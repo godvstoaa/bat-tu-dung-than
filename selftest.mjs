@@ -561,6 +561,23 @@ assert(ltM.decades.some((d) => d.themeName.includes('Vợ')), 'nam: có theme "V
 assert(!lt1.decades.some((d) => d.themeName.includes('Vợ')), 'nữ: không có theme "Vợ"');
 console.log(`   quỹ tích nữ Ất: ${lt1.decades.length} cung · đỉnh ${lt1.turningPoints.find((t) => t.kind === 'golden')?.ages || '-'} · dè ${lt1.turningPoints.find((t) => t.kind === 'caution')?.ages || '-'}`);
 
+// ################## 13. LƯU NHẬT CẢ NĂM (流日整年) ##################
+import { computeYearDaily, liunianGanZhi } from './src/engine/year-daily.js';
+console.log('\n################## 13. LƯU NHẬT CẢ NĂM ##################');
+assert(liunianGanZhi(2026).ganZhi === '丙午', 'lưu năm 2026 = 丙午');
+assert(liunianGanZhi(2000).ganZhi === '庚辰', 'lưu năm 2000 = 庚辰');
+const yd1 = computeYearDaily(analyze(1995, 8, 12, 9, 30, 'nu'), 2026);
+const yd2 = computeYearDaily(analyze(1995, 8, 12, 9, 30, 'nu'), 2026);
+assert(JSON.stringify(yd1) === JSON.stringify(yd2), 'computeYearDaily deterministic');
+assert(yd1.days.length === 365, 'đủ 365 ngày (2026)');
+assert(yd1.best.length === 12 && yd1.worst.length === 12, 'top 12 Cát + 12 Kỵ');
+assert(['total', 'cat', 'binh', 'hoiky', 'ky'].every((k) => typeof yd1.stats[k] === 'number'), 'stats đủ 5 trường');
+assert(yd1.stats.total === yd1.stats.cat + yd1.stats.binh + yd1.stats.hoiky + yd1.stats.ky, 'stats: tổng = Cát+Bình+Hơi kỵ+Kỵ');
+assert(yd1.monthSummary.length === 12, 'đủ 12 tháng');
+assert(yd1.days.every((d) => typeof d.score === 'number' && d.score >= 5 && d.score <= 95), 'mỗi ngày có score 5–95');
+assert(computeYearDaily(analyze(1995, 8, 12, 9, 30, 'nu'), 2080).days.length === 366, 'năm 2080 nhuận (ngoài đại vận) vẫn chạy 366 ngày');
+console.log(`   2026: ${yd1.stats.total} ngày · Cát ${yd1.stats.cat} · Kỵ ${yd1.stats.ky} · đỉnh ${yd1.best[0].date}=${yd1.best[0].score} · đại vận ${yd1.dayun ? yd1.dayun.ganZhi : '(null)'}`);
+
 console.log('\n=========================================');
 console.log(FAILS === 0 ? `🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (${FAILS} fail)` : `⚠ CÓ ${FAILS} KIỂM CHỨNG THẤT BẠI`);
 console.log('=========================================');

@@ -30,6 +30,7 @@ import { analyzeFamily } from './engine/family.js';
 import { radialData, matrixData, radarData } from './engine/family-diagram.js';
 import { rectifyHour } from './engine/family-rectify.js';
 import { buildLifeTrajectory } from './engine/life-trajectory.js';
+import { computeYearDaily } from './engine/year-daily.js';
 import { analyzeChangsheng } from './engine/changsheng-deep.js';
 import { gaimenhPlan } from './engine/gaimenh.js';
 import { SHENSHA_INFO } from './engine/shensha.js';
@@ -55,6 +56,10 @@ function godVi(g) { return TEN_GOD_VI[g] || g; }
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
 ));
+// State + ánh xạ rating cho "Lưu Nhật cả năm" (khai báo sớm tránh TDZ khi run() gọi lúc load).
+let currentYearDaily = null;
+const YD_RATE_CLS = { 'Cát': 'rate-cat', 'Bình': 'rate-mid', 'Hơi kỵ': 'rate-bad', 'Kỵ': 'rate-hung' };
+const YD_CHIP_CLS = { 'Cát': 'cat', 'Bình': 'binh', 'Hơi kỵ': 'hky', 'Kỵ': 'ky' };
 
 // ---------------------------------------------------------------- TỨ TRỤ
 function renderPillars(chart) {
@@ -488,6 +493,7 @@ function run() {
   const curYear = new Date().getFullYear();
   $('ly-year').value = curYear;
   renderLyear(curYear);
+  try { $('yd-year').value = curYear; renderYearDaily(currentResult, curYear); } catch (e) { console.warn('yd', e.message); }
   $('lm-year').value = curYear;
   renderLiuyue(curYear);
   const today = new Date();
@@ -1096,6 +1102,79 @@ function renderLifeTrajectory(R) {
 
   $('life-rectify-note').textContent = L.rectifyNote;
 }
+
+// ============================================================
+// LƯU NHẬT CẢ NĂM (流日整年) — render + wiring
+// ============================================================
+function renderYearDaily(R, year) {
+  if (!R) return;
+  const Y = computeYearDaily(R, year);
+  currentYearDaily = Y;
+
+  const ctxLine = `Năm <b>${Y.year}</b> · Lưu năm <span class="zh">${Y.liunian.ganZhi}</span> · `
+    + (Y.dayun ? `Đại vận hành <span class="zh">${Y.dayun.ganZhi}</span> [${Y.dayun.startAge}–${Y.dayun.startAge + 9}t, ${Y.dayun.rating}]` : '(ngoài phạm vi đại vận đã tính)');
+  $('yd-context').innerHTML = `<div class="yd-context">${ctxLine}</div>`;
+
+  const s = Y.stats;
+  const statsHtml = `<div class="yd-stats">`
+    + `<span class="yd-stat"><b>${s.total}</b> ngày</span>`
+    + `<span class="yd-stat ln-rate rate-cat">Cát <b>${s.cat}</b></span>`
+    + `<span class="yd-stat ln-rate rate-mid">Bình <b>${s.binh}</b></span>`
+    + `<span class="yd-stat ln-rate rate-bad">Hơi kỵ <b>${s.hoiky}</b></span>`
+    + `<span class="yd-stat ln-rate rate-hung">Kỵ <b>${s.ky}</b></span>`
+    + `</div>`;
+  $('yd-stats').innerHTML = statsHtml;
+
+  const bestHtml = Y.best.map((d) => `<div class="yd-bw cat" data-date="${d.date}"><b>${esc(d.date)}</b> <span class="zh">${esc(d.ganZhi)}</span> <span class="ln-rate rate-cat">${d.score}</span></div>`).join('');
+  const worstHtml = Y.worst.map((d) => `<div class="yd-bw bad" data-date="${d.date}"><b>${esc(d.date)}</b> <span class="zh">${esc(d.ganZhi)}</span> <span class="ln-rate rate-hung">${d.score}</span></div>`).join('');
+  const bwHtml = `<div class="yd-bw-col"><div class="yd-bw-h">🏆 ${Y.best.length} ngày Cát nhất (nên làm việc lớn)</div>${bestHtml}</div>`
+    + `<div class="yd-bw-col"><div class="yd-bw-h">⚠ ${Y.worst.length} ngày Kỵ nhất (giữ mình)</div>${worstHtml}</div>`;
+  $('yd-bestworst').innerHTML = bwHtml;
+
+  const monthsHtml = Y.monthSummary.map((ms) => {
+    const daysInMonth = Y.days.filter((d) => d.month === ms.month);
+    const chips = daysInMonth.map((d) => {
+      const cls = YD_CHIP_CLS[d.rating] || 'binh';
+      return `<button class="yd-chip ${cls}" data-date="${d.date}" title="${esc(d.ganZhi)} · ${d.rating} (${d.score})">${d.day}<span class="yd-gz zh">${esc(d.ganZhi)}</span></button>`;
+    }).join('');
+    const mcls = ms.avg >= 55 ? 'rate-cat' : ms.avg >= 45 ? 'rate-mid' : 'rate-hung';
+    return `<div class="yd-month"><div class="yd-month-h">Tháng ${ms.month} <span class="ln-rate ${mcls}">TB ${ms.avg}</span> <span class="hint-inline">Cát ${ms.catCount} · Kỵ ${ms.kyCount}</span></div><div class="yd-chips">${chips}</div></div>`;
+  }).join('');
+  $('yd-months').innerHTML = monthsHtml;
+
+  $('yd-day-detail').innerHTML = '<p class="hint">Bấm vào 1 ngày bất kỳ ở lịch trên để xem luận chi tiết.</p>';
+}
+
+function renderYearDayDetail(date) {
+  if (!currentYearDaily) return;
+  const d = currentYearDaily.days.find((x) => x.date === date);
+  if (!d) return;
+  const rcls = YD_RATE_CLS[d.rating] || 'rate-mid';
+  const ctxHtml = d.ctx.length
+    ? `<div class="yd-ctx">${d.ctx.map((c) => `<span class="yd-ctx-item">${esc(c)}</span>`).join('')}</div>`
+    : '<p class="hint">(lưu nhật không hợp/xung lưu năm & đại vận — vận thuần theo nền mệnh + Thập thần ngày)</p>';
+  const html = `<div class="yd-day">`
+    + `<div class="yd-day-h"><b>${esc(d.date)}</b> <span class="zh big">${esc(d.ganZhi)}</span> can <b>${esc(d.ganGod)}</b> <span class="ln-rate ${rcls}">${esc(d.rating)} (${d.score}/100)</span></div>`
+    + `<p class="yd-day-note">${esc(d.baseNote)}</p>`
+    + `<div class="yd-ctx-h">Tương tác lưu năm / đại vận (引动):</div>${ctxHtml}`
+    + `</div>`;
+  $('yd-day-detail').innerHTML = html;
+}
+
+// wiring năm
+$('yd-btn').addEventListener('click', () => {
+  if (!currentResult) { $('yd-context').textContent = 'Nhập ngày sinh người trung tâm rồi luận giải trước.'; return; }
+  const yr = parseInt($('yd-year').value, 10) || new Date().getFullYear();
+  renderYearDaily(currentResult, yr);
+});
+$('yd-months').addEventListener('click', (e) => {
+  const t = e.target.closest('.yd-chip'); if (!t) return;
+  renderYearDayDetail(t.dataset.date);
+});
+$('yd-bestworst').addEventListener('click', (e) => {
+  const t = e.target.closest('.yd-bw'); if (!t) return;
+  renderYearDayDetail(t.dataset.date);
+});
 
 // ============================================================
 // ANIMATION LAYER (taste-skill) — cô lập, KHÔNG sửa logic có sẵn.

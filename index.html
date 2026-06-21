@@ -68,6 +68,7 @@
         <a href="#verdict">Dụng Thần</a>
         <a href="#synthesis">Tổng luận</a>
         <a href="#life-section" class="toc-new">🛤️ Quỹ tích đời <span class="toc-badge">MỚI</span></a>
+        <a href="#year-daily-section" class="toc-new">📅 Lưu nhật cả năm <span class="toc-badge">MỚI</span></a>
         <a href="#liuqin">Lục Thân</a>
         <a href="#family-section" class="toc-new">👪 Nghiệm chứng gia tộc <span class="toc-badge">MỚI</span></a>
         <a href="#dayun">Đại Vận</a>
@@ -106,6 +107,24 @@
         <h3 class="life-sub">🧭 4 giai đoạn đời <span class="zh">四柱限运</span></h3>
         <div id="life-stages"></div>
         <p class="hint" id="life-rectify-note"></p>
+      </section>
+
+      <!-- LƯU NHẬT CẢ NĂM (bất kỳ năm nào) -->
+      <section class="card" id="year-daily-section">
+        <h2 class="card-title">📅 Lưu nhật cả năm <span class="zh">流日整年 · bất kỳ năm nào</span></h2>
+        <p class="hint">Luận TỪNG NGÀY của BẤT KỲ năm nào (quá khứ/tương lai) theo <b>流日论断</b> — lưu nhật tương tác lưu năm + đại vận + mệnh cục. Nền phải là lá số đã nghiệm chứng/hiệu chỉnh (đặc biệt trụ Giờ) để chuẩn — xem "Nghiệm chứng gia tộc" trước.</p>
+        <div class="tool-row">
+          <label>Năm<input type="number" id="yd-year" value="2026" min="1900" max="2100" /></label>
+          <button class="btn-ghost" id="yd-btn">Xem lưu nhật cả năm</button>
+        </div>
+        <div id="yd-context"></div>
+        <div id="yd-stats"></div>
+        <h3 class="life-sub">🏆 Top ngày Cát (nên làm việc lớn) / ⚠ Top ngày Kỵ (giữ mình)</h3>
+        <div id="yd-bestworst"></div>
+        <h3 class="life-sub">🗓 Từng ngày 12 tháng (bấm 1 ngày xem chi tiết)</h3>
+        <div id="yd-months"></div>
+        <h3 class="life-sub">🔎 Chi tiết ngày</h3>
+        <div id="yd-day-detail"><p class="hint">Bấm vào 1 ngày bất kỳ ở lịch trên để xem luận chi tiết (các phái + tương tác lưu năm/đại vận).</p></div>
       </section>
 
       <!-- 韋千里 BÁT BỘ PHÁN ĐOÁN -->
