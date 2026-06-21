@@ -25,6 +25,7 @@ import { analyzePillarAges } from './engine/pillar-age.js';
 import { spaceFs } from './engine/space-fs.js';
 import { dailyGuidance } from './engine/daily.js';
 import { findIdealPartners, idealChildTiming, idealChildDates } from './engine/ideal-match.js';
+import { analyzeMarriageDeep } from './engine/marriage-deep.js';
 import { buildFullProfile } from './engine/partner-profile.js';
 import { analyzeFamily } from './engine/family.js';
 import { radialData, matrixData, radarData } from './engine/family-diagram.js';
@@ -42,7 +43,7 @@ import { taiYuan } from './engine/taiyuan.js';
 import { xiuDay } from './engine/ershibaxiu.js';
 import { interpretZiweiStars } from './engine/ziwei-stars.js';
 import { computeAuxStars } from './engine/ziwei-aux.js';
-import { computeMarriageShensha } from './engine/shensha-marriage.js';
+import { computeMarriageShensha, computeExtraShensha } from './engine/shensha-marriage.js';
 import { viToHan } from './engine/vi2han.js';
 import { askAI, getConfig, setConfig, isAIReady, PRESETS } from './engine/ai.js';
 
@@ -488,6 +489,8 @@ function run() {
   renderInteractions(currentResult);
   renderShensha(currentResult);
   renderShenshaExtra(currentResult);
+  try{renderExtraShensha();
+  try{renderMarriageDeep();}catch(e){}}catch(e){}
   renderDaYun(currentResult.dayun);
   renderLiuNian(currentResult.liunian);
   const curYear = new Date().getFullYear();
@@ -901,6 +904,18 @@ $('ai-settings-btn').addEventListener('click', openModal);
 $('cfg-cancel').addEventListener('click', closeModal);
 $('cfg-save').addEventListener('click', saveModal);
 $('ai-modal').addEventListener('click', (e) => { if (e.target.id === 'ai-modal') closeModal(); });
+// AI popup (chat widget nổi): mở/đóng
+$('ai-fab').addEventListener('click', () => {
+  $('ai-popup').classList.remove('hidden');
+  $('ai-fab').classList.add('hidden');
+  setTimeout(() => { const q = $('question'); if (q) q.focus(); }, 50);
+  const cl = $('chat-log');
+  if (cl && !cl.childElementCount) appendMsg('assistant', 'Xin chào! Tôi là trợ lý Bát Tự AI. Bạn đã lập lá số — hãy hỏi tôi bất cứ điều gì về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà… (Bấm ⚙ để bật AI thật; chưa bật thì tôi dùng bộ luân giải cục bộ.)');
+});
+$('ai-popup-close').addEventListener('click', () => {
+  $('ai-popup').classList.add('hidden');
+  $('ai-fab').classList.remove('hidden');
+});
 
 $('calendar-note').textContent =
   'Lưu ý: trụ Tháng tính theo Tiết khí (24 tiết), trụ Giờ theo giờ Tý–Hợi. Giờ sinh càng chính xác, luận giải càng chuẩn.';
@@ -1447,4 +1462,28 @@ function renderZiweiFull() {
   const msHtml = ms.length ? ms.map(s => '<span class="zw-aux sha">' + s.star + ' (' + s.vi + ') @' + s.positions + '</span>').join(' ') : '(không)';
   const el = document.getElementById('ziwei-stars-out');
   if (el) el.innerHTML = '<div class="zw-stars-list">' + starsHtml + '</div><h4>六吉六煞</h4><div class="zw-aux-list">' + auxHtml + '</div><h4>神煞 hôn nhân</h4><div class="zw-aux-list">' + msHtml + '</div>';
+}
+
+function renderExtraShensha(){
+  if(!currentResult) return;
+  try{
+    const es = computeExtraShensha(currentResult.chart);
+    if(!es.length) return;
+    const html = es.map(function(s) {
+      return '<div class="ss volatile"><div class="ss-zh">' + s.star + '</div><div class="ss-vi">' + s.vi + ' @' + s.at + '</div><div class="ss-desc">' + s.desc + '</div></div>';
+    }).join('');
+    const el = document.getElementById('shensha-extra-out');
+    if (el) el.innerHTML = '<div class="shensha" style="margin-top:8px">' + html + '</div>';
+  } catch(e) { console.warn('extraShensha', e.message); }
+}
+function renderMarriageDeep(){
+  if(!currentResult) return;
+  try{
+    const md = analyzeMarriageDeep(currentResult);
+    const cls = md.score >= 65 ? 'rate-cat' : md.score >= 45 ? 'rate-mid' : 'rate-hung';
+    var html = '<div class="md-head">Hôn nhân: <b>' + md.score + '/100</b> <span class="ln-rate ' + cls + '">' + md.summary + '</span></div>';
+    html += '<div class="md-body">' + md.paragraphs.map(function(p){ return '<p>' + p + '</p>'; }).join('') + '</div>';
+    var el = document.getElementById('marriage-out');
+    if(el) el.innerHTML = html;
+  }catch(e){console.warn('marriageDeep',e.message);}
 }

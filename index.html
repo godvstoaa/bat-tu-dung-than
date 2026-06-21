@@ -62,21 +62,7 @@
     </section>
 
     <div id="result" class="result hidden">
-      <nav class="toc" aria-label="Mục lục nhanh">
-        <span class="toc-label">Đi nhanh:</span>
-        <a href="#pillars">Tứ Trụ</a>
-        <a href="#verdict">Dụng Thần</a>
-        <a href="#synthesis">Tổng luận</a>
-        <a href="#life-section" class="toc-new">🛤️ Quỹ tích đời <span class="toc-badge">MỚI</span></a>
-        <a href="#year-daily-section" class="toc-new">📅 Lưu nhật cả năm <span class="toc-badge">MỚI</span></a>
-        <a href="#liuqin">Lục Thân</a>
-        <a href="#family-section" class="toc-new">👪 Nghiệm chứng gia tộc <span class="toc-badge">MỚI</span></a>
-        <a href="#dayun">Đại Vận</a>
-        <a href="#liunian">Lưu Niên</a>
-        <a href="#wuxing">Ngũ Hành</a>
-        <a href="#interactions">Hội Hợp Xung</a>
-        <a href="#shensha">Thần Sát</a>
-      </nav>
+      
       <!-- TỨ TRỤ -->
       <section class="card">
         <h2 class="card-title">Tứ Trụ <span class="zh">四柱</span></h2>
@@ -84,11 +70,7 @@
         <div class="pillars" id="pillars"></div>
       </section>
 
-      <!-- KẾT LUẬN DỤNG THẦN -->
-      <section class="card verdict-card">
-        <h2 class="card-title">Cách Cục · Vượng suy · Dụng Thần <span class="zh">格局 · 用喜忌仇</span></h2>
-        <div class="verdict" id="verdict"></div>
-      </section>
+      
 
       <!-- TỔNG LUẬN MỆNH -->
       <section class="card synthesis-card">
@@ -96,18 +78,173 @@
         <div id="synthesis"></div>
       </section>
 
-      <!-- QUỸ TÍCH CUỘC ĐỜI (一生运程) -->
-      <section class="card" id="life-section">
-        <h2 class="card-title">🛤️ Quỹ tích cuộc đời <span class="zh">一生运程 · 人生轨迹</span></h2>
-        <div id="life-summary"></div>
-        <h3 class="life-sub">🔑 Các cửa sổ cuộc đời (thời vận Cát)</h3>
-        <div id="life-windows"></div>
-        <h3 class="life-sub">⏳ Dòng đời theo Đại Vận — mỗi cung 10 năm</h3>
-        <div id="life-decades"></div>
-        <h3 class="life-sub">🧭 4 giai đoạn đời <span class="zh">四柱限运</span></h3>
-        <div id="life-stages"></div>
-        <p class="hint" id="life-rectify-note"></p>
+      
+
+      <!-- LỤC THÂN -->
+      <section class="card">
+        <h2 class="card-title">Lục Thân <span class="zh">六亲 · 宫位/星曜</span></h2>
+        <div class="liuqin" id="liuqin"></div>
       </section>
+
+      
+
+      <!-- HỘI – HỢP – XUNG – HÌNH – HẠI -->
+      <section class="card">
+        <h2 class="card-title">Hội – Hợp – Xung – Hình – Hại <span class="zh">刑沖會合</span></h2>
+        <div class="interactions" id="interactions"></div>
+      </section>
+
+      
+
+      <!-- THẦN SÁT -->
+      <section class="card">
+        <h2 class="card-title">Thần Sát <span class="zh">神煞</span></h2>
+        <div class="shensha" id="shensha"></div><div id="shensha-extra-out"></div></section><section class="card"><h2 class="card-title">Hôn Nhân Sâu <span class="zh">婚姻深度</span></h2><div id="marriage-out"></div>
+      </section>
+
+      
+
+      <!-- 韋千里 BÁT BỘ PHÁN ĐOÁN -->
+      <section class="card qianli-card">
+        <h2 class="card-title">韋千里 八步评断 <span class="zh">千里命稿 · 评断篇</span></h2>
+        <div id="qianli"></div>
+      </section>
+
+      
+
+      <!-- BẢN MỆNH KINH ĐIỂN -->
+      <section class="card classic-card">
+        <h2 class="card-title">Bản mệnh kinh điển <span class="zh">滴天髓 · 窮通寶鑑</span></h2>
+        <div id="classic"></div>
+      </section>
+
+      
+
+      <!-- 盲派 (lens bí truyền) -->
+      <section class="card mp-card">
+        <h2 class="card-title">盲派命理 <span class="zh">做功 · 财官 · 宾主</span></h2>
+        <div id="mangpai"></div>
+      </section>
+
+      
+
+      <!-- TỬ VI ĐẨU SỐ (khung mệnh bàn) -->
+      <section class="card ziwei-card">
+        <h2 class="card-title">Tử Vi Đẩu Số <span class="zh">紫微斗数 · 命盘</span></h2>
+        <div id="ziwei"></div><div id="ziwei-stars-out"></div>
+      </section>
+
+      
+
+      <!-- 梅花易数 (gieo quẻ theo thời/số) -->
+      <section class="card mh-card">
+        <h2 class="card-title">Mai Hoa Dịch Số <span class="zh">梅花易数 · 体用生克</span></h2>
+        <div class="lyear-row">
+          <label>Ngày hỏi<input type="date" id="mh-date" /></label>
+          <label>Giờ<input type="time" id="mh-time" value="12:00" /></label>
+          <button class="btn-ghost" id="mh-time-btn">Gieo theo giờ</button>
+          <span class="hint-inline">hoặc</span>
+          <label>2 số<input type="text" id="mh-nums" placeholder="vd: 3,8" /></label>
+          <button class="btn-ghost" id="mh-num-btn">Gieo theo số</button>
+        </div>
+        <div id="meihua"></div>
+      </section>
+
+      
+
+      <!-- 六爻 (gieo 6 hào, hỏi cụ thể) -->
+      <section class="card ly-card">
+        <h2 class="card-title">Lục Diệu <span class="zh">六爻 · 纳甲六亲用神</span></h2>
+        <div class="lyear-row">
+          <label>6 lần gieo (6/7/8/9)<input type="text" id="ly-vals" placeholder="vd: 7,7,8,9,7,8" /></label>
+          <label>Câu hỏi về
+            <select id="ly-cat">
+              <option value="wealth">Tài lộc</option>
+              <option value="career">Công danh</option>
+              <option value="love">Tình duyên</option>
+              <option value="health">Sức khỏe/bệnh</option>
+              <option value="parents">Cha mẹ/nhà</option>
+              <option value="children">Con cái</option>
+              <option value="siblings">Anh em/hợp tác</option>
+              <option value="general">Chung (thế)</option>
+            </select>
+          </label>
+          <label>Ngày gieo<input type="date" id="ly-date" /></label>
+          <button class="btn-ghost" id="ly-btn">Gieo & luận quẻ</button>
+        </div>
+        <p class="hint">Gieo 3 đồng xu mỗi lần → tổng: 6=lão âm(động) · 7=thiểu dương · 8=thiểu âm · 9=lão dương(động). Nhập 6 lần (dưới lên trên).</p>
+        <div id="liuyao"></div>
+      </section>
+
+      
+
+      <!-- 奇门遁甲 -->
+      <section class="card qm-card">
+        <h2 class="card-title">Kỳ Môn Độn Giáp <span class="zh">奇门遁甲 · 局盘吉格</span></h2>
+        <div class="lyear-row">
+          <label>Ngày giờ hỏi<input type="datetime-local" id="qm-dt" /></label>
+          <button class="btn-ghost" id="qm-btn">Xếp kỳ môn</button>
+          <span class="hint-inline">(定局 theo节气 + 地盘三奇六仪 + 九星八门 + 找吉格)</span>
+        </div>
+        <div id="qimen"></div>
+      </section>
+
+      
+
+      <!-- 大六壬 -->
+      <section class="card lr-card">
+        <h2 class="card-title">Đại Lục Nhâm <span class="zh">大六壬 · 三式</span></h2>
+        <div class="lyear-row">
+          <label>Ngày giờ hỏi<input type="datetime-local" id="ln-dt" /></label>
+          <button class="btn-ghost" id="ln-btn">Xếp lục nhâm</button>
+          <span class="hint-inline">(月将加时 → 天地盘/四课/三传/十二天将)</span>
+        </div>
+        <div id="liuren"></div>
+      </section>
+
+      
+
+      <!-- ĐẠI VẬN -->
+      <section class="card">
+        <h2 class="card-title">Đại Vận <span class="zh">大運</span></h2>
+        <div class="dayun" id="dayun"></div>
+      </section>
+
+      
+
+      <!-- LƯU NIÊN -->
+      <section class="card">
+        <h2 class="card-title">Lưu Niên <span class="zh">流年</span> <span class="hint-inline" id="liunian-note"></span></h2>
+        <div class="liunian" id="liunian"></div>
+      </section>
+
+      
+
+      <!-- LUẬN VẬN NĂM ĐA TRƯỜNG PHÁI -->
+      <section class="card lyear-card">
+        <h2 class="card-title">Luận vận năm <span class="zh">流年综合论 · 六派合参</span></h2>
+        <div class="lyear-row">
+          <label>Năm <input type="number" id="ly-year" min="1900" max="2099" /></label>
+          <button class="btn-ghost" id="ly-btn">Luận năm này</button>
+          <span class="hint-inline">(6 trường phái: Ngũ hành · Thập thần · Thái tuế · Thần sát · Thiên khắc địa xung · Dụng thần)</span>
+        </div>
+        <div id="lyear"></div>
+      </section>
+
+      
+
+      <!-- LƯU NGUYỆT (vận từng tháng) -->
+      <section class="card">
+        <h2 class="card-title">Lưu Nguyệt — vận từng tháng <span class="zh">流月 · 五虎遁</span></h2>
+        <div class="lyear-row">
+          <label>Năm <input type="number" id="lm-year" min="1900" max="2099" /></label>
+          <button class="btn-ghost" id="lm-btn">Xem 12 tháng</button>
+          <span class="hint-inline">(五虎遁起月 + 流月十神入命 + 合冲 + Dụng神)</span>
+        </div>
+        <div id="liuyue"></div>
+      </section>
+
+      
 
       <!-- LƯU NHẬT CẢ NĂM (bất kỳ năm nào) -->
       <section class="card" id="year-daily-section">
@@ -127,52 +264,20 @@
         <div id="yd-day-detail"><p class="hint">Bấm vào 1 ngày bất kỳ ở lịch trên để xem luận chi tiết (các phái + tương tác lưu năm/đại vận).</p></div>
       </section>
 
-      <!-- 韋千里 BÁT BỘ PHÁN ĐOÁN -->
-      <section class="card qianli-card">
-        <h2 class="card-title">韋千里 八步评断 <span class="zh">千里命稿 · 评断篇</span></h2>
-        <div id="qianli"></div>
-      </section>
+      
 
-      <!-- BẢN MỆNH KINH ĐIỂN -->
-      <section class="card classic-card">
-        <h2 class="card-title">Bản mệnh kinh điển <span class="zh">滴天髓 · 窮通寶鑑</span></h2>
-        <div id="classic"></div>
-      </section>
-
-      <!-- TỬ VI ĐẨU SỐ (khung mệnh bàn) -->
-      <section class="card ziwei-card">
-        <h2 class="card-title">Tử Vi Đẩu Số <span class="zh">紫微斗数 · 命盘</span></h2>
-        <div id="ziwei"></div><div id="ziwei-stars-out"></div>
-      </section>
-
-      <!-- LỤC THÂN -->
-      <section class="card">
-        <h2 class="card-title">Lục Thân <span class="zh">六亲 · 宫位/星曜</span></h2>
-        <div class="liuqin" id="liuqin"></div>
-      </section>
-
-      <!-- ============ NGHIỆM CHỨNG GIA TỘC ============ -->
-      <section class="card" id="family-section">
-        <h2 class="card-title">👪 Nghiệm chứng gia tộc <span class="zh">家族八字交叉验证</span></h2>
-        <p class="hint">Người trung tâm = lá số form sinh chính (vd: em gái). Thêm người thân (bố/mẹ/anh chị/chồng/con) để chấm độ nhất quán <b>6 trục cổ pháp</b> + sơ đồ chòm sao / ma trận / radar + sổ cái xác–nghiệm. Ai đánh "giờ chưa rõ" sẽ được <b>hiệu chỉnh giờ sinh</b> (校正时辰)。</p>
-        <div id="family-members"></div>
-        <div class="tool-row">
-          <button class="btn-ghost" id="fam-add">+ Thêm người thân</button>
-          <button class="btn-ghost" id="family-btn">🔬 Nghiệm chứng</button>
+      <!-- THÁI TUẾ -->
+      <section class="card ts-card">
+        <h2 class="card-title">Thái Tuế <span class="zh">太岁 · 犯太岁 & 化解</span></h2>
+        <div class="lyear-row">
+          <label>Năm <input type="number" id="ts-year" min="1900" max="2099" /></label>
+          <button class="btn-ghost" id="ts-btn">Xem thái tuế năm này</button>
+          <span class="hint-inline">(值/冲/刑/破/害 — + hoá giải cho tuổi bạn)</span>
         </div>
-        <div class="tool-out" id="family-score"></div>
-        <div class="tool-out" id="family-constellation"></div>
-        <details><summary>Sổ cái xác / nghiệm (chi tiết từng trục)</summary><div id="family-ledger"></div></details>
-        <details><summary>Ma trận cặp + Radar 6 trục</summary><div id="family-matrix"></div><div id="family-radar"></div></details>
-        <div id="family-rectify"></div>
+        <div id="taisui"></div>
       </section>
 
-
-      <!-- NGHỊCH THIÊN CẢI MỆNH -->
-      <section class="card remedy-card">
-        <h2 class="card-title">Nghịch Thiên Cải Mệnh <span class="zh">逆天改命 · 改运十二法</span></h2>
-        <div id="remedy"></div>
-      </section>
+      
 
       <!-- CÔNG CỤ PHONG THỦY -->
       <section class="card tools-card">
@@ -239,93 +344,18 @@
 
       
 
+      <!-- 玄空飞星 (phong thủy không gian kiểu đại sư HK) -->
+      <section class="card xk-card">
+        <h2 class="card-title">玄空飞星 <span class="zh">三元九运 · 运盘</span></h2>
+        <div class="lyear-row">
+          <label>Năm <input type="number" id="xk-year" min="1900" max="2099" /></label>
+          <button class="btn-ghost" id="xk-btn">Xem vận bàn</button>
+          <span class="hint-inline">(phương pháp giới siêu giàu HK cho nhà/trụ sở)</span>
+        </div>
+        <div id="xuankong"></div>
+      </section>
+
       
-
-      <!-- NGŨ HÀNH -->
-      <section class="card">
-        <h2 class="card-title">Cân bằng Ngũ Hành <span class="zh">五行</span></h2>
-        <div class="wuxing-bars" id="wuxing"></div>
-      </section>
-
-      <!-- HỘI – HỢP – XUNG – HÌNH – HẠI -->
-      <section class="card">
-        <h2 class="card-title">Hội – Hợp – Xung – Hình – Hại <span class="zh">刑沖會合</span></h2>
-        <div class="interactions" id="interactions"></div>
-      </section>
-
-      <!-- THẦN SÁT -->
-      <section class="card">
-        <h2 class="card-title">Thần Sát <span class="zh">神煞</span></h2>
-        <div class="shensha" id="shensha"></div>
-      </section>
-
-      <!-- ĐẠI VẬN -->
-      <section class="card">
-        <h2 class="card-title">Đại Vận <span class="zh">大運</span></h2>
-        <div class="dayun" id="dayun"></div>
-      </section>
-
-      <!-- LƯU NIÊN -->
-      <section class="card">
-        <h2 class="card-title">Lưu Niên <span class="zh">流年</span> <span class="hint-inline" id="liunian-note"></span></h2>
-        <div class="liunian" id="liunian"></div>
-      </section>
-
-      <!-- LUẬN VẬN NĂM ĐA TRƯỜNG PHÁI -->
-      <section class="card lyear-card">
-        <h2 class="card-title">Luận vận năm <span class="zh">流年综合论 · 六派合参</span></h2>
-        <div class="lyear-row">
-          <label>Năm <input type="number" id="ly-year" min="1900" max="2099" /></label>
-          <button class="btn-ghost" id="ly-btn">Luận năm này</button>
-          <span class="hint-inline">(6 trường phái: Ngũ hành · Thập thần · Thái tuế · Thần sát · Thiên khắc địa xung · Dụng thần)</span>
-        </div>
-        <div id="lyear"></div>
-      </section>
-
-      <!-- LƯU NGUYỆT (vận từng tháng) -->
-      <section class="card">
-        <h2 class="card-title">Lưu Nguyệt — vận từng tháng <span class="zh">流月 · 五虎遁</span></h2>
-        <div class="lyear-row">
-          <label>Năm <input type="number" id="lm-year" min="1900" max="2099" /></label>
-          <button class="btn-ghost" id="lm-btn">Xem 12 tháng</button>
-          <span class="hint-inline">(五虎遁起月 + 流月十神入命 + 合冲 + Dụng神)</span>
-        </div>
-        <div id="liuyue"></div>
-      </section>
-
-      <!-- LƯU NHẬT (vận từng ngày) -->
-      <section class="card">
-        <h2 class="card-title">Lưu Nhật — vận từng ngày <span class="zh">流日 · "hôm nay sao?"</span></h2>
-        <div class="lyear-row">
-          <label>Ngày <input type="date" id="lr-date" /></label>
-          <button class="btn-ghost" id="lr-btn">Xem vận ngày</button>
-          <button class="btn-ghost" id="lr-find">Tìm ngày tốt (14 ngày)</button>
-          <span class="hint-inline">(vận CÁ NHÂN mỗi ngày: Thập thần + Dụng + đào hoa/dương nhận + xung)</span>
-        </div>
-        <div id="liuri"></div>
-      </section>
-
-      <!-- THÁI TUẾ -->
-      <section class="card ts-card">
-        <h2 class="card-title">Thái Tuế <span class="zh">太岁 · 犯太岁 & 化解</span></h2>
-        <div class="lyear-row">
-          <label>Năm <input type="number" id="ts-year" min="1900" max="2099" /></label>
-          <button class="btn-ghost" id="ts-btn">Xem thái tuế năm này</button>
-          <span class="hint-inline">(值/冲/刑/破/害 — + hoá giải cho tuổi bạn)</span>
-        </div>
-        <div id="taisui"></div>
-      </section>
-
-      <!-- LƯU NIÊN 12 THẦN (通胜流年神煞) -->
-      <section class="card">
-        <h2 class="card-title">Lưu Niên 12 Thần <span class="zh">流年十二神 · 四利三元</span></h2>
-        <div class="lyear-row">
-          <label>Năm <input type="number" id="lns-year" min="1900" max="2099" /></label>
-          <button class="btn-ghost" id="lns-btn">Xem 12 thần năm này</button>
-          <span class="hint-inline">(李淳风四利三元: 太岁/太阳/丧门/太阴/官符/死符/岁破/龙德/白虎/福德/吊客/病符)</span>
-        </div>
-        <div id="lns"></div>
-      </section>
 
       <!-- HỌC TÊN 姓名学 -->
       <section class="card name-card">
@@ -339,88 +369,42 @@
         <div id="nameout"></div>
       </section>
 
-      <!-- 盲派 (lens bí truyền) -->
-      <section class="card mp-card">
-        <h2 class="card-title">盲派命理 <span class="zh">做功 · 财官 · 宾主</span></h2>
-        <div id="mangpai"></div>
+      
+
+
+      <!-- NGHỊCH THIÊN CẢI MỆNH -->
+      <section class="card remedy-card">
+        <h2 class="card-title">Nghịch Thiên Cải Mệnh <span class="zh">逆天改命 · 改运十二法</span></h2>
+        <div id="remedy"></div>
       </section>
 
-      <!-- 玄空飞星 (phong thủy không gian kiểu đại sư HK) -->
-      <section class="card xk-card">
-        <h2 class="card-title">玄空飞星 <span class="zh">三元九运 · 运盘</span></h2>
-        <div class="lyear-row">
-          <label>Năm <input type="number" id="xk-year" min="1900" max="2099" /></label>
-          <button class="btn-ghost" id="xk-btn">Xem vận bàn</button>
-          <span class="hint-inline">(phương pháp giới siêu giàu HK cho nhà/trụ sở)</span>
-        </div>
-        <div id="xuankong"></div>
-      </section>
-
-      <!-- 梅花易数 (gieo quẻ theo thời/số) -->
-      <section class="card mh-card">
-        <h2 class="card-title">Mai Hoa Dịch Số <span class="zh">梅花易数 · 体用生克</span></h2>
-        <div class="lyear-row">
-          <label>Ngày hỏi<input type="date" id="mh-date" /></label>
-          <label>Giờ<input type="time" id="mh-time" value="12:00" /></label>
-          <button class="btn-ghost" id="mh-time-btn">Gieo theo giờ</button>
-          <span class="hint-inline">hoặc</span>
-          <label>2 số<input type="text" id="mh-nums" placeholder="vd: 3,8" /></label>
-          <button class="btn-ghost" id="mh-num-btn">Gieo theo số</button>
-        </div>
-        <div id="meihua"></div>
-      </section>
-
-      <!-- 六爻 (gieo 6 hào, hỏi cụ thể) -->
-      <section class="card ly-card">
-        <h2 class="card-title">Lục Diệu <span class="zh">六爻 · 纳甲六亲用神</span></h2>
-        <div class="lyear-row">
-          <label>6 lần gieo (6/7/8/9)<input type="text" id="ly-vals" placeholder="vd: 7,7,8,9,7,8" /></label>
-          <label>Câu hỏi về
-            <select id="ly-cat">
-              <option value="wealth">Tài lộc</option>
-              <option value="career">Công danh</option>
-              <option value="love">Tình duyên</option>
-              <option value="health">Sức khỏe/bệnh</option>
-              <option value="parents">Cha mẹ/nhà</option>
-              <option value="children">Con cái</option>
-              <option value="siblings">Anh em/hợp tác</option>
-              <option value="general">Chung (thế)</option>
-            </select>
-          </label>
-          <label>Ngày gieo<input type="date" id="ly-date" /></label>
-          <button class="btn-ghost" id="ly-btn">Gieo & luận quẻ</button>
-        </div>
-        <p class="hint">Gieo 3 đồng xu mỗi lần → tổng: 6=lão âm(động) · 7=thiểu dương · 8=thiểu âm · 9=lão dương(động). Nhập 6 lần (dưới lên trên).</p>
-        <div id="liuyao"></div>
-      </section>
-
-      <!-- 奇门遁甲 -->
-      <section class="card qm-card">
-        <h2 class="card-title">Kỳ Môn Độn Giáp <span class="zh">奇门遁甲 · 局盘吉格</span></h2>
-        <div class="lyear-row">
-          <label>Ngày giờ hỏi<input type="datetime-local" id="qm-dt" /></label>
-          <button class="btn-ghost" id="qm-btn">Xếp kỳ môn</button>
-          <span class="hint-inline">(定局 theo节气 + 地盘三奇六仪 + 九星八门 + 找吉格)</span>
-        </div>
-        <div id="qimen"></div>
-      </section>
-
-      <!-- 大六壬 -->
-      <section class="card lr-card">
-        <h2 class="card-title">Đại Lục Nhâm <span class="zh">大六壬 · 三式</span></h2>
-        <div class="lyear-row">
-          <label>Ngày giờ hỏi<input type="datetime-local" id="ln-dt" /></label>
-          <button class="btn-ghost" id="ln-btn">Xếp lục nhâm</button>
-          <span class="hint-inline">(月将加时 → 天地盘/四课/三传/十二天将)</span>
-        </div>
-        <div id="liuren"></div>
-      </section>
+      
 
       <!-- 改命 TỔNG KẾ -->
       <section class="card gm-card">
         <h2 class="card-title">Tổng Kế Cải Mệnh <span class="zh">改命总纲 · 6 tầng</span></h2>
         <div id="gaimenh"></div>
       </section>
+
+      
+
+      <!-- ============ NGHIỆM CHỨNG GIA TỘC ============ -->
+      <section class="card" id="family-section">
+        <h2 class="card-title">👪 Nghiệm chứng gia tộc <span class="zh">家族八字交叉验证</span></h2>
+        <p class="hint">Người trung tâm = lá số form sinh chính (vd: em gái). Thêm người thân (bố/mẹ/anh chị/chồng/con) để chấm độ nhất quán <b>6 trục cổ pháp</b> + sơ đồ chòm sao / ma trận / radar + sổ cái xác–nghiệm. Ai đánh "giờ chưa rõ" sẽ được <b>hiệu chỉnh giờ sinh</b> (校正时辰)。</p>
+        <div id="family-members"></div>
+        <div class="tool-row">
+          <button class="btn-ghost" id="fam-add">+ Thêm người thân</button>
+          <button class="btn-ghost" id="family-btn">🔬 Nghiệm chứng</button>
+        </div>
+        <div class="tool-out" id="family-score"></div>
+        <div class="tool-out" id="family-constellation"></div>
+        <details><summary>Sổ cái xác / nghiệm (chi tiết từng trục)</summary><div id="family-ledger"></div></details>
+        <details><summary>Ma trận cặp + Radar 6 trục</summary><div id="family-matrix"></div><div id="family-radar"></div></details>
+        <div id="family-rectify"></div>
+      </section>
+
+      
 
       <!-- LUẬN GIẢI THEO LĨNH VỰC -->
       <section class="card">
@@ -429,52 +413,91 @@
         <div class="topic-body" id="topic-body"></div>
       </section>
 
-      <!-- TRỢ LÝ AI — hỏi tự do -->
-      <section class="card ai-card">
-        <h2 class="card-title">Trợ lý Bát Tự AI <span class="zh">命理問答</span>
-          <button class="btn-cog" id="ai-settings-btn" title="Cài đặt AI">⚙</button>
-        </h2>
+      
+
+      <!-- TRỢ LÝ AI — popup chat nổi (mở bằng nút 💬 góc phải) -->
+      <button class="ai-fab" id="ai-fab" title="Trợ lý Bát Tự AI" aria-label="Mở trợ lý AI">💬<span class="ai-fab-label">Trợ lý AI</span></button>
+      <div class="ai-popup hidden" id="ai-popup" role="dialog" aria-label="Trợ lý Bát Tự AI">
+        <div class="ai-popup-head">
+          <div class="ai-popup-title">🧭 Trợ lý Bát Tự AI <span class="zh">命理問答</span></div>
+          <div class="ai-popup-actions">
+            <button class="btn-cog" id="ai-settings-btn" title="Cài đặt AI">⚙</button>
+            <button class="ai-popup-close" id="ai-popup-close" title="Đóng" aria-label="Đóng">✕</button>
+          </div>
+        </div>
         <div class="ai-status" id="ai-status"></div>
         <div class="chat-log" id="chat-log"></div>
         <div class="ask">
           <input type="text" id="question" placeholder="Hỏi bất cứ điều gì về lá số: “Năm 2026 có nên đổi việc?”, “Khi nào mua nhà?”, “Tôi hợp nghề gì?”..." />
           <button id="ask-btn" class="btn-ghost">Hỏi</button>
         </div>
-      </section>
-
-      <!-- MODAL CÀI ĐẶT AI -->
-      <div class="modal-mask hidden" id="ai-modal">
-        <div class="modal">
-          <h3>Cài đặt AI (OpenAI-compatible)</h3>
-          <p class="modal-hint">Mặc định: <b>GLM-5.2 qua Z.ai</b>. API key lấy tại <code>z.ai/model-api</code>. Để trống key / tắt → dùng bộ luân giải cục bộ.</p>
-          <label class="field"><span>Nhà cung cấp</span>
-            <select id="cfg-preset"></select>
-          </label>
-          <p class="preset-note" id="cfg-preset-note"></p>
-          <label class="field"><span>Bật AI</span><input type="checkbox" id="cfg-enabled" /></label>
-          <label class="field"><span>Endpoint API</span><input type="text" id="cfg-endpoint" placeholder="https://api.z.ai/api/paas/v4" /></label>
-          <label class="field"><span>API Key</span><input type="password" id="cfg-apikey" placeholder="API key Z.ai của bạn..." /></label>
-          <label class="field"><span>Model</span><input type="text" id="cfg-model" placeholder="glm-5.2" /></label>
-          <div class="modal-actions">
-            <button class="btn-ghost" id="cfg-cancel">Huỷ</button>
-            <button class="btn-primary" id="cfg-save">Lưu</button>
-          </div>
-        </div>
+        <p class="ai-popup-hint">Luận dựa trên lá số đã tính chính xác. AI chỉ diễn giải &amp; kết nối — không tự tính lại Tứ Trụ/Dụng Thần.</p>
       </div>
 
-      <p class="disclaimer">
-        Ứng dụng dựa trên logic Bát quái – Ngũ hành – Thập thần của Tử Bình (子平命理), phương pháp Phù Ức (扶抑)
-        kết hợp Điều Hậu (调候用神 — 窮通寶鑑). Kết quả mang tính tham khảo văn hóa – huyền học, không thay thế quyết định cá nhân.
-      </p>
-    </div>
-  <section class="card dy-card"><h2 class="card-title">Hôm Nay <span class="zh">每日总论</span></h2><div id="daily-out"></div></section>
-  <section class="card"><h2 class="card-title">Phong Thủy Hướng <span class="zh">四系合参</span></h2><div id="space-out"></div></section>
-      <section class="card"><h2 class="card-title">Vận Đời Từng Giai Đoạn <span class="zh">四柱限运</span></h2><div id="pillarage-out"></div></section>
-      <section class="card"><h2 class="card-title">Không Vong <span class="zh">空亡</span></h2><div id="kongwang-out"></div></section>
-  <section class="card"><h2 class="card-title">Trường Sinh — Năng Lượng Từng Trụ <span class="zh">十二长生</span></h2><div id="csdeep-out"></div></section>
-  <section class="card im-card"><h2 class="card-title">Phối Ngẫu Lý Tưởng + Con Cái <span class="zh">理想配偶 · 子女</span></h2><div id="match-out"></div></section>
+      
+
+      <!-- KẾT LUẬN DỤNG THẦN -->
+      <section class="card verdict-card">
+        <h2 class="card-title">Cách Cục · Vượng suy · Dụng Thần <span class="zh">格局 · 用喜忌仇</span></h2>
+        <div class="verdict" id="verdict"></div>
+      </section>
+
+      
+
+      <!-- QUỸ TÍCH CUỘC ĐỜI (一生运程) -->
+      <section class="card" id="life-section">
+        <h2 class="card-title">🛤️ Quỹ tích cuộc đời <span class="zh">一生运程 · 人生轨迹</span></h2>
+        <div id="life-summary"></div>
+        <h3 class="life-sub">🔑 Các cửa sổ cuộc đời (thời vận Cát)</h3>
+        <div id="life-windows"></div>
+        <h3 class="life-sub">⏳ Dòng đời theo Đại Vận — mỗi cung 10 năm</h3>
+        <div id="life-decades"></div>
+        <h3 class="life-sub">🧭 4 giai đoạn đời <span class="zh">四柱限运</span></h3>
+        <div id="life-stages"></div>
+        <p class="hint" id="life-rectify-note"></p>
+      </section>
+
+      
+
+      
+
+      
+
+      <!-- NGŨ HÀNH -->
+      <section class="card">
+        <h2 class="card-title">Cân bằng Ngũ Hành <span class="zh">五行</span></h2>
+        <div class="wuxing-bars" id="wuxing"></div>
+      </section>
+
+      
+
+      <!-- LƯU NHẬT (vận từng ngày) -->
+      <section class="card">
+        <h2 class="card-title">Lưu Nhật — vận từng ngày <span class="zh">流日 · "hôm nay sao?"</span></h2>
+        <div class="lyear-row">
+          <label>Ngày <input type="date" id="lr-date" /></label>
+          <button class="btn-ghost" id="lr-btn">Xem vận ngày</button>
+          <button class="btn-ghost" id="lr-find">Tìm ngày tốt (14 ngày)</button>
+          <span class="hint-inline">(vận CÁ NHÂN mỗi ngày: Thập thần + Dụng + đào hoa/dương nhận + xung)</span>
+        </div>
+        <div id="liuri"></div>
+      </section>
+
+      
+
+      <!-- LƯU NIÊN 12 THẦN (通胜流年神煞) -->
+      <section class="card">
+        <h2 class="card-title">Lưu Niên 12 Thần <span class="zh">流年十二神 · 四利三元</span></h2>
+        <div class="lyear-row">
+          <label>Năm <input type="number" id="lns-year" min="1900" max="2099" /></label>
+          <button class="btn-ghost" id="lns-btn">Xem 12 thần năm này</button>
+          <span class="hint-inline">(李淳风四利三元: 太岁/太阳/丧门/太阴/官符/死符/岁破/龙德/白虎/福德/吊客/病符)</span>
+        </div>
+        <div id="lns"></div>
+      </section>
+
   </main>
 
   <script type="module" src="./src/main.js"></script>
-</body>
+<div class="modal-mask hidden" id="ai-modal"><div class="modal"><h3>Cài đặt AI (OpenAI-compatible)</h3><div class="modal-hint">Mặc định: GLM-5.2 Z.ai. Key tại z.ai/model-api.</div><label class="field"><span>Nhà cung cấp</span><select id="cfg-preset"></select></label><p class="preset-note" id="cfg-preset-note"></p><label class="field"><span>Bật AI</span><input type="checkbox" id="cfg-enabled" /></label><label class="field"><span>Endpoint</span><input type="text" id="cfg-endpoint" placeholder="https://api.z.ai/api/coding/paas/v4" /></label><label class="field"><span>API Key</span><input type="password" id="cfg-apikey" placeholder="key..." /></label><label class="field"><span>Model</span><input type="text" id="cfg-model" placeholder="glm-5.2" /></label><div class="modal-actions"><button class="btn-ghost" id="cfg-cancel">Huỷ</button><button class="btn-primary" id="cfg-save">Lưu</button></div></div></div></body>
 </html>

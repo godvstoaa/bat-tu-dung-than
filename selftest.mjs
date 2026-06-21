@@ -578,6 +578,17 @@ assert(yd1.days.every((d) => typeof d.score === 'number' && d.score >= 5 && d.sc
 assert(computeYearDaily(analyze(1995, 8, 12, 9, 30, 'nu'), 2080).days.length === 366, 'năm 2080 nhuận (ngoài đại vận) vẫn chạy 366 ngày');
 console.log(`   2026: ${yd1.stats.total} ngày · Cát ${yd1.stats.cat} · Kỵ ${yd1.stats.ky} · đỉnh ${yd1.best[0].date}=${yd1.best[0].score} · đại vận ${yd1.dayun ? yd1.dayun.ganZhi : '(null)'}`);
 
+// ################## 14. TÊN VIỆT → HÁN (vi2han) ##################
+import { viToHan } from './src/engine/vi2han.js';
+console.log('\n################## 14. TÊN VIỆT → HÁN ##################');
+const vh1 = viToHan('Nguyễn Tùng Quân');
+assert(vh1.ok && vh1.hanString === '阮松君', `viToHan "Nguyễn Tùng Quân" → 阮松君 (được ${vh1.hanString})`);
+assert(JSON.stringify(vh1.strokes) === '[12,8,7]', `nét [12,8,7] (được ${JSON.stringify(vh1.strokes)})`);
+const vh2 = viToHan('Trần Thị Mai');
+assert(vh2.ok && vh2.hanString === '陳氏梅', 'viToHan "Trần Thị Mai" → 陳氏梅');
+assert(viToHan('nguyen van an').ok, 'viToHan nhập không dấu "nguyen van an" cũng ok');
+console.log(`   Nguyễn Tùng Quân → ${vh1.hanString} [${vh1.strokes.join(',')}] ✓`);
+
 console.log('\n=========================================');
 console.log(FAILS === 0 ? `🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (${FAILS} fail)` : `⚠ CÓ ${FAILS} KIỂM CHỨNG THẤT BẠI`);
 console.log('=========================================');

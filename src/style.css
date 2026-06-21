@@ -814,3 +814,41 @@ html{scroll-behavior:smooth}
 .yd-ctx{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .yd-ctx-item{font-size:11.5px;padding:2px 9px;border-radius:10px;background:rgba(212,175,55,.14);color:var(--gold-bright,var(--gold-soft))}
 @media(max-width:680px){.yd-bestworst{grid-template-columns:1fr}}
+
+.md-head{font-size:15px;margin-bottom:8px}.md-body p{margin:0 0 5px;font-size:13px;line-height:1.6}
+
+/* ===== AI POPUP (chat widget nổi) ===== */
+.ai-fab{
+  position:fixed; right:22px; bottom:22px; z-index:60;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:12px 18px; font-size:14px; font-weight:600; color:var(--gold-pale,#f7eccb);
+  background:linear-gradient(145deg,var(--gold,#d4af37),#b48a1e);
+  border:2px solid var(--gold-bright,#f3d57a); border-radius:30px; cursor:pointer;
+  box-shadow:0 12px 30px rgba(0,0,0,.55), 0 0 22px rgba(212,175,55,.35);
+  animation:aiFabPulse 3.2s var(--ease-out) infinite;
+}
+.ai-fab:hover{transform:translateY(-2px)}
+.ai-fab-label{font-family:'Be Vietnam Pro',sans-serif}
+@keyframes aiFabPulse{0%,100%{box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 0 rgba(212,175,55,.4)}50%{box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 12px rgba(212,175,55,0)}}
+.ai-popup{
+  position:fixed; right:22px; bottom:22px; z-index:70;
+  width:min(400px,calc(100vw - 32px)); height:min(560px,calc(100vh - 44px));
+  display:flex; flex-direction:column;
+  background:linear-gradient(180deg,rgba(21,18,30,.98),rgba(10,9,19,.99));
+  border:1px solid var(--gold,#d4af37); border-radius:16px; overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.7), 0 0 30px rgba(212,175,55,.18);
+  animation:aiPopIn .28s var(--ease-spring) both;
+}
+@keyframes aiPopIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.ai-popup-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;background:linear-gradient(90deg,rgba(192,57,43,.18),transparent);border-bottom:1px solid var(--hairline)}
+.ai-popup-title{font-size:14.5px;font-weight:700;color:var(--gold-bright,#f3d57a)}
+.ai-popup-title .zh{font-size:12px;margin-left:4px}
+.ai-popup-actions{display:flex;gap:6px;align-items:center}
+.ai-popup-close{width:28px;height:28px;border-radius:8px;border:1px solid var(--hairline);background:rgba(0,0,0,.3);color:var(--silk,#f3ead2);font-size:14px;cursor:pointer;line-height:1}
+.ai-popup-close:hover{background:rgba(224,83,61,.25);border-color:#e0533d}
+.ai-popup .ai-status{padding:6px 14px;font-size:11.5px;border-bottom:1px solid rgba(255,255,255,.05)}
+.ai-popup .chat-log{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.ai-popup .ask{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--hairline);background:rgba(0,0,0,.25)}
+.ai-popup .ask input{flex:1;padding:9px 12px;background:rgba(0,0,0,.35);color:var(--silk,#f3ead2);border:1px solid var(--hairline);border-radius:10px;font-size:13.5px}
+.ai-popup-hint{padding:6px 14px 10px;font-size:10.5px;color:var(--silk-muted,#948864);margin:0;line-height:1.4}
+@media(max-width:560px){.ai-fab{right:14px;bottom:14px;padding:11px 14px}.ai-popup{right:8px;bottom:8px;left:8px;width:auto}}

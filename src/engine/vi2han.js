@@ -38,7 +38,7 @@ const NAME_VI = {
   // Given names (nam)
   an: { han: '安', strokes: 6 }, anh: { han: '英', strokes: 11 }, bình: { han: '平', strokes: 5 },
   cường: { han: '強', strokes: 11 }, dũng: { han: '勇', strokes: 9 }, dương: { han: '陽', strokes: 17 },
-  phong: { han: '風', strokes: 9 }, quang: { han: '光', strokes: 6 }, quân: { han: '君', strokes: 7 },
+  phong: { han: '風', strokes: 9 }, quang: { han: '光', strokes: 6 }, quân: { han: '君', strokes: 7 }, huy: { han: '輝', strokes: 15 },
   sơn: { han: '山', strokes: 3 }, thắng: { han: '勝', strokes: 12 }, tiến: { han: '進', strokes: 14 },
   trường: { han: '長', strokes: 8 }, tuấn: { han: '俊', strokes: 9 }, tuấn: { han: '俊', strokes: 9 },
   vinh: { han: '榮', strokes: 14 }, long: { han: '龍', strokes: 16 }, nam: { han: '南', strokes: 9 },
@@ -61,7 +61,7 @@ const NAME_VI = {
   hiếu: { han: '孝', strokes: 7 }, phát: { han: '發', strokes: 12 }, phú: { han: '富', strokes: 12 },
   hiển: { han: '顯', strokes: 23 }, trí: { han: '智', strokes: 12 }, kiên: { han: '堅', strokes: 11 },
   chính: { han: '正', strokes: 5 }, trung: { han: '忠', strokes: 8 }, nghĩa: { han: '義', strokes: 13 },
-  lạc: { han: '樂', strokes: 15 }, tung: { han: '從', strokes: 11 }, wiel: { han: '偉', strokes: 11 },
+  lạc: { han: '樂', strokes: 15 }, tùng: { han: '松', strokes: 8 }, wiel: { han: '偉', strokes: 11 },
   việt: { han: '越', strokes: 12 }, hà: { han: '霞', strokes: 17 }, nhi: { han: '兒', strokes: 8 },
   vĩ: { han: '偉', strokes: 11 }, hào: { han: '豪', strokes: 14 }, khang: { han: '康', strokes: 11 },
   thiện: { han: '善', strokes: 12 }, nhẫn: { han: '忍', strokes: 7 }, đan: { han: '丹', strokes: 4 },
@@ -79,7 +79,8 @@ const _SUR = {}; for (const [k,v] of Object.entries(SURNAME_VI)) _SUR[stripDiacr
 const _NAME = {}; for (const [k,v] of Object.entries(NAME_VI)) _NAME[stripDiacritics(k)] = v;
 
 export function viToHan(viName) {
-  const parts = viName.toLowerCase().trim().split(/\s+/);
+  // stripDiacritics từng từ để tra đúng key (dict đã strip dấu): "Nguyễn"→"nguyen"
+  const parts = viName.toLowerCase().trim().split(/\s+/).map(stripDiacritics);
   const chars = [];
   const missing = [];
 
