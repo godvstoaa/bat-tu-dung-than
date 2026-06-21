@@ -176,6 +176,7 @@ NGUYEN TAC:
 7. PHONG CACH: am ap nhu ong thay day hoc tro - "con a, menh con la... nen..." - KHONG lanh nhu robot.
 8. NAM/THANG HIEN TAI - CUC KY QUAN TRONG: doc muc "THOI GIAN HIEN TAI" dau chart brief. Do la nam/thang DANG DIEN RA. Khi user hoi "nam nay"/"thang nay"/"thang nay black"/"nam roi" -> PHAI dung DUNG nam + thang ghi o brief (vi du neu brief ghi "NAM NAY = 2026" thi "nam nay" = 2026, KHONG PHAI 2024). TUYET DOI KHONG mac dinh nam 2024 hay nam cu. KHONG noi "sang nam 2026 se..." neu 2026 da la nam nay.
 9. NGON NGU: chi viet TIENG VIET. KHONG xai chu Han-Trung trong cau (vd "一棵", "恰恰" - CAM). Chi duoc giu ten HAN-VIET cua sao/cach cuc (Chinh Quan, That Sat...). Noi "cay bi ngap nuoc" chu KHONG noi "一棵树".
+10. CHINH TA TIENG VIET - BAT BUOC: viet DUNG chinh ta, co dau day du, ro nghia. KHONG duoc viet tu sai/garble/khong ton tai (VD CAM: "tránhinten", "kwệt", "kwet", "khuyet" - phai la "hao/khaying/khuyet" dung nghia). Neu khong chac mot tu -> dung tu don gian khac cho chac. TRUOC KHI gui: DOC LAI toan bo cau tra loi va SUA HET loi chinh ta. Moi tu phai la tieng Viet hop le, de doc.
 
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the. NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.`;
 // ===========================================================================
@@ -318,7 +319,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history } = {
   const headers = { 'Content-Type': 'application/json', ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}) };
   const isGlm = /glm|z\.ai|bigmodel/i.test((cfg.model || '') + (cfg.endpoint || ''));
   const buildBody = (msgs, toolsOn) => ({
-    model: cfg.model, messages: msgs, temperature: 0.6, stream: true,
+    model: cfg.model, messages: msgs, temperature: 0.5, stream: true,
     ...(isGlm ? { thinking: { type: 'enabled' } } : {}),       // GLM: bật deep thinking bản địa
     ...(toolsOn ? { tools: AI_TOOLS, tool_choice: 'auto' } : {}),
   });
