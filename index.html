@@ -62,6 +62,19 @@
     </section>
 
     <div id="result" class="result hidden">
+      <nav class="toc" aria-label="Mục lục nhanh">
+        <span class="toc-label">Đi nhanh:</span>
+        <a href="#pillars">Tứ Trụ</a>
+        <a href="#verdict">Dụng Thần</a>
+        <a href="#synthesis">Tổng luận</a>
+        <a href="#liuqin">Lục Thân</a>
+        <a href="#family-section" class="toc-new">👪 Nghiệm chứng gia tộc <span class="toc-badge">MỚI</span></a>
+        <a href="#dayun">Đại Vận</a>
+        <a href="#liunian">Lưu Niên</a>
+        <a href="#wuxing">Ngũ Hành</a>
+        <a href="#interactions">Hội Hợp Xung</a>
+        <a href="#shensha">Thần Sát</a>
+      </nav>
       <!-- TỨ TRỤ -->
       <section class="card">
         <h2 class="card-title">Tứ Trụ <span class="zh">四柱</span></h2>
@@ -104,6 +117,23 @@
         <h2 class="card-title">Lục Thân <span class="zh">六亲 · 宫位/星曜</span></h2>
         <div class="liuqin" id="liuqin"></div>
       </section>
+
+      <!-- ============ NGHIỆM CHỨNG GIA TỘC ============ -->
+      <section class="card" id="family-section">
+        <h2 class="card-title">👪 Nghiệm chứng gia tộc <span class="zh">家族八字交叉验证</span></h2>
+        <p class="hint">Người trung tâm = lá số form sinh chính (vd: em gái). Thêm người thân (bố/mẹ/anh chị/chồng/con) để chấm độ nhất quán <b>6 trục cổ pháp</b> + sơ đồ chòm sao / ma trận / radar + sổ cái xác–nghiệm. Ai đánh "giờ chưa rõ" sẽ được <b>hiệu chỉnh giờ sinh</b> (校正时辰)。</p>
+        <div id="family-members"></div>
+        <div class="tool-row">
+          <button class="btn-ghost" id="fam-add">+ Thêm người thân</button>
+          <button class="btn-ghost" id="family-btn">🔬 Nghiệm chứng</button>
+        </div>
+        <div class="tool-out" id="family-score"></div>
+        <div class="tool-out" id="family-constellation"></div>
+        <details><summary>Sổ cái xác / nghiệm (chi tiết từng trục)</summary><div id="family-ledger"></div></details>
+        <details><summary>Ma trận cặp + Radar 6 trục</summary><div id="family-matrix"></div><div id="family-radar"></div></details>
+        <div id="family-rectify"></div>
+      </section>
+
 
       <!-- NGHỊCH THIÊN CẢI MỆNH -->
       <section class="card remedy-card">
@@ -174,21 +204,9 @@
         </div>
       </section>
 
-      <!-- ============ NGHIỆM CHỨNG GIA TỘC ============ -->
-      <section class="card" id="family-section">
-        <h2 class="card-title">👪 Nghiệm chứng gia tộc <span class="zh">家族八字交叉验证</span></h2>
-        <p class="hint">Người trung tâm = lá số form sinh chính (vd: em gái). Thêm người thân (bố/mẹ/anh chị/chồng/con) để chấm độ nhất quán <b>6 trục cổ pháp</b> + sơ đồ chòm sao / ma trận / radar + sổ cái xác–nghiệm. Ai đánh "giờ chưa rõ" sẽ được <b>hiệu chỉnh giờ sinh</b> (校正时辰).</p>
-        <div id="family-members"></div>
-        <div class="tool-row">
-          <button class="btn-ghost" id="fam-add">+ Thêm người thân</button>
-          <button class="btn-ghost" id="family-btn">🔬 Nghiệm chứng</button>
-        </div>
-        <div class="tool-out" id="family-score"></div>
-        <div class="tool-out" id="family-constellation"></div>
-        <details><summary>Sổ cái xác / nghiệm (chi tiết từng trục)</summary><div id="family-ledger"></div></details>
-        <details><summary>Ma trận cặp + Radar 6 trục</summary><div id="family-matrix"></div><div id="family-radar"></div></details>
-        <div id="family-rectify"></div>
-      </section>
+      
+
+      
 
       <!-- NGŨ HÀNH -->
       <section class="card">
