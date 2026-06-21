@@ -1,0 +1,101 @@
+// ============================================================================
+//  ZÉ RÌ 择日 — CHỌN NGÀY LÀNH (thực dụng nhất khi người ta tìm phong thủy)
+//  Đánh giá một ngày dương lịch cho một việc cụ thể + theo tuổi người làm.
+//  Cơ sở: 建除十二神 (12 trực), 黄道/黑道, 生肖冲煞 (tránh ngày xung tuổi),
+//  通胜宜忌 theo từng việc (嫁娶/开市/入宅/动土/出行). Nguồn: 通胜, 协纪辨方.
+// ============================================================================
+import { Solar } from 'lunar-javascript';
+import { ZHI, ZHI_ORDER } from './constants.js';
+
+// 12 trực (建除十二神) theo thứ tự
+const ZHI_OFFICERS = ['建', '除', '满', '平', '定', '执', '破', '危', '成', '收', '开', '闭'];
+const OFFICER_VI = { 建:'Kiến', 除:'Trừ', 满:'Mãn', 平:'Bình', 定:'Định', 执:'Chấp', 破:'Phá', 危:'Nguy', 成:'Thành', 收:'Thu', 开:'Khai', 闭:'Bế' };
+// Phân loại trực: cát / bình / hung (theo thông tục 通胜)
+const OFFICER_TONE = { 建:'cát', 除:'cát', 满:'cát', 平:'hung', 定:'cát', 执:'bình', 破:'hung', 危:'bình', 成:'cát', 收:'bình', 开:'cát', 闭:'hung' };
+// 六冲
+const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
+
+// Việc lớn → các trực CÁT (宜) và HUNG (忌) tương ứng
+const ACTIVITY = {
+  marry: { label: 'Cưới hỏi (嫁娶)', yi: ['成', '定', '开', '建', '除'], ji: ['破', '平', '闭', '危'] },
+  business: { label: 'Khai trương / mở cửa hàng (开市)', yi: ['开', '成', '建', '满'], ji: ['破', '闭', '平'] },
+  move: { label: 'Dọn nhà / nhập trạch (入宅·移徙)', yi: ['成', '定', '开', '满', '除'], ji: ['破', '闭', '平'] },
+  build: { label: 'Động thổ / xây cất (动土)', yi: ['成', '定', '开'], ji: ['破', '闭'] },
+  travel: { label: 'Xuất hành xa (出行)', yi: ['开', '建', '除', '满'], ji: ['破', '闭', '平'] },
+  sign: { label: 'Ký hợp đồng / giao dịch (立券)', yi: ['成', '定', '开'], ji: ['破', '闭', '危'] },
+};
+
+/**
+ * Đánh giá một ngày cho một việc + tuổi (địa chi năm sinh) người hỏi.
+ * @returns {{ solar, lunar, dayGanZhi, officer, officerVi, tone, chongZhi, clashYou, yi, ji, score, rating, advice }}
+ */
+export function evaluateDate(year, month, day, activityId, userZhi) {
+  const solar = Solar.fromYmdHms(year, month, day, 12, 0, 0);
+  const lunar = solar.getLunar();
+  const dayGan = lunar.getDayGan();
+  const dayZhi = lunar.getDayZhi();
+  const monthZhi = lunar.getMonthZhi();
+
+  // 12 trực: index = (dayZhi - monthZhi) mod 12
+  const oIdx = ((ZHI_ORDER.indexOf(dayZhi) - ZHI_ORDER.indexOf(monthZhi)) + 12) % 12;
+  const officer = ZHI_OFFICERS[oIdx];
+  const officerVi = OFFICER_VI[officer];
+  const tone = OFFICER_TONE[officer];
+
+  // 生肖冲: ngày nay chi xung với chi tuổi?
+  const chongZhi = CHONG[dayZhi];
+  const clashYou = userZhi ? (dayZhi === CHONG[userZhi] || chongZhi === userZhi) : false;
+
+  const act = ACTIVITY[activityId] || ACTIVITY.marry;
+  const yi = act.yi.includes(officer);
+  const ji = act.ji.includes(officer);
+
+  // Chấm điểm
+  let score = 50;
+  const reasons = [];
+  if (tone === 'cát') { score += 18; reasons.push(`Trực ${officerVi} (${officer}) là trực CÁT (黄道), nền tốt.`); }
+  else if (tone === 'hung') { score -= 18; reasons.push(`Trực ${officerVi} (${officer}) là trực HUNG (黑道).`); }
+  else { reasons.push(`Trực ${officerVi} (${officer}) ở mức bình.`); }
+
+  if (yi) { score += 22; reasons.push(`Trực ${officerVi} thuộc nhóm "宜 ${act.label}" → rất hợp việc.`); }
+  else if (ji) { score -= 22; reasons.push(`Trực ${officerVi} thuộc nhóm "忌 ${act.label}" → kỵ việc này.`); }
+  else { reasons.push(`Trực ${officerVi} không nằm trong 宜/忌 chính của việc "${act.label}".`); }
+
+  if (clashYou) { score -= 25; reasons.push(`⚠ Ngày chi ${dayZhi} (${ZHI[dayZhi].vi}) XUNG trực tiếp tuổi ${ZHI[userZhi].vi} (${userZhi}) — "日冲岁" rất kỵ với cá nhân.`); }
+  else if (userZhi) { reasons.push(`Ngày không xung tuổi ${ZHI[userZhi].vi}.`); }
+
+  score = Math.max(5, Math.min(98, Math.round(score)));
+  let rating = 'Bình';
+  if (score >= 80) rating = 'Đại cát';
+  else if (score >= 65) rating = 'Cát';
+  else if (score >= 45) rating = 'Bình';
+  else if (score >= 30) rating = 'Hơi kỵ';
+  else rating = 'Kỵ';
+
+  const advice = score >= 65
+    ? `Ngày ${rating} cho việc "${act.label}" — nên tiến hành.`
+    : score >= 45
+      ? `Ngày trung bình — tiến hành được nếu gấp, nhưng nên tìm ngày trực 成/开/định không xung tuổi sẽ tốt hơn.`
+      : `Ngày ${rating} cho việc này${clashYou ? ' + xung tuổi' : ''} — nên tránh, chọn ngày khác.`;
+
+  return {
+    solar: solar.toYmd(), lunar: `${lunar.getMonthInChinese()}月 ${lunar.getDayInChinese()}`,
+    dayGanZhi: dayGan + dayZhi, dayGan, dayZhi, officer, officerVi, tone,
+    chongZhi, clashYou, yi, ji, score, rating, reasons, advice, activity: act.label,
+  };
+}
+
+// Tìm N ngày tốt nhất trong khoảng (cho một việc + tuổi) — quét window
+export function findGoodDates(startYear, startMonth, startDay, days, activityId, userZhi, topN = 5) {
+  const out = [];
+  for (let i = 0; i < days; i++) {
+    const d = Solar.fromYmdHms(startYear, startMonth, startDay, 12, 0, 0).next(i);
+    try {
+      const ev = evaluateDate(d.getYear(), d.getMonth(), d.getDay(), activityId, userZhi);
+      out.push(ev);
+    } catch (e) { /* bỏ ngày lỗi */ }
+  }
+  return out.sort((a, b) => b.score - a.score).slice(0, topN);
+}
+
+export { ACTIVITY, ZHI_OFFICERS, OFFICER_VI };

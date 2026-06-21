@@ -1,0 +1,20 @@
+{
+  "name": "bat-tu-dung-than",
+  "private": true,
+  "version": "1.0.0",
+  "description": "App luận Bát Tự - Dụng Thần theo Tử Bình / Phong thủy huyền học Hồng Kông",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host ::",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node selftest.mjs"
+  },
+  "dependencies": {
+    "lunar-javascript": "^1.7.3"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.0",
+    "vite": "^7.0.0"
+  }
+}

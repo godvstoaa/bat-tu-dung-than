@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Test screenshots
+verify-shots/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Session / tooling state
+.claude/scheduled_tasks.lock
