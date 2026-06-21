@@ -128,12 +128,15 @@ Không có ngẫu nhiên. `selftest.mjs` kiểm chứng tính tất định + đ
 1. Lấy API key tại <https://z.ai/model-api> (mục API Keys).
 2. Mở app → bấm **⚙** (góc phải thẻ "Trợ lý Bát Tự AI").
 3. Chọn nhà cung cấp trong menu **Nhà cung cấp** (endpoint + model tự điền):
-   - **Z.ai — GLM Coding Plan**: `https://api.z.ai/api/coding/paas/v4` · `glm-5.2`
-     *(theo docs Z.ai, endpoint Coding Plan dành cho công cụ được hỗ trợ; app web nếu bị chặn hãy đổi sang "Z.ai API chung")*
-   - **Z.ai — API chung (pay-as-you-go)**: `https://api.z.ai/api/paas/v4` · `glm-5.2` ← **khuyên dùng cho app**
-   - **BigModel (智谱)**: `https://open.bigmodel.cn/api/paas/v4` · `glm-4.6`
-   - **DeepSeek** / **OpenAI** / **Ollama (cục bộ, không cần key)**
-4. Dán API key → bật "Bật AI" → Lưu.
+   - **★ Z.ai — PROXY DEV**: `/zai/api/paas/v4` · `glm-5.2` ← **KHUYÊN DÙNG khi `npm run dev`** (đi qua Vite proxy → tránh CORS)
+   - **Z.ai — API chung / Coding Plan** (endpoint thẳng `https://api.z.ai/...`): **CORS sẽ chặn** nếu gọi thẳng từ trình duyệt — chỉ chạy qua backend/proxy
+   - **BigModel (智谱)** / **DeepSeek** / **OpenAI** (endpoint thẳng): đều bị CORS — cần backend/proxy
+   - **Ollama (cục bộ, không cần key)**: chạy `OLLAMA_ORIGINS=* ollama serve`
+4. Dán API key → bật "Bật AI" → **🔌 Test kết nối** để chắc chắn AI gọi được (✅ thì mới trả lời thông minh) → Lưu.
+
+> **Lưu ý CORS**: các LLM API (Z.ai/OpenAI/DeepSeek) đều **không cho trình duyệt gọi thẳng**.
+> Khi `npm run dev`, preset **★ PROXY DEV** đi qua proxy Vite (có sẵn trong `vite.config.js`) → chạy được.
+> Khi triển khai tĩnh (production) → cần **backend/proxy riêng** (key không được để trong code frontend).
 
 Khi AI bật: câu hỏi + **chart brief** (toàn bộ dữ liệu đã tính đúng) + **system prompt**
 (chuyên gia Tử Bình theo cổ pháp) được gửi → AI luân giải **streaming**. Khi chưa cấu hình

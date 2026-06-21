@@ -852,3 +852,8 @@ html{scroll-behavior:smooth}
 .ai-popup .ask input{flex:1;padding:9px 12px;background:rgba(0,0,0,.35);color:var(--silk,#f3ead2);border:1px solid var(--hairline);border-radius:10px;font-size:13.5px}
 .ai-popup-hint{padding:6px 14px 10px;font-size:10.5px;color:var(--silk-muted,#948864);margin:0;line-height:1.4}
 @media(max-width:560px){.ai-fab{right:14px;bottom:14px;padding:11px 14px}.ai-popup{right:8px;bottom:8px;left:8px;width:auto}}
+
+/* ===== Config AI: nút Test kết nối ===== */
+.cfg-test-row{display:flex;gap:10px;align-items:center;margin:10px 0;flex-wrap:wrap}
+.cfg-test-result{font-size:12px;color:var(--silk-muted,#948864);flex:1;min-width:200px;line-height:1.4}
+.modal-hint code{background:rgba(212,175,55,.14);padding:1px 5px;border-radius:4px;font-size:11px}

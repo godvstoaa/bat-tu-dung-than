@@ -45,7 +45,7 @@ import { interpretZiweiStars } from './engine/ziwei-stars.js';
 import { computeAuxStars } from './engine/ziwei-aux.js';
 import { computeMarriageShensha, computeExtraShensha } from './engine/shensha-marriage.js';
 import { viToHan } from './engine/vi2han.js';
-import { askAI, getConfig, setConfig, isAIReady, PRESETS } from './engine/ai.js';
+import { askAI, getConfig, setConfig, isAIReady, PRESETS, testAIConnection } from './engine/ai.js';
 
 let currentResult = null;
 let currentTopic = 'general';
@@ -904,6 +904,27 @@ $('ai-settings-btn').addEventListener('click', openModal);
 $('cfg-cancel').addEventListener('click', closeModal);
 $('cfg-save').addEventListener('click', saveModal);
 $('ai-modal').addEventListener('click', (e) => { if (e.target.id === 'ai-modal') closeModal(); });
+// Test kết nối AI (dùng giá trị đang nhập trong modal, chưa cần Lưu)
+$('cfg-test').addEventListener('click', async () => {
+  const cfg = {
+    enabled: $('cfg-enabled').checked,
+    endpoint: $('cfg-endpoint').value.trim(),
+    apiKey: $('cfg-apikey').value.trim(),
+    model: $('cfg-model').value.trim(),
+    preset: $('cfg-preset').value,
+  };
+  const el = $('cfg-test-result');
+  el.style.color = 'var(--silk-muted,#948864)';
+  el.textContent = '⏳ Đang thử kết nối...';
+  try {
+    const r = await testAIConnection(cfg);
+    el.textContent = r.detail;
+    el.style.color = r.ok ? '#2e9e5b' : '#e0533d';
+  } catch (e) {
+    el.textContent = '❌ Lỗi: ' + e.message;
+    el.style.color = '#e0533d';
+  }
+});
 // AI popup (chat widget nổi): mở/đóng
 $('ai-fab').addEventListener('click', () => {
   $('ai-popup').classList.remove('hidden');

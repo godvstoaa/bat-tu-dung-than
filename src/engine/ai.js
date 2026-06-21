@@ -21,15 +21,19 @@ const wxVi = (w) => WX_VI[w];
 const CFG_KEY = 'bazi_ai_config_v1';
 
 // Các preset nhà cung cấp (OpenAI-compatible). Z.ai GLM-5.2 là mặc định theo yêu cầu.
+// LƯU Ý CORS: gọi THẲNG (https://api.z.ai...) từ trình duyệt sẽ bị CORS chặn → fallback.
+// Khi `npm run dev`, dùng preset "proxy dev" (/zai/...) đi qua Vite proxy → chạy được.
 export const PRESETS = [
-  { id: 'zai-coding', label: 'Z.ai — GLM Coding Plan (glm-5.2)', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2',
-    note: 'Endpoint Coding Plan — theo docs Z.ai chỉ dành cho công cụ được hỗ trợ; với app web nếu bị chặn hãy đổi sang "Z.ai API chung".' },
-  { id: 'zai-general', label: 'Z.ai — API chung pay-as-you-go (glm-5.2)', endpoint: 'https://api.z.ai/api/paas/v4', model: 'glm-5.2',
-    note: 'Endpoint chung — khuyên dùng cho ứng dụng web. Mua credit tại z.ai/model-api.' },
-  { id: 'bigmodel', label: 'BigModel (智谱 open.bigmodel.cn, glm-4.6)', endpoint: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4.6', note: '' },
-  { id: 'deepseek', label: 'DeepSeek', endpoint: 'https://api.deepseek.com/v1', model: 'deepseek-chat', note: '' },
-  { id: 'openai', label: 'OpenAI', endpoint: 'https://api.openai.com/v1', model: 'gpt-4o-mini', note: '' },
-  { id: 'ollama', label: 'Ollama (cục bộ, không cần key)', endpoint: 'http://localhost:11434/v1', model: 'qwen2.5', note: '' },
+  { id: 'zai-proxy', label: '★ Z.ai — PROXY DEV (glm-5.2) [khuyên dùng npm run dev]', endpoint: '/zai/api/paas/v4', model: 'glm-5.2',
+    note: 'Đi qua Vite proxy → KHÔNG bị CORS. CHỈ chạy được khi `npm run dev` (localhost). Mua key tại z.ai/model-api. Đây là lựa chọn nên dùng khi test.' },
+  { id: 'zai-general', label: 'Z.ai — API chung (glm-5.2) [CORS: chỉ chạy qua backend]', endpoint: 'https://api.z.ai/api/paas/v4', model: 'glm-5.2',
+    note: 'Endpoint thẳng — trình duyệt sẽ CHẶN CORS. Chỉ dùng nếu app có backend/proxy, hoặc chạy qua server-side.' },
+  { id: 'zai-coding', label: 'Z.ai — GLM Coding Plan (glm-5.2) [CORS]', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2',
+    note: 'Endpoint Coding Plan — CORS sẽ chặn khi gọi từ web. Ưu tiên preset PROXY DEV ở trên.' },
+  { id: 'bigmodel', label: 'BigModel (智谱 glm-4.6)', endpoint: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4.6', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
+  { id: 'deepseek', label: 'DeepSeek', endpoint: 'https://api.deepseek.com/v1', model: 'deepseek-chat', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
+  { id: 'openai', label: 'OpenAI', endpoint: 'https://api.openai.com/v1', model: 'gpt-4o-mini', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
+  { id: 'ollama', label: 'Ollama (cục bộ, không cần key)', endpoint: 'http://localhost:11434/v1', model: 'qwen2.5', note: 'Chạy Ollama local + đặt OLLAMA_ORIGINS=* để trình duyệt gọi được.' },
   { id: 'custom', label: 'Tùy chỉnh', endpoint: '', model: '', note: '' },
 ];
 
@@ -193,7 +197,35 @@ export async function askAI(question, R, cfg, { onToken } = {}) {
     if (!text) throw new Error('Phản hồi rỗng');
     return { source: 'ai', text };
   } catch (e) {
-    return localFallback(`Không gọi được AI: ${e.message}. Đang dùng bộ luân giải cục bộ.`);
+    const isCors = /Failed to fetch|NetworkError|Load failed/i.test(e.message);
+    const hint = isCors
+      ? `Không gọi được AI — CORS: trình duyệt chặn gọi ${cfg.endpoint}. Mở ⚙ chọn preset "★ PROXY DEV" (khi npm run dev) hoặc dùng backend.`
+      : `Không gọi được AI: ${e.message}.`;
+    return localFallback(hint + ' Hiện trả lời bằng bộ luân giải cục bộ.');
+  }
+}
+
+// ---- Test kết nối (cho nút "Test" trong ⚙) — báo chính xác CORS/auth/HTTP ----
+export async function testAIConnection(cfg) {
+  cfg = cfg || getConfig();
+  if (!cfg.endpoint || !cfg.model) return { ok: false, detail: '❌ Thiếu endpoint/model.' };
+  const endpoint = cfg.endpoint.replace(/\/$/, '');
+  const url = endpoint.endsWith('/chat/completions') ? endpoint : endpoint + '/chat/completions';
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}) },
+      body: JSON.stringify({ model: cfg.model, messages: [{ role: 'user', content: 'ping' }], max_tokens: 1, stream: false }),
+    });
+    if (res.ok) return { ok: true, detail: `✅ Kết nối OK (HTTP ${res.status}). AI sẵn sàng — hãy bật AI và hỏi.` };
+    let t = ''; try { t = (await res.text()).slice(0, 160); } catch (_) {}
+    if (res.status === 401 || res.status === 403) return { ok: false, detail: `❌ HTTP ${res.status} — API key sai/hết hạn. ${t}` };
+    return { ok: false, detail: `❌ HTTP ${res.status} ${res.statusText}. ${t}` };
+  } catch (e) {
+    const isCors = /Failed to fetch|NetworkError|Load failed/i.test(e.message);
+    return { ok: false, detail: isCors
+      ? `❌ CORS/mạng: trình duyệt chặn gọi ${cfg.endpoint}. Khi npm run dev → mở ⚙ chọn preset "★ PROXY DEV". Nếu production → cần backend/proxy.`
+      : `❌ Lỗi mạng: ${e.message}` };
   }
 }
 
