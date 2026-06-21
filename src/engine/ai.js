@@ -13,6 +13,8 @@ import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
 import { nayinInfo } from './nayin.js';
 import { analyzeChangsheng } from './changsheng-deep.js';
+import { computeLiuyue } from './liuyue.js';
+import { Solar } from 'lunar-javascript';
 
 const hanviet = (gz) => gz.split('').map((c) => (GAN[c]?.vi || ZHI[c]?.vi || c)).join(' ');
 const wxVi = (w) => WX_VI[w];
@@ -60,6 +62,22 @@ export function isAIReady(cfg) {
 export function buildChartBrief(R) {
   const c = R.chart;
   const dm = c.dayMaster;
+
+  // ---- THỜI GIAN HIỆN TẠI: neo năm/tháng hôm nay để AI KHÔNG hallucinate (vd mặc định 2024) ----
+  const _now = new Date();
+  const nowSolar = Solar.fromYmdHms(_now.getFullYear(), _now.getMonth() + 1, _now.getDate(), 12, 0, 0);
+  const nowLunar = nowSolar.getLunar();
+  const nowEC = nowLunar.getEightChar();
+  const curYear = _now.getFullYear();
+  const curYearGZ = nowEC.getYearGan() + nowEC.getYearZhi();
+  const curMonthGZ = nowEC.getMonthGan() + nowEC.getMonthZhi();
+  let curMonthRating = '(không tính được)';
+  let curMonthNote = '';
+  try {
+    const lm = computeLiuyue(R, curYear);
+    const cm = lm.months.find((x) => x.m === _now.getMonth());
+    if (cm) { curMonthRating = `${cm.ganZhi} — ${cm.rating}`; curMonthNote = ` (tháng CÁT trong năm: ${lm.best.map((b) => 'T' + (b.m + 1)).join(', ')}; tháng KỴ: ${lm.worst.map((b) => 'T' + (b.m + 1)).join(', ')})`; }
+  } catch (e) {}
   const pillars = ['year', 'month', 'day', 'time'].map((k) => {
     const p = c.pillars[k];
     const labelVi = { year: 'Năm', month: 'Tháng', day: 'Ngày', time: 'Giờ' }[k];
@@ -78,7 +96,14 @@ export function buildChartBrief(R) {
   const liunianStr = (R.liunian || []).map((l) =>
     `${l.year}(${hanviet(l.ganZhi)}:${l.rating}${l.isNow ? '★nay' : ''})`).join(' ');
 
-  return `== LÁ SỐ BÁT TỰ (đã tính chính xác, dùng để luân giải) ==
+  return `== ⏰ THỜI GIAN HIỆN TẠI (CHUẨN MỌI PHÂN TÍCH — ĐỌC KỄ, RẤT QUAN TRỌNG) ==
+- Hôm nay (dương lịch): ${nowSolar.toYmd()}
+- Âm lịch: ${nowLunar.toString()}
+- NĂM NAY = ${curYear} = ${curYearGZ} (${hanviet(curYearGZ)}). ĐÂY LÀ NĂM ĐANG DIỄN RA, KHÔNG PHẢI TƯƠNG LAI. Từ "năm nay" / "năm này" LUÔN là ${curYear} — KHÔNG được mặc định 2024 hay bất kỳ năm nào khác.
+- THÁNG NAY (lưu nguyệt) = ${curMonthGZ} (${hanviet(curMonthGZ)}) — rating ${curMonthRating}${curMonthNote}
+- Khi user hỏi "tháng này / năm nay" → PHẢI dùng ${curYear} và lưu nguyệt ${curMonthGZ} ở trên.
+
+== LÁ SỐ BÁT TỰ (đã tính chính xác, dùng để luân giải) ==
 - Nhật Chủ (日主): ${dm.gan} ${dm.vi} — hành ${wxVi(dm.wx)} ${dm.yin ? '(âm)' : '(dương)'}
 - 滴天髓 luận ${dm.gan}: ${DITIANSUI[dm.gan].verse} → ${DITIANSUI[dm.gan].nature}
 - Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
@@ -145,6 +170,8 @@ NGUYEN TAC:
 5. DUA RA HANH DONG CU THE: "mac do vang/nau, lam viec huong Dong Bac, tranh ky hop dong thang 6" - khong noi chung chung "nen can than".
 6. NOI THAT: neu hung -> noi hung thang ("nam nay con den, thu cho chac"); neu cat -> noi cat nhung giu chung muc.
 7. PHONG CACH: am ap nhu ong thay day hoc tro - "con a, menh con la... nen..." - KHONG lanh nhu robot.
+8. NAM/THANG HIEN TAI - CUC KY QUAN TRONG: doc muc "THOI GIAN HIEN TAI" dau chart brief. Do la nam/thang DANG DIEN RA. Khi user hoi "nam nay"/"thang nay"/"thang nay black"/"nam roi" -> PHAI dung DUNG nam + thang ghi o brief (vi du neu brief ghi "NAM NAY = 2026" thi "nam nay" = 2026, KHONG PHAI 2024). TUYET DOI KHONG mac dinh nam 2024 hay nam cu. KHONG noi "sang nam 2026 se..." neu 2026 da la nam nay.
+9. NGON NGU: chi viet TIENG VIET. KHONG xai chu Han-Trung trong cau (vd "一棵", "恰恰" - CAM). Chi duoc giu ten HAN-VIET cua sao/cach cuc (Chinh Quan, That Sat...). Noi "cay bi ngap nuoc" chu KHONG noi "一棵树".
 
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the. NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.`;
 // ===========================================================================
