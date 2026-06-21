@@ -547,6 +547,20 @@ console.log(`   Cluster ${fam1.score}/100 — ${fam1.rating} | xác ${fam1.confi
 fam1.pairs.forEach((p) => console.log(`     ${p.label}: ${p.pair.pairScore} (${p.pair.rating})`));
 console.log(`   Rectify giờ (Con): best ${rh1.best.zhiVi} ${rh1.best.hour}h = ${rh1.best.score} | ${rh1.verdict.slice(0, 60)}…`);
 
+// ################## 12. QUỸ TÍCH CUỘC ĐỜI (一生运程) ##################
+import { buildLifeTrajectory } from './src/engine/life-trajectory.js';
+console.log('\n################## 12. QUỸ TÍCH CUỘC ĐỜI ##################');
+const lt1 = buildLifeTrajectory(analyze(1995, 8, 12, 9, 30, 'nu'));
+const lt2 = buildLifeTrajectory(analyze(1995, 8, 12, 9, 30, 'nu'));
+assert(JSON.stringify(lt1) === JSON.stringify(lt2), 'buildLifeTrajectory deterministic');
+assert(lt1.decades.length === 8 && lt1.stages.length === 4, '8 đại vận + 4 giai đoạn đời');
+assert(['marriage', 'children', 'career', 'wealth', 'health'].every((k) => Array.isArray(lt1.keyWindows[k])), 'đủ 5 cửa sổ cuộc đời');
+assert(typeof lt1.summary === 'string' && lt1.summary.length > 30, 'có tóm tắt cung đường');
+const ltM = buildLifeTrajectory(analyze(1990, 6, 15, 14, 30, 'nam'));
+assert(ltM.decades.some((d) => d.themeName.includes('Vợ')), 'nam: có theme "Vợ"');
+assert(!lt1.decades.some((d) => d.themeName.includes('Vợ')), 'nữ: không có theme "Vợ"');
+console.log(`   quỹ tích nữ Ất: ${lt1.decades.length} cung · đỉnh ${lt1.turningPoints.find((t) => t.kind === 'golden')?.ages || '-'} · dè ${lt1.turningPoints.find((t) => t.kind === 'caution')?.ages || '-'}`);
+
 console.log('\n=========================================');
 console.log(FAILS === 0 ? `🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (${FAILS} fail)` : `⚠ CÓ ${FAILS} KIỂM CHỨNG THẤT BẠI`);
 console.log('=========================================');

@@ -761,3 +761,26 @@ html{scroll-behavior:smooth}
 .toc a.toc-new{background:rgba(224,83,61,.22);color:#ffe3db;border-color:#e0533d;font-weight:700}
 .toc a.toc-new:hover{background:rgba(224,83,61,.38)}
 .toc-badge{font-size:8.5px;background:#e0533d;color:#fff;padding:1px 6px;border-radius:8px;margin-left:4px;letter-spacing:.5px}
+
+/* ===== QUỸ TÍCH CUỘC ĐỜI (一生运程) ===== */
+.life-sub{margin:16px 0 6px;font-size:14px;color:var(--gold-bright,var(--gold-soft));font-weight:700}
+.life-found{font-size:13.5px;padding:8px 12px;border:1px solid var(--gold-soft,#5a5a6e);border-radius:10px;background:rgba(212,175,55,.08);margin:6px 0}
+.life-found b{color:var(--gold-bright,var(--gold-soft))}
+.life-summary-text{font-size:12.5px;line-height:1.6;color:var(--silk,var(--fg,#eee));margin:8px 0}
+.life-tps{display:flex;flex-direction:column;gap:5px;margin:8px 0}
+.life-tp{font-size:12px;padding:6px 10px;border-radius:8px;background:rgba(0,0,0,.22)}
+.life-tp.rate-cat{border-left:3px solid #2e9e5b}.life-tp.rate-hung{border-left:3px solid #e0533d}
+.life-win{display:flex;gap:10px;align-items:flex-start;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.06);font-size:12.5px}
+.life-win-k{min-width:104px;font-weight:600;color:var(--gold-bright,var(--gold-soft))}
+.life-win-age{display:inline-block;background:rgba(46,158,91,.18);border:1px solid rgba(46,158,91,.4);color:#c8f0d4;padding:2px 8px;border-radius:12px;margin:2px 4px 2px 0;font-size:11.5px;white-space:nowrap}
+.life-dec{padding:10px 12px;margin:6px 0;border:1px solid var(--gold-soft,#5a5a6e);border-left:4px solid var(--gold,#caa14a);border-radius:0 10px 10px 0;background:rgba(0,0,0,.2)}
+.life-dec-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
+.life-dec-head .big{font-size:16px;color:var(--gold-bright,var(--gold-soft))}
+.life-dec-theme{font-size:12.5px;color:var(--gold-bright,var(--gold-soft));margin-top:3px;font-weight:600}
+.life-dec-line{font-size:12.5px;line-height:1.55;color:var(--silk,var(--fg,#eee));margin-top:2px}
+.life-flag{font-size:10.5px;padding:1px 7px;border-radius:10px;margin-left:2px}
+.life-flag.golden{background:rgba(46,158,91,.22);color:#9fe3b6;border:1px solid rgba(46,158,91,.4)}
+.life-flag.caution{background:rgba(224,83,61,.22);color:#ffc9bd;border:1px solid rgba(224,83,61,.4)}
+.life-stage{padding:8px 12px;margin:5px 0;border-radius:8px;background:rgba(0,0,0,.22);border-left:3px solid var(--gold-soft,#5a5a6e)}
+.life-stage-h{font-size:12.5px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.life-stage-v{font-size:12px;color:var(--silk-muted,var(--muted));margin-top:2px;line-height:1.5}

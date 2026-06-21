@@ -29,6 +29,7 @@ import { buildFullProfile } from './engine/partner-profile.js';
 import { analyzeFamily } from './engine/family.js';
 import { radialData, matrixData, radarData } from './engine/family-diagram.js';
 import { rectifyHour } from './engine/family-rectify.js';
+import { buildLifeTrajectory } from './engine/life-trajectory.js';
 import { analyzeChangsheng } from './engine/changsheng-deep.js';
 import { gaimenhPlan } from './engine/gaimenh.js';
 import { SHENSHA_INFO } from './engine/shensha.js';
@@ -50,6 +51,10 @@ let currentTopic = 'general';
 const $ = (id) => document.getElementById(id);
 function wxClass(w) { return `wx-${w}`; }
 function godVi(g) { return TEN_GOD_VI[g] || g; }
+// Escape mọi chuỗi động trước khi ghép HTML → chống XSS (dùng chung toàn app).
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+));
 
 // ---------------------------------------------------------------- TỨ TRỤ
 function renderPillars(chart) {
@@ -506,6 +511,7 @@ function run() {
   try{renderChangshengDeep();}catch(e){console.warn('csDeep',e.message);}
   try{renderIdealMatch();}catch(e){console.warn('idealMatch',e.message);}
   try{renderZiweiFull();}catch(e){console.warn('ziweiFull',e.message);}
+  try{renderLifeTrajectory(currentResult);}catch(e){console.warn('life',e.message);}
   $("result").classList.remove("hidden");
   $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -904,10 +910,6 @@ const ROLE_OPTS = [
   { v:'father', t:'Cha' }, { v:'mother', t:'Mẹ' }, { v:'sibling', t:'Anh/chị/em' },
   { v:'spouse', t:'Vợ/Chồng' }, { v:'child', t:'Con cái' },
 ];
-// Escape mọi chuỗi động trước khi ghép HTML → chống XSS (label/ghi chú do user nhập).
-const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
-  { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]
-));
 
 function renderFamilyForm() {
   const rows = familyMembers.map((m, i) => {
@@ -1048,6 +1050,52 @@ $('family-members').addEventListener('change', (e) => {
 });
 $('family-btn').addEventListener('click', runFamily);
 renderFamilyForm();
+
+// ============================================================
+// QUỸ TÍCH CUỘC ĐỜI (一生运程) — render timeline (an toàn XSS)
+// ============================================================
+function renderLifeTrajectory(R) {
+  if (!R) return;
+  const L = buildLifeTrajectory(R);
+  const f = L.foundation;
+  const tpHtml = L.turningPoints.map((t) => {
+    const cls = t.kind === 'golden' ? 'rate-cat' : 'rate-hung';
+    const mark = t.kind === 'golden' ? '🌟 Đỉnh vận' : '⚠ Dè chừng';
+    return `<div class="life-tp ${cls}"><b>${mark} ${esc(t.ages)}</b> <span class="zh">${esc(t.ganZhi)}</span> — ${esc(t.reason)}</div>`;
+  }).join('');
+  const summaryHtml = `<div class="life-found">Nhật Chủ <b>${esc(f.dmVi)}</b> (${esc(f.dmWx)}) · ${esc(f.strength)} · Dụng <b>${esc(f.yong)}</b> (Hỷ ${esc(f.yongXi)}) · Cấp mệnh <b>${esc(f.grade || '—')}</b>${f.score != null ? ` (${f.score}/100)` : ''}</div>`
+    + `<p class="life-summary-text">${esc(L.summary)}</p>`
+    + (tpHtml ? `<div class="life-tps">${tpHtml}</div>` : '');
+  $('life-summary').innerHTML = summaryHtml;
+
+  const winLabels = { marriage: '💍 Hôn nhân', children: '👶 Con cái', career: '💼 Sự nghiệp', wealth: '💰 Tài lộc', health: '🏥 Sức khoẻ' };
+  const winHtml = Object.entries(L.keyWindows).map(([k, list]) => {
+    const items = list.length
+      ? list.map((w) => `<span class="life-win-age">${esc(w.ages)} <span class="zh">${esc(w.ganZhi)}</span></span>`).join(' ')
+      : '<span class="hint">(không rõ qua đại vận — xem chi tiết Lưu Niên)</span>';
+    return `<div class="life-win"><div class="life-win-k">${winLabels[k]}</div><div class="life-win-v">${items}</div></div>`;
+  }).join('');
+  $('life-windows').innerHTML = winHtml;
+
+  const decHtml = L.decades.map((d) => {
+    const rcls = rateClass(d.rating);
+    const flags = (d.golden ? '<span class="life-flag golden">🌟 Cát</span>' : '') + (d.caution ? '<span class="life-flag caution">⚠ Trở ngại</span>' : '');
+    const head = `<div class="life-dec-head"><b>${esc(d.ages)}</b> <span class="zh big">${esc(d.ganZhi)}</span> <span class="ln-rate ${rcls}">${esc(d.rating)}</span> ${flags}</div>`;
+    const theme = `<div class="life-dec-theme">${esc(d.themeName)} <span class="hint-inline">(can ${esc(d.ganGodVi)} · chi ${esc(d.zhiGodVi)})</span></div>`;
+    const line = `<div class="life-dec-line">${esc(d.line)}</div>`;
+    return `<div class="life-dec">${head}${theme}${line}</div>`;
+  }).join('');
+  $('life-decades').innerHTML = decHtml;
+
+  const stgHtml = L.stages.map((s) => {
+    const lab = s.score >= 62 ? 'Thuận' : s.score >= 42 ? 'Bình' : 'Bất lợi';
+    const cls = s.score >= 62 ? 'rate-cat' : s.score >= 42 ? 'rate-mid' : 'rate-hung';
+    return `<div class="life-stage"><div class="life-stage-h"><b>${esc(s.label)}</b> <span class="hint-inline">${esc(s.range)}</span> <span class="ln-rate ${cls}">${lab}</span></div><div class="life-stage-v">${esc(s.verdict)}</div></div>`;
+  }).join('');
+  $('life-stages').innerHTML = stgHtml;
+
+  $('life-rectify-note').textContent = L.rectifyNote;
+}
 
 // ============================================================
 // ANIMATION LAYER (taste-skill) — cô lập, KHÔNG sửa logic có sẵn.
