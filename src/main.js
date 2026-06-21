@@ -49,6 +49,7 @@ import { askAI, getConfig, setConfig, isAIReady, PRESETS, testAIConnection } fro
 
 let currentResult = null;
 let currentTopic = 'general';
+let chatHistory = []; // bộ nhớ hội thoại AI: [{role:'user'|'assistant', content}]
 
 const $ = (id) => document.getElementById(id);
 function wxClass(w) { return `wx-${w}`; }
@@ -401,13 +402,20 @@ async function handleAsk() {
   const { body, badge } = appendMsg('assistant', 'Đang luân giải…');
   body.classList.add('streaming');
   const cfg = getConfig();
+  let lastStatus = '';
   try {
     const { source, text } = await askAI(q, currentResult, cfg, {
+      history: chatHistory,
+      onStatus: (s) => { lastStatus = s; body.textContent = s + ' …'; $('chat-log').scrollTop = $('chat-log').scrollHeight; },
       onToken: (_delta, full) => { body.textContent = full; $('chat-log').scrollTop = $('chat-log').scrollHeight; },
     });
     body.textContent = text;
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? 'Trợ lý AI' : 'Trợ lý (cục bộ)';
+    // lưu bộ nhớ hội thoại
+    chatHistory.push({ role: 'user', content: q });
+    chatHistory.push({ role: 'assistant', content: text });
+    if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
   } catch (e) {
     body.textContent = 'Lỗi: ' + e.message;
     body.classList.remove('streaming');
@@ -512,6 +520,7 @@ function run() {
   renderTabs();
   renderTopic();
   $('chat-log').replaceChildren();
+  chatHistory = [];
   updateAIStatus();
   try{renderDaily();}catch(e){console.warn('daily',e.message);}
   try{renderSpaceFs();}catch(e){console.warn('spaceFs',e.message);}

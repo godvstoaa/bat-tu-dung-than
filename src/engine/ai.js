@@ -14,6 +14,10 @@ import { analyzePillarAges } from './pillar-age.js';
 import { nayinInfo } from './nayin.js';
 import { analyzeChangsheng } from './changsheng-deep.js';
 import { computeLiuyue } from './liuyue.js';
+import { analyzeLiuRi, findGoodDays } from './liuri.js';
+import { computeYearDaily } from './year-daily.js';
+import { buildLifeTrajectory } from './life-trajectory.js';
+import { viToHan } from './vi2han.js';
 import { Solar } from 'lunar-javascript';
 
 const hanviet = (gz) => gz.split('').map((c) => (GAN[c]?.vi || ZHI[c]?.vi || c)).join(' ');
@@ -175,14 +179,121 @@ NGUYEN TAC:
 
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the. NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.`;
 // ===========================================================================
-//  3. HÀM HỎI ĐÁP CHÍNH
+//  3. TOOLS — các engine deterministic cho AI tự gọi (Z.ai/OpenAI tool-calling)
+//  AI tính thêm khi cần (ngày/năm/cả năm/quỹ tích...) → chuyên gia agent, không
+//  chỉ đọc dump tĩnh. Spec: tools + tool_choice='auto'; response tool_calls.
+//  Nguồn: docs.z.ai/guides/capabilities/function-calling.
 // ===========================================================================
-/**
- * Hỏi AI. Trả về Promise<{ source, text }>.
- *  - source 'ai': LLM đã trả lời
- *  - source 'local': fallback NLG cục bộ (do chưa cấu hình hoặc lỗi)
- */
-export async function askAI(question, R, cfg, { onToken } = {}) {
+const _s = (str, n) => (str == null ? '' : String(str)).slice(0, n);
+
+export const AI_TOOLS = [
+  { type: 'function', function: {
+    name: 'get_current_time', description: 'Lấy thời gian hiện tại: ngày/tháng/năm dương lịch, âm lịch, can-chi năm & tháng. Dùng để biết CHÍNH XÁC "năm nay/tháng nay" — KHÔNG đoán năm.',
+    parameters: { type: 'object', properties: {}, required: [] },
+  } },
+  { type: 'function', function: {
+    name: 'analyze_day', description: 'Luận lưu nhật của MỘT ngày cụ thể (can-chi, Thập thần, điểm Cát/Hung, lời khuyên, tương tác lưu năm/đại vận). Dùng khi hỏi về 1 ngày.',
+    parameters: { type: 'object', properties: {
+      year: { type: 'integer', description: 'Năm dương lịch, vd 2026' },
+      month: { type: 'integer', description: 'Tháng 1-12' },
+      day: { type: 'integer', description: 'Ngày 1-31' },
+    }, required: ['year', 'month', 'day'] },
+  } },
+  { type: 'function', function: {
+    name: 'analyze_year', description: 'Luận lưu niên của MỘT năm (đa trường phái): can-chi năm, điểm Cát/Hung + lý do từng phái, lời khuyên cả năm.',
+    parameters: { type: 'object', properties: {
+      year: { type: 'integer', description: 'Năm dương lịch' },
+    }, required: ['year'] },
+  } },
+  { type: 'function', function: {
+    name: 'best_days_in_year', description: 'Các ngày CÁT nhất & KỴ nhất trong 1 năm (lưu nhật từng ngày). Dùng khi hỏi chọn ngày tốt (cưới/khai trương/ký hợp đồng).',
+    parameters: { type: 'object', properties: {
+      year: { type: 'integer', description: 'Năm dương lịch' },
+    }, required: ['year'] },
+  } },
+  { type: 'function', function: {
+    name: 'life_trajectory', description: 'Quỹ tích cuộc đời: 8 đại vận (thập kỷ) + chủ đề/Cát-Hung, 4 giai đoạn đời, cửa sổ hôn nhân/con/sự nghiệp/tài/sức khoẻ, điểm rẽ. Dùng khi hỏi về cả đời.',
+    parameters: { type: 'object', properties: {}, required: [] },
+  } },
+  { type: 'function', function: {
+    name: 'analyze_month', description: 'Luận lưu nguyệt (vận tháng) của tháng hiện tại hoặc 1 tháng. Dùng khi hỏi "tháng này/tháng X sao".',
+    parameters: { type: 'object', properties: {
+      year: { type: 'integer', description: 'Năm (bỏ trống = năm hiện tại)' },
+      month: { type: 'integer', description: 'Tháng 1-12 dương lịch (bỏ trống = tháng hiện tại)' },
+    }, required: [] },
+  } },
+  { type: 'function', function: {
+    name: 'find_good_days', description: 'Tìm N ngày CÁT nhất (vận cá nhân) trong khoảng kể từ 1 ngày. Dùng khi hỏi "sắp tới ngày nào tốt".',
+    parameters: { type: 'object', properties: {
+      start: { type: 'string', description: 'Ngày bắt đầu YYYY-MM-DD' },
+      count: { type: 'integer', description: 'Số ngày quét, vd 30' },
+      topN: { type: 'integer', description: 'Số ngày tốt cần lấy, vd 5' },
+    }, required: ['start', 'count'] },
+  } },
+];
+
+// Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
+export function execTool(name, args, R) {
+  const a = args || {};
+  try {
+    switch (name) {
+      case 'get_current_time': {
+        const n = new Date();
+        const s = Solar.fromYmdHms(n.getFullYear(), n.getMonth() + 1, n.getDate(), 12, 0, 0);
+        const l = s.getLunar(); const ec = l.getEightChar();
+        return { solar: s.toYmd(), lunar: l.toString(), year: n.getFullYear(), yearGanZhi: ec.getYearGan() + ec.getYearZhi(), monthGanZhi: ec.getMonthGan() + ec.getMonthZhi() };
+      }
+      case 'analyze_day': {
+        const d = analyzeLiuRi(R, a.year, a.month, a.day);
+        return { date: d.solar, ganZhi: d.ganZhi, ganGod: d.ganGod, rating: d.rating, score: d.score, advice: _s(d.advice, 240), interactions: (d.ctx || []) };
+      }
+      case 'analyze_year': {
+        const y = analyzeLiunianDeep(R, a.year);
+        return { year: y.year, ganZhi: y.ganZhi, rating: y.rating, score: y.score, advice: _s(y.advice, 260), schools: y.schools.map((sc) => ({ school: sc.phai, delta: sc.d, note: _s(sc.note, 110) })) };
+      }
+      case 'best_days_in_year': {
+        const Y = computeYearDaily(R, a.year);
+        return { year: Y.year, best: Y.best.slice(0, 8).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score })), worst: Y.worst.slice(0, 5).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score })) };
+      }
+      case 'life_trajectory': {
+        const L = buildLifeTrajectory(R);
+        return {
+          foundation: L.foundation,
+          decades: L.decades.map((d) => ({ ages: d.ages, ganZhi: d.ganZhi, rating: d.rating, theme: d.themeName, golden: d.golden, caution: d.caution, note: _s(d.line, 120) })),
+          keyWindows: Object.fromEntries(Object.entries(L.keyWindows).map(([k, v]) => [k, v.map((w) => w.ages + '(' + w.ganZhi + ')')])),
+          turningPoints: L.turningPoints,
+        };
+      }
+      case 'analyze_month': {
+        const n = new Date();
+        const yr = a.year ?? n.getFullYear(); const mo = a.month ?? (n.getMonth() + 1);
+        const lm = computeLiuyue(R, yr);
+        const cm = lm.months.find((x) => x.m === (mo - 1)) || lm.months[mo - 1];
+        return cm ? { month: mo, ganZhi: cm.ganZhi, ganGod: cm.ganGod, rating: cm.rating } : { error: 'không tính được tháng ' + mo };
+      }
+      case 'find_good_days': {
+        const [yy, mm, dd] = String(a.start).split('-').map(Number);
+        const list = findGoodDays(R, yy, mm, dd, a.count || 30, a.topN || 5);
+        return { start: a.start, top: list.map((d) => ({ date: d.solar, ganZhi: d.ganZhi, rating: d.rating, score: d.score })) };
+      }
+      default:
+        return { error: 'tool không hỗ trợ: ' + name };
+    }
+  } catch (e) {
+    return { error: 'lỗi tính tool ' + name + ': ' + e.message };
+  }
+}
+
+function toolLabel(name) {
+  return ({ get_current_time: 'Lấy thời gian', analyze_day: 'Luận lưu ngày', analyze_year: 'Luận lưu năm', best_days_in_year: 'Tìm ngày tốt', life_trajectory: 'Quỹ tích đời', analyze_month: 'Luận lưu tháng', find_good_days: 'Tìm ngày tốt' })[name] || name;
+}
+
+// ===========================================================================
+//  4. AGENTIC ASK — streaming + tools + thinking + memory (Z.ai spec)
+//  - history: [{role:'user'|'assistant', content}] bộ nhớ hội thoại
+//  - onToken(delta, full): stream nội dung; onStatus(text): báo tiến trình tool
+// ===========================================================================
+export async function askAI(question, R, cfg, { onToken, onStatus, history } = {}) {
   cfg = cfg || getConfig();
   const localFallback = (note) => {
     const block = composeAnswer(question, R);
@@ -191,42 +302,67 @@ export async function askAI(question, R, cfg, { onToken } = {}) {
   };
 
   if (!isAIReady(cfg)) {
-    return localFallback('Đang dùng bộ luân giải cục bộ. Cấu hình API AI trong ⚙ Cài đặt để nhận phân tích chuyên sâu hơn.');
+    return localFallback('Đang dùng bộ luân giải cục bộ. Mở ⚙ Cài đặt để nhận phân tích chuyên sâu hơn.');
   }
 
   const brief = buildChartBrief(R);
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'system', content: brief },
+    { role: 'system', content: brief + '\n\n== TOOLS (FUNCTION CALLING) ==\nBạn CÓ THỂ gọi hàm để TÍNH THÊM khi cần: get_current_time, analyze_day, analyze_year, best_days_in_year, life_trajectory, analyze_month, find_good_days. Gọi tool khi câu hỏi cần dữ liệu cụ thể (1 ngày / 1 năm / cả đời) mà brief chưa đủ. TUYET DOI KHONG tu doung du lieu — luon goi tool de lay so lieu chinh xac, roi moi luan.' },
+    ...((history || []).slice(-8)),
     { role: 'user', content: question },
   ];
 
-  try {
-    const endpoint = cfg.endpoint.replace(/\/$/, '');
-    const url = endpoint.endsWith('/chat/completions') ? endpoint : endpoint + '/chat/completions';
+  const endpoint = cfg.endpoint.replace(/\/$/, '');
+  const url = endpoint.endsWith('/chat/completions') ? endpoint : endpoint + '/chat/completions';
+  const headers = { 'Content-Type': 'application/json', ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}) };
+  const isGlm = /glm|z\.ai|bigmodel/i.test((cfg.model || '') + (cfg.endpoint || ''));
+  const buildBody = (msgs, toolsOn) => ({
+    model: cfg.model, messages: msgs, temperature: 0.6, stream: true,
+    ...(isGlm ? { thinking: { type: 'enabled' } } : {}),       // GLM: bật deep thinking bản địa
+    ...(toolsOn ? { tools: AI_TOOLS, tool_choice: 'auto' } : {}),
+  });
 
-    if (onToken) {
-      // Streaming
-      const text = await streamChat(url, cfg, messages, onToken);
-      return { source: 'ai', text };
+  let toolsOn = true;
+  try {
+    for (let step = 0; step < 6; step++) {
+      let round;
+      try {
+        round = await streamRound(url, headers, buildBody(messages, toolsOn), onToken, onStatus);
+      } catch (e) {
+        // Lượt đầu: nếu model không hỗ trợ tools/thinking → tắt cả 2 và thử lại
+        if (step === 0 && toolsOn) { toolsOn = false; step = -1; continue; }
+        throw e;
+      }
+      const { content, toolCalls } = round;
+
+      if (toolCalls && toolCalls.length && toolsOn) {
+        messages.push({
+          role: 'assistant', content: content || '',
+          tool_calls: toolCalls.map((tc) => ({ id: tc.id, type: 'function', function: { name: tc.name, arguments: tc.arguments } })),
+        });
+        for (const tc of toolCalls) {
+          let args = {}; try { args = JSON.parse(tc.arguments || '{}'); } catch (_) {}
+          const ctx = args.start || ((args.year || '') + (args.month ? '/' + args.month : '') + (args.day ? '/' + args.day : ''));
+          if (onStatus) onStatus(`🔧 ${toolLabel(tc.name)}${ctx ? ' · ' + ctx : ''}`);
+          const result = execTool(tc.name, args, R);
+          messages.push({ role: 'tool', tool_call_id: tc.id, content: JSON.stringify(result) });
+        }
+        continue; // model tiếp tục luận (interleaved thinking) + có thể gọi tiếp hoặc trả lời
+      }
+
+      if (!content) {
+        if (toolsOn) { toolsOn = false; step = -1; continue; } // thử lại không tool
+        throw new Error('Phản hồi rỗng');
+      }
+      return { source: 'ai', text: content };
     }
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}),
-      },
-      body: JSON.stringify({ model: cfg.model, messages, temperature: 0.6, stream: false }),
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const text = data?.choices?.[0]?.message?.content?.trim() || '';
-    if (!text) throw new Error('Phản hồi rỗng');
-    return { source: 'ai', text };
+    const last = [...messages].reverse().find((m) => m.role === 'assistant' && m.content);
+    return { source: 'ai', text: (last?.content) || '(AI không trả lời được)' };
   } catch (e) {
     const isCors = /Failed to fetch|NetworkError|Load failed/i.test(e.message);
     const hint = isCors
-      ? `Không gọi được AI — CORS: trình duyệt chặn gọi ${cfg.endpoint}. Mở ⚙ chọn preset "★ PROXY DEV" (khi npm run dev) hoặc dùng backend.`
+      ? `Không gọi được AI — CORS: trình duyệt chặn ${cfg.endpoint}. Mở ⚙ chọn "★ PROXY DEV" (npm run dev) hoặc backend.`
       : `Không gọi được AI: ${e.message}.`;
     return localFallback(hint + ' Hiện trả lời bằng bộ luân giải cục bộ.');
   }
@@ -256,37 +392,44 @@ export async function testAIConnection(cfg) {
   }
 }
 
-// ---- Streaming (SSE) qua fetch + ReadableStream ----
-async function streamChat(url, cfg, messages, onToken) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}),
-    },
-    body: JSON.stringify({ model: cfg.model, messages, temperature: 0.6, stream: true }),
-  });
-  if (!res.ok || !res.body) throw new Error('HTTP ' + res.status);
+// ---- 1 vòng streaming SSE: gom content (→ onToken) + tool_calls + bỏ qua reasoning_content ----
+// Theo docs Z.ai (interleaved thinking + stream tool call).
+async function streamRound(url, headers, body, onToken, onStatus) {
+  const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+  if (!res.ok || !res.body) {
+    let t = ''; try { t = await res.text(); } catch (_) {}
+    throw new Error('HTTP ' + res.status + (t ? ': ' + t.slice(0, 140) : ''));
+  }
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buf = '', full = '';
+  const toolCalls = [];
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
     buf += decoder.decode(value, { stream: true });
-    const lines = buf.split('\n');
-    buf = lines.pop();
+    const lines = buf.split('\n'); buf = lines.pop();
     for (const line of lines) {
       const s = line.trim();
       if (!s.startsWith('data:')) continue;
       const payload = s.slice(5).trim();
-      if (payload === '[DONE]') return full;
-      try {
-        const json = JSON.parse(payload);
-        const delta = json?.choices?.[0]?.delta?.content || '';
-        if (delta) { full += delta; onToken(delta, full); }
-      } catch (e) { /* bỏ qua dòng không hợp lệ */ }
+      if (payload === '[DONE]') continue;
+      let json; try { json = JSON.parse(payload); } catch (_) { continue; }
+      const delta = json?.choices?.[0]?.delta;
+      if (!delta) continue;
+      // reasoning_content (thinking) → không hiển thị, chỉ lấy content cho user
+      if (delta.content) { full += delta.content; if (onToken) onToken(delta.content, full); }
+      // tool_calls streaming — tích lũy theo index (spec Z.ai/OpenAI)
+      if (delta.tool_calls) {
+        for (const tc of delta.tool_calls) {
+          const idx = (typeof tc.index === 'number') ? tc.index : 0;
+          if (idx >= toolCalls.length) toolCalls.push({ id: tc.id || ('call_' + idx), name: '', arguments: '' });
+          if (tc.function?.name) toolCalls[idx].name = tc.function.name;
+          if (tc.function?.arguments) toolCalls[idx].arguments += tc.function.arguments;
+          if (tc.id) toolCalls[idx].id = tc.id;
+        }
+      }
     }
   }
-  return full;
+  return { content: full.trim(), toolCalls };
 }
