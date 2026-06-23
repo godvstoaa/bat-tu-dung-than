@@ -17,8 +17,84 @@ import { computeLiuyue } from './liuyue.js';
 import { analyzeLiuRi, findGoodDays } from './liuri.js';
 import { computeYearDaily } from './year-daily.js';
 import { buildLifeTrajectory } from './life-trajectory.js';
+import { healthMonthlyAlert } from './health-monthly.js';
+import { lifeReading } from './life-reading.js';
+import { scanFuyin, dayunFuyin, natalFuyin } from './fuyin.js';
+import { marriageStars } from './marriage-stars.js';
+import { taiSuiOverview } from './taisui-general.js';
+import { sanyuanJiuyun } from './sanyuan-jiuyun.js';
+import { analyzeDaySpecial, specialDays, nextTianShe } from './zheri-stars.js';
+import { jiaoYunAnalysis } from './jiaoyun.js';
+import { analyzePillarQuality } from './pillar-quality.js';
+import { analyzeTaohua } from './taohua.js';
+import { analyzeTongGen } from './tonggen.js';
+import { analyzeHuaQi } from './huaqi.js';
+import { analyzeKu } from './ku.js';
+import { computeZiwei } from './ziwei.js';
+import { ziweiCoreReading } from './ziwei-sanfang.js';
+import { analyzeZiweiBrightness } from './ziwei-brightness.js';
+import { analyzeShuangXing } from './ziwei-shuangxing.js';
+import { analyzeZiweiGeju } from './ziwei-geju.js';
+import { annualSihuaToNatal } from './ziwei-liunian-sihua.js';
+import { computeAuxStars } from './ziwei-aux.js';
+import { idealHouse } from './ideal-house.js';
+import { annualDirection } from './annual-direction.js';
+import { scanMarriageTiming } from './marriage-timing.js';
+import { sanshaDirection } from './sansha.js';
+import { annualTabooOverview } from './annual-taboo.js';
+import { monthlySha } from './monthly-sha.js';
+import { starPower } from './star-power.js';
+import { scanWealthCareerYingqi } from './yingqi-wealth.js';
+import { strength3Fa } from './strength-3fa.js';
+import { decadeForecast } from './decade-forecast.js';
+import { analyzeDeRi, deRiInYear, nextDeRi } from './deri.js';
+import { analyzeXiongRi, xiongRiInYear } from './xiongri.js';
+import { analyzeMonthShen, monthShenInYear, nextTianYi } from './zheri-extra.js';
+import { huangdao12 } from './huangdao.js';
+import { analyzeYanQin } from './yanqin.js';
+import { qinxingOverview } from './qinxing.js';
+import { dominantGod } from './dominant-god.js';
+import { missingGod } from './missing-god.js';
 import { viToHan } from './vi2han.js';
+// Cycle 32 — 流日 + 流年引动六亲 (wired vào brief)
+import { ziweiLiuri } from './ziwei-liuri.js';
+import { liunianEvents } from './liunian-event.js';
+// Cycle 33 — 择吉时合成 (wired vào brief)
+import { bestHourToday } from './best-hour.js';
+// 5 module bổ sung (wired vào brief + NLG)
+import { chenggu } from './chenggu.js';
+import { analyzeLiunian12 } from './liunian-12shen.js';
+import { analyzeNobleStars } from './noble-stars.js';
+import { sanshishu } from './sanshishu.js';
+import { analyzeMangpaiView } from './mangpai-view.js';
+import { waterActivation } from './water-activation.js';
+import { physiognomyOverview } from './physiognomy.js';
+import { yinzhaiOverview } from './yinzhai.js';
+import { cezi } from './cezi.js';
+import { qizheng, longitudeToMansion } from './qizheng.js';
+// 天星择日 (cycle 38) — chọn ngày theo vị trí thật của 7 chính tinh tới 坐向
+import { tianxingZheri } from './tianxing-zheri.js';
+import { taiyi } from './taiyi.js';
+import { POSITIONS as XLR_POSITIONS } from './xiaoliuren.js';
+import { qiuqian } from './qiuqian.js';
+import { daguaOverview } from './xuankong-dagua.js';
+import { zodiacPairScore } from './zodiac-deep.js';
+import { jinkoujue as jinkoujueCast } from './jinkoujue.js';
+import { heluo } from './heluo.js';
 import { Solar } from 'lunar-javascript';
+// Cycle 35 — DAILY BRIEFING (composite 8 hệ → 1 thẻ tóm tắt HÔM NAY; section nổi bật ở đầu brief)
+import { dailyBriefing } from './daily-briefing.js';
+// Deep-domain analysis (财库/暗合/nạp âm/spouse/wealth/career/health/study/dayun-god/taiyuan/...)
+import { extendBrief } from './brief-extender.js';
+// Tier-2 forecasting (golden year / 5-year alert / dayun rank / wealth month / health decade)
+import { findGoldenYear } from './golden-year.js';
+import { forecast5 } from './forecast5.js';
+import { rankDayun } from './dayun-rank.js';
+import { wealthMonthlyAlert } from './wealth-alert.js';
+import { healthAlertScan } from './health-alert.js';
+
+// brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
+let _briefCache = null;
 
 const hanviet = (gz) => gz.split('').map((c) => (GAN[c]?.vi || ZHI[c]?.vi || c)).join(' ');
 const wxVi = (w) => WX_VI[w];
@@ -30,8 +106,8 @@ const CFG_KEY = 'bazi_ai_config_v1';
 // LƯU Ý CORS: gọi THẲNG (https://api.z.ai...) từ trình duyệt sẽ bị CORS chặn → fallback.
 // Khi `npm run dev`, dùng preset "proxy dev" (/zai/...) đi qua Vite proxy → chạy được.
 export const PRESETS = [
-  { id: 'zai-proxy', label: '★ Z.ai — PROXY DEV (glm-5.2) [khuyên dùng npm run dev]', endpoint: '/zai/api/paas/v4', model: 'glm-5.2',
-    note: 'Đi qua Vite proxy → KHÔNG bị CORS. CHỈ chạy được khi `npm run dev` (localhost). Mua key tại z.ai/model-api. Đây là lựa chọn nên dùng khi test.' },
+  { id: 'zai-proxy', label: '★ Z.ai — PROXY (glm-5.2) [khuyên dùng — web + dev]', endpoint: '/zai/api/paas/v4', model: 'glm-5.2',
+    note: 'Đi qua proxy cùng-origin → KHÔNG bị CORS. Chạy được cả npm run dev (Vite proxy) LẪN trên web production (Cloudflare Pages Function /zai). Nên dùng.' },
   { id: 'zai-general', label: 'Z.ai — API chung (glm-5.2) [CORS: chỉ chạy qua backend]', endpoint: 'https://api.z.ai/api/paas/v4', model: 'glm-5.2',
     note: 'Endpoint thẳng — trình duyệt sẽ CHẶN CORS. Chỉ dùng nếu app có backend/proxy, hoặc chạy qua server-side.' },
   { id: 'zai-coding', label: 'Z.ai — GLM Coding Plan (glm-5.2) [CORS]', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2',
@@ -78,8 +154,14 @@ export function buildChartBrief(R) {
   let curMonthRating = '(không tính được)';
   let curMonthNote = '';
   try {
+    // Tháng âm lịch hiện tại (lunar-javascript) — x.m trong computeLiuyue là chỉ số tiết khí 0-11,
+    // không phải getMonth() (dương lịch) → so với lunar month của hôm nay.
+    let curLunarMonth = -1;
+    try {
+      curLunarMonth = Solar.fromYmdHms(_now.getFullYear(), _now.getMonth() + 1, _now.getDate(), 12, 0, 0).getLunar().getMonth();
+    } catch (_) {}
     const lm = computeLiuyue(R, curYear);
-    const cm = lm.months.find((x) => x.m === _now.getMonth());
+    const cm = lm.months.find((x) => x.m === curLunarMonth - 1) || lm.months[curLunarMonth - 1];
     if (cm) { curMonthRating = `${cm.ganZhi} — ${cm.rating}`; curMonthNote = ` (tháng CÁT trong năm: ${lm.best.map((b) => 'T' + (b.m + 1)).join(', ')}; tháng KỴ: ${lm.worst.map((b) => 'T' + (b.m + 1)).join(', ')})`; }
   } catch (e) {}
   const pillars = ['year', 'month', 'day', 'time'].map((k) => {
@@ -100,15 +182,22 @@ export function buildChartBrief(R) {
   const liunianStr = (R.liunian || []).map((l) =>
     `${l.year}(${hanviet(l.ganZhi)}:${l.rating}${l.isNow ? '★nay' : ''})`).join(' ');
 
-  return `== ⏰ THỜI GIAN HIỆN TẠI (CHUẨN MỌI PHÂN TÍCH — ĐỌC KỄ, RẤT QUAN TRỌNG) ==
+  let brief = `== ⏰ THỜI GIAN HIỆN TẠI (CHUẨN MỌI PHÂN TÍCH — ĐỌC KỄ, RẤT QUAN TRỌNG) ==
 - Hôm nay (dương lịch): ${nowSolar.toYmd()}
 - Âm lịch: ${nowLunar.toString()}
 - NĂM NAY = ${curYear} = ${curYearGZ} (${hanviet(curYearGZ)}). ĐÂY LÀ NĂM ĐANG DIỄN RA, KHÔNG PHẢI TƯƠNG LAI. Từ "năm nay" / "năm này" LUÔN là ${curYear} — KHÔNG được mặc định 2024 hay bất kỳ năm nào khác.
 - THÁNG NAY (lưu nguyệt) = ${curMonthGZ} (${hanviet(curMonthGZ)}) — rating ${curMonthRating}${curMonthNote}
 - Khi user hỏi "tháng này / năm nay" → PHẢI dùng ${curYear} và lưu nguyệt ${curMonthGZ} ở trên.
+- TRỊ NIÊN THÁI TUẾ ${curYear}: ${(() => { try { const o = taiSuiOverview(R, curYear); return `${o.current.ganZhi} = ${o.current.name} (vị ${o.current.index}/60). ${o.current.note} Bản mệnh TS (năm sinh) = ${o.natal.name}.`; } catch (e) { return '(không tính được)'; } })()}
+
+== 📅 HÔM NAY TỔNG KHÁI (DAILY BRIEFING — QUAN TRỌNG NHẤT, ĐỌC TRƯỚC) ==
+${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() + 1, _now.getDate()); return `ONE_LINER: ${b.oneLiner}\n${b.summary}`; } catch (e) { return '(không tính được)'; } })()}
+⏩ Khi user hỏi "hôm nay thế nào / hôm nay làm gì / tổng quan hôm nay" → Ưu tiên trả lời từ block "HÔM NAY TỔNG KHÁI" này TRƯỚC, sau đó mới đi sâu vào chi tiết bên dưới nếu được hỏi thêm.
 
 == LÁ SỐ BÁT TỰ (đã tính chính xác, dùng để luân giải) ==
 - Nhật Chủ (日主): ${dm.gan} ${dm.vi} — hành ${wxVi(dm.wx)} ${dm.yin ? '(âm)' : '(dương)'}
+- BẢN MỆNH HÀM 演禽 (28 túc con-vật-tinh, như con giáp 28-fold): ${(() => { try { return analyzeYanQin(R).summary; } catch (e) { return '(không tính được)'; } })()}
+- 禽星 NĂN ${curYear} (annual bird rotation — con vật tinh trụ trị năm nay, feng shui timing): ${(() => { try { return qinxingOverview(R, curYear).summary; } catch (e) { return '(không tính được)'; } })()}
 - 滴天髓 luận ${dm.gan}: ${DITIANSUI[dm.gan].verse} → ${DITIANSUI[dm.gan].nature}
 - Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
 - Tiết khí gần nhất: ${c.jieqi.prev.name}
@@ -117,12 +206,14 @@ TỨ TRỤ:
 ${pillars}
 
 VƯỢNG SUY: ${R.strength.level} (tỉ lệ phù trợ thân ${(R.strength.ratio * 100).toFixed(1)}%, ${R.strength.deLenh ? 'đắc lệnh' : 'thất lệnh'})
+WHY VƯỢNG SUY 得令/得地/得势 3 pháp (mạnh nhờ lệnh/địa/thế hay nhờ Ấn?): ${(() => { try { return strength3Fa(R).summary; } catch (e) { return '(không tính được)'; } })()}
 
 NGŨ HÀNH: ${wx}
 
 CÁCH CỤC (格局): ${R.pattern.vi} — ${R.pattern.name}
+HÓA KHÍ (化气格 — can hợp có hóa không; nếu thành → Dụng đổi hẳn): ${(() => { try { const h = analyzeHuaQi(R); return h.huaQiGe ? `⚠ ${h.summary}` : h.summary; } catch (e) { return '(không tính được)'; } })()}
   ${R.pattern.note}
-  ${R.pattern.geShen ? `格 thần: ${R.pattern.geShen.gan} (${TEN_GOD_VI[R.pattern.geShen.god] || R.pattern.geShen.god})` : ''}
+  ${R.pattern.geShen ? `格 thần: ${R.pattern.geShen.gan || '(can tòng/vương)'} (${TEN_GOD_VI[R.pattern.geShen.god] || R.pattern.geShen.god || '—'})${R.pattern.geShen.wx ? ' [' + R.pattern.geShen.wx + ']' : ''}` : ''}
 
 DỤNG – HỶ – KỴ – THÙ (用喜忌仇):
   - Dụng (dùng): ${[R.yong.primary, R.yong.secondary].filter(Boolean).map((w) => wxVi(w) + '(' + w + ')').join(', ')}
@@ -132,23 +223,65 @@ DỤNG – HỶ – KỴ – THÙ (用喜忌仇):
   - Phép lấy Dụng Thần: ${R.yong.method.join(' + ')}
   - Lập luận: ${R.yong.reasons.join(' ')}
   - Điều Hậu (调候): ${R.yong.tiaohou.note || '(không)'}
+  - SỨC MẠNH DỤNG (通根透干 + 旺相休囚死): ${(() => { try { const t = analyzeTongGen(R); return `${t.dung.verdict} (${t.dung.seasonVi}) — căn ${t.dung.root.total}, lộ ${t.dung.reveal.length}. ${t.dung.verdict === '藏而不透' ? 'Đợi lưu niên can ' + t.whenReveal.join('/') + ' thấu mới phát.' : t.dung.verdict === '虚浮' || t.dung.verdict === '虚' ? 'Dụng YẾU — cần bù mạnh.' : 'Dụng thật, có lực.'}`; } catch (e) { return '(không tính được)'; } })()}
 
 TỔNG LUẬN MỆNH: ${R.synthesis.gradeVi} · ${R.synthesis.fortuneVi} (điểm ${R.synthesis.score}/100)
   Nhân tố: ${R.synthesis.factors.join(' | ')}
   Tổ hợp Thập thần: ${(R.synthesis.combos || []).map((c) => c.vi + '[' + (c.tone === 'cat' ? 'cát' : 'hung') + ']').join(', ') || '(không nổi)'}
+THẬP THẦN CHỦ ĐẠO 主导十神 (tuýp người + nghề hợp + có thuận Dụng không): ${(() => { try { return dominantGod(R).summary; } catch (e) { return '(không tính được)'; } })()}
+THẬP THẦN KHUYẾT/THIẾU 缺十神 (lĩnh vực đời nào yếu): ${(() => { try { return missingGod(R).summary; } catch (e) { return '(không tính được)'; } })()}
+SAO TRỌNG ĐIỂM 财官印 通根透干 (sao Tài/Quan/Ấn có THẬT lực không hay hư phù): ${(() => { try { return starPower(R).summary; } catch (e) { return '(không tính được)'; } })()}
+TÀI/QUAN THẤU CÁN ỨNG KỲ (năm nào sao TÀI/QUAN ẩn được kích hoạt — đế can cùng hành thấu): ${(() => { try { return scanWealthCareerYingqi(R, curYear, 12).summary; } catch (e) { return '(không tính được)'; } })()}
 
 HỘI – HỢP – XUNG – HÌNH – HẠI: ${R.interactions.summary}
+
+CHẤT LƯỢNG TRỤ 盖头截脚 (can-chi có khắc-nhau trong trụ không — đọc "sao hay vấp"):
+${(() => { try { return analyzePillarQuality(R).summary; } catch (e) { return '(không tính được)'; } })()}
 
 THẦN SÁT: ${shenshaList}
 
 LỤC THÂN (cung vị + tinh): ${(R.liuqin || []).map((l) => `${l.relVi}(${l.mainStar || '-'}, cung ${l.palaceGod}${l.stable ? '' : ', xung'})`).join('; ') || '(không)'}
 
+SAO HÔN NHÂN CỔ (theo trụ — 孤鸾/阴阳差错/八专/九丑; dùng trả lời "cớ sao duyên trắc/kết hôn sao 选"):
+${(() => { try { return marriageStars(R).summary; } catch (e) { return '(không tính được)'; } })()}
+
+ĐÀO HOA 桃花 (正/烂桃花 — dùng trả lời "tình duyên tôi lành/hão, sao hay lỡ duyên"):
+${(() => { try { return analyzeTaohua(R).summary; } catch (e) { return '(không tính được)'; } })()}
+HÔN/LUYÊN ỨNG KỲ (năm nào gặp duyên/kết hôn — 红鸾天喜/配偶星/桃花 đến theo LƯU NIÊN):
+${(() => { try { return scanMarriageTiming(R, curYear, 12).summary; } catch (e) { return '(không tính được)'; } })()}
+
+TAM NGUYÊN CỬU VẬN 三元九运 (vĩ mô phong thuỷ 20 năm — dùng trả lời "20 năm tới vận gì/ngành nào mệnh"):
+${(() => { try { return sanyuanJiuyun(R, curYear).summary; } catch (e) { return '(không tính được)'; } })()}
+
+天赦日 / 四废 / 十恶大败 (黄历择日 — dùng khi khuyên NGÀY TỐT/XẤU cụ thể):
+${(() => { try { const sd = specialDays(curYear); const today = analyzeDaySpecial(_now.getFullYear(), _now.getMonth() + 1, _now.getDate()); const nx = nextTianShe(_now.getFullYear(), _now.getMonth() + 1, _now.getDate(), 3); const todayTag = today.special.length ? `HÔM NAY (${today.ganZhi}): ${today.special.map(s=>s.typeVi).join('+')}. ` : ''; return `${todayTag}${sd.summary} 3 天赦 tiếp theo: ${nx.map(t=>`${t.solar}(${t.ganZhi})`).join(', ')} — khuyên làm việc lớn (khai trương/cưới/dọn nhà/ký kết/cầu phúc) vào 天赦日; tránh 四废 (đại hung) + 十恶大败 (kỴ cầu tài).`; } catch (e) { return '(không tính được)'; } })()}
+
+四ĐỨC NHẬT 岁德/月德 (4 sao Đức, «vạn ác tiêu trừ», bổ 天赦): ${(() => { try { const dy = deRiInYear(curYear); const nx = nextDeRi(_now.getFullYear(), _now.getMonth() + 1, _now.getDate(), 3); return `${dy.summary} 3 ngày đức tới: ${nx.map((d) => `${d.solar}(${d.de})`).join(', ')} — ưu tiên ≥2 đức để làm việc lớn.`; } catch (e) { return '(không tính được)'; } })()}
+HUNG NHẬT 黄历凶日 月破/月厌/往亡 (KỴ làm việc lớn): ${(() => { try { const xr = xiongRiInYear(curYear); const today = analyzeXiongRi(_now.getFullYear(), _now.getMonth() + 1, _now.getDate()); const todayTag = today.isXiong ? `⚠ HÔM NAY (${today.ganZhi}) = ${today.hits.map((h) => h.typeVi).join('+')} → KỴ làm việc lớn! ` : ''; return `${todayTag}${xr.summary}`; } catch (e) { return '(không tính được)'; } })()}
+黄道 HÔM NAY (12 thần hoàng/hắc đạo — 青龙/明堂/...): ${(() => { try { const r = huangdao12(_now.getFullYear(), _now.getMonth() + 1, _now.getDate()); return `${r.deity} (${r.deityVi}) — ${r.road === 'yellow' ? '黄道' : '黑道'} — ${r.meaning}`; } catch (e) { return '(không tính được)'; } })()}
+GIỜ TỐT NHẤT HÔM NAY 择吉时合成 (composite 5 chiều: 黄道/黑道 giờ + Dụng ngũ hành + 紫微流时 + 流时神煞 quý nhân + 建除直 ngày — dùng trả lời "hôm nay giờ nào tốt nhất cho [việc]"):
+${(() => { try { const bh = bestHourToday(R, _now.getFullYear(), _now.getMonth() + 1, _now.getDate()); const best = bh.best.map((h) => `${h.vi}(${h.range}, ${h.rating}, ${h.score}/100)`).join(' · '); const worst = bh.worst.filter((w) => w.score < 45).map((w) => `${w.vi}(${w.range})`).join(' · '); return `Hôm nay ${bh.dayGanZhi} trực ${bh.dayOfficer.officerVi}: BEST_HOURS = ${best}${worst ? ` | TRÁNH: WORST_HOURS = ${worst}` : ''}. ${bh.summary}`; } catch (e) { return '(không tính được)'; } })()}
+紫微流日 HÔM NAY (紫微流日 — mệnh cung lưu nhật + sao + tứ hóa ngày, dùng trả lời "hôm nay CHỦ ĐỀ gì nổi / tỷ lệ gì bật"):
+${(() => { try { const zlr = ziweiLiuri({ input: c.input }, _now.getFullYear(), _now.getMonth() + 1, _now.getDate()); const g = zlr.liuriGong; const sh = zlr.liuriSihua.filter((s) => s.palace); return `Hôm nay ${zlr.dayGanZhi} (âm ${zlr.lunarDay}/${zlr.lunarMonth}): 流日命宫 tại ${g.zhi} — ${g.vi} (chủ đề: ${g.meaning}) [${g.tone === 'cat' ? 'Cát' : g.tone === 'hung' ? 'Hung' : 'Bình'}]. Sao tại cung: ${g.stars.length ? g.stars.join(', ') : '(cung trống)'}. Day 四化 ${zlr.dayGan}: ${sh.length ? sh.map((s) => `${s.hua}${s.star}@${s.palace}(${s.palaceVi}: ${s.theme})`).join(' · ') : '(không hóa đặt được cung)'}.`; } catch (e) { return '(không tính được)'; } })()}
+流年引动六亲 NĂM NAY (流年引动 — sao năm dẫn động AI/vùng nào bị ảnh hưởng, dùng trả lời "năm nay chuyện gì XẢY RA vs AI"):
+${(() => { try { const le = liunianEvents(R, curYear); const top = le.events.slice(0, 4); return `Năm ${le.year} ${le.ganZhi}: sao năm ${le.yearGodVi} (${le.bodyStrong ? 'thân vượng' : 'thân nhược'})${le.shaZhiHua ? ' + Sát có chế' : ' + Sát VÔ chế'}. Trụ bị dẫn động: ${Object.keys(le.pillarHits).length ? Object.entries(le.pillarHits).map(([k, v]) => `${k}(${v.join('/')})`).join(', ') : '(không xung/hình/hại/hợp trực tiếp)'}. Sự việc nổi: ${top.length ? top.map((e) => `${e.vi}→${e.who}${e.tone === 'hung' ? '[Kỵ]' : e.tone === 'cat' ? '[Cát]' : ''}`).join(' · ') : '(êm)'} — ${le.summary}`; } catch (e) { return '(không tính được)'; } })()}
+THIÊN Y/NGUYỆT ÂN 黄历 (天医=cát sức khoẻ / 月恩=cát việc chung): ${(() => { try { const ms = monthShenInYear(curYear); const today = analyzeMonthShen(_now.getFullYear(), _now.getMonth() + 1, _now.getDate()); const tTag = today.isAuspicious ? `✓ HÔM NAY (${today.ganZhi}) = ${today.hits.map((h) => h.keyVi).join('+')} — cát. ` : ''; const ty = nextTianYi(_now.getFullYear(), _now.getMonth() + 1, _now.getDate(), 2); return `${tTag}${ms.summary} Thiên Y tới: ${ty.map((d) => d.solar).join(', ')} (khởi đầu trị bệnh/liệu trình sức khoẻ).`; } catch (e) { return '(không tính được)'; } })()}
+
 NGHỊCH THIÊN CẢI MỆNH (cải vận):
   - Bổ Dụng ${wxVi(R.yong.primary)}/Hỷ ${wxVi(R.yong.xi)}: phương/hướng, màu, nghề, số, thực phẩm, phong thuỷ (theo bảng ngũ hành).
+  - LÝ TƯỞNG NHÀ (层楼坐向): ${(() => { try { return idealHouse(R, 20).summary; } catch (e) { return '(không tính được)'; } })()}
+  - HƯỚNG CÁT × LƯU NIÊN PHI TINH (4 cát方 của bản mệnh năm ${curYear} còn tốt không): ${(() => { try { return annualDirection(R, curYear).summary; } catch (e) { return '(không tính được)'; } })()}
+  - TAM SÁT ${curYear} (phương tối kỵ động thổ/dời nhà năm nay): ${(() => { try { return sanshaDirection(curYear).summary; } catch (e) { return '(không tính được)'; } })()}
+  - SAT PHƯƠNG ${curYear} TỔNG HỢP (kiểm 1 hướng vs TháiTuế/TuếPhá/TamSát/5黄/2黑 — "có cải tạo hướng X được không"): ${(() => { try { return annualTabooOverview(curYear).summary; } catch (e) { return '(không tính được)'; } })()}
+  - NGUYỆT SÁT (月三煞/月建/月破 THÁNG NÀY — "tháng này cải tạo hướng X được không"): ${(() => { try { return monthlySha(_now.getFullYear(), _now.getMonth() + 1, _now.getDate()).summary; } catch (e) { return '(không tính được)'; } })()}
+  - THỦY PHÁP 水法 (kích hoạt tài/tình — đặt nước hướng nào): ${(() => { try { const wa = waterActivation(curYear); const pw = wa.primaryWealth; const rm = wa.romanceWater; const av = (wa.avoidWater || []).map((x) => x.dir).join('/') || '—'; return `primary wealth → ${pw && pw.dir ? pw.dir + ' (' + (pw.starName || pw.star) + ')' : '—'}, romance → ${rm && rm.dir ? rm.dir + ' (' + (rm.starName || rm.star) + ')' : '—'}, AVOID → ${av} [运${wa.yun} 零神=${wa.yunInfo.ling}]. ${wa.summary}`; } catch (e) { return '(không tính được)'; } })()}
   - 12 pháp cải vận + 了凡四训 (tích âm đức là pháp cốt lõi nghịch thiên) đã có sẵn trong dữ liệu.
   - Thời điểm vàng (lưu niên CÁT): ${(R.remedy?.timing || []).map((t) => t.year).join(', ') || '(không trong khung)'}
 
 ĐẠI VẬN: ${dayunStr}
+
+GIAO THỜI ĐẠI VẬN 交运 (khi vận 10 năm đổi — dùng trả lời "vận tôi bao giờ đổi"):
+${(() => { try { const j = jiaoYunAnalysis(R, _now); return j.summary; } catch (e) { return '(không tính được)'; } })()}
 
 --- 4 TẦNG BỔ SUNG ---
 KHÔNG VONG: ${(() => { try { const kw = analyzeKongwang(R.chart); return kw.affected.length ? kw.kong.join(",") + " — trụ " + kw.affected.map(a=>a.pos+"("+a.zhi+")").join(",") + " bị treo." : "không."; } catch(e) { return "(lỗi)"; } })()}
@@ -157,8 +290,156 @@ NẠP ÂM (日柱): ${(() => { try { const n = nayinInfo(R.chart.pillars.day.nay
 THẬP NHỊ TRƯỜNG SINH: ${(() => { try { const cs = analyzeChangsheng(R.chart); return cs.stages.map(s => s.label.split(" ")[1] + "=" + s.stageVi + "(" + s.luck + ")").join(", ") + ". " + cs.monthNote; } catch(e) { return "(lỗi)"; } })()}
 LƯU NIÊN (đại vận đang hành): ${liunianStr}
 
+KHỞ MỞ/KHỎA TÀI NGUYÊN 开库闭库 (Dụng/Hỷ/Tài có bị nhốt trong khổ đóng không; khi nào mở): ${(() => { try { return analyzeKu(R, curYear).summary; } catch (e) { return '(không tính được)'; } })()}
+
+TỬ VI MỆNH CỐT TỦY 紫微命宫三方四正 (đọc cả cuộc đời qua Mệnh+Tài+Quan+Duyên): ${(() => { try { const zr = computeZiwei(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute, c.input.gender); return ziweiCoreReading(zr).summary; } catch (e) { return '(không tính được)'; } })()}
+TỬ VI ĐỘ SÁNG 紫微庙旺 (sao mạnh hay yếu tại cung; 庙旺 mạnh / 陷 hãm đảo nghĩa): ${(() => { try { const zr = computeZiwei(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute, c.input.gender); return analyzeZiweiBrightness(zr).summary; } catch (e) { return '(không tính được)'; } })()}
+TỬ VI SONG TINH 紫微双星 (2 chính tinh đồng cung → ý nghĩa hòa trộn; đặc biệt 紫微 5 song tinh): ${(() => { try { const zr = computeZiwei(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute, c.input.gender); return analyzeShuangXing(zr).summary; } catch (e) { return '(không tính được)'; } })()}
+TỬ VI CỤC HÌNH 紫微格局 (tuýp mệnh: 杀破狼/机月同梁/府相朝垣/紫府同宫/日月并明/火贪/君臣庆会/石中隐玉): ${(() => { try { const zr = computeZiwei(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute, c.input.gender); const bw = analyzeZiweiBrightness(zr); const aux = computeAuxStars(c.pillars.year.gan, c.pillars.year.zhi, zr.birth.lunarMonth, zr.birth.timeZhi); return analyzeZiweiGeju(zr, bw, aux).summary; } catch (e) { return '(không tính được)'; } })()}
+LƯU NIÊN TỨ HÓA 流年四化 (năm nay 4 hóa禄权科忌 bay vào cung bẩm sinh nào = lĩnh vực được kích hoạt): ${(() => { try { const a = annualSihuaToNatal(R, curYear); return a.summary; } catch (e) { return '(không tính được)'; } })()}
+
+七政四余 果老星宗 (Chinese Astrology — real planetary positions):
+${(() => { try { const q = qizheng(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute);
+  const lumTxt = q.luminaries.map(l => `${l.name}@${longitudeToMansion(l.longitude).zhi}`).join(' ');
+  const shaTxt = q.siyu.map(s => `${s.name}@${longitudeToMansion(s.longitude).zhi}`).join(' ');
+  return `Mệnh cung #${q.palaceOfMing + 1} | ${lumTxt} | ${shaTxt}`;
+} catch (e) { return '(không tính được)'; } })()}
+
+--- 天星择日 (STAR DATE SELECTION — chọn ngày theo sao tới hướng) ---
+${(() => { try {
+  // Mẫu: toạ 子 (Bắc — phổ biến nhà ở VN) quét 60 ngày tới. KHÔNG cố định theo lá số —
+  // chỉ chạy khi user chủ động hỏi "ngày nào tốt theo sao cho hướng X" (rule-13 bullet cuối).
+  const now = new Date();
+  const tx = tianxingZheri('子', now.getFullYear(), now.getMonth() + 1, now.getDate(), 60, {});
+  const top = tx.best[0];
+  const worst = tx.worst[0];
+  const ecl = tx.best.concat(tx.worst).filter(d => d.eclipse).length;
+  return `[mẫu toạ 子 (Bắc), 60 ngày tới] Sơn ${tx.mountainElementLabel}. TỐT NHẤT ${top.date.solar} (${top.date.ganZhi}, điểm ${top.score}): ${top.hits.slice(0,3).map(h => h.zh).join('+')}. KỴ NHẤT ${worst.date.solar} (điểm ${worst.score})${worst.eclipse ? ' ⚠cửa thực' : ''}.${ecl ? ` ${ecl} ngày phạm cửa nhật/nguyệt thực (罗计掩日月, cấm).` : ''} ⚠ Đây là MẪU — nếu user hỏi hướng cụ thể, dùng tool/section này với toạ sơn tương ứng (24 sơn).`;
+} catch (e) { return '(không tính được)'; } })()}
+
 LUẬN VẬN NĂM HIỆN TẠI (đa trường phái — QUAN TRỌNG, dùng để trả lời câu "năm nay sao"):
-${(() => { try { const y = (R.liunian && R.liunian[0]) ? R.liunian[0].year : (new Date().getFullYear()); const d = analyzeLiunianDeep(R, y); return `Năm ${d.year} ${d.ganZhi}: ${d.rating} (${d.score}/100). Chi tiết: ${d.schools.map((s) => `[${s.phai} ${s.d>=0?'+':''}${s.d}] ${s.note}`).join('  ')}`; } catch (e) { return '(không tính được)'; } })()}`;
+${(() => { try { const y = (R.liunian && R.liunian[0]) ? R.liunian[0].year : (new Date().getFullYear()); const d = analyzeLiunianDeep(R, y); return `Năm ${d.year} ${d.ganZhi}: ${d.rating} (${d.score}/100). Chi tiết: ${d.schools.map((s) => `[${s.phai} ${s.d>=0?'+':''}${s.d}] ${s.note}`).join('  ')}`; } catch (e) { return '(không tính được)'; } })()}
+
+10 NĂM TỚI 一览 (bảng tổng hợp: vận + 💰Tài + 🎯Quan + 💞Duyên theo năm): ${(() => { try { return decadeForecast(R, curYear, 10).summary; } catch (e) { return '(không tính được)'; } })()}
+
+SỨC KHOẺ LƯU NGUYỆT ${curYear} (治未病 — dùng trả lời "tháng nào yếu/phòng bệnh gì"):
+${(() => { try { const h = healthMonthlyAlert(R, curYear); return `${h.summary} Tháng yếu nhất: ${h.worstMonth.mVi} (${h.worstMonth.ganZhi}, ${h.worstMonth.godVi}, điểm ${h.worstMonth.score}) — phòng ${h.weakestOrgan.organs}, nguy cơ: ${h.weakestOrgan.risk}. Tháng khoẻ nhất: ${h.bestMonth.mVi} (điểm ${h.bestMonth.score}).`; } catch (e) { return '(không tính được)'; } })()}
+
+PHỤC/PHẢN NGÂM 伏吟反吟 (dùng trả lời "năm nào biến cố/sóng gió" — QUAN TRỌNG, phân biệt với vận thường):
+${(() => { try { const n = natalFuyin(R); const y = scanFuyin(R, curYear); const d = dayunFuyin(R); const parts = []; if (n.items.length) parts.push('bẩm sinh: ' + n.items.map(i=>`${i.typeVi} ${i.pair}`).join(', ')); parts.push(`năm ${curYear}: ` + (y.items.length ? y.items.map(i=>`${i.typeVi} ${i.pillarVi}(cảnh báo ${i.severity>=7?'NẶNG':'trung'})`).join('; ') : 'không phạm')); if (d.items?.length) parts.push(`đại vận ${d.dayun}: ` + d.items.map(i=>`${i.typeVi} ${i.pillarVi}`).join(', ')); return parts.join(' | ') + '. Cổ quyết «反吟伏吟泪淋淋, 不伤自己损他人»: phạm = năm dễ buồn/hiểm/li tán, đặc biệt Nhật Trụ = bản thân+phối ngẫu; nếu hành trùng = Dụng/Hỷ thì hung giảm.'; } catch (e) { return '(không tính được)'; } })()}
+
+TỔNG LUẬN 1 CÂU (one-liner — dùng mở đầu câu trả lời tổng quát):
+${(() => { try { return lifeReading(R).oneSentence; } catch (e) { return '(không tính được)'; } })()}
+
+BỔ SUNG 5 TRƯỜNG PHÁI (称骨/12神/贵人/三世/盲派 — góc nhìn phụ, KHÔNG thay Tử Bình):
+${(() => {
+  const parts = [];
+  // 称骨 (bone weight) — tổng trọng lượng + tầng
+  try { const cg = chenggu(R); parts.push(`称骨: ${cg.totalStr} = ${cg.summary.tier}`); } catch (e) { parts.push('称骨: (không tính được)'); }
+  // 12 thần lưu niên năm nay
+  try { const l12 = analyzeLiunian12(R, curYear); parts.push(`12神 ${curYear}: ${l12.mine.vi}(${l12.mine.viSub}) — ${l12.mine.tone}`); } catch (e) { parts.push('12神: (không tính được)'); }
+  // Nhóm quý nhân cao cấp
+  try { const ns = analyzeNobleStars(R); parts.push(`贵人: ${ns.count ? ns.stars.filter((s) => s.present).map((s) => s.zh).join('+') + ' = ' + ns.assessment.level : 'không nổi'}`); } catch (e) { parts.push('贵人: (không tính được)'); }
+  // 三世书 (tiền thế)
+  try { const ss = sanshishu(R); parts.push(`三世: ${ss.pastLife.type}(${ss.pastLife.vi})`); } catch (e) { parts.push('三世: (không tính được)'); }
+  // 盲派象法 — các口诀 khớp
+  try { const mp = analyzeMangpaiView(R); const hits = mp.classicalRules.filter((r) => r.matched).map((r) => r.mnemonic); parts.push(`盲派: ${mp.luAnalysis.present ? '禄@' + (mp.luAnalysis.positionVi || '?') : '无禄'}${hits.length ? ' + ' + hits.join('/') : ''}`); } catch (e) { parts.push('盲派: (không tính được)'); }
+  return parts.join(' | ');
+})()}
+
+== CÔNG CỤ TƯỚNG PHẬN / PHONG THỦY TƯƠNG TÁC (KHÔNG CỐ ĐỊNH — USER CHỌN MỖI LẦN) ==
+- 相术 面相: 12 cung mặt + 23 vị trí痣 + 18 mốc流年部位 (module tương tác)
+- 阴宅 24山: 二十四山立向分金 (module tương tác — chọn tọa sơn → phân tích)
+${(() => { try { const ph = physiognomyOverview(); return `[kiểm tra dữ liệu] 相术 sẵn sàng: ${ph.totals.palaces} cung / ${ph.totals.moles} vị trí痣 / ${ph.totals.ageMilestones} mốc流年.`; } catch (e) { return '[kiểm tra dữ liệu] 相术: (không tính được)'; } })()}
+${(() => { try { const yz = yinzhaiOverview(); return `[kiểm tra dữ liệu] 阴宅 sẵn sàng: ${yz.mountainsCount ?? 24} sơn / ${yz.palaces?.length ?? 8} cung.`; } catch (e) { return '[kiểm tra dữ liệu] 阴宅: (không tính được)'; } })()}
+${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字 sẵn sàng: 「福」→ quẻ ${cz.hexagram.name} (${cz.hexagram.nameVi}), ngũ hành ${cz.wxVi}.`; } catch (e) { return '[kiểm tra dữ liệu] 测字: (không tính được)'; } })()}
+- 测字拆字 (châm tự): module tương tác — user nhập 1 chữ Hán → 拆字 (tháo bộ/nét) + 梅花起卦 + ngũ hành luận (50 chữ phổ biến + fallback cho chữ khác). KHÔNG cố định theo lá số — chỉ chạy khi user chủ động hỏi xem 1 chữ.
+
+== 三式 / DÂN GIAN BÓI TOÁN (module tương tác + Thái Nhất cố định theo năm) ==
+- 小六壬 掐指一算: module tương tác (tháng+ngày+giờ → 6 vị trí Đại An/Không Vong). 6 cung cố định: ${(() => { try { return XLR_POSITIONS.map((p) => `${p.han}(${p.vi},${p.tone})`).join(' / '); } catch (e) { return '(không tải được)'; } })()}. Chỉ chạy khi user chủ động nhập tháng/ngày/giờ — KHÔNG cố định theo lá số.
+- 太乙神数 三式之首 (Thái Nhất thần số — thức ĐẦU TIÊN của三式, phán chủ/khách năm):
+太乙 ${curYear}: ${(() => { try { return taiyi(curYear).summary; } catch (e) { return '(không tính được)'; } })()}
+- 金口诀 (Kim Khẩu Quyết — "Golden Key", biến thể rút gọn của 大六壬 cho bói nhanh yes/no): module tương tác — user nhập tháng + ngày + giờ chi + (tuỳ chọn) nhật can + câu hỏi → xếp 4 vị trí (地分/月将/贵神/人元) → phán CÁT/HUNG/TRUNG + yes/no.${(() => { try { const j = jinkoujueCast(6, 15, 4, { solar: { year: curYear, month: 6, day: 15 }, question: 'probe' }); return ` [kiểm tra dữ liệu] 金口诀 sẵn sàng: mẫu T6·N15·giờTý(4) → ${j.verdict} (${j.yesNo}), ${j.summary}`; } catch (e) { return ' [kiểm tra dữ liệu] 金口诀: (không tính được)'; } })()}
+- 求签 黄大仙灵签: module tương tác (100签 + 掷筊)${(() => { try { const qq = qiuqian('Xin chỉ đường'); return ` [kiểm tra dữ liệu] 求签 sẵn sàng: chiếu mẫu #${qq.num} (${qq.tone} / ${qq.toneVi}) — ${qq.summary}`; } catch (e) { return ' [kiểm tra dữ liệu] 求签: (không tính được)'; } })()}
+- 玄空大卦 (Đại Quái — 24 sơn × 64 quẻ + 卦运): module tương tác — user chọn toạ sơn + hướng → luận hợp 10 / 生成 / đồng vận (lập hướng phong thuỷ âm - dương trạch).${(() => { try { const dg = daguaOverview(); return ` [kiểm tra dữ liệu] 玄空大卦 sẵn sàng: ${dg.mountainsCount} sơn × quẻ, cát nhất (vận 1/5) = ${dg.bestYun.slice(0, 6).join(', ')}, ${dg.heTenPairs.length} cặp hợp 10 kinh điển.`; } catch (e) { return ' [kiểm tra dữ liệu] 玄空大卦: (không tính được)'; } })()}
+- 生肖配对 (con giáp hợp - khắc): module tương tác — user nhập tuổi 2 người (chi năm sinh) → điểm 0-100 + bóc tách Lục Hợp / Tam Hợp / Lục Xung / Lục Hại / Tam Hình / Tự Hình.${(() => { try { const zp = zodiacPairScore('子', '午'); return ` [kiểm tra dữ liệu] 生肖配对 sẵn sàng: mẫu Tý×Ngọ = ${zp.score}/100 (${zp.rating}) — ${zp.relations.map((r) => r.name).join('+') || 'không phạm'}.`; } catch (e) { return ' [kiểm tra dữ liệu] 生肖配对: (không tính được)'; } })()}`;
+
+  // ---- DEEP-DOMAIN ANALYSIS (wealth/career/spouse/study/health/caiku/marriage/...) ----
+  // brief-extender gọi 12 submodule; nếu cả khối ném → marker lỗi rõ (không im lặng).
+  try {
+    const deep = extendBrief(R);
+    if (deep) brief += '\n' + deep;
+  } catch (e) {
+    brief += '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n[deep-analysis: lỗi — ' + (e?.message || 'unknown') + ']';
+  }
+
+  // ---- 河洛理数 (HELUO LISHU — 命卦): bát tự → 周易 quẻ + 元堂 ----
+  try {
+    const h = heluo(R);
+    if (h && h.ok) {
+      const yy = (h.yinNan || h.yangNu) ? '阴男/阳女→地上天' : '阳男/阴女→天上地';
+      brief += `\n--- 河洛理数 (HELUO LISHU — 命卦) ---\n` +
+        `天地数: 天数 ${h.tianRaw}→${h.tianShu} (${h.tianTrigram}), 地数 ${h.diRaw}→${h.diShu} (${h.diTrigram}). ${yy} (三元${h.yuan}).\n` +
+        `本命卦 #${h.hexagram.num} ${h.hexagram.name} (${h.hexagram.nameVi}) = ${h.upperTrigram}上${h.lowerTrigram}下. ` +
+        `元堂 = hào ${h.yuantang.line} (${h.yuantang.lineVi}, giờ ${h.yuantang.hourZhi}).\n` +
+        `后天卦 #${h.houtianHexagram.num} ${h.houtianHexagram.name} (${h.houtianHexagram.nameVi})${h.yuantang.disputed ? ' [元堂 DISPUTED — review]' : ''}.\n` +
+        `卦辞: ${h.reading.hexagramText}\n爻辞(hào ${h.yuantang.line}): ${h.reading.yuantangLineText}`;
+    }
+  } catch (e) { /* heluo optional — bỏ qua nếu lỗi, không phá brief */ }
+
+  // ---- TIER-2 FORECASTING (condensed headlines — trả lời "năm nào / tháng nào") ----
+  const fcParts = [];
+  // Golden year — top-3 tốt + năm xấu nhất (1-2 dòng)
+  try {
+    const gy = findGoldenYear(R, curYear, 10);
+    const top = (gy.ranked || []).slice(0, 3).map((y) => `${y.year}(${y.ganZhi},${y.totalScore},${y.alert||''})`).join(' ');
+    const w = gy.worst;
+    fcParts.push(`NĂM VÀNG (10 năm tới, xếp hạng): ${top}${w ? ` | XẤU NHẤT: ${w.year}(${w.ganZhi},${w.totalScore})` : ''}`);
+  } catch (e) { fcParts.push('NĂM VÀNG: [lỗi]'); }
+  // forecast5 — 5 năm cảnh báo 🟢🟡🔴 (1 dòng/năm, gọn)
+  try {
+    const f5 = forecast5(R, curYear, 5);
+    const dot = (t) => (t === 'cat' ? '🟢' : t === 'hung' ? '🔴' : '🟡');
+    const line = (f5.years || []).map((y) => `${y.year}(${y.ganZhi}) ${dot(y.tone)}${y.score}`).join(' · ');
+    fcParts.push(`5 NĂM TỚI: ${line}`);
+  } catch (e) { fcParts.push('5 NĂM TỚI: [lỗi]'); }
+  // dayun rank — top-3 大运 (1-2 dòng)
+  try {
+    const rd = rankDayun(R);
+    const top = (rd.ranked || []).slice(0, 3).map((d) => `${d.ganZhi}[${d.startAge}t:${d.godVi}/${d.rating}]`).join(' ');
+    fcParts.push(`ĐẠI VẬN XẾP HẠNG (top 3): ${top}`);
+  } catch (e) { fcParts.push('ĐẠI VẬN XẾP HẠNG: [lỗi]'); }
+  // wealth-alert — tháng tốt/xấu kiếm tiền 12 tháng tới (1 dòng)
+  try {
+    const wa = wealthMonthlyAlert(R, curYear);
+    let best = wa.bestMonth;
+    let worst = wa.worstMonth;
+    // Phòng bug worstMonth rỗng ({score:0}) → tự tính từ mảng months
+    if ((!worst || !worst.mVi) && Array.isArray(wa.months) && wa.months.length) {
+      const sorted = [...wa.months].sort((a, b) => (a.score || 0) - (b.score || 0));
+      worst = sorted[0];
+    }
+    if ((!best || !best.mVi) && Array.isArray(wa.months) && wa.months.length) {
+      const sorted = [...wa.months].sort((a, b) => (b.score || 0) - (a.score || 0));
+      best = sorted[0];
+    }
+    const bestTxt = best && best.mVi ? `${best.mVi}(${best.ganZhi},${best.godVi},${best.score})` : '(?)';
+    const worstTxt = worst && worst.mVi ? `${worst.mVi}(${worst.ganZhi},${worst.godVi},${worst.score})` : '(?)';
+    fcParts.push(`TÀI LỘC LƯU NGUYỆT ${curYear}: TỐT NHẤT=${bestTxt} | KỴ NHẤT=${worstTxt}`);
+  } catch (e) { fcParts.push('TÀI LỘC LƯU NGUYỆT: [lỗi]'); }
+  // health-alert — năm cờ đỏ sức khoẻ thập kỷ (1 dòng)
+  try {
+    const ha = healthAlertScan(R, 10);
+    const red = (ha.alerts || []).filter((a) => a.level && /CAO/i.test(a.level));
+    const top = (red[0] || (ha.alerts || [])[0]);
+    fcParts.push(`SỨC KHOẺ 10 NĂM: ${ha.summary}${top ? ` | Năm rủi ro cao nhất: ${top.year}(${top.ganZhi},${top.level})` : ''}`);
+  } catch (e) { fcParts.push('SỨC KHOẺ 10 NĂM: [lỗi]'); }
+
+  if (fcParts.length) {
+    brief += '\n--- DỰ BÁO & THỜI ĐIỂM ---\n' + fcParts.join('\n');
+  }
+
+  return brief;
 }
 
 // ===========================================================================
@@ -181,6 +462,24 @@ NGUYEN TAC:
 12. KIEM CHUNG TRUOC KHI DONG Y - CHONG HUA THEO (RAT QUAN TRONG): khi user dua ra nhan dinh ve tinh trang cua ho ("toi do/xui", "toi dang may", "nam nay te", "thang nay khong duoc") -> KHONG dong y ngay. TRUOC TIEN goi tool (analyze_month + analyze_year hoac analyze_day) de KIEM CHUNG nhan dinh do co DUNG voi la so khong:
   - Neu DUNG (data xac nhan dang ky/hung) -> xac nhan that + bang chung cu the ("dung, thang nay con dang o Giap Ngo - Kiep Tai, ky that").
   - Neu SAI (data trai: vd thang nay la CAT ma user noi "do") -> PHAI phan bien ro rang, KHONG hua theo: "thuc ra theo la so, thang nay con dang CAT (diem X) - chuyen xui con gap chac do nguyen khac (vd cu ly, lam qua suc), khong phai la van". La chuyen gia that: dung bao noi dung, sai bao noi sai - do moi la gia tri.
+
+13. KHI HỎI "KHI NÀO X" (tài/quan/duyên/hôn/sức khoẻ/đổi vận/thời điểm vàng) — KHÔNG bịa, ĐỌC CÁC MỤC ỨNG KỲ đã tính sẵn trong brief rồi trích NĂM/THÁNG CỤ THỂ:
+  - "bao giờ phát tài/sự nghiệp" → mục "TÀI/QUAN THẤU CÁN ỨNG KỲ" + "10 NĂM TỚI" (vd "Tài kích hoạt 2028 戊申, Quan 2030 庚戌").
+  - "bao giờ gặp duyên/kết hôn" → mục "HÔN/LUYÊN ỨNG KỲ" (vd "2036 红鸾 đến配偶 cung").
+  - "vận tôi bao giờ đổi" → mục "GIAO THỜI ĐẠI VẬN" (vd "2027-12-11 giờ Tý bước sang 戊午 [Cát]").
+  - "tháng nào yếu/khoẻ" → mục "SỨC KHOẺ LƯU NGUYỆT" (tháng yếu/tốt cụ thể).
+  - "10 năm tới thế nào" → mục "10 NĂM TỚI" (best/worst year + cờ 💰🎯💞).
+  - "cải tạo/dời nhà hướng X được không" → mục "SAT PHƯƠNG TỔNG HỢP" + "NGUYỆT SÁT" (kiểm hướng vs TháiTuế/TamSát/5黄).
+  - "tháng nào kiếm tiền tốt / phá tài / hao tiền" → mục "TÀI LỘC LƯU NGUYỆT" (mục DỰ BÁO & THỜI ĐIỂM) — trích tháng tốt nhất + tháng kỵ nhất kèm can-chi + Thập thần.
+  - "năm vàng / nên tiến thủ lớn / làm ăn lớn năm nào" → mục "NĂM VÀNG" (DỰ BÁO & THỜI ĐIỂM) + "ĐẠI VẬN XẾP HẠNG" — trích top-3 năm 🟢 + cảnh báo năm 🔴.
+  - "đầu tư / day trade / chơi chứng khoán tiền ảo có nên không" → mục "TÀI TINH" + "TÀI KHỐ" (PHÂN TÍCH CHUYÊN SÂU) — thân nhậm tài không, có kho giữ tiền không, rồi quyết CO/KHÔNG + thời điểm (TÀI LỘC LƯU NGUYỆT).
+  - "khởi nghiệp / mở công ty / tự kinh doanh" → mục "SỰ NGHIỆP" + "TÀI TINH" (PHÂN TÍCH CHUYÊN SÂU) + "ĐẠI VẬN XẾP HẠNG" — Quan/Tài có lực không, vận nào thuận.
+  - "con cái / khi nào sinh con / có con không" → mục "TỬ NỮ TINH" + "PHỐI NGÃU" (PHÂN TÍCH CHUYÊN SÂU) + "HÔN/LUYÊN ỨNG KỆ" — phối hợp năm sinh (năm Tử nữ tinh kích hoạt).
+  - "học / thi cử / bằng cấp / du học" → mục "HỌC VẤN" (PHÂN TÍCH CHUYÊN SÂU) + "NĂM VÀNG" — Ấn/Thực Thương mạnh không, timing năm Cát để thi.
+  - "năm nào sức khoẻ yếu / phòng bệnh năm nào" (thập kỷ, khác "tháng nào yếu") → mục "SỨC KHOẺ 10 NĂM" (DỰ BÁO & THỜI ĐIỂM) + "SỨC KHOẺ" (PHÂN TÍCH CHUYÊN SÂU) — năm cờ đỏ 🔴 + tạng yếu + dưỡng hành.
+  - "khởi công / dọn nhà / an táng ngày nào tốt nhất theo sao cho hướng X" → mục "天星择日 (STAR DATE SELECTION)" — chọn ngày theo vị trí THẬT của 7 chính tinh (đặc biệt 太阳/太阴) tới 坐向 (sơn toạ + hướng đối cung): 太阳到向(+5)/到山(+3), 太阴到山(+4)/到向(+2), 恩用仇难, 调候 mùa, cấm 罗计掩日月 (cửa thực). Section mẫu dùng toạ 子 — nếu user nói hướng khác, dùng tool/section với toạ sơn tương ứng (24 sơn: 子癸丑艮寅甲卯乙辰巽巳丙午丁未坤申庚酉辛戌乾亥壬).
+  - "河洛 / 命卦 / 周易卦象 / quẻ chủ mệnh / I-Ching hexagram của đời tôi" → mục "河洛理数 (HELUO LISHU — 命卦)" — bát tự → 天数/地数 → 本命卦 + 元堂 (hào động) + 后天卦 + 卦辞/爻辞. Trích tên quẻ King Wen + số + hào 元堂 + lời quẻ/hào.
+  Khi dùng: ghi NĂM + can-chi + lý do (từ brief), KHÔNG nói chung chung " vài năm nữa".
 
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the (CO NGAY THAT tu tool). NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.`;
 // ===========================================================================
@@ -310,7 +609,9 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history } = {
     return localFallback('Đang dùng bộ luân giải cục bộ. Mở ⚙ Cài đặt để nhận phân tích chuyên sâu hơn.');
   }
 
-  const brief = buildChartBrief(R);
+  const _td = new Date();
+  const _ck = `${R.chart.input.year}-${R.chart.input.month}-${R.chart.input.day}-${R.chart.input.hour}-${R.chart.input.minute}-${R.chart.input.gender}-${_td.getFullYear()}-${_td.getMonth()}-${_td.getDate()}`;
+  const brief = (_briefCache && _briefCache.key === _ck) ? _briefCache.brief : (_briefCache = { key: _ck, brief: buildChartBrief(R) }).brief;
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
     { role: 'system', content: brief + '\n\n== TOOLS (FUNCTION CALLING) ==\nBạn có thể gọi: get_current_time, analyze_day, analyze_year, best_days_in_year, life_trajectory, analyze_month, find_good_days. QUY TAC: (1) bat cu khi khuen ngay/thang cu the -> PHAI goi best_days_in_year/find_good_days/analyze_day de lay NGAY THAT (dung bia "thang 10"); (2) cau ve 1 nam -> goi analyze_year; (3) ca doi -> life_trajectory; (4) thang nay -> analyze_month + get_current_time; (5) hoi "lam sao bớt xui / ngay nao tot" -> goi find_good_days hoac best_days_in_year de dua ngay cat gan nhat + ngay ky can tranh; (6) KHI USER KHANG ĐỊNH tình trạng ("toi do/xui/may/te") -> BAT BUOC goi analyze_month + analyze_year de KIEM CHỨNG có ĐÚNG không, rồi xác nhận hoặc phản biện. TUYET DOI KHONG tu đung du lieu — luon goi tool.' },
