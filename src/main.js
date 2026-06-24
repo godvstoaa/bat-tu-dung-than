@@ -12,6 +12,7 @@ import { trueSolarTime } from './engine/truetime.js'; // [loop 23] 真太阳时 
 import { chartSensitivity } from './engine/sensitivity.js'; // [loop 26] mệnh nhạy cảm
 import { fiveDimRadar } from './engine/five-dim-radar.js'; // [loop 33] ngũ duy radar
 import { weekPreview } from './engine/week-preview.js'; // [loop 36] tuần này 7 ngày
+import { analyzeVitality } from './engine/vitality.js'; // [loop 42] đại vận khúc tuyến
 import { analyzeLiunianDeep } from './engine/liunian-pro.js';
 import { liunianEvents } from './engine/liunian-event.js';
 import { qianliEightSteps, QIANLI_QUOTE } from './engine/qianli.js';
@@ -1681,6 +1682,7 @@ function run() {
   lazyRender('five-dim-radar', () => { try { renderFiveDimRadar(); } catch (e) { console.warn('5dim', e.message); } });
   lazyRender('week-preview',  () => { try { renderWeekPreview(); } catch (e) { console.warn('week', e.message); } });
   renderQuickSummary(); // [loop 39] tóm tắt nhanh — render ngay (không lazy, ở đầu trang)
+  lazyRender('decade-curve',  () => { try { renderDecadeCurve(); } catch (e) { console.warn('decade-curve', e.message); } });
   lazyRender('ziwei-stars-out',() => { try { renderZiweiFull(); } catch (e) { console.warn('ziweiFull', e.message); } });
   lazyRender('life-summary',   () => { try { renderLifeTrajectory(currentResult); } catch (e) { console.warn('life', e.message); } });
   $("result").classList.remove("hidden");
@@ -3180,6 +3182,40 @@ function renderChangshengDeep() {
 }
 
 // ---------------------------------------------------------------- PHỐI NGỖU LÝ TƯỞNG (BẢNG + CHI TIẾT)
+function renderDecadeCurve() {
+  if (!currentResult) return;
+  let v;
+  try { v = analyzeVitality(currentResult); } catch (e) { $('decade-curve').innerHTML = '<p class="hint">Không tính được.</p>'; return; }
+  const traj = v.trajectory || [];
+  if (!traj.length) { $('decade-curve').innerHTML = '<p class="hint">Không có dữ liệu đại vận.</p>'; return; }
+  const W = 340, H = 140, padX = 30, padY = 20;
+  const n = traj.length;
+  const xOf = (i) => padX + (i * (W - padX * 2) / (n - 1));
+  const yOf = (s) => H - padY - (s / 100) * (H - padY * 2);
+  const pts = traj.map((t, i) => `${xOf(i)},${yOf(t.score)}`);
+  const area = `M${xOf(0)},${H - padY} L${pts.join(' L')} L${xOf(n - 1)},${H - padY} Z`;
+  const peakIdx = traj.findIndex((t) => t.age === v.peakAge);
+  const lowIdx = traj.findIndex((t) => t.age === v.lowAge);
+  const labels = traj.map((t, i) => {
+    const x = xOf(i), y = yOf(t.score);
+    const isPeak = i === peakIdx, isLow = i === lowIdx;
+    const color = t.score >= 60 ? '#2e7d32' : t.score >= 40 ? '#b8860b' : '#c62828';
+    const dot = `<circle cx="${x}" cy="${y}" r="${isPeak || isLow ? 5 : 3}" fill="${color}" stroke="#fff" stroke-width="1"/>`;
+    const lbl = `<text x="${x}" y="${y - 8}" text-anchor="middle" font-size="8" fill="${color}" font-weight="bold">${t.score}</text>`;
+    const age = `<text x="${x}" y="${H - 6}" text-anchor="middle" font-size="7" fill="#888">${t.age}</text>`;
+    const mark = isPeak ? `<text x="${x}" y="${y + 14}" text-anchor="middle" font-size="7" fill="#2e7d32">★đỉnh</text>` : isLow ? `<text x="${x}" y="${y + 14}" text-anchor="middle" font-size="7" fill="#c62828">⚠đáy</text>` : '';
+    return dot + lbl + age + mark;
+  }).join('');
+  $('decade-curve').innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%;height:auto">
+      <defs><linearGradient id="dc-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4a017" stop-opacity="0.3"/><stop offset="100%" stop-color="#d4a017" stop-opacity="0.05"/></linearGradient></defs>
+      <path d="${area}" fill="url(#dc-grad)"/>
+      <polyline points="${pts.join(' ')}" fill="none" stroke="#d4a017" stroke-width="2"/>
+      ${labels}
+    </svg>
+    <p class="hint" style="margin:4px 0">Đỉnh vận: <b>${v.peakAge || '?'}</b> | Đáy vận: <b>${v.lowAge || '?'}</b> | Hiện tại: <b>${v.currentVitality ?? '?'}</b>. ${v.advice || ''}</p>`;
+}
+
 function renderQuickSummary() {
   if (!currentResult) return;
   const c = currentResult;
