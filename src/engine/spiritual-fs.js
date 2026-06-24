@@ -14,14 +14,14 @@ const WX_PRACTICES = {
     chanting: 'niệm "A Di Đà Phật" hoặc "Om" (âm A = Mộc sinh khí), đọc Kinh Địa Tạng (sinh khí từ đất)',
     charity: 'trồng cây, bảo vệ thiên nhiên, từ thiện môi trường, nuôi dưỡng sinh linh',
     virtue: 'nhân từ (仁) — yêu thương vạn vật, tha thứ, không nóng giận',
-    ritual: 'mở cửa sổ sáng sớm hít khí Mộc; chàu cây xanh; giã từ oán hận',
+    ritual: 'mở cửa sổ sáng sớm hít khí Mộc; chạm cây xanh; giã từ oán hận',
     time: 'sáng 5-7h (Mão — Mộc vượng) — khí Mộc thịnh, sinh khí mạnh',
     organ: 'Gan — khởi động từ cơn giận, chuyển hóa thành từ bi',
   },
   火: {
     primary: 'Thiền minh (light meditation) + cúng dường',
     meditation: 'quán ánh sáng tim — nhìn ngọn nến/đèn, cảm nhận ấm áp lan tỏa',
-    qigong: 'Lục Tự Quyết (xuất "Hư" — âm Hỏa phát tâm), Thái Cực Quyền (động tác mở rộng, vươn tay)',
+    qigong: 'Lục Tự Quyết (xuất "Ha (呵)" — âm Hỏa phát tâm), Thái Cực Quyền (động tác mở rộng, vươn tay)',
     chanting: 'niệm "Quán Thế Âm Bồ Tát" (từ bi hỏa), chú Đại Bi, đọc Kinh Pháp Hoa',
     charity: 'thắp đèn cúng dường (chùa/phật), giúp người nghèo mùa đông, truyền cảm hứng',
     virtue: 'lễ nghĩa (礼) — tôn trọng, lễ độ, khiêm cung',
@@ -31,7 +31,7 @@ const WX_PRACTICES = {
   },
   土: {
     primary: 'Thiền tọa (sitting meditation) + kết nối đất',
-    meditation: 'thiền tọa trên đất (không đệm cách điện), quán heavy ở bụng dưới (đan điền)',
+    meditation: 'thiền tọa trên đất (không đệm cách điện), quán khí nặng ở bụng dưới (đan điền)',
     qigong: 'Khí công dưỡng sinh (chậm, ổn), Bát Duan Cân ("Lý tỳ vị cửu" — nâng tỳ vị), thở bụng',
     chanting: 'niệm "Địa Tạng Vương Bồ Tát" (đại địa), chú Lăng Nghiêm, đọc Kinh Địa Tạng',
     charity: 'bố thí thức ăn, xây chùa/trường, làm việc công ích, ổn định cộng đồng',
@@ -43,7 +43,7 @@ const WX_PRACTICES = {
   金: {
     primary: 'Khí công phế (breathwork) + kỷ luật thiền',
     meditation: 'thiền hơi thở (anapana) — tập trung luồng không khí vào-ra phổi',
-    qigong: 'Lục Tự Quyết (xuất "Tỳ" — âm Kim thanh phế), Dịch Cân Kinh (sắc bén, dứt khoát)',
+    qigong: 'Lục Tự Quyết (xuất "Tứ (呬)" — âm Kim thanh phế), Dịch Cân Kinh (sắc bén, dứt khoát)',
     chanting: 'niệm "Dược Sư Phật" (thanh khiết), chú Dược Sư, đọc Kinh Kim Cang (sắc bén)',
     charity: 'giúp người bệnh (y từ thiện), bảo vệ nghĩa trang, viếng người già/những người đã khuất',
     virtue: 'nghĩa khí (义) — chính nghĩa, công bằng, liêm khiết',
@@ -74,8 +74,8 @@ export function spiritualPractice(R) {
   const kyWx = R.yong.ji;
   const dmWx = R.chart.dayMaster.wx;
 
-  const dung = WX_PRACTICES[dungWx];
-  const xi = WX_PRACTICES[xiWx];
+  const dung = WX_PRACTICES[dungWx] || WX_PRACTICES['土']; // [loop 45] guard crash
+  const xi = WX_PRACTICES[xiWx] || WX_PRACTICES['土'];
 
   const advice = `Tu Dụng Thần (${WX_VI[dungWx]}): ${dung.primary}. ` +
     `${dung.meditation}. Khí công: ${dung.qigong}. ` +

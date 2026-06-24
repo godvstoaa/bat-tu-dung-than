@@ -9,13 +9,13 @@ import { WX_VI } from './constants.js';
 // 五音 → ngũ hành → tạng phủ
 const FIVE_TONES = {
   角: { vi: 'Giác (jué)', wx: '木', organ: 'Gan–Mật', freq: 'E (Mi)', color: 'xanh', emotion: 'nóng giận → hóa giải bằng Giác (lành)', instruments: 'đàn tranh, sáo trúc, guitar acoustic, violin', genre: 'nhạc dân gian, nhạc tự nhiên (tiếng chim, gió cây)', key: 'E major / E minor', effect: 'sơ can, giải uất, thư giãn thần kinh, làm dịu cơn giận' },
-  徵: { vi: 'Trủy (zhǐ)', wx: '火', organ: 'Tim–Ruột non', freq: 'A (La)', color: 'đỏ', emotion: 'vui vẻ → duy trì bằng Trủy', instruments: 'đàn tỳ bà, đàn nguyệt, trumpet, synthesizer', genre: 'nhạc vui, pop, dance, hội hè', key: 'A major', effect: 'thông tâm, bồi dương, hưng phấn, tăng nhiệt huyết' },
+  徵: { vi: 'Trủy (zhǐ)', wx: '火', organ: 'Tim–Ruột non', freq: 'G (Sol)', color: 'đỏ', emotion: 'vui vẻ → duy trì bằng Trủy', instruments: 'đàn tỳ bà, đàn nguyệt, trumpet, synthesizer', genre: 'nhạc vui, pop, dance, hội hè', key: 'G major', effect: 'thông tâm, bồi dương, hưng phấn, tăng nhiệt huyết' },
   宫: { vi: 'Cung (gōng)', wx: '土', organ: 'Tỳ–Vị', freq: 'C (Đô)', color: 'vàng', emotion: 'lo nghĩ → hóa giải bằng Cung', instruments: 'đàn cổ cầm, piano, cello, organ, trống', genre: 'nhạc thiền, nhạc cổ điển, baroque, nhạc thiền Phật', key: 'C major', effect: 'bổ tỳ, dưỡng vị, an thần, ổn định tiêu hóa' },
   商: { vi: 'Thương (shāng)', wx: '金', organ: 'Phổi–Đại tràng', freq: 'D (Rê)', color: 'trắng', emotion: 'buồn → hóa giải bằng Thương', instruments: 'sáo gỗ, clarinet, trumpet, chuông đồng, steel drum', genre: 'nhạc nhẹ, ballad, nhạc thiền chuông', key: 'D major / D minor', effect: 'tuyên phế, thanh nhiệt, hạ khí, mạnh phổi' },
-  羽: { vi: 'Vũ (yǔ)', wx: '水', organ: 'Thận–Bàng quang', freq: 'F (Fa)', color: 'đen', emotion: 'sợ hãi → hóa giải bằng Vũ', instruments: 'đàn tam thập lục, harp, nước (nước chảy), bass', genre: 'nhạc môi trường nước, nhạc thiền sâu, ambient', key: 'F minor', effect: 'bổ thận, tĩnh tâm, nuôi tủy, sâu lắng' },
+  羽: { vi: 'Vũ (yǔ)', wx: '水', organ: 'Thận–Bàng quang', freq: 'A (La)', color: 'đen', emotion: 'sợ hãi → hóa giải bằng Vũ', instruments: 'đàn tam thập lục, harp, nước (nước chảy), bass', genre: 'nhạc môi trường nước, nhạc thiền sâu, ambient', key: 'A minor', effect: 'bổ thận, tĩnh tâm, nuôi tủy, sâu lắng' },
 };
 
-const TONE_ORDER = ['宫', '商', '角', '徵', '羽']; // C D E A F (thứ tự ngũ âm)
+const TONE_ORDER = ['宫', '商', '角', '徵', '羽']; // C D E G A (ngũ âm chuẩn)
 
 // Nhạc gợi ý theo mục đích
 const PURPOSE_MUSIC = {

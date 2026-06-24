@@ -93,9 +93,9 @@ export function teaTherapy(R) {
   const kyWx = R.yong.ji;
   const dmWx = R.chart.dayMaster.wx;
 
-  const dungTea = FIVE_TEAS[dungWx];
-  const xiTea = FIVE_TEAS[xiWx];
-  const kyTea = FIVE_TEAS[kyWx];
+  const dungTea = FIVE_TEAS[dungWx] || FIVE_TEAS['土']; // [loop 45] guard crash khi yong undefined
+  const xiTea = FIVE_TEAS[xiWx] || FIVE_TEAS['土'];
+  const kyTea = FIVE_TEAS[kyWx] || FIVE_TEAS['土'];
 
   // Lịch uống trà theo giờ
   const dailySchedule = [
