@@ -9,6 +9,9 @@ import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI } from './constants.js';
 import { tenGod } from './core.js';
 import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP } from './shensha.js';
+// [loop 12] 格局流日喜忌 — cộng tầng 格局 LÊN TRÊN 4 trường phái (ngũ hành + thập
+//   thần ngày + xung + thần sát). Optional patternQuality → backward compatible.
+import { adjustLiuriByGeju } from './pattern-quality.js';
 
 const wxVi = (w) => WX_VI[w];
 const CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
@@ -29,9 +32,14 @@ const GOD_DAY = {
 };
 
 /**
- * @returns {{ solar, ganZhi, ganGod, score, rating, schools:[{phai,d,note}], advice }}
+ * @param {object} R                 — kết quả analyze()
+ * @param {number} year, month, day  — ngày dương lịch cần luận
+ * @param {object} [patternQuality]  — [loop 12] OPTIONAL kết quả patternQuality(R).
+ *        Khi truyền vào, cộng thêm tầng 格局流日喜忌 (★格局喜 +2 / ⚠格局忌 −2)
+ *        LÊN TRÊN 4 trường phái cốt lõi. Không truyền → backward compatible.
+ * @returns {{ solar, ganZhi, ganGod, score, rating, schools:[{phai,d,note}], advice, gejuDelta?, gejuNote? }}
  */
-export function analyzeLiuRi(R, year, month, day) {
+export function analyzeLiuRi(R, year, month, day, patternQuality) {
   const c = R.chart;
   const dayGan = c.dayGan, birthYearZhi = c.pillars.year.zhi, selfDayZhi = c.pillars.day.zhi;
   const yong = R.yong;
@@ -82,7 +90,11 @@ export function analyzeLiuRi(R, year, month, day) {
     : score >= 50 ? `Hôm nay (${rating}) — tạm ổn, làm việc thường, tránh quyết định lớn.`
     : `Hôm nay (${rating}) — bất lợi, giữ mình, tránh đầu tư/cho vay/cãi vã/đi xa liều, bao dung tình cảm.`;
 
-  return { solar: s.toYmd(), ganZhi: dGan + dZhi, ganGod, ganWx, zhiWx, score, rating, schools, advice };
+  const result = { solar: s.toYmd(), ganZhi: dGan + dZhi, ganGod, ganWx, zhiWx, score, rating, schools, advice };
+  // [loop 12] Cộng tầng 格局流日喜忌 (optional, backward compatible).
+  //   patternQuality truyền vào → cộng ★格局喜(+2)/⚠格局忌(−2) lên trên 4 trường phái.
+  //   Không truyền → adjustLiuriByGeju trả clone với gejuDelta=0 (không thay đổi score).
+  return patternQuality ? adjustLiuriByGeju(result, patternQuality, dayGan) : result;
 }
 
 // Tìm N ngày tốt kế tiếp cho việc cá nhân (vận cá nhân, không theo việc cụ thể)

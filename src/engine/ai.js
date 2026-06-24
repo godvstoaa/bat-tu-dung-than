@@ -605,16 +605,16 @@ export function execTool(name, args, R) {
         return { solar: s.toYmd(), lunar: l.toString(), year: n.getFullYear(), yearGanZhi: ec.getYearGan() + ec.getYearZhi(), monthGanZhi: ec.getMonthGan() + ec.getMonthZhi() };
       }
       case 'analyze_day': {
-        const d = analyzeLiuRi(R, a.year, a.month, a.day);
-        return { date: d.solar, ganZhi: d.ganZhi, ganGod: d.ganGod, rating: d.rating, score: d.score, advice: _s(d.advice, 240), interactions: (d.ctx || []) };
+        const d = analyzeLiuRi(R, a.year, a.month, a.day, R.patternQuality);
+        return { date: d.solar, ganZhi: d.ganZhi, ganGod: d.ganGod, rating: d.rating, score: d.score, advice: _s(d.advice, 240), gejuDelta: d.gejuDelta, gejuNote: d.gejuNote ? _s(d.gejuNote, 200) : '', interactions: (d.ctx || []) };
       }
       case 'analyze_year': {
         const y = analyzeLiunianDeep(R, a.year);
         return { year: y.year, ganZhi: y.ganZhi, rating: y.rating, score: y.score, advice: _s(y.advice, 260), schools: y.schools.map((sc) => ({ school: sc.phai, delta: sc.d, note: _s(sc.note, 110) })) };
       }
       case 'best_days_in_year': {
-        const Y = computeYearDaily(R, a.year);
-        return { year: Y.year, best: Y.best.slice(0, 8).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score })), worst: Y.worst.slice(0, 5).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score })) };
+        const Y = computeYearDaily(R, a.year, R.patternQuality);
+        return { year: Y.year, best: Y.best.slice(0, 8).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })), worst: Y.worst.slice(0, 5).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })) };
       }
       case 'life_trajectory': {
         const L = buildLifeTrajectory(R);

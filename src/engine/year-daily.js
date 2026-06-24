@@ -7,6 +7,8 @@
 // ============================================================================
 import { Solar } from 'lunar-javascript';
 import { analyzeLiuRi } from './liuri.js';
+// [loop 12] 格局流日喜忌 — áp cho từng ngày của năm để "best/worst days" nhận thức 格局.
+import { adjustLiuriByGeju } from './pattern-quality.js';
 
 // ---- Tương tác can-chi (天干五合 / 地支六合 / 六冲) ----
 const GAN_HE = { 甲己: 1, 乙庚: 1, 丙辛: 1, 丁壬: 1, 戊癸: 1 };
@@ -49,18 +51,24 @@ function ratingOf(score) {
  * Luận từng ngày của cả `year`.
  * @param R kết quả analyze() của người trung tâm (nền đã nghiệm chứng/hiệu chỉnh)
  * @param year năm bất kỳ (quá khứ/tương lai)
- * @returns {{ year, dayun, liunian, days:[{date,month,day,ganZhi,ganGod,score,rating,baseNote,ctx:[]}],
+ * @param {object} [patternQuality] — [loop 12] OPTIONAL patternQuality(R). Khi truyền,
+ *        mỗi ngày được cộng thêm tầng 格局流日喜忌 (★格局喜 +2 / ⚠格局忌 −2) →
+ *        best/worst days của năm trở nên nhận thức 格局 (pattern-aware).
+ * @returns {{ year, dayun, liunian, days:[{date,month,day,ganZhi,ganGod,score,rating,baseNote,ctx:[],gejuDelta?,gejuNote?}],
  *            monthSummary:[{month,avg,catCount,kyCount,count}], best:[], worst:[] }}
  */
-export function computeYearDaily(R, year) {
+export function computeYearDaily(R, year, patternQuality) {
   const dayun = activeDayun(R, year);
   const ln = liunianGanZhi(year);
+  const dayGan = R.chart && R.chart.dayGan;
   const days = [];
   let cur = Solar.fromYmdHms(year, 1, 1, 12, 0, 0);
   while (cur.getYear() === year) {
     const y = cur.getYear(), m = cur.getMonth(), d = cur.getDay();
     let base;
     try { base = analyzeLiuRi(R, y, m, d); } catch (e) { cur = cur.next(1); continue; }
+    // [loop 12] Cộng tầng 格局流日喜忌 (optional) lên trên 4 trường phái + tương tác.
+    if (patternQuality && dayGan) base = adjustLiuriByGeju(base, patternQuality, dayGan);
     const dgz = { gan: base.ganZhi[0], zhi: base.ganZhi[1] };
     let ctxD = 0; const ctx = [];
     const withLn = interact(dgz, ln);
@@ -75,6 +83,9 @@ export function computeYearDaily(R, year) {
       weekday: cur.getWeek(), month: m, day: d,
       ganZhi: base.ganZhi, ganGod: base.ganGod, score, rating: ratingOf(score),
       baseNote: base.advice, ctx,
+      // [loop 12] Giữ tầng 格局 để best/worst & display nhận thức 格局 (0 nếu không truyền patternQuality).
+      gejuDelta: base.gejuDelta || 0,
+      gejuNote: base.gejuNote || '',
     });
     cur = cur.next(1);
   }

@@ -450,6 +450,59 @@ const goodDays = findGoodDays(RU, 2026, 6, 21, 14, 5);
 assert(goodDays.length === 5 && goodDays[0].score >= goodDays[4].score, 'lưu nhật: findGoodDays sắp xếp giảm dần');
 console.log(`   Hôm nay ${lr.solar} ${lr.ganZhi} ${lr.ganGod} → ${lr.rating}(${lr.score}). Ngày tốt kế: ${goodDays.slice(0, 2).map((g) => g.solar + ' ' + g.ganZhi).join(', ')}`);
 
+// ---- [loop 12] 格局流日喜忌 (adjustLiuriByGeju) ----
+//   RU = 正財格 (乙 nhật chủ). patternYong: xi=[shi,guan], ji=[ti].
+//   → ngày can nhóm shi (食/傷) + guan (官/殺) = 格局喜 (+2); nhóm ti (比/劫) = 格局忌 (−2);
+//     nhóm cai (Tài = chính cách thần) = trung tính (0).
+console.log('   --- 格局流日喜忌 (loop 12) ---');
+import { adjustLiuriByGeju } from './src/engine/pattern-quality.js';
+// (a) backward compatible: không truyền patternQuality → KHÔNG có gejuDelta, score giữ nguyên.
+assert(typeof lr.gejuDelta === 'undefined', 'lưu nhật: KHÔNG truyền patternQuality → không gejuDelta (backward compatible)');
+assert(analyzeLiuRi(RU, 2026, 6, 21).score === lr.score, 'lưu nhật: bỏ patternQuality → score không đổi');
+// (b) Pure unit: adjustLiuriByGeju với input rỗng / thiếu patternYong → gejuDelta=0.
+assert(adjustLiuriByGeju(null, RU.patternQuality, '乙') === null, 'adjustLiuriByGeju(null) → null');
+assert(adjustLiuriByGeju(undefined, RU.patternQuality, '乙') === undefined, 'adjustLiuriByGeju(undefined) → undefined');
+const noYongDay = adjustLiuriByGeju(lr, { patternYong: { xi: [], ji: [] } }, '乙');
+assert(noYongDay.gejuDelta === 0 && noYongDay.score === lr.score, 'adjustLiuriByGeju: patternYong rỗng → gejuDelta=0, score giữ');
+// (c) Tìm ngày thuộc từng nhóm để verify ±2.
+//   RU 日主=乙. shi=丙(傷官)/丁(食神)? No: tenGod(乙,丙)=傷官, tenGod(乙,丁)=食神 → cả nhóm shi.
+//   guan=庚(正官)/辛(七殺) → nhóm guan. ti=甲(劫財)/乙(比肩) → nhóm ti. cai=戊/己/辰戌 → nhóm cai.
+//   Quét 30 ngày từ 2026-06-21, gom theo gejuDelta.
+const dayGanRU = RU.chart.dayGan;
+const xiDays = [], jiDays = [], neuDays = [];
+for (let i = 0; i < 60; i++) {
+  const sd = Solar.fromYmdHms(2026, 6, 21, 12, 0, 0).next(i);
+  const rd = analyzeLiuRi(RU, sd.getYear(), sd.getMonth(), sd.getDay(), RU.patternQuality);
+  if (rd.gejuDelta > 0) xiDays.push(rd);
+  else if (rd.gejuDelta < 0) jiDays.push(rd);
+  else neuDays.push(rd);
+}
+assert(xiDays.length > 0 && jiDays.length > 0, `lưu nhật: 正財格 có ngày 格局喜 + 格局忌 trong 60 ngày (xi=${xiDays.length}, ji=${jiDays.length})`);
+assert(xiDays.every((d) => d.gejuDelta === 2), 'lưu nhật: 格局喜 = +2 (ngang 流月, nhẹ 流年 ±3)');
+assert(jiDays.every((d) => d.gejuDelta === -2), 'lưu nhật: 格局忌 = −2');
+// (d) đúng nhóm thập thần: xi phải là shi/guan, ji phải là ti (theo patternYong của RU).
+assert(xiDays.every((d) => ['shi', 'guan'].includes(godGroup(d.ganGod))), `lưu nhật: 格局喜 đúng nhóm shi/guan — thực tế ${xiDays.map((d) => d.ganGod).slice(0,5).join(',')}`);
+assert(jiDays.every((d) => godGroup(d.ganGod) === 'ti'), `lưu nhật: 格局忌 đúng nhóm ti — thực tế ${jiDays.map((d) => d.ganGod).slice(0,5).join(',')}`);
+// (e) note có keyword 格局喜 / 格局忌.
+assert(xiDays[0].gejuNote.includes('格局喜'), 'lưu nhật: note 格局喜 có keyword "格局喜"');
+assert(jiDays[0].gejuNote.includes('格局忌'), 'lưu nhật: note 格局忌 có keyword "格局忌"');
+// (f) conservation: score = base (4 trường phái) + gejuDelta → chứng minh không thay thế tầng cốt lõi.
+const lrXiDay = xiDays[0];
+const lrXiBase = analyzeLiuRi(RU, parseInt(lrXiDay.solar.slice(0,4)), parseInt(lrXiDay.solar.slice(5,7)), parseInt(lrXiDay.solar.slice(8,10)));
+assert(lrXiDay.score === lrXiBase.score + 2, `lưu nhật: score 格局喜 = base + 2 (${lrXiBase.score}+2=${lrXiDay.score})`);
+// (g) 正財格: nhóm cai (Tài = chính cách thần) phải TRUNG TÍNH (gejuDelta=0) — không tự khắc/mình.
+const caiDay = neuDays.find((d) => godGroup(d.ganGod) === 'cai');
+if (caiDay) assert(caiDay.gejuDelta === 0, `lưu nhật: ngày Tài (chính cách thần) trung tính — god=${caiDay.ganGod}`);
+// (h) year-daily: computeYearDaily với patternQuality → best không chứa ngày 格局忌.
+//   (computeYearDaily được import phía dưới ở module scope — ES hoist nên dùng được)
+const YD = computeYearDaily(RU, 2026, RU.patternQuality);
+assert(YD.days.every((d) => typeof d.gejuDelta === 'number'), 'year-daily: mỗi ngày có gejuDelta (số)');
+assert(YD.best.every((d) => d.gejuDelta >= 0), 'year-daily: top CÁT năm không chứa ngày 格局忌');
+const YDbase = computeYearDaily(RU, 2026); // không geju — backward compatible
+assert(YDbase.days.every((d) => d.gejuDelta === 0), 'year-daily: bỏ patternQuality → mọi gejuDelta = 0 (backward compatible)');
+console.log(`   格局流日喜忌 OK. ★格局喜(${xiDays.length}): ${xiDays.slice(0,3).map((d) => d.ganZhi + d.ganGod).join(', ')} | ⚠格局忌(${jiDays.length}): ${jiDays.slice(0,3).map((d) => d.ganZhi + d.ganGod).join(', ')} | trung tính(${neuDays.length})`);
+console.log(`   Year-daily 2026: top Cát (sau geju) ${YD.best.slice(0,3).map((d) => d.date.slice(5) + d.ganZhi + (d.gejuDelta > 0 ? '★' : '')).join(', ')}`);
+
 console.log('\n################## 15. THÁI TUẾ (犯太岁 + 化解) ##################');
 import { taSuiTable, personalTaSui, taSuiDirection } from './src/engine/taisui.js';
 // 2026 午年: phải có 4 con phạm = 马(值+刑), 鼠(冲), 兔(破), 牛(害)

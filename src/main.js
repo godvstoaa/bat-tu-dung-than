@@ -1681,12 +1681,14 @@ function renderLiuyue(year) {
 function renderLiuRi(dateStr) {
   if (!currentResult || !dateStr) return;
   const [y, m, d] = dateStr.split('-').map(Number);
-  const r = analyzeLiuRi(currentResult, y, m, d);
+  // [loop 12] Truyền patternQuality để cộng tầng 格局流日喜忌 (★格局喜/⚠格局忌 mỗi ngày).
+  const r = analyzeLiuRi(currentResult, y, m, d, currentResult.patternQuality);
   const GOD_VI = { 比肩: 'Tỷ Kiên', 劫財: 'Kiếp Tài', 食神: 'Thực Thần', 傷官: 'Thương Quan', 偏財: 'Thiên Tài', 正財: 'Chính Tài', 七殺: 'Thất Sát', 正官: 'Chính Quan', 偏印: 'Thiên Ấn', 正印: 'Chính Ấn' };
   const cls = r.score >= 64 ? 'rate-cat' : r.score >= 50 ? 'rate-mid' : r.score >= 38 ? 'rate-bad' : 'rate-hung';
   $('liuri').innerHTML = `
     <div class="ly-head"><span class="zh big">${r.ganZhi}</span> ${r.solar} · can <b>${GOD_VI[r.ganGod] || r.ganGod}</b> → <span class="ln-rate ${cls}">${r.rating} (${r.score}/100)</span></div>
     <div class="ly-schools">${r.schools.map((s) => `<div class="ly-school ${s.d >= 0 ? 'pos' : 'neg'}"><div class="ly-sname">${s.phai} <span class="ly-d">${s.d >= 0 ? '+' : ''}${s.d}</span></div><div class="ly-snote">${s.note}</div></div>`).join('')}</div>
+    ${r.gejuNote ? `<div class="ly-school ${r.gejuDelta >= 0 ? 'pos' : 'neg'}"><div class="ly-sname">格局流日喜忌 <span class="ly-d">${r.gejuDelta >= 0 ? '+' : ''}${r.gejuDelta}</span></div><div class="ly-snote">${esc(r.gejuNote)}</div></div>` : ''}
     <p class="zr-advice">${r.advice}</p>`;
 }
 
@@ -2724,7 +2726,8 @@ function renderLifeTrajectory(R) {
 // ============================================================
 function renderYearDaily(R, year) {
   if (!R) return;
-  const Y = computeYearDaily(R, year);
+  // [loop 12] Truyền patternQuality → best/worst days của năm nhận thức 格局.
+  const Y = computeYearDaily(R, year, R.patternQuality);
   currentYearDaily = Y;
 
   const ctxLine = `Năm <b>${Y.year}</b> · Lưu năm <span class="zh">${Y.liunian.ganZhi}</span> · `

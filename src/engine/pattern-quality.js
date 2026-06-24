@@ -777,5 +777,87 @@ export function adjustLiuyueByGeju(liuyueMonths, patternQuality, dayGan) {
   return out;
 }
 
+// ===========================================================================
+//  LƯU NHẬT 喜忌 THEO CÁCH CỤC (格局流日喜忌) — bước cuối trong chuỗi
+//  格局→timing (sau loop 1 成败, loop 2 大运, loop 3 流年, loop 4 流月).
+//
+//  Nguyên lý cổ pháp (子平真詮 ch.10-11 tiếp): cùng một luật 喜忌 đặc trưng của
+//  cách áp dụng cho 大运/Lưu niên/Lưu nguyệt CŨNG áp dụng cho Lưu nhật — một ngày
+//  có thập thần "sinh trợ Dụng/相" = 格局喜 (ngày giúp cách cục phát huy), thập thần
+//  "khắc phá Dụng" = 格局忌 (ngày làm cách cục tổn thương). Đây là CẤP THẤP NHẤT
+//  trong chuỗi thời gian (lưu nhật chỉ 1 ngày), nhưng lại là CẤP NHỎ NHẤT & trực
+//  tiếp nhất — ứng dụng cho quyết định "hôm nay có nên tiến thủ không".
+//
+//  Thang điểm: +2 cho ngày can thuộc nhóm "喜", −2 cho nhóm "忌" — NGANG BẰNG 流月
+//  (±2) vì cùng là cấp NGÀY (lưu nhật 1 ngày, lưu nguyệt 30 ngày), NHẸ HƠN 流年 (±3)
+//  vì 1 ngày tác động quá ngắn. Cộng tầng 格局 LÊN TRÊN 4 trường phái (ngũ hành +
+//  thập thần ngày + xung + thần sát) của analyzeLiuRi, KHÔNG thay thế tầng nào.
+//
+//  So với 流月: KHÔNG áp tầng 运中救应/破格 (tầng B của adjustDayunByGeju) ở cấp
+//  ngày — vì cứu ứng/bại một NGÀY quá ngắn để thay đổi cấu trúc cách cục; tầng B
+//  chỉ có ý nghĩa ở cấp 10 năm (大运). Ở lưu nhật chỉ cần tầng A (xi/ji tổng quát).
+// ===========================================================================
+
+// Ngưỡng rating lưu nhật — khớp đúng analyzeLiuRi (5..95, 4 bậc).
+function rateLiuriByScore(score) {
+  const s = Math.max(5, Math.min(95, Math.round(score)));
+  if (s >= 64) return 'Cát';
+  if (s >= 50) return 'Bình';
+  if (s >= 38) return 'Hơi kỵ';
+  return 'Kỵ';
+}
+
+/**
+ * Điều chỉnh điểm một Lưu nhật (1 ngày) theo 喜忌 đặc trưng của 格局 (子平真詮 ch.10-11).
+ *
+ * Khác các hàm adjust*ByGeju khác (nhận mảng → trả mảng): hàm này nhận/kết quả
+ * MỘT NGÀY duy nhất (vì analyzeLiuRi trả về 1 object, không phải mảng).
+ *
+ * @param {object} liuriResult   — kết quả analyzeLiuRi(R, year, month, day) (có ganGod/score/rating…)
+ * @param {object} patternQuality — kết quả patternQuality(R) (chứa patternYong.{xi,ji})
+ * @param {string} dayGan         — Thiên can Nhật Chủ (dự phòng nếu ganGod thiếu)
+ * @returns {object} clone của liuriResult + gejuDelta + gejuNote + score đã cộng + rating đã đánh lại.
+ *   Nếu patternQuality rỗng/không có patternYong → trả clone với gejuDelta=0 (backward compatible).
+ */
+export function adjustLiuriByGeju(liuriResult, patternQuality, dayGan) {
+  if (!liuriResult || typeof liuriResult !== 'object') return liuriResult;
+  // Backward compatible: không có patternQuality / patternYong → KHÔNG cộng tầng 格局.
+  if (!patternQuality || !patternQuality.patternYong) {
+    return { ...liuriResult, gejuDelta: 0, gejuNote: '' };
+  }
+  const py = patternQuality.patternYong;
+  const xiGroups = new Set((py.xi || []).map((x) => x.group));
+  const jiGroups = new Set((py.ji || []).map((x) => x.group));
+  if (xiGroups.size === 0 && jiGroups.size === 0) {
+    return { ...liuriResult, gejuDelta: 0, gejuNote: '' };
+  }
+
+  const nd = { ...liuriResult };
+  // Thập thần của ngày CAN (ganGod đã được analyzeLiuRi tính sẵn; fallback tenGod nếu thiếu).
+  let god = liuriResult.ganGod;
+  if (!god) {
+    const dayFirstGan = liuriResult.ganZhi && liuriResult.ganZhi[0];
+    if (dayGan && dayFirstGan) {
+      try { god = tenGod(dayGan, dayFirstGan); } catch (e) { god = null; }
+    }
+  }
+  const grp = god ? godGroup(god) : null;
+  let delta = 0;
+  let note = '';
+  if (grp && xiGroups.has(grp)) {
+    delta = 2;
+    note = `Ngày ${liuriResult.ganZhi || ''} can ${god} (${GROUP_VI[grp]}) sinh trợ格 → 格局喜 (+2)`;
+  } else if (grp && jiGroups.has(grp)) {
+    delta = -2;
+    note = `Ngày ${liuriResult.ganZhi || ''} can ${god} (${GROUP_VI[grp]}) khắc phá/cản trở格 → 格局忌 (−2)`;
+  }
+  nd.gejuDelta = delta;
+  nd.gejuNote = note;
+  nd.score = (liuriResult.score || 0) + delta;
+  // Đánh lại rating sau cộng tầng 格局 (giữ nguyên ngưỡng analyzeLiuRi).
+  nd.rating = rateLiuriByScore(nd.score);
+  return nd;
+}
+
 // Tra bảng luật (dùng cho selftest)
 export { GE_RULES, GROUP_VI, GROUP_WX };
