@@ -467,6 +467,31 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
       }
     }
   } catch (e) { /* 病药 enrichment không bắt buộc — fallback giữ yong nguyên */ }
+  // [loop 41 ELEVATION] 病药 → PRIMARY (败中有成): quality='有救' + phi cực đoán → thuốc LÀM CHỦ.
+  //   Cổ法 «有病方为贵, 败中有成» — mệnh bại cách nhưng CÓ CỨU → phần tử CỨU chính là Dụng Thần.
+  //   Chỉ khi: (a) quality='有救', (b) KHÔNG 调候 override (调候 đã xử lý cực đoán), (c) thuốc ≠ primary.
+  try {
+    if (patternQualityResult && patternQualityResult.quality === '有救'
+        && !(yong.tiaohou?.override) && patternQualityResult.rescues?.length) {
+      const dmWx = chart.dayMaster.wx;
+      const GROUP_WX = { ti: dmWx, yin: SHENG_BY[dmWx], shi: SHENG[dmWx], cai: KE[dmWx], guan: KE_BY[dmWx] };
+      const firstRescue = patternQualityResult.rescues[0];
+      const drugWx = firstRescue.drug?.length ? GROUP_WX[firstRescue.drug[0]] : null;
+      if (drugWx && drugWx !== yong.primary) {
+        const oldPrimary = yong.primary;
+        yong.primary = drugWx;                                    // 药 → Dụng chính
+        yong.secondary = oldPrimary;                              // Phù Ức cũ → secondary
+        // recompute 用喜忌仇 from new primary
+        yong.xi = SHENG_BY[drugWx];
+        yong.ji = KE_BY[drugWx];
+        yong.chou = SHENG_BY[yong.ji];
+        yong.xian = SHENG[drugWx];
+        yong.avoid = yong.avoid.filter((w) => w !== drugWx);     // gỡ thuốc khỏi Kỵ
+        yong.reasons.push(`★ Bệnh Dược LÀM CHỦ (败中有成): mệnh «${patternQualityResult.quality}» — bệnh «${(firstRescue.diseaseNote || '').slice(0, 50)}» CÓ CỨU bằng nhóm ${firstRescue.drug[0]} (hành ${drugWx}) → Dụng Thần CHÍNH = ${drugWx} («有病方为贵»). Phù Ức cũ (${oldPrimary}) giáng secondary.`);
+        if (!yong.method.includes('Bệnh Dược (病药) — LÀM CHỦ (败中有成)')) yong.method.push('Bệnh Dược (病药) — LÀM CHỦ (败中有成)');
+      }
+    }
+  } catch (e) { /* 病药 promotion không bắt buộc */ }
   let dayun = [], liunian = [];
   try { dayun = computeDaYun(year, month, day, hour, minute, gender, yong); } catch (e) { dayun = []; }
   try { liunian = computeLiuNian(year, month, day, hour, minute, gender, yong, refYear); } catch (e) { liunian = []; }

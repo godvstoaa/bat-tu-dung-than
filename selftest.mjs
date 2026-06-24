@@ -194,6 +194,14 @@ assert(R1990.yong.method.some((m) => m.includes('Điều Hậu') && m.includes('
 // [loop 37] 病药 UNIFICATION — pattern-quality rescues feed vào yong (secondary + method, KHÔNG đổi primary)
 assert(R1990.yong.method.some((m) => m.includes('Bệnh Dược')), '1990 method có "Bệnh Dược" (pattern-quality rescue)');
 assert(R1990.yong.reasons.some((r) => /Bệnh Dược.*pattern-quality/.test(r)), '1990 reasons có 病药 enrich note');
+// [loop 41] 病药 → PRIMARY (败中有成): 1985 nam (quality='有救', phi cực đoan) → thuốc LÀM CHỦ
+{
+  const _byR = analyze(1985, 3, 20, 8, 0, 'nam', 2026);
+  if (_byR.patternQuality?.quality === '有救' && !_byR.yong.tiaohou?.override) {
+    assert(_byR.yong.method.some((m) => m.includes('败中有成') && m.includes('LÀM CHỦ')), '1985 有救 (败中有成) → 病药 LÀM CHỦ (method có tag)');
+    assert(_byR.yong.reasons.some((r) => /Bệnh Dược LÀM CHỦ/.test(r)), '1985 reasons có «病药 LÀM CHỦ» note');
+  }
+}
 // chart mùa không cực đoan → KHÔNG override (giữ Phù Ức)
 { const _sp = analyze(1993, 10, 21, 0, 30, 'nam', 2026); // 戌月 (thu, không cực đoan)
   assert(_sp.yong.tiaohou.override === false, '1993 戌月 (không cực đoan) → KHÔNG override 调候'); }
