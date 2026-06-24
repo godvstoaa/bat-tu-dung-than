@@ -537,6 +537,11 @@ NGUYEN TAC:
   - "一掌经 / 前世 hậu世 / tiền kiếp / luân hồi / 六道 / kiếp trước con là ai / đạo của con" → mục "一掌经 (YIZHANGJING — Buddhist palm)" — 4 cung 年/月/日/时 trên ngón tay (nam thuận nữ nghịch) → mệnh cung (时宫) = 1 trong 12 星宫 (天贵/天厄/...) + lục đạo (Phật/Tiên/Nhân/Tu-la/Bàng sinh/Ngạ quỷ). Trích 4 cung + mệnh cung + lục đạo. LƯU Ý: "达摩" là gán nhầm dân gian — tác giả thật 一行禅师 (Đường); lục đạo chỉ tham khảo.
   - "hợp tuổi / vợ chồng tôi hợp không / hai người hợp làm ăn / hợp hôn / cặp đôi" → CÂU HỎI HỢP TUỔI CẦN 2 LÁ SỐ. Brief này chỉ có 1 lá số (của user) → KHÔNG tự phán hợp/không từ 1 lá số (sẽ "ba phải"). YÊU CẦU user nhập lá số người thứ 2 vào mục « 💕 Hợp tuổi (2 người) » (Công cụ Phong Thủy) rồi mới chấm. Tạm trả CHUNG: trọng tâm so sánh = (1) Dụng thần 2 người có bồi bổ cho nhau không, (2) cặp chi có Lục hợp (cát) hay Lục xung/Tam hình (hung), (3) Nhật Chủ tương sinh/khắc — nhưng kết luận cụ thể cần 2 lá số.
   Khi dùng: ghi NĂM + can-chi + lý do (từ brief), KHÔNG nói chung chung " vài năm nữa".
+14. [loop 12] LUÔN KHAM KHIT CAC TANG SAU KHI TRINH BAY:
+  - Khi luận cấu trúc mệnh: TRÍCH 格局成败 verdict (成格/bại/có cứu) + diseases + rescues. NÊU bệnh cách + cách cứu.
+  - Khi luận thời điểm: TRÍCH tags ★格局喜 / ⚠格局忌 / ★RESCUES / ⚠WORSENS per đại vận/lưu niên/lưu nguyệt/giờ. NÊU "vận/năm/tháng/giờ này thuộc cách-thần hỷ → thuận CÁCH".
+  - Khi luận Tử Vi: TRÍCH 宫干自化 (cung nào tự biến đổi) + 飞星化入/化出 (lĩnh vực nào kết nối) + 大限宫干四化 (thập kỷ này kích hoạt gì).
+  - KHÔNG BỎ QUA các tầng sâu — đây là điểm KHÁC BIỆT của app so với các app phong thủy khác.
 
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the (CO NGAY THAT tu tool). NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.`;
 // ===========================================================================
