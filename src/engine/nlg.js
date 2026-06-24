@@ -29,6 +29,16 @@ const hanviet = (gz) => gz.split('').map((c) => (GAN[c]?.vi || ZHI[c]?.vi || c))
 const wxVi = (w) => WX_VI[w];
 const godViShort = (g) => TEN_GOD_VI[g] || g;
 const favText = (yong) => [...new Set([yong.primary, yong.xi].filter(Boolean))].map((w) => `${wxVi(w)} (${w})`).join(' & ');
+// [loop 46] giải thích TẠI SAO Dụng Thần được chọn (调候/病药/扶抑) — user hiểu cơ sở luận giải
+const yongExplain = (R) => {
+  const y = R.yong;
+  if (!y?.method?.length) return '';
+  const hasTiao = y.method.some((m) => /Điều Hậu.*LÀM CHỦ/.test(m));
+  const hasBYao = y.method.some((m) => /Bệnh Dược.*LÀM CHỦ/.test(m));
+  if (hasTiao) return `Dụng Thần ${wxVi(y.primary)} được chọn vì ĐIỀU HẬU (调候) — bạn sinh mùa cực đoan (hàn/nhiệt), 穮通宝鑑 bắt buộc dùng hành ${wxVi(y.primary)} để điều hòa khí hậu, đè Phù Ức.`;
+  if (hasBYao) return `Dụng Thần ${wxVi(y.primary)} được chọn vì BỆNH DƯỢC (病药) — mệnh «bại trung hữu thành», hành ${wxVi(y.primary)} là THUỐC chữa bệnh cách cục («có bệnh mới là quý»).`;
+  return `Dụng Thần ${wxVi(y.primary)} được chọn theo PHÙ ỨC (扶抑) — cân bằng vượng suy của Nhật Chủ.`;
+};
 const avoidText = (yong) => [...new Set(yong.avoid)].map((w) => `${wxVi(w)} (${w})`).join(' & ');
 
 // ---------------------------------------------------------------------------
@@ -117,6 +127,8 @@ function pCareer(R) {
   const favCareer = [...new Set([yong.primary, yong.xi].filter(Boolean))];
   const pq = R.patternQuality;
   const lines = [];
+  const yExpC = yongExplain(R);
+  if (yExpC) lines.push(`💡 ${yExpC}`);
   // [loop 17] 格局-aware opening
   const gejuCtx = pq ? ` Cách ${R.pattern.vi} → ${pq.quality}.` : '';
   lines.push(`Sự nghiệp lấy Quan – Ấn làm sao chủ.${gejuCtx} Mệnh bạn Quan Sát ${guan >= 1.5 ? 'hiện rõ, có khí chất lãnh đạo/địa vị' : guan > 0 ? 'có nhưng hơi mỏng' : 'ẩn/khuyết — sự nghiệp tự thân gây dựng nhiều hơn nhờ lộc'}.`);
@@ -154,6 +166,8 @@ function pWealth(R) {
   const isAvoid = yong.avoid.includes(wealthWx);
   const pq = R.patternQuality;
   const lines = [];
+  const yExpW = yongExplain(R);
+  if (yExpW) lines.push(`💡 ${yExpW}`);
   // [loop 17] 格局-aware opening
   const gejuCtx = pq ? ` Cách ${R.pattern.vi} → ${pq.quality}.` : '';
   lines.push(`Tài lộc lấy Tài tinh (hành ${wxVi(wealthWx)}) làm chủ.${gejuCtx} Mệnh ${cai >= 1.5 ? 'Tài vượng, cơ hội tiền bạc nhiều' : cai > 0 ? 'Tài vừa phải' : 'Tài mỏng — phải chủ động tìm'}.`);
@@ -303,6 +317,8 @@ function pTiming(R, intent) {
   // [loop 16] NLG giờ 格局-aware — khai thác 12 elevations cho user KHÔNG có AI
   const gejuLine = pq ? ` Cách ${R.pattern.vi} → ${pq.quality}.` : '';
   lines.push(`Thước đo vận hạn là Dụng Thần ${favText(R.yong)} — vận nào mang hành Dụng Thần thì hanh thông, Kỵ Thần ${avoidText(R.yong)} thì nên thủ.${gejuLine}`);
+  const yExp = yongExplain(R);
+  if (yExp) lines.push(`💡 ${yExp}`);
   // Nếu câu hỏi có mốc năm cụ thể → dùng phân tích đa phái + 格局 (chính xác)
   if (intent.years.length) {
     for (const yr of intent.years) {
