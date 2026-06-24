@@ -194,6 +194,22 @@ assert(R1990.yong.method.some((m) => m.includes('Điều Hậu') && m.includes('
 // [loop 37] 病药 UNIFICATION — pattern-quality rescues feed vào yong (secondary + method, KHÔNG đổi primary)
 assert(R1990.yong.method.some((m) => m.includes('Bệnh Dược')), '1990 method có "Bệnh Dược" (pattern-quality rescue)');
 assert(R1990.yong.reasons.some((r) => /Bệnh Dược.*pattern-quality/.test(r)), '1990 reasons có 病药 enrich note');
+// [loop 51] comprehensive 用神 override test — 调候 fires ONLY for extreme + conflict
+{
+  const EXTREME = new Set(['亥','子','丑','巳','午','未']);
+  // winter chart: 1984-12-22 nam 子月 → override=true (tiao 火 ≠ Phù Ức)
+  const _w = analyze(1984, 12, 22, 10, 0, 'nam', 2026);
+  assert(_w.yong.tiaohou?.override === true, `1984 子月 (extreme cold) → override=true`);
+  assert(_w.yong.primary === '火', `1984 子月 调候 → Dụng=Hỏa (noãn)`);
+  // 调候 agree → no override: 1995 壬午 → tiao 金 = Phù Ức 金 → agree, no override
+  const _a = analyze(1995, 6, 20, 8, 0, 'nam', 2026);
+  assert(_a.yong.tiaohou?.override === false, `1995 壬午 → tiao=Kim=PhùỨc → agree, KHÔNG override`);
+  // non-extreme → never override: 2010 申月
+  const _n = analyze(2010, 8, 8, 12, 0, 'nu', 2026);
+  assert(_n.yong.tiaohou?.override === false, `2010 申月 (không cực đoan) → KHÔNG override`);
+  // override → xi/ji/chou recomputed from NEW primary
+  assert(_w.yong.xi === '木' && _w.yong.ji === '水', `1984 override → xi/ji recomputed từ primary Hỏa`);
+}
 // [loop 41] 病药 → PRIMARY (败中有成): 1985 nam (quality='有救', phi cực đoan) → thuốc LÀM CHỦ
 {
   const _byR = analyze(1985, 3, 20, 8, 0, 'nam', 2026);
