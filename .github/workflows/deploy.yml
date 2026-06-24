@@ -1,0 +1,33 @@
+# Auto-deploy lên Cloudflare Pages mỗi push → battu.god8.shop tự update.
+# SETUP (1 LẦN, 2 phút):
+#   1. Vào GitHub repo → Settings → Secrets and variables → Actions → New repository secret:
+#      - Name: CLOUDFLARE_API_TOKEN  → Value: token từ Cloudflare (dashboard → My Profile →
+#        API Tokens → Create Token → "Edit Cloudflare Workers" template).
+#      - Name: CLOUDFLARE_ACCOUNT_ID → Value: Account ID từ dashboard (bên phải Overview).
+#   2. Push code → GitHub Action tự build + deploy. battu.god8.shop tự update.
+name: Deploy to Cloudflare Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # cho phép chạy thủ công
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run build
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: battu
+          directory: dist
+          # functions/ dir tự động picked up cho AI proxy (/zai/ /deepseek/ /openai/ /bigmodel/)

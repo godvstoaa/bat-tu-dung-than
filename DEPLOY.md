@@ -1,8 +1,20 @@
 # Hướng dẫn up web (deploy lên battu.god8.shop)
 
-> ⚠ **Vấn đề hiện tại**: `git push` KHÔNG tự update web. App dùng Cloudflare **Worker** (tên `battu`, phục vụ `dist/`), và Worker chỉ update khi chạy `wrangler deploy`. Vì vậy code mới trên GitHub chưa lên web.
+> ✅ **GIẢI PHÁP MỚI (GitHub Actions auto-deploy)** — đã có sẵn workflow `.github/workflows/deploy.yml`. Chỉ cần thêm 2 secrets (1 LẦN, 2 phút), mỗi push → web tự update.
 
-Có 3 cách để web cập nhật. Chọn 1:
+---
+
+## ⭐ Cách 0 — GitHub Actions auto-deploy (KHUYẾN NGHỊ — 1 lần setup, tự động mãi mãi)
+
+1. **Vào GitHub repo** → Settings → Secrets and variables → Actions → **New repository secret**:
+   - `CLOUDFLARE_API_TOKEN`: dashboard → My Profile → API Tokens → Create Token → template "Edit Cloudflare Workers".
+   - `CLOUDFLARE_ACCOUNT_ID`: dashboard → bên phải Overview (Account ID).
+2. **Xong!** Mỗi push → GitHub Action tự `npm run build` + deploy lên Cloudflare Pages → web tự update.
+3. (1 lần) Vào Cloudflare Pages → custom domain → trỏ `battu.god8.shop` về Pages project "battu" (nếu đang trỏ Worker thì gỡ Worker route).
+
+---
+
+## Các cách khác (nếu không dùng GitHub Actions)
 
 ---
 
