@@ -80,9 +80,10 @@ export function buildRemedy(R) {
     summary: `Bổ Dụng ${WX_VI[dung]} là chính, phối Hỷ ${WX_VI[hy]} tăng hiệu.`,
   };
 
-  // 2. Thời điểm vàng — các lưu niên/đại vận mang hành Dụng/Hỷ sắp tới
-  const catYears = (liunian || []).filter((l) => l.score >= 1).map((l) => ({
-    year: l.year, gz: l.ganZhi, rating: l.rating, wx: `${GAN[l.gan].wx || ''}${l.zhiWx || ''}`,
+  // 2. Thời điểm vàng — các lưu niên CÁT mang hành Dụng/Hỷ sắp tới
+  //   [loop 35 sửa] filter cũ 'score >= 1' cho mọi năm (score clamp tối thiểu 2 = đại hung vẫn qua).
+  const catYears = (liunian || []).filter((l) => l.rating === 'Cát' || l.rating === 'Đại cát').map((l) => ({
+    year: l.year, gz: l.ganZhi, rating: l.rating, wx: `${GAN[l.gan]?.wx || ''}${l.zhiWx || ''}`,
   }));
 
   // 3. Hóa giải tổ hợp hung (nếu có)

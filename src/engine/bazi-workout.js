@@ -84,10 +84,19 @@ export function personalWorkout(R) {
     { day: 'CN', focus: 'rest', focusVi: 'Nghỉ', workout: 'thái cực/yoga nhẹ', duration: '30 phút', intensity: 'nhẹ' },
   ];
 
+  // [loop 35 W2] Kỵ avoid — KHÔNG dùng kyInfo.avoid (đó là chấn thương của NGƯỜI DỤNG Kỵ-hành,
+  //   không phải việc TRÁNH vì Kỵ). Dùng KY_AMPLIFY: việc/phong cảnh làm TĂNG Kỵ → tránh.
+  const KY_AMPLIFY = {
+    木: 'gió lạnh & rừng sâu vào mùa xuân (tăng Mộc)',
+    火: 'nắng trưa/nóng bức quá lâu (tăng Hỏa)',
+    土: 'ẩm thấp, bùn lầy, trong nhà kín quá (tăng Thổ)',
+    金: 'khô hanh, không khí lạnh/lạnh lẽo (tăng Kim)',
+    水: 'tắm lạnh lâu, môi trường hàn lạnh (tăng Thủy)',
+  };
   const advice = `Tập chính: ${dungInfo.best} (Dụng ${WX_VI[dungWx]}). ` +
     `Giờ tốt: ${dungInfo.timing}. Cường độ: ${dungInfo.intensity}. ` +
     `Mục tiêu: ${dungInfo.goal}. ` +
-    `⚠ Tránh: ${kyInfo.avoid} (Kỵ ${WX_VI[R.yong.ji]}). ` +
+    `⚠ Kỵ ${WX_VI[R.yong.ji]} — tránh: ${KY_AMPLIFY[R.yong.ji] || 'môi trường quá thiên lệch'}. ` +
     `Chấn thương: chú ý ${dungInfo.injury_risk}. ` +
     `Hô hấp: ${dungInfo.breathwork}.`;
 

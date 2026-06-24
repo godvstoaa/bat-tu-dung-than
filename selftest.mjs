@@ -194,6 +194,15 @@ assert(R1990.yong.method.some((m) => m.includes('Điều Hậu') && m.includes('
 // chart mùa không cực đoan → KHÔNG override (giữ Phù Ức)
 { const _sp = analyze(1993, 10, 21, 0, 30, 'nam', 2026); // 戌月 (thu, không cực đoan)
   assert(_sp.yong.tiaohou.override === false, '1993 戌月 (không cực đoan) → KHÔNG override 调候'); }
+// [loop 35] seasonal-advice: 5 mùa (có Thổ) + 调候 integration (winter chart → climate note)
+{
+  const { seasonalAdvice } = await import('./src/engine/seasonal-advice.js');
+  const sa = seasonalAdvice(R1990); // 1990 辛午 (extreme hot)
+  assert(sa.seasons.length === 5, `seasonal-advice: 5 mùa (có Thổ) — được ${sa.seasons.length}`);
+  assert(sa.seasons.some((s) => s.wxPeak === '土'), 'seasonal-advice: có mùa Thổ (Trường Hạ)');
+  assert(sa.climate === 'hot', `1990 辛午 → climate=hot (được ${sa.climate})`);
+  assert(sa.climateNote && sa.climateNote.length > 20, 'climate note có nội dung (NHIỆT → cần MÁT)');
+}
 
 console.log('\n################## 10. CẢI MỆNH + LỤC THÂN + 9 TẦNG ##################');
 import { tieredAnalysis } from './src/engine/tiers.js';
