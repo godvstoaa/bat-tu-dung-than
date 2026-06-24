@@ -69,6 +69,13 @@ export function nobleCultivation(R) {
   const give = GIVE_BACK[dungWx];
   const drainer = DRAINER_DESC[kyWx];
 
+  // [loop 43] Đọc QUÝ NHÂN TINH thực từ R.shensha (trước đây bỏ sót — chỉ làm heuristic Dụng)
+  const ss = R.shensha || {};
+  const nobleStars = [];
+  if (ss.tianYi?.at?.length) nobleStars.push({ star: 'Thiên Ất (天乙)', at: ss.tianYi.at.join('/'), vi: 'quý nhân tối tôn — 逢凶化吉, mọi việc có người giúp' });
+  if (ss.tianDe?.at?.length) nobleStars.push({ star: 'Thiên Đức (天德)', at: ss.tianDe.at.join('/'), vi: 'đức trời phù — hóa giải tai ách' });
+  if (ss.yueDe?.at?.length) nobleStars.push({ star: 'Nguyệt Đức (月德)', at: ss.yueDe.at.join('/'), vi: 'đức tháng — tăng phúc lộc' });
+
   // Timing: khi nào quý nhân đến (từ shensha-activation + liunian)
   const curYear = new Date().getFullYear();
   const timing = [];
@@ -84,14 +91,15 @@ export function nobleCultivation(R) {
     '5. Trở thành quý nhân của người khác — 《了凡四训》: tích âm đức = tự tạo quý nhân.',
   ];
 
-  const advice = `Quý nhân của bạn mang hành ${WX_VI[dungWx]} (Dụng Thần). ` +
-    `Tìm ở: ${seek.place}. Cách tiếp cận: ${approach}. ` +
-    `Cho đi: ${give}. ` +
-    `Tránh: người ${drainer}. ` +
-    `Trên hết: 《了凡四训》 dạy "tích âm đức" = cách THẬT SỰ thu hút quý nhân — giúp người vô điều kiện, quý nhân tự hội tụ.`;
+  const advice = (nobleStars.length
+      ? `★ BẠN CÓ ${nobleStars.length} QUÝ NHÂN TINH: ${nobleStars.map(s => `${s.star} @ ${s.at} (${s.vi})`).join('; ')}. ` : 'Mệnh KHÔNG có quý nhân tinh rõ → cần tự tích đức tạo quý nhân. ')
+    + `Quý nhân mang hành ${WX_VI[dungWx]} (Dụng Thần). Tìm ở: ${seek.place}. Cách tiếp cận: ${approach}. `
+    + `Cho đi: ${give}. Tránh: người ${drainer}. `
+    + `《了凡四训》: "tích âm đức" = cách THẬT SỰ thu hút quý nhân — giúp người vô điều kiện, quý nhân tự hội tụ.`;
 
   return {
     dungWx, dungVi: WX_VI[dungWx],
+    nobleStars,
     whoToSeek: `Người mang hành ${WX_VI[dungWx]} (= Dụng Thần) + tính cách ${seek.approach.slice(0, 40)}...`,
     whereToFind: `${seek.place} — ${seek.occasion}`,
     howToApproach: approach,

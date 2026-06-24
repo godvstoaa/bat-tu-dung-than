@@ -52,7 +52,6 @@ export function lifeReading(R) {
       strength.strong
         ? 'Thân vượng → đủ sức gánh Quan-Tài, hợp quản lý/kinh doanh/lãnh đạo.'
         : 'Thân nhược → nên chọn nơi ổn định, có quý nhân dìu dắt, tích lũy rồi tiến.',
-      `Dụng Thần = sao phối ngẫu → hôn nhân mang may mắn, nên kết hôn để vượng vận.`,
     ],
   });
 
