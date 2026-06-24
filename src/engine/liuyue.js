@@ -7,6 +7,7 @@
 import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI } from './constants.js';
 import { tenGod } from './core.js';
+import { adjustLiuyueByGeju } from './pattern-quality.js';
 
 const wxVi = (w) => WX_VI[w];
 const MONTH_ZH = ['寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '丑'];
@@ -28,9 +29,15 @@ const GOD_MONTH = {
 
 /**
  * Tính 12 lưu nguyệt trong năm solarYear.
- * @returns {{ year, months:[{m, ganZhi, ganGod, ganWx, zhiWx, score, rating, note, solarMonth}], best, worst }}
+ * @param {object} R               — kết quả analyze() (chứa chart, yong…)
+ * @param {number} solarYear       — năm dương lịch cần tính lưu nguyệt
+ * @param {object} [patternQuality] — TÙY CHỌN: kết quả patternQuality(R). Khi truyền vào,
+ *        mỗi tháng được cộng thêm 1 tầng 格局 喜忌 (adjustLiuyueByGeju) LÊN TRÊN tầng
+ *        ngũ hành + thập thần tháng. Khi BỎ TRỐNG → không điều chỉnh (giữ nguyên điểm
+ *        ngũ hành, backward compatible — dùng cho selftest cũ / chart chưa có patternQuality).
+ * @returns {{ year, months:[{m, ganZhi, ganGod, ganWx, zhiWx, score, rating, note, solarMonth, gejuDelta?, gejuNote?}], best, worst }}
  */
-export function computeLiuyue(R, solarYear) {
+export function computeLiuyue(R, solarYear, patternQuality) {
   const dayGan = R.chart.dayGan;
   const fav = new Set([R.yong.primary, R.yong.xi].filter(Boolean));
   const avoid = new Set([R.yong.ji, R.yong.chou]);
@@ -71,10 +78,16 @@ export function computeLiuyue(R, solarYear) {
     months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note: godVi });
   }
 
-  const sorted = [...months].sort((a, b) => b.score - a.score);
+  // [loop 4 — 格局流月喜忌] Cộng tầng 格局 LÊN TRÊN tầng ngũ hành + thập thần tháng
+  //   (子平真詮 ch.10-11). TÙY CHỌN: chỉ khi caller truyền patternQuality. Khi không
+  //   truyền → months giữ nguyên (backward compatible). Áp dụng TRƯỚC khi tính best/worst
+  //   để tháng 格局喜 nổi lên top Cát, tháng 格局忌 tụt xuống top Kỵ.
+  const finalMonths = patternQuality ? adjustLiuyueByGeju(months, patternQuality, dayGan) : months;
+
+  const sorted = [...finalMonths].sort((a, b) => b.score - a.score);
   const best = sorted.slice(0, 2);
   const worst = sorted.slice(-2).reverse();
-  return { year: solarYear, months, best, worst };
+  return { year: solarYear, months: finalMonths, best, worst };
 }
 
 export { MONTH_ZH, MONTH_LABEL };

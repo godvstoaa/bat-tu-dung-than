@@ -516,32 +516,54 @@ function specialVerdict(pattern, chart) {
 /**
  * Điều chỉnh điểm mỗi Đại vận theo 喜忌 đặc trưng của 格局 (子平真詮 ch.10-11).
  *
+ * Bao gồm 2 tầng (cộng dồn, KHÔNG thay thế tầng ngũ hành):
+ *   (A) 格局大运喜忌: +2 nếu vận can thuộc nhóm "喜", −2 nếu thuộc nhóm "忌".
+ *   (B) 运中救应 / 运中破格 (ALGORITHM ELEVATION #7 — 运能改格, 子平真詮 ch.10-11):
+ *       - 运中救应: nếu thập thần vận (hoặc nhóm của nó) KHỚP một PHẦN TỬ CỨU
+ *         (drug) trong patternQuality.rescues → vận tạm CỨU một bệnh bại của cách.
+ *         + thêm +1 (cộng LÊN TRÊN +2 ở tầng A nếu trùng), tag ★RESCUES.
+ *       - 运中破格: nếu thập thần vận KHỚP một PHẦN TỬ GÂY BỆNH (killer) trong
+ *         patternQuality.diseases → vận làm cách TỔN THƯƠNG thêm (hoặc mang bệnh mới
+ *         vào một cách vốn thành). − thêm −1, tag ⚠WORSENS.
+ *       Nguyên lý cổ pháp: "运能改格" — cách tĩnh (natal) chỉ là thế cục ban đầu;
+ *       Đại vận mang thập thần CỨUỆNG cụ thể sẽ tạm thời HÓA GIẢI bệnh, mang thập thần
+ *       GÂY BỆNH sẽ tạm thời PHÁ hoại cách → đây là "格局败中有成, 成中有败" ĐỘNG.
+ *
  * @param {Array}  dayun          — mảng kết quả computeDaYun (mỗi ptử có gan/ganGod/score/rating…)
- * @param {object} patternQuality — kết quả patternQuality(R) (chứa patternYong.{xi,ji})
+ * @param {object} patternQuality — kết quả patternQuality(R) (chứa patternYong.{xi,ji}, diseases, rescues)
  * @param {string} dayGan         — Thiên can Nhật Chủ
- * @returns {Array} mảng dayun MỚI (clone), mỗi ptử thêm gejuDelta + gejuNote + score đã cộng.
+ * @returns {Array} mảng dayun MỚI (clone), mỗi ptử thêm gejuDelta + gejuNote + gejuRescue +
+ *   gejuWorsen + rescueNotes[] + worsenNotes[] + score đã cộng.
  */
 export function adjustDayunByGeju(dayun, patternQuality, dayGan) {
   if (!Array.isArray(dayun) || !patternQuality || !dayGan) return dayun || [];
   const py = patternQuality.patternYong;
-  if (!py) return dayun.map((d) => ({ ...d, gejuDelta: 0, gejuNote: '' }));
+  if (!py) return dayun.map((d) => ({ ...d, gejuDelta: 0, gejuNote: '', gejuRescue: false, gejuWorsen: false }));
 
   // Tập nhóm ưa/kỵ của cách (ti/yin/shi/cai/guan).
   const xiGroups = new Set((py.xi || []).map((x) => x.group));
   const jiGroups = new Set((py.ji || []).map((x) => x.group));
-  if (xiGroups.size === 0 && jiGroups.size === 0) {
-    return dayun.map((d) => ({ ...d, gejuDelta: 0, gejuNote: '' }));
+
+  // [tầng B — 运中救应/破格] Thu thập nhóm cứu/drug + nhóm gây bệnh/killer từ diseases & rescues.
+  //   Chỉ xét disease CÒN TỒN TẠI (killers không rỗng) và rescue có drug cụ thể.
+  const diseases = Array.isArray(patternQuality.diseases) ? patternQuality.diseases : [];
+  const rescues = Array.isArray(patternQuality.rescues) ? patternQuality.rescues : [];
+
+  if (xiGroups.size === 0 && jiGroups.size === 0 && diseases.length === 0 && rescues.length === 0) {
+    return dayun.map((d) => ({ ...d, gejuDelta: 0, gejuNote: '', gejuRescue: false, gejuWorsen: false }));
   }
 
   const geName = patternQuality.keyStar ? patternQuality.keyStar.god : '';
   const out = [];
   for (const d of dayun) {
-    const nd = { ...d };
+    const nd = { ...d, gejuRescue: false, gejuWorsen: false, rescueNotes: [], worsenNotes: [] };
     // Dùng thập thần của vận CAN (chính khí của vận). ganGod đã được computeDaYun tính sẵn.
     const god = d.ganGod;
     const grp = godGroup(god);
     let delta = 0;
     let note = '';
+
+    // ----- TẦNG A: 格局大运喜忌 (xi/ji tổng quát) -----
     if (grp && xiGroups.has(grp)) {
       delta = 2;
       note = `Vận ${god} (${GROUP_VI[grp]}) là ${geName ? GROUP_VI[grp] + ' sinh trợ格' : 'hỷ của cách'} → 格局喜 (+2)`;
@@ -549,6 +571,42 @@ export function adjustDayunByGeju(dayun, patternQuality, dayGan) {
       delta = -2;
       note = `Vận ${god} (${GROUP_VI[grp]}) khắc phá/cản trở格 → 格局忌 (−2)`;
     }
+
+    // ----- TẦNG B: 运中救应 (运 can nhóm trùng drug của một rescue) -----
+    //   Một運 CỨU CÁCH khi thập thần vận thuộc một NHÓM CỨU (drug) của bất kỳ rescue nào.
+    //   Ghi rõ rescue nào cứu bệnh nào → note cụ thể (vd "CỨU CÁCH: hóa giải 比劫夺财").
+    if (grp) {
+      const hitRescues = rescues.filter((r) => Array.isArray(r.drug) && r.drug.includes(grp));
+      if (hitRescues.length) {
+        nd.gejuRescue = true;
+        delta += 1; // cộng thêm +1 LÊN TRÊN tầng A (nếu trùng xi)
+        nd.rescueNotes = hitRescues.map((r) => r.note);
+        // Lấy tên bệnh bị cứu (diseaseNote) để note cụ thể.
+        const diseaseNames = hitRescues
+          .map((r) => r.diseaseNote || '')
+          .filter(Boolean);
+        const rescueTag = '★RESCUES';
+        const rescueClause = `Vận ${god} (${GROUP_VI[grp]}) CỨU CÁCH — ${hitRescues[0].note}` +
+          (diseaseNames.length ? ` (cụ thể: ${diseaseNames[0]})` : '');
+        // Ghép vào note: nếu tầng A đã có note → nối tiếp, không thì đứng riêng.
+        note = note ? `${note} | ${rescueTag} ${rescueClause} (+1)` : `${rescueTag} ${rescueClause} (+1)`;
+      }
+
+      // ----- TẦNG B: 运中破格 (运 can nhóm trùng killer của một disease) -----
+      //   Một运 LÀM TỔN THƯƠNG khi thập thần vận thuộc NHÓM GÂY BỆNH (killer) của cách.
+      //   Áp dụng cho cách đã bại (bổ thêm bệnh) HOẶC cách thành (mang bệnh mới vào).
+      //   BỎ QUA disease có killers rỗng (bệnh do "he"/"kong"/"noroot" không phải do thập thần).
+      const hitDiseases = diseases.filter((dis) => Array.isArray(dis.killers) && dis.killers.includes(grp));
+      if (hitDiseases.length) {
+        nd.gejuWorsen = true;
+        delta -= 1; // trừ thêm −1 LÊN TRÊN tầng A (nếu trùng ji)
+        nd.worsenNotes = hitDiseases.map((dis) => dis.note);
+        const worsenTag = '⚠WORSENS';
+        const worsenClause = `Vận ${god} (${GROUP_VI[grp]})加重格病 — ${hitDiseases[0].note}`;
+        note = note ? `${note} | ${worsenTag} ${worsenClause} (−1)` : `${worsenTag} ${worsenClause} (−1)`;
+      }
+    }
+
     nd.gejuDelta = delta;
     nd.gejuNote = note;
     nd.score = (d.score || 0) + delta;
@@ -638,6 +696,82 @@ export function adjustLiunianByGeju(liunianList, patternQuality, dayGan) {
     nd.score = (l.score || 0) + delta;
     // Đánh lại rating sau cộng tầng 格局 (giữ nguyên ngưỡng scoreLiunianYear).
     nd.rating = rateLiunianByScore(nd.score);
+    out.push(nd);
+  }
+  return out;
+}
+
+// ===========================================================================
+//  LƯU NGUYỆT 喜忌 THEO CÁCH CỤC (格局流月喜忌) — bước thứ 4 trong chuỗi
+//  格局→timing (sau loop 1: 格局成败, loop 2: 格局大运喜忌, loop 3: 格局流年喜忌).
+//
+//  Nguyên lý cổ pháp (子平真詮 ch.10-11 tiếp): cùng một luật 喜忌 đặc trưng của
+//  cách áp dụng cho 大运/Lưu niên CŨNG áp dụng cho Lưu nguyệt — một tháng có thập
+//  thần "sinh trợ Dụng/相" = 格局喜 (tháng giúp cách cục phát huy), thập thần "khắc
+//  phá Dụng" = 格局忌 (tháng làm cách cục tổn thương). Đây là CẤP THẤP NHẤT trong
+//  chuỗi thời gian (lưu nguyệt chỉ 30 ngày), nhưng lại là CẤP GẦN NHẤT — ứng dụng
+//  trực tiếp cho quyết định "tháng này có nên tiến thủ không".
+//
+//  Thang điểm: +2 cho tháng can thuộc nhóm "喜", −2 cho nhóm "忌" — NGANG BẰNG 大运
+//  (±2), NHẸ HƠN 流年 (±3) vì Lưu nguyệt tác động chỉ 30 ngày (ngắn nhất, loãng
+//  nhất trong chuỗi 格局→大运→流年→流月). Cộng tầng 格局 LÊN TRÊN tầng ngũ hành +
+//  thập thần tháng của computeLiuyue, KHÔNG thay thế tầng nào.
+//
+//  So với 大运: KHÔNG áp tầng 运中救应/破格 (tầng B của adjustDayunByGeju) ở cấp
+//  tháng — vì cứu ứng/bại một THÁNG quá ngắn để thay đổi cấu trúc cách cục; tầng B
+//  chỉ có ý nghĩa ở cấp 10 năm (大运). Ở lưu nguyệt chỉ cần tầng A (xi/ji tổng quát).
+// ===========================================================================
+
+// Ngưỡng rating lưu nguyệt — khớp đúng computeLiuyue (5..95, 4 bậc).
+function rateLiuyueByScore(score) {
+  const s = Math.max(5, Math.min(95, Math.round(score)));
+  if (s >= 64) return 'Cát';
+  if (s >= 50) return 'Bình';
+  if (s >= 38) return 'Hơi kỵ';
+  return 'Kỵ';
+}
+
+/**
+ * Điều chỉnh điểm mỗi Lưu nguyệt (tháng) theo 喜忌 đặc trưng của 格局 (子平真詮 ch.10-11).
+ *
+ * @param {Array}  liuyueMonths   — mảng lm.months (mỗi ptử có gan/ganGod/score/rating…)
+ * @param {object} patternQuality — kết quả patternQuality(R) (chứa patternYong.{xi,ji})
+ * @param {string} dayGan         — Thiên can Nhật Chủ (dự phòng nếu ganGod thiếu)
+ * @returns {Array} mảng tháng MỚI (clone), mỗi ptử thêm gejuDelta + gejuNote + score đã cộng + rating đã đánh lại.
+ */
+export function adjustLiuyueByGeju(liuyueMonths, patternQuality, dayGan) {
+  if (!Array.isArray(liuyueMonths) || !patternQuality || !dayGan) return liuyueMonths || [];
+  const py = patternQuality.patternYong;
+  if (!py) return liuyueMonths.map((m) => ({ ...m, gejuDelta: 0, gejuNote: '' }));
+
+  // Tập nhóm ưa/kỵ của cách (ti/yin/shi/cai/guan).
+  const xiGroups = new Set((py.xi || []).map((x) => x.group));
+  const jiGroups = new Set((py.ji || []).map((x) => x.group));
+  if (xiGroups.size === 0 && jiGroups.size === 0) {
+    return liuyueMonths.map((m) => ({ ...m, gejuDelta: 0, gejuNote: '' }));
+  }
+
+  const geName = patternQuality.keyStar ? patternQuality.keyStar.god : '';
+  const out = [];
+  for (const m of liuyueMonths) {
+    const nd = { ...m };
+    // Thập thần của tháng CAN (ganGod đã được computeLiuyue tính sẵn; fallback tenGod).
+    const god = m.ganGod || tenGod(dayGan, m.gan);
+    const grp = godGroup(god);
+    let delta = 0;
+    let note = '';
+    if (grp && xiGroups.has(grp)) {
+      delta = 2;
+      note = `Tháng T${m.m + 1} ${m.ganZhi} can ${god} (${GROUP_VI[grp]}) sinh trợ格 → 格局喜 (+2)`;
+    } else if (grp && jiGroups.has(grp)) {
+      delta = -2;
+      note = `Tháng T${m.m + 1} ${m.ganZhi} can ${god} (${GROUP_VI[grp]}) khắc phá/cản trở格 → 格局忌 (−2)`;
+    }
+    nd.gejuDelta = delta;
+    nd.gejuNote = note;
+    nd.score = (m.score || 0) + delta;
+    // Đánh lại rating sau cộng tầng 格局 (giữ nguyên ngưỡng computeLiuyue).
+    nd.rating = rateLiuyueByScore(nd.score);
     out.push(nd);
   }
   return out;

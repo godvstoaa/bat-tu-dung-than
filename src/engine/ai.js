@@ -162,9 +162,14 @@ export function buildChartBrief(R) {
     const ZHI_LYIDX = { 寅:0,卯:1,辰:2,巳:3,午:4,未:5,申:6,酉:7,戌:8,亥:9,子:10,丑:11 };
     let curJieqiIdx = -1;
     try { curJieqiIdx = ZHI_LYIDX[Solar.fromYmdHms(_now.getFullYear(), _now.getMonth() + 1, _now.getDate(), 12, 0, 0).getLunar().getMonthZhi()]; } catch (_) {}
-    const lm = computeLiuyue(R, curYear);
+    const lm = computeLiuyue(R, curYear, R.patternQuality);
     const cm = curJieqiIdx >= 0 ? lm.months[curJieqiIdx] : null;
-    if (cm) { curMonthRating = `${cm.ganZhi} — ${cm.rating}`; curMonthNote = ` (tháng CÁT trong năm: ${lm.best.map((b) => 'T' + (b.m + 1)).join(', ')}; tháng KỴ: ${lm.worst.map((b) => 'T' + (b.m + 1)).join(', ')})`; }
+    if (cm) {
+      // [loop 4] Thêm tag 格局 喜忌 của tháng hiện tại vào ghi chú (giúp AI nắm tháng thuận/nghịch cách).
+      const gejuTag = cm.gejuDelta > 0 ? ' ★格局喜' : cm.gejuDelta < 0 ? ' ⚠格局忌' : '';
+      curMonthRating = `${cm.ganZhi} — ${cm.rating}${gejuTag}`;
+      curMonthNote = ` (tháng CÁT trong năm: ${lm.best.map((b) => 'T' + (b.m + 1)).join(', ')}; tháng KỴ: ${lm.worst.map((b) => 'T' + (b.m + 1)).join(', ')})`;
+    }
   } catch (e) {}
   const pillars = ['year', 'month', 'day', 'time'].map((k) => {
     const p = c.pillars[k];
@@ -181,17 +186,26 @@ export function buildChartBrief(R) {
 
   const dayunStr = (R.dayun || []).slice(0, 8)
     .map((d) => {
-      const tag = d.gejuDelta > 0 ? '★格局喜' : d.gejuDelta < 0 ? '⚠格局忌' : '';
-      return `${hanviet(d.ganZhi)}[${d.startAge}-${d.startAge + 9}t:${d.rating}${tag ? '|' + tag : ''}]`;
+      const tags = [];
+      if (d.gejuDelta > 0) tags.push('★格局喜');
+      if (d.gejuDelta < 0) tags.push('⚠格局忌');
+      if (d.gejuRescue) tags.push('★RESCUES');
+      if (d.gejuWorsen) tags.push('⚠WORSENS');
+      const tagStr = tags.length ? '|' + tags.join('|') : '';
+      return `${hanviet(d.ganZhi)}[${d.startAge}-${d.startAge + 9}t:${d.rating}${tagStr}]`;
     }).join(' ');
   // Tóm tắt 大运 格局喜忌 (子平真詮 ch.10-11): vận nào 格局-thuận / 格局-nghịch nhất.
   const gejuDayunBrief = (() => {
     if (!R.patternQuality || !Array.isArray(R.dayun) || !R.dayun.length) return '';
     const fav = R.dayun.filter((d) => d.gejuDelta > 0);
     const host = R.dayun.filter((d) => d.gejuDelta < 0);
+    const rescuers = R.dayun.filter((d) => d.gejuRescue);
+    const worseners = R.dayun.filter((d) => d.gejuWorsen);
     const parts = [];
     if (fav.length) parts.push(`Cách-thuận (${fav.map((d) => `${hanviet(d.ganZhi)}/${d.ganGod}`).join(', ')})`);
     if (host.length) parts.push(`Cách-nghịch (${host.map((d) => `${hanviet(d.ganZhi)}/${d.ganGod}`).join(', ')})`);
+    if (rescuers.length) parts.push(`★CỨU CÁCH (${rescuers.map((d) => `${hanviet(d.ganZhi)}/${d.ganGod}`).join(', ')})`);
+    if (worseners.length) parts.push(`⚠加重格病 (${worseners.map((d) => `${hanviet(d.ganZhi)}/${d.ganGod}`).join(', ')})`);
     return parts.length ? ` → phân loại vận theo 格局: ${parts.join('; ')}.` : '';
   })();
   const liunianStr = (R.liunian || []).map((l) => {
@@ -614,13 +628,14 @@ export function execTool(name, args, R) {
       case 'analyze_month': {
         const n = new Date();
         const yr = a.year ?? n.getFullYear(); const mo = a.month ?? (n.getMonth() + 1);
-        const lm = computeLiuyue(R, yr);
+        const lm = computeLiuyue(R, yr, R.patternQuality);
         // [cycle 53] chỉ số tiết khí từ getMonthZhi (đồng bộ brief THÁNG NAY — không lệch 甲午/乙未)
         const ZLI = { 寅:0,卯:1,辰:2,巳:3,午:4,未:5,申:6,酉:7,戌:8,亥:9,子:10,丑:11 };
         let idx = -1;
         try { idx = ZLI[Solar.fromYmdHms(yr, mo, 15, 12, 0, 0).getLunar().getMonthZhi()]; } catch (_) {}
         const cm = idx >= 0 ? lm.months[idx] : null;
-        return cm ? { month: mo, ganZhi: cm.ganZhi, ganGod: cm.ganGod, rating: cm.rating } : { error: 'không tính được tháng ' + mo };
+        // [loop 4] Trả thêm gejuDelta/gejuNote để AI biết tháng có 格局 喜忌.
+        return cm ? { month: mo, ganZhi: cm.ganZhi, ganGod: cm.ganGod, rating: cm.rating, gejuDelta: cm.gejuDelta || 0, gejuNote: cm.gejuNote || '' } : { error: 'không tính được tháng ' + mo };
       }
       case 'find_good_days': {
         const [yy, mm, dd] = String(a.start).split('-').map(Number);

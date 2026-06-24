@@ -108,15 +108,25 @@ export function synthesize(R) {
   if (qualityLines.length) paragraphs.splice(2, 0, qualityLines[0]);
 
   // --- 格局大运喜忌 (子平真詮 ch.10-11): vận nào 格局-thuận / 格局-nghịch nhất ---
+  //   + 运中救应 (ALGORITHM ELEVATION #7): nhắc riêng các vận CỨU CÁCH cụ thể.
   if (pq && Array.isArray(dayun) && dayun.length) {
     const fav = dayun.filter((d) => d.gejuDelta > 0);
     const host = dayun.filter((d) => d.gejuDelta < 0);
     if (fav.length || host.length) {
       const fv = fav.map((d) => `${d.ganZhi}(${d.startAge}t)`).join(', ');
       const hv = host.map((d) => `${d.ganZhi}(${d.startAge}t)`).join(', ');
-      paragraphs.push(
+      let para =
         `Theo 格局 (子平真詮 ch.10-11): ${fav.length ? `vận cách-thuận = ${fv}` : 'không có vận cách-thuận rõ'}${host.length ? `; vận cách-nghịch = ${hv}` : ''}. ` +
-        (fav.length ? `Đại vận mang thập thần sinh trợ Dụng/相 (${pq.patternYong.xi.map((x) => x.vi).join('/')}) là vận nên tiến thủ.` : '')
+        (fav.length ? `Đại vận mang thập thần sinh trợ Dụng/相 (${pq.patternYong.xi.map((x) => x.vi).join('/')}) là vận nên tiến thủ.` : '');
+      paragraphs.push(para);
+    }
+    // 运中救应 (运能改格): các vận tạm CỨU một bệnh bại cụ thể của cách → nhấn mạnh riêng.
+    const rescuers = dayun.filter((d) => d.gejuRescue);
+    if (rescuers.length) {
+      const rc = rescuers.map((d) => `${d.ganZhi}(${d.startAge}t)`).join(', ');
+      paragraphs.push(
+        `★ 运中救应 (运能改格): đại vận ${rc} tạm CỨU CÁCH — thập thần vận trùng với phần tử cứu ứng của bệnh bại, ` +
+        `nên dù cách vốn ${pq.quality} vẫn có cửa bại-trung-hữu-thành trong khoảng 10 năm này. Đây là vận đáng chờ đợi để xoay chuyển.`
       );
     }
   }
