@@ -13,6 +13,7 @@ import { tenGod, changSheng } from './core.js';
 import { detectInteractions } from './interactions.js';
 import { computeShensha } from './shensha.js';
 import { computePattern } from './pattern.js';
+import { patternQuality, adjustDayunByGeju, adjustLiunianByGeju } from './pattern-quality.js';
 import { synthesize } from './synthesis.js';
 import { analyzeLiuqin } from './liuqin.js';
 import { buildRemedy } from './remedy.js';
@@ -417,12 +418,25 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   const shensha = computeShensha(chart);
   const pattern = computePattern(chart, wx, strength, interactions);
   const yong = findYongShen(chart, wx, strength, pattern, interactions);
+  let patternQualityResult = null;
+  try { patternQualityResult = patternQuality({ chart, pattern, strength, interactions }); } catch (e) { patternQualityResult = null; }
   let dayun = [], liunian = [];
   try { dayun = computeDaYun(year, month, day, hour, minute, gender, yong); } catch (e) { dayun = []; }
   try { liunian = computeLiuNian(year, month, day, hour, minute, gender, yong, refYear); } catch (e) { liunian = []; }
+  // [loop 2 — 格局大运喜忌] Cộng tầng 格局 LÊN TRÊN tầng ngũ hành (子平真詮 ch.10-11).
+  //   patternQuality đã tính xong ở trên → giờ mới điều chỉnh dayun (giải sequencing).
+  try {
+    if (patternQualityResult) dayun = adjustDayunByGeju(dayun, patternQualityResult, chart.dayGan);
+  } catch (e) { /* fallback: giữ dayun tầng ngũ hành */ }
+  // [loop 3 — 格局流年喜忌] Cộng tầng 格局 LÊN TRÊN 5 trường phái của scoreLiunianYear
+  //   (ngũ hành / thập thần năm / thái tuế / thần sát / thiên khắc địa xung). Cùng luật
+  //   喜忌 với 大运 nhưng ±3 (năm tập trung hơn运 10 năm). sequencing giống loop 2.
+  try {
+    if (patternQualityResult) liunian = adjustLiunianByGeju(liunian, patternQualityResult, chart.dayGan);
+  } catch (e) { /* fallback: giữ liunian tầng 5 trường phái */ }
   let synthesis = {};
-  try { synthesis = synthesize({ chart, wx, strength, interactions, shensha, pattern, yong }); } catch (e) { synthesis = { paragraphs: [] }; }
-  const full = { chart, wx, strength, interactions, shensha, pattern, yong, dayun, liunian, synthesis };
+  try { synthesis = synthesize({ chart, wx, strength, interactions, shensha, pattern, yong, patternQuality: patternQualityResult, dayun }); } catch (e) { synthesis = { paragraphs: [] }; }
+  const full = { chart, wx, strength, interactions, shensha, pattern, yong, dayun, liunian, synthesis, patternQuality: patternQualityResult };
   try { full.liuqin = analyzeLiuqin(full); } catch (e) { full.liuqin = []; }
   try { full.remedy = buildRemedy(full); } catch (e) { full.remedy = { twelveLaws: [] }; }
   return full;

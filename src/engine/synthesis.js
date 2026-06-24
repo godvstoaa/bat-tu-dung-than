@@ -13,10 +13,22 @@ const wxVi = (w) => WX_VI[w];
  * @returns {{ score, grade, gradeVi, fortune, fortuneVi, factors[], paragraphs[] }}
  */
 export function synthesize(R) {
-  const { chart, wx, strength, pattern, yong, interactions, shensha } = R;
+  const { chart, wx, strength, pattern, yong, interactions, shensha, dayun } = R;
   const combos = detectCombos(chart, strength);
   let score = 45;
   const factors = [];
+  const qualityLines = [];
+
+  // --- 0. 格局成败救应 (子平真詮 chương 9) — lớp đoạt trước khi chấm điểm ---
+  const pq = R.patternQuality;
+  if (pq) {
+    const QUALITY_DELTA = { 成格: 6, 有救: 2, 败格: -7, 特殊: 3, 未知: 0 };
+    const QUALITY_VI = { 成格: 'Thành cách', 有救: 'Có cứu ứng (bại trung hữu thành)', 败格: 'Bại cách', 特殊: 'Cách đặc biệt' };
+    const d = QUALITY_DELTA[pq.quality] || 0;
+    score += d;
+    factors.push(`格局成败 (${pq.quality} — ${QUALITY_VI[pq.quality] || pq.quality}): ${pq.summary.split('。').slice(1).join('。').trim() || pq.summary} ${d > 0 ? '+' : ''}${d}.`);
+    qualityLines.push(`Cách ${pattern.vi} ở trạng thái ${QUALITY_VI[pq.quality] || pq.quality}: ${pq.summary}`);
+  }
 
   const yongScore = wx.score[yong.primary] || 0;
   const jiScore = wx.score[yong.ji] || 0;
@@ -93,6 +105,21 @@ export function synthesize(R) {
       ? 'Khuyên dùng: giữ vững hướng Dụng/Hỷ Thần (màu/phương/ngành nghề), đón lưu niên/đại vận mang hành Dụng để tiến thủ.'
       : 'Khuyên dùng: tránh Kỵ/仇 Thần, chủ động bổ sung Dụng Thần; đổi vận nhờ lưu niên/đại vận mang hành Dụng (xem mục Lưu Niên).',
   ];
+  if (qualityLines.length) paragraphs.splice(2, 0, qualityLines[0]);
 
-  return { score, grade, gradeVi, fortune, fortuneVi, factors, paragraphs, combos };
+  // --- 格局大运喜忌 (子平真詮 ch.10-11): vận nào 格局-thuận / 格局-nghịch nhất ---
+  if (pq && Array.isArray(dayun) && dayun.length) {
+    const fav = dayun.filter((d) => d.gejuDelta > 0);
+    const host = dayun.filter((d) => d.gejuDelta < 0);
+    if (fav.length || host.length) {
+      const fv = fav.map((d) => `${d.ganZhi}(${d.startAge}t)`).join(', ');
+      const hv = host.map((d) => `${d.ganZhi}(${d.startAge}t)`).join(', ');
+      paragraphs.push(
+        `Theo 格局 (子平真詮 ch.10-11): ${fav.length ? `vận cách-thuận = ${fv}` : 'không có vận cách-thuận rõ'}${host.length ? `; vận cách-nghịch = ${hv}` : ''}. ` +
+        (fav.length ? `Đại vận mang thập thần sinh trợ Dụng/相 (${pq.patternYong.xi.map((x) => x.vi).join('/')}) là vận nên tiến thủ.` : '')
+      );
+    }
+  }
+
+  return { score, grade, gradeVi, fortune, fortuneVi, factors, paragraphs, combos, patternQuality: pq || null };
 }

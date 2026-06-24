@@ -183,6 +183,13 @@ function renderVerdict(R) {
       <div class="v-label">Cách Cục (格局)</div>
       <div class="v-value pattern-value">${pattern.vi}<span class="zh small">${pattern.name}</span></div>
       <div class="v-sub">${pattern.shunNi} · ${pattern.type === 'special' ? 'ngoại cách' : (pattern.type === 'luyue' ? 'nguyệt lệnh tỷ kiếp' : 'chính cách')}</div>
+      ${(() => {
+        const pq = R.patternQuality; if (!pq) return '';
+        const cls = { 成格: 'rate-cat', 有救: 'rate-mid', 败格: 'rate-hung', 特殊: 'rate-cat', 未知: 'rate-mid' }[pq.quality] || 'rate-mid';
+        const vi = { 成格: '✓ Thành cách', 有救: '⚠ Có cứu', 败格: '✗ Bại cách', 特殊: '★ Đặc biệt', 未知: '?' }[pq.quality] || pq.quality;
+        const title = esc(pq.summary);
+        return `<div class="v-sub"><span class="ln-rate ${cls}" title="${title}" style="cursor:help">${vi}</span> <span class="hint-inline" title="${title}">成败救应 (子平真诠 ch.9)</span></div>`;
+      })()}
     </div>
     <div class="v-box">
       <div class="v-label">Vượng suy (${strength.deLenh ? 'đắc lệnh' : 'thất lệnh'} · phù ${(strength.ratio * 100).toFixed(1)}%)</div>
@@ -246,6 +253,17 @@ function renderZiwei() {
     <div class="zw-grid">${pal}</div>
     <h4 class="syn-h4">四化 生年 (theo năm can ${z.birth.yearGan}) —禄/权/科/忌</h4>
     <div class="zw-sihua">${sihuaHtml}</div>
+    ${(() => {
+      const zh = z.zihua;
+      if (!zh || !Array.isArray(zh.list) || !zh.list.length) {
+        return `<h4 class="syn-h4">宫干自化 宮干自化 (can cung → hóa rơi trúng cung phát = tự biến đổi)</h4>
+        <div class="hint" style="font-size:12px">Mệnh bàn không có cung nào bị 宫干自化 — các cung ổn định, không "tự biến đổi" từ bên trong.</div>`;
+      }
+      const tags = zh.list.map((r) =>
+        `<span class="zw-sh ${r.tone}" title="${r.interpretation}"><b>自化${r.hua}</b> ${r.star} <span class="hint-inline">${r.palaceVi}</span> <span class="zh">(${r.palaceGanZhi})</span></span>`).join('');
+      return `<h4 class="syn-h4">宫干自化 宮干自化 (${zh.list.length} cung tự biến đổi — lõi phi tinh; 忌=tự phá hoại, 禄=dễ được không bền)</h4>
+      <div class="zw-sihua">${tags}</div>`;
+    })()}
     ${(() => {
       const yx = yunXianSihua(z, new Date().getFullYear(), i.year);
       const fmt = (sh) => Object.entries(sh || {}).map(([k, v]) => `<span class="zw-sh ${v.tone}"><b>${k}</b> ${v.star}@${v.palace || '?'}</span>`).join('');

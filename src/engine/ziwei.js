@@ -117,6 +117,10 @@ export function computeZiwei(year, month, day, hour, minute, gender) {
   const boshi = boshi12(yearGan, gender);
   // 辅星 (左辅右弼/文昌文曲/天魁天钺)
   const fuxing = computeFuxing(lm, hourOrder, yearGan);
+  // 宫干自化 (phi tinh tầng lõi: can mỗi cung → 4 hóa → rơi trúng cung nào → tự hóa)
+  const zihuaInfo = computeZihua(palaces, starInfo?.mainStars || {}, fuxing);
+  // 飞星四化 (fly-IN / fly-OUT): ma trận 48 hóa giữa các cung — zeigt kết nối lifetime-area
+  const feixingInfo = computeFeiXing(palaces, starInfo?.mainStars || {}, fuxing);
 
   return {
     birth: { lunarMonth: lm, lunarDay: ld, timeZhi, yearGan },
@@ -128,9 +132,16 @@ export function computeZiwei(year, month, day, hour, minute, gender) {
     tianfuBranch: starInfo?.tianfuBranch || null,
     mainStars: starInfo?.mainStars || {},
     sihua: sihuaInfo?.sihua || {},
+    zihua: zuaInfoSafe(zihuaInfo),
+    feixing: feixingInfo || { matrix: [], flyOut: {}, flyIn: {}, mingHighlights: '(không tính được)' },
     boshi, fuxing,
-    note: 'Mệnh bàn Tử Vi: cung + cục + đại hạn + 14 chính tinh + 四化 + 博士 + 辅星.',
+    note: 'Mệnh bàn Tử Vi: cung + cục + đại hạn + 14 chính tinh + 四化 + 宫干自化 + 飞星化入化出 + 博士 + 辅星.',
   };
+}
+
+// helper nhỏ: đảm bảo z.zihua luôn là object có .list dù computeZihua trả null
+function zuaInfoSafe(x) {
+  return x && Array.isArray(x.list) ? x : { list: [], byPalace: {}, summary: '(không tính được 宫干自化)' };
 }
 
 export { PALACES, YIN_ORDER };
@@ -284,3 +295,248 @@ export function computeSihua(yearGan, mainStars) {
   }
   return { sihua: out, yearGan };
 }
+
+// ============================================================================
+//  宫干自化 宮干自化 — TỰ HÓA (PALACE-STEM SELF-TRANSFORMATION)
+//  Lõi phi tinh tứ hóa: mỗi cung có can riêng (宫干, do 五虎遁+thuận từ 寅) → sinh 4 hóa
+//  (禄/权/科/忌). 4 hóa "bay" tới các sao trên toàn bàn. Khi hóa rơi TRÚNG sao đang ngồi
+//  TRONG CHÍNH CUNG phát ra → 自化 = cung tự biến đổi chính mình.
+//
+//  Luận cổ điển (中州派/飞星派):
+//   - 自化禄: cung tự sinh tài/duận → dễ đến nhưng không bền (容易得也容易失), bề ngoài thuận.
+//   - 自化权: cung tự sinh quyền → có năng lực nhưng độc đoán, tự lập, hay áp đặt.
+//   - 自化科: cung tự sinh danh → có vẻ có danh nhưng hời hợt, không sâu.
+//   - 自化忌: cung tự sinh trở ngại → TỰ PHÁ HOẠI, chủ đề cung bị nghẽn từ bên trong.
+//     Thường là tự hóa QUAN TRỌNG NHẤT (đặc biệt 命/财/官/夫/田 五 nội cung).
+//
+//  Ghi chú: cung chỉ có 1 chính tinh độc tọa hay nhiều sao cùng toạ đều có thể tự hóa,
+//  miễn sao được hóa nằm đúng cung phát can. 辅星 (左辅/右弼/文昌/文曲) cũng计入 vì
+//  SIHUA_TABLE có 4 sao phụ (戊/己/辛/壬 can đều hóa phụ tinh).
+// ============================================================================
+const ZIHUA_DESC = {
+  禄: 'tự sinh tài/duận — dễ được nhưng không bền (容易得也容易失); bề ngoài thuận lợi, thực tế khó giữ',
+  权: 'tự sinh quyền lực — có năng lực, chủ động, nhưng độc đoán, tự lập, hay áp đặt người khác',
+  科: 'tự sinh danh tiếng — có vẻ có danh, quý nhân, nhưng hời hợt, không sâu, bề ngoài hơn thực chất',
+  忌: 'tự sinh trở ngại — TỰ PHÁ HOẠI, chủ đề cung bị nghẽn từ bên trong, hay tự gây phiền cho chính mình',
+};
+
+/**
+ * Tính 宫干自化 cho toàn mệnh bàn.
+ *
+ * @param {Array} palaces — z.palaces (mỗi pal có {zh,vi,gan,zhi,stars})
+ * @param {object} mainStars — { sao: chi } từ placeMainStars (14 chính tinh)
+ * @param {object} [fuxing] — z.fuxing (tùy chọn; để四化 dò được cả 文昌/文曲/左辅/右弼)
+ * @returns {{
+ *   list: [{ palace, palaceVi, palaceGan, palaceGanZhi, hua, huaVi, star, tone, interpretation }],
+ *   byPalace: { [palaceZh]: [{hua, star, ...}] },   // nhóm theo cung phát can
+ *   summary: string,                                  // one-liner VH liệt kê cung có tự hóa
+ * }}
+ */
+export function computeZihua(palaces, mainStars, fuxing) {
+  const list = [];
+  const byPalace = {};
+  if (!palaces || !palaces.length) return { list, byPalace, summary: '(không có palaces)' };
+
+  // starMap: sao → chi cung đang ngồi (14 chính tinh + phụ tinh nếu có fuxing)
+  // Bắt buộc thêm phụ tinh vì 4 trong 10 thiên can (戊己辛壬) hóa các sao phụ này.
+  const starMap = { ...(mainStars || {}) };
+  if (fuxing?.stars) {
+    for (const s of fuxing.stars) starMap[s.star] = s.atZhi;
+  }
+  const chiToPalace = {};
+  for (const p of palaces) chiToPalace[p.zhi] = p;
+
+  // Với mỗi cung: lấy 宫干 → 4 hóa → kiểm tra sao đích có ngồi đúng cung phát không
+  for (const p of palaces) {
+    const gan = p.gan;
+    if (!gan) continue;
+    const four = SIHUA_TABLE[gan];
+    if (!four) continue;
+    for (let i = 0; i < 4; i++) {
+      const hua = SIHUA_KEY[i];
+      const star = four[i];
+      const atZhi = starMap[star];
+      if (!atZhi) continue; // sao không có trên bàn (phi常)
+      if (atZhi !== p.zhi) continue; // không trùng cung phát → KHÔNG phải tự hóa
+      // TRÚNG → tự hóa
+      byPalace[p.zh] = byPalace[p.zh] || [];
+      const rec = {
+        palace: p.zh,
+        palaceVi: p.vi,
+        palaceGan: gan,
+        palaceGanZhi: gan + p.zhi,
+        hua,
+        huaVi: SIHUA_VI[hua],
+        star,
+        tone: SIHUA_TONE[hua],
+        interpretation: ZIHUA_DESC[hua],
+      };
+      byPalace[p.zh].push(rec);
+      list.push(rec);
+    }
+  }
+
+  // one-liner tóm tắt
+  let summary;
+  if (!list.length) {
+    summary = 'Mệnh bàn KHÔNG có cung nào bị 宫干自化 — các cung ổn định, không bị "tự biến đổi" từ bên trong.';
+  } else {
+    const parts = list.map((r) => `${r.palaceVi}(${r.palaceGanZhi}) tự化${r.hua} ở ${r.star} → ${r.interpretation}`);
+    summary = `宫干自化 (${list.length} cung tự biến đổi): ${parts.join(' · ')}`;
+  }
+  return { list, byPalace, summary };
+}
+
+export { ZIHUA_DESC };
+
+// ============================================================================
+//  飞星四化 飛星四化 — HÓA-IN (化入) + HÓA-OUT (化出) — kết nối giữa các cung
+//  Vòng 6: mở rộng 宫干自化 (vòng 5) thành ma trận 48-hóa đầy đủ (12 cung × 4 hóa).
+//  Mỗi hóa do 宫干 phát ra "bay" tới một sao → sao đó đang ngồi ở một cung X.
+//    - Nếu X == cung phát                → 自化 (đã tính ở computeZihua, vòng 5).
+//    - Với cung PHÁT: đó là 化出 (fly-OUT) — năng lượng cung này GỬI đi.
+//    - Với cung X (nhận): đó là 化入 (fly-IN) — năng lượng TỚI từ cung khác.
+//
+//  Luận cổ điển (中州派/飞星派 — "phi tinh" thật sự):
+//   - 命宫化禄入财帛: Mệnh chủ ĐỊNH HƯỚNG sinh tài → tự nhiên tạo ra tiền.
+//   - 命宫化忌入夫妻: nội tâm/vấn đề Mệnh ảnh hưởng XẤU tới hôn nhân.
+//   - 财帛化禄入命: tài lộc đổ về trực tiếp cho người → giàu có thật.
+//   - 官禄化权入命: quyền lực sự nghiệp tiếp sức cho người → thăng tiến.
+//   - 化入 = CỦA ĐẾN (received), 化出 = CỦA ĐI (sent). 化忌入 = bị làm hại bởi
+//     lĩnh vực phát; 化禄入 = được lĩnh vực phát nuôi dưỡng.
+//   3 cung đọc nhiều nhất: 命 (bản thân), 财 (tiền), 官 (sự nghiệp) — surface highlights.
+// ============================================================================
+const FEIXING_DIR = {
+  禄: { vi: 'Hóa Lộc', nature: 'cat', sense: 'tài lộc/duyen/thuận lợi đổ về' },
+  权: { vi: 'Hóa Quyền', nature: 'cat', sense: 'quyền lực/năng lực tiếp sức' },
+  科: { vi: 'Hóa Khoa', nature: 'cat', sense: 'danh tiếng/quý nhân phù trợ' },
+  忌: { vi: 'Hóa Kỵ', nature: 'hung', sense: 'trở ngại/thị phi/thương tổn đổ về' },
+};
+
+/**
+ * Tính ma trận 48-hóa 飞星四化: mỗi cung phát 4 hóa → ghi nhận 化出 (gửi) & 化入 (nhận).
+ *
+ * @param {Array} palaces — z.palaces (mỗi pal có {zh,vi,gan,zhi,stars})
+ * @param {object} mainStars — { sao: chi } từ placeMainStars
+ * @param {object} [fuxing] — z.fuxing (để四化 dò được 文昌/文曲/左辅/右弼)
+ * @returns {{
+ *   matrix: [{ fromPalace, fromVi, fromGanZhi, hua, star, toPalace, toVi, toGanZhi, kind, tone }],
+ *     // kind: 'self'(自化) | 'out'(化出) | 'in'(化入 — ghi ở phía nhận)
+ *   flyOut: { [fromPalaceZh]: [{ hua, star, toPalace, toVi, tone, sense, note }] },
+ *   flyIn:  { [toPalaceZh]:   [{ hua, star, fromPalace, fromVi, tone, sense, note }] },
+ *   mingHighlights: string,   // one-liner VH: 命宫 化出/化入 chính
+ *   summary: string,          // one-liner VH 3 cung (命/财/官)
+ * }}
+ */
+export function computeFeiXing(palaces, mainStars, fuxing) {
+  const matrix = [];
+  const flyOut = {};
+  const flyIn = {};
+  if (!palaces || !palaces.length) {
+    return { matrix, flyOut, flyIn, mingHighlights: '(không có palaces)', summary: '(không có palaces)' };
+  }
+
+  // starMap: sao → chi cung đang ngồi (14 chính tinh + phụ tinh nếu có fuxing)
+  const starMap = { ...(mainStars || {}) };
+  if (fuxing?.stars) {
+    for (const s of fuxing.stars) starMap[s.star] = s.atZhi;
+  }
+  // chi → palace (để tra cung nhận hóa)
+  const chiToPalace = {};
+  for (const p of palaces) chiToPalace[p.zhi] = p;
+
+  // Với mỗi cung phát: 宫干 → 4 hóa → tìm sao đích → tra cung đích
+  for (const from of palaces) {
+    const gan = from.gan;
+    if (!gan) continue;
+    const four = SIHUA_TABLE[gan];
+    if (!four) continue;
+    for (let i = 0; i < 4; i++) {
+      const hua = SIHUA_KEY[i];
+      const star = four[i];
+      const toZhi = starMap[star];
+      if (!toZhi) continue; // sao không có trên bàn → hóa "bay mất", không đếm
+      const toPal = chiToPalace[toZhi];
+      if (!toPal) continue;
+      const isSelf = (toZhi === from.zhi);
+      const tone = SIHUA_TONE[hua];
+      const dir = FEIXING_DIR[hua];
+
+      // Ghi vào ma trận: 1 dòng mô tả đầy đủ (tự hóa hoặc hóa xuất)
+      matrix.push({
+        fromPalace: from.zh,
+        fromVi: from.vi,
+        fromGanZhi: gan + from.zhi,
+        hua,
+        star,
+        toPalace: toPal.zh,
+        toVi: toPal.vi,
+        toGanZhi: toPal.gan + toPal.zhi,
+        kind: isSelf ? 'self' : 'out',
+        tone,
+      });
+
+      if (isSelf) continue; // tự hóa: không tạo fly-OUT/fly-IN (đã lo ở computeZihua)
+
+      // 化出 (fly-OUT): từ cung PHÁT gửi đi
+      flyOut[from.zh] = flyOut[from.zh] || [];
+      flyOut[from.zh].push({
+        hua,
+        huaVi: SIHUA_VI[hua],
+        star,
+        toPalace: toPal.zh,
+        toVi: toPal.vi,
+        toGanZhi: toPal.gan + toPal.zhi,
+        tone,
+        sense: dir.sense,
+        note: `${from.zh}化${hua}入${toPal.zh} (${from.vi} → ${toPal.vi}): ${dir.sense} ở ${toPal.vi}.`,
+      });
+
+      // 化入 (fly-IN): cung NHẬN được hóa từ cung phát
+      flyIn[toPal.zh] = flyIn[toPal.zh] || [];
+      flyIn[toPal.zh].push({
+        hua,
+        huaVi: SIHUA_VI[hua],
+        star,
+        fromPalace: from.zh,
+        fromVi: from.vi,
+        fromGanZhi: gan + from.zhi,
+        tone,
+        sense: dir.sense,
+        note: `${from.zh}化${hua}入${toPal.zh} (${from.vi} → ${toPal.vi}): ${toPal.vi} nhận ${dir.sense} từ ${from.vi}.`,
+      });
+    }
+  }
+
+  const mingHighlights = summarizePalaceFeiXing(palaces, '命宫', flyOut, flyIn);
+  const summary = summarizeTop3(palaces, flyOut, flyIn);
+  return { matrix, flyOut, flyIn, mingHighlights, summary };
+}
+
+// Tóm tắt 1 cung (thường 命宫): gộp 化出 + 化入 thành 1 dòng VH ngắn
+function summarizePalaceFeiXing(palaces, palaceZh, flyOut, flyIn) {
+  const out = flyOut[palaceZh] || [];
+  const ins = flyIn[palaceZh] || [];
+  if (!out.length && !ins.length) {
+    const pal = palaces.find((p) => p.zh === palaceZh);
+    return `${pal?.vi || palaceZh}: KHÔNG có hóa kết nối ra/vào (cung cô lập, ít tác động qua lại).`;
+  }
+  const outTxt = out.map((r) => `化${r.hua}→${r.toPalace}(${r.toVi})`).join(', ') || '(không)';
+  const inTxt = ins.map((r) => `${r.fromPalace}(${r.fromVi})化${r.hua}→`).join(', ') || '(không)';
+  return `${palaceZh}: 化出[${outTxt}] | 化入[${inTxt} →${palaceZh}]`;
+}
+
+// Tóm tắt 3 cung đọc nhiều nhất: 命/财/官
+function summarizeTop3(palaces, flyOut, flyIn) {
+  const targets = ['命宫', '财帛', '官禄'];
+  const parts = targets.map((zh) => {
+    const pal = palaces.find((p) => p.zh === zh);
+    if (!pal) return null;
+    const out = (flyOut[zh] || []).map((r) => `${zh}化${r.hua}→${r.toPalace}`).join(',');
+    const ins = (flyIn[zh] || []).map((r) => `${r.fromPalace}化${r.hua}→${zh}`).join(',');
+    return `${zh}: 出[${out || '∅'}] 入[${ins || '∅'}]`;
+  }).filter(Boolean);
+  return `飞星化入化出: ${parts.join(' · ')}`;
+}
+
+export { FEIXING_DIR };

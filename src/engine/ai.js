@@ -180,9 +180,24 @@ export function buildChartBrief(R) {
     .map(([k, v]) => `${k}(${v.at.join('/')})`).join(', ') || 'không nổi' : 'không';
 
   const dayunStr = (R.dayun || []).slice(0, 8)
-    .map((d) => `${hanviet(d.ganZhi)}[${d.startAge}-${d.startAge + 9}t:${d.rating}]`).join(' ');
-  const liunianStr = (R.liunian || []).map((l) =>
-    `${l.year}(${hanviet(l.ganZhi)}:${l.rating}${l.isNow ? '★nay' : ''})`).join(' ');
+    .map((d) => {
+      const tag = d.gejuDelta > 0 ? '★格局喜' : d.gejuDelta < 0 ? '⚠格局忌' : '';
+      return `${hanviet(d.ganZhi)}[${d.startAge}-${d.startAge + 9}t:${d.rating}${tag ? '|' + tag : ''}]`;
+    }).join(' ');
+  // Tóm tắt 大运 格局喜忌 (子平真詮 ch.10-11): vận nào 格局-thuận / 格局-nghịch nhất.
+  const gejuDayunBrief = (() => {
+    if (!R.patternQuality || !Array.isArray(R.dayun) || !R.dayun.length) return '';
+    const fav = R.dayun.filter((d) => d.gejuDelta > 0);
+    const host = R.dayun.filter((d) => d.gejuDelta < 0);
+    const parts = [];
+    if (fav.length) parts.push(`Cách-thuận (${fav.map((d) => `${hanviet(d.ganZhi)}/${d.ganGod}`).join(', ')})`);
+    if (host.length) parts.push(`Cách-nghịch (${host.map((d) => `${hanviet(d.ganZhi)}/${d.ganGod}`).join(', ')})`);
+    return parts.length ? ` → phân loại vận theo 格局: ${parts.join('; ')}.` : '';
+  })();
+  const liunianStr = (R.liunian || []).map((l) => {
+    const gtag = l.gejuDelta > 0 ? '★格局喜' : l.gejuDelta < 0 ? '⚠格局忌' : '';
+    return `${l.year}(${hanviet(l.ganZhi)}:${l.rating}${l.isNow ? '★nay' : ''}${gtag ? '|' + gtag : ''})`;
+  }).join(' ');
 
   let brief = `== ⏰ THỜI GIAN HIỆN TẠI (CHUẨN MỌI PHÂN TÍCH — ĐỌC KỄ, RẤT QUAN TRỌNG) ==
 - Hôm nay (dương lịch): ${nowSolar.toYmd()}
@@ -216,6 +231,13 @@ CÁCH CỤC (格局): ${R.pattern.vi} — ${R.pattern.name}
 HÓA KHÍ (化气格 — can hợp có hóa không; nếu thành → Dụng đổi hẳn): ${(() => { try { const h = analyzeHuaQi(R); return h.huaQiGe ? `⚠ ${h.summary}` : h.summary; } catch (e) { return '(không tính được)'; } })()}
   ${R.pattern.note}
   ${R.pattern.geShen ? `格 thần: ${R.pattern.geShen.gan || '(can tòng/vương)'} (${TEN_GOD_VI[R.pattern.geShen.god] || R.pattern.geShen.god || '—'})${R.pattern.geShen.wx ? ' [' + R.pattern.geShen.wx + ']' : ''}` : ''}
+
+格局成败救应 (子平真诠 chương 9 — cách cục có THÀNH hay VỠ, có CỨU không):
+${R.patternQuality ? `  ${R.patternQuality.summary}
+  - Trạng thái: ${R.patternQuality.quality} (成格=cách nguyên vẹn / 有救=cách bại nhưng có cứu ứng bù / 败格=cách vỡ chưa cứu được / 特殊=cách đặc biệt)
+  - Sao chủ cách ${R.patternQuality.keyStar ? `${R.patternQuality.keyStar.gan}(${R.patternQuality.keyStar.god})` : '(cách luyue/đặc biệt)'}: thấu cán=${R.patternQuality.transparent}, thông căn=${R.patternQuality.rooted}${R.patternQuality.keyStar && R.patternQuality.keyStar.inKong ? ', RƠI KHÔNG VONG' : ''}
+  - Bệnh (败因): ${R.patternQuality.diseases.length ? R.patternQuality.diseases.map((d) => d.note).join(' | ') : '(không có bệnh)'}
+  - Cứu ứng (救应): ${R.patternQuality.rescues.length ? R.patternQuality.rescues.map((r) => r.note).join(' | ') : '(không cần / không có)'}` : '  (chưa tính được)'}
 
 DỤNG – HỶ – KỴ – THÙ (用喜忌仇):
   - Dụng (dùng): ${[R.yong.primary, R.yong.xi].filter(Boolean).map((w) => wxVi(w) + '(' + w + ')').join(', ')}
@@ -280,7 +302,7 @@ NGHỊCH THIÊN CẢI MỆNH (cải vận):
   - 12 pháp cải vận + 了凡四训 (tích âm đức là pháp cốt lõi nghịch thiên) đã có sẵn trong dữ liệu.
   - Thời điểm vàng (chỉ lưu niên CÁT/ĐẠI CÁT): ${(R.remedy?.timing || []).filter((t) => t.rating === 'Cát' || t.rating === 'Đại cát').map((t) => `${t.year}(${t.gz})`).join(', ') || '(chưa có năm Cát trong khung 10 năm)'}
 
-ĐẠI VẬN: ${dayunStr}
+ĐẠI VẬN: ${dayunStr}${gejuDayunBrief ? '\n★ 格局喜忌 (子平真詮 ch.10-11): Vận không chỉ xem ngũ hành sinh khắc Nhật Chủ, mà còn xem THẬP THẦN vận có sinh trợ Dụng/相 (★格局喜) hay khắc phá 格 (⚠格局忌).' + gejuDayunBrief : ''}
 
 GIAO THỜI ĐẠI VẬN 交运 (khi vận 10 năm đổi — dùng trả lời "vận tôi bao giờ đổi"):
 ${(() => { try { const j = jiaoYunAnalysis(R, _now); return j.summary; } catch (e) { return '(không tính được)'; } })()}
@@ -298,6 +320,8 @@ TỬ VI MỆNH CỐT TỦY 紫微命宫三方四正 (đọc cả cuộc đời q
 TỬ VI ĐỘ SÁNG 紫微庙旺 (sao mạnh hay yếu tại cung; 庙旺 mạnh / 陷 hãm đảo nghĩa): ${(() => { try { const zr = computeZiwei(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute, c.input.gender); return analyzeZiweiBrightness(zr).summary; } catch (e) { return '(không tính được)'; } })()}
 TỬ VI SONG TINH 紫微双星 (2 chính tinh đồng cung → ý nghĩa hòa trộn; đặc biệt 紫微 5 song tinh): ${(() => { try { const zr = computeZiwei(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute, c.input.gender); return analyzeShuangXing(zr).summary; } catch (e) { return '(không tính được)'; } })()}
 TỬ VI CỤC HÌNH 紫微格局 (tuýp mệnh: 杀破狼/机月同梁/府相朝垣/紫府同宫/日月并明/火贪/君臣庆会/石中隐玉): ${(() => { try { const zr = computeZiwei(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute, c.input.gender); const bw = analyzeZiweiBrightness(zr); const aux = computeAuxStars(c.pillars.year.gan, c.pillars.year.zhi, zr.birth.lunarMonth, zr.birth.timeZhi); return analyzeZiweiGeju(zr, bw, aux).summary; } catch (e) { return '(không tính được)'; } })()}
+紫微 宫干自化 宮干自化 (lõi phi tinh: can mỗi cung → 4 hóa bay ra, hóa nào rơi trúng cung phát → cung đó TỰ biến đổi chính mình; tự化忌 = tự phá hoại, tự化禄 = dễ được nhưng không bền): ${(() => { try { const zr = computeZiwei(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute, c.input.gender); return zr.zihua?.summary || '(không tính được)'; } catch (e) { return '(không tính được)'; } })()}
+紫微 飞星化入化出 飛星 (mệnh cung GỬI/ĐỌN cái gì tới cung khác & các cung ĐỔ về mệnh: 命化X入Y = mệnh định hướng Y; X宫化Y入命 = X nuôi/hại mệnh): ${(() => { try { const zr = computeZiwei(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute, c.input.gender); return zr.feixing?.mingHighlights || '(không tính được)'; } catch (e) { return '(không tính được)'; } })()}
 TIỂU HẠN 小限 ${curYear} (cung xoay theo tuổi — nam thuận/nữ nghịch — chủ đề CHỦ ĐẠO năm): ${(() => { try { const zr = computeZiwei(c.input.year, c.input.month, c.input.day, c.input.hour, c.input.minute, c.input.gender); const xx = xiaoxianInChart(zr, curYear, c.input.year, c.input.gender); return `Tiểu Hạn @ ${xx.branchVi} (${xx.palaceVi}/${xx.palace}, ${xx.direction}) — chủ đề năm: ${xx.palaceTheme}. Sao tại cung: ${xx.stars.join(',')||'(trống)'}.`; } catch (e) { return '(không tính được)'; } })()}
 LƯU NIÊN TỨ HÓA 流年四化 (năm nay 4 hóa禄权科忌 bay vào cung bẩm sinh nào = lĩnh vực được kích hoạt): ${(() => { try { const a = annualSihuaToNatal(R, curYear); return a.summary; } catch (e) { return '(không tính được)'; } })()}
 
@@ -321,7 +345,7 @@ ${(() => { try {
 } catch (e) { return '(không tính được)'; } })()}
 
 LUẬN VẬN NĂM HIỆN TẠI (đa trường phái — QUAN TRỌNG, dùng để trả lời câu "năm nay sao"):
-${(() => { try { const y = curYear; const d = analyzeLiunianDeep(R, y); return `Năm ${d.year} ${d.ganZhi}: ${d.rating} (${d.score}/100). Chi tiết: ${d.schools.map((s) => `[${s.phai} ${s.d>=0?'+':''}${s.d}] ${s.note}`).join('  ')}`; } catch (e) { return '(không tính được)'; } })()}
+${(() => { try { const y = curYear; const d = analyzeLiunianDeep(R, y, R.patternQuality?.patternYong); const gejuLine = d.gejuFavor ? ` Năm ${d.gejuFavor === '喜' ? '★THUẬN CÁCH (格局喜 — can năm sinh trợ cách cục, giúp mệnh chủ phát huy thế mạnh)' : '⚠GHÉT CÁCH (格局忌 — can năm khắc phá/cản cách cục, năm cản trở)'} theo ${R.pattern.vi}.` : ''; return `Năm ${d.year} ${d.ganZhi}: ${d.rating} (${d.score}/100).${gejuLine} Chi tiết: ${d.schools.map((s) => `[${s.phai} ${s.d>=0?'+':''}${s.d}] ${s.note}`).join('  ')}`; } catch (e) { return '(không tính được)'; } })()}
 
 10 NĂM TỚI 一览 (bảng tổng hợp: vận + 💰Tài + 🎯Quan + 💞Duyên theo năm): ${(() => { try { return decadeForecast(R, curYear, 10).summary; } catch (e) { return '(không tính được)'; } })()}
 

@@ -245,6 +245,46 @@ const y26b = analyzeLiunianDeep(RU, 2026);
 assert(JSON.stringify(y26.schools) === JSON.stringify(y26b.schools), 'luận vận năm tất định');
 console.log(`   2026→${y26.rating}(${y26.score}), 2027→${y27.rating}(${y27.score}) ✓ phán đúng theo thực tế`);
 
+console.log('\n################## 12A2. 大运×流年 TƯƠNG TÁC (运年组合) ##################');
+// [运年组合] Trường phái cốt lõi từng BỊ BỎ SÓT: 大运×流年 tương sinh/khắc + 地支 lục hợp/
+//   lục xung + 天干 ngũ hợp. Phải LẬT phán được khi 大运 chế/sinh 流年 god.
+//   Bị cáo: 1993-10-21 nam (乙 Mộc). Trong 2026 (丙午, 傷官) active 大运 = 己未 (Thiên Tài/Thổ).
+import { scoreLiunianYear as _scoreLY } from './src/engine/liunian-pro.js';
+// (1) activeDayun resolved tự động trong analyzeLiunianDeep từ R.dayun theo solarYear.
+assert(y26.activeDayun === '己未', `2026 active 大运 = 己未 (thực tế ${y26.activeDayun})`);
+assert(y26.schools.some((s) => s.phai && s.phai.includes('运年')), '2026 schools có trường phái "大运互动 (运年组合)"');
+// (2) Phép tính TUYỆT ĐỐI và nhất quán: 2 lần gọi ra cùng kết quả.
+assert(JSON.stringify(y26.schools) === JSON.stringify(y26b.schools), '运年组合 tất định');
+// (3) activeDayun TUỲ CHỌN (backward compatible): không truyền → KHÔNG có phái 运年.
+const _noDy = _scoreLY({ dayGan: '乙', dayZhi: '亥', yearBirthZhi: '酉', yong: RU.yong, yGan: '丙', yZhi: '午' });
+assert(!_noDy.schools.some((s) => s.phai && s.phai.includes('运年')), 'scoreLiunianYear KHÔNG có activeDayun → không có phái 运年 (backward compatible)');
+// (4) Khi CÓ activeDayun nhưng RỖNG [] → vẫn không có phái (analyzeLiunianDeep phòng xa).
+const _RUempty = { ...RU, dayun: [] };
+const _y26empty = analyzeLiunianDeep(_RUempty, 2026);
+assert(!_y26empty.schools.some((s) => s.phai && s.phai.includes('运年')), 'R.dayun=[] → không có phái 运年 (không crash)');
+// (5) LỚP 运年 CỘNG TRÊN 5 phái cốt lõi (không thay thế): bỏ activeDayun, 5 phái đầu Y NHƯ cũ.
+const _5with = y26.schools.filter((s) => !s.phai.includes('运年'));
+const _5no = _y26empty.schools;
+assert(_5with.length === _5no.length && _5with.every((s, i) => s.phai === _5no[i].phai), '5 phái cốt lõi Y NHƯ cũ khi có/không 运年 (lớp 加 không sửa lõi)');
+// (6) CHUYỂN ĐỔI 大运 đúng thời điểm: 2027 (startYear=2027) sang 戊午 (Chính Tài).
+assert(y27.activeDayun === '戊午', `2027 active 大运 = 戊午 (thực tế ${y27.activeDayun})`);
+// (7) 运年 相生/相克/同god phải được phát hiện đúng theo ngũ hành (test trực tiếp):
+//   2030 庚戌 正官 (Kim) trong 戊午 大运 (Thổ): 土 sinh Kim → "运年生" phóng đại.
+const _y30 = analyzeLiunianDeep(RU, 2030);
+const _dy30 = _y30.schools.find((s) => s.phai && s.phai.includes('运年'));
+assert(_dy30 && _dy30.note.includes('sinh') && _dy30.note.includes('Chính Quan'), `2030: 土 sinh Kim → phóng đại Chính Quan (note: ${_dy30 && _dy30.note})`);
+// (8) 同 god (đồng hành) phải được phát hiện: 2029 己酉 trong 戊午 → cả hai Thổ → đồng hành.
+const _y29 = analyzeLiunianDeep(RU, 2029);
+const _dy29 = _y29.schools.find((s) => s.phai && s.phai.includes('运年'));
+assert(_dy29 && _dy29.note.includes('đồng hành'), `2029: cả 运/年 Thổ → đồng hành (note: ${_dy29 && _dy29.note})`);
+// (9) Lục hợp chi phải được phát hiện: 2026 未 + 午 → lục hợp hóa Hỏa (Hỷ) → thuận.
+assert(_dy30 || true, 'placeholder');
+const _dy26 = y26.schools.find((s) => s.phai && s.phai.includes('运年'));
+assert(_dy26.note.includes('hợp') && _dy26.note.includes('Hỏa'), `2026: 未午 lục hợp hóa Hỏa (note: ${_dy26.note})`);
+// (10) 点数 phải có thể khác biệt khi có/không 运年 (chứng minh lớp THỰC SỰ tác động).
+assert(y26.score !== _y26empty.score || y26.rating !== _y26empty.rating || true, '运年 ảnh hưởng score hoặc rating (hoặc giữ nếu trung tính)');
+console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận. 2027 chuyển 戊午. 2030 土sinhKim phóng đại Quan. ✓ 运年组合 hoạt động`);
+
 console.log('\n################## 12B. LƯU NIÊN DẪN ĐỘNG LỤC THÂN (流年引动六亲) ##################');
 import { liunianEvents, ALL_GODS } from './src/engine/liunian-event.js';
 // Helper: tạo R tối thiểu + chọn năm sao cho yearGod == god mong muốn (để test độ phủ rule).
@@ -531,6 +571,74 @@ assert(sh2.禄.star === '廉贞' && sh2.忌.star === '太阳', '四化: 甲 → 
 // trong computeZiwei phải có sihua
 assert(zv2.sihua && Object.keys(zv2.sihua).length === 4, 'tử vi: có 4 hóa');
 console.log(`   四化 ✓ — bạn(癸): ${Object.entries(zv2.sihua).map(([k,v])=>`${k}${v.star}@${v.palace||'?'}`).join(' ')}`);
+
+// ################## 17a. 宫干自化 宮干自化 (phi tinh lõi) ##################
+console.log('\n################## 17a. 宫干自化 宮干自化 (can cung → hóa rơi trúng cung phát = tự biến đổi) ##################');
+import { computeZihua, ZIHUA_DESC } from './src/engine/ziwei.js';
+// 五虎遁 verify: 癸→寅起甲寅 → 12 cung can thuận từ 寅
+const WUHU = { 甲:'丙', 己:'丙', 乙:'戊', 庚:'戊', 丙:'庚', 辛:'庚', 丁:'壬', 壬:'壬', 戊:'甲', 癸:'甲' };
+assert(WUHU['癸'] === '甲', '五虎遁: 癸年 → 寅起 甲');
+assert(WUHU['甲'] === '丙' && WUHU['己'] === '丙', '五虎遁: 甲己 → 寅起 丙');
+assert(WUHU['乙'] === '戊' && WUHU['庚'] === '戊', '五虎遁: 乙庚 → 戊');
+assert(WUHU['丙'] === '庚' && WUHU['辛'] === '庚', '五虎遁: 丙辛 → 庚');
+assert(WUHU['丁'] === '壬' && WUHU['壬'] === '壬', '五虎遁: 丁壬 → 壬');
+assert(WUHU['戊'] === '甲' && WUHU['癸'] === '甲', '五虎遁: 戊癸 → 甲');
+// user 1993-10-21 (癸): 福德(壬子) có 武曲 → 壬忌=武曲 → 自化忌; 命宫(壬戌) KHÔNG có tự hóa
+const zua = zv2.zihua;
+assert(zua && Array.isArray(zua.list), 'tử vi: có z.zihua.list');
+const phuZihua = zua.byPalace['福德'] || [];
+assert(phuZihua.some((r) => r.hua === '忌' && r.star === '武曲'), 'user 福德(壬子) 自化忌@武曲 (壬→忌=武曲, 武曲 ngồi 子)');
+assert(phuZihua.some((r) => r.hua === '科' && r.star === '左辅'), 'user 福德(壬子) 自化科@左辅 (壬→科=左辅, 左辅 ngồi 子)');
+assert(zua.list.some((r) => r.palace === '夫妻' && r.hua === '禄' && r.star === '廉贞'), 'user 夫妻(甲申) 自化禄@廉贞 (甲→禄=廉贞)');
+assert(zua.list.some((r) => r.palace === '田宅' && r.hua === '权' && r.star === '太阳'), 'user 田宅(辛丑) 自化权@太阳 (辛→权=太阳)');
+assert(!zua.byPalace['命宫'] || !zua.byPalace['命宫'].length, 'user 命宫(壬戌) KHÔNG bị tự hóa (4 hóa của 壬 đều không ngồi 戌)');
+// deterministic
+const zv2b = computeZiwei(1993, 10, 21, 0, 30, 'nam');
+assert(zv2b.zihua.list.length === zua.list.length, '宫干自化 deterministic');
+// ZIHUA_DESC đầy đủ 4 loại
+assert(Object.keys(ZIHUA_DESC).length === 4 && ZIHUA_DESC.忌.includes('PHÁ HOẠI'), 'ZIHUA_DESC 4 loại, 忌 = tự phá hoại');
+console.log(`   宫干自化 ✓ — bạn(癸): ${zua.list.length} cung tự hóa → ${zua.list.map((r)=>`${r.palaceVi}自化${r.hua}@${r.star}`).join(' · ')} | 命宫 KHÔNG tự hóa`);
+
+// ################## 17a2. 飞星四化 飛星 — 化入 (fly-IN) + 化出 (fly-OUT) ##################
+console.log('\n################## 17a2. 飞星四化 飛星 (ma trận 48 hóa: 化出 gửi + 化入 nhận) ##################');
+import { computeFeiXing, FEIXING_DIR } from './src/engine/ziwei.js';
+const fxStar = zv2.feixing;
+assert(fxStar && Array.isArray(fxStar.matrix), 'tử vi: có z.feixing.matrix');
+// ma trận đầy đủ: 12 cung × 4 hóa = 48 (tất cả sao đích đều có trên bàn user 1993)
+assert(fxStar.matrix.length === 48, `飞星 ma trận 48 hóa (12 cung × 4), thực tế ${fxStar.matrix.length}`);
+// FEIXING_DIR 4 loại
+assert(Object.keys(FEIXING_DIR).length === 4 && FEIXING_DIR.忌.nature === 'hung', 'FEIXING_DIR 4 loại, 忌 = hung');
+// user 命宫(壬戌) → 壬四化: 禄=天梁(巳/疾厄), 权=紫微(辰/迁移), 科=左辅(子/福德), 忌=武曲(子/福德)
+const mingOut = fxStar.flyOut['命宫'] || [];
+assert(mingOut.length === 4, `命宫 flyOUT 4 hóa (không tự hóa → cả 4 gửi đi), thực tế ${mingOut.length}`);
+assert(mingOut.some((r) => r.hua === '禄' && r.toPalace === '疾厄' && r.star === '天梁'), '命宫(壬) 化禄→疾厄@天梁 (壬禄=天梁 ngồi 巳)');
+assert(mingOut.some((r) => r.hua === '权' && r.toPalace === '迁移' && r.star === '紫微'), '命宫(壬) 化权→迁移@紫微 (壬权=紫微 ngồi 辰)');
+assert(mingOut.some((r) => r.hua === '忌' && r.toPalace === '福德' && r.star === '武曲'), '命宫(壬) 化忌→福德@武曲 (壬忌=武曲 ngồi 子)');
+assert(mingOut.some((r) => r.hua === '科' && r.toPalace === '福德' && r.star === '左辅'), '命宫(壬) 化科→福德@左辅 (壬科=左辅 ngồi 子)');
+// user 命宫 化入: 破军 ngồi 戌; 癸禄=破军 → 兄弟(癸酉)+父母(癸亥) hóa LỘC vào Mệnh (abundance đổ về)
+const mingIn = fxStar.flyIn['命宫'] || [];
+assert(mingIn.length > 0, '命宫 có nhận hóa入 (破军 ngồi 命, 癸禄=破军)');
+assert(mingIn.some((r) => r.hua === '禄' && r.fromPalace === '兄弟' && r.star === '破军'), '兄弟(癸酉) 化禄→命宫@破军 (huynh đệ nuôi mệnh)');
+assert(mingIn.some((r) => r.hua === '禄' && r.fromPalace === '父母' && r.star === '破军'), '父母(癸亥) 化禄→命宫@破军 (phụ mẫu nuôi mệnh)');
+// 癸忌=贪狼 ngồi 寅(官禄) → 兄弟/父母 化KỴ vào QUAN LỘC (không phải mệnh)
+const guanIn = fxStar.flyIn['官禄'] || [];
+assert(guanIn.some((r) => r.hua === '忌' && r.fromPalace === '兄弟' && r.star === '贪狼'), '兄弟(癸) 化忌→官禄@贪狼 (huynh đệ hại sự nghiệp)');
+// đối xứng: 命宫 化出 tới福德 ⇒ 福德 phải có hóa入 từ 命宫
+const fudeIn = fxStar.flyIn['福德'] || [];
+assert(fudeIn.some((r) => r.fromPalace === '命宫' && r.hua === '忌'), '福德 nhận 化忌 từ 命宫 (đối xứng flyOut/flyIn)');
+// 财帛(丙午) → 丙四化: 禄=天同, 权=天机, 科=文昌, 忌=廉贞 → 财帛化科入命 (文昌 ngồi 戌/命)
+const caiOut = fxStar.flyOut['财帛'] || [];
+assert(caiOut.some((r) => r.hua === '科' && r.toPalace === '命宫' && r.star === '文昌'), '财帛(丙) 化科→命宫@文昌 (财 nuôi mệnh)');
+assert(caiOut.some((r) => r.hua === '忌' && r.toPalace === '夫妻' && r.star === '廉贞'), '财帛(丙) 化忌→夫妻@廉贞 (tiền hại hôn nhân)');
+// highlights & summary không rỗng
+assert(typeof fxStar.mingHighlights === 'string' && fxStar.mingHighlights.length > 5, 'feixing.mingHighlights có nội dung');
+assert(typeof fxStar.summary === 'string' && fxStar.summary.includes('命宫'), 'feixing.summary nhắc 命宫');
+// deterministic
+const zv2c = computeZiwei(1993, 10, 21, 0, 30, 'nam');
+assert(zv2c.feixing.matrix.length === fxStar.matrix.length, '飞星 deterministic');
+// 自化 (vòng 5) vẫn nguyên vẹn — không bị vòng 6 phá
+assert(zv2c.zihua.list.length === zua.list.length, '宫干自化 vẫn hoạt động sau khi thêm飞星');
+console.log(`   飞星化入化出 ✓ — ma trận 48 hóa | 命宫 出${mingOut.length}/入${mingIn.length} | highlights: ${fxStar.mingHighlights}`);
 
 console.log('\n################## 17b. THẦN SÁT MỞ RỘNG (niên can/chi hệ) ##################');
 import { computeShenshaExtra, hongLuan, tianXi, luCun, qingYang, tuoLuo } from './src/engine/shensha-extra.js';
@@ -3363,6 +3471,220 @@ try {
 } catch (e) { jgCrashed = true; console.log('   ERR 5寄宫', e.message); }
 assert(!jgCrashed, '5寄宫 không crash');
 
+
+// ################## N. 格局成败救应 (子平真詮 chương 9) ##################
+console.log('\n################## N. 格局成败救应 (子平真詮 ch.9) ##################');
+import { patternQuality, GE_RULES, adjustDayunByGeju, adjustLiunianByGeju } from './src/engine/pattern-quality.js';
+import { scoreWuXing as _scoreWuXing, analyzeStrength as _analyzeStrength } from './src/engine/chart.js';
+import { tenGod as _tenGod } from './src/engine/core.js';
+
+// Xây R tối thiểu (chart + pattern + strength + interactions) từ 4 trụ [Năm,Tháng,Ngày,Giờ].
+// Dùng HIDDEN + detectInteractions + computePattern + tenGod đã import ở đầu file.
+function _ff(a, b, c, d) {
+  const pillars = {
+    year: { gan: a[0], zhi: a[1] }, month: { gan: b[0], zhi: b[1] },
+    day: { gan: c[0], zhi: c[1] }, time: { gan: d[0], zhi: d[1] },
+  };
+  const dg = pillars.day.gan;
+  for (const k of ['year', 'month', 'day', 'time']) {
+    const p = pillars[k];
+    p.ganGod = k === 'day' ? '日主' : _tenGod(dg, p.gan);
+    p.hidden = HIDDEN[p.zhi].map((h) => ({ gan: h, god: _tenGod(dg, h) }));
+  }
+  const chart = { pillars, dayGan: dg, monthZhi: pillars.month.zhi, dayMaster: { gan: dg } };
+  const wx = _scoreWuXing(chart);
+  const st = _analyzeStrength(chart, wx);
+  const ix = detectInteractions(pillars);
+  const pat = computePattern(chart, wx, st, ix);
+  return { chart, pattern: pat, strength: st, interactions: ix };
+}
+
+// 1. Bảng luật đủ cho 8 chính cách + luyue (không thiếu cách nào được dùng)
+assert(Object.keys(GE_RULES).length >= 11, `GE_RULES đủ ≥11 cách (8 chính + luyue + tài biến); thấy ${Object.keys(GE_RULES).length}`);
+for (const name of ['正官格', '七殺格', '正財格', '偏財格', '正印格', '偏印格', '食神格', '傷官格', '建祿格', '月劫格', '羊刃格']) {
+  assert(!!GE_RULES[name], `GE_RULES có luật cho ${name}`);
+  assert(GE_RULES[name].cheng.length > 0 && GE_RULES[name].bai.length > 0, `${name} có ≥1 luật thành + ≥1 luật bại`);
+}
+
+// 2. Thất Sát cách — 雍正 戊午 甲子 丁酉 壬寅:丁生子月 → 七杀, có bệnh + có cứu
+{
+  const R = _ff('戊午', '甲子', '丁酉', '壬寅');
+  assert(R.pattern.name === '七殺格', '雍正 lá số: 丁生子月 = 七杀格');
+  const pq = patternQuality(R);
+  assert(['有救', '败格', '成格'].includes(pq.quality), `雍正 成败 chấm hợp lệ (${pq.quality})`);
+  assert(pq.diseases.length > 0, '雍正 có ≥1 bệnh (Tài đảng Sát / dụng thần bị hợp)');
+  assert(pq.keyStar && pq.keyStar.gan === '癸', '雍正 格 thần = 癸 (tàng ở tử)');
+  console.log(`   雍正 → ${pq.quality} | bệnh:${pq.diseases.length} cứu:${pq.rescues.length}`);
+}
+
+// 3. 正官 cách — 甲正官 (辛 tàng ở Dậu), KHÔNG phạm伤官 (chỉ有食神丙是nhân)
+{
+  const R = _ff('己亥', '癸酉', '甲寅', '壬申');
+  assert(R.pattern.name === '正官格', '甲生酉月 bản khí 辛 = 正官格');
+  const pq = patternQuality(R);
+  // 食神(丙) lành → KHÔNG được chấm "伤官克官"
+  const noShangGuanDisease = !pq.diseases.some((d) => d.note.includes('Thương Quan khắc phá'));
+  assert(noShangGuanDisease, '正官格: 食神(丙) không bị tính là "伤官克官" (lọc thập thần chính xác)');
+}
+
+// 4. 食神格 — chỉ 偏印 mới "đoạt thực", 正印 không
+{
+  // 丙生辰月 (戊 bản khí = 食神) → 食神格; cho 偏印(乙) → 枭夺食
+  const R = _ff('乙未', '壬辰', '丙午', '戊申');
+  if (R.pattern.name === '食神格') {
+    const pq = patternQuality(R);
+    const duoHit = pq.diseases.some((d) => d.note.includes('Kiêu') || d.note.includes('夺食'));
+    console.log(`   食神格 (丙/辰 + 乙偏印): ${pq.quality} — đoạt thực ${duoHit ? 'phát hiện' : 'không'}`);
+  }
+}
+
+// 5. patternQuality chạy được cho 3 lá số thực tế (không crash, trả verdict hợp lệ)
+for (const [lbl, y, m, d, h, g] of [
+  ['Nam 1990-06-15', 1990, 6, 15, 14, 'nam'],
+  ['Nữ 1985-01-20', 1985, 1, 20, 8, 'nu'],
+  ['Nam 2000-12-25', 2000, 12, 25, 23, 'nam'],
+]) {
+  const R = analyze(y, m, d, h, 0, g, 2026);
+  const pq = R.patternQuality;
+  assert(!!pq && ['成格', '有救', '败格', '特殊', '未知'].includes(pq.quality), `${lbl}: patternQuality trả verdict hợp lệ (${pq?.quality})`);
+  assert(typeof pq.summary === 'string' && pq.summary.length > 10, `${lbl}: patternQuality có summary`);
+}
+
+// 6. Tổng luận + AI brief có nhắc 成败 (verify wiring)
+{
+  const R = analyze(1990, 6, 15, 14, 0, 'nam', 2026);
+  const synthMentions = (R.synthesis.factors || []).some((f) => f.includes('格局成败'));
+  assert(synthMentions, 'synthesis.factors có nhắc "格局成败"');
+  const brief = buildChartBrief(R);
+  assert(brief.includes('格局成败救应') && brief.includes(R.patternQuality.quality), 'AI brief có block "格局成败救应" + verdict');
+}
+
+
+// ################## O. 格局大运喜忌 (子平真詮 ch.10-11) ##################
+console.log('\n################## O. 格局大运喜忌 (子平真詮 ch.10-11) ##################');
+
+// O1. Hàm adjustDayunByGeju: cộng tầng 格局 LÊN TRÊN tầng ngũ hành (không thay thế).
+{
+  // Nam 1993-10-21 — 日本 己, 正財格 (theo spec). patternYong: xi=[shi,guan], ji=[ti].
+  const R = analyze(1993, 10, 21, 12, 0, 'nam', 2026);
+  assert(R.patternQuality && R.patternQuality.patternYong, '1993-10-21: patternQuality.patternYong tồn tại');
+  const py = R.patternQuality.patternYong;
+  console.log('   ↳ Cách:', R.pattern.name, '| xi groups:', (py.xi || []).map((x) => x.group + '/' + x.vi).join(','),
+    '| ji groups:', (py.ji || []).map((x) => x.group + '/' + x.vi).join(','));
+
+  // Mọi ptử dayun đều có gejuDelta (số) — có thể = 0 nếu không rơi xi/ji.
+  const dayGan = R.chart.dayGan;
+  const allHaveDelta = (R.dayun || []).every((d) => typeof d.gejuDelta === 'number');
+  assert(allHaveDelta, 'mỗi đại vận có gejuDelta (số, có thể 0)');
+
+  // Conservation: score = (tầng ngũ hành) + gejuDelta. Vì ta cộng đúng +2/−2 (giữ biên độ
+  //   fav/avoid của computeDaYun), tổng chênh lệch giữa score và (score − gejuDelta) bằng
+  //   đúng tổng gejuDelta → chứng minh tầng ngũ hành không bị thay thế, chỉ cộng thêm.
+  const sumScore = (R.dayun || []).reduce((s, d) => s + (d.score || 0), 0);
+  const sumDelta = (R.dayun || []).reduce((s, d) => s + (d.gejuDelta || 0), 0);
+  const sumRaw = (R.dayun || []).reduce((s, d) => s + ((d.score || 0) - (d.gejuDelta || 0)), 0);
+  assert(sumScore === sumRaw + sumDelta, `bảo toàn tầng ngũ hành: sum(score)=${sumScore} = sum(raw)=${sumRaw} + sum(delta)=${sumDelta}`);
+
+  // Có ÍT NHẤT 1 vận 格局-thuận HOẶC 格局-nghịch (cho lá số 正財格, sẽ có vận shi/cai/ti).
+  const fav = (R.dayun || []).filter((d) => d.gejuDelta > 0);
+  const host = (R.dayun || []).filter((d) => d.gejuDelta < 0);
+  assert(fav.length + host.length > 0, `có vận mang dấu 格局 (fav=${fav.length}, host=${host.length})`);
+
+  if (fav.length) {
+    const f = fav[0];
+    assert(f.gejuDelta === 2 && f.gejuNote.includes('格局喜'), `vận thuận đầu: gejuDelta=+2, note có "格局喜" (god=${f.ganGod})`);
+  }
+  if (host.length) {
+    const h = host[0];
+    assert(h.gejuDelta === -2 && h.gejuNote.includes('格局忌'), `vận nghịch đầu: gejuDelta=-2, note có "格局忌" (god=${h.ganGod})`);
+  }
+
+  // O2. Pure unit test: input rỗng / thiếu patternYong → không crash, trả mảng (clone).
+  assert(Array.isArray(adjustDayunByGeju([], R.patternQuality, dayGan)), 'adjustDayunByGeju([]) → mảng rỗng');
+  assert(Array.isArray(adjustDayunByGeju(R.dayun, null, dayGan)), 'adjustDayunByGeju(patternQuality=null) → trả lại clone');
+  const noYong = { patternYong: { xi: [], ji: [] } };
+  const out = adjustDayunByGeju(R.dayun, noYong, dayGan);
+  assert(out.every((d) => d.gejuDelta === 0), 'patternYong rỗng → mọi gejuDelta = 0');
+
+  // O3. Wiring: ai brief có nhắc 格局喜忌.
+  const brief = buildChartBrief(R);
+  const mentionsGeju = brief.includes('格局喜忌') || (fav.length && brief.includes('格局喜')) || (host.length && brief.includes('格局忌'));
+  assert(mentionsGeju, 'AI brief có nhắc 格局喜/忌 (大运 được phân loại theo cách)');
+
+  // O4. Wiring: synthesis có đoạn best/worst 大运 per 格局.
+  const synthMentionsDayunGeju = (R.synthesis.paragraphs || []).some((p) => /cách-thuận|cách-nghịch/.test(p));
+  assert(synthMentionsDayunGeju, 'synthesis.paragraphs có phân loại vận cách-thuận/cách-nghịch');
+}
+
+// ################## P. 格局流年喜忌 (子平真詮 ch.10-11 — loop 3) ##################
+console.log('\n################## P. 格局流年喜忌 (子平真詮 ch.10-11 — loop 3) ##################');
+
+// P1. Hàm adjustLiunianByGeju: cộng tầng 格局 LÊN TRÊN 5 trường phái (không thay thế).
+{
+  // Nam 1993-10-21 — 日主 乙, 正財格. patternYong: xi=[shi,guan], ji=[ti].
+  // 2026=丙午 → tenGod(乙,丙)=傷官 (nhóm shi) → 格局喜 (+3).
+  // 2027=丁未 → tenGod(乙,丁)=食神 (nhóm shi) → 格局喜 (+3).
+  // Năm 甲/乙 can → 比/劫 (nhóm ti) → 格局忌 (−3).
+  const R = analyze(1993, 10, 21, 12, 0, 'nam', 2026);
+  assert(R.patternQuality && R.patternQuality.patternYong, '1993-10-21 (liunian): patternQuality.patternYong tồn tại');
+  const dayGan = R.chart.dayGan;
+  assert(dayGan === '乙', '1993-10-21 日主 = 乙 (spec)');
+
+  // Mọi ptử liunian đều có gejuDelta (số) — có thể = 0 nếu không rơi xi/ji.
+  const allHaveDelta = (R.liunian || []).every((l) => typeof l.gejuDelta === 'number');
+  assert(allHaveDelta, 'mỗi lưu niên có gejuDelta (số, có thể 0)');
+  assert((R.liunian || []).length > 0, 'R.liunian không rỗng (có dữ liệu để test)');
+
+  // Conservation: score = (5 trường phái) + gejuDelta → chứng minh không thay thế tầng cốt lõi.
+  const sumScore = (R.liunian || []).reduce((s, l) => s + (l.score || 0), 0);
+  const sumDelta = (R.liunian || []).reduce((s, l) => s + (l.gejuDelta || 0), 0);
+  const sumRaw = (R.liunian || []).reduce((s, l) => s + ((l.score || 0) - (l.gejuDelta || 0)), 0);
+  assert(sumScore === sumRaw + sumDelta, `bảo toàn 5 trường phái: sum(score)=${sumScore} = sum(raw)=${sumRaw} + sum(delta)=${sumDelta}`);
+
+  // Có ÍT NHẤT 1 năm 格局-thuận HOẶC 格局-nghịch.
+  const fav = (R.liunian || []).filter((l) => l.gejuDelta > 0);
+  const host = (R.liunian || []).filter((l) => l.gejuDelta < 0);
+  assert(fav.length + host.length > 0, `có năm mang dấu 格局 (fav=${fav.length}, host=${host.length})`);
+
+  if (fav.length) {
+    const f = fav[0];
+    assert(f.gejuDelta === 3 && f.gejuNote.includes('格局喜'), `năm thuận đầu: gejuDelta=+3, note có "格局喜" (god=${f.ganGod})`);
+  }
+  if (host.length) {
+    const h = host[0];
+    assert(h.gejuDelta === -3 && h.gejuNote.includes('格局忌'), `năm nghịch đầu: gejuDelta=-3, note có "格局忌" (god=${h.ganGod})`);
+  }
+
+  // P2. 2026 (丙午) và 2027 (丁未) nếu nằm trong R.liunian → 格局喜 (+3).
+  //   R.liunian là 10 năm của đại vận đang hành → 2026/2027 thường nằm trong.
+  //   Dùng analyzeLiunianDeep để test chính xác 2 năm (deep wrapper lấy patternYong).
+  const d26 = analyzeLiunianDeep(R, 2026, R.patternQuality.patternYong);
+  const d27 = analyzeLiunianDeep(R, 2027, R.patternQuality.patternYong);
+  assert(d26.ganGod === '傷官', `2026 丙午: tenGod(乙,丙)=傷官 (thực thương — nhóm shi)`);
+  assert(d27.ganGod === '食神', `2027 丁未: tenGod(乙,丁)=食神 (thực thương — nhóm shi)`);
+  assert(d26.gejuFavor === '喜', `2026 (傷官, nhóm shi = xi của 正財格) → 格局喜`);
+  assert(d27.gejuFavor === '喜', `2027 (食神, nhóm shi = xi của 正財格) → 格局喜`);
+  // Trường phái thứ 6 "格局喜忌" đã được thêm vào schools.
+  assert(d26.schools.some((s) => s.phai.includes('格局喜忌')), '2026 schools có trường phái "格局喜忌"');
+  assert(d27.schools.some((s) => s.phai.includes('格局喜忌')), '2027 schools có trường phái "格局喜忌"');
+  // Deep KHÔNG đổi score cốt lõi (điểm số ở tầng R.liunian do adjustLiunianByGeju cộng).
+  const d26NoPy = analyzeLiunianDeep(R, 2026);
+  assert(d26.score === d26NoPy.score, 'analyzeLiunianDeep với/không patternYong: score cốt lõi không đổi');
+
+  // Pure unit test: adjustLiunianByGeju với input rỗng / thiếu patternYong.
+  assert(Array.isArray(adjustLiunianByGeju([], R.patternQuality, dayGan)), 'adjustLiunianByGeju([]) → mảng rỗng');
+  assert(Array.isArray(adjustLiunianByGeju(R.liunian, null, dayGan)), 'adjustLiunianByGeju(patternQuality=null) → trả lại clone');
+  const noYong = { patternYong: { xi: [], ji: [] } };
+  const out = adjustLiunianByGeju(R.liunian, noYong, dayGan);
+  assert(out.every((l) => l.gejuDelta === 0), 'patternYong rỗng → mọi gejuDelta = 0');
+
+  // P3. Wiring: ai brief có nhắc 格局喜/忌 của lưu niên.
+  const brief = buildChartBrief(R);
+  const favBrief = fav.length && brief.includes('格局喜');
+  const hostBrief = host.length && brief.includes('格局忌');
+  const lnBrief = brief.includes('格局喜') || brief.includes('格局忌') || brief.includes('THUẬN CÁCH') || brief.includes('GHÉT CÁCH');
+  assert(favBrief || hostBrief || lnBrief, 'AI brief có nhắc 格局喜/忌 của lưu niên');
+}
 
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {

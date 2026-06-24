@@ -74,8 +74,28 @@ export function ziweiCoreReading(zr) {
   const mingPalace = zr.palaces.find((p) => p.isMing);
   if (!mingPalace) return { summary: '(không tìm thấy Mệnh cung)' };
   const core = analyzePalaceSanfang(zr, mingPalace.zhi);
-  const summary = `Mệnh cung (${mingPalace.vi}) tam phương tứ chính = Mệnh + Tài Bố + Quan Lộc + Thiên Di: ${core.verdictVi} ` +
+  let summary = `Mệnh cung (${mingPalace.vi}) tam phương tứ chính = Mệnh + Tài Bố + Quan Lộc + Thiên Di: ${core.verdictVi} ` +
     `Chính tinh: ${[mingPalace.zhi, ...TRINE[mingPalace.zhi].filter((z) => z !== mingPalace.zhi), OPP[mingPalace.zhi]].map((z) => zr.palaces.find((p) => p.zhi === z)?.vi + ':' + (zr.palaces.find((p) => p.zhi === z)?.stars || []).join('')).join(' | ')}.`;
+  // 宫干自化 — nếu Mệnh cung có tự hóa thì ghi rõ (rất quan trọng), nếu không thì note toàn bàn.
+  const zh = zr.zihua;
+  if (zh && Array.isArray(zh.list) && zh.list.length) {
+    const mingZihua = (zh.byPalace?.[mingPalace.zh]) || [];
+    if (mingZihua.length) {
+      summary += ` 宫干自化 tại Mệnh (${mingPalace.gan}${mingPalace.zhi}): ${mingZihua.map((r) => `tự化${r.hua}@${r.star} (${r.interpretation})`).join(' · ')}.`;
+    } else {
+      summary += ` Mệnh cung không bị tự hóa (ổn định). Toàn bàn có ${zh.list.length} cung tự hóa.`;
+    }
+  }
+  // 飞星化入 (fly-IN) — các cung ĐỔ hóa vào Mệnh: cho biết vùng đời nào nuôi dưỡng (禄/权/科) hay
+  // thương tổn (忌) bản thân. Ưu tiên 忌 (hại) + 禄 (nuôi) vì 2 loại tác động rõ nhất.
+  const fx = zr.feixing;
+  if (fx && fx.flyIn && fx.flyIn[mingPalace.zh]?.length) {
+    const ins = fx.flyIn[mingPalace.zh];
+    const ji = ins.filter((r) => r.hua === '忌').map((r) => `${r.fromVi} hóa Kỵ vào Mệnh`);
+    const lu = ins.filter((r) => r.hua === '禄').map((r) => `${r.fromVi} hóa Lộc vào Mệnh`);
+    const parts = [...lu, ...ji];
+    if (parts.length) summary += ` 飛星化入 Mệnh: ${parts.join(' · ')}.`;
+  }
   return { core, summary };
 }
 
