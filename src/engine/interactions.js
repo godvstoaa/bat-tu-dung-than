@@ -136,6 +136,17 @@ export function detectInteractions(pillars) {
     .map((s) => ({ ...s, present: s.branches }));
   const sanHui = ZHI_SANHUI.filter((s) => s.branches.every((b) => zset.has(b)))
     .map((s) => ({ ...s, present: s.branches }));
+  // [loop 29] BÁN HỢP (半合) — 2/3 chi của 1 cục (vd 申子, 子辰 = bán thủy cục). Cổ pháp công nhận
+  //   bán hợp lực yếu hơn toàn cục nhưng vẫn là tương tác thật. Comment cũ hứa nhưng chưa implement.
+  const banHe = [];
+  for (const s of ZHI_SANHE) {
+    if (s.branches.every((b) => zset.has(b))) continue; // đã là toàn cục
+    const present = s.branches.filter((b) => zset.has(b));
+    if (present.length === 2) {
+      const missing = s.branches.find((b) => !zset.has(b));
+      banHe.push({ wx: s.wx, name: 'Bán ' + s.name, present, missing, at: present.map((b) => POS_LABEL[zhis.indexOf(b)]).filter(Boolean).join('–') });
+    }
+  }
 
   // --- Lục xung ---
   const chong = [];
@@ -167,11 +178,12 @@ export function detectInteractions(pillars) {
   const parts = [];
   if (sanHui.length) parts.push(`Tam hội ${sanHui.map((s) => s.name + '(' + s.branches.join('') + '→' + s.wx + ')').join(', ')}`);
   if (sanHe.length) parts.push(`Tam hợp ${sanHe.map((s) => s.name + '(' + s.branches.join('') + '→' + s.wx + ')').join(', ')}`);
+  if (banHe.length) parts.push(`Bán hợp ${banHe.map((s) => s.present.join('') + '(thiếu ' + s.missing + '→' + s.wx + ')').join(', ')}`);
   if (ganHe.length) parts.push(`Can hợp ${ganHe.map((g) => g.a + g.b + '→' + g.hua).join(', ')}`);
   if (zhiHe.length) parts.push(`Chi lục hợp ${zhiHe.map((g) => g.a + g.b + '→' + g.hua).join(', ')}`);
   if (chong.length) parts.push(`Xung ${chong.map((c) => c.a + '↔' + c.b).join(', ')}`);
   if (xing.length) parts.push(`Hình ${xing.map((c) => c.a + (c.a === c.b ? '' : '–' + c.b)).join(', ')}`);
   if (hai.length) parts.push(`Hại ${hai.map((c) => c.a + '–' + c.b).join(', ')}`);
 
-  return { ganHe, zhiHe, sanHe, sanHui, chong, xing, hai, summary: parts.join(' · ') || 'Tứ trụ tương đối yên tĩnh, không có xung hợp rõ rệt.' };
+  return { ganHe, zhiHe, sanHe, banHe, sanHui, chong, xing, hai, summary: parts.join(' · ') || 'Tứ trụ tương đối yên tĩnh, không có xung hợp rõ rệt.' };
 }

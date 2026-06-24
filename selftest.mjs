@@ -32,6 +32,8 @@ function run(label, y, m, d, h, min, g, refYear) {
   console.log('DỤNG:', R.yong.primary + '/' + R.yong.secondary, '| KỴ:', R.yong.avoid.join(','));
   console.log('Phép:', R.yong.method.join(' + '));
   console.log('Hội hợp:', R.interactions.summary);
+  // [loop 29] bán hợp (半合) được phát hiện — 1990 nam có 亥+未 = bán Mộc cục (thiếu 卯)
+  assert(Array.isArray(R.interactions.banHe), 'interactions trả banHe[] (bán hợp)');
   console.log('Thần sát:', Object.keys(R.shensha).join(', ') || '(không)');
   console.log('Đại vận:', (R.dayun || []).slice(0, 3).map((d) => `${d.ganZhi}[${d.startAge}t:${d.rating}]`).join(' '));
   console.log('Lưu niên hiện tại:', (R.liunian || []).filter((l) => l.isNow).map((l) => `${l.year}(${l.ganZhi}:${l.rating})`).join(' ') || '(không khớp năm tham chiếu)');
@@ -1665,6 +1667,10 @@ assert(sinhKhi && sinhKhi.annualStar === 2 && sinhKhi.tone === 'hung', '2026 Sin
 const dienNien = ad.auspicious.find((x) => x.star.startsWith('Diên Niên'));
 assert(dienNien && dienNien.annualStar === 4 && dienNien.tone === 'cat', '2026 Diên Niên(Đông Bắc) ← 4绿 = cát (kích hoạt)');
 assert(ad.summary.includes('KÍCH HOẠT') && ad.summary.includes('TRÁNH'), 'summary có kích hoạt + tránh');
+// [loop 29] Thái Tuế + Tam Sát (2026 午年): TT@Chính Nam (trùng 5 hoàng ★kỵ kép), TS@Chính Bắc
+assert(ad.taisuiDir === 'Chính Nam' && ad.taisuiZhi === '午', `2026 Thái Tuế @ Chính Nam (午) — được ${ad.taisuiDir}/${ad.taisuiZhi}`);
+assert(ad.sanshaDir === 'Chính Bắc', `2026 Tam Sát @ Chính Bắc (寅午戌→亥子丑) — được ${ad.sanshaDir}`);
+assert(ad.taisuiDouble === true && ad.summary.includes('THÁI TUẾ'), '2026 Thái Tuế trùng Ngũ Hoàng = kỵ kép + summary nhắc THÁI TUẾ');
 const ad2 = annualDirection(adR, 2026);
 assert(ad2.summary === ad.summary, 'annualDirection deterministic');
 console.log(`   user 2026: KÍCH HOẠT Đông Bắc(4绿) | TRÁNH Tây Bắc(2黑)/Tây Nam(7赤)/Tây(3碧) ✓`);
