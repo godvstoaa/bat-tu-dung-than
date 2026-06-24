@@ -68,12 +68,15 @@ export function lifeTimeline(R) {
     };
   });
 
-  // Peak & challenge
-  const peak = decades.reduce((a, b) => (b.vitalityScore > a.vitalityScore ? b : a), decades[0] || {});
-  const challenge = decades.reduce((a, b) => (b.vitalityScore < a.vitalityScore ? b : a), decades[0] || {});
+  // [loop 31 sửa] empty dayun → KHÔNG render "undefined" trong summary
+  if (!decades.length) return { decades: [], peakDecade: null, challengeDecade: null, goldenYears: [], summary: 'Không có dữ liệu đại vận.' };
 
-  // Golden years (vitality >= 65 AND rank <= 3)
-  const golden = decades.filter(d => d.vitalityScore >= 65 && (d.rank || 99) <= 4);
+  // Peak & challenge
+  const peak = decades.reduce((a, b) => (b.vitalityScore > a.vitalityScore ? b : a), decades[0]);
+  const challenge = decades.reduce((a, b) => (b.vitalityScore < a.vitalityScore ? b : a), decades[0]);
+
+  // Golden years (vitality >= 65 AND rank <= 3) — [loop 31 sửa] code dùng <=4 mâu thuẫn comment <=3
+  const golden = decades.filter(d => d.vitalityScore >= 65 && (d.rank || 99) <= 3);
 
   const summary = `Timeline ${decades.length} thập niên: Đỉnh ${peak.range} (${peak.ganZhi}, vit=${peak.vitalityScore}), Thách thức ${challenge.range} (${challenge.ganZhi}, vit=${challenge.vitalityScore}). ${golden.length ? `Khu vàng: ${golden.map(g => g.range).join(', ')}.` : 'Không có khu vàng rõ.'}`;
 

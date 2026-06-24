@@ -15,8 +15,9 @@ const DIRS = [
   { key: 'Tây', zhaiPal: '兑' }, { key: 'Tây Bắc', zhaiPal: '乾' },
 ];
 
-// Dụng Thần phương vị (theo ngũ hành)
-const WX_DIR = { 木: ['Đông', 'Đông Nam'], 火: ['Nam'], 土: ['Đông Bắc', 'Tây Nam', 'Trung'], 金: ['Tây', 'Tây Bắc'], 水: ['Bắc'] };
+// Dụng Thần phương vị (theo ngũ hành). [loop 31] bỏ 'Trung' (trung cung không phải hướng bàn 8-phương,
+//   dead data — vòng DIRS chỉ 8 hướng, 'Trung' không bao giờ được vote nhưng có thể leak vào advice)
+const WX_DIR = { 木: ['Đông', 'Đông Nam'], 火: ['Nam'], 土: ['Đông Bắc', 'Tây Nam'], 金: ['Tây', 'Tây Bắc'], 水: ['Bắc'] };
 
 // 八宅: Đông Tứ = 坎/震/巽/离 (cát); Tây Tứ = 乾/坤/艮/兑
 const EAST_GROUP = new Set(['坎', '震', '巽', '离']);

@@ -3850,6 +3850,16 @@ assert(ho.upperTrigram === '艮' && ho.lowerTrigram === '艮', '阴男 → 地�
   }
   assert(leak === 0, `heluo 天/地 số luôn ∈ [1,9] sau reduction (leak ${leak})`);
 }
+// ################## [loop 31] destiny-timeline golden-years rank≤3 + empty dayun guard ##################
+{
+  const { lifeTimeline } = await import('./src/engine/destiny-timeline.js');
+  const R = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
+  const tl = lifeTimeline(R);
+  assert(tl.goldenYears.every((g) => g.rank <= 3), 'golden-years rank ≤ 3 (sửa off-by-one <=4)');
+  // empty dayun → KHÔNG render undefined
+  const tlE = lifeTimeline({ ...R, dayun: [] });
+  assert(!/undefined/.test(tlE.summary) && tlE.decades.length === 0, 'empty dayun → summary sạch (không undefined)');
+}
 assert(ho.hexagram.num === 52 && ho.hexagram.name === '艮', '本命卦 #52 艮为山');
 assert(ho.yuantang.line === 6, '元堂 = hào 6 (N=2 重数, 卯→6)');
 assert(ho.bianHexagram.upper === '坤' && ho.bianHexagram.lower === '艮', '变卦 = 坤上艮下 (地山谦)');
