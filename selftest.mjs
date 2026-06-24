@@ -348,6 +348,31 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   assert(f5.years.every((y) => y.dayunGod !== undefined), 'mỗi năm forecast5 có dayunGod');
 }
 
+// ################## [loop 23] 真太阳时 + múi giờ (truetime.js) ##################
+{
+  const { trueSolarTime, equationOfTime, shichenOf } = await import('./src/engine/truetime.js');
+  // EOT nằm trong [−17, +17] phút (cổ: Feb ~−14, Nov ~+16)
+  for (const m of [2, 5, 8, 11]) {
+    const e = equationOfTime(2026, m, 15);
+    assert(e >= -17 && e <= 17, `EOT tháng ${m} ∈ [−17,17] (được ${e.toFixed(1)})`);
+  }
+  assert(equationOfTime(2026, 2, 15) < 0 && equationOfTime(2026, 11, 3) > 10, 'EOT Feb âm, Nov dương lớn (chuẩn cổ)');
+  // Không longitude → giữ nguyên giờ nhập, usedTrueSolar=false
+  const t0 = trueSolarTime({ year: 2026, month: 6, day: 24, hour: 14, minute: 30, tzOffset: 7 });
+  assert(!t0.usedTrueSolar && t0.solar.hour === 14 && t0.solar.minute === 30, 'không kinh độ → giữ nguyên giờ nhập');
+  // Đà Nẵng 108.22°Đ GMT+7, 14:55 → 真太阳时 vượt 15:00 → 时辰 đổi 未→申
+  const t1 = trueSolarTime({ year: 2026, month: 6, day: 24, hour: 14, minute: 55, tzOffset: 7, longitude: 108.22 });
+  assert(t1.usedTrueSolar && (t1.solar.hour > 14 || (t1.solar.hour === 15)), `ĐN 14:55 → 真太阳时 ≥ 15:00 (được ${t1.solar.hour}:${t1.solar.minute})`);
+  assert(shichenOf(t1.solar.hour, t1.solar.minute).zhi === '申', `ĐN 14:55 真太阳时 → 时辰 申 (được ${shichenOf(t1.solar.hour, t1.solar.minute).zhi})`);
+  // HCM 106.7 (gần chuẩn 105) → sai số nhỏ
+  const t2 = trueSolarTime({ year: 2026, month: 6, day: 24, hour: 14, minute: 30, tzOffset: 7, longitude: 106.70 });
+  assert(Math.abs(t2.shiftMin) < 15, `HCM shift nhỏ (<15′, được ${t2.shiftMin.toFixed(1)})`);
+  // day rollover: 23:55 + hiệu chỉnh dương → có thể sang ngày sau (không crash, giờ hợp lệ)
+  const t3 = trueSolarTime({ year: 2026, month: 6, day: 24, hour: 23, minute: 58, tzOffset: 8, longitude: 130 });
+  assert(t3.solar.hour >= 0 && t3.solar.hour <= 23, `day rollover không crash (giờ ${t3.solar.hour})`);
+  console.log(`   真太阳时 ✓ — EOT Feb/Nov đúng dấu; ĐN 14:55→申时 (đổi 时柱); HCM shift ${t2.shiftMin.toFixed(1)}′.`);
+}
+
 console.log('\n################## 12B. LƯU NIÊN DẪN ĐỘNG LỤC THÂN (流年引动六亲) ##################');
 import { liunianEvents, ALL_GODS } from './src/engine/liunian-event.js';
 // Helper: tạo R tối thiểu + chọn năm sao cho yearGod == god mong muốn (để test độ phủ rule).

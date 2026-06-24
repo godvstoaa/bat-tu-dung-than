@@ -8,6 +8,7 @@ import { evaluateDate, findGoodDates, ACTIVITY } from './engine/zheri.js';
 import { computeZhai } from './engine/zhai.js';
 import { computeHehun } from './engine/hehun.js';
 import { inverseBaZiSolve, labelResult } from './engine/inverse-bazi.js'; // [loop 21] 逆推八字
+import { trueSolarTime } from './engine/truetime.js'; // [loop 23] 真太阳时 + múi giờ
 import { analyzeLiunianDeep } from './engine/liunian-pro.js';
 import { liunianEvents } from './engine/liunian-event.js';
 import { qianliEightSteps, QIANLI_QUOTE } from './engine/qianli.js';
@@ -1510,11 +1511,30 @@ function run() {
   const dateVal = $('date').value;
   const timeVal = $('time').value || '12:00';
   if (!dateVal) return;
-  const [y, m, d] = dateVal.split('-').map(Number);
-  const [hh, mm] = timeVal.split(':').map(Number);
+  const [y0, m0, d0] = dateVal.split('-').map(Number);
+  const [hh0, mm0] = timeVal.split(':').map(Number);
   const gender = document.querySelector('input[name="gender"]:checked').value;
+  // [loop 23] Múi giờ + 真太阳时 (giờ Mặt Trời thật theo kinh độ nơi sinh).
+  //   Bát Tự dùng 真太阳时 — đồng hồ múi giờ chỉ là xấp xỉ. Sinh gần ranh 时辰 thì sai vài
+  //   phút có đổi 时柱. Có city/longitude → hiệu chỉnh; không thì dùng giờ nhập y nguyên.
+  const tz = parseFloat($('tz').value) || 7;
+  const cityVal = $('city').value;
+  let longitude = null;
+  if (cityVal === 'manual') longitude = parseFloat($('long').value);
+  else if (cityVal && !Number.isNaN(parseFloat(cityVal))) longitude = parseFloat(cityVal);
+  const tt = trueSolarTime({ year: y0, month: m0, day: d0, hour: hh0, minute: mm0, tzOffset: tz, longitude });
+  const y = tt.solar.year, m = tt.solar.month, d = tt.solar.day, hh = tt.solar.hour, mm = tt.solar.minute;
   // persist birth data
-  try { localStorage.setItem('bazi-birth', JSON.stringify({ date: dateVal, time: timeVal, gender })); } catch (e) {}
+  try { localStorage.setItem('bazi-birth', JSON.stringify({ date: dateVal, time: timeVal, gender, tz, city: cityVal, long: $('long') ? $('long').value : '' })); } catch (e) {}
+  // hiển thị note 真太阳时
+  const ttNote = $('truetime-note');
+  if (ttNote) {
+    const same = (y === y0 && m === m0 && d === d0 && hh === hh0 && mm === mm0);
+    ttNote.style.display = 'block';
+    ttNote.innerHTML = (tt.usedTrueSolar && !same)
+      ? `🕐 <b>${tt.note}</b> ⚠ Trụ Giờ có thể ĐỔI do hiệu chỉnh — kết quả dùng 真太阳时.`
+      : `🕐 ${tt.note}`;
+  }
 
   currentResult = analyze(y, m, d, hh, mm, gender);
   const c = currentResult.chart;
@@ -3264,7 +3284,17 @@ try {
     if (saved.time) $('time').value = saved.time;
     const gRadio = document.querySelector(`input[name="gender"][value="${saved.gender}"]`);
     if (gRadio) gRadio.checked = true;
+    if (saved.tz && $('tz')) $('tz').value = String(saved.tz);
+    if (saved.city && $('city')) $('city').value = saved.city;
+    if (saved.long && $('long')) $('long').value = saved.long;
   }
 } catch (e) {}
+// [loop 23] city change → hiện/ẩn ô kinh độ thủ công
+function syncLongField() {
+  const lf = $('long-field'); const c = $('city');
+  if (!lf || !c) return;
+  lf.style.display = (c.value === 'manual') ? '' : 'none';
+}
+if ($('city')) { $('city').addEventListener('change', syncLongField); syncLongField(); }
 // auto-render on page load — user sees results immediately (saved data or defaults)
 try { run(); } catch (e) { console.warn('auto-render:', e.message); }

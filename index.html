@@ -72,9 +72,42 @@
             <label for="g-nu">Nữ</label>
           </div>
         </div>
+        <div class="field">
+          <label for="tz">Múi giờ nơi sinh <span class="hint-inline">(mặc định VN = GMT+7)</span></label>
+          <select id="tz">
+            <option value="7" selected>GMT+7 (Việt Nam, Thái Lan)</option>
+            <option value="8">GMT+8 (Trung, Sing, Malaysia, Đài Loan, PH)</option>
+            <option value="9">GMT+9 (Hàn, Nhật)</option>
+            <option value="6">GMT+6 (Bangladesh)</option>
+            <option value="0">GMT+0 (Anh, Bồ Đào Nha)</option>
+            <option value="-5">GMT−5 (US Đông, Colombia)</option>
+            <option value="-8">GMT−8 (US Thái Bình Dương)</option>
+            <option value="1">GMT+1 (Đức, Pháp, Việt hải ngoại Âu)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="city">Nơi sinh <span class="hint-inline">(→ hiệu chỉnh 真太阳时 theo kinh độ)</span></label>
+          <select id="city">
+            <option value="" selected>— Không / giờ nhập dùng nguyên —</option>
+            <option value="105.85">Hà Nội (105.85°Đ)</option>
+            <option value="106.70">TP.HCM (106.70°Đ)</option>
+            <option value="108.22">Đà Nẵng (108.22°Đ)</option>
+            <option value="106.68">Hải Phòng (106.68°Đ)</option>
+            <option value="105.78">Cần Thơ (105.78°Đ)</option>
+            <option value="107.58">Huế (107.58°Đ)</option>
+            <option value="109.22">Nha Trang / Quy Nhơn (109.22°Đ)</option>
+            <option value="108.45">Đà Lạt (108.45°Đ)</option>
+            <option value="manual">Khác (nhập kinh độ ↓)</option>
+          </select>
+        </div>
+        <div class="field" id="long-field" style="display:none">
+          <label for="long">Kinh độ nơi sinh (°Đ, vd 116.4 cho Bắc Kinh)</label>
+          <input type="number" id="long" step="0.01" min="-180" max="180" style="width:7em" />
+        </div>
         <button type="submit" class="btn-primary">Luận giải</button>
       </form>
       <p class="hint" id="calendar-note"></p>
+      <p class="hint" id="truetime-note" style="display:none"></p>
     </section>
 
     <div id="result" class="result hidden">
