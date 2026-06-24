@@ -11,6 +11,7 @@ import { inverseBaZiSolve, labelResult } from './engine/inverse-bazi.js'; // [lo
 import { trueSolarTime } from './engine/truetime.js'; // [loop 23] 真太阳时 + múi giờ
 import { chartSensitivity } from './engine/sensitivity.js'; // [loop 26] mệnh nhạy cảm
 import { fiveDimRadar } from './engine/five-dim-radar.js'; // [loop 33] ngũ duy radar
+import { weekPreview } from './engine/week-preview.js'; // [loop 36] tuần này 7 ngày
 import { analyzeLiunianDeep } from './engine/liunian-pro.js';
 import { liunianEvents } from './engine/liunian-event.js';
 import { qianliEightSteps, QIANLI_QUOTE } from './engine/qianli.js';
@@ -1678,6 +1679,7 @@ function run() {
   lazyRender('match-out',      () => { try { renderIdealMatch(); } catch (e) { console.warn('idealMatch', e.message); } });
   lazyRender('sensitivity',    () => { try { renderSensitivity(); } catch (e) { console.warn('sensitivity', e.message); } });
   lazyRender('five-dim-radar', () => { try { renderFiveDimRadar(); } catch (e) { console.warn('5dim', e.message); } });
+  lazyRender('week-preview',  () => { try { renderWeekPreview(); } catch (e) { console.warn('week', e.message); } });
   lazyRender('ziwei-stars-out',() => { try { renderZiweiFull(); } catch (e) { console.warn('ziweiFull', e.message); } });
   lazyRender('life-summary',   () => { try { renderLifeTrajectory(currentResult); } catch (e) { console.warn('life', e.message); } });
   $("result").classList.remove("hidden");
@@ -3177,6 +3179,29 @@ function renderChangshengDeep() {
 }
 
 // ---------------------------------------------------------------- PHỐI NGỖU LÝ TƯỞNG (BẢNG + CHI TIẾT)
+function renderWeekPreview() {
+  if (!currentResult) return;
+  let w;
+  try { w = weekPreview(currentResult, { days: 7 }); } catch (e) { $('week-preview').innerHTML = '<p class="hint">Không tính được.</p>'; return; }
+  const colors = { cat: '#2e7d32', mid: '#b8860b', hung: '#c62828' };
+  const cells = w.days.map((d) => {
+    const c = colors[d.tone];
+    const isBest = w.best && d.date === w.best.date;
+    const isWorst = w.worst && d.date === w.worst.date;
+    return `<div style="flex:1;min-width:80px;text-align:center;border:1px solid #e0d0a0;border-radius:8px;padding:6px 4px;background:${c}15;border-color:${isBest ? c : '#e0d0a0'};${isBest ? 'box-shadow:0 0 6px '+c+'80' : ''}">
+      <div style="font-size:.7em;color:#888">${d.weekdayVi}</div>
+      <div style="font-weight:bold;font-size:1.1em;color:${c}">${d.day}/${d.month}</div>
+      <div class="zh" style="font-size:.7em;opacity:.6">${d.ganZhi}</div>
+      <div style="font-weight:bold;color:${c};font-size:1em">${d.score}</div>
+      <div style="font-size:.65em;color:#666">${d.rating}</div>
+      ${isBest ? '<div style="font-size:.6em;color:#2e7d32">★ tốt</div>' : isWorst ? '<div style="font-size:.6em;color:#c62828">⚠ kỵ</div>' : ''}
+    </div>`;
+  }).join('');
+  $('week-preview').innerHTML = `
+    <p style="margin:0 0 6px">${w.summary}</p>
+    <div style="display:flex;gap:4px;overflow-x:auto">${cells}</div>`;
+}
+
 function renderFiveDimRadar() {
   if (!currentResult) return;
   let r;

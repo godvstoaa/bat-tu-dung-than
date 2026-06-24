@@ -3875,6 +3875,18 @@ assert(ho.upperTrigram === '艮' && ho.lowerTrigram === '艮', '阴男 → 地�
   const tlE = lifeTimeline({ ...R, dayun: [] });
   assert(!/undefined/.test(tlE.summary) && tlE.decades.length === 0, 'empty dayun → summary sạch (không undefined)');
 }
+// ################## [loop 36] Tuần Này 7 Ngày (week-preview.js) ##################
+{
+  const { weekPreview } = await import('./src/engine/week-preview.js');
+  const R = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
+  const w = weekPreview(R, { days: 7, startDate: '2026-06-25' });
+  assert(w.days.length === 7, `week-preview: 7 ngày (được ${w.days.length})`);
+  assert(w.days.every((d) => d.score >= 0 && d.score <= 100 && d.tone), 'mỗi ngày có score + tone');
+  assert(w.best && w.worst && w.best.score >= w.worst.score, 'best.score >= worst.score');
+  assert(typeof w.summary === 'string' && w.summary.length > 10, 'summary có nội dung');
+  console.log(`   Tuần 7 ngày ✓ — best ${w.best.weekdayVi} ${w.best.day}/${w.best.month} (${w.best.score}), worst ${w.worst.day}/${w.worst.month} (${w.worst.score}).`);
+}
+
 // ################## [loop 33] Mệnh Bàn Ngũ Duy radar (five-dim-radar.js) ##################
 {
   const { fiveDimRadar } = await import('./src/engine/five-dim-radar.js');
