@@ -28,12 +28,16 @@ const GOD_EVENTS = {
 export function predictEvents(R, startYear, years = 5) {
   const { chart, dayun } = R;
   const dayGan = chart.dayGan;
-  const age = startYear - chart.input.year;
-  const activeDy = (dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10) || (dayun || [])[0];
   const out = [];
+  let lastDayun = '?'; // [loop 24] theo dõi 大运 năm cuối (activeDy giờ per-year trong loop)
 
   for (let i = 0; i < years; i++) {
     const year = startYear + i;
+    // [loop 24 sửa bug CAO] giải active 大运 THEO NĂM (startYear), KHÔNG đóng băng cả cửa sổ.
+    //   Trước đây age/activeDy tính 1 lần ngoài loop (dùng startYear) → năm vượt ranh thập niên
+    //   bị ghép 大运 SAI. Giải theo startYear khớp analyzeLiunianDeep/forecast5.
+    const activeDy = (dayun || []).find((d) => d && d.startYear != null && d.startYear <= year && year < d.startYear + 10) || (dayun || [])[0];
+    lastDayun = activeDy?.ganZhi || '?';
     const yearSolar = Solar.fromYmdHms(year, 6, 15, 12, 0, 0);
     const lnGan = yearSolar.getLunar().getYearGan();
     const lnGod = tenGod(dayGan, lnGan);
@@ -42,21 +46,14 @@ export function predictEvents(R, startYear, years = 5) {
     const dyGod = activeDy ? tenGod(dayGan, activeDy.gan) : '';
     const dyInfo = GOD_EVENTS[dyGod] || { events: [], area: '?', vi: '?' };
 
-    // Combined events: lưu niên + đại vận giao thoa
-    const combinedEvents = [...lnInfo.events];
-    // Nếu lưu niên + đại vận CÙNG thập thần → nhân đôi
+    // Combined events: lưu niên + đại vận giao thoa [loop 24] gộp thật sự cả 2 nguồn
     const sameGod = lnGod === dyGod;
-    // Nếu lưu niên sinh/khắc đại vận thập thần
-    const lnWx = GAN[lnGan].wx;
-    const dyWx = activeDy ? GAN[activeDy.gan].wx : '';
-    let cross = '';
-    if (lnWx && dyWx) {
-      if (lnWx === dyWx) cross = `${lnInfo.vi} nhân đôi (lưu niên + đại vận cùng sao)`;
-      // Don't over-compute — keep practical
-    }
+    const combinedEvents = sameGod
+      ? [...new Set([...lnInfo.events, ...dyInfo.events])] // cùng sao → nhân đôi lực, gộp sự kiện
+      : [...new Set([...lnInfo.events, ...dyInfo.events])];
 
     const advice = sameGod
-      ? `Năm ${year}: ${lnInfo.vi} NHÂN ĐÔI (lưu niên = đại vận) → ${lnInfo.area} cực mạnh: ${lnInfo.events.join(', ')}.`
+      ? `Năm ${year}: ${lnInfo.vi} NHÂN ĐÔI (lưu niên = đại vận ${dyInfo.vi}) → ${lnInfo.area} cực mạnh: ${combinedEvents.join(', ')}.`
       : `Năm ${year}: Lưu niên ${lnInfo.vi} → ${lnInfo.area}. Đại vận ${dyInfo.vi} → ${dyInfo.area}. Chỗ giao thoa: ${lnInfo.area} + ${dyInfo.area}.`;
 
     out.push({
@@ -67,5 +64,5 @@ export function predictEvents(R, startYear, years = 5) {
     });
   }
 
-  return { years: out, activeDayun: activeDy?.ganZhi || '?' };
+  return { years: out, activeDayun: lastDayun };
 }

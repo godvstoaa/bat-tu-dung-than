@@ -257,7 +257,8 @@ export function liunianEvents(R, year) {
     if (pref.ji.has(grp)) conf -= 0.08;
 
     // Sát vô chế → giảm thêm (chỉ áp dụng cho 七殺)
-    if (yearGod === '七殺' && !shaZhiHua) {
+    const satNoControl = yearGod === '七殺' && !shaZhiHua;
+    if (satNoControl) {
       conf -= 0.10;
       events.push({
         type: 'sat-no-control',
@@ -271,18 +272,21 @@ export function liunianEvents(R, year) {
       });
     }
 
-    // Sự việc chính
-    for (const ev of evList) {
-      events.push({
-        type: 'god-main',
-        vi: ev,
-        who: primaryWho(yearGod, R),
-        pillar: primaryPillar(yearGod),
-        tone: conf >= 0.5 ? 'cat' : 'hung',
-        confidence: clamp(conf),
-        detail: note,
-        source: rule.source,
-      });
+    // Sự việc chính [loop 24 sửa trùng lặp] — bỏ qua khi đã push 'sat-no-control' chuyên biệt
+    //   (trước đây đẩy cả 2 → "bệnh/tiểu nhân" double-count, phồng event hung).
+    if (!satNoControl) {
+      for (const ev of evList) {
+        events.push({
+          type: 'god-main',
+          vi: ev,
+          who: primaryWho(yearGod, R),
+          pillar: primaryPillar(yearGod),
+          tone: conf >= 0.5 ? 'cat' : 'hung',
+          confidence: clamp(conf),
+          detail: note,
+          source: rule.source,
+        });
+      }
     }
 
     // Thương quan kiến quan → ĐẠI HUNG

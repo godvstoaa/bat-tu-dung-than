@@ -89,21 +89,26 @@ export function verifyPastEvent(R, eventYear, eventType, eventDesc) {
     details.push(`Thái tuế: ${ts?.offends ? 'phạm' : 'không phạm'} — không khớp hướng sự kiện.`);
   }
 
-  // 4. Lưu niên thập thần
+  // 4. Lưu niên thập thần [loop 24 sửa] — godMatch GIỚI TÍNH-aware.
+  //   marriage: nam → vợ=Tài(正/偏), nữ → chồng=Quan(正官/七殺). Trước đây ['正財','正官']
+  //   cố định → nữ năm 七殺 (sao chồng) báo "không khớp" sai. birth_child cũng theo giới.
   const yearGan = Solar.fromYmdHms(eventYear, 6, 15, 12, 0, 0).getLunar().getYearGan();
   const lnGod = tenGod(dayGan, yearGan);
+  const isMale = (R.chart.input && R.chart.input.gender) === 'nam';
   maxScore += 2;
+  const spouseGods = isMale ? ['正財', '偏財'] : ['正官', '七殺']; // hôn nhân theo giới
+  const childGods = isMale ? ['七殺', '正官'] : ['食神', '傷官'];   // con cái theo giới
   const godMatch = {
-    marriage: ['正財', '正官'],
-    breakup: ['劫財', '傷官'],
-    newJob: ['正官', '正印'],
-    jobLoss: ['七殺', '劫財'],
+    marriage: spouseGods,
+    breakup: ['劫財', '傷官', '七殺'],
+    newJob: ['正官', '正印', '七殺'],
+    jobLoss: ['七殺', '劫財', '傷官'],
     wealth_gain: ['正財', '偏財'],
     wealth_loss: ['劫財', '傷官'],
-    illness: ['七殺'],
-    birth_child: ['食神', '傷官', '七殺', '正官'],
-    study_success: ['正印', '食神'],
-    legal: ['傷官', '七殺'],
+    illness: ['七殺', '偏印'],
+    birth_child: childGods,
+    study_success: ['正印', '食神', '文昌'],
+    legal: ['傷官', '七殺', '偏官'],
   };
   const expectedGods2 = godMatch[eventType] || [];
   if (expectedGods2.includes(lnGod)) {

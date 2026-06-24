@@ -62,13 +62,21 @@ export function computeZhai(birthYear, gender) {
   }
   const g = GUA[gua];
   const ausp = AUSPICIOUS[gua];
-  const auspSet = new Set(Object.values(ausp));
-  const inausp = {};
-  let ix = 0;
-  const inKeys = ['Tuyệt Mệnh', 'Ngũ Quỷ', 'Lục Sát', 'Họa Hại'];
-  for (const d of ALL_DIRS) {
-    if (!auspSet.has(d)) { inausp[inKeys[ix % 4]] = d; ix++; }
-  }
+  // [loop 24 sửa CRITICAL] 四凶方 theo 八宅明镜 大游年歌诀 (KHÔ phải fill kim đồng hồ).
+  //   Trước đây gán sao 凶 theo thứ tự la bàn → SAI cả 4 hướng cho mọi mệnh quẻ (vd Cảm:
+  //   code tuyệt mệnh=Đông Bắc, đúng=Tây Nam). Bảng verified từ 大游年 (坎五天生延绝祸六…).
+  //   Hướng: 1 Cảm 2 Khôn 3 Chấn 4 Tốn 6 Càn 7 Đoài 8 Cấn 9 Ly.
+  const INAUSPICIOUS = {
+    1: { 'Tuyệt Mệnh': 'Tây Nam', 'Ngũ Quỷ': 'Đông Bắc', 'Lục Sát': 'Tây Bắc', 'Họa Hại': 'Tây' },        // 坎
+    2: { 'Tuyệt Mệnh': 'Bắc',      'Ngũ Quỷ': 'Đông Nam', 'Lục Sát': 'Nam',      'Họa Hại': 'Đông' },        // 坤
+    3: { 'Tuyệt Mệnh': 'Tây',      'Ngũ Quỷ': 'Tây Bắc', 'Lục Sát': 'Đông Bắc', 'Họa Hại': 'Tây Nam' },     // 震
+    4: { 'Tuyệt Mệnh': 'Đông Bắc', 'Ngũ Quỷ': 'Tây Nam', 'Lục Sát': 'Tây',      'Họa Hại': 'Tây Bắc' },     // 巽
+    6: { 'Tuyệt Mệnh': 'Nam',      'Ngũ Quỷ': 'Đông',     'Lục Sát': 'Bắc',      'Họa Hại': 'Đông Nam' },    // 乾
+    7: { 'Tuyệt Mệnh': 'Đông',     'Ngũ Quỷ': 'Tây Nam', 'Lục Sát': 'Đông Nam', 'Họa Hại': 'Bắc' },         // 兑
+    8: { 'Tuyệt Mệnh': 'Đông Nam', 'Ngũ Quỷ': 'Bắc',      'Lục Sát': 'Đông',     'Họa Hại': 'Nam' },         // 艮
+    9: { 'Tuyệt Mệnh': 'Tây Bắc', 'Ngũ Quỷ': 'Tây',      'Lục Sát': 'Tây Nam', 'Họa Hại': 'Đông Bắc' },     // 离
+  };
+  const inausp = INAUSPICIOUS[gua] || {};
   const advice = [
     `① Cửa chính (大门): mở về hướng cát — tốt nhất ${ausp['Sinh Khí']} (Sinh Khí) hoặc ${ausp['Diên Niên']} (Diên Niên) để thu vượng khí.`,
     `② Phòng ngủ chủ (主卧): đặt ở hướng cát ${ausp['Thiên Y']} (Thiên Y — tốt sức khoẻ) hoặc ${ausp['Phục Vị']} (Phục Vị — yên ngủ); đầu giường hướng cát.`,

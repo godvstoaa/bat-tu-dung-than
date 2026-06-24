@@ -92,7 +92,9 @@ const YONGSHEN_MAP = {
  * @param {string} dayZhi - 日辰 chi
  */
 export function castLiuYao(vals, cat, monthZhi, dayZhi) {
-  const yang = vals.map((v) => (v >= 7 ? 1 : 0)); // 6,8 = âm; 7,9 = dương
+  // [loop 24 sửa CRITICAL] yang = 7 hoặc 9 (少阳/老阳); 6 và 8 là âm (老阴/少阴).
+  //   Trước đây 'v >= 7' tính 8(少阴) là DƯƠNG — sai, corrupt quẻ mỗi khi 1 hào =8 (~37.5%).
+  const yang = vals.map((v) => ((v === 7 || v === 9) ? 1 : 0)); // 6,8 = âm; 7,9 = dương
   const dong = vals.map((v) => v === 6 || v === 9); // 老阳/老阴 = động
   const lower = triFromLines3(yang[0], yang[1], yang[2]);
   const upper = triFromLines3(yang[3], yang[4], yang[5]);
