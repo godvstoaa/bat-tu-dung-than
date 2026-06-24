@@ -8,7 +8,9 @@
     "dev": "vite --host ::",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node selftest.mjs"
+    "test": "node selftest.mjs",
+    "deploy": "vite build && npx wrangler deploy",
+    "deploy:worker": "npx wrangler deploy"
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",
