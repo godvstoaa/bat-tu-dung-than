@@ -83,12 +83,12 @@ export function dailyPro(R, year, month, day) {
   schools.push({ phai: 'Xung', d: e4, note: e4note });
 
   // PHÁI 5: Thần sát ngày (đào hoa/hồng diễm/dương nhận)
-  let e5 = 0, e5note = '';
+  let e5 = 0, e5note = '', e5YangRen = false; // [loop 27] flag dương nhận (tránh bug case-sensitive)
   const grp = BRANCH_GROUP[birthYearZhi];
   const grpDay = BRANCH_GROUP[dayZhi_pillar];
   if (TAO_HUA[grp] === dZhi || TAO_HUA[grpDay] === dZhi) { e5 -= 3; e5note += 'Đào hoa ngày. '; }
   if (HONG_YAN[dayGan] === dZhi) { e5 -= 3; e5note += 'Hồng diễm. '; }
-  if (YANG_REN[dayGan] === dZhi) { e5 -= 4; e5note += 'Dương nhận (cẩn thận). '; }
+  if (YANG_REN[dayGan] === dZhi) { e5 -= 4; e5note += 'Dương nhận (cẩn thận). '; e5YangRen = true; }
   if (YI_MA[grp] === dZhi || YI_MA[grpDay] === dZhi) { e5 += 2; e5note += 'Dịch mã (di chuyển tốt). '; }
   if (!e5note) e5note = 'Không thần sát nổi.';
   score += e5;
@@ -110,7 +110,7 @@ export function dailyPro(R, year, month, day) {
 
   // Best activity / avoid
   const bestActivity = score >= 65 ? 'tiến thủ, ký kết, gặp quý nhân, làm việc lớn' : score >= 48 ? 'làm việc thường, tránh quyết định lớn' : 'giữ ổn định, tránh đầu tư/cãi vã/đi xa';
-  const avoidActivity = `tránh ${tsJi.slice(0, 3).join(',')}${avoid.has(dgWx) ? ', đầu tư' : ''}${e5 < 0 && e5note.includes('Nhận') ? ', nguy hiểm' : ''}`;
+  const avoidActivity = `tránh ${tsJi.slice(0, 3).join(',')}${avoid.has(dgWx) ? ', đầu tư' : ''}${e5YangRen ? ', nguy hiểm (dương nhận — huyết quang)' : ''}`;
 
   // Best direction
   const caishen = lunar.getDayPositionCaiDesc ? lunar.getDayPositionCaiDesc() : '?';

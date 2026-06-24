@@ -292,6 +292,36 @@ export function dailyBriefing(R, year, month, day, patternQuality) {
   } catch (_) {}
 
   // ============================================================
+  // [loop 27] PERSONALIZED SCORE BLEND — score tiêu đề GHÉP chiều cá nhân
+  //   (Dụng/神煞 Thái Tuế/格局), KHÔNG chỉ 黄道. Trước đây ngày xung user vẫn hiện 'Đại Cát'
+  //   vì score chỉ phụ thuộc 黄道. Nay: +/− bounded theo yongAction/taisui/格局 rồi re-clamp.
+  //   Giữ level tên ĐẶC BIỆT (天赦/四废/十恶) nếu có; level/tone theo score mới.
+  // ============================================================
+  try {
+    const specialLevel = /天赦|Thiên Xá|四废|Tứ Phế|十恶|Thập Ác/.test(rating.level);
+    let delta = 0;
+    if (yongAction.boost) delta += 8;          // can/chi = Dụng/Hỷ
+    if (yongAction.reduce) delta -= 8;          // can/chi = Kỵ/仇
+    if (taisui && taisui.relation) {
+      if (/冲太岁|值太岁|xung|tự thái/.test(taisui.relation)) delta -= 12;   // 大变 động năm
+      else if (/刑|破|害|hình|phá|hại/.test(taisui.relation)) delta -= 6;
+    }
+    if (directionTaboo && directionTaboo.avoid && directionTaboo.avoid.length) delta -= 5; // 三煞/冲 hướng
+    if (gejuTag) {
+      if (/★.*格局喜|THUẬN CÁCH/.test(gejuTag.tag)) delta += 6;
+      else if (/⚠.*格局忌|GHÉT CÁCH/.test(gejuTag.tag)) delta -= 6;
+    }
+    if (delta !== 0) {
+      rating.score = Math.max(2, Math.min(98, Math.round(rating.score + delta)));
+      rating.tone = rating.score >= 50 ? 'cat' : 'hung';
+      if (!specialLevel) {
+        rating.level = rating.score >= 65 ? 'Cát' : rating.score >= 48 ? 'Bình' : rating.score >= 35 ? 'Hơi kỵ' : 'Kỵ';
+      }
+      rating.summary = `${rating.summary} ${delta > 0 ? `★ Cá nhân +${delta}` : `⚠ Cá nhân ${delta}`} (Dụng/Thái tuế/格局).`.trim();
+    }
+  } catch (_) {}
+
+  // ============================================================
   // ONE-LINER — câu chốt tóm tắt cả ngày
   // ============================================================
   const oneLiner = buildOneLiner({ rating, huang, bestHours, directionTaboo, yongAction, bhDayOfficerVi, gejuTag });
