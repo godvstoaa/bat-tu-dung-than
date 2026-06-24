@@ -31,11 +31,15 @@ export function forecast5(R, startYear, years = 5) {
   // [cycle 51 sửa regression] dyGanZhi phải ở SCOPE HÀM (theo dõi đại vận cuối) — trước đây `const`
   //   trong loop → return ngoài scope throws ReferenceError → section "5 NĂM TỚI" brief = [lỗi].
   let dyGanZhi = '?';
+  // [loop 22 sửa bug CAO] dayunGodMeaning bất biến trong loop → hoist ra ngoài (perf).
+  //   + giải active 大运 THEO startYear (năm dương lịch), KHÔNG theo startAge (虚岁).
+  //   Trước đây age=year-birthYear (tuổi thật) vs startAge (虚岁=startYear-birthYear+1)
+  //   lệch 1 → dayunGod/suiyun lệch CẢ THẬP KỶ so với ln.score (đã đúng qua startYear).
+  const dg = dayunGodMeaning(chart, dayun);
 
   for (let i = 0; i < years; i++) {
     const year = startYear + i;
-    const age = year - birthYear;
-    const activeDy = (dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10) || null;
+    const activeDy = (dayun || []).find((d) => d && d.startYear != null && d.startYear <= year && year < d.startYear + 10) || null;
     dyGanZhi = activeDy?.ganZhi || '?';
     const alerts = [];
     const positives = [];
@@ -71,9 +75,8 @@ export function forecast5(R, startYear, years = 5) {
     const sy = suiyunCheck(dyGanZhi, year, ln.ganZhi);
     if (sy?.severity >= 2) alerts.push(`⚡ Tuế vận: ${sy.note.slice(0, 50)}`);
 
-    // 6. Đại vận thập thần
-    const dg = dayunGodMeaning(chart, dayun);
-    const activeDg = dg.items.find((d) => age >= d.startAge && age < d.startAge + 10);
+    // 6. Đại vận thập thần [loop 22] — giải theo startYear (khớp analyzeLiunianDeep), dg đã hoist
+    const activeDg = dg.items.find((d) => d && d.startYear != null && d.startYear <= year && year < d.startYear + 10);
 
     // Tổng hợp
     const summary = (positives.length ? positives.join(' | ') : '—') + (alerts.length ? ' ‖ ' + alerts.join(' | ') : '');

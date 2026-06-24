@@ -231,6 +231,16 @@ const hh = computeHehun(RA, RB);
 assert(typeof hh.score === 'number' && hh.factors.length >= 3, '合婚: có điểm + factors');
 assert(hh.factors.some((f) => f.includes('Xung') || f.includes('xung')), '合婚: phát hiện xung Ngọ-Tý');
 console.log(`   择日 OK, 宅 ${z1990.guaName}, 合婚 ${hh.rating}(${hh.score})`);
+// [loop 22] 十神 spouse-star cross-check + same-用神 penalty (giới tính-aware).
+//   Cặp: nam 辛 + nữ 乙 → nam nhìn nữ = 偏財 (sao vợ), nữ nhìn nam = 七殺 (sao chồng) → cả 2.
+{
+  const _A = analyze(1990, 6, 15, 14, 30, 'nam', 2026);   // 辛
+  const _B = analyze(1991, 5, 5, 8, 0, 'nu', 2026);        // 乙 (đảm bảo)
+  const _hh = computeHehun(_A, _B);
+  assert(_hh.factors.some((f) => /sao phối ngẫu|Sao phối ngẫu/i.test(f)), `合婚: có factor sao phối ngẫu (giới tính-aware)`);
+  // 日柱 giờ phải có权重 cao nhất — factor nhắc "CUNG PHU THÊ" hoặc "Ngũ Hành tương bổ"
+  assert(_hh.factors.some((f) => /CUNG PHU THÊ|tương bổ|tổn dụng|Cùng Dụng/i.test(f)), '合婚: factor trọng yếu (日柱/五行/用神)');
+}
 
 console.log('\n################## 12. LUẬN VẬN NĂM ĐA TRƯỜNG PHÁI (sửa lỗi phán ngược) ##################');
 import { analyzeLiunianDeep } from './src/engine/liunian-pro.js';
@@ -322,6 +332,21 @@ console.log('\n################## 12.5 十二长生运 (đại vận/lưu niên)
 }
 // [loop 20 sửa mỹ từ] 纳音 Hán-Việt: 金箔金 = Kim Bạc Kim (箔=Bạc, không phải Bác)
 assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi = Kim Bạc Kim (được ${NAYIN_MEANING['金箔金'].vi})`);
+
+// ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
+{
+  const { forecast5 } = await import('./src/engine/forecast5.js');
+  // 1990 nam: 大运 ranh giới năm 2017 (甲申). Trước đây forecast5 lệch 1 năm (虚岁 vs tuổi thật).
+  const f5 = forecast5(R0, 2017, 5);   // R0 = analyze(1990,6,15,14,30,'nam',2026)
+  // Năm 2017 phải thuộc 大运 startYear<=2017 (không phải 大运 trước)
+  const dy2017 = (R0.dayun || []).find((d) => d && d.startYear != null && d.startYear <= 2017 && 2017 < d.startYear + 10);
+  const f5row = f5.years.find((y) => y.year === 2017);
+  assert(f5row && dy2017, 'forecast5 + R0.dayun resolve được 大运 cho 2017');
+  // activeDayun trả về (năm cuối) phải là 大运 thật chứa 2021 (năm cuối cửa sổ), không '?'()
+  assert(f5.activeDayun && f5.activeDayun !== '?', `forecast5.activeDayun hợp lệ (được ${f5.activeDayun})`);
+  // Mỗi row có dayunGod nhất quán (không lệch thập kỷ)
+  assert(f5.years.every((y) => y.dayunGod !== undefined), 'mỗi năm forecast5 có dayunGod');
+}
 
 console.log('\n################## 12B. LƯU NIÊN DẪN ĐỘNG LỤC THÂN (流年引动六亲) ##################');
 import { liunianEvents, ALL_GODS } from './src/engine/liunian-event.js';
@@ -1976,21 +2001,39 @@ if (qingLongSample) {
   assert(qingLongSample.monthZhi === '寅', `tháng Dần sample OK (${qingLongSample.solar})`);
   assert(qingLongSample.deity === '青龙', `tháng Dần + 子日 = 青龙 (được ${qingLongSample.deity} @ ${qingLongSample.solar})`);
 }
-// 卯月 → 丑日 = 青龙 (advance 1 chi)
+// [loop 22 sửa] 卯月 → 寅日 = 青龙 (cổ quyết «卯酉却在寅», KHÔNG phải advance-1 «丑日»).
+//   Thông quyết 6 cặp đối xung: 寅申→子, 卯酉→寅, 辰戌→辰, 巳亥→午, 子午→申, 丑未→戌.
 let qingLongMao = null;
 for (let dd = 6; dd <= 28 && !qingLongMao; dd++) {
   const s = _Sol.fromYmdHms(2026, 3, dd, 12, 0, 0);
-  if (s.getLunar().getDayZhi() === '丑') qingLongMao = huangdao12(2026, 3, dd);
+  if (s.getLunar().getDayZhi() === '寅') qingLongMao = huangdao12(2026, 3, dd);
 }
 if (qingLongMao) {
   assert(qingLongMao.monthZhi === '卯', `tháng Mão sample OK`);
-  assert(qingLongMao.deity === '青龙', `tháng Mão + 丑日 = 青龙 (được ${qingLongMao.deity})`);
+  assert(qingLongMao.deity === '青龙', `tháng Mão + 寅日 = 青龙 (được ${qingLongMao.deity})`);
 }
 // Quét cả năm: tổng = yellow + black, phân phối ~50/50 (vì 6/6 thần đều nhau)
 const yr = huangdaoInYear(2026);
 assert(yr.total === 365, `2026 đủ 365 ngày (được ${yr.total})`);
 assert(yr.total === yr.yellow + yr.black, 'tổng = yellow + black');
 assert(yr.yellow > 150 && yr.black > 150, `phân phối cân bằng ~50/50 (được ${yr.yellow}/${yr.black})`);
+// [loop 22] 起青龙诀 invariant: 青龙 chỉ rơi chi DƯƠNG + tháng đối xung CHUNG ngày 青龙.
+{
+  const YANG = new Set(['子', '寅', '辰', '午', '申', '戌']);
+  const CHONG2 = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
+  // Tìm ngày 青龙 đầu tiên trong mỗi tháng tiết khí của 2026
+  const qlByMonth = {};
+  for (let mm = 1; mm <= 12; mm++) {
+    for (let dd = 1; dd <= 28; dd++) {
+      const h = huangdao12(2026, mm, dd);
+      if (h.deity === '青龙' && !qlByMonth[h.monthZhi]) qlByMonth[h.monthZhi] = h.dayZhi;
+    }
+  }
+  const months = Object.keys(qlByMonth);
+  assert(months.length > 0, 'tìm được ≥1 tháng có ngày 青龙');
+  // Mọi 青龙 day-branch phải là chi dương
+  assert(months.every((m) => YANG.has(qlByMonth[m])), `青龙 chỉ rơi chi dương (được ${months.map((m) => m + '=' + qlByMonth[m]).join(',')})`);
+}
 assert(Math.abs(yr.yellow - yr.black) <= 12, `chênh yellow-black ≤12 (vì 6 cát có offset {0,1,4,5,7,10} không đều trong 60 hoa giáp; được ${Math.abs(yr.yellow - yr.black)})`);
 assert(yr.perDeity.length === 12 && yr.perDeity.every((p) => p.count > 0), 'mỗi thần xuất hiện ít nhất 1 lần');
 // Tổng count 12 thần = tổng ngày

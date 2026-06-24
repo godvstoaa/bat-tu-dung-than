@@ -10,8 +10,10 @@ import { ZHI, ZHI_ORDER } from './constants.js';
 // 12 trực (建除十二神) theo thứ tự
 const ZHI_OFFICERS = ['建', '除', '满', '平', '定', '执', '破', '危', '成', '收', '开', '闭'];
 const OFFICER_VI = { 建:'Kiến', 除:'Trừ', 满:'Mãn', 平:'Bình', 定:'Định', 执:'Chấp', 破:'Phá', 危:'Nguy', 成:'Thành', 收:'Thu', 开:'Khai', 闭:'Bế' };
-// Phân loại trực: cát / bình / hung (theo thông tục 通胜)
-const OFFICER_TONE = { 建:'cát', 除:'cát', 满:'cát', 平:'hung', 定:'cát', 执:'bình', 破:'hung', 危:'bình', 成:'cát', 收:'bình', 开:'cát', 闭:'hung' };
+// Phân loại trực: cát / hung theo thông quyết 通胜 chuẩn «建满平收黑, 除危定执黄, 成开皆可用,
+//   破闭不相当» [loop 22 sửa]. Trước đây 建/满='cát', 执/危/收='bình' — lệch cổ quyết.
+//   黄道(cát): 除 危 定 执 成 开 | 黑道(hung): 建 满 平 破 收 闭.
+const OFFICER_TONE = { 建:'hung', 除:'cát', 满:'hung', 平:'hung', 定:'cát', 执:'cát', 破:'hung', 危:'cát', 成:'cát', 收:'hung', 开:'cát', 闭:'hung' };
 // 六冲
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
 

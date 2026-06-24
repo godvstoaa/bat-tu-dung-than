@@ -4,6 +4,7 @@
 //  (4) 用神互不损伤. Trả điểm + chốt hợp/không. Nguồn: 渊海子平, 八字合婚.
 // ============================================================================
 import { ZHI } from './constants.js';
+import { tenGod } from './core.js'; // [loop 22] 十神 spouse-star cross-check
 import { XING_PAIRS, HAI_PAIRS } from './zodiac-deep.js';
 
 // Tam hợp / Lục hợp / Xung của Địa Chi
@@ -28,27 +29,34 @@ export function computeHehun(R1, R2) {
   let score = 50;
   const factors = [];
 
-  // 1. 生肖 (chi năm) 三合/六合/冲
+  // 1. 生肖 (chi năm) 三合/六合/冲 [loop 22 GIẢM trọng số — 生肖 là yếu tố ÍT quan trọng
+  //   nhất cổ pháp (渊海子平/三命通会 trọng 日柱=phu thê cung nhất). Trước đây 三合+15/冲−15
+  //   cho phép 生肖 lấn át 日柱 → ngược cổ pháp. Nay giảm thành bổ trợ nhẹ.]
   const zRel = zhiRel(a.pillars.year.zhi, b.pillars.year.zhi);
-  if (zRel.type === 'tam hợp') { score += 15; factors.push(`✓ Chi năm ${ZHI[a.pillars.year.zhi].vi}–${ZHI[b.pillars.year.zhi].vi} ${zRel.vi} → rất hợp.`); }
-  else if (zRel.type === 'lục hợp') { score += 10; factors.push(`✓ Chi năm ${ZHI[a.pillars.year.zhi].vi}–${ZHI[b.pillars.year.zhi].vi} ${zRel.vi} → hợp.`); }
-  else if (zRel.type === 'xung') { score -= 15; factors.push(`✗ Chi năm ${ZHI[a.pillars.year.zhi].vi}–${ZHI[b.pillars.year.zhi].vi} ${zRel.vi} → xung khắc tuổi, cần hóa giải.`); }
+  if (zRel.type === 'tam hợp') { score += 8; factors.push(`• Chi năm ${ZHI[a.pillars.year.zhi].vi}–${ZHI[b.pillars.year.zhi].vi} ${zRel.vi} → hợp tuổi (bổ trợ nhẹ).`); }
+  else if (zRel.type === 'lục hợp') { score += 5; factors.push(`• Chi năm ${ZHI[a.pillars.year.zhi].vi}–${ZHI[b.pillars.year.zhi].vi} ${zRel.vi} → hơi hợp tuổi.`); }
+  else if (zRel.type === 'xung') { score -= 8; factors.push(`• Chi năm ${ZHI[a.pillars.year.zhi].vi}–${ZHI[b.pillars.year.zhi].vi} ${zRel.vi} → xung tuổi (nhẹ, có thể hóa giải).`); }
   else { factors.push(`• Chi năm ${ZHI[a.pillars.year.zhi].vi}–${ZHI[b.pillars.year.zhi].vi}: ${zRel.vi}.`); }
 
   // 1b. 六害 / 三刑 (bổ sung — zhiRel cũ chỉ bắt 合/Xung, bỏ sót Hại/Hình)
   const ya = a.pillars.year.zhi, yb = b.pillars.year.zhi;
   const haiHit = HAI_PAIRS.find((h) => h.pair.includes(ya) && h.pair.includes(yb) && ya !== yb);
-  if (haiHit) { score -= 12; factors.push(`✗ Chi năm ${ZHI[ya].vi}–${ZHI[yb].vi} Lục Hại (${haiHit.vi}) — 暗 tổn, dễ lục đục dai dẳng.`); }
+  if (haiHit) { score -= 6; factors.push(`• Chi năm ${ZHI[ya].vi}–${ZHI[yb].vi} Lục Hại (${haiHit.vi}) — 暗 tổn nhẹ, lục đục dai dẳng.`); }
   const xingHit = XING_PAIRS.find((x) => x.pair.includes(ya) && x.pair.includes(yb) && ya !== yb);
-  if (xingHit) { score -= 10; factors.push(`✗ Chi năm ${ZHI[ya].vi}–${ZHI[yb].vi} ${xingHit.vi} — hình thương, thị phi, cần bao dung.`); }
+  if (xingHit) { score -= 5; factors.push(`• Chi năm ${ZHI[ya].vi}–${ZHI[yb].vi} ${xingHit.vi} — hình thương nhẹ.`); }
 
   // 2. 五行互补: Dụng của A có mạnh trong cục B không & ngược lại
   const aNeed = R1.yong.primary, bNeed = R2.yong.primary;
+  // [loop 22] same-用神 penalty: 2 người cùng cần 1 hành → cùng thiếu, KHÔNG bổ nhau (kém).
+  if (aNeed === bNeed) {
+    score -= 5;
+    factors.push(`✗ Cùng Dụng Thần (${aNeed}): hai mệnh cùng thiếu/khuynh về 1 hành → khó bổ sung nhau, duyên dựa nỗ lực vun đắp chứ không互补 trời cho.`);
+  }
   const bHasA = (R2.wx.score[aNeed] || 0) / (R2.wx.total || 1);
   const aHasB = (R1.wx.score[bNeed] || 0) / (R1.wx.total || 1);
-  if (bHasA > 0.18 && aHasB > 0.18) { score += 18; factors.push(`✓ Ngũ Hành tương bổ: A cần ${aNeed}, B vượng ${aNeed} (${(bHasA * 100).toFixed(0)}%); B cần ${bNeed}, A vượng ${bNeed} (${(aHasB * 100).toFixed(0)}%) → bổ sung cho nhau.`); }
+  if (aNeed !== bNeed && bHasA > 0.18 && aHasB > 0.18) { score += 18; factors.push(`✓ Ngũ Hành tương bổ: A cần ${aNeed}, B vượng ${aNeed} (${(bHasA * 100).toFixed(0)}%); B cần ${bNeed}, A vượng ${bNeed} (${(aHasB * 100).toFixed(0)}%) → bổ sung cho nhau.`); }
   else if (bHasA > 0.18 || aHasB > 0.18) { score += 8; factors.push(`• Bổ một chiều: ${bHasA > 0.18 ? `B bổ A` : `A bổ B`}五行.`); }
-  else { score -= 6; factors.push(`✗ Ngũ Hành ít bổ sung nhau (A cần ${aNeed}, B chỉ ${(bHasA * 100).toFixed(0)}%; B cần ${bNeed}, A ${(aHasB * 100).toFixed(0)}%).`); }
+  else if (aNeed !== bNeed) { score -= 6; factors.push(`✗ Ngũ Hành ít bổ sung nhau (A cần ${aNeed}, B chỉ ${(bHasA * 100).toFixed(0)}%; B cần ${bNeed}, A ${(aHasB * 100).toFixed(0)}%).`); }
 
   // 3. 用神互不损伤: A có khắc Dụng của B / B khắc Dụng của A không?
   // (đơn giản: A kỵ hành có trùng Dụng của B không → kiểm Kỵ của A vs Dụng của B)
@@ -57,14 +65,27 @@ export function computeHehun(R1, R2) {
   if (aHurtB || bHurtA) { score -= 12; factors.push(`✗ Tổn dụng: ${aHurtB ? 'mệnh A kỵ đúng Dụng ' + bNeed : ''}${bHurtA ? ' mệnh B kỵ đúng Dụng ' + aNeed : ''} — một bên bất lợi.`); }
   else { score += 6; factors.push(`✓ Dụng Thần hai bên không tổn thương nhau.`); }
 
-  // 4. 日柱 天干 / 地支 相合
+  // 4. 日柱 天干 / 地支 相合 [loop 22 TĂNG trọng số — 日柱 = cung phu thê, yếu tố #1 cổ pháp]
   const dgRel = a.dayGan + b.dayGan;
   const dayZhiRel = zhiRel(a.pillars.day.zhi, b.pillars.day.zhi);
   const GAN_HE = { '甲己': 1, '乙庚': 1, '丙辛': 1, '丁壬': 1, '戊癸': 1 };
   const ganHe = GAN_HE[dgRel] || GAN_HE[dgRel.split('').reverse().join('')];
-  if (ganHe) { score += 10; factors.push(`✓ Nhật Can ${a.dayGan}–${b.dayGan} ngũ hợp → tâm đầu ý hợp.`); }
-  if (dayZhiRel.type === 'lục hợp' || dayZhiRel.type === 'tam hợp') { score += 10; factors.push(`✓ Nhật Chi ${ZHI[a.pillars.day.zhi].vi}–${ZHI[b.pillars.day.zhi].vi} ${dayZhiRel.vi} → cung phu thê hợp.`); }
-  else if (dayZhiRel.type === 'xung') { score -= 12; factors.push(`✗ Nhật Chi ${ZHI[a.pillars.day.zhi].vi}–${ZHI[b.pillars.day.zhi].vi} Xung → cung phu thê biến động.`); }
+  if (ganHe) { score += 16; factors.push(`✓ Nhật Can ${a.dayGan}–${b.dayGan} ngũ hợp → tâm đầu ý hợp (cung bản mệnh hợp).`); }
+  if (dayZhiRel.type === 'lục hợp' || dayZhiRel.type === 'tam hợp') { score += 18; factors.push(`✓ Nhật Chi ${ZHI[a.pillars.day.zhi].vi}–${ZHI[b.pillars.day.zhi].vi} ${dayZhiRel.vi} → CUNG PHU THÊ hợp — yếu tố quan trọng nhất.`); }
+  else if (dayZhiRel.type === 'xung') { score -= 18; factors.push(`✗ Nhật Chi ${ZHI[a.pillars.day.zhi].vi}–${ZHI[b.pillars.day.zhi].vi} Xung → CUNG PHU THÊ biến động — trọng yếu, cần cố ý hóa giải.`); }
+
+  // 4b. [loop 22 NEW] 十神 spouse-star cross-check (giới tính): nam lấy 财 làm vợ, nữ lấy 官
+  //   làm chồng. Nếu Nhật Chủ A nhìn B đúng sao phối ngẫu (và B nhìn A) → tín hiệu mạnh.
+  const aMale = (a.input && a.input.gender) === 'nam';
+  const bMale = (b.input && b.input.gender) === 'nam';
+  const wifeGods = ['正財', '偏財']; // nam → vợ = Tài
+  const husbGods = ['正官', '七殺']; // nữ → chồng = Quan Sát
+  const aSeesB = tenGod(a.dayGan, b.dayGan);
+  const bSeesA = tenGod(b.dayGan, a.dayGan);
+  const aHit = (aMale ? wifeGods : husbGods).includes(aSeesB);
+  const bHit = (bMale ? wifeGods : husbGods).includes(bSeesA);
+  if (aHit && bHit) { score += 14; factors.push(`★ Sao phối ngẫu tương ứng: A (nhìn B = ${aSeesB}) đúng sao vợ/chồng, B (nhìn A = ${bSeesA}) cũng vậy → duyên "sao mệnh đối ứng" rất mạnh.`); }
+  else if (aHit || bHit) { score += 7; factors.push(`✓ Một bên nhìn đối phương đúng sao phối ngẫu (${aHit ? 'A' : 'B'}) → duyên có chiều.`); }
 
   score = Math.max(5, Math.min(98, Math.round(score)));
   let rating, verdict;

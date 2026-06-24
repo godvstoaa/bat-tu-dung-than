@@ -4,7 +4,10 @@
 //  KHÁC với 建除12直 (trong daily.js / tongsheng.js): hệ này dựa vào 12 thần
 //  (青龙/明堂/天刑/...) luân chuyển theo 月建 + 日支, không phải trực 建/除/...
 //
-//  Phương pháp: 月建 (month-branch) → ngày chi nào = 青龙 advance 1 chi mỗi tháng.
+//  Phương pháp: 起青龙诀 —「寅申须加子, 卯酉却在寅, 辰戌龙位上, 巳亥午上存,
+//    子午临申地, 丑未戌相寻」. Các tháng ĐỐI XUNG (6 cặp) CHUNG 1 ngày chi 青龙; 6 vị
+//    青龙 đều là chi DƯƠNG (子/寅/辰/午/申/戌). [loop 22 sửa bug CAO: trước đây dùng
+//    công thức tuyến tính (monthIdx+10)%12 — không phải cổ quyết, sai mọi verdict 黄/黑道]
 //  Từ 青龙 (offset 0), 12 thần tuần hoàn qua 12 địa chi theo thứ tự:
 //   青龙→明堂→天刑→朱雀→金匮→天德→白虎→玉堂→天牢→玄武→司命→勾陈
 //
@@ -15,6 +18,13 @@ import { ZHI } from './constants.js';
 
 const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 const zhiIdx = (z) => ZHI_ORDER.indexOf(z);
+
+// [loop 22] 起青龙诀 — 6 cặp tháng đối xung共用 1 ngày chi 青龙 (toàn chi dương).
+//   寅申→子, 卯酉→寅, 辰戌→辰, 巳亥→午, 子午→申, 丑未→戌.
+const QL_BY_MONTH = {
+  寅: '子', 申: '子', 卯: '寅', 酉: '寅', 辰: '辰', 戌: '辰',
+  巳: '午', 亥: '午', 子: '申', 午: '申', 丑: '戌', 未: '戌',
+};
 
 // Thứ tự 12 thần tuần hoàn (offset 0..11)
 const DEITIES = [
@@ -35,16 +45,13 @@ const DEITIES = [
 /**
  * Tính thần Hoàng/Hắc Đạo cho 1 ngày dương lịch.
  *
- * Phương pháp 月建 (đơn giản, phổ biến):
- *  - 寅月 → 子日 = 青龙 (offset 0)
- *  - 卯月 → 丑日 = 青龙
- *  - Mỗi tháng 青龙 advance 1 địa chi.
- *  - Từ 青龙, 12 thần tuần hoàn qua 12 chi theo thứ tự đã định.
+ * Phương pháp 起青龙诀 (cổ quyết chính thống) [loop 22 sửa]:
+ *  - 6 cặp tháng ĐỐI XUNG共用 1 ngày chi 青龙 (toàn chi dương):
+ *    寅申→子日, 卯酉→寅日, 辰戌→辰日, 巳亥→午日, 子午→申日, 丑未→戌日.
+ *  - Từ 青龙 (offset 0), 12 thần tuần hoàn qua 12 chi theo thứ tự đã định.
  *
- * Công thức tổng quát:
- *   qinglongZhiIdx = (zhiIdx(monthZhi) - zhiIdx('寅') + zhiIdx('子') + 12) % 12
- *                  = (zhiIdx(monthZhi) - 2 + 0 + 12) % 12
- *                  = (zhiIdx(monthZhi) + 10) % 12
+ * Công thức:
+ *   qinglongZhiIdx = zhiIdx(QL_BY_MONTH[monthZhi])
  *   offset = (zhiIdx(dayZhi) - qinglongZhiIdx + 12) % 12
  *   deity = DEITIES[offset]
  *
@@ -64,8 +71,8 @@ export function huangdao12(year, month, day) {
   const mZhi = lunar.getMonthZhi();
   const dGan = lunar.getDayGan();
 
-  // Vị trí 青龙 (offset 0) trong tháng này
-  const qinglongZhiIdx = (zhiIdx(mZhi) + 10) % 12;
+  // Vị trí 青龙 (offset 0) trong tháng này — theo 起青龙诀 (6 cặp đối xung, [loop 22 sửa])
+  const qinglongZhiIdx = zhiIdx(QL_BY_MONTH[mZhi]);
   const offset = ((zhiIdx(dZhi) - qinglongZhiIdx) + 12) % 12;
   const d = DEITIES[offset];
 

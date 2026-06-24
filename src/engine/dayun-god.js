@@ -28,7 +28,7 @@ export function dayunGodMeaning(chart, dayun) {
     const god = tenGod(dayGan, d.gan);
     const info = GOD_DECADE[god] || { vi: god, theme: '?', cat: 'mid', detail: '' };
     return {
-      ganZhi: d.ganZhi, startAge: d.startAge, rating: d.rating,
+      ganZhi: d.ganZhi, startAge: d.startAge, startYear: d.startYear, rating: d.rating,
       god, godVi: TEN_GOD_VI[god] || god,
       theme: info.theme, cat: info.cat, detail: info.detail,
     };
