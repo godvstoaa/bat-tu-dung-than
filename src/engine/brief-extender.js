@@ -24,6 +24,16 @@ import { taiYuan } from './taiyuan.js';
 export function extendBrief(R) {
   const parts = [];
 
+  // [loop 40] Điều Hậu (调候) — phải đưa vào brief để AI biết 调候 đang LÀM CHỦ (loop 34 elevation)
+  try {
+    const th = R.yong?.tiaohou;
+    if (th && (th.override || th.note)) {
+      parts.push(th.override
+        ? `🔥 ĐIỀU HẬU (调候) OVERRIDE: ${th.note || ''} — 调候 LÀM CHỦ, đè Phù Ức. Dụng Thần chính = hành ${th.primaryWx} (khí hậu thiên lệch, 窮通寶鑑).`
+        : `ĐIỀU HẬU (调候): ${th.note || ''}`);
+    }
+  } catch (e) {}
+
   // Thai nguyên (nếu có)
   try {
     const ty = taiYuan(R.chart.pillars.month.gan, R.chart.pillars.month.zhi);

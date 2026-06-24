@@ -70,11 +70,15 @@ export function sleepOptimization(R, birthYear, gender) {
   const allCat = Object.values(ausp);
   const tianYiDir = ausp['天医'] || ausp['Thiên Y (天医 — sức khoẻ, quý nhân)'] || '?';
 
-  let headDir;
+  // [loop 40 sửa] Ưu tiên DỤNG THẦN hướng (KHÔNG fallback Thiên Y + gán nhãn sai "(Dụng Mộc)"
+  //   khi hướng thực ra là Kim). Dụng Thần hướng là primary; Thiên Y chỉ là tiebreaker.
+  let headDir, headSource;
   const dungInCat = dungDirs.find(d => allCat.includes(d));
-  if (dungInCat) headDir = dungInCat;
-  else if (tianYiDir && tianYiDir !== '?') headDir = tianYiDir;
-  else headDir = dungDirs[0] || xiDirs[0] || '?';
+  if (dungInCat) { headDir = dungInCat; headSource = 'dung+cat'; }
+  else if (dungDirs[0]) { headDir = dungDirs[0]; headSource = 'dung'; } // [loop 40] Dụng Thần > Thiên Y
+  else if (xiDirs[0]) { headDir = xiDirs[0]; headSource = 'xi'; }
+  else if (tianYiDir && tianYiDir !== '?') { headDir = tianYiDir; headSource = 'tianYi'; }
+  else { headDir = '?'; headSource = 'none'; }
 
   // Hướng tránh = Kỵ Thần + Tuyệt Mệnh/Họa Hại
   const allHung = Object.values(inausp);
@@ -103,7 +107,9 @@ export function sleepOptimization(R, birthYear, gender) {
     `Tránh: hướng ${avoidDir}, màu ${ROOM_COLOR[kyWx]}.`,
   ];
 
-  const advice = `Đầu hướng ${headDir} (Dụng ${WX_VI[dungWx]}), ngủ ${sleepInfo.best}, ` +
+  // [loop 40] gán nhãn đúng: chỉ nói "(Dụng X)" khi headDir thực sự từ Dụng Thần, else "(Thiên Y Bát Trạch)"
+  const headLabel = (headSource === 'dung' || headSource === 'dung+cat') ? `Dụng ${WX_VI[dungWx]}` : (headSource === 'xi') ? `Hỷ ${WX_VI[xiWx]}` : (headSource === 'tianYi') ? 'Thiên Y (Bát Trạch)' : '?';
+  const advice = `Đầu hướng ${headDir} (${headLabel}), ngủ ${sleepInfo.best}, ` +
     `phòng màu ${ROOM_COLOR[dungWx].split(',')[0]}, hương ${AROMA[dungWx].split(',')[0]}. ` +
     `${sleepInfo.reason}.`;
 

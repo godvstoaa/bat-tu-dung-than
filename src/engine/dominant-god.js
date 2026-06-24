@@ -26,7 +26,7 @@ const TENDENCY = {
   劫財: { traits: 'cạnh tranh, dũng cảm, hào sảng, dễ xung động, hao tiền', career: 'sales, đầu tư, môi giới, kinh doanh nhạy bén (cẩn thận tài chính)', drive: 'thắng & lợi ích' },
   食神: { traits: 'ôn hoà, nghệ thuật, phúc đức, hưởng thụ, khẩu tài tốt, dễ dãi', career: 'ẩm thực, nghệ thuật, giáo dục, sáng tạo, dịch vụ, chăm sóc', drive: 'thú vui & sáng tạo' },
   傷官: { traits: 'phản kháng, tài ba, miệng lưỡi sắc, phá quy củ, thông minh kiêu ngạo', career: 'nghệ thuật, kỹ thuật, luật, truyền thông, thuyết trình, sáng tạo đột phá', drive: 'biểu đạt & bứt phá' },
-  正財: { traits: 'cần kiệm, ổn định, thực tế, tiết độ, đáng tin, thủalda', career: 'kế toán, tài chính, ngân hàng, công việc ổn định, quản lý gia đình', drive: 'an toàn & tích luỹ' },
+  正財: { traits: 'cần kiệm, ổn định, thực tế, tiết độ, đáng tin, thủ cựu', career: 'kế toán, tài chính, ngân hàng, công việc ổn định, quản lý gia đình', drive: 'an toàn & tích luỹ' },
   偏財: { traits: 'giao tế, hào phóng, tài lớn, đa duyên, linh hoạt, đầu cơ', career: 'doanh nhân, kinh doanh, đầu tư, giao thương, giải trí', drive: 'tài lớn & giao thương' },
   正官: { traits: 'quy củ, trách nhiệm, ổn trọng, danh dự, tự luật, sợ sai', career: 'quan chức, quản lý, hành chính, pháp luật, thể chế', drive: 'danh dự & thứ bậc' },
   七殺: { traits: 'quyền uy, quyết đoán, áp lực, dũng cảm, mưu lược, uy nghiêm', career: 'quân sự/cảnh sát, lãnh đạo doanh nghiệp, khởi nghiệp việc lớn, quản trị khủng hoảng', drive: 'quyền lực & chinh phục' },
@@ -63,7 +63,8 @@ export function dominantGod(R) {
   let favor, favorVi;
   if (catWx && dung.has(catWx)) { favor = 'dung'; favorVi = `thuận — thần chủ (${TEN_GOD_VI[dominant.god]}, hành ${catWx}) = DỤNG/HỶ → động lực cốt lõi HỖ TRỢ mệnh, đời đi đúng hướng tuýp mình.`; }
   else if (catWx && jiSet.has(catWx)) { favor = 'ji'; favorVi = `nghịch — thần chủ (${TEN_GOD_VI[dominant.god]}, hành ${catWx}) = KỴ/THÙ → khuynh hướng tự nhiên lại TRÁI Dụng, cần khắc phục (bù Dụng, tránh cực đoan theo tuýp).`; }
-  else { favor = 'neutral'; favorVi = `trung — thần chủ (${TEN_GOD_VI[dominant.god]}) trung tính với Dụng.`; }
+  else if (dominant) { favor = 'neutral'; favorVi = `trung — thần chủ (${TEN_GOD_VI[dominant.god]}) trung tính với Dụng.`; }
+  else { favor = 'neutral'; favorVi = ''; }
 
   const tend = dominant ? TENDENCY[dominant.god] : null;
   const summary = dominant
