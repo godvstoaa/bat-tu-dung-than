@@ -3338,7 +3338,7 @@ console.log(`   12 giờ: BEST ${zdd.bestHours.map((h)=>h.hourZhi+'='+h.gongVi).
 // ============================================================================
 // ################## 25. BEST HOUR TODAY 择吉时合成 (composite) ##################
 // ============================================================================
-console.log('\n################## 25. BEST HOUR TODAY 择吉时合成 (composite 5 chiều) ##################');
+console.log('\n################## 25. BEST HOUR TODAY 择吉时合成 (composite 6 chiều) ##################');
 import { bestHourToday, BEST_HOUR_WEIGHTS } from './src/engine/best-hour.js';
 const BH_R = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
 
@@ -3372,9 +3372,10 @@ assert(worstScores.join(',') === sortedScores.slice(-2).sort((a,b)=>a-b).join(',
 // P5. best[0].score >= worst[0].score (best luôn tốt hơn worst)
 assert(bh1.best[0].score >= bh1.worst[0].score, `best đầu (${bh1.best[0].score}) >= worst đầu (${bh1.worst[0].score})`);
 
-// P6. Trọng số 5 chiều tổng = 100
+// P6. Trọng số 6 chiều tổng = 100
 const wsum = Object.values(BEST_HOUR_WEIGHTS).reduce((a, b) => a + b, 0);
-assert(wsum === 100, `tổng trọng số 5 chiều = 100 (thực tế ${wsum})`);
+assert(wsum === 100, `tổng trọng số 6 chiều = 100 (thực tế ${wsum})`);
+assert(BEST_HOUR_WEIGHTS.geju === 8, `chiều 格局 = 8% (thực tế ${BEST_HOUR_WEIGHTS.geju})`);
 
 // P7. summary có nội dung + chứa tên giờ
 assert(typeof bh1.summary === 'string' && bh1.summary.length > 10, 'summary có nội dung');
@@ -3408,6 +3409,57 @@ assert(typeof bh1.dayOfficer.officerVi === 'string' && bh1.dayOfficer.officerVi.
 console.log(`   2026-06-23 ${bh1.dayGanZhi} trực ${bh1.dayOfficer.officerVi}: BEST ${bh1.best.map((h)=>h.vi+'='+h.score).join(', ')} | WORST ${bh1.worst.map((h)=>h.vi+'='+h.score).join(', ')}`);
 console.log(`   Top giờ: ${bh1.best[0].vi} (${bh1.best[0].range}) ${bh1.best[0].score}/100 — ${bh1.best[0].reasons.join(' / ')}`);
 console.log(`   Summary: ${bh1.summary} ✓`);
+
+// ============================================================================
+// P13–P17. Chiều 6: 格局喜忌 (6th dimension — pattern-specific scoring)
+// ============================================================================
+// P13. Backward compatible: KHÔNG truyền patternYong → gejuEnabled=false, không có gejuScore
+assert(bh1.gejuEnabled === false, 'mặc định gejuEnabled=false (backward compatible)');
+assert(bh1.hours.every((h) => h.gejuScore === undefined), 'không truyền patternYong → không có gejuScore');
+assert(Object.values(bh1.weights).reduce((a, b) => a + b, 0) === 100, 'weights (không geju) vẫn tổng 100');
+
+// P14. Truyền patternYong → gejuEnabled=true, mỗi giờ có gejuScore/gejuReason
+const py = BH_R.patternQuality?.patternYong;
+assert(py && Array.isArray(py.xi) && Array.isArray(py.ji), 'chart có patternYong.xi/ji');
+const bhG = bestHourToday(BH_R, 2026, 6, 23, py);
+assert(bhG.gejuEnabled === true, 'truyền patternYong → gejuEnabled=true');
+assert(bhG.weights.geju === 8, 'weights có chiều geju=8 khi bật');
+assert(Object.values(bhG.weights).reduce((a, b) => a + b, 0) === 100, 'weights (6 chiều) tổng 100');
+for (const h of bhG.hours) {
+  assert(typeof h.gejuScore === 'number' && [-5, 0, 5].includes(h.gejuScore), `gejuScore ∈ {−5,0,+5} (${h.zhi}=${h.gejuScore})`);
+  assert(typeof h.gejuReason === 'string' && h.gejuReason.length > 0, `gejuReason có nội dung (${h.zhi})`);
+  assert(typeof h.dim.geju === 'number' && h.dim.geju >= 0 && h.dim.geju <= 100, `dim.geju trong [0,100] (${h.zhi})`);
+}
+
+// P15. Cụ thể theo nhóm thập thần (dayGan-agnostic): mỗi giờ gejuScore KHỚP nhóm
+//   của thập thần giờ-can so với xi/ji của patternYong.
+const dayGan = BH_R.chart.dayGan;
+const xiSet = new Set(py.xi.map((x) => x.group));
+const jiSet = new Set(py.ji.map((x) => x.group));
+for (const h of bhG.hours) {
+  const ganZhi = h.ganZhi;
+  const hGan = ganZhi[0];
+  if (!hGan || hGan === '?') continue;
+  const grp = godGroup(tenGod(dayGan, hGan));
+  const expected = xiSet.has(grp) ? 5 : (jiSet.has(grp) ? -5 : 0);
+  assert(h.gejuScore === expected, `${h.zhi} (${ganZhi}) nhóm ${grp} → gejuScore=${expected} (thực tế ${h.gejuScore})`);
+}
+// Bảo đảm có ÍT NHẤT một giờ 格局喜 (+5) VÀ một giờ 格局忌 (−5) — chứng minh chiều có tác động.
+const hasXi = bhG.hours.some((h) => h.gejuScore === 5);
+const hasJi = bhG.hours.some((h) => h.gejuScore === -5);
+assert(hasXi, 'có ít nhất 1 giờ 格局喜 (+5)');
+assert(hasJi, 'có ít nhất 1 giờ 格局忌 (−5)');
+
+// P16. Tác động lên xếp hạng: bật geju phải thay đổi thứ tự (so với tắt) ÍT NHẤT 1 vị trí
+const topNoGeju = bh1.best[0].zhi;
+const topWithGeju = bhG.best[0].zhi;
+// Không assert bằng nhau (chính point: geju CHO THAY ĐỔI). Chỉ log để người xem thấy.
+console.log(`   格局喜忌 BẬT: top giờ ${topWithGeju} (vs TẮT: ${topNoGeju}) — ${topWithGeju === topNoGeju ? 'không đổi' : 'THAY ĐỔI ✓'}`);
+
+// P17. Determinism với geju
+const bhG2 = bestHourToday(BH_R, 2026, 6, 23, py);
+assert(JSON.stringify(bhG) === JSON.stringify(bhG2), 'bestHourToday+geju tất định khi chạy lại');
+console.log(`   Chiều 格局: xi=[${py.xi.map((x)=>x.vi).join(',')}] ji=[${py.ji.map((x)=>x.vi).join(',')}] — 12 giờ gejuScore: ${bhG.hours.map((h)=>h.zhi+h.gejuScore).join(' ')} ✓`);
 
 
 // ============================================================================

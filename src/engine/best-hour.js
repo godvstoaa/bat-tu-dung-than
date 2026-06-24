@@ -2,12 +2,13 @@
 //  BEST HOUR TODAY 择吉时合成 — "Hôm nay giờ nào tốt nhất cho [việc]?"
 //  Composite: chấm điểm 12 时辰 (mỗi 时辰 = 2h) trên 5 chiều rồi xếp hạng.
 //
-//  5 chiều đánh giá (mỗi chiều đóng góp điểm, có lý do đi kèm):
+//  6 chiều đánh giá (mỗi chiều đóng góp điểm, có lý do đi kèm):
 //    1. 黄道/黑道 giờ       (lucky-hours.js — hoàng/hắc đạo của từng thìn)
 //    2. 建除 trực của ngày   (zheri.js/daily.js — trực ngày làm nền)
 //    3. Dụng Thần ngũ hành  (can/chi giờ có mang hành Dụng/Hỷ/Kỵ không)
 //    4. 紫微流时             (ziwei-liuri.js — cung lưu thời được kích hoạt)
 //    5. 流时神煞 quý nhân    (shensha.js — Thiên Ất/Văn Xương có kích hoạt giờ)
+//    6. 格局喜忌             (pattern-quality.js — thập thần giờ vs patternYong.xi/ji)
 //
 //  Đầu ra: 12 giờ chấm điểm + best 3 + worst 2 + tóm tắt 1 câu.
 //  Tất cả các trạm đều bọc try/catch → lỗi 1 chiều không làm sập cả composite.
@@ -18,6 +19,7 @@ import { luckyHours } from './lucky-hours.js';
 import { evaluateDate, OFFICER_VI } from './zheri.js';
 import { ziweiLiushi } from './ziwei-liuri.js';
 import { TIAN_YI, WEN_CHANG } from './shensha.js';
+import { tenGod, godGroup } from './core.js';
 
 const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 // Giờ đại diện cho mỗi thìn (lấy giữa khoảng) — 子 = 23:00 (thuộc ngày kế)
@@ -29,8 +31,13 @@ const RANGE_VI = {
 };
 const ZHI_VI = { 子:'Tý', 丑:'Sửu', 寅:'Dần', 卯:'Mão', 辰:'Thìn', 巳:'Tỵ', 午:'Ngọ', 未:'Mùi', 申:'Thân', 酉:'Dậu', 戌:'Tuất', 亥:'Hợi' };
 
-// ---- Trọng số 5 chiều (tổng 100) ----
-const W = { huangdao: 28, yong: 24, ziwei: 20, shensha: 16, officer: 12 };
+// ---- Trọng số 6 chiều (tổng 100) ----
+//  Phân bổ lại khi thêm 格局 (chiều 6): mỗi chiều cũ nhường ~2%.
+//  Khi KHÔNG có patternYong → trả trọng số 格局 về huangdao (giữ tổng 100).
+const W = { huangdao: 26, yong: 22, ziwei: 18, shensha: 14, officer: 12, geju: 8 };
+
+// Nhãn Việt của 5 nhóm thập thần (cho lý do hiển thị).
+const GROUP_VI = { ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 'Tài', guan: 'Quan Sát' };
 
 function clampScore(x) { return Math.max(0, Math.min(100, Math.round(x))); }
 
@@ -38,14 +45,18 @@ function clampScore(x) { return Math.max(0, Math.min(100, Math.round(x))); }
  * Composite "giờ tốt nhất hôm nay".
  * @param {object} R - reading object (cần R.chart.input, R.yong, R.chart.dayGan)
  * @param {number} year/month/day - ngày dương lịch (mặc định hôm nay)
+ * @param {object} [patternYong] - TÙY CHỌN: patternYong.xi/ji (từ patternQuality).
+ *   Khi có → bật chiều 6 (格局喜忌). Khi không/v_null → bỏ qua chiều 6 (backward compatible).
  * @returns {{
  *   date, dayGanZhi, dayOfficer:{officer,officerVi,tone},
- *   hours: Array<{ zhi, vi, range, ganZhi, score, rating, dim:{huangdao,yong,ziwei,shensha,officer}, reasons:string[] }>,
+ *   hours: Array<{ zhi, vi, range, ganZhi, score, rating,
+ *     dim:{huangdao,yong,ziwei,shensha,officer,geju?},
+ *     gejuScore?, gejuReason?, reasons:string[] }>,
  *   best: Array, worst: Array,
- *   summary: string
+ *   summary: string, gejuEnabled: boolean
  * }}
  */
-export function bestHourToday(R, year, month, day) {
+export function bestHourToday(R, year, month, day, patternYong) {
   const _now = new Date();
   const y = year ?? _now.getFullYear();
   const mo = month ?? (_now.getMonth() + 1);
@@ -78,6 +89,20 @@ export function bestHourToday(R, year, month, day) {
   const tianYiZhis = TIAN_YI[dayGan] || [];
   const wenChangZhi = WEN_CHANG[dayGan];
 
+  // ---- Chiều 6: 格局喜忌 (TÙY CHỌN — chỉ bật khi truyền patternYong hợp lệ) ----
+  //  patternYong.xi/ji là mảng {group, wx, vi} (ti/yin/shi/cai/guan).
+  //  Mỗi giờ: lấy thập thần của GIỜ CAN (tenGod(dayGan, hourGan)) → godGroup → so xi/ji.
+  //  Thang điểm: 格局喜 giờ = +5 (cột điểm 0..100 ánh xạ: 95/50/5), 格局忌 = −5, trung tính 0.
+  //  Ánh xạ sang dim.geju (0..100 để nhất quán với 5 chiều kia):
+  //    格局喜 → dim.geju = 95, 格局忌 → dim.geju = 5, trung tính → 50.
+  const gejuEnabled = !!patternYong && Array.isArray(patternYong.xi) && Array.isArray(patternYong.ji);
+  const xiGroups = gejuEnabled ? new Set(patternYong.xi.map((x) => x.group)) : null;
+  const jiGroups = gejuEnabled ? new Set(patternYong.ji.map((x) => x.group)) : null;
+  // Trọng số thực tế: nếu tắt geju → dồn 8% sang huangdao để tổng vẫn 100.
+  const Weff = gejuEnabled
+    ? W
+    : { huangdao: W.huangdao + W.geju, yong: W.yong, ziwei: W.ziwei, shensha: W.shensha, officer: W.officer };
+
   // Day gan-zhi (cho hiển thị)
   let dayGanZhi = '?';
   try { const l = Solar.fromYmdHms(y, mo, d, 12, 0, 0).getLunar(); dayGanZhi = l.getDayGan() + l.getDayZhi(); } catch (_) {}
@@ -87,7 +112,9 @@ export function bestHourToday(R, year, month, day) {
     const zhi = ZHI_ORDER[i];
     const lh = hoursMap.get(zhi) || {};
     const reasons = [];
-    const dim = { huangdao: 50, yong: 50, ziwei: 50, shensha: 50, officer: dayOfficer.score };
+    const dim = { huangdao: 50, yong: 50, ziwei: 50, shensha: 50, officer: dayOfficer.score, geju: 50 };
+    let gejuScore = 0;       // điểm thô chiều 格局 (+5 / −5 / 0)
+    let gejuReason = '';     // lý do ngắn cho hiển thị
     let score = 0;
 
     // === 1. 黄道/黑道 giờ ===
@@ -138,12 +165,40 @@ export function bestHourToday(R, year, month, day) {
     // === 5. Officer ngày (nền chung, cùng cho mọi giờ) ===
     dim.officer = dayOfficer.score;
 
+    // === 6. 格局喜忌 (thập thần của GIỜ CAN vs patternYong.xi/ji — 子平真詮 ch.10-11) ===
+    //  Nguyên lý cổ pháp: "行运之阴阳有别，取用之喜忌相同" — cùng luật 喜忌 đặc trưng
+    //  của cách áp dụng cho 大运/Lưu niên CŨNG áp dụng cho LƯU THỜI: một giờ có thập thần
+    //  "sinh trợ Dụng/相" = 格局喜 (giờ giúp cách cục phát huy), thập thần "khắc phá Dụng"
+    //  = 格局忌 (giờ làm cách cục tổn thương). Dùng thập thần của GIỜ CAN (chính khí giờ).
+    if (gejuEnabled) {
+      try {
+        const hGan = lh.gan;
+        if (hGan && hGan !== '?') {
+          const god = tenGod(dayGan, hGan);          // thập thần của giờ can
+          const grp = godGroup(god);                 // nhóm (ti/yin/shi/cai/guan)
+          if (grp && xiGroups.has(grp)) {
+            dim.geju = 95; gejuScore = +5;
+            gejuReason = `格局喜: giờ ${hGan} (${god}/${GROUP_VI[grp]}) sinh trợ格 (+5)`;
+            reasons.push(gejuReason);
+          } else if (grp && jiGroups.has(grp)) {
+            dim.geju = 5; gejuScore = -5;
+            gejuReason = `格局忌: giờ ${hGan} (${god}/${GROUP_VI[grp]}) khắc phá格 (−5)`;
+            reasons.push(gejuReason);
+          } else {
+            dim.geju = 50; gejuScore = 0;
+            gejuReason = `Giờ ${hGan} (${god}/${GROUP_VI[grp] || '—'}) — trung tính với格`;
+          }
+        }
+      } catch (_) { dim.geju = 50; gejuScore = 0; }
+    }
+
     // === Tổng hợp có trọng số ===
-    score = W.huangdao * dim.huangdao / 100
-          + W.yong * dim.yong / 100
-          + W.ziwei * dim.ziwei / 100
-          + W.shensha * dim.shensha / 100
-          + W.officer * dim.officer / 100;
+    score = Weff.huangdao * dim.huangdao / 100
+          + Weff.yong * dim.yong / 100
+          + Weff.ziwei * dim.ziwei / 100
+          + Weff.shensha * dim.shensha / 100
+          + Weff.officer * dim.officer / 100
+          + (gejuEnabled ? (Weff.geju * dim.geju / 100) : 0);
     score = clampScore(score);
 
     let rating;
@@ -162,6 +217,7 @@ export function bestHourToday(R, year, month, day) {
       rating,
       dim,
       reasons,
+      ...(gejuEnabled ? { gejuScore, gejuReason } : {}),
     });
   }
 
@@ -186,7 +242,8 @@ export function bestHourToday(R, year, month, day) {
     date: `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`,
     dayGanZhi,
     dayOfficer,
-    weights: W,
+    weights: gejuEnabled ? W : Weff,   // trọng số thực tế dùng (tổng luôn 100)
+    gejuEnabled,
     hours,
     best,
     worst,

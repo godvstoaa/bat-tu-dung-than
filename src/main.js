@@ -1737,7 +1737,7 @@ function renderBestHour(dateStr) {
   if (!el) return;
   const scan = dateStr || (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`; })();
   let r;
-  try { r = bestHourToday(currentResult, ...scan.split('-').map(Number)); }
+  try { r = bestHourToday(currentResult, ...scan.split('-').map(Number), currentResult?.patternQuality?.patternYong); }
   catch (e) { el.innerHTML = `<p class="hint">Không tính được: ${esc(e.message)}</p>`; return; }
 
   const toneCls = (s) => s >= 72 ? 'rate-cat' : s >= 60 ? 'rate-cat' : s >= 45 ? 'rate-mid' : 'rate-hung';
@@ -1757,7 +1757,7 @@ function renderBestHour(dateStr) {
   }).join('');
 
   el.innerHTML = `
-    <div class="bh-head"><span class="zh big">${r.dayGanZhi}</span> ${r.date} · trực ngày <b>${esc(r.dayOfficer.officerVi)}</b> (${esc(r.dayOfficer.tone)}) · <span class="hint-inline">trọng số: 黄道${r.weights.huangdao}/Dụng${r.weights.yong}/紫微${r.weights.ziwei}/神煞${r.weights.shensha}/建除${r.weights.officer}</span></div>
+    <div class="bh-head"><span class="zh big">${r.dayGanZhi}</span> ${r.date} · trực ngày <b>${esc(r.dayOfficer.officerVi)}</b> (${esc(r.dayOfficer.tone)}) · <span class="hint-inline">trọng số: 黄道${r.weights.huangdao}/Dụng${r.weights.yong}/紫微${r.weights.ziwei}/神煞${r.weights.shensha}/建除${r.weights.officer}${r.gejuEnabled ? `/格局${r.weights.geju}` : ''}</span></div>
     <p class="bh-summary"><b>💡 ${esc(r.summary)}</b></p>
     <div class="bh-grid">${cells}</div>
     ${r.best.length ? `<p class="hint">⏰ <b>Top 3 giờ tốt:</b> ${r.best.map((h) => `${esc(h.vi)} (${esc(h.range)}, ${h.score})`).join(' · ')}</p>` : ''}
