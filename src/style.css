@@ -1141,3 +1141,34 @@ html{scroll-behavior:smooth}
    END UX OVERHAUL
    ========================================================================== */
 
+/* ==========================================================================
+   [loop 50] MOBILE — responsive cho tính năng mới (Quick Summary / Week / Calendar / Curve / Radar)
+   ========================================================================== */
+@media (max-width: 760px) {
+  /* Quick Summary: 1 cột trên mobile */
+  #quick-summary > div { flex-direction: column !important; }
+  #quick-summary > div > div { min-width: 100% !important; }
+
+  /* Week Preview: scroll ngang */
+  #week-preview > div:last-child { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #week-preview > div:last-child > div { min-width: 70px !important; flex-shrink: 0; }
+
+  /* Month Calendar: scroll ngang, cell nhỏ hơn */
+  #month-calendar > div:last-child { overflow-x: auto; -webkit-overflow-scrolling: touch; min-width: 320px; }
+
+  /* Decade Curve: full width */
+  #decade-curve svg { width: 100% !important; }
+
+  /* Radar: full width, bảng xuống dưới */
+  #five-dim-radar > div { flex-direction: column !important; }
+  #five-dim-radar svg { width: 100% !important; max-width: 280px; margin: 0 auto; display: block; }
+
+  /* Birth form: select múi giờ/nơi sinh full width */
+  .birth-form { grid-template-columns: 1fr 1fr; }
+  .birth-form .field select { width: 100%; }
+
+  /* Tool cards: stack vertically */
+  .tool-row { flex-direction: column !important; }
+  .tool-row > * { width: 100% !important; margin-bottom: 6px; }
+}
+
