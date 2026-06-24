@@ -201,7 +201,7 @@ export const LIFE_AREA_INDEX = {
   study: { gods: ['正印', '偏印', '食神', '傷官'], title: 'Học vấn & trí tuệ', focus: 'Ấn – Thực Thương' },
   children: { gods: ['食神', '傷官', '正官', '七殺'], title: 'Con cái', focus: 'sao con (nam: quan, nữ: thực thương)' },
   family: { gods: ['正印', '偏印', '正財', '正官'], title: 'Gia đạo', focus: 'Ấn(cha mẹ) – Tài(nam: vợ) – Quan(nữ: chồng)' },
-  travel: { gods: ['偏财', '七殺', '食神'], title: 'Di chuyển – nước ngoài', focus: 'Dịch Mã – Tài – Sát' },
+  travel: { gods: ['偏財', '七殺', '食神'], title: 'Di chuyển – nước ngoài', focus: 'Dịch Mã – Tài – Sát' },
   power: { gods: ['七殺', '正官', '将星'], title: 'Quyền lực – lãnh đạo', focus: 'Quan Sát – Tướng Tinh' },
   timing: { gods: [], title: 'Thời điểm – vận hạn', focus: 'Đại Vận / Lưu Niên vs Dụng Thần' },
   personality: { gods: [], title: 'Tính cách – bản mệnh', focus: 'Nhật Chủ + Thập Thần vượng' },

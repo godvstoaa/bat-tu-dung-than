@@ -4,6 +4,7 @@
 //  (4) 用神互不损伤. Trả điểm + chốt hợp/không. Nguồn: 渊海子平, 八字合婚.
 // ============================================================================
 import { ZHI } from './constants.js';
+import { XING_PAIRS, HAI_PAIRS } from './zodiac-deep.js';
 
 // Tam hợp / Lục hợp / Xung của Địa Chi
 const SANHE = [['申', '子', '辰'], ['寅', '午', '戌'], ['巳', '酉', '丑'], ['亥', '卯', '未']];
@@ -33,6 +34,13 @@ export function computeHehun(R1, R2) {
   else if (zRel.type === 'lục hợp') { score += 10; factors.push(`✓ Chi năm ${ZHI[a.pillars.year.zhi].vi}–${ZHI[b.pillars.year.zhi].vi} ${zRel.vi} → hợp.`); }
   else if (zRel.type === 'xung') { score -= 15; factors.push(`✗ Chi năm ${ZHI[a.pillars.year.zhi].vi}–${ZHI[b.pillars.year.zhi].vi} ${zRel.vi} → xung khắc tuổi, cần hóa giải.`); }
   else { factors.push(`• Chi năm ${ZHI[a.pillars.year.zhi].vi}–${ZHI[b.pillars.year.zhi].vi}: ${zRel.vi}.`); }
+
+  // 1b. 六害 / 三刑 (bổ sung — zhiRel cũ chỉ bắt 合/Xung, bỏ sót Hại/Hình)
+  const ya = a.pillars.year.zhi, yb = b.pillars.year.zhi;
+  const haiHit = HAI_PAIRS.find((h) => h.pair.includes(ya) && h.pair.includes(yb) && ya !== yb);
+  if (haiHit) { score -= 12; factors.push(`✗ Chi năm ${ZHI[ya].vi}–${ZHI[yb].vi} Lục Hại (${haiHit.vi}) — 暗 tổn, dễ lục đục dai dẳng.`); }
+  const xingHit = XING_PAIRS.find((x) => x.pair.includes(ya) && x.pair.includes(yb) && ya !== yb);
+  if (xingHit) { score -= 10; factors.push(`✗ Chi năm ${ZHI[ya].vi}–${ZHI[yb].vi} ${xingHit.vi} — hình thương, thị phi, cần bao dung.`); }
 
   // 2. 五行互补: Dụng của A có mạnh trong cục B không & ngược lại
   const aNeed = R1.yong.primary, bNeed = R2.yong.primary;

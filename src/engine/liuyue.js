@@ -37,12 +37,16 @@ export function computeLiuyue(R, solarYear) {
   const months = [];
 
   for (let i = 0; i < 12; i++) {
-    // Tháng tiết khí i: 寅(tháng1) ... dùng giữa tháng dương lịch ~i+1 (gần đúng, an toàn ở giữa tháng)
-    // Lấy can chi nguyệt bằng lunar-javascript cho giữa tháng dương tương ứng
-    const solarMonth = i + 1; // 1..12 dương lịch (xấp xỉ tháng tiết khí)
+    // [cycle 48 sửa CRITICAL C1] Ánh xạ tháng TIẾT KHÍ i (寅=0..丑=11) → giữa tháng DƯƠNG LỊCH tương ứng.
+    //   Trước đây solarMonth=i+1 (Jan15..) → Jan15 vẫn là 丑 tháng (chưa qua立春~4/2) → MỌI lưu nguyệt
+    //   lệch 1 tháng (1月 báo 己丑 thay vì 庚寅). Nay: 寅≈Feb15, 卯≈Mar15, ..., 子≈Dec15, 丑≈Jan15 năm SAU.
+    //   (Ranh tiết khí ~ngày 4-8, giữa tháng 15 an toàn nằm đúng tháng tiết khí.)
+    let gYear = solarYear, gMonth;
+    if (i < 11) { gMonth = i + 2; }        // 寅=Feb ... 子=Dec
+    else { gMonth = 1; gYear = solarYear + 1; } // 丑 = tháng 1 năm sau (vượt立春sang năm kế)
     let gan, zhi;
     try {
-      const s = Solar.fromYmdHms(solarYear, solarMonth, 15, 12, 0, 0);
+      const s = Solar.fromYmdHms(gYear, gMonth, 15, 12, 0, 0);
       gan = s.getLunar().getMonthGan();
       zhi = s.getLunar().getMonthZhi();
     } catch (e) { continue; }
@@ -64,7 +68,7 @@ export function computeLiuyue(R, solarYear) {
     else if (score >= 50) rating = 'Bình';
     else if (score >= 38) rating = 'Hơi kỵ';
     else rating = 'Kỵ';
-    months.push({ m: i, solarMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note: godVi });
+    months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note: godVi });
   }
 
   const sorted = [...months].sort((a, b) => b.score - a.score);

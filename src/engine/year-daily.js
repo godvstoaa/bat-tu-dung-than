@@ -89,10 +89,13 @@ export function computeYearDaily(R, year) {
   });
 
   const sorted = [...days].sort((a, b) => b.score - a.score);
+  // [cycle 51 C4] de-dup theo ganZhi — ganZhi lặp mỗi 60 ngày cùng điểm → trước đây best là 5 bản sao
+  //   cùng 1 ngày (vd 丁丑×5) → AI/daily-briefing trích "ngày tốt: 3/1, 4/3, 3/5" như cơ hội riêng.
+  const dedup = (arr, n) => { const seen = new Set(); const out = []; for (const d of arr) { if (d.ganZhi && !seen.has(d.ganZhi)) { seen.add(d.ganZhi); out.push(d); } if (out.length >= n) break; } return out; };
   return {
     year, dayun, liunian: ln, days, monthSummary,
-    best: sorted.slice(0, 12),
-    worst: sorted.slice(-12).reverse(),
+    best: dedup(sorted, 12),
+    worst: dedup([...sorted].reverse(), 12),
     stats: {
       total: days.length,
       cat: days.filter((x) => x.rating === 'Cát').length,

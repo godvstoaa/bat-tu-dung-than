@@ -16,6 +16,7 @@ import { computePattern } from './pattern.js';
 import { synthesize } from './synthesis.js';
 import { analyzeLiuqin } from './liuqin.js';
 import { buildRemedy } from './remedy.js';
+import { scoreLiunianYear } from './liunian-pro.js'; // [cycle 44] dùng chung score với analyzeLiunianDeep → không mâu thuẫn verdict
 export { synthesize };
 
 export { tenGod, changSheng };
@@ -323,10 +324,16 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
 export function computeDaYun(year, month, day, hour, minute, gender, yong) {
   const solar = Solar.fromYmdHms(year, month, day, hour, minute, 0);
   const ec = solar.getLunar().getEightChar();
-  const yun = ec.getYun(gender === 'nam' ? 1 : 0);
+  // Quy ước lunar-javascript getYun: 1 = nam (dương), 0 = nữ (âm).
+  // Validate rõ ràng — mọi giá trị lạ (typo, null...) fallback về 0 (nữ) để không ném.
+  const g = (gender === 'nam') ? 1 : (gender === 'nữ' || gender === 'nu') ? 0 : 0;
+  const yun = ec.getYun(g);
   const list = yun.getDaYun();
-  const favSet = new Set([yong.primary, yong.secondary].filter(Boolean));
-  const avoidSet = new Set(yong.avoid);
+  // [cycle 47 sửa C7] chuẩn hoá khung Dụng sang 用/喜/忌/仇 (giống scoreLiunianYear) → 大运 & 流年
+  //   nhất quán về "hành có lợi". Trước đây dùng secondary/avoid (khung khác) → dayun & liunian
+  //   chênh nhau cho lá số secondary≠xi.
+  const favSet = new Set([yong.primary, yong.xi].filter(Boolean));
+  const avoidSet = new Set([yong.ji, yong.chou].filter(Boolean));
   const dGan = ec.getDayGan();
   const out = [];
   for (let i = 1; i < list.length && i <= 8; i++) {
@@ -359,11 +366,11 @@ export function computeDaYun(year, month, day, hour, minute, gender, yong) {
 export function computeLiuNian(year, month, day, hour, minute, gender, yong, refYear) {
   const solar = Solar.fromYmdHms(year, month, day, hour, minute, 0);
   const ec = solar.getLunar().getEightChar();
-  const yun = ec.getYun(gender === 'nam' ? 1 : 0);
+  // Validate gender (xem computeDaYun). Fallback 0 (nữ) cho giá trị lạ.
+  const g = (gender === 'nam') ? 1 : (gender === 'nữ' || gender === 'nu') ? 0 : 0;
+  const yun = ec.getYun(g);
   const dayunList = yun.getDaYun();
   const dGan = ec.getDayGan();
-  const favSet = new Set([yong.primary, yong.secondary].filter(Boolean));
-  const avoidSet = new Set(yong.avoid);
   const cur = refYear || new Date().getFullYear();
 
   // Tìm đại vận đang hành (startAge <= tuổi hiện tại)
@@ -384,17 +391,12 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
     if (!gz) continue;
     const gan = gz[0], zhi = gz[1];
     const ganWx = GAN[gan].wx, zhiWx = ZHI[zhi].wx;
-    let score = 0;
-    if (favSet.has(ganWx)) score += 2;
-    if (avoidSet.has(ganWx)) score -= 2;
-    if (favSet.has(zhiWx)) score += 1;
-    if (avoidSet.has(zhiWx)) score -= 1;
-    let rating;
-    if (score >= 2) rating = 'Cát';
-    else if (score >= 1) rating = 'Hơi thuận';
-    else if (score <= -2) rating = 'Hung';
-    else if (score <= -1) rating = 'Hơi nghịch';
-    else rating = 'Bình hòa';
+    // [cycle 44] Dùng scoreLiunianYear (chung với analyzeLiunianDeep) → thẻ "Lưu Niên"
+    //   nhất quán với brief "Luận vận năm". Trước đây chỉ chấm ngũ hành → 2026 báo "Cát"
+    //   trong khi deep (có Thương Quan −16 + Thái tuế) báo "Hơi kỵ" → mâu thuẫn.
+    const { score, rating } = scoreLiunianYear({
+      dayGan: dGan, dayZhi: ec.getDayZhi(), yearBirthZhi: ec.getYearZhi(), yong, yGan: gan, yZhi: zhi,
+    });
     const lnYear = ln.getYear();
     out.push({ ganZhi: gz, gan, zhi, ganWx, zhiWx,
       year: lnYear, age: ln.getAge(),

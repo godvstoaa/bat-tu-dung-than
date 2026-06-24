@@ -1,0 +1,679 @@
+// ============================================================================
+//  解梦 (GIẢI MỘNG) — 周公解梦 (Chu Công Giải Mộng)
+//  Hệ thống giải mộng kinh điển của văn hoá Hoa, tương truyền do 周公 (Chu Công,
+//  Công tước nước Chu) soạn. Người dùng miêu tả giấc mơ → khớp từ khoá Hán/Việt
+//  → trả về luận giải theo truyền thống.
+//
+//  Phương pháp:
+//    1. Người dùng nhập miêu tả mơ (tiếng Việt hoặc Hán).
+//    2. Bỏ dấu + lowercase + so khớp nhiều từ khoá cùng lúc.
+//    3. Mỗi từ khoá có: tone (cat/hung/neutral) + nghĩa Việt + lời khuyên.
+//    4. Trả về TẤT CẢ từ khoá khớp, xếp hạng theo mức độ liên quan.
+//    5. Bổ sung 10 "common dream patterns" — luận tổng hợp cho các giấc mơ phổ biến.
+//
+//  Nguồn: 周公解梦 (Dreams of Zhou) — tập hợp dân gian Hán, đây là module tham
+//  khảo / giải trí — KHÔNG thay bát tự / tử vi. Trong văn hoá dân gian, mộng
+//  thường được xem là điềm báo hoặc phản chiếu tâm trạng/thân tâm.
+// ============================================================================
+// (Không import — module độc lập, không phụ thuộc constants/chart.)
+
+// ---------------------------------------------------------------------------
+// BỎ DẤU tiếng Việt + lowercase + chuẩn hoá để so khớp từ khoá.
+// Ví dụ "Răng gãy" → "rang gay", "Răng" → "rang".
+// Hỗ trợ cả input Hán (giữ nguyên) và input Việt (bỏ dấu).
+// ---------------------------------------------------------------------------
+const VIET_DIACRITIC_MAP = {
+  a: 'áàảãạăắằẳẵặâấầẩẫậ',
+  A: 'ÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬ',
+  d: 'đ', D: 'Đ',
+  e: 'éèẻẽẹêếềểễệ',
+  E: 'ÉÈẺẼẸÊẾỀỂỄỆ',
+  i: 'íìỉĩị', I: 'ÍÌỈĨỊ',
+  o: 'óòỏõọôốồổỗộơớờởỡợ',
+  O: 'ÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢ',
+  u: 'úùủũụưứừửữự',
+  U: 'ÚÙỦŨỤƯỨỪỬỮỰ',
+  y: 'ýỳỷỹỵ', Y: 'ÝỲỶỸỴ',
+};
+const DIACRITIC_LOOKUP = {};
+for (const [base, diacritics] of Object.entries(VIET_DIACRITIC_MAP)) {
+  for (const ch of diacritics) DIACRITIC_LOOKUP[ch] = base;
+}
+
+export function normalizeViet(str) {
+  if (!str) return '';
+  let out = '';
+  for (const ch of String(str)) {
+    out += DIACRITIC_LOOKUP[ch] ?? ch;
+  }
+  return out.toLowerCase();
+}
+
+// ---------------------------------------------------------------------------
+// TỪ ĐIỂN GIẢI MỘNG — ~100 từ khoá, nhóm theo 7 loại.
+// Mỗi entry: { kw (Hán), vi (Việt), aliases (Việt ko dấu + Hán + biến thể),
+//   tone: 'cat'|'hung'|'neutral', meaning (luận Việt), advice }.
+//
+// aliases chứa đủ các dạng người dùng có thể gõ: "răng","rang", vả cả Hán.
+// Khi search ta normalizeViet cả query lẫn alias rồi tìm bằng includes /边界.
+// ---------------------------------------------------------------------------
+const DREAM_DICT = [
+  // ===== 动物 ANIMALS =====
+  { kw: '龙', vi: 'Rồng', aliases: ['龙', 'rong', 'rồng'],
+    tone: 'cat',
+    meaning: 'Mộng thấy rồng là điềm đại cát: quý nhân phù trợ, sự nghiệp thăng tiến, quyền thế tăng. Rồng là tượng đế vương, phúc lộc lớn.',
+    advice: 'Nắm bắt cơ hội lớn, mạnh dạn tiến lên, sự nghiệp sắp bứt phá.' },
+  { kw: '蛇', vi: 'Rắn', aliases: ['蛇', 'ran', 'rắn'],
+    tone: 'neutral',
+    meaning: 'Rắn trong mộng thường liên quan tài lộc (tiểu nhân hoặc lừa đảo). Có thể báo có tiền nhưng kèm thị phi, hoặc vấn đề tình cảm ngầm.',
+    advice: 'Cẩn thận tiểu nhân và lừa đảo về tiền bạc, giữ khẩu đức.' },
+  { kw: '狗', vi: 'Chó', aliases: ['狗', 'cho', 'chó', 'chória'],
+    tone: 'neutral',
+    meaning: 'Chó tượng trưng lòng trung thành, bạn bè. Mộng thấy chó là có bạn tốt giúp đỡ, hoặc có người đang nghĩ tốt về mình. Chó cắn thì đề phòng kẻ oán.',
+    advice: 'Trân trọng bạn bè chân thành, đề phòng người oán trách nếu chó cắn.' },
+  { kw: '猫', vi: 'Mèo', aliases: ['猫', 'meo', 'mèo'],
+    tone: 'neutral',
+    meaning: 'Mèo thường liên quan nữ giới, linh cảm. Đen mèo báo điềm tin thần bí, mèo trắng báo may mắn nhỏ, mèo cào thì đề phòng thị phi với phụ nữ.',
+    advice: 'Để ý linh cảm, cẩn thận thị phi với người khác giới.' },
+  { kw: '鱼', vi: 'Cá', aliases: ['鱼', 'ca', 'cá'],
+    tone: 'cat',
+    meaning: 'Cá (鱼) đồng âm 余 (dư) — mộng cá là điềm "niên niên hữu dư", tài lộc dồi dào, sung túc. Cá chép hóa rồng là thi cử đỗ đạt.',
+    advice: 'Tài lộc sắp đến, nên tích luỹ, cơ hội thăng tiến / thi cử tốt.' },
+  { kw: '鸟', vi: 'Chim', aliases: ['鸟', 'chim', 'chimchóc'],
+    tone: 'cat',
+    meaning: 'Chim báo tin vui, tin lành sắp đến. Chim bay tự do là tự do tinh thần, chim đậu trong nhà là khách quý đến.',
+    advice: 'Đón tin vui, mở lòng với cơ hội giao thiệp mới.' },
+  { kw: '虎', vi: 'Hổ', aliases: ['虎', 'ho', 'hổ', 'cop', 'cop'],
+    tone: 'hung',
+    meaning: 'Hổ là mãnh thú, mộng thấy hổ báo có áp lực mạnh hoặc kẻ mạnh đe doạ. Cũng có thể là chính mình được quyền lực, nhưng cần chế ngự.',
+    advice: 'Đề phòng áp lực / đối thủ mạnh, giữ bình tĩnh không đối đầu trực tiếp.' },
+  { kw: '马', vi: 'Ngựa', aliases: ['马', 'ngua', 'ngựa'],
+    tone: 'cat',
+    meaning: 'Ngựa tượng trưng sự nghiệp, mã đáo thành công. Cưỡi ngựa chạy là thăng tiến, tài lộc đến nhanh. Ngựa trắng là quý nhân.',
+    advice: 'Sự nghiệp tiến nhanh, nên cất bước hành động, đừng chần chừ.' },
+  { kw: '猪', vi: 'Lợn/Heo', aliases: ['猪', 'lon', 'lợn', 'heo'],
+    tone: 'cat',
+    meaning: 'Lợn tượng trưng tài lộc, phúc khí. Mộng thấy lợn béo là tài lộc đến, gia đạo sung túc.',
+    advice: 'Tài lộc dồi dào, nên biết đủ và tích đức.' },
+  { kw: '鸡', vi: 'Gà', aliases: ['鸡', 'ga', 'gà'],
+    tone: 'neutral',
+    meaning: 'Gà gáy báo bình minh, tin mới. Mộng gà là tin tức sắp đến, có thể là việc công việc. Gà đẻ trứng là tài lộc nhỏ.',
+    advice: 'Sắp có tin mới về công việc, để ý cơ hội nhỏ nhưng đều đặn.' },
+  { kw: '蜘蛛', vi: 'Nhện', aliases: ['蜘蛛', 'nhen', 'nhện'],
+    tone: 'neutral',
+    meaning: 'Nhện giăng lưới thường báo tin tài lộc nhỏ ("nhện descending = tài đến") hoặc kẻ giăng bẫy. Tùy hoàn cảnh: nhện sa xuống là tiền đến, nhện giăng lưới là cẩn thận bẫy.',
+    advice: 'Có thể có tài lộc nhỏ, nhưng cũng đề phòng bẫy / tiểu nhân giăng kế.' },
+  { kw: '蝴蝶', vi: 'Bướm', aliases: ['蝴蝶', 'buom', 'bướm'],
+    tone: 'neutral',
+    meaning: 'Bướm tượng trưng tình yêu, hồn điên đảo. Mộng bướm (Trang Chu mộng điệp) có thể hỏi: mình là người mơ hay người trong mơ. Báo tình cảm lãng mạn hoặcảo tưởng.',
+    advice: 'Phân biệt thực – mơ trong tình cảm, đừng quá lụy ảo tưởng.' },
+  { kw: '牛', vi: 'Trâu/Bò', aliases: ['牛', 'trau', 'trâu', 'bo', 'bò'],
+    tone: 'neutral',
+    meaning: 'Trâu bò là cần cù, sức lao động. Mộng trâu kéo cày là vất vả nhưng sẽ có quả, trâu húc thì đề phòng xung đột.',
+    advice: 'Kiên nhẫn chăm chỉ sẽ có quả, tránh cứng đầu xung đột.' },
+  { kw: '鼠', vi: 'Chuột', aliases: ['鼠', 'chuot', 'chuột'],
+    tone: 'hung',
+    meaning: 'Chuột báo tiểu nhân, hao tài, hoặc lo âu. Nhiều chuột là thị phi, mất mát nhỏ.',
+    advice: 'Đề phòng tiểu nhân và hao tiền, giữ tài sản cẩn thận.' },
+  { kw: '兔', vi: 'Thỏ', aliases: ['兔', 'tho', 'thỏ', 'thỏ'],
+    tone: 'cat',
+    meaning: 'Thỏ là trường thọ, mềm mại. Mộng thỏ báo điềm lành, sống lâu, tình cảm êm ả.',
+    advice: 'Điềm tĩnh sống, sức khoẻ và tình cảm đều tốt.' },
+  { kw: '羊', vi: 'Dê/Cừu', aliases: ['羊', 'de', 'dê', 'cuu', 'cừu'],
+    tone: 'cat',
+    meaning: 'Dê (羊) đồng âm 祥 (tường) — điềm cát tường, bình an. Mộng dê là bình an, tài lộc êm ả.',
+    advice: 'Bình an, hanh thông, cứ thuần hậu mà sống.' },
+
+  // ===== 自然 NATURE =====
+  { kw: '水', vi: 'Nước', aliases: ['水', 'nuoc', 'nước'],
+    tone: 'neutral',
+    meaning: 'Nước tượng trưng tài (phong thuỷ: sơn chủ nhân丁,水 chủ tài). Nước trong chảy là tài đến, nước đục / lũ là tai hoạ, rơi xuống nước là trở ngại.',
+    advice: 'Nước trong = tài lộc đến; nước đục/lũ = cẩn thận tài sản và an toàn.' },
+  { kw: '火', vi: 'Lửa', aliases: ['火', 'lua', 'lửa', 'chay', 'hoả hoạn'],
+    tone: 'hung',
+    meaning: 'Lửa báo nóng nảy, xung đột, hoặc tai nạn. Đốt cháy là hao tài. Nhưng lửa bếp ấm là gia đạo êm. Cháy nhà thường báo thay đổi lớn.',
+    advice: 'Kiềm chế nóng giận, cẩn thận hao tài và an toàn hoả hoạn.' },
+  { kw: '太阳', vi: 'Mặt trời', aliases: ['太阳', 'mat troi', 'mặt trời'],
+    tone: 'cat',
+    meaning: 'Mặt trời là dương khí, sức mạnh, sự nghiệp sáng. Mộng mặt trời mọc là khởi đầu tốt, sự nghiệp hanh thông.',
+    advice: 'Dương khí lên, sự nghiệp sáng, mạnh dạn tiến hành.' },
+  { kw: '月亮', vi: 'Mặt trăng', aliases: ['月亮', 'mat trang', 'mặt trăng', 'nguyet'],
+    tone: 'neutral',
+    meaning: 'Mặt trăng là âm, tình cảm, nữ giới. Trăng tròn là viên mãn, trăng khuyết là thiếu / trắc trở tình cảm.',
+    advice: 'Đề phòng tình cảm âm thầm, tìm sự viên mãn thay vì thiếu thốn.' },
+  { kw: '星星', vi: 'Sao', aliases: ['星星', 'sao', 'ngân hà'],
+    tone: 'cat',
+    meaning: 'Sao là hi vọng, ước nguyện. Mộng sao sa là biến cố lớn (tốt hoặc xấu tùy ngữ cảnh), nhiều sao sáng là vận may.',
+    advice: 'Giữ hy vọng, để ý cơ hội đặc biệt sắp đến.' },
+  { kw: '雷', vi: 'Sấm', aliases: ['雷', 'sam', 'sấm', 'set', 'sét'],
+    tone: 'hung',
+    meaning: 'Sấm sét là cảnh báo mạnh từ trời, báo biến cố bất ngờ, đôi khi là tỉnh ngộ. Đề phòng cú sốc hoặc quyết định bất ngờ.',
+    advice: 'Chuẩn bị cho biến cố bất ngờ, giữ bình tĩnh trước cú sốc.' },
+  { kw: '雨', vi: 'Mưa', aliases: ['雨', 'mua', 'mưa'],
+    tone: 'neutral',
+    meaning: 'Mưa là tẩy rửa, cảm xúc, đôi khi tài (雨露). Mưa nhỏ êm là bình an, mưa bão là thử thách cảm xúc.',
+    advice: 'Để cảm xúc được giải phóng, vượt qua thử thách bằng kiên nhẫn.' },
+  { kw: '雪', vi: 'Tuyết', aliases: ['雪', 'tuyet', 'tuyết'],
+    tone: 'neutral',
+    meaning: 'Tuyết là thanh khiết, tĩnh lặng, hoặc lạnh lẽo cô đơn. Mộng tuyết rơi trắng là tĩnh, nhưng cô đơn; tan tuyết là khó khăn sắp qua.',
+    advice: 'Tận hưởng sự tĩnh tại, nhưng đừng để cô đơn kéo dài.' },
+  { kw: '风', vi: 'Gió', aliases: ['风', 'gio', 'gió'],
+    tone: 'neutral',
+    meaning: 'Gió là thay đổi, vận may đến đi. Gió nhẹ là thay đổi tốt, gió bão là biến động lớn ngoài ý muốn.',
+    advice: 'Thích ứng với thay đổi, gió mạnh thì tìm nơi trú ẩn tạm.' },
+  { kw: '山', vi: 'Núi', aliases: ['山', 'nui', 'núi'],
+    tone: 'neutral',
+    meaning: 'Núi là vị thế (sơn chủ nhân đinh), ổn định, trở ngại. Leo núi là vươn lên, núi chắn là trở ngại cần vượt.',
+    advice: 'Vượt qua trở ngại sẽ lên cao, kiên trì leo dốc.' },
+  { kw: '海', vi: 'Biển', aliases: ['海', 'bien', 'biển', 'dai duong'],
+    tone: 'neutral',
+    meaning: 'Biển là bao la, tiềm năng vô hạn, cũng là nguy hiểm. Biển lặng là cơ hội lớn, biển động là rủi ro.',
+    advice: 'Cơ hội lớn nhưng rủi ro cao, cần kỹ năng và bình tĩnh.' },
+  { kw: '树', vi: 'Cây', aliases: ['树', 'cay', 'cây', 'rừng'],
+    tone: 'cat',
+    meaning: 'Cây là sinh khí, sinh trưởng, gia đạo. Cây xanh tốt là phúc lộc, gia đạo hưng; cây khô là suy, hao mòn.',
+    advice: 'Nuôi dưỡng sinh khí, chăm lo gia đạo và sức khoẻ.' },
+
+  // ===== 人物 PEOPLE =====
+  { kw: '陌生人', vi: 'Người lạ', aliases: ['陌生人', 'nguoi la', 'người lạ'],
+    tone: 'neutral',
+    meaning: 'Người lạ trong mộng thường là khía cạnh chưa nhận thức của bản thân, hoặc cơ hội / nguy cơ mới chưa rõ.',
+    advice: 'Quan sát khía cạnh mới trong mình, cẩn trọng với cái mới chưa rõ.' },
+  { kw: '老人', vi: 'Người già', aliases: ['老人', 'nguoi gia', 'người già', 'cu'],
+    tone: 'cat',
+    meaning: 'Người già là trí tuệ, kinh nghiệm, quý nhân. Mộng thấy cụ già thường là được khuyên bảo, hoặc cần lắng nghe trực giác.',
+    advice: 'Lắng nghe người lớn tuổi / trực giác của chính mình.' },
+  { kw: '小孩', vi: 'Trẻ em', aliases: ['小孩', 'tre em', 'trẻ em', 'tre con'],
+    tone: 'cat',
+    meaning: 'Trẻ em là sự mới mẻ, khởi đầu, phần trẻ con trong ta. Báo niềm vui, dự án mới, hoặc cần chăm sóc nội tâm.',
+    advice: 'Ôm ước vọng mới, chăm sóc phần trong trẻo của bản thân.' },
+  { kw: '死人', vi: 'Người chết', aliases: ['死人', 'nguoi chet', 'người chết', 'chết', 'ma'],
+    tone: 'hung',
+    meaning: 'Người chết trong mộng thường là kết thúc một giai đoạn, không hẳn điềm dữ. Người chết biết ơi dậy là vận thay đổi lớn; người sống chết trong mơ thường báo người đó sống lâu (phản mộng).',
+    advice: 'Kết thúc cái cũ để đón cái mới, không hẳn xấu — bình tĩnh đón thay đổi.' },
+  { kw: '结婚', vi: 'Kết hôn/Cưới', aliases: ['结婚', 'ket hon', 'kết hôn', 'cuoi', 'cưới'],
+    tone: 'cat',
+    meaning: 'Cưới hỏi trong mộng (nếu độc thân) báo duyên đến; (nếu đã có gia đình) báo sự thay đổi hoặc gắn kết mới. Cưới người lạ là hợp tác mới.',
+    advice: 'Đón duyên / cơ hội hợp tác mới, sẵn sàng cam kết.' },
+  { kw: '打架', vi: 'Đánh nhau', aliases: ['打架', 'danh nhau', 'đánh nhau', 'xung dot'],
+    tone: 'hung',
+    meaning: 'Đánh nhau trong mơ phản ánh xung đột nội tâm hoặc với người khác đang kìm nén. Cần giải quyết mâu thuẫn.',
+    advice: 'Giải quyết xung đột đang kìm nén, đừng để dồn nén thêm.' },
+  { kw: '哭', vi: 'Khóc', aliases: ['哭', 'khoc', 'khóc'],
+    tone: 'cat',
+    meaning: 'Khóc trong mơ thường là giải phóng cảm xúc — điềm "phản", khóc thì ngoài đời sắp vui. Cũng báo dồn nút được giải toả.',
+    advice: 'Để cảm xúc được giải phóng, sau buồn sẽ nhẹ và vui.' },
+  { kw: '笑', vi: 'Cười', aliases: ['笑', 'cuoi', 'cười'],
+    tone: 'hung',
+    meaning: 'Cười trong mơ có thể là "phản mộng" — cười thì ngoài đời cẩn thận buồn, hoặc cười gượng kìm nén.',
+    advice: 'Đừng kìm nén cảm xúc thật, cẩn thận thị phi sau khi cười梦中.' },
+  { kw: '死人复活', vi: 'Người chết sống lại', aliases: ['死人复活', 'chet song lai', 'sống lại'],
+    tone: 'hung',
+    meaning: 'Người chết sống lại báo chuyện cũ quay lại, hoặc cơ hội tưởng chừng mất được hồi sinh. Cần đối diện quá khứ.',
+    advice: 'Đối diện chuyện cũ đang quay lại, có cơ hội thứ hai nếu khéo xử.' },
+
+  // ===== 身体 BODY =====
+  { kw: '牙齿', vi: 'Răng', aliases: ['牙齿', 'rang', 'răng', 'nha'],
+    tone: 'hung',
+    meaning: 'Mộng răng gãy / rụng là một trong những mộng phổ biến nhất, thường báo người thân có hoạ (gia nhân hữu tai), hoặc lo lắng về ngoại hình / quyền lực. Rụng răng không đau / không máu là người thân xa có sự.',
+    advice: 'Quan tâm sức khoẻ người thân (đặc biệt lớn tuổi), cẩn thận khẩu thiệt.' },
+  { kw: '头发', vi: 'Tóc', aliases: ['头发', 'toc', 'tóc', 'mao'],
+    tone: 'neutral',
+    meaning: 'Tóc là phiền não (三千烦恼丝). Rụng tóc là giảm phiền, hoặc lo âu sức khoẻ; tóc dài xoã là tự do; tóc bạc là trưởng thành.',
+    advice: 'Giảm phiền não, để mặc cảm xúc được tự do.' },
+  { kw: '血', vi: 'Máu', aliases: ['血', 'mau', 'máu', 'huyết'],
+    tone: 'hung',
+    meaning: 'Máu trong mộng báo vận tài thay đổi (thường là "phản" — thấy máu thì ra tài), hoặc xung đột/thể lực. Chảy máu tay chân cẩn thận hao tiền.',
+    advice: 'Đề phòng hao tài, cẩn thận an toàn thân thể.' },
+  { kw: '怀孕', vi: 'Có thai', aliases: ['怀孕', 'co thai', 'có thai', 'mang thai'],
+    tone: 'cat',
+    meaning: 'Có thai trong mộng (nếu không thật) báo dự án / ý tưởng mới đang nhen nhóm, hoặc tài lộc sắp sinh. Sinh con trai là dương sự, con gái là tài / duyên.',
+    advice: 'Nuôi dưỡng dự án / ý tưởng mới, cơ hội sắp "trổ".' },
+  { kw: '生病', vi: 'Ốm', aliases: ['生病', 'om', 'ốm', 'benh', 'bệnh'],
+    tone: 'hung',
+    meaning: 'Ốm đau trong mơ thường "phản" — mộng ốm thì ngoài đời khoẻ, hoặc cần nghỉ ngơi. Đề phòng sức khoẻ, đừng quá sức.',
+    advice: 'Nghỉ ngơi, đừng quá sức, kiểm tra sức khoẻ định kỳ.' },
+  { kw: '死亡', vi: 'Chết (mình)', aliases: ['死亡', 'chet', 'chết bản thân'],
+    tone: 'cat',
+    meaning: 'Mộng thấy mình chết thường là điềm "phản" cát — chết rồi tái sinh, báo giai đoạn cũ kết thúc, vận mới bắt đầu, tuổi thọ tăng.',
+    advice: 'Kết thúc cái cũ để tái sinh, vận mới sắp đến.' },
+
+  // ===== 物品 OBJECTS =====
+  { kw: '钱', vi: 'Tiền', aliases: ['钱', 'tien', 'tiền', 'kim tien'],
+    tone: 'cat',
+    meaning: 'Tiền trong mộng là vấn đề tài chính. Nhặt được tiền là tài đến, mất tiền là hao tài (hoặc "phản" — mất tiền mơ thì ra tiền).',
+    advice: 'Cân nhắc tài chính, cơ hội tài lộc hoặc cảnh báo hao tiền.' },
+  { kw: '房子', vi: 'Nhà', aliases: ['房子', 'nha', 'nhà', 'phòng'],
+    tone: 'neutral',
+    meaning: 'Nhà là bản thân / gia đạo. Nhà mới là thay đổi lớn, nhà cũ nát là cần tu bổ nội tâm, nhà lớn là vận lên.',
+    advice: 'Chăm lo tổ ấm / nội tâm, sẵn sàng cho thay đổi.' },
+  { kw: '车', vi: 'Xe', aliases: ['车', 'xe', 'o to', 'ô tô'],
+    tone: 'neutral',
+    meaning: 'Xe tượng trưng tiến trình cuộc đời. Lái xe trơn là chủ động cuộc đời, xe hư / đâm là trở ngại / mất kiểm soát.',
+    advice: 'Nắm lại tay lái cuộc đời, cẩn thận mất kiểm soát.' },
+  { kw: '衣服', vi: 'Quần áo', aliases: ['衣服', 'quan ao', 'quần áo', 'y phuc'],
+    tone: 'neutral',
+    meaning: 'Quần áo là bề ngoài, danh tiếng. Đổi đồ mới là thay đổi hình tượng / vận mới, đồ rách là danh tiếng hao.',
+    advice: 'Chăm lo hình tượng và danh tiếng, đón vận mới.' },
+  { kw: '鞋', vi: 'Giày', aliases: ['鞋', 'giay', 'giày', 'lâu'],
+    tone: 'neutral',
+    meaning: 'Giày là đôi đường, phương hướng cuộc đời. Mất giày là lạc hướng, đổi giày mới là thay đổi con đường.',
+    advice: 'Rà soát hướng đi cuộc đời, không nên lạc lối.' },
+  { kw: '镜子', vi: 'Gương', aliases: ['镜子', 'guong', 'gương', 'kính'],
+    tone: 'neutral',
+    meaning: 'Gương phản chiếu bản thân. Nhìn gương thấy mặt lạ là chưa nhận ra mình, gương vỡ là vận thay đổi đột ngột / tình duyên đổ.',
+    advice: 'Tự soi lại bản thân, cẩn thận vận tình duyên thay đổi.' },
+  { kw: '刀', vi: 'Dao', aliases: ['刀', 'dao', 'kiem', 'vũ khí'],
+    tone: 'hung',
+    meaning: 'Dao kiếm là sát khí, xung đột. Cầm dao chém là tức giận, bị đâm là tổn thương hoặc phản bội.',
+    advice: 'Kiềm chế giận dữ, đề phòng bị phản bội / tổn thương.' },
+  { kw: '钟', vi: 'Đồng hồ', aliases: ['钟', 'dong ho', 'đồng hồ', 'chuông'],
+    tone: 'hung',
+    meaning: 'Đồng hồ / chuông báo thời gian, thường là nhắc nhở tuổi thọ hoặc kết thúc một giai đoạn. Chuông đổ là biến cố.',
+    advice: 'Trân trọng thời gian, để ý dấu hiệu kết thúc/kết toán.' },
+
+  // ===== 活动 ACTIVITIES =====
+  { kw: '飞', vi: 'Bay', aliases: ['飞', 'bay', 'bay tren troi'],
+    tone: 'neutral',
+    meaning: 'Bay là ước muốn tự do / trốn tránh. Bay cao tự do là khát vọng vươn lên, bay rồi rơi là sợ thất bại, bay khó khăn là áp lực nặng.',
+    advice: 'Khát vọng tự do — cân bằng giữa vươn lên và đối diện thực tại.' },
+  { kw: '掉牙', vi: 'Răng rụng', aliases: ['掉牙', 'rang rung', 'răng rụng', 'răng gãy'],
+    tone: 'hung',
+    meaning: 'Mộng răng rụng/gãy: (i) 家人有灾 — người thân có hoạ, đặc biệt người lớn tuổi; (ii) lo âu ngoại hình / uy tín; (iii) "phản" — đổi vận. Đây là một trong những mộng phổ biến và được ghi chép nhiều nhất trong Chu Công giải mộng.',
+    advice: 'Quan tâm người thân lớn tuổi, cẩn thận khẩu thiệt, đề phòng hao tiền.' },
+  { kw: '考试', vi: 'Thi cử', aliases: ['考试', 'thi', 'thi cu', 'thi cử', 'kiem tra'],
+    tone: 'hung',
+    meaning: 'Thi cử trong mộng (dù đã lớn) báo đang bị đánh giá / thử thách trong đời thực, lo âu thành tích, sợ không đạt.',
+    advice: 'Chuẩn bị cho tình huống bị đánh giá, đừng quá lo âu kết quả.' },
+  { kw: '迷路', vi: 'Lạc đường', aliases: ['迷路', 'lac duong', 'lạc đường', 'lac lo'],
+    tone: 'hung',
+    meaning: 'Lạc đường báo mất phương hướng cuộc đời, không biết quyết định gì tiếp theo. Cần dừng và định vị lại.',
+    advice: 'Dừng lại định vị mục tiêu, tìm người hướng dẫn / tĩnh tâm.' },
+  { kw: '被追', vi: 'Bị rượt đuổi', aliases: ['被追', 'bi ruot', 'bị rượt', 'bi duoi', 'trốn chạy'],
+    tone: 'hung',
+    meaning: 'Bị rượt đuổi là áp lực / nỗi sợ trốn tránh trong đời thực. Người đuổi thường là vấn đề mình không dám đối diện.',
+    advice: 'Quay lại đối diện vấn đề đang trốn, áp lực sẽ giảm.' },
+  { kw: '找东西', vi: 'Tìm đồ', aliases: ['找东西', 'tim do', 'tìm đồ', 'tim kiem'],
+    tone: 'hung',
+    meaning: 'Tìm đồ mất báo đang tìm kiếm điều gì đó quan trọng trong đời (mục đích, tình, bản thân). Không tìm thấy là chưa đủ rõ.',
+    advice: 'Xác định rõ mình đang thực sự tìm kiếm điều gì.' },
+  { kw: '坠落', vi: 'Rơi/Đổ', aliases: ['坠落', 'roi', 'rơi', 'roi xuong', 'té'],
+    tone: 'hung',
+    meaning: 'Rơi từ trên cao xuống (rồi giật mình tỉnh) là hiện tượnghypnagogic phổ biến, báo mất kiểm soát / lo âu thất bại trong đời thực.',
+    advice: 'Tìm lại cảm giác kiểm soát, đừng quá áp lực cao.' },
+  { kw: '游泳', vi: 'Bơi', aliases: ['游泳', 'boi', 'bơi'],
+    tone: 'neutral',
+    meaning: 'Bơi trong nước là đối diện cảm xúc / tài chính. Bơi dễ là xử lý tốt, bơi挣扎 là đang vật lộn.',
+    advice: 'Đối diện cảm xúc / tài chính một cách bình tĩnh.' },
+
+  // ===== 食物 FOOD =====
+  { kw: '吃饭', vi: 'Ăn cơm', aliases: ['吃饭', 'an com', 'ăn cơm', 'ăn'],
+    tone: 'cat',
+    meaning: 'Ăn uống là sinh khí, tài lộc. Ăn ngon là phúc lộc, ăn cùng nhiều người là quý nhân, ăn một mình là cô đơn.',
+    advice: 'Đón tài lộc / phúc khí, kết nối giao thiệp.' },
+  { kw: '喝酒', vi: 'Uống rượu', aliases: ['喝酒', 'uong ruou', 'uống rượu', 'bia'],
+    tone: 'neutral',
+    meaning: 'Uống rượu là giao thiệp, đôi khi trốn tránh thực tại. Say là mất kiểm soát / hao tiền.',
+    advice: 'Giao thiệp có chừng mực, đừng lạm dụng để trốn tránh.' },
+  { kw: '水果', vi: 'Trái cây', aliases: ['水果', 'trai cay', 'trái cây', 'hoa quả'],
+    tone: 'cat',
+    meaning: 'Trái cây là quả, thành quả. Ăn trái ngọt là sắp thu thành quả, hái trái là thu hoạch công sức.',
+    advice: 'Thành quả sắp đến, tận hưởng quả của công sức.' },
+  { kw: '米饭', vi: 'Cơm', aliases: ['米饭', 'com', 'cơm', 'gao'],
+    tone: 'cat',
+    meaning: 'Cơm gạo là lương thực cốt lõi, sinh kế. Cơm đầy bát là tài lộc đủ đầy, no ấm.',
+    advice: 'Sinh kế ổn định, tài lộc đủ dùng, nên biết đủ.' },
+  { kw: '糖', vi: 'Kẹo/Đường', aliases: ['糖', 'keo', 'kẹo', 'duong', 'ngọt'],
+    tone: 'cat',
+    meaning: 'Kẹo ngọt là niềm vui, tình cảm ngọt ngào. Mộng ăn kẹo là vui vẻ / tình duyên đẹp.',
+    advice: 'Đón niềm vui nhỏ, tình cảm đang ngọt ngào.' },
+
+  // ===== 动物 ANIMALS (bổ sung) =====
+  { kw: '猴', vi: 'Khỉ', aliases: ['猴', 'khi', 'khỉ'],
+    tone: 'neutral',
+    meaning: 'Khỉ tượng tránh nhanh nhẹn, cũng là tiểu xảo. Mộng khỉ báo có người quỷ quyệt hoặc mình cần linh hoạt.',
+    advice: 'Linh hoạt xử sự, nhưng đề phòng kẻ xảo trá.' },
+  { kw: '鸟蛋', vi: 'Trứng chim', aliases: ['鸟蛋', 'trung', 'trứng', 'ung'],
+    tone: 'cat',
+    meaning: 'Trứng là khởi đầu, tiềm năng. Mộng trứng là cơ hội / ý tưởng đang ấpủ, cần nuôi dưỡng.',
+    advice: 'Nuôi dưỡng ý tưởng/cơ hội đang chớm nở.' },
+  { kw: '青蛙', vi: 'Ếch', aliases: ['青蛙', 'ech', 'ếch', 'nhái'],
+    tone: 'neutral',
+    meaning: 'Ếch liên quan nước và sự chuyển đổi (nòng nọc → ếch). Mộng ếch báo biến đổi nhỏ, hoặc cất tiếng kêu về điều ấm ức.',
+    advice: 'Sẵn sàng cho biến đổi nhỏ, lên tiếng nếu cần.' },
+  { kw: '蚂蚁', vi: 'Kiến', aliases: ['蚂蚁', 'kien', 'kiến'],
+    tone: 'neutral',
+    meaning: 'Kiến tượng trưng cần cù tập thể, nhỏ nhưng đông. Mộng kiến báo cần kiên trì từng bước, hoặc hao tài lắt nhắt.',
+    advice: 'Kiên trì tích tiểu thành đại, cẩn thận hao tiền lắt nhắt.' },
+  { kw: '狼', vi: 'Sói', aliases: ['狼', 'soi', 'sói'],
+    tone: 'hung',
+    meaning: 'Sói là mãnh thú cô độc, lừa đảo (sói già). Mộng sói báo tiểu nhân nguy hiểm, hoặc lòng tham.',
+    advice: 'Đề phòng kẻ lừa đảo / tiểu nhân nguy hiểm.' },
+  { kw: '乌鸦', vi: 'Quạ', aliases: ['乌鸦', 'qua', 'quạ'],
+    tone: 'hung',
+    meaning: 'Quạ thường bị coi là điềm dữ trong dân gian (quạ kêu báo tang). Nhưng cũng có thể là tin từ nơi xa.',
+    advice: 'Cẩn thận tin dữ từ xa, quan tâm sức khoẻ người thân.' },
+  { kw: '蜜蜂', vi: 'Ong mật', aliases: ['蜜蜂', 'ong', 'ong mat', 'ong mật'],
+    tone: 'cat',
+    meaning: 'Ong mật là cần cù, đoàn kết, ngọt (mật). Mộng ong báo cần cù sẽ có quả ngọt, hoặc tin vui nhờ hợp tác.',
+    advice: 'Cần cù và hợp tác sẽ mang quả ngọt.' },
+
+  // ===== 自然 NATURE (bổ sung) =====
+  { kw: '彩虹', vi: 'Cầu vồng', aliases: ['彩虹', 'cau vong', 'cầu vồng'],
+    tone: 'cat',
+    meaning: 'Cầu vồng là điềm hi vọng, vận mới sau mưa. Mộng cầu vồng báo cơ hội tốt sắp đến sau khó khăn.',
+    advice: 'Hi vọng sau khó khăn, đón cơ hội mới.' },
+  { kw: '地震', vi: 'Động đất', aliases: ['地震', 'dong dat', 'động đất'],
+    tone: 'hung',
+    meaning: 'Động đất báo biến cố lớn làm rung chuyển nền tảng cuộc đời, mất ổn định. Cần đề phòng thay đổi bất ngờ.',
+    advice: 'Chuẩn bị cho biến cố lớn, củng cố nền tảng quan trọng.' },
+  { kw: '花', vi: 'Hoa', aliases: ['花', 'hoa', 'đóa hoa'],
+    tone: 'cat',
+    meaning: 'Hoa là tình duyên, sắc đẹp, thành quả. Hoa nở là duyên đến / sự nghiệp nở, hoa tàn là phai.',
+    advice: 'Đón duyên / thành quả, tận hưởng khi thời nở rộ.' },
+  { kw: '草', vi: 'Cỏ', aliases: ['草', 'co', 'cỏ'],
+    tone: 'neutral',
+    meaning: 'Cỏ là sức sống dẻo dai, khiêm tốn. Mộng cỏ xanh là dẻo dai phục hồi, cỏ khô là suy yếu.',
+    advice: 'Học sự dẻo dai, phục hồi sau khó khăn.' },
+  { kw: '云', vi: 'Mây', aliases: ['云', 'may', 'mây'],
+    tone: 'neutral',
+    meaning: 'Mây là mơ mộng, không chắc chắn. Mây trắng là mơ đẹp, mây đen u ám là ưu tư.',
+    advice: 'Phân biệt mơ mộng và thực tế, đừng quá lơ lửng.' },
+
+  // ===== 人物 PEOPLE (bổ sung) =====
+  { kw: '警察', vi: 'Cảnh sát', aliases: ['警察', 'canh sat', 'cảnh sát', 'cong an'],
+    tone: 'neutral',
+    meaning: 'Cảnh sát tượng trưng quyền uy, lương tâm, quy tắc. Mộng bị cảnh sát đuổi = sợ vi phạm / lỗi lầm; được giúp = được bảo vệ.',
+    advice: 'Rà soát lương tâm và quy tắc đang bị bỏ qua.' },
+  { kw: '医生', vi: 'Bác sĩ', aliases: ['医生', 'bac si', 'bác sĩ', 'y ta'],
+    tone: 'neutral',
+    meaning: 'Bác sĩ là sự chữa lành, lo âu sức khoẻ. Mộng bác sĩ báo cần chăm sóc sức khoẻ hoặc có người giúp chữa lành.',
+    advice: 'Kiểm tra sức khoẻ, tìm sự giúp đỡ chữa lành.' },
+  { kw: '老师', vi: 'Thầy giáo', aliases: ['老师', 'thay', 'thầy', 'giao vien'],
+    tone: 'cat',
+    meaning: 'Thầy cô là sự chỉ đạo, học hỏi. Mộng thầy là đang cần học hỏi / được dẫn dắt, hoặc nhớ lỗi cũ.',
+    advice: 'Khiêm tốn học hỏi, tìm người dẫn dắt.' },
+  { kw: '婴儿', vi: 'Em bé sơ sinh', aliases: ['婴儿', 'em be', 'em bé', 'so sinh'],
+    tone: 'cat',
+    meaning: 'Em bé là sự mới mẻ, dự án mới, phần ngây thơ. Mộng em bé báo khởi đầu mới cần chăm sóc.',
+    advice: 'Nuôi dưỡng khởi đầu mới, dỗ dành phần ngây thơ trong ta.' },
+  { kw: '朋友', vi: 'Bạn bè', aliases: ['朋友', 'ban be', 'bạn bè', 'hoi ban'],
+    tone: 'neutral',
+    meaning: 'Bạn bè phản ánh quan hệ xã hội. Mộng bạn cũ là nhớ / cần khép lại quá khứ; bạn mới là cơ hội giao thiệp.',
+    advice: 'Chăm lo quan hệ bạn bè, khép lại nếu cần.' },
+  { kw: '贼', vi: 'Trộm cắp', aliases: ['贼', 'trom', 'trộm', 'cuop', 'cướp'],
+    tone: 'hung',
+    meaning: 'Trộm cắp trong mộng báo mất mát (tài, danh, tình), hoặc sợ mất thứ quan trọng, hoặc chính mình đang "lấy" điều không phải mình.',
+    advice: 'Đề phòng hao tài / mất mát, rà soát lòng tham.' },
+
+  // ===== 物品 OBJECTS (bổ sung) =====
+  { kw: '钥匙', vi: 'Chìa khoá', aliases: ['钥匙', 'chia khoa', 'chìa khoá', 'chìa'],
+    tone: 'cat',
+    meaning: 'Chìa khoá là giải pháp, cơ hội mở ra. Mộng nhặt chìa khoá = tìm ra đáp án / cơ hội mới.',
+    advice: 'Có giải pháp / cơ hội mở ra, mạnh dạn dùng.' },
+  { kw: '书', vi: 'Sách', aliases: ['书', 'sach', 'sách'],
+    tone: 'cat',
+    meaning: 'Sách là tri thức, sự thật cần đọc. Mộng đọc sách = cần học hỏi; sách cũ là thông tin quá khứ.',
+    advice: 'Đọc thêm, học thêm — có sự thật cần nhận ra.' },
+  { kw: '伞', vi: 'Ô/Dù', aliases: ['伞', 'o', 'ô', 'du', 'dù'],
+    tone: 'neutral',
+    meaning: 'Ô là sự che chở, bảo vệ. Mộng ô hỏng = mất sự bảo vệ; ô mới có người che trở.',
+    advice: 'Tìm sự che chở, đề phòng mất chỗ dựa.' },
+  { kw: '手机', vi: 'Điện thoại', aliases: ['手机', 'dien thoai', 'điện thoại'],
+    tone: 'neutral',
+    meaning: 'Điện thoại là giao tiếp, tin nhắn. Mộng điện thoại hỏng = mất liên lạc / không nói lên điều cần; chuông = tin đến.',
+    advice: 'Rà soát giao tiếp, nói lên điều còn giấu.' },
+  { kw: '戒指', vi: 'Nhẫn', aliases: ['戒指', 'nhan', 'nhẫn'],
+    tone: 'cat',
+    meaning: 'Nhẫn là cam kết tình duyên. Mộng nhẫn = cam kết / đính ước, mất nhẫn = lo vỡ cam kết.',
+    advice: 'Đón cam kết tình duyên, giữ gìn nếu đã có.' },
+  { kw: '船', vi: 'Thuyền/Tàu', aliases: ['船', 'thuyen', 'thuyền', 'tau', 'tàu'],
+    tone: 'neutral',
+    meaning: 'Thuyền là hành trình qua cảm xúc / tài chính. Thuyền êm = vượt qua tốt, thuyền chìm = rủi ro lớn.',
+    advice: 'Điều khiển hành trình tài chính/cảm xúc cẩn thận.' },
+
+  // ===== 活动 ACTIVITIES (bổ sung) =====
+  { kw: '搬家', vi: 'Chuyển nhà', aliases: ['搬家', 'chuyen nha', 'chuyển nhà', 'dọn nha'],
+    tone: 'neutral',
+    meaning: 'Chuyển nhà là thay đổi lớn môi trường sống / trạng thái. Báo giai đoạn mới, đôi khi bất ổn tạm.',
+    advice: 'Sẵn sàng cho thay đổi lớn, củng cố nền tảng mới.' },
+  { kw: '打架输', vi: 'Thua trận', aliases: ['thua', 'thua trận', 'bai', '败'],
+    tone: 'hung',
+    meaning: 'Thua trong mộng báo tự ti, cảm giác yếu thế, sợ không đủ sức. Cần xây lại sự tự tin.',
+    advice: 'Xây lại tự tin, nhìn lại điểm mạnh thực sự.' },
+  { kw: '爬', vi: 'Trèo/Leo', aliases: ['爬', 'treo', 'trèo', 'leo'],
+    tone: 'neutral',
+    meaning: 'Leo trèo là nỗ lực vươn lên. Leo dễ = tiến thuận; leo trượt / sợ = áp lực mục tiêu quá cao.',
+    advice: 'Vươn lên từng bước, điều chỉnh mục tiêu nếu quá cao.' },
+  { kw: '洗澡', vi: 'Tắm rửa', aliases: ['洗澡', 'tam rua', 'tắm rửa', 'tắm'],
+    tone: 'cat',
+    meaning: 'Tắm rửa là thanh tẩy, gột rửa lỗi lầm / cảm xúc nặng. Mộng tắm = cần làm mới, buông bỏ.',
+    advice: 'Thanh tẩy cảm xúc, buông bỏ nặng nề, làm mới bản thân.' },
+
+  // ===== 食物 FOOD (bổ sung) =====
+  { kw: '面条', vi: 'Mì/Miến', aliases: ['面条', 'mi', 'mì', 'mien', 'miến'],
+    tone: 'cat',
+    meaning: 'Mì sợi dài tượng trưng trường thọ (trường thọ diện). Mộng ăn mì = cầu mong sống lâu, bình an.',
+    advice: 'Chúc Mong bình an, sức khoẻ trường thọ.' },
+  { kw: '蛋糕', vi: 'Bánh ngọt', aliases: ['蛋糕', 'banh', 'bánh', 'banh ngot'],
+    tone: 'cat',
+    meaning: 'Bánh ngọt là lễ kỷ niệm, vui vẻ. Mộng bánh = có sự kiện vui / kỉ niệm sắp đến.',
+    advice: 'Đón sự kiện vui, kỷ niệm cùng người thân.' },
+];
+
+// ---------------------------------------------------------------------------
+// 10 COMMON DREAM PATTERNS — luận tổng hợp cho các kịch bản mơ phổ biến.
+// trigger: mảng keyword (vi không dấu) — nếu query chứa đủ → pattern match.
+// priority càng cao (số lớn) càng ưu tiên trước khi chỉ trả kw lẻ.
+// ---------------------------------------------------------------------------
+const DREAM_PATTERNS = [
+  {
+    id: 'tooth-fall',
+    name: 'Răng gãy / rụng',
+    triggers: ['rang', 'răng', '掉牙', '牙齿'],
+    requiresAny: ['rung', 'gay', 'gãy', 'rụng', '断', '落'],
+    tone: 'hung',
+    meaning: 'Theo Chu Công giải mộng, mộng răng gãy/rụng là một trong những điềm quan trọng nhất: thường báo "gia nhân hữu tai" — người thân (đặc biệt lớn tuổi) có hoạ ốm đau, hoặc lo âu về uy tín / ngoại hình. Rụng răng không đau không máu thường ứng với người thân ở xa.',
+    advice: 'Quan tâm sức khoẻ người thân lớn tuổi, cẩn thận khẩu thiệt và hao tiền; nếu lo âo thái quá thì nên chia sẻ với ai đó.',
+  },
+  {
+    id: 'flying',
+    name: 'Bay trên trời',
+    triggers: ['bay', '飞', '飞在天'],
+    requiresAny: ['troi', 'trời', 'cao', 'tự do'],
+    tone: 'neutral',
+    meaning: 'Bay là khát vọng tự do, vươn lên khỏi áp lực, hoặc muốn trốn tránh. Bay cao tự do thoải mái = khát vọng vươn lên đang mạnh; bay rồi rơi = sợ thất bại; bay rất khó = áp lực quá nặng.',
+    advice: 'Cân bằng giữa khát vọng tự do và việc đối diện thực tại; nếu áp lực quá nặng nên chia sẻ và nghỉ ngơi.',
+  },
+  {
+    id: 'chased',
+    name: 'Bị rượt đuổi',
+    triggers: ['ruot', 'rượt', 'duoi', 'đuổi', '被追', 'trốn', 'chạy'],
+    tone: 'hung',
+    meaning: 'Bị rượt đuổi phản ánh áp lực hoặc nỗi sợ mà mình đang trốn tránh trong đời thực. Kẻ đuổi thường là biểu tượng của vấn đề mình không dám đối diện (deadline, xung đột, hậu quả).',
+    advice: 'Quay lại đối diện vấn đề thay vì trốn; khi dừng lại và nhìn thẳng, nỗi sợ thường tự giảm.',
+  },
+  {
+    id: 'exam',
+    name: 'Thi cử / bị đánh giá',
+    triggers: ['thi', 'thi cu', '考试', 'kiem tra', 'đề thi', 'trượt'],
+    tone: 'hung',
+    meaning: 'Mộng đi thi (dù đã đi làm lâu) là dấu hiệu đang bị đánh giá / thử thách trong đời thực và lo âu về kết quả. Đây là một trong những mộng phổ biến nhất ở người trưởng thành.',
+    advice: 'Chuẩn bị kỹ cho tình huống bị đánh giá; đừng quá dính vào kết quả, tập trung vào quá trình.',
+  },
+  {
+    id: 'lost',
+    name: 'Lạc đường',
+    triggers: ['lac', 'lạc', '迷路', 'khong biet duong'],
+    requiresAny: ['duong', 'đường', 'phuong huong', 'lối'],
+    tone: 'hung',
+    meaning: 'Lạc đường báo mất phương hướng trong đời thực — không rõ mục tiêu tiếp theo hoặc đang do dự quyết định lớn.',
+    advice: 'Dừng lại, định vị lại mục tiêu cốt lõi; có thể tìm người hướng dẫn hoặc tĩnh tâm vài ngày.',
+  },
+  {
+    id: 'falling',
+    name: 'Rơi từ trên cao',
+    triggers: ['roi', 'rơi', '坠落', 'té', 'roi xuong'],
+    requiresAny: ['cao', 'xuong', 'tu tren', 'từ trên', 'tuong'],
+    tone: 'hung',
+    meaning: 'Rơi từ cao (thường giật mình tỉnh — hiện tượng hypnagogic jerk) phản ánh mất kiểm soát, lo âu thất bại hoặc bất ổn trong đời thực. Về thể chất có thể do mệt mỏi / thiếu ngủ.',
+    advice: 'Tìm lại cảm giác kiểm soát; đảm bảo ngủ đủ, giảm cafein, chia nhỏ áp lực.',
+  },
+  {
+    id: 'late',
+    name: 'Đi trễ / bỏ lỡ',
+    triggers: ['tre', 'trễ', 'muon', 'muộn', '迟到', 'bo lo', 'bỏ lỡ'],
+    tone: 'hung',
+    meaning: 'Đi trễ trong mộng báo lo âu bỏ lỡ cơ hội, không kịp thời gian, hoặc cảm giác không kiểm soát được tiến độ.',
+    advice: 'Rà soát tiến độ các mục tiêu, ưu tiên việc quan trọng, đừng để tiện nghi trì hoãn.',
+  },
+  {
+    id: 'naked',
+    name: 'Mặc đồ mỏng / trần trụi chốn đông người',
+    triggers: ['tran', 'trần', 'khong do', '裸', 'trần truồng'],
+    requiresAny: ['dong nguoi', 'đông người', 'nguoi khac', 'cong co'],
+    tone: 'hung',
+    meaning: 'Đứng trần / mỏng trước đám đông là điềm lo sợ bị phơi bày, sợ bị phán xét, hoặc mất an toàn.',
+    advice: 'Rà soát nỗi sợ bị phán xét; thường người khác không để ý như mình tưởng.',
+  },
+  {
+    id: 'water-flood',
+    name: 'Nước lụt / chìm trong nước',
+    triggers: ['nuoc', 'nước', '水'],
+    requiresAny: ['lu', 'lụt', 'ngap', 'ngập', 'chim', 'chìm', 'bien dong', 'sóng'],
+    tone: 'hung',
+    meaning: 'Lụt / chìm trong nước = cảm xúc / tài chính đang quá tải, có cảm giác bị cuốn trôi. Nước đục lớn là tai hoạ, cần đề phòng.',
+    advice: 'Giải phóng cảm xúc dồn nén, giảm rủi ro tài chính, tìm nơi an toàn tạm.',
+  },
+  {
+    id: 'dead-relative',
+    name: 'Thấy người thân đã khuất',
+    triggers: ['nguoi than', 'người thân', 'ong ba', 'ông bà', 'cha me', 'cha mẹ'],
+    requiresAny: ['chet', 'chết', 'khuất', 'quan', 'mộ'],
+    tone: 'neutral',
+    meaning: 'Thấy người thân đã khuất thường là nỗi nhớ, hoặc người đó đang "bảo vệ" / nhắc nhở mình. Đôi khi báo một biến cố nhỏ trong họ. Theo cổ, người chết cười với mình là tốt, khóc là cẩn thận.',
+    advice: 'Đi thăm mộ / tưởng niệm nếu lâu chưa về; phản tỉnh xem mình có đang nợ điều gì với người đó.',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// SEARCH CORE
+// ---------------------------------------------------------------------------
+
+/**
+ * Tìm tất cả từ khoá khớp trong query.
+ * Quy tắc khớp để tránh dương tính (alias ngắt quá tham lam):
+ *   - Alias Hán (chứa ký tự non-ASCII): so sub-string (Hán không có "từ").
+ *   - Alias Latin dài ≥ 4: so sub-string (cụm, tin cậy).
+ *   - Alias Latin ngắn (≤ 3): chỉ khớp ở biên từ (\b) để "ho" không khớp trong "xyzqwerty".
+ * @param {string} query - miêu tả mơ (Việt có/không dấu, hoặc Hán)
+ * @returns {Array} mảng { ...entry, matchCount, matchTerms } xếp theo độ liên quan
+ */
+function aliasMatches(q, alias) {
+  const a = normalizeViet(alias);
+  if (!a) return false;
+  const isLatin = /^[a-z0-9 ]+$/.test(a);
+  if (!isLatin) {
+    // Hán / ký tự khác: sub-string
+    return q.includes(a) ? a : false;
+  }
+  if (a.length >= 4) return q.includes(a) ? a : false;
+  // Latin ngắn: word-boundary
+  const re = new RegExp(`(^|[^a-z0-9])${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z0-9]|$)`, 'i');
+  return re.test(q) ? a : false;
+}
+
+export function searchKeywords(query) {
+  const q = normalizeViet(query);
+  if (!q.trim()) return [];
+  const matches = [];
+  for (const entry of DREAM_DICT) {
+    const matchTerms = [];
+    for (const alias of entry.aliases) {
+      const m = aliasMatches(q, alias);
+      if (m) matchTerms.push(m);
+    }
+    if (matchTerms.length) {
+      // Điểm: số alias khớp + tổng độ dài alias khớp (alias dài = cụm = tin cậy hơn)
+      const score = matchTerms.length + matchTerms.reduce((s, t) => s + t.length, 0) / 50;
+      matches.push({ ...entry, matchCount: matchTerms.length, matchTerms, score });
+    }
+  }
+  // Xếp theo score giảm dần; hoà thì theo độ dài kw
+  matches.sort((a, b) => b.score - a.score || b.kw.length - a.kw.length);
+  return matches;
+}
+
+/**
+ * Tìm common dream patterns khớp.
+ * Triggers: cần ít nhất 1 trigger; nếu có requiresAny thì cần thêm 1 từ yêu cầu.
+ */
+export function searchPatterns(query) {
+  const q = normalizeViet(query);
+  if (!q.trim()) return [];
+  const out = [];
+  for (const p of DREAM_PATTERNS) {
+    const hitTrig = p.triggers.some((t) => q.includes(normalizeViet(t)));
+    if (!hitTrig) continue;
+    if (p.requiresAny && p.requiresAny.length) {
+      const hitReq = p.requiresAny.some((t) => q.includes(normalizeViet(t)));
+      if (!hitReq) continue;
+    }
+    out.push(p);
+  }
+  return out;
+}
+
+/**
+ * Hàm chính GIẢI MỘNG.
+ * @param {string} query - miêu tả giấc mơ
+ * @returns {object} { query, matches, patterns, summary, toneCounts }
+ */
+export function jiemeng(query) {
+  const q = String(query ?? '').trim();
+  const matches = searchKeywords(q).map(({ kw, vi, tone, meaning, advice, score }) => ({
+    keyword: kw, vi, tone, meaning, advice, score,
+  }));
+  const patterns = searchPatterns(q);
+
+  // Thống kê tone
+  const toneCounts = { cat: 0, hung: 0, neutral: 0 };
+  for (const m of matches) {
+    const t = m.tone || 'neutral';
+    if (toneCounts[t] != null) toneCounts[t]++;
+  }
+
+  // Tổng hợp tone tổng thể (pattern + keyword đều tính)
+  const all = [
+    ...matches.map((m) => m.tone),
+    ...patterns.map((p) => p.tone),
+  ].filter(Boolean);
+  const overallCat = all.filter((t) => t === 'cat').length;
+  const overallHung = all.filter((t) => t === 'hung').length;
+  let overall;
+  if (!all.length) overall = 'unknown';
+  else if (overallCat > overallHung && overallCat > all.length / 2) overall = 'cat';
+  else if (overallHung > overallCat && overallHung > all.length / 2) overall = 'hung';
+  else overall = 'neutral';
+
+  const summaryVi = {
+    cat: 'Đại thể điềm CÁT — các biểu tượng mộng cho thấy vận tốt, cơ hội hoặc tin lành.',
+    hung: 'Đại thể điềm HUNG — nên cẩn thận, đặc biệt người thân, tài sản và khẩu thiệt.',
+    neutral: 'Đại thể điềm TRUNG BÌNH — mộng mang tính phản chiếu tâm / thân trạng thái, không tốt không xấu.',
+    unknown: 'Không nhận ra từ khoá nào — thử miêu tả chi tiết hơn (vd: "răng gãy", "bay trên trời", "bị rượt đuổi").',
+  }[overall];
+
+  return {
+    query: q,
+    matches,
+    patterns,
+    toneCounts,
+    overall,
+    summary: summaryVi,
+  };
+}
+
+// Export dữ liệu để UI / test truy cập
+export { DREAM_DICT, DREAM_PATTERNS };
+export const DREAM_DICT_COUNT = DREAM_DICT.length;
+export const DREAM_PATTERN_COUNT = DREAM_PATTERNS.length;

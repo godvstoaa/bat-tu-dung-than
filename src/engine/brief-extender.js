@@ -14,6 +14,7 @@ import { analyzeHealth } from './health-analysis.js';
 import { analyzeStudy } from './study-analysis.js';
 import { dayunGodMeaning } from './dayun-god.js';
 import { checkDayunInteractions } from './dayun-check.js';
+import { taiYuan } from './taiyuan.js';
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -25,9 +26,8 @@ export function extendBrief(R) {
 
   // Thai nguyên (nếu có)
   try {
-    const { taiYuan } = require_taiyuan();
-    if (taiYuan) {
-      const ty = taiYuan(R.chart.pillars.month.gan, R.chart.pillars.month.zhi);
+    const ty = taiYuan(R.chart.pillars.month.gan, R.chart.pillars.month.zhi);
+    if (ty) {
       parts.push(`THAI NGUYÊN: ${ty.ganZhi} (${ty.ganVi} ${ty.zhiVi}, ${ty.wx}) — thể chất bẩm sinh.`);
     }
   } catch (e) {}
@@ -106,9 +106,3 @@ export function extendBrief(R) {
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';
 }
 
-// Lazy import thaiyuan (tránh circular nếu chưa import)
-function require_taiyuan() {
-  try {
-    return { taiYuan: null }; // taiYuan cần import động — bỏ qua nếu lỗi
-  } catch (e) { return { taiYuan: null }; }
-}

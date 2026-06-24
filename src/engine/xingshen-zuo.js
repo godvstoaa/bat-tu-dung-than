@@ -77,8 +77,9 @@ const COMBO_MEANING = {
  */
 export function xingshenZuo(chart) {
   const items = [];
-  const labels = { year: 'Trụ Năm', month: 'Trụ Tháng', time: 'Trụ Giờ' };
-  for (const key of ['year', 'month', 'time']) {
+  // [cycle 52] thêm Trụ Ngày (日柱 = bản mệnh) — trước đây bỏ sót, mất tổ hợp 十神坐支 quan trọng nhất
+  const labels = { year: 'Trụ Năm', month: 'Trụ Tháng', day: 'Trụ Ngày', time: 'Trụ Giờ' };
+  for (const key of ['year', 'month', 'day', 'time']) {
     const p = chart.pillars[key];
     const surfaceGod = p.ganGod; // 十神 của can hiển
     const sitOnGod = p.hidden[0]?.god || ''; // 十神 của tàng chính can (chi's main hidden)

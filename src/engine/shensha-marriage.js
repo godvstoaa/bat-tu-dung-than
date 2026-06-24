@@ -86,3 +86,43 @@ export function computeMarriageShensha(chart) {
 }
 
 export { GUCHEN_GROUP, WANGJIE_GROUP, INFO };
+
+// ---- 4 THẦN SA BỔ SUNG (hay hỏi) ----
+// 丧门吊客: year+2 = 丧门, year+6 = 吊客 (前二/前六)
+const ZHI12 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const FWD2 = {}; const FWD6 = {};
+ZHI12.forEach((z,i) => { FWD2[z] = ZHI12[(i+2)%12]; FWD6[z] = ZHI12[(i+6)%12]; });
+
+// 血刃: by month branch (月支)
+const XUEREN = { 子:'酉', 丑:'戌', 寅:'亥', 卯:'子', 辰:'丑', 巳:'寅', 午:'卯', 未:'辰', 申:'巳', 酉:'午', 戌:'未', 亥:'申' };
+
+// 元辰 (大耗): by year branch + yin/yang
+// 阳男阴女顺数, 阴男阳女逆数, 从年支起数到"太岁对宫"... simplified: 元辰 = year-1 (for yang), year+1 (for yin)
+const YUANCHEN = { 甲:'未', 乙:'午', 丙:'巳', 丁:'辰', 戊:'巳', 己:'辰', 庚:'卯', 辛:'寅', 壬:'丑', 癸:'子' };
+const DAHAO = { 甲:'丑', 乙:'寅', 丙:'卯', 丁:'辰', 戊:'卯', 己:'辰', 庚:'巳', 辛:'午', 壬:'未', 癸:'申' };
+
+export function computeExtraShensha(chart) {
+  const yz = chart.pillars.year.zhi;
+  const mz = chart.pillars.month.zhi;
+  const yg = chart.dayGan;
+  const out = [];
+  const allZhi = ['year','month','day','time'].map(k => chart.pillars[k].zhi);
+
+  // 丧门
+  const sm = FWD2[yz];
+  if (allZhi.includes(sm)) out.push({ star:'丧门', vi:'Tang Môn', desc:'chủ tang sự, bệnh nặng, thương tâm — gặp lưu niên mang chi này cần chú ý sức khoảogia đình', at: allZhi.filter(z=>z===sm).join(','), tone:'volatile' });
+  // 吊客
+  const dk = FWD6[yz];
+  if (allZhi.includes(dk)) out.push({ star:'吊客', vi:'Điếu Khách', desc:'chủ có tang, wearing mourning — năm gặp chi này cẩn thận người lớn tuổi', at: allZhi.filter(z=>z===dk).join(','), tone:'volatile' });
+  // 血刃
+  const xr = XUEREN[mz];
+  if (allZhi.includes(xr)) out.push({ star:'血刃', vi:'Huyết Nhận', desc:'chủ出血, phẫu thuật, tai nạn đao kiếm — cẩn thận刀具, tránh ẩu đả', at: allZhi.filter(z=>z===xr).join(','), tone:'volatile' });
+  // 元辰
+  const yc = YUANCHEN[yg];
+  if (allZhi.includes(yc)) out.push({ star:'元辰', vi:'Nguyên Thần', desc:'chủ hao tốn, tiết kiệm khó, vận nhạt — nên tránh đầu tư lớn', at: allZhi.filter(z=>z===yc).join(','), tone:'volatile' });
+  // 大耗
+  const dh = DAHAO[yg];
+  if (allZhi.includes(dh)) out.push({ star:'大耗', vi:'Đại Hao', desc:'chủ破财 lớn, mất mát tài sản — tuyệt đối tránh cho vay/đầu cơ năm gặp', at: allZhi.filter(z=>z===dh).join(','), tone:'volatile' });
+
+  return out;
+}

@@ -24,7 +24,7 @@ export const STAR = {
   2: { name: 'Nhị Hắc', han: '二黑 巨门', wx: 'Thổ', base: 'hung', vi: 'bệnh tật, thương tổn (病符)' },
   3: { name: 'Tam Bích', han: '三碧 禄存', wx: 'Mộc', base: 'hung', vi: 'thị phi, khẩu thiệt, tranh cãi' },
   4: { name: 'Tứ Lục', han: '四绿 文曲', wx: 'Mộc', base: 'cát', vi: 'văn chương, học vấn, thi cử (文昌)' },
-  5: { name: 'Ngũ Hoàng', han: '五黄 廉贞', wx: 'Thổ', base: 'đại hung', vi: 'tai hoạ,意外的 (灾煞, "nhị ngũ giao tất tổn chủ")' },
+  5: { name: 'Ngũ Hoàng', han: '五黄 廉贞', wx: 'Thổ', base: 'đại hung', vi: 'tai hoạ, 灾煞 (đại hung, "nhị ngũ giao tất tổn chủ")' },
   6: { name: 'Lục Bạch', han: '六白 武曲', wx: 'Kim', base: 'cát', vi: 'quyền lực, võ quý, uy' },
   7: { name: 'Thất Xích', han: '七赤 破军', wx: 'Kim', base: 'hung', vi: 'khẩu thiệt, hao tổn, hình thương' },
   8: { name: 'Bát Bạch', han: '八白 左辅', wx: 'Thổ', base: 'cát', vi: 'tài lộc, điền sản (tài tinh)' },

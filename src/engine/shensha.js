@@ -157,8 +157,10 @@ export function computeShensha(chart) {
     const tdHit = allZhi.concat(allGan).filter((x) => x === tdMark);
     if (tdHit.length) result.tianDe = { at: tdHit };
   }
-  // Nguyệt Đức — can theo nhóm tam hợp nguyệt chi
-  const ydStem = YUE_DE[group];
+  // Nguyệt Đức — can theo nhóm tam hợp NGUYỆT CHI (KHÔNG phải năm chi).
+  // [cycle 47 sửa CRITICAL] trước đây dùng `group` (= nhóm NĂM chi) → 月德 sai (false +/- lucky star)
+  //   → inflate/deflate grade lá số. Chính thống (三命通会): 寅午戌月→丙, 申子辰月→壬, 巳酉丑月→庚, 亥卯未月→甲.
+  const ydStem = YUE_DE[BRANCH_GROUP[chart.monthZhi]];
   if (ydStem) {
     const ydHit = allGan.filter((g) => g === ydStem);
     if (ydHit.length) result.yueDe = { at: ydHit };

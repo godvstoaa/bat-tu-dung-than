@@ -5,16 +5,20 @@
 // ============================================================================
 import { TEN_GOD_VI } from './constants.js';
 
-// Đếm điểm Thập Thần (can năm/tháng/giờ = 1, tàng chính cả 4 trụ = 0.5)
+// Đếm điểm Thập Thần. [cycle 55] can năm/tháng/giờ = 1; TÀNG CAN (cả 本/中/余 khí của 4 trụ) =
+//   [0.5, 0.3, 0.1]. Trước đây chỉ đếm 本气 (hidden[0]) → bỏ sót 十神 chỉ có ở 中气/余气 →
+//   tổ hợp (vd 食神制杀) KHÔNG phát hiện dù đủ điều kiện. Cổ pháp 十神组合 tính cả tàng can.
 function godCount(chart) {
   const c = {};
   for (const key of ['year', 'month', 'time']) {
     const g = chart.pillars[key].ganGod;
     if (g && g !== '日主') c[g] = (c[g] || 0) + 1;
   }
+  const W = [0.5, 0.3, 0.1]; // 本/中/余 khí trọng số
   for (const key of ['year', 'month', 'day', 'time']) {
-    const main = chart.pillars[key].hidden[0];
-    c[main.god] = (c[main.god] || 0) + 0.5;
+    const p = chart.pillars[key];
+    if (!p.hidden) continue;
+    p.hidden.forEach((h, i) => { if (h && h.god && h.god !== '日主') c[h.god] = (c[h.god] || 0) + (W[i] || 0.1); });
   }
   delete c['日主'];
   return c;
@@ -74,4 +78,4 @@ export function detectCombos(chart, strength) {
   return out;
 }
 
-export { TEN_GOD_VI };
+export { TEN_GOD_VI, COMBO_DEFS };

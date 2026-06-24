@@ -49,7 +49,9 @@ export function qimenPan(year, month, day, hour = 12) {
   // 元: số ngày từ tiết khí → div 5 (gần đúng, bỏ qua 正授/置闰 tinh tế)
   const ms = (s) => new Date(s.getYear(), s.getMonth() - 1, s.getDay()).getTime();
   const daysSince = Math.floor((ms(solar) - ms(termStart)) / 86400000);
-  const yuanIdx = Math.max(0, Math.min(2, Math.floor(daysSince / 5) % 3));
+  // [cycle 59 sửa CRITICAL] bỏ `% 3` — qua ngày 15 (hết 下元) KHÔNG quay lại 上元 (mod sai), mà GIỮ 下元
+  //   cho tới tiết kế. Trước đây wrap → ~18 ngày/năm sai 局 (vd 大寒+15 = 下元, không phải 上元).
+  const yuanIdx = Math.max(0, Math.min(2, Math.floor(daysSince / 5)));
   const yinYang = info.yy;
   const ju = info.ju[yuanIdx];
 
@@ -79,6 +81,70 @@ export function qimenPan(year, month, day, hour = 12) {
 }
 
 export { TERM_JU, QIYI, GONG_STAR, DOOR_AT, GONG_DIR };
+
+// ============================================================================
+//  天盘三奇六仪 (Heavenly Plate) — 转盘法 [cycle 60 ADD]
+//  Canon: "天盘直符随时干走 (阳顺阴逆)". 旬首六仪(戊) → 转到 时干落宫; 天盘九干
+// 随之刚体旋转. Equivalent 公式法 (数字奇门):
+//    阳遁: 天盘奇仪数 = 天盘星对应数 − 局数 + 1   (星对应数 = 该星本位宫数)
+//    阴遁: 天盘奇仪数 = 局数 − 天盘星对应数 + 1   (若 <1 则 +9)
+//  九干数: 1戊 2己 3庚 4辛 5壬 6癸 7丁 8丙 9乙
+//  Nguồn: 知乎专栏/p/682589067, 博客园数字奇门完整教程, ctext《奇门法竅》.
+// ============================================================================
+// 7 cát cách 天/地/人/神/鬼/风/云遁 (kinh điển) — cần 天盘奇 + 地盘仪 + cát môn
+//   天遁: 丙(天) + 戊(地) 临开/休/生吉门
+//   地遁: 乙(天) + 己(地) 临吉门
+//   人遁: 丁(天) + 太阴神 + 吉门  (神盘 yêu cầu — nếu thiếu thì 2/3 yếu tố)
+//   神遁: 丙(天) + 九天神 + 吉门
+//   鬼遁: 乙(天) + 九地神 + 吉门  (có bản: 丁+九地)
+//   风遁: 乙(天) + 巽4 cung (hoặc 丙+巽) + 吉门
+//   云遁: 乙(天) + 乾6 cung + 吉门  (có bản: 六合+辛)
+// 凶格: 击刑 (thiên hình), 入墓 (nhập mộ), 空亡 (không vong — cầntruè thời)
+// Nguồn: 福山堂, 奇门法竅, 知乎奇门吉格总表.
+const SANQI = ['丁', '丙', '乙']; // 三奇 (cần cho cát cách)
+const JI_GE = { // key → { tian (天盘奇), di (地盘仪), note }
+  tianDun:  { name: '天遁', vi: 'Thiên Độn', tian: '丙', di: '戊', note: 'Cô/sĩ đạt đạo, sự nghiệp hiển hách' },
+  diDun:    { name: '地遁', vi: 'Địa Độn', tian: '乙', di: '己', note: 'Tài lộc, điền sản, ẩn náu an toàn' },
+  renDun:   { name: '人遁', vi: 'Nhân Độn', tian: '丁', shen: '太阴', note: 'Mưu lược, ngoại giao, hôn nhân êm ả' },
+  shenDun:  { name: '神遁', vi: 'Thần Độn', tian: '丙', shen: '九天', note: 'Thần linh phù hộ, xuất quân/khai trương' },
+  guiDun:   { name: '鬼遁', vi: 'Quỷ Độn', tian: '丁', shen: '九地', note: 'Trừ tà, yếm kỵ, ẩn nấp bí mật' },
+  fengDun:  { name: '风遁', vi: 'Phong Độn', tian: '乙', gong: 4, note: 'Giao tiếp, du lịch, truyền tin (cung Tốn)' },
+  yunDun:   { name: '云遁', vi: 'Vân Độn', tian: '乙', gong: 6, note: 'Cầu mưa, ẩn mình, thủ nghiệp (cung Càn)' },
+};
+// 凶格 (đơn giản hoá — không cần đầy đủ 80+ hung cách)
+const XIONG_GE = [
+  { name: '入墓', vi: 'Nhập Mộ', test: (p) => { // 三奇入墓: 乙@坤2(未墓)/乾6; 丙@乾6; 丁@艮8(丑墓)/坤2
+    const t = p.tianQiyi, g = p.gong;
+    if (t === '乙' && (g === 2 || g === 6)) return '乙奇 nhập mộ';
+    if (t === '丙' && g === 6) return '丙奇 nhập mộ';
+    if (t === '丁' && (g === 8 || g === 2)) return '丁奇 nhập mộ';
+    return null;
+  }, note: 'Sao cát bị chôn vùi — sức lực giảm' },
+  { name: '击刑', vi: 'Kích Hình', test: (p) => { // 六仪 tự hình: 戊@震3, 己@坤2, 庚@艮8, 辛@离9, 壬@坎1, 癸@巽4 (thiên hình vị)
+    const t = p.tianQiyi, g = p.gong;
+    const xingMap = { 戊: 3, 己: 2, 庚: 8, 辛: 9, 壬: 1, 癸: 4 };
+    if (xingMap[t] === g) return `${t} @cung${g} thiên hình`;
+    return null;
+  }, note: 'Mâu thuẫn nội bộ, pháp luật, tổn thương' },
+];
+
+/**
+ * Tính 天盘三奇六仪 cho 9 cung (转盘法). Trả về map gong -> 天盘奇仪.
+ * Nguyên lý: 戊 (旬首六仪 / 遁甲 bến đầu) quay đến cung 时干 rơi xuống; 8 cung còn lại
+ * đi theo chu trình 阳 顺 / 阴 逆. (Tương đương 公式法 — đã cross-check.)
+ */
+function tianQiyiRotation(yinYang, ju, tgGong) {
+  const out = {};
+  // 阳遁: 戊@tgGong, đi 1→2→3→... theo 宫序 (1-9 cyclic, skip? KHÔNG — 转盘 dùng洛书顺序 1..9 cyclic)
+  //   QIYI = [戊,己,庚,辛,壬,癸,丁,丙,乙]; 阳顺 thì cung kế = (g mod 9)+1
+  // 阴遁: 戊@tgGong, đi nghịch cung序: cung kế = ((g-1-1+9) mod 9)+1
+  let g = tgGong;
+  for (let i = 0; i < 9; i++) {
+    out[g] = QIYI[i];
+    g = yinYang === '阳' ? (g % 9) + 1 : ((g - 1 - 1 + 9) % 9) + 1;
+  }
+  return out;
+}
 
 // ---- 旬首 → 六仪 (六甲遁干) ----
 const XUN_YI = ['戊', '己', '庚', '辛', '壬', '癸']; // 甲子/甲戌/甲申/甲午/甲辰/甲寅
@@ -121,9 +187,57 @@ export function qimenDongPan(year, month, day, hour) {
       zhiShiLanding = base.yinYang === '阳' ? (zhiShiLanding % 9) + 1 : ((zhiShiLanding - 1 - 1 + 9) % 9) + 1;
     }
   }
+  // [cycle 60] 天盘三奇六仪 (转盘法) — 戊随时干转, 阳 顺 / 阴 逆
+  const tgGongSafe = tgGong || ju; // fallback:若无时干落宫则 天盘 = 地盘 (不动)
+  const tianMap = tianQiyiRotation(base.yinYang, base.ju, tgGongSafe);
+  const panTian = base.pan.map((p) => ({ ...p, tianQiyi: tianMap[p.gong] || p.qiyi }));
+
+  // 八神落宫 (转盘): 小值符随大值符星落, 阳 顺时针 / 阴 逆时针
+  //   BASHEN = [值符,螣蛇,太阴,六合,白虎,玄武,九地,九天] (天禽寄, 中宫跳)
+  //   转盘顺序 theo洛书 "戴九覆一": 1→8→3→4→9→2→7→6 (cung có sao) — 阳顺 / 阴逆
+  const LUO_SHU_ORDER = [1, 8, 3, 4, 9, 2, 7, 6]; // 8 cung ngoài (bỏ 5)
+  const shenAtGong = {};
+  const order = base.yinYang === '阳' ? LUO_SHU_ORDER : [...LUO_SHU_ORDER].reverse();
+  // tìm vị trí của tgGong trong order; nếu tgGong=5 thì 寄 2 (坤) — 天禽寄坤
+  let startG = (tgGongSafe === 5) ? 2 : tgGongSafe;
+  let idx = order.indexOf(startG);
+  if (idx < 0) idx = 0;
+  for (let k = 0; k < BASHEN.length; k++) {
+    shenAtGong[order[(idx + k) % 8]] = BASHEN[k];
+  }
+
+  // 吉格 / 凶格 detection (cần 天盘 + 地盘 + 门 + 神)
+  const catGe = [], xiongGe = [];
+  for (const p of panTian) {
+    const tian = p.tianQiyi, di = p.qiyi, door = p.door, shen = shenAtGong[p.gong];
+    const jiDoorHit = JI_DOOR.includes(door);
+    for (const [key, rule] of Object.entries(JI_GE)) {
+      let hit = false;
+      if (rule.tian && tian !== rule.tian) continue;
+      if (rule.di && di !== rule.di) continue;
+      if (rule.gong && p.gong !== rule.gong) continue;
+      if (rule.shen) {
+        // 人遁/神遁/鬼遁 cần cả 八神 + 吉门; nếu thiếu神盘 xác định thì giảm yêu cầu
+        if (shen !== rule.shen) continue;
+      }
+      // mọi cát cách cần 吉门 临 (trừ 风遁/云遁 có bản yêu cầu, vẫn ưu tiên吉门)
+      if (!jiDoorHit) continue;
+      hit = true;
+      if (hit) catGe.push({ key, name: rule.name, vi: rule.vi, gong: p.gong, dir: p.dir, note: rule.note, combo: `${tian}(天)+${di}(地)+${door}门${shen ? '+' + shen : ''}` });
+    }
+    for (const xrule of XIONG_GE) {
+      const r = xrule.test(p);
+      if (r) xiongGe.push({ name: xrule.name, vi: xrule.vi, gong: p.gong, dir: p.dir, detail: r, note: xrule.note });
+    }
+  }
+
   // 直符(神)落 = 值符星天盘落 (随时干) = tgGong
   return {
     ...base,
+    pan: panTian, // ghi đè: pan giờ có thêm tianQiyi
+    tian: tianMap, // raw map gong -> 天盘奇仪 (cho verify)
+    shenAtGong,
+    catGe, xiongGe,
     dong: {
       hourGanZhi: hGan + hZhi, xunName, xunYi, xunGong,
       zhiFuStar, zhiFuStarVi: STAR_VI[zhiFuStar] || '',

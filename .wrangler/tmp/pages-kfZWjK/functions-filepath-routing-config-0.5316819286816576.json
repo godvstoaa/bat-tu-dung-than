@@ -1,0 +1,37 @@
+{
+  "routes": [
+    {
+      "routePath": "/bigmodel/:path*",
+      "mountPath": "/bigmodel",
+      "method": "",
+      "module": [
+        "bigmodel/[[path]].js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/deepseek/:path*",
+      "mountPath": "/deepseek",
+      "method": "",
+      "module": [
+        "deepseek/[[path]].js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/openai/:path*",
+      "mountPath": "/openai",
+      "method": "",
+      "module": [
+        "openai/[[path]].js:onRequest"
+      ]
+    },
+    {
+      "routePath": "/zai/:path*",
+      "mountPath": "/zai",
+      "method": "",
+      "module": [
+        "zai/[[path]].js:onRequest"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}

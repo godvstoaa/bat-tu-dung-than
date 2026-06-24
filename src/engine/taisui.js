@@ -45,7 +45,7 @@ const TYPE_VI = {
 };
 
 // Phương vị thái tuế = phương của chi năm
-const ZHI_DIR = { 子: 'chính Bắc', 丑: 'Đông Bắc', 寅: 'Đông Bắc', 卯: 'chính Đông', 辰: 'Đông Nam', 巳: 'Đông Nam', 午: 'chính Nam', 未: 'Tây Nam', 申: 'Tây Nam', 酉: 'chính Tây', 戌: 'Tây Bắc', 亥: 'Tây Bắc' };
+const ZHI_DIR = { 子: 'Bắc', 丑: 'Đông Bắc', 寅: 'Đông Bắc', 卯: 'Đông', 辰: 'Đông Nam', 巳: 'Đông Nam', 午: 'Nam', 未: 'Tây Nam', 申: 'Tây Nam', 酉: 'Tây', 戌: 'Tây Bắc', 亥: 'Tây Bắc' };
 
 /**
  * Toàn bộ 12 con giáp → trạng thái phạm thái tuế trong năm yearZhi.

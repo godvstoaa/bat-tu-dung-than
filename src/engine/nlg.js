@@ -6,15 +6,29 @@
 // ============================================================================
 import { WX_VI, GAN, ZHI, SHENG, KE, KE_BY, TEN_GOD_VI } from './constants.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
+import { scanMarriageTiming } from './marriage-timing.js';
+import { scanWealthCareerYingqi } from './yingqi-wealth.js';
+import { jiaoYunAnalysis } from './jiaoyun.js';
+import { decadeForecast } from './decade-forecast.js';
+import { analyzeTaohua } from './taohua.js';
+import { marriageStars } from './marriage-stars.js';
+import { starPower } from './star-power.js';
+import { dominantGod } from './dominant-god.js';
+import { healthAlertScan } from './health-alert.js';
+import { buildRemedy } from './remedy.js';
 import { WX_INFO, DM_PROFILE } from './interpret.js';
 import {
   TEN_GOD_DEEP, INTERACTION_MEANING, PATTERN_GUIDE, LIFE_AREA_INDEX, dominantGods, DITIANSUI,
 } from './kb.js';
+// 5 module bổ sung (dùng cho supplements trong các pXxx)
+import { chenggu } from './chenggu.js';
+import { analyzeLiunian12 } from './liunian-12shen.js';
+import { analyzeMangpaiView } from './mangpai-view.js';
 
 const hanviet = (gz) => gz.split('').map((c) => (GAN[c]?.vi || ZHI[c]?.vi || c)).join(' ');
 const wxVi = (w) => WX_VI[w];
 const godViShort = (g) => TEN_GOD_VI[g] || g;
-const favText = (yong) => [...new Set([yong.primary, yong.secondary].filter(Boolean))].map((w) => `${wxVi(w)} (${w})`).join(' & ');
+const favText = (yong) => [...new Set([yong.primary, yong.xi].filter(Boolean))].map((w) => `${wxVi(w)} (${w})`).join(' & ');
 const avoidText = (yong) => [...new Set(yong.avoid)].map((w) => `${wxVi(w)} (${w})`).join(' & ');
 
 // ---------------------------------------------------------------------------
@@ -39,9 +53,9 @@ export function detectIntent(question) {
   const t = (question || '').toLowerCase();
   const norm = t.normalize('NFD').replace(/[̀-ͯ]/g, ''); // bỏ dấu để match thoáng
   const years = (question.match(/(19|20)\d{2}/g) || []).map(Number);
-  const isTiming = /\b(khi nào|lúc nào|năm nào|tháng nào|năm nay|năm sau|bao giờ)\b/.test(norm) || years.length > 0;
-  const isYesNo = /\b(có nên|có được không|nên không|được không|có tốt không|có xấu không|có thể|liệu có)\b/.test(norm);
-  const isCompat = /\b(hợp không|hợp nhau|xung khắc|theo không|phù hợp)\b/.test(norm);
+  const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|nam nay|nam sau|bao gio)\b/.test(norm) || years.length > 0;
+  const isYesNo = /\b(co nen|co duoc khong|nen khong|duoc khong|co tot khong|co xau khong|co the|lieu co)\b/.test(norm);
+  const isCompat = /\b(hop khong|hop nhau|xung khac|theo khong|phu hop)\b/.test(norm);
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
@@ -83,16 +97,16 @@ function pPersonality(R) {
   const dm = R.chart.dayMaster;
   const top = dominantGods(R.chart, 2);
   const dt = DITIANSUI[dm.gan];
-  return {
-    title: 'Bản mệnh & tính cách',
-    paragraphs: [
-      `「${dt.verse}」 — 滴天髓 luận ${dm.gan} ${dm.vi}. ${dt.vi}`,
-      `Bản chất sâu: ${dt.nature}`,
-      `Thập Thần nổi bật: ${top.map((g) => `${g.vi} (${g.n})`).join(', ')} — ${top.map((g) => TEN_GOD_DEEP[g.god]?.nature).join(' ')}`,
-      top[0] && TEN_GOD_DEEP[top[0].god] ? (R.strength.strong ? `Vượng: ${TEN_GOD_DEEP[top[0].god].vuong}` : `Nhược: ${TEN_GOD_DEEP[top[0].god].nhuoc}`) : '',
-      `Cách cục ${R.pattern.vi}. Nhu cầu khai vận: ${dt.need}.`,
-    ].filter(Boolean),
-  };
+  const paras = [
+    `「${dt.verse}」 — 滴天髓 luận ${dm.gan} ${dm.vi}. ${dt.vi}`,
+    `Bản chất sâu: ${dt.nature}`,
+    `Thập Thần nổi bật: ${top.map((g) => `${g.vi} (${g.n})`).join(', ')} — ${top.map((g) => TEN_GOD_DEEP[g.god]?.nature).join(' ')}`,
+    top[0] && TEN_GOD_DEEP[top[0].god] ? (R.strength.strong ? `Vượng: ${TEN_GOD_DEEP[top[0].god].vuong}` : `Nhược: ${TEN_GOD_DEEP[top[0].god].nhuoc}`) : '',
+    `Cách cục ${R.pattern.vi}. Nhu cầu khai vận: ${dt.need}.`,
+  ].filter(Boolean);
+  // Session supplement: 称骨 (bone-weight divination)
+  try { const cg = chenggu(R); paras.push(`🦴 称骨: ${cg.totalStr} = ${cg.summary.tier} — ${cg.summary.note}`); } catch (e) {}
+  return { title: 'Bản mệnh & tính cách', paragraphs: paras };
 }
 
 function pCareer(R) {
@@ -100,7 +114,7 @@ function pCareer(R) {
   const gods = godScore(R.chart);
   const guan = (gods['正官'] || 0) + (gods['七殺'] || 0);
   const officerWx = yong.relations.officerWx;
-  const favCareer = [...new Set([yong.primary, yong.secondary].filter(Boolean))];
+  const favCareer = [...new Set([yong.primary, yong.xi].filter(Boolean))];
   const lines = [];
   lines.push(`Sự nghiệp lấy Quan – Ấn làm sao chủ. Mệnh bạn Quan Sát ${guan >= 1.5 ? 'hiện rõ, có khí chất lãnh đạo/địa vị' : guan > 0 ? 'có nhưng hơi mỏng' : 'ẩn/khuyết — sự nghiệp tự thân gây dựng nhiều hơn nhờ lộc'}.`);
   lines.push(R.strength.strong
@@ -109,6 +123,11 @@ function pCareer(R) {
   if (hasShen(R, 'jiangXing')) lines.push(`🌟 Có Tướng Tinh → tiềm năng lãnh đạo, chỉ huy.`);
   lines.push(`Ngành nghề hợp Dụng Thần (${favText(yong)}): ${favCareer.map((w) => WX_INFO[w].nghe).join('; ')}.`);
   lines.push(`Phương vị tốt cho văn phòng: ${WX_INFO[yong.primary].huong}; bàn làm việc hướng về phương này tăng trợ lực. Màu ${WX_INFO[yong.primary].mau}.`);
+  // Session module supplements
+  try { const dg = dominantGod(R); const t = dg.tendency; if (t) lines.push(`🎯 Sao chủ đạo: ${dg.dominant.godVi} → tuýp «${t.traits.slice(0, 40)}». Nghề hợp: ${t.career.split(',')[0]}.`); } catch (e) {}
+  try { const sp = starPower(R); const quan = sp.items.find((x) => x.key === 'guan'); if (quan) lines.push(`💼 Sao Quan (${quan.wxVi}): ${quan.verdict} (căn ${quan.root}, lộ ${quan.reveal}) — ${quan.verdict === '有力' ? 'sự nghiệp THẬT, có nền tảng' : quan.verdict === '藏而不透' ? 'có nền nhưng ẩn — đợi thời' : 'hư/yếu — cần tự gây dựng'}.`); } catch (e) {}
+  // Session supplement: 盲派象法 perspective on 财/官 host-guest + 禄
+  try { const mp = analyzeMangpaiView(R); lines.push(`👁 盲派: 禄(${mp.luAnalysis.luZhi}/${mp.luAnalysis.luZhiVi})${mp.luAnalysis.present ? '@' + (mp.luAnalysis.positionVi || '?') : '无'} | 财 ${mp.hostGuest.groups['财'].sitsAt} | ${mp.deeds.dynamismVi.split(' — ')[0]}.`); } catch (e) {}
   return { title: 'Sự nghiệp & công danh', paragraphs: lines };
 }
 
@@ -117,7 +136,7 @@ function pWealth(R) {
   const gods = godScore(R.chart);
   const cai = (gods['正財'] || 0) + (gods['偏財'] || 0);
   const wealthWx = yong.relations.wealthWx;
-  const isFav = yong.primary === wealthWx || yong.secondary === wealthWx;
+  const isFav = yong.primary === wealthWx || yong.xi === wealthWx;
   const isAvoid = yong.avoid.includes(wealthWx);
   const lines = [];
   lines.push(`Tài lộc lấy Tài tinh (hành ${wxVi(wealthWx)}) làm chủ. Mệnh ${cai >= 1.5 ? 'Tài vượng, cơ hội tiền bạc nhiều' : cai > 0 ? 'Tài vừa phải' : 'Tài mỏng — phải chủ động tìm'}.`);
@@ -126,6 +145,9 @@ function pWealth(R) {
   if (isFav) lines.push(`🎉 Tài chính là Dụng Thần → chủ động cầu tài rất hiệu, tài vận sáng.`);
   else if (isAvoid) lines.push(`⚠️ Tài nằm trong Kỵ Thần → đừng tham liều; giữ tiền qua kênh Dụng Thần (${favText(yong)}) mới bền.`);
   lines.push(`Kênh tích tài thiên về lĩnh vực hành ${favText(yong)}; màu ví/tài khoản hợp: ${WX_INFO[yong.primary].mau}.`);
+  // Session module supplements
+  try { const sp = starPower(R); const tai = sp.items.find((x) => x.key === 'cai'); if (tai) lines.push(`💰 Sao Tài (${tai.wxVi}): ${tai.verdict} (căn ${tai.root}, lộ ${tai.reveal}) — ${tai.verdict === '有力' ? 'sao THẬT, tài vượng' : tai.verdict === '藏而不透' ? 'có nền nhưng ẩn — đợi lưu niên thấu (can ' + ['甲乙','丙丁','戊己','庚辛','壬癸'][['木','火','土','金','水'].indexOf(tai.wx)] + ') mới phát' : 'hư/yếu — cần bù mạnh qua Dụng'}.`); } catch (e) {}
+  try { const wc = scanWealthCareerYingqi(R, new Date().getFullYear(), 8); if (wc.caiYears.length) lines.push(`📅 Năm Tài kích hoạt: ${wc.caiYears.map((y) => y.year).join(', ')} — cơ hội tài chính.`); } catch (e) {}
   return { title: 'Tài lộc & tiền bạc', paragraphs: lines };
 }
 
@@ -136,7 +158,7 @@ function pLove(R) {
   const spouseStar = isMale ? 'Tài (vợ)' : 'Quan Sát (chồng)';
   const dayZhi = chart.pillars.day.zhi;
   const dayZhiGod = chart.pillars.day.hidden[0].god;
-  const isFav = yong.primary === spouseWx || yong.secondary === spouseWx;
+  const isFav = yong.primary === spouseWx || yong.xi === spouseWx;
   const isAvoid = yong.avoid.includes(spouseWx);
   const lines = [];
   lines.push(`Với ${isMale ? 'nam' : 'nữ'} mệnh, sao hôn nhân là ${spouseStar} (hành ${wxVi(spouseWx)}). Cung phu thê (Nhật Chi) = ${dayZhi} (${ZHI[dayZhi].vi}), tàng ${TEN_GOD_VI[dayZhiGod] || dayZhiGod}.`);
@@ -145,9 +167,12 @@ function pLove(R) {
   else lines.push(`Sao phối ngẫu trung tính → hôn nhân thuận theo sự vun đắp của hai bên.`);
   if (hasShen(R, 'taoHua')) lines.push(`🌸 Có Đào Hoa → duyên sắc tốt, dễ hấp dẫn người khác giới (lợi giao tế, cẩn thận đào hoa lệch).`);
   // xung/hình Nhật chi → biến động gia đạo
-  const dayClash = R.interactions.chong.find((c) => c.at.includes('Ngày') || c.a === dayZhi || c.b === dayZhi);
+  const dayClash = R.interactions.chong.find((c) => (c.at && c.at.includes('Ngày')) || c.a === dayZhi || c.b === dayZhi);
   if (dayClash) lines.push(`⚡ Nhật Chi bị xung (${dayClash.a}↔${dayClash.b}) → gia đạo/hôn nhân dễ biến động, cần bao dung.`);
   lines.push(`Người hợp thường mang hành ${favText(yong)}; phương ${WX_INFO[yong.primary].huong} lợi cho hẹn hò/cưới.`);
+  // Session module supplements
+  try { const th = analyzeTaohua(R); if (th.positions.length) lines.push(`🌸 Phân loại đào hoa ${th.taohuaZhi} tại ${th.positions.map((p) => p.vi).join(', ')} → ${th.verdict === '烂桃花' ? 'LẠN ĐÀO HOA (duyên hão/dữ, cẩn thận mất tiền vì tình)' : th.verdict === '正桃花' ? 'CHÍNH ĐÀO HOA (duyên lành)' : 'đào hoa trung tính'}.`); } catch (e) {}
+  try { const ms = marriageStars(R); if (ms.hits.length) lines.push(`⚠ Sao hôn nhân cổ: ${ms.hits.map((h) => h.starVi + '@' + h.pillarVi).join(', ')} — ${ms.summary.split('.')[0]}.`); } catch (e) {}
   return { title: 'Tình duyên & hôn nhân', paragraphs: lines };
 }
 
@@ -160,6 +185,8 @@ function pHealth(R) {
     `Dưỡng sinh theo Dụng Thần ${favText(R.yong)}: tăng ${WX_INFO[R.yong.primary].mau.split(',')[0]} trong ăn ở, vận động phương ${WX_INFO[R.yong.primary].huong} sáng sớm.`,
     `Tránh để hành Kỵ ${avoidText(R.yong)} lấn át; giữ điều độ hàn – nhiệt.`,
   ];
+  // Session supplement: năm nay sức khoẻ sao?
+  try { const ha = healthAlertScan(R, 1); if (ha.alerts.length) { const cur = ha.alerts[0]; lines.push(`🏥 Năm ${cur.year}: sức khoẻ ${cur.level}${cur.reasons.length ? ' — ' + cur.reasons.slice(0, 2).join('; ') : ''}.`); } else if (ha.safeYears.length) { lines.push(`🏥 Năm ${ha.safeYears[0].year}: sức khoẻ tương đối ổn — duy trì dưỡng sinh.`); } } catch (e) {}
   return { title: 'Sức khỏe & dưỡng sinh', paragraphs: lines };
 }
 
@@ -184,7 +211,7 @@ function pChildren(R) {
   const childGod = isMale ? ['正官', '七殺'] : ['食神', '傷官'];
   const childWx = isMale ? KE_BY[R.chart.dayMaster.wx] : SHENG[R.chart.dayMaster.wx];
   const cnt = childGod.reduce((s, g) => s + (gods[g] || 0), 0);
-  const isFav = R.yong.primary === childWx || R.yong.secondary === childWx;
+  const isFav = R.yong.primary === childWx || R.yong.xi === childWx;
   const isAvoid = R.yong.avoid.includes(childWx);
   const lines = [
     `Sao con cái: ${isMale ? 'Quan Sát (nam lấy quan sát làm con)' : 'Thực Thương (nữ lấy thực thương làm con)'} — hành ${wxVi(childWx)}. Mệnh ${cnt >= 1.5 ? 'có sao con rõ → duyên con tốt' : cnt > 0 ? 'sao con nhẹ' : 'sao con ẩn → nên chú trọng dưỡng thai theo Dụng Thần'}.`,
@@ -231,6 +258,13 @@ function pTiming(R, intent) {
   const badDy = dy.filter((d) => d.score < 0).slice(0, 2);
   if (goodDy.length) lines.push(`Đại vận CÁT gần nhất: ${goodDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}–${d.startAge + 9}t]`).join('; ')} — tiến thủ.`);
   if (badDy.length) lines.push(`Đại vận cần THẬN TRỌNG: ${badDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}–${d.startAge + 9}t]`).join('; ')} — giữ ổn định.`);
+  // Session module supplements (khi không có AI, NLG vẫn có dữ liệu timing đầy đủ)
+  try { const jy = jiaoYunAnalysis(R); if (jy.next) lines.push(`🔄 Giao thời đại vận kế: ${jy.next.ganZhi} [${jy.next.age}t, ${jy.next.rating}] — còn ${jy.daysUntil} ngày.`); } catch (e) {}
+  try { const wc = scanWealthCareerYingqi(R, new Date().getFullYear(), 8); if (wc.caiYears.length) lines.push(`💰 Tài kích hoạt: ${wc.caiYears.map((y) => y.year).join(', ')}${wc.guanYears.length ? ' | 🎯 Quan: ' + wc.guanYears.map((y) => y.year).join(', ') : ''}.`); } catch (e) {}
+  try { const mt = scanMarriageTiming(R, new Date().getFullYear(), 10); if (mt.topMarriage.length) lines.push(`💍 Năm hôn nhân: ${mt.topMarriage.map((y) => y.year).join(', ')}.${mt.topRomance.length ? ' Duyên: ' + mt.topRomance.slice(0, 3).map((y) => y.year).join(', ') + '.' : ''}`); } catch (e) {}
+  try { const df = decadeForecast(R, new Date().getFullYear(), 10); lines.push(`📊 10 năm: TỐT ${df.best?.year ?? '?'}(${df.best?.rating ?? '?'}), XẤU ${df.worst?.year ?? '?'}.`); } catch (e) {}
+  // Session supplement: 12 thần lưu niên năm nay (四利三元)
+  try { const l12 = analyzeLiunian12(R, new Date().getFullYear()); const m = l12.mine; lines.push(`🎴 12神 ${l12.year}: ${m.vi}(${m.viSub}) — ${m.tone === 'cat' ? 'CÁT' : m.tone === 'hung' ? 'HUNG' : 'TRUNG'}: ${m.meaning.slice(0, 70)}.`); } catch (e) {}
   return { title: 'Vận hạn & thời điểm', paragraphs: lines };
 }
 
@@ -246,6 +280,8 @@ function pRemedy(R, intent) {
       (rm.timing || []).length ? `Thời điểm vàng (lưu niên CÁT): ${rm.timing.map((t) => t.year).join(', ')} — nên tiến thủ.` : 'Chọn thời điểm hành Dụng/Hỷ để tiến thủ.',
       `Trên hết, 《了凡四训》 dạy: TÍCH ÂM ĐỨC (积阴德) là pháp DUY NHẤT thật sự nghịch thiên — cải quá, tích thiện, khiêm đức. Mệnh lý chỉ là "thuận vận".`,
       `12 pháp cải vận: ${rm.twelveLaws.join(' ')}`,
+      // Session supplement: specific hung-combo remedies
+      ...(() => { try { const br = buildRemedy(R); return (br.specific || []).length ? [`⚠ Pháp hoá giải cụ thể: ${(br.specific || []).map((s) => s.remedy.split('—')[0].trim()).join('; ')}.`] : []; } catch (e) { return []; } })(),
     ],
   };
 }
@@ -285,6 +321,20 @@ const COMPOSERS = {
 // ---------------------------------------------------------------------------
 export function composeAnswer(question, R) {
   const intent = detectIntent(question);
+
+  // [cycle 49] Câu hỏi HỢP TUỔI cần 2 lá số — composeAnswer chỉ có 1 lá số → trả lời trung thực
+  //   thay vì giả vờ luận duyên 1 người (lỗi "ba phải" cũ: compat question → single-chart love answer).
+  if (intent.isCompat) {
+    return {
+      title: 'Hợp tuổi — cần 2 lá số',
+      lead: 'Câu hỏi hợp tuổi/hôn nhân/đối tác cần so sánh lá số của CẢ HAI người. Tôi mới chỉ có lá số của bạn.',
+      paragraphs: [
+        `Mở mục « 💕 Hợp tuổi (2 người) » trong Công cụ Phong Thủy — nhập ngày/giờ sinh của người kia → app chấm điểm hợp hôn (ngũ hành bổ trợ + Dụng thần tương hỗ + Lục hợp/Lục xung/Tam hình/Hoá khí).`,
+        `Lá số của bạn: Nhật Chủ ${R.chart.dayMaster.gan} ${R.chart.dayMaster.vi} (${R.strength.level}); Dụng ${favText(R.yong)}. Khi có lá số người kia, trọng tâm so sánh: (1) Dụng thần 2 người có bổ sung cho nhau không, (2) cặp chi có Lục hợp (cát) hay Lục xung/Tam hình (hung), (3) Nhật Chủ tương sinh hay tương khắc.`,
+      ],
+      intent,
+    };
+  }
 
   // Câu hỏi TỰ DO / khó hiểu (confidence thấp, không khớp lĩnh vực) → fallback khéo léo
   // Vẫn trả lời được: mở bằng chốt lá số + gợi ý hỏi lại cụ thể (luân giải "bất kỳ câu").

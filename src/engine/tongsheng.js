@@ -52,8 +52,8 @@ export function tongshengDay(year, month, day, userZhi) {
   else if (matchJq(fenZhi)) bigBad = '四离 (Tứ Ly — trước分至, đại hung)';
 
   // 岁破 (day chi xung year chi 太岁), 月破 (day chi xung month chi)
-  if (!bigBad && CHONG[yZhi] === dZhi) bigBad = '岁破 (Tuế Phá — xung Thái Tuế, đại hung, chư sự bất nghi)';
-  if (!bigBad && CHONG[mZhi] === dZhi) bigBad = (bigBad ? bigBad + ' + ' : '') + '月破 (Nguyệt Phá)';
+  if (CHONG[yZhi] === dZhi) bigBad = '岁破 (Tuế Phá — xung Thái Tuế, đại hung, chư sự bất nghi)';
+  if (CHONG[mZhi] === dZhi) bigBad = (bigBad ? bigBad + ' + ' : '') + '月破 (Nguyệt Phá)';
 
   // Xung tuổi cá nhân
   const chongYear = userZhi ? (CHONG[dZhi] === userZhi) : false;

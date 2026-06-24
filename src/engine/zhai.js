@@ -44,9 +44,14 @@ export function computeZhai(birthYear, gender) {
   const isMale = gender === 'nam';
   // Mệnh quái theo năm sinh (dương lịch, sau lập xuân mới tính năm sau — giản lược dùng năm dương lịch)
   const s = digitRoot(birthYear);
+  const lt = ((birthYear % 100) + 100) % 100; // 2 chữ số cuối của năm (lastTwoDigits)
   let gua;
   if (birthYear >= 2000) {
-    gua = isMale ? (9 - (s % 9 || 9) + 9) % 9 : (6 + (s % 9 || 9)) % 9;
+    // [cycle 43 — sửa bug C1] Thế kỷ 21: công thức chính thống dùng lastTwoDigits, KHÔNG dùng digitRoot.
+    //   digitRoot(20xx) ≡ 2 + lastTwo (mod 9) ≠ lastTwo → code cũ (dùng digitRoot) ra SAI gua cho MỌI
+    //   người sinh ≥2000, thậm chí sai cả nhóm Đông/Tây Tứ (vd 2000 nam: cũ=兑/Tây, đúng=离/Đông;
+    //   2025 nữ: cũ=乾/Tây, đúng=巽/Đông). Chính thống 八宅明镜: nam=(99−lt)%9, nữ=(lt+6)%9.
+    gua = isMale ? (99 - lt) % 9 : (lt + 6) % 9;
     if (gua === 0) gua = 9;
     if (gua === 5) gua = isMale ? 2 : 8;
   } else {

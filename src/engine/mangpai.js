@@ -70,7 +70,7 @@ export function analyzeMangpai(R) {
 
   // 4. Phú hay Quý (Tài chủ đạo → phú; Quan chủ đạo → quý)
   let fuguui;
-  if (caiHits.length > guanHits.length) fuguui = 'PHÚ (天 chủ đạo — Tài nhiều → hướng phú/kinh doanh)';
+  if (caiHits.length > guanHits.length) fuguui = 'PHÚ (Tài chủ đạo — Tài nhiều → hướng phú/kinh doanh)';
   else if (guanHits.length > caiHits.length) fuguui = 'QUÝ (Quan/Sát chủ đạo → hướng quý/quyền/quan)';
   else fuguui = 'Phú Quý cân bằng';
 

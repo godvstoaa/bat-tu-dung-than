@@ -27,8 +27,22 @@ export function radialData(family, opts = {}) {
 }
 
 // ---- MATRIX: cặp người × người (chủ thể + members) ----
-const INVERSE = { father: 'child', mother: 'child', child: 'father', spouse: 'spouse', sibling: 'sibling' };
+//Inverse role khi đổi góc nhìn (member nhìn center / member khác).
+// father/mother → parent (giữ phân biệt cha/mẹ thay vì gộp 'child');
+// child → parent nhưng cần phân biệt theo giới center để chọn father hay mother.
+function invertRole(role, centerGender) {
+  switch (role) {
+    case 'father': return 'child';   // cha nhìn chủ thể = con
+    case 'mother': return 'child';   // mẹ nhìn chủ thể = con
+    case 'child':  // con nhìn chủ thể = cha HOẶC mẹ tuỳ giới chủ thể
+      return centerGender === 'nam' ? 'father' : 'mother';
+    case 'spouse':  return 'spouse';
+    case 'sibling': return 'sibling';
+    default: return role;
+  }
+}
 export function matrixData(family) {
+  const centerGender = family.center.R.chart.input.gender;
   const people = [
     { id: 'center', label: family.center.label || 'Chủ thể', R: family.center.R, role: 'self' },
     ...family.members.map((m, i) => ({ id: m.label, label: m.label, R: m.R, role: family.pairs[i].role })),
@@ -38,7 +52,7 @@ export function matrixData(family) {
     for (let j = 0; j < people.length; j++) {
       if (i === j) { cells.push({ i, j, score: null }); continue; }
       let role = people[j].role;
-      if (people[i].role !== 'self') role = (people[j].role === 'self') ? INVERSE[role] : 'sibling';
+      if (people[i].role !== 'self') role = (people[j].role === 'self') ? invertRole(role, centerGender) : 'sibling';
       let s = null;
       try { s = analyzePair(people[i].R, people[j].R, role).pairScore; } catch (e) { s = null; }
       cells.push({ i, j, score: s });

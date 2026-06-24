@@ -7,7 +7,7 @@
 import { Solar } from 'lunar-javascript';
 import { analyze } from './chart.js';
 import { computeHehun } from './hehun.js';
-import { GAN, ZHI, WX_VI, KE } from './constants.js';
+import { GAN, ZHI, WX_VI, KE, KE_BY } from './constants.js';
 
 const ZHI12 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const SANHE = [['申','子','辰'],['寅','午','戌'],['巳','酉','丑'],['亥','卯','未']];
@@ -136,7 +136,7 @@ function buildNameHint(element) {
 export function idealChildTiming(R) {
   const isMale = R.chart.input.gender === 'nam';
   // Child star: nam = 官杀 (Kim for 乙), nữ = 食伤 (Hỏa for 乙)
-  const childWx = isMale ? KE[R.chart.dayMaster.wx] : (function(){ const dm=R.chart.dayMaster.wx; const SHENG={木:'火',火:'土',土:'金',金:'水',水:'木'}; return SHENG[dm]; })();
+  const childWx = isMale ? KE_BY[R.chart.dayMaster.wx] : (function(){ const dm=R.chart.dayMaster.wx; const SHENG={木:'火',火:'土',土:'金',金:'水',水:'木'}; return SHENG[dm]; })();
   const userYong = R.yong;
   const results = [];
   const ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
@@ -245,7 +245,7 @@ export function buildPartnerProfile(match, userR) {
 export function idealChildDates(R, year) {
   const userYong = R.yong;
   const isMale = R.chart.input.gender === 'nam';
-  const childWx = isMale ? KE[R.chart.dayMaster.wx] : (function(){ const dm=R.chart.dayMaster.wx; const SHENG={木:'火',火:'土',土:'金',金:'水',水:'木'}; return SHENG[dm]; })();
+  const childWx = isMale ? KE_BY[R.chart.dayMaster.wx] : (function(){ const dm=R.chart.dayMaster.wx; const SHENG={木:'火',火:'土',土:'金',金:'水',水:'木'}; return SHENG[dm]; })();
   const results = [];
   const times = [0, 6, 12, 18]; // 4 giờ đại diện
 

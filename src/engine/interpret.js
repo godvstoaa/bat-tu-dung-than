@@ -58,7 +58,7 @@ function countGods(chart) {
 }
 
 function favText(yong) {
-  const f = [yong.primary, yong.secondary].filter(Boolean);
+  const f = [yong.primary, yong.xi].filter(Boolean);
   const uniq = [...new Set(f)];
   return uniq.map((w) => `${wxVi(w)} (${w})`).join(' & ');
 }
@@ -99,7 +99,7 @@ function career(R) {
   } else {
     lines.push(`Do thân nhược, không nên ôm đồm chức vụ vượt sức; nên dựa vào quý nhân/Ấn tinh, tích lũy năng lực rồi mới tiến. Hợp môi trường ổn định, có người dìu dắt.`);
   }
-  lines.push(`Ngành nghề hợp DỤNG THẦN (${favText(yong)}): ${[...new Set([yong.primary, yong.secondary].filter(Boolean))].map((w) => WX_INFO[w].nghe).join('; ')}.`);
+  lines.push(`Ngành nghề hợp DỤNG THẦN (${favText(yong)}): ${[...new Set([yong.primary, yong.xi].filter(Boolean))].map((w) => WX_INFO[w].nghe).join('; ')}.`);
   lines.push(`Nên chọn công ty/văn phòng ở phương ${WX_INFO[yong.primary].huong}; bàn làm việc hướng về phương này giúp tăng trợ lực.`);
   return { title: 'Sự nghiệp & công danh', paragraphs: lines };
 }
@@ -109,7 +109,7 @@ function wealth(R) {
   const gods = countGods(chart);
   const cai = (gods['正財'] || 0) + (gods['偏財'] || 0);
   const wealthWx = yong.relations.wealthWx;
-  const caiIsFav = yong.primary === wealthWx || yong.secondary === wealthWx;
+  const caiIsFav = yong.primary === wealthWx || yong.xi === wealthWx;
   const lines = [];
   lines.push(`Tài lộc lấy Tài tinh (hành ${wxVi(wealthWx)}) làm sao chủ. Mệnh ${cai >= 1.5 ? 'Tài tinh vượng, cơ hội tiền bạc dồi dào' : cai > 0 ? 'Tài tinh ở mức vừa phải' : 'Tài tinh mỏng/ẩn, tiền tới cần chủ động tìm'}.`);
   if (strength.strong) {
@@ -132,7 +132,7 @@ function love(R) {
   const spouseWx = isMale ? KE[chart.dayMaster.wx] : KE_BY[chart.dayMaster.wx];
   const spouseStar = isMale ? 'Tài tinh (vợ)' : 'Quan Sát (chồng)';
   const dayZhiGod = chart.pillars.day.hidden[0].god;
-  const spouseIsFav = yong.primary === spouseWx || yong.secondary === spouseWx;
+  const spouseIsFav = yong.primary === spouseWx || yong.xi === spouseWx;
   const spouseIsAvoid = yong.avoid.includes(spouseWx);
   const lines = [];
   lines.push(`Với ${isMale ? 'nam mệnh' : 'nữ mệnh'}, sao hôn nhân là ${spouseStar} thuộc hành ${wxVi(spouseWx)}. Cung phối ngẫu (Nhật Chi) là ${chart.pillars.day.zhi} (${ZHI[chart.pillars.day.zhi].vi}), tàng ${TEN_GOD_VI[dayZhiGod] || dayZhiGod}.`);

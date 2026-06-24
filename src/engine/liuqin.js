@@ -26,7 +26,10 @@ function godCount(chart) {
     const g = chart.pillars[key].ganGod;
     if (g && g !== '日主') c[g] = (c[g] || 0) + 1;
   }
-  for (const key of ['year', 'month', 'day', 'time']) {
+  // Chỉ đếm tàng can NGUYÊN TRỤ (year/month/time) cho lục thân.
+  // BỎ qua trụ day: Nhật Chi đại diện 配偶/自身, không phải họ hàng —
+  // tính nó như lục thân chung sẽ sai lệch điểm sao (vd: chính/tà của mình).
+  for (const key of ['year', 'month', 'time']) {
     const main = chart.pillars[key].hidden[0];
     c[main.god] = (c[main.god] || 0) + 0.5;
   }

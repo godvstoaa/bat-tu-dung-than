@@ -10,12 +10,14 @@ const idxOf = (z) => PAL12.indexOf(z);
 
 // 生年干 → 禄存宫 (LU_SHEN table, verified)
 const LUCUN = { 甲: '寅', 乙: '卯', 丙: '巳', 丁: '午', 戊: '巳', 己: '午', 庚: '申', 辛: '酉', 壬: '亥', 癸: '子' };
-// 生年干 → 天魁(阳贵) + 天钺(阴贵)
+// 生年干 → 天魁(阳贵) + 天钺(阴贵). [cycle 52] 紫微斗数 天魁天钺 theo NHÓM quý nhân
+//   (甲戊庚=丑未, 乙己=子申, 丙丁=亥酉, 壬癸=卯巳, 辛=午寅) — cùng nhóm 2 can CÙNG 魁钺.
+//   Sửa swap 丙/辛/癸 (cũ đảo魁钺 cho 3 can này). Nguồn: iztro getKuiYueIndex + 中州派.
 const KUIYUE = {
-  甲: { kui: '丑', yue: '未' }, 乙: { kui: '子', yue: '申' }, 丙: { kui: '酉', yue: '亥' },
+  甲: { kui: '丑', yue: '未' }, 乙: { kui: '子', yue: '申' }, 丙: { kui: '亥', yue: '酉' },
   丁: { kui: '亥', yue: '酉' }, 戊: { kui: '丑', yue: '未' }, 己: { kui: '子', yue: '申' },
-  庚: { kui: '丑', yue: '未' }, 辛: { kui: '寅', yue: '午' }, 壬: { kui: '卯', yue: '巳' },
-  癸: { kui: '巳', yue: '卯' },
+  庚: { kui: '丑', yue: '未' }, 辛: { kui: '午', yue: '寅' }, 壬: { kui: '卯', yue: '巳' },
+  癸: { kui: '卯', yue: '巳' },
 };
 // 火铃 starting position by year branch group
 const HUOLING_START = {
@@ -56,12 +58,13 @@ export function computeAuxStars(yearGan, yearZhi, lunarMonth, timeZhi) {
   const t = ZHI12.indexOf(timeZhi); // 0-11 (子=0)
   const result = {};
 
-  // 六吉: 左辅 右弼 (生月, 辰/戌起, 顺行)
+  // 六吉: [cycle 52 sửa theo 中州派诀 + iztro]
+  //   左辅: 辰起 THUẬN theo sinh月 ("辰上顺正左辅"); 右弼: 戌起 NGHỊCH theo sinh月 ("戌上逆正右弼")
   result['左辅'] = { branch: fwd('辰', m), ...AUX_INFO['左辅'] };
-  result['右弼'] = { branch: fwd('戌', m), ...AUX_INFO['右弼'] };
-  // 文昌 文曲 (生月, 戌/辰起, 逆行)
-  result['文昌'] = { branch: bwd('戌', m), ...AUX_INFO['文昌'] };
-  result['文曲'] = { branch: bwd('辰', m), ...AUX_INFO['文曲'] };
+  result['右弼'] = { branch: bwd('戌', m), ...AUX_INFO['右弼'] };
+  //   文曲: 辰起 THUẬN theo sinh时 ("辰上顺时文曲位"); 文昌: 戌起 NGHỊCH theo sinh时 ("戌上逆时觅文昌")
+  result['文曲'] = { branch: fwd('辰', t), ...AUX_INFO['文曲'] };
+  result['文昌'] = { branch: bwd('戌', t), ...AUX_INFO['文昌'] };
   // 天魁 天钺 (生年干)
   const ky = KUIYUE[yearGan] || { kui: '丑', yue: '未' };
   result['天魁'] = { branch: ky.kui, ...AUX_INFO['天魁'] };

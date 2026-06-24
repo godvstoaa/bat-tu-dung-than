@@ -8,7 +8,7 @@
 //    4) Cách ĐẶC BIỆT (ngoại cách): Chuyên Vượng (曲直/炎上/稼穑/从革/润下),
 //       Tòng cách (tòng tài/sát/ nhi/ vượng/ cường), Hóa khí.
 // ============================================================================
-import { GAN, ZHI, HIDDEN, SHENG, KE, KE_BY } from './constants.js';
+import { GAN, ZHI, HIDDEN, SHENG, KE, KE_BY, SHENG_BY } from './constants.js';
 import { tenGod, godGroup } from './core.js';
 
 // ---- Tên Hán-Việt cho 8 chính cách + biến thể ----

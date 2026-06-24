@@ -35,8 +35,10 @@ export function analyzeCaiKu(R) {
   // Chi trong tứ trụ
   const allZhi = ['year', 'month', 'day', 'time'].map((k) => chart.pillars[k].zhi);
 
-  // Tài khố
-  const taikuZhi = WX_KU[taikuWx] || '?';
+  // Tài khố. [cycle 48] 土 không có 1库 riêng (cả 辰戌丑未 đều Thổ) → special-case chuỗi hiển thị
+  //   (trước đây taikuZhi/taikuZhiVi trả '?' cho ~40% lá số có Tài=Thổ dù hasTaiku=true).
+  const taikuZhi = taikuWx === '土' ? '辰戌丑未' : (WX_KU[taikuWx] || '?');
+  const taikuZhiVi = taikuWx === '土' ? 'Thìn/Tuất/Sửu/Mùi' : (KU_VI[WX_KU[taikuWx]] || '?');
   const hasTaiku = taikuWx === '土' ? allZhi.some((z) => ['辰', '戌', '丑', '未'].includes(z)) : allZhi.includes(taikuZhi);
   const taikuPos = taikuWx === '土' ? allZhi.filter((z) => ['辰', '戌', '丑', '未'].includes(z)) : allZhi.filter((z) => z === taikuZhi);
 
@@ -81,7 +83,7 @@ export function analyzeCaiKu(R) {
         : 'Tài khố trung tính.';
 
   return {
-    taikuWx, taikuWxVi: WX_VI[taikuWx], taikuZhi, taikuZhiVi: KU_VI[taikuZhi] || '?',
+    taikuWx, taikuWxVi: WX_VI[taikuWx], taikuZhi, taikuZhiVi,
     hasTaiku, taikuPos,
     guankuWx: guankuWx, guankuZhi, hasGuanku,
     yinkuWx: yinkuWx, yinkuZhi, hasYinku,

@@ -1,0 +1,128 @@
+// ============================================================================
+//  LƯU NHẬT LỤC PHÁI 流日六派 — DAILY 6-SCHOOL ANALYSIS
+//  "Hôm nay tôi sao? Làm gì tốt/tránh gì?" — phiên bản chi tiết nhất.
+//  Khác liuri.js (nhẹ): 6 trường phái đầy đủ cho 1 ngày cụ thể.
+//  Nguồn: tổng hợp từ liunian-pro + tongsheng + daily-directions.
+// ============================================================================
+import { Solar } from 'lunar-javascript';
+import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
+import { tenGod } from './core.js';
+import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP } from './shensha.js';
+
+const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
+const ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const OFFICERS = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
+const OFFICER_ROAD = { 建:'black', 满:'black', 平:'black', 收:'black', 破:'black', 闭:'black', 除:'yellow', 危:'yellow', 定:'yellow', 执:'yellow', 成:'yellow', 开:'yellow' };
+const TONE_WORD = { yellow: '黄道', black: '黑道' };
+
+// 12 thần (daily version - simpler than annual, based on day chi vs birth chi)
+const DAILY_GOD = {
+  比肩: { d: -1, note: 'cạnh tranh nhẹ, gặp bạn bè' },
+  劫財: { d: -5, note: 'hao tiền, tránh cho vay/mua sắm bốc đồng' },
+  食神: { d: 5, note: 'vui vẻ, tài hoa,口 phúc, làm việc sáng tạo tốt' },
+  傷官: { d: -5, note: 'dễ cãi/khẩu thiệp, hao tiền, cẩn thận tình cảm' },
+  偏財: { d: 3, note: 'tài bất ngờ/hao, hào phóng' },
+  正財: { d: 4, note: 'tiến tài đều, việc tiền thuận' },
+  七殺: { d: -4, note: 'áp lực, tiểu nhân, cẩn thận an toàn' },
+  正官: { d: 4, note: 'danh vọng, quý nhân, việc quan quyền thuận' },
+  偏印: { d: -2, note: 'cô, hay nghĩ nhiều, hao tài nguyên nhẹ' },
+  正印: { d: 4, note: 'quý nhân, học/văn, có người giúp' },
+};
+
+/**
+ * Phân tích 6 phái cho 1 ngày cụ thể.
+ * @returns {{ date, ganZhi, score, rating, schools, bestActivity, avoidActivity, bestDirection, advice }}
+ */
+export function dailyPro(R, year, month, day) {
+  const chart = R.chart;
+  const dayGan = chart.dayGan;
+  const birthYearZhi = chart.pillars.year.zhi;
+  const dayZhi_pillar = chart.pillars.day.zhi;
+  const yong = R.yong;
+
+  const solar = Solar.fromYmdHms(year, month, day, 12, 0, 0);
+  const lunar = solar.getLunar();
+  const dGan = lunar.getDayGan(), dZhi = lunar.getDayZhi();
+  const mZhi = lunar.getMonthZhi();
+
+  const schools = [];
+  let score = 50;
+
+  // PHÁI 1: Ngũ hành / Dụng Thần
+  const dgWx = GAN[dGan].wx, dzWx = ZHI[dZhi].wx;
+  const fav = new Set([yong.primary, yong.xi].filter(Boolean));
+  const avoid = new Set([yong.ji, yong.chou]);
+  let e1 = 0, e1note = `Can ${dGan}(${WX_VI[dgWx]}) + Chi ${dZhi}(${WX_VI[dzWx]}). `;
+  if (fav.has(dgWx)) { e1 += 5; e1note += 'Can Dụng/Hỷ. '; }
+  if (avoid.has(dgWx)) { e1 -= 6; e1note += 'Can Kỵ/Thù. '; }
+  if (fav.has(dzWx)) { e1 += 4; e1note += 'Chi Dụng/Hỷ. '; }
+  if (avoid.has(dzWx)) { e1 -= 5; e1note += 'Chi Kỵ/Thù. '; }
+  score += e1;
+  schools.push({ phai: 'Ngũ Hành/Dụng', d: e1, note: e1note });
+
+  // PHÁI 2: Thập thần ngày
+  const god = tenGod(dayGan, dGan);
+  const gInfo = DAILY_GOD[god] || { d: 0, note: '' };
+  score += gInfo.d;
+  schools.push({ phai: 'Thập Thần', d: gInfo.d, note: `${TEN_GOD_VI[god]}: ${gInfo.note}` });
+
+  // PHÁI 3: Trực (建除十二神)
+  const oIdx = ((ZHI_ORDER.indexOf(dZhi) - ZHI_ORDER.indexOf(mZhi)) + 12) % 12;
+  const officer = OFFICERS[oIdx];
+  const road = OFFICER_ROAD[officer];
+  let e3 = road === 'yellow' ? 3 : -2;
+  score += e3;
+  schools.push({ phai: 'Trực', d: e3, note: `Trực ${officer} (${TONE_WORD[road]}): ${road === 'yellow' ? 'nền cát' : 'nền hắc đạo, hạn chế việc lớn'}.` });
+
+  // PHÁI 4: Chi xung/hại tuổi
+  let e4 = 0, e4note = '';
+  if (CHONG[dZhi] === birthYearZhi || dZhi === CHONG[birthYearZhi]) { e4 -= 5; e4note = `Chi ${dZhi} xung tuổi ${birthYearZhi}. `; }
+  if (CHONG[dZhi] === dayZhi_pillar || dZhi === CHONG[dayZhi_pillar]) { e4 -= 4; e4note += `Chi xung Nhật Chi (bản thân). `; }
+  if (!e4note) e4note = 'Không xung.';
+  score += e4;
+  schools.push({ phai: 'Xung', d: e4, note: e4note });
+
+  // PHÁI 5: Thần sát ngày (đào hoa/hồng diễm/dương nhận)
+  let e5 = 0, e5note = '';
+  const grp = BRANCH_GROUP[birthYearZhi];
+  const grpDay = BRANCH_GROUP[dayZhi_pillar];
+  if (TAO_HUA[grp] === dZhi || TAO_HUA[grpDay] === dZhi) { e5 -= 3; e5note += 'Đào hoa ngày. '; }
+  if (HONG_YAN[dayGan] === dZhi) { e5 -= 3; e5note += 'Hồng diễm. '; }
+  if (YANG_REN[dayGan] === dZhi) { e5 -= 4; e5note += 'Dương nhận (cẩn thận). '; }
+  if (YI_MA[grp] === dZhi || YI_MA[grpDay] === dZhi) { e5 += 2; e5note += 'Dịch mã (di chuyển tốt). '; }
+  if (!e5note) e5note = 'Không thần sát nổi.';
+  score += e5;
+  schools.push({ phai: 'Thần Sát', d: e5, note: e5note });
+
+  // PHÁI 6: Thông thắng 宜忌
+  const tsYi = lunar.getDayYi ? (lunar.getDayYi() || []) : [];
+  const tsJi = lunar.getDayJi ? (lunar.getDayJi() || []) : [];
+  let e6 = 0, e6note = '';
+  if (tsYi.length > 5) { e6 += 2; e6note = `宜 ${tsYi.length} việc (nền tốt).`; }
+  if (tsJi.length > 3) { e6 -= 1; e6note += ` 忌 ${tsJi.length} việc.`; }
+  if (!e6note) e6note = `宜 ${tsYi.length}/忌 ${tsJi.length}.`;
+  score += e6;
+  schools.push({ phai: 'Thông Thắng', d: e6, note: e6note });
+
+  // Score
+  score = Math.max(5, Math.min(98, Math.round(score)));
+  let rating = score >= 65 ? 'Cát' : score >= 48 ? 'Bình' : score >= 35 ? 'Hơi kỵ' : 'Kỵ';
+
+  // Best activity / avoid
+  const bestActivity = score >= 65 ? 'tiến thủ, ký kết, gặp quý nhân, làm việc lớn' : score >= 48 ? 'làm việc thường, tránh quyết định lớn' : 'giữ ổn định, tránh đầu tư/cãi vã/đi xa';
+  const avoidActivity = `tránh ${tsJi.slice(0, 3).join(',')}${avoid.has(dgWx) ? ', đầu tư' : ''}${e5 < 0 && e5note.includes('Nhận') ? ', nguy hiểm' : ''}`;
+
+  // Best direction
+  const caishen = lunar.getDayPositionCaiDesc ? lunar.getDayPositionCaiDesc() : '?';
+  const xishen = lunar.getDayPositionXiDesc ? lunar.getDayPositionXiDesc() : '?';
+
+  const advice = score >= 65
+    ? `Hôm nay CÁT (${score}/100). Nên: ${bestActivity}. Hướng: ${caishen} (tài) / ${xishen} (hỷ).`
+    : score >= 48
+      ? `Hôm nay BÌNH (${score}/100). ${bestActivity}.`
+      : `Hôm nay ${rating} (${score}/100). ${bestActivity}. ${avoidActivity}.`;
+
+  return { date: solar.toYmd(), ganZhi: dGan + dZhi, officer, god: TEN_GOD_VI[god],
+    score, rating, schools, tsYi: tsYi.slice(0, 6), tsJi: tsJi.slice(0, 4),
+    bestActivity, avoidActivity, caishen, xishen, advice };
+}

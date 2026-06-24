@@ -411,6 +411,21 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .remedy-timing { font-size: 13px; color: #7ee2a4; background: rgba(46,158,107,0.1); padding: 9px 13px; border-radius: 4px; margin-bottom: 12px; }
 .remedy-specific { margin-bottom: 12px; }
 .sp-item { font-size: 12.5px; color: #f0a99c; background: rgba(224,70,58,0.08); padding: 7px 12px; border-radius: 4px; margin-top: 6px; line-height: 1.55; }
+.quick-nav { position: sticky; top: 0; z-index: 100; display: flex; gap: 4px; overflow-x: auto; padding: 6px 10px; background: rgba(10,8,6,0.92); backdrop-filter: blur(8px); border-radius: 6px; margin-bottom: 8px; border: 1px solid rgba(212,175,55,0.15); }
+.quick-nav a { flex-shrink: 0; font-size: 11px; color: var(--gold, #d4af37); text-decoration: none; padding: 3px 8px; border-radius: 3px; background: rgba(212,175,55,0.06); white-space: nowrap; transition: background .15s; cursor: pointer; }
+.quick-nav a:hover { background: rgba(212,175,55,0.2); }
+.sp-star { font-weight: 600; color: var(--gold, #d4af37); font-size: 13px; }
+.sp-area { font-size: 11px; color: var(--silk-dim, #9a8c7a); margin-top: 1px; }
+.sp-verdict { font-weight: 600; margin-top: 2px; }
+.sp-verdict.cat { color: var(--cat, #2a7); }
+.sp-verdict.hung { color: var(--hung, #c33); }
+.sp-verdict.mid { color: #d49a3a; }
+.ln-flags { font-size: 10px; color: var(--gold, #d4af37); text-align: center; margin-top: 1px; }
+.ln-decade { gap: 5px; }
+.dir-grid > .ln { min-width: 72px; text-align: center; }
+.dir-grid > .ln .ln-rate { font-size: 10px; font-weight: 600; }
+.ln-rate.cat { color: var(--cat, #2a7); }
+.ln-rate.hung { color: var(--hung, #c33); }
 .laws { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 8px; }
 .law { font-size: 12.5px; color: var(--silk-dim); background: rgba(0,0,0,0.28); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 4px; padding: 9px 12px; line-height: 1.55; transition: transform .2s var(--ease-out), border-color .2s; }
 .law:hover { transform: translateY(-2px); border-color: rgba(212,175,55,.32); }
@@ -426,6 +441,14 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .verse-zh { font-family: 'Noto Serif SC', serif; font-size: 19px; color: var(--gold-bright); line-height: 1.95; font-weight: 600; letter-spacing: 1px; }
 .verse-vi { font-size: 13.5px; color: var(--silk-muted); margin-top: 8px; font-style: italic; }
 .classic-nature { font-size: 14.5px; color: var(--silk-dim); line-height: 1.8; margin: 0 0 10px; }
+
+/* --- 称骨算命 (Bone-Weight Divination) --- */
+.cg-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+.cg-total .zh.big { font-family: 'Noto Serif SC', serif; font-size: 30px; color: var(--gold-bright); font-weight: 700; letter-spacing: 1px; text-shadow: 0 0 18px var(--cinnabar-glow); }
+.cg-tier { margin-left: auto; }
+.cg-breakdown { font-size: 12.5px; line-height: 1.7; }
+.cg-interp { font-size: 14px; color: var(--silk-dim); line-height: 1.85; margin: 4px 0; }
+
 .classic-need { font-size: 13.5px; color: var(--silk); margin: 0 0 12px; }
 .verse { font-family: 'Noto Serif SC', serif; color: var(--gold-bright); font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
 
@@ -644,11 +667,59 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .mh-rel { font-size: 14px; margin-bottom: 8px; }
 .mh-hubi { font-size: 13px; color: var(--silk-muted); margin-bottom: 8px; }
 
+/* ===== TIỂU LỤC NHÂM 小六壬 ===== */
+.xlr-card { border-color: rgba(212,175,55,0.4); }
+.xlr-flow { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.xlr-stage, .xlr-final { background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.1); border-radius: 11px; padding: 11px 13px; flex: 1 1 130px; min-width: 130px; }
+.xlr-stage.cat, .xlr-final.cat { border-left: 3px solid #2e9e5b; }
+.xlr-stage.hung, .xlr-final.hung { border-left: 3px solid #e0533d; }
+.xlr-final { flex: 1.4 1 160px; background: rgba(212,175,55,0.06); }
+.xlr-stage-label { font-size: 11.5px; color: var(--silk-muted); margin-bottom: 4px; }
+.xlr-stage-han { font-size: 24px; color: var(--gold-bright); line-height: 1.2; }
+.xlr-stage-vi { font-size: 13px; margin: 3px 0; }
+.xlr-stage-ess { font-size: 11.5px; color: var(--silk-dim); line-height: 1.5; }
+.xlr-arrow { align-self: center; font-size: 18px; color: var(--gold); }
+.xlr-input-hint { font-size: 12px; color: var(--silk-muted); margin-bottom: 6px; }
+.xlr-detail { font-size: 13px; color: var(--silk); margin-top: 8px; line-height: 1.55; }
+
 /* 14 chính tinh trong ô Tử Vi */
 .zw-stars { font-family: 'Noto Serif SC', serif; font-size: 11px; color: #b8d8ff; margin-top: 4px; min-height: 14px; line-height: 1.3; }
 
 /* ===== LỤC DIỆU 六爻 ===== */
 .ly-card { border-color: rgba(212,175,55,0.4); }
+
+/* ------------------------------ 求签 黄大仙 + 掷筊 ------------------------------ */
+.qq-card { border-color: rgba(192,57,43,0.42); }
+.qq-sub { padding: 8px 0; border-top: 1px dashed rgba(212,175,55,0.18); }
+.qq-sub:first-of-type { border-top: none; }
+.qq-sub-title { font-size: 14px; color: var(--gold-soft); margin: 4px 0 8px; font-weight: 600; }
+.qq-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.qq-head .big { font-size: 26px; color: var(--gold-bright); text-shadow: 0 0 16px rgba(212,175,55,.4); }
+.qq-poem { font-family: 'Noto Serif SC', serif; font-size: 17px; line-height: 2; color: var(--silk-dim);
+  background: rgba(0,0,0,0.25); border-left: 3px solid var(--cinnabar); padding: 10px 16px; border-radius: 8px; margin-bottom: 10px; white-space: pre-wrap; animation: qqShake .6s ease-out; }
+.qq-story { font-size: 13px; color: var(--gold-soft); margin-bottom: 8px; }
+.qq-vi { font-size: 14px; line-height: 1.65; margin-bottom: 8px; }
+.qq-jiao-blocks { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.qq-block { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px;
+  border-radius: 50%; background: linear-gradient(145deg, #6b1f1a, #3a0f0c); border: 1px solid var(--gold-soft);
+  color: var(--gold-bright); font-size: 20px; animation: jiaoFlip .5s ease-out; }
+.qq-jiao-meaning { font-size: 14px; line-height: 1.6; }
+@keyframes qqShake {
+  0% { transform: translateY(-6px) rotate(-1.5deg); opacity: 0; }
+  25% { transform: translateY(2px) rotate(1deg); }
+  50% { transform: translateY(-2px) rotate(-0.5deg); }
+  75% { transform: translateY(1px) rotate(0.3deg); }
+  100% { transform: translateY(0) rotate(0); opacity: 1; }
+}
+@keyframes jiaoFlip {
+  0% { transform: rotateY(0deg) scale(.6); opacity: 0; }
+  60% { transform: rotateY(540deg) scale(1.08); opacity: 1; }
+  100% { transform: rotateY(720deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qq-poem { animation: none; }
+  .qq-block { animation: none; }
+}
 .ly-head { font-size: 15px; margin-bottom: 10px; }
 .ly-head .big { font-size: 24px; }
 .ly-lines { display: flex; flex-direction: column; gap: 3px; background: rgba(0,0,0,0.22); border-radius: 10px; padding: 10px 14px; margin-bottom: 10px; max-width: 360px; }
@@ -682,6 +753,28 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 
 /* highlight "tuổi mình" trong lưới */
 .lm-cell.me, .ts-cell.me { border-color: var(--gold) !important; box-shadow: 0 0 0 1px rgba(212,175,55,0.5); background: rgba(212,175,55,0.14); }
+
+/* ===== BEST HOUR TODAY 择吉时合成 ===== */
+.bh-card { border-color: rgba(212,175,55,0.32); }
+.bh-head { padding: 6px 0 2px; font-size: 13px; }
+.bh-summary { background: rgba(212,175,55,0.08); border-left: 3px solid var(--gold); padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 13.5px; }
+.bh-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 8px 0; }
+.bh-cell { background: rgba(0,0,0,0.28); border: 1px solid rgba(212,175,55,0.14); border-radius: 5px; padding: 9px 8px; transition: transform .2s var(--ease-out); }
+.bh-cell:hover { transform: translateY(-2px); border-color: rgba(212,175,55,.35); }
+.bh-cell.bh-best { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(212,175,55,0.45); background: rgba(212,175,55,0.12); }
+.bh-cell.bh-worst { border-color: rgba(220,70,70,0.5); background: rgba(220,70,70,0.08); }
+.bh-m { font-size: 13px; font-weight: 600; }
+.bh-m .zh { font-family: 'Noto Serif SC', serif; font-size: 19px; font-weight: 700; margin-right: 2px; }
+.bh-range { font-size: 11px; color: var(--silk-muted); margin: 3px 0; }
+.bh-range .zh { color: var(--gold-bright); }
+.bh-score { font-size: 13px; font-weight: 700; padding: 3px 7px; border-radius: 3px; display: inline-block; }
+.bh-score.rate-cat { background: rgba(120,200,120,0.18); color: #b6e6b6; }
+.bh-score.rate-mid { background: rgba(200,180,90,0.16); color: #e8d690; }
+.bh-score.rate-hung { background: rgba(220,90,90,0.18); color: #f0a0a0; }
+.bh-reasons { margin-top: 6px; display: flex; flex-direction: column; gap: 2px; }
+.bh-reasons span { font-size: 10.5px; color: var(--silk-muted); line-height: 1.35; }
+.bh-reasons span::before { content: '· '; color: var(--gold-bright); }
+@media (max-width: 760px) { .bh-grid { grid-template-columns: repeat(2, 1fr); } }
 
 /* ===== ĐẠI LỤC NHÂM ===== */
 .lr-card { border-color: rgba(58,123,213,0.4); }
@@ -857,3 +950,190 @@ html{scroll-behavior:smooth}
 .cfg-test-row{display:flex;gap:10px;align-items:center;margin:10px 0;flex-wrap:wrap}
 .cfg-test-result{font-size:12px;color:var(--silk-muted,#948864);flex:1;min-width:200px;line-height:1.4}
 .modal-hint code{background:rgba(212,175,55,.14);padding:1px 5px;border-radius:4px;font-size:11px}
+
+/* ===== 盲派象法 (mangpai-view) ===== */
+.mpv-card .mpv-note { background: rgba(212,175,55,0.10); border-left: 3px solid var(--gold); padding: 6px 10px; border-radius: 6px; font-size: 12.5px; color: var(--silk-dim); margin-bottom: 8px; }
+.mpv-card .mpv-sub { font-size: 13px; color: var(--silk-muted); margin-bottom: 6px; }
+.mpv-card .mpv-h { font-size: 13.5px; color: var(--gold-soft, var(--gold)); margin: 12px 0 5px; font-weight: 600; }
+.mpv-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 4px 0; }
+.mpv-table th { text-align: left; color: var(--silk-muted); font-weight: 500; font-size: 11.5px; padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+.mpv-table td { padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,0.06); vertical-align: top; color: var(--silk-dim); }
+.mpv-table td.mpv-read { font-size: 12px; color: var(--silk-muted); }
+.mpv-card .mpv-lu, .mpv-card .mpv-deeds { font-size: 13px; color: var(--silk-dim); line-height: 1.55; padding: 6px 0; }
+.mpv-card .mpv-read { font-size: 12px; color: var(--silk-muted); margin-top: 3px; line-height: 1.5; }
+.mpv-card details.mpv-det { margin-top: 10px; font-size: 12.5px; }
+.mpv-card details.mpv-det > summary { cursor: pointer; color: var(--gold-soft, var(--gold)); font-weight: 600; }
+
+/* ===== PRINT ===== */
+@media print {
+  body { background: white !important; color: #111 !important; font-size: 11px; }
+  .quick-nav, #print-btn, .ai-fab, #ai-modal, #ai-popup, .form-card, .hero, nav, .lyear-row label input, .lyear-row select, .lyear-row button, #family-members, #ev-btn, #ln-btn, #ln-dt, #yd-btn, #fam-add, #family-btn, button { display: none !important; }
+  .result { max-width: 100% !important; padding: 0 !important; }
+  .card { border: 1px solid #ccc !important; background: white !important; box-shadow: none !important; break-inside: avoid; margin-bottom: 6px !important; padding: 8px !important; }
+  .card-title { color: #333 !important; font-size: 13px !important; border-bottom: 1px solid #999 !important; }
+  .hint, .hint-inline { color: #555 !important; }
+  .ln, .sp-item { background: #f5f5f5 !important; color: #333 !important; border: 1px solid #ddd !important; }
+  details { open: true; }
+  details > div, details summary + * { display: block !important; }
+  details summary::after { content: ''; }
+  .gold, [style*="color"] { color: #333 !important; }
+  a { color: #333 !important; text-decoration: none !important; }
+  .hidden { display: block !important; }
+}
+.chat-suggest { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.suggest-chip { font-size: 11px; color: var(--gold); background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.18); border-radius: 12px; padding: 4px 10px; cursor: pointer; white-space: nowrap; transition: background .15s; }
+.suggest-chip:hover { background: rgba(212,175,55,0.2); }
+
+/* === yinzhai 24 sơn (âm phần) === */
+.yz-head { font-size: 14px; color: var(--gold-bright); margin-bottom: 6px; font-weight: 600; }
+.yz-select { margin: 10px 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.yz-select select { background: rgba(20,15,10,0.6); color: var(--gold-bright); border: 1px solid var(--gold);
+  border-radius: 4px; padding: 5px 8px; font-size: 13px; max-width: 70%; }
+.yz-select label { color: var(--ink); font-size: 13px; }
+.yz-row { font-size: 13.5px; color: var(--ink); margin: 4px 0; }
+.yz-row b { color: var(--gold-bright); }
+.yz-rules { margin-top: 12px; }
+.yz-rules details { margin: 5px 0; font-size: 13px; color: var(--ink); }
+.yz-rules summary { cursor: pointer; color: var(--gold-bright); font-weight: 600; }
+.yz-rules ul { margin: 6px 0 6px 18px; padding: 0; }
+.yz-rules li { margin: 3px 0; line-height: 1.5; }
+#yz-result .lm-rate { display: inline-block; margin: 2px 4px 2px 0; }
+/* === END yinzhai === */
+
+/* ==========================================================================
+   UX OVERHAUL — group headers, visual hierarchy, animations (APPENDED)
+   Goal: scannable priority groups, Vietnamese-first titles, lively entrances.
+   Enhances the dark/gold "huyền học" aesthetic; does NOT replace existing rules.
+   ========================================================================== */
+
+/* ---------- Group header (.grp) — large gold divider with glow ---------- */
+#result > .grp {
+  position: relative;
+  grid-column: 1 / -1;
+  margin: 34px 0 16px;
+  padding: 14px 0 12px;
+  font-family: 'Be Vietnam Pro', 'Noto Serif SC', serif;
+  font-size: clamp(20px, 3.4vw, 27px);
+  font-weight: 700;
+  letter-spacing: .3px;
+  color: var(--gold-bright, #f0d98a);
+  text-shadow: 0 0 14px rgba(212,175,55,0.35), 0 1px 0 rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  scroll-margin-top: 64px;
+}
+/* glowing divider line under the title */
+#result > .grp::after {
+  content: '';
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(212,175,55,0.65) 0%,
+    rgba(212,175,55,0.35) 35%,
+    rgba(212,175,55,0.08) 75%,
+    transparent 100%);
+  box-shadow: 0 0 10px rgba(212,175,55,0.25);
+}
+/* decorative seal dot before the group title */
+#result > .grp::before {
+  content: '◈';
+  color: var(--cinnabar, #c0392b);
+  font-size: .62em;
+  transform: translateY(-2px);
+  text-shadow: 0 0 12px var(--cinnabar-glow, rgba(192,57,43,0.6));
+  animation: grpSealPulse 3.4s ease-in-out infinite;
+}
+/* first group: less top margin (sits right under nav) */
+#result > .grp:first-of-type { margin-top: 14px; }
+@keyframes grpSealPulse {
+  0%, 100% { opacity: .85; text-shadow: 0 0 10px var(--cinnabar-glow, rgba(192,57,43,0.6)); }
+  50%      { opacity: 1;   text-shadow: 0 0 18px var(--cinnabar-glow, rgba(192,57,43,0.9)); }
+}
+
+/* ---------- De-emphasize Chinese in card titles (Vietnamese reads first) ---------- */
+/* Scope ONLY to .card-title .zh — hero/subtitle .zh stay large & bright. */
+.card-title .zh {
+  font-size: 0.7em !important;       /* smaller than the Vietnamese lead */
+  opacity: .55 !important;            /* dimmer */
+  font-weight: 500 !important;
+  color: var(--gold, #d4af37) !important;
+  letter-spacing: .5px;
+  transition: opacity .2s ease;
+}
+.card:hover .card-title .zh { opacity: .75 !important; } /* reveal hint on hover */
+
+/* ---------- Card hover lift (interactivity) ---------- */
+#result > .card {
+  transition: transform .28s var(--ease-out, cubic-bezier(.2,.7,.3,1)),
+              box-shadow .28s var(--ease-out, cubic-bezier(.2,.7,.3,1)),
+              border-color .28s ease;
+  will-change: transform;
+}
+#result > .card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px -10px rgba(0,0,0,0.65),
+              0 0 0 1px rgba(212,175,55,0.28),
+              0 0 22px -6px rgba(212,175,55,0.18);
+  border-color: rgba(212,175,55,0.5) !important;
+}
+@media (hover: none) { #result > .card:hover { transform: none; } } /* touch safe */
+
+/* ---------- Card entrance on scroll-into-view (lazy reveal) ---------- */
+/* The app lazy-renders cards via IntersectionObserver (lazyRender in main.js).
+   When a card scrolls in and its content renders, add a fade-in-up. We key off
+   the existing reveal-run mechanism plus a fresh entrance for newly-rendered cards. */
+@keyframes cardFadeInUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Re-affirm the staggered entrance (existing #result.reveal-run > .card uses cardReveal;
+   we layer a slightly softer curve for the overhaul). Reduced-motion safe. */
+@media (prefers-reduced-motion: no-preference) {
+  #result.reveal-run > .card { animation: cardFadeInUp .5s var(--ease-out, ease-out) both; }
+  #result.reveal-run > .card:nth-child(1)  { animation-delay: .00s; }
+  #result.reveal-run > .card:nth-child(2)  { animation-delay: .05s; }
+  #result.reveal-run > .card:nth-child(3)  { animation-delay: .10s; }
+  #result.reveal-run > .card:nth-child(4)  { animation-delay: .15s; }
+  #result.reveal-run > .card:nth-child(5)  { animation-delay: .20s; }
+  #result.reveal-run > .card:nth-child(6)  { animation-delay: .25s; }
+  #result.reveal-run > .card:nth-child(7)  { animation-delay: .30s; }
+  #result.reveal-run > .card:nth-child(8)  { animation-delay: .35s; }
+  #result.reveal-run > .card:nth-child(n + 9) { animation-delay: .40s; }
+  /* group headers also fade/slide in, slightly ahead of their cards */
+  #result.reveal-run > .grp { animation: grpFadeIn .5s var(--ease-out, ease-out) both; }
+  @keyframes grpFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #result.reveal-run > .card,
+  #result.reveal-run > .grp { animation: none !important; }
+}
+
+/* ---------- Color-coded rating polish (vivid cát/hung/bình) ---------- */
+/* Existing .rate-cat/.rate-mid/.rate-hung exist; make them crisper + subtle border. */
+.rate-cat  { background: rgba(46,158,107,0.22);  color: #7ee2a4; border: 1px solid rgba(46,158,107,0.4);  }
+.rate-mid  { background: rgba(212,175,55,0.14);  color: #e8d690; border: 1px solid rgba(212,175,55,0.32); }
+.rate-hung { background: rgba(224,70,58,0.28);   color: #ff9b89; border: 1px solid rgba(224,70,58,0.45);  }
+.rate-cat, .rate-mid, .rate-hung {
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+}
+/* gold-variant for "gold rating" contexts (e.g. bh-score already uses these — keep parity) */
+.rate-gold { background: rgba(212,175,55,0.20); color: #f0d98a; border: 1px solid rgba(212,175,55,0.45); border-radius: 6px; padding: 2px 8px; font-weight: 600; }
+
+/* ---------- Visual hierarchy: emphasize priority cards ---------- */
+/* The two "hero" summary cards (🌟 Tổng Quan Mệnh + 📅 Hôm Nay Tổng Khái) already carry
+   inline gold borders in the markup. We boost their title slightly so the eye lands there first. */
+#result > .card:first-of-type .card-title,
+#result > .card:nth-of-type(2) .card-title { font-size: 19px; }
+
+/* ==========================================================================
+   END UX OVERHAUL
+   ========================================================================== */
+

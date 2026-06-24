@@ -13,8 +13,8 @@ import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, SHENSHA_INFO } from '
 const wxVi = (w) => WX_VI[w];
 const CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
 const HAI = { 子: '未', 未: '子', 丑: '午', 午: '丑', 寅: '巳', 巳: '寅', 卯: '辰', 辰: '卯', 申: '亥', 亥: '申', 酉: '戌', 戌: '酉' };
-// Tam hình (pair)
-const XING = { 子: '卯', 卯: '子', 寅: '巳', 巳: '申', 申: '寅', 丑: '戌', 戌: '未', 未: '丑' };
+// Tam hình (pair) + tự hình (辰辰/午午/酉酉/亥亥)
+const XING = { 子: '卯', 卯: '子', 寅: '巳', 巳: '申', 申: '寅', 丑: '戌', 戌: '未', 未: '丑', 辰: '辰', 午: '午', 酉: '酉', 亥: '亥' };
 // Phá thái tuế
 const PO = { 子: '酉', 酉: '子', 丑: '辰', 辰: '丑', 寅: '亥', 亥: '寅', 卯: '午', 午: '卯', 巳: '申', 申: '巳', 戌: '未', 未: '戌' };
 
@@ -33,29 +33,23 @@ const GOD_YEAR_EFFECT = {
 };
 
 /**
- * Luận lưu niên đa trường phái cho 1 năm.
- * @returns {{ year, ganZhi, ganGod, elementSchool, taiSui, shensha, tianKe, score, rating, schools, advice }}
+ * Chấm điểm 1 LƯU NIÊN theo 5 trường phái — HÀM CHUNG. Cả chart.js:computeLiuNian
+ * (thẻ "Lưu Niên" / bảng 10 năm) và analyzeLiunianDeep (brief "Luận vận năm") đều gọi
+ * hàm này → 2 nơi KHÔNG bao giờ mâu thuẫn. [cycle 44 sửa lỗi] trước đây computeLiuNian
+ * chỉ chấm ngũ hành (bỏ qua Thập thần 伤官 −16 + Thái tuế) → báo 2026 "Cát" trong khi
+ * deep báo "Hơi kỵ" → AI nhận 2 phán đoán trái ngược ("ba phải").
+ * @returns {{ score, rating, schools, ganGod, ganWx, zhiWx }}
  */
-export function analyzeLiunianDeep(R, solarYear) {
-  const c = R.chart;
-  const dayGan = c.dayGan, dayZhi = c.pillars.day.zhi;
-  const yearBirthZhi = c.pillars.year.zhi;
-  const yong = R.yong;
-
-  // Lấy can chi năm (dùng giữa năm để đúng năm can chi theo lập xuân)
-  const ys = Solar.fromYmdHms(solarYear, 6, 15, 12, 0, 0);
-  const yl = ys.getLunar();
-  const yGan = yl.getYearGan(), yZhi = yl.getYearZhi();
+export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZhi }) {
   const ganGod = tenGod(dayGan, yGan);
   const ganWx = GAN[yGan].wx, zhiWx = ZHI[yZhi].wx;
-
   const schools = [];
   let score = 50;
 
   // (1) Ngũ hành / Dụng thần học
   let elementNote = `Can ${yGan}(${wxVi(ganWx)}) + Chi ${yZhi}(${wxVi(zhiWx)}). `;
   const favSet = new Set([yong.primary, yong.xi].filter(Boolean));
-  const avoidSet = new Set([yong.ji, yong.chou]);
+  const avoidSet = new Set([yong.ji, yong.chou].filter(Boolean));
   let elD = 0;
   if (favSet.has(ganWx)) { elD += 8; elementNote += `Can hành ${wxVi(ganWx)} là Dụng/Hỷ → thuận. `; }
   if (avoidSet.has(ganWx)) { elD -= 10; elementNote += `Can hành ${wxVi(ganWx)} là Kỵ/Thù → nghịch. `; }
@@ -75,7 +69,6 @@ export function analyzeLiunianDeep(R, solarYear) {
   if (XING[yearBirthZhi] === yZhi) { score -= 12; taiSuiNotes.push('刑太岁 — quan phi, thị phi.'); }
   if (PO[yearBirthZhi] === yZhi) { score -= 8; taiSuiNotes.push('破太岁 — phá tài.'); }
   if (HAI[yearBirthZhi] === yZhi) { score -= 8; taiSuiNotes.push('害太岁 — tiểu nhân, hao tốn ngầm.'); }
-  // Tuế vs chi NGÀY (日破)
   if (CHONG[dayZhi] === yZhi) { score -= 14; taiSuiNotes.push('⚡日支冲太岁 — tổn bản thân/sức khoẻ, năm "ngày xung".'); }
   if (taiSuiNotes.length) schools.push({ phai: 'Thái Tuế', note: taiSuiNotes.join(' '), d: -1 });
 
@@ -88,14 +81,13 @@ export function analyzeLiunianDeep(R, solarYear) {
   if (YI_MA[grp] === yZhi || YI_MA[BRANCH_GROUP[dayZhi]] === yZhi) { score += 3; ssNotes.push('🐎 Dịch Mã năm — di chuyển/đổi việc (cát nếu Dụng, hao nếu không).'); }
   if (ssNotes.length) schools.push({ phai: 'Lưu Niên Thần Sát', note: ssNotes.join(' '), d: -1 });
 
-  // (5) Thiên khắc địa xung (can năm khắc can ngày + chi năm xung chi ngày)
-  // can năm là Quan/Sát của Nhật Can = khắc thân; + chi xung
-  const ganClash = ganGod === '七殺' || ganGod === '正官';
+  // (5) Thiên khắc địa xung (can năm & can ngày TƯƠNG KHẮC 2 chiều + chi năm xung chi ngày)
+  // [cycle 48 C2] bidirectional — trước đây chỉ bắt 克入(官杀), bỏ sót 克出(财). Nay cả 4 thần khắc.
+  const ganClash = ['七殺', '正官', '正財', '偏財'].includes(ganGod);
   const zhiClash = CHONG[dayZhi] === yZhi;
   if (ganClash && zhiClash) { score -= 18; schools.push({ phai: 'Thiên Khắc Địa Xung', note: '⚡ Năm can khắc Nhật Can + chi xung Nhật Chi = "thiên khắc địa xung" — năm ĐẠI HUNG, biến loạn lớn.', d: -18 }); }
   else if (zhiClash) { score -= 10; schools.push({ phai: 'Địa Xung', note: 'Chi năm xung Nhật Chi — biến động bản thân/gia đạo.', d: -10 }); }
 
-  // Tổng
   score = Math.max(2, Math.min(98, Math.round(score)));
   let rating;
   if (score >= 78) rating = 'Đại cát';
@@ -105,11 +97,33 @@ export function analyzeLiunianDeep(R, solarYear) {
   else if (score >= 20) rating = 'Hung';
   else rating = 'Đại hung';
 
-  const advice = score >= 62
-    ? `Năm ${solarYear} (${rating}) — nên tiến thủ, nắm cơ hội; vẫn giữ Dụng ${wxVi(yong.primary)}.`
-    : score >= 46
-      ? `Năm ${solarYear} (${rating}) — giữ ổn định, thuận tự nhiên, tránh quyết định lớn nếu chưa rõ.`
-      : `Năm ${solarYear} (${rating}) — NĂM BẤT LỢI. Thủ không tiến: giữ tiền, tránh đầu tư/đi xa/liều, bao dung tình cảm, tích đức hoá giải, đợi năm mang Dụng ${wxVi(yong.primary)}/Hỷ ${wxVi(yong.xi)} sẽ khá hơn.`;
+  return { score, rating, schools, ganGod, ganWx, zhiWx };
+}
 
+// Lời khuyên năm — [cycle 44 sửa C1] KHÔNG nói "đợi năm mang Hỷ X" khi năm hiện tại
+// ĐÃ mang Hỷ X (tự mâu thuẫn). Nếu năm có Dụng/Hỷ nhưng vẫn hung (Thái tuế/xung át),
+// nói thẳng "dù có Hỷ nhưng bị át" thay vì "đợi Hỷ".
+function buildLiunianAdvice(score, rating, solarYear, yong, ganWx, zhiWx) {
+  const favSet = new Set([yong.primary, yong.xi].filter(Boolean));
+  const yearHasFav = favSet.has(ganWx) || favSet.has(zhiWx);
+  if (score >= 62) return `Năm ${solarYear} (${rating}) — nên tiến thủ, nắm cơ hội; vẫn giữ Dụng ${wxVi(yong.primary)}.`;
+  if (score >= 46) return `Năm ${solarYear} (${rating}) — giữ ổn định, thuận tự nhiên, tránh quyết định lớn nếu chưa rõ.`;
+  if (yearHasFav) return `Năm ${solarYear} (${rating}) — BẤT LỢI dù năm có mang Dụng ${wxVi(yong.primary)}/Hỷ ${wxVi(yong.xi)} (bị Thái Tuế / xung / Thương Quan lấn át). Thủ không tiến: giữ tiền, tránh đầu tư/liều, bao dung tình cảm, tích đức hoá giải.`;
+  return `Năm ${solarYear} (${rating}) — NĂM BẤT LỢI. Thủ không tiến: giữ tiền, tránh đầu tư/đi xa/liều, bao dung tình cảm, tích đức hoá giải, đợi năm mang Dụng ${wxVi(yong.primary)}/Hỷ ${wxVi(yong.xi)} sẽ khá hơn.`;
+}
+
+/**
+ * Luận lưu niên đa trường phái cho 1 năm (brief dùng). Wrapper mỏng quanh scoreLiunianYear.
+ * @returns {{ year, ganZhi, ganGod, ganWx, zhiWx, score, rating, schools, advice }}
+ */
+export function analyzeLiunianDeep(R, solarYear) {
+  const c = R.chart;
+  const ys = Solar.fromYmdHms(solarYear, 6, 15, 12, 0, 0);
+  const yl = ys.getLunar();
+  const yGan = yl.getYearGan(), yZhi = yl.getYearZhi();
+  const { score, rating, schools, ganGod, ganWx, zhiWx } = scoreLiunianYear({
+    dayGan: c.dayGan, dayZhi: c.pillars.day.zhi, yearBirthZhi: c.pillars.year.zhi, yong: R.yong, yGan, yZhi,
+  });
+  const advice = buildLiunianAdvice(score, rating, solarYear, R.yong, ganWx, zhiWx);
   return { year: solarYear, ganZhi: yGan + yZhi, ganGod, ganWx, zhiWx, score, rating, schools, advice };
 }

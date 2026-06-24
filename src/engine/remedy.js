@@ -54,12 +54,12 @@ export const LIAOFAN = {
 };
 
 // ---- Pháp hóa giải tổ hợp hung cụ thể ----
-const SPECIFIC_REMEDY = {
-  '伤官见官': 'Có Thương Quan khắc Chính Quan: dùng Ấn (hoá Thương) hoặc Tài (phá Ấn sinh quan) — tránh cãi vã quan quyền, nữ mạng kết hôn muộn, chọn bạn đời bao dung.',
-  '枭神夺食': 'Thiên Ấn đoạt Thực Thần: dùng Thiên Tài chế Kiêu (Tài khắc Ấn) — tránh đầu tư mạo hiểm, giữ nguồn thu ổn định, cẩn thận sức khỏe tiêu hóa.',
-  '官杀混杂': 'Quan – Sát lẫn lộn: dùng Thực Bán chế Sát hoặc Ấn hoá — giữ sự nghiệp chuyên nhất, tránh đa tình, nữ mạng cẩn thận hôn nhân.',
-  '财多身弱': 'Tài nhiều thân nhược: dùng Tỷ Kiếp trợ thân kháng Tài — hợp tác/cộng sự, tránh ôm nợ lớn, tích lũy dần, đừng đầu cơ.',
-  '杀攻身': 'Sát công thân: dùng Ấn hoá Sát (thông quan) hoặc Thực chế Sát — tránh ngành nguy hiểm, chú ý an toàn, chọn môi trường có người bảo hộ.',
+export const SPECIFIC_REMEDY = {
+  '傷官見官': 'Có Thương Quan khắc Chính Quan: dùng Ấn (hoá Thương) hoặc Tài (phá Ấn sinh quan) — tránh cãi vã quan quyền, nữ mạng kết hôn muộn, chọn bạn đời bao dung.',
+  '梟神奪食': 'Thiên Ấn đoạt Thực Thần: dùng Thiên Tài chế Kiêu (Tài khắc Ấn) — tránh đầu tư mạo hiểm, giữ nguồn thu ổn định, cẩn thận sức khỏe tiêu hóa.',
+  '官殺混雜': 'Quan – Sát lẫn lộn: dùng Thực Bán chế Sát hoặc Ấn hoá — giữ sự nghiệp chuyên nhất, tránh đa tình, nữ mạng cẩn thận hôn nhân.',
+  '財多身弱': 'Tài nhiều thân nhược: dùng Tỷ Kiếp trợ thân kháng Tài — hợp tác/cộng sự, tránh ôm nợ lớn, tích lũy dần, đừng đầu cơ.',
+  '殺攻身': 'Sát công thân: dùng Ấn hoá Sát (thông quan) hoặc Thực chế Sát — tránh ngành nguy hiểm, chú ý an toàn, chọn môi trường có người bảo hộ.',
 };
 
 const hanviet = (gz) => gz.split('').map((c) => (GAN[c]?.vi || c)).join(' ');

@@ -3,7 +3,7 @@
 //  Output = multi-paragraph: personality + career + appearance + family +
 //  interaction + strengths/weaknesses + name suggestion + children forecast.
 // ============================================================================
-import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
+import { GAN, ZHI, WX_VI, TEN_GOD_VI, KE_BY, SHENG } from './constants.js';
 import { DITIANSUI } from './kb.js';
 import { dominantGods } from './kb.js';
 
@@ -126,7 +126,10 @@ export function buildFullProfile(match, userR) {
 
   // 8. CON CÁI
   const isMaleUser = userR.chart.input.gender === 'nam';
-  const childWxUser = isMaleUser ? '金' : '火'; // simplified
+  // Hành của con = khắc nhập (正官/七殺 group với nam) hoặc sinh xuất (正財/偏財 với nữ)
+  // — tính từ Nhật Chủ của USER, không hardcode.
+  const userDmWx = userR.chart.dayMaster.wx;
+  const childWxUser = isMaleUser ? KE_BY[userDmWx] : SHENG[userDmWx]; // nam: ai khắc Nhật Chủ (官 sát); nữ: Nhật Chủ sinh (tài)
   const combinedChildWx = dmWx; // child inherits partner's element tendency
   p.push(`Con cái: nếu sinh con với partner này → con thừa hưởng Thổ (từ mẹ) + Mộc (từ bạn) = Mộc khắc Thổ = con có tính tự lập, mạnh mẽ. Nên sinh vào năm mang hành ${WX_VI[userYong.primary]} (Dụng của bạn) → con bổ mệnh cha mẹ.`);
 

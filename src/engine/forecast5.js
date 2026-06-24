@@ -1,0 +1,92 @@
+// ============================================================================
+//  5 NĂM DỰ BÁO 五年预测 — TỔNG HỢP ĐA HỆ THỐNG
+//  Kéo 6 module timing (lưu niên 6 phái + tử vi lưu niên + thái tuế +
+//  lưu niên 12 thần + tuế vận + đại vận thập thần) → "năm nào làm gì, cẩn thận gì".
+//  Nguồn: tổng hợp từ các module.
+// ============================================================================
+import { Solar } from 'lunar-javascript';
+import { analyzeLiunianDeep } from './liunian-pro.js';
+import { liunian12Shen } from './liunian-shen.js';
+import { ziweiLiunian } from './ziwei-liunian.js';
+import { personalTaSui } from './taisui.js';
+import { dayunGodMeaning } from './dayun-god.js';
+import { suiyunCheck } from './suiyun.js';
+import { GAN, ZHI, TEN_GOD_VI } from './constants.js';
+
+/**
+ * @param {object} R - kết quả analyze()
+ * @param {number} startYear - năm bắt đầu (thường hiện tại)
+ * @param {number} years - số năm (mặc định 5)
+ * @returns {{ years:[{year, ganZhi, score, rating, schools, taSui, shen12,
+ *            ziwei, suiyun, dayunGod, summary, alert}] }}
+ */
+export function forecast5(R, startYear, years = 5) {
+  const { chart, dayun } = R;
+  const birthZhi = chart.pillars.year.zhi;
+  const birthYear = chart.input.year;
+  const out = [];
+
+  // [cycle 48 H1] age / activeDy / dyGanZhi tính MỖI NĂM trong loop (trước đây tính 1 lần ngoài
+  //   loop → đại vận thập thần + tuế vận bị "đóng băng" cả 5 năm, sai sau ranh giới đại vận).
+  // [cycle 51 sửa regression] dyGanZhi phải ở SCOPE HÀM (theo dõi đại vận cuối) — trước đây `const`
+  //   trong loop → return ngoài scope throws ReferenceError → section "5 NĂM TỚI" brief = [lỗi].
+  let dyGanZhi = '?';
+
+  for (let i = 0; i < years; i++) {
+    const year = startYear + i;
+    const age = year - birthYear;
+    const activeDy = (dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10) || null;
+    dyGanZhi = activeDy?.ganZhi || '?';
+    const alerts = [];
+    const positives = [];
+
+    // 1. Lưu niên 6 phái
+    const ln = analyzeLiunianDeep(R, year);
+    const tone = ln.score >= 62 ? 'cat' : ln.score >= 46 ? 'mid' : 'hung';
+    if (tone === 'hung') alerts.push(`⚠ Vận năm ${ln.rating} (${ln.score}/100): ${ln.schools.filter(s => s.d < -8).map(s => s.note.slice(0, 50)).join('; ')}`);
+    else if (tone === 'cat') positives.push(`✓ Vận năm ${ln.rating} (${ln.score}/100) — nên tiến thủ.`);
+
+    // 2. Lưu niên 12 thần
+    const yearZhi = Solar.fromYmdHms(year, 6, 15, 12, 0, 0).getLunar().getYearZhi();
+    const shen12 = liunian12Shen(birthZhi, yearZhi);
+    if (shen12.god.tone === 'hung') alerts.push(`${shen12.god.zh} (${shen12.god.vi}) — ${shen12.god.meaning.slice(0, 40)}`);
+    else positives.push(`${shen12.god.zh} (${shen12.god.vi})`);
+
+    // 3. Thái tuế
+    const ts = personalTaSui(birthZhi, yearZhi);
+    if (ts?.offends) {
+      const typeStr = (ts.types || []).map((t) => typeof t === 'string' ? t : (t.vi || t.name || JSON.stringify(t))).join('+');
+      alerts.push(`⚡ Phạm thái tuế (${typeStr}): ${(ts.msg || '').slice(0, 40)}`);
+    }
+
+    // 4. Tử vi lưu niên
+    try {
+      const zw = ziweiLiunian(birthYear, chart.input.month, chart.input.day, chart.input.hour, chart.input.minute, chart.input.gender, year);
+      const zwTone = zw.tone === 'cat' ? 'cát' : zw.tone === 'hung' ? 'hung' : 'trung';
+      if (zw.tone === 'hung') alerts.push(`Tử Vi: cung ${zw.palace} (${zw.stars.join(',')}) [${zwTone}]`);
+      else positives.push(`Tử Vi: cung ${zw.palace} (${zw.stars.join(',')}) [${zwTone}]`);
+    } catch (e) {}
+
+    // 5. Tuế vận tương tác
+    const sy = suiyunCheck(dyGanZhi, year, ln.ganZhi);
+    if (sy?.severity >= 2) alerts.push(`⚡ Tuế vận: ${sy.note.slice(0, 50)}`);
+
+    // 6. Đại vận thập thần
+    const dg = dayunGodMeaning(chart, dayun);
+    const activeDg = dg.items.find((d) => age >= d.startAge && age < d.startAge + 10);
+
+    // Tổng hợp
+    const summary = (positives.length ? positives.join(' | ') : '—') + (alerts.length ? ' ‖ ' + alerts.join(' | ') : '');
+    const alert = alerts.length >= 2 ? '🔴 NĂM CẨN THẬN' : alerts.length === 1 ? '🟡 CẨN THẬN NHẸ' : positives.length >= 2 ? '🟢 NĂM TỐT' : '⚪ BÌNH THƯỜNG';
+
+    out.push({
+      year, ganZhi: ln.ganZhi, score: ln.score, rating: ln.rating, tone,
+      shen12: shen12.god.zh,
+      ziwei: { palace: '(xem trên)', tone: '?' },
+      dayunGod: activeDg?.godVi || '?',
+      positives, alerts, summary, alert,
+    });
+  }
+
+  return { years: out, activeDayun: dyGanZhi };
+}

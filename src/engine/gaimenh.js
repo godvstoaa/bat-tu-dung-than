@@ -73,7 +73,7 @@ export function gaimenhPlan(R, opts) {
     pri: 5, name: '🅴 LÀM CÔNG TĂNG PHÚ QUÝ (盲派)', kind: 'mangpai',
     acts: [
       `盲派: "hợp" = công lớn → tăng 做功 bằng HỢP TÁC/KẾT NỐI/quan hệ (${mangpai.fuguui}). Dù mệnh thấp, năng lực "lấy tài quan về主位" vẫn tăng được qua mạng lưới.`,
-      `${mangpai.notes[mangpai.notes.length - 2]}`,
+      `${mangpai.notes[mangpai.notes.length - 2] || '(không có ghi chú)'}`,
     ],
   });
   layers.push({

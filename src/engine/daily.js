@@ -19,10 +19,10 @@ const ZHI_VI = { 子:'Tý',丑:'Sửu',寅:'Dần',卯:'Mão',辰:'Thìn',巳:'T
  */
 export function dailyGuidance(R, yy, mm, dd, hh) {
   const now = new Date();
-  const y = yy || now.getFullYear();
-  const mo = mm || now.getMonth() + 1;
-  const d = dd || now.getDate();
-  const h = hh || now.getHours();
+  const y = yy ?? now.getFullYear();
+  const mo = mm ?? now.getMonth() + 1;
+  const d = dd ?? now.getDate();
+  const h = hh ?? now.getHours();
 
   const solar = Solar.fromYmdHms(y, mo, d, h, 0, 0);
   const lunar = solar.getLunar();

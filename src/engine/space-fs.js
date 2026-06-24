@@ -21,6 +21,14 @@ const WX_DIR = { 木: ['Đông', 'Đông Nam'], 火: ['Nam'], 土: ['Đông Bắ
 // 八宅: Đông Tứ = 坎/震/巽/离 (cát); Tây Tứ = 乾/坤/艮/兑
 const EAST_GROUP = new Set(['坎', '震', '巽', '离']);
 
+// Normalize shorthand direction names to full 8-direction names so that
+// exact-match comparisons don't get fooled by substrings
+// ('Bắc' should NOT match both 'Tây Bắc' and 'Đông Bắc').
+function normalizeDir(d) {
+  const map = { 'Bắc': 'Chính Bắc', 'Nam': 'Chính Nam', 'Đông': 'Chính Đông', 'Tây': 'Chính Tây' };
+  return map[d] || d;
+}
+
 /**
  * Tổng hợp phong thủy không gian — hướng RIÊNG cho bạn năm [year].
  * @param birthYear, gender (cho 命卦), yong (Dụng Thần), year (năm hỏi)
@@ -65,7 +73,8 @@ export function spaceFs(birthYear, gender, yong, year) {
     else { votes -= 1; notes.push('八宅 ✗'); }
 
     // 玄空运盘: find this direction's star
-    const yunCell = yunPan.pan.find((p) => p.palace.includes(d) || d.includes(p.palace.split(' ')[0]));
+    const dNorm = normalizeDir(d);
+    const yunCell = yunPan.pan.find((p) => p.palace === dNorm);
     if (yunCell) {
       if (yunCell.quality.includes('vượng') || yunCell.quality.includes('sinh khí')) { votes += 1; notes.push(`运盘 ${yunCell.info.name} ✓`); }
       else if (yunCell.quality.includes('hung')) { votes -= 1; notes.push(`运盘 ${yunCell.info.name} ✗`); }
@@ -73,7 +82,7 @@ export function spaceFs(birthYear, gender, yong, year) {
     }
 
     // 玄空流年: find this direction's star
-    const yfsCell = yfsPan.pan.find((p) => p.palace.includes(d) || d.includes(p.palace.split(' ')[0]));
+    const yfsCell = yfsPan.pan.find((p) => p.palace === dNorm);
     if (yfsCell) {
       if (yfsCell.base === 'cát' || yfsCell.base === 'đại cát') { votes += 1; notes.push(`流年 ${yfsCell.name} ✓`); }
       else if (yfsCell.base === 'hung' || yfsCell.base === 'đại hung') { votes -= 1; notes.push(`流年 ${yfsCell.name} ✗`); }

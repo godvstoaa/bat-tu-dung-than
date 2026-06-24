@@ -18,4 +18,8 @@ export default defineConfig({
       '/openai':   { target: 'https://api.openai.com',   changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/openai/, '') },
     },
   },
+  build: {
+    emptyOutDir: true,   // luôn xoá dist/ cũ trước build — tránh tích luỹ file stale
+    chunkSizeWarningLimit: 800,  // 768KB chunk OK — bỏ warning
+  },
 });

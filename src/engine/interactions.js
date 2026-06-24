@@ -70,15 +70,16 @@ export const ZHI_CHONG_MAP = (() => {
 })();
 
 // ---- TAM HÌNH (三刑) + TỰ HÌNH ----
-// Vô lễ: 子↔卯 ; Thế thế: 寅→巳→申→寅 ; Vô ân: 丑→戌→未→丑 ; Tự hình: 辰辰/午午/酉酉/亥亥
+// [cycle 47 sửa NHÃN] Vô lễ: 子↔卯 ; Vô ân(无恩): 寅→巳→申→寅 ; Thế thế(恃势): 丑→戌→未→丑 ; Tự hình: 辰辰/午午/酉酉/亥亥
+//   (trước đây 2 nhãn Vô ân/Thế thế bị HOÁN cho nhau — sai thuật ngữ cổ trên mọi luận hình)
 export const ZHI_XING_PAIRS = [
   { pair: ['子', '卯'], name: 'Vô lễ chi hình', vi: 'Hình vô lễ' },
-  { pair: ['寅', '巳'], name: 'Thế thế chi hình', vi: 'Hình thế thế' },
-  { pair: ['巳', '申'], name: 'Thế thế chi hình', vi: 'Hình thế thế' },
-  { pair: ['寅', '申'], name: 'Thế thế chi hình', vi: 'Hình thế thế' },
-  { pair: ['丑', '戌'], name: 'Vô ân chi hình', vi: 'Hình vô ân' },
-  { pair: ['戌', '未'], name: 'Vô ân chi hình', vi: 'Hình vô ân' },
-  { pair: ['丑', '未'], name: 'Vô ân chi hình', vi: 'Hình vô ân' },
+  { pair: ['寅', '巳'], name: 'Vô ân chi hình', vi: 'Hình vô ân' },
+  { pair: ['巳', '申'], name: 'Vô ân chi hình', vi: 'Hình vô ân' },
+  { pair: ['寅', '申'], name: 'Vô ân chi hình', vi: 'Hình vô ân' },
+  { pair: ['丑', '戌'], name: 'Thế thế chi hình', vi: 'Hình thế thế' },
+  { pair: ['戌', '未'], name: 'Thế thế chi hình', vi: 'Hình thế thế' },
+  { pair: ['丑', '未'], name: 'Thế thế chi hình', vi: 'Hình thế thế' },
 ];
 export const ZHI_XING_SELF = ['辰', '午', '酉', '亥'];
 
@@ -145,7 +146,7 @@ export function detectInteractions(pillars) {
   const xing = [];
   for (const [a, b, i, j] of pairs(zhis)) {
     const hit = ZHI_XING_PAIRS.find((p) =>
-      (p.pair[0] === a && p.pair[1] === b));
+      (p.pair[0] === a && p.pair[1] === b) || (p.pair[0] === b && p.pair[1] === a));
     if (hit) xing.push({ a, b, name: hit.name, vi: hit.vi, at: `${POS_LABEL[i]}–${POS_LABEL[j]}` });
   }
   // Tự hình: cùng một chi xuất hiện ≥2 lần
