@@ -14,7 +14,7 @@ import { Solar } from 'lunar-javascript';
 import { sanshaDirection } from './sansha.js';
 import { yearFlyingStar } from './xuankong.js';
 
-const ZHI_TO_CARDINAL = { 子: 'Bắc', 午: 'Nam', 卯: 'Đông', 酉: 'Tây', 寅: 'Đông', 申: 'Tây', 巳: 'Nam', 亥: 'Bắc', 辰: 'Đông', 戌: 'Tây', 丑: 'Bắc', 未: 'Nam' };
+const ZHI_TO_CARDINAL = { 子: 'Bắc', 午: 'Nam', 卯: 'Đông', 酉: 'Tây', 寅: 'Đông Bắc', 申: 'Tây Nam', 巳: 'Đông Nam', 亥: 'Tây Bắc', 辰: 'Đông Nam', 戌: 'Tây Bắc', 丑: 'Đông Bắc', 未: 'Tây Nam' };
 const CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
 // Gộp vocab 4-phương (Bắc/Nam/Đông/Tây) và 8-phương (Chính Bắc/Tây Bắc...) về 1 tập 8 hướng.
 // KHÔNG gộp đường chéo vào chính phương (bug cũ: 'Tây Bắc'→'Bắc' khiến hướng chéo kế thừa sát chính phương).
