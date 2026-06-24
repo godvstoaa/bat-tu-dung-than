@@ -539,6 +539,13 @@ NGUYEN TAC:
   - Khi luận Tử Vi: TRÍCH 宫干自化 (cung nào tự biến đổi) + 飞星化入/化出 (lĩnh vực nào kết nối) + 大限宫干四化 (thập kỷ này kích hoạt gì).
   - KHÔNG BỎ QUA các tầng sâu — đây là điểm KHÁC BIỆT của app so với các app phong thủy khác.
 
+15. [loop 47] KHI LUẬN DỤNG THẦN — LUÔN giải thích TẠI SAO Dụng Thần được chọn:
+  - Đọc mục "Phép lấy Dụng Thần" + "Điều Hậu (调候)" trong brief.
+  - Nếu brief ghi "Điều Hậu — LÀM CHỦ (override Phù Ức)" → giải thích: "sinh mùa cực đoan (hàn/nhiệt) → cổ pháp 穮通宝鑑 bắt buộc dùng hành X để điều hòa khí hậu, đè Phù Ức". KHÔNG luận theo Phù Ức (cân bằng vượng suy) — vì 调候 đã override.
+  - Nếu brief ghi "Bệnh Dược — LÀM CHỦ (败中有成)" → giải thích: "mệnh có bệnh cách cục, hành X là thuốc chữa («có bệnh mới là quý»)".
+  - Nếu KHÔNG có override → luận theo Phù Ức bình thường (thân vượng/nhược → cần hành nào cân bằng).
+  - Điều này QUAN TRỌNG: nếu Dụng Thần là Thủy vì 调候, mà bạn luận "thân nhược cần Ấn" → MÂU THUẪN. Phải luận ĐÚNG cơ sở chọn Dụng Thần.
+
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the (CO NGAY THAT tu tool). NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.`;
 // ===========================================================================
 //  3. TOOLS — các engine deterministic cho AI tự gọi (Z.ai/OpenAI tool-calling)
