@@ -17,7 +17,9 @@
 import { ZHI } from './constants.js';
 
 const TAOHUA = { 寅: '卯', 午: '卯', 戌: '卯', 申: '酉', 子: '酉', 辰: '酉', 巳: '午', 酉: '午', 丑: '午', 亥: '子', 卯: '子', 未: '子' };
-const HONGYAN = { 甲: '午', 乙: '午', 丙: '寅', 丁: '未', 戊: '辰', 己: '辰', 庚: '戌', 辛: '酉', 壬: '子', 癸: '丑' };
+// [loop 28 sửa] 癸→申 (khẩu quyết «癸临申上», 《三命通会》) — trước đây 癸→丑 (thiếu chỗ dựa cổ pháp,
+//   và mâu thuẫn shensha.js HONG_YAN[癸]=申). Đồng bộ 2 module.
+const HONGYAN = { 甲: '午', 乙: '午', 丙: '寅', 丁: '未', 戊: '辰', 己: '辰', 庚: '戌', 辛: '酉', 壬: '子', 癸: '申' };
 const PILLAR_VI = { year: 'Niên', month: 'Nguyệt', day: 'Nhật', time: 'Thời' };
 
 /**

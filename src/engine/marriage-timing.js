@@ -35,26 +35,34 @@ export function scanMarriageTiming(R, fromYear, count = 12) {
   const spouseGods = isMale ? ['正財', '偏財'] : ['正官', '七殺'];
 
   const years = [];
+  // [loop 28 sửa CRITICAL] 红鸾/天喜 là sao CỐ ĐỊNH theo NĂM SINH (年命), KHÔNG phải năm lưu.
+  //   Trước đây HONGLUAN[zhi_lưu] (红鸾-của-năm-lưu — vô nghĩa cổ pháp) so với nhật chi → gắn
+  //   SAI năm cưới. Đúng: chi năm lưu ĐẾN vị 红鸾 cố định của năm sinh. marriage-deep.js làm đúng.
+  const hongLuanStar = HONGLUAN[yearZhiBirth];
+  const tianXiStar = TIANXI[yearZhiBirth];
+  // Lục hợp / Lục xung nhật chi (cung phu thê) — fixed maps
+  const LH = ['子丑','寅亥','卯戌','辰酉','巳申','午未'];
+  const CHONG_M = { 子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳' };
   for (let i = 0; i < count; i++) {
     const y = start + i;
     const { gan, zhi } = yearGanZhi(y);
     const signals = [];
     let score = 0;
-    const hongLuan = HONGLUAN[zhi], tianXi = TIANXI[zhi], taoHua = TAOHUA[zhi];
 
-    // 1) 红鸾/天喜 đến 配偶 cung / 本命
-    if (hongLuan === dayZhi) { score += 3; signals.push(`红鸾(${hongLuan}) ĐẾN 配偶 cung (日支) → TÍN HIỆU HÔN NHÂN mạnh`); }
-    else if (hongLuan === yearZhiBirth) { score += 2; signals.push(`红鸾 đến 本命 chi`); }
-    if (tianXi === dayZhi) { score += 2; signals.push(`天喜(${tianXi}) đến 配偶 cung → cát hỉ, dễ có việc vui (hôn/thai)`); }
+    // 1) 红鸾/天喜 (cố định năm sinh) ĐẾN — chi năm lưu trùng sao
+    if (zhi === hongLuanStar) { score += 3; signals.push(`红鸾(${hongLuanStar}) ĐẾN (chi năm ${zhi}) → TÍN HIỆU HÔN NHÂN mạnh`); }
+    if (zhi === tianXiStar) { score += 2; signals.push(`天喜(${tianXiStar}) ĐẾN → cát hỉ, dễ có việc vui (hôn/thai)`); }
     // 2) 配偶 tinh thấu can
     const g = tenGod(dayGan, gan);
     if (spouseGods.includes(g)) { score += 2; signals.push(`配偶 tinh (${g}) thấu can năm → sao vợ/chồng hiện`); }
     // 3) 桃花 năm = chi năm TRÙNG vị đào hoa BẢN MỆNH. [cycle 60 sửa H1] trước đây `taoHua === dayZhi`
     //   ĐẢO (tính đào hoa của NĂM rồi so ngày chi → sai hướng). Đúng: chi năm == TAOHUA[ngày chi/năm sinh chi].
-    //   Vd user (日亥→桃花子, 年酉→桃花午): 2026 午 nay bắt được (trước miss).
     if (zhi === TAOHUA[dayZhi] || zhi === TAOHUA[yearZhiBirth]) { score += 1; signals.push(`桃花(${zhi}) đến → duyên tình (hôn nhẹ)`); }
     // 红艳 theo can năm == 日支
     if (HONGYAN[dayGan] === zhi) { score += 1; signals.push(`红艳 năm → duyên mạnh`); }
+    // [loop 28 thêm] 日支 (cung phu thê) 合/冲 — trigger hôn nhân chính
+    if (LH.some((p) => p === zhi + dayZhi || p === dayZhi + zhi)) { score += 2; signals.push(`流年 chi ${zhi} LỤC HỢP 日支 ${dayZhi} (cung phu thê) → TRIGGER hôn nhân/gia đạo`); }
+    if (CHONG_M[dayZhi] === zhi) { score += 1; signals.push(`⚡流年 chi ${zhi} XUNG 日支 ${dayZhi} → biến động hôn nhân (cưới HOẶC ly)`); }
 
     if (score > 0) years.push({ year: y, ganZhi: gan + zhi, score, signals, type: score >= 4 ? 'hôn nhân' : score >= 2 ? 'duyên tình' : 'nhẹ' });
   }

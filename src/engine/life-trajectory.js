@@ -8,6 +8,7 @@
 // ============================================================================
 import { GAN, WX_VI, TEN_GOD_VI, SHENG, KE, SHENG_BY, KE_BY } from './constants.js';
 import { analyzePillarAges } from './pillar-age.js';
+import { isFuyin, isFanyin } from './fuyin.js'; // [loop 28] landmark 大运×natal pillar
 
 // ---- Nhóm Thập Thần (ti/yin/shi/cai/guan) ----
 function godGroup(god) {
@@ -83,8 +84,10 @@ function decadeTheme(R, dy) {
   if (headG === 'cai' && !strong && anyFav) line = 'tài đến nhưng thân nhược — cần tiết chế, đừng vội đầu tư lớn; "tài đa thân nhược" dễ mệt';
   if (headG === 'ti' && strong && anyKy) line = 'tỷ kiếp trùng điệp — cạnh tranh/phá tài, hao tiền vì bạn bè/người thân';
 
-  const golden = isCat && anyFav;
-  const caution = isHung || anyKy;
+  // [loop 28 sửa] golden & caution phải LOẠI NHAU — trước đây thập niên có can=Dụng + chi=Kỵ bị
+  //   flag CẢ 2 (đỉnh vận + dè chừng) tự mâu thuẫn. golden chỉ khi KHÔNG có Kỵ; caution khi không golden.
+  const golden = isCat && anyFav && !anyKy;
+  const caution = !golden && (isHung || anyKy);
 
   return {
     headG, themeName, flavour, line,
@@ -166,9 +169,26 @@ export function buildLifeTrajectory(R) {
   // Điểm rẽ: 2 đại vận Cát nhất (golden) + 2 Hung nhất (caution)
   const golden = decades.filter((d) => d.golden).sort((a, b) => b.dy.score - a.dy.score).slice(0, 2);
   const caution = decades.filter((d) => d.caution).sort((a, b) => a.dy.score - b.dy.score).slice(0, 2);
+  // [loop 28] LANDMARK: 大运 伏吟/反吟 1 trụ nguyên cục → thập kỷ biến cố lớn (cổ法 «反吟伏吟
+  //   泪淋淋»). Đặc biệt nhật trụ = bản thân/phối ngẫu. isFuyin/isFanyin đã verify (loop 19).
+  const pillarKeys = ['year', 'month', 'day', 'time'];
+  const pillarVi = { year: 'Niên', month: 'Nguyệt', day: 'Nhật', time: 'Thời' };
+  const landmarks = [];
+  for (const d of decades) {
+    if (!d.ganZhi || d.ganZhi.length < 2) continue;
+    const dyP = { gan: d.ganZhi[0], zhi: d.ganZhi[1] };
+    for (const k of pillarKeys) {
+      const np = R.chart.pillars[k];
+      if (!np || !np.gan) continue;
+      const natal = { gan: np.gan, zhi: np.zhi };
+      if (isFuyin(dyP, natal)) landmarks.push({ kind: 'fuyin', ages: d.ages, ganZhi: d.ganZhi, pillar: pillarVi[k], reason: `伏吟 ${pillarVi[k]} (đại vận trùng ${np.gan}${np.zhi}) — ${k === 'day' ? 'BIẾN CỐ BẢN THÂN/PHỐI NGẪU' : 'đình trệ/lặp'} ${pillarVi[k].toLowerCase()}` });
+      else if (isFanyin(dyP, natal)) landmarks.push({ kind: 'fanyin', ages: d.ages, ganZhi: d.ganZhi, pillar: pillarVi[k], reason: `⚡反吟 ${pillarVi[k]} (đại vận thiên khắc địa xung ${np.gan}${np.zhi}) — ${k === 'day' ? 'BIẾN ĐỘNG LỚN bản thân/phối ngẫu' : 'động loạn'} ${pillarVi[k].toLowerCase()}` });
+    }
+  }
   const turningPoints = [
     ...golden.map((d) => ({ kind: 'golden', ages: d.ages, ganZhi: d.ganZhi, reason: d.line })),
     ...caution.map((d) => ({ kind: 'caution', ages: d.ages, ganZhi: d.ganZhi, reason: d.line })),
+    ...landmarks,
   ];
 
   const synth = R.synthesis || {};

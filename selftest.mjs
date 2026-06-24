@@ -1352,7 +1352,8 @@ console.log(`   user: ${pq.gaijieCount}/4 trụ 盖头/截脚 (flowOk=${pq.flowO
 import { analyzeTaohua, TAOHUA, HONGYAN } from './src/engine/taohua.js';
 console.log('\n################## 22. ĐÀO HOA 桃花 正/烂 ##################');
 assert(TAOHUA['亥'] === '子' && TAOHUA['寅'] === '卯' && TAOHUA['巳'] === '午' && TAOHUA['申'] === '酉', '桃花: 亥卯未→子 寅午戌→卯 巳酉丑→午 申子辰→酉');
-assert(HONGYAN['乙'] === '午' && HONGYAN['庚'] === '戌' && HONGYAN['癸'] === '丑', '红艳: 乙→午 庚→戌 癸→丑');
+// [loop 28] 癸→申 (khẩu quyết «癸临申上», đồng bộ shensha.js) — trước đây 癸→丑
+assert(HONGYAN['乙'] === '午' && HONGYAN['庚'] === '戌' && HONGYAN['癸'] === '申', '红艳: 乙→午 庚→戌 癸→申 (口诀 癸临申上)');
 const thR = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
 const th = analyzeTaohua(thR);
 assert(th.taohuaZhi === '子', 'nhật chi 亥 → 桃花 子');
@@ -1725,10 +1726,14 @@ console.log('\n################## 41. HÔN/LUYÊN ỨNG KỲ 流年婚恋 ######
 const mtR = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
 const mt = scanMarriageTiming(mtR, 2026, 12);
 assert(mt.years.length >= 3, `user có ≥3 năm kích hoạt婚恋 (được ${mt.years.length})`);
-// 2036 丙辰: 红鸾(辰年=亥) đến 配偶 cung (日支亥) → score 3 (duyên tình). [cycle 60] 桃花 fix:
-//   2036 辰 KHÔNG phải năm đào hoa bản mệnh (子/午 mới đúng) → mất điểm 桃花 cũ (sai) → score 4→3.
-const y2036 = mt.years.find((y) => y.year === 2036);
-assert(y2036 && y2036.score >= 3 && y2036.signals.some((s) => s.includes('红鸾')), '2036 丙辰 = 红鸾(亥) đến 配偶 cung (日支亥), score ≥3 (duyên)');
+// [loop 28] 红鸾 CỐ ĐỊNH theo năm sinh: HONGLUAN[酉]=午 → năm chi=午 mới kích. 1993 nam:
+//   2026 丙午 (午) = 红鸾 ĐẾN (+3) + 桃花(午, TAOHUA[酉]=午) (+1) → score 5. (Trước đây bug
+//   HONGLUAN[chi năm lưu] gắn 2036 辰 — sai, vì 红鸾 không tính theo năm lưu.)
+const y2026 = mt.years.find((y) => y.year === 2026);
+assert(y2026 && y2026.score >= 3 && y2026.signals.some((s) => s.includes('红鸾')), `2026 丙午 = 红鸾(午) ĐẾN (birth-fixed), score ≥3 (được ${y2026 && y2026.score})`);
+// [loop 28] 合/冲 日支 trigger: 2037 丁巳 xung 日支 亥 → biến động hôn nhân
+const y2037 = mt.years.find((y) => y.year === 2037);
+assert(y2037 && y2037.signals.some((s) => /XUNG|xung/i.test(s)), '2037 丁巳 XUNG 日支 → trigger biến động hôn nhân (合/冲 日支 mới)');
 // nam 乙: 配偶 tinh = Tài (正財/偏財); 2028 戊 = 正財
 const y2028 = mt.years.find((y) => y.year === 2028);
 assert(y2028 && y2028.signals.some((s) => s.includes('配偶 tinh') && s.includes('正財')), '2028 戊申 = 配偶 tinh 正財 thấu (nam 乙, vợ=Tài)');
