@@ -92,8 +92,12 @@ export function computeZiwei(year, month, day, hour, minute, gender) {
     // cung index trong YIN_ORDER: từ mệnh cung, các cung次 逆 (giảm) — 12 cung逆排 từ命
     const palIdx = (mingIdx - p + 12) % 12;
     const pZhi = YIN_ORDER[palIdx];
-    // thiên can thuận theo bước từ mệnh cung can (cung thứ p = mệnh can + p bước)
-    const pGan = GAN_ORDER[(GAN_ORDER.indexOf(mingGongGan) + p) % 10];
+    // [loop 23 sửa CRITICAL] thiên can phải rút từ CHÍNH chi của cung qua 五虎遁 (không phải
+    //   "mệnh can + p bước" tuyến tính). Trước đây can thuận (+p) mà chi nghịch (−p) → ngược
+    //   chiều → 9/12 cung can SAI (vì quan hệ can-chi qua 60 hoa giáp, không tuyến tính). Vd
+    //   甲年 兄弟(酉) ra 乙 thay vì 癸. Sai số này làm hỏng MỌI 飞星/自化. Nay rút per-chi:
+    const pZhiPos = ZHI_ORDER.indexOf(pZhi);
+    const pGan = GAN_ORDER[(yinGanIdx + ((pZhiPos - yinZhiPos + 12) % 12)) % 10];
     // đại hạn: từ mệnh cung (p=0) là giới đầu; cung thứ k =起运 + k*10 ... theo chiều forward/nghịch
     const daXianStart = p === 0 ? ju : null; // chỉ mệnh cung ghi tuổi起运; các cung khác tính theo chiều
     palaces.push({ zh: PALACES[p].zh, vi: PALACES[p].vi, gan: pGan, zhi: pZhi, palIdx, isMing: p === 0, isShen: pZhi === shenGongZhi });
