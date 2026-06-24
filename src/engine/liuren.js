@@ -206,11 +206,13 @@ export function liurenPan(year, month, day, hour) {
   //   Trước đây dùng parity 阳支=顺 (sai 6/12 chi) + khi nghịch không đảo thứ tự 天将 (đặt 螣蛇 nhầm chỗ 天后).
   const SHUN_RANGE = ['亥', '子', '丑', '寅', '卯', '辰'];
   const guiShun = SHUN_RANGE.includes(gui);
-  // 12 天将 排: 贵人在 gui, 顺则正序 tới gui+11; nghịch则 ĐẢO thứ tự 天将 (贵人→天后→太阴→…) tới gui-11.
+  // 12 天将 排: 贵人在 gui. [loop 24 sửa CRITICAL] CHỈ đảo CHIỀU CHI (顺: gui+i / 逆: gui−i),
+  //   KHÔNG đảo THỨ TỰ 天将 — thứ tự 贵人→螣蛇→朱雀→…→天后 là CỐT ĐỊNH mọi phái. Trước đây
+  //   nghịch đảo cả mảng 天将 → đặt 天后 nhầm chỗ 螣蛇 (10/12 general sai mỗi case 逆排).
   const tjAt = {}; // 支 → 天将
   for (let i = 0; i < 12; i++) {
-    const general = guiShun ? TIANJIANG[i] : TIANJIANG[(12 - i) % 12]; // nghịch: đảo mảng 天将
-    const zpos = guiShun ? (guiPos + i) % 12 : (guiPos - i + 12) % 12; // nghịch: lùi chi
+    const general = TIANJIANG[i]; // thứ tự KHÔNG bao giờ đảo
+    const zpos = guiShun ? (guiPos + i) % 12 : (guiPos - i + 12) % 12; // chỉ lùi chi khi nghịch
     tjAt[ZHI[zpos]] = general;
   }
 

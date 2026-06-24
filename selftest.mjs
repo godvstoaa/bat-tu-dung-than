@@ -1040,6 +1040,19 @@ assert(lrPan.ke4.filter((k) => k.rel === '贼').length === 2, 'liuren: 4课 có 
 // [5] 全部具备: sanchuan đủ 3传 + tjAt (12天将) + verdict
 assert(lrPan.sanchuan.length === 3 && lrPan.tjAt && Object.keys(lrPan.tjAt).length === 12, 'liuren: đủ 3传 + 12天将');
 assert(lrPan.verdict && lrPan.verdict.length > 20, 'liuren: có verdict');
+// [loop 24] 天将 thứ tự CỐT ĐỊNH: 螣蛇(TIANJIANG[1]) phải KỀ 贵人 (cả 顺/逆, chỉ đảo chiều chi).
+//   Trước đây nghịch đảo cả mảng 天将 → 螣蛇 nhầm chỗ 天后. Kiểm cho 1 case 逆排.
+{
+  const _ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const _dist = (a, b) => { const da = _ZHI.indexOf(a), db = _ZHI.indexOf(b); return Math.min((da - db + 12) % 12, (db - da + 12) % 12); };
+  let _checked = false;
+  for (let hh = 0; hh < 24 && !_checked; hh++) {
+    const _lr = liurenPan(2026, 6, 24, hh);
+    const _guiChi = Object.entries(_lr.tjAt).find(([z, v]) => v === '贵人')?.[0];
+    const _tengChi = Object.entries(_lr.tjAt).find(([z, v]) => v === '螣蛇')?.[0];
+    if (_guiChi && _tengChi) { assert(_dist(_guiChi, _tengChi) === 1, `liuren 天将: 螣蛇 kề 贵人 (được khoảng ${_dist(_guiChi, _tengChi)})`); _checked = true; }
+  }
+}
 // [6] Tất định
 const lrPan2 = liurenPan(2029, 3, 15, 6);
 assert(JSON.stringify(lrPan) === JSON.stringify(lrPan2), 'liuren: tất định');

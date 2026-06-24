@@ -209,9 +209,14 @@ function buildHexagram(strokes, radicalStrokes) {
   const lowerTri = Object.keys(TRIGRAMS).find((k) => TRIGRAMS[k].lines.join('') === lo3.join(''));
   const upperTri = Object.keys(TRIGRAMS).find((k) => TRIGRAMS[k].lines.join('') === up3.join(''));
   const bianName = (lowerTri && upperTri) ? (HEX64[lowerTri]?.[upperTri] || '?') : '?';
-  // Thể = hạ quái (không đổi gốc), Dụng = thượng quái
-  const ti = TRIGRAMS[lower];
-  const yong = TRIGRAMS[upper];
+  // [loop 24 sửa CRITICAL] Thể/Dụng theo ĐỘNG HÀO (không hardcode hạ/thượng). Quái KHÔNG chứa
+  //   động hào = Thể (bản thân), quái CÓ động hào = Dụng (hành động). Trước đây hardcode
+  //   Thể=hạ/Dụng=thượng → đảo ~50% verdict (khi động hào ở 1-3). Mirror meihua.js buildGua.
+  const dongInUpper = changing >= 4;
+  const tiTri = dongInUpper ? lower : upper;   // quái KHÔNG động = thể
+  const yongTri = dongInUpper ? upper : lower; // quái CÓ động = dụng
+  const ti = TRIGRAMS[tiTri];
+  const yong = TRIGRAMS[yongTri];
   // Quan hệ ngũ hành thể-dụng → cát hung
   let relVi = '', luck = 'Bình';
   if (ti.wx === yong.wx) { relVi = 'thể dụng đồng hành — hoà hợp'; luck = 'Cát'; }

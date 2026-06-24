@@ -120,9 +120,10 @@ const XIONG_GE = [
     if (t === '丁' && (g === 8 || g === 2)) return '丁奇 nhập mộ';
     return null;
   }, note: 'Sao cát bị chôn vùi — sức lực giảm' },
-  { name: '击刑', vi: 'Kích Hình', test: (p) => { // 六仪 tự hình: 戊@震3, 己@坤2, 庚@艮8, 辛@离9, 壬@坎1, 癸@巽4 (thiên hình vị)
+  { name: '击刑', vi: 'Kích Hình', test: (p) => { // 六仪 tự hình: 戊@震3, 己@坤2, 庚@艮8, 辛@离9, 壬@巽4, 癸@巽4 (天刑位)
+    //   [loop 24 sửa] 壬(甲辰) 辰辰自刑 → 巽4 (KHÔ phải 坎1). 癸(甲寅) 寅刑巳 →巽4. 口诀 «壬癸同入巽四宫».
     const t = p.tianQiyi, g = p.gong;
-    const xingMap = { 戊: 3, 己: 2, 庚: 8, 辛: 9, 壬: 1, 癸: 4 };
+    const xingMap = { 戊: 3, 己: 2, 庚: 8, 辛: 9, 壬: 4, 癸: 4 };
     if (xingMap[t] === g) return `${t} @cung${g} thiên hình`;
     return null;
   }, note: 'Mâu thuẫn nội bộ, pháp luật, tổn thương' },
@@ -172,8 +173,11 @@ export function qimenDongPan(year, month, day, hour) {
   const xunName = XUN_NAME[xunIdx];
   // 旬首六仪 ở地盘 nào → 值符星 (本位星 of cung) + 值使门
   const xunGong = base.pan.find((p) => p.qiyi === xunYi)?.gong;
-  const zhiFuStar = GONG_STAR[xunGong];
-  const zhiShiDoor = GONG_DOOR[xunGong];
+  // [loop 24 sửa] 中宫(5) không có cửa/sao riêng → 寄坤2 (cùng convention 八神 line 202).
+  //   Trước đây xunGong===5 → zhiFuStar/zhiShiDoor undefined (vd 阳遁1局 甲辰时 壬@中宫5).
+  const xunGongResolved = xunGong === 5 ? 2 : xunGong;
+  const zhiFuStar = GONG_STAR[xunGongResolved];
+  const zhiShiDoor = GONG_DOOR[xunGongResolved];
   // 时干 ở地盘 nào → 值符随时干落 đây
   const tg = (hGan === '甲') ? xunYi : hGan; // 甲 ẩn → dùng 六仪旬首
   const tgGong = base.pan.find((p) => p.qiyi === tg)?.gong;
@@ -183,12 +187,14 @@ export function qimenDongPan(year, month, day, hour) {
   let zhiShiLanding = zhiShiDoor ? Object.keys(GONG_DOOR).find((g) => GONG_DOOR[g] === zhiShiDoor) : null;
   if (zhiShiLanding) {
     zhiShiLanding = +zhiShiLanding;
-    for (let i = 0; i < step; i++) {
+    // [loop 24 sửa off-by-one] 旬首宫 chính là vị trí 子 (0 bước). 时支 index k → đi k−1 bước.
+    //   Vd 阳遁1局 丁卯时 休门 đến 巽4 (code cũ đi `step` bước → dư 1, ra 5/sai).
+    for (let i = 0; i < step - 1; i++) {
       zhiShiLanding = base.yinYang === '阳' ? (zhiShiLanding % 9) + 1 : ((zhiShiLanding - 1 - 1 + 9) % 9) + 1;
     }
   }
   // [cycle 60] 天盘三奇六仪 (转盘法) — 戊随时干转, 阳 顺 / 阴 逆
-  const tgGongSafe = tgGong || ju; // fallback:若无时干落宫则 天盘 = 地盘 (不动)
+  const tgGongSafe = tgGong || base.ju; // [loop 24 sửa] fallback base.ju (ju không trong scope qimenDongPan)
   const tianMap = tianQiyiRotation(base.yinYang, base.ju, tgGongSafe);
   const panTian = base.pan.map((p) => ({ ...p, tianQiyi: tianMap[p.gong] || p.qiyi }));
 
