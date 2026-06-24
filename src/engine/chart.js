@@ -386,6 +386,14 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
   if (!active) return [];
 
   const lnList = active.getLiuNian();
+  // [loop 19] 4 trụ nguyên cục — truyền vào scoreLiunianYear để bật tầng 伏吟/反吟
+  //   (năm biến cố), giữ thẻ "Lưu Niên" nhất quán với brief "Luận vận năm".
+  const natalPillars = {
+    year: { gan: ec.getYearGan(), zhi: ec.getYearZhi() },
+    month: { gan: ec.getMonthGan(), zhi: ec.getMonthZhi() },
+    day: { gan: ec.getDayGan(), zhi: ec.getDayZhi() },
+    time: { gan: ec.getTimeGan(), zhi: ec.getTimeZhi() },
+  };
   const out = [];
   for (const ln of lnList) {
     const gz = ln.getGanZhi();
@@ -397,6 +405,7 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
     //   trong khi deep (có Thương Quan −16 + Thái tuế) báo "Hơi kỵ" → mâu thuẫn.
     const { score, rating } = scoreLiunianYear({
       dayGan: dGan, dayZhi: ec.getDayZhi(), yearBirthZhi: ec.getYearZhi(), yong, yGan: gan, yZhi: zhi,
+      natalPillars,
     });
     const lnYear = ln.getYear();
     out.push({ ganZhi: gz, gan, zhi, ganWx, zhiWx,

@@ -12,6 +12,11 @@ import { GAN, ZHI, WX_VI, SHENG, KE, TEN_GOD_VI } from './constants.js';
 import { tenGod, godGroup } from './core.js';
 import { GAN_HE_MAP, ZHI_LIUHE_MAP, ZHI_CHONG_MAP } from './interactions.js';
 import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, SHENSHA_INFO } from './shensha.js';
+// [loop 19 — elevation] 伏吟/反吟 chuẩn từ module chuyên dụng (4 cặp thất sát, không phải "bất kỳ ngũ hành khắc").
+import { isFuyin, isFanyin } from './fuyin.js';
+
+// [loop 19] Nhãn 6 thân theo trụ — cho tầng Phục/Phản ngâm (năm biến cố).
+const QIN_VI = { year: 'Niên Trụ (tổ bối)', month: 'Nguyệt Trụ (phụ mẫu/sự nghiệp)', day: 'Nhật Trụ (bản thân/phối ngẫu)', time: 'Thời Trụ (tử tức)' };
 
 const wxVi = (w) => WX_VI[w];
 // Hướng (dấu) của một hành đối với Dụng thần: Dụng/Hỷ → +1, Kỵ/Thù → −1, trung → 0.
@@ -64,7 +69,7 @@ const GOD_YEAR_EFFECT = {
  *        傷官 năm trong 比劫 vận → được sinh → thêm hung). Nguồn 渊海子平/滴天髓.
  * @returns {{ score, rating, schools, ganGod, ganWx, zhiWx }}
  */
-export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZhi, activeDayun }) {
+export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZhi, activeDayun, natalPillars }) {
   const ganGod = tenGod(dayGan, yGan);
   const ganWx = GAN[yGan].wx, zhiWx = ZHI[yZhi].wx;
   const schools = [];
@@ -172,6 +177,37 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
     schools.push({ phai: '大运互动 (运年组合)', note: `[大运 ${activeDayun} ${TEN_GOD_VI[dyGod]}] ${dyNotes.join(' ')}`, d: dyD });
   }
 
+  // (7) Phục/Phản Ngâm 流年 × 4 trụ nguyên cục [loop 19 — ALGORITHM ELEVATION]
+  //   Cổ quyết (渊海子平 反吟伏吟篇 «反吟伏吟泪淋淋»): năm can-chi TRÙNG hoàn toàn 1 trụ
+  //   = 伏吟 (đình trệ/哀泣/lặp); năm THIÊN KHẮC ĐỊA XUNG 1 trụ = 反吟 (động loạn/ly tán).
+  //   Đây là 2 kiểu "năm biến cố" mạnh nhất (hôn nhân/ly tán/bệnh/thăng giáng đột ngột).
+  //   Trước đây scoreLiunianYear CHỈ bắt 天克地冲 vs NHẬT trụ (mục 5) → bỏ sót 伏吟 + 反吟
+  //   vs Nguyệt/Niên/Thời trụ. Nay dùng isFuyin/isFanyin chuẩn (4 cặp thất sát) quét cả 4 trụ.
+  //   Lực: 反吟 > 伏吟; tầm trụ 日>月>年/时. Nhật trụ 反吟 đã ở mục (5) → không tính lại.
+  //   Hóa giải: năm mang Dụng/Hỷ → hung giảm 60% ("phản cát"/hồi phục).
+  if (natalPillars) {
+    const yp = { gan: yGan, zhi: yZhi };
+    const fy = []; let fdD = 0;
+    const W_FUYIN = { day: 7, month: 5, year: 4, time: 4 };     // 伏吟 base (âm)
+    const W_FANYIN = { month: 10, year: 8, time: 8 };           // 反吟 base (âm; day ở mục 5)
+    const fav = new Set([yong.primary, yong.xi].filter(Boolean));
+    const mitig = fav.has(ganWx) || fav.has(zhiWx);            // năm mang Dụng/Hỷ
+    const factor = mitig ? 0.4 : 1;
+    for (const k of ['day', 'month', 'year', 'time']) {
+      const np = natalPillars[k];
+      if (!np || !np.gan) continue;
+      if (isFuyin(yp, np)) {
+        fdD -= W_FUYIN[k] * factor;
+        fy.push(`${k === 'day' ? '⚡' : '•'} 伏吟 ${QIN_VI[k]} (năm trùng ${np.gan}${np.zhi})${mitig ? ' → năm mang Dụng/Hỷ nên hung giảm (có thể "phản cát")' : ''}.`);
+      } else if (isFanyin(yp, np)) {
+        if (k === 'day') continue;                              // mục (5) đã tính 天克地冲 (−18)
+        fdD -= W_FANYIN[k] * factor;
+        fy.push(`⚡ 反吟 ${QIN_VI[k]} (năm thiên khắc địa xung ${np.gan}${np.zhi})${mitig ? ' → năm mang Dụng/Hỷ nên hung giảm' : ''}.`);
+      }
+    }
+    if (fy.length) { score += fdD; schools.push({ phai: 'Phục/Phản Ngâm (伏吟反吟)', note: fy.join(' '), d: fdD }); }
+  }
+
   score = Math.max(2, Math.min(98, Math.round(score)));
   let rating;
   if (score >= 78) rating = 'Đại cát';
@@ -229,6 +265,7 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
   }
   const { score, rating, schools, ganGod, ganWx, zhiWx } = scoreLiunianYear({
     dayGan: c.dayGan, dayZhi: c.pillars.day.zhi, yearBirthZhi: c.pillars.year.zhi, yong: R.yong, yGan, yZhi, activeDayun,
+    natalPillars: c.pillars, // [loop 19] bật tầng 伏吟/反吟 vs 4 trụ nguyên cục
   });
 
   // [loop 3] Trường phái thứ 6: 格局喜忌 (thông tin, không đổi score cốt lõi).

@@ -23,15 +23,18 @@ const PILLAR_QIN = {
 
 // --- Định nghĩa cơ khí ---
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
-const KE_WX = { 木:'土', 火:'金', 土:'水', 金:'木', 水:'火' };
+// [loop 19 sửa bug CAO] Thiên can xung (天克/七杀 pair) — CHỈ 4 cặp đối xứng:
+//   甲↔庚, 乙↔辛, 丙↔壬, 丁↔癸. 戊己 (trung thổ) KHÔNG có thiên can xung.
+//   Trước đây isFanyin dùng "bất kỳ ngũ hành khắc" (ganKe) → chấp nhận cả 偏财/正官
+//   và các cặp âm-dương khắc lộn → 384 false positive / 96 thật (đếm brute-force).
+//   Cổ quyết (渊海子平 反吟伏吟篇): Phản Ngâm = THIÊN KHẮC ĐỊA XUNG, "天克" = đúng 7-vị xung.
+const GAN_CHONG = { 甲:'庚', 庚:'甲', 乙:'辛', 辛:'乙', 丙:'壬', 壬:'丙', 丁:'癸', 癸:'丁' };
 
-// can a khắc can b?
-function ganKe(a, b) { return KE_WX[GAN[a].wx] === GAN[b].wx; }
 // 2 trụ = Phục Ngâm?
 export function isFuyin(p, q) { return p.gan === q.gan && p.zhi === q.zhi; }
 // 2 trụ = Phản Ngâm (thiên khắc địa xung)?
 export function isFanyin(p, q) {
-  return (ganKe(p.gan, q.gan) || ganKe(q.gan, p.gan)) && CHONG[p.zhi] === q.zhi;
+  return GAN_CHONG[p.gan] === q.gan && CHONG[p.zhi] === q.zhi;
 }
 
 // --- Ý nghĩa theo cặp trụ (nguyên cục nội bộ) ---

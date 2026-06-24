@@ -13,10 +13,10 @@ import { WX_VI } from './constants.js';
 // 9 vận — bản cung (hậu thiên bát quái) + hành + phương
 const YUN = [
   { num: 1, star: '一白', starVi: 'Nhất Bạch Tham Lang', trig: 'Khảm 坎', wx: '水', wxVi: 'Thủy', dir: 'Bắc', opp: 'Nam', yuan: 'thượng nguyên', tone: 'giao thông, thông tin, hải vận, tài chính lưu thông, trí tuệ, du lịch' },
-  { num: 2, star: '二黑', starVi: 'Nhị Hỗ Cự Môn', trig: 'Khôn 坤', wx: '土', wxVi: 'Thổ', dir: 'Tây Nam', opp: 'Đông Bắc', yuan: 'thượng nguyên', tone: 'bất động sản, nông nghiệp, mẫu tính, dân sinh, khoáng sản' },
+  { num: 2, star: '二黑', starVi: 'Nhị Hắc Cự Môn', trig: 'Khôn 坤', wx: '土', wxVi: 'Thổ', dir: 'Tây Nam', opp: 'Đông Bắc', yuan: 'thượng nguyên', tone: 'bất động sản, nông nghiệp, mẫu tính, dân sinh, khoáng sản' },
   { num: 3, star: '三碧', starVi: 'Tam Bích Lộc Tồn', trig: 'Chấn 震', wx: '木', wxVi: 'Mộc', dir: 'Đông', opp: 'Tây', yuan: 'thượng nguyên', tone: 'giáo dục, thanh niên, khởi nghiệp, vận động, nông lâm' },
-  { num: 4, star: '四绿', starVi: 'Tứ Lộc Văn Khúc', trig: 'Tốn 巽', wx: '木', wxVi: 'Mộc', dir: 'Đông Nam', opp: 'Tây Bắc', yuan: 'trung nguyên', tone: 'văn hóa, học thuật, xuất bản, phong cảnh, thư pháp, mậu dịch' },
-  { num: 5, star: '五黄', starVi: 'Ngũ Hoả Liêm Trinh', trig: 'Trung cung 中', wx: '土', wxVi: 'Thổ', dir: 'Trung cung', opp: '(đặc biệt)', yuan: 'trung nguyên', tone: 'đại địa, bệnh tật, biến động lớn, trung tâm quyền lực' },
+  { num: 4, star: '四绿', starVi: 'Tứ Lục Văn Khúc', trig: 'Tốn 巽', wx: '木', wxVi: 'Mộc', dir: 'Đông Nam', opp: 'Tây Bắc', yuan: 'trung nguyên', tone: 'văn hóa, học thuật, xuất bản, phong cảnh, thư pháp, mậu dịch' },
+  { num: 5, star: '五黄', starVi: 'Ngũ Hoàng Liêm Trinh', trig: 'Trung cung 中', wx: '土', wxVi: 'Thổ', dir: 'Trung cung', opp: '(đặc biệt)', yuan: 'trung nguyên', tone: 'đại địa, bệnh tật, biến động lớn, trung tâm quyền lực' },
   { num: 6, star: '六白', starVi: 'Lục Bạch Vũ Khúc', trig: 'Càn 乾', wx: '金', wxVi: 'Kim', dir: 'Tây Bắc', opp: 'Đông Nam', yuan: 'trung nguyên', tone: 'tài chính, ngân hàng, quân sự, lãnh đạo, cơ khí, pháp luật' },
   { num: 7, star: '七赤', starVi: 'Thất Xích Phá Quân', trig: 'Đoài 兑', wx: '金', wxVi: 'Kim', dir: 'Tây', opp: 'Đông', yuan: 'hạ nguyên', tone: 'giải trí, khẩu tài, giao tiếp, ngôn luận, sắc đẹp, mồm miệng' },
   { num: 8, star: '八白', starVi: 'Bát Bạch Tả Phụ', trig: 'Cấn 艮', wx: '土', wxVi: 'Thổ', dir: 'Đông Bắc', opp: 'Tây Nam', yuan: 'hạ nguyên', tone: 'BĐS, xây dựng, thiếu niên, tài sản tích luỹ, tĩnh' },
@@ -46,6 +46,11 @@ const YUN9_DETAIL = {
 
 /**
  * Vận của 1 năm dương lịch.
+ * [TODO loop sau] Biên chuyển vận cổ pháp rơi vào LẬP XUÂN (~4/2) của năm biên, KHÔNG phải
+ *   1/1 dương lịch. Vd 2024-02-04 mới vào Cửu vận; 2024-01-01..02-03 vẫn Bát vận. Hiện hàm
+ *   gán cả năm dương lịch cho 1 vận — sai tối đa ~34 ngày ở các năm biên (2004/2024/2044…).
+ *   2026 không nằm ở năm biên nên KHÔNG ảnh hưởng. Khi cần chính xác theo ngày sinh, đổi
+ *   `year` → Date và trừ 1 năm trong cửa sổ 1/1..lập xuẩn-3.
  */
 export function currentYun(year) {
   // 180-năm = 1 chính nguyên (9 vận × 20). Vòng mod 9 để năm 2044 (=1864+180) mở nguyên mới → Nhất vận.

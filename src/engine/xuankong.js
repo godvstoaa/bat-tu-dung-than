@@ -7,12 +7,19 @@
 
 // 三元九运 — xác định vận của một năm dương lịch
 export function determineYun(year) {
-  // 1864 = thượng nguyên nhất vận khởi đầu
-  const idx = Math.floor((year - 1864) / 20); // 0..∞
-  const yun = (idx % 9) + 1; // 1..9
-  const yuan = idx < 3 ? 'Thượng Nguyên' : idx < 6 ? 'Trung Nguyên' : 'Hạ Nguyên';
-  const startYear = 1864 + idx * 20;
-  return { yuan, yun, startYear, endYear: startYear + 19 };
+  // 1864 = thượng nguyên nhất vận khởi đầu (mỗi vận 20 năm, 9 vận = 1正元 180 năm).
+  // [loop 19 sửa bug CAO] Trước đây dùng (idx % 9) + 1 → với year < 1864 (idx âm)
+  //   (idx % 9) cho số âm → yun = 0 vô hiệu, crash downstream (STAR[0] undefined).
+  //   Đồng thời `yuan` không wrap qua 正元 180 năm → 2044 (idx=9) báo "Hạ Nguyên"
+  //   nhưng thực ra 2044 mở 正 nguyên mới (Thượng Nguyên), mâu thuẫn với sanyuan-jiuyun.
+  //   Fix: wrap modulo dương + tính yuan theo localIdx trong 1 正元.
+  const idx = Math.floor((year - 1864) / 20);
+  const localIdx = ((idx % 9) + 9) % 9;            // 0..8 (luời dương sau wrap)
+  const yun = localIdx + 1;                          // 1..9
+  const yuan = localIdx < 3 ? 'Thượng Nguyên' : localIdx < 6 ? 'Trung Nguyên' : 'Hạ Nguyên';
+  const cycleStart = 1864 + Math.floor(idx / 9) * 180; // đầu 正元 chứa `year`
+  const yunStartInCycle = cycleStart + localIdx * 20;
+  return { yuan, yun, startYear: yunStartInCycle, endYear: yunStartInCycle + 19 };
 }
 
 // 9 cung theo thứ tự thuận phi (洛书): trung→tây bắc→tây→đông bắc→nam→bắc→tây nam→đông→đông nam
