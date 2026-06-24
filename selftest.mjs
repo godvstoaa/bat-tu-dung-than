@@ -671,6 +671,52 @@ assert(zv2c.feixing.matrix.length === fxStar.matrix.length, '飞星 deterministi
 assert(zv2c.zihua.list.length === zua.list.length, '宫干自化 vẫn hoạt động sau khi thêm飞星');
 console.log(`   飞星化入化出 ✓ — ma trận 48 hóa | 命宫 出${mingOut.length}/入${mingIn.length} | highlights: ${fxStar.mingHighlights}`);
 
+// ################## 17a3. 大限宫干四化 大限宮干四化 (decade can → 4 hóa → bay vào mệnh bàn) ##################
+console.log('\n################## 17a3. 大限宫干四化 大限宮干四化 (cung đại hạn hiện tại can → 4 hóa kích hoạt mệnh bàn) ##################');
+import { computeDaxianSihua, DX_SIHUA_DOMAIN, DX_SIHUA_INTERP } from './src/engine/ziwei.js';
+// user 1993-10-21 (nam): age 33 (2026), 大限 32-41t ở 子女(乙未) → can 乙
+//   乙四化: 禄=天机(卯/奴仆), 权=天梁(巳/疾厄), 科=紫微(辰/迁移), 忌=太阴(丑/田宅)
+const dxR = computeDaxianSihua(zv2, 2026, 1993);
+assert(dxR.active === true, '大限 hiện tại active cho tuổi 33 (2026)');
+assert(dxR.age === 33, 'computeDaxianSihua: age=33');
+assert(dxR.daxianPalace === '子女', `大限 palace = 子女 (age 32-41), thực tế ${dxR.daxianPalace}`);
+assert(dxR.daxianGan === '乙', `大限 can = 乙 (乙未), thực tế ${dxR.daxianGan}`);
+assert(dxR.daxianGanZhi === '乙未', `大限 ganZhi = 乙未, thực tế ${dxR.daxianGanZhi}`);
+assert(dxR.ageRange === '32-41t', `ageRange = '32-41t', thực tế ${dxR.ageRange}`);
+// 4 hóa đầy đủ + đều placed (sao đích đều có trên bàn user)
+assert(Array.isArray(dxR.sihua) && dxR.sihua.length === 4, `4 hóa đại hạn, thực tế ${dxR.sihua.length}`);
+assert(dxR.sihua.every((r) => r.placed), 'cả 4 hóa đại hạn đều placed (sao đích có trên bàn)');
+// verify từng hóa (乙: 天机/天梁/紫微/太阴)
+assert(dxR.sihua.some((r) => r.type === '禄' && r.star === '天机' && r.targetPalace === '奴仆'), '乙化禄→天机→奴仆 (bạn bè/đối tác kích hoạt tài/duyên)');
+assert(dxR.sihua.some((r) => r.type === '权' && r.star === '天梁' && r.targetPalace === '疾厄'), '乙化权→天梁→疾厄 (sức khoẻ có năng lực/chủ động)');
+assert(dxR.sihua.some((r) => r.type === '科' && r.star === '紫微' && r.targetPalace === '迁移'), '乙化科→紫微→迁移 (thiên di được danh/quý nhân)');
+assert(dxR.sihua.some((r) => r.type === '忌' && r.star === '太阴' && r.targetPalace === '田宅'), '乙化忌→太阴→田宅 (nhà cửa bị nặng trong decade)');
+// tone đúng (3 cat + 1 hung)
+assert(dxR.sihua.filter((r) => r.tone === 'cat').length === 3 && dxR.sihua.filter((r) => r.tone === 'hung').length === 1, '3 cát (禄权科) + 1 hung (忌)');
+// domain & interpretation không rỗng
+assert(dxR.sihua.every((r) => r.domain && r.interpretation), 'mỗi hóa có domain + interpretation');
+// summary nhắc 大限 + ganZhi + các cung đích
+assert(typeof dxR.summary === 'string' && dxR.summary.includes('大限'), 'summary có chữ 大限');
+assert(dxR.summary.includes('乙未'), 'summary có ganZhi 乙未');
+assert(dxR.summary.includes('奴仆') && dxR.summary.includes('田宅'), 'summary liệt kê cung đích');
+// DX_SIHUA_DOMAIN 12 cung + DX_SIHUA_INTERP 4 loại
+assert(Object.keys(DX_SIHUA_DOMAIN).length === 12, 'DX_SIHUA_DOMAIN đủ 12 cung');
+assert(Object.keys(DX_SIHUA_INTERP).length === 4 && DX_SIHUA_INTERP.忌.includes('KÍCH HOẠT'), 'DX_SIHUA_INTERP 4 loại, 忌 = kích hoạt trở ngại');
+// deterministic
+const dxR2 = computeDaxianSihua(zv2, 2026, 1993);
+assert(JSON.stringify(dxR) === JSON.stringify(dxR2), 'computeDaxianSihua deterministic');
+// không phá 宫干自化 (vòng 5) + 飞星 (vòng 6)
+const zv2d = computeZiwei(1993, 10, 21, 0, 30, 'nam');
+assert(zv2d.zihua.list.length === zua.list.length, '宫干自化 nguyên vẹn sau vòng 9');
+assert(zv2d.feixing.matrix.length === 48, '飞星 nguyên vẹn sau vòng 9');
+// edge: năm ngoài range đại hạn (age > 122) → active=false nhưng không crash
+const dxEdge = computeDaxianSihua(zv2, 2120, 1993);
+assert(dxEdge.active === false, 'computeDaxianSihua: ngoài range đại hạn → active=false, không crash');
+// edge: input thiếu daXian → empty an toàn
+const dxEmpty = computeDaxianSihua({}, 2026, 1993);
+assert(dxEmpty.active === false && Array.isArray(dxEmpty.sihua) && dxEmpty.sihua.length === 0, 'computeDaxianSihua: empty input → empty an toàn');
+console.log(`   大限宫干四化 ✓ — bạn(癸) age 33: 大限@子女(乙未) 32-41t → ${dxR.sihua.map((r)=>`${r.type}@${r.star}→${r.targetPalace}`).join(' · ')}`);
+
 console.log('\n################## 17b. THẦN SÁT MỞ RỘNG (niên can/chi hệ) ##################');
 import { computeShenshaExtra, hongLuan, tianXi, luCun, qingYang, tuoLuo } from './src/engine/shensha-extra.js';
 assert(hongLuan('酉') === '午', '红鸾: 酉年 → 午');

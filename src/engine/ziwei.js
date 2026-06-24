@@ -259,6 +259,121 @@ export function yunXianSihua(z, currentYear, birthYear) {
 }
 
 // ============================================================================
+//  大限宫干四化 大限宮干四化 — DECADE PALACE-STEM 4-化 FLYING INTO NATAL CHART
+//  Vòng 9 (ALGORITHM ELEVATION): tầng ĐỘNG của phi tinh — khác với 宫干自化 (vòng 5,
+//  tĩnh, từ can cung bẩm sinh) và 飞星 (vòng 6, tĩnh, ma trận 48-hóa lifetime),
+//  tầng này lấy can của cung ĐẠI HẠN HIỆN TẠI → sinh 4 hóa → bay vào mệnh bàn
+//  bẩm sinh → tiết lộ lĩnh vực nào bị KÍCH HOẠT trong 10 năm này.
+//
+//  Ý nghĩa cổ điển (中州派/飞星派 — vận限四化 thật sự):
+//   - 大限化禄入命/财/官: 10 năm này SINH TÀI/duyên ở đúng cung cốt lõi → decade
+//     của sự thuận lợi, cơ hội tự đến.
+//   - 大限化忌入夫妻/田宅: 10 năm này TRỞ NGẠI đổ vào hôn nhân/nhà cửa → cẩn trọng
+//     lĩnh vực đó BOTH năm (kể cả năm tốt thì gốc decade vẫn nặng).
+//   - 大限化权入官禄: 10 năm này QUYỀN LỰC sự nghiệp kích hoạt → thăng tiến, chủ động.
+//   - 大限化科入命/福: 10 năm này DANH TIẾNG/quý nhân kích hoạt → được giúp đỡ.
+//
+//  Đây là "Aktivierung" của decade: cho biết CHỦ ĐỀ 10 năm (giống 运中救应 của BaZi
+//  loop 8, nhưng ở đây là tầng Tử Vi). Mỗi hóa đích = 1 lĩnh vực bị decade "bật công tắc".
+// ============================================================================
+const DX_SIHUA_DOMAIN = {
+  命宫: 'bản thân/cá nhân', 兄弟: 'anh chị em/quan hệ ngang', 夫妻: 'hôn nhân/bạn đời',
+  子女: 'con cái/sinh sản/đầu tư', 财帛: 'tài lộc/kiếm tiền', 疾厄: 'sức khoẻ/thân thể',
+  迁移: 'di chuyển/ngoại cảnh/đối ngoại', 奴仆: 'bạn bè/cấp dưới/đối tác',
+  官禄: 'sự nghiệp/công danh', 田宅: 'nhà cửa/gia đình/kho', 福德: 'tinh thần/phúc đức/hậu vận',
+  父母: 'cha mẹ/trưởng bối/văn thư',
+};
+const DX_SIHUA_INTERP = {
+  禄: 'KÍCH HOẠT tài lộc/duyên — 10 năm này lĩnh vực đích TRÔI CHẢY, cơ hội tự đến, dễ được',
+  权: 'KÍCH HOẠT quyền lực/năng lực — 10 năm này lĩnh vực đích CÓ SỨC MẠNH, chủ động, thăng tiến',
+  科: 'KÍCH HOẠT danh tiếng/quý nhân — 10 năm này lĩnh vực đích ĐƯỢC GIÚP, có danh, học vấn',
+  忌: 'KÍCH HOẠT trở ngại/thị phi — 10 năm này lĩnh vực đích BỊ NẶNG, cẩn trọng, dễ vướng',
+};
+
+/**
+ * Tính 大限宫干四化: cung đại hạn hiện tại's can → 4 hóa → bay vào mệnh bàn.
+ *
+ * @param {object} z - kết quả computeZiwei (cần z.daXian, z.palaces, z.mainStars, z.fuxing)
+ * @param {number} currentYear - năm hiện tại (vd 2026)
+ * @param {number} birthYear - năm sinh (vd 1993)
+ * @returns {{
+ *   active: boolean,                              // có tìm được đại hạn hiện tại không
+ *   daxianPalace: string,                          // cung đại hạn (zh, vd '子女')
+ *   daxianPalaceVi: string,                        // cung đại hạn (vi)
+ *   daxianGan: string,                             // can cung đại hạn (vd '乙')
+ *   daxianGanZhi: string,                          // can-chi cung đại hạn (vd '乙未')
+ *   ageRange: string,                              // vd '32-41t'
+ *   age: number,                                   // tuổi hiện tại
+ *   sihua: [{ type, typeVi, star, targetPalace, targetPalaceVi, targetGanZhi, tone, domain, interpretation }],
+ *     // type: 禄/权/科/忌; star: sao hóa đích; targetPalace: cung nhận (zh)
+ *   summary: string,                               // one-liner VH liệt kê 4 kích hoạt
+ * }}
+ */
+export function computeDaxianSihua(z, currentYear, birthYear) {
+  const empty = {
+    active: false, daxianPalace: '', daxianPalaceVi: '', daxianGan: '', daxianGanZhi: '',
+    ageRange: '', age: currentYear - birthYear, sihua: [], summary: '(không tìm được đại hạn hiện tại)',
+  };
+  if (!z || !Array.isArray(z.daXian) || !z.daXian.length) return empty;
+  const age = currentYear - birthYear;
+  const activeDy = z.daXian.find((d) => age >= d.from && age <= d.to);
+  if (!activeDy) return empty;
+
+  const daxianGan = activeDy.ganZhi[0]; // ký tự đầu = thiên can
+  if (!daxianGan) return { ...empty, active: true, daxianPalace: activeDy.palace, daxianPalaceVi: activeDy.palaceVi, daxianGanZhi: activeDy.ganZhi, ageRange: `${activeDy.from}-${activeDy.to}t` };
+
+  // starMap: sao → chi cung đang ngồi (14 chính tinh + phụ tinh từ fuxing)
+  // BẮT BUỘC thêm phụ tinh vì 4 trong 10 can (戊己辛壬) hóa các sao phụ này.
+  const starMap = { ...(z.mainStars || {}) };
+  if (z.fuxing?.stars) {
+    for (const s of z.fuxing.stars) starMap[s.star] = s.atZhi;
+  }
+  // chi → palace (tra cung nhận)
+  const chiToPalace = {};
+  for (const p of (z.palaces || [])) chiToPalace[p.zhi] = p;
+
+  const four = SIHUA_TABLE[daxianGan] || [];
+  const sihua = [];
+  for (let i = 0; i < 4; i++) {
+    const type = SIHUA_KEY[i];
+    const star = four[i];
+    if (!star) continue;
+    const toZhi = starMap[star]; // chi cung nơi sao đích đang ngồi
+    const toPal = toZhi ? chiToPalace[toZhi] : null;
+    const targetPalace = toPal ? toPal.zh : '';
+    sihua.push({
+      type,
+      typeVi: SIHUA_VI[type],
+      star,
+      targetPalace,
+      targetPalaceVi: toPal ? toPal.vi : '(sao không có trên bàn)',
+      targetGanZhi: toPal ? toPal.gan + toPal.zhi : '',
+      placed: !!toPal,
+      tone: SIHUA_TONE[type],
+      domain: targetPalace ? (DX_SIHUA_DOMAIN[targetPalace] || '') : '',
+      interpretation: DX_SIHUA_INTERP[type],
+    });
+  }
+
+  const parts = sihua.map((r) => `${r.type}@${r.star}→${r.targetPalace || '(?)'}(${r.targetPalaceVi.split('(')[0]})`);
+  const summary = `大限(${activeDy.ganZhi} ${activeDy.from}-${activeDy.to}t) can ${daxianGan} kích hoạt: ${parts.join(' · ')}`;
+
+  return {
+    active: true,
+    daxianPalace: activeDy.palace,
+    daxianPalaceVi: activeDy.palaceVi,
+    daxianGan,
+    daxianGanZhi: activeDy.ganZhi,
+    ageRange: `${activeDy.from}-${activeDy.to}t`,
+    age,
+    sihua,
+    summary,
+  };
+}
+
+export { DX_SIHUA_DOMAIN, DX_SIHUA_INTERP };
+
+// ============================================================================
 //  TỨ HÓA 四化 (禄权科忌) — "linh hồn" Tử Vi, theo năm thiên can (生年四化)
 //  Nguồn: 十干四化表 (安星诀). 禄=lộc/thuận, 权=quyền, 科=khoa/danh, 忌=kỵ/trở ngại.
 // ============================================================================

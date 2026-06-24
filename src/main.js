@@ -18,7 +18,7 @@ import { analyzeMangpai } from './engine/mangpai.js';
 import { analyzeMangpaiView } from './engine/mangpai-view.js';
 import { xuankongPan } from './engine/xuankong.js';
 import { daguaByMountain, daguaCompatibility, daguaOverview, MOUNTAINS_HAN } from './engine/xuankong-dagua.js';
-import { computeZiwei, yunXianSihua } from './engine/ziwei.js';
+import { computeZiwei, yunXianSihua, computeDaxianSihua } from './engine/ziwei.js';
 import { annualSihuaToNatal } from './engine/ziwei-liunian-sihua.js';
 import { ziweiDailyZiwei } from './engine/ziwei-liuri.js';
 import { xiaoxianInChart } from './engine/xiaoxian.js';
@@ -271,6 +271,21 @@ function renderZiwei() {
     <h4 class="syn-h4">运限四化 — 大限(${yx.activeDy?.ganZhi||'?'} ${yx.activeDy?.from}-${yx.activeDy?.to}t) + 流年(${yx.yearStem})</h4>
     <div class="zw-sihua"><span style="color:var(--muted);font-size:11px">大限:</span> ${fmt(yx.dxSihua)}</div>
     <div class="zw-sihua"><span style="color:var(--muted);font-size:11px">流年:</span> ${fmt(yx.lnSihua)}</div>`;
+    })()}
+    ${(() => {
+      // 大限宫干四化 (vòng 9): can cung đại hạn HIỆN TẠI → 4 hóa → bay vào mệnh bàn
+      // → tiết lộ 4 lĩnh vực bị KÍCH HOẠT trong 10 năm này (động, khác 自化/飞星 tĩnh).
+      const dx = computeDaxianSihua(z, new Date().getFullYear(), i.year);
+      if (!dx.active || !dx.sihua.length) return '';
+      const tags = dx.sihua.map((r) =>
+        `<span class="zw-sh ${r.tone}" title="${esc(r.interpretation)}"><b>化${r.type}</b> ${r.star}
+          → ${r.placed ? `<b>${esc(r.targetPalaceVi.split('(')[0])}</b> <span class="zh small">(${esc(r.targetGanZhi)})</span>` : '<span class="hint">(không đặt)</span>'}
+          <span class="hint-inline">${esc(r.domain)}</span></span>`).join('');
+      return `
+    <h4 class="syn-h4">大限宫干四化 大限宮干四化 — decade ${esc(dx.ageRange)} @ <span class="zh">${esc(dx.daxianGanZhi)}</span> kích hoạt 4 lĩnh vực</h4>
+    <div class="hint" style="font-size:12px">Cung đại hạn ${esc(dx.daxianPalaceVi)} có can <b class="zh">${esc(dx.daxianGan)}</b> → 4 hóa bay vào mệnh bàn bẩm sinh → bật công tắc 4 lĩnh vực trong 10 năm (${esc(dx.ageRange)}):</div>
+    <div class="zw-sihua">${tags}</div>
+    <p class="hint" style="font-size:11px;margin-top:3px">${esc(dx.summary)}</p>`;
     })()}
     <h4 class="syn-h4">博士十二神 (niên hệ, 禄存@${z.boshi?.luCunZhi} ${z.boshi?.direction})</h4>
     <div class="zw-dxrow" style="grid-template-columns:repeat(6,1fr)">${(z.boshi?.stars||[]).map((s) => `<div class="zw-dx"><span class="zh">${s.star}</span> <span class="ln-rate ${s.tone==='cat'?'rate-cat':'rate-hung'}" style="font-size:10px">${s.atZhi}</span></div>`).join('')}</div>
