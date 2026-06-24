@@ -104,9 +104,15 @@ export function analyzeZiweiGeju(zr, brightness, aux) {
       const hasFu = (aux['左辅'] && inMingSan(aux['左辅'].branch)) || (aux['右弼'] && inMingSan(aux['右弼'].branch));
       if (hasFu) auxMatched.push({ key: '君臣庆会', name: '君臣庆会格', vi: 'Quân Thần Khánh Hội', tone: 'cat', meaning: 'Tử Vi (quân) + Tả Phụ/Hữu Bật (thần) hội → lãnh tụ được hiền thần phù tá, quyền uy + thanh vọng, «tài học kinh bang».', career: 'lãnh đạo cấp cao, chính trị, quản trị đại tổ chức.' });
     }
-    // 石中隐玉 (Cự Môn độc tọa mệnh Tý/Ngọ)
+    // 石中隐玉 (Cự Môn độc tọa mệnh Tý/Ngọ) — [loop 38] thêm điều kiện 煞破 (擎羊/陀罗/火/铃 in sanfang = 破格)
     if ((ming.stars || []).includes('巨门') && (ming.stars || []).filter((s) => s !== '巨门').length === 0 && ['子', '午'].includes(ming.zhi)) {
-      auxMatched.push({ key: '石中隐玉', name: '石中隐玉格', vi: 'Thạch Trung Ẩn Ngọc', tone: 'cat', meaning: 'Cự Môn độc tọa mệnh Tý/Ngọ — ngọc ẩn trong đá, tài hoa nhưng须经 ma luyện mới thành đại khí (vãn phát), Tý chủ phú/Ngọ chủ quý.', career: 'chuyên gia/nghiên cứu/vãn phát — cần kiên nhẫn tôi luyện.' });
+      const shaInSan = ['擎羊', '陀罗', '火星', '铃星'].some((sk) => aux[sk] && inMingSan(aux[sk].branch));
+      const hasAux = (aux['左辅'] && inMingSan(aux['左辅'].branch)) || (aux['右弼'] && inMingSan(aux['右弼'].branch)) || (aux['文昌'] && inMingSan(aux['文昌'].branch)) || (aux['文曲'] && inMingSan(aux['文曲'].branch));
+      if (shaInSan) {
+        auxMatched.push({ key: '石中隐玉-破', name: '石中隐玉格(破)', vi: 'Thạch Trung Ẩn Ngọc (PHÁ)', tone: 'volatile', meaning: 'Cự Môn độc tọa Tý/Ngọ nhưng tam phương gặp SÁT tinh (擎羊/陀罗/火/铃) → PHÁ CÁCH. Cổ quyết «男盗女娼» — ngọc vỡ, cần cảnh giác.', career: 'cần hóa giải trước khi tiến.' });
+      } else {
+        auxMatched.push({ key: '石中隐玉', name: '石中隐玉格', vi: 'Thạch Trung Ẩn Ngọc', tone: 'cat', meaning: `Cự Môn độc tọa mệnh ${ming.zhi === '子' ? 'Tý' : 'Ngọ'} — ngọc ẩn trong đá${hasAux ? ', có 辅弼/昌曲 hội → CÁCH THÀNH' : ' (vãn phát)'}, tài hoa nhưng须经 ma luyện mới thành đại khí, ${ming.zhi === '子' ? 'Tý chủ phú' : 'Ngọ chủ quý'}.`, career: 'chuyên gia/nghiên cứu/vãn phát — cần kiên nhẫn tôi luyện.' });
+      }
     }
   }
 

@@ -8,7 +8,7 @@ import { WX_VI } from './constants.js';
 // Cây theo ngũ hành
 const WX_PLANTS = {
   木: {
-    plants: ['Kim tiền (Zamioculcas)', 'Bàng Singapore', 'Thiết mộc lan', 'Ngũ gia bì', 'Kim ngân', 'Phú quý', 'Trầu bà'],
+    plants: ['Bàng Singapore', 'Thiết mộc lan', 'Ngũ gia bì', 'Phú quý', 'Trầu bà'],
     desc: 'cây lá to, xanh đậm, vượng Mộc — tăng sinh khí',
     placement: 'Đông, Đông Nam (Mộc phương)',
     care: 'tưới vừa, tránh úng, sáng nhẹ',
@@ -26,14 +26,14 @@ const WX_PLANTS = {
     care: 'ít nước, chịu hạn tốt',
   },
   金: {
-    plants: ['Bạch mã (Dieffenbachia)', 'Cây lan ý (Spathiphyllum)', 'Cúc trắng', 'Ngọc ngân trắng', 'Bồ kết'],
-    desc: 'cây lá trắng/bạc, hoa trắng — vượng Kim, thanh khiết',
+    plants: ['Kim tiền (Zamioculcas)', 'Kim ngân', 'Ngọc ngân', 'Bạch mã (Dieffenbachia)', 'Cây lan ý (Spathiphyllum)', 'Cúc trắng', 'Bồ kết'],
+    desc: 'Kim tiền/Kim ngân (tên chữ Kim = hành Kim!), cây lá trắng/bạc — vượng Kim, tài lộc',
     placement: 'Tây, Tây Bắc (Kim phương)',
     care: 'sáng gián tiếp, ẩm vừa',
   },
   水: {
-    plants: ['Lan hồ điệp', 'Cây kim ngân nước', 'Trúc mây', 'Tre nhỏ (Lucky bamboo)', 'Cỏ đồng tiền (Pilea)', 'Thủy tùng'],
-    desc: 'cây thủy sinh, phong thủy — vượng Thủy, lưu thông',
+    plants: ['Sen (Lotus)', 'Cây thủy sinh (Pothos nước)', 'Cây kim ngân nước', 'Trúc mây', 'Tre nhỏ (Lucky bamboo - trồng nước)', 'Thủy tùng'],
+    desc: 'cây thủy sinh/thủy tùng, phong thủy — vượng Thủy, lưu thông',
     placement: 'Bắc (Thủy phương)',
     care: 'nước nhiều, ẩm ướt, sáng nhẹ',
   },
