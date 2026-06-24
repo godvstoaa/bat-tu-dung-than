@@ -1,7 +1,7 @@
 {
   "name": "bat-tu-dung-than",
   "private": true,
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "App luận Bát Tự - Dụng Thần theo Tử Bình / Phong thủy huyền học Hồng Kông",
   "type": "module",
   "scripts": {
