@@ -191,6 +191,9 @@ assert(R1990.yong.tiaohou.note.includes('Hạ'), 'tiaohou note gắn khí hậu 
 // [loop 34] 调候 OVERRIDE: 1990 辛午 (cực nhiệt) → 窮通寶鑑 lấy 壬水 → Dụng=Thủy (override Phù Ức)
 assert(R1990.yong.tiaohou.override === true && R1990.yong.primary === '水', `1990 辛午 调候 OVERRIDE → Dụng=Thủy (được override=${R1990.yong.tiaohou.override}, primary=${R1990.yong.primary})`);
 assert(R1990.yong.method.some((m) => m.includes('Điều Hậu') && m.includes('LÀM CHỦ')), '1990 method có "Điều Hậu — LÀM CHỦ"');
+// [loop 37] 病药 UNIFICATION — pattern-quality rescues feed vào yong (secondary + method, KHÔNG đổi primary)
+assert(R1990.yong.method.some((m) => m.includes('Bệnh Dược')), '1990 method có "Bệnh Dược" (pattern-quality rescue)');
+assert(R1990.yong.reasons.some((r) => /Bệnh Dược.*pattern-quality/.test(r)), '1990 reasons có 病药 enrich note');
 // chart mùa không cực đoan → KHÔNG override (giữ Phù Ức)
 { const _sp = analyze(1993, 10, 21, 0, 30, 'nam', 2026); // 戌月 (thu, không cực đoan)
   assert(_sp.yong.tiaohou.override === false, '1993 戌月 (không cực đoan) → KHÔNG override 调候'); }

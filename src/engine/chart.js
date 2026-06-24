@@ -448,6 +448,25 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   const yong = findYongShen(chart, wx, strength, pattern, interactions);
   let patternQualityResult = null;
   try { patternQualityResult = patternQuality({ chart, pattern, strength, interactions }); } catch (e) { patternQualityResult = null; }
+  // [loop 37] 病药 UNIFICATION — feed pattern-quality rescues vào yong (SAFE: enrich secondary +
+  //   method, KHÔNG đổi primary). Đóng gap loop 34: 2 hệ 病药 (computeBingYi pct-based vs
+  //   pattern-quality structural) giờ thống nhất — rescue structural ưu tiên secondary.
+  try {
+    if (patternQualityResult && patternQualityResult.rescues && patternQualityResult.rescues.length) {
+      const dmWx = chart.dayMaster.wx;
+      const GROUP_WX = { ti: dmWx, yin: SHENG_BY[dmWx], shi: SHENG[dmWx], cai: KE[dmWx], guan: KE_BY[dmWx] };
+      for (const r of patternQualityResult.rescues) {
+        const drugGroups = r.drug || [];
+        if (!drugGroups.length) continue;
+        const drugWx = GROUP_WX[drugGroups[0]];
+        if (drugWx && drugWx !== yong.primary && drugWx !== yong.secondary) {
+          yong.secondary = drugWx;
+          yong.reasons.push(`💊 Bệnh Dược (病药 từ pattern-quality): «${(r.diseaseNote || r.note || '').slice(0, 60)}» → thuốc nhóm ${drugGroups[0]} (hành ${drugWx}) → ưu tiên làm Dụng thứ cấp (chữa bệnh cách cục).`);
+          if (!yong.method.includes('Bệnh Dược (病药)')) yong.method.push('Bệnh Dược (病药)');
+        }
+      }
+    }
+  } catch (e) { /* 病药 enrichment không bắt buộc — fallback giữ yong nguyên */ }
   let dayun = [], liunian = [];
   try { dayun = computeDaYun(year, month, day, hour, minute, gender, yong); } catch (e) { dayun = []; }
   try { liunian = computeLiuNian(year, month, day, hour, minute, gender, yong, refYear); } catch (e) { liunian = []; }
