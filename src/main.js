@@ -1680,6 +1680,7 @@ function run() {
   lazyRender('sensitivity',    () => { try { renderSensitivity(); } catch (e) { console.warn('sensitivity', e.message); } });
   lazyRender('five-dim-radar', () => { try { renderFiveDimRadar(); } catch (e) { console.warn('5dim', e.message); } });
   lazyRender('week-preview',  () => { try { renderWeekPreview(); } catch (e) { console.warn('week', e.message); } });
+  renderQuickSummary(); // [loop 39] tóm tắt nhanh — render ngay (không lazy, ở đầu trang)
   lazyRender('ziwei-stars-out',() => { try { renderZiweiFull(); } catch (e) { console.warn('ziweiFull', e.message); } });
   lazyRender('life-summary',   () => { try { renderLifeTrajectory(currentResult); } catch (e) { console.warn('life', e.message); } });
   $("result").classList.remove("hidden");
@@ -3179,6 +3180,38 @@ function renderChangshengDeep() {
 }
 
 // ---------------------------------------------------------------- PHỐI NGỖU LÝ TƯỞNG (BẢNG + CHI TIẾT)
+function renderQuickSummary() {
+  if (!currentResult) return;
+  const c = currentResult;
+  const syn = c.synthesis || {};
+  const yong = c.yong || {};
+  const pattern = c.pattern || {};
+  const el = $('quick-summary');
+  if (!el) return;
+  const WX_VI = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
+  const dungVi = WX_VI[yong.primary] || '?';
+  // Hôm nay
+  let todayScore = '?', todayRating = '?', todayOneLiner = '';
+  try { const b = dailyBriefing(c, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate(), c.patternQuality); todayScore = b.rating?.score ?? '?'; todayRating = b.rating?.level ?? '?'; todayOneLiner = (b.oneLiner || '').slice(0, 60); } catch (e) {}
+  const todayTone = (typeof todayScore === 'number' && todayScore >= 60) ? '🟢' : (typeof todayScore === 'number' && todayScore >= 45) ? '🟡' : '🔴';
+  // Tuần này
+  let weekSummary = '';
+  try { const w = weekPreview(c, { days: 7 }); weekSummary = (w.summary || '').slice(0, 70); } catch (e) {}
+  // Cảnh báo
+  let alert = '';
+  try { const ha = healthAlertScan(c, 1); if (ha.alerts.length) { const a = ha.alerts[0]; alert = `⚠ ${a.year}: ${a.level}${a.reasons.length ? ' — ' + a.reasons[0].slice(0, 50) : ''}`; } } catch (e) {}
+  // Dụng thần hành động
+  const dungAction = { 木: 'màu xanh, hướng Đông, cây cối', 火: 'màu đỏ, hướng Nam, ánh sáng', 土: 'màu vàng, hướng Tây Nam, gốm đá', 金: 'màu trắng, hướng Tây, vật kim loại', 水: 'màu đen/xanh đậm, hướng Bắc, nước' }[yong.primary] || '';
+  const rows = [
+    { icon: '🧬', label: 'Mệnh bạn', text: `${pattern.vi || '?'}, thân ${c.strength?.strong ? 'vượng (mạnh)' : 'nhược (yếu)'}. <b>Điểm tổng mệnh: ${syn.score ?? '?'}/100 (${syn.gradeVi ?? '?'})</b>.` },
+    { icon: '💊', label: 'Hành cần bổ', text: `Dụng Thần = <b>${dungVi}</b>. Bổ qua ${dungAction}.${yong.tiaohou?.override ? ' ⚠ 调候 LÀM CHỦ (sinh mùa cực đoan).' : ''}` },
+    { icon: todayTone, label: 'Hôm nay', text: `${todayRating} (${todayScore}/100). ${todayOneLiner}` },
+    { icon: '📆', label: 'Tuần này', text: weekSummary || '(đang tính...)' },
+    { icon: alert ? '⚠' : '✓', label: alert ? 'Cảnh báo' : 'An tâm', text: alert || 'Không cảnh báo nặng năm nay.' },
+  ];
+  el.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:10px">${rows.map((r) => `<div style="flex:1;min-width:180px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:8px;border:1px solid #e3c878"><div style="font-size:.75em;color:#888;font-weight:bold">${r.icon} ${r.label}</div><div style="font-size:.88em;margin-top:2px">${r.text}</div></div>`).join('')}</div>`;
+}
+
 function renderWeekPreview() {
   if (!currentResult) return;
   let w;
