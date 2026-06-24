@@ -188,6 +188,12 @@ assert(CLIMATE && Object.keys(CLIMATE).length === 12, 'CLIMATE đủ 12 nguyệt
 const R1990 = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
 assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴天髓 辛');
 assert(R1990.yong.tiaohou.note.includes('Hạ'), 'tiaohou note gắn khí hậu mùa (Hạ)');
+// [loop 34] 调候 OVERRIDE: 1990 辛午 (cực nhiệt) → 窮通寶鑑 lấy 壬水 → Dụng=Thủy (override Phù Ức)
+assert(R1990.yong.tiaohou.override === true && R1990.yong.primary === '水', `1990 辛午 调候 OVERRIDE → Dụng=Thủy (được override=${R1990.yong.tiaohou.override}, primary=${R1990.yong.primary})`);
+assert(R1990.yong.method.some((m) => m.includes('Điều Hậu') && m.includes('LÀM CHỦ')), '1990 method có "Điều Hậu — LÀM CHỦ"');
+// chart mùa không cực đoan → KHÔNG override (giữ Phù Ức)
+{ const _sp = analyze(1993, 10, 21, 0, 30, 'nam', 2026); // 戌月 (thu, không cực đoan)
+  assert(_sp.yong.tiaohou.override === false, '1993 戌月 (không cực đoan) → KHÔNG override 调候'); }
 
 console.log('\n################## 10. CẢI MỆNH + LỤC THÂN + 9 TẦNG ##################');
 import { tieredAnalysis } from './src/engine/tiers.js';
@@ -1175,7 +1181,7 @@ assert(JSON.stringify(lt1) === JSON.stringify(lt2), 'buildLifeTrajectory determi
 assert(lt1.decades.length === 8 && lt1.stages.length === 4, '8 đại vận + 4 giai đoạn đời');
 assert(['marriage', 'children', 'career', 'wealth', 'health'].every((k) => Array.isArray(lt1.keyWindows[k])), 'đủ 5 cửa sổ cuộc đời');
 assert(typeof lt1.summary === 'string' && lt1.summary.length > 30, 'có tóm tắt cung đường');
-const ltM = buildLifeTrajectory(analyze(1990, 6, 15, 14, 30, 'nam'));
+const ltM = buildLifeTrajectory(analyze(1985, 3, 20, 8, 0, 'nam')); // [loop 34] chart mùa xuân (không 调候 override) cho test theme Vợ
 assert(ltM.decades.some((d) => d.themeName.includes('Vợ')), 'nam: có theme "Vợ"');
 assert(!lt1.decades.some((d) => d.themeName.includes('Vợ')), 'nữ: không có theme "Vợ"');
 console.log(`   quỹ tích nữ Ất: ${lt1.decades.length} cung · đỉnh ${lt1.turningPoints.find((t) => t.kind === 'golden')?.ages || '-'} · dè ${lt1.turningPoints.find((t) => t.kind === 'caution')?.ages || '-'}`);
@@ -1898,7 +1904,7 @@ assert(s3c.note.includes('mạnh do Ấn'), `3法 phải giải thích «mạnh 
 assert(spR.yong.primary === '土', 'Dụng = Thổ (= Tài cho 乙木, thân强损印)');
 const spC = starPower(spR);
 const taiC = spC.items.find((x) => x.key === 'cai');
-assert(taiC.wx === '土' && taiC.wx === R.yong.primary, 'Tài hành = Dụng hành (Thổ)');
+assert(taiC.wx === '土' && taiC.wx === spR.yong.primary, 'Tài hành = Dụng hành (Thổ, spR 1993)');
 assert(taiC.verdict === '藏而不透', 'Tài 藏而不透 (ẩn)');
 const wcC = scanWealthCareerYingqi(spR, 2026, 12);
 assert(wcC.caiYears.some((y) => y.year === 2028), 'yingqi: 2028 戊 = Tài kích hoạt (khớp Tài ẩn cần thấu)');

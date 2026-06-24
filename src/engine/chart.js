@@ -274,48 +274,67 @@ export function findYongShen(chart, wx, strength, pattern, interactions) {
 
 // Hoàn thiện: gắn Điều Hậu + 用喜忌仇 + relations + tiaohou note
 function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, interactions, strength, wx) {
-  // --- BỘ 用喜忌仇 (Dụng – Hỷ – Kỵ – Thù) đầy đủ ---
-  // 喜神 = sinh Dụng Thần (trợ dụng); 忌神 = khắc Dụng (hại dụng);
-  // 仇神 = sinh Kỵ (nuôi kỵ, hại gián tiếp); 闲神 = Dụng sinh ra (tiêu hao).
-  const xi = SHENG_BY[primary];                          // 喜神
-  const ji = KE_BY[primary];                             // 忌神 (đơn — khắc dụng)
-  const chou = SHENG_BY[ji];                             // 仇神
-  const xian = SHENG[primary];                           // 闲神 (dụng tiết)
-  reasons.push(`💝 Hỷ Thần (喜神): hành ${xi} (sinh trợ Dụng ${primary}) — gặp vận/năm hành ${xi} thì Dụng Thần thêm vững, là sức mạnh thứ hai sau Dụng.`);
-  reasons.push(`😤 Kỵ Thần (忌神): hành ${ji} (khắc phá Dụng ${primary}); 仇 Thần (仇神): hành ${chou} (sinh nuôi Kỵ ${ji}, hại gián tiếp). Năm/vận mang ${chou} phải đề phòng vì nó làm Kỵ thêm mạnh.`);
-
-  // --- Điều Hậu (调候) theo 窮通寶鑑 ---
+  // --- Điều Hậu (调候) theo 窮通寶鑑 — tính TRƯỚC để có thể OVERRIDE Phù Ức ---
   const tiaoRaw = TIAOHOU[chart.dayGan]?.[chart.monthZhi] || [];
   const tiaoElems = [...new Set(tiaoRaw.map((g) => GAN[g].wx))];
   const tiaoPrimaryWx = tiaoRaw.length ? GAN[tiaoRaw[0]].wx : null;
-
-  let climateNote = '';
   const clim = CLIMATE[chart.monthZhi];
+  // [loop 34 ELEVATION] 调候 OVERRIDE: khí hậu THIÊN LỆCH (hàn 亥子丑 / nhiệt 巳午未) → 调候 LÀM CHỦ
+  //   theo 窮通寶鑑 «寒甚必用火暖, 燥甚必用水润». Trước đây 调候 chỉ ghi note → sai 用神 cho mọi
+  //   chart sinh mùa hàn/nóng (vd 甲木 tháng 子 cần 丁火 noãn, code cũ lấy Mộc/Thủy + cấm Hỏa).
+  const EXTREME_COLD = ['亥', '子', '丑']; // đông hàn → cần Hỏa noãn
+  const EXTREME_HOT = ['巳', '午', '未'];  // hạ nhiệt → cần Thủy nhuận
+  const isExtreme = EXTREME_COLD.includes(chart.monthZhi) || EXTREME_HOT.includes(chart.monthZhi);
+  let tiaoOverride = false;
+  if (isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary) {
+    tiaoOverride = true;
+    const fuyiPrimary = primary;
+    primary = tiaoPrimaryWx;                                  // 调候 lên làm chủ
+    if (fuyiPrimary !== primary && fuyiPrimary !== secondary) secondary = fuyiPrimary; // Phù Ức giáng secondary
+    avoid = avoid.filter((w) => w !== tiaoPrimaryWx);          // gỡ 调候 khỏi Kỵ (nay là Dụng)
+    method.push('Điều Hậu (调候) — khí hậu thiên lệch, LÀM CHỦ (override Phù Ức)');
+    reasons.push(`🔥 Điều Hậu (调候) OVERRIDE: sinh tháng ${chart.monthZhi} (${clim ? clim.climate : 'khí hậu thiên lệch'}) — 窮通寶鑑 bắt buộc lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) ${clim ? clim.need : ''} làm Dụng Thần CHÍNH, đè Phù Ức (${fuyiPrimary}). Mệnh hàn/nóng quá nặng thì điều hòa khí hậu ưu tiên hơn cân bằng vượng suy.`);
+  }
+
+  // --- BỘ 用喜忌仇 (Dụng – Hỷ – Kỵ – Thù) — tính từ primary SAU override ---
+  const xi = SHENG_BY[primary];                          // 喜神
+  const ji = KE_BY[primary];                             // 忌神
+  const chou = SHENG_BY[ji];                             // 仇神
+  const xian = SHENG[primary];                           // 闲神
+  reasons.push(`💝 Hỷ Thần (喜神): hành ${xi} (sinh trợ Dụng ${primary}) — gặp vận/năm hành ${xi} thì Dụng Thần thêm vững, là sức mạnh thứ hai sau Dụng.`);
+  reasons.push(`😤 Kỵ Thần (忌神): hành ${ji} (khắc phá Dụng ${primary}); 仇 Thần (仇神): hành ${chou} (sinh nuôi Kỵ ${ji}, hại gián tiếp). Năm/vận mang ${chou} phải đề phòng vì nó làm Kỵ thêm mạnh.`);
+
+  // --- climateNote (cho field tiaohou.note) ---
+  let climateNote = '';
   const climatePrefix = clim
     ? `Sinh tháng ${chart.monthZhi} (${clim.season} — ${clim.climate}), cổ pháp Điều Hậu (${chart.dayGan}) `
     : '';
   if (tiaoPrimaryWx) {
-    const agree = tiaoPrimaryWx === primary || tiaoPrimaryWx === secondary;
-    const conflict = avoid.includes(tiaoPrimaryWx);
-    let body;
-    if (agree) {
-      body = `lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''}. Hành này TRÙNG Dụng Thần ⇒ Dụng Thần càng vững (đã thoả mãn cả cân bằng lẫn khí hậu).`;
-      method.push('Điều Hậu (调候)');
-    } else if (conflict) {
-      body = `cổ điển lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''}; nhưng xét cân bằng vượng suy thì hành này là Kỵ Thần. Nên lấy Phù Ức (${primary}) làm chủ, Điều Hậu chỉ phối hợp khi khí hậu thiên lệch quá nặng.`;
+    if (tiaoOverride) {
+      climateNote = climatePrefix + `lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''} làm DỤNG CHÍNH (override Phù Ức) vì khí hậu thiên lệch.`;
     } else {
-      body = `gợi ý ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''} để điều hòa hàn–noãn–táo–thấp; có thể phối hợp cùng Dụng Thần.`;
+      const agree = tiaoPrimaryWx === primary || tiaoPrimaryWx === secondary;
+      const conflict = avoid.includes(tiaoPrimaryWx);
+      let body;
+      if (agree) {
+        body = `lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''}. Hành này TRÙNG Dụng Thần ⇒ Dụng càng vững (thoả mãn cả cân bằng lẫn khí hậu).`;
+        method.push('Điều Hậu (调候)');
+      } else if (conflict) {
+        body = `cổ điển lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''}; nhưng cân bằng vượng suy lấy Phù Ức (${primary}) làm chủ, Điều Hậu phối hợp khi thiên lệch.`;
+      } else {
+        body = `gợi ý ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''} để điều hòa hàn–noãn–táo–thấp; phối hợp cùng Dụng Thần.`;
+      }
+      climateNote = climatePrefix + body;
     }
-    climateNote = climatePrefix + body;
   }
 
   return {
     primary, secondary, avoid,
-    xi, ji, chou, xian,           // 用喜忌仇闲 (bộ 5 đầy đủ)
+    xi, ji, chou, xian,           // 用喜忌仇闲 (bộ 5 đầy đủ, tính từ primary cuối)
     reasons,
     method: [...new Set(method)],
     relations: { resourceWx: G.yin, sameWx: G.ti, outputWx: G.shi, wealthWx: G.cai, officerWx: G.guan },
-    tiaohou: { raw: tiaoRaw, elems: tiaoElems, primaryWx: tiaoPrimaryWx, note: climateNote },
+    tiaohou: { raw: tiaoRaw, elems: tiaoElems, primaryWx: tiaoPrimaryWx, note: climateNote, override: tiaoOverride },
   };
 }
 
