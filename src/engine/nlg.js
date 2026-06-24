@@ -120,11 +120,13 @@ function pCareer(R) {
   // [loop 17] 格局-aware opening
   const gejuCtx = pq ? ` Cách ${R.pattern.vi} → ${pq.quality}.` : '';
   lines.push(`Sự nghiệp lấy Quan – Ấn làm sao chủ.${gejuCtx} Mệnh bạn Quan Sát ${guan >= 1.5 ? 'hiện rõ, có khí chất lãnh đạo/địa vị' : guan > 0 ? 'có nhưng hơi mỏng' : 'ẩn/khuyết — sự nghiệp tự thân gây dựng nhiều hơn nhờ lộc'}.`);
-  // [loop 17] 格局 pattern-specific advice
+  // [loop 17/18 sửa bug] 格局 pattern-specific advice
+  //   patternYong.xi/ji là array object {group,wx,vi} (KHÔNG phải string) → dùng .vi trực tiếp.
   if (pq?.patternYong) {
     const xiG = pq.patternYong.xi || [];
     const jiG = pq.patternYong.ji || [];
-    if (xiG.length) lines.push(`📊 Theo cách ${R.pattern.vi}: vận mang ${xiG.map((g) => ({ ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 'Tài', guan: 'Quan Sát' }[g])).join('/')} → thuận sự nghiệp; mang ${jiG.map((g) => ({ ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 'Tài', guan: 'Quan Sát' }[g])).join('/')} → nghịch.`);
+    const lbl = (g) => g?.vi || g?.group || g;
+    if (xiG.length) lines.push(`📊 Theo cách ${R.pattern.vi}: vận mang ${xiG.map(lbl).join('/')} → thuận sự nghiệp; mang ${jiG.map(lbl).join('/')} → nghịch.`);
   }
   // [loop 17] RESCUES decade cho career
   const rescueDy = (R.dayun || []).filter((d) => d.gejuRescue);
@@ -155,12 +157,13 @@ function pWealth(R) {
   // [loop 17] 格局-aware opening
   const gejuCtx = pq ? ` Cách ${R.pattern.vi} → ${pq.quality}.` : '';
   lines.push(`Tài lộc lấy Tài tinh (hành ${wxVi(wealthWx)}) làm chủ.${gejuCtx} Mệnh ${cai >= 1.5 ? 'Tài vượng, cơ hội tiền bạc nhiều' : cai > 0 ? 'Tài vừa phải' : 'Tài mỏng — phải chủ động tìm'}.`);
-  // [loop 17] 格局 pattern-specific wealth advice
+  // [loop 17/18 sửa bug] 格局 pattern-specific wealth advice
+  //   patternYong.xi/ji là array object {group,wx,vi} (KHÔNG phải string) → dùng .vi trực tiếp.
   if (pq?.patternYong) {
     const xiG = pq.patternYong.xi || [];
     const jiG = pq.patternYong.ji || [];
-    const G_VI = { ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 'Tài', guan: 'Quan Sát' };
-    if (xiG.length) lines.push(`📊 Theo cách ${R.pattern.vi}: vận mang ${xiG.map((g) => G_VI[g]).join('/')} → thuận tài lộc; mang ${jiG.map((g) => G_VI[g]).join('/')} → nghịch tài.`);
+    const lbl = (g) => g?.vi || g?.group || g;
+    if (xiG.length) lines.push(`📊 Theo cách ${R.pattern.vi}: vận mang ${xiG.map(lbl).join('/')} → thuận tài lộc; mang ${jiG.map(lbl).join('/')} → nghịch tài.`);
   }
   // [loop 17] RESCUES decade cho tài
   const rescueDy = (R.dayun || []).filter((d) => d.gejuRescue);
@@ -181,15 +184,32 @@ function pLove(R) {
   const isMale = chart.input.gender === 'nam';
   const spouseWx = isMale ? KE[chart.dayMaster.wx] : KE_BY[chart.dayMaster.wx];
   const spouseStar = isMale ? 'Tài (vợ)' : 'Quan Sát (chồng)';
+  const spouseCat = isMale ? 'cai' : 'guan'; // [loop 18] nhóm thập thần của sao phối ngẫu để map 格局喜忌
   const dayZhi = chart.pillars.day.zhi;
   const dayZhiGod = chart.pillars.day.hidden[0].god;
   const isFav = yong.primary === spouseWx || yong.xi === spouseWx;
   const isAvoid = yong.avoid.includes(spouseWx);
+  const pq = R.patternQuality;
   const lines = [];
-  lines.push(`Với ${isMale ? 'nam' : 'nữ'} mệnh, sao hôn nhân là ${spouseStar} (hành ${wxVi(spouseWx)}). Cung phu thê (Nhật Chi) = ${dayZhi} (${ZHI[dayZhi].vi}), tàng ${TEN_GOD_VI[dayZhiGod] || dayZhiGod}.`);
+  // [loop 18] 格局-aware opening
+  const gejuCtx = pq ? ` Cách ${R.pattern.vi} → ${pq.quality}.` : '';
+  lines.push(`Với ${isMale ? 'nam' : 'nữ'} mệnh, sao hôn nhân là ${spouseStar} (hành ${wxVi(spouseWx)}). Cung phu thê (Nhật Chi) = ${dayZhi} (${ZHI[dayZhi].vi}), tàng ${TEN_GOD_VI[dayZhiGod] || dayZhiGod}.${gejuCtx}`);
+  // [loop 18] 格局 pattern-specific love advice — xem sao phối ngẫu thuộc nhóm 喜 hay 忌 của cách
+  //   patternYong.xi/ji là array object {group,wx,vi} → match theo g.group với spouseCat.
+  if (pq?.patternYong) {
+    const xiG = pq.patternYong.xi || [];
+    const jiG = pq.patternYong.ji || [];
+    const inJi = jiG.some((g) => g.group === spouseCat);
+    const inXi = xiG.some((g) => g.group === spouseCat);
+    if (inJi) lines.push(`📊 Theo cách ${R.pattern.vi}: sao phối ngẫu (${spouseCat === 'cai' ? 'Tài' : 'Quan Sát'}) ∈ KỴ của cách → hôn nhân dễ làm phá cách/mang rắc rối; nên kết hôn muộn, chọn người khắc chế được.${pq.quality?.includes('败') ? ' Lại thêm CÁCH BẠI → duyên càng cần thận trọng.' : ''}`);
+    else if (inXi) lines.push(`📊 Theo cách ${R.pattern.vi}: sao phối ngẫu (${spouseCat === 'cai' ? 'Tài' : 'Quan Sát'}) ∈ THÍCH của cách → duyên lành, hôn nhân giúp làm nên cách.${pq.quality?.includes('成') ? ' Cách THÀNH gặp sao phối ngẫu tốt → 门当户对, nên cưới.' : ''}`);
+  }
   if (isFav) lines.push(`💕 Sao phối ngẫu = Dụng Thần → hôn nhân là trợ lực lớn, bạn đời mang lại may mắn.`);
   else if (isAvoid) lines.push(` Sao phối ngẫu ∈ Kỵ Thần → duyên cần chọn lọc, dễ thử thách; nên kết hôn muộn, ưu tiên người mệnh bổ trợ Dụng Thần.`);
   else lines.push(`Sao phối ngẫu trung tính → hôn nhân thuận theo sự vun đắp của hai bên.`);
+  // [loop 18] RESCUES decade cho tình duyên — khi vận CỨU CÁCH, duyên lành/hôn nhân dễ thành
+  const rescueDy = (R.dayun || []).filter((d) => d.gejuRescue);
+  if (rescueDy.length) lines.push(`★ Vận CỨU CÁCH (duyên lành bật): ${rescueDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}-${d.startAge + 9}t]`).join(', ')} — cửa sổ cưới hỏi/hàn gắn tốt nhất.`);
   if (hasShen(R, 'taoHua')) lines.push(`🌸 Có Đào Hoa → duyên sắc tốt, dễ hấp dẫn người khác giới (lợi giao tế, cẩn thận đào hoa lệch).`);
   // xung/hình Nhật chi → biến động gia đạo
   const dayClash = R.interactions.chong.find((c) => (c.at && c.at.includes('Ngày')) || c.a === dayZhi || c.b === dayZhi);
@@ -204,11 +224,24 @@ function pLove(R) {
 function pHealth(R) {
   const entries = Object.entries(R.wx.pct).sort((a, b) => a[1] - b[1]);
   const weak = entries[0], strong = entries[entries.length - 1];
+  const pq = R.patternQuality;
+  // [loop 18] 格局 — "bệnh" của cách (diseases) phản ánh thiên lệch nguyên cục → cơ quan dễ suy trước
+  const diseaseLines = [];
+  if (pq?.diseases?.length) {
+    diseaseLines.push(`⚠️ Theo cách ${R.pattern.vi} → ${pq.quality}: mệnh có ${pq.diseases.length} "bệnh" (${pq.diseases.map((d) => d.note.split(' — ')[0]).join('; ')}) → thể chất có chỗ thiên lệch, dễ suy trước tạng bị khắc. Nên khám định kỳ, dưỡng sinh quanh năm.`);
+    const hasRescue = pq.rescues?.length > 0;
+    if (hasRescue) diseaseLines.push(`✅ Cách có CỨU CÁCH (có "thuốc" tự bù) → thể chất có khả năng phục hồi; chỉ cần giữ gìn thì "bệnh" không đến mức.`);
+    else diseaseLines.push(`⚠️ Cách thiếu cứu ứng → "bệnh" dễ mãn tính; ưu tiên bù Dụng Thần ${favText(R.yong)} qua ăn ở cả đời, không đợi vận mới chăm.`);
+    // giai đoạn phục hồi mạnh = vận CỨU CÁCH (giống pWealth/pCareer)
+    const rescueDy = (R.dayun || []).filter((d) => d.gejuRescue);
+    if (rescueDy.length) diseaseLines.push(`★ Thập niên phục hồi sức khoẻ tốt: ${rescueDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}-${d.startAge + 9}t]`).join(', ')}.`);
+  }
   const lines = [
     `Sức khỏe theo cân bằng Ngũ Hành. Hành yếu nhất ${wxVi(weak[0])} (${weak[1]}%) → lưu ý ${WX_INFO[weak[0]].tang}.`,
     `Hành vượng nhất ${wxVi(strong[0])} (${strong[1]}%) → khi thái quá dễ ảnh hưởng tạng bị khắc (${wxVi(KE[strong[0]])}: ${WX_INFO[KE[strong[0]]].tang}).`,
     `Dưỡng sinh theo Dụng Thần ${favText(R.yong)}: tăng ${WX_INFO[R.yong.primary].mau.split(',')[0]} trong ăn ở, vận động phương ${WX_INFO[R.yong.primary].huong} sáng sớm.`,
     `Tránh để hành Kỵ ${avoidText(R.yong)} lấn át; giữ điều độ hàn – nhiệt.`,
+    ...diseaseLines,
   ];
   // Session supplement: năm nay sức khoẻ sao?
   try { const ha = healthAlertScan(R, 1); if (ha.alerts.length) { const cur = ha.alerts[0]; lines.push(`🏥 Năm ${cur.year}: sức khoẻ ${cur.level}${cur.reasons.length ? ' — ' + cur.reasons.slice(0, 2).join('; ') : ''}.`); } else if (ha.safeYears.length) { lines.push(`🏥 Năm ${ha.safeYears[0].year}: sức khoẻ tương đối ổn — duy trì dưỡng sinh.`); } } catch (e) {}
