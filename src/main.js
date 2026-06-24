@@ -9,6 +9,7 @@ import { computeZhai } from './engine/zhai.js';
 import { computeHehun } from './engine/hehun.js';
 import { inverseBaZiSolve, labelResult } from './engine/inverse-bazi.js'; // [loop 21] 逆推八字
 import { trueSolarTime } from './engine/truetime.js'; // [loop 23] 真太阳时 + múi giờ
+import { chartSensitivity } from './engine/sensitivity.js'; // [loop 26] mệnh nhạy cảm
 import { analyzeLiunianDeep } from './engine/liunian-pro.js';
 import { liunianEvents } from './engine/liunian-event.js';
 import { qianliEightSteps, QIANLI_QUOTE } from './engine/qianli.js';
@@ -1674,6 +1675,7 @@ function run() {
   lazyRender('csdeep-out',     () => { try { renderChangshengDeep(); } catch (e) { console.warn('csDeep', e.message); } });
   // renderMarriageDeep() đã gọi ở block immediate (line ~1313) — KHÔNG bọc lại.
   lazyRender('match-out',      () => { try { renderIdealMatch(); } catch (e) { console.warn('idealMatch', e.message); } });
+  lazyRender('sensitivity',    () => { try { renderSensitivity(); } catch (e) { console.warn('sensitivity', e.message); } });
   lazyRender('ziwei-stars-out',() => { try { renderZiweiFull(); } catch (e) { console.warn('ziweiFull', e.message); } });
   lazyRender('life-summary',   () => { try { renderLifeTrajectory(currentResult); } catch (e) { console.warn('life', e.message); } });
   $("result").classList.remove("hidden");
@@ -3173,6 +3175,31 @@ function renderChangshengDeep() {
 }
 
 // ---------------------------------------------------------------- PHỐI NGỖU LÝ TƯỞNG (BẢNG + CHI TIẾT)
+function renderSensitivity() {
+  if (!currentResult) return;
+  const i = currentResult.chart.input;
+  // nếu giờ sinh ẩn/12:00 mặc định → nhắc user nhập giờ
+  let s;
+  try { s = chartSensitivity({ year: i.year, month: i.month, day: i.day, hour: i.hour, minute: i.minute, gender: i.gender }, { varyDays: 2 }); }
+  catch (e) { $('sensitivity').innerHTML = '<p class="hint">Không tính được.</p>'; return; }
+  if (s.spread == null) { $('sensitivity').innerHTML = '<p class="hint">Không tính được điểm.</p>'; return; }
+  // bar chart 12 时辰
+  const max = s.max || 1, min = s.min || 0;
+  const bars = s.hourScores.map((h) => {
+    const pct = max > min ? Math.round(((h.score - min) / (max - min)) * 100) : 50;
+    const tone = h.score >= 62 ? '#2e7d32' : h.score >= 46 ? '#b8860b' : '#c62828';
+    const user = h.isUser ? ' ★bạn' : '';
+    return `<span title="${h.shichenVi}(${h.shichen})时 = ${h.score}đ" style="display:inline-block;width:34px;text-align:center;font-size:.7em;vertical-align:bottom">
+      <b>${h.score}</b><span style="display:block;height:${Math.max(4, pct * 0.4)}px;background:${tone};border-radius:2px;border:${h.isUser?'2px solid #1565c0':'none'}"></span>${h.shichenVi}${user}</span>`;
+  }).join('');
+  const dayVaryStr = s.dayVary && s.dayVary.length ? s.dayVary.map((d) => `<b>${d.offset > 0 ? '+' : ''}${d.offset}ngày</b>:${d.score}đ`).join(' · ') : '';
+  $('sensitivity').innerHTML = `
+    <p class="hint">Điểm mệnh của bạn: <b>${s.baseScore}đ</b> @ ${s.baseShichenVi}(${s.baseShichen})时 · dao động khi đổi 时辰: <b>${s.spread}đ</b> (${s.min}→${s.max}).</p>
+    <div style="display:flex;align-items:flex-end;gap:1px;margin:6px 0;flex-wrap:wrap">${bars}</div>
+    <p style="margin:6px 0">📊 ${s.insight}</p>
+    ${dayVaryStr ? `<p class="hint">Đổi NGÀY sinh (±2): ${dayVaryStr} — xem ngày cũng tác động bao nhiêu.</p>` : ''}`;
+}
+
 function renderIdealMatch() {
   if (!currentResult) return;
   const i = currentResult.chart.input;

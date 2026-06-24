@@ -378,6 +378,21 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   console.log(`   真太阳时 ✓ — EOT Feb/Nov đúng dấu; ĐN 14:55→申时 (đổi 时柱); HCM shift ${t2.shiftMin.toFixed(1)}′.`);
 }
 
+// ################## [loop 26] Mệnh nhạy cảm (sensitivity.js) ##################
+{
+  const { chartSensitivity } = await import('./src/engine/sensitivity.js');
+  const s = chartSensitivity({ year: 1990, month: 6, day: 15, hour: 14, minute: 30, gender: 'nam' }, { varyDays: 2 });
+  assert(s.hourScores.length === 12, `sensitivity: 12 时辰 đủ (được ${s.hourScores.length})`);
+  assert(s.max != null && s.min != null && s.spread >= 0, 'sensitivity: có max/min/spread');
+  assert(s.max >= s.baseScore && s.min <= s.baseScore, 'sensitivity: base trong khoảng [min,max]');
+  // đúng 1 时辰 đánh dấu isUser (giờ thật)
+  assert(s.hourScores.filter((h) => h.isUser).length === 1, 'sensitivity: đúng 1 时辰 = giờ user');
+  // varyDays trả 4 mục (±1, ±2)
+  assert(s.dayVary && s.dayVary.length === 4, `sensitivity: ±2 ngày = 4 mục (được ${s.dayVary && s.dayVary.length})`);
+  assert(typeof s.insight === 'string' && s.insight.length > 20, 'sensitivity: có insight');
+  console.log(`   Nhạy cảm ✓ — 1990-06-15 14:30 nam: base ${s.baseScore}đ @ ${s.baseShichenVi}, spread ${s.spread}đ (${s.min}→${s.max}).`);
+}
+
 console.log('\n################## 12B. LƯU NIÊN DẪN ĐỘNG LỤC THÂN (流年引动六亲) ##################');
 import { liunianEvents, ALL_GODS } from './src/engine/liunian-event.js';
 // Helper: tạo R tối thiểu + chọn năm sao cho yearGod == god mong muốn (để test độ phủ rule).

@@ -35,15 +35,16 @@ export function healthAlertScan(R, scanYears = 10) {
   const dayZhi = chart.pillars.day.zhi;
   const curYear = new Date().getFullYear();
 
-  // Đại vận đang hành
-  const age = curYear - chart.input.year;
-  const activeDy = (dayun || []).find(d => age >= d.startAge && age < d.startAge + 10) || (dayun || [])[0];
-
+  // [loop 26 sửa CRITICAL] 大运 giải per-year THEO startYear (KHÔ đóng băng cả cửa sổ).
+  //   Trước đây age/activeDy tính 1 lần ngoài loop (dùng curYear + startAge 虚岁) → năm vượt
+  //   ranh thập niên ghép 大运 SAI → false-negative "Kỵ Thần nền sức khoẻ". Khớp forecast5/
+  //   event-predict/liunian-pro (đã sửa loop 24).
   const alerts = [];
   const safeYears = [];
 
   for (let i = 0; i < scanYears; i++) {
     const year = curYear + i;
+    const activeDy = (dayun || []).find((d) => d && d.startYear != null && d.startYear <= year && year < d.startYear + 10) || null;
     let riskScore = 0;
     const reasons = [];
 
@@ -79,7 +80,7 @@ export function healthAlertScan(R, scanYears = 10) {
       const dyGanWx = GAN[activeDy.gan]?.wx;
       if (dyGanWx === yong.ji) {
         riskScore += 1;
-        reasons.push(`Đại vận ${activeDy.ganZhi} mang Kỵ Thần (${WX_Vy(dyGanWx)}) → nền sức khoẻ yếu cả thập niên.`);
+        reasons.push(`Đại vận ${activeDy.ganZhi} mang Kỵ Thần (${WX_VI[dyGanWx]}) → nền sức khoẻ yếu cả thập niên.`);
       }
     }
 
@@ -120,5 +121,3 @@ export function healthAlertScan(R, scanYears = 10) {
 
   return { alerts, safeYears, weakestOrgan, weakestWx, summary };
 }
-
-function WX_Vy(w) { return WX_VI[w] || w; }
