@@ -9,6 +9,8 @@ import { defineConfig } from 'vite';
 //     Production (host tĩnh) cần backend/proxy riêng.
 // ============================================================================
 export default defineConfig({
+  // [loop 55] GitHub Pages phục vụ ở /bat-tu-dung-than/ → base phải đúng để asset load
+  base: process.env.GH_PAGES ? '/bat-tu-dung-than/' : '/',
   server: {
     host: '::',
     proxy: {
