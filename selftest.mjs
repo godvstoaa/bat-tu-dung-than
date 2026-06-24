@@ -2142,6 +2142,10 @@ assert(wa.romanceWater.dir === null, '2026 一白 ở trung cung → không có 
 assert(wa.stabilityWater.dir === 'Chính Đông' && wa.stabilityWater.star === 8, '2026 八白 → Chính Đông (tài ổn định)');
 assert(wa.celebrationWater.dir === 'Đông Nam' && wa.celebrationWater.star === 9, '2026 九紫 → Đông Nam (hỷ khánh)');
 assert(wa.authorityWater.dir === 'Chính Bắc' && wa.authorityWater.star === 6, '2026 六白 → Chính Bắc (quý)');
+// [loop 30] 零神(Chính Bắc) trùng 三煞(2026 午年→Bắc) → KHÔNG mâu thuẫn: block warn, không "★ đặt nước Bắc"
+assert(!/★ TÀI CHỦ LỰC.*Bắc/.test(wa.summary), '2026 water: KHÔ emit "★ đặt nước Chính Bắc" (零神 trùng tam sát)');
+assert(/零神.*TRÙNG TAM SÁT|KHÔNG đặt nước催 tài/.test(wa.summary), '2026 water: warn BLOCK 零神 trùng tam sát (thay vì mâu thuẫn)');
+assert(wa.sanshaConflict && wa.sanshaConflict.mainDir === 'Bắc', '2026 water: tam sát sector đơn = Bắc (không phình 3 hướng)');
 // Hung tinh kỵ nước: 2(TB), 5(Nam), 3(T), 7(TN)
 const avDirs = wa.avoidWater.map((x) => x.dir);
 assert(avDirs.includes('Chính Nam') && avDirs.includes('Tây Bắc') && avDirs.includes('Chính Tây'), '2026 kỵ nước: Nam(5)/TB(2)/T(3)');
@@ -3835,6 +3839,17 @@ assert(ho.ok, 'heluo chạy không lỗi (辛亥庚寅甲子丁卯)');
 assert(ho.tianRaw === 18 && ho.tianShu === 8 && ho.tianTrigram === '艮', '天数 18→8 → 艮');
 assert(ho.diRaw === 38 && ho.diShu === 8 && ho.diTrigram === '艮', '地数 38→8 → 艮');
 assert(ho.upperTrigram === '艮' && ho.lowerTrigram === '艮', '阴男 → 地上天下 → 艮为山');
+// [loop 30] reduction «反复减» — 天/地 số luôn ∈ [1,9] dù raw lớn (max thiên 56/địa 72).
+//   Trước đây trừ 1 lần → raw>50/60 leak số 2 chữ số → trigram sai.
+{
+  let leak = 0;
+  for (const [y, m, d, h] of [[1969,5,5,12],[1978,8,8,14],[1959,3,3,6],[1988,11,11,10],[1975,7,7,8],[1992,2,2,4]]) {
+    const R = analyze(y, m, d, h, 0, 'nam', 2026);
+    const r = heluoCast(R);
+    if (!(r.tianShu >= 1 && r.tianShu <= 9) || !(r.diShu >= 1 && r.diShu <= 9)) leak++;
+  }
+  assert(leak === 0, `heluo 天/地 số luôn ∈ [1,9] sau reduction (leak ${leak})`);
+}
 assert(ho.hexagram.num === 52 && ho.hexagram.name === '艮', '本命卦 #52 艮为山');
 assert(ho.yuantang.line === 6, '元堂 = hào 6 (N=2 重数, 卯→6)');
 assert(ho.bianHexagram.upper === '坤' && ho.bianHexagram.lower === '艮', '变卦 = 坤上艮下 (地山谦)');

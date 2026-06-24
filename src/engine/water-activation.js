@@ -13,7 +13,7 @@
 // ============================================================================
 
 import { yearFlyingStar, determineYun, STAR } from './xuankong.js';
-import { SANSHA, DIR_OF } from './sansha.js'; // [cycle 45] check xung đột 零神 vs 三煞
+import { SANSHA, DIR_OF, sanshaDirection } from './sansha.js'; // [loop 30] sanshaDirection → sector tam sát đơn
 import { Solar } from 'lunar-javascript';
 
 // ---- Ánh xạ ngũ hành sao → loại nước nên đặt ----
@@ -154,20 +154,25 @@ export function waterActivation(year) {
   // ---- Summary ----
   const catDirs = [primaryWealth, romanceWater, stabilityWater, celebrationWater, authorityWater]
     .filter((x) => x && x.dir);
-  // [cycle 45] 三煞 phương năm — cảnh báo khi cát-thuỷ/零 thần trùng 三煞 (tránh mâu thuẫn với
-  //   annual-taboo: trước đây app vừa nói "đặt nước hướng X催 tài" vừa nói "kỵ hướng X" cùng năm).
-  //   NOTE chuẩn hoá từ vựng hướng: module này dùng "Chính Bắc" nhưng DIR_OF dùng "Bắc" → strip "Chính ".
+  // [loop 30 sửa] 三煞 = 1 SECTOR chính phương (Bắc/Nam/Đông/Tây), KHÔ phải 3 hướng/chi riêng lẻ.
+  //   Trước đây map mỗi chi qua DIR_OF → phình thành 3 hướng (vd 午年 ra Tây Bắc/Bắc/Đông Bắc) →
+  //   false positive. Dùng sanshaDirection().mainDir (sector đơn, khớp sansha.js annual).
   const normDir = (d) => (d || '').replace(/^Chính /, '');
-  const yz = Solar.fromYmdHms(curYear, 6, 15, 12, 0, 0).getLunar().getYearZhi();
-  const sanshaDirs = [...new Set((SANSHA[yz] || []).map((b) => DIR_OF[b]).filter(Boolean))];
-  const sanshaDirsN = sanshaDirs.map(normDir);
-  const conflictCats = catDirs.filter((x) => sanshaDirsN.includes(normDir(x.dir)));
-  const sanshaConflict = { dirs: sanshaDirs, conflict: conflictCats.map((x) => ({ dir: x.dir, star: x.starName })) };
+  const sanshaMain = sanshaDirection(curYear).mainDir; // 'Bắc'/'Nam'/... (sector đơn)
+  const sanshaConflicts = normDir(sanshaMain);
+  // [loop 30] dedup theo (dir+star) + gom conflict
+  const conflictCats = Object.values(Object.fromEntries(
+    catDirs.filter((x) => normDir(x.dir) === sanshaConflicts).map((x) => [normDir(x.dir) + '|' + x.starName, x])
+  ));
+  const sanshaConflict = { mainDir: sanshaMain, branches: SANSHA[Solar.fromYmdHms(curYear, 6, 15, 12, 0, 0).getLunar().getYearZhi()] || [], conflict: conflictCats.map((x) => ({ dir: x.dir, star: x.starName })) };
+  // [loop 30] 零神 (primaryWealth) trùng 三煞 → KHÔ emit "★ đặt nước" + "⚠ đừng đặt" cùng hướng.
+  const primaryWealthBlocked = primaryWealth && normDir(primaryWealth.dir) === sanshaConflicts;
   const summaryParts = [`Năm ${curYear} (运 ${yun}, 正神=${yunZL.zheng}/零神=${yunZL.ling}):`];
-  if (primaryWealth && primaryWealth.dir) summaryParts.push(`★ TÀI CHỦ LỰC: ${primaryWealth.waterTypeVi} hướng ${primaryWealth.dir} (零神).`);
-  const otherCats = catDirs.filter((x) => x !== primaryWealth && x.dir);
+  if (primaryWealth && primaryWealth.dir && !primaryWealthBlocked) summaryParts.push(`★ TÀI CHỦ LỰC: ${primaryWealth.waterTypeVi} hướng ${primaryWealth.dir} (零神).`);
+  const otherCats = catDirs.filter((x) => x !== primaryWealth && x.dir && normDir(x.dir) !== sanshaConflicts);
   if (otherCats.length) summaryParts.push(`Kích khác: ${otherCats.map((x) => `${x.starName}→${x.dir}`).join(', ')}.`);
-  if (conflictCats.length) summaryParts.push(`⚠ XUNG ĐỘT 三煞: ${conflictCats.map((x) => `${x.starName}(${x.dir})`).join(', ')} trùng phương 三煞 ${sanshaDirs.join('/')} năm ${curYear} → KHÔNG đặt nước hướng này (三煞 kỵ động thuỷ, phạm chủ hung). Chọn hướng cát KHÁC không phạm三煞.`);
+  if (primaryWealthBlocked) summaryParts.push(`⚠ 零神(${primaryWealth.dir}) NĂM ${curYear} TRÙNG TAM SÁT (${sanshaMain}) → KHÔNG đặt nước催 tài hướng này (三煞 kỵ động thuỷ). Chờ năm khác hoặc dùng hướng cát không phạm tam sát.`);
+  else if (conflictCats.length) summaryParts.push(`⚠ XUNG ĐỘT 三煞: ${conflictCats.map((x) => `${x.starName}(${x.dir})`).join(', ')} trùng phương tam sát ${sanshaMain} năm ${curYear} → KHÔNG đặt nước hướng này.`);
   if (avoidWater.length) summaryParts.push(`KỴ nước: ${avoidWater.map((x) => `${x.starName}(${x.dir})`).join(', ')}.`);
   if (saltCleanse) summaryParts.push(`Muối tiêu hoá: ${saltCleanse.dir} (5黄).`);
   const summary = summaryParts.join(' ');

@@ -279,20 +279,20 @@ function yiFor(hexName, yaoLine) {
 //     R.chart.pillars.time.zhi (giờ sinh).
 // ---------------------------------------------------------------------------
 function reduceTianShu(n) {
-  // 天数: <25 → chữ số hàng đơn vị; =25 → 5; >25 → trừ 25 rồi lấy đơn vị.
-  //   "遇十不用": dư 10→1, dư 20→2 (zhihu + sách PDF).
+  // 天数: «反复减二十五» — trừ 25 LẶP LẠI tới ≤25. [loop 30 sửa] trước đây trừ 1 lần → sai
+  //   khi tianRaw>50 (max thực tế 56). Vd 56→56-25-25=6 (đúng), cũ ra 31→1 (sai).
   let r = n;
-  if (r > 25) r -= 25;
+  while (r > 25) r -= 25;
   if (r === 25) return 5;
-  // giờ r ∈ [1,25]. Lấy hàng đơn vị; nếu 0 (bội 10) → lấy hàng chục.
   const u = r % 10;
-  if (u === 0) return r === 10 ? 1 : 2; // 10→1, 20→2
+  if (u === 0) return r === 10 ? 1 : 2; // 遇十不用: 10→1, 20→2
   return u;
 }
 function reduceDiShu(n) {
-  // 地数: <30 → đơn vị; =30 → 3; >30 → trừ 30 rồi đơn vị. "遇十不用".
+  // 地数: «反复减三十» — trừ 30 LẶP LẠI tới ≤30. [loop 30 sửa] trước trừ 1 lần → sai khi
+  //   diRaw>60 (max thực tế 72). + 遇十 fallback đủ cho mọi dư bội 10.
   let r = n;
-  if (r > 30) r -= 30;
+  while (r > 30) r -= 30;
   if (r === 30) return 3;
   const u = r % 10;
   if (u === 0) return r === 10 ? 1 : r === 20 ? 2 : 3; // 10→1,20→2,30→3
