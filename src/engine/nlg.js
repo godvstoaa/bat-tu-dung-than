@@ -241,23 +241,29 @@ function pPower(R) {
 function pTiming(R, intent) {
   const lines = [];
   const dy = R.dayun || [];
-  lines.push(`Thước đo vận hạn là Dụng Thần ${favText(R.yong)} — vận nào mang hành Dụng Thần thì hanh thông, Kỵ Thần ${avoidText(R.yong)} thì nên thủ. (Đa trường phái: thêm Thập thần năm + Thái tuế + Đào hoa/红艳.)`);
-  // Nếu câu hỏi có mốc năm cụ thể → dùng phân tích 6 phái (chính xác)
+  const pq = R.patternQuality;
+  // [loop 16] NLG giờ 格局-aware — khai thác 12 elevations cho user KHÔNG có AI
+  const gejuLine = pq ? ` Cách ${R.pattern.vi} → ${pq.quality}.` : '';
+  lines.push(`Thước đo vận hạn là Dụng Thần ${favText(R.yong)} — vận nào mang hành Dụng Thần thì hanh thông, Kỵ Thần ${avoidText(R.yong)} thì nên thủ.${gejuLine}`);
+  // Nếu câu hỏi có mốc năm cụ thể → dùng phân tích đa phái + 格局 (chính xác)
   if (intent.years.length) {
     for (const yr of intent.years) {
       try {
-        const d = analyzeLiunianDeep(R, yr);
+        const d = analyzeLiunianDeep(R, yr, pq?.patternYong);
         const warns = d.schools.filter((s) => s.d < -8).map((s) => s.note.slice(0, 60)).join('; ');
-        lines.push(`📅 Năm ${yr} (${d.ganZhi}, can ${godViShort(d.ganGod)}): ${d.rating} (${d.score}/100). ${d.advice}${warns ? ' Lưu ý: ' + warns + '.' : ''}`);
+        // [loop 16] trích 格局 tag từ kết quả
+        const gejuTag = d.gejuFavor === '喜' ? ' ★THUẬN CÁCH' : d.gejuFavor === '忌' ? ' ⚠GHÉT CÁCH' : '';
+        lines.push(`📅 Năm ${yr} (${d.ganZhi}, can ${godViShort(d.ganGod)}): ${d.rating} (${d.score}/100)${gejuTag}. ${d.advice}${warns ? ' Lưu ý: ' + warns + '.' : ''}`);
       } catch (e) {
         lines.push(`📅 Năm ${yr}: chưa tính được chi tiết đa phái.`);
       }
     }
   }
+  // [loop 16] Đại vận Nay hiển thị 格局 tags (★RESCUES / ⚠WORSENS)
   const goodDy = dy.filter((d) => d.score > 0).slice(0, 3);
   const badDy = dy.filter((d) => d.score < 0).slice(0, 2);
-  if (goodDy.length) lines.push(`Đại vận CÁT gần nhất: ${goodDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}–${d.startAge + 9}t]`).join('; ')} — tiến thủ.`);
-  if (badDy.length) lines.push(`Đại vận cần THẬN TRỌNG: ${badDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}–${d.startAge + 9}t]`).join('; ')} — giữ ổn định.`);
+  if (goodDy.length) lines.push(`Đại vận CÁT: ${goodDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}–${d.startAge + 9}t]${d.gejuRescue ? ' ★RESCUES' : d.gejuDelta > 0 ? ' ★CÁCH THUẬN' : ''}`).join('; ')} — tiến thủ.`);
+  if (badDy.length) lines.push(`Đại vận cần THẬN TRỌNG: ${badDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}–${d.startAge + 9}t]${d.gejuWorsen ? ' ⚠WORSENS' : d.gejuDelta < 0 ? ' ⚠CÁCH NGHỊCH' : ''}`).join('; ')} — giữ ổn định.`);
   // Session module supplements (khi không có AI, NLG vẫn có dữ liệu timing đầy đủ)
   try { const jy = jiaoYunAnalysis(R); if (jy.next) lines.push(`🔄 Giao thời đại vận kế: ${jy.next.ganZhi} [${jy.next.age}t, ${jy.next.rating}] — còn ${jy.daysUntil} ngày.`); } catch (e) {}
   try { const wc = scanWealthCareerYingqi(R, new Date().getFullYear(), 8); if (wc.caiYears.length) lines.push(`💰 Tài kích hoạt: ${wc.caiYears.map((y) => y.year).join(', ')}${wc.guanYears.length ? ' | 🎯 Quan: ' + wc.guanYears.map((y) => y.year).join(', ') : ''}.`); } catch (e) {}
