@@ -3528,6 +3528,61 @@ dbThrew = false;
 try { dailyBriefing({ chart: { input: { year: 1990, month: 6, day: 15, hour: 14, minute: 30, gender: 'nam' } } }, 2026, 6, 23); } catch { dbThrew = true; }
 assert(!dbThrew, 'không crash khi R thiếu yong/chart');
 
+// P9. ALGORITHM ELEVATION #11 — 格局喜忌 tag (optional patternQuality param)
+//     DB_R = 辛 / 七殺格: patternYong.xi=[shi], ji=[cai].
+//     (a) backward-compat: KHÔNG truyền patternQuality + R không có R.patternQuality → gejuTag=null.
+//     (b) truyền patternQuality → gejuTag có đủ {tag,note,verdict,dayGod,group}.
+//     (c) xi day (2026-01-08 壬/傷官) → ★格局喜.
+//     (d) ji day (2026-01-01 乙/偏財) → ⚠格局忌.
+//     (e) neutral day (2026-06-23 戊/正印) → ·格局中性.
+//     (f) tag được inject vào oneLiner VÀ có dòng riêng trong summary.
+const bareR = { chart: { input: DB_R.chart.input, dayGan: DB_R.chart.dayGan }, yong: DB_R.yong };
+const bBare = dailyBriefing(bareR, 2026, 6, 23);
+assert(bBare.gejuTag === null, 'P9a backward-compat: không truyền patternQuality → gejuTag=null');
+assert(!bBare.oneLiner.includes('格局'), 'P9a backward-compat: oneLiner không chứa tag 格局');
+assert(!bBare.summary.includes('格局:'), 'P9a backward-compat: summary không chứa dòng 格局');
+
+const dbPy = DB_R.patternQuality;
+assert(dbPy && dbPy.patternYong, 'P9 fixture: DB_R.patternQuality có patternYong');
+const bPy = dailyBriefing(DB_R, 2026, 6, 23, dbPy);
+assert(bPy.gejuTag && ['★格局喜','⚠格局忌','·格局中性'].includes(bPy.gejuTag.tag), `P9b gejuTag.tag hợp lệ (${bPy.gejuTag?.tag})`);
+assert(typeof bPy.gejuTag.note === 'string' && bPy.gejuTag.note.length > 0, 'P9b gejuTag.note không rỗng');
+assert(typeof bPy.gejuTag.verdict === 'string' && bPy.gejuTag.verdict.length > 0, `P9b gejuTag.verdict không rỗng (${bPy.gejuTag?.verdict})`);
+assert(typeof bPy.gejuTag.dayGod === 'string', 'P9b gejuTag.dayGod là string');
+assert(['ti','yin','shi','cai','guan'].includes(bPy.gejuTag.group), `P9b gejuTag.group hợp lệ (${bPy.gejuTag?.group})`);
+
+// P9c xi day: 2026-01-08 (壬/傷官 → shi → xi của 七殺格)
+const bXi = dailyBriefing(DB_R, 2026, 1, 8, dbPy);
+assert(bXi.gejuTag.tag === '★格局喜', `P9c xi day → ★格局喜 (${bXi.gejuTag.tag} / ${bXi.gejuTag.dayGod})`);
+assert(bXi.oneLiner.includes('★格局喜'), 'P9c xi day oneLiner chứa ★格局喜');
+
+// P9d ji day: 2026-01-01 (乙/偏財 → cai → ji của 七殺格)
+const bJi = dailyBriefing(DB_R, 2026, 1, 1, dbPy);
+assert(bJi.gejuTag.tag === '⚠格局忌', `P9d ji day → ⚠格局忌 (${bJi.gejuTag.tag} / ${bJi.gejuTag.dayGod})`);
+assert(bJi.oneLiner.includes('⚠格局忌'), 'P9d ji day oneLiner chứa ⚠格局忌');
+
+// P9e neutral day: 2026-06-23 (戊/正印 → yin → không nằm trong xi=[shi] hay ji=[cai])
+const bNeu = dailyBriefing(DB_R, 2026, 6, 23, dbPy);
+assert(bNeu.gejuTag.tag === '·格局中性', `P9e neutral day → ·格局中性 (${bNeu.gejuTag.tag} / ${bNeu.gejuTag.dayGod})`);
+
+// P9f tag injection: oneLiner có tag, summary có dòng "格局:"
+assert(bPy.oneLiner.includes(bPy.gejuTag.tag), 'P9f oneLiner inject tag 格局');
+assert(bPy.summary.includes('格局:'), 'P9f summary có dòng 格局');
+assert(bPy.summary.includes(bPy.gejuTag.tag), 'P9f summary chứa tag');
+
+// P9g auto-fallback: R.patternQuality có sẵn → không cần truyền param thứ 4 cũng dùng được
+const bAuto = dailyBriefing(DB_R, 2026, 6, 23);
+assert(bAuto.gejuTag !== null && bAuto.gejuTag.tag === bPy.gejuTag.tag, 'P9g auto-fallback R.patternQuality khi không truyền param');
+
+// P9h determinism với patternQuality
+const bPy2 = dailyBriefing(DB_R, 2026, 6, 23, dbPy);
+assert(JSON.stringify(bPy) === JSON.stringify(bPy2), 'P9h dailyBriefing+patternQuality tất định');
+
+console.log(`   格局 tag (DB_R=${DB_R.chart.dayGan}/${DB_R.pattern.vi}, xi=${dbPy.patternYong.xi.map(x=>x.vi).join('/')}, ji=${dbPy.patternYong.ji.map(x=>x.vi).join('/')}):`);
+console.log(`     2026-01-08 (壬/傷官) → ${bXi.gejuTag.tag} ✓`);
+console.log(`     2026-01-01 (乙/偏財) → ${bJi.gejuTag.tag} ✓`);
+console.log(`     2026-06-23 (戊/正印) → ${bNeu.gejuTag.tag} ✓`);
+
 console.log(`   2026-06-23 ${db1.dayGanZhi} (ÂL ${db1.lunarStr}): ${db1.rating.level} (${db1.rating.score}/100)`);
 console.log(`   Giờ tốt: ${db1.bestHours.map((h)=>h.vi+'='+h.score).join(', ')} | Giờ kỵ: ${db1.avoidHours.map((h)=>h.vi).join(', ')}`);
 console.log(`   Hướng kỵ: ${db1.directionTaboo.avoid.join(', ')} | 紫微: ${db1.ziweiDaily.palace} ${db1.ziweiDaily.vi} [${db1.ziweiDaily.tone}]`);

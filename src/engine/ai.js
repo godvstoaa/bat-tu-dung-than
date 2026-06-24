@@ -222,7 +222,7 @@ export function buildChartBrief(R) {
 - TRỊ NIÊN THÁI TUẾ ${curYear}: ${(() => { try { const o = taiSuiOverview(R, curYear); return `${o.current.ganZhi} = ${o.current.name} (vị ${o.current.index}/60). ${o.current.note} Bản mệnh TS (năm sinh) = ${o.natal.name}.`; } catch (e) { return '(không tính được)'; } })()}
 
 == 📅 HÔM NAY TỔNG KHÁI (DAILY BRIEFING — QUAN TRỌNG NHẤT, ĐỌC TRƯỚC) ==
-${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() + 1, _now.getDate()); return `ONE_LINER: ${b.oneLiner}\n${b.summary}`; } catch (e) { return '(không tính được)'; } })()}
+${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() + 1, _now.getDate(), R.patternQuality); return `ONE_LINER: ${b.oneLiner}\n${b.summary}`; } catch (e) { return '(không tính được)'; } })()}
 ⏩ Khi user hỏi "hôm nay thế nào / hôm nay làm gì / tổng quan hôm nay" → Ưu tiên trả lời từ block "HÔM NAY TỔNG KHÁI" này TRƯỚC, sau đó mới đi sâu vào chi tiết bên dưới nếu được hỏi thêm.
 
 == LÁ SỐ BÁT TỰ (đã tính chính xác, dùng để luân giải) ==

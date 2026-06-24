@@ -29,6 +29,12 @@ import { annualTabooOverview } from './annual-taboo.js';
 import { taiSuiOverview } from './taisui-general.js';
 import { liunianEvents } from './liunian-event.js';
 import { WX_REMEDY } from './remedy.js';
+import { tenGod, godGroup } from './core.js';
+
+// ---- Tên Hán-Việt nhóm Thập thần (cho 格局 喜忌 tag) ----
+const GROUP_VI = { ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 'Tài', guan: 'Quan Sát' };
+// ---- Verdict 格局成败 (rút gọn cho one-liner) ----
+const QUALITY_VI = { '成格': 'Thành cách', '有救': 'Có cứu ứng', '败格': 'Bại cách', '特殊': 'Cách đặc biệt' };
 
 // ---- Định nghĩa action theo tone ngày + Dụng Thần (cho `tips` cải vận ngắn) ----
 // Tone hoàng đạo → tiến thủ; tone hắc đạo → tĩnh/thu dọn.
@@ -42,6 +48,9 @@ const ACTION_HUNG = ['dọn dẹp', 'thu xếp sổ sách', 'nghỉ ngơi', 'an 
  * @param {number} [year]  - năm dương lịch (mặc định hôm nay)
  * @param {number} [month] - tháng (1..12)
  * @param {number} [day]   - ngày
+ * @param {object} [patternQuality] - OPTIONAL kết quả patternQuality(R) (R.patternQuality).
+ *        Khi truyền vào, oneLiner/summary sẽ kèm tag 格局喜/格局忌 + verdict thành/bại.
+ *        Khi KHÔNG truyền (backward compatible), bỏ qua chiều 格局.
  * @returns {{
  *   date: string, lunarStr: string, dayGanZhi: string,
  *   rating: { score:number, level:string, tone:'cat'|'hung'|'bình', summary:string },
@@ -52,12 +61,13 @@ const ACTION_HUNG = ['dọn dẹp', 'thu xếp sổ sách', 'nghỉ ngơi', 'an 
  *   taisui: { current:string, relation:string },
  *   yongAction: { boost:string, reduce:string, reason:string },
  *   yearEvent: { god:string, event:string, who:string },
+ *   gejuTag: { tag:string, note:string, verdict:string, dayGod:string, group:string } | null,
  *   tips: string[],
  *   oneLiner: string,
  *   summary: string
  * }}
  */
-export function dailyBriefing(R, year, month, day) {
+export function dailyBriefing(R, year, month, day, patternQuality) {
   const _now = new Date();
   const y = year ?? _now.getFullYear();
   const mo = month ?? (_now.getMonth() + 1);
@@ -249,9 +259,42 @@ export function dailyBriefing(R, year, month, day) {
   } catch (_) {}
 
   // ============================================================
+  // 9. 格局喜忌 TAG (ALGORITHM ELEVATION #11) — thập thần NGÀY
+  //    vs patternYong.xi/ji của cách cục (子平真詮 ch.10-11).
+  //    Makes the 格局 deep layers VISIBLE trong dòng được đọc nhiều nhất.
+  //    - optional: khi patternQuality thiếu → bỏ qua (backward compatible).
+  //    - xi (★格局喜): nhóm thập thần ngày sinh trợ 格 thần.
+  //    - ji (⚠格局忌): nhóm thập thần ngày khắc phá/cản trở 格 thần.
+  //    - else: trung tính (chính 格 thần hoặc nhóm không lie trong xi/ji).
+  // ============================================================
+  let gejuTag = null;
+  try {
+    const pq = patternQuality || R?.patternQuality;
+    if (pq && pq.patternYong && R?.chart?.dayGan && dayGan) {
+      const dayGod = tenGod(R.chart.dayGan, dayGan);   // thập thần của can NGÀY vs Nhật Chủ
+      const grp = godGroup(dayGod);
+      const xiGroups = new Set((pq.patternYong.xi || []).map((x) => x.group));
+      const jiGroups = new Set((pq.patternYong.ji || []).map((x) => x.group));
+      const verdict = QUALITY_VI[pq.quality] || pq.quality || '';
+      let tag = '', note = '';
+      if (grp && xiGroups.has(grp)) {
+        tag = '★格局喜';
+        note = `can ngày ${dayGod} (${GROUP_VI[grp]}) sinh trợ 格 → ngày thuận cách cục.`;
+      } else if (grp && jiGroups.has(grp)) {
+        tag = '⚠格局忌';
+        note = `can ngày ${dayGod} (${GROUP_VI[grp]}) khắc phá/cản trở 格 → ngày tổn cách cục.`;
+      } else {
+        tag = '·格局中性';
+        note = `can ngày ${dayGod} (${GROUP_VI[grp] || '—'}) không trực tiếp ưa/kỵ cách.`;
+      }
+      gejuTag = { tag, note, verdict, dayGod, group: grp };
+    }
+  } catch (_) {}
+
+  // ============================================================
   // ONE-LINER — câu chốt tóm tắt cả ngày
   // ============================================================
-  const oneLiner = buildOneLiner({ rating, huang, bestHours, directionTaboo, yongAction, bhDayOfficerVi });
+  const oneLiner = buildOneLiner({ rating, huang, bestHours, directionTaboo, yongAction, bhDayOfficerVi, gejuTag });
 
   // ============================================================
   // SUMMARY — bản multi-line đầy đủ
@@ -266,6 +309,7 @@ export function dailyBriefing(R, year, month, day) {
   if (taisui.current !== '?') lines.push(`THÁI TUẾ: ${taisui.current}${taisui.relation ? ' — ' + taisui.relation : ''}`);
   if (yongAction.boost || yongAction.reduce) lines.push(`DỤNG THẦN: ${yongAction.boost ? 'tăng ' + yongAction.boost : ''}${yongAction.reduce ? ' | giảm ' + yongAction.reduce : ''}`);
   if (yearEvent.god !== '?') lines.push(`LƯU NIÊN: sao ${yearEvent.god}${yearEvent.event ? ' → ' + yearEvent.event : ''}${yearEvent.who ? ' (' + yearEvent.who + ')' : ''}`);
+  if (gejuTag) lines.push(`格局: ${gejuTag.tag}${gejuTag.verdict ? ' [' + gejuTag.verdict + ']' : ''} — ${gejuTag.note}`);
   if (tips.length) lines.push(`CẢI VẬN: ${tips.join(' ')}`);
   const summary = lines.join('\n');
 
@@ -281,6 +325,7 @@ export function dailyBriefing(R, year, month, day) {
     taisui,
     yongAction,
     yearEvent,
+    gejuTag,
     tips,
     oneLiner,
     summary,
@@ -288,7 +333,7 @@ export function dailyBriefing(R, year, month, day) {
 }
 
 // ---- Helper: dựng câu oneLiner (KEY output) ----
-function buildOneLiner({ rating, huang, bestHours, directionTaboo, yongAction, bhDayOfficerVi }) {
+function buildOneLiner({ rating, huang, bestHours, directionTaboo, yongAction, bhDayOfficerVi, gejuTag }) {
   const bits = [];
 
   // 1. Tone ngày + trực
@@ -306,18 +351,25 @@ function buildOneLiner({ rating, huang, bestHours, directionTaboo, yongAction, b
     bits.push(`giờ tốt ${b0.vi}${why}`);
   }
 
-  // 3. Dụng Thần hành động (nếu ngày mang Dụng/Hỷ/Kỵ rõ)
+  // 3. 格局喜忌 tag (ALGORITHM ELEVATION #11) — MỘT clause ngắn ngay sau giờ tốt,
+  //    trước Dụng Thần. Chỉ hiển thị khi gejuTag có giá trị (patternQuality được truyền).
+  //    Giữ scannable: chỉ tag + verdict (vd "★格局喜 [Thành cách]"), KHÔNG cả câu dài.
+  if (gejuTag && gejuTag.tag) {
+    bits.push(`${gejuTag.tag}${gejuTag.verdict ? ' [' + gejuTag.verdict + ']' : ''}`);
+  }
+
+  // 4. Dụng Thần hành động (nếu ngày mang Dụng/Hỷ/Kỵ rõ)
   if (yongAction.boost) bits.push(`ngày ${yongAction.boost}`);
   else if (yongAction.reduce) bits.push(`ngày ${yongAction.reduce}`);
 
-  // 4. Hướng tránh
+  // 5. Hướng tránh
   if (directionTaboo.avoid.length) {
     bits.push(`hướng tránh ${directionTaboo.avoid[0]}`);
   }
 
   const head = bits.join(', ') + '.';
 
-  // 5. Nên / Tránh (câu hành động ngắn)
+  // 6. Nên / Tránh (câu hành động ngắn)
   const isCat = rating.tone === 'cat';
   const should = isCat ? 'Nên: khai trương/ký kết/gặp người lớn' : 'Nên: dọn dẹp/thu xếp/an tĩnh';
   const avoid = isCat

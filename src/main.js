@@ -512,7 +512,7 @@ function renderDailyBriefing(R) {
   const el = $('daily-briefing');
   if (!el) return;
   try {
-    const b = dailyBriefing(R);
+    const b = dailyBriefing(R, undefined, undefined, undefined, R.patternQuality);
     const rateCls = b.rating.tone === 'cat' ? 'rate-cat' : b.rating.tone === 'hung' ? 'rate-hung' : 'rate-mid';
     const toneVi = b.rating.tone === 'cat' ? 'Cát' : b.rating.tone === 'hung' ? 'Hung' : 'Bình';
     const bestHtml = b.bestHours.map((h) => {
