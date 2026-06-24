@@ -19,7 +19,16 @@ export default defineConfig({
     },
   },
   build: {
-    emptyOutDir: true,   // luôn xoá dist/ cũ trước build — tránh tích luỹ file stale
-    chunkSizeWarningLimit: 800,  // 768KB chunk OK — bỏ warning
+    emptyOutDir: true,
+    chunkSizeWarningLimit: 1000,
+    // [loop 49] tách vendor (lunar-javascript + astronomy-engine) khỏi app code
+    // → vendor cache lâu hơn (hiếm đổi), app cache ngắn (đổi mỗi loop)
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['lunar-javascript', 'astronomy-engine'],
+        },
+      },
+    },
   },
 });
