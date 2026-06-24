@@ -4065,6 +4065,34 @@ console.log('\n################## Q. 运中救应 / 运中破格 (运能改格) 
     'AI brief có tag ★RESCUES / ⚠WORSENS / CỨU CÁCH');
 }
 
+// ################## R. BÁT TỰ NGƯỢC (逆推 — INVERSE SOLVER) [loop 21] ##################
+//   Nguyên lý user: phương pháp chuẩn phải DỊCH NGƯỢC được. Đã chấm điểm mệnh → phải tìm
+//   được lá số điểm CAO/THẤP nhất. Quét-thật bằng analyze() → cực đại/cực tiểu thật.
+console.log('\n################## R. BÁT TỰ NGƯỢC (逆推 INVERSE SOLVER) ##################');
+{
+  const { inverseBaZiSolve, labelResult } = await import('./src/engine/inverse-bazi.js');
+  // Cửa sổ nhỏ, nhanh: 3 tháng 1990, step 7 ngày, 12时辰 × 2 giới
+  const r = inverseBaZiSolve({ refYear: 2026, yearStart: 1990, yearEnd: 1990, stepDays: 7, topK: 3, maxSamples: 1500 });
+  assert(r.scanned > 50, `inverseBaZiSolve quét được nhiều lá số (được ${r.scanned})`);
+  assert(r.max && r.min && r.max.score >= r.min.score, 'max.score >= min.score');
+  assert(r.max.score > r.min.score, 'có sự phân biệt điểm (max > min)');
+  // Tính NHẤT QUÁN: lá max re-analyze phải ra cùng điểm (chứng minh score thật, không random)
+  const reMax = analyze(r.max.y, r.max.m, r.max.d, r.max.h, r.max.min, r.max.g, 2026);
+  assert(reMax.synthesis.score === r.max.score, `lá max re-analyze cùng điểm (${reMax.synthesis.score} vs ${r.max.score})`);
+  const reMin = analyze(r.min.y, r.min.m, r.min.d, r.min.h, r.min.min, r.min.g, 2026);
+  assert(reMin.synthesis.score === r.min.score, `lá min re-analyze cùng điểm (${reMin.synthesis.score} vs ${r.min.score})`);
+  // Histogram tổng = scanned
+  const histSum = r.histogram.reduce((s, h) => s + h.count, 0);
+  assert(histSum === r.scanned, `histogram tổng (${histSum}) = scanned (${r.scanned})`);
+  // Target: tìm được lá số gần target
+  const t = inverseBaZiSolve({ refYear: 2026, yearStart: 1990, yearEnd: 1990, stepDays: 7, target: 65, maxSamples: 1500 });
+  assert(t.nearestToTarget && Math.abs(t.nearestToTarget.score - 65) <= 20, `target 65 → tìm được lá số gần (điểm ${t.nearestToTarget && t.nearestToTarget.score})`);
+  // Cao nhất thường là 成格/有救, thấp nhất thường 败格 — xu hướng cổ pháp
+  console.log(`   Quét ${r.scanned} lá / ${r.durationMs}ms. Khoảng ${r.scoreStats.min}→${r.scoreStats.max} (TB ${r.scoreStats.mean}).`);
+  console.log(`   CAO NHẤT: ${labelResult(r.max)}`);
+  console.log(`   THẤP NHẤT: ${labelResult(r.min)}`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');

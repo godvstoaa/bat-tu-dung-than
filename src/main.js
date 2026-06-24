@@ -7,6 +7,7 @@ import { tieredAnalysis } from './engine/tiers.js';
 import { evaluateDate, findGoodDates, ACTIVITY } from './engine/zheri.js';
 import { computeZhai } from './engine/zhai.js';
 import { computeHehun } from './engine/hehun.js';
+import { inverseBaZiSolve, labelResult } from './engine/inverse-bazi.js'; // [loop 21] 逆推八字
 import { analyzeLiunianDeep } from './engine/liunian-pro.js';
 import { liunianEvents } from './engine/liunian-event.js';
 import { qianliEightSteps, QIANLI_QUOTE } from './engine/qianli.js';
@@ -2323,6 +2324,39 @@ function runHehun() {
     <p class="zr-advice">${h.verdict}</p>`;
 }
 
+// ---------------------------------------------------------------- 逆推八字 [loop 21] — tìm lá số điểm cực
+function runInverse() {
+  const mode = $('inv-mode').value;
+  const target = parseInt($('inv-target').value, 10);
+  const year = parseInt($('inv-year').value, 10) || new Date().getFullYear();
+  const step = parseInt($('inv-step').value, 10) || 5;
+  const out = $('inv-out');
+  out.innerHTML = `<p class="hint">⏳ Đang quét Bát Tự (năm ${year}, bước ${step} ngày × 12时辰 × 2 giới)... vài giây.</p>`;
+  // setTimeout để UI kịp repaint trước khi quét đồng bộ nặng
+  setTimeout(() => {
+    let sol;
+    try {
+      sol = inverseBaZiSolve({
+        refYear: new Date().getFullYear(), yearStart: year, yearEnd: year, stepDays: step, topK: 5, maxSamples: 5000,
+        target: mode === 'target' ? target : null,
+      });
+    } catch (e) { out.innerHTML = `<p class="hint">Lỗi: ${e.message}</p>`; return; }
+    const fmt = (r) => r ? `<div class="zr-item"><b>${r.y}-${String(r.m).padStart(2,'0')}-${String(r.d).padStart(2,'0')}</b> ${r.g==='nam'?'Nam':'Nữ'} · giờ <b>${r.shichen}</b> <span class="zh">${r.pillars.join(' ')}</span> <span class="ln-rate ${r.score>=62?'rate-cat':r.score>=46?'rate-mid':'rate-hung'}">${r.score}đ</span> · ${r.pattern}${r.gejuQuality?' ('+r.gejuQuality+')':''}</div>` : '';
+    const heading = mode === 'max' ? '🥇 BÁT TỰ ĐIỂM CAO NHẤT (mệnh tốt nhất có thể)' : mode === 'min' ? '🔻 BÁT TỰ ĐIỂM THẤP NHẤT (mệnh xấu nhất có thể)' : `🎯 BÁT TỰ GẦN ${target} ĐIỂM NHẤT`;
+    const focus = mode === 'max' ? sol.max : mode === 'min' ? sol.min : sol.nearestToTarget;
+    const list = mode === 'max' ? sol.topK : mode === 'min' ? sol.bottomK : null;
+    const histBars = sol.histogram.map((h) => `<span title="${h.range}đ: ${h.count} lá" style="display:inline-block;width:24px;text-align:center;font-size:.7em;">${h.count||''}<span style="display:block;height:${Math.min(40,h.count/4)}px;background:linear-gradient(#d4a017,#b8860b);border-radius:2px;"></span></span>`).join('');
+    out.innerHTML = `
+      <p class="hint">Quét <b>${sol.scanned}</b> lá số thật trong ${sol.durationMs}ms. Khoảng điểm <b>${sol.scoreStats.min}→${sol.scoreStats.max}</b> (TB ${sol.scoreStats.mean}).</p>
+      <div class="zr-head">${heading}:</div>
+      ${fmt(focus)}
+      ${list && list.length ? `<div class="zr-head" style="margin-top:8px;font-size:.9em">Top ${list.length}:</div><div class="zr-list">${list.filter(r=>r!==focus).map(fmt).join('')}</div>` : ''}
+      <div class="zr-head" style="margin-top:8px;font-size:.85em">Phân phối điểm (trục dưới = khoảng điểm):</div>
+      <div style="display:flex;align-items:flex-end;gap:1px;margin:4px 0">${histBars}</div>
+      <p class="hint">⚠ Tham khảo chọn giờ/ngày sinh — không dùng để "chọn số mệnh". Điểm phụ thuộc refYear (đại vận/niên hiện tại); mở rộng năm quét để sát cực hơn.</p>`;
+  }, 20);
+}
+
 // ---------------------------------------------------------------- 生肖配对评分 (六合/三合/六冲/六害/三刑/自刑)
 function runZodiacPair() {
   const za = $('zp-a').value, zb = $('zp-b').value;
@@ -2360,6 +2394,7 @@ function runZhai() {
 $('zr-btn').addEventListener('click', runZheri);
 $('zr-find').addEventListener('click', runZheriFind);
 $('hh-btn').addEventListener('click', runHehun);
+if ($('inv-btn')) $('inv-btn').addEventListener('click', runInverse); // [loop 21] 逆推八字
 if ($('zp-btn')) $('zp-btn').addEventListener('click', runZodiacPair);
 $('zh-btn').addEventListener('click', runZhai);
 $('ts2-btn').addEventListener('click', runTongsheng);

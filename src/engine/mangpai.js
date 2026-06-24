@@ -9,6 +9,8 @@
 // ============================================================================
 import { GAN, ZHI, KE, KE_BY } from './constants.js';
 import { tenGod } from './core.js';
+import { LU_SHEN } from './shensha.js'; // [loop 21] 禄 = THỂ (thân Nhật Chủ ở địa chi)
+import { ZHI_LIUHE_MAP, ZHI_CHONG_MAP } from './interactions.js';
 
 const ORDER = ['year', 'month', 'day', 'time'];
 const POS_VI = { year: 'Năm', month: 'Tháng', day: 'Ngày', time: 'Giờ' };
@@ -48,13 +50,38 @@ export function analyzeMangpai(R) {
   if (caiBin > caiZhu) { score -= 5; notes.push(`• Tài tinh phân tán 宾位 (Năm/Tháng) → tài ra ngoài, mình phải争/chiếm mới có.`); }
   if (caiHits.length === 0 && guanHits.length === 0) { score -= 8; notes.push(`• Mệnh ít Tài Quan → 盲派 gọi là "thiếu đối tượng làm công", phú quý thiên về tích lũy chậm.`); }
 
-  // 2. 做功效率 — có hợp/chế/xung 拿 tài quan không?
-  const ix = R.interactions;
-  const hasHe = ix.zhiHe.length + ix.ganHe.length + ix.sanHe.length;
-  const hasChong = ix.chong.length;
-  if (hasHe >= 2) { score += 8; notes.push(`✓ Nhiều hợp (${hasHe}) — 做功效率 CAO (lục/tam hợp là công lớn), chủ động lấy được tài quan.`); }
-  else if (hasHe > 0) { score += 4; notes.push(`• Có hợp — 做功 vừa, cơ hội tới qua quan hệ.`); }
-  if (hasChong >= 2) { score -= 4; notes.push(`• Xung nhiều — 做功 bằng xung (hiệu năng thấp), biến động nhiều mới được.`); }
+  // 2. [loop 21 ELEVATION] 禄-base 做功 — CỐT LÕI 盲派. Trước đây đếm 合/冲 chung (bất kỳ
+  //    trụ nào) → không phải 盲派 thật. Nay: 禄 = THỂ (thân Nhật Chủ ở địa chi); 做功 = 禄
+  //    LÀM GÌ với 财/官 chi (hợp=NHẬN — công lớn nhất; xung=chiếm — công vừa, biến động).
+  //    Nguồn: 盲派 «禄做功» quyết («逢合做功最大», «禄逢财合发大财»).
+  const luZhi = LU_SHEN[dmGan];
+  const pillarsByPos = ORDER.map((k) => ({ pos: k, zhi: c.pillars[k].zhi }));
+  const luPos = pillarsByPos.filter((p) => p.zhi === luZhi).map((p) => p.pos);
+  const caiZhiSet = new Set(pillarsByPos.filter((p) => ZHI[p.zhi].wx === caiWx).map((p) => p.zhi));
+  const guanZhiSet = new Set(pillarsByPos.filter((p) => ZHI[p.zhi].wx === guanWx).map((p) => p.zhi));
+  const targetZhi = [...new Set([...caiZhiSet, ...guanZhiSet])];
+  if (luPos.length === 0) {
+    score -= 6;
+    notes.push(`• 禄 (Lộc ${luZhi}) KHÔNG tọa địa chi nào → "thiếu thể": làm công không có nền thân, phú quý thiên nhờ vận mang Lộc / phải bù Dụng.`);
+  } else {
+    score += 3;
+    notes.push(`✓ 禄 (${luZhi}) tọa ${luPos.map((p) => POS_VI[p]).join('/')} → có "thể" (thân) để làm công.`);
+    const heHits = targetZhi.filter((tz) => ZHI_LIUHE_MAP[luZhi + tz]);        // 禄 hợp 财/官
+    const chongHits = targetZhi.filter((tz) => ZHI_CHONG_MAP[luZhi + tz]);      // 禄 xung 财/官
+    if (heHits.length) {
+      score += 10;
+      const rel = (tz) => caiZhiSet.has(tz) ? 'Tài' : 'Quan';
+      notes.push(`★ 禄 ${luZhi} lục hợp ${heHits.map((tz) => tz + '(' + rel(tz) + ')').join('/')} → "HỢP NHẬN" = 做功 hiệu năng CAO NHẤT — thân tự lấy được tài/quan, phú quý thật.`);
+    }
+    if (chongHits.length) {
+      score += 4;
+      notes.push(`⚡ 禄 ${luZhi} xung ${chongHits.join('/')} (Tài/Quan chi) → "XUNG LẤY" = 做功 bằng lực (hiệu năng vừa, phải biến động/争 mới giữ được).`);
+    }
+    if (!heHits.length && !chongHits.length && targetZhi.length) {
+      score += 1;
+      notes.push(`• 禄 hiện nhưng không hợp/xung trực tiếp 财/官 chi → 做功 gián tiếp (qua can/tam hợp), hiệu năng trung bình.`);
+    }
+  }
 
   // 3. 日干合 tài/quan → chủ động theo đuổi
   const dmHe = GAN_HE[dmGan];

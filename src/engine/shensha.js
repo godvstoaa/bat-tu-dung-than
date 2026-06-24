@@ -14,9 +14,11 @@ export const TIAN_YI = {
   辛: ['寅', '午'],
 };
 // Văn Xương (文昌) — sao học vấn, thi cử, tài năng
+// [loop 21 sửa bug CAO] khẩu quyết «甲乙巳午…丙戊申宫丁己鸡, 庚猪辛逢壬见虎, 癸人见兔»:
+//   辛 → DẦN (寅), KHÔNG phải '子'. Trước đây 辛:'子' → nhật can 辛 không bao giờ kích hoạt Văn Xương.
 export const WEN_CHANG = {
   甲: '巳', 乙: '午', 丙: '申', 戊: '申', 丁: '酉', 己: '酉',
-  庚: '亥', 辛: '子', 壬: '寅', 癸: '卯',
+  庚: '亥', 辛: '寅', 壬: '寅', 癸: '卯',
 };
 // Lộc Thần (禄神) — vị trí Lâm Quan, lương thực, tài lộc cơ bản
 export const LU_SHEN = {

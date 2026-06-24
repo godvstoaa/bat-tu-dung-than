@@ -47,11 +47,12 @@ function nayinQuick(gan, zhi) {
   return '?';
 }
 
-// Thai tức (thái dương +1, thái âm +4 — một biến thể khác)
+// Thai tức (thái dương +1, thái âm +3) — [loop 21 sửa bug] trước đây chi +4 (chẵn) làm lệch
+//   parity can-chi → ra cặp KHÔNG TỒN TẠI trong 60 hoa giáp (60/60 lỗi). Chi +3 (lẻ) khớp parity.
 export function taiXi(monthGan, monthZhi) {
   const gIdx = GAN_ORDER.indexOf(monthGan);
   const zIdx = ZHI_ORDER.indexOf(monthZhi);
-  return GAN_ORDER[(gIdx + 1) % 10] + ZHI_ORDER[(zIdx + 4) % 12];
+  return GAN_ORDER[(gIdx + 1) % 10] + ZHI_ORDER[(zIdx + 3) % 12];
 }
 
 export { GAN_ORDER, ZHI_ORDER };

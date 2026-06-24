@@ -435,6 +435,26 @@
           <div class="tool-out" id="hh-out"></div>
         </div>
 
+        <!-- 逆推八字 — BÁT TỰ NGƯỢC: tìm lá số điểm cao/thấp nhất có thể [loop 21] -->
+        <div class="tool">
+          <h3>🔄 Bát Tự Ngược <span class="zh">逆推八字 — tìm mệnh cực</span></h3>
+          <p class="hint">Đã chấm được điểm mệnh → tìm ra lá số Bát Tự đạt điểm <b>CAO NHẤT / THẤP NHẤT</b> có thể (dịch ngược). Dùng tham khảo chọn giờ/ngày sinh hoặc xem "mệnh cực" ra sao.</p>
+          <div class="tool-row">
+            <label>Chế độ
+              <select id="inv-mode">
+                <option value="max">Điểm CAO nhất (mệnh tốt nhất)</option>
+                <option value="min">Điểm THẤP nhất (mệnh xấu nhất)</option>
+                <option value="target">Gần 1 điểm target</option>
+              </select>
+            </label>
+            <label>Target điểm<input type="number" id="inv-target" value="70" min="0" max="100" style="width:5em" /></label>
+            <label>Năm quét<input type="number" id="inv-year" value="1990" min="1900" max="2100" style="width:6em" /></label>
+            <label>Bước ngày<select id="inv-step"><option value="3">3 (sát cực, chậm)</option><option value="5" selected>5 (cân bằng)</option><option value="9">9 (nhanh)</option></select></label>
+            <button class="btn-ghost" id="inv-btn">🔄 Tìm Bát Tự cực</button>
+          </div>
+          <div class="tool-out" id="inv-out"></div>
+        </div>
+
         <!-- 生肖配对评分 (六合/三合/六冲/六害/三刑/自刑) -->
         <div class="tool">
           <h3>🐲 生肖配对评分 <span class="zh">生肖六合/三合/六冲/六害/三刑</span></h3>

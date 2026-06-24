@@ -16,6 +16,7 @@ import { analyzeChangsheng } from './changsheng-deep.js';
 import { computeLiuyue } from './liuyue.js';
 import { analyzeLiuRi, findGoodDays } from './liuri.js';
 import { computeYearDaily } from './year-daily.js';
+import { inverseBaZiSolve, labelResult } from './inverse-bazi.js'; // [loop 21] 逆推 inverse solver
 import { buildLifeTrajectory } from './life-trajectory.js';
 import { healthMonthlyAlert } from './health-monthly.js';
 import { lifeReading } from './life-reading.js';
@@ -591,6 +592,18 @@ export const AI_TOOLS = [
       topN: { type: 'integer', description: 'Số ngày tốt cần lấy, vd 5' },
     }, required: ['start', 'count'] },
   } },
+  { type: 'function', function: {
+    // [loop 21] BÁT TỰ NGƯỢC — tìm lá số điểm CAO/THẤP nhất (hoặc gần target). Nguyên lý:
+    //   phương pháp chuẩn phải dịch ngược được. Không cần R (quét độc lập).
+    name: 'inverse_bazi', description: 'TÌM BÁT TỰ (lá số sinh) có điểm Tổng Mệnh CAO NHẤT / THẤP NHẤT có thể đạt, hoặc gần một điểm target. Dịch ngược của hàm chấm điểm mệnh. Dùng khi user hỏi ngược "bát tư của người điểm cao/thấp nhất là gì", "muốn đẻ con mệnh tốt nhất thì sinh năm/tháng/giờ nào", "tìm lá số đạt điểm X".',
+    parameters: { type: 'object', properties: {
+      mode: { type: 'string', enum: ['max', 'min', 'target'], description: 'max=điểm cao nhất, min=thấp nhất, target=gần 1 điểm cụ thể' },
+      target: { type: 'integer', description: 'Điểm mong muốn (0-100) khi mode=target' },
+      yearStart: { type: 'integer', description: 'Năm bắt đầu quét (bỏ trống = năm hiện tại)' },
+      yearEnd: { type: 'integer', description: 'Năm kết thúc quét (bỏ trống = yearStart)' },
+      stepDays: { type: 'integer', description: 'Bước nhảy ngày (mặc định 5; nhỏ hơn = sát cực hơn nhưng chậm)' },
+    }, required: ['mode'] },
+  } },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -615,6 +628,30 @@ export function execTool(name, args, R) {
       case 'best_days_in_year': {
         const Y = computeYearDaily(R, a.year, R.patternQuality);
         return { year: Y.year, best: Y.best.slice(0, 8).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })), worst: Y.worst.slice(0, 5).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })) };
+      }
+      case 'inverse_bazi': {
+        // [loop 21] 逆推 — tìm lá số điểm cực/trung. Quét độc lập, không cần R.
+        const refYear = new Date().getFullYear();
+        const opts = {
+          refYear,
+          yearStart: a.yearStart ?? refYear,
+          yearEnd: a.yearEnd ?? (a.yearStart ?? refYear),
+          stepDays: a.stepDays ?? 5,
+          topK: 4,
+          maxSamples: 4000,
+          target: a.mode === 'target' && a.target != null ? a.target : null,
+        };
+        const sol = inverseBaZiSolve(opts);
+        const fmt = (r) => r ? { label: labelResult(r), score: r.score, pattern: r.pattern, geju: r.gejuQuality, pillars: r.pillars, birth: `${r.y}-${String(r.m).padStart(2,'0')}-${String(r.d).padStart(2,'0')} ${r.g} giờ ${r.shichen}` } : null;
+        return {
+          mode: a.mode,
+          window: sol.window, scanned: sol.scanned, durationMs: sol.durationMs,
+          scoreRange: { min: sol.scoreStats.min, max: sol.scoreStats.max, mean: sol.scoreStats.mean },
+          max: fmt(sol.max), min: fmt(sol.min),
+          nearestToTarget: sol.nearestToTarget ? fmt(sol.nearestToTarget) : null,
+          topK: sol.topK.map(fmt), bottomK: sol.bottomK.map(fmt),
+          note: `Quét ${sol.scanned} lá số thật (analyze đầy đủ) trong cửa sổ ${sol.window}. Đây là BÁT TỰ ĐẠT ĐIỂM CỰC có thể — dùng tham khảo chọn ngày sinh/con/match; không dùng sai để "chọn số mệnh".`,
+        };
       }
       case 'life_trajectory': {
         const L = buildLifeTrajectory(R);
@@ -676,7 +713,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history } = {
   const brief = (_briefCache && _briefCache.key === _ck) ? _briefCache.brief : (_briefCache = { key: _ck, brief: buildChartBrief(R) }).brief;
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'system', content: brief + '\n\n== TOOLS (FUNCTION CALLING) ==\nBạn có thể gọi: get_current_time, analyze_day, analyze_year, best_days_in_year, life_trajectory, analyze_month, find_good_days. QUY TAC: (1) bat cu khi khuen ngay/thang cu the -> PHAI goi best_days_in_year/find_good_days/analyze_day de lay NGAY THAT (dung bia "thang 10"); (2) cau ve 1 nam -> goi analyze_year; (3) ca doi -> life_trajectory; (4) thang nay -> analyze_month + get_current_time; (5) hoi "lam sao bớt xui / ngay nao tot" -> goi find_good_days hoac best_days_in_year de dua ngay cat gan nhat + ngay ky can tranh; (6) KHI USER KHANG ĐỊNH tình trạng ("toi do/xui/may/te") -> BAT BUOC goi analyze_month + analyze_year de KIEM CHỨNG có ĐÚNG không, rồi xác nhận hoặc phản biện. TUYET DOI KHONG tu đung du lieu — luon goi tool.' },
+    { role: 'system', content: brief + '\n\n== TOOLS (FUNCTION CALLING) ==\nBạn có thể gọi: get_current_time, analyze_day, analyze_year, best_days_in_year, life_trajectory, analyze_month, find_good_days, inverse_bazi. QUY TAC: (1) bat cu khi khuen ngay/thang cu the -> PHAI goi best_days_in_year/find_good_days/analyze_day de lay NGAY THAT (dung bia "thang 10"); (2) cau ve 1 nam -> goi analyze_year; (3) ca doi -> life_trajectory; (4) thang nay -> analyze_month + get_current_time; (5) hoi "lam sao bớt xui / ngay nao tot" -> goi find_good_days hoac best_days_in_year de dua ngay cat gan nhat + ngay ky can tranh; (6) KHI USER KHANG ĐỊNH tình trạng ("toi do/xui/may/te") -> BAT BUOC goi analyze_month + analyze_year de KIEM CHỨNG có ĐÚNG không, rồi xác nhận hoặc phản biện; (7) [loop 21] KHI USER HỎI NGƯỢC "bát tự người điểm CAO/THẤP nhất là gì", "muốn đẻ con mệnh tốt thì sinh khi nào", "tìm lá số đạt điểm X", "mệnh cao nhất/thấp nhất có thể" -> BAT BUOC goi inverse_bazi (mode=max/min/target) — đây là bài toán DỊCH NGƯỢC: đã chấm được điểm thì phải tìm ra lá số đạt điểm cực. Trả về can-chi + ngày sinh + giờ thật. TUYET DOI KHONG tu đung du lieu — luon goi tool.' },
     ...((history || []).slice(-8)),
     { role: 'user', content: question },
   ];
