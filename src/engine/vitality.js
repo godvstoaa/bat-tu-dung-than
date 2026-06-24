@@ -16,9 +16,10 @@ export function analyzeVitality(R) {
   const dmWx = chart.dayMaster.wx;
   const total = wx.total || 1;
 
-  // 1. Thể chất nền (constitution)
+  // 1. Thể chất nền (constitution). [loop 32 V3] guard yong.primary thiếu → NaN.
+  const yongWx = yong?.primary || dmWx;
   const dmScore = (wx.score[dmWx] / total) * 100;
-  const yongScore = (wx.score[yong.primary] / total) * 100;
+  const yongScore = ((wx.score[yongWx] || 0) / total) * 100;
   const baseVitality = (dmScore * 0.4 + yongScore * 0.6); // yong weight higher
 
   // 2. Sinh lực qua từng đại vận
@@ -61,8 +62,10 @@ export function analyzeVitality(R) {
   const peak = trajectory.reduce((a, b) => b.score > a.score ? b : a, trajectory[0] || { age: '?', score: 0 });
   const low = trajectory.reduce((a, b) => b.score < a.score ? b : a, trajectory[0] || { age: '?', score: 100 });
 
-  // 4. Sinh lực hiện tại (dựa tuổi)
-  const curAge = new Date().getFullYear() - chart.input.year;
+  // 4. Sinh lực hiện tại (dựa tuổi). [loop 32 V1] dùng năm tham chiếu (R.asOfYear/R.now) thay
+  //   vì new Date() (wall-clock) — đảm bảo deterministic cho engine mệnh lý.
+  const refYear = R.asOfYear || R.now || new Date().getFullYear();
+  const curAge = refYear - chart.input.year;
   const current = trajectory.find((t) => {
     const [from, to] = t.age.split('-').map(Number);
     return curAge >= from && curAge <= to;
