@@ -443,21 +443,16 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
   } catch (e) { /* yizhangjing optional — bỏ qua nếu lỗi, không phá brief */ }
 
   // ---- TIER-2 FORECASTING (condensed headlines — trả lời "năm nào / tháng nào") ----
+  // [loop 13] gộp NĂM VÀNG + 5 NĂM TỚI → 1 dòng duy nhất (trước đây 3 section trùng lặp:
+  //   10 NĂM + NĂM VÀNG + 5 NĂM, sau cycle 44 unified ratings → cùng kết quả khác format).
+  //   Giữ 10 NĂN TỚI (section chính) + gộp highlights vào 1 dòng ngắn → tiết kiệm ~400 chars.
   const fcParts = [];
-  // Golden year — top-3 tốt + năm xấu nhất (1-2 dòng)
   try {
     const gy = findGoldenYear(R, curYear, 10);
-    const top = (gy.ranked || []).slice(0, 3).map((y) => `${y.year}(${y.ganZhi},${y.totalScore},${y.alert||''})`).join(' ');
+    const top = (gy.ranked || []).slice(0, 3).map((y) => `${y.year}(${y.ganZhi},${y.totalScore})`).join(' ');
     const w = gy.worst;
-    fcParts.push(`NĂM VÀNG (10 năm tới, xếp hạng): ${top}${w ? ` | XẤU NHẤT: ${w.year}(${w.ganZhi},${w.totalScore})` : ''}`);
+    fcParts.push(`NĂM VÀNG: ${top}${w ? ` | XẤU: ${w.year}(${w.ganZhi})` : ''}`);
   } catch (e) { fcParts.push('NĂM VÀNG: [lỗi]'); }
-  // forecast5 — 5 năm cảnh báo 🟢🟡🔴 (1 dòng/năm, gọn)
-  try {
-    const f5 = forecast5(R, curYear, 5);
-    const dot = (t) => (t === 'cat' ? '🟢' : t === 'hung' ? '🔴' : '🟡');
-    const line = (f5.years || []).map((y) => `${y.year}(${y.ganZhi}) ${dot(y.tone)}${y.score}`).join(' · ');
-    fcParts.push(`5 NĂM TỚI: ${line}`);
-  } catch (e) { fcParts.push('5 NĂM TỚI: [lỗi]'); }
   // dayun rank — top-3 大运 (1-2 dòng)
   try {
     const rd = rankDayun(R);
