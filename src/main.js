@@ -13,6 +13,7 @@ import { chartSensitivity } from './engine/sensitivity.js'; // [loop 26] mệnh 
 import { fiveDimRadar } from './engine/five-dim-radar.js'; // [loop 33] ngũ duy radar
 import { weekPreview } from './engine/week-preview.js'; // [loop 36] tuần này 7 ngày
 import { analyzeVitality } from './engine/vitality.js'; // [loop 42] đại vận khúc tuyến
+import { monthCalendar } from './engine/month-calendar.js'; // [loop 48] lịch tháng vận
 import { analyzeLiunianDeep } from './engine/liunian-pro.js';
 import { liunianEvents } from './engine/liunian-event.js';
 import { qianliEightSteps, QIANLI_QUOTE } from './engine/qianli.js';
@@ -1681,6 +1682,7 @@ function run() {
   lazyRender('sensitivity',    () => { try { renderSensitivity(); } catch (e) { console.warn('sensitivity', e.message); } });
   lazyRender('five-dim-radar', () => { try { renderFiveDimRadar(); } catch (e) { console.warn('5dim', e.message); } });
   lazyRender('week-preview',  () => { try { renderWeekPreview(); } catch (e) { console.warn('week', e.message); } });
+  lazyRender('month-calendar',() => { try { renderMonthCalendar(); } catch (e) { console.warn('cal', e.message); } });
   renderQuickSummary(); // [loop 39] tóm tắt nhanh — render ngay (không lazy, ở đầu trang)
   lazyRender('decade-curve',  () => { try { renderDecadeCurve(); } catch (e) { console.warn('decade-curve', e.message); } });
   lazyRender('ziwei-stars-out',() => { try { renderZiweiFull(); } catch (e) { console.warn('ziweiFull', e.message); } });
@@ -3246,6 +3248,39 @@ function renderQuickSummary() {
     { icon: alert ? '⚠' : '✓', label: alert ? 'Cảnh báo' : 'An tâm', text: alert || 'Không cảnh báo nặng năm nay.' },
   ];
   el.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:10px">${rows.map((r) => `<div style="flex:1;min-width:180px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:8px;border:1px solid #e3c878"><div style="font-size:.75em;color:#888;font-weight:bold">${r.icon} ${r.label}</div><div style="font-size:.88em;margin-top:2px">${r.text}</div></div>`).join('')}</div>`;
+}
+
+function renderMonthCalendar() {
+  if (!currentResult) return;
+  const el = $('month-calendar');
+  const mSel = $('cal-month'), ySel = $('cal-year'), btn = $('cal-btn');
+  // populate selects once
+  if (mSel && !mSel.childElementCount) {
+    const now = new Date();
+    for (let m = 1; m <= 12; m++) { const o = document.createElement('option'); o.value = m; o.textContent = 'T' + m; if (m === now.getMonth() + 1) o.selected = true; mSel.appendChild(o); }
+    for (let y = now.getFullYear() - 1; y <= now.getFullYear() + 5; y++) { const o = document.createElement('option'); o.value = y; o.textContent = y; if (y === now.getFullYear()) o.selected = true; ySel.appendChild(o); }
+    btn.addEventListener('click', () => renderMonthCalendar());
+  }
+  const year = parseInt(ySel?.value) || new Date().getFullYear();
+  const month = parseInt(mSel?.value) || (new Date().getMonth() + 1);
+  let cal;
+  try { cal = monthCalendar(currentResult, { year, month }); } catch (e) { el.innerHTML = '<p class="hint">Không tính được.</p>'; return; }
+  const colors = { cat: { bg: '#e8f5e9', border: '#2e7d32', text: '#1b5e20' }, mid: { bg: '#fff8e1', border: '#b8860b', text: '#5d4037' }, hung: { bg: '#ffebee', border: '#c62828', text: '#b71c1c' }, pad: { bg: 'transparent', border: 'transparent', text: '#ccc' } };
+  const headers = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map(d => `<div style="text-align:center;font-size:.7em;font-weight:bold;color:#888;padding:2px">${d}</div>`).join('');
+  const cells = cal.days.map((d) => {
+    if (!d.inMonth) return `<div style="min-height:38px;padding:2px;opacity:.3;color:#ccc;font-size:.75em;text-align:center"></div>`;
+    const c = colors[d.tone];
+    const isBest = cal.best && d.day === cal.best.day;
+    const isWorst = cal.worst && d.day === cal.worst.day;
+    return `<div style="min-height:38px;padding:2px 3px;background:${c.bg};border:1px solid ${c.border}40;border-radius:4px;${isBest ? 'box-shadow:0 0 4px '+c.border+'80;' : ''}">
+      <div style="font-size:.75em;font-weight:bold;color:${c.text}">${d.day}</div>
+      <div style="font-size:.55em;color:${c.text};opacity:.7">${d.score}</div>
+      ${isBest ? '<div style="font-size:.5em;color:#2e7d32">★</div>' : isWorst ? '<div style="font-size:.5em;color:#c62828">⚠</div>' : ''}
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <p style="margin:0 0 6px">${cal.monthVi}: ${cal.summary}</p>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;max-width:100%">${headers}${cells}</div>`;
 }
 
 function renderWeekPreview() {
