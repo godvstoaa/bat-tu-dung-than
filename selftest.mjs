@@ -3860,7 +3860,18 @@ assert(ho.upperTrigram === '艮' && ho.lowerTrigram === '艮', '阴男 → 地�
   const tlE = lifeTimeline({ ...R, dayun: [] });
   assert(!/undefined/.test(tlE.summary) && tlE.decades.length === 0, 'empty dayun → summary sạch (không undefined)');
 }
-// ################## [loop 32] golden-year: 大运 per-year + truly-golden gate ##################
+// ################## [loop 33] Mệnh Bàn Ngũ Duy radar (five-dim-radar.js) ##################
+{
+  const { fiveDimRadar } = await import('./src/engine/five-dim-radar.js');
+  const R = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
+  const r = fiveDimRadar(R.chart);
+  assert(r.dims.length === 5, '5 chiều thập thần (Tài/Quan/Ấn/Thực Thương/Tỷ Kiếp)');
+  assert(r.dims.every((d) => d.score >= 0 && d.score <= 100), 'mỗi chiều score ∈ [0,100]');
+  assert(['cai', 'guan', 'yin', 'shi', 'ti'].includes(r.dominant.key), 'dominant là 1 trong 5 nhóm');
+  assert(r.dominant.raw >= r.weakest.raw, 'dominant.raw >= weakest.raw');
+  console.log(`   Ngũ Duy ✓ — 1990 nam: trội ${r.dominant.vi.split(' ')[0]}(${r.dominant.score}), yếu ${r.weakest.vi.split(' ')[0]}(${r.weakest.score}).`);
+}
+
 {
   const { findGoldenYear } = await import('./src/engine/golden-year.js');
   const R = analyze(1990, 6, 15, 14, 30, 'nam', 2026);

@@ -10,6 +10,7 @@ import { computeHehun } from './engine/hehun.js';
 import { inverseBaZiSolve, labelResult } from './engine/inverse-bazi.js'; // [loop 21] 逆推八字
 import { trueSolarTime } from './engine/truetime.js'; // [loop 23] 真太阳时 + múi giờ
 import { chartSensitivity } from './engine/sensitivity.js'; // [loop 26] mệnh nhạy cảm
+import { fiveDimRadar } from './engine/five-dim-radar.js'; // [loop 33] ngũ duy radar
 import { analyzeLiunianDeep } from './engine/liunian-pro.js';
 import { liunianEvents } from './engine/liunian-event.js';
 import { qianliEightSteps, QIANLI_QUOTE } from './engine/qianli.js';
@@ -1676,6 +1677,7 @@ function run() {
   // renderMarriageDeep() đã gọi ở block immediate (line ~1313) — KHÔNG bọc lại.
   lazyRender('match-out',      () => { try { renderIdealMatch(); } catch (e) { console.warn('idealMatch', e.message); } });
   lazyRender('sensitivity',    () => { try { renderSensitivity(); } catch (e) { console.warn('sensitivity', e.message); } });
+  lazyRender('five-dim-radar', () => { try { renderFiveDimRadar(); } catch (e) { console.warn('5dim', e.message); } });
   lazyRender('ziwei-stars-out',() => { try { renderZiweiFull(); } catch (e) { console.warn('ziweiFull', e.message); } });
   lazyRender('life-summary',   () => { try { renderLifeTrajectory(currentResult); } catch (e) { console.warn('life', e.message); } });
   $("result").classList.remove("hidden");
@@ -3175,6 +3177,38 @@ function renderChangshengDeep() {
 }
 
 // ---------------------------------------------------------------- PHỐI NGỖU LÝ TƯỞNG (BẢNG + CHI TIẾT)
+function renderFiveDimRadar() {
+  if (!currentResult) return;
+  let r;
+  try { r = fiveDimRadar(currentResult.chart); } catch (e) { $('five-dim-radar').innerHTML = '<p class="hint">Không tính được.</p>'; return; }
+  // SVG radar: ngũ giác, 5 trục, lưới 25/50/75/100, polygon dữ liệu tô màu.
+  const cx = 130, cy = 130, R = 100;
+  const n = r.dims.length;
+  const angle = (i) => (-Math.PI / 2) + (i * 2 * Math.PI / n); // trục 0 lên trên
+  const pt = (i, rad) => [cx + Math.cos(angle(i)) * rad, cy + Math.sin(angle(i)) * rad];
+  const rings = [25, 50, 75, 100];
+  const ringPoly = (rr) => rings.map((v) => { const rad = R * v / 100; const [x, y] = pt(0, rad); let p = `M${x},${y}`; for (let i = 1; i < n; i++) { const [xi, yi] = pt(i, rad); p += ` L${xi},${yi}`; } return p + ' Z'; });
+  const grid = rings.map((v, i) => `<path d="${ringPoly(v)[0]}" fill="none" stroke="#e3c878" stroke-width="${v === 100 ? 1.2 : 0.5}" opacity="${v === 100 ? 0.7 : 0.4}"/>`).join('');
+  const axes = r.dims.map((d, i) => { const [x, y] = pt(i, R); const [lx, ly] = pt(i, R + 16); const [lx2, ly2] = pt(i, R + 30); return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#e3c878" stroke-width="0.5" opacity="0.5"/><text x="${lx}" y="${ly}" text-anchor="middle" font-size="9" fill="#d4a017" font-weight="bold">${d.vi.split(' ')[0]}</text><text x="${lx2}" y="${ly2 + 3}" text-anchor="middle" font-size="9.5" fill="#3a3a3a" font-weight="bold">${d.score}</text>`; }).join('');
+  const dataPts = r.dims.map((d, i) => { const [x, y] = pt(i, R * d.score / 100); return `${x},${y}`; }).join(' ');
+  const dominantKey = r.dominant.key;
+  const colors = { cai: '#e0533d', guan: '#7e57c2', yin: '#2e7d32', shi: '#e08a00', ti: '#1565c0' };
+  const fill = colors[dominantKey] || '#d4a017';
+  const dataPoly = `<polygon points="${dataPts}" fill="${fill}" fill-opacity="0.28" stroke="${fill}" stroke-width="2"/>`;
+  const dots = r.dims.map((d, i) => { const [x, y] = pt(i, R * d.score / 100); return `<circle cx="${x}" cy="${y}" r="3" fill="${fill}"/>`; }).join('');
+  // bảng chi tiết
+  const rows = r.dims.map((d) => `<tr><td><b>${d.vi.split(' ')[0]}</b></td><td class="zh">${d.gods.map((g) => g.god).join('/')}</td><td><b>${d.score}</b></td><td style="color:#888;font-size:.85em">${d.trait}</td></tr>`).join('');
+  $('five-dim-radar').innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+      <svg viewBox="0 0 260 260" width="240" height="240" style="flex:0 0 240px">${grid}${axes}${dataPoly}${dots}</svg>
+      <div style="flex:1;min-width:220px">
+        <p style="margin:0 0 4px"><b style="color:${fill}">★ Trục trội: ${r.dominant.vi.split(' ')[0]}</b> — thiên ${r.dominant.trait}.</p>
+        <p style="margin:0 0 8px;color:#666;font-size:.9em">${r.weakest.vi.split(' ')[0]} yếu nhất (${r.weakest.score}) — cần bồi (đợi vận mang nhóm ${r.weakest.zh}).</p>
+        <table style="width:100%;font-size:.85em;border-collapse:collapse"><thead><tr style="color:#999;text-align:left"><th>Trục</th><th class="zh">Thập thần</th><th>Điểm</th><th>Thiên</th></tr></thead><tbody>${rows}</tbody></table>
+      </div>
+    </div>`;
+}
+
 function renderSensitivity() {
   if (!currentResult) return;
   const i = currentResult.chart.input;

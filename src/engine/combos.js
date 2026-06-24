@@ -78,4 +78,4 @@ export function detectCombos(chart, strength) {
   return out;
 }
 
-export { TEN_GOD_VI, COMBO_DEFS };
+export { TEN_GOD_VI, COMBO_DEFS, godCount };
