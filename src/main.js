@@ -3187,12 +3187,16 @@ function renderIdealMatch() {
     var diff = userYr - pYr;
     var ageStr = diff > 0 ? 'kém ' + diff + 't' : diff < 0 ? 'hơn ' + Math.abs(diff) + 't' : 'bằng tuổi';
     var dung = p.dmIsGood ? ' ★ DỤNG' : '';
+    // [loop 25] giờ sinh phối ngẫu — time pillar (tháp thần #4) + giờ chi
+    var hourZhi = p.ganZhi4.split(' ')[3] ? p.ganZhi4.split(' ')[3][1] : '';
+    var hourZhiVi = hourZhi ? ({子:'Tý',丑:'Sửu',寅:'Dần',卯:'Mão',辰:'Thìn',巳:'Tỵ',午:'Ngọ',未:'Mùi',申:'Thân',酉:'Dậu',戌:'Tuất',亥:'Hợi'})[hourZhi] : '';
+    var hourStr = p.time ? ('giờ ' + p.time + ' (~' + hourZhiVi + '时)') : '';
     // Full profile
     var prof = buildFullProfile(p, currentResult);
     var detailId = 'im-det-' + p.rank;
     return '<tr class="im-row" onclick="var d=document.getElementById(\'' + detailId + '\'); d.style.display=d.style.display===\'none\'?\'\':\'none\';">' +
       '<td><b>#' + p.rank + '</b></td>' +
-      '<td>' + p.date + '<br><span class="im-age">' + ageStr + '</span></td>' +
+      '<td>' + p.date + '<br><b>' + hourStr + '</b><br><span class="im-age">' + ageStr + '</span></td>' +
       '<td class="zh">' + p.ganZhi4 + '</td>' +
       '<td>' + p.dayMaster + dung + '</td>' +
       '<td><b>' + p.combinedScore + '</b></td>' +
