@@ -5,6 +5,7 @@
 //  Nguồn: 滴天髓, 三命通会 (trường sinh luận).
 // ============================================================================
 import { TEN_GOD_VI } from './constants.js';
+import { changSheng } from './core.js';
 
 export const STAGE_MEANING = {
   長生: {
@@ -93,4 +94,67 @@ export function analyzeChangsheng(chart) {
       ? `Nhật Chủ tại nguyệt lệnh = ${monthStage.stageVi} → THẤT LỆNH (thân nhược tại tháng sinh) → nền suy.`
       : `Nhật Chủ tại nguyệt lệnh = ${monthStage.stageVi} → trung bình.`;
   return { stages: out, monthNote };
+}
+
+// [loop 20 — NEW FEATURE] 十二长生运 — phân nhóm giai đoạn
+const RISE_STAGES = ['長生', '冠帶', '臨官', '帝旺'];   // trỗi dậy / vượng
+const DECLINE_STAGES = ['衰', '病', '死', '墓', '絕'];   // thu lại / suy
+export function stageCategory(stage) {
+  if (RISE_STAGES.includes(stage)) return { cat: 'trỗi dậy', tone: 'cát' };
+  if (DECLINE_STAGES.includes(stage)) return { cat: 'thu lại', tone: 'hung nhẹ' };
+  return { cat: 'chuyển hóa / ấp ủ', tone: 'bình' };      // 沐浴/胎/养
+}
+
+/**
+ * [loop 20 — NEW FEATURE] 十二长生运 cho ĐẠI VẬN.
+ *   Mỗi đại vận = 1 giai đoạn 12 trường sinh của Nhật Chủ (tại đại vận chi).
+ *   帝旺/临官/长生/冠带 → thập niên trỗi dậy, mạnh, sáng tạo; 墓/绝/死/病 → thu lại,
+ *   bảo tồn, phục hồi. Cho user "đời đang ở giai đoạn nào" mỗi 10 năm.
+ *   Nguồn: 滴天髓 运元, 三命通会 长生十二运 (lấy đại vận chi tra trường sinh).
+ * @param {object} R analyze()
+ * @returns {{ current, currentStage, stages:[{ganZhi,range,zhi,stage,stageVi,luck,meaning,area,cat,isNow}], note }}
+ */
+export function dayunChangsheng(R) {
+  const dayGan = R.chart.dayGan;
+  const stages = (R.dayun || []).map((d) => {
+    const zhi = d.zhi || (d.ganZhi && d.ganZhi[1]);
+    const stage = zhi ? changSheng(dayGan, zhi) : '';
+    const info = STAGE_MEANING[stage] || { vi: stage, meaning: '', area: '', luck: '' };
+    const { cat } = stageCategory(stage);
+    const isNow = !!d.isNow;
+    return { ganZhi: d.ganZhi, range: `${d.startAge}-${d.startAge + 9}t`, zhi, stage, stageVi: info.vi, luck: info.luck, meaning: info.meaning, area: info.area, cat, isNow };
+  }).filter((s) => s.stage);
+  const cur = stages.find((s) => s.isNow) || stages[0] || null;
+  let note = '';
+  if (cur) {
+    note = `Đại vận hiện tại (${cur.ganZhi}, ${cur.range}): Nhật Chủ ở giai đoạn ${cur.stageVi} → thập niên ${cur.cat}.`;
+    if (cur.area) note += ` Khuyên: ${cur.area}.`;
+  }
+  // Số thập niên "trỗi dậy" vs "thu lại" — cho thấy nhịp cả nửa đời
+  const rise = stages.filter((s) => s.cat === 'trỗi dậy').length;
+  const decline = stages.filter((s) => s.cat === 'thu lại').length;
+  return { current: cur, currentStage: cur?.stage || null, stages, riseCount: rise, declineCount: decline, note };
+}
+
+/**
+ * [loop 20 — NEW FEATURE] 十二长生运 cho LƯU NIÊN (1 năm).
+ *   Tương tự dayunChangsheng nhưng cho 1 năm cụ thể — "năm này đời ở giai đoạn nào".
+ * @param {object} R analyze()
+ * @param {number} scanYear
+ */
+export function liunianChangsheng(R, scanYear) {
+  const dayGan = R.chart.dayGan;
+  const yr = scanYear || new Date().getFullYear();
+  // can-chi năm (chu kỳ 60甲子)
+  const GAN_ORDER = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+  const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+  const gan = GAN_ORDER[((yr - 4) % 10 + 10) % 10];
+  const zhi = ZHI_ORDER[((yr - 4) % 12 + 12) % 12];
+  const stage = changSheng(dayGan, zhi);
+  const info = STAGE_MEANING[stage] || { vi: stage, meaning: '', area: '', luck: '' };
+  const { cat, tone } = stageCategory(stage);
+  const ganZhi = gan + zhi;
+  let note = `Năm ${yr} (${ganZhi}): Nhật Chủ ở giai đoạn ${info.vi} → năm ${cat} (${tone}).`;
+  if (info.area) note += ` Khuyên: ${info.area}.`;
+  return { year: yr, ganZhi, stage, stageVi: info.vi, luck: info.luck, meaning: info.meaning, area: info.area, cat, tone, note };
 }

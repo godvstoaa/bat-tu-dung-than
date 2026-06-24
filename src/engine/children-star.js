@@ -5,6 +5,7 @@
 //  Nguồn: 渊海子平 子女篇, 滴天髓 子息, 三命通会.
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
+import { tenGod } from './core.js';
 
 /**
  * @returns {{ childStar, childWx, isMale, strength, palaceZhi, palaceStable,
@@ -51,11 +52,8 @@ export function analyzeChildrenStar(R) {
   else estimated = 'con muộn/ít — nên dưỡng thai theo Dụng, chọn năm cát';
 
   // 6. Giới tính con đầu (cổ pháp ước lượng)
-  // Nam: 正官=con trai đầu, 七殺=con trai; 偏/正 tài tinh cho gái (khác trường phái)
-  // Nữ: 食神=con trai, 傷官=con gái (thường)
+  // Nam: 正官=con gái (dị tính), 七殺=con trai (đồng tính); Nữ: 食神=con trai, 傷官=con gái.
   let firstGender = 'khó đoán chắc';
-  const firstChildGod = positions[0] ? positions[0].includes('year') || positions[0].includes('month')
-    ? chart.pillars.year.ganGod : chart.pillars.time.ganGod : '';
   if (isMale) {
     if (chart.pillars.year.ganGod === '七殺' || chart.pillars.month.ganGod === '七殺') firstGender = 'thiên con trai';
     else if (chart.pillars.year.ganGod === '正官' || chart.pillars.month.ganGod === '正官') firstGender = 'thiên con gái';
@@ -73,9 +71,12 @@ export function analyzeChildrenStar(R) {
   // 8. Tương tác
   const interacts = [];
   if (!palaceStable) interacts.push('Trụ Giờ (cung tử nữ) bị xung/hình → thai nghén cần cẩn thận.');
-  // Sao con bị hợp → con xa nhà/đi sớm
-  for (const gh of interactions.ganHe) {
-    const godA = GAN[gh.a] ? null : null; // simplified
+  // [loop 20 hoàn thiện stub] Sao con bị can hợp → "tinh bị hợp" → con xa nhà sớm / duyên mỏng
+  //   (cổ pháp: 子女星逢合则离家/做养子). Trước đây là dead code (GAN[gh.a]?null:null).
+  for (const gh of interactions.ganHe || []) {
+    const gA = tenGod(dayGan, gh.a), gB = tenGod(dayGan, gh.b);
+    const hit = childGods.includes(gA) ? `${gh.a}(${TEN_GOD_VI[gA]})` : childGods.includes(gB) ? `${gh.b}(${TEN_GOD_VI[gB]})` : null;
+    if (hit) interacts.push(`🤝 Sao con ${hit} bị can hợp → duyên con dễ rời nhà sớm/đi xa (tinh bị hợp).`);
   }
   // Sao con bị 克 → khó có con hoặc con khắc cha mẹ
   if (isJi) interacts.push(`⚠ Sao con = Kỵ Thần → con cái mang áp lực; cần chọn năm Dụng Thần sinh.`);

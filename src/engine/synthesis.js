@@ -5,6 +5,7 @@
 // ============================================================================
 import { WX_VI, GAN } from './constants.js';
 import { detectCombos } from './combos.js';
+import { dayunChangsheng } from './changsheng-deep.js'; // [loop 20] 十二长生运 giai đoạn đại vận
 
 const wxVi = (w) => WX_VI[w];
 
@@ -130,6 +131,17 @@ export function synthesize(R) {
       );
     }
   }
+
+  // --- [loop 20 NEW] 十二长生运: giai đoạn sinh mệnh đại vận hiện tại (滴天髓 运元) ---
+  try {
+    const dcs = dayunChangsheng(R);
+    if (dcs.current) {
+      paragraphs.push(
+        `Giai đoạn sinh mệnh (十二长生运): ${dcs.note} ` +
+        `Cả nửa đời: ${dcs.riseCount} thập niên trỗi dậy / ${dcs.declineCount} thập niên thu lại.`
+      );
+    }
+  } catch (e) {}
 
   return { score, grade, gradeVi, fortune, fortuneVi, factors, paragraphs, combos, patternQuality: pq || null };
 }

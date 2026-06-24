@@ -103,7 +103,10 @@ export function computePattern(chart, wx, strength, interactions) {
   if (geGroup === 'ti') {
     let name;
     if (monthZhi === LU_SHEN[dg]) name = '建祿格';          // nguyệt lệnh đúng vị trí Lộc
-    else if (monthZhi === YANG_REN[dg]) name = '羊刃格';    // đúng vị trí Dương Nhận
+    // [loop 20 sửa] Dương Nhận (羊刃) cổ pháp CHỈ cho DƯƠNG can (甲丙戊庚壬 — 子平真詮/渊海).
+    //   Âm can không có chân nhận (YANG_REN[乙丁己辛癸] trỏ về 辰戌丑未 thổ là tục-pha sau này) →
+    //   Âm can nguyệt lệnh tỷ kiếp = Nguyệt Kiếp cách (đa số phái).
+    else if (monthZhi === YANG_REN[dg] && !GAN[dg].yin) name = '羊刃格';
     else name = '月劫格';
     const pref = PATTERN_PREF[name];
     return {
