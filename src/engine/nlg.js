@@ -115,8 +115,20 @@ function pCareer(R) {
   const guan = (gods['正官'] || 0) + (gods['七殺'] || 0);
   const officerWx = yong.relations.officerWx;
   const favCareer = [...new Set([yong.primary, yong.xi].filter(Boolean))];
+  const pq = R.patternQuality;
   const lines = [];
-  lines.push(`Sự nghiệp lấy Quan – Ấn làm sao chủ. Mệnh bạn Quan Sát ${guan >= 1.5 ? 'hiện rõ, có khí chất lãnh đạo/địa vị' : guan > 0 ? 'có nhưng hơi mỏng' : 'ẩn/khuyết — sự nghiệp tự thân gây dựng nhiều hơn nhờ lộc'}.`);
+  // [loop 17] 格局-aware opening
+  const gejuCtx = pq ? ` Cách ${R.pattern.vi} → ${pq.quality}.` : '';
+  lines.push(`Sự nghiệp lấy Quan – Ấn làm sao chủ.${gejuCtx} Mệnh bạn Quan Sát ${guan >= 1.5 ? 'hiện rõ, có khí chất lãnh đạo/địa vị' : guan > 0 ? 'có nhưng hơi mỏng' : 'ẩn/khuyết — sự nghiệp tự thân gây dựng nhiều hơn nhờ lộc'}.`);
+  // [loop 17] 格局 pattern-specific advice
+  if (pq?.patternYong) {
+    const xiG = pq.patternYong.xi || [];
+    const jiG = pq.patternYong.ji || [];
+    if (xiG.length) lines.push(`📊 Theo cách ${R.pattern.vi}: vận mang ${xiG.map((g) => ({ ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 'Tài', guan: 'Quan Sát' }[g])).join('/')} → thuận sự nghiệp; mang ${jiG.map((g) => ({ ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 'Tài', guan: 'Quan Sát' }[g])).join('/')} → nghịch.`);
+  }
+  // [loop 17] RESCUES decade cho career
+  const rescueDy = (R.dayun || []).filter((d) => d.gejuRescue);
+  if (rescueDy.length) lines.push(`★ Vận CỨU CÁCH: ${rescueDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}-${d.startAge + 9}t]`).join(', ')} — cửa sổ cơ hội sự nghiệp lớn nhất.`);
   lines.push(R.strength.strong
     ? `Thân vượng, đủ sức gánh Quan – Tài, hợp môi trường cạnh tranh, giữ vị trí quản lý hoặc tự làm chủ.`
     : `Thân nhược, nên chọn nơi ổn định, có quý nhân/Ấn dìu dắt, tích lũy rồi mới tiến; tránh ôm đồm quyền cao chức trọng.`);
@@ -138,8 +150,21 @@ function pWealth(R) {
   const wealthWx = yong.relations.wealthWx;
   const isFav = yong.primary === wealthWx || yong.xi === wealthWx;
   const isAvoid = yong.avoid.includes(wealthWx);
+  const pq = R.patternQuality;
   const lines = [];
-  lines.push(`Tài lộc lấy Tài tinh (hành ${wxVi(wealthWx)}) làm chủ. Mệnh ${cai >= 1.5 ? 'Tài vượng, cơ hội tiền bạc nhiều' : cai > 0 ? 'Tài vừa phải' : 'Tài mỏng — phải chủ động tìm'}.`);
+  // [loop 17] 格局-aware opening
+  const gejuCtx = pq ? ` Cách ${R.pattern.vi} → ${pq.quality}.` : '';
+  lines.push(`Tài lộc lấy Tài tinh (hành ${wxVi(wealthWx)}) làm chủ.${gejuCtx} Mệnh ${cai >= 1.5 ? 'Tài vượng, cơ hội tiền bạc nhiều' : cai > 0 ? 'Tài vừa phải' : 'Tài mỏng — phải chủ động tìm'}.`);
+  // [loop 17] 格局 pattern-specific wealth advice
+  if (pq?.patternYong) {
+    const xiG = pq.patternYong.xi || [];
+    const jiG = pq.patternYong.ji || [];
+    const G_VI = { ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 'Tài', guan: 'Quan Sát' };
+    if (xiG.length) lines.push(`📊 Theo cách ${R.pattern.vi}: vận mang ${xiG.map((g) => G_VI[g]).join('/')} → thuận tài lộc; mang ${jiG.map((g) => G_VI[g]).join('/')} → nghịch tài.`);
+  }
+  // [loop 17] RESCUES decade cho tài
+  const rescueDy = (R.dayun || []).filter((d) => d.gejuRescue);
+  if (rescueDy.length) lines.push(`★ Vận CỨU CÁCH (tài lộc bật): ${rescueDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}-${d.startAge + 9}t]`).join(', ')}.`);
   if (R.strength.strong) lines.push(`Thân vượng nhậm được tài — càng làm càng giữ, hợp kinh doanh/đầu tư chủ động.`);
   else lines.push(`Thân nhược gặp Tài vượng dễ "tài đa thân nhược", tiền qua tay khó giữ; nên hùn hạp, cộng sự, tránh đòn bẩy/nợ lớn.`);
   if (isFav) lines.push(`🎉 Tài chính là Dụng Thần → chủ động cầu tài rất hiệu, tài vận sáng.`);
