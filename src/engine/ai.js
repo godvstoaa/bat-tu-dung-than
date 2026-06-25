@@ -97,7 +97,6 @@ import { wealthMonthlyAlert } from './wealth-alert.js';
 import { healthAlertScan } from './health-alert.js';
 import { computeHehun } from './hehun.js';
 import { matchBusinessPartners } from './partner-match.js';
-import { bestHourToday } from './best-hour.js';
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
