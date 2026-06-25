@@ -3248,6 +3248,7 @@ if ($('planned-birth-btn')) $('planned-birth-btn').addEventListener('click', () 
   if (!yr || yr < 1990 || yr > 2050) { alert('Năm không hợp lệ. VD: 2027'); return; }
   renderPlannedBirth(yr);
 });
+if ($('wedding-date-btn')) $('wedding-date-btn').addEventListener('click', () => {
   const raw = prompt('Nhập NĂM SINH cô dâu + chú rể (cách nhau dấu phẩy)\nvd: 1995,1993');
   if (!raw) return;
   const [ya, yb] = raw.split(',').map((s) => parseInt(s.trim(), 10));
