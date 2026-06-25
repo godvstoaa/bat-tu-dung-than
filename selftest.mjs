@@ -5125,6 +5125,18 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(_okS === _cS && _cS > 0, `從殺格 Dụng = Quan (khắc thân): ${_okS}/${_cS}`);
   assert(_okE === _cE && _cE > 0, `從兒格 Dụng = Thực (thân sinh): ${_okE}/${_cE}`);
   console.log(`   從財 1998-5-15h12: Dụng=火 ✓ | 從殺 ${_okS}/${_cS} ✓ | 從兒 ${_okE}/${_cE} ✓ | 调候 không corrupt ✓`);
+
+  // [loop 119] 专旺/從旺 verify + lock
+  // 曲直格 1987h0: dm=木 → yong=火 (tiết/泄秀). 從旺格 1992h0: dm=水 → yong=水 (tỷ).
+  const _RZW = analyze(1987, 2, 5, 0, 0, 'nam', 2026);
+  if (_RZW.pattern?.name === '曲直格') {
+    assert(_RZW.yong.primary === '火', `曲直格 (Mộc vượng) → Dụng = 火/tiết (được ${_RZW.yong.primary})`);
+  }
+  const _RCW = analyze(1992, 2, 5, 0, 0, 'nam', 2026);
+  if (_RCW.pattern?.name === '從旺格') {
+    assert(_RCW.yong.primary === '水', `從旺格 (Thủy cực vượng) → Dụng = 水/tỷ (được ${_RCW.yong.primary})`);
+  }
+  console.log(`   专旺 曲直→tiết ✓ | 從旺→tỷ ✓ | locked`);
 }
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
