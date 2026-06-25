@@ -88,8 +88,21 @@ export function matchBusinessPartners(R1, R2) {
       ? `Hợp tác TRUNG (score ${score}). Có thể hợp tác nhưng cần hợp đồng chặt, phân vai rõ, kiểm soát dòng tiền.`
       : `Hợp tác KHÓ (score ${score}). Nên cân nhắc: một bên làm chủ, một bên làm thuê; hoặc chọn người khác.`;
 
-  return { score, rating, details, aRole, bRole, roleComplement,
+  // [loop 173 fix] roleFit — tóm tắt phân vai BỔ SUNG. Trước đây KHÔNG trả field này
+  //   → renderPartnerMatch (UI) và analyze_partner tool (AI) đều đọc m.roleFit nhưng luôn
+  //   undefined → dòng «🤝 role fit» không hiện, AI trả roleFit rỗng.
+  const roleFit = roleComplement
+    ? `Vai trò BỔ SUNG nhau: A thiên ${aRole.role} (${aRole.desc}); B thiên ${bRole.role} (${bRole.desc}) → ít chồng chéo, phối hợp tốt.`
+    : `Cả hai cùng thiên ${aRole.role} (${aRole.desc}) → vai trò chồng chéo, nên mời người thứ ba bổ sung (${_complementRole(aRole.role)}).`;
+
+  return { score, rating, details, roleFit, aRole, bRole, roleComplement,
     aTop: aTopVi, bTop: bTopVi, aNeed, bNeed, advice };
+}
+
+// [loop 173] gợi ý vai VỚAI bổ sung khi 2 người trùng vai
+function _complementRole(role) {
+  const pairs = { CEO: 'CFO/CTO', CFO: 'CEO/COO', CTO: 'CMO/CEO', COO: 'CMO/CTO', CMO: 'CFO/COO', HR: 'CEO/CFO', Advisor: 'CEO' };
+  return pairs[role] || 'CEO';
 }
 
 function suggestRole(topGod) {
