@@ -567,8 +567,16 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, best_days_in
       <p>Năm ${h.year}: <b>${h.bird}</b> (${h.animal}, hành ${h.element}) trụ trị — ${h.nature}</p>
       <p>Bản mệnh ${t.benMing?t.benMing.qin+" (hành "+h.element+")":"(?)"} → <span class="${a}"><b>${t.toneVi}</b></span> — ${t.relVi}</p>
       <p class="hint">${t.advice}</p>
-      <p class="hint">Chu kỳ 28 năm quanh đây: ${e.map(c=>c.year+"="+c.bird.split(/[^一-龥]/)[0]).join(" · ")}</p>`}catch{i.innerHTML='<p class="hint">Không tính được禽星 năm.</p>'}}function ZN(n){const i=w("tonggen");if(i)try{const t=wg(n),h=t.dung,a=h.verdict==="有力"?"cat":h.verdict==="虚浮"||h.verdict==="虚"?"hung":"mid";i.innerHTML=`
+      <p class="hint">Chu kỳ 28 năm quanh đây: ${e.map(c=>c.year+"="+c.bird.split(/[^一-龥]/)[0]).join(" · ")}</p>`}catch{i.innerHTML='<p class="hint">Không tính được禽星 năm.</p>'}}function ZN(n){const i=w("tonggen");if(i)try{const t=wg(n),h=t.dung,a=h.verdict==="有力"?"cat":h.verdict==="虚浮"||h.verdict==="虚"?"hung":"mid",e=n.yong||{},c=n.wx.score||{},s=(c[e.primary]||0)+(c[e.xi]||0),o=(c[e.ji]||0)+(c[e.chou]||0),r=s+o||1,g=Math.round(s/r*100),u=100-g,l=g>=55?"✓ DỤNG THẦN chiếm ưu thế — mệnh thuận, chủ động":g<=45?"⚠ KỴ THẦN lấn át — Dụng yếu, cần bù + đợi vận Dụng":"⚖ Cân bằng — Dụng/Kỵ ngang nhau",m=`
+      <div style="margin:8px 0">
+        <div style="display:flex;height:22px;border-radius:4px;overflow:hidden;border:1px solid rgba(212,175,55,0.3)">
+          <div style="width:${g}%;background:#2e9e5b;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600">Dụng+Hỷ ${g}%</div>
+          <div style="width:${u}%;background:#e0533d;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600">Kỵ+Thù ${u}%</div>
+        </div>
+        <p class="hint">${k(l)}</p>
+      </div>`;i.innerHTML=`
       <p>Dụng <b>${h.wxVi}</b>: <span class="${a}"><b>${h.verdict}</b></span> (căn ${h.root.total}, lộ ${h.reveal.length}, mùa ${h.seasonVi}) — ${h.verdictVi}</p>
+      ${m}
       ${h.verdict==="藏而不透"?`<p class="hint">⏳ Đợi lưu niên can ${t.whenReveal.join("/")} thấu ra mới phát Dụng.</p>`:""}
       <p class="hint">Nhật Chủ ${t.dm.wxVi}: ${t.dm.verdict} (${t.dm.seasonVi}).</p>`}catch{i.innerHTML='<p class="hint">Không tính được thông căn thấu cán.</p>'}}function _N(n){const i=w("missing-god");if(i)try{const t=Rg(n),h=a=>a==="lacking"?"hung":a==="partial"?"mid":"cat";i.innerHTML=Object.values(t.categories).map(a=>`
       <div class="sp-item">
