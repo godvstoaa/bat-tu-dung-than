@@ -136,7 +136,6 @@ import { flyingSihua } from './engine/flying-sihua.js';
 import { findMoveDates } from './engine/move-fs.js';
 import { matchBusinessPartners } from './engine/partner-match.js';
 import { findWeddingDates } from './engine/wedding-date.js';
-import { inverseBaZiSolve, labelResult } from './engine/inverse-bazi.js';
 import { analyzeFamilyHarmony } from './engine/family-fortune.js';
 import { nayinRelations } from './engine/nayin-relation.js';
 import { patternQuality } from './engine/pattern-quality.js';
