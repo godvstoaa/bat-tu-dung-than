@@ -91,6 +91,8 @@ import { taiSuiOverview } from './engine/taisui-general.js';
 import { analyzeTaohua } from './engine/taohua.js';
 import { buildRemedy } from './engine/remedy.js';
 import { wuTai } from './engine/tonggen.js';
+import { dailyGuide } from './engine/daily-guide.js';
+import { dailyDirections } from './engine/daily-directions.js';
 import { strength3Fa } from './engine/strength-3fa.js';
 import { jiaoYunAnalysis } from './engine/jiaoyun.js';
 import { analyzePillarQuality } from './engine/pillar-quality.js';
@@ -1334,6 +1336,29 @@ function renderDailyPro(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được lưu nhật chuyên sâu.</p>'; }
 }
 
+function renderDailyGuide(R) {
+  const el = $('daily-guide');
+  if (!el) return;
+  try {
+    const now = new Date();
+    const g = dailyGuide(R, now.getFullYear(), now.getMonth() + 1, now.getDate());
+    const dir = dailyDirections(now.getFullYear(), now.getMonth() + 1, now.getDate(), R.yong);
+    const yi = (g.tsYi || []).slice(0, 8).join(', ');
+    const ji = (g.tsJi || []).slice(0, 6).join(', ');
+    const goodH = (g.bestHours || []).map((h) => esc(h)).join(', ');
+    const badH = (g.avoidHours || []).map((h) => esc(h)).join(', ');
+    el.innerHTML = `
+      <p><b>${esc(g.date || '')} (${esc(g.lunar || '')}) ${esc(g.ganZhi || '')} — trực ${esc(g.officer || '')}</b></p>
+      ${g.oneLiner ? `<p>${esc(g.oneLiner)}</p>` : ''}
+      ${yi ? `<p>✓ <b>宜:</b> ${esc(yi)}</p>` : ''}
+      ${ji ? `<p>⚠ <b>忌:</b> ${esc(ji)}</p>` : ''}
+      <p class="hint">🧭 Tài Thần ${esc(dir.directions?.caiShen || '?')} | Hỷ Thần ${esc(dir.directions?.xiShen || '?')} | Hướng tốt ${esc(dir.bestDirection || '?')}</p>
+      ${goodH ? `<p class="hint">⏰ Giờ tốt: ${goodH}</p>` : ''}
+      ${badH ? `<p class="hint">⏰ Giờ kỵ: ${badH}</p>` : ''}
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được hướng dẫn hôm nay.</p>'; }
+}
+
 function renderFiveAspects(R) {
   const el = $('five-aspects');
   if (!el) return;
@@ -2275,6 +2300,7 @@ function run() {
   lazyRender('personality-profile', () => { try { renderPersonalityProfile(currentResult); } catch (e) { console.warn('personality', e.message); } });
   lazyRender('mingzhu',         () => { try { renderMingZhu(currentResult); } catch (e) { console.warn('mingzhu', e.message); } });
   lazyRender('daily-pro',       () => { try { renderDailyPro(currentResult); } catch (e) { console.warn('dailypro', e.message); } });
+  lazyRender('daily-guide',     () => { try { renderDailyGuide(currentResult); } catch (e) { console.warn('dailyguide', e.message); } });
   lazyRender('five-aspects',    () => { try { renderFiveAspects(currentResult); } catch (e) { console.warn('fiveaspects', e.message); } });
   lazyRender('romance-deep',    () => { try { renderRomanceDeep(currentResult); } catch (e) { console.warn('romancedeep', e.message); } });
   lazyRender('invest-style',    () => { try { renderInvestStyle(currentResult); } catch (e) { console.warn('investstyle', e.message); } });
