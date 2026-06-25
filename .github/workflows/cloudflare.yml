@@ -1,7 +1,7 @@
 # Auto-deploy battu.god8.shop (Cloudflare Worker — serve static + AI proxy /zai /deepseek...)
-# [loop 85] tạo lại đúng: CHỈ deploy khi có CLOUDFLARE_API_TOKEN → KHÔNG fail-spam email
-# như vòng 63 (workflow cũ fail mọi push vì thiếu token). Nay guard: skip sạch nếu chưa set secret.
-# Cần 2 GitHub secret: CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID (tạo ở Cloudflare dashboard).
+# [loop 89] dùng Global API Key auth (CLOUDFLARE_EMAIL + CLOUDFLARE_API_KEY).
+#   CHỈ deploy khi cả 2 secret đã set → KHÔNG fail-spam email (vòng 63 cũ fail mọi push).
+#   Build base='/' (Worker serve root, KHÔNG dùng GH_PAGES base).
 name: Deploy to Cloudflare (battu.god8.shop)
 on:
   push:
@@ -19,19 +19,16 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      - run: npm run build
-      - name: Check Cloudflare token
-        run: echo "CF_TOKEN_SET=${{ secrets.CLOUDFLARE_API_TOKEN != '' }}" >> $GITHUB_ENV
+      - run: npm run build   # base='/' cho Worker (KHÔNG set GH_PAGES)
+      - name: Check Cloudflare creds
+        run: echo "CF_KEY_SET=${{ secrets.CLOUDFLARE_API_KEY != '' }}" >> $GITHUB_ENV
       - name: Deploy Worker (battu.god8.shop)
-        if: env.CF_TOKEN_SET == 'true'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
-      - name: Skip (chưa set token)
-        if: env.CF_TOKEN_SET != 'true'
-        run: |
-          echo "⚠ CLOUDFLARE_API_TOKEN secret chưa set → bỏ qua deploy Cloudflare (GitHub Pages vẫn deploy bình thường)."
-          echo "Để battu.god8.shop auto-update: thêm 2 GitHub secret (CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID) — tạo ở Cloudflare → My Profile → API Tokens."
-          echo "HOẶC chạy local: npx wrangler login && npm run deploy"
+        if: env.CF_KEY_SET == 'true'
+        env:
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler deploy
+      - name: Skip (chưa set creds)
+        if: env.CF_KEY_SET != 'true'
+        run: echo "⚠ CLOUDFLARE_API_KEY/CLOUDFLARE_EMAIL secret chưa set → bỏ qua (GitHub Pages vẫn deploy). Thêm secret để battu.god8.shop auto-update."
