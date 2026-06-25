@@ -120,6 +120,11 @@ import { seasonalAdvice } from './engine/seasonal-advice.js';
 import { detectAnchong } from './engine/anchong.js';
 import { lifeTimeline } from './engine/destiny-timeline.js';
 import { nobleCultivation } from './engine/noble-cultivate.js';
+import { cityRecommendation } from './engine/city-fs.js';
+import { socialStrategy } from './engine/social-fs.js';
+import { spiritualPractice } from './engine/spiritual-fs.js';
+import { cureByElement } from './engine/fs-cure.js';
+import { findNoblePerson } from './engine/emperor-star.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1332,6 +1337,31 @@ function renderNobleCultivate(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được quý nhân dưỡng dụng.</p>'; }
 }
 
+function renderFengshuiExtra(R) {
+  const el = $('fengshui-extra');
+  if (!el) return;
+  const bestText = (o) => o.summary || o.advice || o.tip || o.recommendation || Object.values(o).find((v) => typeof v === 'string' && v.length > 25) || '';
+  const arr = (x) => Array.isArray(x) ? x.join(', ') : (x || '');
+  let html = '';
+  const gen = (title, fn, extra) => {
+    try {
+      const o = fn(R);
+      const t = bestText(o);
+      if (t) html += `<p class="hint"><b>${title}:</b> ${esc(t)}${extra ? ' ' + esc(extra(o)) : ''}</p>`;
+    } catch (e) {}
+  };
+  gen('🏙️ Thành phố hợp', cityRecommendation);
+  gen('🧿 Vật phẩm hóa giải', cureByElement);
+  gen('🤝 Giao tế', socialStrategy);
+  gen('🧘 Tu tập', spiritualPractice);
+  try {
+    const np = findNoblePerson(R);
+    const t = bestText(np);
+    if (t) html += `<p class="hint"><b>👑 Quý nhân (đế tinh):</b> ${esc(t)}</p>`;
+  } catch (e) {}
+  el.innerHTML = html || '<p class="hint">Không tính được phong thủy định vị.</p>';
+}
+
 function renderLifestyle(R) {
   const el = $('lifestyle');
   if (!el) return;
@@ -2045,6 +2075,7 @@ function run() {
   lazyRender('anchong',         () => { try { renderAnchong(currentResult); } catch (e) { console.warn('anchong', e.message); } });
   lazyRender('destiny-timeline', () => { try { renderDestinyTimeline(currentResult); } catch (e) { console.warn('timeline', e.message); } });
   lazyRender('noble-cultivate', () => { try { renderNobleCultivate(currentResult); } catch (e) { console.warn('noble', e.message); } });
+  lazyRender('fengshui-extra', () => { try { renderFengshuiExtra(currentResult); } catch (e) { console.warn('fsextra', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
