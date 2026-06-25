@@ -5104,6 +5104,28 @@ console.log('\n################## II. [loop 88] Ngũ Hành Lưu Thông (wire wx-
   console.log(`   wx-flow wire ✓: chart đủ hành=5/5流通 TỐT | thiếu Thổ=3/5 + 2 đứt | chỉ 2 hành=KÉM | deterministic ✓`);
 }
 
+// ################## JJ. [loop 117] 从格 用神 ĐÚNG — 调候 KHÔNG corrupt (regression) ##################
+console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không corrupt (regression loop 116) ##################');
+{
+  // 從財格 1998-5-15h12 nam: dmWx=水 → Dụng PHẢI = 火 (Tài). Trước fix = 水 (调候 override SAI).
+  const _R = analyze(1998, 5, 15, 12, 0, 'nam', 2026);
+  assert(_R.pattern?.type === 'special' && _R.pattern?.name === '從財格', `chart = 從財格 (được ${_R.pattern?.name})`);
+  assert(_R.yong.primary === '火', `[fix loop 116] 從財格 dmWx=水 → Dụng = 火/Tài (được ${_R.yong.primary}, trước fix = 水 SAI)`);
+  assert(_R.yong.method?.includes('Cách cục đặc biệt'), 'method có "Cách cục đặc biệt"');
+  assert(!_R.yong.method?.some((m) => m.includes('LÀM CHỦ')), 'KHÔNG có 调候 "LÀM CHỦ" override trên 从格');
+  // 從殺/從兒 cũng verify (scan nhanh)
+  const { KE_BY: _KEBY, SHENG: _SH } = await import('./src/engine/constants.js');
+  let _cS = 0, _cE = 0, _okS = 0, _okE = 0;
+  for (let _y = 1985; _y <= 2003; _y++) for (const _m of [2,5,8,11]) for (const _d of [5,15,25]) for (const _h of [0,6,12,18]) {
+    let _RR; try { _RR = analyze(_y, _m, _d, _h, 0, 'nam', 2026); } catch (e) { continue; }
+    const _n = _RR.pattern?.name, _dm = _RR.chart.dayMaster.wx;
+    if (_n === '從殺格') { _cS++; if (_RR.yong.primary === _KEBY[_dm]) _okS++; }
+    if (_n === '從兒格') { _cE++; if (_RR.yong.primary === _SH[_dm]) _okE++; }
+  }
+  assert(_okS === _cS && _cS > 0, `從殺格 Dụng = Quan (khắc thân): ${_okS}/${_cS}`);
+  assert(_okE === _cE && _cE > 0, `從兒格 Dụng = Thực (thân sinh): ${_okE}/${_cE}`);
+  console.log(`   從財 1998-5-15h12: Dụng=火 ✓ | 從殺 ${_okS}/${_cS} ✓ | 從兒 ${_okE}/${_cE} ✓ | 调候 không corrupt ✓`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
