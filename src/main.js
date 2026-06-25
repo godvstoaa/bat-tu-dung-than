@@ -1654,7 +1654,7 @@ function renderWeddingDate(dates) {
 function renderPlannedBirth(year) {
   const el = $('planned-birth');
   if (!el) return;
-  el.innerHTML = '<p class="hint">⏳ Đang quét ' + year + ' (tất cả ngày × 12时辰 × 2 giới)... mất ~10s.</p>';
+  el.innerHTML = '<p class="hint">⏳ Đang quét ' + year + ' (tất cả ngày × 12时辰 × 2 giới)... mất vài giây.</p>';
   // Run async (non-blocking)
   setTimeout(() => {
     try {
