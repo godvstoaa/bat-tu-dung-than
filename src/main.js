@@ -79,6 +79,7 @@ import { idealHouse } from './engine/ideal-house.js';
 import { scanWealthCareerYingqi } from './engine/yingqi-wealth.js';
 import { dominantGod } from './engine/dominant-god.js';
 import { analyzeYanQin } from './engine/yanqin.js';
+import { analyzeHealth } from './engine/health-analysis.js'; // [loop 183] Sức Khoẻ Ngũ Hành card
 import { qinxingOverview, qinxingCycle } from './engine/qinxing.js';
 import { analyzeTongGen } from './engine/tonggen.js';
 import { missingGod } from './engine/missing-god.js';
@@ -885,6 +886,31 @@ function renderYanQin(R) {
       <p><b>Bản mệnh HÀM: ${bm.qin}</b> (${bm.animal}, hành ${bm.wx}) — ${bm.nature}</p>
       <p class="hint">Hôm nay: ${yq.today.qin} (${yq.today.animal}) → ${yq.relVi}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được bản mệnh hàm.</p>'; }
+}
+
+// ---------------------------------------------------------------- SỨC KHOẺ NGŨ HÀNH 五行健康
+function renderHealth(R) {
+  const el = $('health-out');
+  if (!el) return;
+  try {
+    const h = analyzeHealth(R);
+    const organ = (o) => o ? `<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:3px 0">
+      <b>${esc(o.vi)} (${esc(o.wx)})${o.pct ? ' — ' + esc(o.pct) + '%' : ''}</b> · ${esc(o.organs || '')}<br>
+      <span class="hint">⚠ Dễ yếu: ${esc(o.risk || '')}</span><br>
+      <span class="hint">食疗 bổ: ${esc(o.foods || '')}</span>
+    </div>` : '';
+    el.innerHTML = `
+      <p class="hint">${esc(h.profile || '')}</p>
+      <h4 class="syn-h4" style="margin-top:6px">🔴 Hành yếu nhất (tạng dễ bệnh)</h4>
+      ${organ(h.weakest)}
+      <h4 class="syn-h4" style="margin-top:6px">🟢 Hành mạnh nhất (tạng vượng)</h4>
+      ${organ(h.strongest)}
+      ${h.constitution ? `<h4 class="syn-h4" style="margin-top:6px">Thể chất ${esc(h.constitutionVi || '')}</h4><p class="hint">${esc(h.constitution)}</p>` : ''}
+      ${h.remedyFoods ? `<div class="tiaohou-note"><b>Thực phẩm chữa lành (hành ${esc(h.remedyVi || '')}):</b> ${esc(h.remedyFoods)}</div>` : ''}
+      ${h.riskSeason ? `<p class="hint">📅 Mùa phòng bệnh: ${esc(h.riskSeason)}</p>` : ''}
+      ${h.organRisk ? `<p class="hint">${esc(h.organRisk)}</p>` : ''}
+      <p class="hint" style="margin-top:6px">${esc(h.advice || '')}</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được sức khoẻ ngũ hành.</p>'; }
 }
 
 function renderQinxing(R) {
@@ -2469,6 +2495,7 @@ function run() {
   lazyRender('pillarage-out',  () => { try { renderPillarAge(); } catch (e) { console.warn('pillarAge', e.message); } });
   lazyRender('kongwang-out',   () => { try { renderKongwang(); } catch (e) { console.warn('kongwang', e.message); } });
   lazyRender('suiyun-out',     () => { try { renderSuiyun(); } catch (e) { console.warn('suiyun', e.message); } });
+  lazyRender('health-out',     () => { try { renderHealth(currentResult); } catch (e) { console.warn('health', e.message); } });
   lazyRender('csdeep-out',     () => { try { renderChangshengDeep(); } catch (e) { console.warn('csDeep', e.message); } });
   // renderMarriageDeep() đã gọi ở block immediate (line ~1313) — KHÔNG bọc lại.
   lazyRender('match-out',      () => { try { renderIdealMatch(); } catch (e) { console.warn('idealMatch', e.message); } });
