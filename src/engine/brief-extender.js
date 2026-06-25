@@ -17,6 +17,8 @@ import { checkDayunInteractions } from './dayun-check.js';
 import { analyzeHanNuan } from './han-nuan.js';
 import { analyzeWxFlow } from './wx-flow.js';
 import { classifyChartLevel } from './chart-level.js';
+import { baziMingGong } from './bazi-minggong.js';
+import { analyzeChildrenStar } from './children-star.js';
 import { dayunChangSheng, dayunYongChangSheng } from './dayun-changsheng.js';
 import { taiYuan } from './taiyuan.js';
 
@@ -57,6 +59,18 @@ export function extendBrief(R) {
     if (lv && lv.level !== 'unknown') {
       parts.push(`MỆNH CÁCH TẦNG LỚP (命格層次): ${lv.levelVi} — ${lv.passCount}/6 tiêu chí (${(lv.criteria || []).filter((c) => c.pass).map((c) => c.name).join('/')}). ${lv.note}`);
     }
+  } catch (e) {}
+
+  // [loop 90] MỆNH CUNG (命宮) — cung mệnh phụ (三命通会), tính từ tháng+giờ (module bazi-minggong ẩn).
+  try {
+    const mg = baziMingGong(R);
+    parts.push(`MỆNH CUNG (命宮): ${mg.ganZhi} (${mg.ganVi} ${mg.zhiVi}, thập thần ${mg.godVi}, hành ${mg.wxVi}, nạp âm ${mg.nayinWx}). ${mg.interactionWithDay} ${mg.isYong ? '★ Mệnh cung = DỤNG/HỶ → bổ mệnh.' : mg.isJi ? '⚠ Mệnh cung = KỴ.' : ''}`);
+  } catch (e) {}
+
+  // [loop 90] TỬ NỮ LUẬN (子女論) — sao con sâu: số/giới tính/timing (module children-star ẩn).
+  try {
+    const c = analyzeChildrenStar(R);
+    parts.push(`TỬ NỮ (子女): sao ${c.childStar} (hành ${c.childWxVi}), ${c.strength} (${c.count.toFixed(1)}), cung Tử Nữ ${c.palaceZhiVi} ${c.palaceStable ? 'yên' : 'bị xung'}. ${c.estimated}. Con đầu: ${c.firstGender}.${c.isYong ? ' ★ Sao con=Dụng.' : c.isJi ? ' ⚠ Sao con=Kỵ.' : ''}`);
   } catch (e) {}
 
   // Thai nguyên (nếu có)

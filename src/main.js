@@ -98,6 +98,8 @@ import { dayunChangSheng, liunianChangSheng, dayunYongChangSheng, liuyueChangShe
 import { analyzeHanNuan } from './engine/han-nuan.js';
 import { analyzeWxFlow } from './engine/wx-flow.js';
 import { classifyChartLevel } from './engine/chart-level.js';
+import { baziMingGong } from './engine/bazi-minggong.js';
+import { analyzeChildrenStar } from './engine/children-star.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1091,6 +1093,34 @@ function renderChartLevel(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được mệnh cách tầng lớp.</p>'; }
 }
 
+function renderMingGong(R) {
+  const el = $('minggong');
+  if (!el) return;
+  try {
+    const mg = baziMingGong(R);
+    const yongIcon = mg.isYong ? '★ Dụng/Hỷ' : mg.isJi ? '⚠ Kỵ' : '· trung tính';
+    el.innerHTML = `
+      <p><b>Mệnh cung: ${esc(mg.ganVi)} ${esc(mg.zhiVi)}</b> (${esc(mg.ganZhi)}) — thập thần <b>${esc(mg.godVi)}</b>, hành ${esc(mg.wxVi)}, nạp âm ${esc(mg.nayinWx)}. <span class="hint">${esc(yongIcon)} với Dụng</span></p>
+      <p>${esc(mg.interactionWithDay)}</p>
+      <p class="hint">${esc(mg.meaning)}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được mệnh cung.</p>'; }
+}
+
+function renderChildrenStar(R) {
+  const el = $('children-star');
+  if (!el) return;
+  try {
+    const c = analyzeChildrenStar(R);
+    const profile = (c.profile || []).map((p) => `<p>${esc(p)}</p>`).join('');
+    el.innerHTML = `
+      ${profile}
+      ${c.interactions && c.interactions.length ? `<p>${c.interactions.map((x) => esc(x)).join('<br>')}</p>` : ''}
+      <p class="hint">${esc(c.advice)}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được tử nữ.</p>'; }
+}
+
 function renderMarriageStars(R) {
   const el = $('marriage-stars');
   if (!el) return;
@@ -1751,6 +1781,8 @@ function run() {
   lazyRender('han-nuan',       () => { try { renderHanNuan(currentResult); } catch (e) { console.warn('hannuan', e.message); } });
   lazyRender('wx-flow',        () => { try { renderWxFlow(currentResult); } catch (e) { console.warn('wxflow', e.message); } });
   lazyRender('chart-level',    () => { try { renderChartLevel(currentResult); } catch (e) { console.warn('chartlevel', e.message); } });
+  lazyRender('minggong',       () => { try { renderMingGong(currentResult); } catch (e) { console.warn('minggong', e.message); } });
+  lazyRender('children-star',  () => { try { renderChildrenStar(currentResult); } catch (e) { console.warn('childrenstar', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
