@@ -5323,6 +5323,25 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(_same(RMB1.chart.pillars, RMB2.chart.pillars), `[loop 180] rollover cuối THÁNG: 31/1 23:30 = 1/2 00:30 (day+month pillar khớp)`);
   console.log(`   子时换日 (23:00+ = sang hôm sau, ngũ-thử-độn đúng, rollover cuối năm + cuối tháng) ✓ | locked`);
 }
+
+// ################## PP. [loop 187] 立春/节 boundary — year pillar @立春, month pillar @节 ##################
+{
+  // [loop 187] Cổ pháp: trụ NĂM đổi tại 立春 (~4/2), trụ THÁNG đổi tại các 节.
+  //   lunar-javascript xử lý đúng; lock để không regress (nếu đổi sang dùng năm dương/tháng âm thuần = sai).
+  // Year: Feb 3 2026 (trước 立春) = 乙巳 (2025 zhi); Feb 5 (sau 立春) = 丙午 (2026 zhi)
+  const yPre = analyze(2026, 2, 3, 12, 0, 'nam', 2026);
+  const yPost = analyze(2026, 2, 5, 12, 0, 'nam', 2026);
+  assert(yPre.chart.pillars.year.gan + yPre.chart.pillars.year.zhi === '乙巳', `[loop 187] 立春: Feb 3 (trước) = 乙巳 (năm 2025)`);
+  assert(yPost.chart.pillars.year.gan + yPost.chart.pillars.year.zhi === '丙午', `[loop 187] 立春: Feb 5 (sau) = 丙午 (năm 2026)`);
+  // Month: Feb 3 = 丑月 (tháng cuối 乙巳); Feb 5 = 寅月 (tháng đầu 丙午)
+  assert(yPre.chart.pillars.month.zhi === '丑', `[loop 187] 节: Feb 3 = 丑月 (chưa qua 立春)`);
+  assert(yPost.chart.pillars.month.zhi === '寅', `[loop 187] 节: Feb 5 = 寅月 (sau 立春 = đầu xuân)`);
+  // 惊蛰 (~Mar 5-6): 寅月 → 卯月
+  const mPre = analyze(2026, 3, 4, 12, 0, 'nam', 2026);
+  const mPost = analyze(2026, 3, 7, 12, 0, 'nam', 2026);
+  assert(mPre.chart.pillars.month.zhi === '寅' && mPost.chart.pillars.month.zhi === '卯', `[loop 187] 惊蛰: Mar 4=寅月, Mar 7=卯月 (tháng đổi tại 节, không phải 1/âm)`);
+  console.log(`   立春 (year boundary) + 节 (month boundary) cổ pháp chính xác ✓ | locked`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
