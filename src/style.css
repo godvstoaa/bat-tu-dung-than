@@ -1326,3 +1326,79 @@ html{scroll-behavior:smooth}
   }
 }
 
+/* ============================================================
+   [loop 146] MOBILE POLISH + SCROLLBAR + AI CHAT ENHANCEMENT
+   ============================================================ */
+
+/* --- Custom scrollbar (thin gold) --- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--ink-black); }
+::-webkit-scrollbar-thumb { background: var(--gold-soft); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.3); }
+
+/* --- Mobile card spacing tighten --- */
+@media (max-width: 480px) {
+  .card { padding: 14px 12px 12px; margin-bottom: 12px; border-radius: 4px; }
+  .card-title { font-size: 15px; margin-bottom: 10px; }
+  .yz-row { font-size: 12.5px; }
+  .quick-nav a { font-size: 10px; padding: 2px 6px; }
+  .quick-nav { padding: 4px 6px; gap: 3px; }
+  .hint, .hint-inline { font-size: 11px; }
+  .combo { font-size: 11px; padding: 3px 6px; }
+  .grp { font-size: 14px; margin-top: 16px; }
+}
+
+/* --- AI chat bubble polish --- */
+.msg-user .msg-text {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.06));
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+.msg-ai .msg-text {
+  background: linear-gradient(135deg, rgba(245, 236, 203, 0.04), rgba(10, 9, 19, 0.3));
+  border: 1px solid var(--hairline);
+}
+.msg-ai .msg-text strong, .msg-ai .msg-text b {
+  color: var(--gold-bright);
+}
+
+/* --- Input fields glass effect --- */
+.birth-form input[type="date"],
+.birth-form input[type="number"],
+.birth-form select {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: var(--silk);
+  border-radius: 4px;
+  padding: 8px 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.birth-form input:focus,
+.birth-form select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+  outline: none;
+}
+
+/* --- Tab active state gold underline --- */
+.tab.active {
+  border-bottom: 2px solid var(--gold-bright);
+  color: var(--gold-bright);
+}
+
+/* --- Group header emoji glow --- */
+.grp::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  animation: grpLineFade 0.8s var(--ease-out) 0.3s forwards;
+}
+@keyframes grpLineFade {
+  to { opacity: 0.6; }
+}
+
