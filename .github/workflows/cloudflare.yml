@@ -1,0 +1,37 @@
+# Auto-deploy battu.god8.shop (Cloudflare Worker — serve static + AI proxy /zai /deepseek...)
+# [loop 85] tạo lại đúng: CHỈ deploy khi có CLOUDFLARE_API_TOKEN → KHÔNG fail-spam email
+# như vòng 63 (workflow cũ fail mọi push vì thiếu token). Nay guard: skip sạch nếu chưa set secret.
+# Cần 2 GitHub secret: CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID (tạo ở Cloudflare dashboard).
+name: Deploy to Cloudflare (battu.god8.shop)
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  deployments: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run build
+      - name: Check Cloudflare token
+        run: echo "CF_TOKEN_SET=${{ secrets.CLOUDFLARE_API_TOKEN != '' }}" >> $GITHUB_ENV
+      - name: Deploy Worker (battu.god8.shop)
+        if: env.CF_TOKEN_SET == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+      - name: Skip (chưa set token)
+        if: env.CF_TOKEN_SET != 'true'
+        run: |
+          echo "⚠ CLOUDFLARE_API_TOKEN secret chưa set → bỏ qua deploy Cloudflare (GitHub Pages vẫn deploy bình thường)."
+          echo "Để battu.god8.shop auto-update: thêm 2 GitHub secret (CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID) — tạo ở Cloudflare → My Profile → API Tokens."
+          echo "HOẶC chạy local: npx wrangler login && npm run deploy"
