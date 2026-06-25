@@ -424,6 +424,21 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
     day: { gan: ec.getDayGan(), zhi: ec.getDayZhi() },
     time: { gan: ec.getTimeGan(), zhi: ec.getTimeZhi() },
   };
+  // [loop 161] Tính không vong tại chỗ — để thẻ "Lưu Niên" bắt được tầng 出空/冲空
+  //   (scoreLiunianYear đọc kongwang?.kong). Trước đây tham chiếu kongwang chưa khai báo
+  //   → ReferenceError → try/catch ở analyze() nuốt lỗi → thẻ trống. Sửa: tính cục bộ.
+  let kongwang = null;
+  try {
+    kongwang = analyzeKongwang({
+      dayGan: dGan,
+      pillars: {
+        year: { zhi: natalPillars.year.zhi, ganGod: tenGod(dGan, ec.getYearGan()) },
+        month: { zhi: natalPillars.month.zhi, ganGod: tenGod(dGan, ec.getMonthGan()) },
+        day: { zhi: natalPillars.day.zhi, ganGod: 'Nhật Chủ' },
+        time: { zhi: natalPillars.time.zhi, ganGod: tenGod(dGan, ec.getTimeGan()) },
+      },
+    });
+  } catch (e) { kongwang = null; }
   const out = [];
   for (const ln of lnList) {
     const gz = ln.getGanZhi();
@@ -435,7 +450,7 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
     //   trong khi deep (có Thương Quan −16 + Thái tuế) báo "Hơi kỵ" → mâu thuẫn.
     const { score, rating } = scoreLiunianYear({
       dayGan: dGan, dayZhi: ec.getDayZhi(), yearBirthZhi: ec.getYearZhi(), yong, yGan: gan, yZhi: zhi,
-      natalPillars,
+      natalPillars, kongwang,
     });
     const lnYear = ln.getYear();
     out.push({ ganZhi: gz, gan, zhi, ganWx, zhiWx,
