@@ -130,6 +130,7 @@ import { sleepOptimization } from './engine/sleep-fs.js';
 import { checkNatalActivation } from './engine/shensha-activation.js';
 import { flyingSihua } from './engine/flying-sihua.js';
 import { findMoveDates } from './engine/move-fs.js';
+import { matchBusinessPartners } from './engine/partner-match.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1415,6 +1416,21 @@ function renderMoveFs(R) {
     const rows = mv.map((d) => `<div class="yz-row"><b>${esc(d.date)}</b> ${esc(d.ganZhi || '')} ${esc(d.lunar || '')} — <b>${esc(d.rating || '')}</b> (${esc(String(d.score || ''))}) <span class="hint">${esc((d.reasons || []).join('; ').slice(0, 80))}</span></div>`).join('');
     el.innerHTML = `<p class="hint">Top 5 ngày tốt dọn nhà / nhập trazaar trong 60 ngày tới (择日).</p>${rows}`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được ngày dọn nhà.</p>'; }
+}
+
+function renderPartnerMatch(userR, partnerR) {
+  const el = $('partner-match');
+  if (!el) return;
+  try {
+    const m = matchBusinessPartners(userR, partnerR);
+    const details = (m.details || []).map((d) => `<p class="hint">${esc(d)}</p>`).join('');
+    el.innerHTML = `
+      <p><b>Điểm hợp tác: ${esc(String(m.score ?? ''))}/100 — ${esc(m.rating || '')}</b></p>
+      ${m.roleFit ? `<p class="hint">🤝 ${esc(m.roleFit)}</p>` : ''}
+      ${details}
+      <p class="hint">${esc(m.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được ghép đôi đối tác.</p>'; }
 }
 
 function renderLifestyle(R) {
@@ -2982,6 +2998,17 @@ $('ly-btn').addEventListener('click', () => {
 if ($('ly-ev-btn')) $('ly-ev-btn').addEventListener('click', () => renderLyearEvents(parseInt($('ly-year').value, 10) || new Date().getFullYear()));
 $('lm-btn').addEventListener('click', () => renderLiuyue(parseInt($('lm-year').value, 10) || new Date().getFullYear()));
 $('lr-btn').addEventListener('click', () => renderLiuRi($('lr-date').value));
+if ($('partner-match-btn')) $('partner-match-btn').addEventListener('click', () => {
+  if (!currentResult) { alert('Nhập lá số của bạn trước.'); return; }
+  const raw = prompt('Nhập lá số ĐỐI TÁC (định dạng: năm,tháng,ngày,giờ,giới tính)\nvd: 1995,3,3,14,nữ');
+  if (!raw) return;
+  const parts = raw.split(',').map((s) => s.trim());
+  if (parts.length < 5) { alert('Sai định dạng. VD: 1995,3,3,14,nữ'); return; }
+  try {
+    const pR = analyze(+parts[0], +parts[1], +parts[2], +parts[3], 0, parts[4], new Date().getFullYear());
+    renderPartnerMatch(currentResult, pR);
+  } catch (e) { alert('Không tính được lá số đối tác: ' + e.message); }
+});
 if ($('zlr-btn')) $('zlr-btn').addEventListener('click', () => renderZiweiLiuri($('zlr-date').value));
 if ($('bh-btn')) $('bh-btn').addEventListener('click', () => renderBestHour($('bh-date').value));
 $('lr-find').addEventListener('click', () => {
