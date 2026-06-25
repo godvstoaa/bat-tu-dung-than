@@ -107,6 +107,9 @@ import { dailyPro } from './engine/daily-pro.js';
 import { analyzeFiveVirtues } from './engine/five-aspects.js';
 import { analyzeRomance } from './engine/romance-deep.js';
 import { investmentStyle } from './engine/invest-style.js';
+import { personalNutrition } from './engine/bazi-diet.js';
+import { crystalLuckyObjects } from './engine/crystal-fs.js';
+import { clothingByOccasion } from './engine/clothing-fs.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1240,6 +1243,34 @@ function renderInvestStyle(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được phong cách đầu tư.</p>'; }
 }
 
+function renderLifestyle(R) {
+  const el = $('lifestyle');
+  if (!el) return;
+  const arr = (x) => Array.isArray(x) ? x.join(', ') : (x || '');
+  let html = '';
+  // Ẩm thực
+  try {
+    const d = personalNutrition(R);
+    const f = d.dungFlavor || {};
+    html += `<h4 class="syn-h4" style="margin-top:8px">🍱 Ẩm thực hợp mệnh (Dụng ${esc(d.dungVi || '')})</h4>`;
+    html += `<p class="hint">Vị ${esc(f.vi || '')} (${esc(f.organ || '')}) — ${esc(f.action || '')}. Thực phẩm: ${esc(f.foods || '')}.${f.caution ? ' Lưu ý: ' + esc(f.caution) + '.' : ''} Tránh vị ${(d.kyFlavor || {}).vi || ''} (${d.kyVi || ''}).</p>`;
+    if (d.meals || d.tea || d.fruit) html += `<p class="hint">${d.meals ? 'Gợi ý: ' + esc(d.meals) + '. ' : ''}${d.tea ? 'Trà: ' + esc(d.tea) + '. ' : ''}${d.fruit ? 'Trái cây: ' + esc(d.fruit) + '.' : ''}</p>`;
+  } catch (e) {}
+  // Đá/trang sức
+  try {
+    const c = crystalLuckyObjects(R);
+    html += `<h4 class="syn-h4" style="margin-top:8px">💎 Đá phong thủy & trang sức (Dụng ${esc(c.dungVi || '')})</h4>`;
+    html += `<p class="hint">Đeo: ${esc(arr(c.dungCrystals))}. Màu: ${esc(c.dungColor || '')}. Lợi: ${esc(c.dungBenefit || '')}. Kim loại: ${esc(c.dungMetal || '')}.${c.dungObjects ? ' Vật phẩm: ' + esc(arr(c.dungObjects)) + '.' : ''}</p>`;
+  } catch (e) {}
+  // Trang phục
+  try {
+    const cl = clothingByOccasion(R);
+    const text = cl.advice || cl.summary || '';
+    if (text) html += `<h4 class="syn-h4" style="margin-top:8px">👕 Trang phục & màu sắc</h4><p class="hint">${esc(text)}</p>`;
+  } catch (e) {}
+  el.innerHTML = html || '<p class="hint">Không tính được lifestyle.</p>';
+}
+
 function renderMarriageStars(R) {
   const el = $('marriage-stars');
   if (!el) return;
@@ -1909,6 +1940,7 @@ function run() {
   lazyRender('five-aspects',    () => { try { renderFiveAspects(currentResult); } catch (e) { console.warn('fiveaspects', e.message); } });
   lazyRender('romance-deep',    () => { try { renderRomanceDeep(currentResult); } catch (e) { console.warn('romancedeep', e.message); } });
   lazyRender('invest-style',    () => { try { renderInvestStyle(currentResult); } catch (e) { console.warn('investstyle', e.message); } });
+  lazyRender('lifestyle',       () => { try { renderLifestyle(currentResult); } catch (e) { console.warn('lifestyle', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
