@@ -125,6 +125,9 @@ import { socialStrategy } from './engine/social-fs.js';
 import { spiritualPractice } from './engine/spiritual-fs.js';
 import { cureByElement } from './engine/fs-cure.js';
 import { findNoblePerson } from './engine/emperor-star.js';
+import { recommendNumbers } from './engine/number-fs.js';
+import { sleepOptimization } from './engine/sleep-fs.js';
+import { checkNatalActivation } from './engine/shensha-activation.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1359,7 +1362,32 @@ function renderFengshuiExtra(R) {
     const t = bestText(np);
     if (t) html += `<p class="hint"><b>👑 Quý nhân (đế tinh):</b> ${esc(t)}</p>`;
   } catch (e) {}
+  // Số may mắn (number-fs)
+  try {
+    const nm = recommendNumbers(R);
+    const fav = (nm.favNums || []).join(','), avoid = (nm.avoidNums || []).join(',');
+    const combos = (nm.goodCombos || []).slice(0, 4).join('/');
+    if (fav) html += `<p class="hint"><b>🔢 Số hợp:</b> ${esc(fav)} (combo ${esc(combos)}), tránh ${esc(avoid)}. ${esc((nm.tips || [])[0] || '')}</p>`;
+  } catch (e) {}
+  // Hướng ngủ (sleep-fs)
+  try {
+    const sl = sleepOptimization(R, R.chart.input.year, R.chart.input.gender);
+    const t = bestText(sl);
+    if (t) html += `<p class="hint"><b>😴 Giấc ngủ:</b> ${esc(t)}</p>`;
+  } catch (e) {}
   el.innerHTML = html || '<p class="hint">Không tính được phong thủy định vị.</p>';
+}
+
+function renderShenshaActivation(R) {
+  const el = $('shensha-activation');
+  if (!el) return;
+  try {
+    const ac = checkNatalActivation(R);
+    const stars = ac.natalStars || [];
+    if (!stars.length) { el.innerHTML = '<p class="hint">Không phát hiện thần sát kích hoạt rõ.</p>'; return; }
+    const rows = stars.map((s) => `<div class="yz-row"><b>${esc(s.vi || s.zh || '')}</b> @ ${esc(s.at || '')} (${esc(s.pillar || '')}) <span class="hint">— ${esc(s.effect || '')}</span></div>`).join('');
+    el.innerHTML = `<p class="hint">Thần sát kích hoạt trong nguyên cục (theo trigger ${esc('')}).</p>${rows}`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được kích hoạt thần煞.</p>'; }
 }
 
 function renderLifestyle(R) {
@@ -2076,6 +2104,7 @@ function run() {
   lazyRender('destiny-timeline', () => { try { renderDestinyTimeline(currentResult); } catch (e) { console.warn('timeline', e.message); } });
   lazyRender('noble-cultivate', () => { try { renderNobleCultivate(currentResult); } catch (e) { console.warn('noble', e.message); } });
   lazyRender('fengshui-extra', () => { try { renderFengshuiExtra(currentResult); } catch (e) { console.warn('fsextra', e.message); } });
+  lazyRender('shensha-activation', () => { try { renderShenshaActivation(currentResult); } catch (e) { console.warn('shenshaact', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
