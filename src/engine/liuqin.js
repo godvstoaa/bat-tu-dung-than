@@ -6,12 +6,20 @@
 //  Nguồn: 渊海子平, 三命通会, 八字应用阐微.
 // ============================================================================
 import { TEN_GOD_VI, GAN, ZHI } from './constants.js';
+// [loop 80 DRY — Bug #6 root cause] starMap import elementForRole từ family.js
+//   (single source of truth). Trước đây 2 định nghĩa song song (liuqin starMap +
+//   family elementForRole) — root cause của pattern bug giới tính/sao lục thân tái
+//   diễn (đổi phái 1 nơi quên nơi kia → 2 module contradict). Nay 1 nguồn duy nhất.
+import { elementForRole } from './family.js';
 
-// Ánh xạ Thập thần tinh theo lục thân (chuẩn 渊海子平 / 邵伟华)
-function starMap(isMale) {
-  return isMale
-    ? { 父: ['偏財', '正財'], 母: ['正印', '偏印'], 兄弟姐妹: ['比肩', '劫財'], 配偶: ['正財', '偏財'], 子女: ['七殺', '正官'] }
-    : { 父: ['偏財', '正財'], 母: ['正印', '偏印'], 兄弟姐妹: ['比肩', '劫財'], 配偶: ['正官', '七殺'], 子女: ['食神', '傷官'] };
+// Ánh xạ relation (Hán Việt) → role (family.js). starMap derive từ elementForRole.
+const REL_ROLE = { 父: 'father', 母: 'mother', 兄弟姐妹: 'sibling', 配偶: 'spouse', 子女: 'child' };
+function starMap(dayGan, isMale) {
+  const m = {};
+  for (const [rel, role] of Object.entries(REL_ROLE)) {
+    m[rel] = elementForRole(dayGan, isMale, role).gods;
+  }
+  return m;
 }
 // Cung vị ứng lục thân
 const PALACE = {
@@ -51,7 +59,7 @@ function godCount(chart) {
 export function analyzeLiuqin(R) {
   const { chart, interactions } = R;
   const isMale = chart.input.gender === 'nam';
-  const sm = starMap(isMale);
+  const sm = starMap(chart.dayGan, isMale);
   const gc = godCount(chart);
   const out = [];
 
