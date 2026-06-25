@@ -629,6 +629,17 @@ export const AI_TOOLS = [
       stepDays: { type: 'integer', description: 'Bước nhảy ngày (mặc định 5; nhỏ hơn = sát cực hơn nhưng chậm)' },
     }, required: ['mode'] },
   } },
+  { type: 'function', function: {
+    name: 'analyze_partner', description: '[loop 133] Phân tích HỢP HÔN / HỢP ĐỐI TÁC giữa user và 1 người khác. Cần ngày sinh đối tác. Trả điểm hợp + nhân tố + lời khuyên. Dùng khi hỏi "hợp tuổi/hợp không/vợ chồng tôi sinh X".',
+    parameters: { type: 'object', properties: {
+      year: { type: 'integer', description: 'Năm sinh đối tác' },
+      month: { type: 'integer', description: 'Tháng sinh 1-12' },
+      day: { type: 'integer', description: 'Ngày sinh 1-31' },
+      hour: { type: 'integer', description: 'Giờ sinh 0-23 (để trống=12 trưa)' },
+      gender: { type: 'string', description: 'nam hoặc nữ' },
+      type: { type: 'string', description: 'hôn nhân (mặc định) hoặc kinhdoanh' },
+    }, required: ['year', 'month', 'day', 'gender'] },
+  } },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -703,6 +714,18 @@ export function execTool(name, args, R) {
         const [yy, mm, dd] = String(a.start).split('-').map(Number);
         const list = findGoodDays(R, yy, mm, dd, a.count || 30, a.topN || 5);
         return { start: a.start, top: list.map((d) => ({ date: d.solar, ganZhi: d.ganZhi, rating: d.rating, score: d.score })) };
+      }
+      case 'analyze_partner': {
+        // [loop 133] HỢP HÔN / HỢP ĐỐI TÁC — AI tool cho câu hỏi hợp tuổi
+        const pR = analyze(a.year, a.month, a.day, a.hour ?? 12, 0, a.gender, new Date().getFullYear());
+        if (a.type === 'kinhdoanh') {
+          const { matchBusinessPartners } = await import('./partner-match.js');
+          const m = matchBusinessPartners(R, pR);
+          return { type: 'kinhdoanh', score: m.score, rating: m.rating, roleFit: _s(m.roleFit, 200), details: (m.details || []).map((d) => _s(d, 150)), advice: _s(m.advice, 250) };
+        }
+        const { computeHehun } = await import('./hehun.js');
+        const h = computeHehun(R, pR);
+        return { type: 'hôn nhân', score: h.score, rating: h.rating, verdict: _s(h.verdict, 250), factors: (h.factors || []).map((f) => _s(f, 150)) };
       }
       default:
         return { error: 'tool không hỗ trợ: ' + name };
