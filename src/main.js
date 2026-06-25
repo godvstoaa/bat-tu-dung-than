@@ -90,6 +90,7 @@ import { analyzeShuangXing } from './engine/ziwei-shuangxing.js';
 import { taiSuiOverview } from './engine/taisui-general.js';
 import { analyzeTaohua } from './engine/taohua.js';
 import { buildRemedy } from './engine/remedy.js';
+import { wuTai } from './engine/tonggen.js';
 import { strength3Fa } from './engine/strength-3fa.js';
 import { jiaoYunAnalysis } from './engine/jiaoyun.js';
 import { analyzePillarQuality } from './engine/pillar-quality.js';
@@ -417,14 +418,20 @@ function renderWuXing(wx, yong) {
   const fav = new Set([yong?.primary, yong?.xi].filter(Boolean));
   const avoid = new Set([yong?.ji, yong?.chou].filter(Boolean));
   const TAG = { [yong?.primary]: '★Dụng', [yong?.xi]: '♥Hỷ', [yong?.ji]: '⚠Kỵ', [yong?.chou]: '⚔Thù' };
+  // [loop 140] 旺相休囚死 — mùa nào hành đó vượng/suy
+  const monthWx = window._currentResult?.strength?.monthMainWx || '';
+  const WT_VI = { 旺: 'Vượng', 相: 'Tướng', 休: 'Hưu', 囚: 'Tù', 死: 'Tử' };
+  const WT_COLOR = { 旺: '#2e9e5b', 相: '#5cb85c', 休: '#caa14a', 囚: '#e8a23d', 死: '#e0533d' };
   $('wuxing').innerHTML = ['木', '火', '土', '金', '水'].map((w) => {
     const pct = wx.pct[w];
     const width = max > 0 ? (pct / max) * 100 : 0;
     const tag = TAG[w] || '';
     const tagColor = fav.has(w) ? '#2e9e5b' : avoid.has(w) ? '#e0533d' : '';
+    const wt = monthWx ? wuTai(w, monthWx) : '';
+    const wtBadge = wt ? `<span style="color:${WT_COLOR[wt]||'#888'};font-size:10px;border:1px solid ${WT_COLOR[wt]||'#888'};border-radius:3px;padding:0 3px;margin-left:3px">${WT_VI[wt]||wt}</span>` : '';
     return `
       <div class="wx-row">
-        <div class="wx-name"><span class="dot" style="background:${WX_COLOR[w]}"></span>${w} ${WX_VI[w]}${tag ? ` <span style="color:${tagColor};font-weight:700;font-size:11px">${tag}</span>` : ''}</div>
+        <div class="wx-name"><span class="dot" style="background:${WX_COLOR[w]}"></span>${w} ${WX_VI[w]}${tag ? ` <span style="color:${tagColor};font-weight:700;font-size:11px">${tag}</span>` : ''}${wtBadge}</div>
         <div class="wx-track"><div class="wx-fill" style="width:${width}%;background:${WX_COLOR[w]}"></div></div>
         <div class="wx-pct">${pct}%</div>
       </div>`;
@@ -2211,6 +2218,7 @@ function run() {
   try { renderLnSihua(currentResult); } catch (e) { console.warn('lnSihua', e.message); }
   renderLiuqin(currentResult);
   renderRemedy(currentResult);
+  window._currentResult = currentResult; // [loop 140] cho renderWuXing truy cập monthMainWx
   renderWuXing(currentResult.wx, currentResult.yong);
   renderInteractions(currentResult);
   renderShensha(currentResult);
