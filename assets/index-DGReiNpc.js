@@ -300,6 +300,7 @@ NGUYEN TAC:
 
 15. [loop 47] KHI LUẬN DỤNG THẦN — LUÔN giải thích TẠI SAO Dụng Thần được chọn:
   - Đọc mục "Phép lấy Dụng Thần" + "Điều Hậu (调候)" trong brief.
+  - [loop 121] Nếu brief ghi "Cách cục đặc biệt" (从格/专旺: 从财/从杀/从儿/专旺/从旺) → giải thích: "mệnh là CÁCH ĐẶC BIỆT → Dụng Thần THEO THẾ CỤC (从财→Tài, 从杀→Quan, 从儿→Thực, 专旺→tiết, 从旺→Tỷ). KHÔNG luận Phù Ức hay 调候 («从格不论调候»)". Đây là ưu tiên CAO NHẤT —从格 đè mọi phương pháp khác.
   - Nếu brief ghi "Điều Hậu — LÀM CHỦ (override Phù Ức)" → giải thích: "sinh mùa cực đoan (hàn/nhiệt) → cổ pháp 穮通宝鑑 bắt buộc dùng hành X để điều hòa khí hậu, đè Phù Ức". KHÔNG luận theo Phù Ức (cân bằng vượng suy) — vì 调候 đã override.
   - Nếu brief ghi "Bệnh Dược — LÀM CHỦ (败中有成)" → giải thích: "mệnh có bệnh cách cục, hành X là thuốc chữa («có bệnh mới là quý»)".
   - Nếu KHÔNG có override → luận theo Phù Ức bình thường (thân vượng/nhược → cần hành nào cân bằng).
