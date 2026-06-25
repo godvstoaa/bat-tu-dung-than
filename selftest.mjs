@@ -5145,6 +5145,16 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
     assert(_RB.yong.avoid.includes(_RB.yong.chou), `[fix loop 127] 病药 avoid chứa chou=${_RB.yong.chou}`);
     console.log(`   病药 promote avoid ✓ (ji=${_RB.yong.ji}, chou=${_RB.yong.chou} đều trong avoid) | locked`);
   }
+
+  // [loop 130] TIAOHOU table regression (core 調候 用神)
+  const { TIAOHOU: _TH } = await import('./src/engine/constants.js');
+  assert(_TH['甲']['寅'].join('') === '丙癸', 'TIAOHOU 甲+寅 = 丙癸');
+  assert(_TH['丙']['午'].join('') === '壬庚', 'TIAOHOU 丙+午 = 壬庚');
+  assert(_TH['壬']['子'].join('') === '戊丙', 'TIAOHOU 壬+子 = 戊丙');
+  let _thM = 0;
+  for (const g of ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸']) for (const z of ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥']) if (!_TH[g]?.[z]?.length) _thM++;
+  assert(_thM === 0, `TIAOHOU đủ 120/120 (thiếu ${_thM})`);
+  console.log(`   TIAOHOU 120/120 ✓ | spot-check ✓ | locked`);
 }
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
