@@ -24,6 +24,8 @@ import { taiYuan } from './taiyuan.js';
 import { getPersonalityProfile } from './personality-profile.js';
 import { lifeTimeline } from './destiny-timeline.js';
 import { mingZhuShenZhu } from './mingzhu.js';
+import { predictEvents } from './event-predict.js';
+import { detectAnchong } from './anchong.js';
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -193,6 +195,19 @@ export function extendBrief(R) {
     const mg = baziMingGong(R);
     const mz = mingZhuShenZhu(mg.zhi, R.chart.pillars.year.zhi);
     parts.push(`MỆNH CHỦ/THÂN CHỦ: 命主=${mz.mingZhuVi}, 身主=${mz.shenZhuVi}.`);
+  } catch (e) {}
+
+  // [loop 114] ÁM XUNG (暗冲 — 盲派) + SỰ KIỆN NĂM (event-predict)
+  try {
+    const ac = detectAnchong(R.chart);
+    if (ac.pairs && ac.pairs.length) {
+      parts.push(`ÁM XUNG (暗冲): ${ac.summary}`);
+    }
+  } catch (e) {}
+  try {
+    const yr = new Date().getFullYear();
+    const ev = predictEvents(R, yr, 3);
+    parts.push(`SỰ KIỆN ${yr}-${yr + 2}: ${ev.years.map((y) => `${y.year}(${y.lnArea}${y.sameGod ? '/nhân đôi' : ''})`).join(', ')}.`);
   } catch (e) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';
