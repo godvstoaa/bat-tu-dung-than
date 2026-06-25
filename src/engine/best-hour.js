@@ -84,10 +84,15 @@ export function bestHourToday(R, year, month, day, patternYong) {
   const ky = yong.ji;              // hành Kỵ
   const cho = yong.chou;           // hành Thù
 
-  // ---- Nhật can (để xét quý nhân Thiên Ất/Văn Xương theo giờ chi) ----
-  const dayGan = R?.chart?.dayGan || (() => { try { return Solar.fromYmdHms(y, mo, d, 12, 0, 0).getLunar().getDayGan(); } catch (_) { return '甲'; } })();
-  const tianYiZhis = TIAN_YI[dayGan] || [];
-  const wenChangZhi = WEN_CHANG[dayGan];
+  // ---- Nhật can: PHÂN BIỆT SINH (cho 格局) vs CAN NGÀY (cho thần煞 quý nhân) ----
+  // [loop 81 sửa bug] 天乙/文昌 quý nhân GIỜ theo CAN NGÀY đang xem («甲戊庚牛羊...» —
+  //   quý nhân ở giờ = hàm số CAN NGÀY, đổi mỗi ngày). Trước đây dùng R.chart.dayGan
+  //   (Nhật Chủ sinh) → quý nhân giờ CỐ ĐỊNH 2 giờ/yếu cho mỗi user (sai — phải đổi daily).
+  //   Riêng 格局喜忌 (line ~177) dùng birthDayGan (Nhật Chủ) là ĐÚNG (patternYong của user).
+  const birthDayGan = R?.chart?.dayGan || '甲';
+  const evalDayGan = (() => { try { return Solar.fromYmdHms(y, mo, d, 12, 0, 0).getLunar().getDayGan(); } catch (_) { return birthDayGan; } })();
+  const tianYiZhis = TIAN_YI[evalDayGan] || [];
+  const wenChangZhi = WEN_CHANG[evalDayGan];
 
   // ---- Chiều 6: 格局喜忌 (TÙY CHỌN — chỉ bật khi truyền patternYong hợp lệ) ----
   //  patternYong.xi/ji là mảng {group, wx, vi} (ti/yin/shi/cai/guan).
@@ -174,7 +179,7 @@ export function bestHourToday(R, year, month, day, patternYong) {
       try {
         const hGan = lh.gan;
         if (hGan && hGan !== '?') {
-          const god = tenGod(dayGan, hGan);          // thập thần của giờ can
+          const god = tenGod(birthDayGan, hGan);          // [loop 81] thập thần của giờ can vs Nhật Chủ SINH (cách của user)
           const grp = godGroup(god);                 // nhóm (ti/yin/shi/cai/guan)
           if (grp && xiGroups.has(grp)) {
             dim.geju = 95; gejuScore = +5;

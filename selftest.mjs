@@ -4877,6 +4877,42 @@ console.log('\n################## CC. [loop 79] lục thân: loại tàng day + 
   console.log(`   lục thân: loại tàng day ✓ | đếm đủ bản/trung/dư ✓ | giới tính đúng (nam con=Quan, nữ con=Thực) ✓`);
 }
 
+// ################## DD. [loop 81] best-hour 天乙/文昌 giờ theo CAN NGÀY (fix bug) ##################
+import { bestHourToday as _bht } from './src/engine/best-hour.js';
+import { TIAN_YI as _TY, WEN_CHANG as _WC } from './src/engine/shensha.js';
+console.log('\n################## DD. [loop 81] best-hour: 天乙/文昌 giờ theo CAN NGÀY ##################');
+{
+  const _R = analyze(1993, 10, 21, 0, 30, 'nam', 2026); // Nhật Chủ 乙
+  const _nobleHours = (b) => b.hours.filter((h) => h.reasons.some((r) => r.includes('天乙'))).map((h) => h.zhi);
+
+  // DD1. [fix] 天乙 giờ ĐỔI theo ngày (can ngày), KHÔNG cố định theo Nhật Chủ sinh.
+  //   Trước đây: TIAN_YI[乙]=子申 cố định mọi ngày. Nay: theo can ngày.
+  const _b1 = _bht(_R, 2026, 6, 15); // 庚 ngày
+  const _b2 = _bht(_R, 2026, 6, 16); // 辛 ngày
+  const _n1 = _nobleHours(_b1).sort().join(',');
+  const _n2 = _nobleHours(_b2).sort().join(',');
+  assert(_n1 !== _n2, `[fix] 天乙 giờ KHÁC nhau 2 ngày khác can (${_n1} vs ${_n2}) — đổi theo can ngày, không cố định Nhật Chủ`);
+
+  // DD2. khớp cổ法 mnemonic «甲戊庚牛羊, 乙己鼠猴乡, 丙丁猪鸡, 壬癸兔蛇, 六辛逢马虎»:
+  //   庚日 → Sửu/Mùi (牛羊). verify TIAN_YI[庚] = 丑未.
+  assert(_TY['庚'].sort().join(',') === ['丑', '未'].sort().join(','), '天乙 mnemonic «甲戊庚牛羊»: 庚 → Sửu/Mùi');
+  assert(_TY['辛'].sort().join(',') === ['午', '寅'].sort().join(','), '天乙 mnemonic «六辛逢马虎»: 辛 → Ngọ/Dần');
+  assert(_TY['乙'].sort().join(',') === ['子', '申'].sort().join(','), '天乙 mnemonic «乙己鼠猴乡»: 乙 → Tý/Thân');
+
+  // DD3. best-hour 天乙 giờ = TIAN_YI[can NGÀY], KHÔNG = TIAN_YI[Nhật Chủ 乙]:
+  const _evalGan1 = _b1.dayGanZhi[0]; // can ngày của 2026-6-15
+  const _expect = _TY[_evalGan1].sort().join(',');
+  assert(_n1 === _expect, `天乙 giờ = TIAN_YI[can ngày ${_evalGan1}] = ${_expect} (được ${_n1})`);
+  assert(_n1 !== _TY['乙'].sort().join(','), '[fix] 天乙 giờ KHÔNG còn = TIAN_YI[Nhật Chủ 乙] cố định');
+
+  // DD4. 格局 chiều vẫn dùng birthDayGan (Nhật Chủ) — không bị phá.
+  const _bG = _bht(_R, 2026, 6, 15, _R.patternQuality?.patternYong);
+  assert(_bG.gejuEnabled === !!_R.patternQuality?.patternYong, 'best-hour geju chiều vẫn bật đúng (dùng birthDayGan cho tenGod)');
+
+  console.log(`   庚日 天乙=[${_n1}] | 辛日 天乙=[${_n2}] — đổi theo can ngày ✓ (mnemonic «甲戊庚牛羊/六辛逢马虎»)`);
+  console.log(`   Trước fix: 天乙 cố định Tý/Thân cho user 乙 mọi ngày (sai). Nay đúng can ngày ✓`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
