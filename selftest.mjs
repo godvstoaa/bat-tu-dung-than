@@ -5155,6 +5155,19 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   for (const g of ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸']) for (const z of ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥']) if (!_TH[g]?.[z]?.length) _thM++;
   assert(_thM === 0, `TIAOHOU đủ 120/120 (thiếu ${_thM})`);
   console.log(`   TIAOHOU 120/120 ✓ | spot-check ✓ | locked`);
+
+  // [loop 131] HIDDEN (tàng can) table regression — THE most critical BaZi table
+  const { HIDDEN: _HD } = await import('./src/engine/constants.js');
+  assert(JSON.stringify(_HD['子']) === JSON.stringify(['癸']), 'HIDDEN 子=癸');
+  assert(JSON.stringify(_HD['丑']) === JSON.stringify(['己','癸','辛']), 'HIDDEN 丑=己癸辛');
+  assert(JSON.stringify(_HD['寅']) === JSON.stringify(['甲','丙','戊']), 'HIDDEN 寅=甲丙戊');
+  assert(JSON.stringify(_HD['辰']) === JSON.stringify(['戊','乙','癸']), 'HIDDEN 辰=戊乙癸');
+  assert(JSON.stringify(_HD['亥']) === JSON.stringify(['壬','甲']), 'HIDDEN 亥=壬甲');
+  assert(_HD['辰'].includes('癸'), '辰=水库(癸)');
+  assert(_HD['戌'].includes('丁'), '戌=火库(丁)');
+  assert(_HD['丑'].includes('辛'), '丑=金库(辛)');
+  assert(_HD['未'].includes('乙'), '未=木库(乙)');
+  console.log(`   HIDDEN 12/12 ✓ | 4库 stored ✓ | locked`);
 }
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
