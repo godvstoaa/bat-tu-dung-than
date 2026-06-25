@@ -97,6 +97,7 @@ import { wealthMonthlyAlert } from './wealth-alert.js';
 import { healthAlertScan } from './health-alert.js';
 import { computeHehun } from './hehun.js';
 import { matchBusinessPartners } from './partner-match.js';
+import { bestHourToday } from './best-hour.js';
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
@@ -642,6 +643,12 @@ export const AI_TOOLS = [
       type: { type: 'string', description: 'hôn nhân (mặc định) hoặc kinhdoanh' },
     }, required: ['year', 'month', 'day', 'gender'] },
   } },
+  { type: 'function', function: {
+    name: 'analyze_best_hour', description: '[loop 135] Tìm GIỜ TỐT NHẤT trong 1 ngày (12时辰 × 6 chiều: hoàng đạo + Dụng + thần煞 + 格局). Dùng khi hỏi "giờ nào tốt hôm nay / giờ ký kết / giờ khai trương".',
+    parameters: { type: 'object', properties: {
+      year: { type: 'integer' }, month: { type: 'integer' }, day: { type: 'integer' },
+    }, required: ['year', 'month', 'day'] },
+  } },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -716,6 +723,16 @@ export function execTool(name, args, R) {
         const [yy, mm, dd] = String(a.start).split('-').map(Number);
         const list = findGoodDays(R, yy, mm, dd, a.count || 30, a.topN || 5);
         return { start: a.start, top: list.map((d) => ({ date: d.solar, ganZhi: d.ganZhi, rating: d.rating, score: d.score })) };
+      }
+      case 'analyze_best_hour': {
+        // [loop 135] GIỜ TỐT NHẤT — 12时辰 composite scoring
+        const bh = bestHourToday(R, a.year, a.month, a.day, R.patternQuality?.patternYong);
+        return {
+          date: bh.date, dayGanZhi: bh.dayGanZhi,
+          best: (bh.best || []).map((h) => ({ zhi: h.zhi, vi: h.vi, range: h.range, score: h.score, rating: h.rating, reason: _s((h.reasons || []).join(' '), 120) })),
+          worst: (bh.worst || []).map((h) => ({ zhi: h.zhi, vi: h.vi, range: h.range, score: h.score })),
+          summary: _s(bh.summary, 300),
+        };
       }
       case 'analyze_partner': {
         // [loop 133] HỢP HÔN / HỢP ĐỐI TÁC — AI tool cho câu hỏi hợp tuổi
