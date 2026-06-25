@@ -37,6 +37,14 @@ const GROUP_VI = { ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 
 //  1. TÍNH TỨ TRỤ
 // ===========================================================================
 export function buildChart(year, month, day, hour, minute, gender) {
+  // [loop 176 — 子时换日 CONSIDERATION, DOCUMENTED CHOICE]
+  // lunar-javascript dùng quy ước «00:00换日» (23:00-23:59 thuộc NGÀY HIỆN TẠI), KHÔNG phải
+  // quy ước cổ pháp «子时换日» (23:00+ = sang NGÀY HÔM SAU — 渊海子平/三命通会/滴天髓 đều chu).
+  //   Hệ quả: sinh 23:00-23:59 → trụ Ngày (Nhật Chủ) theo lịch hiện tại, KHÔNG lùi sang hôm sau.
+  // Đây là LỰA CHỌN CỔ điển-tSupportedContent-có-tranh-luận; app dùng mặc định thư viện để giữ
+  // nhất quán với các lá số đã luận. inverse-bazi/sensitivity đã AVOID ranh 早子 bằng sample 00:30.
+  // Muốn sang 子时换日: khi hour>=23, cộng 1 ngày (xử lý rollover tháng/năm) trước fromYmdHms.
+  // ⚠ Ảnh hưởng ~1/12 lá số (đổi Nhật Chủ) — quyết định methodological, cần user chốt.
   const solar = Solar.fromYmdHms(year, month, day, hour, minute, 0);
   const lunar = solar.getLunar();
   const ec = lunar.getEightChar();
