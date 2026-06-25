@@ -1172,3 +1172,22 @@ html{scroll-behavior:smooth}
   .tool-row > * { width: 100% !important; margin-bottom: 6px; }
 }
 
+/* ==========================================================================
+   [loop 67] ĐỒNG NHẤT TÔNG MÀU — Quick Summary card + toàn bộ card
+   ========================================================================== */
+.quick-summary-card {
+  border: 2px solid var(--gold);
+  background: var(--lacquer);
+}
+.quick-summary-card > div > div > div {
+  background: rgba(212, 175, 55, 0.08) !important;
+  border: 1px solid var(--hairline) !important;
+  color: var(--silk) !important;
+}
+.quick-summary-card > div > div > div > div:first-child {
+  color: var(--gold-bright) !important;
+}
+.quick-summary-card > div > div > div > div:last-child {
+  color: var(--silk) !important;
+}
+
