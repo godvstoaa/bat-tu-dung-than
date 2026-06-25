@@ -1024,7 +1024,7 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
     </div>
     <div class="xlr-input-hint">Âm lịch tháng ${n.input.month}, ngày ${n.input.day}, giờ ${h[n.input.hour]} (chi ${n.input.hour})</div>
     <div class="zr-advice">→ <span class="ln-rate ${a.tone==="CÁT"?"rate-cat":"rate-hung"}">${k(n.luck)}</span> ${k(n.verdict)}</div>
-    <div class="xlr-detail"><b>Luận (${k(n.categoryKey)}):</b> ${k(n.detail)}</div>
+    <div class="xlr-detail"><b>Bản chất cung kết:</b> ${k(a.essence||"")}</div>
     <ul class="zr-reasons">
       <li><b>Sự nghiệp:</b> ${k(a.career)}</li>
       <li><b>Tài lộc:</b> ${k(a.wealth)}</li>
