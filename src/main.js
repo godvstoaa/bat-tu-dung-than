@@ -134,6 +134,7 @@ import { matchBusinessPartners } from './engine/partner-match.js';
 import { findWeddingDates } from './engine/wedding-date.js';
 import { analyzeFamilyHarmony } from './engine/family-fortune.js';
 import { nayinRelations } from './engine/nayin-relation.js';
+import { patternQuality } from './engine/pattern-quality.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1214,6 +1215,24 @@ function renderNayinRelation(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được nạp âm quan hệ.</p>'; }
 }
 
+function renderPatternQuality(R) {
+  const el = $('pattern-quality');
+  if (!el) return;
+  try {
+    const pq = R.patternQuality || patternQuality(R);
+    const QVI = { 成格: '✓ THÀNH CÁCH', 有救: '✓ BẠI CÓ CỨU (败中有成)', 败格: '⚠ BẠI CÁCH', 特殊: '★ CÁCH ĐẶC BIỆT', 未知: '? KHÔNG RÕ' };
+    const QCOLOR = { 成格: '#2e9e5b', 有救: '#2e9e5b', 败格: '#e0533d', 特殊: '#d4af55', 未知: '#caa14a' };
+    const disHtml = (pq.diseases || []).map((d) => `<div class="yz-row" style="border-left:3px solid #e0533d;padding-left:8px;margin:3px 0"><b>病:</b> ${esc(d.note || '')}</div>`).join('');
+    const resHtml = (pq.rescues || []).map((r) => `<div class="yz-row" style="border-left:3px solid #2e9e5b;padding-left:8px;margin:3px 0"><b>药:</b> ${esc(r.note || '')}${r.drug && r.drug.length ? ' (' + esc(r.drug.join(',')) + ')' : ''}</div>`).join('');
+    el.innerHTML = `
+      <p><b style="color:${QCOLOR[pq.quality] || '#caa14a'}">${esc(QVI[pq.quality] || pq.quality)}</b></p>
+      ${disHtml ? `<h4 class="syn-h4" style="margin-top:6px">病 (bệnh cách)</h4>${disHtml}` : ''}
+      ${resHtml ? `<h4 class="syn-h4" style="margin-top:6px">药 (cứu ứng — «败中有成»)</h4>${resHtml}` : ''}
+      <p class="hint">${esc(pq.summary || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được cách cục thành bại.</p>'; }
+}
+
 function renderEventPredict(R) {
   const el = $('event-predict');
   if (!el) return;
@@ -2209,6 +2228,7 @@ function run() {
   lazyRender('children-star',  () => { try { renderChildrenStar(currentResult); } catch (e) { console.warn('childrenstar', e.message); } });
   lazyRender('family-fortune', () => { try { renderFamilyFortune(currentResult); } catch (e) { console.warn('familyfortune', e.message); } });
   lazyRender('nayin-relation', () => { try { renderNayinRelation(currentResult); } catch (e) { console.warn('nayinrel', e.message); } });
+  lazyRender('pattern-quality', () => { try { renderPatternQuality(currentResult); } catch (e) { console.warn('patternquality', e.message); } });
   lazyRender('event-predict',  () => { try { renderEventPredict(currentResult); } catch (e) { console.warn('eventpredict', e.message); } });
   lazyRender('personality-profile', () => { try { renderPersonalityProfile(currentResult); } catch (e) { console.warn('personality', e.message); } });
   lazyRender('mingzhu',         () => { try { renderMingZhu(currentResult); } catch (e) { console.warn('mingzhu', e.message); } });
