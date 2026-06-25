@@ -104,6 +104,9 @@ import { predictEvents } from './engine/event-predict.js';
 import { getPersonalityProfile } from './engine/personality-profile.js';
 import { mingZhuShenZhu } from './engine/mingzhu.js';
 import { dailyPro } from './engine/daily-pro.js';
+import { analyzeFiveVirtues } from './engine/five-aspects.js';
+import { analyzeRomance } from './engine/romance-deep.js';
+import { investmentStyle } from './engine/invest-style.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1185,6 +1188,58 @@ function renderDailyPro(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được lưu nhật chuyên sâu.</p>'; }
 }
 
+function renderFiveAspects(R) {
+  const el = $('five-aspects');
+  if (!el) return;
+  try {
+    const f = analyzeFiveVirtues(R);
+    el.innerHTML = `
+      <p><b>Đức chính: ${esc(f.virtue || '')}</b> <span class="hint">(hành ${esc(f.primaryVi || '')})</span> — ${esc(f.desc || '')}</p>
+      ${f.strong ? `<p class="hint">✓ Mạnh: ${esc(f.strong)}</p>` : ''}
+      ${f.weak ? `<p class="hint">⚠ Nhược: ${esc(f.weak)}</p>` : ''}
+      ${f.kyVirtue ? `<p class="hint">Đức Kỵ: ${esc(f.kyVirtue)}${f.kyWeak ? ' — ' + esc(f.kyWeak) : ''}</p>` : ''}
+      ${f.cultivation ? `<p>🌿 Tu dưỡng: ${esc(f.cultivation)}</p>` : ''}
+      <p class="hint">${esc(f.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được ngũ đức.</p>'; }
+}
+
+function renderRomanceDeep(R) {
+  const el = $('romance-deep');
+  if (!el) return;
+  try {
+    const r = analyzeRomance(R);
+    const profile = (r.profile || []).map((p) => `<p>${esc(p)}</p>`).join('');
+    const warn = (r.warningSigns || []).map((w) => `<p class="hint">⚠ ${esc(w)}</p>`).join('');
+    el.innerHTML = `
+      <p><b>Điểm tình duyên: ${esc(String(r.romanceScore ?? ''))}</b> | Sức phối ngẫu: ${esc(r.spouseStrength || '')} | Cung ${esc(r.palaceStable ? 'yên' : 'bị xung')}</p>
+      ${r.peachBlossom ? `<p class="hint">🌸 Đào hoa: ${esc(r.peachBlossom)}${r.peachPositions ? ' (' + esc(r.peachPositions) + ')' : ''}</p>` : ''}
+      ${r.redAttraction ? `<p class="hint">💋 Hồng diễm: ${esc(r.redAttraction)}${r.redPositions ? ' (' + esc(r.redPositions) + ')' : ''}</p>` : ''}
+      ${profile}
+      ${warn}
+      <p class="hint">${esc(r.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được tình duyên sâu.</p>'; }
+}
+
+function renderInvestStyle(R) {
+  const el = $('invest-style');
+  if (!el) return;
+  try {
+    const inv = investmentStyle(R);
+    const dung = Array.isArray(inv.dungAssets) ? inv.dungAssets.join(', ') : (inv.dungAssets || '');
+    const avoid = Array.isArray(inv.avoidAssets) ? inv.avoidAssets.join(', ') : (inv.avoidAssets || inv.kyAssets && Array.isArray(inv.kyAssets) ? inv.kyAssets.join(', ') : (inv.kyAssets || ''));
+    el.innerHTML = `
+      <p><b>${esc(inv.style || '')}</b> <span class="hint">(${esc(inv.topGodVi || '')}, rủi ro ${esc(String(inv.riskScore ?? ''))}/10${inv.canDayTrade ? ', hợp day-trade' : ''})</span></p>
+      <p class="hint">${esc(inv.investDesc || '')}</p>
+      ${dung ? `<p class="hint">✓ Tài sản hợp Dụng: ${esc(dung)}</p>` : ''}
+      ${avoid ? `<p class="hint">⚠ Tránh: ${esc(avoid)}</p>` : ''}
+      ${inv.timingNote ? `<p class="hint">⏰ ${esc(inv.timingNote)}</p>` : ''}
+      <p class="hint">${esc(inv.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được phong cách đầu tư.</p>'; }
+}
+
 function renderMarriageStars(R) {
   const el = $('marriage-stars');
   if (!el) return;
@@ -1851,6 +1906,9 @@ function run() {
   lazyRender('personality-profile', () => { try { renderPersonalityProfile(currentResult); } catch (e) { console.warn('personality', e.message); } });
   lazyRender('mingzhu',         () => { try { renderMingZhu(currentResult); } catch (e) { console.warn('mingzhu', e.message); } });
   lazyRender('daily-pro',       () => { try { renderDailyPro(currentResult); } catch (e) { console.warn('dailypro', e.message); } });
+  lazyRender('five-aspects',    () => { try { renderFiveAspects(currentResult); } catch (e) { console.warn('fiveaspects', e.message); } });
+  lazyRender('romance-deep',    () => { try { renderRomanceDeep(currentResult); } catch (e) { console.warn('romancedeep', e.message); } });
+  lazyRender('invest-style',    () => { try { renderInvestStyle(currentResult); } catch (e) { console.warn('investstyle', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
