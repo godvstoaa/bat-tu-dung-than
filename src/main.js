@@ -2383,7 +2383,18 @@ function run() {
       : `🕐 ${tt.note}`;
   }
 
-  currentResult = analyze(y, m, d, hh, mm, gender);
+  // [loop 199] defensive: analyze() có thể throw trên ngày biên (lunar-javascript validate
+  //   tháng/ngày) hoặc sau hiệu chỉnh 真太阳时. UI dùng type=date/time (constrained) nên hiếm,
+  //   nhưng bọc try/catch để hiện lỗi thân thiện thay vì crash cả trang.
+  try {
+    currentResult = analyze(y, m, d, hh, mm, gender);
+  } catch (e) {
+    currentResult = null;
+    const res = $('result');
+    if (res) res.innerHTML = '<p class="hint" style="color:var(--cinnabar);padding:16px">⚠ Không tính được lá số cho ' + esc(y + '/' + m + '/' + d + ' ' + hh + ':' + String(mm).padStart(2, '0')) + ': ' + esc(e.message) + '. Thử ngày/giờ khác (có thể do ranh tiết khí hoặc ngoài khoảng hỗ trợ).</p>';
+    if (res) res.scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
   const c = currentResult.chart;
   // Reset lazy-render state (Task 2): mỗi lần run() → có thể render lại tất cả card.
   // disconnect() tháo toàn bộ observer cũ — những card dưới nếp chưa kịp fire sẽ được
