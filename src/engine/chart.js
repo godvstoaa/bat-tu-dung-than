@@ -18,6 +18,7 @@ import { synthesize } from './synthesis.js';
 import { analyzeLiuqin } from './liuqin.js';
 import { buildRemedy } from './remedy.js';
 import { scoreLiunianYear } from './liunian-pro.js'; // [cycle 44] dùng chung score với analyzeLiunianDeep → không mâu thuẫn verdict
+import { analyzeKongwang } from './kongwang.js'; // [loop 148] 空亡 effect on scoring
 export { synthesize };
 
 export { tenGod, changSheng };
@@ -451,6 +452,28 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
 export function analyze(year, month, day, hour, minute, gender, refYear) {
   const chart = buildChart(year, month, day, hour, minute, gender);
   const wx = scoreWuXing(chart);
+  // [loop 148 ELEVATION] 空亡 hiệu ứng — giảm tàng can weight của trụ rơi không vong
+  //   Cổ pháp «空则不实»: chi không vong → tàng can yếu (gốc không vững). Thiên can KHÔNG bị ảnh hưởng.
+  //   Áp dụng SAU scoreWuXing (không đổi interface) → giảm ~50% tàng can đóng góp từ trụ void.
+  let kongwang = null;
+  try {
+    kongwang = analyzeKongwang(chart);
+    if (kongwang && kongwang.affected && kongwang.affected.length) {
+      const voidPillars = new Set(kongwang.affected.map((a) => a.pos));
+      for (const d of wx.detail) {
+        if (d.src && d.src.startsWith('Tàng') && voidPillars.has(d.src.replace('Tàng ', ''))) {
+          const old = d.pts;
+          d.pts = +(old * 0.5).toFixed(3); // 空亡: tàng can giảm 50%
+          wx.score[d.wx] = +(wx.score[d.wx] - old + d.pts).toFixed(3);
+          d.kong = true;
+        }
+      }
+      // recalculate pct
+      const kwTotal = Object.values(wx.score).reduce((a, b) => a + b, 0);
+      wx.total = +kwTotal.toFixed(3);
+      for (const w of WUXING) wx.pct[w] = +((wx.score[w] / kwTotal) * 100).toFixed(1);
+    }
+  } catch (e) { /* kongwang optional */ }
   const strength = analyzeStrength(chart, wx);
   const interactions = detectInteractions(chart.pillars);
   const shensha = computeShensha(chart);
@@ -520,7 +543,7 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   } catch (e) { /* fallback: giữ liunian tầng 5 trường phái */ }
   let synthesis = {};
   try { synthesis = synthesize({ chart, wx, strength, interactions, shensha, pattern, yong, patternQuality: patternQualityResult, dayun }); } catch (e) { synthesis = { paragraphs: [] }; }
-  const full = { chart, wx, strength, interactions, shensha, pattern, yong, dayun, liunian, synthesis, patternQuality: patternQualityResult };
+  const full = { chart, wx, strength, interactions, shensha, pattern, yong, dayun, liunian, synthesis, patternQuality: patternQualityResult, kongwang };
   try { full.liuqin = analyzeLiuqin(full); } catch (e) { full.liuqin = []; }
   try { full.remedy = buildRemedy(full); } catch (e) { full.remedy = { twelveLaws: [] }; }
   return full;
