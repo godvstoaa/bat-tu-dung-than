@@ -40,6 +40,7 @@ import { liurenPan } from './engine/liuren.js';
 import { jinkoujue, renderJinkoujueCard } from './engine/jinkoujue.js';
 import { taiyi } from './engine/taiyi.js';
 import { analyzeKongwang } from './engine/kongwang.js';
+import { scanSuiyun } from './engine/suiyun.js'; // [loop 165] Tuế Vận Tịnh Lâm card — lưu niên × đại vận interaction
 import { analyzePillarAges } from './engine/pillar-age.js';
 import { spaceFs } from './engine/space-fs.js';
 import { MOUNTAINS_24, sittingDirectionAnalysis, yinzhaiOverview, mountainInfo } from './engine/yinzhai.js';
@@ -2457,6 +2458,7 @@ function run() {
   // dung div bên trong đều nằm trong 1 .card nên lazyRender lấy closest('.card') OK.
   lazyRender('pillarage-out',  () => { try { renderPillarAge(); } catch (e) { console.warn('pillarAge', e.message); } });
   lazyRender('kongwang-out',   () => { try { renderKongwang(); } catch (e) { console.warn('kongwang', e.message); } });
+  lazyRender('suiyun-out',     () => { try { renderSuiyun(); } catch (e) { console.warn('suiyun', e.message); } });
   lazyRender('csdeep-out',     () => { try { renderChangshengDeep(); } catch (e) { console.warn('csDeep', e.message); } });
   // renderMarriageDeep() đã gọi ở block immediate (line ~1313) — KHÔNG bọc lại.
   lazyRender('match-out',      () => { try { renderIdealMatch(); } catch (e) { console.warn('idealMatch', e.message); } });
@@ -4017,6 +4019,49 @@ function renderKongwang() {
       ).join('') + '</ul></div>'
     : '<p class="hint">Trong cửa sổ 10 năm tới không có lưu niên/đại vận mang chi «' + kw.kong.join('/') + '» (hoặc 冲 chi đó) — cung «treo» vẫn chưa tới lúc «xuất không».</p>';
   el.innerHTML = '<div class="kw-note"><b>空亡 (' + kw.kong.join(', ') + ')</b> — ' + kw.note + '</div><ul class="zr-reasons">' + kw.affected.map((a) => '<li><b>' + a.palace + '</b>: ' + a.note + '</li>').join('') + '</ul>' + timelineHtml + (kw.tips.length ? '<p class="hint">' + kw.tips.join(' ') + '</p>' : '');
+}
+
+// ---------------------------------------------------------------- TUẾ VẬN TỊNH LÂM 岁运并临 (lưu niên × đại vận)
+function renderSuiyun() {
+  if (!currentResult) return;
+  const R = currentResult;
+  const el = document.getElementById('suiyun-out');
+  if (!el) return;
+  const age = (new Date().getFullYear() - R.chart.input.year);
+  const out = scanSuiyun(R.chart, R.dayun, R.liunian, age);
+  if (!out || !out.activeDayun) { el.innerHTML = '<p class="hint">Không xác định được đại vận đang hành.</p>'; return; }
+  // [loop 165] Phân loại «hướng» từng năm: cát (hòa/hợp/đồng khí Dụng) vs hung (xung/并临 Kỵ).
+  const curYear = new Date().getFullYear();
+  const fav = new Set([R.yong.primary, R.yong.xi].filter(Boolean));
+  const rows = (out.specialYears || []).map((s) => {
+    const lnGan = s.liunianGanZhi[0], lnZhi = s.liunianGanZhi[1];
+    const ganFav = fav.has(GAN[lnGan] ? GAN[lnGan].wx : '');
+    const zhiFav = fav.has(ZHI[lnZhi] ? ZHI[lnZhi].wx : '');
+    const isXung = /XUNG|xung/i.test(s.note);
+    const isBinglin = s.type === '并临';
+    // hung: xung đại vận, hoặc 并临 mà năm KHÔNG mang Dụng/Hỷ (Kỵ amplified); cát: hợp/hòa hoặc Dụng-bearing
+    let tone;
+    if (isXung) tone = 'hung';
+    else if (isBinglin) tone = (ganFav || zhiFav) ? 'cat' : 'hung';
+    else if (ganFav || zhiFav) tone = 'cat';
+    else tone = 'mid';
+    return { ...s, tone, ganFav, zhiFav, isPast: s.year < curYear, isNow: s.year === curYear };
+  });
+  // sort: 并临 đầu, rồi theo severity, rồi năm
+  rows.sort((a, b) => {
+    if (a.isBinglin !== b.isBinglin) return (b.type === '并临' ? 1 : 0) - (a.type === '并临' ? 1 : 0);
+    return b.severity - a.severity || a.year - b.year;
+  });
+  const toneCls = { cat: 'rate-cat', hung: 'rate-hung', mid: 'rate-mid' };
+  const toneVi = { cat: 'Cát', hung: 'Hung', mid: 'Trung' };
+  const head = '<div class="kw-tl-head">🎯 Đại vận đang hành <b class="zh">' + out.activeDayun.ganZhi + '</b> (' + out.activeDayun.from + '–' + out.activeDayun.to + ' tuổi) — các lưu niên «kép»:</div>';
+  const body = rows.length
+    ? '<ul class="kw-tl">' + rows.map((r) => {
+        const tag = r.type === '并临' ? '<span class="geju-ji">⚡ 岁运并临</span>' : r.tone === 'cat' ? '<span class="geju-xi">cát</span>' : r.tone === 'hung' ? '<span class="geju-ji">hung</span>' : '<span class="geju-xi">·</span>';
+        return '<li class="sy-' + r.tone + '"><b>' + r.year + (r.isNow ? ' ★' : '') + (r.isPast ? ' <span class="hint">(đã qua)</span>' : '') + '</b> <span class="zh">' + r.liunianGanZhi + '</span> <span class="ln-rate ' + toneCls[r.tone] + '">' + toneVi[r.tone] + '</span> ' + tag + '<div class="hint">' + esc(r.note) + '</div></li>';
+      }).join('') + '</ul>'
+    : '<p class="hint">Trong đại vận này không có lưu niên nào trùng/xung/hợp đại vận một cách nổi bật — thập niên tương đối «đều».</p>';
+  el.innerHTML = head + body + '<p class="hint">Cổ ngữ «岁运并临, 不死自己死他人» — năm lưu niên TRÙNG ĐỨNG đại vận (cùng干支) là năm cực trọng, lực nhân đôi (Dụng → đỉnh cát / Kỵ → hung mạnh). Năm XUNG đại vận = biến động lớn.</p>';
 }
 
 // ---------------------------------------------------------------- THẬP NHỊ TRƯỜNG SINH SÂU

@@ -406,6 +406,10 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .kw-tl .geju-xi { color: #6dd49a; font-weight: 600; font-size: 11px; }
 .kw-tl .geju-ji { color: #f0a99c; font-weight: 600; font-size: 11px; }
 .kw-tl .hint { color: var(--silk-muted, var(--muted)); font-size: 11px; }
+/* [loop 165] Tuế Vận Tịnh Lâm — tone-coded year rows */
+.kw-tl li.sy-cat { border-left-color: #2e9e5b; }
+.kw-tl li.sy-hung { border-left-color: #e0533d; }
+.kw-tl li.sy-mid { border-left-color: var(--gold); }
 .zr-advice { font-size: 13.5px; color: var(--gold-bright); background: rgba(212,175,55,0.08); border-left: 3px solid var(--cinnabar); padding: 9px 13px; border-radius: 0 4px 4px 0; margin-top: 8px; }
 .zr-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 7px; }
 .zr-item { background: rgba(0,0,0,0.28); border: 1px solid rgba(212, 175, 55, 0.12); border-radius: 4px; padding: 7px 10px; font-size: 12.5px; transition: transform .2s var(--ease-out), border-color .2s; }
