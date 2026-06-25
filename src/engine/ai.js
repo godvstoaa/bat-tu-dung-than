@@ -9,6 +9,7 @@ import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { composeAnswer } from './nlg.js';
 import { DITIANSUI } from './kb.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
+import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
 import { nayinInfo } from './nayin.js';
