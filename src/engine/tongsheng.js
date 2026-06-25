@@ -58,26 +58,27 @@ export function tongshengDay(year, month, day, userZhi) {
   // Xung tuổi cá nhân
   const chongYear = userZhi ? (CHONG[dZhi] === userZhi) : false;
 
-  let advice;
-  if (bigBad) advice = `⚠ ${bigBad} — ĐẠI HUNG, “chư sự bất nghi”: tránh việc lớn (cưới/khai trương/dọn nhà/động thổ/ký kết).`;
-  else if (OFFICER_ROAD[officer] === 'yellow') advice = `Trực ${OFFICER_VI[officer]} (hoàng đạo) — nền cát; làm các việc trong “宜” thuận, tránh việc trong “忌”.`;
-  else advice = `Trực ${OFFICER_VI[officer]} (hắc đạo) — nên hạn chế việc lớn; chỉ làm việc trong “宜”, tránh “忌”.`;
-  if (chongYear) advice += ` ⚠ Ngày xung tuổi bạn (${ZHI[userZhi]?.vi || userZhi}) — cá nhân càng cẩn trọng.`;
-
-  // 通胜 宜忌 THẬT (từ thư viện — factoring all 神煞, not just officers)
+  // [loop 65 sửa] road/hoàng-hắc đạo ưu tiên THIÊN THẦN (12 青龙/明堂/...) thay vì
+  //   OFFICER_ROAD (建除 folk mnemonic — thường mâu thuẫn天神). 天神 đã tính ở line 75.
   const tsYi = lunar.getDayYi ? (lunar.getDayYi() || []) : [];
   const tsJi = lunar.getDayJi ? (lunar.getDayJi() || []) : [];
   const tianShen = lunar.getDayTianShen ? lunar.getDayTianShen() : '';
   const caiShenDir = lunar.getDayPositionCaiDesc ? lunar.getDayPositionCaiDesc() : '';
   const xiShenDir = lunar.getDayPositionXiDesc ? lunar.getDayPositionXiDesc() : '';
-  // 12 thiên thần hoàng/hắc đạo
   const HUANG_TIANSHEN = ['青龙','明堂','金匮','天德','玉堂','司命'];
   const tianShenRoad = HUANG_TIANSHEN.includes(tianShen) ? 'yellow' : (tianShen ? 'black' : '');
+  const road = tianShenRoad || OFFICER_ROAD[officer]; // ưu tiên 天神, fallback officer
+
+  let advice;
+  if (bigBad) advice = `⚠ ${bigBad} — ĐẠI HUNG, “chư sự bất nghi”: tránh việc lớn (cưới/khai trương/dọn nhà/động thổ/ký kết).`;
+  else if (road === 'yellow') advice = `Trực ${OFFICER_VI[officer]} · 天神 ${tianShen} (HOÀNG ĐẠO) — nền cát; làm các việc trong “宜” thuận.`;
+  else advice = `Trực ${OFFICER_VI[officer]} · 天神 ${tianShen} (HẮC ĐẠO) — nên hạn chế việc lớn; chỉ làm việc trong “宜”.`;
+  if (chongYear) advice += ` ⚠ Ngày xung tuổi bạn (${ZHI[userZhi]?.vi || userZhi}) — cá nhân càng cẩn trọng.`;
 
   return {
     solar: solar.toYmd(), lunar: `${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`,
     dayGanZhi: lunar.getDayGan() + dZhi, officer, officerVi: OFFICER_VI[officer],
-    road: OFFICER_ROAD[officer], yi: yiji.yi, ji: yiji.ji, bigBad, chongYear,
+    road, yi: yiji.yi, ji: yiji.ji, bigBad, chongYear,
     tsYi, tsJi, tianShen, tianShenRoad, caiShenDir, xiShenDir,
     advice,
   };
