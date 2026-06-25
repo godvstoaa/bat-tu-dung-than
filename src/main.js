@@ -1176,7 +1176,22 @@ function renderPillarQuality(R) {
   if (!el) return;
   try {
     const pq = analyzePillarQuality(R);
-    el.innerHTML = `<p>${pq.summary}</p>`;
+    // [loop 190] hiển thị chi tiết 盖头/截脚 từng trụ (trước đây chỉ show summary)
+    const POS = [['year', 'Niên'], ['month', 'Nguyệt'], ['day', 'Nhật'], ['time', 'Thời']];
+    const rows = POS.map(([k, vi]) => {
+      const p = pq.perPillar && pq.perPillar[k];
+      if (!p) return '';
+      const cls = p.damaged ? 'rate-hung' : 'rate-cat';
+      const flag = p.damaged ? `<span class="ln-rate ${cls}">${esc(p.vi || p.type || '')}</span>` : `<span class="ln-rate rate-mid">thuận</span>`;
+      return `<div class="yz-row" style="margin:3px 0;padding-left:8px;border-left:3px solid ${p.damaged ? 'var(--cinnabar)' : 'var(--jade)'}">
+        <b>${vi}</b> <span class="zh">${esc(p.ganZhi || '')}</span> ${flag}
+        ${p.impact ? `<div class="hint">${esc(p.impact)}</div>` : ''}</div>`;
+    }).join('');
+    const headline = pq.gaijieCount > 0
+      ? `<p class="hint">⚠ <b>${pq.gaijieCount}/4 trụ</b> bị 盖头/截脚 (can-chi khắc trong cùng trụ) — ${pq.flowOk ? 'nhưng khí VẪN THÔNG (có hóa giải)' : 'khí KHÔNG THÔNG, đời nhiều trở ngại'}.</p>`
+      : `<p class="hint">✓ Không trụ nào bị 盖头/截脚 — can-chi 4 trụ đều thuận, khí thông.</p>`;
+    const shenHtml = pq.dayShenVi ? `<p class="hint">📊 Nhật trụ ${esc(pq.dayShenVi)} (12-trường-sinh: giai đoạn sinh khí của bản mệnh).</p>` : '';
+    el.innerHTML = `${headline}${rows}${shenHtml}<p class="hint" style="margin-top:4px">${esc(pq.summary || '')}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được chất lượng trụ.</p>'; }
 }
 
