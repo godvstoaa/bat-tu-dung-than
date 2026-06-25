@@ -5168,6 +5168,15 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(_HD['丑'].includes('辛'), '丑=金库(辛)');
   assert(_HD['未'].includes('乙'), '未=木库(乙)');
   console.log(`   HIDDEN 12/12 ✓ | 4库 stored ✓ | locked`);
+
+  // [loop 137] CLIMATE + SHENG + KE tables regression
+  const { CLIMATE: _CL, SHENG: _SG, KE: _K2 } = await import('./src/engine/constants.js');
+  assert(_CL['寅']?.season === 'Xuân' && _CL['巳']?.season === 'Hạ' && _CL['申']?.season === 'Thu' && _CL['亥']?.season === 'Đông', 'CLIMATE 4 mùa đúng (Xuân/Hạ/Thu/Đông)');
+  assert(_SG['木'] === '火' && _SG['火'] === '土' && _SG['土'] === '金' && _SG['金'] === '水' && _SG['水'] === '木', 'SHENG ngũ hành sinh đúng (木→火→土→金→水→木)');
+  assert(_K2['木'] === '土' && _K2['火'] === '金' && _K2['土'] === '水' && _K2['金'] === '木' && _K2['水'] === '火', 'KE ngũ hành khắc đúng (木→土→水→火→金→木)');
+  let _clM = 0; for (const z of ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑']) if (!_CL[z]?.season) _clM++;
+  assert(_clM === 0, `CLIMATE đủ 12/12 (thiếu ${_clM})`);
+  console.log(`   CLIMATE 12/12 ✓ | SHENG ✓ | KE ✓ | locked`);
 }
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
