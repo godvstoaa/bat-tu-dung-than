@@ -3976,11 +3976,47 @@ function renderPillarAge() {
 // ---------------------------------------------------------------- KHÔNG VONG
 function renderKongwang() {
   if (!currentResult) return;
-  const kw = analyzeKongwang(currentResult.chart);
+  const R = currentResult;
+  const kw = analyzeKongwang(R.chart);
   const el = document.getElementById('kongwang-out');
   if (!el) return;
   if (!kw.affected.length) { el.innerHTML = '<p class="hint">Không trụ nào rơi không vong — lá số không bị "treo".</p>'; return; }
-  el.innerHTML = '<div class="kw-note"><b>空亡 (' + kw.kong.join(', ') + ')</b> — ' + kw.note + '</div><ul class="zr-reasons">' + kw.affected.map((a) => '<li><b>' + a.palace + '</b>: ' + a.note + '</li>').join('') + '</ul>' + (kw.tips.length ? '<p class="hint">' + kw.tips.join(' ') + '</p>' : '');
+  // [loop 163 ELEVATION] Lịch kích hoạt 空亡 — quét 流年 (10 năm tới) & 大运 thực tế của
+  //   mệnh chủ để chỉ ra CHÍNH XÁC năm nào cung bị «treo» sẽ «xuất không»/«冲空» → sự kiện phát.
+  //   Trước đây thẻ chỉ nói «đợi vận đến» chung chung; nay cho ngày giờ cụ thể.
+  const CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
+  const curYear = new Date().getFullYear();
+  const liunian = (R.liunian || []).filter((l) => l.year >= curYear - 1); // cửa sổ ~10 năm quanh hiện tại
+  const dayun = R.dayun || [];
+  const kongSet = new Set(kw.kong);
+  // Với mỗi void chi, gom các mốc 出空/冲空
+  const rows = [];
+  for (const kc of kw.kong) {
+    const chongChi = CHONG[kc];
+    // 流年
+    for (const l of liunian) {
+      if (l.zhi === kc) rows.push({ chi: kc, type: '出空', scope: `Lưu niên ${l.year}`, gz: l.ganZhi, rating: l.rating, isNow: l.isNow, tag: '⚡ cung «treo» NĂM NAY BẬT' });
+      else if (chongChi && l.zhi === chongChi) rows.push({ chi: kc, type: '冲空', scope: `Lưu niên ${l.year}`, gz: l.ganZhi, rating: l.rating, isNow: l.isNow, tag: '💥 sự kiện ĐỘT NGỘT' });
+    }
+    // 大运 (thập niên)
+    for (const d of dayun) {
+      if (!d.ganZhi) continue;
+      if (d.zhi === kc) rows.push({ chi: kc, type: '出空 (đại vận)', scope: `Đại vận ${d.startAge}t (${d.startYear})`, gz: d.ganZhi, rating: d.rating, isNow: false, tag: '⚡ cả THẬP NIÊN cung bật' });
+      else if (chongChi && d.zhi === chongChi) rows.push({ chi: kc, type: '冲空 (đại vận)', scope: `Đại vận ${d.startAge}t (${d.startYear})`, gz: d.ganZhi, rating: d.rating, isNow: false, tag: '💥 thập niên biến động' });
+    }
+  }
+  rows.sort((a, b) => {
+    const ya = parseInt((a.scope.match(/\d{4}/) || [0])[0], 10);
+    const yb = parseInt((b.scope.match(/\d{4}/) || [0])[0], 10);
+    return (ya || 9999) - (yb || 9999);
+  });
+  const typeCls = (t) => t.startsWith('出空') ? 'geju-xi' : 'geju-ji';
+  const timelineHtml = rows.length
+    ? '<div class="kw-timeline"><div class="kw-tl-head">📅 Lịch kích hoạt (khi cung «treo» thành «thực»):</div><ul class="kw-tl">' + rows.map((r) =>
+        '<li><span class="kw-chi zh">' + r.chi + '</span> <span class="' + typeCls(r.type) + '">' + r.type + '</span> <b>' + r.scope + '</b> <span class="zh">' + r.gz + '</span> <span class="ln-rate ' + rateClass(r.rating) + '">' + (r.rating || '—') + '</span>' + (r.tag ? ' <span class="hint">' + r.tag + '</span>' : '') + '</li>'
+      ).join('') + '</ul></div>'
+    : '<p class="hint">Trong cửa sổ 10 năm tới không có lưu niên/đại vận mang chi «' + kw.kong.join('/') + '» (hoặc 冲 chi đó) — cung «treo» vẫn chưa tới lúc «xuất không».</p>';
+  el.innerHTML = '<div class="kw-note"><b>空亡 (' + kw.kong.join(', ') + ')</b> — ' + kw.note + '</div><ul class="zr-reasons">' + kw.affected.map((a) => '<li><b>' + a.palace + '</b>: ' + a.note + '</li>').join('') + '</ul>' + timelineHtml + (kw.tips.length ? '<p class="hint">' + kw.tips.join(' ') + '</p>' : '');
 }
 
 // ---------------------------------------------------------------- THẬP NHỊ TRƯỜNG SINH SÂU
