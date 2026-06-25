@@ -81,6 +81,14 @@ export function synthesize(R) {
   const catHit = catStars.filter((k) => shensha && shensha[k]);
   if (catHit.length >= 2) { score += 3; factors.push(`Nhiều cát tinh (${catHit.join(', ')}) phù trợ, +3.`); }
 
+  // [loop 150] KHÔNG VONG penalty — trụ rơi旬空 = sao/Dụng ở đó «treo» → trừ điểm
+  const kw = R.kongwang;
+  if (kw && kw.affected && kw.affected.length) {
+    const penalty = -2 * kw.affected.length;
+    score += penalty;
+    factors.push(`Không vong (空亡): ${kw.affected.length} trụ rơi旬空 (${kw.affected.map((a) => a.pos).join('/')}) → tàng can «treo» («空则不实»), ${penalty}.`);
+  }
+
   score = Math.max(0, Math.min(100, Math.round(score)));
 
   // --- Đẳng cấp ---
