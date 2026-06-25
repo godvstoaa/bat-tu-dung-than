@@ -280,7 +280,7 @@ function geStarCombined(chart, pattern) {
 // --------------------------------------------------------------------------
 //  Xét một quy tắc bại (bai entry) cho cách: trả về {hit, detail} hoặc null.
 // --------------------------------------------------------------------------
-function evalBai(rule, groups, chart, pattern, ge) {
+function evalBai(rule, groups, chart, pattern, ge, interactions) {
   const via = rule.via;
   // 1.Ke/clash/mix/dang/duo/xoroot → dựa vào nhóm killer hiện diện
   if (['ke', 'mix', 'dang', 'duo', 'xoroot'].includes(via)) {
@@ -297,9 +297,12 @@ function evalBai(rule, groups, chart, pattern, ge) {
     return { hit: true, via, killers: present, god: rule.god || null, note: rule.note };
   }
   // 2. chong → nguyệt chi hoặc chi cung cách bị xung/hình/hại
+  //   [loop 72 sửa bug CAO] trước đây `chart.interactions` — nhưng R.chart KHÔNG có field
+  //   này (interactions là trường riêng của R, destructured ở patternQuality dòng 343).
+  //   → ix luôn {} → detection 正官格 "官逢刑冲破害" 败 là DEAD CODE. Nay truyền interactions vào.
   if (via === 'chong') {
     const monthZhi = chart.monthZhi;
-    const ix = chart.interactions || {};
+    const ix = interactions || {};
     const hit = (ix.chong || []).some((c) => c.a === monthZhi || c.b === monthZhi)
              || (ix.xing || []).some((c) => c.a === monthZhi || c.b === monthZhi)
              || (ix.hai || []).some((c) => c.a === monthZhi || c.b === monthZhi);
@@ -382,7 +385,7 @@ export function patternQuality(R) {
 
   // ----- Lớp 2: quy tắc bại đặc trưng của từng cách -----
   for (const rule of rules.bai) {
-    const d = evalBai(rule, groups, chart, pattern, ge);
+    const d = evalBai(rule, groups, chart, pattern, ge, interactions);
     if (d && d.hit) {
       broken = true;
       diseases.push(d);

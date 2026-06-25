@@ -291,7 +291,13 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     const fuyiPrimary = primary;
     primary = tiaoPrimaryWx;                                  // 调候 lên làm chủ
     if (fuyiPrimary !== primary && fuyiPrimary !== secondary) secondary = fuyiPrimary; // Phù Ức giáng secondary
-    avoid = avoid.filter((w) => w !== tiaoPrimaryWx);          // gỡ 调候 khỏi Kỵ (nay là Dụng)
+    // [loop 72 sửa bug] recompute avoid cho primary MỚI. Trước đây chỉ filter bỏ tiaoPrimaryWx
+    //   → avoid (group-based kỵ CŨ) mâu thuẫn ji/chou mới (tính dòng 301-302) → sai hehun/
+    //   ideal-match/NLG (yong.avoid.includes) cho chart 调候 override. Nay: gỡ Dụng/Hỷ mới,
+    //   thêm Kỵ/Thù mới (ji=克 Dụng, chou=sinh Kỵ) → avoid nhất quán với ji/chou.
+    const _newXi = SHENG_BY[primary], _newJi = KE_BY[primary], _newChou = SHENG_BY[_newJi];
+    avoid = avoid.filter((w) => w !== primary && w !== _newXi);   // gỡ Dụng + Hỷ mới khỏi Kỵ
+    for (const w of [_newJi, _newChou]) if (w && !avoid.includes(w)) avoid.push(w); // thêm Kỵ + Thù mới
     method.push('Điều Hậu (调候) — khí hậu thiên lệch, LÀM CHỦ (override Phù Ức)');
     reasons.push(`🔥 Điều Hậu (调候) OVERRIDE: sinh tháng ${chart.monthZhi} (${clim ? clim.climate : 'khí hậu thiên lệch'}) — 窮通寶鑑 bắt buộc lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) ${clim ? clim.need : ''} làm Dụng Thần CHÍNH, đè Phù Ức (${fuyiPrimary}). Mệnh hàn/nóng quá nặng thì điều hòa khí hậu ưu tiên hơn cân bằng vượng suy.`);
   }

@@ -1901,10 +1901,9 @@ console.log(`   user: Tài kích hoạt 2028(戊)/2029(己) | Quan kích hoạt 
 import { strength3Fa } from './src/engine/strength-3fa.js';
 console.log('\n################## 47. WHY VƯỢNG SUY 得令得地得势 ##################');
 const s3 = strength3Fa(spR);
-// user 乙木 戌月: 得令✗ (木 in 土月), 得地✗ (căn 0.3 < 1), 得势✗ (tỷ 0.5 < 1.5)
-assert(s3.deLenh === false, 'user 乙木 戌(土)月 → KHÔNG 得令');
+// user 乙木 戌月: 得令✗ (木 in 土月), 得地✗ (căn 0.3 < 1), 得势✗ (tỷ lộ 0 < 1.5)assert(s3.deLenh === false, 'user 乙木 戌(土)月 → KHÔNG 得令');
 assert(s3.deDia === false && s3.root < 1, '得地✗ (căn chỉ 0.3)');
-assert(s3.deShi === false && s3.biCount < 1.5, '得势✗ (tỷ 0.5)');
+assert(s3.deShi === false && s3.biCount < 1.5, '得势✗ (tỷ lộ 0 — [loop 72] 得势 chỉ đếm thiên can lộ, không trùng tàng của 得地)');
 assert(s3.count === 0, '0/3 pháp → nhược theo 3 pháp');
 // nhưng chart.js strong + Ấn(Thủy) vượng → «mạnh do Ấn»
 assert(s3.yinWx === '水' && s3.yinRoot >= 1.5, 'Ấn(Thủy) vượng (căn ≥1.5) → mạnh do Ấn');
@@ -4490,6 +4489,72 @@ console.log('\n################## U. [loop 71] double-count xung + chart-level g
 
   console.log(`   double-count xung Nhật Chi: -24→-14 ✓ | dayZhi=yearBirthZhi: -30→-16 ✓ | 天克地冲 -18 còn nguyên ✓`);
   console.log(`   chart-level guard: wx/pct rỗng → "unknown" + 配合流通 không pass sai ✓`);
+}
+
+// ################## V. [loop 72] 正官格 败 chong detection (dead-code fix) + 得势 cổ pháp ##################
+import { patternQuality as _pq } from './src/engine/pattern-quality.js';
+import { strength3Fa as _s3fa } from './src/engine/strength-3fa.js';
+console.log('\n################## V. [loop 72] 正官格败(chong) fix + 得势 cổ pháp ##################');
+{
+  // V1. [HIGH] evalBai via:'chong' — trước đây chart.interactions={} (dead code) → KHÔNG BAO GIỜ
+  //   phát hiện 正官格 "官逢刑冲破害" 败. Nay truyền interactions → scan thấy disease via:'chong'.
+  //   Scan nhiều lá số thực: trước fix count=0, sau fix phải >0.
+  let _chongDiseaseCount = 0, _sample = 0;
+  for (let _y = 1985; _y <= 2005 && _sample < 60; _y++) {
+    for (const _m of [3, 6, 9, 12]) {
+      for (const _d of [5, 18, 27]) {
+        let _R; try { _R = analyze(_y, _m, _d, 8, 0, 'nam', 2026); } catch (e) { continue; }
+        _sample++;
+        try {
+          const _q = _pq(_R);
+          if ((_q.diseases || []).some((dd) => dd.via === 'chong')) _chongDiseaseCount++;
+        } catch (e) {}
+      }
+    }
+  }
+  assert(_chongDiseaseCount > 0, `[fix] patternQuality phát hiện ≥1 disease via:'chong' (正官格 刑冲破害 败) qua ${_sample} lá — trước fix = 0 (dead code)`);
+  console.log(`   正官格 刑冲破害 败 detection: ${_chongDiseaseCount}/${_sample} lá có disease via:'chong' → dead code đã sống ✓`);
+
+  // V2. [MED] 得势 cổ pháp — chỉ đếm THIÊN CAN LỘ (không trùng tàng của 得地).
+  //   2 can tỷ lộ (甲/甲) → 得势 ✓; tàng can tỷ KHÔNG còn boosting biCount (chống double-count).
+  const _s3pos = _s3fa({ chart: { dayMaster:{wx:'木'}, pillars: {
+    year:{gan:'甲',zhi:'子'}, month:{gan:'丙',zhi:'午'}, day:{gan:'乙',zhi:'子'}, time:{gan:'甲',zhi:'午'},
+  }}, strength:{ monthMainWx:'火' } });
+  assert(_s3pos.deShi === true && _s3pos.biCount === 2, '2 can tỷ lộ (甲/甲) → 得势 ✓ (biCount=2, đúng «干透比劫»)');
+
+  const _s3pos2 = _s3fa({ chart: { dayMaster:{wx:'木'}, pillars: {
+    year:{gan:'甲',zhi:'子'}, month:{gan:'丙',zhi:'午'}, day:{gan:'乙',zhi:'子'}, time:{gan:'甲',zhi:'午'},
+  }}, strength:{ monthMainWx:'火' } });
+  assert(_s3pos2.biCount === 2, '[fix] biCount chỉ từ lộ =2 (tàng KHÔNG cộng — chống double-count 得地)');
+
+  // V3. 得势 ✗ khi chỉ có tàng tỷ (không lộ) — tàng thuộc 得地, không đẩy 得势 ảo.
+  //   寅 tàng 甲(Mộc) nhưng KHÔNG lộ → biCount=0, 得势 ✗ (tàng thuộc 得地).
+  const _s3noto = _s3fa({ chart: { dayMaster:{wx:'木'}, pillars: {
+    year:{gan:'丙',zhi:'寅'}, month:{gan:'丁',zhi:'午'}, day:{gan:'乙',zhi:'寅'}, time:{gan:'庚',zhi:'申'},
+  }}, strength:{ monthMainWx:'火' } });
+  assert(_s3noto.deShi === false && _s3noto.biCount === 0, 'không can tỷ lộ (甲 chỉ tàng trong 寅) → 得势 ✗ (tàng là 得地, không tính 得势)');
+  console.log(`   得势 cổ pháp: 2 lộ→✓ biCount=2, tàng không boost (chống double-count 得地), chỉ-tàng→✗ ✓`);
+
+  // V4. [MED] avoid nhất quán sau 调候 override. Trước đây avoid (kỵ CŨ) không recompute cho
+  //   primary MỚI → có thể chứa Hỷ, thiếu Kỵ → sai hehun/ideal-match/NLG. Nay avoid chứa ji/chou,
+  //   KHÔNG chứa primary/xi. Scan chart 调候 override (tháng cực đoan 亥子丑/巳午未).
+  let _ovCount = 0;
+  for (let _y = 1985; _y <= 2002 && _ovCount < 8; _y++) {
+    for (const _m of [1, 6, 7, 11, 12]) { // tháng extreme (hàn/nhiệt)
+      for (const _d of [8, 22]) {
+        let _R; try { _R = analyze(_y, _m, _d, 10, 0, 'nam', 2026); } catch (e) { continue; }
+        if (!_R.yong?.tiaohou?.override) continue;
+        _ovCount++;
+        const { primary, xi, ji, chou, avoid } = _R.yong;
+        assert(!avoid.includes(primary), `[fix] avoid KHÔNG chứa Dụng ${primary} (chart ${_y}-${_m} override)`);
+        assert(!avoid.includes(xi), `[fix] avoid KHÔNG chứa Hỷ ${xi} (chart ${_y}-${_m} override)`);
+        assert(avoid.includes(ji), `[fix] avoid CHỨA Kỵ ${ji} = 克 Dụng (chart ${_y}-${_m} override)`);
+        assert(avoid.includes(chou), `[fix] avoid CHỨA Thù ${chou} = sinh Kỵ (chart ${_y}-${_m} override)`);
+      }
+    }
+  }
+  assert(_ovCount > 0, `scan thấy ≥1 chart 调候 override để test avoid (được ${_ovCount})`);
+  console.log(`   avoid sau 调候 override: ${_ovCount} chart test — avoid chứa Kỵ/Thù, KHÔNG chứa Dụng/Hỷ ✓`);
 }
 
 console.log('\n' + '='.repeat(70));

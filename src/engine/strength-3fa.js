@@ -30,14 +30,16 @@ export function strength3Fa(R) {
   const root = tongGen(R.chart, dmWx);
   const deDia = root.total >= 1.0; // có căn đáng kể
 
-  // 3) 得势: đếm Tỷ Kiếp (cùng hành) ở 3 thiên can phi nhật + tàng can
+  // 3) 得势: «干透比劫» — đếm THIÊN CAN Tỷ/Kiếp LỘ (cùng hành) ngoài Nhật Can.
+  //   [loop 72 sửa double-count] trước đây cũng cộng tàng can (+0.5) → trùng 得地 (tongGen
+  //   đã đếm tàng dmWx). Cổ法 (渊海子平) phân biệt: 得地 = thông căn (tàng, đo ĐỘ SÂU rễ);
+  //   得势 = thiên can tỷ KIẾP LỘ (đo SỐ LƯỢNG đồng minh lộ). Tàng thuộc 得地, không thuộc 得势.
   let biCount = 0;
   for (const k of ['year', 'month', 'day', 'time']) {
     const p = pillars[k];
-    if (k !== 'day' && GAN[p.gan].wx === dmWx) biCount += 1; // thiên can tỷ
-    (p.hidden || []).forEach((h) => { if (GAN[h.gan].wx === dmWx) biCount += 0.5; }); // tàng tỷ (nửa sức)
+    if (k !== 'day' && GAN[p.gan].wx === dmWx) biCount += 1; // thiên can tỷ lộ
   }
-  const deShi = biCount >= 1.5;
+  const deShi = biCount >= 1.5; // ≥2 can tỷ lộ = «党众多» (đắc thế rõ)
 
   const count = [deLenh, deDia, deShi].filter(Boolean).length;
 
