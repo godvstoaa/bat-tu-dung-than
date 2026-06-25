@@ -373,11 +373,14 @@ export function computeDaYun(year, month, day, hour, minute, gender, yong) {
     if (!gz) continue;
     const gan = gz[0], zhi = gz[1];
     const ganWx = GAN[gan].wx, zhiWx = ZHI[zhi].wx;
+    // [loop 164 ELEVATION] 大运重地支，流年重天干 (子平 cổ quyết, verified).
+    //   Chi mang 月令 vượng suy → chủ đạo基调 10 năm (±2); Can chỉ «động/biểu hiện» phụ (±1).
+    //   Trước đây ngược (Can ±2, Chi ±1) → sai nguyên lý. Đảo trọng số.
     let score = 0;
-    if (favSet.has(ganWx)) score += 2;
-    if (avoidSet.has(ganWx)) score -= 2;
-    if (favSet.has(zhiWx)) score += 1;
-    if (avoidSet.has(zhiWx)) score -= 1;
+    if (favSet.has(zhiWx)) score += 2;
+    if (avoidSet.has(zhiWx)) score -= 2;
+    if (favSet.has(ganWx)) score += 1;
+    if (avoidSet.has(ganWx)) score -= 1;
     let rating;
     if (score >= 2) rating = 'Cát';
     else if (score >= 1) rating = 'Hơi thuận';
