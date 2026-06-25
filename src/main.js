@@ -857,8 +857,26 @@ function renderTongGen(R) {
     const tg = analyzeTongGen(R);
     const d = tg.dung;
     const tone = d.verdict === '有力' ? 'cat' : (d.verdict === '虚浮' || d.verdict === '虚') ? 'hung' : 'mid';
+    // [loop 108 elevate] 敌我力量 bar — Dụng/Hỷ (ally) vs Kỵ/Thù (enemy), core 命局 tension
+    const yong = R.yong || {};
+    const sc = R.wx.score || {};
+    const ally = (sc[yong.primary] || 0) + (sc[yong.xi] || 0);
+    const enemy = (sc[yong.ji] || 0) + (sc[yong.chou] || 0);
+    const sum = ally + enemy || 1;
+    const allyPct = Math.round((ally / sum) * 100);
+    const enemyPct = 100 - allyPct;
+    const lead = allyPct >= 55 ? '✓ DỤNG THẦN chiếm ưu thế — mệnh thuận, chủ động' : allyPct <= 45 ? '⚠ KỴ THẦN lấn át — Dụng yếu, cần bù + đợi vận Dụng' : '⚖ Cân bằng — Dụng/Kỵ ngang nhau';
+    const forceBar = `
+      <div style="margin:8px 0">
+        <div style="display:flex;height:22px;border-radius:4px;overflow:hidden;border:1px solid rgba(212,175,55,0.3)">
+          <div style="width:${allyPct}%;background:#2e9e5b;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600">Dụng+Hỷ ${allyPct}%</div>
+          <div style="width:${enemyPct}%;background:#e0533d;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600">Kỵ+Thù ${enemyPct}%</div>
+        </div>
+        <p class="hint">${esc(lead)}</p>
+      </div>`;
     el.innerHTML = `
       <p>Dụng <b>${d.wxVi}</b>: <span class="${tone}"><b>${d.verdict}</b></span> (căn ${d.root.total}, lộ ${d.reveal.length}, mùa ${d.seasonVi}) — ${d.verdictVi}</p>
+      ${forceBar}
       ${d.verdict === '藏而不透' ? `<p class="hint">⏳ Đợi lưu niên can ${tg.whenReveal.join('/')} thấu ra mới phát Dụng.</p>` : ''}
       <p class="hint">Nhật Chủ ${tg.dm.wxVi}: ${tg.dm.verdict} (${tg.dm.seasonVi}).</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được thông căn thấu cán.</p>'; }
