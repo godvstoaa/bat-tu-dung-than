@@ -4996,6 +4996,53 @@ console.log('\n################## FF. [loop 83] DỤNG THẦN 12 trường sinh 
   console.log(`   Dụng vượng ${_t.dungStrong.length} | Dụng suy ${_t.dungWeak.length} | ≠ Nhật Chủ arc ✓ | deterministic ✓`);
 }
 
+// ################## GG. [loop 86] khóa 5 tổ hợp thập thần mới (loop 85) ##################
+import { detectCombos as _dc2 } from './src/engine/combos.js';
+console.log('\n################## GG. [loop 86] khóa 5 tổ hợp mới (loop 85) ##################');
+{
+  // Mỗi combo mới: 1 synthetic chart trigger → detectCombos phải bắt.
+  const cases = [
+    { name: '傷官傷盡', chart: { pillars: {
+      year: { ganGod: '傷官', hidden: [{ god: '傷官' }, { god: '比肩' }] },
+      month: { ganGod: '食神', hidden: [{ god: '傷官' }] },
+      day: { ganGod: '日主', hidden: [{ god: '比肩' }] },
+      time: { ganGod: '偏財', hidden: [] } } }, strength: { strong: false } },
+    { name: '群劫爭財', chart: { pillars: {
+      year: { ganGod: '劫財', hidden: [{ god: '劫財' }] },
+      month: { ganGod: '劫財', hidden: [{ god: '正財' }] },
+      day: { ganGod: '日主', hidden: [] },
+      time: { ganGod: '偏財', hidden: [] } } }, strength: { strong: true } },
+    { name: '印綬護身', chart: { pillars: {
+      year: { ganGod: '正印', hidden: [{ god: '正印' }] },
+      month: { ganGod: '偏印', hidden: [{ god: '偏印' }] },
+      day: { ganGod: '日主', hidden: [{ god: '正印' }] },
+      time: { ganGod: '正官', hidden: [] } } }, strength: { strong: false } },
+    { name: '食神洩秀', chart: { pillars: {
+      year: { ganGod: '食神', hidden: [{ god: '食神' }] },
+      month: { ganGod: '比肩', hidden: [{ god: '比肩' }] },
+      day: { ganGod: '日主', hidden: [] },
+      time: { ganGod: '偏印', hidden: [] } } }, strength: { strong: true } },
+    { name: '身旺任財', chart: { pillars: {
+      year: { ganGod: '正財', hidden: [{ god: '正財' }] },
+      month: { ganGod: '偏財', hidden: [{ god: '偏財' }] },
+      day: { ganGod: '日主', hidden: [{ god: '比肩' }] },
+      time: { ganGod: '比肩', hidden: [] } } }, strength: { strong: true } },
+  ];
+  for (const cs of cases) {
+    const got = _dc2(cs.chart, cs.strength).map((c) => c.name);
+    assert(got.includes(cs.name), `[loop 85] combo ${cs.name} detect đúng (combos: ${got.join(',')})`);
+  }
+  // verify tone đúng (cat/xiong)
+  const catOnes = ['傷官傷盡', '印綬護身', '食神洩秀', '身旺任財'];
+  const xiongOnes = ['群劫爭財'];
+  for (const cs of cases) {
+    const hit = _dc2(cs.chart, cs.strength).find((c) => c.name === cs.name);
+    const expectTone = catOnes.includes(cs.name) ? 'cat' : 'xiong';
+    assert(hit && hit.tone === expectTone, `${cs.name} tone=${expectTone} (được ${hit && hit.tone})`);
+  }
+  console.log(`   5 tổ hợp mới (loop 85) đều detect đúng + tone đúng (4 cat, 1 xiong) ✓`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
