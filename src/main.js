@@ -4268,7 +4268,7 @@ try { run(); } catch (e) { console.warn('auto-render:', e.message); }
 function init3DTilt() {
   const cards = document.querySelectorAll('#result > .card');
   if (!cards.length) return;
-  if (matchMedia('(hover: none)').matches) return;
+  const isTouch = matchMedia('(hover: none)').matches;
 
   cards.forEach((card) => {
     let glare = card.querySelector('.tilt-glare');
@@ -4280,8 +4280,33 @@ function init3DTilt() {
     }
     card.style.transformStyle = 'preserve-3d';
     let raf = null;
-    let isHovering = false;
 
+    // [loop 157] MOBILE: touch-drag tilt
+    if (isTouch) {
+      let touching = false;
+      card.addEventListener('touchstart', () => { touching = true; card.style.transition = 'none'; }, { passive: true });
+      card.addEventListener('touchmove', (e) => {
+        if (!touching || e.touches.length !== 1) return;
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          const rect = card.getBoundingClientRect();
+          const t = e.touches[0];
+          const x = (t.clientX - rect.left) / rect.width;
+          const y = (t.clientY - rect.top) / rect.height;
+          const rx = Math.max(-8, Math.min(8, (0.5 - y) * 14));
+          const ry = Math.max(-8, Math.min(8, (x - 0.5) * 14));
+          card.style.transform = `perspective(500px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(6px)`;
+          glare.style.setProperty('--gx', (x * 100) + '%');
+          glare.style.setProperty('--gy', (y * 100) + '%');
+          glare.style.opacity = '1';
+        });
+      }, { passive: true });
+      card.addEventListener('touchend', () => { touching = false; if (raf) cancelAnimationFrame(raf); card.style.transition = ''; card.style.transform = ''; glare.style.opacity = '0'; });
+      return;
+    }
+
+    // DESKTOP: mouse hover tilt
+    let isHovering = false;
     const onEnter = () => {
       isHovering = true;
       card.style.transition = 'none'; // tắt transition khi đang tilt → mượt theo chuột
