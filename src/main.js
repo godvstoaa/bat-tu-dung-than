@@ -2967,7 +2967,7 @@ function renderXiaoliuren(r) {
     </div>
     <div class="xlr-input-hint">Âm lịch tháng ${r.input.month}, ngày ${r.input.day}, giờ ${ZHI_HOUR[r.input.hour]} (chi ${r.input.hour})</div>
     <div class="zr-advice">→ <span class="ln-rate ${f.tone === 'CÁT' ? 'rate-cat' : 'rate-hung'}">${esc(r.luck)}</span> ${esc(r.verdict)}</div>
-    <div class="xlr-detail"><b>Luận (${esc(r.categoryKey)}):</b> ${esc(r.detail)}</div>
+    <div class="xlr-detail"><b>Bản chất cung kết:</b> ${esc(f.essence || '')}</div>
     <ul class="zr-reasons">
       <li><b>Sự nghiệp:</b> ${esc(f.career)}</li>
       <li><b>Tài lộc:</b> ${esc(f.wealth)}</li>
