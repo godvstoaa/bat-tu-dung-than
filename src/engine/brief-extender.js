@@ -15,6 +15,7 @@ import { analyzeStudy } from './study-analysis.js';
 import { dayunGodMeaning } from './dayun-god.js';
 import { checkDayunInteractions } from './dayun-check.js';
 import { analyzeHanNuan } from './han-nuan.js';
+import { dayunChangSheng } from './dayun-changsheng.js';
 import { taiYuan } from './taiyuan.js';
 
 /**
@@ -119,6 +120,12 @@ export function extendBrief(R) {
     if (di.length) {
       parts.push(`ĐẠI VẬN TƯƠNG TÁC: ${di.map((d) => `${d.ganZhi}[${d.startAge}t] ${d.notes.join(';')}`).join(' | ')}`);
     }
+  } catch (e) {}
+
+  // [loop 77] 大运十二长生运 — sinh khí Nhật Chủ qua 12 giai đoạn (chiều cổ pháp song song Dụng).
+  try {
+    const cs = dayunChangSheng(R.chart.dayGan, R.dayun);
+    parts.push(`ĐẠI VẬN 12 TRƯỜNG SINH: ${cs.items.map((i) => `${i.ganZhi}[${i.startAge}t:${i.stageVi}/${i.tone}]`).join(' ')}. ${cs.summary}`);
   } catch (e) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';

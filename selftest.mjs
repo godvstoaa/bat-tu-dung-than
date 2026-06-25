@@ -4753,6 +4753,48 @@ console.log('\n################## Z. [loop 76] phối ngẫu profile: crash fix 
   console.log(`   buildFullProfile: ${_oks} pair OK, 0 crash, mọi pair có "Con cái" + không 孤辰 bịa ✓`);
 }
 
+// ################## AA. [loop 77] 大运十二长生运 (tính năng mới) ##################
+import { dayunChangSheng as _dcs, STAGE as _DSTAGE } from './src/engine/dayun-changsheng.js';
+console.log('\n################## AA. [loop 77] 大运十二长生运 (12 trường sinh qua đại vận) ##################');
+{
+  // AA1. 8 đại vận mỗi vận có 1 stage thuộc 12 + tone cat/hung/neutral.
+  const _R = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
+  const _t = _dcs(_R.chart.dayGan, _R.dayun);
+  const _12 = Object.keys(_DSTAGE);
+  assert(_t.items.length === _R.dayun.length, `mỗi đại vận có 1 mục (được ${_t.items.length}/${_R.dayun.length})`);
+  assert(_t.items.every((i) => _12.includes(i.stage) && ['cat', 'hung', 'neutral'].includes(i.tone)), 'mọi stage thuộc 12 trường sinh + tone hợp lệ');
+  assert(_t.items.every((i) => typeof i.startAge === 'number' && i.ganZhi && i.stageVi), 'mỗi mục có startAge + ganZhi + stageVi');
+
+  // AA2. peak/rising/low phát hiện đúng: stage 臨官/帝旺 ∈ peak, 死/墓/絞 ∈ low, 長生/冠帶 ∈ rising.
+  assert(_t.peak.every((p) => p.stage === '臨官' || p.stage === '帝旺'), 'peak chỉ chứa Lâm Quan/Đế Vượng');
+  assert(_t.low.every((p) => ['死', '墓', '絕'].includes(p.stage)), 'low chỉ chứa Tử/Mộ/Tuyệt');
+  assert(_t.rising.every((p) => p.stage === '長生' || p.stage === '冠帶'), 'rising chỉ chứa Trường Sinh/Quan Đới');
+
+  // AA3. qua nhiều lá số, tổng peak+rising+low + các giai đoạn giữa = đủ 8 đại vận (mỗi vận 1 stage).
+  let _allCovered = true;
+  for (const [_y, _m, _d] of [[1988, 6, 15], [2000, 12, 22], [1990, 1, 5], [1995, 7, 20]]) {
+    const _RR = analyze(_y, _m, _d, 10, 0, 'nam', 2026);
+    const _tt = _dcs(_RR.chart.dayGan, _RR.dayun);
+    if (_tt.items.length !== _RR.dayun.length) _allCovered = false;
+    // deterministic
+    const _tt2 = _dcs(_RR.chart.dayGan, _RR.dayun);
+    if (JSON.stringify(_tt.items) !== JSON.stringify(_tt2.items)) _allCovered = false;
+  }
+  assert(_allCovered, '4 lá số: mỗi đại vận có stage + deterministic');
+
+  // AA4. chiều dương thuận / âm nghịch — 2 lá số ĐỐI CHIẾU dương vs âm can phải khác hướng stage.
+  //   甲(dương): 长生 ở 亥, thuận hành. 乙(âm): 长生 ở 午, nghịch hành. → stage ở cùng chi phải khác.
+  const _jia = analyze(2000, 12, 22, 10, 0, 'nam', 2026); // 甲
+  const _yi = analyze(1993, 10, 21, 0, 30, 'nam', 2026);  // 乙
+  const _jiaStages = _dcs(_jia.chart.dayGan, _jia.dayun).items.map((i) => i.stage).join('');
+  const _yiStages = _dcs(_yi.chart.dayGan, _yi.dayun).items.map((i) => i.stage).join('');
+  assert(_jiaStages !== _yiStages, '甲 (dương thuận) vs 乙 (âm nghịch) → chuỗi stage đại vận KHÁC nhau (chiều hành khác)');
+
+  // AA5. lá số user: in arc
+  console.log(`   user 乙 (âm nghịch): ${_t.items.map((i) => i.startAge + 't:' + i.stageVi + '(' + i.tone[0] + ')').join(' → ')}`);
+  console.log(`   peak ${_t.peak.length} | rising ${_t.rising.length} | low ${_t.low.length} — «运好不如运旺» ✓`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');

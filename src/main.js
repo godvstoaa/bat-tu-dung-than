@@ -94,6 +94,7 @@ import { strength3Fa } from './engine/strength-3fa.js';
 import { jiaoYunAnalysis } from './engine/jiaoyun.js';
 import { analyzePillarQuality } from './engine/pillar-quality.js';
 import { analyzeHuaQi } from './engine/huaqi.js';
+import { dayunChangSheng } from './engine/dayun-changsheng.js';
 import { analyzeHanNuan } from './engine/han-nuan.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
@@ -869,6 +870,25 @@ function renderFuyin(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được phục/phan ngâm.</p>'; }
 }
 
+function renderDayunChangSheng(R) {
+  const el = $('dayun-changsheng');
+  if (!el) return;
+  try {
+    const t = dayunChangSheng(R.chart.dayGan, R.dayun);
+    const TONE_COLOR = { cat: '#2e9e5b', hung: '#e0533d', neutral: '#caa14a' };
+    const TONE_ICON = { cat: '▲', hung: '▼', neutral: '◆' };
+    const rows = t.items.map((i) => {
+      const c = TONE_COLOR[i.tone];
+      return `<div class="yz-row" style="border-left:3px solid ${c};padding-left:8px;margin:3px 0">
+        <b>${i.startAge}–${i.startAge + 9}t</b> ${i.ganZhi}
+        <span style="color:${c};font-weight:600">${TONE_ICON[i.tone]} ${i.stageVi}</span>
+        <span class="hint">— ${i.desc}</span>
+      </div>`;
+    }).join('');
+    el.innerHTML = `<p class="hint">Sinh khí Nhật Chủ qua 12 giai đoạn (dương can thuận / âm can nghịch hành). «运好不如运旺».</p>${rows}<p style="margin-top:6px">${t.summary}</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được đại vận trường sinh.</p>'; }
+}
+
 function renderZiweiDeep(R) {
   const el = $('ziwei-deep');
   if (!el) return;
@@ -1622,6 +1642,7 @@ function run() {
   lazyRender('sanyuan',        () => { try { renderSanyuan(currentResult); } catch (e) { console.warn('sanyuan', e.message); } });
   lazyRender('ku',             () => { try { renderKu(currentResult); } catch (e) { console.warn('ku', e.message); } });
   lazyRender('fuyin',          () => { try { renderFuyin(currentResult); } catch (e) { console.warn('fuyin', e.message); } });
+  lazyRender('dayun-changsheng', () => { try { renderDayunChangSheng(currentResult); } catch (e) { console.warn('dayuncs', e.message); } });
   lazyRender('ziwei-deep',     () => { try { renderZiweiDeep(currentResult); } catch (e) { console.warn('ziweiDeep', e.message); } });
   lazyRender('taisui-general', () => { try { renderTaisuiGeneral(currentResult); } catch (e) { console.warn('taisui', e.message); } });
   lazyRender('taohua',         () => { try { renderTaohua(currentResult); } catch (e) { console.warn('taohua', e.message); } });
