@@ -27,6 +27,7 @@ import { mingZhuShenZhu } from './mingzhu.js';
 import { predictEvents } from './event-predict.js';
 import { detectAnchong } from './anchong.js';
 import { analyzeFiveVirtues } from './five-aspects.js';
+import { computeLiuyue } from './liuyue.js';
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -215,6 +216,17 @@ export function extendBrief(R) {
   try {
     const fv = analyzeFiveVirtues(R);
     parts.push(`NGŨ ĐỨC (五常): đức chính ${fv.virtue} (${fv.primaryVi}) — ${fv.strong ? fv.strong.slice(0, 40) : ''}${fv.kyVirtue ? ' | thiếu: ' + fv.kyVirtue : ''}. ${fv.cultivation ? fv.cultivation.slice(0, 50) : ''}`);
+  } catch (e) {}
+
+  // [loop 124] LƯU THÁNG hiện tại — AI trả lời "tháng này sao"
+  try {
+    const now = new Date();
+    const ly = computeLiuyue(R, now.getFullYear());
+    const curMonth = now.getMonth(); // 0-11
+    const m = ly.months.find((mm) => mm.m === curMonth) || ly.months[0];
+    if (m) {
+      parts.push(`LƯU THÁNG ${now.getMonth() + 1} (${m.ganZhi}): ${m.rating} (${m.score}/100) — ${(m.note || '').slice(0, 80)}${m.taiSui?.length ? ' | ' + m.taiSui.join(', ') : ''}${m.fuyin?.length ? ' | ' + m.fuyin.join(', ') : ''}`);
+    }
   } catch (e) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';
