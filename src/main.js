@@ -128,6 +128,8 @@ import { findNoblePerson } from './engine/emperor-star.js';
 import { recommendNumbers } from './engine/number-fs.js';
 import { sleepOptimization } from './engine/sleep-fs.js';
 import { checkNatalActivation } from './engine/shensha-activation.js';
+import { flyingSihua } from './engine/flying-sihua.js';
+import { findMoveDates } from './engine/move-fs.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1390,6 +1392,31 @@ function renderShenshaActivation(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được kích hoạt thần煞.</p>'; }
 }
 
+function renderFlyingSihua(R) {
+  const el = $('flying-sihua');
+  if (!el) return;
+  try {
+    const i = R.chart.input;
+    const z = computeZiwei(i.year, i.month, i.day, i.hour, i.minute, i.gender);
+    const fs = flyingSihua(z);
+    if (!fs) { el.innerHTML = '<p class="hint">Không tính được phi tinh.</p>'; return; }
+    el.innerHTML = `<p class="hint">紫微飞星四化 — 4 hóa (禄/权/科/忌) phi từ 5 cung chính (命/财/官/夫/福) chiếu các cung khác.</p><p>${esc(fs.summary || '')}</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được phi tinh tứ hóa.</p>'; }
+}
+
+function renderMoveFs(R) {
+  const el = $('move-fs');
+  if (!el) return;
+  try {
+    const i = R.chart.input;
+    const now = new Date();
+    const mv = findMoveDates(R.chart.pillars.year.zhi, i.year, i.gender, now.getFullYear(), now.getMonth() + 1, now.getDate(), 60, 5);
+    if (!mv || !mv.length) { el.innerHTML = '<p class="hint">Không tìm được ngày dọn nhà tốt trong 60 ngày tới.</p>'; return; }
+    const rows = mv.map((d) => `<div class="yz-row"><b>${esc(d.date)}</b> ${esc(d.ganZhi || '')} ${esc(d.lunar || '')} — <b>${esc(d.rating || '')}</b> (${esc(String(d.score || ''))}) <span class="hint">${esc((d.reasons || []).join('; ').slice(0, 80))}</span></div>`).join('');
+    el.innerHTML = `<p class="hint">Top 5 ngày tốt dọn nhà / nhập trazaar trong 60 ngày tới (择日).</p>${rows}`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được ngày dọn nhà.</p>'; }
+}
+
 function renderLifestyle(R) {
   const el = $('lifestyle');
   if (!el) return;
@@ -2105,6 +2132,8 @@ function run() {
   lazyRender('noble-cultivate', () => { try { renderNobleCultivate(currentResult); } catch (e) { console.warn('noble', e.message); } });
   lazyRender('fengshui-extra', () => { try { renderFengshuiExtra(currentResult); } catch (e) { console.warn('fsextra', e.message); } });
   lazyRender('shensha-activation', () => { try { renderShenshaActivation(currentResult); } catch (e) { console.warn('shenshaact', e.message); } });
+  lazyRender('flying-sihua',     () => { try { renderFlyingSihua(currentResult); } catch (e) { console.warn('flyingsihua', e.message); } });
+  lazyRender('move-fs',          () => { try { renderMoveFs(currentResult); } catch (e) { console.warn('movefs', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
