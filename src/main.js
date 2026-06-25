@@ -1541,15 +1541,20 @@ function renderDestinyTimeline(R) {
   if (!el) return;
   try {
     const t = lifeTimeline(R, new Date().getFullYear());
+    // [loop 191 fix BUG] trước đây đọc d.vit/d.score (KHÔNG tồn tại) + ngưỡng 0-100 trên totalScore
+    //   nhỏ (−28..30) → mọi thập niên đều đỏ, điểm trống. Nay dùng godCat (cat/mid/hung) + totalScore.
     const decades = (t.decades || []).map((d) => {
-      const tone = (d.vit || d.score || 0) >= 60 ? '#2e9e5b' : (d.vit || d.score || 0) >= 40 ? '#caa14a' : '#e0533d';
-      const label = d.label || d.tag || '';
-      return `<div class="yz-row" style="border-left:3px solid ${tone};padding-left:8px;margin:3px 0"><b>${esc(String(d.age || d.range || ''))}</b> ${esc(d.ganZhi || '')} <span style="color:${tone};font-weight:600">${esc(String(d.vit || d.score || ''))}</span> <span class="hint">${esc(label)}</span></div>`;
+      const tone = d.godCat === 'cat' ? '#2e9e5b' : d.godCat === 'hung' ? '#e0533d' : '#caa14a';
+      const label = d.lifePhase || d.godTheme || d.godVi || '';
+      return `<div class="yz-row" style="border-left:3px solid ${tone};padding-left:8px;margin:3px 0">
+        <b>${esc(String(d.range || ''))}</b> <span class="zh">${esc(d.ganZhi || '')}</span> <span style="color:${tone};font-weight:600">${esc(d.godVi || '')}</span> <span class="hint">(${esc(String(d.totalScore ?? ''))})</span>
+        <div class="hint">${esc(label)}</div></div>`;
     }).join('');
+    const fmtDec = (x, icon) => x ? `<p class="hint">${icon} ${esc(x.range || '')} <span class="zh">${esc(x.ganZhi || '')}</span> — ${esc(x.godVi || '')} (${esc(x.godTheme || '')})</p>` : '';
     el.innerHTML = `
       <p><b>${esc(t.summary || '')}</b></p>
-      ${t.peakDecade ? `<p class="hint">🏆 Đỉnh: ${esc(typeof t.peakDecade === 'string' ? t.peakDecade : JSON.stringify(t.peakDecade))}</p>` : ''}
-      ${t.challengeDecade ? `<p class="hint">⚠ Thách thức: ${esc(typeof t.challengeDecade === 'string' ? t.challengeDecade : JSON.stringify(t.challengeDecade))}</p>` : ''}
+      ${fmtDec(t.peakDecade, '🏆 Đỉnh cao:')}
+      ${fmtDec(t.challengeDecade, '⚠ Thách thức:')}
       ${decades}
     `;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được dòng đời timeline.</p>'; }
