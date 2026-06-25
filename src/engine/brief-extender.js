@@ -226,6 +226,17 @@ export function extendBrief(R) {
     }
   } catch (e) {}
 
+  // [loop 153] 大运 进气退气 — AI biết vận đang vào/ra/vượng
+  try {
+    const yr = new Date().getFullYear();
+    const dy = (R.dayun || []).find((d) => d && d.startYear != null && d.startYear <= yr && yr < d.startYear + 10);
+    if (dy) {
+      const offset = yr - dy.startYear;
+      const phase = offset <= 2 ? `进气 (năm ${offset + 1}/10 — vận đang VÀO, lực chưa tối đa)` : offset >= 7 ? `退气 (năm ${offset + 1}/10 — vận đang RA, lực suy)` : `旺气 (năm ${offset + 1}/10 — vận ĐANG PHÁ HUY mạnh nhất)`;
+      parts.push(`大运 PHASE: ${dy.ganZhi} hiện ${phase}. «进气退气»: vận đầu chưa mạnh, vận cuối đã suy.`);
+    }
+  } catch (e) {}
+
   // [loop 124] LƯU THÁNG hiện tại — AI trả lời "tháng này sao"
   try {
     const now = new Date();
