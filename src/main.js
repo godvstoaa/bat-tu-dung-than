@@ -102,6 +102,8 @@ import { baziMingGong } from './engine/bazi-minggong.js';
 import { analyzeChildrenStar } from './engine/children-star.js';
 import { predictEvents } from './engine/event-predict.js';
 import { getPersonalityProfile } from './engine/personality-profile.js';
+import { mingZhuShenZhu } from './engine/mingzhu.js';
+import { dailyPro } from './engine/daily-pro.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1151,6 +1153,38 @@ function renderPersonalityProfile(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được tính cách.</p>'; }
 }
 
+function renderMingZhu(R) {
+  const el = $('mingzhu');
+  if (!el) return;
+  try {
+    const mg = baziMingGong(R);
+    const yearZhi = R.chart.pillars.year.zhi;
+    const z = mingZhuShenZhu(mg.zhi, yearZhi);
+    el.innerHTML = `
+      <p><b>命主 (Mệnh Chủ):</b> ${esc(z.mingZhuVi)} <span class="hint">— sao chủ Mệnh Cung (${esc(mg.zhiVi)})</span></p>
+      <p class="hint">${esc(z.mingZhuDesc)}</p>
+      <p><b>身主 (Thân Chủ):</b> ${esc(z.shenZhuVi)} <span class="hint">— sao chủ Thân (năm sinh ${esc(R.chart.pillars.year.zhi)})</span></p>
+      <p class="hint">${esc(z.shenZhuDesc)}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được Mệnh Chủ / Thân Chủ.</p>'; }
+}
+
+function renderDailyPro(R) {
+  const el = $('daily-pro');
+  if (!el) return;
+  try {
+    const now = new Date();
+    const d = dailyPro(R, now.getFullYear(), now.getMonth() + 1, now.getDate());
+    el.innerHTML = `
+      <p><b>Hôm nay ${esc(d.ganZhi || '')}:</b> ${esc(d.rating || '')} (${esc(String(d.score || ''))}/100)</p>
+      ${d.bestActivity ? `<p>✓ Nên: ${esc(d.bestActivity)}</p>` : ''}
+      ${d.avoidActivity ? `<p>⚠ Tránh: ${esc(d.avoidActivity)}</p>` : ''}
+      ${d.bestDirection ? `<p>🧭 Hướng tốt: ${esc(d.bestDirection)}</p>` : ''}
+      <p class="hint">${esc(d.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được lưu nhật chuyên sâu.</p>'; }
+}
+
 function renderMarriageStars(R) {
   const el = $('marriage-stars');
   if (!el) return;
@@ -1815,6 +1849,8 @@ function run() {
   lazyRender('children-star',  () => { try { renderChildrenStar(currentResult); } catch (e) { console.warn('childrenstar', e.message); } });
   lazyRender('event-predict',  () => { try { renderEventPredict(currentResult); } catch (e) { console.warn('eventpredict', e.message); } });
   lazyRender('personality-profile', () => { try { renderPersonalityProfile(currentResult); } catch (e) { console.warn('personality', e.message); } });
+  lazyRender('mingzhu',         () => { try { renderMingZhu(currentResult); } catch (e) { console.warn('mingzhu', e.message); } });
+  lazyRender('daily-pro',       () => { try { renderDailyPro(currentResult); } catch (e) { console.warn('dailypro', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
