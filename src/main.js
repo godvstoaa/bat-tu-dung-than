@@ -2899,6 +2899,7 @@ function rateClsDg(r) { return r === 'ĐẠI CÁT' ? 'rate-cat' : r === 'CÁT' ?
 function renderDagua() {
   const sit = $('dg-sit').value; const face = $('dg-face').value;
   const c = daguaCompatibility(sit, face);
+  const ov = daguaOverview(); // [loop 198] compute once (was called 2× — .note + .rows)
   const el = $('dagua');
   if (!c.ok) { el.innerHTML = `<p class="hint">${esc(c.error)}</p>`; return; }
   const a = c.sit, b = c.face;
@@ -2914,8 +2915,8 @@ function renderDagua() {
       </div>
     </details>
     <details><summary>Tổng quan 24 sơn × 卦运 (bảng đầy đủ)</summary>
-      <p class="hint">${esc(daguaOverview().note)}</p>
-      <div class="xk-grid">${daguaOverview().rows.map((r) => `<div class="xk-cell ${(r.yun === 1 || r.yun === 9) ? 'cat' : 'mid'}" title="${esc(r.star||'')} · ${esc(r.family||'')}"><div class="xk-palace">${esc(r.mountain)} ${esc(r.vi)}</div><div class="xk-star zh">${esc(r.hex)}</div><div class="xk-name">${esc(r.hexVi)}</div><div class="xk-q">vận ${r.yun} · ${esc(r.yunCat)}</div></div>`).join('')}</div>
+      <p class="hint">${esc(ov.note)}</p>
+      <div class="xk-grid">${ov.rows.map((r) => `<div class="xk-cell ${(r.yun === 1 || r.yun === 9) ? 'cat' : 'mid'}" title="${esc(r.star||'')} · ${esc(r.family||'')}"><div class="xk-palace">${esc(r.mountain)} ${esc(r.vi)}</div><div class="xk-star zh">${esc(r.hex)}</div><div class="xk-name">${esc(r.hexVi)}</div><div class="xk-q">vận ${r.yun} · ${esc(r.yunCat)}</div></div>`).join('')}</div>
     </details>`;
 }
 
