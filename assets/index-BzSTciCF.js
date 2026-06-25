@@ -610,7 +610,7 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       ${t.remedyFoods?`<div class="tiaohou-note"><b>Thực phẩm chữa lành (hành ${k(t.remedyVi||"")}):</b> ${k(t.remedyFoods)}</div>`:""}
       ${t.riskSeason?`<p class="hint">📅 Mùa phòng bệnh: ${k(t.riskSeason)}</p>`:""}
       ${t.organRisk?`<p class="hint">${k(t.organRisk)}</p>`:""}
-      <p class="hint" style="margin-top:6px">${k(t.advice||"")}</p>`}catch{i.innerHTML='<p class="hint">Không tính được sức khoẻ ngũ hành.</p>'}}function r1(n){const i=H("qinxing");if(i)try{const t=gg(n),h=t.annual,a=t.tone==="cat"?"cat":t.tone==="hung"?"hung":"",e=Ab(t.scanYear,5);i.innerHTML=`
+      ${Array.isArray(t.advice)&&t.advice.length?`<p class="hint" style="margin-top:6px">💡 ${t.advice.map(a=>k(a)).join("<br>💡 ")}</p>`:t.advice?`<p class="hint">${k(t.advice)}</p>`:""}`}catch{i.innerHTML='<p class="hint">Không tính được sức khoẻ ngũ hành.</p>'}}function r1(n){const i=H("qinxing");if(i)try{const t=gg(n),h=t.annual,a=t.tone==="cat"?"cat":t.tone==="hung"?"hung":"",e=Ab(t.scanYear,5);i.innerHTML=`
       <p>Năm ${h.year}: <b>${h.bird}</b> (${h.animal}, hành ${h.element}) trụ trị — ${h.nature}</p>
       <p>Bản mệnh ${t.benMing?t.benMing.qin+" (hành "+h.element+")":"(?)"} → <span class="${a}"><b>${t.toneVi}</b></span> — ${t.relVi}</p>
       <p class="hint">${t.advice}</p>
