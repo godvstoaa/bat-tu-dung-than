@@ -5316,7 +5316,12 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   // Rollover tháng/năm: 23:30 ngày 31/12 → 01/01 năm sau
   const RNY = analyze(2025, 12, 31, 23, 30, 'nam', 2026);
   assert(RNY.chart.pillars.day.gan + RNY.chart.pillars.day.zhi !== analyze(2025, 12, 31, 22, 0, 'nam', 2026).chart.pillars.day.gan + analyze(2025, 12, 31, 22, 0, 'nam', 2026).chart.pillars.day.zhi, `[loop 177] rollover 31/12 23:30 ≠ 22:00 (roll ngày cuối năm OK)`);
-  console.log(`   子时换日 (23:00+ = sang hôm sau, ngũ-thử-độn đúng, rollover cuối năm) ✓ | locked`);
+  // [loop 180] month-boundary rollover: 31/1 23:30 → 1/2 (cùng 八字 với 1/2 00:30)
+  const RMB1 = analyze(2026, 1, 31, 23, 30, 'nam', 2026);
+  const RMB2 = analyze(2026, 2, 1, 0, 30, 'nam', 2026);
+  const _same = (a, b) => a.day.gan + a.day.zhi === b.day.gan + b.day.zhi && a.month.gan + a.month.zhi === b.month.gan + b.month.zhi;
+  assert(_same(RMB1.chart.pillars, RMB2.chart.pillars), `[loop 180] rollover cuối THÁNG: 31/1 23:30 = 1/2 00:30 (day+month pillar khớp)`);
+  console.log(`   子时换日 (23:00+ = sang hôm sau, ngũ-thử-độn đúng, rollover cuối năm + cuối tháng) ✓ | locked`);
 }
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
