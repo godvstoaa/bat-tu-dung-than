@@ -325,10 +325,10 @@ assert(!_noDy.schools.some((s) => s.phai && s.phai.includes('运年')), 'scoreLi
 const _RUempty = { ...RU, dayun: [] };
 const _y26empty = analyzeLiunianDeep(_RUempty, 2026);
 assert(!_y26empty.schools.some((s) => s.phai && s.phai.includes('运年')), 'R.dayun=[] → không có phái 运年 (không crash)');
-// (5) LỚP 运年 CỘNG TRÊN 5 phái cốt lõi (không thay thế): bỏ activeDayun, 5 phái đầu Y NHƯ cũ.
-const _5with = y26.schools.filter((s) => !s.phai.includes('运年'));
+// (5) LỚP 运年 CỘNG TRÊN 5 phái cốt lõi (không thay thế): bỏ activeDayun + 进气退气, 5 phái đầu Y NHƯ cũ.
+const _5with = y26.schools.filter((s) => !s.phai.includes('运年') && !s.phai.includes('进气退气'));
 const _5no = _y26empty.schools;
-assert(_5with.length === _5no.length && _5with.every((s, i) => s.phai === _5no[i].phai), '5 phái cốt lõi Y NHƯ cũ khi có/không 运年 (lớp 加 không sửa lõi)');
+assert(_5with.length === _5no.length && _5with.every((s, i) => s.phai === _5no[i].phai), '5 phái cốt lõi Y NHƯ cũ khi có/không 运年/进气退气 (lớp 加 không sửa lõi)');
 // (5b) [loop 19] TẦNG Phục/Phản Ngâm (伏吟反吟) trong scoreLiunianYear: năm can-chi trùng
 //   1 trụ nguyên cục → bật phái "Phục/Phản Ngâm". Dùng lá số 乙亥 nhật trụ: 1995 乙亥 = 伏吟 日柱.
 const _fuR = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
