@@ -132,6 +132,7 @@ import { flyingSihua } from './engine/flying-sihua.js';
 import { findMoveDates } from './engine/move-fs.js';
 import { matchBusinessPartners } from './engine/partner-match.js';
 import { findWeddingDates } from './engine/wedding-date.js';
+import { analyzeFamilyHarmony } from './engine/family-fortune.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1153,6 +1154,23 @@ function renderChildrenStar(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được tử nữ.</p>'; }
 }
 
+function renderFamilyFortune(R) {
+  const el = $('family-fortune');
+  if (!el) return;
+  try {
+    const f = analyzeFamilyHarmony(R);
+    const relRows = (f.relations || []).map((r) => {
+      const tone = /vượng|mạnh|tốt/.test(r.strength || '') ? '#2e9e5b' : /nhược|yếu|thử thách|khuyết/.test(r.strength || '') ? '#e0533d' : '#caa14a';
+      return `<div class="yz-row" style="border-left:3px solid ${tone};padding-left:8px;margin:3px 0"><b>${esc(r.name || r.key || '')}</b> — ${esc(r.strength || '')}${r.palaceZhi ? ' (cung ' + esc(r.palaceZhi) + (r.palaceStable ? ' yên' : ' xung') + ')' : ''}</div>`;
+    }).join('');
+    el.innerHTML = `
+      <p><b>Gia đạo: ${esc(String(f.familyScore ?? ''))}/100</b>${f.weakest ? ' — cần chú ý: ' + esc(f.weakest.name || f.weakest.key || '') : ''}${f.strongest ? ' | mạnh: ' + esc(f.strongest.name || f.strongest.key || '') : ''}</p>
+      ${relRows}
+      <p class="hint">${esc(f.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được gia đạo.</p>'; }
+}
+
 function renderEventPredict(R) {
   const el = $('event-predict');
   if (!el) return;
@@ -2146,6 +2164,7 @@ function run() {
   lazyRender('chart-level',    () => { try { renderChartLevel(currentResult); } catch (e) { console.warn('chartlevel', e.message); } });
   lazyRender('minggong',       () => { try { renderMingGong(currentResult); } catch (e) { console.warn('minggong', e.message); } });
   lazyRender('children-star',  () => { try { renderChildrenStar(currentResult); } catch (e) { console.warn('childrenstar', e.message); } });
+  lazyRender('family-fortune', () => { try { renderFamilyFortune(currentResult); } catch (e) { console.warn('familyfortune', e.message); } });
   lazyRender('event-predict',  () => { try { renderEventPredict(currentResult); } catch (e) { console.warn('eventpredict', e.message); } });
   lazyRender('personality-profile', () => { try { renderPersonalityProfile(currentResult); } catch (e) { console.warn('personality', e.message); } });
   lazyRender('mingzhu',         () => { try { renderMingZhu(currentResult); } catch (e) { console.warn('mingzhu', e.message); } });
