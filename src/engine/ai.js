@@ -525,6 +525,23 @@ NGUYEN TAC:
   - "năm vàng / nên tiến thủ lớn / làm ăn lớn năm nào" → mục "NĂM VÀNG" (DỰ BÁO & THỜI ĐIỂM) + "ĐẠI VẬN XẾP HẠNG" — trích top-3 năm 🟢 + cảnh báo năm 🔴.
   - "đầu tư / day trade / chơi chứng khoán tiền ảo có nên không" → mục "TÀI TINH" + "TÀI KHỐ" (PHÂN TÍCH CHUYÊN SÂU) — thân nhậm tài không, có kho giữ tiền không, rồi quyết CO/KHÔNG + thời điểm (TÀI LỘC LƯU NGUYỆT).
   - "khởi nghiệp / mở công ty / tự kinh doanh" → mục "SỰ NGHIỆP" + "TÀI TINH" (PHÂN TÍCH CHUYÊN SÂU) + "ĐẠI VẬN XẾP HẠNG" — Quan/Tài có lực không, vận nào thuận.
+  - [loop 132] "mệnh cung / thân cung của tôi" → mục "MỆNH CUNG" (PHÂN TÍCH CHUYÊN SÂU) — mệnh cung/thân cung + thập thần + Dụng/Kỵ.
+  - "mệnh cách tầng lớp / đẳng cấp mệnh" → mục "MỆNH CÁCH TẦNG LỚP" (PHÂN TÍCH CHUYÊN SÂU) — 6 tiêu chí cổ điển.
+  - "tính cách / tính tôi ra sao / bản chất" → mục "TÍNH CÁCH NHẬT CAN" + "NGŨ ĐỨC" (PHÂN TÍCH CHUYÊN SÂU).
+  - "ăn gì hợp / mặc màu gì / đeo đá gì / tinh dầu / trà / cây" → mục "LIFESTYLE" (PHÂN TÍCH CHUYÊN SÂU) — ẩm thực/đá/trang phục/vận động/cây/nhạc/trà/tinh dầu.
+  - "số hợp / số điện thoại / biển số" → mục "SỐ HỢP" (trong PHONG THỦY & ĐỊNH VÍ).
+  - "hướng ngủ / thành phố nào hợp / vật phẩm hóa giải" → mục "PHONG THỦY & ĐỊNH VÍ" (PHÂN TÍCH CHUYÊN SÂU).
+  - "tình duyên sâu / đào hoa / hồng diễm / sức phối ngẫu chi tiết" → mục "TÌNH DUYÊN SÂU" (PHÂN TÍCH CHUYÊN SÂU).
+  - "dòng đời / timeline / đỉnh đời / thách thức" → mục "DÒNG ĐỜI" (PHÂN TÍCH CHUYÊN SÂU).
+  - "quý nhân / ai giúp đỡ / tìm đâu" → mục "QUÝ NHÂN DƯỠNG DỤNG" (PHÂN TÍCH CHUYÊN SÂU).
+  - "hòa khí hàn/noãn/táo/thấp / khí hậu mệnh" → mục "HÀN-NOÃN-TÁO-THẤP" (PHÂN TÍCH CHUYÊN SÂU).
+  - "ngũ hành lưu thông / khí cơ" → mục "NGŨ HÀNH LƯU THÔNG" (PHÂN TÍCH CHUYÊN SÂU).
+  - "nạp âm / bản mệnh nạp âm" → mục "NẠP ÂM QUAN HỆ" (PHÂN TÍCH CHUYÊN SÂU).
+  - "ám xung / xung đột tiềm ẩn" → mục "ÁM XUNG" (PHÂN TÍCH CHUYÊN SÂU).
+  - "sự kiện năm / năm tới xảy ra gì" → mục "SỰ KIỆN" (PHÂN TÍCH CHUYÊN SÂU).
+  - "giờ tốt hôm nay / giờ nào làm việc" → mục "HÔM NAY TỔNG KHÁI" + tool analyze_best_hour.
+  - "mùa nào tốt / mùa nào yếu" → mục "LỜI KHUYÊN THEO MÙA" (PHÂN TÍCH CHUYÊN SÂU).
+  - "đầu tư phong cách / nên đầu tư gì" → mục "PHONG CÁCH ĐẦU TƯ" (PHÂN TÍCH CHUYÊN SÂU) + "KHỞI NGHIỆP".
   - "con cái / khi nào sinh con / có con không" → mục "TỬ NỮ TINH" + "PHỐI NGÃU" (PHÂN TÍCH CHUYÊN SÂU) + "HÔN/LUYÊN ỨNG KỆ" — phối hợp năm sinh (năm Tử nữ tinh kích hoạt).
   - "học / thi cử / bằng cấp / du học" → mục "HỌC VẤN" (PHÂN TÍCH CHUYÊN SÂU) + "NĂM VÀNG" — Ấn/Thực Thương mạnh không, timing năm Cát để thi.
   - "năm nào sức khoẻ yếu / phòng bệnh năm nào" (thập kỷ, khác "tháng nào yếu") → mục "SỨC KHOẺ 10 NĂM" (DỰ BÁO & THỜI ĐIỂM) + "SỨC KHOẺ" (PHÂN TÍCH CHUYÊN SÂU) — năm cờ đỏ 🔴 + tạng yếu + dưỡng hành.
