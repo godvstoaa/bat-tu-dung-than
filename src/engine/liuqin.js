@@ -20,18 +20,26 @@ const PALACE = {
 };
 const PALACE_VI = { year: 'Trụ Năm (cung tổ thượng)', month: 'Trụ Tháng (cung cha mẹ/huynh đệ)', day: 'Trụ Ngày (cung phối ngẫu)', time: 'Trụ Giờ (cung tử nữ)' };
 
+// [loop 79 sửa] trọng số tàng can cho lục thân: bản khí 0.5, trung khí 0.25, dư khí 0.1.
+//   Trước đây chỉ hidden[0] (bản khí) → MISS sao lục thân ẩn ở trung/dư khí (vd Dần tàng
+//   甲丙戊 — 丙/戊 là lục thân nhưng bị bỏ). Nay đếm ĐỦ tàng can theo trọng số cổ法.
+const TANG_W = { 1: [0.5], 2: [0.5, 0.25], 3: [0.5, 0.25, 0.1] };
+
 function godCount(chart) {
   const c = {};
   for (const key of ['year', 'month', 'time']) {
     const g = chart.pillars[key].ganGod;
     if (g && g !== '日主') c[g] = (c[g] || 0) + 1;
   }
-  // Chỉ đếm tàng can NGUYÊN TRỤ (year/month/time) cho lục thân.
+  // Đếm ĐỦ tàng can (bản/trung/dư) NGUYÊN TRỤ (year/month/time) cho lục thân.
   // BỎ qua trụ day: Nhật Chi đại diện 配偶/自身, không phải họ hàng —
   // tính nó như lục thân chung sẽ sai lệch điểm sao (vd: chính/tà của mình).
   for (const key of ['year', 'month', 'time']) {
-    const main = chart.pillars[key].hidden[0];
-    c[main.god] = (c[main.god] || 0) + 0.5;
+    const hidden = chart.pillars[key].hidden;
+    const w = TANG_W[hidden.length] || [0.5];
+    hidden.forEach((h, idx) => {
+      if (h.god && h.god !== '日主') c[h.god] = (c[h.god] || 0) + w[idx];
+    });
   }
   delete c['日主'];
   return c;

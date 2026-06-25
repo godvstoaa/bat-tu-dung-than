@@ -23,6 +23,12 @@ export function analyzeChildrenStar(R) {
     ? ({ 木:'金', 火:'水', 土:'木', 金:'火', 水:'土' })[GAN[dayGan].wx]  // 克日 = Quan
     : ({ 木:'火', 火:'土', 土:'金', 金:'水', 水:'木' })[GAN[dayGan].wx];  // 日 sinh = Thực/Thương
 
+  // [loop 79 sửa] trọng số tàng can (bản 0.5 / trung 0.25 / dư 0.1) — đếm ĐỦ tàng,
+  //   và LOẠI trụ day (Nhật Chi = phối ngẫu/bản thân, không phải cung con — nhất quán
+  //   liuqin.js). Trước đây: chỉ hidden[0] (bỏ trung/dư) + đếm cả day → count sai.
+  const TANG_W = { 1: [0.5], 2: [0.5, 0.25], 3: [0.5, 0.25, 0.1] };
+  const TANG_LABEL = ['bản', 'trung', 'dư'];
+
   // 2. Đếm sao con
   let count = 0;
   const positions = [];
@@ -30,9 +36,12 @@ export function analyzeChildrenStar(R) {
     const g = chart.pillars[key].ganGod;
     if (childGods.includes(g)) { count += 1; positions.push(key + '(can)'); }
   }
-  for (const key of ['year','month','day','time']) {
-    const g = chart.pillars[key].hidden[0]?.god;
-    if (childGods.includes(g)) { count += 0.5; positions.push(key + '(tàng)'); }
+  for (const key of ['year','month','time']) {            // [loop 79] loại day
+    const hidden = chart.pillars[key].hidden;
+    const w = TANG_W[hidden.length] || [0.5];
+    hidden.forEach((h, idx) => {
+      if (childGods.includes(h.god)) { count += w[idx]; positions.push(key + '(tàng:' + (TANG_LABEL[idx] || idx) + ')'); }
+    });
   }
 
   // 3. Cung tử nữ = Trụ Giờ
