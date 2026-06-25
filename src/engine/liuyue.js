@@ -8,10 +8,22 @@ import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI } from './constants.js';
 import { tenGod } from './core.js';
 import { adjustLiuyueByGeju } from './pattern-quality.js';
+// [loop 74 nâng tầng] Phục/Phản ngâm tháng × 4 trụ nguyên cục (mirror 流年 loop 19).
+import { isFuyin, isFanyin } from './fuyin.js';
 
 const wxVi = (w) => WX_VI[w];
 const MONTH_ZH = ['寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '丑'];
 const MONTH_LABEL = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+
+// [loop 74 nâng tầng] Thái tuế tháng + 伏吟/反吟 (mirror liunian-pro.js, nhẹ hơn vì tháng 30 ngày).
+const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
+const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌', 戌:'未', 未:'丑', 辰:'辰', 午:'午', 酉:'酉', 亥:'亥' };
+const PO = { 子:'酉', 酉:'子', 丑:'辰', 辰:'丑', 寅:'亥', 亥:'寅', 卯:'午', 午:'卯', 巳:'申', 申:'巳', 戌:'未', 未:'戌' };
+const HAI = { 子:'未', 未:'子', 丑:'午', 午:'丑', 寅:'巳', 巳:'寅', 卯:'辰', 辰:'卯', 申:'亥', 亥:'申', 酉:'戌', 戌:'酉' };
+const QIN_VI = { year: 'Niên Trụ (tổ bối)', month: 'Nguyệt Trụ (phụ mẫu/sự nghiệp)', day: 'Nhật Trụ (bản thân/phối ngẫu)', time: 'Thời Trụ (tử tức)' };
+// Trọng số 伏吟/反吟 tháng (nhẹ hơn 流年: tháng ngắn). 反吟 KHÔNG có day (冲日支 đã tính ở Thái tuế).
+const W_FUYIN = { day: 4, month: 3, year: 2, time: 2 };
+const W_FANYIN = { month: 6, year: 5, time: 5 };
 
 // Thập thần lưu nguyệt → độ倾斜 (nhẹ hơn lưu niên vì chỉ 30 ngày)
 const GOD_MONTH = {
@@ -41,6 +53,8 @@ export function computeLiuyue(R, solarYear, patternQuality) {
   const dayGan = R.chart.dayGan;
   const fav = new Set([R.yong.primary, R.yong.xi].filter(Boolean));
   const avoid = new Set([R.yong.ji, R.yong.chou]);
+  const dayZhi = R.chart.pillars.day.zhi;           // [loop 74] Thái tuế tháng
+  const yearBirthZhi = R.chart.pillars.year.zhi;
   const months = [];
 
   for (let i = 0; i < 12; i++) {
@@ -69,13 +83,42 @@ export function computeLiuyue(R, solarYear, patternQuality) {
     const g = GOD_MONTH[ganGod];
     let godVi = '';
     if (g) { score += g.d; godVi = g.vi; }
+
+    // [loop 74 nâng tầng] (3) THÁI TUẾ THÁNG — tháng chi vs Nhật Chi + năm sinh chi.
+    //   Tháng chi xung/hình/hại = tháng BIẾN ĐỘNG (mirror 流年 layer, nhẹ hơn vì 30 ngày).
+    //   Chống double-count: 冲日支 chỉ tính khi dayZhi≠yearBirthZhi (冲年支 đã bao hàm nếu trùng).
+    const extraNotes = [];
+    if (zhi === yearBirthZhi) { score -= 3; extraNotes.push('值月太岁'); }
+    if (CHONG[dayZhi] === zhi && dayZhi !== yearBirthZhi) { score -= 7; extraNotes.push('⚡月支冲日支 — biến động bản thân/sức khoẻ'); }
+    if (CHONG[yearBirthZhi] === zhi) { score -= 5; extraNotes.push('冲年支 (thái tuế tháng)'); }
+    if (XING[yearBirthZhi] === zhi) { score -= 4; extraNotes.push('刑月太岁 — quan phi/thị phi'); }
+    if (PO[yearBirthZhi] === zhi) { score -= 3; extraNotes.push('破月太岁 — hao tài'); }
+    if (HAI[yearBirthZhi] === zhi) { score -= 3; extraNotes.push('害月太岁 — tiểu nhân'); }
+
+    // [loop 74 nâng tầng] (4) PHỤC/PHẢN NGÂM tháng × 4 trụ nguyên cục.
+    //   Tháng can-chi trùng trụ = 伏吟 (đình trệ); 天克地冲 trụ = 反吟 (biến cố).
+    //   反吟 loại day (冲日支 đã tính ở Thái tuế). Hóa giải: tháng mang Dụng/Hỷ → giảm 60%.
+    const yp = { gan, zhi };
+    const mitig = fav.has(ganWx) || fav.has(zhiWx);
+    const factor = mitig ? 0.4 : 1;
+    let fyD = 0;
+    const fyNotes = [];
+    for (const k of ['day', 'month', 'year', 'time']) {
+      const np = R.chart.pillars[k];
+      if (!np || !np.gan) continue;
+      if (isFuyin(yp, np)) { fyD -= W_FUYIN[k] * factor; fyNotes.push(`伏吟 ${QIN_VI[k]}`); }
+      else if (isFanyin(yp, np)) { if (k === 'day') continue; fyD -= W_FANYIN[k] * factor; fyNotes.push(`反吟 ${QIN_VI[k]}`); }
+    }
+    score += fyD;
+
     score = Math.max(5, Math.min(95, Math.round(score)));
     let rating;
     if (score >= 64) rating = 'Cát';
     else if (score >= 50) rating = 'Bình';
     else if (score >= 38) rating = 'Hơi kỵ';
     else rating = 'Kỵ';
-    months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note: godVi });
+    const note = [godVi, ...extraNotes, ...fyNotes].filter(Boolean).join(' · ');
+    months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note, taiSui: extraNotes, fuyin: fyNotes });
   }
 
   // [loop 4 — 格局流月喜忌] Cộng tầng 格局 LÊN TRÊN tầng ngũ hành + thập thần tháng
