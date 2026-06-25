@@ -2379,6 +2379,9 @@ function run() {
   renderLiuRi(todayStr);
   if ($('zlr-date')) { $('zlr-date').value = todayStr; try { renderZiweiLiuri(todayStr); } catch (e) { console.warn('zlr init', e.message); } }
   try { renderXiaoxian(); } catch (e) { console.warn('xiaoxian init', e.message); }
+
+  // [loop 148] 3D TILT INTERACTIVE — ALL cards get mouse-tracking 3D tilt + glare
+  init3DTilt();
   if ($('bh-date')) { $('bh-date').value = todayStr; try { renderBestHour(todayStr); } catch (e) { console.warn('best-hour init', e.message); } }
   $('ts-year').value = curYear;
   renderTaisui(curYear);
@@ -4240,3 +4243,47 @@ function syncLongField() {
 if ($('city')) { $('city').addEventListener('change', syncLongField); syncLongField(); }
 // auto-render on page load — user sees results immediately (saved data or defaults)
 try { run(); } catch (e) { console.warn('auto-render:', e.message); }
+
+// ============================================================================
+// [loop 148] 3D TILT INTERACTIVE — chuột/touch → card nghiêng 3D + lóa mắt
+// ============================================================================
+function init3DTilt() {
+  const cards = document.querySelectorAll('#result > .card');
+  if (!cards.length) return;
+  // Skip on touch-only devices (tilt needs mouse)
+  if (matchMedia('(hover: none)').matches) return;
+
+  cards.forEach((card) => {
+    let glare = card.querySelector('.tilt-glare');
+    if (!glare) {
+      glare = document.createElement('div');
+      glare.className = 'tilt-glare';
+      glare.style.cssText = 'position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;opacity:0;transition:opacity .3s;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,0.12),transparent 50%)';
+      card.appendChild(glare);
+    }
+    card.style.transformStyle = 'preserve-3d';
+    let raf = null;
+
+    const onMove = (e) => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;   // 0→1
+        const y = (e.clientY - rect.top) / rect.height;    // 0→1
+        const rx = (0.5 - y) * 8;   // rotateX: -4°→+4°
+        const ry = (x - 0.5) * 8;   // rotateY: -4°→+4°
+        card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(4px)`;
+        glare.style.setProperty('--gx', (x * 100) + '%');
+        glare.style.setProperty('--gy', (y * 100) + '%');
+        glare.style.opacity = '1';
+      });
+    };
+    const onLeave = () => {
+      if (raf) cancelAnimationFrame(raf);
+      card.style.transform = '';
+      glare.style.opacity = '0';
+    };
+    card.addEventListener('mousemove', onMove);
+    card.addEventListener('mouseleave', onLeave);
+  });
+}
