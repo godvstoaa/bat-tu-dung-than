@@ -16,6 +16,7 @@ import { dayunGodMeaning } from './dayun-god.js';
 import { checkDayunInteractions } from './dayun-check.js';
 import { analyzeHanNuan } from './han-nuan.js';
 import { analyzeWxFlow } from './wx-flow.js';
+import { classifyChartLevel } from './chart-level.js';
 import { dayunChangSheng, dayunYongChangSheng } from './dayun-changsheng.js';
 import { taiYuan } from './taiyuan.js';
 
@@ -48,6 +49,14 @@ export function extendBrief(R) {
   try {
     const wf = analyzeWxFlow(R);
     parts.push(`NGŨ HÀNH LƯU THÔNG (五行流通): ${wf.circulation} Thông ${wf.flow.length}/5${wf.blocks.length ? ', đứt ' + wf.blocks.length : ''}.${wf.profile.length ? ' ' + wf.profile.join(' ') : ''}`);
+  } catch (e) {}
+
+  // [loop 89] MỆNH CÁCH TẦNG LỚP (命格層次) — phân loại cổ điển 6 tiêu chí (module chart-level trước đây ẩn).
+  try {
+    const lv = classifyChartLevel(R);
+    if (lv && lv.level !== 'unknown') {
+      parts.push(`MỆNH CÁCH TẦNG LỚP (命格層次): ${lv.levelVi} — ${lv.passCount}/6 tiêu chí (${(lv.criteria || []).filter((c) => c.pass).map((c) => c.name).join('/')}). ${lv.note}`);
+    }
   } catch (e) {}
 
   // Thai nguyên (nếu có)

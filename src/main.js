@@ -97,6 +97,7 @@ import { analyzeHuaQi } from './engine/huaqi.js';
 import { dayunChangSheng, liunianChangSheng, dayunYongChangSheng, liuyueChangSheng } from './engine/dayun-changsheng.js';
 import { analyzeHanNuan } from './engine/han-nuan.js';
 import { analyzeWxFlow } from './engine/wx-flow.js';
+import { classifyChartLevel } from './engine/chart-level.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1071,6 +1072,25 @@ function renderWxFlow(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được ngũ hành流通.</p>'; }
 }
 
+function renderChartLevel(R) {
+  const el = $('chart-level');
+  if (!el) return;
+  try {
+    const lv = classifyChartLevel(R);
+    if (lv.level === 'unknown') { el.innerHTML = '<p class="hint">' + esc(lv.note) + '</p>'; return; }
+    const critHtml = (lv.criteria || []).map((c) => {
+      const icon = c.pass ? '✓' : '✗';
+      const cls = c.pass ? 'cat' : 'xiong';
+      return `<div class="yz-row"><span class="combo ${cls}">${icon} ${esc(c.name)}</span> <span class="hint">${esc(c.detail)}</span></div>`;
+    }).join('');
+    el.innerHTML = `
+      <p><b>Đẳng cấp: ${esc(lv.levelVi)}</b> (${(lv.passCount || 0)}/6 tiêu chí đạt)</p>
+      ${critHtml}
+      <p class="hint">${esc(lv.note)}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được mệnh cách tầng lớp.</p>'; }
+}
+
 function renderMarriageStars(R) {
   const el = $('marriage-stars');
   if (!el) return;
@@ -1730,6 +1750,7 @@ function run() {
   lazyRender('huaqi',          () => { try { renderHuaqi(currentResult); } catch (e) { console.warn('huaqi', e.message); } });
   lazyRender('han-nuan',       () => { try { renderHanNuan(currentResult); } catch (e) { console.warn('hannuan', e.message); } });
   lazyRender('wx-flow',        () => { try { renderWxFlow(currentResult); } catch (e) { console.warn('wxflow', e.message); } });
+  lazyRender('chart-level',    () => { try { renderChartLevel(currentResult); } catch (e) { console.warn('chartlevel', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
