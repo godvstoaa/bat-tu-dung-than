@@ -140,6 +140,15 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
     const dyNotes = [];
     let dyD = 0;
 
+    // [loop 112 elevate] 岁运并临 (tuế vận tịnh lâm) — 流年 ganZhi TRÙNG ĐỨNG 大运 ganZhi
+    //   (exact match, không chỉ đồng hành). «岁运并临, 其力倍增» — lực NHÂN ĐÔI.
+    //   Dụng → CÁT mạnh / Kỵ → HUNG mạnh. Sự kiện quan trọng năm đó.
+    if (activeDayun === yGan + yZhi) {
+      const sign = _yongSign(yWx, yong);
+      dyD += 8 * sign; // ±8 (cực mạnh, nhân đôi)
+      dyNotes.push(`⚡ 岁运并临 (tuế vận tịnh lâm): 流年 ${yGan}${yZhi} = 大运 ${activeDayun} TRÙNG ĐỨNG → lực NHÂN ĐÔI cực mạnh. ${sign > 0 ? '★ Dụng → CÁT MẠNH (năm đỉnh)' : sign < 0 ? '⚠ Kỵ → HUNG MẠNH (cẩn thận)' : 'trung tính nhưng biến động lớn'}.`);
+    }
+
     // (6a) 十 thần tương sinh/khắc giữa 大运 và 流年 (dùng ngũ hành).
     //   运god 生 年god → 年god được SINH → lực phóng đại (cùng chiều với delta gốc của năm).
     //   运god 克 年god → 年god bị KHẮC → lực suy giảm (ngược chiều delta gốc).
