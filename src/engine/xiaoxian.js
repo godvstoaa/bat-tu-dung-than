@@ -31,11 +31,16 @@ const PALACE_THEME = {
  * @returns {{ branch, branchVi, direction, palaceLabel?, palaceTheme? }}
  */
 export function xiaoxian(birthZhi, virtualAge, gender) {
-  const bIdx = ZHI_ORDER.indexOf(birthZhi);
   const isMale = gender === 'nam';
-  // nam thuận (+), nữ nghịch (-); từ 1 tuổi, mỗi tuổi +1
+  // [loop 66 sửa] 安小限诀: tam hợp nhóm → 墓库対 cung khởi 1 tuổi (KHÔNG phải birthZhi cung).
+  //   «寅午戌人辰上起, 申子辰人自戌宫, 巳酉丑人未宫始, 亥卯未人丑宫行»
+  const START_BY_GROUP = {
+    寅:'辰', 午:'辰', 戌:'辰', 申:'戌', 子:'戌', 辰:'戌',
+    巳:'未', 酉:'未', 丑:'未', 亥:'丑', 卯:'丑', 未:'丑',
+  };
+  const startIdx = ZHI_ORDER.indexOf(START_BY_GROUP[birthZhi] || '辰');
   const offset = (virtualAge - 1) * (isMale ? 1 : -1);
-  const xIdx = ((bIdx + offset) % 12 + 12) % 12;
+  const xIdx = ((startIdx + offset) % 12 + 12) % 12;
   return {
     branch: ZHI_ORDER[xIdx],
     branchVi: ZHI_VI[ZHI_ORDER[xIdx]],
