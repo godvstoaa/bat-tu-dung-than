@@ -30,6 +30,11 @@
   --shadow-card: inset 0 1px 0 rgba(247, 236, 203, 0.06), 0 18px 44px -20px rgba(0, 0, 0, 0.75);
   --shadow-edict: inset 0 1px 0 rgba(247, 236, 203, 0.08), inset 0 0 0 1px rgba(192, 57, 43, 0.1), 0 22px 50px -22px rgba(0, 0, 0, 0.8);
   --shadow-gold: 0 10px 36px rgba(212, 175, 55, 0.4);
+  /* [loop 144 — StyleSeed inspired] fix missing vars */
+  --gold-soft: rgba(212, 175, 55, 0.12);
+  --muted: #6b6480;
+  --glass: rgba(245, 236, 203, 0.04);
+  --glass-border: rgba(212, 175, 55, 0.15);
 }
 
 * { box-sizing: border-box; }
@@ -1189,5 +1194,135 @@ html{scroll-behavior:smooth}
 }
 .quick-summary-card > div > div > div > div:last-child {
   color: var(--silk) !important;
+}
+
+/* ============================================================
+   [loop 144] STYLESEED-INSPIRED ANIMATION ENHANCEMENTS
+   Glass morphism + shimmer + glow + gradient text + loading states
+   ============================================================ */
+
+/* --- Glass morphism cards --- */
+.card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.card:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(247, 236, 203, 0.1),
+    0 0 0 1px rgba(212, 175, 55, 0.15),
+    0 22px 55px -18px rgba(0, 0, 0, 0.8),
+    0 0 35px -12px rgba(212, 175, 55, 0.08);
+}
+
+/* --- Gradient gold text for card titles --- */
+.card-title {
+  background: linear-gradient(135deg, var(--gold-pale) 0%, var(--gold) 50%, var(--gold-bright) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+}
+
+/* --- Wuxing bar shimmer sweep --- */
+@keyframes wxShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.wx-fill {
+  position: relative;
+  overflow: hidden;
+  background-image: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: wxShimmer 3s ease-in-out infinite;
+}
+
+/* --- Callout border-glow pulse --- */
+@keyframes borderGlow {
+  0%, 100% { box-shadow: inset 3px 0 0 var(--gold); opacity: 0.85; }
+  50% { box-shadow: inset 3px 0 0 var(--gold-bright); opacity: 1; }
+}
+.verse-box, .tiaohou-note, .syn-advice, .zr-advice, .kw-note {
+  animation: borderGlow 4s ease-in-out infinite;
+}
+
+/* --- Number counter pop-in --- */
+@keyframes numPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.wx-pct, .syn-grade .zh, .ln-rate {
+  animation: numPop 0.4s var(--ease-spring) both;
+}
+
+/* --- Button loading state --- */
+@keyframes btnLoading {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+.btn-loading {
+  animation: btnLoading 1.2s ease-in-out infinite;
+  cursor: wait;
+  pointer-events: none;
+}
+
+/* --- Smooth tab panel transition --- */
+.topic-body {
+  transition: opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+}
+.topic-body.topic-hidden {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* --- Section divider draw-in --- */
+@keyframes dividerDraw {
+  0% { transform: scaleX(0); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: left; }
+}
+.grp {
+  position: relative;
+}
+.grp::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: dividerDraw 0.6s var(--ease-out) 0.2s forwards;
+}
+
+/* --- Quick-nav link active glow on scroll --- */
+.quick-nav a.active {
+  background: rgba(212, 175, 55, 0.25);
+  color: var(--gold-bright);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+/* --- Combo badge subtle float --- */
+@keyframes comboFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+.combo.cat { animation: comboFloat 2.5s ease-in-out infinite; }
+
+/* --- Respect reduced motion for ALL new animations --- */
+@media (prefers-reduced-motion: reduce) {
+  .wx-fill, .verse-box, .tiaohou-note, .syn-advice, .zr-advice, .kw-note,
+  .combo.cat, .grp::after, .wx-pct, .syn-grade .zh, .ln-rate {
+    animation: none !important;
+  }
+  .card-title {
+    -webkit-text-fill-color: var(--gold-bright);
+    text-fill-color: var(--gold-bright);
+    background: none;
+  }
 }
 
