@@ -61,6 +61,22 @@ const COMBO_DEFS = [
   { id: 'shaGong', name: '殺攻身', vi: 'Sát Công Thân', tone: 'xiong',
     test: (g, s) => s && !s.strong && (g['七殺'] || 0) >= 2,
     desc: 'Thất Sát quá nặng mà thân nhược không chịu nổi — áp lực/sức khỏe/rủi ro lớn; cần Ấn hóa hoặc Thực chế.' },
+  // [loop 85 bổ sung 5 tổ hợp cổ pháp còn thiếu]
+  { id: 'shangJin', name: '傷官傷盡', vi: 'Thương Quan Thương Tận', tone: 'cat',
+    test: (g) => (g['傷官'] || 0) >= 1.5 && (g['正官'] || 0) === 0 && (g['七殺'] || 0) === 0,
+    desc: 'Thương Quan nhiều mà QUAN SÁT vắng sạch («伤官伤尽, 富贵») — phản nghịch biến tài năng đột phá, hợp khởi nghiệp/sáng tạo, phú quý (cát khi quan sát tuyệt).' },
+  { id: 'qunJie', name: '群劫爭財', vi: 'Quần Kiếp Tranh Tài', tone: 'xiong',
+    test: (g) => (g['劫財'] || 0) >= 1.5 && ((g['正財'] || 0) + (g['偏財'] || 0)) >= 1,
+    desc: 'Kiếp Tài nhiều tranh giành Tài («群劫争财») — hao tiền, hôn nhân biến, đầu tư thất bại; cần Quan Sát chế Kiếp.' },
+  { id: 'yinHuy', name: '印綬護身', vi: 'Ấn Thụ Hộ Thân', tone: 'cat',
+    test: (g, s) => s && !s.strong && ((g['正印'] || 0) + (g['偏印'] || 0)) >= 2,
+    desc: 'Thân nhược được Ấn (nhiều) sinh phù bảo vệ («印绶护身») — quý nhân giúp, học vấn, ấm no, phúc (dù thân nhược vẫn được ấpủ).' },
+  { id: 'shiXie', name: '食神洩秀', vi: 'Thực Tiết Tú', tone: 'cat',
+    test: (g, s) => s && s.strong && (g['食神'] || 0) >= 1,
+    desc: 'Thân vượng được Thực Thần tiết tú («身旺食泄秀») — thông minh, nghệ thuật/tài hoa bộc lộ, phúc lộc.' },
+  { id: 'shenRenCai', name: '身旺任財', vi: 'Thân Vượng Nhậm Tài', tone: 'cat',
+    test: (g, s) => s && s.strong && ((g['正財'] || 0) + (g['偏財'] || 0)) >= 2,
+    desc: 'Thân vượng + Tài nhiều («身旺任财») — gánh được tài lớn, tiền đồ phú quý, kinh doanh lớn (đối lập «财多身弱»).' },
 ];
 
 /**
