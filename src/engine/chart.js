@@ -285,8 +285,12 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
   const EXTREME_COLD = ['亥', '子', '丑']; // đông hàn → cần Hỏa noãn
   const EXTREME_HOT = ['巳', '午', '未'];  // hạ nhiệt → cần Thủy nhuận
   const isExtreme = EXTREME_COLD.includes(chart.monthZhi) || EXTREME_HOT.includes(chart.monthZhi);
+  // [loop 116 fix BUG CAO] 调候 override KHÔNG fire cho CÁCH ĐẶC BIỆT (从格/专旺).
+  //   Từ cách «tòng/tracking thế» — đã theo thế cục thì 调候 không đè (cổ法: «从格
+  //   不论调候»). Trước đây 调候 override CHẾT 从財格 用神 (火→Thủy) → Dụng SAI.
+  const isSpecial = method.includes('Cách cục đặc biệt');
   let tiaoOverride = false;
-  if (isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary) {
+  if (isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary && !isSpecial) {
     tiaoOverride = true;
     const fuyiPrimary = primary;
     primary = tiaoPrimaryWx;                                  // 调候 lên làm chủ
