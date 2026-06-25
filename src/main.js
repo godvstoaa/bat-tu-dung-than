@@ -110,6 +110,12 @@ import { investmentStyle } from './engine/invest-style.js';
 import { personalNutrition } from './engine/bazi-diet.js';
 import { crystalLuckyObjects } from './engine/crystal-fs.js';
 import { clothingByOccasion } from './engine/clothing-fs.js';
+import { personalWorkout } from './engine/bazi-workout.js';
+import { plantFengShui } from './engine/plant-fs.js';
+import { musicTherapy } from './engine/music-therapy.js';
+import { teaTherapy } from './engine/tea-therapy.js';
+import { aromaTherapy } from './engine/aroma-fs.js';
+import { analyzeBusiness } from './engine/bazi-business.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1243,6 +1249,22 @@ function renderInvestStyle(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được phong cách đầu tư.</p>'; }
 }
 
+function renderBaziBusiness(R) {
+  const el = $('bazi-business');
+  if (!el) return;
+  try {
+    const b = analyzeBusiness(R);
+    const biz = Array.isArray(b.bizTypes) ? b.bizTypes.join(', ') : (b.bizTypes || '');
+    el.innerHTML = `
+      <p><b>${b.shouldStart ? '✓ Nên khởi nghiệp' : '⚠ Cần thận trọng khởi nghiệp'}</b>${biz ? ' — ngành hợp: ' + esc(biz) : ''}</p>
+      ${b.soloVsPartner ? `<p class="hint">🤝 ${esc(b.soloVsPartner)}</p>` : ''}
+      ${b.partnerStyle ? `<p class="hint">Phong cách: ${esc(b.partnerStyle)}</p>` : ''}
+      ${b.timing ? `<p class="hint">⏰ ${esc(b.timing)}</p>` : ''}
+      <p class="hint">${esc(b.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được khởi nghiệp.</p>'; }
+}
+
 function renderLifestyle(R) {
   const el = $('lifestyle');
   if (!el) return;
@@ -1268,6 +1290,16 @@ function renderLifestyle(R) {
     const text = cl.advice || cl.summary || '';
     if (text) html += `<h4 class="syn-h4" style="margin-top:8px">👕 Trang phục & màu sắc</h4><p class="hint">${esc(text)}</p>`;
   } catch (e) {}
+  // Generic lifestyle sections (workout/plant/music/tea/aroma) — tìm summary string tốt nhất
+  const bestText = (o) => o.summary || o.advice || o.tip || o.recommendation || Object.values(o).find((v) => typeof v === 'string' && v.length > 30) || '';
+  const gen = (title, fn) => {
+    try { const o = fn(R); const t = bestText(o); if (t) html += `<p class="hint"><b>${title}:</b> ${esc(t)}</p>`; } catch (e) {}
+  };
+  gen('🏃 Vận động', personalWorkout);
+  gen('🌱 Cây phong thủy', plantFengShui);
+  gen('🎵 Âm nhạc trị liệu', musicTherapy);
+  gen('🍵 Trà dưỡng sinh', teaTherapy);
+  gen('💧 Tinh dầu', aromaTherapy);
   el.innerHTML = html || '<p class="hint">Không tính được lifestyle.</p>';
 }
 
@@ -1941,6 +1973,7 @@ function run() {
   lazyRender('romance-deep',    () => { try { renderRomanceDeep(currentResult); } catch (e) { console.warn('romancedeep', e.message); } });
   lazyRender('invest-style',    () => { try { renderInvestStyle(currentResult); } catch (e) { console.warn('investstyle', e.message); } });
   lazyRender('lifestyle',       () => { try { renderLifestyle(currentResult); } catch (e) { console.warn('lifestyle', e.message); } });
+  lazyRender('bazi-business',   () => { try { renderBaziBusiness(currentResult); } catch (e) { console.warn('bizbusiness', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
