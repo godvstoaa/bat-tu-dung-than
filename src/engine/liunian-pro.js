@@ -110,11 +110,13 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
   if (YI_MA[grp] === yZhi || YI_MA[BRANCH_GROUP[dayZhi]] === yZhi) { score += 3; ssNotes.push('🐎 Dịch Mã năm — di chuyển/đổi việc (cát nếu Dụng, hao nếu không).'); }
   if (ssNotes.length) schools.push({ phai: 'Lưu Niên Thần Sát', note: ssNotes.join(' '), d: -1 });
 
-  // (5) Thiên khắc địa xung (can năm & can ngày TƯƠNG KHẮC 2 chiều + chi năm xung chi ngày)
-  // [cycle 48 C2] bidirectional — trước đây chỉ bắt 克入(官杀), bỏ sót 克出(财). Nay cả 4 thần khắc.
-  const ganClash = ['七殺', '正官', '正財', '偏財'].includes(ganGod);
+  // (5) Thiên khắc địa xung (天干 xung + địa chi xung)
+  // [loop 60 sửa] 天克 = GAN_CHONG (4 cặp thất sát), KHÔNG phải tenGod ∈ 4 thần khắc.
+  //   Cùng bug fuyin.js (L19) / dayun-check (L59) / dayun-rank (L59): tenGod-based 克 → 384 FP.
+  const _GANCHONG = { 甲:'庚', 庚:'甲', 乙:'辛', 辛:'乙', 丙:'壬', 壬:'丙', 丁:'癸', 癸:'丁' };
+  const ganClash = _GANCHONG[dayGan] === yGan;
   const zhiClash = CHONG[dayZhi] === yZhi;
-  if (ganClash && zhiClash) { score -= 18; schools.push({ phai: 'Thiên Khắc Địa Xung', note: '⚡ Năm can khắc Nhật Can + chi xung Nhật Chi = "thiên khắc địa xung" — năm ĐẠI HUNG, biến loạn lớn.', d: -18 }); }
+  if (ganClash && zhiClash) { score -= 18; schools.push({ phai: 'Thiên Khắc Địa Xung', note: '⚡ Thiên xung + Địa xung Nhật Trụ = "thiên khắc địa xung" — năm ĐẠI HUNG, biến loạn lớn.', d: -18 }); }
   else if (zhiClash) { score -= 10; schools.push({ phai: 'Địa Xung', note: 'Chi năm xung Nhật Chi — biến động bản thân/gia đạo.', d: -10 }); }
 
   // (6) 大运互动 (运年组合) — TUỲ CHỌN, chỉ khi có activeDayun.
