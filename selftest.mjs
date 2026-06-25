@@ -4710,6 +4710,49 @@ console.log('\n################## Y. [loop 75] LƯU NHẬT nâng tầng (fix dou
   console.log(`   lưu nhật nâng tầng: 刑/破太岁 + 伏吟反吟 + deterministic ✓`);
 }
 
+// ################## Z. [loop 76] PHỐI NGÃU profile crash fix (KE import) + 孤辰 bịa bỏ ##################
+import { buildFullProfile as _bfp } from './src/engine/partner-profile.js';
+console.log('\n################## Z. [loop 76] phối ngẫu profile: crash fix (KE) + bỏ 孤辰 bịa ##################');
+{
+  // Z1. [HIGH crash fix] buildFullProfile KHÔNG crash khi sao-con quan hệ 克/none.
+  //   Trước đây rel() dùng KE (KHÔNG import) → ReferenceError → feature "hồ sơ phối ngẫu"
+  //   crash cho mọi pair có child-wx 克/none (live ở main.js:3406). Nay import KE.
+  let _crashes = 0, _oks = 0, _kidPara = 0;
+  for (const [uy, um, ud] of [[1990, 5, 15], [1988, 8, 20], [1995, 3, 3]]) {
+    const _userR = analyze(uy, um, ud, 10, 0, 'nam', 2026);
+    for (const [py, pm, pd] of [[1992, 7, 7], [1989, 11, 11], [1993, 6, 6], [1991, 2, 14]]) {
+      const _pR = analyze(py, pm, pd, 14, 0, 'nữ', 2026);
+      const _match = { chart: _pR, rank: 1, hehunScore: 70, hehunRating: 'Hợp', yearRel: 'tam hợp', dayRel: true, date: '2026-01-01' };
+      try {
+        const _prof = _bfp(_match, _userR);
+        _oks++;
+        if (_prof.paragraphs.some((pp) => pp.startsWith('Con cái'))) _kidPara++;
+        // [loop 76] KHÔNG còn 孤辰 bịa 'tại Day' / 'day.zhi===亥'
+        assert(!_prof.paragraphs.some((pp) => /孤辰 tại Day/.test(pp)), '[fix] KHÔNG còn 孤辰 "tại Day" bịa cổ pháp');
+      } catch (e) { _crashes++; }
+    }
+  }
+  assert(_crashes === 0, `[fix] buildFullProfile KHÔNG crash qua ${_oks} pair (trước fix crash ở child-wx 克/none)`);
+  assert(_kidPara === _oks, `[fix] mọi pair có paragraph "Con cái" (rel() chạy được — KE branch hoạt động)`);
+
+  // Z2. 克 branch works: tìm pair có child-wx 克 nhau → paragraph Con cái ghi rõ "khắc"
+  let _keText = null;
+  outer: for (const [uy, um, ud] of [[1990, 5, 15], [1988, 8, 20], [1995, 3, 3], [2000, 12, 22]]) {
+    const _u = analyze(uy, um, ud, 10, 0, 'nam', 2026);
+    for (const [py, pm, pd] of [[1992, 7, 7], [1989, 11, 11], [1993, 6, 6], [1991, 2, 14], [1987, 9, 9]]) {
+      const _p = analyze(py, pm, pd, 14, 0, 'nữ', 2026);
+      const _m = { chart: _p, rank: 1, hehunScore: 70, hehunRating: 'Hợp', yearRel: 'tam hợp', dayRel: true, date: '2026-01-01' };
+      try {
+        const _pr = _bfp(_m, _u);
+        const _kid = _pr.paragraphs.find((pp) => pp.startsWith('Con cái'));
+        if (_kid && _kid.includes('khắc')) { _keText = _kid; break outer; }
+      } catch (e) {}
+    }
+  }
+  if (_keText) console.log(`   克 branch hoạt động: "${_keText.slice(0, 70)}..." ✓`);
+  console.log(`   buildFullProfile: ${_oks} pair OK, 0 crash, mọi pair có "Con cái" + không 孤辰 bịa ✓`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');

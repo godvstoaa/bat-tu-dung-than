@@ -3,7 +3,7 @@
 //  Output = multi-paragraph: personality + career + appearance + family +
 //  interaction + strengths/weaknesses + name suggestion + children forecast.
 // ============================================================================
-import { GAN, ZHI, WX_VI, TEN_GOD_VI, KE_BY, SHENG } from './constants.js';
+import { GAN, ZHI, WX_VI, TEN_GOD_VI, KE, KE_BY, SHENG } from './constants.js';
 import { DITIANSUI } from './kb.js';
 import { dominantGods } from './kb.js';
 
@@ -114,8 +114,9 @@ export function buildFullProfile(match, userR) {
   if (match.dayRel) strengths.push('Nhật Can hợp → tâm đầu ý hợp, dễ đồng cảm');
   strengths.push(`Điểm hợp hôn: ${match.hehunScore}/100 (${match.hehunRating})`);
   if (userR.yong.avoid.includes(R.yong.primary)) weaknesses.push(`Partner Dụng ${WX_VI[R.yong.primary]} trùng Kỵ của bạn → một số lợi ích của partner có thể giảm`);
-  // 孤辰 check
-  if (userR.chart.pillars.day.zhi === '亥') weaknesses.push('Bạn có 孤辰 tại Day → cần chủ động mở lòng, kiên nhẫn');
+  // [loop 76 sửa] bỏ 孤辰 hardcode 'day.zhi===亥' — BỊA cổ pháp. 孤辰寡宿 cổ pháp theo
+  //   NIÊN CHI (四方位) + GIỚI TÍNH (nam 孤辰, nữ 寡宿), đã tính đúng ở shensha-marriage.js.
+  //   Đoán theo nhật chi 亥 = sai cung + sai nguồn → gây hiểu nhầm. Chi tiết xem mục Thần Sát Hôn Nhân.
   p.push(`Điểm mạnh: ${strengths.join('; ')}.`);
   if (weaknesses.length) p.push(`Cẩn thận: ${weaknesses.join('; ')}.`);
 
