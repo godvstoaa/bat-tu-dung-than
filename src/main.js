@@ -909,7 +909,7 @@ function renderHealth(R) {
       ${h.remedyFoods ? `<div class="tiaohou-note"><b>Thực phẩm chữa lành (hành ${esc(h.remedyVi || '')}):</b> ${esc(h.remedyFoods)}</div>` : ''}
       ${h.riskSeason ? `<p class="hint">📅 Mùa phòng bệnh: ${esc(h.riskSeason)}</p>` : ''}
       ${h.organRisk ? `<p class="hint">${esc(h.organRisk)}</p>` : ''}
-      <p class="hint" style="margin-top:6px">${esc(h.advice || '')}</p>`;
+      ${Array.isArray(h.advice) && h.advice.length ? `<p class="hint" style="margin-top:6px">💡 ${h.advice.map((a) => esc(a)).join('<br>💡 ')}</p>` : (h.advice ? `<p class="hint">${esc(h.advice)}</p>` : '')}`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được sức khoẻ ngũ hành.</p>'; }
 }
 
