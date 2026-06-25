@@ -138,6 +138,16 @@ body {
 .subtitle .zh { color: var(--gold); }
 
 /* ===== LAYOUT / CARD (kiểu chiếu chỉ + ấn ký) ===== */
+/* [loop 156] Card search/filter input */
+.card-search {
+  width: 100%; max-width: 500px; margin: 0 auto 8px; display: block;
+  padding: 8px 14px; font-size: 13px; color: var(--silk);
+  background: var(--glass); border: 1px solid var(--glass-border); border-radius: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-search:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(212,175,55,0.15); outline: none; }
+.card-search::placeholder { color: var(--silk-muted); }
+
 /* [loop 150] CARD VARIETY — alternating accent top borders */
 #result > .card:nth-child(4n+1) { border-top: 2px solid rgba(212, 175, 55, 0.25); }
 #result > .card:nth-child(4n+2) { border-top: 2px solid rgba(46, 158, 107, 0.2); }

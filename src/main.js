@@ -2382,6 +2382,24 @@ function run() {
 
   // [loop 148] 3D TILT INTERACTIVE — ALL cards get mouse-tracking 3D tilt + glare
   init3DTilt();
+
+  // [loop 156] CARD SEARCH/FILTER — lọc 109 card theo từ khoá
+  const cardSearch = $('card-search');
+  if (cardSearch) {
+    cardSearch.classList.remove('hidden');
+    cardSearch.addEventListener('input', () => {
+      const q = cardSearch.value.trim().toLowerCase();
+      const cards = document.querySelectorAll('#result > .card, #result > h2.grp');
+      cards.forEach((el) => {
+        if (!q) { el.style.display = ''; return; }
+        const title = el.querySelector('.card-title') || el;
+        const text = title.textContent.toLowerCase();
+        // also search card content
+        const body = el.textContent.toLowerCase().slice(0, 500);
+        el.style.display = (text.includes(q) || body.includes(q)) ? '' : 'none';
+      });
+    });
+  }
   if ($('bh-date')) { $('bh-date').value = todayStr; try { renderBestHour(todayStr); } catch (e) { console.warn('best-hour init', e.message); } }
   $('ts-year').value = curYear;
   renderTaisui(curYear);
