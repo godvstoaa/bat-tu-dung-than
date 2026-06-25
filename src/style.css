@@ -15,6 +15,8 @@
   --cinnabar-deep: #7d1a14;
   --cinnabar-glow: rgba(192, 57, 43, 0.5);
   --jade: #2e9e6b;
+  --cat: var(--jade);     /* [loop 182] cát accent — unify var(--cat,…) usages with theme (trước đây fallback #2a7 lệch --jade) */
+  --hung: var(--cinnabar); /* hung accent — unify với --cinnabar (trước đây fallback #c33) */
   --silk: #f3ead2;
   --silk-dim: #d8cba8;
   --silk-muted: #948864;
