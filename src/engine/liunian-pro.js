@@ -331,14 +331,16 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
     }
   }
 
-  // [loop 159 fix] apply 进气退气 factor to score
+  // [loop 159 fix] apply 进气退气 factor to score (score/rating are const from destructuring)
+  let finalScore = score;
+  let finalRating = rating;
   if (dayunPhase && dayunPhase.factor < 1) {
-    score = Math.max(2, Math.min(98, Math.round(score * dayunPhase.factor)));
-    rating = rateByScore(score);
-    schools.push({ phai: '进气退气', d: -Math.round(score * (1 - dayunPhase.factor)), note: dayunPhase.vi + ' → điểm ×' + dayunPhase.factor });
+    finalScore = Math.max(2, Math.min(98, Math.round(score * dayunPhase.factor)));
+    finalRating = finalScore >= 78 ? 'Đại cát' : finalScore >= 62 ? 'Cát' : finalScore >= 46 ? 'Bình' : finalScore >= 32 ? 'Hơi kỵ' : finalScore >= 20 ? 'Hung' : 'Đại hung';
+    schools.push({ phai: '进气退气', d: finalScore - score, note: dayunPhase.vi + ' → điểm ×' + dayunPhase.factor });
   }
 
-  const out = { year: solarYear, ganZhi: yGan + yZhi, ganGod, ganWx, zhiWx, score, rating, schools, advice };
+  const out = { year: solarYear, ganZhi: yGan + yZhi, ganGod, ganWx, zhiWx, score: finalScore, rating: finalRating, schools, advice };
   if (gejuFavor) out.gejuFavor = gejuFavor;
   if (activeDayun) out.activeDayun = activeDayun; // [运年组合] 大运 đang hành cho năm này
   if (dayunPhase) out.dayunPhase = dayunPhase; // [loop 152] 进气/退气
