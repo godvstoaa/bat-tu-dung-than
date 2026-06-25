@@ -23,7 +23,7 @@ export function rankDayun(R) {
 
   const items = (dayun || []).map((d) => {
     // 1. Base score from Dụng Thần rating
-    let score = d.score * 10; // existing -4..+3 → -40..+30
+    let score = d.score * 10; // [loop 71 sửa comment] range thật -3..+3 (can±2 + chi±1, chart.js:366-369) → -30..+30
 
     // 2. 十神 cat/hung
     const god = tenGod(dayGan, d.gan);

@@ -98,7 +98,9 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
   if (XING[yearBirthZhi] === yZhi) { score -= 12; taiSuiNotes.push('刑太岁 — quan phi, thị phi.'); }
   if (PO[yearBirthZhi] === yZhi) { score -= 8; taiSuiNotes.push('破太岁 — phá tài.'); }
   if (HAI[yearBirthZhi] === yZhi) { score -= 8; taiSuiNotes.push('害太岁 — tiểu nhân, hao tốn ngầm.'); }
-  if (CHONG[dayZhi] === yZhi) { score -= 14; taiSuiNotes.push('⚡日支冲太岁 — tổn bản thân/sức khoẻ, năm "ngày xung".'); }
+  // [loop 71 sửa double-count] chỉ tính khi dayZhi ≠ yearBirthZhi: nếu trùng thì 冲太岁
+  //   (dòng trên, -16) đã bao hàm cùng 1 xung → không trừ 2 lần (trước đây -16+-14=-30).
+  if (CHONG[dayZhi] === yZhi && dayZhi !== yearBirthZhi) { score -= 14; taiSuiNotes.push('⚡日支冲太岁 — tổn bản thân/sức khoẻ, năm "ngày xung".'); }
   if (taiSuiNotes.length) schools.push({ phai: 'Thái Tuế', note: taiSuiNotes.join(' '), d: -1 });
 
   // (4) Thần sát năm (đào hoa / hồng diễm / dương nhận / dịch mã)
@@ -116,8 +118,11 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
   const _GANCHONG = { 甲:'庚', 庚:'甲', 乙:'辛', 辛:'乙', 丙:'壬', 壬:'丙', 丁:'癸', 癸:'丁' };
   const ganClash = _GANCHONG[dayGan] === yGan;
   const zhiClash = CHONG[dayZhi] === yZhi;
-  if (ganClash && zhiClash) { score -= 18; schools.push({ phai: 'Thiên Khắc Địa Xung', note: '⚡ Thiên xung + Địa xung Nhật Trụ = "thiên khắc địa xung" — năm ĐẠI HUNG, biến loạn lớn.', d: -18 }); }
-  else if (zhiClash) { score -= 10; schools.push({ phai: 'Địa Xung', note: 'Chi năm xung Nhật Chi — biến động bản thân/gia đạo.', d: -10 }); }
+  // [loop 71 sửa double-count CAO] mục (3) 日支冲太岁 ĐÃ tính mọi zhiClash (-14 khi dayZhi≠yearBirthZhi).
+  //   Trước đây nhánh `else if (zhiClash) -10` → CÙNG sự kiện bị -14 + -10 = -24 (mọi lá số vào
+  //   năm chi xung Nhật Chi). Nay BỎ nhánh else if; chỉ giữ 天克地冲 (gan+zi) là combo ĐẠI HUNG
+  //   riêng (thêm 天克 + combo amplifier; 地冲 component đã thuộc phái Thái Tuế, không trừ lại).
+  if (ganClash && zhiClash) { score -= 18; schools.push({ phai: 'Thiên Khắc Địa Xung', note: '⚡ Thiên xung + Địa xung Nhật Trụ = "thiên khắc địa xung" — năm ĐẠI HUNG, biến loạn lớn (thêm 天克 + combo; 地冲 đã ở Thái Tuế).', d: -18 }); }
 
   // (6) 大运互动 (运年组合) — TUỲ CHỌN, chỉ khi có activeDayun.
   //   Nguyên lý cổ (渊海子平 ch.论运年, 滴天髓): "运为主, 年为辅". Lực 流年 bị 大运

@@ -11,6 +11,11 @@ import { GAN } from './constants.js';
  */
 export function classifyChartLevel(R) {
   const { chart, wx, yong, pattern, synthesis, shensha, dayun } = R;
+  // [loop 71 guard] upstream (analyze/synthesize) có thể fail im lặng → wx/yong/pattern undefined.
+  //   Trả nhãn an toàn thay vì throw hoặc tính bậy (vd Math.max(...[]=-Infinity) → balanced SAI).
+  if (!wx || !yong || !pattern || !wx.score) {
+    return { level: 'unknown', levelVi: 'Không đủ dữ liệu', criteria: [], note: 'Lá số thiếu dữ liệu ngũ hành/Dụng (upstream fail) — không xếp bậc.', passCount: 0 };
+  }
   const total = wx.total || 1;
   const yongScore = (wx.score[yong.primary] || 0) / total;
   const jiScore = (wx.score[yong.ji] || 0) / total;
@@ -36,10 +41,13 @@ export function classifyChartLevel(R) {
   criteria.push({ name: '清浊', pass: clean, detail: clean ? 'Mệnh thanh (không tổ hợp hung)' : `Trọc (${xiongCombos.length} tổ hợp hung: ${xiongCombos.map((c) => c.vi).join(',')})` });
 
   // 4. 配合 (ngũ hành lưu thông — không có hành quá thái/quá suy)
-  const pct = Object.values(wx.pct);
-  const maxPct = Math.max(...pct), minPct = Math.min(...pct);
-  const balanced = maxPct < 50 && minPct > 5;
-  criteria.push({ name: '配合流通', pass: balanced, detail: balanced ? 'Ngũ hành tương đối cân' : `Thiên lệch (max ${maxPct.toFixed(0)}%, min ${minPct.toFixed(0)}%)` });
+  //   [loop 71 sửa bug] guard pct rỗng: Math.max(...[])=-Infinity, Math.min(...[])=+Infinity
+  //   → balanced=true SAI (đẩy bậc quá cao) khi upstream wx.pct fail. Nay yêu cầu pct có dữ liệu.
+  const pct = Object.values(wx.pct || {});
+  const hasPct = pct.length > 0;
+  const maxPct = hasPct ? Math.max(...pct) : 0, minPct = hasPct ? Math.min(...pct) : 0;
+  const balanced = hasPct && maxPct < 50 && minPct > 5;
+  criteria.push({ name: '配合流通', pass: balanced, detail: !hasPct ? 'Không đủ dữ liệu ngũ hành' : (balanced ? 'Ngũ hành tương đối cân' : `Thiên lệch (max ${maxPct.toFixed(0)}%, min ${minPct.toFixed(0)}%)`) });
 
   // 5. 神煞 cát tinh
   const hasStars = catShensha >= 3;
