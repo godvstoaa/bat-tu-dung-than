@@ -7,6 +7,7 @@
 import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { tenGod } from './core.js';
+import { ziShiRoll } from './chart.js'; // [loop 178] 命宫 bẩm sinh dùng cùng 子时换日 八字
 
 const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 const YIN_ORDER = ['寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '丑'];
@@ -18,7 +19,9 @@ const WUHU = { 甲:'丙', 己:'丙', 乙:'戊', 庚:'戊', 丙:'庚', 辛:'庚',
  */
 export function baziMingGong(R) {
   const chart = R.chart;
-  const lunar = Solar.fromYmdHms(chart.input.year, chart.input.month, chart.input.day, chart.input.hour, chart.input.minute, 0).getLunar();
+  // [loop 178] 子时换日 — đồng bộ buildChart: chart.input giữ giờ thật, roll cho tính âm lịch
+  const [my, mm, md, mh, mmin] = ziShiRoll(chart.input.year, chart.input.month, chart.input.day, chart.input.hour, chart.input.minute);
+  const lunar = Solar.fromYmdHms(my, mm, md, mh, mmin, 0).getLunar();
   const lm = lunar.getMonth();
   const timeZhi = lunar.getTimeZhi();
   const hourOrder = ZHI_ORDER.indexOf(timeZhi) + 1;

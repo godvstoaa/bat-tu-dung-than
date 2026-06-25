@@ -7,6 +7,7 @@
 import { Solar } from 'lunar-javascript';
 import { computeFuxing } from './fuxing.js';
 import { GAN, ZHI } from './constants.js';
+import { ziShiRoll } from './chart.js'; // [loop 178] 紫微 bẩm sinh dùng cùng 子时换日 quy ước 八字
 
 const GAN_ORDER = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
 const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
@@ -52,8 +53,10 @@ function nayinWxOf(gan, zhi) {
  */
 export function computeZiwei(year, month, day, hour, minute, gender) {
   const h = (hour === undefined || hour === null) ? 12 : hour;
-  const mi = (minute === undefined || minute === null) ? 0 : minute;
-  const solar = Solar.fromYmdHms(year, month, day, h, mi, 0);
+  const mi = (minute === undefined || hour === null) ? 0 : minute;
+  // [loop 178] 子时换日 — đồng bộ buildChart: 23:00+ → sang hôm sau (cùng lá số bẩm sinh)
+  const [cy, cm, cd, ch, cmi] = ziShiRoll(year, month, day, h, mi);
+  const solar = Solar.fromYmdHms(cy, cm, cd, ch, cmi, 0);
   const lunar = solar.getLunar();
   const lm = lunar.getMonth();          // 农历月 (1-12, 闰月 vẫn lấy số)
   const ly = lunar.getYear();           // 农历年 (can chi năm)

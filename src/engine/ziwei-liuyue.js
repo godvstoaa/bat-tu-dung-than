@@ -26,6 +26,7 @@
 // ============================================================================
 import { Solar } from 'lunar-javascript';
 import { computeZiwei } from './ziwei.js';
+import { ziShiRoll } from './chart.js'; // [loop 178] dữ liệu SINH dùng cùng 子时换日 quy ước computeZiwei
 
 const ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const MONTH_ZH = ['正','二','三','四','五','六','七','八','九','十','冬','腊'];
@@ -86,7 +87,8 @@ export function ziweiLiuyueContext(input, tYear, tMonth, tDay) {
   const z = computeZiwei(input.year, input.month, input.day, input.hour ?? 12, input.minute ?? 0, input.gender);
 
   // --- Dữ liệu SINH ---
-  const birthSolar = Solar.fromYmdHms(input.year, input.month, input.day, input.hour ?? 12, input.minute ?? 0, 0);
+  const [by, bm, bd, bh, bmin] = ziShiRoll(input.year, input.month, input.day, input.hour ?? 12, input.minute ?? 0); // [loop 178] đồng bộ computeZiwei
+  const birthSolar = Solar.fromYmdHms(by, bm, bd, bh, bmin, 0);
   const birthLunar = birthSolar.getLunar();
   const birthLunarMonth = absLunarMonth(birthLunar.getMonth()); // tháng sinh (tuyệt đối)
   const birthHourZhi = birthLunar.getTimeZhi();
@@ -123,7 +125,8 @@ export function ziweiLiuyue(birthYear, birthMonth, birthDay, birthHour, birthMin
   const z = computeZiwei(birthYear, birthMonth, birthDay, birthHour, birthMinute, gender);
 
   // --- Dữ liệu SINH (để tính 斗君) ---
-  const birthSolar = Solar.fromYmdHms(birthYear, birthMonth, birthDay, birthHour ?? 12, birthMinute ?? 0, 0);
+  const [by2, bm2, bd2, bh2, bmin2] = ziShiRoll(birthYear, birthMonth, birthDay, birthHour ?? 12, birthMinute ?? 0); // [loop 178] đồng bộ computeZiwei
+  const birthSolar = Solar.fromYmdHms(by2, bm2, bd2, bh2, bmin2, 0);
   const birthLunar = birthSolar.getLunar();
   const birthLunarMonth = absLunarMonth(birthLunar.getMonth());
   const birthHourZhiIdx = ZHI_ORDER.indexOf(birthLunar.getTimeZhi());

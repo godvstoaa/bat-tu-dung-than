@@ -11,6 +11,7 @@
 
 import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, ZHI_ORDER } from './constants.js';
+import { ziShiRoll } from './chart.js'; // [loop 178] 称骨 bẩm sinh dùng cùng 子时换日 八字
 
 // --- Trọng lượng NĂM (lạng) theo index 0-59 của lục thập hoa giáp (甲子=0) ---
 //  甲子1.2 乙丑0.9 丙寅0.6 丁卯0.7 戊辰1.2 己巳0.5 庚午0.9 辛未0.8 壬申0.7 癸酉0.8
@@ -310,8 +311,10 @@ export function chenggu(R) {
   // hour có thể = 0 (giờ Tý giữa đêm) → KHÔNG dùng `hour || 12` (sẽ sai 0→12)
   const hh = (inp.hour == null) ? 12 : inp.hour;
   const mm = (inp.minute == null) ? 0 : inp.minute;
+  // [loop 178] 子时换日 — đồng bộ buildChart: 23:00+ → sang hôm sau (cùng lá số bẩm sinh)
+  const [cy, cm, cd, ch, cmin] = ziShiRoll(year, month, day, hh, mm);
   // Quy đổi dương lịch → âm lịch + can chi năm + chi giờ
-  const lunar = Solar.fromYmdHms(year, month, day, hh, mm, 0).getLunar();
+  const lunar = Solar.fromYmdHms(cy, cm, cd, ch, cmin, 0).getLunar();
   const lunarMonth = lunar.getMonth();        // 1-12 (có thể âm nếu nhuận — lấy abs)
   let lunarDay = lunar.getDay();              // 1-30
   const timeZhi = lunar.getTimeZhi();         // 子..亥

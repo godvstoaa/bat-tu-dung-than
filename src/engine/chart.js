@@ -41,7 +41,8 @@ const GROUP_VI = { ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 
 //   nên phải roll. Map (D, 23:xx) → (D+1, 00:xx): giữ phút, giờ→0 (vị trí 晚子) để lưu-thời
 //   can dùng ngũ-thử-độn TỪ ngày hôm sau (nếu giữ h=23, lunar-javascript lại lấy can ngày sau-nữa).
 //   input (hiển thị) vẫn giữ giờ thật 23:xx; chỉ BÁT TỰ tính theo ngày_roll.
-function ziShiRoll(year, month, day, hour, minute) {
+// [loop 178] export — 紫微 (computeZiwei) là lá số BẨM SINH cùng kiểu, phải dùng cùng quy ước.
+export function ziShiRoll(year, month, day, hour, minute) {
   if (hour >= 23) {
     const dt = new Date(year, month - 1, day);
     dt.setDate(dt.getDate() + 1);
