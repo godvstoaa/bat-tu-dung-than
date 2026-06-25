@@ -73,6 +73,16 @@ assertField('analyze_partner.kinhdoanh roleFit', pb, 'roleFit');
 
 for (const c of checks) console.log('  ' + c);
 
+// [loop 181] SYSTEM_PROMPT TOOLS summary must mention ALL 10 tools (was missing analyze_partner + analyze_best_hour)
+import fs from 'fs';
+const aiSrc = fs.readFileSync('./src/engine/ai.js', 'utf8');
+const summaryMatch = aiSrc.match(/Bạn có thể gọi: ([^.]+)\./);
+const listed = summaryMatch ? summaryMatch[1] : '';
+const allTools = ['get_current_time','analyze_day','analyze_year','analyze_month','best_days_in_year','find_good_days','analyze_best_hour','analyze_partner','life_trajectory','inverse_bazi'];
+const missingFromPrompt = allTools.filter((t) => !listed.includes(t));
+if (missingFromPrompt.length) { fails++; console.log(`  ✗ TOOLS summary missing: ${missingFromPrompt.join(',')}`); }
+else console.log('  ✓ TOOLS summary lists all 10 tools');
+
 console.log(`\n${'='.repeat(70)}`);
 console.log(`AI tools audit: ${results.length - results.filter(r => r.isError).length}/${results.length} tools OK, schema checks above`);
 if (fails === 0) console.log('🎉 ALL AI tools respond without error');
