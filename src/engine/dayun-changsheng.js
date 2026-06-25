@@ -11,7 +11,7 @@
 //  Nguồn: 滴天髓 论运, 渊海子平 十二长生, 三命通会 卷二.
 // ============================================================================
 import { changSheng } from './core.js';
-import { CHANGSHENG_VI, WX_VI } from './constants.js';
+import { CHANGSHENG_VI, WX_VI, ZHI } from './constants.js';
 
 // Giai đoạn → tone + diễn giải. Tone: cat (dương khí lên) / hung (xuống) / neutral (chuyển).
 const STAGE = {
@@ -118,3 +118,24 @@ export function dayunYongChangSheng(yongWx, xiWx, dayun) {
 }
 
 export { STAGE, TONE_VI };
+
+// [loop 87 — TÍNH NĂNG MỚI] LƯU NGUYỆT thập nhị trường sinh — tháng nào trong năm
+//   Nhật Chủ mạnh (长生/帝旺) vs yếu (死/绝). Đây là NHỊP NĂNG LƯỢNG THÁNG cố định
+//   (12 chi tiết khí = 12 tháng: 寅=T1立春...丑=T12小寒), mỗi chi → 1 stage.
+//   Hoàn thiện bộ 12 trường sinh 4 cấp: 大运(77)/流年(78)/用神(83)/流月(87).
+//   Khác 得令 (chỉ tháng sinh): đây là CẢ 12 tháng — «lịch năng lượng cá nhân».
+const MONTH_ZH_LY = ['寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '丑'];
+export function liuyueChangSheng(dayGan) {
+  const items = MONTH_ZH_LY.map((zhi, i) => {
+    const si = stageInfo(dayGan, zhi);
+    return { m: i, mLabel: `T${i + 1}`, zhi, zhiVi: ZHI[zhi]?.vi || zhi, label: `T${i + 1}(${ZHI[zhi]?.vi || zhi})`, ...si };
+  });
+  const { peak, rising, low } = _classify(items);
+  const fmt = (arr) => arr.map((p) => p.label.split('(')[0]).join(', ');
+  let summary = `Nhịp năng lượng 12 tháng của Nhật Chủ: `;
+  summary += peak.length ? `tháng MẠNH (Lâm Quan/Đế Vượng) = ${fmt(peak)}` : `không có tháng Đế Vượng/Lâm Quan`;
+  if (rising.length) summary += `; tháng ĐANG LÊN (Trường Sinh/Quan Đới) = ${fmt(rising)}`;
+  if (low.length) summary += `; tháng YẾU (Tử/Mộ/Tuyệt) = ${fmt(low)}`;
+  summary += `. Đây là «lịch năng lượng cá nhân» — tháng mạnh nên tiến thủ, tháng yếu nên thủ/bồi bổ.`;
+  return { items, peak, rising, low, summary };
+}

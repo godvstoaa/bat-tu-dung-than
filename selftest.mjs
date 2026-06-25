@@ -5043,6 +5043,38 @@ console.log('\n################## GG. [loop 86] khóa 5 tổ hợp mới (loop 8
   console.log(`   5 tổ hợp mới (loop 85) đều detect đúng + tone đúng (4 cat, 1 xiong) ✓`);
 }
 
+// ################## HH. [loop 87] 流月十二长生 (lịch năng lượng 12 tháng) ##################
+import { liuyueChangSheng as _lycs } from './src/engine/dayun-changsheng.js';
+console.log('\n################## HH. [loop 87] 流月十二长生 (12 tháng năng lượng) ##################');
+{
+  // HH1. 12 tháng, mỗi tháng 1 stage; 12 stage KHÁC NHAU (chu trình đầy đủ).
+  const _t = _lycs('乙');
+  assert(_t.items.length === 12, `đủ 12 tháng (${_t.items.length})`);
+  const _unique = new Set(_t.items.map((i) => i.stage)).size;
+  assert(_unique === 12, `12 tháng = 12 stage khác nhau (chu trình đầy đủ, được ${_unique})`);
+  assert(_t.peak.every((p) => p.stage === '臨官' || p.stage === '帝旺'), 'peak = Lâm Quan/Đế Vượng');
+
+  // HH2. tính thời vụ ĐÚNG: 乙木 mạnh mùa XUÂN (T1-T3 寅卯辰 = Mộc), yếu mùa THU (T8-T10 酉戌亥 = Kim khắc Mộc).
+  //   乙 长生 ở 午(T5), nghịch hành → T1(寅)=ĐếVượng, T2=LâmQuan, T3=QuanĐới (xuân mạnh);
+  //   T8(酉)=Tuyệt, T9(戌)=Mộ, T10(亥)=Tử (thu yếu).
+  const _stageOf = (mLabel) => _t.items.find((i) => i.mLabel === mLabel).stage;
+  assert(['臨官', '帝旺'].includes(_stageOf('T1')), `乙 tháng T1 (xuân 寅) = Đế Vượng/Lâm Quan (mạnh) — được ${_stageOf('T1')}`);
+  assert(['死', '墓', '絕'].includes(_stageOf('T8')), `乙 tháng T8 (thu 酉) = Tử/Mộ/Tuyệt (Kim khắc Mộc, yếu) — được ${_stageOf('T8')}`);
+
+  // HH3. dương vs âm can → arc khác (甲 thuận ≠ 乙 nghịch).
+  const _jia = _lycs('甲').items.map((i) => i.stage).join('');
+  const _yi = _t.items.map((i) => i.stage).join('');
+  assert(_jia !== _yi, '甲 (dương thuận) vs 乙 (âm nghịch) → 12 tháng arc KHÁC nhau');
+
+  // HH4. deterministic + đa lá số không crash
+  assert(JSON.stringify(_lycs('乙').items) === JSON.stringify(_t.items), 'liuyueChangSheng deterministic');
+  for (const _g of ['丙', '戊', '庚', '壬', '丁', '己', '辛', '癸']) {
+    assert(_lycs(_g).items.length === 12, `Nhật Chủ ${_g}: đủ 12 tháng`);
+  }
+  console.log(`   乙: ${_t.items.map((i) => i.mLabel + ':' + i.stageVi).join(' ')}`);
+  console.log(`   T1 xuân=Đế Vượng (mạnh), T8 thu=Tuyệt (yếu) — đúng thời vụ ✓ | dương≠âm | deterministic ✓`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
