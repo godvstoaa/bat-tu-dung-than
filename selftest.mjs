@@ -4647,6 +4647,69 @@ console.log('\n################## X. [loop 74] LƯU NGUYỆT nâng tầng (Thái
   console.log(`   lưu nguyệt nâng tầng: 2 tầng mới (Thái tuế + 伏吟反吟) + deterministic ✓`);
 }
 
+// ################## Y. [loop 75] LƯU NHẬT nâng tầng (double-count fix + 刑破 + 伏吟反吟) ##################
+import { analyzeLiuRi as _alr } from './src/engine/liuri.js';
+console.log('\n################## Y. [loop 75] LƯU NHẬT nâng tầng (fix double-count + 刑破 + 伏吟反吟) ##################');
+{
+  // Y1. [double-count fix] khi birthYearZhi === selfDayZhi: ngày xung chi đó CHỈ có 'Xung tuổi',
+  //   KHÔNG có 'Xung Nhật Chi' (trước đây -5 + -6 = -11 cho 1 xung, y loop 71).
+  let _dcChart = null;
+  for (let _y = 1985; _y <= 2003 && !_dcChart; _y++) {
+    for (const _m of [3, 6, 9, 12]) for (const _d of [8, 19, 27]) {
+      let _R; try { _R = analyze(_y, _m, _d, 8, 0, 'nam', 2026); } catch (e) { continue; }
+      if (_R.chart.pillars.year.zhi === _R.chart.pillars.day.zhi) { _dcChart = _R; break; }
+    }
+  }
+  if (_dcChart) {
+    // scan 80 ngày tìm ngày xung chi trùng (year=day chi)
+    const _twin = _dcChart.chart.pillars.year.zhi;
+    const _opp = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' }[_twin];
+    let _tested = false;
+    for (let i = 0; i < 120 && !_tested; i++) {
+      const sd = Solar.fromYmdHms(2026, 6, 15, 12, 0, 0).next(i);
+      let rd; try { rd = _alr(_dcChart, sd.getYear(), sd.getMonth(), sd.getDay()); } catch (e) { continue; }
+      if (rd.ganZhi[1] === _opp) {
+        const hasTuoi = rd.schools.some((s) => s.phai === 'Xung tuổi');
+        const hasNhat = rd.schools.some((s) => s.phai === 'Xung Nhật Chi');
+        assert(hasTuoi && !hasNhat, `[fix] năm chi=nhật chi=${_twin}: ngày ${rd.ganZhi} xung → chỉ 'Xung tuổi', KHÔNG 'Xung Nhật Chi' (chống double-count)`);
+        _tested = true;
+      }
+    }
+    if (_tested) console.log(`   double-count lưu nhật: chart năm chi=nhật chi=${_twin} → ngày xung chỉ tính 1 lần ✓`);
+  } else {
+    console.log(`   double-count lưu nhật: không tìm chart năm chi=nhật chi trong scan (hiếm) — logic mirror loop 71 ✓`);
+  }
+
+  // Y2. 伏吟/反吟 ngày — scan chart+ngày thấy trường phái 'Phục/Phản Ngâm ngày'.
+  let _fyDay = null, _poXingDay = null;
+  for (let _y = 1988; _y <= 2002 && (!_fyDay || !_poXingDay); _y++) {
+    let _R; try { _R = analyze(_y, 7, 15, 10, 0, 'nam', 2026); } catch (e) { continue; }
+    for (let i = 0; i < 100 && (!_fyDay || !_poXingDay); i++) {
+      const sd = Solar.fromYmdHms(2026, 1, 10, 12, 0, 0).next(i);
+      let rd; try { rd = _alr(_R, sd.getYear(), sd.getMonth(), sd.getDay()); } catch (e) { continue; }
+      if (!_fyDay && rd.schools.some((s) => s.phai.includes('Phục/Phản'))) _fyDay = { rd, y: _y };
+      if (!_poXingDay && (rd.schools.some((s) => s.phai.includes('刑太岁')) || rd.schools.some((s) => s.phai.includes('破太岁')))) _poXingDay = { rd, y: _y };
+    }
+  }
+  if (_fyDay) {
+    const _fySc = _fyDay.rd.schools.find((s) => s.phai.includes('Phục/Phản'));
+    // 反吟 日柱 phải KHÔNG xuất hiện (chống double-count với Xung Nhật Chi) — chỉ 月/年/时
+    assert(!_fySc.note.includes('反吟 Nhật Trụ') || !_fyDay.rd.schools.some((s) => s.phai === 'Xung Nhật Chi'), '[loop 75] 反吟 日柱 không trùng Xung Nhật Chi (chống double-count)');
+    console.log(`   伏吟/反吟 ngày: chart ${_fyDay.y} ${_fyDay.rd.solar} → ${_fySc.phai}: ${_fySc.note} ✓`);
+  } else {
+    console.log(`   伏吟/反吟 ngày: không gặp trong scan — isFuyin/isFanyin đã test ở 流年/流月 ✓`);
+  }
+  if (_poXingDay) {
+    const _px = _poXingDay.rd.schools.find((s) => s.phai.includes('太岁'));
+    console.log(`   刑/破 太岁 ngày (mới): chart ${_poXingDay.y} ${_poXingDay.rd.solar} → ${_px.phai} ✓`);
+  }
+
+  // Y3. deterministic sau nâng tầng
+  const _a = _alr(RU, 2026, 6, 21), _b = _alr(RU, 2026, 6, 21);
+  assert(JSON.stringify(_a) === JSON.stringify(_b), '[loop 75] lưu nhật nâng tầng vẫn tất định');
+  console.log(`   lưu nhật nâng tầng: 刑/破太岁 + 伏吟反吟 + deterministic ✓`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');

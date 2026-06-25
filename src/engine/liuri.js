@@ -12,10 +12,18 @@ import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP } from './shensha.js';
 // [loop 12] 格局流日喜忌 — cộng tầng 格局 LÊN TRÊN 4 trường phái (ngũ hành + thập
 //   thần ngày + xung + thần sát). Optional patternQuality → backward compatible.
 import { adjustLiuriByGeju } from './pattern-quality.js';
+// [loop 75 nâng tầng] 伏吟/反吟 ngày × 4 trụ nguyên cục (mirror 流月 loop 74 / 流年 loop 19).
+import { isFuyin, isFanyin } from './fuyin.js';
 
 const wxVi = (w) => WX_VI[w];
 const CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
 const HAI = { 子: '未', 未: '子', 丑: '午', 午: '丑', 寅: '巳', 巳: '寅', 卯: '辰', 辰: '卯', 申: '亥', 亥: '申', 酉: '戌', 戌: '酉' };
+// [loop 75] Thái tuế ngày đầy đủ (trước đây chỉ 冲+害, thiếu 刑+破) + 伏吟/反吟 trọng số (1 ngày, nhẹ nhất).
+const XING = { 子: '卯', 卯: '子', 寅: '巳', 巳: '申', 申: '寅', 丑: '戌', 戌: '未', 未: '丑', 辰: '辰', 午: '午', 酉: '酉', 亥: '亥' };
+const PO = { 子: '酉', 酉: '子', 丑: '辰', 辰: '丑', 寅: '亥', 亥: '寅', 卯: '午', 午: '卯', 巳: '申', 申: '巳', 戌: '未', 未: '戌' };
+const QIN_VI = { year: 'Niên Trụ (tổ bối)', month: 'Nguyệt Trụ (phụ mẫu/sự nghiệp)', day: 'Nhật Trụ (bản thân/phối ngẫu)', time: 'Thời Trụ (tử tức)' };
+const W_FUYIN_D = { day: 3, month: 2, year: 2, time: 2 };     // 伏吟 ngày (1 ngày, nhẹ nhất)
+const W_FANYIN_D = { month: 4, year: 3, time: 3 };            // 反吟 ngày (KHÔNG có day — 冲 Nhật Chi đã tính)
 
 // Thập thần ngày → độ (nhẹ vì 1 ngày)
 const GOD_DAY = {
@@ -67,9 +75,13 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
   const g = GOD_DAY[ganGod];
   if (g) { score += g.d; schools.push({ phai: 'Thập Thần ngày', d: g.d, note: `${ganGod}: ${g.vi}` }); }
 
-  // (3) Chi ngày vs chi tuổi + chi ngày bản mệnh
+  // (3) Chi ngày vs chi tuổi + Nhật Chi — THÁI TUẾ NGÀY đầy đủ (冲/刑/破/害).
+  //   [loop 75 sửa double-count] 冲 Nhật Chi chỉ tính khi selfDayZhi !== birthYearZhi
+  //   (nếu trùng thì 冲 tuổi đã bao hàm — trước đây -5 + -6 = -11 cho cùng 1 xung, y loop 71).
   if (CHONG[birthYearZhi] === dZhi) { score -= 5; schools.push({ phai: 'Xung tuổi', d: -5, note: `Chi ngày ${ZHI[dZhi].vi} XUNG chi tuổi ${ZHI[birthYearZhi].vi} — cẩn thận biến động.` }); }
-  if (CHONG[selfDayZhi] === dZhi) { score -= 6; schools.push({ phai: 'Xung Nhật Chi', d: -6, note: `Chi ngày xung Nhật Chi (bản thân) — cẩn thận sức khoẻ/an toàn.` }); }
+  if (CHONG[selfDayZhi] === dZhi && selfDayZhi !== birthYearZhi) { score -= 6; schools.push({ phai: 'Xung Nhật Chi', d: -6, note: `Chi ngày xung Nhật Chi (bản thân) — cẩn thận sức khoẻ/an toàn.` }); }
+  if (XING[birthYearZhi] === dZhi) { score -= 3; schools.push({ phai: 'Ngày刑太岁', d: -3, note: `Chi ngày hình chi tuổi — quan phi/thị phi nhẹ.` }); }
+  if (PO[birthYearZhi] === dZhi) { score -= 2; schools.push({ phai: 'Ngày破太岁', d: -2, note: `Chi ngày phá chi tuổi — hao tiền nhẹ.` }); }
   if (HAI[birthYearZhi] === dZhi) { score -= 3; schools.push({ phai: 'Hại tuổi', d: -3, note: `Chi ngày hại chi tuổi — tiểu nhân, hao tốn nhẹ.` }); }
 
   // (4) Thần sát ngày
@@ -78,6 +90,21 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
   if (HONG_YAN[dayGan] === dZhi) { score -= 3; schools.push({ phai: 'Hồng Diễm ngày', d: -3, note: 'Hồng diễm — sắc duyên, dễ sa vào tình cảm không lợi.' }); }
   if (YANG_REN[dayGan] === dZhi) { score -= 4; schools.push({ phai: 'Dương Nhận ngày', d: -4, note: 'Dương nhận — sát khí, dễ tổn thương/xe cộ/cắt đứt, kỵ liều.' }); }
   if (YI_MA[grp] === dZhi || YI_MA[BRANCH_GROUP[selfDayZhi]] === dZhi) { score += 2; schools.push({ phai: 'Dịch Mã ngày', d: 2, note: 'Dịch mã — di chuyển/đổi chỗ, có biến (cát nếu Dụng).' }); }
+
+  // (5) [loop 75 nâng tầng] PHỤC/PHẢN NGÂM ngày × 4 trụ nguyên cục (mirror 流月/流年).
+  //   Ngày can-chi trùng trụ = 伏吟 (trùng phức, chủ buồn/chướng); 天克地冲 trụ = 反吟 (biến cố).
+  //   反吟 loại 日柱 (冲 Nhật Chi đã tính ở mục 3 → chống double-count). Hóa giải: ngày Dụng/Hỷ → giảm 60%.
+  const dp = { gan: dGan, zhi: dZhi };
+  const mitig = fav.has(ganWx) || fav.has(zhiWx);
+  const factor = mitig ? 0.4 : 1;
+  let fyD = 0; const fyNotes = [];
+  for (const k of ['day', 'month', 'year', 'time']) {
+    const np = c.pillars[k];
+    if (!np || !np.gan) continue;
+    if (isFuyin(dp, np)) { fyD -= W_FUYIN_D[k] * factor; fyNotes.push(`伏吟 ${QIN_VI[k]}`); }
+    else if (isFanyin(dp, np)) { if (k === 'day') continue; fyD -= W_FANYIN_D[k] * factor; fyNotes.push(`反吟 ${QIN_VI[k]}`); }
+  }
+  if (fyNotes.length) { score += fyD; schools.push({ phai: 'Phục/Phản Ngâm ngày', d: fyD, note: fyNotes.join(', ') + (mitig ? ' (ngày mang Dụng/Hỷ → hung giảm)' : '') }); }
 
   score = Math.max(5, Math.min(95, Math.round(score)));
   let rating;
