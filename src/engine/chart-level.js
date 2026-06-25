@@ -22,8 +22,9 @@ export function classifyChartLevel(R) {
   // 6 tiêu chí cổ pháp
   const criteria = [];
 
-  // 1. 格局成败
-  const patternOK = pattern.type === 'normal' || pattern.type === 'special';
+  // 1. 格局成败 — [loop 63 sửa] 建祿/月劫/羊刃 (type='luyue') CŨNG là cách chính thống
+  //   (子平真詮 liệt kê trong 8 nội cách). Trước đây exclude → under-rate ~1/3 chart.
+  const patternOK = pattern.type === 'normal' || pattern.type === 'special' || pattern.type === 'luyue';
   criteria.push({ name: '格局成败', pass: patternOK, detail: patternOK ? `${pattern.vi} thành cách` : 'Cách không thành/khuyết' });
 
   // 2. 用神有力

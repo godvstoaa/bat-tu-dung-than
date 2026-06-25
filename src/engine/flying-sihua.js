@@ -89,7 +89,7 @@ export function flyingSihua(z) {
       if (f.toZhi) {
         const toPalace = chiToPalace[f.toZhi] || '?';
         const tone = f.tone === 'cat' ? '✓ giúp' : '⚠ hại';
-        summaryLines.push(`${tone} ${f.hua}${f.star} → cung ${toPalace} (${f.toZhi}): mệnh ảnh hưởng ${f.vi.includes('cát') ? 'tốt' : 'xấu'} ${toPalace.toLowerCase()}.`);
+        summaryLines.push(`${tone} ${f.hua}${f.star} → cung ${toPalace} (${f.toZhi}): mệnh ảnh hưởng ${f.tone === 'cat' ? 'tốt' : 'xấu'} ${toPalace.toLowerCase()}.`);
       }
     }
   }
