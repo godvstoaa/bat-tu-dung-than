@@ -31,43 +31,65 @@ const STAGE = {
 
 const TONE_VI = { cat: 'THỊNH (dương khí lên)', hung: 'SUY/TRẦM (dương khí xuống)', neutral: 'CHUYỂN (dao động/ươm)' };
 
+// [loop 78] helper chung: stage + info cho 1 chi.
+function stageInfo(dayGan, zhi) {
+  const stage = changSheng(dayGan, zhi);
+  const info = STAGE[stage] || { vi: CHANGSHENG_VI[stage] || stage, tone: 'neutral', desc: '' };
+  return { stage, stageVi: info.vi, tone: info.tone, toneVi: TONE_VI[info.tone], desc: info.desc };
+}
+
+// Phân loại + summary dùng chung.
+function _classify(items) {
+  const peak = items.filter((i) => i.stage === '臨官' || i.stage === '帝旺');
+  const rising = items.filter((i) => i.stage === '長生' || i.stage === '冠帶');
+  const low = items.filter((i) => i.stage === '死' || i.stage === '墓' || i.stage === '絕');
+  return { peak, rising, low };
+}
+function _summary(items, unit) {
+  const { peak, rising, low } = _classify(items);
+  const fmt = (arr) => arr.map((p) => `${p.label}(${p.ganZhi}/${p.stageVi})`).join(', ');
+  let s;
+  if (peak.length) s = `ĐỈNH (Lâm Quan/Đế Vượng — thịnh nhất) rơi vào ${unit} ${fmt(peak)}.`;
+  else if (rising.length) s = `${unit === 'đại vận' ? 'Vận' : 'Năm'} ĐANG LÊN (Trường Sinh/Quan Đới): ${fmt(rising)}.`;
+  else s = `${unit} trải: ${items.map((i) => i.stageVi).join(' → ')}.`;
+  if (rising.length && peak.length) s += ` Khởi: ${fmt(rising)}.`;
+  if (low.length) s += ` SUY/TRẦM (Tử/Mộ/Tuyệt — thủ/bảo toàn): ${fmt(low)}.`;
+  return s;
+}
+
 /**
- * Timeline 12 trường sinh của Nhật Chủ qua các đại vận.
- * @param {string} dayGan — Nhật Chủ can
- * @param {array}  dayun  — R.dayun (mỗi entry có ganZhi, zhi, startAge, startYear, ...)
- * @returns {{ items:[{ganZhi,zhi,startAge,startYear,stage,stageVi,tone,toneVi,desc}],
- *            peak, low, rising, summary }}
+ * Timeline 12 trường sinh qua các ĐẠI VẬN (loop 77).
  */
 export function dayunChangSheng(dayGan, dayun) {
   const items = (dayun || []).map((d) => {
     if (!d || !d.zhi) return null;
-    const stage = changSheng(dayGan, d.zhi);
-    const info = STAGE[stage] || { vi: CHANGSHENG_VI[stage] || stage, tone: 'neutral', desc: '' };
-    return {
-      ganZhi: d.ganZhi, zhi: d.zhi, startAge: d.startAge, startYear: d.startYear,
-      stage, stageVi: info.vi, tone: info.tone, toneVi: TONE_VI[info.tone], desc: info.desc,
-    };
+    const si = stageInfo(dayGan, d.zhi);
+    return { ganZhi: d.ganZhi, zhi: d.zhi, startAge: d.startAge, startYear: d.startYear, label: `${d.startAge}t`, ...si };
   }).filter(Boolean);
+  const { peak, rising, low } = _classify(items);
+  return { items, peak, rising, low, summary: _summary(items, 'đại vận') + ` «运好不如运旺».` };
+}
 
-  // Phân loại theo dương khí
-  const peak = items.filter((i) => i.stage === '臨官' || i.stage === '帝旺');      // đỉnh
-  const rising = items.filter((i) => i.stage === '長生' || i.stage === '冠帶');     // đang lên
-  const low = items.filter((i) => i.stage === '死' || i.stage === '墓' || i.stage === '絕'); // đáy
-
-  const fmt = (arr) => arr.map((p) => `${p.startAge}t(${p.ganZhi}/${p.stageVi})`).join(', ');
-  let summary;
-  if (peak.length) {
-    summary = `ĐỈNH vận (Lâm Quan/Đế Vượng — thịnh vượng nhất) rơi vào đại vận ${fmt(peak)}.`;
-  } else if (rising.length) {
-    summary = `Vận ĐANG LÊN (Trường Sinh/Quan Đới) ở đại vận ${fmt(rising)}.`;
-  } else {
-    summary = `Đại vận trải các giai đoạn: ${items.map((i) => i.stageVi).join(' → ')}.`;
-  }
-  if (rising.length && peak.length) summary += ` Giai đoạn KHỞI: ${fmt(rising)}.`;
-  if (low.length) summary += ` Giai đoạn SUY/TRẦM (Tử/Mộ/Tuyệt — nên thủ/bảo toàn): ${fmt(low)}.`;
-  summary += ` Nguyên lý: «运好不如运旺» — đại vận Dụng cát NHƯNG rơi 死/墓/絞 thì sinh khí kém, Dụng khó phát huy.`;
-
-  return { items, peak, low, rising, summary };
+/**
+ * [loop 78] Timeline 12 trường sinh qua các LƯU NIÊN (10 năm của đại vận đang hành).
+ *   «年逢长生如春起, 年逢帝旺如日中天, 年逢墓绝如秋冬» — sinh khí TỪNG NĂM.
+ *   Tổ hợp với đại vận: «年长生 + 运帝旺» = năm khởi + vận đỉnh = cực thuận;
+ *   «年绝 + 运死» = năm + vận đều suy = cần thủ.
+ * @param {string} dayGan
+ * @param {array}  liunian — R.liunian (mỗi entry có ganZhi, zhi, year, age, ...)
+ * @returns {{ items, peak, rising, low, nowStage, summary }}
+ */
+export function liunianChangSheng(dayGan, liunian) {
+  const items = (liunian || []).map((d) => {
+    if (!d || !d.zhi) return null;
+    const si = stageInfo(dayGan, d.zhi);
+    return { ganZhi: d.ganZhi, zhi: d.zhi, year: d.year, age: d.age, isNow: !!d.isNow, label: `${d.year}`, ...si };
+  }).filter(Boolean);
+  const { peak, rising, low } = _classify(items);
+  const nowStage = items.find((i) => i.isNow) || null;
+  let summary = _summary(items, 'năm');
+  if (nowStage) summary += ` Năm nay (${nowStage.year}): ${nowStage.stageVi} (${nowStage.toneVi}).`;
+  return { items, peak, rising, low, nowStage, summary };
 }
 
 export { STAGE, TONE_VI };
