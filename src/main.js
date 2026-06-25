@@ -93,7 +93,6 @@ import { buildRemedy } from './engine/remedy.js';
 import { wuTai } from './engine/tonggen.js';
 import { dailyGuide } from './engine/daily-guide.js';
 import { dailyDirections } from './engine/daily-directions.js';
-import { computeZhai } from './engine/zhai.js';
 import { personalFengShui } from './engine/family-sync.js';
 import { strength3Fa } from './engine/strength-3fa.js';
 import { jiaoYunAnalysis } from './engine/jiaoyun.js';
