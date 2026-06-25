@@ -394,6 +394,7 @@ function renderSynthesis(R) {
   const quickMetrics = `
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
       ${QVI[pq.quality] ? `<span class="combo ${pq.quality === '败格' ? 'xiong' : 'cat'}">${esc(QVI[pq.quality])}</span>` : ''}
+      <span class="combo ${R.strength?.strong ? 'cat' : 'xiong'}">Thân ${R.strength?.strong ? 'VƯỢNG' : 'NHƯỢC'} ${Math.round((R.strength?.ratio || 0) * 100)}%</span>
       <span class="combo ${allyPct >= 55 ? 'cat' : allyPct <= 45 ? 'xiong' : ''}">敌我: Dụng ${allyPct}% / Kỵ ${100 - allyPct}%</span>
       <span class="combo">Dụng ${esc(R.yong ? WX_VI[R.yong.primary] || '' : '')}</span>
     </div>`;
