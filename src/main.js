@@ -2869,8 +2869,12 @@ function renderMangpaiView(R) {
 function renderXuankong(year) {
   const x = xuankongPan(year);
   const cls = (p) => (p.quality.includes('vượng') || p.quality.includes('sinh khí')) ? 'cat' : (p.info.base === 'đại hung' || p.quality.includes('đại hung')) ? 'xiong' : (p.info.base === 'hung') ? 'xiong' : 'mid';
+  // [loop 197] tóm tắt 旺方/凶方 (hướng nên tăng cường vs tránh) — trước đây chỉ có trong grid
+  const wangLine = (x.wangFang || []).length ? `<p class="hint"><b style="color:var(--jade)">旺方 (nên sơn/cao/thực, tăng cường):</b> ${(x.wangFang||[]).map((p) => `${esc(p.palace)} (${esc(p.info.name)})`).join(', ')}</p>` : '';
+  const xiongLine = (x.xiongFang || []).length ? `<p class="hint"><b style="color:var(--cinnabar)">凶方 (nên thuỷ/thấp/hư, tránh động thổ):</b> ${(x.xiongFang||[]).map((p) => `${esc(p.palace)} (${esc(p.info.name)} — ${esc((p.info.vi||'').split('(')[0].trim())})`).join(', ')}</p>` : '';
   $('xuankong').innerHTML = `
     <div class="xk-head">${esc(x.yuan)} <b>${esc(x.yun)}运</b> (${esc(x.range)}) · 当令 <b>${esc(x.currentStar.han)} ${esc(x.currentStar.name)}</b> (${esc(x.currentStar.wx)})</div>
+    ${wangLine}${xiongLine}
     <div class="xk-grid">${x.pan.map((p) => `
       <div class="xk-cell ${cls(p)}"><div class="xk-palace">${esc(p.palace)}</div><div class="xk-star">${esc(p.star)}</div><div class="xk-name">${esc(p.info.name)}</div><div class="xk-q">${esc(p.quality)}</div></div>
     `).join('')}</div>
