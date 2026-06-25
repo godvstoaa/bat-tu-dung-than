@@ -477,7 +477,7 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, best_days_in
         <div class="ss-vi">${x(s.vi)} <span class="ss-at">${x(g)}</span></div>
         <div class="ss-desc">${s.present?x(s.meaning):'<span style="opacity:.7">'+x(s.meaning)+"</span>"}</div>
         ${s.present?`<div class="tiaohou-note" style="margin-top:4px;font-size:11px"><b>Lời khuyên:</b> ${x(s.advice)}</div>`:""}
-      </div>`}).join("")}</div>`;i.innerHTML=e+c+`<p class="hint" style="margin-top:6px">${x(t.summary)}</p>`}catch{i.innerHTML='<p class="hint">Không tính được nhóm quý nhân cao cấp.</p>'}}function Hi(n){return{Cát:"rate-cat","Hơi thuận":"rate-good","Bình hòa":"rate-mid","Hơi nghịch":"rate-bad",Hung:"rate-hung"}[n]||"rate-mid"}function BN(n){if(!n.length){H("dayun").innerHTML='<p class="hint">Không tính được Đại Vận.</p>';return}H("dayun").innerHTML=n.map(i=>`
+      </div>`}).join("")}</div>`;i.innerHTML=e+c+`<p class="hint" style="margin-top:6px">${x(t.summary)}</p>`}catch{i.innerHTML='<p class="hint">Không tính được nhóm quý nhân cao cấp.</p>'}}function Hi(n){return{"Đại cát":"rate-cat",Cát:"rate-cat","Hơi thuận":"rate-good","Bình hòa":"rate-mid",Bình:"rate-mid","Hơi nghịch":"rate-bad","Hơi kỵ":"rate-bad",Hung:"rate-hung","Đại hung":"rate-hung"}[n]||"rate-mid"}function BN(n){if(!n.length){H("dayun").innerHTML='<p class="hint">Không tính được Đại Vận.</p>';return}H("dayun").innerHTML=n.map(i=>`
     <div class="dy">
       <div class="dy-gz"><span class="${Vn(i.ganWx)}">${i.gan}</span><span class="${Vn(i.zhiWx)}">${i.zhi}</span></div>
       <div class="dy-vi">${sh(i.ganZhi)}</div>
