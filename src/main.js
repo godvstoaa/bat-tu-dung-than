@@ -1158,7 +1158,16 @@ function renderJiaoyun(R) {
   if (!el) return;
   try {
     const j = jiaoYunAnalysis(R);
-    el.innerHTML = `<p>${j.summary}</p>`;
+    // [loop 189] hiển thị chi tiết giao vận (trước đây chỉ show summary)
+    const cur = j.current ? `<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:4px 0">
+      <b>Đại vận HIỆN TẠI:</b> <span class="zh">${esc(j.current.ganZhi || '')}</span> (${esc(String(j.current.age ?? ''))}–${esc(String((j.current.age || 0) + 9))}t)
+      ${j.current.rating ? ' · <b>' + esc(j.current.rating) + '</b>' : ''}</div>` : '';
+    const next = j.next ? `<div class="yz-row" style="border-left:3px solid var(--cinnabar);padding-left:8px;margin:4px 0">
+      <b>Đại运 TIẾP THEO:</b> <span class="zh">${esc(j.next.ganZhi || '')}</span> (từ ${esc(String(j.next.age ?? ''))}t)${j.daysUntil != null ? ` — còn <b>${esc(String(j.daysUntil))} ngày</b> nữa giao vận` : ''}
+      ${j.next.rating ? ' · <b>' + esc(j.next.rating) + '</b>' : ''}</div>` : '';
+    const avoidStr = Array.isArray(j.avoidZhi) ? j.avoidZhi.join(', ') : (j.avoidZhi || '');
+    const extras = (j.dungDir || avoidStr) ? `<p class="hint">${j.dungDir ? '🧭 Hướng Dụng: ' + esc(j.dungDir) + '.' : ''}${avoidStr ? ' ⚠ Tránh chi: ' + esc(avoidStr) + '.' : ''}</p>` : '';
+    el.innerHTML = `${cur}${next}${extras}<p class="hint" style="margin-top:4px">${esc(j.summary || '')}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được giao thời đại vận.</p>'; }
 }
 
