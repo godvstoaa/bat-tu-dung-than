@@ -4250,7 +4250,6 @@ try { run(); } catch (e) { console.warn('auto-render:', e.message); }
 function init3DTilt() {
   const cards = document.querySelectorAll('#result > .card');
   if (!cards.length) return;
-  // Skip on touch-only devices (tilt needs mouse)
   if (matchMedia('(hover: none)').matches) return;
 
   cards.forEach((card) => {
@@ -4258,31 +4257,40 @@ function init3DTilt() {
     if (!glare) {
       glare = document.createElement('div');
       glare.className = 'tilt-glare';
-      glare.style.cssText = 'position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;opacity:0;transition:opacity .3s;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,0.12),transparent 50%)';
+      glare.style.cssText = 'position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;opacity:0;transition:opacity .3s;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,0.15),transparent 45%)';
       card.appendChild(glare);
     }
     card.style.transformStyle = 'preserve-3d';
     let raf = null;
+    let isHovering = false;
 
+    const onEnter = () => {
+      isHovering = true;
+      card.style.transition = 'none'; // tắt transition khi đang tilt → mượt theo chuột
+    };
     const onMove = (e) => {
+      if (!isHovering) return;
       if (raf) cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width;   // 0→1
-        const y = (e.clientY - rect.top) / rect.height;    // 0→1
-        const rx = (0.5 - y) * 8;   // rotateX: -4°→+4°
-        const ry = (x - 0.5) * 8;   // rotateY: -4°→+4°
-        card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(4px)`;
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        const rx = (0.5 - y) * 12;   // ±6° — DRAMATIC hơn
+        const ry = (x - 0.5) * 12;
+        card.style.transform = `perspective(600px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(8px) scale(1.02)`;
         glare.style.setProperty('--gx', (x * 100) + '%');
         glare.style.setProperty('--gy', (y * 100) + '%');
         glare.style.opacity = '1';
       });
     };
     const onLeave = () => {
+      isHovering = false;
       if (raf) cancelAnimationFrame(raf);
+      card.style.transition = ''; // bật lại transition cho reset mượt
       card.style.transform = '';
       glare.style.opacity = '0';
     };
+    card.addEventListener('mouseenter', onEnter);
     card.addEventListener('mousemove', onMove);
     card.addEventListener('mouseleave', onLeave);
   });
