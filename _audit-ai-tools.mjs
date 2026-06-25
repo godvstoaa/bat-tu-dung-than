@@ -67,6 +67,10 @@ const pt = execTool('analyze_partner', { year: 1988, month: 11, day: 3, gender: 
 assertField('analyze_partner.score', pt, 'score');
 assertField('analyze_partner.verdict', pt, 'verdict');
 
+// [loop 173] kinhdoanh partner tool must return non-empty roleFit (was empty before fix)
+const pb = execTool('analyze_partner', { year: 1985, month: 6, day: 15, gender: 'nam', type: 'kinhdoanh' }, R);
+assertField('analyze_partner.kinhdoanh roleFit', pb, 'roleFit');
+
 for (const c of checks) console.log('  ' + c);
 
 console.log(`\n${'='.repeat(70)}`);
