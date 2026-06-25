@@ -5137,6 +5137,14 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
     assert(_RCW.yong.primary === '水', `從旺格 (Thủy cực vượng) → Dụng = 水/tỷ (được ${_RCW.yong.primary})`);
   }
   console.log(`   专旺 曲直→tiết ✓ | 從旺→tỷ ✓ | locked`);
+
+  // [loop 128] 病药 promote avoid recompute regression
+  const _RB = analyze(1985, 2, 25, 6, 0, 'nam', 2026);
+  if (_RB.yong?.method?.some((m) => m.includes('Bệnh Dược') && m.includes('LÀM CHỦ'))) {
+    assert(_RB.yong.avoid.includes(_RB.yong.ji), `[fix loop 127] 病药 avoid chứa ji=${_RB.yong.ji} (được [${_RB.yong.avoid.join(',')}])`);
+    assert(_RB.yong.avoid.includes(_RB.yong.chou), `[fix loop 127] 病药 avoid chứa chou=${_RB.yong.chou}`);
+    console.log(`   病药 promote avoid ✓ (ji=${_RB.yong.ji}, chou=${_RB.yong.chou} đều trong avoid) | locked`);
+  }
 }
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
