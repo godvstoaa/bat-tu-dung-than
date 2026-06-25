@@ -5255,6 +5255,30 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(avoidConsistent === 5, `用神 avoid consistency (Dụng/Hỷ∉avoid, 忌∈avoid) — ${avoidConsistent}/5`);
   console.log(`   合婚/hợp tác: đối xứng + range + avoid-consistency ✓ | locked`);
 }
+
+// ################## MM. [loop 174] planned-birth / business-partner field consistency ##################
+//   Locks the loop 171-173 fixes (wrong/missing field name class that silently crippled features).
+{
+  const { inverseBaZiSolve, labelResult } = await import('./src/engine/inverse-bazi.js');
+  const { matchBusinessPartners } = await import('./src/engine/partner-match.js');
+  const A = analyze(1990, 5, 14, 13, 0, 'nam', 2026);
+  const B = analyze(1985, 6, 15, 12, 0, 'nam', 2026);
+
+  // [loop 171] inverseBaZiSolve returns topK (NOT topResults); array of topK entries
+  const sol = inverseBaZiSolve({ refYear: 2026, yearStart: 2026, yearEnd: 2026, stepDays: 10, topK: 5, maxSamples: 2000 });
+  assert(Array.isArray(sol.topK) && sol.topK.length === 5, `inverse-bazi: trả topK 5 ptử (loop 171 — trước đây renderPlannedBirth đọc 'topResults' sai tên → chỉ hiện 1)`);
+  assert(sol.topResults === undefined, 'inverse-bazi: KHÔNG có field topResults (field sai đã fix)');
+  // [loop 172] each entry has pillars (NOT gz) — 四柱 must be displayable
+  assert(sol.topK.every((e) => Array.isArray(e.pillars) && e.pillars.length === 4), 'inverse-bazi: mỗi entry có pillars[4] (loop 172 — trước đây render đọc .gz không tồn tại → 四柱 ẩn)');
+  assert(sol.topK.every((e) => e.gz === undefined), 'inverse-bazi: KHÔNG có field gz (field sai đã fix)');
+  assert(typeof labelResult(sol.topK[0]) === 'string' && labelResult(sol.topK[0]).length > 20, 'labelResult trả chuỗi đầy đủ');
+
+  // [loop 173] matchBusinessPartners returns roleFit (expected by UI renderPartnerMatch + AI analyze_partner)
+  const m = matchBusinessPartners(A, B);
+  assert(typeof m.roleFit === 'string' && m.roleFit.length > 10, `partner-match: trả roleFit (loop 173 — UI+AI đều đọc, trước đây undefined)`);
+  assert(['score', 'rating', 'details', 'advice', 'aRole', 'bRole'].every((k) => k in m), 'partner-match: trả đủ core fields');
+  console.log(`   planned-birth (topK/pillars) + partner-match (roleFit) field consistency ✓ | locked`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
