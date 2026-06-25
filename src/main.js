@@ -2485,7 +2485,7 @@ function renderZiweiLiuri(dateStr) {
     <p class="ly-snote">Chủ đề hôm nay: <b>${esc(liuri.liuriGong.meaning)}</b>. Sao tại cung: ${liuri.liuriGong.stars.length ? esc(liuri.liuriGong.stars.join(', ')) : '(cung trống)'}. · Tứ hóa ngày <span class="zh">${liuri.dayGan}</span>: ${liuri.liuriSihua.map((s) => `<span class="ln-rate ${s.tone==='hung'?'rate-hung':'rate-cat'}" style="margin-right:4px">${s.hua}${esc(s.star)}${s.palace ? '@'+s.palace : ''}</span>`).join(' ')}</p>
     ${dd.bestHours.length ? `<p class="hint">⏰ Khung giờ TỐT (nên làm việc chính): <b>${dd.bestHours.map((h) => `${h.hourZhi} ${h.hourRange} → ${esc(h.gongVi)}`).join(' · ')}</b></p>` : ''}
     ${dd.worstHours.length ? `<p class="hint">⚠️ Khung giờ KỴ (giữ mình): <b>${dd.worstHours.map((h) => `${h.hourZhi} ${h.hourRange} → ${esc(h.gongVi)}`).join(' · ')}</b></p>` : ''}
-    <div class="lm-grid">${dd.hours.map((h) => `<div class="lm-cell"><div class="lm-m">${h.hourZhi}</div><div class="lm-g" style="font-size:10px;color:#888">${h.hourRange}</div><div class="zh">${h.gongZhi}</div><div style="font-size:11px">${esc(h.gongVi)}</div><div class="ln-rate ${toneCls(h.tone)}">${toneVi(h.tone).split(' ')[0]}</div></div>`).join('')}</div>`;
+    <div class="lm-grid">${dd.hours.map((h) => `<div class="lm-cell"><div class="lm-m">${h.hourZhi}</div><div class="lm-g" style="font-size:10px;color:var(--silk-muted)">${h.hourRange}</div><div class="zh">${h.gongZhi}</div><div style="font-size:11px">${esc(h.gongVi)}</div><div class="ln-rate ${toneCls(h.tone)}">${toneVi(h.tone).split(' ')[0]}</div></div>`).join('')}</div>`;
 }
 
 // ---------------------------------------------------------------- BEST HOUR TODAY 择吉时合成
@@ -3995,7 +3995,7 @@ function renderQuickSummary() {
     { icon: '📆', label: 'Tuần này', text: weekSummary || '(đang tính...)' },
     { icon: alert ? '⚠' : '✓', label: alert ? 'Cảnh báo' : 'An tâm', text: alert || 'Không cảnh báo nặng năm nay.' },
   ];
-  el.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:10px">${rows.map((r) => `<div style="flex:1;min-width:180px;padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:8px;border:1px solid #e3c878"><div style="font-size:.75em;color:#888;font-weight:bold">${r.icon} ${r.label}</div><div style="font-size:.88em;margin-top:2px">${r.text}</div></div>`).join('')}</div>`;
+  el.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:10px">${rows.map((r) => `<div style="flex:1;min-width:180px;padding:8px 10px;background:var(--glass);border-radius:8px;border:1px solid var(--glass-border)"><div style="font-size:.75em;color:var(--gold-bright);font-weight:bold">${r.icon} ${r.label}</div><div style="font-size:.88em;margin-top:2px;color:var(--silk)">${r.text}</div></div>`).join('')}</div>`;
 }
 
 function renderMonthCalendar() {
@@ -4014,7 +4014,7 @@ function renderMonthCalendar() {
   let cal;
   try { cal = monthCalendar(currentResult, { year, month }); } catch (e) { el.innerHTML = '<p class="hint">Không tính được.</p>'; return; }
   const colors = { cat: { bg: '#e8f5e9', border: '#2e7d32', text: '#1b5e20' }, mid: { bg: '#fff8e1', border: '#b8860b', text: '#5d4037' }, hung: { bg: '#ffebee', border: '#c62828', text: '#b71c1c' }, pad: { bg: 'transparent', border: 'transparent', text: '#ccc' } };
-  const headers = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map(d => `<div style="text-align:center;font-size:.7em;font-weight:bold;color:#888;padding:2px">${d}</div>`).join('');
+  const headers = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map(d => `<div style="text-align:center;font-size:.7em;font-weight:bold;color:var(--silk-muted);padding:2px">${d}</div>`).join('');
   const cells = cal.days.map((d) => {
     if (!d.inMonth) return `<div style="min-height:38px;padding:2px;opacity:.3;color:#ccc;font-size:.75em;text-align:center"></div>`;
     const c = colors[d.tone];
@@ -4023,7 +4023,7 @@ function renderMonthCalendar() {
     return `<div style="min-height:38px;padding:2px 3px;background:${c.bg};border:1px solid ${c.border}40;border-radius:4px;${isBest ? 'box-shadow:0 0 4px '+c.border+'80;' : ''}">
       <div style="font-size:.75em;font-weight:bold;color:${c.text}">${d.day}</div>
       <div style="font-size:.55em;color:${c.text};opacity:.7">${d.score}</div>
-      ${isBest ? '<div style="font-size:.5em;color:#2e7d32">★</div>' : isWorst ? '<div style="font-size:.5em;color:#c62828">⚠</div>' : ''}
+      ${isBest ? '<div style="font-size:.5em;color:#2e9e5b">★</div>' : isWorst ? '<div style="font-size:.5em;color:#e0533d">⚠</div>' : ''}
     </div>`;
   }).join('');
   el.innerHTML = `
@@ -4041,12 +4041,12 @@ function renderWeekPreview() {
     const isBest = w.best && d.date === w.best.date;
     const isWorst = w.worst && d.date === w.worst.date;
     return `<div style="flex:1;min-width:80px;text-align:center;border:1px solid #e0d0a0;border-radius:8px;padding:6px 4px;background:${c}15;border-color:${isBest ? c : '#e0d0a0'};${isBest ? 'box-shadow:0 0 6px '+c+'80' : ''}">
-      <div style="font-size:.7em;color:#888">${d.weekdayVi}</div>
+      <div style="font-size:.7em;color:var(--silk-muted)">${d.weekdayVi}</div>
       <div style="font-weight:bold;font-size:1.1em;color:${c}">${d.day}/${d.month}</div>
       <div class="zh" style="font-size:.7em;opacity:.6">${d.ganZhi}</div>
       <div style="font-weight:bold;color:${c};font-size:1em">${d.score}</div>
-      <div style="font-size:.65em;color:#666">${d.rating}</div>
-      ${isBest ? '<div style="font-size:.6em;color:#2e7d32">★ tốt</div>' : isWorst ? '<div style="font-size:.6em;color:#c62828">⚠ kỵ</div>' : ''}
+      <div style="font-size:.65em;color:var(--silk-muted)">${d.rating}</div>
+      ${isBest ? '<div style="font-size:.6em;color:#2e9e5b">★ tốt</div>' : isWorst ? '<div style="font-size:.6em;color:#e0533d">⚠ kỵ</div>' : ''}
     </div>`;
   }).join('');
   $('week-preview').innerHTML = `
@@ -4074,13 +4074,13 @@ function renderFiveDimRadar() {
   const dataPoly = `<polygon points="${dataPts}" fill="${fill}" fill-opacity="0.28" stroke="${fill}" stroke-width="2"/>`;
   const dots = r.dims.map((d, i) => { const [x, y] = pt(i, R * d.score / 100); return `<circle cx="${x}" cy="${y}" r="3" fill="${fill}"/>`; }).join('');
   // bảng chi tiết
-  const rows = r.dims.map((d) => `<tr><td><b>${d.vi.split(' ')[0]}</b></td><td class="zh">${d.gods.map((g) => g.god).join('/')}</td><td><b>${d.score}</b></td><td style="color:#888;font-size:.85em">${d.trait}</td></tr>`).join('');
+  const rows = r.dims.map((d) => `<tr><td><b>${d.vi.split(' ')[0]}</b></td><td class="zh">${d.gods.map((g) => g.god).join('/')}</td><td><b>${d.score}</b></td><td style="color:var(--silk-muted);font-size:.85em">${d.trait}</td></tr>`).join('');
   $('five-dim-radar').innerHTML = `
     <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
       <svg viewBox="0 0 260 260" width="240" height="240" style="flex:0 0 240px">${grid}${axes}${dataPoly}${dots}</svg>
       <div style="flex:1;min-width:220px">
         <p style="margin:0 0 4px"><b style="color:${fill}">★ Trục trội: ${r.dominant.vi.split(' ')[0]}</b> — thiên ${r.dominant.trait}.</p>
-        <p style="margin:0 0 8px;color:#666;font-size:.9em">${r.weakest.vi.split(' ')[0]} yếu nhất (${r.weakest.score}) — cần bồi (đợi vận mang nhóm ${r.weakest.zh}).</p>
+        <p style="margin:0 0 8px;color:var(--silk-muted);font-size:.9em">${r.weakest.vi.split(' ')[0]} yếu nhất (${r.weakest.score}) — cần bồi (đợi vận mang nhóm ${r.weakest.zh}).</p>
         <table style="width:100%;font-size:.85em;border-collapse:collapse"><thead><tr style="color:#999;text-align:left"><th>Trục</th><th class="zh">Thập thần</th><th>Điểm</th><th>Thiên</th></tr></thead><tbody>${rows}</tbody></table>
       </div>
     </div>`;
