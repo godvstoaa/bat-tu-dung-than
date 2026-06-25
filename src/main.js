@@ -101,6 +101,7 @@ import { classifyChartLevel } from './engine/chart-level.js';
 import { baziMingGong } from './engine/bazi-minggong.js';
 import { analyzeChildrenStar } from './engine/children-star.js';
 import { predictEvents } from './engine/event-predict.js';
+import { getPersonalityProfile } from './engine/personality-profile.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1139,6 +1140,17 @@ function renderEventPredict(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được sự kiện dự đoán.</p>'; }
 }
 
+function renderPersonalityProfile(R) {
+  const el = $('personality-profile');
+  if (!el) return;
+  try {
+    const p = getPersonalityProfile(R);
+    const LABEL = { temperament: 'Khí chất', strengths: 'Ưu điểm', weaknesses: 'Nhược điểm', social: 'Xã hội', love: 'Tình cảm', career: 'Sự nghiệp', health: 'Sức khoẻ', finance: 'Tài chính' };
+    const rows = (p.keys || []).map((k) => `<div class="yz-row"><b>${esc(LABEL[k] || k)}:</b> ${esc(p.profile[k])}</div>`).join('');
+    el.innerHTML = `<p><b>Nhật can ${esc(p.ganVi)}</b> (hành ${esc(p.wxVi)}) — tính cách bẩm sinh:</p>${rows}`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được tính cách.</p>'; }
+}
+
 function renderMarriageStars(R) {
   const el = $('marriage-stars');
   if (!el) return;
@@ -1802,6 +1814,7 @@ function run() {
   lazyRender('minggong',       () => { try { renderMingGong(currentResult); } catch (e) { console.warn('minggong', e.message); } });
   lazyRender('children-star',  () => { try { renderChildrenStar(currentResult); } catch (e) { console.warn('childrenstar', e.message); } });
   lazyRender('event-predict',  () => { try { renderEventPredict(currentResult); } catch (e) { console.warn('eventpredict', e.message); } });
+  lazyRender('personality-profile', () => { try { renderPersonalityProfile(currentResult); } catch (e) { console.warn('personality', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
