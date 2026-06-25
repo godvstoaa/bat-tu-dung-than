@@ -27,11 +27,11 @@ const WX_CAREER = {
   水: 'thương mại, vận tải, du lịch, tài chính lưu thông, xuất nhập khẩu',
 };
 const WX_LOOKS = {
-  木: 'thanh hình cao thon, xương to, gan ro, toc day khoe, mat dai - khi chat manh me, phong thai',
-  火: 'mat tron hoac vuong, mat sang co than, da ung do, toc mem - bieu cam ruc ro, khi chat nhiet huyet',
-  土: 'than hinh day da hoac trung binh, da vang am, di dung vung chai - phong thai on hoa, dang tin',
-  金: 'da trang, ngu quan sac net gon gang, xuong goc canh ro, toc thang cung - khi chat lanh, thanh tu',
-  水: 'da mem, mat sau long lanh, toc den day, than hinh tron day mem mai - khi chat linh hoat, bi an',
+  木: 'thanh hình cao thon, xương to, gan to, tóc dày khỏe, mặt dài — khí chất mạnh mẽ, phong thái',
+  火: 'mặt tròn hoặc vuông, mắt sáng có thần, da ưng đỏ, tóc mềm — biểu cảm rực rỡ, khí chất nhiệt huyết',
+  土: 'thân hình đầy đà hoặc trung bình, da vàng ấm, đi đứng vững chãi — phong thái ôn hòa, đáng tin',
+  金: 'da trắng, ngũ quan sắc nét gọn gàng, xương góc canh rõ, tóc thẳng cứng — khí chất lạnh, thanh tú',
+  水: 'da mềm, mắt sâu long lanh, tóc đen dày, thân hình tròn đầy mềm mại — khí chất linh hoạt, bí ẩn',
 };
 const GOD_NATURE = {
   正官: 'ôn hoà, quy củ, có ý thức trách nhiệm, phù hợp công chức',
@@ -130,8 +130,9 @@ export function buildFullProfile(match, userR) {
   // — tính từ Nhật Chủ của USER, không hardcode.
   const userDmWx = userR.chart.dayMaster.wx;
   const childWxUser = isMaleUser ? KE_BY[userDmWx] : SHENG[userDmWx]; // nam: ai khắc Nhật Chủ (官 sát); nữ: Nhật Chủ sinh (tài)
-  const combinedChildWx = dmWx; // child inherits partner's element tendency
-  p.push(`Con cái: nếu sinh con với partner này → con thừa hưởng Thổ (từ mẹ) + Mộc (từ bạn) = Mộc khắc Thổ = con có tính tự lập, mạnh mẽ. Nên sinh vào năm mang hành ${WX_VI[userYong.primary]} (Dụng của bạn) → con bổ mệnh cha mẹ.`);
+  const partnerChildWx = isMaleUser ? SHENG[dmWx] : KE_BY[dmWx]; // [loop 64] partner's child-star element
+  const rel = (a, b) => a === b ? 'đồng hành (tương hỗ)' : SHENG[a] === b ? `${WX_VI[a]} sinh ${WX_VI[b]}` : KE[a] === b ? `${WX_VI[a]} khắc ${WX_VI[b]}` : `${WX_VI[a]} ↔ ${WX_VI[b]}`;
+  p.push(`Con cái: nếu sinh con với partner này → con thừa hưởng hành ${WX_VI[childWxUser]} (sao con của bạn) + ${WX_VI[partnerChildWx]} (sao con của partner) → ${rel(childWxUser, partnerChildWx)}. Nên sinh vào năm mang hành ${WX_VI[userYong.primary]} (Dụng của bạn) → con bổ mệnh cha mẹ.`);
 
-  return { paragraphs: p, summary: `Partner #${match.rank}: ${dm.vi} (${WX_VI[dmWx]}) sinh ${match.date} — ${DM_TRAITS[dmGan]?.split(',')[0] || ''}. ${isUserDung ? '★ BỔ DỤNG THẦN!' : ''} Hợn ${match.hehunScore}/100.` };
+  return { paragraphs: p, summary: `Partner #${match.rank}: ${dm.vi} (${WX_VI[dmWx]}) sinh ${match.date} — ${DM_TRAITS[dmGan]?.split(',')[0] || ''}. ${isUserDung ? '★ BỔ DỤNG THẦN!' : ''} Hợp hôn ${match.hehunScore}/100.` };
 }
