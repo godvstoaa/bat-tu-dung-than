@@ -338,24 +338,34 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
 
   // [loop 152 ELEVATION] 大运 进气退气 — năm đầu (1-3t) = 进气 (vận đang vào),
   //   năm cuối (8-10t) = 退气 (vận đang ra). Giữa = vượng.
+  // [loop 164 ELEVATION] 2 sửa logic:
+  //   (1) factor GRADUATED theo khoảng cách tới cửa sổ đỉnh (offset 3-6): năm 1/10
+  //       yếu hơn năm 3/10 — trước đây cố định 0.9 cho cả 3 năm đầu & cuối.
+  //   (2) áp dụng DAMPEN TOWARD NEUTRAL (50), KHÔNG phải score*factor. Semantics:
+  //       进气/退气 = «lực đại vận realised năm nay = factor% đỉnh». Year tốt → bớt tốt
+  //       một chút; year XẤU → bớt xấu một chút (kỵ thần chưa/phai tác dụng đầy đủ).
+  //       Trước đây score*0.9 luôn KÉO XUỐNG → năm xấu bị PHẠT THÊM (sai hướng).
   let dayunPhase = null;
   if (activeDayun && Array.isArray(R.dayun)) {
     const dy = R.dayun.find((d) => d && d.startYear != null && d.startYear <= solarYear && solarYear < d.startYear + 10);
     if (dy && dy.startYear != null) {
       const offset = solarYear - dy.startYear; // 0→9
-      if (offset <= 2) dayunPhase = { phase: '进气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 进气 (đang VÀO, lực chưa tối đa, đang tích lũy)`, factor: 0.9 };
-      else if (offset >= 7) dayunPhase = { phase: '退气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 退气 (đang RA, lực suy, chuyển sang vận sau)`, factor: 0.9 };
-      else dayunPhase = { phase: '旺气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 旺气 (lực tối đa)`, factor: 1.0 };
+      const dToPeak = offset < 3 ? 3 - offset : offset > 6 ? offset - 6 : 0; // 0 (đỉnh) .. 3 (viền)
+      const factor = +(1 - dToPeak * 0.06).toFixed(2);                       // 1.00 .. 0.82
+      const pct = Math.round(factor * 100);
+      if (offset <= 2) dayunPhase = { phase: '进气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 进气 (đang VÀO, lực realised ${pct}% đỉnh)`, factor };
+      else if (offset >= 7) dayunPhase = { phase: '退气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 退气 (đang RA, lực realised ${pct}% đỉnh)`, factor };
+      else dayunPhase = { phase: '旺气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 旺气 (lực tối đa 100%)`, factor: 1.0 };
     }
   }
 
-  // [loop 159 fix] apply 进气退气 factor to score (score/rating are const from destructuring)
+  // [loop 159/164] apply 进气退气 — dampen score TOWARD neutral(50) by factor.
   let finalScore = score;
   let finalRating = rating;
   if (dayunPhase && dayunPhase.factor < 1) {
-    finalScore = Math.max(2, Math.min(98, Math.round(score * dayunPhase.factor)));
+    finalScore = Math.max(2, Math.min(98, Math.round(50 + (score - 50) * dayunPhase.factor)));
     finalRating = finalScore >= 78 ? 'Đại cát' : finalScore >= 62 ? 'Cát' : finalScore >= 46 ? 'Bình' : finalScore >= 32 ? 'Hơi kỵ' : finalScore >= 20 ? 'Hung' : 'Đại hung';
-    schools.push({ phai: '进气退气', d: finalScore - score, note: dayunPhase.vi + ' → điểm ×' + dayunPhase.factor });
+    schools.push({ phai: '进气退气', d: finalScore - score, note: dayunPhase.vi + ` → điểm co về neut ${Math.round((1 - dayunPhase.factor) * 100)}%` });
   }
 
   const out = { year: solarYear, ganZhi: yGan + yZhi, ganGod, ganWx, zhiWx, score: finalScore, rating: finalRating, schools, advice };
