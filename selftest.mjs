@@ -5223,6 +5223,38 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(SH.HUA_GAI['A']==='辰' && SH.HUA_GAI['B']==='戌' && SH.HUA_GAI['C']==='丑' && SH.HUA_GAI['D']==='未', '华盖 A辰B戌C丑D未');
   console.log(`   SHENSHA tables (天乙/文昌/禄神/羊刃/桃花/驿马/华盖) + 旺相休囚死 ✓ | locked`);
 }
+
+// ################## LL. [loop 169] 合婚/business-match invariants — symmetry + range + avoid-consistency ##################
+{
+  const { matchBusinessPartners } = await import('./src/engine/partner-match.js');
+  // Diverse pairs
+  const pairs = [
+    [analyze(1990,5,14,13,0,'nam',2026), analyze(1988,11,3,23,30,'nữ',2026)],
+    [analyze(1975,7,20,6,0,'nữ',2026),   analyze(2000,4,5,6,0,'nam',2026)],
+    [analyze(1995,9,9,12,0,'nam',2026),  analyze(1992,6,6,9,0,'nam',2026)],
+  ];
+  for (let i = 0; i < pairs.length; i++) {
+    const [A, B] = pairs[i];
+    // hehun symmetry + range
+    const ab = computeHehun(A, B), ba = computeHehun(B, A);
+    assert(ab.score === ba.score, `合婚[${i}] đối xứng: score(A,B)=${ab.score} === score(B,A)=${ba.score}`);
+    assert(ab.score >= 5 && ab.score <= 98, `合婚[${i}] điểm trong [5,98] (${ab.score})`);
+    assert(ab.factors.length >= 3, `合婚[${i}] có ≥3 factors (${ab.factors.length})`);
+    // partner-match symmetry + range
+    const pab = matchBusinessPartners(A, B), pba = matchBusinessPartners(B, A);
+    assert(pab.score === pba.score, `hợp tác[${i}] đối xứng: ${pab.score} === ${pba.score}`);
+    assert(pab.score >= 10 && pab.score <= 98, `hợp tác[${i}] điểm trong [10,98] (${pab.score})`);
+  }
+  // [loop 167-168 benefit] avoid must NOT contain Dụng or Hỷ for any chart → compatibility
+  //   never penalises a partner whose Dụng = user's Hỷ (someone who supplements the remedy).
+  let avoidConsistent = 0;
+  for (const [y, m, d, h] of [[1990,5,14,13],[1988,11,3,23],[1975,7,20,6],[2000,4,5,6],[1995,9,9,12]]) {
+    const R = analyze(y, m, d, h, 0, 'nam', 2026);
+    if (!R.yong.avoid.includes(R.yong.primary) && !R.yong.avoid.includes(R.yong.xi) && R.yong.avoid.includes(R.yong.ji)) avoidConsistent++;
+  }
+  assert(avoidConsistent === 5, `用神 avoid consistency (Dụng/Hỷ∉avoid, 忌∈avoid) — ${avoidConsistent}/5`);
+  console.log(`   合婚/hợp tác: đối xứng + range + avoid-consistency ✓ | locked`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
