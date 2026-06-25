@@ -218,6 +218,14 @@ export function extendBrief(R) {
     parts.push(`NGŨ ĐỨC (五常): đức chính ${fv.virtue} (${fv.primaryVi}) — ${fv.strong ? fv.strong.slice(0, 40) : ''}${fv.kyVirtue ? ' | thiếu: ' + fv.kyVirtue : ''}. ${fv.cultivation ? fv.cultivation.slice(0, 50) : ''}`);
   } catch (e) {}
 
+  // [loop 149] KHÔNG VONG (空亡) — AI biết trụ nào bị treo → giải thích «空则不实»
+  try {
+    const kw = R.kongwang;
+    if (kw && kw.affected && kw.affected.length) {
+      parts.push(`KHÔNG VONG (空亡):旬 ${kw.xun}, chi trống = ${kw.kong.join('/')}. ${kw.affected.map((a) => `${a.palace.split('(')[0]}(${a.zhi})`).join(', ')} bị «treo» → tàng can YẾU 50% («空则不实»). Đợi vận/年 mang chi đó (hoặc xung) = «xuất không» → sự việc phát.`);
+    }
+  } catch (e) {}
+
   // [loop 124] LƯU THÁNG hiện tại — AI trả lời "tháng này sao"
   try {
     const now = new Date();
