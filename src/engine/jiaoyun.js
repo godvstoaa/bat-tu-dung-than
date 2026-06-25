@@ -60,7 +60,7 @@ export function jiaoYunAnalysis(R, refDate) {
 
   // kiêng kỵ giao thời
   const dungDir = DUNG_DIR[R.yong?.primary] || 'hướng Dụng Thần';
-  const birthZhi = R.chart.pillars.year.zhi;
+  const birthZhi = R.chart?.pillars?.year?.zhi;
   const avoidZhiSet = new Set();
   if (next?.ganZhi) avoidZhiSet.add(CHONG[next.ganZhi[1]]);          // xung chi大运 tới
   if (birthZhi) avoidZhiSet.add(CHONG[birthZhi]);                     // xung bản mệnh chi
@@ -79,7 +79,7 @@ export function jiaoYunAnalysis(R, refDate) {
     qiyunDate, isForward, transitions,
     current: prev, next, daysUntil, dungDir, avoidZhi,
     summary,
-    allTransitions: transitions.map((t) => `${fmt(t.date)} → ${t.ganZhi || '?'}[${t.age || '?'}–${(t.age || 0) + 9}t, ${t.rating || '?'}]`),
+    allTransitions: transitions.map((t) => `${fmt(t.date)} → ${t.ganZhi || '?'}[${t.age ? t.age + '–' + (t.age + 9) + 't' : '?'}${t.rating ? ', ' + t.rating : ''}]`),
   };
 }
 

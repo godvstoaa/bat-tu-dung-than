@@ -19,9 +19,11 @@ export function suiyunCheck(dayunGanZhi, liunianYear, liunianGanZhi) {
   const lnGan = liunianGanZhi[0], lnZhi = liunianGanZhi[1];
   const events = [];
   let severity = 0;
+  let isBinglin = false; // [loop 61] track 并临 separately from severity
 
   // 1. 岁运并临 (cùng ganZhi)
   if (dayunGanZhi === liunianGanZhi) {
+    isBinglin = true;
     events.push('⚡ 岁运并临 — lưu niên TRÙNG đại vận (cùng ganZhi): hiệu ứng NHÂN ĐÔI. Cổ ngữ "不死自己死他人" — năm CỰC TRỌNG, mọi thứ amplified.');
     severity += 3;
   }
@@ -57,7 +59,7 @@ export function suiyunCheck(dayunGanZhi, liunianYear, liunianGanZhi) {
   return {
     year: liunianYear,
     dayunGanZhi, liunianGanZhi,
-    type: severity >= 3 ? '并临' : severity >= 2 ? 'tương tác mạnh' : 'tương tác nhẹ',
+    type: isBinglin ? '并临' : severity >= 2 ? 'tương tác mạnh' : 'tương tác nhẹ',
     severity, events,
     note: events.join(' '),
   };
