@@ -651,7 +651,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .zw-cell { background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.08); border-radius: 9px; padding: 8px 6px; text-align: center; }
 .zw-cell.ming { border-color: var(--gold); background: rgba(212,175,55,0.12); }
 .zw-cell.shen { border-color: rgba(58,123,213,0.5); }
-.zw-palace { font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.zw-palace { font-size: 12.5px; font-weight: 600; color: var(--silk); }
 .zw-pvi { display: block; font-size: 10px; color: var(--muted); font-weight: 400; }
 .zw-gz { font-family: 'Noto Serif SC', serif; font-size: 16px; color: var(--gold-soft); margin-top: 3px; }
 .zw-gz span { margin: 0 1px; }
@@ -993,11 +993,11 @@ html{scroll-behavior:smooth}
 .yz-select { margin: 10px 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .yz-select select { background: rgba(20,15,10,0.6); color: var(--gold-bright); border: 1px solid var(--gold);
   border-radius: 4px; padding: 5px 8px; font-size: 13px; max-width: 70%; }
-.yz-select label { color: var(--ink); font-size: 13px; }
-.yz-row { font-size: 13.5px; color: var(--ink); margin: 4px 0; }
+.yz-select label { color: var(--silk-dim); font-size: 13px; }
+.yz-row { font-size: 13.5px; color: var(--silk-dim); margin: 4px 0; }
 .yz-row b { color: var(--gold-bright); }
 .yz-rules { margin-top: 12px; }
-.yz-rules details { margin: 5px 0; font-size: 13px; color: var(--ink); }
+.yz-rules details { margin: 5px 0; font-size: 13px; color: var(--silk-dim); }
 .yz-rules summary { cursor: pointer; color: var(--gold-bright); font-weight: 600; }
 .yz-rules ul { margin: 6px 0 6px 18px; padding: 0; }
 .yz-rules li { margin: 3px 0; line-height: 1.5; }
