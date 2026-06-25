@@ -138,6 +138,11 @@ body {
 .subtitle .zh { color: var(--gold); }
 
 /* ===== LAYOUT / CARD (kiểu chiếu chỉ + ấn ký) ===== */
+/* [loop 150] CARD VARIETY — alternating accent top borders */
+#result > .card:nth-child(4n+1) { border-top: 2px solid rgba(212, 175, 55, 0.25); }
+#result > .card:nth-child(4n+2) { border-top: 2px solid rgba(46, 158, 107, 0.2); }
+#result > .card:nth-child(4n+3) { border-top: 2px solid rgba(192, 57, 43, 0.2); }
+#result > .card:nth-child(4n+4) { border-top: 2px solid rgba(74, 134, 208, 0.2); }
 .container { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; padding: 16px 20px 70px; }
 .card {
   position: relative;
@@ -582,6 +587,11 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+/* [loop 150] CARD ENTRANCE VARIETY — 4 kiểu đan xen (không đơn điệu) */
+@keyframes cardSlideL { from { opacity: 0; transform: translateX(-20px) rotateY(-3deg); } to { opacity: 1; transform: translateX(0) rotateY(0); } }
+@keyframes cardSlideR { from { opacity: 0; transform: translateX(20px) rotateY(3deg); } to { opacity: 1; transform: translateX(0) rotateY(0); } }
+@keyframes cardScale { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes cardFlip { from { opacity: 0; transform: perspective(600px) rotateX(-12deg); } to { opacity: 1; transform: perspective(600px) rotateX(0); } }
 
 #result.reveal-run > .card { animation: cardReveal .55s var(--ease-out) both; }
 #result.reveal-run > .card:nth-child(1) { animation-delay: 0.00s; }
@@ -593,6 +603,11 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 #result.reveal-run > .card:nth-child(7) { animation-delay: 0.36s; }
 #result.reveal-run > .card:nth-child(8) { animation-delay: 0.42s; }
 #result.reveal-run > .card:nth-child(n + 9) { animation-delay: 0.48s; }
+/* [loop 150] ENTRANCE VARIETY — 4 kiểu đan xen thay vì toàn cardReveal */
+#result.reveal-run > .card:nth-child(4n+2) { animation-name: cardSlideL; }
+#result.reveal-run > .card:nth-child(4n+3) { animation-name: cardSlideR; }
+#result.reveal-run > .card:nth-child(4n+4) { animation-name: cardScale; }
+#result.reveal-run > .card:nth-child(4n+1):not(:first-child) { animation-name: cardFlip; }
 
 #result.reveal-run .pillar { animation: pillarRise .55s var(--ease-out) both; }
 #result.reveal-run .pillar:nth-child(1) { animation-delay: 0.18s; }
