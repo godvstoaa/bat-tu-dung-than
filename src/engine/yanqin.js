@@ -10,6 +10,7 @@
 //    tính cách + bản mệnh + quan hệ sinh khắc. Nguồn: 禽星易见, 演禽正传, 演禽赋.
 // ============================================================================
 import { Solar } from 'lunar-javascript';
+import { ziShiRoll } from './chart.js'; // [loop 179] 演禽 bản mệnh dùng cùng 子时换日 八字
 
 // 28禽: 宿 → {禽, 七曜, động vật, tính cách, vận thế}
 export const QIN_28 = {
@@ -67,7 +68,9 @@ export function dayQin(year, month, day) {
  */
 export function analyzeYanQin(R) {
   const inp = R.chart.input;
-  const bm = dayQin(inp.year, inp.month, inp.day);
+  // [loop 179] 子时换日 — bản mệnh禽 phải dùng ngày ROLL (đồng bộ 八字), không phải input thô
+  const [by, bm_, bd] = ziShiRoll(inp.year, inp.month, inp.day, inp.hour, inp.minute);
+  const bm = dayQin(by, bm_, bd);
   const now = new Date();
   const today = dayQin(now.getFullYear(), now.getMonth() + 1, now.getDate());
 
