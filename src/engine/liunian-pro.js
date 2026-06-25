@@ -69,7 +69,7 @@ const GOD_YEAR_EFFECT = {
  *        傷官 năm trong 比劫 vận → được sinh → thêm hung). Nguồn 渊海子平/滴天髓.
  * @returns {{ score, rating, schools, ganGod, ganWx, zhiWx }}
  */
-export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZhi, activeDayun, natalPillars }) {
+export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZhi, activeDayun, natalPillars, kongwang }) {
   const ganGod = tenGod(dayGan, yGan);
   const ganWx = GAN[yGan].wx, zhiWx = ZHI[yZhi].wx;
   const schools = [];
@@ -193,19 +193,18 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
     schools.push({ phai: '大运互动 (运年组合)', note: `[大运 ${activeDayun} ${TEN_GOD_VI[dyGod]}] ${dyNotes.join(' ')}`, d: dyD });
   }
 
-  // [loop 160 ELEVATION] 空亡 出空/冲空 — 流年 chi = void chi → «xuất không» (sao bị treo BẮT ĐẦU hoạt động)
-  //   hoặc 流年 chi 冲 void chi → «xung không» (sự kiện đột ngột).
-  if (R.kongwang?.kong?.length && R.kongwang.kong.includes(yZhi)) {
+  // [loop 160 ELEVATION] 空亡 出空/冲空 — 流年 chi = void chi → «xuất không»
+  if (kongwang?.kong?.length && kongwang.kong.includes(yZhi)) {
     const fav = new Set([yong.primary, yong.xi].filter(Boolean));
     const isFav = fav.has(GAN[yGan]?.wx);
     const delta = isFav ? 8 : -6;
     score += delta;
-    schools.push({ phai: '出空 (空亡激活)', note: `⚡ 流年 ${yGan}${yZhi} = chi KHÔNG VONG → «xuất không»: sao/Dụng bị «treo» trong nguyên cục NĂM NAY BẮT ĐẦU HOẠT ĐỘNG. ${isFav ? '★ Dụng xuất không → CÁT (sự việc tốt bị treo giờ phát).' : '⚠ Kỵ xuất không → HUNG (áp lực bị treo giờ đến).'}`, d: delta });
-  } else if (R.kongwang?.kong?.length) {
-    for (const kc of R.kongwang.kong) {
+    schools.push({ phai: '出空 (空亡激活)', note: `⚡ 流年 ${yGan}${yZhi} = chi KHÔNG VONG → «xuất không»: sao bị «treo» trong nguyên cục NĂM NAY BẮT ĐẦU HOẠT ĐỘNG. ${isFav ? '★ Dụng xuất không → CÁT.' : '⚠ Kỵ xuất không → HUNG.'}`, d: delta });
+  } else if (kongwang?.kong?.length) {
+    for (const kc of kongwang.kong) {
       if (CHONG[kc] === yZhi) {
         score -= 5;
-        schools.push({ phai: '冲空 (空亡被冲)', note: `⚡ 流年 ${yGan}${yZhi} 冲 chi không vong ${kc} → «xung không»: sự kiện ĐỘT NGỘT, treo bao lâu giờ bùng nổ. Cẩn thận biến cố.`, d: -5 });
+        schools.push({ phai: '冲空 (空亡被冲)', note: `⚡ 流年 ${yGan}${yZhi} 冲 chi không vong ${kc} → «xung không»: sự kiện ĐỘT NGỘT.`, d: -5 });
         break;
       }
     }
@@ -300,6 +299,7 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
   const { score, rating, schools, ganGod, ganWx, zhiWx } = scoreLiunianYear({
     dayGan: c.dayGan, dayZhi: c.pillars.day.zhi, yearBirthZhi: c.pillars.year.zhi, yong: R.yong, yGan, yZhi, activeDayun,
     natalPillars: c.pillars, // [loop 19] bật tầng 伏吟/反吟 vs 4 trụ nguyên cục
+    kongwang: R.kongwang, // [loop 160] 空亡 出空/冲空
   });
 
   // [loop 3] Trường phái thứ 6: 格局喜忌 (thông tin, không đổi score cốt lõi).
