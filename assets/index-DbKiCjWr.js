@@ -416,6 +416,7 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, best_days_in
       <p class="hint" style="margin-top:4px">${k(h.summary)}</p>`}catch(t){console.warn("lnSihua",t.message),i.innerHTML='<p class="hint">Không tính được lưu niên tứ hóa.</p>'}}function TN(n){const i=n.synthesis;if(!i||!i.paragraphs){w("synthesis").innerHTML='<p class="hint">Chưa tính được tổng luận.</p>';return}const t=i.combos&&i.combos.length?`<div class="combos">${i.combos.map(m=>`<span class="combo ${k(m.tone)}"><b>${k(m.vi)}</b> <span class="zh small">${k(m.name)}</span> — ${k(m.desc)}</span>`).join("")}</div>`:'<p class="hint">Không có tổ hợp Thập thần nổi bật.</p>',h=i.score>=68?"cat":i.score>=55?"mid":"warn",a=n.patternQuality||{},e={成格:"✓ Thành cách",有救:"✓ Bại+cứu",败格:"⚠ Bại cách",特殊:"★ Đặc biệt",未知:""},c=n.yong||{},s=n.wx.score||{},o=(s[c.primary]||0)+(s[c.xi]||0),r=(s[c.ji]||0)+(s[c.chou]||0),g=o+r||1,u=Math.round(o/g*100),l=`
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
       ${e[a.quality]?`<span class="combo ${a.quality==="败格"?"xiong":"cat"}">${k(e[a.quality])}</span>`:""}
+      <span class="combo ${n.strength?.strong?"cat":"xiong"}">Thân ${n.strength?.strong?"VƯỢNG":"NHƯỢC"} ${Math.round((n.strength?.ratio||0)*100)}%</span>
       <span class="combo ${u>=55?"cat":u<=45?"xiong":""}">敌我: Dụng ${u}% / Kỵ ${100-u}%</span>
       <span class="combo">Dụng ${k(n.yong&&M[n.yong.primary]||"")}</span>
     </div>`;w("synthesis").innerHTML=`
