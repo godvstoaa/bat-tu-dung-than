@@ -93,6 +93,8 @@ import { buildRemedy } from './engine/remedy.js';
 import { wuTai } from './engine/tonggen.js';
 import { dailyGuide } from './engine/daily-guide.js';
 import { dailyDirections } from './engine/daily-directions.js';
+import { computeZhai } from './engine/zhai.js';
+import { personalFengShui } from './engine/family-sync.js';
 import { strength3Fa } from './engine/strength-3fa.js';
 import { jiaoYunAnalysis } from './engine/jiaoyun.js';
 import { analyzePillarQuality } from './engine/pillar-quality.js';
@@ -1336,6 +1338,18 @@ function renderDailyPro(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được lưu nhật chuyên sâu.</p>'; }
 }
 
+function renderPersonalFengShui(R) {
+  const el = $('personal-fengshui');
+  if (!el) return;
+  try {
+    const z = computeZhai(R.chart.input.year, R.chart.input.gender);
+    const pf = personalFengShui(z.auspicious, z.inauspicious, R.yong);
+    const rooms = pf.rooms || [];
+    const rows = rooms.map((r) => `<div class="yz-row"><b>${esc(r.vi)}</b> → hướng <b style="color:#2e9e5b">${esc(r.bestDir)}</b> <span class="hint">(${esc(r.why || '')})</span></div>`).join('');
+    el.innerHTML = `<p class="hint">Bát Trạch (八宅): quái ${esc(z.guaName || '')} — ${esc(z.grpVi || '')} nhóm. Hướng từng phòng theo Dụng + Bát Trạch.</p>${rows}`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được phong thủy phòng ở.</p>'; }
+}
+
 function renderDailyGuide(R) {
   const el = $('daily-guide');
   if (!el) return;
@@ -2312,6 +2326,7 @@ function run() {
   lazyRender('noble-cultivate', () => { try { renderNobleCultivate(currentResult); } catch (e) { console.warn('noble', e.message); } });
   lazyRender('fengshui-extra', () => { try { renderFengshuiExtra(currentResult); } catch (e) { console.warn('fsextra', e.message); } });
   lazyRender('shensha-activation', () => { try { renderShenshaActivation(currentResult); } catch (e) { console.warn('shenshaact', e.message); } });
+  lazyRender('personal-fengshui', () => { try { renderPersonalFengShui(currentResult); } catch (e) { console.warn('pfs', e.message); } });
   lazyRender('flying-sihua',     () => { try { renderFlyingSihua(currentResult); } catch (e) { console.warn('flyingsihua', e.message); } });
   lazyRender('move-fs',          () => { try { renderMoveFs(currentResult); } catch (e) { console.warn('movefs', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
