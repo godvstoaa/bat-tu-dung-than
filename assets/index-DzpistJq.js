@@ -412,13 +412,19 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, best_days_in
       <p class="hint">Năm ${h.year} — can ${h.yearGan} (<span class="zh">${h.yearGanZhi}</span>) sinh 4 hóa bay vào mệnh bàn bẩm sinh:</p>
       <div class="ln-sihua-list">${a}</div>
       ${e}${c}
-      <p class="hint" style="margin-top:4px">${k(h.summary)}</p>`}catch(t){console.warn("lnSihua",t.message),i.innerHTML='<p class="hint">Không tính được lưu niên tứ hóa.</p>'}}function TN(n){const i=n.synthesis;if(!i||!i.paragraphs){w("synthesis").innerHTML='<p class="hint">Chưa tính được tổng luận.</p>';return}const t=i.combos&&i.combos.length?`<div class="combos">${i.combos.map(a=>`<span class="combo ${k(a.tone)}"><b>${k(a.vi)}</b> <span class="zh small">${k(a.name)}</span> — ${k(a.desc)}</span>`).join("")}</div>`:'<p class="hint">Không có tổ hợp Thập thần nổi bật.</p>',h=i.score>=68?"cat":i.score>=55?"mid":"warn";w("synthesis").innerHTML=`
+      <p class="hint" style="margin-top:4px">${k(h.summary)}</p>`}catch(t){console.warn("lnSihua",t.message),i.innerHTML='<p class="hint">Không tính được lưu niên tứ hóa.</p>'}}function TN(n){const i=n.synthesis;if(!i||!i.paragraphs){w("synthesis").innerHTML='<p class="hint">Chưa tính được tổng luận.</p>';return}const t=i.combos&&i.combos.length?`<div class="combos">${i.combos.map(m=>`<span class="combo ${k(m.tone)}"><b>${k(m.vi)}</b> <span class="zh small">${k(m.name)}</span> — ${k(m.desc)}</span>`).join("")}</div>`:'<p class="hint">Không có tổ hợp Thập thần nổi bật.</p>',h=i.score>=68?"cat":i.score>=55?"mid":"warn",a=n.patternQuality||{},e={成格:"✓ Thành cách",有救:"✓ Bại+cứu",败格:"⚠ Bại cách",特殊:"★ Đặc biệt",未知:""},c=n.yong||{},s=n.wx.score||{},o=(s[c.primary]||0)+(s[c.xi]||0),r=(s[c.ji]||0)+(s[c.chou]||0),g=o+r||1,u=Math.round(o/g*100),l=`
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
+      ${e[a.quality]?`<span class="combo ${a.quality==="败格"?"xiong":"cat"}">${k(e[a.quality])}</span>`:""}
+      <span class="combo ${u>=55?"cat":u<=45?"xiong":""}">敌我: Dụng ${u}% / Kỵ ${100-u}%</span>
+      <span class="combo">Dụng ${k(n.yong&&M[n.yong.primary]||"")}</span>
+    </div>`;w("synthesis").innerHTML=`
     <div class="syn-head">
       <div class="syn-grade ${h}"><span class="zh big">${k(i.grade)}</span><span>${k(i.gradeVi)}</span></div>
       <div class="syn-fortune"><b>${k(i.fortuneVi)}</b> · điểm <b>${k(i.score)}/100</b></div>
     </div>
+    ${l}
     <p class="syn-lead">${k(i.paragraphs[0])} ${k(i.paragraphs[1])}</p>
-    <details class="syn-factors"><summary>Các nhân tố chấm điểm (cách – tình – lực – thanh trọc – phối hợp)</summary><div class="factor-list">${i.factors.map(a=>`<div class="factor">${k(a)}</div>`).join("")}</div></details>
+    <details class="syn-factors"><summary>Các nhân tố chấm điểm (cách – tình – lực – thanh trọc – phối hợp)</summary><div class="factor-list">${i.factors.map(m=>`<div class="factor">${k(m)}</div>`).join("")}</div></details>
     <h4 class="syn-h4">Tổ hợp Thập Thần (十神组合)</h4>
     ${t}
     <p class="syn-advice">${k(i.paragraphs[3])}</p>`}function bN(n){const i=Math.max(...Object.values(n.pct));w("wuxing").innerHTML=["木","火","土","金","水"].map(t=>{const h=n.pct[t],a=i>0?h/i*100:0;return`
