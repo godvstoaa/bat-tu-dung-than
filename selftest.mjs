@@ -4385,6 +4385,74 @@ console.log('\n################## S. [loop 69] 盲派暗合/暗冲 nghiêm + 化
   console.log(`   化气格: root 0.54<0.6 → KHÔNG thành ✓; root 0.6+ (có 辰) → THÀNH ✓ (chống fake hóa khí)`);
 }
 
+// ################## T. [loop 70] 寒暖燥湿 HÀN-NOÃN-TÁO-THẤP (tính năng mới) ##################
+import { analyzeHanNuan, MONTH_CLIMATE } from './src/engine/han-nuan.js';
+console.log('\n################## T. [loop 70] 寒暖燥湿 HÀN-NOÃN-TÁO-THẤP ##################');
+{
+  // Month climate nền đúng cổ pháp: 亥子=hàn cực (temp âm lớn), 巳午=nhiệt cực (temp dương lớn)
+  assert(MONTH_CLIMATE['子'].temp < -1.5 && MONTH_CLIMATE['午'].temp > 1.5, 'khí hậu nền: 子 hàn cực (temp<-1.5), 午 nhiệt cực (temp>1.5)');
+  // 季月 táo/thấp phân minh: 未戌 = 燥 (humid âm), 辰丑 = 湿 (humid dương)
+  assert(MONTH_CLIMATE['未'].humid < 0 && MONTH_CLIMATE['戌'].humid < 0, '未/戌 = 燥土 (humid âm)');
+  assert(MONTH_CLIMATE['辰'].humid > 0 && MONTH_CLIMATE['丑'].humid > 0, '辰/丑 = 湿土 (humid dương)');
+
+  // S1. HÀN lạnh — 子月 + toàn Thủy → temperature 寒, cần Hỏa noãn
+  const hnCold = analyzeHanNuan({ chart: { monthZhi:'子', pillars: {
+    year:{gan:'壬',zhi:'亥'}, month:{gan:'癸',zhi:'子'}, day:{gan:'壬',zhi:'子'}, time:{gan:'癸',zhi:'亥'},
+  }}, yong:{primary:'火'} });
+  assert(hnCold.temperature === '寒', `mệnh Thủy 子月 → HÀN (được ${hnCold.tempVi}, điểm ${hnCold.tempScore})`);
+  assert(hnCold.needs.some((n) => n.wx === '火'), '寒 → cần Hỏa noãn («寒甚必用火暖»)');
+  assert(hnCold.alignNote.includes('TRÙNG') || hnCold.alignNote.includes('✓'), 'Dụng Hỏa TRÙNG nhu cầu寒 → Dụng thật vững');
+
+  // S2. NOÃN/NHIỆT — 午月 + toàn Hỏa → temperature 暖, cần Thủy
+  const hnHot = analyzeHanNuan({ chart: { monthZhi:'午', pillars: {
+    year:{gan:'丙',zhi:'巳'}, month:{gan:'丁',zhi:'午'}, day:{gan:'丙',zhi:'午'}, time:{gan:'丁',zhi:'巳'},
+  }}, yong:{primary:'水'} });
+  assert(hnHot.temperature === '暖', `mệnh Hỏa 午月 → NOÃN/NHIỆT (điểm ${hnHot.tempScore})`);
+  assert(hnHot.needs.some((n) => n.wx === '水'), '暖 → cần Thủy nhuận («燥甚必用水润»)');
+  assert(hnHot.alignNote.includes('TRÙNG') || hnHot.alignNote.includes('✓'), 'Dụng Thủy TRÙNG nhu cầu暖');
+
+  // S3. TÁO — 戌月 + 未/戌 chi + ít Thủy → humidity 燥
+  const hnDry = analyzeHanNuan({ chart: { monthZhi:'戌', pillars: {
+    year:{gan:'戊',zhi:'未'}, month:{gan:'丙',zhi:'戌'}, day:{gan:'戊',zhi:'戌'}, time:{gan:'丁',zhi:'未'},
+  }}, yong:{primary:'水'} });
+  assert(hnDry.humidity === '燥', `mệnh táo thổ (未戌+Hỏa) → TÁO (điểm ${hnDry.humidScore})`);
+  assert(hnDry.needs.some((n) => n.wx === '水'), '燥 → cần Thủy nhuận');
+
+  // S4. THẤP — 丑月 + 辰/丑 + Thủy → humidity 湿
+  const hnWet = analyzeHanNuan({ chart: { monthZhi:'丑', pillars: {
+    year:{gan:'己',zhi:'辰'}, month:{gan:'癸',zhi:'丑'}, day:{gan:'辛',zhi:'丑'}, time:{gan:'壬',zhi:'辰'},
+  }}, yong:{primary:'火'} });
+  assert(hnWet.humidity === '湿', `mệnh thấp thổ (辰丑+Thủy) → THẤP (điểm ${hnWet.humidScore})`);
+  assert(hnWet.needs.some((n) => n.wx === '火'), '湿 → cần Hỏa bốc + Mộc thấu');
+
+  // S5. CÂN — 卯月 (ôn hoà) + ngũ hành pha → 平 / 平
+  const hnBal = analyzeHanNuan({ chart: { monthZhi:'卯', pillars: {
+    year:{gan:'甲',zhi:'寅'}, month:{gan:'乙',zhi:'卯'}, day:{gan:'丙',zhi:'午'}, time:{gan:'壬',zhi:'子'},
+  }}, yong:{primary:'木'} });
+  assert(hnBal.temperature === '平', `ô nhiễm/ôn hoà → temperature 平 (điểm ${hnBal.tempScore})`);
+  assert(hnBal.needs.length === 0, 'khí hậu cân → không nhu cầu điều hậu ép buộc');
+
+  // S6. DỤng ≠ nhu cầu → cảnh báo phối hợp
+  const hnMisalign = analyzeHanNuan({ chart: { monthZhi:'子', pillars: {
+    year:{gan:'壬',zhi:'亥'}, month:{gan:'癸',zhi:'子'}, day:{gan:'壬',zhi:'子'}, time:{gan:'癸',zhi:'亥'},
+  }}, yong:{primary:'金'} }); // 寒 cần Hỏa, nhưng Dụng = Kim → MISMATCH
+  assert(hnMisalign.alignNote.includes('⚠'), 'Dụng Kim ≠ nhu cầu寒(Hỏa) → cảnh báo phối hợp');
+
+  // S7. deterministic
+  const hnAgain = analyzeHanNuan({ chart: { monthZhi:'子', pillars: {
+    year:{gan:'壬',zhi:'亥'}, month:{gan:'癸',zhi:'子'}, day:{gan:'壬',zhi:'子'}, time:{gan:'癸',zhi:'亥'},
+  }}, yong:{primary:'火'} });
+  assert(JSON.stringify(hnCold.summary) === JSON.stringify(hnAgain.summary), 'analyzeHanNuan deterministic');
+
+  // S8. lá số thật (user) — không crash, có summary
+  const hnUser = analyzeHanNuan(hqR); // hqR = analyze(1993,...) đã có từ section 24
+  assert(typeof hnUser.summary === 'string' && hnUser.summary.length > 20, 'lá số user: analyzeHanNuan ra summary');
+
+  console.log(`   子月/Thủy → 寒 (điểm ${hnCold.tempScore}, cần Hỏa) ✓ | 午月/Hỏa → 暖 (điểm ${hnHot.tempScore}, cần Thủy) ✓`);
+  console.log(`   未戌+Hỏa → 燥 (điểm ${hnDry.humidScore}) ✓ | 辰丑+Thủy → 湿 (điểm ${hnWet.humidScore}) ✓ | 卯月 cân → 平 ✓`);
+  console.log(`   lá số user: ${hnUser.tempVi} + ${hnUser.humidVi}, ${hnUser.needs.length ? 'cần '+hnUser.needs.map(n=>n.vi).join('/') : 'cân khí hậu'}`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');

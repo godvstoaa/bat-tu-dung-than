@@ -14,6 +14,7 @@ import { analyzeHealth } from './health-analysis.js';
 import { analyzeStudy } from './study-analysis.js';
 import { dayunGodMeaning } from './dayun-god.js';
 import { checkDayunInteractions } from './dayun-check.js';
+import { analyzeHanNuan } from './han-nuan.js';
 import { taiYuan } from './taiyuan.js';
 
 /**
@@ -32,6 +33,13 @@ export function extendBrief(R) {
         ? `🔥 ĐIỀU HẬU (调候) OVERRIDE: ${th.note || ''} — 调候 LÀM CHỦ, đè Phù Ức. Dụng Thần chính = hành ${th.primaryWx} (khí hậu thiên lệch, 窮通寶鑑).`
         : `ĐIỀU HẬU (调候): ${th.note || ''}`);
     }
+  } catch (e) {}
+
+  // [loop 70] 寒暖燥湿 — cân bằng khí hậu CỤ THỂ (cơ sở định LÝ cho Điều Hậu ở trên).
+  //   Cho AI biết mệnh hàn/nhiệt/táo/thấp ra sao + Dụng có khớp nhu cầu khí hậu không.
+  try {
+    const hn = analyzeHanNuan(R);
+    parts.push(`HÀN-NOÃN-TÁO-THẤP (寒暖燥湿): ${hn.tempVi} (điểm ${hn.tempScore}) + ${hn.humidVi} (điểm ${hn.humidScore})${hn.needs.length ? ' → cần ' + hn.needs.map((n) => n.vi).join(' / ') : ' → khí hậu cân'}.${hn.alignNote ? ' ' + hn.alignNote : ''}`);
   } catch (e) {}
 
   // Thai nguyên (nếu có)

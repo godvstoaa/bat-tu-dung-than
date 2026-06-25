@@ -94,6 +94,7 @@ import { strength3Fa } from './engine/strength-3fa.js';
 import { jiaoYunAnalysis } from './engine/jiaoyun.js';
 import { analyzePillarQuality } from './engine/pillar-quality.js';
 import { analyzeHuaQi } from './engine/huaqi.js';
+import { analyzeHanNuan } from './engine/han-nuan.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -957,6 +958,25 @@ function renderHuaqi(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được hóa khí.</p>'; }
 }
 
+function renderHanNuan(R) {
+  const el = $('han-nuan');
+  if (!el) return;
+  try {
+    const h = analyzeHanNuan(R);
+    const tColor = h.temperature === '寒' ? '#3a7bd5' : h.temperature === '暖' ? '#e0533d' : '#caa14a';
+    const hColor = h.humidity === '燥' ? '#b58105' : h.humidity === '湿' ? '#2e9e5b' : '#caa14a';
+    const needLine = h.needs.length
+      ? `<p><b>Nhu cầu điều hòa:</b> ${h.needs.map((n) => `<span class="god-bad">${n.vi}</span> — ${n.why}`).join('<br>')}</p>`
+      : '<p class="hint">Khí hậu tương đối cân — không cần điều hậu ép buộc.</p>';
+    el.innerHTML = `
+      <p><b>Nhiệt độ:</b> <span style="color:${tColor};font-weight:600">${h.tempVi}</span> (điểm ${h.tempScore}) &nbsp;|&nbsp; <b>Độ ẩm:</b> <span style="color:${hColor};font-weight:600">${h.humidVi}</span> (điểm ${h.humidScore})</p>
+      ${needLine}
+      ${h.alignNote ? `<p class="hint">${h.alignNote}</p>` : ''}
+      <p class="hint">Khuyến nghị sinh hoạt: ${h.remedy}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được cân bằng khí hậu.</p>'; }
+}
+
 function renderMarriageStars(R) {
   const el = $('marriage-stars');
   if (!el) return;
@@ -1610,6 +1630,7 @@ function run() {
   lazyRender('jiaoyun',        () => { try { renderJiaoyun(currentResult); } catch (e) { console.warn('jiaoyun', e.message); } });
   lazyRender('pillar-quality', () => { try { renderPillarQuality(currentResult); } catch (e) { console.warn('pillarquality', e.message); } });
   lazyRender('huaqi',          () => { try { renderHuaqi(currentResult); } catch (e) { console.warn('huaqi', e.message); } });
+  lazyRender('han-nuan',       () => { try { renderHanNuan(currentResult); } catch (e) { console.warn('hannuan', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
