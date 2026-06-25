@@ -1634,7 +1634,7 @@ function renderPlannedBirth(year) {
     try {
       const r = inverseBaZiSolve({ refYear: year, yearStart: year, yearEnd: year, stepDays: 5, topK: 5, maxSamples: 3000 });
       if (!r.max) { el.innerHTML = '<p class="hint">Không tính được.</p>'; return; }
-      const results = r.topResults || [r.max];
+      const results = r.topK || [r.max]; // [loop 171 fix] inverseBaZiSolve trả `topK` (5 ptử), KHÔNG phải `topResults` — trước đây field sai → fallback [r.max] → thẻ «择吉生育» chỉ hiện 1 lựa chọn thay vì top 5
       const rows = results.map((res, i) => {
         const lbl = labelResult(res);
         const birth = new Date(res.y, res.m - 1, res.d);
