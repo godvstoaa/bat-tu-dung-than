@@ -163,7 +163,11 @@ export function scanFuyin(R, scanYear) {
  * Quét đại vận đang hành vs 4 trụ (bổ sung cho lưu niên).
  */
 export function dayunFuyin(R) {
-  const dy = (R.dayun || []).find((d) => d.isNow) || (R.dayun || [])[0];
+  // [loop 68 sửa] chọn đại vận ĐANG HÀNH theo startYear (KHÔNG dùng d.isNow — field
+  //   KHÔNG TỒN TẠI trên dayun entries, chỉ có trên liunian → luôn fallback [0] = năm thủ).
+  const curYear = R.chart.input?.refYear || new Date().getFullYear();
+  let dy = (R.dayun || []).find((d) => d && d.startYear != null && d.startYear <= curYear && curYear < d.startYear + 10);
+  if (!dy) dy = (R.dayun || []).find((d) => d && d.isNow) || (R.dayun || [])[0];
   if (!dy) return { items: [] };
   const dp = { gan: dy.ganZhi[0], zhi: dy.ganZhi[1] };
   const items = [];
