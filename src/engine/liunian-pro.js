@@ -317,8 +317,23 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
   }
 
   const advice = buildLiunianAdvice(score, rating, solarYear, R.yong, ganWx, zhiWx, dayunAdviceNote);
+
+  // [loop 152 ELEVATION] 大运 进气退气 — năm đầu (1-3t) = 进气 (vận đang vào),
+  //   năm cuối (8-10t) = 退气 (vận đang ra). Giữa = vượng.
+  let dayunPhase = null;
+  if (activeDayun && Array.isArray(R.dayun)) {
+    const dy = R.dayun.find((d) => d && d.startYear != null && d.startYear <= solarYear && solarYear < d.startYear + 10);
+    if (dy && dy.startYear != null) {
+      const offset = solarYear - dy.startYear; // 0→9
+      if (offset <= 2) dayunPhase = { phase: '进气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 进气 (đang VÀO, lực chưa tối đa, đang tích lũy)`, factor: 0.9 };
+      else if (offset >= 7) dayunPhase = { phase: '退气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 退气 (đang RA, lực suy, chuyển sang vận sau)`, factor: 0.9 };
+      else dayunPhase = { phase: '旺气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 旺气 (lực tối đa)`, factor: 1.0 };
+    }
+  }
+
   const out = { year: solarYear, ganZhi: yGan + yZhi, ganGod, ganWx, zhiWx, score, rating, schools, advice };
   if (gejuFavor) out.gejuFavor = gejuFavor;
   if (activeDayun) out.activeDayun = activeDayun; // [运年组合] 大运 đang hành cho năm này
+  if (dayunPhase) out.dayunPhase = dayunPhase; // [loop 152] 进气/退气
   return out;
 }
