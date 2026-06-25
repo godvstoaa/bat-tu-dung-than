@@ -1,6 +1,6 @@
 // Service worker — PWA (cho Android/Chrome install + offline shell).
 // An toàn: NETWORK-FIRST, không bao giờ block bằng cache cũ (tránh trắng trang).
-const CACHE = 'bazi-v3'; // [loop 52] bump cache → returning users get latest after deploy
+const CACHE = 'bazi-v4'; // [loop 155] bump → returning users get CSS fixes + 3D + card variety
 self.addEventListener('install', () => { self.skipWaiting(); });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
