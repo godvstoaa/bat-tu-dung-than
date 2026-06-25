@@ -412,14 +412,19 @@ function renderSynthesis(R) {
 }
 
 // ---------------------------------------------------------------- NGŨ HÀNH
-function renderWuXing(wx) {
+function renderWuXing(wx, yong) {
   const max = Math.max(...Object.values(wx.pct));
+  const fav = new Set([yong?.primary, yong?.xi].filter(Boolean));
+  const avoid = new Set([yong?.ji, yong?.chou].filter(Boolean));
+  const TAG = { [yong?.primary]: '★Dụng', [yong?.xi]: '♥Hỷ', [yong?.ji]: '⚠Kỵ', [yong?.chou]: '⚔Thù' };
   $('wuxing').innerHTML = ['木', '火', '土', '金', '水'].map((w) => {
     const pct = wx.pct[w];
     const width = max > 0 ? (pct / max) * 100 : 0;
+    const tag = TAG[w] || '';
+    const tagColor = fav.has(w) ? '#2e9e5b' : avoid.has(w) ? '#e0533d' : '';
     return `
       <div class="wx-row">
-        <div class="wx-name"><span class="dot" style="background:${WX_COLOR[w]}"></span>${w} ${WX_VI[w]}</div>
+        <div class="wx-name"><span class="dot" style="background:${WX_COLOR[w]}"></span>${w} ${WX_VI[w]}${tag ? ` <span style="color:${tagColor};font-weight:700;font-size:11px">${tag}</span>` : ''}</div>
         <div class="wx-track"><div class="wx-fill" style="width:${width}%;background:${WX_COLOR[w]}"></div></div>
         <div class="wx-pct">${pct}%</div>
       </div>`;
@@ -2206,7 +2211,7 @@ function run() {
   try { renderLnSihua(currentResult); } catch (e) { console.warn('lnSihua', e.message); }
   renderLiuqin(currentResult);
   renderRemedy(currentResult);
-  renderWuXing(currentResult.wx);
+  renderWuXing(currentResult.wx, currentResult.yong);
   renderInteractions(currentResult);
   renderShensha(currentResult);
   renderShenshaExtra(currentResult);
