@@ -107,7 +107,7 @@ export function verifyPastEvent(R, eventYear, eventType, eventDesc) {
     wealth_loss: ['劫財', '傷官'],
     illness: ['七殺', '偏印'],
     birth_child: childGods,
-    study_success: ['正印', '食神', '文昌'],
+    study_success: ['正印', '食神'], // [loop 84] bỏ '文昌' (神煞, không phải thập thần → lnGod KHÔNG bao giờ = 文昌, dead entry)
     legal: ['傷官', '七殺', '偏官'],
   };
   const expectedGods2 = godMatch[eventType] || [];
