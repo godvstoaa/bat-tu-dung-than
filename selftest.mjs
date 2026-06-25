@@ -5180,9 +5180,9 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
 
   // [loop 138] CHANGSHENG_START + STAGES regression
   const { CHANGSHENG_START: _CS, CHANGSHENG_STAGES: _CST } = await import('./src/engine/constants.js');
-  const { changSheng: _cS } = await import('./src/engine/core.js');
+  const { changSheng: _csFn } = await import('./src/engine/core.js');
   for (const g of ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸']) {
-    assert(_cS(g, _CS[g]) === '長生', `changSheng(${g}, ${_CS[g]}) = 長生`);
+    assert(_csFn(g, _CS[g]) === '長生', `changSheng(${g}, ${_CS[g]}) = 長生`);
   }
   assert(_CST[0] === '長生' && _CST[4] === '帝旺' && _CST[6] === '死' && _CST[9] === '絕' && _CST[11] === '養', 'STAGES thứ tự đúng (0=長生 4=帝旺 6=死 9=絕 11=養)');
   console.log(`   CHANGSHENG 10 can→長生 ✓ | STAGES 12/12 ✓ | locked`);
