@@ -1076,7 +1076,19 @@ function renderStrength3Fa(R) {
   if (!el) return;
   try {
     const s = strength3Fa(R);
-    el.innerHTML = `<p>${s.summary}</p>`;
+    const ratio = R.strength?.ratio || 0.5;
+    const pct = Math.round(ratio * 100);
+    const strong = R.strength?.strong;
+    const spectrum = `
+      <div style="margin:8px 0">
+        <div style="position:relative;height:22px;border-radius:4px;background:linear-gradient(90deg,#e0533d 0%,#e0533d 25%,#caa14a 40%,#caa14a 60%,#2e9e5b 75%,#2e9e5b 100%)">
+          <div style="position:absolute;left:${pct}%;top:-3px;transform:translateX(-50%);width:4px;height:28px;background:#d4af55;border-radius:2px;box-shadow:0 0 6px rgba(212,175,85,0.9)"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--silk);margin-top:2px">
+          <span>極弱</span><span>身弱</span><span style="color:#d4af55;font-weight:700">${strong ? '身VƯỢNG' : '身NHƯỢC'} ${pct}%</span><span>身強</span><span>極強</span>
+        </div>
+      </div>`;
+    el.innerHTML = `${spectrum}<p>${s.summary}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 3 pháp vượng suy.</p>'; }
 }
 
