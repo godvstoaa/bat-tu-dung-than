@@ -1607,7 +1607,31 @@ function renderFlyingSihua(R) {
     const z = computeZiwei(i.year, i.month, i.day, i.hour, i.minute, i.gender);
     const fs = flyingSihua(z);
     if (!fs) { el.innerHTML = '<p class="hint">Không tính được phi tinh.</p>'; return; }
-    el.innerHTML = `<p class="hint">紫微飞星四化 — 4 hóa (禄/权/科/忌) phi từ 5 cung chính (命/财/官/夫/福) chiếu các cung khác.</p><p>${esc(fs.summary || '')}</p>`;
+    // [loop 188] hiển thị chi tiết 4 hóa phi từ 5 cung chính (trước đây chỉ show summary)
+    const HUA_VI = { 禄: 'Hóa Lộc', 权: 'Hóa Quyền', 科: 'Hóa Khoa', 忌: 'Hóa Kỵ' };
+    const HUA_TONE = { 禄: 'cat', 权: 'cat', 科: 'cat', 忌: 'hung' };
+    const SOURCES = [
+      ['fromMing', 'Mệnh (命宫)', 'bản thân/khởi điểm'],
+      ['fromWealth', 'Tài (財帛)', 'tiền bạc/kiếm tiền'],
+      ['fromCareer', 'Quan (官禄)', 'sự nghiệp/danh vọng'],
+      ['fromSpouse', 'Phu/Thê (夫妻)', 'hôn nhân/đối tác'],
+      ['fromFortune', 'Phúc (福德的)', 'phúc đức/tâm trạng'],
+    ];
+    const palHtml = SOURCES.map(([key, label, desc]) => {
+      const p = fs[key];
+      if (!p || !Array.isArray(p.flies) || !p.flies.length) return '';
+      const flies = p.flies.map((fl) => {
+        const cls = HUA_TONE[fl.hua] === 'hung' ? 'geju-ji' : 'geju-xi';
+        return `<span class="zw-sh ${cls}" title="${esc(fl.vi || '')}"><b>${HUA_VI[fl.hua] || fl.hua}</b> ${esc(fl.star || '')}→<span class="zh">${esc(fl.toZhi || '?')}</span>${fl.placed === false ? ' <span class="hint">(không đặt)</span>' : ''}</span>`;
+      }).join(' ');
+      return `<div class="yz-row" style="margin:4px 0;padding-left:8px;border-left:3px solid var(--gold)">
+        <b>${esc(label)}</b> <span class="hint">(${esc(desc)}) — can cung <span class="zh">${esc(p.gan || '')}</span></span><br>
+        <div style="margin-top:3px">${flies}</div>
+      </div>`;
+    }).join('');
+    el.innerHTML = `<p class="hint">紫微飞星四化 飛星四化 — can của 5 cung chính sinh ra 4 hóa (禄/权/科/忌) bay chiếu cung khác → bật lĩnh vực tương ứng.</p>
+      ${palHtml || `<p>${esc(fs.summary || '')}</p>`}
+      <p class="hint" style="margin-top:6px">${esc(fs.summary || '')}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được phi tinh tứ hóa.</p>'; }
 }
 
