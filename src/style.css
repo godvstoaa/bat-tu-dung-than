@@ -538,6 +538,9 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .ln:hover { transform: translateY(-2px); border-color: rgba(212,175,55,.35); }
 .ln-now { border-color: var(--cinnabar); box-shadow: 0 0 0 1px rgba(192,57,43,.4), 0 0 16px -4px var(--cinnabar-glow); }
 .ln-year { font-size: 12px; color: var(--silk-muted); }
+.ln-phase { display: inline-block; font-size: 9px; font-weight: 700; padding: 0 4px; border-radius: 6px; margin-left: 2px; vertical-align: middle; }
+.ln-phase.ph-in { background: rgba(46,158,107,0.22); color: #7ee2a4; }   /* 进气 = đang vào (xây đỉnh) */
+.ln-phase.ph-out { background: rgba(224,70,58,0.18); color: #f0a99c; }    /* 退气 = đang ra (phai) */
 .ln-gz { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 700; margin-top: 3px; }
 .ln-age { font-size: 10.5px; color: var(--silk-muted); font-variant-numeric: tabular-nums; }
 .ln-rate { font-size: 10px; margin-top: 4px; padding: 1px 5px; border-radius: 8px; display: inline-block; }

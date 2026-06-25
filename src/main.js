@@ -14,7 +14,7 @@ import { fiveDimRadar } from './engine/five-dim-radar.js'; // [loop 33] ngũ duy
 import { weekPreview } from './engine/week-preview.js'; // [loop 36] tuần này 7 ngày
 import { analyzeVitality } from './engine/vitality.js'; // [loop 42] đại vận khúc tuyến
 import { monthCalendar } from './engine/month-calendar.js'; // [loop 48] lịch tháng vận
-import { analyzeLiunianDeep } from './engine/liunian-pro.js';
+import { analyzeLiunianDeep, computeDayunPhase } from './engine/liunian-pro.js'; // [loop 170] +phase cho Lưu Niên card
 import { liunianEvents } from './engine/liunian-event.js';
 import { qianliEightSteps, QIANLI_QUOTE } from './engine/qianli.js';
 import { computeLiuyue } from './engine/liuyue.js';
@@ -557,13 +557,22 @@ function renderLiuNian(liunian) {
   if (!liunian.length) { $('liunian').innerHTML = '<p class="hint">Không tính được Lưu Niên.</p>'; return; }
   const nowItem = liunian.find((l) => l.isNow);
   $('liunian-note').textContent = nowItem ? `(đại vận ${hanviet(nowItem.dayunGanZhi)})` : '';
-  $('liunian').innerHTML = liunian.map((l) => `
+  // [loop 170] 进气退气 phase — lực đại vận realised năm đó (xây đỉnh / đỉnh / phai).
+  //   Chỉ badge 进气/退气 (nămfactor <1, điểm bị co về neut); 旺气 (đỉnh) là mặc định.
+  const dayun = (currentResult && currentResult.dayun) || [];
+  $('liunian').innerHTML = liunian.map((l) => {
+    const ph = computeDayunPhase(dayun, l.year);
+    const phaseBadge = ph && ph.factor < 1
+      ? `<span class="ln-phase ${ph.phase === '进气' ? 'ph-in' : 'ph-out'}" title="${ph.vi}">${ph.phase === '进气' ? '进' : '退'}</span>`
+      : '';
+    return `
     <div class="ln ${l.isNow ? 'ln-now' : ''}">
-      <div class="ln-year">${l.year}${l.isNow ? ' ★' : ''}</div>
+      <div class="ln-year">${l.year}${l.isNow ? ' ★' : ''}${phaseBadge}</div>
       <div class="ln-gz"><span class="${wxClass(l.ganWx)}">${l.gan}</span><span class="${wxClass(l.zhiWx)}">${l.zhi}</span></div>
       <div class="ln-age">${l.age}t</div>
       <div class="ln-rate ${rateClass(l.rating)}">${l.rating}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function renderDecade(R) {

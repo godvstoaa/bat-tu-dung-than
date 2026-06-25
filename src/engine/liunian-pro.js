@@ -278,9 +278,29 @@ function buildLiunianAdvice(score, rating, solarYear, yong, ganWx, zhiWx, dayunN
  * tầng 格局 LÊN TRÊN, còn analyseLiunianDeep dùng cho brief mô tả 5→6 trường phái).
  * @param {object} R          — kết quả analyze()
  * @param {number} solarYear  — năm dương lịch cần luận
- * @param {object} [patternYong] — R.patternQuality.patternYong (tuỳ chọn, loop 3)
- * @returns {{ year, ganZhi, ganGod, ganWx, zhiWx, score, rating, schools, advice, gejuFavor?:'喜'|'忌'|null }}
+/**
+ * [loop 170 extract] 大运 进气退气 phase cho 1 năm trong đại vận đang hành.
+ *   Năm 1-3 = 进气 (đang VÀO), 4-7 = 旺气 (đỉnh), 8-10 = 退气 (đang RA).
+ *   factor graduated theo khoảng cách tới cửa sổ đỉnh (offset 3-6); áp dụng
+ *   DAMPEN TOWARD NEUTRAL ở scoreLiunianYear (xem loop 164).
+ * @param {Array} dayunList - R.dayun (mỗi ptử có startYear, ganZhi)
+ * @param {number} solarYear - năm dương lịch
+ * @returns {{phase:'进气'|'旺气'|'退气', vi:string, factor:number, offset:number, ganZhi:string}|null}
  */
+export function computeDayunPhase(dayunList, solarYear) {
+  if (!Array.isArray(dayunList)) return null;
+  const dy = dayunList.find((d) => d && d.startYear != null && d.startYear <= solarYear && solarYear < d.startYear + 10);
+  if (!dy || dy.startYear == null) return null;
+  const offset = solarYear - dy.startYear; // 0→9
+  const dToPeak = offset < 3 ? 3 - offset : offset > 6 ? offset - 6 : 0; // 0 (đỉnh) .. 3 (viền)
+  const factor = +(1 - dToPeak * 0.06).toFixed(2);                       // 1.00 .. 0.82
+  const pct = Math.round(factor * 100);
+  const gz = dy.ganZhi || '';
+  if (offset <= 2) return { phase: '进气', vi: `Đại vận ${gz} năm ${offset + 1}/10 — 进气 (đang VÀO, lực realised ${pct}% đỉnh)`, factor, offset, ganZhi: gz };
+  if (offset >= 7) return { phase: '退气', vi: `Đại vận ${gz} năm ${offset + 1}/10 — 退气 (đang RA, lực realised ${pct}% đỉnh)`, factor, offset, ganZhi: gz };
+  return { phase: '旺气', vi: `Đại vận ${gz} năm ${offset + 1}/10 — 旺气 (lực tối đa 100%)`, factor: 1.0, offset, ganZhi: gz };
+}
+
 export function analyzeLiunianDeep(R, solarYear, patternYong) {
   const c = R.chart;
   const ys = Solar.fromYmdHms(solarYear, 6, 15, 12, 0, 0);
@@ -345,19 +365,9 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
   //       进气/退气 = «lực đại vận realised năm nay = factor% đỉnh». Year tốt → bớt tốt
   //       một chút; year XẤU → bớt xấu một chút (kỵ thần chưa/phai tác dụng đầy đủ).
   //       Trước đây score*0.9 luôn KÉO XUỐNG → năm xấu bị PHẠT THÊM (sai hướng).
-  let dayunPhase = null;
-  if (activeDayun && Array.isArray(R.dayun)) {
-    const dy = R.dayun.find((d) => d && d.startYear != null && d.startYear <= solarYear && solarYear < d.startYear + 10);
-    if (dy && dy.startYear != null) {
-      const offset = solarYear - dy.startYear; // 0→9
-      const dToPeak = offset < 3 ? 3 - offset : offset > 6 ? offset - 6 : 0; // 0 (đỉnh) .. 3 (viền)
-      const factor = +(1 - dToPeak * 0.06).toFixed(2);                       // 1.00 .. 0.82
-      const pct = Math.round(factor * 100);
-      if (offset <= 2) dayunPhase = { phase: '进气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 进气 (đang VÀO, lực realised ${pct}% đỉnh)`, factor };
-      else if (offset >= 7) dayunPhase = { phase: '退气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 退气 (đang RA, lực realised ${pct}% đỉnh)`, factor };
-      else dayunPhase = { phase: '旺气', vi: `Đại vận ${activeDayun} năm ${offset + 1}/10 — 旺气 (lực tối đa 100%)`, factor: 1.0 };
-    }
-  }
+  // [loop 170] dayunPhase tính qua helper chung (computeDayunPhase) — dùng cho cả
+  //   brief AI lẫn UI card. Trước đây inline chỉ ở đây → UI không thấy được phase.
+  const dayunPhase = computeDayunPhase(R.dayun, solarYear);
 
   // [loop 159/164] apply 进气退气 — dampen score TOWARD neutral(50) by factor.
   let finalScore = score;
