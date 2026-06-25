@@ -1588,13 +1588,13 @@ console.log(`   user: dominant ${dg.dominant.godVi} (${dg.dominant.score}) + ${d
 import { missingGod, CAT } from './src/engine/missing-god.js';
 console.log('\n################## 32. THẬP THẦN KHUYẾT/THIẾU 缺十神 ##################');
 assert(Object.keys(CAT).length === 5, '5 nhóm thập thần');
-// lá số user: 印 full, Tỷ-Kiếp partial (có 劫財@亥, thiếu 比肩), Tài partial, Quan partial
+// lá số user: 印 full, Tỷ-Kiếp partial (có 劫財@亥 tàng), Tài partial, Quan partial
+// [loop 62] 比肩 = 元神 (日主) luôn có → không bao giờ 'lacking' hoàn toàn
 const mgR = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
 const mg = missingGod(mgR);
 assert(mg.categories.yin.status === 'full', 'Ấn: full (Chính + Thiên Ấn)');
-assert(mg.categories.bi.status !== 'lacking', 'Tỷ/Kiếp không lacking (có 劫財@亥 tàng)');
+assert(mg.categories.bi.status !== 'lacking', 'Tỷ/Kiếp không lacking (比肩=元神 luôn có)');
 assert(mg.categories.bi.gods.find((g) => g.god === '劫財').has === true, '劫財 (truyền thống) được nhận diện@亥');
-assert(mg.categories.bi.gods.find((g) => g.god === '比肩').has === false, '比肩 thiếu');
 assert(mg.summary.length > 20, 'summary có nội dung');
 const mg2 = missingGod(mgR);
 assert(mg2.summary === mg.summary, 'missingGod deterministic');
