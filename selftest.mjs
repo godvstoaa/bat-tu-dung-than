@@ -4315,6 +4315,76 @@ console.log('\n################## R. BÁT TỰ NGƯỢC (逆推 INVERSE SOLVER) 
   console.log(`   THẤP NHẤT: ${labelResult(r.min)}`);
 }
 
+// ################## S. [loop 69] 盲派 暗合/暗冲 nghiêm ngặt + 化气格 rootOk stricter ##################
+//   Sửa 3 bug cùng pattern "cổ pháp nghiêm bị code lỏng" (y hệt bug 天克/五行克):
+//   1) 暗合 = 6 cặp CHI chuẩn (đừng quét thiên can ngũ hợp lộ+tàng)
+//   2) 暗冲 = THIÊN KHẮC 4 cặp GAN_CHONG (đừng dùng ngũ hành 克 chung)
+//   3) 化气格 rootOk 0.3→0.6 (Hóa hành phải thật thông căn, không chỉ dư khí lẻ)
+import { isAnHe, AN_HE, detectAnhe } from './src/engine/anhe.js';
+import { isGanChong, detectAnchong } from './src/engine/anchong.js';
+import { HIDDEN as C_HIDDEN } from './src/engine/constants.js';
+console.log('\n################## S. [loop 69] 盲派暗合/暗冲 nghiêm + 化气格 rootOk ##################');
+{
+  // --- S1. 6 cặp暗合 chuẩn ---
+  assert(isAnHe('寅','丑') && isAnHe('丑','寅'), '暗合 寅↔丑 (đối xứng)');
+  assert(isAnHe('卯','申'), '暗合 卯↔申 (乙庚)');
+  assert(isAnHe('巳','戌') && isAnHe('巳','酉'), '暗合 巳↔戌 & 巳↔酉 (丙辛)');
+  assert(isAnHe('午','亥') && isAnHe('未','亥'), '暗合 午↔亥 & 未↔亥');
+  // phủ định: các cặp KHÔNG phải暗合 chuẩn (trước đây báo bừa)
+  assert(!isAnHe('寅','午') && !isAnHe('子','丑') && !isAnHe('辰','戌') && !isAnHe('卯','酉'), 'KHÔNG暗合: 寅午/子丑/辰戌/卯酉 (sửa bug quét bừa)');
+  // đếm cặp chuẩn: 6 cặp (12 hướng đối xứng trong map)
+  const allKeys = Object.keys(AN_HE);
+  let dirCount = 0; for (const k of allKeys) dirCount += AN_HE[k].length;
+  assert(dirCount === 12, `暗 hợp chuẩn = 6 cặp × 2 hướng = 12 entry (được ${dirCount})`);
+
+  // detectAnhe trên lá số có 寅丑 → 全暗合 (3/3 tàng can ngũ hợp)
+  const anheChart = { pillars: {
+    year: { gan:'甲', zhi:'寅' }, month: { gan:'己', zhi:'丑' },
+    day: { gan:'丙', zhi:'午' }, time: { gan:'庚', zhi:'申' },
+  }};
+  const an = detectAnhe(anheChart);
+  assert(an.pairs.length === 1 && an.pairs[0].chiA + an.pairs[0].chiB === '寅丑' && an.pairs[0].isQuanAn, 'detectAnhe: 寅丑 = 全暗合 (3/3), các cặp khác không算');
+  assert(an.pairs[0].hePairs.length === 3, '寅丑 tàng can ngũ hợp đủ 3: 甲己 丙辛 戊癸');
+
+  // --- S2. GAN_CHONG 4 cặp nghiêm ---
+  assert(isGanChong('甲','庚') && isGanChong('庚','甲'), '天克 甲↔庚 (đối xứng)');
+  assert(isGanChong('乙','辛') && isGanChong('丙','壬') && isGanChong('丁','癸'), '天克 乙辛 / 丙壬 / 丁癸');
+  // phủ định: 戊己 (thổ trung) KHÔNG有天克; 同五行 không天克
+  assert(!isGanChong('戊','壬') && !isGanChong('己','癸') && !isGanChong('戊','甲') && !isGanChong('甲','乙') && !isGanChong('丙','丁'), 'KHÔNG天克: 戊壬/己癸/戊甲 (thổ trung) + 甲乙/丙丁 (同五行) — sửa bug ngũ hành 克 bừa');
+
+  // detectAnchong: 甲↔庚 天克; 戊 day露 KHẮC nothing (thổ trung)
+  const hid = (z) => C_HIDDEN[z].map((g) => ({ gan: g }));
+  const achChart = { pillars: {
+    year: { gan:'甲', zhi:'寅', hidden: hid('寅') }, month: { gan:'丙', zhi:'寅', hidden: hid('寅') },
+    day: { gan:'戊', zhi:'午', hidden: hid('午') }, time: { gan:'庚', zhi:'申', hidden: hid('申') },
+  }};
+  const ac = detectAnchong(achChart);
+  const hasJiaGeng = ac.pairs.some((p) => (p.ganA === '甲' && p.ganB === '庚') || (p.ganA === '庚' && p.ganB === '甲'));
+  assert(hasJiaGeng, 'detectAnchong: phát hiện 甲↔庚 天克');
+  //戊 (day露) không tạo天克 với bất kỳ → KHÔNG có pair nào gán 戊 làm 天克 chủ thể
+  assert(!ac.pairs.some((p) => p.ganA === '戊' || p.ganB === '戊'), '戊 (thổ trung) KHÔNG天克 với ai — lọc đúng');
+
+  // --- S3. 化气格 rootOk stricter (0.3→0.6) ---
+  // 甲+己午(火令 sinh Hóa Thổ) NHƯNG Thổ chỉ có 中气 己 ở 午 (0.3×1.8=0.54 < 0.6) →
+  //   KHÔNG thành Hóa khí cách (Hóa hành vô bản khí căn). Trước đây 0.54≥0.3 → fake THÀNH.
+  const hq3 = analyzeHuaQi({ chart: { dayGan:'甲', dayMaster:{wx:'木'}, pillars: {
+    year: { gan:'丙', zhi:'子' }, month: { gan:'己', zhi:'午' },
+    day: { gan:'甲', zhi:'子' }, time: { gan:'丁', zhi:'卯' },
+  }}, strength: { monthMainWx:'火' } });
+  assert(hq3.hasHe === true && hq3.huaQiGe === false, '甲己/午月(火 sinh Thổ) nhưng Thổ chỉ 中气 0.54 < 0.6 → KHÔNG thành Hóa (sửa fake hóa)');
+  const weak3 = hq3.pairs.find((p) => p.with === 'month');
+  assert(weak3 && weak3.monthOk === true && weak3.rootOk === false && Math.abs(weak3.rootTotal - 0.54) < 0.01, `Thổ root 0.54 (trung khí 午×1.8): monthOk=T, rootOk=F (ngưỡng 0.6)`);
+  // đối chứng: cùng cấu trúc NHƯNG thêm 辰 day (Thổ bản khí) → root vượt 0.6 → THÀNH
+  const hq4 = analyzeHuaQi({ chart: { dayGan:'甲', dayMaster:{wx:'木'}, pillars: {
+    year: { gan:'丙', zhi:'子' }, month: { gan:'己', zhi:'午' },
+    day: { gan:'甲', zhi:'辰' }, time: { gan:'丁', zhi:'卯' },
+  }}, strength: { monthMainWx:'火' } });
+  assert(hq4.huaQiGe === true, '甲己/午月 + 辰 (Thổ bản khí 0.6+) → THÀNH Hóa Thổ (root đủ mạnh)');
+
+  console.log(`   暗合: 6 cặp chuẩn ✓ (寅丑全暗合 3/3 tàng can) | 暗冲: 4 cặp天克 ✓ (戊 thổ trung bị lọc)`);
+  console.log(`   化气格: root 0.54<0.6 → KHÔNG thành ✓; root 0.6+ (có 辰) → THÀNH ✓ (chống fake hóa khí)`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');

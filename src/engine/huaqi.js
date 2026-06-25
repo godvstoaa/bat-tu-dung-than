@@ -47,7 +47,13 @@ export function analyzeHuaQi(R) {
     const huaWx = p.hua;
     const monthOk = monthMainWx === huaWx || SHENG[monthMainWx] === huaWx; // lệnh = Hóa hoặc lệnh sinh Hóa
     const root = tongGen(R.chart, huaWx);
-    const rootOk = root.total >= 0.3;
+    // [loop 69 sửa bug CAO] 化气格 = ngoại cách KHẮT KHIET — Hóa hành phải THÔNG CĂN
+    //   thật (bản khí hoặc tích lũy đáng kể), không thể chỉ 1 dư khí lẻ tẻ.
+    //   Trước đây rootOk = total >= 0.3 → 1 dư khí (0.1) + 1 trung khí phi-tháng (0.3)
+    //   đã vượt → fake "thành Hóa khí cách" → DỤNG THẦN ĐỔI SAI (cốt lõi lá số).
+    //   Ngưỡng 0.6: yêu cầu bản khí (0.6×1.0+) hoặc trung khí nguyệt lệnh (0.3×1.8=0.54)
+    //   + bù. Tức Hóa hành phải thực sự CÓ GỐC trong cục — cổ pháp «化神必须有根».
+    const rootOk = root.total >= 0.6;
     // phá hóa: can khắc Hóa hành xuất hiện ở trụ KHÁC (loại trừ 2 can đang hợp)
     const inHe = new Set([dayGan, p.withGan]);
     const breakers = [];
