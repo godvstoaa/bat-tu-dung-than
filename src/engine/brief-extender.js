@@ -26,6 +26,7 @@ import { lifeTimeline } from './destiny-timeline.js';
 import { mingZhuShenZhu } from './mingzhu.js';
 import { predictEvents } from './event-predict.js';
 import { detectAnchong } from './anchong.js';
+import { analyzeFiveVirtues } from './five-aspects.js';
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -208,6 +209,12 @@ export function extendBrief(R) {
     const yr = new Date().getFullYear();
     const ev = predictEvents(R, yr, 3);
     parts.push(`SỰ KIỆN ${yr}-${yr + 2}: ${ev.years.map((y) => `${y.year}(${y.lnArea}${y.sameGod ? '/nhân đôi' : ''})`).join(', ')}.`);
+  } catch (e) {}
+
+  // [loop 115] NGŨ ĐỨC (五常) — đức chính + tu dưỡng (AI personality depth)
+  try {
+    const fv = analyzeFiveVirtues(R);
+    parts.push(`NGŨ ĐỨC (五常): đức chính ${fv.virtue} (${fv.primaryVi}) — ${fv.strong ? fv.strong.slice(0, 40) : ''}${fv.kyVirtue ? ' | thiếu: ' + fv.kyVirtue : ''}. ${fv.cultivation ? fv.cultivation.slice(0, 50) : ''}`);
   } catch (e) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';
