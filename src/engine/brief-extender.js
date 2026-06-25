@@ -21,6 +21,9 @@ import { baziMingGong } from './bazi-minggong.js';
 import { analyzeChildrenStar } from './children-star.js';
 import { dayunChangSheng, dayunYongChangSheng } from './dayun-changsheng.js';
 import { taiYuan } from './taiyuan.js';
+import { getPersonalityProfile } from './personality-profile.js';
+import { lifeTimeline } from './destiny-timeline.js';
+import { mingZhuShenZhu } from './mingzhu.js';
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -162,6 +165,34 @@ export function extendBrief(R) {
   try {
     const ys = dayunYongChangSheng(R.yong.primary, R.yong.xi, R.dayun);
     parts.push(`DỤNG THẦN 12 TRƯỜNG SINH (${ys.yongWx}): ${ys.items.map((i) => `${i.ganZhi}[${i.startAge}t:${i.stageVi}]`).join(' ')}. ${ys.summary}`);
+  } catch (e) {}
+
+  // [loop 113] CÁC FEATURE PHÂN TÍCH bổ sung cho AI (trước đây chỉ UI, AI không biết)
+  // 格局成败救应 (病→药)
+  try {
+    const pq = R.patternQuality;
+    if (pq && pq.quality) {
+      const QVI = { 成格: 'Thành cách', 有救: 'Bại có cứu (败中有成)', 败格: 'Bại cách', 特殊: 'Đặc biệt' };
+      const dis = (pq.diseases || []).map((d) => d.note).join('; ');
+      const res = (pq.rescues || []).map((r) => r.note).join('; ');
+      parts.push(`CÁCH CỤC THÀNH BẠI: ${QVI[pq.quality] || pq.quality}. ${dis ? 'Bệnh: ' + dis + '.' : ''} ${res ? 'Cứu ứng: ' + res + '.' : ''}`);
+    }
+  } catch (e) {}
+  // 日干性情
+  try {
+    const pp = getPersonalityProfile(R);
+    parts.push(`TÍNH CÁCH NHẬT CAN (${pp.ganVi}/${pp.wxVi}): ${(pp.profile.temperament || '') + '. Ưu: ' + (pp.profile.strengths || '').slice(0, 50) + '. Nhược: ' + (pp.profile.weaknesses || '').slice(0, 50)}`);
+  } catch (e) {}
+  // Dòng đời timeline (đỉnh/thách thức)
+  try {
+    const tl = lifeTimeline(R, new Date().getFullYear());
+    parts.push(`DÒNG ĐỜI: ${tl.summary}`);
+  } catch (e) {}
+  // 命主身主 (紫微)
+  try {
+    const mg = baziMingGong(R);
+    const mz = mingZhuShenZhu(mg.zhi, R.chart.pillars.year.zhi);
+    parts.push(`MỆNH CHỦ/THÂN CHỦ: 命主=${mz.mingZhuVi}, 身主=${mz.shenZhuVi}.`);
   } catch (e) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';
