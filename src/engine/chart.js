@@ -474,6 +474,10 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
       for (const w of WUXING) wx.pct[w] = +((wx.score[w] / kwTotal) * 100).toFixed(1);
     }
   } catch (e) { /* kongwang optional */ }
+  // [loop 151] pass kongwang void pillars to chart for tonggen
+  if (kongwang && kongwang.affected) {
+    chart._kongwangPillars = kongwang.affected.map((a) => a.pos);
+  }
   const strength = analyzeStrength(chart, wx);
   const interactions = detectInteractions(chart.pillars);
   const shensha = computeShensha(chart);

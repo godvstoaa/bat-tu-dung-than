@@ -35,7 +35,9 @@ export function tongGen(chart, wx) {
   // [loop 29 sửa] trọng số NHÁNH: nguyệt lệnh (tháng) ×1.8 (lệnh = gốc mạnh nhất, «得令»);
   //   khớp chart.js scoreWuXing posWeightBranch. Trước đây tháng = năm/thời → 得地 mập mờ
   //   (gốc chỉ ở tháng vs chỉ ở năm được tính equal, sai cổ pháp).
+  // [loop 151] 空亡: nếu chart có kongwang field → tàng can ở trụ void giảm 50%.
   const PILLAR_W = { year: 1.0, month: 1.8, day: 1.1, time: 1.0 };
+  const voidSet = new Set((chart._kongwangPillars || []));
   const roots = [];
   let total = 0;
   for (const k of ['year', 'month', 'day', 'time']) {
@@ -43,7 +45,8 @@ export function tongGen(chart, wx) {
     const hidden = HIDDEN[zhi];
     hidden.forEach((stem, idx) => {
       if (GAN[stem].wx === wx) {
-        const w = HIDDEN_WEIGHT[hidden.length][idx] * PILLAR_W[k];
+        let w = HIDDEN_WEIGHT[hidden.length][idx] * PILLAR_W[k];
+        if (voidSet.has(k)) w *= 0.5; // 空亡: tàng can yếu
         total += w;
         // [loop 29] pos label: 余气 chỉ tồn tại ở chi 3-tàng (idx 2); chi 2-tàng idx1 = 中气
         const pos = idx === 0 ? '本气' : (hidden.length === 3 && idx === 2) ? '余气' : '中气';
