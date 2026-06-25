@@ -27,8 +27,9 @@ export default defineConfig({
     // → vendor cache lâu hơn (hiếm đổi), app cache ngắn (đổi mỗi loop)
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['lunar-javascript', 'astronomy-engine'],
+        manualChunks(id) {
+          if (id.includes('node_modules/lunar-javascript')) return 'vendor-lunar';
+          if (id.includes('node_modules/astronomy-engine')) return 'vendor-astronomy';
         },
       },
     },
