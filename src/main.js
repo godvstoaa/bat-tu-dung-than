@@ -118,6 +118,8 @@ import { aromaTherapy } from './engine/aroma-fs.js';
 import { analyzeBusiness } from './engine/bazi-business.js';
 import { seasonalAdvice } from './engine/seasonal-advice.js';
 import { detectAnchong } from './engine/anchong.js';
+import { lifeTimeline } from './engine/destiny-timeline.js';
+import { nobleCultivation } from './engine/noble-cultivate.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1293,6 +1295,43 @@ function renderAnchong(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được ám xung.</p>'; }
 }
 
+function renderDestinyTimeline(R) {
+  const el = $('destiny-timeline');
+  if (!el) return;
+  try {
+    const t = lifeTimeline(R, new Date().getFullYear());
+    const decades = (t.decades || []).map((d) => {
+      const tone = (d.vit || d.score || 0) >= 60 ? '#2e9e5b' : (d.vit || d.score || 0) >= 40 ? '#caa14a' : '#e0533d';
+      const label = d.label || d.tag || '';
+      return `<div class="yz-row" style="border-left:3px solid ${tone};padding-left:8px;margin:3px 0"><b>${esc(String(d.age || d.range || ''))}</b> ${esc(d.ganZhi || '')} <span style="color:${tone};font-weight:600">${esc(String(d.vit || d.score || ''))}</span> <span class="hint">${esc(label)}</span></div>`;
+    }).join('');
+    el.innerHTML = `
+      <p><b>${esc(t.summary || '')}</b></p>
+      ${t.peakDecade ? `<p class="hint">🏆 Đỉnh: ${esc(typeof t.peakDecade === 'string' ? t.peakDecade : JSON.stringify(t.peakDecade))}</p>` : ''}
+      ${t.challengeDecade ? `<p class="hint">⚠ Thách thức: ${esc(typeof t.challengeDecade === 'string' ? t.challengeDecade : JSON.stringify(t.challengeDecade))}</p>` : ''}
+      ${decades}
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được dòng đời timeline.</p>'; }
+}
+
+function renderNobleCultivate(R) {
+  const el = $('noble-cultivate');
+  if (!el) return;
+  try {
+    const n = nobleCultivation(R);
+    const arr = (x) => Array.isArray(x) ? x.join(', ') : (x || '');
+    el.innerHTML = `
+      <p><b>Quý nhân mang hành ${esc(n.dungVi || '')}</b> (Dụng Thần)</p>
+      ${n.whoToSeek ? `<p class="hint">🧑 Quý nhân là: ${esc(arr(n.whoToSeek))}</p>` : ''}
+      ${n.whereToFind ? `<p class="hint">📍 Tìm ở: ${esc(arr(n.whereToFind))}</p>` : ''}
+      ${n.howToApproach ? `<p class="hint">🤝 Tiếp cận: ${esc(arr(n.howToApproach))}</p>` : ''}
+      ${n.whatToGive ? `<p class="hint">🎁 Tặng/đổi lại: ${esc(arr(n.whatToGive))}</p>` : ''}
+      ${n.drainers && (n.drainers.length || n.drainers) ? `<p class="hint">⚠ Hao quý nhân: ${esc(arr(n.drainers))}</p>` : ''}
+      <p class="hint">${esc(n.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được quý nhân dưỡng dụng.</p>'; }
+}
+
 function renderLifestyle(R) {
   const el = $('lifestyle');
   if (!el) return;
@@ -2004,6 +2043,8 @@ function run() {
   lazyRender('bazi-business',   () => { try { renderBaziBusiness(currentResult); } catch (e) { console.warn('bizbusiness', e.message); } });
   lazyRender('seasonal-advice', () => { try { renderSeasonalAdvice(currentResult); } catch (e) { console.warn('seasonal', e.message); } });
   lazyRender('anchong',         () => { try { renderAnchong(currentResult); } catch (e) { console.warn('anchong', e.message); } });
+  lazyRender('destiny-timeline', () => { try { renderDestinyTimeline(currentResult); } catch (e) { console.warn('timeline', e.message); } });
+  lazyRender('noble-cultivate', () => { try { renderNobleCultivate(currentResult); } catch (e) { console.warn('noble', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
