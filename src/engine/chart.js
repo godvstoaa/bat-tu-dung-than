@@ -339,6 +339,12 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     }
   }
 
+  // [loop 167] 必忌 guard — 忌神 (ji = khắc Dụng) và 仇神 (chou = sinh Kỵ) là hostile
+  //   trong MỌI method (kể cả 病药/通关) → PHẢI nằm trong avoid. Trước đây ~12% chart
+  //   (method-order race 病药+调候) bị thiếu ji trong avoid → hehun/ideal-match cho
+  //   partner mang Dụng=ji điểm «không tổn» (sai — ji khắc Dụng user). Fix: đảm bảo có.
+  for (const w of [ji, chou]) if (w && !avoid.includes(w)) avoid.push(w);
+
   return {
     primary, secondary, avoid,
     xi, ji, chou, xian,           // 用喜忌仇闲 (bộ 5 đầy đủ, tính từ primary cuối)
