@@ -36,10 +36,11 @@ export function rankDayun(R) {
     let intScore = 0;
     if (d.ganZhi === dayGan + dayZhi) { interaction = '伏吟'; intScore -= 5; }
     else if (CHONG[d.zhi] === dayZhi) {
-      // [cycle 48 C2] 天克地冲 bidirectional — cả 克入(官杀) LẪN 克出(财).
-      const godClash = ['七殺', '正官', '正財', '偏財'].includes(god);
-      if (godClash) { interaction = '⚡天克地冲(反吟)'; intScore -= 15; }
-      else { interaction = '⚡地冲'; intScore -= 8; } // chỉ xung chi, can không khắc = 地冲 (không phải 反吟)
+      // [loop 59 sửa] 天克 = GAN_CHONG (4 cặp thất sát), KHÔNG phải tenGod ∈ {七殺,正官,正財,偏財}.
+      //   Cùng bug fuyin.js L19 + dayun-check.js: tenGod-based 克 → 384 false positive.
+      const GANCHONG = { 甲:'庚', 庚:'甲', 乙:'辛', 辛:'乙', 丙:'壬', 壬:'丙', 丁:'癸', 癸:'丁' };
+      if (GANCHONG[dayGan] === d.gan) { interaction = '⚡天克地冲(反吟)'; intScore -= 15; }
+      else { interaction = '⚡地冲'; intScore -= 8; }
     }
     else if (d.gan === dayGan) { interaction = '同气'; intScore += 3; }
     score += intScore;

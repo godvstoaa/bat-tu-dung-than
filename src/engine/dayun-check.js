@@ -19,23 +19,24 @@ export function checkDayunInteractions(chart, dayun) {
   const dayGanZhi = dayGan + dayZhi;
   const results = [];
 
-  for (const d of dayun) {
+  // [loop 59 sửa] 天克 = GAN_CHONG (4 cặp thất sát 甲庚/乙辛/丙壬/丁癸), KHÔNG phải 'bất kỳ ngũ hành khắc'.
+  //   Trước đây dùng tenGod ∈ {七殺,正官,正財,偏財} → 384 false positive (cùng bug fuyin.js L19 đã sửa).
+  const GAN_CHONG = { 甲:'庚', 庚:'甲', 乙:'辛', 辛:'乙', 丙:'壬', 壬:'丙', 丁:'癸', 癸:'丁' };
+  for (const d of (dayun || [])) {
+    if (!d || !d.gan || !d.zhi) continue;
     const dgGan = d.gan, dgZhi = d.zhi;
     const notes = [];
     let severity = 0;
 
-    // 1. 天克地冲 (= 反吟): 大运 can khắc 日 can (KHẮC HAI CHIỀU) + 大运 chi 冲 日 chi.
-    // [cycle 48 sửa C2] 天克地冲 bidirectional — trước đây chỉ bắt 克 NHẬP (官/sát), bỏ sót 克 XUẤT
-    //   (Tài: 日 can khắc đại vận can). Nay bắt cả 4 thần khắc (七殺/正官/正財/偏財).
-    const godOfDgGan = tenGod(dayGan, dgGan);
-    const ganClash = ['七殺', '正官', '正財', '偏財'].includes(godOfDgGan);
+    // 1. 天克地冲 (= 反吟): 天干 xung (4 cặp thất sát) + địa chi xung.
+    const ganClash = GAN_CHONG[dayGan] === dgGan;
     const zhiChong = CHONG[dayZhi] === dgZhi;
     if (ganClash && zhiChong) {
-      notes.push('⚡ 天克地冲 (反吟) — đại vận can khắc Nhật Can + chi xung Nhật Chi: BIẾN ĐỘNG LỚN, cẩn thận.');
+      notes.push('⚡ 天克地冲 (反吟) — đại vận thiên xung + địa xung Nhật Trụ: BIẾN ĐỘNG LỚN, cẩn thận.');
       severity += 3;
     }
 
-    // 2. Địa xung (大运 chi 冲 日 chi, can KHÔNG khắc) — chỉ xung chi, nhẹ hơn天克地冲.
+    // 2. Địa xung (大运 chi 冲 日 chi, can KHÔNG xung) — chỉ xung chi, nhẹ hơn 天克地冲.
     if (zhiChong && !ganClash) {
       notes.push('⚡ Địa xung — đại vận chi xung Nhật Chi: gia đạo/bản thân biến động.');
       severity += 2;
