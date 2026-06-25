@@ -96,6 +96,7 @@ import { analyzePillarQuality } from './engine/pillar-quality.js';
 import { analyzeHuaQi } from './engine/huaqi.js';
 import { dayunChangSheng, liunianChangSheng, dayunYongChangSheng, liuyueChangSheng } from './engine/dayun-changsheng.js';
 import { analyzeHanNuan } from './engine/han-nuan.js';
+import { analyzeWxFlow } from './engine/wx-flow.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1052,6 +1053,24 @@ function renderHanNuan(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được cân bằng khí hậu.</p>'; }
 }
 
+function renderWxFlow(R) {
+  const el = $('wx-flow');
+  if (!el) return;
+  try {
+    const f = analyzeWxFlow(R);
+    const flowHtml = f.flow.length ? f.flow.map((x) => `<span class="combo cat">✓ ${esc(x)}</span>`).join(' ') : '<span class="hint">không có liên kết sinh nào流通</span>';
+    const blockHtml = f.blocks.length ? f.blocks.map((x) => `<span class="combo xiong">⚠ ${esc(x)}</span>`).join(' ') : '';
+    const profileHtml = f.profile.length ? `<p>${f.profile.map((p) => esc(p)).join('<br>')}</p>` : '';
+    el.innerHTML = `
+      <p><b>${esc(f.circulation)}</b></p>
+      <p>${flowHtml}</p>
+      ${blockHtml ? `<p>${blockHtml}</p>` : ''}
+      ${profileHtml}
+      <p class="hint">${esc(f.advice)}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được ngũ hành流通.</p>'; }
+}
+
 function renderMarriageStars(R) {
   const el = $('marriage-stars');
   if (!el) return;
@@ -1710,6 +1729,7 @@ function run() {
   lazyRender('pillar-quality', () => { try { renderPillarQuality(currentResult); } catch (e) { console.warn('pillarquality', e.message); } });
   lazyRender('huaqi',          () => { try { renderHuaqi(currentResult); } catch (e) { console.warn('huaqi', e.message); } });
   lazyRender('han-nuan',       () => { try { renderHanNuan(currentResult); } catch (e) { console.warn('hannuan', e.message); } });
+  lazyRender('wx-flow',        () => { try { renderWxFlow(currentResult); } catch (e) { console.warn('wxflow', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });

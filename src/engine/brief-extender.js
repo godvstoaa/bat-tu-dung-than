@@ -15,6 +15,7 @@ import { analyzeStudy } from './study-analysis.js';
 import { dayunGodMeaning } from './dayun-god.js';
 import { checkDayunInteractions } from './dayun-check.js';
 import { analyzeHanNuan } from './han-nuan.js';
+import { analyzeWxFlow } from './wx-flow.js';
 import { dayunChangSheng, dayunYongChangSheng } from './dayun-changsheng.js';
 import { taiYuan } from './taiyuan.js';
 
@@ -41,6 +42,12 @@ export function extendBrief(R) {
   try {
     const hn = analyzeHanNuan(R);
     parts.push(`HÀN-NOÃN-TÁO-THẤP (寒暖燥湿): ${hn.tempVi} (điểm ${hn.tempScore}) + ${hn.humidVi} (điểm ${hn.humidScore})${hn.needs.length ? ' → cần ' + hn.needs.map((n) => n.vi).join(' / ') : ' → khí hậu cân'}.${hn.alignNote ? ' ' + hn.alignNote : ''}`);
+  } catch (e) {}
+
+  // [loop 88] NGŨ HÀNH LƯU THÔNG (五行流通) — dòng sinh có thông suốt (module wx-flow trước đây ẩn).
+  try {
+    const wf = analyzeWxFlow(R);
+    parts.push(`NGŨ HÀNH LƯU THÔNG (五行流通): ${wf.circulation} Thông ${wf.flow.length}/5${wf.blocks.length ? ', đứt ' + wf.blocks.length : ''}.${wf.profile.length ? ' ' + wf.profile.join(' ') : ''}`);
   } catch (e) {}
 
   // Thai nguyên (nếu có)

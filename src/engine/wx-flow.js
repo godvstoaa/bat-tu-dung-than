@@ -17,10 +17,12 @@ function collectWx(chart, wx) {
   const arr = [];
   const posLabel = { year: 'Năm', month: 'Tháng', day: 'Ngày', time: 'Giờ' };
   for (const key of ['year', 'month', 'day', 'time']) {
-    const p = chart.pillars[key];
+    const p = chart.pillars && chart.pillars[key];
+    if (!p || !p.gan || !GAN[p.gan]) continue; // [loop 88] guard missing pillars (robustness)
     const ganWx = GAN[p.gan].wx;
     arr.push({ pos: posLabel[key], type: 'can', wx: ganWx, pts: 1.0 });
-    for (const h of p.hidden) {
+    for (const h of (p.hidden || [])) {
+      if (!h || !h.gan || !GAN[h.gan]) continue;
       const hwx = GAN[h.gan].wx;
       const hpts = +(p.hidden.indexOf(h) === 0 ? 1.5 : 0.5).toFixed(1);
       arr.push({ pos: posLabel[key], type: 'tàng', wx: hwx, pts: hpts });
