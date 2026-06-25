@@ -131,6 +131,7 @@ import { checkNatalActivation } from './engine/shensha-activation.js';
 import { flyingSihua } from './engine/flying-sihua.js';
 import { findMoveDates } from './engine/move-fs.js';
 import { matchBusinessPartners } from './engine/partner-match.js';
+import { findWeddingDates } from './engine/wedding-date.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1431,6 +1432,18 @@ function renderPartnerMatch(userR, partnerR) {
       <p class="hint">${esc(m.advice || '')}</p>
     `;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được ghép đôi đối tác.</p>'; }
+}
+
+function renderWeddingDate(dates) {
+  const el = $('wedding-date');
+  if (!el) return;
+  if (!dates || !dates.length) { el.innerHTML = '<p class="hint">Không tìm được ngày cưới tốt trong 90 ngày tới.</p>'; return; }
+  const rows = dates.map((d) => {
+    const yi = d.hasMarryYi ? '✓ 宜嫁娶' : d.hasMarryJi ? '⚠ 忌嫁娶' : '';
+    const clash = d.clashA || d.clashB ? ' ⚠ xung tuổi' : '';
+    return `<div class="yz-row"><b>${esc(d.date)}</b> ${esc(d.ganZhi || '')} ${esc(d.lunar || '')} — <b>${esc(d.rating || '')}</b> (${esc(String(d.score || ''))}) <span class="hint">${esc(yi)}${esc(clash)}</span></div>`;
+  }).join('');
+  el.innerHTML = `<p class="hint">Top 5 ngày tốt cưới (嫁娶) trong 90 ngày tới.</p>${rows}`;
 }
 
 function renderLifestyle(R) {
@@ -3008,6 +3021,19 @@ if ($('partner-match-btn')) $('partner-match-btn').addEventListener('click', () 
     const pR = analyze(+parts[0], +parts[1], +parts[2], +parts[3], 0, parts[4], new Date().getFullYear());
     renderPartnerMatch(currentResult, pR);
   } catch (e) { alert('Không tính được lá số đối tác: ' + e.message); }
+});
+if ($('wedding-date-btn')) $('wedding-date-btn').addEventListener('click', () => {
+  const raw = prompt('Nhập NĂM SINH cô dâu + chú rể (cách nhau dấu phẩy)\nvd: 1995,1993');
+  if (!raw) return;
+  const [ya, yb] = raw.split(',').map((s) => parseInt(s.trim(), 10));
+  if (!ya || !yb) { alert('Sai. VD: 1995,1993'); return; }
+  const ZHI12 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const zA = ZHI12[((ya - 4) % 12 + 12) % 12], zB = ZHI12[((yb - 4) % 12 + 12) % 12];
+  try {
+    const now = new Date();
+    const dates = findWeddingDates(zA, zB, now.getFullYear(), now.getMonth() + 1, now.getDate(), 90, 5);
+    renderWeddingDate(dates);
+  } catch (e) { alert('Không tính được ngày cưới: ' + e.message); }
 });
 if ($('zlr-btn')) $('zlr-btn').addEventListener('click', () => renderZiweiLiuri($('zlr-date').value));
 if ($('bh-btn')) $('bh-btn').addEventListener('click', () => renderBestHour($('bh-date').value));
