@@ -133,6 +133,7 @@ import { findMoveDates } from './engine/move-fs.js';
 import { matchBusinessPartners } from './engine/partner-match.js';
 import { findWeddingDates } from './engine/wedding-date.js';
 import { analyzeFamilyHarmony } from './engine/family-fortune.js';
+import { nayinRelations } from './engine/nayin-relation.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1171,6 +1172,19 @@ function renderFamilyFortune(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được gia đạo.</p>'; }
 }
 
+function renderNayinRelation(R) {
+  const el = $('nayin-relation');
+  if (!el) return;
+  try {
+    const n = nayinRelations(R.chart);
+    const rows = (n.pairsAll || []).map((p) => {
+      const tone = p.rel === 'same' ? '#caa14a' : (p.rel === 'sheng' || p.rel === 'shengBy') ? '#2e9e5b' : '#e0533d';
+      return `<div class="yz-row" style="border-left:3px solid ${tone};padding-left:8px;margin:3px 0"><b>${esc(p.fromVi.split('(')[0])} × ${esc(p.toVi.split('(')[0])}</b>: ${esc(p.fromNayin)} ↔ ${esc(p.toNayin)} — <span style="color:${tone}">${esc(p.relVi)}</span> <span class="hint">${esc(p.note)}</span></div>`;
+    }).join('');
+    el.innerHTML = `<p>${esc(n.summary || '')}</p>${rows}`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được nạp âm quan hệ.</p>'; }
+}
+
 function renderEventPredict(R) {
   const el = $('event-predict');
   if (!el) return;
@@ -2165,6 +2179,7 @@ function run() {
   lazyRender('minggong',       () => { try { renderMingGong(currentResult); } catch (e) { console.warn('minggong', e.message); } });
   lazyRender('children-star',  () => { try { renderChildrenStar(currentResult); } catch (e) { console.warn('childrenstar', e.message); } });
   lazyRender('family-fortune', () => { try { renderFamilyFortune(currentResult); } catch (e) { console.warn('familyfortune', e.message); } });
+  lazyRender('nayin-relation', () => { try { renderNayinRelation(currentResult); } catch (e) { console.warn('nayinrel', e.message); } });
   lazyRender('event-predict',  () => { try { renderEventPredict(currentResult); } catch (e) { console.warn('eventpredict', e.message); } });
   lazyRender('personality-profile', () => { try { renderPersonalityProfile(currentResult); } catch (e) { console.warn('personality', e.message); } });
   lazyRender('mingzhu',         () => { try { renderMingZhu(currentResult); } catch (e) { console.warn('mingzhu', e.message); } });
