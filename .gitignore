@@ -14,3 +14,15 @@ Thumbs.db
 
 # Session / tooling state
 .claude/scheduled_tasks.lock
+
+# Cloudflare deploy artifacts
+.wrangler/
+
+# PDF OCR temp
+_pdf_*/
+
+# Temp verify/test scripts
+_verify.txt
+fuzz-*.mjs
+regression-*.mjs
+perf-*.mjs
