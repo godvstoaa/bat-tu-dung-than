@@ -1,23 +1,14 @@
-# Auto-deploy lên GitHub Pages mỗi push → https://godvistoaa.github.io/bat-tu-dung-than/
-# Actions-based deploy (build_type=workflow, KHÔNG cần gh-pages branch).
+# Auto-deploy GitHub Pages mỗi push (gh-pages npm — method ĐÃ WORK trước loop 67)
 name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-concurrency:
-  group: pages
-  cancel-in-progress: true
+  contents: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,9 +16,9 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: GH_PAGES=1 npm run build
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Deploy
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          npx gh-pages -d dist -m "Auto-deploy ${GITHUB_SHA::7}"
