@@ -193,6 +193,24 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
     schools.push({ phai: '大运互动 (运年组合)', note: `[大运 ${activeDayun} ${TEN_GOD_VI[dyGod]}] ${dyNotes.join(' ')}`, d: dyD });
   }
 
+  // [loop 160 ELEVATION] 空亡 出空/冲空 — 流年 chi = void chi → «xuất không» (sao bị treo BẮT ĐẦU hoạt động)
+  //   hoặc 流年 chi 冲 void chi → «xung không» (sự kiện đột ngột).
+  if (R.kongwang?.kong?.length && R.kongwang.kong.includes(yZhi)) {
+    const fav = new Set([yong.primary, yong.xi].filter(Boolean));
+    const isFav = fav.has(GAN[yGan]?.wx);
+    const delta = isFav ? 8 : -6;
+    score += delta;
+    schools.push({ phai: '出空 (空亡激活)', note: `⚡ 流年 ${yGan}${yZhi} = chi KHÔNG VONG → «xuất không»: sao/Dụng bị «treo» trong nguyên cục NĂM NAY BẮT ĐẦU HOẠT ĐỘNG. ${isFav ? '★ Dụng xuất không → CÁT (sự việc tốt bị treo giờ phát).' : '⚠ Kỵ xuất không → HUNG (áp lực bị treo giờ đến).'}`, d: delta });
+  } else if (R.kongwang?.kong?.length) {
+    for (const kc of R.kongwang.kong) {
+      if (CHONG[kc] === yZhi) {
+        score -= 5;
+        schools.push({ phai: '冲空 (空亡被冲)', note: `⚡ 流年 ${yGan}${yZhi} 冲 chi không vong ${kc} → «xung không»: sự kiện ĐỘT NGỘT, treo bao lâu giờ bùng nổ. Cẩn thận biến cố.`, d: -5 });
+        break;
+      }
+    }
+  }
+
   // (7) Phục/Phản Ngâm 流年 × 4 trụ nguyên cục [loop 19 — ALGORITHM ELEVATION]
   //   Cổ quyết (渊海子平 反吟伏吟篇 «反吟伏吟泪淋淋»): năm can-chi TRÙNG hoàn toàn 1 trụ
   //   = 伏吟 (đình trệ/哀泣/lặp); năm THIÊN KHẮC ĐỊA XUNG 1 trụ = 反吟 (động loạn/ly tán).
