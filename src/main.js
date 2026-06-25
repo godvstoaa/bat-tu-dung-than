@@ -1830,7 +1830,14 @@ function renderMonthlySha() {
   try {
     const now = new Date();
     const ms = monthlySha(now.getFullYear(), now.getMonth() + 1, now.getDate());
-    el.innerHTML = `<p>${ms.summary}</p>`;
+    // [loop 202] hiển thị 月煞/月建/月破 dạng badge hướng (trước đây chỉ show summary)
+    const taboo = new Set(ms.tabooDirs || []);
+    const ALL = ['Bắc', 'Đông Bắc', 'Đông', 'Đông Nam', 'Nam', 'Tây Nam', 'Tây', 'Tây Bắc'];
+    const badges = ALL.map((d) => `<span class="ln-rate ${taboo.has(d) ? 'rate-hung' : 'rate-cat'}" style="margin:2px">${d}${taboo.has(d) ? ' ⚠' : ''}</span>`).join(' ');
+    el.innerHTML = `
+      <p><b>Tháng <span class="zh">${esc(ms.monthZhi || '')}</span></b> · 月三煞: <b style="color:var(--cinnabar)">${esc(ms.yueSha3 || '')}</b> · 月建: ${esc(ms.yueJian || '')} · 月破: <b style="color:var(--cinnabar)">${esc(ms.yuePo || '')}</b></p>
+      <div style="margin:6px 0">${badges}</div>
+      <p class="hint">⚠ <b>Tránh động thổ/cải tạo/dời nhà</b> về hướng đỏ; ưu tiên hướng xanh. ${esc(ms.summary || '')}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được sát phương tháng.</p>'; }
 }
 
