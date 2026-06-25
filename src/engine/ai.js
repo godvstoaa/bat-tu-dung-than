@@ -95,6 +95,8 @@ import { forecast5 } from './forecast5.js';
 import { rankDayun } from './dayun-rank.js';
 import { wealthMonthlyAlert } from './wealth-alert.js';
 import { healthAlertScan } from './health-alert.js';
+import { computeHehun } from './hehun.js';
+import { matchBusinessPartners } from './partner-match.js';
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
@@ -719,11 +721,9 @@ export function execTool(name, args, R) {
         // [loop 133] HỢP HÔN / HỢP ĐỐI TÁC — AI tool cho câu hỏi hợp tuổi
         const pR = analyze(a.year, a.month, a.day, a.hour ?? 12, 0, a.gender, new Date().getFullYear());
         if (a.type === 'kinhdoanh') {
-          const { matchBusinessPartners } = await import('./partner-match.js');
           const m = matchBusinessPartners(R, pR);
           return { type: 'kinhdoanh', score: m.score, rating: m.rating, roleFit: _s(m.roleFit, 200), details: (m.details || []).map((d) => _s(d, 150)), advice: _s(m.advice, 250) };
         }
-        const { computeHehun } = await import('./hehun.js');
         const h = computeHehun(R, pR);
         return { type: 'hôn nhân', score: h.score, rating: h.rating, verdict: _s(h.verdict, 250), factors: (h.factors || []).map((f) => _s(f, 150)) };
       }
