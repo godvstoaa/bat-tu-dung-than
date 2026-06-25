@@ -1014,8 +1014,24 @@ function renderFuyin(R) {
   const el = $('fuyin');
   if (!el) return;
   try {
-    const f = scanFuyin(R, new Date().getFullYear());
-    el.innerHTML = f.summary;
+    // [loop 193] quét 12 năm tới — tìm các năm 伏吟/反吟 (biến cố lớn) thay vì chỉ năm hiện tại
+    const cur = new Date().getFullYear();
+    const hits = [];
+    for (let yr = cur; yr < cur + 12; yr++) {
+      const f = scanFuyin(R, yr);
+      if (f.hasFuyin || f.hasFanyin) hits.push(f);
+    }
+    const rows = hits.map((f) => {
+      const isFanyin = f.hasFanyin;
+      const cls = isFanyin ? 'rate-hung' : 'rate-bad';
+      const items = (f.items || []).map((it) => `<div class="yz-row" style="margin:3px 0;padding-left:8px;border-left:3px solid ${isFanyin ? 'var(--cinnabar)' : 'var(--gold)'}">
+        <span class="ln-rate ${cls}">${esc(it.typeVi || it.type || '')} ${esc(it.pillarVi || '')}</span> <span class="hint">(${esc(it.qin || '')})</span>
+        <div class="hint">${esc((it.meaning || '').slice(0, 110))}</div></div>`).join('');
+      return `<b>${esc(String(f.year))}</b> <span class="zh">${esc(f.ganZhi || '')}</span>${items}`;
+    }).join('');
+    el.innerHTML = rows
+      ? `<p class="hint">伏吟/反吟 (渊海子平 «反吟伏吟泪淋淋») — năm can-chi trùng/trái 1 trụ nguyên cục = năm BIẾN CỐ lớn. Các năm đáng chú ý 12 năm tới:</p>${rows}`
+      : `<p class="hint">12 năm tới không có năm phạm 伏吟/反吟 (tương đối ổn định theo tiêu chí này).</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được phục/phan ngâm.</p>'; }
 }
 
