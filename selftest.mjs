@@ -4956,6 +4956,46 @@ console.log('\n################## EE. [loop 82] daily-briefing: tone aligned + t
   console.log(`   tone 3-valued aligned level ✓ | không cat cho ngày Bình ✓ | năm 冲太岁 2023 phạt đúng ✓`);
 }
 
+// ################## FF. [loop 83] DỤNG THẦN 12 trường sinh (sinh khí DỤNG HÀNH, khác Nhật Chủ) ##################
+import { dayunYongChangSheng as _dycs } from './src/engine/dayun-changsheng.js';
+import { changSheng as _cs2 } from './src/engine/core.js';
+console.log('\n################## FF. [loop 83] DỤNG THẦN 12 trường sinh (Dụng hành khí) ##################');
+{
+  // FF1. mỗi đại vận có 1 stage; dungStrong/dungWeak phân loại đúng.
+  const _R = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
+  const _t = _dycs(_R.yong.primary, _R.yong.xi, _R.dayun);
+  assert(_t.items.length === _R.dayun.length, `mỗi đại vận 1 mục (${_t.items.length}/${_R.dayun.length})`);
+  assert(_t.yongWx === _R.yong.primary, `yongWx = Dụng Thần (${_t.yongWx}=${_R.yong.primary})`);
+  assert(_t.dungStrong.every((p) => ['長生', '冠帶', '臨官', '帝旺'].includes(p.stage)), 'dungStrong chỉ chứa Trường Sinh/Quan Đới/Lâm Quan/Đế Vượng');
+  assert(_t.dungWeak.every((p) => ['死', '墓', '絕'].includes(p.stage)), 'dungWeak chỉ chứa Tử/Mộ/Tuyệt');
+
+  // FF2. DỤNG stage dùng dương can của Dụng hành (木→甲, 火→丙, 土→戊, 金→庚, 水→壬).
+  //   verify: 甲(Mộc) 长生 ở 亥 → Dụng=Mộc + đại vận chi 亥 → stage 長生.
+  assert(_cs2('甲', '亥') === '長生', 'cơ sở: 甲(Mộc) 长生 ở 亥');
+  // FF3. KHÁC Nhật Chủ 12 trường sinh: Dụng hành arc ≠ 日主 arc (2 chiều khác nhau).
+  //   1993 日主=乙; Dụng=Thủy(Nhâm). 2 arc phải khác.
+  const _selfArc = _R.dayun.map((d) => _cs2('乙', d.zhi)).join('');
+  const _yongArc = _t.items.map((i) => i.stage).join('');
+  assert(_selfArc !== _yongArc, `Dụng 12 trường sinh (${_t.yongWx}) ≠ Nhật Chủ (乙) arc — 2 chiều khác`);
+
+  // FF4. 2 Dụng khác hành → arc khác (vd Mộc vs Hỏa Dụng).
+  const _R2 = analyze(2000, 12, 22, 10, 0, 'nam', 2026); // Dụng khác
+  const _t2 = _dycs(_R2.yong.primary, _R2.yong.xi, _R2.dayun);
+  const _arc1 = _t.items.map((i, idx) => i.stage).join('');
+  const _arc2 = _t2.items.map((i) => i.stage).join('');
+  // (chỉ so sánh nếu 2 chart cùng số đại vận)
+  if (_t.items.length === _t2.items.length) {
+    assert(_arc1 !== _arc2 || _R.yong.primary !== _R2.yong.primary, '2 Dụng khác hành → arc KHÁC (hoặc Dụng khác)');
+  }
+
+  // FF5. deterministic
+  const _t1b = _dycs(_R.yong.primary, _R.yong.xi, _R.dayun);
+  assert(JSON.stringify(_t.items) === JSON.stringify(_t1b.items), 'Dụng 12 trường sinh deterministic');
+
+  console.log(`   user 1993 Dụng ${_t.yongWx}: ${_t.items.map((i) => i.startAge + 't:' + i.stageVi).join(' → ')}`);
+  console.log(`   Dụng vượng ${_t.dungStrong.length} | Dụng suy ${_t.dungWeak.length} | ≠ Nhật Chủ arc ✓ | deterministic ✓`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');

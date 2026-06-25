@@ -15,7 +15,7 @@ import { analyzeStudy } from './study-analysis.js';
 import { dayunGodMeaning } from './dayun-god.js';
 import { checkDayunInteractions } from './dayun-check.js';
 import { analyzeHanNuan } from './han-nuan.js';
-import { dayunChangSheng } from './dayun-changsheng.js';
+import { dayunChangSheng, dayunYongChangSheng } from './dayun-changsheng.js';
 import { taiYuan } from './taiyuan.js';
 
 /**
@@ -125,7 +125,13 @@ export function extendBrief(R) {
   // [loop 77] 大运十二长生运 — sinh khí Nhật Chủ qua 12 giai đoạn (chiều cổ pháp song song Dụng).
   try {
     const cs = dayunChangSheng(R.chart.dayGan, R.dayun);
-    parts.push(`ĐẠI VẬN 12 TRƯỜNG SINH: ${cs.items.map((i) => `${i.ganZhi}[${i.startAge}t:${i.stageVi}/${i.tone}]`).join(' ')}. ${cs.summary}`);
+    parts.push(`ĐẠI VẬN 12 TRƯỜNG SINH (Nhật Chủ): ${cs.items.map((i) => `${i.ganZhi}[${i.startAge}t:${i.stageVi}/${i.tone}]`).join(' ')}. ${cs.summary}`);
+  } catch (e) {}
+
+  // [loop 83] DỤNG THẦN 12 trường sinh — khi nào Dụng hành thật sự vượng (khác Nhật Chủ).
+  try {
+    const ys = dayunYongChangSheng(R.yong.primary, R.yong.xi, R.dayun);
+    parts.push(`DỤNG THẦN 12 TRƯỜNG SINH (${ys.yongWx}): ${ys.items.map((i) => `${i.ganZhi}[${i.startAge}t:${i.stageVi}]`).join(' ')}. ${ys.summary}`);
   } catch (e) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';

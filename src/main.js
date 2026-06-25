@@ -94,7 +94,7 @@ import { strength3Fa } from './engine/strength-3fa.js';
 import { jiaoYunAnalysis } from './engine/jiaoyun.js';
 import { analyzePillarQuality } from './engine/pillar-quality.js';
 import { analyzeHuaQi } from './engine/huaqi.js';
-import { dayunChangSheng, liunianChangSheng } from './engine/dayun-changsheng.js';
+import { dayunChangSheng, liunianChangSheng, dayunYongChangSheng } from './engine/dayun-changsheng.js';
 import { analyzeHanNuan } from './engine/han-nuan.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
@@ -889,6 +889,25 @@ function renderDayunChangSheng(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được đại vận trường sinh.</p>'; }
 }
 
+function renderDayunYongChangSheng(R) {
+  const el = $('dayun-yong-changsheng');
+  if (!el) return;
+  try {
+    const t = dayunYongChangSheng(R.yong.primary, R.yong.xi, R.dayun);
+    const STRONG = new Set(['長生', '冠帶', '臨官', '帝旺']);
+    const WEAK = new Set(['死', '墓', '絕']);
+    const rows = t.items.map((i) => {
+      const c = STRONG.has(i.stage) ? '#2e9e5b' : WEAK.has(i.stage) ? '#e0533d' : '#caa14a';
+      const mark = STRONG.has(i.stage) ? '★Dụng vượng' : WEAK.has(i.stage) ? '⚠Dụng suy' : '';
+      return `<div class="yz-row" style="border-left:3px solid ${c};padding-left:8px;margin:3px 0">
+        <b>${i.startAge}–${i.startAge + 9}t</b> ${i.ganZhi}
+        <span style="color:${c};font-weight:600">${i.stageVi}</span>${mark ? ` <span class="hint">${mark}</span>` : ''}
+      </div>`;
+    }).join('');
+    el.innerHTML = `<p class="hint">Sinh khí của <b>Dụng Thần (${t.yongWx})</b> qua đại vận. «用神旺相, 其福必厚» — vận Dụng vượng = vận thật sự tốt (khác Nhật Chủ: đây là khí của hành giúp mệnh).</p>${rows}<p style="margin-top:6px">${t.summary}</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được Dụng thần trường sinh.</p>'; }
+}
+
 function renderLiunianChangSheng(R) {
   const el = $('liunian-changsheng');
   if (!el) return;
@@ -1662,6 +1681,7 @@ function run() {
   lazyRender('ku',             () => { try { renderKu(currentResult); } catch (e) { console.warn('ku', e.message); } });
   lazyRender('fuyin',          () => { try { renderFuyin(currentResult); } catch (e) { console.warn('fuyin', e.message); } });
   lazyRender('dayun-changsheng', () => { try { renderDayunChangSheng(currentResult); } catch (e) { console.warn('dayuncs', e.message); } });
+  lazyRender('dayun-yong-changsheng', () => { try { renderDayunYongChangSheng(currentResult); } catch (e) { console.warn('yongcs', e.message); } });
   lazyRender('liunian-changsheng', () => { try { renderLiunianChangSheng(currentResult); } catch (e) { console.warn('liuniancs', e.message); } });
   lazyRender('ziwei-deep',     () => { try { renderZiweiDeep(currentResult); } catch (e) { console.warn('ziweiDeep', e.message); } });
   lazyRender('taisui-general', () => { try { renderTaisuiGeneral(currentResult); } catch (e) { console.warn('taisui', e.message); } });

@@ -11,7 +11,7 @@
 //  Nguồn: 滴天髓 论运, 渊海子平 十二长生, 三命通会 卷二.
 // ============================================================================
 import { changSheng } from './core.js';
-import { CHANGSHENG_VI } from './constants.js';
+import { CHANGSHENG_VI, WX_VI } from './constants.js';
 
 // Giai đoạn → tone + diễn giải. Tone: cat (dương khí lên) / hung (xuống) / neutral (chuyển).
 const STAGE = {
@@ -71,13 +71,7 @@ export function dayunChangSheng(dayGan, dayun) {
 }
 
 /**
- * [loop 78] Timeline 12 trường sinh qua các LƯU NIÊN (10 năm của đại vận đang hành).
- *   «年逢长生如春起, 年逢帝旺如日中天, 年逢墓绝如秋冬» — sinh khí TỪNG NĂM.
- *   Tổ hợp với đại vận: «年长生 + 运帝旺» = năm khởi + vận đỉnh = cực thuận;
- *   «年绝 + 运死» = năm + vận đều suy = cần thủ.
- * @param {string} dayGan
- * @param {array}  liunian — R.liunian (mỗi entry có ganZhi, zhi, year, age, ...)
- * @returns {{ items, peak, rising, low, nowStage, summary }}
+ * Timeline 12 trường sinh qua các LƯU NIÊN (10 năm của đại vận đang hành).
  */
 export function liunianChangSheng(dayGan, liunian) {
   const items = (liunian || []).map((d) => {
@@ -90,6 +84,37 @@ export function liunianChangSheng(dayGan, liunian) {
   let summary = _summary(items, 'năm');
   if (nowStage) summary += ` Năm nay (${nowStage.year}): ${nowStage.stageVi} (${nowStage.toneVi}).`;
   return { items, peak, rising, low, nowStage, summary };
+}
+
+// [loop 83 — TÍNH NĂNG MỚI] Dương can đại diện mỗi ngũ hành (cho 用神 + Hỷ thần 长生).
+const YANG_STEM_OF_WX = { 木: '甲', 火: '丙', 土: '戊', 金: '庚', 水: '壬' };
+
+/**
+ * [loop 83] DỤNG THẦN thập nhị trường sinh — sinh khí của DỤNG HÀNH qua đại vận.
+ *   Khác loop 77 (Nhật Chủ = «thân»): đây là sinh khí của «DỤNG» (hành giúp mệnh).
+ *   «用神在长生/临官/帝旺 = Dụng vượng → phát huy tốt; 在死/墓/绝 = Dụng suy → khó phát».
+ *   Tổ hợp với 日主 12 trường sinh: 日主ĐếVượng + DụngTrườngSinh = vận ĐỈNH (thân + dụng đều mạnh).
+ * @param {string} yongWx — hành Dụng Thần (R.yong.primary)
+ * @param {string} xiWx  — hành Hỷ Thần (R.yong.xi, tuỳ chọn)
+ * @param {array}  dayun — R.dayun
+ * @returns {{ yongWx, items, dungStrong, dungWeak, summary }}
+ */
+export function dayunYongChangSheng(yongWx, xiWx, dayun) {
+  const stem = YANG_STEM_OF_WX[yongWx] || '甲';
+  const items = (dayun || []).map((d) => {
+    if (!d || !d.zhi) return null;
+    const si = stageInfo(stem, d.zhi);
+    return { ganZhi: d.ganZhi, zhi: d.zhi, startAge: d.startAge, label: `${d.startAge}t`, ...si };
+  }).filter(Boolean);
+  // Dụng mạnh: 長生/冠帶/臨官/帝旺 (dương khí Dụng lên). Dụng suy: 死/墓/絕.
+  const dungStrong = items.filter((i) => ['長生', '冠帶', '臨官', '帝旺'].includes(i.stage));
+  const dungWeak = items.filter((i) => ['死', '墓', '絕'].includes(i.stage));
+  const fmt = (arr) => arr.map((p) => `${p.label}(${p.ganZhi}/${p.stageVi})`).join(', ');
+  let summary = `Dụng Thần (${yongWx ? WX_VI[yongWx] : '?'}) sinh khí qua đại vận: `;
+  if (dungStrong.length) summary += `DỤNG VƯỢNG (Trường Sinh/Quan Đới/Lâm Quan/Đế Vượng — Dụng phát huy tốt) ở ${fmt(dungStrong)}. `;
+  if (dungWeak.length) summary += `Dụng SUY (Tử/Mộ/Tuyệt — Dụng khó phát, cần nỗ lực/bù ngoài) ở ${fmt(dungWeak)}. `;
+  summary += `Nguyên lý: «用神旺相, 其福必厚» — đại vận Dụng vượng = vận thật sự tốt (dù Nhật Chủ có thể không đỉnh).`;
+  return { yongWx, xiWx, items, dungStrong, dungWeak, summary };
 }
 
 export { STAGE, TONE_VI };
