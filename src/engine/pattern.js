@@ -44,7 +44,7 @@ export const PATTERN_PREF = {
   正財格: { shun: true, yong: ['cai'], xi: ['shi', 'guan'], ji: ['ti'], note: 'Chính Tài là lương thực, thuận dụng — lấy Thực Thương sinh tài, Quan tinh hộ tài; kỵ Tỷ Kiếp đoạt tài.' },
   偏財格: { shun: true, yong: ['cai'], xi: ['shi', 'guan'], ji: ['ti'], note: 'Thiên Tài (Tài lớn), thuận dụng như Chính Tài — lấy Thực Thương sinh tài, Quan hộ tài; kỵ Tỷ Kiếp tranh giành.' },
   正印格: { shun: true, yong: ['yin'], xi: ['guan'], ji: ['cai'], note: 'Chính Ấn chủ quyền lộc, thuận dụng — lấy Quan Sát sinh Ấn; tối kỵ Tài tinh phá Ấn.' },
-  偏印格: { shun: false, yong: ['cai'], xi: ['cai'], ji: ['shi'], note: 'Kiêu Thần (Thiên Ấn), nghịch dụng — cần Thiên Tài chế ngự Kiêu Thần; đặc kỵ Kiêu đoạt Thực (kiêu thần đoạt thực).' },
+  偏印格: { shun: false, yong: ['cai'], xi: ['cai'], ji: ['ti'], note: 'Kiêu Thần (Thiên Ấn), nghịch dụng — 子平真诠: cần Tài chế ngự Kiêu (phòng «kiêu thần đoạt thực»). [loop 73 sửa] kỵ = Tỷ Kiếp đẵm Tài (làm suy yếu khí chế Kiêu), KHÔNG phải kỵ Thực — Thực là BẢO VẬT được Tài bảo vệ (Hỷ), «đắc tài chế kiêu, thực thần đắc bảo».' },
   食神格: { shun: true, yong: ['shi'], xi: ['cai', 'guan'], ji: ['yin'], note: 'Thực Thần chủ yến ẩm phúc lộc, thuận dụng — lấy Tài đi kèm, Quan tinh hộ vệ; kỵ Thiên Ấn (Kiêu) đoạt thực.' },
   傷官格: { shun: false, yong: ['yin', 'cai'], xi: ['cai', 'yin'], ji: ['guan'], note: 'Thương Quan nghịch dụng — hoặc dùng Ấn chế thương (thương quan phối ấn), hoặc dùng Tài hóa thương (thương quan sinh tài); tối kỵ "thương quan kiến quan" sinh tai họa.' },
   建祿格: { shun: true, yong: ['cai', 'guan'], xi: ['cai', 'guan', 'yin'], ji: ['ti'], note: 'Nguyệt lệnh là Lộc (Tỷ Kiếp), bản thân vốn vượng — Dụng Thần chuyển sang Tài – Quan; kỵ thêm Tỷ Kiếp.' },

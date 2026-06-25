@@ -4557,6 +4557,44 @@ console.log('\n################## V. [loop 72] 正官格败(chong) fix + 得势 
   console.log(`   avoid sau 调候 override: ${_ovCount} chart test — avoid chứa Kỵ/Thù, KHÔNG chứa Dụng/Hỷ ✓`);
 }
 
+// ################## W. [loop 73] 偏印格 kỵ thần đúng 子平真诠 (sửa ji=['shi'] sai dấu) ##################
+import { PATTERN_PREF as _PPREF } from './src/engine/pattern.js';
+console.log('\n################## W. [loop 73] 偏印格 kỵ thần đúng 子平真诠 ##################');
+{
+  // W1. unit: 偏印格 ji phải là ['ti'] (Tỷ Kiếp đẵm Tài = làm suy yếu khí chế Kiêu),
+  //   KHÔNG phải ['shi']. 子平真诠: Thực là BẢO VẬT được Tài bảo vệ (Hỷ) — trước đây
+  //   ji=['shi'] sai dấu → adjustByGeju trừ điểm vận/năm Thực của chart 偏印格 (sai).
+  assert(_PPREF['偏印格'].ji.includes('ti'), '偏印格 ji gồm ti (Tỷ Kiếp đẵm Tài)');
+  assert(!_PPREF['偏印格'].ji.includes('shi'), '[fix] 偏印格 ji KHÔNG còn shi (Thực là bảo vật, không kỵ) — sửa dấu sai');
+  assert(_PPREF['偏印格'].yong.includes('cai'), '偏印格 yong = cai (Tài chế Kiêu, «đắc tài chế kiêu»)');
+
+  // W2. behavioral: scan chart 偏印格 thật → patternYong.ji phải có nhóm ti, không có shi.
+  let _piR = null;
+  for (let _y = 1985; _y <= 2005 && !_piR; _y++) {
+    for (const _m of [2, 5, 8, 11]) {
+      for (const _d of [7, 19, 28]) {
+        let _R; try { _R = analyze(_y, _m, _d, 6, 0, 'nam', 2026); } catch (e) { continue; }
+        if (_R.pattern && _R.pattern.name === '偏印格') { _piR = _R; break; }
+      }
+      if (_piR) break;
+    }
+  }
+  assert(_piR, 'scan thấy ≥1 chart 偏印格 để test patternYong');
+  if (_piR) {
+    const _piPy = _piR.patternQuality.patternYong;
+    const _cy = _piR.chart.input.year, _cm = _piR.chart.input.month;
+    assert(_piPy.ji.some((j) => j.group === 'ti'), `偏印格 patternYong.ji có nhóm ti (chart ${_cy}-${_cm})`);
+    assert(!_piPy.ji.some((j) => j.group === 'shi'), `[fix] 偏印格 patternYong.ji KHÔNG có nhóm shi (chart ${_cy}-${_cm}) — Thực không bị gán kỵ`);
+    console.log(`   偏印格 chart ${_cy}-${_cm}: patternYong ji=[${_piPy.ji.map((j)=>j.vi).join(',')}] (Tỷ Kiếp, KHÔNG phải Thực) ✓`);
+  }
+
+  // W3. đối chiếu các cách khác KHÔNG bị thay đổi (chỉ 偏印 sai trước đây):
+  assert(_PPREF['食神格'].ji.includes('yin'), '食神格 ji vẫn = yin (Kiêu đoạt thực — đúng, 格神 là Thực nên Kiêu khắc nó)');
+  assert(_PPREF['正官格'].ji.includes('shi'), '正官格 ji vẫn = shi (Thương Quan phá quan — đúng)');
+  assert(_PPREF['正印格'].ji.includes('cai'), '正印格 ji vẫn = cai (Tài phá ấn — đúng)');
+  console.log(`   đối chiếu: 食神格 kỵ yin ✓ | 正官格 kỵ shi ✓ | 正印格 kỵ cai ✓ (chỉ 偏印格 sai trước đây)`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
