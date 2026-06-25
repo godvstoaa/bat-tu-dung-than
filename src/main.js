@@ -136,6 +136,7 @@ import { flyingSihua } from './engine/flying-sihua.js';
 import { findMoveDates } from './engine/move-fs.js';
 import { matchBusinessPartners } from './engine/partner-match.js';
 import { findWeddingDates } from './engine/wedding-date.js';
+import { inverseBaZiSolve, labelResult } from './engine/inverse-bazi.js';
 import { analyzeFamilyHarmony } from './engine/family-fortune.js';
 import { nayinRelations } from './engine/nayin-relation.js';
 import { patternQuality } from './engine/pattern-quality.js';
@@ -1603,6 +1604,32 @@ function renderWeddingDate(dates) {
     return `<div class="yz-row"><b>${esc(d.date)}</b> ${esc(d.ganZhi || '')} ${esc(d.lunar || '')} — <b>${esc(d.rating || '')}</b> (${esc(String(d.score || ''))}) <span class="hint">${esc(yi)}${esc(clash)}</span></div>`;
   }).join('');
   el.innerHTML = `<p class="hint">Top 5 ngày tốt cưới (嫁娶) trong 90 ngày tới.</p>${rows}`;
+}
+
+function renderPlannedBirth(year) {
+  const el = $('planned-birth');
+  if (!el) return;
+  el.innerHTML = '<p class="hint">⏳ Đang quét ' + year + ' (tất cả ngày × 12时辰 × 2 giới)... mất ~10s.</p>';
+  // Run async (non-blocking)
+  setTimeout(() => {
+    try {
+      const r = inverseBaZiSolve({ refYear: year, yearStart: year, yearEnd: year, stepDays: 5, topK: 5, maxSamples: 3000 });
+      if (!r.max) { el.innerHTML = '<p class="hint">Không tính được.</p>'; return; }
+      const results = r.topResults || [r.max];
+      const rows = results.map((res, i) => {
+        const lbl = labelResult(res);
+        const birth = new Date(res.y, res.m - 1, res.d);
+        const conc = new Date(birth); conc.setDate(conc.getDate() - 280);
+        const concStr = conc.getFullYear() + '-' + String(conc.getMonth() + 1).padStart(2, '0') + '-' + String(conc.getDate()).padStart(2, '0');
+        return `<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:4px 0">
+          <b>#${i + 1} Sinh ${res.y}-${res.m}-${res.d} giờ ${res.h >= 10 ? res.h : '0' + res.h}:${res.min || '00'} (${res.g})</b> — ${res.score}đ<br>
+          <span class="zh">${res.gz || ''}</span><br>
+          <span class="hint">🤰 Thụ thai khoảng <b>${concStr}</b> (trước sinh ~280 ngày)</span>
+        </div>`;
+      }).join('');
+      el.innerHTML = `<p class="hint">Top ${results.length} lá số tốt nhất năm ${year} (quét ${r.scanned}). Điểm ${r.scoreStats.min}→${r.scoreStats.max} (TB ${r.scoreStats.mean}).</p>${rows}`;
+    } catch (e) { el.innerHTML = '<p class="hint">Lỗi: ' + esc(e.message) + '</p>'; }
+  }, 50);
 }
 
 function renderLifestyle(R) {
@@ -3214,7 +3241,13 @@ if ($('partner-match-btn')) $('partner-match-btn').addEventListener('click', () 
     renderPartnerMatch(currentResult, pR);
   } catch (e) { alert('Không tính được lá số đối tác: ' + e.message); }
 });
-if ($('wedding-date-btn')) $('wedding-date-btn').addEventListener('click', () => {
+if ($('planned-birth-btn')) $('planned-birth-btn').addEventListener('click', () => {
+  const raw = prompt('Nhập NĂM SINH mong muốn (vd: 2027)');
+  if (!raw) return;
+  const yr = parseInt(raw.trim(), 10);
+  if (!yr || yr < 1990 || yr > 2050) { alert('Năm không hợp lệ. VD: 2027'); return; }
+  renderPlannedBirth(yr);
+});
   const raw = prompt('Nhập NĂM SINH cô dâu + chú rể (cách nhau dấu phẩy)\nvd: 1995,1993');
   if (!raw) return;
   const [ya, yb] = raw.split(',').map((s) => parseInt(s.trim(), 10));
