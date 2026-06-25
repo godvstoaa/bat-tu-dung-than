@@ -992,7 +992,21 @@ function renderKu(R) {
   if (!el) return;
   try {
     const k = analyzeKu(R, new Date().getFullYear());
-    el.innerHTML = k.summary;
+    // [loop 192] hiển thị kho (库) + trạng thái + khi nào mở/khóa (trước đây chỉ show summary)
+    const cur = (k.kuInChart || []).map((u) => {
+      const cls = (u.state || '').includes('open') || (u.stateShort || '').includes('开') ? 'rate-cat' : 'rate-hung';
+      return `<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:3px 0">
+        <b>${esc(u.vi || '')} <span class="zh">${esc(u.zhi || '')}</span></b> (${esc(u.zhiVi || '')}) — chứa ${esc(u.storeVi || '')} · <span class="ln-rate ${cls}">${esc(u.stateVi || u.stateShort || u.state || '')}</span></div>`;
+    }).join('');
+    const yrRow = (y) => y ? `<div class="yz-row" style="margin:3px 0;padding-left:8px;border-left:3px solid ${y.action && /mở|open/i.test(y.action) ? 'var(--jade)' : 'var(--cinnabar)'}">
+      <b>${esc(String(y.year || ''))}</b> <span class="zh">${esc(y.ganZhi || '')}</span> — ${esc(y.action || '')}</div>` : '';
+    const opens = (k.openYears || []).slice(0, 4).map(yrRow).join('');
+    const closes = (k.closedYears || []).slice(0, 3).map(yrRow).join('');
+    el.innerHTML = `
+      ${cur || '<p class="hint">Không có trụ kho (辰戌丑未) trong lá số.</p>'}
+      ${opens ? `<h4 class="syn-h4" style="margin-top:6px">🔓 Năm KHO MỞ (tài/sự được phát)</h4>${opens}` : ''}
+      ${closes ? `<h4 class="syn-h4" style="margin-top:6px">🔒 Năm kho khép (tài/sự tạm trữ)</h4>${closes}` : ''}
+      <p class="hint" style="margin-top:4px">${esc(k.summary || '')}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được kho mở/khóa.</p>'; }
 }
 
