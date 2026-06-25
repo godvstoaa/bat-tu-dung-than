@@ -2093,7 +2093,19 @@ function renderZiweiSanfang(R) {
     const inp = R.chart.input;
     const zr = computeZiwei(inp.year, inp.month, inp.day, inp.hour, inp.minute, inp.gender);
     const core = ziweiCoreReading(zr);
-    el.innerHTML = `<p>${core.summary}</p>`;
+    // [loop 201] hiển thị 4 cung tam phương tứ chính + sao (trước đây chỉ show summary)
+    const cc = core.core || {};
+    const detailHtml = Array.isArray(cc.detail) && cc.detail.length ? cc.detail.map((p) => {
+      const roleCls = p.role === '本宫' ? 'rate-cat' : 'rate-mid';
+      const stars = (p.stars && p.stars.length) ? p.stars.map((s) => `<span class="zh">${esc(s)}</span>`).join(' ') : '<span class="hint">(cung trống)</span>';
+      return `<div class="yz-row" style="margin:3px 0;padding-left:8px;border-left:3px solid ${p.role === '本宫' ? 'var(--gold)' : 'var(--silk-muted)'}">
+        <b><span class="zh">${esc(p.zhi || '')}</span> ${esc(p.palaceVi || '')}</b> <span class="ln-rate ${roleCls}">${esc(p.role || '')}</span>
+        <div>★ ${stars}</div></div>`;
+    }).join('') : '';
+    el.innerHTML = `
+      <p><b>Cung焦 điểm:</b> <span class="zh">${esc(cc.focusZhi || '')}</span> ${esc(cc.focusPalace || '')}</p>
+      ${detailHtml}
+      <p class="hint" style="margin-top:4px">${esc(core.summary || '')}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được Tử Vi tam phương tứ chính.</p>'; }
 }
 
