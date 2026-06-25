@@ -496,7 +496,9 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
         yong.ji = KE_BY[drugWx];
         yong.chou = SHENG_BY[yong.ji];
         yong.xian = SHENG[drugWx];
-        yong.avoid = yong.avoid.filter((w) => w !== drugWx);     // gỡ thuốc khỏi Kỵ
+        yong.avoid = yong.avoid.filter((w) => w !== drugWx && w !== yong.xi);     // gỡ thuốc + Hỷ mới khỏi Kỵ
+        // [loop 127 fix] thêm Kỵ/Thù mới từ new primary (ji=克 Dụng, chou=sinh Kỵ)
+        for (const w of [yong.ji, yong.chou]) if (w && !yong.avoid.includes(w)) yong.avoid.push(w);
         yong.reasons.push(`★ Bệnh Dược LÀM CHỦ (败中有成): mệnh «${patternQualityResult.quality}» — bệnh «${(firstRescue.diseaseNote || '').slice(0, 50)}» CÓ CỨU bằng nhóm ${firstRescue.drug[0]} (hành ${drugWx}) → Dụng Thần CHÍNH = ${drugWx} («有病方为贵»). Phù Ức cũ (${oldPrimary}) giáng secondary.`);
         if (!yong.method.includes('Bệnh Dược (病药) — LÀM CHỦ (败中有成)')) yong.method.push('Bệnh Dược (病药) — LÀM CHỦ (败中有成)');
       }
