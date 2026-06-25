@@ -1640,13 +1640,14 @@ function renderPlannedBirth(year) {
         const birth = new Date(res.y, res.m - 1, res.d);
         const conc = new Date(birth); conc.setDate(conc.getDate() - 280);
         const concStr = conc.getFullYear() + '-' + String(conc.getMonth() + 1).padStart(2, '0') + '-' + String(conc.getDate()).padStart(2, '0');
-        return `<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:4px 0">
-          <b>#${i + 1} Sinh ${res.y}-${res.m}-${res.d} giờ ${res.h >= 10 ? res.h : '0' + res.h}:${res.min || '00'} (${res.g})</b> — ${res.score}đ<br>
-          <span class="zh">${res.gz || ''}</span><br>
-          <span class="hint">🤰 Thụ thai khoảng <b>${concStr}</b> (trước sinh ~280 ngày)</span>
+        const pillars = (res.pillars || []).join(' · '); // [loop 172 fix] res.gz không tồn tại → bát tự 四柱 không hiện; dùng res.pillars (trước đây card KHÔNG hiển thị lá số — sát nghĩa «bát tự mong muốn»)
+        return `<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:4px 0" title="${esc(lbl)}">
+          <b>#${i + 1} Sinh ${res.y}-${res.m}-${res.d} giờ ${res.h >= 10 ? res.h : '0' + res.h}:${res.min || '00'} (${res.g})</b> — ${res.score}đ · ${esc(res.gradeVi || '')} · ${esc(res.pattern || '')}${res.gejuQuality ? ' (' + esc(res.gejuQuality) + ')' : ''}<br>
+          <span class="zh" style="font-size:16px;letter-spacing:1px">${pillars}</span> <span class="hint">(年 · 月 · 日 · 时)</span><br>
+          <span class="hint">🤰 Thụ thai khoảng <b>${concStr}</b> (trước sinh ~280 ngày) · Dụng ${esc(res.yong || '')}</span>
         </div>`;
       }).join('');
-      el.innerHTML = `<p class="hint">Top ${results.length} lá số tốt nhất năm ${year} (quét ${r.scanned}). Điểm ${r.scoreStats.min}→${r.scoreStats.max} (TB ${r.scoreStats.mean}).</p>${rows}`;
+      el.innerHTML = `<p class="hint">Top ${results.length} lá số tốt nhất năm ${year} (quét ${r.scanned}). Điểm ${r.scoreStats.min}→${r.scoreStats.max} (TB ${r.scoreStats.mean}). <b>四柱 =年·月·日·时</b>; hover xem chi tiết.</p>${rows}`;
     } catch (e) { el.innerHTML = '<p class="hint">Lỗi: ' + esc(e.message) + '</p>'; }
   }, 50);
 }
