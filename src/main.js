@@ -116,6 +116,8 @@ import { musicTherapy } from './engine/music-therapy.js';
 import { teaTherapy } from './engine/tea-therapy.js';
 import { aromaTherapy } from './engine/aroma-fs.js';
 import { analyzeBusiness } from './engine/bazi-business.js';
+import { seasonalAdvice } from './engine/seasonal-advice.js';
+import { detectAnchong } from './engine/anchong.js';
 import { marriageStars } from './engine/marriage-stars.js';
 import { monthlySha } from './engine/monthly-sha.js';
 import { annualDirection } from './engine/annual-direction.js';
@@ -1265,6 +1267,32 @@ function renderBaziBusiness(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được khởi nghiệp.</p>'; }
 }
 
+function renderSeasonalAdvice(R) {
+  const el = $('seasonal-advice');
+  if (!el) return;
+  try {
+    const s = seasonalAdvice(R);
+    const adviceArr = Array.isArray(s.advice) ? s.advice : (s.advice ? [s.advice] : []);
+    const adviceHtml = adviceArr.map((a) => `<p class="hint">• ${esc(a)}</p>`).join('');
+    el.innerHTML = `
+      <p><b>Dụng ${esc(s.dungVi || '')}</b> — Mùa TỐT NHẤT: <b>${esc(s.bestSeason || '')}</b> | Mùa CẨN THẬN: <b>${esc(s.worstSeason || '')}</b></p>
+      ${s.climateNote ? `<p class="hint">${esc(s.climateNote)}</p>` : ''}
+      ${adviceHtml}
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được lời khuyên mùa.</p>'; }
+}
+
+function renderAnchong(R) {
+  const el = $('anchong');
+  if (!el) return;
+  try {
+    const ac = detectAnchong(R.chart);
+    if (!ac.pairs.length) { el.innerHTML = '<p class="hint">Không phát hiện ám xung — tàng can giữa các trụ không thiên khắc.</p>'; return; }
+    const rows = ac.pairs.map((p) => `<div class="yz-row"><b>${esc(p.bothHidden ? '暗冲' : '½')} ${esc(p.ganA)}↔${esc(p.ganB)}</b> (${esc(p.from)}↔${esc(p.to)}) <span class="hint">${esc(p.note)}</span></div>`).join('');
+    el.innerHTML = `<p class="hint">盲派: tàng can thiên khắc ngầm (4 cặp thất sát 甲庚/乙辛/丙壬/丁癸) giữa các trụ — xung đột tiềm ẩn.</p>${rows}`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được ám xung.</p>'; }
+}
+
 function renderLifestyle(R) {
   const el = $('lifestyle');
   if (!el) return;
@@ -1974,6 +2002,8 @@ function run() {
   lazyRender('invest-style',    () => { try { renderInvestStyle(currentResult); } catch (e) { console.warn('investstyle', e.message); } });
   lazyRender('lifestyle',       () => { try { renderLifestyle(currentResult); } catch (e) { console.warn('lifestyle', e.message); } });
   lazyRender('bazi-business',   () => { try { renderBaziBusiness(currentResult); } catch (e) { console.warn('bizbusiness', e.message); } });
+  lazyRender('seasonal-advice', () => { try { renderSeasonalAdvice(currentResult); } catch (e) { console.warn('seasonal', e.message); } });
+  lazyRender('anchong',         () => { try { renderAnchong(currentResult); } catch (e) { console.warn('anchong', e.message); } });
   lazyRender('marriage-stars', () => { try { renderMarriageStars(currentResult); } catch (e) { console.warn('marriagestars', e.message); } });
   lazyRender('monthly-sha',    () => { try { renderMonthlySha(); } catch (e) { console.warn('monthlysha', e.message); } });
   lazyRender('annual-direction', () => { try { renderAnnualDirection(currentResult); } catch (e) { console.warn('annualdir', e.message); } });
