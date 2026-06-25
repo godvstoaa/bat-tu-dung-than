@@ -29,12 +29,18 @@ const hanviet = (gz) => gz.split('').map((c) => (GAN[c]?.vi || ZHI[c]?.vi || c))
 const wxVi = (w) => WX_VI[w];
 const godViShort = (g) => TEN_GOD_VI[g] || g;
 const favText = (yong) => [...new Set([yong.primary, yong.xi].filter(Boolean))].map((w) => `${wxVi(w)} (${w})`).join(' & ');
-// [loop 46] giải thích TẠI SAO Dụng Thần được chọn (调候/病药/扶抑) — user hiểu cơ sở luận giải
+// [loop 46] giải thích TẠI SAO Dụng Thần được chọn (调候/病药/扶抑/从格) — user hiểu cơ sở luận giải
 const yongExplain = (R) => {
   const y = R.yong;
   if (!y?.method?.length) return '';
+  // [loop 120 fix] thêm Cách cục đặc biệt (从格/专旺) — trước đây missed → "Phù Ức" SAI cho 从格
+  const hasSpecial = y.method.some((m) => m.includes('Cách cục đặc biệt'));
   const hasTiao = y.method.some((m) => /Điều Hậu.*LÀM CHỦ/.test(m));
   const hasBYao = y.method.some((m) => /Bệnh Dược.*LÀM CHỦ/.test(m));
+  if (hasSpecial) {
+    const pv = R.pattern?.vi || 'cách đặc biệt';
+    return `Dụng Thần ${wxVi(y.primary)} được chọn vì CÁCH CỤC ĐẶC BIỆT — ${pv}: «thuận thế cục», theo thế mạnh của mệnh mà dùng (KHÔNG luận Phù Ức vượng suy hay 调候 — «从格不论调候»).`;
+  }
   if (hasTiao) return `Dụng Thần ${wxVi(y.primary)} được chọn vì ĐIỀU HẬU (调候) — bạn sinh mùa cực đoan (hàn/nhiệt), 穮通宝鑑 bắt buộc dùng hành ${wxVi(y.primary)} để điều hòa khí hậu, đè Phù Ức.`;
   if (hasBYao) return `Dụng Thần ${wxVi(y.primary)} được chọn vì BỆNH DƯỢC (病药) — mệnh «bại trung hữu thành», hành ${wxVi(y.primary)} là THUỐC chữa bệnh cách cục («có bệnh mới là quý»).`;
   return `Dụng Thần ${wxVi(y.primary)} được chọn theo PHÙ ỨC (扶抑) — cân bằng vượng suy của Nhật Chủ.`;
