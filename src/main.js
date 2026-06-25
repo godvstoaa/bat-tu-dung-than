@@ -1133,9 +1133,20 @@ function renderMingGong(R) {
   try {
     const mg = baziMingGong(R);
     const yongIcon = mg.isYong ? '★ Dụng/Hỷ' : mg.isJi ? '⚠ Kỵ' : '· trung tính';
+    // [loop 107 elevate] thân cung (三命: 命 cung chủ cả đời/前半, 身 cung chủ nửa sau)
+    let shenHtml = '';
+    try {
+      const i = R.chart.input;
+      const z = computeZiwei(i.year, i.month, i.day, i.hour, i.minute, i.gender);
+      const shen = (z.palaces || []).find((p) => p.isShen);
+      if (shen) {
+        shenHtml = `<p><b>Thân cung (身宮):</b> ${esc(shen.gan)}${esc(shen.zhi)} — tọa ${esc(shen.vi || '')} (cung 紫微). <span class="hint">«命主前半生, 身主后半生» — Thân cung chủ NỬA SAU đời (~35t+), hậu vận.${shen.zhi === mg.zhi ? ' Thân cung đồng 命 cung → sức mạnh hội tụ.' : ''}</span></p>`;
+      }
+    } catch (e2) {}
     el.innerHTML = `
-      <p><b>Mệnh cung: ${esc(mg.ganVi)} ${esc(mg.zhiVi)}</b> (${esc(mg.ganZhi)}) — thập thần <b>${esc(mg.godVi)}</b>, hành ${esc(mg.wxVi)}, nạp âm ${esc(mg.nayinWx)}. <span class="hint">${esc(yongIcon)} với Dụng</span></p>
+      <p><b>Mệnh cung (命宮): ${esc(mg.ganVi)} ${esc(mg.zhiVi)}</b> (${esc(mg.ganZhi)}) — thập thần <b>${esc(mg.godVi)}</b>, hành ${esc(mg.wxVi)}, nạp âm ${esc(mg.nayinWx)}. <span class="hint">${esc(yongIcon)} với Dụng</span></p>
       <p>${esc(mg.interactionWithDay)}</p>
+      ${shenHtml}
       <p class="hint">${esc(mg.meaning)}</p>
     `;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được mệnh cung.</p>'; }
