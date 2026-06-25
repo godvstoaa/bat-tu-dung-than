@@ -529,8 +529,18 @@ function renderNobleStars(R) {
 
 // ---------------------------------------------------------------- ĐẠI VẬN / LƯU NIÊN
 function rateClass(rating) {
-  return { 'Cát': 'rate-cat', 'Hơi thuận': 'rate-good', 'Bình hòa': 'rate-mid',
-    'Hơi nghịch': 'rate-bad', 'Hung': 'rate-hung' }[rating] || 'rate-mid';
+  // [loop 162 fix] Hỗ trợ CẢ HAI hệ rating:
+  //   • Đại vận (computeDaYun): Cát / Hơi thuận / Bình hòa / Hơi nghịch / Hung
+  //   • Lưu niên (scoreLiunianYear): Đại cát / Cát / Bình / Hơi kỵ / Hung / Đại hung
+  //   Trước đây chỉ map vocab đại vận → 'Đại cát' & 'Đại hung' & 'Hơi kỵ' rơi vào rate-mid
+  //   (năm tốt nhất/xấu nhất KHÔNG được tô màu). Bổ sung vocab lưu niên.
+  return {
+    'Đại cát': 'rate-cat', 'Cát': 'rate-cat',
+    'Hơi thuận': 'rate-good',
+    'Bình hòa': 'rate-mid', 'Bình': 'rate-mid',
+    'Hơi nghịch': 'rate-bad', 'Hơi kỵ': 'rate-bad',
+    'Hung': 'rate-hung', 'Đại hung': 'rate-hung',
+  }[rating] || 'rate-mid';
 }
 function renderDaYun(dayun) {
   if (!dayun.length) { $('dayun').innerHTML = '<p class="hint">Không tính được Đại Vận.</p>'; return; }
