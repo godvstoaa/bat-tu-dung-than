@@ -5184,7 +5184,7 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   for (const g of ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸']) {
     assert(_csFn(g, _CS[g]) === '長生', `changSheng(${g}, ${_CS[g]}) = 長生`);
   }
-  assert(_CST[0] === '長生' && _CST[4] === '帝旺' && _CST[6] === '死' && _CST[9] === '絕' && _CST[11] === '養', 'STAGES thứ tự đúng (0=長生 4=帝旺 6=死 9=絕 11=養)');
+  assert(_CST[0] === '長生' && _CST[4] === '帝旺' && _CST[5] === '衰' && _CST[7] === '死' && _CST[9] === '絕' && _CST[11] === '養', 'STAGES thứ tự đúng (0=長生 4=帝旺 5=衰 7=死 9=絕 11=養)');
   console.log(`   CHANGSHENG 10 can→長生 ✓ | STAGES 12/12 ✓ | locked`);
 }
 console.log('\n' + '='.repeat(70));
