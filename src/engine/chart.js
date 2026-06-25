@@ -36,16 +36,23 @@ const GROUP_VI = { ti: 'Tỷ Kiếp', yin: 'Ấn', shi: 'Thực Thương', cai: 
 // ===========================================================================
 //  1. TÍNH TỨ TRỤ
 // ===========================================================================
+// [loop 177] 子时换日 (zǐ-shí day-rollover) — cổ pháp 渊海子平/三命通会/滴天髓:
+//   23:00+ (早子时) thuộc NGÀY HÔM SAU. lunar-javascript mặc định «00:00换日» (23:00=hiện tại),
+//   nên phải roll. Map (D, 23:xx) → (D+1, 00:xx): giữ phút, giờ→0 (vị trí 晚子) để lưu-thời
+//   can dùng ngũ-thử-độn TỪ ngày hôm sau (nếu giữ h=23, lunar-javascript lại lấy can ngày sau-nữa).
+//   input (hiển thị) vẫn giữ giờ thật 23:xx; chỉ BÁT TỰ tính theo ngày_roll.
+function ziShiRoll(year, month, day, hour, minute) {
+  if (hour >= 23) {
+    const dt = new Date(year, month - 1, day);
+    dt.setDate(dt.getDate() + 1);
+    return [dt.getFullYear(), dt.getMonth() + 1, dt.getDate(), 0, minute];
+  }
+  return [year, month, day, hour, minute];
+}
+
 export function buildChart(year, month, day, hour, minute, gender) {
-  // [loop 176 — 子时换日 CONSIDERATION, DOCUMENTED CHOICE]
-  // lunar-javascript dùng quy ước «00:00换日» (23:00-23:59 thuộc NGÀY HIỆN TẠI), KHÔNG phải
-  // quy ước cổ pháp «子时换日» (23:00+ = sang NGÀY HÔM SAU — 渊海子平/三命通会/滴天髓 đều chu).
-  //   Hệ quả: sinh 23:00-23:59 → trụ Ngày (Nhật Chủ) theo lịch hiện tại, KHÔNG lùi sang hôm sau.
-  // Đây là LỰA CHỌN CỔ điển-tSupportedContent-có-tranh-luận; app dùng mặc định thư viện để giữ
-  // nhất quán với các lá số đã luận. inverse-bazi/sensitivity đã AVOID ranh 早子 bằng sample 00:30.
-  // Muốn sang 子时换日: khi hour>=23, cộng 1 ngày (xử lý rollover tháng/năm) trước fromYmdHms.
-  // ⚠ Ảnh hưởng ~1/12 lá số (đổi Nhật Chủ) — quyết định methodological, cần user chốt.
-  const solar = Solar.fromYmdHms(year, month, day, hour, minute, 0);
+  const [cy, cm, cd, ch, cmin] = ziShiRoll(year, month, day, hour, minute);
+  const solar = Solar.fromYmdHms(cy, cm, cd, ch, cmin, 0);
   const lunar = solar.getLunar();
   const ec = lunar.getEightChar();
 
@@ -371,7 +378,8 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
 //  5. ĐẠI VẬN (大運)
 // ===========================================================================
 export function computeDaYun(year, month, day, hour, minute, gender, yong) {
-  const solar = Solar.fromYmdHms(year, month, day, hour, minute, 0);
+  const [cy, cm, cd, ch, cmin] = ziShiRoll(year, month, day, hour, minute); // [loop 177] 子时换日 — đồng bộ buildChart
+  const solar = Solar.fromYmdHms(cy, cm, cd, ch, cmin, 0);
   const ec = solar.getLunar().getEightChar();
   // Quy ước lunar-javascript getYun: 1 = nam (dương), 0 = nữ (âm).
   // Validate rõ ràng — mọi giá trị lạ (typo, null...) fallback về 0 (nữ) để không ném.
@@ -416,7 +424,8 @@ export function computeDaYun(year, month, day, hour, minute, gender, yong) {
 //  6. LƯU NIÊN (流年) — 10 năm của đại vận đang hành + đánh dấu "hiện tại"
 // ===========================================================================
 export function computeLiuNian(year, month, day, hour, minute, gender, yong, refYear) {
-  const solar = Solar.fromYmdHms(year, month, day, hour, minute, 0);
+  const [cy, cm, cd, ch, cmin] = ziShiRoll(year, month, day, hour, minute); // [loop 177] 子时换日 — đồng bộ buildChart
+  const solar = Solar.fromYmdHms(cy, cm, cd, ch, cmin, 0);
   const ec = solar.getLunar().getEightChar();
   // Validate gender (xem computeDaYun). Fallback 0 (nữ) cho giá trị lạ.
   const g = (gender === 'nam') ? 1 : (gender === 'nữ' || gender === 'nu') ? 0 : 0;

@@ -5297,6 +5297,27 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(z.fuxing && z.fuxing.stars.every((s) => ['star','atZhi','desc'].every((k) => k in s)), '紫微: fuxing.stars fields');
   console.log(`   紫微斗数 field consistency (12 cung + daXian + 四化 + 自化 + 博士 + 辅星) ✓ | locked`);
 }
+
+// ################## OO. [loop 177] 子时换日 (zǐ-shí day-rollover) — 23:00+ = sang ngày hôm sau ##################
+{
+  // Sinh 2026/6/15 23:30 (早子) → dưới 子时换日 phải dùng trụ Ngày 6/16 (辛酉) + thời 戊子
+  //   (ngũ-thử-độn từ can 6/16=辛: «丙辛从戊起» → 子=戊子). lunar-javascript mặc định «00:00换日»
+  //   cho 庚申 (sai cổ pháp) → engine phải roll.
+  const R23 = analyze(2026, 6, 15, 23, 30, 'nam', 2026);
+  assert(R23.chart.pillars.day.gan + R23.chart.pillars.day.zhi === '辛酉', `[loop 177] 子时换日: 23:30 sinh → trụ Ngày 辛酉 (ngày 6/16), KHÔNG 庚申`);
+  assert(R23.chart.pillars.time.gan + R23.chart.pillars.time.zhi === '戊子', `[loop 177] 23:30 thời 戊子 (ngũ-thử-độn từ 辛, KHÔNG 庚子)`);
+  assert(R23.chart.input.hour === 23, `[loop 177] input giữ giờ thật 23 (hiển thị), chỉ BÁT TỰ tính theo ngày_roll`);
+  // 00:30 ngày 6/16 (晚子) cùng kết quả (cùng 子时换日 → cùng 辛酉)
+  const R00 = analyze(2026, 6, 16, 0, 30, 'nam', 2026);
+  assert(R00.chart.pillars.day.gan + R00.chart.pillars.day.zhi === '辛酉', `[loop 177] 00:30 cùng 辛酉 (nhất quán với 23:30 roll)`);
+  // 22:00 (亥时) KHÔNG roll — vẫn trụ ngày 6/15
+  const R22 = analyze(2026, 6, 15, 22, 0, 'nam', 2026);
+  assert(R22.chart.pillars.day.gan + R22.chart.pillars.day.zhi === '庚申', `[loop 177] 22:00 (亥时) không roll → 庚申 (chỉ h>=23 mới roll)`);
+  // Rollover tháng/năm: 23:30 ngày 31/12 → 01/01 năm sau
+  const RNY = analyze(2025, 12, 31, 23, 30, 'nam', 2026);
+  assert(RNY.chart.pillars.day.gan + RNY.chart.pillars.day.zhi !== analyze(2025, 12, 31, 22, 0, 'nam', 2026).chart.pillars.day.gan + analyze(2025, 12, 31, 22, 0, 'nam', 2026).chart.pillars.day.zhi, `[loop 177] rollover 31/12 23:30 ≠ 22:00 (roll ngày cuối năm OK)`);
+  console.log(`   子时换日 (23:00+ = sang hôm sau, ngũ-thử-độn đúng, rollover cuối năm) ✓ | locked`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
