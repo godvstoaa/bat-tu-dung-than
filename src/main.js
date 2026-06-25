@@ -1804,7 +1804,23 @@ function renderMarriageStars(R) {
   if (!el) return;
   try {
     const m = marriageStars(R);
-    el.innerHTML = `<p>${m.summary}</p>`;
+    // [loop 200] hiển thị sao hôn nhân cổ chi tiết (trước đây chỉ show summary)
+    const levelCls = m.level === 'tốt' || m.level === 'cat' ? 'rate-cat' : m.level === 'xấu' || m.level === 'hung' ? 'rate-hung' : 'rate-mid';
+    const flags = `${m.hasGuan ? '✓ có Chính Quan/Seven Sát (sao chồng)' : '✗ thiếu sao chồng (Quan)'} · ${m.hasNoble ? '✓ có quý nhân hộ hôn' : ''}`;
+    const hits = (m.hits || []).map((s) => {
+      const sev = s.severity || 0;
+      const cls = sev >= 6 ? 'rate-hung' : sev >= 3 ? 'rate-bad' : 'rate-mid';
+      return `<div class="yz-row" style="border-left:3px solid ${sev >= 6 ? 'var(--cinnabar)' : 'var(--gold)'};padding-left:8px;margin:4px 0">
+        <b class="zh">${esc(s.star)}</b> ${esc(s.starVi || '')} <span class="ln-rate ${cls}">trọng ${sev}/10</span> @ ${esc(s.pillarVi || s.pillar || '')} <span class="zh">(${esc(s.ganZhi || '')})</span>
+        ${s.mitigated ? '<span class="geju-xi">★ đã hóa giải</span>' : ''}
+        <div class="hint">${esc(s.meaning || '')}</div>
+        ${s.verse ? `<div class="hint" style="font-style:italic">${esc(s.verse)}</div>` : ''}
+        ${s.mitigation && !s.mitigated ? `<div class="hint">💭 Hóa giải: ${esc(s.mitigation)}</div>` : ''}</div>`;
+    }).join('');
+    el.innerHTML = `
+      <p><b>Sao hôn nhân cổ — cấp:</b> <span class="ln-rate ${levelCls}">${esc(m.level || '')}</span> · <span class="hint">${flags}</span></p>
+      ${hits || '<p class="hint">Không kích hoạt sao hôn nhân đặc biệt.</p>'}
+      <p class="hint" style="margin-top:4px">${esc(m.summary || '')}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được sao hôn nhân cổ.</p>'; }
 }
 
