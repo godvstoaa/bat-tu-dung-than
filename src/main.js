@@ -382,11 +382,27 @@ function renderSynthesis(R) {
     ? `<div class="combos">${s.combos.map((c) => `<span class="combo ${esc(c.tone)}"><b>${esc(c.vi)}</b> <span class="zh small">${esc(c.name)}</span> — ${esc(c.desc)}</span>`).join('')}</div>`
     : '<p class="hint">Không có tổ hợp Thập thần nổi bật.</p>';
   const gradeTone = s.score >= 68 ? 'cat' : (s.score >= 55 ? 'mid' : 'warn');
+  // [loop 110 integrate] quick metrics: 格局成败 + 敌我力量 (tích hợp elevation vào card Tổng Luận)
+  const pq = R.patternQuality || {};
+  const QVI = { 成格: '✓ Thành cách', 有救: '✓ Bại+cứu', 败格: '⚠ Bại cách', 特殊: '★ Đặc biệt', 未知: '' };
+  const yong = R.yong || {};
+  const sc = R.wx.score || {};
+  const ally = (sc[yong.primary] || 0) + (sc[yong.xi] || 0);
+  const enemy = (sc[yong.ji] || 0) + (sc[yong.chou] || 0);
+  const sum = ally + enemy || 1;
+  const allyPct = Math.round((ally / sum) * 100);
+  const quickMetrics = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
+      ${QVI[pq.quality] ? `<span class="combo ${pq.quality === '败格' ? 'xiong' : 'cat'}">${esc(QVI[pq.quality])}</span>` : ''}
+      <span class="combo ${allyPct >= 55 ? 'cat' : allyPct <= 45 ? 'xiong' : ''}">敌我: Dụng ${allyPct}% / Kỵ ${100 - allyPct}%</span>
+      <span class="combo">Dụng ${esc(R.yong ? WX_VI[R.yong.primary] || '' : '')}</span>
+    </div>`;
   $('synthesis').innerHTML = `
     <div class="syn-head">
       <div class="syn-grade ${gradeTone}"><span class="zh big">${esc(s.grade)}</span><span>${esc(s.gradeVi)}</span></div>
       <div class="syn-fortune"><b>${esc(s.fortuneVi)}</b> · điểm <b>${esc(s.score)}/100</b></div>
     </div>
+    ${quickMetrics}
     <p class="syn-lead">${esc(s.paragraphs[0])} ${esc(s.paragraphs[1])}</p>
     <details class="syn-factors"><summary>Các nhân tố chấm điểm (cách – tình – lực – thanh trọc – phối hợp)</summary><div class="factor-list">${s.factors.map((f) => `<div class="factor">${esc(f)}</div>`).join('')}</div></details>
     <h4 class="syn-h4">Tổ hợp Thập Thần (十神组合)</h4>
