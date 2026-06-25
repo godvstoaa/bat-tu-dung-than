@@ -4895,15 +4895,17 @@ console.log('\n################## DD. [loop 81] best-hour: 天乙/文昌 giờ t
 
   // DD2. khớp cổ法 mnemonic «甲戊庚牛羊, 乙己鼠猴乡, 丙丁猪鸡, 壬癸兔蛇, 六辛逢马虎»:
   //   庚日 → Sửu/Mùi (牛羊). verify TIAN_YI[庚] = 丑未.
-  assert(_TY['庚'].sort().join(',') === ['丑', '未'].sort().join(','), '天乙 mnemonic «甲戊庚牛羊»: 庚 → Sửu/Mùi');
-  assert(_TY['辛'].sort().join(',') === ['午', '寅'].sort().join(','), '天乙 mnemonic «六辛逢马虎»: 辛 → Ngọ/Dần');
-  assert(_TY['乙'].sort().join(',') === ['子', '申'].sort().join(','), '天乙 mnemonic «乙己鼠猴乡»: 乙 → Tý/Thân');
+  // [loop 166 fix] dùng [...x].sort() — KHÔNG .sort() trực tiếp: Array.sort() mutate
+  //   array gốc → làm «bẩn» singleton TIAN_YI (đảo thứ tự chi) → test sau đọc sai.
+  assert([..._TY['庚']].sort().join(',') === ['丑', '未'].sort().join(','), '天乙 mnemonic «甲戊庚牛羊»: 庚 → Sửu/Mùi');
+  assert([..._TY['辛']].sort().join(',') === ['午', '寅'].sort().join(','), '天乙 mnemonic «六辛逢马虎»: 辛 → Ngọ/Dần');
+  assert([..._TY['乙']].sort().join(',') === ['子', '申'].sort().join(','), '天乙 mnemonic «乙己鼠猴乡»: 乙 → Tý/Thân');
 
   // DD3. best-hour 天乙 giờ = TIAN_YI[can NGÀY], KHÔNG = TIAN_YI[Nhật Chủ 乙]:
   const _evalGan1 = _b1.dayGanZhi[0]; // can ngày của 2026-6-15
-  const _expect = _TY[_evalGan1].sort().join(',');
+  const _expect = [..._TY[_evalGan1]].sort().join(',');
   assert(_n1 === _expect, `天乙 giờ = TIAN_YI[can ngày ${_evalGan1}] = ${_expect} (được ${_n1})`);
-  assert(_n1 !== _TY['乙'].sort().join(','), '[fix] 天乙 giờ KHÔNG còn = TIAN_YI[Nhật Chủ 乙] cố định');
+  assert(_n1 !== [..._TY['乙']].sort().join(','), '[fix] 天乙 giờ KHÔNG còn = TIAN_YI[Nhật Chủ 乙] cố định');
 
   // DD4. 格局 chiều vẫn dùng birthDayGan (Nhật Chủ) — không bị phá.
   const _bG = _bht(_R, 2026, 6, 15, _R.patternQuality?.patternYong);
@@ -5186,6 +5188,40 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   }
   assert(_CST[0] === '長生' && _CST[4] === '帝旺' && _CST[5] === '衰' && _CST[7] === '死' && _CST[9] === '絕' && _CST[11] === '養', 'STAGES thứ tự đúng (0=長生 4=帝旺 5=衰 7=死 9=絕 11=養)');
   console.log(`   CHANGSHENG 10 can→長生 ✓ | STAGES 12/12 ✓ | locked`);
+}
+
+// ################## KK. [loop 166] SHENSHA tables + 旺相休囚死 — lock classical lookups ##################
+{
+  const SH = await import('./src/engine/shensha.js');
+  const TG = await import('./src/engine/tonggen.js');
+  // order-insensitive compare (chi pairs có thể bị sort mutation ở section khác)
+  const eq = (arr, expect) => [...arr].sort().join(',') === [...expect].sort().join(',');
+  // 天乙贵人: 甲戊庚牛羊(丑未) · 乙己鼠猴(子申) · 丙丁猪鸡(亥酉) · 壬癸兔蛇(卯巳) · 六辛逢马虎(午寅)
+  assert(eq(SH.TIAN_YI['甲'],['丑','未']) && eq(SH.TIAN_YI['庚'],['丑','未']) && eq(SH.TIAN_YI['戊'],['丑','未']), '天乙 甲戊庚 → 丑未 (牛羊)');
+  assert(eq(SH.TIAN_YI['乙'],['子','申']) && eq(SH.TIAN_YI['己'],['子','申']), '天乙 乙己 → 子申 (鼠猴)');
+  assert(eq(SH.TIAN_YI['丙'],['亥','酉']) && eq(SH.TIAN_YI['丁'],['亥','酉']), '天乙 丙丁 → 亥酉 (猪鸡)');
+  assert(eq(SH.TIAN_YI['壬'],['卯','巳']) && eq(SH.TIAN_YI['癸'],['卯','巳']), '天乙 壬癸 → 卯巳 (兔蛇)');
+  assert(eq(SH.TIAN_YI['辛'],['寅','午']), '天乙 辛 → 寅午 (六辛逢马虎)');
+  // 文昌: 甲乙巳午 · 丙戊申 · 丁己酉 · 庚亥 · 辛壬寅 · 癸卯
+  assert(SH.WEN_CHANG['甲']==='巳' && SH.WEN_CHANG['乙']==='午' && SH.WEN_CHANG['丙']==='申' && SH.WEN_CHANG['戊']==='申', '文昌 甲乙巳午/丙戊申');
+  assert(SH.WEN_CHANG['丁']==='酉' && SH.WEN_CHANG['己']==='酉' && SH.WEN_CHANG['庚']==='亥', '文昌 丁己酉/庚亥');
+  assert(SH.WEN_CHANG['辛']==='寅' && SH.WEN_CHANG['壬']==='寅' && SH.WEN_CHANG['癸']==='卯', '文昌 辛壬寅/癸卯 (loop 21 fix 辛→寅 not 子)');
+  // 禄神 = 临官位: 甲寅乙卯丙巳戊巳丁午己午庚申辛酉壬亥癸子
+  assert(SH.LU_SHEN['甲']==='寅' && SH.LU_SHEN['乙']==='卯' && SH.LU_SHEN['丙']==='巳' && SH.LU_SHEN['戊']==='巳', '禄神 阳干临官 (甲寅乙卯丙戊巳)');
+  assert(SH.LU_SHEN['丁']==='午' && SH.LU_SHEN['己']==='午' && SH.LU_SHEN['庚']==='申' && SH.LU_SHEN['辛']==='酉' && SH.LU_SHEN['壬']==='亥' && SH.LU_SHEN['癸']==='子', '禄神 (丁己午/庚辛酉/壬亥癸子)');
+  // 羊刃 = 帝旺位 (阳干): 甲卯丙午戊午庚酉壬子
+  assert(SH.YANG_REN['甲']==='卯' && SH.YANG_REN['丙']==='午' && SH.YANG_REN['戊']==='午' && SH.YANG_REN['庚']==='酉' && SH.YANG_REN['壬']==='子', '羊刃 阳干帝旺 (甲卯丙戊午庚酉壬子)');
+  // 旺相休囚死 (wuTai): element e trong tháng令 m
+  assert(TG.wuTai('木','木')==='旺', 'wuTai 木@木月=旺 (đương lệnh)');
+  assert(TG.wuTai('火','木')==='相', 'wuTai 火@木月=相 (lệnh sinh: 木→火)');
+  assert(TG.wuTai('水','木')==='休', 'wuTai 水@木月=休 (sinh lệnh: 水→木)');
+  assert(TG.wuTai('土','水')==='囚', 'wuTai 土@水月=囚 (khắc lệnh: 土克水)');
+  assert(TG.wuTai('土','木')==='死', 'wuTai 土@木月=死 (lệnh khắc: 木克土)');
+  // 桃花/驿马/将星/华盖 theo tam hợp cục (A=申子辰 B=寅午戌 C=巳酉丑 D=亥卯未)
+  assert(SH.TAO_HUA['A']==='酉' && SH.TAO_HUA['B']==='卯' && SH.TAO_HUA['C']==='午' && SH.TAO_HUA['D']==='子', '桃花 A酉B卯C午D子');
+  assert(SH.YI_MA['A']==='寅' && SH.YI_MA['B']==='申' && SH.YI_MA['C']==='亥' && SH.YI_MA['D']==='巳', '驿马 A寅B申C亥D巳');
+  assert(SH.HUA_GAI['A']==='辰' && SH.HUA_GAI['B']==='戌' && SH.HUA_GAI['C']==='丑' && SH.HUA_GAI['D']==='未', '华盖 A辰B戌C丑D未');
+  console.log(`   SHENSHA tables (天乙/文昌/禄神/羊刃/桃花/驿马/华盖) + 旺相休囚死 ✓ | locked`);
 }
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
