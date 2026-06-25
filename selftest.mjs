@@ -5279,6 +5279,24 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(['score', 'rating', 'details', 'advice', 'aRole', 'bRole'].every((k) => k in m), 'partner-match: trả đủ core fields');
   console.log(`   planned-birth (topK/pillars) + partner-match (roleFit) field consistency ✓ | locked`);
 }
+
+// ################## NN. [loop 175] 紫微斗数 field consistency — renderZiwei reads many nested fields ##################
+{
+  const { computeZiwei } = await import('./src/engine/ziwei.js');
+  const z = computeZiwei(1990, 5, 14, 13, 0, 'nam');
+  // top-level scalars renderZiwei reads
+  assert(['mingGong','shenGong','juVi','ju','ziweiBranch','tianfuBranch','note'].every((k) => k in z), '紫微: đủ scalars (mingGong/shenGong/juVi/ju/ziweiBranch/tianfuBranch/note)');
+  assert(z.birth && ['lunarMonth','lunarDay','timeZhi','yearGan'].every((k) => k in z.birth), '紫微: birth có lunarMonth/Day/timeZhi/yearGan');
+  // palaces (12), daXian, sihua
+  assert(Array.isArray(z.palaces) && z.palaces.length === 12 && z.palaces.every((p) => ['zh','vi','gan','zhi','isMing','isShen','stars'].every((k) => k in p)), '紫微: 12 cung đủ fields (zh/vi/gan/zhi/isMing/isShen/stars)');
+  assert(Array.isArray(z.daXian) && z.daXian.every((d) => ['from','to','palace','ganZhi'].every((k) => k in d)), '紫微: daXian entries có from/to/palace/ganZhi');
+  assert(z.sihua && ['禄','权','科','忌'].every((k) => z.sihua[k] && ['star','palace','tone'].every((f) => f in z.sihua[k])), '紫微: sihua đủ 禄权科忌 (star/palace/tone)');
+  // zihua/boshi/fuxing nested
+  assert(z.zihua && Array.isArray(z.zihua.list) && z.zihua.list.every((r) => ['hua','star','palaceVi','palaceGanZhi','tone','interpretation'].every((k) => k in r)), '紫微: zihua.list fields');
+  assert(z.boshi && z.boshi.stars.every((s) => ['star','tone','atZhi'].every((k) => k in s)) && z.boshi.luCunZhi, '紫微: boshi.stars + luCunZhi');
+  assert(z.fuxing && z.fuxing.stars.every((s) => ['star','atZhi','desc'].every((k) => k in s)), '紫微: fuxing.stars fields');
+  console.log(`   紫微斗数 field consistency (12 cung + daXian + 四化 + 自化 + 博士 + 辅星) ✓ | locked`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
