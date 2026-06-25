@@ -27,6 +27,7 @@ import { ziweiLiuri } from './ziwei-liuri.js';
 import { sanshaDirection } from './sansha.js';
 import { annualTabooOverview } from './annual-taboo.js';
 import { taiSuiOverview } from './taisui-general.js';
+import { personalTaSui } from './taisui.js'; // [loop 82] structured 5 loại phạm thái tuế (值/冲/刑/破/害)
 import { liunianEvents } from './liunian-event.js';
 import { WX_REMEDY } from './remedy.js';
 import { tenGod, godGroup } from './core.js';
@@ -77,12 +78,14 @@ export function dailyBriefing(R, year, month, day, patternQuality) {
   let dayGanZhi = '?';
   let lunarStr = '';
   let dayGan = '甲', dayZhi = '子';
+  let yearZhi = '子'; // [loop 82] chi năm đang xem (cho personalTaSui)
   try {
     const s = Solar.fromYmdHms(y, mo, d, 12, 0, 0);
     const l = s.getLunar();
     dayGan = l.getDayGan();
     dayZhi = l.getDayZhi();
     dayGanZhi = dayGan + dayZhi;
+    yearZhi = l.getYearZhi();
     lunarStr = `${l.getMonthInChinese()}月${l.getDayInChinese()}`;
   } catch (_) {}
 
@@ -302,10 +305,20 @@ export function dailyBriefing(R, year, month, day, patternQuality) {
     let delta = 0;
     if (yongAction.boost) delta += 8;          // can/chi = Dụng/Hỷ
     if (yongAction.reduce) delta -= 8;          // can/chi = Kỵ/仇
-    if (taisui && taisui.relation) {
-      if (/冲太岁|值太岁|xung|tự thái/.test(taisui.relation)) delta -= 12;   // 大变 động năm
-      else if (/刑|破|害|hình|phá|hại/.test(taisui.relation)) delta -= 6;
-    }
+    // [loop 82 sửa bug CAO] dùng personalTaSui STRUCTURED (bắt đủ 5 loại 值/冲/刑/破/害
+    //   theo chi NĂM SINH × chi NĂM XEM) thay vì regex trên taiSuiOverview text. Trước đây
+    //   regex /冲太岁|xung/ KHÔNG match — taiSuiOverview chỉ bắt 值太岁 60-hoa-giáp (hiếm),
+    //   summary (tách trước "Khuyến nghị") không chứa 'xung' → năm 冲/刑/破/害 KHÔNG bị phạt.
+    try {
+      const birthZhi = R?.chart?.pillars?.year?.zhi;
+      if (birthZhi) {
+        const pts = personalTaSui(birthZhi, yearZhi);
+        if (pts.offends) {
+          const heavy = pts.types.some((t) => t.key === 'zhi' || t.key === 'chong'); // 值/冲 = nặng
+          delta += heavy ? -12 : -6;
+        }
+      }
+    } catch (_) {}
     if (directionTaboo && directionTaboo.avoid && directionTaboo.avoid.length) delta -= 5; // 三煞/冲 hướng
     if (gejuTag) {
       if (/★.*格局喜|THUẬN CÁCH/.test(gejuTag.tag)) delta += 6;
@@ -313,7 +326,10 @@ export function dailyBriefing(R, year, month, day, patternQuality) {
     }
     if (delta !== 0) {
       rating.score = Math.max(2, Math.min(98, Math.round(rating.score + delta)));
-      rating.tone = rating.score >= 50 ? 'cat' : 'hung';
+      // [loop 82 sửa bug] tone 3-valued aligned với level (65/48/35). Trước đây tone binary
+      //   score>=50?'cat' mâu thuẫn level (50-64='Bình' nhưng tone='cat' → oneLiner khuyên
+      //   'khai trương' cho ngày Bình). Nay: cat=Cát(>=65), bình=Bình(48-64), hung=<48.
+      rating.tone = rating.score >= 65 ? 'cat' : rating.score >= 48 ? 'bình' : 'hung';
       if (!specialLevel) {
         rating.level = rating.score >= 65 ? 'Cát' : rating.score >= 48 ? 'Bình' : rating.score >= 35 ? 'Hơi kỵ' : 'Kỵ';
       }
@@ -399,12 +415,15 @@ function buildOneLiner({ rating, huang, bestHours, directionTaboo, yongAction, b
 
   const head = bits.join(', ') + '.';
 
-  // 6. Nên / Tránh (câu hành động ngắn)
-  const isCat = rating.tone === 'cat';
-  const should = isCat ? 'Nên: khai trương/ký kết/gặp người lớn' : 'Nên: dọn dẹp/thu xếp/an tĩnh';
-  const avoid = isCat
+  // 6. Nên / Tránh (câu hành động ngắn) — [loop 82] 3 tone cat/bình/hung
+  const tone = rating.tone || 'bình';
+  const should = tone === 'cat' ? 'Nên: khai trương/ký kết/gặp người lớn'
+    : tone === 'hung' ? 'Nên: dọn dẹp/thu xếp/an tĩnh'
+    : 'Nên: việc thường, thuận tự nhiên';
+  const avoid = tone === 'cat'
     ? (directionTaboo.avoid.length ? `Tránh: động thổ hướng ${directionTaboo.avoid[0]}` : 'Tránh: liều lĩnh/quá mức')
-    : 'Tránh: khai trương/đầu tư/việc lớn';
+    : tone === 'hung' ? 'Tránh: khai trương/đầu tư/việc lớn'
+    : 'Tránh: quyết định lớn nếu chưa rõ';
   return `${head} ${should}. ${avoid}.`;
 }
 

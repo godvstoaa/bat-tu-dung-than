@@ -4913,6 +4913,49 @@ console.log('\n################## DD. [loop 81] best-hour: 天乙/文昌 giờ t
   console.log(`   Trước fix: 天乙 cố định Tý/Thân cho user 乙 mọi ngày (sai). Nay đúng can ngày ✓`);
 }
 
+// ################## EE. [loop 82] daily-briefing: tone 3-valued + thái tuế structured ##################
+import { dailyBriefing as _dbf } from './src/engine/daily-briefing.js';
+import { personalTaSui as _pts } from './src/engine/taisui.js';
+console.log('\n################## EE. [loop 82] daily-briefing: tone aligned + thái tuế structured ##################');
+{
+  const _R = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
+
+  // EE1. [Bug #2 fix] tone aligned level: Bình→bình (không cat/hung), Cát→cat.
+  //   Trước đây tone binary score>=50?'cat' → ngày Bình (50-64) bị tone='cat' sai.
+  //   (Special levels Hoàng Đạo/Hắc Đạo/天赦除外 — chỉ check 2 level chuẩn.)
+  let _binhToBinh = true, _catToCat = true;
+  for (let _mm = 1; _mm <= 12; _mm++) for (let _dd = 1; _dd <= 28; _dd += 4) {
+    let _b; try { _b = _dbf(_R, 2025, _mm, _dd); } catch (e) { continue; }
+    if (_b.rating.level === 'Bình' && _b.rating.tone !== 'bình') _binhToBinh = false;
+    if (_b.rating.level === 'Cát' && _b.rating.tone !== 'cat') _catToCat = false;
+  }
+  assert(_binhToBinh, '[fix] level Bình → tone bình (không cat/hung)');
+  assert(_catToCat, '[fix] level Cát → tone cat');
+
+  // EE2. tone KHÔNG còn 'cat' cho ngày 'Bình' (mâu thuẫn cũ).
+  let _noCatBinh = true;
+  for (let _mm = 1; _mm <= 12; _mm++) for (let _dd = 1; _dd <= 28; _dd += 4) {
+    let _b; try { _b = _dbf(_R, 2025, _mm, _dd); } catch (e) { continue; }
+    if (_b.rating.level === 'Bình' && _b.rating.tone === 'cat') _noCatBinh = false;
+  }
+  assert(_noCatBinh, '[fix] KHÔNG còn tone=cat cho ngày Bình (trước đây score 50-64 bị cat sai)');
+
+  // EE3. [Bug #3 fix] thái tuế STRUCTURED — năm 冲太岁 bị phạt. User sinh 酉 (1993),
+  //   năm 2023 = 卯 → 冲 酉. personalTaSui detects 'chong'. dailyBriefing summary có delta âm.
+  assert(_pts('酉', '卯').offends && _pts('酉', '卯').types.some((t) => t.key === 'chong'), 'personalTaSui(酉,卯) = 冲太岁 (chong)');
+  let _penalized = null;
+  for (let _dd = 5; _dd <= 25 && !_penalized; _dd += 3) {
+    let _b; try { _b = _dbf(_R, 2023, 6, _dd); } catch (e) { continue; }
+    if (/Cá nhân -\d+/.test(_b.rating.summary)) _penalized = _b;
+  }
+  assert(_penalized, '[fix] năm 冲太岁 (2023, user 酉) → dailyBriefing áp delta âm (thái tuế phạt) — trước đây KHÔNG phạt');
+  // EE4. đối chứng: năm KHÔNG phạm thái tuế (2026 午 vs 酉 = bình) → ít/có delta dương hoặc 0, không bắt buộc âm
+  const _pts2026 = _pts('酉', _dbf(_R, 2026, 6, 15) && (() => { try { return Solar.fromYmdHms(2026,6,15,12,0,0).getLunar().getYearZhi(); } catch (_) { return '?'; } })());
+  assert(!_pts2026.offends || !_pts2026.types.some((t) => t.key === 'chong' || t.key === 'zhi'), 'năm 2026 (午) vs 酉 = KHÔNG 冲/值 thái tuế (đối chứng)');
+
+  console.log(`   tone 3-valued aligned level ✓ | không cat cho ngày Bình ✓ | năm 冲太岁 2023 phạt đúng ✓`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
