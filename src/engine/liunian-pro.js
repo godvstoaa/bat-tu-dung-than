@@ -331,6 +331,13 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
     }
   }
 
+  // [loop 159 fix] apply 进气退气 factor to score
+  if (dayunPhase && dayunPhase.factor < 1) {
+    score = Math.max(2, Math.min(98, Math.round(score * dayunPhase.factor)));
+    rating = rateByScore(score);
+    schools.push({ phai: '进气退气', d: -Math.round(score * (1 - dayunPhase.factor)), note: dayunPhase.vi + ' → điểm ×' + dayunPhase.factor });
+  }
+
   const out = { year: solarYear, ganZhi: yGan + yZhi, ganGod, ganWx, zhiWx, score, rating, schools, advice };
   if (gejuFavor) out.gejuFavor = gejuFavor;
   if (activeDayun) out.activeDayun = activeDayun; // [运年组合] 大运 đang hành cho năm này
