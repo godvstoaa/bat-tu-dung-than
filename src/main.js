@@ -2,6 +2,19 @@ import { analyze } from './engine/chart.js';
 import { Solar } from 'lunar-javascript';
 import { TOPICS, answer, hanviet, wxVi } from './engine/interpret.js';
 import { GAN, ZHI, ZHI_ORDER, WX_VI, WX_COLOR, TEN_GOD_VI, CHANGSHENG_VI } from './engine/constants.js';
+import { tenGod } from './engine/core.js';
+import { dayunGodMeaning } from './engine/dayun-god.js';
+import { analyzeWealthStar } from './engine/wealth-star.js';
+import { analyzeCareerStar } from './engine/career-star.js';
+import { analyzeSpouseStar } from './engine/spouse-star.js';
+import { analyzeStudy } from './engine/study-analysis.js';
+import { detectCombos } from './engine/combos.js';
+import { computeFuxing } from './engine/fuxing.js';
+import { healthMonthlyAlert } from './engine/health-monthly.js';
+import { analyzeCaiKu } from './engine/caiku.js';
+import { wealthMonthlyAlert } from './engine/wealth-alert.js';
+import { detectAnhe } from './engine/anhe.js';
+import { xingshenZuo } from './engine/xingshen-zuo.js';
 import { INTERACTION_MEANING, DITIANSUI } from './engine/kb.js';
 import { tieredAnalysis } from './engine/tiers.js';
 import { evaluateDate, findGoodDates, ACTIVITY } from './engine/zheri.js';
@@ -60,13 +73,14 @@ import { computeShenshaExtra } from './engine/shensha-extra.js';
 import { analyzeNobleStars } from './engine/noble-stars.js';
 import { liunian12Shen } from './engine/liunian-shen.js';
 import { analyzeLiunian12 } from './engine/liunian-12shen.js';
-import { nayinInfo } from './engine/nayin.js';
+import { nayinInfo, ganZhiNayin } from './engine/nayin.js';
 import { tongshengDay } from './engine/tongsheng.js';
-import { taiYuan } from './engine/taiyuan.js';
+import { taiYuan, taiXi } from './engine/taiyuan.js';
 import { xiuDay } from './engine/ershibaxiu.js';
 import { zodiacPairScore, ZODIAC as ZODIAC_DEEP } from './engine/zodiac-deep.js';
 import { interpretZiweiStars } from './engine/ziwei-stars.js';
 import { computeAuxStars } from './engine/ziwei-aux.js';
+import { checkDayunInteractions } from './engine/dayun-check.js';
 import { computeMarriageShensha, computeExtraShensha } from './engine/shensha-marriage.js';
 import { viToHan } from './engine/vi2han.js';
 import { askAI, getConfig, setConfig, isAIReady, PRESETS, testAIConnection } from './engine/ai.js';
@@ -172,6 +186,7 @@ import { yizhangjingFromChart as yizhangjingCast, renderYizhangjingCard } from '
 let currentResult = null;
 let currentTopic = 'general';
 let chatHistory = []; // bộ nhớ hội thoại AI: [{role:'user'|'assistant', content}]
+let _skipChatReset = false; // [loop 389] flag: skip chatHistory reset on initial auto-render (same chart)
 
 const $ = (id) => document.getElementById(id);
 function wxClass(w) { return `wx-${w}`; }
@@ -189,30 +204,40 @@ const YD_CHIP_CLS = { 'Cát': 'cat', 'Bình': 'binh', 'Hơi kỵ': 'hky', 'Kỵ'
 function renderPillars(chart) {
   const labels = { year: 'Trụ Năm', month: 'Trụ Tháng', day: 'Trụ Ngày', time: 'Trụ Giờ' };
   const order = ['year', 'month', 'day', 'time'];
+  // [loop 339] tập lộ can (thiên can 4 trụ) để đánh dấu tàng can «透干» (xuất hiện trên can = kích hoạt)
+  const louGan = new Set(order.map((k) => chart.pillars[k].gan));
   $('pillars').innerHTML = order.map((key) => {
     const p = chart.pillars[key];
     const gWx = GAN[p.gan].wx, zWx = ZHI[p.zhi].wx;
     const ganGod = key === 'day' ? 'Nhật Chủ' : godVi(p.ganGod);
-    const hidden = p.hidden.map((h) =>
-      `<span class="chip ${wxClass(GAN[h.gan].wx)}">${h.gan} ${GAN[h.gan].vi}·${godVi(h.god)}</span>`).join('');
+    const hidden = p.hidden.map((h) => {
+      // [loop 338] 本气/中气/余气 — tàng can phân rõ khí chính (本 = chủ đạo chi đó)
+      const qi = (h.weight || 0) >= 0.5 ? '本气' : (h.weight || 0) >= 0.15 ? '中气' : '余气';
+      const qiCls = qi === '本气' ? ' qi-ben' : '';
+      const tou = louGan.has(h.gan); // [loop 339] 透干: tàng can xuất hiện ở thiên can
+      return `<span class="chip${qiCls} ${wxClass(GAN[h.gan].wx)}" title="${qi}${tou ? ' · 透干 (xuất lộ)' : ''}">${h.gan} ${GAN[h.gan].vi}·${godVi(h.god)}<span class="qi-tag">${qi}</span>${tou ? '<span class="tou-tag">透</span>' : ''}</span>`;
+    }).join('');
+    // [loop 352] Thông căn (通根) — thiên can có gốc ở chi nào (thực), ngược lại «hư» (yếu). Đối xứng 透干.
+    const tongGen = order.filter((k) => (chart.pillars[k].hidden || []).some((h) => h.gan === p.gan)).map((k) => chart.pillars[k].zhi);
     return `
-      <div class="pillar">
-        <div class="pillar-head">${labels[key]}</div>
+      <div class="pillar${key === 'month' ? ' pillar-yueling' : ''}">
+        <div class="pillar-head">${labels[key]}${key === 'month' ? '<span class="yueling-tag" title="月令 — trụ QUAN TRỌNG NHẤT: quyết định 格局 + vượng suy thân chủ">月令</span>' : ''}</div>
         <div class="gz gan">
-          <div class="han ${wxClass(gWx)}">${p.gan}</div>
-          <div class="vi">${GAN[p.gan].vi} · ${WX_VI[gWx]}</div>
-          <div class="god">${ganGod}</div>
+          <div class="han ${wxClass(gWx)}">${esc(p.gan)}</div>
+          <div class="vi">${esc(GAN[p.gan].vi)} · ${esc(WX_VI[gWx])}</div>
+          <div class="god">${esc(ganGod)}</div>
+          ${tongGen.length ? `<div class="tg-tag" title="Thông căn — thiên can CÓ gốc ở chi ${esc(tongGen.join(','))} (thực → có lực)">根@${esc(tongGen.join(','))}</div>` : '<div class="tg-tag tg-xu" title="Vô căn — thiên can HƯ (thiếu gốc địa chi), lực yếu, dễ «động mà không thực»">无根 (hư)</div>'}
         </div>
         <div class="gz zhi">
-          <div class="han ${wxClass(zWx)}">${p.zhi}</div>
-          <div class="vi">${ZHI[p.zhi].vi} · ${ZHI[p.zhi].con}</div>
+          <div class="han ${wxClass(zWx)}">${esc(p.zhi)}</div>
+          <div class="vi">${esc(ZHI[p.zhi].vi)} · ${esc(ZHI[p.zhi].con)}</div>
           <div class="hidden-stems">${hidden}</div>
         </div>
         <div class="pillar-foot">
-          <div>Tàng can: <b>${WX_VI[zWx]}</b></div>
-          <div>Trường sinh: <b>${CHANGSHENG_VI[p.changSheng]}</b></div>
-          <div>Nạp âm: <b>${p.nayin}</b>${(() => { const ni = nayinInfo(p.nayin); return ni ? ` <span class="nayin-vi">${ni.vi}</span>` : ''; })()}</div>
-          ${(() => { const ni = nayinInfo(p.nayin); return ni ? `<div class="nayin-meaning">${ni.meaning}</div>` : ''; })()}
+          <div>Tàng can: <b>${esc(WX_VI[zWx])}</b></div>
+          <div>Trường sinh: <b>${esc(CHANGSHENG_VI[p.changSheng])}</b></div>
+          <div>Nạp âm: <b>${esc(p.nayin)}</b>${(() => { const ni = nayinInfo(p.nayin); return ni ? ` <span class="nayin-vi">${esc(ni.vi)}</span>` : ''; })()}</div>
+          ${(() => { const ni = nayinInfo(p.nayin); return ni ? `<div class="nayin-meaning">${esc(ni.meaning)}</div>` : ''; })()}
         </div>
       </div>`;
   }).join('');
@@ -238,6 +263,12 @@ function renderVerdict(R) {
       <div class="v-label">Cách Cục (格局)</div>
       <div class="v-value pattern-value">${pattern.vi}<span class="zh small">${pattern.name}</span></div>
       <div class="v-sub">${pattern.shunNi} · ${pattern.type === 'special' ? 'ngoại cách' : (pattern.type === 'luyue' ? 'nguyệt lệnh tỷ kiếp' : 'chính cách')}</div>
+      ${(() => {
+        // [loop 341] 格神 gốc — tàng can nào của Nguyệt Lệnh (透干/bản khí) định ra cách (kết nối 月令→格局)
+        const gs = pattern.geShen;
+        if (!gs || !gs.gan) return '';
+        return `<div class="v-sub"><span class="hint-inline" title="«八字用神, 专求月令» — 格神 lấy từ Nguyệt Lệnh">格神: <b>${esc(gs.gan)}</b> (${esc(TEN_GOD_VI[gs.god] || gs.god)}, hành ${esc(WX_VI[gs.wx] || gs.wx)}) <span class="hint-inline">← Nguyệt lệnh ${esc(gs.source || '?')}</span></span></div>`;
+      })()}
       ${(() => {
         const pq = R.patternQuality; if (!pq) return '';
         const cls = { 成格: 'rate-cat', 有救: 'rate-mid', 败格: 'rate-hung', 特殊: 'rate-cat', 未知: 'rate-mid' }[pq.quality] || 'rate-mid';
@@ -271,22 +302,44 @@ function renderVerdict(R) {
       <div class="method-row">${methodBadges}</div>
       <ul class="reasons">${reasons}</ul>
       ${tiaohou}
-    </div>`;
+    </div>
+    <button id="copy-summary-btn" class="btn-ghost" style="margin-top:8px;font-size:12px">📋 Sao chép tóm tắt lá số</button>`;
 }
+// [loop 390] copy chart summary to clipboard — chia sẻ nhanh
+$('copy-summary-btn') && document.addEventListener('click', (e) => {
+  if (!e.target.closest || !e.target.closest('#copy-summary-btn')) return;
+  if (!currentResult) return;
+  try {
+    const c = currentResult.chart, y = currentResult.yong, s = currentResult.strength;
+    const p = c.pillars;
+    const txt = [
+      `Lá số Bát Tự — ${c.solar}`,
+      `Tứ trụ: ${p.year.gan}${p.year.zhi} ${p.month.gan}${p.month.zhi} ${p.day.gan}${p.day.zhi} ${p.time.gan}${p.time.zhi}`,
+      `Nhật chủ: ${c.dayMaster.gan} (${WX_VI[c.dayMaster.wx]})`,
+      `Thân: ${s.level} (${s.strong ? 'vượng' : 'nhược'}, ${s.deLenh ? 'đắc lệnh' : 'thất lệnh'})`,
+      `Cách cục: ${currentResult.pattern?.vi || '?'}`,
+      `Dụng thần: ${WX_VI[y.primary] || y.primary} · Hỷ: ${WX_VI[y.xi] || y.xi} · Kỵ: ${WX_VI[y.ji] || y.ji}`,
+      `Mệnh cách: ${currentResult.synthesis?.gradeVi || '?'} (${currentResult.synthesis?.score || '?'}/100)`,
+    ].join('\n');
+    navigator.clipboard.writeText(txt).then(() => {
+      const btn = $('copy-summary-btn'); if (btn) { const t = btn.textContent; btn.textContent = '✓ Đã sao chép!'; setTimeout(() => { btn.textContent = t; }, 2000); }
+    }).catch(() => {});
+  } catch (_) {}
+});
 
 // ---------------------------------------------------------------- BẢN MỆNH KINH ĐIỂN
 function renderClassic(R) {
   const dm = R.chart.dayMaster;
   const dt = DITIANSUI[dm.gan];
   $('classic').innerHTML = `
-    <div class="classic-dm">${dm.gan} <span class="zh">${dm.gan}</span> ${dm.vi} · <span class="${wxClass(dm.wx)}">${WX_VI[dm.wx]}</span></div>
+    <div class="classic-dm">${esc(dm.gan)} <span class="zh">${esc(dm.gan)}</span> ${esc(dm.vi)} · <span class="${wxClass(dm.wx)}">${esc(WX_VI[dm.wx])}</span></div>
     <div class="verse-box">
-      <div class="verse-zh">${dt.verse}</div>
-      <div class="verse-vi">${dt.vi}</div>
+      <div class="verse-zh">${esc(dt.verse)}</div>
+      <div class="verse-vi">${esc(dt.vi)}</div>
     </div>
-    <p class="classic-nature">${dt.nature}</p>
-    <p class="classic-need"><b>Nhu cầu khai vận:</b> ${dt.need}</p>
-    <div class="tiaohou-note"><b>調候 窮通寶鑑 (${dm.gan} × ${R.chart.monthZhi}):</b> ${R.yong.tiaohou.note || '(không)'}</div>`;
+    <p class="classic-nature">${esc(dt.nature)}</p>
+    <p class="classic-need"><b>Nhu cầu khai vận:</b> ${esc(dt.need)}</p>
+    <div class="tiaohou-note"><b>調候 窮通寶鑑 (${esc(dm.gan)} × ${esc(R.chart.monthZhi)}):</b> ${esc(R.yong.tiaohou.note || '(không)')}</div>`;
 }
 
 // ---------------------------------------------------------------- TỬ VI ĐẨU SỐ (khung mệnh bàn)
@@ -301,12 +354,12 @@ function renderZiwei() {
     </div>`).join('');
   // [loop 204] 大限: trước đây slice(0,6) → chỉ 5-64t (che 大限 hiện tại của người >65t).
   //   Nay filter to≤95: đủ cả đời thực tế (5-94t, ~9 大限), bỏ 95-124t vô nghĩa.
-  const dx = z.daXian.filter((d) => d.to <= 95).map((d) => `<div class="zw-dx"><b>${d.from}-${d.to}t</b> ${d.palace} <span class="zh">${d.ganZhi}</span></div>`).join('');
+  const dx = z.daXian.filter((d) => d.to <= 95).map((d) => `<div class="zw-dx"><b>${d.from}-${d.to}t</b> ${esc(d.palace)} <span class="zh">${esc(d.ganZhi)}</span></div>`).join('');
   const sihuaHtml = Object.entries(z.sihua || {}).map(([k, v]) =>
-    `<span class="zw-sh ${v.tone}"><b>${k}</b> ${v.star}${v.palace ? '@' + v.palace : ''}</span>`).join('');
+    `<span class="zw-sh ${v.tone}"><b>${esc(k)}</b> ${esc(v.star)}${v.palace ? '@' + esc(v.palace) : ''}</span>`).join('');
   $('ziwei').innerHTML = `
-    <div class="zw-head">Mệnh cung <span class="zh big">${z.mingGong}</span> · Thân cung ${z.shenGong} · <span class="ln-rate rate-mid">${z.juVi}</span>
-      <span class="hint-inline">(ÂL ${z.birth.lunarMonth}月${z.birth.lunarDay}日 · 时 ${z.birth.timeZhi} · 紫微@${z.ziweiBranch||'?'} · 天府@${z.tianfuBranch||'?'})</span></div>
+    <div class="zw-head">Mệnh cung <span class="zh big">${esc(z.mingGong)}</span> · Thân cung ${esc(z.shenGong)} · <span class="ln-rate rate-mid">${esc(z.juVi)}</span>
+      <span class="hint-inline">(ÂL ${esc(String(z.birth.lunarMonth))}月${esc(String(z.birth.lunarDay))}日 · 时 ${esc(z.birth.timeZhi)} · 紫微@${esc(z.ziweiBranch||'?')} · 天府@${esc(z.tianfuBranch||'?')})</span></div>
     <div class="zw-grid">${pal}</div>
     <h4 class="syn-h4">四化 生年 (theo năm can ${z.birth.yearGan}) —禄/权/科/忌</h4>
     <div class="zw-sihua">${sihuaHtml}</div>
@@ -344,10 +397,10 @@ function renderZiwei() {
     <div class="zw-sihua">${tags}</div>
     <p class="hint" style="font-size:11px;margin-top:3px">${esc(dx.summary)}</p>`;
     })()}
-    <h4 class="syn-h4">博士十二神 (niên hệ, 禄存@${z.boshi?.luCunZhi} ${z.boshi?.direction})</h4>
-    <div class="zw-dxrow" style="grid-template-columns:repeat(6,1fr)">${(z.boshi?.stars||[]).map((s) => `<div class="zw-dx"><span class="zh">${s.star}</span> <span class="ln-rate ${s.tone==='cat'?'rate-cat':'rate-hung'}" style="font-size:10px">${s.atZhi}</span></div>`).join('')}</div>
+    <h4 class="syn-h4">博士十二神 (niên hệ, 禄存@${esc(z.boshi?.luCunZhi)} ${esc(z.boshi?.direction)})</h4>
+    <div class="zw-dxrow" style="grid-template-columns:repeat(6,1fr)">${(z.boshi?.stars||[]).map((s) => `<div class="zw-dx"><span class="zh">${esc(s.star)}</span> <span class="ln-rate ${s.tone==='cat'?'rate-cat':'rate-hung'}" style="font-size:10px">${esc(s.atZhi)}</span></div>`).join('')}</div>
     <h4 class="syn-h4">辅星 (左辅右弼/文昌文曲/天魁天钺)</h4>
-    <div class="zw-dxrow" style="grid-template-columns:repeat(6,1fr)">${(z.fuxing?.stars||[]).map((s) => `<div class="zw-dx" title="${s.desc}"><span class="zh">${s.star}</span> <span class="ln-rate rate-cat" style="font-size:10px">${s.atZhi}</span></div>`).join('')}</div>
+    <div class="zw-dxrow" style="grid-template-columns:repeat(6,1fr)">${(z.fuxing?.stars||[]).map((s) => `<div class="zw-dx" title="${esc(s.desc)}"><span class="zh">${esc(s.star)}</span> <span class="ln-rate rate-cat" style="font-size:10px">${esc(s.atZhi)}</span></div>`).join('')}</div>
     <h4 class="syn-h4">大限 (đại hạn, 10 năm/cung, ${z.ju}t起运)</h4>
     <div class="zw-dxrow">${dx}</div>
     <p class="hint">${z.note}</p>`;
@@ -454,24 +507,39 @@ function renderWuXing(wx, yong) {
         <div class="wx-track"><div class="wx-fill" style="width:${width}%;background:${WX_COLOR[w]}"></div></div>
         <div class="wx-pct">${pct}%</div>
       </div>`;
-  }).join('');
+  }).join('') + (() => {
+    // [loop 383] chi tiết nguồn lực ngũ hành — từng trụ/tàng can đóng góp bao nhiêu cho mỗi hành
+    const det = wx.detail || [];
+    if (!det.length) return '';
+    const rows = ['木','火','土','金','水'].map((w) => {
+      const sources = det.filter((d) => d.wx === w);
+      if (!sources.length) return '';
+      const total = sources.reduce((a, d) => a + d.pts, 0);
+      return `<div class="wx-row"><div class="wx-name"><span class="dot" style="background:${WX_COLOR[w]}"></span>${w} ${WX_VI[w]}</div> <b>${total.toFixed(1)}</b> <span class="hint">${sources.map((s) => esc(s.src) + ' ' + esc(s.gan) + '=' + s.pts).join(' · ')}</span></div>`;
+    }).join('');
+    return `<details class="syn-factors" style="margin-top:8px"><summary>Chi tiết nguồn lực (${det.length} nguồn)</summary>${rows}</details>`;
+  })();
 }
 
 // ---------------------------------------------------------------- HỘI – HỢP – XUNG
 function renderInteractions(R) {
   const it = R.interactions;
   const chip = (label, items, cls) => items.length
-    ? `<div class="ix-group ${cls}"><span class="ix-label">${label}</span> ${items.map((x) => `<span class="ix-chip">${x}</span>`).join('')}</div>` : '';
+    ? `<div class="ix-group ${cls}"><span class="ix-label">${esc(label)}</span> ${items.map((x) => `<span class="ix-chip">${esc(x)}</span>`).join('')}</div>` : '';
   const ganHe = it.ganHe.map((g) => `${g.a}${g.b}→${g.hua}`);
+  const ganChong = (it.ganChong || []).map((g) => `${g.a}↔${g.b}`);
   const zhiHe = it.zhiHe.map((g) => `${g.a}${g.b}→${g.hua}`);
   const san = [...it.sanHui.map((s) => `會 ${s.branches.join('')}→${s.wx}`), ...it.sanHe.map((s) => `合 ${s.branches.join('')}→${s.wx}`)];
+  // [loop 332] 半合 (bán cục) — 2/3 chi tam hợp, chờ chi «missing» đến trong vận thì thành cục đầy đủ
+  const ban = (it.banHe || []).map((s) => `${(s.present || []).join('')}… thiếu ${s.missing}→${s.wx} (${s.name})`);
   const chong = it.chong.map((c) => `${c.a}↔${c.b}`);
   const xing = it.xing.map((c) => `${c.a}${c.a === c.b ? '' : '–' + c.b} (${c.vi})`);
   const hai = it.hai.map((c) => `${c.a}–${c.b}`);
-  const any = san.length || ganHe.length || zhiHe.length || chong.length || xing.length || hai.length;
+  const any = san.length || ban.length || ganHe.length || ganChong.length || zhiHe.length || chong.length || xing.length || hai.length;
   $('interactions').innerHTML =
     chip('Tam hội/hợp', san, 'cat') +
-    chip('Can hợp', ganHe, 'cat') + chip('Chi lục hợp', zhiHe, 'cat') +
+    chip('Bán hợp (chờ vận)', ban, 'cat') +
+    chip('Can hợp', ganHe, 'cat') + chip('Can xung (Thất Sát)', ganChong, 'warn') + chip('Chi lục hợp', zhiHe, 'cat') +
     chip('Xung', chong, 'warn') + chip('Hình', xing, 'warn') + chip('Hại', hai, 'warn') +
     (any ? '' : `<p class="hint">Tứ trụ tương đối yên tĩnh, không có xung hợp rõ.</p>`) +
     `<p class="ix-meaning">${meaningFor(it)}</p>`;
@@ -479,7 +547,9 @@ function renderInteractions(R) {
 function meaningFor(it) {
   const m = [];
   if (it.sanHe.length || it.sanHui.length) m.push(INTERACTION_MEANING.sanHe);
+  else if ((it.banHe || []).length) m.push(INTERACTION_MEANING.banHe);
   if (it.ganHe.length) m.push(INTERACTION_MEANING.ganHe);
+  if ((it.ganChong || []).length) m.push(INTERACTION_MEANING.ganChong);
   if (it.chong.length) m.push(INTERACTION_MEANING.chong);
   if (it.xing.length) m.push(INTERACTION_MEANING.xing);
   return m.slice(0, 2).join(' ');
@@ -491,11 +561,13 @@ function renderShensha(R) {
   if (!keys.length) { $('shensha').innerHTML = '<p class="hint">Không có thần sát nổi bật.</p>'; return; }
   $('shensha').innerHTML = keys.map((k) => {
     const info = SHENSHA_INFO[k];
+    if (!info) return ''; // [loop 292] guard: sao chưa có trong SHENSHA_INFO → bỏ qua, không crash
     const at = R.shensha[k].at;
+    const subName = R.shensha[k].name; // [loop 292] tam kỳ: 天/地/人三奇 phân biệt
     return `<div class="ss ${info.tone}">
-      <div class="ss-zh">${info.zh}</div>
-      <div class="ss-vi">${info.vi} <span class="ss-at">@ ${at.join('/')}</span></div>
-      <div class="ss-desc">${info.desc}</div>
+      <div class="ss-zh">${esc(info.zh)}</div>
+      <div class="ss-vi">${esc(info.vi)}${subName ? ' <span class="hint">(' + esc(subName) + ')</span>' : ''} <span class="ss-at">@ ${esc(at.join('/'))}</span></div>
+      <div class="ss-desc">${esc(info.desc)}</div>
     </div>`;
   }).join('');
 }
@@ -506,9 +578,9 @@ function renderShenshaExtra(R) {
   if (!ex || !ex.length) return;
   const html = `<h4 class="syn-h4" style="grid-column:1/-1;margin-top:6px">神煞 niên can/chi (红鸾/禄存/擎羊/孤辰寡宿…)</h4>` +
     ex.map((s) => `<div class="ss ${s.tone}">
-      <div class="ss-zh">${s.zh}</div>
-      <div class="ss-vi">${s.vi} <span class="ss-at">${s.at}</span></div>
-      <div class="ss-desc">${s.desc}</div>
+      <div class="ss-zh">${esc(s.zh)}</div>
+      <div class="ss-vi">${esc(s.vi)} <span class="ss-at">${esc(s.at)}</span></div>
+      <div class="ss-desc">${esc(s.desc)}</div>
     </div>`).join('');
   $('shensha').insertAdjacentHTML('beforeend', html);
 }
@@ -558,27 +630,63 @@ function rateClass(rating) {
     'Hung': 'rate-hung', 'Đại hung': 'rate-hung',
   }[rating] || 'rate-mid';
 }
+function renderDayunInteract(R) {
+  const el = $('dayun-interact');
+  if (!el) return;
+  try {
+    // [loop 330] checkDayunInteractions — module từng chỉ feed AI: cảnh báo 大运 冲/害/刑/伏吟 Nhật Trụ
+    const list = checkDayunInteractions(R.chart, R.dayun);
+    if (!list.length) { el.innerHTML = '<p class="hint">✓ Không có đại vận nào phạm 冲/害/刑/伏吟 với Nhật Trụ — các thập kỷ đều tương đối thuận bản thân.</p>'; return; }
+    const sevClass = (s) => s >= 3 ? 'hung' : s >= 2 ? 'mid' : 'mid';
+    const rows = list.map((r) => `<div class="ss ${sevClass(r.severity)}">
+      <div class="ss-vi"><b>${esc(r.ganZhi)}</b> (${esc(String(r.startAge))}–${esc(String(r.startAge + 9))}t) <span class="ln-rate ${r.severity >= 3 ? 'rate-bad' : r.severity >= 2 ? 'rate-mid' : 'rate-mid'}">sev ${esc(String(r.severity))}</span></div>
+      <div class="ss-desc">${(r.notes || []).map((n) => esc(n)).join(' ')}</div>
+    </div>`).join('');
+    el.innerHTML = `<p class="hint">Các thập niên đại vận CÓ tương tác đặc biệt với Nhật Trụ (本命). sev ≥3 = biến động lớn (天克地冲); sev 1–2 = cẩn thận (xung/hại/hình/伏吟).</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:6px;margin-top:6px">${rows}</div>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được tương tác đại vận.</p>'; }
+}
+
 function renderDaYun(dayun) {
   if (!dayun.length) { $('dayun').innerHTML = '<p class="hint">Không tính được Đại Vận.</p>'; return; }
   // [loop 217] highlight thập kỷ TỐT NHẤT / XẤU NHẤT / HIỆN TẠI
   const scores = dayun.map((d) => d.score);
   const maxS = Math.max(...scores), minS = Math.min(...scores);
   const curAge = currentResult ? (new Date().getFullYear() - currentResult.chart.input.year) : -1;
-  $('dayun').innerHTML = dayun.map((d) => {
+  const dayGan = currentResult ? currentResult.chart.dayGan : null;
+  // [loop 297] dayun-god: chủ đề thập niên (十神 + theme + detail cổ pháp) — module từng hoàn toàn chưa dùng
+  const dgMap = {};
+  try { for (const it of dayunGodMeaning(currentResult.chart, dayun).items) dgMap[it.ganZhi + it.startAge] = it; } catch (e) {}
+  // [loop 372] quý nhân chi (từ shensha) — đánh dấu thập niên đại vận có quý nhân tọa
+  const _dySs = currentResult && currentResult.shensha ? currentResult.shensha : null;
+  const dyNoble = new Set();
+  if (_dySs) { ['tianYi','wenChang','jiangXing'].forEach((k) => { if (_dySs[k] && _dySs[k].at) _dySs[k].at.forEach((z) => dyNoble.add(z)); }); }
+  let curDetail = '';
+  const cells = dayun.map((d) => {
     const isNow = curAge >= d.startAge && curAge < d.startAge + 10;
     const isBest = d.score === maxS && maxS >= 2;
     const isWorst = d.score === minS && minS <= -2;
     const mark = isNow ? ' ★' : '';
     const crown = isBest ? '<span class="ln-best" title="Thập kỷ TỐT NHẤT">👑</span>' : '';
     const warn = isWorst ? '<span class="ln-worst" title="Thập kỷ KỴ NHẤT — thủ">⚠</span>' : '';
+    const dg = dgMap[d.ganZhi + d.startAge];
+    const godVi = dg ? dg.godVi : (dayGan && d.gan ? (TEN_GOD_VI[tenGod(dayGan, d.gan)] || '') : '');
+    const themeTitle = dg ? esc(dg.detail || '') : '';
+    const themeSub = dg ? `<div class="dy-theme" title="${themeTitle}">${esc(dg.theme || '')}</div>` : '';
+    if (isNow && dg && dg.detail) curDetail = dg;
     return `
     <div class="dy ${isNow ? 'dy-now' : ''} ${isBest ? 'ln-best-row' : ''} ${isWorst ? 'ln-worst-row' : ''}">
-      <div class="dy-gz"><span class="${wxClass(d.ganWx)}">${d.gan}</span><span class="${wxClass(d.zhiWx)}">${d.zhi}</span></div>
-      <div class="dy-vi">${hanviet(d.ganZhi)}${crown}${warn}${mark}</div>
-      <div class="dy-age">${d.startAge}–${d.startAge + 9}t</div>
-      <div class="dy-rate ${rateClass(d.rating)}">${d.rating}</div>
+      <div class="dy-gz"><span class="${wxClass(d.ganWx)}">${esc(d.gan)}</span><span class="${wxClass(d.zhiWx)}">${esc(d.zhi)}</span></div>
+      <div class="dy-vi">${esc(hanviet(d.ganZhi))}${crown}${warn}${mark}${dyNoble.has(d.zhi) ? '<span class="ln-noble" title="Đại vận chi tọa quý nhân (天乙/文昌/将星) — CẢ thập niên được quý nhân phò">🌟</span>' : ''}</div>
+      ${(() => { const n = ganZhiNayin(d.ganZhi); const ni = n && nayinInfo(n); return ni ? `<div class="dy-nayin" title="${esc(ni.meaning || '')}">${esc(n)}(${esc(WX_VI[ni.wx] || ni.wx)})</div>` : ''; })()}
+      <div class="dy-god">${godVi ? '<span class="dy-god-tag" title="Thiên can — chủ 5 năm đầu">干 ' + esc(godVi) + '</span>' : ''}${d.zhiGod && TEN_GOD_VI[d.zhiGod] ? '<span class="dy-god-tag dy-god-chi" title="Địa chi本气 — chủ基调 CẢ thập niên («大运重地支»)">' + esc(TEN_GOD_VI[d.zhiGod]) + '</span>' : ''}</div>
+      ${themeSub}
+      <div class="dy-age">${esc(String(d.startAge))}–${esc(String(d.startAge + 9))}t</div>
+      <div class="dy-rate ${rateClass(d.rating)}">${esc(d.rating)}</div>
     </div>`;
   }).join('');
+  $('dayun').innerHTML = cells +
+    (curDetail ? `<div class="dy-now-detail tiaohou-note" style="margin-top:10px"><b>★ Thập niên hiện tại — ${esc(curDetail.godVi)} vận (${esc(curDetail.ganZhi)}, ${esc(String(curDetail.startAge))}–${esc(String(curDetail.startAge + 9))}t):</b> ${esc(curDetail.detail)}</div>` : '');
 }
 function renderLiuNian(liunian) {
   if (!liunian.length) { $('liunian').innerHTML = '<p class="hint">Không tính được Lưu Niên.</p>'; return; }
@@ -590,19 +698,40 @@ function renderLiuNian(liunian) {
   // [loop 170] 进气退气 phase — lực đại vận realised năm đó (xây đỉnh / đỉnh / phai).
   //   Chỉ badge 进气/退气 (nămfactor <1, điểm bị co về neut); 旺气 (đỉnh) là mặc định.
   const dayun = (currentResult && currentResult.dayun) || [];
+  const dayGan = currentResult ? currentResult.chart.dayGan : null;
+  // [loop 354] 本命年/冲太岁 — chi năm = chi tuổi (值太岁) hoặc xung chi tuổi
+  const birthZhi = currentResult ? currentResult.chart.pillars.year.zhi : null;
+  const CHONG = { 子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳' };
+  // [loop 379] 刑/破/害 — hoàn thiện 5 loại thái tuế trên lưới lưu niên
+  const XING = { 子:'卯',卯:'子',寅:'巳',巳:'申',申:'寅',丑:'戌',戌:'未',未:'丑',辰:'辰',午:'午',酉:'酉',亥:'亥' };
+  const PO = { 子:'酉',酉:'子',丑:'辰',辰:'丑',寅:'亥',亥:'寅',卯:'午',午:'卯',巳:'申',申:'巳',戌:'未',未:'戌' };
+  const HAI = { 子:'未',未:'子',丑:'午',午:'丑',寅:'巳',巳:'寅',卯:'辰',辰:'卯',申:'亥',亥:'申',酉:'戌',戌:'酉' };
+  // [loop 371] quý nhân chi (天乙/文昌/将星) — từ shensha đã tính, đánh dấu năm có quý nhân
+  const _ss = currentResult && currentResult.shensha ? currentResult.shensha : null;
+  const nobleChis = new Set();
+  if (_ss) { ['tianYi','wenChang','jiangXing'].forEach((k) => { if (_ss[k] && _ss[k].at) _ss[k].at.forEach((z) => nobleChis.add(z)); }); }
   $('liunian').innerHTML = liunian.map((l) => {
     const ph = computeDayunPhase(dayun, l.year);
     const phaseBadge = ph && ph.factor < 1
-      ? `<span class="ln-phase ${ph.phase === '进气' ? 'ph-in' : 'ph-out'}" title="${ph.vi}">${ph.phase === '进气' ? '进' : '退'}</span>`
+      ? `<span class="ln-phase ${ph.phase === '进气' ? 'ph-in' : 'ph-out'}" title="${esc(ph.vi)}">${ph.phase === '进气' ? '进' : '退'}</span>`
       : '';
     const bestMark = l.score === maxScore && maxScore > 50 ? '<span class="ln-best" title="Năm TỐT NHẤT thập kỷ — nên tiến thủ">👑</span>' : '';
     const worstMark = l.score === minScore && minScore < 45 ? '<span class="ln-worst" title="Năm KỴ NHẤT — thủ, tránh quyết lớn">⚠</span>' : '';
+    const tsMark = birthZhi && l.zhi === birthZhi ? '<span class="ln-ts" title="本命年 (值太岁) — chi năm = chi tuổi, năm biến động lớn, cần hóa giải">岁</span>'
+      : birthZhi && CHONG[birthZhi] === l.zhi ? '<span class="ln-ts ln-ts-chong" title="冲太岁 — chi năm xung chi tuổi, đại biến động">冲</span>'
+      : birthZhi && XING[birthZhi] === l.zhi ? '<span class="ln-ts ln-ts-chong" title="刑太岁 — quanphi/thị phi">刑</span>'
+      : birthZhi && PO[birthZhi] === l.zhi ? '<span class="ln-ts" title="破太岁 — phá hoại/hao">破</span>'
+      : birthZhi && HAI[birthZhi] === l.zhi ? '<span class="ln-ts" title="害太岁 — tiểu nhân ám toán">害</span>' : '';
+    const nobleMark = nobleChis.has(l.zhi) ? '<span class="ln-noble" title="Năm có quý nhân (天乙/文昌/将星) đến — quý nhân phò, thuận sự nghiệp/học/vận">🌟</span>' : '';
+    // [loop 295] 流年天干十神 — sao nào ĐẾN năm đó (Chính Quan năm/Thất Sát năm…)
+    const godVi = dayGan && l.gan ? (TEN_GOD_VI[tenGod(dayGan, l.gan)] || '') : '';
     return `
     <div class="ln ${l.isNow ? 'ln-now' : ''} ${l.score === maxScore && maxScore > 50 ? 'ln-best-row' : ''} ${l.score === minScore && minScore < 45 ? 'ln-worst-row' : ''}">
-      <div class="ln-year">${l.year}${l.isNow ? ' ★' : ''}${bestMark}${worstMark}${phaseBadge}</div>
-      <div class="ln-gz"><span class="${wxClass(l.ganWx)}">${l.gan}</span><span class="${wxClass(l.zhiWx)}">${l.zhi}</span></div>
-      <div class="ln-age">${l.age}t</div>
-      <div class="ln-rate ${rateClass(l.rating)}">${l.rating}</div>
+      <div class="ln-year">${esc(String(l.year))}${l.isNow ? ' ★' : ''}${bestMark}${worstMark}${phaseBadge}${tsMark}${nobleMark}</div>
+      <div class="ln-gz"><span class="${wxClass(l.ganWx)}">${esc(l.gan)}</span><span class="${wxClass(l.zhiWx)}">${esc(l.zhi)}</span></div>
+      ${godVi ? '<div class="ln-god"><span class="ln-god-tag">' + esc(godVi) + '</span></div>' : ''}
+      <div class="ln-age">${esc(String(l.age))}t</div>
+      <div class="ln-rate ${rateClass(l.rating)}">${esc(l.rating)}</div>
     </div>`;
   }).join('');
 }
@@ -613,18 +742,18 @@ function renderDecade(R) {
   try {
     const df = decadeForecast(R, new Date().getFullYear(), 10);
     el.innerHTML = `
-      <p class="hint">10 năm tới一览: vận (6 phái) + 💰Tài + 🎯Quan + 💞Duyên. TỐT <b>${df.best.year} (${df.best.rating}, ${df.best.score}/100${df.best.flags.length ? ', ' + df.best.flags.join(' ') : ''})</b> · XẤU <b>${df.worst.year} (${df.worst.rating})</b></p>
+      <p class="hint">10 năm tới一览: vận (6 phái) + 💰Tài + 🎯Quan + 💞Duyên. TỐT <b>${esc(String(df.best.year))} (${esc(df.best.rating)}, ${esc(String(df.best.score))}/100${df.best.flags.length ? ', ' + esc(df.best.flags.join(' ')) : ''})</b> · XẤU <b>${esc(String(df.worst.year))} (${esc(df.worst.rating)})</b></p>
       <div class="ln-decade" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${df.years.map((y) => {
         const curY = new Date().getFullYear();
         const isNow = y.year === curY;
         const isBest = y.year === df.best.year;
         const rowCls = isNow ? ' ln-now' : isBest ? ' ln-best-row' : '';
         return `
-        <div class="ln${rowCls}" title="${y.ganZhi} ${y.flags.join(' ')}">
-          <div class="ln-year">${y.year}${isNow ? ' ★' : ''}</div>
-          <div class="ln-gz">${y.ganZhi}</div>
-          <div class="ln-rate ${rateClass(y.rating)}">${y.rating} <small>${y.score}</small></div>
-          <div class="ln-flags">${y.flags.join(' ') || '·'}</div>
+        <div class="ln${rowCls}" title="${esc(y.ganZhi)} ${esc(y.flags.join(' '))}">
+          <div class="ln-year">${esc(String(y.year))}${isNow ? ' ★' : ''}</div>
+          <div class="ln-gz">${esc(y.ganZhi)}</div>
+          <div class="ln-rate ${rateClass(y.rating)}">${esc(y.rating)} <small>${esc(String(y.score))}</small></div>
+          <div class="ln-flags">${esc(y.flags.join(' ') || '·')}</div>
         </div>`;
       }).join('')}</div>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 10 năm.</p>'; }
@@ -636,11 +765,11 @@ function renderLifeReading(R) {
   try {
     const lr = lifeReading(R);
     el.innerHTML = `
-      <p style="font-size:14px;font-weight:600;color:var(--gold,#d4af37);margin-bottom:8px">${lr.oneSentence}</p>
+      <p style="font-size:14px;font-weight:600;color:var(--gold,#d4af37);margin-bottom:8px">${esc(lr.oneSentence)}</p>
       ${lr.sections.map((s) => `
         <details style="margin-bottom:4px">
-          <summary style="cursor:pointer;font-weight:600;font-size:13px;color:var(--gold,#d4af37)">${s.title}</summary>
-          <div class="hint" style="margin:4px 0 4px 16px">${s.content.map((c) => `<p>${c}</p>`).join('')}</div>
+          <summary style="cursor:pointer;font-weight:600;font-size:13px;color:var(--gold,#d4af37)">${esc(s.title)}</summary>
+          <div class="hint" style="margin:4px 0 4px 16px">${s.content.map((c) => `<p>${esc(c)}</p>`).join('')}</div>
         </details>`).join('')}`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được tổng quan mệnh.</p>'; }
 }
@@ -657,7 +786,7 @@ function renderDailyBriefing(R) {
       const r = h.score >= 60 ? 'rate-cat' : h.score >= 45 ? 'rate-mid' : 'rate-hung';
       return `<span class="ln-rate ${r}" style="margin-right:4px">${h.vi} <b>${h.score}</b></span>`;
     }).join('');
-    const avoidHtml = b.avoidHours.map((h) => `<span class="ln-rate rate-hung" style="margin-right:4px">${h.vi}</span>`).join('');
+    const avoidHtml = b.avoidHours.map((h) => `<span class="ln-rate rate-hung" style="margin-right:4px">${esc(h.vi)}</span>`).join('');
     const tabooAvoid = b.directionTaboo.avoid.length
       ? b.directionTaboo.avoid.map((d) => `<span class="ln-rate rate-hung" style="margin-right:4px">${d}</span>`).join('')
       : '<span class="hint">(không có)</span>';
@@ -681,7 +810,7 @@ function renderDailyBriefing(R) {
         <div><b>📊 Dụng Thần:</b> ${b.yongAction.boost ? `<span class="ln-rate rate-cat">tăng ${b.yongAction.boost}</span>` : ''}${b.yongAction.reduce ? ` <span class="ln-rate rate-hung">giảm ${b.yongAction.reduce}</span>` : ''}</div>
       </div>
       ${b.yearEvent.god !== '?' ? `<p class="hint" style="margin:4px 0"><b>📆 Lưu niên ${new Date().getFullYear()}:</b> sao ${b.yearEvent.god}${b.yearEvent.event ? ' → ' + b.yearEvent.event : ''}${b.yearEvent.who ? ' (' + b.yearEvent.who + ')' : ''}</p>` : ''}
-      <div style="margin-top:6px">${b.tips.map((t) => `<p class="hint" style="margin:2px 0">▸ ${t}</p>`).join('')}</div>`;
+      <div style="margin-top:6px">${b.tips.map((t) => `<p class="hint" style="margin:2px 0">▸ ${esc(t)}</p>`).join('')}</div>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được每日简报.</p>'; }
 }
 
@@ -695,15 +824,15 @@ function renderChenggu(R) {
     const tone = cg.summary.tone === 'cat' ? 'rate-cat' : cg.summary.tone === 'warn' ? 'rate-hung' : 'rate-mid';
     el.innerHTML = `
       <div class="cg-head">
-        <div class="cg-total"><span class="zh big">${cg.totalStr}</span></div>
-        <div class="cg-tier"><span class="ln-rate ${tone}"><b>${cg.summary.tier}</b></span></div>
+        <div class="cg-total"><span class="zh big">${esc(cg.totalStr)}</span></div>
+        <div class="cg-tier"><span class="ln-rate ${tone}"><b>${esc(cg.summary.tier)}</b></span></div>
       </div>
-      <p class="cg-breakdown hint">Năm ${cg.lunar.yearGanZhi} (${w.year}两) + tháng ÂL ${cg.lunar.month} (${w.month}两) + ngày ${cg.lunar.day} (${w.day}两) + giờ ${cg.lunar.timeZhi} (${w.hour}两) = <b>${cg.totalStr}</b></p>
+      <p class="cg-breakdown hint">Năm ${esc(cg.lunar.yearGanZhi)} (${esc(String(w.year))}两) + tháng ÂL ${esc(String(cg.lunar.month))} (${esc(String(w.month))}两) + ngày ${esc(String(cg.lunar.day))} (${esc(String(w.day))}两) + giờ ${esc(cg.lunar.timeZhi)} (${esc(String(w.hour))}两) = <b>${esc(cg.totalStr)}</b></p>
       <div class="verse-box">
-        <div class="verse-zh">${cg.verse}</div>
+        <div class="verse-zh">${esc(cg.verse)}</div>
       </div>
-      <p class="cg-interp">${cg.interpretation}</p>
-      <p class="hint">${cg.summary.note}</p>`;
+      <p class="cg-interp">${esc(cg.interpretation)}</p>
+      <p class="hint">${esc(cg.summary.note)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 称骨 (trọng lượng xương).</p>'; }
 }
 
@@ -801,10 +930,10 @@ function renderDirectionTaboo() {
   try {
     const ov = annualTabooOverview(new Date().getFullYear());
     const tone = (r) => r.maxSeverity >= 4 ? 'hung' : r.taboos.length ? 'mid' : 'cat';
-    el.innerHTML = `<p class="hint">Năm ${ov.year}: hướng SẠCH (không phạm sát lớn) <b>${ov.clean.join(', ') || '(không)'}</b>; hướng KỴ ${ov.worst.length ? ov.worst.join(', ') : '(không)'}.</p>` +
+    el.innerHTML = `<p class="hint">Năm ${esc(ov.year)}: hướng SẠCH (không phạm sát lớn) <b>${esc(ov.clean.join(', ')) || '(không)'}</b>; hướng KỴ ${ov.worst.length ? esc(ov.worst.join(', ')) : '(không)'}.</p>` +
       `<div class="dir-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${ov.results.map((r) => `
-        <div class="ln ${tone(r)}" title="${r.taboos.map((t) => t.type).join(', ') || 'sạch'}">
-          <div class="ln-year">${r.dir}</div>
+        <div class="ln ${tone(r)}" title="${esc(r.taboos.map((t) => t.type).join(', ') || 'sạch')}">
+          <div class="ln-year">${esc(r.dir)}</div>
           <div class="ln-rate ${tone(r)}">${r.maxSeverity >= 4 ? 'KỴ' : r.taboos.length ? '⚠' : 'Thuận'}</div>
         </div>`).join('')}</div>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được sát phương.</p>'; }
@@ -865,12 +994,12 @@ function renderMarriageTiming(R) {
   try {
     const mt = scanMarriageTiming(R, new Date().getFullYear(), 12);
     const tone = (y) => y.score >= 4 ? 'cat' : y.score >= 2 ? 'mid' : '';
-    el.innerHTML = (mt.topMarriage.length ? `<p class="hint">💍 Năm <b>HÔN NHÂN</b>: ${mt.topMarriage.map((y) => y.year + '(' + y.ganZhi + ')').join(', ')}</p>` : '<p class="hint">12 năm tới chưa có năm hôn nhân mạnh (≥4đ).</p>') +
+    el.innerHTML = (mt.topMarriage.length ? `<p class="hint">💍 Năm <b>HÔN NHÂN</b>: ${mt.topMarriage.map((y) => esc(y.year) + '(' + esc(y.ganZhi) + ')').join(', ')}</p>` : '<p class="hint">12 năm tới chưa có năm hôn nhân mạnh (≥4đ).</p>') +
       (mt.years.length ? `<div class="ln-decade" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${mt.years.map((y) => `
-        <div class="ln ${tone(y)}" title="${y.signals.join('; ')}">
-          <div class="ln-year">${y.year}</div>
-          <div class="ln-gz">${y.ganZhi}</div>
-          <div class="ln-rate ${tone(y)}">${y.type}</div>
+        <div class="ln ${tone(y)}" title="${esc(y.signals.join('; '))}">
+          <div class="ln-year">${esc(y.year)}</div>
+          <div class="ln-gz">${esc(y.ganZhi)}</div>
+          <div class="ln-rate ${tone(y)}">${esc(y.type)}</div>
           <div class="ln-flags">${'★'.repeat(Math.min(y.score, 5))}</div>
         </div>`).join('')}</div>` : '<p class="hint">Không có năm kích hoạt婚恋 nổi bật.</p>');
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được hôn/luyên ứng kỳ.</p>'; }
@@ -881,12 +1010,166 @@ function renderIdealHouse(R) {
   if (!el) return;
   try {
     const h = idealHouse(R, 20);
-    el.innerHTML = `<p class="hint">${h.grpVi} ${h.gua}. Hướng cát tốt nhất: <b>${h.bestFacing ? h.bestFacing.dir + ' (' + h.bestFacing.star.split(' (')[0] + ')' : '?'}</b>.</p>` +
+    el.innerHTML = `<p class="hint">${esc(h.grpVi)} ${esc(h.gua)}. Hướng cát tốt nhất: <b>${h.bestFacing ? esc(h.bestFacing.dir) + ' (' + esc(h.bestFacing.star.split(' (')[0]) + ')' : '?'}</b>.</p>` +
       `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">
         <div><b style="color:var(--cat,#2a7)">Tầng TỐT</b>: ${h.idealFloors.map((f) => 'T' + f.floor).join(', ')}</div>
         <div><b style="color:var(--hung,#c33)">Tầng TRÁNH</b>: ${h.avoidFloors.map((f) => 'T' + f.floor).join(', ')}</div>
       </div>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được lý tưởng nhà.</p>'; }
+}
+
+function renderWealthDeep(R) {
+  const el = $('wealth-deep');
+  if (!el) return;
+  try {
+    // [loop 298] analyzeWealthStar — module từng chỉ feed AI brief, giờ có card riêng
+    const w = analyzeWealthStar(R);
+    const tone = w.isYong ? 'cat' : w.isJi ? 'hung' : 'mid';
+    const holdBadge = w.bodyCanHold
+      ? '<span class="ln-rate rate-good">Thân nhậm Tài ✓</span>'
+      : '<span class="ln-rate rate-bad">Thân nhược — khó giữ ⚠</span>';
+    const yongBadge = w.isYong ? ' <span class="ln-rate rate-good">Tài = Dụng</span>'
+      : w.isJi ? ' <span class="ln-rate rate-bad">Tài = Kỵ</span>' : '';
+    const src = (w.hasFoodGen >= 1.5) ? `<span class="hint">Nguồn sinh (食伤): ${esc(String(w.hasFoodGen.toFixed(1)))} → tài có gốc sinh</span>`
+      : (w.hasFoodGen > 0 ? `<span class="hint">Nguồn sinh (食伤): ${esc(String(w.hasFoodGen.toFixed(1)))} — mỏng</span>` : '');
+    const rob = (w.hasRobber >= 1.5) ? ` <span class="hint" style="color:var(--cinnabar,#c33)">Cướp đoạt (比劫): ${esc(String(w.hasRobber.toFixed(1)))} → dễ hao</span>`
+      : (w.hasRobber > 0 ? ` <span class="hint">Cướp đoạt (比劫): ${esc(String(w.hasRobber.toFixed(1)))}</span>` : '');
+    el.innerHTML = `
+      <p><b>Sao Tài: ${esc(w.wealthStar)}</b> (hành ${esc(w.wealthWxVi)}, độ <b>${esc(w.strength)}</b> — ${esc(String(w.count.toFixed(1)))}) ${holdBadge}${yongBadge}</p>
+      ${R.shensha && R.shensha.luShen ? `<div class="tiaohou-note" style="border-color:var(--gold);background:rgba(212,175,55,0.06)"><b>💰 Lộc Thần (禄神) chiếu @${esc(R.shensha.luShen.at.join(','))}:</b> lương thực/thu nhập cơ bản ổn định, có «lộc» (lương, bổng), dễ có nguồn thu cố định.</div>` : ''}
+      <p class="hint">${esc(w.posMeaning || '')}</p>
+      <p>${src}${rob}</p>
+      ${(w.interacts && w.interacts.length) ? `<details class="syn-factors"><summary>Tương tác tài (${esc(String(w.interacts.length))})</summary>${w.interacts.map((x) => `<div class="yz-row">${esc(x)}</div>`).join('')}</details>` : ''}
+      ${(w.profile && w.profile.length) ? `<div style="margin:6px 0">${w.profile.map((x) => `<div class="yz-row">${esc(x)}</div>`).join('')}</div>` : ''}
+      ${w.timing.length ? `<p class="hint">⏰ Đại vận hành Tài: ${esc(w.timing.join(', '))}</p>` : ''}
+      <p class="tiaohou-note">${esc(w.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được tài tinh sâu.</p>'; }
+}
+
+function renderCareerDeep(R) {
+  const el = $('career-deep');
+  if (!el) return;
+  try {
+    // [loop 299] analyzeCareerStar — sao Quan + Ấn/Thực + nghề hợp + timing
+    const c = analyzeCareerStar(R);
+    const yongBadge = c.isYong ? ' <span class="ln-rate rate-good">Quan = Dụng</span>'
+      : c.isJi ? ' <span class="ln-rate rate-bad">Quan = Kỵ</span>' : '';
+    const bodyBadge = c.bodyStrong
+      ? ' <span class="ln-rate rate-good">Thân vượng nhậm Quan ✓</span>'
+      : ' <span class="ln-rate rate-bad">Thân nhược — Quan nặng ⚠</span>';
+    const seal = c.hasSeal
+      ? `<span class="hint">Ấn (${esc(String(c.sealCount.toFixed(1)))}) → «quan ấn tương sinh» — có bằng cấp/quyền lực nền</span>`
+      : `<span class="hint" style="color:var(--cinnabar,#c33)">Không Ấn → Quan vô «âm», thiếu chỗ dựa/bằng cấp</span>`;
+    const food = c.hasFood
+      ? ` <span class="hint">Có Thực Thương → «thực chế sát» — chế được Áp lực/Thất Sát</span>` : '';
+    const fav = c.favCareers
+      ? `<p class="hint">💼 Nghề hợp (theo Dụng/Hỷ ${esc(WX_VI[(R.yong && R.yong.primary) || ''] || '')}/${esc(WX_VI[(R.yong && R.yong.xi) || ''] || '')}): ${esc(c.favCareers)}</p>` : '';
+    el.innerHTML = `
+      <p><b>Sao Quan: ${esc(c.officerStar)}</b> (hành ${esc(c.officerWxVi)}, độ <b>${esc(c.strength)}</b> — ${esc(String(c.officerCount.toFixed(1)))})${yongBadge}${bodyBadge}</p>
+      ${c.patternCareer ? `<p class="hint">🎓 Nghề theo cách cục: ${esc(c.patternCareer)}</p>` : ''}
+      ${fav}
+      <p>${seal}${food}</p>
+      ${R.shensha && R.shensha.jiangXing ? `<div class="tiaohou-note" style="border-color:var(--gold);background:rgba(212,175,55,0.06)"><b>🎖️ Tướng Tinh (将星) chiếu @${esc(R.shensha.jiangXing.at.join(','))}:</b> có uy quyền, hợp lãnh đạo/chỉ huy, dễ nắm quyền.</div>` : ''}
+      ${R.shensha && R.shensha.yiMa ? `<div class="tiaohou-note" style="border-color:#caa14a;background:rgba(202,161,74,0.06)"><b>🐎 Dịch Mã (驿马) chiếu @${esc(R.shensha.yiMa.at.join(','))}:</b> sự nghiệp động (thương mại, logistics, ngoại thương, công việc cần di chuyển nhiều).</div>` : ''}
+      ${(c.profile && c.profile.length) ? `<div style="margin:6px 0">${c.profile.map((x) => `<div class="yz-row">${esc(x)}</div>`).join('')}</div>` : ''}
+      ${c.timing.length ? `<p class="hint">⏰ Đại vận hành Quan/Ấn: ${esc(c.timing.join(', '))}</p>` : ''}
+      <p class="tiaohou-note">${esc(c.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được sự nghiệp tinh sâu.</p>'; }
+}
+
+function renderSpouseDeep(R) {
+  const el = $('spouse-deep');
+  if (!el) return;
+  try {
+    // [loop 300] analyzeSpouseStar — sao phối ngẫu + cung (Nhật Chi) + đào hoa/biến động
+    const s = analyzeSpouseStar(R);
+    const yongBadge = s.isYong ? ' <span class="ln-rate rate-good">Phối ngẫu = Dụng</span>'
+      : s.isJi ? ' <span class="ln-rate rate-bad">Phối ngẫu = Kỵ</span>' : '';
+    const palaceBadge = s.palaceStable
+      ? ' <span class="ln-rate rate-good">Cung phối ngẫu ổn ✓</span>'
+      : ' <span class="ln-rate rate-bad">Cung phối ngẫu bất ổn ⚠</span>';
+    el.innerHTML = `
+      <p><b>Sao phối ngẫu: ${esc(s.spouseStar)}</b> (hành ${esc(s.spouseWxVi)}, độ <b>${esc(s.strength)}</b> — ${esc(String(s.count.toFixed(1)))})${yongBadge}</p>
+      <p class="hint">💒 Cung phối ngẫu = Nhật Chi <b>${esc(s.palaceZhiVi || '')}</b> (${esc(s.palaceGodVi || '')}) ${palaceBadge}</p>
+      <p class="hint">${esc(s.posMeaning || '')}</p>
+      ${(s.interactions && s.interactions.length) ? `<details class="syn-factors"><summary>Tương tác hôn nhân (${esc(String(s.interactions.length))})</summary>${s.interactions.map((x) => `<div class="yz-row">${esc(x)}</div>`).join('')}</details>` : ''}
+      ${(s.profile && s.profile.length) ? `<div style="margin:6px 0">${s.profile.map((x) => `<div class="yz-row">${esc(x)}</div>`).join('')}</div>` : ''}
+      <p class="tiaohou-note">${esc(s.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được phối ngẫu tinh sâu.</p>'; }
+}
+
+function renderStudyDeep(R) {
+  const el = $('study-deep');
+  if (!el) return;
+  try {
+    // [loop 300] analyzeStudy — sao Ấn (học) + Thực (trí) + Văn Xương/Học Đường/Tam Kỳ
+    const s = analyzeStudy(R);
+    const bodyBadge = s.bodyCanStudy
+      ? ' <span class="ln-rate rate-good">Thân nhậm học ✓</span>'
+      : ' <span class="ln-rate rate-bad">Thân nhược — mệt khi học nhiều ⚠</span>';
+    const yongBadge = s.isYong ? ' <span class="ln-rate rate-good">Ấn = Dụng</span>' : '';
+    const stars = [s.hasWenChang ? 'Văn Xương' : '', s.hasXueTang ? 'Học Đường' : '', s.hasSanQi ? 'Tam Kỳ' : ''].filter(Boolean);
+    const starLine = stars.length ? `<p class="hint">🎓 Sao học vấn: ${stars.map((x) => '<b>' + esc(x) + '</b>').join(', ')}</p>` : '';
+    el.innerHTML = `
+      <p><b>Sao Ấn (học vấn): ${esc(s.sealStar)}</b> (hành ${esc(s.sealWxVi)}, độ <b>${esc(s.sealStrength)}</b> — ${esc(String(s.sealCount.toFixed(1)))})${yongBadge}${bodyBadge}</p>
+      <p class="hint">Trí tuệ (Thực Thương): ${esc(s.foodStrength)} (${esc(String(s.foodCount.toFixed(1)))})</p>
+      ${starLine}
+      ${s.studyFields ? `<p class="hint">📚 Ngành học hợp (theo Dụng/Hỷ): ${esc(s.studyFields)}</p>` : ''}
+      ${(s.profile && s.profile.length) ? `<div style="margin:6px 0">${s.profile.map((x) => `<div class="yz-row">${esc(x)}</div>`).join('')}</div>` : ''}
+      ${s.timing.length ? `<p class="hint">⏰ Đại vận hành Ấn/Thực: ${esc(s.timing.join(', '))}</p>` : ''}
+      <p class="tiaohou-note">${esc(s.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được học vấn tinh sâu.</p>'; }
+}
+
+function renderCaiKu(R) {
+  const el = $('caiku');
+  if (!el) return;
+  try {
+    // [loop 307] analyzeCaiKu — Tam khố (Tài/Quan/Ấn có kho chứa không), module từng chỉ feed AI
+    const k = analyzeCaiKu(R);
+    const storeRow = (label, wx, zhi, has, isSpecial) => {
+      const badge = has ? '<span class="ln-rate rate-good">CÓ KHỐ ✓</span>' : '<span class="ln-rate rate-mid">không kho</span>';
+      const pos = has ? ` <span class="hint">@ ${esc(zhi || '?')}${isSpecial ? ' (Thổ)' : ''}</span>` : '';
+      return `<div class="yz-row"><b>${esc(label)}</b> (hành ${esc(wx || '?')}) ${badge}${pos}</div>`;
+    };
+    el.innerHTML = `
+      <p class="hint">Kho (庫) = nơi chứa Tài/Quan/Ấn. CÓ kho → giữ được; KHÔNG → vào rồi ra. Kho bị XUNG («开库») → phát ra (lấy được), nhưng xung vô tứ → hao.</p>
+      ${storeRow('Tài khố (财库)', k.taikuWxVi, k.taikuZhiVi, k.hasTaiku, k.taikuWx === '土')}
+      ${storeRow('Quan khố (官库)', k.guankuWx, k.guankuZhi, k.hasGuanku, k.guankuWx === '土')}
+      ${storeRow('Ấn khố (印库)', k.yinkuWx, k.yinkuZhi, k.hasYinku, k.yinkuWx === '土')}
+      ${(k.opens && k.opens.length) ? `<p class="hint" style="color:var(--gold-pale,#e8d596)">🔑 Kho bị MỞ (xung): ${esc((k.opens || []).join(', '))} → kho phát ra, cơ hội lấy tài/chức.</p>` : ''}
+      ${(k.fourTu && k.fourTu.length) ? `<p class="hint">Chi Thổ (辰戌丑未 = kho chung) trong tứ trụ: ${esc((k.fourTu || []).join(', '))}</p>` : ''}
+      ${(k.profile && k.profile.length) ? `<div style="margin:6px 0">${k.profile.map((x) => `<div class="yz-row">${esc(x)}</div>`).join('')}</div>` : ''}
+      <p class="tiaohou-note">${esc(k.advice || '')}</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được tam khố.</p>'; }
+}
+
+function renderWealthMonthly(R) {
+  const el = $('wealth-monthly');
+  if (!el) return;
+  try {
+    // [loop 310] wealthMonthlyAlert — dự báo tài vận 12 tháng, module từng chỉ feed AI
+    const w = wealthMonthlyAlert(R, new Date().getFullYear());
+    const toneClass = { cat: 'rate-good', mid: 'rate-mid', 'slight-hung': 'rate-bad', hung: 'rate-bad' };
+    const cells = w.months.map((mm) => {
+      const isBest = mm === w.bestMonth, isWorst = mm === w.worstMonth;
+      return `<div class="ln ${mm.tone === 'hung' || mm.tone === 'slight-hung' ? 'ln-worst-row' : ''}">
+        <div class="ln-year">${esc(mm.mVi)}${isBest ? ' 👑' : isWorst ? ' ⚠' : ''}</div>
+        <div class="ln-gz">${esc(mm.godVi || '')}</div>
+        <div class="ln-rate ${toneClass[mm.tone] || 'rate-mid'}">${esc(String(mm.score))}</div>
+      </div>`;
+    }).join('');
+    el.innerHTML = `
+      <p class="hint">Tháng TÀI TỐT NHẤT: <b>${esc(w.bestMonth.mVi)}</b> (${esc(String(w.bestMonth.score))}, ${esc(w.bestMonth.godVi || '')}) — nên tiến thủ/ký kết. Tháng TÀI XẤU NHẤT: <b>${esc(w.worstMonth.mVi)}</b> (${esc(String(w.worstMonth.score))}) — giữ chặt, tránh đầu tư lớn.</p>
+      <div class="ln-decade" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:5px;margin-top:6px">${cells}</div>
+      <details class="syn-factors"><summary>Lời khuyên tài chính từng tháng</summary>${w.months.map((mm) => `<div class="yz-row"><b>${esc(mm.mVi)}</b> <span class="hint">${esc(mm.advice || '')}</span></div>`).join('')}</details>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được tài vận 12 tháng.</p>'; }
 }
 
 function renderWealthCareer(R) {
@@ -897,10 +1180,10 @@ function renderWealthCareer(R) {
     const statusTone = (s) => s === '有力' ? 'cat' : (s === '藏而不透' || s === '虚浮' || s === '虚') ? 'mid' : '';
     el.innerHTML = `
       <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:6px">
-        <div>💰 <b>Tài (${wc.caiWx})</b> <span class="${statusTone(wc.caiStatus)}">${wc.caiStatus || '?'}</span> → kích hoạt: <b>${wc.caiYears.length ? wc.caiYears.map((y) => y.year).join(', ') : '(không)'}</b></div>
-        <div>🎯 <b>Quan (${wc.guanWx})</b> <span class="${statusTone(wc.guanStatus)}">${wc.guanStatus || '?'}</span> → kích hoạt: <b>${wc.guanYears.length ? wc.guanYears.map((y) => y.year).join(', ') : '(không)'}</b></div>
+        <div>💰 <b>Tài (${esc(wc.caiWx)})</b> <span class="${statusTone(wc.caiStatus)}">${esc(wc.caiStatus || '?')}</span> → kích hoạt: <b>${wc.caiYears.length ? wc.caiYears.map((y) => esc(String(y.year))).join(', ') : '(không)'}</b></div>
+        <div>🎯 <b>Quan (${esc(wc.guanWx)})</b> <span class="${statusTone(wc.guanStatus)}">${esc(wc.guanStatus || '?')}</span> → kích hoạt: <b>${wc.guanYears.length ? wc.guanYears.map((y) => esc(String(y.year))).join(', ') : '(không)'}</b></div>
       </div>
-      <p class="hint">${wc.summary}</p>`;
+      <p class="hint">${esc(wc.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được Tài/Quan ứng kỳ.</p>'; }
 }
 
@@ -911,9 +1194,9 @@ function renderDominantGod(R) {
     const dg = dominantGod(R);
     const t = dg.tendency;
     el.innerHTML = `
-      <p><b>Sao chủ đạo: ${dg.dominant.godVi}</b> (điểm ${dg.dominant.score})${dg.subDominant ? `, phụ ${dg.subDominant.godVi} (${dg.subDominant.score})` : ''} — <span class="${dg.favor === 'dung' ? 'cat' : dg.favor === 'ji' ? 'hung' : ''}">${dg.favorVi.split(' — ')[0]}</span></p>
-      <p class="hint">Tuýp: ${t.traits}</p>
-      <p class="hint">Nghề hợp: ${t.career} · Động lực: ${t.drive}</p>`;
+      <p><b>Sao chủ đạo: ${esc(dg.dominant.godVi)}</b> (điểm ${esc(String(dg.dominant.score))})${dg.subDominant ? `, phụ ${esc(dg.subDominant.godVi)} (${esc(String(dg.subDominant.score))})` : ''} — <span class="${dg.favor === 'dung' ? 'cat' : dg.favor === 'ji' ? 'hung' : ''}">${esc(dg.favorVi.split(' — ')[0])}</span></p>
+      <p class="hint">Tuýp: ${esc(t.traits)}</p>
+      <p class="hint">Nghề hợp: ${esc(t.career)} · Động lực: ${esc(t.drive)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được thập thần chủ đạo.</p>'; }
 }
 
@@ -924,8 +1207,8 @@ function renderYanQin(R) {
     const yq = analyzeYanQin(R);
     const bm = yq.benMing;
     el.innerHTML = `
-      <p><b>Bản mệnh HÀM: ${bm.qin}</b> (${bm.animal}, hành ${bm.wx}) — ${bm.nature}</p>
-      <p class="hint">Hôm nay: ${yq.today.qin} (${yq.today.animal}) → ${yq.relVi}</p>`;
+      <p><b>Bản mệnh HÀM: ${esc(bm.qin)}</b> (${esc(bm.animal)}, hành ${esc(bm.wx)}) — ${esc(bm.nature)}</p>
+      <p class="hint">Hôm nay: ${esc(yq.today.qin)} (${esc(yq.today.animal)}) → ${esc(yq.relVi)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được bản mệnh hàm.</p>'; }
 }
 
@@ -947,6 +1230,7 @@ function renderHealth(R) {
       <h4 class="syn-h4" style="margin-top:6px">🟢 Hành mạnh nhất (tạng vượng)</h4>
       ${organ(h.strongest)}
       ${h.constitution ? `<h4 class="syn-h4" style="margin-top:6px">Thể chất ${esc(h.constitutionVi || '')}</h4><p class="hint">${esc(h.constitution)}</p>` : ''}
+      ${R.shensha && R.shensha.tianYiMed ? `<div class="tiaohou-note" style="border-color:var(--cat,#2a7);background:rgba(46,158,107,0.06)"><b>⚕️ Thiên Y (天医) chiếu @${esc(R.shensha.tianYiMed.at.join(','))}:</b> duyên y tế, thể chất có khả năng tự phục hồi, hợp nghề y/dược/dưỡng sinh. «天医拱照, 可作良医».</div>` : ''}
       ${h.remedyFoods ? `<div class="tiaohou-note"><b>Thực phẩm chữa lành (hành ${esc(h.remedyVi || '')}):</b> ${esc(h.remedyFoods)}</div>` : ''}
       ${h.riskSeason ? `<p class="hint">📅 Mùa phòng bệnh: ${esc(h.riskSeason)}</p>` : ''}
       ${h.organRisk ? `<p class="hint">${esc(h.organRisk)}</p>` : ''}
@@ -965,10 +1249,10 @@ function renderQinxing(R) {
     const toneCls = ov.tone === 'cat' ? 'cat' : ov.tone === 'hung' ? 'hung' : '';
     const cycle = qinxingCycle(ov.scanYear, 5);
     el.innerHTML = `
-      <p>Năm ${a.year}: <b>${a.bird}</b> (${a.animal}, hành ${a.element}) trụ trị — ${a.nature}</p>
-      <p>Bản mệnh ${ov.benMing ? ov.benMing.qin + ' (hành ' + a.element + ')' : '(?)'} → <span class="${toneCls}"><b>${ov.toneVi}</b></span> — ${ov.relVi}</p>
-      <p class="hint">${ov.advice}</p>
-      <p class="hint">Chu kỳ 28 năm quanh đây: ${cycle.map((c) => c.year + '=' + c.bird.split(/[^一-龥]/)[0]).join(' · ')}</p>`;
+      <p>Năm ${esc(String(a.year))}: <b>${esc(a.bird)}</b> (${esc(a.animal)}, hành ${esc(a.element)}) trụ trị — ${esc(a.nature)}</p>
+      <p>Bản mệnh ${ov.benMing ? esc(ov.benMing.qin) + ' (hành ' + esc(a.element) + ')' : '(?)'} → <span class="${toneCls}"><b>${esc(ov.toneVi)}</b></span> — ${esc(ov.relVi)}</p>
+      <p class="hint">${esc(ov.advice)}</p>
+      <p class="hint">Chu kỳ 28 năm quanh đây: ${cycle.map((c) => esc(String(c.year)) + '=' + esc(c.bird.split(/[^一-龥]/)[0])).join(' · ')}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được禽星 năm.</p>'; }
 }
 
@@ -1016,9 +1300,9 @@ function renderMissingGod(R) {
     const tone = (status) => status === 'lacking' ? 'hung' : status === 'partial' ? 'mid' : 'cat';
     el.innerHTML = Object.values(mg.categories).map((c) => `
       <div class="sp-item">
-        <div class="sp-star">${c.vi.split(' (')[0]} <span class="${tone(c.status)}">${c.status === 'lacking' ? 'KHUYẾT' : c.status === 'partial' ? 'THIẾU' : 'đủ'}</span></div>
-        <div class="sp-area hint">${c.area}</div>
-      </div>`).join('') + `<p class="hint" style="margin-top:6px">${mg.summary}</p>`;
+        <div class="sp-star">${esc(c.vi.split(' (')[0])} <span class="${tone(c.status)}">${c.status === 'lacking' ? 'KHUYẾT' : c.status === 'partial' ? 'THIẾU' : 'đủ'}</span></div>
+        <div class="sp-area hint">${esc(c.area)}</div>
+      </div>`).join('') + `<p class="hint" style="margin-top:6px">${esc(mg.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được khuyết thập thần.</p>'; }
 }
 
@@ -1028,8 +1312,8 @@ function renderSanyuan(R) {
   try {
     const s = sanyuanJiuyun(R, new Date().getFullYear());
     el.innerHTML = `
-      <p><b>${s.yun.starVi} · ${s.yun.trig} · ${s.yun.wxVi}</b> (${s.yun.yuan}, ${s.yun.start}-${s.yun.end})</p>
-      <p class="hint">正神=${s.zhengShen} · 零神=${s.lingShen}</p>
+      <p><b>${esc(s.yun.starVi)} · ${esc(s.yun.trig)} · ${esc(s.yun.wxVi)}</b> (${esc(s.yun.yuan)}, ${esc(String(s.yun.start))}-${esc(String(s.yun.end))})</p>
+      <p class="hint">正神=${esc(s.zhengShen)} · 零神=${esc(s.lingShen)}</p>
       <p class="hint">${s.align}</p>
       ${s.detail ? `<details style="margin:6px 0"><summary class="hint">📋 Chi tiết kỷ nguyên ${s.yun.starVi} (${s.yun.start}-${s.yun.end})</summary>
         ${s.detail.industriesWang ? `<p class="hint"><b>🔥 Ngành vượng:</b> ${esc(s.detail.industriesWang.join(', '))}</p>` : ''}
@@ -1099,12 +1383,12 @@ function renderDayunChangSheng(R) {
     const rows = t.items.map((i) => {
       const c = TONE_COLOR[i.tone];
       return `<div class="yz-row" style="border-left:3px solid ${c};padding-left:8px;margin:3px 0">
-        <b>${i.startAge}–${i.startAge + 9}t</b> ${i.ganZhi}
-        <span style="color:${c};font-weight:600">${TONE_ICON[i.tone]} ${i.stageVi}</span>
-        <span class="hint">— ${i.desc}</span>
+        <b>${i.startAge}–${i.startAge + 9}t</b> ${esc(i.ganZhi)}
+        <span style="color:${c};font-weight:600">${TONE_ICON[i.tone]} ${esc(i.stageVi)}</span>
+        <span class="hint">— ${esc(i.desc)}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<p class="hint">Sinh khí Nhật Chủ qua 12 giai đoạn (dương can thuận / âm can nghịch hành). «运好不如运旺».</p>${rows}<p style="margin-top:6px">${t.summary}</p>`;
+    el.innerHTML = `<p class="hint">Sinh khí Nhật Chủ qua 12 giai đoạn (dương can thuận / âm can nghịch hành). «运好不如运旺».</p>${rows}<p style="margin-top:6px">${esc(t.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được đại vận trường sinh.</p>'; }
 }
 
@@ -1119,11 +1403,11 @@ function renderDayunYongChangSheng(R) {
       const c = STRONG.has(i.stage) ? '#2e9e5b' : WEAK.has(i.stage) ? '#e0533d' : '#caa14a';
       const mark = STRONG.has(i.stage) ? '★Dụng vượng' : WEAK.has(i.stage) ? '⚠Dụng suy' : '';
       return `<div class="yz-row" style="border-left:3px solid ${c};padding-left:8px;margin:3px 0">
-        <b>${i.startAge}–${i.startAge + 9}t</b> ${i.ganZhi}
-        <span style="color:${c};font-weight:600">${i.stageVi}</span>${mark ? ` <span class="hint">${mark}</span>` : ''}
+        <b>${i.startAge}–${i.startAge + 9}t</b> ${esc(i.ganZhi)}
+        <span style="color:${c};font-weight:600">${esc(i.stageVi)}</span>${mark ? ` <span class="hint">${mark}</span>` : ''}
       </div>`;
     }).join('');
-    el.innerHTML = `<p class="hint">Sinh khí của <b>Dụng Thần (${t.yongWx})</b> qua đại vận. «用神旺相, 其福必厚» — vận Dụng vượng = vận thật sự tốt (khác Nhật Chủ: đây là khí của hành giúp mệnh).</p>${rows}<p style="margin-top:6px">${t.summary}</p>`;
+    el.innerHTML = `<p class="hint">Sinh khí của <b>Dụng Thần (${esc(t.yongWx)}</b>) qua đại vận. «用神旺相, 其福必厚» — vận Dụng vượng = vận thật sự tốt (khác Nhật Chủ: đây là khí của hành giúp mệnh).</p>${rows}<p style="margin-top:6px">${esc(t.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được Dụng thần trường sinh.</p>'; }
 }
 
@@ -1138,11 +1422,11 @@ function renderLiunianChangSheng(R) {
       const c = TONE_COLOR[i.tone];
       const now = i.isNow ? 'box-shadow:0 0 0 2px #d4af37' : '';
       return `<div class="yz-row" style="border-left:3px solid ${c};padding-left:8px;margin:3px 0;${now}">
-        <b>${i.year}</b> ${i.ganZhi}${i.isNow ? ' <span style="color:#d4af37">★năm nay</span>' : ''}
-        <span style="color:${c};font-weight:600">${TONE_ICON[i.tone]} ${i.stageVi}</span>
+        <b>${i.year}</b> ${esc(i.ganZhi)}${i.isNow ? ' <span style="color:#d4af37">★năm nay</span>' : ''}
+        <span style="color:${c};font-weight:600">${TONE_ICON[i.tone]} ${esc(i.stageVi)}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<p class="hint">Sinh khí TỪNG NĂM của đại vận đang hành. «年逢长生如春起, 年逢帝旺如日中天, 年逢墓绝如秋冬».</p>${rows}<p style="margin-top:6px">${t.summary}</p>`;
+    el.innerHTML = `<p class="hint">Sinh khí TỪNG NĂM của đại vận đang hành. «年逢长生如春起, 年逢帝旺如日中天, 年逢墓绝如秋冬».</p>${rows}<p style="margin-top:6px">${esc(t.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được lưu niên trường sinh.</p>'; }
 }
 
@@ -1156,10 +1440,10 @@ function renderLiuyueChangSheng(R) {
     const rows = t.items.map((i) => {
       const c = TONE_COLOR[i.tone];
       return `<div class="yz-row" style="border-left:3px solid ${c};padding-left:8px;margin:3px 0;display:inline-block;width:auto;margin-right:4px">
-        <b>${i.mLabel}</b> <span style="color:${c};font-weight:600">${TONE_ICON[i.tone]} ${i.stageVi}</span>
+        <b>${esc(i.mLabel)}</b> <span style="color:${c};font-weight:600">${TONE_ICON[i.tone]} ${esc(i.stageVi)}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<p class="hint">Nhịp năng lượng 12 tháng (tiết khí) của Nhật Chủ — «lịch cá nhân»: tháng mạnh nên tiến thủ, tháng yếu nên thủ.</p>${rows}<p style="margin-top:6px">${t.summary}</p>`;
+    el.innerHTML = `<p class="hint">Nhịp năng lượng 12 tháng (tiết khí) của Nhật Chủ — «lịch cá nhân»: tháng mạnh nên tiến thủ, tháng yếu nên thủ.</p>${rows}<p style="margin-top:6px">${esc(t.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được lưu月 trường sinh.</p>'; }
 }
 
@@ -1167,16 +1451,37 @@ function renderZiweiDeep(R) {
   const el = $('ziwei-deep');
   if (!el) return;
   try {
+    // [loop 305] surface đầy đủ 4 phân tích 紫微 sâu (trước đây nén thành 3 dòng mỏng, aux bỏ trống)
     const inp = R.chart.input;
     const zr = computeZiwei(inp.year, inp.month, inp.day, inp.hour, inp.minute, inp.gender);
     const bw = analyzeZiweiBrightness(zr);
     const aux = computeAuxStars(R.chart.pillars.year.gan, R.chart.pillars.year.zhi, zr.birth.lunarMonth, zr.birth.timeZhi);
     const gj = analyzeZiweiGeju(zr, bw, aux);
     const sx = analyzeShuangXing(zr);
+    // Mệnh cung sao + độ sáng
+    const mingLine = (bw.mingStars && bw.mingStars.length)
+      ? `<p><b>Cung Mệnh:</b> ${bw.mingStars.map((s) => `${esc(s.starVi)} <span class="ln-rate ${s.score >= 1.5 ? 'rate-good' : s.score <= -1 ? 'rate-bad' : 'rate-mid'}">${esc(s.vi)}</span>`).join(' · ')}</p>`
+      : '';
+    // 紫微格局
+    const gjMatched = (gj.matched || []).filter(Boolean);
+    const gjHtml = gjMatched.length
+      ? `<details class="syn-factors" open><summary>紫微格局 (${esc(String(gjMatched.length))})</summary>${gjMatched.map((m) => `<div class="yz-row"><b>${esc(m.name)}</b> <span class="hint">${esc(m.meaning || '')}</span></div>`).join('')}</details>`
+      : `<p class="hint">紫微格局: (không nổi bật) — ${esc(gj.summary || '')}</p>`;
+    // Song tinh (双星)
+    const sxItems = (sx.shuangXing || []).filter((x) => x && x.meaning);
+    const sxHtml = sxItems.length
+      ? `<details class="syn-factors"><summary>双星 (Song tinh, ${esc(String(sxItems.length))})</summary>${sxItems.map((x) => `<div class="ss ${x.meaning.tone === 'cat' ? 'cat' : 'mid'}"><div class="ss-vi"><b>${esc(x.palace)}</b>: ${esc((x.stars || []).join('+'))} → ${esc(x.meaning.vi || x.meaning.combo)}</div><div class="ss-desc">${esc(x.meaning.nature || '')}${x.meaning.career ? ' · Nghề: ' + esc(x.meaning.career) : ''}</div></div>`).join('')}</details>`
+      : `<p class="hint">Song tinh: (độc toạ — các chính tinh đứng riêng)</p>`;
+    // Độ sáng: miếu/vượng (sáng) vs hãm/nhàn (tối)
+    const brightRow = (s) => `<div class="yz-row"><b>${esc(s.starVi)}</b> <span class="hint">@ ${esc(s.palaceVi || '')}</span> <span class="ln-rate ${s.score >= 1.5 ? 'rate-good' : 'rate-bad'}">${esc(s.vi)}</span> <span class="hint">${esc(s.note || '')}</span></div>`;
+    const bwHtml = `<details class="syn-factors"><summary>Độ sáng 庙旺平陷 — ${esc(String(bw.strong.length))} sáng / ${esc(String(bw.weak.length))} tối</summary>` +
+      `${(bw.strong || []).length ? '<p class="hint" style="color:var(--cat,#2a7)">▲ SÁNG (miếu/vượng — sức sao phát huy):</p>' + bw.strong.map(brightRow).join('') : ''}` +
+      `${(bw.weak || []).length ? '<p class="hint" style="color:var(--cinnabar,#c33)">▼ TỐI (hãm/nhàn — sức sao giảm):</p>' + bw.weak.map(brightRow).join('') : ''}</details>`;
     el.innerHTML = `
-      <p><b>Cục hình:</b> ${gj.matched.length ? gj.matched.map((m) => m.name).join(', ') : '(không nổi)'} — ${gj.matched[0]?.meaning.slice(0, 80) || gj.summary.slice(0, 80)}</p>
-      <p class="hint"><b>Song tinh:</b> ${sx.shuangXing.length ? sx.shuangXing.map((x) => `${x.palaceShort}:${x.meaning.combo}`).join(', ') : '(độc toạ)'}</p>
-      <p class="hint"><b>Độ sáng:</b> ${bw.strong.length} miếu/vượng, ${bw.weak.length} hãm/nhàn — Mệnh ${bw.mingStars.length ? bw.mingStars.map((s) => s.star + '=' + s.vi).join(', ') + ' → ' + (bw.mingStars[0].score >= 1.5 ? 'sao MỆNH SÁNG' : bw.mingStars[0].score <= -1 ? 'sao mệnh hãm' : 'trung bình') : '?'}</p>`;
+      ${mingLine}
+      ${gjHtml}
+      ${sxHtml}
+      ${bwHtml}`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được Tử Vi sâu.</p>'; }
 }
 
@@ -1199,9 +1504,9 @@ function renderTaohua(R) {
     const th = analyzeTaohua(R);
     const tone = th.verdict === '正桃花' ? 'cat' : th.verdict === '烂桃花' ? 'hung' : 'mid';
     el.innerHTML = `
-      <p>Đào hoa <b>${th.taohuaZhi}</b> tại ${th.positions.map((p) => p.vi).join(', ')} → <span class="${tone}"><b>${th.verdictVi.split(' — ')[0]}</b></span> (score ${th.score})</p>
-      <p class="hint">${th.flags.map((f) => f.typeVi + '(' + (f.tone === 'cat' ? 'cát' : 'hung') + ')').join(', ') || 'không có flag'}</p>
-      <p class="hint">${th.summary}</p>`;
+      <p>Đào hoa <b>${esc(th.taohuaZhi)}</b> tại ${th.positions.map((p) => esc(p.vi)).join(', ')} → <span class="${tone}"><b>${esc(th.verdictVi.split(' — ')[0])}</b></span> (score ${esc(String(th.score))})</p>
+      <p class="hint">${th.flags.map((f) => esc(f.typeVi) + '(' + (f.tone === 'cat' ? 'cát' : 'hung') + ')').join(', ') || 'không có flag'}</p>
+      <p class="hint">${esc(th.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được đào hoa.</p>'; }
 }
 
@@ -1211,9 +1516,9 @@ function renderRemedyLaws(R) {
   try {
     const rm = buildRemedy(R);
     el.innerHTML = `
-      <p class="hint">${rm.byElement.summary}</p>
+      <p class="hint">${esc(rm.byElement.summary)}</p>
       <p class="hint"><b>12 pháp cải vận (chính):</b></p>
-      <ul class="hint" style="margin:4px 0 4px 16px">${rm.twelveLaws.map((l) => `<li>${l}</li>`).join('')}</ul>`;
+      <ul class="hint" style="margin:4px 0 4px 16px">${rm.twelveLaws.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được cải vận.</p>'; }
 }
 
@@ -1234,7 +1539,7 @@ function renderStrength3Fa(R) {
           <span>極弱</span><span>身弱</span><span style="color:#d4af55;font-weight:700">${strong ? '身VƯỢNG' : '身NHƯỢC'} ${pct}%</span><span>身強</span><span>極強</span>
         </div>
       </div>`;
-    el.innerHTML = `${spectrum}<p>${s.summary}</p>`;
+    el.innerHTML = `${spectrum}<p>${esc(s.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 3 pháp vượng suy.</p>'; }
 }
 
@@ -1290,7 +1595,28 @@ function renderHuaqi(R) {
   if (!el) return;
   try {
     const h = analyzeHuaQi(R);
-    el.innerHTML = `<p>${h.summary}</p>`;
+    const dayGan = R.chart.dayGan;
+    // [loop 293] từng hợp → checklist 4 điều kiện cổ pháp (合/nguyệt lệnh/thông căn/không phá hóa)
+    const mark = (ok) => ok ? '<span style="color:var(--cat,#2a7)">✓</span>' : '<span style="color:var(--hung,#c33)">✗</span>';
+    const pairRows = (h.pairs || []).map((p) => {
+      const condHtml = [
+        `${mark(true)} Hợp: <b>${esc(dayGan)}+${esc(p.withGan)}</b> (${esc(p.with)} trụ) → Hóa <b>${esc(WX_VI[p.hua] || p.hua)}</b>`,
+        `${mark(p.monthOk)} Nguyệt lệnh hỗ trợ Hóa (${esc(WX_VI[R.strength?.monthMainWx] || '?')})`,
+        `${mark(p.rootOk)} Thông căn Hóa hành (gốc ${esc(String((p.rootTotal ?? 0).toFixed(2)))} ${esc(p.rootOk ? '— đủ' : '— quá mỏng')})`,
+        `${mark(!p.poHua)} Không phá hóa${p.poHua ? ' — bị can khắc ' + esc((p.breakers || []).join(', ')) + ' phá tan' : ''}`,
+      ].map((x) => `<div class="yz-row" style="gap:4px">${x}</div>`).join('');
+      return `<div class="ss ${p.cheng ? 'cat' : 'mid'}" style="margin-bottom:6px">
+        <div class="ss-vi"><b>${esc(dayGan)}+${esc(p.withGan)} → Hóa ${esc(WX_VI[p.hua] || p.hua)}</b> ${p.cheng ? '<span class="ln-rate rate-good">THÀNH HÓA KHÍ</span>' : '<span class="ln-rate rate-mid">không thành</span>'}</div>
+        ${condHtml}
+      </div>`;
+    }).join('');
+    const dungHtml = h.huaQiGe && h.dung ? `<p><b>Dụng Thần ĐỔI theo Hóa:</b> Dụng <span class="ln-rate rate-good">${esc(WX_VI[h.dung.primary] || '')}</span> + Hỷ <span class="ln-rate rate-good">${esc(WX_VI[h.dung.xi] || '')}</span> (thuận hóa) · Kỵ <span class="ln-rate rate-bad">${esc(WX_VI[h.dung.ji] || '')}</span> (phá hóa). <span class="hint">Không lấy Dụng theo vượng suy thường nữa.</span></p>` : '';
+    el.innerHTML = `
+      <p>${h.huaQiGe ? '<b style="color:var(--cat,#2a7)">✓ THÀNH HÓA KHÍ CÁCH</b> — Nhật Chủ đổi bản chất, Dụng Thần đổi hẳn.' : '<b style="color:var(--cinnabar,#c33)">✗ Không thành Hóa Khí cách</b> — «hợp mà không hóa», Dụng tính theo vượng suy thường.'}</p>
+      ${pairRows}
+      ${dungHtml}
+      <p class="hint">${esc(h.summary)}</p>
+    `;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được hóa khí.</p>'; }
 }
 
@@ -1302,13 +1628,13 @@ function renderHanNuan(R) {
     const tColor = h.temperature === '寒' ? '#3a7bd5' : h.temperature === '暖' ? '#e0533d' : '#caa14a';
     const hColor = h.humidity === '燥' ? '#b58105' : h.humidity === '湿' ? '#2e9e5b' : '#caa14a';
     const needLine = h.needs.length
-      ? `<p><b>Nhu cầu điều hòa:</b> ${h.needs.map((n) => `<span class="god-bad">${n.vi}</span> — ${n.why}`).join('<br>')}</p>`
+      ? `<p><b>Nhu cầu điều hòa:</b> ${h.needs.map((n) => `<span class="god-bad">${esc(n.vi)}</span> — ${esc(n.why)}`).join('<br>')}</p>`
       : '<p class="hint">Khí hậu tương đối cân — không cần điều hậu ép buộc.</p>';
     el.innerHTML = `
-      <p><b>Nhiệt độ:</b> <span style="color:${tColor};font-weight:600">${h.tempVi}</span> (điểm ${h.tempScore}) &nbsp;|&nbsp; <b>Độ ẩm:</b> <span style="color:${hColor};font-weight:600">${h.humidVi}</span> (điểm ${h.humidScore})</p>
+      <p><b>Nhiệt độ:</b> <span style="color:${tColor};font-weight:600">${esc(h.tempVi)}</span> (điểm ${esc(String(h.tempScore))}) &nbsp;|&nbsp; <b>Độ ẩm:</b> <span style="color:${hColor};font-weight:600">${esc(h.humidVi)}</span> (điểm ${esc(String(h.humidScore))})</p>
       ${needLine}
-      ${h.alignNote ? `<p class="hint">${h.alignNote}</p>` : ''}
-      <p class="hint">Khuyến nghị sinh hoạt: ${h.remedy}</p>
+      ${h.alignNote ? `<p class="hint">${esc(h.alignNote)}</p>` : ''}
+      <p class="hint">Khuyến nghị sinh hoạt: ${esc(h.remedy)}</p>
     `;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được cân bằng khí hậu.</p>'; }
 }
@@ -1375,6 +1701,34 @@ function renderMingGong(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được mệnh cung.</p>'; }
 }
 
+function renderTaiyuan(R) {
+  const el = $('taiyuan');
+  if (!el) return;
+  try {
+    const c = R.chart;
+    const ty = taiYuan(c.pillars.month.gan, c.pillars.month.zhi);
+    const tx = taiXi(c.pillars.month.gan, c.pillars.month.zhi);
+    // [loop 291] quan hệ ngũ hành thai nguyên ↔ Dụng thần (bẩm sinh có gốc tốt hay không)
+    const yong = R.yong || {};
+    const fav = new Set([yong.primary, yong.xi].filter(Boolean));
+    const avoid = new Set([yong.ji, yong.chou].filter(Boolean));
+    const rel = fav.has(ty.wx) ? { t: 'cat', s: '★ Thai nguyên hành TRÙNG Dụng/Hỷ → bẩm sinh có gốc tốt, thể chất vượng' }
+      : avoid.has(ty.wx) ? { t: 'hung', s: '⚠ Thai nguyên hành TRÙNG Kỵ/Thù → thể chất bẩm sinh suy, cần bồi dưỡng sớm' }
+      : { t: 'mid', s: '· Thai nguyên hành trung tính với Dụng' };
+    // Xung/hại thai chi với nhật chi (thai nguyên xung nhật → «胎元冲日» cổ pháp bất lợi thai kỳ/sức khoẻ đầu đời)
+    const CHONG = { 子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳' };
+    const dayZhi = c.pillars.day.zhi;
+    const clashes = CHONG[ty.zhi] === dayZhi || ty.zhi === CHONG[dayZhi];
+    el.innerHTML = `
+      <p><b>Thai nguyên (胎元): ${esc(ty.ganVi)} ${esc(ty.zhiVi)}</b> (${esc(ty.ganZhi)}) — nạp âm ${esc(ty.nayin)}, hành ${esc(ty.wx)}.</p>
+      <p class="ln-rate ${rel.t}" style="display:inline-block;padding:2px 8px;border-radius:6px;margin:4px 0">${esc(rel.s)}</p>
+      ${clashes ? `<p class="hint" style="color:var(--cinnabar,#c33)">⚠ Thai chi ${esc(ty.zhi)} xung Nhật chi ${esc(dayZhi)} («胎元冲日») — cổ pháp luận ảnh hưởng thai kỳ / sức khoẻ đầu đời.</p>` : ''}
+      <p class="hint">${esc(ty.meaning)}</p>
+      <p class="hint">Thai tức (胎息): ${esc(tx)} — khí tức bẩm sinh, bổ trợ luận thể chất.</p>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được thai nguyên.</p>'; }
+}
+
 function renderChildrenStar(R) {
   const el = $('children-star');
   if (!el) return;
@@ -1423,6 +1777,144 @@ function renderNayinRelation(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được nạp âm quan hệ.</p>'; }
 }
 
+function renderFuxing(R) {
+  const el = $('fuxing');
+  if (!el) return;
+  try {
+    // [loop 302] computeFuxing — 6 sao phụ tá 紫微 (Tả Phù/Hữu Biệt/Văn Xương/Văn Khúc/Thiên Khôi/Thiên Việt)
+    const c = R.chart;
+    const CN_MONTH = { '一':1,'二':2,'三':3,'四':4,'正':1,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'十一':11,'十二':12,'冬':11,'腊':12 };
+    const lm = typeof c.lunar.month === 'number' ? c.lunar.month : (CN_MONTH[String(c.lunar.month).replace(/^闰/, '')] || 0);
+    const hourOrder = ZHI_ORDER.indexOf(c.pillars.time.zhi) + 1; // 子=1..亥=12, lấy từ thời trụ (đáng tin hơn giờ-toán)
+    const fx = computeFuxing(lm, hourOrder, c.pillars.year.gan);
+    const rows = fx.stars.map((s) => `<div class="ss ${s.tone}">
+      <div class="ss-zh">${esc(s.star)}</div>
+      <div class="ss-vi">${esc(s.vi)} <span class="ss-at">→ cung ${esc(s.atZhi || '?')}</span></div>
+      <div class="ss-desc">${esc(s.desc)}</div>
+    </div>`).join('');
+    el.innerHTML = `<p class="hint">6 sao phụ tá 紫微 (cát tinh quý nhân) — vị trí cung an theo tháng/giờ/năm sinh. Tả Phù + Hữu Biệt = quý nhân trợ lực; Văn Xương + Văn Khúc = học/nghệ thuật; Thiên Khôi (quý nam) + Thiên Việt (quý nữ) = trên đề bạt / dưới phò trợ.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px;margin-top:6px">${rows}</div>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được sao phụ tá.</p>'; }
+}
+
+function renderHealthMonthly(R) {
+  const el = $('health-monthly');
+  if (!el) return;
+  try {
+    // [loop 306] healthMonthlyAlert — dự báo sức khoẻ 12 tháng, module từng chỉ feed AI
+    const h = healthMonthlyAlert(R, new Date().getFullYear());
+    const toneClass = { cat: 'rate-good', mid: 'rate-mid', 'slight-hung': 'rate-bad', hung: 'rate-bad' };
+    const cells = h.months.map((m) => {
+      const isBest = m === h.bestMonth, isWorst = m === h.worstMonth;
+      const organ = m.organFocus ? String(m.organFocus.organs || '').split(' ')[0] : '';
+      return `<div class="ln ${m.tone === 'cat' ? '' : m.tone === 'hung' ? 'ln-worst-row' : m.tone === 'slight-hung' ? 'ln-worst-row' : ''}">
+        <div class="ln-year">${esc(m.mVi)}${isBest ? ' 👑' : isWorst ? ' ⚠' : ''}</div>
+        <div class="ln-gz">${esc(m.godVi || '')}</div>
+        <div class="ln-rate ${toneClass[m.tone] || 'rate-mid'}">${esc(String(m.score))}</div>
+        <div class="ln-flags">${organ ? esc(organ) : ''}</div>
+      </div>`;
+    }).join('');
+    el.innerHTML = `
+      <p class="hint">⚠ Tạng cần phòng cả năm: <b>${esc(h.weakestOrgan ? (h.weakestOrgan.organs || '') : '')}</b>. Tháng khỏe nhất <b>${esc(h.bestMonth.mVi)}</b> (${esc(String(h.bestMonth.score))}) · Tháng yếu nhất <b>${esc(h.worstMonth.mVi)}</b> (${esc(String(h.worstMonth.score))}).</p>
+      <div class="ln-decade" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:5px;margin-top:6px">${cells}</div>
+      <details class="syn-factors"><summary>Lời khuyên từng tháng</summary>${h.months.map((m) => `<div class="yz-row"><b>${esc(m.mVi)}</b> <span class="hint">${esc(m.advice || '')}</span></div>`).join('')}</details>
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được sức khoẻ 12 tháng.</p>'; }
+}
+
+function renderLiuSha(R) {
+  const el = $('liusha');
+  if (!el) return;
+  try {
+    // [loop 320] computeAuxStars — 6 sao hung 紫微 (Kình/Đà/Hỏa/Linh/Không/Kiếp), bổ túc Lục Phụ Tinh
+    const inp = R.chart.input;
+    const zr = computeZiwei(inp.year, inp.month, inp.day, inp.hour, inp.minute, inp.gender);
+    const aux = computeAuxStars(R.chart.pillars.year.gan, R.chart.pillars.year.zhi, zr.birth.lunarMonth, zr.birth.timeZhi);
+    const order = ['擎羊', '陀罗', '火星', '铃星', '地空', '地劫'];
+    const rows = order.filter((s) => aux[s]).map((s) => `<div class="ss hung">
+      <div class="ss-zh">${esc(s)}</div>
+      <div class="ss-vi">${esc(aux[s].vi || s)} <span class="ss-at">→ cung ${esc(aux[s].branch || '?')}</span></div>
+      <div class="ss-desc">${esc(aux[s].desc || '')}</div>
+    </div>`).join('');
+    el.innerHTML = `<p class="hint">6 sao hung 紫微 — chỉ thị áp lực/xung đột/hao tổn theo cung tọa. «Kình/Đà» tổn thương/trì trệ; «Hỏa/Linh» bạo/tai nạn; «Địa Không/Địa Kiếp» hao tài/biến động. Né/quan trọng cung chúng tọa; chế bằng chính tinh cát + Dụng.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px;margin-top:6px">${rows}</div>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được lục sát tinh.</p>'; }
+}
+
+function renderCombos(R) {
+  const el = $('combos');
+  if (!el) return;
+  try {
+    // [loop 301] detectCombos — tổ hợp Thập Thần kinh điển, module từng hoàn toàn chưa dùng
+    const list = detectCombos(R.chart, R.strength);
+    if (!list.length) { el.innerHTML = '<p class="hint">Lá số không có tổ hợp Thập Thần nổi bật (Sát Ấn/Thực Chế Sát/Quan Sát Hỗn Tạp…).</p>'; return; }
+    const cat = list.filter((c) => c.tone === 'cat');
+    const xiong = list.filter((c) => c.tone !== 'cat');
+    const row = (c) => {
+      // [loop 303] huy hiệu chất lượng: chân cách (genuine) vs hình thức (sao lẻ/không đủ lực)
+      const qlabel = c.genuine === false
+        ? '<span class="ln-rate rate-mid" title="Sao tham gia có lực mỏng (chỉ tàng khí lẻ) — cấu hình chưa thật sự thành">hình thức</span>'
+        : '<span class="ln-rate rate-good">chân cách</span>';
+      const counts = c.starCounts && Object.keys(c.starCounts).length
+        ? '<span class="hint"> lực: ' + Object.entries(c.starCounts).map(([k, v]) => esc(k) + '=' + esc(String(v))).join(' · ') + '</span>' : '';
+      // [loop 312] yếu tố chế: hung combo đã chế (giảm) hay chưa chế (nghiêm)
+      const mit = c.tone !== 'cat' && c.mitigation
+        ? '<span class="ln-rate rate-good" title="Yếu tố chế/giải tổ hợp hung">đã chế: ' + esc(c.mitigation) + '</span>'
+        : (c.tone !== 'cat' && !c.mitigation ? '<span class="ln-rate rate-bad" title="Chưa có yếu tố chế → tổ hợp hung vẫn hoạt động">chưa chế</span>' : '');
+      return `<div class="ss ${c.tone === 'cat' ? 'cat' : 'hung'}">
+        <div class="ss-zh">${esc(c.name)}</div>
+        <div class="ss-vi">${esc(c.vi)} <span class="ln-rate ${c.tone === 'cat' ? 'rate-good' : 'rate-bad'}">${c.tone === 'cat' ? 'CÁT' : 'HUNG'}</span> ${qlabel} ${mit}</div>
+        <div class="ss-desc">${esc(c.desc)}</div>
+        ${counts}
+      </div>`;
+    };
+    el.innerHTML = `
+      ${cat.length ? `<p class="hint">✓ Tổ hợp CÁT (${esc(String(cat.length))}):</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px;margin-bottom:6px">${cat.map(row).join('')}</div>` : ''}
+      ${xiong.length ? `<p class="hint" style="color:var(--cinnabar,#c33)">⚠ Tổ hợp HUNG (${esc(String(xiong.length))}) — cần chế/giải:</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px">${xiong.map(row).join('')}</div>` : ''}
+    `;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được tổ hợp thập thần.</p>'; }
+}
+
+function renderAnhe(R) {
+  const el = $('anhe');
+  if (!el) return;
+  try {
+    // [loop 308] detectAnhe — 盲派地支暗合 (tàng can ngầm hợp), module từng chỉ feed AI
+    const a = detectAnhe(R.chart);
+    if (!a.pairs || !a.pairs.length) {
+      el.innerHTML = `<p class="hint">✓ Không phát hiện 暗合 — tứ trụ địa chi không cặp 盲派暗合 (6 cặp chuẩn: 卯申/寅午/巳戌/亥午/子戌/辰寅). Các mối quan hệ minh bạch, ít khuất.</p>`;
+      return;
+    }
+    const rows = a.pairs.map((p) => {
+      const heTxt = (p.hePairs || []).map((h) => `${esc(h.ganA)}${esc(h.ganB)}→${esc(h.hua)}`).join(' · ');
+      const quanBadge = p.isQuanAn ? ' <span class="ln-rate rate-bad">全暗 (toàn ngầm)</span>' : '';
+      const hidden = p.bothHidden ? ' <span class="hint">(cả 2 tàng)</span>' : '';
+      return `<div class="ss mid">
+        <div class="ss-vi"><b>${esc(p.chiA)}↔${esc(p.chiB)}</b> → hóa ${esc(p.hua)} ${quanBadge}${hidden}</div>
+        <div class="ss-desc"><b>${esc(p.relVi || '')}</b> — tàng can ngầm hợp: ${heTxt}. Mối liên kết NGẦM giữa 2 trụ (không lộ trên thiên can) — có thể là quý nhân khuất, sự nghiệp ngầm, hoặc quan hệ ẩn/double-faced.</div>
+      </div>`;
+    }).join('');
+    el.innerHTML = `
+      <p class="hint">暗合 = địa chi các trụ có tàng can «ngầm hợp» nhau (không lộ trên can). Chỉ thị quan hệ/kết nối NGẦM giữa hai lãnh vực trụ đó — quý nhân khuất, sự nghiệp ngầm, hoặc quan hệ song mặt.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px;margin-top:6px">${rows}</div>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được ám hợp.</p>'; }
+}
+
+function renderXingShen(R) {
+  const el = $('xingshen');
+  if (!el) return;
+  try {
+    // [loop 309] xingshenZuo — 盲派 十神坐基 (can trụ ngồi lên chi), module từng chỉ feed AI
+    const x = xingshenZuo(R.chart);
+    const rows = (x.items || []).map((i) => `<div class="ss mid">
+      <div class="ss-vi"><b>${esc(i.pillarVi)}</b> · ${esc(i.surfaceVi)} <span class="hint">tọa</span> ${esc(i.sitOnVi)} <span class="ln-rate rate-mid">${esc(i.combo || '')}</span></div>
+      <div class="ss-desc">${esc(i.meaning || '')}</div>
+    </div>`).join('');
+    el.innerHTML = `<p class="hint">Mỗi trụ: 天干 (lộ) «surface» 十神 ngồi trên địa chi (tàng bản khí) «sit-on» 十神 → tổ hợp nói lên tính cách/vận thế vùng đó. «伤坐才=giỏi kiếm tiền, 劫坐杀=dám liều, 官坐印=quyền + bằng cấp…»</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px;margin-top:6px">${rows}</div>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được thập thần tọa cơ.</p>'; }
+}
+
 function renderPatternQuality(R) {
   const el = $('pattern-quality');
   if (!el) return;
@@ -1447,14 +1939,19 @@ function renderEventPredict(R) {
   try {
     const startY = new Date().getFullYear();
     const ev = predictEvents(R, startY, 5);
+    // [loop 387] quý nhân chi — đánh dấu năm có quý nhân trong event-predict
+    const _epSs = R && R.shensha ? R.shensha : null;
+    const epNoble = new Set();
+    if (_epSs) { ['tianYi','wenChang','jiangXing'].forEach((k) => { if (_epSs[k] && _epSs[k].at) _epSs[k].at.forEach((z) => epNoble.add(z)); }); }
     const rows = ev.years.map((y) => {
       const dupe = y.sameGod ? ' <span class="combo cat">★ NHÂN ĐÔI</span>' : '';
+      const noble = y.ganZhi && epNoble.has(y.ganZhi[1]) ? ' <span class="ln-noble" title="Năm có quý nhân">🌟</span>' : '';
       // [loop 239] hiển thị lnArea/dyArea + events (trước đây chỉ advice)
       const lnHtml = y.lnArea ? `<div class="hint"><b>📅 Lưu niên ${esc(y.lnGodVi||'')}</b> → ${esc(y.lnArea)}${y.lnEvents && y.lnEvents.length ? ': ' + y.lnEvents.map(esc).join(', ') : ''}</div>` : '';
       const dyHtml = y.dyArea ? `<div class="hint"><b>🛤️ Đại vận ${esc(y.dyGodVi||'')}</b> → ${esc(y.dyArea)}${y.dyEvents && y.dyEvents.length ? ': ' + y.dyEvents.map(esc).join(', ') : ''}</div>` : '';
       const combHtml = y.combinedEvents && y.combinedEvents.length ? `<div class="hint" style="color:var(--gold-bright,#d4af37)"><b>⚡ Kích hoạt kép:</b> ${y.combinedEvents.map(esc).join(', ')}</div>` : '';
       return `<div class="yz-row" style="border-left:3px solid var(--gold-bright, #d4af37);margin:4px 0;padding-left:8px">
-        <b>${y.year}</b> <span class="zh">${esc(y.ganZhi)}</span>${dupe}
+        <b>${y.year}</b> <span class="zh">${esc(y.ganZhi)}</span>${dupe}${noble}
         ${lnHtml}${dyHtml}${combHtml}
         <div class="hint" style="margin-top:2px">${esc(y.advice)}</div>
       </div>`;
@@ -1496,11 +1993,17 @@ function renderDailyPro(R) {
   try {
     const now = new Date();
     const d = dailyPro(R, now.getFullYear(), now.getMonth() + 1, now.getDate());
+    const tone = (x) => x > 0 ? 'cat' : x < 0 ? 'hung' : 'mid';
+    const schoolRows = (d.schools || []).map((s) =>
+      `<div class="yz-row"><span class="ln-rate ${tone(s.d)}" style="min-width:42px">${s.d > 0 ? '+' : ''}${esc(String(s.d))}</span> <b>${esc(s.phai)}</b> <span class="hint">${esc(s.note)}</span></div>`).join('');
     el.innerHTML = `
-      <p><b>Hôm nay ${esc(d.ganZhi || '')}:</b> ${esc(d.rating || '')} (${esc(String(d.score || ''))}/100)</p>
+      <p><b>Hôm nay ${esc(d.ganZhi || '')}:</b> ${esc(d.rating || '')} (${esc(String(d.score || ''))}/100)${d.officer ? ` · Trực <b>${esc(d.officer)}</b>${d.god ? ` · ${esc(d.god)}` : ''}` : ''}</p>
+      ${schoolRows ? `<div style="margin:6px 0">${schoolRows}</div>` : ''}
+      ${d.tsYi && d.tsYi.length ? `<p class="hint">宜 (nên): ${d.tsYi.map((t) => esc(t)).join(', ')}</p>` : ''}
+      ${d.tsJi && d.tsJi.length ? `<p class="hint">忌 (kỵ): ${d.tsJi.map((t) => esc(t)).join(', ')}</p>` : ''}
+      ${(d.caishen || d.xishen) ? `<p class="hint">🧭 Hướng <b>Tài</b>: ${esc(d.caishen || '?')} · <b>Hỷ</b>: ${esc(d.xishen || '?')}</p>` : ''}
       ${d.bestActivity ? `<p>✓ Nên: ${esc(d.bestActivity)}</p>` : ''}
       ${d.avoidActivity ? `<p>⚠ Tránh: ${esc(d.avoidActivity)}</p>` : ''}
-      ${d.bestDirection ? `<p>🧭 Hướng tốt: ${esc(d.bestDirection)}</p>` : ''}
       <p class="hint">${esc(d.advice || '')}</p>
     `;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được lưu nhật chuyên sâu.</p>'; }
@@ -1902,7 +2405,7 @@ function renderLifestyle(R) {
     const d = personalNutrition(R);
     const f = d.dungFlavor || {};
     html += `<h4 class="syn-h4" style="margin-top:8px">🍱 Ẩm thực hợp mệnh (Dụng ${esc(d.dungVi || '')})</h4>`;
-    html += `<p class="hint">Vị ${esc(f.vi || '')} (${esc(f.organ || '')}) — ${esc(f.action || '')}. Thực phẩm: ${esc(f.foods || '')}.${f.caution ? ' Lưu ý: ' + esc(f.caution) + '.' : ''} Tránh vị ${(d.kyFlavor || {}).vi || ''} (${d.kyVi || ''}).</p>`;
+    html += `<p class="hint">Vị ${esc(f.vi || '')} (${esc(f.organ || '')}) — ${esc(f.action || '')}. Thực phẩm: ${esc(f.foods || '')}.${f.caution ? ' Lưu ý: ' + esc(f.caution) + '.' : ''} Tránh vị ${esc((d.kyFlavor || {}).vi || '')} (${esc(d.kyVi || '')}).</p>`;
     if (d.meals || d.tea || d.fruit) html += `<p class="hint">${d.meals ? 'Gợi ý: ' + esc(d.meals) + '. ' : ''}${d.tea ? 'Trà: ' + esc(d.tea) + '. ' : ''}${d.fruit ? 'Trái cây: ' + esc(d.fruit) + '.' : ''}</p>`;
   } catch (e) {}
   // Đá/trang sức
@@ -2083,7 +2586,26 @@ function renderAnnualDirection(R) {
   if (!el) return;
   try {
     const ad = annualDirection(R, new Date().getFullYear());
-    el.innerHTML = `<p>${ad.summary}</p>`;
+    // [loop 294] surface per-direction flying-star analysis + Thái Tuế/Tam Sát (trước đây chỉ dump summary)
+    const toneClass = { cat: 'rate-good', hung: 'rate-bad', 'very-hung': 'rate-bad', mid: 'rate-mid' };
+    const toneVi = { cat: 'KÍCH HOẠT', hung: 'YẾU/GIỮ YÊN', 'very-hung': 'NGŨ HOÀNG — TRÁNH', mid: '—' };
+    const rows = (ad.auspicious || []).map((a) => {
+      const num = a.annualStar == null ? '?' : a.annualStar;
+      return `<div class="ss ${a.tone === 'cat' ? 'cat' : a.tone === 'very-hung' ? 'hung' : 'mid'}">
+        <div class="ss-vi"><b>${esc(a.star)}</b> → ${esc(a.dir)} <span class="ln-rate ${toneClass[a.tone] || 'rate-mid'}">${esc(toneVi[a.tone] || a.tone)} ${esc(String(num))}${a.annualVi ? ' ' + esc(a.annualVi) : ''}</span></div>
+        <div class="ss-desc">${esc(a.note || '')}</div>
+      </div>`;
+    }).join('');
+    const warnBox = (ad.taisuiDir || ad.sanshaDir) ? `<p class="tiaohou-note" style="margin-top:6px">
+      ⚠ <b>Thái Tuế ${esc(String(ad.year))} (${esc(ad.taisuiZhi || '')})</b> tọa <b>${esc(ad.taisuiDir || '?')}</b> — kỵ động thổ/phá hoại hướng này cả năm${ad.taisuiDouble ? ' <b style="color:var(--cinnabar,#c33)">★ TRÙNG NGŨ HOÀNG = kỵ KÉP, tuyệt đối tránh!</b>' : ''}.<br>
+      <b>Tam Sát</b> tọa <b>${esc(ad.sanshaDir || '?')}</b> — kỵ động thổ/xây cất hướng này cả năm.
+    </p>` : '';
+    el.innerHTML = `
+      <p class="hint">Mệnh quái <b>${esc(ad.grpVi || '')}</b> (${esc(ad.gua || '')}) · Lưu niên ${esc(String(ad.year))} phi tinh đến 4 cát phương:</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px;margin:6px 0">${rows}</div>
+      ${warnBox}
+      <p class="hint">${esc(ad.summary || '')}</p>
+    `;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được hướng cát × lưu niên.</p>'; }
 }
 
@@ -2099,13 +2621,13 @@ function renderTodayZheri() {
     const ms = analyzeMonthShen(y, m, d);
     const nx = nextTianShe(y, m, d, 2);
     const tags = [];
-    sp.special.forEach((s) => tags.push(`<b style="color:var(--cat,#2a7)">${s.typeVi}</b>`));
-    de.hits.forEach((h) => tags.push(`<b style="color:var(--cat,#2a7)">${h.keyVi}</b>`));
-    xi.hits.forEach((h) => tags.push(`<b style="color:var(--hung,#c33)">${h.typeVi}</b>`));
-    ms.hits.forEach((h) => tags.push(`<b>${h.keyVi}</b>`));
+    sp.special.forEach((s) => tags.push(`<b style="color:var(--cat,#2a7)">${esc(s.typeVi)}</b>`));
+    de.hits.forEach((h) => tags.push(`<b style="color:var(--cat,#2a7)">${esc(h.keyVi)}</b>`));
+    xi.hits.forEach((h) => tags.push(`<b style="color:var(--hung,#c33)">${esc(h.typeVi)}</b>`));
+    ms.hits.forEach((h) => tags.push(`<b>${esc(h.keyVi)}</b>`));
     el.innerHTML = `
-      <p>Hôm nay ${sp.solar} (${sp.ganZhi}): ${tags.length ? tags.join(' · ') : '<span class="hint">ngày thường (không phạm sao đặc biệt)</span>'}</p>
-      ${nx.length ? `<p class="hint">天赦 gần nhất: ${nx.map((t) => t.solar + '(' + t.ganZhi + ')').join(', ')}</p>` : ''}`;
+      <p>Hôm nay ${esc(sp.solar)} (${esc(sp.ganZhi)}): ${tags.length ? tags.join(' · ') : '<span class="hint">ngày thường (không phạm sao đặc biệt)</span>'}</p>
+      ${nx.length ? `<p class="hint">天赦 gần nhất: ${nx.map((t) => esc(t.solar) + '(' + esc(t.ganZhi) + ')').join(', ')}</p>` : ''}`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được hôm nay择日.</p>'; }
 }
 
@@ -2134,10 +2656,10 @@ function renderHuangdao() {
         ? `<h4 class="syn-h4" style="margin-top:8px">3 ngày 黄道 (hoàng đạo) gần nhất</h4>
            <div class="ln-decade" style="display:flex;flex-wrap:wrap;gap:6px">${next.map((r) => `
              <div class="ln">
-               <div class="ln-year">${r.solar}</div>
-               <div class="ln-gz"><span class="zh">${r.dayGanZhi}</span></div>
-               <div class="ln-rate rate-cat"><span class="zh">${r.deity}</span> ${r.deityVi}</div>
-               <div class="ln-flags">${r.domain}</div>
+               <div class="ln-year">${esc(r.solar)}</div>
+               <div class="ln-gz"><span class="zh">${esc(r.dayGanZhi)}</span></div>
+               <div class="ln-rate rate-cat"><span class="zh">${esc(r.deity)}</span> ${esc(r.deityVi)}</div>
+               <div class="ln-flags">${esc(r.domain)}</div>
              </div>`).join('')}</div>`
         : '<p class="hint">Không tìm thấy ngày hoàng đạo trong 60 ngày tới.</p>');
   } catch (e) {
@@ -2155,7 +2677,7 @@ function renderDonggongDay(r) {
   if (r.heMonth) flagBits.push(`<span class="ln-rate rate-cat">合月 (tam hợp)</span>`);
   if (r.chongMonth) flagBits.push(`<span class="ln-rate rate-hung">冲月 (xung chi tháng)</span>`);
   el.innerHTML = `
-    <div class="zr-head"><b>${esc(r.solar)}</b> (ÂL ${esc(r.lunar)}) · <span class="zh">${esc(r.dayGanZhi)}</span> · Trực <b class="zh">${esc(r.officer)}</b> (${esc(r.officerVi)}) · ${r.monthZhi}月 <span class="ln-rate ${toneCls}">${esc(r.toneVi)}</span> · <b>${esc(r.rating)}</b> (${r.score}/100) ${flagBits.join(' ')}</div>
+    <div class="zr-head"><b>${esc(r.solar)}</b> (ÂL ${esc(r.lunar)}) · <span class="zh">${esc(r.dayGanZhi)}</span> · Trực <b class="zh">${esc(r.officer)}</b> (${esc(r.officerVi)}) · ${esc(r.monthZhi)}月 <span class="ln-rate ${toneCls}">${esc(r.toneVi)}</span> · <b>${esc(r.rating)}</b> (${esc(String(r.score))}/100) ${flagBits.join(' ')}</div>
     <p><b>Ý nghĩa:</b> ${esc(r.meaning)}</p>
     ${r.monthNote ? `<p class="hint">⚠ Biến thể tháng ${esc(r.monthZhi)}: ${esc(r.monthNote)}</p>` : ''}
     <p class="zr-advice">→ ${esc(r.advice)}</p>
@@ -2302,13 +2824,18 @@ function renderGoldenYear(R) {
   if (!el) return;
   try {
     const gy = findGoldenYear(R, new Date().getFullYear(), 10);
+    // [loop 380] quý nhân chi — đánh dấu năm vàng có quý nhân
+    const _gySs = currentResult && currentResult.shensha ? currentResult.shensha : null;
+    const gyNoble = new Set();
+    if (_gySs) { ['tianYi','wenChang','jiangXing'].forEach((k) => { if (_gySs[k] && _gySs[k].at) _gySs[k].at.forEach((z) => gyNoble.add(z)); }); }
     // [loop 222] hiển thị details (6 hệ thống) + isTrulyGolden (trước đây chỉ score trần)
     el.innerHTML = gy.ranked.slice(0, 5).map((y, i) => {
       const details = (y.details || []).map((d) => `<span class="hint" style="margin-right:6px">${esc(d)}</span>`).join('');
       const goldTag = y.isTrulyGolden ? '<span class="geju-xi" title="Đại vận + Lưu niên đều mang Dụng/Hỷ → NĂM VÀNG cổ pháp">★ NĂM VÀNG</span>' : '';
+      const nobleTag = gyNoble.has(y.ganZhi[1]) ? '<span class="ln-noble" title="Năm có quý nhân (天乙/文昌/将星)">🌟</span>' : '';
       return `
       <div class="yz-row" style="border-left:3px solid ${y.totalScore >= 60 ? 'var(--jade)' : 'var(--gold)'};margin:4px 0;padding-left:8px">
-        <b>#${y.rank || i + 1} ${y.year}</b> <span class="zh">${esc(y.ganZhi)}</span> <span class="ln-rate ${y.totalScore >= 60 ? 'rate-cat' : y.totalScore >= 48 ? 'rate-mid' : 'rate-hung'}">${y.totalScore}/100 ${y.alert || ''}</span> ${goldTag}
+        <b>#${y.rank || i + 1} ${y.year}</b> <span class="zh">${esc(y.ganZhi)}</span> <span class="ln-rate ${y.totalScore >= 60 ? 'rate-cat' : y.totalScore >= 48 ? 'rate-mid' : 'rate-hung'}">${y.totalScore}/100 ${y.alert || ''}</span> ${goldTag}${nobleTag}
         <div style="margin-top:2px">${details}</div>
       </div>`;
     }).join('')
@@ -2321,11 +2848,16 @@ function renderForecast5(R) {
   if (!el) return;
   try {
     const f5 = forecast5(R, new Date().getFullYear(), 5);
+    // [loop 378] quý nhân chi — đánh dấu năm có quý nhân trong forecast 5 năm
+    const _f5ss = currentResult && currentResult.shensha ? currentResult.shensha : null;
+    const f5Noble = new Set();
+    if (_f5ss) { ['tianYi','wenChang','jiangXing'].forEach((k) => { if (_f5ss[k] && _f5ss[k].at) _f5ss[k].at.forEach((z) => f5Noble.add(z)); }); }
     el.innerHTML = f5.years.map((y) => {
       // [loop 221] hiển thị shen12 + dayunGod + positives/alerts (trước đây chỉ score trần)
       const ctx = [];
       if (y.shen12) ctx.push(`12神: ${esc(y.shen12)}`);
       if (y.dayunGod) ctx.push(`运 ${esc(y.dayunGod)}`);
+      if (f5Noble.has(y.ganZhi[1])) ctx.push('<span class="ln-noble" title="Năm có quý nhân (天乙/文昌/将星)">🌟 quý nhân</span>');
       const posHtml = (y.positives || []).length ? `<div class="hint" style="color:#9fe0b8">✓ ${y.positives.map(esc).join('; ')}</div>` : '';
       const alertHtml = (y.alerts || []).length ? `<div class="hint" style="color:#f0a99c">⚠ ${y.alerts.map(esc).join('; ')}</div>` : '';
       const isNow = y.year === new Date().getFullYear();
@@ -2369,9 +2901,9 @@ function renderLiuqin(R) {
   if (!list.length) { $('liuqin').innerHTML = '<p class="hint">Chưa tính được Lục Thân.</p>'; return; }
   $('liuqin').innerHTML = list.map((r) => `
     <div class="lq">
-      <div class="lq-rel">${r.relVi} <span class="lq-star">${r.mainStar ? '★ ' + r.mainStar : ''}</span><span class="lq-stable ${r.stable ? 'ok' : 'warn'}">${r.stable ? 'cung yên' : 'cung bị xung'}</span></div>
-      <div class="lq-palace">${r.palace} · tàng ${r.palaceGod}${r.starInPalace ? ' · tinh tại cung (chính vị)' : ''}</div>
-      <div class="lq-verdict">${r.verdict}</div>
+      <div class="lq-rel">${r.relVi} ${r.hasStar ? `<span class="lq-star">sao ${(r.stars || []).map((s) => esc(TEN_GOD_VI[s] || s)).join('/')}</span>` : '<span class="lq-star hint">không có sao</span>'}<span class="lq-stable ${r.stable ? 'ok' : 'warn'}">${r.stable ? 'cung yên' : 'cung bị xung'}</span></div>
+      <div class="lq-palace">${esc(r.palace)} · tàng ${esc(r.palaceGod)}${r.starInPalace ? ' · tinh tại cung (chính vị)' : ''}</div>
+      <div class="lq-verdict">${esc(r.verdict)}</div>
     </div>`).join('');
 }
 
@@ -2449,6 +2981,7 @@ async function handleAsk() {
     body.classList.remove('streaming');
   } finally {
     _aiBusy = false;
+    try { localStorage.setItem('bazi-chat', JSON.stringify(chatHistory.slice(-12))); } catch (_) {}
   }
 }
 
@@ -2559,6 +3092,8 @@ function run() {
   const y = tt.solar.year, m = tt.solar.month, d = tt.solar.day, hh = tt.solar.hour, mm = tt.solar.minute;
   // persist birth data
   try { localStorage.setItem('bazi-birth', JSON.stringify({ date: dateVal, time: timeVal, gender, tz, city: cityVal, long: $('long') ? $('long').value : '' })); } catch (e) {}
+  // [loop 391] update URL with birth params for shareable link
+  try { const u = new URL(window.location.href); u.searchParams.set('dob', dateVal); u.searchParams.set('time', timeVal); u.searchParams.set('g', gender); history.replaceState(null, '', u); } catch (_) {}
   // hiển thị note 真太阳时
   const ttNote = $('truetime-note');
   if (ttNote) {
@@ -2618,6 +3153,7 @@ function run() {
   try { renderExtraShensha(); } catch (e) { console.warn('extraShensha', e.message); }
   try { renderMarriageDeep(); } catch (e) { console.warn('marriageDeep', e.message); }
   renderDaYun(currentResult.dayun);
+  renderDayunInteract(currentResult);
   renderLiuNian(currentResult.liunian);
   try { renderDailyBriefing(currentResult); } catch (e) { console.warn('dailyBriefing', e.message); }
   // ====== Lazy-render: các card nặng phía dưới (Task 2) ======
@@ -2634,6 +3170,12 @@ function run() {
   lazyRender('marriage-timing',() => { try { renderMarriageTiming(currentResult); } catch (e) { console.warn('marriagetiming', e.message); } });
   lazyRender('ideal-house',    () => { try { renderIdealHouse(currentResult); } catch (e) { console.warn('idealhouse', e.message); } });
   lazyRender('wealth-career',  () => { try { renderWealthCareer(currentResult); } catch (e) { console.warn('wealthcareer', e.message); } });
+  lazyRender('wealth-deep',    () => { try { renderWealthDeep(currentResult); } catch (e) { console.warn('wealthdeep', e.message); } });
+  lazyRender('caiku',          () => { try { renderCaiKu(currentResult); } catch (e) { console.warn('caiku', e.message); } });
+  lazyRender('wealth-monthly', () => { try { renderWealthMonthly(currentResult); } catch (e) { console.warn('wealthmonthly', e.message); } });
+  lazyRender('career-deep',    () => { try { renderCareerDeep(currentResult); } catch (e) { console.warn('careerdeep', e.message); } });
+  lazyRender('spouse-deep',    () => { try { renderSpouseDeep(currentResult); } catch (e) { console.warn('spousedeep', e.message); } });
+  lazyRender('study-deep',     () => { try { renderStudyDeep(currentResult); } catch (e) { console.warn('studydeep', e.message); } });
   lazyRender('dominant-god',   () => { try { renderDominantGod(currentResult); } catch (e) { console.warn('dominantgod', e.message); } });
   lazyRender('yanqin',         () => { try { renderYanQin(currentResult); } catch (e) { console.warn('yanqin', e.message); } });
   lazyRender('qinxing',        () => { try { renderQinxing(currentResult); } catch (e) { console.warn('qinxing', e.message); } });
@@ -2658,10 +3200,17 @@ function run() {
   lazyRender('wx-flow',        () => { try { renderWxFlow(currentResult); } catch (e) { console.warn('wxflow', e.message); } });
   lazyRender('chart-level',    () => { try { renderChartLevel(currentResult); } catch (e) { console.warn('chartlevel', e.message); } });
   lazyRender('minggong',       () => { try { renderMingGong(currentResult); } catch (e) { console.warn('minggong', e.message); } });
+  lazyRender('taiyuan',        () => { try { renderTaiyuan(currentResult); } catch (e) { console.warn('taiyuan', e.message); } });
   lazyRender('children-star',  () => { try { renderChildrenStar(currentResult); } catch (e) { console.warn('childrenstar', e.message); } });
   lazyRender('family-fortune', () => { try { renderFamilyFortune(currentResult); } catch (e) { console.warn('familyfortune', e.message); } });
   lazyRender('nayin-relation', () => { try { renderNayinRelation(currentResult); } catch (e) { console.warn('nayinrel', e.message); } });
   lazyRender('pattern-quality', () => { try { renderPatternQuality(currentResult); } catch (e) { console.warn('patternquality', e.message); } });
+  lazyRender('combos',         () => { try { renderCombos(currentResult); } catch (e) { console.warn('combos', e.message); } });
+  lazyRender('anhe',           () => { try { renderAnhe(currentResult); } catch (e) { console.warn('anhe', e.message); } });
+  lazyRender('xingshen',       () => { try { renderXingShen(currentResult); } catch (e) { console.warn('xingshen', e.message); } });
+  lazyRender('fuxing',         () => { try { renderFuxing(currentResult); } catch (e) { console.warn('fuxing', e.message); } });
+  lazyRender('liusha',         () => { try { renderLiuSha(currentResult); } catch (e) { console.warn('liusha', e.message); } });
+  lazyRender('health-monthly', () => { try { renderHealthMonthly(currentResult); } catch (e) { console.warn('healthmonthly', e.message); } });
   lazyRender('event-predict',  () => { try { renderEventPredict(currentResult); } catch (e) { console.warn('eventpredict', e.message); } });
   lazyRender('personality-profile', () => { try { renderPersonalityProfile(currentResult); } catch (e) { console.warn('personality', e.message); } });
   lazyRender('mingzhu',         () => { try { renderMingZhu(currentResult); } catch (e) { console.warn('mingzhu', e.message); } });
@@ -2736,20 +3285,30 @@ function run() {
   // [loop 148] 3D TILT INTERACTIVE — ALL cards get mouse-tracking 3D tilt + glare
   init3DTilt();
 
-  // [loop 156] CARD SEARCH/FILTER — lọc 109 card theo từ khoá
+  // [loop 156] CARD SEARCH/FILTER — lọc card theo từ khoá. [loop 311] ẩn grp header mồ côi.
   const cardSearch = $('card-search');
   if (cardSearch) {
     cardSearch.classList.remove('hidden');
     cardSearch.addEventListener('input', () => {
       const q = cardSearch.value.trim().toLowerCase();
-      const cards = document.querySelectorAll('#result > .card, #result > h2.grp');
-      cards.forEach((el) => {
-        if (!q) { el.style.display = ''; return; }
+      const kids = Array.from(document.querySelectorAll('#result > .card, #result > h2.grp'));
+      if (!q) { kids.forEach((el) => { el.style.display = ''; }); return; }
+      const match = (el) => {
         const title = el.querySelector('.card-title') || el;
         const text = title.textContent.toLowerCase();
-        // also search card content
-        const body = el.textContent.toLowerCase().slice(0, 500);
-        el.style.display = (text.includes(q) || body.includes(q)) ? '' : 'none';
+        const body = el.textContent.toLowerCase().slice(0, 500); // cũng search nội dung card
+        return text.includes(q) || body.includes(q);
+      };
+      // Pass 1: card visible theo match
+      kids.forEach((el) => { if (el.classList.contains('card')) el.style.display = match(el) ? '' : 'none'; });
+      // Pass 2: grp header visible iff có ≥1 card hiện giữa nó và grp kế tiếp
+      kids.forEach((el, i) => {
+        if (!el.classList.contains('grp')) return;
+        let hasVisible = false;
+        for (let j = i + 1; j < kids.length && !kids[j].classList.contains('grp'); j++) {
+          if (kids[j].style.display !== 'none') { hasVisible = true; break; }
+        }
+        el.style.display = hasVisible ? '' : 'none';
       });
     });
   }
@@ -2764,7 +3323,7 @@ function run() {
   renderTabs();
   renderTopic();
   $('chat-log').replaceChildren();
-  chatHistory = [];
+  if (!_skipChatReset) { chatHistory = []; try { localStorage.removeItem('bazi-chat'); } catch (_) {} }
   updateAIStatus();
   try{renderDaily();}catch(e){console.warn('daily',e.message);}
   try{renderSpaceFs();}catch(e){console.warn('spaceFs',e.message);}
@@ -2805,7 +3364,7 @@ function renderLiuyue(year) {
   const now = new Date();
   const curMonth = (year === now.getFullYear()) ? now.getMonth() : -1;
   $('liuyue').innerHTML = `
-    <p class="hint">Tháng CÁT (nên tiến thủ): <b>${lm.best.map((m) => `T${m.m + 1} ${m.ganZhi}`).join(', ')}</b> · Tháng KỴ (cẩn thận): <b>${lm.worst.map((m) => `T${m.m + 1} ${m.ganZhi}`).join(', ')}</b></p>
+    <p class="hint">Tháng CÁT (nên tiến thủ): <b>${lm.best.map((m) => `T${esc(String(m.m + 1))} ${esc(m.ganZhi)}`).join(', ')}</b> · Tháng KỴ (cẩn thận): <b>${lm.worst.map((m) => `T${esc(String(m.m + 1))} ${esc(m.ganZhi)}`).join(', ')}</b></p>
     <div class="lm-grid">${lm.months.map((m) => {
       const cls = m.rating === 'Cát' ? 'rate-cat' : m.rating === 'Kỵ' ? 'rate-hung' : m.rating === 'Hơi kỵ' ? 'rate-bad' : 'rate-mid';
       const gejuTag = m.gejuDelta > 0 ? '<span class="geju-xi" title="' + esc(m.gejuNote || '') + '">★格局喜</span>'
@@ -2816,7 +3375,21 @@ function renderLiuyue(year) {
       const isWorst = m.score === minS && m.rating === 'Kỵ';
       const rowCls = isNow ? ' lm-now' : isBest ? ' ln-best-row' : isWorst ? ' ln-worst-row' : '';
       const mark = isNow ? ' ★' : '';
-      return `<div class="lm-cell${rowCls}"><div class="lm-m">T${m.m + 1}${mark}</div><div class="zh">${m.ganZhi}</div><div class="lm-g">${GOD_VI[m.ganGod] || m.ganGod}</div>${gejuTag}<div class="ln-rate ${cls}">${m.rating}</div></div>`;
+      // [loop 370] badge 太岁/贵人 tháng (taiSui notes — trước đây tính nhưng ẩn)
+      const tsBadge = (m.taiSui && m.taiSui.length)
+        ? '<div class="lm-ts">' + m.taiSui.map((t) => {
+            if (t.includes('Thiên Ất')) return '<span class="lm-ts-cat" title="' + esc(t) + '">🌟</span>';
+            if (t.includes('Văn Xương')) return '<span class="lm-ts-cat" title="' + esc(t) + '">📚</span>';
+            if (t.includes('Tướng tinh')) return '<span class="lm-ts-cat" title="' + esc(t) + '">🎖️</span>';
+            if (t.includes('值月')) return '<span class="lm-ts-hung" title="' + esc(t) + '">⚠️</span>';
+            if (t.includes('冲')) return '<span class="lm-ts-hung" title="' + esc(t) + '">⚡</span>';
+            if (t.includes('刑')) return '<span class="lm-ts-hung" title="' + esc(t) + '">⚖️</span>';
+            if (t.includes('破')) return '<span class="lm-ts-hung" title="' + esc(t) + '">💥</span>';
+            if (t.includes('害')) return '<span class="lm-ts-hung" title="' + esc(t) + '">🦂</span>';
+            return '';
+          }).join('') + '</div>'
+        : '';
+      return `<div class="lm-cell${rowCls}"><div class="lm-m">T${esc(String(m.m + 1))}${mark}</div><div class="zh">${esc(m.ganZhi)}</div><div class="lm-g">${esc(GOD_VI[m.ganGod] || m.ganGod)}</div>${tsBadge}${gejuTag}<div class="ln-rate ${cls}">${esc(m.rating)}</div></div>`;
     }).join('')}</div>`;
 }
 
@@ -2830,10 +3403,10 @@ function renderLiuRi(dateStr) {
   const cls = r.score >= 64 ? 'rate-cat' : r.score >= 50 ? 'rate-mid' : r.score >= 38 ? 'rate-bad' : 'rate-hung';
   $('liuri').innerHTML = `
     <p class="hint" style="margin-bottom:6px">⚡ Vận ngày <b>THEO MỆNH CHỦ</b> (太岁/十神/神煞 tương tác cá nhân với lá số — khác Hoàng Đạo chung ở thẻ «Hôm Nay Tổng Khái»).</p>
-    <div class="ly-head"><span class="zh big">${r.ganZhi}</span> ${r.solar} · can <b>${GOD_VI[r.ganGod] || r.ganGod}</b> → <span class="ln-rate ${cls}">${r.rating} (${r.score}/100)</span></div>
-    <div class="ly-schools">${r.schools.map((s) => `<div class="ly-school ${s.d >= 0 ? 'pos' : 'neg'}"><div class="ly-sname">${s.phai} <span class="ly-d">${s.d >= 0 ? '+' : ''}${s.d}</span></div><div class="ly-snote">${s.note}</div></div>`).join('')}</div>
-    ${r.gejuNote ? `<div class="ly-school ${r.gejuDelta >= 0 ? 'pos' : 'neg'}"><div class="ly-sname">格局流日喜忌 <span class="ly-d">${r.gejuDelta >= 0 ? '+' : ''}${r.gejuDelta}</span></div><div class="ly-snote">${esc(r.gejuNote)}</div></div>` : ''}
-    <p class="zr-advice">${r.advice}</p>`;
+    <div class="ly-head"><span class="zh big">${esc(r.ganZhi)}</span> ${esc(r.solar)} · can <b>${esc(GOD_VI[r.ganGod] || r.ganGod)}</b> → <span class="ln-rate ${cls}">${esc(r.rating)} (${esc(String(r.score))}/100)</span></div>
+    <div class="ly-schools">${r.schools.map((s) => `<div class="ly-school ${s.d >= 0 ? 'pos' : 'neg'}"><div class="ly-sname">${esc(s.phai)} <span class="ly-d">${s.d >= 0 ? '+' : ''}${esc(String(s.d))}</span></div><div class="ly-snote">${esc(s.note)}</div></div>`).join('')}</div>
+    ${r.gejuNote ? `<div class="ly-school ${r.gejuDelta >= 0 ? 'pos' : 'neg'}"><div class="ly-sname">格局流日喜忌 <span class="ly-d">${r.gejuDelta >= 0 ? '+' : ''}${esc(String(r.gejuDelta))}</span></div><div class="ly-snote">${esc(r.gejuNote)}</div></div>` : ''}
+    <p class="zr-advice">${esc(r.advice)}</p>`;
 }
 
 // ---------------------------------------------------------------- TIỂU HẠN 小限 (annual palace rotation)
@@ -2947,12 +3520,12 @@ function renderLiunianShen(year) {
   const cls = (t) => t === 'cat' ? 'rate-cat' : 'rate-hung';
   const mine = r.god;
   $('lns').innerHTML = `
-    <div class="ts-head">Năm ${year} (<span class="zh">${yZhi}</span>) · tuổi bạn <b>${ZHI[birthZhi].con} (${birthZhi})</b> gặp <span class="ln-rate ${cls(mine.tone)}"><b>${mine.zh} ${mine.vi}</b></span></div>
-    <p class="ly-snote" style="margin:8px 0">${mine.meaning}</p>
-    ${mine.tone === 'hung' ? `<div class="tiaohou-note"><b>Hoá giải:</b> ${mine.remedy}</div>` : `<div class="tiaohou-note" style="border-color:#2e9e5b;background:rgba(46,158,91,0.08)"><b>Tận dụng:</b> ${mine.remedy}</div>`}
+    <div class="ts-head">Năm ${esc(String(year))} (<span class="zh">${esc(yZhi)}</span>) · tuổi bạn <b>${esc(ZHI[birthZhi].con)} (${esc(birthZhi)})</b> gặp <span class="ln-rate ${cls(mine.tone)}"><b>${esc(mine.zh)} ${esc(mine.vi)}</b></span></div>
+    <p class="ly-snote" style="margin:8px 0">${esc(mine.meaning)}</p>
+    ${mine.tone === 'hung' ? `<div class="tiaohou-note"><b>Hoá giải:</b> ${esc(mine.remedy)}</div>` : `<div class="tiaohou-note" style="border-color:#2e9e5b;background:rgba(46,158,91,0.08)"><b>Tận dụng:</b> ${esc(mine.remedy)}</div>`}
     <h4 class="syn-h4" style="margin-top:12px">12 thần theo chi tuổi (李淳风四利三元)</h4>
-    <div class="lm-grid">${r.allGods.map((g) => `<div class="lm-cell ${g.isMine ? 'me' : ''}"><div class="lm-m">${ZHI[g.atZhi]?.con || g.atZhi}</div><div class="zh">${g.zh}</div><div class="ln-rate ${cls(g.tone)}" style="font-size:10px">${g.tone === 'cat' ? 'cát' : 'hung'}</div></div>`).join('')}</div>
-    <p class="hint">${r.note}</p>`;
+    <div class="lm-grid">${r.allGods.map((g) => `<div class="lm-cell ${g.isMine ? 'me' : ''}"><div class="lm-m">${esc(ZHI[g.atZhi]?.con || g.atZhi)}</div><div class="zh">${esc(g.zh)}</div><div class="ln-rate ${cls(g.tone)}" style="font-size:10px">${g.tone === 'cat' ? 'cát' : 'hung'}</div></div>`).join('')}</div>
+    <p class="hint">${esc(r.note)}</p>`;
 }
 // Can chi năm (công thức chu kỳ, không cần thư viện; hợp lệ cho cả năm立春)
 const GAN_ORDER = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
@@ -3407,9 +3980,21 @@ function renderLyear(year) {
   const phaseBadge = ph ? `<span class="ln-phase ${ph.phase === '进气' ? 'ph-in' : 'ph-out'}" title="${esc(ph.vi)}">${ph.phase}</span>` : '';
   const gejuBadge = r.gejuFavor === '喜' ? '<span class="geju-xi" title="Can năm sinh trợ cách cục → năm THUẬN CÁCH">★格局喜</span>'
                  : r.gejuFavor === '忌' ? '<span class="geju-ji" title="Can năm khắc phá cách cục → năm GHÉT CÁCH">⚠格局忌</span>' : '';
+  // [loop 381] 太岁/贵人 badges trong header detail (xem nhanh loại năm)
+  const _bz = currentResult ? currentResult.chart.pillars.year.zhi : null;
+  const _yz = r.ganZhi[1];
+  const _X = { 子:'卯',卯:'子',寅:'巳',巳:'申',申:'寅',丑:'戌',戌:'未',未:'丑',辰:'辰',午:'午',酉:'酉',亥:'亥' };
+  const _P = { 子:'酉',酉:'子',丑:'辰',辰:'丑',寅:'亥',亥:'寅',卯:'午',午:'卯',巳:'申',申:'巳',戌:'未',未:'戌' };
+  const _H = { 子:'未',未:'子',丑:'午',午:'丑',寅:'巳',巳:'寅',卯:'辰',辰:'卯',申:'亥',亥:'申',酉:'戌',戌:'酉' };
+  const _C = { 子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳' };
+  const tsH = _bz === _yz ? '<span class="ln-ts" title="值太岁">岁</span>' : _C[_bz] === _yz ? '<span class="ln-ts ln-ts-chong" title="冲太岁 — đại biến động">冲</span>' : _X[_bz] === _yz ? '<span class="ln-ts ln-ts-chong" title="刑太岁">刑</span>' : _P[_bz] === _yz ? '<span class="ln-ts" title="破太岁">破</span>' : _H[_bz] === _yz ? '<span class="ln-ts" title="害太岁">害</span>' : '';
+  const _ss2 = currentResult && currentResult.shensha ? currentResult.shensha : null;
+  const _noble = new Set();
+  if (_ss2) { ['tianYi','wenChang','jiangXing'].forEach((k) => { if (_ss2[k] && _ss2[k].at) _ss2[k].at.forEach((z) => _noble.add(z)); }); }
+  const nobleH = _noble.has(_yz) ? '<span class="ln-noble" title="Năm có quý nhân">🌟</span>' : '';
   $('lyear').innerHTML = `
-    <div class="ly-head"><span class="zh big">${esc(r.ganZhi)}</span> ${esc(year)} · can <b>${esc(GOD_VI[r.ganGod] || r.ganGod)}</b>${r.activeDayun ? ` · đại运 <span class="zh">${esc(r.activeDayun)}</span>` : ''}
-      → <span class="ln-rate ${cls}">${esc(r.rating)} (${esc(r.score)}/100)</span> ${phaseBadge} ${gejuBadge}</div>
+    <div class="ly-head"><span class="zh big">${esc(r.ganZhi)}</span> ${(() => { const n = ganZhiNayin(r.ganZhi); return n ? `<span class="hint-inline" title="${esc(nayinInfo(n)?.meaning || '')}">${esc(n)}</span>` : ''; })()} ${esc(year)} · can <b>${esc(GOD_VI[r.ganGod] || r.ganGod)}</b>${r.activeDayun ? ` · đại运 <span class="zh">${esc(r.activeDayun)}</span>` : ''}
+      → <span class="ln-rate ${cls}">${esc(r.rating)} (${esc(r.score)}/100)</span> ${phaseBadge} ${gejuBadge}${tsH}${nobleH}</div>
     <div class="ly-schools">${r.schools.map((s) => `
       <div class="ly-school ${s.d >= 0 ? 'pos' : 'neg'}">
         <div class="ly-sname">${esc(s.phai)} <span class="ly-d">${esc(dHanzi(s.d))}</span></div>
@@ -3499,8 +4084,8 @@ function runInverse() {
         refYear: new Date().getFullYear(), yearStart: year, yearEnd: year, stepDays: step, topK: 5, maxSamples: 5000,
         target: mode === 'target' ? target : null,
       });
-    } catch (e) { out.innerHTML = `<p class="hint">Lỗi: ${e.message}</p>`; return; }
-    const fmt = (r) => r ? `<div class="zr-item"><b>${r.y}-${String(r.m).padStart(2,'0')}-${String(r.d).padStart(2,'0')}</b> ${r.g==='nam'?'Nam':'Nữ'} · giờ <b>${r.shichen}</b> <span class="zh">${r.pillars.join(' ')}</span> <span class="ln-rate ${r.score>=62?'rate-cat':r.score>=46?'rate-mid':'rate-hung'}">${r.score}đ</span> · ${r.pattern}${r.gejuQuality?' ('+r.gejuQuality+')':''}</div>` : '';
+    } catch (e) { out.innerHTML = `<p class="hint">Lỗi: ${esc(e.message)}</p>`; return; }
+    const fmt = (r) => r ? `<div class="zr-item"><b>${r.y}-${String(r.m).padStart(2,'0')}-${String(r.d).padStart(2,'0')}</b> ${r.g==='nam'?'Nam':'Nữ'} · giờ <b>${esc(r.shichen)}</b> <span class="zh">${esc(r.pillars.join(' '))}</span> <span class="ln-rate ${r.score>=62?'rate-cat':r.score>=46?'rate-mid':'rate-hung'}">${r.score}đ</span> · ${esc(r.pattern)}${r.gejuQuality?' ('+esc(r.gejuQuality)+')':''}</div>` : '';
     const heading = mode === 'max' ? '🥇 BÁT TỰ ĐIỂM CAO NHẤT (mệnh tốt nhất có thể)' : mode === 'min' ? '🔻 BÁT TỰ ĐIỂM THẤP NHẤT (mệnh xấu nhất có thể)' : `🎯 BÁT TỰ GẦN ${target} ĐIỂM NHẤT`;
     const focus = mode === 'max' ? sol.max : mode === 'min' ? sol.min : sol.nearestToTarget;
     const list = mode === 'max' ? sol.topK : mode === 'min' ? sol.bottomK : null;
@@ -3752,28 +4337,35 @@ $('cfg-test').addEventListener('click', async () => {
     el.style.color = '#e0533d';
   }
 });
-// AI popup (chat widget nổi): mở/đóng
-$('ai-fab').addEventListener('click', () => {
-  $('ai-popup').classList.remove('hidden');
-  $('ai-fab').classList.add('hidden');
+// AI popup (chat widget nổi): mở/đóng. [loop 358] Dùng event DELEGATION (gắn vào document)
+//   thay vì addEventListener trực tiếp — fix bug «sau Luận giải, bấm Trợ lý AI không hoạt động»:
+//   listener trực tiếp bị mất nếu element bị thay thế (innerHTML #result lúc error, hoặc re-render).
+//   Delegation survive mọi thay thế element → click luôn hoạt động.
+function openAIPopup() {
+  const p = $('ai-popup'); if (!p) return;
+  p.classList.remove('hidden');
+  const fab = $('ai-fab'); if (fab) fab.classList.add('hidden');
   const cs = $('chat-suggest'); if (cs) cs.style.display = ''; // re-show chips when reopening
   setTimeout(() => { const q = $('question'); if (q) q.focus(); }, 50);
   const cl = $('chat-log');
   if (cl && !cl.childElementCount) appendMsg('assistant', 'Xin chào! Tôi là trợ lý Bát Tự AI. Bạn đã lập lá số — hãy hỏi tôi bất cứ điều gì về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà… (Bấm ⚙ để bật AI thật; chưa bật thì tôi dùng bộ luân giải cục bộ.)');
-});
-// suggestion chips — click to auto-fill + submit
-document.querySelectorAll('.suggest-chip').forEach((chip) => {
-  chip.addEventListener('click', () => {
+}
+function closeAIPopup() {
+  const p = $('ai-popup'); if (p) p.classList.add('hidden');
+  const fab = $('ai-fab'); if (fab) fab.classList.remove('hidden');
+}
+document.addEventListener('click', (e) => {
+  const fabEl = e.target.closest && e.target.closest('#ai-fab');
+  if (fabEl) { openAIPopup(); return; }
+  const closeEl = e.target.closest && e.target.closest('#ai-popup-close');
+  if (closeEl) { closeAIPopup(); return; }
+  const chipEl = e.target.closest && e.target.closest('.suggest-chip');
+  if (chipEl) {
     const q = $('question');
-    if (q) { q.value = chip.dataset.q; const btn = $('ask-btn'); if (btn) btn.click(); }
-    // hide chips after first use
+    if (q) { q.value = chipEl.dataset.q; const btn = $('ask-btn'); if (btn) btn.click(); }
     const cs = $('chat-suggest'); if (cs) cs.style.display = 'none';
-  });
-});
-
-$('ai-popup-close').addEventListener('click', () => {
-  $('ai-popup').classList.add('hidden');
-  $('ai-fab').classList.remove('hidden');
+    return;
+  }
 });
 
 $('calendar-note').textContent =
@@ -3986,8 +4578,8 @@ function renderYearDaily(R, year) {
   const Y = computeYearDaily(R, year, R.patternQuality);
   currentYearDaily = Y;
 
-  const ctxLine = `Năm <b>${Y.year}</b> · Lưu năm <span class="zh">${Y.liunian.ganZhi}</span> · `
-    + (Y.dayun ? `Đại vận hành <span class="zh">${Y.dayun.ganZhi}</span> [${Y.dayun.startAge}–${Y.dayun.startAge + 9}t, ${Y.dayun.rating}]` : '(ngoài phạm vi đại vận đã tính)');
+  const ctxLine = `Năm <b>${esc(String(Y.year))}</b> · Lưu năm <span class="zh">${esc(Y.liunian.ganZhi)}</span> · `
+    + (Y.dayun ? `Đại vận hành <span class="zh">${esc(Y.dayun.ganZhi)}</span> [${esc(String(Y.dayun.startAge))}–${esc(String(Y.dayun.startAge + 9))}t, ${esc(Y.dayun.rating)}]` : '(ngoài phạm vi đại vận đã tính)');
   $('yd-context').innerHTML = `<div class="yd-context">${ctxLine}</div>`;
 
   const s = Y.stats;
@@ -4356,7 +4948,7 @@ function renderPillarAge() {
   const pa = analyzePillarAges(currentResult);
   const cells = pa.map((p) => {
     const cls = p.score >= 62 ? 'cat' : p.score >= 42 ? 'mid' : 'xiong';
-    return '<div class="pa-cell ' + cls + '"><div class="pa-label">' + p.label + '</div><div class="pa-range">' + p.range + '</div><div class="pa-score">' + p.score + '</div><div class="pa-god">Can: ' + p.ganGod + (p.ganIsDung ? ' ★' : p.ganIsKy ? ' ✗' : '') + ' | Chi: ' + p.zhiGod + (p.zhiIsDung ? ' ★' : '') + '</div><div class="pa-v">' + p.verdict + '</div></div>';
+    return '<div class="pa-cell ' + cls + '"><div class="pa-label">' + esc(p.label) + '</div><div class="pa-range">' + esc(p.range) + '</div><div class="pa-score">' + esc(String(p.score)) + '</div><div class="pa-god">Can: ' + esc(p.ganGod) + (p.ganIsDung ? ' ★' : p.ganIsKy ? ' ✗' : '') + ' | Chi: ' + esc(p.zhiGod) + (p.zhiIsDung ? ' ★' : '') + '</div><div class="pa-v">' + esc(p.verdict) + '</div></div>';
   }).join('');
   const el = document.getElementById('pillarage-out');
   if (el) el.innerHTML = '<div class="pa-grid">' + cells + '</div>';
@@ -4526,12 +5118,20 @@ function renderQuickSummary() {
     const age = new Date().getFullYear() - c.chart.input.year;
     const dy = (c.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
     const ln = (c.liunian || []).find((l) => l.isNow);
-    curDyTxt = dy ? `Đại vận <b>${hanviet(dy.ganZhi)}</b> (${dy.startAge}–${dy.startAge + 9}t, ${dy.rating})${ln ? ` · Lưu niên ${hanviet(ln.ganZhi)} (${ln.rating})` : ''}` : '(không rõ)';
+    const dyNy = dy ? ganZhiNayin(dy.ganZhi) : null; // [loop 361] nạp âm đại vận
+    curDyTxt = dy ? `Đại vận <b>${hanviet(dy.ganZhi)}</b> (${dy.startAge}–${dy.startAge + 9}t, ${dy.zhiGod ? TEN_GOD_VI[dy.zhiGod] + ' vận, ' : ''}${dyNy ? dyNy + ', ' : ''}${dy.rating})${ln ? ` · Lưu niên ${hanviet(ln.ganZhi)} (${ln.gan ? TEN_GOD_VI[tenGod(c.chart.dayGan, ln.gan)] + ' năm, ' : ''}${ln.rating})` : ''}` : '(không rõ)';
+    // [loop 350] Lưu nguyệt hiện tại (tháng này) — lightweight qua Solar, hoàn thiện bức tranh «đại vận·lưu niên·lưu nguyệt»
+    try {
+      const ml = Solar.fromDate(new Date()).getLunar();
+      const lyGz = ml.getMonthGan() + ml.getMonthZhi();
+      curDyTxt += ` · Lưu nguyệt ${hanviet(lyGz)} (${TEN_GOD_VI[tenGod(c.chart.dayGan, ml.getMonthGan())]} tháng)`;
+    } catch (e) {}
   } catch (e) {}
   const rows = [
     { icon: '🧬', label: 'Mệnh bạn', text: `${pattern.vi || '?'}, thân ${c.strength?.strong ? 'vượng (mạnh)' : 'nhược (yếu)'}. <b>Điểm tổng mệnh: ${syn.score ?? '?'}/100 (${syn.gradeVi ?? '?'})</b>.` },
     { icon: '💊', label: 'Hành cần bổ', text: `Dụng Thần = <b>${dungVi}</b>. Bổ qua ${dungAction}.${yong.tiaohou?.override ? ' ⚠ 调候 LÀM CHỦ (sinh mùa cực đoan).' : ''}` },
     { icon: '🛤️', label: 'Vận hiện tại', text: curDyTxt },
+    { icon: '🕐', label: 'Giờ hiện tại', text: (() => { const _Z = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥']; const _ZV = ['Tý','Sửu','Dần','Mão','Thìn','Tỵ','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi']; const _h = new Date().getHours(); const _i = Math.floor(((_h + 1) % 24) / 2); return `<b>${_Z[_i]} (${_ZV[_i]})</b> giờ`; })() },
     { icon: todayTone, label: 'Hôm nay', text: `${todayRating} (${todayScore}/100). ${todayOneLiner}` },
     { icon: '📆', label: 'Tuần này', text: weekSummary || '(đang tính...)' },
     { icon: alert ? '⚠' : '✓', label: alert ? 'Cảnh báo' : 'An tâm', text: alert || 'Không cảnh báo nặng năm nay.' },
@@ -4555,18 +5155,23 @@ function renderMonthCalendar() {
   let cal;
   try { cal = monthCalendar(currentResult, { year, month }); } catch (e) { el.innerHTML = '<p class="hint">Không tính được.</p>'; return; }
   const colors = { cat: { bg: '#e8f5e9', border: '#2e7d32', text: '#1b5e20' }, mid: { bg: '#fff8e1', border: '#b8860b', text: '#5d4037' }, hung: { bg: '#ffebee', border: '#c62828', text: '#b71c1c' }, pad: { bg: 'transparent', border: 'transparent', text: '#ccc' } };
+  // [loop 384] quý nhân chi — đánh dấu ngày có quý nhân trên lịch tháng
+  const _calSs = currentResult && currentResult.shensha ? currentResult.shensha : null;
+  const calNoble = new Set();
+  if (_calSs) { ['tianYi','wenChang','jiangXing'].forEach((k) => { if (_calSs[k] && _calSs[k].at) _calSs[k].at.forEach((z) => calNoble.add(z)); }); }
   const headers = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map(d => `<div style="text-align:center;font-size:.7em;font-weight:bold;color:var(--silk-muted);padding:2px">${d}</div>`).join('');
   const cells = cal.days.map((d) => {
     if (!d.inMonth) return `<div style="min-height:38px;padding:2px;opacity:.3;color:#ccc;font-size:.75em;text-align:center"></div>`;
     const c = colors[d.tone];
     const isBest = cal.best && d.day === cal.best.day;
     const isWorst = cal.worst && d.day === cal.worst.day;
+    const isNoble = d.ganZhi && calNoble.has(d.ganZhi[1]);
     const now = new Date();
     const isToday = year === now.getFullYear() && month === (now.getMonth() + 1) && d.day === now.getDate();
     return `<div style="min-height:38px;padding:2px 3px;background:${c.bg};border:${isToday ? '2px solid var(--gold,#d4af37)' : '1px solid '+c.border+'40'};border-radius:4px;${isBest ? 'box-shadow:0 0 4px '+c.border+'80;' : ''}${isToday ? 'box-shadow:0 0 6px var(--gold,#d4af37);' : ''}">
       <div style="font-size:.75em;font-weight:bold;color:${c.text}">${d.day}${isToday ? ' ★' : ''}</div>
       <div style="font-size:.55em;color:${c.text};opacity:.7">${d.score}</div>
-      ${isBest ? '<div style="font-size:.5em;color:#2e9e5b">★</div>' : isWorst ? '<div style="font-size:.5em;color:#e0533d">⚠</div>' : ''}
+      ${isBest ? '<div style="font-size:.5em;color:#2e9e5b">★</div>' : isWorst ? '<div style="font-size:.5em;color:#e0533d">⚠</div>' : isNoble ? '<div style="font-size:.5em">🌟</div>' : ''}
     </div>`;
   }).join('');
   el.innerHTML = `
@@ -4579,10 +5184,15 @@ function renderWeekPreview() {
   let w;
   try { w = weekPreview(currentResult, { days: 7 }); } catch (e) { $('week-preview').innerHTML = '<p class="hint">Không tính được.</p>'; return; }
   const colors = { cat: '#2e7d32', mid: '#b8860b', hung: '#c62828' };
+  // [loop 385] quý nhân chi — đánh dấu ngày có quý nhân trong tuần
+  const _wkSs = currentResult && currentResult.shensha ? currentResult.shensha : null;
+  const wkNoble = new Set();
+  if (_wkSs) { ['tianYi','wenChang','jiangXing'].forEach((k) => { if (_wkSs[k] && _wkSs[k].at) _wkSs[k].at.forEach((z) => wkNoble.add(z)); }); }
   const cells = w.days.map((d) => {
     const c = colors[d.tone];
     const isBest = w.best && d.date === w.best.date;
     const isWorst = w.worst && d.date === w.worst.date;
+    const isNoble = d.ganZhi && wkNoble.has(d.ganZhi[1]);
     const now = new Date();
     const isToday = d.day === now.getDate() && d.month === (now.getMonth() + 1);
     return `<div style="flex:1;min-width:80px;text-align:center;border:1px solid ${isToday ? 'var(--gold,#d4af37)' : isBest ? c : '#e0d0a0'};border-radius:8px;padding:6px 4px;background:${c}15;${isBest ? 'box-shadow:0 0 6px '+c+'80;' : ''}${isToday ? 'box-shadow:0 0 6px var(--gold,#d4af37);' : ''}">
@@ -4591,7 +5201,7 @@ function renderWeekPreview() {
       <div class="zh" style="font-size:.7em;opacity:.6">${d.ganZhi}</div>
       <div style="font-weight:bold;color:${c};font-size:1em">${d.score}</div>
       <div style="font-size:.65em;color:var(--silk-muted)">${d.rating}</div>
-      ${isBest ? '<div style="font-size:.6em;color:#2e9e5b">★ tốt</div>' : isWorst ? '<div style="font-size:.6em;color:#e0533d">⚠ kỵ</div>' : isToday ? '<div style="font-size:.6em;color:var(--gold,#d4af37)">← hôm nay</div>' : ''}
+      ${isBest ? '<div style="font-size:.6em;color:#2e9e5b">★ tốt</div>' : isWorst ? '<div style="font-size:.6em;color:#e0533d">⚠ kỵ</div>' : isToday ? '<div style="font-size:.6em;color:var(--gold,#d4af37)">← hôm nay</div>' : ''}${isNoble ? '<div style="font-size:.6em" title="Ngày có quý nhân (天乙/文昌/将星)">🌟</div>' : ''}
     </div>`;
   }).join('');
   $('week-preview').innerHTML = `
@@ -4729,13 +5339,13 @@ function renderZiweiFull() {
   const z = computeZiwei(i.year, i.month, i.day, i.hour, i.minute, i.gender);
   // 14主星 meaning
   const stars = interpretZiweiStars(z);
-  const starsHtml = stars.map(s => '<div class="zw-star ' + (s.inMingGong ? 'ming' : '') + ' ' + s.tone + '"><b>' + s.star + '</b> (' + s.vi + ') @' + s.branch + (s.inMingGong ? ' ★ Mệnh' : '') + '<div class="zw-sn">' + s.nature + '</div></div>').join('');
+  const starsHtml = stars.map(s => '<div class="zw-star ' + (s.inMingGong ? 'ming' : '') + ' ' + s.tone + '"><b>' + esc(s.star) + '</b> (' + esc(s.vi) + ') @' + esc(s.branch) + (s.inMingGong ? ' ★ Mệnh' : '') + '<div class="zw-sn">' + esc(s.nature) + '</div></div>').join('');
   // 六吉六煞
   const aux = computeAuxStars(z.birth.yearGan, z.birth.yearZhi || '酉', z.birth.lunarMonth, z.birth.timeZhi);
-  const auxHtml = Object.entries(aux).map(([k,v]) => '<span class="zw-aux ' + v.tone + '">' + k + ' (' + v.vi + ') @' + v.branch + '</span>').join(' ');
+  const auxHtml = Object.entries(aux).map(([k,v]) => '<span class="zw-aux ' + v.tone + '">' + esc(k) + ' (' + esc(v.vi) + ') @' + esc(v.branch) + '</span>').join(' ');
   // 孤辰寡宿 etc
   const ms = computeMarriageShensha(currentResult.chart);
-  const msHtml = ms.length ? ms.map(s => '<span class="zw-aux sha">' + s.star + ' (' + s.vi + ') @' + s.positions + '</span>').join(' ') : '(không)';
+  const msHtml = ms.length ? ms.map(s => '<span class="zw-aux sha">' + esc(s.star) + ' (' + esc(s.vi) + ') @' + esc(s.positions) + '</span>').join(' ') : '(không)';
   const el = document.getElementById('ziwei-stars-out');
   if (el) el.innerHTML = '<div class="zw-stars-list">' + starsHtml + '</div><h4>六吉六煞</h4><div class="zw-aux-list">' + auxHtml + '</div><h4>神煞 hôn nhân</h4><div class="zw-aux-list">' + msHtml + '</div>';
 }
@@ -4764,8 +5374,14 @@ function renderMarriageDeep(){
   }catch(e){console.warn('marriageDeep',e.message);}
 }
 // load saved birth data from localStorage (if user previously entered their own)
+// [loop 391] URL params take precedence (shareable link) over localStorage
 try {
-  const saved = JSON.parse(localStorage.getItem('bazi-birth') || 'null');
+  const params = new URLSearchParams(window.location.search);
+  const uDob = params.get('dob'), uTime = params.get('time'), uG = params.get('g');
+  if (uDob) { $('date').value = uDob; if (uTime) $('time').value = uTime; if (uG) { const r = document.querySelector(`input[name="gender"][value="${uG}"]`); if (r) r.checked = true; }
+    // skip localStorage restore if URL params present
+  } else {
+    const saved = JSON.parse(localStorage.getItem('bazi-birth') || 'null');
   if (saved && saved.date) {
     $('date').value = saved.date;
     if (saved.time) $('time').value = saved.time;
@@ -4775,7 +5391,17 @@ try {
     if (saved.city && $('city')) $('city').value = saved.city;
     if (saved.long && $('long')) $('long').value = saved.long;
   }
+  } // close else
 } catch (e) {}
+// [loop 388] restore AI chat history from previous session (same chart)
+try {
+  const savedChat = JSON.parse(localStorage.getItem('bazi-chat') || 'null');
+  if (Array.isArray(savedChat) && savedChat.length) {
+    chatHistory = savedChat;
+    // re-append messages to chat-log (visible when user opens popup)
+    setTimeout(() => { savedChat.forEach((m) => { try { appendMsg(m.role, m.content); } catch (_) {} }); }, 200);
+  }
+} catch (_) {}
 // [loop 23] city change → hiện/ẩn ô kinh độ thủ công
 function syncLongField() {
   const lf = $('long-field'); const c = $('city');
@@ -4784,7 +5410,9 @@ function syncLongField() {
 }
 if ($('city')) { $('city').addEventListener('change', syncLongField); syncLongField(); }
 // auto-render on page load — user sees results immediately (saved data or defaults)
+_skipChatReset = true; // [loop 389] don't clear chat on initial render (same chart)
 try { run(); } catch (e) { console.warn('auto-render:', e.message); }
+_skipChatReset = false;
 
 // ============================================================================
 // [loop 148] 3D TILT INTERACTIVE — chuột/touch → card nghiêng 3D + lóa mắt

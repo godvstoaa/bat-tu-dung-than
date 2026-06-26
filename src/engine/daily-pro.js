@@ -7,9 +7,13 @@
 import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { tenGod } from './core.js';
-import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP } from './shensha.js';
+import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, TIAN_YI, WEN_CHANG, JIANG_XING } from './shensha.js';
 
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
+// [loop 290] 六害 (穿) + 三刑 — daily-pro từng thiếu (chỉ có 冲) nên nông hơn cả liuri (light).
+// Bổ sung cho khớp cổ pháp 择日: chi ngày phạm 害/刑 với tuổi/Nhật Chi cũng giảm cát.
+const HAI = { 子:'未', 未:'子', 丑:'午', 午:'丑', 寅:'巳', 巳:'寅', 卯:'辰', 辰:'卯', 申:'亥', 亥:'申', 酉:'戌', 戌:'酉' };
+const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌', 戌:'未', 未:'丑', 辰:'辰', 午:'午', 酉:'酉', 亥:'亥' };
 const ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const OFFICERS = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
 const OFFICER_ROAD = { 建:'black', 满:'black', 平:'black', 收:'black', 破:'black', 闭:'black', 除:'yellow', 危:'yellow', 定:'yellow', 执:'yellow', 成:'yellow', 开:'yellow' };
@@ -74,13 +78,20 @@ export function dailyPro(R, year, month, day) {
   score += e3;
   schools.push({ phai: 'Trực', d: e3, note: `Trực ${officer} (${TONE_WORD[road]}): ${road === 'yellow' ? 'nền cát' : 'nền hắc đạo, hạn chế việc lớn'}.` });
 
-  // PHÁI 4: Chi xung/hại tuổi
+  // PHÁI 4: Chi 冲/害/刑 tuổi (cổ pháp 择日 — chi ngày phạm cả 3 dạng đều giảm cát)
   let e4 = 0, e4note = '';
-  if (CHONG[dZhi] === birthYearZhi || dZhi === CHONG[birthYearZhi]) { e4 -= 5; e4note = `Chi ${dZhi} xung tuổi ${birthYearZhi}. `; }
+  // 冲 (lớn nhất)
+  if (CHONG[dZhi] === birthYearZhi || dZhi === CHONG[birthYearZhi]) { e4 -= 5; e4note += `Chi ${dZhi} xung tuổi ${birthYearZhi}. `; }
   if (CHONG[dZhi] === dayZhi_pillar || dZhi === CHONG[dayZhi_pillar]) { e4 -= 4; e4note += `Chi xung Nhật Chi (bản thân). `; }
-  if (!e4note) e4note = 'Không xung.';
+  // 害 (穿 — nhẹ hơn 冲)
+  if (HAI[dZhi] === birthYearZhi || dZhi === HAI[birthYearZhi]) { e4 -= 3; e4note += `Chi ${dZhi} hại tuổi ${birthYearZhi}. `; }
+  if (HAI[dZhi] === dayZhi_pillar || dZhi === HAI[dayZhi_pillar]) { e4 -= 2; e4note += `Chi hại Nhật Chi. `; }
+  // 刑 (刑罚 — cẩn thận quanphi/sức khoẻ)
+  if (XING[dZhi] === birthYearZhi || dZhi === XING[birthYearZhi]) { e4 -= 3; e4note += `Chi ${dZhi} hình tuổi ${birthYearZhi} (cẩn thận quanphi). `; }
+  if (XING[dZhi] === dayZhi_pillar || dZhi === XING[dayZhi_pillar]) { e4 -= 2; e4note += `Chi hình Nhật Chi. `; }
+  if (!e4note) e4note = 'Chi ngày không phạm 冲/害/刑 với tuổi.';
   score += e4;
-  schools.push({ phai: 'Xung', d: e4, note: e4note });
+  schools.push({ phai: 'Xung/Hại/Hình', d: e4, note: e4note });
 
   // PHÁI 5: Thần sát ngày (đào hoa/hồng diễm/dương nhận)
   let e5 = 0, e5note = '', e5YangRen = false; // [loop 27] flag dương nhận (tránh bug case-sensitive)
@@ -90,6 +101,10 @@ export function dailyPro(R, year, month, day) {
   if (HONG_YAN[dayGan] === dZhi) { e5 -= 3; e5note += 'Hồng diễm. '; }
   if (YANG_REN[dayGan] === dZhi) { e5 -= 4; e5note += 'Dương nhận (cẩn thận). '; e5YangRen = true; }
   if (YI_MA[grp] === dZhi || YI_MA[grpDay] === dZhi) { e5 += 2; e5note += 'Dịch mã (di chuyển tốt). '; }
+  // [loop 365 nâng logic] thần sát CÁT ngày (cùng fix loop 364: trước đây chỉ score hung)
+  if (TIAN_YI[dayGan] && TIAN_YI[dayGan].includes(dZhi)) { e5 += 3; e5note += 'Thiên Ất quý nhân (quý nhân phò). '; }
+  if (WEN_CHANG[dayGan] === dZhi) { e5 += 2; e5note += 'Văn Xương (học/văn thuận). '; }
+  if (JIANG_XING[grp] === dZhi) { e5 += 2; e5note += 'Tướng tinh (uy quyền). '; }
   if (!e5note) e5note = 'Không thần sát nổi.';
   score += e5;
   schools.push({ phai: 'Thần Sát', d: e5, note: e5note });

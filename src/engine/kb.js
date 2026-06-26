@@ -159,9 +159,11 @@ export const TEN_GOD_DEEP = {
 // ---- Ý NGHĨA CỦA CÁC TƯƠNG TÁC HỘI – HỢP – XUNG – HÌNH – HẠI ----
 export const INTERACTION_MEANING = {
   ganHe: 'Thiên Can hợp → nhân duyên, cơ hội, sự nghiệp gắn kết; nếu hóa khí tốt thì càng lợi. Hợp thường mang tính "ràng buộc" nhẹ (dễ bị níu kéo).',
+  ganChong: 'Thiên Can xung (Thất Sát: 甲庚/乙辛/丙壬/丁癸) → xung đột cương quyết giữa 2 lãnh vực trụ (vd Năm–Tháng = tổ bối ↔ phụ mẫu/sự nghiệp), dễ va chạm ý tưởng/quyết đoán, cần hạ hoả.',
   zhiHe: 'Địa Chi lục hợp → quan hệ/gia đạo hòa hợp, nhân duyên; chi hợp hóa hành Dụng Thần thì rất tốt.',
   sanHe: 'Tam hợp cục → khí lực của một hành mạnh lên nhiều, tăng vượng cho hành đó (lợi nếu là Dụng, hại nếu là Kỵ).',
   sanHui: 'Tam hội phương → khí thế một phương cực mạnh, gần như đổi hướng cả cục.',
+  banHe: 'Bán hợp cục → 2/3 tam hợp, «chờ» chi còn lại đến trong đại vận/lưu niên thì thành cục đầy đủ (kích hoạt khi đủ 3 chi). Bán hợp nhẹ hơn tam hợp đầy đủ nhưng vẫn nghiêng về hành đó.',
   chong: 'Xung → biến động, thay đổi, di chuyển, xung đột; xung trụ Ngày (cung phu thê) hay Năm (thái tổ) thường mang ý nghĩa biến động lớn.',
   xing: 'Hình → rắc rối pháp lý, thị phi, tổn thương, bệnh tật, đau đớn; tự hình thì hay tự gây rắc rối cho mình.',
   hai: 'Hại → trở ngại âm thầm, tiểu nhân, mất mát không rõ nguyên nhân, quan hệ ngầm bất hòa.',

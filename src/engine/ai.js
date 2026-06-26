@@ -530,6 +530,7 @@ NGUYEN TAC:
   - "khởi nghiệp / mở công ty / tự kinh doanh" → mục "KINH DOANH" + "SỰ NGHIỆP" + "TÀI TINH" (PHÂN TÍCH CHUYÊN SÂU) + "ĐẠI VẬN XẾP HẠNG" — should-start + tài khố + Quan/Tài lực + vận thuận.
   - [loop 132] "mệnh cung / thân cung của tôi" → mục "MỆNH CUNG" (PHÂN TÍCH CHUYÊN SÂU) — mệnh cung/thân cung + thập thần + Dụng/Kỵ.
   - "mệnh cách tầng lớp / đẳng cấp mệnh" → mục "MỆNH CÁCH TẦNG LỚP" (PHÂN TÍCH CHUYÊN SÂU) — 6 tiêu chí cổ điển.
+  - [loop 318] "cấu hình mệnh / cấu trúc thập thần / mệnh có gì đặc biệt / sát ấn / thương quan / quan sát hỗn tạp" → mục "TỔ HỢP CÁT" + "TỔ HỢP HUNG" (trong brief) — nêu tổ hợp kinh điển (Sát Ấn Tương Sinh, Thực Chế Sát, Quan Sát Hỗn Tạp, Tài Đa Thân Nhược…) + «chân cách/hình thức» + hung «đã chế/chưa chế».
   - "tính cách / tính tôi ra sao / bản chất" → mục "TÍNH CÁCH NHẬT CAN" + "NGŨ ĐỨC" (PHÂN TÍCH CHUYÊN SÂU).
   - "ăn gì hợp / mặc màu gì / đeo đá gì / tinh dầu / trà / cây" → mục "ẨM THỰC" (PHÂN TÍCH CHUYÊN SÂU) — vị Dụng + thực phẩm + trà + thực đơn. Màu/đá/vận động → bổ Dụng (SYSTEM_PROMPT bảng ngũ hành).
   - "số hợp / số điện thoại / biển số" → mục "SỐ HỢP" (trong PHONG THỦY & ĐỊNH VÍ).

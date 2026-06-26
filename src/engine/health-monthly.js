@@ -9,6 +9,10 @@ import { GAN, ZHI, HIDDEN, WX_VI, TEN_GOD_VI } from './constants.js';
 import { tenGod } from './core.js';
 
 const MONTH_ZH = ['正','二','三','四','五','六','七','八','九','十','冬','腊'];
+// [loop 313 sửa bug] tên tháng phải theo mZhi THẬT (tiết khí), không phải index Dương lịch.
+//   Trước đây i=0 (tháng 1 Dương=丑月/腊) bị gán nhãn «正» → sai 1 tháng so với ganZhi.
+//   寅=正, 卯=二, … 丑=腊 (lịch âm bắt đầu 立春/tháng Dần).
+const ZHI_MONTH = { '寅':'正','卯':'二','辰':'三','巳':'四','午':'五','未':'六','申':'七','酉':'八','戌':'九','亥':'十','子':'冬','丑':'腊' };
 
 const ORGAN = {
   木: { vi: 'Mộc', organs: 'Gan – Mật, thần kinh, gân, mắt', risk: 'gan nóng, căng thẳng, đau mắt, tức giận' },
@@ -80,13 +84,13 @@ export function healthMonthlyAlert(R, scanYear) {
     const totalScore = Math.max(10, Math.min(95, 50 + gInfo.d + wxScore + seasonRisk));
 
     let tone, advice, organFocus;
-    if (totalScore >= 65) { tone = 'cat'; advice = `✓ Tháng ${MONTH_ZH[i]}: sức khoẻ TỐT — duy trì dưỡng sinh.`; organFocus = ORGAN[yong.primary]; }
-    else if (totalScore >= 48) { tone = 'mid'; advice = `Tháng ${MONTH_ZH[i]}: sức khoẻ trung — duy trì.`; organFocus = ORGAN[dmWx]; }
-    else if (totalScore >= 35) { tone = 'slight-hung'; advice = `⚠ Tháng ${MONTH_ZH[i]}: sức khoẻ bất lợi — chú ý ${ORGAN[weakest].risk}.`; organFocus = ORGAN[weakest]; }
-    else { tone = 'hung'; advice = `🚨 Tháng ${MONTH_ZH[i]}: RỦI RO CAO — khám ${ORGAN[weakest].organs.split(' ')[0]}, giảm cường độ, dưỡng Dụng ${WX_VI[yong.primary]}.`; organFocus = ORGAN[weakest]; }
+    if (totalScore >= 65) { tone = 'cat'; advice = `✓ Tháng ${ZHI_MONTH[mZhi] || "?"}: sức khoẻ TỐT — duy trì dưỡng sinh.`; organFocus = ORGAN[yong.primary]; }
+    else if (totalScore >= 48) { tone = 'mid'; advice = `Tháng ${ZHI_MONTH[mZhi] || "?"}: sức khoẻ trung — duy trì.`; organFocus = ORGAN[dmWx]; }
+    else if (totalScore >= 35) { tone = 'slight-hung'; advice = `⚠ Tháng ${ZHI_MONTH[mZhi] || "?"}: sức khoẻ bất lợi — chú ý ${ORGAN[weakest].risk}.`; organFocus = ORGAN[weakest]; }
+    else { tone = 'hung'; advice = `🚨 Tháng ${ZHI_MONTH[mZhi] || "?"}: RỦI RO CAO — khám ${ORGAN[weakest].organs.split(' ')[0]}, giảm cường độ, dưỡng Dụng ${WX_VI[yong.primary]}.`; organFocus = ORGAN[weakest]; }
 
     months.push({
-      m: i, mVi: `T${i + 1} (${MONTH_ZH[i]}月/${season})`, ganZhi: mGan + mZhi,
+      m: i, mVi: `T${i + 1} (${ZHI_MONTH[mZhi] || '?'}月/${season})`, ganZhi: mGan + mZhi,
       god, godVi: TEN_GOD_VI[god] || god,
       score: totalScore, tone, organFocus, advice,
     });

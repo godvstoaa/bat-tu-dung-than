@@ -444,22 +444,23 @@ export function qizheng(year, month, day, hour, minute, tzOffset = 7) {
 
 // ---- UI helper: render thẻ HTML (dùng chung class với huangdao/ziwei) ----
 export function renderQizhengCard(r) {
+  const e = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const planetRow = (p) => {
     const cls = p.tone === 'cat' ? 'rate-cat' : p.tone === 'hung' ? 'rate-hung' : '';
     const shadow = p.isShadow ? ' <span class="hint-inline">(dư)</span>' : '';
     return `
       <div class="ln" style="min-width:150px">
-        <div class="ln-year"><span class="zh">${p.name}</span> ${p.vi}${shadow}</div>
-        <div class="ln-gz">${p.longitude}° · <span class="zh">${p.mansion.zhi}</span> ${p.mansion.vi} túc</div>
-        <div class="ln-rate ${cls}"><span class="zh">${p.palace.zh}</span> ${p.palace.vi}</div>
-        <div class="ln-flags" style="font-size:11px;color:var(--muted)">${p.interpretation}</div>
+        <div class="ln-year"><span class="zh">${e(p.name)}</span> ${e(p.vi)}${shadow}</div>
+        <div class="ln-gz">${e(String(p.longitude))}° · <span class="zh">${e(p.mansion.zhi)}</span> ${e(p.mansion.vi)} túc</div>
+        <div class="ln-rate ${cls}"><span class="zh">${e(p.palace.zh)}</span> ${e(p.palace.vi)}</div>
+        <div class="ln-flags" style="font-size:11px;color:var(--muted)">${e(p.interpretation)}</div>
       </div>`;
   };
   const seven = r.chart.planets.filter((p) => !p.isShadow);
   const yu = r.chart.planets.filter((p) => p.isShadow);
   return `
-    <div class="zr-head"><b>${r.input.year}-${r.input.month}-${r.input.day} ${String(r.input.hour).padStart(2,'0')}:${String(r.input.minute).padStart(2,'0')}</b> · 七政四余 · Mệnh cung hoàng đạo <b>#${r.palaceOfMing + 1}</b> <span class="zh">${PALACES_12[0].zh}</span></div>
-    <p class="hint" style="margin:4px 0">${r.chart.summary}</p>
+    <div class="zr-head"><b>${e(r.input.year)}-${e(r.input.month)}-${e(r.input.day)} ${e(String(r.input.hour).padStart(2,'0'))}:${e(String(r.input.minute).padStart(2,'0'))}</b> · 七政四余 · Mệnh cung hoàng đạo <b>#${e(String(r.palaceOfMing + 1))}</b> <span class="zh">${e(PALACES_12[0].zh)}</span></div>
+    <p class="hint" style="margin:4px 0">${e(r.chart.summary)}</p>
     <h4 class="syn-h4" style="margin-top:6px">七政 — 7 chính tinh (toạ độ hoàng đạo thật)</h4>
     <div class="ln-decade" style="display:flex;flex-wrap:wrap;gap:6px">${seven.map(planetRow).join('')}</div>
     <h4 class="syn-h4" style="margin-top:8px">四余 — 4 tinh dư (mean motion cổ)</h4>

@@ -10,8 +10,8 @@
 import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI, SHENG, KE, TEN_GOD_VI } from './constants.js';
 import { tenGod, godGroup } from './core.js';
-import { GAN_HE_MAP, ZHI_LIUHE_MAP, ZHI_CHONG_MAP } from './interactions.js';
-import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, SHENSHA_INFO } from './shensha.js';
+import { GAN_HE_MAP, ZHI_LIUHE_MAP, ZHI_CHONG_MAP, GAN_CHONG } from './interactions.js';
+import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, SHENSHA_INFO, TIAN_YI, WEN_CHANG, JIANG_XING } from './shensha.js';
 // [loop 19 — elevation] 伏吟/反吟 chuẩn từ module chuyên dụng (4 cặp thất sát, không phải "bất kỳ ngũ hành khắc").
 import { isFuyin, isFanyin } from './fuyin.js';
 
@@ -103,14 +103,19 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
   if (CHONG[dayZhi] === yZhi && dayZhi !== yearBirthZhi) { score -= 14; taiSuiNotes.push('⚡日支冲太岁 — tổn bản thân/sức khoẻ, năm "ngày xung".'); }
   if (taiSuiNotes.length) schools.push({ phai: 'Thái Tuế', note: taiSuiNotes.join(' '), d: -1 });
 
-  // (4) Thần sát năm (đào hoa / hồng diễm / dương nhận / dịch mã)
+  // (4) Thần sát năm (đào hoa / hồng diễm / dương nhận / dịch mã + [loop 364] quý nhân/văn/tướng)
   const grp = BRANCH_GROUP[yearBirthZhi];
   const ssNotes = [];
-  if (TAO_HUA[grp] === yZhi || TAO_HUA[BRANCH_GROUP[dayZhi]] === yZhi) { score -= 8; ssNotes.push('🌸 Đào Hoa năm — biến động tình cảm, 桃花劫/桃花破财 (cẩn thận烂桃花 hao tiền hao tình).'); }
-  if (HONG_YAN[dayGan] === yZhi) { score -= 6; ssNotes.push('💋 Hồng Diễm năm — sắc duyên mạnh, dễ lệch lạc tình cảm.'); }
-  if (YANG_REN[dayGan] === yZhi) { score -= 10; ssNotes.push('⚔️ Dương Nhận năm — sát khí, dễ tổn thương/xa lánh, kỵ đầu tư liều.'); }
-  if (YI_MA[grp] === yZhi || YI_MA[BRANCH_GROUP[dayZhi]] === yZhi) { score += 3; ssNotes.push('🐎 Dịch Mã năm — di chuyển/đổi việc (cát nếu Dụng, hao nếu không).'); }
-  if (ssNotes.length) schools.push({ phai: 'Lưu Niên Thần Sát', note: ssNotes.join(' '), d: -1 });
+  let ssD = 0;
+  if (TAO_HUA[grp] === yZhi || TAO_HUA[BRANCH_GROUP[dayZhi]] === yZhi) { score -= 8; ssD -= 8; ssNotes.push('🌸 Đào Hoa năm — biến động tình cảm, 桃花劫/桃花破财 (cẩn thận烂桃花 hao tiền hao tình).'); }
+  if (HONG_YAN[dayGan] === yZhi) { score -= 6; ssD -= 6; ssNotes.push('💋 Hồng Diễm năm — sắc duyên mạnh, dễ lệch lạc tình cảm.'); }
+  if (YANG_REN[dayGan] === yZhi) { score -= 10; ssD -= 10; ssNotes.push('⚔️ Dương Nhận năm — sát khí, dễ tổn thương/xa lánh, kỵ đầu tư liều.'); }
+  if (YI_MA[grp] === yZhi || YI_MA[BRANCH_GROUP[dayZhi]] === yZhi) { score += 3; ssD += 3; ssNotes.push('🐎 Dịch Mã năm — di chuyển/đổi việc (cát nếu Dụng, hao nếu không).'); }
+  // [loop 364 nâng logic] thần sát CÁT năm (trước đây chỉ score hung → mất cân bằng)
+  if (TIAN_YI[dayGan] && TIAN_YI[dayGan].includes(yZhi)) { score += 8; ssD += 8; ssNotes.push('🌟 Thiên Ất Quý Nhân năm — quý nhân phò, gặp dữ hóa lành, sự nghiệp/thăng tiến thuận.'); }
+  if (WEN_CHANG[dayGan] === yZhi) { score += 5; ssD += 5; ssNotes.push('📚 Văn Xương năm — thi cử/học vấn thuận, tư duy sắc bén, hợp ký văn/bằng cấp.'); }
+  if (JIANG_XING[grp] === yZhi) { score += 4; ssD += 4; ssNotes.push('🎖️ Tướng Tinh năm — uy quyền/lãnh đạo tăng, hợp nhận chức/quyết định lớn.'); }
+  if (ssNotes.length) schools.push({ phai: 'Lưu Niên Thần Sát', note: ssNotes.join(' '), d: ssD });
 
   // (5) Thiên khắc địa xung (天干 xung + địa chi xung)
   // [loop 60 sửa] 天克 = GAN_CHONG (4 cặp thất sát), KHÔNG phải tenGod ∈ 4 thần khắc.
@@ -179,6 +184,10 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
       else dyNotes.push(`运支 ${dyZhi} hợp 年支 ${yZhi} → hóa ${wxVi(hua)} (trung tính) → hợp cục, ít biến.`); }
     else if (ZHI_CHONG_MAP[dyZhi + yZhi]) { dyD -= 3; dyNotes.push(`⚡运支 ${dyZhi} xung 年支 ${yZhi} (运年 xung) — biến động năm bị đại vận khuếch đại, hung tăng.`); }
     else if (dyZhi === yZhi) { dyD -= 2; dyNotes.push(`运支 ${dyZhi} = 年支 ${yZhi} (伏吟) — trùng phức, chủ buồn/chướng.`); }
+    // [loop 324 nâng logic] 运年 害/形 — cùng bug-class loop 290 (daily-pro): 害/刑 maps có sẵn nhưng
+    //   chưa áp cho tương tác 大运 chi × 流年 chi. 寅-巳 vừa hại vừa hình → if riêng (không else-if).
+    if (HAI[dyZhi] === yZhi) { dyD -= 2; dyNotes.push(`运支 ${dyZhi} hại 年支 ${yZhi} (运年 hại) — tiểu nhân/trệ, vận khuếch đại.`); }
+    if (XING[dyZhi] === yZhi) { dyD -= 2; dyNotes.push(`运支 ${dyZhi} hình 年支 ${yZhi} (运年 hình) — quanphi/thị phi, vận khuếch đại.`); }
 
     // (6c) 天干 ngũ hợp giữa 大运 can và 流年 can (khi hợp → khả năng hóa khí).
     if (GAN_HE_MAP[dyGan + yGan]) {
@@ -188,6 +197,8 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
       if (fav.has(hua)) { dyD += 2; dyNotes.push(`运干 ${dyGan} hợp 年干 ${yGan} → hóa ${wxVi(hua)} (Dụng/Hỷ) → trợ mệnh.`); }
       else if (avoid.has(hua)) { dyD -= 2; dyNotes.push(`运干 ${dyGan} 合 年干 ${yGan} → hóa ${wxVi(hua)} (Kỵ/Thù) → bất lợi.`); }
       else dyNotes.push(`运干 ${dyGan} 合 年干 ${yGan} → khả năng hóa ${wxVi(hua)} (trung tính) → trệ/kìm.`); }
+    // [loop 335] (6c-bis) 天干 xung giữa 大运 can và 流年 can (4 cặp Thất Sát) — «运年 can xung» khuếch đại xung đột.
+    if (GAN_CHONG[dyGan] === yGan) { dyD -= 3; dyNotes.push(`⚡运干 ${dyGan} xung 年干 ${yGan} (Thất Sát) — can xung 运年, quyết đoấn va chạm, hung tăng.`); }
 
     score += dyD;
     schools.push({ phai: '大运互动 (运年组合)', note: `[大运 ${activeDayun} ${TEN_GOD_VI[dyGod]}] ${dyNotes.join(' ')}`, d: dyD });

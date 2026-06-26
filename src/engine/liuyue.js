@@ -10,6 +10,7 @@ import { tenGod } from './core.js';
 import { adjustLiuyueByGeju } from './pattern-quality.js';
 // [loop 74 nâng tầng] Phục/Phản ngâm tháng × 4 trụ nguyên cục (mirror 流年 loop 19).
 import { isFuyin, isFanyin } from './fuyin.js';
+import { TIAN_YI, WEN_CHANG, JIANG_XING, BRANCH_GROUP } from './shensha.js';
 
 const wxVi = (w) => WX_VI[w];
 const MONTH_ZH = ['寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '丑'];
@@ -94,6 +95,11 @@ export function computeLiuyue(R, solarYear, patternQuality) {
     if (XING[yearBirthZhi] === zhi) { score -= 4; extraNotes.push('刑月太岁 — quan phi/thị phi'); }
     if (PO[yearBirthZhi] === zhi) { score -= 3; extraNotes.push('破月太岁 — hao tài'); }
     if (HAI[yearBirthZhi] === zhi) { score -= 3; extraNotes.push('害月太岁 — tiểu nhân'); }
+  // [loop 368] thần sát CÁT tháng (quý nhân/văn/tướng tới — tháng tốt việc lớn), nhất quán với lưu niên/lưu nhật
+  const _grp = BRANCH_GROUP[yearBirthZhi];
+  if (TIAN_YI[dayGan] && TIAN_YI[dayGan].includes(zhi)) { score += 3; extraNotes.push('🌟 Thiên Ất quý nhân tháng'); }
+  if (WEN_CHANG[dayGan] === zhi) { score += 2; extraNotes.push('📚 Văn Xương tháng'); }
+  if (JIANG_XING[_grp] === zhi) { score += 2; extraNotes.push('🎖️ Tướng tinh tháng'); }
 
     // [loop 74 nâng tầng] (4) PHỤC/PHẢN NGÂM tháng × 4 trụ nguyên cục.
     //   Tháng can-chi trùng trụ = 伏吟 (đình trệ); 天克地冲 trụ = 反吟 (biến cố).

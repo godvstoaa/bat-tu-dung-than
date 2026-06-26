@@ -263,6 +263,8 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
   box-shadow: inset 0 1px 0 rgba(247, 236, 203, 0.05);
 }
 .pillar-head { text-align: center; padding: 8px; font-size: 12.5px; color: var(--gold-pale); letter-spacing: 1px; border-bottom: 1px solid rgba(212, 175, 55, 0.14); }
+.pillar-yueling { border-top: 3px solid var(--gold-bright, var(--gold)); box-shadow: inset 0 1px 0 rgba(247,236,203,0.08), 0 0 12px rgba(212,175,55,0.15); }
+.yueling-tag { display: inline-block; margin-left: 4px; font-size: 9px; font-weight: 700; color: var(--gold-bright, var(--gold)); background: rgba(212,175,55,0.22); padding: 1px 5px; border-radius: 8px; letter-spacing: 0; }
 .gz { text-align: center; padding: 14px 8px; }
 .gz .han { font-family: 'Noto Serif SC', serif; font-size: 42px; font-weight: 700; line-height: 1.1; text-shadow: 0 0 22px currentColor, 0 0 4px rgba(0, 0, 0, 0.6); }
 .gz .vi { font-size: 13px; color: var(--silk-dim); }
@@ -272,6 +274,11 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .pillar-foot b { color: var(--silk); font-weight: 500; }
 .hidden-stems { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; margin-top: 3px; }
 .chip { font-size: 11px; padding: 1px 7px; border-radius: 20px; background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.14); }
+.chip.qi-ben { background: rgba(212, 175, 55, 0.22); border-color: rgba(212, 175, 55, 0.5); font-weight: 600; }
+.qi-tag { font-size: 8px; opacity: 0.7; margin-left: 2px; }
+.tou-tag { font-size: 8px; font-weight: 700; color: var(--cat, #2a7); margin-left: 3px; padding: 0 3px; border-radius: 6px; background: rgba(46,158,107,0.18); }
+.tg-tag { font-size: 9px; margin-top: 2px; color: var(--cat, #2a7); }
+.tg-tag.tg-xu { color: var(--cinnabar, #c33); }
 
 .wx-木 { color: var(--wx-moc); } .wx-火 { color: var(--wx-hoa); }
 .wx-土 { color: var(--wx-tho); } .wx-金 { color: var(--wx-kim); } .wx-水 { color: var(--wx-thuy); }
@@ -302,8 +309,15 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .dy:hover { transform: translateY(-2px); border-color: rgba(212,175,55,.4); }
 .dy .dy-gz { font-family: 'Noto Serif SC', serif; font-size: 22px; font-weight: 700; }
 .dy .dy-vi { font-size: 10.5px; color: var(--silk-muted); }
+.dy .dy-nayin { font-size: 9px; color: var(--silk-dim, #8a7e5a); margin-top: 1px; }
 .dy .dy-age { font-size: 11px; color: var(--silk-muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
 .dy .dy-rate { font-size: 11px; margin-top: 5px; padding: 1px 6px; border-radius: 10px; display:inline-block; }
+.dy .dy-god { margin-top: 3px; }
+.dy .dy-god-tag { font-size: 10px; padding: 1px 6px; border-radius: 10px; background: rgba(212,175,55,0.16); color: var(--gold-pale, #e8d596); display:inline-block; white-space: nowrap; }
+.dy .dy-god-tag + .dy-god-tag { margin-left: 3px; }
+.dy .dy-god-chi { background: rgba(212,175,55,0.32); color: var(--gold-bright, #f3e3a8); font-weight: 600; } /* 大运重地支 — chi = chủ đạo */
+.dy .dy-theme { font-size: 9px; color: var(--silk-muted); margin-top: 2px; line-height: 1.2; min-height: 11px; }
+.dy-now-detail { font-size: 12.5px; line-height: 1.5; }
 .rate-cat { background: rgba(46,158,107,0.22); color: #7ee2a4; }
 .rate-good { background: rgba(46,158,107,0.14); color: #9fe0b8; }
 .rate-mid { background: rgba(255,255,255,0.08); color: var(--silk-muted); }
@@ -346,6 +360,9 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .lm-cell { background: rgba(0,0,0,0.28); border: 1px solid rgba(212, 175, 55, 0.14); border-radius: 4px; padding: 9px 4px; text-align: center; transition: transform .2s var(--ease-out); }
 .lm-cell:hover { transform: translateY(-2px); border-color: rgba(212,175,55,.35); }
 .lm-cell .zh { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 700; margin: 2px 0; }
+.lm-ts { font-size: 10px; line-height: 1.1; margin: 1px 0; }
+.lm-ts-cat { filter: drop-shadow(0 0 2px rgba(46,158,107,0.5)); }
+.lm-ts-hung { filter: grayscale(0.3); opacity: 0.85; }
 .lm-m { font-size: 12px; color: var(--silk-muted); }
 .lm-g { font-size: 11px; color: var(--gold-bright); }
 /* [loop 4] 格局流月喜忌 tag — ★格局喜 / ⚠格局忌 trên mỗi ô lưu nguyệt */
@@ -551,6 +568,11 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .ln-gz { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 700; margin-top: 3px; }
 .ln-age { font-size: 10.5px; color: var(--silk-muted); font-variant-numeric: tabular-nums; }
 .ln-rate { font-size: 10px; margin-top: 4px; padding: 1px 5px; border-radius: 8px; display: inline-block; }
+.ln-god { margin-top: 2px; }
+.ln-god-tag { font-size: 9px; padding: 1px 5px; border-radius: 8px; background: rgba(212,175,55,0.16); color: var(--gold-pale, #e8d596); display: inline-block; white-space: nowrap; }
+.ln-ts { font-size: 9px; font-weight: 700; color: var(--cinnabar, #c33); margin-left: 2px; }
+.ln-ts-chong { color: #e0533d; }
+.ln-noble { font-size: 9px; margin-left: 2px; filter: drop-shadow(0 0 3px rgba(46,158,107,0.6)); }
 
 /* ===== AI CARD / CHAT ===== */
 .ai-card { border-color: rgba(212, 175, 55, 0.3); }
@@ -1025,7 +1047,7 @@ html{scroll-behavior:smooth}
 /* ===== PRINT ===== */
 @media print {
   body { background: white !important; color: #111 !important; font-size: 11px; }
-  .quick-nav, #print-btn, .ai-fab, #ai-modal, #ai-popup, .form-card, .hero, nav, .lyear-row label input, .lyear-row select, .lyear-row button, #family-members, #ev-btn, #ln-btn, #ln-dt, #yd-btn, #fam-add, #family-btn, button { display: none !important; }
+  .quick-nav, #print-btn, .ai-fab, #ai-modal, #ai-popup, .form-card, .hero, nav, .lyear-row label input, .lyear-row select, .lyear-row button, #family-members, #ev-btn, #ln-btn, #ln-dt, #yd-btn, #fam-add, #family-btn, .card-search, .chat-suggest, button { display: none !important; }
   .result { max-width: 100% !important; padding: 0 !important; }
   .card { border: 1px solid #ccc !important; background: white !important; box-shadow: none !important; break-inside: avoid; margin-bottom: 6px !important; padding: 8px !important; }
   .card-title { color: #333 !important; font-size: 13px !important; border-bottom: 1px solid #999 !important; }

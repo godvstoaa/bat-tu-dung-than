@@ -79,16 +79,53 @@ const COMBO_DEFS = [
     desc: 'Thân vượng + Tài nhiều («身旺任财») — gánh được tài lớn, tiền đồ phú quý, kinh doanh lớn (đối lập «财多身弱»).' },
 ];
 
+// [loop 312 nâng logic] YẾU TỐ CHẾ (mitigation) cho tổ hợp HUNG. Cổ pháp: mọi cấu hình hung đều có
+//   «chế/giải» — vd «伤官见官» được Ấn chế, «梟神奪食» được Tài chế Kiêu, «财多身弱» được Tỷ/Ấn trợ thân.
+//   Trả về chuỗi cách giải nếu ĐỦ lực (≥0.5/≥1), null nếu chưa chế → tổ hợp hung VẪN hoạt động.
+const MITIGATION = {
+  shangGuan: (g) => ((g['正印'] || 0) + (g['偏印'] || 0)) >= 0.5 ? 'Ấn chế Thương Quan' : null,
+  xiaoShi:   (g) => ((g['正財'] || 0) + (g['偏財'] || 0)) >= 0.5 ? 'Tài chế Kiêu (Thiên Ấn)' : null,
+  guanZha:   (g) => ((g['食神'] || 0) >= 0.5 || (g['傷官'] || 0) >= 0.5) ? 'Thực/Thương chế Sát («đi quan lưu sát»)' : null,
+  shaGong:   (g) => ((g['正印'] || 0) + (g['偏印'] || 0)) >= 0.5 ? 'Ấn hóa Sát' : ((g['食神'] || 0) >= 0.5 ? 'Thực chế Sát' : null),
+  caiDuo:    (g) => ((g['比肩'] || 0) + (g['劫財'] || 0)) >= 1 ? 'Tỷ Kiếp trợ thân' : (((g['正印'] || 0) + (g['偏印'] || 0)) >= 1 ? 'Ấn sinh thân' : null),
+  qunJie:    (g) => ((g['正官'] || 0) >= 0.5 || (g['七殺'] || 0) >= 0.5) ? 'Quan/Sát chế Kiếp' : null,
+};
+
+// [loop 303 nâng logic] Tổ hợp "chân cách" (genuine) iff MỌI nhóm sao đều có ≥1 sao đủ thực lực
+//   (≥0.5 = 本气 hoặc 透干 lộ can). Mỗi entry = mảng các NHÓM; nhóm OR (vd [正印,偏印]) thỏa khi
+//   ≥1 thành viên ≥0.5; nhóm bắt buộc (vd [七殺]) phải có chính nó ≥0.5. Vd «杀印相生» với 正印 0.8
+//   (mạnh) + 偏印 0.2 (lẻ) → VẪN chân cách (Ấn mạnh đủ hóa Sát), không phải «hình thức».
+//   Tổ hợp dựa-threshold (caiDuo/shaGong…) đã yêu cầu thực lực → không trong map → luôn genuine.
+const COMBO_KEY = {
+  shaYin: [['七殺'], ['正印', '偏印']],   guanYin: [['正官'], ['正印']],         shiSha: [['食神'], ['七殺']],
+  shiCai: [['食神'], ['正財', '偏財']],   shangCai: [['傷官'], ['正財', '偏財']], shangYin: [['傷官'], ['正印', '偏印']],
+  shangGuan: [['傷官'], ['正官']],       xiaoShi: [['偏印'], ['食神']],
+  caiGuan: [['正財', '偏財'], ['正官', '七殺']], guanZha: [['正官'], ['七殺']], // 混杂: CẢ 2 phải thật
+};
+
 /**
  * Phát hiện tổ hợp Thập Thần trong lá số.
- * @returns {Array<{id,name,vi,tone,desc}>}
+ * @returns {Array<{id,name,vi,tone,desc,genuine,starCounts}>}
  */
 export function detectCombos(chart, strength) {
   const g = godCount(chart);
   const out = [];
   for (const def of COMBO_DEFS) {
     try {
-      if (def.test(g, strength)) out.push({ id: def.id, name: def.name, vi: def.vi, tone: def.tone, desc: def.desc });
+      if (def.test(g, strength)) {
+        // [loop 303] đánh giá «chân cách»: mỗi nhóm phải có ≥1 sao ≥0.5
+        const groups = COMBO_KEY[def.id];
+        let genuine = true;
+        const starCounts = {};
+        if (groups) {
+          for (const grp of groups) {
+            grp.forEach((s) => { if ((g[s] || 0) > 0) starCounts[s] = +(g[s] || 0).toFixed(2); });
+            if (!grp.some((s) => (g[s] || 0) >= 0.5)) { genuine = false; break; }
+          }
+        }
+        out.push({ id: def.id, name: def.name, vi: def.vi, tone: def.tone, desc: def.desc, genuine, starCounts,
+          mitigation: def.tone !== 'cat' && MITIGATION[def.id] ? MITIGATION[def.id](g) : null });
+      }
     } catch (e) { /* bỏ qua lỗi 1 tổ hợp */ }
   }
   return out;

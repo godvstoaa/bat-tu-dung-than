@@ -9,6 +9,8 @@ import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { tenGod } from './core.js';
 
 const MONTH_ZH = ['正','二','三','四','五','六','七','八','九','十','冬','腊'];
+// [loop 313 sửa bug] tên tháng theo mZhi THẬT (tiết khí), không phải index Dương lịch (sai 1 tháng).
+const ZHI_MONTH = { '寅':'正','卯':'二','辰':'三','巳':'四','午':'五','未':'六','申':'七','酉':'八','戌':'九','亥':'十','子':'冬','丑':'腊' };
 
 // Thập thần → độ倾斜 tài lộc
 const GOD_WEALTH = {
@@ -59,13 +61,13 @@ export function wealthMonthlyAlert(R, scanYear) {
     const totalScore = Math.max(5, Math.min(98, 50 + gInfo.d + wxScore));
 
     let tone, advice;
-    if (totalScore >= 65) { tone = 'cat'; advice = `✓ Tháng ${MONTH_ZH[i]}: TÀI LỘC TỐT — nên tiến thủ, ký kết, đầu tư, mở rộng.`; }
-    else if (totalScore >= 48) { tone = 'mid'; advice = `Tháng ${MONTH_ZH[i]}: tài lộc trung — duy trì, không mạo hiểm.`; }
-    else if (totalScore >= 35) { tone = 'slight-hung'; advice = `⚠ Tháng ${MONTH_ZH[i]}: tài lộc bất lợi — giữ chặt, tránh đầu tư lớn.`; }
-    else { tone = 'hung'; advice = `🚨 Tháng ${MONTH_ZH[i]}: ⚠⚠ PHÁ TÀI RỦI RO — TRÁNH đầu tư/cho vay/đầu cơ. Tiết kiệm chặt.`; }
+    if (totalScore >= 65) { tone = 'cat'; advice = `✓ Tháng ${ZHI_MONTH[mZhi] || "?"}: TÀI LỘC TỐT — nên tiến thủ, ký kết, đầu tư, mở rộng.`; }
+    else if (totalScore >= 48) { tone = 'mid'; advice = `Tháng ${ZHI_MONTH[mZhi] || "?"}: tài lộc trung — duy trì, không mạo hiểm.`; }
+    else if (totalScore >= 35) { tone = 'slight-hung'; advice = `⚠ Tháng ${ZHI_MONTH[mZhi] || "?"}: tài lộc bất lợi — giữ chặt, tránh đầu tư lớn.`; }
+    else { tone = 'hung'; advice = `🚨 Tháng ${ZHI_MONTH[mZhi] || "?"}: ⚠⚠ PHÁ TÀI RỦI RO — TRÁNH đầu tư/cho vay/đầu cơ. Tiết kiệm chặt.`; }
 
     months.push({
-      m: i, mVi: `T${i + 1} (${MONTH_ZH[i]}月)`, ganZhi: mGan + mZhi,
+      m: i, mVi: `T${i + 1} (${ZHI_MONTH[mZhi] || "?"}月)`, ganZhi: mGan + mZhi,
       god, godVi: TEN_GOD_VI[god] || god,
       score: totalScore, tone, advice, gInfo: gInfo.vi,
     });

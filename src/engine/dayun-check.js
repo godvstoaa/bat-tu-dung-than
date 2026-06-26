@@ -7,6 +7,9 @@
 import { tenGod } from './core.js';
 
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
+// [loop 328] 六害 + 三刑 — đại vận chi hại/hình Nhật Chi cũng đáng cảnh báo (cùng bug-class loop 290/324-327)
+const HAI = { 子:'未', 未:'子', 丑:'午', 午:'丑', 寅:'巳', 巳:'寅', 卯:'辰', 辰:'卯', 申:'亥', 亥:'申', 酉:'戌', 戌:'酉' };
+const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌', 戌:'未', 未:'丑', 辰:'辰', 午:'午', 酉:'酉', 亥:'亥' };
 
 /**
  * @param {object} chart - từ analyze()
@@ -40,6 +43,15 @@ export function checkDayunInteractions(chart, dayun) {
     if (zhiChong && !ganClash) {
       notes.push('⚡ Địa xung — đại vận chi xung Nhật Chi: gia đạo/bản thân biến động.');
       severity += 2;
+    }
+    // [loop 328] 2b. 大运 chi HẠI/HÌNH Nhật Chi — nhẹ hơn 冲 nhưng vẫn cảnh báo trệ/quanphi.
+    if (!zhiChong && HAI[dayZhi] === dgZhi) {
+      notes.push('• Địa hại — đại vận chi hại Nhật Chi: tiểu nhân, trì trệ ngầm.');
+      severity += 1;
+    }
+    if (!zhiChong && XING[dayZhi] === dgZhi && dgZhi !== dayZhi) {
+      notes.push('• Địa hình — đại vận chi hình Nhật Chi: quan phi/thị phi, cẩn thận giấy tờ.');
+      severity += 1;
     }
 
     // 3. 伏吟 (大运 = 日柱)

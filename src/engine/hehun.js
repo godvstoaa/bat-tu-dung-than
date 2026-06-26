@@ -6,6 +6,7 @@
 import { ZHI } from './constants.js';
 import { tenGod } from './core.js'; // [loop 22] 十神 spouse-star cross-check
 import { XING_PAIRS, HAI_PAIRS } from './zodiac-deep.js';
+import { computeZhai } from './zhai.js';
 
 // Tam hợp / Lục hợp / Xung của Địa Chi
 const SANHE = [['申', '子', '辰'], ['寅', '午', '戌'], ['巳', '酉', '丑'], ['亥', '卯', '未']];
@@ -73,6 +74,13 @@ export function computeHehun(R1, R2) {
   if (ganHe) { score += 16; factors.push(`✓ Nhật Can ${a.dayGan}–${b.dayGan} ngũ hợp → tâm đầu ý hợp (cung bản mệnh hợp).`); }
   if (dayZhiRel.type === 'lục hợp' || dayZhiRel.type === 'tam hợp') { score += 18; factors.push(`✓ Nhật Chi ${ZHI[a.pillars.day.zhi].vi}–${ZHI[b.pillars.day.zhi].vi} ${dayZhiRel.vi} → CUNG PHU THÊ hợp — yếu tố quan trọng nhất.`); }
   else if (dayZhiRel.type === 'xung') { score -= 18; factors.push(`✗ Nhật Chi ${ZHI[a.pillars.day.zhi].vi}–${ZHI[b.pillars.day.zhi].vi} Xung → CUNG PHU THÊ biến động — trọng yếu, cần cố ý hóa giải.`); }
+  // [loop 325 nâng logic] Nhật Chi Lục Hại / 三刑 — cùng bug-class loop 290/324: zhiRel chỉ bắt
+  //   合/Xung, bỏ sót Hại/Hình ở CUNG PHU THÊ (quan trọng nhất). Lớn hơn year (~2×).
+  const dza = a.pillars.day.zhi, dzb = b.pillars.day.zhi;
+  const dHai = HAI_PAIRS.find((h) => h.pair.includes(dza) && h.pair.includes(dzb) && dza !== dzb);
+  const dXing = XING_PAIRS.find((x) => x.pair.includes(dza) && x.pair.includes(dzb) && dza !== dzb);
+  if (dHai) { score -= 10; factors.push(`✗ Nhật Chi ${ZHI[dza].vi}–${ZHI[dzb].vi} ${dHai.vi} → CUNG PHU THÊ trệ/tiểu nhân — cần bao dung, tránh so đo.`); }
+  if (dXing) { score -= 12; factors.push(`✗ Nhật Chi ${ZHI[dza].vi}–${ZHI[dzb].vi} ${dXing.vi} → CUNG PHU THÊ hình khắc — bất lợi hôn nhân, cần cố ý hóa giải (chọn năm cát cưới).`); }
 
   // 4b. [loop 22 NEW] 十神 spouse-star cross-check (giới tính): nam lấy 财 làm vợ, nữ lấy 官
   //   làm chồng. Nếu Nhật Chủ A nhìn B đúng sao phối ngẫu (và B nhìn A) → tín hiệu mạnh.
@@ -86,6 +94,16 @@ export function computeHehun(R1, R2) {
   const bHit = (bMale ? wifeGods : husbGods).includes(bSeesA);
   if (aHit && bHit) { score += 14; factors.push(`★ Sao phối ngẫu tương ứng: A (nhìn B = ${aSeesB}) đúng sao vợ/chồng, B (nhìn A = ${bSeesA}) cũng vậy → duyên "sao mệnh đối ứng" rất mạnh.`); }
   else if (aHit || bHit) { score += 7; factors.push(`✓ Một bên nhìn đối phương đúng sao phối ngẫu (${aHit ? 'A' : 'B'}) → duyên có chiều.`); }
+
+  // [loop 357] 命卦 (八宅) compat — cùng nhóm Đông/Tứ Tứ Mệnh → thuận sống chung; khác nhóm → trệ phong thuỷ ở chung.
+  try {
+    const za = computeZhai(a.input.year, a.input.gender);
+    const zb = computeZhai(b.input.year, b.input.gender);
+    const ga = (za.grpVi || '').includes('Tây') ? 'Tây' : 'Đông';
+    const gb = (zb.grpVi || '').includes('Tây') ? 'Tây' : 'Đông';
+    if (ga === gb) { score += 6; factors.push(`✓ Cùng nhóm Mệnh quái ${ga} Tứ Mệnh (${za.guaName}/${zb.guaName}) → thuận ở chung, hướng nhà/bếp hợp cả hai.`); }
+    else { score -= 4; factors.push(`• Khác nhóm Mệnh quái (${ga} vs ${gb} Tứ Mệnh) → phong thuỷ ở chung cần thỏa hiệp hướng (chọn hướng Đông/Tây trung tính hoặc dụng người yếu hơn).`); }
+  } catch (e) {}
 
   score = Math.max(5, Math.min(98, Math.round(score)));
   let rating, verdict;

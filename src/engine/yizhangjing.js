@@ -298,6 +298,7 @@ export function renderYizhangjingCard(result) {
   if (!result || !result.ok) {
     return '<p class="hint">Không tính được 一掌经.</p>';
   }
+  const e = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const r = result;
   const toneClass = (t) => (t === 'cat' ? 'rate-cat' : t === 'hung' ? 'rate-hung' : 'rate-mid');
   const toneLabel = (t) => (t === 'cat' ? 'Cát' : t === 'hung' ? 'Hung' : 'Bình');
@@ -305,23 +306,23 @@ export function renderYizhangjingCard(result) {
   const posHtml = r.positions.map((p) => {
     const isMing = p.role.startsWith('时宫');
     return `<div class="cg-breakdown" style="${isMing ? 'background:rgba(255,193,7,.18);border-left:3px solid #ffc107;padding:2px 6px' : ''}">
-      <b>${p.role}</b> <span class="zh big">${p.zhi}</span> → <b>${p.starZh}</b> (${p.starVi})
+      <b>${e(p.role)}</b> <span class="zh big">${e(p.zhi)}</span> → <b>${e(p.starZh)}</b> (${e(p.starVi)})
       <span class="ln-rate ${toneClass(p.tone)}"><b>${toneLabel(p.tone)}</b></span>
-      <span class="hint-inline">${p.grade}</span>
-      <div class="hint">${p.meaning}</div>
-      ${isMing ? `<div class="cg-interp"><b>Mệnh cung:</b> ${p.destiny}</div>` : ''}
+      <span class="hint-inline">${e(p.grade)}</span>
+      <div class="hint">${e(p.meaning)}</div>
+      ${isMing ? `<div class="cg-interp"><b>Mệnh cung:</b> ${e(p.destiny)}</div>` : ''}
     </div>`;
   }).join('');
 
   const dirVi = r.direction === 'forward' ? 'Nam thuận chiều' : 'Nữ nghịch chiều';
   const liudaoHtml = r.liudao
-    ? `<p class="cg-interp"><b>Lục đạo (theo mệnh cung):</b> <span class="ln-rate ${r.liudao.upper ? 'rate-cat' : 'rate-hung'}"><b>${r.liudao.daoVi}</b></span> ${r.liudao.upper ? '[thượng đạo — thiện đạo]' : '[hạ đạo — cần tu]'} — ${r.liudao.note}</p>`
+    ? `<p class="cg-interp"><b>Lục đạo (theo mệnh cung):</b> <span class="ln-rate ${r.liudao.upper ? 'rate-cat' : 'rate-hung'}"><b>${e(r.liudao.daoVi)}</b></span> ${r.liudao.upper ? '[thượng đạo — thiện đạo]' : '[hạ đạo — cần tu]'} — ${e(r.liudao.note)}</p>`
     : '';
 
   return `
-    <p class="cg-breakdown hint">Sinh ${r.input.day}/${r.input.month}/${r.input.year} giờ ${r.input.hour}h (${r.input.gender}) → âm lịch ${r.lunar.label}, năm ${r.lunar.yearZhi}. ${dirVi}. 男顺女逆 — đếm 年→月→日→时.</p>
+    <p class="cg-breakdown hint">Sinh ${e(r.input.day)}/${e(r.input.month)}/${e(r.input.year)} giờ ${e(r.input.hour)}h (${e(r.input.gender)}) → âm lịch ${e(r.lunar.label)}, năm ${e(r.lunar.yearZhi)}. ${dirVi}. 男顺女逆 — đếm 年→月→日→时.</p>
     <div style="display:grid;gap:4px;margin:6px 0">${posHtml}</div>
     ${liudaoHtml}
-    <p class="cg-interp"><b>Tổng luận:</b> ${r.summary}</p>
-    <p class="hint" style="margin-top:6px">${r.note}</p>`;
+    <p class="cg-interp"><b>Tổng luận:</b> ${e(r.summary)}</p>
+    <p class="hint" style="margin-top:6px">${e(r.note)}</p>`;
 }

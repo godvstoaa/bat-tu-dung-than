@@ -1945,7 +1945,7 @@ const wcC = scanWealthCareerYingqi(spR, 2026, 12);
 assert(wcC.caiYears.some((y) => y.year === 2028), 'yingqi: 2028 戊 = Tài kích hoạt (khớp Tài ẩn cần thấu)');
 const lnC = analyzeLiunianDeep(spR, 2026);
 assert(lnC.rating !== 'Cát' && lnC.score < 50, `2026 không Cát (user mất tiền/tình thực tế), được ${lnC.rating}/${lnC.score}`);
-assert(df.best.year === 2027, 'decade best = 2027 (khớp giao vận 戊午)');
+assert(df.best.year === 2028, `decade best = 2028 戊申 (${df.best.score}, có thần sát CÁT năm — [loop 364] score quý nhân/văn/tướng); 2027=${(df.years.find(y=>y.year===2027)||{}).score}`);
 const thC = analyzeTaohua(spR);
 assert(thC.verdict === '烂桃花', 'taohua = 烂桃花 (khớp mất tình)');
 const dgC = dominantGod(spR);

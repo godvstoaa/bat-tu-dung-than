@@ -16,6 +16,9 @@ const OFFICER_VI = { 建:'Kiến', 除:'Trừ', 满:'Mãn', 平:'Bình', 定:'Đ
 const OFFICER_TONE = { 建:'hung', 除:'cát', 满:'hung', 平:'hung', 定:'cát', 执:'cát', 破:'hung', 危:'cát', 成:'cát', 收:'hung', 开:'cát', 闭:'hung' };
 // 六冲
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
+// [loop 326] 六害 + 三刑 — 择日 cũng kỵ ngày hại/hình tuổi (trước đây chỉ check 冲 → có thể suggest ngày «cát» mà thực ra hại/hình người dùng)
+const HAI = { 子:'未', 未:'子', 丑:'午', 午:'丑', 寅:'巳', 巳:'寅', 卯:'辰', 辰:'卯', 申:'亥', 亥:'申', 酉:'戌', 戌:'酉' };
+const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌', 戌:'未', 未:'丑', 辰:'辰', 午:'午', 酉:'酉', 亥:'亥' };
 
 // Việc lớn → các trực CÁT (宜) và HUNG (忌) tương ứng
 const ACTIVITY = {
@@ -65,6 +68,9 @@ export function evaluateDate(year, month, day, activityId, userZhi) {
 
   if (clashYou) { score -= 25; reasons.push(`⚠ Ngày chi ${dayZhi} (${ZHI[dayZhi].vi}) XUNG trực tiếp tuổi ${ZHI[userZhi].vi} (${userZhi}) — "日冲岁" rất kỵ với cá nhân.`); }
   else if (userZhi) { reasons.push(`Ngày không xung tuổi ${ZHI[userZhi].vi}.`); }
+  // [loop 326] 日害岁 / 日刑岁 — nhẹ hơn 冲 nhưng vẫn giảm (tránh suggest ngày «cát» mà hại/hình tuổi)
+  if (!clashYou && userZhi && HAI[dayZhi] === userZhi) { score -= 10; reasons.push(`• Ngày chi ${dayZhi} (${ZHI[dayZhi].vi}) HẠI tuổi ${ZHI[userZhi].vi} — "日害岁" tiểu nhân/trệ, giảm cát.`); }
+  if (!clashYou && userZhi && XING[dayZhi] === userZhi && dayZhi !== userZhi) { score -= 12; reasons.push(`• Ngày chi ${dayZhi} (${ZHI[dayZhi].vi}) HÌNH tuổi ${ZHI[userZhi].vi} — "日刑岁" quanphi/thị phi, nên tránh việc lớn.`); }
 
   score = Math.max(5, Math.min(98, Math.round(score)));
   let rating = 'Bình';

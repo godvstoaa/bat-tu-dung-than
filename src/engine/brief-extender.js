@@ -4,7 +4,9 @@
 //  dayun-god/小限/命主身主/taiyuan/xingshen-zuo) vào brief → AI/NLG luân giải sâu hơn.
 // ============================================================================
 import { detectAnhe } from './anhe.js';
+import { TEN_GOD_VI, WX_VI } from './constants.js';
 import { nayinRelations } from './nayin-relation.js';
+import { ganZhiNayin } from './nayin.js';
 import { analyzeCaiKu } from './caiku.js';
 import { xingshenZuo } from './xingshen-zuo.js';
 import { analyzeSpouseStar } from './spouse-star.js';
@@ -13,6 +15,9 @@ import { analyzeCareerStar } from './career-star.js';
 import { analyzeHealth } from './health-analysis.js';
 import { analyzeStudy } from './study-analysis.js';
 import { dayunGodMeaning } from './dayun-god.js';
+import { detectCombos } from './combos.js';
+import { computeFuxing } from './fuxing.js';
+import { computeAuxStars } from './ziwei-aux.js';
 import { checkDayunInteractions } from './dayun-check.js';
 import { analyzeHanNuan } from './han-nuan.js';
 import { analyzeWxFlow } from './wx-flow.js';
@@ -98,12 +103,48 @@ export function extendBrief(R) {
     parts.push(`TÀI KHỐ: ${ck.hasTaiku ? 'CÓ (' + ck.taikuPos.join(',') + ', yên=' + !ck.opens.length + ')' : 'KHÔNG'} → ${ck.hasTaiku ? 'giữ được tiền' : 'tiền chảy qua tay'}.`);
   } catch (e) {}
 
+  // [loop 336] Tương tác Tứ Trụ (can/chi 合/冲/害/刑/三合/半合) — cấu trúc tương tác nguyên cục, từng thiếu trong brief
+  try {
+    const it = R.interactions;
+    if (it && it.summary && !it.summary.includes('yên tĩnh')) parts.push(`TƯƠNG TÁC TỨ TRỤ: ${it.summary}`);
+  } catch (e) {}
+
   // Ẩn hợp
   try {
     const ah = detectAnhe(R.chart);
     if (ah.pairs.length) {
       parts.push(`ẨN HỢP: ${ah.summary}`);
     }
+  } catch (e) {}
+
+  // [loop 316] Thập thần tổ hợp (cấu hình cát/hung kinh điển) — để AI trả lời «cấu hình mệnh»
+  try {
+    const cb = detectCombos(R.chart, R.strength);
+    if (cb.length) {
+      const cat = cb.filter((c) => c.tone === 'cat').map((c) => c.vi + (c.genuine === false ? '(hình thức)' : ''));
+      const hung = cb.filter((c) => c.tone !== 'cat').map((c) => c.vi + (c.mitigation ? '[đã chế:' + c.mitigation + ']' : (c.genuine === false ? '(hình thức)' : '[chưa chế]')));
+      if (cat.length) parts.push(`TỔ HỢP CÁT (十神组合): ${cat.join(', ')}.`);
+      if (hung.length) parts.push(`TỔ HỢP HUNG: ${hung.join(', ')}.`);
+    }
+  } catch (e) {}
+
+  // [loop 317] Lục phụ tinh (6 sao quý nhân phò tá 紫微) — bổ trợ luận quý nhân
+  try {
+    const CN = { '一':1,'二':2,'三':3,'四':4,'正':1,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'十一':11,'十二':12,'冬':11,'腊':12 };
+    const ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    const lm = CN[String(R.chart.lunar.month).replace(/^闰/, '')] || 0;
+    const ho = ZHI.indexOf(R.chart.pillars.time.zhi) + 1;
+    const fx = computeFuxing(lm, ho, R.chart.pillars.year.gan);
+    parts.push(`LỤC PHỤ TINH (六辅星): ${fx.stars.map((s) => `${s.vi}@${s.atZhi}`).join(', ')}.`);
+  } catch (e) {}
+
+  // [loop 321] Lục sát tinh (6 sao hung 紫微) — bổ trợ luận áp lực/hao tổn
+  try {
+    const aux = computeAuxStars(R.chart.pillars.year.gan, R.chart.pillars.year.zhi,
+      ({ '一':1,'二':2,'三':3,'四':4,'正':1,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'十一':11,'十二':12,'冬':11,'腊':12 })[String(R.chart.lunar.month).replace(/^闰/, '')] || 0,
+      R.chart.pillars.time.zhi);
+    const sha = ['擎羊', '陀罗', '火星', '铃星', '地空', '地劫'].map((s) => aux[s] ? `${aux[s].vi}@${aux[s].branch}` : null).filter(Boolean);
+    if (sha.length) parts.push(`LỤC SÁT TINH (六煞星): ${sha.join(', ')}.`);
   } catch (e) {}
 
   // Nạp âm quan hệ
@@ -148,10 +189,10 @@ export function extendBrief(R) {
     parts.push(`HỌC VẤN: Ấn=${s.sealStrength}(${s.sealCount}) ThựcThương=${s.foodStrength}(${s.foodCount}) | VănXương=${s.hasWenChang} | thân=${s.bodyCanStudy} | timing=${(s.timing || []).join(',')}`);
   } catch (e) {}
 
-  // Đại vận thập thần (3 vận gần nhất)
+  // Đại vận thập thần (3 vận gần nhất) + nạp âm
   try {
     const dg = dayunGodMeaning(R.chart, R.dayun);
-    const near = dg.items.slice(0, 4).map((d) => `${d.ganZhi}[${d.startAge}t:${d.godVi}(${d.cat})]`);
+    const near = dg.items.slice(0, 4).map((d) => `${d.ganZhi}[${d.startAge}t:${d.godVi}(${d.cat})${ganZhiNayin(d.ganZhi) ? '/' + ganZhiNayin(d.ganZhi) : ''}]`);
     parts.push(`ĐẠI VẬN THẬP THẦN: ${near.join(' ')}`);
   } catch (e) {}
 
@@ -185,6 +226,9 @@ export function extendBrief(R) {
       const res = (pq.rescues || []).map((r) => r.note).join('; ');
       parts.push(`CÁCH CỤC THÀNH BẠI: ${QVI[pq.quality] || pq.quality}. ${dis ? 'Bệnh: ' + dis + '.' : ''} ${res ? 'Cứu ứng: ' + res + '.' : ''}`);
     }
+    // [loop 342] 格神 nguồn (kết nối 月令 → 格局) — để AI luận «cách cục lấy từ Nguyệt lệnh nào»
+    const pat = R.pattern, gs = pat && pat.geShen;
+    if (gs && gs.gan) parts.push(`CÁCH CỤC: ${pat.vi} (${pat.name}). 格神 ${gs.gan}(${TEN_GOD_VI[gs.god] || gs.god}, ${WX_VI[gs.wx] || gs.wx}) ← Nguyệt lệnh ${gs.source || '?'}.`);
   } catch (e) {}
   // 日干性情
   try {

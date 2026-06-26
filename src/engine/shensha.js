@@ -53,6 +53,11 @@ export const JIANG_XING = { A: '子', B: '午', C: '酉', D: '卯' };
 // Hoa Cái (华盖) — nghệ thuật, tôn giáo, trí tuệ cô cao, tâm linh
 export const HUA_GAI = { A: '辰', B: '戌', C: '丑', D: '未' };
 
+// [loop 369] Thiên Y (天医) — sao chủ y tế/sức khoẻ, tra theo NGUYỆT CHI (月支的前一位).
+//   Nguồn: 知乎/阐微堂 «正月起丑, 顺行» = 月支逆行一位 (寅→丑, 午→巳, 子→亥…).
+//   Mệnh mang Thiên Y → duyên y tế, thể chất, đức từ bi; hợp nghề y/dược/tâm lý.
+export const TIAN_YI_MED = { 子:'亥', 丑:'子', 寅:'丑', 卯:'寅', 辰:'卯', 巳:'辰', 午:'巳', 未:'午', 申:'未', 酉:'申', 戌:'酉', 亥:'戌' };
+
 // ---- THIÊN ĐỨC QUÝ NHÂN (天德贵人) — tra theo Nguyệt Chi ----
 // (một số vị trí là Địa Chi, phần còn lại là Thiên Can; cổ pháp 窮通寶鑑)
 export const TIAN_DE = {
@@ -97,6 +102,7 @@ export const SHENSHA_INFO = {
   hongYan: { zh: '红艳煞', vi: 'Hồng Diễm', desc: 'đào hoa sắc vóc, duyên dáng, tình cảm phong phú (nữ mạng rõ)', tone: 'neutral' },
   kuiGang: { zh: '魁罡', vi: 'Quù Cương', desc: 'cương nghị, thông minh, quyết đoán, cứng rắn; kỵ hình xung, nữ mạng bất lợi hôn nhân', tone: 'volatile' },
   sanQi: { zh: '三奇贵人', vi: 'Tam Kỳ Quý Nhân', desc: 'tài năng kỳ xuất, bác học đa năng,胸怀 xuất chúng (cần quý nhân phù trợ mới phát)', tone: 'cat' },
+  tianYiMed: { zh: '天医', vi: 'Thiên Y', desc: 'sao chủ y tế/sức khoẻ — duyên y/dược, thể chất, đức từ bi thương xót; «天医拱照, 可作良医»', tone: 'cat' },
 };
 
 /**
@@ -152,6 +158,13 @@ export function computeShensha(chart) {
   const hg = [HUA_GAI[group], HUA_GAI[groupDay]];
   const hgHit = findAny(hg);
   if (hgHit.length) result.huaGai = { at: hgHit };
+
+  // [loop 369] Thiên Y (天医) — theo NGUYỆT CHI, kiểm chi tứ trụ
+  const tyMedTarget = TIAN_YI_MED[chart.monthZhi];
+  if (tyMedTarget) {
+    const tyMedHit = find(tyMedTarget);
+    if (tyMedHit.length) result.tianYiMed = { at: tyMedHit };
+  }
 
   // Thiên Đức — ký hiệu (can hoặc chi) theo nguyệt chi, kiểm toàn tứ trụ (can+chi)
   const tdMark = TIAN_DE[chart.monthZhi];

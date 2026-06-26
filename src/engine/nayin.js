@@ -59,3 +59,16 @@ export function analyzeNayin(chart) {
   }
   return out;
 }
+
+// [loop 360] ganZhi → tên nạp âm qua chu kỳ 60 hoa giáp (cặp liền nhau共用 1 nạp âm).
+//   NAYIN_MEANING keys theo đúng thứ tự 60-cycle (海中金=甲子乙丑, 炉中火=丙寅丁卯, …).
+const _GAN10 = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const _ZHI12 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const _NAYIN_BY_ORDER = Object.keys(NAYIN_MEANING); // 30 tên theo thứ tự 60-cycle
+export function ganZhiNayin(gz) {
+  if (!gz || gz.length !== 2) return null;
+  for (let i = 0; i < 60; i++) {
+    if (_GAN10[i % 10] + _ZHI12[i % 12] === gz) return _NAYIN_BY_ORDER[Math.floor(i / 2)];
+  }
+  return null;
+}

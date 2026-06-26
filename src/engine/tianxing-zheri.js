@@ -421,19 +421,20 @@ export function tianxingZheri(sitting, fromY, fromM, fromD, days = 60, opts = {}
 //  UI HELPER: renderTianxingCard — thẻ HTML (reuse .ln-decade, .zr-head như qizheng).
 // ---------------------------------------------------------------------------
 export function renderTianxingCard(r) {
+  const e = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const scoreCls = (s) => (s >= 8 ? 'rate-cat' : s <= -3 ? 'rate-hung' : '');
   const hitRow = (h) => {
     const cls = h.d >= 0 ? 'rate-cat' : 'rate-hung';
-    return `<div class="ln-flags" style="font-size:11px;color:var(--muted)"><span class="zh">${h.zh}</span> ${h.vi} <span class="lm-rate ${cls}">${h.d >= 0 ? '+' : ''}${h.d}</span></div>`;
+    return `<div class="ln-flags" style="font-size:11px;color:var(--muted)"><span class="zh">${e(h.zh)}</span> ${e(h.vi)} <span class="lm-rate ${cls}">${h.d >= 0 ? '+' : ''}${e(String(h.d))}</span></div>`;
   };
   const dayRow = (d, label) => {
     if (!d) return '';
     const cls = scoreCls(d.score);
-    const bodiesTxt = (d.bodies || []).slice(0, 7).map((b) => `<span class="zh">${b.name}</span>${b.mountain}`).join(' ');
+    const bodiesTxt = (d.bodies || []).slice(0, 7).map((b) => `<span class="zh">${e(b.name)}</span>${e(b.mountain)}`).join(' ');
     return `
       <div class="ln" style="min-width:240px">
-        <div class="ln-year">${label} <b>${d.date.solar}</b> <span class="hint-inline">${d.date.lunar} · ${d.date.ganZhi}</span></div>
-        <div class="ln-gz">Điểm: <span class="lm-rate ${cls}">${d.score}</span> · ${d.eclipse ? '⚠ CẤM (thực)' : ''}</div>
+        <div class="ln-year">${label} <b>${e(d.date.solar)}</b> <span class="hint-inline">${e(d.date.lunar)} · ${e(d.date.ganZhi)}</span></div>
+        <div class="ln-gz">Điểm: <span class="lm-rate ${cls}">${e(String(d.score))}</span> · ${d.eclipse ? '⚠ CẤM (thực)' : ''}</div>
         <div class="ln-rate" style="font-size:11px">Vị trí: ${bodiesTxt}</div>
         ${d.hits.map(hitRow).join('')}
       </div>`;

@@ -8,7 +8,7 @@
 import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI } from './constants.js';
 import { tenGod } from './core.js';
-import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP } from './shensha.js';
+import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, TIAN_YI, WEN_CHANG, JIANG_XING } from './shensha.js';
 // [loop 12] 格局流日喜忌 — cộng tầng 格局 LÊN TRÊN 4 trường phái (ngũ hành + thập
 //   thần ngày + xung + thần sát). Optional patternQuality → backward compatible.
 import { adjustLiuriByGeju } from './pattern-quality.js';
@@ -90,6 +90,10 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
   if (HONG_YAN[dayGan] === dZhi) { score -= 3; schools.push({ phai: 'Hồng Diễm ngày', d: -3, note: 'Hồng diễm — sắc duyên, dễ sa vào tình cảm không lợi.' }); }
   if (YANG_REN[dayGan] === dZhi) { score -= 4; schools.push({ phai: 'Dương Nhận ngày', d: -4, note: 'Dương nhận — sát khí, dễ tổn thương/xe cộ/cắt đứt, kỵ liều.' }); }
   if (YI_MA[grp] === dZhi || YI_MA[BRANCH_GROUP[selfDayZhi]] === dZhi) { score += 2; schools.push({ phai: 'Dịch Mã ngày', d: 2, note: 'Dịch mã — di chuyển/đổi chỗ, có biến (cát nếu Dụng).' }); }
+  // [loop 366 nâng logic] thần sát CÁT ngày (cùng fix loop 364/365: trước đây chỉ score hung)
+  if (TIAN_YI[dayGan] && TIAN_YI[dayGan].includes(dZhi)) { score += 3; schools.push({ phai: 'Thiên Ất ngày', d: 3, note: 'Thiên Ất quý nhân — quý nhân phò, gặp dữ hóa lành, hợp gặp người lớn/ký kết.' }); }
+  if (WEN_CHANG[dayGan] === dZhi) { score += 2; schools.push({ phai: 'Văn Xương ngày', d: 2, note: 'Văn Xương — học/văn/thi cử thuận, tư duy sắc.' }); }
+  if (JIANG_XING[grp] === dZhi) { score += 2; schools.push({ phai: 'Tướng Tinh ngày', d: 2, note: 'Tướng tinh — uy quyền, hợp quyết định/lãnh đạo.' }); }
 
   // (5) [loop 75 nâng tầng] PHỤC/PHẢN NGÂM ngày × 4 trụ nguyên cục (mirror 流月/流年).
   //   Ngày can-chi trùng trụ = 伏吟 (trùng phức, chủ buồn/chướng); 天克地冲 trụ = 反吟 (biến cố).
