@@ -721,7 +721,7 @@ export function execTool(name, args, R) {
       }
       case 'find_good_days': {
         const [yy, mm, dd] = String(a.start).split('-').map(Number);
-        const list = findGoodDays(R, yy, mm, dd, a.count || 30, a.topN || 5);
+        const list = findGoodDays(R, yy, mm, dd, a.count || 30, a.topN || 5, R.patternQuality);
         return { start: a.start, top: list.map((d) => ({ date: d.solar, ganZhi: d.ganZhi, rating: d.rating, score: d.score })) };
       }
       case 'analyze_best_hour': {

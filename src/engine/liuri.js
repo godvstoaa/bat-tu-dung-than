@@ -125,11 +125,13 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
 }
 
 // Tìm N ngày tốt kế tiếp cho việc cá nhân (vận cá nhân, không theo việc cụ thể)
-export function findGoodDays(R, startYear, startMonth, startDay, count, topN = 5) {
+export function findGoodDays(R, startYear, startMonth, startDay, count, topN = 5, patternQuality) {
   const out = [];
   for (let i = 0; i < count; i++) {
     const d = Solar.fromYmdHms(startYear, startMonth, startDay, 12, 0, 0).next(i);
-    try { out.push(analyzeLiuRi(R, d.getYear(), d.getMonth(), d.getDay())); } catch (e) {}
+    // [loop 211 fix] truyền patternQuality → bật tầng 格局流日喜忌 (trước đây thiếu →
+    //   find_good_days AI tool lệch analyze_day tool cho ngày có 格局 喜/忌)
+    try { out.push(analyzeLiuRi(R, d.getYear(), d.getMonth(), d.getDay(), patternQuality)); } catch (e) {}
   }
   return out.sort((a, b) => b.score - a.score).slice(0, topN);
 }
