@@ -93,15 +93,16 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
 
   // (3) Thái tuế (chi năm vs chi năm sinh + chi ngày)
   const taiSuiNotes = [];
-  if (yZhi === yearBirthZhi) { score -= 10; taiSuiNotes.push('值太岁 (tự thái tuế) — năm biến động, dễ惹事.'); }
-  if (CHONG[yearBirthZhi] === yZhi) { score -= 16; taiSuiNotes.push('⚡冲太岁 (xung) — Đại biến động, hung, năm "tuổi xung".'); }
-  if (XING[yearBirthZhi] === yZhi) { score -= 12; taiSuiNotes.push('刑太岁 — quan phi, thị phi.'); }
-  if (PO[yearBirthZhi] === yZhi) { score -= 8; taiSuiNotes.push('破太岁 — phá tài.'); }
-  if (HAI[yearBirthZhi] === yZhi) { score -= 8; taiSuiNotes.push('害太岁 — tiểu nhân, hao tốn ngầm.'); }
+  let taiSuiD = 0; // [loop 419] track actual total (trước đây d: -1 gây hiểu lầm)
+  if (yZhi === yearBirthZhi) { score -= 10; taiSuiD -= 10; taiSuiNotes.push('值太岁 (tự thái tuế) — năm biến động, dễ惹事.'); }
+  if (CHONG[yearBirthZhi] === yZhi) { score -= 16; taiSuiD -= 16; taiSuiNotes.push('⚡冲太岁 (xung) — Đại biến động, hung, năm "tuổi xung".'); }
+  if (XING[yearBirthZhi] === yZhi) { score -= 12; taiSuiD -= 12; taiSuiNotes.push('刑太岁 — quan phi, thị phi.'); }
+  if (PO[yearBirthZhi] === yZhi) { score -= 8; taiSuiD -= 8; taiSuiNotes.push('破太岁 — phá tài.'); }
+  if (HAI[yearBirthZhi] === yZhi) { score -= 8; taiSuiD -= 8; taiSuiNotes.push('害太岁 — tiểu nhân, hao tốn ngầm.'); }
   // [loop 71 sửa double-count] chỉ tính khi dayZhi ≠ yearBirthZhi: nếu trùng thì 冲太岁
   //   (dòng trên, -16) đã bao hàm cùng 1 xung → không trừ 2 lần (trước đây -16+-14=-30).
-  if (CHONG[dayZhi] === yZhi && dayZhi !== yearBirthZhi) { score -= 14; taiSuiNotes.push('⚡日支冲太岁 — tổn bản thân/sức khoẻ, năm "ngày xung".'); }
-  if (taiSuiNotes.length) schools.push({ phai: 'Thái Tuế', note: taiSuiNotes.join(' '), d: -1 });
+  if (CHONG[dayZhi] === yZhi && dayZhi !== yearBirthZhi) { score -= 14; taiSuiD -= 14; taiSuiNotes.push('⚡日支冲太岁 — tổn bản thân/sức khoẻ, năm "ngày xung".'); }
+  if (taiSuiNotes.length) schools.push({ phai: 'Thái Tuế', note: taiSuiNotes.join(' '), d: taiSuiD });
 
   // (4) Thần sát năm (đào hoa / hồng diễm / dương nhận / dịch mã + [loop 364] quý nhân/văn/tướng)
   const grp = BRANCH_GROUP[yearBirthZhi];
