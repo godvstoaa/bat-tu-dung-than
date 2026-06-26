@@ -479,9 +479,12 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
     // [cycle 44] Dùng scoreLiunianYear (chung với analyzeLiunianDeep) → thẻ "Lưu Niên"
     //   nhất quán với brief "Luận vận năm". Trước đây chỉ chấm ngũ hành → 2026 báo "Cát"
     //   trong khi deep (có Thương Quan −16 + Thái tuế) báo "Hơi kỵ" → mâu thuẫn.
+    // [loop 207 fix BUG] truyền activeDayun → bật tầng 大运互动 (运年组合). Trước đây THIẾU
+    //   activeDayun → scoreLiunianYear skip school 6 → thẻ «Lưu Niên» thiếu 1 phái, lệch
+    //   deep (AI/brief) tới ~8 điểm (vd nam 2000 năm 2027: card 51 vs deep 43).
     const { score, rating } = scoreLiunianYear({
       dayGan: dGan, dayZhi: ec.getDayZhi(), yearBirthZhi: ec.getYearZhi(), yong, yGan: gan, yZhi: zhi,
-      natalPillars, kongwang,
+      activeDayun: active.getGanZhi(), natalPillars, kongwang,
     });
     const lnYear = ln.getYear();
     out.push({ ganZhi: gz, gan, zhi, ganWx, zhiWx,
