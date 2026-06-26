@@ -2543,7 +2543,7 @@ function run() {
   const tz = parseFloat($('tz').value) || 7;
   const cityVal = $('city').value;
   let longitude = null;
-  if (cityVal === 'manual') longitude = parseFloat($('long').value);
+  if (cityVal === 'manual') { const lv = parseFloat($('long').value); longitude = Number.isFinite(lv) && lv >= -180 && lv <= 180 ? lv : null; }
   else if (cityVal && !Number.isNaN(parseFloat(cityVal))) longitude = parseFloat(cityVal);
   const tt = trueSolarTime({ year: y0, month: m0, day: d0, hour: hh0, minute: mm0, tzOffset: tz, longitude });
   const y = tt.solar.year, m = tt.solar.month, d = tt.solar.day, hh = tt.solar.hour, mm = tt.solar.minute;
