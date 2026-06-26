@@ -51,9 +51,15 @@ function nayinWxOf(gan, zhi) {
 /**
  * @returns {{ mingGong, shenGong, ju, juVi, palaces:[{zh,vi,gan,zhi,daXian}], birth (lunar) }}
  */
+const _ziweiCache = new Map();
 export function computeZiwei(year, month, day, hour, minute, gender) {
   const h = (hour === undefined || hour === null) ? 12 : hour;
   const mi = (minute === undefined || hour === null) ? 0 : minute;
+  // [loop 257] memoize — computeZiwei được gọi 8× trong main.js (ziwei/sanfang/liuri/
+  //   xiaoxian/minggong/...) cho cùng lá số → tính lại 8 lần (8×50ms=400ms lãng phí).
+  //   Cache theo input params → lần 2+ trả kết quả ngay (<1ms).
+  const cacheKey = `${year}-${month}-${day}-${h}-${mi}-${gender}`;
+  if (_ziweiCache.has(cacheKey)) return _ziweiCache.get(cacheKey);
   // [loop 178] 子时换日 — đồng bộ buildChart: 23:00+ → sang hôm sau (cùng lá số bẩm sinh)
   const [cy, cm, cd, ch, cmi] = ziShiRoll(year, month, day, h, mi);
   const solar = Solar.fromYmdHms(cy, cm, cd, ch, cmi, 0);
@@ -129,7 +135,7 @@ export function computeZiwei(year, month, day, hour, minute, gender) {
   // 飞星四化 (fly-IN / fly-OUT): ma trận 48 hóa giữa các cung — zeigt kết nối lifetime-area
   const feixingInfo = computeFeiXing(palaces, starInfo?.mainStars || {}, fuxing);
 
-  return {
+  const _result = {
     birth: { lunarMonth: lm, lunarDay: ld, timeZhi, yearGan },
     mingGong: mingGongGan + mingGongZhi,
     shenGong: shenGongZhi,
@@ -144,6 +150,8 @@ export function computeZiwei(year, month, day, hour, minute, gender) {
     boshi, fuxing,
     note: 'Mệnh bàn Tử Vi: cung + cục + đại hạn + 14 chính tinh + 四化 + 宫干自化 + 飞星化入化出 + 博士 + 辅星.',
   };
+  _ziweiCache.set(cacheKey, _result);
+  return _result;
 }
 
 // helper nhỏ: đảm bảo z.zihua luôn là object có .list dù computeZihua trả null
