@@ -1528,6 +1528,8 @@ function renderFiveAspects(R) {
       ${f.weak ? `<p class="hint">⚠ Nhược: ${esc(f.weak)}</p>` : ''}
       ${f.kyVirtue ? `<p class="hint">Đức Kỵ: ${esc(f.kyVirtue)}${f.kyWeak ? ' — ' + esc(f.kyWeak) : ''}</p>` : ''}
       ${f.cultivation ? `<p>🌿 Tu dưỡng: ${esc(f.cultivation)}</p>` : ''}
+      ${f.dungVirtue ? `<div class="tiaohou-note"><b>🎯 Đức bổ Dụng (${esc(f.primaryVi || '')}):</b> ${esc(f.dungVirtue)}${f.dungCultivation ? ' — ' + esc(f.dungCultivation) : ''}</div>` : ''}
+      ${f.balance ? `<p class="hint">⚖️ Cân bằng đức: ${esc(f.balance)}</p>` : ''}
       <p class="hint">${esc(f.advice || '')}</p>
     `;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được ngũ đức.</p>'; }
