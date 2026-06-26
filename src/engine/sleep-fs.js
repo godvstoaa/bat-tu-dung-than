@@ -49,9 +49,14 @@ export function sleepOptimization(R, birthYear, gender) {
   const xiWx = R.yong.xi;
   const kyWx = R.yong.ji;
   const dmWx = R.chart.dayMaster.wx;
+  // [loop 253 fix] birthYear/gender tùy chọn — fallback vào R.chart.input (trước đây
+  //   gen() trong renderLifestyle gọi sleepOptimization(R) mà THIẾU 2 param → crash
+  //   «Cannot read 'Sinh Khí' of undefined» → try/catch nuốt → section «Ngủ» KHÔNG hiện.
+  const by = birthYear ?? R.chart?.input?.year;
+  const gd = gender ?? R.chart?.input?.gender;
 
   // Bát Trạch
-  const z = computeZhai(birthYear, gender);
+  const z = computeZhai(by, gd);
   const ausp = z.auspicious || {};
   const inausp = z.inauspicious || {};
 
