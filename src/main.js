@@ -1396,7 +1396,11 @@ function renderFamilyFortune(R) {
     const f = analyzeFamilyHarmony(R);
     const relRows = (f.relations || []).map((r) => {
       const tone = /vượng|mạnh|tốt/.test(r.strength || '') ? '#2e9e5b' : /nhược|yếu|thử thách|khuyết/.test(r.strength || '') ? '#e0533d' : '#caa14a';
-      return `<div class="yz-row" style="border-left:3px solid ${tone};padding-left:8px;margin:3px 0"><b>${esc(r.name || r.key || '')}</b> — ${esc(r.strength || '')}${r.palaceZhi ? ' (cung ' + esc(r.palaceZhi) + (r.palaceStable ? ' yên' : ' xung') + ')' : ''}</div>`;
+      const scoreTag = r.harmonyScore != null ? ` <span class="ln-rate ${r.harmonyScore >= 60 ? 'rate-cat' : r.harmonyScore >= 40 ? 'rate-mid' : 'rate-hung'}">${r.harmonyScore}/100</span>` : '';
+      const yongTag = r.isYong ? ' <span class="geju-xi">★ Dụng</span>' : r.isJi ? ' <span class="geju-ji">⚠ Kỵ</span>' : '';
+      const issuesHtml = (r.issues && r.issues.length) ? `<div class="hint" style="color:#f0a99c">⚠ ${r.issues.map(esc).join('; ')}</div>` : '';
+      const adviceHtml = r.advice ? `<div class="hint">💡 ${esc(r.advice)}</div>` : '';
+      return `<div class="yz-row" style="border-left:3px solid ${tone};padding-left:8px;margin:3px 0"><b>${esc(r.name || r.key || '')}</b>${yongTag}${scoreTag} — ${esc(r.strength || '')}${r.starLabel ? ' · ' + esc(r.starLabel) : ''}${r.palaceZhi ? ' (cung ' + esc(r.palaceZhi) + (r.palaceStable ? ' yên' : ' xung') + ')' : ''}${issuesHtml}${adviceHtml}</div>`;
     }).join('');
     el.innerHTML = `
       <p><b>Gia đạo: ${esc(String(f.familyScore ?? ''))}/100</b>${f.weakest ? ' — cần chú ý: ' + esc(f.weakest.name || f.weakest.key || '') : ''}${f.strongest ? ' | mạnh: ' + esc(f.strongest.name || f.strongest.key || '') : ''}</p>
