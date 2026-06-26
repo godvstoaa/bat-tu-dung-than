@@ -1881,7 +1881,8 @@ function renderLifestyle(R) {
   try {
     const c = crystalLuckyObjects(R);
     html += `<h4 class="syn-h4" style="margin-top:8px">💎 Đá phong thủy & trang sức (Dụng ${esc(c.dungVi || '')})</h4>`;
-    html += `<p class="hint">Đeo: ${esc(arr(c.dungCrystals))}. Màu: ${esc(c.dungColor || '')}. Lợi: ${esc(c.dungBenefit || '')}. Kim loại: ${esc(c.dungMetal || '')}.${c.dungObjects ? ' Vật phẩm: ' + esc(arr(c.dungObjects)) + '.' : ''}</p>`;
+    html += `<p class="hint">Đeo: ${esc(arr(c.dungCrystals))}. Màu: ${esc(c.dungColor || '')}. Lợi: ${esc(c.dungBenefit || '')}. Kim loại: ${esc(c.dungMetal || '')}.${c.dungObjects ? ' Vật phẩm: ' + esc(arr(c.dungObjects)) + '.' : ''}${c.dungOrgan ? ' Bổ: ' + esc(c.dungOrgan) + '.' : ''}${c.dungPlacement ? ' Vị trí: ' + esc(arr(c.dungPlacement)) + '.' : ''}</p>`;
+    ${c.kyCrystals && (Array.isArray(c.kyCrystals) ? c.kyCrystals.length : c.kyCrystals) ? html += `<p class="hint">⚠ Tránh đá: ${esc(arr(c.kyCrystals))} (hành ${esc(c.kyVi || '')}).</p>` : '' }
   } catch (e) {}
   // Trang phục
   try {
