@@ -408,7 +408,7 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       <div class="zw-palace">${e.zh}<span class="zw-pvi">${e.vi.split("(")[0]}</span>${e.isMing?"<b>★命</b>":""}${e.isShen&&!e.isMing?"<b>身</b>":""}</div>
       <div class="zw-gz"><span class="zh">${e.gan}</span><span class="zh">${e.zhi}</span></div>
       <div class="zw-stars">${(e.stars||[]).join(" ")}</div>
-    </div>`).join(""),h=i.daXian.slice(0,6).map(e=>`<div class="zw-dx"><b>${e.from}-${e.to}t</b> ${e.palace} <span class="zh">${e.ganZhi}</span></div>`).join(""),a=Object.entries(i.sihua||{}).map(([e,c])=>`<span class="zw-sh ${c.tone}"><b>${e}</b> ${c.star}${c.palace?"@"+c.palace:""}</span>`).join("");H("ziwei").innerHTML=`
+    </div>`).join(""),h=i.daXian.filter(e=>e.to<=95).map(e=>`<div class="zw-dx"><b>${e.from}-${e.to}t</b> ${e.palace} <span class="zh">${e.ganZhi}</span></div>`).join(""),a=Object.entries(i.sihua||{}).map(([e,c])=>`<span class="zw-sh ${c.tone}"><b>${e}</b> ${c.star}${c.palace?"@"+c.palace:""}</span>`).join("");H("ziwei").innerHTML=`
     <div class="zw-head">Mệnh cung <span class="zh big">${i.mingGong}</span> · Thân cung ${i.shenGong} · <span class="ln-rate rate-mid">${i.juVi}</span>
       <span class="hint-inline">(ÂL ${i.birth.lunarMonth}月${i.birth.lunarDay}日 · 时 ${i.birth.timeZhi} · 紫微@${i.ziweiBranch||"?"} · 天府@${i.tianfuBranch||"?"})</span></div>
     <div class="zw-grid">${t}</div>
