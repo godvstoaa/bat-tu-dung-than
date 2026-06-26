@@ -1026,7 +1026,14 @@ function renderSanyuan(R) {
     el.innerHTML = `
       <p><b>${s.yun.starVi} · ${s.yun.trig} · ${s.yun.wxVi}</b> (${s.yun.yuan}, ${s.yun.start}-${s.yun.end})</p>
       <p class="hint">正神=${s.zhengShen} · 零神=${s.lingShen}</p>
-      <p class="hint">${s.align}</p>`;
+      <p class="hint">${s.align}</p>
+      ${s.detail ? `<details style="margin:6px 0"><summary class="hint">📋 Chi tiết kỷ nguyên ${s.yun.starVi} (${s.yun.start}-${s.yun.end})</summary>
+        ${s.detail.industriesWang ? `<p class="hint"><b>🔥 Ngành vượng:</b> ${esc(s.detail.industriesWang.join(', '))}</p>` : ''}
+        ${s.detail.industriesSuy ? `<p class="hint"><b>📉 Ngành suy:</b> ${esc(s.detail.industriesSuy.join(', '))}</p>` : ''}
+        ${s.detail.health ? `<p class="hint"><b>🏥 Sức khoẻ:</b> ${esc(s.detail.health)}</p>` : ''}
+        ${s.detail.society ? `<p class="hint"><b>🌐 Xã hội:</b> ${esc(s.detail.society)}</p>` : ''}
+        ${s.detail.layout ? `<p class="hint"><b>🧭 Bố trí:</b> ${s.detail.layout.map(esc).join(' · ')}</p>` : ''}
+      </details>` : ''}`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được tam nguyên cửu vận.</p>'; }
 }
 
