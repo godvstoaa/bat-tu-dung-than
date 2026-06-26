@@ -408,6 +408,15 @@ export function computeDaYun(year, month, day, hour, minute, gender, yong) {
     if (avoidSet.has(zhiWx)) score -= 2;
     if (favSet.has(ganWx)) score += 1;
     if (avoidSet.has(ganWx)) score -= 1;
+    // [loop 423 elevate] 大运-vs-日柱 structural clash — cổ pháp: 天克地冲 = đại hung
+    //   bất kể ngũ hành. Trước đây score CHỈ xét ngũ hành → 大运 天克地冲 vẫn «Cát» nếu
+    //   hành Dụng → sai thực tế (thập kỷ biến loạn lớn dù hành tốt). Nay: trừ theo mức.
+    const dgZhi = ec.getDayZhi();
+    const _GC = { 甲:'庚',庚:'甲',乙:'辛',辛:'乙',丙:'壬',壬:'丙',丁:'癸',癸:'丁' };
+    const _CH = { 子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳' };
+    if (_GC[dGan] === gan && _CH[dgZhi] === zhi) score -= 4; // 天克地冲 — severe
+    else if (_CH[dgZhi] === zhi) score -= 2; // 地冲 only
+    if (gan + zhi === dGan + dgZhi) score -= 1; // 伏吟 — trùng phức
     let rating;
     if (score >= 2) rating = 'Cát';
     else if (score >= 1) rating = 'Hơi thuận';

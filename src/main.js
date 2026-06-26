@@ -3317,6 +3317,14 @@ function run() {
       });
     });
   }
+  // [loop 422] keyboard shortcut: "/" → focus card search (skip if typing in input/textarea)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement?.tagName)) {
+      e.preventDefault();
+      const cs = $('card-search');
+      if (cs) { cs.focus(); cs.select(); }
+    }
+  });
   if ($('bh-date')) { $('bh-date').value = todayStr; try { renderBestHour(todayStr); } catch (e) { console.warn('best-hour init', e.message); } }
   $('ts-year').value = curYear;
   renderTaisui(curYear);
