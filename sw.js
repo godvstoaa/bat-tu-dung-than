@@ -1,6 +1,6 @@
 // Service worker — PWA (cho Android/Chrome install + offline shell).
 // An toàn: NETWORK-FIRST, không bao giờ block bằng cache cũ (tránh trắng trang).
-const CACHE = 'bazi-mqug2pck'; // [loop 234] bump v4→v5 — 70+ changes since v4 (health card, desired-用神, current-marks, param-consistency fixes, 进气退气, 子时换日, etc.)
+const CACHE = 'bazi-mqug7gey'; // [loop 234] bump v4→v5 — 70+ changes since v4 (health card, desired-用神, current-marks, param-consistency fixes, 进气退气, 子时换日, etc.)
 self.addEventListener('install', () => { self.skipWaiting(); });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
