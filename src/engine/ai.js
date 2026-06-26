@@ -623,10 +623,11 @@ export const AI_TOOLS = [
   { type: 'function', function: {
     // [loop 21] BÁT TỰ NGƯỢC — tìm lá số điểm CAO/THẤP nhất (hoặc gần target). Nguyên lý:
     //   phương pháp chuẩn phải dịch ngược được. Không cần R (quét độc lập).
-    name: 'inverse_bazi', description: 'TÌM BÁT TỰ (lá số sinh) có điểm Tổng Mệnh CAO NHẤT / THẤP NHẤT có thể đạt, hoặc gần một điểm target. Dịch ngược của hàm chấm điểm mệnh. Dùng khi user hỏi ngược "bát tư của người điểm cao/thấp nhất là gì", "muốn đẻ con mệnh tốt nhất thì sinh năm/tháng/giờ nào", "tìm lá số đạt điểm X".',
+    name: 'inverse_bazi', description: '[loop 230] TÌM BÁT TỰ có điểm CAO/THẤP nhất, gần target, HOẶC có DỤNG THẦN mong muốn. Dùng khi user hỏi "bát tự điểm cao/thấp nhất", "muốn đẻ con mệnh tốt", "muốn con Dụng Thủy/Mộc/Hỏa thì thụ thai khi nào", "tìm lá số đạt điểm X".',
     parameters: { type: 'object', properties: {
-      mode: { type: 'string', enum: ['max', 'min', 'target'], description: 'max=điểm cao nhất, min=thấp nhất, target=gần 1 điểm cụ thể' },
+      mode: { type: 'string', enum: ['max', 'min', 'target', 'yong'], description: 'max=điểm cao nhất, min=thấp nhất, target=gần điểm cụ thể, yong=lọc theo Dụng Thần mong muốn' },
       target: { type: 'integer', description: 'Điểm mong muốn (0-100) khi mode=target' },
+      targetYong: { type: 'string', enum: ['木','火','土','金','水'], description: 'Dụng Thần mong muốn khi mode=yong' },
       yearStart: { type: 'integer', description: 'Năm bắt đầu quét (bỏ trống = năm hiện tại)' },
       yearEnd: { type: 'integer', description: 'Năm kết thúc quét (bỏ trống = yearStart)' },
       stepDays: { type: 'integer', description: 'Bước nhảy ngày (mặc định 5; nhỏ hơn = sát cực hơn nhưng chậm)' },
@@ -685,6 +686,7 @@ export function execTool(name, args, R) {
           topK: 4,
           maxSamples: 4000,
           target: a.mode === 'target' && a.target != null ? a.target : null,
+          targetYong: a.mode === 'yong' && a.targetYong ? a.targetYong : null, // [loop 230] desired Dụng Thần
         };
         const sol = inverseBaZiSolve(opts);
         const fmt = (r) => r ? { label: labelResult(r), score: r.score, pattern: r.pattern, geju: r.gejuQuality, pillars: r.pillars, birth: `${r.y}-${String(r.m).padStart(2,'0')}-${String(r.d).padStart(2,'0')} ${r.g} giờ ${r.shichen}` } : null;
