@@ -80,6 +80,7 @@ import { scanWealthCareerYingqi } from './engine/yingqi-wealth.js';
 import { dominantGod } from './engine/dominant-god.js';
 import { analyzeYanQin } from './engine/yanqin.js';
 import { analyzeHealth } from './engine/health-analysis.js'; // [loop 183] Sức Khoẻ Ngũ Hành card
+import { healthAlertScan } from './engine/health-alert.js'; // [loop 224 fix] quickSummary + health card timeline — trước đây KHÔNG import → quickSummary's health alert CHẾT (ReferenceError bị try/catch nuốt)
 import { qinxingOverview, qinxingCycle } from './engine/qinxing.js';
 import { analyzeTongGen } from './engine/tonggen.js';
 import { missingGod } from './engine/missing-god.js';
@@ -934,7 +935,9 @@ function renderHealth(R) {
       ${h.remedyFoods ? `<div class="tiaohou-note"><b>Thực phẩm chữa lành (hành ${esc(h.remedyVi || '')}):</b> ${esc(h.remedyFoods)}</div>` : ''}
       ${h.riskSeason ? `<p class="hint">📅 Mùa phòng bệnh: ${esc(h.riskSeason)}</p>` : ''}
       ${h.organRisk ? `<p class="hint">${esc(h.organRisk)}</p>` : ''}
-      ${Array.isArray(h.advice) && h.advice.length ? `<p class="hint" style="margin-top:6px">💡 ${h.advice.map((a) => esc(a)).join('<br>💡 ')}</p>` : (h.advice ? `<p class="hint">${esc(h.advice)}</p>` : '')}`;
+      ${Array.isArray(h.advice) && h.advice.length ? `<p class="hint" style="margin-top:6px">💡 ${h.advice.map((a) => esc(a)).join('<br>💡 ')}</p>` : (h.advice ? `<p class="hint">${esc(h.advice)}</p>` : '')}
+      <h4 class="syn-h4" style="margin-top:10px">📅 Năm cần chú ý sức khoẻ (5 năm tới)</h4>
+      ${(() => { try { const ha = healthAlertScan(R, 5); return (ha.alerts||[]).map((a) => `<div class="yz-row" style="border-left:3px solid ${a.level && a.level.includes('CAO') ? 'var(--cinnabar)' : 'var(--gold)'};margin:3px 0;padding-left:8px"><b>${a.year}</b> <span class="zh">${esc(a.ganZhi||'')}</span> <span class="ln-rate ${a.level && a.level.includes('CAO') ? 'rate-hung' : 'rate-bad'}">${esc(a.level||'')}</span><div class="hint">${(a.reasons||[]).map(esc).join('; ').slice(0,120)}</div></div>`).join('') || '<p class="hint">5 năm tới không có năm cảnh báo y tế nặng.</p>'; } catch(_) { return ''; } })()}`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được sức khoẻ ngũ hành.</p>'; }
 }
 
