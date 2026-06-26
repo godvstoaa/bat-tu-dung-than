@@ -729,6 +729,7 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       ${h.oneLiner?`<p>${k(h.oneLiner)}</p>`:""}
       ${e?`<p>✓ <b>宜:</b> ${k(e)}</p>`:""}
       ${c?`<p>⚠ <b>忌:</b> ${k(c)}</p>`:""}
+      ${h.color?`<p class="hint">🎨 <b>Màu may mắn:</b> ${k(h.color.primary||"")}${h.color.accent?" (phụ "+k(h.color.accent)+")":""}${h.colorAdvice?" — "+k(h.colorAdvice):""}</p>`:""}
       <p class="hint">🧭 Tài Thần ${k(a.directions?.caiShen||"?")} | Hỷ Thần ${k(a.directions?.xiShen||"?")} | Hướng tốt ${k(a.bestDirection||"?")}</p>
       ${s?`<p class="hint">⏰ Giờ tốt: ${s}</p>`:""}
       ${o?`<p class="hint">⏰ Giờ kỵ: ${o}</p>`:""}
