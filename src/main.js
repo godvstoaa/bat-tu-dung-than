@@ -3948,6 +3948,7 @@ $('ev-btn')?.addEventListener('click', () => {
     $('event-verify').innerHTML = `
       <p style="font-weight:600;color:${r.confidence === 'high' ? 'var(--cat,#2a7)' : r.confidence === 'low' ? 'var(--hung,#c33)' : '#d49a3a'}">${r.verdict}</p>
       <p class="hint"><b>Sự kiện:</b> ${r.eventVi} (${r.eventYear}) — Mong đợi: ${r.expected}</p>
+      <p class="hint">📊 Năm ${r.eventYear}: vận ${r.lnRating||'?'} (${r.lnScore||'?'}đ) · can ${r.lnGod||'?'} · 12神 ${r.god12||'?'}${r.taiSuiOffends ? ' · ⚡ phạm thái tuế' : ''}</p>
       <ul class="hint" style="margin:4px 0 4px 16px">${r.found.map((f) => `<li>${f}</li>`).join('')}</ul>`;
   } catch (e) { $('event-verify').innerHTML = '<p class="hint">Không xác nhận được.</p>'; }
 });
