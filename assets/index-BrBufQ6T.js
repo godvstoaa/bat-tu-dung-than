@@ -558,7 +558,8 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       <div class="sp-item">
         <div class="sp-star">${a.starVi} <span class="${An(a.wx)}">${a.wxVi}</span></div>
         <div class="sp-area hint">${a.area}</div>
-        <div class="sp-verdict ${h(a.verdict)}">${a.verdict} <span class="hint">(căn ${a.root}, lộ ${a.reveal})</span></div>
+        <div class="sp-verdict ${h(a.verdict)}">${a.verdict} <span class="hint">(căn ${a.root}, lộ ${a.reveal}, mùa ${a.season})</span></div>
+        <div class="sp-vi hint">${f(a.verdictVi||"")}</div>
       </div>`).join("")+`<p class="hint" style="margin-top:6px">${t.summary}</p>`}catch{i.innerHTML='<p class="hint">Không tính được sao trọng điểm.</p>'}}function i1(){const n=H("dir-taboo");if(n)try{const i=Ge(new Date().getFullYear()),t=h=>h.maxSeverity>=4?"hung":h.taboos.length?"mid":"cat";n.innerHTML=`<p class="hint">Năm ${i.year}: hướng SẠCH (không phạm sát lớn) <b>${i.clean.join(", ")||"(không)"}</b>; hướng KỴ ${i.worst.length?i.worst.join(", "):"(không)"}.</p><div class="dir-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${i.results.map(h=>`
         <div class="ln ${t(h)}" title="${h.taboos.map(a=>a.type).join(", ")||"sạch"}">
           <div class="ln-year">${h.dir}</div>
