@@ -726,7 +726,9 @@ function renderSanshishu(R) {
         <div class="verse-zh">${s.pastLife.verse}</div>
       </div>
       <p class="cg-interp"><b>♛ Nhân quả kiếp trước:</b> ${s.karma.vi}</p>
+      ${s.karma.cause && s.karma.cause !== s.karma.vi ? `<p class="hint">📖 Nguyên nhân: ${esc(s.karma.cause)}</p>` : ''}
       <p class="cg-interp"><b>☞ Phúc hoạ kiếp này:</b> ${s.currentLife.vi}</p>
+      ${s.currentLife.fortune && s.currentLife.fortune !== s.currentLife.vi ? `<p class="hint">🔮 Chi tiết: ${esc(s.currentLife.fortune)}</p>` : ''}
       ${s.boneCross ? `<p class="hint"><span class="ln-rate ${boneTone}"><b>称骨三世:</b></span> ${s.boneCross.vi}</p>` : ''}
       <p class="hint" style="margin-top:6px">⚠ ${s.disclaimer}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 三世书.</p>'; }
