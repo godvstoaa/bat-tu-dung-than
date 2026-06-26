@@ -28,6 +28,10 @@ import { predictEvents } from './event-predict.js';
 import { detectAnchong } from './anchong.js';
 import { analyzeFiveVirtues } from './five-aspects.js';
 import { computeLiuyue } from './liuyue.js';
+import { cityRecommendation } from './city-fs.js';
+import { personalNutrition } from './bazi-diet.js';
+import { investmentStyle } from './invest-style.js';
+import { analyzeBusiness } from './bazi-business.js';
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -248,6 +252,27 @@ export function extendBrief(R) {
     if (m) {
       parts.push(`LƯU THÁNG ${now.getMonth() + 1} (${m.ganZhi}): ${m.rating} (${m.score}/100) — ${(m.note || '').slice(0, 80)}${m.taiSui?.length ? ' | ' + m.taiSui.join(', ') : ''}${m.fuyin?.length ? ' | ' + m.fuyin.join(', ') : ''}`);
     }
+  } catch (e) {}
+
+  // [loop 271] lifestyle 1-liners — city/diet/investment/business (trước đây chỉ có trên card, AI không biết)
+  try {
+    const c = cityRecommendation(R);
+    const cities = c.bestCityType?.cities?.slice(0, 3).join(', ') || '';
+    parts.push(`THÀNH PHỐ HỢP: hướng ${c.bestDirectionVi || '?'}, ${c.bestCityType?.vi || '?'}${cities ? ' (' + cities + ')' : ''}${c.careerCityVi ? ', career=' + c.careerCityVi : ''}${c.wealthCityVi ? ', wealth=' + c.wealthCityVi : ''}.`);
+  } catch (e) {}
+  try {
+    const d = personalNutrition(R);
+    const f = d.dungFlavor || {};
+    parts.push(`ẨM THỰC: vị ${f.vi || '?'} (${f.flavor || ''})${f.foods ? ', thực phẩm: ' + (f.foods + '').slice(0, 60) : ''}${d.tea ? '. Trà: ' + d.tea.slice(0, 40) : ''}.`);
+  } catch (e) {}
+  try {
+    const inv = investmentStyle(R);
+    const alloc = inv.allocation ? Object.entries(inv.allocation).map(([k, v]) => `${k.replace(/_/g, '')} ${v}%`).join(' ') : '';
+    parts.push(`ĐẦU TƯ: ${inv.style || '?'} (risk ${inv.riskScore ?? '?'}/10)${alloc ? ', phân bổ: ' + alloc : ''}${inv.canDayTrade ? ', HỢP day-trade' : ''}${inv.dayTradeNote ? '. ' + inv.dayTradeNote : ''}.`);
+  } catch (e) {}
+  try {
+    const biz = analyzeBusiness(R);
+    parts.push(`KINH DOANH: ${biz.shouldStart ? '✓ nên khởi nghiệp' : '⚠ thận trọng'}${biz.bizTypes?.length ? ' (' + biz.bizTypes.slice(0, 3).join(', ') + ')' : ''}${biz.hasCaiKu === false ? ', KHÔNG có tài khố' : ''}.`);
   } catch (e) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';
