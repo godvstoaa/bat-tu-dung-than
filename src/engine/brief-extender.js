@@ -240,7 +240,9 @@ export function extendBrief(R) {
   // [loop 124] LƯU THÁNG hiện tại — AI trả lời "tháng này sao"
   try {
     const now = new Date();
-    const ly = computeLiuyue(R, now.getFullYear());
+    // [loop 209 fix] truyền patternQuality — bật tầng 格局流月喜忌 (gejuDelta). Trước đây
+    //   THIẾU patternQuality → brief's LƯU THÁNG thiếu 1 tầng, lệch thẻ «Lưu Nguyệt» + AI tool.
+    const ly = computeLiuyue(R, now.getFullYear(), R.patternQuality);
     const curMonth = now.getMonth(); // 0-11
     const m = ly.months.find((mm) => mm.m === curMonth) || ly.months[0];
     if (m) {
