@@ -491,13 +491,13 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       <div class="ln-rate ${Yt(c.rating)}">${c.rating}</div>
     </div>`}).join("")}function UN(n){const i=H("decade");if(i)try{const t=xe(n,new Date().getFullYear(),10);i.innerHTML=`
       <p class="hint">10 năm tới一览: vận (6 phái) + 💰Tài + 🎯Quan + 💞Duyên. TỐT <b>${t.best.year} (${t.best.rating}, ${t.best.score}/100${t.best.flags.length?", "+t.best.flags.join(" "):""})</b> · XẤU <b>${t.worst.year} (${t.worst.rating})</b></p>
-      <div class="ln-decade" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${t.years.map(h=>`
-        <div class="ln ${h.year===t.best.year?"ln-now":""}" title="${h.ganZhi} ${h.flags.join(" ")}">
-          <div class="ln-year">${h.year}</div>
+      <div class="ln-decade" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${t.years.map(h=>{const a=new Date().getFullYear(),e=h.year===a,c=h.year===t.best.year;return`
+        <div class="ln${e?" ln-now":c?" ln-best-row":""}" title="${h.ganZhi} ${h.flags.join(" ")}">
+          <div class="ln-year">${h.year}${e?" ★":""}</div>
           <div class="ln-gz">${h.ganZhi}</div>
-          <div class="ln-rate ${Yt(h.rating)}">${h.rating}</div>
+          <div class="ln-rate ${Yt(h.rating)}">${h.rating} <small>${h.score}</small></div>
           <div class="ln-flags">${h.flags.join(" ")||"·"}</div>
-        </div>`).join("")}</div>`}catch{i.innerHTML='<p class="hint">Không tính được 10 năm.</p>'}}function QN(n){const i=H("life-reading");if(i)try{const t=Zr(n);i.innerHTML=`
+        </div>`}).join("")}</div>`}catch{i.innerHTML='<p class="hint">Không tính được 10 năm.</p>'}}function QN(n){const i=H("life-reading");if(i)try{const t=Zr(n);i.innerHTML=`
       <p style="font-size:14px;font-weight:600;color:var(--gold,#d4af37);margin-bottom:8px">${t.oneSentence}</p>
       ${t.sections.map(h=>`
         <details style="margin-bottom:4px">
