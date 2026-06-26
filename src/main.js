@@ -2204,13 +2204,20 @@ function renderForecast5(R) {
   if (!el) return;
   try {
     const f5 = forecast5(R, new Date().getFullYear(), 5);
-    el.innerHTML = f5.years.map((y) => `
-      <div class="ln ${y.tone === 'cat' ? '' : y.tone === 'hung' ? '' : ''}">
-        <div class="ln-year">${y.year}</div>
-        <div class="ln-gz">${y.ganZhi}</div>
-        <div class="ln-rate ${rateClass(y.rating)}">${y.rating}</div>
-        <div class="ln-flags">${y.score}/100</div>
-      </div>`).join('') + (f5.activeDayun ? `<p class="hint" style="margin-top:4px">Đại vận đang hành: ${f5.activeDayun.ganZhi} [${f5.activeDayun.startAge}-${f5.activeDayun.startAge + 9}t]</p>` : '');
+    el.innerHTML = f5.years.map((y) => {
+      // [loop 221] hiển thị shen12 + dayunGod + positives/alerts (trước đây chỉ score trần)
+      const ctx = [];
+      if (y.shen12) ctx.push(`12神: ${esc(y.shen12)}`);
+      if (y.dayunGod) ctx.push(`运 ${esc(y.dayunGod)}`);
+      const posHtml = (y.positives || []).length ? `<div class="hint" style="color:#9fe0b8">✓ ${y.positives.map(esc).join('; ')}</div>` : '';
+      const alertHtml = (y.alerts || []).length ? `<div class="hint" style="color:#f0a99c">⚠ ${y.alerts.map(esc).join('; ')}</div>` : '';
+      return `
+      <div class="yz-row" style="border-left:3px solid ${y.tone === 'cat' ? 'var(--jade)' : y.tone === 'hung' ? 'var(--cinnabar)' : 'var(--gold)'};margin:4px 0;padding-left:8px">
+        <b>${y.year}</b> <span class="zh">${esc(y.ganZhi)}</span> <span class="ln-rate ${rateClass(y.rating)}">${esc(y.rating)} (${y.score}/100)</span>
+        ${ctx.length ? ` <span class="hint">${ctx.join(' · ')}</span>` : ''}
+        ${posHtml}${alertHtml}
+      </div>`;
+    }).join('') + (f5.activeDayun ? `<p class="hint" style="margin-top:4px">Đại vận đang hành: ${f5.activeDayun.ganZhi} [${f5.activeDayun.startAge}-${f5.activeDayun.startAge + 9}t]</p>` : '');
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được forecast 5 năm.</p>'; }
 }
 
