@@ -3487,6 +3487,37 @@ if ($('planned-birth-btn')) $('planned-birth-btn').addEventListener('click', () 
   if (!yr || yr < 1990 || yr > 2050) { alert('Năm không hợp lệ. VD: 2027'); return; }
   renderPlannedBirth(yr);
 });
+// [loop 229] desired 用神 filter for planned-birth — "thụ thai để sinh ra bát tự mong muốn"
+if ($('pb-yong-filter')) {
+  const WX_BTN = [['木','Mộc','#4caf50'],['火','Hỏa','#e65100'],['土','Thổ','#8d6e63'],['金','Kim','#90a4ae'],['水','Thủy','#1976d2']];
+  $('pb-yong-filter').innerHTML = WX_BTN.map(([zh,vi,color]) => `<button class="btn-ghost pb-yong-btn" data-wx="${zh}" style="padding:4px 12px;border-color:${color}40;color:${color}">${vi} <span class="zh">${zh}</span></button>`).join('');
+  $('pb-yong-filter').addEventListener('click', (e) => {
+    const btn = e.target.closest('.pb-yong-btn');
+    if (!btn) return;
+    const wx = btn.dataset.wx;
+    const defYr = new Date().getFullYear() + 1;
+    const raw = prompt(`Tìm bát tự có DỤng = ${btn.textContent.trim()} — nhập NĂM SINH (vd: ${defYr}):`, defYr);
+    if (!raw) return;
+    const yr2 = parseInt(raw.trim(), 10);
+    if (!yr2 || yr2 < 1990 || yr2 > 2050) { alert('Năm không hợp lệ'); return; }
+    const el = $('planned-birth');
+    if (el) el.innerHTML = '<p class="hint">⏳ Đang quét bát tự có Dụng ' + btn.textContent.trim() + '... mất vài giây.</p>';
+    setTimeout(() => {
+      try {
+        const r = inverseBaZiSolve({ refYear: yr2, yearStart: yr2, yearEnd: yr2, stepDays: 3, topK: 5, maxSamples: 4000, targetYong: wx });
+        if (!r.max) { el.innerHTML = '<p class="hint">Không tìm thấy lá số nào có Dụng ' + btn.textContent.trim() + ' trong năm ' + yr2 + '.</p>'; return; }
+        const results = r.topK || [r.max];
+        const rows = results.map((res, i) => {
+          const birth = new Date(res.y, res.m - 1, res.d);
+          const conc = new Date(birth); conc.setDate(conc.getDate() - 280);
+          const concStr = conc.getFullYear() + '-' + String(conc.getMonth() + 1).padStart(2, '0') + '-' + String(conc.getDate()).padStart(2, '0');
+          return '<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:4px 0" title="' + esc(labelResult(res)) + '"><b>#' + (i + 1) + ' Sinh ' + res.y + '-' + res.m + '-' + res.d + ' giờ ' + (res.h >= 10 ? res.h : '0' + res.h) + ':' + (res.min || '00') + ' (' + res.g + ')</b> — ' + res.score + 'đ · Dụng ' + esc(res.yong || '') + '<br><span class="zh" style="font-size:16px">' + (res.pillars || []).join(' · ') + '</span> <span class="hint">(年·月·日·时)</span><br><span class="hint">🤰 Thụ thai khoảng <b>' + concStr + '</b></span></div>';
+        }).join('');
+        el.innerHTML = '<p class="hint">Top ' + results.length + ' lá số có <b>Dụng ' + btn.textContent.trim() + '</b> năm ' + yr2 + ' (lọc ' + results.length + ' từ ' + r.scanned + ' lá số). ' + esc(r.note || '') + '</p>' + rows;
+      } catch (e) { el.innerHTML = '<p class="hint">Lỗi: ' + esc(e.message) + '</p>'; }
+    }, 50);
+  });
+}
 if ($('wedding-date-btn')) $('wedding-date-btn').addEventListener('click', () => {
   const raw = prompt('Nhập NĂM SINH cô dâu + chú rể (cách nhau dấu phẩy)\nvd: 1995,1993');
   if (!raw) return;

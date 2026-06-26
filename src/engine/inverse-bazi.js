@@ -66,6 +66,7 @@ export function inverseBaZiSolve(opts = {}) {
   const topK = opts.topK ?? 5;
   const maxSamples = opts.maxSamples ?? 6000;
   const target = opts.target ?? null;
+  const targetYong = opts.targetYong ?? null; // [loop 229] filter by desired 用神 element
   const onProgress = opts.onProgress ?? null;
 
   // Liệt kê (y,m,d) trong window
@@ -108,6 +109,24 @@ export function inverseBaZiSolve(opts = {}) {
   const durationMs = Date.now() - t0;
 
   results.sort((a, b) => b.score - a.score);
+  // [loop 229] nếu targetYong → chỉ giữ lá số có Dụng = hành mong muốn, rank lại
+  if (targetYong) {
+    const filtered = results.filter((r) => r.yong === targetYong);
+    const top = filtered.slice(0, topK);
+    return {
+      scanned: results.length, totalPossible: samples.length, durationMs,
+      refYear, window: `${yearStart}${yearEnd !== yearStart ? '-' + yearEnd : ''}`, stepDays, maxSamples,
+      targetYong,
+      max: filtered[0] || null, min: filtered[filtered.length - 1] || null,
+      topK: top, bottomK: filtered.slice(-topK).reverse(),
+      scoreStats: {
+        mean: +(filtered.reduce((s, r) => s + r.score, 0) / (filtered.length || 1)).toFixed(1),
+        min: filtered.length ? filtered[filtered.length - 1].score : null,
+        max: filtered.length ? filtered[0].score : null,
+      },
+      note: `Lọc ${filtered.length}/${results.length} lá số có Dụng Thần = ${targetYong} (trong ${results.length} lá số đạt). ${filtered.length ? 'Đây là ngày sinh THỰC SỰ có bát tự mong muốn.' : 'Không tìm thấy lá số nào có Dụng ' + targetYong + ' trong khoảng quét — thử rộng hơn.'}`,
+    };
+  }
   const top = results.slice(0, topK);
   const bottom = results.slice(-topK).reverse();
 
