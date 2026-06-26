@@ -742,6 +742,8 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       ${t.weak?`<p class="hint">⚠ Nhược: ${T(t.weak)}</p>`:""}
       ${t.kyVirtue?`<p class="hint">Đức Kỵ: ${T(t.kyVirtue)}${t.kyWeak?" — "+T(t.kyWeak):""}</p>`:""}
       ${t.cultivation?`<p>🌿 Tu dưỡng: ${T(t.cultivation)}</p>`:""}
+      ${t.dungVirtue?`<div class="tiaohou-note"><b>🎯 Đức bổ Dụng (${T(t.primaryVi||"")}):</b> ${T(t.dungVirtue)}${t.dungCultivation?" — "+T(t.dungCultivation):""}</div>`:""}
+      ${t.balance?`<p class="hint">⚖️ Cân bằng đức: ${T(t.balance)}</p>`:""}
       <p class="hint">${T(t.advice||"")}</p>
     `}catch{i.innerHTML='<p class="hint">Không tính được ngũ đức.</p>'}}function Y1(n){const i=H("romance-deep");if(i)try{const t=fx(n),h=(t.profile||[]).map(e=>`<p>${T(e)}</p>`).join(""),a=(t.warningSigns||[]).map(e=>`<p class="hint">⚠ ${T(e)}</p>`).join("");i.innerHTML=`
       <p><b>Điểm tình duyên: ${T(String(t.romanceScore??""))}</b> | Sức phối ngẫu: ${T(t.spouseStrength||"")} | Cung ${T(t.palaceStable?"yên":"bị xung")}</p>
