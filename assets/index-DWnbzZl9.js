@@ -556,6 +556,7 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       <p class="cg-interp"><b>后天卦:</b> #${t.houtianHexagram.num} ${t.houtianHexagram.name} (${$(t.houtianHexagram.nameVi)})${t.yuantang.disputed?' <span class="ln-rate rate-hung">⚠ 元堂 DISPUTED</span>':""}</p>
       <div class="verse-box"><div class="verse-zh">${$(t.reading.hexagramText)}</div></div>
       <p class="cg-interp"><b>爻辞 (hào ${t.yuantang.line}):</b> ${$(t.reading.yuantangLineText)}</p>
+      ${t.reading.houtianHexagramText?`<p class="cg-interp"><b>后天卦辞:</b> ${$(t.reading.houtianHexagramText)}</p>`:""}
       <p class="hint" style="margin-top:6px">河洛理数 (陈抟) — chuyển bát tự sang quẻ 周易 đọc mệnh. Thuật toán 飞支 (三才发秘). ${t.yuantang.disputed?"Quẻ N=6 (乾/坤) cổ thư chia theo giới+đông/hạ chí — kết quả nên review thủ công.":""}</p>`}catch{i.innerHTML='<p class="hint">Không tính được 河洛理数.</p>'}}function n1(n){const i=H("yizhangjing");if(i)try{const t=jg(n);i.innerHTML=Fk(t)}catch{i.innerHTML='<p class="hint">Không tính được 一掌经.</p>'}}function t1(n){const i=H("starpower");if(i)try{const t=Ni(n),h=a=>a==="有力"?"cat":a==="藏而不透"?"mid":"hung";i.innerHTML=t.items.map(a=>`
       <div class="sp-item">
         <div class="sp-star">${a.starVi} <span class="${An(a.wx)}">${a.wxVi}</span></div>
