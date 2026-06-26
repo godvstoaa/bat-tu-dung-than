@@ -47,13 +47,15 @@ export function nayinInfo(name) {
 /**
  * Tra nạp âm 4 trụ + ý nghĩa.
  */
+const _WX_VI = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
 export function analyzeNayin(chart) {
   const labels = { year: 'Trụ Năm (ổ tổ)', month: 'Trụ Tháng (cha mẹ)', day: 'Trụ Ngày (bản mệnh)', time: 'Trụ Giờ (con cái/vãn niên)' };
   const out = [];
   for (const key of ['year', 'month', 'day', 'time']) {
     const name = chart.pillars[key].nayin;
     const m = nayinInfo(name);
-    out.push({ key, label: labels[key], name, vi: m?.vi || name, wx: m?.wx || '', meaning: m?.meaning || '(chưa encode)' });
+    const wx = m?.wx || '';
+    out.push({ key, label: labels[key], name, vi: m?.vi || name, wx, wxVi: _WX_VI[wx] || '?', meaning: m?.meaning || '(chưa encode)' });
   }
   return out;
 }
