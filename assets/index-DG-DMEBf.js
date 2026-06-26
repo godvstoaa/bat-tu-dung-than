@@ -359,7 +359,7 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
           <div>Nạp âm: <b>${a.nayin}</b>${(()=>{const g=ci(a.nayin);return g?` <span class="nayin-vi">${g.vi}</span>`:""})()}</div>
           ${(()=>{const g=ci(a.nayin);return g?`<div class="nayin-meaning">${g.meaning}</div>`:""})()}
         </div>
-      </div>`}).join("")}function IN(n){const{chart:i,strength:t,yong:h,pattern:a}=n,e=i.dayMaster,c=(u,l)=>`<span class="elem-pill ${An(u)}">${u} ${D[u]}</span>`,s=[...new Set([h.primary,h.xi].filter(Boolean))].map(u=>c(u)).join(""),o=h.reasons.map(u=>`<li>${u}</li>`).join(""),g=h.tiaohou.note?`<div class="tiaohou-note"><b>調候 Điều Hậu:</b> ${h.tiaohou.note}</div>`:"",r=h.method.map(u=>`<span class="badge-method">${u}</span>`).join("");H("verdict").innerHTML=`
+      </div>`}).join("")}function IN(n){const{chart:i,strength:t,yong:h,pattern:a}=n,e=i.dayMaster,c=(u,l)=>`<span class="elem-pill ${An(u)}">${u} ${D[u]}</span>`,s=[...new Set([h.primary,h.xi].filter(Boolean))].map(u=>c(u)).join(""),o=h.reasons.map(u=>`<li>${u}</li>`).join(""),g=h.tiaohou.note?`<div class="tiaohou-note"><b>調候 Điều Hậu:</b> ${$(h.tiaohou.note)}</div>`:"",r=h.method.map(u=>`<span class="badge-method">${u}</span>`).join("");H("verdict").innerHTML=`
     <div class="v-box">
       <div class="v-label">Nhật Chủ (日主)</div>
       <div class="v-value ${An(e.wx)}">${e.gan} ${e.vi} · ${D[e.wx]}</div>
