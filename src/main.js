@@ -2666,15 +2666,24 @@ function renderLiuyue(year) {
   // [loop 4] Truyền patternQuality để cộng tầng 格局流月喜忌 (★格局喜/⚠格局忌 mỗi tháng).
   const lm = computeLiuyue(currentResult, year, currentResult.patternQuality);
   const GOD_VI = { 比肩:'Tỷ Kiên', 劫財:'Kiếp Tài', 食神:'Thực Thần', 傷官:'Thương Quan', 偏財:'Thiên Tài', 正財:'Chính Tài', 七殺:'Thất Sát', 正官:'Chính Quan', 偏印:'Thiên Ấn', 正印:'Chính Ấn' };
+  // [loop 218] highlight tháng TỐT/XẤU nhất + đánh dấu tháng HIỆN TẠI
+  const scores = lm.months.map((m) => m.score);
+  const maxS = Math.max(...scores), minS = Math.min(...scores);
+  const now = new Date();
+  const curMonth = (year === now.getFullYear()) ? now.getMonth() : -1;
   $('liuyue').innerHTML = `
     <p class="hint">Tháng CÁT (nên tiến thủ): <b>${lm.best.map((m) => `T${m.m + 1} ${m.ganZhi}`).join(', ')}</b> · Tháng KỴ (cẩn thận): <b>${lm.worst.map((m) => `T${m.m + 1} ${m.ganZhi}`).join(', ')}</b></p>
     <div class="lm-grid">${lm.months.map((m) => {
       const cls = m.rating === 'Cát' ? 'rate-cat' : m.rating === 'Kỵ' ? 'rate-hung' : m.rating === 'Hơi kỵ' ? 'rate-bad' : 'rate-mid';
-      // Tag 格局 喜忌 (chỉ hiển thị khi có gejuDelta khác 0).
       const gejuTag = m.gejuDelta > 0 ? '<span class="geju-xi" title="' + esc(m.gejuNote || '') + '">★格局喜</span>'
                     : m.gejuDelta < 0 ? '<span class="geju-ji" title="' + esc(m.gejuNote || '') + '">⚠格局忌</span>'
                     : '';
-      return `<div class="lm-cell"><div class="lm-m">T${m.m + 1}</div><div class="zh">${m.ganZhi}</div><div class="lm-g">${GOD_VI[m.ganGod] || m.ganGod}</div>${gejuTag}<div class="ln-rate ${cls}">${m.rating}</div></div>`;
+      const isNow = m.m === curMonth;
+      const isBest = m.score === maxS && m.rating === 'Cát';
+      const isWorst = m.score === minS && m.rating === 'Kỵ';
+      const rowCls = isNow ? ' lm-now' : isBest ? ' ln-best-row' : isWorst ? ' ln-worst-row' : '';
+      const mark = isNow ? ' ★' : '';
+      return `<div class="lm-cell${rowCls}"><div class="lm-m">T${m.m + 1}${mark}</div><div class="zh">${m.ganZhi}</div><div class="lm-g">${GOD_VI[m.ganGod] || m.ganGod}</div>${gejuTag}<div class="ln-rate ${cls}">${m.rating}</div></div>`;
     }).join('')}</div>`;
 }
 
