@@ -597,6 +597,23 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   try {
     if (patternQualityResult) dayun = adjustDayunByGeju(dayun, patternQualityResult, chart.dayGan);
   } catch (e) { /* fallback: giữ dayun tầng ngũ hành */ }
+  // [loop 431 elevate] 大运 空亡 weakening — cổ pháp «空则不实»: 大运 chi rơi không vong →
+  //   lực giảm (~30%). Trước đây 大运 full score dù trong 空亡 (lưu niên mới bắt «出空»).
+  if (kongwang && kongwang.kong && kongwang.kong.length) {
+    const voidSet = new Set(kongwang.kong);
+    for (const d of dayun) {
+      if (voidSet.has(d.zhi)) {
+        d.score = Math.round(d.score * 0.7);
+        // re-rate after weakening
+        if (d.score >= 2) d.rating = 'Cát';
+        else if (d.score >= 1) d.rating = 'Hơi thuận';
+        else if (d.score <= -2) d.rating = 'Hung';
+        else if (d.score <= -1) d.rating = 'Hơi nghịch';
+        else d.rating = 'Bình hòa';
+        if (!d._kwNote) d._kwNote = `Chi ${d.zhi} = KHÔNG VONG → lực giảm («không thực»)`;
+      }
+    }
+  }
   // [loop 3 — 格局流年喜忌] Cộng tầng 格局 LÊN TRÊN 5 trường phái của scoreLiunianYear
   //   (ngũ hành / thập thần năm / thái tuế / thần sát / thiên khắc địa xung). Cùng luật
   //   喜忌 với 大运 nhưng ±3 (năm tập trung hơn运 10 năm). sequencing giống loop 2.
