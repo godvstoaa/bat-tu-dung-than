@@ -560,6 +560,9 @@ function renderLiuNian(liunian) {
   if (!liunian.length) { $('liunian').innerHTML = '<p class="hint">Không tính được Lưu Niên.</p>'; return; }
   const nowItem = liunian.find((l) => l.isNow);
   $('liunian-note').textContent = nowItem ? `(đại vận ${hanviet(nowItem.dayunGanZhi)})` : '';
+  // [loop 216] highlight năm TỐT NHẤT (nên tiến thủ) & XẤU NHẤT (cẩn thận) trong thập kỷ
+  const scores = liunian.map((l) => l.score);
+  const maxScore = Math.max(...scores), minScore = Math.min(...scores);
   // [loop 170] 进气退气 phase — lực đại vận realised năm đó (xây đỉnh / đỉnh / phai).
   //   Chỉ badge 进气/退气 (nămfactor <1, điểm bị co về neut); 旺气 (đỉnh) là mặc định.
   const dayun = (currentResult && currentResult.dayun) || [];
@@ -568,9 +571,11 @@ function renderLiuNian(liunian) {
     const phaseBadge = ph && ph.factor < 1
       ? `<span class="ln-phase ${ph.phase === '进气' ? 'ph-in' : 'ph-out'}" title="${ph.vi}">${ph.phase === '进气' ? '进' : '退'}</span>`
       : '';
+    const bestMark = l.score === maxScore && maxScore > 50 ? '<span class="ln-best" title="Năm TỐT NHẤT thập kỷ — nên tiến thủ">👑</span>' : '';
+    const worstMark = l.score === minScore && minScore < 45 ? '<span class="ln-worst" title="Năm KỴ NHẤT — thủ, tránh quyết lớn">⚠</span>' : '';
     return `
-    <div class="ln ${l.isNow ? 'ln-now' : ''}">
-      <div class="ln-year">${l.year}${l.isNow ? ' ★' : ''}${phaseBadge}</div>
+    <div class="ln ${l.isNow ? 'ln-now' : ''} ${l.score === maxScore && maxScore > 50 ? 'ln-best-row' : ''} ${l.score === minScore && minScore < 45 ? 'ln-worst-row' : ''}">
+      <div class="ln-year">${l.year}${l.isNow ? ' ★' : ''}${bestMark}${worstMark}${phaseBadge}</div>
       <div class="ln-gz"><span class="${wxClass(l.ganWx)}">${l.gan}</span><span class="${wxClass(l.zhiWx)}">${l.zhi}</span></div>
       <div class="ln-age">${l.age}t</div>
       <div class="ln-rate ${rateClass(l.rating)}">${l.rating}</div>
