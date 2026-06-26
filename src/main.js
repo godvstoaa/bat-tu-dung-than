@@ -1583,6 +1583,10 @@ function renderBaziBusiness(R) {
     const biz = Array.isArray(b.bizTypes) ? b.bizTypes.join(', ') : (b.bizTypes || '');
     el.innerHTML = `
       <p><b>${b.shouldStart ? '✓ Nên khởi nghiệp' : '⚠ Cần thận trọng khởi nghiệp'}</b>${biz ? ' — ngành hợp: ' + esc(biz) : ''}</p>
+      ${Array.isArray(b.reasons) && b.reasons.length ? `<ul class="zr-reasons">${b.reasons.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>` : ''}
+      ${b.hasCaiKu === false ? `<p class="hint">💰 <b>KHÔNG có tài khố</b> — kiếm được nhưng khó giữ; cần kế hoạch tiết kiệm/quỹ dự phòng nghiêm ngặt.</p>` : b.hasCaiKu === true ? '<p class="hint">💰 Có tài khố — giữ tiền tốt, tích luỹ được.</p>' : ''}
+      ${b.foodGen > 0 ? `<p class="hint">🏭 Sao Thực Thần ${b.foodGen} — tiềm năng sản phẩm/dịch vụ ${b.foodGen >= 3 ? 'MẠNH' : 'vừa'}.</p>` : ''}
+      ${b.robberLevel > 0 ? `<p class="hint" style="color:#f0a99c">⚠ Kiếp Tài cấp ${b.robberLevel} — rủi ro cạnh tranh/tranh giành; cẩn thận đối tác, hợp đồng chặt.</p>` : ''}
       ${b.soloVsPartner ? `<p class="hint">🤝 ${esc(b.soloVsPartner)}</p>` : ''}
       ${b.partnerStyle ? `<p class="hint">Phong cách: ${esc(b.partnerStyle)}</p>` : ''}
       ${b.timing ? `<p class="hint">⏰ ${esc(b.timing)}</p>` : ''}
