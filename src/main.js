@@ -3297,7 +3297,7 @@ function renderLyear(year) {
   const gejuBadge = r.gejuFavor === '喜' ? '<span class="geju-xi" title="Can năm sinh trợ cách cục → năm THUẬN CÁCH">★格局喜</span>'
                  : r.gejuFavor === '忌' ? '<span class="geju-ji" title="Can năm khắc phá cách cục → năm GHÉT CÁCH">⚠格局忌</span>' : '';
   $('lyear').innerHTML = `
-    <div class="ly-head"><span class="zh big">${esc(r.ganZhi)}</span> ${esc(year)} · can <b>${esc(GOD_VI[r.ganGod] || r.ganGod)}</b>
+    <div class="ly-head"><span class="zh big">${esc(r.ganZhi)}</span> ${esc(year)} · can <b>${esc(GOD_VI[r.ganGod] || r.ganGod)}</b>${r.activeDayun ? ` · đại运 <span class="zh">${esc(r.activeDayun)}</span>` : ''}
       → <span class="ln-rate ${cls}">${esc(r.rating)} (${esc(r.score)}/100)</span> ${phaseBadge} ${gejuBadge}</div>
     <div class="ly-schools">${r.schools.map((s) => `
       <div class="ly-school ${s.d >= 0 ? 'pos' : 'neg'}">
