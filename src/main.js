@@ -1187,7 +1187,8 @@ function renderTaisuiGeneral(R) {
     const ov = taiSuiOverview(R, new Date().getFullYear());
     el.innerHTML = `
       <p>Trị niên <b>${ov.current.ganZhi}</b> = <b>${ov.current.name}</b> (vị ${ov.current.index}/60). ${ov.current.note}</p>
-      <p class="hint">Bản mệnh TS (năm sinh ${ov.natal.ganZhi}) = ${ov.natal.name}.</p>`;
+      ${ov.isBenMingYear ? '<div class="tiaohou-note" style="border-color:var(--cinnabar)"><b>⚠ NĂM THÂN (本命年):</b> Chi năm = chi tuổi sinh → năm biến động lớn, cổ khuyên «犯太岁» → hóa giải (佩生肖 tam hợp, tránh động thổ phương TS, tích đức).</div>' : ''}
+      <p class="hint">Bản mệnh TS (năm sinh ${ov.natal.ganZhi}) = ${ov.natal.name}${ov.natal.note ? ' — ' + esc(ov.natal.note) : ''}.</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 60 thái tuế.</p>'; }
 }
 
