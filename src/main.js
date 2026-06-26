@@ -2190,12 +2190,17 @@ function renderGoldenYear(R) {
   if (!el) return;
   try {
     const gy = findGoldenYear(R, new Date().getFullYear(), 10);
-    el.innerHTML = gy.ranked.slice(0, 5).map((y, i) => `
-      <div class="ln ${i === 0 ? 'ln-now' : ''}">
-        <div class="ln-year">${y.year}</div>
-        <div class="ln-gz">${y.ganZhi}</div>
-        <div class="ln-rate ${y.totalScore >= 60 ? 'cat' : y.totalScore >= 40 ? '' : 'hung'}">${y.alert || ''} ${y.totalScore}</div>
-      </div>`).join('');
+    // [loop 222] hiển thị details (6 hệ thống) + isTrulyGolden (trước đây chỉ score trần)
+    el.innerHTML = gy.ranked.slice(0, 5).map((y, i) => {
+      const details = (y.details || []).map((d) => `<span class="hint" style="margin-right:6px">${esc(d)}</span>`).join('');
+      const goldTag = y.isTrulyGolden ? '<span class="geju-xi" title="Đại vận + Lưu niên đều mang Dụng/Hỷ → NĂM VÀNG cổ pháp">★ NĂM VÀNG</span>' : '';
+      return `
+      <div class="yz-row" style="border-left:3px solid ${y.totalScore >= 60 ? 'var(--jade)' : 'var(--gold)'};margin:4px 0;padding-left:8px">
+        <b>#${y.rank || i + 1} ${y.year}</b> <span class="zh">${esc(y.ganZhi)}</span> <span class="ln-rate ${y.totalScore >= 60 ? 'rate-cat' : y.totalScore >= 48 ? 'rate-mid' : 'rate-hung'}">${y.totalScore}/100 ${y.alert || ''}</span> ${goldTag}
+        <div style="margin-top:2px">${details}</div>
+      </div>`;
+    }).join('')
+    + (gy.golden ? `<p class="hint" style="margin-top:6px">🏆 Năm VÀNG thực sự: ${gy.golden.year} (${gy.golden.ganZhi}) — Đại vận + Lưu niên đều mang Dụng/Hỷ.</p>` : '<p class="hint" style="margin-top:6px">Chưa có «năm vàng» thực sự (đại运+lưu niên cùng Dụng) trong 10 năm tới — năm tốt nhất trên là cao điểm tương đối.</p>');
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được năm hoàng kim.</p>'; }
 }
 
