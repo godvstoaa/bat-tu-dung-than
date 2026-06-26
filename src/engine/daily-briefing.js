@@ -133,7 +133,7 @@ export function dailyBriefing(R, year, month, day, patternQuality) {
   let avoidHours = [];
   let bhDayOfficerVi = '';
   try {
-    const bh = bestHourToday(R, y, mo, d);
+    const bh = bestHourToday(R, y, mo, d, patternQuality?.patternYong); // [loop 210 fix] truyền patternYong → bật chiều 格局 (trước đây thiếu → best-hours lệch card/AI tool cho ½ lá số)
     bhDayOfficerVi = bh.dayOfficer?.officerVi || '';
     bestHours = (bh.best || []).map((h) => ({
       zhi: h.zhi,
