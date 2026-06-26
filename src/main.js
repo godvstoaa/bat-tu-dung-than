@@ -226,7 +226,7 @@ function renderVerdict(R) {
   const favHtml = [...new Set([yong.primary, yong.xi].filter(Boolean))].map((w) => pill(w)).join('');
   const reasons = yong.reasons.map((r) => `<li>${r}</li>`).join('');
   const tiaohou = yong.tiaohou.note
-    ? `<div class="tiaohou-note"><b>調候 Điều Hậu:</b> ${yong.tiaohou.note}</div>` : '';
+    ? `<div class="tiaohou-note"><b>調候 Điều Hậu:</b> ${esc(yong.tiaohou.note)}</div>` : '';
   const methodBadges = yong.method.map((m) => `<span class="badge-method">${m}</span>`).join('');
 
   $('verdict').innerHTML = `
