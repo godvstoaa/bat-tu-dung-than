@@ -298,7 +298,9 @@ function renderZiwei() {
       <div class="zw-gz"><span class="zh">${p.gan}</span><span class="zh">${p.zhi}</span></div>
       <div class="zw-stars">${(p.stars || []).join(' ')}</div>
     </div>`).join('');
-  const dx = z.daXian.slice(0, 6).map((d) => `<div class="zw-dx"><b>${d.from}-${d.to}t</b> ${d.palace} <span class="zh">${d.ganZhi}</span></div>`).join('');
+  // [loop 204] 大限: trước đây slice(0,6) → chỉ 5-64t (che 大限 hiện tại của người >65t).
+  //   Nay filter to≤95: đủ cả đời thực tế (5-94t, ~9 大限), bỏ 95-124t vô nghĩa.
+  const dx = z.daXian.filter((d) => d.to <= 95).map((d) => `<div class="zw-dx"><b>${d.from}-${d.to}t</b> ${d.palace} <span class="zh">${d.ganZhi}</span></div>`).join('');
   const sihuaHtml = Object.entries(z.sihua || {}).map(([k, v]) =>
     `<span class="zw-sh ${v.tone}"><b>${k}</b> ${v.star}${v.palace ? '@' + v.palace : ''}</span>`).join('');
   $('ziwei').innerHTML = `
