@@ -1236,7 +1236,12 @@ function renderJiaoyun(R) {
       ${j.next.rating ? ' · <b>' + esc(j.next.rating) + '</b>' : ''}</div>` : '';
     const avoidStr = Array.isArray(j.avoidZhi) ? j.avoidZhi.join(', ') : (j.avoidZhi || '');
     const extras = (j.dungDir || avoidStr) ? `<p class="hint">${j.dungDir ? '🧭 Hướng Dụng: ' + esc(j.dungDir) + '.' : ''}${avoidStr ? ' ⚠ Tránh chi: ' + esc(avoidStr) + '.' : ''}</p>` : '';
-    el.innerHTML = `${cur}${next}${extras}<p class="hint" style="margin-top:4px">${esc(j.summary || '')}</p>`;
+    // [loop 262] 起运 date + full transitions list (trước đây ẩn)
+    const qiyunTxt = j.qiyunDate ? new Date(j.qiyunDate).toLocaleDateString('vi-VN') : '';
+    const qiyunHtml = qiyunTxt ? `<p class="hint">⚡ <b>Khởi vận:</b> ${esc(qiyunTxt)} (tuổi ${esc(String(j.current ? j.current.index : ''))}${j.isForward ? ', thuận hành' : ', nghịch hành'})</p>` : '';
+    const transList = (j.transitions || []).length
+      ? `<details style="margin:4px 0"><summary class="hint">📋 Toàn bộ đại vận (${(j.transitions||[]).length} thập niên)</summary><ul class="hint" style="margin:4px 0 4px 16px">${(j.transitions||[]).map((t) => `<li><b>${t.age}–${t.age+9}t</b> <span class="zh">${esc(t.ganZhi||'')}</span>${t.rating ? ' — '+esc(t.rating) : ''}</li>`).join('')}</ul></details>` : '';
+    el.innerHTML = `${qiyunHtml}${cur}${next}${extras}${transList}<p class="hint" style="margin-top:4px">${esc(j.summary || '')}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được giao thời đại vận.</p>'; }
 }
 
