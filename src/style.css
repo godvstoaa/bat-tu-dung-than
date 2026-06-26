@@ -546,6 +546,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .ln-best-row { box-shadow: 0 0 0 1.5px rgba(46,158,107,0.5); background: rgba(46,158,107,0.08); }
 .ln-worst-row { box-shadow: 0 0 0 1.5px rgba(224,70,58,0.45); background: rgba(224,70,58,0.06); }
 .ln-best, .ln-worst { font-size: 11px; margin-left: 1px; }
+.dy-now { box-shadow: 0 0 0 1.5px var(--gold); background: rgba(212,175,55,0.08); }
 .ln-gz { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 700; margin-top: 3px; }
 .ln-age { font-size: 10.5px; color: var(--silk-muted); font-variant-numeric: tabular-nums; }
 .ln-rate { font-size: 10px; margin-top: 4px; padding: 1px 5px; border-radius: 8px; display: inline-block; }

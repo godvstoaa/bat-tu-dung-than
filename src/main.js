@@ -548,13 +548,25 @@ function rateClass(rating) {
 }
 function renderDaYun(dayun) {
   if (!dayun.length) { $('dayun').innerHTML = '<p class="hint">Không tính được Đại Vận.</p>'; return; }
-  $('dayun').innerHTML = dayun.map((d) => `
-    <div class="dy">
+  // [loop 217] highlight thập kỷ TỐT NHẤT / XẤU NHẤT / HIỆN TẠI
+  const scores = dayun.map((d) => d.score);
+  const maxS = Math.max(...scores), minS = Math.min(...scores);
+  const curAge = currentResult ? (new Date().getFullYear() - currentResult.chart.input.year) : -1;
+  $('dayun').innerHTML = dayun.map((d) => {
+    const isNow = curAge >= d.startAge && curAge < d.startAge + 10;
+    const isBest = d.score === maxS && maxS >= 2;
+    const isWorst = d.score === minS && minS <= -2;
+    const mark = isNow ? ' ★' : '';
+    const crown = isBest ? '<span class="ln-best" title="Thập kỷ TỐT NHẤT">👑</span>' : '';
+    const warn = isWorst ? '<span class="ln-worst" title="Thập kỷ KỴ NHẤT — thủ">⚠</span>' : '';
+    return `
+    <div class="dy ${isNow ? 'dy-now' : ''} ${isBest ? 'ln-best-row' : ''} ${isWorst ? 'ln-worst-row' : ''}">
       <div class="dy-gz"><span class="${wxClass(d.ganWx)}">${d.gan}</span><span class="${wxClass(d.zhiWx)}">${d.zhi}</span></div>
-      <div class="dy-vi">${hanviet(d.ganZhi)}</div>
+      <div class="dy-vi">${hanviet(d.ganZhi)}${crown}${warn}${mark}</div>
       <div class="dy-age">${d.startAge}–${d.startAge + 9}t</div>
       <div class="dy-rate ${rateClass(d.rating)}">${d.rating}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function renderLiuNian(liunian) {
   if (!liunian.length) { $('liunian').innerHTML = '<p class="hint">Không tính được Lưu Niên.</p>'; return; }
