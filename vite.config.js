@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import fs from 'fs';
 
 // ============================================================================
 //  Vite config — proxy LLM API để TRÁNH CORS khi gọi từ trình duyệt.
@@ -8,7 +9,26 @@ import { defineConfig } from 'vite';
 //  ⚠ Chỉ hoạt động khi chạy Vite dev server (npm run dev / preview).
 //     Production (host tĩnh) cần backend/proxy riêng.
 // ============================================================================
+
+// [loop 236] SW auto-version plugin — thay CACHE trong dist/sw.js bằng timestamp build
+// → mỗi deploy tự bump SW version → returning users LUÔN nhận content mới (tránh lỗi
+// loop 234: SW kẹt v4 suốt 70+ loop). Trước đây phải bump thủ công → dễ quên.
+function swAutoVersion() {
+  return {
+    name: 'sw-auto-version',
+    closeBundle() {
+      const swPath = 'dist/sw.js';
+      if (!fs.existsSync(swPath)) return;
+      let sw = fs.readFileSync(swPath, 'utf8');
+      const ts = Date.now().toString(36);
+      sw = sw.replace(/const CACHE = '[^']+'/, `const CACHE = 'bazi-${ts}'`);
+      fs.writeFileSync(swPath, sw);
+    },
+  };
+}
+
 export default defineConfig({
+  plugins: [swAutoVersion()],
   // [loop 55] GitHub Pages phục vụ ở /bat-tu-dung-than/ → base phải đúng để asset load
   base: process.env.GH_PAGES ? '/bat-tu-dung-than/' : '/',
   server: {
