@@ -1819,6 +1819,31 @@ function renderPlannedBirth(year) {
   }, 50);
 }
 
+// ---------------------------------------------------------------- ẨM THỰC HỢP MỆNH 飲食養生
+function renderDiet(R) {
+  const el = $('diet-out');
+  if (!el) return;
+  try {
+    const d = personalNutrition(R);
+    const f = d.dungFlavor || {};
+    const kf = d.kyFlavor || {};
+    el.innerHTML = `
+      <div class="yz-row" style="border-left:3px solid var(--jade);padding-left:8px;margin:4px 0">
+        <b>✓ Vị ${esc(f.vi||'')} (${esc(f.flavor||'')})</b> — ${esc(f.organ||'')}
+        <div class="hint">🥗 Thực phẩm: ${esc(f.foods||'')}</div>
+        <div class="hint">💪 Tác dụng: ${esc(f.action||'')}</div>
+        ${f.caution ? `<div class="hint" style="color:#f0a99c">⚠ Lưu ý: ${esc(f.caution)}</div>` : ''}
+      </div>
+      ${kf.flavor ? `<p class="hint">⚠ Tránh vị ${esc(kf.vi||'')} (${esc(kf.flavor||'')}): ${esc(kf.foods||'')}</p>` : ''}
+      ${d.meals ? `<p class="hint">🍚 ${esc(d.meals)}</p>` : ''}
+      ${d.tea ? `<p class="hint">🍵 ${esc(d.tea)}</p>` : ''}
+      ${d.fruit ? `<p class="hint">🍎 ${esc(d.fruit)}</p>` : ''}
+      ${d.supplement ? `<p class="hint">💊 ${esc(d.supplement)}</p>` : ''}
+      ${d.weeklyMenu ? `<details style="margin:4px 0"><summary class="hint">📋 Thực đơn tuần</summary><p class="hint" style="margin:4px 0 4px 16px">${esc(d.weeklyMenu)}</p></details>` : ''}
+      <p class="hint">${esc(d.advice||'')}</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được ẩm thực hợp mệnh.</p>'; }
+}
+
 // ---------------------------------------------------------------- THÀNH PHỐ HỢP MỆNH 城市風水
 function renderCityFs(R) {
   const el = $('city-fs');
@@ -2717,6 +2742,7 @@ function run() {
   lazyRender('suiyun-out',     () => { try { renderSuiyun(); } catch (e) { console.warn('suiyun', e.message); } });
   lazyRender('health-out',     () => { try { renderHealth(currentResult); } catch (e) { console.warn('health', e.message); } });
   lazyRender('city-fs',        () => { try { renderCityFs(currentResult); } catch (e) { console.warn('city', e.message); } });
+  lazyRender('diet-out',       () => { try { renderDiet(currentResult); } catch (e) { console.warn('diet', e.message); } });
   lazyRender('csdeep-out',     () => { try { renderChangshengDeep(); } catch (e) { console.warn('csDeep', e.message); } });
   // renderMarriageDeep() đã gọi ở block immediate (line ~1313) — KHÔNG bọc lại.
   lazyRender('match-out',      () => { try { renderIdealMatch(); } catch (e) { console.warn('idealMatch', e.message); } });
