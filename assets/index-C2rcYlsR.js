@@ -765,6 +765,10 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       <p class="hint">${T(t.advice||"")}</p>
     `}catch{i.innerHTML='<p class="hint">Không tính được phong cách đầu tư.</p>'}}function E1(n){const i=H("bazi-business");if(i)try{const t=Vx(n),h=Array.isArray(t.bizTypes)?t.bizTypes.join(", "):t.bizTypes||"";i.innerHTML=`
       <p><b>${t.shouldStart?"✓ Nên khởi nghiệp":"⚠ Cần thận trọng khởi nghiệp"}</b>${h?" — ngành hợp: "+T(h):""}</p>
+      ${Array.isArray(t.reasons)&&t.reasons.length?`<ul class="zr-reasons">${t.reasons.map(a=>`<li>${T(a)}</li>`).join("")}</ul>`:""}
+      ${t.hasCaiKu===!1?'<p class="hint">💰 <b>KHÔNG có tài khố</b> — kiếm được nhưng khó giữ; cần kế hoạch tiết kiệm/quỹ dự phòng nghiêm ngặt.</p>':t.hasCaiKu===!0?'<p class="hint">💰 Có tài khố — giữ tiền tốt, tích luỹ được.</p>':""}
+      ${t.foodGen>0?`<p class="hint">🏭 Sao Thực Thần ${t.foodGen} — tiềm năng sản phẩm/dịch vụ ${t.foodGen>=3?"MẠNH":"vừa"}.</p>`:""}
+      ${t.robberLevel>0?`<p class="hint" style="color:#f0a99c">⚠ Kiếp Tài cấp ${t.robberLevel} — rủi ro cạnh tranh/tranh giành; cẩn thận đối tác, hợp đồng chặt.</p>`:""}
       ${t.soloVsPartner?`<p class="hint">🤝 ${T(t.soloVsPartner)}</p>`:""}
       ${t.partnerStyle?`<p class="hint">Phong cách: ${T(t.partnerStyle)}</p>`:""}
       ${t.timing?`<p class="hint">⏰ ${T(t.timing)}</p>`:""}
