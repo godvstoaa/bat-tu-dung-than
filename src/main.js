@@ -2413,11 +2413,13 @@ function updateAIStatus() {
     ? `✓ Đang dùng AI (${cfg.model})` : '⊘ Chưa cấu hình AI — đang dùng bộ luân giải cục bộ. Bấm ⚙ để bật AI.';
 }
 
+let _aiBusy = false;
 async function handleAsk() {
-  if (!currentResult) return;
+  if (!currentResult || _aiBusy) return;
   const q = $('question').value.trim();
   if (!q) return;
   $('question').value = '';
+  _aiBusy = true;
   appendMsg('user', q);
   const { body, badge } = appendMsg('assistant', 'Đang luân giải…');
   body.classList.add('streaming');
@@ -2439,6 +2441,8 @@ async function handleAsk() {
   } catch (e) {
     body.textContent = 'Lỗi: ' + e.message;
     body.classList.remove('streaming');
+  } finally {
+    _aiBusy = false;
   }
 }
 
