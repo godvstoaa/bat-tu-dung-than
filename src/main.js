@@ -1654,10 +1654,12 @@ function renderNobleCultivate(R) {
     const arr = (x) => Array.isArray(x) ? x.join(', ') : (x || '');
     el.innerHTML = `
       <p><b>Quý nhân mang hành ${esc(n.dungVi || '')}</b> (Dụng Thần)</p>
+      ${Array.isArray(n.nobleStars) && n.nobleStars.length ? `<p class="hint">⭐ Sao quý nhân: ${n.nobleStars.map((s) => `${esc(s.star)} (${esc(s.at||'')}) — ${esc(s.vi||'')}`).join(' · ')}</p>` : ''}
       ${n.whoToSeek ? `<p class="hint">🧑 Quý nhân là: ${esc(arr(n.whoToSeek))}</p>` : ''}
       ${n.whereToFind ? `<p class="hint">📍 Tìm ở: ${esc(arr(n.whereToFind))}</p>` : ''}
       ${n.howToApproach ? `<p class="hint">🤝 Tiếp cận: ${esc(arr(n.howToApproach))}</p>` : ''}
       ${n.whatToGive ? `<p class="hint">🎁 Tặng/đổi lại: ${esc(arr(n.whatToGive))}</p>` : ''}
+      ${Array.isArray(n.maintenance) && n.maintenance.length ? `<details style="margin:4px 0"><summary class="hint">🌱 Duy trì quan hệ quý nhân</summary><ul class="hint" style="margin:4px 0 4px 16px">${n.maintenance.map((m) => `<li>${esc(m)}</li>`).join('')}</ul></details>` : ''}
       ${n.drainers && (n.drainers.length || n.drainers) ? `<p class="hint">⚠ Hao quý nhân: ${esc(arr(n.drainers))}</p>` : ''}
       <p class="hint">${esc(n.advice || '')}</p>
     `;
