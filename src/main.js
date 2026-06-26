@@ -1605,6 +1605,7 @@ function renderSeasonalAdvice(R) {
     el.innerHTML = `
       <p><b>Dụng ${esc(s.dungVi || '')}</b> — Mùa TỐT NHẤT: <b>${esc(s.bestSeason || '')}</b> | Mùa CẨN THẬN: <b>${esc(s.worstSeason || '')}</b></p>
       ${s.climateNote ? `<p class="hint">${esc(s.climateNote)}</p>` : ''}
+      ${Array.isArray(s.seasons) ? s.seasons.map((se) => `<div class="yz-row" style="border-left:3px solid ${se.fav ? 'var(--jade)' : 'var(--gold)'};margin:3px 0;padding-left:8px"><b>${esc(se.vi||'')}</b> <span class="hint">(${esc(se.months||'')})</span>${se.fav ? ' <span class="geju-xi">★ thuận Dụng</span>' : ''}<div class="hint">${esc(se.yourAdvice || '')}</div></div>`).join('') : ''}
       ${adviceHtml}
     `;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được lời khuyên mùa.</p>'; }
