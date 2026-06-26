@@ -786,7 +786,8 @@ function renderStarPower(R) {
       <div class="sp-item">
         <div class="sp-star">${x.starVi} <span class="${wxClass(x.wx)}">${x.wxVi}</span></div>
         <div class="sp-area hint">${x.area}</div>
-        <div class="sp-verdict ${tone(x.verdict)}">${x.verdict} <span class="hint">(căn ${x.root}, lộ ${x.reveal})</span></div>
+        <div class="sp-verdict ${tone(x.verdict)}">${x.verdict} <span class="hint">(căn ${x.root}, lộ ${x.reveal}, mùa ${x.season})</span></div>
+        <div class="sp-vi hint">${esc(x.verdictVi || '')}</div>
       </div>`).join('') + `<p class="hint" style="margin-top:6px">${sp.summary}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được sao trọng điểm.</p>'; }
 }
