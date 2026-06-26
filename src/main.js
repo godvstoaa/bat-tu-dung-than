@@ -1564,7 +1564,11 @@ function renderInvestStyle(R) {
       <p><b>${esc(inv.style || '')}</b> <span class="hint">(${esc(inv.topGodVi || '')}, rủi ro ${esc(String(inv.riskScore ?? ''))}/10${inv.canDayTrade ? ', hợp day-trade' : ''})</span></p>
       <p class="hint">${esc(inv.investDesc || '')}</p>
       ${dung ? `<p class="hint">✓ Tài sản hợp Dụng: ${esc(dung)}</p>` : ''}
+      ${Array.isArray(inv.dungStable) && inv.dungStable.length ? `<p class="hint">🛡️ Tài sản an toàn: ${inv.dungStable.map(esc).join(', ')}</p>` : ''}
       ${avoid ? `<p class="hint">⚠ Tránh: ${esc(avoid)}</p>` : ''}
+      ${inv.allocation ? `<p class="hint">📊 Phân bổ gợi ý: ${Object.entries(inv.allocation).map(([k,v]) => `${esc(k.replace(/_/g,' '))} <b>${v}%</b>`).join(' · ')}</p>` : ''}
+      ${inv.dayTradeNote ? `<div class="tiaohou-note" style="border-color:var(--cinnabar)">${esc(inv.dayTradeNote)}</div>` : ''}
+      ${Array.isArray(inv.goodDayun) && inv.goodDayun.length ? `<p class="hint">🛤️ Đại运 thuận đầu tư: ${inv.goodDayun.map(esc).join(', ')}</p>` : ''}
       ${inv.timingNote ? `<p class="hint">⏰ ${esc(inv.timingNote)}</p>` : ''}
       <p class="hint">${esc(inv.advice || '')}</p>
     `;
