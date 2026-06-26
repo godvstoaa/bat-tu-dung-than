@@ -494,7 +494,37 @@ function renderWuXing(wx, yong) {
   const monthWx = window._currentResult?.strength?.monthMainWx || '';
   const WT_VI = { 旺: 'Vượng', 相: 'Tướng', 休: 'Hưu', 囚: 'Tù', 死: 'Tử' };
   const WT_COLOR = { 旺: '#2e9e5b', 相: '#5cb85c', 休: '#caa14a', 囚: '#e8a23d', 死: '#e0533d' };
-  $('wuxing').innerHTML = ['木', '火', '土', '金', '水'].map((w) => {
+  $('wuxing').innerHTML = (() => {
+    // [loop 426] 五行 radar chart (SVG pentagon) — trực quan hơn bar chart cho cân bằng
+    const ELEMS = ['木', '火', '土', '金', '水'];
+    const colors = { 木: WX_COLOR['木'], 火: WX_COLOR['火'], 土: WX_COLOR['土'], 金: WX_COLOR['金'], 水: WX_COLOR['水'] };
+    const cx = 80, cy = 80, R = 65;
+    const pts = ELEMS.map((w, i) => {
+      const angle = (-90 + i * 72) * Math.PI / 180;
+      const val = max > 0 ? (wx.pct[w] || 0) / max : 0;
+      const r = R * Math.max(0.08, val);
+      return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle), labelX: cx + (R + 14) * Math.cos(angle), labelY: cy + (R + 14) * Math.sin(angle), w, pct: wx.pct[w] || 0, angle };
+    });
+    const polyPts = pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    const gridLevels = [0.25, 0.5, 0.75, 1.0];
+    const gridPoly = gridLevels.map((lvl) => {
+      const gp = ELEMS.map((_, i) => {
+        const a = (-90 + i * 72) * Math.PI / 180;
+        return `${(cx + R * lvl * Math.cos(a)).toFixed(1)},${(cy + R * lvl * Math.sin(a)).toFixed(1)}`;
+      }).join(' ');
+      return `<polygon points="${gp}" fill="none" stroke="rgba(212,175,55,${0.08 + lvl * 0.08})" stroke-width="0.5"/>`;
+    }).join('');
+    const axes = ELEMS.map((_, i) => {
+      const a = (-90 + i * 72) * Math.PI / 180;
+      return `<line x1="${cx}" y1="${cy}" x2="${(cx + R * Math.cos(a)).toFixed(1)}" y2="${(cy + R * Math.sin(a)).toFixed(1)}" stroke="rgba(212,175,55,0.12)" stroke-width="0.5"/>`;
+    }).join('');
+    const labels = pts.map((p) => {
+      const tag = TAG[p.w] || '';
+      const tagColor = fav.has(p.w) ? '#2e9e5b' : avoid.has(p.w) ? '#e0533d' : '#948864';
+      return `<text x="${p.labelX.toFixed(1)}" y="${p.labelY.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${colors[p.w]}" font-weight="bold">${p.w}${p.pct}%</text>${tag ? `<text x="${p.labelX.toFixed(1)}" y="${(p.labelY + 11).toFixed(1)}" text-anchor="middle" font-size="7" fill="${tagColor}">${tag}</text>` : ''}`;
+    }).join('');
+    return `<div style="text-align:center;margin:8px 0"><svg width="180" height="180" viewBox="0 0 160 160" style="max-width:100%;height:auto">${gridPoly}${axes}<polygon points="${polyPts}" fill="rgba(212,175,55,0.15)" stroke="rgba(212,175,55,0.6)" stroke-width="1.5"/>${pts.map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.5" fill="${colors[p.w]}"/>`).join('')}${labels}</svg></div>`;
+  })() + ['木', '火', '土', '金', '水'].map((w) => {
     const pct = wx.pct[w];
     const width = max > 0 ? (pct / max) * 100 : 0;
     const tag = TAG[w] || '';
