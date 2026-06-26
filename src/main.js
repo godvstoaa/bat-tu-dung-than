@@ -1711,8 +1711,11 @@ function renderShenshaActivation(R) {
     const ac = checkNatalActivation(R);
     const stars = ac.natalStars || [];
     if (!stars.length) { el.innerHTML = '<p class="hint">Không phát hiện thần sát kích hoạt rõ.</p>'; return; }
-    const rows = stars.map((s) => `<div class="yz-row"><b>${esc(s.vi || s.zh || '')}</b> @ ${esc(s.at || '')} (${esc(s.pillar || '')}) <span class="hint">— ${esc(s.effect || '')}</span></div>`).join('');
-    el.innerHTML = `<p class="hint">Thần sát kích hoạt trong nguyên cục (theo trigger ${esc('')}).</p>${rows}`;
+    const starRows = stars.map((s) => `<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:3px 0"><b>${esc(s.vi || s.zh || '')}</b> @ ${esc(s.at || '')} (${esc(s.pillar || '')}) <span class="hint">— ${esc(s.effect || '')}</span></div>`).join('');
+    // [loop 261] dòng thời gian kích hoạt — năm nào sao bẩm sinh BẬT
+    const acts = (ac.activations || []).slice(0, 10);
+    const actRows = acts.map((a) => `<div class="yz-row" style="border-left:3px solid ${a.activationType && /xung|hại|kỵ/i.test(a.activationType) ? 'var(--cinnabar)' : 'var(--jade)'};padding-left:8px;margin:3px 0"><b>${a.year}</b> <span class="zh">${esc(a.yZhi||'')}</span> → <b>${esc(a.shenshaVi||'')}</b> ${esc(a.activationType||'')} <span class="hint">(${esc(a.reason||'')}) — ${esc(a.effect||'')}</span></div>`).join('');
+    el.innerHTML = `<p class="hint">⚡ ${stars.length} sao bẩm sinh (trigger bởi 合/冲/刑/害 trong lưu niên):</p>${starRows}${actRows ? `<h4 class="syn-h4" style="margin-top:8px">📅 Năm kích hoạt (sắp tới):</h4>${actRows}` : ''}`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được kích hoạt thần煞.</p>'; }
 }
 
