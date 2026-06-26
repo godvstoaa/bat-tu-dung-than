@@ -2778,13 +2778,19 @@ function renderBestHour(dateStr) {
   const toneCls = (s) => s >= 72 ? 'rate-cat' : s >= 60 ? 'rate-cat' : s >= 45 ? 'rate-mid' : 'rate-hung';
   const bestSet = new Set(r.best.map((h) => h.zhi));
   const worstSet = new Set(r.worst.map((h) => h.zhi));
+  // [loop 232] mark current 时辰 (if viewing today)
+  const ZHI_ORD = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const now = new Date();
+  const isToday = dateStr === `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const curZhi = isToday ? ZHI_ORD[Math.floor(((now.getHours() + 1) % 24) / 2)] : null;
 
   const cells = r.hours.map((h) => {
     const tag = bestSet.has(h.zhi) ? '★' : worstSet.has(h.zhi) ? '⚠' : '';
     const cls = bestSet.has(h.zhi) ? 'bh-best' : worstSet.has(h.zhi) ? 'bh-worst' : '';
+    const isNow = curZhi && h.zhi === curZhi;
     const reasons = h.reasons.length ? `<div class="bh-reasons">${h.reasons.map((x) => `<span>${esc(x)}</span>`).join('')}</div>` : '';
-    return `<div class="bh-cell ${cls}">
-      <div class="bh-m">${tag}<span class="zh">${h.zhi}</span> <b>${esc(h.vi)}</b></div>
+    return `<div class="bh-cell ${cls}" style="${isNow ? 'box-shadow:0 0 0 2px var(--gold,#d4af37);' : ''}">
+      <div class="bh-m">${tag}${isNow ? '🕐' : ''}<span class="zh">${h.zhi}</span> <b>${esc(h.vi)}</b>${isNow ? ' <span class="hint">← đang</span>' : ''}</div>
       <div class="bh-range">${esc(h.range)} <span class="zh small">${esc(h.ganZhi)}</span></div>
       <div class="bh-score ${toneCls(h.score)}">${h.score} <b>${esc(h.rating)}</b></div>
       ${reasons}
