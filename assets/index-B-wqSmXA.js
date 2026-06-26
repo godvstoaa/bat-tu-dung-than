@@ -282,14 +282,14 @@ NGUYEN TAC:
   - "cải tạo/dời nhà hướng X được không" → mục "SAT PHƯƠNG TỔNG HỢP" + "NGUYỆT SÁT" (kiểm hướng vs TháiTuế/TamSát/5黄).
   - "tháng nào kiếm tiền tốt / phá tài / hao tiền" → mục "TÀI LỘC LƯU NGUYỆT" (mục DỰ BÁO & THỜI ĐIỂM) — trích tháng tốt nhất + tháng kỵ nhất kèm can-chi + Thập thần.
   - "năm vàng / nên tiến thủ lớn / làm ăn lớn năm nào" → mục "NĂM VÀNG" (DỰ BÁO & THỜI ĐIỂM) + "ĐẠI VẬN XẾP HẠNG" — trích top-3 năm 🟢 + cảnh báo năm 🔴.
-  - "đầu tư / day trade / chơi chứng khoán tiền ảo có nên không" → mục "TÀI TINH" + "TÀI KHỐ" (PHÂN TÍCH CHUYÊN SÂU) — thân nhậm tài không, có kho giữ tiền không, rồi quyết CO/KHÔNG + thời điểm (TÀI LỘC LƯU NGUYỆT).
-  - "khởi nghiệp / mở công ty / tự kinh doanh" → mục "SỰ NGHIỆP" + "TÀI TINH" (PHÂN TÍCH CHUYÊN SÂU) + "ĐẠI VẬN XẾP HẠNG" — Quan/Tài có lực không, vận nào thuận.
+  - "đầu tư / day trade / chơi chứng khoán tiền ảo có nên không" → mục "ĐẦU TƯ" + "TÀI TINH" + "TÀI KHỐ" (PHÂN TÍCH CHUYÊN SÂU) — phân bổ % + risk + day-trade note + thân nhậm tài không + kho giữ tiền.
+  - "khởi nghiệp / mở công ty / tự kinh doanh" → mục "KINH DOANH" + "SỰ NGHIỆP" + "TÀI TINH" (PHÂN TÍCH CHUYÊN SÂU) + "ĐẠI VẬN XẾP HẠNG" — should-start + tài khố + Quan/Tài lực + vận thuận.
   - [loop 132] "mệnh cung / thân cung của tôi" → mục "MỆNH CUNG" (PHÂN TÍCH CHUYÊN SÂU) — mệnh cung/thân cung + thập thần + Dụng/Kỵ.
   - "mệnh cách tầng lớp / đẳng cấp mệnh" → mục "MỆNH CÁCH TẦNG LỚP" (PHÂN TÍCH CHUYÊN SÂU) — 6 tiêu chí cổ điển.
   - "tính cách / tính tôi ra sao / bản chất" → mục "TÍNH CÁCH NHẬT CAN" + "NGŨ ĐỨC" (PHÂN TÍCH CHUYÊN SÂU).
-  - "ăn gì hợp / mặc màu gì / đeo đá gì / tinh dầu / trà / cây" → mục "LIFESTYLE" (PHÂN TÍCH CHUYÊN SÂU) — ẩm thực/đá/trang phục/vận động/cây/nhạc/trà/tinh dầu.
+  - "ăn gì hợp / mặc màu gì / đeo đá gì / tinh dầu / trà / cây" → mục "ẨM THỰC" (PHÂN TÍCH CHUYÊN SÂU) — vị Dụng + thực phẩm + trà + thực đơn. Màu/đá/vận động → bổ Dụng (SYSTEM_PROMPT bảng ngũ hành).
   - "số hợp / số điện thoại / biển số" → mục "SỐ HỢP" (trong PHONG THỦY & ĐỊNH VÍ).
-  - "hướng ngủ / thành phố nào hợp / vật phẩm hóa giải" → mục "PHONG THỦY & ĐỊNH VÍ" (PHÂN TÍCH CHUYÊN SÂU).
+  - "hướng ngủ / thành phố nào hợp / sống ở đâu / vật phẩm hóa giải" → mục "THÀNH PHỐ" (PHÂN TÍCH CHUYÊN SÂU) — hướng + loại địa lý + VN cities + career/wealth city. Hướng ngủ → Bát Trạch trong SYSTEM_PROMPT.
   - "tình duyên sâu / đào hoa / hồng diễm / sức phối ngẫu chi tiết" → mục "TÌNH DUYÊN SÂU" (PHÂN TÍCH CHUYÊN SÂU).
   - "dòng đời / timeline / đỉnh đời / thách thức" → mục "DÒNG ĐỜI" (PHÂN TÍCH CHUYÊN SÂU).
   - "quý nhân / ai giúp đỡ / tìm đâu" → mục "QUÝ NHÂN DƯỠNG DỤNG" (PHÂN TÍCH CHUYÊN SÂU).
