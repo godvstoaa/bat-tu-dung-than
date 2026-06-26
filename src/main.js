@@ -3109,6 +3109,11 @@ function run() {
   //   nhưng bọc try/catch để hiện lỗi thân thiện thay vì crash cả trang.
   try {
     currentResult = analyze(y, m, d, hh, mm, gender);
+    // [loop 421] validate: lunar-javascript silently returns undefined cho năm ngoài ~1900-2100
+    //   → tất cả trụ = undefined → user thấy lá số rác mà không có error. Verify explicitly.
+    if (!currentResult.chart.pillars.day.gan || !currentResult.chart.pillars.year.gan) {
+      throw new Error('Ngày sinh ngoài khoảng hỗ trợ (≈1900–2100). Vui lòng nhập ngày trong khoảng này.');
+    }
   } catch (e) {
     currentResult = null;
     const res = $('result');
