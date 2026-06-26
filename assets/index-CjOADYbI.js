@@ -663,7 +663,7 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       <p class="hint">${t.summary}</p>`}catch{i.innerHTML='<p class="hint">Không tính được đào hoa.</p>'}}function k1(n){const i=H("remedy-laws");if(i)try{const t=ie(n);i.innerHTML=`
       <p class="hint">${t.byElement.summary}</p>
       <p class="hint"><b>12 pháp cải vận (chính):</b></p>
-      <ul class="hint" style="margin:4px 0 4px 16px">${t.twelveLaws.slice(0,6).map(h=>`<li>${h}</li>`).join("")}</ul>`}catch{i.innerHTML='<p class="hint">Không tính được cải vận.</p>'}}function x1(n){const i=H("strength-3fa");if(i)try{const t=cg(n),h=n.strength?.ratio||.5,a=Math.round(h*100),e=n.strength?.strong,c=`
+      <ul class="hint" style="margin:4px 0 4px 16px">${t.twelveLaws.map(h=>`<li>${h}</li>`).join("")}</ul>`}catch{i.innerHTML='<p class="hint">Không tính được cải vận.</p>'}}function x1(n){const i=H("strength-3fa");if(i)try{const t=cg(n),h=n.strength?.ratio||.5,a=Math.round(h*100),e=n.strength?.strong,c=`
       <div style="margin:8px 0">
         <div style="position:relative;height:22px;border-radius:4px;background:linear-gradient(90deg,#e0533d 0%,#e0533d 25%,#caa14a 40%,#caa14a 60%,#2e9e5b 75%,#2e9e5b 100%)">
           <div style="position:absolute;left:${a}%;top:-3px;transform:translateX(-50%);width:4px;height:28px;background:#d4af55;border-radius:2px;box-shadow:0 0 6px rgba(212,175,85,0.9)"></div>
