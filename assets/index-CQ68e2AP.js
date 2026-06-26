@@ -483,12 +483,12 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       <div class="dy-vi">${oh(i.ganZhi)}</div>
       <div class="dy-age">${i.startAge}–${i.startAge+9}t</div>
       <div class="dy-rate ${Bt(i.rating)}">${i.rating}</div>
-    </div>`).join("")}function _N(n){if(!n.length){H("liunian").innerHTML='<p class="hint">Không tính được Lưu Niên.</p>';return}const i=n.find(h=>h.isNow);H("liunian-note").textContent=i?`(đại vận ${oh(i.dayunGanZhi)})`:"";const t=K&&K.dayun||[];H("liunian").innerHTML=n.map(h=>{const a=qo(t,h.year),e=a&&a.factor<1?`<span class="ln-phase ${a.phase==="进气"?"ph-in":"ph-out"}" title="${a.vi}">${a.phase==="进气"?"进":"退"}</span>`:"";return`
-    <div class="ln ${h.isNow?"ln-now":""}">
-      <div class="ln-year">${h.year}${h.isNow?" ★":""}${e}</div>
-      <div class="ln-gz"><span class="${Vn(h.ganWx)}">${h.gan}</span><span class="${Vn(h.zhiWx)}">${h.zhi}</span></div>
-      <div class="ln-age">${h.age}t</div>
-      <div class="ln-rate ${Bt(h.rating)}">${h.rating}</div>
+    </div>`).join("")}function _N(n){if(!n.length){H("liunian").innerHTML='<p class="hint">Không tính được Lưu Niên.</p>';return}const i=n.find(c=>c.isNow);H("liunian-note").textContent=i?`(đại vận ${oh(i.dayunGanZhi)})`:"";const t=n.map(c=>c.score),h=Math.max(...t),a=Math.min(...t),e=K&&K.dayun||[];H("liunian").innerHTML=n.map(c=>{const s=qo(e,c.year),o=s&&s.factor<1?`<span class="ln-phase ${s.phase==="进气"?"ph-in":"ph-out"}" title="${s.vi}">${s.phase==="进气"?"进":"退"}</span>`:"",g=c.score===h&&h>50?'<span class="ln-best" title="Năm TỐT NHẤT thập kỷ — nên tiến thủ">👑</span>':"",r=c.score===a&&a<45?'<span class="ln-worst" title="Năm KỴ NHẤT — thủ, tránh quyết lớn">⚠</span>':"";return`
+    <div class="ln ${c.isNow?"ln-now":""} ${c.score===h&&h>50?"ln-best-row":""} ${c.score===a&&a<45?"ln-worst-row":""}">
+      <div class="ln-year">${c.year}${c.isNow?" ★":""}${g}${r}${o}</div>
+      <div class="ln-gz"><span class="${Vn(c.ganWx)}">${c.gan}</span><span class="${Vn(c.zhiWx)}">${c.zhi}</span></div>
+      <div class="ln-age">${c.age}t</div>
+      <div class="ln-rate ${Bt(c.rating)}">${c.rating}</div>
     </div>`}).join("")}function UN(n){const i=H("decade");if(i)try{const t=xe(n,new Date().getFullYear(),10);i.innerHTML=`
       <p class="hint">10 năm tới一览: vận (6 phái) + 💰Tài + 🎯Quan + 💞Duyên. TỐT <b>${t.best.year} (${t.best.rating}, ${t.best.score}/100${t.best.flags.length?", "+t.best.flags.join(" "):""})</b> · XẤU <b>${t.worst.year} (${t.worst.rating})</b></p>
       <div class="ln-decade" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${t.years.map(h=>`
