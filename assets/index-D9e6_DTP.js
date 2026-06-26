@@ -1121,13 +1121,13 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
     <div class="ql-soul">Dụng Thần (linh hồn mệnh): <span class="ln-rate ${t}">${k(i.soul)}</span></div>
     <div class="ql-steps">${i.steps.map(h=>`
       <div class="ql-step"><div class="ql-n">${k(h.n)}</div><div><div class="ql-sname">${k(h.name)}</div><div class="ql-stext">${k(h.text)}</div></div></div>`).join("")}</div>
-    <p class="ql-source"><i>Nguồn: ${k(i.source)} · <a href="https://www.quanxue.cn/qt_mingxiang/qianlimg/qianlimg19.html" target="_blank" rel="noopener">quanxue.cn 千里命稿·评断篇</a></i></p>`}function Hu(n){if(!K)return;const i=Yn(K,n),t={比肩:"Tỷ Kiên",劫財:"Kiếp Tài",食神:"Thực Thần",傷官:"Thương Quan",偏財:"Thiên Tài",正財:"Chính Tài",七殺:"Thất Sát",正官:"Chính Quan",偏印:"Thiên Ấn",正印:"Chính Ấn"},h=i.score>=62?"rate-cat":i.score>=46?"rate-mid":i.score>=32?"rate-bad":"rate-hung",a=e=>e>0?`+${e}`:`${e}`;H("lyear").innerHTML=`
+    <p class="ql-source"><i>Nguồn: ${k(i.source)} · <a href="https://www.quanxue.cn/qt_mingxiang/qianlimg/qianlimg19.html" target="_blank" rel="noopener">quanxue.cn 千里命稿·评断篇</a></i></p>`}function Hu(n){if(!K)return;const i=Yn(K,n),t={比肩:"Tỷ Kiên",劫財:"Kiếp Tài",食神:"Thực Thần",傷官:"Thương Quan",偏財:"Thiên Tài",正財:"Chính Tài",七殺:"Thất Sát",正官:"Chính Quan",偏印:"Thiên Ấn",正印:"Chính Ấn"},h=i.score>=62?"rate-cat":i.score>=46?"rate-mid":i.score>=32?"rate-bad":"rate-hung",a=o=>o>0?`+${o}`:`${o}`,e=i.dayunPhase,c=e?`<span class="ln-phase ${e.phase==="进气"?"ph-in":"ph-out"}" title="${k(e.vi)}">${e.phase}</span>`:"",s=i.gejuFavor==="喜"?'<span class="geju-xi" title="Can năm sinh trợ cách cục → năm THUẬN CÁCH">★格局喜</span>':i.gejuFavor==="忌"?'<span class="geju-ji" title="Can năm khắc phá cách cục → năm GHÉT CÁCH">⚠格局忌</span>':"";H("lyear").innerHTML=`
     <div class="ly-head"><span class="zh big">${k(i.ganZhi)}</span> ${k(n)} · can <b>${k(t[i.ganGod]||i.ganGod)}</b>
-      → <span class="ln-rate ${h}">${k(i.rating)} (${k(i.score)}/100)</span></div>
-    <div class="ly-schools">${i.schools.map(e=>`
-      <div class="ly-school ${e.d>=0?"pos":"neg"}">
-        <div class="ly-sname">${k(e.phai)} <span class="ly-d">${k(a(e.d))}</span></div>
-        <div class="ly-snote">${k(e.note)}</div>
+      → <span class="ln-rate ${h}">${k(i.rating)} (${k(i.score)}/100)</span> ${c} ${s}</div>
+    <div class="ly-schools">${i.schools.map(o=>`
+      <div class="ly-school ${o.d>=0?"pos":"neg"}">
+        <div class="ly-sname">${k(o.phai)} <span class="ly-d">${k(a(o.d))}</span></div>
+        <div class="ly-snote">${k(o.note)}</div>
       </div>`).join("")}</div>
     <p class="zr-advice">${k(i.advice)}</p>`}function qe(n){if(!K)return;const i=oe(K,n),t=c=>c==="cat"?"rate-cat":c==="hung"?"rate-hung":"rate-mid",h=c=>c==="cat"?"Cát":c==="hung"?"Kỵ":"Trung",a=i.bodyStrong?"Thân vượng":"Thân nhược",e=c=>({year:"Niên",month:"Nguyệt",day:"Nhật",time:"Thời"})[c]||c;H("ly-ev").innerHTML=`
     <div class="ly-head"><span class="zh big">${k(i.ganZhi)}</span> ${k(n)} · sao <b>${k(i.yearGodVi)}</b> (${k(i.yearGod)}) · ${k(a)}${i.yearGod==="七殺"?` · Sát ${i.shaZhiHua?"CÓ chế/hóa":"VÔ chế ⚠"}`:""}
