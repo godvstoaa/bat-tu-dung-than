@@ -1467,6 +1467,7 @@ function renderDailyGuide(R) {
       ${g.oneLiner ? `<p>${esc(g.oneLiner)}</p>` : ''}
       ${yi ? `<p>✓ <b>宜:</b> ${esc(yi)}</p>` : ''}
       ${ji ? `<p>⚠ <b>忌:</b> ${esc(ji)}</p>` : ''}
+      ${g.color ? `<p class="hint">🎨 <b>Màu may mắn:</b> ${esc(g.color.primary || '')}${g.color.accent ? ' (phụ ' + esc(g.color.accent) + ')' : ''}${g.colorAdvice ? ' — ' + esc(g.colorAdvice) : ''}</p>` : ''}
       <p class="hint">🧭 Tài Thần ${esc(dir.directions?.caiShen || '?')} | Hỷ Thần ${esc(dir.directions?.xiShen || '?')} | Hướng tốt ${esc(dir.bestDirection || '?')}</p>
       ${goodH ? `<p class="hint">⏰ Giờ tốt: ${goodH}</p>` : ''}
       ${badH ? `<p class="hint">⏰ Giờ kỵ: ${badH}</p>` : ''}
