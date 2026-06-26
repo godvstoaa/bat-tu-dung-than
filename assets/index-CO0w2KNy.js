@@ -627,7 +627,11 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       <p>Dụng <b>${h.wxVi}</b>: <span class="${a}"><b>${h.verdict}</b></span> (căn ${h.root.total}, lộ ${h.reveal.length}, mùa ${h.seasonVi}) — ${h.verdictVi}</p>
       ${m}
       ${h.verdict==="藏而不透"?`<p class="hint">⏳ Đợi lưu niên can ${t.whenReveal.join("/")} thấu ra mới phát Dụng.</p>`:""}
-      <p class="hint">Nhật Chủ ${t.dm.wxVi}: ${t.dm.verdict} (${t.dm.seasonVi}).</p>`}catch{i.innerHTML='<p class="hint">Không tính được thông căn thấu cán.</p>'}}function l1(n){const i=H("missing-god");if(i)try{const t=mg(n),h=a=>a==="lacking"?"hung":a==="partial"?"mid":"cat";i.innerHTML=Object.values(t.categories).map(a=>`
+      <p class="hint">Nhật Chủ ${t.dm.wxVi}: ${t.dm.verdict} (${t.dm.seasonVi}).</p>
+      ${h.root.roots&&h.root.roots.length||t.dm.root&&t.dm.root.roots&&t.dm.root.roots.length?`<details style="margin:4px 0"><summary class="hint">🔍 Chi tiết thông căn (trụ nào có gốc)</summary>
+        ${h.root.roots&&h.root.roots.length?`<p class="hint"><b>Dụng ${h.wxVi} căn tại:</b> ${h.root.roots.map(d=>`${f(d.vi)}(${f(d.zhi)}=${f(d.stem)},${f(d.pos)},${d.weight})`).join("; ")}.</p>`:""}
+        ${t.dm.root&&t.dm.root.roots&&t.dm.root.roots.length?`<p class="hint"><b>Nhật Chủ căn tại:</b> ${t.dm.root.roots.map(d=>`${f(d.vi)}(${f(d.zhi)}=${f(d.stem)},${f(d.pos)},${d.weight})`).join("; ")}.</p>`:""}
+      </details>`:""}`}catch{i.innerHTML='<p class="hint">Không tính được thông căn thấu cán.</p>'}}function l1(n){const i=H("missing-god");if(i)try{const t=mg(n),h=a=>a==="lacking"?"hung":a==="partial"?"mid":"cat";i.innerHTML=Object.values(t.categories).map(a=>`
       <div class="sp-item">
         <div class="sp-star">${a.vi.split(" (")[0]} <span class="${h(a.status)}">${a.status==="lacking"?"KHUYẾT":a.status==="partial"?"THIẾU":"đủ"}</span></div>
         <div class="sp-area hint">${a.area}</div>
