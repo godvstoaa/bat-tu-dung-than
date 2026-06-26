@@ -756,7 +756,11 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       <p><b>${T(t.style||"")}</b> <span class="hint">(${T(t.topGodVi||"")}, rủi ro ${T(String(t.riskScore??""))}/10${t.canDayTrade?", hợp day-trade":""})</span></p>
       <p class="hint">${T(t.investDesc||"")}</p>
       ${h?`<p class="hint">✓ Tài sản hợp Dụng: ${T(h)}</p>`:""}
+      ${Array.isArray(t.dungStable)&&t.dungStable.length?`<p class="hint">🛡️ Tài sản an toàn: ${t.dungStable.map(T).join(", ")}</p>`:""}
       ${a?`<p class="hint">⚠ Tránh: ${T(a)}</p>`:""}
+      ${t.allocation?`<p class="hint">📊 Phân bổ gợi ý: ${Object.entries(t.allocation).map(([e,c])=>`${T(e.replace(/_/g," "))} <b>${c}%</b>`).join(" · ")}</p>`:""}
+      ${t.dayTradeNote?`<div class="tiaohou-note" style="border-color:var(--cinnabar)">${T(t.dayTradeNote)}</div>`:""}
+      ${Array.isArray(t.goodDayun)&&t.goodDayun.length?`<p class="hint">🛤️ Đại运 thuận đầu tư: ${t.goodDayun.map(T).join(", ")}</p>`:""}
       ${t.timingNote?`<p class="hint">⏰ ${T(t.timingNote)}</p>`:""}
       <p class="hint">${T(t.advice||"")}</p>
     `}catch{i.innerHTML='<p class="hint">Không tính được phong cách đầu tư.</p>'}}function E1(n){const i=H("bazi-business");if(i)try{const t=Vx(n),h=Array.isArray(t.bizTypes)?t.bizTypes.join(", "):t.bizTypes||"";i.innerHTML=`
