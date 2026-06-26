@@ -2225,9 +2225,10 @@ function renderForecast5(R) {
       if (y.dayunGod) ctx.push(`运 ${esc(y.dayunGod)}`);
       const posHtml = (y.positives || []).length ? `<div class="hint" style="color:#9fe0b8">✓ ${y.positives.map(esc).join('; ')}</div>` : '';
       const alertHtml = (y.alerts || []).length ? `<div class="hint" style="color:#f0a99c">⚠ ${y.alerts.map(esc).join('; ')}</div>` : '';
+      const isNow = y.year === new Date().getFullYear();
       return `
-      <div class="yz-row" style="border-left:3px solid ${y.tone === 'cat' ? 'var(--jade)' : y.tone === 'hung' ? 'var(--cinnabar)' : 'var(--gold)'};margin:4px 0;padding-left:8px">
-        <b>${y.year}</b> <span class="zh">${esc(y.ganZhi)}</span> <span class="ln-rate ${rateClass(y.rating)}">${esc(y.rating)} (${y.score}/100)</span>
+      <div class="yz-row ${isNow ? 'dy-now' : ''}" style="border-left:3px solid ${isNow ? 'var(--gold)' : y.tone === 'cat' ? 'var(--jade)' : y.tone === 'hung' ? 'var(--cinnabar)' : 'var(--gold)'};margin:4px 0;padding-left:8px">
+        <b>${y.year}${isNow ? ' ★' : ''}</b> <span class="zh">${esc(y.ganZhi)}</span> <span class="ln-rate ${rateClass(y.rating)}">${esc(y.rating)} (${y.score}/100)</span>
         ${ctx.length ? ` <span class="hint">${ctx.join(' · ')}</span>` : ''}
         ${posHtml}${alertHtml}
       </div>`;
