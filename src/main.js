@@ -3263,9 +3263,14 @@ function renderLyear(year) {
   const GOD_VI = { 比肩: 'Tỷ Kiên', 劫財: 'Kiếp Tài', 食神: 'Thực Thần', 傷官: 'Thương Quan', 偏財: 'Thiên Tài', 正財: 'Chính Tài', 七殺: 'Thất Sát', 正官: 'Chính Quan', 偏印: 'Thiên Ấn', 正印: 'Chính Ấn' };
   const cls = r.score >= 62 ? 'rate-cat' : r.score >= 46 ? 'rate-mid' : r.score >= 32 ? 'rate-bad' : 'rate-hung';
   const dHanzi = (n) => (n > 0 ? `+${n}` : `${n}`);
+  // [loop 220] 进气退气 phase + 格局流年喜忌 (trước đây tính nhưng không hiện)
+  const ph = r.dayunPhase;
+  const phaseBadge = ph ? `<span class="ln-phase ${ph.phase === '进气' ? 'ph-in' : 'ph-out'}" title="${esc(ph.vi)}">${ph.phase}</span>` : '';
+  const gejuBadge = r.gejuFavor === '喜' ? '<span class="geju-xi" title="Can năm sinh trợ cách cục → năm THUẬN CÁCH">★格局喜</span>'
+                 : r.gejuFavor === '忌' ? '<span class="geju-ji" title="Can năm khắc phá cách cục → năm GHÉT CÁCH">⚠格局忌</span>' : '';
   $('lyear').innerHTML = `
     <div class="ly-head"><span class="zh big">${esc(r.ganZhi)}</span> ${esc(year)} · can <b>${esc(GOD_VI[r.ganGod] || r.ganGod)}</b>
-      → <span class="ln-rate ${cls}">${esc(r.rating)} (${esc(r.score)}/100)</span></div>
+      → <span class="ln-rate ${cls}">${esc(r.rating)} (${esc(r.score)}/100)</span> ${phaseBadge} ${gejuBadge}</div>
     <div class="ly-schools">${r.schools.map((s) => `
       <div class="ly-school ${s.d >= 0 ? 'pos' : 'neg'}">
         <div class="ly-sname">${esc(s.phai)} <span class="ly-d">${esc(dHanzi(s.d))}</span></div>
