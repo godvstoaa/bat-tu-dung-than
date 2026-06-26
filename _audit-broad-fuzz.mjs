@@ -29,6 +29,13 @@ for (let i = 0; i < 80; i++) {
       const p23 = R23.chart.pillars.day.gan + R23.chart.pillars.day.zhi;
       if (p22 === p23) { issues++; log.push(`✗ 子时换日 not rolling @ ${y}/${m}/${d} ${g} (22h=${p22}=23h)`); }
     }
+    // [loop 214] determinism — same input must give identical output (every 20th chart)
+    if (i % 20 === 0) {
+      const R2 = analyze(y, m, d, h, 0, g, 2026);
+      const a = JSON.stringify({ p: R.yong.primary, s: R.synthesis.score, dn: R.dayun.length, ln: R.liunian.length });
+      const b = JSON.stringify({ p: R2.yong.primary, s: R2.synthesis.score, dn: R2.dayun.length, ln: R2.liunian.length });
+      if (a !== b) { issues++; log.push(`✗ NON-DETERMINISTIC @ ${y}/${m}/${d} ${h}h ${g}`); }
+    }
   } catch (e) { crashes++; log.push(`💥 CRASH @ ${y}/${m}/${d} ${h}h ${g}: ${e.message}`); }
 }
 
