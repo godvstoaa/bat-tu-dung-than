@@ -417,7 +417,18 @@ function renderSynthesis(R) {
     <details class="syn-factors"><summary>Các nhân tố chấm điểm (cách – tình – lực – thanh trọc – phối hợp)</summary><div class="factor-list">${s.factors.map((f) => `<div class="factor">${esc(f)}</div>`).join('')}</div></details>
     <h4 class="syn-h4">Tổ hợp Thập Thần (十神组合)</h4>
     ${combosHtml}
-    <p class="syn-advice">${esc(s.paragraphs[3])}</p>`;
+    ${(() => {
+      // [loop 241 fix BUG CAO] paragraphs.splice(2,0,qualityLine) làm indices lệch:
+      //   [3] = FACTORS (không phải advice!), [4] = advice thật, [5] = 格局大运, [6] = 十二长生
+      //   Trước đây render chỉ show [3] (=factors) làm «advice» → KHÔNG show advice + 格局大运 + 十二长生.
+      //   Nay: tìm advice qua content + show tất cả paragraphs sau factors.
+      const ps = s.paragraphs;
+      const adviceIdx = ps.findIndex((p, i) => i > 1 && /Khuyên dùng/.test(p));
+      const advice = adviceIdx >= 0 ? ps[adviceIdx] : (ps.length > 3 ? ps[ps.length - 1] : '');
+      // show 格局大运 + 十二长生 (các paragraphs sau advice)
+      const extras = ps.slice(Math.max(adviceIdx + 1, 4)).filter(Boolean);
+      return `<p class="syn-advice">${esc(advice)}</p>${extras.map((p) => `<p class="hint" style="margin-top:4px">${esc(p)}</p>`).join('')}`;
+    })()}`;
 }
 
 // ---------------------------------------------------------------- NGŨ HÀNH
