@@ -868,13 +868,12 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
         <div class="ln-year">${h.year}</div>
         <div class="ln-gz">${h.ganZhi}</div>
         <div class="ln-rate ${h.totalScore>=60?"cat":h.totalScore>=40?"":"hung"}">${h.alert||""} ${h.totalScore}</div>
-      </div>`).join("")}catch{i.innerHTML='<p class="hint">Không tính được năm hoàng kim.</p>'}}function $H(n){const i=H("forecast5");if(i)try{const t=Z0(n,new Date().getFullYear(),5);i.innerHTML=t.years.map(h=>`
-      <div class="ln ${h.tone==="cat"||h.tone==="hung",""}">
-        <div class="ln-year">${h.year}</div>
-        <div class="ln-gz">${h.ganZhi}</div>
-        <div class="ln-rate ${Yt(h.rating)}">${h.rating}</div>
-        <div class="ln-flags">${h.score}/100</div>
-      </div>`).join("")+(t.activeDayun?`<p class="hint" style="margin-top:4px">Đại vận đang hành: ${t.activeDayun.ganZhi} [${t.activeDayun.startAge}-${t.activeDayun.startAge+9}t]</p>`:"")}catch{i.innerHTML='<p class="hint">Không tính được forecast 5 năm.</p>'}}function ou(){H("tabs").innerHTML=La.map(n=>`<button class="tab ${n.id===vi?"active":""}" data-id="${n.id}">${n.label}</button>`).join(""),H("tabs").querySelectorAll(".tab").forEach(n=>n.addEventListener("click",()=>{vi=n.dataset.id,ou(),ru()}))}function ru(){if(vi==="luck"){const i=Dm("luck",K);H("topic-body").innerHTML=`<h3>${k(i.title)}</h3>${i.paragraphs.map(t=>`<p>${k(t)}</p>`).join("")}`;return}const n=zm(K,vi);H("topic-body").innerHTML=`
+      </div>`).join("")}catch{i.innerHTML='<p class="hint">Không tính được năm hoàng kim.</p>'}}function $H(n){const i=H("forecast5");if(i)try{const t=Z0(n,new Date().getFullYear(),5);i.innerHTML=t.years.map(h=>{const a=[];h.shen12&&a.push(`12神: ${k(h.shen12)}`),h.dayunGod&&a.push(`运 ${k(h.dayunGod)}`);const e=(h.positives||[]).length?`<div class="hint" style="color:#9fe0b8">✓ ${h.positives.map(k).join("; ")}</div>`:"",c=(h.alerts||[]).length?`<div class="hint" style="color:#f0a99c">⚠ ${h.alerts.map(k).join("; ")}</div>`:"";return`
+      <div class="yz-row" style="border-left:3px solid ${h.tone==="cat"?"var(--jade)":h.tone==="hung"?"var(--cinnabar)":"var(--gold)"};margin:4px 0;padding-left:8px">
+        <b>${h.year}</b> <span class="zh">${k(h.ganZhi)}</span> <span class="ln-rate ${Yt(h.rating)}">${k(h.rating)} (${h.score}/100)</span>
+        ${a.length?` <span class="hint">${a.join(" · ")}</span>`:""}
+        ${e}${c}
+      </div>`}).join("")+(t.activeDayun?`<p class="hint" style="margin-top:4px">Đại vận đang hành: ${t.activeDayun.ganZhi} [${t.activeDayun.startAge}-${t.activeDayun.startAge+9}t]</p>`:"")}catch{i.innerHTML='<p class="hint">Không tính được forecast 5 năm.</p>'}}function ou(){H("tabs").innerHTML=La.map(n=>`<button class="tab ${n.id===vi?"active":""}" data-id="${n.id}">${n.label}</button>`).join(""),H("tabs").querySelectorAll(".tab").forEach(n=>n.addEventListener("click",()=>{vi=n.dataset.id,ou(),ru()}))}function ru(){if(vi==="luck"){const i=Dm("luck",K);H("topic-body").innerHTML=`<h3>${k(i.title)}</h3>${i.paragraphs.map(t=>`<p>${k(t)}</p>`).join("")}`;return}const n=zm(K,vi);H("topic-body").innerHTML=`
     <h3>${k(n.topic)}</h3>
     <p class="tier-intro">Phân tích <b>9 tầng</b> cổ pháp — từ bản khí đến kết luận cấp độ:</p>
     <div class="tier-list">${n.tiers.map(i=>`
