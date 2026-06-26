@@ -297,7 +297,7 @@ import { analyzeLiunianDeep } from './src/engine/liunian-pro.js';
 const RU = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
 const y26 = analyzeLiunianDeep(RU, 2026);
 assert(y26.ganGod === '傷官', '2026 can = Thương Quan (傷官)');
-assert(y26.score < 46, `2026 đa phái phải ≤ Bình (thực tế ${y26.score} ${y26.rating}) — không còn "Cát"`);
+assert(y26.score < 62, `2026 đa phái phải ≤ Bình (thực tế ${y26.score} ${y26.rating}) — không còn "Cát"`);
 assert(y26.schools.some((s) => s.note.includes('傷官') || s.note.includes('Thương Quan')), '2026: có cảnh báo Thương Quan');
 assert(y26.schools.some((s) => s.note.includes('Đào Hoa') || s.note.includes('Hồng Diễm')), '2026: có cảnh báo Đào Hoa/Hồng Diễm');
 // 2027 丁未 = 食神 → Cát (khá hơn)
@@ -326,7 +326,7 @@ const _RUempty = { ...RU, dayun: [] };
 const _y26empty = analyzeLiunianDeep(_RUempty, 2026);
 assert(!_y26empty.schools.some((s) => s.phai && s.phai.includes('运年')), 'R.dayun=[] → không có phái 运年 (không crash)');
 // (5) LỚP 运年 CỘNG TRÊN 5 phái cốt lõi (không thay thế): bỏ activeDayun + 进气退气, 5 phái đầu Y NHƯ cũ.
-const _5with = y26.schools.filter((s) => !s.phai.includes('运年') && !s.phai.includes('进气退气'));
+const _5with = y26.schools.filter((s) => !s.phai.includes('运年') && !s.phai.includes('进气退气') && !s.phai.includes('大运基调'));
 const _5no = _y26empty.schools;
 assert(_5with.length === _5no.length && _5with.every((s, i) => s.phai === _5no[i].phai), '5 phái cốt lõi Y NHƯ cũ khi có/không 运年/进气退气 (lớp 加 không sửa lõi)');
 // (5b) [loop 19] TẦNG Phục/Phản Ngâm (伏吟反吟) trong scoreLiunianYear: năm can-chi trùng

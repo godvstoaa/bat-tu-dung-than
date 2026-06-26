@@ -253,6 +253,24 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
     if (fy.length) { score += fdD; schools.push({ phai: 'Phục/Phản Ngâm (伏吟反吟)', note: fy.join(' '), d: fdD }); }
   }
 
+  // [loop 428 elevate] 大运基调 — cổ pháp «运好不如限好»: thập niên TỐT nâng trần lưu niên,
+  //   thập niên XẤU hạ trần. Trước đây 流年 score KHÔNG xét chất lượng đại vận TỔNG THỂ
+  //   → năm TỐT trong thập niên HUNG bị overrated; năm XẤU trong thập niên CÁT bị underrated.
+  if (activeDayun && activeDayun.length >= 2) {
+    const dyGan = activeDayun[0], dyZhi = activeDayun[1];
+    const dyGanWx = GAN[dyGan]?.wx, dyZhiWx = ZHI[dyZhi]?.wx;
+    let dyBase = 0;
+    if (favSet.has(dyZhiWx)) dyBase += 3;   // 大运重地支 → ±3
+    if (avoidSet.has(dyZhiWx)) dyBase -= 3;
+    if (favSet.has(dyGanWx)) dyBase += 1;   // 天干 → ±1
+    if (avoidSet.has(dyGanWx)) dyBase -= 1;
+    if (dyBase !== 0) {
+      score += dyBase;
+      const tone = dyBase > 0 ? 'nâng (thập niên thuận)' : 'kìm (thập niên nghịch)';
+      schools.push({ phai: '大运基调', note: `Đại vận ${activeDayun} (${dyZhiWx ? wxVi(dyZhiWx) : '?'}) ${tone} → ${dyBase > 0 ? '+' : ''}${dyBase} điểm`, d: dyBase });
+    }
+  }
+
   score = Math.max(2, Math.min(98, Math.round(score)));
   let rating;
   if (score >= 78) rating = 'Đại cát';
