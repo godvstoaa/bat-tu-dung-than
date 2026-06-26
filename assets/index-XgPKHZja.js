@@ -638,7 +638,14 @@ Bạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_mont
       </div>`).join("")+`<p class="hint" style="margin-top:6px">${t.summary}</p>`}catch{i.innerHTML='<p class="hint">Không tính được khuyết thập thần.</p>'}}function m1(n){const i=H("sanyuan");if(i)try{const t=Ur(n,new Date().getFullYear());i.innerHTML=`
       <p><b>${t.yun.starVi} · ${t.yun.trig} · ${t.yun.wxVi}</b> (${t.yun.yuan}, ${t.yun.start}-${t.yun.end})</p>
       <p class="hint">正神=${t.zhengShen} · 零神=${t.lingShen}</p>
-      <p class="hint">${t.align}</p>`}catch{i.innerHTML='<p class="hint">Không tính được tam nguyên cửu vận.</p>'}}function p1(n){const i=H("ku");if(i)try{const t=Xr(n,new Date().getFullYear()),h=(t.kuInChart||[]).map(s=>{const o=(s.state||"").includes("open")||(s.stateShort||"").includes("开")?"rate-cat":"rate-hung";return`<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:3px 0">
+      <p class="hint">${t.align}</p>
+      ${t.detail?`<details style="margin:6px 0"><summary class="hint">📋 Chi tiết kỷ nguyên ${t.yun.starVi} (${t.yun.start}-${t.yun.end})</summary>
+        ${t.detail.industriesWang?`<p class="hint"><b>🔥 Ngành vượng:</b> ${f(t.detail.industriesWang.join(", "))}</p>`:""}
+        ${t.detail.industriesSuy?`<p class="hint"><b>📉 Ngành suy:</b> ${f(t.detail.industriesSuy.join(", "))}</p>`:""}
+        ${t.detail.health?`<p class="hint"><b>🏥 Sức khoẻ:</b> ${f(t.detail.health)}</p>`:""}
+        ${t.detail.society?`<p class="hint"><b>🌐 Xã hội:</b> ${f(t.detail.society)}</p>`:""}
+        ${t.detail.layout?`<p class="hint"><b>🧭 Bố trí:</b> ${t.detail.layout.map(f).join(" · ")}</p>`:""}
+      </details>`:""}`}catch{i.innerHTML='<p class="hint">Không tính được tam nguyên cửu vận.</p>'}}function p1(n){const i=H("ku");if(i)try{const t=Xr(n,new Date().getFullYear()),h=(t.kuInChart||[]).map(s=>{const o=(s.state||"").includes("open")||(s.stateShort||"").includes("开")?"rate-cat":"rate-hung";return`<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:3px 0">
         <b>${f(s.vi||"")} <span class="zh">${f(s.zhi||"")}</span></b> (${f(s.zhiVi||"")}) — chứa ${f(s.storeVi||"")} · <span class="ln-rate ${o}">${f(s.stateVi||s.stateShort||s.state||"")}</span></div>`}).join(""),a=s=>s?`<div class="yz-row" style="margin:3px 0;padding-left:8px;border-left:3px solid ${s.action&&/mở|open/i.test(s.action)?"var(--jade)":"var(--cinnabar)"}">
       <b>${f(String(s.year||""))}</b> <span class="zh">${f(s.ganZhi||"")}</span> — ${f(s.action||"")}</div>`:"",e=(t.openYears||[]).slice(0,4).map(a).join(""),c=(t.closedYears||[]).slice(0,3).map(a).join("");i.innerHTML=`
       ${h||'<p class="hint">Không có trụ kho (辰戌丑未) trong lá số.</p>'}
