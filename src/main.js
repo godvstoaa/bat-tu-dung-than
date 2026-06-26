@@ -2429,11 +2429,13 @@ async function handleAsk() {
   body.classList.add('streaming');
   const cfg = getConfig();
   let lastStatus = '';
+  const _cl = $('chat-log');
+  const _atBottom = () => { if (!_cl) return true; return _cl.scrollHeight - _cl.scrollTop - _cl.clientHeight < 100; };
   try {
     const { source, text } = await askAI(q, currentResult, cfg, {
       history: chatHistory,
-      onStatus: (s) => { lastStatus = s; body.textContent = s + ' …'; $('chat-log').scrollTop = $('chat-log').scrollHeight; },
-      onToken: (_delta, full) => { body.textContent = full; $('chat-log').scrollTop = $('chat-log').scrollHeight; },
+      onStatus: (s) => { lastStatus = s; body.textContent = s + ' …'; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
+      onToken: (_delta, full) => { body.textContent = full; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
     });
     body.textContent = text;
     body.classList.remove('streaming');
