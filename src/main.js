@@ -602,13 +602,19 @@ function renderDecade(R) {
     const df = decadeForecast(R, new Date().getFullYear(), 10);
     el.innerHTML = `
       <p class="hint">10 năm tới一览: vận (6 phái) + 💰Tài + 🎯Quan + 💞Duyên. TỐT <b>${df.best.year} (${df.best.rating}, ${df.best.score}/100${df.best.flags.length ? ', ' + df.best.flags.join(' ') : ''})</b> · XẤU <b>${df.worst.year} (${df.worst.rating})</b></p>
-      <div class="ln-decade" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${df.years.map((y) => `
-        <div class="ln ${y.year === df.best.year ? 'ln-now' : ''}" title="${y.ganZhi} ${y.flags.join(' ')}">
-          <div class="ln-year">${y.year}</div>
+      <div class="ln-decade" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${df.years.map((y) => {
+        const curY = new Date().getFullYear();
+        const isNow = y.year === curY;
+        const isBest = y.year === df.best.year;
+        const rowCls = isNow ? ' ln-now' : isBest ? ' ln-best-row' : '';
+        return `
+        <div class="ln${rowCls}" title="${y.ganZhi} ${y.flags.join(' ')}">
+          <div class="ln-year">${y.year}${isNow ? ' ★' : ''}</div>
           <div class="ln-gz">${y.ganZhi}</div>
-          <div class="ln-rate ${rateClass(y.rating)}">${y.rating}</div>
+          <div class="ln-rate ${rateClass(y.rating)}">${y.rating} <small>${y.score}</small></div>
           <div class="ln-flags">${y.flags.join(' ') || '·'}</div>
-        </div>`).join('')}</div>`;
+        </div>`;
+      }).join('')}</div>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 10 năm.</p>'; }
 }
 
