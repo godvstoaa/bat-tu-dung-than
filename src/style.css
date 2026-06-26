@@ -1035,6 +1035,9 @@ html{scroll-behavior:smooth}
   details > div, details summary + * { display: block !important; }
   details summary::after { content: ''; }
   .gold, [style*="color"] { color: #333 !important; }
+  .rate-cat, .rate-hung, .rate-mid, .rate-bad, .rate-good, .ln-rate, .ln-phase, .combo, .geju-xi, .geju-ji { color: #333 !important; }
+  .rate-hung, .bh-worst { background: rgba(200,50,40,0.15) !important; }
+  .rate-cat, .bh-best { background: rgba(40,140,80,0.15) !important; }
   a { color: #333 !important; text-decoration: none !important; }
   .hidden { display: block !important; }
 }
