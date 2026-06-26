@@ -4402,8 +4402,10 @@ function renderMonthCalendar() {
     const c = colors[d.tone];
     const isBest = cal.best && d.day === cal.best.day;
     const isWorst = cal.worst && d.day === cal.worst.day;
-    return `<div style="min-height:38px;padding:2px 3px;background:${c.bg};border:1px solid ${c.border}40;border-radius:4px;${isBest ? 'box-shadow:0 0 4px '+c.border+'80;' : ''}">
-      <div style="font-size:.75em;font-weight:bold;color:${c.text}">${d.day}</div>
+    const now = new Date();
+    const isToday = year === now.getFullYear() && month === (now.getMonth() + 1) && d.day === now.getDate();
+    return `<div style="min-height:38px;padding:2px 3px;background:${c.bg};border:${isToday ? '2px solid var(--gold,#d4af37)' : '1px solid '+c.border+'40'};border-radius:4px;${isBest ? 'box-shadow:0 0 4px '+c.border+'80;' : ''}${isToday ? 'box-shadow:0 0 6px var(--gold,#d4af37);' : ''}">
+      <div style="font-size:.75em;font-weight:bold;color:${c.text}">${d.day}${isToday ? ' ★' : ''}</div>
       <div style="font-size:.55em;color:${c.text};opacity:.7">${d.score}</div>
       ${isBest ? '<div style="font-size:.5em;color:#2e9e5b">★</div>' : isWorst ? '<div style="font-size:.5em;color:#e0533d">⚠</div>' : ''}
     </div>`;
