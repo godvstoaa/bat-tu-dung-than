@@ -4461,13 +4461,15 @@ function renderWeekPreview() {
     const c = colors[d.tone];
     const isBest = w.best && d.date === w.best.date;
     const isWorst = w.worst && d.date === w.worst.date;
-    return `<div style="flex:1;min-width:80px;text-align:center;border:1px solid #e0d0a0;border-radius:8px;padding:6px 4px;background:${c}15;border-color:${isBest ? c : '#e0d0a0'};${isBest ? 'box-shadow:0 0 6px '+c+'80' : ''}">
+    const now = new Date();
+    const isToday = d.day === now.getDate() && d.month === (now.getMonth() + 1);
+    return `<div style="flex:1;min-width:80px;text-align:center;border:1px solid ${isToday ? 'var(--gold,#d4af37)' : isBest ? c : '#e0d0a0'};border-radius:8px;padding:6px 4px;background:${c}15;${isBest ? 'box-shadow:0 0 6px '+c+'80;' : ''}${isToday ? 'box-shadow:0 0 6px var(--gold,#d4af37);' : ''}">
       <div style="font-size:.7em;color:var(--silk-muted)">${d.weekdayVi}</div>
-      <div style="font-weight:bold;font-size:1.1em;color:${c}">${d.day}/${d.month}</div>
+      <div style="font-weight:bold;font-size:1.1em;color:${c}">${d.day}/${d.month}${isToday ? ' ★' : ''}</div>
       <div class="zh" style="font-size:.7em;opacity:.6">${d.ganZhi}</div>
       <div style="font-weight:bold;color:${c};font-size:1em">${d.score}</div>
       <div style="font-size:.65em;color:var(--silk-muted)">${d.rating}</div>
-      ${isBest ? '<div style="font-size:.6em;color:#2e9e5b">★ tốt</div>' : isWorst ? '<div style="font-size:.6em;color:#e0533d">⚠ kỵ</div>' : ''}
+      ${isBest ? '<div style="font-size:.6em;color:#2e9e5b">★ tốt</div>' : isWorst ? '<div style="font-size:.6em;color:#e0533d">⚠ kỵ</div>' : isToday ? '<div style="font-size:.6em;color:var(--gold,#d4af37)">← hôm nay</div>' : ''}
     </div>`;
   }).join('');
   $('week-preview').innerHTML = `
