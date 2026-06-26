@@ -1158,7 +1158,7 @@ function renderRemedyLaws(R) {
     el.innerHTML = `
       <p class="hint">${rm.byElement.summary}</p>
       <p class="hint"><b>12 pháp cải vận (chính):</b></p>
-      <ul class="hint" style="margin:4px 0 4px 16px">${rm.twelveLaws.slice(0, 6).map((l) => `<li>${l}</li>`).join('')}</ul>`;
+      <ul class="hint" style="margin:4px 0 4px 16px">${rm.twelveLaws.map((l) => `<li>${l}</li>`).join('')}</ul>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được cải vận.</p>'; }
 }
 
