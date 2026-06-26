@@ -42,11 +42,10 @@ for (const [y, m, d, h, g] of [[1990,5,14,13,'nam'],[1988,11,3,23,'nữ'],[1975,
     if (!cardRow) continue;
     const deep = analyzeLiunianDeep(R, yr);
     const cardBase = cardRow.score - (cardRow.gejuDelta || 0);
-    // 进气退气 dampens toward 50 by factor 0.82-1.0; deep score is base after that.
-    // base = (deepScore - 50) / factor + 50, factor in [0.82,1.0] → base within
-    // [deepScore, deepScore adjusted]. Allow ±18 (max 进气退气 swing ~12 + 格局 ±3 + slack).
     const diff = Math.abs(cardBase - deep.score);
     check(`${tag} ${yr} liunian base consistency (±18)`, diff <= 18, `(cardBase=${cardBase} deep=${deep.score} diff=${diff})`);
+    // [loop 208] activeDayun ganZhi must match (foundation of 大运互动 school consistency)
+    check(`${tag} ${yr} activeDayun ganZhi match`, cardRow.dayunGanZhi === deep.activeDayun, `(card=${cardRow.dayunGanZhi} deep=${deep.activeDayun})`);
   }
 }
 
