@@ -765,6 +765,7 @@ function renderHeluo(R) {
       <p class="cg-interp"><b>后天卦:</b> #${h.houtianHexagram.num} ${h.houtianHexagram.name} (${esc(h.houtianHexagram.nameVi)})${h.yuantang.disputed ? ' <span class="ln-rate rate-hung">⚠ 元堂 DISPUTED</span>' : ''}</p>
       <div class="verse-box"><div class="verse-zh">${esc(h.reading.hexagramText)}</div></div>
       <p class="cg-interp"><b>爻辞 (hào ${h.yuantang.line}):</b> ${esc(h.reading.yuantangLineText)}</p>
+      ${h.reading.houtianHexagramText ? `<p class="cg-interp"><b>后天卦辞:</b> ${esc(h.reading.houtianHexagramText)}</p>` : ''}
       <p class="hint" style="margin-top:6px">河洛理数 (陈抟) — chuyển bát tự sang quẻ 周易 đọc mệnh. Thuật toán 飞支 (三才发秘). ${h.yuantang.disputed ? 'Quẻ N=6 (乾/坤) cổ thư chia theo giới+đông/hạ chí — kết quả nên review thủ công.' : ''}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 河洛理数.</p>'; }
 }
