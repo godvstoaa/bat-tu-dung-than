@@ -1819,6 +1819,26 @@ function renderPlannedBirth(year) {
   }, 50);
 }
 
+// ---------------------------------------------------------------- THÀNH PHỐ HỢP MỆNH 城市風水
+function renderCityFs(R) {
+  const el = $('city-fs');
+  if (!el) return;
+  try {
+    const c = cityRecommendation(R);
+    const arr = (x) => Array.isArray(x) ? x.join(', ') : (x || '');
+    el.innerHTML = `
+      <p><b>Hướng tốt: ${esc(c.bestDirectionVi || '')}</b> (hành ${esc(c.dungVi || '')}) · Loại địa lý lý tưởng: <b>${esc(c.bestCityType?.vi || '')}</b>${c.bestCityType?.benefit ? ' — ' + esc(c.bestCityType.benefit) : ''}</p>
+      ${c.bestCityType?.cities?.length ? `<p class="hint">🏙️ Thành phố VN hợp: <b>${c.bestCityType.cities.map(esc).join(', ')}</b></p>` : ''}
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;margin:6px 0">
+        ${c.careerCityVi ? `<div class="yz-row" style="border-left:3px solid var(--gold);padding:4px 8px"><b>💼 Sự nghiệp</b><br><span class="hint">${esc(c.careerCityVi)}</span></div>` : ''}
+        ${c.wealthCityVi ? `<div class="yz-row" style="border-left:3px solid var(--gold);padding:4px 8px"><b>💰 Tài lộc</b><br><span class="hint">${esc(c.wealthCityVi)}</span></div>` : ''}
+        ${c.healthCity ? `<div class="yz-row" style="border-left:3px solid var(--gold);padding:4px 8px"><b>🏥 Sức khoẻ</b><br><span class="hint">${esc(arr(c.healthCity))}</span></div>` : ''}
+      </div>
+      ${c.avoidCities?.length ? `<p class="hint">⚠ Tránh hướng ${esc(c.avoidDirection || '')} — các vùng: ${c.avoidCities.map((a) => esc(a.vi || a.cities?.join('/') || '')).join('; ')}</p>` : ''}
+      <p class="hint">${esc(c.advice || '')}</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được thành phố hợp mệnh.</p>'; }
+}
+
 function renderLifestyle(R) {
   const el = $('lifestyle');
   if (!el) return;
@@ -2696,6 +2716,7 @@ function run() {
   lazyRender('kongwang-out',   () => { try { renderKongwang(); } catch (e) { console.warn('kongwang', e.message); } });
   lazyRender('suiyun-out',     () => { try { renderSuiyun(); } catch (e) { console.warn('suiyun', e.message); } });
   lazyRender('health-out',     () => { try { renderHealth(currentResult); } catch (e) { console.warn('health', e.message); } });
+  lazyRender('city-fs',        () => { try { renderCityFs(currentResult); } catch (e) { console.warn('city', e.message); } });
   lazyRender('csdeep-out',     () => { try { renderChangshengDeep(); } catch (e) { console.warn('csDeep', e.message); } });
   // renderMarriageDeep() đã gọi ở block immediate (line ~1313) — KHÔNG bọc lại.
   lazyRender('match-out',      () => { try { renderIdealMatch(); } catch (e) { console.warn('idealMatch', e.message); } });
