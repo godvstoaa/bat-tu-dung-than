@@ -4334,9 +4334,18 @@ function renderQuickSummary() {
   try { const ha = healthAlertScan(c, 1); if (ha.alerts.length) { const a = ha.alerts[0]; alert = `⚠ ${a.year}: ${a.level}${a.reasons.length ? ' — ' + a.reasons[0].slice(0, 50) : ''}`; } } catch (e) {}
   // Dụng thần hành động
   const dungAction = { 木: 'màu xanh, hướng Đông, cây cối', 火: 'màu đỏ, hướng Nam, ánh sáng', 土: 'màu vàng, hướng Tây Nam, gốm đá', 金: 'màu trắng, hướng Tây, vật kim loại', 水: 'màu đen/xanh đậm, hướng Bắc, nước' }[yong.primary] || '';
+  // [loop 219] Vận hiện tại — đại运 + lưu niên đang hành (ngữ cảnh giai đoạn đời)
+  let curDyTxt = '(đang tính)';
+  try {
+    const age = new Date().getFullYear() - c.chart.input.year;
+    const dy = (c.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
+    const ln = (c.liunian || []).find((l) => l.isNow);
+    curDyTxt = dy ? `Đại vận <b>${hanviet(dy.ganZhi)}</b> (${dy.startAge}–${dy.startAge + 9}t, ${dy.rating})${ln ? ` · Lưu niên ${hanviet(ln.ganZhi)} (${ln.rating})` : ''}` : '(không rõ)';
+  } catch (e) {}
   const rows = [
     { icon: '🧬', label: 'Mệnh bạn', text: `${pattern.vi || '?'}, thân ${c.strength?.strong ? 'vượng (mạnh)' : 'nhược (yếu)'}. <b>Điểm tổng mệnh: ${syn.score ?? '?'}/100 (${syn.gradeVi ?? '?'})</b>.` },
     { icon: '💊', label: 'Hành cần bổ', text: `Dụng Thần = <b>${dungVi}</b>. Bổ qua ${dungAction}.${yong.tiaohou?.override ? ' ⚠ 调候 LÀM CHỦ (sinh mùa cực đoan).' : ''}` },
+    { icon: '🛤️', label: 'Vận hiện tại', text: curDyTxt },
     { icon: todayTone, label: 'Hôm nay', text: `${todayRating} (${todayScore}/100). ${todayOneLiner}` },
     { icon: '📆', label: 'Tuần này', text: weekSummary || '(đang tính...)' },
     { icon: alert ? '⚠' : '✓', label: alert ? 'Cảnh báo' : 'An tâm', text: alert || 'Không cảnh báo nặng năm nay.' },
