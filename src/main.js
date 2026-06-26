@@ -1413,9 +1413,14 @@ function renderEventPredict(R) {
     const ev = predictEvents(R, startY, 5);
     const rows = ev.years.map((y) => {
       const dupe = y.sameGod ? ' <span class="combo cat">★ NHÂN ĐÔI</span>' : '';
+      // [loop 239] hiển thị lnArea/dyArea + events (trước đây chỉ advice)
+      const lnHtml = y.lnArea ? `<div class="hint"><b>📅 Lưu niên ${esc(y.lnGodVi||'')}</b> → ${esc(y.lnArea)}${y.lnEvents && y.lnEvents.length ? ': ' + y.lnEvents.map(esc).join(', ') : ''}</div>` : '';
+      const dyHtml = y.dyArea ? `<div class="hint"><b>🛤️ Đại vận ${esc(y.dyGodVi||'')}</b> → ${esc(y.dyArea)}${y.dyEvents && y.dyEvents.length ? ': ' + y.dyEvents.map(esc).join(', ') : ''}</div>` : '';
+      const combHtml = y.combinedEvents && y.combinedEvents.length ? `<div class="hint" style="color:var(--gold-bright,#d4af37)"><b>⚡ Kích hoạt kép:</b> ${y.combinedEvents.map(esc).join(', ')}</div>` : '';
       return `<div class="yz-row" style="border-left:3px solid var(--gold-bright, #d4af37);margin:4px 0;padding-left:8px">
-        <b>${y.year}</b> ${esc(y.ganZhi)}${dupe}
-        <div class="hint">${esc(y.advice)}</div>
+        <b>${y.year}</b> <span class="zh">${esc(y.ganZhi)}</span>${dupe}
+        ${lnHtml}${dyHtml}${combHtml}
+        <div class="hint" style="margin-top:2px">${esc(y.advice)}</div>
       </div>`;
     }).join('');
     el.innerHTML = `<p class="hint">Dự báo 5 năm tới theo thập thần năm × đại vận (渊海子平 应期).</p>${rows}`;
