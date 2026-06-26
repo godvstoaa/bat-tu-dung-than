@@ -784,22 +784,22 @@ function renderDailyBriefing(R) {
     const toneVi = b.rating.tone === 'cat' ? 'Cát' : b.rating.tone === 'hung' ? 'Hung' : 'Bình';
     const bestHtml = b.bestHours.map((h) => {
       const r = h.score >= 60 ? 'rate-cat' : h.score >= 45 ? 'rate-mid' : 'rate-hung';
-      return `<span class="ln-rate ${r}" style="margin-right:4px">${h.vi} <b>${h.score}</b></span>`;
+      return `<span class="ln-rate ${r}" style="margin-right:4px">${esc(h.vi)} <b>${esc(String(h.score))}</b></span>`;
     }).join('');
     const avoidHtml = b.avoidHours.map((h) => `<span class="ln-rate rate-hung" style="margin-right:4px">${esc(h.vi)}</span>`).join('');
     const tabooAvoid = b.directionTaboo.avoid.length
-      ? b.directionTaboo.avoid.map((d) => `<span class="ln-rate rate-hung" style="margin-right:4px">${d}</span>`).join('')
+      ? b.directionTaboo.avoid.map((d) => `<span class="ln-rate rate-hung" style="margin-right:4px">${esc(d)}</span>`).join('')
       : '<span class="hint">(không có)</span>';
     const tabooSafe = b.directionTaboo.safe.length
-      ? b.directionTaboo.safe.map((d) => `<span class="ln-rate rate-cat" style="margin-right:4px">${d}</span>`).join('')
+      ? b.directionTaboo.safe.map((d) => `<span class="ln-rate rate-cat" style="margin-right:4px">${esc(d)}</span>`).join('')
       : '';
     const zTone = b.ziweiDaily.tone === 'cat' ? 'rate-cat' : b.ziweiDaily.tone === 'hung' ? 'rate-hung' : 'rate-mid';
 
     el.innerHTML = `
-      <p style="font-size:14.5px;font-weight:700;color:var(--gold,#d4af37);margin:4px 0 8px;line-height:1.45">${b.oneLiner}</p>
+      <p style="font-size:14.5px;font-weight:700;color:var(--gold,#d4af37);margin:4px 0 8px;line-height:1.45">${esc(b.oneLiner)}</p>
       <div class="zr-head" style="margin-bottom:6px">
-        <span class="zh">${b.dayGanZhi}</span> · ÂL ${b.lunarStr || '?'} ·
-        <span class="ln-rate ${rateCls}">${b.rating.level} (${b.rating.score}/100 · ${toneVi})</span>
+        <span class="zh">${esc(b.dayGanZhi)}</span> · ÂL ${esc(b.lunarStr || '?')} ·
+        <span class="ln-rate ${rateCls}">${esc(b.rating.level)} (${esc(String(b.rating.score))}/100 · ${toneVi})</span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:8px;font-size:12.5px">
         <div><b>⏰ Giờ tốt:</b> ${bestHtml || '<span class="hint">—</span>'}</div>
@@ -847,19 +847,19 @@ function renderSanshishu(R) {
       : '';
     el.innerHTML = `
       <div class="cg-head">
-        <div class="cg-total"><span class="zh big">${s.yearGanZhi}</span></div>
-        <div class="cg-tier"><span class="ln-rate rate-mid"><b>${s.pastLife.type} ${s.pastLife.vi}</b></span></div>
+        <div class="cg-total"><span class="zh big">${esc(s.yearGanZhi)}</span></div>
+        <div class="cg-tier"><span class="ln-rate rate-mid"><b>${esc(s.pastLife.type)} ${esc(s.pastLife.vi)}</b></span></div>
       </div>
-      <p class="cg-breakdown hint">Năm sinh ${s.yearGanZhi} (vị ${s.code + 1}/60 hoa giáp, can mang hành ${s.ganWx}) → tiền thế tại <b>${s.pastLife.location}</b></p>
+      <p class="cg-breakdown hint">Năm sinh ${esc(s.yearGanZhi)} (vị ${esc(String(s.code + 1))}/60 hoa giáp, can mang hành ${esc(s.ganWx)}) → tiền thế tại <b>${esc(s.pastLife.location)}</b></p>
       <div class="verse-box">
-        <div class="verse-zh">${s.pastLife.verse}</div>
+        <div class="verse-zh">${esc(s.pastLife.verse)}</div>
       </div>
-      <p class="cg-interp"><b>♛ Nhân quả kiếp trước:</b> ${s.karma.vi}</p>
+      <p class="cg-interp"><b>♛ Nhân quả kiếp trước:</b> ${esc(s.karma.vi)}</p>
       ${s.karma.cause && s.karma.cause !== s.karma.vi ? `<p class="hint">📖 Nguyên nhân: ${esc(s.karma.cause)}</p>` : ''}
-      <p class="cg-interp"><b>☞ Phúc hoạ kiếp này:</b> ${s.currentLife.vi}</p>
+      <p class="cg-interp"><b>☞ Phúc hoạ kiếp này:</b> ${esc(s.currentLife.vi)}</p>
       ${s.currentLife.fortune && s.currentLife.fortune !== s.currentLife.vi ? `<p class="hint">🔮 Chi tiết: ${esc(s.currentLife.fortune)}</p>` : ''}
-      ${s.boneCross ? `<p class="hint"><span class="ln-rate ${boneTone}"><b>称骨三世:</b></span> ${s.boneCross.vi}</p>` : ''}
-      <p class="hint" style="margin-top:6px">⚠ ${s.disclaimer}</p>`;
+      ${s.boneCross ? `<p class="hint"><span class="ln-rate ${boneTone}"><b>称骨三世:</b></span> ${esc(s.boneCross.vi)}</p>` : ''}
+      <p class="hint" style="margin-top:6px">⚠ ${esc(s.disclaimer)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 三世书.</p>'; }
 }
 
@@ -916,11 +916,11 @@ function renderStarPower(R) {
     const tone = (v) => v === '有力' ? 'cat' : v === '藏而不透' ? 'mid' : 'hung';
     el.innerHTML = sp.items.map((x) => `
       <div class="sp-item">
-        <div class="sp-star">${x.starVi} <span class="${wxClass(x.wx)}">${x.wxVi}</span></div>
-        <div class="sp-area hint">${x.area}</div>
-        <div class="sp-verdict ${tone(x.verdict)}">${x.verdict} <span class="hint">(căn ${x.root}, lộ ${x.reveal}, mùa ${x.season})</span></div>
+        <div class="sp-star">${esc(x.starVi)} <span class="${wxClass(x.wx)}">${esc(x.wxVi)}</span></div>
+        <div class="sp-area hint">${esc(x.area)}</div>
+        <div class="sp-verdict ${tone(x.verdict)}">${esc(x.verdict)} <span class="hint">(căn ${esc(x.root)}, lộ ${esc(x.reveal)}, mùa ${esc(x.season)})</span></div>
         <div class="sp-vi hint">${esc(x.verdictVi || '')}</div>
-      </div>`).join('') + `<p class="hint" style="margin-top:6px">${sp.summary}</p>`;
+      </div>`).join('') + `<p class="hint" style="margin-top:6px">${esc(sp.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được sao trọng điểm.</p>'; }
 }
 
@@ -1012,8 +1012,8 @@ function renderIdealHouse(R) {
     const h = idealHouse(R, 20);
     el.innerHTML = `<p class="hint">${esc(h.grpVi)} ${esc(h.gua)}. Hướng cát tốt nhất: <b>${h.bestFacing ? esc(h.bestFacing.dir) + ' (' + esc(h.bestFacing.star.split(' (')[0]) + ')' : '?'}</b>.</p>` +
       `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">
-        <div><b style="color:var(--cat,#2a7)">Tầng TỐT</b>: ${h.idealFloors.map((f) => 'T' + f.floor).join(', ')}</div>
-        <div><b style="color:var(--hung,#c33)">Tầng TRÁNH</b>: ${h.avoidFloors.map((f) => 'T' + f.floor).join(', ')}</div>
+        <div><b style="color:var(--cat,#2a7)">Tầng TỐT</b>: ${h.idealFloors.map((f) => 'T' + esc(String(f.floor))).join(', ')}</div>
+        <div><b style="color:var(--hung,#c33)">Tầng TRÁNH</b>: ${h.avoidFloors.map((f) => 'T' + esc(String(f.floor))).join(', ')}</div>
       </div>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được lý tưởng nhà.</p>'; }
 }
@@ -1491,9 +1491,9 @@ function renderTaisuiGeneral(R) {
   try {
     const ov = taiSuiOverview(R, new Date().getFullYear());
     el.innerHTML = `
-      <p>Trị niên <b>${ov.current.ganZhi}</b> = <b>${ov.current.name}</b> (vị ${ov.current.index}/60). ${ov.current.note}</p>
+      <p>Trị niên <b>${esc(ov.current.ganZhi)}</b> = <b>${esc(ov.current.name)}</b> (vị ${esc(String(ov.current.index))}/60). ${esc(ov.current.note)}</p>
       ${ov.isBenMingYear ? '<div class="tiaohou-note" style="border-color:var(--cinnabar)"><b>⚠ NĂM THÂN (本命年):</b> Chi năm = chi tuổi sinh → năm biến động lớn, cổ khuyên «犯太岁» → hóa giải (佩生肖 tam hợp, tránh động thổ phương TS, tích đức).</div>' : ''}
-      <p class="hint">Bản mệnh TS (năm sinh ${ov.natal.ganZhi}) = ${ov.natal.name}${ov.natal.note ? ' — ' + esc(ov.natal.note) : ''}.</p>`;
+      <p class="hint">Bản mệnh TS (năm sinh ${esc(ov.natal.ganZhi)}) = ${esc(ov.natal.name)}${ov.natal.note ? ' — ' + esc(ov.natal.note) : ''}.</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 60 thái tuế.</p>'; }
 }
 
@@ -3544,14 +3544,14 @@ function renderLiunian12Shen(year) {
   const mine = r.mine;
   const Z = (z) => ZHI[z]?.con || z;
   $('lns12').innerHTML = `
-    <div class="ts-head">Năm ${r.year} (<span class="zh">${r.yearZhi}</span>) · tuổi bạn <b>${Z(r.birthZhi)} (${r.birthZhi})</b> ở vị trí <b>${mine.position}</b>: <span class="ln-rate ${cls(mine.tone)}"><b>${mine.spirit} ${mine.vi}</b> · 副星 ${mine.subStar} (${mine.viSub})</span></div>
-    <p class="ly-snote" style="margin:8px 0">${mine.meaning}</p>
-    <div class="tiaohou-note" style="border-color:${mine.tone === 'hung' ? '#c0392b' : '#2e9e5b'};background:${mine.tone === 'hung' ? 'rgba(192,57,43,0.07)' : 'rgba(46,158,91,0.08)'}"><b>${mine.tone === 'hung' ? 'Hoá giải' : 'Tận dụng'}:</b> ${mine.advice}</div>
+    <div class="ts-head">Năm ${esc(String(r.year))} (<span class="zh">${esc(r.yearZhi)}</span>) · tuổi bạn <b>${esc(Z(r.birthZhi))} (${esc(r.birthZhi)})</b> ở vị trí <b>${esc(mine.position)}</b>: <span class="ln-rate ${cls(mine.tone)}"><b>${esc(mine.spirit)} ${esc(mine.vi)}</b> · 副星 ${esc(mine.subStar)} (${esc(mine.viSub)})</span></div>
+    <p class="ly-snote" style="margin:8px 0">${esc(mine.meaning)}</p>
+    <div class="tiaohou-note" style="border-color:${mine.tone === 'hung' ? '#c0392b' : '#2e9e5b'};background:${mine.tone === 'hung' ? 'rgba(192,57,43,0.07)' : 'rgba(46,158,91,0.08)'}"><b>${mine.tone === 'hung' ? 'Hoá giải' : 'Tận dụng'}:</b> ${esc(mine.advice)}</div>
     <h4 class="syn-h4" style="margin-top:12px">12 vị trí thần sát (主星 + 副星) theo chi tuổi</h4>
-    <div class="lm-grid">${r.positions.map((p) => `<div class="lm-cell ${p.isMine ? 'me' : ''}" title="${p.subStar} (${p.viSub})">
-      <div class="lm-m">${Z(p.atZhi)}</div>
-      <div class="zh">${p.spirit}</div>
-      <div class="zh" style="font-size:10px;opacity:.75">${p.subStar}</div>
+    <div class="lm-grid">${r.positions.map((p) => `<div class="lm-cell ${p.isMine ? 'me' : ''}" title="${esc(p.subStar)} (${esc(p.viSub)})">
+      <div class="lm-m">${esc(Z(p.atZhi))}</div>
+      <div class="zh">${esc(p.spirit)}</div>
+      <div class="zh" style="font-size:10px;opacity:.75">${esc(p.subStar)}</div>
       <div class="ln-rate ${cls(p.tone)}" style="font-size:10px">${label(p.tone)}</div>
     </div>`).join('')}</div>
     <div class="syn-factors" style="margin-top:10px;font-size:12px">
@@ -3611,15 +3611,15 @@ function renderMangpaiView(R) {
   const hgRow = (k, star) => {
     const g = hg[k];
     const sitsCls = g.sitsAt.startsWith('主') ? 'rate-cat' : g.sitsAt.startsWith('宾') ? 'rate-mid' : 'rate-bad';
-    return `<tr><td class="zh big">${k}</td><td>${star}</td><td>${g.weightHost}</td><td>${g.weightGuest}</td>
-      <td><span class="ln-rate ${sitsCls}">${g.sitsAt}</span></td>
-      <td class="mpv-read">${g.reading}</td></tr>`;
+    return `<tr><td class="zh big">${esc(k)}</td><td>${esc(star)}</td><td>${esc(g.weightHost)}</td><td>${esc(g.weightGuest)}</td>
+      <td><span class="ln-rate ${sitsCls}">${esc(g.sitsAt)}</span></td>
+      <td class="mpv-read">${esc(g.reading)}</td></tr>`;
   };
   const matched = v.classicalRules.filter((r) => r.matched);
   const unmatched = v.classicalRules.filter((r) => !r.matched);
   $('mangpai-view').innerHTML = `
     <div class="mpv-note">⚠ ${v.label} — đây là lăng kính <b>khác</b> với Tử Bình (dụng thần/cách cục) ở trên, chỉ bổ sung, không thay thế.</div>
-    <div class="mpv-sub">日主 <span class="zh big">${v.dayGan}</span> · ${wxVi(v.dayWx)} · Thân ${v.isStrong ? 'vượng' : 'nhược'}</div>
+    <div class="mpv-sub">日主 <span class="zh big">${esc(v.dayGan)}</span> · ${esc(wxVi(v.dayWx))} · Thân ${v.isStrong ? 'vượng' : 'nhược'}</div>
     <h4 class="mpv-h">① 宾主定位 <span class="hint-inline">主=Trụ Ngày, 宾=ba trụ kia</span></h4>
     <table class="mpv-table">
       <thead><tr><th>Nhóm</th><th>Thập thần</th><th>Trọng 主</th><th>Trọng 宾</th><th>Tọa</th><th>Đọc</th></tr></thead>
@@ -3710,14 +3710,14 @@ function renderDagua() {
 
 // ---------------------------------------------------------------- MAI HOA DỊCH SỐ
 function renderMeihua(g) {
-  const tri = (t) => `${TRIGRAMS[t.tri].img} <b>${t.tri}</b> ${t.tri in {乾:'Càn',兑:'Đoài',离:'Ly',震:'Chấn',巽:'Tốn',坎:'Khảm',艮:'Cấn',坤:'Khôn'} ? TRIGRAMS[t.tri].vi : ''} (${t.wx} · ${TRIGRAMS[t.tri].ele})`;
+  const tri = (t) => `${TRIGRAMS[t.tri].img} <b>${esc(t.tri)}</b> ${t.tri in {乾:'Càn',兑:'Đoài',离:'Ly',震:'Chấn',巽:'Tốn',坎:'Khảm',艮:'Cấn',坤:'Khôn'} ? esc(TRIGRAMS[t.tri].vi) : ''} (${esc(t.wx)} · ${esc(TRIGRAMS[t.tri].ele)})`;
   const luckCls = (l) => l === '大吉' || l === '吉' ? 'rate-cat' : l === '大凶' || l === '不吉' ? 'rate-hung' : 'rate-mid';
   $('meihua').innerHTML = `
-    <div class="mh-ben">本卦 <span class="zh big">${g.name}</span> <span class="hint-inline">(上${g.upper} ☐ 下${g.lower}) · động hào ${g.dong} (${g.dongInUpper ? 'thượng' : 'hạ'})</span></div>
+    <div class="mh-ben">本卦 <span class="zh big">${esc(g.name)}</span> <span class="hint-inline">(上${esc(g.upper)} ☐ 下${esc(g.lower)}) · động hào ${esc(String(g.dong))} (${g.dongInUpper ? 'thượng' : 'hạ'})</span></div>
     <div class="mh-tiyong"><div class="mh-ti"><b>体</b> (mình): ${tri(g.ti)}</div><div class="mh-yong"><b>用</b> (việc/sự): ${tri(g.yong)}</div></div>
-    <div class="mh-rel">Quan hệ: <b>${g.rel.k}</b> → <span class="ln-rate ${luckCls(g.rel.luck)}">${g.rel.luck}</span>. ${g.rel.vi}</div>
-    <div class="mh-hubi">互卦 <b>${g.hu.name}</b> (quá trình · ${g.huRel.k}) · 变卦 <b>${g.bian.name}</b> (kết quả · ${g.bianRel.k})</div>
-    <div class="zr-advice">→ ${g.verdict}</div>`;
+    <div class="mh-rel">Quan hệ: <b>${esc(g.rel.k)}</b> → <span class="ln-rate ${luckCls(g.rel.luck)}">${esc(g.rel.luck)}</span>. ${esc(g.rel.vi)}</div>
+    <div class="mh-hubi">互卦 <b>${esc(g.hu.name)}</b> (quá trình · ${esc(g.huRel.k)}) · 变卦 <b>${esc(g.bian.name)}</b> (kết quả · ${esc(g.bianRel.k)})</div>
+    <div class="zr-advice">→ ${esc(g.verdict)}</div>`;
 }
 function runMeihuaTime() {
   const v = $('mh-date').value; if (!v) return;
@@ -3918,26 +3918,26 @@ function runQimen() {
   const d2 = r.dong;
   const gongName = (g) => r.pan.find((p) => p.gong === g)?.dir.split(' ')[0] || g;
   $('qimen').innerHTML = `
-    <div class="qm-head">Tiết <b>${r.term}</b> · ${r.yuan} → <b>${r.yinYang}遁 ${r.ju}局</b> <span class="hint-inline">(戊起 cung ${r.ju})</span></div>
+    <div class="qm-head">Tiết <b>${esc(r.term)}</b> · ${esc(r.yuan)} → <b>${esc(r.yinYang)}遁 ${esc(r.ju)}局</b> <span class="hint-inline">(戊起 cung ${esc(r.ju)})</span></div>
     <div class="qm-dong">
-      <span>时柱 <b>${d2.hourGanZhi}</b></span>
-      <span>旬首 ${d2.xunName}→${d2.xunYi}@cung${d2.xunGong}</span>
-      <span>值符星 <b>${d2.zhiFuStar}</b> <span class="hint-inline">${d2.zhiFuStarVi}</span></span>
-      <span>值使门 <b>${d2.zhiShiDoor}</b></span>
-      <span>值符随时干 → 落 cung ${d2.zhiFuLanding} (${gongName(d2.zhiFuLanding)})</span>
-      <span>值使随时支 → 落 cung ${d2.zhiShiLanding}</span>
+      <span>时柱 <b>${esc(d2.hourGanZhi)}</b></span>
+      <span>旬首 ${esc(d2.xunName)}→${esc(d2.xunYi)}@cung${esc(d2.xunGong)}</span>
+      <span>值符星 <b>${esc(d2.zhiFuStar)}</b> <span class="hint-inline">${esc(d2.zhiFuStarVi)}</span></span>
+      <span>值使门 <b>${esc(d2.zhiShiDoor)}</b></span>
+      <span>值符随时干 → 落 cung ${esc(String(d2.zhiFuLanding))} (${esc(gongName(d2.zhiFuLanding))})</span>
+      <span>值使随时支 → 落 cung ${esc(String(d2.zhiShiLanding))}</span>
     </div>
     <div class="qm-grid">${r.pan.map((p) => `
       <div class="qm-cell ${p.isCat ? 'cat' : ''} ${p.gong === d2.zhiFuLanding ? 'zhifu' : ''} ${p.gong === 5 ? 'mid' : ''}">
-        <div class="qm-dir">${p.gong}. ${p.dir.split(' ')[0]}</div>
-        <div class="qm-qiyi zh">${p.qiyi}</div>
-        <div class="qm-star">${p.star}</div>
-        <div class="qm-door ${JI_DOOR_SET.has(p.door) ? 'ji' : ''}">${p.door}门</div>
+        <div class="qm-dir">${esc(String(p.gong))}. ${esc(p.dir.split(' ')[0])}</div>
+        <div class="qm-qiyi zh">${esc(p.qiyi)}</div>
+        <div class="qm-star">${esc(p.star)}</div>
+        <div class="qm-door ${JI_DOOR_SET.has(p.door) ? 'ji' : ''}">${esc(p.door)}门</div>
         ${p.isCat ? '<div class="qm-cat">★吉格</div>' : ''}
         ${p.gong === d2.zhiFuLanding ? '<div class="qm-cat">值符</div>' : ''}
       </div>`).join('')}</div>
-    <div class="zr-advice">${r.advice}</div>
-    <p class="hint">动盘: 值符随时干/值使随时支/八神直符随值符星 — 9 cung hiển thị = 静盘(地盘三奇六仪+九星本位+八门定宫). ${r.note}</p>`;
+    <div class="zr-advice">${esc(r.advice)}</div>
+    <p class="hint">动盘: 值符随时干/值使随时支/八神直符随值符星 — 9 cung hiển thị = 静盘(地盘三奇六仪+九星本位+八门定宫). ${esc(r.note)}</p>`;
 }
 const JI_DOOR_SET = new Set(['开', '休', '生']);
 
@@ -3946,12 +3946,12 @@ function renderGaimenh(R) {
   const g = gaimenhPlan(R, { year: new Date().getFullYear() });
   const tone = (p) => p.sev === 'cao' ? 'rate-hung' : p.sev === 'trung' ? 'rate-bad' : 'rate-mid';
   $('gaimenh').innerHTML = `
-    <div class="gm-verdict">${g.verdict}</div>
+    <div class="gm-verdict">${esc(g.verdict)}</div>
     <h4 class="syn-h4">🎯 Chẩn đoán bệnh ưu tiên</h4>
-    <div class="gm-diag">${g.diagnosis.map((p) => `<div class="gm-p"><span class="ln-rate ${tone(p)}">${p.sev}</span> <b>${p.t}</b> — ${p.d}</div>`).join('')}</div>
+    <div class="gm-diag">${g.diagnosis.map((p) => `<div class="gm-p"><span class="ln-rate ${tone(p)}">${esc(p.sev)}</span> <b>${esc(p.t)}</b> — ${esc(p.d)}</div>`).join('')}</div>
     <h4 class="syn-h4">📋 Kế hoạch 6 tầng (áp theo thứ tự)</h4>
     <div class="gm-layers">${g.layers.map((l) => `
-      <div class="gm-layer"><div class="gm-lname">${l.name}</div><ul>${l.acts.map((a) => `<li>${a}</li>`).join('')}</ul></div>
+      <div class="gm-layer"><div class="gm-lname">${esc(l.name)}</div><ul>${l.acts.map((a) => `<li>${esc(a)}</li>`).join('')}</ul></div>
     `).join('')}</div>
     <div class="remedy-core">“Số không bất biến” — 5 tầng đầu là <b>thuận vận</b> (giảm xấu/đón tốt); tầng 6 <b>Tích Âm Đức</b> mới thật <b>nghịch thiên</b> đổi số cốt lõi (了凡四训).</div>`;
 }
@@ -4045,8 +4045,8 @@ function runZheriFind() {
   const act = $('zr-act').value;
   const userZhi = currentResult ? currentResult.chart.pillars.year.zhi : null;
   const list = findGoodDates(y, m, d, 30, act, userZhi, 6);
-  $('zr-out').innerHTML = `<p class="hint">Top ${list.length} ngày tốt nhất cho «${ACTIVITY[act].label}» trong 30 ngày tới${userZhi ? ' (loại trừ xung tuổi)' : ''}:</p>
-    <div class="zr-list">${list.map((g) => `<div class="zr-item"><b>${g.solar}</b> <span class="zh">${g.dayGanZhi}</span> trực ${g.officerVi} <span class="ln-rate ${g.score >= 65 ? 'rate-cat' : 'rate-mid'}">${g.rating} ${g.score}</span></div>`).join('')}</div>`;
+  $('zr-out').innerHTML = `<p class="hint">Top ${esc(String(list.length))} ngày tốt nhất cho «${esc(ACTIVITY[act].label)}» trong 30 ngày tới${userZhi ? ' (loại trừ xung tuổi)' : ''}:</p>
+    <div class="zr-list">${list.map((g) => `<div class="zr-item"><b>${esc(g.solar)}</b> <span class="zh">${esc(g.dayGanZhi)}</span> trực ${esc(g.officerVi)} <span class="ln-rate ${g.score >= 65 ? 'rate-cat' : 'rate-mid'}">${esc(g.rating)} ${esc(String(g.score))}</span></div>`).join('')}</div>`;
 }
 function runHehun() {
   const ad = $('hh-a-date').value, bd = $('hh-b-date').value;
@@ -5255,14 +5255,14 @@ function renderSensitivity() {
     const pct = max > min ? Math.round(((h.score - min) / (max - min)) * 100) : 50;
     const tone = h.score >= 62 ? '#2e7d32' : h.score >= 46 ? '#b8860b' : '#c62828';
     const user = h.isUser ? ' ★bạn' : '';
-    return `<span title="${h.shichenVi}(${h.shichen})时 = ${h.score}đ" style="display:inline-block;width:34px;text-align:center;font-size:.7em;vertical-align:bottom">
-      <b>${h.score}</b><span style="display:block;height:${Math.max(4, pct * 0.4)}px;background:${tone};border-radius:2px;border:${h.isUser?'2px solid #1565c0':'none'}"></span>${h.shichenVi}${user}</span>`;
+    return `<span title="${esc(h.shichenVi)}(${esc(h.shichen)})时 = ${esc(String(h.score))}đ" style="display:inline-block;width:34px;text-align:center;font-size:.7em;vertical-align:bottom">
+      <b>${esc(String(h.score))}</b><span style="display:block;height:${Math.max(4, pct * 0.4)}px;background:${tone};border-radius:2px;border:${h.isUser?'2px solid #1565c0':'none'}"></span>${esc(h.shichenVi)}${user}</span>`;
   }).join('');
-  const dayVaryStr = s.dayVary && s.dayVary.length ? s.dayVary.map((d) => `<b>${d.offset > 0 ? '+' : ''}${d.offset}ngày</b>:${d.score}đ`).join(' · ') : '';
+  const dayVaryStr = s.dayVary && s.dayVary.length ? s.dayVary.map((d) => `<b>${d.offset > 0 ? '+' : ''}${esc(String(d.offset))}ngày</b>:${esc(String(d.score))}đ`).join(' · ') : '';
   $('sensitivity').innerHTML = `
-    <p class="hint">Điểm mệnh của bạn: <b>${s.baseScore}đ</b> @ ${s.baseShichenVi}(${s.baseShichen})时 · dao động khi đổi 时辰: <b>${s.spread}đ</b> (${s.min}→${s.max}).</p>
+    <p class="hint">Điểm mệnh của bạn: <b>${esc(String(s.baseScore))}đ</b> @ ${esc(s.baseShichenVi)}(${esc(s.baseShichen)})时 · dao động khi đổi 时辰: <b>${esc(String(s.spread))}đ</b> (${esc(String(s.min))}→${esc(String(s.max))}).</p>
     <div style="display:flex;align-items:flex-end;gap:1px;margin:6px 0;flex-wrap:wrap">${bars}</div>
-    <p style="margin:6px 0">📊 ${s.insight}</p>
+    <p style="margin:6px 0">📊 ${esc(s.insight)}</p>
     ${dayVaryStr ? `<p class="hint">Đổi NGÀY sinh (±2): ${dayVaryStr} — xem ngày cũng tác động bao nhiêu.</p>` : ''}`;
 }
 
@@ -5356,7 +5356,7 @@ function renderExtraShensha(){
     const es = computeExtraShensha(currentResult.chart);
     if(!es.length) return;
     const html = es.map(function(s) {
-      return '<div class="ss volatile"><div class="ss-zh">' + s.star + '</div><div class="ss-vi">' + s.vi + ' @' + s.at + '</div><div class="ss-desc">' + s.desc + '</div></div>';
+      return '<div class="ss volatile"><div class="ss-zh">' + esc(s.star) + '</div><div class="ss-vi">' + esc(s.vi) + ' @' + esc(s.at) + '</div><div class="ss-desc">' + esc(s.desc) + '</div></div>';
     }).join('');
     const el = document.getElementById('shensha-extra-out');
     if (el) el.innerHTML = '<div class="shensha" style="margin-top:8px">' + html + '</div>';
