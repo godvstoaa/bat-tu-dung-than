@@ -996,7 +996,11 @@ function renderTongGen(R) {
       <p>Dụng <b>${d.wxVi}</b>: <span class="${tone}"><b>${d.verdict}</b></span> (căn ${d.root.total}, lộ ${d.reveal.length}, mùa ${d.seasonVi}) — ${d.verdictVi}</p>
       ${forceBar}
       ${d.verdict === '藏而不透' ? `<p class="hint">⏳ Đợi lưu niên can ${tg.whenReveal.join('/')} thấu ra mới phát Dụng.</p>` : ''}
-      <p class="hint">Nhật Chủ ${tg.dm.wxVi}: ${tg.dm.verdict} (${tg.dm.seasonVi}).</p>`;
+      <p class="hint">Nhật Chủ ${tg.dm.wxVi}: ${tg.dm.verdict} (${tg.dm.seasonVi}).</p>
+      ${(d.root.roots && d.root.roots.length) || (tg.dm.root && tg.dm.root.roots && tg.dm.root.roots.length) ? `<details style="margin:4px 0"><summary class="hint">🔍 Chi tiết thông căn (trụ nào có gốc)</summary>
+        ${d.root.roots && d.root.roots.length ? `<p class="hint"><b>Dụng ${d.wxVi} căn tại:</b> ${d.root.roots.map((r) => `${esc(r.vi)}(${esc(r.zhi)}=${esc(r.stem)},${esc(r.pos)},${r.weight})`).join('; ')}.</p>` : ''}
+        ${tg.dm.root && tg.dm.root.roots && tg.dm.root.roots.length ? `<p class="hint"><b>Nhật Chủ căn tại:</b> ${tg.dm.root.roots.map((r) => `${esc(r.vi)}(${esc(r.zhi)}=${esc(r.stem)},${esc(r.pos)},${r.weight})`).join('; ')}.</p>` : ''}
+      </details>` : ''}`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được thông căn thấu cán.</p>'; }
 }
 
