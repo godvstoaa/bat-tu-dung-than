@@ -2499,7 +2499,7 @@ const _lazyIO = (typeof IntersectionObserver !== 'undefined')
           const fn = ent.target.__lazyRender;
           if (fn && !_lazyRendered.has(ent.target)) {
             _lazyRendered.add(ent.target);
-            try { fn(); } catch (e) { console.warn('lazyRender', e.message); }
+            try { fn(); } catch (e) { console.warn('lazyRender', e.message); if (ent.target && !ent.target.innerHTML.trim()) ent.target.innerHTML = '<p class="hint">Không hiển thị được mục này — thử phân tích lại.</p>'; }
           }
           _lazyIO.unobserve(ent.target);
         }
