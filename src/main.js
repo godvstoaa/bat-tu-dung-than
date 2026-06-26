@@ -4038,6 +4038,16 @@ $('yd-btn').addEventListener('click', () => {
 });
 
 $('print-btn')?.addEventListener('click', () => window.print());
+// [loop 278] force-open all <details> for print — CSS display:block !important
+//   doesn't override browser's built-in details hiding. Without this, all
+//   collapsible sections (factors/tonggen roots/sanyuan/jiaoyun/etc.) are
+//   MISSING from the print/PDF.
+window.addEventListener('beforeprint', () => {
+  document.querySelectorAll('details:not([open])').forEach((d) => { d.setAttribute('open', ''); d.dataset._printOpened = '1'; });
+});
+window.addEventListener('afterprint', () => {
+  document.querySelectorAll('details[data-_printOpened]').forEach((d) => { d.removeAttribute('open'); delete d.dataset._printOpened; });
+});
 
 $('ev-btn')?.addEventListener('click', () => {
   if (!currentResult) { $('event-verify').innerHTML = '<p class="hint">Nhập ngày sinh rồi luận giải trước.</p>'; return; }
