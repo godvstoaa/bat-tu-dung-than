@@ -107,7 +107,11 @@ export function extendBrief(R) {
     }
     // [loop 536] 鬼谷子分定經 (两头钳) — 年干×时干 → 配卦 → 命格 (VN translated)
     const fdg = guiguziFDG(R);
-    if (fdg) parts.push(`鬼谷子分定經 LIẾU ĐẦU KÈM: ${fdg.combo} → quẻ ${fdg.guaVi} (cách「${fdg.geMing}」). ${fdg.star ? fdg.star + ': ' : ''}${fdg.starDesc || ''} ${fdg.guaMeaning || ''}`);
+    if (fdg) {
+      let line = `鬼谷子分定經 LIẾU ĐẦU KÈM: ${fdg.combo} → quẻ ${fdg.guaVi} (cách「${fdg.geMing}」). ${fdg.star ? fdg.star + ': ' : ''}${fdg.starDesc || ''} ${fdg.guaMeaning || ''}`;
+      if (fdg.geShiVi) line += ` 格诗VN: ${fdg.geShiVi}`;
+      parts.push(line);
+    }
   } catch (e) {}
   // [loop 526] 日柱納音 personality — bản chất bẩm sinh theo nạp âm NGÀY
   try {

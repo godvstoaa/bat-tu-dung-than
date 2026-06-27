@@ -1994,6 +1994,14 @@ const dnpR = dayNayinPersonality(spR);
 assert(dnpR && dnpR.dayJiaZi && dnpR.nayin && dnpR.traits, `dayNayinPersonality returns traits (got ${dnpR?.nayin})`);
 assert(dnpR.strength && dnpR.weakness && dnpR.compat, 'dayNayinPersonality has strength/weakness/compat');
 console.log(`   日柱納音: ${dnpR.dayJiaZi} ${dnpR.nayin} (${dnpR.vi}) — ${dnpR.nature} ✓`);
+// [loop 539] guiguzi-fdg coverage
+import { guiguziFDG } from './src/engine/guiguzi-fdg.js';
+const fdgR = guiguziFDG(spR);
+assert(fdgR && fdgR.combo && fdgR.gua && fdgR.geMing, `guiguziFDG returns combo+gua+geMing (got ${fdgR?.combo})`);
+assert(fdgR.guaVi && fdgR.guaMeaning, 'guiguziFDG has VN guaMeaning');
+assert(fdgR.starDesc && fdgR.starDesc.length > 20, `guiguziFDG has starDesc VN (got ${fdgR.starDesc?.length} chars)`);
+assert(!fdgR.starDesc.includes('chưa encode'), 'guiguziFDG starDesc is VN (not placeholder)');
+console.log(`   鬼谷子分定經: ${fdgR.combo} → ${fdgR.guaVi},「${fdgR.geMing}」✓`);
 
 // ################## 48. 10 NĂM TỚI 一览 (decade forecast) ##################
 import { decadeForecast } from './src/engine/decade-forecast.js';

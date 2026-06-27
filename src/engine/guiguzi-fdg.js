@@ -96,6 +96,30 @@ const STARS = {
   '甲癸': { star: 'Thiên Phúc - Thiên Tinh - Văn Quý', desc: 'Cơ mưu sâu, đa học thiểu thành, thẳng tính khẩu độc, dễ使人 trách. Trải qua nhiều trước khi phát. Lục thân khó trọn.' },
 };
 
+// [loop 539] 格诗 (4 câu thơ đoán mệnh) — từ 永樂大典 crawled data + dịch VN
+const GE_SHI = {
+  '甲甲': { shi: '長天忽震雷霆響，凜凜帷中獨有威。驚散雁鴻飛塞遠，狂風飄散落花枝。',
+    vn: 'Trời xanh chợt sấm vang rền — uy quyền rợn ngợp một mình vươn cao. Nhạn bay tản mác biên cương xa — gió cuốn hoa rơi tàn tạ. (Vận: uy lực bẩm sinh nhưng dễ cô đơn, cần khiêm nhường)' },
+  '甲乙': { shi: '群群雁過遠離塞，雨打鴛鴦各自飛。縱有海風吹不斷，也須相守自相宜。',
+    vn: 'Đàn nhạn bay xa khỏi ải — mưa đánh uyên ương mỗi phía bay. Dù gió biển không đứt — cũng cần giữ nhau mới yên. (Vận: tình duyên trắc trở đầu đời, bình yên cuối đời)' },
+  '甲丙': { shi: '遙遙千里見波濤，獨有心機志氣高。故國豈無根葉在，爭名圖利逢蕭條。',
+    vn: 'Ngàn dặm xa thấy sóng trào — một mình mưu trí chí cao. Quê nhà có gốc lá — tranh danh gặp lúc tiêu điều. (Vận: tài cao nhưng thời cuộc khó, cần kiên nhẫn đợi thời)' },
+  '甲丁': { shi: '祖計紛紛東又西，綠楊深處子規啼。山空霧潤猿聲切，澗遠林深鳥倦飛。',
+    vn: 'Kế tổ rối ren đông tây — bụi dương sâu chim quyên kêu. Núi trống sương ướt vượn kêu thiết — suối xa rừng sâu chim mệt bay. (Vận: phiêu bạt, đa sầu, cần an cư lập nghiệp)' },
+  '甲戊': { shi: '漁父歸莊利祿名，旗橫隨後詔宣城。年來塞外思鄉國，游水中心逐浪平。',
+    vn: 'Ngư phủ về làng danh lợi — cờ theo sau chiếu triệu về thành. Năm tháng biên cương nhớ quê — dòng nước giữa lòng theo sóng yên. (Vận: vất vả sớm, an cư muộn, nên rời quê lập nghiệp)' },
+  '甲己': { shi: '鳳凰池上釣連鰲，風卷長沙逐浪濤。應過碧天群失隊，違親背祖奮身高。',
+    vn: 'Hồ phượng câu liền cá rồng — gió cuốn cát dài theo sóng trào. Nhạn xanh bay qua lạc đàn — lìa thân bỏ tổ tự vươn lên. (Vận: tự lập, nên rời quê, thành tựu muộn)' },
+  '甲庚': { shi: '女嫁男婚寡與，心靈機巧性居閒。江邊雁伴飛南北，百歲榮華醉夢間。',
+    vn: 'Gả vợ cưới chồng ai cùng — tâm linh cơ khéo tính an nhàn. Nhạn bờ sông nam bắc — trăm tuổi vinh hoa trong mộng say. (Vận: tài năng nhưng an nhàn quá, cần chủ động)' },
+  '甲辛': { shi: '金烏明處蟾蜍黑，高山險處不須行。雁過長江波浪急，平生活計破中成。',
+    vn: 'Mặt trời sáng chỗ trăng tối — núi cao chỗ hiểm chớ hành. Nhạn qua sông dài sóng gấp — đời người mưu kế vỡ giữa đường. (Vận: khó khăn nhiều, mưu sự hay vỡ, cần cẩn trọng)' },
+  '甲壬': { shi: '春來芳草依依綠，雪散紛紛見枯竹。空中群雁各東西，傷情獨向灘邊宿。',
+    vn: 'Mùa xuân cỏ thơm xanh rờn — tuyết tan lộ trúc khô khô. Trời xanh nhạn bay mỗi hướng — buồn tình một mình ngủ bờ sông. (Vận: có lúc tốt xấu đan xen, cô đơn, cần kiên nhẫn)' },
+  '甲癸': { shi: '年光迅速催人老，風過瀟湘春又秋。雁過碧天沙塞遠，雨殘花敗果難收。',
+    vn: 'Năm tháng thoi đưa giục người già — gió qua Tương Hồ xuân lại thu. Nhạn trời xanh cát biên xa — mưa tàn hoa dạ quả khó thu. (Vận: thời gian trôi nhanh, cần tranh thủ cơ hội sớm)' },
+};
+
 /**
  * @param {object} R — kết quả analyze()
  * @returns {{ yearGan, hourGan, combo, gua, guaVi, geMing, star, starDesc, guaMeaning, summary }}
@@ -125,11 +149,13 @@ export function guiguziFDG(R) {
       desc: `${guaInfo.meaning} Năm ${yearGan}: ${ganNat}. Giờ ${hourGan}: ${hourNat}. Cách "${geMing}" ám chỉ: ${interpGeMing(geMing)}.`,
     };
   }
+  const shiInfo = GE_SHI[combo];
   const summary = `${combo} → quẻ ${guaInfo.vi} | Cách "${geMing}" | ${starInfo.star || ''} — ${(starInfo.desc || guaInfo.meaning).slice(0, 100)}`;
   return {
     yearGan, hourGan, combo, gua, guaVi: guaInfo.vi, guaNature: guaInfo.nature,
     guaMeaning: guaInfo.meaning, geMing, star: starInfo.star || '',
-    starDesc: starInfo.desc || '', summary,
+    starDesc: starInfo.desc || '', geShi: shiInfo?.shi || '', geShiVi: shiInfo?.vn || '',
+    summary,
   };
 }
 
