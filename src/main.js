@@ -191,6 +191,7 @@ import {
 import { cezi as ceziDivination } from './engine/cezi.js';
 import { yizhangjingFromChart as yizhangjingCast, renderYizhangjingCard } from './engine/yizhangjing.js';
 import { computeLiuDao, SIX_REALMS } from './engine/liudao.js';
+import { destinyConsensus } from './engine/destiny-consensus.js';
 
 let currentResult = null;
 let currentTopic = 'general';
@@ -1009,6 +1010,28 @@ function renderLiuDao(R) {
       ${realmBars}
       <p class="hint" style="margin-top:6px">⚠ ${esc(ld.disclaimer)} Nghiệp nhân 6 đạo theo Phật giáo (nguồn: Wikipedia/Rigpa Wiki ṣaḍgati, 法鼓文化). BaZi→tam độc là đồng bộ DÂN GIAN融通, giúp tự tỉnh tu tập — không phải tiên đoán tái sinh.</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được Lục Đạo.</p>'; }
+}
+
+// [loop 562] Destiny Consensus — tổng hợp đồng thuận đa hệ thống (meta-synthesis)
+function renderConsensus(R) {
+  const el = $('consensus');
+  if (!el) return;
+  try {
+    const dc = destinyConsensus(R);
+    if (!dc.ok || !dc.consensus) { el.innerHTML = '<p class="hint">Không tính được Tổng Hợp Đồng Thuận.</p>'; return; }
+    const c = dc.consensus;
+    const vCls = c.verdict.includes('CÁT') ? 'rate-cat' : c.verdict.includes('HUNG') ? 'rate-hung' : 'rate-mid';
+    // bảng các hệ
+    const sysRow = (s, label) => s ? `<div style="margin:3px 0"><span style="display:inline-block;width:160px;font-size:12px">${label}</span> <span class="ln-rate ${s.tone === 'cat' ? 'rate-cat' : s.tone === 'hung' ? 'rate-hung' : 'rate-mid'}">${s.tone === 'cat' ? 'CÁT' : s.tone === 'hung' ? 'HUNG' : 'TRUNG'}</span> <span class="hint">${esc(s.detail || '')}</span></div>` : '';
+    const sysHtml = sysRow(dc.systems.bazi, '🔮 BaZi ngũ hành') + sysRow(dc.systems.chenggu, '🦴 称骨 (xương)') + sysRow(dc.systems.hexagram, '☯ Kinh Dịch (河洛+鬼谷)');
+    const liudaoHtml = dc.systems.liudao ? `<div style="margin:3px 0"><span style="display:inline-block;width:160px;font-size:12px">🪷 Lục Đạo (nghiệp)</span> <span class="ln-rate ${dc.systems.liudao.tier === 'thiện' ? 'rate-cat' : 'rate-hung'}">${dc.systems.liudao.tier === 'thiện' ? 'THIỆN' : 'ÁC'}</span> <span class="hint">${esc(dc.systems.liudao.realm)} — ${esc(dc.systems.liudao.poisonTop?.vi || '')}</span> <span class="hint-inline">(chiều tu học, riêng biệt)</span></div>` : '';
+    el.innerHTML = `
+      <div class="cg-head"><div class="cg-total"><span class="ln-rate ${vCls}" style="font-size:14px">${esc(c.verdict)}</span> <span class="hint-inline">agreement ${c.agreement} (${c.n} hệ fortune)</span></div></div>
+      <div class="tiaohou-note" style="margin:8px 0;padding:8px 10px;border-left:3px solid var(--gold-bright)"><b>🔎 Tổng luận:</b> ${esc(c.narrative)}</div>
+      <h4 class="syn-h4" style="margin-top:8px">Đối chiếu các hệ thống</h4>
+      ${sysHtml}${liudaoHtml}
+      <p class="hint" style="margin-top:6px">Khi nhiều hệ ĐỘC LẬP (khác cơ sở: ngũ hành / xương / Dịch / nghiệp) cùng chỉ 1 hướng → tín hiệu MẠNH. Phân kỳ → bản mệnh phức tạp, đọc từng khía cạnh (sự nghiệp vs phúc đức vs vận). 六道 là chiều tu học, tách khỏi phú quý.</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được Tổng Hợp Đồng Thuận.</p>'; }
 }
 
 function renderStarPower(R) {
@@ -3454,6 +3477,7 @@ function run() {
   lazyRender('heluo',          () => { try { renderHeluo(currentResult); } catch (e) { console.warn('heluo', e.message); } });
   lazyRender('yizhangjing',    () => { try { renderYizhangjing(currentResult); } catch (e) { console.warn('yizhangjing', e.message); } });
   lazyRender('liudao',         () => { try { renderLiuDao(currentResult); } catch (e) { console.warn('liudao', e.message); } });
+  lazyRender('consensus',      () => { try { renderConsensus(currentResult); } catch (e) { console.warn('consensus', e.message); } });
   lazyRender('decade',         () => { try { renderDecade(currentResult); } catch (e) { console.warn('decade', e.message); } });
   lazyRender('starpower',      () => { try { renderStarPower(currentResult); } catch (e) { console.warn('starpower', e.message); } });
   lazyRender('dir-taboo',      () => { try { renderDirectionTaboo(); } catch (e) { console.warn('dirtaboo', e.message); } });
