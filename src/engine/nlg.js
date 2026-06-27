@@ -414,8 +414,8 @@ function pDivination(R, intent) {
   const cjk = q.match(/[一-鿿]/g);
   // [loop 510] routing by keyword includes (avoid Unicode normalization issues)
   const isCezi = q.includes('测字') || q.includes('châm tự') || q.includes('xem chữ');
-  const isLiuren = q.includes('nh壬') || q.includes('六壬') || q.includes('lục nh');
-  const isQimen = q.includes('kỳ môn') || q.includes('奇门') || q.includes('遁甲') || q.includes('độn giáp');
+  const isLiuren = q.includes('壬');
+  const isQimen = q.includes('奇') || q.includes('遁');
 
   // [loop 510] 大六壬 offline
   if (isLiuren) {
