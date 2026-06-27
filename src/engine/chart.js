@@ -19,6 +19,7 @@ import { analyzeLiuqin } from './liuqin.js';
 import { buildRemedy } from './remedy.js';
 import { scoreLiunianYear } from './liunian-pro.js'; // [cycle 44] dùng chung score với analyzeLiunianDeep → không mâu thuẫn verdict
 import { analyzeKongwang } from './kongwang.js'; // [loop 148] 空亡 effect on scoring
+import { tongGen } from './tonggen.js'; // [loop 451] 得地 (thông căn) cho 三法 feedback vượng suy
 export { synthesize };
 
 export { tenGod, changSheng };
@@ -136,14 +137,31 @@ export function analyzeStrength(chart, wx) {
   const monthMainWx = GAN[HIDDEN[chart.monthZhi][0]].wx;
   const deLenh = monthMainWx === dmWx || monthMainWx === resourceWx;
 
+  // [loop 451 ELEVATION] 三法 反馈 — 得令/得地 modulate ngưỡng vượng suy.
+  //   Cổ法 «得令者旺, 失令者衰» (渊海子平): 月令 là yếu tố QUYẾT ĐỊNH vượng suy,
+  //   đáng ~40% trọng số. Trước đây analyzeStrength chỉ dùng ratio (đã nạp 得令 MỘT PHẦN
+  //   qua trọng số tháng 1.8×) nhưng bỏ qua tính chất QUYẾT ĐỊNH nhị phân của 得令/得地
+  //   → các lá «đắc lệnh + thông căn» bản chất mạnh nhưng bị ratio mờ đánh nhược → sai
+  //   Dụng Thần (lấy Ấn/Tỷ thay vì Tài/Quan). Nay 三 pháp feedback: 得令 +0.04, 得地 +0.03
+  //   BỔ DƯƠNG vào ratio hiệu dụng. CHỈ cộng dương (không trừ) — tránh đè lên trường hợp
+  //   «mạnh do Ấn» (mạnh qua sinh phù chứ không qua lệnh/địa, vẫn mạnh chính thống).
+  //   得势 BỎ: đã nằm sẵn trong ratio (support side) → cộng lại sẽ double-count.
+  const root = tongGen(chart, dmWx).total;       // 得地: tổng thông căn của Nhật Chủ
+  const deDia = root >= 1.0;                       // có «rễ» đáng kể
+  let sanFaBonus = 0;
+  if (deLenh) sanFaBonus += 0.04;                  // 得令 quyết định (~40%)
+  if (deDia) sanFaBonus += 0.03;                    // 得地 có căn (~30%)
+  const effRatio = ratio + sanFaBonus;
+
   let level, strong;
-  if (ratio >= 0.62) { level = 'Thân quá vượng'; strong = true; }
-  else if (ratio >= 0.50) { level = 'Thân vượng'; strong = true; }
-  else if (ratio >= 0.38) { level = 'Thân nhược'; strong = false; }
+  if (effRatio >= 0.62) { level = 'Thân quá vượng'; strong = true; }
+  else if (effRatio >= 0.50) { level = 'Thân vượng'; strong = true; }
+  else if (effRatio >= 0.38) { level = 'Thân nhược'; strong = false; }
   else { level = 'Thân quá nhược'; strong = false; }
 
   return { dmWx, resourceWx, support: +support.toFixed(3), oppose: +oppose.toFixed(3),
-    ratio: +ratio.toFixed(3), deLenh, monthMainWx, level, strong };
+    ratio: +ratio.toFixed(3), effRatio: +effRatio.toFixed(3), deLenh, deDia, root: +root.toFixed(2),
+    sanFaBonus: +sanFaBonus.toFixed(2), monthMainWx, level, strong };
 }
 
 // ===========================================================================
