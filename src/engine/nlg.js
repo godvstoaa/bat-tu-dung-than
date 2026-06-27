@@ -411,10 +411,11 @@ function pFlow(R) {
 // [loop 497] divination offline — 测字 (nếu user gõ chữ Hán) hoặc 梅花易数 起卦 (time).
 function pDivination(R, intent) {
   const q = intent?.raw || '';
+  const norm = q.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const cjk = q.match(/[一-鿿]/g);
-  const isCezi = /测字|châm tự|xem chữ|chữ hán/i.test(q);
-  const isLiuren = /六壬|lục nh壬|luc nh壬/i.test(q);
-  const isQimen = /奇门|遁甲|kỳ môn|ky mon|don giap/i.test(q);
+  const isCezi = /测字|cham tu|xem chu|chu han/i.test(norm);
+  const isLiuren = /luc nh|六壬/.test(norm) || /六壬/.test(q);
+  const isQimen = /ky mon|don giap|奇门|遁甲/.test(norm) || /奇门|遁甲/.test(q);
 
   // [loop 510] 大六壬 offline
   if (isLiuren) {
