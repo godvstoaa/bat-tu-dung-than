@@ -78,7 +78,7 @@ export function detectIntent(question) {
   const isYesNo = /\b(co nen|co duoc khong|nen khong|duoc khong|co tot khong|co xau khong|co the|lieu co)\b/.test(norm);
   const isCompat = /\b(hop khong|hop nhau|xung khac|theo khong|phu hop)\b/.test(norm);
   // [loop 497] divination intent (起卦/测字 CJK ngắn → confidence <3 → bypass như isCompat)
-  const isDivination = /\b(gieo que|lac que|que dich|boi que|thao que|cham tu)\b/.test(norm) || /起卦|测字|占卦|占卜/.test(question);
+  const isDivination = /\b(gieo que|lac que|que dich|boi que|thao que|cham tu|luc nh壬|ky mon|don giap)\b/.test(norm) || /起卦|测字|占卦|占卜|六壬|奇门|遁甲/.test(question);
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
@@ -413,10 +413,37 @@ function pDivination(R, intent) {
   const q = intent?.raw || '';
   const cjk = q.match(/[一-鿿]/g);
   const isCezi = /测字|châm tự|xem chữ|chữ hán/i.test(q);
+  const isLiuren = /六壬|lục nh壬|luc nh壬/i.test(q);
+  const isQimen = /奇门|遁甲|kỳ môn|ky mon|don giap/i.test(q);
+
+  // [loop 510] 大六壬 offline
+  if (isLiuren) {
+    try {
+      const now = new Date();
+      const r = liurenPan(now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes());
+      return { title: '大六壬 四课三传', paragraphs: [
+        `Ngày ${r.dayGanZhi}, giờ ${r.hourZhi}. 月将: ${r.yuejiangVi}. Tổng môn: <b>${r.zongMen}</b>.`,
+        `四课: ${(r.ke4 || []).map((k) => `${k.n} ${k.up}/${k.down}(${k.rel})`).join(' · ')}.`,
+        `三传: ${(r.sanchuan || []).map((s) => `${s.n} ${s.zhi}(${s.rel})`).join(' · ')}.`,
+      ].filter(Boolean) };
+    } catch (e) {}
+  }
+  // [loop 510] 奇门遁甲 offline
+  if (isQimen) {
+    try {
+      const now = new Date();
+      const r = qimenDongPan(now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours());
+      return { title: '奇门遁甲', paragraphs: [
+        `${r.term} ${r.yuan} ${r.yinYang}局${r.ju}.`,
+        ...(r.gige || []).map((g) => `格格: ${g}`),
+        r.advice ? `<b>${r.advice}</b>` : '',
+      ].filter(Boolean) };
+    } catch (e) {}
+  }
   // 测字 nếu user cung cấp chữ Hán + hỏi测字
   if (isCezi && cjk && cjk.length) {
     try {
-      const ch = cjk[cjk.length - 1]; // lấy chữ Hán cuối (thường là chữ cần测)
+      const ch = cjk[cjk.length - 1];
       const cz = cezi(ch);
       return { title: `测字 «${ch}»`, paragraphs: [
         `Chữ «${ch}» — bộ ${cz.radical} (${cz.strokes} nét 康熙), ngũ hành ${cz.wxVi}.`,
@@ -425,7 +452,7 @@ function pDivination(R, intent) {
       ].filter(Boolean) };
     } catch (e) {}
   }
-  // ngược lại: 梅花易数 起卦 theo thời điểm hiện tại
+  // default: 梅花易数 起卦 theo thời điểm hiện tại
   try {
     const now = new Date();
     const nums = solarToMhNums(now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes());
