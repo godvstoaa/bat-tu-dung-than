@@ -240,7 +240,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 TỨ TRỤ:
 ${pillars}
 
-VƯỢNG SUY: ${R.strength.level} (tỉ lệ phù trợ thân ${(R.strength.ratio * 100).toFixed(1)}%${R.strength.sanFaBonus > 0 ? ` → hiệu dụng ${(R.strength.effRatio * 100).toFixed(1)}% do 得令/得地 (cổ法 «得令者旺» cộng +${R.strength.sanFaBonus})` : ''}, ${R.strength.deLenh ? 'đắc lệnh' : 'thất lệnh'}${R.strength.deDia ? ' + đắc địa (thông căn)' : ''})
+VƯỢNG SUY: ${R.strength.level} (tỉ lệ phù trợ thân ${(R.strength.ratio * 100).toFixed(1)}%${R.strength.sanFaBonus > 0 ? ` → hiệu dụng ${(R.strength.effRatio * 100).toFixed(1)}% do 得令/得地 (cổ法 «得令者旺» cộng +${R.strength.sanFaBonus})` : ''}, ${R.strength.deLenh ? 'đắc lệnh' : 'thất lệnh'}${R.strength.qiPhase ? ` (${R.strength.qiPhase})` : ''}${R.strength.deDia ? ' + đắc địa (thông căn)' : ''})
 WHY VƯỢNG SUY 得令/得地/得势 3 pháp (mạnh nhờ lệnh/địa/thế hay nhờ Ấn?): ${(() => { try { return strength3Fa(R).summary; } catch (e) { return '(không tính được)'; } })()}
 
 NGŨ HÀNH: ${wx}

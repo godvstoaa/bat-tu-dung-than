@@ -138,6 +138,20 @@ export function analyzeStrength(chart, wx) {
 
   const monthMainWx = GAN[HIDDEN[chart.monthZhi][0]].wx;
   const deLenh = monthMainWx === dmWx || monthMainWx === resourceWx;
+  // [loop 484] 进气/旺气/退气 — vị trí ngày sinh trong khoảng节气 (滴天髓 进气退气).
+  //   Refinement 得令: mới vào节气 (初气) = 进气 «lệnh đang VÀO mạnh dần»; sắp转 (末气)
+  //   = 退气 «lệnh RA suy»; giữa = 旺气 «đương lệnh đầy đủ». Cổ法 «进气 Ungасpending, 退气 waning».
+  let qiPhase = '旺气';
+  try {
+    const inp = chart.input;
+    if (inp && chart.jieqi) {
+      const birth = new Date(inp.year, (inp.month || 1) - 1, inp.day || 1, inp.hour || 0, inp.minute || 0).getTime();
+      const _pt = (s) => { const [d, tt] = String(s).split(' '); const [y, mo, da] = (d || '').split('-').map(Number); const [h, mi] = (tt || '0:0:0').split(':').map(Number); return new Date(y, (mo || 1) - 1, da || 1, h || 0, mi || 0).getTime(); };
+      const prev = _pt(chart.jieqi.prev.time), next = _pt(chart.jieqi.next.time);
+      const pos = (birth - prev) / ((next - prev) || 1);
+      qiPhase = pos < 0.33 ? '进气' : pos > 0.67 ? '退气' : '旺气';
+    }
+  } catch (e) {}
 
   // [loop 451 ELEVATION] 三法 反馈 — 得令/得地 modulate ngưỡng vượng suy.
   //   Cổ法 «得令者旺, 失令者衰» (渊海子平): 月令 là yếu tố QUYẾT ĐỊNH vượng suy,
@@ -163,7 +177,7 @@ export function analyzeStrength(chart, wx) {
 
   return { dmWx, resourceWx, support: +support.toFixed(3), oppose: +oppose.toFixed(3),
     ratio: +ratio.toFixed(3), effRatio: +effRatio.toFixed(3), deLenh, deDia, root: +root.toFixed(2),
-    sanFaBonus: +sanFaBonus.toFixed(2), monthMainWx, level, strong };
+    sanFaBonus: +sanFaBonus.toFixed(2), qiPhase, monthMainWx, level, strong };
 }
 
 // ===========================================================================
