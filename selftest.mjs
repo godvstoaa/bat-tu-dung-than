@@ -2145,8 +2145,8 @@ assert(YEAR_WEIGHT[48] === 0.7, '壬子 year weight 0.7');
 const ssDet = sanshishu(ssR);
 assert(JSON.stringify(ss) === JSON.stringify(ssDet), 'sanshishu deterministic');
 // [loop 519] 神煞 formula regression guards (verified accurate vs classical)
-import { TIAN_YI, WEN_CHANG, JIANG_XING, TAO_HUA } from './src/engine/shensha.js';
-assert(JSON.stringify(TIAN_YI['甲']) === '["丑","未"]', '天乙贵人 甲→丑未');
+import { TIAN_YI as SS_TIANYI, WEN_CHANG, JIANG_XING, TAO_HUA } from './src/engine/shensha.js';
+assert(JSON.stringify(SS_TIANYI['甲']) === '["丑","未"]', '天乙贵人 甲→丑未');
 assert(WEN_CHANG['辛'] === '寅', '文昌 辛→寅 (loop-21 fix guard)');
 assert(JIANG_XING['A'] === '子' && JIANG_XING['B'] === '午', '将星 申子辰→子, 寅午戌→午');
 assert(TAO_HUA['A'] === '酉', '桃花 申子辰→酉');
