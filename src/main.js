@@ -1715,21 +1715,31 @@ function renderDayunTimeline(R) {
   el.innerHTML = `<div class="dt-row">${segs}</div><p class="hint" style="margin-top:6px">Mỗi ô = 1 thập kỷ đại vận, tô màu theo đánh giá (<span class="rate-supercat" style="padding:0 4px">vàng</span>=đại cát · <span class="rate-cat" style="padding:0 4px">xanh</span>=cát · <span class="rate-mid" style="padding:0 4px">xám</span>=bình · <span class="rate-hung" style="padding:0 4px">đỏ</span>=hung). Ô viền sáng ★ = thập kỷ đang hành. <b>Nhấp ô → xem tường thuật giai đoạn đó.</b></p>`;
 }
 
-// [loop 522] 鬼谷子算命 — Guiguzi divination card
+// [loop 522→535] 鬼谷子算命 — 4 pillars comprehensive
 function renderGuiguzi(R) {
   const el = $('guiguzi');
   if (!el) return;
   try {
     const g = guiguziFortune(R);
     if (!g) { el.innerHTML = '<p class="hint">Không tính được Quỷ Cốc Tử.</p>'; return; }
-    const toneCls = g.tone === 'cat' ? 'rate-cat' : g.tone === 'hung' ? 'rate-hung' : 'rate-mid';
+    const toneCls = g.toneVi === 'CÁT' ? 'rate-cat' : g.toneVi === 'HUNG' ? 'rate-hung' : 'rate-mid';
+    // 4-pillar readings
+    const pillarHtml = (g.pillarReadings || []).map((p) => {
+      const pCls = p.tone === 'cat' ? 'rate-cat' : p.tone === 'hung' ? 'rate-hung' : 'rate-mid';
+      return `<div class="yz-row" style="margin:4px 0;padding-left:8px;border-left:3px solid var(--gold-soft)">
+        <b>${esc(p.palaceVi)}</b> <span class="zh">${esc(p.gz)}</span> <span class="ln-rate ${pCls}">${esc(p.nayin)}</span>
+        <div class="hint">${esc(p.fortune?.slice(0,80) || '')} ${esc(p.ganMod || '')}</div>
+      </div>`;
+    }).join('');
     el.innerHTML = `
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <div style="font-size:28px;font-family:'Noto Serif SC',serif;font-weight:700;color:var(--gold-bright)">${esc(g.yearJiaZi)}</div>
+        <div style="font-size:24px;font-family:'Noto Serif SC',serif;font-weight:700;color:var(--gold-bright)">${esc(g.yearJiaZi)}</div>
         <div><div style="font-weight:600">${esc(g.nayin)} (${esc(g.vi)})</div><span class="ln-rate ${toneCls}">${esc(g.toneVi)}</span></div>
       </div>
       ${g.verse ? `<div class="tiaohou-note" style="font-size:14px"><b class="zh">${esc(g.verse)}</b></div>` : ''}
       <p style="margin:6px 0">${esc(g.fortune)}</p>
+      <h4 class="syn-h4" style="margin-top:10px">🔮 4 Trụ Nạp Âm (năm+tháng+ngày+giờ)</h4>
+      ${pillarHtml}
       ${g.career ? `<p class="hint">💼 Nghề hợp: ${esc(g.career)}.</p>` : ''}`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được Quỷ Cốc Tử.</p>'; }
 }

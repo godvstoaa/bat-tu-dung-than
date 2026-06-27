@@ -46,27 +46,57 @@ const GUIGUZI_NAYIN = {
  * @returns {{ yearJiaZi, nayin, verse, vi, tone, fortune, career, summary }}
  */
 export function guiguziFortune(R) {
+  const pillars = R.chart?.pillars;
   const birthYear = R.chart?.input?.year;
-  if (!birthYear) return null;
-  // Tính 甲子 năm sinh (chu kỳ 60)
+  if (!birthYear || !pillars) return null;
   const GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   const ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  const idx = ((birthYear - 4) % 60 + 60) % 60;
-  const yearJiaZi = GAN[idx % 10] + ZHI[idx % 12];
-  // 納音 (qua nayin module)
-  let nayin = '';
-  try { nayin = ganZhiNayin(yearJiaZi) || ''; } catch (e) {}
-  const info = GUIGUZI_NAYIN[nayin] || { vi: nayin, tone: 'bình', verse: '', fortune: '(chưa có thơ cho 納音 này)', career: '' };
-  const toneVi = info.tone === 'cat' ? 'CÁT' : info.tone === 'hung' ? 'HUNG' : 'BÌNH';
-  // [loop 534] 60 甲子 unique — 天干 陽/陰 modifier: yang = active/bold, yin = refined/patient.
-  //   Classical 鬼谷子 phân biệt 甲子 ≠ 乙丑 dù cùng 海中金 — 陽干 (甲丙戊庚壬) chủ động,
-  //   陰干 (乙丁己辛癸) thụ động/tinh tế. Nay thêm GAN_MOD cho 60 readings unique.
-  const gan = yearJiaZi[0];
   const YANG_GAN = ['甲','丙','戊','庚','壬'];
-  const isYang = YANG_GAN.includes(gan);
-  const mod = isYang
-    ? { trait: 'Dương can → chủ động, dám hành động, bộc lộ nhanh nhưng dễ vội.', nuance: 'Cần kỷ luật, tránh bốc đồng — năng lượng dương mạnh.' }
-    : { trait: 'Âm can → tinh tế, kiên nhẫn, nội tâm nhưng dễ chần chừ.', nuance: 'Cần quyết đoán hơn, đừng chờ «điều kiện hoàn hảo» — năng lượng âm sâu.' };
-  const summary = `${yearJiaZi} (${nayin}/${info.vi}) — ${toneVi}. ${info.fortune?.slice(0, 60) || ''} ${mod.trait}`;
-  return { yearJiaZi, nayin, ...info, toneVi, isYang, ganMod: mod.trait, ganNuance: mod.nuance, summary };
+
+  // [loop 535] 4 TRỤ 納音 — cổ pháp 鬼谷子 dùng CẢ 年月日时, không chỉ năm.
+  //   年 = 命 (base fate), 月 = 运 (fortune), 日 = 性 (personality), 时 = 果 (outcome).
+  const PALACE = { year: '命 (cơ bản)', month: '运 (vận hành)', day: '性 (bản tính)', time: '果 (kết quả)' };
+  const pillarReadings = [];
+  for (const k of ['year', 'month', 'day', 'time']) {
+    const gz = pillars[k]?.gan + pillars[k]?.zhi;
+    if (!gz) continue;
+    let ny = '';
+    try { ny = ganZhiNayin(gz) || ''; } catch (e) {}
+    const nyInfo = GUIGUZI_NAYIN[ny] || GUIGUZI_NAYIN[ny?.replace('砂','沙')] || { vi: ny, tone: 'bình', verse: '', fortune: '(chưa có thơ)', career: '' };
+    const isYangG = YANG_GAN.includes(gz[0]);
+    pillarReadings.push({
+      palace: k, palaceVi: PALACE[k], gz, nayin: ny, vi: nyInfo.vi, tone: nyInfo.tone,
+      verse: nyInfo.verse || '', fortune: nyInfo.fortune || '', career: nyInfo.career || '',
+      isYang: isYangG,
+      ganMod: isYangG ? 'Dương can → chủ động, dám hành động' : 'Âm can → tinh tế, kiên nhẫn',
+    });
+  }
+
+  // Year pillar = main reading (giữ backward compat)
+  const yearR = pillarReadings.find((p) => p.palace === 'year') || pillarReadings[0];
+  const info = yearR ? {
+    vi: yearR.vi, tone: yearR.tone, verse: yearR.verse,
+    fortune: yearR.fortune, career: yearR.career,
+  } : { vi: '?', tone: 'bình', verse: '', fortune: '(không tính được)', career: '' };
+  const toneVi = info.tone === 'cat' ? 'CÁT' : info.tone === 'hung' ? 'HUNG' : 'BÌNH';
+  const isYang = yearR?.isYang ?? true;
+  const ganMod = isYang ? 'Dương can → chủ động, dám hành động' : 'Âm can → tinh tế, kiên nhẫn';
+
+  // Overall tone: combine 4 pillars — majority cát = CÁT, majority hung = HUNG
+  const allTones = pillarReadings.map((p) => p.tone);
+  const catCount = allTones.filter((t) => t === 'cat').length;
+  const hungCount = allTones.filter((t) => t === 'hung').length;
+  const overallTone = catCount > hungCount ? 'CÁT' : hungCount > catCount ? 'HUNG' : 'BÌNH';
+
+  // Full 4-pillar reading
+  const reading4 = pillarReadings.map((p) =>
+    `${p.palaceVi}: ${p.gz} nạp âm ${p.nayin} (${p.vi}) — ${p.fortune?.slice(0, 70) || ''}`
+  ).join('\n');
+
+  const summary = `${yearR?.gz || '?'} (${yearR?.nayin || '?'}/${info.vi}) — ${overallTone}. ${info.fortune?.slice(0, 60) || ''} ${ganMod}.`;
+
+  return {
+    yearJiaZi: yearR?.gz || '', nayin: yearR?.nayin || '', ...info, toneVi: overallTone,
+    isYang, ganMod, pillarReadings, reading4, summary,
+  };
 }
