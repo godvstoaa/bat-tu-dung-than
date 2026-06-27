@@ -78,7 +78,7 @@ export function detectIntent(question) {
   const isYesNo = /\b(co nen|co duoc khong|nen khong|duoc khong|co tot khong|co xau khong|co the|lieu co)\b/.test(norm);
   const isCompat = /\b(hop khong|hop nhau|xung khac|theo khong|phu hop)\b/.test(norm);
   // [loop 497] divination intent (起卦/测字 CJK ngắn → confidence <3 → bypass như isCompat)
-  const isDivination = /\b(gieo que|lac que|que dich|boi que|thao que|cham tu|luc nh壬|ky mon|don giap)\b/.test(norm) || /起卦|测字|占卦|占卜|六壬|奇门|遁甲/.test(question);
+  const isDivination = /gieo que|lac que|que dich|boi que|thao que|cham tu|luc nh|ky mon|don giap/.test(norm) || /起卦|测字|占卦|占卜|六壬|奇门|遁甲/.test(question);
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
