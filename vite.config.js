@@ -48,8 +48,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // vendor tách (cache lâu — hiếm đổi)
           if (id.includes('node_modules/lunar-javascript')) return 'vendor-lunar';
           if (id.includes('node_modules/astronomy-engine')) return 'vendor-astronomy';
+          // [loop 568] engine code-split theo nhóm → mỗi deploy chỉ re-download chunk đổi,
+          //   không cả 1.3MB. Cải thiện caching cho mobile (returning users).
+          if (id.includes('/src/engine/ziwei')) return 'engine-ziwei';       // 10+ file Tử Vi
+          if (id.match(/\/src\/engine\/(meihua|cezi|liuren|qimen|heluo|guiguzi|jinkoujue|hexagram)/)) return 'engine-divination';
+          if (id.match(/\/src\/engine\/(bazi-diet|bazi-workout|aroma|crystal|cloth|space-fs|city-fs|health)/)) return 'engine-lifestyle';
         },
       },
     },
