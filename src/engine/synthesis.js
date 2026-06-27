@@ -111,7 +111,11 @@ export function synthesize(R) {
     if (pqDelta !== 0) {
       score += pqDelta;
       const why = [];
-      if (pql.dungHits) why.push(`${pql.dungHits} trụ 盖头/截脚 trúng DỤNG → Dụng bị khắc yếu (${-2 * pql.dungHits})`);
+      if (pql.dungHits) {
+        // [loop 502] concrete remedy: 补 Dụng (màu/hướng) — mirror 源流 gap-remedy
+        const _dr = { 木:'xanh/Đông', 火:'đỏ/Nam', 土:'vàng/Tây Nam', 金:'trắng/Tây', 水:'đen/Bắc' }[yong.primary];
+        why.push(`${pql.dungHits} trụ 盖头/截脚 trúng DỤNG → Dụng bị khắc yếu (${-2 * pql.dungHits})${_dr ? ` → 补 Dụng: màu ${_dr}` : ''}`);
+      }
       if (pql.jiHits) why.push(`${pql.jiHits} trụ trúng KỴ → khắc được忌, lợi (+${pql.jiHits})`);
       factors.push(`盖头截脚 (${pql.gaijieCount}/4 trụ can-chi khắc): ${why.join('; ')}.`);
     }
