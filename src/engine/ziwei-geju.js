@@ -37,7 +37,7 @@ const GEJU = [
   {
     key: '紫府同宫', name: '紫府同宫格', test: (s, same) => same('紫微', '天府'),
     vi: 'Tử Phủ Đồng Cung', tone: 'cat',
-    meaning: 'ĐẠI QUÝ — Tử Vi (chủ tinh) + Thiên Phủ (tài khố) đồng cung Dần/Thân → tôn quý, lãnh đạo. (Cần cát tinh Tả/Hữu/Khôi/Việt/Lộc củng + không sát kỵ không kiếp mới thành cách mạnh; 否则破格.)',
+    meaning: 'ĐẠI QUÝ — Tử Vi (chủ tinh) + Thiên Phủ (tài khố) đồng cung Dần/Thân → tôn quý, lãnh đạo. (Cần cát tinh Tả/Hữu/Khôi/Việt/Lộc củng + không sát kỵ không kiếp mới thành cách mạnh; nếu không sẽ bại cách.)',
     career: 'lãnh đạo cấp cao, chính thương lãnh tụ, quý khí cực lớn.',
   },
 ];
