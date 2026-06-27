@@ -96,28 +96,91 @@ const STARS = {
   '甲癸': { star: 'Thiên Phúc - Thiên Tinh - Văn Quý', desc: 'Cơ mưu sâu, đa học thiểu thành, thẳng tính khẩu độc, dễ使人 trách. Trải qua nhiều trước khi phát. Lục thân khó trọn.' },
 };
 
-// [loop 539] 格诗 (4 câu thơ đoán mệnh) — từ 永樂大典 crawled data + dịch VN
+// [loop 539→540] 格诗 (4 câu thơ đoán mệnh) — từ 永樂大典 crawled data + dịch VN SÂU
+//   USER REQUEST: «Thơ có nhiều tầng ý nghĩa, phải hiểu cả bối cảnh từng câu, cách ghép vần».
+//   Mỗi 格诗 giờ có: shi (gốc), analysis (phân tích đa tầng VN).
+//   Phân tích gồm: dịch từng câu + hình ảnh biểu tượng + giai đoạn đời + lời khuyên.
 const GE_SHI = {
   '甲甲': { shi: '長天忽震雷霆響，凜凜帷中獨有威。驚散雁鴻飛塞遠，狂風飄散落花枝。',
-    vn: 'Trời xanh chợt sấm vang rền — uy quyền rợn ngợp một mình vươn cao. Nhạn bay tản mác biên cương xa — gió cuốn hoa rơi tàn tạ. (Vận: uy lực bẩm sinh nhưng dễ cô đơn, cần khiêm nhường)' },
+    analysis: [
+      'Câu 1 «長天忽震雷霆響»: Bầu trời rộng lớn chợt vang sấm — ám chỉ bản mệnh mang uy lực bẩm sinh, bùng nổ bất ngờ, tiếng tăm đồn xa. «雷霆» = quyền uy thiên liệu, không thể đ resisting.',
+      'Câu 2 «凜凜帷中獨有威»: Trong màn trướng lạnh lẽo, một mình có uy — ám chỉ tính cách độc lập, lãnh đạo bẩm sinh, nhưng cô đơn («獨» = một mình). Người này không cần đông người, tự đứng vững.',
+      'Câu 3 «驚散雁鴻飛塞遠»: Nhạn hoảng hốt tản mác bay xa biên cương — «雁鴻» biểu tượng anh em, bạn bè. Ý: lục thân bạn bè khó gần, dễ chia lìa, duyên mỏng. Thuở nhỏ có thể xa nhà.',
+      'Câu 4 «狂風飄散落花枝»: Gió cuốn hoa rơi tàn tạ — «落花» = tuổi thanh xuân dẫu đẹp nhưng mau tàn. Ý: tuổi trẻ nhiều biến động, sự nghiệp/thình duyên gặp sóng gió. Cần kiên nhẫn đợi qua giông bão.',
+      'TỔNG: Bản mệnh uy quyền, độc lập, nhưng cô đơn + tuổi trẻ biến động → đợi qua giông bão mới ổn. Lời khuyên: khiêm nhường («雷霆» quá mạnh dễ「震」người khác), nuôi dưỡng nhân duyên («雁» tản = cần giữ liên lạc).',
+    ] },
   '甲乙': { shi: '群群雁過遠離塞，雨打鴛鴦各自飛。縱有海風吹不斷，也須相守自相宜。',
-    vn: 'Đàn nhạn bay xa khỏi ải — mưa đánh uyên ương mỗi phía bay. Dù gió biển không đứt — cũng cần giữ nhau mới yên. (Vận: tình duyên trắc trở đầu đời, bình yên cuối đời)' },
+    analysis: [
+      'Câu 1 «群群雁過遠離塞»: Đàn nhạn bay xa khỏi ải — «雁» = anh em, bạn bè; «遠離塞» = rời xa quê. Ý: thuở trẻ rời quê lập nghiệp, anh em mỗi người một ngả.',
+      'Câu 2 «雨打鴛鴦各自飛»: Mưa đánh uyên ương mỗi phía bay — «鴛鴦» = tình duyên vợ chồng; «各自飛» = chia lìa. Ý: tình duyên đầu đời trắc trở, dễ chia tay. Đây là TIERNG ĐIỂM quan trọng: duyên đầu khó thành.',
+      'Câu 3 «縱有海風吹不斷»: Dù gió biển mạnh cũng không đứt — «海風» =外界 tác động. Ý: duyên sau (cuối đời) bền vững, dù ngoài khó khăn cũng không chia lìa.',
+      'Câu 4 «也須相守自相宜»: Cũng cần giữ nhau mới yên — khuyên giữ gìn nhân duyên muộn. Câu này nhấn mạnh: nỗ lực vun đắp duyên sau.',
+      'TỔNG: Duyên đầu chia lìa (câu 2), duyên sau bền (câu 3-4). Lời khuyên: đừng quá đau khổ vì tình đầu tan vỡ — duyên thật ở phía sau. Cần kiên nhẫn.',
+    ] },
   '甲丙': { shi: '遙遙千里見波濤，獨有心機志氣高。故國豈無根葉在，爭名圖利逢蕭條。',
-    vn: 'Ngàn dặm xa thấy sóng trào — một mình mưu trí chí cao. Quê nhà có gốc lá — tranh danh gặp lúc tiêu điều. (Vận: tài cao nhưng thời cuộc khó, cần kiên nhẫn đợi thời)' },
+    analysis: [
+      'Câu 1 «遙遙千里見波濤»: Từ ngàn dặm thấy sóng trào — «千里» = tầm nhìn xa; «波濤» = sóng gió cuộc đời. Ý: người có tầm nhìn rộng, biết trước sóng gió.',
+      'Câu 2 «獨有心機志氣高»: Một mình mưu trí chí khí cao — «獨» = một mình; «心機» = trí mưu; «志氣高» = chí lớn. Ý: tài trí hơn người, tự lập, nhưng dễ cô đơn trong chí hướng.',
+      'Câu 3 «故國豈無根葉在»: Quê nhà há không còn gốc lá — «根葉» = cơ nghiệp tổ tiên. Ý: có thể dựa vào gia đình tổ tiên, nhưng...',
+      'Câu 4 «爭名圖利逢蕭條»: Tranh danh mưu lợi gặp lúc tiêu điều — «蕭條» = suy thoái. Ý: dù có tài, thời cuộc không thuận → khó thành danh lợi ngay. Cần kiên nhẫn đợi thời.',
+      'TỔNG: Tài + chí cao, nhưng thời cuộc khó → mưu sự chậm thành. Câu 3-4 ám chỉ: nên giữ liên lạc quê nhà (câu 3), đừng quá nôn nóng danh lợi trong thời khó (câu 4).',
+    ] },
   '甲丁': { shi: '祖計紛紛東又西，綠楊深處子規啼。山空霧潤猿聲切，澗遠林深鳥倦飛。',
-    vn: 'Kế tổ rối ren đông tây — bụi dương sâu chim quyên kêu. Núi trống sương ướt vượn kêu thiết — suối xa rừng sâu chim mệt bay. (Vận: phiêu bạt, đa sầu, cần an cư lập nghiệp)' },
+    analysis: [
+      'Câu 1 «祖計紛紛東又西»: Kế tổ rối ren, đông rồi tây — «祖» = gia đình/tổ tiên; «紛紛» = loạn. Ý: gia đạo bất ổn, anh em chia rẽ, phiêu bạt.',
+      'Câu 2 «綠楊深處子規啼»: Bụi dương xanh sâu, chim quyên kêu — «子規» = chim cuốc (quyên), biểu tượng nhớ quê, buồn bã. Ý: nỗi sầu nhớ quê hương, hoài niệm.',
+      'Câu 3 «山空霧潤猿聲切»: Núi trống sương ướt, vượn kêu thiết — «猿聲» = tiếng vượn (biểu tượng cô đơn, sầu muộn trong thi ca Đường). Ý: cô đơn, sầu cảm.',
+      'Câu 4 «澗遠林深鳥倦飛»: Suối xa rừng sâu, chim mệt bay — «鳥倦» = chim mệt = mệt mỏi phiêu bạt. Ý: cần an cư, bớt lang thang.',
+      'TỔNG: Gia đạo bất ổn → phiêu bạt → sầu nhớ → mệt mỏi. Lời khuyên: sớm an cư lập nghiệp, đừng lang thang mãi. «倦» = mệt = cần dừng lại.',
+    ] },
   '甲戊': { shi: '漁父歸莊利祿名，旗橫隨後詔宣城。年來塞外思鄉國，游水中心逐浪平。',
-    vn: 'Ngư phủ về làng danh lợi — cờ theo sau chiếu triệu về thành. Năm tháng biên cương nhớ quê — dòng nước giữa lòng theo sóng yên. (Vận: vất vả sớm, an cư muộn, nên rời quê lập nghiệp)' },
+    analysis: [
+      'Câu 1 «漁父歸莊利祿名»: Ngư phủ về làng, danh lợi — «漁父歸莊» = trở về sau phiêu bạt. Ý: sau thời gian xa quê mưu sinh, cuối cùng trở về an cư, có danh lợi.',
+      'Câu 2 «旗橫隨後詔宣城»: Cờ theo sau, chiếu triệu về thành — «詔» = chiếu vua = được tin dùng. Ý: được người trên trọng dụng, công danh đến muộn nhưng vững.',
+      'Câu 3 «年來塞外思鄉國»: Năm tháng ngoài biên nhớ quê — «塞外» = ngoài biên cương = xa nhà. Ý: thuở trẻ phiêu bạt xa quê, nhớ nhà.',
+      'Câu 4 «游水中心逐浪平»: Giữa dòng nước theo sóng yên — «逐浪平» = sóng yên = bình yên cuối đời. Ý: cuối đời bình ổn, an cư.',
+      'TỔNG: Phiêu bạt sớm → trở về muộn → bình yên. Nên rời quê lập nghiệp sớm, sau về an cư. Câu 4 «逐浪平» = kết cục tốt.',
+    ] },
   '甲己': { shi: '鳳凰池上釣連鰲，風卷長沙逐浪濤。應過碧天群失隊，違親背祖奮身高。',
-    vn: 'Hồ phượng câu liền cá rồng — gió cuốn cát dài theo sóng trào. Nhạn xanh bay qua lạc đàn — lìa thân bỏ tổ tự vươn lên. (Vận: tự lập, nên rời quê, thành tựu muộn)' },
+    analysis: [
+      'Câu 1 «鳳凰池上釣連鰲»: Hồ phượng câu liền cá rồng — «連鰲» = bắt được cá lớn = cơ hội lớn, phú quý. «鳳凰池» = nơi cao quý. Ý: cơ hội phú quý ở nơi cao quý.',
+      'Câu 2 «風卷長沙逐浪濤»: Gió cuốn cát dài, theo sóng trào — «逐浪» = theo sóng = hành động theo thời cuộc. Ý: cần nắm bắt thời cơ, hành động mạnh.',
+      'Câu 3 «應過碧天群失隊»: Nhạn xanh bay qua, lạc đàn — «失隊» = lạc đàn = lìa thân nhân. Ý: nên rời quê/đồng nghiệp để phát triển.',
+      'Câu 4 «違親背祖奮身高»: Lìa thân bỏ tổ, tự vươn lên — «奮身高» = tự mình vươn cao. Ý: thành tựu đến từ tự lập, rời vùng an toàn.',
+      'TỔNG: Phú quý + rời quê + tự lập → thành đại sự. Lời khuyên: dám rời vùng an toàn để vươn lên.',
+    ] },
   '甲庚': { shi: '女嫁男婚寡與，心靈機巧性居閒。江邊雁伴飛南北，百歲榮華醉夢間。',
-    vn: 'Gả vợ cưới chồng ai cùng — tâm linh cơ khéo tính an nhàn. Nhạn bờ sông nam bắc — trăm tuổi vinh hoa trong mộng say. (Vận: tài năng nhưng an nhàn quá, cần chủ động)' },
+    analysis: [
+      'Câu 1 «女嫁男婚寡與»: Gả vợ cưới chồng ít người chung — «寡與» = ít ai hợp. Ý: duyên tình ít người tri kỷ, khó tìm ý hợp tâm đầu.',
+      'Câu 2 «心靈機巧性居閒»: Tâm linh cơ khéo, tính an nhàn — «居閒» = sống nhàn. Ý: tài năng, khéo léo, nhưng tính quá nhàn → dễ ỷ lại.',
+      'Câu 3 «江邊雁伴飛南北»: Bờ sông nhạn bay nam bắc — «南北» = phương hướng khác nhau. Ý: anh em bạn bè mỗi người mỗi ngả.',
+      'Câu 4 «百歲榮華醉夢間»: Trăm tuổi vinh hoa trong mộng say — «醉夢» = mộng say. Ý: vinh hoa dù có cũng như mộng, dễ vụt mất. Cần tỉnh táo.',
+      'TỔNG: Tài + nhàn + duyên ít + vinh hoa mong manh. Lời khuyên: bớt an nhàn, chủ động hơn, đừng xem vinh hoa là tất cả.',
+    ] },
   '甲辛': { shi: '金烏明處蟾蜍黑，高山險處不須行。雁過長江波浪急，平生活計破中成。',
-    vn: 'Mặt trời sáng chỗ trăng tối — núi cao chỗ hiểm chớ hành. Nhạn qua sông dài sóng gấp — đời người mưu kế vỡ giữa đường. (Vận: khó khăn nhiều, mưu sự hay vỡ, cần cẩn trọng)' },
+    analysis: [
+      'Câu 1 «金烏明處蟾蜍黑»: Mặt trời sáng chỗ trăng tối — «金烏» = mặt trời (dương), «蟾蜍» = mặt trăng (âm). Âm dương đối lập → ý: người tài thường gặp hoàn cảnh trái ngcast, có sáng则有 tối.',
+      'Câu 2 «高山險處不須行»: Núi cao chỗ hiểm chớ hành — «不須行» = đừng đi. Ý: biết tránh hiểm, đừng mạo hiểm. Cẩn thận hơn tham lam.',
+      'Câu 3 «雁過長江波浪急»: Nhạn qua sông dài sóng gấp — «波浪急» = sóng dữ. Ý: cuộc đời nhiều sóng gió, mưu sự gặp trở ngại.',
+      'Câu 4 «平生活計破中成»: Đời người mưu kế vỡ giữa đường — «破中成» = vỡ giữa thành = công đức đến giữa chừng rồi đổ. Ý: cẩn trọng với việc sắp thành mà đổ.',
+      'TỔNG: Âm dương đối lập + tránh hiểm + sóng gió + vỡ giữa đường. Lời khuyên: cẩn thận, đừng mạo hiểm, đặc biệt cẩn thận lúc sắp thành («破中成»).',
+    ] },
   '甲壬': { shi: '春來芳草依依綠，雪散紛紛見枯竹。空中群雁各東西，傷情獨向灘邊宿。',
-    vn: 'Mùa xuân cỏ thơm xanh rờn — tuyết tan lộ trúc khô khô. Trời xanh nhạn bay mỗi hướng — buồn tình một mình ngủ bờ sông. (Vận: có lúc tốt xấu đan xen, cô đơn, cần kiên nhẫn)' },
+    analysis: [
+      'Câu 1 «春來芳草依依綠»: Xuân đến cỏ thơm xanh rờn — «芳草» = cơ hội tốt, sinh sôi. «依依» = lần lượt. Ý: có giai đoạn tốt đẹp, sự nghiệp đâm chồi.',
+      'Câu 2 «雪散紛紛見枯竹»: Tuyết tan lộ trúc khô — «枯竹» = trúc khô = tàn tạ. Ý: sau mùa tốt là có lúc tồi tệ. Tốt xấu đan xen.',
+      'Câu 3 «空中群雁各東西»: Nhạn bay mỗi hướng một — «各東西» = chia lìa. Ý: anh em bạn bè chia xa, cô đơn.',
+      'Câu 4 «傷情獨向灘邊宿»: Buồn tình một mình ngủ bờ sông — «灘邊» = bãi bờ = chỗ trơ trọi. Ý: cô đơn, nhưng cũng tự tại.',
+      'TỔNG: Tốt xấu đan xen + chia lìa + cô đơn. Nhưng câu 4 «獨» cũng có nghĩa tự do. Lời khuyên: chấp nhận thăng trầm, tìm niềm vui trong sự độc lập.',
+    ] },
   '甲癸': { shi: '年光迅速催人老，風過瀟湘春又秋。雁過碧天沙塞遠，雨殘花敗果難收。',
-    vn: 'Năm tháng thoi đưa giục người già — gió qua Tương Hồ xuân lại thu. Nhạn trời xanh cát biên xa — mưa tàn hoa dạ quả khó thu. (Vận: thời gian trôi nhanh, cần tranh thủ cơ hội sớm)' },
+    analysis: [
+      'Câu 1 «年光迅速催人老»: Năm tháng thoi đưa giục người già — «迅速» = nhanh. Ý: thời gian trôi nhanh, cần tranh thủ tuổi trẻ.',
+      'Câu 2 «風過瀟湘春又秋»: Gió qua Tương Hồ, xuân lại thu — «瀟湘» = vùng hồ Tương (cổ thi = sầu muộn, nhớ nhung). «春又秋» = mùa nào cũng buồn. Ý: sống nhiều sầu cảm, tuổi trẻ qua mau.',
+      'Câu 3 «雁過碧天沙塞遠»: Nhạn trời xanh, cát biên xa — «沙塞遠» = biên cương xa = cô độc, xa quê. Ý: phiêu bạt xa nhà.',
+      'Câu 4 «雨殘花敗果難收»: Mưa tàn hoa dạ, quả khó thu — «果難收» = quả khó thu hoạch = công sức khó kết quả. Ý: đầu tư nhiều nhưng thu hoạch ít, cần chọn đúng việc.',
+      'TỔNG: Thời gian trôi nhanh + sầu cảm + phiêu bạt + kết quả ít. Lời khuyên: tranh thủ cơ hội sớm, đừng phung phí tuổi trẻ vào việc không ra quả.',
+    ] },
 };
 
 /**
@@ -154,7 +217,7 @@ export function guiguziFDG(R) {
   return {
     yearGan, hourGan, combo, gua, guaVi: guaInfo.vi, guaNature: guaInfo.nature,
     guaMeaning: guaInfo.meaning, geMing, star: starInfo.star || '',
-    starDesc: starInfo.desc || '', geShi: shiInfo?.shi || '', geShiVi: shiInfo?.vn || '',
+    starDesc: starInfo.desc || '', geShi: shiInfo?.shi || '', geShiAnalysis: shiInfo?.analysis || null,
     summary,
   };
 }

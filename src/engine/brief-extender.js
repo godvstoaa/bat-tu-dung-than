@@ -109,7 +109,9 @@ export function extendBrief(R) {
     const fdg = guiguziFDG(R);
     if (fdg) {
       let line = `鬼谷子分定經 LIẾU ĐẦU KÈM: ${fdg.combo} → quẻ ${fdg.guaVi} (cách「${fdg.geMing}」). ${fdg.star ? fdg.star + ': ' : ''}${fdg.starDesc || ''} ${fdg.guaMeaning || ''}`;
-      if (fdg.geShiVi) line += ` 格诗VN: ${fdg.geShiVi}`;
+      if (fdg.geShiAnalysis && fdg.geShiAnalysis.length) {
+        line += ` 格诗分層: ${fdg.geShiAnalysis.map(a => a.slice(0, 60)).join(' | ')}`;
+      }
       parts.push(line);
     }
   } catch (e) {}
