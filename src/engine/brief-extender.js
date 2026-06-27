@@ -45,6 +45,7 @@ import { guiguziFortune } from './guiguzi.js';
 import { guiguziFDG } from './guiguzi-fdg.js';
 import { hexagramSynthesis } from './hexagram-synthesis.js';
 import { computeLiuDao } from './liudao.js';
+import { destinyConsensus } from './destiny-consensus.js';
 import { dayNayinPersonality } from './nayin-personality.js';
 
 /**
@@ -133,6 +134,14 @@ export function extendBrief(R) {
       const ld = computeLiuDao(R);
       if (ld.ok) {
         parts.push(`LỤC ĐẠO 輪迴 (ṣaḍ-gati, Phạn): tam độc [THAM ${ld.poisons.tham}/SÂN ${ld.poisons.san}/SI ${ld.poisons.si}] → khuynh hướng ${ld.realm.vi} (${ld.realm.skt}, ${ld.realm.tier === 'thiện' ? 'thiện đạo' : 'ác đạo'}). Nghiệp nhân: ${ld.realm.karmaCause}. ${ld.narrative.slice(0, 160)} (Đây là góc nhìn tu học dân gian融通, KHÔNG tiên đoán tái sinh).`);
+      }
+    } catch (e) {}
+    // [loop 561] DESTINY CONSENSUS — tổng hợp đa hệ thống (BaZi + 称骨 + Dịch + 六道)
+    try {
+      const dc = destinyConsensus(R);
+      if (dc.ok && dc.consensus) {
+        const sys = dc.systems;
+        parts.push(`DESTINY CONSENSUS (meta): BaZi=${sys.bazi?.detail || '?'} | 称骨=${sys.chenggu?.detail || '?'} | Dịch=${sys.hexagram?.detail?.slice(0, 30) || '?'} | 六道=${sys.liudao?.realm || '?'}. → ${dc.consensus.verdict} (agreement ${dc.consensus.agreement}, ${dc.consensus.n} hệ). ${dc.consensus.narrative.slice(0, 200)}`);
       }
     } catch (e) {}
   } catch (e) {}

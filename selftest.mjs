@@ -206,6 +206,17 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
   assert(am.ganZhi === hdrGZ, `[loop 559] analyze_month«tháng này»(${am.ganZhi}) khớp brief header (${hdrGZ}) — không mâu thuẫn`);
   console.log(`   analyze_month ✓ — «tháng này» ganZhi ${am.ganZhi} khớp brief header (AI không mâu thuẫn)`);
 }
+
+// ################## DESTINY CONSENSUS (meta-synthesis đa hệ thống) [loop 561] ##################
+{
+  const { destinyConsensus } = await import('./src/engine/destiny-consensus.js');
+  const dc = destinyConsensus(R);
+  assert(dc.ok === true, 'destinyConsensus ok');
+  assert(dc.consensus && typeof dc.consensus.verdict === 'string', 'consensus có verdict');
+  assert(dc.systems.bazi && dc.systems.chenggu, 'consensus có hệ bazi + chenggu');
+  assert(['CỰC KỲ ĐỒNG THUẬN CÁT','CỰC KỲ ĐỒNG THUẬN HUNG','ĐỒNG THUẬN THIÊN CÁT','ĐỒNG THUẬN THIÊN HUNG','PHÂN KỲ (mệnh phức tạp)','KHÔNG ĐỦ DỮ LIỆU'].includes(dc.consensus.verdict), `verdict hợp lệ (got ${dc.consensus.verdict})`);
+  console.log(`   Destiny Consensus ✓ — spR: ${dc.consensus.verdict} (agreement ${dc.consensus.agreement}, ${dc.consensus.n} hệ)`);
+}
 assert(R1990.yong.tiaohou.note.includes('Hạ'), 'tiaohou note gắn khí hậu mùa (Hạ)');
 // [loop 34] 调候 OVERRIDE: 1990 辛午 (cực nhiệt) → 窮通寶鑑 lấy 壬水 → Dụng=Thủy (override Phù Ức)
 assert(R1990.yong.tiaohou.override === true && R1990.yong.primary === '水', `1990 辛午 调候 OVERRIDE → Dụng=Thủy (được override=${R1990.yong.tiaohou.override}, primary=${R1990.yong.primary})`);
