@@ -58,7 +58,6 @@ export function guiguziFortune(R) {
   try { nayin = ganZhiNayin(yearJiaZi) || ''; } catch (e) {}
   const info = GUIGUZI_NAYIN[nayin] || { vi: nayin, tone: 'bình', verse: '', fortune: '(chưa có thơ cho 納音 này)', career: '' };
   const toneVi = info.tone === 'cat' ? 'CÁT' : info.tone === 'hung' ? 'HUNG' : 'BÌNH';
-  const summary = `${yearJiaZi} (${nayin}/${info.vi}) — ${toneVi}. ${info.fortune?.slice(0, 80) || ''}`;
   // [loop 534] 60 甲子 unique — 天干 陽/陰 modifier: yang = active/bold, yin = refined/patient.
   //   Classical 鬼谷子 phân biệt 甲子 ≠ 乙丑 dù cùng 海中金 — 陽干 (甲丙戊庚壬) chủ động,
   //   陰干 (乙丁己辛癸) thụ động/tinh tế. Nay thêm GAN_MOD cho 60 readings unique.

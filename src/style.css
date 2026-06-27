@@ -1111,8 +1111,8 @@ html{scroll-behavior:smooth}
   a { color: #333 !important; text-decoration: none !important; }
   .hidden { display: block !important; }
 }
-.chat-suggest { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
-.suggest-chip { font-size: 11px; color: var(--gold); background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.18); border-radius: 12px; padding: 4px 10px; cursor: pointer; white-space: nowrap; transition: background .15s; }
+.chat-suggest { display: flex; flex-wrap: nowrap; gap: 4px; margin-bottom: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.suggest-chip { font-size: 11px; color: var(--gold); background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.18); border-radius: 12px; padding: 3px 8px; cursor: pointer; white-space: nowrap; transition: background .15s; flex-shrink: 0; }
 .suggest-chip:hover { background: rgba(212,175,55,0.2); }
 
 /* === yinzhai 24 sơn (âm phần) === */
