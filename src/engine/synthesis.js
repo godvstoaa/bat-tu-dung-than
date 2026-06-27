@@ -8,6 +8,9 @@ import { detectCombos } from './combos.js';
 import { dayunChangsheng } from './changsheng-deep.js'; // [loop 20] 十二长生运 giai đoạn đại vận
 
 const wxVi = (w) => WX_VI[w];
+// [loop 503] WX_REMEDY map — dùng cho remedy factors (Dụng yếu/Kỵ thái quá/盖头截脚 trúng Dụng)
+const WX_REMEDY = { 木: 'xanh/Đông', 火: 'đỏ/Nam', 土: 'vàng/Tây Nam', 金: 'trắng/Tây', 水: 'đen/Bắc' };
+const remedyHint = (wx) => (WX_REMEDY[wx] ? ` → ${wxVi(wx)}: màu ${WX_REMEDY[wx]}` : '');
 
 /**
  * @param {object} R - kết quả analyze() đầy đủ
@@ -43,7 +46,7 @@ export function synthesize(R) {
 
   // --- 2. 有力 (Dụng Thần có gốc/có lực không) ---
   if (yongScore / total >= 0.15) { score += 6; factors.push(`Dụng Thần ${wxVi(yong.primary)} có lực (${((yongScore / total) * 100).toFixed(0)}%) — có gốc, +6.`); }
-  else if (yongScore / total < 0.08) { score -= 6; factors.push(`Dụng Thần ${wxVi(yong.primary)} yếu (${((yongScore / total) * 100).toFixed(0)}%) — thiếu lực, −6.`); }
+  else if (yongScore / total < 0.08) { score -= 6; factors.push(`Dụng Thần ${wxVi(yong.primary)} yếu (${((yongScore / total) * 100).toFixed(0)}%) — thiếu lực, −6.${remedyHint(yong.primary)}补 mạnh.`); }
   // Dụng ở can năm/tháng (vị trí mạnh)
   const yongInYueGan = ['year', 'month', 'time'].some((k) => GAN[chart.pillars[k].gan].wx === yong.primary);
   if (yongInYueGan) { score += 3; factors.push('Dụng Thần thấu Thiên Can năm/tháng/giờ — vị trí hữu lực, +3.'); }
@@ -51,7 +54,7 @@ export function synthesize(R) {
   // --- 3. 有情 (Dụng có nguồn <喜> không; Kỵ có chế không) ---
   if (xiScore / total >= 0.12) { score += 5; factors.push(`Có Hỷ Thần ${wxVi(yong.xi)} (${((xiScore / total) * 100).toFixed(0)}%) sinh trợ Dụng — hữu tình, +5.`); }
   else { score -= 3; factors.push('Hỷ Thần (nguồn sinh Dụng) mỏng — Dụng thiếu hậu thuẫn, −3.'); }
-  if (jiScore / total >= 0.25) { score -= 6; factors.push(`Kỵ Thần ${wxVi(yong.ji)} thái quá (${((jiScore / total) * 100).toFixed(0)}%) — Dụng bị khắc nặng, −6.`); }
+  if (jiScore / total >= 0.25) { score -= 6; factors.push(`Kỵ Thần ${wxVi(yong.ji)} thái quá (${((jiScore / total) * 100).toFixed(0)}%) — Dụng bị khắc nặng, −6.${remedyHint(yong.primary)}tăng, tránh ${wxVi(yong.ji)}.`); }
   if (yongScore >= jiScore) { score += 3; factors.push('Lực Dụng ≥ lực Kỵ — thế cục chủ động, +3.'); }
 
   // --- 4. 清浊 (tổ hợp hung làm trọc cục) ---
@@ -112,9 +115,7 @@ export function synthesize(R) {
       score += pqDelta;
       const why = [];
       if (pql.dungHits) {
-        // [loop 502] concrete remedy: 补 Dụng (màu/hướng) — mirror 源流 gap-remedy
-        const _dr = { 木:'xanh/Đông', 火:'đỏ/Nam', 土:'vàng/Tây Nam', 金:'trắng/Tây', 水:'đen/Bắc' }[yong.primary];
-        why.push(`${pql.dungHits} trụ 盖头/截脚 trúng DỤNG → Dụng bị khắc yếu (${-2 * pql.dungHits})${_dr ? ` → 补 Dụng: màu ${_dr}` : ''}`);
+        why.push(`${pql.dungHits} trụ 盖头/截脚 trúng DỤNG → Dụng bị khắc yếu (${-2 * pql.dungHits}) → 补 Dụng${remedyHint(yong.primary)}.`);
       }
       if (pql.jiHits) why.push(`${pql.jiHits} trụ trúng KỴ → khắc được忌, lợi (+${pql.jiHits})`);
       factors.push(`盖头截脚 (${pql.gaijieCount}/4 trụ can-chi khắc): ${why.join('; ')}.`);
