@@ -115,6 +115,7 @@ import { strength3Fa } from './engine/strength-3fa.js';
 import { jiaoYunAnalysis } from './engine/jiaoyun.js';
 import { analyzePillarQuality } from './engine/pillar-quality.js';
 import { analyzeYuanLiu } from './engine/yuanliu.js';
+import { phaseNarrative } from './engine/phase-narrative.js';
 import { analyzeHuaQi } from './engine/huaqi.js';
 import { dayunChangSheng, liunianChangSheng, dayunYongChangSheng, liuyueChangSheng } from './engine/dayun-changsheng.js';
 import { analyzeHanNuan } from './engine/han-nuan.js';
@@ -1656,6 +1657,17 @@ function renderYuanLiu(R) {
       <p class="hint" style="margin-top:4px">${esc(yl.note)}</p>
       <p class="hint" style="margin-top:2px;color:var(--muted)">${esc(yl.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được dòng khí.</p>'; }
+}
+
+// [loop 472] Tường thuật giai đoạn — narrative prose may xuyên 大运→lưu niên→lưu nguyệt.
+function renderPhaseNarrative(R) {
+  const el = $('phase-narrative');
+  if (!el) return;
+  try {
+    const pn = phaseNarrative(R);
+    const toneCls = (p) => /Đại cát|Cát|thuận lợi|nắm lấy/.test(p) ? 'rate-cat' : /Đại hung|Hung|khó khăn|cẩn trọng/.test(p) ? 'rate-hung' : 'rate-mid';
+    el.innerHTML = pn.paragraphs.map((p) => `<p class="yz-row" style="line-height:1.6;border-left:3px solid var(--gold-soft);padding-left:10px;margin:6px 0">${p}</p>`).join('');
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được tường thuật giai đoạn.</p>'; }
 }
 
 function renderHuaqi(R) {
@@ -3207,6 +3219,7 @@ function run() {
   renderPillars(c);
   renderVerdict(currentResult);
   renderSynthesis(currentResult);
+  renderPhaseNarrative(currentResult); // [loop 472] narrative ngay sau tổng luận
   renderQianli(currentResult);
   renderMangpai(currentResult);
   renderMangpaiView(currentResult);
