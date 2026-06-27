@@ -5492,6 +5492,23 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(['CÁT','HUNG','NHẤT','LỆCH','TRUNG','CỰC','Chỉ'].some((k) => syn.synthesis.verdict.includes(k) || syn.synthesis.verdict.includes('一致') || true), 'verdict hợp lệ');
   console.log(`   Kinh Dịch: 64 quẻ VN + tổng hợp 河洛(${syn.systems.heluo.nameVi}) ↔ 鬼谷(${syn.systems.guiguzi.nameVi}) → ${syn.synthesis.verdict} ✓`);
 }
+
+// ################## LỤC ĐẠO (ṢAḌ-GATI, Phật giáo) [loop 546] ##################
+{
+  const { computeLiuDao, SIX_REALMS } = await import('./src/engine/liudao.js');
+  assert(Object.keys(SIX_REALMS).length === 6, `Lục đạo đủ 6 đạo (got ${Object.keys(SIX_REALMS).length})`);
+  // Sanskrit chính xác (research, không phán bừa)
+  assert(SIX_REALMS['天道'].skt === 'devagati' && SIX_REALMS['地狱道'].skt === 'narakagati', 'Sanskrit ṣaḍ-gati chính xác (devagati/narakagati)');
+  assert(SIX_REALMS['饿鬼道'].sktRoot === 'preta' && SIX_REALMS['畜生道'].sktRoot === 'tiryagyoni', 'Skt root preta/tiryagyoni chính xác');
+  // nghiệp nhân
+  assert(SIX_REALMS['饿鬼道'].karmaCause.includes('悭贪') || SIX_REALMS['饿鬼道'].karmaCause.includes('keo kiệt'), '饿鬼 nghiệp nhân = 悭贪');
+  const ld = computeLiuDao(spR);
+  assert(ld.ok === true, 'computeLiuDao ok');
+  assert(['天道','人道','阿修罗道','畜生道','饿鬼道','地狱道'].includes(ld.primary), `primary realm hợp lệ (got ${ld.primary})`);
+  assert(ld.poisons && ld.narrative, 'liudao có tam độc + narrative');
+  assert(ld.disclaimer && ld.disclaimer.includes('KHÔ'), 'liudao có disclaimer (không tiên đoán tái sinh)');
+  console.log(`   Lục Đạo (ṣaḍ-gati): 6 đạo + Skt chính xác + spR→${ld.realm.vi} (tam độc ${ld.poisonTop.vi}) ✓`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');

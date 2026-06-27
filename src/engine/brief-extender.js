@@ -44,6 +44,7 @@ import { detectGongjia } from './gongjia.js';
 import { guiguziFortune } from './guiguzi.js';
 import { guiguziFDG } from './guiguzi-fdg.js';
 import { hexagramSynthesis } from './hexagram-synthesis.js';
+import { computeLiuDao } from './liudao.js';
 import { dayNayinPersonality } from './nayin-personality.js';
 
 /**
@@ -127,8 +128,14 @@ export function extendBrief(R) {
         parts.push(line);
       }
     } catch (e) {}
+    // [loop 546] 六道轮回 (ṣaḍ-gati) — BaZi → tam độc → khuynh hướng 6 đạo (Phật giáo, Skt)
+    try {
+      const ld = computeLiuDao(R);
+      if (ld.ok) {
+        parts.push(`LỤC ĐẠO 輪迴 (ṣaḍ-gati, Phạn): tam độc [THAM ${ld.poisons.tham}/SÂN ${ld.poisons.san}/SI ${ld.poisons.si}] → khuynh hướng ${ld.realm.vi} (${ld.realm.skt}, ${ld.realm.tier === 'thiện' ? 'thiện đạo' : 'ác đạo'}). Nghiệp nhân: ${ld.realm.karmaCause}. ${ld.narrative.slice(0, 160)} (Đây là góc nhìn tu học dân gian融通, KHÔNG tiên đoán tái sinh).`);
+      }
+    } catch (e) {}
   } catch (e) {}
-  // [loop 526] 日柱納音 personality — bản chất bẩm sinh theo nạp âm NGÀY
   try {
     const dnp = dayNayinPersonality(R);
     if (dnp && dnp.traits) parts.push(`日柱納音 BẢN CHẤT: ${dnp.dayJiaZi} nạp âm ${dnp.nayin} (${dnp.vi}) — ${dnp.nature}. ${dnp.traits.slice(0, 80)} Mạnh: ${dnp.strength}. Yếu: ${dnp.weakness}.`);

@@ -190,6 +190,7 @@ import {
 } from './engine/physiognomy.js';
 import { cezi as ceziDivination } from './engine/cezi.js';
 import { yizhangjingFromChart as yizhangjingCast, renderYizhangjingCard } from './engine/yizhangjing.js';
+import { computeLiuDao, SIX_REALMS } from './engine/liudao.js';
 
 let currentResult = null;
 let currentTopic = 'general';
@@ -969,6 +970,45 @@ function renderYizhangjing(R) {
     const yz = yizhangjingCast(R);
     el.innerHTML = renderYizhangjingCard(yz);
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 一掌经.</p>'; }
+}
+
+// [loop 546] 六道轮回 (ṣaḍ-gati) — BaZi → tam độc → khuynh hướng 6 đạo
+function renderLiuDao(R) {
+  const el = $('liudao');
+  if (!el) return;
+  try {
+    const ld = computeLiuDao(R);
+    if (!ld.ok) { el.innerHTML = '<p class="hint">Không tính được Lục Đạo.</p>'; return; }
+    const r = ld.realm;
+    const tierCls = r.tier === 'thiện' ? 'rate-cat' : 'rate-hung';
+    // thanh tam độc
+    const poisonBars = ['tham', 'san', 'si'].map((k) => {
+      const v = ld.poisons[k];
+      const vi = k === 'tham' ? 'THAM 贪' : k === 'san' ? 'SÂN 嗔' : 'SI 痴';
+      const cls = v >= 60 ? 'rate-hung' : v >= 35 ? 'rate-mid' : 'rate-cat';
+      return `<div style="margin:3px 0"><span style="display:inline-block;width:60px;font-size:12px">${vi}</span> <span class="ln-rate ${cls}">${v}/100</span></div>`;
+    }).join('');
+    // 6 đạo score bars (sắp xếp theo điểm giảm dần)
+    const realmBars = Object.entries(ld.scores).sort((a, b) => b[1] - a[1]).map(([k, v]) => {
+      const info = SIX_REALMS[k];
+      const cls = info.tier === 'thiện' ? 'rate-cat' : 'rate-hung';
+      const isPrimary = k === ld.primary;
+      return `<div style="margin:3px 0;${isPrimary ? 'background:rgba(247,236,203,0.10);padding:3px 6px;border-left:3px solid var(--gold-bright)' : ''}">
+        <span class="zh">${k}</span> <span class="hint">${esc(info.vi)}</span> <span class="hint">(${info.skt})</span>
+        <span class="ln-rate ${cls}" style="float:right">${v}${isPrimary ? ' ★' : ''}</span>
+      </div>`;
+    }).join('');
+    el.innerHTML = `
+      <div class="cg-head"><div class="cg-total"><span class="zh big">${r.name}</span> <span class="hint-inline">${esc(r.vi)} · <i>${r.skt}</i> (Phạn)</span> <span class="ln-rate ${tierCls}">${r.tier === 'thiện' ? 'THIỆN ĐẠO' : 'ÁC ĐẠO'}</span></div></div>
+      <p class="cg-interp">${esc(r.desc)}</p>
+      <p class="cg-interp"><b>Nghiệp nhân:</b> ${esc(r.karmaCause)}. <b>Độc chính:</b> ${esc(r.poison)}. <b>Đối trị:</b> ${esc(r.remedy)} → hướng về ${esc(r.buddha)}.</p>
+      <div class="tiaohou-note" style="margin:8px 0;padding:8px 10px;border-left:3px solid var(--gold-bright)"><b>🔎 Luận khuynh hướng:</b> ${esc(ld.narrative)}</div>
+      <h4 class="syn-h4" style="margin-top:10px">Tam độc (贪嗔痴) từ lá số</h4>
+      ${poisonBars}
+      <h4 class="syn-h4" style="margin-top:10px">Điểm 6 đạo (ṣaḍ-gati)</h4>
+      ${realmBars}
+      <p class="hint" style="margin-top:6px">⚠ ${esc(ld.disclaimer)} Nghiệp nhân 6 đạo theo Phật giáo (nguồn: Wikipedia/Rigpa Wiki ṣaḍgati, 法鼓文化). BaZi→tam độc là đồng bộ DÂN GIAN融通, giúp tự tỉnh tu tập — không phải tiên đoán tái sinh.</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được Lục Đạo.</p>'; }
 }
 
 function renderStarPower(R) {
@@ -3413,6 +3453,7 @@ function run() {
   lazyRender('sanshishu',      () => { try { renderSanshishu(currentResult); } catch (e) { console.warn('sanshishu', e.message); } });
   lazyRender('heluo',          () => { try { renderHeluo(currentResult); } catch (e) { console.warn('heluo', e.message); } });
   lazyRender('yizhangjing',    () => { try { renderYizhangjing(currentResult); } catch (e) { console.warn('yizhangjing', e.message); } });
+  lazyRender('liudao',         () => { try { renderLiuDao(currentResult); } catch (e) { console.warn('liudao', e.message); } });
   lazyRender('decade',         () => { try { renderDecade(currentResult); } catch (e) { console.warn('decade', e.message); } });
   lazyRender('starpower',      () => { try { renderStarPower(currentResult); } catch (e) { console.warn('starpower', e.message); } });
   lazyRender('dir-taboo',      () => { try { renderDirectionTaboo(); } catch (e) { console.warn('dirtaboo', e.message); } });
