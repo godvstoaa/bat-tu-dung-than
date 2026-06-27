@@ -672,7 +672,11 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
     if (patternQualityResult) liunian = adjustLiunianByGeju(liunian, patternQualityResult, chart.dayGan);
   } catch (e) { /* fallback: giữ liunian tầng 5 trường phái */ }
   let synthesis = {};
-  try { synthesis = synthesize({ chart, wx, strength, interactions, shensha, pattern, yong, patternQuality: patternQualityResult, dayun }); } catch (e) { synthesis = { paragraphs: [] }; }
+  try { synthesis = synthesize({ chart, wx, strength, interactions, shensha, pattern, yong, patternQuality: patternQualityResult, dayun, yuanliu, kongwang }); } catch (e) { synthesis = { paragraphs: [] }; }
+  // [loop 466 FIX BUG CAO] truyền yuanliu + kongwang vào synthesize. Trước đây synthesize
+  //   nhận object THIẾU 2 field này → 源流 factor (loop 457) VÀ 空亡 penalty (loop 150) là
+  //   DEAD CODE trong production (R.yuanliu/R.kongwang undefined → if(yl)/if(kw) skip).
+  //   Tổng luận bỏ qua dòng khí + trụ void-pillar suốt! Nay fix → 2 factor activate.
   const full = { chart, wx, strength, interactions, shensha, pattern, yong, dayun, liunian, synthesis, patternQuality: patternQualityResult, kongwang };
   try { full.liuqin = analyzeLiuqin(full); } catch (e) { full.liuqin = []; }
   try { full.remedy = buildRemedy(full); } catch (e) { full.remedy = { twelveLaws: [] }; }
