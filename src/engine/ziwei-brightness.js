@@ -34,14 +34,15 @@ export const BRIGHTNESS = {
 
 const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 
-const SCORE = { 庙: 3, 旺: 2, 得: 1.5, 利: 1, 平: 0, 闲: -0.5, 陷: -1.5 };
-const STATE_VI = { 庙: 'Miếu', 旺: 'Vượng', 得: 'Đắc', 利: 'Lợi', 平: 'Bình', 闲: 'Nhàn', 陷: 'Hãm' };
+const SCORE = { 庙: 3, 旺: 2, 得: 1.5, 利: 1, 平: 0, 地: -0.5, 闲: -0.5, 陷: -1.5 };
+const STATE_VI = { 庙: 'Miếu', 旺: 'Vượng', 得: 'Đắc', 利: 'Lợi', 平: 'Bình', 地: 'Địa', 闲: 'Nhàn', 陷: 'Hãm' };
 const STATE_NOTE = {
   庙: 'mạnh nhất — ưu điểm phóng đại, khuyết điểm giảm, địa vị xã hội cao',
   旺: 'mạnh — sức sao phát huy tốt',
   得: 'khá mạnh — lực bình thường tốt',
   利: 'trung bình khá',
   平: 'trung bình — đặc tính sao không nổi',
+  地: 'lạc địa — sao rơi xuống đất, lực suy yếu (giữa Bình và Hãm)',
   闲: 'yếu — lực không mạnh, ích kỷ hưu tiếu, ít tiến thủ',
   陷: 'hãm — ưu điểm khó phát, KHÔNG nhất thiết hung nhưng dễ đảo nghịch',
 };
@@ -70,7 +71,7 @@ export function analyzeZiweiBrightness(zr) {
     }
   }
   const strong = items.filter((i) => i.state === '庙' || i.state === '旺').sort((a, b) => b.score - a.score);
-  const weak = items.filter((i) => i.state === '陷' || i.state === '闲').sort((a, b) => a.score - b.score);
+  const weak = items.filter((i) => i.state === '陷' || i.state === '闲' || i.state === '地').sort((a, b) => a.score - b.score);
   // sao MỆNH cung quan trọng nhất
   const ming = zr.palaces.find((p) => p.isMing);
   const mingStars = items.filter((i) => i.palaceVi === ming?.vi);
