@@ -54,6 +54,10 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+/* [loop 533] Scroll-triggered card reveal — premium scroll experience */
+.card-hidden { opacity: 0; transform: translateY(28px) perspective(800px) rotateX(4deg); }
+.card-visible { opacity: 1; transform: none; transition: opacity .5s var(--ease-spring), transform .6s var(--ease-spring); }
+
 /* [loop 532] Animated particle background — gold floating particles */
 body::before {
   content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;

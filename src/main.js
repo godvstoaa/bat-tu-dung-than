@@ -3196,6 +3196,24 @@ function saveModal() {
 }
 
 // ---------------------------------------------------------------- MAIN
+// [loop 533] Scroll-triggered card reveal — premium scroll experience
+const _revealIO = (typeof IntersectionObserver !== 'undefined')
+  ? new IntersectionObserver((entries) => {
+      for (const ent of entries) {
+        if (ent.isIntersecting) {
+          ent.target.classList.add('card-visible');
+          _revealIO.unobserve(ent.target);
+        }
+      }
+    }, { rootMargin: '0px 0px -50px 0px', threshold: 0.05 })
+  : null;
+
+function observeCardReveal(cardEl) {
+  if (!_revealIO || !cardEl) return;
+  cardEl.classList.add('card-hidden');
+  _revealIO.observe(cardEl);
+}
+
 // ---- Lazy-render (Task 2): defer heavy cards below the fold ----
 // Giữ nguyên import/render logic; chỉ bọc lời gọi render trong kiểm tra viewport.
 // Fallback: không có IntersectionObserver → render ngay (giữ hành vi cũ).
@@ -3539,6 +3557,8 @@ function run() {
   lazyRender('decade-curve',  () => { try { renderDecadeCurve(); } catch (e) { console.warn('decade-curve', e.message); } });
   lazyRender('ziwei-stars-out',() => { try { renderZiweiFull(); } catch (e) { console.warn('ziweiFull', e.message); } });
   lazyRender('life-summary',   () => { try { renderLifeTrajectory(currentResult); } catch (e) { console.warn('life', e.message); } });
+  // [loop 533] observe all cards for scroll-triggered reveal
+  document.querySelectorAll('#result .card').forEach((card) => observeCardReveal(card));
   $("result").classList.remove("hidden");
   $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
