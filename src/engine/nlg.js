@@ -12,6 +12,7 @@ import { jiaoYunAnalysis } from './jiaoyun.js';
 import { decadeForecast } from './decade-forecast.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
+import { predictEvents } from './event-predict.js';
 import { analyzeTaohua } from './taohua.js';
 import { marriageStars } from './marriage-stars.js';
 import { starPower } from './star-power.js';
@@ -357,6 +358,8 @@ function pTiming(R, intent) {
   try { const df = decadeForecast(R, new Date().getFullYear(), 10); lines.push(`📊 10 năm: TỐT ${df.best?.year ?? '?'}(${df.best?.rating ?? '?'}), XẤU ${df.worst?.year ?? '?'}.`); } catch (e) {}
   // Session supplement: 12 thần lưu niên năm nay (四利三元)
   try { const l12 = analyzeLiunian12(R, new Date().getFullYear()); const m = l12.mine; lines.push(`🎴 12神 ${l12.year}: ${m.vi}(${m.viSub}) — ${m.tone === 'cat' ? 'CÁT' : m.tone === 'hung' ? 'HUNG' : 'TRUNG'}: ${m.meaning.slice(0, 70)}.`); } catch (e) {}
+  // [loop 506] SỰ KIỆN (event-predict + favor-aware tone) — offline user biết WHAT xảy ra
+  try { const ev = predictEvents(R, new Date().getFullYear(), 3); if (ev.years?.length) lines.push(`📅 Sự kiện: ${ev.years.map((y) => `${y.year}(${y.lnArea}${y.tone === 'cat' ? ' Cát' : y.tone === 'hung' ? ' Hung' : ''})`).join(', ')}.`); } catch (e) {}
   return { title: 'Vận hạn & thời điểm', paragraphs: lines };
 }
 
