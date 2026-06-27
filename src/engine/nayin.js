@@ -20,6 +20,7 @@ export const NAYIN_MEANING = {
   松柏木: { vi: 'Tùng Bách Mộc', wx: '木', meaning: 'Cây tùng bách — xanh bốn mùa, cứng cáp, tiết tháo; quân tử.' },
   长流水: { vi: 'Trường Lưu Thủy', wx: '水', meaning: 'Nước chảy dài — liên tục không nghỉ, uyển chuyển, bền bỉ.' },
   砂中金: { vi: 'Sa Trung Kim', wx: '金', meaning: 'Kim trong cát — lẫn lộn, cần đãi sàng mới lấy được; quý nhưng khó tìm.' },
+  沙中金: { vi: 'Sa Trung Kim', wx: '金', meaning: 'Kim trong cát — lẫn lộn, cần đãi sàng mới lấy được; quý nhưng khó tìm.' }, // [loop 437] lunar-javascript dùng 沙 (không phải 砂) → alias
   山下火: { vi: 'Sơn Hạ Hỏa', wx: '火', meaning: 'Lửa chân núi — sáng gần, ấm; cần củi nuôi, cát tường.' },
   平地木: { vi: 'Bình Địa Mộc', wx: '木', meaning: 'Cây đất bằng — mọc thấp, khoẻ, dễ sinh sôi; bình dị.' },
   壁上土: { vi: 'Bích Thượng Thổ', wx: '土', meaning: 'Đất trên tường — che chắn, kín đáo; cần vữa gắn.' },

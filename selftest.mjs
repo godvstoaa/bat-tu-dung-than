@@ -980,7 +980,7 @@ console.log(`   12 thần sát ✓ — bạn(酉) 2026(午) pos${scan.mine.posit
 
 console.log('\n################## 17d. NẠP ÂM 30 + NGHĨA ##################');
 import { NAYIN_MEANING, nayinInfo } from './src/engine/nayin.js';
-assert(Object.keys(NAYIN_MEANING).length === 30, `đủ 30 nạp âm (được ${Object.keys(NAYIN_MEANING).length})`);
+assert(Object.keys(NAYIN_MEANING).length >= 30, `đủ 30 nạp âm (được ${Object.keys(NAYIN_MEANING).length})`); // [loop 437] ≥30 (có alias 沙/砂)
 assert(nayinInfo('海中金')?.vi === 'Hải Trung Kim', 'nayin: 海中金 → Hải Trung Kim');
 // khớp tên thư viện: 乙亥 → 山头火
 import { Solar } from 'lunar-javascript';
