@@ -119,6 +119,21 @@ export function dailyPro(R, year, month, day) {
   score += e6;
   schools.push({ phai: 'Thông Thắng', d: e6, note: e6note });
 
+  // [loop 434 elevate] 大运基调 (silent) — completing temporal chain 大运→流年→流月→流日
+  //   Daily weight is lightest (±1 total) — day inherits tiny decade influence.
+  //   Applied silently (no visible school) to avoid repetition with 流年/流月 cards.
+  try {
+    const _dyAge = (year - R.chart.input.year);
+    const _ad = (R.dayun || []).find((d) => _dyAge >= d.startAge && _dyAge < d.startAge + 10);
+    if (_ad && _ad.gan && _ad.zhi) {
+      const _dgWx = GAN[_ad.gan]?.wx, _dzWx = ZHI[_ad.zhi]?.wx;
+      const _fav = new Set([yong.primary, yong.xi].filter(Boolean));
+      const _avoid = new Set([yong.ji, yong.chou]);
+      if (_fav.has(_dzWx)) score += 1;
+      else if (_avoid.has(_dzWx)) score -= 1;
+    }
+  } catch (_) {}
+
   // Score
   score = Math.max(5, Math.min(98, Math.round(score)));
   let rating = score >= 65 ? 'Cát' : score >= 48 ? 'Bình' : score >= 35 ? 'Hơi kỵ' : 'Kỵ';
