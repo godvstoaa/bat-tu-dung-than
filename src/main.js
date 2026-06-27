@@ -5258,8 +5258,8 @@ function renderQuickSummary() {
   const WX_VI = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
   const dungVi = WX_VI[yong.primary] || '?';
   // Hôm nay
-  let todayScore = '?', todayRating = '?', todayOneLiner = '';
-  try { const b = dailyBriefing(c, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate(), c.patternQuality); todayScore = b.rating?.score ?? '?'; todayRating = b.rating?.level ?? '?'; todayOneLiner = (b.oneLiner || '').slice(0, 60); } catch (e) {}
+  let todayScore = '?', todayRating = '?', todayOneLiner = '', todayYi = '';
+  try { const b = dailyBriefing(c, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate(), c.patternQuality); todayScore = b.rating?.score ?? '?'; todayRating = b.rating?.level ?? '?'; todayOneLiner = (b.oneLiner || '').slice(0, 60); const _m = (b.rating?.summary || '').match(/chủ\s*["']([^"'']{2,40})["']/); if (_m) todayYi = _m[1]; } catch (e) {}
   const todayTone = (typeof todayScore === 'number' && todayScore >= 60) ? '🟢' : (typeof todayScore === 'number' && todayScore >= 45) ? '🟡' : '🔴';
   // Tuần này
   let weekSummary = '';
@@ -5290,7 +5290,7 @@ function renderQuickSummary() {
     { icon: (() => { const _yl = c.yuanliu; return _yl?.fullCycle ? '🌊' : (_yl && _yl.flowLen <= 1 ? '🚧' : '💧'); })(), label: 'Dòng khí 源流', text: (() => { const _yl = c.yuanliu; if (!_yl) return '(đang tính)'; return `${_yl.verdict}. Quy về <b>${_yl.aspectKey}</b> (${_yl.aspectVi}).${_yl.fullCycle ? ' Ngũ hành流通 tuần hoàn — phú quý bền.' : (_yl.gap ? ` Tắc ${WX_VI[_yl.gap] || _yl.gap}, đợi vận «mở dòng».` : '')}`; })() },
     { icon: '🛤️', label: 'Vận hiện tại', text: curDyTxt },
     { icon: '🕐', label: 'Giờ hiện tại', text: (() => { const _Z = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥']; const _ZV = ['Tý','Sửu','Dần','Mão','Thìn','Tỵ','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi']; const _h = new Date().getHours(); const _i = Math.floor(((_h + 1) % 24) / 2); return `<b>${_Z[_i]} (${_ZV[_i]})</b> giờ`; })() },
-    { icon: todayTone, label: 'Hôm nay', text: `${todayRating} (${todayScore}/100). ${todayOneLiner}` },
+    { icon: todayTone, label: 'Hôm nay', text: `${todayRating} (${todayScore}/100). ${todayOneLiner}${todayYi ? ` 📌 Hợp: ${esc(todayYi)}` : ''}` },
     { icon: '📆', label: 'Tuần này', text: weekSummary || '(đang tính...)' },
     { icon: alert ? '⚠' : '✓', label: alert ? 'Cảnh báo' : 'An tâm', text: alert || 'Không cảnh báo nặng năm nay.' },
   ];
