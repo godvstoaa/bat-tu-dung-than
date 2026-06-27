@@ -3,6 +3,7 @@
    Sơn đen + vàng đế vương + 朱砂 đỏ · bát quái · ấn ký · thư pháp
    ============================================================ */
 :root {
+  scroll-behavior: smooth;
   --ink-black: #0a0913;
   --ink: #0f0d1a;
   --lacquer: #15121e;
@@ -1499,11 +1500,14 @@ html{scroll-behavior:smooth}
   to { opacity: 0.6; }
 }
 
-/* [loop 522] MOBILE OPTIMIZATION — responsive layout + touch-friendly + reduced 3D */
+/* [loop 522→525] MOBILE OPTIMIZATION — responsive + touch-friendly + smooth */
 @media (max-width: 768px) {
+  html { scroll-behavior: smooth; }
   .container { padding: 8px 10px 50px; }
   .card { padding: 14px 14px 12px; margin-bottom: 12px; border-radius: 8px; backdrop-filter: blur(4px); }
-  .card:hover { transform: none; /* disable 3D tilt on touch — no hover on mobile */ }
+  .card:hover { transform: none; }
+  .card:active { transform: scale(0.985); transition: transform .12s; }
+  .card-3d:hover, .card-3d:active { transform: none; }
   .card-title { font-size: 15px; }
   .quick-nav { padding: 4px 6px; gap: 2px; font-size: 11px; }
   .quick-nav a, .quick-nav button { padding: 3px 6px; font-size: 11px; white-space: nowrap; }
@@ -1536,7 +1540,11 @@ html{scroll-behavior:smooth}
   /* reduce heavy animations on mobile for performance */
   .dt-seg:hover { transform: none; }
   * { -webkit-tap-highlight-color: transparent; }
-  button, .btn-ghost, .suggest-chip { min-height: 36px; /* touch target */ }
+  button, .btn-ghost, .suggest-chip { min-height: 36px; }
+  .pillar:hover { transform: none; }
+  .pillar:active { transform: scale(0.96); transition: transform .1s; }
+  .dt-seg:active { transform: scale(0.92); }
+  .quick-nav, .toc, .dt-row, #family-members { -webkit-overflow-scrolling: touch; }
 }
 
 /* [loop 522→523] 3D card effect for special cards — enhanced with flip entrance */
