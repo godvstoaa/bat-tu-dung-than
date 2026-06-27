@@ -293,7 +293,9 @@ export function extendBrief(R) {
   try {
     const yr = new Date().getFullYear();
     const ev = predictEvents(R, yr, 3);
-    parts.push(`SỰ KIỆN ${yr}-${yr + 2}: ${ev.years.map((y) => `${y.year}(${y.lnArea}${y.sameGod ? '/nhân đôi' : ''})`).join(', ')}.`);
+    // [loop 505] surface tone (favor-aware từ loop 490) trong brief
+    const _toneVi = (t) => t === 'cat' ? 'Cát' : t === 'hung' ? 'Hung' : '';
+    parts.push(`SỰ KIỆN ${yr}-${yr + 2}: ${ev.years.map((y) => `${y.year}(${y.lnArea}${y.sameGod ? '/nhân đôi' : ''}${y.tone ? '/' + _toneVi(y.tone) : ''})`).join(', ')}.`);
   } catch (e) {}
 
   // [loop 115] NGŨ ĐỨC (五常) — đức chính + tu dưỡng (AI personality depth)
