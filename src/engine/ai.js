@@ -74,6 +74,7 @@ import { waterActivation } from './water-activation.js';
 import { physiognomyOverview } from './physiognomy.js';
 import { yinzhaiOverview } from './yinzhai.js';
 import { cezi } from './cezi.js';
+import { castByTime, solarToMhNums } from './meihua.js';
 import { qizheng, longitudeToMansion } from './qizheng.js';
 // 天星择日 (cycle 38) — chọn ngày theo vị trí thật của 7 chính tinh tới 坐向
 import { tianxingZheri } from './tianxing-zheri.js';
@@ -658,6 +659,16 @@ export const AI_TOOLS = [
       char: { type: 'string', description: '1 chữ Hán cần测 (vd 福, 财, 发)' },
     }, required: ['char'] },
   },
+  { // [loop 496] 梅花易数 AI tool — 起卦 by time (AI-friendly, no manual cast)
+    name: 'analyze_meihua', description: '梅花易数 起卦 (time-based divination): gieo quẻ theo thời điểm → 本卦/互卦/变卦 + 体用 ngũ hành sinh khắc + verdict cát/hung. Dùng khi user hỏi «gieo quẻ», «起卦 about X», «占 [chủ đề]», «xem quẻ hôm nay». Trả quẻ +体用 + cát hung.',
+    parameters: { type: 'object', properties: {
+      year: { type: 'integer', description: 'Năm (bỏ trống = năm nay)' },
+      month: { type: 'integer', description: 'Tháng (bỏ trống = tháng nay)' },
+      day: { type: 'integer', description: 'Ngày (bỏ trống = hôm nay)' },
+      hour: { type: 'integer', description: 'Giờ 0-23 (bỏ trống = hiện tại)' },
+      minute: { type: 'integer', description: 'Phút 0-59 (bỏ trống = hiện tại)' },
+    } },
+  },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -692,6 +703,18 @@ export function execTool(name, args, R) {
           radical: cz.radical, strokes: cz.strokes, wx: cz.wx, wxVi: cz.wxVi,
           hexagram: cz.hexagram ? { name: cz.hexagram.name, vi: cz.hexagram.nameVi, meaning: cz.hexagram.meaning } : null,
           reading: cz.reading || cz.summary || '',
+        };
+      }
+      case 'analyze_meihua': { // [loop 496] 梅花易数 起卦 by time
+        const n = new Date();
+        const yr = a.year ?? n.getFullYear(), mo = a.month ?? (n.getMonth() + 1), da = a.day ?? n.getDate(), hr = a.hour ?? n.getHours(), mi = a.minute ?? n.getMinutes();
+        const nums = solarToMhNums(yr, mo, da, hr, mi);
+        const r = castByTime(nums);
+        return {
+          time: nums.label, ben: r.ben?.name, hu: r.hu?.name, bian: r.bian?.name,
+          dong: r.dong, dongInUpper: r.dongInUpper,
+          ti: r.ti ? `${r.ti.vi}(${r.ti.wx})` : '', yong: r.yong ? `${r.yong.vi}(${r.yong.wx})` : '',
+          rel: r.rel, huRel: r.huRel, bianRel: r.bianRel, verdict: r.verdict,
         };
       }
       case 'inverse_bazi': {
