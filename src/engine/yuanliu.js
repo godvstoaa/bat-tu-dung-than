@@ -72,20 +72,23 @@ export function analyzeYuanLiu(wx, dmWx) {
 
   // 6) Phán
   const fullCycle = flowLen >= 5;
+  // [loop 501] gap remedy — hành động cụ thể mở dòng (màu/hướng/ngành cho gap element).
+  const GAP_REMEDY = { 木:{màu:'xanh lá',hướng:'Đông',ngành:'giáo dục/nông/gỗ'}, 火:{màu:'đỏ',hướng:'Nam',ngành:'ẩm thực/điện/giải trí'}, 土:{màu:'vàng/nâu',hướng:'Tây Nam/Trung',ngành:'BĐS/xây/nông'}, 金:{màu:'trắng',hướng:'Tây',ngành:'tài chính/kim loại/công nghệ'}, 水:{màu:'đen/xanh đậm',hướng:'Bắc',ngành:'thương mại/logistics/thủy sản'} };
+  const gapTip = (g) => { const r = GAP_REMEDY[g]; return r ? ` Mở dòng: bổ ${WX_VI[g]} — màu ${r.màu}, hướng ${r.hướng}, ngành ${r.ngành}.` : ''; };
   let verdict, note;
   if (fullCycle) {
     verdict = '源远流长 (nguồn xa chảy dài)';
     note = `5 hành LƯU THÔNG tuần hoàn («源远流长») — khí mệnh THUẬN HOÀ, ngũ hành tương sinh không tắc → phú quý bền vững, đời ít nghịch, tài năng phát huy trọn vẹn. Dòng từ ${WX_VI[source]} thuận sinh qua đủ 5 hành.`;
   } else if (flowLen >= 3) {
     verdict = `lưu thông tốt (${flowLen}/5 hành)`;
-    note = `Dòng khí từ nguồn ${WX_VI[source]} chảy ${flowLen}/5 hành rồi quy về ${asp.key} (${asp.vi}).${gap ? ` Khí đình tại ${WX_VI[gap]} (chỉ ${+(pct(gap) * 100).toFixed(1)}% < 15%) → cần 大运/流 niên bổ ${WX_VI[gap]} dòng mới thông tiếp.` : ''}`;
+    note = `Dòng khí từ nguồn ${WX_VI[source]} chảy ${flowLen}/5 hành rồi quy về ${asp.key} (${asp.vi}).${gap ? ` Khí đình tại ${WX_VI[gap]} (chỉ ${+(pct(gap) * 100).toFixed(1)}% < 15%) → cần 大运/流 niên bổ ${WX_VI[gap]} dòng mới thông tiếp.${gapTip(gap)}` : ''}`;
   } else if (flowLen === 2) {
     verdict = `lưu thông vừa (${flowLen}/5 hành)`;
-    note = `Dòng khí chỉ chảy ${flowLen} hành rồi dừng, quy về ${asp.key} (${asp.vi}). Khí chưa lan tới toàn cục, tài/Dụng cần vận bổ hành ${gap ? WX_VI[gap] : 'thiếu'} mới phát huy.`;
+    note = `Dòng khí chỉ chảy ${flowLen} hành rồi dừng, quy về ${asp.key} (${asp.vi}). Khí chưa lan tới toàn cục, tài/Dụng cần vận bổ hành ${gap ? WX_VI[gap] : 'thiếu'} mới phát huy.${gap ? gapTip(gap) : ''}`;
   } else {
     verdict = 'khí trệ (nguồn mạnh nhưng dòng tắc)';
     const next = SHENG[source];
-    note = `${WX_VI[source]} vượng nhất (${+(pct(source) * 100).toFixed(1)}%) nhưng dòng sinh không chảy xa («源头旺而流不远») → khí ĐÌNH TRỆ, tài năng khó phát huy, dễ ứ. Cần 大运/流 niên có ${WX_VI[next]} (hành ${WX_VI[source]} sinh tới) mở dòng.`;
+    note = `${WX_VI[source]} vượng nhất (${+(pct(source) * 100).toFixed(1)}%) nhưng dòng sinh không chảy xa («源头旺而流不远») → khí ĐÌNH TRỆ, tài năng khó phát huy, dễ ủ. Cần 大运/流 niên có ${WX_VI[next]} (hành ${WX_VI[source]} sinh tới) mở dòng.${gapTip(next)}`;
   }
 
   const chainVi = chain.map((c) => `${WX_VI[c.wx]}(${(c.pct * 100).toFixed(0)}%)`).join(' → ');
