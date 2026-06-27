@@ -1682,12 +1682,17 @@ function renderDayunTimeline(R) {
   const curYear = new Date().getFullYear();
   const birthYear = R.chart.input.year;
   const curAge = curYear - birthYear;
+  // [loop 478] 十二长生 stage mỗi đại vận (长生=khởi, 帝旺=đỉnh, 墓=táng/suy...)
+  const stages = {};
+  try { dayunChangSheng(R.chart.dayGan, dys).items.forEach((it) => { stages[it.startAge] = it; }); } catch (e) {}
   const segs = dys.map((d) => {
     const isNow = curAge >= d.startAge && curAge < d.startAge + 10;
     const nayin = (() => { try { const n = ganZhiNayin(d.ganZhi); return n || ''; } catch (e) { return ''; } })();
-    const tip = `${d.ganZhi} · ${d.startAge}–${d.startAge + 9}t · ${d.rating}${nayin ? ' · ' + nayin : ''}${d._ylNote ? ' · ' + d._ylNote : ''}`;
+    const st = stages[d.startAge];
+    const tip = `${d.ganZhi} · ${d.startAge}–${d.startAge + 9}t · ${d.rating}${nayin ? ' · ' + nayin : ''}${st ? ' · ' + st.stage + ' (' + st.stageVi + ')' : ''}${d._ylNote ? ' · ' + d._ylNote : ''}`;
     return `<div class="dt-seg ${rateClass(d.rating)}${isNow ? ' dt-now' : ''}" data-sy="${d.startYear}" title="${esc(tip)} — nhấp xem tường thuật giai đoạn này">
       <div class="dt-gz zh">${esc(d.ganZhi)}</div>
+      <div class="dt-stage zh${st && /帝旺|臨官|長生/.test(st.stage) ? ' dt-stage-peak' : ''}">${st ? esc(st.stage) : ''}</div>
       <div class="dt-age">${d.startAge}–${d.startAge + 9}t${isNow ? ' ★' : ''}</div>
       <div class="dt-rate">${esc(d.rating)}</div>
     </div>`;
