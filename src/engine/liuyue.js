@@ -64,9 +64,11 @@ export function computeLiuyue(R, solarYear, patternQuality) {
     //   lệch 1 tháng (1月 báo 己丑 thay vì 庚寅). Nay: 寅≈Feb15, 卯≈Mar15, ..., 子≈Dec15, 丑≈Jan15 năm SAU.
     //   (Ranh tiết khí ~ngày 4-8, giữa tháng 15 an toàn nằm đúng tháng tiết khí.)
     let gYear = solarYear, gMonth;
+    let lmDyBase = 0; // [loop 433] 大运基调 modifier (tính 1 lần, dùng cho cả 12 tháng)
     if (i < 11) { gMonth = i + 2; }        // 寅=Feb ... 子=Dec
     else { gMonth = 1; gYear = solarYear + 1; } // 丑 = tháng 1 năm sau (vượt立春sang năm kế)
     let gan, zhi;
+    if (i === 0) lmDyBase = 0; // reset 1 lần đầu vòng lặp (tính ở lần đầu có active dayun)
     try {
       const s = Solar.fromYmdHms(gYear, gMonth, 15, 12, 0, 0);
       gan = s.getLunar().getMonthGan();
@@ -116,6 +118,22 @@ export function computeLiuyue(R, solarYear, patternQuality) {
       else if (isFanyin(yp, np)) { if (k === 'day') continue; fyD -= W_FANYIN[k] * factor; fyNotes.push(`反吟 ${QIN_VI[k]}`); }
     }
     score += fyD;
+
+    // [loop 433 elevate] 大运基调 cho lưu nguyệt — cùng nguyên lý 流年 (loop 428):
+    //   tháng tốt trong thập niên HUNG bị kìm, tháng xấu trong thập niên CÁT được đỡ.
+    //   Trước đây computeLiuyue không xét chất lượng đại vận tổng thể.
+    if (!lmDyBase) { // tính 1 lần (đại vận không đổi qua 12 tháng)
+      const age = solarYear - R.chart.input.year;
+      const ad = (R.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
+      if (ad && ad.gan && ad.zhi) {
+        const _dgWx = GAN[ad.gan]?.wx, _dzWx = ZHI[ad.zhi]?.wx;
+        if (fav.has(_dzWx)) lmDyBase += 2;
+        if (avoid.has(_dzWx)) lmDyBase -= 2;
+        if (fav.has(_dgWx)) lmDyBase += 1;
+        if (avoid.has(_dgWx)) lmDyBase -= 1;
+      }
+    }
+    score += lmDyBase;
 
     score = Math.max(5, Math.min(95, Math.round(score)));
     let rating;
