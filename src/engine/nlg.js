@@ -13,6 +13,7 @@ import { decadeForecast } from './decade-forecast.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
+import { guiguziFortune } from './guiguzi.js';
 import { analyzeTaohua } from './taohua.js';
 import { marriageStars } from './marriage-stars.js';
 import { starPower } from './star-power.js';
@@ -489,6 +490,8 @@ function pFreeForm(R, intent) {
   if (bits.length) lines.push(...bits);
   else lines.push(`Trục cốt lõi của mọi vấn đề là Dụng ${favText(yong)} / Hỷ ${wxVi(yong.xi)} (nên tăng) và Kỵ ${wxVi(yong.ji)} / Thù ${wxVi(yong.chou)} (nên tránh).`);
   lines.push(`Tổng luận mệnh ${synthesis.gradeVi} (${synthesis.score}/100). Khai vận: màu ${WX_INFO[yong.primary].mau}; phương ${WX_INFO[yong.primary].huong}; nghề ${WX_INFO[yong.primary].nghe.split('，')[0]}.`);
+  // [loop 524] Quỷ Cốc Tử bonus
+  try { const gg = guiguziFortune(R); if (gg) lines.push(`🔮 Quỷ Cốc Tử: năm ${gg.yearJiaZi} (${gg.vi}) ${gg.toneVi} — ${gg.fortune.slice(0, 90)}.`); } catch (e) {}
   lines.push(`${now && now.score < 0 ? `⚠ Đang ở năm ${now.year} bất lợi → thủ giữ, tránh mạo hiểm; đợi lưu niên mang hành Dụng.` : `Nên tiến thủ theo Dụng Thần, đón lưu niên/đại vận cát.`} Để có phân tích tự do chuyên sâu hơn, bật AI trong ⚙ Cài đặt.`);
   return { title: 'Luận theo câu hỏi của bạn', paragraphs: lines };
 }
