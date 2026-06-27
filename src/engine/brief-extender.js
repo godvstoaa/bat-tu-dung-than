@@ -42,6 +42,7 @@ import { analyzeBusiness } from './bazi-business.js';
 import { analyzePillarQuality } from './pillar-quality.js';
 import { detectGongjia } from './gongjia.js';
 import { guiguziFortune } from './guiguzi.js';
+import { guiguziFDG } from './guiguzi-fdg.js';
 import { dayNayinPersonality } from './nayin-personality.js';
 
 /**
@@ -104,6 +105,9 @@ export function extendBrief(R) {
       const pillars4 = (gg.pillarReadings || []).map((p) => `${p.palaceVi}:${p.gz} ${p.nayin}(${p.tone === 'cat' ? 'Cát' : p.tone === 'hung' ? 'Hung' : 'Bình'})`).join(', ');
       parts.push(`鬼谷子 GUIGUZI (4 trụ): ${pillars4}. Tổng ${gg.toneVi}. Năm ${gg.yearJiaZi} ${gg.nayin}/${gg.vi} — ${gg.fortune?.slice(0, 100) || ''} ${gg.ganMod || ''}. Nghề: ${(gg.career || '').slice(0, 50)}.`);
     }
+    // [loop 536] 鬼谷子分定經 (两头钳) — 年干×时干 → 配卦 → 命格 (VN translated)
+    const fdg = guiguziFDG(R);
+    if (fdg) parts.push(`鬼谷子分定經 LIẾU ĐẦU KÈM: ${fdg.combo} → quẻ ${fdg.guaVi} (cách「${fdg.geMing}」). ${fdg.star ? fdg.star + ': ' : ''}${fdg.starDesc || ''} ${fdg.guaMeaning || ''}`);
   } catch (e) {}
   // [loop 526] 日柱納音 personality — bản chất bẩm sinh theo nạp âm NGÀY
   try {
