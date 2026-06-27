@@ -13,7 +13,7 @@ export const WX_REMEDY = {
     direction: 'Đông, Đông Nam', house: 'tọa Đông hướng Tây / tọa Đông Nam hướng Tây Bắc',
     color: 'xanh lá, xanh ngọc, xanh mint', career: 'giáo dục, xuất bản, thư viện, mộc – nội thất, dược – đông y, nông – lâm – hoa viên, thời trang vải sợi, từ thiện',
     food: 'rau xanh, đậu, ngũ cốc, chanh, trà xanh, vị chua tự nhiên', material: 'gỗ, tre, mây, giấy, sợi, bông',
-    number: '1, 3, 8', organ: 'gan – mật – gân cốt',
+    number: '1, 3, 8', organ: 'gan – mật – gân', // [loop 481] gân cốt→gân (骨=Thủy)
     animal: 'mèo, thỏ (Dần/Mão)', season: 'xuân',
   },
   火: {

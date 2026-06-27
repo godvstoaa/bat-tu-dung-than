@@ -10,19 +10,19 @@ import { DITIANSUI } from './kb.js';
 export const WX_INFO = {
   木: { mau: 'xanh lá, xanh ngọc', huong: 'Đông & Đông Nam', so: '3, 8',
         nghe: 'giáo dục, xuất bản, gỗ – nội thất, dược – đông y, thời trang vải sợi, nông – lâm nghiệp',
-        tang: 'Gan – Mật, hệ thần kinh, mắt, gân cốt' },
+        tang: 'Gan – Mật, hệ thần kinh, mắt (目), gân (筋)' },
   火: { mau: 'đỏ, hồng, tím, cam', huong: 'Nam',  so: '2, 7',
         nghe: 'năng lượng – điện, điện tử, ẩm thực, quảng cáo – truyền thông, giải trí, mỹ phẩm',
-        tang: 'Tim – Ruột non, huyết mạch, mắt' },
+        tang: 'Tim – Ruột non, huyết mạch, lưỡi (舌)' },
   土: { mau: 'vàng, nâu đất, be', huong: 'trung cung, Đông Bắc & Tây Nam', so: '5, 0',
         nghe: 'bất động sản, xây dựng, nông nghiệp, bảo hiểm, gốm sứ, tư vấn – quản lý',
-        tang: 'Tỳ – Vị, hệ tiêu hóa, cơ nhục' },
+        tang: 'Tỳ – Vị, hệ tiêu hóa, cơ nhục, miệng (口)' },
   金: { mau: 'trắng, xám, ánh kim', huong: 'Tây & Tây Bắc', so: '4, 9',
         nghe: 'tài chính – ngân hàng, cơ khí – kim loại, công nghệ, luật, quân – cảnh, trang sức',
-        tang: 'Phổi – Đại tràng, hệ hô hấp, da lông' },
+        tang: 'Phổi – Đại tràng, hệ hô hấp, da lông, mũi (鼻)' },
   水: { mau: 'đen, xanh nước biển', huong: 'Bắc', so: '1, 6',
         nghe: 'thương mại, vận tải – logistics, du lịch, truyền thông, thủy sản, xuất nhập khẩu',
-        tang: 'Thận – Bàng quang, hệ sinh dục – tiết niệu, xương tủy' },
+        tang: 'Thận – Bàng quang, hệ sinh dục – tiết niệu, xương tủy, tai (耳)' },
 };
 
 // ---- Tính cách Nhật Chủ theo Thiên Can ----
