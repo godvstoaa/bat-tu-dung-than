@@ -7,6 +7,8 @@ import { detectAnhe } from './anhe.js';
 import { TEN_GOD_VI, WX_VI } from './constants.js';
 import { nayinRelations } from './nayin-relation.js';
 import { ganZhiNayin } from './nayin.js';
+import { analyzeZiweiBrightness } from './ziwei-brightness.js';
+import { computeZiwei } from './ziwei.js';
 import { analyzeCaiKu } from './caiku.js';
 import { xingshenZuo } from './xingshen-zuo.js';
 import { analyzeSpouseStar } from './spouse-star.js';
@@ -145,6 +147,18 @@ export function extendBrief(R) {
       R.chart.pillars.time.zhi);
     const sha = ['擎羊', '陀罗', '火星', '铃星', '地空', '地劫'].map((s) => aux[s] ? `${aux[s].vi}@${aux[s].branch}` : null).filter(Boolean);
     if (sha.length) parts.push(`LỤC SÁT TINH (六煞星): ${sha.join(', ')}.`);
+  } catch (e) {}
+
+  // [loop 441] 紫微 độ sáng mệnh cung — AI cần biết sao chính sáng (庙/旺) hay tối (陷/地)
+  try {
+    const inp = R.chart.input;
+    const zr = computeZiwei(inp.year, inp.month, inp.day, inp.hour, inp.minute, inp.gender);
+    const bw = analyzeZiweiBrightness(zr);
+    const ming = zr.palaces.find((p) => p.isMing);
+    if (ming && bw.items?.length) {
+      const mingStars = bw.items.filter((i) => i.zhi === ming.zhi);
+      if (mingStars.length) parts.push(`紫微 Mệnh cung độ sáng: ${mingStars.map((s) => `${s.starVi || s.star}=${s.vi}(${s.score > 0 ? '+' : ''}${s.score})`).join(', ')}. ${bw.summary || ''}`);
+    }
   } catch (e) {}
 
   // Nạp âm quan hệ
