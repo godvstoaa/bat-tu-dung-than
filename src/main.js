@@ -1686,13 +1686,13 @@ function renderDayunTimeline(R) {
     const isNow = curAge >= d.startAge && curAge < d.startAge + 10;
     const nayin = (() => { try { const n = ganZhiNayin(d.ganZhi); return n || ''; } catch (e) { return ''; } })();
     const tip = `${d.ganZhi} · ${d.startAge}–${d.startAge + 9}t · ${d.rating}${nayin ? ' · ' + nayin : ''}${d._ylNote ? ' · ' + d._ylNote : ''}`;
-    return `<div class="dt-seg ${rateClass(d.rating)}${isNow ? ' dt-now' : ''}" title="${esc(tip)}">
+    return `<div class="dt-seg ${rateClass(d.rating)}${isNow ? ' dt-now' : ''}" data-sy="${d.startYear}" title="${esc(tip)} — nhấp xem tường thuật giai đoạn này">
       <div class="dt-gz zh">${esc(d.ganZhi)}</div>
       <div class="dt-age">${d.startAge}–${d.startAge + 9}t${isNow ? ' ★' : ''}</div>
       <div class="dt-rate">${esc(d.rating)}</div>
     </div>`;
   }).join('');
-  el.innerHTML = `<div class="dt-row">${segs}</div><p class="hint" style="margin-top:6px">Mỗi ô = 1 thập kỷ đại vận, tô màu theo đánh giá (<span class="rate-supercat" style="padding:0 4px">vàng</span>=đại cát · <span class="rate-cat" style="padding:0 4px">xanh</span>=cát · <span class="rate-mid" style="padding:0 4px">xám</span>=bình · <span class="rate-hung" style="padding:0 4px">đỏ</span>=hung). Ô viền sáng ★ = thập kỷ đang hành.</p>`;
+  el.innerHTML = `<div class="dt-row">${segs}</div><p class="hint" style="margin-top:6px">Mỗi ô = 1 thập kỷ đại vận, tô màu theo đánh giá (<span class="rate-supercat" style="padding:0 4px">vàng</span>=đại cát · <span class="rate-cat" style="padding:0 4px">xanh</span>=cát · <span class="rate-mid" style="padding:0 4px">xám</span>=bình · <span class="rate-hung" style="padding:0 4px">đỏ</span>=hung). Ô viền sáng ★ = thập kỷ đang hành. <b>Nhấp ô → xem tường thuật giai đoạn đó.</b></p>`;
 }
 
 function renderHuaqi(R) {
@@ -4295,6 +4295,15 @@ $('ly-btn').addEventListener('click', () => {
 if ($('ly-ev-btn')) $('ly-ev-btn').addEventListener('click', () => renderLyearEvents(parseInt($('ly-year').value, 10) || new Date().getFullYear()));
 $('lm-btn').addEventListener('click', () => renderLiuyue(parseInt($('lm-year').value, 10) || new Date().getFullYear()));
 $('pn-btn').addEventListener('click', () => { if (currentResult) renderPhaseNarrative(currentResult, parseInt($('pn-year').value, 10) || new Date().getFullYear()); }); // [loop 474]
+$('dayun-timeline').addEventListener('click', (ev) => { // [loop 476] click 大运 segment → narrative giai đoạn đó
+  const seg = ev.target.closest('.dt-seg');
+  if (!seg || !currentResult) return;
+  const sy = parseInt(seg.dataset.sy, 10);
+  if (!sy) return;
+  $('pn-year').value = sy;
+  renderPhaseNarrative(currentResult, sy);
+  document.getElementById('phase-narrative')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
 $('lr-btn').addEventListener('click', () => renderLiuRi($('lr-date').value));
 if ($('partner-match-btn')) $('partner-match-btn').addEventListener('click', () => {
   if (!currentResult) { alert('Nhập lá số của bạn trước.'); return; }
