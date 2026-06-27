@@ -9,7 +9,9 @@ import { Solar } from 'lunar-javascript';
 // Hướng Dụng Thần theo ngũ hành. [cycle 46 sửa C4] mỗi hành có thể NHIỀU hướng → dùng MẢNG
 //   (trước đây là chuỗi "Đông, Đông Nam" → so `===` từng hướng không bao giờ khớp → bestDirection
 //    rơi về mostCommon, cho user Dụng Thổ hay ra "Bắc" = hướng 三煞 năm → mâu thuẫn).
-const WX_DIR = { 木: ['Đông', 'Đông Nam'], 火: ['Nam'], 土: ['Trung cung', 'Đông Bắc', 'Tây Nam'], 金: ['Tây', 'Tây Bắc'], 水: ['Bắc'] };
+// [loop 555 FIX] Thổ bỏ «Trung cung» (không phải hướng 8-phương có thể «đi/hướng về») —
+//   đồng bộ space-fs.js loop 31. Trước đây leak «Trung cung» vào userDungDir hiển thị.
+const WX_DIR = { 木: ['Đông', 'Đông Nam'], 火: ['Nam'], 土: ['Đông Bắc', 'Tây Nam'], 金: ['Tây', 'Tây Bắc'], 水: ['Bắc'] };
 
 const DIR_VI = {
   '正北': 'Bắc', '正南': 'Nam', '正东': 'Đông', '正西': 'Tây',

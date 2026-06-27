@@ -22,7 +22,10 @@ const HUNG_STAR = new Set([2, 3, 5, 7]);   // 二黑/三碧/五黄/七赤 = hung
 // [loop 29] Thái Tuế & Tam Sát theo năm — 2 hướng KỴ ĐỘNG THỔ quan trọng nhất (mà module cũ bỏ sót).
 //   Thái Tuế = hướng chi năm (后天八卦). Tam Sát = 3 chi đối lập nhóm tam hợp.
 const ZHI_TO_DIR = { 子:'Chính Bắc', 丑:'Đông Bắc', 寅:'Đông Bắc', 卯:'Chính Đông', 辰:'Đông Nam', 巳:'Đông Nam', 午:'Chính Nam', 未:'Tây Nam', 申:'Tây Nam', 酉:'Chính Tây', 戌:'Tây Bắc', 亥:'Tây Bắc' };
-const SANSHA_BY_GROUP = { '申子辰': 'Chính Bắc', '寅午戌': 'Chính Bắc', '亥卯未': 'Chính Tây', '巳酉丑': 'Chính Đông' };
+// [loop 555 FIX] SANSHA_BY_GROUP (dead, không dùng — code thực dùng SANSHA_CENTER dòng 28)
+//   từng ghi SAI 申子辰='Chính Bắc' (phải=Chính Nam, Thủy cục → tam sát 巳午未=Hỏa=Nam).
+//   Sửa đúng để tránh maintainer dùng nhầm. Khớp SANSHA_CENTER + sansha.js.
+const SANSHA_BY_GROUP = { '申子辰': 'Chính Nam', '寅午戌': 'Chính Bắc', '亥卯未': 'Chính Tây', '巳酉丑': 'Chính Đông' };
 // Tam Sát: nhóm tam hợp năm → 3 chi đối lập → hướng trung tâm. 寅午戌(火)→亥子丑(北); 申子辰(水)→巳午未(南);
 //   亥卯未(木)→申酉戌(西); 巳酉丑(金)→寅卯辰(东).
 const SANSHA_CENTER = { '申子辰': 'Chính Nam', '寅午戌': 'Chính Bắc', '亥卯未': 'Chính Tây', '巳酉丑': 'Chính Đông' };

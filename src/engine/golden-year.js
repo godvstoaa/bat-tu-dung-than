@@ -63,7 +63,9 @@ export function findGoldenYear(R, startYear, scanYears = 10) {
     if (sy?.severity >= 2) details.push(`⚡ Tuế vận: ${sy.type}`);
 
     // 5. Đại vận god (weight: 15%) — dg đã hoist, lookup per-year
-    const activeDg = dg.items.find((d) => age >= d.startAge && age < d.startAge + 10);
+    //   [loop 555 FIX BUG2] dùng startYear (nhất quán với activeDy dòng 37). Trước đây dùng
+    //   startAge → lệch 1 năm ở ranh giới thập niên (age=year-birthYear ≠ startYear do tháng/lập xuân).
+    const activeDg = dg.items.find((d) => d.startYear != null && d.startYear <= year && year < d.startYear + 10);
     const dyCat = activeDg?.cat || 'mid';
     const dyScore = dyCat === 'cat' ? 75 : dyCat === 'hung' ? 30 : 50;
     totalScore += dyScore * 0.15;
@@ -73,7 +75,13 @@ export function findGoldenYear(R, startYear, scanYears = 10) {
     const alert = totalR >= 60 ? '🟢 TỐT' : totalR >= 48 ? '🟡 TRUNG' : '🔴 KÉM';
     // [loop 32 G2] 黄金年 THẬT theo cổ pháp: 大运 VÀ 流年 đều mang Dụng/Hỷ VÀ điểm ≥ 65.
     //   Trước đây golden = ranked[0] (chỉ năm cao nhất, dù có thể平庸).
-    const dyFav = activeDy && GAN[activeDy.gan]?.wx && fav.has(GAN[activeDy.gan].wx);
+    // [loop 555 FIX BUG1] dyFav phải check CẢ CAN VÀ CHI đại vận (đồng bộ lnFav). Trước đây
+    //   chỉ check can → bỏ qua CHI đại vận (chủ khí thập kỷ, quan trọng hơn can) → «năm vàng»
+    //   KHÔNG BAO GIỜ flag khi chỉ chi đại vận mang Dụng/Hỷ.
+    const dyFav = activeDy && (
+      (GAN[activeDy.gan]?.wx && fav.has(GAN[activeDy.gan].wx)) ||
+      (ZHI[activeDy.zhi]?.wx && fav.has(ZHI[activeDy.zhi].wx))
+    );
     const lnFav = (ln.ganZhi && GAN[ln.ganZhi[0]]?.wx && fav.has(GAN[ln.ganZhi[0]].wx)) ||
                   (ln.ganZhi && ZHI[ln.ganZhi[1]]?.wx && fav.has(ZHI[ln.ganZhi[1]].wx));
     const isTrulyGolden = !!(dyFav && lnFav && totalR >= 65);
@@ -87,7 +95,10 @@ export function findGoldenYear(R, startYear, scanYears = 10) {
 
   return {
     ranked,
-    golden: ranked.find((r) => r.isTrulyGolden) || (ranked[0] && ranked[0].totalScore >= 65 ? ranked[0] : null),
+    // [loop 555 FIX BUG4] golden CHỈ là truly-golden (đại vận+lưu niên đều Dụng/Hỷ), hoặc null.
+    //   Trước đây fallback trả ranked[0] (≥65 điểm) dù KHÔNG isTrulyGolden → caller nhận«năm vàng»
+    //   mà không thoả ĐK cốt lõi, mâu thuẫn comment dòng 74-75.
+    golden: ranked.find((r) => r.isTrulyGolden) || null,
     worst: ranked[ranked.length - 1] || null,
   };
 }
