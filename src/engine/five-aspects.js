@@ -62,8 +62,8 @@ export function analyzeFiveVirtues(R) {
 
   const advice = [
     `Đức tính cốt lõi: **${primary.virtue}** (${primary.desc}). Mạnh: ${primary.strong}. Cần bồi: ${primary.cultivation}.`,
-    `Dụng Thần (${WX_VI[yongPrimary]}) = đức **${dungVirtue?.virtue || '?'}**: nên phát triển ${dungVirtue?.desc || ''} để bổ mệnh.`,
-    `Kỵ Thần (${WX_VI[yongJi]}) = đức **${kyVirtue?.virtue || '?'}**: cần kiểm soát ${kyVirtue?.weak || ''} — khi thái quá dễ gây họa.`,
+    `Dụng Thần (${WX_VI[yongPrimary] || '?'}) = đức **${dungVirtue?.virtue || '?'}**: nên phát triển ${dungVirtue?.desc || ''} để bổ mệnh.`,
+    `Kỵ Thần (${WX_VI[yongJi] || '?'}) = đức **${kyVirtue?.virtue || '?'}**: cần kiểm soát ${kyVirtue?.weak || ''} — khi thái quá dễ gây họa.`,
     `Cân bằng: ${primary.balance}.`,
   ];
 

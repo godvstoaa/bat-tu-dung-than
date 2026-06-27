@@ -52,7 +52,7 @@ export function matrixData(family) {
     for (let j = 0; j < people.length; j++) {
       if (i === j) { cells.push({ i, j, score: null }); continue; }
       let role = people[j].role;
-      if (people[i].role !== 'self') role = (people[j].role === 'self') ? invertRole(role, centerGender) : 'sibling';
+      if (people[i].role !== 'self') role = (people[j].role === 'self') ? invertRole(people[i].role, centerGender) : 'sibling'; // [loop 566 FIX] dùng people[i].role (vd 'father'→'child') không phải role='self'
       let s = null;
       try { s = analyzePair(people[i].R, people[j].R, role).pairScore; } catch (e) { s = null; }
       cells.push({ i, j, score: s });

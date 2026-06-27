@@ -41,8 +41,10 @@ export function dailyGuide(R, year, month, day) {
 
   // --- Score (6 phái rút gọn) ---
   let score = 50;
-  const fav = new Set([yong.primary, yong.xi].filter(Boolean));
-  const avoid = new Set([yong.ji, yong.chou]);
+  // [loop 566 FIX] guard yong undefined — trước đây crash TypeError.
+  const _y = yong || {};
+  const fav = new Set([_y.primary, _y.xi].filter(Boolean));
+  const avoid = new Set([_y.ji, _y.chou].filter(Boolean));
   const dgWx = GAN[dGan].wx, dzWx = ZHI[dZhi].wx;
   if (fav.has(dgWx)) score += 6; if (avoid.has(dgWx)) score -= 7;
   if (fav.has(dzWx)) score += 4; if (avoid.has(dzWx)) score -= 5;
@@ -98,7 +100,7 @@ export function dailyGuide(R, year, month, day) {
   if (tsYi.includes('开市') || tsYi.includes('交易') || tsYi.includes('立券')) activities.go.push('ký kết/kinh doanh');
   if (tsYi.includes('嫁娶') || tsYi.includes('祈福')) activities.go.push('hẹn hò/cưới');
   if (tsYi.includes('入宅') || tsYi.includes('移徙')) activities.go.push('dọn nhà');
-  if (tsYi.includes('动土') || tsYi.includes('修造')) activities.go.push('xây/delight');
+  if (tsYi.includes('动土') || tsYi.includes('修造')) activities.go.push('xây dựng/sửa chữa');
   if (tsYi.includes('出行')) activities.go.push('đi xa');
   if (tsYi.includes('祈福') || tsYi.includes('祭祀')) activities.go.push('tế tự/cầu phúc');
 
