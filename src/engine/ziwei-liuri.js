@@ -80,7 +80,14 @@ function gongInfo(z, gongIdx, sihuaValues) {
   const gongZhi = ZHI_ORDER[((gongIdx % 12) + 12) % 12];
   const palace = z.palaces.find((p) => p.zhi === gongZhi);
   const stars = palace?.stars || [];
-  const { tone, catStars, hungStars, hasLu, hasJi } = evalTone(stars, sihuaValues);
+  // [loop 548 FIX BUG3] gộp hung tinh phụ (擎羊/陀罗/火铃/空劫 từ z.fuxing) tại cung này
+  //   vào đánh giá tone — trước đây evalTone mù với chúng (chỉ thấy 14 chính tinh).
+  const FU_HUNG = ['擎羊','陀罗','火星','铃星','地空','地劫'];
+  const fuHungAtGong = (z.fuxing?.stars || [])
+    .filter((s) => FU_HUNG.includes(s.star) && s.atZhi === gongZhi)
+    .map((s) => s.star);
+  const starsWithFu = stars.concat(fuHungAtGong);
+  const { tone, catStars, hungStars, hasLu, hasJi } = evalTone(starsWithFu, sihuaValues);
   return {
     index: ((gongIdx % 12) + 12) % 12,
     zhi: gongZhi,

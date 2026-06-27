@@ -60,7 +60,14 @@ export function ziweiLiunian(birthYear, birthMonth, birthDay, birthHour, birthMi
 
   // Đánh giá: sao cát/hung tại cung + 四化
   const catStars = lnStars.filter((s) => ['紫微','天府','太阳','太阴','武曲','天相','左辅','右弼','文昌','文曲','天魁','天钺'].includes(s));
-  const hungStars = lnStars.filter((s) => ['七杀','破军','贪狼','巨门','廉贞','擎羊','陀罗'].includes(s));
+  // [loop 548 FIX BUG3] 擎羊/陀罗/火铃/空劫 (6 hung tinh) nằm trong z.fuxing.stars
+  //   (KHÔNG trong palace.stars chỉ chứa 14 chính tinh) → trước đây HUNG_STARS filter
+  //   mù với chúng. Nay gộp hung tinh phụ tại cung lưu niên vào.
+  const FU_HUNG = ['擎羊','陀罗','火星','铃星','地空','地劫'];
+  const fuHungAtGong = (z.fuxing?.stars || [])
+    .filter((s) => FU_HUNG.includes(s.star) && s.atZhi === yearZhi)
+    .map((s) => s.star);
+  const hungStars = lnStars.filter((s) => ['七杀','破军','贪狼','巨门','廉贞','擎羊','陀罗'].includes(s)).concat(fuHungAtGong);
   const hasLu = Object.values(lnSihua).some((v) => v.star && lnStars.includes(v.star) && v.tone === 'cat');
   const hasJi = Object.values(lnSihua).some((v) => v.star && lnStars.includes(v.star) && v.tone === 'hung');
 

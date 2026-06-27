@@ -64,7 +64,12 @@ export function computeZiwei(year, month, day, hour, minute, gender) {
   const [cy, cm, cd, ch, cmi] = ziShiRoll(year, month, day, h, mi);
   const solar = Solar.fromYmdHms(cy, cm, cd, ch, cmi, 0);
   const lunar = solar.getLunar();
-  const lm = lunar.getMonth();          // 农历月 (1-12, 闰月 vẫn lấy số)
+  // [loop 548 FIX BUG1] tháng nhuận: lunar-javascript trả getMonth() ÂM cho nhuận月
+  //   (vd 闰二月 = -2). iztro/《全书》quy ước: tháng nhuận đếm như tháng kế tiếp
+  //   (闰二月 → dùng tháng 3 để定命). Trước đây dùng trực tiếp getMonth() →命宫 SAI
+  //   cho mọi người sinh tháng nhuận (~7 năm/lần: 2023闰二月, 2025闰六月...).
+  const absLunarMonth = (m) => (m > 0 ? m : Math.abs(m) + 1); // -2→3, -6→7
+  const lm = absLunarMonth(lunar.getMonth());
   const ly = lunar.getYear();           // 农历年 (can chi năm)
   const yearGan = lunar.getYearGan();   // 年干 (theo lập xuân)
   const timeZhi = lunar.getTimeZhi();   // 时支

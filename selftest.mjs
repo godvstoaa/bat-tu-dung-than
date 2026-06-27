@@ -888,6 +888,19 @@ assert(zv2c.feixing.matrix.length === fxStar.matrix.length, '飞星 deterministi
 assert(zv2c.zihua.list.length === zua.list.length, '宫干自化 vẫn hoạt động sau khi thêm飞星');
 console.log(`   飞星化入化出 ✓ — ma trận 48 hóa | 命宫 出${mingOut.length}/入${mingIn.length} | highlights: ${fxStar.mingHighlights}`);
 
+// [loop 548] leap month (闰月) 命宫 — lunar-javascript getMonth() âm cho nhuận月
+{
+  // 2023-03-27 = 闰二月初六, giờ 子. Cũ: lm=-2 → 命宫=亥 (SAI). Này: lm=3 → 辰.
+  const zLeap = computeZiwei(2023, 3, 27, 0, 30, 'nam');
+  const mingLeap = (zLeap.palaces.find((p) => p.isMing) || zLeap.palaces.find((p) => p.zh === '命宫'))?.zhi;
+  assert(mingLeap === '辰', `[loop 548] 闰二月 giờ子 → 命宫=辰 (xử lý nhuận月=tháng kế, got ${mingLeap})`);
+  // tháng 2 thường (không nhuận) cùng giờ → 命宫=卯 (khác 1 cung so với nhuận)
+  const zReg = computeZiwei(2023, 3, 13, 0, 30, 'nam');
+  const mingReg = (zReg.palaces.find((p) => p.isMing) || zReg.palaces.find((p) => p.zh === '命宫'))?.zhi;
+  assert(mingReg === '卯', `[loop 548] tháng 2 thường giờ子 → 命宫=卯 (got ${mingReg})`);
+  console.log(`   闰月命宫 ✓ — 闰二月→辰 / tháng2thường→卯 (trước đây 闰月 SAI=亥 do getMonth() âm)`);
+}
+
 // ################## 17a3. 大限宫干四化 大限宮干四化 (decade can → 4 hóa → bay vào mệnh bàn) ##################
 console.log('\n################## 17a3. 大限宫干四化 大限宮干四化 (cung đại hạn hiện tại can → 4 hóa kích hoạt mệnh bàn) ##################');
 import { computeDaxianSihua, DX_SIHUA_DOMAIN, DX_SIHUA_INTERP } from './src/engine/ziwei.js';

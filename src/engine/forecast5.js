@@ -64,8 +64,9 @@ export function forecast5(R, startYear, years = 5) {
     }
 
     // 4. Tử vi lưu niên
+    let zw = null;
     try {
-      const zw = ziweiLiunian(birthYear, chart.input.month, chart.input.day, chart.input.hour, chart.input.minute, chart.input.gender, year);
+      zw = ziweiLiunian(birthYear, chart.input.month, chart.input.day, chart.input.hour, chart.input.minute, chart.input.gender, year);
       const zwTone = zw.tone === 'cat' ? 'cát' : zw.tone === 'hung' ? 'hung' : 'trung';
       if (zw.tone === 'hung') alerts.push(`Tử Vi: cung ${zw.palace} (${zw.stars.join(',')}) [${zwTone}]`);
       else positives.push(`Tử Vi: cung ${zw.palace} (${zw.stars.join(',')}) [${zwTone}]`);
@@ -85,7 +86,7 @@ export function forecast5(R, startYear, years = 5) {
     out.push({
       year, ganZhi: ln.ganZhi, score: ln.score, rating: ln.rating, tone,
       shen12: shen12.god.zh,
-      ziwei: { palace: '(xem trên)', tone: '?' },
+      ziwei: zw ? { palace: zw.palace, palaceVi: zw.palaceVi, stars: zw.stars, tone: zw.tone === 'cat' ? 'cát' : zw.tone === 'hung' ? 'hung' : 'trung', theme: zw.theme } : null,
       dayunGod: activeDg?.godVi || '?',
       positives, alerts, summary, alert,
     });

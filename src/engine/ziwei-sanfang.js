@@ -20,7 +20,7 @@ function starTone(star) {
   if (STARS_14[star]) {
     const t = STARS_14[star].tone;
     if (t === '吉' || t === '中吉') return 'cat';
-    if (t === 'hung') return 'hung';
+    if (t === 'hung' || t === 'volatile') return 'hung'; // [loop 548] volatile=廉贞/贪狼/七杀/破军 — thiên hung/biến động
     return 'mid';
   }
   if (AUX_TONE[star] === '吉') return 'cat';
