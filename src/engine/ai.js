@@ -75,6 +75,7 @@ import { physiognomyOverview } from './physiognomy.js';
 import { yinzhaiOverview } from './yinzhai.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
+import { liurenPan } from './liuren.js';
 import { qizheng, longitudeToMansion } from './qizheng.js';
 // 天星择日 (cycle 38) — chọn ngày theo vị trí thật của 7 chính tinh tới 坐向
 import { tianxingZheri } from './tianxing-zheri.js';
@@ -669,6 +670,16 @@ export const AI_TOOLS = [
       minute: { type: 'integer', description: 'Phút 0-59 (bỏ trống = hiện tại)' },
     } },
   },
+  { // [loop 508] 大六壬 AI tool — 四课三传 time-based divination
+    name: 'analyze_liuren', description: '大六壬 (Da Liu Ren): 3-truyền 4-bài (四课三传) theo thời điểm → luận sự kiện. Dùng khi user hỏi «lục nhâm», «đại六壬 hôm nay», «thần kỳ phái» (các câu về phe thần/kỳ). Trả 月将 + 四课 + 三传 + tong môn.',
+    parameters: { type: 'object', properties: {
+      year: { type: 'integer', description: 'Năm (bỏ trống = năm nay)' },
+      month: { type: 'integer', description: 'Tháng (bỏ trống = tháng nay)' },
+      day: { type: 'integer', description: 'Ngày (bỏ trống = hôm nay)' },
+      hour: { type: 'integer', description: 'Giờ 0-23 (bỏ trống = 12)' },
+      minute: { type: 'integer', description: 'Phút (bỏ trống = 0)' },
+    } },
+  },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -715,6 +726,17 @@ export function execTool(name, args, R) {
           dong: r.dong, dongInUpper: r.dongInUpper,
           ti: r.ti ? `${r.ti.vi}(${r.ti.wx})` : '', yong: r.yong ? `${r.yong.vi}(${r.yong.wx})` : '',
           rel: r.rel, huRel: r.huRel, bianRel: r.bianRel, verdict: r.verdict,
+        };
+      }
+      case 'analyze_liuren': { // [loop 508] 大六壬 四课三传
+        const n = new Date();
+        const yr = a.year ?? n.getFullYear(), mo = a.month ?? (n.getMonth() + 1), da = a.day ?? n.getDate(), hr = a.hour ?? 12, mi = a.minute ?? 0;
+        const r = liurenPan(yr, mo, da, hr, mi);
+        return {
+          dayGanZhi: r.dayGanZhi, hourZhi: r.hourZhi, yuejiang: r.yuejiangVi,
+          ke4: (r.ke4 || []).map((k) => `${k.n}:${k.up}/${k.down}(${k.rel})`),
+          sanchuan: (r.sanchuan || []).map((s) => `${s.n}:${s.zhi}(${s.rel})`),
+          zongMen: r.zongMen,
         };
       }
       case 'inverse_bazi': {
