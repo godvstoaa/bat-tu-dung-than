@@ -1031,7 +1031,7 @@ assert(JSON.stringify(analyzeLiunian12(fakeR, 2026).positions) === JSON.stringif
 console.log(`   12 thần sát ✓ — bạn(酉) 2026(午) pos${scan.mine.position} ${scan.mine.spirit} ${scan.mine.vi} | 副星 ${scan.mine.subStar} | cát:${scan.cat.length} hung:${scan.hung.length} bình:${scan.mid.length}`);
 
 console.log('\n################## 17d. NẠP ÂM 30 + NGHĨA ##################');
-import { NAYIN_MEANING, nayinInfo } from './src/engine/nayin.js';
+import { NAYIN_MEANING, nayinInfo, ganZhiNayin } from './src/engine/nayin.js';
 assert(Object.keys(NAYIN_MEANING).length === 30, `đúng 30 nạp âm (được ${Object.keys(NAYIN_MEANING).length}) — [loop 563 FIX] trước đây 31 do alias 砂/沙 trùng → lệch index`); // [loop 563] chặt ===30, KHÔNG >=
 // [loop 563 CRITICAL regression] 28/60 nạp âm từng SAI do alias lệch index từ idx 15.
 assert(ganZhiNayin('壬戌') === '大海水', `[loop 563] ganZhiNayin 壬戌=大海水 (trước fix SAI=石榴木)`);
