@@ -4,9 +4,10 @@
 //  (4) 用神互不损伤. Trả điểm + chốt hợp/không. Nguồn: 渊海子平, 八字合婚.
 // ============================================================================
 import { ZHI } from './constants.js';
-import { tenGod } from './core.js'; // [loop 22] 十神 spouse-star cross-check
+import { tenGod } from './core.js';
 import { XING_PAIRS, HAI_PAIRS } from './zodiac-deep.js';
 import { computeZhai } from './zhai.js';
+import { ganZhiNayin } from './nayin.js'; // [loop 530] 納音配婚
 
 // Tam hợp / Lục hợp / Xung của Địa Chi
 const SANHE = [['申', '子', '辰'], ['寅', '午', '戌'], ['巳', '酉', '丑'], ['亥', '卯', '未']];
@@ -103,6 +104,24 @@ export function computeHehun(R1, R2) {
     const gb = (zb.grpVi || '').includes('Tây') ? 'Tây' : 'Đông';
     if (ga === gb) { score += 6; factors.push(`✓ Cùng nhóm Mệnh quái ${ga} Tứ Mệnh (${za.guaName}/${zb.guaName}) → thuận ở chung, hướng nhà/bếp hợp cả hai.`); }
     else { score -= 4; factors.push(`• Khác nhóm Mệnh quái (${ga} vs ${gb} Tứ Mệnh) → phong thuỷ ở chung cần thỏa hiệp hướng (chọn hướng Đông/Tây trung tính hoặc dụng người yếu hơn).`); }
+  } catch (e) {}
+
+  // 5. [loop 530] 納音配婚 (Nayin marriage compatibility — classical 納音論)
+  try {
+    const na = ganZhiNayin(a.dayGan + a.pillars.day.zhi);
+    const nb = ganZhiNayin(b.dayGan + b.pillars.day.zhi);
+    const SHENG5 = { '木': '火', '火': '土', '土': '金', '金': '水', '水': '木' };
+    const KE5 = { '木': '土', '火': '金', '土': '水', '金': '木', '水': '火' };
+    const nayinWx = { '海中金':'金','炉中火':'火','大林木':'木','路旁土':'土','剑锋金':'金','山头火':'火','涧下水':'水','城头土':'土','白蜡金':'金','杨柳木':'木','泉中水':'水','屋上土':'土','霹雳火':'火','松柏木':'木','长流水':'水','沙中金':'金','沙中土':'土','山下火':'火','平地木':'木','壁上土':'土','金箔金':'金','覆灯火':'火','天河水':'水','大驿土':'土','钗钏金':'金','桑柘木':'木','大溪水':'水','砂中金':'金','天上火':'火','石榴木':'木','大海水':'水' };
+    const wa = nayinWx[na] || '?', wb = nayinWx[nb] || '?';
+    if (wa !== '?' && wb !== '?') {
+      if (SHENG5[wa] === wb && SHENG5[wb] !== wa) { score += 8; factors.push(`✓ Nạp âm tương sinh: ${na}(${wa}) sinh ${nb}(${wb}) → CỔ PHÁP «納音相生為上婚» — bồi bổ bẩm sinh.`); }
+      else if (SHENG5[wb] === wa && SHENG5[wa] !== wb) { score += 8; factors.push(`✓ Nạp âm tương sinh: ${nb}(${wb}) sinh ${na}(${wa}) → «納音相生為上婚».`); }
+      else if (SHENG5[wa] === wb && SHENG5[wb] === wa) { score += 5; factors.push(`✓ Nạp âm tương sinh lẫn nhau (${na}/${nb}) → «納音互生» cực thuận.`); }
+      else if (KE5[wa] === wb || KE5[wb] === wa) { score -= 6; factors.push(`• Nạp âm tương khắc: ${na}(${wa}) ↔ ${nb}(${wb}) → «納音相剋為次婚» — bản chất hơi xung, cần bao dung.`); }
+      else if (wa === wb) { score += 3; factors.push(`• Nạp âm đồng hành (${na}/${nb}, cùng ${wa}) → «納音比和» — trung tính, hiểu nhau.`); }
+      else { factors.push(`• Nạp âm ${na}(${wa}) – ${nb}(${wb}): quan hệ trung tính.`); }
+    }
   } catch (e) {}
 
   score = Math.max(5, Math.min(98, Math.round(score)));
