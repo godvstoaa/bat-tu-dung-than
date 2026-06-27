@@ -1971,6 +1971,15 @@ const evN = predictEvents(spR, 2026, 3);
 assert(evN.years && evN.years.length === 3, `predictEvents 3 năm (được ${evN.years?.length})`);
 assert(evN.years.every((y) => ['cat', 'hung', 'neutral'].includes(y.tone)), 'predictEvents mỗi năm có tone cat/hung/neutral');
 console.log(`   qiPhase=${spR.strength.qiPhase} | personality=${pnN.paragraphs.length}p | phase=${phN.paragraphs.length}p | event tones=[${evN.years.map((y) => y.tone).join(',')}] ✓`);
+// [loop 514] 拱夹 coverage
+import { detectGongjia } from './src/engine/gongjia.js';
+const gjR = detectGongjia(spR);
+assert(Array.isArray(gjR.arches), `拱夹 arches là mảng`);
+assert(typeof gjR.summary === 'string', `拱夹 summary là chuỗi`);
+const gjTest = analyze(1986, 1, 15, 10, 0, 'nam', 2026);
+const gjT = detectGongjia(gjTest);
+assert(gjT.arches.length > 0 && gjT.arches.some((a) => a.type.includes('拱禄')), `1986-1-15 己 dm: 拱禄 detected`);
+console.log(`   拱夹: spR arches=${gjR.arches.length} | 1986-1-15 拱禄 ✓`);
 
 // ################## 48. 10 NĂM TỚI 一览 (decade forecast) ##################
 import { decadeForecast } from './src/engine/decade-forecast.js';
