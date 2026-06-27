@@ -108,9 +108,9 @@ export function extendBrief(R) {
     // [loop 536] 鬼谷子分定經 (两头钳) — 年干×时干 → 配卦 → 命格 (VN translated)
     const fdg = guiguziFDG(R);
     if (fdg) {
-      let line = `鬼谷子分定經 LIẾU ĐẦU KÈM: ${fdg.combo} → quẻ ${fdg.guaVi} (cách「${fdg.geMing}」). ${fdg.star ? fdg.star + ': ' : ''}${fdg.starDesc || ''} ${fdg.guaMeaning || ''}`;
+      let line = `鬼谷子分定經 兩頭鉗 (源《永樂大典》): ${fdg.combo} → quẻ ${fdg.guaVi} (cách「${fdg.geMing}」). ${fdg.stars ? 'Ba sao: ' + fdg.stars + '. ' : ''}${fdg.starDesc ? fdg.starDesc.slice(0, 200) + ' ' : ''}${fdg.guaMeaning || ''} ${fdg.shuYun ? '述雲: ' + fdg.shuYun : ''}`;
       if (fdg.geShiAnalysis && fdg.geShiAnalysis.length) {
-        line += ` 格诗分層: ${fdg.geShiAnalysis.map(a => a.slice(0, 60)).join(' | ')}`;
+        line += ` 格诗分層: ${fdg.geShiAnalysis.map(a => a.slice(0, 70)).join(' | ')}`;
       }
       parts.push(line);
     }

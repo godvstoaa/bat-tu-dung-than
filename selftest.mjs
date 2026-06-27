@@ -1994,14 +1994,43 @@ const dnpR = dayNayinPersonality(spR);
 assert(dnpR && dnpR.dayJiaZi && dnpR.nayin && dnpR.traits, `dayNayinPersonality returns traits (got ${dnpR?.nayin})`);
 assert(dnpR.strength && dnpR.weakness && dnpR.compat, 'dayNayinPersonality has strength/weakness/compat');
 console.log(`   日柱納音: ${dnpR.dayJiaZi} ${dnpR.nayin} (${dnpR.vi}) — ${dnpR.nature} ✓`);
-// [loop 539] guiguzi-fdg coverage
-import { guiguziFDG } from './src/engine/guiguzi-fdg.js';
+// [loop 539→543] guiguzi-fdg coverage — GUA_MAP chính xác từ 《永樂大典》laiboyee.com
+import { guiguziFDG, GUA_MAP } from './src/engine/guiguzi-fdg.js';
 const fdgR = guiguziFDG(spR);
 assert(fdgR && fdgR.combo && fdgR.gua && fdgR.geMing, `guiguziFDG returns combo+gua+geMing (got ${fdgR?.combo})`);
 assert(fdgR.guaVi && fdgR.guaMeaning, 'guiguziFDG has VN guaMeaning');
-assert(fdgR.starDesc && fdgR.starDesc.length > 20, `guiguziFDG has starDesc VN (got ${fdgR.starDesc?.length} chars)`);
-assert(!fdgR.starDesc.includes('chưa encode'), 'guiguziFDG starDesc is VN (not placeholder)');
-console.log(`   鬼谷子分定經: ${fdgR.combo} → ${fdgR.guaVi},「${fdgR.geMing}」✓`);
+assert(fdgR.starDesc && fdgR.starDesc.length > 20, `guiguziFDG has 星照命 (got ${fdgR.starDesc?.length} chars)`);
+assert(fdgR.geShiAnalysis && fdgR.geShiAnalysis.length >= 4, `guiguziFDG has multi-layer analysis (got ${fdgR.geShiAnalysis?.length})`);
+console.log(`   鬼谷子分定經: ${fdgR.combo} → ${fdgR.guaVi},「${fdgR.geMing}」(${fdgR.geShiAnalysis.length} layers) ✓`);
+// [loop 543] REGRESSION: GUA_MAP phải = dữ liệu cổ THẬT, không phải cyclic pattern giả.
+//   Trước đây 癸戊=歸妹 (SAI); laiboyee/kabala/shen88 đều xác nhận 癸戊=艮.
+const GUA_CHECKS = {
+  '甲甲': '震', '甲乙': '恒', '甲庚': '歸妹', '甲癸': '小畜',
+  '乙甲': '益', '乙乙': '巽', '乙丙': '家人',
+  '丙甲': '大有', '丙丙': '離', '丙辛': '大有',
+  '丁甲': '復', '丁丁': '坤', '丁己': '坎',
+  '戊戊': '艮', '戊癸': '艮', '戊壬': '夬',
+  '己庚': '臨', '己辛': '既濟',
+  '庚甲': '隨', '庚庚': '兌', '庚辛': '夬',
+  '辛甲': '無妄', '辛乙': '姤', '辛辛': '乾',
+  '壬甲': '屯', '壬己': '中孚', '壬壬': '坎',
+  '癸戊': '艮', '癸庚': '損', '癸壬': '蒙', '癸癸': '艮',
+};
+let badGua = [];
+for (const [combo, expect] of Object.entries(GUA_CHECKS)) {
+  if (GUA_MAP[combo] !== expect) badGua.push(`${combo}=${GUA_MAP[combo]}(≠${expect})`);
+}
+assert(badGua.length === 0, `GUA_MAP chính xác 《永樂大典》— sai: ${badGua.join(', ')}`);
+assert(Object.keys(GUA_MAP).length === 100, `GUA_MAP đủ 100 tổ hợp (got ${Object.keys(GUA_MAP).length})`);
+// [loop 543] 格名 phải là tên cổ THẬT (không bịa). Spot-check vài cell.
+const GEMING_CHECKS = { '癸戊': '雁過重嵐', '甲庚': '花遇殘愁', '丙甲': '池內雙蓮', '庚丙': '革故鼎新', '癸丙': '金榜題名' };
+let badGm = [];
+for (const [combo, expect] of Object.entries(GEMING_CHECKS)) {
+  const r = guiguziFDG({ chart: { pillars: { year: { gan: combo[0] }, time: { gan: combo[1] } } } });
+  if (r.geMing !== expect) badGm.push(`${combo}=${r.geMing}(≠${expect})`);
+}
+assert(badGm.length === 0, `格名 cổ thật — sai: ${badGm.join(', ')}`);
+console.log(`   GUA_MAP 100/100 + 格名 cổ thật ✓ (癸戊=${GUA_MAP['癸戊']}, 癸庚=${GUA_MAP['癸庚']})`);
 
 // ################## 48. 10 NĂM TỚI 一览 (decade forecast) ##################
 import { decadeForecast } from './src/engine/decade-forecast.js';

@@ -1733,19 +1733,28 @@ function renderGuiguzi(R) {
         <div class="hint">${esc(p.fortune?.slice(0,80) || '')} ${esc(p.ganMod || '')}</div>
       </div>`;
     }).join('');
-    // 分定經 格诗 multi-layer analysis
+    // 分定經 格诗 multi-layer analysis (data cổ thật từ 《永樂大典》laiboyee.com)
     let fdgHtml = '';
     if (f) {
       const shiHtml = f.geShi ? `<div class="tiaohou-note" style="margin:8px 0;font-size:13px;line-height:1.8"><b class="zh">${esc(f.geShi)}</b></div>` : '';
-      const analysisHtml = (f.geShiAnalysis || []).map((a, i) =>
-        `<div class="yz-row" style="margin:3px 0;padding-left:8px;border-left:3px solid ${i === 4 ? 'var(--gold-bright)' : 'var(--gold-soft)'}"><span style="font-size:11px;color:var(--gold-bright);font-weight:600">${i === 4 ? '★ TỔNG' : 'Câu ' + (i+1)}</span> <span style="font-size:12px">${esc(a)}</span></div>`
-      ).join('');
+      const analysisHtml = (f.geShiAnalysis || []).map((a) => {
+        const isTotal = a.startsWith('TỔNG');
+        const isPoem = a.startsWith('Câu ');
+        const label = isTotal ? '★ TỔNG' : isPoem ? '' : '◇';
+        const border = isTotal ? 'var(--gold-bright)' : 'var(--gold-soft)';
+        const wt = isTotal ? '700' : '400';
+        return `<div class="yz-row" style="margin:3px 0;padding-left:8px;border-left:3px solid ${border}">${label ? `<span style="font-size:11px;color:var(--gold-bright);font-weight:700">${esc(label)} </span>` : ''}<span style="font-size:12px;font-weight:${wt}">${esc(a)}</span></div>`;
+      }).join('');
+      const starsHtml = f.stars ? `<div style="margin:4px 0"><span class="hint">⭐ Ba sao chiếu mệnh:</span> <b class="zh">${esc(f.stars)}</b></div>` : '';
+      const shuYunHtml = f.shuYun ? `<div class="tiaohou-note" style="margin:8px 0;padding:8px 10px;background:rgba(247,236,203,0.06);border-left:3px solid var(--gold-bright)"><span class="hint">🔮 Kết luận (述雲):</span> <b class="zh" style="font-size:14px">${esc(f.shuYun)}</b></div>` : '';
       fdgHtml = `
         <h4 class="syn-h4" style="margin-top:12px">📜 Phân Định Kinh (兩頭鉗: ${esc(f.combo)} → ${esc(f.guaVi)})</h4>
         <div style="margin:4px 0"><b>Cách「<span class="zh">${esc(f.geMing)}</span>」</b> <span class="ln-rate rate-mid">${esc(f.guaNature)}</span></div>
+        ${starsHtml}
         ${shiHtml}
         ${analysisHtml}
-        <p class="hint" style="margin-top:4px">${esc(f.starDesc || '')}</p>`;
+        ${shuYunHtml}
+        ${f.starDesc ? `<details style="margin-top:6px"><summary class="hint" style="cursor:pointer">📖 Luận cổ đầy đủ (星照命)</summary><p class="hint" style="margin-top:6px;line-height:1.7">${esc(f.starDesc)}</p></details>` : ''}`;
     }
     el.innerHTML = `
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
