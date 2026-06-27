@@ -62,7 +62,8 @@ export function synthesize(R) {
   const catCombos = combos.filter((c) => c.tone === 'cat');
   if (xiong.length) {
     score -= 5 * xiong.length;
-    factors.push(`Tổ hợp hung (${xiong.map((c) => c.vi).join(', ')}) làm trọc cục, ${-5 * xiong.length}.`);
+    const _xMit = xiong.filter((c) => c.mitigation).map((c) => c.mitigation).join('; ');
+    factors.push(`Tổ hợp hung (${xiong.map((c) => c.vi).join(', ')}) làm trọc cục, ${-5 * xiong.length}.${_xMit ? ` Hóa giải: ${_xMit}.` : ''}`);
   }
   if (catCombos.length) {
     const bonus = 3 * Math.min(catCombos.length, 2);
@@ -89,7 +90,7 @@ export function synthesize(R) {
   if (kw && kw.affected && kw.affected.length) {
     const penalty = -2 * kw.affected.length;
     score += penalty;
-    factors.push(`Không vong (空亡): ${kw.affected.length} trụ rơi旬空 (${kw.affected.map((a) => a.pos).join('/')}) → tàng can «treo» («空则不实»), ${penalty}.`);
+    factors.push(`Không vong (空亡): ${kw.affected.length} trụ rơi旬空 (${kw.affected.map((a) => a.pos).join('/')}) → tàng can «treo» («空则不实»), ${penalty}. → đợi lưu niên/đại vận «xuất旬空» tàng can mới phát huy.`);
   }
 
   // [loop 457] 源流 (ngũ hành lưu thông — 滴天髓源流篇) — chiều đo thứ 6.
