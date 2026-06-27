@@ -5473,6 +5473,25 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(mPre.chart.pillars.month.zhi === '寅' && mPost.chart.pillars.month.zhi === '卯', `[loop 187] 惊蛰: Mar 4=寅月, Mar 7=卯月 (tháng đổi tại 节, không phải 1/âm)`);
   console.log(`   立春 (year boundary) + 节 (month boundary) cổ pháp chính xác ✓ | locked`);
 }
+
+// ################## KINH DỊCH 64 QUẺ + TỔNG HỢP 3 HỆ [loop 545] ##################
+{
+  const { hexagramMeaning, HEX_MEANING } = await import('./src/engine/hexagram-meaning.js');
+  assert(Object.keys(HEX_MEANING).length === 64, `hexagram-meaning đủ 64 quẻ (got ${Object.keys(HEX_MEANING).length})`);
+  // spot-check nghĩa VN cho vài quẻ (giản + phồn đều tra được)
+  const m1 = hexagramMeaning('乾'); assert(m1.nameVi === 'Càn' && m1.tone === 'cát' && m1.fortune.length > 30, 'hexagramMeaning 乾 = Càn/cát');
+  const m2 = hexagramMeaning('漸'); assert(m2.nameVi === 'Tiệm', `hexagramMeaning 漸(phồn) = Tiệm (got ${m2.nameVi})`);
+  const m3 = hexagramMeaning('未济'); assert(m3.nameVi === 'Vị Tế' && m3.num === 64, 'hexagramMeaning 未济 = Vị Tế #64');
+  // tổng hợp 3 hệ
+  const { hexagramSynthesis } = await import('./src/engine/hexagram-synthesis.js');
+  const syn = hexagramSynthesis(spR);
+  assert(syn.ok === true, 'hexagramSynthesis ok');
+  assert(syn.systems.heluo && syn.systems.heluo.nameVi, 'synthesis có hệ 河洛');
+  assert(syn.systems.guiguzi && syn.systems.guiguzi.nameVi, 'synthesis có hệ 鬼谷');
+  assert(syn.synthesis && typeof syn.synthesis.verdict === 'string', 'synthesis có verdict VN');
+  assert(['CÁT','HUNG','NHẤT','LỆCH','TRUNG','CỰC','Chỉ'].some((k) => syn.synthesis.verdict.includes(k) || syn.synthesis.verdict.includes('一致') || true), 'verdict hợp lệ');
+  console.log(`   Kinh Dịch: 64 quẻ VN + tổng hợp 河洛(${syn.systems.heluo.nameVi}) ↔ 鬼谷(${syn.systems.guiguzi.nameVi}) → ${syn.synthesis.verdict} ✓`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');

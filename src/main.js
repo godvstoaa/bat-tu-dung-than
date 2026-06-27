@@ -178,6 +178,8 @@ import { dailyBriefing } from './engine/daily-briefing.js';
 import { chenggu } from './engine/chenggu.js';
 import { sanshishu } from './engine/sanshishu.js';
 import { heluo } from './engine/heluo.js';
+import { hexagramSynthesis } from './engine/hexagram-synthesis.js';
+import { hexagramMeaning } from './engine/hexagram-meaning.js';
 import { huangdao12, renderHuangdaoCard } from './engine/huangdao.js';
 import { donggongDay, donggongInMonth } from './engine/donggong.js';
 import { qizheng, renderQizhengCard } from './engine/qizheng.js';
@@ -943,6 +945,19 @@ function renderHeluo(R) {
       <div class="verse-box"><div class="verse-zh">${esc(h.reading.hexagramText)}</div></div>
       <p class="cg-interp"><b>爻辞 (hào ${h.yuantang.line}):</b> ${esc(h.reading.yuantangLineText)}</p>
       ${h.reading.houtianHexagramText ? `<p class="cg-interp"><b>后天卦辞:</b> ${esc(h.reading.houtianHexagramText)}</p>` : ''}
+      ${(() => { const m = hexagramMeaning(h.hexagram.name); return m && m.fortune && !m.fortune.startsWith('(') ? `<div class="tiaohou-note" style="margin:8px 0;padding:8px 10px"><b>📖 Luận VN (本命卦 ${esc(h.hexagram.nameVi)}):</b> ${esc(m.fortune)} <span class="hint">— ${esc(m.image)}</span></div>` : ''; })()}
+      ${(() => {
+        const syn = hexagramSynthesis(R);
+        if (!syn.ok || !syn.synthesis) return '';
+        const toneCls = syn.synthesis.consistency >= 1 ? 'rate-cat' : syn.synthesis.consistency <= -1 ? 'rate-hung' : 'rate-mid';
+        const heluoV = syn.systems.heluo?.nameVi || '?', ggV = syn.systems.guiguzi?.nameVi || '?';
+        return `<div class="tiaohou-note" style="margin:8px 0;padding:8px 10px;border-left:3px solid var(--gold-bright)">
+          <h4 class="syn-h4">🔗 Tổng hợp 3 hệ quẻ Dịch (河洛 ↔ 鬼谷)</h4>
+          <p class="hint">河洛理数 (Bát tự→quẻ): <b>${esc(heluoV)}</b>${syn.systems.heluo?.tone ? ' <span class="ln-rate rate-mid">' + esc(syn.systems.heluo.tone) + '</span>' : ''} · 鬼谷分定經 (can năm×giờ→quẻ): <b>${esc(ggV)}</b>${syn.systems.guiguzi?.tone ? ' <span class="ln-rate rate-mid">' + esc(syn.systems.guiguzi.tone) + '</span>' : ''}</p>
+          <p><span class="ln-rate ${toneCls}">${esc(syn.synthesis.verdict)}</span>${syn.synthesis.sameHexagram ? ' ⭐' : ''}</p>
+          <p class="hint" style="margin-top:4px">${esc(syn.synthesis.advice || '')}</p>
+        </div>`;
+      })()}
       <p class="hint" style="margin-top:6px">河洛理数 (陈抟) — chuyển bát tự sang quẻ 周易 đọc mệnh. Thuật toán 飞支 (三才发秘). ${h.yuantang.disputed ? 'Quẻ N=6 (乾/坤) cổ thư chia theo giới+đông/hạ chí — kết quả nên review thủ công.' : ''}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 河洛理数.</p>'; }
 }

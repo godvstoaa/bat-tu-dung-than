@@ -15,6 +15,7 @@ import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
 import { guiguziFortune } from './guiguzi.js';
 import { guiguziFDG } from './guiguzi-fdg.js';
+import { hexagramSynthesis } from './hexagram-synthesis.js';
 import { dayNayinPersonality } from './nayin-personality.js';
 import { analyzeTaohua } from './taohua.js';
 import { marriageStars } from './marriage-stars.js';
@@ -496,6 +497,8 @@ function pFreeForm(R, intent) {
   try { const gg = guiguziFortune(R); if (gg) lines.push(`🔮 Quỷ Cốc Tử: năm ${gg.yearJiaZi} (${gg.vi}) ${gg.toneVi} — ${gg.fortune.slice(0, 90)}.`); } catch (e) {}
   // [loop 536] 鬼谷子分定經 (两头钳)
   try { const fdg = guiguziFDG(R); if (fdg) lines.push(`📜 Phân Định Kinh: ${fdg.combo} quẻ ${fdg.guaVi}, cách「${fdg.geMing}」— ${fdg.guaMeaning?.slice(0, 80) || ''} ${fdg.starDesc?.slice(0, 60) || ''}`); } catch (e) {}
+  // [loop 545] TỔNG HỢP KINH DỊCH — kết nối 河洛 (Bát tự) ↔ 鬼谷 (can năm×giờ)
+  try { const syn = hexagramSynthesis(R); if (syn?.ok && syn.synthesis) lines.push(`☯ Kinh Dịch tổng hợp: 河洛 ${syn.systems.heluo?.nameVi || '?'}[${syn.systems.heluo?.tone || ''}] + 鬼谷 ${syn.systems.guiguzi?.nameVi || '?'}[${syn.systems.guiguzi?.tone || ''}] → ${syn.synthesis.verdict}.`); } catch (e) {}
   // [loop 527] 日柱納音 personality bonus
   try { const dnp = dayNayinPersonality(R); if (dnp && dnp.traits) lines.push(`🏺 Nạp âm ${dnp.dayJiaZi} (${dnp.vi}): ${dnp.nature}. ${dnp.strength}, cần khắc phục ${dnp.weakness}.`); } catch (e) {}
   lines.push(`${now && now.score < 0 ? `⚠ Đang ở năm ${now.year} bất lợi → thủ giữ, tránh mạo hiểm; đợi lưu niên mang hành Dụng.` : `Nên tiến thủ theo Dụng Thần, đón lưu niên/đại vận cát.`} Để có phân tích tự do chuyên sâu hơn, bật AI trong ⚙ Cài đặt.`);

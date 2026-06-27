@@ -43,6 +43,7 @@ import { analyzePillarQuality } from './pillar-quality.js';
 import { detectGongjia } from './gongjia.js';
 import { guiguziFortune } from './guiguzi.js';
 import { guiguziFDG } from './guiguzi-fdg.js';
+import { hexagramSynthesis } from './hexagram-synthesis.js';
 import { dayNayinPersonality } from './nayin-personality.js';
 
 /**
@@ -114,6 +115,18 @@ export function extendBrief(R) {
       }
       parts.push(line);
     }
+    // [loop 545] TỔNG HỢP 3 HỆ QUẺ DỊCH (河洛理数 + 鬼谷分定經) — kết nối Dịch số với bát tự + quỷ cốc
+    try {
+      const syn = hexagramSynthesis(R);
+      if (syn.ok && syn.synthesis) {
+        const he = syn.systems.heluo, gg = syn.systems.guiguzi;
+        let line = `TỔNG HỢP KINH DỊCH (3 hệ quẻ): `;
+        if (he) line += `河洛理数 (Bát tự→本命卦) = ${he.nameVi} [${he.tone}]: ${he.fortune?.slice(0, 90)}${he.nature ? ` (${he.nature})` : ''}. `;
+        if (gg) line += `鬼谷分定經 (can năm×giờ→配卦) = ${gg.nameVi}「${gg.geMing}」[${gg.tone}]. `;
+        line += `→ ${syn.synthesis.verdict}. ${syn.synthesis.advice || ''}`;
+        parts.push(line);
+      }
+    } catch (e) {}
   } catch (e) {}
   // [loop 526] 日柱納音 personality — bản chất bẩm sinh theo nạp âm NGÀY
   try {
