@@ -116,6 +116,7 @@ import { jiaoYunAnalysis } from './engine/jiaoyun.js';
 import { analyzePillarQuality } from './engine/pillar-quality.js';
 import { analyzeYuanLiu } from './engine/yuanliu.js';
 import { phaseNarrative } from './engine/phase-narrative.js';
+import { personalityNarrative } from './engine/personality-narrative.js';
 import { analyzeHuaQi } from './engine/huaqi.js';
 import { dayunChangSheng, liunianChangSheng, dayunYongChangSheng, liuyueChangSheng } from './engine/dayun-changsheng.js';
 import { analyzeHanNuan } from './engine/han-nuan.js';
@@ -1663,6 +1664,16 @@ function renderYuanLiu(R) {
 
 // [loop 472] Tường thuật giai đoạn — narrative prose may xuyên 大运→lưu niên→lưu nguyệt.
 // [loop 474] tương tác: nhận năm (xem giai đoạn quá khứ/tương lai).
+// [loop 488] Tường thuật bản mệnh — personality narrative (natal «bạn là ai»).
+function renderPersonalityNarrative(R) {
+  const el = $('personality-narrative');
+  if (!el) return;
+  try {
+    const pn = personalityNarrative(R);
+    el.innerHTML = pn.paragraphs.map((p) => `<p class="yz-row" style="line-height:1.6;border-left:3px solid var(--jade);padding-left:10px;margin:6px 0">${p}</p>`).join('');
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được tường thuật bản mệnh.</p>'; }
+}
+
 function renderPhaseNarrative(R, year) {
   const el = $('phase-narrative');
   if (!el) return;
@@ -3251,6 +3262,7 @@ function run() {
   renderPillars(c);
   renderVerdict(currentResult);
   renderSynthesis(currentResult);
+  renderPersonalityNarrative(currentResult); // [loop 488] natal «bạn là ai»
   renderPhaseNarrative(currentResult); // [loop 472] narrative ngay sau tổng luận
   renderDayunTimeline(currentResult); // [loop 475] timeline trực quan thập kỷ
   renderQianli(currentResult);
