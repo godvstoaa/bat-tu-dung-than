@@ -39,6 +39,7 @@ import { cityRecommendation } from './city-fs.js';
 import { personalNutrition } from './bazi-diet.js';
 import { investmentStyle } from './invest-style.js';
 import { analyzeBusiness } from './bazi-business.js';
+import { analyzePillarQuality } from './pillar-quality.js';
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -81,6 +82,12 @@ export function extendBrief(R) {
         .map((d) => `${d.ganZhi}: ${d._ylNote.replace(/MỞ dòng tắc.*→/, 'mở dòng').replace(/KHẮC归宿.*→.*TỔN/, 'khắc归宿')}`);
       parts.push(`源流 NGUỒN-LƯU: nguồn ${yl.source} chảy ${yl.flowLen}/5 hành, quy về ${yl.aspectKey} (${yl.aspectVi}) → ${yl.fullCycle ? '源远流长 (phú quý bền)' : yl.verdict}.${yl.gap ? ' Tắc tại ' + yl.gap + '.' : ''}${ylDy.length ? ' 大运 tương tác 源流: ' + ylDy.join(' | ') + '.' : ''}`);
     }
+  } catch (e) {}
+  // [loop 467] 盖头截脚 (can-chi khắc nhau TRONG trụ) — 滴天髓 khí thông/không thông.
+  //   Trước đây AI không truy cập (pillar-quality chỉ tính ở render, không trong brief).
+  try {
+    const pq = analyzePillarQuality(R);
+    if (pq && pq.gaijieCount > 0) parts.push(`盖头截脚: ${pq.gaijieCount}/4 trụ can-chi khắc nhau (${(pq.summary || '').split('。')[0].slice(0, 60)}) → ${pq.flowOk ? 'khí vẫn tương đối thông' : 'khí KHÔNG thông, đời hay vấp/trở ngại'}.`);
   } catch (e) {}
 
   // [loop 89] MỆNH CÁCH TẦNG LỚP (命格層次) — phân loại cổ điển 6 tiêu chí (module chart-level trước đây ẩn).
