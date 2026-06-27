@@ -4503,7 +4503,7 @@ function runFamily() {
 }
 
 function renderFamilyScore(fam) {
-  const cls = fam.score >= 72 ? 'rate-cat' : fam.score >= 55 ? 'rate-mid' : 'rate-hung';
+  const cls = fam.score >= 57 ? 'rate-cat' : fam.score >= 51 ? 'rate-mid' : 'rate-hung'; // [loop 459] recalibrate neo family tiers
   const html = `<div class="fam-score-head"><span class="ln-rate ${cls}">${fam.score}/100</span> <b>${esc(fam.rating)}</b>`
     + ` · xác <b style="color:#2e9e5b">${fam.confirms}</b> / nghiệm <b style="color:#e0533d">${fam.conflicts}</b></div>`;
   $('family-score').innerHTML = html;

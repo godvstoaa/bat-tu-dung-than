@@ -223,7 +223,9 @@ export function analyzeFamily(center, members) {
   const timing = scoreTimingCorrelation(center, members);
   const avgPair = pairs.length ? pairs.reduce((a, p) => a + p.pair.pairScore, 0) / pairs.length : 50;
   const score = Math.round(avgPair * 0.75 + familyBalance.score * 0.15 + timing.score * 0.10);
-  const rating = score >= 72 ? 'Gia tộc nhất quán cao' : score >= 55 ? 'Gia tộc khá nhất quán' : score >= 40 ? 'Gia tộc lệch nhẹ' : 'Gia tộc mâu thuẫn nhiều';
+  // [loop 459] recalibrate theo percentile 120 gia đình (range 47-77, median 59). Cũ 72/55/40
+  //   khiến «mâu thuẫn nhiều» (<40) CHẾT (min thực tế 47) + «khá» quá rộng (75%). Nay neo p85/p45/p15.
+  const rating = score >= 67 ? 'Gia tộc nhất quán cao' : score >= 57 ? 'Gia tộc khá nhất quán' : score >= 51 ? 'Gia tộc lệch nhẹ' : 'Gia tộc mâu thuẫn nhiều';
   const ledger = [];
   pairs.forEach((p) => p.pair.ledger.forEach((l) => ledger.push({ ...l, who: p.label || ROLE[p.role].vi })));
   [familyBalance, timing].forEach((ax) => ax.reasons.forEach((r) => ledger.push({ ok: !/⚠|✗/.test(r), msg: r, who: 'Cả gia tộc' })));
