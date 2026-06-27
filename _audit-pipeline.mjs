@@ -65,15 +65,15 @@ console.log(`\n${'='.repeat(70)}`);
 console.log(`Pipeline audit: ${checks - fails}/${checks} passed, ${fails} fail`);
 if (fails === 0) console.log('🎉 NO silent fallback triggered — pipeline healthy');
 
-// --- [loop 162] rateClass regression guard ---
-// Lưu Niên (scoreLiunianYear) ratings MUST get a colored class, never rate-mid
-// for extreme values. Previously 'Đại cát'/'Đại hung'/'Hơi kỵ' fell to rate-mid.
+// --- [loop 162→492] rateClass regression guard — đã update cho loop 463 rewrite ---
+// loop 463 rewrite rateClass: normalize .toLowerCase() + 21 vocab lowercase keys.
+// Guard cũ (loop 162) check titlecase literals → STALE fail (keys giờ lowercase).
+// Nay check: (a) toLowerCase normalization + (b) lowercase key terms present.
 import fs from 'fs';
 const expected = {
-  'Đại cát': 'rate-cat', 'Cát': 'rate-cat',
-  'Bình hòa': 'rate-mid', 'Bình': 'rate-mid',
-  'Hơi nghịch': 'rate-bad', 'Hơi kỵ': 'rate-bad',
-  'Hung': 'rate-hung', 'Đại hung': 'rate-hung',
+  'đại cát': 'rate-supercat', 'cát': 'rate-cat',
+  'bình': 'rate-mid', 'hơi kỵ': 'rate-bad',
+  'hung': 'rate-hung', 'đại hung': 'rate-superhung', 'kỵ': 'rate-hung',
 };
 const src = fs.readFileSync('./src/main.js', 'utf8');
 const rcMatch = src.match(/function rateClass\(rating\)\s*\{([\s\S]*?)\n\}/);
@@ -81,10 +81,11 @@ let rcFails = 0;
 if (!rcMatch) { console.log('  ✗ rateClass not found'); rcFails++; }
 else {
   const body = rcMatch[1];
-  for (const [label, cls] of Object.entries(expected)) {
-    if (!body.includes(`'${label}'`)) { console.log(`  ✗ rateClass missing '${label}' → ${cls}`); rcFails++; }
+  if (!body.includes('toLowerCase')) { console.log('  ✗ rateClass missing toLowerCase normalization'); rcFails++; }
+  for (const [label] of Object.entries(expected)) {
+    if (!body.includes(`'${label}'`)) { console.log(`  ✗ rateClass missing '${label}'`); rcFails++; }
   }
 }
-console.log(`rateClass guard: ${rcFails === 0 ? '✓ both vocabs covered' : rcFails + ' missing'}`);
+console.log(`rateClass guard: ${rcFails === 0 ? '✓ normalization + vocab covered' : rcFails + ' missing'}`);
 process.exit((fails + rcFails) > 0 ? 1 : 0);
 
