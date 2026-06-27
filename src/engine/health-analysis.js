@@ -49,15 +49,16 @@ export function analyzeHealth(R) {
   const riskSeason = SEASON_LOW[weakest];
 
   // Kỵ Thần = hành khắc Dụng → tạng bị Kỵ hành tổn
-  const jiInfo = ORGAN[yong.ji];
+  // [loop 565 FIX] guard jiInfo — trước đây ORGAN[undefined] → crash «reading 'risk'».
+  const jiInfo = ORGAN[yong.ji] || { organs: '?', risk: 'không xác định' };
 
   const profile = [
     `Hành yếu nhất: ${WX_VI[weakest]} (${weakest}, ${weakPct}%) → tạng ${weakInfo.organs} suy. Cần chú ý: ${weakInfo.risk}.`,
-    `Hành vượng nhất: ${WX_VI[strongest]} (${strongest}, ${strongPct}%) → thái quá dễ tổn tạng bị khắc: ${ORGAN[({ 木:'土', 火:'金', 土:'水', 金:'木', 水:'火' })[strongest]].organs}.`,
+    `Hành vượng nhất: ${WX_VI[strongest]} (${strongest}, ${strongPct}%) → thái quá dễ tổn tạng bị khắc: ${ORGAN[({ 木:'土', 火:'金', 土:'水', 金:'木', 水:'火' })[strongest]]?.organs || '?'}.`,
     constitution,
-    `Dưỡng sinh theo Dụng Thần (${WX_VI[remedyWx]}): tăng ${remedyFoods}. Tránh thực phẩm hành Kỵ ${WX_VI[yong.ji]}.`,
+    `Dưỡng sinh theo Dụng Thần (${WX_VI[remedyWx]}): tăng ${remedyFoods}. Tránh thực phẩm hành Kỵ ${WX_VI[yong.ji] || '?'}.`,
     `⚠ Mùa rủi ro: ${riskSeason} — hành ${WX_VI[weakest]} bị khắc mạnh, tạng dễ phát bệnh.`,
-    `Kỵ Thần (${WX_VI[yong.ji]}) → ${jiInfo.risk}; cần hạn chế môi trường/thức ăn hành ${WX_VI[yong.ji]}.`,
+    `Kỵ Thần (${WX_VI[yong.ji] || '?'}) → ${jiInfo.risk}; cần hạn chế môi trường/thức ăn hành ${WX_VI[yong.ji] || '?'}.`,
   ];
 
   // Thai nguyên check (nếu có)

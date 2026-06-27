@@ -42,13 +42,13 @@ export function analyzeCaiKu(R) {
   const hasTaiku = taikuWx === '土' ? allZhi.some((z) => ['辰', '戌', '丑', '未'].includes(z)) : allZhi.includes(taikuZhi);
   const taikuPos = taikuWx === '土' ? allZhi.filter((z) => ['辰', '戌', '丑', '未'].includes(z)) : allZhi.filter((z) => z === taikuZhi);
 
-  // Quan khố
-  const guankuZhi = WX_KU[guankuWx] || '?';
-  const hasGuanku = allZhi.includes(guankuZhi);
+  // Quan khố [loop 565 FIX] special-case Thổ (giống Tài) — trước đây WX_KU[土]=undefined → '?' SAI.
+  const guankuZhi = guankuWx === '土' ? '辰戌丑未' : (WX_KU[guankuWx] || '?');
+  const hasGuanku = guankuWx === '土' ? allZhi.some((z) => ['辰', '戌', '丑', '未'].includes(z)) : allZhi.includes(guankuZhi);
 
   // Ấn khố
-  const yinkuZhi = WX_KU[yinkuWx] || '?';
-  const hasYinku = allZhi.includes(yinkuZhi);
+  const yinkuZhi = yinkuWx === '土' ? '辰戌丑未' : (WX_KU[yinkuWx] || '?');
+  const hasYinku = yinkuWx === '土' ? allZhi.some((z) => ['辰', '戌', '丑', '未'].includes(z)) : allZhi.includes(yinkuZhi);
 
   // Có bao nhiêu trong 4 chi Thổ
   const fourTu = allZhi.filter((z) => ['辰', '戌', '丑', '未'].includes(z));
@@ -66,10 +66,10 @@ export function analyzeCaiKu(R) {
   // Hồ sơ
   const profile = [
     hasTaiku
-      ? `✓ Có TÀI KHỐ: ${taikuWx === '土' ? '4 chi Thổ (' + taikuPos.join(',') + ')' : KU_VI[taikuZhi] + ' (' + taikuZhi + ')'} → GIỮ ĐƯỢC TIỀN. Tiền vào có nơi chứa, tích luỹ được.`
+      ? `✓ Có TÀI KHỐ: ${taikuWx === '土' ? taikuPos.length + ' chi Thổ (' + taikuPos.join(',') + ')' : KU_VI[taikuZhi] + ' (' + taikuZhi + ')'} → GIỮ ĐƯỢC TIỀN. Tiền vào có nơi chứa, tích luỹ được.`
       : `✗ KHÔNG có tài khố (${taikuWx === '土' ? 'không chi Thổ nào' : 'thiếu ' + KU_VI[taikuZhi]}) → tiền dễ chảy qua tay, cần tích cực giữ (gửi tiết kiệm, mua BĐS).`,
-    hasGuanku ? `✓ Có QUAN KHỐ (${KU_VI[guankuZhi]}): sự nghiệp có nền, quyền lực tích luỹ được.` : `Không quan khố: sự nghiệp phải liên tục duy trì.`,
-    hasYinku ? `✓ Có ẤN KHỐ (${KU_VI[yinkuZhi]}): học vấn/bảo vệ có tích luỹ.` : `Không ấn khố.`,
+    hasGuanku ? `✓ Có QUAN KHỐ (${guankuWx === '土' ? 'chi Thổ' : KU_VI[guankuZhi]}): sự nghiệp có nền, quyền lực tích luỹ được.` : `Không quan khố: sự nghiệp phải liên tục duy trì.`,
+    hasYinku ? `✓ Có ẤN KHỐ (${yinkuWx === '土' ? 'chi Thổ' : KU_VI[yinkuZhi]}): học vấn/bảo vệ có tích luỹ.` : `Không ấn khố.`,
     fourTu.length ? `4 chi Thổ (kho/tài cho nhiều mệnh): ${fourTu.map((z) => KU_VI[z]).join(', ')} (${fourTu.length} chi).` : 'Không chi Thổ nào trong tứ trụ.',
     opens.length ? `🔓 Kho mở (xung): ${opens.join(', ')} → kho bị mở, tài dễ ra (tốt cho chi tiêu đầu tư, xấu cho tích luỹ).` : 'Kho yên (không bị xung) → tiền tích luỹ được, khó lấy ra (cần vận mở kho).',
   ];
@@ -79,7 +79,7 @@ export function analyzeCaiKu(R) {
     : hasTaiku && opens.length
       ? 'Có tài khố NHƯNG bị xung → kho MỞ → tiền vào ra nhanh. Tốt cho kinh doanh/đầu tư (dòng tiền lưu thông) nhưng khó tích luỹ dưa.'
       : !hasTaiku
-        ? 'KHÔNG có tài khố → tiền dễ chảy. Bù đắp: (1) gửi tiết kiệm có kỷ luật, (2) mua BĐS/vàng (chuyển tiền thành vật), (3) đợi đại vận/lưu niên mang chi khố (vd ' + (WX_KU[taikuWx] || '?') + ') → "mở kho" để tích.'
+        ? 'KHÔNG có tài khố → tiền dễ chảy. Bù đắp: (1) gửi tiết kiệm có kỷ luật, (2) mua BĐS/vàng (chuyển tiền thành vật), (3) đợi đại vận/lưu niên mang chi khố (vd ' + taikuZhi + ') → "mở kho" để tích.'
         : 'Tài khố trung tính.';
 
   return {

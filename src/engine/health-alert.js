@@ -105,7 +105,7 @@ export function healthAlertScan(R, scanYears = 10) {
 
     if (riskScore >= 2) {
       yearAlert.advice = riskScore >= 4
-        ? `⚠ NĂM RỦI RO CAO — khám sức khoẻ định kỳ, giảm cường độ, dưỡng sinh ${WX_VI[yong.primary]}, tránh thức khách.`
+        ? `⚠ NĂM RỦI RO CAO — khám sức khoẻ định kỳ, giảm cường độ, dưỡng sinh ${WX_VI[yong.primary]}, tránh thức khuya.`
         : `Năm cần chú ý sức khoẻ — duy trì dưỡng sinh, khám ${weakestOrgan.split(' ')[0]}.`;
       alerts.push(yearAlert);
     } else {

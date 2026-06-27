@@ -78,8 +78,9 @@ export function investmentStyle(R) {
 
   // 3. Phân bổ (allocation) dựa: thân vượng/nhược + rủi ro thập thần
   let riskScore = investStyle.risk;
-  if (strength.strong) riskScore += 1; // vượng → dám rủi ro hơn
-  if (!strength.strong) riskScore -= 1; // nhược → cần an toàn hơn
+  // [loop 565 FIX] strength.strong undefined → !undefined=true → luôn -1 (coi nhược). Nay explicit.
+  if (strength.strong === true) riskScore += 1; // vượng → dám rủi ro hơn
+  else if (strength.strong === false) riskScore -= 1; // nhược → cần an toàn hơn
   riskScore = Math.max(1, Math.min(5, riskScore));
 
   // Allocation theo risk
