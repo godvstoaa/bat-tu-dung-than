@@ -5621,6 +5621,42 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(ld.disclaimer && ld.disclaimer.includes('KHÔ'), 'liudao có disclaimer (không tiên đoán tái sinh)');
   console.log(`   Lục Đạo (ṣaḍ-gati): 6 đạo + Skt chính xác + spR→${ld.realm.vi} (tam độc ${ld.poisonTop.vi}) ✓`);
 }
+
+// ################## SMOKE TEST: zero-coverage modules [loop 567] ##################
+// [loop 567] bảo vệ đầu tư audit — thêm smoke test cho module vừa audit (loop 565-566) nhưng
+//   zero selftest coverage. Đảm bảo không crash + trả shape hợp lệ. Tránh regress âm thầm.
+{
+  console.log('\n################## SMOKE: zero-coverage modules [loop 567] ##################');
+  const { healthAlertScan } = await import('./src/engine/health-alert.js');
+  const { analyzeHealth } = await import('./src/engine/health-analysis.js');
+  const { healthMonthlyAlert } = await import('./src/engine/health-monthly.js');
+  const { analyzeCaiKu } = await import('./src/engine/caiku.js');
+  const { investmentStyle } = await import('./src/engine/invest-style.js');
+  const { analyzeFiveVirtues } = await import('./src/engine/five-aspects.js');
+  const { cureByElement } = await import('./src/engine/fs-cure.js');
+  // health-alert: returns {alerts, safeYears, weakestOrgan, summary}
+  const ha = healthAlertScan(spR, 3);
+  assert(ha && ha.summary, `[smoke] health-alert trả summary`);
+  // health-analysis: returns profile object
+  const han = analyzeHealth(spR);
+  assert(han && han.profile, `[smoke] health-analysis trả profile`);
+  // health-monthly: returns months array
+  const hm = healthMonthlyAlert(spR, 2026);
+  assert(hm && (hm.months || Array.isArray(hm)), `[smoke] health-monthly trả months`);
+  // caiku: hasTaiku boolean
+  const ck = analyzeCaiKu(spR);
+  assert(typeof ck.hasTaiku === 'boolean', `[smoke] caiku.hasTaiku boolean (got ${typeof ck.hasTaiku})`);
+  // invest-style: riskScore 1-5
+  const iv = investmentStyle(spR);
+  assert(iv.riskScore >= 1 && iv.riskScore <= 5, `[smoke] invest-style riskScore ∈ [1,5] (got ${iv.riskScore})`);
+  // five-aspects: returns {primary, virtue, desc, ...}
+  const fa = analyzeFiveVirtues(spR);
+  assert(fa && fa.virtue, `[smoke] five-aspects trả virtue`);
+  // fs-cure: cureByElement returns cures
+  const fc = cureByElement(spR);
+  assert(fc && (fc.cures || fc.generalCures || fc.dungMaterial), `[smoke] fs-cure trả cure data`);
+  console.log(`   Smoke 7 module ✓ — health×3 + caiku + invest + five-aspects + fs-cure`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
