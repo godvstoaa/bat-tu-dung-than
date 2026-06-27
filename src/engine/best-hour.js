@@ -20,6 +20,7 @@ import { evaluateDate, OFFICER_VI } from './zheri.js';
 import { ziweiLiushi } from './ziwei-liuri.js';
 import { TIAN_YI, WEN_CHANG } from './shensha.js';
 import { tenGod, godGroup } from './core.js';
+import { ZHI_CHONG_MAP } from './interactions.js';
 
 const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 // Giờ đại diện cho mỗi thìn (lấy giữa khoảng) — 子 = 23:00 (thuộc ngày kế)
@@ -126,10 +127,22 @@ export function bestHourToday(R, year, month, day, patternYong) {
     try {
       const road = lh.road; // 'yellow' | 'black'
       const tone = lh.tone; // 'cat' | 'hung'
-      if (road === 'yellow') { dim.huangdao = 82; reasons.push(`黄道${lh.officerVi || ''} (giờ hoàng đạo — thuận)`); }
-      else if (road === 'black') { dim.huangdao = 28; reasons.push(`黑道${lh.officerVi || ''} (giờ hắc đạo — kỵ)`); }
+      // [loop 554 FIX] label 黄道/黑道 phải dùng DEITY (青龙/明堂...) không phải OFFICER (建除 trực).
+      //   Trước đây「黄道Phá」hiểu nhầm trực Phá(hung) là thần hoàng đạo.
+      if (road === 'yellow') { dim.huangdao = 82; reasons.push(`黄道${lh.deityVi || ''} (giờ hoàng đạo — thuận)${lh.officerVi ? ' · trực ' + lh.officerVi : ''}`); }
+      else if (road === 'black') { dim.huangdao = 28; reasons.push(`黑道${lh.deityVi || ''} (giờ hắc đạo — kỵ)${lh.officerVi ? ' · trực ' + lh.officerVi : ''}`); }
       else { dim.huangdao = 50; }
     } catch (_) { dim.huangdao = 50; }
+
+    // [loop 554 FIX BUG3] 日破时 — giờ chi xung chi NGÀY → đại hung, kỵ khởi sự.
+    //   Trước đây thiếu chiều này → giờ xung chi ngày có thể lọt top best (vd 巳日 giờ亥).
+    try {
+      const dayZhi = dayGanZhi[1];
+      if (dayZhi && ZHI_CHONG_MAP[dayZhi] === zhi) {
+        dim.huangdao = Math.min(dim.huangdao, 15);
+        reasons.push(`⚡ 日破时: giờ ${WX_VI[ZHI[zhi]?.wx] || zhi}(${zhi}) xung chi ngày ${dayZhi} — đại hung, kỵ khởi sự/ký/cưới.`);
+      }
+    } catch (_) {}
 
     // === 2. Dụng Thần ngũ hành (can + chi giờ) ===
     try {

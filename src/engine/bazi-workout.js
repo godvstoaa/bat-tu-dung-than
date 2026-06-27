@@ -69,17 +69,21 @@ const WORKOUT = {
 export function personalWorkout(R) {
   const dmWx = R.chart.dayMaster.wx;
   const dungWx = R.yong.primary;
-  const dmInfo = WORKOUT[dmWx];
+  // [loop 554 FIX BUG2] dmWx có thể trùng Kỵ/Thù (chart thân vượng) → tập đúng hành cần tránh.
+  //   Nếu trùng, thay bằng Hỷ để tập hành bổ Dụng.
+  const kyWx = R.yong.ji, chouWx = R.yong.chou, xiWx = R.yong.xi;
+  const dmSafeWx = (dmWx === kyWx || dmWx === chouWx) ? (xiWx || dungWx) : dmWx;
+  const dmInfo = WORKOUT[dmSafeWx];
   const dungInfo = WORKOUT[dungWx];
   const kyInfo = WORKOUT[R.yong.ji];
 
   // Kế hoạch tuần: xen kẽ Nhật Chủ + Dụng Thần
   const week = [
     { day: 'T2', focus: dungWx, focusVi: WX_VI[dungWx] + ' (Dụng)', workout: dungInfo.best, duration: dungInfo.duration, intensity: dungInfo.intensity },
-    { day: 'T3', focus: dmWx, focusVi: WX_VI[dmWx] + ' (Nhật Chủ)', workout: dmInfo.best, duration: dmInfo.duration, intensity: dmInfo.intensity },
+    { day: 'T3', focus: dmSafeWx, focusVi: WX_VI[dmSafeWx] + (dmSafeWx === dmWx ? ' (Nhật Chủ)' : ' (Hỷ — Nhật Chủ trùng Kỵ)'), workout: dmInfo.best, duration: dmInfo.duration, intensity: dmInfo.intensity },
     { day: 'T4', focus: 'rest', focusVi: 'Nghỉ', workout: 'đi bộ nhẹ 20ph + giãn cơ', duration: '20 phút', intensity: 'rất nhẹ' },
     { day: 'T5', focus: dungWx, focusVi: WX_VI[dungWx] + ' (Dụng)', workout: dungInfo.best, duration: dungInfo.duration, intensity: dungInfo.intensity },
-    { day: 'T6', focus: dmWx, focusVi: WX_VI[dmWx] + ' (Nhật Chủ)', workout: dmInfo.best, duration: dmInfo.duration, intensity: dmInfo.intensity },
+    { day: 'T6', focus: dmSafeWx, focusVi: WX_VI[dmSafeWx] + (dmSafeWx === dmWx ? ' (Nhật Chủ)' : ' (Hỷ — Nhật Chủ trùng Kỵ)'), workout: dmInfo.best, duration: dmInfo.duration, intensity: dmInfo.intensity },
     { day: 'T7', focus: dungWx, focusVi: WX_VI[dungWx] + ' (Dụng)', workout: dungInfo.best, duration: dungInfo.duration, intensity: dungInfo.intensity },
     { day: 'CN', focus: 'rest', focusVi: 'Nghỉ', workout: 'thái cực/yoga nhẹ', duration: '30 phút', intensity: 'nhẹ' },
   ];

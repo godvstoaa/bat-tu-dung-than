@@ -2323,6 +2323,15 @@ console.log(`   2026-06-22 ${hd2.dayGanZhi} → ${hd2.deity}(${hd2.deityVi}) [${
 console.log(`   Năm 2026: ${yr.total} ngày · 黄道 ${yr.yellow} (${yr.distribution.yellowPct}%) · 黑道 ${yr.black} (${yr.distribution.blackPct}%)`);
 console.log(`   Mỗi thần: ${yr.perDeity.map((p) => p.vi + '=' + p.count).join(', ')}`);
 
+// [loop 554] lucky-hours giờ Tý (23h) — trước đây +1 ngày → double-roll (戊子 SAI). Nay 丙子.
+{
+  const { luckyHours } = await import('./src/engine/lucky-hours.js');
+  const lh = luckyHours(2026, 6, 24); // 己巳日
+  const zi = (lh.hours || []).find((h) => h.zhi === '子');
+  assert(zi && zi.gan === '丙', `[loop 554] 己巳日 giờ Tý = 丙子 (trước fix SAI=戊子 do +1 ngày double-roll), got ${zi?.gan}${zi?.zhi}`);
+  console.log(`   lucky-hours 子时 ✓ — 2026-6-24(己巳) giờ Tý = 丙子 (không còn 戊子)`);
+}
+
 // ################## 54. THỦY PHÁP 零神水法 (water-activation) ##################
 import { waterActivation, waterActivationBrief } from './src/engine/water-activation.js';
 console.log('\n################## 54. THỦY PHÁP 零神水法 water-activation ##################');

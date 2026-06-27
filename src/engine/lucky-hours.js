@@ -66,15 +66,11 @@ export function luckyHours(year, month, day) {
     const repHour = i === 0 ? 23 : (i * 2 - 1); // 子=23h, 丑=1h, ...
     let gan = '';
     try {
-      // 子 hour (23:00) thuộc ngày kế tiếp theo thời柱 truyền thống → +1 ngày trước khi tính time-gan
-      let s;
-      if (repHour === 23) {
-        const next = new Date(year, month - 1, day);
-        next.setDate(next.getDate() + 1);
-        s = Solar.fromYmdHms(next.getFullYear(), next.getMonth() + 1, next.getDate(), 23, 30, 0);
-      } else {
-        s = Solar.fromYmdHms(year, month, day, repHour, 30, 0);
-      }
+      // [loop 554 FIX] KHÔNG +1 ngày — lunar-javascript đã xử lý 夜子时 nội bộ:
+      //   Solar.fromYmdHms(D, 23, 30) tự cho time-gan theo ngày kế (roll). Trước đây
+      //   +1 ngày → Solar(D+1, 23:30) = 子时 của ngày D+2 (double-roll SAI).
+      //   VD 2026-6-24(己巳) giờ Tý: code cũ 戊子 (SAI), nay 丙子 (đúng, 庚日子时).
+      const s = Solar.fromYmdHms(year, month, day, repHour, 30, 0);
       gan = s.getLunar().getTimeGan();
     } catch (e) { gan = '?'; }
     hours.push({

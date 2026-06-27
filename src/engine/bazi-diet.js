@@ -74,7 +74,10 @@ export function personalNutrition(R) {
   const meals = WX_MEALS[dungWx];
 
   // Weekly menu — 7 ngày xoay vòng Dụng + Hỷ
-  const dayWx = [dungWx, xiWx, dungWx, dmWx, xiWx, dungWx, xiWx];
+  // [loop 554 FIX BUG1] dmWx (Nhật Chủ hành) có thể trùng Kỵ/Thù (chart thân vượng) →
+  //   ăn/tập đúng hành cần tránh. Nếu trùng, thay bằng Hỷ (bổ Dụng).
+  const dmSafeWx = (dmWx === kyWx || dmWx === chouWx) ? (xiWx || dungWx) : dmWx;
+  const dayWx = [dungWx, xiWx, dungWx, dmSafeWx, xiWx, dungWx, xiWx];
   const weeklyMenu = dayWx.map((wx, i) => ({
     day: `T${i + 1}`, wx, vi: WX_VI[wx], focus: wx === dungWx ? 'Dụng' : wx === xiWx ? 'Hỷ' : 'Nhật Chủ',
     flavor: FIVE_FLAVORS[wx]?.vi || '?',
