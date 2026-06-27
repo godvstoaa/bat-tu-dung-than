@@ -5,6 +5,7 @@
 // ============================================================================
 import { WX_VI, GAN } from './constants.js';
 import { detectCombos } from './combos.js';
+import { detectGongjia } from './gongjia.js'; // [loop 513] 拱夹 synthesis factor
 import { dayunChangsheng } from './changsheng-deep.js'; // [loop 20] 十二长生运 giai đoạn đại vận
 
 const wxVi = (w) => WX_VI[w];
@@ -122,6 +123,20 @@ export function synthesize(R) {
       factors.push(`盖头截脚 (${pql.gaijieCount}/4 trụ can-chi khắc): ${why.join('; ')}.`);
     }
   }
+
+  // [loop 513] 拱夹 (gongjia) — 拱禄/拱贵 = significant auspicious (子平真诠)
+  try {
+    const gj = detectGongjia(R);
+    if (gj.arches && gj.arches.length) {
+      let gjDelta = 0;
+      for (const a of gj.arches) {
+        if (a.type.includes('拱禄')) gjDelta += 5;
+        else if (a.type.includes('拱贵')) gjDelta += 3;
+        else if (a.type.includes('Dụng')) gjDelta += 2;
+      }
+      if (gjDelta > 0) { score += gjDelta; factors.push(`拱夹: ${gj.summary} (+${gjDelta}).`); }
+    }
+  } catch (e) {}
 
   score = Math.max(0, Math.min(100, Math.round(score)));
 

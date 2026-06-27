@@ -40,6 +40,7 @@ import { personalNutrition } from './bazi-diet.js';
 import { investmentStyle } from './invest-style.js';
 import { analyzeBusiness } from './bazi-business.js';
 import { analyzePillarQuality } from './pillar-quality.js';
+import { detectGongjia } from './gongjia.js';
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -88,6 +89,11 @@ export function extendBrief(R) {
   try {
     const pq = analyzePillarQuality(R);
     if (pq && pq.gaijieCount > 0) parts.push(`盖头截脚: ${pq.gaijieCount}/4 trụ can-chi khắc nhau (${(pq.summary || '').split('。')[0].slice(0, 60)}) → ${pq.flowOk ? 'khí vẫn tương đối thông' : 'khí KHÔNG thông, đời hay vấp/trở ngại'}.`);
+  } catch (e) {}
+  // [loop 513] 拱夹 (gongjia) — arch hidden branch (子平真诠 拱格)
+  try {
+    const gj = detectGongjia(R);
+    if (gj.arches && gj.arches.length) parts.push(`拱夹 GONGJIA: ${gj.summary}`);
   } catch (e) {}
 
   // [loop 89] MỆNH CÁCH TẦNG LỚP (命格層次) — phân loại cổ điển 6 tiêu chí (module chart-level trước đây ẩn).
