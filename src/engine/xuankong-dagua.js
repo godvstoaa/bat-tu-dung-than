@@ -336,19 +336,19 @@ export function daguaCompatibility(sit, face) {
 
   // 合十
   if (isHeTen(sa.yun, fa.yun)) {
-    rules.push({ type: '合十 (cộng = 10)', rating: 'ĐẠI CÁT', delta: +35,
+    rules.push({ type: '合十 (cộng = 10)', rating: 'Đại cát', delta: +35,
       note: `Toạ vận ${sa.yun} + hướng vận ${fa.yun} = 10 → bù trừ hoàn hảo, "phối hợp tương thành", vượng khí trọn vẹn. Đây là TỐI THƯỢNG của Đại Quái.` });
     score += 35; bestRule = bestRule || '合十';
   }
   // 生成 (Hà Đồ) — dùng 卦运
   if (isShengCheng(sa.yun, fa.yun)) {
-    rules.push({ type: '生成 (Hà Đồ phối)', rating: 'CÁT', delta: +22,
+    rules.push({ type: '生成 (Hà Đồ phối)', rating: 'Cát', delta: +22,
       note: `Toạ ${sa.yun} + hướng ${fa.yun} là cặp sinh-thành Hà Đồ → sinh vượng cho nhau, "khí trường" tăng đều.` });
     score += 22; bestRule = bestRule || '生成';
   }
   // 同运
   if (isTongYun(sa.yun, fa.yun)) {
-    rules.push({ type: '同运 (cùng vận)', rating: 'CÁT', delta: +12,
+    rules.push({ type: '同运 (cùng vận)', rating: 'Cát', delta: +12,
       note: `Toạ & hướng cùng vận ${sa.yun} (${sa.star}) → đồng khí tương cầu, ổn định (nhưng không mạnh bằng hợp 10/生成).` });
     score += 12; bestRule = bestRule || '同运';
   }
@@ -358,11 +358,11 @@ export function daguaCompatibility(sit, face) {
   const KE = { 'Kim': 'Mộc', 'Mộc': 'Thổ', 'Thổ': 'Thuỷ', 'Thuỷ': 'Hoả', 'Hoả': 'Kim' };
   const upA = BAGUA[sa.upper].ele, upB = BAGUA[fa.upper].ele;
   if (KE[upA] === upB || KE[upB] === upA) {
-    rules.push({ type: '相克 (thượng quái khắc)', rating: 'KỴ', delta: -20,
+    rules.push({ type: '相克 (thượng quái khắc)', rating: 'Hung', delta: -20,
       note: `Thượng quái toạ (${upA}) ↔ hướng (${upB}) tương khắc → khí xung, cản trở tài lộc/sức khoẻ, nên hoá giải.` });
     score -= 20;
   } else if (SHENG[upA] === upB || SHENG[upB] === upA) {
-    rules.push({ type: '相生 (thượng quái sinh)', rating: 'CÁT nhẹ', delta: +8,
+    rules.push({ type: '相生 (thượng quái sinh)', rating: 'Cát nhẹ', delta: +8,
       note: `Thượng quái toạ (${upA}) ↔ hướng (${upB}) tương sinh → khí lưu thông êm.` });
     score += 8;
   }
@@ -370,22 +370,22 @@ export function daguaCompatibility(sit, face) {
   // Đối cung (toạ + hướng cách 12 sơn = 180°) → chính tuyến
   const isOpposite = MOUNTAIN_MAP[sit].idx === (MOUNTAIN_MAP[face].idx + 12) % 24;
   if (isOpposite) {
-    rules.push({ type: '正针 (toạ-hướng đối cung)', rating: 'bình', delta: 0,
+    rules.push({ type: '正针 (toạ-hướng đối cung)', rating: 'Bình', delta: 0,
       note: `Toạ ${sit} ⇔ hướng ${face} là đối cung 180° → "chính tuyến", khí thuần nhưng nhị phân — cần quẻ vận tốt để phát.` });
   }
 
   score = Math.max(0, Math.min(100, score));
   let rating, ratingVi;
-  if (score >= 80) { rating = 'ĐẠI CÁT'; ratingVi = 'Cực tốt — nên lập hướng này'; }
-  else if (score >= 65) { rating = 'CÁT'; ratingVi = 'Tốt — phù hợp xây cất/hướng cửa'; }
-  else if (score >= 50) { rating = 'BÌNH'; ratingVi = 'Trung hoà — chấp nhận được'; }
-  else if (score >= 35) { rating = 'TIỂU KỴ'; ratingVi = 'Hơi bất lợi — cần hoá giải'; }
-  else { rating = 'KỴ'; ratingVi = 'Xung khắc mạnh — nên đổi hướng'; }
+  if (score >= 80) { rating = 'Đại cát'; ratingVi = 'Cực tốt — nên lập hướng này'; }
+  else if (score >= 65) { rating = 'Cát'; ratingVi = 'Tốt — phù hợp xây cất/hướng cửa'; }
+  else if (score >= 50) { rating = 'Bình'; ratingVi = 'Trung hoà — chấp nhận được'; }
+  else if (score >= 35) { rating = 'Hơi kỵ'; ratingVi = 'Hơi bất lợi — cần hoá giải'; }
+  else { rating = 'Hung'; ratingVi = 'Xung khắc mạnh — nên đổi hướng'; }
 
   const advice = [];
   if (bestRule === '合十') advice.push('Hướng này RẤT TỐT cho xây cất, mở cửa chính, bố trí bàn thờ/bàn làm việc.');
   else if (bestRule === '生成' || bestRule === '同运') advice.push('Hướng tốt, dùng được cho nhà ở và văn phòng.');
-  else if (rating === 'KỴ' || rating === 'TIỂU KỴ') advice.push('Nên đổi hướng hoặc dùng vật phẩm phong thuỷ hoá giải (gương, la bàn, ngũ hành tương sinh).');
+  else if (rating === 'Hung' || rating === 'Hơi kỵ') advice.push('Nên đổi hướng hoặc dùng vật phẩm phong thuỷ hoá giải (gương, la bàn, ngũ hành tương sinh).');
   else advice.push('Hướng trung tính — kết hợp thêm Phi Tinh (xuankong.js) và tam hợp (yinzhai.js) để quyết định.');
   const better = MOUNTAINS_24
     .map((mm) => ({ m: mm.zhi, sc: daguaCompatibility0(sit, mm.zhi) }))

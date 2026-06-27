@@ -88,7 +88,7 @@ export function evaluateNumber(numStr, R) {
   if (kyRatio >= 0.4) score -= 8;
 
   score = Math.max(5, Math.min(98, Math.round(score)));
-  let rating = score >= 65 ? 'Đại cát' : score >= 50 ? 'Cát' : score >= 35 ? 'Trung' : 'Kỵ';
+  let rating = score >= 65 ? 'Đại cát' : score >= 50 ? 'Cát' : score >= 35 ? 'Bình' : 'Hung'; // [loop 479] Trung→Bình, Kỵ→Hung unify vocab
 
   // 5. Advice
   const advice = `${rating} (${score}/100). ` +

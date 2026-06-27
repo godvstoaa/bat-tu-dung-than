@@ -3373,7 +3373,7 @@ assert(dagH10.length > 0, 'overview phát hiện được cặp hợp 10');
 const dagSample = dagH10[0];
 const dagC10 = daguaCompatibility(dagSample.sit, dagSample.face);
 assert(dagC10.ok === true, 'cặp hợp 10 hợp lệ');
-assert(dagC10.rules.some((r) => r.type.includes('合十') && r.rating === 'ĐẠI CÁT'), `cặp ${dagSample.sit}↔${dagSample.face} có rule 合10 ĐẠI CÁT`);
+assert(dagC10.rules.some((r) => r.type.includes('合十') && r.rating === 'Đại cát'), `cặp ${dagSample.sit}↔${dagSample.face} có rule 合10 Đại cát [loop 479 titlecase]`);
 assert(dagC10.score >= 65, `cặp hợp 10 score cao (${dagC10.score} >= 65)`);
 assert(dagC10.bestRule === '合十', `bestRule = 合十 cho cặp ${dagSample.sit}↔${dagSample.face}`);
 
