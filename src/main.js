@@ -5344,7 +5344,7 @@ function renderQuickSummary() {
     { icon: alert ? '⚠' : '✓', label: alert ? 'Cảnh báo' : 'An tâm', text: alert || 'Không cảnh báo nặng năm nay.' },
     { icon: '📊', label: '10 năm tới', text: (() => { try { const df = decadeForecast(c, new Date().getFullYear(), 10); return `TỐT: <b>${df.best ? df.best.year + ' (' + df.best.rating + ')' : '?'}</b>${df.worst ? ` · XẤU: <b>${df.worst.year} (${df.worst.rating})</b>` : ''}`; } catch (e) { return '(đang tính)'; } })() },
   ];
-  el.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:10px">${rows.map((r) => `<div style="flex:1;min-width:180px;padding:8px 10px;background:var(--glass);border-radius:8px;border:1px solid var(--glass-border)"><div style="font-size:.75em;color:var(--gold-bright);font-weight:bold">${r.icon} ${r.label}</div><div style="font-size:.88em;margin-top:2px;color:var(--silk)">${r.text}</div></div>`).join('')}</div>`;
+  el.innerHTML = `<div class="qs-grid">${rows.map((r) => `<div class="qs-tile"><div class="qs-label">${r.icon} ${r.label}</div><div class="qs-text">${r.text}</div></div>`).join('')}</div>`;
 }
 
 function renderMonthCalendar() {

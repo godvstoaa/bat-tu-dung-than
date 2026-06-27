@@ -1527,7 +1527,7 @@ html{scroll-behavior:smooth}
   .v-box { min-width: 60px; padding: 6px 4px; }
   .synthesis-card { padding: 16px; }
   /* dashboard quick-summary — stack vertical on mobile */
-  #quick-summary > div { min-width: 100% !important; flex: 1 1 100% !important; }
+  #quick-summary > div, .qs-tile { min-width: 100% !important; flex: 1 1 100% !important; }
   /* AI modal — full screen on mobile */
   #ai-modal { width: 100% !important; height: 100% !important; border-radius: 0 !important; max-height: 100vh !important; }
   #ai-chat { height: calc(100vh - 140px) !important; }
@@ -1545,6 +1545,41 @@ html{scroll-behavior:smooth}
   .pillar:active { transform: scale(0.96); transition: transform .1s; }
   .dt-seg:active { transform: scale(0.92); }
   .quick-nav, .toc, .dt-row, #family-members { -webkit-overflow-scrolling: touch; }
+}
+
+/* [loop 529] Dashboard quick-summary tiles — 3D hover + entrance */
+.qs-grid { display: flex; flex-wrap: wrap; gap: 10px; perspective: 1000px; }
+.qs-tile {
+  flex: 1; min-width: 180px; padding: 10px 12px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.06), var(--glass));
+  border-radius: 10px; border: 1px solid var(--glass-border);
+  transition: transform .35s var(--ease-spring), box-shadow .35s var(--ease-out), border-color .35s;
+  transform-style: preserve-3d; will-change: transform;
+  animation: qsTileIn .5s var(--ease-spring) both;
+}
+.qs-tile:nth-child(1) { animation-delay: 0s; }
+.qs-tile:nth-child(2) { animation-delay: .06s; }
+.qs-tile:nth-child(3) { animation-delay: .12s; }
+.qs-tile:nth-child(4) { animation-delay: .18s; }
+.qs-tile:nth-child(5) { animation-delay: .24s; }
+.qs-tile:nth-child(6) { animation-delay: .30s; }
+.qs-tile:nth-child(7) { animation-delay: .36s; }
+.qs-tile:nth-child(8) { animation-delay: .42s; }
+.qs-tile:nth-child(9) { animation-delay: .48s; }
+.qs-tile:hover {
+  transform: perspective(800px) rotateY(-2deg) rotateX(1deg) translateY(-3px);
+  box-shadow: 0 12px 30px -10px rgba(0,0,0,0.7), 0 0 0 1px rgba(247,236,203,0.15);
+  border-color: rgba(212,175,55,0.3);
+}
+.qs-label { font-size: .75em; color: var(--gold-bright); font-weight: bold; }
+.qs-text { font-size: .88em; margin-top: 2px; color: var(--silk); }
+@keyframes qsTileIn {
+  from { opacity: 0; transform: perspective(800px) translateY(16px) rotateX(8deg); }
+  to { opacity: 1; transform: perspective(800px) translateY(0) rotateX(0); }
+}
+@media (max-width: 768px) {
+  .qs-tile:hover { transform: none; }
+  .qs-tile:active { transform: scale(0.97); transition: transform .1s; }
 }
 
 /* [loop 522→523] 3D card effect for special cards — enhanced with flip entrance */
