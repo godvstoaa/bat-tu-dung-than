@@ -9,6 +9,7 @@ import { getPersonalityProfile } from './personality-profile.js';
 import { analyzeFiveVirtues } from './five-aspects.js';
 import { dominantGod } from './dominant-god.js';
 import { tenGod } from './core.js';
+import { dayNayinPersonality } from './nayin-personality.js';
 
 /**
  * @returns {{ title, paragraphs[] }}
@@ -21,6 +22,14 @@ export function personalityNarrative(R) {
   const syn = R.synthesis || {};
   const paras = [];
   if (!dm) return { title: 'Tường thuật bản mệnh', paragraphs: ['Chưa có dữ liệu.'] };
+
+  // --- P0: NẠP ÂM BẨM SINH (day pillar nayin — bản chất sâu nhất) ---
+  try {
+    const dnp = dayNayinPersonality(R);
+    if (dnp && dnp.traits) {
+      paras.push(`Cốt lõi bẩm sinh: <b>${dnp.dayJiaZi} nạp âm ${dnp.nayin}</b> (${dnp.vi}) — ${dnp.nature}. ${dnp.traits.slice(0, 100)}`);
+    }
+  } catch (e) {}
 
   // --- P1: BẢN CHẤT (Nhật Chủ + personality profile) ---
   let prof = null;
