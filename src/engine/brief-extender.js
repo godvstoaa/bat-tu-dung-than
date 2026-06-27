@@ -100,7 +100,10 @@ export function extendBrief(R) {
   // [loop 523] 鬼谷子算命 — Guiguzi divination (bổ sung góc nhìn cổ đại)
   try {
     const gg = guiguziFortune(R);
-    if (gg) parts.push(`鬼谷子 GUIGUZI: năm ${gg.yearJiaZi} (${gg.nayin}/${gg.vi}) ${gg.toneVi}. ${gg.fortune?.slice(0, 80) || ''} Nghề: ${(gg.career || '').slice(0, 50)}.`);
+    if (gg) {
+      const pillars4 = (gg.pillarReadings || []).map((p) => `${p.palaceVi}:${p.gz} ${p.nayin}(${p.tone === 'cat' ? 'Cát' : p.tone === 'hung' ? 'Hung' : 'Bình'})`).join(', ');
+      parts.push(`鬼谷子 GUIGUZI (4 trụ): ${pillars4}. Tổng ${gg.toneVi}. Năm ${gg.yearJiaZi} ${gg.nayin}/${gg.vi} — ${gg.fortune?.slice(0, 100) || ''} ${gg.ganMod || ''}. Nghề: ${(gg.career || '').slice(0, 50)}.`);
+    }
   } catch (e) {}
   // [loop 526] 日柱納音 personality — bản chất bẩm sinh theo nạp âm NGÀY
   try {
