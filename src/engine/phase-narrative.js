@@ -54,7 +54,14 @@ export function phaseNarrative(R, refYear) {
   const dy = (R.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
   phase.dayun = dy;
   if (!dy) {
-    paras.push('Chưa xác định được đại vận cho độ tuổi hiện tại (có thể giờ sinh chưa chính xác — thử hiệu chỉnh trụ Giờ).');
+    // [loop 477] phân loại message: tuổi nhỏ chưa mở vận / tuổi già qua vận cuối / lạ
+    const dys = R.dayun || [];
+    const first = dys[0], last = dys[dys.length - 1];
+    let why;
+    if (first && age < first.startAge) why = `Bạn chưa vào đại vận đầu tiên — mở vận lúc ${first.startAge} tuổi (giai đoạn ấu thơ, nền vận chưa hình).`;
+    else if (last && age >= last.startAge + 10) why = `Bạn đã qua đại vận cuối (${last.ganZhi}, kết ${last.startAge + 9} tuổi) — giai đoạn vãn 晚上, luận theo lưu niên/tháng.`;
+    else why = 'Chưa xác định được đại vận cho độ tuổi này (có thể giờ sinh chưa chính xác — thử hiệu chỉnh trụ Giờ).';
+    paras.push(why);
   } else {
     const motif = TONE_MOTIF[toneOf(dy.rating)] || TONE_MOTIF.binh;
     let stage = null, nayin = null;
