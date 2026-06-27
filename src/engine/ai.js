@@ -399,7 +399,7 @@ ${(() => {
 ${(() => { try { const ph = physiognomyOverview(); return `[kiểm tra dữ liệu] 相术 sẵn sàng: ${ph.totals.palaces} cung / ${ph.totals.moles} vị trí痣 / ${ph.totals.ageMilestones} mốc流年.`; } catch (e) { return '[kiểm tra dữ liệu] 相术: (không tính được)'; } })()}
 ${(() => { try { const yz = yinzhaiOverview(); return `[kiểm tra dữ liệu] 阴宅 sẵn sàng: ${yz.mountainsCount ?? 24} sơn / ${yz.palaces?.length ?? 8} cung.`; } catch (e) { return '[kiểm tra dữ liệu] 阴宅: (không tính được)'; } })()}
 ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字 sẵn sàng: 「福」→ quẻ ${cz.hexagram.name} (${cz.hexagram.nameVi}), ngũ hành ${cz.wxVi}.`; } catch (e) { return '[kiểm tra dữ liệu] 测字: (không tính được)'; } })()}
-- 测字拆字 (châm tự): module tương tác — user nhập 1 chữ Hán → 拆字 (tháo bộ/nét) + 梅花起卦 + ngũ hành luận (50 chữ phổ biến + fallback cho chữ khác). KHÔNG cố định theo lá số — chỉ chạy khi user chủ động hỏi xem 1 chữ.
+- 测字拆字 (châm tự): module tương tác — user nhập 1 chữ Hán → 拆字 (tháo bộ/nét) + 梅花起卦 + ngũ hành luận (50 chữ phổ biến + fallback cho chữ khác). KHÔNG cố định theo lá số — chỉ chạy khi user chủ động hỏi xem 1 chữ. [loop 495] GIỜ AI cũng测字 được qua tool «analyze_char» — khi user hỏi «测字 X» hãy gọi tool.
 
 == 三式 / DÂN GIAN BÓI TOÁN (module tương tác + Thái Nhất cố định theo năm) ==
 - 小六壬 掐指一算: module tương tác (tháng+ngày+giờ → 6 vị trí Đại An/Không Vong). 6 cung cố định: ${(() => { try { return XLR_POSITIONS.map((p) => `${p.han}(${p.vi},${p.tone})`).join(' / '); } catch (e) { return '(không tải được)'; } })()}. Chỉ chạy khi user chủ động nhập tháng/ngày/giờ — KHÔNG cố định theo lá số.
@@ -652,6 +652,12 @@ export const AI_TOOLS = [
       year: { type: 'integer' }, month: { type: 'integer' }, day: { type: 'integer' },
     }, required: ['year', 'month', 'day'] },
   } },
+  { // [loop 495] 测字 AI tool — user hỏi «测字 X» qua chat (trước đây card-only)
+    name: 'analyze_char', description: '测字拆字 (châm tự): phân tích 1 chữ Hán — tháo bộ/nét (康熙) + 梅花起卦 + ngũ hành luận. Dùng khi user hỏi «测字 X», «xem chữ 福/财/...», «chữ này cát/hung». KHÔNG cố định lá số — độc lập.',
+    parameters: { type: 'object', properties: {
+      char: { type: 'string', description: '1 chữ Hán cần测 (vd 福, 财, 发)' },
+    }, required: ['char'] },
+  },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -676,6 +682,17 @@ export function execTool(name, args, R) {
       case 'best_days_in_year': {
         const Y = computeYearDaily(R, a.year, R.patternQuality);
         return { year: Y.year, best: Y.best.slice(0, 8).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })), worst: Y.worst.slice(0, 5).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })) };
+      }
+      case 'analyze_char': { // [loop 495] 测字 via AI chat
+        const ch = (a.char || '').trim();
+        if (!ch) return { error: 'Cần 1 chữ Hán để测字.' };
+        const cz = cezi(ch);
+        return {
+          char: ch,
+          radical: cz.radical, strokes: cz.strokes, wx: cz.wx, wxVi: cz.wxVi,
+          hexagram: cz.hexagram ? { name: cz.hexagram.name, vi: cz.hexagram.nameVi, meaning: cz.hexagram.meaning } : null,
+          reading: cz.reading || cz.summary || '',
+        };
       }
       case 'inverse_bazi': {
         // [loop 21] 逆推 — tìm lá số điểm cực/trung. Quét độc lập, không cần R.
