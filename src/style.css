@@ -326,6 +326,14 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 /* [loop 455] Đại cát/Đại hung — tầng cực «mọi tầng đồng phướng», pop hơn Cát/Hung thường */
 .rate-supercat { background: linear-gradient(135deg, rgba(212,175,55,0.32), rgba(46,158,107,0.22)); color: #f7eccb; border: 1px solid rgba(247,236,203,0.4); box-shadow: 0 0 8px rgba(212,175,55,0.35); }
 .rate-superhung { background: linear-gradient(135deg, rgba(140,20,20,0.4), rgba(224,70,58,0.3)); color: #ffb3a3; border: 1px solid rgba(255,120,100,0.45); box-shadow: 0 0 8px rgba(200,40,40,0.3); }
+/* [loop 475] Tiến trình đại vận — timeline các thập kỷ */
+.dt-row { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 4px; }
+.dt-seg { flex: 1 1 0; min-width: 62px; padding: 6px 4px; border-radius: 6px; text-align: center; border: 1px solid rgba(255,255,255,0.08); transition: transform .15s; cursor: default; }
+.dt-seg:hover { transform: translateY(-2px); }
+.dt-seg.dt-now { border: 2px solid var(--gold-bright); box-shadow: 0 0 10px rgba(243,213,122,0.5); }
+.dt-gz { font-family: 'Noto Serif SC', serif; font-size: 15px; font-weight: 700; }
+.dt-age { font-size: 10px; opacity: .85; margin: 2px 0; }
+.dt-rate { font-size: 9.5px; font-weight: 600; }
 
 /* ===== TABS + TOPIC ===== */
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }

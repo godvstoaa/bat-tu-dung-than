@@ -1673,6 +1673,28 @@ function renderPhaseNarrative(R, year) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được tường thuật giai đoạn.</p>'; }
 }
 
+// [loop 475] Tiến trình đại vận — timeline trực quan (mỗi thập kỷ 1 ô màu theo rating).
+function renderDayunTimeline(R) {
+  const el = $('dayun-timeline');
+  if (!el) return;
+  const dys = R.dayun || [];
+  if (!dys.length) { el.innerHTML = '<p class="hint">Chưa có dữ liệu đại vận.</p>'; return; }
+  const curYear = new Date().getFullYear();
+  const birthYear = R.chart.input.year;
+  const curAge = curYear - birthYear;
+  const segs = dys.map((d) => {
+    const isNow = curAge >= d.startAge && curAge < d.startAge + 10;
+    const nayin = (() => { try { const n = ganZhiNayin(d.ganZhi); return n || ''; } catch (e) { return ''; } })();
+    const tip = `${d.ganZhi} · ${d.startAge}–${d.startAge + 9}t · ${d.rating}${nayin ? ' · ' + nayin : ''}${d._ylNote ? ' · ' + d._ylNote : ''}`;
+    return `<div class="dt-seg ${rateClass(d.rating)}${isNow ? ' dt-now' : ''}" title="${esc(tip)}">
+      <div class="dt-gz zh">${esc(d.ganZhi)}</div>
+      <div class="dt-age">${d.startAge}–${d.startAge + 9}t${isNow ? ' ★' : ''}</div>
+      <div class="dt-rate">${esc(d.rating)}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `<div class="dt-row">${segs}</div><p class="hint" style="margin-top:6px">Mỗi ô = 1 thập kỷ đại vận, tô màu theo đánh giá (<span class="rate-supercat" style="padding:0 4px">vàng</span>=đại cát · <span class="rate-cat" style="padding:0 4px">xanh</span>=cát · <span class="rate-mid" style="padding:0 4px">xám</span>=bình · <span class="rate-hung" style="padding:0 4px">đỏ</span>=hung). Ô viền sáng ★ = thập kỷ đang hành.</p>`;
+}
+
 function renderHuaqi(R) {
   const el = $('huaqi');
   if (!el) return;
@@ -3223,6 +3245,7 @@ function run() {
   renderVerdict(currentResult);
   renderSynthesis(currentResult);
   renderPhaseNarrative(currentResult); // [loop 472] narrative ngay sau tổng luận
+  renderDayunTimeline(currentResult); // [loop 475] timeline trực quan thập kỷ
   renderQianli(currentResult);
   renderMangpai(currentResult);
   renderMangpaiView(currentResult);
