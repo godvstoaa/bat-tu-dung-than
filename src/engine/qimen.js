@@ -200,6 +200,24 @@ export function qimenDongPan(year, month, day, hour) {
   const tianMap = tianQiyiRotation(base.yinYang, base.ju, tgGongSafe);
   const panTian = base.pan.map((p) => ({ ...p, tianQiyi: tianMap[p.gong] || p.qiyi }));
 
+  // [loop 556 ELEVATION] 八门 动盘 (转盘法) — trước đây panTian.giữ door TĨNH (BUG 2 loop 552).
+  //   Nay xoay vòng cửa theo洛书 [1,8,3,4,9,2,7,6] (bỏ 5) sao cho 值使 (zhiShiDoor) đáp
+  //   đúng zhiShiLanding, các cửa khác theo thứ tự tự nhiên. Nguồn: 奇门遁甲统宗 (wikisource).
+  //   ⚠ 奇门 có nhiều trường phái (转盘/飞盘, 寄坤/寄艮) — đây là 转盘洛书 phổ biến.
+  const LUO_SHU_8 = [1, 8, 3, 4, 9, 2, 7, 6];
+  const doorAtGong = {};
+  if (zhiShiDoor && zhiShiLanding) {
+    let land = zhiShiLanding === 5 ? 2 : zhiShiLanding; // 中宫无门 → 寄坤2
+    const orig = xunGongResolved; // 值使原宫 (旬首宫, 5→2 đã resolve)
+    const oi = LUO_SHU_8.indexOf(orig), li = LUO_SHU_8.indexOf(land);
+    if (oi >= 0 && li >= 0) {
+      const delta = (li - oi + 8) % 8; // xoay thuận;  âm遁 landing đã nghịch nên delta tự điều chỉnh
+      for (let i = 0; i < 8; i++) doorAtGong[LUO_SHU_8[(i + delta) % 8]] = GONG_DOOR[LUO_SHU_8[i]];
+    }
+  }
+  // áp door động (giữ door tĩnh làm fallback nếu chưa tính được)
+  for (const p of panTian) if (doorAtGong[p.gong]) p.door = doorAtGong[p.gong];
+
   // 八神落宫 (转盘): 小值符随大值符星落, 阳 顺时针 / 阴 逆时针
   //   BASHEN = [值符,螣蛇,太阴,六合,白虎,玄武,九地,九天] (天禽寄, 中宫跳)
   //   转盘顺序 theo洛书 "戴九覆一": 1→8→3→4→9→2→7→6 (cung có sao) — 阳顺 / 阴逆

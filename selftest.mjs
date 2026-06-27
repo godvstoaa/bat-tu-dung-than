@@ -1173,6 +1173,22 @@ assert(ok, `阳遁6局 地盘 戊@6顺布 (thực ${qm.pan.map((p) => p.gong + p
 assert(qm.pan.find((p)=>p.gong===1).star==='天蓬' && qm.pan.find((p)=>p.gong===6).star==='天心' && qm.pan.find((p)=>p.gong===9).star==='天英', '九星 fixed本位 天蓬@1/天心@6/天英@9');
 // 八门定宫: 宫1=休, 宫8=生, 宫6=开
 assert(qm.pan.find((p) => p.gong === 1).door === '休' && qm.pan.find((p) => p.gong === 8).door === '生' && qm.pan.find((p) => p.gong === 6).door === '开', '八门定宫 休1/生8/开6');
+// [loop 556] 动盘 八门 xoay theo giờ (trước đây doors TĨNH cho mọi giờ — BUG 2 loop 552).
+//   值使 phải đáp đúng zhiShiLanding; doors khác nhau giữa các giờ.
+{
+  const d0 = qimenDongPan(2025, 12, 22, 0), d4 = qimenDongPan(2025, 12, 22, 4);
+  const doors0 = d0.pan.map((p) => p.door).join(''), doors4 = d4.pan.map((p) => p.door).join('');
+  assert(doors0 !== doors4, `[loop 556] 动盘 doors XOAY theo giờ (trước đây tĩnh giống nhau)`);
+  // 值使 đáp zhiShiLanding
+  let zhiOk = 0;
+  for (let h = 0; h < 12; h++) {
+    const r = qimenDongPan(2025, 12, 22, h);
+    const land = r.dong.zhiShiLanding === 5 ? 2 : r.dong.zhiShiLanding;
+    if (r.pan.find((p) => p.gong === land)?.door === r.dong.zhiShiDoor) zhiOk++;
+  }
+  assert(zhiOk === 12, `[loop 556] 值使 đáp đúng zhiShiLanding 12/12 giờ (got ${zhiOk})`);
+  console.log(`   奇门动盘 ✓ — 八门 xoay theo giờ, 值使 đáp zhiShiLanding 12/12`);
+}
 assert(qm.pan.length === 9 && qm.advice.length > 20, '9 cung + advice');
 // 所有 18 局表齐
 assert(Object.keys(TERM_JU).length === 24, '24节气定局表 đủ');
