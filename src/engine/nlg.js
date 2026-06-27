@@ -63,6 +63,7 @@ const INTENT_KEYWORDS = {
   timing: ['vận', 'đại vận', 'thời điểm', 'năm nào', 'tuổi', 'lúc nào', 'tương lai', 'khi nào', 'tháng', 'năm nay', 'năm sau'],
   personality: ['tính cách', 'bản mệnh', 'con người', 'tướng', 'khí chất', 'bản chất', 'người như thế nào', 'cấu hình', 'cách cục', 'sát ấn', 'thương quan', 'quan sát', 'tỷ kiếp', '格局'],
   remedy: ['cải mệnh', 'cải vận', 'làm sao để', 'nên làm gì', 'làm gì', 'cách', 'hóa giải', 'tăng', 'giảm', 'tránh', 'phương pháp', 'khắc phục', 'thay đổi', 'cải thiện', 'khai vận', 'bổ mệnh', 'sống ở đâu', 'thành phố', 'phong thủy'],
+  flow: ['dòng khí', 'lưu thông', 'khí mệnh', 'nguồn khí', 'dòng chảy', 'thông khí', '源流', 'khí lưu', 'nguồn lực mệnh', 'tắc khí'],
 };
 
 export function detectIntent(question) {
@@ -372,6 +373,33 @@ function pRemedy(R, intent) {
   };
 }
 
+function pFlow(R) {
+  // [loop 464] 源流 dòng khí + 三法 vượng suy — fallback NLG khi user hỏi về khí/lưu thông
+  //   (trước đây NLG không cover 源流 → offline user hỏi «dòng khí» rơi generic).
+  const yl = R.yuanliu;
+  const s = R.strength || {};
+  if (!yl) return { title: 'Dòng khí ngũ hành 源流', paragraphs: ['Chưa tính được dòng khí.'] };
+  const lines = [];
+  lines.push(`源流 (滴天髓源流篇): nguồn khí mệnh là hành <b>${wxVi(yl.source)}</b> (vượng nhất), dòng theo tương sinh chảy <b>${yl.flowLen}/5 hành</b>.`);
+  if (yl.fullCycle) {
+    lines.push(`★ 源远流长 — ngũ hành LƯU THÔNG tuần hoàn (5/5) → khí mệnh thuận hoà, phú quý bền, tài năng phát huy trọn vẹn. Rất hiếm và quý.`);
+  } else {
+    lines.push(`Dòng khí quy về <b>${yl.aspectKey}</b> (${yl.aspectVi}) — khía cạnh được dòng khí nuôi dưỡng, dễ phát.${yl.gap ? ` Nhưng khí TẮC tại hành ${wxVi(yl.gap)} (quá nhẹ) → dòng không thông tiếp, cần đại vận/lưu niên mang ${wxVi(yl.gap)} «mở dòng» mới phát huy hết.` : ''}`);
+  }
+  // 三法 context
+  const fa = [];
+  if (s.deLenh) fa.push('đắc lệnh'); else fa.push('thất lệnh');
+  if (s.deDia) fa.push('đắc địa (thông căn)');
+  lines.push(`Nền vượng suy: ${s.level} (${(s.ratio * 100).toFixed(0)}% phù trợ${s.sanFaBonus > 0 ? ` → hiệu dụng ${(s.effRatio * 100).toFixed(0)}% do ${fa.join(', ')}` : ''}).`);
+  // advice
+  if (yl.gap) {
+    lines.push(`Mở dòng khí: khi gặp đại vận/lưu niên/tháng mang hành <b>${wxVi(yl.gap)}</b>, dòng sẽ LƯU THÔNG → thời cơ phát triển ${yl.aspectKey.toLowerCase()}. Trước đó, bổ sung nhẹ hành ${wxVi(yl.gap)} (màu/hướng) cũng giúp thông khí — thứ cấp, sau Dụng Thần ${favText(R.yong)}.`);
+  } else {
+    lines.push(`Dòng khí đã thông — tận dụng điểm mạnh <b>${yl.aspectKey.toLowerCase()}</b>, đừng tự trói bằng chần chừ.`);
+  }
+  return { title: 'Dòng khí ngũ hành 源流', paragraphs: lines };
+}
+
 function pFreeForm(R, intent) {
   // Composer "bất kỳ câu hỏi" — khi không khớp lĩnh vực cụ thể, dệt câu trả lời
   // theo TOÀN BỘ lá số + bất kỳ từ khoá nào phát hiện được trong câu hỏi.
@@ -399,7 +427,7 @@ function pFreeForm(R, intent) {
 const COMPOSERS = {
   personality: pPersonality, career: pCareer, wealth: pWealth, love: pLove,
   health: pHealth, study: pStudy, children: pChildren, travel: pTravel,
-  power: pPower, family: pLove, timing: pTiming, remedy: pRemedy, general: pFreeForm,
+  power: pPower, family: pLove, timing: pTiming, remedy: pRemedy, flow: pFlow, general: pFreeForm,
 };
 
 // ---------------------------------------------------------------------------
