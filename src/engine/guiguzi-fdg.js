@@ -16,8 +16,8 @@
 //   Ghi chú: 複→復, 逅→姤, 央→夬 (chuẩn hóa tên quẻ Dịch).
 const GUA_MAP = {
   // 甲 group (甲庚~甲癸: laiboyee xác nhận; 甲甲~甲己: pattern + WebSearch)
-  '甲甲': '震', '甲乙': '恒', '甲丙': '豊', '甲丁': '豫', '甲戊': '小過',
-  '甲己': '豊', '甲庚': '歸妹', '甲辛': '大壯', '甲壬': '解', '甲癸': '小畜',
+  '甲甲': '震', '甲乙': '恒', '甲丙': '丰', '甲丁': '豫', '甲戊': '小過',
+  '甲己': '丰', '甲庚': '歸妹', '甲辛': '大壯', '甲壬': '解', '甲癸': '小畜',
   // 乙 group
   '乙甲': '益', '乙乙': '巽', '乙丙': '家人', '乙丁': '觀', '乙戊': '漸',
   '乙己': '謙', '乙庚': '中孚', '乙辛': '渙', '乙壬': '小畜', '乙癸': '漸',
@@ -155,7 +155,7 @@ const GUA_VI = {
     meaning: 'Tiến từng bước — như chim bay dần lên cây. Đúng quy trình, không nôn nóng, hôn nhân theo lễ thì bền.' },
   '歸妹': { vi: 'Quy Muội (Gả Muộn)', nature: 'trật tự, duyên muộn, kết quả muộn',
     meaning: 'Gả con gái — duyên tình trắc trở đầu đời, nhưng cuối bình yên. Cần kiên nhẫn, duyên muộn nhưng bền vững.' },
-  '豊': { vi: 'Phong (Phong Phú)', nature: 'đa tài, phong phú, thịnh vượng',
+  '丰': { vi: 'Phong (Phong Phú)', nature: 'đa tài, phong phú, thịnh vượng',
     meaning: 'Sự phong phú — tài năng đa dạng, thích cái đẹp, hưởng thụ. Nhưng dễ sa vào xa xỉ. Cần tiết độ, đức khiêm.' },
   '旅': { vi: 'Lữ (Du Hành)', nature: 'phiêu bạt, tạm trú, linh hoạt',
     meaning: 'Sang du hành — xa nhà lập nghiệp, tạm bợ. Cẩn thận giữ mình, linh hoạt, nhanh nhẹn. Phiêu bạt nhưng cần nơi nương tựa.' },

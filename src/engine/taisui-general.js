@@ -49,7 +49,7 @@ const NAYIN_TRAIT = {
   '剑锋金': 'sắc bén, quyết liệt, dễ tổn (với kiếm)',
   '山头火': 'rực rỡ bốc cao, chói nhưng nhanh tắt (lửa đỉnh núi)',
   '涧下水': 'tinh khiết, uyển chuyển, tĩnh (nước khe suối)',
-  '城墙土': 'vững chãi, phòng thủ, bảo thủ (đất thành)',
+  '城头土': 'vững chãi, phòng thủ, bảo thủ (đất thành — lunar-javascript用 城头)',
   '白蜡金': 'sáng, tinh khiết, mong manh (kim sáp trắng)',
   '杨柳木': 'linh hoạt, mềm mỏng, thích nghi (gỗ liễu)',
   '泉中水': 'trong, mát, nuôi dưỡng (nước suối)',
@@ -67,7 +67,8 @@ const NAYIN_TRAIT = {
   '石榴木': 'nhiều quả, ngoại cương, viên mãn (gỗ lựu)',
   '大海水': 'rộng lớn, biến động, bao dung (nước biển)',
   '大驿土': 'kết nối, giao thông, tĩnh (đất trạm)',
-  '砂中金': 'tinh, ẩn (kim cát)',
+  '大溪水': 'chảy liên tục, rộng lớn, bao dung (nước suối lớn)',
+  '沙中土': 'tinh tế, ẩn sâu, cần lọc (đất trong cát)',
   '天上火': 'sáng, cao, rực (lửa trời)',
   '钗钏金': 'tinh xảo, nữ tính, trang sức (kim trâm)',
   '桑柘木': 'kiên, nuôi tằm, thực dụng (gỗ dâu)',
@@ -88,7 +89,7 @@ export function taiSuiGeneral(year) {
   const idx = TAISUI_60.findIndex((t) => t[0] === gz);
   const name = TAISUI_60[idx]?.[1] || '?';
   const note = CURATED[gz] || `${name} đại tướng quân — nạp âm ${nayin}: ${NAYIN_TRAIT[nayin] || 'vị tướng trấn năm ' + gz}.`;
-  return { year, ganZhi: gz, index: idx + 1, name: name + ' đại将军', nameShort: name, nayin, note };
+  return { year, ganZhi: gz, index: idx + 1, name: name + ' đại tướng quân', nameShort: name, nayin, note };
 }
 
 /**
