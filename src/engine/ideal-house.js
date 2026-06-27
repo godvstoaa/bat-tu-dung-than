@@ -24,7 +24,9 @@ function floorFive(floor) { return DIGIT_WX[floor % 10]; }
 export function idealHouse(R, maxFloor = 30) {
   const inp = R.chart.input;
   const zhai = computeZhai(inp.year, inp.gender);
+  // [loop 557 FIX BUG3] guard yong thiếu — trước đây WX_VI[undefined] leak «Dụng undefined» vào summary.
   const dung = R.yong?.primary, hy = R.yong?.xi, ky = R.yong?.ji, thou = R.yong?.chou;
+  const W = (wx) => WX_VI[wx] || '?';
   const dungSet = new Set([dung, hy].filter(Boolean));
   const avoidSet = new Set([ky, thou].filter(Boolean));
 
@@ -39,19 +41,21 @@ export function idealHouse(R, maxFloor = 30) {
 
   // hướng: 4 cát方 của mệnh quái (auspicious = {tênSao: hướng})
   const ausp = zhai.auspicious || {};
-  // ưu tiên Sinh Khí > Thiên Y > Diên Niên; nếu hướng trùng Dụng方向 thì càng tốt
-  const dungDir = ({ 木: 'Đông', 火: 'Nam', 土: 'Trung/Tây Nam', 金: 'Tây', 水: 'Bắc' })[dung] || '';
+  // [loop 557 FIX BUG2+5] Dụng-hướng dùng SET chính xác, KHÔNG substring (trước đây
+  //   'Đông Bắc'.includes('Đông') → bonus nhầm cho Mộc-Dụng; Thổ ghi「Trung/Tây Nam」không match).
+  //   Thổ = Đông Bắc (Cấn) + Tây Nam (Khôn) theo Hậu Thiên Bát Quái.
+  const DUNG_DIRS = ({ 木: ['Đông', 'Đông Nam'], 火: ['Nam'], 土: ['Đông Bắc', 'Tây Nam'], 金: ['Tây', 'Tây Bắc'], 水: ['Bắc'] })[dung] || [];
   let bestFacing = null, bestScore = -1;
   for (const [star, dir] of Object.entries(ausp)) {
     let sc = 10 - (TONE_RANK[star] || 5);
-    if (dir.includes(dungDir) || dungDir.includes(dir)) sc += 5;
+    if (DUNG_DIRS.includes(dir)) sc += 5; // khớp CHÍNH XÁC hướng Dụng thần
     if (sc > bestScore) { bestScore = sc; bestFacing = { star, dir }; }
   }
 
   const fmtFloors = (arr) => arr.length ? arr.map((e) => `T${e.floor}(${e.wxVi})`).join(', ') : '(không)';
   const summary = `Mệnh ${zhai.grpVi}, quái ${zhai.guaName}. ` +
-    `Tầng TỐT (ngũ hành = Dụng ${WX_VI[dung]}/Hỷ ${WX_VI[hy]}): ${fmtFloors(idealFloors)}. ` +
-    `Tầng TRÁNH (ngũ hành = Kỵ ${WX_VI[ky]} / Thù ${WX_VI[thou]}): ${fmtFloors(avoidFloors)}. ` +
+    `Tầng TỐT (ngũ hành = Dụng ${W(dung)}/Hỷ ${W(hy)}): ${fmtFloors(idealFloors)}. ` +
+    `Tầng TRÁNH (ngũ hành = Kỵ ${W(ky)} / Thù ${W(thou)}): ${fmtFloors(avoidFloors)}. ` +
     (bestFacing ? `Hướng cát tốt nhất: ${bestFacing.dir} (${bestFacing.star}) — nên 选 nhà 坐 đối cung, mở cửa/hướng về đây.` : '') +
     ` (4 cát方: ${Object.entries(ausp).map(([s, d]) => `${s}→${d}`).join(', ')}.)`;
 

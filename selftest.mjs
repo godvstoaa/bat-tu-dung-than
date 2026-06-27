@@ -1732,6 +1732,8 @@ assert(ih.avoidFloors.some((f) => f.floor === 1 && f.wx === '水'), 'T1 = Thủy
 assert(ih.avoidFloors.some((f) => f.floor === 3 && f.wx === '木'), 'T3 = Mộc = Kỵ → tránh');
 assert(ih.bestFacing && ih.bestFacing.dir, 'có hướng cát tốt nhất');
 assert(!ih.summary.includes('&amp;'), 'summary không còn HTML entity &amp;');
+// [loop 557] ideal-house undefined guard — yong thiếu không leak «undefined»
+assert(!idealHouse({ chart: { input: { year: 1993, gender: 'nam' } }, yong: undefined }, 10).summary.includes('undefined'), '[loop 557] yong undefined → summary clean (không leak undefined)');
 const ih2 = idealHouse(ihR, 20);
 assert(ih2.summary === ih.summary, 'idealHouse deterministic');
 console.log(`   user: ${ih.grpVi} ${ih.gua} | TỐT ${ih.idealFloors.map((f) => 'T'+f.floor).slice(0,4).join(',')}… | hướng ${ih.bestFacing.dir} ✓`);

@@ -16,10 +16,13 @@
 // ============================================================================
 import { analyze } from './chart.js';
 
-// 12 时辰 — lấy giờ giữa mỗi时辰 để chắc thuộc đúng chi (tránh ranh 早子/晚子).
-//   子 23-01, 丑 01-03, 寅 03-05, ... , 亥 21-23.
+// 13 mẫu时辰 — lấy giờ giữa mỗi时辰 để chắc thuộc đúng chi.
+//   [loop 557 FIX] thêm 早子 (h=23) — 23:00+ roll sang ngày D+1 (ziShiRoll) → trụ ngày KHÁC
+//  正子(h=0). Trước đây chỉ mẫu h=0 → BỎ LỌT 8.3% tổ hợp (mọi ngày sinh giờ 23 có trụ ngày
+//   khác, là cực đại tiềm năng nhưng solver không thấy).
 const SHICHEN_HOURS = [
-  { zhi: '子', h: 0, m: 30 }, { zhi: '丑', h: 2, m: 30 }, { zhi: '寅', h: 4, m: 30 },
+  { zhi: '子', h: 0, m: 30 }, { zhi: '子', h: 23, m: 30 }, // 正子 + 早子 (khác trụ ngày)
+  { zhi: '丑', h: 2, m: 30 }, { zhi: '寅', h: 4, m: 30 },
   { zhi: '卯', h: 6, m: 30 }, { zhi: '辰', h: 8, m: 30 }, { zhi: '巳', h: 10, m: 30 },
   { zhi: '午', h: 12, m: 30 }, { zhi: '未', h: 14, m: 30 }, { zhi: '申', h: 16, m: 30 },
   { zhi: '酉', h: 18, m: 30 }, { zhi: '戌', h: 20, m: 30 }, { zhi: '亥', h: 22, m: 30 },
