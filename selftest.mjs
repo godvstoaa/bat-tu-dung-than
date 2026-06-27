@@ -1913,6 +1913,21 @@ const s3b = strength3Fa(spR);
 assert(s3b.summary === s3.summary, 'strength3Fa deterministic');
 console.log(`   user: 得令✗ 得地✗ 得势✗ (0/3 pháp = nhược) nhưng mạnh do Ấn(Thủy) vượng ✓`);
 
+// ################## 47b. 源流 NGUỒN-LƯU dòng khí ngũ hành (滴天髓源流篇) ##################
+import { analyzeYuanLiu } from './src/engine/yuanliu.js';
+console.log('\n################## 47b. 源流 NGUỒN-LƯU (loop 452) ##################');
+const ylR = analyzeYuanLiu(spR.wx, spR.chart.dayMaster.wx);
+assert(['木','火','土','金','水'].includes(ylR.source), '源头 là 1 trong 5 hành');
+assert(ylR.chain.length === 5, 'chuỗi tương sinh 5 phần tử');
+assert(ylR.flowLen >= 1 && ylR.flowLen <= 5, 'flowLen trong [1,5]');
+assert(['Tỷ/Kiếp','Thực/Thương','Ấn','Tài','Quan/Sát'].includes(ylR.aspectKey), 'aspectKey ánh xạ endpoint→khía cạnh');
+assert(typeof ylR.summary === 'string' && ylR.summary.length > 10, 'summary có nội dung');
+const ylR2 = analyzeYuanLiu(spR.wx, spR.chart.dayMaster.wx);
+assert(ylR2.summary === ylR.summary, 'yuanliu deterministic');
+// R.yuanliu được gắn trong analyze
+assert(spR.yuanliu && spR.yuanliu.source === ylR.source, 'analyze() gắn R.yuanliu');
+console.log(`   user: nguồn ${ylR.source} → chảy ${ylR.flowLen}/5 → quy ${ylR.aspectKey} | ${ylR.verdict} ✓`);
+
 // ################## 48. 10 NĂM TỚI 一览 (decade forecast) ##################
 import { decadeForecast } from './src/engine/decade-forecast.js';
 console.log('\n################## 48. 10 NĂM TỚI 一览 decade forecast ##################');

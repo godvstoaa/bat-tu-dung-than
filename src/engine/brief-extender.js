@@ -71,6 +71,13 @@ export function extendBrief(R) {
     parts.push(`NGŨ HÀNH LƯU THÔNG (五行流通): ${wf.circulation} Thông ${wf.flow.length}/5${wf.blocks.length ? ', đứt ' + wf.blocks.length : ''}.${wf.profile.length ? ' ' + wf.profile.join(' ') : ''}`);
   } catch (e) {}
 
+  // [loop 452] 源流 (NGUỒN-LƯU) — nguồn khí +归宿 quy về khía cạnh nào (滴天髓源流篇).
+  //   Khác wx-flow (đo流通 có thông không): 源流 chỉ rõ NGUỒN + điểm DỪNG = khía cạnh THỊNH.
+  try {
+    const yl = R.yuanliu;
+    if (yl) parts.push(`源流 NGUỒN-LƯU: nguồn ${yl.source} chảy ${yl.flowLen}/5 hành, quy về ${yl.aspectKey} (${yl.aspectVi}) → ${yl.fullCycle ? '源远流长 (phú quý bền)' : yl.verdict}.${yl.gap ? ' Tắc tại ' + yl.gap + '.' : ''}`);
+  } catch (e) {}
+
   // [loop 89] MỆNH CÁCH TẦNG LỚP (命格層次) — phân loại cổ điển 6 tiêu chí (module chart-level trước đây ẩn).
   try {
     const lv = classifyChartLevel(R);

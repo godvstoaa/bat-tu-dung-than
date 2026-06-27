@@ -114,6 +114,7 @@ import { personalFengShui } from './engine/family-sync.js';
 import { strength3Fa } from './engine/strength-3fa.js';
 import { jiaoYunAnalysis } from './engine/jiaoyun.js';
 import { analyzePillarQuality } from './engine/pillar-quality.js';
+import { analyzeYuanLiu } from './engine/yuanliu.js';
 import { analyzeHuaQi } from './engine/huaqi.js';
 import { dayunChangSheng, liunianChangSheng, dayunYongChangSheng, liuyueChangSheng } from './engine/dayun-changsheng.js';
 import { analyzeHanNuan } from './engine/han-nuan.js';
@@ -1620,6 +1621,31 @@ function renderPillarQuality(R) {
     const shenHtml = pq.dayShenVi ? `<p class="hint">📊 Nhật trụ ${esc(pq.dayShenVi)} (12-trường-sinh: giai đoạn sinh khí của bản mệnh).</p>` : '';
     el.innerHTML = `${headline}${rows}${shenHtml}<p class="hint" style="margin-top:4px">${esc(pq.summary || '')}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được chất lượng trụ.</p>'; }
+}
+
+// [loop 452] 源流 — dòng khí ngũ hành (滴天髓源流篇): nguồn → lưu hướng → quy túc.
+function renderYuanLiu(R) {
+  const el = $('yuanliu');
+  if (!el) return;
+  try {
+    const yl = R.yuanliu || analyzeYuanLiu(R.wx, R.chart.dayMaster.wx);
+    if (!yl) { el.innerHTML = '<p class="hint">Không tính được dòng khí.</p>'; return; }
+    // chuỗi tương sinh: đánh dấu nguồn + highlight điểm tắc (gap) + endpoint
+    const chainHtml = yl.chain.map((c, i) => {
+      const isSrc = i === 0;
+      const isGap = yl.gap && c.wx === yl.gap;
+      const isEnd = c.wx === yl.endpoint;
+      const tag = isSrc ? ' <b class="zh" style="color:var(--gold-bright)">[源头 NGUỒN]</b>' : (isGap ? ' <b style="color:var(--cinnabar)">[tắc]</b>' : (isEnd ? ` <b style="color:var(--jade)">[quy ${esc(yl.aspectKey)}]</b>` : ''));
+      const color = isGap ? 'var(--cinnabar)' : (c.pct >= 0.15 ? 'var(--gold-pale)' : 'var(--muted)');
+      return `<span style="color:${color}"><b class="zh">${esc(WX_VI[c.wx] || c.wx)}</b> ${(c.pct * 100).toFixed(0)}%${tag}</span>${i < yl.chain.length - 1 ? ' <span class="muted">→ sinh →</span> ' : ''}`;
+    }).join('');
+    const verdictCls = yl.fullCycle ? 'rate-good' : (yl.flowLen >= 2 ? 'rate-cat' : 'rate-hung');
+    el.innerHTML = `
+      <div class="yz-row" style="margin:6px 0;line-height:2">${chainHtml}</div>
+      <p><span class="ln-rate ${verdictCls}">${esc(yl.verdict)}</span></p>
+      <p class="hint" style="margin-top:4px">${esc(yl.note)}</p>
+      <p class="hint" style="margin-top:2px;color:var(--muted)">${esc(yl.summary)}</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được dòng khí.</p>'; }
 }
 
 function renderHuaqi(R) {
@@ -3235,6 +3261,7 @@ function run() {
   lazyRender('strength-3fa',   () => { try { renderStrength3Fa(currentResult); } catch (e) { console.warn('strength3fa', e.message); } });
   lazyRender('jiaoyun',        () => { try { renderJiaoyun(currentResult); } catch (e) { console.warn('jiaoyun', e.message); } });
   lazyRender('pillar-quality', () => { try { renderPillarQuality(currentResult); } catch (e) { console.warn('pillarquality', e.message); } });
+  lazyRender('yuanliu', () => { try { renderYuanLiu(currentResult); } catch (e) { console.warn('yuanliu', e.message); } });
   lazyRender('huaqi',          () => { try { renderHuaqi(currentResult); } catch (e) { console.warn('huaqi', e.message); } });
   lazyRender('han-nuan',       () => { try { renderHanNuan(currentResult); } catch (e) { console.warn('hannuan', e.message); } });
   lazyRender('wx-flow',        () => { try { renderWxFlow(currentResult); } catch (e) { console.warn('wxflow', e.message); } });

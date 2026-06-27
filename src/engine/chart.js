@@ -20,6 +20,7 @@ import { buildRemedy } from './remedy.js';
 import { scoreLiunianYear } from './liunian-pro.js'; // [cycle 44] dùng chung score với analyzeLiunianDeep → không mâu thuẫn verdict
 import { analyzeKongwang } from './kongwang.js'; // [loop 148] 空亡 effect on scoring
 import { tongGen } from './tonggen.js'; // [loop 451] 得地 (thông căn) cho 三法 feedback vượng suy
+import { analyzeYuanLiu } from './yuanliu.js'; // [loop 452] 源流 dòng khí ngũ hành (滴天髓源流篇)
 export { synthesize };
 
 export { tenGod, changSheng };
@@ -643,5 +644,7 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   const full = { chart, wx, strength, interactions, shensha, pattern, yong, dayun, liunian, synthesis, patternQuality: patternQualityResult, kongwang };
   try { full.liuqin = analyzeLiuqin(full); } catch (e) { full.liuqin = []; }
   try { full.remedy = buildRemedy(full); } catch (e) { full.remedy = { twelveLaws: [] }; }
+  // [loop 452] 源流 dòng khí ngũ hành — đọc độc lập từ wx (không cascade/đổi score).
+  try { full.yuanliu = analyzeYuanLiu(wx, chart.dayMaster.wx); } catch (e) { full.yuanliu = null; }
   return full;
 }
