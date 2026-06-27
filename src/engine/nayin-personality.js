@@ -135,10 +135,13 @@ const NAYIN_PERSONALITY = {
  * @returns {{ dayJiaZi, nayin, vi, nature, traits, strength, weakness, compat, avoid, summary }}
  */
 export function dayNayinPersonality(R) {
-  const dayGz = R.chart?.pillars?.day?.gan + R.chart?.pillars?.day?.zhi;
+  const dayP = R.chart?.pillars?.day;
+  const dayGz = dayP?.gan + dayP?.zhi;
   if (!dayGz) return null;
-  let nayin = '';
-  try { nayin = ganZhiNayin(dayGz); } catch (e) { return null; }
+  // [loop 563 FIX BUG2] ưu tiên .nayin có sẵn (chart.js tính bằng lunar-javascript, chính xác)
+  //   — trước đây tự ganZhiNayin (từng nhiễm BUG 1 alias lệch). Fallback chỉ khi thiếu.
+  let nayin = dayP?.nayin || '';
+  if (!nayin) { try { nayin = ganZhiNayin(dayGz); } catch (e) { return null; } }
   const info = NAYIN_PERSONALITY[nayin] || NAYIN_PERSONALITY[nayin.replace('砂', '沙')];
   if (!info) return { dayJiaZi: dayGz, nayin, vi: nayin, summary: `Nhật trụ ${dayGz} nạp âm ${nayin}.` };
   const summary = `Nhật trụ ${dayGz} — nạp âm ${nayin} (${info.vi}): ${info.nature}. ${info.traits.slice(0, 80)}`;

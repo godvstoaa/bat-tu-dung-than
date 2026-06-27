@@ -1032,7 +1032,13 @@ console.log(`   12 thần sát ✓ — bạn(酉) 2026(午) pos${scan.mine.posit
 
 console.log('\n################## 17d. NẠP ÂM 30 + NGHĨA ##################');
 import { NAYIN_MEANING, nayinInfo } from './src/engine/nayin.js';
-assert(Object.keys(NAYIN_MEANING).length >= 30, `đủ 30 nạp âm (được ${Object.keys(NAYIN_MEANING).length})`); // [loop 437] ≥30 (có alias 沙/砂)
+assert(Object.keys(NAYIN_MEANING).length === 30, `đúng 30 nạp âm (được ${Object.keys(NAYIN_MEANING).length}) — [loop 563 FIX] trước đây 31 do alias 砂/沙 trùng → lệch index`); // [loop 563] chặt ===30, KHÔNG >=
+// [loop 563 CRITICAL regression] 28/60 nạp âm từng SAI do alias lệch index từ idx 15.
+assert(ganZhiNayin('壬戌') === '大海水', `[loop 563] ganZhiNayin 壬戌=大海水 (trước fix SAI=石榴木)`);
+assert(ganZhiNayin('戊申') === '大驿土', `[loop 563] ganZhiNayin 戊申=大驿土 (trước fix SAI=天河水)`);
+assert(ganZhiNayin('丙申') === '山下火', `[loop 563] ganZhiNayin 丙申=山下火 (trước fix SAI=沙中金, idx sau alias)`);
+assert(ganZhiNayin('甲子') === '海中金', `ganZhiNayin 甲子=海中金 (idx 0, không đổi)`);
+console.log(`   纳音 ✓ — 30 nạp âm + 28/60 fix regression (壬戌=大海水, 戊申=大驿土, 丙申=山下火)`);
 assert(nayinInfo('海中金')?.vi === 'Hải Trung Kim', 'nayin: 海中金 → Hải Trung Kim');
 // khớp tên thư viện: 乙亥 → 山头火
 import { Solar } from 'lunar-javascript';

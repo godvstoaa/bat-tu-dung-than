@@ -22,7 +22,9 @@ export function baziMingGong(R) {
   // [loop 178] 子时换日 — đồng bộ buildChart: chart.input giữ giờ thật, roll cho tính âm lịch
   const [my, mm, md, mh, mmin] = ziShiRoll(chart.input.year, chart.input.month, chart.input.day, chart.input.hour, chart.input.minute);
   const lunar = Solar.fromYmdHms(my, mm, md, mh, mmin, 0).getLunar();
-  const lm = lunar.getMonth();
+  // [loop 563 FIX BUG1] tháng nhuận: getMonth() trả ÂM (闰二月=-2) →命宫 SAI. 同 bug ziwei loop 548.
+  const _rawM = lunar.getMonth();
+  const lm = _rawM > 0 ? _rawM : Math.abs(_rawM) + 1; // nhuận月 = tháng kế (闰二→3)
   const timeZhi = lunar.getTimeZhi();
   const hourOrder = ZHI_ORDER.indexOf(timeZhi) + 1;
   const yearGan = lunar.getYearGan();
@@ -66,8 +68,10 @@ export function baziMingGong(R) {
   }
 
   // Đánh giá strength: mệnh cung hành có bổ Dụng Thần không?
-  const isYong = (R.yong.primary === wx || R.yong.xi === wx);
-  const isJi = (R.yong.ji === wx || R.yong.chou === wx);
+  // [loop 563 FIX BUG2] xét cả secondary + avoid[] — trước đây chỉ primary/xi/ji/chou.
+  const _y = R.yong || {};
+  const isYong = (_y.primary === wx || _y.xi === wx || _y.secondary === wx);
+  const isJi = (_y.ji === wx || _y.chou === wx || (_y.avoid || []).includes(wx));
 
   const meaning = `Mệnh cung ${mgGan}${mgZhi} (${GAN[mgGan].vi} ${ZHI[mgZhi].vi}), thập thần ${TEN_GOD_VI[god] || god}, hành ${WX_VI[wx]}. ` +
     `${interaction} ` +
