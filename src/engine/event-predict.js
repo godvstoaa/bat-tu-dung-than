@@ -46,7 +46,12 @@ export function predictEvents(R, startYear, years = 5) {
     // [loop 24 sửa bug CAO] giải active 大运 THEO NĂM (startYear), KHÔNG đóng băng cả cửa sổ.
     //   Trước đây age/activeDy tính 1 lần ngoài loop (dùng startYear) → năm vượt ranh thập niên
     //   bị ghép 大运 SAI. Giải theo startYear khớp analyzeLiunianDeep/forecast5.
-    const activeDy = (dayun || []).find((d) => d && d.startYear != null && d.startYear <= year && year < d.startYear + 10) || (dayun || [])[0];
+    // [loop 544 FIX BUG3] khi năm ngoài mọi đại vận (quá khứ/tương lai xa), fallback [0]
+    //   lấy đại vận TUỔI NHỎ cho năm tuổi già → ghép thập thần SAI. Nay lấy đại vận GẦN NHẤT.
+    const _dyInRange = (dayun || []).find((d) => d && d.startYear != null && d.startYear <= year && year < d.startYear + 10);
+    const _dyNearest = (dayun || []).filter((d) => d && d.startYear != null)
+      .sort((a, b) => Math.abs(a.startYear - year) - Math.abs(b.startYear - year))[0];
+    const activeDy = _dyInRange || _dyNearest || null;
     lastDayun = activeDy?.ganZhi || '?';
     const yearSolar = Solar.fromYmdHms(year, 6, 15, 12, 0, 0);
     const lnGan = yearSolar.getLunar().getYearGan();
@@ -56,15 +61,19 @@ export function predictEvents(R, startYear, years = 5) {
     const dyGod = activeDy ? tenGod(dayGan, activeDy.gan) : '';
     const dyInfo = GOD_EVENTS[dyGod] || { events: [], area: '?', vi: '?' };
 
-    // Combined events: lưu niên + đại vận giao thoa [loop 24] gộp thật sự cả 2 nguồn
+    // [loop 544 FIX BUG8] sameGod → lnInfo===dyInfo (cùng GOD_EVENTS entry), nên 2 nhánh ternary
+    //   cũ giống hệt nhau (dead code). Đơn giản hoá + đánh dấu (x2) khi sự kiện trùng 2 nguồn.
     const sameGod = lnGod === dyGod;
     const combinedEvents = sameGod
-      ? [...new Set([...lnInfo.events, ...dyInfo.events])] // cùng sao → nhân đôi lực, gộp sự kiện
-      : [...new Set([...lnInfo.events, ...dyInfo.events])];
+      ? lnInfo.events.map((e) => `${e} (x2)`)
+      : [...new Set([...lnInfo.events, ...dyInfo.events].map((e) => (lnInfo.events.includes(e) && dyInfo.events.includes(e) ? `${e} (x2)` : e)))];
 
-    // [loop 490] tone favor-aware: god-element là Dụng/Hỷ (cát) hay Kỵ/Thù (hung).
+    // [loop 490→544 FIX BUG4] tone favor-aware + ĐỐI XỨNG: trước đây `cat||cat→cat` nhưng
+    //   `hung+neutral→neutral` (mất cảnh báo hung). Nay cộng trọng số cat=+1/hung=-1/neutral=0.
     const lnTone = _tone(lnGod), dyTone = _tone(dyGod);
-    const tone = lnTone === 'cat' || dyTone === 'cat' ? 'cat' : lnTone === 'hung' && dyTone === 'hung' ? 'hung' : 'neutral';
+    const _tw = { cat: 1, hung: -1, neutral: 0 };
+    const _ts = (_tw[lnTone] || 0) + (_tw[dyTone] || 0);
+    const tone = _ts >= 1 ? 'cat' : _ts <= -1 ? 'hung' : 'neutral';
     const toneVi = tone === 'cat' ? 'CÁT (thuận Dụng)' : tone === 'hung' ? 'HUNG (nghịch, kỵ)' : 'trung';
     const advice = sameGod
       ? `Năm ${year}: ${lnInfo.vi} NHÂN ĐÔI (lưu niên = đại vận ${dyInfo.vi}) → ${lnInfo.area} cực mạnh: ${combinedEvents.join(', ')}. [${toneVi}]`

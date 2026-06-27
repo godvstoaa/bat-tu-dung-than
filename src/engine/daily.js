@@ -67,8 +67,11 @@ export function dailyGuidance(R, yy, mm, dd, hh) {
   if (yearChongUser) { score -= 8; reasons.push(`Ngày chi xung chi năm (${ZHI_VI[userYearZhi]}) → hơi bất lợi tuổi.`); }
   if (['正官','正印','食神','正財'].includes(dayGanVsDm)) { score += 6; reasons.push(`Can ngày = ${dayGanVsDm} (sao cát) → cát tinh chiếu.`); }
   if (['七殺','傷官','劫財','偏印'].includes(dayGanVsDm)) { score -= 4; reasons.push(`Can ngày = ${dayGanVsDm} (sao thiên hung) → cẩn thận.`); }
-  if (lnNow && lnNow.score < 0) { score -= 5; reasons.push(`Lưu niên ${lnNow.year} (${lnNow.rating}) → nền vận năm bất lợi.`); ji.push('Giữ ổn định (lưu niên hung)'); }
-  if (lnNow && lnNow.score >= 1) { score += 5; reasons.push(`Lưu niên ${lnNow.year} (${lnNow.rating}) → nền vận năm cát.`); yi.push('Tiến thủ (lưu niên cát)'); }
+  // [loop 544 FIX BUG2] score bị clamp [2,98] trong scoreLiunianYear → `score<0` KHÔNG BAO GIỜ
+  //   true (dead branch) và `score>=1` LUÔN true → năm «Đại hung» (score 2-9) vẫn +5 (sai).
+  //   Nay dùng threshold đồng bộ rating: >=56 Cát (+5), <22 Hơi kỵ trở xuống (-5), giữa = trung.
+  if (lnNow && lnNow.score >= 56) { score += 5; reasons.push(`Lưu niên ${lnNow.year} (${lnNow.rating}) → nền vận năm cát.`); yi.push('Tiến thủ (lưu niên cát)'); }
+  else if (lnNow && lnNow.score < 22) { score -= 5; reasons.push(`Lưu niên ${lnNow.year} (${lnNow.rating}) → nền vận năm bất lợi.`); ji.push('Giữ ổn định (lưu niên hung)'); }
 
   // Dụng Thần reminder
   yi.push(`Dùng màu ${yong.primary === '木' ? 'xanh lá' : yong.primary === '火' ? 'đỏ' : yong.primary === '土' ? 'vàng/nâu' : yong.primary === '金' ? 'trắng/kim' : 'đen/xanh biển'}`);

@@ -401,14 +401,15 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     }
   }
 
-  // [loop 167-168] AVOID normalization — 用喜忌仇 consistency.
+  // [loop 167-168→544] AVOID normalization — 用喜忌仇 consistency.
   //   • 忌(ji)/仇(chou) PHẢI ở avoid (hostile mọi method) — [loop 167]
   //   • Dụng(primary)/Hỷ(xi) KHÔNG ở avoid — [loop 168]: trước đây ~22% chart giữ
   //     avoid THÔ coarse Phù Ức (thân-relative: tránh Tài/Quan/Thực) kể cả sau khi
   //     chọn Dụng, nên Hỷ (cha sinh Dụng, VD Quan→Ấn) bị liệt «kỵ» sai → hehun/
   //     ideal-match phạt partner mang Dụng=Hỷ user (ngược: người đó BỔ Dụng user).
-  //     An toàn: 病药 «illness» = KE[primary] ≠ xi (parent) nên không bị xoá nhầm.
-  avoid = avoid.filter((w) => w !== primary && w !== xi);
+  //   • [loop 544 FIX] secondary (dụng thần phụ, từ 病药/通关/调候) cũng KHÔNG ở avoid —
+  //     trước đây quên filter → 56% chart có secondary∈avoid → hehun phạt partner sai.
+  avoid = avoid.filter((w) => w !== primary && w !== xi && w !== secondary);
   for (const w of [ji, chou]) if (w && !avoid.includes(w)) avoid.push(w);
 
   return {

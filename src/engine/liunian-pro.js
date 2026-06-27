@@ -413,7 +413,9 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
   let finalRating = rating;
   if (dayunPhase && dayunPhase.factor < 1) {
     finalScore = Math.max(2, Math.min(98, Math.round(50 + (score - 50) * dayunPhase.factor)));
-    finalRating = finalScore >= 78 ? 'Đại cát' : finalScore >= 62 ? 'Cát' : finalScore >= 46 ? 'Bình' : finalScore >= 32 ? 'Hơi kỵ' : finalScore >= 20 ? 'Hung' : 'Đại hung';
+    // [loop 544 FIX] đồng bộ threshold với scoreLiunianYear (70/56/36/22/10) — trước đây
+    //   dùng 78/62/46/32/20 cũ (loop 461 quên cập nhật đây) → năm 进气退气 phán lệch UI.
+    finalRating = finalScore >= 70 ? 'Đại cát' : finalScore >= 56 ? 'Cát' : finalScore >= 36 ? 'Bình' : finalScore >= 22 ? 'Hơi kỵ' : finalScore >= 10 ? 'Hung' : 'Đại hung';
     schools.push({ phai: '进气退气', d: finalScore - score, note: dayunPhase.vi + ` → điểm co về neut ${Math.round((1 - dayunPhase.factor) * 100)}%` });
   }
 
