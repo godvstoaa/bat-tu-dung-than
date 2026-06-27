@@ -11,7 +11,7 @@ import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI, SHENG, KE, TEN_GOD_VI } from './constants.js';
 import { tenGod, godGroup } from './core.js';
 import { GAN_HE_MAP, ZHI_LIUHE_MAP, ZHI_CHONG_MAP, GAN_CHONG } from './interactions.js';
-import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, SHENSHA_INFO, TIAN_YI, WEN_CHANG, JIANG_XING } from './shensha.js';
+import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, SHENSHA_INFO, TIAN_YI, WEN_CHANG, JIANG_XING, TIAN_DE, YUE_DE } from './shensha.js';
 // [loop 19 — elevation] 伏吟/反吟 chuẩn từ module chuyên dụng (4 cặp thất sát, không phải "bất kỳ ngũ hành khắc").
 import { isFuyin, isFanyin } from './fuyin.js';
 
@@ -116,6 +116,12 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
   if (TIAN_YI[dayGan] && TIAN_YI[dayGan].includes(yZhi)) { score += 8; ssD += 8; ssNotes.push('🌟 Thiên Ất Quý Nhân năm — quý nhân phò, gặp dữ hóa lành, sự nghiệp/thăng tiến thuận.'); }
   if (WEN_CHANG[dayGan] === yZhi) { score += 5; ssD += 5; ssNotes.push('📚 Văn Xương năm — thi cử/học vấn thuận, tư duy sắc bén, hợp ký văn/bằng cấp.'); }
   if (JIANG_XING[grp] === yZhi) { score += 4; ssD += 4; ssNotes.push('🎖️ Tướng Tinh năm — uy quyền/lãnh đạo tăng, hợp nhận chức/quyết định lớn.'); }
+  // [loop 450 elevate] 天德/月德 activation — «天德化灾»: sao HOÁ GIẢI tai hoạ, giảm hung.
+  //   TIAN_DE[monthZhi] trả về CAN hoặc CHI (khác 贵 nhân chỉ trả CHI). Kiểm cả yGan + yZhi.
+  const tdMark = TIAN_DE[natalPillars?.month?.zhi || ''];
+  if (tdMark && (yGan === tdMark || yZhi === tdMark)) { score += 5; ssD += 5; ssNotes.push('🛡️ Thiên Đức (天德) năm — hoá giải tai hoạ, giảm sát khí, «gặp dữ hoá lành».'); }
+  const ydMark = YUE_DE[grp];
+  if (ydMark && yGan === ydMark) { score += 4; ssD += 4; ssNotes.push('🛡️ Nguyệt Đức (月德) năm — giảm hung, phúc đức tự nhiên.'); }
   if (ssNotes.length) schools.push({ phai: 'Lưu Niên Thần Sát', note: ssNotes.join(' '), d: ssD });
 
   // (5) Thiên khắc địa xung (天干 xung + địa chi xung)
