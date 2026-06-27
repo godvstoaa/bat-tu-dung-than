@@ -297,7 +297,7 @@ import { analyzeLiunianDeep } from './src/engine/liunian-pro.js';
 const RU = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
 const y26 = analyzeLiunianDeep(RU, 2026);
 assert(y26.ganGod === '傷官', '2026 can = Thương Quan (傷官)');
-assert(y26.score < 62, `2026 đa phái phải ≤ Bình (thực tế ${y26.score} ${y26.rating}) — không còn "Cát"`);
+assert(y26.score < 56, `2026 đa phái phải ≤ Bình (thực tế ${y26.score} ${y26.rating}) — không còn "Cát" [loop 461 Cát≥56]`);
 assert(y26.schools.some((s) => s.note.includes('傷官') || s.note.includes('Thương Quan')), '2026: có cảnh báo Thương Quan');
 assert(y26.schools.some((s) => s.note.includes('Đào Hoa') || s.note.includes('Hồng Diễm')), '2026: có cảnh báo Đào Hoa/Hồng Diễm');
 // 2027 丁未 = 食神 → Cát (khá hơn)
@@ -1957,7 +1957,7 @@ console.log('\n################## 48. 10 NĂM TỚI 一览 decade forecast #####
 const df = decadeForecast(spR, 2026, 10);
 assert(df.years.length === 10, 'đủ 10 năm');
 const df2027 = df.years.find((y) => y.year === 2027);
-assert(df2027 && df2027.rating === 'Cát', '2027 丁未 = Cát');
+assert(df2027 && (df2027.rating === 'Cát' || df2027.rating === 'Đại cát'), `2027 丁未 = Cát/Đại cát (được ${df2027?.rating} — [loop 461] recalibrate ≥70=Đại cát)`);
 const df2028 = df.years.find((y) => y.year === 2028);
 assert(df2028 && df2028.flags.some((f) => f.includes('Tài')), '2028 có cờ 💰Tài');
 const df2030 = df.years.find((y) => y.year === 2030);

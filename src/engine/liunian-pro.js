@@ -279,11 +279,14 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
 
   score = Math.max(2, Math.min(98, Math.round(score)));
   let rating;
-  if (score >= 78) rating = 'Đại cát';
-  else if (score >= 62) rating = 'Cát';
-  else if (score >= 46) rating = 'Bình';
-  else if (score >= 32) rating = 'Hơi kỵ';
-  else if (score >= 20) rating = 'Hung';
+  // [loop 461] recalibrate theo percentile 528 year-readings (range 2-91, median 40).
+  //   Cũ 78/62/46/32/20 → median 40 rơi «Hơi kỵ» (sai — năm TB phải «Bình»), 61% kỵ+.
+  //   Nay neo percentile: median → Bình, Đại cát top ~5%, Đại hung bottom ~3%.
+  if (score >= 70) rating = 'Đại cát';
+  else if (score >= 56) rating = 'Cát';
+  else if (score >= 36) rating = 'Bình';
+  else if (score >= 22) rating = 'Hơi kỵ';
+  else if (score >= 10) rating = 'Hung';
   else rating = 'Đại hung';
 
   return { score, rating, schools, ganGod, ganWx, zhiWx };
@@ -299,8 +302,8 @@ function buildLiunianAdvice(score, rating, solarYear, yong, ganWx, zhiWx, dayunN
   //   để brief nói rõ TẠI SAO năm này hung/cát khác kỳ vọng (vd 傷官 năm nhưng trong 印运
   //   → bớt hung; 傷官 năm trong 比劫 vận → thêm hung).
   const suffix = dayunNote ? ` 【运年】${dayunNote}` : '';
-  if (score >= 62) return `Năm ${solarYear} (${rating}) — nên tiến thủ, nắm cơ hội; vẫn giữ Dụng ${wxVi(yong.primary)}.${suffix}`;
-  if (score >= 46) return `Năm ${solarYear} (${rating}) — giữ ổn định, thuận tự nhiên, tránh quyết định lớn nếu chưa rõ.${suffix}`;
+  if (score >= 56) return `Năm ${solarYear} (${rating}) — nên tiến thủ, nắm cơ hội; vẫn giữ Dụng ${wxVi(yong.primary)}.${suffix}`;
+  if (score >= 36) return `Năm ${solarYear} (${rating}) — giữ ổn định, thuận tự nhiên, tránh quyết định lớn nếu chưa rõ.${suffix}`;
   if (yearHasFav) return `Năm ${solarYear} (${rating}) — BẤT LỢI dù năm có mang Dụng ${wxVi(yong.primary)}/Hỷ ${wxVi(yong.xi)} (bị Thái Tuế / xung / Thương Quan lấn át). Thủ không tiến: giữ tiền, tránh đầu tư/liều, bao dung tình cảm, tích đức hoá giải.${suffix}`;
   return `Năm ${solarYear} (${rating}) — NĂM BẤT LỢI. Thủ không tiến: giữ tiền, tránh đầu tư/đi xa/liều, bao dung tình cảm, tích đức hoá giải, đợi năm mang Dụng ${wxVi(yong.primary)}/Hỷ ${wxVi(yong.xi)} sẽ khá hơn.${suffix}`;
 }
