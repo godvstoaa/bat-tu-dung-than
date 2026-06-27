@@ -44,7 +44,10 @@ export function computeHehun(R1, R2) {
   const ya = a.pillars.year.zhi, yb = b.pillars.year.zhi;
   const haiHit = HAI_PAIRS.find((h) => h.pair.includes(ya) && h.pair.includes(yb) && ya !== yb);
   if (haiHit) { score -= 6; factors.push(`• Chi năm ${ZHI[ya].vi}–${ZHI[yb].vi} Lục Hại (${haiHit.vi}) — 暗 tổn nhẹ, lục đục dai dẳng.`); }
-  const xingHit = XING_PAIRS.find((x) => x.pair.includes(ya) && x.pair.includes(yb) && ya !== yb);
+  // [loop 550 FIX] skip 刑 khi cặp đã là Xung hoặc Hợp — một cặp không thể vừa 冲 vừa 形, hoặc vừa 合 vừa 形.
+  //   Tránh double-count (vd 丑未: 冲-8 + 形-5) và mâu thuẫn (vd 巳申: 合+5 + 形-5).
+  const yXingBlocked = zRel.type === 'xung' || zRel.type === 'lục hợp' || zRel.type === 'tam hợp';
+  const xingHit = yXingBlocked ? null : XING_PAIRS.find((x) => x.pair.includes(ya) && x.pair.includes(yb) && ya !== yb);
   if (xingHit) { score -= 5; factors.push(`• Chi năm ${ZHI[ya].vi}–${ZHI[yb].vi} ${xingHit.vi} — hình thương nhẹ.`); }
 
   // 2. 五行互补: Dụng của A có mạnh trong cục B không & ngược lại
@@ -79,7 +82,10 @@ export function computeHehun(R1, R2) {
   //   合/Xung, bỏ sót Hại/Hình ở CUNG PHU THÊ (quan trọng nhất). Lớn hơn year (~2×).
   const dza = a.pillars.day.zhi, dzb = b.pillars.day.zhi;
   const dHai = HAI_PAIRS.find((h) => h.pair.includes(dza) && h.pair.includes(dzb) && dza !== dzb);
-  const dXing = XING_PAIRS.find((x) => x.pair.includes(dza) && x.pair.includes(dzb) && dza !== dzb);
+  // [loop 550 FIX] skip 刑 nếu cặp đã Xung/Hợp — tránh double-count (vd 丑未: 冲-18+形-12=-30)
+  //   và mâu thuẫn (vd 巳申: 合+18 + 形-12 = vừa hợp vừa khắc cùng cặp).
+  const dXingBlocked = dayZhiRel.type === 'xung' || dayZhiRel.type === 'lục hợp' || dayZhiRel.type === 'tam hợp';
+  const dXing = dXingBlocked ? null : XING_PAIRS.find((x) => x.pair.includes(dza) && x.pair.includes(dzb) && dza !== dzb);
   if (dHai) { score -= 10; factors.push(`✗ Nhật Chi ${ZHI[dza].vi}–${ZHI[dzb].vi} ${dHai.vi} → CUNG PHU THÊ trệ/tiểu nhân — cần bao dung, tránh so đo.`); }
   if (dXing) { score -= 12; factors.push(`✗ Nhật Chi ${ZHI[dza].vi}–${ZHI[dzb].vi} ${dXing.vi} → CUNG PHU THÊ hình khắc — bất lợi hôn nhân, cần cố ý hóa giải (chọn năm cát cưới).`); }
 

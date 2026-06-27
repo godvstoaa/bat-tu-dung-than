@@ -63,6 +63,7 @@ export function findIdealPartners(R, opts = {}) {
           // 4. Partner's Dụng should NOT be user's Kỵ (互不损伤)
           const pYong = pR.yong;
           if (!userYong.avoid.includes(pYong.primary)) score += 3;
+          score = Math.max(5, Math.min(98, Math.round(score))); // [loop 550 FIX] clamp [5,98] — tránh vượt 100
 
           const ganZhi4 = ['year','month','day','time'].map(k =>
             pR.chart.pillars[k].gan + pR.chart.pillars[k].zhi).join(' ');

@@ -410,6 +410,9 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
   //   • [loop 544 FIX] secondary (dụng thần phụ, từ 病药/通关/调候) cũng KHÔNG ở avoid —
   //     trước đây quên filter → 56% chart có secondary∈avoid → hehun phạt partner sai.
   avoid = avoid.filter((w) => w !== primary && w !== xi && w !== secondary);
+  // [loop 550] ji/chou (KỴ/THÙ) luôn ∈ avoid — lập trường Phù Ức cổ pháp (regression test
+  //   cố ý assert điều này). Khi hiếm secondary===ji/chou (đụng 调候/通关), kỵ/仇 vẫn ưu tiên
+  //   trong avoid list. Bug 3 audit = tranh luận cổ pháp, KHÔNG đổi thiết kế này.
   for (const w of [ji, chou]) if (w && !avoid.includes(w)) avoid.push(w);
 
   return {
