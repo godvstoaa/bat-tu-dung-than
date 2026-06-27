@@ -194,6 +194,9 @@ export function extendBrief(R) {
     const dg = dayunGodMeaning(R.chart, R.dayun);
     const near = dg.items.slice(0, 4).map((d) => `${d.ganZhi}[${d.startAge}t:${d.godVi}(${d.cat})${ganZhiNayin(d.ganZhi) ? '/' + ganZhiNayin(d.ganZhi) : ''}]`);
     parts.push(`ĐẠI VẬN THẬP THẦN: ${near.join(' ')}`);
+    // [loop 436] 空亡 weakening note — cho AI biết大运 nào bị giảm lực
+    const kwDayun = (R.dayun || []).filter((d) => d._kwNote);
+    if (kwDayun.length) parts.push(`ĐẠI VẬN KHÔNG VONG: ${kwDayun.map((d) => d.ganZhi + '[' + d.startAge + 't] ' + d._kwNote).join(' | ')}`);
   } catch (e) {}
 
   // Đại vận tương tác
