@@ -85,6 +85,10 @@ export function analyzeYuanLiu(wx, dmWx) {
   } else if (flowLen === 2) {
     verdict = `lưu thông vừa (${flowLen}/5 hành)`;
     note = `Dòng khí chỉ chảy ${flowLen} hành rồi dừng, quy về ${asp.key} (${asp.vi}). Khí chưa lan tới toàn cục, tài/Dụng cần vận bổ hành ${gap ? WX_VI[gap] : 'thiếu'} mới phát huy.${gap ? gapTip(gap) : ''}`;
+  } else if (pct(source) < 0.001) {
+    // [loop 551 FIX] chart degenerate (toàn ngũ hành = 0) → trước note vô lý«Mộc vượng nhất (0%)»
+    verdict = 'ngũ hành khiếu (chart chưa có khí rõ)';
+    note = `Ngũ hành chưa phân bố («无源无流»), chưa có nguồn khí rõ rệt — chưa luận được dòng chảy源流. Cần lá số đầy đủ hoặc đại vận/流 niên bổ ngũ hành.`;
   } else {
     verdict = 'khí trệ (nguồn mạnh nhưng dòng tắc)';
     const next = SHENG[source];

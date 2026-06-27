@@ -41,7 +41,8 @@ const DAJI = { 1:1,11:1,13:1,15:1,16:1,21:1,23:1,24:1,25:1,31:1,32:1,33:1,35:1,3
 const BINH = { 17:1,18:1,38:1,51:1,55:1,58:1,71:1,72:1,77:1 };
 function luckOf(n) {
   if (n > 81) n = (n % 80) || 80;
-  if (n <= 0) n = 1;
+  // [loop 551 FIX] n<=0 (外格=0 do 复姓复名 zong===ren, hoặc NaN) → Bình, KHÔNG ép =1 → Đại cát.
+  if (!(n > 0)) return { lv: 'Bình', cls: 'mid' };
   if (DAJI[n]) return { lv: 'Đại cát', cls: 'cat' };
   if (JI[n]) return { lv: 'Cát', cls: 'cat' };
   if (BINH[n]) return { lv: 'Bình', cls: 'mid' };
@@ -71,6 +72,8 @@ export function analyzeName(chars, strokeOverride, yong) {
     return { needStrokes: true, missing, hint: `Chưa có nét康熙 của: ${missing.join(' ')}. Hãy nhập nét (tra康熙字典).` };
   }
   const n = st.length;
+  // [loop 551 FIX] guard đầu vào — cần ít nhất họ + 1 chữ tên.
+  if (n < 2) return { error: 'Tên cần ít nhất họ + 1 chữ tên.', needStrokes: false };
   // Giả định: 1 chữ họ (chuẩn Việt Nam), còn lại là tên.
   const S = st[0];
   // 五 cách (họ đơn)
@@ -78,7 +81,9 @@ export function analyzeName(chars, strokeOverride, yong) {
   const ren = S + st[1];
   const di = (n === 2) ? (st[1] + 1) : st.slice(1).reduce((a, b) => a + b, 0);
   const zong = st.reduce((a, b) => a + b, 0);
-  const wai = Math.max(1, zong - ren + 1);
+  // [loop 551 FIX] 单姓单名 (n===2) → 外格 = 2 (hằng số 五格剖象), không phải zong-ren+1=1.
+  //   Trước đây wai=1 → luckOf(1)=Đại cát (SAI, phải luckOf(2)=Hung).
+  const wai = (n === 2) ? 2 : Math.max(1, zong - ren + 1);
 
   const grids = [
     { key: 'tian', vi: '天格 Thiên Cách (tiên tổ)', n: tian, role: 'cội nguồn họ, ảnh hưởng nhẹ' },

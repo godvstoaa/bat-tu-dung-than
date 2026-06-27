@@ -679,6 +679,14 @@ const nm = analyzeName(['阮', '文', '英']);
 assert(!nm.needStrokes, 'bảng nét có 阮/文/英');
 assert(nm.grids[0].n === 13 && nm.grids[1].n === 16 && nm.grids[2].n === 15, `五 cách 天/人/地 = 13/16/15 (thực ${nm.grids[0].n}/${nm.grids[1].n}/${nm.grids[2].n})`);
 assert(nm.grids[4].n === 27, '总 cách = 27 (12+4+11)');
+// [loop 551] 单名单姓 外格 = 2 (hằng số 五格剖象), KHÔNG phải zong-ren+1=1.
+//   阮英: 阮12 英11 → 天13 人23 地12 外2 总23. Trước fix 外=1(luck Đại cát SAI).
+const nm2 = analyzeName(['阮', '英']);
+const wai2 = nm2.grids.find((g) => g.key === 'wai');
+assert(wai2.n === 2, `[loop 551] 单名单姓 外格=2 (got ${wai2.n}, trước fix SAI=1)`);
+assert(wai2.luck.cls === 'hung', `[loop 551] 外格 2 → Hung (got ${wai2.luck.cls}, trước fix SAI=cat Đại cát)`);
+// input guard: 1 ký tự → error, không NaN leak
+assert(analyzeName(['阮']).error, '[loop 551] tên 1 ký tự → error guard (không NaN)');
 assert(wxOf(13) === '火' && wxOf(16) === '土' && wxOf(15) === '土', 'ngũ hành theo chữ số cuối');
 assert(nm.sancaiLuck === 'Cát', 'tam tài 火土土 → Cát (sinh/tỷ)');
 assert(nm.score > 60 && nm.score < 98, `điểm tên hợp lý (${nm.score})`);

@@ -136,8 +136,10 @@ export function analyzeStrength(chart, wx) {
   const oppose = wx.total - support;
   const ratio = support / wx.total;
 
-  const monthMainWx = GAN[HIDDEN[chart.monthZhi][0]].wx;
-  const deLenh = monthMainWx === dmWx || monthMainWx === resourceWx;
+  // [loop 551 FIX] guard monthZhi null/undefined — trước đây GAN[HIDDEN[undefined][0]] → TypeError crash.
+  const _mz0 = chart.monthZhi && HIDDEN[chart.monthZhi] ? HIDDEN[chart.monthZhi][0] : null;
+  const monthMainWx = _mz0 && GAN[_mz0] ? GAN[_mz0].wx : null;
+  const deLenh = monthMainWx != null && (monthMainWx === dmWx || monthMainWx === resourceWx);
   // [loop 484] 进气/旺气/退气 — vị trí ngày sinh trong khoảng节气 (滴天髓 进气退气).
   //   Refinement 得令: mới vào节气 (初气) = 进气 «lệnh đang VÀO mạnh dần»; sắp转 (末气)
   //   = 退气 «lệnh RA suy»; giữa = 旺气 «đương lệnh đầy đủ». Cổ法 «进气 Ungасpending, 退气 waning».
