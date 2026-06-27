@@ -1660,12 +1660,15 @@ function renderYuanLiu(R) {
 }
 
 // [loop 472] Tường thuật giai đoạn — narrative prose may xuyên 大运→lưu niên→lưu nguyệt.
-function renderPhaseNarrative(R) {
+// [loop 474] tương tác: nhận năm (xem giai đoạn quá khứ/tương lai).
+function renderPhaseNarrative(R, year) {
   const el = $('phase-narrative');
   if (!el) return;
+  const yv = $('pn-year');
+  const yr = year || (yv && yv.value ? parseInt(yv.value, 10) : new Date().getFullYear());
+  if (yv && !yv.value) yv.value = yr; // default hiện năm đang xem
   try {
-    const pn = phaseNarrative(R);
-    const toneCls = (p) => /Đại cát|Cát|thuận lợi|nắm lấy/.test(p) ? 'rate-cat' : /Đại hung|Hung|khó khăn|cẩn trọng/.test(p) ? 'rate-hung' : 'rate-mid';
+    const pn = phaseNarrative(R, yr);
     el.innerHTML = pn.paragraphs.map((p) => `<p class="yz-row" style="line-height:1.6;border-left:3px solid var(--gold-soft);padding-left:10px;margin:6px 0">${p}</p>`).join('');
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được tường thuật giai đoạn.</p>'; }
 }
@@ -4268,6 +4271,7 @@ $('ly-btn').addEventListener('click', () => {
 });
 if ($('ly-ev-btn')) $('ly-ev-btn').addEventListener('click', () => renderLyearEvents(parseInt($('ly-year').value, 10) || new Date().getFullYear()));
 $('lm-btn').addEventListener('click', () => renderLiuyue(parseInt($('lm-year').value, 10) || new Date().getFullYear()));
+$('pn-btn').addEventListener('click', () => { if (currentResult) renderPhaseNarrative(currentResult, parseInt($('pn-year').value, 10) || new Date().getFullYear()); }); // [loop 474]
 $('lr-btn').addEventListener('click', () => renderLiuRi($('lr-date').value));
 if ($('partner-match-btn')) $('partner-match-btn').addEventListener('click', () => {
   if (!currentResult) { alert('Nhập lá số của bạn trước.'); return; }
