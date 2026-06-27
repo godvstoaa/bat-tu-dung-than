@@ -103,18 +103,22 @@ export function synthesize(R) {
   score = Math.max(0, Math.min(100, Math.round(score)));
 
   // --- Đẳng cấp ---
+  // [loop 458] RECALIBRATE theo percentile 4392 lá (median 45, p95 65). Cũ 80/68/55/43
+  //   khiến 上等 gần UNREACHABLE (max thực tế 81) + >50% lá rơi 下等 — sai phân bố.
+  //   Nay neo percentile: 上 = top ~6% (≥62), 中 = quanh median (≥41), 下 = bottom ~12% (<31).
   let grade, gradeVi;
-  if (score >= 80) { grade = '上'; gradeVi = 'Thượng đẳng (mệnh tốt, hiếm)'; }
-  else if (score >= 68) { grade = '中上'; gradeVi = 'Trung thượng (khá tốt)'; }
-  else if (score >= 55) { grade = '中'; gradeVi = 'Trung đẳng (cân bằng)'; }
-  else if (score >= 43) { grade = '中下'; gradeVi = 'Trung hạ (khá vất vả)'; }
+  if (score >= 62) { grade = '上'; gradeVi = 'Thượng đẳng (mệnh tốt, hiếm)'; }
+  else if (score >= 52) { grade = '中上'; gradeVi = 'Trung thượng (khá tốt)'; }
+  else if (score >= 41) { grade = '中'; gradeVi = 'Trung đẳng (cân bằng)'; }
+  else if (score >= 31) { grade = '中下'; gradeVi = 'Trung hạ (khá vất vả)'; }
   else { grade = '下'; gradeVi = 'Hạ đẳng (nhiều thử thách)'; }
 
   // --- Phú quý bần tiện (xu hướng) ---
+  // [loop 458] neo percentile cùng đẳng cấp (p80/p37/p12)
   let fortune, fortuneVi;
-  if (score >= 68 && catCombos.length >= 1) { fortune = 'phú quý'; fortuneVi = 'Phú/Qúy — danh lợi đều có, đáng tiến thủ'; }
-  else if (score >= 55) { fortune = 'tiểu phú quý'; fortuneVi = 'Tiểu phú/qúy — ấm no, có thành tựu vừa'; }
-  else if (score >= 43) { fortune = 'bình'; fortuneVi = 'Bình thường — no ấm, cần nỗ lực nhiều'; }
+  if (score >= 55 && catCombos.length >= 1) { fortune = 'phú quý'; fortuneVi = 'Phú/Qúy — danh lợi đều có, đáng tiến thủ'; }
+  else if (score >= 41) { fortune = 'tiểu phú quý'; fortuneVi = 'Tiểu phú/qúy — ấm no, có thành tựu vừa'; }
+  else if (score >= 31) { fortune = 'bình'; fortuneVi = 'Bình thường — no ấm, cần nỗ lực nhiều'; }
   else { fortune = 'bần tiện'; fortuneVi = 'Khó nhọc — cần dựa Dụng Thần + đúng thời để vươn lên'; }
 
   const paragraphs = [

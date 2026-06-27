@@ -444,7 +444,7 @@ function renderSynthesis(R) {
   const combosHtml = (s.combos && s.combos.length)
     ? `<div class="combos">${s.combos.map((c) => `<span class="combo ${esc(c.tone)}"><b>${esc(c.vi)}</b> <span class="zh small">${esc(c.name)}</span> — ${esc(c.desc)}</span>`).join('')}</div>`
     : '<p class="hint">Không có tổ hợp Thập thần nổi bật.</p>';
-  const gradeTone = s.score >= 68 ? 'cat' : (s.score >= 55 ? 'mid' : 'warn');
+  const gradeTone = s.score >= 52 ? 'cat' : (s.score >= 41 ? 'mid' : 'warn'); // [loop 458] recalibrate neo percentile (中上+cat, 中mid)
   // [loop 110 integrate] quick metrics: 格局成败 + 敌我力量 (tích hợp elevation vào card Tổng Luận)
   const pq = R.patternQuality || {};
   const QVI = { 成格: '✓ Thành cách', 有救: '✓ Bại+cứu', 败格: '⚠ Bại cách', 特殊: '★ Đặc biệt', 未知: '' };
