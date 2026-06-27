@@ -2211,7 +2211,8 @@ assert(JSON.stringify(ss) === JSON.stringify(ssDet), 'sanshishu deterministic');
 // [loop 519] 神煞 formula regression guards (verified accurate vs classical)
 import { TIAN_YI as SS_TIANYI, WEN_CHANG, JIANG_XING, TAO_HUA } from './src/engine/shensha.js';
 assert(JSON.stringify(SS_TIANYI['甲']) === '["丑","未"]', '天乙贵人 甲→丑未');
-assert(WEN_CHANG['辛'] === '寅', '文昌 辛→寅 (loop-21 fix guard)');
+assert(WEN_CHANG['辛'] === '子', '文昌 辛→子 (鼠) theo «庚猪辛鼠壬逢虎» [loop 549 fix]');
+assert(WEN_CHANG['壬'] === '寅', '文昌 壬→寅 (虎)');
 assert(JIANG_XING['A'] === '子' && JIANG_XING['B'] === '午', '将星 申子辰→子, 寅午戌→午');
 assert(TAO_HUA['A'] === '酉', '桃花 申子辰→酉');
 console.log(`   1993 癸酉 →「${ss.pastLife.type} ${ss.pastLife.vi}」@ ${ss.pastLife.location}`);
@@ -5349,7 +5350,7 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   // 文昌: 甲乙巳午 · 丙戊申 · 丁己酉 · 庚亥 · 辛壬寅 · 癸卯
   assert(SH.WEN_CHANG['甲']==='巳' && SH.WEN_CHANG['乙']==='午' && SH.WEN_CHANG['丙']==='申' && SH.WEN_CHANG['戊']==='申', '文昌 甲乙巳午/丙戊申');
   assert(SH.WEN_CHANG['丁']==='酉' && SH.WEN_CHANG['己']==='酉' && SH.WEN_CHANG['庚']==='亥', '文昌 丁己酉/庚亥');
-  assert(SH.WEN_CHANG['辛']==='寅' && SH.WEN_CHANG['壬']==='寅' && SH.WEN_CHANG['癸']==='卯', '文昌 辛壬寅/癸卯 (loop 21 fix 辛→寅 not 子)');
+  assert(SH.WEN_CHANG['辛']==='子' && SH.WEN_CHANG['壬']==='寅' && SH.WEN_CHANG['癸']==='卯', '文昌 辛→子/壬→寅/癸→卯 [loop 549 fix 辛→子 đúng cổ pháp, loop21 nhầm]');
   // 禄神 = 临官位: 甲寅乙卯丙巳戊巳丁午己午庚申辛酉壬亥癸子
   assert(SH.LU_SHEN['甲']==='寅' && SH.LU_SHEN['乙']==='卯' && SH.LU_SHEN['丙']==='巳' && SH.LU_SHEN['戊']==='巳', '禄神 阳干临官 (甲寅乙卯丙戊巳)');
   assert(SH.LU_SHEN['丁']==='午' && SH.LU_SHEN['己']==='午' && SH.LU_SHEN['庚']==='申' && SH.LU_SHEN['辛']==='酉' && SH.LU_SHEN['壬']==='亥' && SH.LU_SHEN['癸']==='子', '禄神 (丁己午/庚辛酉/壬亥癸子)');

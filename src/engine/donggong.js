@@ -192,12 +192,16 @@ export function donggongDay(year, month, day) {
 
   // 冲月 / 合月 kiểm
   const chongMonth = CHONG[dayZhi] === monthZhi;   // chi ngày xung chi tháng
-  const heMonth = SANHE_GROUP[dayZhi] === SANHE_GROUP[monthZhi] && dayZhi !== monthZhi; // tam hợp (không tính chính 月建)
+  // [loop 549 FIX] hợp tháng: 通胜«日辰与月建六合为吉» = LỤC HỢP (子丑/寅亥/卯戌/辰酉/巳申/午未),
+  //   trước đây CHỈ xét tam hợp cục → sót ~92% ngày lục hợp. Nay xét cả lục hợp lẫn tam hợp.
+  const LIUHE = { 子: '丑', 丑: '子', 寅: '亥', 亥: '寅', 卯: '戌', 戌: '卯', 辰: '酉', 酉: '辰', 巳: '申', 申: '巳', 午: '未', 未: '午' };
+  const heMonth = (LIUHE[dayZhi] === monthZhi) || (SANHE_GROUP[dayZhi] === SANHE_GROUP[monthZhi] && dayZhi !== monthZhi);
 
   // Xác định tone cuối (variant có thể đè)
   let tone = base.tone;
   if (variant && variant.extraTone === 'hung') tone = 'hung';
   else if (variant && variant.extraTone === 'cat') tone = 'cat';
+  else if (variant && variant.extraTone === 'binh') tone = 'binh'; // [loop 549 FIX] thiếu nhánh binh
   // Phá nhật luôn xung tháng → đảm bảo hung
   if (officer === '破') tone = 'hung';
 
