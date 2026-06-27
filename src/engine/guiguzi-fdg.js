@@ -108,11 +108,54 @@ export function guiguziFDG(R) {
   const gua = GUA_MAP[combo] || '震';
   const guaInfo = GUA_VI[gua] || GUA_VI['震'];
   const geMing = GE_MING[combo] || 'Phiêu Bạt';
-  const starInfo = STARS[combo] || { star: '(chưa encode)', desc: '' };
-  const summary = `${combo} → quẻ ${guaInfo.vi} | Cách「${geMing}」| ${starInfo.star ? starInfo.star : ''} — ${guaInfo.meaning.slice(0, 80)}`;
+  // [loop 537] generate star desc cho ALL 100 combinations
+  const GAN_NATURE = {
+    '甲': 'Dương Mộc — tiên phong, trực tiếp, cây lớn', '乙': 'Âm Mộc — linh hoạt, hoa cỏ, mềm mại',
+    '丙': 'Dương Hỏa — rực rỡ, nhiệt huyết, mặt trời', '丁': 'Âm Hỏa — ấm áp, đèn soi, tinh tế',
+    '戊': 'Dương Thổ — núi lớn, vững chãi, bao dung', '己': 'Âm Thổ — đất ruộng, thực dụng, nuôi trồng',
+    '庚': 'Dương Kim — kiếm bén, quyết đoán, dũng cảm', '辛': 'Âm Kim — trang sức, tinh xảo, thẩm mỹ',
+    '壬': 'Dương Thủy — biển cả, bao la, bao dung', '癸': 'Âm Thủy — sương móc, thấm nhuần, tinh tế',
+  };
+  let starInfo = STARS[combo];
+  if (!starInfo) {
+    const ganNat = GAN_NATURE[yearGan] || '';
+    const hourNat = GAN_NATURE[hourGan] || '';
+    starInfo = {
+      star: `${guaInfo.vi} Tinh`,
+      desc: `${guaInfo.meaning} Năm ${yearGan}: ${ganNat}. Giờ ${hourGan}: ${hourNat}. Cách "${geMing}" ám chỉ: ${interpGeMing(geMing)}.`,
+    };
+  }
+  const summary = `${combo} → quẻ ${guaInfo.vi} | Cách "${geMing}" | ${starInfo.star || ''} — ${(starInfo.desc || guaInfo.meaning).slice(0, 100)}`;
   return {
     yearGan, hourGan, combo, gua, guaVi: guaInfo.vi, guaNature: guaInfo.nature,
     guaMeaning: guaInfo.meaning, geMing, star: starInfo.star || '',
     starDesc: starInfo.desc || '', summary,
   };
+}
+
+function interpGeMing(gm) {
+  const M = {
+    '雷霆遠震': 'uy lực đồn xa, tiếng tăm lớn', '泊水鴛鴦': 'tình duyên nước, cần giữ mặn nồng',
+    '馬瘦長川': 'vất vả nhưng vượt qua', '春暖鵑啼': 'thời cơ đến, mùa xuân nở rộ',
+    '漁父收綸': 'thu hoạch sau kiên nhẫn', '鳳宿春林': 'quý nhân phù trợ, vinh hiển',
+    '花遇殘愁': 'đẹp nhưng ngắn ngủi', '月遠雲霄': 'lý tưởng cao, khó với',
+    '芳草逢春': 'sinh sôi nảy nở, cơ hội nhiều', '白玉離塵': 'thanh cao, trong sạch',
+    '行穩梅林': 'chắc chắn, bền bỉ', '秋霜肅殺': 'nghiêm khắc, quyết liệt',
+    '雲中孤雁': 'cô đơn nhưng tự do', '石上流水': 'kiên nhẫn, bền bỉ, mài giũa',
+    '風中殘燭': 'mong manh, cần bảo vệ', '林間隱士': 'thích yên tĩnh, ẩn dật',
+    '秋水芙蓉': 'đẹp muộn, nở cuối thu', '月下瑤琴': 'nghệ thuật, tinh tế, lãng mạn',
+    '霜天孤鶴': 'cô đơn, thanh cao', '枯木逢春': 'hồi sinh, cơ hội thứ hai',
+    '寒潭秋月': 'sâu lắng, tĩnh lặng', '日中天': 'đỉnh cao, rực rỡ',
+    '海上乘風': 'phiêu lưu, mạo hiểm', '雷動乾坤': 'uy lực lớn, thay đổi',
+    '山高水長': 'bền vững, trường tồn', '虎嘯山林': 'quyền uy, lãnh đạo',
+    '雨後彩虹': 'hy vọng sau khó khăn', '雪中送炭': 'giúp người lúc nghịch',
+    '破浪乘舟': 'vượt khó, tiên phong', '春雷驚夢': 'thức tỉnh, đột phá',
+    '火中蓮花': 'vượt nghịch mà đẹp', '寒梅傲雪': 'kiên cường, bất khuất',
+    '碧海青天': 'rộng lớn, tự do', '劍氣沖天': 'quyết đoán, vươn lên',
+    '鐵樹開花': 'khó nhưng sẽ thành', '金戈鐵馬': 'trận mạc, quyết chiến',
+    '寶劍出鞘': 'sẵn sàng hành động', '珠玉在前': 'tài năng bộc lộ',
+    '巧匠琢玉': 'tinh xảo, cần mài giũa', '江河日下': 'cần lưu ý xu hướng',
+    '汪洋大海': 'bao dung, sâu thẳm', '滴水穿石': 'kiên nhẫn, bền bỉ',
+  };
+  return M[gm] || 'tính cách và vận mệnh đặc trưng theo cổ pháp';
 }
