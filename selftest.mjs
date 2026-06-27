@@ -1106,6 +1106,8 @@ import { liurenPan, sheHaiCount, zhiShen as lrShen } from './src/engine/liuren.j
 //   → 子涉害 sâu hơn → 取子为初传.
 assert(sheHaiCount('戌', '寅') === 4, `涉害: 戌@寅 = 4重害 (thực ${sheHaiCount('戌','寅')})`);
 assert(sheHaiCount('子', '辰') === 5, `涉害: 子@辰 = 5重害 (thực ${sheHaiCount('子','辰')})`);
+// [loop 552] giờ Tý (hour=0) — `hour || 12` từng nuốt 0→12 (午). Nay hourZhi phải=子.
+assert(liurenPan(2029, 3, 15, 0).hourZhi === '子', `[loop 552] 六壬 hour=0 = 子时 (trước fix SAI=午 do hour||12)`);
 // [2] 孟仲季 helper
 assert(lrShen('寅') === '孟' && lrShen('子') === '仲' && lrShen('辰') === '季', '涉害: 孟/仲/季 classification đúng');
 // [3] Lá số 甲辰亥将卯时 thật (2029-03-15 = 甲辰, 卯时 6h, yuejiang=亥) → 初传 PHẢI = 子, zongMen phải nhắc '涉害'

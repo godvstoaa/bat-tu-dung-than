@@ -276,9 +276,10 @@ export function cezi(char) {
   const cp = s.codePointAt(0);
   const ch = String.fromCodePoint(cp);
   // Bỏ qua nếu không phải ký tự "chữ" (chữ số la-tinh thường, dấu câu thuần)
-  // Cho phép CJK (0x4E00-0x9FFF) + phần mở rộng; cho phép mọi ký tự non-ASCII để test dễ.
-  const isAscii = ch.charCodeAt(0) < 128;
-  if (isAscii && !/[一-鿿]/.test(ch)) return null;
+  // [loop 552 FIX] chỉ chấp nhận ký tự Hán (CJK Unified + Ext A). Trước đây cho phép mọi
+  //   non-ASCII → emoji 🎉/hiragana あ/latin có dấu đều lọt fallback → «bói chữ»vô nghĩa.
+  const isCjk = /[一-鿿㐀-䶿]/.test(ch);
+  if (!isCjk) return null;
 
   // Tra CHARACTER_DATA; nếu không có → fallback
   let data = CHARACTER_DATA[ch];

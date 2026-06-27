@@ -104,7 +104,8 @@ function yuejiangFor(solar) {
  * @returns {{ yuejiang, hGanZhi, sky(12), ke4:[{up,down,rel}], sanchuan, tianjiang(12), dayGui, verdict }}
  */
 export function liurenPan(year, month, day, hour) {
-  const solar = Solar.fromYmdHms(year, month, day, hour || 12, 0, 0);
+  // [loop 552 FIX] hour || 12 nuốt giờ Tý (hour=0 falsy → 12=午). Dùng == null check.
+  const solar = Solar.fromYmdHms(year, month, day, hour == null ? 12 : hour, 0, 0);
   const lunar = solar.getLunar();
   const dGan = lunar.getDayGan(), dZhi = lunar.getDayZhi();
   const hZhi = lunar.getTimeZhi();

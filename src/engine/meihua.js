@@ -102,7 +102,11 @@ function buildGua(lower, upper, dong, src) {
   const bian = bianGua(lower, upper, dong);
   // 互/变 ngũ hành vs thể (quá trình / kết quả)
   const huRel = relOf(ti.wx, TRIGRAMS[hu.upper].wx);
-  const bianRel = relOf(ti.wx, TRIGRAMS[bian.upper].wx);
+  // [loop 552 FIX] bianRel phải so THỂ với DỤNG MỚI (quái có động hào SAU BIẾN). Trước đây
+  //   luôn dùng bian.upper → khi động hào ở HẠ, bian.upper=thể → relOf(thể,thể)=比和 (SAI cho
+  //   ~50% quẻ). Nay chọn quái động sau biến.
+  const bianYongTri = dongInUpper ? bian.upper : bian.lower;
+  const bianRel = relOf(ti.wx, TRIGRAMS[bianYongTri].wx);
   // tổng phán
   let verdict;
   if (rel.d >= 1) verdict = 'CÁT — 本卦 thể dụng tương sinh: nên tiến hành, việc thuận.';
@@ -121,7 +125,8 @@ function buildGua(lower, upper, dong, src) {
 
 /** Helper: từ dương lịch → số âm lịch để gieo */
 export function solarToMhNums(year, month, day, hour, minute) {
-  const s = Solar.fromYmdHms(year, month, day, hour || 12, minute || 0, 0);
+  // [loop 552 FIX] hour || 12 nuốt giờ Tý (hour=0 → 12). Dùng == null check.
+  const s = Solar.fromYmdHms(year, month, day, hour == null ? 12 : hour, minute || 0, 0);
   const l = s.getLunar();
   const yearBranch = l.getYearZhi(); // 子…亥
   const yearNum = '子丑寅卯辰巳午未申酉戌亥'.indexOf(yearBranch) + 1;

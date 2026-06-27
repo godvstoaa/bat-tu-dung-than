@@ -163,8 +163,10 @@ function seq60(gan, zhi) { const gi = GAN10.indexOf(gan), zi = ZHI12.indexOf(zhi
  * 动盘: thêm tầng thời-động (旬首→值符/值使 + 值符随时干 + 八神) lên静盘.
  */
 export function qimenDongPan(year, month, day, hour) {
-  const base = qimenPan(year, month, day, hour || 12);
-  const solar = Solar.fromYmdHms(year, month, day, hour || 12, 0, 0);
+  // [loop 552 FIX] hour || 12 nuốt giờ Tý (hour=0 → 12=午). Dùng == null check.
+  const _h = hour == null ? 12 : hour;
+  const base = qimenPan(year, month, day, _h);
+  const solar = Solar.fromYmdHms(year, month, day, _h, 0, 0);
   const lunar = solar.getLunar();
   const hGan = lunar.getTimeGan(), hZhi = lunar.getTimeZhi();
   const seq = seq60(hGan, hZhi);

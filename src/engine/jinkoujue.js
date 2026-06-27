@@ -185,7 +185,8 @@ export function jinkoujue(month, day, hour, opts = {}) {
   let solar, lunar, dGan, hZhi;
   if (opts.solar && opts.solar.year) {
     // nếu có giờ dương lịch → ưu tiên lấy từ đó (chính xác hơn cho 月将)
-    const h = opts.solar.hour || 12;
+    // [loop 552 FIX] hour || 12 nuốt giờ Tý (hour=0 → 12). Dùng == null check.
+    const h = opts.solar.hour == null ? 12 : opts.solar.hour;
     solar = Solar.fromYmdHms(opts.solar.year, opts.solar.month, opts.solar.day, h, 0, 0);
     lunar = solar.getLunar();
     dGan = opts.dayGan || lunar.getDayGan();
