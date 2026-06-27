@@ -38,13 +38,14 @@ export function personalityNarrative(R) {
     }
   } catch (e) {}
 
-  // --- P3: THẾ LỰC NỘI TẠI (dominant god — sao thập thần chủ đạo chi phối tính cách) ---
+  // --- P3: THẾ LỰC NỘI TẠI (dominant god — sao thập thần chủ đạo + thuận/nghịch Dụng) ---
   try {
     const dg = dominantGod(R);
     const top = dg?.ranked?.[0];
     if (top) {
       const trait = { 'Tỷ Kiên':'độc lập, tự chủ, cạnh tranh', 'Kiếp Tài':'quyết đoán, mạo hiểm, tranh giành', 'Chính Quan':'kỷ luật, trách nhiệm, danh chính', 'Thất Sát':'quyết liệt, dũng cảm, biến động', 'Chính Tài':'thực tế, tiết chế, tài chính', 'Thiên Tài':'kinh doanh, đầu cơ, duyên ngoài', 'Chính Ấn':'sâu sắc, học thuật, bao dung', 'Thiên Ấn':'độc đáo, chuyên môn, lý luận', 'Thực Thần':'an nhàn, sáng tạo, khẩu phúc', 'Thương Quan':'biểu đạt, phản trào, tài năng' }[top.godVi] || '';
-      paras.push(`Thế lực nội tại chi phối mạnh nhất: <b>${top.godVi}</b> (thập thần chủ đạo)${trait ? ' — «' + trait + '»' : ''}.`);
+      // [loop 489] favor relation: khuynh hướng tự nhiên thuận Dụng (đi đúng hướng) hay nghịch (trái, cần khắc phục)
+      paras.push(`Thế lực nội tại chi phối mạnh nhất: <b>${top.godVi}</b> (thập thần chủ đạo)${trait ? ' — «' + trait + '»' : ''}.${dg.favorVi ? ' ' + dg.favorVi : ''}`);
     }
   } catch (e) {}
 
