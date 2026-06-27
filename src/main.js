@@ -3451,13 +3451,13 @@ function renderLiuyue(year) {
   $('liuyue').innerHTML = `
     <p class="hint">Tháng CÁT (nên tiến thủ): <b>${lm.best.map((m) => `T${esc(String(m.m + 1))} ${esc(m.ganZhi)}`).join(', ')}</b> · Tháng KỴ (cẩn thận): <b>${lm.worst.map((m) => `T${esc(String(m.m + 1))} ${esc(m.ganZhi)}`).join(', ')}</b></p>
     <div class="lm-grid">${lm.months.map((m) => {
-      const cls = m.rating === 'Cát' ? 'rate-cat' : m.rating === 'Kỵ' ? 'rate-hung' : m.rating === 'Hơi kỵ' ? 'rate-bad' : 'rate-mid';
+      const cls = rateClass(m.rating); // [loop 470] dùng rateClass (handle Đại cát/Hung mọi vocab)
       const gejuTag = m.gejuDelta > 0 ? '<span class="geju-xi" title="' + esc(m.gejuNote || '') + '">★格局喜</span>'
                     : m.gejuDelta < 0 ? '<span class="geju-ji" title="' + esc(m.gejuNote || '') + '">⚠格局忌</span>'
                     : '';
       const isNow = m.m === curMonth;
-      const isBest = m.score === maxS && m.rating === 'Cát';
-      const isWorst = m.score === minS && m.rating === 'Kỵ';
+      const isBest = m.score === maxS && (m.rating === 'Cát' || m.rating === 'Đại cát');
+      const isWorst = m.score === minS && m.rating === 'Hung';
       const rowCls = isNow ? ' lm-now' : isBest ? ' ln-best-row' : isWorst ? ' ln-worst-row' : '';
       const mark = isNow ? ' ★' : '';
       // [loop 370] badge 太岁/贵人 tháng (taiSui notes — trước đây tính nhưng ẩn)

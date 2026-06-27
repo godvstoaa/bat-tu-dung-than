@@ -137,12 +137,13 @@ export function computeLiuyue(R, solarYear, patternQuality) {
 
     score = Math.max(5, Math.min(95, Math.round(score)));
     let rating;
-    // [loop 469] recalibrate theo percentile (median 47, p15 40, p85 56). Cũ 64/50/38
-    //   → median rơi «Hơi kỵ» (sai — tháng TB phải «Bình»), 55% Hơi kỵ. Nay median→Bình.
-    if (score >= 55) rating = 'Cát';
+    // [loop 469→470] recalibrate percentile + unify vocab với 流年 (Kỵ→Hung) + add Đại cát
+    //   (max ~65 → Đại cát≥62 reachable, highlight «tháng rất tốt» như 大运/流年).
+    if (score >= 62) rating = 'Đại cát';
+    else if (score >= 55) rating = 'Cát';
     else if (score >= 41) rating = 'Bình';
     else if (score >= 34) rating = 'Hơi kỵ';
-    else rating = 'Kỵ';
+    else rating = 'Hung';
     const note = [godVi, ...extraNotes, ...fyNotes].filter(Boolean).join(' · ');
     months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note, taiSui: extraNotes, fuyin: fyNotes });
   }
