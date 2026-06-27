@@ -165,7 +165,9 @@ export function analyzeStrength(chart, wx) {
   const root = tongGen(chart, dmWx).total;       // 得地: tổng thông căn của Nhật Chủ
   const deDia = root >= 1.0;                       // có «rễ» đáng kể
   let sanFaBonus = 0;
-  if (deLenh) sanFaBonus += 0.04;                  // 得令 quyết định (~40%)
+  // [loop 486] 得令 FUNCTIONAL: 进气退气 modulate — 进气 (lệnh đang VÀO) mạnh hơn 退气 (RA suy).
+  //   Cổ法 «进气 Ungасpending, 退气 waning»: 得令 đầu tháng mạnh hơn cuối tháng.
+  if (deLenh) sanFaBonus += (qiPhase === '进气' ? 0.05 : qiPhase === '退气' ? 0.03 : 0.04);
   if (deDia) sanFaBonus += 0.03;                    // 得地 có căn (~30%)
   const effRatio = ratio + sanFaBonus;
 
