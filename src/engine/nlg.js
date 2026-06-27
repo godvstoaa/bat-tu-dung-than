@@ -459,8 +459,8 @@ export function composeAnswer(question, R) {
       lead: `Câu hỏi của tôi chưa rõ thuộc lĩnh vực nào — tôi luân giải chung theo lá số, bạn có thể hỏi cụ thể hơn:`,
       paragraphs: [
         `Chốt lá số: Nhật Chủ ${dm.gan} ${dm.vi} (${R.strength.level}); cách cục ${R.pattern.vi}; Dụng ${favText(y)} / Hỷ ${wxVi(y.xi)} / Kỵ ${wxVi(y.ji)}. Tổng luận: ${s.gradeVi || ''} (${s.score || '?'}/100).`,
-        `Tôi có thể luân giải các mảng: <b>sự nghiệp · tài lộc · tình duyên · sức khoẻ · học vấn · con cái · vận năm/tháng/ngày · cải vận · hợp tuổi · chọn ngày · phong thuỷ nhà · tên</b>.`,
-        `Thử hỏi vd: "Năm 2026 tôi có nên đổi việc?", "Khi nào phát tài?", "Làm sao cải vận?", "Vợ chồng tôi hợp không?" — hoặc bật AI (⚙ GLM-5.2 Z.ai) để trả lời mở hoàn toàn.`,
+        `Tôi có thể luân giải các mảng: <b>sự nghiệp · tài lộc · tình duyên · sức khoẻ · học vấn · con cái · vận năm/tháng/ngày · cải vận · dòng khí (源流) · hợp tuổi · chọn ngày · phong thuỷ nhà · tên</b>.`,
+        `Thử hỏi vd: "Năm 2026 tôi có nên đổi việc?", "Khi nào phát tài?", "Dòng khí mệnh tôi sao?", "Làm sao cải vận?", "Vợ chồng tôi hợp không?" — hoặc bật AI (⚙ GLM-5.2 Z.ai) để trả lời mở hoàn toàn.`,
       ],
       intent,
     };
