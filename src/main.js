@@ -654,11 +654,11 @@ function rateClass(rating) {
   //   Trước đây chỉ map vocab đại vận → 'Đại cát' & 'Đại hung' & 'Hơi kỵ' rơi vào rate-mid
   //   (năm tốt nhất/xấu nhất KHÔNG được tô màu). Bổ sung vocab lưu niên.
   return {
-    'Đại cát': 'rate-cat', 'Cát': 'rate-cat',
+    'Đại cát': 'rate-supercat', 'Cát': 'rate-cat',
     'Hơi thuận': 'rate-good',
     'Bình hòa': 'rate-mid', 'Bình': 'rate-mid',
     'Hơi nghịch': 'rate-bad', 'Hơi kỵ': 'rate-bad',
-    'Hung': 'rate-hung', 'Đại hung': 'rate-hung',
+    'Hung': 'rate-hung', 'Đại hung': 'rate-superhung',
   }[rating] || 'rate-mid';
 }
 function renderDayunInteract(R) {

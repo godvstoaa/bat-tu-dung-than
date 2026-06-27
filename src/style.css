@@ -323,6 +323,9 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .rate-mid { background: rgba(255,255,255,0.08); color: var(--silk-muted); }
 .rate-bad { background: rgba(224,70,58,0.16); color: #f0a99c; }
 .rate-hung { background: rgba(224,70,58,0.28); color: #ff9b89; }
+/* [loop 455] Đại cát/Đại hung — tầng cực «mọi tầng đồng phướng», pop hơn Cát/Hung thường */
+.rate-supercat { background: linear-gradient(135deg, rgba(212,175,55,0.32), rgba(46,158,107,0.22)); color: #f7eccb; border: 1px solid rgba(247,236,203,0.4); box-shadow: 0 0 8px rgba(212,175,55,0.35); }
+.rate-superhung { background: linear-gradient(135deg, rgba(140,20,20,0.4), rgba(224,70,58,0.3)); color: #ffb3a3; border: 1px solid rgba(255,120,100,0.45); box-shadow: 0 0 8px rgba(200,40,40,0.3); }
 
 /* ===== TABS + TOPIC ===== */
 .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
