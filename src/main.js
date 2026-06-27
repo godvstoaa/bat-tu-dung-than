@@ -699,6 +699,8 @@ function renderDaYun(dayun) {
     const mark = isNow ? ' ★' : '';
     const crown = isBest ? '<span class="ln-best" title="Thập kỷ TỐT NHẤT">👑</span>' : '';
     const warn = isWorst ? '<span class="ln-worst" title="Thập kỷ KỴ NHẤT — thủ">⚠</span>' : '';
+    // [loop 446] 空亡 badge — 显示WHY thập kỷ underperform
+    const kwBadge = d._kwNote ? '<span class="ln-kw" title="' + esc(d._kwNote) + '">空</span>' : '';
     const dg = dgMap[d.ganZhi + d.startAge];
     const godVi = dg ? dg.godVi : (dayGan && d.gan ? (TEN_GOD_VI[tenGod(dayGan, d.gan)] || '') : '');
     const themeTitle = dg ? esc(dg.detail || '') : '';
@@ -707,7 +709,7 @@ function renderDaYun(dayun) {
     return `
     <div class="dy ${isNow ? 'dy-now' : ''} ${isBest ? 'ln-best-row' : ''} ${isWorst ? 'ln-worst-row' : ''}">
       <div class="dy-gz"><span class="${wxClass(d.ganWx)}">${esc(d.gan)}</span><span class="${wxClass(d.zhiWx)}">${esc(d.zhi)}</span></div>
-      <div class="dy-vi">${esc(hanviet(d.ganZhi))}${crown}${warn}${mark}${dyNoble.has(d.zhi) ? '<span class="ln-noble" title="Đại vận chi tọa quý nhân (天乙/文昌/将星) — CẢ thập niên được quý nhân phò">🌟</span>' : ''}</div>
+      <div class="dy-vi">${esc(hanviet(d.ganZhi))}${crown}${warn}${mark}${kwBadge}${dyNoble.has(d.zhi) ? '<span class="ln-noble" title="Đại vận chi tọa quý nhân (天乙/文昌/将星) — CẢ thập niên được quý nhân phò">🌟</span>' : ''}</div>
       ${(() => { const n = ganZhiNayin(d.ganZhi); const ni = n && nayinInfo(n); return ni ? `<div class="dy-nayin" title="${esc(ni.meaning || '')}">${esc(n)}(${esc(WX_VI[ni.wx] || ni.wx)})</div>` : ''; })()}
       <div class="dy-god">${godVi ? '<span class="dy-god-tag" title="Thiên can — chủ 5 năm đầu">干 ' + esc(godVi) + '</span>' : ''}${d.zhiGod && TEN_GOD_VI[d.zhiGod] ? '<span class="dy-god-tag dy-god-chi" title="Địa chi本气 — chủ基调 CẢ thập niên («大运重地支»)">' + esc(TEN_GOD_VI[d.zhiGod]) + '</span>' : ''}</div>
       ${themeSub}
