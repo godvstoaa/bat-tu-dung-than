@@ -309,6 +309,16 @@ export function findYongShen(chart, wx, strength, pattern, interactions) {
 }
 
 // Hoàn thiện: gắn Điều Hậu + 用喜忌仇 + relations + tiaohou note
+// [loop 456] chức năng cổ pháp của từng thiên can 窮通寶鑑 调候 dụng thần. Cổ pháp phân biệt
+//   rõ 丙 (sưởi ấm) ≠ 丁 (rèn), 癸 (nhuận) ≠ 壬 (làm mát) — cùng hành nhưng DỤNG khác. Trước
+//   đây note chỉ hiện «丙癸 (hành Hỏa)» → MẤT chức năng cụ thể + SAI khi 2 can khác hành
+//   (vd 甲 tháng Dần cần 丙[Hỏa]+癸[Thủy], ghi «hành Hỏa» che khuất 癸). Nay annotate từng can.
+const TIAO_FUNC = {
+  丙: 'sưởi ấm', 丁: 'rèn luyện', 癸: 'nhuận táo', 壬: 'làm mát',
+  庚: 'tỉa mộc vượng', 辛: 'tỉa gọt tinh', 甲: 'sơ thông thổ cứng', 乙: 'nhu dưỡng nhẹ',
+  戊: 'chắn nước', 己: 'bồi dưỡng',
+};
+const tiaoStemsVi = (raw) => raw.map((s) => `${s}(${GAN[s]?.wx || '?'}: ${TIAO_FUNC[s] || '?'})`).join(' + ');
 function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, interactions, strength, wx) {
   // --- Điều Hậu (调候) theo 窮通寶鑑 — tính TRƯỚC để có thể OVERRIDE Phù Ức ---
   const tiaoRaw = TIAOHOU[chart.dayGan]?.[chart.monthZhi] || [];
@@ -339,7 +349,7 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     avoid = avoid.filter((w) => w !== primary && w !== _newXi);   // gỡ Dụng + Hỷ mới khỏi Kỵ
     for (const w of [_newJi, _newChou]) if (w && !avoid.includes(w)) avoid.push(w); // thêm Kỵ + Thù mới
     method.push('Điều Hậu (调候) — khí hậu thiên lệch, LÀM CHỦ (override Phù Ức)');
-    reasons.push(`🔥 Điều Hậu (调候) OVERRIDE: sinh tháng ${chart.monthZhi} (${clim ? clim.climate : 'khí hậu thiên lệch'}) — 窮通寶鑑 bắt buộc lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) ${clim ? clim.need : ''} làm Dụng Thần CHÍNH, đè Phù Ức (${fuyiPrimary}). Mệnh hàn/nóng quá nặng thì điều hòa khí hậu ưu tiên hơn cân bằng vượng suy.`);
+    reasons.push(`🔥 Điều Hậu (调候) OVERRIDE: sinh tháng ${chart.monthZhi} (${clim ? clim.climate : 'khí hậu thiên lệch'}) — 窮通寶鑑 bắt buộc lấy ${tiaoStemsVi(tiaoRaw)} ${clim ? clim.need : ''} làm Dụng Thần CHÍNH, đè Phù Ức (${fuyiPrimary}). Mệnh hàn/nóng quá nặng thì điều hòa khí hậu ưu tiên hơn cân bằng vượng suy.`);
   }
 
   // --- BỘ 用喜忌仇 (Dụng – Hỷ – Kỵ – Thù) — tính từ primary SAU override ---
@@ -357,18 +367,18 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     : '';
   if (tiaoPrimaryWx) {
     if (tiaoOverride) {
-      climateNote = climatePrefix + `lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''} làm DỤNG CHÍNH (override Phù Ức) vì khí hậu thiên lệch.`;
+      climateNote = climatePrefix + `lấy ${tiaoStemsVi(tiaoRaw)} — ${clim ? clim.need : ''} làm DỤNG CHÍNH (override Phù Ức) vì khí hậu thiên lệch.`;
     } else {
       const agree = tiaoPrimaryWx === primary || tiaoPrimaryWx === secondary;
       const conflict = avoid.includes(tiaoPrimaryWx);
       let body;
       if (agree) {
-        body = `lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''}. Hành này TRÙNG Dụng Thần ⇒ Dụng càng vững (thoả mãn cả cân bằng lẫn khí hậu).`;
+        body = `lấy ${tiaoStemsVi(tiaoRaw)} — ${clim ? clim.need : ''}. Hành này TRÙNG Dụng Thần ⇒ Dụng càng vững (thoả mãn cả cân bằng lẫn khí hậu).`;
         method.push('Điều Hậu (调候)');
       } else if (conflict) {
-        body = `cổ điển lấy ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''}; nhưng cân bằng vượng suy lấy Phù Ức (${primary}) làm chủ, Điều Hậu phối hợp khi thiên lệch.`;
+        body = `cổ điển lấy ${tiaoStemsVi(tiaoRaw)} — ${clim ? clim.need : ''}; nhưng cân bằng vượng suy lấy Phù Ức (${primary}) làm chủ, Điều Hậu phối hợp khi thiên lệch.`;
       } else {
-        body = `gợi ý ${tiaoRaw.join('')} (hành ${tiaoPrimaryWx}) — ${clim ? clim.need : ''} để điều hòa hàn–noãn–táo–thấp; phối hợp cùng Dụng Thần.`;
+        body = `gợi ý ${tiaoStemsVi(tiaoRaw)} — ${clim ? clim.need : ''} để điều hòa hàn–noãn–táo–thấp; phối hợp cùng Dụng Thần.`;
       }
       climateNote = climatePrefix + body;
     }
