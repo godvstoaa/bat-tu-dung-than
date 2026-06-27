@@ -279,6 +279,7 @@ const RB = analyze(1985, 1, 20, 8, 0, 'nu', 2026);
 const hh = computeHehun(RA, RB);
 assert(typeof hh.score === 'number' && hh.factors.length >= 3, '合婚: có điểm + factors');
 assert(hh.factors.some((f) => f.includes('Xung') || f.includes('xung')), '合婚: phát hiện xung Ngọ-Tý');
+assert(hh.factors.some((f) => f.includes('Nạp âm')), '合婚: có factor nạp âm配婚 (loop 530)');
 console.log(`   择日 OK, 宅 ${z1990.guaName}, 合婚 ${hh.rating}(${hh.score})`);
 // [loop 22] 十神 spouse-star cross-check + same-用神 penalty (giới tính-aware).
 //   Cặp: nam 辛 + nữ 乙 → nam nhìn nữ = 偏財 (sao vợ), nữ nhìn nam = 七殺 (sao chồng) → cả 2.
