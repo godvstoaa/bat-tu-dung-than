@@ -687,11 +687,24 @@ export const AI_TOOLS = [
       year: { type: 'integer' }, month: { type: 'integer' }, day: { type: 'integer' }, hour: { type: 'integer' },
     } },
   },
+  { // [loop 543] 鬼谷子 AI tool — user hỏi «Quỷ Cốc Tử mệnh tôi sao?»
+    name: 'analyze_guiguzi', description: '鬼谷子算命 (Guiguzi): 4-trụ nạp âm + 分定經 两头钳 (年干×时干→配卦→命格+格诗+多层VN). Dùng khi user hỏi «Quỷ Cốc Tử», «鬼谷子», «phân định kinh», «mệnh tôi theo cổ thư». Trả full analysis.',
+    parameters: { type: 'object', properties: {} },
+  },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
 export function execTool(name, args, R) {
   const a = args || {};
+  // [loop 558 FIX BUG2] validate required params TRƯỚC khi gọi engine — tránh crash rác
+  //   (vd analyze_day thiếu year → «wrong solar year undefined» tiếng Anh). Trả error VN sạch.
+  const _tool = AI_TOOLS.find((t) => t?.function?.name === name);
+  const _req = (_tool?.function?.parameters?.required) || [];
+  for (const k of _req) {
+    if (a[k] === undefined || a[k] === null || a[k] === '') {
+      return { error: `Thiếu tham số bắt buộc «${k}» cho tool ${name}.` };
+    }
+  }
   try {
     switch (name) {
       case 'get_current_time': {
@@ -713,9 +726,11 @@ export function execTool(name, args, R) {
         return { year: Y.year, best: Y.best.slice(0, 8).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })), worst: Y.worst.slice(0, 5).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })) };
       }
       case 'analyze_char': { // [loop 495] 测字 via AI chat
-        const ch = (a.char || '').trim();
-        if (!ch) return { error: 'Cần 1 chữ Hán để测字.' };
+        const ch = (a.char || '').trim().slice(0, 4);
+        // [loop 558 FIX BUG4] guard ký tự không-Hán — cezi() trả null → trước đây null deref crash.
+        if (!ch || !/[一-鿿㐀-䶿]/.test(ch)) return { error: 'Cần đúng 1 chữ Hán (Hán tự) để测字.' };
         const cz = cezi(ch);
+        if (!cz) return { error: `Chữ «${ch}» chưa có trong dữ liệu测字 — thử chữ Hán phổ biến khác.` };
         return {
           char: ch,
           radical: cz.radical, strokes: cz.strokes, wx: cz.wx, wxVi: cz.wxVi,
@@ -834,7 +849,14 @@ export function execTool(name, args, R) {
 }
 
 function toolLabel(name) {
-  return ({ get_current_time: 'Lấy thời gian', analyze_day: 'Luận lưu ngày', analyze_year: 'Luận lưu năm', best_days_in_year: 'Tìm ngày tốt', life_trajectory: 'Quỹ tích đời', analyze_month: 'Luận lưu tháng', find_good_days: 'Tìm ngày tốt' })[name] || name;
+  // [loop 558 FIX BUG8] đầy đủ 14 tool — trước đây chỉ 7, tool còn lại hiện tên kỹ thuật.
+  return ({
+    get_current_time: 'Lấy thời gian', analyze_day: 'Luận lưu ngày', analyze_year: 'Luận lưu năm',
+    best_days_in_year: 'Tìm ngày tốt cả năm', life_trajectory: 'Quỹ tích đời', analyze_month: 'Luận lưu tháng',
+    find_good_days: 'Tìm ngày tốt', analyze_best_hour: 'Tìm giờ tốt', analyze_partner: 'Luận hợp hôn',
+    inverse_bazi: 'Tìm bát tự ngược', analyze_char: '测字 (châm tự)', analyze_meihua: 'Gieo quẻ梅花',
+    analyze_liuren: 'Đại lục nhâm', analyze_qimen: 'Kỳ môn độn giáp', analyze_guiguzi: 'Quỷ cốc tử',
+  })[name] || name;
 }
 
 // ===========================================================================

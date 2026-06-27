@@ -187,6 +187,17 @@ assert(CLIMATE && Object.keys(CLIMATE).length === 12, 'CLIMATE đủ 12 nguyệt
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic
 const R1990 = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
 assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴天髓 辛');
+// [loop 558] execTool: validate required params + guard analyze_char không-Hán (trước đây crash rác).
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  const eDay = execTool('analyze_day', {}, R);
+  assert(eDay.error && eDay.error.includes('Thiếu tham số'), `[loop 558] analyze_day thiếu param → error VN sạch (không crash rác), got ${eDay.error}`);
+  const eChar = execTool('analyze_char', { char: '<x>' }, R);
+  assert(eChar.error && eChar.error.includes('chữ Hán'), `[loop 558] analyze_char không-Hán → error VN (không null deref crash), got ${eChar.error}`);
+  const okChar = execTool('analyze_char', { char: '福' }, R);
+  assert(okChar.char === '福' && okChar.radical, `[loop 558] analyze_char「福」hợp lệ vẫn hoạt động`);
+  console.log(`   execTool ✓ — validate required + analyze_char guard (error VN sạch, không crash rác)`);
+}
 assert(R1990.yong.tiaohou.note.includes('Hạ'), 'tiaohou note gắn khí hậu mùa (Hạ)');
 // [loop 34] 调候 OVERRIDE: 1990 辛午 (cực nhiệt) → 窮通寶鑑 lấy 壬水 → Dụng=Thủy (override Phù Ức)
 assert(R1990.yong.tiaohou.override === true && R1990.yong.primary === '水', `1990 辛午 调候 OVERRIDE → Dụng=Thủy (được override=${R1990.yong.tiaohou.override}, primary=${R1990.yong.primary})`);
