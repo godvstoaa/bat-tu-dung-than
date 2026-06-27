@@ -213,13 +213,32 @@ export function guiguziFDG(R) {
     };
   }
   const shiInfo = GE_SHI[combo];
+  // [loop 542] For non-甲 combos (no classical 格诗): generate synthetic VN analysis
+  //   from 卦 + 格名 + 年干 so EVERY user gets same card richness.
+  let geShi = shiInfo?.shi || '';
+  let geShiAnalysis = shiInfo?.analysis || null;
+  if (!geShiAnalysis) {
+    geShiAnalysis = generateAnalysis(combo, gua, guaInfo, geMing, starInfo, GAN_NATURE[yearGan], GAN_NATURE[hourGan]);
+  }
   const summary = `${combo} → quẻ ${guaInfo.vi} | Cách "${geMing}" | ${starInfo.star || ''} — ${(starInfo.desc || guaInfo.meaning).slice(0, 100)}`;
   return {
     yearGan, hourGan, combo, gua, guaVi: guaInfo.vi, guaNature: guaInfo.nature,
     guaMeaning: guaInfo.meaning, geMing, star: starInfo.star || '',
-    starDesc: starInfo.desc || '', geShi: shiInfo?.shi || '', geShiAnalysis: shiInfo?.analysis || null,
+    starDesc: starInfo.desc || '', geShi, geShiAnalysis,
     summary,
   };
+}
+
+// [loop 542] Generate synthetic multi-layer analysis for non-甲 combinations
+function generateAnalysis(combo, gua, guaInfo, geMing, starInfo, yearNat, hourNat) {
+  const interp = interpGeMing(geMing);
+  return [
+    `Câu 1: Cách「${geMing}」— ${interp}. Quẻ ${guaInfo.vi} mang tính «${guaInfo.nature}», ảnh hưởng toàn bộ cuộc đời.`,
+    `Câu 2: Năm ${combo[0]} (${yearNat}) kết hợp giờ ${combo[1]} (${hourNat}) → ${starInfo.star || guaInfo.vi + ' tinh'}: ${starInfo.desc?.slice(0, 100) || guaInfo.meaning.slice(0, 80)}`,
+    `Câu 3: ${guaInfo.meaning}`,
+    `Câu 4: Trong tình duyên/hôn nhân — quẻ ${guaInfo.vi} ${guaInfo.vi.includes('Bền') || guaInfo.vi.includes('Vượt') ? 'cho thấy cần kiên nhẫn, duyên muộn nhưng bền' : guaInfo.vi.includes('Mạnh') || guaInfo.vi.includes('Sấm') ? 'cho thấy tính cách mạnh, cần người bao dung' : guaInfo.vi.includes('Phong') || guaInfo.vi.includes('Vui') ? 'cho thấy duyên đa dạng, cần chọn lọc' : 'cho thấy duyên cần nỗ lực vun đắp'}.`,
+    `TỔNG: ${guaInfo.vi} (${guaInfo.nature}) + cách「${geMing}」(${interp}) → ${(starInfo.desc || guaInfo.meaning).slice(0, 60)} Cần phát huy điểm mạnh («${guaInfo.nature}»), khắc phục điểm yếu theo lời khuyên trên.`,
+  ];
 }
 
 function interpGeMing(gm) {
