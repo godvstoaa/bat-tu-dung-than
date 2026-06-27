@@ -215,10 +215,13 @@ export function donggongDay(year, month, day) {
   score = Math.max(5, Math.min(97, Math.round(score)));
 
   let rating;
+  // [loop 460] recalibrate: 董公 score BIMODAL + neutral spike — bad cluster 12-24, ~30% ngày
+  //   tại baseline 50, good cluster 60-88, dải 25-49 TRỐNG. Cũ «Hơi kỵ» (30-45) = DEAD tier.
+  //   Hạ ngưỡng «Hơi kỵ» xuống 18 để tách bad cluster (18-24=Hơi kỵ, <18=Kỵ) — cả tier reachable.
   if (score >= 75) rating = 'Đại cát';
   else if (score >= 60) rating = 'Cát';
   else if (score >= 45) rating = 'Bình';
-  else if (score >= 30) rating = 'Hơi kỵ';
+  else if (score >= 18) rating = 'Hơi kỵ';
   else rating = 'Kỵ';
 
   // activities: gom good list thành phrase ngắn cho UI
