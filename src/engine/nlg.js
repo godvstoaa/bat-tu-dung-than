@@ -10,6 +10,8 @@ import { scanMarriageTiming } from './marriage-timing.js';
 import { scanWealthCareerYingqi } from './yingqi-wealth.js';
 import { jiaoYunAnalysis } from './jiaoyun.js';
 import { decadeForecast } from './decade-forecast.js';
+import { cezi } from './cezi.js';
+import { castByTime, solarToMhNums } from './meihua.js';
 import { analyzeTaohua } from './taohua.js';
 import { marriageStars } from './marriage-stars.js';
 import { starPower } from './star-power.js';
@@ -64,6 +66,7 @@ const INTENT_KEYWORDS = {
   personality: ['tính cách', 'bản mệnh', 'con người', 'tướng', 'khí chất', 'bản chất', 'người như thế nào', 'cấu hình', 'cách cục', 'sát ấn', 'thương quan', 'quan sát', 'tỷ kiếp', '格局'],
   remedy: ['cải mệnh', 'cải vận', 'làm sao để', 'nên làm gì', 'làm gì', 'cách', 'hóa giải', 'tăng', 'giảm', 'tránh', 'phương pháp', 'khắc phục', 'thay đổi', 'cải thiện', 'khai vận', 'bổ mệnh', 'sống ở đâu', 'thành phố', 'phong thủy'],
   flow: ['dòng khí', 'lưu thông', 'khí mệnh', 'nguồn khí', 'dòng chảy', 'thông khí', '源流', 'khí lưu', 'nguồn lực mệnh', 'tắc khí'],
+  divination: ['gieo quẻ', '起卦', '占', 'lắc quẻ', 'quẻ dịch', 'bói quẻ', 'meihua', 'thảo quẻ', 'quẻ hôm', '测字', 'châm tự', 'xem chữ', 'phép bói'],
 };
 
 export function detectIntent(question) {
@@ -73,6 +76,8 @@ export function detectIntent(question) {
   const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|nam nay|nam sau|bao gio)\b/.test(norm) || years.length > 0;
   const isYesNo = /\b(co nen|co duoc khong|nen khong|duoc khong|co tot khong|co xau khong|co the|lieu co)\b/.test(norm);
   const isCompat = /\b(hop khong|hop nhau|xung khac|theo khong|phu hop)\b/.test(norm);
+  // [loop 497] divination intent (起卦/测字 CJK ngắn → confidence <3 → bypass như isCompat)
+  const isDivination = /\b(gieo que|lac que|que dich|boi que|thao que|cham tu)\b/.test(norm) || /起卦|测字|占卦|占卜/.test(question);
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
@@ -86,7 +91,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -400,6 +405,39 @@ function pFlow(R) {
   return { title: 'Dòng khí ngũ hành 源流', paragraphs: lines };
 }
 
+// [loop 497] divination offline — 测字 (nếu user gõ chữ Hán) hoặc 梅花易数 起卦 (time).
+function pDivination(R, intent) {
+  const q = intent?.raw || '';
+  const cjk = q.match(/[一-鿿]/g);
+  const isCezi = /测字|châm tự|xem chữ|chữ hán/i.test(q);
+  // 测字 nếu user cung cấp chữ Hán + hỏi测字
+  if (isCezi && cjk && cjk.length) {
+    try {
+      const ch = cjk[cjk.length - 1]; // lấy chữ Hán cuối (thường là chữ cần测)
+      const cz = cezi(ch);
+      return { title: `测字 «${ch}»`, paragraphs: [
+        `Chữ «${ch}» — bộ ${cz.radical} (${cz.strokes} nét 康熙), ngũ hành ${cz.wxVi}.`,
+        cz.hexagram ? `Gieo quẻ 梅花易数 → <b>${cz.hexagram.nameVi || cz.hexagram.name}</b>${cz.hexagram.meaning ? ': ' + cz.hexagram.meaning.slice(0, 80) : ''}.` : '',
+        cz.summary ? `Luận: ${cz.summary.slice(0, 120)}.` : '',
+      ].filter(Boolean) };
+    } catch (e) {}
+  }
+  // ngược lại: 梅花易数 起卦 theo thời điểm hiện tại
+  try {
+    const now = new Date();
+    const nums = solarToMhNums(now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes());
+    const r = castByTime(nums);
+    const rel = r.rel?.vi || '';
+    return { title: '梅花易数 起卦', paragraphs: [
+      `Thời điểm ${nums.label} → <b>本卦 ${r.ben?.name || '?'}</b>${r.dong ? ` (动爻 ${r.dongInUpper ? 'thượng' : 'hạ'} ${r.dong})` : ''} → <b>变卦 ${r.bian?.name || '?'}</b>. 互卦 ${r.hu?.name || '?'}.`,
+      `Thể ${r.ti?.vi || ''}(${r.ti?.wx || ''}) ↔ Dụng ${r.yong?.vi || ''}(${r.yong?.wx || ''}): ${rel}.`,
+      `Verdict: <b>${(r.verdict || '').slice(0, 150)}</b>`,
+    ].filter(Boolean) };
+  } catch (e) {
+    return { title: 'Bói toán', paragraphs: ['Không gieo quẻ được lúc này.'] };
+  }
+}
+
 function pFreeForm(R, intent) {
   // Composer "bất kỳ câu hỏi" — khi không khớp lĩnh vực cụ thể, dệt câu trả lời
   // theo TOÀN BỘ lá số + bất kỳ từ khoá nào phát hiện được trong câu hỏi.
@@ -427,7 +465,7 @@ function pFreeForm(R, intent) {
 const COMPOSERS = {
   personality: pPersonality, career: pCareer, wealth: pWealth, love: pLove,
   health: pHealth, study: pStudy, children: pChildren, travel: pTravel,
-  power: pPower, family: pLove, timing: pTiming, remedy: pRemedy, flow: pFlow, general: pFreeForm,
+  power: pPower, family: pLove, timing: pTiming, remedy: pRemedy, flow: pFlow, divination: pDivination, general: pFreeForm,
 };
 
 // ---------------------------------------------------------------------------
@@ -450,9 +488,16 @@ export function composeAnswer(question, R) {
     };
   }
 
+  // [loop 497] divination intent (起卦/测字) — ưu tiên TRƯỚC confidence fallback
+  //   (CJK keywords 2 chars → confidence <3, nhưng là lệnh rõ ràng → bypass)
+  if (intent.isDivination) {
+    const block = pDivination(R, intent);
+    return { title: block.title, lead: `Bạn hỏi về bói toán / gieo quẻ. Kết quả:`, paragraphs: block.paragraphs, intent };
+  }
+
   // Câu hỏi TỰ DO / khó hiểu (confidence thấp, không khớp lĩnh vực) → fallback khéo léo
   // Vẫn trả lời được: mở bằng chốt lá số + gợi ý hỏi lại cụ thể (luân giải "bất kỳ câu").
-  if (!intent.isTiming && intent.confidence < 3) {
+  if (!intent.isTiming && !intent.isDivination && intent.confidence < 3) {
     const dm = R.chart.dayMaster, y = R.yong, s = R.synthesis || {};
     return {
       title: 'Luận theo lá số (câu hỏi mở)',
