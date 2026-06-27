@@ -2069,12 +2069,16 @@ function renderEventPredict(R) {
     const rows = ev.years.map((y) => {
       const dupe = y.sameGod ? ' <span class="combo cat">★ NHÂN ĐÔI</span>' : '';
       const noble = y.ganZhi && epNoble.has(y.ganZhi[1]) ? ' <span class="ln-noble" title="Năm có quý nhân">🌟</span>' : '';
+      // [loop 491] tone favor-aware — màu viền + badge (cat=xanh, hung=đỏ, neutral=vàng)
+      const toneCls = y.tone === 'cat' ? 'rate-cat' : y.tone === 'hung' ? 'rate-hung' : 'rate-mid';
+      const toneBorder = y.tone === 'cat' ? 'var(--jade)' : y.tone === 'hung' ? 'var(--cinnabar)' : 'var(--gold-bright, #d4af37)';
+      const toneBadge = ` <span class="ln-rate ${toneCls}">${y.tone === 'cat' ? 'CÁT' : y.tone === 'hung' ? 'HUNG' : 'trung'}</span>`;
       // [loop 239] hiển thị lnArea/dyArea + events (trước đây chỉ advice)
       const lnHtml = y.lnArea ? `<div class="hint"><b>📅 Lưu niên ${esc(y.lnGodVi||'')}</b> → ${esc(y.lnArea)}${y.lnEvents && y.lnEvents.length ? ': ' + y.lnEvents.map(esc).join(', ') : ''}</div>` : '';
       const dyHtml = y.dyArea ? `<div class="hint"><b>🛤️ Đại vận ${esc(y.dyGodVi||'')}</b> → ${esc(y.dyArea)}${y.dyEvents && y.dyEvents.length ? ': ' + y.dyEvents.map(esc).join(', ') : ''}</div>` : '';
       const combHtml = y.combinedEvents && y.combinedEvents.length ? `<div class="hint" style="color:var(--gold-bright,#d4af37)"><b>⚡ Kích hoạt kép:</b> ${y.combinedEvents.map(esc).join(', ')}</div>` : '';
-      return `<div class="yz-row" style="border-left:3px solid var(--gold-bright, #d4af37);margin:4px 0;padding-left:8px">
-        <b>${y.year}</b> <span class="zh">${esc(y.ganZhi)}</span>${dupe}${noble}
+      return `<div class="yz-row" style="border-left:3px solid ${toneBorder};margin:4px 0;padding-left:8px">
+        <b>${y.year}</b> <span class="zh">${esc(y.ganZhi)}</span>${toneBadge}${dupe}${noble}
         ${lnHtml}${dyHtml}${combHtml}
         <div class="hint" style="margin-top:2px">${esc(y.advice)}</div>
       </div>`;
