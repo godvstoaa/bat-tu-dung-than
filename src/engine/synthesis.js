@@ -89,6 +89,17 @@ export function synthesize(R) {
     factors.push(`Không vong (空亡): ${kw.affected.length} trụ rơi旬空 (${kw.affected.map((a) => a.pos).join('/')}) → tàng can «treo» («空则不实»), ${penalty}.`);
   }
 
+  // [loop 457] 源流 (ngũ hành lưu thông — 滴天髓源流篇) — chiều đo thứ 6.
+  //   Trước đây 源流 (loop 452) chỉ là card độc lập, KHÔNG ảnh hưởng tổng luận. Nay tích hợp:
+  //   khí流通 tuần hoàn (源远流长) = mệnh thuận hoà (+5); khí trệ = tài khó phát huy (−4).
+  const yl = R.yuanliu;
+  if (yl) {
+    if (yl.fullCycle) { score += 5; factors.push(`源流 源远流长 — ngũ hành lưu thông tuần hoàn (5/5) → khí mệnh thuận hoà, phú quý bền, +5.`); }
+    else if (yl.flowLen >= 3) { score += 2; factors.push(`源流 dòng khí thông ${yl.flowLen}/5, quy ${yl.aspectKey} (${yl.aspectVi}) → khía cạnh ${yl.aspectKey} hữu duyên, +2.`); }
+    else if (yl.flowLen <= 1) { score -= 4; factors.push(`源流 khí trệ (chỉ ${yl.flowLen}/5) — nguồn ${wxVi(yl.source)} vượng nhưng dòng tắc → tài năng khó phát huy, cần vận «mở dòng», −4.`); }
+    // flowLen === 2: trung tính (khí chảy vừa, không thưởng/phạt)
+  }
+
   score = Math.max(0, Math.min(100, Math.round(score)));
 
   // --- Đẳng cấp ---
