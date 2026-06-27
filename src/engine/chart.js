@@ -21,6 +21,7 @@ import { scoreLiunianYear } from './liunian-pro.js'; // [cycle 44] dùng chung s
 import { analyzeKongwang } from './kongwang.js'; // [loop 148] 空亡 effect on scoring
 import { tongGen } from './tonggen.js'; // [loop 451] 得地 (thông căn) cho 三法 feedback vượng suy
 import { analyzeYuanLiu } from './yuanliu.js'; // [loop 452] 源流 dòng khí ngũ hành (滴天髓源流篇)
+import { analyzePillarQuality } from './pillar-quality.js'; // [loop 468] 盖头截脚 feed synthesis
 export { synthesize };
 
 export { tenGod, changSheng };
@@ -672,12 +673,14 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
     if (patternQualityResult) liunian = adjustLiunianByGeju(liunian, patternQualityResult, chart.dayGan);
   } catch (e) { /* fallback: giữ liunian tầng 5 trường phái */ }
   let synthesis = {};
-  try { synthesis = synthesize({ chart, wx, strength, interactions, shensha, pattern, yong, patternQuality: patternQualityResult, dayun, yuanliu, kongwang }); } catch (e) { synthesis = { paragraphs: [] }; }
+  // [loop 468] 盖头截脚 — tính trước synthesis (cần {chart,yong}), feed vào tổng luận.
+  const pillarQualResult = (() => { try { return analyzePillarQuality({ chart, yong }); } catch (e) { return null; } })();
+  try { synthesis = synthesize({ chart, wx, strength, interactions, shensha, pattern, yong, patternQuality: patternQualityResult, dayun, yuanliu, kongwang, pillarQuality: pillarQualResult }); } catch (e) { synthesis = { paragraphs: [] }; }
   // [loop 466 FIX BUG CAO] truyền yuanliu + kongwang vào synthesize. Trước đây synthesize
   //   nhận object THIẾU 2 field này → 源流 factor (loop 457) VÀ 空亡 penalty (loop 150) là
   //   DEAD CODE trong production (R.yuanliu/R.kongwang undefined → if(yl)/if(kw) skip).
   //   Tổng luận bỏ qua dòng khí + trụ void-pillar suốt! Nay fix → 2 factor activate.
-  const full = { chart, wx, strength, interactions, shensha, pattern, yong, dayun, liunian, synthesis, patternQuality: patternQualityResult, kongwang };
+  const full = { chart, wx, strength, interactions, shensha, pattern, yong, dayun, liunian, synthesis, patternQuality: patternQualityResult, kongwang, pillarQuality: pillarQualResult };
   try { full.liuqin = analyzeLiuqin(full); } catch (e) { full.liuqin = []; }
   try { full.remedy = buildRemedy(full); } catch (e) { full.remedy = { twelveLaws: [] }; }
   // [loop 452] 源流 dòng khí ngũ hành — đọc độc lập từ wx (không cascade/đổi score).

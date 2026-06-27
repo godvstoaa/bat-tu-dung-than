@@ -54,7 +54,7 @@ export function analyzePillarQuality(R) {
   const dung = new Set([R.yong?.primary, R.yong?.xi].filter(Boolean));
   const ji = new Set([R.yong?.ji].filter(Boolean));
   const perPillar = {};
-  let gaijieCount = 0, flowSum = 0;
+  let gaijieCount = 0, flowSum = 0, dungHits = 0, jiHits = 0;
   const damagedList = [];
 
   for (const k of ['year', 'month', 'day', 'time']) {
@@ -70,8 +70,8 @@ export function analyzePillarQuality(R) {
       const 克gan = rel.type === '截脚';                       // chi khắc can
       const 克zhi = rel.type === '盖头';                       // can khắc chi
       const hit = [];
-      if (克gan) { if (dung.has(ganWx)) hit.push(`can ${WX_VI[ganWx]}=DỤNG bị khắc → Dụng tổn`); if (ji.has(ganWx)) hit.push(`can ${WX_VI[ganWx]}=KỴ bị khắc → tốt`); }
-      if (克zhi) { if (dung.has(zhiWx)) hit.push(`chi ${WX_VI[zhiWx]}=DỤNG bị khắc → Dụng tổn`); if (ji.has(zhiWx)) hit.push(`chi ${WX_VI[zhiWx]}=KỴ bị khắc → tốt`); }
+      if (克gan) { if (dung.has(ganWx)) { hit.push(`can ${WX_VI[ganWx]}=DỤNG bị khắc → Dụng tổn`); dungHits++; } if (ji.has(ganWx)) { hit.push(`can ${WX_VI[ganWx]}=KỴ bị khắc → tốt`); jiHits++; } }
+      if (克zhi) { if (dung.has(zhiWx)) { hit.push(`chi ${WX_VI[zhiWx]}=DỤNG bị khắc → Dụng tổn`); dungHits++; } if (ji.has(zhiWx)) { hit.push(`chi ${WX_VI[zhiWx]}=KỴ bị khắc → tốt`); jiHits++; } }
       perPillar[k] = { ...rel, ganZhi: p.gan + p.zhi, damaged: true, impact: hit.join('; ') || 'không trúng Dụng/Kỵ trực tiếp' };
     } else {
       perPillar[k] = { ...rel, ganZhi: p.gan + p.zhi, damaged: false };
@@ -94,7 +94,7 @@ export function analyzePillarQuality(R) {
   if (dayShen) summary += `Nhật trụ ${dayGz} = ${SHEN_VI[dayShen]} (${SHEN_MEAN[dayShen]}) — tính chất cốt lõi bản mệnh mang hơi hướng này.`;
   else summary += `Nhật trụ ${dayGz} không thuộc nhóm tiến/thoái/giao/phục thần (trung tính).`;
 
-  return { perPillar, gaijieCount, flowOk, dayShen, dayShenVi: dayShen ? SHEN_VI[dayShen] : null, yearShen, summary };
+  return { perPillar, gaijieCount, dungHits, jiHits, flowOk, dayShen, dayShenVi: dayShen ? SHEN_VI[dayShen] : null, yearShen, summary };
 }
 
 export { SHEN_VI, SHEN_MEAN };

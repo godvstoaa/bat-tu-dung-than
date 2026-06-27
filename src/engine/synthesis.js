@@ -100,6 +100,23 @@ export function synthesize(R) {
     // flowLen === 2: trung tính (khí chảy vừa, không thưởng/phạt)
   }
 
+  // [loop 468] 盖头截脚 — can-chi khắc nhau TRONG trụ. Context-dependent (滴天髓 气通):
+  //   trụ 盖头/截脚 trúng DỤNG → Dụng bị khắc yếu (−2/hit); trúng KỴ → khắc được忌 = tốt (+1/hit).
+  //   pillar-quality đã đếm dungHits/jiHits. Trước đây tổng luận bỏ qua (chỉ tính ở render).
+  const pql = R.pillarQuality;
+  if (pql && pql.gaijieCount > 0) {
+    let pqDelta = 0;
+    if (pql.dungHits) pqDelta += -2 * pql.dungHits;
+    if (pql.jiHits) pqDelta += 1 * pql.jiHits;
+    if (pqDelta !== 0) {
+      score += pqDelta;
+      const why = [];
+      if (pql.dungHits) why.push(`${pql.dungHits} trụ 盖头/截脚 trúng DỤNG → Dụng bị khắc yếu (${-2 * pql.dungHits})`);
+      if (pql.jiHits) why.push(`${pql.jiHits} trụ trúng KỴ → khắc được忌, lợi (+${pql.jiHits})`);
+      factors.push(`盖头截脚 (${pql.gaijieCount}/4 trụ can-chi khắc): ${why.join('; ')}.`);
+    }
+  }
+
   score = Math.max(0, Math.min(100, Math.round(score)));
 
   // --- Đẳng cấp ---

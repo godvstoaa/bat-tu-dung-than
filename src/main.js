@@ -1613,7 +1613,7 @@ function renderPillarQuality(R) {
   const el = $('pillar-quality');
   if (!el) return;
   try {
-    const pq = analyzePillarQuality(R);
+    const pq = R.pillarQuality || analyzePillarQuality(R); // [loop 468] tái dụng R.pillarQuality (tránh recompute)
     // [loop 190] hiển thị chi tiết 盖头/截脚 từng trụ (trước đây chỉ show summary)
     const POS = [['year', 'Niên'], ['month', 'Nguyệt'], ['day', 'Nhật'], ['time', 'Thời']];
     const rows = POS.map(([k, vi]) => {
