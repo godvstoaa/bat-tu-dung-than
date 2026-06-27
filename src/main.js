@@ -648,18 +648,22 @@ function renderNobleStars(R) {
 
 // ---------------------------------------------------------------- ĐẠI VẬN / LƯU NIÊN
 function rateClass(rating) {
-  // [loop 162 fix] Hỗ trợ CẢ HAI hệ rating:
-  //   • Đại vận (computeDaYun): Cát / Hơi thuận / Bình hòa / Hơi nghịch / Hung
-  //   • Lưu niên (scoreLiunianYear): Đại cát / Cát / Bình / Hơi kỵ / Hung / Đại hung
-  //   Trước đây chỉ map vocab đại vận → 'Đại cát' & 'Đại hung' & 'Hơi kỵ' rơi vào rate-mid
-  //   (năm tốt nhất/xấu nhất KHÔNG được tô màu). Bổ sung vocab lưu niên.
-  return {
-    'Đại cát': 'rate-supercat', 'Cát': 'rate-cat',
-    'Hơi thuận': 'rate-good',
-    'Bình hòa': 'rate-mid', 'Bình': 'rate-mid',
-    'Hơi nghịch': 'rate-bad', 'Hơi kỵ': 'rate-bad',
-    'Hung': 'rate-hung', 'Đại hung': 'rate-superhung',
-  }[rating] || 'rate-mid';
+  // [loop 162→463] Map rating vocab → CSS class. Đa hệ thống dùng vocab khác nhau
+  //   (大运: Cát/Hơi thuận/Hung · 流年: Đại cát/Cát/Hơi kỵ · daily/donggong: Kỵ ·
+  //   hehun: Hợp/Không hợp · jinkoujue/qinxing: CÁT/HUNG CHỮ HOA · tiers: CẦN HÓA GIẢI).
+  //   Trước đây chỉ map vocab 大运+流年 → «Kỵ», «Hợp», «CÁT»(hoa) rơi rate-mid SAI
+  //   (bad bị tô xám trung tính). Nay normalize lower-case + map đầy đủ mọi hệ.
+  const low = String(rating || '').trim().toLowerCase();
+  const MAP = {
+    'đại cát': 'rate-supercat', 'đại hợp': 'rate-supercat',
+    'cát': 'rate-cat', 'hợp': 'rate-cat',
+    'cát nhẹ': 'rate-good', 'hơi thuận': 'rate-good',
+    'bình': 'rate-mid', 'bình hòa': 'rate-mid', 'trung': 'rate-mid', 'trung bình': 'rate-mid',
+    'hơi nghịch': 'rate-bad', 'hơi kỵ': 'rate-bad', 'tiểu kỵ': 'rate-bad', 'cần hóa giải': 'rate-bad',
+    'hung': 'rate-hung', 'kỵ': 'rate-hung', 'khắc': 'rate-hung', 'không hợp': 'rate-hung',
+    'đại hung': 'rate-superhung', 'đại khắc': 'rate-superhung',
+  };
+  return MAP[low] || 'rate-mid';
 }
 function renderDayunInteract(R) {
   const el = $('dayun-interact');
