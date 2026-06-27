@@ -8,11 +8,13 @@ import { GAN, WX_VI } from './constants.js';
 import { nayinInfo } from './nayin.js';
 
 const ORGAN = {
-  木: { vi: 'Mộc', organs: 'Gan – Mật, hệ thần kinh, mắt, gân cốt', risk: 'gan nóng, thị lực, căng thẳng thần kinh, giận dữ', foods: 'rau xanh, chanh, trà xanh, ngũ cốc' },
-  火: { vi: 'Hỏa', organs: 'Tim – Ruột non, huyết mạch, mắt', risk: 'tim mạch, huyết áp, mất ngủ, lo âu', foods: 'vị đắng, cà chua, trà đỏ, cà phê (vừa)' },
-  土: { vi: 'Thổ', organs: 'Tỳ – Vị, hệ tiêu hoá, cơ nhục', risk: 'tiêu hoá, dạ dày, đường huyết, lo nghĩ', foods: 'vị ngọt, khoai, củ, gạo, đậu' },
-  金: { vi: 'Kim', organs: 'Phổi – Đại tràng, hệ hô hấp, da lông', risk: 'hô hấp, phổi, da, dị ứng', foods: 'vị cay, hành tỏi, gừng, thịt trắng' },
-  水: { vi: 'Thủy', organs: 'Thận – Bàng quang, sinh dục – tiết niệu, xương tủy', risk: 'thận, tiết niệu, xương khớp, sinh dục', foods: 'vị mặn, cá, hải sản, đậu đen, nước' },
+  // [loop 480] 五脏+五腑+五窍+五体 cổ điển (黄帝内经). Fix: Hỏa mắt→lưỡi (目=Mộc, 舌=Hỏa);
+  //   bổ 五窍 còn thiếu (Thổ=口, Kim=鼻, Thủy=耳); Mộc «gân cốt»→«gân» (骨=Thủy).
+  木: { vi: 'Mộc', organs: 'Gan – Mật, hệ thần kinh, mắt (目), gân (筋)', risk: 'gan nóng, thị lực, căng thẳng thần kinh, giận dữ', foods: 'rau xanh, chanh, trà xanh, ngũ cốc' },
+  火: { vi: 'Hỏa', organs: 'Tim – Ruột non, huyết mạch, lưỡi (舌)', risk: 'tim mạch, huyết áp, mất ngủ, lo âu', foods: 'vị đắng, cà chua, trà đỏ, cà phê (vừa)' },
+  土: { vi: 'Thổ', organs: 'Tỳ – Vị, hệ tiêu hoá, cơ nhục, miệng (口)', risk: 'tiêu hoá, dạ dày, đường huyết, lo nghĩ', foods: 'vị ngọt, khoai, củ, gạo, đậu' },
+  金: { vi: 'Kim', organs: 'Phổi – Đại tràng, hệ hô hấp, da lông, mũi (鼻)', risk: 'hô hấp, phổi, da, dị ứng', foods: 'vị cay, hành tỏi, gừng, thịt trắng' },
+  水: { vi: 'Thủy', organs: 'Thận – Bàng quang, sinh dục – tiết niệu, xương tủy, tai (耳)', risk: 'thận, tiết niệu, xương khớp, sinh dục', foods: 'vị mặn, cá, hải sản, đậu đen, nước' },
 };
 const SEASON_PEAK = { 木: 'mùa xuân (sinh trưởng mạnh nhất)', 火: 'mùa hạ (noãn nhiệt đỉnh)', 土: 'quý mùa (chuyển giao)', 金: 'mùa thu (tinh khiết)', 水: 'mùa đông (hàn lạnh)' };
 const SEASON_LOW = { 木: 'mùa thu (Kim khắc Mộc)', 火: 'mùa đông (Thủy khắc Hỏa)', 土: 'mùa xuân (Mộc khắc Thổ)', 金: 'mùa hạ (Hỏa khắc Kim)', 水: 'quý mùa (Thổ khắc Thủy)' };
