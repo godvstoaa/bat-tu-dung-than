@@ -44,7 +44,7 @@ function ratingOf(score) {
   if (score >= 64) return 'Cát';
   if (score >= 50) return 'Bình';
   if (score >= 38) return 'Hơi kỵ';
-  return 'Kỵ';
+  return 'Hung'; // [loop 471] Kỵ→Hung unify daily vocab
 }
 
 /**
@@ -96,7 +96,7 @@ export function computeYearDaily(R, year, patternQuality) {
   const monthSummary = Object.keys(byMonth).map(Number).sort((a, b) => a - b).map((mk) => {
     const arr = byMonth[mk];
     const avg = arr.reduce((a, x) => a + x.score, 0) / arr.length;
-    return { month: mk, avg: +avg.toFixed(1), catCount: arr.filter((x) => x.rating === 'Cát').length, kyCount: arr.filter((x) => x.rating === 'Kỵ').length, count: arr.length };
+    return { month: mk, avg: +avg.toFixed(1), catCount: arr.filter((x) => x.rating === 'Cát').length, kyCount: arr.filter((x) => x.rating === 'Hung').length, count: arr.length };
   });
 
   const sorted = [...days].sort((a, b) => b.score - a.score);
@@ -112,7 +112,7 @@ export function computeYearDaily(R, year, patternQuality) {
       cat: days.filter((x) => x.rating === 'Cát').length,
       binh: days.filter((x) => x.rating === 'Bình').length,
       hoiky: days.filter((x) => x.rating === 'Hơi kỵ').length,
-      ky: days.filter((x) => x.rating === 'Kỵ').length,
+      ky: days.filter((x) => x.rating === 'Hung').length,
     },
   };
 }

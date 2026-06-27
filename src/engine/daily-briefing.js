@@ -331,7 +331,7 @@ export function dailyBriefing(R, year, month, day, patternQuality) {
       //   'khai trương' cho ngày Bình). Nay: cat=Cát(>=65), bình=Bình(48-64), hung=<48.
       rating.tone = rating.score >= 65 ? 'cat' : rating.score >= 48 ? 'bình' : 'hung';
       if (!specialLevel) {
-        rating.level = rating.score >= 65 ? 'Cát' : rating.score >= 48 ? 'Bình' : rating.score >= 35 ? 'Hơi kỵ' : 'Kỵ';
+        rating.level = rating.score >= 65 ? 'Cát' : rating.score >= 48 ? 'Bình' : rating.score >= 35 ? 'Hơi kỵ' : 'Hung'; // [loop 471] Kỵ→Hung unify
       }
       rating.summary = `${rating.summary} ${delta > 0 ? `★ Cá nhân +${delta}` : `⚠ Cá nhân ${delta}`} (Dụng/Thái tuế/格局).`.trim();
     }

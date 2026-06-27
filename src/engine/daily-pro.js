@@ -136,7 +136,7 @@ export function dailyPro(R, year, month, day) {
 
   // Score
   score = Math.max(5, Math.min(98, Math.round(score)));
-  let rating = score >= 65 ? 'Cát' : score >= 48 ? 'Bình' : score >= 35 ? 'Hơi kỵ' : 'Kỵ';
+  let rating = score >= 65 ? 'Cát' : score >= 48 ? 'Bình' : score >= 35 ? 'Hơi kỵ' : 'Hung'; // [loop 471] Kỵ→Hung unify temporal vocab
 
   // Best activity / avoid
   const bestActivity = score >= 65 ? 'tiến thủ, ký kết, gặp quý nhân, làm việc lớn' : score >= 48 ? 'làm việc thường, tránh quyết định lớn' : 'giữ ổn định, tránh đầu tư/cãi vã/đi xa';
