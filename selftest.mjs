@@ -197,6 +197,14 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
   const okChar = execTool('analyze_char', { char: '福' }, R);
   assert(okChar.char === '福' && okChar.radical, `[loop 558] analyze_char「福」hợp lệ vẫn hoạt động`);
   console.log(`   execTool ✓ — validate required + analyze_char guard (error VN sạch, không crash rác)`);
+  // [loop 559] analyze_month (no params) ganZhi phải KHỚP brief header curMonthGZ (cùng today).
+  //   Trước đây tool dùng ngày-15 → đầu tháng lệch vs brief → AI mâu thuẫn«tháng này».
+  const { Solar: SS } = await import('lunar-javascript');
+  const nn = new Date();
+  const hdrGZ = SS.fromYmdHms(nn.getFullYear(), nn.getMonth() + 1, nn.getDate(), 12, 0, 0).getLunar().getEightChar().getMonthGan() + SS.fromYmdHms(nn.getFullYear(), nn.getMonth() + 1, nn.getDate(), 12, 0, 0).getLunar().getMonthZhi();
+  const am = execTool('analyze_month', {}, R);
+  assert(am.ganZhi === hdrGZ, `[loop 559] analyze_month«tháng này»(${am.ganZhi}) khớp brief header (${hdrGZ}) — không mâu thuẫn`);
+  console.log(`   analyze_month ✓ — «tháng này» ganZhi ${am.ganZhi} khớp brief header (AI không mâu thuẫn)`);
 }
 assert(R1990.yong.tiaohou.note.includes('Hạ'), 'tiaohou note gắn khí hậu mùa (Hạ)');
 // [loop 34] 调候 OVERRIDE: 1990 辛午 (cực nhiệt) → 窮通寶鑑 lấy 壬水 → Dụng=Thủy (override Phù Ức)

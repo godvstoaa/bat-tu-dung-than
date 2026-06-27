@@ -807,10 +807,15 @@ export function execTool(name, args, R) {
         const n = new Date();
         const yr = a.year ?? n.getFullYear(); const mo = a.month ?? (n.getMonth() + 1);
         const lm = computeLiuyue(R, yr, R.patternQuality);
-        // [cycle 53] chỉ số tiết khí từ getMonthZhi (đồng bộ brief THÁNG NAY — không lệch 甲午/乙未)
+        // [loop 559 FIX BUG1] idx phải dùng CÙNG ngày nguồn như brief header (curMonthGZ = today).
+        //   Trước đây cố định ngày 15 → đầu tháng (trước tiết khí, vd 1-5/6 trước 芒种) idx lệch
+        //   vs brief → AI tự mâu thuẫn«tháng này». Nay:«tháng này» (no params) dùng hôm nay,
+        //   tháng cụ thể dùng ngày 15 (đại diện giữa tháng).
         const ZLI = { 寅:0,卯:1,辰:2,巳:3,午:4,未:5,申:6,酉:7,戌:8,亥:9,子:10,丑:11 };
+        const thisMonth = (a.year == null && a.month == null);
+        const dayForIdx = thisMonth ? n.getDate() : 15;
         let idx = -1;
-        try { idx = ZLI[Solar.fromYmdHms(yr, mo, 15, 12, 0, 0).getLunar().getMonthZhi()]; } catch (_) {}
+        try { idx = ZLI[Solar.fromYmdHms(yr, mo, dayForIdx, 12, 0, 0).getLunar().getMonthZhi()]; } catch (_) {}
         const cm = idx >= 0 ? lm.months[idx] : null;
         // [loop 4] Trả thêm gejuDelta/gejuNote để AI biết tháng có 格局 喜忌.
         return cm ? { month: mo, ganZhi: cm.ganZhi, ganGod: cm.ganGod, rating: cm.rating, gejuDelta: cm.gejuDelta || 0, gejuNote: cm.gejuNote || '' } : { error: 'không tính được tháng ' + mo };
