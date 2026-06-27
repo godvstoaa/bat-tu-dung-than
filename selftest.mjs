@@ -1928,6 +1928,29 @@ assert(ylR2.summary === ylR.summary, 'yuanliu deterministic');
 assert(spR.yuanliu && spR.yuanliu.source === ylR.source, 'analyze() gắn R.yuanliu');
 console.log(`   user: nguồn ${ylR.source} → chảy ${ylR.flowLen}/5 → quy ${ylR.aspectKey} | ${ylR.verdict} ✓`);
 
+// ################## 47c. 源流 × 大运 interaction (loop 453) ##################
+console.log('\n################## 47c. 源流 × 大运 interaction (loop 453) ##################');
+// quét nhiều lá → xác nhận có 大运 được 源流 modify + rating re-derived nhất quán
+let ylDayunMods = 0, checked = 0;
+for (let y = 1975; y <= 1995; y += 5) {
+  for (const m of [2, 7]) {
+    let R; try { R = analyze(y, m, 15, 10, 0, 'nam', 2026); } catch (e) { continue; }
+    checked++;
+    for (const d of (R.dayun || [])) {
+      if (d._ylNote) {
+        ylDayunMods++;
+        // rating phải khớp score sau modifier
+        const expRate = d.score >= 2 ? 'Cát' : d.score >= 1 ? 'Hơi thuận' : d.score <= -2 ? 'Hung' : d.score <= -1 ? 'Hơi nghịch' : 'Bình hòa';
+        assert(d.rating === expRate, `源流 大运 rating khớp score (${d.ganZhi} score=${d.score} → ${d.rating})`);
+        // note phải có 1 trong 3 kiểu interaction
+        assert(/MỞ dòng|SINH nguồn|KHẮC归宿/.test(d._ylNote), `_ylNote có interaction hợp lệ: ${d._ylNote}`);
+      }
+    }
+  }
+}
+assert(ylDayunMods > 0, `có 大运 được 源流 modify (${checked} lá, ${ylDayunMods} mods)`);
+console.log(`   ${checked} lá: ${ylDayunMods} 大运 entries được 源流 modify (mở dòng/sinh nguồn/khắc归宿) ✓`);
+
 // ################## 48. 10 NĂM TỚI 一览 (decade forecast) ##################
 import { decadeForecast } from './src/engine/decade-forecast.js';
 console.log('\n################## 48. 10 NĂM TỚI 一览 decade forecast ##################');

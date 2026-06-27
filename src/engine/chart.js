@@ -633,6 +633,24 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
       }
     }
   }
+  // [loop 453 elevate] 源流 × 大运 interaction — 滴天髓: vận đến CÓ MỞ dòng tắc
+  //   (源流 gap) → CÁT lớn; KHẮC归宿 (harm aspect thịnh) → HUNG nhẹ; SINH nguồn → CÁT nhẹ.
+  //   Connects 源流 tĩnh (loop 452) với đại vận động. 大运重地支 (loop 164) → xét chiWx.
+  //   Trước đây 大运 score CHỈ xét 用神/clash/空亡, không biết dòng 源流 đang tắc ở đâu →
+  //   vận bổ đúng hành «mở dòng» không được cộng thưởng. Nay 源流 feedback vào 大运.
+  const yuanliu = (() => { try { return analyzeYuanLiu(wx, chart.dayMaster.wx); } catch (e) { return null; } })();
+  if (yuanliu) {
+    const _SG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
+    const _KK = { 木: '土', 火: '金', 土: '水', 金: '木', 水: '火' };
+    const _rate = (s) => s >= 2 ? 'Cát' : s >= 1 ? 'Hơi thuận' : s <= -2 ? 'Hung' : s <= -1 ? 'Hơi nghịch' : 'Bình hòa';
+    for (const d of dayun) {
+      const mods = [];
+      if (yuanliu.gap && d.zhiWx === yuanliu.gap) { d.score += 2; mods.push(`vận ${d.zhi} (${d.zhiWx}) MỞ dòng tắc 源流 ${yuanliu.gap} → khí LƯU THÔNG`); }
+      if (yuanliu.source && _SG[d.zhiWx] === yuanliu.source) { d.score += 1; mods.push(`vận ${d.zhi} SINH nguồn ${yuanliu.source} → khí PHÁT`); }
+      if (yuanliu.endpoint && _KK[d.zhiWx] === yuanliu.endpoint) { d.score -= 1; mods.push(`vận ${d.zhi} KHẮC归宿 ${yuanliu.endpoint} (${yuanliu.aspectKey}) → ${yuanliu.aspectKey} TỔN`); }
+      if (mods.length) { d.rating = _rate(d.score); d._ylNote = mods.join(' · '); }
+    }
+  }
   // [loop 3 — 格局流年喜忌] Cộng tầng 格局 LÊN TRÊN 5 trường phái của scoreLiunianYear
   //   (ngũ hành / thập thần năm / thái tuế / thần sát / thiên khắc địa xung). Cùng luật
   //   喜忌 với 大运 nhưng ±3 (năm tập trung hơn运 10 năm). sequencing giống loop 2.
@@ -645,6 +663,7 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   try { full.liuqin = analyzeLiuqin(full); } catch (e) { full.liuqin = []; }
   try { full.remedy = buildRemedy(full); } catch (e) { full.remedy = { twelveLaws: [] }; }
   // [loop 452] 源流 dòng khí ngũ hành — đọc độc lập từ wx (không cascade/đổi score).
-  try { full.yuanliu = analyzeYuanLiu(wx, chart.dayMaster.wx); } catch (e) { full.yuanliu = null; }
+  // [loop 453] tái dụng `yuanliu` đã tính ở tầng 大运 interaction (tránh tính 2 lần).
+  full.yuanliu = yuanliu || (() => { try { return analyzeYuanLiu(wx, chart.dayMaster.wx); } catch (e) { return null; } })();
   return full;
 }

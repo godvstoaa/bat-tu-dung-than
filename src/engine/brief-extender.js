@@ -75,7 +75,12 @@ export function extendBrief(R) {
   //   Khác wx-flow (đo流通 có thông không): 源流 chỉ rõ NGUỒN + điểm DỪNG = khía cạnh THỊNH.
   try {
     const yl = R.yuanliu;
-    if (yl) parts.push(`源流 NGUỒN-LƯU: nguồn ${yl.source} chảy ${yl.flowLen}/5 hành, quy về ${yl.aspectKey} (${yl.aspectVi}) → ${yl.fullCycle ? '源远流长 (phú quý bền)' : yl.verdict}.${yl.gap ? ' Tắc tại ' + yl.gap + '.' : ''}`);
+    if (yl) {
+      // [loop 453] liệt kê các 大运 源流 interaction nổi bật (mở dòng tắc / khắc归宿)
+      const ylDy = (R.dayun || []).filter((d) => d._ylNote).slice(0, 2)
+        .map((d) => `${d.ganZhi}: ${d._ylNote.replace(/MỞ dòng tắc.*→/, 'mở dòng').replace(/KHẮC归宿.*→.*TỔN/, 'khắc归宿')}`);
+      parts.push(`源流 NGUỒN-LƯU: nguồn ${yl.source} chảy ${yl.flowLen}/5 hành, quy về ${yl.aspectKey} (${yl.aspectVi}) → ${yl.fullCycle ? '源远流长 (phú quý bền)' : yl.verdict}.${yl.gap ? ' Tắc tại ' + yl.gap + '.' : ''}${ylDy.length ? ' 大运 tương tác 源流: ' + ylDy.join(' | ') + '.' : ''}`);
+    }
   } catch (e) {}
 
   // [loop 89] MỆNH CÁCH TẦNG LỚP (命格層次) — phân loại cổ điển 6 tiêu chí (module chart-level trước đây ẩn).
