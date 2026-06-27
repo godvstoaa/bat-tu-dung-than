@@ -1363,7 +1363,7 @@ assert(cy.transitions.every((t, i) => i === 0 || t.zhi === cy.transitions[0].zhi
 const jyR = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
 const jy = jiaoYunAnalysis(jyR, new Date(2026, 5, 22));
 assert(jy.next && jy.next.ganZhi === '戊午' && jy.next.age === 35, 'giao thời kế = 戊午 [35t]');
-assert(jy.next.rating === 'Cát', 'đại运 tới Cát');
+assert(jy.next.rating === 'Cát' || jy.next.rating === 'Đại cát', `đại运 tới Cát/Đại cát (được ${jy.next.rating} — [loop 454] tier mới ≥5=Đại cát)`);
 assert(jy.daysUntil > 0 && jy.daysUntil < 600, 'còn <600 ngày tới giao thời');
 assert(jy.avoidZhi.includes('子'), 'né tuổi Tý (xung午 đại vận tới)');
 assert(jy.summary.includes('GIAO THỜI') && jy.summary.includes('戊午'), 'summary nhắc giao thời + 戊午');

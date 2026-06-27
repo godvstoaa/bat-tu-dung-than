@@ -397,6 +397,20 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
 // ===========================================================================
 //  5. ĐẠI VẬN (大運)
 // ===========================================================================
+// [loop 454]统一 rating scale — thêm tầng Đại cát/Đại hung cho score cực (±5+).
+//   Sau loop 451-453 (三法/源流/源流×大运), score 大运 mở rộng ±9 → tầng Cát/Hung
+//   cũ nén thập kỷ +9 vào cùng bucket «Cát» với +2 → MẤT PHÂN BIỆT. Đại cát (≥5) =
+//   «mọi tầng đồng phướng» (Dụng+格局+源流 mở dòng+không clash), Đại hung (≤−5) = ngược.
+//   Dùng chung cho computeDaYun + 空亡 re-rate + 源流 re-rate (trước đây 3 chỗ duplicate).
+function _dayunRating(score) {
+  if (score >= 5) return 'Đại cát';
+  if (score >= 2) return 'Cát';
+  if (score >= 1) return 'Hơi thuận';
+  if (score <= -5) return 'Đại hung';
+  if (score <= -2) return 'Hung';
+  if (score <= -1) return 'Hơi nghịch';
+  return 'Bình hòa';
+}
 export function computeDaYun(year, month, day, hour, minute, gender, yong) {
   const [cy, cm, cd, ch, cmin] = ziShiRoll(year, month, day, hour, minute); // [loop 177] 子时换日 — đồng bộ buildChart
   const solar = Solar.fromYmdHms(cy, cm, cd, ch, cmin, 0);
@@ -436,12 +450,7 @@ export function computeDaYun(year, month, day, hour, minute, gender, yong) {
     if (_GC[dGan] === gan && _CH[dgZhi] === zhi) score -= 4; // 天克地冲 — severe
     else if (_CH[dgZhi] === zhi) score -= 2; // 地冲 only
     if (gan + zhi === dGan + dgZhi) score -= 1; // 伏吟 — trùng phức
-    let rating;
-    if (score >= 2) rating = 'Cát';
-    else if (score >= 1) rating = 'Hơi thuận';
-    else if (score <= -2) rating = 'Hung';
-    else if (score <= -1) rating = 'Hơi nghịch';
-    else rating = 'Bình hòa';
+    const rating = _dayunRating(score); // [loop 454] shared scale w/ Đại cát/Đại hung
     out.push({ ganZhi: gz, gan, zhi, ganWx, zhiWx,
       startAge: dy.getStartAge(), startYear: dy.getStartYear(),
       ganGod: tenGod(dGan, gan), zhiGod: tenGod(dGan, HIDDEN[zhi][0]), score, rating });
@@ -623,12 +632,8 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
     for (const d of dayun) {
       if (voidSet.has(d.zhi)) {
         d.score = Math.round(d.score * 0.7);
-        // re-rate after weakening
-        if (d.score >= 2) d.rating = 'Cát';
-        else if (d.score >= 1) d.rating = 'Hơi thuận';
-        else if (d.score <= -2) d.rating = 'Hung';
-        else if (d.score <= -1) d.rating = 'Hơi nghịch';
-        else d.rating = 'Bình hòa';
+        // re-rate after weakening [loop 454] shared _dayunRating
+        d.rating = _dayunRating(d.score);
         if (!d._kwNote) d._kwNote = `Chi ${d.zhi} = KHÔNG VONG → lực giảm («không thực»)`;
       }
     }
@@ -642,13 +647,12 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   if (yuanliu) {
     const _SG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
     const _KK = { 木: '土', 火: '金', 土: '水', 金: '木', 水: '火' };
-    const _rate = (s) => s >= 2 ? 'Cát' : s >= 1 ? 'Hơi thuận' : s <= -2 ? 'Hung' : s <= -1 ? 'Hơi nghịch' : 'Bình hòa';
     for (const d of dayun) {
       const mods = [];
       if (yuanliu.gap && d.zhiWx === yuanliu.gap) { d.score += 2; mods.push(`vận ${d.zhi} (${d.zhiWx}) MỞ dòng tắc 源流 ${yuanliu.gap} → khí LƯU THÔNG`); }
       if (yuanliu.source && _SG[d.zhiWx] === yuanliu.source) { d.score += 1; mods.push(`vận ${d.zhi} SINH nguồn ${yuanliu.source} → khí PHÁT`); }
       if (yuanliu.endpoint && _KK[d.zhiWx] === yuanliu.endpoint) { d.score -= 1; mods.push(`vận ${d.zhi} KHẮC归宿 ${yuanliu.endpoint} (${yuanliu.aspectKey}) → ${yuanliu.aspectKey} TỔN`); }
-      if (mods.length) { d.rating = _rate(d.score); d._ylNote = mods.join(' · '); }
+      if (mods.length) { d.rating = _dayunRating(d.score); d._ylNote = mods.join(' · '); } // [loop 454] shared
     }
   }
   // [loop 3 — 格局流年喜忌] Cộng tầng 格局 LÊN TRÊN 5 trường phái của scoreLiunianYear
