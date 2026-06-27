@@ -1980,6 +1980,13 @@ const gjTest = analyze(1986, 1, 15, 10, 0, 'nam', 2026);
 const gjT = detectGongjia(gjTest);
 assert(gjT.arches.length > 0 && gjT.arches.some((a) => a.type.includes('拱禄')), `1986-1-15 己 dm: 拱禄 detected`);
 console.log(`   拱夹: spR arches=${gjR.arches.length} | 1986-1-15 拱禄 ✓`);
+// [loop 523] guiguzi coverage
+import { guiguziFortune } from './src/engine/guiguzi.js';
+const ggR = guiguziFortune(spR);
+assert(ggR && ggR.yearJiaZi && ggR.nayin, `guiguzi returns yearJiaZi + nayin (got ${ggR?.yearJiaZi})`);
+assert(['CÁT','HUNG','BÌNH'].includes(ggR.toneVi), `guiguzi toneVi hợp lệ (got ${ggR.toneVi})`);
+assert(ggR.fortune.length > 20, 'guiguzi fortune có nội dung');
+console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi} ✓`);
 
 // ################## 48. 10 NĂM TỚI 一览 (decade forecast) ##################
 import { decadeForecast } from './src/engine/decade-forecast.js';

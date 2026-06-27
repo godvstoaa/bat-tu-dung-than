@@ -41,6 +41,7 @@ import { investmentStyle } from './invest-style.js';
 import { analyzeBusiness } from './bazi-business.js';
 import { analyzePillarQuality } from './pillar-quality.js';
 import { detectGongjia } from './gongjia.js';
+import { guiguziFortune } from './guiguzi.js';
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -94,6 +95,11 @@ export function extendBrief(R) {
   try {
     const gj = detectGongjia(R);
     if (gj.arches && gj.arches.length) parts.push(`拱夹 GONGJIA: ${gj.summary}`);
+  } catch (e) {}
+  // [loop 523] 鬼谷子算命 — Guiguzi divination (bổ sung góc nhìn cổ đại)
+  try {
+    const gg = guiguziFortune(R);
+    if (gg) parts.push(`鬼谷子 GUIGUZI: năm ${gg.yearJiaZi} (${gg.nayin}/${gg.vi}) ${gg.toneVi}. ${gg.fortune?.slice(0, 80) || ''} Nghề: ${(gg.career || '').slice(0, 50)}.`);
   } catch (e) {}
 
   // [loop 89] MỆNH CÁCH TẦNG LỚP (命格層次) — phân loại cổ điển 6 tiêu chí (module chart-level trước đây ẩn).
