@@ -94,6 +94,24 @@ export function phaseNarrative(R, refYear) {
     paras.push(`Tháng này (${lyGz}${lyGodVi ? ' — ' + lyGodVi + ' tháng' : ''}) là «đơn vị hành động» gần nhất —查阅 lưu nguyệt chi tiết để chọn việc nên làm/tránh trong 4 tuần tới.`);
   }
 
+  // --- NHÌN TRƯỚC: đại vận KẾ (look-ahead — «运好不如运旺», biết trước để chuẩn bị) ---
+  const nextDy = dy ? (R.dayun || []).find((d) => d.startAge === dy.startAge + 10) : null;
+  if (nextDy) {
+    const yearsUntil = nextDy.startAge - age;
+    const nextMotif = TONE_MOTIF[toneOf(nextDy.rating)] || TONE_MOTIF.binh;
+    let nextStage = null, nextNayin = null, nextGodVi = '';
+    try { const dcs = dayunChangSheng(dayGan, R.dayun); nextStage = (dcs.items || []).find((it) => it.startAge === nextDy.startAge); } catch (e) {}
+    try { const n = ganZhiNayin(nextDy.ganZhi); if (n) nextNayin = { name: n, ...(nayinInfo(n) || {}) }; } catch (e) {}
+    if (nextDy.gan) nextGodVi = GOD_VI[tenGod(dayGan, nextDy.gan)] || '';
+    const curTone = toneOf(dy.rating), nextTone = toneOf(nextDy.rating);
+    let bridge;
+    if (curTone === 'hung' && nextTone === 'cat') bridge = ' → chuyển HƯỞNG LÊN: giai đoạn khó sắp qua, nên kiên nhẫn và chuẩn bị đón vận tốt';
+    else if (curTone === 'cat' && nextTone === 'hung') bridge = ' → chuyển HƯỚNG XUỐNG: nên phòng bị, tích luỹ/fix nền TRƯỚC khi vận đổi';
+    else if (nextTone === 'cat') bridge = ' → tiếp tục thuận lợi, có thể phát triển thêm';
+    else bridge = ' → giữ mức, không biến động lớn';
+    paras.push(`Nhìn trước: còn <b>${yearsUntil > 0 ? yearsUntil : 0} năm</b> (đến ${nextDy.startAge} tuổi, năm ${nextDy.startYear}) bạn chuyển sang đại vận <b>${nextDy.ganZhi}</b>${nextNayin ? ' (' + nextNayin.name + ')' : ''}${nextStage ? ', thế «' + nextStage.stageVi + '»' : ''}${nextGodVi ? ' — ' + nextGodVi + ' vận' : ''}, đánh giá <b>${nextDy.rating}</b> — ${nextMotif.v}${bridge}.`);
+  }
+
   // --- Tổng luận + 源流 context ---
   const syn = R.synthesis || {};
   const yl = R.yuanliu;
