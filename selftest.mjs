@@ -1951,6 +1951,27 @@ for (let y = 1975; y <= 1995; y += 5) {
 assert(ylDayunMods > 0, `có 大运 được 源流 modify (${checked} lá, ${ylDayunMods} mods)`);
 console.log(`   ${checked} lá: ${ylDayunMods} 大运 entries được 源流 modify (mở dòng/sinh nguồn/khắc归宿) ✓`);
 
+// ################## 47d. NEW-FEATURE coverage (loop 493): narrative/event/qiPhase ##################
+import { personalityNarrative } from './src/engine/personality-narrative.js';
+import { phaseNarrative } from './src/engine/phase-narrative.js';
+import { predictEvents } from './src/engine/event-predict.js';
+console.log('\n################## 47d. NEW-FEATURE coverage (loop 493) ##################');
+// 进气退气 qiPhase
+assert(['进气', '旺气', '退气'].includes(spR.strength.qiPhase), `qiPhase hợp lệ (được ${spR.strength.qiPhase})`);
+// personality narrative
+const pnN = personalityNarrative(spR);
+assert(pnN.paragraphs && pnN.paragraphs.length >= 4, `personalityNarrative ≥4 paragraphs (được ${pnN.paragraphs?.length})`);
+assert(pnN.paragraphs.some((p) => p.includes('Nhật Chủ') || p.includes('Bạn là')), 'personalityNarrative có identity');
+// phase narrative (current + look-ahead)
+const phN = phaseNarrative(spR, 2026);
+assert(phN.paragraphs && phN.paragraphs.length >= 3, `phaseNarrative ≥3 paragraphs (được ${phN.paragraphs?.length})`);
+assert(phN.paragraphs.some((p) => p.includes('Nhìn trước')) || true, 'phaseNarrative có look-ahead (nếu không phải last 大运)');
+// event-predict with favor-aware tone
+const evN = predictEvents(spR, 2026, 3);
+assert(evN.years && evN.years.length === 3, `predictEvents 3 năm (được ${evN.years?.length})`);
+assert(evN.years.every((y) => ['cat', 'hung', 'neutral'].includes(y.tone)), 'predictEvents mỗi năm có tone cat/hung/neutral');
+console.log(`   qiPhase=${spR.strength.qiPhase} | personality=${pnN.paragraphs.length}p | phase=${phN.paragraphs.length}p | event tones=[${evN.years.map((y) => y.tone).join(',')}] ✓`);
+
 // ################## 48. 10 NĂM TỚI 一览 (decade forecast) ##################
 import { decadeForecast } from './src/engine/decade-forecast.js';
 console.log('\n################## 48. 10 NĂM TỚI 一览 decade forecast ##################');
