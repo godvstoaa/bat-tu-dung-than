@@ -76,6 +76,7 @@ import { yinzhaiOverview } from './yinzhai.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { liurenPan } from './liuren.js';
+import { qimenDongPan } from './qimen.js';
 import { qizheng, longitudeToMansion } from './qizheng.js';
 // 天星择日 (cycle 38) — chọn ngày theo vị trí thật của 7 chính tinh tới 坐向
 import { tianxingZheri } from './tianxing-zheri.js';
@@ -680,6 +681,12 @@ export const AI_TOOLS = [
       minute: { type: 'integer', description: 'Phút (bỏ trống = 0)' },
     } },
   },
+  { // [loop 509] 奇门遁甲 AI tool — 9-cung time-based
+    name: 'analyze_qimen', description: '奇门遁甲 (Qi Men Dun Jia): 9-cung + 8-môn + 9-tinh + 3-kỳ + 格格 theo thời điểm → hướng tốt/xấu hành sự. Dùng khi user hỏi «kỳ môn», «độn giáp hôm nay», «hướng nào tốt (theo kỳ môn)». Trả 节气/局 + 格格 cát/hung + advice hướng.',
+    parameters: { type: 'object', properties: {
+      year: { type: 'integer' }, month: { type: 'integer' }, day: { type: 'integer' }, hour: { type: 'integer' },
+    } },
+  },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -737,6 +744,14 @@ export function execTool(name, args, R) {
           ke4: (r.ke4 || []).map((k) => `${k.n}:${k.up}/${k.down}(${k.rel})`),
           sanchuan: (r.sanchuan || []).map((s) => `${s.n}:${s.zhi}(${s.rel})`),
           zongMen: r.zongMen,
+        };
+      }
+      case 'analyze_qimen': { // [loop 509] 奇门遁甲
+        const n2 = new Date();
+        const r = qimenDongPan(a.year ?? n2.getFullYear(), a.month ?? (n2.getMonth() + 1), a.day ?? n2.getDate(), a.hour ?? 12);
+        return {
+          term: r.term, yuan: r.yuan, ju: r.ju, yinYang: r.yinYang,
+          gige: r.gige, catGe: r.catGe, xiongGe: r.xiongGe, advice: r.advice,
         };
       }
       case 'inverse_bazi': {
