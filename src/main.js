@@ -47,7 +47,7 @@ import { castByTime, castByNumbers, solarToMhNums, TRIGRAMS } from './engine/mei
 import { xiaoliurenDetail, solarToXlrNums } from './engine/xiaoliuren.js';
 import { castLiuYao } from './engine/liuyao.js';
 import { qiuqian, zhiJiao } from './engine/qiuqian.js';
-import { jiemeng as jiemengEngine } from './engine/jiemeng.js';
+// [loop 520] jiemeng lazy-loaded — dynamic import in runJiemeng() (saves ~48KB initial)
 import { qimenDongPan } from './engine/qimen.js';
 import { liurenPan } from './engine/liuren.js';
 import { jinkoujue, renderJinkoujueCard } from './engine/jinkoujue.js';
@@ -4051,7 +4051,10 @@ function renderJiemeng(r) {
 function runJiemeng() {
   const q = $('jm-query').value;
   if (!q.trim()) return;
-  renderJiemeng(jiemengEngine(q));
+  $('jiemeng').innerHTML = '<p class="hint">Đang tải giải mộng...</p>';
+  import('./engine/jiemeng.js').then(({ jiemeng: jiemengEngine }) => {
+    renderJiemeng(jiemengEngine(q));
+  }).catch(() => { $('jiemeng').innerHTML = '<p class="hint">Không tải được module giải mộng.</p>'; });
 }
 
 // ---------------------------------------------------------------- 改命 TỔNG KẾ
