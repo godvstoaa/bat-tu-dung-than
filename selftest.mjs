@@ -2135,6 +2135,12 @@ assert(ss.summary.includes('癸酉') && ss.summary.includes('医者'), 'summary 
 assert(ss.disclaimer && ss.disclaimer.includes('văn hoá dân gian'), 'có disclaimer văn hoá dân gian');
 // Lớp phụ 称骨三世 phải có (chenggu chạy được cho user)
 assert(ss.boneCross && ss.boneCross.vi.length > 20 && ['cat','mid','warn'].includes(ss.boneCross.tone), 'có lớp 称骨三世 + tone hợp lệ');
+// [loop 518] chenggu year-weight regression guard (7 fixes loop 517)
+import { YEAR_WEIGHT } from './src/engine/chenggu.js';
+assert(YEAR_WEIGHT[12] === 1.6, '丙子 year weight 1.6 (loop 517 fix)');
+assert(YEAR_WEIGHT[13] === 0.8, '丁丑 year weight 0.8');
+assert(YEAR_WEIGHT[21] === 1.5, '乙酉 year weight 1.5');
+assert(YEAR_WEIGHT[48] === 0.7, '壬子 year weight 0.7');
 // Tất định
 const ssDet = sanshishu(ssR);
 assert(JSON.stringify(ss) === JSON.stringify(ssDet), 'sanshishu deterministic');
