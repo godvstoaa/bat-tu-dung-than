@@ -280,7 +280,7 @@ function renderVerdict(R) {
       })()}
     </div>
     <div class="v-box">
-      <div class="v-label">Vượng suy (${strength.deLenh ? 'đắc lệnh' : 'thất lệnh'} · phù ${(strength.ratio * 100).toFixed(1)}%)</div>
+      <div class="v-label">Vượng suy (${strength.deLenh ? 'đắc lệnh' : 'thất lệnh'}${strength.qiPhase ? ' · ' + strength.qiPhase : ''} · phù ${(strength.ratio * 100).toFixed(1)}%)</div>
       <div class="v-value">${strength.level}</div>
     </div>
     <div class="v-box">
@@ -318,7 +318,7 @@ $('copy-summary-btn') && document.addEventListener('click', (e) => {
       `Lá số Bát Tự — ${c.solar}`,
       `Tứ trụ: ${p.year.gan}${p.year.zhi} ${p.month.gan}${p.month.zhi} ${p.day.gan}${p.day.zhi} ${p.time.gan}${p.time.zhi}`,
       `Nhật chủ: ${c.dayMaster.gan} (${WX_VI[c.dayMaster.wx]})`,
-      `Thân: ${s.level} (${s.strong ? 'vượng' : 'nhược'}, ${s.deLenh ? 'đắc lệnh' : 'thất lệnh'})`,
+      `Thân: ${s.level} (${s.strong ? 'vượng' : 'nhược'}, ${s.deLenh ? 'đắc lệnh' : 'thất lệnh'}${s.qiPhase ? ' ' + s.qiPhase : ''})`,
       `Cách cục: ${currentResult.pattern?.vi || '?'}`,
       `Dụng thần: ${WX_VI[y.primary] || y.primary} · Hỷ: ${WX_VI[y.xi] || y.xi} · Kỵ: ${WX_VI[y.ji] || y.ji}`,
       `Mệnh cách: ${currentResult.synthesis?.gradeVi || '?'} (${currentResult.synthesis?.score || '?'}/100)`,
@@ -1583,7 +1583,9 @@ function renderStrength3Fa(R) {
           <span>極弱</span><span>身弱</span><span style="color:#d4af55;font-weight:700">${strong ? '身VƯỢNG' : '身NHƯỢC'} ${pct}%</span><span>身強</span><span>極強</span>
         </div>
       </div>`;
-    el.innerHTML = `${spectrum}<p>${esc(s.summary)}</p>`;
+    const qiPhase = R.strength?.qiPhase;
+    const qiBadge = qiPhase ? `<p class="hint">🌀 Lệnh khí节气: <b>${qiPhase}</b> — ${qiPhase === '进气' ? 'lệnh đang VÀO (mới nhận, mạnh dần)' : qiPhase === '退气' ? 'lệnh đang RA (sắp nhường, suy)' : 'đương lệnh đầy đủ (mạnh nhất)'}.</p>` : '';
+    el.innerHTML = `${spectrum}${qiBadge}<p>${esc(s.summary)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 3 pháp vượng suy.</p>'; }
 }
 
