@@ -36,8 +36,28 @@ export function analyzeMangpai(R) {
 
   // Tài/Quan ở 主 (ngày/giờ) hay 宾 (năm/tháng)?
   const isZhu = (pos) => pos === 'day' || pos === 'time';
-  const caiHits = list.filter((x) => GAN[x.gan].wx === caiWx);
-  const guanHits = list.filter((x) => GAN[x.gan].wx === guanWx);
+  // [loop 553 FIX] 盲派 «财官» gồm cả TÀNG CAN (庫中財官), không chỉ thiên can lộ.
+  //   Trước đây chỉ đếm lộ can → khi Tài/Quan chỉ ở địa chi tàng, mệnh bị luận
+  //   «ít Tài Quan»/«cân bằng» SAI (flip verdict) trong khi thực có Tài tọa chủ.
+  const caiHits = [];
+  const guanHits = [];
+  for (const x of list) {
+    const wx = GAN[x.gan] ? GAN[x.gan].wx : null;
+    if (wx === caiWx) caiHits.push(x);
+    else if (wx === guanWx) guanHits.push(x);
+  }
+  // bổ sung tàng can (bản khí + trung/dư khí) — 盲派 đếm cả tàng
+  for (const k of ORDER) {
+    const p = c.pillars[k];
+    if (!p || !p.hidden) continue;
+    for (const h of p.hidden) {
+      if (!h || !h.gan || !GAN[h.gan]) continue;
+      const wx = GAN[h.gan].wx;
+      const e = { pos: k, gan: h.gan, viaTang: true };
+      if (wx === caiWx) caiHits.push(e);
+      else if (wx === guanWx) guanHits.push(e);
+    }
+  }
   const caiInZhu = caiHits.filter((x) => isZhu(x.pos));
   const guanInZhu = guanHits.filter((x) => isZhu(x.pos));
 

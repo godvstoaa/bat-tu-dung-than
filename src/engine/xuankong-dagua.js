@@ -113,8 +113,10 @@ const HEX_NAME = {
   '震离': { name: '噬嗑', vi: 'Thệ Hạp', no: 21 },
   '艮震': { name: '颐', vi: 'Di', no: 27 },
   '震艮': { name: '小过', vi: 'Tiểu Quá', no: 62 },
-  '兑震': { name: '归妹', vi: 'Quy Muội', no: 54 },
-  '震兑': { name: '随', vi: 'Tùy', no: 17 },
+  // [loop 553 FIX] 兑震↔震兑 từng đảo thượng/hạ (cùng class bug heluo loop 550).
+  //   兑(泽)上震(雷)下 = 泽雷随 #17; 震(雷)上兑(泽)下 = 雷泽归妹 #54.
+  '兑震': { name: '随', vi: 'Tùy', no: 17 },
+  '震兑': { name: '归妹', vi: 'Quy Muội', no: 54 },
   '乾震': { name: '无妄', vi: 'Vô Vọng', no: 25 },
   '震乾': { name: '大壮', vi: 'Đại Tráng', no: 34 },
   '离巽': { name: '鼎', vi: 'Đỉnh', no: 50 },
@@ -255,7 +257,7 @@ const DAGUA_24 = [
   { zhi: '酉', upper: '坎', lower: '坎' }, // 坎 thuần → 1运 (坎尽酉中)
   { zhi: '辛', upper: '兑', lower: '兑' }, // 兑 thuần → 1运
   // —— TÂY BẮC (乾 Càn - Kim) — 戌乾亥 ——
-  { zhi: '戌', upper: '坎', lower: '艮' }, // 蹇 — 陈益峰 mỏ neo: 戌=蹇, 2运
+  { zhi: '戌', upper: '艮', lower: '坎' }, // [loop 553 FIX] 蹇 = 艮上坎下 (山水蹇#39). Trước đây 坎/艮=蒙 SAI vs comment「戌=蹇」.
   { zhi: '乾', upper: '乾', lower: '乾' }, // 乾 thuần → 1运
   { zhi: '亥', upper: '巽', lower: '艮' }, // 渐 — 陈益峰 mỏ neo: 来龙渐, 7运
 ].map((d) => {

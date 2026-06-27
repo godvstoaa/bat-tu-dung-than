@@ -3425,6 +3425,10 @@ for (const h of MOUNTAINS_HAN) {
   if (!d || !VALID_YUN.has(d.yun)) allYunOk = false; // 5 KHÔNG bao giờ xuất hiện
 }
 assert(allHaveHex, 'mọi sơn đều có quẻ (hexagram + hexagramVi)');
+// [loop 553] 戌 = 蹇#39 (艮上坎下), KHÔNG phải 蒙 (坎/艮) như bug cũ vs comment.
+assert(daguaByMountain('戌').hexagram === '蹇', `[loop 553] 戌=蹇 (sau fix, trước SAI=蒙 do upper/lower ngược)`);
+// [loop 553] 兑震=随 (泽雷随), sơn 丑 dùng兑/震 → phải ra 随 (trước fix SAI=归妹 do HEX_NAME đảo)
+assert(daguaByMountain('丑').hexagram === '随', `[loop 553] 丑(兑震)=随 (sau fix HEX_NAME, trước SAI=归妹)`);
 assert(allYunOk, 'mọi sơn đều có 卦运 hợp lệ {1,2,3,4,6,7,8,9} — 5=空亡 bị loại');
 
 // N1b. CANONICAL 卦运 derivation (张心言 lineage): HEX64 phân hoạch đúng 8×8, không 0/5
