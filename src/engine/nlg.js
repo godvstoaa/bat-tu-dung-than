@@ -14,6 +14,7 @@ import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
 import { guiguziFortune } from './guiguzi.js';
+import { dayNayinPersonality } from './nayin-personality.js';
 import { analyzeTaohua } from './taohua.js';
 import { marriageStars } from './marriage-stars.js';
 import { starPower } from './star-power.js';
@@ -492,6 +493,8 @@ function pFreeForm(R, intent) {
   lines.push(`Tổng luận mệnh ${synthesis.gradeVi} (${synthesis.score}/100). Khai vận: màu ${WX_INFO[yong.primary].mau}; phương ${WX_INFO[yong.primary].huong}; nghề ${WX_INFO[yong.primary].nghe.split('，')[0]}.`);
   // [loop 524] Quỷ Cốc Tử bonus
   try { const gg = guiguziFortune(R); if (gg) lines.push(`🔮 Quỷ Cốc Tử: năm ${gg.yearJiaZi} (${gg.vi}) ${gg.toneVi} — ${gg.fortune.slice(0, 90)}.`); } catch (e) {}
+  // [loop 527] 日柱納音 personality bonus
+  try { const dnp = dayNayinPersonality(R); if (dnp && dnp.traits) lines.push(`🏺 Nạp âm ${dnp.dayJiaZi} (${dnp.vi}): ${dnp.nature}. ${dnp.strength}, cần khắc phục ${dnp.weakness}.`); } catch (e) {}
   lines.push(`${now && now.score < 0 ? `⚠ Đang ở năm ${now.year} bất lợi → thủ giữ, tránh mạo hiểm; đợi lưu niên mang hành Dụng.` : `Nên tiến thủ theo Dụng Thần, đón lưu niên/đại vận cát.`} Để có phân tích tự do chuyên sâu hơn, bật AI trong ⚙ Cài đặt.`);
   return { title: 'Luận theo câu hỏi của bạn', paragraphs: lines };
 }

@@ -1987,6 +1987,12 @@ assert(ggR && ggR.yearJiaZi && ggR.nayin, `guiguzi returns yearJiaZi + nayin (go
 assert(['CÁT','HUNG','BÌNH'].includes(ggR.toneVi), `guiguzi toneVi hợp lệ (got ${ggR.toneVi})`);
 assert(ggR.fortune.length > 20, 'guiguzi fortune có nội dung');
 console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi} ✓`);
+// [loop 527] dayNayinPersonality coverage
+import { dayNayinPersonality } from './src/engine/nayin-personality.js';
+const dnpR = dayNayinPersonality(spR);
+assert(dnpR && dnpR.dayJiaZi && dnpR.nayin && dnpR.traits, `dayNayinPersonality returns traits (got ${dnpR?.nayin})`);
+assert(dnpR.strength && dnpR.weakness && dnpR.compat, 'dayNayinPersonality has strength/weakness/compat');
+console.log(`   日柱納音: ${dnpR.dayJiaZi} ${dnpR.nayin} (${dnpR.vi}) — ${dnpR.nature} ✓`);
 
 // ################## 48. 10 NĂM TỚI 一览 (decade forecast) ##################
 import { decadeForecast } from './src/engine/decade-forecast.js';
