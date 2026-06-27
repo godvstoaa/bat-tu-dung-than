@@ -35,6 +35,7 @@ export function detectGongjia(R) {
     const z2 = pillars[keys[i + 1]].zhi;
     const idx1 = ZHI_ORDER.indexOf(z1);
     const idx2 = ZHI_ORDER.indexOf(z2);
+    if (idx1 < 0 || idx2 < 0) continue; // [loop 560 FIX BUG3] chi undefined/invalid → midIdx rác
     const d = Math.abs(idx1 - idx2);
     let midIdx = -1;
     if (d === 2) midIdx = Math.min(idx1, idx2) + 1;

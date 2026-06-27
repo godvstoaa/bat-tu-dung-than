@@ -21,7 +21,7 @@ const PALACE_VI = { year: 'Trụ Năm (ổ tổ)', month: 'Trụ Tháng (cha m�
 
 function allStems(pillar, key) {
   const stems = [{ gan: pillar.gan, isHidden: false, src: 'can ' + key }];
-  for (const h of pillar.hidden) {
+  for (const h of (pillar.hidden || [])) { // [loop 560 FIX] guard hidden undefined → crash «not iterable»
     stems.push({ gan: h.gan, isHidden: true, src: 'tàng ' + key });
   }
   return stems;

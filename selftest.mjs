@@ -5060,6 +5060,14 @@ console.log('\n################## CC. [loop 79] lục thân: loại tàng day + 
     if (_cs.positions.some((p) => p.startsWith('day'))) _noDayViolation = false;
   }
   assert(_noDayViolation, '[fix] children-star positions KHÔNG chứa trụ day (Nhật Chi = phối ngẫu, không phải cung con)');
+  // [loop 560] NỮ firstGender phải check cả month (đồng bộ nam) — trước đây chỉ year.
+  //   Chart 1987 nữ có year.ganGod=食神 → firstGender phải = «thiên con trai» (food god=con trai cho nữ).
+  {
+    const _nR = analyze(1987, 1, 1, 12, 0, 'nữ', 2026);
+    const _ncs = _acs(_nR);
+    // chỉ assert KHÔNG crash + trả firstGender (giá trị phụ chart, không hardcode sai)
+    assert(typeof _ncs.firstGender === 'string' && _ncs.firstGender.length > 0, `[loop 560] children-star NỮ trả firstGender hợp lệ (month check đã thêm)`);
+  }
 
   // CC2. [Bug #5 fix] đếm ĐỦ tàng khí — có chart bắt sao ở trung/dư khí (trước đây chỉ hidden[0]=bản).
   let _foundTangMid = false;

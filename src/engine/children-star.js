@@ -50,9 +50,10 @@ export function analyzeChildrenStar(R) {
   const palaceStable = !interactions.chong.some(c => c.a === palaceZhi || c.b === palaceZhi)
     && !interactions.xing.some(c => c.a === palaceZhi || c.b === palaceZhi);
 
-  // 4. Dụng/Kỵ
-  const isYong = (yong.primary === childWx || yong.xi === childWx);
-  const isJi = (yong.ji === childWx || yong.chou === childWx);
+  // 4. Dụng/Kỵ  [loop 560 FIX BUG2] guard yong undefined — trước đây crash TypeError.
+  const y = yong || {};
+  const isYong = (y.primary === childWx || y.xi === childWx);
+  const isJi = (y.ji === childWx || y.chou === childWx);
 
   // 5. Ước lượng số con (cổ pháp: dựa sao + cung)
   let estimated;
@@ -67,14 +68,16 @@ export function analyzeChildrenStar(R) {
     if (chart.pillars.year.ganGod === '七殺' || chart.pillars.month.ganGod === '七殺') firstGender = 'thiên con trai';
     else if (chart.pillars.year.ganGod === '正官' || chart.pillars.month.ganGod === '正官') firstGender = 'thiên con gái';
   } else {
-    if (chart.pillars.year.ganGod === '食神') firstGender = 'thiên con trai';
-    else if (chart.pillars.year.ganGod === '傷官') firstGender = 'thiên con gái';
+    // [loop 560 FIX BUG1] NỮ cũng check cả month (đồng bộ nam) — trước đây chỉ year.
+    //   Cổ法: 食神/傷官 ở THÁNG (thiên nguyên chính đáng) quan trọng hơn năm.
+    if (chart.pillars.year.ganGod === '食神' || chart.pillars.month.ganGod === '食神') firstGender = 'thiên con trai';
+    else if (chart.pillars.year.ganGod === '傷官' || chart.pillars.month.ganGod === '傷官') firstGender = 'thiên con gái';
   }
 
   // 7. Thời điểm sinh con tốt (đại vận mang hành sao con / Dụng)
   const childDayun = (dayun || []).filter(d => {
     const dgWx = GAN[d.gan]?.wx, dzWx = ZHI[d.zhi]?.wx;
-    return dgWx === childWx || dzWx === childWx || dgWx === yong.primary;
+    return dgWx === childWx || dzWx === childWx || dgWx === y.primary;
   }).map(d => `${d.ganZhi}[${d.startAge}-${d.startAge+9}t]`);
 
   // 8. Tương tác
