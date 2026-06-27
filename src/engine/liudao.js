@@ -58,75 +58,75 @@ export const SIX_REALMS = {
     poison: 'sân (sân hận, giận dữ)', buddha: 'Địa Tạng Vương Bồ Tát', remedy: 'tu từ bi, nhẫn nhục, buông sân' },
 };
 
-// Tam độc + thiện/định score từ lá số BaZi (đồng bộ dân gian)
-// Trả về { tham, san, si, thien(善), dinh(禅定/印) } dạng 0-100.
+// [loop 547 FIX] Tam độc + thiện/định từ lá số — đếm ngũ hành TRỰC TIẾP từ trụ
+//   (R.interactions.elements KHÔNG tồn tại) + check 神煞 đúng key (R.shensha là
+//   object {nameCamel:{at:[...]}}, không phải .list/.stars). Trước đây san/si
+//   detection hầu như không kích hoạt → tam độc sai.
+const GAN_WX = { '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土', '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水' };
+
 function computePoisons(R) {
   const chart = R?.chart;
   const pillars = chart?.pillars || {};
-  const gods = [];
-  let fireWx = 0, earthWx = 0, totalWx = 0;
+  // (a) thập thần: ganGod (can lộ) + hidden[].god (tàng can)
+  const godCount = {};
+  // (b) ngũ hành count: can + tàng can (tàng = 0.5)
   const wxCount = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
   for (const k of ['year', 'month', 'day', 'time']) {
     const p = pillars[k];
     if (!p) continue;
-    if (p.ganGod) gods.push(p.ganGod);
-    if (p.hidden) for (const h of p.hidden) if (h?.god) gods.push(h.god);
+    if (p.ganGod) godCount[p.ganGod] = (godCount[p.ganGod] || 0) + 1;
+    if (p.gan && GAN_WX[p.gan]) wxCount[GAN_WX[p.gan]] += 1;
+    if (p.hidden) for (const h of p.hidden) {
+      if (h?.god) godCount[h.god] = (godCount[h.god] || 0) + 0.5;
+      if (h?.gan && GAN_WX[h.gan]) wxCount[GAN_WX[h.gan]] += 0.5;
+    }
   }
-  // ngũ hành count (ước lượng qua ganGod + can chi nếu có)
-  const ganWx = R?.chart?.dayMaster?.wx;
-  void ganWx;
-  // đếm thập thần
-  const godCount = {};
-  for (const g of gods) godCount[g] = (godCount[g] || 0) + 1;
-
-  // THAM (贪) — tài tinh mạnh (正财/偏财), đặc biệt tài nhiều thân nhược
-  let tham = (godCount['正財'] || 0) * 2 + (godCount['偏財'] || 0) * 2;
   const strength = R?.strength;
-  if (strength && strength.strong === false && ((godCount['正財'] || 0) + (godCount['偏財'] || 0)) >= 2) tham += 4; // tài đa thân nhược → tham nặng
+  const isStrong = !!(strength && strength.strong === true);
+  const isWeak = !!(strength && strength.strong === false);
 
-  // SAN (嗔) — thất sát + thương quan + dương nhận + hoả vượng + hình
-  let san = (godCount['七殺'] || 0) * 3 + (godCount['傷官'] || 0) * 2 + (godCount['偏官'] || 0) * 3;
-  // hoả vượng (lấy từ interactions/strength nếu có)
-  if (R?.interactions?.elements) {
-    fireWx = R.interactions.elements['火'] || 0;
-    earthWx = R.interactions.elements['土'] || 0;
-    if (fireWx >= 3) san += 3;
-  }
-  // dương nhận / hình → sân
-  const ss = R?.shensha;
-  if (ss) {
-    const ssList = Array.isArray(ss) ? ss : (ss.list || ss.stars || []);
-    const ssStr = JSON.stringify(ssList);
-    if (/羊刃|亡神|灾煞|劫煞|血刃/.test(ssStr)) san += 3;
-  }
+  // THAM (贪) — tài tinh (正財/偏財), nặng hơn nếu tài đa thân nhược
+  let tham = (godCount['正財'] || 0) * 2.4 + (godCount['偏財'] || 0) * 2.4;
+  const caiCnt = (godCount['正財'] || 0) + (godCount['偏財'] || 0);
+  if (isWeak && caiCnt >= 2) tham += 4; // tài đa thân nhược → tham gắt
+  if ((wxCount['金'] + wxCount['火']) >= 4) tham += 2; // kim/hỏa (tài/quan sát) thịnh
+
+  // SAN (嗔) — thất sát + thương quan + hoả vượng + dương nhận/hình + thân cường bá đạo
+  let san = (godCount['七殺'] || 0) * 3 + (godCount['傷官'] || 0) * 2;
+  if (wxCount['火'] >= 2.5) san += 3; // hoả vượng → nóng nảy
+  if (isStrong && (godCount['七殺'] || 0) >= 1) san += 2; // thân cường sát hiển → hiếu斗
+  // thần煞 hung (R.shensha là object, check key)
+  const ss = R?.shensha || {};
+  const hungSha = ['yangRen', 'wangShen', 'zaiSha', 'jieSha', 'xueRen', 'yangRenXing']; // 羊刃 亡神 灾煞 劫煞 血刃
+  let shaHit = 0;
+  for (const key of Object.keys(ss)) if (hungSha.includes(key) || /羊刃|亡神|灾煞|劫煞|血刃|元辰/.test(key)) shaHit++;
+  san += shaHit * 2;
   if (R?.interactions?.xing && R.interactions.xing.length) san += R.interactions.xing.length * 2;
 
-  // SI (痴) — thổ trọc + vô ấn + thực thương yếu → ngu muội
+  // SI (痴) — thổ trọc + vô ấn + vô thực thương (thiếu minh đạt)
   let si = 0;
-  if (earthWx >= 3) si += 3; // thổ trọc
-  if ((godCount['正印'] || 0) + (godCount['偏印'] || 0) === 0) si += 3; // vô ấn → thiếu tuệ
-  if ((godCount['食神'] || 0) + (godCount['傷官'] || 0) === 0) si += 2; // vô thực thương → thiếu minh đạt
+  if (wxCount['土'] >= 2.5) si += 4; // thổ trọc → nặng nề, cố chấp
+  if ((godCount['正印'] || 0) + (godCount['偏印'] || 0) === 0) si += 4; // vô ấn → thiếu tuệ
+  if ((godCount['食神'] || 0) + (godCount['傷官'] || 0) === 0) si += 3; // vô thực thương → kém linh hoạt
+  if (wxCount['水'] >= 3) si += 1; // thuỷ quá nhiều cũng dễ trôi (mơ hồ) — nhẹ
 
-  // THIỆN (善) — chính quan + chính ấn (giới + tuệ), cân bằng
-  let thien = (godCount['正官'] || 0) * 3 + (godCount['正印'] || 0) * 2 + (godCount['正財'] || 0) * 1;
-  if (strength && strength.strong !== undefined) {
-    // trung hòa (không quá vượng/nhược) → thiện
-    const sc = strength.score ?? strength.value ?? 0;
-    if (sc >= 35 && sc <= 65) thien += 3;
-  }
+  // THIỆN (善) — chính quan + chính ấn + chính tài (tam chính = giới tuệ tài)
+  let thien = (godCount['正官'] || 0) * 3 + (godCount['正印'] || 0) * 2.5 + (godCount['正財'] || 0) * 1.2;
+  // trung hoà (không quá vượng/nhược) → thiện
+  const effRatio = strength?.effRatio;
+  if (effRatio != null && effRatio >= 0.35 && effRatio <= 0.65) thien += 4;
 
   // ĐỊNH (禅定 / ấn tinh hộ thân)
   let dinh = (godCount['正印'] || 0) * 3 + (godCount['偏印'] || 0) * 2;
 
   // BỐ (布施 / thực thần sinh tài — cho đi)
-  let bo = (godCount['食神'] || 0) * 3 + (godCount['傷官'] || 0) * 1;
+  let bo = (godCount['食神'] || 0) * 3 + (godCount['傷官'] || 0) * 1.5;
 
-  // chuẩn hoá 0-100 (giả định max ~15 mỗi loại)
   const clamp = (n) => Math.max(0, Math.min(100, Math.round(n * 100 / 15)));
   return {
     tham: clamp(tham), san: clamp(san), si: clamp(si),
     thien: clamp(thien), dinh: clamp(dinh), bo: clamp(bo),
-    godCount,
+    godCount, wxCount, shaHit,
   };
 }
 
@@ -137,7 +137,7 @@ export function computeLiuDao(R) {
     const p = computePoisons(R);
     const scores = {
       '天道': Math.round(p.thien * 0.5 + p.dinh * 0.5),           // 上品十善 + 禅定
-      '人道': Math.round(p.thien * 0.4 + p.bo * 0.2 + (100 - Math.abs(p.tham + p.san + p.si - 50)) * 0.4), // 五戒 + trung hòa
+      '人道': Math.round(p.thien * 0.5 + p.bo * 0.2 + (100 - (p.tham + p.san + p.si) / 3) * 0.3), // 五戒: thiện cao + tam độc thấp
       '阿修罗道': Math.round(p.bo * 0.5 + p.san * 0.5),           // 布施 + 嗔
       '畜生道': Math.round(p.si * 0.8),                           // 愚痴
       '饿鬼道': Math.round(p.tham * 0.9),                         // 悭贪
