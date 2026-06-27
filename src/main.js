@@ -3109,6 +3109,9 @@ function run() {
   const dateVal = $('date').value;
   const timeVal = $('time').value || '12:00';
   if (!dateVal) return;
+  // [loop 447] loading state — visual feedback during compute+render
+  const _btn = document.querySelector('#birth-form button[type="submit"]');
+  if (_btn) { const _orig = _btn.innerHTML; _btn.innerHTML = '⏳ Đang luận giải…'; _btn.disabled = true; setTimeout(() => { _btn.innerHTML = _orig; _btn.disabled = false; }, 2000); }
   const [y0, m0, d0] = dateVal.split('-').map(Number);
   const [hh0, mm0] = timeVal.split(':').map(Number);
   const gender = document.querySelector('input[name="gender"]:checked').value;
