@@ -42,6 +42,7 @@ import { analyzeBusiness } from './bazi-business.js';
 import { analyzePillarQuality } from './pillar-quality.js';
 import { detectGongjia } from './gongjia.js';
 import { guiguziFortune } from './guiguzi.js';
+import { dayNayinPersonality } from './nayin-personality.js';
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -100,6 +101,11 @@ export function extendBrief(R) {
   try {
     const gg = guiguziFortune(R);
     if (gg) parts.push(`鬼谷子 GUIGUZI: năm ${gg.yearJiaZi} (${gg.nayin}/${gg.vi}) ${gg.toneVi}. ${gg.fortune?.slice(0, 80) || ''} Nghề: ${(gg.career || '').slice(0, 50)}.`);
+  } catch (e) {}
+  // [loop 526] 日柱納音 personality — bản chất bẩm sinh theo nạp âm NGÀY
+  try {
+    const dnp = dayNayinPersonality(R);
+    if (dnp && dnp.traits) parts.push(`日柱納音 BẢN CHẤT: ${dnp.dayJiaZi} nạp âm ${dnp.nayin} (${dnp.vi}) — ${dnp.nature}. ${dnp.traits.slice(0, 80)} Mạnh: ${dnp.strength}. Yếu: ${dnp.weakness}.`);
   } catch (e) {}
 
   // [loop 89] MỆNH CÁCH TẦNG LỚP (命格層次) — phân loại cổ điển 6 tiêu chí (module chart-level trước đây ẩn).

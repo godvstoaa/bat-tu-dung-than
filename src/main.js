@@ -116,6 +116,7 @@ import { jiaoYunAnalysis } from './engine/jiaoyun.js';
 import { analyzePillarQuality } from './engine/pillar-quality.js';
 import { analyzeYuanLiu } from './engine/yuanliu.js';
 import { guiguziFortune } from './engine/guiguzi.js';
+import { dayNayinPersonality } from './engine/nayin-personality.js';
 import { phaseNarrative } from './engine/phase-narrative.js';
 import { personalityNarrative } from './engine/personality-narrative.js';
 import { analyzeHuaQi } from './engine/huaqi.js';
@@ -1733,6 +1734,27 @@ function renderGuiguzi(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được Quỷ Cốc Tử.</p>'; }
 }
 
+// [loop 526] 日柱納音 personality card
+function renderNayinPersonality(R) {
+  const el = $('nayin-personality');
+  if (!el) return;
+  try {
+    const np = dayNayinPersonality(R);
+    if (!np || !np.traits) { el.innerHTML = '<p class="hint">Không tính được nạp âm nhật trụ.</p>'; return; }
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="font-size:28px;font-family:'Noto Serif SC',serif;font-weight:700;color:var(--gold-bright)">${esc(np.dayJiaZi)}</div>
+        <div><div style="font-weight:600">${esc(np.nayin)} (${esc(np.vi)})</div><span class="hint">${esc(np.nature)}</span></div>
+      </div>
+      <p style="margin:6px 0">${esc(np.traits)}</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin:6px 0">
+        <span class="ln-rate rate-cat">✓ Mạnh: ${esc(np.strength)}</span>
+        <span class="ln-rate rate-hung">⚠ Yếu: ${esc(np.weakness)}</span>
+      </div>
+      <p class="hint">💖 Tương hợp: ${esc(np.compat)} · ⚡ Tránh: ${esc(np.avoid)}</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được nạp âm nhật trụ.</p>'; }
+}
+
 function renderHuaqi(R) {
   const el = $('huaqi');
   if (!el) return;
@@ -3290,6 +3312,7 @@ function run() {
   renderPhaseNarrative(currentResult); // [loop 472] narrative ngay sau tổng luận
   renderDayunTimeline(currentResult); // [loop 475] timeline trực quan thập kỷ
   renderGuiguzi(currentResult); // [loop 522] Quỷ Cốc Tử thần toán
+  renderNayinPersonality(currentResult); // [loop 526] 日柱納音 personality
   renderQianli(currentResult);
   renderMangpai(currentResult);
   renderMangpaiView(currentResult);
