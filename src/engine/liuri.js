@@ -112,9 +112,11 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
 
   score = Math.max(5, Math.min(95, Math.round(score)));
   let rating;
-  if (score >= 64) rating = 'Cát';
-  else if (score >= 50) rating = 'Bình';
-  else if (score >= 38) rating = 'Hơi kỵ';
+  // [loop 469] recalibrate theo percentile (median 52, p15 43, p85 57, range hẹp). Cũ 64
+  //   → «Cát» UNREACHABLE (max 57 < 64). Nay Cát≥54 reachable, median→Bình.
+  if (score >= 54) rating = 'Cát';
+  else if (score >= 48) rating = 'Bình';
+  else if (score >= 44) rating = 'Hơi kỵ';
   else rating = 'Kỵ';
 
   const advice = score >= 64 ? `Hôm nay (${rating}) — thuận, nên làm việc chính/ký kết/gặp quý nhân.`

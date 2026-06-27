@@ -137,9 +137,11 @@ export function computeLiuyue(R, solarYear, patternQuality) {
 
     score = Math.max(5, Math.min(95, Math.round(score)));
     let rating;
-    if (score >= 64) rating = 'Cát';
-    else if (score >= 50) rating = 'Bình';
-    else if (score >= 38) rating = 'Hơi kỵ';
+    // [loop 469] recalibrate theo percentile (median 47, p15 40, p85 56). Cũ 64/50/38
+    //   → median rơi «Hơi kỵ» (sai — tháng TB phải «Bình»), 55% Hơi kỵ. Nay median→Bình.
+    if (score >= 55) rating = 'Cát';
+    else if (score >= 41) rating = 'Bình';
+    else if (score >= 34) rating = 'Hơi kỵ';
     else rating = 'Kỵ';
     const note = [godVi, ...extraNotes, ...fyNotes].filter(Boolean).join(' · ');
     months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note, taiSui: extraNotes, fuyin: fyNotes });
