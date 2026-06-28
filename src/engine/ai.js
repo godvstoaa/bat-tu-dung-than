@@ -242,7 +242,8 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
   const _age = curYear - R.chart.input.year;
   const _dy = (R.dayun || []).find((d) => _age >= d.startAge && _age < d.startAge + 10);
   let _gy = ''; try { const g = findGoldenYear(R, curYear, 10); const tg = (g.ranked || []).filter((r) => r.isTrulyGolden).map((r) => r.year); if (tg.length) _gy = `, năm vàng ${tg.join('/')}`; } catch (_) {}
-  return `Nhật Chủ ${dm.vi} (${R.strength?.strong ? 'vượng' : 'nhược'}), Dụng ${wxVi(R.yong.primary)}${R.yong.tiaohou?.override ? ' (调候)' : ''}, điểm ${R.synthesis?.score ?? '?'}/100 (${R.synthesis?.gradeVi ?? '?'}${R.synthesis?.percentile ? ', cao hơn ' + R.synthesis.percentile + '% lá số' : ''})${_dy ? `, đại vận ${_dy.ganZhi}[${_dy.rating}]` : ''}${_gy}.`;
+  const _qy = (R.dayun || [])[0]?.startAge;
+  return `Nhật Chủ ${dm.vi} (${R.strength?.strong ? 'vượng' : 'nhược'}), Dụng ${wxVi(R.yong.primary)}${R.yong.tiaohou?.override ? ' (调候)' : ''}, điểm ${R.synthesis?.score ?? '?'}/100 (${R.synthesis?.gradeVi ?? '?'}${R.synthesis?.percentile ? ', cao hơn ' + R.synthesis.percentile + '% lá số' : ''})${_qy ? `, 起运 ${_qy}t` : ''}${_dy ? `, đại vận ${_dy.ganZhi}[${_dy.rating}]` : ''}${_gy}.`;
 } catch (_) { return '(đang tính)'; } })()}
 - Nhật Chủ (日主): ${dm.gan} ${dm.vi} — hành ${wxVi(dm.wx)} ${dm.yin ? '(âm)' : '(dương)'}
 - BẢN MỆNH HÀM 演禽 (28 túc con-vật-tinh, như con giáp 28-fold): ${(() => { try { return analyzeYanQin(R).summary; } catch (e) { return '(không tính được)'; } })()}
