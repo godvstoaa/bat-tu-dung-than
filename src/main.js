@@ -5651,9 +5651,16 @@ function renderQuickSummary() {
     const ln = (c.liunian || []).find((l) => l.isNow);
     const dyNy = dy ? ganZhiNayin(dy.ganZhi) : null; // [loop 361] nạp âm đại vận
     curDyTxt = dy ? `Đại vận <b>${hanviet(dy.ganZhi)}</b> (${dy.startAge}–${dy.startAge + 9}t, ${dy.zhiGod ? TEN_GOD_VI[dy.zhiGod] + ' vận, ' : ''}${dyNy ? dyNy + ', ' : ''}${dy.rating})${ln ? ` · Lưu niên ${hanviet(ln.ganZhi)} (${ln.gan ? TEN_GOD_VI[tenGod(c.chart.dayGan, ln.gan)] + ' năm, ' : ''}${ln.rating})` : ''}` : '(không rõ)';
-    // [loop 645] ĐỈNH VẬN emphasis — khi đại vận hiện tại Đại cát, thêm alert hành động (rất quan trọng user dễ miss)
+    // [loop 645→663] ĐỈNH VẬN emphasis — ten-god specific strategy (Tài/Quan/Ấn/Thực/Tỷ)
     if (dy && dy.rating === 'Đại cát') {
-      curDyTxt = `⭐ <b>ĐỈNH VẬN</b> — đang ở giai đoạn <b>Đại cát</b> (${dy.startAge}–${dy.startAge + 9}t), nên tận dụng tiến thủ lớn (mua nhà, khởi nghiệp, quyết định quan trọng). ${curDyTxt}`;
+      // [loop 663] strategy theo thập thần vận — Tài=đầu tư, Quan=sự nghiệp, Ấn=học vấn, Thực=sáng tạo, Tỷ=hợp tác
+      const _dyGod = dy.zhiGod || dy.ganGod || '';
+      const _strat = /Tài/.test(_dyGod) ? 'đầu tư/kinh doanh/mua nhà (vận Tài)'
+        : /Quan|Sát/.test(_dyGod) ? 'thăng tiến sự nghiệp/xây quyền (vận Quan)'
+        : /Ấn/.test(_dyGod) ? 'học tập/chứng chỉ/quý nhân (vận Ấn)'
+        : /Thực|Thương/.test(_dyGod) ? 'sáng tạo/khởi nghiệp/ý tưởng (vận Thực)'
+        : /Tỷ|Kiếp/.test(_dyGod) ? 'hợp tác/xây mạng lưới (vận Tỷ)' : 'tiến thủ lớn';
+      curDyTxt = `⭐ <b>ĐỈNH VẬN</b> — đang ở giai đoạn <b>Đại cát</b> (${dy.startAge}–${dy.startAge + 9}t), nên ${_strat}. ${curDyTxt}`;
     } else if (dy && /Hung|nghịch|Kỵ/.test(dy.rating)) {
       curDyTxt = `⚠ Đại vận <b>${dy.rating}</b> (${dy.startAge}–${dy.startAge + 9}t) — giữ ổn định, tránh rủi ro lớn, đợi vận better. ${curDyTxt}`;
     }
