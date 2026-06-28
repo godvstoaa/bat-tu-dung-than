@@ -658,8 +658,10 @@ export function composeAnswer(question, R) {
       intent,
     };
   }
-  // [loop 655] REMEDY (offline) — «bớt xui/đổi vận»
-  if (intent.isRemedy) {
+  // [loop 655→716 FIX] REMEDY (offline) — nhưng KHÔNG override isTiming
+  //   Trước đây «năm sau nên làm gì» match cả isRemedy (nen lam gi) + isTiming (nam sau)
+  //   → isRemedy check trước → route SAI sang remedy thay vì timing.
+  if (intent.isRemedy && !intent.isTiming) {
     const WX_COLOR = { 木: 'xanh lá', 火: 'đỏ/tím', 土: 'vàng/nâu', 金: 'trắng/bạc', 水: 'đen/xanh đậm' };
     const WX_LIFE = { 木: 'giữ lòng từ bi, trồng cây, đi rừng', 火: 'tăng ánh sáng, lễ bái, vận động', 土: 'chân đất, gốm đá, thiền định', 金: 'sáng sớm, kỷ luật, rèn luyện', 水: 'gần sông biển, đọc sách, tĩnh lặng' };
     const dung = R.yong?.primary;
