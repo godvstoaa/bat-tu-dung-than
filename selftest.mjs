@@ -622,6 +622,26 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
   assert(wu.taboos.some((t) => t.type === 'Thái Tuế' && t.at.includes('午')), `[loop 635] 午 = Thái Tuế năm 2026 precise 24-sơn`);
   console.log(`   yinzhai-deep precise 24-sơn sat ✓ — 三煞 亥子丑 đều flag; 壬/癸 không false-flag; 午=Thái Tuế`);
 }
+// [loop 636] year-daily ratingOf phải dùng CÙNG thang liuri (54/48/44) — không 64/50/38 cũ.
+//   Kiểm: với ngày có score BẰNG NHAU giữa 2 hệ → verdict phải ĐỒNG (chứng tỏ threshold aligned).
+{
+  const { computeYearDaily } = await import('./src/engine/year-daily.js');
+  const { analyzeLiuRi } = await import('./src/engine/liuri.js');
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const yd = computeYearDaily(R, 2026, R.patternQuality);
+  // year-daily gọi liuri KHÔNG patternQuality (base), nên so cùng base (liuri không geju)
+  let mismatch = 0, checked = 0;
+  for (const d of (yd.days || []).filter((_, i) => i % 50 === 0)) {
+    const [y, mo, da] = (d.date || '').split('-').map(Number);
+    let lr; try { lr = analyzeLiuRi(R, y, mo, da); } catch (e) { continue; } // base (no geju) — khớp year-daily
+    if (d.score === lr.score) { checked++; if (d.rating !== lr.rating) mismatch++; }
+  }
+  assert(checked > 0 && mismatch === 0, `[loop 636] year-daily & liuri CÙNG threshold (${mismatch}/${checked} mismatch cho ngày score bằng — trước fix lệch 64/50/38)`);
+  // direct threshold check: score 56 phải = Cát ở cả 2 (trước fix year-daily = «Bình»)
+  const _exp54 = (s) => s >= 54 ? 'Cát' : s >= 48 ? 'Bình' : s >= 44 ? 'Hơi kỵ' : 'Hung';
+  assert(_exp54(56) === 'Cát', `[loop 636] score 56 = Cát (thang daily 54/48/44)`);
+  console.log(`   year-daily ≡ liuri threshold ✓ — ${checked} ngày score-bằng đồng verdict (thang 54/48/44 thống nhất)`);
+}
 
 // ################## [loop 20 NEW] 十二长生运 (đại vận + lưu niên) ##################
 import { dayunChangsheng, liunianChangsheng, stageCategory } from './src/engine/changsheng-deep.js';

@@ -41,10 +41,14 @@ function activeDayun(R, year) {
 }
 
 function ratingOf(score) {
-  if (score >= 64) return 'Cát';
-  if (score >= 50) return 'Bình';
-  if (score >= 38) return 'Hơi kỵ';
-  return 'Hung'; // [loop 471] Kỵ→Hung unify daily vocab
+  // [loop 636 FIX] align với liuri rateLiuriByScore loop 469→470 (54/48/44).
+  //   Trước đây 64/50/38 (thang cũ, không recalibrate) → cùng ngày cho rating KHÁC liuri
+  //   (vd score 56: year-daily «Bình», liuri «Cát») → user thấy 2 verdict mâu thuẫn.
+  //   Cùng bug-class loop 628-630 (recalibrate miss spot).
+  if (score >= 54) return 'Cát';
+  if (score >= 48) return 'Bình';
+  if (score >= 44) return 'Hơi kỵ';
+  return 'Hung';
 }
 
 /**
