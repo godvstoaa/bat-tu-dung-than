@@ -284,7 +284,8 @@ export function extendBrief(R) {
   // Phối ngẫu tinh
   try {
     const sp = analyzeSpouseStar(R);
-    parts.push(`PHỐI NGÃU: ${sp.spouseStar}(${sp.spouseWxVi}) ${sp.strength} | Dụng=${sp.isYong} Kỵ=${sp.isJi} | cung ${sp.palaceZhiVi} ${sp.palaceStable ? 'yên' : 'xung'}${sp.interactions.length ? ' | ' + sp.interactions.join(';') : ''}`);
+    const _spDir = { 木: 'Đông', 火: 'Nam', 土: 'Tây Nam/Trung', 金: 'Tây', 水: 'Bắc' }[sp.spouseWx] || '?';
+    parts.push(`PHỐI NGÃU: ${sp.spouseStar}(${sp.spouseWxVi}) ${sp.strength} | Dụng=${sp.isYong} Kỵ=${sp.isJi} | cung ${sp.palaceZhiVi} ${sp.palaceStable ? 'yên' : 'xung'}${sp.interactions.length ? ' | ' + sp.interactions.join(';') : ''} | hướng gặp: ${_spDir}${sp.isYong ? ' (Dụng → bạn đời mang lại may mắn)' : ''}`);
   } catch (e) {}
 
   // [loop 601] TÌNH DUYÊN SÂU — đào hoa + hồng diễm + duyên score + timing
