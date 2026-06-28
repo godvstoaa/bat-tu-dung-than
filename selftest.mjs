@@ -5691,6 +5691,32 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(ev != null, `[smoke] event-verify trả object`);
   console.log(`   Smoke batch 2 ✓ — business + career + diet + workout + minggong + family + event-verify`);
 }
+
+// ################## SMOKE TEST batch 3: lifestyle/dayun [loop 571] ##################
+{
+  console.log('\n##### SMOKE batch 3: lifestyle + analysis [loop 571] #####');
+  const { aromaTherapy } = await import('./src/engine/aroma-fs.js');
+  const { crystalLuckyObjects } = await import('./src/engine/crystal-fs.js');
+  const { clothingByOccasion } = await import('./src/engine/clothing-fs.js');
+  const { dominantGod } = await import('./src/engine/dominant-god.js');
+  const { analyzeMarriageDeep } = await import('./src/engine/marriage-deep.js');
+  // aroma: dungOils array
+  const ar = aromaTherapy(spR);
+  assert(ar.dungOils && ar.dungOils.length > 0, `[smoke] aroma-fs.dungOils non-empty`);
+  // crystal: dungCrystals
+  const cr = crystalLuckyObjects(spR);
+  assert(cr.dungCrystals, `[smoke] crystal-fs.dungCrystals exists`);
+  // clothing: occasions
+  const cl = clothingByOccasion(spR);
+  assert(cl.occasions, `[smoke] clothing-fs.occasions exists`);
+  // dominant-god: ranked array
+  const dg = dominantGod(spR);
+  assert(Array.isArray(dg.ranked) && dg.ranked.length > 0, `[smoke] dominant-god.ranked non-empty array`);
+  // marriage-deep: score number
+  const md = analyzeMarriageDeep(spR);
+  assert(typeof md.score === 'number', `[smoke] marriage-deep.score number`);
+  console.log(`   Smoke batch 3 ✓ — aroma + crystal + clothing + dominant-god + marriage-deep`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
