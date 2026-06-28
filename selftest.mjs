@@ -946,6 +946,19 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   }
   console.log('   [loop 750] 胎元 (5 thành viên) khớp công thức 月干+1/月支+3 ✓');
 }
+// [loop 751] 从格/专旺 detection RATE — meta-invariant bảo vệ threshold calibration.
+//   Cổ pháp: ~3-7% charts. Engine conservative 1.5% (false 从格 flip 用神 thảm họa → thà miss).
+//   Guard: rate phải trong 0.5%-12% — bắt regress nếu threshold quá lỏng (rate nổ) hoặc quá chặt (rate tắt).
+{
+  let _total = 0, _special = 0;
+  for (let _y = 1985; _y <= 2005; _y++) for (const _m of [2, 5, 8, 11]) for (const _d of [5, 15, 25]) for (const _h of [0, 6, 12, 18]) {
+    try { const _R = analyze(_y, _m, _d, _h, 0, 'nam', 2026); _total++; if (_R.pattern?.type === 'special') _special++; } catch (e) {}
+  }
+  const _rate = _special / _total;
+  assert(_rate >= 0.005 && _rate <= 0.12, `[loop 751] 从格/专旺 rate trong khoảng 0.5%-12% (got ${(_rate * 100).toFixed(1)}% = ${_special}/${_total}) — threshold calibration ổn định`);
+  assert(_special > 0, '[loop 751] phát hiện ÍT NHẤT 1 从格/专旺 trong sample (detectSpecial hoạt động)');
+  console.log(`   [loop 751] 从格/专旺 rate ${(_rate * 100).toFixed(1)}% (${_special}/${_total}) — trong khoảng an toàn ✓`);
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
