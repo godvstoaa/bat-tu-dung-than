@@ -226,7 +226,7 @@ export function deduceFromFamily(subject, members) {
     const detail = famFortune.map((f) => `${f.who}=${f.r}`).join(', ');
     let note = `🎭 VẬN HIỆN CẢ NHÀ (${curYear}): ${detail}.`;
     if (peak.length) note += ` ⭐ Đang ĐỈNH VẬN: ${peak.join(', ')} — nên tiến thủ lớn.`;
-    if (hard.length) note += ` ⚠ Đang vận khó: ${hard.join(', ')} — cần hỗ trợ/khích lệ, tránh gây áp lực.`;
+    if (hard.length) note += ` ⚠ Đang vận khó: ${hard.join(', ')} — cần hỗ trợ/khích lệ, tránh gây áp lực. [loop 670] Mẹ khó đến ~${(() => { const m = validMembers.find(mm => /Mẹ|mẹ/.test(mm.label||'')); if (!m) return '?'; const dy = (m.R.dayun||[]).find(d => { const a = curYear - m.R.chart.input.year; return a >= d.startAge && a < d.startAge + 10; }); const nxt = (m.R.dayun||[])[(m.R.dayun||[]).indexOf(dy)+1]; return dy ? (m.R.chart.input.year + dy.startAge + 10) + (nxt ? ` → chuyển ${nxt.ganZhi}[${nxt.rating}]` : '') : '?'; })()} —「命好不如运好」vận sẽ đổi.`;
     holographic.push(note);
   }
 
