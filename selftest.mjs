@@ -1947,6 +1947,16 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   assert(vf.includes('ĐỈNH VẬN') || vf.includes('Đại cát'), `[loop 646] flag chủ thể ĐỈNH VẬN (Quân 己未 Đại cát)`);
   console.log(`   family fortune overview ✓ — ${vf.slice(0, 80)}...`);
 }
+// [loop 647] analyze_partner marriageTiming — năm CẢ HAI vận tốt (cửa sổ cưới).
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  const Ru = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const p = execTool('analyze_partner', { year: 1990, month: 8, day: 12, hour: 14, gender: 'nữ' }, Ru);
+  assert(!p.error, `[loop 647] analyze_partner không crash (got ${p.error})`);
+  assert(p.score && p.rating, `[loop 647] analyze_partner trả score/rating (got ${p.score}/${p.rating})`);
+  assert(p.marriageTiming && Array.isArray(p.marriageTiming.bestYears) && p.marriageTiming.note, `[loop 647] analyze_partner có marriageTiming (bestYears + note)`);
+  console.log(`   analyze_partner marriageTiming ✓ — score ${p.score} ${p.rating}, timing note có`);
+}
 // [loop 644] daily.js (dailyGuidance) + liuri advice — align thang 54/48 (không 65/45 hay 64).
 //   Bug: dailyGuidance dùng 65/45 (thang cũ); liuri advice >=64 nhưng rating Cát >=54 → mâu thuẫn nội bộ.
 {

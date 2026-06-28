@@ -875,7 +875,25 @@ export function execTool(name, args, R) {
           return { type: 'kinhdoanh', score: m.score, rating: m.rating, roleFit: _s(m.roleFit, 200), details: (m.details || []).map((d) => _s(d, 150)), advice: _s(m.advice, 250) };
         }
         const h = computeHehun(R, pR);
-        return { type: 'hôn nhân', score: h.score, rating: h.rating, verdict: _s(h.verdict, 250), factors: (h.factors || []).map((f) => _s(f, 150)) };
+        // [loop 647] MARRIAGE TIMING — tìm năm CẢ HAI đương đại vận Cát (cửa sổ cưới tốt).
+        //   Cổ法 «婚期看运»: năm cưới nên cả hai đang vận tốt + không冲/phạm năm xấu.
+        const _dyAt = (res, yr) => { const dy = (res.dayun || []).find((d) => { const a = yr - res.chart.input.year; return a >= d.startAge && a < d.startAge + 10; }); return dy?.rating || '?'; };
+        const _isCat = (r) => r === 'Đại cát' || r === 'Cát' || r === 'Hơi thuận';
+        const curY = new Date().getFullYear();
+        const goodYears = [], badYears = [];
+        for (let y = curY; y <= curY + 6; y++) {
+          const rR = _dyAt(R, y), rP = _dyAt(pR, y);
+          if (_isCat(rR) && _isCat(rP)) goodYears.push(`${y}(${rR}/${rP})`);
+          else if (/Hung|nghịch|Kỵ/.test(rR) || /Hung|nghịch|Kỵ/.test(rP)) badYears.push(`${y}(${rR}/${rP})`);
+        }
+        const marriageTiming = {
+          bestYears: goodYears.slice(0, 4),
+          avoidYears: badYears.slice(0, 3),
+          note: goodYears.length
+            ? (h.score >= 45 ? `Nên cưới ${goodYears[0]} (cả 2 đang vận tốt). Cửa sổ cát: ${goodYears.join(', ')}.` : `Dù tương hợp trung bình, nếu cưới hãy chọn ${goodYears.join(', ')} (vận cả 2 tốt bù đắp).`)
+            : `6 năm tới không có năm nào CẢ HAI đều vận tốt — nếu cưới, chọn năm ít xấu nhất (${badYears[0] || '...'}), kết hợp xem thêm lưu niên + tháng cát.`,
+        };
+        return { type: 'hôn nhân', score: h.score, rating: h.rating, verdict: _s(h.verdict, 250), factors: (h.factors || []).map((f) => _s(f, 150)), marriageTiming };
       }
       case 'analyze_relative': {
         // [loop 606] Phân tích người thân — AI tool cho câu hỏi «mẹ/bố/em tôi thế nào»
