@@ -208,6 +208,27 @@ export function deduceFromFamily(subject, members) {
   } else {
     holographic.push(`⛩️ THÁI TUẾ ${tsYear}: cả nhà KHÔNG ai phạm thái tuế nặng — bình an.`);
   }
+  // [loop 646] VẬN HIỆN CẢ NHÀ — mỗi người đang ở đại vận gì (peak/khó) → ai cần hỗ trợ.
+  //   Cổ法 «一家之兴衰，观其成员之运»: tổng khí cả nhà = tổng vận các thành viên.
+  const curYear = new Date().getFullYear();
+  const famFortune = [];
+  // chủ thể
+  const subjDy = (S.dayun || []).find((d) => { const a = curYear - S.chart.input.year; return a >= d.startAge && a < d.startAge + 10; });
+  if (subjDy) famFortune.push({ who: 'chủ thể', r: subjDy.rating });
+  for (const m of validMembers) {
+    const age = curYear - m.R.chart.input.year;
+    const dy = (m.R.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
+    if (dy) famFortune.push({ who: m.label || ROLE_VI_LONG[m.role], r: dy.rating });
+  }
+  if (famFortune.length) {
+    const peak = famFortune.filter((f) => f.r === 'Đại cát').map((f) => f.who);
+    const hard = famFortune.filter((f) => /Hung|nghịch/.test(f.r)).map((f) => f.who);
+    const detail = famFortune.map((f) => `${f.who}=${f.r}`).join(', ');
+    let note = `🎭 VẬN HIỆN CẢ NHÀ (${curYear}): ${detail}.`;
+    if (peak.length) note += ` ⭐ Đang ĐỈNH VẬN: ${peak.join(', ')} — nên tiến thủ lớn.`;
+    if (hard.length) note += ` ⚠ Đang vận khó: ${hard.join(', ')} — cần hỗ trợ/khích lệ, tránh gây áp lực.`;
+    holographic.push(note);
+  }
 
   return {
     ok: results.length > 0,

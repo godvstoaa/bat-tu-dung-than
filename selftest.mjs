@@ -1932,6 +1932,21 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   assert(ts && ts.includes('Mỹ Anh') && ts.includes('冲太岁'), `[loop 643] family taisui flag Mỹ Anh (子) 冲太岁 2026 (got ${(ts || 'NONE').slice(0, 60)})`);
   console.log(`   family taisui overview ✓ — Mỹ Anh (子) 冲太岁 2026 được flag`);
 }
+// [loop 646] VẬN HIỆN CẢ NHÀ — mỗi người đang ở đại vận gì (peak/khó) → ai cần hỗ trợ.
+{
+  const { deduceFromFamily } = await import('./src/engine/family-deduction.js');
+  const S = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const fam = [
+    { role: 'mother', label: 'Mẹ', R: analyze(1970, 6, 27, 7, 15, 'nữ', 2026) },
+    { role: 'father', label: 'Bố', R: analyze(1964, 4, 4, 12, 0, 'nam', 2026) },
+  ];
+  const d = deduceFromFamily(S, fam);
+  const vf = d.holographic.find((h) => h.includes('VẬN HIỆN CẢ NHÀ'));
+  assert(vf, `[loop 646] có insight VẬN HIỆN CẢ NHÀ`);
+  assert(vf.includes('chủ thể') && vf.includes('Mẹ') && vf.includes('Bố'), `[loop 646] liệt kê đủ thành viên`);
+  assert(vf.includes('ĐỈNH VẬN') || vf.includes('Đại cát'), `[loop 646] flag chủ thể ĐỈNH VẬN (Quân 己未 Đại cát)`);
+  console.log(`   family fortune overview ✓ — ${vf.slice(0, 80)}...`);
+}
 // [loop 644] daily.js (dailyGuidance) + liuri advice — align thang 54/48 (không 65/45 hay 64).
 //   Bug: dailyGuidance dùng 65/45 (thang cũ); liuri advice >=64 nhưng rating Cát >=54 → mâu thuẫn nội bộ.
 {
