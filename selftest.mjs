@@ -736,6 +736,31 @@ console.log('\n################## 12.5 十二长生运 (đại vận/lưu niên)
 }
 // [loop 20 sửa mỹ từ] 纳音 Hán-Việt: 金箔金 = Kim Bạc Kim (箔=Bạc, không phải Bác)
 assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi = Kim Bạc Kim (được ${NAYIN_MEANING['金箔金'].vi})`);
+// [loop 737] ABSOLUTE classical guards — pin 12长生 + 空亡 to cố-định cổ quyết.
+//   Test trước đây chỉ check INTERNAL consistency (changSheng khớp giữa modules) → nếu
+//   CHANGSHENG_START / XUN_KONG sai thì vẫn PASS (sai nhất quán). Guard này chốt GIÁ TRỊ TUYỆT ĐỐI.
+{
+  // 12长生 — 渊海子平 «阳干顺行, 阴干逆行» school. 10 thiên can, vị trí kinh điển:
+  assert(changSheng('甲', '亥') === '長生' && changSheng('甲', '卯') === '帝旺' && changSheng('甲', '寅') === '臨官', '[loop 737] 甲木: 长生@亥, 帝旺@卯, 临官@寅');
+  assert(changSheng('丙', '寅') === '長生' && changSheng('丙', '午') === '帝旺', '[loop 737] 丙火: 长生@寅, 帝旺@午');
+  assert(changSheng('戊', '寅') === '長生', '[loop 737] 戊土长生@寅 (thổ tòng hỏa)');
+  assert(changSheng('庚', '巳') === '長生' && changSheng('庚', '酉') === '帝旺', '[loop 737] 庚金: 长生@巳, 帝旺@酉');
+  assert(changSheng('壬', '申') === '長生' && changSheng('壬', '子') === '帝旺', '[loop 737] 壬水: 长生@申, 帝旺@子');
+  // 阴干逆行 (âm can nghịch hành) — 5 can âm
+  assert(changSheng('乙', '午') === '長生' && changSheng('乙', '卯') === '臨官', '[loop 737] 乙木阴干逆行: 长生@午, 临官@卯');
+  assert(changSheng('丁', '酉') === '長生', '[loop 737] 丁火阴干: 长生@酉');
+  assert(changSheng('己', '酉') === '長生', '[loop 737] 己土阴干: 长生@酉');
+  assert(changSheng('辛', '子') === '長生' && changSheng('辛', '申') === '帝旺', '[loop 737] 辛金阴干: 长生@子, 帝旺@申');
+  assert(changSheng('癸', '卯') === '長生', '[loop 737] 癸水阴干: 长生@卯');
+  // 空亡 — 6 旬 cổ quyết, test trực tiếp analyzeKongwang với mini-chart
+  const { analyzeKongwang } = await import('./src/engine/kongwang.js');
+  const XUN_TEST = [['甲','子',['戌','亥']],['甲','戌',['申','酉']],['甲','申',['午','未']],['甲','午',['辰','巳']],['甲','辰',['寅','卯']],['甲','寅',['子','丑']]];
+  for (const [g, z, exp] of XUN_TEST) {
+    const kw = analyzeKongwang({ dayGan: g, pillars: { year: { gan: g, zhi: z }, month: { gan: g, zhi: z }, day: { gan: g, zhi: z }, time: { gan: g, zhi: z } } });
+    assert(kw.kong.length === 2 && exp.every((e) => kw.kong.includes(e)), `[loop 737] ${g}${z}旬 空亡 = ${exp.join('')} (got ${kw.kong.join('')})`);
+  }
+  console.log('   [loop 737] 12长生 (10 can) + 空亡 (6 旬) — GIÁ TRỊ TUYỆT ĐỐI cổ pháp ✓');
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
