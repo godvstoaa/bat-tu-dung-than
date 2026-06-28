@@ -494,7 +494,7 @@ export function extendBrief(R) {
             const m = members.find((mm) => mm.label === r.label || mm.role === r.role);
             return `${r.label}: sao ${r.star}(${r.starWx})@${r.palace} → ${r.verify}; ${r.insight.slice(0, 140)}${m && m.hourUnknown ? ' ⚠ GIỜ CHƯA RÕ → Dụng/điểm CÓ THỂ SAI ~25%' : ''}`;
           }).join(' ‖ ');
-          parts.push(`🔮 LỤC THÂN ĐOẠN (六亲断/家庭全息): ${dd.summary} ${relBrief} ${dd.holographic.length ? 'HOLOGRAPHIC: ' + dd.holographic.join(' / ') : ''} ${hourWarn.length ? '⚠ GIỜ CHƯA RÕ: ' + hourWarn.join(', ') + ' → những người này đọc cần thận trọng.' : ''}[${dd.disclaimer}]`);
+          parts.push(`🔮 LỤC THÂN ĐOẠN (六亲断/家庭全息): ${dd.summary} ${relBrief} ${dd.holographic.length ? 'HOLOGRAPHIC: ' + dd.holographic.join(' / ') : ''} ${hourWarn.length ? '⚠ GIỜ CHƯA RÕ: ' + hourWarn.join(', ') + ' → đọc cần thận trọng (~25% sai). GIẢI QUYẾT: hỏi người lớn tìm giờ sinh thật, HOẶC mở lá số riêng người đó + xem card «Quét 12 Giờ» để biết Dụng có đổi theo giờ không.' : ''}[${dd.disclaimer}]`);
         }
       }
     } catch (e) { /* deduction optional — không crash brief */ }
