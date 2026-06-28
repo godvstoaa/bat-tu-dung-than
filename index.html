@@ -46,13 +46,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script type="module" crossorigin src="/bat-tu-dung-than/assets/index-DGnMYypw.js"></script>
+  <script type="module" crossorigin src="/bat-tu-dung-than/assets/index-CIwgCQd1.js"></script>
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/vendor-lunar-Chzur7NX.js">
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-lifestyle-BRnH5EEg.js">
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-ziwei-oUPtR5nl.js">
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-divination-0z7pfdcN.js">
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/vendor-astronomy-BgUMeOPF.js">
-  <link rel="stylesheet" crossorigin href="/bat-tu-dung-than/assets/index-CnaveIQo.css">
+  <link rel="stylesheet" crossorigin href="/bat-tu-dung-than/assets/index-BrgsB3dg.css">
 </head>
 <body>
   <div class="bg-glow"></div>
@@ -602,6 +602,34 @@
 
 <section class="card">
         <h2 class="card-title">🧭 Định Vị Phong Thủy <span class="zh">風水羅盤 24山</span> <span class="hint-inline">(chọn hướng → luận Bát Trạch + sát phương năm + phi tinh) [loop 631]</span></h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+          <button class="btn-ghost" id="compass-real-btn" style="font-size:15px;padding:8px 16px">🧭 Bật la bàn thật (cảm biến điện thoại)</button>
+        </div>
+        <div id="compass-real-ui" style="display:none">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center">
+            <svg viewBox="0 0 200 200" id="compass-svg" style="width:180px;max-width:45vw;height:auto;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))">
+              <circle cx="100" cy="100" r="95" fill="rgba(20,15,10,.7)" stroke="var(--gold)" stroke-width="2"/>
+              <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(212,175,55,.2)" stroke-width="1"/>
+              <text x="100" y="22" text-anchor="middle" fill="var(--cinnabar,#c33)" font-size="18" font-weight="bold" font-family="Noto Serif SC,serif">N</text>
+              <text x="183" y="106" text-anchor="middle" fill="var(--gold-pale,#f7eccb)" font-size="14" font-family="Noto Serif SC,serif">E</text>
+              <text x="100" y="190" text-anchor="middle" fill="var(--gold-pale,#f7eccb)" font-size="14" font-family="Noto Serif SC,serif">S</text>
+              <text x="17" y="106" text-anchor="middle" fill="var(--gold-pale,#f7eccb)" font-size="14" font-family="Noto Serif SC,serif">W</text>
+              <g id="compass-needle" style="transform-origin:100px 100px;transition:transform .12s ease-out">
+                <polygon points="100,28 94,105 106,105" fill="var(--cinnabar,#c33)"/>
+                <polygon points="100,172 94,95 106,95" fill="var(--gold-pale,#f7eccb)" opacity=".5"/>
+                <circle cx="100" cy="100" r="6" fill="var(--gold-bright,#f0d97a)" stroke="#333" stroke-width="1"/>
+              </g>
+            </svg>
+            <div style="text-align:center">
+              <div id="compass-heading" style="font-size:28px;font-family:'Noto Serif SC',serif;color:var(--gold-bright,#f0d97a);font-weight:700">— °</div>
+              <div id="compass-shan-display" style="font-size:20px;font-family:'Noto Serif SC',serif;color:var(--gold)">—</div>
+              <div id="compass-palace" style="font-size:13px;color:var(--muted,#888)">Bật la bàn để xem</div>
+              <div id="compass-verdict" style="font-size:13px;margin-top:4px"></div>
+            </div>
+          </div>
+          <p class="hint" style="text-align:center;margin-top:6px;font-size:11px">📡 Cầm điện thoại ngang ngực, xoay người → la bàn theo hướng máy chỉ. Cần cho phép truy cập cảm biến.</p>
+        </div>
+        <hr style="border:0;border-top:1px solid rgba(212,175,55,.15);margin:10px 0">
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
           <select id="fs-compass-sel" class="inp" style="min-width:200px"></select>
           <input id="fs-compass-deg" type="number" min="0" max="359" placeholder="hoặc độ 0-359" class="inp" style="width:130px">
