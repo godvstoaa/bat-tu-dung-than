@@ -16,6 +16,7 @@
 import { WX_VI, TEN_GOD_VI, SHENG, KE } from './constants.js';
 import { elementForRole, ROLE, PALACE_VI } from './family.js';
 import { personalTaSui } from './taisui.js'; // [loop 643] family taisui overview
+import { changSheng } from './core.js'; // [loop 710] 12 trường sinh for family members
 
 const PALACE_PILLAR = { father: 'month', mother: 'month', sibling: 'month', spouse: 'day', child: 'time' };
 const ROLE_VI_LONG = { father: 'Cha', mother: 'Mẹ', sibling: 'Anh/chị/em', spouse: 'Vợ/chồng', child: 'Con cái' };
@@ -223,10 +224,32 @@ export function deduceFromFamily(subject, members) {
   if (famFortune.length) {
     const peak = famFortune.filter((f) => f.r === 'Đại cát').map((f) => f.who);
     const hard = famFortune.filter((f) => /Hung|nghịch/.test(f.r)).map((f) => f.who);
-    const detail = famFortune.map((f) => `${f.who}=${f.r}`).join(', ');
+    // [loop 710] 12 trường sinh stage for each member — shows who's about to break through
+    const _CS_VI = { '長生':'SINH','帝旺':'ĐỈNH','臨官':'THÀNH TỰU','衰':'suy','病':'bệnh','死':'tắt','絕':'hết','胎':'thai','養':'dưỡng','冠帶':'trưởng thành','沐浴':'thanh tẩy' };
+    for (const f of famFortune) {
+      try {
+        const _isSubj = f.who === 'chủ thể';
+        const _src = _isSubj ? S : validMembers.find(vm => (vm.label||'') === f.who || ROLE_VI_LONG[vm.role] === f.who);
+        if (_src?.R?.dayun || _isSubj) {
+          const _allDy = _isSubj ? S.dayun : _src.R.dayun;
+          const _yr = _isSubj ? S.chart.input.year : _src.R.chart.input.year;
+          const _dm = _isSubj ? S.chart.dayGan : _src.R.chart.dayGan;
+          const _age = curYear - _yr;
+          const _dy = (_allDy||[]).find(dd => _age >= dd.startAge && _age < dd.startAge + 10);
+          const _next = (_allDy||[]).find(dd => dd.startAge === _dy?.startAge + 10);
+          if (_dy && _dm) {
+            const _cs = changSheng(_dm, _dy.zhi);
+            const _ns = _next ? changSheng(_dm, _next.zhi) : null;
+            f.stage = _CS_VI[_cs] || _cs;
+            if (_ns && (_ns === '帝旺' || _ns === '長生' || _ns === '臨官')) f.nextStage = '⭐ sắp ' + (_CS_VI[_ns] || _ns);
+          }
+        }
+      } catch (_) {}
+    }
+    const detail = famFortune.map((f) => `${f.who}=${f.r}${f.stage ? '/'+f.stage : ''}${f.nextStage ? ' '+f.nextStage : ''}`).join(', ');
     let note = `🎭 VẬN HIỆN CẢ NHÀ (${curYear}): ${detail}.`;
     if (peak.length) note += ` ⭐ Đang ĐỈNH VẬN: ${peak.join(', ')} — nên tiến thủ lớn.`;
-    if (hard.length) note += ` ⚠ Đang vận khó: ${hard.join(', ')} — cần hỗ trợ/khích lệ, tránh gây áp lực. [loop 670] Mẹ khó đến ~${(() => { const m = validMembers.find(mm => /Mẹ|mẹ/.test(mm.label||'')); if (!m) return '?'; const dy = (m.R.dayun||[]).find(d => { const a = curYear - m.R.chart.input.year; return a >= d.startAge && a < d.startAge + 10; }); const nxt = (m.R.dayun||[])[(m.R.dayun||[]).indexOf(dy)+1]; return dy ? (m.R.chart.input.year + dy.startAge + 10) + (nxt ? ` → chuyển ${nxt.ganZhi}[${nxt.rating}]` : '') : '?'; })()} —「命好不如运好」vận sẽ đổi.`;
+    if (hard.length) note += ` ⚠ Đang vận khó: ${hard.join(', ')} — cần hỗ trợ/khích lệ, tránh gây áp lực.`;
     holographic.push(note);
   }
 
