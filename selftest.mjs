@@ -5844,7 +5844,7 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
     ['Kinh Dịch', /KINH D[ỊI]CH|河洛|鬼谷|hexagram/i],
     ['Thập thần', /th[ậpậ]p th[ầầ]n|ten god|正官|七殺/i],
     ['Ngũ hành', /ng[ũũ] hành|wuxing|五行的/i],
-    ['神煞', /th[ầầ]n s[ áát]|shensha|天乙|羊刃/i],
+    ['神煞', /文昌|天乙|羊刃|桃花|驿马|空亡|th[ầầ]n s[áà]t/i],
   ];
   let missing = 0;
   for (const [name, re] of SECTIONS) {
