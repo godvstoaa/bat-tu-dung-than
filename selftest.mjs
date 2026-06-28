@@ -5666,7 +5666,7 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   const { personalNutrition } = await import('./src/engine/bazi-diet.js');
   const { personalWorkout } = await import('./src/engine/bazi-workout.js');
   const { baziMingGong } = await import('./src/engine/bazi-minggong.js');
-  const { analyzeFamilyFortune } = await import('./src/engine/family-fortune.js');
+  const { analyzeFamilyHarmony } = await import('./src/engine/family-fortune.js');
   const { verifyEvents } = await import('./src/engine/event-verify.js');
   // bazi-business: shouldStart boolean
   const biz = analyzeBusiness(spR);
@@ -5684,7 +5684,7 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   const mg = baziMingGong(spR);
   assert(typeof mg.ganZhi === 'string' && mg.ganZhi.length === 2, `[smoke] bazi-minggong.ganZhi 2-char`);
   // family-fortune: relations array
-  const ff = analyzeFamilyFortune(spR);
+  const ff = analyzeFamilyHarmony(spR);
   assert(Array.isArray(ff.relations), `[smoke] family-fortune.relations array`);
   // event-verify: returns object
   const ev = verifyEvents(spR);
