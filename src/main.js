@@ -192,6 +192,7 @@ import { cezi as ceziDivination } from './engine/cezi.js';
 import { yizhangjingFromChart as yizhangjingCast, renderYizhangjingCard } from './engine/yizhangjing.js';
 import { computeLiuDao, SIX_REALMS } from './engine/liudao.js';
 import { destinyConsensus } from './engine/destiny-consensus.js';
+import { scanHours } from './engine/hour-scan.js';
 
 let currentResult = null;
 let currentTopic = 'general';
@@ -1032,6 +1033,37 @@ function renderConsensus(R) {
       ${sysHtml}${liudaoHtml}
       <p class="hint" style="margin-top:6px">Khi nhiều hệ ĐỘC LẬP (khác cơ sở: ngũ hành / xương / Dịch / nghiệp) cùng chỉ 1 hướng → tín hiệu MẠNH. Phân kỳ → bản mệnh phức tạp, đọc từng khía cạnh (sự nghiệp vs phúc đức vs vận). 六道 là chiều tu học, tách khỏi phú quý.</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được Tổng Hợp Đồng Thuận.</p>'; }
+}
+
+// [loop 596] Hour scan — quét 12 giờ khi không biết giờ sinh
+function renderHourScan(R) {
+  const el = $('hour-scan');
+  if (!el) return;
+  const section = $('hour-scan-section');
+  try {
+    const inp = R.chart.input;
+    // Chỉ hiện khi user KHÔNG nhập giờ (hour=12 default = nghi vấn)
+    // Hoặc khi user chủ động muốn xem → luôn hiện
+    const sr = scanHours(inp.year, inp.month, inp.day, inp.gender, new Date().getFullYear());
+    if (!sr) { if (section) section.style.display = 'none'; return; }
+    if (section) section.style.display = '';
+    const srCls = sr.stableCount >= 10 ? 'rate-cat' : sr.stableCount >= 7 ? 'rate-mid' : 'rate-hung';
+    const rows = sr.hours.map((h) => {
+      if (h.error) return `<div style="margin:2px 0;color:var(--muted)">${esc(h.zhiVi)}: lỗi</div>`;
+      const cls = h.stable ? 'rate-mid' : 'rate-hung';
+      const mark = h.stable ? '✓' : '⚠';
+      return `<div style="display:grid;grid-template-columns:90px 50px 50px 40px 30px;gap:4px;font-size:12px;margin:2px 0;padding:2px 4px;${h.stable ? '' : 'background:rgba(255,193,7,.08);border-radius:3px'}">
+        <span>${esc(h.zhiVi)}</span><span class="zh">${esc(h.ganZhi)}</span><span>Dụng ${esc(h.yongPrimary)}</span><span class="ln-rate ${cls}">${h.synScore}</span><span>${mark}</span>
+      </div>`;
+    }).join('');
+    el.innerHTML = `
+      <div class="cg-head"><div class="cg-total"><span class="ln-rate ${srCls}">Dụng ${esc(sr.stableYong)} (${sr.stableCount}/12 giờ)</span> ${sr.outlierCount ? `<span class="hint-inline">· ${sr.outlierCount} giờ outlier</span>` : ''}</div></div>
+      <div class="tiaohou-note" style="margin:8px 0;padding:8px 10px;border-left:3px solid var(--gold-bright)">${esc(sr.summary)}</div>
+      <div style="display:flex;justify-content:space-between;margin:4px 0"><span class="hint">Chi tiết 12 giờ:</span><span class="hint">Score ${sr.scoreRange?.min}-${sr.scoreRange?.max} (avg ${sr.scoreRange?.avg})</span></div>
+      <div style="display:grid;grid-template-columns:90px 50px 50px 40px 30px;gap:4px;font-size:11px;color:var(--muted);margin-bottom:4px"><span>Giờ</span><span>Trụ</span><span>Dụng</span><span>Điểm</span><span></span></div>
+      ${rows}
+      <p class="hint" style="margin-top:6px">Trụ giờ quyết định ~25% lá số. Quét 12 cho biết «độ nhạy» — Dụng phổ biến = an toàn luận; Dụng đổi nhiều = cần giờ chính xác.</p>`;
+  } catch (e) { if (section) section.style.display = 'none'; }
 }
 
 function renderStarPower(R) {
@@ -3478,6 +3510,7 @@ function run() {
   lazyRender('yizhangjing',    () => { try { renderYizhangjing(currentResult); } catch (e) { console.warn('yizhangjing', e.message); } });
   lazyRender('liudao',         () => { try { renderLiuDao(currentResult); } catch (e) { console.warn('liudao', e.message); } });
   lazyRender('consensus',      () => { try { renderConsensus(currentResult); } catch (e) { console.warn('consensus', e.message); } });
+  lazyRender('hour-scan',      () => { try { renderHourScan(currentResult); } catch (e) { console.warn('hourscan', e.message); } });
   lazyRender('decade',         () => { try { renderDecade(currentResult); } catch (e) { console.warn('decade', e.message); } });
   lazyRender('starpower',      () => { try { renderStarPower(currentResult); } catch (e) { console.warn('starpower', e.message); } });
   lazyRender('dir-taboo',      () => { try { renderDirectionTaboo(); } catch (e) { console.warn('dirtaboo', e.message); } });
