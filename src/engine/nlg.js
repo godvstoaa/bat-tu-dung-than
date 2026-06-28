@@ -70,7 +70,7 @@ const INTENT_KEYWORDS = {
   travel: ['đi xa', 'xuất khẩu', 'nước ngoài', 'di cư', 'du lịch', 'dịch chuyển', 'định cư', 'xa nhà', 'lao động'],
   power: ['quyền', 'lãnh đạo', 'uy quyền', 'chức quyền', 'ảnh hưởng', 'địa vị', 'quyết định'],
   timing: ['vận', 'đại vận', 'thời điểm', 'năm nào', 'tuổi', 'lúc nào', 'tương lai', 'khi nào', 'bao giờ', 'bao lâu', 'tháng', 'năm nay', 'năm sau'],
-  personality: ['tính cách', 'bản mệnh', 'con người', 'tướng', 'khí chất', 'bản chất', 'người như thế nào', 'cấu hình', 'cách cục', 'sát ấn', 'thương quan', 'quan sát', 'tỷ kiếp', '格局', 'dụng thần', 'kỵ thần', 'hỷ thần', 'ngũ hành'],
+  personality: ['tính cách', 'bản mệnh', 'con người', 'tướng', 'khí chất', 'bản chất', 'người như thế nào', 'cấu hình', 'cách cục', 'sát ấn', 'thương quan', 'quan sát', 'tỷ kiếp', '格局', 'dụng thần', 'kỵ thần', 'hỷ thần', 'ngũ hành', 'thiếu', 'bổ mệnh'],
   remedy: ['cải mệnh', 'cải vận', 'làm sao để', 'nên làm gì', 'làm gì', 'cách', 'hóa giải', 'tăng', 'giảm', 'tránh', 'phương pháp', 'khắc phục', 'thay đổi', 'cải thiện', 'khai vận', 'bổ mệnh', 'sống ở đâu', 'thành phố', 'phong thủy', 'mua nhà', 'mua đất', 'bất động sản', 'màu', 'màu sắc', 'hết xui', 'giải xui', 'đổi vận'],
   flow: ['dòng khí', 'lưu thông', 'khí mệnh', 'nguồn khí', 'dòng chảy', 'thông khí', '源流', 'khí lưu', 'nguồn lực mệnh', 'tắc khí'],
   divination: ['gieo quẻ', '起卦', '占', 'lắc quẻ', 'quẻ dịch', 'bói quẻ', 'meihua', 'thảo quẻ', 'quẻ hôm', '测字', 'châm tự', 'xem chữ', 'phép bói'],
@@ -84,7 +84,9 @@ export function detectIntent(question) {
   // [loop 717 FIX] thêm «tháng này» (thang nay), «hôm nay» (hom nay), «hôm qua», «tuần này»
   // [loop 734 FIX] thêm «bao giờ» (bao gio), «bao lâu» (bao lau) — câu hỏi timing phổ biến nhất,
   //   trước đây thiếu → «bao giờ tôi phát tài?» misroute sang wealth thay vì pTiming.
-  const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|bao gio|bao lau|nam nay|nam sau|thang nay|hom nay|hom qua|tuan nay|tuan sau|thang sau)\b/.test(norm) || years.length > 0;
+  // [loop 735 FIX] thêm «đại vận» (dai van), «lưu niên» (luu nien) — «đại vận nào tốt nhất?» trước đây
+  //   area='timing' đúng nhưng isTiming=false → mất context-aware pTiming path.
+  const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|bao gio|bao lau|dai van|luu nien|nam nay|nam sau|thang nay|hom nay|hom qua|tuan nay|tuan sau|thang sau)\b/.test(norm) || years.length > 0;
   const isYesNo = /\b(co nen|co duoc khong|nen khong|duoc khong|co tot khong|co xau khong|co the|lieu co)\b/.test(norm);
   // [loop 674 FIX] isCompat exclude số/tên/màu/đá — «số hợp không», «tên hợp không»
   //   là number/name analysis, KHÔNG phải chart compat (trước đây misroute → compat).
@@ -98,7 +100,13 @@ export function detectIntent(question) {
   // [loop 655] fengshui + remedy intent (trước đây → «chưa rõ lĩnh vực» khi API fail)
   const isFengshui = /\b(phong thuy|dinh vi|la ban)\b/.test(norm)
     || (/\b(huong|nha|tang|giuong|bep|cua chinh)\b/.test(norm) && /\b(tot|xau|hop|nao|cat|hung|nen|duoc|the nao)\b/.test(norm));
-  const isRemedy = /\b(bot xui|giam xui|bo xui|xui xe|doi van|hoa giai|may man|phuc duc|lam cai gi|nen lam gi|cuu|cai menh|bo tui|giam tui|deo da|da quy|mau gi|mau hop|mau sac)\b/.test(norm);
+  const isRemedy = /\b(bot xui|giam xui|bo xui|xui xe|doi van|hoa giai|giai han|giai xui|khai van|may man|phuc duc|lam cai gi|nen lam gi|cuu|cai menh|cai van|bo tui|giam tui|deo da|da quy|mau gi|mau hop|mau sac)\b/.test(norm);
+  // [loop 735] isRemedyStrong — ĐỘNG TỪ cải vận RÕ RÀNG (giải hạn/hoá giải/cải mệnh/cải vận/bớt xui/giải xui/khai vận/cứu).
+  //   Khi user hỏi «sao giải hạn năm nay?» → isTiming (năm nay) true → isRemedy && !isTiming bị skip → MẤT remedy.
+  //   Nhưng «giải hạn/hoá giải/cải vận» là intent remedy CHỦ ĐẠO (hỏi CÁCH hoá giải), KHÔNG phải timing.
+  //   Phân biệt với «năm sau nên làm gì?» (loop 716) — «nên làm gì» mơ hồ → có thể timing.
+  //   → isRemedyStrong thắng CẢ khi isTiming (remedy là chủ ý thực sự).
+  const isRemedyStrong = /\b(giai han|hoa giai|giai xui|cai menh|cai van|doi van|khai van|bot xui|giam xui|cuu menh|cuu|bo tui|giam tui)\b/.test(norm);
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
@@ -112,7 +120,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -664,7 +672,9 @@ export function composeAnswer(question, R) {
   // [loop 655→716 FIX] REMEDY (offline) — nhưng KHÔNG override isTiming
   //   Trước đây «năm sau nên làm gì» match cả isRemedy (nen lam gi) + isTiming (nam sau)
   //   → isRemedy check trước → route SAI sang remedy thay vì timing.
-  if (intent.isRemedy && !intent.isTiming) {
+  // [loop 735 FIX] NGOẠI LỆ: isRemedyStrong (giải hạn/hoá giải/cải vận/bớt xui) = intent remedy
+  //   THỰC SỰ → thắng CẢ khi isTiming. «sao giải hạn năm nay?» trước đây mất remedy do năm nay.
+  if (intent.isRemedy && (!intent.isTiming || intent.isRemedyStrong)) {
     const WX_COLOR = { 木: 'xanh lá', 火: 'đỏ/tím', 土: 'vàng/nâu', 金: 'trắng/bạc', 水: 'đen/xanh đậm' };
     const WX_LIFE = { 木: 'giữ lòng từ bi, trồng cây, đi rừng', 火: 'tăng ánh sáng, lễ bái, vận động', 土: 'chân đất, gốm đá, thiền định', 金: 'sáng sớm, kỷ luật, rèn luyện', 水: 'gần sông biển, đọc sách, tĩnh lặng' };
     const dung = R.yong?.primary;

@@ -2636,6 +2636,13 @@ assert(detectIntent('khi nào tôi gặp duyên?').isTiming === true, 'isTiming:
 assert(detectIntent('sức khoẻ tôi sao?').isTiming === false, 'isTiming: «sức khoẻ» (không timing) → false');
 assert(detectIntent('có nên đầu tư không?').isYesNo === true, 'isYesNo: «có nên» → true');
 assert(detectIntent('chúng tôi hợp không?').isCompat === true, 'isCompat: «hợp không» → true');
+// [loop 735] routing fix guards
+assert(detectIntent('sao giải hạn năm nay?').isRemedyStrong === true, 'isRemedyStrong: «giải hạn» → true (thắng timing)');
+assert(detectIntent('sao giải hạn năm nay?').isRemedy === true && detectIntent('sao giải hạn năm nay?').isTiming === true, '«giải hạn năm nay»: cả isRemedy + isTiming nhưng isRemedyStrong=true');
+assert(detectIntent('năm sau nên làm gì?').isRemedyStrong === false, 'isRemedyStrong: «nên làm gì» KHÔNG strong (→ timing thắng, giữ loop 716)');
+assert(detectIntent('đại vận nào tốt nhất?').isTiming === true, 'isTiming: «đại vận» → true (loop 735 fix)');
+assert(detectIntent('mệnh tôi thiếu gì?').area === 'personality', '«mệnh thiếu gì» → personality (không còn misroute study do «thi» substring trong «thieu»)');
+assert(detectIntent('làm sao cải vận?').isRemedyStrong === true, 'isRemedyStrong: «cải vận» → true');
 console.log('   isTiming/isYesNo/isCompat detect đúng sau fix diacritics-regex ✓');
 
 // ################## 51. NLG 6-DOMAIN SESSION MODULE DATA GUARD ##################
@@ -2663,6 +2670,11 @@ assert(at.paragraphs.some((p) => p.includes('10 năm')), 'pTiming: có decade fo
 // no undefined leaks in any domain
 for (const a of [aw, al, ac, ah, at]) assert(!a.paragraphs.some((p) => p.includes('undefined')), `NLG ${a.title}: không undefined leak`);
 console.log('   6-domain NLG session data hiện trong output ✓ (pWealth/pLove/pCareer/pHealth/pTiming)');
+// [loop 735] routing guard: «sao giải hạn năm nay?» → remedy composer (isRemedyStrong thắng isTiming)
+const aRemedy = composeAnswer('sao giải hạn năm nay?', nlR);
+assert(/cải mệnh|Nghịch thiên|màu|Dụng/i.test(aRemedy.title + ' ' + aRemedy.paragraphs.join(' ')), '«giải hạn năm nay» route sang remedy (isRemedyStrong thắng timing)');
+assert(aRemedy.intent.isRemedyStrong === true, '«giải hạn năm nay» có isRemedyStrong=true');
+console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyStrong thắng isTiming)');
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
