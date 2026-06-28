@@ -12,9 +12,54 @@
 import { MOUNTAINS_24, MOUNTAIN_MAP, oppositeMountain, sittingDirectionAnalysis } from './yinzhai.js';
 import { daguaCompatibility } from './xuankong-dagua.js';
 import { checkAnnualTaboo } from './annual-taboo.js';
+import { sanshaDirection } from './sansha.js';
 
 const QUAI_TO_PALACE8 = { 坎: 'Bắc', 艮: 'Đông Bắc', 震: 'Đông', 巽: 'Đông Nam', 离: 'Nam', 坤: 'Tây Nam', 兑: 'Tây', 乾: 'Tây Bắc' };
 const WX_VI_LOCAL = { 水: 'Thủy', 土: 'Thổ', 木: 'Mộc', 火: 'Hỏa', 金: 'Kim' };
+// [loop 635] CHONG map (đối cung 6 xung) cho Thái Tuế/Tuế Phá precise 24-sơn
+const CHONG_ZHI = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
+
+/**
+ * [loop 635 FIX] Sát phương ÂM TRẠCH — PRECISE 24-sơn (không 8-palace mù).
+ *   checkAnnualTaboo chỉ xét 8 hướng → 三煞 亥(NW)/丑(NE) bị MISS, 壬/癸(Bắc nhưng
+ *   không phải 亥子丑) bị FALSE flag. Âm Trạch cần exact sơn.
+ *   - 三煞: 3 CHÍNH XÁC branches (vd 2026 亥子丑) — from sanshaDirection
+ *   - Thái Tuế: exact year branch + 冲 (Tuế Phá) — 24-sơn
+ *   - Ngũ Hoàng/Nhị Hắc: giữ 8-palace (phi tinh theo cung, đúng)
+ */
+function preciseGraveSat(faceZhi, sitZhi, year) {
+  const taboos = [];
+  const faceP8 = QUAI_TO_PALACE8[MOUNTAIN_MAP[faceZhi].palace];
+  const sitP8 = QUAI_TO_PALACE8[MOUNTAIN_MAP[sitZhi].palace];
+  // (1) 三煞 precise — check cả toạ + hướng vs 3 branches chính xác
+  const ss = sanshaDirection(year);
+  const sanshaChis = new Set((ss.sansha || []).map((s) => s.chi));
+  const ssNames = {};
+  for (const s of (ss.sansha || [])) ssNames[s.chi] = s.name;
+  for (const [zhi, at, p8] of [[sitZhi, 'toạ', sitP8], [faceZhi, 'hướng', faceP8]]) {
+    if (sanshaChis.has(zhi)) {
+      taboos.push({ at: `${at} ${zhi}(${p8})`, type: 'Tam Sát', detail: `${at} ${zhi} = ${ssNames[zhi]} (三煞 ${[...sanshaChis].join('')})`, severity: 4 });
+    }
+  }
+  // (2) Thái Tuế/Tuế Phá precise — exact year branch + 冲
+  const yearZhi = ss.yearZhi; // vd 午
+  const suiPo = CHONG_ZHI[yearZhi]; // vd 子
+  for (const [zhi, at, p8] of [[sitZhi, 'toạ', sitP8], [faceZhi, 'hướng', faceP8]]) {
+    if (zhi === yearZhi) taboos.push({ at: `${at} ${zhi}(${p8})`, type: 'Thái Tuế', detail: `${at} ${zhi} = Thái Tuế năm (${yearZhi})`, severity: 3 });
+    if (zhi === suiPo) taboos.push({ at: `${at} ${zhi}(${p8})`, type: 'Tuế Phá', detail: `${at} ${zhi} = Tuế Phá (đối Thái Tuế ${suiPo})`, severity: 4 });
+  }
+  // (3) Ngũ Hoàng/Nhị Hắc — 8-palace (phi tinh theo cung là đúng), mượn checkAnnualTaboo
+  const faceTaboo8 = checkAnnualTaboo(faceP8, year);
+  const sitTaboo8 = checkAnnualTaboo(sitP8, year);
+  for (const t of faceTaboo8.taboos) {
+    if (t.type === 'Ngũ Hoàng' || t.type === 'Nhị Hắc') taboos.push({ at: `hướng ${faceZhi}(${faceP8})`, ...t });
+  }
+  for (const t of sitTaboo8.taboos) {
+    if (t.type === 'Ngũ Hoàng' || t.type === 'Nhị Hắc') taboos.push({ at: `toạ ${sitZhi}(${sitP8})`, ...t });
+  }
+  const maxSev = taboos.reduce((m, t) => Math.max(m, t.severity), 0);
+  return { taboos, maxSeverity: maxSev };
+}
 
 /**
  * Luận hướng mộ SÂU: toạ-hướng Tam Hợc (cũ) + Đại Quái phối hợp + sát năm + Dụng.
@@ -33,12 +78,8 @@ export function graveDirectionDeep(faceZhi, R, scanYear) {
   const dg = daguaCompatibility(sitZhi, faceZhi);
   const sitP8 = QUAI_TO_PALACE8[MOUNTAIN_MAP[sitZhi].palace];
   const faceP8 = QUAI_TO_PALACE8[faceMap.palace];
-  const sitTaboo = checkAnnualTaboo(sitP8, year);
-  const faceTaboo = checkAnnualTaboo(faceP8, year);
-  const taboos = [];
-  for (const t of sitTaboo.taboos) taboos.push({ at: `toạ ${sitZhi}(${sitP8})`, ...t });
-  for (const t of faceTaboo.taboos) taboos.push({ at: `hướng ${faceZhi}(${faceP8})`, ...t });
-  const maxSev = taboos.reduce((m, t) => Math.max(m, t.severity), 0);
+  // [loop 635] sat Âm Trạch PRECISE 24-sơn (tam sát + thái tuế exact, ngũ hoàng/nhị hắc 8-palace)
+  const { taboos, maxSeverity: maxSev } = preciseGraveSat(faceZhi, sitZhi, year);
 
   // score (0-100): Đại Quái 40% + Tam Hợc legacy 40% + base 20%
   let score = Math.round(dg.score * 0.4 + (legacy?.score ?? 50) * 0.4 + 50 * 0.2);

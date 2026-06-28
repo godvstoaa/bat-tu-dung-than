@@ -605,6 +605,23 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
   assert(opp === '子', `[loop 634] toạ của hướng 午 = 子 (đối cung 180°) (got ${opp})`);
   console.log(`   yinzhai-deep ✓ — Đại Quái phối hợp + sat năm; hướng 午 2026 = ĐẠI KỴ (Ngũ Hoàng); best=${bd.best.sit}⇔${bd.best.face}${bd.best.faceVi}`);
 }
+// [loop 635] ÂM TRẠCH sat PRECISE 24-sơn — 三煞 亥子丑 phải ĐỀU được flag.
+//   Bug cũ: checkAnnualTaboo 8-palace → 亥(NW)/丑(NE) MISS, 壬/癸(Bắc non-sansha) FALSE flag.
+{
+  const { graveDirectionDeep } = await import('./src/engine/yinzhai-deep.js');
+  const hasSansha = (z) => (graveDirectionDeep(z, null, 2026).taboos || []).some((t) => t.type === 'Tam Sát');
+  // 亥子丑 = 三煞 2026 → ĐỀU phải flag
+  assert(hasSansha('亥'), `[loop 635] 三煞 亥(Tây Bắc) được flag (trước miss do 8-palace)`);
+  assert(hasSansha('子'), `[loop 635] 三煞 子(Bắc) được flag`);
+  assert(hasSansha('丑'), `[loop 635] 三煞 丑(Đông Bắc) được flag (trước miss)`);
+  // 壬/癸 = Bắc nhưng KHÔNG phải 亥子丑 → KHÔNG flag Tam Sát
+  assert(!hasSansha('壬'), `[loop 635] 壬(Bắc non-sansha) KHÔNG bị false-flag Tam Sát`);
+  assert(!hasSansha('癸'), `[loop 635] 癸(Bắc non-sansha) KHÔNG bị false-flag Tam Sát`);
+  // 午 = Thái Tuế (year branch 2026) precise
+  const wu = graveDirectionDeep('午', null, 2026);
+  assert(wu.taboos.some((t) => t.type === 'Thái Tuế' && t.at.includes('午')), `[loop 635] 午 = Thái Tuế năm 2026 precise 24-sơn`);
+  console.log(`   yinzhai-deep precise 24-sơn sat ✓ — 三煞 亥子丑 đều flag; 壬/癸 không false-flag; 午=Thái Tuế`);
+}
 
 // ################## [loop 20 NEW] 十二长生运 (đại vận + lưu niên) ##################
 import { dayunChangsheng, liunianChangsheng, stageCategory } from './src/engine/changsheng-deep.js';
