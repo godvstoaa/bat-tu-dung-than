@@ -695,6 +695,18 @@ export const AI_TOOLS = [
     name: 'analyze_guiguzi', description: '鬼谷子算命 (Guiguzi): 4-trụ nạp âm + 分定經 两头钳 (年干×时干→配卦→命格+格诗+多层VN). Dùng khi user hỏi «Quỷ Cốc Tử», «鬼谷子», «phân định kinh», «mệnh tôi theo cổ thư». Trả full analysis.',
     parameters: { type: 'object', properties: {} },
   },
+  // [loop 606] ANALYZE RELATIVE — phân tích NGƯỜI THÂN khi user cho ngày sinh
+  { type: 'function', function: {
+    name: 'analyze_relative', description: '[loop 606] Phan tich BAT TU nguoi than (me/bo/em/anh/chau/con) — can ngay sinh nguoi do. Tra Dung Than + diem menh + cach cuc + dai van + ngu hanh tuong quan voi user. Dung khi user hoi «me/bo/em/con TOI the nao» VA user DA CHO ngay sinh nguoi do.',
+    parameters: { type: 'object', properties: {
+      year: { type: 'integer', description: 'Nam sinh nguoi than' },
+      month: { type: 'integer', description: 'Thang sinh (1-12)' },
+      day: { type: 'integer', description: 'Ngay sinh (1-31)' },
+      hour: { type: 'integer', description: 'Gio sinh (0-23, bo trong=12 trua)' },
+      gender: { type: 'string', enum: ['nam', 'nữ'], description: 'Gioi tinh nguoi than' },
+      relation: { type: 'string', description: 'Moi quan he: me/bo/em/anh/chau/con ( tuy chon )' },
+    }, required: ['year', 'month', 'day', 'gender'] },
+  } },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -849,6 +861,37 @@ export function execTool(name, args, R) {
         const h = computeHehun(R, pR);
         return { type: 'hôn nhân', score: h.score, rating: h.rating, verdict: _s(h.verdict, 250), factors: (h.factors || []).map((f) => _s(f, 150)) };
       }
+      case 'analyze_relative': {
+        // [loop 606] Phân tích người thân — AI tool cho câu hỏi «mẹ/bố/em tôi thế nào»
+        const rel = analyze(a.year, a.month, a.day, a.hour ?? 12, 0, a.gender, new Date().getFullYear());
+        const relSyn = synthesize(rel);
+        // ngũ hành tương quan giữa user và người thân
+        const userWx = R.chart.dayMaster.wx, relWx = rel.chart.dayMaster.wx;
+        const SHENG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
+        const KE = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' };
+        let relType = 'bằng (cùng hành)';
+        if (SHENG[userWx] === relWx) relType = `user sinh thân (${userWx}→${relWx}) → user cho đi, thân nhận`;
+        else if (SHENG[relWx] === userWx) relType = `thân sinh user (${relWx}→${userWx}) → thân nuôi user`;
+        else if (KE[userWx] === relWx) relType = `user khắc thân (${userWx} khắc ${relWx}) → user chế thân`;
+        else if (KE[relWx] === userWx) relType = `thân khắc user (${relWx} khắc ${userWx}) → thân áp user`;
+        // Dụng tương hỗ?
+        const userDung = R.yong.primary, relDung = rel.yong.primary;
+        const userHelpsRel = (rel.yong.avoid || []).includes(userWx) === false && userWx === relDung;
+        const relHelpsUser = (R.yong.avoid || []).includes(relWx) === false && relWx === userDung;
+        return {
+          relation: a.relation || 'người thân',
+          nhatChu: rel.chart.dayGan + ' (' + rel.chart.dayMaster.wx + ')',
+          dung: rel.yong.primary, hy: rel.yong.xi, ky: rel.yong.vuong,
+          diemMenh: relSyn.score + '/100 (' + relSyn.gradeVi + ')',
+          cachCuc: rel.pattern?.vi || '?',
+          vantageNhuoc: rel.strength.strong ? 'vượng' : 'nhược',
+          nguHanhTuongQuan: relType,
+          userHelpsRelative: userHelpsRel ? `✓ NC user (${userWx}) = Dụng của người thân (${relDung}) → user TỐT cho người này` : 'không trực tiếp bổ Dụng',
+          relativeHelpsUser: relHelpsUser ? `✓ NC người thân (${relWx}) = Dụng của user (${userDung}) → người này TỐT cho user` : 'không trực tiếp bổ Dụng',
+          daiVanTop: (rel.dayun || []).slice(0, 3).map((d) => `${d.ganZhi}[${d.rating}]`).join(', '),
+          advice: relHelpsUser ? 'Người này mang hành bổ mệnh bạn — nên gần gũi.' : userHelpsRel ? 'Bạn mang hành bổ mệnh người này — bạn tốt cho họ.' : 'Ngũ hành không trực tiếp bổ — quan hệ cần nỗ lực vun đắp.',
+        };
+      }
       default:
         return { error: 'tool không hỗ trợ: ' + name };
     }
@@ -865,6 +908,7 @@ function toolLabel(name) {
     find_good_days: 'Tìm ngày tốt', analyze_best_hour: 'Tìm giờ tốt', analyze_partner: 'Luận hợp hôn',
     inverse_bazi: 'Tìm bát tự ngược', analyze_char: '测字 (châm tự)', analyze_meihua: 'Gieo quẻ梅花',
     analyze_liuren: 'Đại lục nhâm', analyze_qimen: 'Kỳ môn độn giáp', analyze_guiguzi: 'Quỷ cốc tử',
+    analyze_relative: 'Phân tích người thân',
   })[name] || name;
 }
 
