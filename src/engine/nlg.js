@@ -10,6 +10,7 @@ import { scanMarriageTiming } from './marriage-timing.js';
 import { scanWealthCareerYingqi } from './yingqi-wealth.js';
 import { jiaoYunAnalysis } from './jiaoyun.js';
 import { decadeForecast } from './decade-forecast.js';
+import { SHENSHA_INFO } from './shensha.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
@@ -111,6 +112,11 @@ export function detectIntent(question) {
   //   Trước đây NLG offline KHÔNG surface interaction data (elevation 746-752 chỉ giúp AI brief).
   const isInteraction = /\b(xung hinh hai|xung hinh|xung khac|mau thuan|tuong tac|tu tru|tuong han|xung\.?hinh|xung khat|co gi dac biet|gi day)\b/.test(norm)
     || (/\b(xung|hinh|hai)\b/.test(norm) && /\b(gi|nao|co khong|the nao|ra sao)\b/.test(norm));
+  // [loop 758] isShensha — hỏi về thần煞/sao (quý nhân/đào hoa/dịch mã/văn xương...).
+  //   Trước đây «tôi có quý nhân sao?» misroute (health/love) → KHÔNG surface R.shensha.
+  //   «sao» phải kết hợp context sao (tránh «sao tôi lại...» = why).
+  const isShensha = /\b(quy nhan|chinh tinh|than sat|van xuong|duong nhan|hoa cai|tuong tinh|thien duc|thien y|kim du|hong diem|qui cuong|tam ky|loc than|dich ma|hoc duong)\b/.test(norm)
+    || (/\bsao\b/.test(norm) && /\b(co|gi dac biet|chinh tinh|than|nao tot|nao xau)\b/.test(norm));
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
@@ -124,7 +130,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -501,11 +507,40 @@ function pDivination(R, intent) {
   }
 }
 
+function pShensha(R) {
+  // [loop 758] Surface thần煞 offline — R.shensha + SHENSHA_INFO desc, nhóm theo tone.
+  const ss = R.shensha || {};
+  const dm = R.chart.dayMaster;
+  const dayGz = (R.chart.pillars && R.chart.pillars.day) ? R.chart.pillars.day.gan + R.chart.pillars.day.zhi : dm.gan;
+  const keys = Object.keys(ss).filter((k) => ss[k] && ss[k].at && ss[k].at.length && SHENSHA_INFO[k]);
+  if (!keys.length) {
+    return {
+      title: 'Thần 煞 (sao mệnh)',
+      lead: `Lá số ${dayGz}: khảo các sao thần煞 classique —`,
+      paragraphs: ['Mệnh không mang sao thần煞 nổi bật trong nguyên cục (theo bộ sao chính). Sao chỉ thật sự «phát tác» khi lưu niên/đại vận mang chi đó tới — mở AI (⚙ GLM-5.2) để quét sao theo vận.'],
+    };
+  }
+  const TONE = { cat: '★ CÁT (thuận)', neutral: '○ TRUNG (tùy)', volatile: '⚠ CƯỜNG (cần chế)' };
+  const order = { cat: 0, neutral: 1, volatile: 2 };
+  const sorted = keys.sort((a, b) => (order[SHENSHA_INFO[a].tone] - order[SHENSHA_INFO[b].tone]));
+  const lines = sorted.map((k) => {
+    const info = SHENSHA_INFO[k];
+    const at = (ss[k].at || []).join(', ');
+    return `${TONE[info.tone] || ''} ${info.vi} (${info.zh}) @ ${at} — ${info.desc}`;
+  });
+  const catCount = keys.filter((k) => SHENSHA_INFO[k].tone === 'cat').length;
+  return {
+    title: 'Thần 煞 (sao mệnh)',
+    lead: `Mệnh ${dayGz} mang ${keys.length} sao thần煞 (${catCount} cát):`,
+    paragraphs: lines.concat([`💡 Sao thần煞 phụ trợ — cát sao tăng lực khi trùng Dụng/Hỷ; cường sao (羊刃/魁罡) cần «chế» (quan sát/đapsulation) mới tốt. Mở AI để luân giải sao theo lưu niên/đại vận.`]),
+  };
+}
 function pInteractions(R) {
   // [loop 757] Surface tương tác tứ trụ (刑冲害合) offline — dùng typed meanings (elevation 746-752).
   const it = R.interactions || {};
   const paras = [];
   const dm = R.chart.dayMaster;
+  const dayGz = (R.chart.pillars && R.chart.pillars.day) ? R.chart.pillars.day.gan + R.chart.pillars.day.zhi : dm.gan;
   const lead = `Tương tác Tứ Trụ (刑沖會合) của ${dm.gan} ${dm.vi}:`;
   const has = (a) => Array.isArray(a) && a.length;
   // 三刑
@@ -541,7 +576,7 @@ function pInteractions(R) {
     return {
       title: 'Tương tác Tứ Trụ',
       lead,
-      paragraphs: [`Lá số ${dm.gan}${dm.zhi} KHÔNG phạm xung/hình/hại nặng giữa các trụ — nền tương đối ổn, lục thân/quan hệ ít xung đột nội tại.`],
+      paragraphs: [`Lá số ${dayGz} KHÔNG phạm xung/hình/hại nặng giữa các trụ — nền tương đối ổn, lục thân/quan hệ ít xung đột nội tại.`],
     };
   }
   return {
@@ -597,6 +632,8 @@ export function composeAnswer(question, R) {
   const intent = detectIntent(question);
   // [loop 757] interaction question — surface 刑冲害合 typed meanings (offline, không cần AI)
   if (intent.isInteraction) return pInteractions(R);
+  // [loop 758] shensha question — surface thần煞 (offline, không cần AI)
+  if (intent.isShensha) return pShensha(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family

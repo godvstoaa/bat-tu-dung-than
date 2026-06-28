@@ -3081,6 +3081,23 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_a2.paragraphs.length > 0, '[loop 757] chart ít tương tác vẫn trả clean');
   console.log('   [loop 757] offline 刑沖會合 surface (isInteraction + pInteractions) ✓');
 }
+// [loop 758] isShensha — offline thần煞 surface (R.shensha + SHENSHA_INFO desc).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('tôi có quý nhân giúp đỡ không?').isShensha === true, '[loop 758] isShensha detect «quý nhân»');
+  assert(detectIntent('tôi có sao gì đặc biệt?').isShensha === true, '[loop 758] isShensha detect «sao đặc biệt»');
+  // «sao tôi lại...» (why) KHÔNG phải shensha
+  assert(detectIntent('sao tôi lại xui thế?').isShensha === false, '[loop 758] «sao tôi lại» (why) ≠ shensha');
+  const _a = composeAnswer('tôi có quý nhân/sao gì?', _QR);
+  assert(/Thần 煞|sao mệnh/.test(_a.title), `[loop 758] shensha route → title thần煞 (got ${_a.title})`);
+  // Quân có Dịch Mã + Tướng Tinh + Hoa Cái + Thiên Y → surface
+  assert(_a.paragraphs.some((p) => /Dịch Mã|Tướng Tinh|Hoa Cái|Thiên Y/.test(p)), '[loop 758] surface các sao Quân (Dịch Mã/Tướng Tinh/Hoa Cái/Thiên Y)');
+  assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 758] không undefined leak (dayGz fix)');
+  // chart không có sao chính → vẫn clean
+  const _a2 = composeAnswer('sao của tôi?', analyze(1996, 12, 4, 10, 15, 'nữ', 2026));
+  assert(_a2.paragraphs.length > 0, '[loop 758] chart ít sao vẫn clean');
+  console.log('   [loop 758] offline thần煞 surface (isShensha + pShensha) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
