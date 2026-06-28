@@ -149,16 +149,17 @@ export function synthesize(R) {
   else if (score >= 52) { grade = '中上'; gradeVi = 'Trung thượng (khá tốt)'; percentile = 65 + Math.round(25 * (score - 52) / 10); }
   else if (score >= 41) { grade = '中'; gradeVi = 'Trung đẳng (cân bằng)'; percentile = 31 + Math.round(34 * (score - 41) / 11); }
   else if (score >= 31) { grade = '中下'; gradeVi = 'Trung hạ (khá vất vả)'; percentile = 7 + Math.round(24 * (score - 31) / 10); }
-  else { grade = '下'; gradeVi = 'Hạ đẳng (nhiều thử thách)'; percentile = Math.max(1, Math.round(7 * (score - 14) / 17)); }
+  else { grade = '下'; gradeVi = 'Hạ đẳng — nhiều thử thách nhưng CÓ CƠ HỘI đổi vận'; percentile = Math.max(1, Math.round(7 * (score - 14) / 17)); }
   percentile = Math.max(1, Math.min(99, percentile));
 
   // --- Phú quý bần tiện (xu hướng) ---
-  // [loop 458] neo percentile cùng đẳng cấp (p80/p37/p12)
+  // [loop 458→589] neo percentile + soften wording cho low-score (đặc biệt trẻ em).
+  //   Trước đây dùng «bần tiện» — quá harsh. Nay «khởi sắc muộn» + constructive advice.
   let fortune, fortuneVi;
   if (score >= 55 && catCombos.length >= 1) { fortune = 'phú quý'; fortuneVi = 'Phú/Qúy — danh lợi đều có, đáng tiến thủ'; }
   else if (score >= 41) { fortune = 'tiểu phú quý'; fortuneVi = 'Tiểu phú/qúy — ấm no, có thành tựu vừa'; }
   else if (score >= 31) { fortune = 'bình'; fortuneVi = 'Bình thường — no ấm, cần nỗ lực nhiều'; }
-  else { fortune = 'bần tiện'; fortuneVi = 'Khó nhọc — cần dựa Dụng Thần + đúng thời để vươn lên'; }
+  else { fortune = 'tiềm năng ẩn'; fortuneVi = 'Khởi đầu vất vả nhưng có tiềm năng — cần đúng Dụng Thần + đúng thời điểm để bứt phá (大运 lưu niên mang Dụng sẽ chuyển vận)'; }
 
   const paragraphs = [
     `Mệnh bạn xếp ở ${gradeVi} — điểm tổng hợp ${score}/100 (top ${percentile}% người cùng tuổi mệnh).`,
