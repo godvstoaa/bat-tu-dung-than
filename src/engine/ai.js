@@ -887,20 +887,27 @@ export function execTool(name, args, R) {
         // [loop 647] MARRIAGE TIMING — tìm năm CẢ HAI đương đại vận Cát (cửa sổ cưới tốt).
         //   Cổ法 «婚期看运»: năm cưới nên cả hai đang vận tốt + không冲/phạm năm xấu.
         const _dyAt = (res, yr) => { const dy = (res.dayun || []).find((d) => { const a = yr - res.chart.input.year; return a >= d.startAge && a < d.startAge + 10; }); return dy?.rating || '?'; };
+        // [loop 726 FIX] «Bình hòa» cũng OK cho hôn nhân — trước đây yêu cầu CẢ HAI «Cát»
+        //   → partner «Bình hòa» (trung tính, KHÔNG xấu) bị loại → 0 năm tốt → note lừa.
+        const _isOk = (r) => r === 'Đại cát' || r === 'Cát' || r === 'Hơi thuận' || r === 'Bình hòa';
         const _isCat = (r) => r === 'Đại cát' || r === 'Cát' || r === 'Hơi thuận';
         const curY = new Date().getFullYear();
-        const goodYears = [], badYears = [];
+        const goodYears = [], okYears = [], badYears = [];
         for (let y = curY; y <= curY + 6; y++) {
           const rR = _dyAt(R, y), rP = _dyAt(pR, y);
           if (_isCat(rR) && _isCat(rP)) goodYears.push(`${y}(${rR}/${rP})`);
-          else if (/Hung|nghịch|Kỵ/.test(rR) || /Hung|nghịch|Kỵ/.test(rP)) badYears.push(`${y}(${rR}/${rP})`);
+          else if (_isOk(rR) && _isOk(rP)) okYears.push(`${y}(${rR}/${rP})`); // cả 2 OK (không Hung)
+          if (/Hung|nghịch|Kỵ/.test(rR) || /Hung|nghịch|Kỵ/.test(rP)) badYears.push(`${y}(${rR}/${rP})`);
         }
         const marriageTiming = {
           bestYears: goodYears.slice(0, 4),
+          okYears: okYears.slice(0, 3),
           avoidYears: badYears.slice(0, 3),
           note: goodYears.length
             ? (h.score >= 45 ? `Nên cưới ${goodYears[0]} (cả 2 đang vận tốt). Cửa sổ cát: ${goodYears.join(', ')}.` : `Dù tương hợp trung bình, nếu cưới hãy chọn ${goodYears.join(', ')} (vận cả 2 tốt bù đắp).`)
-            : `6 năm tới không có năm nào CẢ HAI đều vận tốt — nếu cưới, chọn năm ít xấu nhất (${badYears[0] || '...'}), kết hợp xem thêm lưu niên + tháng cát.`,
+            : okYears.length
+              ? `6 năm tới không có năm nào CẢ HAI đều «Cát»+, nhưng có năm «Bình hòa» (không Hung): ${okYears.join(', ')}. Nên cưới các năm này — trung tính là ĐỦ tốt cho hôn nhân.`
+              : `6 năm tới không có năm nào CẢ HAI đều vận tốt — nếu cưới, chọn năm ít xấu nhất (${badYears[0] || '...'}), kết hợp xem thêm lưu niên + tháng cát.`,
         };
         return { type: 'hôn nhân', score: h.score, rating: h.rating, verdict: _s(h.verdict, 250), factors: (h.factors || []).map((f) => _s(f, 150)), marriageTiming };
       }
