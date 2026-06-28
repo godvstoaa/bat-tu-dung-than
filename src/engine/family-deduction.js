@@ -15,9 +15,13 @@
 // ============================================================================
 import { WX_VI, TEN_GOD_VI, SHENG, KE } from './constants.js';
 import { elementForRole, ROLE, PALACE_VI } from './family.js';
+import { personalTaSui } from './taisui.js'; // [loop 643] family taisui overview
 
 const PALACE_PILLAR = { father: 'month', mother: 'month', sibling: 'month', spouse: 'day', child: 'time' };
 const ROLE_VI_LONG = { father: 'Cha', mother: 'Mẹ', sibling: 'Anh/chị/em', spouse: 'Vợ/chồng', child: 'Con cái' };
+// [loop 643] solar year → địa chi (子=0..亥=11). (year-4)%12 vì 4 AD = 甲子.
+const _ZHI12 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const _yearZhiOf = (year) => _ZHI12[((year - 4) % 12 + 12) % 12];
 
 // Ngũ hành VI + tương quan cho diễn giải
 const SHENG_VI = { 木: 'Mộc sinh Hỏa', 火: 'Hỏa sinh Thổ', 土: 'Thổ sinh Kim', 金: 'Kim sinh Thủy', 水: 'Thủy sinh Mộc' };
@@ -183,6 +187,26 @@ export function deduceFromFamily(subject, members) {
     const childStar = elementForRole(S.chart.dayGan, isMale, 'child');
     const ksh = starHealth(S, childStar.wx);
     holographic.push(`🧒 Sao con (${childStar.gods.map((g) => TEN_GOD_VI[g]).join('/')}, ${WX_VI[childStar.wx]}): ${ksh.note}. ${kids.length} con ghi nhận — đối chiếu lá con thật để «chọn giờ đẻ» bài học cho sau.`);
+  }
+  // [loop 643] FAMILY THÁI TUẾ — ai trong nhà phạm thái tuế năm nay (cần hóa giải).
+  //   Cảnh báo sớm: vd em gái 子 năm 午 冲太岁 (nặng). Trước đây family analysis không có.
+  const tsYear = new Date().getFullYear();
+  const tsOffenders = [];
+  const subjZhi = S.chart.pillars?.year?.zhi;
+  if (subjZhi) {
+    const ps = personalTaSui(subjZhi, _yearZhiOf(tsYear));
+    if (ps.offends) tsOffenders.push({ who: 'chủ thể', zhi: subjZhi, msg: ps.msg, level: ps.level });
+  }
+  for (const m of validMembers) {
+    const z = m.R?.chart?.pillars?.year?.zhi;
+    if (!z) continue;
+    const ps = personalTaSui(z, _yearZhiOf(tsYear));
+    if (ps.offends) tsOffenders.push({ who: m.label || ROLE_VI_LONG[m.role], zhi: z, msg: ps.msg, level: ps.level });
+  }
+  if (tsOffenders.length) {
+    holographic.push(`⛩️ THÁI TUẾ ${tsYear}: ${tsOffenders.map((o) => `${o.who} (${o.zhi}) — ${o.msg}`).join(' | ')}. Người phạm nên hóa giải (an thái tuế /佩 tam hợp /trị huyết quang /đỗ xuân) — đặc biệt 冲太岁 (nặng) thì tránh thay đổi lớn đầu năm.`);
+  } else {
+    holographic.push(`⛩️ THÁI TUẾ ${tsYear}: cả nhà KHÔNG ai phạm thái tuế nặng — bình an.`);
   }
 
   return {

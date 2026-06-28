@@ -1918,6 +1918,20 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
     assert(!c2.summary.includes('空宫'), `[loop 642] Mệnh CÓ sao → không nhầm note 空宫`);
   }
 }
+// [loop 643] FAMILY THÁI TUẾ — ai trong nhà phạm thái tuế năm nay (overview).
+//   VD em Mỹ Anh (子) năm 午 (2026) 冲太岁 (nặng). Trước đây family analysis không có.
+{
+  const { deduceFromFamily } = await import('./src/engine/family-deduction.js');
+  const S = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const fam = [
+    { role: 'sibling', label: 'em Mỹ Anh', R: analyze(1996, 12, 4, 10, 15, 'nữ', 2026) },
+    { role: 'mother', label: 'Mẹ', R: analyze(1970, 6, 27, 7, 15, 'nữ', 2026) },
+  ];
+  const d = deduceFromFamily(S, fam);
+  const ts = d.holographic.find((h) => h.includes('THÁI TUẾ'));
+  assert(ts && ts.includes('Mỹ Anh') && ts.includes('冲太岁'), `[loop 643] family taisui flag Mỹ Anh (子) 冲太岁 2026 (got ${(ts || 'NONE').slice(0, 60)})`);
+  console.log(`   family taisui overview ✓ — Mỹ Anh (子) 冲太岁 2026 được flag`);
+}
 
 // ################## 27. TỬ VI ĐỘ SÁNG 庙旺平陷 ##################
 import { starBrightness, analyzeZiweiBrightness, BRIGHTNESS } from './src/engine/ziwei-brightness.js';
