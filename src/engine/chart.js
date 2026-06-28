@@ -587,7 +587,15 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   //   «02-30», «04-31» → chart cho ngày KHÔNG TỒN TẠI → sai toàn bộ lá số.
   const _maxDay = [31, (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
   if (day > _maxDay) throw new Error(`Ngày ${day}/${month}/${year} không tồn tại (tháng ${month} năm ${year} chỉ có ${_maxDay} ngày).`);
-  const chart = buildChart(year, month, day, hour, minute, gender);
+  // [loop 736 FIX] normalize hour/minute — `analyze(y,m,d,undefined)` CRASH («wrong hour undefined»
+  //   trong lunar-javascript buildChart→fromYmdHms), `null` vô tình coerce → giờ Tý(0) SAI.
+  //   Chuẩn hóa == null → 12 (Ngọ) theo convention codebase (hour == null ? 12 : hour, loop 712 pattern).
+  //   Caller (ai.js) vẫn check `a.hour == null` để set hourWarning — không phụ thuộc giá trị normalize.
+  if (hour != null && (!_n(hour) || hour < 0 || hour > 23)) throw new Error(`Giờ sinh không hợp lệ («${hour}» — phải 0-23).`);
+  if (minute != null && (!_n(minute) || minute < 0 || minute > 59)) throw new Error(`Phút sinh không hợp lệ («${minute}» — phải 0-59).`);
+  const hh = (hour == null) ? 12 : hour;
+  const mm = (minute == null) ? 0 : minute;
+  const chart = buildChart(year, month, day, hh, mm, gender);
   const wx = scoreWuXing(chart);
   // [loop 148 ELEVATION] 空亡 hiệu ứng — giảm tàng can weight của trụ rơi không vong
   //   Cổ pháp «空则不实»: chi không vong → tàng can yếu (gốc không vững). Thiên can KHÔNG bị ảnh hưởng.

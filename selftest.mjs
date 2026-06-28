@@ -2007,6 +2007,23 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   assert(!r3.error && r3.diemMenh, `[loop 662] ngày hợp lệ vẫn hoạt động`);
   console.log(`   analyze() input validation ✓ — tháng/ngày sai → VN error; hợp lệ OK`);
 }
+// [loop 736] hour/minute normalization — `analyze(y,m,d,undefined)` CRASH («wrong hour undefined»),
+//   `null` vô tình coerce → giờ Tý(0) SAI. Cả hai phải → Ngọ(12) nhất quán.
+{
+  const rUndef = analyze(1993, 10, 21, undefined, undefined, 'nam', 2026);
+  const rNull = analyze(1993, 10, 21, null, null, 'nam', 2026);
+  const rExplicit = analyze(1993, 10, 21, 12, 0, 'nam', 2026);
+  const hp = (R) => R.chart.pillars.time.gan + R.chart.pillars.time.zhi;
+  assert(hp(rUndef) === '壬午', `[loop 736] undefined hour → Ngọ 壬午 không crash (got ${hp(rUndef)})`);
+  assert(hp(rNull) === hp(rExplicit), `[loop 736] null hour === explicit 12 (got ${hp(rNull)} vs ${hp(rExplicit)})`);
+  // giờ thật KHÔNG bị normalize
+  const rReal = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(hp(rReal) === '丁丑', `[loop 736] giờ thật 1:15 → 丁丑 (không normalize, got ${hp(rReal)})`);
+  // hour sai range → VN error sạch
+  let eH = null; try { analyze(1993, 10, 21, 25, 0, 'nam'); } catch (e) { eH = e.message; }
+  assert(eH && eH.includes('Giờ sinh không hợp lệ'), `[loop 736] hour=25 → VN error (got ${eH})`);
+  console.log(`   [loop 736] hour normalization ✓ — undefined/null → Ngọ(12); giờ thật giữ nguyên; range reject`);
+}
 // [loop 666] viToHan single-word + tên user (Quân/Nhật). Bug: parts[0] chỉ check _SUR →
 //   given name đơn (Tùng/Quân) bị missing.
 {
