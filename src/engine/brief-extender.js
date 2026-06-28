@@ -483,13 +483,18 @@ export function extendBrief(R) {
         const [h, mi] = (f.time || '12:00').split(':').map(Number);
         const roleMap = { father: 'father', mother: 'mother', mẹ: 'mother', bố: 'father', cha: 'father', sibling: 'sibling', em: 'sibling', anh: 'sibling', chị: 'sibling', spouse: 'spouse', child: 'child', con: 'child', cháu: 'child' };
         const role = roleMap[(f.role || '').toLowerCase()] || 'sibling';
-        return { role, label: f.label || f.relation, R: analyze(y, m, d, h, mi, f.gender, new Date().getFullYear()) };
+        return { role, label: f.label || f.relation, hourUnknown: !!f.hourUnknown, R: analyze(y, m, d, h, mi, f.gender, new Date().getFullYear()) };
       }).filter((mm) => mm.R);
       if (members.length) {
         const dd = deduceFromFamily(R, members);
         if (dd.ok) {
-          const relBrief = dd.relations.map((r) => `${r.label}: sao ${r.star}(${r.starWx})@${r.palace} → ${r.verify}; ${r.insight.slice(0, 140)}`).join(' ‖ ');
-          parts.push(`🔮 LỤC THÂN ĐOẠN (六亲断/家庭全息): ${dd.summary} ${relBrief} ${dd.holographic.length ? 'HOLOGRAPHIC: ' + dd.holographic.join(' / ') : ''} [${dd.disclaimer}]`);
+          // [loop 660] gắn hourWarning cho người thân chưa rõ giờ (trụ giờ ~25% lá số → đọc có thể sai)
+          const hourWarn = members.filter((mm) => mm.hourUnknown).map((mm) => mm.label);
+          const relBrief = dd.relations.map((r) => {
+            const m = members.find((mm) => mm.label === r.label || mm.role === r.role);
+            return `${r.label}: sao ${r.star}(${r.starWx})@${r.palace} → ${r.verify}; ${r.insight.slice(0, 140)}${m && m.hourUnknown ? ' ⚠ GIỜ CHƯA RÕ → Dụng/điểm CÓ THỂ SAI ~25%' : ''}`;
+          }).join(' ‖ ');
+          parts.push(`🔮 LỤC THÂN ĐOẠN (六亲断/家庭全息): ${dd.summary} ${relBrief} ${dd.holographic.length ? 'HOLOGRAPHIC: ' + dd.holographic.join(' / ') : ''} ${hourWarn.length ? '⚠ GIỜ CHƯA RÕ: ' + hourWarn.join(', ') + ' → những người này đọc cần thận trọng.' : ''}[${dd.disclaimer}]`);
         }
       }
     } catch (e) { /* deduction optional — không crash brief */ }
