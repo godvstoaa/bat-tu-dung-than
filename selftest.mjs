@@ -1979,6 +1979,20 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   assert(/戊|Thổ/.test(a.lead || ''), `[loop 656] seeded family answer có NC mẹ (戊 Thổ)`);
   console.log(`   NLG seeded family ✓ — «mẹ tôi» → ${a.title} (dùng R._family, không hỏi lại ngày)`);
 }
+// [loop 662] analyze() validate input — VN error cho ngày/tháng/năm không hợp lệ.
+//   Trước đây lunar-javascript throw «wrong month 13» (English) → AI nhận error khó hiểu.
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  const Ru = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const r1 = execTool('analyze_relative', { year: 1990, month: 13, day: 1, gender: 'nữ' }, Ru);
+  assert(r1.error && r1.error.includes('Tháng sinh không hợp lệ'), `[loop 662] month=13 → VN error (got ${(r1.error||'').slice(0,40)})`);
+  const r2 = execTool('analyze_relative', { year: 1990, month: 6, day: 0, gender: 'nữ' }, Ru);
+  assert(r2.error && r2.error.includes('Ngày sinh không hợp lệ'), `[loop 662] day=0 → VN error`);
+  // valid still works
+  const r3 = execTool('analyze_relative', { year: 1990, month: 8, day: 12, gender: 'nữ' }, Ru);
+  assert(!r3.error && r3.diemMenh, `[loop 662] ngày hợp lệ vẫn hoạt động`);
+  console.log(`   analyze() input validation ✓ — tháng/ngày sai → VN error; hợp lệ OK`);
+}
 // [loop 644] daily.js (dailyGuidance) + liuri advice — align thang 54/48 (không 65/45 hay 64).
 //   Bug: dailyGuidance dùng 65/45 (thang cũ); liuri advice >=64 nhưng rating Cát >=54 → mâu thuẫn nội bộ.
 {

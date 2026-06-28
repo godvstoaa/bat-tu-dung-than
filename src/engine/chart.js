@@ -577,6 +577,12 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
 //  7. HÀM TỔNG: TRẢ VỀ TOÀN BỘ KẾT QUẢ LUẬN MỆNH
 // ===========================================================================
 export function analyze(year, month, day, hour, minute, gender, refYear) {
+  // [loop 662] validate input VN — lunar-javascript throws English «wrong month 13»;
+  //   validate trước để error tiếng Việt sạch (AI tool / form đều hưởng).
+  const _n = (v) => Number.isFinite(Number(v));
+  if (!_n(year)) throw new Error(`Năm sinh không hợp lệ («${year}»).`);
+  if (!_n(month) || month < 1 || month > 12) throw new Error(`Tháng sinh không hợp lệ («${month}» — phải 1-12).`);
+  if (!_n(day) || day < 1 || day > 31) throw new Error(`Ngày sinh không hợp lệ («${day}» — phải 1-31).`);
   const chart = buildChart(year, month, day, hour, minute, gender);
   const wx = scoreWuXing(chart);
   // [loop 148 ELEVATION] 空亡 hiệu ứng — giảm tàng can weight của trụ rơi không vong
