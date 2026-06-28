@@ -5832,6 +5832,36 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   console.log(`   flying-sihua ✓ — cần z (ziwei pan), trả fromMing/fromWealth/fromCareer/fromSpouse`);
 }
 
+// ################## SMOKE TEST batch 8: final modules [loop 582] ##################
+{
+  console.log('\n##### SMOKE batch 8: final modules [loop 582] #####');
+  const { xiaoxian } = await import('./src/engine/xiaoxian.js');
+  const { spiritualPractice } = await import('./src/engine/spiritual-fs.js');
+  const { socialStrategy } = await import('./src/engine/social-fs.js');
+  const { plantFengShui } = await import('./src/engine/plant-fs.js');
+  const { analyzePillarAges } = await import('./src/engine/pillar-age.js');
+  const { computeMarriageShensha } = await import('./src/engine/shensha-marriage.js');
+  // xiaoxian: branch string
+  const xx = xiaoxian(spR, 2026);
+  assert(typeof xx.branch === 'string', `[smoke] xiaoxian.branch string`);
+  // spiritual-fs: dungWx
+  const sp = spiritualPractice(spR);
+  assert(['木','火','土','金','水'].includes(sp.dungWx), `[smoke] spiritual-fs.dungWx hợp lệ`);
+  // social-fs: dmStyle
+  const so = socialStrategy(spR);
+  assert(so.dmStyle, `[smoke] social-fs.dmStyle exists`);
+  // plant-fs: dungPlants
+  const pl = plantFengShui(spR);
+  assert(pl.dungPlants, `[smoke] plant-fs.dungPlants exists`);
+  // pillar-age: array of 4
+  const pa = analyzePillarAges(spR);
+  assert(Array.isArray(pa) && pa.length === 4, `[smoke] pillar-age returns 4-element array`);
+  // shensha-marriage: array
+  const sm = computeMarriageShensha(spR.chart);
+  assert(Array.isArray(sm), `[smoke] shensha-marriage returns array`);
+  console.log(`   Smoke batch 8 ✓ — xiaoxian + spiritual + social + plant + pillar-age + marriage-shensha`);
+}
+
 // ################## META: brief content completeness [loop 580] ##################
 // [loop 580] brief là context chính cho AI — phải chứa TẤT CẢ section quan trọng.
 //   Nếu brief vỡ section nào (do refactor/dependency change), test này bắt được.
