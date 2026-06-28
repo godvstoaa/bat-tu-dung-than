@@ -974,6 +974,22 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   assert(_special > 0, '[loop 751] phát hiện ÍT NHẤT 1 从格/专旺 trong sample (detectSpecial hoạt động)');
   console.log(`   [loop 751] 从格/专旺 rate ${(_rate * 100).toFixed(1)}% (${_special}/${_total}) — trong khoảng an toàn ✓`);
 }
+// [loop 753] ORGAN ngũ hành → tạng phủ (五脏六腑+五体+五窍) — foundation health-analysis.
+//   Cổ pháp: 木→肝/目/筋, 火→心/舌/脉, 土→脾/口/肉, 金→肺/鼻/皮, 水→肾/耳/骨.
+{
+  const { ORGAN } = await import('./src/engine/health-analysis.js');
+  const _EXP = { 木: 'Gan', 火: 'Tim', 土: 'Tỳ', 金: 'Phổi', 水: 'Thận' };
+  for (const [wx, organ] of Object.entries(_EXP)) {
+    assert(ORGAN[wx] && ORGAN[wx].organs.includes(organ), `[loop 753] ${wx} → ${organ} (got ${ORGAN[wx]?.organs})`);
+  }
+  // 缺行 detection: Bố 甲辰丁卯癸未戊午 = 缺金 (Kim 0%)
+  const _BR = analyze(1964, 4, 4, 12, 0, 'nam', 2026);
+  const { analyzeHealth } = await import('./src/engine/health-analysis.js');
+  const _bh = analyzeHealth(_BR);
+  assert(_bh.weakest.wx === '金' && Number(_bh.weakest.pct) === 0, `[loop 753] Bố 缺金: weakest=Kim 0% (got ${_bh.weakest.wx} ${_bh.weakest.pct}%)`);
+  assert(_bh.remedyWx === _BR.yong.primary, '[loop 753] health remedyWx == Dụng thần');
+  console.log('   [loop 753] ORGAN ngũ hành→tạng phủ (5 hành) + 缺行 detection (Bố 缺金 0%) ✓');
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
