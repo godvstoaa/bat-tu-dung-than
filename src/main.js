@@ -5634,6 +5634,8 @@ function renderQuickSummary() {
     { icon: '📊', label: '10 năm tới', text: (() => { try { const df = decadeForecast(c, new Date().getFullYear(), 10); return `TỐT: <b>${df.best ? df.best.year + ' (' + df.best.rating + ')' : '?'}</b>${df.worst ? ` · XẤU: <b>${df.worst.year} (${df.worst.rating})</b>` : ''}`; } catch (e) { return '(đang tính)'; } })() },
     // [loop 586] NEW TILE: Kinh Dịch hexagram (河洛理数 本命卦)
     { icon: '☯', label: 'Quẻ chủ mệnh', text: (() => { try { const h = heluo(c); if (!h?.ok) return '(chưa tính được)'; return `<b>#${h.hexagram.num} ${esc(h.hexagram.nameVi)}</b> <span class="zh">${esc(h.hexagram.name)}</span>. 元堂 hào ${h.yuantang.line}.${h.houtianHexagram ? ` 后天 #${h.houtianHexagram.num} ${esc(h.houtianHexagram.nameVi)}` : ''}`; } catch (e) { return '(đang tính)'; } })() },
+    // [loop 641] NEW TILE: fengshui best direction (cửa chính) — kết nối feature loop 631-633
+    { icon: '🧭', label: 'Hướng cửa tốt (năm)', text: (() => { try { const bd = bestDirection(c, 'cuakhach', new Date().getFullYear()); if (!bd?.best) return '(đang tính)'; return `Năm ${bd.year}: <b>${esc(bd.best.shan)}</b> (${esc(bd.best.palace8)}, ${esc(bd.best.baziStar)}) — ${bd.best.idealHit ? '★ ĐÚNG sao lý tưởng' : bd.best.verdict}. <span class="hint">Tránh ${esc(bd.worst?.shan||'?')} (${esc(bd.worst?.palace8||'?')}).</span>`; } catch (e) { return '(đang tính)'; } })() },
   ];
   el.innerHTML = `<div class="qs-grid">${rows.map((r) => `<div class="qs-tile"><div class="qs-label">${r.icon} ${r.label}</div><div class="qs-text">${r.text}</div></div>`).join('')}</div>`;
 }
