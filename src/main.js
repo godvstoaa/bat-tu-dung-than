@@ -4897,6 +4897,77 @@ function initFsCompass(R) {
     renderFsCompass(R, sel.value || '子');
   }
 }
+
+// ============================================================
+// [loop 693] REAL COMPASS — DeviceOrientation (cảm biến điện thoại)
+// ============================================================
+let _compassActive = false, _compassLastDeg = -1, _compassThrottle = 0;
+(function initRealCompass() {
+  const btn = $('compass-real-btn'); if (!btn) return;
+  btn.addEventListener('click', async () => {
+    if (_compassActive) { _stopCompass(); return; }
+    btn.textContent = '⏳ Đang yêu cầu quyền...';
+    btn.disabled = true;
+    try {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        const perm = await DeviceOrientationEvent.requestPermission();
+        if (perm !== 'granted') { btn.textContent = '⚠ Bị từ chối — mở Settings → Safari → cho phép cảm biến'; btn.disabled = false; return; }
+      } else if (!window.DeviceOrientationEvent) { btn.textContent = '⚠ Thiết bị không hỗ trợ la bàn'; btn.disabled = false; return; }
+      _startCompass();
+    } catch (e) { btn.textContent = '⚠ Lỗi cảm biến: ' + e.message.slice(0, 40); btn.disabled = false; }
+  });
+})();
+function _startCompass() {
+  _compassActive = true; _compassLastDeg = -1;
+  $('compass-real-ui').style.display = 'block';
+  const btn = $('compass-real-btn'); btn.textContent = '🔴 Tắt la bàn'; btn.disabled = false;
+  window.addEventListener('deviceorientationabsolute', _onCompass, true);
+  window.addEventListener('deviceorientation', _onCompass, true);
+}
+function _stopCompass() {
+  _compassActive = false;
+  window.removeEventListener('deviceorientationabsolute', _onCompass, true);
+  window.removeEventListener('deviceorientation', _onCompass, true);
+  $('compass-real-btn').textContent = '🧭 Bật la bàn thật (cảm biến điện thoại)';
+}
+function _onCompass(e) {
+  if (!_compassActive) return;
+  let heading = null;
+  if (e.webkitCompassHeading != null) heading = e.webkitCompassHeading;
+  else if (e.absolute && e.alpha != null) heading = 360 - e.alpha;
+  else if (e.alpha != null) heading = 360 - e.alpha;
+  if (heading == null || isNaN(heading)) return;
+  heading = ((heading % 360) + 360) % 360;
+  // Throttle: chỉ update khi đổi >3° hoặc sau 200ms
+  const now = Date.now();
+  if (Math.abs(heading - _compassLastDeg) < 3 && now - _compassThrottle < 200) return;
+  _compassLastDeg = heading; _compassThrottle = now;
+  // Update needle
+  const needle = document.querySelector('#compass-needle');
+  if (needle) needle.style.transform = `rotate(${heading}deg)`;
+  // Update heading display
+  const hdEl = $('compass-heading'); if (hdEl) hdEl.textContent = Math.round(heading) + '°';
+  // Map to 24 sơn + real-time analysis
+  const s = shanFromDegree(heading);
+  if (s) {
+    const shanEl = $('compass-shan-display');
+    if (shanEl) shanEl.textContent = `${s.han} (${s.vi})`;
+    const palEl = $('compass-palace');
+    if (palEl) palEl.textContent = `Hướng ${s.palace8} · ngũ hành ${s.trungQuai}`;
+    // Real-time verdict (lightweight — full analysis khi user bấm «Luận hướng»)
+    const vEl = $('compass-verdict');
+    if (vEl && currentResult) {
+      try {
+        const rd = compassReading(currentResult, heading, new Date().getFullYear());
+        const cls = rd.verdict.includes('CÁT') ? 'color:#2e9e5b' : rd.verdict.includes('KỴ') ? 'color:#e0533d' : 'color:var(--muted)';
+        vEl.innerHTML = `<span style="${cls}"><b>${rd.verdict}</b></span>`;
+      } catch (_) { vEl.textContent = ''; }
+    }
+    // Sync degree input + selector
+    const degEl = $('fs-compass-deg'); if (degEl) degEl.value = Math.round(heading);
+    const selEl = $('fs-compass-sel'); if (selEl) selEl.value = s.han;
+  }
+}
 function renderFsCompass(R, input) {
   const el = $('fs-compass-out'); if (!el) return;
   const rd = compassReading(R, input);

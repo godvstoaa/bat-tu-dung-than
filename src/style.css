@@ -1632,3 +1632,13 @@ html{scroll-behavior:smooth}
   * { animation-duration: 0.01ms !important; }
 }
 
+
+/* [loop 693] REAL COMPASS — mobile-first */
+#compass-real-ui { animation: fadeIn .4s var(--ease-out); }
+#compass-needle { transition: transform .12s var(--ease-out); }
+#compass-real-btn:active { transform: scale(.97); }
+@media (max-width: 760px) {
+  #compass-svg { width: 150px !important; }
+  #compass-heading { font-size: 24px !important; }
+  #compass-shan-display { font-size: 18px !important; }
+}
