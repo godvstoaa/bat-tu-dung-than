@@ -1081,7 +1081,8 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history } = {
   }
 
   const _td = new Date();
-  const _ck = `${R.chart.input.year}-${R.chart.input.month}-${R.chart.input.day}-${R.chart.input.hour}-${R.chart.input.minute}-${R.chart.input.gender}-${_td.getFullYear()}-${_td.getMonth()}-${_td.getDate()}`;
+  const _famKey = (R._family || []).map((f) => `${f.role || ''}:${f.date || ''}:${f.time || ''}`).join(',');
+  const _ck = `${R.chart.input.year}-${R.chart.input.month}-${R.chart.input.day}-${R.chart.input.hour}-${R.chart.input.minute}-${R.chart.input.gender}-${_td.getFullYear()}-${_td.getMonth()}-${_td.getDate()}-${_famKey}`;
   const brief = (_briefCache && _briefCache.key === _ck) ? _briefCache.brief : (_briefCache = { key: _ck, brief: buildChartBrief(R) }).brief;
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
