@@ -227,6 +227,12 @@ export function extendBrief(R) {
     const wm = xing.filter((x) => x.meaning);
     if (wm.length) parts.push(`TAM HÌNH 三刑 (phân loại cổ pháp — mỗi loại hậu quả khác nhau): ${wm.map((x) => `${x.at}: ${x.vi}${x.heavy ? ' «PHÁP HÌNH (đủ 3 chi) = NẶNG nhất»' : ''} — ${x.meaning}`).join(' | ')}`);
   } catch (e) {}
+  // [loop 747 ELEVATION] LỤC HẠI 六害 — 6 cặp tên cổ + hậu quả (trước đây chỉ «có hại» generic).
+  try {
+    const hai = (R.interactions && R.interactions.hai) || [];
+    const wm = hai.filter((h) => h.meaning);
+    if (wm.length) parts.push(`LỤC HẠI 六害 (phân loại — «相穿»): ${wm.map((h) => `${h.a}–${h.b} ${h.vi} (${h.at}) — ${h.meaning}`).join(' | ')}`);
+  } catch (e) {}
 
   // Ẩn hợp
   try {

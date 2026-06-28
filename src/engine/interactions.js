@@ -102,6 +102,22 @@ export const ZHI_HAI_MAP = (() => {
   for (const p of ZHI_HAI) { m[p] = true; m[p[1] + p[0]] = true; }
   return m;
 })();
+// [loop 747 ELEVATION] LỤC HẠI 六害 — 6 cặp đều có tên cổ + hậu quả khác nhau (trước đây
+//   detectInteractions chỉ push {a,b} KHÔNG có name/meaning → brief/UI không giải thích).
+//   Nguồn: 三命通会 «六害相穿».
+export const HAI_MEANING = {
+  '子未': { name: 'Thế gia tương hại', vi: 'Hại thế gia', meaning: '«势家»: khí cực đụng (tý âm cực ↔ vị dương cực) → cốt nhục tương hại, lục thân duyên bạc (đặc biệt mẹ-con/cha-con).' },
+  '丑午': { name: 'Quan quỷ tương hại', vi: 'Hại quan quỷ', meaning: '«官鬼»: Sửu kim khố ↔ Ngọ hỏa vượng (hỏa khắc kim) → sự nghiệp tiểu nhân, khẩu phi, dễ oan ức.' },
+  '寅巳': { name: 'Vô ân tương hại', vi: 'Hại vô ân', meaning: 'Đa nghi, ân oán lẫn lộn, khẩu thiệt; dễ bị người giúp quay ra gây khó (liên quan 寅巳 hình).' },
+  '卯辰': { name: 'Đồng bào tương hại', vi: 'Hại đồng bào', meaning: 'Huynh đệ/bạn bè tương tranh, dễ đụng chấn người ngang hàng; cục bộ bất hòa.' },
+  '申亥': { name: 'Tranh tiến tương hại', vi: 'Hại tranh tiến', meaning: '«争进»: Lục thân/giao tế khẩu phi, tranh giành cơ hội, tiểu nhân ngầm.' },
+  '酉戌': { name: 'Đố kỵ tương hại', vi: 'Hại đố kỵ', meaning: '«嫉妒»: Phụ nữ/đệ huynh bất lợi; nữ mệnh dễ hình khắc phối ngẫu, khẩu thiệt đố kỵ.' },
+};
+const _HAI_LOOKUP = (() => {
+  const m = {};
+  for (const [pair, info] of Object.entries(HAI_MEANING)) { m[pair] = info; m[pair[1] + pair[0]] = info; }
+  return m;
+})();
 
 // ============================================================================
 //  HÀM PHÁT HIỆN TƯƠNG TÁC TRONG LÁ SỐ
@@ -195,7 +211,10 @@ export function detectInteractions(pillars) {
   // --- Lục hại ---
   const hai = [];
   for (const [a, b, i, j] of pairs(zhis))
-    if (ZHI_HAI_MAP[a + b]) hai.push({ a, b, at: `${POS_LABEL[i]}–${POS_LABEL[j]}` });
+    if (ZHI_HAI_MAP[a + b]) {
+      const info = _HAI_LOOKUP[a + b] || {};
+      hai.push({ a, b, name: info.name, vi: info.vi, meaning: info.meaning, at: `${POS_LABEL[i]}–${POS_LABEL[j]}` });
+    }
 
   // --- Tổng hợp narration ---
   const parts = [];
