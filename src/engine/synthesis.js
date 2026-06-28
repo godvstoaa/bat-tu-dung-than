@@ -141,15 +141,16 @@ export function synthesize(R) {
   score = Math.max(0, Math.min(100, Math.round(score)));
 
   // --- Đẳng cấp ---
-  // [loop 458] RECALIBRATE theo percentile 4392 lá (median 45, p95 65). Cũ 80/68/55/43
-  //   khiến 上等 gần UNREACHABLE (max thực tế 81) + >50% lá rơi 下等 — sai phân bố.
-  //   Nay neo percentile: 上 = top ~6% (≥62), 中 = quanh median (≥41), 下 = bottom ~12% (<31).
-  let grade, gradeVi;
-  if (score >= 62) { grade = '上'; gradeVi = 'Thượng đẳng (mệnh tốt, hiếm)'; }
-  else if (score >= 52) { grade = '中上'; gradeVi = 'Trung thượng (khá tốt)'; }
-  else if (score >= 41) { grade = '中'; gradeVi = 'Trung đẳng (cân bằng)'; }
-  else if (score >= 31) { grade = '中下'; gradeVi = 'Trung hạ (khá vất vả)'; }
-  else { grade = '下'; gradeVi = 'Hạ đẳng (nhiều thử thách)'; }
+  // [loop 458→587] RECALIBRATE theo percentile 2160 lá post-Thông-Quan-fix (loop 575).
+  //   Nay neo percentile: 上 = top ~10% (≥62), 中 = quanh median 47 (≥41), 下 = bottom ~6% (<31).
+  let grade, gradeVi, percentile;
+  // [loop 587] percentile neo theo phân bố thực 2160 lá: 下=p0-7, 中下=p7-31, 中=p31-65, 中上=p65-90, 上=p90-100
+  if (score >= 62) { grade = '上'; gradeVi = 'Thượng đẳng (mệnh tốt, hiếm)'; percentile = 90 + Math.round(10 * (score - 62) / 21); }
+  else if (score >= 52) { grade = '中上'; gradeVi = 'Trung thượng (khá tốt)'; percentile = 65 + Math.round(25 * (score - 52) / 10); }
+  else if (score >= 41) { grade = '中'; gradeVi = 'Trung đẳng (cân bằng)'; percentile = 31 + Math.round(34 * (score - 41) / 11); }
+  else if (score >= 31) { grade = '中下'; gradeVi = 'Trung hạ (khá vất vả)'; percentile = 7 + Math.round(24 * (score - 31) / 10); }
+  else { grade = '下'; gradeVi = 'Hạ đẳng (nhiều thử thách)'; percentile = Math.max(1, Math.round(7 * (score - 14) / 17)); }
+  percentile = Math.max(1, Math.min(99, percentile));
 
   // --- Phú quý bần tiện (xu hướng) ---
   // [loop 458] neo percentile cùng đẳng cấp (p80/p37/p12)
@@ -160,7 +161,7 @@ export function synthesize(R) {
   else { fortune = 'bần tiện'; fortuneVi = 'Khó nhọc — cần dựa Dụng Thần + đúng thời để vươn lên'; }
 
   const paragraphs = [
-    `Mệnh bạn xếp ở ${gradeVi} — điểm tổng hợp ${score}/100.`,
+    `Mệnh bạn xếp ở ${gradeVi} — điểm tổng hợp ${score}/100 (top ${percentile}% người cùng tuổi mệnh).`,
     `Trục cốt lõi: Dụng Thần ${wxVi(yong.primary)}, Hỷ ${wxVi(yong.xi)} (trợ), Kỵ ${wxVi(yong.ji)} (hại), 仇 ${wxVi(yong.chou)} (hại gián tiếp). Xu hướng: ${fortuneVi}.`,
     factors.map((f) => '• ' + f).join('\n'),
     score >= 58
@@ -204,5 +205,5 @@ export function synthesize(R) {
     }
   } catch (e) {}
 
-  return { score, grade, gradeVi, fortune, fortuneVi, factors, paragraphs, combos, patternQuality: pq || null };
+  return { score, grade, gradeVi, percentile, fortune, fortuneVi, factors, paragraphs, combos, patternQuality: pq || null };
 }
