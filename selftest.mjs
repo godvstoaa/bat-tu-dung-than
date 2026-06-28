@@ -931,6 +931,21 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   }
   console.log('   [loop 742] 命宫 (4 case gia đình) khớp công thức 寅+(月−时)mod12 — TUYỆT ĐỐI ✓');
 }
+// [loop 750] 胎元 (thai nguyên / conception pillar «trụ thứ 5») — 月干+1, 月支+3 (công thức cổ).
+//   Foundation cho health-analysis + bazi-minggong. Pin 5 thành viên.
+{
+  const { taiYuan } = await import('./src/engine/taiyuan.js');
+  const _G10 = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const _Z12 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const _C = [['Quân','壬','戌','癸丑'],['Mỹ Anh','己','亥','庚寅'],['Nhật Minh','癸','丑','甲辰'],['Mẹ','壬','午','癸酉'],['Bố','丁','卯','戊午']];
+  for (const [nm, mg, mz, exp] of _C) {
+    const ty = taiYuan(mg, mz);
+    const expG = _G10[(_G10.indexOf(mg) + 1) % 10];
+    const expZ = _Z12[(_Z12.indexOf(mz) + 3) % 12];
+    assert(ty.ganZhi === exp && ty.gan === expG && ty.zhi === expZ, `[loop 750] ${nm} 胎元 = ${exp} (got ${ty.ganZhi}); 月${mg}${mz}+1/+3`);
+  }
+  console.log('   [loop 750] 胎元 (5 thành viên) khớp công thức 月干+1/月支+3 ✓');
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
