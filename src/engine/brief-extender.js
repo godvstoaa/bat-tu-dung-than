@@ -268,6 +268,16 @@ export function extendBrief(R) {
       const mingStars = bw.items.filter((i) => i.zhi === ming.zhi);
       if (mingStars.length) parts.push(`紫微 Mệnh cung độ sáng: ${mingStars.map((s) => `${s.starVi || s.star}=${s.vi}(${s.score > 0 ? '+' : ''}${s.score})`).join(', ')}. ${bw.summary || ''}`);
     }
+    // [loop 687] 四化 SIHUA — 4 transformations (禄/权/科/忌) = core dynamic 紫微斗数. Trước đây KHÔNG surface.
+    const sh = zr.sihua;
+    if (sh) {
+      const shDetail = [];
+      if (sh.禄) shDetail.push(`化禄(${sh.禄.star}@${sh.禄.palace}): tài lộc/duyên thuận`);
+      if (sh.权) shDetail.push(`化权(${sh.权.star}@${sh.权.palace}): quyền lực/chủ động`);
+      if (sh.科) shDetail.push(`化科(${sh.科.star}@${sh.科.palace}): danh tiếng/quý nhân`);
+      if (sh.忌) shDetail.push(`化忌(${sh.忌.star}@${sh.忌.palace}): ⚠ trở ngại/thử thách`);
+      if (shDetail.length) parts.push(`紫微 四化 SIHUA (${inp.gender === 'nam' ? 'nam' : 'nữ'} ${R.chart.pillars.year.gan} năm): ${shDetail.join(' | ')}. 化禄/权/科 = kích hoạt mặt tốt; 化忌 = cản trở (cần chú ý cung có hóa忌).`);
+    }
   } catch (e) {}
 
   // Nạp âm quan hệ
