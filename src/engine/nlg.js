@@ -61,7 +61,7 @@ const avoidText = (yong) => [...new Set(yong.avoid)].map((w) => `${wxVi(w)} (${w
 const INTENT_KEYWORDS = {
   career: ['sự nghiệp', 'công việc', 'công danh', 'thăng tiến', 'nghề', 'làm ăn', 'kinh doanh', 'chức', 'sếp', 'đi làm', 'nghỉ việc', 'đổi việc', 'thăng chức', 'khởi nghiệp', 'mở công ty'],
   wealth: ['tài', 'tiền', 'của cải', 'giàu', 'lộc', 'đầu tư', 'tài chính', 'phát tài', 'làm giàu', 'kiếm tiền', 'kinh tế', 'nợ', 'lãi'],
-  love: ['tình', 'duyên', 'hôn nhân', 'vợ', 'chồng', 'người yêu', 'kết hôn', 'cưới', 'gia đạo', 'ly hôn', 'đào hoa', 'phối ngẫu', 'tái hôn'],
+  love: ['tình', 'duyên', 'hôn nhân', 'vợ', 'chồng', 'người yêu', 'kết hôn', 'cưới', 'gia đạo', 'ly hôn', 'đào hoa', 'phối ngẫu', 'tái hôn', 'lấy vợ', 'lấy chồng', 'gặp duyên', 'độc thân'],
   health: ['sức khỏe', 'bệnh', 'ốm', 'tạng', 'dưỡng sinh', 'thể chất', 'thọ', 'tai nạn', 'đau', 'ăn gì', 'thực phẩm', 'chế độ ăn'],
   study: ['học', 'thi', 'bằng cấp', 'trí tuệ', 'kiến thức', 'sáng tạo', 'trường', 'đại học', 'luận văn', 'nghiên cứu'],
   children: ['con', 'con cái', 'sinh con', 'có con', 'quý tử', 'hậu duệ', 'thai'],
