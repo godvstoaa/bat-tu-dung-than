@@ -5862,6 +5862,20 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   console.log(`   Smoke batch 8 ✓ — xiaoxian + spiritual + social + plant + pillar-age + marriage-shensha`);
 }
 
+// ################## SMOKE TEST batch 9: dayun-god + brief [loop 583] ##################
+{
+  console.log('\n##### SMOKE batch 9: dayun-god + brief-extender [loop 583] #####');
+  const { dayunGodMeaning } = await import('./src/engine/dayun-god.js');
+  const { extendBrief } = await import('./src/engine/brief-extender.js');
+  // dayun-god: items array with 8 大运 phases
+  const dg = dayunGodMeaning(spR.chart, spR.dayun);
+  assert(Array.isArray(dg.items) && dg.items.length > 0, `[smoke] dayun-god.items non-empty array`);
+  // brief-extender: string > 5000 chars
+  const br = extendBrief(spR);
+  assert(typeof br === 'string' && br.length > 5000, `[smoke] brief-extender returns string > 5000 chars (got ${br.length})`);
+  console.log(`   Smoke batch 9 ✓ — dayun-god (${dg.items.length} phases) + brief-extender (${br.length} chars)`);
+}
+
 // ################## META: brief content completeness [loop 580] ##################
 // [loop 580] brief là context chính cho AI — phải chứa TẤT CẢ section quan trọng.
 //   Nếu brief vỡ section nào (do refactor/dependency change), test này bắt được.
