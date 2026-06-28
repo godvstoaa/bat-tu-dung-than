@@ -754,6 +754,7 @@ export function execTool(name, args, R) {
         return { date: d.solar, ganZhi: d.ganZhi, ganGod: d.ganGod, rating: d.rating, score: d.score, advice: _s(d.advice, 240), gejuDelta: d.gejuDelta, gejuNote: d.gejuNote ? _s(d.gejuNote, 200) : '', interactions: (d.ctx || []) };
       }
       case 'analyze_year': {
+        if (!Number.isFinite(Number(a.year))) return { error: `Năm không hợp lệ («${a.year}») — nhập số năm (vd 2026).` };
         const y = analyzeLiunianDeep(R, a.year, R.patternQuality?.patternYong);
         return { year: y.year, ganZhi: y.ganZhi, rating: y.rating, score: y.score, advice: _s(y.advice, 260), schools: y.schools.map((sc) => ({ school: sc.phai, delta: sc.d, note: _s(sc.note, 110) })) };
       }
