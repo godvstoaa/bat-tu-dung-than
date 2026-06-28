@@ -815,7 +815,7 @@ export function execTool(name, args, R) {
           targetYong: a.mode === 'yong' && a.targetYong ? a.targetYong : null, // [loop 230] desired Dụng Thần
         };
         const sol = inverseBaZiSolve(opts);
-        const fmt = (r) => r ? { label: labelResult(r), score: r.score, pattern: r.pattern, geju: r.gejuQuality, pillars: r.pillars, birth: `${r.y}-${String(r.m).padStart(2,'0')}-${String(r.d).padStart(2,'0')} ${r.g} giờ ${r.shichen}` } : null;
+        const fmt = (r) => r ? { label: labelResult(r), score: r.score, dung: r.yong || null, pattern: r.pattern, geju: r.gejuQuality, pillars: r.pillars, birth: `${r.y}-${String(r.m).padStart(2,'0')}-${String(r.d).padStart(2,'0')} ${r.g} giờ ${r.shichen}` } : null;
         return {
           mode: a.mode,
           window: sol.window, scanned: sol.scanned, durationMs: sol.durationMs,
