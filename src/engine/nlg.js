@@ -69,8 +69,8 @@ const INTENT_KEYWORDS = {
   travel: ['đi xa', 'xuất khẩu', 'nước ngoài', 'di cư', 'du lịch', 'dịch chuyển', 'định cư', 'xa nhà', 'lao động'],
   power: ['quyền', 'lãnh đạo', 'uy quyền', 'chức quyền', 'ảnh hưởng', 'địa vị', 'quyết định'],
   timing: ['vận', 'đại vận', 'thời điểm', 'năm nào', 'tuổi', 'lúc nào', 'tương lai', 'khi nào', 'tháng', 'năm nay', 'năm sau'],
-  personality: ['tính cách', 'bản mệnh', 'con người', 'tướng', 'khí chất', 'bản chất', 'người như thế nào', 'cấu hình', 'cách cục', 'sát ấn', 'thương quan', 'quan sát', 'tỷ kiếp', '格局'],
-  remedy: ['cải mệnh', 'cải vận', 'làm sao để', 'nên làm gì', 'làm gì', 'cách', 'hóa giải', 'tăng', 'giảm', 'tránh', 'phương pháp', 'khắc phục', 'thay đổi', 'cải thiện', 'khai vận', 'bổ mệnh', 'sống ở đâu', 'thành phố', 'phong thủy'],
+  personality: ['tính cách', 'bản mệnh', 'con người', 'tướng', 'khí chất', 'bản chất', 'người như thế nào', 'cấu hình', 'cách cục', 'sát ấn', 'thương quan', 'quan sát', 'tỷ kiếp', '格局', 'dụng thần', 'kỵ thần', 'hỷ thần', 'ngũ hành'],
+  remedy: ['cải mệnh', 'cải vận', 'làm sao để', 'nên làm gì', 'làm gì', 'cách', 'hóa giải', 'tăng', 'giảm', 'tránh', 'phương pháp', 'khắc phục', 'thay đổi', 'cải thiện', 'khai vận', 'bổ mệnh', 'sống ở đâu', 'thành phố', 'phong thủy', 'mua nhà', 'mua đất', 'bất động sản', 'màu', 'màu sắc', 'hết xui', 'giải xui', 'đổi vận'],
   flow: ['dòng khí', 'lưu thông', 'khí mệnh', 'nguồn khí', 'dòng chảy', 'thông khí', '源流', 'khí lưu', 'nguồn lực mệnh', 'tắc khí'],
   divination: ['gieo quẻ', '起卦', '占', 'lắc quẻ', 'quẻ dịch', 'bói quẻ', 'meihua', 'thảo quẻ', 'quẻ hôm', '测字', 'châm tự', 'xem chữ', 'phép bói'],
 };
