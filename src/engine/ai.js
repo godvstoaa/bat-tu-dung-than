@@ -611,7 +611,7 @@ export const AI_TOOLS = [
     }, required: ['year', 'month', 'day'] },
   } },
   { type: 'function', function: {
-    name: 'analyze_year', description: 'Luận lưu niên của MỘT năm (đa trường phái): can-chi năm, điểm Cát/Hung + lý do từng phái, lời khuyên cả năm.',
+    name: 'analyze_year', description: 'Luận lưu niên của MỘT năm (đa trường phái): can-chi năm, điểm Cát/Hung + lý do từng phái, lời khuyên cả năm. Dùng khi user hỏi «năm X vận sao», «năm nay tốt xấu», «năm tới ra sao».',
     parameters: { type: 'object', properties: {
       year: { type: 'integer', description: 'Năm dương lịch' },
     }, required: ['year'] },
