@@ -44,6 +44,7 @@ import { detectGongjia } from './gongjia.js';
 import { guiguziFortune } from './guiguzi.js';
 import { guiguziFDG } from './guiguzi-fdg.js';
 import { hexagramSynthesis } from './hexagram-synthesis.js';
+import { synthesize } from './synthesis.js';
 import { computeLiuDao } from './liudao.js';
 import { destinyConsensus } from './destiny-consensus.js';
 import { dayNayinPersonality } from './nayin-personality.js';
@@ -142,6 +143,18 @@ export function extendBrief(R) {
       if (dc.ok && dc.consensus) {
         const sys = dc.systems;
         parts.push(`DESTINY CONSENSUS (meta): BaZi=${sys.bazi?.detail || '?'} | 称骨=${sys.chenggu?.detail || '?'} | Dịch=${sys.hexagram?.detail?.slice(0, 30) || '?'} | 六道=${sys.liudao?.realm || '?'}. → ${dc.consensus.verdict} (agreement ${dc.consensus.agreement}, ${dc.consensus.n} hệ). ${dc.consensus.narrative.slice(0, 200)}`);
+      }
+    } catch (e) {}
+    // [loop 591] SYNTHESIS tổng luận — điểm mệnh + percentile + silver lining + fortune
+    try {
+      const syn = synthesize(R);
+      if (syn) {
+        let line = `TỔNG LUẬN MỆNH: ${syn.score}/100 (${syn.gradeVi}`;
+        if (syn.percentile) line += `, top ${syn.percentile}%`;
+        line += `). Xu hướng: ${syn.fortuneVi}.`;
+        const silver = (syn.paragraphs || []).find((p) => p.includes('TIA SÁNG'));
+        if (silver) line += ' ' + silver.slice(0, 200);
+        parts.push(line);
       }
     } catch (e) {}
   } catch (e) {}
