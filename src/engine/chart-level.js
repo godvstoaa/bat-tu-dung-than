@@ -59,14 +59,19 @@ export function classifyChartLevel(R) {
 
   // Đếm tiêu chí pass
   const passCount = criteria.filter((c) => c.pass).length;
+  // [loop 673 FIX] cap by synthesis score — tránh chart điểm thấp bị xếp bậc cao (vd cháu 16/100
+  //   nhưng 3/6 tiêu chí structural → «Thanh Quý» sai thực tế). Cổ pháp: mệnh đó low → bậc phải thấp.
+  let _effPass = passCount;
+  if (synthesis?.score != null && synthesis.score < 22) _effPass = Math.min(_effPass, 1);      // Hạ đặng nặng → max Hạ Cách
+  else if (synthesis?.score != null && synthesis.score < 31) _effPass = Math.min(_effPass, 2);  // Hạ đẳng → max Thường Cách
 
-  // Phân tầng
+  // Phân tầng (dùng _effPass có cap)
   let level, levelVi;
-  if (passCount >= 6) { level = '极品'; levelVi = 'Cực Phẩm (帝王/Thượng thượng — cực hiếm, toàn mỹ)'; }
-  else if (passCount >= 5) { level = '贵格'; levelVi = 'Quý Cách (将相/Thượng — quý hiển, quyền uy)'; }
-  else if (passCount >= 4) { level = '富格'; levelVi = 'Phú Cách (富豪/Trung thượng — giàu có, phúc lộc)'; }
-  else if (passCount >= 3) { level = '清贵'; levelVi = 'Thanh Quý (văn nhân/Trung — học vấn, thanh cao)'; }
-  else if (passCount >= 2) { level = '常格'; levelVi = 'Thường Cách (bình dân/Trung hạ — no ấm, cần nỗ lực)'; }
+  if (_effPass >= 6) { level = '极品'; levelVi = 'Cực Phẩm (帝王/Thượng thượng — cực hiếm, toàn mỹ)'; }
+  else if (_effPass >= 5) { level = '贵格'; levelVi = 'Quý Cách (将相/Thượng — quý hiển, quyền uy)'; }
+  else if (_effPass >= 4) { level = '富格'; levelVi = 'Phú Cách (富豪/Trung thượng — giàu có, phúc lộc)'; }
+  else if (_effPass >= 3) { level = '清贵'; levelVi = 'Thanh Quý (văn nhân/Trung — học vấn, thanh cao)'; }
+  else if (_effPass >= 2) { level = '常格'; levelVi = 'Thường Cách (bình dân/Trung hạ — no ấm, cần nỗ lực)'; }
   else { level = '下格'; levelVi = 'Hạ Cách (bần tiện — nhiều trở ngại, cần cải vận mạnh)'; }
 
   const note = `Mệnh cách: ${levelVi}. ${passCount}/6 tiêu chí cổ pháp đạt. ` +
