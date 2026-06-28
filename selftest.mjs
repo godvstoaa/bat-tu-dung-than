@@ -1675,6 +1675,12 @@ assert(isFanyin({ gan: '甲', zhi: '子' }, { gan: '庚', zhi: '午' }), '甲子
 assert(isFanyin({ gan: '丙', zhi: '子' }, { gan: '壬', zhi: '午' }), '丙子×壬午 (丙壬天冲+子午地冲) = Phản Ngâm');
 assert(!isFanyin({ gan: '庚', zhi: '午' }, { gan: '丙', zhi: '子' }), '庚午×丙子 (火克金=ngũ hành khắc, nhưng 庚丙 KHÔNG cách-7-vị → KHÔNG phải Phản Ngâm)');
 assert(!isFanyin({ gan: '甲', zhi: '子' }, { gan: '乙', zhi: '丑' }), 'không khắc+xung → không phải Phản Ngâm');
+// [loop 734] 支伏吟 (Chi Phục Ngâm) — đồng chi, dị can. NHẸ hơn Phục Ngâm trụ.
+import { isZhiFuyin } from './src/engine/fuyin.js';
+assert(isZhiFuyin({ gan: '己', zhi: '亥' }, { gan: '乙', zhi: '亥' }), '己亥×乙亥 (đồng chi 亥, dị can) = Chi Phục Ngâm');
+assert(!isZhiFuyin({ gan: '乙', zhi: '亥' }, { gan: '乙', zhi: '亥' }), '乙亥×乙亥 (đồng cả can) → KHÔNG phải Chi Phục Ngâm (là Phục Ngâm trụ)');
+assert(!isZhiFuyin({ gan: '乙', zhi: '亥' }, { gan: '辛', zhi: '巳' }), 'khác chi → KHÔNG phải Chi Phục Ngâm');
+assert(isZhiFuyin({ gan: '甲', zhi: '子' }, { gan: '乙', zhi: '子' }), '甲子×乙子 (đồng chi 子) = Chi Phục Ngâm');
 // Lá số user: 乙亥 nhật trụ → 1995/2055 phục ngâm, 2001/2061 phản ngâm
 const fuR = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
 assert(scanFuyin(fuR, 1995).items.some((i) => i.type === '伏吟' && i.pillar === 'day'), '1995 乙亥 = Phục Ngâm Nhật Trụ');
@@ -1684,6 +1690,14 @@ assert(natalFuyin(fuR).items.length === 0, 'lá số user không có phục/phan
 // severity: phản ngâm nhật trụ + KHÔNG phải Dụng → nặng; ngày Dụng thì giảm
 const sevNormal = scanFuyin(fuR, 2001).items[0].severity;
 assert(sevNormal >= 7, `Phản Ngâm Nhật Trụ (không Dụng) severity ≥7 (được ${sevNormal})`);
+// [loop 734] 支伏吟 lưu niên: 2019 己亥 vs nhật trụ 乙亥 → đồng chi dị can → Chi Phục Ngâm (NHẸ, sev thấp hơn Phục Ngâm trụ)
+const zf2019 = scanFuyin(fuR, 2019).items.find((i) => i.type === '支伏吟' && i.pillar === 'day');
+assert(zf2019, '2019 己亥 × nhật trụ 乙亥 (đồng chi) → phát hiện Chi Phục Ngâm Nhật Trụ');
+assert(zf2019 && zf2019.subtype === 'branch', 'Chi Phục Ngâm có subtype = branch');
+assert(zf2019 && zf2019.severity < sevNormal, `Chi Phục Ngâm (sev ${zf2019?.severity}) < Phản Ngâm trụ (sev ${sevNormal}) — nhẹ hơn`);
+// Phục Ngâm trụ đầy đủ (1995 乙亥) phải NẶNG hơn Chi Phục Ngâm cùng trụ
+const fpm1995 = scanFuyin(fuR, 1995).items.find((i) => i.type === '伏吟' && i.pillar === 'day');
+assert(fpm1995 && zf2019 && fpm1995.severity > zf2019.severity, `Phục Ngâm trụ (sev ${fpm1995?.severity}) > Chi Phục Ngâm (sev ${zf2019?.severity})`);
 assert(typeof dayunFuyin(fuR).dayun === 'string' || dayunFuyin(fuR).items.length >= 0, 'dayunFuyin chạy không lỗi');
 console.log(`   乙亥 nhật trụ: 1995 Phục Ngâm (sev8), 2001 Phản Ngâm (sev7) ✓ | 2026 không phạm ✓ | đại vận ${dayunFuyin(fuR).dayun || '-'}: ${dayunFuyin(fuR).items.length} điểm`);
 

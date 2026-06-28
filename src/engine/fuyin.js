@@ -36,6 +36,14 @@ export function isFuyin(p, q) { return p.gan === q.gan && p.zhi === q.zhi; }
 export function isFanyin(p, q) {
   return GAN_CHONG[p.gan] === q.gan && CHONG[p.zhi] === q.zhi;
 }
+// [loop 734 THÊM] 支伏吟 (Chi Phục Ngâm) — ĐỒNG ĐỊA CHI, DỊ THIÊN CAN.
+//   Cổ pháp (滴天髓阐微, 三命通会 卷三 «年支与日支同为之伏吟»): khi 2 trụ CÙNG ĐỊA CHI
+//   (bản khí trùng điệp) nhưng khác thiên can → cung vị đó "vọng âm/đình trệ nhẹ",
+//   pattern lặp. NHẸ HƠN Phục Ngâm trụ (đầy đủ can+chi) vì thiên can (tượng bên ngoài)
+//   vẫn khác → sự việc trầm nhưng không khóa cứng. Đặc biệt 日支 đồng chi = 配偶 cung
+//   "trùng âm" — quan hệ/hôn nhân dễ lặp pattern, đình trệ cảm xúc. (can khác nên KHÔNG
+//   trùng với isFuyin — không double-count.)
+export function isZhiFuyin(p, q) { return p.zhi === q.zhi && p.gan !== q.gan; }
 
 // --- Ý nghĩa theo cặp trụ (nguyên cục nội bộ) ---
 const NATAL_FUYIN = {
@@ -54,6 +62,15 @@ const NATAL_FANYIN = {
   'month-time':  'Lục thân bất hòa, đa cãi vã, sự nghiệp quái dị bất thuận.',
   'day-time':    'Phối ngẫu – con cái bất hòa, trung – vãn niên nhiều biến cố, hôn nhân khó an.',
 };
+// [loop 734 THÊM] 支伏吟 bẩm sinh (đồng chi, dị can) — NHẸ HƠN Phục Ngâm trụ.
+const NATAL_ZHI_FUYIN = {
+  'year-month':  'Ấu thời & gia đình đồng bản khí (đồng chi) — đình trệ NHẸ, dễ lặp pattern/gia đạo.',
+  'month-day':   'Bản thân & cha mẹ/gia đạo đồng chi — duyên phận đan xen, khó tách bạch (nhẹ).',
+  'day-time':    'Phối ngẫu & tử tức đồng chi — quan hệ lặp/đình trệ nhẹ, dễ xoay vòng.',
+  'year-day':    'Tổ nghiệp & bản mệnh đồng chi — duyên tổ mạnh, sự tình dễ đi vòng lặp.',
+  'year-time':   'Ấu & vãn niên đồng chi — đầu cuối tương ứng (trùng khí), duyên dài.',
+  'month-time':  'Sự nghiệp sớm & muộn đồng chi — phát triển dễ lặp pattern, tiến chậm.',
+};
 
 // --- Ý nghĩa lưu niên/đại vận khắc trụ nguyên cục (theo vị trí trụ bị trùng/xung) ---
 const FUYIN_BY_PILLAR = {
@@ -67,6 +84,13 @@ const FANYIN_BY_PILLAR = {
   month: 'Phản ngâm phụ mẫu/sự nghiệp — sự nghiệp động loạn, lao khổ, hao tổn.',
   day:   '«Phản ngâm phục ngâm, khấp lệ lâm lâm» — BẢN THÂN & PHỐI NGẪU: biến cố lớn, ly tán, phúc sản tổn hại. NẶNG NHẤT.',
   time:  'Phản ngâm tử tức/dự án — con cái dễ hiểm, đầu tư phá sản.',
+};
+// [loop 734 THÊM] Chi Phục Ngâm theo trụ (lưu niên/đại vận đồng chi) — NHẸ.
+const ZHI_FUYIN_BY_PILLAR = {
+  year:  'Đồng chi tổ bối — năm này dễ hoài niệm, vấn đề ông/bà lặp lại (nhẹ).',
+  month: 'Đồng chi phụ mẫu/sự nghiệp — sự nghiệp đình trệ nhẹ, dễ quay về nếp cũ.',
+  day:   'Đồng chi BẢN THÂN & PHỐI NGẪU (日支 vọng âm) — quan hệ/hôn nhân «trùng lặp pattern», đình trệ cảm xúc. Đáng chú ý hơn các trụ khác (dù nhẹ hơn Phục Ngâm trụ).',
+  time:  'Đồng chi tử tức/dự án muộn — tiến triển chậm, dễ lặp.',
 };
 
 // --- Quy tắc hóa giải: trùng/xung đúng hành Dụng/Hỷ → "hồi phục"/"phản cát" ---
@@ -91,8 +115,9 @@ export function natalFuyin(R) {
       const a = keys[i], b = keys[j];
       const pa = R.chart.pillars[a], pb = R.chart.pillars[b];
       const key = `${a}-${b}`;
-      if (isFuyin(pa, pb)) items.push({ type: '伏吟', typeVi: 'Phục Ngâm', pair: `${PILLAR_QIN[a].vi}–${PILLAR_QIN[b].vi}`, meaning: NATAL_FUYIN[key] || 'Đình trệ/lặp lại.' });
-      else if (isFanyin(pa, pb)) items.push({ type: '反吟', typeVi: 'Phản Ngâm', pair: `${PILLAR_QIN[a].vi}–${PILLAR_QIN[b].vi}`, meaning: NATAL_FANYIN[key] || 'Động loạn/ly tán.' });
+      if (isFuyin(pa, pb)) items.push({ type: '伏吟', typeVi: 'Phục Ngâm', subtype: 'pillar', pair: `${PILLAR_QIN[a].vi}–${PILLAR_QIN[b].vi}`, meaning: NATAL_FUYIN[key] || 'Đình trệ/lặp lại.' });
+      else if (isFanyin(pa, pb)) items.push({ type: '反吟', typeVi: 'Phản Ngâm', subtype: 'pillar', pair: `${PILLAR_QIN[a].vi}–${PILLAR_QIN[b].vi}`, meaning: NATAL_FANYIN[key] || 'Động loạn/ly tán.' });
+      else if (isZhiFuyin(pa, pb)) items.push({ type: '支伏吟', typeVi: 'Chi Phục Ngâm', subtype: 'branch', pair: `${PILLAR_QIN[a].vi}–${PILLAR_QIN[b].vi}`, meaning: NATAL_ZHI_FUYIN[key] || 'Đồng chi đình trệ nhẹ.' });
     }
   }
   return { items };
@@ -126,18 +151,21 @@ export function scanFuyin(R, scanYear) {
     let type = null;
     if (isFuyin(yp, np)) type = '伏吟';
     else if (isFanyin(yp, np)) type = '反吟';
+    else if (isZhiFuyin(yp, np)) type = '支伏吟';
     if (!type) continue;
 
     const isFanyinType = type === '反吟';
+    const isZhiFuyinType = type === '支伏吟';
     const isDayPillar = k === 'day';
-    // Severity: phản > phục; nhật trụ nặng nhất; Dụng thì giảm
-    let severity = isFanyinType ? 8 : 5;
-    if (isDayPillar) severity += 3;
+    // Severity: phản(8) > phục trụ(5) > chi phục(2); nhật trụ +; Dụng giảm.
+    let severity = isFanyinType ? 8 : isZhiFuyinType ? 2 : 5;
+    if (isDayPillar) severity += isZhiFuyinType ? 2 : 3;
     if (mitigationNote(R, ganZhi)) severity = Math.max(1, severity - 4);
 
-    const meaning = (isFanyinType ? FANYIN_BY_PILLAR : FUYIN_BY_PILLAR)[k];
+    const meaning = isFanyinType ? FANYIN_BY_PILLAR[k] : isZhiFuyinType ? ZHI_FUYIN_BY_PILLAR[k] : FUYIN_BY_PILLAR[k];
     items.push({
-      type, typeVi: isFanyinType ? 'Phản Ngâm' : 'Phục Ngâm',
+      type, typeVi: isFanyinType ? 'Phản Ngâm' : isZhiFuyinType ? 'Chi Phục Ngâm' : 'Phục Ngâm',
+      subtype: isZhiFuyinType ? 'branch' : 'pillar',
       pillar: k, pillarVi: PILLAR_QIN[k].vi, qin: PILLAR_QIN[k].qin,
       ganZhi, meaning, severity,
       note: mitigationNote(R, ganZhi),
@@ -176,17 +204,20 @@ export function dayunFuyin(R) {
     let type = null;
     if (isFuyin(dp, np)) type = '伏吟';
     else if (isFanyin(dp, np)) type = '反吟';
+    else if (isZhiFuyin(dp, np)) type = '支伏吟';
     if (!type) continue;
     const isFanyinType = type === '反吟';
+    const isZhiFuyinType = type === '支伏吟';
     items.push({
-      type, typeVi: isFanyinType ? 'Phản Ngâm' : 'Phục Ngâm',
+      type, typeVi: isFanyinType ? 'Phản Ngâm' : isZhiFuyinType ? 'Chi Phục Ngâm' : 'Phục Ngâm',
+      subtype: isZhiFuyinType ? 'branch' : 'pillar',
       pillar: k, pillarVi: PILLAR_QIN[k].vi, qin: PILLAR_QIN[k].qin,
       ganZhi: dy.ganZhi, range: `${dy.startAge}-${dy.startAge + 9}t`,
-      meaning: (isFanyinType ? FANYIN_BY_PILLAR : FUYIN_BY_PILLAR)[k],
+      meaning: isFanyinType ? FANYIN_BY_PILLAR[k] : isZhiFuyinType ? ZHI_FUYIN_BY_PILLAR[k] : FUYIN_BY_PILLAR[k],
       note: mitigationNote(R, dy.ganZhi),
     });
   }
   return { dayun: dy.ganZhi, range: `${dy.startAge}-${dy.startAge + 9}t`, items };
 }
 
-export { PILLAR_QIN, NATAL_FUYIN, NATAL_FANYIN, FUYIN_BY_PILLAR, FANYIN_BY_PILLAR };
+export { PILLAR_QIN, NATAL_FUYIN, NATAL_FANYIN, NATAL_ZHI_FUYIN, FUYIN_BY_PILLAR, FANYIN_BY_PILLAR, ZHI_FUYIN_BY_PILLAR };
