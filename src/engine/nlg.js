@@ -100,7 +100,7 @@ export function detectIntent(question) {
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
     let hits = 0;
     for (const k of kws) {
-      const kn = k.normalize('NFD').replace(/[̀-ͯ]/g, '');
+      const kn = k.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D'); // [loop 678] match norm (đ→d)
       // chấm theo độ dài từ khóa: từ càng dài càng cụ thể (tránh "tinh" khớp "tinh cach")
       if (norm.includes(kn)) hits += kn.length;
     }
