@@ -5669,6 +5669,14 @@ function renderQuickSummary() {
     } else if (dy && /Hung|nghịch|Kỵ/.test(dy.rating)) {
       curDyTxt = `⚠ Đại vận <b>${dy.rating}</b> (${dy.startAge}–${dy.startAge + 9}t) — giữ ổn định, tránh rủi ro lớn, đợi vận better. ${curDyTxt}`;
     }
+    // [loop 682] 交运 countdown — khi nào đại vận kế tiếp (giao vận)
+    try {
+      const nextDy = (c.dayun || []).find((d) => d.startAge === dy.startAge + 10);
+      if (nextDy) {
+        const daysLeft = Math.max(0, Math.round((nextDy.startYear + (nextDy.startAge / 365) - new Date().getFullYear()) * 365));
+        curDyTxt += ` <span class="hint-inline">⏳ Giao vận ${nextDy.ganZhi} [${nextDy.rating}] sau ~${daysLeft} ngày.</span>`;
+      }
+    } catch (_) {}
     // [loop 350] Lưu nguyệt hiện tại (tháng này) — lightweight qua Solar, hoàn thiện bức tranh «đại vận·lưu niên·lưu nguyệt»
     try {
       const ml = Solar.fromDate(new Date()).getLunar();
