@@ -334,7 +334,16 @@ $('copy-summary-btn') && document.addEventListener('click', (e) => {
       `Cách cục: ${currentResult.pattern?.vi || '?'}`,
       `Dụng thần: ${WX_VI[y.primary] || y.primary} · Hỷ: ${WX_VI[y.xi] || y.xi} · Kỵ: ${WX_VI[y.ji] || y.ji}`,
       `Mệnh cách: ${currentResult.synthesis?.gradeVi || '?'} (${currentResult.synthesis?.score || '?'}/100)`,
-    ].join('\n');
+      // [loop 661] thêm insight mới (ĐỈNH VẬN + năm vàng) vào copy summary
+      (() => {
+        const age = new Date().getFullYear() - c.input.year;
+        const dy = (currentResult.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
+        let line = '';
+        if (dy) line += `Đại vận hiện tại (${age}t): ${dy.ganZhi} [${dy.rating}]${dy.rating === 'Đại cát' ? ' — ĐỈNH VẬN' : ''}`;
+        try { const gy = findGoldenYear(currentResult, new Date().getFullYear(), 10); const tg = (gy.ranked || []).filter((r) => r.isTrulyGolden).map((r) => r.year); if (tg.length) line += (line ? ' · ' : '') + `Năm vàng: ${tg.join(', ')}`; } catch (_) {}
+        return line;
+      })(),
+    ].filter(Boolean).join('\n');
     navigator.clipboard.writeText(txt).then(() => {
       const btn = $('copy-summary-btn'); if (btn) { const t = btn.textContent; btn.textContent = '✓ Đã sao chép!'; setTimeout(() => { btn.textContent = t; }, 2000); }
     }).catch(() => {});
