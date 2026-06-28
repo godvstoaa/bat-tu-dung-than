@@ -838,6 +838,28 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   assert(HIDDEN['寅'][1] === '丙', '[loop 740] 寅 trung khí = 丙 (丙长生@寅)');
   console.log('   [loop 740] 12 địa chi tàng can (本/中/余 order) — GIÁ TRỊ TUYỆT ĐỐI cổ pháp ✓');
 }
+// [loop 742] ABSOLUTE guard — 命宫 (ming gong) = 寅+(lunar月−hour) mod 12 (công thức cổ).
+//   Nền tảng ziwei + BaZi «trụ thứ 6». Sai = toàn bộ cung vị lệch. Pin 4 case gia đình
+//   (gồm loop 563 tháng-nhuận + loop 178 子时换日 edge).
+{
+  const { baziMingGong } = await import('./src/engine/bazi-minggong.js');
+  const { Solar } = await import('lunar-javascript');
+  const YIN = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+  const HOUR_ORD = {子:1,丑:2,寅:3,卯:4,辰:5,巳:6,午:7,未:8,申:9,酉:10,戌:11,亥:12};
+  const _CASES = [['Quân',1993,10,21,1,15,'nam'],['Mỹ Anh',1996,12,4,10,15,'nữ'],['Mẹ',1970,6,27,7,15,'nữ'],['Bố',1964,4,4,12,0,'nam']];
+  for (const [nm,y,m,d,h,mi,g] of _CASES) {
+    const R = analyze(y, m, d, h, mi, g, 2026);
+    const mg = baziMingGong(R);
+    const ln = Solar.fromYmdHms(y, m, d, h || 12, mi || 0, 0).getLunar();
+    const rawM = ln.getMonth();
+    const lm = rawM > 0 ? rawM : Math.abs(rawM) + 1;
+    const ho = HOUR_ORD[ln.getTimeZhi()];
+    const exp = YIN[((lm - ho) % 12 + 12) % 12];
+    const got = mg.zhi || mg.mgZhi || (mg.gz && mg.gz[1]);
+    assert(got === exp, `[loop 742] ${nm} 命宫 = ${exp} (got ${got}); lunar月=${lm} hour=${ln.getTimeZhi()}(${ho})`);
+  }
+  console.log('   [loop 742] 命宫 (4 case gia đình) khớp công thức 寅+(月−时)mod12 — TUYỆT ĐỐI ✓');
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
