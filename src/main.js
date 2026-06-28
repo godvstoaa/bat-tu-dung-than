@@ -3770,7 +3770,7 @@ function renderLiuRi(dateStr) {
   // [loop 12] Truyền patternQuality để cộng tầng 格局流日喜忌 (★格局喜/⚠格局忌 mỗi ngày).
   const r = analyzeLiuRi(currentResult, y, m, d, currentResult.patternQuality);
   const GOD_VI = { 比肩: 'Tỷ Kiên', 劫財: 'Kiếp Tài', 食神: 'Thực Thần', 傷官: 'Thương Quan', 偏財: 'Thiên Tài', 正財: 'Chính Tài', 七殺: 'Thất Sát', 正官: 'Chính Quan', 偏印: 'Thiên Ấn', 正印: 'Chính Ấn' };
-  const cls = r.score >= 64 ? 'rate-cat' : r.score >= 50 ? 'rate-mid' : r.score >= 38 ? 'rate-bad' : 'rate-hung';
+  const cls = /Cát/.test(r.rating) ? 'rate-cat' : /Hung/.test(r.rating) ? 'rate-hung' : 'rate-mid'; // [loop 653] derive từ rating (không score 64/50 cũ — lệch unified 54/48)
   $('liuri').innerHTML = `
     <p class="hint" style="margin-bottom:6px">⚡ Vận ngày <b>THEO MỆNH CHỦ</b> (太岁/十神/神煞 tương tác cá nhân với lá số — khác Hoàng Đạo chung ở thẻ «Hôm Nay Tổng Khái»).</p>
     <div class="ly-head"><span class="zh big">${esc(r.ganZhi)}</span> ${esc(r.solar)} · can <b>${esc(GOD_VI[r.ganGod] || r.ganGod)}</b> → <span class="ln-rate ${cls}">${esc(r.rating)} (${esc(String(r.score))}/100)</span></div>
@@ -4346,7 +4346,7 @@ function renderLyear(year) {
   if (!currentResult) return;
   const r = analyzeLiunianDeep(currentResult, year);
   const GOD_VI = { 比肩: 'Tỷ Kiên', 劫財: 'Kiếp Tài', 食神: 'Thực Thần', 傷官: 'Thương Quan', 偏財: 'Thiên Tài', 正財: 'Chính Tài', 七殺: 'Thất Sát', 正官: 'Chính Quan', 偏印: 'Thiên Ấn', 正印: 'Chính Ấn' };
-  const cls = r.score >= 62 ? 'rate-cat' : r.score >= 46 ? 'rate-mid' : r.score >= 32 ? 'rate-bad' : 'rate-hung';
+  const cls = /Cát/.test(r.rating) ? 'rate-cat' : /Hung/.test(r.rating) ? 'rate-hung' : 'rate-mid'; // [loop 653] derive từ rating (không score 62/46 cũ — lệch liunian unified 56/36)
   const dHanzi = (n) => (n > 0 ? `+${n}` : `${n}`);
   // [loop 220] 进气退气 phase + 格局流年喜忌 (trước đây tính nhưng không hiện)
   const ph = r.dayunPhase;
