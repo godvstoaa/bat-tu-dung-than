@@ -23,6 +23,8 @@ import { computeAuxStars } from './ziwei-aux.js';
 import { checkDayunInteractions } from './dayun-check.js';
 import { analyzeHanNuan } from './han-nuan.js';
 import { analyzeWxFlow } from './wx-flow.js';
+import { analyze } from './chart.js'; // [loop 626] family deduction cần analyze() người thân
+import { deduceFromFamily } from './family-deduction.js'; // [loop 626] 六亲断 — suy sâu từ gia đình
 import { classifyChartLevel } from './chart-level.js';
 import { baziMingGong } from './bazi-minggong.js';
 import { analyzeChildrenStar } from './children-star.js';
@@ -465,7 +467,7 @@ export function extendBrief(R) {
     const bot3 = gy.ranked.slice(-3).map((r) => `${r.year}(${r.totalScore})`);
     parts.push(`NĂM VÀNG + 10 NĂM TỚI: ${tg.length ? '★ Năm vàng thực: ' + tg.join(', ') : 'không có năm vàng thực (đại vận+lưu niên chưa đủ Dụng)'} | TỐT: ${top3.join(', ')} | XẤU: ${bot3.join(', ')}.`);
   } catch (e) {}
-  // [loop 613] FAMILY MEMBERS — AI BIẾT ai trong gia đình + ngày sinh → gọi analyze_relative mà KHÔNG cần hỏi lại
+  // [loop 613→626] FAMILY MEMBERS + LỤC THÂN ĐOẠN — AI BIẾT ai trong gia đình + suy sâu全息
   if (R._family && R._family.length) {
     const fam = R._family.map((f) => {
       const [y, m, d] = (f.date || '').split('-').map(Number);
@@ -473,6 +475,24 @@ export function extendBrief(R) {
       return `${f.label || f.relation}: ${d}/${m}/${y}${f.time && f.time !== '12:00' ? ' ' + f.time : ''} (${f.gender}${f.hourUnknown ? ', giờ chưa rõ' : ''})`;
     }).join(' | ');
     parts.push(`👨‍👩‍👧‍👦 GIA ĐÌNH (từ «Nghiệm Chứng Gia Tộc»): ${fam}. KHI USER HỎI về người trong danh sách này → DÙNG tool analyze_relative với ngày sinh TỪ DANH SÁCH (KHÔNG cần hỏi lại).`);
+    // [loop 626] LỤC THÂN ĐOẠN — suy sâu全息: so sao十神+cung宫 vị của chủ thể với lá THẬT người thân.
+    //   Cho AI sẵn insight sâu (tương ứng/hi sinh/bất ngờ) để trả lời «gia đình ảnh hưởng vận mình ra sao».
+    try {
+      const members = R._family.filter((f) => f.date).map((f) => {
+        const [y, m, d] = (f.date || '').split('-').map(Number);
+        const [h, mi] = (f.time || '12:00').split(':').map(Number);
+        const roleMap = { father: 'father', mother: 'mother', mẹ: 'mother', bố: 'father', cha: 'father', sibling: 'sibling', em: 'sibling', anh: 'sibling', chị: 'sibling', spouse: 'spouse', child: 'child', con: 'child', cháu: 'child' };
+        const role = roleMap[(f.role || '').toLowerCase()] || 'sibling';
+        return { role, label: f.label || f.relation, R: analyze(y, m, d, h, mi, f.gender, new Date().getFullYear()) };
+      }).filter((mm) => mm.R);
+      if (members.length) {
+        const dd = deduceFromFamily(R, members);
+        if (dd.ok) {
+          const relBrief = dd.relations.map((r) => `${r.label}: sao ${r.star}(${r.starWx})@${r.palace} → ${r.verify}; ${r.insight.slice(0, 140)}`).join(' ‖ ');
+          parts.push(`🔮 LỤC THÂN ĐOẠN (六亲断/家庭全息): ${dd.summary} ${relBrief} ${dd.holographic.length ? 'HOLOGRAPHIC: ' + dd.holographic.join(' / ') : ''} [${dd.disclaimer}]`);
+        }
+      }
+    } catch (e) { /* deduction optional — không crash brief */ }
   }
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';

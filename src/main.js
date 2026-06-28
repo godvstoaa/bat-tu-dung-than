@@ -62,6 +62,7 @@ import { findIdealPartners, idealChildTiming, idealChildDates } from './engine/i
 import { analyzeMarriageDeep } from './engine/marriage-deep.js';
 import { buildFullProfile } from './engine/partner-profile.js';
 import { analyzeFamily } from './engine/family.js';
+import { deduceFromFamily } from './engine/family-deduction.js'; // [loop 626] 六亲断 — suy sâu vận mệnh từ gia đình
 import { radialData, matrixData } from './engine/family-diagram.js';
 import { rectifyHour } from './engine/family-rectify.js';
 import { buildLifeTrajectory } from './engine/life-trajectory.js';
@@ -4756,6 +4757,15 @@ $('calendar-note').textContent =
 // NGHIỆM CHỨNG GIA TỘC (家族八字交叉验证) — state + render an toàn XSS
 // ============================================================
 let familyMembers = []; // [{role,label,date,time,gender,hourUnknown}]
+// [loop 626] DEFAULT_FAMILY — data gia đình CHỦ THỂ (chủ app) được seed thẳng vào app.
+//   Trước đây family chỉ nằm trong localStorage → mở máy khác / xoá cache là mất → AI «chả biết gì».
+//   Nay seed mặc định; user chỉnh sửa sẽ đè lên localStorage (ưu tiên cao hơn).
+const DEFAULT_FAMILY = [
+  { role: 'mother',  label: 'Tô Thị Hồng (mẹ)',          date: '1970-06-27', time: '07:15', gender: 'nữ',  hourUnknown: false },
+  { role: 'father',  label: 'Nguyễn Xuân Tùng (bố)',     date: '1964-04-04', time: '12:00', gender: 'nam', hourUnknown: true },
+  { role: 'sibling', label: 'Nguyễn Mỹ Anh (em gái ruột)', date: '1996-12-04', time: '10:15', gender: 'nữ',  hourUnknown: false },
+  { role: 'child',   label: 'Nguyễn Hoàng Nhật Minh (cháu ngoại)', date: '2023-01-13', time: '07:15', gender: 'nam', hourUnknown: false },
+];
 // [loop 604] save/restore family members to localStorage — user complaint: data lost on reload
 function saveFamily() { try { localStorage.setItem('bazi-family', JSON.stringify(familyMembers)); } catch (_) {} }
 function loadFamily() {
@@ -4763,7 +4773,9 @@ function loadFamily() {
     const saved = JSON.parse(localStorage.getItem('bazi-family') || 'null');
     if (Array.isArray(saved) && saved.length) { familyMembers = saved; return true; }
   } catch (_) {}
-  return false;
+  // [loop 626] fallback: localStorage trống → dùng DEFAULT_FAMILY (chủ app) thay vì mảng rỗng
+  familyMembers = DEFAULT_FAMILY.map((m) => ({ ...m }));
+  return true;
 }
 const ROLE_OPTS = [
   { v:'father', t:'Cha' }, { v:'mother', t:'Mẹ' }, { v:'sibling', t:'Anh/chị/em' },
@@ -4807,6 +4819,25 @@ function runFamily() {
   renderFamilyMatrix(fam);
   renderFamilyRadar(fam);
   rectifyFamily(fam, members);
+  // [loop 626] LỤC THÂN ĐOẠN — suy sâu vận mệnh từ gia đình (六亲断/家庭全息)
+  try { renderFamilyDeduction(currentResult, members); } catch (e) { console.warn('fam-deduct', e.message); }
+}
+function renderFamilyDeduction(S, members) {
+  const el = $('family-deduction'); if (!el) return;
+  const d = deduceFromFamily(S, members);
+  if (!d.ok) { el.innerHTML = '<p class="hint">Thêm ngày sinh người thân rồi bấm «Nghiệm chứng» để suy sâu vận mệnh.</p>'; return; }
+  const vTone = (v) => /XÁC NHẬN/.test(v) ? 'cat' : /BẤT NGỜ/.test(v) ? 'mid' : /TÁC ĐỘNG MẠNH/.test(v) ? 'cat' : 'mid';
+  const relHtml = d.relations.map((r) => `
+    <div class="fam-deduct-rel" style="margin:10px 0;padding:8px 10px;border-left:3px solid var(--gold);background:rgba(247,236,203,0.04)">
+      <div><b>${esc(r.label)}</b> — sao <span class="zh">${esc(r.star)}</span>(${esc(r.starWx)}) tại ${esc(r.palace)}
+        <span class="ln-rate rate-${vTone(r.verify)}" style="font-size:11px">${esc(r.verify)}</span></div>
+      <div style="font-size:12px;color:var(--muted)">${esc(r.starHealthNote)}</div>
+      <div style="margin-top:4px">${esc(r.insight)}</div>
+    </div>`).join('');
+  const holoHtml = d.holographic.length
+    ? `<div style="margin-top:10px"><b>🔍 Holographic (suy ngược về chủ thể):</b>${d.holographic.map((h) => `<div style="margin:4px 0;padding:4px 8px;background:rgba(46,158,91,0.06);border-radius:6px">${esc(h)}</div>`).join('')}</div>` : '';
+  el.innerHTML = `<p style="margin:0 0 6px"><b>${esc(d.summary)}</b></p>${relHtml}${holoHtml}
+    <p class="hint" style="margin-top:8px;font-size:11px">${esc(d.disclaimer)}</p>`;
 }
 
 function renderFamilyScore(fam) {
@@ -5789,15 +5820,15 @@ try {
     // skip localStorage restore if URL params present
   } else {
     const saved = JSON.parse(localStorage.getItem('bazi-birth') || 'null');
-  if (saved && saved.date) {
-    $('date').value = saved.date;
-    if (saved.time) $('time').value = saved.time;
-    const gRadio = document.querySelector(`input[name="gender"][value="${saved.gender}"]`);
-    if (gRadio) gRadio.checked = true;
-    if (saved.tz && $('tz')) $('tz').value = String(saved.tz);
-    if (saved.city && $('city')) $('city').value = saved.city;
-    if (saved.long && $('long')) $('long').value = saved.long;
-  }
+  // [loop 626] fallback default = chủ app (Quân) nếu chưa có subject nào — app chạy ra là luận đúng người
+  const subj = (saved && saved.date) ? saved : { date: '1993-10-21', time: '01:15', gender: 'nam', tz: 7 };
+  $('date').value = subj.date;
+  if (subj.time) $('time').value = subj.time;
+  const gRadio = document.querySelector(`input[name="gender"][value="${subj.gender}"]`);
+  if (gRadio) gRadio.checked = true;
+  if (subj.tz && $('tz')) $('tz').value = String(subj.tz);
+  if (subj.city && $('city')) $('city').value = subj.city;
+  if (subj.long && $('long')) $('long').value = subj.long;
   } // close else
 } catch (e) {}
 // [loop 388] restore AI chat history from previous session (same chart)

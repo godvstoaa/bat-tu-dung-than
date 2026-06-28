@@ -255,6 +255,28 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
   assert(/áp đặt bạn|ranh giới rõ/.test(peer.advice), `[loop 625] peer (không relation) 克 vẫn «áp đặt — ranh giới» (got: ${peer.advice.split('.')[0]})`);
   console.log(`   analyze_relative advice ✓ — cháu 克 → «dẫn dắt/bề dưới» (không «áp đặt»); peer 克 → «ranh giới» (giữ nguyên)`);
 }
+// [loop 626] LỤC THÂN ĐOẠN — deduceFromFamily: suy sâu vận mệnh từ gia đình (六亲断/家庭全息).
+//   Khác family.js (chấm điểm), engine này SUY LUẬN + cross-verify với lá thật người thân.
+{
+  const { deduceFromFamily } = await import('./src/engine/family-deduction.js');
+  const S = analyze(1993, 10, 21, 1, 15, 'nam', 2026); // Quân 乙木
+  const fam = [
+    { role: 'mother', label: 'Mẹ', R: analyze(1970, 6, 27, 7, 15, 'nữ', 2026) }, // 戊土 điểm 35
+    { role: 'father', label: 'Bố', R: analyze(1964, 4, 4, 12, 0, 'nam', 2026) }, // 癸水 điểm 40
+    { role: 'sibling', label: 'Em', R: analyze(1996, 12, 4, 10, 15, 'nữ', 2026) },
+  ];
+  const d = deduceFromFamily(S, fam);
+  assert(d.ok === true, `[loop 626] deduceFromFamily ok`);
+  assert(d.relations.length === 3, `[loop 626] duyệt đủ 3 người thân (got ${d.relations.length})`);
+  assert(d.relations.every((r) => r.star && r.palace && r.prediction && r.verify && r.insight), `[loop 626] mỗi relation có đủ star/palace/prediction/verify/insight`);
+  // sao Mẹ = 印(Thủy) vượng trong Quân → verify phải là «TÁC ĐỘNG MẠNH» (vượng + lá thật Mẹ 35<55)
+  const me = d.relations.find((r) => r.role === 'mother');
+  assert(/TÁC ĐỘNG MẠNH|XÁC NHẬN|BẤT NGỜ/.test(me.verify), `[loop 626] Mẹ có verify hợp lệ (got ${me.verify})`);
+  assert(me.starWx === 'Thủy', `[loop 626] sao Mẹ = Thủy (印 sinh 乙木) (got ${me.starWx})`);
+  assert(d.holographic.length >= 1, `[loop 626] có insight holographic (suy ngược về chủ thể)`);
+  assert(d.disclaimer && /KHÔNG dự đoán/.test(d.disclaimer), `[loop 626] có disclaimer (không dự đoán y tế/sự kiện)`);
+  console.log(`   deduceFromFamily ✓ — ${d.relations.length} relation + ${d.holographic.length} holographic; Mẹ→${me.verify}`);
+}
 
 // ################## DESTINY CONSENSUS (meta-synthesis đa hệ thống) [loop 561] ##################
 {
