@@ -230,10 +230,12 @@ function computeFuYi(chart, wx, strength) {
 function computeTongGuan(chart, wx) {
   const entries = Object.entries(wx.score).sort((a, b) => b[1] - a[1]);
   const total = wx.total || 1;
-  // Tìm cặp (A khắc B) mà cả hai đều vượng (> 18%)
+  // Tìm cặp (A khắc B) mà cả hai đều vượng (> 25%) — [loop 575] nâng từ 18%→25%
+  //   18% (gần bằng trung bình 20%) → 73% chart trigger (quá phổ biến, vô hiệu hoá tính chọn lọc).
+  //   25% = trên trung bình rõ ràng → Thông Quan chỉ khi 2 hành THẬT SỰ vượng + gây tắc.
   for (const [a] of entries) {
     const b = KE[a]; // A khắc B
-    if (wx.score[a] / total > 0.18 && wx.score[b] / total > 0.18) {
+    if (wx.score[a] / total > 0.25 && wx.score[b] / total > 0.25) {
       const bridge = SHENG[a]; // A sinh bridge, bridge sinh B
       return { attacker: a, victim: b, bridge, note: `Hành ${a} khắc ${b} mà cả hai đều vượng, khíết阻滞 → dùng ${bridge} làm Thông Quan (A sinh ${bridge}, ${bridge} sinh B) cho ngũ hành lưu thông.` };
     }
