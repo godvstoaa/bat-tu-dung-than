@@ -817,6 +817,27 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   assert(YI_MA['A']==='寅' && YI_MA['B']==='申' && YI_MA['C']==='亥' && YI_MA['D']==='巳', '[loop 739] 驿马 4 cục');
   console.log('   [loop 739] 6 神煞 chính (天乙/文昌/禄/羊刃/桃花/驿马) — GIÁ TRỊ TUYỆT ĐỐI cổ khẩu quyết ✓');
 }
+// [loop 740] ABSOLUTE classical guard — 12 địa chi TÀNG CAN (HIDDEN).
+//   Nền tảng scoreWuXing + computePattern (透干 本→中→余 priority) + 十神 tàng-can derivation.
+//   Sai 1 entry → toàn lá số tháng đó lệch. Pin 12 chi + trung/dư khí ORDER (巳=丙庚戊, 申=庚壬戊
+//   — can TRƯỜNG SINH là trung khí, đúng 子平真詮).
+{
+  const _CANON = {
+    子:['癸'], 丑:['己','癸','辛'], 寅:['甲','丙','戊'], 卯:['乙'],
+    辰:['戊','乙','癸'], 巳:['丙','庚','戊'], 午:['丁','己'], 未:['己','丁','乙'],
+    申:['庚','壬','戊'], 酉:['辛'], 戌:['戊','辛','丁'], 亥:['壬','甲'],
+  };
+  let bad = [];
+  for (const [z, exp] of Object.entries(_CANON)) {
+    if (JSON.stringify(HIDDEN[z]) !== JSON.stringify(exp)) bad.push(`${z}: ${JSON.stringify(HIDDEN[z])}≠${JSON.stringify(exp)}`);
+  }
+  assert(bad.length === 0, `[loop 740] 12 địa chi tàng can (HIDDEN) khớp tuyệt đối cổ pháp (lệch ${bad.length}: ${bad.slice(0, 3).join(', ')})`);
+  // Spot check trung/dư khí ORDER (kinh điển dễ nhầm):
+  assert(HIDDEN['巳'][1] === '庚', '[loop 740] 巳 trung khí = 庚 (庚长生@巳, không phải 戊)');
+  assert(HIDDEN['申'][1] === '壬', '[loop 740] 申 trung khí = 壬 (壬长生@申)');
+  assert(HIDDEN['寅'][1] === '丙', '[loop 740] 寅 trung khí = 丙 (丙长生@寅)');
+  console.log('   [loop 740] 12 địa chi tàng can (本/中/余 order) — GIÁ TRỊ TUYỆT ĐỐI cổ pháp ✓');
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
