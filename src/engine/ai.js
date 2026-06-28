@@ -1029,9 +1029,19 @@ export function execTool(name, args, R) {
       case 'fengshui_direction': { // [loop 638] la bàn 24 sơn — recommend hoặc read 1 hướng
         if (a.mode === 'recommend') {
           const bd = bestDirection(R, a.purpose || 'cuakhach', new Date().getFullYear());
+          // [loop 699] enrich best với 八卦 (recommend mode cũng cần罗盘 data)
+          let _bestBagua = '';
+          try {
+            const _SHAN = ['壬','子','癸','丑','艮','寅','甲','卯','乙','辰','巽','巳','丙','午','丁','未','坤','申','庚','酉','辛','戌','乾','亥'];
+            const _BG = ['坎','艮','震','巽','离','坤','兑','乾'];
+            const _BGV = ['Khảm','Cấn','Chấn','Tốn','Ly','Khôn','Đoài','Càn'];
+            const _han = bd.best?.shan?.split(' ')[0] || '';
+            const _si = _SHAN.indexOf(_han);
+            if (_si >= 0) { const _bi = Math.floor(_si / 3) % 8; _bestBagua = `${_BG[_bi]} (${_BGV[_bi]})`; }
+          } catch (_) {}
           return {
             mode: 'recommend', purpose: bd.purposeVi, year: bd.year, idealStars: bd.idealStars,
-            best: bd.best ? { shan: bd.best.shan, palace: bd.best.palace8, baziStar: bd.best.baziStar, verdict: bd.best.verdict, dung: bd.best.dung } : null,
+            best: bd.best ? { shan: bd.best.shan, palace: bd.best.palace8, baziStar: bd.best.baziStar, verdict: bd.best.verdict, dung: bd.best.dung, bagua: _bestBagua } : null,
             top3: bd.top3, worst: bd.worst ? { shan: bd.worst.shan, palace: bd.worst.palace8 } : null,
             summary: bd.summary,
           };
