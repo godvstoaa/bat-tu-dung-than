@@ -558,8 +558,24 @@ export function composeAnswer(question, R) {
   }
 
   let composer = COMPOSERS[intent.area] || pPersonality;
-  // Câu hỏi thời điểm luôn ưu tiên pTiming
-  if (intent.isTiming) composer = pTiming;
+  // [loop 592 FIX] Câu hỏi thời điểm: nếu CŨNG có chủ đề cụ thể (wealth/career/marriage)
+  //   → pTiming NHƯNG truyền area để pTiming thêm context chủ đề.
+  //   Trước đây isTiming override hoàn toàn → «bao giờ giàu» = chỉ nói timing, KHÔNG nói wealth.
+  if (intent.isTiming) {
+    composer = (R2, i2) => {
+      const tBlock = pTiming(R2, i2);
+      // Nếu area cụ thể (không phải 'general') → thêm 1-2 câu context chủ đề
+      if (i2.area && i2.area !== 'general' && COMPOSERS[i2.area]) {
+        try {
+          const tCtx = COMPOSERS[i2.area](R2, i2);
+          if (tCtx && tCtx.paragraphs && tCtx.paragraphs.length) {
+            tBlock.paragraphs.push(`🔗 Liên quan đến «${tCtx.title}»: ${tCtx.paragraphs[0].slice(0, 120)}`);
+          }
+        } catch (_) {}
+      }
+      return tBlock;
+    };
+  }
   const block = composer(R, intent);
   const lead = `Ý bạn hỏi về lĩnh vực « ${block.title} »${intent.years.length ? ` (có mốc năm ${intent.years.join(', ')})` : ''}. Luận theo lá số của bạn:`;
   return { title: block.title, lead, paragraphs: block.paragraphs, intent };
