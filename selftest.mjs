@@ -512,6 +512,23 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
   assert(y19 && y19.score >= 70 && y19.rating === 'Đại cát', `[loop 629] Quân 2019 score=${y19?.score} → Đại cát (trước fix «Cát» do thang cũ 78)`);
   console.log(`   lưu niên rating consistency ✓ — 4 lá số dùng đúng thang 461; Quân 2019=${y19.score}→Đại cát`);
 }
+// [loop 630 FIX] lưu nguyệt + lưu nhật rating phải khớp thang loop 469→470 của liuyue.js/liuri.js.
+//   Bug cùng class 628/629: rateLiuyueByScore/rateLiuriByScore dùng thang cũ 64/50/38/«Kỵ» →
+//   adjustLiuyueByGeju/adjustLiuriByGeju ghi đè rating chuẩn.
+{
+  const { computeLiuyue } = await import('./src/engine/liuyue.js');
+  const { analyzeLiuRi } = await import('./src/engine/liuri.js');
+  const lyExp = (s) => { const x = Math.max(5, Math.min(95, Math.round(s))); return x >= 62 ? 'Đại cát' : x >= 55 ? 'Cát' : x >= 41 ? 'Bình' : x >= 34 ? 'Hơi kỵ' : 'Hung'; };
+  const lrExp = (s) => { const x = Math.max(5, Math.min(95, Math.round(s))); return x >= 54 ? 'Cát' : x >= 48 ? 'Bình' : x >= 44 ? 'Hơi kỵ' : 'Hung'; };
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const ly = computeLiuyue(R, 2026, R.patternQuality);
+  const months = ly.months || ly;
+  let lyBad = 0; for (const m of (Array.isArray(months) ? months : [])) { if (lyExp(m.score) !== m.rating) lyBad++; }
+  let lrBad = 0; for (const d of [10, 15, 20, 25]) { try { const r = analyzeLiuRi(R, 2026, 6, d, R.patternQuality); if (lrExp(r.score) !== r.rating) lrBad++; } catch (e) {} }
+  assert(lyBad === 0, `[loop 630] lưu nguyệt rating khớp thang 469→470 (62/55/41/34/Hung) — ${lyBad} lệch`);
+  assert(lrBad === 0, `[loop 630] lưu nhật rating khớp thang 469→470 (54/48/44/Hung) — ${lrBad} lệch`);
+  console.log(`   lưu nguyệt + lưu nhật rating consistency ✓ — khớp liuyue.js/liuri.js loop 469→470`);
+}
 
 // ################## [loop 20 NEW] 十二长生运 (đại vận + lưu niên) ##################
 import { dayunChangsheng, liunianChangsheng, stageCategory } from './src/engine/changsheng-deep.js';

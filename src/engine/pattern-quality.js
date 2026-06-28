@@ -736,11 +736,15 @@ export function adjustLiunianByGeju(liunianList, patternQuality, dayGan) {
 
 // Ngưỡng rating lưu nguyệt — khớp đúng computeLiuyue (5..95, 4 bậc).
 function rateLiuyueByScore(score) {
+  // [loop 630 FIX] align liuyue.js loop 469→470 (percentile + add Đại cát + Kỵ→Hung).
+  //   Trước đây thang cũ 64/50/38/«Kỵ» → adjustLiuyueByGeju ghi đè rating chuẩn liuyue.js.
+  //   Cùng bug-class loop 628/629 (recalibrate miss spot).
   const s = Math.max(5, Math.min(95, Math.round(score)));
-  if (s >= 64) return 'Cát';
-  if (s >= 50) return 'Bình';
-  if (s >= 38) return 'Hơi kỵ';
-  return 'Kỵ';
+  if (s >= 62) return 'Đại cát';
+  if (s >= 55) return 'Cát';
+  if (s >= 41) return 'Bình';
+  if (s >= 34) return 'Hơi kỵ';
+  return 'Hung';
 }
 
 /**
@@ -810,13 +814,14 @@ export function adjustLiuyueByGeju(liuyueMonths, patternQuality, dayGan) {
 //  chỉ có ý nghĩa ở cấp 10 năm (大运). Ở lưu nhật chỉ cần tầng A (xi/ji tổng quát).
 // ===========================================================================
 
-// Ngưỡng rating lưu nhật — khớp đúng analyzeLiuRi (5..95, 4 bậc).
+// Ngưỡng rating lưu nhật — khớp đúng analyzeLiuRi (5..95, 4 bậc) loop 469→470.
+// [loop 630 FIX] trước đây 64/50/38/«Kỵ» lệch liuri.js (54/48/44/«Hung»).
 function rateLiuriByScore(score) {
   const s = Math.max(5, Math.min(95, Math.round(score)));
-  if (s >= 64) return 'Cát';
-  if (s >= 50) return 'Bình';
-  if (s >= 38) return 'Hơi kỵ';
-  return 'Kỵ';
+  if (s >= 54) return 'Cát';
+  if (s >= 48) return 'Bình';
+  if (s >= 44) return 'Hơi kỵ';
+  return 'Hung';
 }
 
 /**
