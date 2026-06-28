@@ -5743,6 +5743,32 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(['木','火','土','金','水'].includes(nc.dungWx), `[smoke] noble-cultivate.dungWx hợp lệ`);
   console.log(`   Smoke batch 4 ✓ — emperor-star + life-reading + dayun-rank + mingzhu + noble-cultivate`);
 }
+
+// ################## SMOKE TEST batch 5: utility/forecast modules [loop 574] ##################
+{
+  console.log('\n##### SMOKE batch 5: utility/forecast modules [loop 574] #####');
+  const { cityRecommendation } = await import('./src/engine/city-fs.js');
+  const { musicTherapy } = await import('./src/engine/music-therapy.js');
+  const { monthCalendar } = await import('./src/engine/month-calendar.js');
+  const { analyzeKongwang } = await import('./src/engine/kongwang.js');
+  const { dailyPro } = await import('./src/engine/daily-pro.js');
+  // city-fs: bestDirection string
+  const city = cityRecommendation(spR);
+  assert(city.bestDirection, `[smoke] city-fs.bestDirection exists`);
+  // music-therapy: dungTone string
+  const mu = musicTherapy(spR);
+  assert(typeof mu.dungTone === 'string', `[smoke] music-therapy.dungTone string`);
+  // month-calendar: year number
+  const mc = monthCalendar(spR, 2026);
+  assert(typeof mc.year === 'number', `[smoke] month-calendar.year number`);
+  // kongwang: xun + kong
+  const kw = analyzeKongwang(spR.chart);
+  assert(kw.xun && kw.kong, `[smoke] kongwang.xun + kong exists`);
+  // daily-pro: date string
+  const dp = dailyPro(spR, 2026, 6, 15);
+  assert(dp.date, `[smoke] daily-pro.date exists`);
+  console.log(`   Smoke batch 5 ✓ — city-fs + music-therapy + month-calendar + kongwang + daily-pro`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
