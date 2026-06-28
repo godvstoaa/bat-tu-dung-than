@@ -620,10 +620,15 @@ export function adjustDayunByGeju(dayun, patternQuality, dayGan) {
   return out;
 }
 
-// Đánh rating theo đúng ngưỡng computeDaYun (giữ nhất quán tầng ngũ hành).
+// Đánh rating theo đúng ngưỡng computeDaYun (_dayunRating — giữ nhất quán tầng ngũ hành).
+// [loop 628 FIX] thêm tầng Đại cát (≥5) / Đại hung (≤−5) — TRƯỚC ĐÂY THIẾU, mâu thuẫn _dayunRating.
+//   Bug: adjustDayunByGeju dùng rateByScore cũ (chỉ đến «Cát») → thập kỷ score≥5 (vd Quân 己未 = 6)
+//   bị phán «Cát» thay vì «Đại cát». Loop 454 «unify» 3 chỗ nhưng MISS chỗ này.
 function rateByScore(score) {
+  if (score >= 5) return 'Đại cát';
   if (score >= 2) return 'Cát';
   if (score >= 1) return 'Hơi thuận';
+  if (score <= -5) return 'Đại hung';
   if (score <= -2) return 'Hung';
   if (score <= -1) return 'Hơi nghịch';
   return 'Bình hòa';
