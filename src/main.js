@@ -5598,7 +5598,9 @@ function renderQuickSummary() {
   try { const b = dailyBriefing(c, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate(), c.patternQuality); todayScore = b.rating?.score ?? '?'; todayRating = b.rating?.level ?? '?'; todayOneLiner = (b.oneLiner || '').slice(0, 60); const _m = (b.rating?.summary || '').match(/chủ\s*["']([^"'']{2,40})["']/); if (_m) todayYi = _m[1]; } catch (e) {}
   // [loop 515] best hour today — actionable timing
   try { const _bh = bestHourToday(c, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate(), c.patternQuality?.patternYong); if (_bh?.best) bestHourVi = `${_bh.best.vi} (${_bh.best.range})`; } catch (e) {}
-  const todayTone = (typeof todayScore === 'number' && todayScore >= 60) ? '🟢' : (typeof todayScore === 'number' && todayScore >= 45) ? '🟡' : '🔴';
+  // [loop 651 FIX] todayTone theo RATING (không score threshold 60/45 cũ — lệch unified scale 54/48).
+  //   Trước đây score 56 rating «Cát» nhưng emoji 🟡 (mâu thuẫn). Nay tone = chính rating.
+  const todayTone = /Cát/.test(todayRating) ? '🟢' : /Hung/.test(todayRating) ? '🔴' : '🟡';
   // Tuần này
   let weekSummary = '';
   try { const w = weekPreview(c, { days: 7 }); weekSummary = (w.summary || '').slice(0, 70); } catch (e) {}
