@@ -47,6 +47,7 @@ import { hexagramSynthesis } from './hexagram-synthesis.js';
 import { synthesize } from './synthesis.js';
 import { scanHours } from './hour-scan.js';
 import { analyzeRomance } from './romance-deep.js';
+import { findGoldenYear } from './golden-year.js';
 import { computeLiuDao } from './liudao.js';
 import { destinyConsensus } from './destiny-consensus.js';
 import { dayNayinPersonality } from './nayin-personality.js';
@@ -455,6 +456,14 @@ export function extendBrief(R) {
   try {
     const biz = analyzeBusiness(R);
     parts.push(`KINH DOANH: ${biz.shouldStart ? '✓ nên khởi nghiệp' : '⚠ thận trọng'}${biz.bizTypes?.length ? ' (' + biz.bizTypes.slice(0, 3).join(', ') + ')' : ''}${biz.hasCaiKu === false ? ', KHÔNG có tài khố' : ''}.`);
+  } catch (e) {}
+  // [loop 602] NĂM VÀNG + 10 NĂM TỚI — AI CẦN biết timing để trả lời «năm nào tiến thủ lớn»
+  try {
+    const gy = findGoldenYear(R, new Date().getFullYear(), 12);
+    const tg = gy.ranked.filter((r) => r.isTrulyGolden).map((r) => r.year);
+    const top3 = gy.ranked.slice(0, 3).map((r) => `${r.year}(${r.totalScore})`);
+    const bot3 = gy.ranked.slice(-3).map((r) => `${r.year}(${r.totalScore})`);
+    parts.push(`NĂM VÀNG + 10 NĂM TỚI: ${tg.length ? '★ Năm vàng thực: ' + tg.join(', ') : 'không có năm vàng thực (đại vận+lưu niên chưa đủ Dụng)'} | TỐT: ${top3.join(', ')} | XẤU: ${bot3.join(', ')}.`);
   } catch (e) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';
