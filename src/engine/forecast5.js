@@ -46,7 +46,7 @@ export function forecast5(R, startYear, years = 5) {
 
     // 1. Lưu niên 6 phái
     const ln = analyzeLiunianDeep(R, year);
-    const tone = ln.score >= 62 ? 'cat' : ln.score >= 46 ? 'mid' : 'hung';
+    const tone = ln.score >= 56 ? 'cat' : ln.score >= 36 ? 'mid' : 'hung'; // [loop 652] align liunian unified (Cát≥56)
     if (tone === 'hung') alerts.push(`⚠ Vận năm ${ln.rating} (${ln.score}/100): ${ln.schools.filter(s => s.d < -8).map(s => s.note.slice(0, 50)).join('; ')}`);
     else if (tone === 'cat') positives.push(`✓ Vận năm ${ln.rating} (${ln.score}/100) — nên tiến thủ.`);
 

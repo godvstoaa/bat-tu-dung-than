@@ -35,7 +35,7 @@ export function monthCalendar(R, opts = {}) {
       day: d, weekdayVi: WEEKDAY_VI[new Date(year, month - 1, d).getDay()],
       ganZhi: base.ganZhi, ganGod: base.ganGod,
       score: base.score, rating: base.rating,
-      tone: base.score >= 62 ? 'cat' : base.score >= 46 ? 'mid' : 'hung',
+      tone: base.score >= 54 ? 'cat' : base.score >= 44 ? 'mid' :'hung', // [loop 652] align liuri unified (Cát≥54)
       gejuDelta: base.gejuDelta || 0,
       inMonth: true,
     });

@@ -45,7 +45,7 @@ export function verifyPastEvent(R, eventYear, eventType, eventDesc) {
   // 1. Lưu niên 6 phái
   const ln = analyzeLiunianDeep(R, eventYear);
   maxScore += 3;
-  const lnTone = ln.score >= 62 ? 'cát' : ln.score >= 46 ? 'trung' : 'hung';
+  const lnTone = ln.score >= 56 ? 'cát' : ln.score >= 36 ? 'trung' : 'hung';
   if ((info.keywords.some(k => ln.schools.some(s => (s.note || '').includes(k) || (s.note || '').toLowerCase().includes(k))))) {
     matchScore += 2;
     const hits = ln.schools.filter(s => info.keywords.some(k => (s.note || '').includes(k) || (s.note || '').toLowerCase().includes(k)));

@@ -33,7 +33,7 @@ export function weekPreview(R, opts = {}) {
     try { base = analyzeLiuRi(R, y, m, d, pq); } catch (e) { continue; }
     const score = base.score;
     const rating = base.rating;
-    const tone = score >= 62 ? 'cat' : score >= 46 ? 'mid' : 'hung';
+    const tone = score >= 54 ? 'cat' : score >= 44 ? 'mid' : 'hung'; // [loop 652] align liuri unified (Cát≥54)
     out.push({
       date: `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`,
       weekdayVi: WEEKDAY_VI[s.getWeek()],
