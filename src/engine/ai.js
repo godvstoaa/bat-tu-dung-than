@@ -882,7 +882,7 @@ export function execTool(name, args, R) {
         return {
           relation: a.relation || 'người thân',
           nhatChu: rel.chart.dayGan + ' (' + rel.chart.dayMaster.wx + ')',
-          dung: rel.yong.primary, hy: rel.yong.xi, ky: rel.yong.vuong,
+          dung: rel.yong.primary, hy: rel.yong.xi, ky: rel.yong.ji,
           diemMenh: relSyn.score + '/100 (' + relSyn.gradeVi + ')',
           cachCuc: rel.pattern?.vi || '?',
           vantageNhuoc: rel.strength.strong ? 'vượng' : 'nhược',
