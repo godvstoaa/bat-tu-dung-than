@@ -795,6 +795,28 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   assert(_gNull === 0, `[loop 738] 60 甲 tử ganZhiNayin → NAYIN_MEANING resolve 100% (null ${_gNull})`);
   console.log('   [loop 738] 十神 (100 cặp) + 纳音 (30 loại/60 甲 tử) — GIÁ TRỊ TUYỆT ĐỐI cổ pháp ✓');
 }
+// [loop 739] ABSOLUTE classical guards — 6 神煞 chính (tables cố định, sai = luận sai sao).
+//   天乙贵人/文昌/禄神/羊刃/桃花/驿马 — pin theo khẩu quyết cổ.
+{
+  const { TIAN_YI, WEN_CHANG, LU_SHEN, YANG_REN, TAO_HUA, YI_MA } = await import('./src/engine/shensha.js');
+  const set = (a) => new Set(a);
+  // 天乙贵人 «甲戊庚牛羊, 乙己鼠猴乡, 丙丁猪鸡位, 壬癸兔蛇藏, 六辛逢马虎»
+  assert(set(TIAN_YI['甲']).has('丑') && set(TIAN_YI['甲']).has('未') && set(TIAN_YI['庚']).has('丑'), '[loop 739] 天乙: 甲戊庚→丑未');
+  assert(set(TIAN_YI['乙']).has('子') && set(TIAN_YI['乙']).has('申'), '[loop 739] 天乙: 乙己→子申');
+  assert(set(TIAN_YI['辛']).has('寅') && set(TIAN_YI['辛']).has('午'), '[loop 739] 天乙: 辛→寅午');
+  assert(set(TIAN_YI['壬']).has('卯') && set(TIAN_YI['壬']).has('巳'), '[loop 739] 天乙: 壬癸→卯巳');
+  // 文昌 «甲乙巳午, 丙戊申, 丁己酉, 庚亥, 辛子, 壬寅, 癸卯»
+  assert(WEN_CHANG['甲']==='巳' && WEN_CHANG['庚']==='亥' && WEN_CHANG['辛']==='子' && WEN_CHANG['壬']==='寅', '[loop 739] 文昌 甲巳/庚亥/辛子/壬寅 (loop 549 fix 辛→子)');
+  // 禄神 = 临官 vị
+  assert(LU_SHEN['甲']==='寅' && LU_SHEN['庚']==='申' && LU_SHEN['壬']==='亥' && LU_SHEN['乙']==='卯', '[loop 739] 禄神 = 临官 (甲寅/庚申/壬亥/乙卯)');
+  // 羊刃 (yang=帝旺, yin=帝旺+1 — mainstream 渊海子平 convention)
+  assert(YANG_REN['甲']==='卯' && YANG_REN['庚']==='酉' && YANG_REN['壬']==='子' && YANG_REN['乙']==='辰', '[loop 739] 羊刃 甲卯/庚酉/壬子/乙辰(帝旺+1)');
+  // 桃花 — 三合 cục: 申子辰→酉, 寅午戌→卯, 巳酉丑→午, 亥卯未→子
+  assert(TAO_HUA['A']==='酉' && TAO_HUA['B']==='卯' && TAO_HUA['C']==='午' && TAO_HUA['D']==='子', '[loop 739] 桃花 4 tam-hợp cục');
+  // 驿马 — 冲 first branch: 寅午戌→申, 申子辰→寅, 巳酉丑→亥, 亥卯未→巳
+  assert(YI_MA['A']==='寅' && YI_MA['B']==='申' && YI_MA['C']==='亥' && YI_MA['D']==='巳', '[loop 739] 驿马 4 cục');
+  console.log('   [loop 739] 6 神煞 chính (天乙/文昌/禄/羊刃/桃花/驿马) — GIÁ TRỊ TUYỆT ĐỐI cổ khẩu quyết ✓');
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
