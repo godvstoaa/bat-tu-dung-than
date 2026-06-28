@@ -4940,6 +4940,10 @@ let _luopanInit = false;
 function renderProLuopan(heading, s) {
   const c = $('luopan-container'); if (!c) return;
   const cx = 100, cy = 100;
+  // [loop 702] sat phương overlay — highlight Thái Tuế/Tam Sát/Ngũ Hoàng trên luopan
+  const _satZhi = ['亥','子','丑']; // Tam Sát 2026 (午 year)
+  const _taiSui = '午'; // Thái Tuế 2026
+  const _wuHuang = '午'; // Ngũ Hoàng 2026 at Chính Nam
   // [loop 697 PERF] Generate static SVG ONCE, only update rotation after
   if (_luopanInit) {
     const ringsEl = c.querySelector('#luopan-rings');
@@ -4957,7 +4961,25 @@ function renderProLuopan(heading, s) {
     for (const r of [30, 45, 62, 80, 94]) svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(212,175,55,${r===62?.5:.15})" stroke-width="${r===62?1:.5}"/>`;
     svg += `<line x1="${cx}" y1="6" x2="${cx}" y2="194" stroke="rgba(212,175,55,.08)" stroke-width=".5"/><line x1="6" y1="${cy}" x2="194" y2="${cy}" stroke="rgba(212,175,55,.08)" stroke-width=".5"/>`;
     svg += `<g id="luopan-rings" style="transform-origin:${cx}px ${cy}px;transition:transform .15s var(--ease-out)">`;
-    for (let i = 0; i < 24; i++) { const ang = i*15, rad=(ang-90)*Math.PI/180, x=cx+71*Math.cos(rad), y=cy+71*Math.sin(rad); const isZ=[1,4,7,10,13,16,19,22].includes(i); const isG=[0,3,6,9,12,15,18,21].includes(i); svg+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="7.5" fill="${isZ?'#e0533d':isG?'#f0d97a':'#d4af37'}" font-family="Noto Serif SC,serif" font-weight="${isZ?'bold':'normal'}" transform="rotate(${ang},${x},${y})">${_SHAN24_L[i]}</text>`; }
+    // [loop 702] sat phương overlay — red highlight on dangerous directions
+    for (let i = 0; i < 24; i++) {
+      const ang = i*15, rad=(ang-90)*Math.PI/180;
+      const han = _SHAN24_L[i];
+      const isSat = _satZhi.includes(han) || han === _taiSui;
+      const x=cx+71*Math.cos(rad), y=cy+71*Math.sin(rad);
+      const isZ=[1,4,7,10,13,16,19,22].includes(i), isG=[0,3,6,9,12,15,18,21].includes(i);
+      const fill = isSat ? '#ff4444' : isZ ? '#e0533d' : isG ? '#f0d97a' : '#d4af37';
+      // sat highlight arc (red glow behind text)
+      if (isSat) {
+        const a1 = (ang - 7.5 - 90) * Math.PI / 180, a2 = (ang + 7.5 - 90) * Math.PI / 180;
+        const x1 = cx + 62 * Math.cos(a1), y1 = cy + 62 * Math.sin(a1);
+        const x2 = cx + 80 * Math.cos(a1), y2 = cy + 80 * Math.sin(a1);
+        const x3 = cx + 80 * Math.cos(a2), y3 = cy + 80 * Math.sin(a2);
+        const x4 = cx + 62 * Math.cos(a2), y4 = cy + 62 * Math.sin(a2);
+        svg += `<polygon points="${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}" fill="rgba(224,67,45,.25)" stroke="rgba(224,67,45,.4)" stroke-width=".3"/>`;
+      }
+      svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="7.5" fill="${fill}" font-family="Noto Serif SC,serif" font-weight="${isZ||isSat?'bold':'normal'}" transform="rotate(${ang},${x},${y})">${han}</text>`;
+    }
     for (let i = 0; i < 8; i++) { const ang=i*45+22.5, rad=(ang-90)*Math.PI/180, x=cx+53*Math.cos(rad), y=cy+53*Math.sin(rad); svg+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#f7eccb" font-family="Noto Serif SC,serif" font-weight="bold">${_BAGUA8[i]}</text>`; }
     for (let i = 0; i < 28; i++) { const ang=i*(360/28)+(360/56), rad=(ang-90)*Math.PI/180, x=cx+87*Math.cos(rad), y=cy+87*Math.sin(rad); svg+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="4.5" fill="rgba(212,175,55,.55)" font-family="Noto Serif SC,serif" transform="rotate(${ang},${x},${y})">${_XIU28[i]}</text>`; }
     for (let i = 0; i < 24; i++) { const ang=i*15, rad=(ang-90)*Math.PI/180; svg+=`<line x1="${cx+62*Math.cos(rad)}" y1="${cy+62*Math.sin(rad)}" x2="${cx+80*Math.cos(rad)}" y2="${cy+80*Math.sin(rad)}" stroke="rgba(212,175,55,.15)" stroke-width=".5"/>`; }
