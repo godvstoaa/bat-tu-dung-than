@@ -6469,5 +6469,30 @@ console.log('='.repeat(70));
   console.log(`   BUILD CHECK ✓ — vite build thành công (guard tránh lặp loop 697-699)`);
 }
 
+
+// [loop 708] 17-TOOL SMOKE TEST — tất cả tools phải trả data (không error) với valid params
+{
+  const { execTool, AI_TOOLS } = await import('./src/engine/ai.js');
+  const Ru = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _tests = [
+    ['get_current_time', {}], ['analyze_day', {year:2026,month:6,day:29}],
+    ['analyze_year', {year:2026}], ['best_days_in_year', {year:2026}],
+    ['life_trajectory', {}], ['analyze_month', {}],
+    ['find_good_days', {start:'2026-06-29'}],
+    ['analyze_best_hour', {year:2026,month:6,day:29}],
+    ['analyze_partner', {year:1990,month:8,day:12,gender:'nữ'}],
+    ['inverse_bazi', {mode:'max'}], ['analyze_char', {char:'福'}],
+    ['analyze_meihua', {year:2026,month:6,day:29,hour:14}],
+    ['analyze_liuren', {year:2026,month:6,day:29,hour:14}],
+    ['analyze_qimen', {year:2026,month:6,day:29,hour:14}],
+    ['analyze_guiguzi', {}],
+    ['analyze_relative', {year:1970,month:6,day:27,gender:'nữ',relation:'mẹ'}],
+    ['fengshui_direction', {mode:'recommend',purpose:'cuakhach'}],
+  ];
+  let _ok = 0;
+  for (const [_n, _a] of _tests) { const _r = execTool(_n, _a, Ru); if (!_r.error) _ok++; }
+  assert(_ok === 17, `[loop 708] 17/17 tools pass smoke test (got ${_ok}/17)`);
+  console.log(`   17-TOOL SMOKE ✓ — ${_ok}/17 tools trả data với valid params`);
+}
 process.exit(FAILS === 0 ? 0 : 1);
 
