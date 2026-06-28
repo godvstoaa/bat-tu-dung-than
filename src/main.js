@@ -5661,6 +5661,8 @@ function renderQuickSummary() {
     { icon: '☯', label: 'Quẻ chủ mệnh', text: (() => { try { const h = heluo(c); if (!h?.ok) return '(chưa tính được)'; return `<b>#${h.hexagram.num} ${esc(h.hexagram.nameVi)}</b> <span class="zh">${esc(h.hexagram.name)}</span>. 元堂 hào ${h.yuantang.line}.${h.houtianHexagram ? ` 后天 #${h.houtianHexagram.num} ${esc(h.houtianHexagram.nameVi)}` : ''}`; } catch (e) { return '(đang tính)'; } })() },
     // [loop 641] NEW TILE: fengshui best direction (cửa chính) — kết nối feature loop 631-633
     { icon: '🧭', label: 'Hướng cửa tốt (năm)', text: (() => { try { const bd = bestDirection(c, 'cuakhach', new Date().getFullYear()); if (!bd?.best) return '(đang tính)'; return `Năm ${bd.year}: <b>${esc(bd.best.shan)}</b> (${esc(bd.best.palace8)}, ${esc(bd.best.baziStar)}) — ${bd.best.idealHit ? '★ ĐÚNG sao lý tưởng' : bd.best.verdict}. <span class="hint">Tránh ${esc(bd.worst?.shan||'?')} (${esc(bd.worst?.palace8||'?')}).</span>`; } catch (e) { return '(đang tính)'; } })() },
+    // [loop 654] NEW TILE: nghề phù hợp — kết nối career-star với peak career decade của user
+    { icon: '💼', label: 'Nghề phù hợp', text: (() => { try { const cs = analyzeCareerStar(c); const dungSeg = (cs.favCareers || '').split('|')[0]; return `Phong cách: <b>${esc((cs.patternCareer || '').split('—')[0].trim())}</b>. <span class="hint">Ngành Dụng: ${esc(dungSeg.split(',').slice(0,4).join(', '))}.</span>`; } catch (e) { return '(đang tính)'; } })() },
   ];
   el.innerHTML = `<div class="qs-grid">${rows.map((r) => `<div class="qs-tile"><div class="qs-label">${r.icon} ${r.label}</div><div class="qs-text">${r.text}</div></div>`).join('')}</div>`;
 }
