@@ -249,7 +249,18 @@ export function deduceFromFamily(subject, members) {
     const detail = famFortune.map((f) => `${f.who}=${f.r}${f.stage ? '/'+f.stage : ''}${f.nextStage ? ' '+f.nextStage : ''}`).join(', ');
     let note = `🎭 VẬN HIỆN CẢ NHÀ (${curYear}): ${detail}.`;
     if (peak.length) note += ` ⭐ Đang ĐỈNH VẬN: ${peak.join(', ')} — nên tiến thủ lớn.`;
-    if (hard.length) note += ` ⚠ Đang vận khó: ${hard.join(', ')} — cần hỗ trợ/khích lệ, tránh gây áp lực.`;
+    if (hard.length) {
+      // [loop 714 RESTORE] loop 710 vô tình xoá «khó đến ~NĂM» timing + 「命好不如运好」 wisdom
+      const hardDetail = famFortune.filter((f) => /Hung|nghịch/.test(f.r)).map((f) => {
+        const m = validMembers.find(mm => (mm.label||'') === f.who || ROLE_VI_LONG[mm.role] === f.who);
+        if (!m) return f.who;
+        const dy = (m.R.dayun||[]).find(d => { const a = curYear - m.R.chart.input.year; return a >= d.startAge && a < d.startAge + 10; });
+        const next = (m.R.dayun||[])[(m.R.dayun||[]).indexOf(dy)+1];
+        const endYear = dy ? (m.R.chart.input.year + dy.startAge + 10) : '?';
+        return `${f.who} (đến ~${endYear})${next ? ` → chuyển ${next.ganZhi}[${next.rating}]` : ''}`;
+      }).join('; ');
+      note += ` ⚠ Đang vận khó: ${hardDetail}. Cổ法「命好不如运好」— hỗ trợ kiên nhẫn, vận sẽ đổi.`;
+    }
     holographic.push(note);
   }
 
