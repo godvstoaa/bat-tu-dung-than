@@ -82,6 +82,9 @@ export function detectIntent(question) {
   const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|nam nay|nam sau|bao gio)\b/.test(norm) || years.length > 0;
   const isYesNo = /\b(co nen|co duoc khong|nen khong|duoc khong|co tot khong|co xau khong|co the|lieu co)\b/.test(norm);
   const isCompat = /\b(hop khong|hop nhau|xung khac|theo khong|phu hop)\b/.test(norm);
+  // [loop 619] family question detection
+  const isFamily = /\b(me toi|bo toi|me cua|bo cua|em toi|em cua|chau toi|con toi|anh toi|chi toi|nguoi than|gia dinh)\b/.test(norm)
+    || /\b(me|bo|em|chau|con|anh|chi)\b.*\b(the nao|ra sao|tuong quan|hop khong|menh gi|dung gi)\b/.test(norm);
   // [loop 497] divination intent (起卦/测字 CJK ngắn → confidence <3 → bypass như isCompat)
   const isDivination = /gieo que|lac que|que dich|boi que|thao que|cham tu|luc nh|ky mon|don giap/.test(norm) || /起卦|测字|占卦|占卜|六壬|奇门|遁甲/.test(question);
 
@@ -97,7 +100,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -537,6 +540,23 @@ export function composeAnswer(question, R) {
   // [loop 497] divination intent (起卦/测字) — ưu tiên TRƯỚC confidence fallback
   //   (CJK keywords 2 chars → confidence <3, nhưng là lệnh rõ ràng → bypass)
   if (intent.isDivination) {
+    const block = pDivination(R, intent);
+    return { title: block.title, lead: `Bạn hỏi về bói toán / gieo quẻ. Kết quả:`, paragraphs: block.paragraphs, intent };
+  }
+
+  // [loop 619] family question — NLG offline hướng dẫn user
+  if (intent.isFamily) {
+    return {
+      title: 'Người thân — cần AI hoặc card Gia Tộc',
+      lead: `Bạn hỏi về người thân. Để luân giải chính xác, tôi cần ngày sinh của người đó.`,
+      paragraphs: [
+        `📋 Cách 1: Mở card「👪 Nghiệm Chứng Gia Tộc」→ bấm «📝» cạnh tên người cần xem → app tự phân tích đầy đủ (164 card).`,
+        `🤖 Cách 2: Bật AI (⚙ Cài đặt → Z.ai) → hỏi «mẹ tôi (27/6/1970) thế nào?» → AI sẽ dùng tool analyze_relative để luân giải NC/Dụng/đại vận/ngũ hành tương quan.`,
+        `💡 Tôi (offline) chỉ có lá số của BẠN. Nếu cho ngày sinh người thân, tôi luận được: ngũ hành tương quan (bạn vs người đó), ai bổ Dụng cho ai, đại vận tương hỗ. Hãy hỏi vd: «mẹ tôi sinh 27/6/1970, ngũ hành hợp không?».`,
+      ],
+      intent,
+    };
+  }
     const block = pDivination(R, intent);
     return { title: block.title, lead: `Bạn hỏi về bói toán / gieo quẻ. Kết quả:`, paragraphs: block.paragraphs, intent };
   }
