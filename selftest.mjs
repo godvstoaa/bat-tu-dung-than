@@ -5717,6 +5717,32 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(typeof md.score === 'number', `[smoke] marriage-deep.score number`);
   console.log(`   Smoke batch 3 ✓ — aroma + crystal + clothing + dominant-god + marriage-deep`);
 }
+
+// ################## SMOKE TEST batch 4: analysis/ziwei modules [loop 573] ##################
+{
+  console.log('\n##### SMOKE batch 4: analysis/ziwei modules [loop 573] #####');
+  const { findNoblePerson } = await import('./src/engine/emperor-star.js');
+  const { lifeReading } = await import('./src/engine/life-reading.js');
+  const { rankDayun } = await import('./src/engine/dayun-rank.js');
+  const { mingZhuShenZhu } = await import('./src/engine/mingzhu.js');
+  const { nobleCultivation } = await import('./src/engine/noble-cultivate.js');
+  // emperor-star: personalities array
+  const ep = findNoblePerson(spR);
+  assert(Array.isArray(ep.personalities), `[smoke] emperor-star.personalities array`);
+  // life-reading: sections array
+  const lr = lifeReading(spR);
+  assert(Array.isArray(lr.sections) && lr.sections.length > 0, `[smoke] life-reading.sections non-empty`);
+  // dayun-rank: ranked array
+  const dr = rankDayun(spR);
+  assert(Array.isArray(dr.ranked), `[smoke] dayun-rank.ranked array`);
+  // mingzhu: mingZhu string
+  const mz = mingZhuShenZhu(spR);
+  assert(typeof mz.mingZhu === 'string', `[smoke] mingzhu.mingZhu string`);
+  // noble-cultivate: dungWx
+  const nc = nobleCultivation(spR);
+  assert(['木','火','土','金','水'].includes(nc.dungWx), `[smoke] noble-cultivate.dungWx hợp lệ`);
+  console.log(`   Smoke batch 4 ✓ — emperor-star + life-reading + dayun-rank + mingzhu + noble-cultivate`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
