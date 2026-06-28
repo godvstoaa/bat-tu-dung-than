@@ -85,16 +85,8 @@ export function hexagramSynthesis(R) {
       const consistency = (TONE_W[helTone] || 0) + (TONE_W[ggTone] || 0);
 
       // ngũ hành: dùng hạ quái (mệnh gốc) của 河洛 vs 行 đặc trưng 鬼谷
-      // 鬼谷 chỉ có tên quẻ kép → lấy ngũ hành hạ quái qua HEX64 ngược (giản thể)
-      // đơn giản hoá: so ngũ hành trigram THƯỢNG của 河洛 vs tone 鬼谷 + nature keyword
-      const helWx = TRI_WX[hel.upperTrigram] || '?';
-      // 鬼谷 ngũ hành: suy từ nature (chứa từ khoá)
-      const natLower = (gg.guaNature || '') + (systems.guiguzi?.nature || '');
-      const wxGuess = natLower.includes('Hỏa') || natLower.includes('火') ? '火'
-        : natLower.includes('Thủy') || natLower.includes('水') ? '水'
-        : natLower.includes('Mộc') || natLower.includes('木') ? '木'
-        : natLower.includes('Kim') || natLower.includes('金') ? '金' : '土';
-      const relInfo = rel(helWx, wxGuess);
+      // [loop 576 FIX BUG2] bỏ wuxingRel — wxGuess parse nature text KHÔNG có ngũ hành keyword
+      //   → luôn trả '土' (noise). Verdict dựa trên tone consistency là phần valuable.
 
       let verdict, advice;
       if (sameHex) {
@@ -118,7 +110,6 @@ export function hexagramSynthesis(R) {
         sameHexagram: !!sameHex,
         heluoTone: helTone, guiguziTone: ggTone,
         consistency, verdict, advice,
-        wuxingRel: { heluoWx: helWx, guiguziWx: wxGuess, rel: relInfo.k, vi: relInfo.vi },
       };
     } else if (hel || gg) {
       const only = hel ? systems.heluo : systems.guiguzi;

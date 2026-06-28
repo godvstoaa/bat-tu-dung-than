@@ -108,8 +108,8 @@ export function destinyConsensus(R) {
       const avg = sum / n;
       if (catN === n && n >= 2) { verdict = 'CỰC KỲ ĐỒNG THUẬN CÁT'; agreement = 1.0; }
       else if (hungN === n && n >= 2) { verdict = 'CỰC KỲ ĐỒNG THUẬN HUNG'; agreement = 1.0; }
-      else if (avg >= 0.5) { verdict = 'ĐỒNG THUẬN THIÊN CÁT'; agreement = catN / n; }
-      else if (avg <= -0.5) { verdict = 'ĐỒNG THUẬN THIÊN HUNG'; agreement = hungN / n; }
+      else if (avg >= 0.5 && n >= 2) { verdict = 'ĐỒNG THUẬN THIÊN CÁT'; agreement = catN / n; } // [loop 576 FIX BUG3] n≥2 guard — 1 hệ không phải «đồng thuận»
+      else if (avg <= -0.5 && n >= 2) { verdict = 'ĐỒNG THUẬN THIÊN HUNG'; agreement = hungN / n; }
       else { verdict = 'PHÂN KỲ (mệnh phức tạp)'; agreement = Math.max(catN, hungN) / n; }
 
       narrative = `Hệ Fortune (${n}): ${fortuneSys.map((s) => `${s.name.split(' ')[0]}=${s.tone}`).join(', ')}.`;
