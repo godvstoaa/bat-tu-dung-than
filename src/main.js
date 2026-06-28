@@ -5478,6 +5478,8 @@ function renderQuickSummary() {
     { icon: '📆', label: 'Tuần này', text: weekSummary || '(đang tính...)' },
     { icon: alert ? '⚠' : '✓', label: alert ? 'Cảnh báo' : 'An tâm', text: alert || 'Không cảnh báo nặng năm nay.' },
     { icon: '📊', label: '10 năm tới', text: (() => { try { const df = decadeForecast(c, new Date().getFullYear(), 10); return `TỐT: <b>${df.best ? df.best.year + ' (' + df.best.rating + ')' : '?'}</b>${df.worst ? ` · XẤU: <b>${df.worst.year} (${df.worst.rating})</b>` : ''}`; } catch (e) { return '(đang tính)'; } })() },
+    // [loop 586] NEW TILE: Kinh Dịch hexagram (河洛理数 本命卦)
+    { icon: '☯', label: 'Quẻ chủ mệnh', text: (() => { try { const h = heluo(c); if (!h?.ok) return '(chưa tính được)'; return `<b>#${h.hexagram.num} ${esc(h.hexagram.nameVi)}</b> <span class="zh">${esc(h.hexagram.name)}</span>. 元堂 hào ${h.yuantang.line}.${h.houtianHexagram ? ` 后天 #${h.houtianHexagram.num} ${esc(h.houtianHexagram.nameVi)}` : ''}`; } catch (e) { return '(đang tính)'; } })() },
   ];
   el.innerHTML = `<div class="qs-grid">${rows.map((r) => `<div class="qs-tile"><div class="qs-label">${r.icon} ${r.label}</div><div class="qs-text">${r.text}</div></div>`).join('')}</div>`;
 }
