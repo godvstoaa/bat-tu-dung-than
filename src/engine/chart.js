@@ -583,6 +583,10 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   if (!_n(year)) throw new Error(`Năm sinh không hợp lệ («${year}»).`);
   if (!_n(month) || month < 1 || month > 12) throw new Error(`Tháng sinh không hợp lệ («${month}» — phải 1-12).`);
   if (!_n(day) || day < 1 || day > 31) throw new Error(`Ngày sinh không hợp lệ («${day}» — phải 1-31).`);
+  // [loop 713 FIX] validate DATE EXISTENCE — lunar-javascript chấp nhận «2025-02-29» (non-leap),
+  //   «02-30», «04-31» → chart cho ngày KHÔNG TỒN TẠI → sai toàn bộ lá số.
+  const _maxDay = [31, (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+  if (day > _maxDay) throw new Error(`Ngày ${day}/${month}/${year} không tồn tại (tháng ${month} năm ${year} chỉ có ${_maxDay} ngày).`);
   const chart = buildChart(year, month, day, hour, minute, gender);
   const wx = scoreWuXing(chart);
   // [loop 148 ELEVATION] 空亡 hiệu ứng — giảm tàng can weight của trụ rơi không vong
