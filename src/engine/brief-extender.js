@@ -45,6 +45,7 @@ import { guiguziFortune } from './guiguzi.js';
 import { guiguziFDG } from './guiguzi-fdg.js';
 import { hexagramSynthesis } from './hexagram-synthesis.js';
 import { synthesize } from './synthesis.js';
+import { scanHours } from './hour-scan.js';
 import { computeLiuDao } from './liudao.js';
 import { destinyConsensus } from './destiny-consensus.js';
 import { dayNayinPersonality } from './nayin-personality.js';
@@ -56,6 +57,16 @@ import { dayNayinPersonality } from './nayin-personality.js';
  */
 export function extendBrief(R) {
   const parts = [];
+  // [loop 598] HOUR UNCERTAINTY — nếu user nhập giờ default 12:00 → brief note
+  try {
+    const inp = R.chart?.input || {};
+    if (inp.hour === 12 && inp.minute === 0) {
+      const hs = scanHours(inp.year, inp.month, inp.day, inp.gender || 'nam', inp.year + 30);
+      if (hs && hs.stableCount < 10) {
+        parts.push(`⚠ GIỜ SINH KHÔNG CHẮC: lá số dùng giờ Ngọ (12:00) mặc định. Quét 12 giờ cho thấy Dụng ${hs.stableYong} chỉ ổn định ${hs.stableCount}/12 giờ — ${hs.outlierCount} giờ outlier đổi Dụng. Score dao động ${hs.scoreRange?.min}-${hs.scoreRange?.max}. KHI LUẬN: nên nói «nếu sinh giờ X thì...» thay vì khẳng định 1 kết quả.`);
+      }
+    }
+  } catch (e) {}
 
   // [loop 40] Điều Hậu (调候) — phải đưa vào brief để AI biết 调候 đang LÀM CHỦ (loop 34 elevation)
   try {
