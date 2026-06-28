@@ -328,6 +328,9 @@ export function extendBrief(R) {
   // Đại vận thập thần (3 vận gần nhất) + nạp âm
   try {
     const dg = dayunGodMeaning(R.chart, R.dayun);
+    // [loop 668] 起运 age — khi mệnh bắt đầu走大运 (cột mốc vận mệnh kích hoạt)
+    const firstDy = (R.dayun || [])[0];
+    if (firstDy) parts.push(`起运: ${firstDy.startAge} tuổi (năm ${firstDy.startYear}) — mệnh bắt đầu走大运 từ đây, trước đó theo tiểu vận/月柱.`);
     const near = dg.items.slice(0, 4).map((d) => `${d.ganZhi}[${d.startAge}t:${d.godVi}(${d.cat})${ganZhiNayin(d.ganZhi) ? '/' + ganZhiNayin(d.ganZhi) : ''}]`);
     parts.push(`ĐẠI VẬN THẬP THẦN: ${near.join(' ')}`);
     // [loop 436] 空亡 weakening note — cho AI biết大运 nào bị giảm lực
