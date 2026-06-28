@@ -25,6 +25,7 @@ import { analyzeHanNuan } from './han-nuan.js';
 import { analyzeWxFlow } from './wx-flow.js';
 import { analyze } from './chart.js'; // [loop 626] family deduction cần analyze() người thân
 import { deduceFromFamily } from './family-deduction.js'; // [loop 626] 六亲断 — suy sâu từ gia đình
+import { personalTaSui } from './taisui.js'; // [loop 671] 3 hành động — check taisui
 import { classifyChartLevel } from './chart-level.js';
 import { baziMingGong } from './bazi-minggong.js';
 import { analyzeChildrenStar } from './children-star.js';
@@ -502,6 +503,33 @@ export function extendBrief(R) {
       }
     } catch (e) { /* deduction optional — không crash brief */ }
   }
+  // [loop 671] 🎯 3 HÀNH ĐỘNG ƯU TIÊN — tổng hợp situation user thành 3 actions ngắn.
+  //   AI có sẵn «lead» hành động — không phải tự tổng hợp từ 218 dòng.
+  try {
+    const _actions = [];
+    const _curYear = new Date().getFullYear();
+    const _age = _curYear - R.chart.input.year;
+    const _dy = (R.dayun || []).find((d) => _age >= d.startAge && _age < d.startAge + 10);
+    // (1) đỉnh vận / vận khó
+    if (_dy?.rating === 'Đại cát') {
+      const _god = _dy.zhiGod || _dy.ganGod || '';
+      const _st = /Tài/.test(_god) ? 'đầu tư/kinh doanh' : /Quan|Sát/.test(_god) ? 'thăng tiến sự nghiệp' : /Ấn/.test(_god) ? 'học vấn/chứng chỉ' : 'tiến thủ lớn';
+      _actions.push(`Tận dụng ĐỈNH VẬN (${_dy.ganZhi}) → ${_st} + nắm bắt năm vàng`);
+    } else if (_dy && /Hung|nghịch/.test(_dy.rating)) {
+      _actions.push(`Đại vận ${_dy.rating} → giữ ổn định, tránh rủi ro lớn, đợi vận đổi`);
+    } else {
+      _actions.push(`Đại vận ${_dy?.rating || '?'} → tiến vừa phải, bổ Dụng ${R.yong?.primary || '?'}`);
+    }
+    // (2) taisui cá nhân / gia đình
+    const _tsZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][((_curYear - 4) % 12 + 12) % 12];
+    const _subjZhi = R.chart?.pillars?.year?.zhi;
+    if (_subjZhi) { try { const ps = personalTaSui(_subjZhi, _tsZhi); if (ps.offends) _actions.push(`Bạn phạm ${ps.types.map((t) => t.vi).join('+')} thái tuế ${_curYear} → hóa giải (an thái tuế/đỗ xuân)`); } catch (_) {} }
+    // (3) bổ Dụng (lifestyle)
+    const _dung = R.yong?.primary;
+    const _dungAct = { 木: 'màu xanh, hướng Đông, cây cối', 火: 'màu đỏ, hướng Nam, ánh sáng', 土: 'màu vàng, hướng Tây Nam, gốm đá', 金: 'màu trắng, hướng Tây, kim loại', 水: 'màu đen, hướng Bắc, nước' }[_dung] || '';
+    if (_dungAct) _actions.push(`Bổ Dụng ${_dung}: ${_dungAct} + tránh hành khắc`);
+    if (_actions.length) parts.push(`🎯 HÀNH ĐỘNG ƯU TIÊN (${_curYear}): ${_actions.map((a, i) => `${['①','②','③','④'][i] || '•'} ${a}`).join(' ')}.`);
+  } catch (_) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';
 }
