@@ -78,11 +78,14 @@ const INTENT_KEYWORDS = {
 
 export function detectIntent(question) {
   const t = (question || '').toLowerCase();
-  const norm = t.normalize('NFD').replace(/[̀-ͯ]/g, ''); // bỏ dấu để match thoáng
+  const norm = t.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D'); // [loop 674] bỏ dấu + đ→d (đ là codepoint đơn, NFD không tách → regex lệch)
   const years = (question.match(/(19|20)\d{2}/g) || []).map(Number);
   const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|nam nay|nam sau|bao gio)\b/.test(norm) || years.length > 0;
   const isYesNo = /\b(co nen|co duoc khong|nen khong|duoc khong|co tot khong|co xau khong|co the|lieu co)\b/.test(norm);
-  const isCompat = /\b(hop khong|hop nhau|xung khac|theo khong|phu hop)\b/.test(norm);
+  // [loop 674 FIX] isCompat exclude số/tên/màu/đá — «số hợp không», «tên hợp không»
+  //   là number/name analysis, KHÔNG phải chart compat (trước đây misroute → compat).
+  const isCompat = /\b(hop khong|hop nhau|xung khac|theo khong|phu hop)\b/.test(norm)
+    && !/\b(so dien thoai|so hop|bien so|ten|mau gi|mau hop|deo da|da quy)\b/.test(norm);
   // [loop 619] family question detection
   const isFamily = /\b(me toi|bo toi|me cua|bo cua|em toi|em cua|chau toi|con toi|anh toi|chi toi|nguoi than|gia dinh)\b/.test(norm)
     || /\b(me|bo|em|chau|con|anh|chi)\b.*\b(the nao|ra sao|tuong quan|hop khong|menh gi|dung gi)\b/.test(norm);
@@ -91,7 +94,7 @@ export function detectIntent(question) {
   // [loop 655] fengshui + remedy intent (trước đây → «chưa rõ lĩnh vực» khi API fail)
   const isFengshui = /\b(phong thuy|dinh vi|la ban)\b/.test(norm)
     || (/\b(huong|nha|tang|giuong|bep|cua chinh)\b/.test(norm) && /\b(tot|xau|hop|nao|cat|hung|nen|duoc|the nao)\b/.test(norm));
-  const isRemedy = /\b(bot xui|giam xui|bo xui|xui xe|doi van|hoa giai|may man|phuc duc|lam cai gi|nen lam gi|cuu|cai menh|bo tui|giam tui)\b/.test(norm);
+  const isRemedy = /\b(bot xui|giam xui|bo xui|xui xe|doi van|hoa giai|may man|phuc duc|lam cai gi|nen lam gi|cuu|cai menh|bo tui|giam tui|deo da|da quy|mau gi|mau hop|mau sac)\b/.test(norm);
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
