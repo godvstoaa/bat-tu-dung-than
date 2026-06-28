@@ -187,13 +187,21 @@ export function detectInteractions(pillars) {
     .map((s) => ({ ...s, present: s.branches }));
   // [loop 29] BÁN HỢP (半合) — 2/3 chi của 1 cục (vd 申子, 子辰 = bán thủy cục). Cổ pháp công nhận
   //   bán hợp lực yếu hơn toàn cục nhưng vẫn là tương tác thật. Comment cũ hứa nhưng chưa implement.
+  // [loop 749 ELEVATION] phân loại STRENGTH bán hợp (cổ pháp — 滴天髓): branches[0]=长生, [1]=帝旺,
+  //   [2]=墓. 生+旺 (thiếu 墓) = mạnh nhất; 旺+墓 (thiếu 生) = trung; 生+墓 (thiếu 旺) = «拱» YẾU nhất
+  //   (2 biên ôm khoảng trống, cần lưu niên/đại vận tới chi 帝旺 thiếu mới «hoá» thành cục).
+  const _BAN_RANK = { '生旺': { type: 'Sinh vượng bán hợp', strength: 'mạnh', note: 'sinh+vượng đủ → lực mạnh nhất, gần thành cục' }, '旺墓': { type: 'Vượng mộ bán hợp', strength: 'trung', note: 'vượng+mộ → trung bình, sinh khí thiếu' }, '生墓': { type: 'Củng hợp (拱)', strength: 'yếu', note: '2 biên «củng» khoảng trống — YẾU nhất, cần lưu niên/đại vận tới chi 帝旺 thiếu mới hoá cục' } };
   const banHe = [];
   for (const s of ZHI_SANHE) {
     if (s.branches.every((b) => zset.has(b))) continue; // đã là toàn cục
     const present = s.branches.filter((b) => zset.has(b));
     if (present.length === 2) {
       const missing = s.branches.find((b) => !zset.has(b));
-      banHe.push({ wx: s.wx, name: 'Bán ' + s.name, present, missing, at: present.map((b) => POS_LABEL[zhis.indexOf(b)]).filter(Boolean).join('–') });
+      // positions: 0=长生, 1=帝旺, 2=墓. present positions sorted.
+      const ppos = s.branches.map((b, i) => zset.has(b) ? i : -1).filter((i) => i >= 0).sort();
+      const key = ppos.includes(0) && ppos.includes(1) ? '生旺' : ppos.includes(1) && ppos.includes(2) ? '旺墓' : '生墓';
+      const rank = _BAN_RANK[key];
+      banHe.push({ wx: s.wx, name: 'Bán ' + s.name, present, missing, banType: rank.type, strength: rank.strength, banNote: rank.note, missingRole: key === '生旺' ? '墓 (kho)' : key === '旺墓' ? '长生 (sinh)' : '帝旺 (vượng — lõi)', at: present.map((b) => POS_LABEL[zhis.indexOf(b)]).filter(Boolean).join('–') });
     }
   }
 

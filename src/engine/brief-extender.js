@@ -239,6 +239,11 @@ export function extendBrief(R) {
     const wm = chong.filter((c) => c.meaning);
     if (wm.length) parts.push(`LỤC XUNG 六冲 (phân loại theo LĨNH VỰC): ${wm.map((c) => `${c.a}↔${c.b} ${c.vi} [${c.domain}] (${c.at}) — ${c.meaning}`).join(' | ')}`);
   } catch (e) {}
+  // [loop 749 ELEVATION] BÁN HỢP 半合 strength — sinh+vượng mạnh, vượng+mộ trung, củng(拱) yếu.
+  try {
+    const ban = (R.interactions && R.interactions.banHe) || [];
+    if (ban.length) parts.push(`BÁN HỢP 半合 (2/3 tam hợp cục — phân strength): ${ban.map((b) => `${b.present.join('')} thiếu ${b.missing}(${b.missingRole}) = ${b.banType} [${b.strength}] — ${b.banNote}`).join(' | ')}`);
+  } catch (e) {}
 
   // Ẩn hợp
   try {
