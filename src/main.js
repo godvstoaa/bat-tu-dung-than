@@ -4930,6 +4930,86 @@ function _stopCompass() {
   window.removeEventListener('deviceorientation', _onCompass, true);
   $('compass-real-btn').textContent = '🧭 Bật la bàn thật (cảm biến điện thoại)';
 }
+// [loop 695] PROFESSIONAL LUOPAN — 多环罗盘 (24山 + 八卦 + 二十八宿)
+const _SHAN24_L = ['壬','子','癸','丑','艮','寅','甲','卯','乙','辰','巽','巳','丙','午','丁','未','坤','申','庚','酉','辛','戌','乾','亥'];
+const _BAGUA8 = ['坎','艮','震','巽','离','坤','兑','乾'];
+const _BAGUA_VI = ['Khảm','Cấn','Chấn','Tốn','Ly','Khôn','Đoài','Càn'];
+const _XIU28 = ['角','亢','氐','房','心','尾','箕','斗','牛','女','虚','危','室','壁','奎','娄','胃','昴','毕','觜','参','井','鬼','柳','星','张','翼','轸'];
+const _XIU_VI = ['Giác','Cang','Đê','Phòng','Tâm','Vĩ','Cơ','Đẩu','Ngưu','Nữ','Hư','Nguy','Thất','Bích','Khu','Lâu','Vị','Mão','Tất','Tư','Tham','Tỉnh','Quỷ','Liễu','Tinh','Trương','Dực','Chẩn'];
+function renderProLuopan(heading, s) {
+  const c = $('luopan-container'); if (!c) return;
+  const cx = 100, cy = 100;
+  const rotateRings = -heading; // rings rotate opposite to heading (traditional luopan)
+  let svg = `<svg viewBox="0 0 200 200" style="width:100%;height:auto;filter:drop-shadow(0 3px 12px rgba(0,0,0,.5))">`;
+  // background fill
+  svg += `<circle cx="${cx}" cy="${cy}" r="96" fill="rgba(15,10,5,.85)" stroke="var(--gold,#d4af37)" stroke-width="1.5"/>`;
+  // concentric circle guides
+  const rings = [30, 45, 62, 80, 94];
+  for (const r of rings) svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(212,175,55,${r===62?.5:.15})" stroke-width="${r===62?1:.5}"/>`;
+  // cross-hair guides (thin)
+  svg += `<line x1="${cx}" y1="6" x2="${cx}" y2="194" stroke="rgba(212,175,55,.08)" stroke-width=".5"/><line x1="6" y1="${cy}" x2="194" y2="${cy}" stroke="rgba(212,175,55,.08)" stroke-width=".5"/>`;
+
+  // RINGS (rotate together)
+  svg += `<g style="transform:rotate(${rotateRings}deg);transform-origin:${cx}px ${cy}px;transition:transform .15s var(--ease-out)">`;
+  // 24山 ring (radius 62-80, labels at 71)
+  for (let i = 0; i < 24; i++) {
+    const ang = i * 15;
+    const rad = (ang - 90) * Math.PI / 180;
+    const x = cx + 71 * Math.cos(rad), y = cy + 71 * Math.sin(rad);
+    const isYangShan = [0, 3, 6, 9, 12, 15, 18, 21].includes(i); // 壬丑甲辰丙未庚戌 = thiên can sơn
+    const isZhiShan = [1, 4, 7, 10, 13, 16, 19, 22].includes(i); // 子卯午酉 etc
+    const fill = isZhiShan ? '#e0533d' : isYangShan ? '#f0d97a' : '#d4af37';
+    svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="7.5" fill="${fill}" font-family="Noto Serif SC,serif" font-weight="${isZhiShan?'bold':'normal'}" transform="rotate(${ang},${x},${y})">${_SHAN24_L[i]}</text>`;
+  }
+  // 八卦 ring (radius 45-62, labels at 53)
+  for (let i = 0; i < 8; i++) {
+    const ang = i * 45 + 22.5;
+    const rad = (ang - 90) * Math.PI / 180;
+    const x = cx + 53 * Math.cos(rad), y = cy + 53 * Math.sin(rad);
+    svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#f7eccb" font-family="Noto Serif SC,serif" font-weight="bold">${_BAGUA8[i]}</text>`;
+  }
+  // 二十八宿 ring (radius 80-94, labels at 87)
+  for (let i = 0; i < 28; i++) {
+    const ang = i * (360/28) + (360/56); // offset half-sector
+    const rad = (ang - 90) * Math.PI / 180;
+    const x = cx + 87 * Math.cos(rad), y = cy + 87 * Math.sin(rad);
+    svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="4.5" fill="rgba(212,175,55,.55)" font-family="Noto Serif SC,serif" transform="rotate(${ang},${x},${y})">${_XIU28[i]}</text>`;
+  }
+  // sector lines (24 thin lines between sơn)
+  for (let i = 0; i < 24; i++) {
+    const ang = i * 15;
+    const rad = (ang - 90) * Math.PI / 180;
+    const x1 = cx + 62 * Math.cos(rad), y1 = cy + 62 * Math.sin(rad);
+    const x2 = cx + 80 * Math.cos(rad), y2 = cy + 80 * Math.sin(rad);
+    svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="rgba(212,175,55,.15)" stroke-width=".5"/>`;
+  }
+  svg += `</g>`;
+
+  // FIXED: needle (red tip at top = N, pointing up)
+  svg += `<polygon points="${cx},${cy-88} ${cx-4},${cy-65} ${cx+4},${cy-65}" fill="#e0533d"/>`;
+  svg += `<polygon points="${cx},${cy+88} ${cx-3},${cy+65} ${cx+3},${cy+65}" fill="rgba(247,236,203,.4)"/>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="5" fill="#f0d97a" stroke="#221" stroke-width=".8"/>`;
+  // center 天池
+  svg += `<text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="central" font-size="6" fill="rgba(212,175,55,.4)" font-family="Noto Serif SC,serif">天</text>`;
+  // fixed N marker (top)
+  svg += `<text x="${cx}" y="6" text-anchor="middle" font-size="8" fill="#e0533d" font-weight="bold" font-family="Noto Serif SC,serif">北</text>`;
+  // fixed S marker (bottom)
+  svg += `<text x="${cx}" y="197" text-anchor="middle" font-size="6" fill="rgba(247,236,203,.5)" font-family="Noto Serif SC,serif">南</text>`;
+  // red crosshair at TOP (shows which sơn user faces)
+  svg += `<line x1="${cx}" y1="0" x2="${cx}" y2="6" stroke="#e0533d" stroke-width="2"/>`;
+  svg += `</svg>`;
+  c.innerHTML = svg;
+  // update bagua + xiu display
+  if (s) {
+    const sIdx = _SHAN24_L.indexOf(s.han);
+    const baguaIdx = Math.floor((sIdx + 1.5) / 3) % 8;
+    const bgEl = $('compass-bagua');
+    if (bgEl) bgEl.textContent = `八卦: ${_BAGUA8[baguaIdx]} (${_BAGUA_VI[baguaIdx]})`;
+    const xiuIdx = Math.floor((heading / (360/28)) + 0.5) % 28;
+    const xiuEl = $('compass-xiu');
+    if (xiuEl) xiuEl.textContent = `二十八宿: ${_XIU28[xiuIdx]} (${_XIU_VI[xiuIdx]})`;
+  }
+}
 function _onCompass(e) {
   if (!_compassActive) return;
   let heading = null;
@@ -4943,9 +5023,6 @@ function _onCompass(e) {
   if (Math.abs(heading - _compassLastDeg) < 3 && now - _compassThrottle < 200) return;
   _compassLastDeg = heading; _compassThrottle = now;
   // Update needle
-  const needle = document.querySelector('#compass-needle');
-  if (needle) needle.style.transform = `rotate(${heading}deg)`;
-  // Update heading display
   const hdEl = $('compass-heading'); if (hdEl) hdEl.textContent = Math.round(heading) + '°';
   // Map to 24 sơn + real-time analysis
   const s = shanFromDegree(heading);
@@ -4954,6 +5031,8 @@ function _onCompass(e) {
     if (shanEl) shanEl.textContent = `${s.han} (${s.vi})`;
     const palEl = $('compass-palace');
     if (palEl) palEl.textContent = `Hướng ${s.palace8} · ngũ hành ${s.trungQuai}`;
+    // [loop 695] render professional luopan (rings rotate, needle fixed)
+    renderProLuopan(heading, s);
     // Real-time verdict (lightweight — full analysis khi user bấm «Luận hướng»)
     const vEl = $('compass-verdict');
     if (vEl && currentResult) {
