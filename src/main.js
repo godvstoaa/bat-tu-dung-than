@@ -5605,6 +5605,23 @@ function renderQuickSummary() {
   // Cảnh báo
   let alert = '';
   try { const ha = healthAlertScan(c, 1); if (ha.alerts.length) { const a = ha.alerts[0]; alert = `⚠ ${a.year}: ${a.level}${a.reasons.length ? ' — ' + a.reasons[0].slice(0, 50) : ''}`; } } catch (e) {}
+  // [loop 649] THÁI TUẾ cảnh báo — cá nhân + gia đình (trước đây chỉ có health alert).
+  try {
+    const tsYear = new Date().getFullYear();
+    const tsYearZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][((tsYear - 4) % 12 + 12) % 12];
+    // cá nhân
+    const subjZhi = c.chart?.pillars?.year?.zhi;
+    if (subjZhi) { const ps = personalTaSui(subjZhi, tsYearZhi); if (ps.offends) alert = (alert ? alert + ' · ' : '') + `⚠ ${tsYear}: BẠN phạm ${ps.types.map((t) => t.vi).join('+')} → ${ps.level === 'nặng' ? 'cần hóa giải gấp' : 'chú ý'}.`; }
+    // gia đình (từ familyMembers đã load)
+    const famOffend = (familyMembers || []).filter((m) => m.date).map((m) => {
+      const [fy] = (m.date || '').split('-').map(Number);
+      if (!fy) return null;
+      const zhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][((fy - 4) % 12 + 12) % 12];
+      const ps = personalTaSui(zhi, tsYearZhi);
+      return ps.offends ? `${m.label || m.role}(${ps.types.map((t) => t.vi).join('+')})` : null;
+    }).filter(Boolean);
+    if (famOffend.length) alert = (alert ? alert + ' · ' : '') + `⚠ Gia đình phạm thái tuế ${tsYear}: ${famOffend.join(', ')}.`;
+  } catch (e) {}
   // Dụng thần hành động
   const dungAction = { 木: 'màu xanh, hướng Đông, cây cối', 火: 'màu đỏ, hướng Nam, ánh sáng', 土: 'màu vàng, hướng Tây Nam, gốm đá', 金: 'màu trắng, hướng Tây, vật kim loại', 水: 'màu đen/xanh đậm, hướng Bắc, nước' }[yong.primary] || '';
   // [loop 219] Vận hiện tại — đại运 + lưu niên đang hành (ngữ cảnh giai đoạn đời)
