@@ -238,6 +238,12 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 ⏩ Khi user hỏi "hôm nay thế nào / hôm nay làm gì / tổng quan hôm nay" → Ưu tiên trả lời từ block "HÔM NAY TỔNG KHÁI" này TRƯỚC, sau đó mới đi sâu vào chi tiết bên dưới nếu được hỏi thêm.
 
 == LÁ SỐ BÁT TỰ (đã tính chính xác, dùng để luân giải) ==
+⭐ TÓM TẮT MỆNH: ${(() => { try {
+  const _age = curYear - R.chart.input.year;
+  const _dy = (R.dayun || []).find((d) => _age >= d.startAge && _age < d.startAge + 10);
+  let _gy = ''; try { const g = findGoldenYear(R, curYear, 10); const tg = (g.ranked || []).filter((r) => r.isTrulyGolden).map((r) => r.year); if (tg.length) _gy = `, năm vàng ${tg.join('/')}`; } catch (_) {}
+  return `Nhật Chủ ${dm.vi} (${R.strength?.strong ? 'vượng' : 'nhược'}), Dụng ${wxVi(R.yong.primary)}${R.yong.tiaohou?.override ? ' (调候)' : ''}, điểm ${R.synthesis?.score ?? '?'}/100 (${R.synthesis?.gradeVi ?? '?'}${R.synthesis?.percentile ? ', top ' + R.synthesis.percentile + '%' : ''})${_dy ? `, đại vận ${_dy.ganZhi}[${_dy.rating}]` : ''}${_gy}.`;
+} catch (_) { return '(đang tính)'; } })()}
 - Nhật Chủ (日主): ${dm.gan} ${dm.vi} — hành ${wxVi(dm.wx)} ${dm.yin ? '(âm)' : '(dương)'}
 - BẢN MỆNH HÀM 演禽 (28 túc con-vật-tinh, như con giáp 28-fold): ${(() => { try { return analyzeYanQin(R).summary; } catch (e) { return '(không tính được)'; } })()}
 - 禽星 NĂN ${curYear} (annual bird rotation — con vật tinh trụ trị năm nay, feng shui timing): ${(() => { try { return qinxingOverview(R, curYear).summary; } catch (e) { return '(không tính được)'; } })()}
