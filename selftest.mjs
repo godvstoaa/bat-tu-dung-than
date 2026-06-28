@@ -5825,6 +5825,34 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(typeof tt.dungTea === 'string', `[smoke] tea-therapy.dungTea string`);
   console.log(`   Smoke batch 7 ✓ — taiyuan + ziwei-stars + sleep-fs + tea-therapy`);
 }
+
+// ################## META: brief content completeness [loop 580] ##################
+// [loop 580] brief là context chính cho AI — phải chứa TẤT CẢ section quan trọng.
+//   Nếu brief vỡ section nào (do refactor/dependency change), test này bắt được.
+{
+  console.log('\n##### META: brief content completeness [loop 580] #####');
+  const { extendBrief } = await import('./src/engine/brief-extender.js');
+  const brief = extendBrief(spR);
+  assert(brief.length > 5000, `[meta] brief > 5000 chars (got ${brief.length}) — đủ context cho AI`);
+  const SECTIONS = [
+    ['Dụng thần', /D[ụu]ng|yong|primary/i],
+    ['格局', /cách cục|geju|格局|pattern/i],
+    ['大运/đại vận', /đ[ạa]i v[ậậ]n|dayun|大运|thập niên/i],
+    ['Lưu niên', /lưu niên|liunian|năm nay|current year/i],
+    ['Lục Đạo', /L[ỤỤ]C [ĐĐ][ẠA]O|六道|ṣaḍ/i],
+    ['Destiny Consensus', /CONSENSUS|TỔNG HỢP|đồng thu[ậậ]n/i],
+    ['Kinh Dịch', /KINH D[ỊI]CH|河洛|鬼谷|hexagram/i],
+    ['Thập thần', /th[ậpậ]p th[ầầ]n|ten god|正官|七殺/i],
+    ['Ngũ hành', /ng[ũũ] hành|wuxing|五行的/i],
+    ['神煞', /th[ầầ]n s[ áát]|shensha|天乙|羊刃/i],
+  ];
+  let missing = 0;
+  for (const [name, re] of SECTIONS) {
+    if (!re.test(brief)) { console.log(`  ⚠ THIẾU: ${name}`); missing++; }
+  }
+  assert(missing === 0, `[meta] brief chứa đủ 10 section quan trọng (thiếu ${missing})`);
+  console.log(`   Brief completeness ✓ — 10/10 section quan trọng có mặt (${brief.length} chars)`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
