@@ -100,6 +100,7 @@ import { rankDayun } from './dayun-rank.js';
 import { wealthMonthlyAlert } from './wealth-alert.js';
 import { healthAlertScan } from './health-alert.js';
 import { computeHehun } from './hehun.js';
+import { synthesize } from './synthesis.js';
 import { matchBusinessPartners } from './partner-match.js';
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
