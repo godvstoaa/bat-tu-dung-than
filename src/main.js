@@ -3945,8 +3945,13 @@ function renderLiunian12Shen(year) {
 
 // ---------------------------------------------------------------- HỌC TÊN 姓名学
 function renderName() {
-  const raw = $('nm-input').value.trim();
+  let raw = $('nm-input').value.trim();
   if (!raw) return;
+  // [loop 667] auto-convert Vietnamese → Han nếu input là tiếng Việt (Latin, không CJK).
+  //   Trước đây user phải nhập Hán tay hoặc dùng ô nm-vi riêng. Nay nm-input chấp nhận VN trực tiếp.
+  if (/[a-zA-ZÀ-ỹ]/.test(raw) && !/[一-鿿]/.test(raw)) {
+    try { const conv = viToHan(raw); if (conv.hanString) raw = conv.hanString; } catch (_) {}
+  }
   const chars = [...raw]; // tách theo ký tự (hỗ trợ BMP)
   // parse override "阮=12,文=4"
   const ov = {};
