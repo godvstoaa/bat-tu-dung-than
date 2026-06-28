@@ -206,6 +206,39 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
   assert(am.ganZhi === hdrGZ, `[loop 559] analyze_month«tháng này»(${am.ganZhi}) khớp brief header (${hdrGZ}) — không mâu thuẫn`);
   console.log(`   analyze_month ✓ — «tháng này» ganZhi ${am.ganZhi} khớp brief header (AI không mâu thuẫn)`);
 }
+// [loop 623 FIX CRITICAL] AI_TOOLS: TẤT CẢ tool phải có wrapper { type:'function', function:{name,...} }.
+//   Trước đây 5 tool bói (analyze_char/meihua/liuren/qimen/guiguzi) FLAT → Z.ai API reject → AI không bao giờ gọi được.
+{
+  const { AI_TOOLS } = await import('./src/engine/ai.js');
+  assert(AI_TOOLS.length === 16, `[loop 623] AI_TOOLS có đúng 16 tool (got ${AI_TOOLS.length})`);
+  const flat = AI_TOOLS.filter((t) => !(t && t.type === 'function' && t.function && t.function.name));
+  assert(flat.length === 0, `[loop 623] KHÔNG còn tool FLAT — tất cả phải có wrapper {type:function,function:{name}} (còn ${flat.length} flat: ${flat.map(t=>t&&t.name).join(',')})`);
+  const names = AI_TOOLS.map((t) => t.function.name);
+  const dups = names.filter((n, i) => names.indexOf(n) !== i);
+  assert(dups.length === 0, `[loop 623] không trùng tên tool (trùng: ${dups.join(',')})`);
+  // 5 tool bói từng flat — xác nhận giờ đã wrapped + có executor
+  for (const tn of ['analyze_char','analyze_meihua','analyze_liuren','analyze_qimen','analyze_guiguzi']) {
+    const t = AI_TOOLS.find((x) => x.function.name === tn);
+    assert(t && t.type === 'function', `[loop 623] ${tn} đã wrapped đúng`);
+  }
+  console.log(`   AI_TOOLS ✓ — ${AI_TOOLS.length} tool ĐỀU wrapped đúng format OpenAI/Z.ai (0 flat)`);
+}
+// [loop 623 FIX] MỖI tool trong AI_TOOLS phải có nhánh xử lý trong tool-runner (không silent-fail).
+//   Bug cũ: analyze_guiguzi có tool AI gọi được nhưng KHÔNG có nhánh xử lý → nhận error → Quỷ Cốc bói không bao giờ trả kết quả.
+{
+  const { AI_TOOLS, execTool } = await import('./src/engine/ai.js');
+  const fs = (await import('fs')).default;
+  const src = await fs.promises.readFile('./src/engine/ai.js', 'utf8');
+  const cases = new Set();
+  for (const m of src.matchAll(/case '([a-z_]+)':/g)) cases.add(m[1]);
+  const orphan = AI_TOOLS.map((t) => t.function.name).filter((n) => !cases.has(n));
+  assert(orphan.length === 0, `[loop 623] mọi tool có nhánh xử lý (orphan: ${orphan.join(',')})`);
+  // smoke: analyze_guiguzi giờ trả 2 hệ (trước đây error)
+  const g = execTool('analyze_guiguzi', {}, R);
+  assert(g.system1 && g.system1.nayinVi, `[loop 623] analyze_guiguzi trả system1 nạp âm (got ${JSON.stringify(g).slice(0,80)})`);
+  assert(g.system2 && g.system2.geMing, `[loop 623] analyze_guiguzi trả system2 分定經 格名`);
+  console.log(`   analyze_guiguzi ✓ — 2 hệ Quỷ Cốc (${g.system1.nayinVi} + 格「${g.system2.geMing}」), 0 tool orphan`);
+}
 
 // ################## DESTINY CONSENSUS (meta-synthesis đa hệ thống) [loop 561] ##################
 {

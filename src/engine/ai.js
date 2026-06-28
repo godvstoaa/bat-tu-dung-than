@@ -33,6 +33,8 @@ import { analyzeTongGen } from './tonggen.js';
 import { analyzeHuaQi } from './huaqi.js';
 import { analyzeKu } from './ku.js';
 import { computeZiwei } from './ziwei.js';
+import { guiguziFortune } from './guiguzi.js'; // [loop 623] analyze_guiguzi tool — trước đây tool KHÔNG có case → AI gọi nhận error
+import { guiguziFDG } from './guiguzi-fdg.js'; // [loop 623] 分定經 两头钳
 import { ziweiCoreReading } from './ziwei-sanfang.js';
 import { analyzeZiweiBrightness } from './ziwei-brightness.js';
 import { analyzeShuangXing } from './ziwei-shuangxing.js';
@@ -660,13 +662,13 @@ export const AI_TOOLS = [
       year: { type: 'integer' }, month: { type: 'integer' }, day: { type: 'integer' },
     }, required: ['year', 'month', 'day'] },
   } },
-  { // [loop 495] 测字 AI tool — user hỏi «测字 X» qua chat (trước đây card-only)
+  { type: 'function', function: { // [loop 495→623 FIX] 测字 — trước đây flat (thiếu wrapper) → API reject
     name: 'analyze_char', description: '测字拆字 (châm tự): phân tích 1 chữ Hán — tháo bộ/nét (康熙) + 梅花起卦 + ngũ hành luận. Dùng khi user hỏi «测字 X», «xem chữ 福/财/...», «chữ này cát/hung». KHÔNG cố định lá số — độc lập.',
     parameters: { type: 'object', properties: {
       char: { type: 'string', description: '1 chữ Hán cần测 (vd 福, 财, 发)' },
     }, required: ['char'] },
-  },
-  { // [loop 496] 梅花易数 AI tool — 起卦 by time (AI-friendly, no manual cast)
+  } },
+  { type: 'function', function: { // [loop 496→623 FIX] 梅花易数 起卦 by time
     name: 'analyze_meihua', description: '梅花易数 起卦 (time-based divination): gieo quẻ theo thời điểm → 本卦/互卦/变卦 + 体用 ngũ hành sinh khắc + verdict cát/hung. Dùng khi user hỏi «gieo quẻ», «起卦 about X», «占 [chủ đề]», «xem quẻ hôm nay». Trả quẻ +体用 + cát hung.',
     parameters: { type: 'object', properties: {
       year: { type: 'integer', description: 'Năm (bỏ trống = năm nay)' },
@@ -675,9 +677,9 @@ export const AI_TOOLS = [
       hour: { type: 'integer', description: 'Giờ 0-23 (bỏ trống = hiện tại)' },
       minute: { type: 'integer', description: 'Phút 0-59 (bỏ trống = hiện tại)' },
     } },
-  },
-  { // [loop 508] 大六壬 AI tool — 四课三传 time-based divination
-    name: 'analyze_liuren', description: '大六壬 (Da Liu Ren): 3-truyền 4-bài (四课三传) theo thời điểm → luận sự kiện. Dùng khi user hỏi «lục nhâm», «đại六壬 hôm nay», «thần kỳ phái» (các câu về phe thần/kỳ). Trả 月将 + 四课 + 三传 + tong môn.',
+  } },
+  { type: 'function', function: { // [loop 508→623 FIX] 大六壬 四课三传
+    name: 'analyze_liuren', description: '大六壬 (Da Liu Ren): 3-truyền 4-bài (四课三传) theo thời điểm → luận sự kiện. Dùng khi user hỏi «lục nhâm», «đại六壬 hôm nay», «thần kỳ phái» (các câu về phe thần/kỳ). Trả 月将 + 四课 + 三传 + tong môn.',
     parameters: { type: 'object', properties: {
       year: { type: 'integer', description: 'Năm (bỏ trống = năm nay)' },
       month: { type: 'integer', description: 'Tháng (bỏ trống = tháng nay)' },
@@ -685,17 +687,17 @@ export const AI_TOOLS = [
       hour: { type: 'integer', description: 'Giờ 0-23 (bỏ trống = 12)' },
       minute: { type: 'integer', description: 'Phút (bỏ trống = 0)' },
     } },
-  },
-  { // [loop 509] 奇门遁甲 AI tool — 9-cung time-based
+  } },
+  { type: 'function', function: { // [loop 509→623 FIX] 奇门遁甲 9-cung
     name: 'analyze_qimen', description: '奇门遁甲 (Qi Men Dun Jia): 9-cung + 8-môn + 9-tinh + 3-kỳ + 格格 theo thời điểm → hướng tốt/xấu hành sự. Dùng khi user hỏi «kỳ môn», «độn giáp hôm nay», «hướng nào tốt (theo kỳ môn)». Trả 节气/局 + 格格 cát/hung + advice hướng.',
     parameters: { type: 'object', properties: {
       year: { type: 'integer' }, month: { type: 'integer' }, day: { type: 'integer' }, hour: { type: 'integer' },
     } },
-  },
-  { // [loop 543] 鬼谷子 AI tool — user hỏi «Quỷ Cốc Tử mệnh tôi sao?»
+  } },
+  { type: 'function', function: { // [loop 543→623 FIX] 鬼谷子算命
     name: 'analyze_guiguzi', description: '鬼谷子算命 (Guiguzi): 4-trụ nạp âm + 分定經 两头钳 (年干×时干→配卦→命格+格诗+多层VN). Dùng khi user hỏi «Quỷ Cốc Tử», «鬼谷子», «phân định kinh», «mệnh tôi theo cổ thư». Trả full analysis.',
     parameters: { type: 'object', properties: {} },
-  },
+  } },
   // [loop 606] ANALYZE RELATIVE — phân tích NGƯỜI THÂN khi user cho ngày sinh
   { type: 'function', function: {
     name: 'analyze_relative', description: '[loop 606] Phan tich BAT TU nguoi than (me/bo/em/anh/chau/con) — can ngay sinh nguoi do. Tra Dung Than + diem menh + cach cuc + dai van + ngu hanh tuong quan voi user. Dung khi user hoi «me/bo/em/con TOI the nao» VA user DA CHO ngay sinh nguoi do.',
@@ -947,6 +949,26 @@ export function execTool(name, args, R) {
           hourWarning: (a.hour == null) ? '⚠ Giờ sinh dùng mặc định 12:00 (Ngọ). Trụ giờ = ~25% lá số → Dụng/điểm CÓ THỂ SAI. Khuyến nghị: tìm giờ sinh thật, hoặc mở app xem card «Quét 12 Giờ» để biết độ nhạy.' : null,
         };
       }
+      case 'analyze_guiguzi': { // [loop 623 FIX] tool từng KHÔNG có case → AI gọi nhận error. Giờ 2 hệ Quỷ Cốc.
+        // (1) guiguziFortune: 4-trụ nạp âm → tone + 4 cung luận; (2) guiguziFDG: 分定經 两头钳 → 配卦 + 格诗
+        const gf = guiguziFortune(R);
+        const fdg = guiguziFDG(R);
+        return {
+          system1: { // 鬼谷子 4-trụ nạp âm (年命)
+            yearJiaZi: gf?.yearJiaZi, nayin: gf?.nayin, nayinVi: gf?.vi,
+            tone: gf?.toneVi || gf?.tone, fortune: _s(gf?.fortune || '', 220), career: gf?.career,
+            summary4Pillar: _s(gf?.summary || '', 260),
+          },
+          system2: fdg ? { // 分定經 两头钳 (年干×时干→配卦)
+            combo: fdg.combo, gua: fdg.gua, guaVi: fdg.guaVi, guaNature: fdg.guaNature,
+            guaMeaning: _s(fdg.guaMeaning || '', 200),
+            geMing: fdg.geMing, stars: fdg.stars, starDesc: _s(fdg.starDesc || '', 160),
+            shuYun: _s(fdg.shuYun || '', 200), geShi: _s(fdg.geShi || '', 200),
+            summary: _s(fdg.summary || '', 240),
+          } : '(không đủ dữ liệu trụ giờ)',
+          note: 'Quỷ Cốc Tử = hệ cổ phái (鬼谷子). Hệ nạp âm (system1) luận tone cát hung; 分定經 两头钳 (system2) ghép năm×giờ → quẻ + 格诗 luận mệnh.',
+        };
+      }
       default:
         return { error: 'tool không hỗ trợ: ' + name };
     }
@@ -989,7 +1011,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history } = {
   const brief = (_briefCache && _briefCache.key === _ck) ? _briefCache.brief : (_briefCache = { key: _ck, brief: buildChartBrief(R) }).brief;
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'system', content: brief + '\n\n== TOOLS (FUNCTION CALLING) ==\nBạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_month, best_days_in_year, find_good_days, analyze_best_hour, analyze_partner, life_trajectory, inverse_bazi, analyze_char (测字), analyze_meihua (梅花易数), analyze_liuren (六壬), analyze_qimen (奇门), analyze_guiguzi (鬼谷), analyze_relative (người thân) (15 tools). QUY TAC: (1) bat cu khi khuen ngay/thang cu the -> PHAI goi best_days_in_year/find_good_days/analyze_day de lay NGAY THAT (dung bia "thang 10"); (2) cau ve 1 nam -> goi analyze_year; (3) ca doi -> life_trajectory; (4) thang nay -> analyze_month + get_current_time; (5) hoi "lam sao bớt xui / ngay nao tot" -> goi find_good_days hoac best_days_in_year de dua ngay cat gan nhat + ngay ky can tranh; (6) KHI USER KHANG ĐỊNH tình trạng ("toi do/xui/may/te") -> BAT BUOC goi analyze_month + analyze_year de KIEM CHỨNG có ĐÚNG không, rồi xác nhận hoặc phản biện; (7) [loop 21/230] KHI USER HỎI NGƯỢC "bát tự điểm CAO/THẤP nhất", "muốn đẻ con mệnh tốt nhất thì sinh khi nào", "tìm lá số đạt điểm X" -> goi inverse_bazi (mode=max/min/target). [loop 230] KHI USER MUỐN CON CÓ DỤNG THẦN CỤ THỂ ("muốn con Dụng Thủy/Mộc/Hỏa", "đẻ con mệnh Mộc") -> goi inverse_bazi (mode=yong, targetYong=木/火/土/金/水) — trả về lá số có Dụng đúng hành + ngày thụ thai; (8) [loop 181] giờ nào tốt hôm nay / giờ ký kết / giờ khai trương -> goi analyze_best_hour; (9) [loop 181] hợp tuổi/hợp hôn/hợp làm ăn (cần ngày sinh đối tác) -> goi analyze_partner; (10) [loop 572] KHI USER HỎI bói quẻ/gieo quẻ/梅花/六壬/奇门/鬼谷/测字 -> goi tool tương ứng (analyze_meihua/liuren/qimen/guiguzi/char); (11) [loop 606→614] KHI USER HỎI ve ME/BO/EM/ANH/CHAU/CON «the nao» -> KIEM TRA brief section «GIA ĐÌNH» co ngay sinh khong. NEU CO -> goi analyze_relative ngay (KHONG hoi lai). NEU KHONG co -> hoi user ngay sinh.' },
+    { role: 'system', content: brief + '\n\n== TOOLS (FUNCTION CALLING) ==\nBạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_month, best_days_in_year, find_good_days, analyze_best_hour, analyze_partner, life_trajectory, inverse_bazi, analyze_char (测字), analyze_meihua (梅花易数), analyze_liuren (六壬), analyze_qimen (奇门), analyze_guiguzi (鬼谷), analyze_relative (người thân) (16 tools). QUY TAC: (1) bat cu khi khuen ngay/thang cu the -> PHAI goi best_days_in_year/find_good_days/analyze_day de lay NGAY THAT (dung bia "thang 10"); (2) cau ve 1 nam -> goi analyze_year; (3) ca doi -> life_trajectory; (4) thang nay -> analyze_month + get_current_time; (5) hoi "lam sao bớt xui / ngay nao tot" -> goi find_good_days hoac best_days_in_year de dua ngay cat gan nhat + ngay ky can tranh; (6) KHI USER KHANG ĐỊNH tình trạng ("toi do/xui/may/te") -> BAT BUOC goi analyze_month + analyze_year de KIEM CHỨNG có ĐÚNG không, rồi xác nhận hoặc phản biện; (7) [loop 21/230] KHI USER HỎI NGƯỢC "bát tự điểm CAO/THẤP nhất", "muốn đẻ con mệnh tốt nhất thì sinh khi nào", "tìm lá số đạt điểm X" -> goi inverse_bazi (mode=max/min/target). [loop 230] KHI USER MUỐN CON CÓ DỤNG THẦN CỤ THỂ ("muốn con Dụng Thủy/Mộc/Hỏa", "đẻ con mệnh Mộc") -> goi inverse_bazi (mode=yong, targetYong=木/火/土/金/水) — trả về lá số có Dụng đúng hành + ngày thụ thai; (8) [loop 181] giờ nào tốt hôm nay / giờ ký kết / giờ khai trương -> goi analyze_best_hour; (9) [loop 181] hợp tuổi/hợp hôn/hợp làm ăn (cần ngày sinh đối tác) -> goi analyze_partner; (10) [loop 572] KHI USER HỎI bói quẻ/gieo quẻ/梅花/六壬/奇门/鬼谷/测字 -> goi tool tương ứng (analyze_meihua/liuren/qimen/guiguzi/char); (11) [loop 606→614] KHI USER HỎI ve ME/BO/EM/ANH/CHAU/CON «the nao» -> KIEM TRA brief section «GIA ĐÌNH» co ngay sinh khong. NEU CO -> goi analyze_relative ngay (KHONG hoi lai). NEU KHONG co -> hoi user ngay sinh.' },
     ...((history || []).slice(-8)),
     { role: 'user', content: question },
   ];
