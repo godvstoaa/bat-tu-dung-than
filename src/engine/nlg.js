@@ -77,7 +77,8 @@ const INTENT_KEYWORDS = {
 };
 
 export function detectIntent(question) {
-  const t = (question || '').toLowerCase();
+  question = String(question || ''); // [loop 679] guard null/undefined → tránh question.match crash
+  const t = question.toLowerCase();
   const norm = t.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D'); // [loop 674] bỏ dấu + đ→d (đ là codepoint đơn, NFD không tách → regex lệch)
   const years = (question.match(/(19|20)\d{2}/g) || []).map(Number);
   const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|nam nay|nam sau|bao gio)\b/.test(norm) || years.length > 0;
