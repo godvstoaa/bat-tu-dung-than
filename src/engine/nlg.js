@@ -14,6 +14,7 @@ import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
 import { guiguziFortune } from './guiguzi.js';
+import { analyze } from './chart.js';
 import { guiguziFDG } from './guiguzi-fdg.js';
 import { hexagramSynthesis } from './hexagram-synthesis.js';
 import { computeLiuDao } from './liudao.js';
@@ -544,15 +545,45 @@ export function composeAnswer(question, R) {
     return { title: block.title, lead: `Bạn hỏi về bói toán / gieo quẻ. Kết quả:`, paragraphs: block.paragraphs, intent };
   }
 
-  // [loop 619] family question — NLG offline hướng dẫn user
+  // [loop 619→620] family question — NLG offline THỰC SỰ luận nếu có ngày sinh
   if (intent.isFamily) {
+    // [loop 620] Extract date from question → compute ngũ hành tương quan OFFLINE
+    const dateMatch = question.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
+    if (dateMatch) {
+      const [, dd, mm, yy] = dateMatch.map(Number);
+      try {
+        const relR = analyze(yy, mm, dd, 12, 0, 'nữ', new Date().getFullYear());
+        const uWx = R.chart.dayMaster.wx, rWx = relR.chart.dayMaster.wx;
+        const SHENG_L = { 木:'火', 火:'土', 土:'金', 金:'水', 水:'木' };
+        const KE_L = { 木:'土', 土:'水', 水:'火', 火:'金', 金:'木' };
+        let rel2;
+        if (SHENG_L[uWx] === rWx) rel2 = `bạn (${WX_VI[uWx]}) sinh họ (${WX_VI[rWx]}) → bạn nuôi họ`;
+        else if (SHENG_L[rWx] === uWx) rel2 = `họ (${WX_VI[rWx]}) sinh bạn (${WX_VI[uWx]}) → họ nuôi bạn`;
+        else if (KE_L[uWx] === rWx) rel2 = `bạn (${WX_VI[uWx]}) khắc họ (${WX_VI[rWx]}) → bạn chế`;
+        else if (KE_L[rWx] === uWx) rel2 = `họ (${WX_VI[rWx]}) khắc bạn (${WX_VI[uWx]}) → họ áp`;
+        else rel2 = `cùng hành (${WX_VI[uWx]}) — tính cách giống`;
+        const relDung = relR.yong.primary;
+        const helpsUser = rWx === R.yong.primary;
+        const userHelps = uWx === relDung;
+        return {
+          title: `Người thân (${dd}/${mm}/${yy}) — ngũ hành tương quan`,
+          lead: `Người này: Nhật Chủ ${relR.chart.dayGan} (${WX_VI[rWx]}), Dụng ${WX_VI[relDung]}. Bạn: ${R.chart.dayGan} (${WX_VI[uWx]}), Dụng ${WX_VI[R.yong.primary]}.`,
+          paragraphs: [
+            `Ngũ hành: ${rel2}.`,
+            helpsUser ? `✓ NC người này (${WX_VI[rWx]}) = Dụng của bạn (${WX_VI[R.yong.primary]}) → NGƯỜI NÀY TỐT CHO BẠN.` : userHelps ? `✓ NC bạn (${WX_VI[uWx]}) = Dụng của người này (${WX_VI[relDung]}) → BẠN TỐT CHO HỌ.` : `Ngũ hành không trực tiếp bổ Dụng — quan hệ cần nỗ lực vun đắp.`,
+            `💡 Để xem phân tích đầy đủ (164 card + đại vận + AI), bấm «📝» cạnh tên người này trong card「👪 Nghiệm Chứng Gia Tộc」, hoặc bật AI để luận giải sâu hơn.`,
+          ],
+          intent,
+        };
+      } catch (_) {}
+    }
     return {
       title: 'Người thân — cần AI hoặc card Gia Tộc',
       lead: `Bạn hỏi về người thân. Để luân giải chính xác, tôi cần ngày sinh của người đó.`,
       paragraphs: [
-        `📋 Cách 1: Mở card「👪 Nghiệm Chứng Gia Tộc」→ bấm «📝» cạnh tên người cần xem → app tự phân tích đầy đủ (164 card).`,
-        `🤖 Cách 2: Bật AI (⚙ Cài đặt → Z.ai) → hỏi «mẹ tôi (27/6/1970) thế nào?» → AI sẽ dùng tool analyze_relative để luân giải NC/Dụng/đại vận/ngũ hành tương quan.`,
-        `💡 Tôi (offline) chỉ có lá số của BẠN. Nếu cho ngày sinh người thân, tôi luận được: ngũ hành tương quan (bạn vs người đó), ai bổ Dụng cho ai, đại vận tương hỗ. Hãy hỏi vd: «mẹ tôi sinh 27/6/1970, ngũ hành hợp không?».`,
+        `📋 Cách 1: Mở card「👪 Nghiệm Chứng Gia Tộc」→ bấm «📝» cạnh tên người cần xem → app tự phân tích đầy đủ.`,
+        `🤖 Cách 2: Bật AI (⚙ Cài đặt) → hỏi «mẹ tôi (27/6/1970) thế nào?» → AI dùng analyze_relative để luận giải đầy đủ.`,
+        `💡 Hoặc hỏi tôi (offline) kèm ngày sinh: «mẹ tôi sinh 27/6/1970, hợp không?» → tôi luận ngũ hành tương quan ngay.`,
       ],
       intent,
     };
