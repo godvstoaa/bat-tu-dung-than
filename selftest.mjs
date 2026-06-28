@@ -239,6 +239,22 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
   assert(g.system2 && g.system2.geMing, `[loop 623] analyze_guiguzi trả system2 分定經 格名`);
   console.log(`   analyze_guiguzi ✓ — 2 hệ Quỷ Cốc (${g.system1.nayinVi} + 格「${g.system2.geMing}」), 0 tool orphan`);
 }
+// [loop 625 FIX] analyze_relative advice phải nhận thức THẾ HỆ — «khắc» không phán sai vai trò.
+//   Bug cũ: cháu 3 tuổi (thân Kim khắc user Mộc) bị advice «họ áp đặt bạn — cần ranh giới» (sai vai trò xã hội).
+//   Fix: isDescendant/isElder → «khắc» được reframe theo thứ bậc (bề dưới = dẫn dắt, bề trên = kính trọng).
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  // Dùng user chart xác định: Quân 1993 = 乙木. Cháu 2023 = 辛金 → Kim khắc Mộc (thân khắc user).
+  const Ru = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const ch = execTool('analyze_relative', { relation: 'cháu', year: 2023, month: 1, day: 13, hour: 7, gender: 'nam' }, Ru);
+  assert(ch.nguHanhTuongQuan.includes('khắc'), `[loop 625] setup đúng: cháu có quan hệ khắc user (got ${ch.nguHanhTuongQuan})`);
+  assert(!/áp đặt bạn|bạn chế\/ap đặt/.test(ch.advice), `[loop 625] cháu KHÔNG bị phán «áp đặt» (got: ${ch.advice.split('.')[0]})`);
+  assert(/dẫn dắt|bề dưới|khí chất/.test(ch.advice), `[loop 625] cháu 克 được reframe theo vai trò bề dưới (got: ${ch.advice.split('.')[0]})`);
+  // peer (không relation) cùng chart Kim-cracks-Mộc → vẫn «áp đặt» (peer preserved, không over-soften)
+  const peer = execTool('analyze_relative', { year: 2023, month: 1, day: 13, hour: 7, gender: 'nam' }, Ru);
+  assert(/áp đặt bạn|ranh giới rõ/.test(peer.advice), `[loop 625] peer (không relation) 克 vẫn «áp đặt — ranh giới» (got: ${peer.advice.split('.')[0]})`);
+  console.log(`   analyze_relative advice ✓ — cháu 克 → «dẫn dắt/bề dưới» (không «áp đặt»); peer 克 → «ranh giới» (giữ nguyên)`);
+}
 
 // ################## DESTINY CONSENSUS (meta-synthesis đa hệ thống) [loop 561] ##################
 {

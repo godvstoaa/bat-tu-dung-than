@@ -908,14 +908,26 @@ export function execTool(name, args, R) {
             const WX_VI = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
             const uV = WX_VI[userWx] || userWx, rV = WX_VI[relWx] || relWx;
             const rel2 = (a.relation || '').toLowerCase();
-            // Cốt lõi: ngũ hành tương quan
+            // [loop 625 FIX] phân loại thế hệ để «khắc» KHÔNG bị phán sai vai trò xã hội.
+            //   Trước đây cháu 3 tuổi bị phán «họ áp đặt bạn — cần ranh giới» (sai vai trò).
+            const isDescendant = /chau|cháu|con|child|chắt/.test(rel2);
+            const isElder = /m[eẽ]|mom|b[oố]|b[oổ]i|dad|cha|ông|bà|cô|dì|chú|bác|ngoại|nội/.test(rel2);
+            // Cốt lõi: ngũ hành tương quan — «khắc» được điều chỉnh theo thứ bậc thế hệ
             let core;
             if (relHelpsUser) core = `${rV} = Dụng của bạn → người này MANG HÀNH BỔ MỆNH bạn, tự nhiên tốt`;
             else if (userHelpsRel) core = `${uV} = Dụng của người này → BẠN mang hành bổ họ, bạn tốt cho họ`;
             else if (SHENG[userWx] === relWx) core = `bạn (${uV}) sinh họ (${rV}) → bạn cho đi, họ nhận — quan hệ «phú dưỡng»`;
             else if (SHENG[relWx] === userWx) core = `họ (${rV}) sinh bạn (${uV}) → họ nuôi bạn — quan hệ «Ấn tinh» (hậu thuẫn)`;
-            else if (KE[userWx] === relWx) core = `bạn (${uV}) khắc họ (${rV}) → bạn chế/ap đặt — cần giảm kiểm soát`;
-            else if (KE[relWx] === userWx) core = `họ (${rV}) khắc bạn (${uV}) → họ áp đặt bạn — cần ranh giới rõ`;
+            else if (KE[userWx] === relWx) {
+              if (isDescendant) core = `bạn (${uV}) khắc họ (${rV}) → ngũ hành «chế», nhưng bạn là bề trên → ĐÓ CHÍNH LÀ QUYỀN dưỡng dục. Đổi «khắc» thành kỷ luật yêu thương, không phải kiểm soát nặng`;
+              else if (isElder) core = `bạn (${uV}) khắc họ (${rV}) → ngũ hành «khắc», nhưng họ là bề trên — KHÔNG nên «chế». Kính trọng khác biệt + nhường nhịn, khắc chỉ là khác khí chất`;
+              else core = `bạn (${uV}) khắc họ (${rV}) → bạn chế/ap đặt — cần giảm kiểm soát`;
+            }
+            else if (KE[relWx] === userWx) {
+              if (isDescendant) core = `họ (${rV}) khắc bạn (${uV}) → ngũ hành «khắc», nhưng họ là bề dưới (con/cháu) — KHÔNG phải «áp đặt», chỉ là khí chất khác. Bạn là người dẫn dắt, đừng để «khắc» thành cãi vã`;
+              else if (isElder) core = `họ (${rV}) khắc bạn (${uV}) → bề trên khí chất «khắc» → hay nghiêm khắc, đặt kỳ vọng cao. Hiểu đó là cách yêu thương kiểu cũ, đừng phản kháng trực diện`;
+              else core = `họ (${rV}) khắc bạn (${uV}) → họ áp đặt bạn — cần ranh giới rõ`;
+            }
             else core = `cùng hành (${uV}) — tính cách giống, dễ hiểu nhưng dễ cạnh tranh`;
             // Relationship-specific
             let specific = '';
