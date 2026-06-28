@@ -77,6 +77,7 @@ export function deduceFromFamily(subject, members) {
     if (!m || !m.R || !m.role) continue;
     const role = m.role;
     const need = elementForRole(S.chart.dayGan, isMale, role);
+    if (!need || !PALACE_PILLAR[role]) continue; // [loop 627] role không hợp lệ → bỏ qua (không crash)
     const palKey = PALACE_PILLAR[role];
     const pillar = S.chart.pillars[palKey];
     const godsAt = pillarGodsAt(pillar);
@@ -155,8 +156,9 @@ export function deduceFromFamily(subject, members) {
   // Đối chiếu đại vận: cha mẹ vận Hung trùng năm chủ thể nhỏ → ảnh hưởng tuổi thơ
   // (đơn giản: nếu parent có badDy rơi vào khoảng chủ thể 0-15t)
   const subjBirthYear = S.chart.input.year;
+  const validMembers = members.filter((m) => m && m.R && m.role); // [loop 627] guard null/missing-R
   for (const p of parents) {
-    for (const member of members.filter((m) => m.role === p.role)) {
+    for (const member of validMembers.filter((m) => m.role === p.role)) {
       const badInRange = (member.R.dayun || []).filter((d) => {
         if (!/Hung|nghịch/.test(d.rating)) return false;
         const dyYear = d.startYear || (member.R.chart.input.year + d.startAge);
@@ -168,7 +170,7 @@ export function deduceFromFamily(subject, members) {
     }
   }
   // Anh chị em: số lượng + độc lập
-  const sibs = members.filter((m) => m.role === 'sibling');
+  const sibs = validMembers.filter((m) => m.role === 'sibling');
   if (sibs.length) {
     const sibWx = elementForRole(S.chart.dayGan, isMale, 'sibling').wx;
     const sibPct = (S.wx?.score?.[sibWx] || 0) / (S.wx?.total || 1);
@@ -176,7 +178,7 @@ export function deduceFromFamily(subject, members) {
     else holographic.push(`👥 Tỷ/Kiếp nhược → duyên anh chị em mỏng hoặc chủ thể «độc hành» trong nhà.`);
   }
   // Con cái (nếu có)
-  const kids = members.filter((m) => m.role === 'child');
+  const kids = validMembers.filter((m) => m.role === 'child');
   if (kids.length) {
     const childStar = elementForRole(S.chart.dayGan, isMale, 'child');
     const ksh = starHealth(S, childStar.wx);

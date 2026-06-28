@@ -277,6 +277,28 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
   assert(d.disclaimer && /KHÔNG dự đoán/.test(d.disclaimer), `[loop 626] có disclaimer (không dự đoán y tế/sự kiện)`);
   console.log(`   deduceFromFamily ✓ — ${d.relations.length} relation + ${d.holographic.length} holographic; Mẹ→${me.verify}`);
 }
+// [loop 627] ROBUSTNESS — deduceFromFamily không crash với data méo (null/missing-R/role sai).
+//   Bug cũ: null member → holographic .filter crash; role sai → elementForRole undefined crash.
+{
+  const { deduceFromFamily } = await import('./src/engine/family-deduction.js');
+  const S = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const crashCases = [
+    [], [null], [undefined], [{ role: 'mother', label: 'x' }], // missing R
+    [{ role: 'wizard', label: 'x', R: analyze(1970, 6, 27, 7, 15, 'nữ', 2026) }], // bad role
+    [null, { role: 'mother', label: 'm', R: analyze(1970, 6, 27, 7, 15, 'nữ', 2026) }, undefined], // mixed
+  ];
+  for (const fam of crashCases) {
+    let threw = false;
+    try { deduceFromFamily(S, fam); } catch (e) { threw = true; }
+    assert(threw === false, `[loop 627] deduceFromFamily không crash với data méo (${JSON.stringify(fam).slice(0, 40)})`);
+  }
+  // female subject path: 乙木 nữ + child → 食伤 = Hỏa (木 sinh Hỏa)
+  const Sf = analyze(1996, 12, 4, 10, 15, 'nữ', 2026); // 乙木 nữ
+  const df = deduceFromFamily(Sf, [{ role: 'child', label: 'con', R: analyze(2023, 1, 13, 7, 15, 'nam', 2026) }]);
+  const ch = df.relations.find((r) => r.role === 'child');
+  assert(ch && ch.starWx === 'Hỏa', `[loop 627] nữ 乙木 → sao con = 食伤 Hỏa (got ${ch?.starWx})`);
+  console.log(`   deduceFromFamily robust ✓ — 6 case data-méo không crash; nữ 乙木 con=Hỏa ✓`);
+}
 
 // ################## DESTINY CONSENSUS (meta-synthesis đa hệ thống) [loop 561] ##################
 {
