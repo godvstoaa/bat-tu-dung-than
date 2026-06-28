@@ -566,6 +566,47 @@ export function composeAnswer(question, R) {
         };
       } catch (_) {}
     }
+    // [loop 656] SEEDED FAMILY — nếu question hỏi về người thân đã có trong R._family
+    //   (seeded loop 626) → analyze ngay thay vì hỏi lại ngày sinh (offline khi AI fail).
+    if (Array.isArray(R._family) && R._family.length) {
+      const qNorm = (question || '').toLowerCase();
+      const relKw = [
+        { kw: ['mẹ', 'me', 'mom', 'má'], role: 'mother' },
+        { kw: ['bố', 'cha', 'ba', 'dad', 'ông'], role: 'father' },
+        { kw: ['em', 'anh', 'chị', 'chi', 'sister', 'brother'], role: 'sibling' },
+        { kw: ['cháu', 'chau', 'con', 'child'], role: 'child' },
+      ];
+      const matched = relKw.find((r) => r.kw.some((k) => qNorm.includes(k)));
+      const member = matched && R._family.find((f) => (f.role || '').toLowerCase() === matched.role || (matched.kw.some((k) => (f.label || f.relation || '').toLowerCase().includes(k))));
+      if (member && member.date) {
+        try {
+          const [yy, mm, dd] = (member.date || '').split('-').map(Number);
+          const [h] = (member.time || '12:00').split(':').map(Number);
+          const relR = analyze(yy, mm, dd, h || 12, 0, member.gender || 'nam', new Date().getFullYear());
+          const uWx = R.chart.dayMaster.wx, rWx = relR.chart.dayMaster.wx;
+          const SHL = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
+          const KEL = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' };
+          let rel2;
+          if (SHL[uWx] === rWx) rel2 = `bạn (${WX_VI[uWx]}) sinh họ (${WX_VI[rWx]}) → bạn nuôi họ`;
+          else if (SHL[rWx] === uWx) rel2 = `họ (${WX_VI[rWx]}) sinh bạn (${WX_VI[uWx]}) → họ nuôi bạn (Ấn)`;
+          else if (KEL[uWx] === rWx) rel2 = `bạn (${WX_VI[uWx]}) khắc họ (${WX_VI[rWx]})`;
+          else if (KEL[rWx] === uWx) rel2 = `họ (${WX_VI[rWx]}) khắc bạn (${WX_VI[uWx]})`;
+          else rel2 = `cùng hành (${WX_VI[uWx]})`;
+          const relDung = relR.yong.primary;
+          const helpsUser = rWx === R.yong.primary;
+          return {
+            title: `${member.label || member.role} — ngũ hành tương quan`,
+            lead: `${member.label || member.role}: NC ${relR.chart.dayGan} (${WX_VI[rWx]}), Dụng ${WX_VI[relDung]}, điểm ${relR.synthesis?.score}/100. Bạn: ${R.chart.dayGan} (${WX_VI[uWx]}), Dụng ${WX_VI[R.yong.primary]}.`,
+            paragraphs: [
+              `Ngũ hành: ${rel2}.`,
+              helpsUser ? `✓ NC ${member.label || member.role} (${WX_VI[rWx]}) = Dụng của bạn (${WX_VI[R.yong.primary]}) → NGƯỜI NÀY TỐT CHO BẠN.` : `Ngũ hành ${WX_VI[rWx]} không trực tiếp bổ Dụng ${WX_VI[R.yong.primary]} — quan hệ cần nỗ lực vun đắp.`,
+              `💡 Bật AI (⚙) hoặc bấm «📝» trong card Gia Tộc để luận giải đầy đủ (đại vận + lục thân đoán + taisui).`,
+            ],
+            intent,
+          };
+        } catch (_) {}
+      }
+    }
     return {
       title: 'Người thân — cần AI hoặc card Gia Tộc',
       lead: `Bạn hỏi về người thân. Để luân giải chính xác, tôi cần ngày sinh của người đó.`,

@@ -1969,6 +1969,16 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   assert(/Thổ|Tây Nam|hướng/i.test(fs.paragraphs[0] || ''), `[loop 655] fengshui answer có Dụng hướng`);
   console.log(`   NLG fengshui+remedy intent ✓ — «hướng nào» → ${fs.title}; «bớt xui» → ${rm.title}`);
 }
+// [loop 656] NLG offline — câu hỏi gia đình DÙNG seeded R._family (không hỏi lại ngày).
+{
+  const { composeAnswer } = await import('./src/engine/nlg.js');
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  R._family = [{ role: 'mother', label: 'Mẹ Tô Hồng', date: '1970-06-27', time: '07:15', gender: 'nữ' }];
+  const a = composeAnswer('mẹ tôi mệnh thế nào?', R);
+  assert(a.title.includes('Mẹ') && !a.title.includes('cần AI'), `[loop 656] câu «mẹ tôi» dùng seeded family (got ${a.title}, trước «cần ngày sinh»)`);
+  assert(/戊|Thổ/.test(a.lead || ''), `[loop 656] seeded family answer có NC mẹ (戊 Thổ)`);
+  console.log(`   NLG seeded family ✓ — «mẹ tôi» → ${a.title} (dùng R._family, không hỏi lại ngày)`);
+}
 // [loop 644] daily.js (dailyGuidance) + liuri advice — align thang 54/48 (không 65/45 hay 64).
 //   Bug: dailyGuidance dùng 65/45 (thang cũ); liuri advice >=64 nhưng rating Cát >=54 → mâu thuẫn nội bộ.
 {
