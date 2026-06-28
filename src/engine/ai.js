@@ -943,6 +943,8 @@ export function execTool(name, args, R) {
             }).join(' | ');
             return `🌟 Mệnh gốc vất vả (${sc}/100) NHƯNG có vận TỐT: ${phaseAdvice}. Cổ pháp「命好不如運好」— vận Dụng bù mệnh khó.`;
           })(),
+          // [loop 618] hour uncertainty warning — KHÔNG để AI luận chắc khi giờ là default
+          hourWarning: (a.hour == null) ? '⚠ Giờ sinh dùng mặc định 12:00 (Ngọ). Trụ giờ = ~25% lá số → Dụng/điểm CÓ THỂ SAI. Khuyến nghị: tìm giờ sinh thật, hoặc mở app xem card «Quét 12 Giờ» để biết độ nhạy.' : null,
         };
       }
       default:
