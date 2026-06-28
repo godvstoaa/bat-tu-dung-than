@@ -118,8 +118,10 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
   else if (score >= 44) rating = 'Hơi kỵ';
   else rating = 'Hung';
 
-  const advice = score >= 64 ? `Hôm nay (${rating}) — thuận, nên làm việc chính/ký kết/gặp quý nhân.`
-    : score >= 50 ? `Hôm nay (${rating}) — tạm ổn, làm việc thường, tránh quyết định lớn.`
+  // [loop 644 FIX] advice threshold align rating (54/48). Trước đây advice >=64 nhưng rating Cát >=54
+  //   → ngày score 54-63 rating «Cát» nhưng advice «tạm ổn» (mâu thuẫn nội bộ liuri).
+  const advice = score >= 54 ? `Hôm nay (${rating}) — thuận, nên làm việc chính/ký kết/gặp quý nhân.`
+    : score >= 48 ? `Hôm nay (${rating}) — tạm ổn, làm việc thường, tránh quyết định lớn.`
     : `Hôm nay (${rating}) — bất lợi, giữ mình, tránh đầu tư/cho vay/cãi vã/đi xa liều, bao dung tình cảm.`;
 
   const result = { solar: s.toYmd(), ganZhi: dGan + dZhi, ganGod, ganWx, zhiWx, score, rating, schools, advice };

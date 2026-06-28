@@ -81,8 +81,11 @@ export function dailyGuidance(R, yy, mm, dd, hh) {
 
   score = Math.max(10, Math.min(95, Math.round(score)));
   let verdict;
-  if (score >= 65) verdict = `NGÀY CÁT (${score}/100) — nên tiến thủ, quyết định lớn OK.`;
-  else if (score >= 45) verdict = `NGÀY BÌNH (${score}/100) — ổn, làm việc thường OK, việc lớn cân nhắc.`;
+  // [loop 644 FIX] align thang liuri đã recalibrate loop 469→470 (54/48/44). Trước đây 65/45
+  //   (thang cũ) → cùng ngày mâu thuẫn các hệ daily khác (daily-pro/liuri/etc).
+  if (score >= 54) verdict = `NGÀY CÁT (${score}/100) — nên tiến thủ, quyết định lớn OK.`;
+  else if (score >= 48) verdict = `NGÀY BÌNH (${score}/100) — ổn, làm việc thường OK, việc lớn cân nhắc.`;
+  else if (score >= 44) verdict = `NGÀY HƠI KỴ (${score}/100) — cẩn thận, ưu tiên việc thường.`;
   else verdict = `NGÀY HUNG (${score}/100) — thủ giữ, tránh rủi ro, đợi ngày tốt hơn.`;
 
   return {

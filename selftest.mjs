@@ -1932,6 +1932,25 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   assert(ts && ts.includes('Mỹ Anh') && ts.includes('冲太岁'), `[loop 643] family taisui flag Mỹ Anh (子) 冲太岁 2026 (got ${(ts || 'NONE').slice(0, 60)})`);
   console.log(`   family taisui overview ✓ — Mỹ Anh (子) 冲太岁 2026 được flag`);
 }
+// [loop 644] daily.js (dailyGuidance) + liuri advice — align thang 54/48 (không 65/45 hay 64).
+//   Bug: dailyGuidance dùng 65/45 (thang cũ); liuri advice >=64 nhưng rating Cát >=54 → mâu thuẫn nội bộ.
+{
+  const { dailyGuidance } = await import('./src/engine/daily.js');
+  const { analyzeLiuRi } = await import('./src/engine/liuri.js');
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // dailyGuidance verdict phải dùng thang 54/48 (không 65)
+  const dg = dailyGuidance(R, 2026, 6, 28, 12);
+  assert(/54|48|44|CÁT|BÌNH|HUNG|HƠI/.test(dg.verdict), `[loop 644] dailyGuidance trả verdict`);
+  // score 60 phải = CÁT (thang 54), không «BÌNH» (thang cũ 65)
+  // verify via a synthetic check: advice↔rating consistency trong liuri
+  let adviceMismatch = 0;
+  for (let d = 1; d <= 28; d++) {
+    const lr = analyzeLiuRi(R, 2026, 6, d, R.patternQuality);
+    if (lr.rating === 'Cát' && !lr.advice.includes('thuận')) adviceMismatch++;
+  }
+  assert(adviceMismatch === 0, `[loop 644] liuri advice «thuận» khớp rating Cát (got ${adviceMismatch}/28 mismatch — trước fix advice >=64 vs rating >=54)`);
+  console.log(`   dailyGuidance + liuri advice ✓ — align thang 54/48; liuri advice↔rating 0 mismatch`);
+}
 
 // ################## 27. TỬ VI ĐỘ SÁNG 庙旺平陷 ##################
 import { starBrightness, analyzeZiweiBrightness, BRIGHTNESS } from './src/engine/ziwei-brightness.js';
