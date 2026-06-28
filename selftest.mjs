@@ -271,6 +271,20 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
   assert(/áp đặt bạn|ranh giới rõ/.test(peer.advice), `[loop 625] peer (không relation) 克 vẫn «áp đặt — ranh giới» (got: ${peer.advice.split('.')[0]})`);
   console.log(`   analyze_relative advice ✓ — cháu 克 → «dẫn dắt/bề dưới» (không «áp đặt»); peer 克 → «ranh giới» (giữ nguyên)`);
 }
+// [loop 640] analyze_relative phải surface 调候 override qua yongNote (loop 639 fix).
+//   Bug: cháu 辛金 nhược Dụng=Hỏa (调候 override) nhưng tool không giải thích → AI có thể phán «Dụng sai».
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  const Ru = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // cháu 辛金 丑月 → 调候 override Hỏa
+  const ch = execTool('analyze_relative', { relation: 'cháu', year: 2023, month: 1, day: 13, hour: 7, gender: 'nam' }, Ru);
+  assert(ch.yongNote && ch.yongNote.includes('ĐIỀU HẬU'), `[loop 640] cháu (调候 override) có yongNote giải thích (got ${(ch.yongNote||'').slice(0,40)})`);
+  assert(ch.dung === '火', `[loop 640] cháu Dụng = Hỏa (调候)`);
+  // relative không override (sinh tháng không cực đoan) → yongNote null hoặc method note (không «ĐIỀU HẬU override» nhầm)
+  const sib = execTool('analyze_relative', { relation: 'em', year: 2000, month: 4, day: 15, hour: 10, gender: 'nữ' }, Ru); // tháng 4 = 辰 (không cực đoan)
+  assert(!/ĐIỀU HẬU.*override/.test(sib.yongNote || ''), `[loop 640] em sinh tháng không cực đoan → không nhầm override (got ${(sib.yongNote||'null').slice(0,40)})`);
+  console.log(`   analyze_relative yongNote ✓ — cháu override Hỏa có giải thích; em không cực đoan không nhầm`);
+}
 // [loop 626] LỤC THÂN ĐOẠN — deduceFromFamily: suy sâu vận mệnh từ gia đình (六亲断/家庭全息).
 //   Khác family.js (chấm điểm), engine này SUY LUẬN + cross-verify với lá thật người thân.
 {

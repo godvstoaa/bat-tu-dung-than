@@ -898,6 +898,11 @@ export function execTool(name, args, R) {
           relation: a.relation || 'người thân',
           nhatChu: rel.chart.dayGan + ' (' + rel.chart.dayMaster.wx + ')',
           dung: rel.yong.primary, hy: rel.yong.xi, ky: rel.yong.ji,
+          // [loop 640] yongNote — surface 调候 override khi có (vd cháu 辛金 nhược nhưng Dụng=Hỏa do hàn thấp).
+          //   Trước đây AI thấy «Dụng Hỏa cho Kim nhược» không hiểu sao → có thể phán sai. Nay giải thích rõ.
+          yongNote: rel.yong.tiaohou?.override
+            ? `⚠ Dụng ${rel.yong.primary} do ĐIỀU HẬU (调候) override Phù Ức — người này sinh tháng hàn/nóng thiên lệch nên ưu tiên điều hòa khí hậu (${rel.yong.tiaohou?.note || ''}). GIẢI THÍCH khi user hỏi «sao Dụng khắc/sinh khác lạ?», KHÔNG phán «Dụng sai».`
+            : (rel.yong.method && rel.yong.method.some((m) => m.includes('LÀM CHỦ')) ? `Dụng ${rel.yong.primary} theo ${rel.yong.method.filter((m) => m.includes('LÀM CHỦ')).join('; ')}.` : null),
           diemMenh: relSyn.score + '/100 (' + relSyn.gradeVi + ')',
           cachCuc: rel.pattern?.vi || '?',
           vantageNhuoc: rel.strength.strong ? 'vượng' : 'nhược',
