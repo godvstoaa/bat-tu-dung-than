@@ -5769,6 +5769,40 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(dp.date, `[smoke] daily-pro.date exists`);
   console.log(`   Smoke batch 5 ✓ — city-fs + music-therapy + month-calendar + kongwang + daily-pro`);
 }
+
+// ################## SMOKE TEST batch 6: analysis/wealth/romance [loop 578] ##################
+{
+  console.log('\n##### SMOKE batch 6: analysis/wealth/romance [loop 578] #####');
+  const { suiyunCheck } = await import('./src/engine/suiyun.js');
+  const { getPersonalityProfile } = await import('./src/engine/personality-profile.js');
+  const { analyzeWealthStar } = await import('./src/engine/wealth-star.js');
+  const { wealthMonthlyAlert } = await import('./src/engine/wealth-alert.js');
+  const { analyzeStudy } = await import('./src/engine/study-analysis.js');
+  const { analyzeVitality } = await import('./src/engine/vitality.js');
+  const { analyzeRomance } = await import('./src/engine/romance-deep.js');
+  // suiyun: year number
+  const sy = suiyunCheck(spR.chart.pillars.day.gan + spR.chart.pillars.day.zhi, 2026, spR.chart.pillars.year.gan + spR.chart.pillars.year.zhi);
+  assert(typeof sy.year === 'number', `[smoke] suiyun.year number`);
+  // personality-profile: gan string
+  const pp = getPersonalityProfile(spR);
+  assert(typeof pp.gan === 'string', `[smoke] personality-profile.gan string`);
+  // wealth-star: wealthStar string
+  const ws = analyzeWealthStar(spR);
+  assert(typeof ws.wealthStar === 'string', `[smoke] wealth-star.wealthStar string`);
+  // wealth-alert: months array
+  const wa = wealthMonthlyAlert(spR, 2026);
+  assert(Array.isArray(wa.months), `[smoke] wealth-alert.months array`);
+  // study-analysis: sealStar string
+  const st = analyzeStudy(spR);
+  assert(typeof st.sealStar === 'string', `[smoke] study-analysis.sealStar string`);
+  // vitality: baseVitality
+  const vt = analyzeVitality(spR);
+  assert(vt.baseVitality, `[smoke] vitality.baseVitality exists`);
+  // romance-deep: peachBlossom
+  const rm = analyzeRomance(spR);
+  assert(rm.peachBlossom, `[smoke] romance-deep.peachBlossom exists`);
+  console.log(`   Smoke batch 6 ✓ — suiyun + personality + wealth×2 + study + vitality + romance`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
