@@ -152,37 +152,62 @@ export function compassReading(R, input, scanYear) {
 
 // =====================================================================
 //  API 2: bestDirection — quét 24 sơn, recommend hướng tốt nhất cho mục đích
-//    R: analyze() chủ thể; purpose: 'cuakhach'|'banlamviec'|'giuong'|'dongtho'|'khaitruong'
+//    R: analyze() chủ thể; purpose: 'cuakhach'|'banlamviec'|'giuong'|'bep'|'dongtho'|'khaitruong'|'khach'
 // =====================================================================
+// [loop 633] purpose → sao Bát Trạch lý tưởng (cổ pháp 八宅明镜). Trước đây bestDirection
+//   chỉ xếp theo score tổng → có thể recommend Sinh Khí cho giường (sai — giường cần Thiên Y/Phục Vị).
+const PURPOSE_IDEAL_STAR = {
+  cuakhach:   ['Sinh Khí', 'Diên Niên'],   // cửa chính: tài lộc/sinh vượng, nhân duyên
+  banlamviec: ['Sinh Khí'],                // bàn làm việc: tài lộc, sự nghiệp
+  giuong:     ['Thiên Y', 'Phục Vị'],      // giường: sức khoẻ, bình yên
+  bep:        ['Thiên Y', 'Phục Vị'],      // bếp: sức khoẻ gia đình
+  khach:      ['Diên Niên', 'Sinh Khí'],   // phòng khách: nhân duyên, giao tế
+  dongtho:    ['Sinh Khí', 'Diên Niên'],   // động thổ: sinh vượng (nếu sạch sát)
+  khaitruong: ['Sinh Khí', 'Diên Niên'],
+};
+const PURPOSE_VI = {
+  cuakhach: 'cửa chính', banlamviec: 'bàn làm việc', giuong: 'giường ngủ', bep: 'bếp',
+  khach: 'phòng khách', dongtho: 'động thổ', khaitruong: 'khai trương',
+};
 export function bestDirection(R, purpose = 'cuakhach', scanYear) {
   const year = scanYear || new Date().getFullYear();
+  const ideal = PURPOSE_IDEAL_STAR[purpose] || PURPOSE_IDEAL_STAR.cuakhach;
   const all = SHAN_24.map(([han, vi, palace8, trungQuai]) => {
     const rd = compassReading(R, han, year);
     if (rd.error) return null;
     let s = rd.score;
-    // purpose-specific weighting
+    // [loop 633] purpose-specific: matching ideal Bát Trạch star.
+    //   Cổ pháp: đồ NỘI THẤT (giường/bếp/bàn — đặt cố định) theo Bát Trạch NATAL (vĩnh viễn)
+    //   là CHỦ ĐẠO; lưu niên phi tinh (đổi mỗi năm, hóa giải được) là thứ yếu. Nay boost mạnh (+4).
+    //   Cửa chính/động thổ: cân bằng hơn (+2), vì cửa cũng chịu lưu niên nhiều.
+    const isFurniture = ['giuong', 'bep', 'banlamviec', 'khach'].includes(purpose);
+    const btStar = rd.baziTrach?.star || '';
+    const idealHit = ideal.some((st) => btStar.includes(st));
+    if (idealHit) s += isFurniture ? 4 : 2;
+    // purpose-specific weighting (giữ logic cũ)
     if (purpose === 'dongtho' || purpose === 'khaitruong') {
-      // động thổ/khai trương: sát phương năm là TUYỆT ĐỐI → taboo nặng loại ngay
-      if (rd.annualTaboo && rd.annualTaboo.maxSeverity >= 4) s -= 5;
+      if (rd.annualTaboo && rd.annualTaboo.maxSeverity >= 4) s -= 5; // sát phương năm TUYỆT ĐỐI
     }
     if (purpose === 'giuong' || purpose === 'cuakhach') {
-      // giường/cửa: Bát Trạch cá nhân quan trọng nhất
-      if (rd.baziTrach && rd.baziTrach.cat) s += 1;
+      if (rd.baziTrach && rd.baziTrach.cat) s += 1; // Bát Trạch cá nhân quan trọng nhất
     }
-    return { shan: han, vi, palace8, score: s, verdict: rd.verdict, dungMatch: rd.dungMatch, flyingStar: rd.flyingStar?.name };
+    return { shan: han, vi, palace8, score: s, verdict: rd.verdict, dungMatch: rd.dungMatch,
+      flyingStar: rd.flyingStar?.name, baziStar: btStar.replace(/\s*\(.*$/, ''), idealHit };
   }).filter(Boolean);
   all.sort((a, b) => b.score - a.score);
   const top = all[0];
   const worst = all[all.length - 1];
   const top3 = all.slice(0, 3);
-  const clean = all.filter((d) => d.score >= 1);
   return {
-    purpose, year,
-    best: top ? { shan: `${top.shan} (${top.vi})`, palace8: top.palace8, verdict: top.verdict, score: top.score, dung: top.dungMatch, star: top.flyingStar } : null,
-    top3: top3.map((d) => `${d.shan}(${d.vi}, ${d.palace8}, ${d.verdict})`),
+    purpose, year, purposeVi: PURPOSE_VI[purpose] || purpose,
+    idealStars: ideal,
+    best: top ? { shan: `${top.shan} (${top.vi})`, palace8: top.palace8, verdict: top.verdict,
+      score: top.score, dung: top.dungMatch, star: top.flyingStar,
+      baziStar: top.baziStar, idealHit: top.idealHit } : null,
+    top3: top3.map((d) => `${d.shan}(${d.vi}, ${d.palace8}, ${d.baziStar || '?'}, ${d.verdict})`),
     worst: worst ? { shan: `${worst.shan} (${worst.vi})`, palace8: worst.palace8, verdict: worst.verdict } : null,
     summary: top
-      ? `Hướng TỐT NHẤT cho «${purpose}» năm ${year}: ${top.shan} (${top.vi}, hướng ${top.palace8}) — ${top.verdict}${top.dung === 'bổ ĐÚNG Dụng' ? ', bổ Dụng' : ''}. Top 3: ${top3.map((d) => d.shan).join(', ')}. Tránh: ${worst.shan} (${worst.palace8}).`
+      ? `Hướng TỐT NHẤT cho «${PURPOSE_VI[purpose] || purpose}» (cần sao ${ideal.join('/')}): ${top.shan} (${top.vi}, hướng ${top.palace8}, ${top.baziStar || '?'}) — ${top.verdict}${top.idealHit ? ' ★ ĐÚNG sao lý tưởng' : ''}. Top 3: ${top3.map((d) => d.shan).join(', ')}. Tránh: ${worst.shan} (${worst.palace8}).`
       : '(không tính được)',
     note: 'Sơn 24 mỗi sơn 15° — cần la bàn cơ để chính xác; sensor điện thoại sai số 5-15°.',
   };

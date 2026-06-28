@@ -4880,8 +4880,6 @@ function renderFsCompass(R, input) {
   if (rd.error) { el.innerHTML = `<p class="hint">${esc(rd.error)}</p>`; return; }
   const vCls = rd.verdict.includes('CÁT') ? 'rate-cat' : rd.verdict.includes('KỴ') ? 'rate-hung' : 'rate-mid';
   const layersHtml = rd.layers.map((l) => `<div style="margin:3px 0">${esc(l)}</div>`).join('');
-  const bd = bestDirection(R, 'cuakhach');
-  const bd2 = bestDirection(R, 'dongtho');
   el.innerHTML = `
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:6px">
       <div style="font-size:22px;font-family:'Noto Serif SC',serif;color:var(--gold-bright)">${esc(rd.shan.split(' ')[0])}</div>
@@ -4891,10 +4889,12 @@ function renderFsCompass(R, input) {
     <div style="padding:8px 10px;border-left:3px solid var(--gold);background:rgba(247,236,203,0.04);font-size:13px">${layersHtml || '<i>không có tầng đặc biệt</i>'}</div>
     <p style="margin:6px 0 2px"><b>${esc(rd.advice)}</b></p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-      <div style="padding:6px 8px;background:rgba(46,158,91,0.06);border-radius:6px;font-size:12px"><b>🏠 Cửa chính/giường:</b> ${esc(bd.best ? bd.best.shan+' ('+bd.best.palace8+', '+bd.best.verdict+')' : '?')}<br><span class="hint">Top: ${esc((bd.top3||[]).join(', '))}</span></div>
-      <div style="padding:6px 8px;background:rgba(46,158,91,0.06);border-radius:6px;font-size:12px"><b>⛏️ Động thổ/khai trương:</b> ${esc(bd2.best ? bd2.best.shan+' ('+bd2.best.palace8+', '+bd2.best.verdict+')' : '?')}</div>
+      ${[['cuakhach','🏠 Cửa chính'],['giuong','🛏️ Giường ngủ'],['banlamviec','💻 Bàn làm việc'],['bep','🔥 Bếp']].map(([p,label]) => {
+        const b = bestDirection(R, p, rd.year);
+        return `<div style="padding:6px 8px;background:rgba(46,158,91,0.06);border-radius:6px;font-size:12px"><b>${label}</b> <span class="hint">(sao ${(b.idealStars||[]).join('/')})</span><br>${esc(b.best ? b.best.shan+' ('+b.best.palace8+', '+b.best.baziStar+')'+(b.best.idealHit?' ★':'') : '?')}</div>`;
+      }).join('')}
     </div>
-    <p class="hint" style="margin-top:6px;font-size:11px">Mỗi sơn 15° — cần la bàn cơ để chính xác; sensor điện thoại sai 5-15°. Sát phương thay đổi theo năm (Thái Tuế/Tam Sát/Ngũ Hoàng dịch cung).</p>`;
+    <p class="hint" style="margin-top:6px;font-size:11px">Mỗi sơn 15° — cần la bàn cơ để chính xác; sensor điện thoại sai 5-15°. Đồ nội thất (giường/bếp/bàn) theo Bát Trạch natal (vĩnh viễn); động thổ phải tránh sát phương năm.</p>`;
 }
 
 function renderFamilyScore(fam) {

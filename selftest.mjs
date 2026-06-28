@@ -570,6 +570,23 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
   assert(nam.score === -10, `[loop 632] Nam 2026 score đúng = −10 (BátTrạch−2 + TháiTuế−3 + NgũHoàng−5, phi tinh skip)`);
   console.log(`   fengshui-compass robustness ✓ — garbage→null; Ngũ Hoàng no double-penalty (Nam 2026 = ${nam.score})`);
 }
+// [loop 633] bestDirection purpose↔sao Bát Trạch lý tưởng (cổ pháp 八宅明镜).
+//   Đồ nội thất (giường/bếp/bàn) theo Bát Trạch NATAL (vĩnh viễn) → boost mạnh.
+{
+  const { bestDirection } = await import('./src/engine/fengshui-compass.js');
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026); // 兑: Sinh Khí=TB, Thiên Y=TN, Diên Niên=ĐB, Phục Vị=T
+  // giường cần Thiên Y/Phục Vị → best phải ở hướng Thiên Y (TN) hoặc Phục Vị (T), KHÔNG phải Diên Niên (ĐB)
+  const bed = bestDirection(R, 'giuong', 2026);
+  assert(bed.best.idealHit === true, `[loop 633] giường → hướng ĐÚNG sao lý tưởng (Thiên Y/Phục Vị), got ${bed.best.baziStar}`);
+  assert(/Thiên Y|Phục Vị/.test(bed.best.baziStar), `[loop 633] giường best = Thiên Y/Phục Vị (got ${bed.best.baziStar})`);
+  // bàn làm việc cần Sinh Khí → best phải Sinh Khí (Tây Bắc)
+  const desk = bestDirection(R, 'banlamviec', 2026);
+  assert(/Sinh Khí/.test(desk.best.baziStar), `[loop 633] bàn → Sinh Khí (got ${desk.best.baziStar})`);
+  // cửa chính cần Sinh Khí/Diên Niên
+  const door = bestDirection(R, 'cuakhach', 2026);
+  assert(/Sinh Khí|Diên Niên/.test(door.best.baziStar), `[loop 633] cửa → Sinh Khí/Diên Niên (got ${door.best.baziStar})`);
+  console.log(`   bestDirection purpose↔sao ✓ — giường→${bed.best.baziStar}, bàn→${desk.best.baziStar}, cửa→${door.best.baziStar}`);
+}
 
 // ################## [loop 20 NEW] 十二长生运 (đại vận + lưu niên) ##################
 import { dayunChangsheng, liunianChangsheng, stageCategory } from './src/engine/changsheng-deep.js';
