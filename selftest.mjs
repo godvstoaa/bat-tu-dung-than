@@ -529,6 +529,30 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
   assert(lrBad === 0, `[loop 630] lưu nhật rating khớp thang 469→470 (54/48/44/Hung) — ${lrBad} lệch`);
   console.log(`   lưu nguyệt + lưu nhật rating consistency ✓ — khớp liuyue.js/liuri.js loop 469→470`);
 }
+// [loop 631] ĐỊNH VỊ PHONG THỦY — la bàn 24 sơn (Bát Trạch + sát phương + phi tinh)
+{
+  const { compassReading, bestDirection, shanFromDegree } = await import('./src/engine/fengshui-compass.js');
+  // 24 sơn degree conversion — cổ pháp chuẩn
+  const cases = [[0,'子','Bắc'],[90,'卯','Đông'],[180,'午','Nam'],[225,'坤','Tây Nam'],[270,'酉','Tây'],[315,'乾','Tây Bắc'],[45,'艮','Đông Bắc'],[135,'巽','Đông Nam']];
+  let convBad = 0;
+  for (const [deg, expHan, expPal] of cases) {
+    const s = shanFromDegree(deg);
+    if (s.han !== expHan || s.palace8 !== expPal) { convBad++; }
+  }
+  assert(convBad === 0, `[loop 631] 24 sơn degree conversion chuẩn (${convBad} lệch)`);
+  // Quân 兑 Tây Tứ Mệnh — Diên Niên = Đông Bắc → Đông Bắc phải CÁT/ĐẠI CÁT (không sát phương lớn 2026)
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const rd = compassReading(R, '艮'); // Đông Bắc
+  assert(rd.shan && rd.baziTrach && rd.baziTrach.cat, `[loop 631] Quân Đông Bắc = Diên Niên (Bát Trạch cát) (got ${rd.baziTrach?.star})`);
+  assert(['ĐẠI CÁT','CÁT','BÌNH'].includes(rd.verdict), `[loop 631] Quân Đông Bắc không bị phán KỴ (got ${rd.verdict})`);
+  // bestDirection phải trả hướng + verdict hợp lệ
+  const bd = bestDirection(R, 'cuakhach', 2026);
+  assert(bd.best && bd.best.shan && ['ĐẠI CÁT','CÁT'].includes(bd.best.verdict), `[loop 631] bestDirection cửa chính = hướng CÁT (got ${bd.best?.shan} ${bd.best?.verdict})`);
+  // 2026 Ngũ Hoàng tại Chính Nam → hướng Nam phải bị phạt (score giảm)
+  const nam = compassReading(R, 180, 2026); // 午 Nam
+  assert(nam.layers.some((l) => l.includes('Ngũ Hoàng') || l.includes('Nhị Hắc') || l.includes('Sát') || l.includes('Tuế') || l.includes('hung')), `[loop 631] hướng Nam 2026 có tầng sát/hung (Ngũ Hoàng tại Nam)`);
+  console.log(`   fengshui-compass ✓ — 24 sơn chuẩn; Quân Đông Bắc=Diên Niên cát; bestDirection=${bd.best.shan}(${bd.best.verdict})`);
+}
 
 // ################## [loop 20 NEW] 十二长生运 (đại vận + lưu niên) ##################
 import { dayunChangsheng, liunianChangsheng, stageCategory } from './src/engine/changsheng-deep.js';

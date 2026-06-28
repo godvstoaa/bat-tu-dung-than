@@ -63,6 +63,7 @@ import { analyzeMarriageDeep } from './engine/marriage-deep.js';
 import { buildFullProfile } from './engine/partner-profile.js';
 import { analyzeFamily } from './engine/family.js';
 import { deduceFromFamily } from './engine/family-deduction.js'; // [loop 626] 六亲断 — suy sâu vận mệnh từ gia đình
+import { compassReading, bestDirection, shanFromDegree } from './engine/fengshui-compass.js'; // [loop 631] la bàn 24 sơn
 import { radialData, matrixData } from './engine/family-diagram.js';
 import { rectifyHour } from './engine/family-rectify.js';
 import { buildLifeTrajectory } from './engine/life-trajectory.js';
@@ -3582,6 +3583,8 @@ function run() {
   lazyRender('destiny-timeline', () => { try { renderDestinyTimeline(currentResult); } catch (e) { console.warn('timeline', e.message); } });
   lazyRender('noble-cultivate', () => { try { renderNobleCultivate(currentResult); } catch (e) { console.warn('noble', e.message); } });
   lazyRender('fengshui-extra', () => { try { renderFengshuiExtra(currentResult); } catch (e) { console.warn('fsextra', e.message); } });
+  // [loop 631] la bàn 24 sơn — populate select + bind button
+  try { initFsCompass(currentResult); } catch (e) { console.warn('fscompass', e.message); }
   lazyRender('shensha-activation', () => { try { renderShenshaActivation(currentResult); } catch (e) { console.warn('shenshaact', e.message); } });
   lazyRender('personal-fengshui', () => { try { renderPersonalFengShui(currentResult); } catch (e) { console.warn('pfs', e.message); } });
   lazyRender('flying-sihua',     () => { try { renderFlyingSihua(currentResult); } catch (e) { console.warn('flyingsihua', e.message); } });
@@ -4838,6 +4841,60 @@ function renderFamilyDeduction(S, members) {
     ? `<div style="margin-top:10px"><b>🔍 Holographic (suy ngược về chủ thể):</b>${d.holographic.map((h) => `<div style="margin:4px 0;padding:4px 8px;background:rgba(46,158,91,0.06);border-radius:6px">${esc(h)}</div>`).join('')}</div>` : '';
   el.innerHTML = `<p style="margin:0 0 6px"><b>${esc(d.summary)}</b></p>${relHtml}${holoHtml}
     <p class="hint" style="margin-top:8px;font-size:11px">${esc(d.disclaimer)}</p>`;
+}
+
+// ============================================================
+// [loop 631] ĐỊNH VỊ PHONG THỦY — la bàn 24 sơn
+// ============================================================
+const _SHAN_OPTS = [
+  ['子','Tý (Bắc)'],['癸','Quý'],['丑','Sửu'],['艮','Cấn (Đông Bắc)'],['寅','Dần'],['甲','Giáp'],['卯','Mão (Đông)'],['乙','Ất'],
+  ['辰','Thìn'],['巽','Tốn (Đông Nam)'],['巳','Tỵ'],['丙','Bính'],['午','Ngọ (Nam)'],['丁','Đinh'],['未','Mùi'],['坤','Khôn (Tây Nam)'],
+  ['申','Thân'],['庚','Canh'],['酉','Đoài (Tây)'],['辛','Tân'],['戌','Tuất'],['乾','Càn (Tây Bắc)'],['亥','Hợi'],['壬','Nhâm'],
+];
+function initFsCompass(R) {
+  const sel = $('fs-compass-sel'); if (!sel) return;
+  if (!sel.dataset.populated) {
+    sel.innerHTML = _SHAN_OPTS.map(([h, v]) => `<option value="${h}">${h} ${v}</option>`).join('');
+    sel.dataset.populated = '1';
+    sel.value = '子';
+  }
+  const btn = $('fs-compass-btn');
+  if (btn && !btn.dataset.bound) {
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      if (!currentResult) { $('fs-compass-out').innerHTML = '<p class="hint">Nhập ngày sinh (form chính) rồi luận giải trước.</p>'; return; }
+      const deg = parseFloat($('fs-compass-deg').value);
+      const input = Number.isFinite(deg) ? deg : sel.value;
+      renderFsCompass(currentResult, input);
+    });
+  }
+  // auto-render mặc định lần đầu
+  if (R && !$('fs-compass-out').dataset.rendered) {
+    $('fs-compass-out').dataset.rendered = '1';
+    renderFsCompass(R, sel.value || '子');
+  }
+}
+function renderFsCompass(R, input) {
+  const el = $('fs-compass-out'); if (!el) return;
+  const rd = compassReading(R, input);
+  if (rd.error) { el.innerHTML = `<p class="hint">${esc(rd.error)}</p>`; return; }
+  const vCls = rd.verdict.includes('CÁT') ? 'rate-cat' : rd.verdict.includes('KỴ') ? 'rate-hung' : 'rate-mid';
+  const layersHtml = rd.layers.map((l) => `<div style="margin:3px 0">${esc(l)}</div>`).join('');
+  const bd = bestDirection(R, 'cuakhach');
+  const bd2 = bestDirection(R, 'dongtho');
+  el.innerHTML = `
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:6px">
+      <div style="font-size:22px;font-family:'Noto Serif SC',serif;color:var(--gold-bright)">${esc(rd.shan.split(' ')[0])}</div>
+      <div><b>${esc(rd.shan)}</b> · hướng <b>${esc(rd.palace8)}</b> · ngũ hành <b>${esc(rd.dirWx)}</b> · năm ${rd.year}</div>
+      <span class="ln-rate ${vCls}">${esc(rd.verdict)}</span>
+    </div>
+    <div style="padding:8px 10px;border-left:3px solid var(--gold);background:rgba(247,236,203,0.04);font-size:13px">${layersHtml || '<i>không có tầng đặc biệt</i>'}</div>
+    <p style="margin:6px 0 2px"><b>${esc(rd.advice)}</b></p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <div style="padding:6px 8px;background:rgba(46,158,91,0.06);border-radius:6px;font-size:12px"><b>🏠 Cửa chính/giường:</b> ${esc(bd.best ? bd.best.shan+' ('+bd.best.palace8+', '+bd.best.verdict+')' : '?')}<br><span class="hint">Top: ${esc((bd.top3||[]).join(', '))}</span></div>
+      <div style="padding:6px 8px;background:rgba(46,158,91,0.06);border-radius:6px;font-size:12px"><b>⛏️ Động thổ/khai trương:</b> ${esc(bd2.best ? bd2.best.shan+' ('+bd2.best.palace8+', '+bd2.best.verdict+')' : '?')}</div>
+    </div>
+    <p class="hint" style="margin-top:6px;font-size:11px">Mỗi sơn 15° — cần la bàn cơ để chính xác; sensor điện thoại sai 5-15°. Sát phương thay đổi theo năm (Thái Tuế/Tam Sát/Ngũ Hoàng dịch cung).</p>`;
 }
 
 function renderFamilyScore(fam) {
