@@ -5824,6 +5824,12 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   const tt = teaTherapy(spR);
   assert(typeof tt.dungTea === 'string', `[smoke] tea-therapy.dungTea string`);
   console.log(`   Smoke batch 7 ✓ — taiyuan + ziwei-stars + sleep-fs + tea-therapy`);
+  // [loop 581] flying-sihua needs ziwei pan (not R) — test với computeZiwei
+  const { flyingSihua } = await import('./src/engine/flying-sihua.js');
+  const _z = computeZiwei(spR.chart.input.year, spR.chart.input.month, spR.chart.input.day, spR.chart.input.hour, spR.chart.input.minute, spR.chart.input.gender);
+  const _fs = flyingSihua(_z);
+  assert(_fs && _fs.fromMing, `[smoke] flying-sihua(z).fromMing exists (cần ziwei pan, không phải R)`);
+  console.log(`   flying-sihua ✓ — cần z (ziwei pan), trả fromMing/fromWealth/fromCareer/fromSpouse`);
 }
 
 // ################## META: brief content completeness [loop 580] ##################
