@@ -74,8 +74,11 @@ export function classifyChartLevel(R) {
   else if (_effPass >= 2) { level = '常格'; levelVi = 'Thường Cách (bình dân/Trung hạ — no ấm, cần nỗ lực)'; }
   else { level = '下格'; levelVi = 'Hạ Cách (bần tiện — nhiều trở ngại, cần cải vận mạnh)'; }
 
-  const note = `Mệnh cách: ${levelVi}. ${passCount}/6 tiêu chí cổ pháp đạt. ` +
-    `${passCount >= 4 ? 'Mệnh có nền tốt — nên phát huy thế mạnh.' : passCount >= 2 ? 'Mệnh trung bình — cần nỗ lực + cải vận.' : 'Mệnh nhiều khó — cải vận + tích đức là then chốt.'}`;
+  // [loop 675] capNote — làm rõ khi bậc bị cap thấp hơn passCount thô
+  const capped = _effPass < passCount;
+  const note = `Mệnh cách: ${levelVi}. ${_effPass}/6 tiêu chí cổ pháp đạt (thực tế).` +
+    `${capped ? ` (cap: điểm mệnh ${synthesis?.score ?? '?'}/100 thấp → bậc giới hạn — structural ${passCount}/6 nhưng vận hạn kéo xuống)` : ''} ` +
+    `${_effPass >= 4 ? 'Mệnh có nền tốt — nên phát huy thế mạnh.' : _effPass >= 2 ? 'Mệnh trung bình — cần nỗ lực + cải vận.' : 'Mệnh nhiều khó — cải vận + tích đức là then chốt.'}`;
 
-  return { level, levelVi, criteria, passCount, note };
+  return { level, levelVi, criteria, passCount: _effPass, rawPassCount: passCount, capped, note };
 }
