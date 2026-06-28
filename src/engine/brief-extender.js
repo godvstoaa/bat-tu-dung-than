@@ -530,7 +530,9 @@ export function extendBrief(R) {
     const _dung = R.yong?.primary;
     const _dungAct = { 木: 'màu xanh, hướng Đông, cây cối', 火: 'màu đỏ, hướng Nam, ánh sáng', 土: 'màu vàng, hướng Tây Nam, gốm đá', 金: 'màu trắng, hướng Tây, kim loại', 水: 'màu đen, hướng Bắc, nước' }[_dung] || '';
     if (_dungAct) _actions.push(`Bổ Dụng ${_dung}: ${_dungAct} + tránh hành khắc`);
-    if (_actions.length) parts.push(`🎯 HÀNH ĐỘNG ƯU TIÊN (${_curYear}): ${_actions.map((a, i) => `${['①','②','③','④'][i] || '•'} ${a}`).join(' ')}.`);
+    // (4) tài khố — nếu CÓ kho → khuyên tích luỹ; nếu KHÔNG → khuyên kiểm soát chi
+    try { const ck = analyzeCaiKu(R); if (ck.hasTaiku && !ck.opens.length) _actions.push(`Có TÀI KHỐ (yên) → nên tích luỹ/gửi tiết kiệm/mua BĐS, tránh chi lớn phi cần`); else if (!ck.hasTaiku) _actions.push(`KHÔNG tài khố → tiền dễ chảy, cần kỷ luật tài chính + gửi tiết kiệm ngay`); } catch (_) {}
+    if (_actions.length) parts.push(`🎯 HÀNH ĐỘNG ƯU TIÊN (${_curYear}): ${_actions.map((a, i) => `${['①','②','③','④','⑤'][i] || '•'} ${a}`).join(' ')}.`);
   } catch (_) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';
