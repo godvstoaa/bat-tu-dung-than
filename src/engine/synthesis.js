@@ -169,6 +169,15 @@ export function synthesize(R) {
       ? 'Khuyên dùng: giữ vững hướng Dụng/Hỷ Thần (màu/phương/ngành nghề), đón lưu niên/đại vận mang hành Dụng để tiến thủ.'
       : 'Khuyên dùng: tránh Kỵ/仇 Thần, chủ động bổ sung Dụng Thần; đổi vận nhờ lưu niên/đại vận mang hành Dụng (xem mục Lưu Niên).',
   ];
+  // [loop 590] SILVER LINING — mệnh điểm thấp nhưng đại vận TỐT → thêm hy vọng
+  //   Cổ pháp「命好不如運好」: mệnh gốc kém nhưng gặp vận Dụng → vẫn phát đạt.
+  if (score < 41 && Array.isArray(dayun) && dayun.length) {
+    const goodDy = dayun.filter((d) => d.rating === 'Đại cát' || d.rating === 'Cát').slice(0, 2);
+    if (goodDy.length) {
+      const dyTxt = goodDy.map((d) => `${d.ganZhi} (${d.startAge}–${d.startAge + 9}t)`).join(', ');
+      paragraphs.push(`🌟 TIA SÁNG: tuy mệnh gốc vất vả, nhưng đại vận sắp tới ${dyTxt} mang hành Dụng/Hỷ → đây là thời điểm VÀNG để bứt phá. Cổ pháp「命好不如運好」— vận tốt sẽ bù đắp mệnh khó. Hãy chuẩn bị sức khoẻ + kỹ năng từ nay để nắm bắt.`);
+    }
+  }
   if (qualityLines.length) paragraphs.splice(2, 0, qualityLines[0]);
 
   // --- 格局大运喜忌 (子平真詮 ch.10-11): vận nào 格局-thuận / 格局-nghịch nhất ---
