@@ -4696,6 +4696,14 @@ $('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run(); }
 $('ask-btn').addEventListener('click', handleAsk);
 $('question').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAsk(); });
 $('ai-settings-btn').addEventListener('click', openModal);
+// [loop 658] clear-chat button — reset hội thoại mà không đổi lá số
+$('ai-chat-clear').addEventListener('click', () => {
+  chatHistory = [];
+  try { localStorage.removeItem('bazi-chat'); } catch (_) {}
+  const log = $('chat-log'); if (log) log.innerHTML = '';
+  _skipChatReset = true; // tránh reset thêm khi render
+  try { const st = $('ai-status'); if (st) st.textContent = '🔄 Đã bắt đầu hội thoại mới.'; } catch (_) {}
+});
 $('cfg-cancel').addEventListener('click', closeModal);
 $('cfg-save').addEventListener('click', saveModal);
 $('ai-modal').addEventListener('click', (e) => { if (e.target.id === 'ai-modal') closeModal(); });
