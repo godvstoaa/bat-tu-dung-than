@@ -5615,6 +5615,12 @@ function renderQuickSummary() {
     const ln = (c.liunian || []).find((l) => l.isNow);
     const dyNy = dy ? ganZhiNayin(dy.ganZhi) : null; // [loop 361] nạp âm đại vận
     curDyTxt = dy ? `Đại vận <b>${hanviet(dy.ganZhi)}</b> (${dy.startAge}–${dy.startAge + 9}t, ${dy.zhiGod ? TEN_GOD_VI[dy.zhiGod] + ' vận, ' : ''}${dyNy ? dyNy + ', ' : ''}${dy.rating})${ln ? ` · Lưu niên ${hanviet(ln.ganZhi)} (${ln.gan ? TEN_GOD_VI[tenGod(c.chart.dayGan, ln.gan)] + ' năm, ' : ''}${ln.rating})` : ''}` : '(không rõ)';
+    // [loop 645] ĐỈNH VẬN emphasis — khi đại vận hiện tại Đại cát, thêm alert hành động (rất quan trọng user dễ miss)
+    if (dy && dy.rating === 'Đại cát') {
+      curDyTxt = `⭐ <b>ĐỈNH VẬN</b> — đang ở giai đoạn <b>Đại cát</b> (${dy.startAge}–${dy.startAge + 9}t), nên tận dụng tiến thủ lớn (mua nhà, khởi nghiệp, quyết định quan trọng). ${curDyTxt}`;
+    } else if (dy && /Hung|nghịch|Kỵ/.test(dy.rating)) {
+      curDyTxt = `⚠ Đại vận <b>${dy.rating}</b> (${dy.startAge}–${dy.startAge + 9}t) — giữ ổn định, tránh rủi ro lớn, đợi vận better. ${curDyTxt}`;
+    }
     // [loop 350] Lưu nguyệt hiện tại (tháng này) — lightweight qua Solar, hoàn thiện bức tranh «đại vận·lưu niên·lưu nguyệt»
     try {
       const ml = Solar.fromDate(new Date()).getLunar();
