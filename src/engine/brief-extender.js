@@ -244,6 +244,12 @@ export function extendBrief(R) {
     const ban = (R.interactions && R.interactions.banHe) || [];
     if (ban.length) parts.push(`BÁN HỢP 半合 (2/3 tam hợp cục — phân strength): ${ban.map((b) => `${b.present.join('')} thiếu ${b.missing}(${b.missingRole}) = ${b.banType} [${b.strength}] — ${b.banNote}`).join(' | ')}`);
   } catch (e) {}
+  // [loop 752 ELEVATION] LỤC HỢP 六合 合化/合绊 — hóa (đổi ngũ hành) vs 绊 (dính, không hóa).
+  try {
+    const he = (R.interactions && R.interactions.zhiHe) || [];
+    const wm = he.filter((h) => h.heType);
+    if (wm.length) parts.push(`LỤC HỢP 六合 (合化 vs 合绊): ${wm.map((h) => `${h.a}+${h.b}→${h.hua} ${h.heType} (${h.at}) — ${h.huaNote}`).join(' | ')}`);
+  } catch (e) {}
 
   // Ẩn hợp
   try {

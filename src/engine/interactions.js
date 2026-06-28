@@ -138,7 +138,7 @@ const _HAI_LOOKUP = (() => {
 //  HÀM PHÁT HIỆN TƯƠNG TÁC TRONG LÁ SỐ
 //  Quét tất cả cặp Địa Chi & cặp Thiên Can giữa 4 trụ (Năm/Tháng/Ngày/Giờ).
 // ============================================================================
-import { GAN } from './constants.js';
+import { GAN, ZHI } from './constants.js';
 
 function pairs(arr) {
   const out = [];
@@ -173,10 +173,25 @@ export function detectInteractions(pillars) {
   }
 
   // --- Lục hợp nhị chi ---
+  // [loop 752 ELEVATION] 合化 vs 合绊 — cổ pháp phân biệt: hợp ĐỦ điều kiện → «合 hóa» (2 chi
+  //   hòa vào hành hóa → đổi ngũ hành cục); KHÔNG đủ → «合绊» (2 chi DÍNH nhau, giảm lực độc lập,
+  //   kéo/kìm nhau). Điều kiện chính «得时»: tháng chi bản khí == hành hóa; hoặc «化神 có根»
+  //   (hành hóa xuất hiện ở trụ khác). Trước đây chỉ note hành hóa, không phân loại.
+  const _monthWx = ZHI[pillars.month.zhi] && ZHI[pillars.month.zhi].wx;
   const zhiHe = [];
   for (const [a, b, i, j] of pairs(zhis)) {
     const hua = ZHI_LIUHE_MAP[a + b];
-    if (hua) zhiHe.push({ a, b, hua, at: `${POS_LABEL[i]}–${POS_LABEL[j]}` });
+    if (!hua) continue;
+    const _genCount = zhis.filter((z, idx) => idx !== i && idx !== j && ZHI[z] && ZHI[z].wx === hua).length;
+    const _deShi = _monthWx === hua;
+    const _huaReal = _deShi || _genCount >= 1;
+    zhiHe.push({
+      a, b, hua, heType: _huaReal ? '合化' : '合绊',
+      huaNote: _huaReal
+        ? `«合化» — 2 chi HÒA VÀO hành ${hua} (${_deShi ? 'đắc lệnh tháng' : 'hóa thần có根'}) → ĐỔI ngũ hành cục (coi 2 chi = hành ${hua})`
+        : `«合绊» — 2 chi DÍNH nhau (không đắc lệnh) → giảm lực độc lập, kéo/kìm nhau (KHÔNG hóa)`,
+      at: `${POS_LABEL[i]}–${POS_LABEL[j]}`,
+    });
   }
 
   // --- Tam hợp / Tam hội (cần đủ 3 chi) ---
