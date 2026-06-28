@@ -637,9 +637,9 @@ export const AI_TOOLS = [
     name: 'find_good_days', description: 'Tìm N ngày CÁT nhất (vận cá nhân) trong khoảng kể từ 1 ngày. Dùng khi hỏi "sắp tới ngày nào tốt".',
     parameters: { type: 'object', properties: {
       start: { type: 'string', description: 'Ngày bắt đầu YYYY-MM-DD' },
-      count: { type: 'integer', description: 'Số ngày quét, vd 30' },
+      count: { type: 'integer', description: 'Số ngày quét (bỏ trống=30)' },
       topN: { type: 'integer', description: 'Số ngày tốt cần lấy, vd 5' },
-    }, required: ['start', 'count'] },
+    }, required: ['start'] },
   } },
   { type: 'function', function: {
     // [loop 21] BÁT TỰ NGƯỢC — tìm lá số điểm CAO/THẤP nhất (hoặc gần target). Nguyên lý:
