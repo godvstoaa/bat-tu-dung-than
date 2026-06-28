@@ -917,6 +917,14 @@ export function execTool(name, args, R) {
             else if (/v[oợ]|ch[oồ]ng|wife|husband/.test(rel2)) specific = ' Vợ/chồng: quan hệ quan trọng nhất — ngũ hành tương quan ảnh hưởng trực tiếp hôn nhân.';
             return `${core}.${specific}`;
           })(),
+          // [loop 612] silver lining cho low-score relative — KHÔNG để AI nói «mệnh thấp» không khích lệ
+          silverLining: (() => {
+            const sc = relSyn.score;
+            if (sc >= 41) return null; // chỉ cho low-score
+            const goodDy = (rel.dayun || []).filter((d) => d.rating === 'Đại cát' || d.rating === 'Cát').slice(0, 2);
+            if (!goodDy.length) return null;
+            return `🌟 Mệnh gốc vất vả (${sc}/100) NHƯNG đại vận sắp tới ${goodDy.map((d) => d.ganZhi + '(' + d.startAge + '-' + (d.startAge+9) + 't)').join(', ')} mang hành Dụng/Hỷ → đây là thời điểm VÀNG để bứt phá. Cổ pháp「命好不如運好」.`;
+          })(),
         };
       }
       default:
