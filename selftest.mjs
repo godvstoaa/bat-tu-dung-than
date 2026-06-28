@@ -6639,5 +6639,23 @@ console.log('='.repeat(70));
   assert(_ok === 17, `[loop 708] 17/17 tools pass smoke test (got ${_ok}/17)`);
   console.log(`   17-TOOL SMOKE ✓ — ${_ok}/17 tools trả data với valid params`);
 }
+// [loop 741] analyze_year / best_days_in_year — year RANGE validation.
+//   Trước đây chỉ Number.isFinite → năm -100 (TCN) / 9999 được luận tự tin gây hiểu nhầm.
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  const _R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _eNeg = execTool('analyze_year', { year: -100 }, _R);
+  assert(_eNeg.error && /ngoài khoảng hợp lệ|1000-3000/.test(_eNeg.error), `[loop 741] analyze_year -100 → reject (got ${_eNeg.error})`);
+  const _eBig = execTool('analyze_year', { year: 9999 }, _R);
+  assert(_eBig.error && /1000-3000/.test(_eBig.error), `[loop 741] analyze_year 9999 → reject`);
+  const _eBd = execTool('best_days_in_year', { year: 9999 }, _R);
+  assert(_eBd.error && /1000-3000/.test(_eBd.error), `[loop 741] best_days_in_year 9999 → reject`);
+  // năm hợp lệ (historical + hiện tại) vẫn OK
+  const _ok1 = execTool('analyze_year', { year: 1840 }, _R);
+  assert(!_ok1.error && _ok1.rating, '[loop 741] analyze_year 1840 (historical) → OK (range generous)');
+  const _ok2 = execTool('analyze_year', { year: 2026 }, _R);
+  assert(!_ok2.error && _ok2.rating, '[loop 741] analyze_year 2026 → OK');
+  console.log('   [loop 741] analyze_year/best_days_in_year year-range (1000-3000) ✓ — reject -100/9999, OK historical/hiện tại');
+}
 process.exit(FAILS === 0 ? 0 : 1);
 

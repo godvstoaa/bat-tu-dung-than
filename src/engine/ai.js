@@ -755,12 +755,19 @@ export function execTool(name, args, R) {
         return { date: d.solar, ganZhi: d.ganZhi, ganGod: d.ganGod, rating: d.rating, score: d.score, advice: _s(d.advice, 240), gejuDelta: d.gejuDelta, gejuNote: d.gejuNote ? _s(d.gejuNote, 200) : '', interactions: (d.ctx || []) };
       }
       case 'analyze_year': {
-        if (!Number.isFinite(Number(a.year))) return { error: `Năm không hợp lệ («${a.year}») — nhập số năm (vd 2026).` };
+        // [loop 741 FIX] year range — trước đây chỉ Number.isFinite → năm -100 (TCN) / 9999
+        //   được luận tự tin («Năm -100 (Cát)») gây hiểu nhầm. Range 1000-3000: generous cho
+        //   historical figures + future planning, reject absurd (typo).
+        const _yr = Number(a.year);
+        if (!Number.isFinite(_yr)) return { error: `Năm không hợp lệ («${a.year}») — nhập số năm (vd 2026).` };
+        if (_yr < 1000 || _yr > 3000) return { error: `Năm «${a.year}» ngoài khoảng hợp lệ (1000-3000) — có thể gõ nhầm. Nhập năm dương lịch thực (vd 2026).` };
         const y = analyzeLiunianDeep(R, a.year, R.patternQuality?.patternYong);
         return { year: y.year, ganZhi: y.ganZhi, rating: y.rating, score: y.score, advice: _s(y.advice, 260), schools: y.schools.map((sc) => ({ school: sc.phai, delta: sc.d, note: _s(sc.note, 110) })) };
       }
       case 'best_days_in_year': {
-        if (!Number.isFinite(Number(a.year))) return { error: `Năm không hợp lệ («${a.year}») — nhập số năm (vd 2026).` };
+        const _yr2 = Number(a.year);
+        if (!Number.isFinite(_yr2)) return { error: `Năm không hợp lệ («${a.year}») — nhập số năm (vd 2026).` };
+        if (_yr2 < 1000 || _yr2 > 3000) return { error: `Năm «${a.year}» ngoài khoảng hợp lệ (1000-3000) — có thể gõ nhầm. Nhập năm dương lịch thực (vd 2026).` };
         const Y = computeYearDaily(R, a.year, R.patternQuality);
         return { year: Y.year, best: Y.best.slice(0, 8).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })), worst: Y.worst.slice(0, 5).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })) };
       }
