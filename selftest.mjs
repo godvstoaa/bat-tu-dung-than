@@ -5803,6 +5803,28 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(rm.peachBlossom, `[smoke] romance-deep.peachBlossom exists`);
   console.log(`   Smoke batch 6 ✓ — suiyun + personality + wealth×2 + study + vitality + romance`);
 }
+
+// ################## SMOKE TEST batch 7: utility/analysis [loop 579] ##################
+{
+  console.log('\n##### SMOKE batch 7: utility/analysis [loop 579] #####');
+  const { taiYuan } = await import('./src/engine/taiyuan.js');
+  const { interpretZiweiStars } = await import('./src/engine/ziwei-stars.js');
+  const { sleepOptimization } = await import('./src/engine/sleep-fs.js');
+  const { teaTherapy } = await import('./src/engine/tea-therapy.js');
+  // taiyuan: ganZhi string
+  const ty = taiYuan(spR);
+  assert(typeof ty.ganZhi === 'string', `[smoke] taiyuan.ganZhi string`);
+  // ziwei-stars: returns array (star interpretations)
+  const zs = interpretZiweiStars(spR);
+  assert(zs != null, `[smoke] ziwei-stars trả result`);
+  // sleep-fs: headDir string
+  const sl = sleepOptimization(spR);
+  assert(sl.headDir, `[smoke] sleep-fs.headDir exists`);
+  // tea-therapy: dungTea string
+  const tt = teaTherapy(spR);
+  assert(typeof tt.dungTea === 'string', `[smoke] tea-therapy.dungTea string`);
+  console.log(`   Smoke batch 7 ✓ — taiyuan + ziwei-stars + sleep-fs + tea-therapy`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
