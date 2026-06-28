@@ -26,6 +26,7 @@ import { analyzeWxFlow } from './wx-flow.js';
 import { analyze } from './chart.js'; // [loop 626] family deduction cần analyze() người thân
 import { deduceFromFamily } from './family-deduction.js'; // [loop 626] 六亲断 — suy sâu từ gia đình
 import { personalTaSui } from './taisui.js'; // [loop 671] 3 hành động — check taisui
+import { changSheng } from './core.js'; // [loop 709] 12 trường sinh context
 import { classifyChartLevel } from './chart-level.js';
 import { baziMingGong } from './bazi-minggong.js';
 import { analyzeChildrenStar } from './children-star.js';
@@ -352,7 +353,6 @@ export function extendBrief(R) {
     if (kwDayun.length) parts.push(`ĐẠI VẬN KHÔNG VONG: ${kwDayun.map((d) => d.ganZhi + '[' + d.startAge + 't] ' + d._kwNote).join(' | ')}`);
     // [loop 709] 12 trường sinh CONTEXT cho đại vận hiện tại — AI biết user đang ở «giai đoạn đời» nào
     try {
-      const { changSheng } = await import('./core.js');
       const _age = new Date().getFullYear() - R.chart.input.year;
       const _curDy = (R.dayun || []).find((d) => _age >= d.startAge && _age < d.startAge + 10);
       const _nextDy = (R.dayun || []).find((d) => d.startAge === _curDy?.startAge + 10);
