@@ -46,6 +46,7 @@ import { guiguziFDG } from './guiguzi-fdg.js';
 import { hexagramSynthesis } from './hexagram-synthesis.js';
 import { synthesize } from './synthesis.js';
 import { scanHours } from './hour-scan.js';
+import { analyzeRomance } from './romance-deep.js';
 import { computeLiuDao } from './liudao.js';
 import { destinyConsensus } from './destiny-consensus.js';
 import { dayNayinPersonality } from './nayin-personality.js';
@@ -280,6 +281,21 @@ export function extendBrief(R) {
   try {
     const sp = analyzeSpouseStar(R);
     parts.push(`PHỐI NGÃU: ${sp.spouseStar}(${sp.spouseWxVi}) ${sp.strength} | Dụng=${sp.isYong} Kỵ=${sp.isJi} | cung ${sp.palaceZhiVi} ${sp.palaceStable ? 'yên' : 'xung'}${sp.interactions.length ? ' | ' + sp.interactions.join(';') : ''}`);
+  } catch (e) {}
+
+  // [loop 601] TÌNH DUYÊN SÂU — đào hoa + hồng diễm + duyên score + timing
+  try {
+    const rm = analyzeRomance(R);
+    if (rm) {
+      let line = `TÌNH DUYÊN SÂU: đào hoa ${rm.peachBlossom}(${rm.peachByDay || '?'} by day)`;
+      if (rm.redAttraction) line += ` | hồng diễm ${rm.redAttraction}`;
+      if (rm.spouseStrength) line += ` | phối ngẫu lực ${rm.spouseStrength}`;
+      line += ` | duyên score ${rm.romanceScore ?? '?'}`;
+      if (rm.palaceStable === false) line += ` | cung phối ngẫu BỊ XUNG — hôn nhân biến động`;
+      if (rm.warnings && rm.warnings.length) line += ` | ⚠ ${rm.warnings.slice(0, 2).join('; ')}`;
+      if (rm.timingYears && rm.timingYears.length) line += ` | năm duyên: ${rm.timingYears.slice(0, 3).join(', ')}`;
+      parts.push(line);
+    }
   } catch (e) {}
 
   // Tài tinh
