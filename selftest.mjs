@@ -210,7 +210,7 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
 //   Trước đây 5 tool bói (analyze_char/meihua/liuren/qimen/guiguzi) FLAT → Z.ai API reject → AI không bao giờ gọi được.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 16, `[loop 623] AI_TOOLS có đúng 16 tool (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 17, `[loop 623→638] AI_TOOLS có đúng 17 tool (got ${AI_TOOLS.length})`);
   const flat = AI_TOOLS.filter((t) => !(t && t.type === 'function' && t.function && t.function.name));
   assert(flat.length === 0, `[loop 623] KHÔNG còn tool FLAT — tất cả phải có wrapper {type:function,function:{name}} (còn ${flat.length} flat: ${flat.map(t=>t&&t.name).join(',')})`);
   const names = AI_TOOLS.map((t) => t.function.name);
@@ -238,6 +238,22 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
   assert(g.system1 && g.system1.nayinVi, `[loop 623] analyze_guiguzi trả system1 nạp âm (got ${JSON.stringify(g).slice(0,80)})`);
   assert(g.system2 && g.system2.geMing, `[loop 623] analyze_guiguzi trả system2 分定經 格名`);
   console.log(`   analyze_guiguzi ✓ — 2 hệ Quỷ Cốc (${g.system1.nayinVi} + 格「${g.system2.geMing}」), 0 tool orphan`);
+}
+// [loop 638] fengshui_direction tool — AI chọn hướng theo cổ pháp (recommend + read)
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  const Ru = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // recommend cửa chính
+  const rec = execTool('fengshui_direction', { mode: 'recommend', purpose: 'cuakhach' }, Ru);
+  assert(rec.mode === 'recommend' && rec.best && rec.best.shan, `[loop 638] fengshui_direction recommend trả best hướng (got ${rec.best?.shan})`);
+  assert(/Sinh Khí|Diên Niên|Thiên Y|Phục Vị/.test(rec.best.baziStar), `[loop 638] recommend best = sao Bát Trạch cát (got ${rec.best.baziStar})`);
+  // read 1 hướng
+  const rd = execTool('fengshui_direction', { mode: 'read', direction: '艮' }, Ru);
+  assert(rd.mode === 'read' && rd.shan && rd.verdict, `[loop 638] fengshui_direction read luận 1 hướng (got ${rd.shan} ${rd.verdict})`);
+  // invalid direction
+  const bad = execTool('fengshui_direction', { mode: 'read', direction: 'XYZ' }, Ru);
+  assert(bad.error, `[loop 638] hướng không hợp lệ → error VN`);
+  console.log(`   fengshui_direction ✓ — recommend cửa=${rec.best.shan}(${rec.best.baziStar}); read 艮=${rd.verdict}`);
 }
 // [loop 625 FIX] analyze_relative advice phải nhận thức THẾ HỆ — «khắc» không phán sai vai trò.
 //   Bug cũ: cháu 3 tuổi (thân Kim khắc user Mộc) bị advice «họ áp đặt bạn — cần ranh giới» (sai vai trò xã hội).

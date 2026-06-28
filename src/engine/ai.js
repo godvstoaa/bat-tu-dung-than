@@ -35,6 +35,8 @@ import { analyzeKu } from './ku.js';
 import { computeZiwei } from './ziwei.js';
 import { guiguziFortune } from './guiguzi.js'; // [loop 623] analyze_guiguzi tool — trước đây tool KHÔNG có case → AI gọi nhận error
 import { guiguziFDG } from './guiguzi-fdg.js'; // [loop 623] 分定經 两头钳
+import { compassReading, bestDirection } from './fengshui-compass.js'; // [loop 638] la bàn 24 sơn
+import { bestGraveDirectionDeep, graveDirectionDeep } from './yinzhai-deep.js'; // [loop 638] Âm Trạch
 import { ziweiCoreReading } from './ziwei-sanfang.js';
 import { analyzeZiweiBrightness } from './ziwei-brightness.js';
 import { analyzeShuangXing } from './ziwei-shuangxing.js';
@@ -710,6 +712,15 @@ export const AI_TOOLS = [
       relation: { type: 'string', description: 'Moi quan he: me/bo/em/anh/chau/con ( tuy chon )' },
     }, required: ['year', 'month', 'day', 'gender'] },
   } },
+  // [loop 638] FENGSHUI DIRECTION — la bàn 24 sơn, AI chọn hướng theo cổ pháp
+  { type: 'function', function: {
+    name: 'fengshui_direction', description: '[loop 638] La bàn phong thủy 24 sơn — luận hướng CÁT/HUNG (Bát Trạch + sát phương năm Thái Tuế/Tam Sát/Ngũ Hoàng + phi tinh) HOẶC recommend hướng tốt nhất cho mục đích (cửa chính/giường/bàn/bếp/động thổ). Dùng khi user hỏi «hướng nào tốt», «hướng cửa/giường/bếp», «hướng động thổ», «định vị phong thủy».',
+    parameters: { type: 'object', properties: {
+      mode: { type: 'string', enum: ['recommend', 'read'], description: 'recommend = tìm hướng tốt nhất cho purpose; read = luận 1 hướng cụ thể' },
+      purpose: { type: 'string', enum: ['cuakhach', 'giuong', 'banlamviec', 'bep', 'dongtho', 'khaitruong', 'khach'], description: 'mục đích (mode=recommend). cuakhach=cửa chính, giuong=giường ngủ, banlamviec=bàn, bep=bếp, dongtho/khaitruong=động thổ' },
+      direction: { type: 'string', description: 'hướng cần luận (mode=read): tên sơn Hán (vd 子,坤) hoặc độ 0-359 hoặc palace (vd Bắc,Tây Nam)' },
+    }, required: ['mode'] },
+  } },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -983,6 +994,26 @@ export function execTool(name, args, R) {
           note: 'Quỷ Cốc Tử = hệ cổ phái (鬼谷子). Hệ nạp âm (system1) luận tone cát hung; 分定經 两头钳 (system2) ghép năm×giờ → quẻ + 格诗 luận mệnh.',
         };
       }
+      case 'fengshui_direction': { // [loop 638] la bàn 24 sơn — recommend hoặc read 1 hướng
+        if (a.mode === 'recommend') {
+          const bd = bestDirection(R, a.purpose || 'cuakhach', new Date().getFullYear());
+          return {
+            mode: 'recommend', purpose: bd.purposeVi, year: bd.year, idealStars: bd.idealStars,
+            best: bd.best ? { shan: bd.best.shan, palace: bd.best.palace8, baziStar: bd.best.baziStar, verdict: bd.best.verdict, dung: bd.best.dung } : null,
+            top3: bd.top3, worst: bd.worst ? { shan: bd.worst.shan, palace: bd.worst.palace8 } : null,
+            summary: bd.summary,
+          };
+        }
+        // mode = read: luận 1 hướng cụ thể
+        const rd = compassReading(R, a.direction || '子', new Date().getFullYear());
+        if (rd.error) return { error: rd.error };
+        return {
+          mode: 'read', shan: rd.shan, palace8: rd.palace8, dirWx: rd.dirWx, year: rd.year,
+          baziTrach: rd.baziTrach?.star, verdict: rd.verdict, advice: rd.advice,
+          layers: (rd.layers || []).slice(0, 5),
+          summary: rd.summary,
+        };
+      }
       default:
         return { error: 'tool không hỗ trợ: ' + name };
     }
@@ -999,7 +1030,7 @@ function toolLabel(name) {
     find_good_days: 'Tìm ngày tốt', analyze_best_hour: 'Tìm giờ tốt', analyze_partner: 'Luận hợp hôn',
     inverse_bazi: 'Tìm bát tự ngược', analyze_char: '测字 (châm tự)', analyze_meihua: 'Gieo quẻ梅花',
     analyze_liuren: 'Đại lục nhâm', analyze_qimen: 'Kỳ môn độn giáp', analyze_guiguzi: 'Quỷ cốc tử',
-    analyze_relative: 'Phân tích người thân',
+    analyze_relative: 'Phân tích người thân', fengshui_direction: 'La bàn phong thủy',
   })[name] || name;
 }
 
@@ -1025,7 +1056,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history } = {
   const brief = (_briefCache && _briefCache.key === _ck) ? _briefCache.brief : (_briefCache = { key: _ck, brief: buildChartBrief(R) }).brief;
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'system', content: brief + '\n\n== TOOLS (FUNCTION CALLING) ==\nBạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_month, best_days_in_year, find_good_days, analyze_best_hour, analyze_partner, life_trajectory, inverse_bazi, analyze_char (测字), analyze_meihua (梅花易数), analyze_liuren (六壬), analyze_qimen (奇门), analyze_guiguzi (鬼谷), analyze_relative (người thân) (16 tools). QUY TAC: (1) bat cu khi khuen ngay/thang cu the -> PHAI goi best_days_in_year/find_good_days/analyze_day de lay NGAY THAT (dung bia "thang 10"); (2) cau ve 1 nam -> goi analyze_year; (3) ca doi -> life_trajectory; (4) thang nay -> analyze_month + get_current_time; (5) hoi "lam sao bớt xui / ngay nao tot" -> goi find_good_days hoac best_days_in_year de dua ngay cat gan nhat + ngay ky can tranh; (6) KHI USER KHANG ĐỊNH tình trạng ("toi do/xui/may/te") -> BAT BUOC goi analyze_month + analyze_year de KIEM CHỨNG có ĐÚNG không, rồi xác nhận hoặc phản biện; (7) [loop 21/230] KHI USER HỎI NGƯỢC "bát tự điểm CAO/THẤP nhất", "muốn đẻ con mệnh tốt nhất thì sinh khi nào", "tìm lá số đạt điểm X" -> goi inverse_bazi (mode=max/min/target). [loop 230] KHI USER MUỐN CON CÓ DỤNG THẦN CỤ THỂ ("muốn con Dụng Thủy/Mộc/Hỏa", "đẻ con mệnh Mộc") -> goi inverse_bazi (mode=yong, targetYong=木/火/土/金/水) — trả về lá số có Dụng đúng hành + ngày thụ thai; (8) [loop 181] giờ nào tốt hôm nay / giờ ký kết / giờ khai trương -> goi analyze_best_hour; (9) [loop 181] hợp tuổi/hợp hôn/hợp làm ăn (cần ngày sinh đối tác) -> goi analyze_partner; (10) [loop 572] KHI USER HỎI bói quẻ/gieo quẻ/梅花/六壬/奇门/鬼谷/测字 -> goi tool tương ứng (analyze_meihua/liuren/qimen/guiguzi/char); (11) [loop 606→614] KHI USER HỎI ve ME/BO/EM/ANH/CHAU/CON «the nao» -> KIEM TRA brief section «GIA ĐÌNH» co ngay sinh khong. NEU CO -> goi analyze_relative ngay (KHONG hoi lai). NEU KHONG co -> hoi user ngay sinh.' },
+    { role: 'system', content: brief + '\n\n== TOOLS (FUNCTION CALLING) ==\nBạn có thể gọi: get_current_time, analyze_day, analyze_year, analyze_month, best_days_in_year, find_good_days, analyze_best_hour, analyze_partner, life_trajectory, inverse_bazi, analyze_char (测字), analyze_meihua (梅花易数), analyze_liuren (六壬), analyze_qimen (奇门), analyze_guiguzi (鬼谷), analyze_relative (người thân), fengshui_direction (la bàn phong thủy) (17 tools). QUY TAC: (1) bat cu khi khuen ngay/thang cu the -> PHAI goi best_days_in_year/find_good_days/analyze_day de lay NGAY THAT (dung bia "thang 10"); (2) cau ve 1 nam -> goi analyze_year; (3) ca doi -> life_trajectory; (4) thang nay -> analyze_month + get_current_time; (5) hoi "lam sao bớt xui / ngay nao tot" -> goi find_good_days hoac best_days_in_year de dua ngay cat gan nhat + ngay ky can tranh; (6) KHI USER KHANG ĐỊNH tình trạng ("toi do/xui/may/te") -> BAT BUOC goi analyze_month + analyze_year de KIEM CHỨNG có ĐÚNG không, rồi xác nhận hoặc phản biện; (7) [loop 21/230] KHI USER HỎI NGƯỢC "bát tự điểm CAO/THẤP nhất", "muốn đẻ con mệnh tốt nhất thì sinh khi nào", "tìm lá số đạt điểm X" -> goi inverse_bazi (mode=max/min/target). [loop 230] KHI USER MUỐN CON CÓ DỤNG THẦN CỤ THỂ ("muốn con Dụng Thủy/Mộc/Hỏa", "đẻ con mệnh Mộc") -> goi inverse_bazi (mode=yong, targetYong=木/火/土/金/水) — trả về lá số có Dụng đúng hành + ngày thụ thai; (8) [loop 181] giờ nào tốt hôm nay / giờ ký kết / giờ khai trương -> goi analyze_best_hour; (9) [loop 181] hợp tuổi/hợp hôn/hợp làm ăn (cần ngày sinh đối tác) -> goi analyze_partner; (10) [loop 572] KHI USER HỎI bói quẻ/gieo quẻ/梅花/六壬/奇门/鬼谷/测字 -> goi tool tương ứng (analyze_meihua/liuren/qimen/guiguzi/char); (11) [loop 606→614] KHI USER HỎI ve ME/BO/EM/ANH/CHAU/CON «the nao» -> KIEM TRA brief section «GIA ĐÌNH» co ngay sinh khong. NEU CO -> goi analyze_relative ngay (KHONG hoi lai). NEU KHONG co -> hoi user ngay sinh. (12) [loop 638] KHI USER HỎI hướng nào tốt / hướng cửa/giường/bếp/bàn / hướng động thổ / định vị phong thủy -> goi fengshui_direction (mode=recommend, purpose=cuakhach/giuong/banlamviec/bep/dongtho). Tra huong tot nhat + sao Bat Trach + verdict.' },
     ...((history || []).slice(-8)),
     { role: 'user', content: question },
   ];
