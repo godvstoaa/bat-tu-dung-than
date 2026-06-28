@@ -5876,6 +5876,32 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   console.log(`   Smoke batch 9 ✓ — dayun-god (${dg.items.length} phases) + brief-extender (${br.length} chars)`);
 }
 
+// ################## SMOKE TEST batch 10: final active modules [loop 584] ##################
+{
+  console.log('\n##### SMOKE batch 10: wedding/shensha/nayin/move/xingshen [loop 584] #####');
+  const { evaluateWeddingDate } = await import('./src/engine/wedding-date.js');
+  const { checkNatalActivation } = await import('./src/engine/shensha-activation.js');
+  const { nayinRelations } = await import('./src/engine/nayin-relation.js');
+  const { evaluateMoveDate } = await import('./src/engine/move-fs.js');
+  const { xingshenZuo } = await import('./src/engine/xingshen-zuo.js');
+  // wedding-date: date + ganZhi
+  const wd = evaluateWeddingDate(2026, 6, 28, '午', '子');
+  assert(wd.date && wd.ganZhi, `[smoke] wedding-date.date + ganZhi`);
+  // shensha-activation: activations array
+  const sa = checkNatalActivation(spR, 3);
+  assert(Array.isArray(sa.activations), `[smoke] shensha-activation.activations array`);
+  // nayin-relation: dayNayin
+  const nr = nayinRelations(spR.chart);
+  assert(nr.dayNayin, `[smoke] nayin-relation.dayNayin`);
+  // move-fs: date + ganZhi
+  const mv = evaluateMoveDate(2026, 6, 28, '午', 1990, 'nam');
+  assert(mv.date && mv.ganZhi, `[smoke] move-fs.date + ganZhi`);
+  // xingshen-zuo: items
+  const xs = xingshenZuo(spR.chart);
+  assert(xs.items, `[smoke] xingshen-zuo.items`);
+  console.log(`   Smoke batch 10 ✓ — wedding + shensha-activation + nayin-relation + move + xingshen`);
+}
+
 // ################## META: brief content completeness [loop 580] ##################
 // [loop 580] brief là context chính cho AI — phải chứa TẤT CẢ section quan trọng.
 //   Nếu brief vỡ section nào (do refactor/dependency change), test này bắt được.
