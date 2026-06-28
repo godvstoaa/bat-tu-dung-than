@@ -5174,7 +5174,7 @@ function runJinkoujue() {
       return;
     }
   } catch (e) {
-    $('jinkoujue').innerHTML = '<p class="hint" style="color:var(--gold)">' + e.message + '</p>';
+    $('jinkoujue').innerHTML = '<p class="hint" style="color:var(--gold)">' + esc(e.message) + '</p>';
     return;
   }
   $('jinkoujue').innerHTML = renderJinkoujueCard(r);
@@ -5188,7 +5188,7 @@ function runTaiyi() {
   if (mEl && mEl.value) { const mn = parseInt(mEl.value, 10); if (mn >= 1 && mn <= 12) m = mn; }
   let r;
   try { r = taiyi(y, m); }
-  catch (e) { $('taiyi').innerHTML = '<p class="hint" style="color:var(--gold)">' + e.message + '</p>'; return; }
+  catch (e) { $('taiyi').innerHTML = '<p class="hint" style="color:var(--gold)">' + esc(e.message) + '</p>'; return; }
   const g = r.taiyiGongInfo;
   const luckCls = r.luck === 'Cát' ? 'rate-cat' : r.luck === 'Hung' ? 'rate-hung' : 'rate-mid';
   const favorCls = r.favor.startsWith('主') ? 'rate-mid' : 'rate-cat';
@@ -5684,7 +5684,7 @@ function renderZiweiFull() {
   const stars = interpretZiweiStars(z);
   const starsHtml = stars.map(s => '<div class="zw-star ' + (s.inMingGong ? 'ming' : '') + ' ' + s.tone + '"><b>' + esc(s.star) + '</b> (' + esc(s.vi) + ') @' + esc(s.branch) + (s.inMingGong ? ' ★ Mệnh' : '') + '<div class="zw-sn">' + esc(s.nature) + '</div></div>').join('');
   // 六吉六煞
-  const aux = computeAuxStars(z.birth.yearGan, z.birth.yearZhi || '酉', z.birth.lunarMonth, z.birth.timeZhi);
+  const aux = computeAuxStars(z.birth.yearGan, currentResult.chart.pillars.year.zhi, z.birth.lunarMonth, z.birth.timeZhi); // [loop 569 FIX] dùng R.chart.pillars.year.zhi (z.birth.yearZhi KHÔNG tồn tại → fallback '酉' SAI cho mọi non-酉 năm sinh)
   const auxHtml = Object.entries(aux).map(([k,v]) => '<span class="zw-aux ' + v.tone + '">' + esc(k) + ' (' + esc(v.vi) + ') @' + esc(v.branch) + '</span>').join(' ');
   // 孤辰寡宿 etc
   const ms = computeMarriageShensha(currentResult.chart);
