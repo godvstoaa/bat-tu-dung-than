@@ -6432,6 +6432,17 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(missing === 0, `[meta] brief chứa đủ 10 section quan trọng (thiếu ${missing})`);
   console.log(`   Brief completeness ✓ — 10/10 section quan trọng có mặt (${brief.length} chars)`);
 }
+
+// [loop 688] 四化 SIHUA surfaced trong brief (loop 687 fix — trước đây COMPUTED nhưng KHÔNG surface)
+{
+  const { buildChartBrief } = await import('./src/engine/ai.js');
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const brief = buildChartBrief(R);
+  assert(brief.includes('四化 SIHUA'), `[loop 688] brief surface 四化 SIHUA`);
+  assert(/化禄.*破军|破军.*化禄/.test(brief), `[loop 688] 癸 year → 破军化禄`);
+  assert(/化忌.*贪狼|贪狼.*化忌/.test(brief), `[loop 688] 癸 year → 贪狼化忌`);
+  console.log(`   四化 SIHUA surfaced ✓ — 破军禄 + 贪狼忌 trong brief`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
@@ -6441,3 +6452,4 @@ if (FAILS === 0) {
 console.log('='.repeat(70));
 
 process.exit(FAILS === 0 ? 0 : 1);
+
