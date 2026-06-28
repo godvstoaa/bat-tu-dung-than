@@ -587,6 +587,24 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
   assert(/Sinh Khí|Diên Niên/.test(door.best.baziStar), `[loop 633] cửa → Sinh Khí/Diên Niên (got ${door.best.baziStar})`);
   console.log(`   bestDirection purpose↔sao ✓ — giường→${bed.best.baziStar}, bàn→${desk.best.baziStar}, cửa→${door.best.baziStar}`);
 }
+// [loop 634] ÂM TRẠCH SÂU — Huyền Không Đại Quái phối hợp + sat năm cho hạ huyệt
+{
+  const { graveDirectionDeep, bestGraveDirectionDeep } = await import('./src/engine/yinzhai-deep.js');
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // hướng 午 (Nam) 2026: Đại Quái Cát NHƯNG Nam = Ngũ Hoàng → phải ĐẠI KỴ (năm)
+  const g = graveDirectionDeep('午', R, 2026);
+  assert(g.dagua && g.dagua.rating === 'Cát', `[loop 634] hướng 午 Đại Quái = Cát (got ${g.dagua?.rating})`);
+  assert(g.maxSeverity >= 5 && g.verdict.includes('KỴ'), `[loop 634] hướng 午 2026 = Ngũ Hoàng → ĐẠI KỴ năm (got ${g.verdict}, sev ${g.maxSeverity})`);
+  assert(g.taboos.some((t) => t.at.includes('hướng') && t.type === 'Ngũ Hoàng'), `[loop 634] taboos có Ngũ Hoàng ở hướng`);
+  // best phải là hướng sạch sat (maxSev=0)
+  const bd = bestGraveDirectionDeep(R, 2026);
+  assert(bd.best && bd.best.face, `[loop 634] bestGraveDirectionDeep trả hướng (got ${bd.best?.face})`);
+  assert(bd.cleanCount > 0 && bd.cleanCount <= 24, `[loop 634] cleanCount hợp lệ (got ${bd.cleanCount})`);
+  // toạ = đối cung 180° của hướng
+  const opp = g.sit; // toạ của hướng 午(idx13) = 子(idx1)? 13→1 (13+12=25%24=1). ✓
+  assert(opp === '子', `[loop 634] toạ của hướng 午 = 子 (đối cung 180°) (got ${opp})`);
+  console.log(`   yinzhai-deep ✓ — Đại Quái phối hợp + sat năm; hướng 午 2026 = ĐẠI KỴ (Ngũ Hoàng); best=${bd.best.sit}⇔${bd.best.face}${bd.best.faceVi}`);
+}
 
 // ################## [loop 20 NEW] 十二长生运 (đại vận + lưu niên) ##################
 import { dayunChangsheng, liunianChangsheng, stageCategory } from './src/engine/changsheng-deep.js';

@@ -64,6 +64,7 @@ import { buildFullProfile } from './engine/partner-profile.js';
 import { analyzeFamily } from './engine/family.js';
 import { deduceFromFamily } from './engine/family-deduction.js'; // [loop 626] 六亲断 — suy sâu vận mệnh từ gia đình
 import { compassReading, bestDirection, shanFromDegree } from './engine/fengshui-compass.js'; // [loop 631] la bàn 24 sơn
+import { bestGraveDirectionDeep } from './engine/yinzhai-deep.js'; // [loop 634] Âm Trạch (mộ)
 import { radialData, matrixData } from './engine/family-diagram.js';
 import { rectifyHour } from './engine/family-rectify.js';
 import { buildLifeTrajectory } from './engine/life-trajectory.js';
@@ -4894,7 +4895,10 @@ function renderFsCompass(R, input) {
         return `<div style="padding:6px 8px;background:rgba(46,158,91,0.06);border-radius:6px;font-size:12px"><b>${label}</b> <span class="hint">(sao ${(b.idealStars||[]).join('/')})</span><br>${esc(b.best ? b.best.shan+' ('+b.best.palace8+', '+b.best.baziStar+')'+(b.best.idealHit?' ★':'') : '?')}</div>`;
       }).join('')}
     </div>
-    <p class="hint" style="margin-top:6px;font-size:11px">Mỗi sơn 15° — cần la bàn cơ để chính xác; sensor điện thoại sai 5-15°. Đồ nội thất (giường/bếp/bàn) theo Bát Trạch natal (vĩnh viễn); động thổ phải tránh sát phương năm.</p>`;
+    <p class="hint" style="margin-top:6px;font-size:11px">Mỗi sơn 15° — cần la bàn cơ để chính xác; sensor điện thoại sai 5-15°. Đồ nội thất (giường/bếp/bàn) theo Bát Trạch natal (vĩnh viễn); động thổ phải tránh sát phương năm.</p>
+    <details style="margin-top:6px"><summary class="hint" style="cursor:pointer">🪦 Âm Trạch (hướng mộ — Huyền Không Đại Quái + sat năm hạ huyệt) [loop 634]</summary>
+    ${(() => { const gd = bestGraveDirectionDeep(R, rd.year); return `<div style="padding:6px 8px;background:rgba(212,175,55,0.05);border-radius:6px;font-size:12px;margin-top:4px"><b>Hướng mộ tốt nhất ${gd.year}:</b> toạ ${esc(gd.best?.sit||'?')} ⇔ hướng ${esc(gd.best?.face||'?')} ${esc(gd.best?.faceVi||'')} (${esc(gd.best?.palace||'')}) — Đại Quái ${esc(gd.best?.dgRating||'')}, <b>${esc(gd.best?.verdict||'')}</b>. ${esc(gd.cleanCount)}/24 sơn năm nay sạch sat (hạ huyệt được).<br><span class="hint">⚠ ${esc(gd.disclaimer)}</span></div>`; })()}
+    </details>`;
 }
 
 function renderFamilyScore(fam) {
