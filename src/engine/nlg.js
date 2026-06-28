@@ -81,7 +81,8 @@ export function detectIntent(question) {
   const t = question.toLowerCase();
   const norm = t.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D'); // [loop 674] bỏ dấu + đ→d (đ là codepoint đơn, NFD không tách → regex lệch)
   const years = (question.match(/(19|20)\d{2}/g) || []).map(Number);
-  const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|nam nay|nam sau|bao gio)\b/.test(norm) || years.length > 0;
+  // [loop 717 FIX] thêm «tháng này» (thang nay), «hôm nay» (hom nay), «hôm qua», «tuần này»
+  const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|nam nay|nam sau|thang nay|hom nay|hom qua|tuan nay|tuan sau|thang sau)\b/.test(norm) || years.length > 0;
   const isYesNo = /\b(co nen|co duoc khong|nen khong|duoc khong|co tot khong|co xau khong|co the|lieu co)\b/.test(norm);
   // [loop 674 FIX] isCompat exclude số/tên/màu/đá — «số hợp không», «tên hợp không»
   //   là number/name analysis, KHÔNG phải chart compat (trước đây misroute → compat).
