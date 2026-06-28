@@ -4782,6 +4782,7 @@ function renderFamilyForm() {
       `<label class="fam-g"><input type="radio" name="fam-g-${i}" value="nam" data-i="${i}" data-k="gender" ${m.gender==='nam'?'checked':''}> Nam</label>`,
       `<label class="fam-g"><input type="radio" name="fam-g-${i}" value="nu"  data-i="${i}" data-k="gender" ${m.gender!=='nam'?'checked':''}> Nữ</label>`,
       `<label class="fam-unk"><input type="checkbox" data-i="${i}" data-k="hourUnknown" ${m.hourUnknown?'checked':''}> giờ chưa rõ</label>`,
+      `<button type="button" class="fam-view btn-ghost" data-i="${i}" title="Xem lá số đầy đủ của người này">📝</button>`,
       `<button type="button" class="fam-del btn-ghost" data-i="${i}">✕</button>`,
       '</div>',
     ].join('');
@@ -4900,6 +4901,17 @@ function rectifyFamily(fam, members) {
 $('fam-add').addEventListener('click', () => { familyMembers.push({ role:'father', label:'', date:'', time:'', gender:'nam', hourUnknown:false }); renderFamilyForm(); saveFamily(); });
 $('family-members').addEventListener('click', (e) => {
   if (e.target.classList.contains('fam-del')) { familyMembers.splice(+e.target.dataset.i, 1); renderFamilyForm(); saveFamily(); }
+  // [loop 615] «📝 Xem lá số» — load family member into main form + analyze
+  if (e.target.classList.contains('fam-view')) {
+    const m = familyMembers[+e.target.dataset.i];
+    if (!m || !m.date) return;
+    $('date').value = m.date;
+    $('time').value = m.time || '12:00';
+    const gr = document.querySelector(`input[name="gender"][value="${m.gender}"]`);
+    if (gr) gr.checked = true;
+    $('birth-form').dispatchEvent(new Event('submit'));
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 });
 $('family-members').addEventListener('change', (e) => {
   const t = e.target; if (t.dataset.i == null) return;
