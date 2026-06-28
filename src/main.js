@@ -5677,7 +5677,7 @@ function renderQuickSummary() {
     } catch (e) {}
   } catch (e) {}
   const rows = [
-    { icon: '🧬', label: 'Mệnh bạn', text: (() => { let t = `${pattern.vi || '?'}, thân ${c.strength?.strong ? 'vượng (mạnh)' : 'nhược (yếu)'}. <b>Điểm tổng mệnh: ${syn.score ?? '?'}/100 (${syn.gradeVi ?? '?'})${syn.percentile ? ' · top ' + syn.percentile + '%' : ''}</b>`; try { const lv = classifyChartLevel(c); if (lv.levelVi) t += ` · <b style="color:var(--gold-bright)">${lv.levelVi}</b>`; } catch (e) {} return t + '.'; })() },
+    { icon: '🧬', label: 'Mệnh bạn', text: (() => { let t = `${pattern.vi || '?'}, thân ${c.strength?.strong ? 'vượng (mạnh)' : 'nhược (yếu)'}. <b>Điểm tổng mệnh: ${syn.score ?? '?'}/100 (${syn.gradeVi ?? '?'})${syn.percentile ? ' · cao hơn ' + syn.percentile + '% lá số' : ''}</b>`; try { const lv = classifyChartLevel(c); if (lv.levelVi) t += ` · <b style="color:var(--gold-bright)">${lv.levelVi}</b>`; } catch (e) {} return t + '.'; })() },
     { icon: '💊', label: 'Hành cần bổ', text: `Dụng Thần = <b>${dungVi}</b>. Bổ qua ${dungAction}.${yong.tiaohou?.override ? ' ⚠ 调候 LÀM CHỦ (sinh mùa cực đoan).' : ''}` },
     { icon: (() => { const _yl = c.yuanliu; return _yl?.fullCycle ? '🌊' : (_yl && _yl.flowLen <= 1 ? '🚧' : '💧'); })(), label: 'Dòng khí 源流', text: (() => { const _yl = c.yuanliu; if (!_yl) return '(đang tính)'; return `${_yl.verdict}. Quy về <b>${_yl.aspectKey}</b> (${_yl.aspectVi}).${_yl.fullCycle ? ' Ngũ hành流通 tuần hoàn — phú quý bền.' : (_yl.gap ? ` Tắc ${WX_VI[_yl.gap] || _yl.gap}, đợi vận «mở dòng».` : '')}`; })() },
     { icon: '🛤️', label: 'Vận hiện tại', text: curDyTxt },

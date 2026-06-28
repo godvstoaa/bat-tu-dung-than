@@ -166,7 +166,7 @@ export function extendBrief(R) {
       const syn = synthesize(R);
       if (syn) {
         let line = `TỔNG LUẬN MỆNH: ${syn.score}/100 (${syn.gradeVi}`;
-        if (syn.percentile) line += `, top ${syn.percentile}%`;
+        if (syn.percentile) line += `, cao hơn ${syn.percentile}% lá số`;
         line += `). Xu hướng: ${syn.fortuneVi}.`;
         const silver = (syn.paragraphs || []).find((p) => p.includes('TIA SÁNG'));
         if (silver) line += ' ' + silver.slice(0, 200);
