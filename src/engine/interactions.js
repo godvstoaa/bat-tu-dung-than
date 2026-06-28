@@ -86,6 +86,14 @@ export const ZHI_XING_PAIRS = [
   { pair: ['丑', '未'], name: 'Thế thế chi hình', vi: 'Hình thế thế' },
 ];
 export const ZHI_XING_SELF = ['辰', '午', '酉', '亥'];
+// [loop 746 ELEVATION] Ý nghĩa cụ thể mỗi loại tam hình (cổ pháp — trước đây chỉ show nhãn,
+//   không giải thích hậu quả → user/AI không biết «vô ân» khác gì «tự hình»).
+export const XING_MEANING = {
+  'Vô ân chi hình': '«恩将仇报»: dễ quên ơn/phản bội ân nhân, khẩu thiệt quan phi, dễ tai nạn xe cộ. Đủ 3 chi 寅巳申 đồng hiện = «pháp hình» NẶNG nhất (quan tụng, họa đến thân).',
+  'Thế thế chi hình': '«恃势»: Ỷ thế lực hiếp người, huynh đệ bất hòa, kiêu ngạo sinh thù, dễ cãi vã tranh giành nội bộ/gia đạo.',
+  'Vô lễ chi hình': '«无礼»: Vô lễ với trưởng bối, lộng quyền, vấn đề luân lý/hôn nhân — đặc biệt Nguyệt-Nhật phạm = khắc cha mẹ/bậc trên.',
+  'Tự hình': '«自刑»: Tự trừng phạt, hoài nghi/khó tha thứ bản thân, trầm cảm, dễ tự hủy; nội xung đột kéo dài (đặc biệt trụ lặp).',
+};
 
 // ---- LỤC HẠI (六害/穿) ----
 export const ZHI_HAI = ['子未', '丑午', '寅巳', '卯辰', '申亥', '酉戌'];
@@ -168,14 +176,19 @@ export function detectInteractions(pillars) {
   for (const [a, b, i, j] of pairs(zhis)) {
     const hit = ZHI_XING_PAIRS.find((p) =>
       (p.pair[0] === a && p.pair[1] === b) || (p.pair[0] === b && p.pair[1] === a));
-    if (hit) xing.push({ a, b, name: hit.name, vi: hit.vi, at: `${POS_LABEL[i]}–${POS_LABEL[j]}` });
+    if (hit) xing.push({ a, b, name: hit.name, vi: hit.vi, meaning: XING_MEANING[hit.name], at: `${POS_LABEL[i]}–${POS_LABEL[j]}` });
+  }
+  // [loop 746] Vô ân chi hình «pháp hình»: đủ 3 chi 寅巳申 đồng hiện = NẶNG nhất (quan tụng).
+  const _zset = new Set(zhis);
+  if (['寅', '巳', '申'].every((z) => _zset.has(z))) {
+    xing.push({ a: '寅巳申', b: '(đủ 3)', name: 'Vô ân chi hình (pháp hình)', vi: 'Pháp hình', meaning: XING_MEANING['Vô ân chi hình'], at: 'Tam hình trọn bộ', heavy: true });
   }
   // Tự hình: cùng một chi xuất hiện ≥2 lần
   const zCount = {};
   zhis.forEach((z, idx) => { (zCount[z] = zCount[z] || []).push(idx); });
   for (const [z, idxs] of Object.entries(zCount)) {
     if (idxs.length >= 2 && ZHI_XING_SELF.includes(z)) {
-      xing.push({ a: z, b: z, name: 'Tự hình', vi: 'Hình tự', at: idxs.map((i) => POS_LABEL[i]).join('–') });
+      xing.push({ a: z, b: z, name: 'Tự hình', vi: 'Hình tự', meaning: XING_MEANING['Tự hình'], at: idxs.map((i) => POS_LABEL[i]).join('–') });
     }
   }
 

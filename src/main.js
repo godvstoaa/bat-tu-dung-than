@@ -586,7 +586,7 @@ function renderInteractions(R) {
   // [loop 332] 半合 (bán cục) — 2/3 chi tam hợp, chờ chi «missing» đến trong vận thì thành cục đầy đủ
   const ban = (it.banHe || []).map((s) => `${(s.present || []).join('')}… thiếu ${s.missing}→${s.wx} (${s.name})`);
   const chong = it.chong.map((c) => `${c.a}↔${c.b}`);
-  const xing = it.xing.map((c) => `${c.a}${c.a === c.b ? '' : '–' + c.b} (${c.vi})`);
+  const xing = it.xing.map((c) => `${c.a}${c.a === c.b ? '' : '–' + c.b} (${c.vi}${c.heavy ? ' ⚖NẶNG' : ''})`);
   const hai = it.hai.map((c) => `${c.a}–${c.b}`);
   const any = san.length || ban.length || ganHe.length || ganChong.length || zhiHe.length || chong.length || xing.length || hai.length;
   $('interactions').innerHTML =

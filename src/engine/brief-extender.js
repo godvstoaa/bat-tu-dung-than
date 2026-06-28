@@ -220,6 +220,13 @@ export function extendBrief(R) {
     const it = R.interactions;
     if (it && it.summary && !it.summary.includes('yên tĩnh')) parts.push(`TƯƠNG TÁC TỨ TRỤ: ${it.summary}`);
   } catch (e) {}
+  // [loop 746 ELEVATION] TAM HÌNH 三刑 phân loại — 4 loại có hậu quả RẤT khác nhau (vô ân/vô lễ/
+  //   thế thế/tự hình). Trước đây brief chỉ show «có hình» generic → AI không phân biệt được.
+  try {
+    const xing = (R.interactions && R.interactions.xing) || [];
+    const wm = xing.filter((x) => x.meaning);
+    if (wm.length) parts.push(`TAM HÌNH 三刑 (phân loại cổ pháp — mỗi loại hậu quả khác nhau): ${wm.map((x) => `${x.at}: ${x.vi}${x.heavy ? ' «PHÁP HÌNH (đủ 3 chi) = NẶNG nhất»' : ''} — ${x.meaning}`).join(' | ')}`);
+  } catch (e) {}
 
   // Ẩn hợp
   try {
