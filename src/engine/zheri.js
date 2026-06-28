@@ -29,6 +29,15 @@ const ACTIVITY = {
   travel: { label: 'Xuất hành xa (出行)', yi: ['开', '建', '除', '满'], ji: ['破', '闭', '平'] },
   sign: { label: 'Ký hợp đồng / giao dịch (立券)', yi: ['成', '定', '开'], ji: ['破', '闭', '危'] },
 };
+// [loop 724 FIX] alias map — user/AI dùng «khai-truong» «dong-tho» thay vì «business» «build»
+const ACTIVITY_ALIAS = {
+  'khai-truong': 'business', 'khai-truong': 'business', 'khaitruong': 'business', 'khai-trương': 'business',
+  'dong-tho': 'build', 'dong-thổ': 'build', 'dongtho': 'build', 'xay-dung': 'build', 'xay-cất': 'build',
+  'don-nha': 'move', 'nhap-trach': 'move', 'dọn-nhà': 'move', 'move-house': 'move',
+  'cuoi-hoi': 'marry', 'cưới-hỏi': 'marry', 'hon-le': 'marry', 'hôn-lễ': 'marry',
+  'ky-hop-dong': 'sign', 'ký-hợp-đồng': 'sign', 'ky-ket': 'sign', 'sign-contract': 'sign',
+  'xuat-hanh': 'travel', 'đi-xa': 'travel', 'travel-far': 'travel',
+};
 
 /**
  * Đánh giá một ngày cho một việc + tuổi (địa chi năm sinh) người hỏi.
@@ -51,7 +60,7 @@ export function evaluateDate(year, month, day, activityId, userZhi) {
   const chongZhi = CHONG[dayZhi];
   const clashYou = userZhi ? (dayZhi === CHONG[userZhi] || chongZhi === userZhi) : false;
 
-  const act = ACTIVITY[activityId] || ACTIVITY.marry;
+  const act = ACTIVITY[activityId] || ACTIVITY[ACTIVITY_ALIAS[activityId]] || ACTIVITY.marry;
   const yi = act.yi.includes(officer);
   const ji = act.ji.includes(officer);
 
