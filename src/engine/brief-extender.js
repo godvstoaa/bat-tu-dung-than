@@ -196,7 +196,8 @@ export function extendBrief(R) {
   // [loop 90] TỬ NỮ LUẬN (子女論) — sao con sâu: số/giới tính/timing (module children-star ẩn).
   try {
     const c = analyzeChildrenStar(R);
-    parts.push(`TỬ NỮ (子女): sao ${c.childStar} (hành ${c.childWxVi}), ${c.strength} (${c.count.toFixed(1)}), cung Tử Nữ ${c.palaceZhiVi} ${c.palaceStable ? 'yên' : 'bị xung'}. ${c.estimated}. Con đầu: ${c.firstGender}.${c.isYong ? ' ★ Sao con=Dụng.' : c.isJi ? ' ⚠ Sao con=Kỵ.' : ''}`);
+    const _cdDir = { 木: 'Đông', 火: 'Nam', 土: 'Tây Nam/Trung', 金: 'Tây', 水: 'Bắc' }[c.childWx] || '?';
+    parts.push(`TỬ NỮ (子女): sao ${c.childStar} (hành ${c.childWxVi}), ${c.strength} (${c.count.toFixed(1)}), cung Tử Nữ ${c.palaceZhiVi} ${c.palaceStable ? 'yên' : 'bị xung'}. ${c.estimated}. Con đầu: ${c.firstGender}.${c.isYong ? ' ★ Sao con=Dụng.' : c.isJi ? ' ⚠ Sao con=Kỵ.' : ''} Hướng dưỡng thai: ${_cdDir}.`);
   } catch (e) {}
 
   // Thai nguyên (nếu có)
