@@ -465,6 +465,15 @@ export function extendBrief(R) {
     const bot3 = gy.ranked.slice(-3).map((r) => `${r.year}(${r.totalScore})`);
     parts.push(`NĂM VÀNG + 10 NĂM TỚI: ${tg.length ? '★ Năm vàng thực: ' + tg.join(', ') : 'không có năm vàng thực (đại vận+lưu niên chưa đủ Dụng)'} | TỐT: ${top3.join(', ')} | XẤU: ${bot3.join(', ')}.`);
   } catch (e) {}
+  // [loop 613] FAMILY MEMBERS — AI BIẾT ai trong gia đình + ngày sinh → gọi analyze_relative mà KHÔNG cần hỏi lại
+  if (R._family && R._family.length) {
+    const fam = R._family.map((f) => {
+      const [y, m, d] = (f.date || '').split('-').map(Number);
+      const [h] = (f.time || '12:00').split(':').map(Number);
+      return `${f.label || f.relation}: ${d}/${m}/${y}${f.time && f.time !== '12:00' ? ' ' + f.time : ''} (${f.gender}${f.hourUnknown ? ', giờ chưa rõ' : ''})`;
+    }).join(' | ');
+    parts.push(`👨‍👩‍👧‍👦 GIA ĐÌNH (từ «Nghiệm Chứng Gia Tộc»): ${fam}. KHI USER HỎI về người trong danh sách này → DÙNG tool analyze_relative với ngày sinh TỪ DANH SÁCH (KHÔNG cần hỏi lại).`);
+  }
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';
 }

@@ -3278,6 +3278,12 @@ async function handleAsk() {
   const _cl = $('chat-log');
   const _atBottom = () => { if (!_cl) return true; return _cl.scrollHeight - _cl.scrollTop - _cl.clientHeight < 100; };
   try {
+    // [loop 613] Pass family members to AI brief so it KNOWS who's in the family
+    const _famData = familyMembers.filter((m) => m.date).map((m) => ({
+      relation: m.role, label: m.label || m.role, date: m.date, time: m.time || '?',
+      gender: m.gender, hourUnknown: m.hourUnknown,
+    }));
+    currentResult._family = _famData.length ? _famData : undefined;
     const { source, text } = await askAI(q, currentResult, cfg, {
       history: chatHistory,
       onStatus: (s) => { lastStatus = s; body.textContent = s + ' …'; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
