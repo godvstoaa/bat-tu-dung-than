@@ -4968,7 +4968,6 @@ function renderProLuopan(heading, s) {
   }
   // update text displays (not SVG — already built once)
   if (s) {
-  if (s) {
     const sIdx = _SHAN24_L.indexOf(s.han);
     const baguaIdx = Math.floor(sIdx / 3) % 8; // [loop 696 FIX] cũ: (sIdx+1.5)/3 → 7/24 sơn sai (vd 癸→艮 thay vì 坎)
     const bgEl = $('compass-bagua');
