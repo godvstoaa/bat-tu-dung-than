@@ -5657,6 +5657,40 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(fc && (fc.cures || fc.generalCures || fc.dungMaterial), `[smoke] fs-cure trả cure data`);
   console.log(`   Smoke 7 module ✓ — health×3 + caiku + invest + five-aspects + fs-cure`);
 }
+
+// ################## SMOKE TEST batch 2: user-facing modules [loop 570] ##################
+{
+  console.log('\n##### SMOKE batch 2: user-facing modules [loop 570] #####');
+  const { analyzeBusiness } = await import('./src/engine/bazi-business.js');
+  const { analyzeCareerStar } = await import('./src/engine/career-star.js');
+  const { personalNutrition } = await import('./src/engine/bazi-diet.js');
+  const { personalWorkout } = await import('./src/engine/bazi-workout.js');
+  const { baziMingGong } = await import('./src/engine/bazi-minggong.js');
+  const { analyzeFamilyFortune } = await import('./src/engine/family-fortune.js');
+  const { verifyEvents } = await import('./src/engine/event-verify.js');
+  // bazi-business: shouldStart boolean
+  const biz = analyzeBusiness(spR);
+  assert(typeof biz.shouldStart === 'boolean', `[smoke] bazi-business.shouldStart boolean`);
+  // career-star: officerStar string
+  const car = analyzeCareerStar(spR);
+  assert(typeof car.officerStar === 'string', `[smoke] career-star.officerStar string`);
+  // bazi-diet: dungWx valid 五行
+  const diet = personalNutrition(spR);
+  assert(['木','火','土','金','水'].includes(diet.dungWx), `[smoke] bazi-diet.dungWx hợp lệ`);
+  // bazi-workout: weeklyPlan array
+  const wo = personalWorkout(spR);
+  assert(Array.isArray(wo.weeklyPlan), `[smoke] bazi-workout.weeklyPlan array`);
+  // bazi-minggong: ganZhi 2-char
+  const mg = baziMingGong(spR);
+  assert(typeof mg.ganZhi === 'string' && mg.ganZhi.length === 2, `[smoke] bazi-minggong.ganZhi 2-char`);
+  // family-fortune: relations array
+  const ff = analyzeFamilyFortune(spR);
+  assert(Array.isArray(ff.relations), `[smoke] family-fortune.relations array`);
+  // event-verify: returns object
+  const ev = verifyEvents(spR);
+  assert(ev != null, `[smoke] event-verify trả object`);
+  console.log(`   Smoke batch 2 ✓ — business + career + diet + workout + minggong + family + event-verify`);
+}
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
