@@ -990,6 +990,29 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   assert(_bh.remedyWx === _BR.yong.primary, '[loop 753] health remedyWx == Dụng thần');
   console.log('   [loop 753] ORGAN ngũ hành→tạng phủ (5 hành) + 缺行 detection (Bố 缺金 0%) ✓');
 }
+// [loop 754] TAM HỢP 三合 / TAM HỘI 三會 full-cục detection — pin 4 cục + 4 phương.
+//   Hoàn verification interaction suite (746-752 elevation + 754 full cục).
+{
+  // 三合: 申子辰(水), 寅午戌(火), 巳酉丑(金), 亥卯未(木)
+  const _SH = [
+    [['申','子','辰'], '水', 'Thủy cục'],
+    [['寅','午','戌'], '火', 'Hỏa cục'],
+    [['巳','酉','丑'], '金', 'Kim cục'],
+    [['亥','卯','未'], '木', 'Mộc cục'],
+  ];
+  for (const [brs, wx, name] of _SH) {
+    const _d = detectInteractions(fakePillars([['year','甲',brs[0]],['month','丁',brs[1]],['day','戊',brs[2]],['time','戊','午']]));
+    const hit = _d.sanHe.find((s) => s.name === name);
+    assert(hit && hit.wx === wx && hit.branches.length === 3, `[loop 754] tam hợp ${name} (${brs.join('')}→${wx}) detect đủ 3`);
+  }
+  // 三会: 寅卯辰(木 Đông), 巳午未(火 Nam), 申酉戌(金 Tây), 亥子丑(水 Bắc)
+  const _HUI = [[['寅','卯','辰'],'木'],[['巳','午','未'],'火'],[['申','酉','戌'],'金'],[['亥','子','丑'],'水']];
+  for (const [brs, wx] of _HUI) {
+    const _d = detectInteractions(fakePillars([['year','甲',brs[0]],['month','丁',brs[1]],['day','戊',brs[2]],['time','戊','午']]));
+    assert(_d.sanHui.some((s) => s.wx === wx && s.branches.length === 3), `[loop 754] tam hội ${brs.join('')}→${wx} detect đủ 3`);
+  }
+  console.log('   [loop 754] TAM HỢP (4 cục) + TAM HỘI (4 phương) full-cục detection ✓');
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
