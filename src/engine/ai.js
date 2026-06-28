@@ -920,10 +920,22 @@ export function execTool(name, args, R) {
           // [loop 612] silver lining cho low-score relative — KHÔNG để AI nói «mệnh thấp» không khích lệ
           silverLining: (() => {
             const sc = relSyn.score;
-            if (sc >= 41) return null; // chỉ cho low-score
-            const goodDy = (rel.dayun || []).filter((d) => d.rating === 'Đại cát' || d.rating === 'Cát').slice(0, 2);
+            if (sc >= 41) return null;
+            const goodDy = (rel.dayun || []).filter((d) => d.rating === 'Đại cát' || d.rating === 'Cát');
             if (!goodDy.length) return null;
-            return `🌟 Mệnh gốc vất vả (${sc}/100) NHƯNG đại vận sắp tới ${goodDy.map((d) => d.ganZhi + '(' + d.startAge + '-' + (d.startAge+9) + 't)').join(', ')} mang hành Dụng/Hỷ → đây là thời điểm VÀNG để bứt phá. Cổ pháp「命好不如運好」.`;
+            const top2 = goodDy.slice(0, 2);
+            const WX_VI2 = { 木:'Mộc', 火:'Hỏa', 土:'Thổ', 金:'Kim', 水:'Thủy' };
+            // [loop 616] actionable advice per golden phase
+            const phaseAdvice = top2.map((d) => {
+              const dWx = ZHI[d.ganZhi[1]]?.wx || '?';
+              const isDung = dWx === relDung, isHy = dWx === rel.yong.xi;
+              let advice = '';
+              if (d.startAge < 18) advice = isDung || isHy ? 'ĐẦU TƯ GIÁO DỤC — vận Hỷ/Dụng, học hỏi thuận lợi' : 'Xây nền tảng sức khoẻ + kỹ năng';
+              else if (d.startAge < 30) advice = isDung || isHy ? 'KHỞI NGHIỆP/SỰ NGHIỆP — vận tốt để tiến thủ lớn' : 'Tích luỹ kinh nghiệm, chờ thời';
+              else advice = isDung || isHy ? 'BỨT PHÁ TÀI LỘC/QUYỀN — đỉnh vận Dụng' : 'Duy trì + mở rộng';
+              return `${d.ganZhi}(${d.startAge}-${d.startAge+9}t, ${WX_VI2[dWx]||dWx}): ${advice}`;
+            }).join(' | ');
+            return `🌟 Mệnh gốc vất vả (${sc}/100) NHƯNG có vận TỐT: ${phaseAdvice}. Cổ pháp「命好不如運好」— vận Dụng bù mệnh khó.`;
           })(),
         };
       }
