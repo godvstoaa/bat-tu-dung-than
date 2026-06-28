@@ -72,6 +72,21 @@ export const ZHI_CHONG_MAP = (() => {
   for (const p of ZHI_CHONG) { m[p] = true; m[p[1] + p[0]] = true; }
   return m;
 })();
+// [loop 748 ELEVATION] LỤC XUNG 六冲 — 6 cặp ảnh hưởng LĨNH VỰC khác nhau (trước đây chỉ
+//   {a,b} không name/meaning). Nguồn: 渊海子平 «六冲论».
+export const CHONG_MEANING = {
+  '子午': { name: 'Thủy hỏa tương chiến', vi: 'Xung thủy hỏa', domain: 'tâm huyết/thần kinh', meaning: 'Bắc-Nam (tý âm cực ↔ ngọ dương cực): thủy hỏa giao chiến → tâm huyết/thần kinh, dễ xúc động bốc đồng; sự nghiệp bắc-nam biến động.' },
+  '丑未': { name: 'Trọng thổ tương xung', vi: 'Xung trọng thổ', domain: 'dời đổi/điền sản', meaning: '2 chi thổ xung → hay đi lại/dời đổi, gia đạo-điền sản biến động, dễ thay đổi chỗ ở.' },
+  '寅申': { name: 'Dịch mã tương xung', vi: 'Xung dịch mã', domain: 'di chuyển/sứ mệnh', meaning: 'Mộc-Kim (dần-thân) = «nhân mã»: di chuyển xa, sự nghiệp thay đổi, dễ bôn ba/tai nạn xe cộ.' },
+  '卯酉': { name: 'Đào hoa tương xung', vi: 'Xung đào hoa', domain: 'nam nữ/hôn nhân', meaning: 'Mộc-Kim (mão-dậu) = «đào hoa tán»: nam nữ/hôn nhân biến động, phối ngẫu duyên mỏng, đào hoa tán.' },
+  '辰戌': { name: 'Thiên la địa võng', vi: 'Xung la võng', domain: 'tài sản/tranh chấp', meaning: '2 chi thổ (thìn-tuất) = «thiên la địa võng»: tranh chấp tài sản/sức lực, dời nhà, dễ phá tài.' },
+  '巳亥': { name: 'Thiên môn địa hộ', vi: 'Xung thiên môn', domain: 'công việc/giao tế', meaning: 'Hỏa-Thủy (tị-hợi) = «thiên môn địa hộ»: thay đổi công việc, giao tế rộng, dễ khẩu phi/tiểu nhân.' },
+};
+const _CHONG_LOOKUP = (() => {
+  const m = {};
+  for (const [pair, info] of Object.entries(CHONG_MEANING)) { m[pair] = info; m[pair[1] + pair[0]] = info; }
+  return m;
+})();
 
 // ---- TAM HÌNH (三刑) + TỰ HÌNH ----
 // [cycle 47 sửa NHÃN] Vô lễ: 子↔卯 ; Vô ân(无恩): 寅→巳→申→寅 ; Thế thế(恃势): 丑→戌→未→丑 ; Tự hình: 辰辰/午午/酉酉/亥亥
@@ -185,7 +200,10 @@ export function detectInteractions(pillars) {
   // --- Lục xung ---
   const chong = [];
   for (const [a, b, i, j] of pairs(zhis))
-    if (ZHI_CHONG_MAP[a + b]) chong.push({ a, b, at: `${POS_LABEL[i]}–${POS_LABEL[j]}` });
+    if (ZHI_CHONG_MAP[a + b]) {
+      const info = _CHONG_LOOKUP[a + b] || {};
+      chong.push({ a, b, name: info.name, vi: info.vi, domain: info.domain, meaning: info.meaning, at: `${POS_LABEL[i]}–${POS_LABEL[j]}` });
+    }
 
   // --- Tam hình (gồm tự hình) ---
   const xing = [];

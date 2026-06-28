@@ -233,6 +233,12 @@ export function extendBrief(R) {
     const wm = hai.filter((h) => h.meaning);
     if (wm.length) parts.push(`LỤC HẠI 六害 (phân loại — «相穿»): ${wm.map((h) => `${h.a}–${h.b} ${h.vi} (${h.at}) — ${h.meaning}`).join(' | ')}`);
   } catch (e) {}
+  // [loop 748 ELEVATION] LỤC XUNG 六冲 — 6 cặp ảnh hưởng LĨNH VỰC khác nhau (trước đây chỉ «có xung» generic).
+  try {
+    const chong = (R.interactions && R.interactions.chong) || [];
+    const wm = chong.filter((c) => c.meaning);
+    if (wm.length) parts.push(`LỤC XUNG 六冲 (phân loại theo LĨNH VỰC): ${wm.map((c) => `${c.a}↔${c.b} ${c.vi} [${c.domain}] (${c.at}) — ${c.meaning}`).join(' | ')}`);
+  } catch (e) {}
 
   // Ẩn hợp
   try {
