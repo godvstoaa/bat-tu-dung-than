@@ -46,6 +46,8 @@ const PALACE8_TO_PAN = {
 
 /** Độ la bàn (0-360) → sơn 24 + palace8. Bắc = 0/360. */
 export function shanFromDegree(degree) {
+  // [loop 632] guard NaN/garbage — trước đây Number('abc')=NaN → fallback mù về 壬
+  if (degree == null || degree === '' || Number.isNaN(Number(degree))) return null;
   let d = ((Number(degree) % 360) + 360) % 360;
   //	chuyển về khoảng [337.5, 697.5) để so sánh liên tục qua 0°
   if (d < 337.5) d += 360;
@@ -119,8 +121,15 @@ export function compassReading(R, input, scanYear) {
     layers.push(`⚠ ${t.type} (năm): ${t.detail}`);
   }
   if (star) {
+    // [loop 632 FIX] Ngũ Hoàng(5)/Nhị Hắc(2) ĐÃ được penalty trong annualTaboo (severity 5/2)
+    //   → KHÔNG trừ thêm ở phi tinh (trước đây double-count, score bị phình — vd Nam 2026 = −11).
+    const alreadyTabooed = taboo.taboos.some((t) => t.type === 'Ngũ Hoàng' || t.type === 'Nhị Hắc');
+    const isStar52 = star.star === 5 || star.star === 2;
     if (/cát/i.test(star.base)) { score += 1; layers.push(`★ Phi tinh ${year}: ${star.name} (${star.vi}) — cát`); }
-    else if (/hung/i.test(star.base)) { score -= 1; layers.push(`⚠ Phi tinh ${year}: ${star.name} (${star.vi}) — hung`); }
+    else if (/hung/i.test(star.base)) {
+      if (!(isStar52 && alreadyTabooed)) score -= 1; // skip double-count cho 5/2 đã trong taboo
+      layers.push(`⚠ Phi tinh ${year}: ${star.name} (${star.vi}) — hung${(isStar52 && alreadyTabooed) ? ' (đã tính ở sát phương)' : ''}`);
+    }
     else layers.push(`• Phi tinh ${year}: ${star.name} (${star.vi})`);
   }
   if (dungMatch === 'bổ ĐÚNG Dụng') { score += 1; layers.push(`✓ Ngũ hành hướng ${dirWx} = Dụng Thần ${dung} → bổ mệnh`); }

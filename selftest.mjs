@@ -553,6 +553,23 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
   assert(nam.layers.some((l) => l.includes('Ngũ Hoàng') || l.includes('Nhị Hắc') || l.includes('Sát') || l.includes('Tuế') || l.includes('hung')), `[loop 631] hướng Nam 2026 có tầng sát/hung (Ngũ Hoàng tại Nam)`);
   console.log(`   fengshui-compass ✓ — 24 sơn chuẩn; Quân Đông Bắc=Diên Niên cát; bestDirection=${bd.best.shan}(${bd.best.verdict})`);
 }
+// [loop 632] fengshui-compass robustness + double-count fix
+{
+  const { compassReading, shanFromDegree } = await import('./src/engine/fengshui-compass.js');
+  // garbage degree → null (không fallback mù)
+  for (const bad of [null, undefined, '', 'abc', NaN]) {
+    assert(shanFromDegree(bad) === null, `[loop 632] shanFromDegree(${JSON.stringify(bad)}) → null (không fallback mù)`);
+  }
+  // Ngũ Hoàng/Nhị Hắc KHÔNG bị double-count (taboo + phi tinh)
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const nam = compassReading(R, 180, 2026); // Nam 2026 = Ngũ Hoàng + Thái Tuế
+  const wuLayers = nam.layers.filter((l) => l.includes('Ngũ Hoàng'));
+  // vẫn hiển thị 2 (1 taboo + 1 phi tinh informational) NHƯNG penalty chỉ tính 1 lần → score ≥ -10
+  assert(nam.score >= -10, `[loop 632] Ngũ Hoàng không double-penalty (score=${nam.score}, trước fix −11)`);
+  // tính tay: Bát Trạch hung(−2) + Thái Tuế(−3) + Ngũ Hoàng taboo(−5) = −10 (phi tinh 5 skip)
+  assert(nam.score === -10, `[loop 632] Nam 2026 score đúng = −10 (BátTrạch−2 + TháiTuế−3 + NgũHoàng−5, phi tinh skip)`);
+  console.log(`   fengshui-compass robustness ✓ — garbage→null; Ngũ Hoàng no double-penalty (Nam 2026 = ${nam.score})`);
+}
 
 // ################## [loop 20 NEW] 十二长生运 (đại vận + lưu niên) ##################
 import { dayunChangsheng, liunianChangsheng, stageCategory } from './src/engine/changsheng-deep.js';
