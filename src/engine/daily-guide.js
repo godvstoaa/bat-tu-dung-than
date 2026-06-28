@@ -66,7 +66,7 @@ export function dailyGuide(R, year, month, day) {
   if (tsYi.length > 5) score += 2;
 
   score = Math.max(5, Math.min(98, Math.round(score)));
-  const rating = score >= 65 ? 'Cát' : score >= 48 ? 'Bình' : score >= 35 ? 'Hơi kỵ' : 'Hung'; // [loop 471] Kỵ→Hung unify
+  const rating = score >= 54 ? 'Cát' : score >= 48 ? 'Bình' : score >= 44 ? 'Hơi kỵ' : 'Hung'; // [loop 637] align thang liuri 54/48/44 (đã recalibrate loop 469→470)
 
   // --- Color ---
   const deityColorWx = score >= 50 ? yong.primary : yong.xi;

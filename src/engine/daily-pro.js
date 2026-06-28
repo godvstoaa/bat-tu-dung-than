@@ -136,17 +136,20 @@ export function dailyPro(R, year, month, day) {
 
   // Score
   score = Math.max(5, Math.min(98, Math.round(score)));
-  let rating = score >= 65 ? 'Cát' : score >= 48 ? 'Bình' : score >= 35 ? 'Hơi kỵ' : 'Hung'; // [loop 471] Kỵ→Hung unify temporal vocab
+  // [loop 637 FIX] align thang liuri đã recalibrate loop 469→470 (54/48/44). Trước đây 65/48/35
+  //   (Cát≥65 = top 5% — quá ngặt, 65% ngày «Hơi kỵ») → cùng ngày mâu thuẫn liuri (54/48/44).
+  //   daily-pro distribution median 49 → 54/48/44 cân bằng (top 25% Cát, bottom 25% Hung).
+  let rating = score >= 54 ? 'Cát' : score >= 48 ? 'Bình' : score >= 44 ? 'Hơi kỵ' : 'Hung';
 
   // Best activity / avoid
-  const bestActivity = score >= 65 ? 'tiến thủ, ký kết, gặp quý nhân, làm việc lớn' : score >= 48 ? 'làm việc thường, tránh quyết định lớn' : 'giữ ổn định, tránh đầu tư/cãi vã/đi xa';
+  const bestActivity = score >= 54 ? 'tiến thủ, ký kết, gặp quý nhân, làm việc lớn' : score >= 48 ? 'làm việc thường, tránh quyết định lớn' : 'giữ ổn định, tránh đầu tư/cãi vã/đi xa';
   const avoidActivity = `tránh ${tsJi.slice(0, 3).join(',')}${avoid.has(dgWx) ? ', đầu tư' : ''}${e5YangRen ? ', nguy hiểm (dương nhận — huyết quang)' : ''}`;
 
   // Best direction
   const caishen = lunar.getDayPositionCaiDesc ? lunar.getDayPositionCaiDesc() : '?';
   const xishen = lunar.getDayPositionXiDesc ? lunar.getDayPositionXiDesc() : '?';
 
-  const advice = score >= 65
+  const advice = score >= 54
     ? `Hôm nay CÁT (${score}/100). Nên: ${bestActivity}. Hướng: ${caishen} (tài) / ${xishen} (hỷ).`
     : score >= 48
       ? `Hôm nay BÌNH (${score}/100). ${bestActivity}.`

@@ -326,12 +326,11 @@ export function dailyBriefing(R, year, month, day, patternQuality) {
     }
     if (delta !== 0) {
       rating.score = Math.max(2, Math.min(98, Math.round(rating.score + delta)));
-      // [loop 82 sửa bug] tone 3-valued aligned với level (65/48/35). Trước đây tone binary
-      //   score>=50?'cat' mâu thuẫn level (50-64='Bình' nhưng tone='cat' → oneLiner khuyên
-      //   'khai trương' cho ngày Bình). Nay: cat=Cát(>=65), bình=Bình(48-64), hung=<48.
-      rating.tone = rating.score >= 65 ? 'cat' : rating.score >= 48 ? 'bình' : 'hung';
+      // [loop 637] align thang liuri đã recalibrate loop 469→470 (54/48/44). Trước đây 65/48/35
+      //   (Cát≥65 = top 5%) → cùng ngày mâu thuẫn liuri. cat=Cát(>=54), bình=Bình(48-53), hung=<48.
+      rating.tone = rating.score >= 54 ? 'cat' : rating.score >= 48 ? 'bình' : 'hung';
       if (!specialLevel) {
-        rating.level = rating.score >= 65 ? 'Cát' : rating.score >= 48 ? 'Bình' : rating.score >= 35 ? 'Hơi kỵ' : 'Hung'; // [loop 471] Kỵ→Hung unify
+        rating.level = rating.score >= 54 ? 'Cát' : rating.score >= 48 ? 'Bình' : rating.score >= 44 ? 'Hơi kỵ' : 'Hung';
       }
       rating.summary = `${rating.summary} ${delta > 0 ? `★ Cá nhân +${delta}` : `⚠ Cá nhân ${delta}`} (Dụng/Thái tuế/格局).`.trim();
     }

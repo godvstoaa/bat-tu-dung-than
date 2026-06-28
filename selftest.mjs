@@ -642,6 +642,29 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
   assert(_exp54(56) === 'Cát', `[loop 636] score 56 = Cát (thang daily 54/48/44)`);
   console.log(`   year-daily ≡ liuri threshold ✓ — ${checked} ngày score-bằng đồng verdict (thang 54/48/44 thống nhất)`);
 }
+// [loop 637] daily-pro / daily-guide / daily-briefing phải dùng thang liuri 54/48/44 (không 65/48/35 cũ).
+//   Bug: cùng ngày, daily-pro nói «Bình» nhưng liuri nói «Cát» → user thấy 2 verdict khác nhau.
+//   Fix: align 54/48/44 → tone-conflict liuri↔daily-pro giảm 13/28 → ~5/28.
+{
+  const { analyzeLiuRi } = await import('./src/engine/liuri.js');
+  const { dailyPro } = await import('./src/engine/daily-pro.js');
+  const { dailyGuide } = await import('./src/engine/daily-guide.js');
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const tone = (r) => /cát/i.test(r) ? '+' : /hung/i.test(r) ? '-' : '0';
+  let conflict = 0;
+  for (let d = 1; d <= 28; d++) {
+    const lr = analyzeLiuRi(R, 2026, 6, d, R.patternQuality);
+    const dp = dailyPro(R, 2026, 6, d);
+    if (tone(lr.rating) && tone(dp.rating) && tone(lr.rating) !== tone(dp.rating)) conflict++;
+  }
+  assert(conflict <= 7, `[loop 637] liuri↔daily-pro tone-conflict giảm (got ${conflict}/28, trước fix 13/28)`);
+  // today all 3 daily systems agree
+  const lr = analyzeLiuRi(R, 2026, 6, 28, R.patternQuality).rating;
+  const dp = dailyPro(R, 2026, 6, 28).rating;
+  const dg = dailyGuide(R, 2026, 6, 28).rating;
+  assert(tone(lr) === tone(dp) && tone(dp) === tone(dg), `[loop 637] 3 hệ daily đồng tone hôm nay (liuri ${lr} / dp ${dp} / dg ${dg})`);
+  console.log(`   daily-pro/guide/briefing ≡ liuri ✓ — tone-conflict ${conflict}/28 (was 13); hôm nay 3 hệ đồng tone`);
+}
 
 // ################## [loop 20 NEW] 十二长生运 (đại vận + lưu niên) ##################
 import { dayunChangsheng, liunianChangsheng, stageCategory } from './src/engine/changsheng-deep.js';
