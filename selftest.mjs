@@ -5667,7 +5667,7 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   const { personalWorkout } = await import('./src/engine/bazi-workout.js');
   const { baziMingGong } = await import('./src/engine/bazi-minggong.js');
   const { analyzeFamilyHarmony } = await import('./src/engine/family-fortune.js');
-  const { verifyEvents } = await import('./src/engine/event-verify.js');
+  const { verifyPastEvent } = await import('./src/engine/event-verify.js');
   // bazi-business: shouldStart boolean
   const biz = analyzeBusiness(spR);
   assert(typeof biz.shouldStart === 'boolean', `[smoke] bazi-business.shouldStart boolean`);
@@ -5686,8 +5686,8 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   // family-fortune: relations array
   const ff = analyzeFamilyHarmony(spR);
   assert(Array.isArray(ff.relations), `[smoke] family-fortune.relations array`);
-  // event-verify: returns object
-  const ev = verifyEvents(spR);
+  // event-verify: returns object (needs eventYear/type/desc)
+  const ev = verifyPastEvent(spR, 2020, 'career', 'thay đổi công việc');
   assert(ev != null, `[smoke] event-verify trả object`);
   console.log(`   Smoke batch 2 ✓ — business + career + diet + workout + minggong + family + event-verify`);
 }
