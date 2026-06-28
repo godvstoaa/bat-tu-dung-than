@@ -350,6 +350,31 @@ export function extendBrief(R) {
     // [loop 436] 空亡 weakening note — cho AI biết大运 nào bị giảm lực
     const kwDayun = (R.dayun || []).filter((d) => d._kwNote);
     if (kwDayun.length) parts.push(`ĐẠI VẬN KHÔNG VONG: ${kwDayun.map((d) => d.ganZhi + '[' + d.startAge + 't] ' + d._kwNote).join(' | ')}`);
+    // [loop 709] 12 trường sinh CONTEXT cho đại vận hiện tại — AI biết user đang ở «giai đoạn đời» nào
+    try {
+      const { changSheng } = await import('./core.js');
+      const _age = new Date().getFullYear() - R.chart.input.year;
+      const _curDy = (R.dayun || []).find((d) => _age >= d.startAge && _age < d.startAge + 10);
+      const _nextDy = (R.dayun || []).find((d) => d.startAge === _curDy?.startAge + 10);
+      if (_curDy) {
+        const _curStage = changSheng(R.chart.dayGan, _curDy.zhi);
+        const _nextStage = _nextDy ? changSheng(R.chart.dayGan, _nextDy.zhi) : null;
+        const _stageMeaning = {
+          '長生': 'SINH (khởi đầu — năng lượng tái sinh, như «sống lại»)', '沐浴': 'TẨM (thanh lọc — cẩn thận tai nạn tình cảm)',
+          '冠帶': 'QUAN ĐỚI (trưởng thành — nhận quyền/sức)', '臨官': 'LÂM QUAN (thành tựu — đỉnh sự nghiệp)',
+          '帝旺': 'ĐẾ VƯỢNG (cực thịnh — mạnh nhất đời)', '衰': 'SUY (bắt đầu giảm — cần tiết chế)',
+          '病': 'BỆNH (yếu — chú ý sức khoẻ)', '死': 'TỬ (tắt — tránh quyết định lớn)',
+          '墓': 'MỘ (chôn — tích trữ, chờ thời)', '絕': 'TUYỆT (hết — kiên nhẫn, chuẩn bị)',
+          '胎': 'THAI (thai nghén — ấp ủ kế hoạch)', '養': 'DƯỠNG (nuôi dưỡng — chuẩn bị cho Trường Sinh kế tiếp)',
+        };
+        const _meaning = _stageMeaning[_curStage] || _curStage;
+        let _note = `12 TRƯỜNG SINH CONTEXT: Đại vận hiện tại ${_curDy.ganZhi} = ${_curStage} → ${_meaning}.`;
+        if (_nextStage === '長生' || _nextStage === '臨官' || _nextStage === '帝旺') {
+          _note += ` ⭐ Đại vận KẾ TIẾP ${_nextDy?.ganZhi} = ${_nextStage} → ${_stageMeaning[_nextStage] || 'đỉnh'} — chuẩn bị SẴN SÀNG cho giai đoạn bứt phá!`;
+        }
+        parts.push(_note);
+      }
+    } catch (_) {}
   } catch (e) {}
 
   // Đại vận tương tác
