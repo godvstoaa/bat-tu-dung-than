@@ -4901,7 +4901,7 @@ function initFsCompass(R) {
 // ============================================================
 // [loop 693] REAL COMPASS — DeviceOrientation (cảm biến điện thoại)
 // ============================================================
-let _compassActive = false, _compassLastDeg = -1, _compassThrottle = 0;
+let _compassActive = false, _compassLastDeg = -1, _compassThrottle = 0, _compassLastTone = '';
 (function initRealCompass() {
   const btn = $('compass-real-btn'); if (!btn) return;
   btn.addEventListener('click', async () => {
@@ -4961,6 +4961,12 @@ function _onCompass(e) {
         const rd = compassReading(currentResult, heading, new Date().getFullYear());
         const cls = rd.verdict.includes('CÁT') ? 'color:#2e9e5b' : rd.verdict.includes('KỴ') ? 'color:#e0533d' : 'color:var(--muted)';
         vEl.innerHTML = `<span style="${cls}"><b>${rd.verdict}</b></span>`;
+        // [loop 694] haptic feedback — rung khi đổi verdict (CÁT nhẹ, KỴ mạnh)
+        const _tone = rd.verdict.includes('CÁT') ? 'cat' : rd.verdict.includes('KỴ') ? 'ky' : 'mid';
+        if (_tone !== _compassLastTone && navigator.vibrate) {
+          navigator.vibrate(_tone === 'cat' ? 50 : _tone === 'ky' ? [100, 50, 100] : 0);
+          _compassLastTone = _tone;
+        }
       } catch (_) { vEl.textContent = ''; }
     }
     // Sync degree input + selector
