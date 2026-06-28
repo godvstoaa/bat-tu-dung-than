@@ -890,6 +890,9 @@ export function execTool(name, args, R) {
           userHelpsRelative: userHelpsRel ? `✓ NC user (${userWx}) = Dụng của người thân (${relDung}) → user TỐT cho người này` : 'không trực tiếp bổ Dụng',
           relativeHelpsUser: relHelpsUser ? `✓ NC người thân (${relWx}) = Dụng của user (${userDung}) → người này TỐT cho user` : 'không trực tiếp bổ Dụng',
           daiVanTop: (rel.dayun || []).slice(0, 3).map((d) => `${d.ganZhi}[${d.rating}]`).join(', '),
+          // [loop 611] quỹ tích đời đầy đủ (all 8 phases) + năm vàng
+          daiVanFull: (rel.dayun || []).map((d) => `${d.startAge}-${d.startAge+9}t:${d.ganZhi}[${d.rating}]`).join(' | '),
+          peakYears: (() => { try { const gy = findGoldenYear(rel, new Date().getFullYear(), 12); const tg = gy.ranked.filter((r) => r.isTrulyGolden).map((r) => r.year); return tg.length ? '★ ' + tg.join(', ') : 'top: ' + gy.ranked.slice(0, 3).map((r) => r.year).join(', '); } catch (_) { return '(chưa tính)'; } })(),
           // [loop 610] advice theo relationship type + ngũ hành tương quan (không generic)
           advice: (() => {
             const WX_VI = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
