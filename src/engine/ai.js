@@ -1039,9 +1039,39 @@ export function execTool(name, args, R) {
         // mode = read: luận 1 hướng cụ thể
         const rd = compassReading(R, a.direction || '子', new Date().getFullYear());
         if (rd.error) return { error: rd.error };
+        // [loop 698] enrich với 八卦 + 二十八宿 + 分金 (罗盘 chuyên nghiệp data)
+        let _deg = null, _bagua = '', _xiu = '', _fenjin = '';
+        try {
+          const _d = typeof a.direction === 'number' || /^\d+(\.\d+)?$/.test(a.direction) ? parseFloat(a.direction) : null;
+          if (_d != null) {
+            const _SHAN24_L = ['壬','子','癸','丑','艮','寅','甲','卯','乙','辰','巽','巳','丙','午','丁','未','坤','申','庚','酉','辛','戌','乾','亥'];
+            const _BG = ['坎','艮','震','巽','离','坤','兑','乾'];
+            const _BGV = ['Khảm','Cấn','Chấn','Tốn','Ly','Khôn','Đoài','Càn'];
+            const _X28 = ['角','亢','氐','房','心','尾','箕','斗','牛','女','虚','危','室','壁','奎','娄','胃','昴','毕','觜','参','井','鬼','柳','星','张','翼','轸'];
+            const sIdx = _SHAN24_L.indexOf(rd.shan.split(' ')[0]);
+            if (sIdx >= 0) {
+              const bIdx = Math.floor(sIdx / 3) % 8;
+              _bagua = `${_BG[bIdx]} (${_BGV[bIdx]})`;
+            }
+            const xIdx = Math.floor((_d / (360/28)) + 0.5) % 28;
+            _xiu = _X28[xIdx];
+            // 分金
+            const _GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+            const _ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+            if (sIdx >= 0) {
+              const sStart = (337.5 + sIdx * 15) % 360;
+              let within = _d - sStart; if (within < 0) within += 360;
+              const fenIdx = Math.min(4, Math.floor(within / 3));
+              const jiaziIdx = (sIdx * 5 + fenIdx) % 60;
+              _fenjin = `${_GAN[jiaziIdx % 10]}${_ZHI[jiaziIdx % 12]} (${fenIdx + 1}/5)`;
+            }
+            _deg = Math.round(_d);
+          }
+        } catch (_) {}
         return {
           mode: 'read', shan: rd.shan, palace8: rd.palace8, dirWx: rd.dirWx, year: rd.year,
           baziTrach: rd.baziTrach?.star, verdict: rd.verdict, advice: rd.advice,
+          bagua: _bagua, xiu: _xiu, fenjin: _fenjin, degree: _deg,
           layers: (rd.layers || []).slice(0, 5),
           summary: rd.summary,
         };
