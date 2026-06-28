@@ -4750,6 +4750,15 @@ $('calendar-note').textContent =
 // NGHIỆM CHỨNG GIA TỘC (家族八字交叉验证) — state + render an toàn XSS
 // ============================================================
 let familyMembers = []; // [{role,label,date,time,gender,hourUnknown}]
+// [loop 604] save/restore family members to localStorage — user complaint: data lost on reload
+function saveFamily() { try { localStorage.setItem('bazi-family', JSON.stringify(familyMembers)); } catch (_) {} }
+function loadFamily() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('bazi-family') || 'null');
+    if (Array.isArray(saved) && saved.length) { familyMembers = saved; return true; }
+  } catch (_) {}
+  return false;
+}
 const ROLE_OPTS = [
   { v:'father', t:'Cha' }, { v:'mother', t:'Mẹ' }, { v:'sibling', t:'Anh/chị/em' },
   { v:'spouse', t:'Vợ/Chồng' }, { v:'child', t:'Con cái' },
@@ -4882,17 +4891,19 @@ function rectifyFamily(fam, members) {
 }
 
 // wiring gia tộc
-$('fam-add').addEventListener('click', () => { familyMembers.push({ role:'father', label:'', date:'', time:'', gender:'nam', hourUnknown:false }); renderFamilyForm(); });
+$('fam-add').addEventListener('click', () => { familyMembers.push({ role:'father', label:'', date:'', time:'', gender:'nam', hourUnknown:false }); renderFamilyForm(); saveFamily(); });
 $('family-members').addEventListener('click', (e) => {
-  if (e.target.classList.contains('fam-del')) { familyMembers.splice(+e.target.dataset.i, 1); renderFamilyForm(); }
+  if (e.target.classList.contains('fam-del')) { familyMembers.splice(+e.target.dataset.i, 1); renderFamilyForm(); saveFamily(); }
 });
 $('family-members').addEventListener('change', (e) => {
   const t = e.target; if (t.dataset.i == null) return;
   const i = +t.dataset.i, k = t.dataset.k;
-  familyMembers[i][k] = (k === 'hourUnknown') ? t.checked : t.value;
+  familyMembers[i][k] = (k === 'hourUnknown') ? t.checked : t.value; saveFamily(); // [loop 604] auto-save
   if (k === 'role') renderFamilyForm();
 });
 $('family-btn').addEventListener('click', runFamily);
+// [loop 604] restore family members from localStorage
+if (loadFamily()) { /* data restored */ }
 renderFamilyForm();
 
 // ============================================================
