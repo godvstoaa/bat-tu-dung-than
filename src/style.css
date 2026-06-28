@@ -1590,6 +1590,9 @@ html{scroll-behavior:smooth}
 .qs-tile:nth-child(7) { animation-delay: .36s; }
 .qs-tile:nth-child(8) { animation-delay: .42s; }
 .qs-tile:nth-child(9) { animation-delay: .48s; }
+.qs-tile:nth-child(10) { animation-delay: .54s; }
+.qs-tile:nth-child(11) { animation-delay: .60s; }
+.qs-tile:nth-child(12) { animation-delay: .66s; }
 .qs-tile:hover {
   transform: perspective(800px) rotateY(-2deg) rotateX(1deg) translateY(-3px);
   box-shadow: 0 12px 30px -10px rgba(0,0,0,0.7), 0 0 0 1px rgba(247,236,203,0.15);
