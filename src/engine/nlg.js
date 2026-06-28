@@ -120,6 +120,9 @@ export function detectIntent(question) {
     || (/\bsao\b/.test(norm) && /\b(co|gi dac biet|chinh tinh|than|nao tot|nao xau)\b/.test(norm));
   // [loop 759] isNayin — hỏi về nạp âm / bản mệnh hành (nayin của trụ ngày).
   const isNayin = /\b(nap am|nayin|nap am cua|ban menh ngu hanh|menh ngu hanh|hanh cua toi|cung menh)\b/.test(norm);
+  // [loop 760] isTiaohou — hỏi về điều hậu (khí hậu mùa sinh → hành cần bổ).
+  const isTiaohou = /\b(dieu hau|hau cua|khi hau|mua sinh|co phap|khong thong bao|ngoai hop|van han|khan|tao|ret|am|nhiet)\b/.test(norm)
+    && /\b(dieu hau|khi hau|hau|co phap)\b/.test(norm);
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
@@ -133,7 +136,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -510,6 +513,27 @@ function pDivination(R, intent) {
   }
 }
 
+function pTiaohou(R) {
+  // [loop 760] Surface điều hậu offline — khí hậu mùa sinh + hành cần (穷通宝鉴).
+  const dm = R.chart.dayMaster;
+  const monthZhi = R.chart.monthZhi;
+  const th = R.yong && R.yong.tiaohou ? R.yong.tiaohou : null;
+  if (!th) {
+    return { title: 'Điều hậu 调候', lead: `Điều hậu cho ${dm.gan} ${dm.vi}:`, paragraphs: ['(không có dữ liệu điều hậu — thử bật AI)'] };
+  }
+  const wxVi = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
+  const elemsVi = (th.elems || []).map((w) => wxVi[w] || w).join(', ');
+  return {
+    title: 'Điều hậu 调候 (khí hậu mùa sinh)',
+    lead: `Nhật Chủ ${dm.gan} (${dm.vi}) sinh tháng ${monthZhi} — cổ pháp Điều Hậu (穷通宝鉴):`,
+    paragraphs: [
+      `💧 Hành cần Điều Hậu (cổ pháp 穷通宝鉴): ${(th.raw || []).join(' + ')} → hành ${elemsVi}${th.primaryWx ? ' (chủ: ' + (wxVi[th.primaryWx] || th.primaryWx) + ')' : ''}.`,
+      th.note || '(khí hậu mùa sinh — bổ hành cho mùa).',
+      `⚖ Quan hệ với Dụng Thần: ${th.override ? 'Điều Hậu ĐÃ override Phù Ức làm Dụng chính (mệnh lệch nặng, khí hậu là yếu tố quyết định).' : 'Phù Ức (cân bằng vượng suy) làm Dụng chính; Điều Hậu phối hợp khi thiên lệch — 2 pháp bổ trợ nhau.'}`,
+      `💡 Điều hậu = bổ hành cho «khí hậu» mùa sinh (vd tháng đông lạnh → cần Hỏa sưởi; tháng hạ nóng → cần Thủy mát), KHÁC với Dụng Thần cân bằng. Mở AI để luân giải sâu.`,
+    ],
+  };
+}
 function pNayin(R) {
   // [loop 759] Surface nạp âm offline — 4 trụ nayin + bản mệnh (trụ ngày) meaning.
   const dayGz = (R.chart.pillars && R.chart.pillars.day) ? R.chart.pillars.day.gan + R.chart.pillars.day.zhi : R.chart.dayMaster.gan;
@@ -658,6 +682,8 @@ export function composeAnswer(question, R) {
   if (intent.isShensha) return pShensha(R);
   // [loop 759] nayin question — surface nạp âm (offline, không cần AI)
   if (intent.isNayin) return pNayin(R);
+  // [loop 760] tiaohou question — surface điều hậu (offline, không cần AI)
+  if (intent.isTiaohou) return pTiaohou(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family

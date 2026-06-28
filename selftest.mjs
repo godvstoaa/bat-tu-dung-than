@@ -3112,6 +3112,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 759] không undefined leak');
   console.log('   [loop 759] offline nạp âm surface (4 trụ + bản mệnh meaning) ✓');
 }
+// [loop 760] isTiaohou — offline điều hậu surface (穷通宝鉴 + quan hệ Dụng).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('mệnh tôi cần điều hậu gì?').isTiaohou === true, '[loop 760] isTiaohou detect «điều hậu»');
+  const _a = composeAnswer('điều hậu của tôi?', _QR);
+  assert(/Điều hậu|调候/.test(_a.title), `[loop 760] tiaohou route → title điều hậu (got ${_a.title})`);
+  // Quân tiaohou = 癸(水) + 辛(金), primary 水
+  assert(_a.paragraphs.some((p) => /癸.*辛|Thủy.*Kim/.test(p)), '[loop 760] surface 癸+辛 → Thủy, Kim');
+  assert(_a.paragraphs.some((p) => /override|Phù Ức|quan hệ/i.test(p)), '[loop 760] surface quan hệ với Dụng Thần');
+  assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 760] không undefined leak');
+  console.log('   [loop 760] offline điều hậu surface (穷通宝鉴 + quan hệ Dụng) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
