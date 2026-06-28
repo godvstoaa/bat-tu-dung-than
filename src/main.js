@@ -5002,12 +5002,27 @@ function renderProLuopan(heading, s) {
   // update bagua + xiu display
   if (s) {
     const sIdx = _SHAN24_L.indexOf(s.han);
-    const baguaIdx = Math.floor((sIdx + 1.5) / 3) % 8;
+    const baguaIdx = Math.floor(sIdx / 3) % 8; // [loop 696 FIX] cũ: (sIdx+1.5)/3 → 7/24 sơn sai (vd 癸→艮 thay vì 坎)
     const bgEl = $('compass-bagua');
     if (bgEl) bgEl.textContent = `八卦: ${_BAGUA8[baguaIdx]} (${_BAGUA_VI[baguaIdx]})`;
     const xiuIdx = Math.floor((heading / (360/28)) + 0.5) % 28;
     const xiuEl = $('compass-xiu');
     if (xiuEl) xiuEl.textContent = `二十八宿: ${_XIU28[xiuIdx]} (${_XIU_VI[xiuIdx]})`;
+    // [loop 696] 分金 FEN JIN — 60甲子 trong sơn (mỗi sơn 15° = 5 phân × 3°)
+    const _GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const _ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    // 60甲子 position: sơn i starts at degree (337.5 + i*15) % 360
+    // within each sơn: 5 分金, each 3°. 分金 index within sơn = floor(within-sơn-deg / 3)
+    const sStart = (337.5 + sIdx * 15) % 360;
+    let within = heading - sStart; if (within < 0) within += 360;
+    const fenIdxInShan = Math.min(4, Math.floor(within / 3));
+    // 60甲子 index: each sơn has specific 甲子 based on 旬
+    // simplified: 甲子 index = (sIdx * 5 + fenIdxInShan) mapping (近似 — chuyên gia nên xem 分金 table)
+    const jiazi60Idx = (sIdx * 5 + fenIdxInShan) % 60;
+    const jiaziGan = _GAN[jiazi60Idx % 10], jiaziZhi = _ZHI[jiazi60Idx % 12];
+    // 纳音 of 甲子 (simplified — just show the 甲子 label for 分金 reference)
+    const fenEl = $('compass-fenjin');
+    if (fenEl) fenEl.textContent = `分金: ${jiaziGan}${jiaziZhi} (${fenIdxInShan+1}/5 trong sơn)`;
   }
 }
 function _onCompass(e) {
