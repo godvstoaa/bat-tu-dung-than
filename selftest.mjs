@@ -761,6 +761,40 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   }
   console.log('   [loop 737] 12长生 (10 can) + 空亡 (6 旬) — GIÁ TRỊ TUYỆT ĐỐI cổ pháp ✓');
 }
+// [loop 738] ABSOLUTE classical guards — 十神 (100 cặp) + 纳音 (30 loại/60 甲 tử).
+//   十神 = calc CƠ BẢN NHẤT (sai → toàn bộ pattern/yong/brief sai). Pin 100 cặp tuyệt đối.
+{
+  const _STG = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  const _SHENG = {木:'火',火:'土',土:'金',金:'水',水:'木'};
+  const _KE = {木:'土',土:'水',水:'火',火:'金',金:'木'};
+  const _KEBY = {木:'金',金:'火',火:'水',水:'土',土:'木'};
+  const _SHENGBY = {木:'水',水:'金',金:'土',土:'火',火:'木'};
+  const _STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  let bad = [];
+  for (const dg of _STEMS) for (const og of _STEMS) {
+    const dE=_STG[dg], oE=_STG[og];
+    // yin/yang: index chẵn = dương, lẻ = âm (thứ tự 甲dương 乙âm 丙dương...)
+    const same = (_STEMS.indexOf(dg) % 2) === (_STEMS.indexOf(og) % 2);
+    let exp;
+    if (oE===dE) exp = same?'比肩':'劫財';
+    else if (oE===_SHENG[dE]) exp = same?'食神':'傷官';
+    else if (oE===_KE[dE]) exp = same?'偏財':'正財';
+    else if (oE===_KEBY[dE]) exp = same?'七殺':'正官';
+    else if (oE===_SHENGBY[dE]) exp = same?'偏印':'正印';
+    if (tenGod(dg,og) !== exp) bad.push(`${dg}→${og}=${tenGod(dg,og)}(cổ:${exp})`);
+  }
+  assert(bad.length === 0, `[loop 738] 十神 100 cặp khớp tuyệt đối cổ quy tắc (lệch ${bad.length}: ${bad.slice(0,3).join(', ')})`);
+  // 纳音 — 30 loại đầy đủ + 60 甲 tử resolve + spot check kinh điển
+  const { ganZhiNayin, NAYIN_MEANING } = await import('./src/engine/nayin.js');
+  assert(Object.keys(NAYIN_MEANING).length === 30, `[loop 738] NAYIN_MEANING đủ 30 loại (got ${Object.keys(NAYIN_MEANING).length})`);
+  assert(ganZhiNayin('甲子')==='海中金' && ganZhiNayin('乙丑')==='海中金', '[loop 738] 甲子/乙丑 = 海中金 (kinh điển đầu)');
+  assert(ganZhiNayin('癸亥')==='大海水', `[loop 738] 癸亥 = 大海水 (kinh điển cuối, got ${ganZhiNayin('癸亥')})`);
+  assert(ganZhiNayin('甲午')==='沙中金', `[loop 738] 甲午 = 沙中金 (got ${ganZhiNayin('甲午')}, 沙≠砂 variant đúng cổ bản 渊海子平)`);
+  let _gNull = 0; const _G=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'], _Z=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  for (let i=0;i<60;i++){const gz=_G[i%10]+_Z[i%12]; if(!ganZhiNayin(gz)||!NAYIN_MEANING[ganZhiNayin(gz)]) _gNull++;}
+  assert(_gNull === 0, `[loop 738] 60 甲 tử ganZhiNayin → NAYIN_MEANING resolve 100% (null ${_gNull})`);
+  console.log('   [loop 738] 十神 (100 cặp) + 纳音 (30 loại/60 甲 tử) — GIÁ TRỊ TUYỆT ĐỐI cổ pháp ✓');
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
