@@ -1052,7 +1052,14 @@ export function execTool(name, args, R) {
         // [loop 698] enrich với 八卦 + 二十八宿 + 分金 (罗盘 chuyên nghiệp data)
         let _deg = null, _bagua = '', _xiu = '', _fenjin = '';
         try {
-          const _d = typeof a.direction === 'number' || /^\d+(\.\d+)?$/.test(a.direction) ? parseFloat(a.direction) : null;
+          const _d0 = typeof a.direction === 'number' || /^\d+(\.\d+)?$/.test(a.direction) ? parseFloat(a.direction) : null;
+          // [loop 704 FIX] khi direction là tên sơn (vd «艮») → compute degree từ sơn index
+          const _SHAN_L = ['壬','子','癸','丑','艮','寅','甲','卯','乙','辰','巽','巳','丙','午','丁','未','坤','申','庚','酉','辛','戌','乾','亥'];
+          let _d = _d0;
+          if (_d == null && rd.shan) {
+            const _si = _SHAN_L.indexOf(rd.shan.split(' ')[0]);
+            if (_si >= 0) _d = ((345 + _si * 15) % 360); // center of sơn
+          }
           if (_d != null) {
             const _SHAN24_L = ['壬','子','癸','丑','艮','寅','甲','卯','乙','辰','巽','巳','丙','午','丁','未','坤','申','庚','酉','辛','戌','乾','亥'];
             const _BG = ['坎','艮','震','巽','离','坤','兑','乾'];
