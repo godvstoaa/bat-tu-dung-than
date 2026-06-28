@@ -173,7 +173,7 @@ export function xiaoliuren(month, day, hour) {
 // ---- Helper: đổi dương lịch → số âm lịch để bói ----------------------------
 // Trả về {month, day, hour} (1-indexed) + label tiếng Hán.
 export function solarToXlrNums(year, month, day, hour, minute) {
-  const s = Solar.fromYmdHms(year, month, day, hour || 12, minute || 0, 0);
+  const s = Solar.fromYmdHms(year, month, day, hour == null ? 12 : hour, minute == null ? 0 : minute, 0); // [loop 712 FIX] hour||12 nuốt giờ Tý (0 falsy → 12)
   const l = s.getLunar();
   const lmonth = l.getMonth();          // 1-12 (âm)
   const lday = l.getDay();              // 1-30 (âm)
