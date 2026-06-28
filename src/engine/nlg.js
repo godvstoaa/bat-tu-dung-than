@@ -11,6 +11,7 @@ import { scanWealthCareerYingqi } from './yingqi-wealth.js';
 import { jiaoYunAnalysis } from './jiaoyun.js';
 import { decadeForecast } from './decade-forecast.js';
 import { SHENSHA_INFO } from './shensha.js';
+import { analyzeNayin, NAYIN_MEANING } from './nayin.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
@@ -117,6 +118,8 @@ export function detectIntent(question) {
   //   «sao» phải kết hợp context sao (tránh «sao tôi lại...» = why).
   const isShensha = /\b(quy nhan|chinh tinh|than sat|van xuong|duong nhan|hoa cai|tuong tinh|thien duc|thien y|kim du|hong diem|qui cuong|tam ky|loc than|dich ma|hoc duong)\b/.test(norm)
     || (/\bsao\b/.test(norm) && /\b(co|gi dac biet|chinh tinh|than|nao tot|nao xau)\b/.test(norm));
+  // [loop 759] isNayin — hỏi về nạp âm / bản mệnh hành (nayin của trụ ngày).
+  const isNayin = /\b(nap am|nayin|nap am cua|ban menh ngu hanh|menh ngu hanh|hanh cua toi|cung menh)\b/.test(norm);
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
@@ -130,7 +133,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -507,6 +510,25 @@ function pDivination(R, intent) {
   }
 }
 
+function pNayin(R) {
+  // [loop 759] Surface nạp âm offline — 4 trụ nayin + bản mệnh (trụ ngày) meaning.
+  const dayGz = (R.chart.pillars && R.chart.pillars.day) ? R.chart.pillars.day.gan + R.chart.pillars.day.zhi : R.chart.dayMaster.gan;
+  let list;
+  try { list = analyzeNayin(R.chart) || []; } catch (e) { list = []; }
+  if (!list.length) {
+    return { title: 'Nạp âm (纳音)', lead: `Nạp âm bản mệnh ${dayGz}:`, paragraphs: ['(không tính được nạp âm — thử bật AI để luân giải)'] };
+  }
+  const lines = list.map((n) => {
+    const isDay = n.key === 'day';
+    return `${isDay ? '★ ' : '  '}${n.label}: ${n.name} (${n.vi}) — hành ${n.wxVi}${n.meaning && n.meaning !== '(chưa encode)' ? ' · ' + n.meaning : ''}`;
+  });
+  const dayNayin = list.find((n) => n.key === 'day');
+  return {
+    title: 'Nạp âm 纳音 (bản mệnh hành)',
+    lead: `Nạp âm 4 trụ — trụ NGÀY (${dayGz} = ${dayNayin ? dayNayin.vi : '?'}) là «bản mệnh hành» (cốt lõi khí chất bẩm sinh):`,
+    paragraphs: lines.concat([`💡 Nạp âm (六十甲子纳音) là hành «cảm quang» của cặp can-chi — khác với hành thiên can địa chi. Nó bổ khuyết cho hành Dụng Thần; màu/số/đá hợp = hành nạp âm + Dụng. Mở AI để luân giải sâu.`]),
+  };
+}
 function pShensha(R) {
   // [loop 758] Surface thần煞 offline — R.shensha + SHENSHA_INFO desc, nhóm theo tone.
   const ss = R.shensha || {};
@@ -634,6 +656,8 @@ export function composeAnswer(question, R) {
   if (intent.isInteraction) return pInteractions(R);
   // [loop 758] shensha question — surface thần煞 (offline, không cần AI)
   if (intent.isShensha) return pShensha(R);
+  // [loop 759] nayin question — surface nạp âm (offline, không cần AI)
+  if (intent.isNayin) return pNayin(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family

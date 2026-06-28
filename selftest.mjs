@@ -3098,6 +3098,20 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_a2.paragraphs.length > 0, '[loop 758] chart ít sao vẫn clean');
   console.log('   [loop 758] offline thần煞 surface (isShensha + pShensha) ✓');
 }
+// [loop 759] isNayin — offline nạp âm surface (4 trụ + bản mệnh meaning).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('nạp âm của tôi là gì?').isNayin === true, '[loop 759] isNayin detect «nạp âm»');
+  assert(detectIntent('bản mệnh ngũ hành tôi?').isNayin === true, '[loop 759] isNayin detect «bản mệnh ngũ hành»');
+  const _a = composeAnswer('nạp âm của tôi?', _QR);
+  assert(/Nạp âm|纳音/.test(_a.title), `[loop 759] nayin route → title nạp âm (got ${_a.title})`);
+  // Quân day nayin = 山头火 (Sơn Đầu Hỏa) — phải surface
+  assert(_a.paragraphs.some((p) => /山头火|Sơn Đầu Hỏa/.test(p)), '[loop 759] surface 山头火 (Quân bản mệnh nạp âm)');
+  // 4 trụ nạp âm đều có
+  assert(_a.paragraphs.some((p) => /剑锋金|Kiếm Phong Kim/.test(p)), '[loop 759] surface năm nạp âm 剑锋金');
+  assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 759] không undefined leak');
+  console.log('   [loop 759] offline nạp âm surface (4 trụ + bản mệnh meaning) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
