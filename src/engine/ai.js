@@ -395,7 +395,7 @@ BỔ SUNG 5 TRƯỜNG PHÁI (称骨/12神/贵人/三世/盲派 — góc nhìn ph
 ${(() => {
   const parts = [];
   // 称骨 (bone weight) — tổng trọng lượng + tầng
-  try { const cg = chenggu(R); parts.push(`称骨: ${cg.totalStr} = ${cg.summary.tier}`); } catch (e) { parts.push('称骨: (không tính được)'); }
+  try { const cg = chenggu(R); parts.push(`称骨: ${cg.totalStr} = ${cg.summary.tier}. ${cg.verse ? '«' + cg.verse + '»' : ''} ${(cg.interpretation || '').slice(0, 120)}`); } catch (e) { parts.push('称骨: (không tính được)'); }
   // 12 thần lưu niên năm nay
   try { const l12 = analyzeLiunian12(R, curYear); parts.push(`12神 ${curYear}: ${l12.mine.vi}(${l12.mine.viSub}) — ${l12.mine.tone}`); } catch (e) { parts.push('12神: (không tính được)'); }
   // Nhóm quý nhân cao cấp
