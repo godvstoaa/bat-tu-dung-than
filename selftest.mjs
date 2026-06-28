@@ -5902,6 +5902,34 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   console.log(`   Smoke batch 10 ✓ — wedding + shensha-activation + nayin-relation + move + xingshen`);
 }
 
+// ################## SMOKE TEST batch 11: last active modules [loop 585] ##################
+{
+  console.log('\n##### SMOKE batch 11: daily/dayun/space/family [loop 585] #####');
+  const { dailyGuide } = await import('./src/engine/daily-guide.js');
+  const { dailyDirections } = await import('./src/engine/daily-directions.js');
+  const { checkDayunInteractions } = await import('./src/engine/dayun-check.js');
+  const { spaceFs } = await import('./src/engine/space-fs.js');
+  const { personalFengShui } = await import('./src/engine/family-sync.js');
+  const { computeZhai } = await import('./src/engine/zhai.js');
+  // dailyGuide: dailyGuide(R, year, month, day)
+  const dg = dailyGuide(spR, 2026, 6, 28);
+  assert(dg.date && dg.ganZhi, `[smoke] dailyGuide.date + ganZhi`);
+  // dailyDirections: dailyDirections(year, month, day, yong)
+  const dd = dailyDirections(2026, 6, 28, spR.yong);
+  assert(dd.date && dd.directions, `[smoke] dailyDirections.date + directions`);
+  // checkDayunInteractions: checkDayunInteractions(R.chart, R.dayun)
+  const dc = checkDayunInteractions(spR.chart, spR.dayun);
+  assert(Array.isArray(dc), `[smoke] dayun-check returns array`);
+  // spaceFs: spaceFs(year, gender, yong, currentYear)
+  const sf = spaceFs(1990, 'nam', spR.yong, 2026);
+  assert(sf.year && sf.birthYear, `[smoke] spaceFs.year + birthYear`);
+  // personalFengShui: personalFengShui(auspicious, inauspicious, yong)
+  const zh = computeZhai(1990, 'nam');
+  const pf = personalFengShui(zh.auspicious, zh.inauspicious, spR.yong);
+  assert(pf.rooms, `[smoke] family-sync.rooms`);
+  console.log(`   Smoke batch 11 ✓ — dailyGuide + dailyDirections + dayun-check + spaceFs + family-sync`);
+}
+
 // ################## META: brief content completeness [loop 580] ##################
 // [loop 580] brief là context chính cho AI — phải chứa TẤT CẢ section quan trọng.
 //   Nếu brief vỡ section nào (do refactor/dependency change), test này bắt được.
