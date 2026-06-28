@@ -3124,6 +3124,20 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 760] không undefined leak');
   console.log('   [loop 760] offline điều hậu surface (穷通宝鉴 + quan hệ Dụng) ✓');
 }
+// [loop 761] isPattern — offline cách cục surface (格局 + quality + diseases/rescues).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('cách cục của tôi là gì?').isPattern === true, '[loop 761] isPattern detect «cách cục»');
+  assert(detectIntent('tôi thuộc cách nào?').isPattern === true, '[loop 761] isPattern detect «thuộc cách»');
+  const _a = composeAnswer('cách cục của tôi?', _QR);
+  assert(/Cách cục|格局/.test(_a.title), `[loop 761] pattern route → title cách cục (got ${_a.title})`);
+  // Quân 食神格 + 败格 + 格 thần 丁
+  assert(_a.paragraphs.some((p) => /Thực Thần cách|食神格/.test(p)), '[loop 761] surface 食神格');
+  assert(_a.paragraphs.some((p) => /BẠI CÁCH|THÀNH CÁCH|HỮU CỨU|ĐẶC BIỆT/.test(p)), '[loop 761] surface chất lượng cách');
+  assert(_a.paragraphs.some((p) => /格 thần|丁/.test(p)), '[loop 761] surface 格 thần');
+  assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 761] không undefined leak');
+  console.log('   [loop 761] offline cách cục surface (格局 + quality + diseases/rescues) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

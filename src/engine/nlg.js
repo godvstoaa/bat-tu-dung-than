@@ -123,6 +123,8 @@ export function detectIntent(question) {
   // [loop 760] isTiaohou — hỏi về điều hậu (khí hậu mùa sinh → hành cần bổ).
   const isTiaohou = /\b(dieu hau|hau cua|khi hau|mua sinh|co phap|khong thong bao|ngoai hop|van han|khan|tao|ret|am|nhiet)\b/.test(norm)
     && /\b(dieu hau|khi hau|hau|co phap)\b/.test(norm);
+  // [loop 761] isPattern — hỏi về cách cục (格局).
+  const isPattern = /\b(cach cuc|cach minh|cach cua|thuoc cach|cach nao|chinh cach|dac biet cach|tong cach)\b/.test(norm);
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
@@ -136,7 +138,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, isPattern, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -513,6 +515,32 @@ function pDivination(R, intent) {
   }
 }
 
+function pPattern(R) {
+  // [loop 761] Surface cách cục (格局) offline — pattern + quality + diseases/rescues.
+  const dm = R.chart.dayMaster;
+  const p = R.pattern || {};
+  const pq = R.patternQuality || {};
+  const QUALITY_VI = { 成格: 'THÀNH CÁCH (cách nguyên vẹn, mạnh)', 有救: 'HỮU CỨU (cách bại nhưng có cứu ứng bù)', 败格: 'BẠI CÁCH (cách vỡ, chưa cứu được)', 特殊: 'ĐẶC BIỆT (tòng/chuyên cách, vượt quy chuẩn)' };
+  const ge = p.geShen || {};
+  const paras = [];
+  paras.push(`📋 Cách cục: ${p.vi || p.name || '(chưa định)'} (${p.name || ''})${p.type === 'special' ? ' — CÁCH ĐẶC BIỆT' : ''}.`);
+  if (ge.gan) paras.push(`🎯 格 thần: ${ge.gan} (${ge.god}, hành ${ge.wx || '?'}) — nguồn ${ge.source || '?'}.`);
+  if (p.shunNi) paras.push(`↔ Hướng dụng: ${p.shunNi}${p.pref && p.pref.note ? ' — ' + p.pref.note : ''}.`);
+  if (pq.quality) {
+    paras.push(`🏆 Chất lượng cách: ${QUALITY_VI[pq.quality] || pq.quality}.`);
+    if (pq.transparent) paras.push(`   格 thần ${ge.gan || ''} THẤU CAN (lộ rõ, có lực).`);
+    if (pq.rooted) paras.push(`   Có ROOT (căn ${pq.keyStar?.rootChi?.join('/') || ''}) → cách có nền.`);
+    if (pq.broken) paras.push(`   ⚠ Cách BỊ VỠ${pq.rescued ? ' nhưng ĐÃ CỨU' : ' CHƯA cứu được'}.`);
+  }
+  if (Array.isArray(pq.diseases) && pq.diseases.length) {
+    paras.push(`🦠 Nguyên nhân vỡ cách: ${pq.diseases.map((d) => d.note).join('; ')}.`);
+  }
+  if (Array.isArray(pq.rescues) && pq.rescues.length) {
+    paras.push(`💊 Cứu ứng: ${pq.rescues.map((r) => r.note).join('; ')}.`);
+  }
+  paras.push(`💡 Cách cục = khung luận mệnh (chọn Dụng theo cách). THÀNH cách → dùng thần cách; BẠI cách → cần cứu ứng/bổ. Mở AI để luân giải sâu.`);
+  return { title: 'Cách cục 格局', lead: `Cách cục của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
+}
 function pTiaohou(R) {
   // [loop 760] Surface điều hậu offline — khí hậu mùa sinh + hành cần (穷通宝鉴).
   const dm = R.chart.dayMaster;
@@ -684,6 +712,8 @@ export function composeAnswer(question, R) {
   if (intent.isNayin) return pNayin(R);
   // [loop 760] tiaohou question — surface điều hậu (offline, không cần AI)
   if (intent.isTiaohou) return pTiaohou(R);
+  // [loop 761] pattern question — surface cách cục (offline, không cần AI)
+  if (intent.isPattern) return pPattern(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family
