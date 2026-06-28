@@ -3138,6 +3138,29 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 761] không undefined leak');
   console.log('   [loop 761] offline cách cục surface (格局 + quality + diseases/rescues) ✓');
 }
+// [loop 762] NLG routing regression — 9 intent chuẩn + 5 intent mới (757-761) cùng tồn tại không xung đột.
+{
+  const _T = [
+    ['tài lộc của tôi sao?', 'area', 'wealth'],
+    ['tình duyên tôi thế nào?', 'area', 'love'],
+    ['sự nghiệp tôi ra sao?', 'area', 'career'],
+    ['sức khoẻ tôi?', 'area', 'health'],
+    ['bao giờ tôi giàu?', 'isTiming', true],
+    ['vợ chồng tôi hợp không?', 'isCompat', true],
+    ['hướng nhà nào tốt?', 'isFengshui', true],
+    ['làm sao cải vận?', 'isRemedyStrong', true],
+    ['gieo quẻ cho tôi', 'isDivination', true],
+    ['xung hình hại của tôi?', 'isInteraction', true],
+    ['tôi có quý nhân không?', 'isShensha', true],
+    ['nạp âm của tôi?', 'isNayin', true],
+    ['điều hậu của tôi?', 'isTiaohou', true],
+    ['cách cục của tôi?', 'isPattern', true],
+  ];
+  for (const [q, key, exp] of _T) {
+    assert(detectIntent(q)[key] === exp, `[loop 762] routing «${q}» → ${key}=${exp} (got ${detectIntent(q)[key]})`);
+  }
+  console.log('   [loop 762] NLG routing regression (9 chuẩn + 5 mới) — 0 xung đột ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
