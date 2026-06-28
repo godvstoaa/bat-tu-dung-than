@@ -61,6 +61,8 @@ const NAME_VI = {
   hiển: { han: '顯', strokes: 23 }, trí: { han: '智', strokes: 12 }, kiên: { han: '堅', strokes: 11 },
   chính: { han: '正', strokes: 5 }, trung: { han: '忠', strokes: 8 }, nghĩa: { han: '義', strokes: 13 },
   lạc: { han: '樂', strokes: 15 }, tùng: { han: '松', strokes: 8 }, wiel: { han: '偉', strokes: 11 },
+  // [loop 666] tên user (Quân 君, Nhật 日 — 康熙 nét)
+  quân: { han: '君', strokes: 7 }, quan: { han: '君', strokes: 7 }, nhật: { han: '日', strokes: 4 },
   việt: { han: '越', strokes: 12 }, hà: { han: '河', strokes: 9, alt: [{ han: '霞', strokes: 17 }] },
   vĩ: { han: '偉', strokes: 11 }, hào: { han: '豪', strokes: 14 }, khang: { han: '康', strokes: 11 },
   thiện: { han: '善', strokes: 12 }, nhẫn: { han: '忍', strokes: 7 }, đan: { han: '丹', strokes: 4 },
@@ -83,9 +85,9 @@ export function viToHan(viName) {
   const chars = [];
   const missing = [];
 
-  // First word = surname
+  // First word = surname (nếu chỉ 1 từ và không phải họ → fallback _NAME cho given name đơn lẻ)
   if (parts.length > 0) {
-    const s = _SUR[parts[0]];
+    const s = parts.length === 1 ? (_SUR[parts[0]] || _NAME[parts[0]]) : _SUR[parts[0]];
     if (s) chars.push({ vi: parts[0], han: s.han, strokes: s.strokes });
     else missing.push(parts[0]);
   }

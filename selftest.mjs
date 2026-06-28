@@ -1993,6 +1993,18 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   assert(!r3.error && r3.diemMenh, `[loop 662] ngày hợp lệ vẫn hoạt động`);
   console.log(`   analyze() input validation ✓ — tháng/ngày sai → VN error; hợp lệ OK`);
 }
+// [loop 666] viToHan single-word + tên user (Quân/Nhật). Bug: parts[0] chỉ check _SUR →
+//   given name đơn (Tùng/Quân) bị missing.
+{
+  const { viToHan } = await import('./src/engine/vi2han.js');
+  // single given name (trước đây missing do check _SUR only)
+  const t = viToHan('Tùng'); assert(t.ok && t.hanString === '松', `[loop 666] «Tùng» → 松 (got ${t.hanString}, trước missing)`);
+  const q = viToHan('Quân'); assert(q.ok && q.hanString === '君', `[loop 666] «Quân» → 君 (got ${q.hanString})`);
+  const n = viToHan('Nhật'); assert(n.ok && n.hanString === '日', `[loop 666] «Nhật» → 日 (got ${n.hanString})`);
+  // full name user
+  const full = viToHan('Nguyễn Tùng Quân'); assert(full.ok && full.hanString === '阮松君', `[loop 666] «Nguyễn Tùng Quân» → 阮松君 (got ${full.hanString})`);
+  console.log(`   viToHan ✓ — Tùng/Quân/Nhật single + «Nguyễn Tùng Quân»→阮松君 convert được`);
+}
 // [loop 644] daily.js (dailyGuidance) + liuri advice — align thang 54/48 (không 65/45 hay 64).
 //   Bug: dailyGuidance dùng 65/45 (thang cũ); liuri advice >=64 nhưng rating Cát >=54 → mâu thuẫn nội bộ.
 {
