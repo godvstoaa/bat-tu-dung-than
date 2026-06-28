@@ -28,6 +28,11 @@ const HOUR_RANGES = [
  *            yongDistribution:{[wx]:number}, stableYong, outlierHours, scoreRange, summary }}
  */
 export function scanHours(year, month, day, gender, currentYear = new Date().getFullYear()) {
+  // [loop 665] validate input — primitives (year,month,day,gender), không phải R object.
+  //   Trước đây scanHours(R) → 12 giờ đều lỗi → summary lừa «0 Dụng khác nhau».
+  if (typeof year === 'object' || !Number.isFinite(Number(year)) || !Number.isFinite(Number(month)) || !Number.isFinite(Number(day))) {
+    return { error: 'scanHours cần (year, month, day, gender) dạng số — không phải object R. VD: scanHours(1964, 4, 4, "nam").', summary: '(input không hợp lệ)' };
+  }
   const results = [];
   const yongCounts = {};
 
