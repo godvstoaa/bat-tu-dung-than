@@ -5780,9 +5780,9 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   const { analyzeStudy } = await import('./src/engine/study-analysis.js');
   const { analyzeVitality } = await import('./src/engine/vitality.js');
   const { analyzeRomance } = await import('./src/engine/romance-deep.js');
-  // suiyun: year number
+  // suiyun: returns {year,...} or null (no interaction) — both valid
   const sy = suiyunCheck(spR.chart.pillars.day.gan + spR.chart.pillars.day.zhi, 2026, spR.chart.pillars.year.gan + spR.chart.pillars.year.zhi);
-  assert(typeof sy.year === 'number', `[smoke] suiyun.year number`);
+  assert(sy === null || typeof sy.year === 'number', `[smoke] suiyun trả {year} hoặc null (hợp lệ)`);
   // personality-profile: gan string
   const pp = getPersonalityProfile(spR);
   assert(typeof pp.gan === 'string', `[smoke] personality-profile.gan string`);
