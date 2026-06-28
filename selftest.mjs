@@ -6449,6 +6449,14 @@ if (FAILS === 0) {
 } else {
   console.log(`💥 CÓ ${FAILS} KIỂM CHỨNG THẤT BẠI — xem ❌ ở trên`);
 }
+// [loop 689] META-GUARD: selftest phải có > 1900 assertions (đảm bảo coverage không bị giảm)
+{
+  const _fs = (await import('fs')).default;
+  const _src = await _fs.promises.readFile('selftest.mjs', 'utf-8');
+  const _count = (_src.match(/assert\(/g) || []).length;
+  assert(_count >= 1900, `[loop 689] selftest có >= 1900 assertions (got ${_count} — coverage regression!)`);
+  console.log(`   META: selftest ${_count} assertions (>= 1900) ✓`);
+}
 console.log('='.repeat(70));
 
 process.exit(FAILS === 0 ? 0 : 1);
