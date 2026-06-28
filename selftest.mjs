@@ -1039,6 +1039,24 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   }
   console.log('   [loop 755] 紫微 14 chính tinh placement (紫微系+天府系 invariants + 局, 5 thành viên) ✓');
 }
+// [loop 756] 河洛理数 heshu (can/chi → 河图数) — khẩu quyết «戊一乙癸二, 庚三辛四同, 壬甲從六數,
+//   丁七丙八宮, 己九; 5寄中». Chi: 河图 thành số (水1,6/火2,7/木3,8/金4,9/土5,10).
+{
+  const { heluo } = await import('./src/engine/heluo.js');
+  // Quân heshuMap: 癸=2,壬=6,乙=2,丁=7 + 酉=[4,9],戌=[5,10],亥=[1,6],丑=[5,10]
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _h = heluo(_QR);
+  const _hm = _h.heshuMap;
+  assert(_hm['癸'] === 2 && _hm['壬'] === 6 && _hm['乙'] === 2 && _hm['丁'] === 7, `[loop 756] can heshu: 壬甲=6, 乙癸=2, 丁=7 (口诀)`);
+  assert(JSON.stringify(_hm['酉']) === '[4,9]' && JSON.stringify(_hm['亥']) === '[1,6]' && JSON.stringify(_hm['戌']) === '[5,10]', `[loop 756] chi heshu: 河图成数 金4,9/水1,6/土5,10`);
+  // 天数 = yang số lẻ sum, 地数 = âm số chẵn sum; tianShu/diShu reduced hợp lệ
+  assert(_h.tianShu >= 1 && _h.tianShu <= 9 && _h.diShu >= 1 && _h.diShu <= 9, `[loop 756] tianShu/diShu reduced 1-9 (got ${_h.tianShu}/${_h.diShu})`);
+  // hexagram + yuantang present (no undefined leak)
+  assert(_h.hexagram && _h.yuantang != null, '[loop 756] hexagram + 元堂 có giá trị');
+  const _j = JSON.stringify(_h);
+  assert(!/undefined|NaN/.test(_j), '[loop 756] heluo output không undefined/NaN leak');
+  console.log('   [loop 756] 河洛理数 heshu (口诀 + 河图成数 + hexagram/元堂) ✓');
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
