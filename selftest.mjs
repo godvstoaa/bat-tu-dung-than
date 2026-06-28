@@ -349,6 +349,22 @@ assert(R1990.yong.reasons.some((r) => /Bệnh Dược.*pattern-quality/.test(r))
   // override → xi/ji/chou recomputed from NEW primary
   assert(_w.yong.xi === '木' && _w.yong.ji === '水', `1984 override → xi/ji recomputed từ primary Hỏa`);
 }
+// [loop 639] 调候 OVERRIDE phải GỠ reason «Kỵ» CŨ của Phù Ức còn liệt kê primary MỚI.
+//   Bug: Dụng=火 (override) nhưng reasons vẫn «Kỵ: ... Quan Sát (火)» → AI nhận mâu thuẫn.
+{
+  // cháu 2023-01-13 辛金 丑月 + 水 41% → hàn thấp → override Hỏa
+  const _c = analyze(2023, 1, 13, 7, 15, 'nam', 2026);
+  assert(_c.yong.tiaohou?.override === true && _c.yong.primary === '火', `[loop 639] cháu 调候 override → Dụng Hỏa`);
+  const staleKwy = (_c.yong.reasons || []).filter((r) => /^Kỵ:/.test(r) && r.includes(`(${_c.yong.primary})`));
+  assert(staleKwy.length === 0, `[loop 639] KHÔNG còn reason «Kỵ: ... (${_c.yong.primary}=Hỏa)» mâu thuẫn Dụng (còn ${staleKwy.length})`);
+  // recomputed Kỵ reason vẫn có (nói 水 khắc Hỏa)
+  const newKwy = (_c.yong.reasons || []).some((r) => r.includes('Kỵ Thần') && r.includes('水'));
+  assert(newKwy, `[loop 639] vẫn có reason Kỵ Thần mới (Thủy khắc Hỏa)`);
+  // chart KHÔNG override (Quân) → reasons count không bị cắt
+  const _q = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(_q.yong.reasons.length >= 5, `[loop 639] Quân (không override) reasons không bị cắt (got ${_q.yong.reasons.length})`);
+  console.log(`   调候 override gỡ reason Kỵ cũ ✓ — cháu Dụng Hỏa, không còn «Kỵ: ...Hỏa» mâu thuẫn`);
+}
 // [loop 41] 病药 → PRIMARY (败中有成): 1985 nam (quality='有救', phi cực đoan) → thuốc LÀM CHỦ
 {
   const _byR = analyze(1985, 3, 20, 8, 0, 'nam', 2026);

@@ -371,6 +371,12 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     for (const w of [_newJi, _newChou]) if (w && !avoid.includes(w)) avoid.push(w); // thêm Kỵ + Thù mới
     method.push('Điều Hậu (调候) — khí hậu thiên lệch, LÀM CHỦ (override Phù Ức)');
     reasons.push(`🔥 Điều Hậu (调候) OVERRIDE: sinh tháng ${chart.monthZhi} (${clim ? clim.climate : 'khí hậu thiên lệch'}) — 窮通寶鑑 bắt buộc lấy ${tiaoStemsVi(tiaoRaw)} ${clim ? clim.need : ''} làm Dụng Thần CHÍNH, đè Phù Ức (${fuyiPrimary}). Mệnh hàn/nóng quá nặng thì điều hòa khí hậu ưu tiên hơn cân bằng vượng suy.`);
+    // [loop 639 FIX] gỡ reason «Kỵ» CỦA PHÙ ỨC còn liệt kê primary MỚI (giờ là Dụng, KHÔNG còn Kỵ).
+    //   Trước đây: Dụng=火 nhưng reasons vẫn «Kỵ: ... Quan Sát (火)» → AI nhận thông tin MÂU THUẪN.
+    //   Nay override → lý do Kỵ mới được line 382 (recomputed Kỵ) cung cấp, reason cũ phải đi.
+    for (let i = reasons.length - 1; i >= 0; i--) {
+      if (/^Kỵ:/.test(reasons[i]) && reasons[i].includes(`(${primary})`)) reasons.splice(i, 1);
+    }
   }
 
   // --- BỘ 用喜忌仇 (Dụng – Hỷ – Kỵ – Thù) — tính từ primary SAU override ---
