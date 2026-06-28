@@ -3065,6 +3065,22 @@ const aRemedy = composeAnswer('sao giải hạn năm nay?', nlR);
 assert(/cải mệnh|Nghịch thiên|màu|Dụng/i.test(aRemedy.title + ' ' + aRemedy.paragraphs.join(' ')), '«giải hạn năm nay» route sang remedy (isRemedyStrong thắng timing)');
 assert(aRemedy.intent.isRemedyStrong === true, '«giải hạn năm nay» có isRemedyStrong=true');
 console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyStrong thắng isTiming)');
+// [loop 757] isInteraction — offline 刑冲害合 surface (elevation 746-752 giờ truy cập được offline)
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('trong lá số tôi có xung hình hại gì?').isInteraction === true, '[loop 757] isInteraction detect «xung hình hại»');
+  assert(detectIntent('mệnh tôi có gì mâu thuẫn?').isInteraction === true, '[loop 757] isInteraction detect «mâu thuẫn»');
+  const _a = composeAnswer('xung hình hại trong lá số tôi?', _QR);
+  assert(/Tương tác Tứ Trụ|刑沖會合/.test(_a.title), `[loop 757] interaction route → title tương tác (got ${_a.title})`);
+  // Quân có Hình thế thế (戌-丑) + Hại đố kỵ (酉-戌) → phải surface
+  assert(_a.paragraphs.some((p) => /Hình thế thế|thế thế/.test(p)), '[loop 757] surface 三刑 thế thế (Quân)');
+  assert(_a.paragraphs.some((p) => /Hại đố kỵ|đố kỵ/.test(p)), '[loop 757] surface 六害 đố kỵ (Quân)');
+  // chart không có tương tác nặng → vẫn trả clean (không crash)
+  const _CR = analyze(1996, 12, 4, 10, 15, 'nữ', 2026);
+  const _a2 = composeAnswer('xung hình hại của tôi?', _CR);
+  assert(_a2.paragraphs.length > 0, '[loop 757] chart ít tương tác vẫn trả clean');
+  console.log('   [loop 757] offline 刑沖會合 surface (isInteraction + pInteractions) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

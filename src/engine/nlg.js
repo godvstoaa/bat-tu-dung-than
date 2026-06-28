@@ -107,6 +107,10 @@ export function detectIntent(question) {
   //   Phân biệt với «năm sau nên làm gì?» (loop 716) — «nên làm gì» mơ hồ → có thể timing.
   //   → isRemedyStrong thắng CẢ khi isTiming (remedy là chủ ý thực sự).
   const isRemedyStrong = /\b(giai han|hoa giai|giai xui|cai menh|cai van|doi van|khai van|bot xui|giam xui|cuu menh|cuu|bo tui|giam tui)\b/.test(norm);
+  // [loop 757] isInteraction — hỏi về tương tác tứ trụ (刑冲害合/xung khắc/mâu thuẫn).
+  //   Trước đây NLG offline KHÔNG surface interaction data (elevation 746-752 chỉ giúp AI brief).
+  const isInteraction = /\b(xung hinh hai|xung hinh|xung khac|mau thuan|tuong tac|tu tru|tuong han|xung\.?hinh|xung khat|co gi dac biet|gi day)\b/.test(norm)
+    || (/\b(xung|hinh|hai)\b/.test(norm) && /\b(gi|nao|co khong|the nao|ra sao)\b/.test(norm));
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
@@ -120,7 +124,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -497,6 +501,55 @@ function pDivination(R, intent) {
   }
 }
 
+function pInteractions(R) {
+  // [loop 757] Surface tương tác tứ trụ (刑冲害合) offline — dùng typed meanings (elevation 746-752).
+  const it = R.interactions || {};
+  const paras = [];
+  const dm = R.chart.dayMaster;
+  const lead = `Tương tác Tứ Trụ (刑沖會合) của ${dm.gan} ${dm.vi}:`;
+  const has = (a) => Array.isArray(a) && a.length;
+  // 三刑
+  if (has(it.xing)) {
+    paras.push(`⚔ 三刑: ${it.xing.map((x) => `${x.a}${x.a === x.b ? '' : '–' + x.b} (${x.vi})${x.heavy ? ' ⚖NẶNG(pháp hình)' : ''}${x.meaning ? ' — ' + x.meaning : ''}`).join('; ') || '(không phạm)'}`);
+  }
+  // 六害
+  if (has(it.hai)) {
+    paras.push(`➶ 六害: ${it.hai.map((h) => `${h.a}–${h.b} (${h.vi || 'hại'})${h.meaning ? ' — ' + h.meaning : ''}`).join('; ')}`);
+  }
+  // 六冲
+  if (has(it.chong)) {
+    paras.push(`⚡ 六冲: ${it.chong.map((c) => `${c.a}↔${c.b} (${c.vi || 'xung'})[${c.domain || '?'}]${c.meaning ? ' — ' + c.meaning : ''}`).join('; ')}`);
+  }
+  // 六合 (合化/合绊)
+  if (has(it.zhiHe)) {
+    paras.push(`🤝 六合: ${it.zhiHe.map((h) => `${h.a}+${h.b}→${h.hua} (${h.heType || 'hợp'})${h.huaNote ? ' — ' + h.huaNote : ''}`).join('; ')}`);
+  }
+  // bán hợp
+  if (has(it.banHe)) {
+    paras.push(`🔗 Bán hợp: ${it.banHe.map((b) => `${b.present.join('')}(thiếu ${b.missing}) = ${b.banType}[${b.strength}]`).join('; ')}`);
+  }
+  // 三合/三会 (cục đủ)
+  if (has(it.sanHe) || has(it.sanHui)) {
+    const all = [...(it.sanHui || []).map((s) => `會 ${s.branches.join('')}→${s.wx}`), ...(it.sanHe || []).map((s) => `合 ${s.branches.join('')}→${s.wx}`)];
+    paras.push(`★ Tam hợp/hội đủ cục: ${all.join('; ')} (lực mạnh, đổi ngũ hành cục)`);
+  }
+  // Can hợp
+  if (has(it.ganHe)) {
+    paras.push(`☉ Can hợp: ${it.ganHe.map((g) => `${g.a}+${g.b}→${g.hua}`).join('; ')}`);
+  }
+  if (!paras.length) {
+    return {
+      title: 'Tương tác Tứ Trụ',
+      lead,
+      paragraphs: [`Lá số ${dm.gan}${dm.zhi} KHÔNG phạm xung/hình/hại nặng giữa các trụ — nền tương đối ổn, lục thân/quan hệ ít xung đột nội tại.`],
+    };
+  }
+  return {
+    title: 'Tương tác Tứ Trụ (刑沖會合)',
+    lead,
+    paragraphs: paras.concat(['💡 Xung/hình/hại không hẳn xấu — 若 trùng Dụng/Hỷ hành thì «hung giảm»; tam hợp/hội đủ cục + hành = Dụng thì CÁT mạnh. Chi tiết mở AI (⚙ GLM-5.2) để luân giải từng tương tác.']),
+  };
+}
 function pFreeForm(R, intent) {
   // Composer "bất kỳ câu hỏi" — khi không khớp lĩnh vực cụ thể, dệt câu trả lời
   // theo TOÀN BỘ lá số + bất kỳ từ khoá nào phát hiện được trong câu hỏi.
@@ -542,6 +595,8 @@ const COMPOSERS = {
 // ---------------------------------------------------------------------------
 export function composeAnswer(question, R) {
   const intent = detectIntent(question);
+  // [loop 757] interaction question — surface 刑冲害合 typed meanings (offline, không cần AI)
+  if (intent.isInteraction) return pInteractions(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family
