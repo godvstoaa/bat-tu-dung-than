@@ -105,7 +105,7 @@ function computePoisons(R) {
 
   // SI (痴) — thổ trọc + vô ấn + vô thực thương (thiếu minh đạt)
   let si = 0;
-  if (wxCount['土'] >= 2.5) si += 4; // thổ trọc → nặng nề, cố chấp
+  if (wxCount['土'] >= 1.5) si += 4; // [loop 577 tune] thổ trọc → nặng nề (hạ 2.5→1.5: tàng-can 0.5/unit → cần ≥3 đơn vị)
   if ((godCount['正印'] || 0) + (godCount['偏印'] || 0) === 0) si += 4; // vô ấn → thiếu tuệ
   if ((godCount['食神'] || 0) + (godCount['傷官'] || 0) === 0) si += 3; // vô thực thương → kém linh hoạt
   if (wxCount['水'] >= 3) si += 1; // thuỷ quá nhiều cũng dễ trôi (mơ hồ) — nhẹ
