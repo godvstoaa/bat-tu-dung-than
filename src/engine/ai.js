@@ -759,6 +759,7 @@ export function execTool(name, args, R) {
         return { year: y.year, ganZhi: y.ganZhi, rating: y.rating, score: y.score, advice: _s(y.advice, 260), schools: y.schools.map((sc) => ({ school: sc.phai, delta: sc.d, note: _s(sc.note, 110) })) };
       }
       case 'best_days_in_year': {
+        if (!Number.isFinite(Number(a.year))) return { error: `Năm không hợp lệ («${a.year}») — nhập số năm (vd 2026).` };
         const Y = computeYearDaily(R, a.year, R.patternQuality);
         return { year: Y.year, best: Y.best.slice(0, 8).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })), worst: Y.worst.slice(0, 5).map((d) => ({ date: d.date, ganZhi: d.ganZhi, score: d.score, geju: d.gejuDelta || 0 })) };
       }
