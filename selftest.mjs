@@ -5876,6 +5876,20 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   console.log(`   Smoke batch 9 ✓ — dayun-god (${dg.items.length} phases) + brief-extender (${br.length} chars)`);
 }
 
+// ################## SMOKE TEST batch 12: hour-scan [loop 597] ##################
+{
+  console.log('\n##### SMOKE batch 12: hour-scan [loop 597] #####');
+  const { scanHours } = await import('./src/engine/hour-scan.js');
+  const hs = scanHours(1964, 4, 4, 'nam', 2026);
+  assert(hs.hours.length === 12, `[smoke] hour-scan returns 12 hours (got ${hs.hours.length})`);
+  assert(hs.stableYong && hs.stableCount > 0, `[smoke] hour-scan.stableYong + stableCount`);
+  assert(hs.scoreRange && typeof hs.scoreRange.min === 'number', `[smoke] hour-scan.scoreRange.min number`);
+  assert(typeof hs.summary === 'string' && hs.summary.length > 20, `[smoke] hour-scan.summary non-empty`);
+  const validHours = hs.hours.filter((h) => !h.error && h.yongPrimary);
+  assert(validHours.length >= 10, `[smoke] hour-scan ≥10/12 hours valid (got ${validHours.length})`);
+  console.log(`   hour-scan ✓ — 12 giờ, Dụng ${hs.stableYong} (${hs.stableCount}/12), score ${hs.scoreRange.min}-${hs.scoreRange.max}`);
+}
+
 // ################## SMOKE TEST batch 10: final active modules [loop 584] ##################
 {
   console.log('\n##### SMOKE batch 10: wedding/shensha/nayin/move/xingshen [loop 584] #####');
