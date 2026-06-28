@@ -4940,10 +4940,14 @@ let _luopanInit = false;
 function renderProLuopan(heading, s) {
   const c = $('luopan-container'); if (!c) return;
   const cx = 100, cy = 100;
-  // [loop 702] sat phương overlay — highlight Thái Tuế/Tam Sát/Ngũ Hoàng trên luopan
-  const _satZhi = ['亥','子','丑']; // Tam Sát 2026 (午 year)
-  const _taiSui = '午'; // Thái Tuế 2026
-  const _wuHuang = '午'; // Ngũ Hoàng 2026 at Chính Nam
+  // [loop 703] DYNAMIC sat phương — compute từ năm hiện tại (không hardcode 2026)
+  const _yr = new Date().getFullYear();
+  const _yearZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][((_yr - 4) % 12 + 12) % 12];
+  const _chong = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
+  const _taiSui = _yearZhi; // Thái Tuế = year chi
+  // Tam Sát: năm DầnNgọTuất → 亥子丑; HợiMãoMùi → ThânDậuTuất; ThânTýThìn → TỵNgọMùi; TỵDậuSửu → DầnMãoThìn
+  const _satGroups = { '寅': ['亥','子','丑'], '午': ['亥','子','丑'], '戌': ['亥','子','丑'], '亥': ['申','酉','戌'], '卯': ['申','酉','戌'], '未': ['申','酉','戌'], '申': ['巳','午','未'], '子': ['巳','午','未'], '辰': ['巳','午','未'], '巳': ['寅','卯','辰'], '酉': ['寅','卯','辰'], '丑': ['寅','卯','辰'] };
+  const _satZhi = _satGroups[_yearZhi] || ['亥','子','丑'];
   // [loop 697 PERF] Generate static SVG ONCE, only update rotation after
   if (_luopanInit) {
     const ringsEl = c.querySelector('#luopan-rings');

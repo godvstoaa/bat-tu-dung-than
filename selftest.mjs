@@ -6459,5 +6459,15 @@ if (FAILS === 0) {
 }
 console.log('='.repeat(70));
 
+
+// [loop 703] BUILD CHECK — selftest phải verify build thành công (tránh loop 697-699 bug lặp)
+{
+  const { execSync } = await import('child_process');
+  let buildOk = false;
+  try { execSync('npx vite build', { stdio: 'pipe', env: { ...process.env, GH_PAGES: '1' }, timeout: 30000 }); buildOk = true; } catch (e) {}
+  assert(buildOk, `[loop 703] vite build phải thành công (trước đây loop 697-699 build fail không phát hiện vì tail -2)`);
+  console.log(`   BUILD CHECK ✓ — vite build thành công (guard tránh lặp loop 697-699)`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
