@@ -293,7 +293,7 @@ export function extendBrief(R) {
       line += ` | duyên score ${rm.romanceScore ?? '?'}`;
       if (rm.palaceStable === false) line += ` | cung phối ngẫu BỊ XUNG — hôn nhân biến động`;
       if (rm.warnings && rm.warnings.length) line += ` | ⚠ ${rm.warnings.slice(0, 2).join('; ')}`;
-      if (rm.timingYears && rm.timingYears.length) line += ` | năm duyên: ${rm.timingYears.slice(0, 3).join(', ')}`;
+      if (rm.timingYears && rm.timingYears.length) line += ` | năm duyên: ${rm.timingYears.slice(0, 3).map((t) => typeof t === 'object' ? t.year : t).join(', ')}`;
       parts.push(line);
     }
   } catch (e) {}
