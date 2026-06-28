@@ -890,7 +890,30 @@ export function execTool(name, args, R) {
           userHelpsRelative: userHelpsRel ? `✓ NC user (${userWx}) = Dụng của người thân (${relDung}) → user TỐT cho người này` : 'không trực tiếp bổ Dụng',
           relativeHelpsUser: relHelpsUser ? `✓ NC người thân (${relWx}) = Dụng của user (${userDung}) → người này TỐT cho user` : 'không trực tiếp bổ Dụng',
           daiVanTop: (rel.dayun || []).slice(0, 3).map((d) => `${d.ganZhi}[${d.rating}]`).join(', '),
-          advice: relHelpsUser ? 'Người này mang hành bổ mệnh bạn — nên gần gũi.' : userHelpsRel ? 'Bạn mang hành bổ mệnh người này — bạn tốt cho họ.' : 'Ngũ hành không trực tiếp bổ — quan hệ cần nỗ lực vun đắp.',
+          // [loop 610] advice theo relationship type + ngũ hành tương quan (không generic)
+          advice: (() => {
+            const WX_VI = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
+            const uV = WX_VI[userWx] || userWx, rV = WX_VI[relWx] || relWx;
+            const rel2 = (a.relation || '').toLowerCase();
+            // Cốt lõi: ngũ hành tương quan
+            let core;
+            if (relHelpsUser) core = `${rV} = Dụng của bạn → người này MANG HÀNH BỔ MỆNH bạn, tự nhiên tốt`;
+            else if (userHelpsRel) core = `${uV} = Dụng của người này → BẠN mang hành bổ họ, bạn tốt cho họ`;
+            else if (SHENG[userWx] === relWx) core = `bạn (${uV}) sinh họ (${rV}) → bạn cho đi, họ nhận — quan hệ «phú dưỡng»`;
+            else if (SHENG[relWx] === userWx) core = `họ (${rV}) sinh bạn (${uV}) → họ nuôi bạn — quan hệ «Ấn tinh» (hậu thuẫn)`;
+            else if (KE[userWx] === relWx) core = `bạn (${uV}) khắc họ (${rV}) → bạn chế/ap đặt — cần giảm kiểm soát`;
+            else if (KE[relWx] === userWx) core = `họ (${rV}) khắc bạn (${uV}) → họ áp đặt bạn — cần ranh giới rõ`;
+            else core = `cùng hành (${uV}) — tính cách giống, dễ hiểu nhưng dễ cạnh tranh`;
+            // Relationship-specific
+            let specific = '';
+            if (/m[eẽ]|mom/.test(rel2)) specific = ' Mẹ-con: dù ngũ hành thế nào, mẹ luôn cho đi vô điều kiện. Hãy biết ơn + giữ liên lạc.';
+            else if (/b[oố]|dad|cha/.test(rel2)) specific = ' Bố-con: bố đại diện Quan tinh (kỷ luật). Tôn trọng + học hỏi kinh nghiệm.';
+            else if (/em|sister|brother|anh/.test(rel2)) specific = ' Anh chị em: cùng thế hệ, dễ cạnh tranh nhưng cũng là đồng minh. Hợp tác > so sánh.';
+            else if (/chau|cháu/.test(rel2)) specific = ' Cháu-cậu: khác thế hệ, cần hướng dẫn + kiên nhẫn. Mệnh cháu khó → cần hỗ trợ thời gian tốt.';
+            else if (/con|child/.test(rel2)) specific = ' Con-cha: con là Tài/Quan tinh của bạn. Dạy dỗ theo Dụng Thần của con.';
+            else if (/v[oợ]|ch[oồ]ng|wife|husband/.test(rel2)) specific = ' Vợ/chồng: quan hệ quan trọng nhất — ngũ hành tương quan ảnh hưởng trực tiếp hôn nhân.';
+            return `${core}.${specific}`;
+          })(),
         };
       }
       default:
