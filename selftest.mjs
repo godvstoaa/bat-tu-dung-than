@@ -1900,6 +1900,24 @@ assert(roles.length === 4, 'đủ 4 cung trong tam phương tứ chính');
 const core2 = ziweiCoreReading(zr);
 assert(core.core.score === core2.core.score, 'ziweiCoreReading deterministic');
 console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = ${core.core.verdict} (score ${core.core.score}, ${core.core.cat.length} cát/${core.core.hung.length} hung) ✓`);
+// [loop 642] 命宫 空宫 → note «借星安命» (mượn sao đối cung). Quân 1993 命宫 酉 trống.
+{
+  const { computeZiwei } = await import('./src/engine/ziwei.js');
+  const zq = computeZiwei(1993, 10, 21, 1, 15, 'nam');
+  const cq = ziweiCoreReading(zq);
+  const mingQ = zq.palaces.find((p) => p.isMing);
+  if ((mingQ.stars || []).length === 0) {
+    assert(cq.summary.includes('空宫') && cq.summary.includes('借星安命'), `[loop 642] Mệnh 空宫 → note «借星安命» (got ${(cq.summary.includes('空宫')?'':'NO 空宫 note')})`);
+    console.log(`   Mệnh 空宫 note ✓ — Quân 1993 命宫 trống, mượn sao đối cung (không phán «mệnh yếu»)`);
+  }
+  // non-empty 命宫 → không note 空宫
+  const z2 = computeZiwei(1990, 6, 15, 14, 15, 'nam');
+  const c2 = ziweiCoreReading(z2);
+  const ming2 = z2.palaces.find((p) => p.isMing);
+  if ((ming2.stars || []).length > 0) {
+    assert(!c2.summary.includes('空宫'), `[loop 642] Mệnh CÓ sao → không nhầm note 空宫`);
+  }
+}
 
 // ################## 27. TỬ VI ĐỘ SÁNG 庙旺平陷 ##################
 import { starBrightness, analyzeZiweiBrightness, BRIGHTNESS } from './src/engine/ziwei-brightness.js';

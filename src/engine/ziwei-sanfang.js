@@ -76,6 +76,18 @@ export function ziweiCoreReading(zr) {
   const core = analyzePalaceSanfang(zr, mingPalace.zhi);
   let summary = `Mệnh cung (${mingPalace.vi}) tam phương tứ chính = Mệnh + Tài Bố + Quan Lộc + Thiên Di: ${core.verdictVi} ` +
     `Chính tinh: ${[mingPalace.zhi, ...TRINE[mingPalace.zhi].filter((z) => z !== mingPalace.zhi), OPP[mingPalace.zhi]].map((z) => zr.palaces.find((p) => p.zhi === z)?.vi + ':' + (zr.palaces.find((p) => p.zhi === z)?.stars || []).join('')).join(' | ')}.`;
+  // [loop 642] 命宫 空宫 → 借对宫 (classical «借星安命»). Trước đây không note → user/AI tưởng
+  //   Mệnh «trống/yếu». Thực ra ~50% lá số Mệnh 空宫, mượn sao đối cung làm chủ đề.
+  const mingStars = mingPalace.stars || [];
+  if (mingStars.length === 0) {
+    const oppPalace = zr.palaces.find((p) => p.zhi === OPP[mingPalace.zhi]);
+    const oppStars = oppPalace?.stars || [];
+    summary += ` ⬜ Mệnh cung KHÔNG có chính tinh (空宫) → CỔ PHÁP «借星安命»: mượn sao ĐỐI CUNG (${oppPalace?.vi || 'Thiên Di'}) làm chủ đề.`;
+    summary += oppStars.length
+      ? ` Tính cách chịu ảnh hưởng mạnh bởi ${oppStars.map((s) => STARS_14[s]?.vi || s).join(' + ')} (của cung đối) — linh hoạt, dễ bị hoàn cảnh định hướng, nhưng khi gặp vận tốt thì bứt phá mạnh (vì mượn được khí đối cung).`
+      : ` Cả đối cung cũng trống → bản mệnh phức tạp, cần xét đại vận/phụ tinh kỹ hơn.`;
+    summary += ` KHÔNG phán «mệnh yếu» — 空宫 là cấu trúc bình thường, không xấu.`;
+  }
   // 宫干自化 — nếu Mệnh cung có tự hóa thì ghi rõ (rất quan trọng), nếu không thì note toàn bàn.
   const zh = zr.zihua;
   if (zh && Array.isArray(zh.list) && zh.list.length) {
