@@ -1140,6 +1140,19 @@ assert(mht.dong >= 1 && mht.dong <= 6, 'gieo thời: động hào 1-6');
 assert(['大吉','吉','比和','小吉','不吉','大凶'].includes(mht.rel.luck), 'gieo thời: có phán cát/hung');
 assert(castByNumbers(3, 8).name === mh.name, 'mai hoa tất định');
 console.log(`   3,8 → ${mh.name} 体${mh.ti.tri}/用${mh.yong.tri} ${mh.rel.k}[${mh.rel.luck}] | thời ${mht.name} ${mht.rel.luck} ✓`);
+// [loop 624] 3-LAYER SYNTHESIS (本卦→互卦→变卦). Trước đây verdict CHỈ dùng 本卦, bỏ qua 变卦 (kết quả).
+//   Cổ pháp: biến quẻ có thể ĐẢO NGƯỢC bản quẻ → 先凶后吉 / 先吉后凶.
+assert(typeof mh.processNote === 'string' && mh.processNote.includes('互卦'), `[loop 624] processNote (互卦/quá trình) có mặt`);
+assert(typeof mh.outcomeNote === 'string' && mh.outcomeNote.includes('变卦'), `[loop 624] outcomeNote (变卦/kết quả) có mặt`);
+assert(typeof mh.finalVerdict === 'string' && mh.finalVerdict.length > 5, `[loop 624] finalVerdict synthesis có mặt`);
+// 3,8 → 晋: 体坤(Thổ) 用离(Hỏa), Hỏa sinh Thổ → 本卦 用生体 CÁT. finalVerdict phải nói CÁT (không phải HUNG toàn diện)
+assert(!/HUNG TOÀN DIỆN/.test(mh.finalVerdict), `[loop 624] 晋 (本CÁT) không bị phán HUNG toàn diện`);
+assert(mht.processNote && mht.outcomeNote && mht.finalVerdict, `[loop 624] cast-by-time cũng có 3-layer synthesis`);
+// quét nhiều thời → finalVerdict phải đa dạng (có lúc 先吉后凶/先凶后吉/xu hướng) — không phải 1 phán cố định
+const _samples = [[6,28,14,30],[3,15,9,0],[11,8,6,15],[8,20,18,45],[2,2,11,11],[5,5,5,5]].map(([mo,d,h,mi]) => castByTime(solarToMhNums(2026,mo,d,h,mi)).finalVerdict);
+const _uniq = new Set(_samples.map((s) => s.slice(0, 12)));
+assert(_uniq.size >= 3, `[loop 624] finalVerdict đa dạng qua các thời (${_uniq.size} kiểu, không 1 phán cố định)`);
+console.log(`   3-layer synthesis ✓ — processNote/outcomeNote/finalVerdict; ${_uniq.size} kiểu phán đa dạng qua 6 thời`);
 
 console.log('\n################## 19. LỤC DIỆU 六爻 (纳甲六亲世应用神) ##################');
 import { castLiuYao } from './src/engine/liuyao.js';

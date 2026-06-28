@@ -107,19 +107,36 @@ function buildGua(lower, upper, dong, src) {
   //   ~50% quẻ). Nay chọn quái động sau biến.
   const bianYongTri = dongInUpper ? bian.upper : bian.lower;
   const bianRel = relOf(ti.wx, TRIGRAMS[bianYongTri].wx);
-  // tổng phán
+  // tổng phán — 本卦 (khởi đầu)
   let verdict;
   if (rel.d >= 1) verdict = 'CÁT — 本卦 thể dụng tương sinh: nên tiến hành, việc thuận.';
   else if (rel.d === 0.5) verdict = 'TIỂU CÁT — thể khắc dụng: làm được nhưng phải tốn công.';
   else if (rel.d === 0) verdict = 'BÌNH — thể dụng tỷ hoà: hoà hợp, tùy nỗ lực.';
   else if (rel.d === -1) verdict = 'HAO — thể sinh dụng (tiết khí): chỉ nên làm nếu xứng đáng, dễ hao sức.';
   else verdict = 'HUNG — dụng khắc thể: NÊN TRÁNH / hoãn / thủ, đợi thời khác.';
+  // [loop 624] 3-LAYER SYNTHESIS — 梅花 cổ pháp: 本卦(始) → 互卦(中/quá trình) → 变卦(终/kết quả).
+  //   Trước đây verdict CHỈ dùng 本卦 rel, bỏ qua huRel/bianRel dù đã tính. Mấu chốt: biến quái
+  //   (kết quả) có thể ĐẢO NGƯỢC bản quái → «先凶后吉» (khởi khó nhưng kết tốt) hoặc «先吉后凶».
+  const _lvl = (r) => (r.d >= 1 ? 4 : r.d === 0.5 ? 3 : r.d === 0 ? 2 : r.d === -1 ? 1 : 0); // 4=cát→0=hung
+  const _lab = (r) => (r.d >= 1 ? 'CÁT' : r.d === 0.5 ? 'tiểu cát' : r.d === 0 ? 'bình' : r.d === -1 ? 'hao' : 'HUNG');
+  const initL = _lvl(rel), procL = _lvl(huRel), outL = _lvl(bianRel);
+  const processNote = `互卦 (quá trình): ${huRel.k} → ${_lab(huRel)}. ${procL >= 3 ? 'Quá trình thuận.' : procL <= 1 ? 'Quá trình nhiều trở ngại.' : 'Quá trình bình ổn.'}`;
+  const outcomeNote = `变卦 (kết quả): ${bianRel.k} → ${_lab(bianRel)}. ${outL >= 3 ? 'Kết quả tốt.' : outL <= 1 ? 'Kết quả không như ý.' : 'Kết quả trung bình.'}`;
+  let finalVerdict;
+  const isCat = (l) => l >= 3, isHung = (l) => l <= 1;
+  if (isCat(outL) && isHung(initL)) finalVerdict = `★ 先凶后吉 — bản quẻ HUNG nhưng BIẾN QUẺ CÁT: khởi đầu khó khăn, CẾT QUẢ VẪN TỐT. Cổ pháp「卦有结局为重」— nên kiên nhẫn vượt qua đầu, đợi kết quả.`;
+  else if (isHung(outL) && isCat(initL)) finalVerdict = `⚠ 先吉后凶 — bản quẻ CÁT nhưng BIẾN QUẺ HUNG: khởi đầu thuận, KẾT QUẢ XẤU. Nên tận dụng sớm, phòng hậu quả về sau.`;
+  else if (isCat(initL) && isCat(outL)) finalVerdict = `✓ CÁT TOÀN DIỆN — bản quẻ + biến quẻ đều CÁT: việc thuận từ đầu đến cuối, nên tiến hành.`;
+  else if (isHung(initL) && isHung(outL)) finalVerdict = `✗ HUNG TOÀN DIỆN — bản quẻ + biến quẻ đều HUNG: nên TRÁNH / hoãn / đợi thời khác.`;
+  else if (initL === 2 && outL === 2) finalVerdict = `〜 BÌNH TOÀN — bản + biến đều tỷ hoà: không大凶大吉, kết quả tùy nỗ lực chủ quan.`;
+  else finalVerdict = `${_lab(rel)} khởi → ${_lab(bianRel)} kết. ${outL > initL ? 'Xu hướng CẦN LÊN (kết tốt hơn đầu).' : outL < initL ? 'Xu hướng XUỐNG (kết kém hơn đầu, cẩn thận).' : 'Ổn định.'}`;
   return {
     src, lower, upper, name: hexName(lower, upper), dong, dongInUpper,
     ben: { lower, upper, name: hexName(lower, upper) },
     hu, bian,
     ti: { tri: tiTri, ...ti }, yong: { tri: yongTri, ...yong },
     rel, huRel, bianRel, verdict,
+    processNote, outcomeNote, finalVerdict, // [loop 624] 3-layer synthesis
   };
 }
 

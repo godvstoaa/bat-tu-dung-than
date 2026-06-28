@@ -767,6 +767,8 @@ export function execTool(name, args, R) {
           dong: r.dong, dongInUpper: r.dongInUpper,
           ti: r.ti ? `${r.ti.vi}(${r.ti.wx})` : '', yong: r.yong ? `${r.yong.vi}(${r.yong.wx})` : '',
           rel: r.rel, huRel: r.huRel, bianRel: r.bianRel, verdict: r.verdict,
+          // [loop 624] 3-layer synthesis — CỔ PHÁP 本卦→互卦→变卦 (đây là kết luận chính)
+          processNote: r.processNote, outcomeNote: r.outcomeNote, finalVerdict: r.finalVerdict,
         };
       }
       case 'analyze_liuren': { // [loop 508] 大六壬 四课三传
