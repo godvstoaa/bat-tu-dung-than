@@ -496,6 +496,22 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
   assert(jw && jw.score >= 5 && jw.rating === 'Đại cát', `[loop 628] Quân 己未 score=${jw?.score} → Đại cát (trước fix phán «Cát» sai)`);
   console.log(`   đại vận rating consistency ✓ — 5 lá số 0 lệch; Quân 己未=${jw.score}→Đại cát`);
 }
+// [loop 629 FIX] lưu niên rating phải dùng thang percentile loop-461 (70/56/36/22/10),
+//   KHÔNG thang cũ 78/62/46/32/20. Bug: adjustLiunianByGeju re-rate bằng thang cũ → ghi đè.
+{
+  const _exp = (s) => s >= 70 ? 'Đại cát' : s >= 56 ? 'Cát' : s >= 36 ? 'Bình' : s >= 22 ? 'Hơi kỵ' : s >= 10 ? 'Hung' : 'Đại hung';
+  let bad = 0;
+  for (const [y, mo, d, h, g] of [[1993, 10, 21, 1, 'nam'], [1996, 12, 4, 10, 'nữ'], [1970, 6, 27, 7, 'nữ'], [1990, 6, 15, 14, 'nam']]) {
+    const r = analyze(y, mo, d, h, 15, g, 2026);
+    for (const ln of r.liunian) { if (_exp(ln.score) !== ln.rating) bad++; }
+  }
+  assert(bad === 0, `[loop 629] lưu niên rating dùng thang percentile 70/56/36/22/10 (loop 461) — ${bad} lệch (thang cũ 78/62/46)`);
+  // specific: Quân 2019 己亥 score 75 → Đại cát (trước fix «Cát» vì thang cũ 78)
+  const rq = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const y19 = rq.liunian.find((l) => l.year === 2019);
+  assert(y19 && y19.score >= 70 && y19.rating === 'Đại cát', `[loop 629] Quân 2019 score=${y19?.score} → Đại cát (trước fix «Cát» do thang cũ 78)`);
+  console.log(`   lưu niên rating consistency ✓ — 4 lá số dùng đúng thang 461; Quân 2019=${y19.score}→Đại cát`);
+}
 
 // ################## [loop 20 NEW] 十二长生运 (đại vận + lưu niên) ##################
 import { dayunChangsheng, liunianChangsheng, stageCategory } from './src/engine/changsheng-deep.js';

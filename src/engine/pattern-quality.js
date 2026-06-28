@@ -655,11 +655,15 @@ function rateByScore(score) {
 
 // Ngưỡng rating lưu niên — KHÔNG trùng ngưỡng đại vận (scoreLiunianYear chấm /100).
 function rateLiunianByScore(score) {
-  if (score >= 78) return 'Đại cát';
-  if (score >= 62) return 'Cát';
-  if (score >= 46) return 'Bình';
-  if (score >= 32) return 'Hơi kỵ';
-  if (score >= 20) return 'Hung';
+  // [loop 629 FIX] align với liunian-pro loop-461 percentile recalibration (70/56/36/22/10).
+  //   Trước đây dùng thang CŨ 78/62/46/32/20 — loop 461 đã chứng minh SAI (median 40 rơi
+  //   «Hơi kỵ» thay vì «Bình», 61% năm kỵ+). adjustLiunianByGeju re-rate bằng thang cũ
+  //   → ghi đè rating chuẩn của liunian-pro. Cùng bug-class loop 628 (recalibrate miss spot).
+  if (score >= 70) return 'Đại cát';
+  if (score >= 56) return 'Cát';
+  if (score >= 36) return 'Bình';
+  if (score >= 22) return 'Hơi kỵ';
+  if (score >= 10) return 'Hung';
   return 'Đại hung';
 }
 
