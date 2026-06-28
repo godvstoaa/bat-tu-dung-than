@@ -329,7 +329,8 @@ export function extendBrief(R) {
   // Sức khoẻ
   try {
     const h = analyzeHealth(R);
-    parts.push(`SỨC KHOẺ: yếu=${h.weakest.vi}(${h.weakest.pct}%) → ${h.weakest.organs.split(',')[0]} | vượng=${h.strongest.vi}(${h.strongest.pct}%) | dưỡng=${h.remedyVi} | mùa rủi ro=${h.riskSeason}`);
+    const _weakDir = { 木: 'Đông', 火: 'Nam', 土: 'Tây Nam', 金: 'Tây', 水: 'Bắc' }[h.weakest.wx] || '?';
+    parts.push(`SỨC KHOẺ: yếu=${h.weakest.vi}(${h.weakest.pct}%) → ${h.weakest.organs.split(',')[0]} | vượng=${h.strongest.vi}(${h.strongest.pct}%) | dưỡng=${h.remedyVi} | mùa rủi ro=${h.riskSeason} | hướng sức khoẻ: ${_weakDir} (bổ tạng yếu qua hướng ngũ hành)`);
   } catch (e) {}
 
   // Học vấn
