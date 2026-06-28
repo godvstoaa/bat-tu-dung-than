@@ -1013,6 +1013,32 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   }
   console.log('   [loop 754] TAM HỢP (4 cục) + TAM HỘI (4 phương) full-cục detection ✓');
 }
+// [loop 755] 紫微斗数 14 chính tinh placement — structural invariants (calc phức tạp nhất).
+//   紫微系: 天机=紫微-1, 廉贞=紫微+4, 天同+7, 武曲+8, 太阳+9.
+//   天府系: 天府→太阴→贪狼→巨门→天相→天梁→七杀 (consecutive forward).
+{
+  const { computeZiwei } = await import('./src/engine/ziwei.js');
+  const _Z = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const _prev = (z) => _Z[(_Z.indexOf(z) - 1 + 12) % 12];
+  const _F = [[1993,10,21,1,15,'nam'],[1996,12,4,10,15,'nữ'],[2023,1,13,7,15,'nam'],[1970,6,27,7,15,'nữ'],[1964,4,4,12,0,'nam']];
+  for (const [y, m, d, h, mi, g] of _F) {
+    const z = computeZiwei(y, m, d, h, mi, g);
+    const ms = z.mainStars;
+    // 局 phải trong 2-6
+    assert(z.ju >= 2 && z.ju <= 6, `[loop 755] ${y}: 五行局 ${z.ju} trong 2-6`);
+    // 紫微-天机 adjacency
+    assert(_prev(ms['紫微']) === ms['天机'], `[loop 755] ${y}: 天机 = 紫微-1 (adjacency)`);
+    // 天府系 consecutive forward
+    const tf = ms['天府'];
+    const _exp = { 太阴: 1, 贪狼: 2, 巨门: 3, 天相: 4, 天梁: 5, 七杀: 6 };
+    for (const [s, off] of Object.entries(_exp)) assert(ms[s] === _Z[(_Z.indexOf(tf) + off) % 12], `[loop 755] ${y}: 天府系 ${s} consecutive`);
+    // 紫微系 offsets
+    const zw = ms['紫微'];
+    const _exp2 = { 廉贞: 4, 天同: 7, 武曲: 8, 太阳: 9 };
+    for (const [s, off] of Object.entries(_exp2)) assert(ms[s] === _Z[(_Z.indexOf(zw) + off) % 12], `[loop 755] ${y}: 紫微系 ${s} offset ${off}`);
+  }
+  console.log('   [loop 755] 紫微 14 chính tinh placement (紫微系+天府系 invariants + 局, 5 thành viên) ✓');
+}
 
 // ################## [loop 22] forecast5 active-大运 KHỚP analyzeLiunianDeep (sửa off-by-one) ##################
 {
