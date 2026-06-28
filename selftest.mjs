@@ -2184,6 +2184,22 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   }
   console.log('   [loop 744] 起运 startAge + first 大运 (5 thành viên) khớp lunar-javascript ✓');
 }
+// [loop 745] 子时换日 (ziShiRoll) consistency — giờ ≥23:00 roll sang ngày kế (晚子时).
+//   23:30/X vs 00:30/X+1 phải cho CÙNG lá số (đều 子 giờ của «ngày tử» X+1).
+//   Test qua day/month/YEAR boundary (year-roll dễ break nếu refactor new Date).
+{
+  const _same = (rA, rB) => {
+    const a = Object.values(rA.chart.pillars).map((p) => p.gan + p.zhi).join(' ');
+    const b = Object.values(rB.chart.pillars).map((p) => p.gan + p.zhi).join(' ');
+    return a === b;
+  };
+  assert(_same(analyze(1993, 10, 21, 23, 30, 'nam', 2026), analyze(1993, 10, 22, 0, 30, 'nam', 2026)), '[loop 745] 子时换日: 23:30/21 == 00:30/22 (cùng lá số)');
+  assert(_same(analyze(1993, 12, 22, 23, 45, 'nam', 2026), analyze(1993, 12, 23, 0, 15, 'nam', 2026)), '[loop 745] 子时换日: month-boundary 23:45/22 == 00:15/23');
+  assert(_same(analyze(1993, 12, 31, 23, 50, 'nam', 2026), analyze(1994, 1, 1, 0, 10, 'nam', 2026)), '[loop 745] 子时换日: YEAR-ROLL 23:50/31/12/93 == 00:10/1/1/94');
+  // giờ <23 KHÔNG roll — 22:59/21 ≠ 00:30/22
+  assert(!_same(analyze(1993, 10, 21, 22, 59, 'nam', 2026), analyze(1993, 10, 22, 0, 30, 'nam', 2026)), '[loop 745] 22:59/21 ≠ 00:30/22 (không roll, khác ngày)');
+  console.log('   [loop 745] 子时换日 consistency (day/month/YEAR roll + no-roll <23) ✓');
+}
 // [loop 666] viToHan single-word + tên user (Quân/Nhật). Bug: parts[0] chỉ check _SUR →
 //   given name đơn (Tùng/Quân) bị missing.
 {
