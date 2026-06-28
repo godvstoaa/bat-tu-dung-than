@@ -532,7 +532,12 @@ export function composeAnswer(question, R) {
     if (dateMatch) {
       const [, dd, mm, yy] = dateMatch.map(Number);
       try {
-        const relR = analyze(yy, mm, dd, 12, 0, 'nữ', new Date().getFullYear());
+        // [loop 622 FIX] detect gender from question text (trước đây hardcode 'nữ' → bố sai NC!)
+        const qNorm = question.toLowerCase();
+        const isMale = /\b(bo|cha|ong|anh|chau trai|con trai|chong|bac|cu)\b/.test(qNorm);
+        const isFemale = /\b(me|vo|chi|chau gai|con gai|co|mo|dom)\b/.test(qNorm);
+        const relGender = isMale ? 'nam' : isFemale ? 'nữ' : 'nam'; // default nam (BaZi standard)
+        const relR = analyze(yy, mm, dd, 12, 0, relGender, new Date().getFullYear());
         const uWx = R.chart.dayMaster.wx, rWx = relR.chart.dayMaster.wx;
         const SHENG_L = { 木:'火', 火:'土', 土:'金', 金:'水', 水:'木' };
         const KE_L = { 木:'土', 土:'水', 水:'火', 火:'金', 金:'木' };
