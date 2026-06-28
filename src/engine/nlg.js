@@ -88,6 +88,10 @@ export function detectIntent(question) {
     || /\b(me|bo|em|chau|con|anh|chi)\b.*\b(the nao|ra sao|tuong quan|hop khong|menh gi|dung gi)\b/.test(norm);
   // [loop 497] divination intent (起卦/测字 CJK ngắn → confidence <3 → bypass như isCompat)
   const isDivination = /gieo que|lac que|que dich|boi que|thao que|cham tu|luc nh|ky mon|don giap/.test(norm) || /起卦|测字|占卦|占卜|六壬|奇门|遁甲/.test(question);
+  // [loop 655] fengshui + remedy intent (trước đây → «chưa rõ lĩnh vực» khi API fail)
+  const isFengshui = /\b(phong thuy|dinh vi|la ban)\b/.test(norm)
+    || (/\b(huong|nha|tang|giuong|bep|cua chinh)\b/.test(norm) && /\b(tot|xau|hop|nao|cat|hung|nen|duoc|the nao)\b/.test(norm));
+  const isRemedy = /\b(bot xui|giam xui|bo xui|xui xe|doi van|hoa giai|may man|phuc duc|lam cai gi|nen lam gi|cuu|cai menh|bo tui|giam tui)\b/.test(norm);
 
   let area = 'general', bestHits = 0;
   for (const [id, kws] of Object.entries(INTENT_KEYWORDS)) {
@@ -101,7 +105,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -591,6 +595,39 @@ export function composeAnswer(question, R) {
   if (intent.isDivination) {
     const block = pDivination(R, intent);
     return { title: block.title, lead: `Bạn hỏi về bói toán / gieo quẻ. Kết quả:`, paragraphs: block.paragraphs, intent };
+  }
+
+  // [loop 655] FENGSHUI direction (offline) — trước đây «chưa rõ lĩnh vực»
+  if (intent.isFengshui) {
+    const WX_DIR = { 木: 'Đông/Mộc (xanh)', 火: 'Nam/Hỏa (đỏ)', 土: 'Tây Nam/Trung/Thổ (vàng)', 金: 'Tây/Kim (trắng)', 水: 'Bắc/Thủy (đen)' };
+    const WX_ITEM = { 木: 'cây cối, gỗ', 火: 'ánh sáng, nến, điện', 土: 'gốm đá, pha lê', 金: 'vật kim loại, đồng', 水: 'bể nước, phong linh, màu đen' };
+    const dung = R.yong?.primary, hy = R.yong?.xi;
+    return {
+      title: 'Phong thủy & định vị',
+      lead: `Bạn hỏi về hướng/phong thủy. Theo Dụng Thần ${WX_VI[dung] || dung} của bạn:`,
+      paragraphs: [
+        `Mệnh bạn Dụng ${WX_VI[dung] || dung}${hy ? ', Hỷ ' + (WX_VI[hy] || hy) : ''}. Hướng CÁT: ${WX_DIR[dung] || '?'}${hy ? ' + ' + (WX_DIR[hy] || '?') : ''}. Hướng KỴ: hành khắc Dụng.`,
+        `Bố trí: đồ nội thất dùng chất liệu ${WX_ITEM[dung] || '?'} (bổ Dụng). Cửa chính/giường ưu tiên hướng ${WX_DIR[dung] || '?'}.`,
+        `⚠ Năm 2026 cần tránh động thổ hướng Nam (Ngũ Hoàng) + hướng Tam Sát (Bắc 亥子丑). Chi tiết mở tab «Định Vị Phong Thủy» hoặc hỏi AI khi online.`,
+      ],
+      intent,
+    };
+  }
+  // [loop 655] REMEDY (offline) — «bớt xui/đổi vận»
+  if (intent.isRemedy) {
+    const WX_COLOR = { 木: 'xanh lá', 火: 'đỏ/tím', 土: 'vàng/nâu', 金: 'trắng/bạc', 水: 'đen/xanh đậm' };
+    const WX_LIFE = { 木: 'giữ lòng từ bi, trồng cây, đi rừng', 火: 'tăng ánh sáng, lễ bái, vận động', 土: 'chân đất, gốm đá, thiền định', 金: 'sáng sớm, kỷ luật, rèn luyện', 水: 'gần sông biển, đọc sách, tĩnh lặng' };
+    const dung = R.yong?.primary;
+    return {
+      title: 'Nghịch thiên cải mệnh (offline)',
+      lead: `Bạn hỏi cách bớt xui/đổi vận. Cổ pháp «后天补救» — bổ Dụng Thần ${WX_VI[dung] || dung}:`,
+      paragraphs: [
+        `① Màu sắc: dùng ${WX_COLOR[dung] || '?'} (Dụng), tránh màu hành khắc. ② Hướng: ở/làm việc hướng Dụng (${ {木:'Đông',火:'Nam',土:'Tây Nam',金:'Tây',水:'Bắc'}[dung] || '?'}).`,
+        `③ Lối sống: ${WX_LIFE[dung] || '?'}. ④ Tên/hiệu: chữ hành ${WX_VI[dung] || dung}. ⑤ Hành thiện tích đức («积善之家必有余庆») — cốt lõi.`,
+        `⚠ «Địa năng bổ thiên, bất năng thay thiên» — cải mệnh BỔ Dụng, nâng nền 5-10 điểm, không biến bát tự. Vận mệnh chịu tác động đa nhân (nỗ lực, hoàn cảnh). Chi tiết hỏi AI khi online.`,
+      ],
+      intent,
+    };
   }
 
   // Câu hỏi TỰ DO / khó hiểu (confidence thấp, không khớp lĩnh vực) → fallback khéo léo

@@ -1957,6 +1957,18 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   assert(p.marriageTiming && Array.isArray(p.marriageTiming.bestYears) && p.marriageTiming.note, `[loop 647] analyze_partner có marriageTiming (bestYears + note)`);
   console.log(`   analyze_partner marriageTiming ✓ — score ${p.score} ${p.rating}, timing note có`);
 }
+// [loop 655] NLG offline fallback — fengshui + remedy intent (trước đây «chưa rõ lĩnh vực»).
+{
+  const { composeAnswer } = await import('./src/engine/nlg.js');
+  const R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const fs = composeAnswer('hướng nào tốt để ở?', R);
+  assert(fs.title.includes('Phong thủy') || fs.title.includes('định vị'), `[loop 655] fengshui Q → Phong thủy (got ${fs.title}, trước «chưa rõ»)`);
+  const rm = composeAnswer('làm sao bớt xui?', R);
+  assert(rm.title.includes('cải mệnh') || rm.title.includes('Nghịch thiên'), `[loop 655] remedy Q → cải mệnh (got ${rm.title}, trước «chưa rõ»)`);
+  // fengshui answer must mention Dụng direction
+  assert(/Thổ|Tây Nam|hướng/i.test(fs.paragraphs[0] || ''), `[loop 655] fengshui answer có Dụng hướng`);
+  console.log(`   NLG fengshui+remedy intent ✓ — «hướng nào» → ${fs.title}; «bớt xui» → ${rm.title}`);
+}
 // [loop 644] daily.js (dailyGuidance) + liuri advice — align thang 54/48 (không 65/45 hay 64).
 //   Bug: dailyGuidance dùng 65/45 (thang cũ); liuri advice >=64 nhưng rating Cát >=54 → mâu thuẫn nội bộ.
 {
