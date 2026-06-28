@@ -524,28 +524,8 @@ const COMPOSERS = {
 export function composeAnswer(question, R) {
   const intent = detectIntent(question);
 
-  // [cycle 49] Câu hỏi HỢP TUỔI cần 2 lá số — composeAnswer chỉ có 1 lá số → trả lời trung thực
-  //   thay vì giả vờ luận duyên 1 người (lỗi "ba phải" cũ: compat question → single-chart love answer).
-  if (intent.isCompat) {
-    return {
-      title: 'Hợp tuổi — cần 2 lá số',
-      lead: 'Câu hỏi hợp tuổi/hôn nhân/đối tác cần so sánh lá số của CẢ HAI người. Tôi mới chỉ có lá số của bạn.',
-      paragraphs: [
-        `Mở mục « 💕 Hợp tuổi (2 người) » trong Công cụ Phong Thủy — nhập ngày/giờ sinh của người kia → app chấm điểm hợp hôn (ngũ hành bổ trợ + Dụng thần tương hỗ + Lục hợp/Lục xung/Tam hình/Hoá khí).`,
-        `Lá số của bạn: Nhật Chủ ${R.chart.dayMaster.gan} ${R.chart.dayMaster.vi} (${R.strength.level}); Dụng ${favText(R.yong)}. Khi có lá số người kia, trọng tâm so sánh: (1) Dụng thần 2 người có bổ sung cho nhau không, (2) cặp chi có Lục hợp (cát) hay Lục xung/Tam hình (hung), (3) Nhật Chủ tương sinh hay tương khắc.`,
-      ],
-      intent,
-    };
-  }
-
-  // [loop 497] divination intent (起卦/测字) — ưu tiên TRƯỚC confidence fallback
-  //   (CJK keywords 2 chars → confidence <3, nhưng là lệnh rõ ràng → bypass)
-  if (intent.isDivination) {
-    const block = pDivination(R, intent);
-    return { title: block.title, lead: `Bạn hỏi về bói toán / gieo quẻ. Kết quả:`, paragraphs: block.paragraphs, intent };
-  }
-
-  // [loop 619→620] family question — NLG offline THỰC SỰ luận nếu có ngày sinh
+  // [loop 620→621] family question — check BEFORE compat/divination
+  //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family
   if (intent.isFamily) {
     // [loop 620] Extract date from question → compute ngũ hành tương quan OFFLINE
     const dateMatch = question.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
@@ -587,6 +567,25 @@ export function composeAnswer(question, R) {
       ],
       intent,
     };
+  }
+
+  // [cycle 49] isCompat — cần 2 lá số (KHÔNG phải family)
+  if (intent.isCompat && !intent.isFamily) {
+    return {
+      title: 'Hợp tuổi — cần 2 lá số',
+      lead: 'Câu hỏi hợp tuổi/hôn nhân/đối tác cần so sánh lá số của CẢ HAI người. Tôi mới chỉ có lá số của bạn.',
+      paragraphs: [
+        `Mở mục « 💕 Hợp tuổi (2 người) » trong Công cụ Phong Thủy — nhập ngày/giờ sinh của người kia → app chấm điểm hợp hôn (ngũ hành bổ trợ + Dụng thần tương hỗ + Lục hợp/Lục xung/Tam hình/Hoá khí).`,
+        `Lá số của bạn: Nhật Chủ ${R.chart.dayMaster.gan} ${R.chart.dayMaster.vi} (${R.strength.level}); Dụng ${favText(R.yong)}. Khi có lá số người kia, trọng tâm so sánh: (1) Dụng thần 2 người có bổ sung cho nhau không, (2) cặp chi có Lục hợp (cát) hay Lục xung/Tam hình (hung), (3) Nhật Chủ tương sinh hay tương khắc.`,
+      ],
+      intent,
+    };
+  }
+
+  // [loop 497] divination intent
+  if (intent.isDivination) {
+    const block = pDivination(R, intent);
+    return { title: block.title, lead: `Bạn hỏi về bói toán / gieo quẻ. Kết quả:`, paragraphs: block.paragraphs, intent };
   }
 
   // Câu hỏi TỰ DO / khó hiểu (confidence thấp, không khớp lĩnh vực) → fallback khéo léo
