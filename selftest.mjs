@@ -2170,6 +2170,20 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   }
   console.log('   [loop 743] parseGender ROBUST ✓ — nam/male/m/男 → forward; nữ/female/女 → backward; garbage → reject');
 }
+// [loop 744] 起运 startAge + first 大运 ganZhi khớp lunar-javascript getYun (foundation
+//   cho toàn bộ dayun timing; phụ thuộc gender fix loop 743). Pin 5 thành viên gia đình.
+{
+  const { Solar } = await import('lunar-javascript');
+  const _C = [['Quân',1993,10,21,1,15,'nam',5,'辛酉'],['Mỹ Anh',1996,12,4,10,15,'nữ',10,'戊戌'],['Nhật Minh',2023,1,13,7,15,'nam',8,'甲寅'],['Mẹ',1970,6,27,7,15,'nữ',8,'辛巳'],['Bố',1964,4,4,12,0,'nam',1,'戊辰']];
+  for (const [nm,y,m,d,h,mi,g,expAge,expGz] of _C) {
+    const R = analyze(y, m, d, h, mi, g, 2026);
+    const dy1 = (R.dayun || [])[0];
+    const lj = Solar.fromYmdHms(y, m, d, h || 12, mi || 0, 0).getLunar().getEightChar().getYun(g === 'nam' ? 1 : 0).getDaYun()[1];
+    assert(dy1 && dy1.startAge === expAge && dy1.ganZhi === expGz, `[loop 744] ${nm} 起运 startAge=${expAge} first=${expGz} (got ${dy1?.startAge}/${dy1?.ganZhi})`);
+    assert(dy1.startAge === lj.getStartAge() && dy1.ganZhi === lj.getGanZhi(), `[loop 744] ${nm} engine khớp lunar-javascript (startAge/ganZhi)`);
+  }
+  console.log('   [loop 744] 起运 startAge + first 大运 (5 thành viên) khớp lunar-javascript ✓');
+}
 // [loop 666] viToHan single-word + tên user (Quân/Nhật). Bug: parts[0] chỉ check _SUR →
 //   given name đơn (Tùng/Quân) bị missing.
 {
