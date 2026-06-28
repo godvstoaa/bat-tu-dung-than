@@ -2148,6 +2148,28 @@ console.log(`   user: Mệnh(${ming.vi.slice(0, 4)}) tam phương tứ chính = 
   assert(eH && eH.includes('Giờ sinh không hợp lệ'), `[loop 736] hour=25 → VN error (got ${eH})`);
   console.log(`   [loop 736] hour normalization ✓ — undefined/null → Ngọ(12); giờ thật giữ nguyên; range reject`);
 }
+// [loop 743] gender ROBUST parsing — trước đây 4 chỗ dùng `gender === 'nam'` → 'male'/'Male'/
+//   'NAM'/'nam '/null/typo THẦM LẶNG fallback NỮ → ĐẢO dayun/大限 direction + SAI 起运 age.
+{
+  const G10 = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const Z12 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  const gzIdx = (gz) => { for (let i = 0; i < 60; i++) { if (G10[i % 10] + Z12[i % 12] === gz) return i; } return -1; };
+  const dirOf = (R) => { const d = (R.dayun || []).filter((x) => x.ganZhi).slice(0, 3); const df = [(gzIdx(d[1].ganZhi) - gzIdx(d[0].ganZhi) + 60) % 60, (gzIdx(d[2].ganZhi) - gzIdx(d[1].ganZhi) + 60) % 60]; return df.every((x) => x === 1) ? 'forward' : df.every((x) => x === 59) ? 'backward' : '?'; };
+  // Bố 甲(dương) năm nam → FORWARD cho MỌI variant nam
+  for (const gv of ['nam', 'male', 'Male', 'NAM', 'man', 'm', '男']) {
+    assert(dirOf(analyze(1964, 4, 4, 12, 0, gv, 2026)) === 'forward', `[loop 743] Bố(甲 nam) gender «${gv}» → dayun FORWARD (trước đây 'male'→nữ→BACKWARD)`);
+  }
+  // Bố 甲(dương) năm nữ → BACKWARD cho MỌI variant nữ
+  for (const gv of ['nữ', 'nu', 'female', 'Female', 'F', 'woman', '女']) {
+    assert(dirOf(analyze(1964, 4, 4, 12, 0, gv, 2026)) === 'backward', `[loop 743] Bố(甲 nữ) gender «${gv}» → dayun BACKWARD`);
+  }
+  // garbage → clean reject (không silent female-default)
+  for (const gv of ['xyz', null, '', '123']) {
+    let err = null; try { analyze(1964, 4, 4, 12, 0, gv, 2026); } catch (e) { err = e.message; }
+    assert(err && err.includes('Giới tính không hợp lệ'), `[loop 743] gender «${gv}» → clean reject (got ${err})`);
+  }
+  console.log('   [loop 743] parseGender ROBUST ✓ — nam/male/m/男 → forward; nữ/female/女 → backward; garbage → reject');
+}
 // [loop 666] viToHan single-word + tên user (Quân/Nhật). Bug: parts[0] chỉ check _SUR →
 //   given name đơn (Tùng/Quân) bị missing.
 {

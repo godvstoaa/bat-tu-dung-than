@@ -8,6 +8,7 @@ import { Solar } from 'lunar-javascript';
 import { computeFuxing } from './fuxing.js';
 import { GAN, ZHI } from './constants.js';
 import { ziShiRoll } from './chart.js'; // [loop 178] 紫微 bẩm sinh dùng cùng 子时换日 quy ước 八字
+import { parseGender } from './core.js'; // [loop 743] ROBUST gender parsing
 
 const GAN_ORDER = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
 const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
@@ -97,7 +98,7 @@ export function computeZiwei(year, month, day, hour, minute, gender) {
   // 12 cung: từ mệnh cung, 逆排 (dùng YIN_ORDER index; 逆 = giảm index)
   // Mỗi cung có thiên can (thuận theo mệnh cung can), địa chi (逆)
   // Đại hạn: từ mệnh cung, mỗi cung 10 năm; 方向: dương nam/âm nữ thuận (tăng), âm nam/dương nữ nghịch (giảm)
-  const isMale = gender === 'nam';
+  const isMale = parseGender(gender) === 1; // [loop 743 FIX] ROBUST — không còn silent female-default cho 'male'/typo
   const yearGanYin = GAN[yearGan]?.yin; // âm/dương của năm can
   // thuận = dương nam hoặc âm nữ
   const forward = (isMale && !yearGanYin) || (!isMale && yearGanYin);
@@ -241,7 +242,7 @@ const BOSHI_INFO = {
 export function boshi12(yearGan, gender) {
   const luCunZhi = LUCUN[yearGan];
   const yearYin = GAN[yearGan]?.yin; // true=âm
-  const isMale = gender === 'nam';
+  const isMale = parseGender(gender) === 1; // [loop 743 FIX] ROBUST — không còn silent female-default cho 'male'/typo
   // 阳男阴女顺 (forward); 阴男阳女逆 (backward)
   const forward = (isMale && !yearYin) || (!isMale && yearYin);
   const base = ZHI_ORDER.indexOf(luCunZhi);

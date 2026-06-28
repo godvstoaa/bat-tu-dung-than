@@ -7,6 +7,19 @@ import {
   CHANGSHENG_STAGES, CHANGSHENG_START, ZHI_ORDER,
 } from './constants.js';
 
+// [loop 743] parseGender — normalize giới tính ROBUST. Trước đây 4 chỗ (computeDaYun,
+//   computeLiuNian, computeZiwei, boshi12) dùng `gender === 'nam'` → 'male'/'Male'/'NAM'/
+//   'nam '/'null'/typo THẦM LẶNG fallback NỮ (0) → ĐẢO dayun/大限 direction + SAI 起运 age
+//   → toàn bộ vận hạn đọc ngược/sai. Helper: accept nhiều variant, THROW cho garbage
+//   (không silent default — garbage phải lỗi rõ, giống validate year/month/day loop 662).
+//   @returns 1 = nam (dương), 0 = nữ (âm) — quy ước lunar-javascript getYun.
+export function parseGender(g) {
+  const s = String(g == null ? '' : g).trim().toLowerCase();
+  if (['nam', 'male', 'm', 'man', 'boy', '男'].includes(s)) return 1;
+  if (['nữ', 'nu', 'female', 'f', 'woman', 'girl', '女'].includes(s)) return 0;
+  throw new Error(`Giới tính không hợp lệ («${g}») — nhập «nam» hoặc «nữ».`);
+}
+
 // --- Thập Thần của một Can so với Nhật Chủ ---
 export function tenGod(dayGan, otherGan) {
   const dm = GAN[dayGan];

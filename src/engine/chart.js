@@ -9,7 +9,7 @@ import {
   GAN, ZHI, HIDDEN, HIDDEN_WEIGHT, WUXING, SHENG, KE, KE_BY, SHENG_BY,
   TIAOHOU, CLIMATE, WX_VI, TEN_GOD_VI,
 } from './constants.js';
-import { tenGod, changSheng } from './core.js';
+import { tenGod, changSheng, parseGender } from './core.js';
 import { detectInteractions } from './interactions.js';
 import { computeShensha } from './shensha.js';
 import { computePattern } from './pattern.js';
@@ -457,8 +457,9 @@ export function computeDaYun(year, month, day, hour, minute, gender, yong) {
   const solar = Solar.fromYmdHms(cy, cm, cd, ch, cmin, 0);
   const ec = solar.getLunar().getEightChar();
   // Quy ước lunar-javascript getYun: 1 = nam (dương), 0 = nữ (âm).
-  // Validate rõ ràng — mọi giá trị lạ (typo, null...) fallback về 0 (nữ) để không ném.
-  const g = (gender === 'nam') ? 1 : (gender === 'nữ' || gender === 'nu') ? 0 : 0;
+  // [loop 743 FIX] parseGender ROBUST — trước đây `=== 'nam'` → 'male'/null/typo fallback NỮ
+  //   thầm lặng → ĐẢO dayun direction + SAI 起运 age. Nay accept variant, throw cho garbage.
+  const g = parseGender(gender);
   const yun = ec.getYun(g);
   const list = yun.getDaYun();
   // [cycle 47 sửa C7] chuẩn hoá khung Dụng sang 用/喜/忌/仇 (giống scoreLiunianYear) → 大运 & 流年
@@ -506,8 +507,8 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
   const [cy, cm, cd, ch, cmin] = ziShiRoll(year, month, day, hour, minute); // [loop 177] 子时换日 — đồng bộ buildChart
   const solar = Solar.fromYmdHms(cy, cm, cd, ch, cmin, 0);
   const ec = solar.getLunar().getEightChar();
-  // Validate gender (xem computeDaYun). Fallback 0 (nữ) cho giá trị lạ.
-  const g = (gender === 'nam') ? 1 : (gender === 'nữ' || gender === 'nu') ? 0 : 0;
+  // [loop 743 FIX] parseGender ROBUST (xem computeDaYun) — không còn silent female-default.
+  const g = parseGender(gender);
   const yun = ec.getYun(g);
   const dayunList = yun.getDaYun();
   const dGan = ec.getDayGan();
@@ -593,6 +594,9 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   //   Caller (ai.js) vẫn check `a.hour == null` để set hourWarning — không phụ thuộc giá trị normalize.
   if (hour != null && (!_n(hour) || hour < 0 || hour > 23)) throw new Error(`Giờ sinh không hợp lệ («${hour}» — phải 0-23).`);
   if (minute != null && (!_n(minute) || minute < 0 || minute > 59)) throw new Error(`Phút sinh không hợp lệ («${minute}» — phải 0-59).`);
+  // [loop 743 FIX] validate gender — trước đây 'male'/'Male'/typo/null thầm lặng fallback NỮ
+  //   → ĐẢO dayun/大 hạn direction + SAI 起运 age. parseGender throw clean error cho garbage.
+  parseGender(gender);
   const hh = (hour == null) ? 12 : hour;
   const mm = (minute == null) ? 0 : minute;
   const chart = buildChart(year, month, day, hh, mm, gender);
