@@ -3572,6 +3572,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!/乙亥|Quân.*1993|Nhật Chủ 乙/.test(_t), '[loop 794] pFamily KHÔNG show chủ thể Quân chart (乙亥/1993)');
   console.log('   [loop 794] pFamily dùng đúng thành viên (Mẹ 1970, ≠ chủ thể Quân) ✓');
 }
+// [loop 795] isInteraction gate !isTiming — «năm X xung» → timing (lưu niên), natal layer giữ.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // «năm 2030 xung» → timing (yearly 太岁/xung năm)
+  assert(composeAnswer('năm 2030 xung hình hại gì?', _QR).title.includes('Vận hạn'), '[loop 795] «năm 2030 xung» → timing (lưu niên, không natal interactions)');
+  // natal layers với năm vẫn → layer composer (năm không đổi natal)
+  assert(composeAnswer('năm 2028 cách cục tôi?', _QR).title.includes('Cách cục'), '[loop 795] «năm 2028 cách cục» → pPattern (natal, năm không đổi)');
+  assert(composeAnswer('năm 2028 tài khố tôi?', _QR).title.includes('Tài khố'), '[loop 795] «năm 2028 tài khố» → pCaiKu (natal)');
+  // regression: bare xung (no year) vẫn → interactions
+  assert(composeAnswer('xung hình hại của tôi?', _QR).title.includes('Tương tác'), '[loop 795] regression: bare «xung» (no year) → interactions');
+  console.log('   [loop 795] isInteraction gate !isTiming — năm+xung→timing, natal layer giữ, bare→interactions ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

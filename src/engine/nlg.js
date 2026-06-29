@@ -810,7 +810,10 @@ export function composeAnswer(question, R) {
   //   không phải pCaiKu(R=chủ thể Quân).
   if (intent.isCaiKu && !intent.isFamily) return pCaiKu(R);
   // [loop 757] interaction question — surface 刑冲害合 typed meanings (offline, không cần AI)
-  if (intent.isInteraction && !_hasDomain) return pInteractions(R);
+  // [loop 795 FIX] gate thêm !isTiming: «năm 2030 xung hình?» → pTiming (lưu niên 太岁/xung năm),
+  //   không pInteractions (natal). Xung/hình LÀ timing-relevant (lưu niên); cách cục/tài khố
+  //   (natal) KHÔNG gate isTiming (năm không đổi natal).
+  if (intent.isInteraction && !_hasDomain && !intent.isTiming) return pInteractions(R);
   // [loop 761] pattern question — surface cách cục (offline, KHÔNG cần AI) — check TRƯỚC isShensha
   //   vì «cách cục ... Dụng thần sao?» có chữ «sao»+«thần» (loop 766 fix false-positive).
   if (intent.isPattern && !_hasDomain) return pPattern(R);
