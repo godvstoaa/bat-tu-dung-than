@@ -141,8 +141,9 @@ export function getConfig() {
     if (raw) return JSON.parse(raw);
   } catch (e) {}
   // [loop 903] Mặc định: Cloudflare Workers AI GLM-5.2 (proxy /cf-ai — chạy trên worker cùng origin).
+  // [loop 905] enabled: true — key nhúng server-side, user KHÔNG cần nhập gì.
   const cfPreset = PRESETS.find((p) => p.id === 'cf-glm') || PRESETS[0];
-  return { enabled: false, endpoint: cfPreset.endpoint, apiKey: '', model: cfPreset.model, preset: 'cf-glm' };
+  return { enabled: true, endpoint: cfPreset.endpoint, apiKey: '', model: cfPreset.model, preset: 'cf-glm' };
 }
 export function setConfig(cfg) {
   try { if (typeof localStorage !== 'undefined') localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
@@ -150,7 +151,9 @@ export function setConfig(cfg) {
 }
 export function isAIReady(cfg) {
   cfg = cfg || getConfig();
-  return !!(cfg.enabled && cfg.endpoint && cfg.model);
+  // [loop 905] cf-glm: key nhúng server-side → KHÔNG cần apiKey
+  const isCfNoKey = cfg.preset === 'cf-glm'; // worker inject key
+  return !!(cfg.enabled && cfg.endpoint && cfg.model && (isCfNoKey || cfg.apiKey));
 }
 
 // ===========================================================================
