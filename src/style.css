@@ -1483,6 +1483,11 @@ html{scroll-behavior:smooth}
 .grp {
   position: relative;
 }
+/* [loop 937] collapsible group headers — click to collapse/expand (mobile length fix) */
+.grp.collapsible-grp { cursor: pointer; user-select: none; }
+.grp.collapsible-grp::before { content: '▼'; display: inline-block; width: 1.2em; color: var(--gold); font-size: 0.7em; transition: transform .2s; }
+.grp.collapsible-grp.collapsed::before { transform: rotate(-90deg); }
+.grp.collapsible-grp.collapsed { opacity: 0.7; }
 .grp::after {
   content: '';
   position: absolute;

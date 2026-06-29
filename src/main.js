@@ -3485,6 +3485,53 @@ function lazyRender(innerId, fn) {
   _lazyIO.observe(card);
 }
 
+// [loop 937] COLLAPSIBLE GROUPS — giảm trang 130K px: mobile thu gọn các nhóm phụ (desktop giữ nguyên).
+//   Click tiêu đề nhóm (h2.grp) → collapse/expand. Single source of truth: visibility = collapse AND search.
+function updateCardVisibility() {
+  const searchEl = $('card-search');
+  const q = searchEl && searchEl.value && searchEl.value.trim().toLowerCase();
+  const searching = !!q;
+  const kids = Array.from(document.querySelectorAll('#result > .card, #result > h2.grp'));
+  let curGrp = null;
+  for (const el of kids) {
+    if (el.classList.contains('grp')) { curGrp = el; continue; }
+    if (!el.classList.contains('card')) continue;
+    const collapsed = curGrp && curGrp.classList.contains('collapsed');
+    const filtered = el.dataset.filtered === '1';
+    const show = searching ? !filtered : !collapsed;
+    el.style.display = show ? '' : 'none';
+  }
+  // grp header: khi search → ẩn nhóm mồ côi (không card match); không search → luôn hiện (để expand)
+  for (let i = 0; i < kids.length; i++) {
+    if (!kids[i].classList.contains('grp')) continue;
+    if (!searching) { kids[i].style.display = ''; continue; }
+    let hasVisible = false;
+    for (let j = i + 1; j < kids.length && !kids[j].classList.contains('grp'); j++) {
+      if (kids[j].style.display !== 'none') { hasVisible = true; break; }
+    }
+    kids[i].style.display = hasVisible ? '' : 'none';
+  }
+}
+function initCollapsibleGroups() {
+  const grps = Array.from(document.querySelectorAll('#result > h2.grp'));
+  if (!grps.length) return;
+  const isMobile = window.matchMedia('(max-width: 720px)').matches;
+  grps.forEach((grp, i) => {
+    if (grp.dataset.collapsible !== '1') {
+      grp.dataset.collapsible = '1';
+      grp.classList.add('collapsible-grp');
+      grp.addEventListener('click', () => {
+        grp.classList.toggle('collapsed');
+        // active quick-nav reset (group có thể đã ẩn)
+        updateCardVisibility();
+      });
+    }
+    if (isMobile && i > 0) grp.classList.add('collapsed');  // mobile: gập nhóm phụ
+    else if (!isMobile) grp.classList.remove('collapsed');   // desktop: mở hết
+  });
+  updateCardVisibility();
+}
+
 function run() {
   const dateVal = $('date').value;
   const timeVal = $('time').value || '12:00';
@@ -3718,6 +3765,8 @@ function run() {
     }
     qnav.classList.remove('hidden');
   }
+  // [loop 937] collapsible groups (mobile default-collapse secondary) — sau quick-nav (grp.id đã set)
+  initCollapsibleGroups();
   // reveal print button
   const pbtn = $('print-btn');
   if (pbtn) pbtn.classList.remove('hidden');
@@ -3744,25 +3793,15 @@ function run() {
     cardSearch.classList.remove('hidden');
     cardSearch.addEventListener('input', () => {
       const q = cardSearch.value.trim().toLowerCase();
-      const kids = Array.from(document.querySelectorAll('#result > .card, #result > h2.grp'));
-      if (!q) { kids.forEach((el) => { el.style.display = ''; }); return; }
-      const match = (el) => {
+      const cards = document.querySelectorAll('#result > .card');
+      // [loop 937] dùng data-filtered + updateCardVisibility (single source: collapse AND search)
+      cards.forEach((el) => {
+        if (!q) { el.dataset.filtered = '0'; return; }
         const title = el.querySelector('.card-title') || el;
-        const text = title.textContent.toLowerCase();
-        const body = el.textContent.toLowerCase().slice(0, 500); // cũng search nội dung card
-        return text.includes(q) || body.includes(q);
-      };
-      // Pass 1: card visible theo match
-      kids.forEach((el) => { if (el.classList.contains('card')) el.style.display = match(el) ? '' : 'none'; });
-      // Pass 2: grp header visible iff có ≥1 card hiện giữa nó và grp kế tiếp
-      kids.forEach((el, i) => {
-        if (!el.classList.contains('grp')) return;
-        let hasVisible = false;
-        for (let j = i + 1; j < kids.length && !kids[j].classList.contains('grp'); j++) {
-          if (kids[j].style.display !== 'none') { hasVisible = true; break; }
-        }
-        el.style.display = hasVisible ? '' : 'none';
+        const text = (title.textContent + ' ' + el.textContent.slice(0, 500)).toLowerCase();
+        el.dataset.filtered = text.includes(q) ? '0' : '1';
       });
+      updateCardVisibility();
     });
   }
   // [loop 422] keyboard shortcut: "/" → focus card search (skip if typing in input/textarea)
