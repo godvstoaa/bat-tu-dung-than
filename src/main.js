@@ -3527,7 +3527,8 @@ function initCollapsibleGroups() {
       });
     }
     if (isMobile && i > 0) grp.classList.add('collapsed');  // mobile: gập nhóm phụ
-    else if (!isMobile) grp.classList.remove('collapsed');   // desktop: mở hết
+    else if (!isMobile && /tham khảo|hệ mệnh sâu/i.test(grp.textContent)) grp.classList.add('collapsed'); // desktop: gập nhóm THAM KHẢO
+    else if (!isMobile) grp.classList.remove('collapsed');   // desktop: mở các nhóm chính
   });
   updateCardVisibility();
 }
