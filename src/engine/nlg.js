@@ -102,7 +102,7 @@ export function detectIntent(question) {
   const isDivination = /gieo que|lac que|que dich|boi que|thao que|cham tu|luc nh|ky mon|don giap/.test(norm) || /起卦|测字|占卦|占卜|六壬|奇门|遁甲/.test(question);
   // [loop 655] fengshui + remedy intent (trước đây → «chưa rõ lĩnh vực» khi API fail)
   const isFengshui = /\b(phong thuy|dinh vi|la ban)\b/.test(norm)
-    || (/\b(huong|nha|tang|giuong|bep|cua chinh)\b/.test(norm) && /\b(tot|xau|hop|nao|cat|hung|nen|duoc|the nao)\b/.test(norm));
+    || (/\b(huong|nha|tang|giuong|bep|cua chinh)\b/.test(norm) && /\b(tot|xau|hop|nao|cat|hung|nen|duoc|the nao|xung|hinh|hai)\b/.test(norm));
   const isRemedy = /\b(bot xui|giam xui|bo xui|xui xe|doi van|hoa giai|giai han|giai xui|khai van|may man|phuc duc|lam cai gi|nen lam gi|cuu|cai menh|cai van|bo tui|giam tui|deo da|da quy|mau gi|mau hop|mau sac)\b/.test(norm);
   // [loop 735] isRemedyStrong — ĐỘNG TỪ cải vận RÕ RÀNG (giải hạn/hoá giải/cải mệnh/cải vận/bớt xui/giải xui/khai vận/cứu).
   //   Khi user hỏi «sao giải hạn năm nay?» → isTiming (năm nay) true → isRemedy && !isTiming bị skip → MẤT remedy.
@@ -735,19 +735,27 @@ const COMPOSERS = {
 // ---------------------------------------------------------------------------
 export function composeAnswer(question, R) {
   const intent = detectIntent(question);
+  // [loop 767 FIX] GATE 6 intent mới (interaction/pattern/shensha/nayin/tiaohou/minggong):
+  //   chỉ fire khi KHÔNG có domain signal mạnh hơn. Trước đây chúng check TRƯỚC isFamily/
+  //   isFengshui/area → HIJACK câu hỏi domain («tài lộc...nạp âm» → nạp âm ❌, «hướng nhà...
+  //   xung» → tương tác ❌, «dòng khí cách cục» → cách cục ❌, «đại vận...quý nhân» → shensha ❌).
+  //   Domain signal: area ∈ {wealth,career,love,health,timing,flow} HOẶC isFamily/isFengshui/
+  //   isRemedyStrong/isCompat/isDivination.
+  const _STRONG_DOMAIN = new Set(['wealth', 'career', 'love', 'health', 'timing', 'flow']);
+  const _hasDomain = _STRONG_DOMAIN.has(intent.area) || intent.isFamily || intent.isFengshui || intent.isRemedyStrong || intent.isCompat || intent.isDivination;
   // [loop 757] interaction question — surface 刑冲害合 typed meanings (offline, không cần AI)
-  if (intent.isInteraction) return pInteractions(R);
+  if (intent.isInteraction && !_hasDomain) return pInteractions(R);
   // [loop 761] pattern question — surface cách cục (offline, KHÔNG cần AI) — check TRƯỚC isShensha
   //   vì «cách cục ... Dụng thần sao?» có chữ «sao»+«thần» (loop 766 fix false-positive).
-  if (intent.isPattern) return pPattern(R);
+  if (intent.isPattern && !_hasDomain) return pPattern(R);
   // [loop 758] shensha question — surface thần煞 (offline, không cần AI)
-  if (intent.isShensha) return pShensha(R);
+  if (intent.isShensha && !_hasDomain) return pShensha(R);
   // [loop 759] nayin question — surface nạp âm (offline, không cần AI)
-  if (intent.isNayin) return pNayin(R);
+  if (intent.isNayin && !_hasDomain) return pNayin(R);
   // [loop 760] tiaohou question — surface điều hậu (offline, không cần AI)
-  if (intent.isTiaohou) return pTiaohou(R);
+  if (intent.isTiaohou && !_hasDomain) return pTiaohou(R);
   // [loop 764] minggong question — surface mệnh cung (offline, không cần AI)
-  if (intent.isMinggong) return pMinggong(R);
+  if (intent.isMinggong && !_hasDomain) return pMinggong(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family

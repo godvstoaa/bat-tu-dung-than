@@ -3215,6 +3215,26 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(/Cách cục|格局/.test(composeAnswer('Cách cục của tôi là gì? Dụng thần sao?', _QR).title), '[loop 766] chip «Cách cục» route đúng pPattern');
   console.log('   [loop 766] isShensha false-positive fix («Dụng thần sao»=what, ≠ star) + 3 chip mới ✓');
 }
+// [loop 767] 6 intent mới KHÔNG hijack câu hỏi domain (wealth/timing/fengshui/flow).
+//   Trước đây «tài lộc...nạp âm» → nạp âm ❌, «hướng nhà...xung» → tương tác ❌, v.v.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _T = [
+    ['tài lộc của tôi có nạp âm gì?', 'Tài lộc'],
+    ['đại vận của tôi có quý nhân giúp?', 'Vận hạn'],
+    ['hướng nhà có xung hình không?', 'Phong thủy'],
+  ];
+  for (const [q, expect] of _T) {
+    const _t = composeAnswer(q, _QR).title;
+    assert(_t.includes(expect), `[loop 767] «${q}» → ${expect} (got ${_t.slice(0, 30)}) — intent mới không hijack domain`);
+  }
+  // pure new-intent questions vẫn route đúng (regression)
+  const _PURE = [['nạp âm của tôi?', 'Nạp âm'], ['cách cục của tôi?', 'Cách cục'], ['xung hình hại của tôi?', 'Tương tác'], ['tôi có quý nhân sao gì?', 'Thần'], ['mệnh cung của tôi?', 'Mệnh cung'], ['điều hậu của tôi?', 'Điều hậu']];
+  for (const [q, expect] of _PURE) {
+    assert(composeAnswer(q, _QR).title.includes(expect), `[loop 767] regression: «${q}» vẫn route đúng`);
+  }
+  console.log('   [loop 767] 6 intent mới gate domain signal — không hijack wealth/timing/fengshui/flow ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
