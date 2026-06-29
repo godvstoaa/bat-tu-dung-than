@@ -3294,6 +3294,17 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_bad === 0 && _n >= 20, `[loop 771] zheri 12 trực khớp lunar-javascript getZhiXing (${_n - _bad}/${_n})`);
   console.log(`   [loop 771] zheri 12 trực (建除十二神) khớp lunar-javascript ${_n - _bad}/${_n} ✓`);
 }
+// [loop 772] find_good_days — top ngày chọn phải là CÁT (Đại cát/Cát) cho 5 việc.
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  const _R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  for (const [label, act] of [['marry','marry'],['business','khai-truong'],['build','dong-tho'],['move','don-nha']]) {
+    const _res = execTool('find_good_days', { start: '2026-07-01', count: 60, topN: 3, activity: act }, _R);
+    assert(!_res.error && (_res.top || []).length, `[loop 772] find_good_days «${label}» trả top dates`);
+    assert((_res.top || []).every((d) => /Đại cát|Cát/.test(d.rating)), `[loop 772] find_good_days «${label}» top dates đều CÁT (got ${(_res.top||[]).map((d)=>d.rating).join(',')})`);
+  }
+  console.log('   [loop 772] find_good_days top ngày đều CÁT cho 4 việc (cưới/khai trương/động thổ/dọn nhà) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
