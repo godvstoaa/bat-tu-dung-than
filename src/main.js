@@ -5775,7 +5775,11 @@ function renderDecadeCurve() {
 }
 
 function renderQuickSummary() {
-  if (!currentResult) return;
+  if (!currentResult) {
+    const el = $('quick-summary');
+    if (el) el.innerHTML = '<div class="qs-welcome" style="text-align:center;padding:2rem 1rem"><p style="font-size:1.15rem;margin-bottom:.5rem">🌟 Chào mừng bạn đến với <b>Bát Tự Dụng Thần</b></p><p style="opacity:.8">Nhập <b>ngày sinh</b> ở form trên rồi bấm <b>«Luận giải»</b> để xem lá số tứ trụ, Dụng Thần, vận hạn, tài lộc, tình duyên, phong thủy…</p></div>';
+    return;
+  }
   const c = currentResult;
   const syn = c.synthesis || {};
   const yong = c.yong || {};
