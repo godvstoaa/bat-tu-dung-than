@@ -3283,6 +3283,18 @@ function _md(s) {
   closeList();
   return out;
 }
+// [loop 946] _stripMd — bỏ markdown syntax cho TTS (đọc to) + copy (paste sạch).
+//   Trước đây read-aloud đọc «**bold**» literal («star star bold»), copy dán đầy asterisk.
+function _stripMd(s) {
+  return String(s == null ? '' : s)
+    .replace(/\*\*([^*]+)\*\*/g, '$1')     // **bold** → bold
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1$2')  // *italic* → italic
+    .replace(/`([^`]+)`/g, '$1')           // `code` → code
+    .replace(/^###?\s+/gm, '')             // ## / ### headings → text
+    .replace(/^\s*[-•*]\s+/gm, '• ')       // bullet → "• " (đọc tự nhiên)
+    .replace(/[◆■▶▼✓✗⚠🥇①②③④⑤]/g, '')     // ký hiệu trang trí → bỏ
+    .replace(/\n{3,}/g, '\n\n');           // gộp dòng trống thừa
+}
 function appendMsg(role, text) {
   const wrap = document.createElement('div');
   wrap.className = `msg msg-${role}`;
@@ -3359,7 +3371,7 @@ async function handleAsk() {
         let _on = false;
         _sp.addEventListener('click', () => {
           if (_on) { window.speechSynthesis.cancel(); return; }
-          const _u = new SpeechSynthesisUtterance(text);
+          const _u = new SpeechSynthesisUtterance(_stripMd(text));
           _u.lang = 'vi-VN'; _u.rate = 1.02;
           _u.onend = () => { _on = false; _sp.textContent = '🔊 Đọc to'; _sp.classList.remove('active'); };
           _u.onerror = _u.onend;
@@ -3372,8 +3384,9 @@ async function handleAsk() {
       _cp.type = 'button'; _cp.className = 'msg-action-btn'; _cp.textContent = '📋 Sao chép';
       _cp.addEventListener('click', () => {
         const _done = () => { _cp.textContent = '✓ Đã chép'; setTimeout(() => { _cp.textContent = '📋 Sao chép'; }, 1500); };
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(_done).catch(() => _fallbackCopy(text, _done));
-        else _fallbackCopy(text, _done);
+        const _clean = _stripMd(text);   // [loop 946] copy text sạch (không ** asterisk)
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(_clean).then(_done).catch(() => _fallbackCopy(_clean, _done));
+        else _fallbackCopy(_clean, _done);
       });
       _act.appendChild(_cp);
       body.parentElement.appendChild(_act);
