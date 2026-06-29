@@ -3332,6 +3332,19 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_hasCat && !_allHung, '[loop 774] năm Bình có mix tháng (cát + bình/hung), không toàn Hung');
   console.log('   [loop 774] lưu nguyệt 12 tháng mix nhất quán (năm Bình có cát+bình+hung) ✓');
 }
+// [loop 775] đại vận × 12 trường sinh integration — mỗi đại vận chi đúng life-stage.
+{
+  const { dayunChangsheng } = await import('./src/engine/changsheng-deep.js');
+  const { changSheng } = await import('./src/engine/core.js');
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _dcs = dayunChangsheng(_QR);
+  let _bad = 0;
+  for (const _s of (_dcs.stages || [])) {
+    if (changSheng(_QR.chart.dayGan, _s.zhi) !== _s.stage) _bad++;
+  }
+  assert(_bad === 0, `[loop 775] đại vận × 12 trường sinh khớp core.changSheng (${(_dcs.stages||[]).length - _bad}/${(_dcs.stages||[]).length})`);
+  console.log(`   [loop 775] đại vận × 12 trường sinh integration — ${(_dcs.stages||[]).length}/${(_dcs.stages||[]).length} khớp core ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
