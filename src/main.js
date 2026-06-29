@@ -3283,8 +3283,16 @@ function _md(s) {
   closeList();
   return out;
 }
+// [loop 949] _streamClean — strip markdown markers AGGRESSIVELY cho streaming display
+//   (bỏ ** ` # dù chưa đóng — partial markdown mid-stream). textContent (not innerHTML) → no jank.
+function _streamClean(s) {
+  return String(s == null ? '' : s)
+    .replace(/\*\*/g, '')
+    .replace(/`/g, '')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/^\s*[-*]\s+/gm, '• ');
+}
 // [loop 946] _stripMd — bỏ markdown syntax cho TTS (đọc to) + copy (paste sạch).
-//   Trước đây read-aloud đọc «**bold**» literal («star star bold»), copy dán đầy asterisk.
 function _stripMd(s) {
   return String(s == null ? '' : s)
     .replace(/\*\*([^*]+)\*\*/g, '$1')     // **bold** → bold
@@ -3394,7 +3402,7 @@ async function handleAsk() {
       history: chatHistory,
       signal: _aiAbort.signal,   // [loop 948] cho phép cancel
       onStatus: (s) => { lastStatus = s; body.textContent = s + ' …'; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
-      onToken: (_delta, full) => { body.textContent = full; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
+      onToken: (_delta, full) => { body.textContent = _streamClean(full); if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
     });
     body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
     body.classList.remove('streaming');
