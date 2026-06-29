@@ -3753,6 +3753,22 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(new Set(_snaps).size === 5, `[loop 809] pOverview 5 thành viên ra 5 snapshot unique (got ${new Set(_snaps).size}/5)`);
   console.log('   [loop 809] pOverview member-specific (5/5 unique snapshot) ✓');
 }
+// [loop 810] daily ganZhi khớp lunar-javascript — foundation cho toàn bộ daily analysis.
+{
+  const { dailyBriefing } = await import('./src/engine/daily-briefing.js');
+  const { Solar } = await import('lunar-javascript');
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  let _bad = 0;
+  for (let _i = 0; _i < 10; _i++) {
+    const _dt = new Date(2026, 5, 25 + _i);
+    const _y = _dt.getFullYear(), _m = _dt.getMonth() + 1, _d = _dt.getDate();
+    const _db = dailyBriefing(_QR, _y, _m, _d, _QR.patternQuality);
+    const _lj = Solar.fromYmdHms(_y, _m, _d, 12, 0, 0).getLunar().getDayInGanZhiExact();
+    if (_db.dayGanZhi !== _lj) _bad++;
+  }
+  assert(_bad === 0, `[loop 810] daily ganZhi khớp lunar-javascript (10 ngày, ${_bad} mismatch)`);
+  console.log('   [loop 810] daily ganZhi khớp lunar-javascript (10 ngày) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
