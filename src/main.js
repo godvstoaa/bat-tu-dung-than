@@ -3277,7 +3277,11 @@ function updateAIStatus() {
 
 let _aiBusy = false;
 async function handleAsk() {
-  if (!currentResult || _aiBusy) return;
+  if (!currentResult) {
+    appendMsg('assistant', '📋 Vui lòng nhập ngày sinh ở form trên rồi bấm «Luận giải» — sau đó tôi có thể trả lời mọi câu hỏi của bạn (vận hạn, tài lộc, tình duyên, phong thủy…).');
+    return;
+  }
+  if (_aiBusy) return;
   const q = $('question').value.trim();
   if (!q) return;
   $('question').value = '';
