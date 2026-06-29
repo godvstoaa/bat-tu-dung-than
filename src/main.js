@@ -86,7 +86,7 @@ import { computeAuxStars } from './engine/ziwei-aux.js';
 import { checkDayunInteractions } from './engine/dayun-check.js';
 import { computeMarriageShensha, computeExtraShensha } from './engine/shensha-marriage.js';
 import { viToHan } from './engine/vi2han.js';
-import { askAI, getConfig, setConfig, isAIReady, PRESETS, testAIConnection } from './engine/ai.js';
+import { askAI, getConfig, setConfig, isAIReady, PRESETS, testAIConnection, suggestFollowups } from './engine/ai.js';
 import { decadeForecast } from './engine/decade-forecast.js';
 import { starPower } from './engine/star-power.js';
 import { annualTabooOverview } from './engine/annual-taboo.js';
@@ -3308,6 +3308,23 @@ async function handleAsk() {
     body.textContent = text;
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? 'Trợ lý AI' : 'Trợ lý (cục bộ)';
+    // [loop 928] gợi ý câu hỏi kế tiếp theo ngữ cảnh (cảm giác ông thầy tư vấn)
+    try {
+      const _fups = suggestFollowups(q);
+      if (_fups && _fups.length) {
+        const fc = document.createElement('div');
+        fc.className = 'msg-followups';
+        for (const f of _fups) {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'followup-chip';
+          chip.textContent = f;
+          chip.addEventListener('click', () => { if (_aiBusy) return; $('question').value = f; handleAsk(); });
+          fc.appendChild(chip);
+        }
+        body.parentElement.appendChild(fc);
+      }
+    } catch (_) {}
     // lưu bộ nhớ hội thoại
     chatHistory.push({ role: 'user', content: q });
     chatHistory.push({ role: 'assistant', content: text });

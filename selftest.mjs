@@ -7994,6 +7994,26 @@ if (FAILS === 0) {
 console.log('='.repeat(70));
 
 
+// ################## FOLLOW-UP SUGGESTIONS [loop 928] — context-aware chips ##################
+import { suggestFollowups as _sf } from './src/engine/ai.js';
+{
+  const _cases = [
+    ['Dụng thần của tôi là gì?', /đại vận|nghề/i],
+    ['Đại vận sắp tới thế nào?', /lưu niên|chuyển vận/i],
+    ['Hôn nhân của tôi ra sao?', /cưới|tuổi nào hợp/i],
+    ['Tài lộc năm nay ra sao?', /tài khố|phát tài/i],
+    ['Tổng quan quỹ đạo đời tôi', /đỉnh cao|khuyên/i],
+    ['', /.{3,}/], // empty → default branch, still returns 3-4
+  ];
+  let _bad = 0;
+  for (const [_q, _re] of _cases) {
+    const _s = _sf(_q);
+    const _ok = Array.isArray(_s) && _s.length >= 3 && _s.length <= 4 && _s.every((x) => typeof x === 'string' && x.length > 5);
+    if (!_ok || (_q && !_re.test(_s.join(' ')))) { _bad++; assert(false, `[loop 928] suggestFollowups(«${_q}»): ra ${JSON.stringify(_s).slice(0, 60)}`); }
+  }
+  if (_bad === 0) console.log(`   [loop 928] FOLLOWUPS ✓ — gợi ý theo intent (Dụng/Đại vận/Hôn nhân/Tài/Tổng quan/default) ra 3-4 chip đúng ngữ cảnh`);
+}
+
 // [loop 703] BUILD CHECK — selftest phải verify build thành công (tránh loop 697-699 bug lặp)
 {
   const { execSync } = await import('child_process');
