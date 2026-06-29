@@ -4778,7 +4778,8 @@ document.addEventListener('click', (e) => {
   if (chipEl) {
     const q = $('question');
     if (q) { q.value = chipEl.dataset.q; const btn = $('ask-btn'); if (btn) btn.click(); }
-    const cs = $('chat-suggest'); if (cs) cs.style.display = 'none';
+    // [loop 859] chỉ ẩn chips khi ĐÃ có chart (currentResult). New user → giữ chips.
+    if (currentResult) { const cs = $('chat-suggest'); if (cs) cs.style.display = 'none'; }
     return;
   }
 });
