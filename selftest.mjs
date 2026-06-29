@@ -3964,6 +3964,13 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('health tôi cần gì?', _QR).title.includes('Sức khỏe'), '[loop 829] «health» → health');
   console.log('   [loop 829] English keywords (wealth/career/love/health) mixed VN-EN route ✓');
 }
+// [loop 830] same 时辰 stability — different minutes → IDENTICAL chart.
+{
+  const _p = (h, mi) => Object.values(analyze(1993, 10, 21, h, mi, 'nam', 2026).chart.pillars).map((p) => p.gan + p.zhi).join(' ');
+  const _a = _p(1, 0), _b = _p(1, 15), _c = _p(1, 59);
+  assert(_a === _b && _b === _c, `[loop 830] same 时辰 (丑 1:00/1:15/1:59) → identical chart (${_a} vs ${_b} vs ${_c})`);
+  console.log('   [loop 830] same 时辰 stability (1:00/1:15/1:59 → identical chart) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
