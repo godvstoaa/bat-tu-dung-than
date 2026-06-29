@@ -600,12 +600,20 @@ function pOverview(R) {
   paras.push(`💡 Muốn xem CHI TIẾT từng lớp: hỏi «cách cục», «xung hình hại», «sao thần煞», «nạp âm», «tài khố», «đại vận», «hôm nay» — hoặc bật AI (⚙ GLM-5.2) cho luân giải mở.`);
   return { title: 'Phân tích toàn diện (tổng quan mệnh)', lead: `Snapshot đa lớp cho ${dayGz}:`, paragraphs: paras };
 }
-function pDaily(R) {
+function pDaily(R, intent) {
   // [loop 802] Surface dailyBriefing offline — «hôm nay» giờ tốt/xấu, hướng kỵ, thái tuế, Dụng action.
+  // [loop 834 FIX] parse date offset (hôm nay/ngày mai/hôm qua) từ question.
   const dm = R.chart.dayMaster;
-  // ngày: hôm nay (refYear không dùng cho daily — lấy ngày thật)
+  let _offset = 0;
+  if (intent && intent.raw) {
+    const _q = intent.raw.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
+    if (/\bngay mai\b/.test(_q)) _offset = 1;
+    else if (/\bhom qua\b/.test(_q)) _offset = -1;
+    else if (/\bngay kia\b/.test(_q)) _offset = 2;
+    else if (/\bhom kia\b/.test(_q)) _offset = -2;
+  }
   let y, mo, d;
-  try { const _n = new Date(); y = _n.getFullYear(); mo = _n.getMonth() + 1; d = _n.getDate(); } catch (e) { y = 2026; mo = 6; d = 29; }
+  try { const _n = new Date(); _n.setDate(_n.getDate() + _offset); y = _n.getFullYear(); mo = _n.getMonth() + 1; d = _n.getDate(); } catch (e) { y = 2026; mo = 6; d = 29; }
   let db;
   try { db = dailyBriefing(R, y, mo, d, R.patternQuality); } catch (e) { db = null; }
   if (!db) return { title: 'Vận hôm nay', lead: `Vận ngày hôm nay của ${dm.gan} ${dm.vi}:`, paragraphs: ['(không tính được — thử bật AI)'] };
@@ -919,7 +927,7 @@ export function composeAnswer(question, R) {
   if (intent.isCaiKu && !intent.isFamily) return pCaiKu(R);
   // [loop 802] daily question — «hôm nay» → dailyBriefing (giờ tốt/xấu, hướng kỵ, thái tuế) —
   //   TRƯỚC isTiming (daily cụ thể hơn năm/tháng).
-  if (intent.isDaily && !intent.isFamily && !intent.isDivination) return pDaily(R);
+  if (intent.isDaily && !intent.isFamily && !intent.isDivination) return pDaily(R, intent);
   // [loop 808] overview question — «phân tích toàn diện» → multi-layer snapshot.
   if (intent.isOverview) return pOverview(R);
   // [loop 757] interaction question — surface 刑冲害合 typed meanings (offline, không cần AI)

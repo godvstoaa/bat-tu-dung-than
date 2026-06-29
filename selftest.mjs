@@ -3995,6 +3995,14 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /undefined|NaN|\[object/.test(p)), '[loop 833] không leak');
   console.log('   [loop 833] 通胜 宜忌 trong pDaily (hôm nay nên/kỵ làm gì) ✓');
 }
+// [loop 834] pDaily date offset — «ngày mai» → tomorrow's date (không today).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _t = composeAnswer('hôm nay nên làm gì?', _QR).paragraphs.find((p) => /📅/.test(p)) || '';
+  const _m = composeAnswer('ngày mai nên làm gì?', _QR).paragraphs.find((p) => /📅/.test(p)) || '';
+  assert(_t.substring(0, 12) !== _m.substring(0, 12), `[loop 834] «hôm nay»(${_t.slice(3, 13)}) ≠ «ngày mai»(${_m.slice(3, 13)}) — date offset đúng`);
+  console.log('   [loop 834] pDaily date offset («ngày mai» → tomorrow, «hôm qua» → yesterday) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
