@@ -3730,6 +3730,19 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_bad === 0, `[loop 807] 5 thành viên × ${_chips.length} chip = ${_n} test: ${_bad} anomaly`);
   console.log(`   [loop 807] 5 thành viên × ${_chips.length} chip (${_n} test) — 0 crash/leak/generic ✓`);
 }
+// [loop 808] pOverview — «phân tích toàn diện» → multi-layer snapshot (5 layers).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('phân tích toàn diện mệnh tôi').isOverview === true, '[loop 808] isOverview detect «phân tích toàn diện»');
+  const _a = composeAnswer('luận sâu mệnh tôi, tổng quan', _QR);
+  assert(/toàn diện|tổng quan/.test(_a.title), `[loop 808] pOverview route (got ${_a.title})`);
+  // phải surface ≥4 layers (bản mệnh + Dụng + tương tác + thần煞 + nạp âm)
+  const _layers = ['Bản mệnh', 'Dụng', 'Tương tác', 'Sao', 'Nạp âm'];
+  const _hit = _layers.filter((l) => _a.paragraphs.some((p) => p.includes(l))).length;
+  assert(_hit >= 4, `[loop 808] pOverview surface ≥4 layers (got ${_hit}: ${_layers.filter((l) => _a.paragraphs.some((p) => p.includes(l))).join(',')})`);
+  assert(!_a.paragraphs.some((p) => /undefined|NaN|\[object/.test(p)), '[loop 808] không leak');
+  console.log('   [loop 808] pOverview multi-layer snapshot (5 layers: bản mệnh/Dụng/tương tác/thần煞/nạp âm) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

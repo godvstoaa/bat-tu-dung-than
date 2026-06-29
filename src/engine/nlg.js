@@ -154,6 +154,8 @@ export function detectIntent(question) {
   const isCaiKu = /\b(tai kho|kho tien|giu tien|giu duoc tien|taikho|cai ku)\b/.test(norm) || /财库/.test(question);
   // [loop 781] isQiFlow — hỏi về khí thông trụ / 盖头截脚 (can-chi khắc trong cùng trụ).
   const isQiFlow = /\b(khi thong|khi luu|cai dau|tiet cuoc|gai dau|khi chay|thong tru)\b/.test(norm) || /盖头|截脚/.test(question);
+  // [loop 808] isOverview — «phân tích toàn diện / luận sâu / tổng quan» → multi-layer snapshot.
+  const isOverview = /\b(phan tich toan dien|toan dien|luan sau|tong quan|danh gia menh|xem toan dien|tom tat menh|ban menh toi sao|menh toi nhu the nao)\b/.test(norm);
   // [loop 760] isTiaohou — hỏi về điều hậu (khí hậu mùa sinh → hành cần bổ).
   const isTiaohou = /\b(dieu hau|hau cua|khi hau|mua sinh|co phap|khong thong bao|ngoai hop|van han|khan|tao|ret|am|nhiet)\b/.test(norm)
     && /\b(dieu hau|khi hau|hau|co phap)\b/.test(norm);
@@ -176,7 +178,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isShenshaStrong, isNayin, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, confidence, raw: question };
+  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isShenshaStrong, isNayin, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, isOverview, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -561,6 +563,39 @@ function pDivination(R, intent) {
   }
 }
 
+function pOverview(R) {
+  // [loop 808] Executive summary — multi-layer snapshot (1 line each) cho «phân tích toàn diện».
+  const dm = R.chart.dayMaster;
+  const dayGz = (R.chart.pillars && R.chart.pillars.day) ? R.chart.pillars.day.gan + R.chart.pillars.day.zhi : dm.gan;
+  const p = R.pattern || {};
+  const pq = R.patternQuality || {};
+  const y = R.yong || {};
+  const s = R.strength || {};
+  const syn = R.synthesis || {};
+  const it = R.interactions || {};
+  const paras = [];
+  // 1. Core
+  paras.push(`🌟 **Bản mệnh**: ${dayGz} — ${dm.vi} (${dm.wx}), ${s.level || '?'} (${(s.ratio * 100).toFixed(0)}%). Cách cục: ${p.vi || p.name || '?'}${pq.quality ? ' (' + pq.quality + ')' : ''}. Tổng luận: ${syn.gradeVi || '?'} (${syn.score || '?'}/100).`);
+  // 2. Dụng
+  paras.push(`⚖ **Dụng thần**: ${favText(y)} / Hỷ ${wxVi(y.xi)} / Kỵ ${wxVi(y.ji)}. ${yongExplain(R) || ''}`);
+  // 3. Tương tác nổi bật
+  const _ints = [];
+  if ((it.xing || []).length) _ints.push(`${(it.xing || []).length} hình`);
+  if ((it.chong || []).length) _ints.push(`${(it.chong || []).length} xung`);
+  if ((it.hai || []).length) _ints.push(`${(it.hai || []).length} hại`);
+  paras.push(`⚔ **Tương tác**: ${_ints.length ? _ints.join(', ') : 'yên (ít xung/hình/hại)'}.`);
+  // 4. Thần煞
+  const _ss = Object.keys(R.shensha || {});
+  paras.push(`⭐ **Sao thần煞**: ${_ss.length ? _ss.length + ' sao (' + _ss.slice(0, 4).map((k) => SHENSHA_INFO[k]?.vi || k).join(', ') + (_ss.length > 4 ? '...' : '') + ')' : 'không sao chính nổi bật'}.`);
+  // 5. Nạp âm
+  try {
+    const _ny = analyzeNayin(R.chart).find((n) => n.key === 'day');
+    if (_ny) paras.push(`🎵 **Nạp âm bản mệnh**: ${_ny.vi} (hành ${_ny.wxVi}).`);
+  } catch (e) {}
+  // 6. Hướng dẫn
+  paras.push(`💡 Muốn xem CHI TIẾT từng lớp: hỏi «cách cục», «xung hình hại», «sao thần煞», «nạp âm», «tài khố», «đại vận», «hôm nay» — hoặc bật AI (⚙ GLM-5.2) cho luân giải mở.`);
+  return { title: 'Phân tích toàn diện (tổng quan mệnh)', lead: `Snapshot đa lớp cho ${dayGz}:`, paragraphs: paras };
+}
 function pDaily(R) {
   // [loop 802] Surface dailyBriefing offline — «hôm nay» giờ tốt/xấu, hướng kỵ, thái tuế, Dụng action.
   const dm = R.chart.dayMaster;
@@ -861,6 +896,8 @@ export function composeAnswer(question, R) {
   // [loop 802] daily question — «hôm nay» → dailyBriefing (giờ tốt/xấu, hướng kỵ, thái tuế) —
   //   TRƯỚC isTiming (daily cụ thể hơn năm/tháng).
   if (intent.isDaily && !intent.isFamily && !intent.isDivination) return pDaily(R);
+  // [loop 808] overview question — «phân tích toàn diện» → multi-layer snapshot.
+  if (intent.isOverview) return pOverview(R);
   // [loop 757] interaction question — surface 刑冲害合 typed meanings (offline, không cần AI)
   // [loop 795 FIX] gate thêm !isTiming: «năm 2030 xung hình?» → pTiming (lưu niên 太岁/xung năm),
   //   không pInteractions (natal). Xung/hình LÀ timing-relevant (lưu niên); cách cục/tài khố
