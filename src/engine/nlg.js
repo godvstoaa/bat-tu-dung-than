@@ -152,6 +152,8 @@ export function detectIntent(question) {
   // [loop 759] isNayin — hỏi về nạp âm / bản mệnh hành (nayin của trụ ngày).
   // [loop 875] «ngũ hành cân bằng/mạnh/yếu» → isWuXing (KHÔNG phải isNayin).
   const isWuXing = /\b(ngu hanh can bang|ngu hanh manh|ngu hanh yeu|hanh nao manh|hanh nao yeu|ngu hanh cua toi)\b/.test(norm);
+  // [loop 878] isTenGod — «thập thần/tính cách sao» → bar chart 10 god.
+  const isTenGod = /\b(thap than|thap than cua toi|sao nao manh|sao nao yeu|tinh cach sao|10 sao|thap than can bang)\b/.test(norm);
   const isNayin = !isWuXing && /\b(nap am|nayin|ban menh ngu hanh|menh ngu hanh|hanh cua toi)\b/.test(norm);
   // [loop 764] isMinggong — hỏi về mệnh cung / thân cung (ziwei-BaZi «trụ thứ 6»).
   const isMinggong = /\b(menh cung|cung menh|than cung|cung than|tru thu 6)\b/.test(norm);
@@ -184,7 +186,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isShenshaStrong, isNayin, isWuXing, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, isOverview, confidence, raw: question };
+  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isShenshaStrong, isNayin, isWuXing, isTenGod, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, isOverview, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -652,6 +654,33 @@ function pDaily(R, intent) {
   paras.push(`💡 Mở tab «Hôm nay» hoặc AI để chi tiết giờ/phút, 选日 cho việc cụ thể (cưới/khai trương/động thổ).`);
   return { title: `Vận ${_dayLabel} (lưu nhật)`, lead: `Vận ${_dayLabel.toUpperCase()} của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
 }
+function pTenGod(R) {
+  // [loop 878] Thập thần bar chart — 10 god personality visualization.
+  const dm = R.chart.dayMaster;
+  const dg = dominantGod(R);
+  const scores = dg.scores || {};
+  const GOD_VI = { '比肩': 'Tỷ Kiên', '劫財': 'Kiếp Tài', '食神': 'Thực Thần', '傷官': 'Thương Quan', '偏財': 'Thiên Tài', '正財': 'Chính Tài', '七殺': 'Thất Sát', '正官': 'Chính Quan', '偏印': 'Thiên Ấn', '正印': 'Chính Ấn' };
+  const GOD_EMOJI = { '比肩': '🤝', '劫財': '⚔️', '食神': '🍽️', '傷官': '🎨', '偏財': '💰', '正財': '💱', '七殺': '🗡️', '正官': '⚖️', '偏印': '📚', '正印': '🎓' };
+  const GROUP_VI = { ti: 'Tỷ Kiếp (bản thân)', yin: 'Ấn (hỗ trợ)', shi: 'Thực Thương (sáng tạo)', cai: 'Tài (tài lộc)', guan: 'Quan Sát (quyền lực)' };
+  const y = R.yong || {};
+  const fav = new Set([y.primary, y.xi].filter(Boolean));
+  const paras = [];
+  // Sort by score descending
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const maxScore = Math.max(...sorted.map(([, v]) => v), 1);
+  const lines = sorted.map(([god, score]) => {
+    const bars = '█'.repeat(Math.round(score / maxScore * 15)) + '░'.repeat(Math.max(0, 15 - Math.round(score / maxScore * 15)));
+    return `${GOD_EMOJI[god] || '⭐'} ${GOD_VI[god] || god} ${bars} ${score.toFixed(1)}`;
+  });
+  paras.push(`📊 **Thập thần** (${dm.gan} ${dm.vi}):`);
+  paras.push(...lines);
+  // Analysis: dominant + group balance
+  const top = dg.ranked?.[0];
+  if (top) paras.push(`📈 **${top.godVi}** trội nhất (${top.score.toFixed(1)}) — ${top.desc?.slice(0, 60) || 'đặc tính chính của mệnh'}.`);
+  if (dg.dominant?.group) paras.push(`🏆 Nhóm trội: ${GROUP_VI[dg.dominant.group] || dg.dominant.group} → khuynh hướng tính cách rõ.`);
+  paras.push(`💡 Thập thần = 10 «sao tính cách» theo quan hệ ngũ hành với Nhật Chủ. Sao trội quyết định khí chất, nghề nghiệp, tình duyên.`);
+  return { title: 'Thập thần 十神 bar chart', lead: `Phân bố thập thần của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
+}
 function pWuXing(R) {
   // [loop 875] Ngũ hành balance — text bar chart + Dụng/Kỵ annotation.
   const dm = R.chart.dayMaster;
@@ -984,6 +1013,8 @@ export function composeAnswer(question, R) {
   if (intent.isQiFlow && !_hasDomain) return pQiFlow(R);
   // [loop 875] ngũ hành balance — text bar chart + Dụng/Kỵ annotation.
   if (intent.isWuXing && !_hasDomain) return pWuXing(R);
+  // [loop 878] thập thần chart — bar chart 10 god personality.
+  if (intent.isTenGod && !_hasDomain) return pTenGod(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family
