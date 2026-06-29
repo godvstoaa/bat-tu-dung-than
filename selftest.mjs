@@ -3769,6 +3769,16 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_bad === 0, `[loop 810] daily ganZhi khớp lunar-javascript (10 ngày, ${_bad} mismatch)`);
   console.log('   [loop 810] daily ganZhi khớp lunar-javascript (10 ngày) ✓');
 }
+// [loop 811] full-pipeline determinism — same input → same FULL R object.
+{
+  const _r1 = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _r2 = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _fields = ['chart', 'yong', 'dayun', 'liunian', 'synthesis', 'pattern', 'patternQuality', 'kongwang', 'interactions', 'shensha', 'strength'];
+  let _diff = 0;
+  for (const _f of _fields) { if (JSON.stringify(_r1[_f]) !== JSON.stringify(_r2[_f])) _diff++; }
+  assert(_diff === 0, `[loop 811] full-pipeline deterministic (11 field, ${_diff} non-det)`);
+  console.log('   [loop 811] full-pipeline determinism (11/11 field stable) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
