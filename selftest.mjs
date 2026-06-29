@@ -3584,6 +3584,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('xung hình hại của tôi?', _QR).title.includes('Tương tác'), '[loop 795] regression: bare «xung» (no year) → interactions');
   console.log('   [loop 795] isInteraction gate !isTiming — năm+xung→timing, natal layer giữ, bare→interactions ✓');
 }
+// [loop 796] wealth keyword «lãi» collision với «lại» (cả 2 → 'lai' sau NFD).
+//   «sao tôi LẠI xui» match «lãi» → area=wealth ❌. Fix: «lãi»→«lãi suất» (specific).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // «sao tôi lại xui» KHÔNG còn wealth (collision fix)
+  assert(detectIntent('sao tôi lại xui — phục ngâm không?').area !== 'wealth', '[loop 796] «sao tôi lại xui» ≠ wealth (lãi/lại collision fix)');
+  // regression: legit wealth «lãi suất» vẫn match
+  assert(detectIntent('lãi suất ngân hàng hợp tôi?').area === 'wealth', '[loop 796] regression: «lãi suất» vẫn → wealth');
+  // «sao tôi lại xui — phục ngâm» → interactions (phục ngâm là subject)
+  assert(composeAnswer('sao tôi lại xui — phục ngâm không?', _QR).title.includes('Tương tác'), '[loop 796] «sao lại xui...phục ngâm» → interactions');
+  console.log('   [loop 796] wealth «lãi»→«lãi suất» fix collision «lại» — «sao lại xui»≠wealth ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
