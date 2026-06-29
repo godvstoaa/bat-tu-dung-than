@@ -3161,6 +3161,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   }
   console.log('   [loop 762] NLG routing regression (9 chuẩn + 5 mới) — 0 xung đột ✓');
 }
+// [loop 763] 大运 PHASE offline — 进气/旺气/退气 (vào lực/đỉnh/ra suy) trong pTiming.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _a = composeAnswer('đại vận của tôi đang mạnh hay suy, năm nay vận sao?', _QR);
+  const _phaseLine = _a.paragraphs.find((p) => /🌀|Đại vận hiện/.test(p));
+  assert(_phaseLine, '[loop 763] pTiming surface 大运 PHASE');
+  assert(/进气|旺气|退气/.test(_phaseLine), `[loop 763] phase label (got ${_phaseLine.slice(0, 60)})`);
+  // Quân 2026 (age 33) trong 己未 [25-34] → năm 10/10 = 退气
+  assert(/退气|năm 10\/10/.test(_phaseLine), '[loop 763] Quân 己未 năm 10/10 = 退气 (đang ra, lực suy)');
+  assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 763] không undefined leak');
+  console.log('   [loop 763] 大运 PHASE offline (进气/旺气/退气 trong pTiming) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

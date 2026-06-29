@@ -378,6 +378,14 @@ function pTiming(R, intent) {
   lines.push(`Thước đo vận hạn là Dụng Thần ${favText(R.yong)} — vận nào mang hành Dụng Thần thì hanh thông, Kỵ Thần ${avoidText(R.yong)} thì nên thủ.${gejuLine}`);
   const yExp = yongExplain(R);
   if (yExp) lines.push(`💡 ${yExp}`);
+  // [loop 763] 大运 PHASE — 进气/旺气/退气 (cổ法: vận đầu «vào lực», giữa «phát huy đỉnh», cuối «suy»).
+  const _refY = (R.chart.input && R.chart.input.refYear) || new Date().getFullYear();
+  const _activeDy = dy.find((d) => d.startYear != null && d.startYear <= _refY && _refY < d.startYear + 10);
+  if (_activeDy) {
+    const _off = _refY - _activeDy.startYear; // 0-9
+    const _phase = _off <= 2 ? `进气 (năm ${_off + 1}/10 — vận ĐANG VÀO, lực chưa tối đa)` : _off >= 7 ? `退气 (năm ${_off + 1}/10 — vận ĐANG RA, lực suy dần)` : `旺气 (năm ${_off + 1}/10 — vận ĐANG PHÁT HUY mạnh nhất)`;
+    lines.push(`🌀 Đại vận hiện ${_activeDy.ganZhi} ${_activeDy.rating ? '(' + _activeDy.rating + ')' : ''}: ${_phase}. «进气退气» — cùng 1 đại vận, đầu/cuối lực khác nhau.`);
+  }
   // Nếu câu hỏi có mốc năm cụ thể → dùng phân tích đa phái + 格局 (chính xác)
   if (intent.years.length) {
     for (const yr of intent.years) {
