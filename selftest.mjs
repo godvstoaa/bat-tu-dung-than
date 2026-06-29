@@ -3823,6 +3823,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   }
   console.log('   [loop 816] ALL offline composers member-specific (4 thành viên × 4 composer = 16, 0 generic) ✓');
 }
+// [loop 817] brief conditional sections — LỤC XUNG xuất hiện khi CÓ xung, vắng khi KHÔNG.
+{
+  const { buildChartBrief } = await import('./src/engine/ai.js');
+  // Quân: không có xung → KHÔNG có LỤC XUNG section
+  const _bQ = buildChartBrief(analyze(1993, 10, 21, 1, 15, 'nam', 2026));
+  const _qrHas = ['TÓM TẮT MỆNH', '格局', '大运', 'Dụng', 'TAM HÌNH', 'tài khố', '反吟伏吟'].every((s) => _bQ.includes(s) || new RegExp(s, 'i').test(_bQ));
+  assert(_qrHas, '[loop 817] Quân brief đủ key sections (TÓM TẮT/格局/大运/Dụng/TAM HÌNH/tài khố/反吟伏吟)');
+  // Mỹ Anh: có 巳亥 xung → CÓ LỤC XUNG section
+  const _bM = buildChartBrief(analyze(1996, 12, 4, 10, 15, 'nữ', 2026));
+  assert(/LỤC XUNG/.test(_bM), '[loop 817] Mỹ Anh brief có LỤC XUNG (có 巳亥 xung)');
+  console.log('   [loop 817] brief conditional sections (LỤC XUNG khi có xung, vắng khi không) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
