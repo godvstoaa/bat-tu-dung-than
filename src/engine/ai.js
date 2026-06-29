@@ -1371,6 +1371,16 @@ export async function testAIConnection(cfg) {
   }
 }
 
+// [loop 922] reasoning stage label tiếng Việt — progress feedback sạch cho user VN
+//   (GLM reasoning là tiếng Trung → không hiện raw, chỉ báo đang ở giai đoạn nào).
+function _reasonStageLabel(reasonLen) {
+  if (reasonLen < 400) return '💭 đang đọc lá số…';
+  if (reasonLen < 1200) return '💭 đang phân tích tứ trụ & vượng suy…';
+  if (reasonLen < 2500) return '💭 đang luận Dụng Thần & Cách cục…';
+  if (reasonLen < 4500) return '💭 đang xét Đại Vận & Lưu Niên…';
+  return '💭 đang tổng hợp câu trả lời…';
+}
+
 // ---- 1 vòng streaming SSE: gom content (→ onToken) + tool_calls + bỏ qua reasoning_content ----
 // Theo docs Z.ai (interleaved thinking + stream tool call).
 async function streamRound(url, headers, body, onToken, onStatus) {
@@ -1404,10 +1414,12 @@ async function streamRound(url, headers, body, onToken, onStatus) {
       if (rc) {
         reasoning += rc;
         const now = Date.now();
-        if (onStatus && (reasoning.length - lastReasonLen > 100 || now - lastReasonAt > 400)) {
+        // [loop 922] reasoning thường là TIẾNG TRUNG (GLM nghĩ bằng ZH) → KHÔNG hiện raw
+        //   (user VN sẽ thấy chữ Hán → tưởng app lỗi ngôn ngữ). Chỉ báo STAGE tiếng Việt
+        //   theo độ dài suy luận: progress feedback sạch, không rò rỉ ngôn ngữ nội bộ.
+        if (onStatus && (reasoning.length - lastReasonLen > 300 || now - lastReasonAt > 600)) {
           lastReasonLen = reasoning.length; lastReasonAt = now;
-          const snippet = reasoning.replace(/\s+/g, ' ').trim().slice(-110);
-          onStatus('💭 đang luận: ' + snippet + (snippet.length >= 110 ? '…' : ''));
+          onStatus(_reasonStageLabel(reasoning.length));
         }
       }
       // content (câu trả lời thật) → hiển thị
