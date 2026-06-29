@@ -3404,6 +3404,15 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 779] không leak');
   console.log('   [loop 779] offline tài khố surface (Tài/Quan/Ấn khố + giữ tiền) ✓');
 }
+// [loop 780] isCaiKu routing — «kiếm tiền»→wealth, «giữ/kho tiền»→caiku (không hijack).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(composeAnswer('tài lộc của tôi sao?', _QR).title.includes('Tài lộc'), '[loop 780] «tài lộc» → wealth (KHÔNG bị caiku)');
+  assert(composeAnswer('làm sao kiếm nhiều tiền?', _QR).title.includes('Tài lộc'), '[loop 780] «kiếm tiền» → wealth (kiếm ≠ giữ)');
+  assert(composeAnswer('tôi có giữ được tiền không?', _QR).title.includes('Tài khố'), '[loop 780] «giữ được tiền» → caiku');
+  assert(composeAnswer('kho tiền tôi có không?', _QR).title.includes('Tài khố'), '[loop 780] «kho tiền» → caiku');
+  console.log('   [loop 780] isCaiKu routing — kiếm(wealth) vs giữ/kho(caiku) phân biệt đúng ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
