@@ -3899,6 +3899,13 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_gz === _lj && _gz === '乙卯', `[loop 823] leap month → BaZi month 乙卯 (got ${_gz}, lunar-js ${_lj})`);
   console.log('   [loop 823] leap month (闰二月) — BaZi dùng tiết khí tháng, không bị lệch ✓');
 }
+// [loop 824] Vietnamese diacritic normalization — có dấu ≡ không dấu (route giống).
+{
+  for (const [a, b] of [['tài lộc', 'tai loc'], ['cải vận', 'cai van'], ['đại vận', 'dai van']]) {
+    assert(detectIntent(a).area === detectIntent(b).area, `[loop 824] «${a}» ≡ «${b}» (area ${detectIntent(a).area} vs ${detectIntent(b).area})`);
+  }
+  console.log('   [loop 824] Vietnamese diacritic normalization (có dấu ≡ không dấu) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
