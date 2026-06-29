@@ -672,6 +672,9 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .msg-text .md-h2 { font-size: 1.08em; }
 .msg-text code { background: rgba(212,175,55,0.1); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
 .msg-text em { color: var(--silk-dim, #d8cba8); }
+.msg-text .md-list { margin: 6px 0; padding-left: 20px; list-style: none; }
+.msg-text .md-list li { position: relative; padding-left: 12px; margin-bottom: 3px; }
+.msg-text .md-list li::before { content: '◆'; position: absolute; left: 0; color: var(--gold, #d4af37); font-size: 0.7em; top: 4px; }
 
 /* [loop 928] follow-up suggestion chips — cảm giác ông thầy tư vấn */
 .msg-followups { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 14px 4px; }

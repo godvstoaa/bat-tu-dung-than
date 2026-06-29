@@ -3256,14 +3256,32 @@ function renderRemedy(R) {
 // ---------------------------------------------------------------- CHAT AI  (XSS-safe: textContent)
 // [loop 943] MARKDOWN render cho câu trả lời AI — trước đây textContent hiện **bold** literal.
 //   Escape HTML TRƯỚC (safety: nội dung AI có thể chứa < >) rồi mới áp markdown → không XSS.
+//   [loop 944] +bullet list (- • *) xử lý theo dòng (pre-wrap giữ \n cho đoạn thường).
 function _md(s) {
-  return String(s == null ? '' : s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const _esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const _inline = (t) => _esc(t)
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')                        // **bold**
     .replace(/(^|[^*`])\*([^*\n`]+)\*/g, '$1<em>$2</em>')                       // *italic*
-    .replace(/`([^`]+)`/g, '<code>$1</code>')                                   // `code`
-    .replace(/^###\s+(.+)$/gm, '<strong class="md-h">$1</strong>')             // ### heading
-    .replace(/^##\s+(.+)$/gm, '<strong class="md-h md-h2">$1</strong>');        // ## heading
+    .replace(/`([^`]+)`/g, '<code>$1</code>');                                   // `code`
+  const lines = String(s == null ? '' : s).split('\n');
+  let out = '', inList = false;
+  const closeList = () => { if (inList) { out += '</ul>'; inList = false; } };
+  for (const raw of lines) {
+    const m = raw.match(/^\s*[-•*]\s+(.+)$/);   // dòng bullet: - • * + space
+    if (m) {
+      if (!inList) { out += '<ul class="md-list">'; inList = true; }
+      out += `<li>${_inline(m[1])}</li>`;
+      continue;
+    }
+    closeList();
+    const h2 = raw.match(/^##\s+(.+)$/), h3 = raw.match(/^###\s+(.+)$/);
+    if (h2) out += `<strong class="md-h md-h2">${_inline(h2[1])}</strong>`;
+    else if (h3) out += `<strong class="md-h">${_inline(h3[1])}</strong>`;
+    else out += _inline(raw);
+    out += '\n';   // giữ ngắt dòng cho đoạn thường (pre-wrap)
+  }
+  closeList();
+  return out;
 }
 function appendMsg(role, text) {
   const wrap = document.createElement('div');
