@@ -3948,6 +3948,13 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_crash === 0 && _leak === 0, `[loop 827] ẩn hợp fuzz ${_n} chart: ${_crash} crash, ${_leak} leak`);
   console.log(`   [loop 827] ẩn hợp fuzz ${_n} chart — 0 crash/leak ✓`);
 }
+// [loop 828] «hôm nay + xung» → daily (today-specific), «xung» (no hôm nay) → interactions.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(composeAnswer('hôm nay có xung hình gì không?', _QR).title.includes('hôm nay'), '[loop 828] «hôm nay + xung» → daily (today-specific)');
+  assert(composeAnswer('xung hình hại của tôi?', _QR).title.includes('Tương tác'), '[loop 828] «xung» (no hôm nay) → interactions (natal)');
+  console.log('   [loop 828] hôm nay+xung→daily (today), xung alone→interactions (natal) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
