@@ -3305,6 +3305,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   }
   console.log('   [loop 772] find_good_days top ngày đều CÁT cho 4 việc (cưới/khai trương/động thổ/dọn nhà) ✓');
 }
+// [loop 773] đại vận scoring — Dụng/Hỷ dayun phải score CAO hơn Kỵ dayun.
+//   Quân Dụng Thổ/Hỷ Hỏa/Kỵ Mộc: 己未/戊午 (Dụng) ≥ 6, 乙卯/甲寅 (Kỵ) ≤ -3.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _dy = (k, gz) => (_QR.dayun || []).find((d) => d.ganZhi === gz);
+  const _dung = _dy(0, '己未');   // Thổ = Dụng
+  const _ky = _dy(0, '乙卯');     // Mộc = Kỵ
+  assert(_dung && _dung.score >= 6 && /Đại cát|Cát/.test(_dung.rating), `[loop 773] Quân 己未 (Dụng Thổ) score≥6 Cát (got ${_dung?.score}/${_dung?.rating})`);
+  assert(_ky && _ky.score <= -3 && /Hung/.test(_ky.rating), `[loop 773] Quân 乙卯 (Kỵ Mộc) score≤-3 Hung (got ${_ky?.score}/${_ky?.rating})`);
+  assert(_dung.score > _ky.score, '[loop 773] Dụng dayun score > Kỵ dayun (scoring đúng hướng)');
+  console.log('   [loop 773] đại vận scoring — Dụng/Hỷ (己未★) > Kỵ (乙卯) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
