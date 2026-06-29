@@ -7886,6 +7886,7 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(/化忌.*贪狼|贪狼.*化忌/.test(brief), `[loop 688] 癸 year → 贪狼化忌`);
   console.log(`   四化 SIHUA surfaced ✓ — 破军禄 + 贪狼忌 trong brief`);
 }
+import { YI_MA as _YM, HUA_GAI as _HG, BRANCH_GROUP as _BG } from './src/engine/shensha.js'; // [loop 925] shensha tables cho fuzz guard
 // ################## FUZZ INVARIANTS [loop 924] — regression guard ##################
 // Chạy ~108 lá số, assert INVARIANT về yong-consistency / timing / interactions không vi phạm.
 // Khóa chặt fix loop 923 (yong) + xác nhận timing (đại vận/lưu niên) + interactions canonical.
@@ -7935,9 +7936,17 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
     for (const _c of (_I.xing || [])) { const _g3 = _br(_c.a + _c.b); const _ok = (_g3.length === 3 && _XING3.has(_g3)) || (_g3.length === 2 && _XING2.has(_g3)) || _XING_SELF.has(_g3); if (!_ok) _bad(_tag, `bad xing ${_c.a}-${_c.b}`); }
     for (const _c of (_I.sanHe || [])) { const _ps = (_c.present || [_c.a, _c.b, _c.c]).filter(Boolean); if (_ps.length >= 3 && !_SANHE.some((gr) => _ps.every((b) => gr.includes(b)))) _bad(_tag, `bad sanHe ${_ps.join('')}`); }
     for (const _c of (_I.banHe || [])) { const _ps = (_c.present || [_c.a, _c.b]).filter(Boolean); if (_ps.length >= 2 && !_SANHE.some((gr) => _ps.every((b) => gr.includes(b)))) _bad(_tag, `bad banHe ${_ps.join('')}`); }
+    // [loop 925] shensha computation phải khớp bảng cổ pháp (đào hoa/dịch mã/tướng tinh/hoa cái)
+    const _present = ['year', 'month', 'day', 'time'].map((_k) => _R.chart.pillars[_k].zhi);
+    const _yz = _R.chart.pillars.year.zhi, _dz = _R.chart.pillars.day.zhi;
+    const _exp = (_tbl) => { const _w = [...new Set([_tbl[_BG[_yz]], _tbl[_BG[_dz]]])]; return [...new Set(_present.filter((_b) => _w.includes(_b)))].sort(); };
+    const _got = (_k) => [...new Set((_R.shensha?.[_k]?.at) || [])].sort();
+    for (const [_k, _t] of [['taoHua', TAO_HUA], ['yiMa', _YM], ['jiangXing', JIANG_XING], ['huaGai', _HG]]) {
+      if (JSON.stringify(_exp(_t)) !== JSON.stringify(_got(_k))) _bad(_tag, `${_k} mismatch (exp ${JSON.stringify(_exp(_t))} got ${JSON.stringify(_got(_k))})`);
+    }
   }
   assert(_crash === 0, `[loop 924] fuzz: 0 crash qua ${_charts} lá số (got ${_crash})`);
-  if (_viol === 0) console.log(`   [loop 924] FUZZ INVARIANTS ✓ — ${_charts} lá số, 0 vi phạm yong/timing/interactions`);
+  if (_viol === 0) console.log(`   [loop 924] FUZZ INVARIANTS ✓ — ${_charts} lá số, 0 vi phạm yong/timing/interactions/shensha`);
   else assert(false, `[loop 924] FUZZ INVARIANTS: ${_viol} vi phạm qua ${_charts} lá số`);
 }
 
