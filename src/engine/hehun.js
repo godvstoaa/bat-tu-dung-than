@@ -97,11 +97,11 @@ export function computeHehun(R1, R2) {
   const ganKe = !ganHe && (KE5[_wxA] === _wxB || KE5[_wxB] === _wxA);
   if (ganKe) {
     score -= 8;
-    factors.push(`✗ Nhật Can ${a.dayGan}–${b.dayGan} tương khắc (${_wxA}↔${_wxB}) → «日干相克两主不和» — hai Nhật Chủ khắc nhau, tính cách đối kháng, cần nhẫn nhịn điều chỉnh.`);
+    factors.push(`✗ Nhật Can ${a.dayGan}–${b.dayGan} tương khắc (${_wxA}↔${_wxB}) → «日干相克两主不和» — tính cách đối kháng, cần nhẫn nhịn.`);
     // 天克地冲: can KHẮC + chi XUNG cùng lúc trên CUNG PHU THÊ → đại kỵ hôn nhân (cổ pháp)
     if (dayZhiRel.type === 'xung') {
       score -= 12;
-      factors.push(`⚠ 天克地冲 CUNG PHU THÊ (can khắc + chi xung ĐỒNG LÚC) — cổ法 «夫妻宫天克地冲» xem là ĐẠI KỴ hôn nhân: biến động lớn, BẮT BUỘC chọn năm cát cưới + bao dung lớn, không thì duyên mỏng dễ tan.`);
+      factors.push(`⚠ 天克地冲 CUNG PHU THÊ (can khắc + chi xung đồng lúc) — «夫妻宫天克地冲» = ĐẠI KỴ: biến động lớn, bắt buộc năm cát cưới + bao dung, không thì duyên mỏng.`);
     }
   }
 
