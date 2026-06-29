@@ -1134,7 +1134,7 @@ function toolLabel(name) {
 }
 
 // [loop 919] SECTION RAG — chia brief thành sections, chọn phần liên quan đến câu hỏi
-function _splitBrief(brief) {
+export function _splitBrief(brief) {
   // Chia theo header lines (ALL CAPS hoặc có emoji)
   const lines = brief.split('\n');
   const sections = [];
@@ -1150,7 +1150,7 @@ function _splitBrief(brief) {
   return sections;
 }
 
-function _selectRelevantSections(sections, question) {
+export function _selectRelevantSections(sections, question) {
   const q = (question || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
   // Keyword → section title mapping
   const KW_MAP = [
@@ -1325,6 +1325,9 @@ async function streamRound(url, headers, body, onToken, onStatus) {
   const decoder = new TextDecoder();
   let buf = '', full = '';
   const toolCalls = [];
+  // [loop 920] reasoning_content preview — tránh UI "đứng" 18-20s khi GLM đang suy nghĩ
+  let reasoning = '';
+  let lastReasonLen = 0, lastReasonAt = 0;
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -1338,7 +1341,18 @@ async function streamRound(url, headers, body, onToken, onStatus) {
       let json; try { json = JSON.parse(payload); } catch (_) { continue; }
       const delta = json?.choices?.[0]?.delta;
       if (!delta) continue;
-      // reasoning_content (thinking) → không hiển thị, chỉ lấy content cho user
+      // [loop 920] reasoning_content → hiện preview "đang luận" (throttle) để user biết app chạy
+      const rc = delta.reasoning_content || delta.reasoning;
+      if (rc) {
+        reasoning += rc;
+        const now = Date.now();
+        if (onStatus && (reasoning.length - lastReasonLen > 100 || now - lastReasonAt > 400)) {
+          lastReasonLen = reasoning.length; lastReasonAt = now;
+          const snippet = reasoning.replace(/\s+/g, ' ').trim().slice(-110);
+          onStatus('💭 đang luận: ' + snippet + (snippet.length >= 110 ? '…' : ''));
+        }
+      }
+      // content (câu trả lời thật) → hiển thị
       if (delta.content) { full += delta.content; if (onToken) onToken(delta.content, full); }
       // tool_calls streaming — tích lũy theo index (spec Z.ai/OpenAI)
       if (delta.tool_calls) {
