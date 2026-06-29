@@ -3485,6 +3485,12 @@ function run() {
     return;
   }
   const c = currentResult.chart;
+  // [loop 915] DỤNG THẦN THEME — đổi accent màu app theo Dụng Thần (may mắn)
+  const _dungWx = currentResult.yong?.primary;
+  if (_dungWx) {
+    document.body.className = document.body.className.replace(/theme-[^ ]+/g, '').trim();
+    document.body.classList.add('theme-' + _dungWx);
+  }
   // Reset lazy-render state (Task 2): mỗi lần run() → có thể render lại tất cả card.
   // disconnect() tháo toàn bộ observer cũ — những card dưới nếp chưa kịp fire sẽ được
   // đăng ký lại bên dưới với closure mới (currentResult mới), tránh render dữ liệu cũ.

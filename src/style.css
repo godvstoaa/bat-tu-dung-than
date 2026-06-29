@@ -30,6 +30,33 @@
   --wx-thuy: #4a86d0;
   --ease-out: cubic-bezier(.22, .61, .36, 1);
   --ease-spring: cubic-bezier(.34, 1.4, .5, 1);
+}
+
+/* [loop 915] DỤNG THẦN THEME — đổi accent màu theo Dụng Thần (mang lại may mắn) */
+/* Giữ nền ink/lacquer (phong thủy hắc địa), chỉ đổi ACCENT (gold → element color) */
+body.theme-木 {
+  --gold: #4caf50; --gold-bright: #66bb6a; --gold-pale: #c8e6c9;
+  --gold-soft: rgba(76, 175, 80, 0.12); --hairline: rgba(76, 175, 80, 0.22);
+}
+body.theme-火 {
+  --gold: #ff5252; --gold-bright: #ff8a80; --gold-pale: #ffcdd2;
+  --gold-soft: rgba(255, 82, 82, 0.12); --hairline: rgba(255, 82, 82, 0.22);
+}
+body.theme-土 {
+  --gold: #d4af37; --gold-bright: #f3d57a; --gold-pale: #f7eccb;
+  --gold-soft: rgba(212, 175, 55, 0.12); --hairline: rgba(212, 175, 55, 0.22);
+}
+body.theme-金 {
+  --gold: #c0c0c0; --gold-bright: #e0e0e0; --gold-pale: #f5f5f5;
+  --gold-soft: rgba(192, 192, 192, 0.12); --hairline: rgba(192, 192, 192, 0.22);
+}
+body.theme-水 {
+  --gold: #2196f3; --gold-bright: #64b5f6; --gold-pale: #bbdefb;
+  --gold-soft: rgba(33, 150, 243, 0.12); --hairline: rgba(33, 150, 243, 0.22);
+}
+/* Smooth transition khi đổi theme */
+body { transition: --gold 0.8s, --gold-bright 0.8s, --hairline 0.8s; }
+body * { transition: border-color 0.6s, color 0.6s, background 0.6s, box-shadow 0.6s; }
   --shadow-card: inset 0 1px 0 rgba(247, 236, 203, 0.06), 0 18px 44px -20px rgba(0, 0, 0, 0.75);
   --shadow-edict: inset 0 1px 0 rgba(247, 236, 203, 0.08), inset 0 0 0 1px rgba(192, 57, 43, 0.1), 0 22px 50px -22px rgba(0, 0, 0, 0.8);
   --shadow-gold: 0 10px 36px rgba(212, 175, 55, 0.4);
