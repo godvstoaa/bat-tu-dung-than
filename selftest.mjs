@@ -3370,6 +3370,28 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 777] pPattern 从格 không leak');
   console.log('   [loop 777] pPattern 从格 (special) — surface «ĐẶC BIỆT» đúng ✓');
 }
+// [loop 778] FULL fuzz — analyze + brief qua 30+ chart đa dạng, 0 crash/NaN.
+{
+  const { buildChartBrief } = await import('./src/engine/ai.js');
+  let _crash = 0, _nan = 0, _n = 0;
+  for (let _y = 1960; _y <= 2005; _y += 15) {
+    for (const _m of [2, 6, 11]) {
+      for (const _d of [5, 18, 28]) {
+        for (const _h of [0, 12, 23]) {
+          const _g = ((_y + _m + _d) % 2) ? 'nam' : 'nữ';
+          try {
+            const _R = analyze(_y, _m, _d, _h, 0, _g, 2026);
+            _n++;
+            if (!Number.isFinite(_R.synthesis?.score)) _nan++;
+            if (/\bundefined\b|\bNaN\b/.test(buildChartBrief(_R))) _nan++;
+          } catch (e) { _crash++; }
+        }
+      }
+    }
+  }
+  assert(_crash === 0 && _nan === 0, `[loop 778] full fuzz ${_n} chart: ${_crash} crash, ${_nan} NaN`);
+  console.log(`   [loop 778] full fuzz analyze+brief ${_n} chart đa dạng — 0 crash/NaN ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
