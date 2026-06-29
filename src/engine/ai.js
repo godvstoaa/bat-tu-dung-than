@@ -126,6 +126,8 @@ export const PRESETS = [
     note: 'Endpoint thẳng — trình duyệt sẽ CHẶN CORS. Chỉ dùng nếu app có backend/proxy, hoặc chạy qua server-side.' },
   { id: 'zai-coding', label: 'Z.ai — GLM Coding Plan (glm-5.2) [CORS]', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2',
     note: 'Endpoint Coding Plan — CORS sẽ chặn khi gọi từ web. Ưu tiên preset PROXY DEV ở trên.' },
+  { id: 'cf-glm', label: '★ Cloudflare Workers AI — GLM-5.2 [CORS ✓]', endpoint: 'https://api.cloudflare.com/client/v4/accounts/bc101a2962ca21a084172c5334ad7dad/ai/v1', model: '@cf/zai-org/glm-5.2',
+    note: 'Cloudflare Workers AI chạy GLM-5.2 — CORS CHO PHÉP gọi thẳng từ trình duyệt. Dùng Cloudflare API Token làm key.' },
   { id: 'bigmodel', label: 'BigModel (智谱 glm-4.6)', endpoint: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4.6', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
   { id: 'deepseek', label: 'DeepSeek', endpoint: 'https://api.deepseek.com/v1', model: 'deepseek-chat', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
   { id: 'openai', label: 'OpenAI', endpoint: 'https://api.openai.com/v1', model: 'gpt-4o-mini', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
