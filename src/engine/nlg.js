@@ -117,8 +117,10 @@ export function detectIntent(question) {
   // [loop 758] isShensha — hỏi về thần煞/sao (quý nhân/đào hoa/dịch mã/văn xương...).
   //   Trước đây «tôi có quý nhân sao?» misroute (health/love) → KHÔNG surface R.shensha.
   //   «sao» phải kết hợp context sao (tránh «sao tôi lại...» = why).
+  // [loop 766 FIX] bỏ bare «than» (match «Dụng thần sao?» = hỏi yongshen, KHÔNG phải sao)
+  //   → false positive. Giữ «than sat» + tên sao cụ thể.
   const isShensha = /\b(quy nhan|chinh tinh|than sat|van xuong|duong nhan|hoa cai|tuong tinh|thien duc|thien y|kim du|hong diem|qui cuong|tam ky|loc than|dich ma|hoc duong)\b/.test(norm)
-    || (/\bsao\b/.test(norm) && /\b(co|gi dac biet|chinh tinh|than|nao tot|nao xau)\b/.test(norm));
+    || (/\bsao\b/.test(norm) && /\b(co|gi dac biet|chinh tinh|than sat|nao tot|nao xau)\b/.test(norm));
   // [loop 759] isNayin — hỏi về nạp âm / bản mệnh hành (nayin của trụ ngày).
   const isNayin = /\b(nap am|nayin|ban menh ngu hanh|menh ngu hanh|hanh cua toi)\b/.test(norm);
   // [loop 764] isMinggong — hỏi về mệnh cung / thân cung (ziwei-BaZi «trụ thứ 6»).
@@ -735,14 +737,15 @@ export function composeAnswer(question, R) {
   const intent = detectIntent(question);
   // [loop 757] interaction question — surface 刑冲害合 typed meanings (offline, không cần AI)
   if (intent.isInteraction) return pInteractions(R);
+  // [loop 761] pattern question — surface cách cục (offline, KHÔNG cần AI) — check TRƯỚC isShensha
+  //   vì «cách cục ... Dụng thần sao?» có chữ «sao»+«thần» (loop 766 fix false-positive).
+  if (intent.isPattern) return pPattern(R);
   // [loop 758] shensha question — surface thần煞 (offline, không cần AI)
   if (intent.isShensha) return pShensha(R);
   // [loop 759] nayin question — surface nạp âm (offline, không cần AI)
   if (intent.isNayin) return pNayin(R);
   // [loop 760] tiaohou question — surface điều hậu (offline, không cần AI)
   if (intent.isTiaohou) return pTiaohou(R);
-  // [loop 761] pattern question — surface cách cục (offline, không cần AI)
-  if (intent.isPattern) return pPattern(R);
   // [loop 764] minggong question — surface mệnh cung (offline, không cần AI)
   if (intent.isMinggong) return pMinggong(R);
 

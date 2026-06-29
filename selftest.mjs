@@ -3204,6 +3204,17 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_crash === 0 && _leak === 0, `[loop 765] NLG composer fuzz (7×${_charts.length}=${_n} test): ${_crash} crash, ${_leak} leak`);
   console.log(`   [loop 765] NLG composer fuzz 7×${_charts.length}=${_n} test — 0 crash/leak ✓`);
 }
+// [loop 766] isShensha false-positive fix — «Dụng thần sao?» không phải sao (sao=what).
+//   «Cách cục ... Dụng thần sao?» trước đây misroute sang shensha («sao»+«thần» từ «Dụng thần»).
+{
+  assert(detectIntent('Cách cục của tôi là gì? Dụng thần sao?').isPattern === true, '[loop 766] «Cách cục...Dụng thần sao» → isPattern (không bị isShensha nuốt)');
+  assert(detectIntent('Cách cục của tôi là gì? Dụng thần sao?').isShensha === false, '[loop 766] «Cách cục» không trigger isShensha');
+  assert(detectIntent('Dụng thần của tôi sao?').isShensha === false, '[loop 766] «Dụng thần sao?» (sao=what) ≠ shensha');
+  assert(detectIntent('tôi có quý nhân sao gì?').isShensha === true, '[loop 766] «quý nhân sao» vẫn → shensha (regression)');
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(/Cách cục|格局/.test(composeAnswer('Cách cục của tôi là gì? Dụng thần sao?', _QR).title), '[loop 766] chip «Cách cục» route đúng pPattern');
+  console.log('   [loop 766] isShensha false-positive fix («Dụng thần sao»=what, ≠ star) + 3 chip mới ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
