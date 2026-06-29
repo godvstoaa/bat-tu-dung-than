@@ -4034,6 +4034,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_avg < 200, `[loop 837] pDaily <200ms (got ${_avg.toFixed(0)}ms — includes 6 evaluateDate for 宜忌)`);
   console.log(`   [loop 837] pDaily performance ${_avg.toFixed(0)}ms (<200ms, 宜忌 không slow) ✓`);
 }
+// [loop 876] pWuXing ngũ hành bar chart — routing + bar + Dụng/Kỵ.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('ngũ hành cân bằng không?').isWuXing === true, '[loop 876] «ngũ hành cân bằng» → isWuXing');
+  assert(detectIntent('ngũ hành cân bằng?').isNayin === false, '[loop 876] isWuXing blocks isNayin');
+  assert(detectIntent('nạp âm của tôi?').isNayin === true, '[loop 876] regression: «nạp âm» → isNayin');
+  const _a = composeAnswer('ngũ hành của tôi mạnh yếu?', _QR);
+  assert(/Ngũ hành balance/.test(_a.title), `[loop 876] pWuXing route (got ${_a.title})`);
+  assert(_a.paragraphs.some((p) => /█/.test(p)), '[loop 876] surface bar chart (█)');
+  assert(_a.paragraphs.some((p) => /Dụng|Hỷ/.test(p)), '[loop 876] surface Dụng/Hỷ');
+  console.log('   [loop 876] pWuXing ngũ hành bar chart — routing + bar + Dụng/Kỵ ✓');
+}
 // [loop 854] localStorage guard — ALL access wrapped in try/catch (incognito safe).
 {
   const { readFileSync: _rf } = await import('fs');
