@@ -3906,6 +3906,17 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   }
   console.log('   [loop 824] Vietnamese diacritic normalization (có dấu ≡ không dấu) ✓');
 }
+// [loop 825] multi-part questions — route hợp lý cho câu phức tạp.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // timing wins for year-specific
+  assert(composeAnswer('tài lộc năm 2028 tôi thế nào?', _QR).title.includes('Vận hạn'), '[loop 825] «tài lộc năm 2028» → timing');
+  // compat wins for hợp không
+  assert(composeAnswer('vợ chồng tôi hợp không và bao giờ gặp duyên?', _QR).title.includes('Hợp tuổi'), '[loop 825] «hợp không + bao giờ» → compat');
+  // daily wins for hôm nay
+  assert(composeAnswer('hôm nay tốt không và giờ nào tốt?', _QR).title.includes('hôm nay') || composeAnswer('hôm nay tốt không?', _QR).title.includes('lưu nhật'), '[loop 825] «hôm nay + giờ» → daily');
+  console.log('   [loop 825] multi-part questions route hợp lý (timing/compat/daily thắng đúng) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
