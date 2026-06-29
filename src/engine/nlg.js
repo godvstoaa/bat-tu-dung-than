@@ -157,7 +157,7 @@ export function detectIntent(question) {
   // [loop 781] isQiFlow — hỏi về khí thông trụ / 盖头截脚 (can-chi khắc trong cùng trụ).
   const isQiFlow = /\b(khi thong|khi luu|cai dau|tiet cuoc|gai dau|khi chay|thong tru)\b/.test(norm) || /盖头|截脚/.test(question);
   // [loop 808] isOverview — «phân tích toàn diện / luận sâu / tổng quan» → multi-layer snapshot.
-  const isOverview = /\b(phan tich toan dien|toan dien|luan sau|tong quan|danh gia menh|xem toan dien|tom tat menh|ban menh toi sao|menh toi nhu the nao|co gi dac biet|gi day)\b/.test(norm);
+  const isOverview = /\b(phan tich toan dien|toan dien|luan sau|tong quan|danh gia menh|xem toan dien|tom tat menh|ban menh toi sao|menh toi nhu the nao|menh la gi|menh toi la gi|co gi dac biet|gi day)\b/.test(norm);
   // [loop 760] isTiaohou — hỏi về điều hậu (khí hậu mùa sinh → hành cần bổ).
   const isTiaohou = /\b(dieu hau|hau cua|khi hau|mua sinh|co phap|khong thong bao|ngoai hop|van han|khan|tao|ret|am|nhiet)\b/.test(norm)
     && /\b(dieu hau|khi hau|hau|co phap)\b/.test(norm);

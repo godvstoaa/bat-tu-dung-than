@@ -3844,6 +3844,14 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(/进气退气|进退气/.test(_b), '[loop 818] brief có 进气退气 (dayun phase context)');
   console.log('   [loop 818] 进气退气 (dayun phase) trong brief + shenJinTui export ✓');
 }
+// [loop 819] «mệnh tôi là gì» → overview (beginner-friendly, không generic).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(composeAnswer('mệnh tôi là gì?', _QR).title.includes('toàn diện') || composeAnswer('mệnh tôi là gì?', _QR).title.includes('tổng quan'), '[loop 819] «mệnh tôi là gì» → overview (5-layer, không generic)');
+  // regression: «bản mệnh ra sao» → personality (khác «là gì»)
+  assert(composeAnswer('bản mệnh tôi ra sao?', _QR).title.includes('Bản mệnh') || composeAnswer('bản mệnh tôi ra sao?', _QR).title.includes('tính cách'), '[loop 819] regression: «bản mệnh ra sao» → personality');
+  console.log('   [loop 819] «mệnh tôi là gì»→overview (beginner), «bản mệnh ra sao»→personality ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
