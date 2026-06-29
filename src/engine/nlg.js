@@ -151,12 +151,12 @@ export function detectIntent(question) {
   const isShenshaStrong = /\b(quy nhan|sao gi|sao gi dac biet|chinh tinh|than sat|dich ma|van xuong|tuong tinh|loc than)\b/.test(norm);
   // [loop 759] isNayin — hỏi về nạp âm / bản mệnh hành (nayin của trụ ngày).
   // [loop 875] «ngũ hành cân bằng/mạnh/yếu» → isWuXing (KHÔNG phải isNayin).
-  const isWuXing = /\b(ngu hanh can bang|ngu hanh manh|ngu hanh yeu|hanh nao manh|hanh nao yeu|ngu hanh cua toi)\b/.test(norm);
+  const isWuXing = /\b(ngu hanh can bang|ngu hanh manh|ngu hanh yeu|hanh nao manh|hanh nao yeu|ngu hanh cua toi|five elements|wuxing|element balance)\b/.test(norm);
   // [loop 878] isTenGod — «thập thần/tính cách sao» → bar chart 10 god.
-  const isTenGod = /\b(thap than|thap than cua toi|sao nao manh|sao nao yeu|tinh cach sao|10 sao|thap than can bang)\b/.test(norm);
+  const isTenGod = /\b(thap than|thap than cua toi|sao nao manh|sao nao yeu|tinh cach sao|10 sao|thap than can bang|ten gods|ten stars)\b/.test(norm);
   const isNayin = !isWuXing && /\b(nap am|nayin|ban menh ngu hanh|menh ngu hanh|hanh cua toi)\b/.test(norm);
   // [loop 882] isBestDays — «tháng này/tuần này ngày nào tốt» → top good days.
-  const isBestDays = /\b(ngay nao tot|ngay nao tot nhat|ngay tot thang nay|tuan nay ngay nao|chon ngay tot|ngay may tot|ngay cát)\b/.test(norm);
+  const isBestDays = /\b(ngay nao tot|ngay nao tot nhat|ngay tot thang nay|tuan nay ngay nao|chon ngay tot|ngay may tot|ngay cát|best days|lucky days|good days)\b/.test(norm);
   // [loop 764] isMinggong — hỏi về mệnh cung / thân cung (ziwei-BaZi «trụ thứ 6»).
   const isMinggong = /\b(menh cung|cung menh|than cung|cung than|tru thu 6)\b/.test(norm);
   // [loop 779] isCaiKu — hỏi về tài khố / giữ tiền / kho tiền (wealth storage).
