@@ -6153,6 +6153,8 @@ function syncLongField() {
 if ($('city')) { $('city').addEventListener('change', syncLongField); syncLongField(); }
 // auto-render on page load — user sees results immediately (saved data or defaults)
 _skipChatReset = true; // [loop 389] don't clear chat on initial render (same chart)
+// [loop 857] render welcome FIRST — for empty form new users (before run() returns early)
+try { renderQuickSummary(); } catch (_) {}
 try { run(); } catch (e) { console.warn('auto-render:', e.message); }
 _skipChatReset = false;
 
