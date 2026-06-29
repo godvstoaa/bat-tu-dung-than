@@ -643,9 +643,8 @@ function pDaily(R, intent) {
       if (_ev.yi) _yi.push(act.label.split('(')[0].trim());
       if (_ev.ji) _ji.push(act.label.split('(')[0].trim());
     }
-    if (_yi.length || _ji.length) {
-      paras.push(`📋 Hôm nay 宜 (nên): ${_yi.join(', ') || '(không rõ)'}. 忌 (kỵ): ${_ji.join(', ') || '(không)'}.`);
-    }
+    // [loop 846] luôn hiện (kể cả khi trung tính — user biết đã check)
+    paras.push(`📋 Hôm nay 宜 (nên): ${_yi.join(', ') || '(không có việc đặc biệt宜)'}. 忌 (kỵ): ${_ji.join(', ') || '(không)'}.`);
   } catch (e) {}
   paras.push(`💡 Mở tab «Hôm nay» hoặc AI để chi tiết giờ/phút, 选日 cho việc cụ thể (cưới/khai trương/động thổ).`);
   return { title: 'Vận hôm nay (lưu nhật)', lead: `Vận HÔM NAY của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
