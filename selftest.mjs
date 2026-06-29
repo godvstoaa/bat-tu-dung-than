@@ -3539,6 +3539,21 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   // → không fix (common forms «tài khố/kho tiền/giữ tiền/sao/quý nhân» đều work)
   console.log('   [loop 791] intent common-variant coverage (cách/xung khắc/khí hậu/nạp âm/phục ngâm) ✓');
 }
+// [loop 792] 17 AI tool descriptions — mỗi tool có description + when-to-use guidance.
+{
+  const { AI_TOOLS } = await import('./src/engine/ai.js');
+  assert(AI_TOOLS.length === 17, `[loop 792] 17 tools (got ${AI_TOOLS.length})`);
+  let _noDesc = 0;
+  for (const t of AI_TOOLS) {
+    const _d = t.function?.description || t.description || '';
+    if (!_d || _d.length < 20) _noDesc++;
+  }
+  assert(_noDesc === 0, `[loop 792] mọi tool có description ≥20 chars (thiếu ${_noDesc})`);
+  // majority có when-to-use guidance (Dùng khi/khi user)
+  const _withGuide = AI_TOOLS.filter((t) => /Dùng khi|khi user|khi hỏi|when/i.test(t.function?.description || t.description || '')).length;
+  assert(_withGuide >= 15, `[loop 792] ≥15 tool có when-to-use guidance (got ${_withGuide})`);
+  console.log(`   [loop 792] 17 tool descriptions đầy đủ (${_withGuide}/17 có when-to-use guidance) ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
