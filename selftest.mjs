@@ -3872,6 +3872,21 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_gzB !== _gzA, '[loop 821] năm ĐỔI tại 立春 boundary (3h vs 6h cùng ngày khác năm)');
   console.log('   [loop 821] 立春 boundary — năm đổi đúng tại tiết khí (乙巳→丙午) ✓');
 }
+// [loop 822] 节气 month boundary — tháng đổi tại tiết khí (không phải ngày 1).
+{
+  const { Solar } = await import('lunar-javascript');
+  for (const [y, m, d, h] of [[2026, 3, 4, 12], [2026, 3, 6, 12]]) {
+    const _R = analyze(y, m, d, h, 0, 'nam', 2026);
+    const _gz = _R.chart.pillars.month.gan + _R.chart.pillars.month.zhi;
+    const _lj = Solar.fromYmdHms(y, m, d, h, 0, 0).getLunar().getMonthInGanZhiExact();
+    assert(_gz === _lj, `[loop 822] ${y}-${m}-${d} month ganZhi khớp lunar-js (engine ${_gz} vs ${_lj})`);
+  }
+  // Mar 4 (寅) ≠ Mar 6 (卯) — tháng ĐỔI tại 惊蛰
+  const _m4 = analyze(2026, 3, 4, 12, 0, 'nam', 2026).chart.pillars.month.zhi;
+  const _m6 = analyze(2026, 3, 6, 12, 0, 'nam', 2026).chart.pillars.month.zhi;
+  assert(_m4 !== _m6, `[loop 822] tháng đổi tại 惊蛰 (Mar 4 ${_m4} ≠ Mar 6 ${_m6})`);
+  console.log('   [loop 822] 节气 month boundary — tháng đổi đúng tại tiết khí (寅→卯) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
