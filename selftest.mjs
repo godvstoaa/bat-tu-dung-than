@@ -3472,6 +3472,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   }
   console.log('   [loop 785] fengshui_direction recommend mode — hướng tốt + sao Bát Trạch ✓');
 }
+// [loop 786] 17 tools (BaZi-analysis subset) deterministic — same input → same output.
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  const _R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _T = [['analyze_year', { year: 2027 }], ['analyze_relative', { year: 1996, month: 12, day: 4, gender: 'nữ' }], ['find_good_days', { start: '2026-08-01', count: 30, topN: 3 }], ['fengshui_direction', { mode: 'recommend', scanYear: 2026 }], ['life_trajectory', {}]];
+  for (const [tool, args] of _T) {
+    const _a = JSON.stringify(execTool(tool, args, _R));
+    const _b = JSON.stringify(execTool(tool, args, _R));
+    assert(_a === _b, `[loop 786] ${tool} deterministic (same input → same output)`);
+  }
+  console.log('   [loop 786] BaZi-analysis tools deterministic (5 tool test, 0 non-det) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
