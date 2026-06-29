@@ -3852,6 +3852,14 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('bản mệnh tôi ra sao?', _QR).title.includes('Bản mệnh') || composeAnswer('bản mệnh tôi ra sao?', _QR).title.includes('tính cách'), '[loop 819] regression: «bản mệnh ra sao» → personality');
   console.log('   [loop 819] «mệnh tôi là gì»→overview (beginner), «bản mệnh ra sao»→personality ✓');
 }
+// [loop 820] pTiming surface cụ thể năm vàng/đại vận CÁT/năm hôn nhân.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _a = composeAnswer('năm nào tốt nhất cho tôi?', _QR);
+  assert(_a.paragraphs.some((p) => /Đại vận CÁT|★CÁCH THUẬN|★RESCUES/i.test(p)), '[loop 820] pTiming surface đại vận CÁT decades');
+  assert(_a.paragraphs.some((p) => /TỐT.*Đại cát|năm.*Đại cát|2028/i.test(p)), '[loop 820] pTiming surface cụ thể năm TỐT');
+  console.log('   [loop 820] pTiming surface năm vàng (đại vận CÁT + năm TỐT cụ thể + hôn nhân) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
