@@ -3345,6 +3345,22 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_bad === 0, `[loop 775] đại vận × 12 trường sinh khớp core.changSheng (${(_dcs.stages||[]).length - _bad}/${(_dcs.stages||[]).length})`);
   console.log(`   [loop 775] đại vận × 12 trường sinh integration — ${(_dcs.stages||[]).length}/${(_dcs.stages||[]).length} khớp core ✓`);
 }
+// [loop 776] family-deduction — 4 người thân seed, holographic insights không crash/leak.
+{
+  const { deduceFromFamily } = await import('./src/engine/family-deduction.js');
+  const _Q = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _mem = [
+    { role: 'mother', label: 'Mẹ', R: analyze(1970, 6, 27, 7, 15, 'nữ', 2026) },
+    { role: 'father', label: 'Bố', R: analyze(1964, 4, 4, 12, 0, 'nam', 2026) },
+    { role: 'sibling', label: 'Mỹ Anh', R: analyze(1996, 12, 4, 10, 15, 'nữ', 2026) },
+    { role: 'child', label: 'Nhật Minh', R: analyze(2023, 1, 13, 7, 15, 'nam', 2026) },
+  ];
+  const _res = deduceFromFamily(_Q, _mem);
+  assert(_res.ok !== false, '[loop 776] family-deduction chạy OK cho 4 thành viên');
+  assert(!/\bundefined\b|\bNaN\b/.test(JSON.stringify(_res)), '[loop 776] family-deduction không undefined/NaN leak');
+  assert((_res.holographic || []).length > 0 || (_res.relations || []).length > 0, '[loop 776] family-deduction trả insights (holographic/relations)');
+  console.log('   [loop 776] family-deduction 4 thành viên seed — holographic insights, 0 leak ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
