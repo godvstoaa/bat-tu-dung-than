@@ -3699,6 +3699,19 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('hướng nhà nào tốt?', _QR).title.includes('Phong thủy'), '[loop 805] regression: «hướng nhà» → fengshui');
   console.log('   [loop 805] 2 chip misroute fix (sự nghiệp+hướng→career, quý nhân+đào hoa→shensha) + regression ✓');
 }
+// [loop 806] 12 chip end-to-end — tất cả produce rich output (≥3 para, no generic fallback).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _chips = ['Năm nay vận sao?', 'Hôm nay tốt hay xấu?', 'Khi nào tôi phát tài?', 'Tình duyên của tôi?', 'Tôi hợp nghề gì?', 'Làm sao cải vận?', 'Gia đình tôi năm nay?', 'Hướng nào tốt để ở?', 'Gieo quẻ cho tôi', 'Trong lá số tôi có xung hình hại gì?', 'Tôi có quý nhân hay sao gì?', 'Cách cục của tôi là gì?'];
+  let _thin = 0;
+  for (const _q of _chips) {
+    const _a = composeAnswer(_q, _QR);
+    const _rich = _a.paragraphs.length >= 3 && _a.paragraphs.some((p) => p.length > 50);
+    if (!_rich) _thin++;
+  }
+  assert(_thin === 0, `[loop 806] 12 chip produce rich output (${12 - _thin}/12 rich, ${_thin} thin)`);
+  console.log(`   [loop 806] 12 chip end-to-end rich output (${12 - _thin}/12) ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
