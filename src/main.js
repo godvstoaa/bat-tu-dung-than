@@ -3295,6 +3295,38 @@ function _stripMd(s) {
     .replace(/[◆■▶▼✓✗⚠🥇①②③④⑤]/g, '')     // ký hiệu trang trí → bỏ
     .replace(/\n{3,}/g, '\n\n');           // gộp dòng trống thừa
 }
+// [loop 947] addMsgActions — toolbar 🔊 Đọc to + 📋 Sao chép (dùng cho cả answer mới VÀ history restore)
+function addMsgActions(body, text) {
+  try {
+    const _act = document.createElement('div');
+    _act.className = 'msg-actions';
+    if ('speechSynthesis' in window) {
+      const _sp = document.createElement('button');
+      _sp.type = 'button'; _sp.className = 'msg-action-btn'; _sp.textContent = '🔊 Đọc to';
+      let _on = false;
+      _sp.addEventListener('click', () => {
+        if (_on) { window.speechSynthesis.cancel(); return; }
+        const _u = new SpeechSynthesisUtterance(_stripMd(text));
+        _u.lang = 'vi-VN'; _u.rate = 1.02;
+        _u.onend = () => { _on = false; _sp.textContent = '🔊 Đọc to'; _sp.classList.remove('active'); };
+        _u.onerror = _u.onend;
+        window.speechSynthesis.cancel(); window.speechSynthesis.speak(_u);
+        _on = true; _sp.textContent = '⏹ Dừng'; _sp.classList.add('active');
+      });
+      _act.appendChild(_sp);
+    }
+    const _cp = document.createElement('button');
+    _cp.type = 'button'; _cp.className = 'msg-action-btn'; _cp.textContent = '📋 Sao chép';
+    _cp.addEventListener('click', () => {
+      const _done = () => { _cp.textContent = '✓ Đã chép'; setTimeout(() => { _cp.textContent = '📋 Sao chép'; }, 1500); };
+      const _clean = _stripMd(text);
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(_clean).then(_done).catch(() => _fallbackCopy(_clean, _done));
+      else _fallbackCopy(_clean, _done);
+    });
+    _act.appendChild(_cp);
+    body.parentElement.appendChild(_act);
+  } catch (_) {}
+}
 function appendMsg(role, text) {
   const wrap = document.createElement('div');
   wrap.className = `msg msg-${role}`;
@@ -3361,36 +3393,8 @@ async function handleAsk() {
     body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? 'Trợ lý AI' : 'Trợ lý (cục bộ)';
-    // [loop 933] message actions: 🔊 Đọc to (TTS) + 📋 Sao chép — cặp với voice input (loop 931)
-    try {
-      const _act = document.createElement('div');
-      _act.className = 'msg-actions';
-      if ('speechSynthesis' in window) {
-        const _sp = document.createElement('button');
-        _sp.type = 'button'; _sp.className = 'msg-action-btn'; _sp.textContent = '🔊 Đọc to';
-        let _on = false;
-        _sp.addEventListener('click', () => {
-          if (_on) { window.speechSynthesis.cancel(); return; }
-          const _u = new SpeechSynthesisUtterance(_stripMd(text));
-          _u.lang = 'vi-VN'; _u.rate = 1.02;
-          _u.onend = () => { _on = false; _sp.textContent = '🔊 Đọc to'; _sp.classList.remove('active'); };
-          _u.onerror = _u.onend;
-          window.speechSynthesis.cancel(); window.speechSynthesis.speak(_u);
-          _on = true; _sp.textContent = '⏹ Dừng'; _sp.classList.add('active');
-        });
-        _act.appendChild(_sp);
-      }
-      const _cp = document.createElement('button');
-      _cp.type = 'button'; _cp.className = 'msg-action-btn'; _cp.textContent = '📋 Sao chép';
-      _cp.addEventListener('click', () => {
-        const _done = () => { _cp.textContent = '✓ Đã chép'; setTimeout(() => { _cp.textContent = '📋 Sao chép'; }, 1500); };
-        const _clean = _stripMd(text);   // [loop 946] copy text sạch (không ** asterisk)
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(_clean).then(_done).catch(() => _fallbackCopy(_clean, _done));
-        else _fallbackCopy(_clean, _done);
-      });
-      _act.appendChild(_cp);
-      body.parentElement.appendChild(_act);
-    } catch (_) {}
+    // [loop 947] message actions (refactored → addMsgActions helper, dùng cả cho restore)
+    addMsgActions(body, text);
     // [loop 928] gợi ý câu hỏi kế tiếp theo ngữ cảnh (cảm giác ông thầy tư vấn)
     try {
       const _fups = suggestFollowups(q, currentResult);
@@ -6347,7 +6351,7 @@ try {
   if (Array.isArray(savedChat) && savedChat.length) {
     chatHistory = savedChat;
     // re-append messages to chat-log (visible when user opens popup)
-    setTimeout(() => { savedChat.forEach((m) => { try { appendMsg(m.role, m.content); } catch (_) {} }); }, 200);
+    setTimeout(() => { savedChat.forEach((m) => { try { const r = appendMsg(m.role, m.content); if (m.role === 'assistant' && r) addMsgActions(r.body, m.content); } catch (_) {} }); }, 200);
   }
 } catch (_) {}
 // [loop 23] city change → hiện/ẩn ô kinh độ thủ công
