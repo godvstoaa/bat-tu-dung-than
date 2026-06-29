@@ -27,3 +27,7 @@ fuzz-*.mjs
 regression-*.mjs
 perf-*.mjs
 _dagua_trace*.mjs
+_rag*.mjs
+_syn*.mjs
+_stream*.mjs
+_verify-*.mjs
