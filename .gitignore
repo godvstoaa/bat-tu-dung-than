@@ -26,3 +26,4 @@ _verify.txt
 fuzz-*.mjs
 regression-*.mjs
 perf-*.mjs
+_dagua_trace*.mjs
