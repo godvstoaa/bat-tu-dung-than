@@ -7615,7 +7615,11 @@ console.log('='.repeat(70));
     const _must = ['反吟伏吟', 'Tài khố', '盖头截脚', 'Điều hậu', 'Cách cục', 'Mệnh cung', 'Nạp âm'];
     const _missing = _must.filter((s) => !_bundle.includes(s));
     assert(_missing.length === 0, `[loop 790] build bundle đủ offline-feature strings (thiếu: ${_missing.join(', ')})`);
-    console.log(`   [loop 790] BUILD-OUTPUT ✓ — bundle chứa ${_must.length}/${_must.length} offline-feature strings`);
+    // [loop 813] bundle size check — catch bloat (latest index-*.js < 2.5MB raw)
+    const _latest = readdirSync(_dir).filter((f) => /^index-.*\.js$/.test(f)).map((f) => ({ f, sz: readFileSync(_dir + '/' + f).length })).sort((a, b) => b.sz - a.sz)[0];
+    const _szMB = (_latest.sz / 1024 / 1024).toFixed(1);
+    assert(_latest.sz < 2.5 * 1024 * 1024, `[loop 813] bundle size < 2.5MB (got ${_szMB}MB ${_latest.f})`);
+    console.log(`   [loop 790] BUILD-OUTPUT ✓ — bundle chứa ${_must.length}/${_must.length} offline-feature strings (${_szMB}MB)`);
   } catch (e) { if (!String(e).includes('assert')) console.log('   [loop 790] BUILD-OUTPUT skip (dist chưa build)'); }
 }
 
