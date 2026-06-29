@@ -374,8 +374,10 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     // [loop 639 FIX] gỡ reason «Kỵ» CỦA PHÙ ỨC còn liệt kê primary MỚI (giờ là Dụng, KHÔNG còn Kỵ).
     //   Trước đây: Dụng=火 nhưng reasons vẫn «Kỵ: ... Quan Sát (火)» → AI nhận thông tin MÂU THUẪN.
     //   Nay override → lý do Kỵ mới được line 382 (recomputed Kỵ) cung cấp, reason cũ phải đi.
+    // [loop 923 FIX] cũng gỡ reason Kỵ liệt kê HỶ MỚI (_newXi) — fuzz phát hiện 52/640 chart
+    //   (8%) giữ «Kỵ: ... (Hỷ_mới)» mâu thuẫn yong cuối → AI nhận thông tin trái chiều.
     for (let i = reasons.length - 1; i >= 0; i--) {
-      if (/^Kỵ:/.test(reasons[i]) && reasons[i].includes(`(${primary})`)) reasons.splice(i, 1);
+      if (/^Kỵ:/.test(reasons[i]) && (reasons[i].includes(`(${primary})`) || reasons[i].includes(`(${_newXi})`))) reasons.splice(i, 1);
     }
   }
 
@@ -649,6 +651,13 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
           yong.secondary = drugWx;
           yong.reasons.push(`💊 Bệnh Dược (病药 từ pattern-quality): «${(r.diseaseNote || r.note || '').slice(0, 60)}» → thuốc nhóm ${drugGroups[0]} (hành ${drugWx}) → ưu tiên làm Dụng thứ cấp (chữa bệnh cách cục).`);
           if (!yong.method.includes('Bệnh Dược (病药)')) yong.method.push('Bệnh Dược (病药)');
+          // [loop 923 FIX] secondary được 病药 đặt SAU khi avoid đã finalize (loop 544 filter
+          //   không biết secondary mới) → gỡ drugWx khỏi avoid trừ khi nó là ji/chou (loop 550:
+          //   kỵ/仇 ưu tiên). Fuzz phát hiện 28/640 chart (4.4%) giữ drugWx beneficial trong avoid
+          //   → hehun/ideal-match phạt partner mang secondary (vốn BỔ ích) — đúng bug loop 544 từng sửa.
+          if (drugWx !== yong.ji && drugWx !== yong.chou) {
+            yong.avoid = yong.avoid.filter((w) => w !== drugWx);
+          }
         }
       }
     }
@@ -672,7 +681,7 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
         yong.ji = KE_BY[drugWx];
         yong.chou = SHENG_BY[yong.ji];
         yong.xian = SHENG[drugWx];
-        yong.avoid = yong.avoid.filter((w) => w !== drugWx && w !== yong.xi);     // gỡ thuốc + Hỷ mới khỏi Kỵ
+        yong.avoid = yong.avoid.filter((w) => w !== drugWx && w !== yong.xi && w !== yong.secondary);     // gỡ thuốc + Hỷ + secondary mới khỏi Kỵ
         // [loop 127 fix] thêm Kỵ/Thù mới từ new primary (ji=克 Dụng, chou=sinh Kỵ)
         for (const w of [yong.ji, yong.chou]) if (w && !yong.avoid.includes(w)) yong.avoid.push(w);
         yong.reasons.push(`★ Bệnh Dược LÀM CHỦ (败中有成): mệnh «${patternQualityResult.quality}» — bệnh «${(firstRescue.diseaseNote || '').slice(0, 50)}» CÓ CỨU bằng nhóm ${firstRescue.drug[0]} (hành ${drugWx}) → Dụng Thần CHÍNH = ${drugWx} («有病方为贵»). Phù Ức cũ (${oldPrimary}) giáng secondary.`);
