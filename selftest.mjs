@@ -3927,6 +3927,27 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!composeAnswer('xung hình hại?', _QR).paragraphs.some((p) => /暗合 \(ẩn hợp\)/.test(p)), '[loop 826] Quân không ẩn hợp → vắng (đúng)');
   console.log('   [loop 826] 暗合 (ẩn hợp) surface trong pInteractions (Nhật Minh 寅丑) ✓');
 }
+// [loop 827] ẩn hợp fuzz — detectAnhe 0 crash/leak qua 60+ chart đa dạng.
+{
+  const { detectAnhe } = await import('./src/engine/anhe.js');
+  let _crash = 0, _leak = 0, _n = 0;
+  for (let _y = 1960; _y <= 2010; _y += 10) {
+    for (const _m of [1, 6, 11]) {
+      for (const _d of [5, 15, 25]) {
+        for (const _h of [0, 12]) {
+          try {
+            const _R = analyze(_y, _m, _d, _h, 0, (_y + _m + _d) % 2 ? 'nam' : 'nữ', 2026);
+            _n++;
+            const _ah = detectAnhe(_R.chart);
+            if (/\bundefined\b|\bNaN\b/.test(JSON.stringify(_ah))) _leak++;
+          } catch (e) { _crash++; }
+        }
+      }
+    }
+  }
+  assert(_crash === 0 && _leak === 0, `[loop 827] ẩn hợp fuzz ${_n} chart: ${_crash} crash, ${_leak} leak`);
+  console.log(`   [loop 827] ẩn hợp fuzz ${_n} chart — 0 crash/leak ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
