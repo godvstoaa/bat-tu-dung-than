@@ -7876,7 +7876,7 @@ console.log('='.repeat(70));
     assert(_latest.sz < 2.5 * 1024 * 1024, `[loop 813] bundle size < 2.5MB (got ${_szMB}MB ${_latest.f})`);
     console.log(`   [loop 790] BUILD-OUTPUT ✓ — bundle chứa ${_must.length}/${_must.length} offline-feature strings (${_szMB}MB)`);
     // [loop 840] PRIVACY: bundle KHÔNG chứa data cá nhân chủ app (chỉ check LATEST build)
-    const _personal = ['Tô Thị Hồng', 'Nguyễn Mỹ Anh', 'Nguyễn Xuân Tùng', 'Nguyễn Hoàng Nhật Minh'];
+    const _personal = ['Tô Thị Hồng', 'Nguyễn Mỹ Anh', 'Nguyễn Xuân Tùng', 'Nguyễn Hoàng Nhật Minh', '1993-10-21'];
     const _leak = _personal.filter((s) => _latest && readFileSync(_dir + '/' + _latest.f, 'utf8').includes(s));
     assert(_leak.length === 0, `[loop 840] bundle KHÔNG chứa data cá nhân (found: ${_leak.join(', ')})`);
   } catch (e) { if (!String(e).includes('assert')) console.log('   [loop 790] BUILD-OUTPUT skip (dist chưa build)'); }
