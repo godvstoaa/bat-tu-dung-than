@@ -3743,6 +3743,16 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /undefined|NaN|\[object/.test(p)), '[loop 808] không leak');
   console.log('   [loop 808] pOverview multi-layer snapshot (5 layers: bản mệnh/Dụng/tương tác/thần煞/nạp âm) ✓');
 }
+// [loop 809] pOverview member-specific — 5 thành viên ra snapshot KHÁC nhau.
+{
+  const _F = [[1993, 10, 21, 1, 15, 'nam'], [1996, 12, 4, 10, 15, 'nữ'], [2023, 1, 13, 7, 15, 'nam'], [1970, 6, 27, 7, 15, 'nữ'], [1964, 4, 4, 12, 0, 'nam']];
+  const _snaps = _F.map(([y, m, d, h, mi, g]) => {
+    const _a = composeAnswer('phân tích toàn diện mệnh', analyze(y, m, d, h, mi, g, 2026));
+    return (_a.paragraphs.find((p) => /Bản mệnh/.test(p)) || '') + (_a.paragraphs.find((p) => /Dụng thần/.test(p)) || '');
+  });
+  assert(new Set(_snaps).size === 5, `[loop 809] pOverview 5 thành viên ra 5 snapshot unique (got ${new Set(_snaps).size}/5)`);
+  console.log('   [loop 809] pOverview member-specific (5/5 unique snapshot) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
