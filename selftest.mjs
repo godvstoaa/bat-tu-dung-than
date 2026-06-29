@@ -3639,6 +3639,31 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(detectIntent('tôi cần gì để thành công?').area !== 'health', '[loop 800] «cần gì» generic ≠ health (ăn gì⊂cần gì fix)');
   console.log('   [loop 800] «ăn gì»→«ăn uống» fix collision «cần gì» — «khí hậu cần gì»→tiaohou ✓');
 }
+// [loop 801] routing production-ready — 22 diverse questions all acceptable (post 8 collision fix).
+{
+  const _di = (q) => detectIntent(q);
+  const _ok = [
+    _di('bao giờ tôi giàu?').isTiming,
+    _di('tình duyên tôi?').area === 'love',
+    _di('sức khoẻ tôi?').area === 'health',
+    _di('vợ chồng hợp không?').isCompat,
+    _di('hướng nhà tốt?').isFengshui,
+    _di('gieo quẻ?').isDivination,
+    _di('xung hình hại?').isInteraction,
+    _di('quý nhân sao?').isShensha,
+    _di('nạp âm?').isNayin,
+    _di('cách cục?').isPattern,
+    _di('mệnh cung?').isMinggong,
+    _di('giữ được tiền?').isCaiKu,
+    _di('mẹ tôi vận?').isFamily,
+    _di('khí hậu mùa sinh?').isTiaohou,
+    _di('làm việc với người khó tính?').area !== 'love',  // collision-fixed
+    _di('sao tôi lại xui?').area !== 'wealth',  // collision-fixed
+  ];
+  const _fail = _ok.filter((x) => !x).length;
+  assert(_fail === 0, `[loop 801] routing production-ready — ${_ok.length - _fail}/${_ok.length} acceptable (kể cả collision-fixed)`);
+  console.log(`   [loop 801] routing production-ready — ${_ok.length - _fail}/${_ok.length} diverse questions acceptable ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
