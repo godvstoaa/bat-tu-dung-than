@@ -8015,12 +8015,21 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
 }
 
 // [loop 703] BUILD CHECK — selftest phải verify build thành công (tránh loop 697-699 bug lặp)
+// [loop 929 FIX CRITICAL] trước đây catch(e){} vứt lỗi → assert msg chung chung «build phải thành công»
+//   KHÔNG cho biết VÌ SAO fail → ta từng dismissed là «flaky timeout» suốt 13 loop (915-927) trong khi
+//   thật ra CSS orphan vars break build. Nay: capture stderr + hiện dòng lỗi thật (css/postcss/error).
 {
   const { execSync } = await import('child_process');
-  let buildOk = false;
-  try { execSync('npx vite build', { stdio: 'pipe', env: { ...process.env, GH_PAGES: '1' }, timeout: 30000 }); buildOk = true; } catch (e) {}
-  assert(buildOk, `[loop 703] vite build phải thành công (trước đây loop 697-699 build fail không phát hiện vì tail -2)`);
-  console.log(`   BUILD CHECK ✓ — vite build thành công (guard tránh lặp loop 697-699)`);
+  let buildOk = false, buildErr = '';
+  try { execSync('npx vite build', { stdio: 'pipe', env: { ...process.env, GH_PAGES: '1' }, timeout: 60000 }); buildOk = true; }
+  catch (e) {
+    const _raw = (e.stderr || e.stdout || '').toString() || (e.message || '');
+    const _lines = _raw.split('\n').filter((l) => /error|Error|Unexpected|failed|postcss|css|CssSyntax/i.test(l));
+    const _isTimeout = e.signal === 'SIGTERM' || /TIMED OUT|timeout/i.test(e.message || '');
+    buildErr = (_isTimeout ? '⏱ TIMEOUT (có thể chậm máy)' : 'BUILD THẬT BỊ LỖI (KHÔNG phải flaky — ĐỌC): ') + (_lines[0] || _raw.split('\n').slice(-2).join(' ')).slice(0, 220);
+  }
+  assert(buildOk, `[loop 703/929] vite build phải thành công — ${buildErr || 'xem output vite build'}`);
+  console.log(`   BUILD CHECK ✓ — vite build thành công (guard tránh lặp loop 697-699; [929] hiện lỗi thật nếu fail)`);
   // [loop 790] BUILD-OUTPUT content — bundle phải chứa key strings của offline features
   //   (catch refactor lỡ tay xoá composer — function minify đổi tên nên check STRING literal).
   try {
