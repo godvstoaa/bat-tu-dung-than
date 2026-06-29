@@ -3802,6 +3802,17 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_crash === 0 && _leak === 0, `[loop 814] garbage input: ${_crash} crash, ${_leak} leak (of ${_garbage.length})`);
   console.log(`   [loop 814] garbage input (${_garbage.length} type: empty/punct/emoji/null) — 0 crash/leak ✓`);
 }
+// [loop 815] pRemedy member-specific — Dụng khác → màu advice khác.
+{
+  const _COLOR = { 木: 'xanh lá', 火: 'đỏ', 土: 'vàng', 金: 'trắng', 水: 'đen' };
+  const _F = [[1993, 10, 21, 1, 15, 'nam', '土'], [1996, 12, 4, 10, 15, 'nữ', '火'], [1970, 6, 27, 7, 15, 'nữ', '水'], [1964, 4, 4, 12, 0, 'nam', '金']];
+  for (const [y, m, d, h, mi, g, dung] of _F) {
+    const _a = composeAnswer('làm sao cải vận?', analyze(y, m, d, h, mi, g, 2026));
+    const _cl = _a.paragraphs.find((p) => /màu|Màu/.test(p)) || '';
+    assert(_cl.includes(_COLOR[dung]), `[loop 815] Dụng ${dung} → màu ${_COLOR[dung]} (got: ${_cl.slice(0, 40)})`);
+  }
+  console.log('   [loop 815] pRemedy member-specific (Dụng Thổ/Hỏa/Thủy/Kim → 4 màu khác) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
