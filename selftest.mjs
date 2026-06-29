@@ -3917,6 +3917,16 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('hôm nay tốt không và giờ nào tốt?', _QR).title.includes('hôm nay') || composeAnswer('hôm nay tốt không?', _QR).title.includes('lưu nhật'), '[loop 825] «hôm nay + giờ» → daily');
   console.log('   [loop 825] multi-part questions route hợp lý (timing/compat/daily thắng đúng) ✓');
 }
+// [loop 826] 暗合 (ẩn hợp) surface trong pInteractions — Nhật Minh có 寅丑 全暗合.
+{
+  const _NM = analyze(2023, 1, 13, 7, 15, 'nam', 2026);
+  const _a = composeAnswer('xung hình hại trong lá số tôi?', _NM);
+  assert(_a.paragraphs.some((p) => /暗合 \(ẩn hợp\)/.test(p)), '[loop 826] Nhật Minh surface 暗合 寅丑 (ẩn hợp)');
+  // Quân (không ẩn hợp) → vắng
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(!composeAnswer('xung hình hại?', _QR).paragraphs.some((p) => /暗合 \(ẩn hợp\)/.test(p)), '[loop 826] Quân không ẩn hợp → vắng (đúng)');
+  console.log('   [loop 826] 暗合 (ẩn hợp) surface trong pInteractions (Nhật Minh 寅丑) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

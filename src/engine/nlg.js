@@ -16,6 +16,7 @@ import { baziMingGong } from './bazi-minggong.js';
 import { analyzeCaiKu } from './caiku.js';
 import { pillarRelation } from './pillar-quality.js';
 import { natalFuyin } from './fuyin.js';
+import { detectAnhe } from './anhe.js';
 import { dailyBriefing } from './daily-briefing.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
@@ -824,6 +825,13 @@ function pInteractions(R) {
   try {
     const fy = natalFuyin(R).items || [];
     if (fy.length) paras.push(`🌀 反吟伏吟: ${fy.map((f) => `${f.typeVi} ${f.pair}${f.meaning ? ' — ' + f.meaning.slice(0, 60) : ''}`).join('; ')}`);
+  } catch (e) {}
+  // [loop 826] 暗合 (ẩn hợp / hidden combination) — detectAnhe.
+  try {
+    const ah = detectAnhe(R.chart);
+    if (ah && ah.pairs && ah.pairs.length) {
+      paras.push(`🔒 暗合 (ẩn hợp): ${ah.pairs.map((p) => `${p.chiA}↔${p.chiB} (${p.relVi || p.from + '↔' + p.to}) → ${p.hua}${p.note ? ' — ' + p.note.slice(0, 80) : ''}`).join('; ')}`);
+    }
   } catch (e) {}
   if (!paras.length) {
     return {
