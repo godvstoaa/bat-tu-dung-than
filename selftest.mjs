@@ -3435,6 +3435,23 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(detectIntent('测字 chữ Phúc').isDivination === true, '[loop 782] CJK «测字» → isDivination');
   console.log('   [loop 782] CJK intent matching (财库/盖头截脚/起卦/测字) — pattern raw-question ✓');
 }
+// [loop 783] AI brief completeness — surface đủ 12 lớp cổ pháp (offline ↔ online consistent).
+{
+  const { buildChartBrief } = await import('./src/engine/ai.js');
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _b = buildChartBrief(_QR);
+  const _layers = {
+    'TAM HÌNH': /TAM HÌNH/i, 'LỤC HẠI': /LỤC HẠI/i, 'LỤC XUNG': /LỤC XUNG/i,
+    'BÁN HỢP': /BÁN HỢP/i, 'LỤC HỢP': /LỤC HỢP/i,
+    'tài khố': /tài khố|TAI KHO|财库/i, 'nạp âm': /nạp âm|纳音/i,
+    'điều hậu': /điều hậu|调候/i, '盖头截脚': /盖头|截脚/,
+    'cách cục': /cách cục|格局/i, 'mệnh cung': /mệnh cung|命宫/i,
+    'đại vận phase': /大运 PHASE|进气|旺气|退气/,
+  };
+  const _missing = Object.entries(_layers).filter(([, re]) => !re.test(_b)).map(([k]) => k);
+  assert(_missing.length === 0, `[loop 783] AI brief đủ 12 lớp (thiếu: ${_missing.join(', ')})`);
+  console.log('   [loop 783] AI brief completeness — 12/12 lớp cổ pháp (offline↔online consistent) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
