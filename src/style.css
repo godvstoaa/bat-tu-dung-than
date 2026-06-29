@@ -673,6 +673,12 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .followup-chip:hover { background: rgba(212,175,55,0.18); border-color: var(--gold); }
 .followup-chip:active { transform: translateY(1px); }
 
+/* [loop 933] message actions: read-aloud + copy */
+.msg-actions { display: flex; gap: 6px; padding: 4px 14px 2px; }
+.msg-action-btn { font-size: 11px; color: var(--silk-muted); background: transparent; border: 1px solid rgba(212,175,55,0.18); border-radius: 10px; padding: 2px 9px; cursor: pointer; line-height: 1.5; transition: color .15s, border-color .15s; font-family: inherit; }
+.msg-action-btn:hover { color: var(--gold); border-color: var(--gold); }
+.msg-action-btn.active { color: var(--cinnabar); border-color: var(--cinnabar); }
+
 /* [loop 931] voice input mic button */
 .voice-btn { font-size: 16px; line-height: 1; padding: 6px 10px; flex-shrink: 0; }
 .voice-btn.listening { color: var(--cinnabar); border-color: var(--cinnabar); animation: micPulse 1s ease-in-out infinite; }

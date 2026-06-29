@@ -3276,7 +3276,19 @@ function updateAIStatus() {
 }
 
 let _aiBusy = false;
+// [loop 933] fallback copy (khi clipboard API không khả dụng — vd http, iframe chặn)
+function _fallbackCopy(text, done) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  } catch (_) {}
+  if (done) done();
+}
 async function handleAsk() {
+  // [loop 933] dừng đọc to đang chạy khi user hỏi câu mới (tránh 2 giọng chồng nhau)
+  try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (_) {}
   if (!currentResult) {
     appendMsg('assistant', '📋 Vui lòng nhập ngày sinh ở form trên rồi bấm «Luận giải» — sau đó tôi có thể trả lời mọi câu hỏi của bạn (vận hạn, tài lộc, tình duyên, phong thủy…).');
     return;
@@ -3308,6 +3320,35 @@ async function handleAsk() {
     body.textContent = text;
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? 'Trợ lý AI' : 'Trợ lý (cục bộ)';
+    // [loop 933] message actions: 🔊 Đọc to (TTS) + 📋 Sao chép — cặp với voice input (loop 931)
+    try {
+      const _act = document.createElement('div');
+      _act.className = 'msg-actions';
+      if ('speechSynthesis' in window) {
+        const _sp = document.createElement('button');
+        _sp.type = 'button'; _sp.className = 'msg-action-btn'; _sp.textContent = '🔊 Đọc to';
+        let _on = false;
+        _sp.addEventListener('click', () => {
+          if (_on) { window.speechSynthesis.cancel(); return; }
+          const _u = new SpeechSynthesisUtterance(text);
+          _u.lang = 'vi-VN'; _u.rate = 1.02;
+          _u.onend = () => { _on = false; _sp.textContent = '🔊 Đọc to'; _sp.classList.remove('active'); };
+          _u.onerror = _u.onend;
+          window.speechSynthesis.cancel(); window.speechSynthesis.speak(_u);
+          _on = true; _sp.textContent = '⏹ Dừng'; _sp.classList.add('active');
+        });
+        _act.appendChild(_sp);
+      }
+      const _cp = document.createElement('button');
+      _cp.type = 'button'; _cp.className = 'msg-action-btn'; _cp.textContent = '📋 Sao chép';
+      _cp.addEventListener('click', () => {
+        const _done = () => { _cp.textContent = '✓ Đã chép'; setTimeout(() => { _cp.textContent = '📋 Sao chép'; }, 1500); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(_done).catch(() => _fallbackCopy(text, _done));
+        else _fallbackCopy(text, _done);
+      });
+      _act.appendChild(_cp);
+      body.parentElement.appendChild(_act);
+    } catch (_) {}
     // [loop 928] gợi ý câu hỏi kế tiếp theo ngữ cảnh (cảm giác ông thầy tư vấn)
     try {
       const _fups = suggestFollowups(q);
