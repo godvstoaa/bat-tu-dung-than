@@ -7345,6 +7345,17 @@ console.log('='.repeat(70));
   try { execSync('npx vite build', { stdio: 'pipe', env: { ...process.env, GH_PAGES: '1' }, timeout: 30000 }); buildOk = true; } catch (e) {}
   assert(buildOk, `[loop 703] vite build phải thành công (trước đây loop 697-699 build fail không phát hiện vì tail -2)`);
   console.log(`   BUILD CHECK ✓ — vite build thành công (guard tránh lặp loop 697-699)`);
+  // [loop 790] BUILD-OUTPUT content — bundle phải chứa key strings của offline features
+  //   (catch refactor lỡ tay xoá composer — function minify đổi tên nên check STRING literal).
+  try {
+    const { readdirSync, readFileSync } = await import('fs');
+    const _dir = 'dist/assets';
+    const _bundle = readdirSync(_dir).filter((f) => /^index-.*\.js$/.test(f)).map((f) => readFileSync(_dir + '/' + f, 'utf8')).join('\n');
+    const _must = ['反吟伏吟', 'Tài khố', '盖头截脚', 'Điều hậu', 'Cách cục', 'Mệnh cung', 'Nạp âm'];
+    const _missing = _must.filter((s) => !_bundle.includes(s));
+    assert(_missing.length === 0, `[loop 790] build bundle đủ offline-feature strings (thiếu: ${_missing.join(', ')})`);
+    console.log(`   [loop 790] BUILD-OUTPUT ✓ — bundle chứa ${_must.length}/${_must.length} offline-feature strings`);
+  } catch (e) { if (!String(e).includes('assert')) console.log('   [loop 790] BUILD-OUTPUT skip (dist chưa build)'); }
 }
 
 
