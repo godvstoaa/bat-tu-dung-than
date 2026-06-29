@@ -3705,9 +3705,10 @@ function run() {
     // scroll-spy: highlight group đang xem (trước đây .active KHÔNG được áp — user lạc trong trang dài)
     if (grpLinks.length) {
       const spy = () => {
-        const mid = (window.scrollY || document.documentElement.scrollTop) + window.innerHeight / 3;
+        // [loop 936] dùng getBoundingClientRect (viewport-relative) — offsetTop lệch theo offsetParent
         let activeIdx = 0;
-        grpLinks.forEach(({ grp }, idx) => { if (grp.offsetTop <= mid) activeIdx = idx; });
+        const line = window.innerHeight / 3;
+        grpLinks.forEach(({ grp }, idx) => { if (grp.getBoundingClientRect().top <= line) activeIdx = idx; });
         grpLinks.forEach(({ a }, idx) => a.classList.toggle('active', idx === activeIdx));
       };
       if (window._qnavSpy) window.removeEventListener('scroll', window._qnavSpy, { passive: true });
