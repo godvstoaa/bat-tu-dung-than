@@ -3449,9 +3449,12 @@ function run() {
   const y = tt.solar.year, m = tt.solar.month, d = tt.solar.day, hh = tt.solar.hour, mm = tt.solar.minute;
   // [loop 851 PRIVACY] persist birth data — nhưng KHÔNG overwrite nếu đến từ URL share
   //   (user B mở link user A → KHÔNG đè localStorage user B)
+  // [loop 852 FIX] clear _fromUrlShare SAU lần save đầu — user B tự nhập data riêng
+  //   lần sau → save ĐÚNG (không bị skip vì flag cũ).
   if (!window._fromUrlShare) {
     try { localStorage.setItem('bazi-birth', JSON.stringify({ date: dateVal, time: timeVal, gender, tz, city: cityVal, long: $('long') ? $('long').value : '' })); } catch (e) {}
   }
+  window._fromUrlShare = false; // clear — lần submit kế (user tự nhập) → save bình thường
   // [loop 391] update URL with birth params for shareable link
   try { const u = new URL(window.location.href); u.searchParams.set('dob', dateVal); u.searchParams.set('time', timeVal); u.searchParams.set('g', gender); history.replaceState(null, '', u); } catch (_) {}
   // hiển thị note 真太阳时
