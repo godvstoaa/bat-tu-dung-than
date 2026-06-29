@@ -3452,6 +3452,16 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_missing.length === 0, `[loop 783] AI brief đủ 12 lớp (thiếu: ${_missing.join(', ')})`);
   console.log('   [loop 783] AI brief completeness — 12/12 lớp cổ pháp (offline↔online consistent) ✓');
 }
+// [loop 784] sat phương (Tam Sát) 2026 động — năm 午 → sat 亥子丑 (Bắc).
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  const _R = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _res = execTool('fengshui_direction', { mode: 'read', face: '北', scanYear: 2026 }, _R);
+  assert(_res.year === 2026, '[loop 784] fengshui read 2026');
+  assert((_res.layers || []).some((l) => /Tam Sát.*Bắc|Tam Sát phương \(亥子丑\)/.test(l)), `[loop 784] 2026 午 sat phương Bắc = Tam Sát (got layers: ${(_res.layers||[]).filter(l=>/Sát|Tuế/i.test(l)).join('; ')})`);
+  assert(/KỴ|xấu|TRÁNH/i.test(_res.verdict + ' ' + _res.advice), '[loop 784] Bắc 2026 = ĐẠI KỴ (sat phương) → tránh động thổ');
+  console.log('   [loop 784] sat phương (Tam Sát) 2026 động — Bắc = 亥子丑 = ĐẠI KỴ ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
