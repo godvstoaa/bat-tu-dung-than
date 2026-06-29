@@ -3712,6 +3712,24 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_thin === 0, `[loop 806] 12 chip produce rich output (${12 - _thin}/12 rich, ${_thin} thin)`);
   console.log(`   [loop 806] 12 chip end-to-end rich output (${12 - _thin}/12) ✓`);
 }
+// [loop 807] 5 thành viên × chip subset integration — 0 crash/leak/generic.
+{
+  const _chips = ['Năm nay vận sao?', 'Hôm nay tốt không?', 'Khi nào phát tài?', 'Tình duyên ra sao?', 'Hợp nghề gì?', 'Xung hình hại gì?', 'Có quý nhân sao gì?', 'Cách cục gì?'];
+  const _F = [[1993, 10, 21, 1, 15, 'nam'], [1996, 12, 4, 10, 15, 'nữ'], [2023, 1, 13, 7, 15, 'nam'], [1970, 6, 27, 7, 15, 'nữ'], [1964, 4, 4, 12, 0, 'nam']];
+  let _bad = 0, _n = 0;
+  for (const [y, m, d, h, mi, g] of _F) {
+    const _R = analyze(y, m, d, h, mi, g, 2026);
+    for (const _q of _chips) {
+      _n++;
+      try {
+        const _a = composeAnswer(_q, _R);
+        if (_a.paragraphs.some((p) => /undefined|NaN|\[object/.test(p)) || _a.paragraphs.length < 2) _bad++;
+      } catch (e) { _bad++; }
+    }
+  }
+  assert(_bad === 0, `[loop 807] 5 thành viên × ${_chips.length} chip = ${_n} test: ${_bad} anomaly`);
+  console.log(`   [loop 807] 5 thành viên × ${_chips.length} chip (${_n} test) — 0 crash/leak/generic ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
