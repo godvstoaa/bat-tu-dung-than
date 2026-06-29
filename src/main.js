@@ -4814,6 +4814,20 @@ $('question').addEventListener('keydown', (e) => { if (e.key === 'Enter') handle
   });
 })();
 $('ai-settings-btn').addEventListener('click', openModal);
+// [loop 935] back-to-top floating button — hiện khi cuộn xuống, click về đầu trang (mobile scroll-fatigue)
+(function initToTop() {
+  const btn = $('to-top');
+  if (!btn) return;
+  let ticking = false;
+  const update = () => {
+    btn.hidden = false;
+    btn.classList.toggle('show', (window.scrollY || document.documentElement.scrollTop) > 700);
+    ticking = false;
+  };
+  window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  update();
+})();
 // [loop 658] clear-chat button — reset hội thoại mà không đổi lá số
 $('ai-chat-clear').addEventListener('click', () => {
   chatHistory = [];

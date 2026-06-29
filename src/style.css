@@ -1093,6 +1093,17 @@ html{scroll-behavior:smooth}
   animation:aiFabPulse 3.2s var(--ease-out) infinite;
 }
 .ai-fab:hover{transform:translateY(-2px)}
+/* [loop 935] back-to-top — giảm mỏi tay cuộn trang dài (mobile) */
+.to-top {
+  position: fixed; left: 18px; bottom: 22px; z-index: 59;
+  width: 42px; height: 42px; font-size: 18px; line-height: 1;
+  color: var(--gold); background: rgba(15, 13, 26, 0.85); backdrop-filter: blur(6px);
+  border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 50%; cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity .25s, transform .15s;
+}
+.to-top.show { opacity: 1; }
+.to-top:hover { transform: translateY(-2px); border-color: var(--gold); }
+@media (max-width: 720px) { .to-top { left: 14px; bottom: 18px; width: 40px; height: 40px; } }
 .ai-fab-label{font-family:'Be Vietnam Pro',sans-serif}
 @keyframes aiFabPulse{0%,100%{box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 0 rgba(212,175,55,.4)}50%{box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 12px rgba(212,175,55,0)}}
 .ai-popup{
