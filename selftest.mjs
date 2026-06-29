@@ -3955,6 +3955,15 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('xung hình hại của tôi?', _QR).title.includes('Tương tác'), '[loop 828] «xung» (no hôm nay) → interactions (natal)');
   console.log('   [loop 828] hôm nay+xung→daily (today), xung alone→interactions (natal) ✓');
 }
+// [loop 829] English keywords — mixed VN-EN «wealth/career/love/health» route đúng.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(composeAnswer('wealth của tôi sao?', _QR).title.includes('Tài lộc'), '[loop 829] «wealth» → wealth');
+  assert(composeAnswer('career tôi sao?', _QR).title.includes('Sự nghiệp'), '[loop 829] «career» → career');
+  assert(composeAnswer('love tôi ra sao?', _QR).title.includes('Tình duyên'), '[loop 829] «love» → love');
+  assert(composeAnswer('health tôi cần gì?', _QR).title.includes('Sức khỏe'), '[loop 829] «health» → health');
+  console.log('   [loop 829] English keywords (wealth/career/love/health) mixed VN-EN route ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

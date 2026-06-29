@@ -68,12 +68,12 @@ const avoidText = (yong) => [...new Set(yong.avoid)].map((w) => `${wxVi(w)} (${w
 //  1. ĐỊNH DANH Ý ĐỊNH từ câu hỏi
 // ---------------------------------------------------------------------------
 const INTENT_KEYWORDS = {
-  career: ['sự nghiệp', 'công việc', 'công danh', 'thăng tiến', 'nghề', 'làm ăn', 'kinh doanh', 'chức', 'sếp', 'đi làm', 'nghỉ việc', 'đổi việc', 'thăng chức', 'khởi nghiệp', 'mở công ty'],
-  wealth: ['tài', 'tiền', 'của cải', 'giàu', 'lộc', 'đầu tư', 'tài chính', 'phát tài', 'làm giàu', 'kiếm tiền', 'kinh tế', 'nợ', 'lãi suất'],
+  career: ['sự nghiệp', 'công việc', 'công danh', 'thăng tiến', 'nghề', 'làm ăn', 'kinh doanh', 'chức', 'sếp', 'đi làm', 'nghỉ việc', 'đổi việc', 'thăng chức', 'khởi nghiệp', 'mở công ty', 'career', 'job'],
+  wealth: ['tài', 'tiền', 'của cải', 'giàu', 'lộc', 'đầu tư', 'tài chính', 'phát tài', 'làm giàu', 'kiếm tiền', 'kinh tế', 'nợ', 'lãi suất', 'wealth', 'money', 'rich'],
   // [loop 798 FIX] «tình»→«tình yêu» — 'tình'(love)≡'tính'(nature) cùng→'tinh' (NFD collision),
   //   «khó TÍNH» match «tình» → love ❌. «tình yêu» specific tránh collision.
-  love: ['tình yêu', 'tình duyên', 'tình cảm', 'duyên', 'hôn nhân', 'vợ', 'chồng', 'người yêu', 'kết hôn', 'cưới', 'gia đạo', 'ly hôn', 'đào hoa', 'phối ngẫu', 'tái hôn', 'lấy vợ', 'lấy chồng', 'gặp duyên', 'độc thân'],
-  health: ['sức khỏe', 'bệnh', 'ốm', 'tạng', 'dưỡng sinh', 'thể chất', 'số thọ', 'tai nạn', 'đau', 'ăn uống', 'thực phẩm', 'chế độ ăn'],
+  love: ['tình yêu', 'tình duyên', 'tình cảm', 'duyên', 'hôn nhân', 'vợ', 'chồng', 'người yêu', 'kết hôn', 'cưới', 'gia đạo', 'ly hôn', 'đào hoa', 'phối ngẫu', 'tái hôn', 'lấy vợ', 'lấy chồng', 'gặp duyên', 'độc thân', 'love', 'relationship'],
+  health: ['sức khỏe', 'bệnh', 'ốm', 'tạng', 'dưỡng sinh', 'thể chất', 'số thọ', 'tai nạn', 'đau', 'ăn uống', 'thực phẩm', 'chế độ ăn', 'health'],
   study: ['học', 'thi', 'bằng cấp', 'trí tuệ', 'kiến thức', 'sáng tạo', 'trường', 'đại học', 'luận văn', 'nghiên cứu'],
   children: ['con', 'con cái', 'sinh con', 'có con', 'quý tử', 'hậu duệ', 'thai'],
   family: ['gia đình', 'cha mẹ', 'anh em', 'ruột thịt', 'thân thuộc', 'mẹ', 'bố', 'cha'],
