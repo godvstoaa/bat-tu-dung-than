@@ -666,6 +666,12 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .msg-user .msg-text { background: linear-gradient(145deg, var(--gold-bright), var(--gold)); color: var(--cinnabar-deep); border-bottom-right-radius: 1px; font-weight: 500; }
 .msg-assistant .msg-text { background: rgba(212, 175, 55, 0.06); border: 1px solid rgba(212, 175, 55, 0.16); border-bottom-left-radius: 1px; color: var(--silk-dim); }
 .msg-text.streaming { color: var(--silk-muted); font-style: italic; }
+/* [loop 943] markdown render trong câu trả lời AI */
+.msg-text strong { color: var(--gold-pale, #f7eccb); font-weight: 700; }
+.msg-text .md-h { display: block; font-size: 1.02em; margin-top: 8px; padding-bottom: 2px; border-bottom: 1px solid rgba(212,175,55,0.18); }
+.msg-text .md-h2 { font-size: 1.08em; }
+.msg-text code { background: rgba(212,175,55,0.1); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+.msg-text em { color: var(--silk-dim, #d8cba8); }
 
 /* [loop 928] follow-up suggestion chips — cảm giác ông thầy tư vấn */
 .msg-followups { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 14px 4px; }

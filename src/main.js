@@ -3254,6 +3254,17 @@ function renderRemedy(R) {
 }
 
 // ---------------------------------------------------------------- CHAT AI  (XSS-safe: textContent)
+// [loop 943] MARKDOWN render cho câu trả lời AI — trước đây textContent hiện **bold** literal.
+//   Escape HTML TRƯỚC (safety: nội dung AI có thể chứa < >) rồi mới áp markdown → không XSS.
+function _md(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')                        // **bold**
+    .replace(/(^|[^*`])\*([^*\n`]+)\*/g, '$1<em>$2</em>')                       // *italic*
+    .replace(/`([^`]+)`/g, '<code>$1</code>')                                   // `code`
+    .replace(/^###\s+(.+)$/gm, '<strong class="md-h">$1</strong>')             // ### heading
+    .replace(/^##\s+(.+)$/gm, '<strong class="md-h md-h2">$1</strong>');        // ## heading
+}
 function appendMsg(role, text) {
   const wrap = document.createElement('div');
   wrap.className = `msg msg-${role}`;
@@ -3262,7 +3273,7 @@ function appendMsg(role, text) {
   badge.textContent = role === 'user' ? 'Bạn' : 'Trợ lý';
   const body = document.createElement('div');
   body.className = 'msg-text';
-  body.textContent = text;
+  if (role === 'assistant') body.innerHTML = _md(text); else body.textContent = text;
   wrap.appendChild(badge); wrap.appendChild(body);
   $('chat-log').appendChild(wrap);
   $('chat-log').scrollTop = $('chat-log').scrollHeight;
@@ -3317,7 +3328,7 @@ async function handleAsk() {
       onStatus: (s) => { lastStatus = s; body.textContent = s + ' …'; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
       onToken: (_delta, full) => { body.textContent = full; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
     });
-    body.textContent = text;
+    body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? 'Trợ lý AI' : 'Trợ lý (cục bộ)';
     // [loop 933] message actions: 🔊 Đọc to (TTS) + 📋 Sao chép — cặp với voice input (loop 931)
