@@ -3779,6 +3779,15 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_diff === 0, `[loop 811] full-pipeline deterministic (11 field, ${_diff} non-det)`);
   console.log('   [loop 811] full-pipeline determinism (11/11 field stable) ✓');
 }
+// [loop 812] «có gì đặc biệt» → isOverview (broad multi-layer) thay isInteraction.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(composeAnswer('mệnh tôi có gì đặc biệt?', _QR).title.includes('toàn diện') || composeAnswer('mệnh tôi có gì đặc biệt?', _QR).title.includes('tổng quan'), '[loop 812] «có gì đặc biệt» → overview (5-layer, không chỉ interactions)');
+  // regression: «xung hình hại»/«tương tác» vẫn → interactions
+  assert(composeAnswer('xung hình hại của tôi?', _QR).title.includes('Tương tác'), '[loop 812] regression: «xung hình hại» → interactions');
+  assert(composeAnswer('tương tác tứ trụ của tôi?', _QR).title.includes('Tương tác'), '[loop 812] regression: «tương tác» → interactions');
+  console.log('   [loop 812] «có gì đặc biệt»→overview (broad), «xung/hình»→interactions (specific) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

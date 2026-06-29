@@ -132,7 +132,9 @@ export function detectIntent(question) {
   const isRemedyStrong = /\b(giai han|hoa giai|giai xui|cai menh|cai van|doi van|khai van|bot xui|giam xui|cuu menh|cuu|bo tui|giam tui)\b/.test(norm);
   // [loop 757] isInteraction — hỏi về tương tác tứ trụ (刑冲害合/xung khắc/mâu thuẫn).
   //   Trước đây NLG offline KHÔNG surface interaction data (elevation 746-752 chỉ giúp AI brief).
-  const isInteraction = /\b(xung hinh hai|xung hinh|xung khac|mau thuan|tuong tac|tu tru|tuong han|xung\.?hinh|xung khat|co gi dac biet|gi day|phuc ngam|phan ngam|phucam)\b/.test(norm)
+  // [loop 812] «có gì đặc biệt/gì đây» chuyển sang isOverview (broad → multi-layer snapshot,
+  //   không chỉ interactions). pInteraction giữ xung/hình/hại/tương tác specific.
+  const isInteraction = /\b(xung hinh hai|xung hinh|xung khac|mau thuan|tuong tac|tu tru|tuong han|xung\.?hinh|xung khat|phuc ngam|phan ngam|phucam)\b/.test(norm)
     || (/\b(xung|hinh|hai)\b/.test(norm) && /\b(gi|nao|co khong|the nao|ra sao)\b/.test(norm))
     || /伏吟|反吟/.test(question);
   // [loop 758] isShensha — hỏi về thần煞/sao (quý nhân/đào hoa/dịch mã/văn xương...).
@@ -155,7 +157,7 @@ export function detectIntent(question) {
   // [loop 781] isQiFlow — hỏi về khí thông trụ / 盖头截脚 (can-chi khắc trong cùng trụ).
   const isQiFlow = /\b(khi thong|khi luu|cai dau|tiet cuoc|gai dau|khi chay|thong tru)\b/.test(norm) || /盖头|截脚/.test(question);
   // [loop 808] isOverview — «phân tích toàn diện / luận sâu / tổng quan» → multi-layer snapshot.
-  const isOverview = /\b(phan tich toan dien|toan dien|luan sau|tong quan|danh gia menh|xem toan dien|tom tat menh|ban menh toi sao|menh toi nhu the nao)\b/.test(norm);
+  const isOverview = /\b(phan tich toan dien|toan dien|luan sau|tong quan|danh gia menh|xem toan dien|tom tat menh|ban menh toi sao|menh toi nhu the nao|co gi dac biet|gi day)\b/.test(norm);
   // [loop 760] isTiaohou — hỏi về điều hậu (khí hậu mùa sinh → hành cần bổ).
   const isTiaohou = /\b(dieu hau|hau cua|khi hau|mua sinh|co phap|khong thong bao|ngoai hop|van han|khan|tao|ret|am|nhiet)\b/.test(norm)
     && /\b(dieu hau|khi hau|hau|co phap)\b/.test(norm);
