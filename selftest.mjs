@@ -3971,6 +3971,14 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_a === _b && _b === _c, `[loop 830] same 时辰 (丑 1:00/1:15/1:59) → identical chart (${_a} vs ${_b} vs ${_c})`);
   console.log('   [loop 830] same 时辰 stability (1:00/1:15/1:59 → identical chart) ✓');
 }
+// [loop 831] 时辰 transition — 2:59(丑) → 3:00(寅) time pillar ĐỔI đúng.
+{
+  const _z = (h, mi) => analyze(1993, 10, 21, h, mi, 'nam', 2026).chart.pillars.time.zhi;
+  assert(_z(2, 59) !== _z(3, 0), `[loop 831] 2:59(${_z(2, 59)}) → 3:00(${_z(3, 0)}) đổi time pillar`);
+  assert(_z(0, 59) !== _z(1, 0), `[loop 831] 0:59(${_z(0, 59)}) → 1:00(${_z(1, 0)}) đổi`);
+  assert(_z(22, 59) !== _z(23, 0), `[loop 831] 22:59(${_z(22, 59)}) → 23:00(${_z(23, 0)}) đổi`);
+  console.log('   [loop 831] 时辰 transition (2:59→3:00, 0:59→1:00, 22:59→23:00 đổi đúng) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
