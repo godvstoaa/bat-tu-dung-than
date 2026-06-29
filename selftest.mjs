@@ -3249,6 +3249,20 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('sức khoẻ tôi sao?', _QR).title.includes('Sức khỏe'), '[loop 768] regression: «sức khoẻ» vẫn → health');
   console.log('   [loop 768] 3 misroute fix (mua được nhà/thờ thần/quẻ hôm nay) + regression ✓');
 }
+// [loop 769] routing edge-case robustness — câu ngắn + multi-domain route hợp lý.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // câu ngắn 1 từ vẫn route đúng area
+  assert(composeAnswer('tài sao?', _QR).title.includes('Tài lộc'), '[loop 769] «tài sao?» → wealth');
+  assert(composeAnswer('duyên?', _QR).title.includes('Tình duyên'), '[loop 769] «duyên?» → love');
+  // negative+timing: «không nên làm gì năm nay» → timing (không bị remedy nuốt)
+  assert(composeAnswer('không nên làm gì năm nay?', _QR).title.includes('Vận hạn'), '[loop 769] «không nên làm gì năm nay» → timing');
+  // yesno+timing: «có nên đầu tư năm 2027» → timing
+  assert(composeAnswer('có nên đầu tư năm 2027?', _QR).title.includes('Vận hạn'), '[loop 769] «có nên đầu tư năm 2027» → timing');
+  // family+health: «bố mẹ tôi khỏe» → family (ưu tiên family)
+  assert(composeAnswer('bố mẹ tôi khỏe không?', _QR).title.includes('Người thân') || composeAnswer('bố mẹ tôi khỏe không?', _QR).title.includes('Gia đình'), '[loop 769] «bố mẹ khỏe» → family (trước health)');
+  console.log('   [loop 769] routing edge-case (câu ngắn/negative/yesno/family+health) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
