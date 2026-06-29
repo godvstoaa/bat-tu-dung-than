@@ -1247,20 +1247,28 @@ QUY TẮC SUY: theo thứ tự thời gian, MỞ = bản chất mệnh, GIỮA =
 DÁM KẾT LUẬN, KHÔNG nói "tùy", KHÔNG liệt kê số liệu rời rạc, KHÔNG "tôi không chắc". Đây là getTotal picture — synopsis cả đời.`;
 
 // [loop 928] FOLLOW-UP SUGGESTIONS — gợi ý câu hỏi kế tiếp theo ngữ cảnh (ông thầy tư vấn).
-//   Sau mỗi câu trả lời, app hiện 3 chip gợi ý hướng đào sâu — dựa vào intent câu vừa hỏi.
-//   Pure function, không cần R (chỉ cần question) → test được.
-export function suggestFollowups(question) {
+//   [loop 940] chart-aware: cá nhân hoá theo Dụng Thần + đại vận tới (R tuỳ chọn).
+export function suggestFollowups(question, R) {
   const norm = String(question || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
   const has = (re) => re.test(norm);
-  // [loop 928 fix] check DOMAIN keywords BEFORE thời gian («năm nay» sẽ ăn câu «tài lộc năm nay»
-  //   nếu để trước → fix: tài/sức khoẻ/nghề/hôn nhân kiểm trước, «năm nay/lưu niên» làm fallback thời gian)
-  if (has(/dung than|yong/)) return ['Đại vận nào mang Dụng Thần tới (đỉnh đời)?', 'Năm nay có gặp Dụng không?', 'Nghề/phương hướng hợp Dụng Thần?'];
-  if (has(/dai van|dayun/)) return ['Lưu niên nào đỉnh trong đại vận này?', 'Đại vận sắp tới tốt hay xấu?', 'Khi nào chuyển vận (giao đại vận)?'];
+  const _wxVi = { '木': 'Mộc', '火': 'Hỏa', '土': 'Thổ', '金': 'Kim', '水': 'Thủy' };
+  const _dung = R && R.yong && R.yong.primary ? (_wxVi[R.yong.primary] || R.yong.primary) : null;
+  let _dy = null;
+  try {
+    if (R && R.dayun && R.dayun.length && R.chart && R.chart.input && R.chart.input.year) {
+      const _age = new Date().getFullYear() - R.chart.input.year;
+      _dy = R.dayun.find((d) => d.startAge >= _age) || R.dayun[R.dayun.length - 1];
+    }
+  } catch (_) {}
+  const _dyTxt = _dy ? `${_dy.ganZhi}${_dy.rating ? ' (' + _dy.rating + ')' : ''}` : null;
+  // [loop 928 fix] check DOMAIN keywords BEFORE thời gian
+  if (has(/dung than|yong/)) return [_dyTxt ? `Đại vận ${_dyTxt} có mang Dụng không?` : 'Đại vận nào mang Dụng Thần tới?', 'Năm nay có gặp Dụng không?', _dung ? `Nghề/phương hướng hợp Dụng ${_dung}?` : 'Nghề/phương hướng hợp Dụng?'];
+  if (has(/dai van|dayun/)) return [_dyTxt ? `Đại vận ${_dyTxt} tốt hay xấu (chi tiết)?` : 'Đại vận sắp tới tốt hay xấu?', 'Lưu niên nào đỉnh trong đại vận này?', 'Khi nào chuyển vận (giao đại vận)?'];
   if (has(/hon nhan|tinh duyen|vo|chong|dao hoa|cuoi|doi tac|hợp hôn/)) return ['Năm nào nên cưới/thành hôn?', 'Tuổi nào hợp tôi (hợp hôn)?', 'Đào hoa tới khi nào?'];
-  if (has(/tai kh|tai loc|tien|kinh doanh|tài lộc|wealth/)) return ['Tài khố tôi có giữ được tiền không?', 'Đại vận nào phát tài?', 'Nghề kiếm tiền hợp mệnh?'];
-  if (has(/nghe|con duong|cong viec|career/)) return ['Nghề nào hợp Dụng Thần tôi?', 'Khi nào sự nghiệp bứt phá?', 'Đại vận thuận nghề nào?'];
-  if (has(/suc khoe|benh|health|bệnh/)) return ['Cẩn thận bệnh gì theo mệnh?', 'Năm/đại vận nào yếu sức?', 'Cách bồi bổ theo Dụng?'];
-  if (has(/phong thuy|huong|feng shui/)) return ['Hướng nhà/hướng bàn làm việc hợp?', 'Màu sắc may mắn của tôi?', 'Vật phẩm phong thủy bổ Dụng?'];
+  if (has(/tai kh|tai loc|tien|kinh doanh|tài lộc|wealth/)) return ['Tài khố tôi có giữ được tiền không?', _dyTxt ? `Đại vận ${_dyTxt} phát tài không?` : 'Đại vận nào phát tài?', 'Nghề kiếm tiền hợp mệnh?'];
+  if (has(/nghe|con duong|cong viec|career/)) return [_dung ? `Nghề nào hợp Dụng ${_dung}?` : 'Nghề nào hợp Dụng Thần tôi?', 'Khi nào sự nghiệp bứt phá?', _dyTxt ? `Đại vận ${_dyTxt} thuận nghề?` : 'Đại vận thuận nghề nào?'];
+  if (has(/suc khoe|benh|health|bệnh/)) return ['Cẩn thận bệnh gì theo mệnh?', 'Năm/đại vận nào yếu sức?', _dung ? `Cách bồi bổ theo Dụng ${_dung}?` : 'Cách bồi bổ theo Dụng?'];
+  if (has(/phong thuy|huong|feng shui/)) return ['Hướng nhà/hướng bàn làm việc hợp?', _dung ? `Màu sắc may mắn (Dụng ${_dung})?` : 'Màu sắc may mắn của tôi?', 'Vật phẩm phong thủy bổ Dụng?'];
   if (has(/tong|quy dao|doi toi|cuoc doi|overview|synthesis|chot/)) return ['Đỉnh cao đời tôi lúc nào?', 'Cẩn thận năm nào nhất?', 'Lời khuyên hành động cho tôi?'];
   if (has(/luu nien|nam nay|2026|2027|2028/)) return ['Tháng nào trong năm tốt nhất?', 'Năm này cẩn thận điều gì?', 'Đại vận đang hành có thuận không?'];
   // default — khám phá lá số

@@ -3351,7 +3351,7 @@ async function handleAsk() {
     } catch (_) {}
     // [loop 928] gợi ý câu hỏi kế tiếp theo ngữ cảnh (cảm giác ông thầy tư vấn)
     try {
-      const _fups = suggestFollowups(q);
+      const _fups = suggestFollowups(q, currentResult);
       if (_fups && _fups.length) {
         const fc = document.createElement('div');
         fc.className = 'msg-followups';

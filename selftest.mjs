@@ -8012,6 +8012,15 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     if (!_ok || (_q && !_re.test(_s.join(' ')))) { _bad++; assert(false, `[loop 928] suggestFollowups(«${_q}»): ra ${JSON.stringify(_s).slice(0, 60)}`); }
   }
   if (_bad === 0) console.log(`   [loop 928] FOLLOWUPS ✓ — gợi ý theo intent (Dụng/Đại vận/Hôn nhân/Tài/Tổng quan/default) ra 3-4 chip đúng ngữ cảnh`);
+  // [loop 940] chart-aware personalization — với R, chip Dụng nhắc đúng Dụng + đại vận thật
+  const _R940 = analyze(1990, 5, 15, 8, 30, 'nam'); // Dụng Thủy (Canh Kim, điều hậu)
+  const _dy940 = _R940.dayun.find((d) => d.startAge >= (new Date().getFullYear() - 1990));
+  const _sfDung = _sf('Dụng thần của tôi?', _R940);
+  assert(_sfDung.some((s) => s.includes('Thủy')), `[loop 940] chart-aware: chip Dụng nhắc Dụng Thủy (got ${JSON.stringify(_sfDung).slice(0, 60)})`);
+  if (_dy940) assert(_sfDung.some((s) => s.includes(_dy940.ganZhi)), `[loop 940] chart-aware: chip Dụng nhắc đại vận thật ${_dy940.ganZhi}`);
+  const _sfDy = _sf('Đại vận sắp tới thế nào?', _R940);
+  if (_dy940) assert(_sfDy[0].includes(_dy940.ganZhi), `[loop 940] chart-aware: chip Đại vận nhắc ${_dy940.ganZhi}`);
+  console.log(`   [loop 940] FOLLOWUPS chart-aware ✓ — cá nhân hoá theo Dụng Thủy + đại vận ${_dy940 ? _dy940.ganZhi : '?'}`);
 }
 
 // [loop 703] BUILD CHECK — selftest phải verify build thành công (tránh loop 697-699 bug lặp)
