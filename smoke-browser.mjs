@@ -8,9 +8,11 @@
 // Run: node smoke-browser.mjs   (needs: npm i playwright + npx playwright install chromium)
 // Optional dev: node smoke-browser.mjs http://localhost:5173
 // Deep AI check (slow/variable): node smoke-browser.mjs --ai
+// Multi-birth render sweep: node smoke-browser.mjs --sweep
 import { chromium } from 'playwright';
 
-const URL = process.argv[2] || 'https://battu.god8.shop/';
+const _urlArg = process.argv.slice(2).find((a) => !a.startsWith('--'));
+const URL = _urlArg || 'https://battu.god8.shop/';
 const pageErrors = [], consoleErrors = [];
 let browser;
 try { browser = await chromium.launch({ headless: true }); }
@@ -29,6 +31,30 @@ try {
   const hasForm = !!(await page.$('input[type="date"]'));
   const hasAsk = !!(await page.$('#ask-btn'));
   console.log(`  app shell: date-input=${hasForm} ask-btn=${hasAsk}`);
+
+  // [loop 934] --sweep: render DIVERSE births (leap day, year boundary, old/recent, năm cuối)
+  //   và bắt lỗi render mà smoke 1-birth (1990) không thấy — render bug cho 1 birth cụ thể.
+  if (process.argv.includes('--sweep')) {
+    const births = ['1990-05-15|08:30', '1985-11-03|14:00', '2000-02-29|00:00', '1950-01-01|23:59', '2010-06-15|12:00', '1995-12-31|06:30'];
+    let okN = 0;
+    for (const b of births) {
+      const [d, t] = b.split('|');
+      pageErrors.length = 0;
+      await page.fill('input[type="date"]', d).catch(() => {});
+      await page.fill('input[type="time"]', t).catch(() => {});
+      const lb = await page.$('button:has-text("Luận"), #analyze-btn, .btn-primary');
+      if (lb) await lb.click();
+      await page.waitForTimeout(3000);
+      const txt = await page.textContent('body').catch(() => '');
+      const rendered = /TỨ TRỤ|四柱|Dụng|Nhật Chủ|Đại vận/.test(txt);
+      console.log(`  ${d} ${t}: ${rendered ? '✓ rendered' : '✗ no chart'}${pageErrors.length ? ' ❌ ' + pageErrors.length + ' errors' : ''}`);
+      if (rendered && !pageErrors.length) okN++; else exit = 1;
+      pageErrors.slice(0, 2).forEach((e) => console.log('     ❌', e.slice(0, 120)));
+    }
+    console.log(`\nSWEEP: ${okN}/${births.length} births render clean\nPAGE ERRORS: ${pageErrors.length}`);
+    console.log(okN === births.length ? '✓ SWEEP PASSED' : '✗ SWEEP FAILED');
+    await browser.close(); process.exit(exit);
+  }
 
   // 2. Render a chart (birth → Luận giải)
   await page.fill('input[type="date"]', '1990-05-15').catch(() => {});
