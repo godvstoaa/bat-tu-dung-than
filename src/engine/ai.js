@@ -1198,6 +1198,55 @@ export function _selectRelevantSections(sections, question) {
   return { text, totalLength: text.length, sectionCount: sorted.length };
 }
 
+// [loop 921] ADAPTIVE QUERY ROUTER — nhận diện câu hỏi TỔNG HỢP (cần bức tranh toàn cảnh)
+//   thay vì lát cắt. RAG là kiến trúc LỌC → làm HỎNG tổng hợp (cắt mất ngữ cảnh).
+//   Câu tổng hợp phải gửi FULL brief + prompt khung 体用应期 (thể→dụng→ứng kỳ).
+export function _isSynthesisQuestion(question) {
+  const q = (question || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').trim();
+  if (!q) return false;
+  const SYN = [
+    //.request "chốt lại / tóm lại / đúc kết" toàn bộ
+    /chot lai|tom lai|tom tat|tong (quan|hop)|toan canh|duc ket|dai cuong|khai quat/,
+    //.quỹ đạo / đời / câu chuyện
+    /quy (dao|tich)|doi (toi|nay|ca)|cuoc doi|cau chuyen|ke lai (tu|cuoc)|dan dat/,
+    //."nhìn thế ai hiểu / tổng tất cả phương pháp"
+    /ai ma hieu|hieu duoc|nhin nhu|nhin the|tat ca.*(phuong phap|lai)|the nao (het|ca)/,
+    //.bản chất mệnh / tôi là người thế nào
+    /ban chat.*(menh|toi)|menh (toi|nay) la|toi la nguoi|loai nguoi/,
+    //.English
+    /summar|overview|overall|big picture|life trajector|story of.*(life|my)|whole picture|boil down|bottom line|connect the dots|what does it (all )?mean/,
+  ];
+  if (SYN.some((re) => re.test(q))) return true;
+  // câu mở rất chung: "mệnh/lá số này (nói) thế nào / ra sao / luận giúp"
+  if (/^(menh|la so|bai tu|tu vi).*(the nao|ra sao|luan g[ii]up)/.test(q)) return true;
+  // "luận/xem/phân tích cho tôi cả... / hết... / nhiều năm" (rộng)
+  if (/(luan|xem|noi|phan tich).*(cho|giup).*toi.*(ca|het|nhieu nam|ca doi)/.test(q)) return true;
+  return false;
+}
+
+// [loop 921] KHUNG TƯ DUY ÔNG THẦY — 体→用→应期 (chuỗi nhân quả cổ pháp)
+// Bắt AI tổng hợp theo trục thời gian như một thầy thực chiến, KHÔNG liệt kê số liệu rời.
+export const MASTER_SYNTHESIS_GUIDE = `== YÊU CẦU ĐẶC BIỆT: TỔNG HỢP QUỸ ĐẠO ĐỜI (KHÔNG lọc, KHÔNG gọi tool) ==
+Đây là câu hỏi TỔNG HỢP — user muốn BỨC TRANH TOÀN CẢNH của cả cuộc đời, không phải 1 lát cắt.
+Luận theo CHUỖI NHÂN QUẢ cổ pháp 体→用→应期, nói THẲNG, DẪN DẮT như ông thầy giảng cho người không rành:
+
+① THỂ (体) — BẢN CHẤT MỆNH (mở đầu 1-2 câu chốt, chạm đúng "cốt"):
+   Đọc Nhật Chủ + vượng/suy + Cách cục (thường hay đặc biệt 从/专) + Dụng Thần (hành gì, VÌ SAO — Phù Ức/调候/通关/病药).
+   → kết: "Mệnh là loại người X, cốt ở hành Y, vì Z."
+
+② DỤNG (用) — XU HƯỚNG 10 NĂM / ĐẠI VẬN (chia đời thành giai đoạn):
+   Đọc DANH SÁCH đại vận. Mỗi mảng mang Dụng/Hỷ = ⬆️ THĂNG; mang Kỵ/Thù = ⬇️ TRẦM; trung tính = ➡️.
+   → Chia: tuổi nhỏ → thanh niên → trung niên → vãn niên; mảng nào tốt-xấu-bình.
+
+③ ỨNG KỲ (应期) — MỐC THỜI GIAN CỤ THỂ (ghi NĂM):
+   Lưu niên nổi bật: mang Dụng/Hỷ → ĐỈNH cơ hội (ghi năm); mang Kỵ/Thù → năm CẨN THẬN (ghi năm).
+
+④ ĐÚC KẾT — 1 câu chuyện đời mạch lạc (trục thời gian) + 3 lời khuyên HÀNH ĐỘNG theo Dụng Thần (màu/phương/ngành/đối tác/thời điểm).
+
+QUY TẮC SUY: theo thứ tự thời gian, MỞ = bản chất mệnh, GIỮA = thăng trầm theo đại vận, CUỐI = mốc thời gian + khuyên.
+DÁM KẾT LUẬN, KHÔNG nói "tùy", KHÔNG liệt kê số liệu rời rạc, KHÔNG "tôi không chắc". Đây là getTotal picture — synopsis cả đời.`;
+
+
 // ===========================================================================
 //  4. AGENTIC ASK — streaming + tools + thinking + memory (Z.ai spec)
 //  - history: [{role:'user'|'assistant', content}] bộ nhớ hội thoại
@@ -1221,15 +1270,24 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history } = {
   const _fullBrief = (_briefCache && _briefCache.key === _ck) ? _briefCache.brief : (_briefCache = { key: _ck, brief: buildChartBrief(R) }).brief;
 
   // [loop 919] SECTION RAG — chia brief thành sections, gửi chỉ phần liên quan
+  // [loop 921] ADAPTIVE ROUTING — câu TỔNG HỢP bypass RAG (RAG lọc → mất bức tranh toàn cảnh),
+  //   gửi FULL brief + khung 体用应期; câu HẸP → Section RAG (gửi subset liên quan).
+  const _isSynthesis = _isSynthesisQuestion(question);
   const _ragSections = _splitBrief(_fullBrief);
   const _relevantSections = _selectRelevantSections(_ragSections, question);
-  const brief = _relevantSections.totalLength < _fullBrief.length * 0.6
-    ? _relevantSections.text
-    : _fullBrief; // nếu >60% liên quan → gửi full (không có lợi cắt)
+  const brief = _isSynthesis
+    ? _fullBrief
+    : (_relevantSections.totalLength < _fullBrief.length * 0.6
+        ? _relevantSections.text
+        : _fullBrief); // nếu >60% liên quan → gửi full (không có lợi cắt)
+  // [loop 921] guide theo loại câu: tổng hợp → khung ông thầy 体用应期; hẹp → luật tool đơn giản
+  const _guide = _isSynthesis
+    ? MASTER_SYNTHESIS_GUIDE
+    : '== HƯỚNG DẪN TRẢ LỜI ==\nQUAN TRỌNG: Thông tin lá số ĐÃ CÓ ĐỦ trong context trên. Khi user hỏi về Nhật Chủ, Dụng Thần, Cách Cục, Đại Vận, Lưu Niên, Thập Thần, Ngũ Hành, Tương Tác, Thần Sát, Nạp Âm, Mệnh Cung, Tài Khố... → TRẢ LỜI TRỰC TIẾP từ context, KHÔNG gọi tool. CHỈ gọi tool khi: (1) hỏi NGÀY CỤ THỂ tốt/xấu → find_good_days/best_days_in_year; (2) hỏi VỀ 1 NĂM cụ thể → analyze_year; (3) bói quẻ (梅花/六壬/奇门) → tool tương ứng; (4) hỏi người thân → analyze_relative; (5) hướng/phong thủy → fengshui_direction; (6) giờ tốt hôm nay → analyze_best_hour.';
 
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'system', content: brief + '\n\n== HƯỚNG DẪN TRẢ LỜI ==\nQUAN TRỌNG: Thông tin lá số ĐÃ CÓ ĐỦ trong context trên. Khi user hỏi về Nhật Chủ, Dụng Thần, Cách Cục, Đại Vận, Lưu Niên, Thập Thần, Ngũ Hành, Tương Tác, Thần Sát, Nạp Âm, Mệnh Cung, Tài Khố... → TRẢ LỜI TRỰC TIẾP từ context, KHÔNG gọi tool. CHỈ gọi tool khi: (1) hỏi NGÀY CỤ THỂ tốt/xấu → find_good_days/best_days_in_year; (2) hỏi VỀ 1 NĂM cụ thể → analyze_year; (3) bói quẻ (梅花/六壬/奇门) → tool tương ứng; (4) hỏi người thân → analyze_relative; (5) hướng/phong thủy → fengshui_direction; (6) giờ tốt hôm nay → analyze_best_hour.' },
+    { role: 'system', content: brief + '\n\n' + _guide },
     ...((history || []).slice(-8)),
     { role: 'user', content: question },
   ];
