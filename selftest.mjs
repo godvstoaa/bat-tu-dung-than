@@ -7886,6 +7886,61 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   assert(/化忌.*贪狼|贪狼.*化忌/.test(brief), `[loop 688] 癸 year → 贪狼化忌`);
   console.log(`   四化 SIHUA surfaced ✓ — 破军禄 + 贪狼忌 trong brief`);
 }
+// ################## FUZZ INVARIANTS [loop 924] — regression guard ##################
+// Chạy ~108 lá số, assert INVARIANT về yong-consistency / timing / interactions không vi phạm.
+// Khóa chặt fix loop 923 (yong) + xác nhận timing (đại vận/lưu niên) + interactions canonical.
+// Bắt regression mà ĐỌC CODE không thấy — chính phương pháp tìm ra 2 bug thật ở loop 923.
+{
+  const _GANS = '甲乙丙丁戊己庚辛壬癸'.split(''), _ZHI = '子丑寅卯辰巳午未申酉戌亥'.split('');
+  const _SX60 = []; for (let i = 0; i < 60; i++) { _SX60.push(_GANS[i % 10] + _ZHI[i % 12]) }
+  const _gi = (gz) => _SX60.indexOf(gz);
+  const _yearGZ = (y) => _GANS[((y - 1984) % 10 + 10) % 10] + _ZHI[((y - 1984) % 12 + 12) % 12];
+  const _br = (s) => [...(s || '')].filter((c) => '子丑寅卯辰巳午未申酉戌亥'.includes(c)).sort().join('');
+  const _gs = (s) => [...(s || '')].filter((c) => '甲乙丙丁戊己庚辛壬癸'.includes(c)).sort().join(''); // can (天干) cho ganHe
+  const _SET = (arr) => new Set(arr.map((s) => [...s].sort().join('')));
+  const _CHONG = _SET(['子午', '丑未', '寅申', '卯酉', '辰戌', '巳亥']);
+  const _HAI = _SET(['子未', '丑午', '寅巳', '卯辰', '申亥', '酉戌']);
+  const _ZHIHE = _SET(['子丑', '寅亥', '卯戌', '辰酉', '巳申', '午未']);
+  const _GANHE = _SET(['甲己', '乙庚', '丙辛', '丁壬', '戊癸']);
+  const _XING2 = _SET(['寅巳', '寅申', '巳申', '丑戌', '丑未', '戌未', '子卯']);
+  const _XING_SELF = _SET(['辰辰', '午午', '酉酉', '亥亥']);
+  const _XING3 = new Set(['寅巳申', '丑戌未']);
+  const _SANHE = [['申', '子', '辰'], ['巳', '酉', '丑'], ['寅', '午', '戌'], ['亥', '卯', '未']];
+  let _viol = 0, _charts = 0, _crash = 0;
+  let _seed = 924; const _rng = () => (_seed = (_seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  const _bad = (tag, msg) => { _viol++; assert(false, `[loop 924] fuzz ${tag}: ${msg}`); };
+  for (let _y = 1955; _y <= 2008; _y += 6) for (const _g of ['nam', 'nữ']) for (let _i = 0; _i < 6; _i++) {
+    const _m = 1 + Math.floor(_rng() * 12), _d = 1 + Math.floor(_rng() * 28), _h = Math.floor(_rng() * 24);
+    let _R; try { _R = analyze(_y, _m, _d, _h, 0, _g); _charts++; } catch (e) { _crash++; continue; }
+    const _tag = `${_y}-${_m}-${_d} ${_h}h ${_g}`, _yo = _R.yong, _I = _R.interactions || {};
+    // [loop 923] yong consistency
+    if (_yo.avoid.includes(_yo.primary)) _bad(_tag, 'Dụng∈avoid');
+    if (_yo.xi && _yo.avoid.includes(_yo.xi)) _bad(_tag, 'Hỷ∈avoid');
+    if (_yo.secondary && _yo.avoid.includes(_yo.secondary) && _yo.secondary !== _yo.ji && _yo.secondary !== _yo.chou) _bad(_tag, `secondary(${_yo.secondary}) beneficial∈avoid — loop 923 fix regressed?`);
+    if (_yo.tiaohou?.override && (_yo.reasons || []).some((r) => /^Kỵ/.test(r) && (r.includes(`(${_yo.primary})`) || r.includes(`(${_yo.xi})`)))) _bad(_tag, 'stale Kỵ reason nhắc primary/Hỷ mới');
+    // timing: 大运 ±1 sequence + lưu niên ganZhi = canonical year
+    const _dy = _R.dayun || [];
+    for (let _j = 1; _j < _dy.length; _j++) {
+      const _a = _gi(_dy[_j - 1].ganZhi), _b = _gi(_dy[_j].ganZhi);
+      if (_a < 0 || _b < 0) { _bad(_tag, `đại vận ganZhi sai (${_dy[_j].ganZhi})`); break; }
+      const _df = ((_b - _a) % 60 + 60) % 60;
+      if (_df !== 1 && _df !== 59) { _bad(_tag, `đại vận seq jump ${_dy[_j - 1].ganZhi}→${_dy[_j].ganZhi}`); break; }
+    }
+    for (const _l of (_R.liunian || [])) if (_l.ganZhi !== _yearGZ(_l.year)) { _bad(_tag, `lưu niên ${_l.year} engine=${_l.ganZhi}≠canonical=${_yearGZ(_l.year)}`); break; }
+    // interactions canonical (mọi pair/group phát hiện phải là cổ pháp)
+    for (const _c of (_I.chong || [])) if (!_CHONG.has(_br(_c.a + _c.b))) _bad(_tag, `bad chong ${_c.a}-${_c.b}`);
+    for (const _c of (_I.hai || [])) if (!_HAI.has(_br(_c.a + _c.b))) _bad(_tag, `bad hai ${_c.a}-${_c.b}`);
+    for (const _c of (_I.zhiHe || [])) if (!_ZHIHE.has(_br(_c.a + _c.b))) _bad(_tag, `bad zhiHe ${_c.a}-${_c.b}`);
+    for (const _c of (_I.ganHe || [])) if (!_GANHE.has(_gs(_c.a + _c.b))) _bad(_tag, `bad ganHe ${_c.a}-${_c.b}`);
+    for (const _c of (_I.xing || [])) { const _g3 = _br(_c.a + _c.b); const _ok = (_g3.length === 3 && _XING3.has(_g3)) || (_g3.length === 2 && _XING2.has(_g3)) || _XING_SELF.has(_g3); if (!_ok) _bad(_tag, `bad xing ${_c.a}-${_c.b}`); }
+    for (const _c of (_I.sanHe || [])) { const _ps = (_c.present || [_c.a, _c.b, _c.c]).filter(Boolean); if (_ps.length >= 3 && !_SANHE.some((gr) => _ps.every((b) => gr.includes(b)))) _bad(_tag, `bad sanHe ${_ps.join('')}`); }
+    for (const _c of (_I.banHe || [])) { const _ps = (_c.present || [_c.a, _c.b]).filter(Boolean); if (_ps.length >= 2 && !_SANHE.some((gr) => _ps.every((b) => gr.includes(b)))) _bad(_tag, `bad banHe ${_ps.join('')}`); }
+  }
+  assert(_crash === 0, `[loop 924] fuzz: 0 crash qua ${_charts} lá số (got ${_crash})`);
+  if (_viol === 0) console.log(`   [loop 924] FUZZ INVARIANTS ✓ — ${_charts} lá số, 0 vi phạm yong/timing/interactions`);
+  else assert(false, `[loop 924] FUZZ INVARIANTS: ${_viol} vi phạm qua ${_charts} lá số`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
