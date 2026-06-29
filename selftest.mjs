@@ -4058,6 +4058,17 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /undefined|NaN/.test(p)), '[loop 879] không leak');
   console.log('   [loop 879] pTenGod thập thần bar chart — routing + bar + dominant ✓');
 }
+// [loop 883] pBestDays — top ngày tốt tháng + routing + leak check.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('tháng này ngày nào tốt?').isBestDays === true, '[loop 883] «ngày nào tốt」 → isBestDays');
+  assert(detectIntent('bao giờ giàu?').isBestDays === false, '[loop 883] «bao giờ」 ≠ isBestDays');
+  const _a = composeAnswer('ngày nào tốt tháng này?', _QR);
+  assert(/Chọn ngày tốt/.test(_a.title), `[loop 883] pBestDays route (got ${_a.title})`);
+  assert(_a.paragraphs.some((p) => /Đại cát|Cát/.test(p)), '[loop 883] surface top good days');
+  assert(!_a.paragraphs.some((p) => /undefined|NaN/.test(p)), '[loop 883] không leak');
+  console.log('   [loop 883] pBestDays top ngày tốt — routing + top days + no leak ✓');
+}
 // [loop 854] localStorage guard — ALL access wrapped in try/catch (incognito safe).
 {
   const { readFileSync: _rf } = await import('fs');
