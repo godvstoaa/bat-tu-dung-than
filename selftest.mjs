@@ -3835,6 +3835,15 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(/LỤC XUNG/.test(_bM), '[loop 817] Mỹ Anh brief có LỤC XUNG (có 巳亥 xung)');
   console.log('   [loop 817] brief conditional sections (LỤC XUNG khi có xung, vắng khi không) ✓');
 }
+// [loop 818] 进气退气 (dayun phase) có trong brief + shenJinTui export.
+{
+  const { buildChartBrief } = await import('./src/engine/ai.js');
+  const { shenJinTui } = await import('./src/engine/pillar-quality.js');
+  assert(typeof shenJinTui === 'function', '[loop 818] shenJinTui export (pillar-quality)');
+  const _b = buildChartBrief(analyze(1993, 10, 21, 1, 15, 'nam', 2026));
+  assert(/进气退气|进退气/.test(_b), '[loop 818] brief có 进气退气 (dayun phase context)');
+  console.log('   [loop 818] 进气退气 (dayun phase) trong brief + shenJinTui export ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
