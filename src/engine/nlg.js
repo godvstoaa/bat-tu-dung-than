@@ -155,6 +155,8 @@ export function detectIntent(question) {
   // [loop 878] isTenGod — «thập thần/tính cách sao» → bar chart 10 god.
   const isTenGod = /\b(thap than|thap than cua toi|sao nao manh|sao nao yeu|tinh cach sao|10 sao|thap than can bang)\b/.test(norm);
   const isNayin = !isWuXing && /\b(nap am|nayin|ban menh ngu hanh|menh ngu hanh|hanh cua toi)\b/.test(norm);
+  // [loop 882] isBestDays — «tháng này/tuần này ngày nào tốt» → top good days.
+  const isBestDays = /\b(ngay nao tot|ngay nao tot nhat|ngay tot thang nay|tuan nay ngay nao|chon ngay tot|ngay may tot|ngay cát)\b/.test(norm);
   // [loop 764] isMinggong — hỏi về mệnh cung / thân cung (ziwei-BaZi «trụ thứ 6»).
   const isMinggong = /\b(menh cung|cung menh|than cung|cung than|tru thu 6)\b/.test(norm);
   // [loop 779] isCaiKu — hỏi về tài khố / giữ tiền / kho tiền (wealth storage).
@@ -186,7 +188,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isShenshaStrong, isNayin, isWuXing, isTenGod, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, isOverview, confidence, raw: question };
+  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isShenshaStrong, isNayin, isWuXing, isTenGod, isBestDays, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, isOverview, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -654,6 +656,37 @@ function pDaily(R, intent) {
   paras.push(`💡 Mở tab «Hôm nay» hoặc AI để chi tiết giờ/phút, 选日 cho việc cụ thể (cưới/khai trương/động thổ).`);
   return { title: `Vận ${_dayLabel} (lưu nhật)`, lead: `Vận ${_dayLabel.toUpperCase()} của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
 }
+function pBestDays(R) {
+  // [loop 882] Top good/bad days in current month — offline date selection.
+  const dm = R.chart.dayMaster;
+  const userZhi = R.chart.pillars.year.zhi;
+  let y, mo;
+  try { const _n = new Date(); y = _n.getFullYear(); mo = _n.getMonth() + 1; } catch (e) { y = 2026; mo = 6; }
+  const _maxDay = new Date(y, mo, 0).getDate();
+  const results = [];
+  for (let d = 1; d <= _maxDay; d++) {
+    try {
+      const ev = evaluateDate(y, mo, d, 'marry', userZhi);
+      results.push({ d, officer: ev.officerVi, officerTone: ev.tone, rating: ev.rating, score: ev.score, ganZhi: ev.dayGanZhi, clashYou: ev.clashYou });
+    } catch (_) {}
+  }
+  results.sort((a, b) => b.score - a.score);
+  const top = results.slice(0, 5);
+  const worst = results.slice(-3).reverse();
+  const paras = [];
+  paras.push(`📅 **Tháng ${mo}/${y}** — top ngày tốt (dựa trực ${top[0]?.officer} + thái tuế + Dụng):`);
+  top.forEach((r, i) => {
+    const d = String(r.d).padStart(2, '0');
+    paras.push(`${i + 1}. **${d}/${mo}** (${r.ganZhi}, trực ${r.officer}) → ${r.rating} (${r.score}/100)${r.clashYou ? ' ⚠ xung tuổi' : ''}`);
+  });
+  paras.push(`⚠ Ngày KỴ:`);
+  worst.forEach((r) => {
+    const d = String(r.d).padStart(2, '0');
+    paras.push(`  ${d}/${mo} (${r.ganZhi}) → ${r.rating}${r.clashYou ? ' ⚠ xung tuổi' : ''}`);
+  });
+  paras.push(`💡 Đây là top ngày theo trực (建除) + xung tuổi. Cho việc cụ thể (cưới/khai trương/động thổ) → hỏi AI hoặc mở tab «择日» để chính xác hơn.`);
+  return { title: `Chọn ngày tốt tháng ${mo}/${y}`, lead: `Top ngày tốt tháng ${mo}/${y} cho ${dm.gan} ${dm.vi}:`, paragraphs: paras };
+}
 function pTenGod(R) {
   // [loop 878] Thập thần bar chart — 10 god personality visualization.
   const dm = R.chart.dayMaster;
@@ -1015,6 +1048,8 @@ export function composeAnswer(question, R) {
   if (intent.isWuXing && !_hasDomain) return pWuXing(R);
   // [loop 878] thập thần chart — bar chart 10 god personality.
   if (intent.isTenGod && !_hasDomain) return pTenGod(R);
+  // [loop 882] best days — UNGATED: «tháng này ngày nào tốt» = date selection, không timing.
+  if (intent.isBestDays && !intent.isFamily) return pBestDays(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family
