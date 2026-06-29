@@ -14,6 +14,7 @@ import { SHENSHA_INFO } from './shensha.js';
 import { analyzeNayin, NAYIN_MEANING } from './nayin.js';
 import { baziMingGong } from './bazi-minggong.js';
 import { analyzeCaiKu } from './caiku.js';
+import { pillarRelation } from './pillar-quality.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
@@ -131,7 +132,10 @@ export function detectIntent(question) {
   // [loop 764] isMinggong — hỏi về mệnh cung / thân cung (ziwei-BaZi «trụ thứ 6»).
   const isMinggong = /\b(menh cung|cung menh|than cung|cung than|tru thu 6)\b/.test(norm);
   // [loop 779] isCaiKu — hỏi về tài khố / giữ tiền / kho tiền (wealth storage).
-  const isCaiKu = /\b(tai kho|kho tien|giu tien|giu duoc tien|taikho|cai ku|财库)\b/.test(norm);
+  //   CJK (财库) test trên raw question KHÔNG \b (CJK không phải word-char → \b fail).
+  const isCaiKu = /\b(tai kho|kho tien|giu tien|giu duoc tien|taikho|cai ku)\b/.test(norm) || /财库/.test(question);
+  // [loop 781] isQiFlow — hỏi về khí thông trụ / 盖头截脚 (can-chi khắc trong cùng trụ).
+  const isQiFlow = /\b(khi thong|khi luu|cai dau|tiet cuoc|gai dau|khi chay|thong tru)\b/.test(norm) || /盖头|截脚/.test(question);
   // [loop 760] isTiaohou — hỏi về điều hậu (khí hậu mùa sinh → hành cần bổ).
   const isTiaohou = /\b(dieu hau|hau cua|khi hau|mua sinh|co phap|khong thong bao|ngoai hop|van han|khan|tao|ret|am|nhiet)\b/.test(norm)
     && /\b(dieu hau|khi hau|hau|co phap)\b/.test(norm);
@@ -150,7 +154,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, isPattern, isMinggong, isCaiKu, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -535,6 +539,32 @@ function pDivination(R, intent) {
   }
 }
 
+function pQiFlow(R) {
+  // [loop 781] Surface khí thông trụ / 盖头截脚 offline — pillarRelation per pillar.
+  const dm = R.chart.dayMaster;
+  const pillars = R.chart.pillars || {};
+  const LABEL = { year: 'Trụ Năm', month: 'Trụ Tháng', day: 'Trụ Ngày', time: 'Trụ Giờ' };
+  const lines = [];
+  let blocked = 0, total = 0;
+  for (const k of ['year', 'month', 'day', 'time']) {
+    const p = pillars[k];
+    if (!p) continue;
+    total++;
+    const r = pillarRelation(p);
+    const isBlock = r.flow < 0;
+    if (isBlock) blocked++;
+    lines.push(`${LABEL[k]} ${p.gan}${p.zhi}: ${r.vi}${isBlock ? ' ⚠KHÍ BỊ CẢN' : ' ✓thông'}`);
+  }
+  const pct = total ? Math.round(((total - blocked) / total) * 100) : 100;
+  return {
+    title: 'Khí thông trụ 盖头截脚',
+    lead: `Mỗi trụ can-chi có quan hệ ngũ hành — «盖头» (can khắc chi) / «截脚» (chi khắc can) = khí BỊ CẢN, sinh/比 hoà = thông:`,
+    paragraphs: lines.concat([
+      `📊 Khí thông: ${pct}% trụ (${total - blocked}/${total} thông). ${blocked >= 2 ? '⚠ Nhiều trụ bị 盖头/截脚 → khí KHÔNG THÔNG, đời nhiều trở ngại 反复周折 (滴天髓阐微).' : '✓ Khí tương đối thông — can-chi tương sinh, ít cản.'}`,
+      `💡 盖头 (can khắc chi): việc «bắt đầu đã hỏng»; 截脚 (chi khắc can): «nửa chừng vấp». NẾU Dụng thần nằm trụ bị 盖头/截脚 → Dụng bị tổn; NẾU Kỵ thần bị → ngược lại tốt (khắc được Kỵ). Mở AI để luân giải.`,
+    ]),
+  };
+}
 function pCaiKu(R) {
   // [loop 779] Surface tài khố offline — analyzeCaiKu (Tài/Quan/Ấn khố + giữ tiền).
   const dm = R.chart.dayMaster;
@@ -784,6 +814,8 @@ export function composeAnswer(question, R) {
   if (intent.isTiaohou && !_hasDomain) return pTiaohou(R);
   // [loop 764] minggong question — surface mệnh cung (offline, không cần AI)
   if (intent.isMinggong && !_hasDomain) return pMinggong(R);
+  // [loop 781] qi-flow question — surface 盖头截脚/khí thông (offline, không cần AI)
+  if (intent.isQiFlow && !_hasDomain) return pQiFlow(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family

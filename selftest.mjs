@@ -3413,6 +3413,19 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('kho tiền tôi có không?', _QR).title.includes('Tài khố'), '[loop 780] «kho tiền» → caiku');
   console.log('   [loop 780] isCaiKu routing — kiếm(wealth) vs giữ/kho(caiku) phân biệt đúng ✓');
 }
+// [loop 781] isQiFlow — offline 盖头截脚/khí thông surface (pillarRelation per pillar).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('盖头截脚 của tôi sao?').isQiFlow === true, '[loop 781] isQiFlow detect «盖头截脚»');
+  assert(detectIntent('khí thông trụ của tôi?').isQiFlow === true, '[loop 781] isQiFlow detect «khí thông»');
+  const _a = composeAnswer('盖头截脚 của tôi sao?', _QR);
+  assert(/Khí thông|盖头截脚/.test(_a.title), `[loop 781] qiflow route → title khí thông (got ${_a.title})`);
+  // Quân 壬戌 = 截脚 (戌土 khắc 壬水) → phải surface
+  assert(_a.paragraphs.some((p) => /壬戌|Tiệt Cước|截脚/.test(p)), '[loop 781] surface 壬戌 截脚 (Quân)');
+  assert(_a.paragraphs.some((p) => /% trụ|khí thông/i.test(p)), '[loop 781] surface % khí thông');
+  assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 781] không leak');
+  console.log('   [loop 781] offline 盖头截脚/khí thông surface (4 trụ + % thông) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
