@@ -805,9 +805,10 @@ export function composeAnswer(question, R) {
   //   isRemedyStrong/isCompat/isDivination.
   const _STRONG_DOMAIN = new Set(['wealth', 'career', 'love', 'health', 'timing', 'flow']);
   const _hasDomain = _STRONG_DOMAIN.has(intent.area) || intent.isFamily || intent.isFengshui || intent.isRemedyStrong || intent.isCompat || intent.isDivination;
-  // [loop 779] tài khố question — surface giữ-tiền/kho (offline) — UNGATED (câu hỏi cụ thể
-  //   về wealth-storage, thắng cả wealth domain).
-  if (intent.isCaiKu) return pCaiKu(R);
+  // [loop 779] tài khố question — surface giữ-tiền/kho (offline) — UNGATED cho wealth domain
+  //   nhưng [loop 793 FIX] gate !isFamily: «mẹ tôi giữ tiền» phải về pFamily (chart MẸ),
+  //   không phải pCaiKu(R=chủ thể Quân).
+  if (intent.isCaiKu && !intent.isFamily) return pCaiKu(R);
   // [loop 757] interaction question — surface 刑冲害合 typed meanings (offline, không cần AI)
   if (intent.isInteraction && !_hasDomain) return pInteractions(R);
   // [loop 761] pattern question — surface cách cục (offline, KHÔNG cần AI) — check TRƯỚC isShensha

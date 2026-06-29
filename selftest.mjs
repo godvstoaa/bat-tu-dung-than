@@ -3554,6 +3554,15 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_withGuide >= 15, `[loop 792] ≥15 tool có when-to-use guidance (got ${_withGuide})`);
   console.log(`   [loop 792] 17 tool descriptions đầy đủ (${_withGuide}/17 có when-to-use guidance) ✓`);
 }
+// [loop 793] isCaiKu gate !isFamily — «mẹ tôi giữ tiền» về pFamily (chart Mẹ), không pCaiKu(Quân).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // family + caiku → family (Mẹ chart)
+  assert(composeAnswer('mẹ tôi có giữ được tiền không?', _QR).title.includes('Người thân') || composeAnswer('mẹ tôi có giữ được tiền không?', _QR).title.includes('Gia đình'), '[loop 793] «mẹ tôi giữ tiền» → family (Mẹ chart, không bị caiku nuốt về chủ thể)');
+  // regression: subject «tôi giữ tiền» vẫn → caiku
+  assert(composeAnswer('tôi có giữ được tiền không?', _QR).title.includes('Tài khố'), '[loop 793] regression: «tôi giữ tiền» → caiku (subject)');
+  console.log('   [loop 793] isCaiKu gate !isFamily — «mẹ giữ tiền»→family, «tôi giữ tiền»→caiku ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
