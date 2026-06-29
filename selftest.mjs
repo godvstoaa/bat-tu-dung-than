@@ -3979,6 +3979,14 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_z(22, 59) !== _z(23, 0), `[loop 831] 22:59(${_z(22, 59)}) → 23:00(${_z(23, 0)}) đổi`);
   console.log('   [loop 831] 时辰 transition (2:59→3:00, 0:59→1:00, 22:59→23:00 đổi đúng) ✓');
 }
+// [loop 832] 命主/身主 (ziwei life/body master) có trong brief.
+{
+  const { buildChartBrief } = await import('./src/engine/ai.js');
+  const _b = buildChartBrief(analyze(1993, 10, 21, 1, 15, 'nam', 2026));
+  assert(/命主/.test(_b), '[loop 832] brief có 命主 (ziwei life master)');
+  assert(/身主/.test(_b), '[loop 832] brief có 身主 (ziwei body master)');
+  console.log('   [loop 832] 命主/身主 (ziwei life/body master) trong brief ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
