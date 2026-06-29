@@ -1503,6 +1503,7 @@ html{scroll-behavior:smooth}
 .grp.collapsible-grp::before { content: '▼'; display: inline-block; width: 1.2em; color: var(--gold); font-size: 0.7em; transition: transform .2s; }
 .grp.collapsible-grp.collapsed::before { transform: rotate(-90deg); }
 .grp.collapsible-grp.collapsed { opacity: 0.7; }
+.grp.collapsible-grp:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: 4px; }
 .grp::after {
   content: '';
   position: absolute;

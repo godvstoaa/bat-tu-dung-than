@@ -3588,11 +3588,12 @@ function initCollapsibleGroups() {
     if (grp.dataset.collapsible !== '1') {
       grp.dataset.collapsible = '1';
       grp.classList.add('collapsible-grp');
-      grp.addEventListener('click', () => {
-        grp.classList.toggle('collapsed');
-        // active quick-nav reset (group có thể đã ẩn)
-        updateCardVisibility();
-      });
+      grp.tabIndex = 0;          // [loop 950] keyboard focusable
+      grp.setAttribute('role', 'button');
+      grp.setAttribute('aria-expanded', 'true');
+      const toggle = () => { grp.classList.toggle('collapsed'); grp.setAttribute('aria-expanded', grp.classList.contains('collapsed') ? 'false' : 'true'); updateCardVisibility(); };
+      grp.addEventListener('click', toggle);
+      grp.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
     }
     if (isMobile && i > 0) grp.classList.add('collapsed');  // mobile: gập nhóm phụ
     else if (!isMobile && /tham khảo|hệ mệnh sâu/i.test(grp.textContent)) grp.classList.add('collapsed'); // desktop: gập nhóm THAM KHẢO
