@@ -4034,7 +4034,21 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_avg < 200, `[loop 837] pDaily <200ms (got ${_avg.toFixed(0)}ms — includes 6 evaluateDate for 宜忌)`);
   console.log(`   [loop 837] pDaily performance ${_avg.toFixed(0)}ms (<200ms, 宜忌 không slow) ✓`);
 }
-// [loop 839] privacy fix verified — empty defaults handled gracefully (run() early-return).
+// [loop 854] localStorage guard — ALL access wrapped in try/catch (incognito safe).
+{
+  const { readFileSync: _rf } = await import('fs');
+  const _main = _rf('src/main.js', 'utf8');
+  const _lines = _main.split('\n');
+  let _unguarded = 0;
+  for (let _i = 0; _i < _lines.length; _i++) {
+    if (/localStorage\.(setItem|getItem|removeItem)/.test(_lines[_i]) && !/\/\/|try/.test(_lines[_i])) {
+      const _ctx = _lines.slice(Math.max(0, _i - 10), _i + 1).join('\n');
+      if (!/try\s*\{/.test(_ctx)) _unguarded++;
+    }
+  }
+  assert(_unguarded === 0, `[loop 854] ALL localStorage try/catch guarded (${_unguarded} unguarded)`);
+  console.log(`   [loop 854] localStorage ALL try/catch (incognito/private mode safe) ✓`);
+}
 {
   const { readFileSync: _rf } = await import('fs');
   const _main = _rf('src/main.js', 'utf8');
