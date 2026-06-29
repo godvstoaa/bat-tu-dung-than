@@ -673,20 +673,35 @@ function pBestDays(R, intent) {
   else if (/\b(ky hop dong|ky ket|giao dich)\b/.test(_q)) { _actId = 'sign'; _actLabel = 'Ký kết'; }
   const _maxDay = new Date(y, mo, 0).getDate();
   // [loop 897] «tuần này」 → chỉ scan 7 ngày từ hôm nay
+  // [loop 899 FIX] cross-month: tuần có thể kéo sang tháng kế (vd 30/6→6/7)
   const _isWeek = /\b(tuan nay|tuan nay ngay)\b/.test(_q);
-  let _startD = 1, _endD = _maxDay, _rangeLabel = `tháng ${mo}/${y}`;
+  const results = [];
+  let _startD = 1, _rangeLabel = `tháng ${mo}/${y}`;
   if (_isWeek) {
     const _now = new Date();
     _startD = _now.getDate();
-    _endD = Math.min(_startD + 6, _maxDay);
-    _rangeLabel = `tuần này (${_startD}–${_endD}/${mo})`;
-  }
-  const results = [];
-  for (let d = _startD; d <= _endD; d++) {
+    const _endOfWeek = new Date(_now); _endOfWeek.setDate(_endOfWeek.getDate() + 6);
+    const _endMo = _endOfWeek.getMonth() + 1, _endD = _endOfWeek.getDate();
+    _rangeLabel = _endMo !== mo
+      ? `tuần này (${_startD}/${mo}–${_endD}/${_endMo})`
+      : `tuần này (${_startD}–${_endD}/${mo})`;
+    // Scan day-by-day from today to end of week (cross-month safe)
+    const _cursor = new Date(_now);
+    for (let i = 0; i <= 6; i++) {
+      const _cy = _cursor.getFullYear(), _cm = _cursor.getMonth() + 1, _cd = _cursor.getDate();
+      try {
+        const ev = evaluateDate(_cy, _cm, _cd, _actId, userZhi);
+        results.push({ d: _cd, mo: _cm, officer: ev.officerVi, rating: ev.rating, score: ev.score, ganZhi: ev.dayGanZhi, clashYou: ev.clashYou });
+      } catch (_) {}
+      _cursor.setDate(_cursor.getDate() + 1);
+    }
+  } else {
+    for (let d = 1; d <= _maxDay; d++) {
     try {
       const ev = evaluateDate(y, mo, d, _actId, userZhi);
       results.push({ d, officer: ev.officerVi, officerTone: ev.tone, rating: ev.rating, score: ev.score, ganZhi: ev.dayGanZhi, clashYou: ev.clashYou });
     } catch (_) {}
+    }
   }
   results.sort((a, b) => b.score - a.score);
   const top = results.slice(0, 5);
