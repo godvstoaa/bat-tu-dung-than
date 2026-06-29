@@ -3462,6 +3462,16 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(/KỴ|xấu|TRÁNH/i.test(_res.verdict + ' ' + _res.advice), '[loop 784] Bắc 2026 = ĐẠI KỴ (sat phương) → tránh động thổ');
   console.log('   [loop 784] sat phương (Tam Sát) 2026 động — Bắc = 亥子丑 = ĐẠI KỴ ✓');
 }
+// [loop 785] fengshui_direction recommend mode — trả hướng TỐT NHẤT + sao Bát Trạch.
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  for (const [nm, y, m, d, h, g] of [['Quân', 1993, 10, 21, 1, 'nam'], ['Bố', 1964, 4, 4, 12, 'nam']]) {
+    const _R = analyze(y, m, d, h, 0, g, 2026);
+    const _res = execTool('fengshui_direction', { mode: 'recommend', scanYear: 2026 }, _R);
+    assert(_res.summary && _res.best && /TỐT NHẤT|ĐẠI CÁT|Sinh Khí|Diên Niên/i.test(_res.summary), `[loop 785] ${nm} recommend trả summary (TỐT NHẤT) + best direction`);
+  }
+  console.log('   [loop 785] fengshui_direction recommend mode — hướng tốt + sao Bát Trạch ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
