@@ -3887,6 +3887,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_m4 !== _m6, `[loop 822] tháng đổi tại 惊蛰 (Mar 4 ${_m4} ≠ Mar 6 ${_m6})`);
   console.log('   [loop 822] 节气 month boundary — tháng đổi đúng tại tiết khí (寅→卯) ✓');
 }
+// [loop 823] leap month (tháng nhuận) — BaZi dùng tháng tiết khí, không bị ảnh hưởng nhuận.
+{
+  const { Solar } = await import('lunar-javascript');
+  // Apr 1 2023 = 闰二月 (lunar leap month) → BaZi month vẫn 乙卯 (tiết khí tháng)
+  const _R = analyze(2023, 4, 1, 12, 0, 'nam', 2026);
+  const _gz = _R.chart.pillars.month.gan + _R.chart.pillars.month.zhi;
+  const _lj = Solar.fromYmdHms(2023, 4, 1, 12, 0, 0).getLunar().getMonthInGanZhiExact();
+  const _isLeap = Solar.fromYmdHms(2023, 4, 1, 12, 0, 0).getLunar().getMonth() < 0;  // negative = leap
+  assert(_isLeap, '[loop 823] Apr 1 2023 thực sự là tháng nhuận (lunar month <0)');
+  assert(_gz === _lj && _gz === '乙卯', `[loop 823] leap month → BaZi month 乙卯 (got ${_gz}, lunar-js ${_lj})`);
+  console.log('   [loop 823] leap month (闰二月) — BaZi dùng tiết khí tháng, không bị lệch ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
