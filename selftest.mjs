@@ -3686,6 +3686,19 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_qh && _bh && _qh !== _bh, '[loop 803] Quân vs Bố best hours KHÁC (chart-specific)');
   console.log('   [loop 803] pDaily boundary (năm nay≠hôm nay) + member-specific (giờ khác/Dụng) ✓');
 }
+// [loop 805] 2 chip misroute fix — sự nghiệp+hướng→career, quý nhân+đào hoa→shensha.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // #2 «sự nghiệp hướng nào» → career (fengshui career-gate)
+  assert(composeAnswer('Tôi hợp nghề gì? Sự nghiệp hướng nào?', _QR).title.includes('Sự nghiệp'), '[loop 805] «sự nghiệp hướng nào» → career (không fengshui)');
+  // #3 «quý nhân...đào hoa» → shensha (isShenshaStrong wins love)
+  assert(composeAnswer('Tôi có quý nhân hay sao gì? Đào hoa, dịch mã?', _QR).title.includes('Thần'), '[loop 805] «quý nhân...đào hoa» → shensha (love không nuốt)');
+  // regression: «đại vận quý nhân» → timing (isShenshaStrong KHÔNG thắng timing)
+  assert(composeAnswer('đại vận của tôi có quý nhân giúp?', _QR).title.includes('Vận hạn'), '[loop 805] regression: «đại vận quý nhân» → timing');
+  // regression: «hướng nhà tốt» → fengshui
+  assert(composeAnswer('hướng nhà nào tốt?', _QR).title.includes('Phong thủy'), '[loop 805] regression: «hướng nhà» → fengshui');
+  console.log('   [loop 805] 2 chip misroute fix (sự nghiệp+hướng→career, quý nhân+đào hoa→shensha) + regression ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

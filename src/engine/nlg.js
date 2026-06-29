@@ -116,8 +116,11 @@ export function detectIntent(question) {
   //   vì bare «que» không match. Giờ catch «quẻ hôm/xem quẻ».
   const isDivination = /gieo que|lac que|que dich|boi que|thao que|que hom|que ngay|xem que|cham tu|luc nh|ky mon|don giap/.test(norm) || /起卦|测字|占卦|占卜|六壬|奇门|遁甲/.test(question);
   // [loop 655] fengshui + remedy intent (trước đây → «chưa rõ lĩnh vực» khi API fail)
-  const isFengshui = /\b(phong thuy|dinh vi|la ban)\b/.test(norm)
-    || (/\b(huong|nha|tang|giuong|bep|cua chinh)\b/.test(norm) && /\b(tot|xau|hop|nao|cat|hung|nen|the nao|xung|hinh|hai)\b/.test(norm));
+  // [loop 805 FIX] gate isFengshui !career — «sự nghiệp HƯỚNG NÀO» trước đây → fengshui
+  //   (hướng+nào) nhưng là career (hướng sự nghiệp ≠ hướng nhà).
+  const isFengshui = (/\b(phong thuy|dinh vi|la ban)\b/.test(norm)
+    || (/\b(huong|nha|tang|giuong|bep|cua chinh)\b/.test(norm) && /\b(tot|xau|hop|nao|cat|hung|nen|the nao|xung|hinh|hai)\b/.test(norm)))
+    && !/\b(nghe|su nghiep|cong viec|nghe nghiep|cong danh|thang tien)\b/.test(norm);
   // [loop 768 FIX] bỏ «duoc» — «bao giờ mua ĐƯỢC nhà?» trước đây trigger fengshui (nha+duoc)
   //   nhưng là câu TIMING (hỏi KHI NÀO mua được). «tốt/hợp/xấu» vẫn cover fengshui quality.
   const isRemedy = /\b(bot xui|giam xui|bo xui|xui xe|xui|doi van|hoa giai|giai han|giai xui|khai van|may man|phuc duc|lam cai gi|nen lam gi|cuu|cai menh|cai van|bo tui|giam tui|deo da|da quy|mau gi|mau hop|mau sac)\b/.test(norm);
@@ -139,6 +142,9 @@ export function detectIntent(question) {
   //   → false positive. Giữ «than sat» + tên sao cụ thể.
   const isShensha = /\b(quy nhan|chinh tinh|than sat|van xuong|duong nhan|hoa cai|tuong tinh|thien duc|thien y|kim du|hong diem|qui cuong|tam ky|loc than|dich ma|hoc duong)\b/.test(norm)
     || (/\bsao\b/.test(norm) && /\b(co|gi dac biet|chinh tinh|than sat|nao tot|nao xau)\b/.test(norm));
+  // [loop 805] isShenshaStrong — chủ thể sao RÕ RÀNG (quý nhân/sao/dịch mã/văn xương) → thắng domain
+  //   (đào hoa→love không được nuốt «quý nhân...đào hoa dịch mã»).
+  const isShenshaStrong = /\b(quy nhan|sao gi|sao gi dac biet|chinh tinh|than sat|dich ma|van xuong|tuong tinh|loc than)\b/.test(norm);
   // [loop 759] isNayin — hỏi về nạp âm / bản mệnh hành (nayin của trụ ngày).
   const isNayin = /\b(nap am|nayin|ban menh ngu hanh|menh ngu hanh|hanh cua toi)\b/.test(norm);
   // [loop 764] isMinggong — hỏi về mệnh cung / thân cung (ziwei-BaZi «trụ thứ 6»).
@@ -170,7 +176,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, confidence, raw: question };
+  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isShenshaStrong, isNayin, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -864,7 +870,9 @@ export function composeAnswer(question, R) {
   //   vì «cách cục ... Dụng thần sao?» có chữ «sao»+«thần» (loop 766 fix false-positive).
   if (intent.isPattern && !_hasDomain) return pPattern(R);
   // [loop 758] shensha question — surface thần煞 (offline, không cần AI)
-  if (intent.isShensha && !_hasDomain) return pShensha(R);
+  // [loop 805] isShenshaStrong thắng CHỈ love (đào hoa collision) — không thắng timing/family
+  //   (đại vận quý nhân = timing primary, quý nhân incidental).
+  if (intent.isShensha && (!_hasDomain || (intent.isShenshaStrong && intent.area === 'love'))) return pShensha(R);
   // [loop 759] nayin question — surface nạp âm (offline, không cần AI)
   if (intent.isNayin && !_hasDomain) return pNayin(R);
   // [loop 760] tiaohou question — surface điều hậu (offline, không cần AI)
