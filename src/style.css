@@ -1152,6 +1152,10 @@ html{scroll-behavior:smooth}
   body { background: white !important; color: #111 !important; font-size: 11px; }
   .quick-nav, #print-btn, .ai-fab, #ai-modal, #ai-popup, .form-card, .hero, nav, .lyear-row label input, .lyear-row select, .lyear-row button, #family-members, #ev-btn, #ln-btn, #ln-dt, #yd-btn, #fam-add, #family-btn, .card-search, .chat-suggest, button { display: none !important; }
   .result { max-width: 100% !important; padding: 0 !important; }
+  /* [loop 938] print LUÔN hiện toàn bộ lá số — override collapse/search ẩn (mobile default-collapse
+     không làm print thiếu nội dung; in = bản đọc ĐẦY ĐỦ để giữ/chia sẻ) */
+  #result > .card, #result > h2.grp { display: block !important; }
+  .grp.collapsible-grp::before { display: none !important; }
   .card { border: 1px solid #ccc !important; background: white !important; box-shadow: none !important; break-inside: avoid; margin-bottom: 6px !important; padding: 8px !important; }
   .card-title { color: #333 !important; font-size: 13px !important; border-bottom: 1px solid #999 !important; }
   .hint, .hint-inline { color: #555 !important; }
