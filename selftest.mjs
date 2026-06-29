@@ -3675,6 +3675,17 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /\[object Object\]|undefined/.test(p)), '[loop 802] không [object]/undefined leak');
   console.log('   [loop 802] pDaily offline — «hôm nay» → dailyBriefing (giờ/hướng/thái tuế/Dụng) ✓');
 }
+// [loop 803] pDaily boundary + member-specific.
+{
+  // boundary: «năm nay»→timing, «hôm nay»→daily (không trộn)
+  assert(detectIntent('năm nay vận sao?').isTiming === true && detectIntent('năm nay vận sao?').isDaily === false, '[loop 803] «năm nay» → timing (không daily)');
+  assert(detectIntent('hôm nay tốt không?').isDaily === true && detectIntent('hôm nay tốt không?').isTiming === false, '[loop 803] «hôm nay» → daily (không timing)');
+  // member-specific: Quân vs Bố best hours KHÁC (Dụng Thổ vs Kim)
+  const _qh = composeAnswer('hôm nay giờ nào tốt?', analyze(1993, 10, 21, 1, 15, 'nam', 2026)).paragraphs.find((p) => /Giờ TỐT/.test(p));
+  const _bh = composeAnswer('hôm nay giờ nào tốt?', analyze(1964, 4, 4, 12, 0, 'nam', 2026)).paragraphs.find((p) => /Giờ TỐT/.test(p));
+  assert(_qh && _bh && _qh !== _bh, '[loop 803] Quân vs Bố best hours KHÁC (chart-specific)');
+  console.log('   [loop 803] pDaily boundary (năm nay≠hôm nay) + member-specific (giờ khác/Dụng) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
