@@ -3263,6 +3263,21 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('bố mẹ tôi khỏe không?', _QR).title.includes('Người thân') || composeAnswer('bố mẹ tôi khỏe không?', _QR).title.includes('Gia đình'), '[loop 769] «bố mẹ khỏe» → family (trước health)');
   console.log('   [loop 769] routing edge-case (câu ngắn/negative/yesno/family+health) ✓');
 }
+// [loop 770] lưu niên 太岁 + 空亡 surface khi HIT (cổ pháp trọng — biến động năm).
+//   Quân 空亡=申酉 (day 乙亥), year 酉 → 2028 申 = xuất không; 2035 卯 = 冲太岁.
+{
+  const { analyzeLiunianDeep } = await import('./src/engine/liunian-pro.js');
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // 2028 戊申 = chi 空亡 → xuất không
+  const _y28 = analyzeLiunianDeep(_QR, 2028, _QR.patternQuality?.patternYong);
+  const _t28 = (_y28.schools || []).map((s) => s.note).join(' ');
+  assert(/xuất không|không vong|空亡激活/i.test(_t28), '[loop 770] 2028 申 (chi空亡) → xuất không surfaced');
+  // 2035 乙卯 = 冲太岁 (xung year branch 酉)
+  const _y35 = analyzeLiunianDeep(_QR, 2035, _QR.patternQuality?.patternYong);
+  const _t35 = (_y35.schools || []).map((s) => s.note).join(' ');
+  assert(/太岁|冲太岁|xung.*tuoi|tuổi xung/i.test(_t35), '[loop 770] 2035 卯 (xung酉) → 冲太岁 surfaced');
+  console.log('   [loop 770] lưu niên 太岁 (2035 冲) + 空亡 (2028 xuất không) surface khi HIT ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
