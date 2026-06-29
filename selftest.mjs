@@ -3186,6 +3186,24 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(detectIntent('mệnh cung của tôi?').isNayin === false, '[loop 764] «mệnh cung» ≠ isNayin (đã tách)');
   console.log('   [loop 764] offline mệnh cung surface (baziMingGong + cleanup isNayin) ✓');
 }
+// [loop 765] NLG composer FUZZ — 7 composer mới (757-764) × diverse chart, 0 crash/leak.
+{
+  const _qs = ['xung hình hại của tôi?', 'tôi có quý nhân sao gì?', 'nạp âm của tôi?', 'điều hậu của tôi?', 'cách cục của tôi?', 'mệnh cung của tôi?', 'đại vận tôi đang mạnh hay suy?'];
+  const _charts = [[1993,10,21,1,15,'nam'],[1996,12,4,10,15,'nữ'],[2023,1,13,7,15,'nam'],[1970,6,27,7,15,'nữ'],[1964,4,4,12,0,'nam'],[2025,6,15,3,0,'nữ'],[1990,8,8,23,30,'nam'],[1985,2,4,5,0,'nữ'],[2000,11,11,11,11,'nam']];
+  let _crash = 0, _leak = 0, _n = 0;
+  for (const [y, m, d, h, mi, g] of _charts) {
+    let _R; try { _R = analyze(y, m, d, h, mi, g, 2026); } catch (e) { continue; }
+    for (const q of _qs) {
+      _n++;
+      try {
+        const _a = composeAnswer(q, _R);
+        if (_a.paragraphs.some((p) => /\bundefined\b|\bNaN\b/.test(p))) _leak++;
+      } catch (e) { _crash++; }
+    }
+  }
+  assert(_crash === 0 && _leak === 0, `[loop 765] NLG composer fuzz (7×${_charts.length}=${_n} test): ${_crash} crash, ${_leak} leak`);
+  console.log(`   [loop 765] NLG composer fuzz 7×${_charts.length}=${_n} test — 0 crash/leak ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
