@@ -4783,15 +4783,10 @@ $('calendar-note').textContent =
 // NGHIỆM CHỨNG GIA TỘC (家族八字交叉验证) — state + render an toàn XSS
 // ============================================================
 let familyMembers = []; // [{role,label,date,time,gender,hourUnknown}]
-// [loop 626] DEFAULT_FAMILY — data gia đình CHỦ THỂ (chủ app) được seed thẳng vào app.
-//   Trước đây family chỉ nằm trong localStorage → mở máy khác / xoá cache là mất → AI «chả biết gì».
-//   Nay seed mặc định; user chỉnh sửa sẽ đè lên localStorage (ưu tiên cao hơn).
-const DEFAULT_FAMILY = [
-  { role: 'mother',  label: 'Tô Thị Hồng (mẹ)',          date: '1970-06-27', time: '07:15', gender: 'nữ',  hourUnknown: false },
-  { role: 'father',  label: 'Nguyễn Xuân Tùng (bố)',     date: '1964-04-04', time: '12:00', gender: 'nam', hourUnknown: true },
-  { role: 'sibling', label: 'Nguyễn Mỹ Anh (em gái ruột)', date: '1996-12-04', time: '10:15', gender: 'nữ',  hourUnknown: false },
-  { role: 'child',   label: 'Nguyễn Hoàng Nhật Minh (cháu ngoại)', date: '2023-01-13', time: '07:15', gender: 'nam', hourUnknown: false },
-];
+// [loop 838 PRIVACY] DEFAULT_FAMILY đã XÓA — app chia sẻ cho người khác, không seed
+//   data cá nhân chủ app nữa. Mỗi user tự nhập family → lưu localStorage máy HỌ.
+//   (loop 626 seed data cá nhân — không còn phù hợp khi app public.)
+const DEFAULT_FAMILY = [];
 // [loop 604] save/restore family members to localStorage — user complaint: data lost on reload
 function saveFamily() { try { localStorage.setItem('bazi-family', JSON.stringify(familyMembers)); } catch (_) {} }
 function loadFamily() {
@@ -4799,9 +4794,9 @@ function loadFamily() {
     const saved = JSON.parse(localStorage.getItem('bazi-family') || 'null');
     if (Array.isArray(saved) && saved.length) { familyMembers = saved; return true; }
   } catch (_) {}
-  // [loop 626] fallback: localStorage trống → dùng DEFAULT_FAMILY (chủ app) thay vì mảng rỗng
-  familyMembers = DEFAULT_FAMILY.map((m) => ({ ...m }));
-  return true;
+  // [loop 838] localStorage trống → mảng RỖNG (không seed data cá nhân). User tự thêm.
+  familyMembers = [];
+  return false;
 }
 const ROLE_OPTS = [
   { v:'father', t:'Cha' }, { v:'mother', t:'Mẹ' }, { v:'sibling', t:'Anh/chị/em' },
@@ -6112,7 +6107,9 @@ try {
   } else {
     const saved = JSON.parse(localStorage.getItem('bazi-birth') || 'null');
   // [loop 626] fallback default = chủ app (Quân) nếu chưa có subject nào — app chạy ra là luận đúng người
-  const subj = (saved && saved.date) ? saved : { date: '1993-10-21', time: '01:15', gender: 'nam', tz: 7 };
+  // [loop 838 PRIVACY] default subject: KHÔNG dùng data cá nhân chủ app nữa.
+  //   Mỗi user tự nhập ngày sinh → lưu localStorage máy HỌ.
+  const subj = (saved && saved.date) ? saved : { date: '', time: '12:00', gender: 'nam', tz: 7 };
   $('date').value = subj.date;
   if (subj.time) $('time').value = subj.time;
   const gRadio = document.querySelector(`input[name="gender"][value="${subj.gender}"]`);
