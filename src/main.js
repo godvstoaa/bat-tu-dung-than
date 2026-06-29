@@ -3745,7 +3745,12 @@ function run() {
       const label = full.length > 24 ? full.slice(0, 22) + '…' : full;
       const a = document.createElement('a');
       a.textContent = label; a.title = full; a.href = '#' + grp.id;
-      a.onclick = (e) => { e.preventDefault(); grp.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+      a.onclick = (e) => {
+        e.preventDefault();
+        // [loop 939] tap nav chip → MỞ nhóm nếu đang gập (mobile default-collapse), rồi nhảy tới
+        if (grp.classList.contains('collapsed')) { grp.classList.remove('collapsed'); updateCardVisibility(); }
+        grp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
       qnav.appendChild(a);
       grpLinks.push({ a, grp });
     });
