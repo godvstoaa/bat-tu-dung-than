@@ -4003,6 +4003,16 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_t.substring(0, 12) !== _m.substring(0, 12), `[loop 834] «hôm nay»(${_t.slice(3, 13)}) ≠ «ngày mai»(${_m.slice(3, 13)}) — date offset đúng`);
   console.log('   [loop 834] pDaily date offset («ngày mai» → tomorrow, «hôm qua» → yesterday) ✓');
 }
+// [loop 835] «hôm qua» date offset — yesterday (-1 day from today).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _t = composeAnswer('hôm nay?', _QR).paragraphs.find((p) => /📅/.test(p));
+  const _y = composeAnswer('hôm qua vận sao?', _QR).paragraphs.find((p) => /📅/.test(p));
+  const _td = _t?.substring(3, 13), _yd = _y?.substring(3, 13);
+  const _diff = Math.round((new Date(_td) - new Date(_yd)) / 86400000);
+  assert(_diff === 1, `[loop 835] «hôm qua» = today - 1 day (diff ${_diff}, got ${_td} vs ${_yd})`);
+  console.log('   [loop 835] «hôm qua» date offset (-1 day) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
