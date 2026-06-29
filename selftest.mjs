@@ -3860,6 +3860,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_a.paragraphs.some((p) => /TỐT.*Đại cát|năm.*Đại cát|2028/i.test(p)), '[loop 820] pTiming surface cụ thể năm TỐT');
   console.log('   [loop 820] pTiming surface năm vàng (đại vận CÁT + năm TỐT cụ thể + hôn nhân) ✓');
 }
+// [loop 821] 立春 boundary — năm đổi ĐÚNG tại tiết khí (boundary quan trọng nhất BaZi).
+{
+  // Feb 4 03:00 (trước LXC ~04:42) → 乙巳; Feb 4 06:00 (sau) → 丙午
+  const _before = analyze(2026, 2, 4, 3, 0, 'nam', 2026);
+  const _after = analyze(2026, 2, 4, 6, 0, 'nam', 2026);
+  const _gzB = _before.chart.pillars.year.gan + _before.chart.pillars.year.zhi;
+  const _gzA = _after.chart.pillars.year.gan + _after.chart.pillars.year.zhi;
+  assert(_gzB === '乙巳', `[loop 821] Feb 4 03:00 (trước LXC) → 乙巳 (got ${_gzB})`);
+  assert(_gzA === '丙午', `[loop 821] Feb 4 06:00 (sau LXC) → 丙午 (got ${_gzA})`);
+  assert(_gzB !== _gzA, '[loop 821] năm ĐỔI tại 立春 boundary (3h vs 6h cùng ngày khác năm)');
+  console.log('   [loop 821] 立春 boundary — năm đổi đúng tại tiết khí (乙巳→丙午) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
