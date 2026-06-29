@@ -3685,27 +3685,36 @@ function run() {
   lazyRender('golden-year',    () => { try { renderGoldenYear(currentResult); } catch (e) { console.warn('goldenyear', e.message); } });
   lazyRender('forecast5',      () => { try { renderForecast5(currentResult); } catch (e) { console.warn('forecast5', e.message); } });
 
-  // quick-nav: auto-generate jump links from card titles + group headers
+  // quick-nav: jump links — [loop 936 FIX] theo GROUP header (~8) thay vì 165 card
+  //   (165 chip overflow trên mobile → nav chính nó không dùng được). + scroll-spy active.
   const qnav = $('quick-nav');
   if (qnav) {
-    const cards = document.querySelectorAll('#result > .card');
     qnav.innerHTML = '';
-    cards.forEach((card, i) => {
-      const title = card.querySelector('.card-title');
-      if (!title) return;
-      // [loop 144] label tốt hơn: lấy text Hán-Việt (bỏ zh span), cắt 20 chars
-      const clone = title.cloneNode(true);
-      clone.querySelectorAll('.zh, .hint-inline').forEach(el => el.remove());
-      const fullLabel = clone.textContent.trim();
-      const label = fullLabel.length > 22 ? fullLabel.slice(0, 20) + '…' : fullLabel;
-      card.id = card.id || `card-${i}`;
+    const grps = Array.from(document.querySelectorAll('#result > h2.grp'));
+    const grpLinks = [];
+    grps.forEach((grp, i) => {
+      grp.id = grp.id || `grp-${i}`;
+      const full = grp.textContent.trim();
+      const label = full.length > 24 ? full.slice(0, 22) + '…' : full;
       const a = document.createElement('a');
-      a.textContent = label;
-      a.title = fullLabel;
-      a.href = '#' + card.id;
-      a.onclick = (e) => { e.preventDefault(); card.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+      a.textContent = label; a.title = full; a.href = '#' + grp.id;
+      a.onclick = (e) => { e.preventDefault(); grp.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
       qnav.appendChild(a);
+      grpLinks.push({ a, grp });
     });
+    // scroll-spy: highlight group đang xem (trước đây .active KHÔNG được áp — user lạc trong trang dài)
+    if (grpLinks.length) {
+      const spy = () => {
+        const mid = (window.scrollY || document.documentElement.scrollTop) + window.innerHeight / 3;
+        let activeIdx = 0;
+        grpLinks.forEach(({ grp }, idx) => { if (grp.offsetTop <= mid) activeIdx = idx; });
+        grpLinks.forEach(({ a }, idx) => a.classList.toggle('active', idx === activeIdx));
+      };
+      if (window._qnavSpy) window.removeEventListener('scroll', window._qnavSpy, { passive: true });
+      window._qnavSpy = spy;
+      window.addEventListener('scroll', spy, { passive: true });
+      spy();
+    }
     qnav.classList.remove('hidden');
   }
   // reveal print button
