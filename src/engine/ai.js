@@ -140,8 +140,9 @@ export function getConfig() {
     const raw = (typeof localStorage !== 'undefined') ? localStorage.getItem(CFG_KEY) : null;
     if (raw) return JSON.parse(raw);
   } catch (e) {}
-  // Mặc định: Z.ai GLM-5.2 (Coding Plan) — chỉ cần dán API key và bật.
-  return { enabled: false, endpoint: PRESETS[0].endpoint, apiKey: '', model: PRESETS[0].model, preset: 'zai-coding' };
+  // [loop 903] Mặc định: Cloudflare Workers AI GLM-5.2 (proxy /cf-ai — chạy trên worker cùng origin).
+  const cfPreset = PRESETS.find((p) => p.id === 'cf-glm') || PRESETS[0];
+  return { enabled: false, endpoint: cfPreset.endpoint, apiKey: '', model: cfPreset.model, preset: 'cf-glm' };
 }
 export function setConfig(cfg) {
   try { if (typeof localStorage !== 'undefined') localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}

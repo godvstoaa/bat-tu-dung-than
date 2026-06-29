@@ -3,6 +3,7 @@
 import { makeProxy } from '../functions/_proxy.js';
 
 const PROXIES = [
+  ['/cf-ai', 'https://api.cloudflare.com'],
   ['/zai', 'https://api.z.ai'],
   ['/openai', 'https://api.openai.com'],
   ['/deepseek', 'https://api.deepseek.com'],
