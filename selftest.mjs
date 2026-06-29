@@ -3278,6 +3278,22 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(/太岁|冲太岁|xung.*tuoi|tuổi xung/i.test(_t35), '[loop 770] 2035 卯 (xung酉) → 冲太岁 surfaced');
   console.log('   [loop 770] lưu niên 太岁 (2035 冲) + 空亡 (2028 xuất không) surface khi HIT ✓');
 }
+// [loop 771] zheri 12 trực (建除十二神) — officer khớp lunar-javascript getZhiXing.
+{
+  const { evaluateDate } = await import('./src/engine/zheri.js');
+  const { Solar } = await import('lunar-javascript');
+  let _bad = 0, _n = 0;
+  for (const _mo of [1, 4, 6, 9, 11]) for (const _dd of [1, 8, 15, 22, 28]) {
+    const _s = Solar.fromYmdHms(2026, _mo, _dd, 12, 0, 0);
+    try {
+      const _ev = evaluateDate(_s.getYear(), _s.getMonth(), _dd, 'marry', '卯');
+      if (_ev.officer !== _s.getLunar().getZhiXing()) _bad++;
+      _n++;
+    } catch (e) {}
+  }
+  assert(_bad === 0 && _n >= 20, `[loop 771] zheri 12 trực khớp lunar-javascript getZhiXing (${_n - _bad}/${_n})`);
+  console.log(`   [loop 771] zheri 12 trực (建除十二神) khớp lunar-javascript ${_n - _bad}/${_n} ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
