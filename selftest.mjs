@@ -3317,6 +3317,21 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_dung.score > _ky.score, '[loop 773] Dụng dayun score > Kỵ dayun (scoring đúng hướng)');
   console.log('   [loop 773] đại vận scoring — Dụng/Hỷ (己未★) > Kỵ (乙卯) ✓');
 }
+// [loop 774] lưu nguyệt (tháng vận) — 12 tháng, phân bổ mix nhất quán với năm.
+{
+  const { computeLiuyue } = await import('./src/engine/liuyue.js');
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _m = computeLiuyue(_QR, 2026, _QR.patternQuality);
+  const _months = _m.months || _m;
+  assert(_months.length === 12, `[loop 774] lưu nguyệt 12 tháng (got ${_months.length})`);
+  assert(_months.every((mo) => typeof mo.score !== 'number' || Number.isFinite(mo.score)), '[loop 774] không NaN score tháng');
+  // năm Bình → phải có mix (cát + hung/bình), không toàn Hung
+  const _ratings = _months.map((mo) => mo.rating || '');
+  const _hasCat = _ratings.some((r) => /Cát|cát/.test(r));
+  const _allHung = _ratings.every((r) => /Hung|hung|Kỵ/.test(r));
+  assert(_hasCat && !_allHung, '[loop 774] năm Bình có mix tháng (cát + bình/hung), không toàn Hung');
+  console.log('   [loop 774] lưu nguyệt 12 tháng mix nhất quán (năm Bình có cát+bình+hung) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
