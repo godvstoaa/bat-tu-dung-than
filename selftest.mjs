@@ -4046,6 +4046,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_a.paragraphs.some((p) => /Dụng|Hỷ/.test(p)), '[loop 876] surface Dụng/Hỷ');
   console.log('   [loop 876] pWuXing ngũ hành bar chart — routing + bar + Dụng/Kỵ ✓');
 }
+// [loop 879] pTenGod thập thần bar chart — routing + member-specific.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('thập thần của tôi?').isTenGod === true, '[loop 879] «thập thần» → isTenGod');
+  assert(detectIntent('tính cách tôi?').isTenGod === false, '[loop 879] «tính cách» ≠ isTenGod');
+  const _a = composeAnswer('thập thần của tôi sao nào mạnh?', _QR);
+  assert(/Thập thần/.test(_a.title), `[loop 879] pTenGod route (got ${_a.title})`);
+  assert(_a.paragraphs.some((p) => /█/.test(p)), '[loop 879] surface bar chart');
+  assert(_a.paragraphs.some((p) => /trội nhất/.test(p)), '[loop 879] surface dominant god');
+  assert(!_a.paragraphs.some((p) => /undefined|NaN/.test(p)), '[loop 879] không leak');
+  console.log('   [loop 879] pTenGod thập thần bar chart — routing + bar + dominant ✓');
+}
 // [loop 854] localStorage guard — ALL access wrapped in try/catch (incognito safe).
 {
   const { readFileSync: _rf } = await import('fs');
