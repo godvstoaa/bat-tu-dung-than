@@ -3618,6 +3618,16 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(detectIntent('vợ tôi hợp không?').area === 'love', '[loop 798] regression: «vợ tôi» → love (word-boundary)');
   console.log('   [loop 798] keyword collision fix (word-boundary + tình→tình yêu) ✓');
 }
+// [loop 799] collision audit CLEAN — đau/đầu outscored, tình removed, con/tháng legit.
+{
+  // «đầu tư» → wealth (đau/đầu collision nhưng «đầu tư» dài hơn → thắng)
+  assert(detectIntent('tôi nên đầu tư không?').area === 'wealth', '[loop 799] «đầu tư» → wealth (đau/đầu collision outscored)');
+  // «đau đầu» → health (pain, đúng)
+  assert(detectIntent('tôi hay đau đầu').area === 'health', '[loop 799] «đau đầu» → health (pain)');
+  // bare 'tình' đã remove khỏi keywords (chỉ còn trong comment)
+  assert(detectIntent('tôi khó tính').area !== 'love', '[loop 799] «khó tính» ≠ love (tình removed)');
+  console.log('   [loop 799] collision audit CLEAN (đau/đầu outscored, tình removed, không misroute) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
