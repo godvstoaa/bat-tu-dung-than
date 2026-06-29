@@ -621,8 +621,8 @@ function pDaily(R, intent) {
   const r = db.rating || {};
   const paras = [];
   paras.push(`📅 ${db.date} (${db.lunarStr}, ${db.dayGanZhi}): ${r.level || '?'}${r.tone === 'cat' ? ' ★HOÀNG ĐẠO' : r.tone === 'hung' ? ' ⚠HẮC ĐẠO' : ''} — ${r.summary || ''}`);
-  if (Array.isArray(db.bestHours) && db.bestHours.length) paras.push(`🕐 Giờ TỐT hôm nay: ${db.bestHours.slice(0, 3).map((h) => `${h.vi || h.zhi}(${h.score})`).join(', ')}.`);
-  if (Array.isArray(db.avoidHours) && db.avoidHours.length) paras.push(`⏰ Giờ KỴ: ${db.avoidHours.slice(0, 2).map((h) => `${h.vi || h.zhi}`).join(', ')}.`);
+  if (Array.isArray(db.bestHours) && db.bestHours.length) paras.push(`🕐 Giờ TỐT ${_dayLabel}: ${db.bestHours.slice(0, 3).map((h) => `${h.vi || h.zhi}(${h.score})`).join(', ')}.`);
+  if (Array.isArray(db.avoidHours) && db.avoidHours.length) paras.push(`⏰ Giờ KỴ ${_dayLabel}: ${db.avoidHours.slice(0, 2).map((h) => `${h.vi || h.zhi}`).join(', ')}.`);
   if (db.directionTaboo) {
     const _dt = db.directionTaboo;
     const _avoid = Array.isArray(_dt.avoid) ? _dt.avoid.join('/') : (_dt.avoid || '');
