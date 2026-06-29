@@ -3426,6 +3426,15 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 781] không leak');
   console.log('   [loop 781] offline 盖头截脚/khí thông surface (4 trụ + % thông) ✓');
 }
+// [loop 782] CJK intent matching — CJK phải test trên raw question (không \b).
+//   Loop 781 fix: isCaiKu/isQiFlow có CJK trong \b(...) → KHÔNG match. Guard khóa pattern.
+{
+  assert(detectIntent('财库 của tôi?').isCaiKu === true, '[loop 782] CJK «财库» → isCaiKu (raw question, không \\b)');
+  assert(detectIntent('盖头截脚 sao?').isQiFlow === true, '[loop 782] CJK «盖头截脚» → isQiFlow');
+  assert(detectIntent('起卦 cho tôi').isDivination === true, '[loop 782] CJK «起卦» → isDivination');
+  assert(detectIntent('测字 chữ Phúc').isDivination === true, '[loop 782] CJK «测字» → isDivination');
+  console.log('   [loop 782] CJK intent matching (财库/盖头截脚/起卦/测字) — pattern raw-question ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
