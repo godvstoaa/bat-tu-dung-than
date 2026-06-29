@@ -3512,6 +3512,21 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_types(_MA).includes('fy'), '[loop 788] Mỹ Anh có 反吟伏吟 (member-specific)');
   console.log('   [loop 788] pInteractions member-specific (Quân≠Mẹ, Mỹ Anh có 反吟伏吟) ✓');
 }
+// [loop 789] 9 offline composer × 5 thành viên = 45 test, 0 crash/leak.
+{
+  const _qs = ['xung hình hại của tôi?', 'tôi có quý nhân sao?', 'nạp âm của tôi?', 'điều hậu của tôi?', 'cách cục của tôi?', 'mệnh cung của tôi?', 'tài khố của tôi?', '盖头截脚 khí thông?', 'đại vận mạnh hay suy?'];
+  const _F = [[1993, 10, 21, 1, 15, 'nam'], [1996, 12, 4, 10, 15, 'nữ'], [2023, 1, 13, 7, 15, 'nam'], [1970, 6, 27, 7, 15, 'nữ'], [1964, 4, 4, 12, 0, 'nam']];
+  let _crash = 0, _leak = 0, _n = 0;
+  for (const [y, m, d, h, mi, g] of _F) {
+    const _R = analyze(y, m, d, h, mi, g, 2026);
+    for (const _q of _qs) {
+      _n++;
+      try { if (composeAnswer(_q, _R).paragraphs.some((p) => /\bundefined\b|\bNaN\b/.test(p))) _leak++; } catch (e) { _crash++; }
+    }
+  }
+  assert(_crash === 0 && _leak === 0, `[loop 789] 9 offline composer × 5 thành viên: ${_crash} crash, ${_leak} leak`);
+  console.log(`   [loop 789] 9 offline composer × 5 thành viên (${_n} test) — 0 crash/leak ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
