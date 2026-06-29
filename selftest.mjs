@@ -3596,6 +3596,17 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('sao tôi lại xui — phục ngâm không?', _QR).title.includes('Tương tác'), '[loop 796] «sao lại xui...phục ngâm» → interactions');
   console.log('   [loop 796] wealth «lãi»→«lãi suất» fix collision «lại» — «sao lại xui»≠wealth ✓');
 }
+// [loop 797] 2 collision fix: «anh ấy»(pronoun)≠«anh»(brother); «xui»→remedy.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // #1 «anh ấy hợp không» → compat (không family — anh ấy = him, ≠ brother)
+  assert(composeAnswer('tôi với anh ấy hợp không?', _QR).title.includes('Hợp tuổi') || composeAnswer('tôi với anh ấy hợp không?', _QR).title.includes('hôn nhân'), '[loop 797] «anh ấy hợp không» → compat (≠ family)');
+  // regression: «anh tôi hợp không» vẫn → family
+  assert(/Người thân|Gia đình/.test(composeAnswer('anh tôi hợp không?', _QR).title), '[loop 797] regression: «anh tôi hợp không» → family');
+  // #3 «đối phó với xui» → remedy (xui thêm vào isRemedy)
+  assert(composeAnswer('đối phó với xui thế nào?', _QR).title.includes('cải mệnh') || composeAnswer('đối phó với xui thế nào?', _QR).title.includes('Cải vận'), '[loop 797] «đối phó với xui» → remedy');
+  console.log('   [loop 797] «anh ấy»≠family + «xui»→remedy fix (2 collision) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

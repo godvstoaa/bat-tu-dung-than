@@ -99,8 +99,11 @@ export function detectIntent(question) {
   const isCompat = /\b(hop khong|hop nhau|xung khac|theo khong|phu hop)\b/.test(norm)
     && !/\b(so dien thoai|so hop|bien so|ten|mau gi|mau hop|deo da|da quy)\b/.test(norm);
   // [loop 619] family question detection
-  const isFamily = /\b(me toi|bo toi|me cua|bo cua|em toi|em cua|chau toi|con toi|anh toi|chi toi|nguoi than|gia dinh)\b/.test(norm)
-    || /\b(me|bo|em|chau|con|anh|chi)\b.*\b(the nao|ra sao|tuong quan|hop khong|menh gi|dung gi)\b/.test(norm);
+  // [loop 797 FIX] exclude «anh/chị/em/con ấy» (non-possessive pronoun: him/her) — trước đây
+  //   «tôi với ANH ẤY hợp không?» match «anh»+«hợp không» → isFamily ❌ (phải compat).
+  const isFamily = (/\b(me toi|bo toi|me cua|bo cua|em toi|em cua|chau toi|con toi|anh toi|chi toi|nguoi than|gia dinh)\b/.test(norm)
+    || /\b(me|bo|em|chau|con|anh|chi)\b.*\b(the nao|ra sao|tuong quan|hop khong|menh gi|dung gi)\b/.test(norm))
+    && !/\b(anh ay|chi ay|em ay|con ay|chong ay|vo ay)\b/.test(norm);
   // [loop 497] divination intent (起卦/测字 CJK ngắn → confidence <3 → bypass như isCompat)
   // [loop 768 FIX] thêm «que hom/xem que/que ngay» — «quẻ hôm nay cho tôi» trước đây → timing (hom nay)
   //   vì bare «que» không match. Giờ catch «quẻ hôm/xem quẻ».
@@ -110,7 +113,7 @@ export function detectIntent(question) {
     || (/\b(huong|nha|tang|giuong|bep|cua chinh)\b/.test(norm) && /\b(tot|xau|hop|nao|cat|hung|nen|the nao|xung|hinh|hai)\b/.test(norm));
   // [loop 768 FIX] bỏ «duoc» — «bao giờ mua ĐƯỢC nhà?» trước đây trigger fengshui (nha+duoc)
   //   nhưng là câu TIMING (hỏi KHI NÀO mua được). «tốt/hợp/xấu» vẫn cover fengshui quality.
-  const isRemedy = /\b(bot xui|giam xui|bo xui|xui xe|doi van|hoa giai|giai han|giai xui|khai van|may man|phuc duc|lam cai gi|nen lam gi|cuu|cai menh|cai van|bo tui|giam tui|deo da|da quy|mau gi|mau hop|mau sac)\b/.test(norm);
+  const isRemedy = /\b(bot xui|giam xui|bo xui|xui xe|xui|doi van|hoa giai|giai han|giai xui|khai van|may man|phuc duc|lam cai gi|nen lam gi|cuu|cai menh|cai van|bo tui|giam tui|deo da|da quy|mau gi|mau hop|mau sac)\b/.test(norm);
   // [loop 735] isRemedyStrong — ĐỘNG TỪ cải vận RÕ RÀNG (giải hạn/hoá giải/cải mệnh/cải vận/bớt xui/giải xui/khai vận/cứu).
   //   Khi user hỏi «sao giải hạn năm nay?» → isTiming (năm nay) true → isRemedy && !isTiming bị skip → MẤT remedy.
   //   Nhưng «giải hạn/hoá giải/cải vận» là intent remedy CHỦ ĐẠO (hỏi CÁCH hoá giải), KHÔNG phải timing.
