@@ -3607,6 +3607,17 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('đối phó với xui thế nào?', _QR).title.includes('cải mệnh') || composeAnswer('đối phó với xui thế nào?', _QR).title.includes('Cải vận'), '[loop 797] «đối phó với xui» → remedy');
   console.log('   [loop 797] «anh ấy»≠family + «xui»→remedy fix (2 collision) ✓');
 }
+// [loop 798] keyword collision fix — word-boundary (≤3 char) + «tình»→«tình yêu».
+{
+  // «khó tính» không love (tình/tính collision)
+  assert(detectIntent('làm việc với người khó tính').area !== 'love', '[loop 798] «khó tính» ≠ love (tình/tính fix)');
+  // «làm việc với người» không love (vợ/với fix via word-boundary)
+  assert(detectIntent('tôi làm việc với người lạ').area !== 'love', '[loop 798] «với người» ≠ love (vợ⊂với fix)');
+  // regression: legit love «tình duyên»/«duyên»/«vợ tôi» still love
+  assert(detectIntent('tình duyên của tôi sao?').area === 'love', '[loop 798] regression: «tình duyên» → love');
+  assert(detectIntent('vợ tôi hợp không?').area === 'love', '[loop 798] regression: «vợ tôi» → love (word-boundary)');
+  console.log('   [loop 798] keyword collision fix (word-boundary + tình→tình yêu) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
