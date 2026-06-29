@@ -3484,6 +3484,16 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   }
   console.log('   [loop 786] BaZi-analysis tools deterministic (5 tool test, 0 non-det) ✓');
 }
+// [loop 787] 反吟伏吟 surface trong pInteractions — Mỹ Anh có 反吟+Chi phục ngâm.
+{
+  const _MA = analyze(1996, 12, 4, 10, 15, 'nữ', 2026);
+  assert(detectIntent('phục ngâm phản ngâm của tôi?').isInteraction === true, '[loop 787] isInteraction detect «phục ngâm phản ngâm»');
+  assert(detectIntent('伏吟反吟 sao?').isInteraction === true, '[loop 787] CJK «伏吟反吟» → isInteraction');
+  const _a = composeAnswer('phục ngâm phản ngâm của tôi?', _MA);
+  assert(/Tương tác|刑沖會合/.test(_a.title), '[loop 787] routes to pInteractions');
+  assert(_a.paragraphs.some((p) => /反吟伏吟|Phục Ngâm|Phản Ngâm/.test(p)), '[loop 787] surface 反吟伏吟 (Mỹ Anh 反吟+Chi phục ngâm)');
+  console.log('   [loop 787] 反吟伏吟 surface trong pInteractions (Mỹ Anh 反吟+Chi phục ngâm) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

@@ -15,6 +15,7 @@ import { analyzeNayin, NAYIN_MEANING } from './nayin.js';
 import { baziMingGong } from './bazi-minggong.js';
 import { analyzeCaiKu } from './caiku.js';
 import { pillarRelation } from './pillar-quality.js';
+import { natalFuyin } from './fuyin.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
@@ -118,8 +119,9 @@ export function detectIntent(question) {
   const isRemedyStrong = /\b(giai han|hoa giai|giai xui|cai menh|cai van|doi van|khai van|bot xui|giam xui|cuu menh|cuu|bo tui|giam tui)\b/.test(norm);
   // [loop 757] isInteraction — hỏi về tương tác tứ trụ (刑冲害合/xung khắc/mâu thuẫn).
   //   Trước đây NLG offline KHÔNG surface interaction data (elevation 746-752 chỉ giúp AI brief).
-  const isInteraction = /\b(xung hinh hai|xung hinh|xung khac|mau thuan|tuong tac|tu tru|tuong han|xung\.?hinh|xung khat|co gi dac biet|gi day)\b/.test(norm)
-    || (/\b(xung|hinh|hai)\b/.test(norm) && /\b(gi|nao|co khong|the nao|ra sao)\b/.test(norm));
+  const isInteraction = /\b(xung hinh hai|xung hinh|xung khac|mau thuan|tuong tac|tu tru|tuong han|xung\.?hinh|xung khat|co gi dac biet|gi day|phuc ngam|phan ngam|phucam)\b/.test(norm)
+    || (/\b(xung|hinh|hai)\b/.test(norm) && /\b(gi|nao|co khong|the nao|ra sao)\b/.test(norm))
+    || /伏吟|反吟/.test(question);
   // [loop 758] isShensha — hỏi về thần煞/sao (quý nhân/đào hoa/dịch mã/văn xương...).
   //   Trước đây «tôi có quý nhân sao?» misroute (health/love) → KHÔNG surface R.shensha.
   //   «sao» phải kết hợp context sao (tránh «sao tôi lại...» = why).
@@ -732,6 +734,11 @@ function pInteractions(R) {
   if (has(it.ganHe)) {
     paras.push(`☉ Can hợp: ${it.ganHe.map((g) => `${g.a}+${g.b}→${g.hua}`).join('; ')}`);
   }
+  // [loop 787] 反吟伏吟 (natalFuyin) — trùng trụ (phục ngâm) / thiên khắc địa xung (phản ngâm).
+  try {
+    const fy = natalFuyin(R).items || [];
+    if (fy.length) paras.push(`🌀 反吟伏吟: ${fy.map((f) => `${f.typeVi} ${f.pair}${f.meaning ? ' — ' + f.meaning.slice(0, 60) : ''}`).join('; ')}`);
+  } catch (e) {}
   if (!paras.length) {
     return {
       title: 'Tương tác Tứ Trụ',
