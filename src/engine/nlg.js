@@ -150,7 +150,9 @@ export function detectIntent(question) {
   //   (đào hoa→love không được nuốt «quý nhân...đào hoa dịch mã»).
   const isShenshaStrong = /\b(quy nhan|sao gi|sao gi dac biet|chinh tinh|than sat|dich ma|van xuong|tuong tinh|loc than)\b/.test(norm);
   // [loop 759] isNayin — hỏi về nạp âm / bản mệnh hành (nayin của trụ ngày).
-  const isNayin = /\b(nap am|nayin|ban menh ngu hanh|menh ngu hanh|hanh cua toi)\b/.test(norm);
+  // [loop 875] «ngũ hành cân bằng/mạnh/yếu» → isWuXing (KHÔNG phải isNayin).
+  const isWuXing = /\b(ngu hanh can bang|ngu hanh manh|ngu hanh yeu|hanh nao manh|hanh nao yeu|ngu hanh cua toi)\b/.test(norm);
+  const isNayin = !isWuXing && /\b(nap am|nayin|ban menh ngu hanh|menh ngu hanh|hanh cua toi)\b/.test(norm);
   // [loop 764] isMinggong — hỏi về mệnh cung / thân cung (ziwei-BaZi «trụ thứ 6»).
   const isMinggong = /\b(menh cung|cung menh|than cung|cung than|tru thu 6)\b/.test(norm);
   // [loop 779] isCaiKu — hỏi về tài khố / giữ tiền / kho tiền (wealth storage).
@@ -182,7 +184,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isShenshaStrong, isNayin, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, isOverview, confidence, raw: question };
+  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isShenshaStrong, isNayin, isWuXing, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, isOverview, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -650,6 +652,36 @@ function pDaily(R, intent) {
   paras.push(`💡 Mở tab «Hôm nay» hoặc AI để chi tiết giờ/phút, 选日 cho việc cụ thể (cưới/khai trương/động thổ).`);
   return { title: `Vận ${_dayLabel} (lưu nhật)`, lead: `Vận ${_dayLabel.toUpperCase()} của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
 }
+function pWuXing(R) {
+  // [loop 875] Ngũ hành balance — text bar chart + Dụng/Kỵ annotation.
+  const dm = R.chart.dayMaster;
+  const wx = R.wx || {};
+  const pct = wx.pct || {};
+  const WX_VI = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
+  const WX_EMOJI = { 木: '🌿', 火: '🔥', 土: '⛰️', 金: '⚔️', 水: '💧' };
+  const y = R.yong || {};
+  const fav = new Set([y.primary, y.xi].filter(Boolean));
+  const avoid = new Set([y.ji, y.chou].filter(Boolean));
+  const paras = [];
+  // Sort elements by % descending
+  const sorted = ['木', '火', '土', '金', '水'].sort((a, b) => (pct[b] || 0) - (pct[a] || 0));
+  const lines = sorted.map((wx_) => {
+    const p = pct[wx_] || 0;
+    const bars = '█'.repeat(Math.round(p / 5)) + '░'.repeat(Math.max(0, 20 - Math.round(p / 5)));
+    let tag = '';
+    if (fav.has(wx_)) tag = ' ★Dụng/Hỷ';
+    else if (avoid.has(wx_)) tag = ' ⚠Kỵ/Thù';
+    return `${WX_EMOJI[wx_]} ${WX_VI[wx_]} ${bars} ${p.toFixed(1)}%${tag}`;
+  });
+  paras.push(`📊 **Ngũ hành balance** (${dm.gan} ${dm.vi}, ${R.strength?.level || '?'}):`);
+  paras.push(...lines);
+  // Analysis
+  const max = sorted[0], min = sorted[sorted.length - 1];
+  const maxP = pct[max] || 0, minP = pct[min] || 0;
+  paras.push(`📈 **${WX_VI[max]}** vượng nhất (${maxP.toFixed(1)}%) → ${maxP > 30 ? 'THÁI QUÁ — cần chế/giảm' : 'vừa phải'}. **${WX_VI[min]}** yếu nhất (${minP.toFixed(1)}%) → ${minP < 12 ? 'thiếu rõ — cần bổ' : 'đủ dùng'}.`);
+  paras.push(`💡 Dụng ${WX_VI[y.primary] || '?'} / Hỷ ${WX_VI[y.xi] || '?'} / Kỵ ${WX_VI[y.ji] || '?'} — tăng hành Dụng (màu/hướng/nghề/đá) để cân bằng.`);
+  return { title: 'Ngũ hành balance 五行', lead: `Cân bằng ngũ hành của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
+}
 function pQiFlow(R) {
   // [loop 781] Surface khí thông trụ / 盖头截脚 offline — pillarRelation per pillar.
   const dm = R.chart.dayMaster;
@@ -950,6 +982,8 @@ export function composeAnswer(question, R) {
   if (intent.isMinggong && !_hasDomain) return pMinggong(R);
   // [loop 781] qi-flow question — surface 盖头截脚/khí thông (offline, không cần AI)
   if (intent.isQiFlow && !_hasDomain) return pQiFlow(R);
+  // [loop 875] ngũ hành balance — text bar chart + Dụng/Kỵ annotation.
+  if (intent.isWuXing && !_hasDomain) return pWuXing(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family
