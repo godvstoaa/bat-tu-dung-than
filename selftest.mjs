@@ -3494,6 +3494,24 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_a.paragraphs.some((p) => /反吟伏吟|Phục Ngâm|Phản Ngâm/.test(p)), '[loop 787] surface 反吟伏吟 (Mỹ Anh 反吟+Chi phục ngâm)');
   console.log('   [loop 787] 反吟伏吟 surface trong pInteractions (Mỹ Anh 反吟+Chi phục ngâm) ✓');
 }
+// [loop 788] pInteractions member-specific — mỗi thành viên ra tương tác RIÊNG (chart-specific).
+{
+  const _types = (a) => {
+    const t = [];
+    if (a.paragraphs.some((p) => /三刑/.test(p))) t.push('h');
+    if (a.paragraphs.some((p) => /六害/.test(p))) t.push('hại');
+    if (a.paragraphs.some((p) => /六冲/.test(p))) t.push('xung');
+    if (a.paragraphs.some((p) => /反吟伏吟/.test(p))) t.push('fy');
+    return t.join('+');
+  };
+  const _Q = composeAnswer('xung hình hại của tôi?', analyze(1993, 10, 21, 1, 15, 'nam', 2026));
+  const _M = composeAnswer('xung hình hại của tôi?', analyze(1970, 6, 27, 7, 15, 'nữ', 2026));
+  assert(_types(_Q) !== _types(_M), `[loop 788] Quân vs Mẹ ra tương tác KHÁC nhau (chart-specific): ${_types(_Q)} vs ${_types(_M)}`);
+  // Mỹ Anh có 反吟伏吟 (riêng)
+  const _MA = composeAnswer('phục ngâm của tôi?', analyze(1996, 12, 4, 10, 15, 'nữ', 2026));
+  assert(_types(_MA).includes('fy'), '[loop 788] Mỹ Anh có 反吟伏吟 (member-specific)');
+  console.log('   [loop 788] pInteractions member-specific (Quân≠Mẹ, Mỹ Anh có 反吟伏吟) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
