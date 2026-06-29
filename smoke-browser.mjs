@@ -6,7 +6,8 @@
 // refs, DOM errors) would sail past the build. This closes that gap.
 //
 // Run: node smoke-browser.mjs   (needs: npm i playwright + npx playwright install chromium)
-// Optional: node smoke-browser.mjs http://localhost:5173   (dev server)
+// Optional dev: node smoke-browser.mjs http://localhost:5173
+// Deep AI check (slow/variable): node smoke-browser.mjs --ai
 import { chromium } from 'playwright';
 
 const URL = process.argv[2] || 'https://battu.god8.shop/';
@@ -40,12 +41,21 @@ try {
   console.log(`  chart rendered: ${chartOk ? '✓' : '✗'}`);
   if (!chartOk) exit = 1;
 
-  // 3. Ask AI → wait for completion (reasoning ~47-70s on GLM) → followup chips
-  await page.evaluate(() => {
-    const q = document.getElementById('question');
-    if (q) { q.scrollIntoView(); q.value = 'Tổng quan mệnh tôi thế nào?'; q.dispatchEvent(new Event('input', { bubbles: true })); }
-  });
-  await page.evaluate(() => { const b = document.getElementById('ask-btn'); if (b) { b.scrollIntoView(); b.click(); } });
+  // 3. Open AI chat via FAB (REAL user flow — loop 931 found we were bypassing it),
+  //    verify voice mic button visible (loop 931 feature). Deep AI check only with --ai
+  //    (GLM reasoning is 50-90s & variable → keep default smoke fast & reliable).
+  const fab = await page.$('#ai-fab');
+  if (fab) { await fab.click(); await page.waitForTimeout(500); }
+  const voiceVisible = await page.$('#voice-btn').then((v) => v ? v.isVisible() : Promise.resolve(false));
+  console.log(`  voice mic button (loop 931): ${voiceVisible ? '✓ visible after FAB' : '⚠ not visible'}`);
+
+  if (!process.argv.includes('--ai')) {
+    console.log('  (bỏ qua AI deep-check — thêm --ai để test hỏi/trả lời/followup)');
+  } else {
+  const q = await page.$('#question');
+  if (q) { await q.scrollIntoViewIfNeeded().catch(() => {}); await q.fill('Tổng quan mệnh tôi thế nào?'); }
+  const askBtn = await page.$('#ask-btn');
+  if (askBtn) { await askBtn.scrollIntoViewIfNeeded().catch(() => {}); await askBtn.click(); }
   let streaming = true;
   for (let i = 0; i < 25; i++) {
     await page.waitForTimeout(3000);
@@ -55,6 +65,7 @@ try {
   await page.waitForTimeout(1500);
   const chips = await page.locator('.followup-chip').count();
   console.log(`  AI answer + followup chips: ${chips > 0 ? `✓ ${chips} chips` : '✗ (AI có thể vẫn đang stream — thử lại)'}`);
+  }
 
   // 4. Verdict
   console.log(`\nPAGE ERRORS: ${pageErrors.length} | CONSOLE ERRORS: ${consoleErrors.length}`);
