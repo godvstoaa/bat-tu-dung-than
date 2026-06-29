@@ -3563,6 +3563,15 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('tôi có giữ được tiền không?', _QR).title.includes('Tài khố'), '[loop 793] regression: «tôi giữ tiền» → caiku (subject)');
   console.log('   [loop 793] isCaiKu gate !isFamily — «mẹ giữ tiền»→family, «tôi giữ tiền»→caiku ✓');
 }
+// [loop 794] pFamily dùng đúng chart thành viên (Mẹ 1970), không phải chủ thể (Quân 1993).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _a = composeAnswer('mẹ tôi vận sao, mệnh mẹ ra sao?', _QR);
+  const _t = _a.paragraphs.join(' ');
+  assert(/1970|Mẹ|mẹ/.test(_t), '[loop 794] pFamily mention Mẹ (1970)');
+  assert(!/乙亥|Quân.*1993|Nhật Chủ 乙/.test(_t), '[loop 794] pFamily KHÔNG show chủ thể Quân chart (乙亥/1993)');
+  console.log('   [loop 794] pFamily dùng đúng thành viên (Mẹ 1970, ≠ chủ thể Quân) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
