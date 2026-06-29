@@ -616,7 +616,8 @@ function pDaily(R, intent) {
   try { const _n = new Date(); _n.setDate(_n.getDate() + _offset); y = _n.getFullYear(); mo = _n.getMonth() + 1; d = _n.getDate(); } catch (e) { y = 2026; mo = 6; d = 29; }
   let db;
   try { db = dailyBriefing(R, y, mo, d, R.patternQuality); } catch (e) { db = null; }
-  if (!db) return { title: 'Vận hôm nay', lead: `Vận ngày hôm nay của ${dm.gan} ${dm.vi}:`, paragraphs: ['(không tính được — thử bật AI)'] };
+  const _dayLabel = _offset === 0 ? 'hôm nay' : _offset === 1 ? 'ngày mai' : _offset === -1 ? 'hôm qua' : _offset === 2 ? 'ngày kia' : _offset === -2 ? 'hôm kia' : `ngày ${y}-${mo}-${d}`;
+  if (!db) return { title: `Vận ${_dayLabel}`, lead: `Vận ${_dayLabel} của ${dm.gan} ${dm.vi}:`, paragraphs: ['(không tính được — thử bật AI)'] };
   const r = db.rating || {};
   const paras = [];
   paras.push(`📅 ${db.date} (${db.lunarStr}, ${db.dayGanZhi}): ${r.level || '?'}${r.tone === 'cat' ? ' ★HOÀNG ĐẠO' : r.tone === 'hung' ? ' ⚠HẮC ĐẠO' : ''} — ${r.summary || ''}`);
@@ -647,7 +648,7 @@ function pDaily(R, intent) {
     paras.push(`📋 Hôm nay 宜 (nên): ${_yi.join(', ') || '(không có việc đặc biệt宜)'}. 忌 (kỵ): ${_ji.join(', ') || '(không)'}.`);
   } catch (e) {}
   paras.push(`💡 Mở tab «Hôm nay» hoặc AI để chi tiết giờ/phút, 选日 cho việc cụ thể (cưới/khai trương/động thổ).`);
-  return { title: 'Vận hôm nay (lưu nhật)', lead: `Vận HÔM NAY của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
+  return { title: `Vận ${_dayLabel} (lưu nhật)`, lead: `Vận ${_dayLabel.toUpperCase()} của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
 }
 function pQiFlow(R) {
   // [loop 781] Surface khí thông trụ / 盖头截脚 offline — pillarRelation per pillar.
