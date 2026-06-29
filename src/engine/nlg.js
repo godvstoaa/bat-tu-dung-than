@@ -12,6 +12,7 @@ import { jiaoYunAnalysis } from './jiaoyun.js';
 import { decadeForecast } from './decade-forecast.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeNayin, NAYIN_MEANING } from './nayin.js';
+import { baziMingGong } from './bazi-minggong.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
@@ -119,7 +120,9 @@ export function detectIntent(question) {
   const isShensha = /\b(quy nhan|chinh tinh|than sat|van xuong|duong nhan|hoa cai|tuong tinh|thien duc|thien y|kim du|hong diem|qui cuong|tam ky|loc than|dich ma|hoc duong)\b/.test(norm)
     || (/\bsao\b/.test(norm) && /\b(co|gi dac biet|chinh tinh|than|nao tot|nao xau)\b/.test(norm));
   // [loop 759] isNayin — hỏi về nạp âm / bản mệnh hành (nayin của trụ ngày).
-  const isNayin = /\b(nap am|nayin|nap am cua|ban menh ngu hanh|menh ngu hanh|hanh cua toi|cung menh)\b/.test(norm);
+  const isNayin = /\b(nap am|nayin|ban menh ngu hanh|menh ngu hanh|hanh cua toi)\b/.test(norm);
+  // [loop 764] isMinggong — hỏi về mệnh cung / thân cung (ziwei-BaZi «trụ thứ 6»).
+  const isMinggong = /\b(menh cung|cung menh|than cung|cung than|tru thu 6)\b/.test(norm);
   // [loop 760] isTiaohou — hỏi về điều hậu (khí hậu mùa sinh → hành cần bổ).
   const isTiaohou = /\b(dieu hau|hau cua|khi hau|mua sinh|co phap|khong thong bao|ngoai hop|van han|khan|tao|ret|am|nhiet)\b/.test(norm)
     && /\b(dieu hau|khi hau|hau|co phap)\b/.test(norm);
@@ -138,7 +141,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, isPattern, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, isPattern, isMinggong, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -523,6 +526,24 @@ function pDivination(R, intent) {
   }
 }
 
+function pMinggong(R) {
+  // [loop 764] Surface mệnh cung offline — baziMingGong (trụ thứ 6) + tương tác nhật trụ.
+  const dm = R.chart.dayMaster;
+  let mg;
+  try { mg = baziMingGong(R); } catch (e) { mg = null; }
+  if (!mg) {
+    return { title: 'Mệnh cung 命宫', lead: `Mệnh cung của ${dm.gan} ${dm.vi}:`, paragraphs: ['(không tính được mệnh cung — thử bật AI)'] };
+  }
+  return {
+    title: 'Mệnh cung 命宫 (trụ thứ 6)',
+    lead: `Mệnh cung = «trụ thứ 6» (sau tứ trụ + thai nguyên) — bản mệnh tiềm ẩn:`,
+    paragraphs: [
+      `🔮 Mệnh cung: ${mg.ganZhi || (mg.gan + mg.zhi)} (${mg.ganVi || ''} ${mg.zhiVi || ''}) — thập thần ${mg.godVi || mg.god || '?'}, hành ${mg.wxVi || ''}${mg.isYong ? ' ★= Dụng' : ''}${mg.isJi ? ' ⚠= Kỵ' : ''}.`,
+      mg.interactionWithDay || 'Mệnh cung trung tính với nhật trụ.',
+      `💡 Mệnh cung (命宫) = «trụ thứ 6» bổ sung tứ trụ — nền tảng tiềm ẩn; khi lưu niên/đại vận tới chi mệnh cung = «kích hoạt». ${mg.meaning ? mg.meaning + '.' : ''} Mở AI để luân giải sâu.`,
+    ],
+  };
+}
 function pPattern(R) {
   // [loop 761] Surface cách cục (格局) offline — pattern + quality + diseases/rescues.
   const dm = R.chart.dayMaster;
@@ -722,6 +743,8 @@ export function composeAnswer(question, R) {
   if (intent.isTiaohou) return pTiaohou(R);
   // [loop 761] pattern question — surface cách cục (offline, không cần AI)
   if (intent.isPattern) return pPattern(R);
+  // [loop 764] minggong question — surface mệnh cung (offline, không cần AI)
+  if (intent.isMinggong) return pMinggong(R);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family

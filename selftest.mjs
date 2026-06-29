@@ -3173,6 +3173,19 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 763] không undefined leak');
   console.log('   [loop 763] 大运 PHASE offline (进气/旺气/退气 trong pTiming) ✓');
 }
+// [loop 764] isMinggong — offline mệnh cung surface (baziMingGong «trụ thứ 6»).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('mệnh cung của tôi là gì?').isMinggong === true, '[loop 764] isMinggong detect «mệnh cung»');
+  const _a = composeAnswer('mệnh cung của tôi?', _QR);
+  assert(/Mệnh cung|命宫/.test(_a.title), `[loop 764] minggong route → title mệnh cung (got ${_a.title})`);
+  // Quân mệnh cung = 辛酉 (Tân Dậu) — phải surface
+  assert(_a.paragraphs.some((p) => /辛酉|Tân Dậu/.test(p)), '[loop 764] surface 辛酉 mệnh cung (Quân)');
+  assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 764] không undefined leak');
+  // «mệnh cung» KHÔNG còn bị isNayin nuốt (cleanup loop 764)
+  assert(detectIntent('mệnh cung của tôi?').isNayin === false, '[loop 764] «mệnh cung» ≠ isNayin (đã tách)');
+  console.log('   [loop 764] offline mệnh cung surface (baziMingGong + cleanup isNayin) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
