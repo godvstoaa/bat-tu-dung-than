@@ -4013,6 +4013,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_diff === 1, `[loop 835] «hôm qua» = today - 1 day (diff ${_diff}, got ${_td} vs ${_yd})`);
   console.log('   [loop 835] «hôm qua» date offset (-1 day) ✓');
 }
+// [loop 836] pDaily structure — 宜/忌 universal, Dụng action member-specific.
+{
+  const _Q = composeAnswer('hôm nay nên làm gì?', analyze(1993, 10, 21, 1, 15, 'nam', 2026));
+  const _B = composeAnswer('hôm nay nên làm gì?', analyze(1964, 4, 4, 12, 0, 'nam', 2026));
+  const _qYi = _Q.paragraphs.find((p) => /Hôm nay 宜/.test(p)) || '';
+  const _bYi = _B.paragraphs.find((p) => /Hôm nay 宜/.test(p)) || '';
+  assert(_qYi === _bYi, '[loop 836] 宜/忌 universal (same Quân & Bố — based on day trực)');
+  const _qDung = _Q.paragraphs.find((p) => /Dụng action/.test(p)) || '';
+  const _bDung = _B.paragraphs.find((p) => /Dụng action/.test(p)) || '';
+  assert(_qDung !== _bDung, '[loop 836] Dụng action member-specific (Quân≠Bố)');
+  console.log('   [loop 836] pDaily structure (宜/忌 universal + Dụng member-specific) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
