@@ -3359,18 +3359,23 @@ function _fallbackCopy(text, done) {
   } catch (_) {}
   if (done) done();
 }
+let _aiAbort = null;   // [loop 948] AbortController cho request AI đang chạy (cancel)
+function _setAskBtn(label, disabled) { const b = $('ask-btn'); if (b) { b.textContent = label; b.disabled = !!disabled; b.classList.toggle('canceling', label === '⏹ Dừng'); } }
 async function handleAsk() {
+  // [loop 948] nếu đang bận → bấm «Hỏi» (=«⏹ Dừng») sẽ HỦY request đang chạy
+  if (_aiBusy) { if (_aiAbort) { try { _aiAbort.abort(); } catch (_) {} } return; }
   // [loop 933] dừng đọc to đang chạy khi user hỏi câu mới (tránh 2 giọng chồng nhau)
   try { if ('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch (_) {}
   if (!currentResult) {
     appendMsg('assistant', '📋 Vui lòng nhập ngày sinh ở form trên rồi bấm «Luận giải» — sau đó tôi có thể trả lời mọi câu hỏi của bạn (vận hạn, tài lộc, tình duyên, phong thủy…).');
     return;
   }
-  if (_aiBusy) return;
   const q = $('question').value.trim();
   if (!q) return;
   $('question').value = '';
   _aiBusy = true;
+  _aiAbort = new AbortController();
+  _setAskBtn('⏹ Dừng', false);   // nút thành «Dừng» khi đang chạy
   appendMsg('user', q);
   const { body, badge } = appendMsg('assistant', 'Đang luân giải…');
   body.classList.add('streaming');
@@ -3387,6 +3392,7 @@ async function handleAsk() {
     currentResult._family = _famData.length ? _famData : undefined;
     const { source, text } = await askAI(q, currentResult, cfg, {
       history: chatHistory,
+      signal: _aiAbort.signal,   // [loop 948] cho phép cancel
       onStatus: (s) => { lastStatus = s; body.textContent = s + ' …'; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
       onToken: (_delta, full) => { body.textContent = full; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
     });
@@ -3417,10 +3423,18 @@ async function handleAsk() {
     chatHistory.push({ role: 'assistant', content: text });
     if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
   } catch (e) {
-    body.textContent = 'Lỗi: ' + e.message;
-    body.classList.remove('streaming');
+    if (e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''))) {
+      body.textContent = '(⏹ đã dừng — bạn có thể hỏi lại)';
+      body.classList.remove('streaming');
+      badge.textContent = 'Trợ lý';
+    } else {
+      body.textContent = 'Lỗi: ' + e.message;
+      body.classList.remove('streaming');
+    }
   } finally {
     _aiBusy = false;
+    _aiAbort = null;
+    _setAskBtn('Hỏi', false);   // [loop 948] trả nút về «Hỏi»
     try { localStorage.setItem('bazi-chat', JSON.stringify(chatHistory.slice(-12))); } catch (_) {}
   }
 }

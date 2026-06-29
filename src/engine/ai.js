@@ -1281,7 +1281,7 @@ export function suggestFollowups(question, R) {
 //  - history: [{role:'user'|'assistant', content}] bộ nhớ hội thoại
 //  - onToken(delta, full): stream nội dung; onStatus(text): báo tiến trình tool
 // ===========================================================================
-export async function askAI(question, R, cfg, { onToken, onStatus, history } = {}) {
+export async function askAI(question, R, cfg, { onToken, onStatus, history, signal } = {}) {
   cfg = cfg || getConfig();
   const localFallback = (note) => {
     const block = composeAnswer(question, R);
@@ -1336,7 +1336,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history } = {
     for (let step = 0; step < 6; step++) {
       let round;
       try {
-        round = await streamRound(url, headers, buildBody(messages, toolsOn), onToken, onStatus);
+        round = await streamRound(url, headers, buildBody(messages, toolsOn), onToken, onStatus, signal);
       } catch (e) {
         // Lượt đầu: nếu model không hỗ trợ tools/thinking → tắt cả 2 và thử lại
         if (step === 0 && toolsOn) { toolsOn = false; step = -1; continue; }
@@ -1368,6 +1368,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history } = {
     const last = [...messages].reverse().find((m) => m.role === 'assistant' && m.content);
     return { source: 'ai', text: (last?.content) || '(AI không trả lời được)' };
   } catch (e) {
+    if (e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''))) throw e;  // [loop 948] user cancel — propagate, no fallback
     const isCors = /Failed to fetch|NetworkError|Load failed/i.test(e.message);
     const hint = isCors
       ? `Không gọi được AI — CORS: trình duyệt chặn ${cfg.endpoint}. Mở ⚙ chọn "★ PROXY DEV" (npm run dev) hoặc backend.`
@@ -1412,8 +1413,8 @@ function _reasonStageLabel(reasonLen) {
 
 // ---- 1 vòng streaming SSE: gom content (→ onToken) + tool_calls + bỏ qua reasoning_content ----
 // Theo docs Z.ai (interleaved thinking + stream tool call).
-async function streamRound(url, headers, body, onToken, onStatus) {
-  const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+async function streamRound(url, headers, body, onToken, onStatus, signal) {
+  const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal });
   if (!res.ok || !res.body) {
     let t = ''; try { t = await res.text(); } catch (_) {}
     throw new Error('HTTP ' + res.status + (t ? ': ' + t.slice(0, 140) : ''));
