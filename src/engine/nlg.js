@@ -656,17 +656,26 @@ function pDaily(R, intent) {
   paras.push(`💡 Mở tab «Hôm nay» hoặc AI để chi tiết giờ/phút, 选日 cho việc cụ thể (cưới/khai trương/động thổ).`);
   return { title: `Vận ${_dayLabel} (lưu nhật)`, lead: `Vận ${_dayLabel.toUpperCase()} của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
 }
-function pBestDays(R) {
+function pBestDays(R, intent) {
   // [loop 882] Top good/bad days in current month — offline date selection.
+  // [loop 885] Activity-aware — detect activity từ question (cưới/khai trương/động thổ...).
   const dm = R.chart.dayMaster;
   const userZhi = R.chart.pillars.year.zhi;
   let y, mo;
   try { const _n = new Date(); y = _n.getFullYear(); mo = _n.getMonth() + 1; } catch (e) { y = 2026; mo = 6; }
+  // [loop 885] detect activity
+  const _q = (intent?.raw || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+  let _actId = 'marry', _actLabel = 'Cưới hỏi';
+  if (/\b(cuoi|cuoi hoi|hon le|cuoi xon)\b/.test(_q)) { _actId = 'marry'; _actLabel = 'Cưới hỏi'; }
+  else if (/\b(khai truong|mo cua|kinh doanh|buon ban)\b/.test(_q)) { _actId = 'business'; _actLabel = 'Khai trương'; }
+  else if (/\b(dong tho|xay dung|xay nha|xay cua|dip nha|nhap trach|don nha)\b/.test(_q)) { _actId = /dip|don|nhap/.test(_q) ? 'move' : 'build'; _actLabel = /dip|don|nhap/.test(_q) ? 'Dọn nhà' : 'Động thổ'; }
+  else if (/\b(di xa|xuat hanh|du lich|cong tac)\b/.test(_q)) { _actId = 'travel'; _actLabel = 'Xuất hành'; }
+  else if (/\b(ky hop dong|ky ket|giao dich)\b/.test(_q)) { _actId = 'sign'; _actLabel = 'Ký kết'; }
   const _maxDay = new Date(y, mo, 0).getDate();
   const results = [];
   for (let d = 1; d <= _maxDay; d++) {
     try {
-      const ev = evaluateDate(y, mo, d, 'marry', userZhi);
+      const ev = evaluateDate(y, mo, d, _actId, userZhi);
       results.push({ d, officer: ev.officerVi, officerTone: ev.tone, rating: ev.rating, score: ev.score, ganZhi: ev.dayGanZhi, clashYou: ev.clashYou });
     } catch (_) {}
   }
@@ -674,7 +683,7 @@ function pBestDays(R) {
   const top = results.slice(0, 5);
   const worst = results.slice(-3).reverse();
   const paras = [];
-  paras.push(`📅 **Tháng ${mo}/${y}** — top ngày tốt (dựa trực ${top[0]?.officer} + thái tuế + Dụng):`);
+  paras.push(`📅 **Tháng ${mo}/${y}** — top ngày tốt cho «${_actLabel}» (dựa trực ${top[0]?.officer} + thái tuế + Dụng):`);
   top.forEach((r, i) => {
     const d = String(r.d).padStart(2, '0');
     paras.push(`${i + 1}. **${d}/${mo}** (${r.ganZhi}, trực ${r.officer}) → ${r.rating} (${r.score}/100)${r.clashYou ? ' ⚠ xung tuổi' : ''}`);
@@ -1049,7 +1058,7 @@ export function composeAnswer(question, R) {
   // [loop 878] thập thần chart — bar chart 10 god personality.
   if (intent.isTenGod && !_hasDomain) return pTenGod(R);
   // [loop 882] best days — UNGATED: «tháng này ngày nào tốt» = date selection, không timing.
-  if (intent.isBestDays && !intent.isFamily) return pBestDays(R);
+  if (intent.isBestDays && !intent.isFamily) return pBestDays(R, intent);
 
   // [loop 620→621] family question — check BEFORE compat/divination
   //   vì «mẹ tôi hợp không» match CẢ isFamily và isCompat → ưu tiên family
