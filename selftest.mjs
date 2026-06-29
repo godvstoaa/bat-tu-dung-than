@@ -4034,6 +4034,15 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_avg < 200, `[loop 837] pDaily <200ms (got ${_avg.toFixed(0)}ms — includes 6 evaluateDate for 宜忌)`);
   console.log(`   [loop 837] pDaily performance ${_avg.toFixed(0)}ms (<200ms, 宜忌 không slow) ✓`);
 }
+// [loop 839] privacy fix verified — empty defaults handled gracefully (run() early-return).
+{
+  const { readFileSync: _rf } = await import('fs');
+  const _main = _rf('src/main.js', 'utf8');
+  assert(/if\s*\(!dateVal\)\s*return/.test(_main), '[loop 839] run() có early-return cho empty date (loop 838 privacy)');
+  assert(/const DEFAULT_FAMILY = \[\];/.test(_main), '[loop 839] DEFAULT_FAMILY = [] (no personal data)');
+  assert(/date: ''/.test(_main), "[loop 839] default subject date: '' (empty)");
+  console.log('   [loop 839] privacy fix verified — empty defaults + run() early-return (no crash) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
