@@ -3361,6 +3361,15 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert((_res.holographic || []).length > 0 || (_res.relations || []).length > 0, '[loop 776] family-deduction trả insights (holographic/relations)');
   console.log('   [loop 776] family-deduction 4 thành viên seed — holographic insights, 0 leak ✓');
 }
+// [loop 777] pPattern cho 从格 (special type) — surface «ĐẶC BIỆT» đúng, 0 leak.
+{
+  const _CR = analyze(1998, 5, 15, 12, 0, 'nam', 2026);  // 從財格 (loop 117)
+  assert(_CR.pattern?.type === 'special' && _CR.patternQuality?.quality === '特殊', `[loop 777] 1998-5-15 = 從財格 special (got ${_CR.pattern?.type}/${_CR.patternQuality?.quality})`);
+  const _a = composeAnswer('cách cục của tôi?', _CR);
+  assert(_a.paragraphs.some((p) => /ĐẶC BIỆT|CÁCH ĐẶC BIỆT/.test(p)), '[loop 777] pPattern surface «ĐẶC BIỆT» cho 从格');
+  assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 777] pPattern 从格 không leak');
+  console.log('   [loop 777] pPattern 从格 (special) — surface «ĐẶC BIỆT» đúng ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
