@@ -3664,6 +3664,17 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_fail === 0, `[loop 801] routing production-ready — ${_ok.length - _fail}/${_ok.length} acceptable (kể cả collision-fixed)`);
   console.log(`   [loop 801] routing production-ready — ${_ok.length - _fail}/${_ok.length} diverse questions acceptable ✓`);
 }
+// [loop 802] pDaily offline — «hôm nay» → dailyBriefing (giờ tốt/xấu, hướng kỵ, thái tuế, Dụng action).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('hôm nay tôi nên làm gì?').isDaily === true, '[loop 802] isDaily detect «hôm nay»');
+  assert(detectIntent('hôm nay tốt không?').isTiming === false, '[loop 802] «hôm nay» moved từ timing → daily');
+  const _a = composeAnswer('hôm nay tôi nên làm gì, giờ nào tốt?', _QR);
+  assert(/hôm nay|lưu nhật/i.test(_a.title), `[loop 802] pDaily route (got ${_a.title})`);
+  assert(_a.paragraphs.some((p) => /Giờ TỐT|Hoàng Đạo|HẮC ĐẠO|giờ/i.test(p)), '[loop 802] surface giờ/rating');
+  assert(!_a.paragraphs.some((p) => /\[object Object\]|undefined/.test(p)), '[loop 802] không [object]/undefined leak');
+  console.log('   [loop 802] pDaily offline — «hôm nay» → dailyBriefing (giờ/hướng/thái tuế/Dụng) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

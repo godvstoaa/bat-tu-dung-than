@@ -16,6 +16,7 @@ import { baziMingGong } from './bazi-minggong.js';
 import { analyzeCaiKu } from './caiku.js';
 import { pillarRelation } from './pillar-quality.js';
 import { natalFuyin } from './fuyin.js';
+import { dailyBriefing } from './daily-briefing.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
@@ -89,12 +90,16 @@ export function detectIntent(question) {
   const t = question.toLowerCase();
   const norm = t.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D'); // [loop 674] bỏ dấu + đ→d (đ là codepoint đơn, NFD không tách → regex lệch)
   const years = (question.match(/(19|20)\d{2}/g) || []).map(Number);
+  // [loop 802] isDaily — «hôm nay/hôm qua/ngày mai» → daily briefing (giờ tốt/xấu, hướng kỵ,
+  //   thái tuế, Dụng action) cụ thể hơn pTiming (năm/tháng). Trước đây «hôm nay» ở isTiming.
+  const isDaily = /\b(hom nay|hom qua|ngay mai|ngay hom nay)\b/.test(norm);
   // [loop 717 FIX] thêm «tháng này» (thang nay), «hôm nay» (hom nay), «hôm qua», «tuần này»
   // [loop 734 FIX] thêm «bao giờ» (bao gio), «bao lâu» (bao lau) — câu hỏi timing phổ biến nhất,
   //   trước đây thiếu → «bao giờ tôi phát tài?» misroute sang wealth thay vì pTiming.
   // [loop 735 FIX] thêm «đại vận» (dai van), «lưu niên» (luu nien) — «đại vận nào tốt nhất?» trước đây
   //   area='timing' đúng nhưng isTiming=false → mất context-aware pTiming path.
-  const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|bao gio|bao lau|dai van|luu nien|nam nay|nam sau|thang nay|hom nay|hom qua|tuan nay|tuan sau|thang sau)\b/.test(norm) || years.length > 0;
+  // [loop 802] «hôm nay/hôm qua» chuyển sang isDaily (daily briefing cụ thể hơn).
+  const isTiming = /\b(khi nao|luc nao|nam nao|thang nao|bao gio|bao lau|dai van|luu nien|nam nay|nam sau|thang nay|tuan nay|tuan sau|thang sau)\b/.test(norm) || years.length > 0;
   const isYesNo = /\b(co nen|co duoc khong|nen khong|duoc khong|co tot khong|co xau khong|co the|lieu co)\b/.test(norm);
   // [loop 674 FIX] isCompat exclude số/tên/màu/đá — «số hợp không», «tên hợp không»
   //   là number/name analysis, KHÔNG phải chart compat (trước đây misroute → compat).
@@ -165,7 +170,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, confidence, raw: question };
+  return { area, years, isTiming, isDaily, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, isPattern, isMinggong, isCaiKu, isQiFlow, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -550,6 +555,35 @@ function pDivination(R, intent) {
   }
 }
 
+function pDaily(R) {
+  // [loop 802] Surface dailyBriefing offline — «hôm nay» giờ tốt/xấu, hướng kỵ, thái tuế, Dụng action.
+  const dm = R.chart.dayMaster;
+  // ngày: hôm nay (refYear không dùng cho daily — lấy ngày thật)
+  let y, mo, d;
+  try { const _n = new Date(); y = _n.getFullYear(); mo = _n.getMonth() + 1; d = _n.getDate(); } catch (e) { y = 2026; mo = 6; d = 29; }
+  let db;
+  try { db = dailyBriefing(R, y, mo, d, R.patternQuality); } catch (e) { db = null; }
+  if (!db) return { title: 'Vận hôm nay', lead: `Vận ngày hôm nay của ${dm.gan} ${dm.vi}:`, paragraphs: ['(không tính được — thử bật AI)'] };
+  const r = db.rating || {};
+  const paras = [];
+  paras.push(`📅 ${db.date} (${db.lunarStr}, ${db.dayGanZhi}): ${r.level || '?'}${r.tone === 'cat' ? ' ★HOÀNG ĐẠO' : r.tone === 'hung' ? ' ⚠HẮC ĐẠO' : ''} — ${r.summary || ''}`);
+  if (Array.isArray(db.bestHours) && db.bestHours.length) paras.push(`🕐 Giờ TỐT hôm nay: ${db.bestHours.slice(0, 3).map((h) => `${h.vi || h.zhi}(${h.score})`).join(', ')}.`);
+  if (Array.isArray(db.avoidHours) && db.avoidHours.length) paras.push(`⏰ Giờ KỴ: ${db.avoidHours.slice(0, 2).map((h) => `${h.vi || h.zhi}`).join(', ')}.`);
+  if (db.directionTaboo) {
+    const _dt = db.directionTaboo;
+    const _avoid = Array.isArray(_dt.avoid) ? _dt.avoid.join('/') : (_dt.avoid || '');
+    const _safe = Array.isArray(_dt.safe) ? _dt.safe.join('/') : (_dt.safe || '');
+    paras.push(`🧭 Hướng: KỴ ${_avoid}${_safe ? ' · AN TOÀN ' + _safe : ''}.`);
+  }
+  if (db.taisui) paras.push(`⚠ Thái Tuế: ${db.taisui.relation || db.taisui.current || '(xem chi tiết)'}.`);
+  if (db.yongAction) {
+    const _ya = db.yongAction;
+    paras.push(`🎯 Dụng action: ${_ya.boost || ''}${_ya.reduce ? ' · giảm ' + _ya.reduce : ''}.${_ya.reason ? ' ' + _ya.reason : ''}`);
+  }
+  if (db.tips) paras.push(`💡 ${db.tips}`);
+  paras.push(`💡 Mở tab «Hôm nay» hoặc AI để chi tiết giờ/phút, 选日 cho việc cụ thể (cưới/khai trương/động thổ).`);
+  return { title: 'Vận hôm nay (lưu nhật)', lead: `Vận HÔM NAY của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
+}
 function pQiFlow(R) {
   // [loop 781] Surface khí thông trụ / 盖头截脚 offline — pillarRelation per pillar.
   const dm = R.chart.dayMaster;
@@ -818,6 +852,9 @@ export function composeAnswer(question, R) {
   //   nhưng [loop 793 FIX] gate !isFamily: «mẹ tôi giữ tiền» phải về pFamily (chart MẸ),
   //   không phải pCaiKu(R=chủ thể Quân).
   if (intent.isCaiKu && !intent.isFamily) return pCaiKu(R);
+  // [loop 802] daily question — «hôm nay» → dailyBriefing (giờ tốt/xấu, hướng kỵ, thái tuế) —
+  //   TRƯỚC isTiming (daily cụ thể hơn năm/tháng).
+  if (intent.isDaily && !intent.isFamily && !intent.isDivination) return pDaily(R);
   // [loop 757] interaction question — surface 刑冲害合 typed meanings (offline, không cần AI)
   // [loop 795 FIX] gate thêm !isTiming: «năm 2030 xung hình?» → pTiming (lưu niên 太岁/xung năm),
   //   không pInteractions (natal). Xung/hình LÀ timing-relevant (lưu niên); cách cục/tài khố
