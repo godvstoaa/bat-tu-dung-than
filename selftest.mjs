@@ -3813,6 +3813,16 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   }
   console.log('   [loop 815] pRemedy member-specific (Dụng Thổ/Hỏa/Thủy/Kim → 4 màu khác) ✓');
 }
+// [loop 816] ALL offline composers member-specific — 4 thành viên ra output khác.
+{
+  const _F = [[1993, 10, 21, 1, 15, 'nam'], [1996, 12, 4, 10, 15, 'nữ'], [1970, 6, 27, 7, 15, 'nữ'], [1964, 4, 4, 12, 0, 'nam']];
+  const _qs = { 'nạp âm': 'nạp âm của tôi?', 'cách cục': 'cách cục của tôi?', 'tài khố': 'tài khố của tôi?', 'overview': 'phân tích toàn diện' };
+  for (const [label, q] of Object.entries(_qs)) {
+    const _outs = _F.map(([y, m, d, h, mi, g]) => JSON.stringify(composeAnswer(q, analyze(y, m, d, h, mi, g, 2026)).paragraphs));
+    assert(new Set(_outs).size === 4, `[loop 816] ${label}: 4/4 member-specific (got ${new Set(_outs).size}/4)`);
+  }
+  console.log('   [loop 816] ALL offline composers member-specific (4 thành viên × 4 composer = 16, 0 generic) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
