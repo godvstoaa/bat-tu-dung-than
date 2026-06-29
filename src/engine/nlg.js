@@ -13,6 +13,7 @@ import { decadeForecast } from './decade-forecast.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeNayin, NAYIN_MEANING } from './nayin.js';
 import { baziMingGong } from './bazi-minggong.js';
+import { analyzeCaiKu } from './caiku.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
@@ -129,6 +130,8 @@ export function detectIntent(question) {
   const isNayin = /\b(nap am|nayin|ban menh ngu hanh|menh ngu hanh|hanh cua toi)\b/.test(norm);
   // [loop 764] isMinggong — hỏi về mệnh cung / thân cung (ziwei-BaZi «trụ thứ 6»).
   const isMinggong = /\b(menh cung|cung menh|than cung|cung than|tru thu 6)\b/.test(norm);
+  // [loop 779] isCaiKu — hỏi về tài khố / giữ tiền / kho tiền (wealth storage).
+  const isCaiKu = /\b(tai kho|kho tien|giu tien|giu duoc tien|taikho|cai ku|财库)\b/.test(norm);
   // [loop 760] isTiaohou — hỏi về điều hậu (khí hậu mùa sinh → hành cần bổ).
   const isTiaohou = /\b(dieu hau|hau cua|khi hau|mua sinh|co phap|khong thong bao|ngoai hop|van han|khan|tao|ret|am|nhiet)\b/.test(norm)
     && /\b(dieu hau|khi hau|hau|co phap)\b/.test(norm);
@@ -147,7 +150,7 @@ export function detectIntent(question) {
   }
   // confidence: bestHits tổng độ dài từ khoá khớp. <3 = không khớp rõ → câu tự do/khó hiểu
   const confidence = bestHits;
-  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, isPattern, isMinggong, confidence, raw: question };
+  return { area, years, isTiming, isYesNo, isCompat, isDivination, isFamily, isFengshui, isRemedy, isRemedyStrong, isInteraction, isShensha, isNayin, isTiaohou, isPattern, isMinggong, isCaiKu, confidence, raw: question };
 }
 
 // ---------------------------------------------------------------------------
@@ -532,6 +535,24 @@ function pDivination(R, intent) {
   }
 }
 
+function pCaiKu(R) {
+  // [loop 779] Surface tài khố offline — analyzeCaiKu (Tài/Quan/Ấn khố + giữ tiền).
+  const dm = R.chart.dayMaster;
+  const dayGz = (R.chart.pillars && R.chart.pillars.day) ? R.chart.pillars.day.gan + R.chart.pillars.day.zhi : dm.gan;
+  let ck;
+  try { ck = analyzeCaiKu(R); } catch (e) { ck = null; }
+  if (!ck) return { title: 'Tài khố 财库', lead: `Tài khố ${dayGz}:`, paragraphs: ['(không tính được — thử bật AI)'] };
+  const paras = [];
+  const kuVi = { taikuWx: 'Tài khố (kho tiền)', guankuWx: 'Quan khố (kho quyền/sự nghiệp)', yinkuWx: 'Ấn khố (kho học/phúc)' };
+  paras.push(`💰 Tài khố: hành ${ck.taikuWxVi} (@ ${ck.taikuZhiVi})${ck.hasTaiku ? ` — CÓ (${ck.taikuPos?.length || 0} chi: ${(ck.taikuPos || []).join(', ')})` : ' — KHÔNG có tàng trong nguyên cục'}.`);
+  if (ck.hasGuanku) paras.push(`🏛 Quan khố (${ck.guankuWx}): CÓ @ ${ck.guankuZhi} — sự nghiệp có nền tích luỹ.`);
+  if (ck.hasYinku) paras.push(`📚 Ấn khố (${ck.yinkuWx}): CÓ @ ${ck.yinkuZhi} — phúc/học vấn tích luỹ.`);
+  if ((ck.opens || []).length) paras.push(`🔓 Kho MỞ (bị 冲): ${ck.opens.join(', ')} — kho bị «mở» → tiền dễ ra, khó giữ trọn.`);
+  if (Array.isArray(ck.profile)) paras.push(...ck.profile.slice(0, 3));
+  if (ck.advice) paras.push(`💡 ${ck.advice}`);
+  paras.push(`💡 Tài khố = chi «kho» (墓) của hành Tài — có kho → giữ được tiền; không kho → tiền qua rồi hết; bị 冲 = «mở kho» hao. Mở AI để luân giải sâu.`);
+  return { title: 'Tài khố 财库 (giữ tiền)', lead: `Khả năng GIỮ TIỀN của ${dayGz}:`, paragraphs: paras };
+}
 function pMinggong(R) {
   // [loop 764] Surface mệnh cung offline — baziMingGong (trụ thứ 6) + tương tác nhật trụ.
   const dm = R.chart.dayMaster;
@@ -747,6 +768,9 @@ export function composeAnswer(question, R) {
   //   isRemedyStrong/isCompat/isDivination.
   const _STRONG_DOMAIN = new Set(['wealth', 'career', 'love', 'health', 'timing', 'flow']);
   const _hasDomain = _STRONG_DOMAIN.has(intent.area) || intent.isFamily || intent.isFengshui || intent.isRemedyStrong || intent.isCompat || intent.isDivination;
+  // [loop 779] tài khố question — surface giữ-tiền/kho (offline) — UNGATED (câu hỏi cụ thể
+  //   về wealth-storage, thắng cả wealth domain).
+  if (intent.isCaiKu) return pCaiKu(R);
   // [loop 757] interaction question — surface 刑冲害合 typed meanings (offline, không cần AI)
   if (intent.isInteraction && !_hasDomain) return pInteractions(R);
   // [loop 761] pattern question — surface cách cục (offline, KHÔNG cần AI) — check TRƯỚC isShensha

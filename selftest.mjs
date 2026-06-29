@@ -3392,6 +3392,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_crash === 0 && _nan === 0, `[loop 778] full fuzz ${_n} chart: ${_crash} crash, ${_nan} NaN`);
   console.log(`   [loop 778] full fuzz analyze+brief ${_n} chart đa dạng — 0 crash/NaN ✓`);
 }
+// [loop 779] isCaiKu — offline tài khố surface (Tài/Quan/Ấn khố + giữ tiền).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  assert(detectIntent('tôi có giữ được tiền không?').isCaiKu === true, '[loop 779] isCaiKu detect «giữ được tiền»');
+  assert(detectIntent('tài khố của tôi sao?').isCaiKu === true, '[loop 779] isCaiKu detect «tài khố»');
+  const _a = composeAnswer('tài khố của tôi sao?', _QR);
+  assert(/Tài khố|财库/.test(_a.title), `[loop 779] caiku route → title tài khố (got ${_a.title})`);
+  // Quân Tài khố Thổ @ 戌,丑 → GIỮ ĐƯỢC TIỀN
+  assert(_a.paragraphs.some((p) => /戌|丑|GIỮ ĐƯỢC|giữ được/.test(p)), '[loop 779] surface Quân Tài khố Thổ (戌/丑) → giữ được tiền');
+  assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 779] không leak');
+  console.log('   [loop 779] offline tài khố surface (Tài/Quan/Ấn khố + giữ tiền) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
