@@ -3,7 +3,7 @@
 //  4 nguyên tắc cổ pháp: (1) 五行互补, (2) 生肖三合六合/冲, (3) 日主干支相合,
 //  (4) 用神互不损伤. Trả điểm + chốt hợp/không. Nguồn: 渊海子平, 八字合婚.
 // ============================================================================
-import { ZHI } from './constants.js';
+import { ZHI, GAN } from './constants.js';
 import { tenGod } from './core.js';
 import { XING_PAIRS, HAI_PAIRS } from './zodiac-deep.js';
 import { computeZhai } from './zhai.js';
@@ -88,6 +88,22 @@ export function computeHehun(R1, R2) {
   const dXing = dXingBlocked ? null : XING_PAIRS.find((x) => x.pair.includes(dza) && x.pair.includes(dzb) && dza !== dzb);
   if (dHai) { score -= 10; factors.push(`✗ Nhật Chi ${ZHI[dza].vi}–${ZHI[dzb].vi} ${dHai.vi} → CUNG PHU THÊ trệ/tiểu nhân — cần bao dung, tránh so đo.`); }
   if (dXing) { score -= 12; factors.push(`✗ Nhật Chi ${ZHI[dza].vi}–${ZHI[dzb].vi} ${dXing.vi} → CUNG PHU THÊ hình khắc — bất lợi hôn nhân, cần cố ý hóa giải (chọn năm cát cưới).`); }
+
+  // [loop 926 RAISE LOGIC] 日干相克 + 天克地冲 — engine từng thưởng 合(+16) nhưng BỎ SÓT 克.
+  //   Cổ法 «日干相克两主不和» + «夫妻宫天克地冲为婚大忌». 5 cặp 干合 đã ưu tiên (hóa → loại trừ).
+  //   Trước đây: cặp Nhật Can tương KHẮC (vd 庚–甲, 丙–庚) không bị phạt → lệch cổ pháp.
+  const KE5 = { '木':'土','土':'水','水':'火','火':'金','金':'木' };
+  const _wxA = GAN[a.dayGan].wx, _wxB = GAN[b.dayGan].wx;
+  const ganKe = !ganHe && (KE5[_wxA] === _wxB || KE5[_wxB] === _wxA);
+  if (ganKe) {
+    score -= 8;
+    factors.push(`✗ Nhật Can ${a.dayGan}–${b.dayGan} tương khắc (${_wxA}↔${_wxB}) → «日干相克两主不和» — hai Nhật Chủ khắc nhau, tính cách đối kháng, cần nhẫn nhịn điều chỉnh.`);
+    // 天克地冲: can KHẮC + chi XUNG cùng lúc trên CUNG PHU THÊ → đại kỵ hôn nhân (cổ pháp)
+    if (dayZhiRel.type === 'xung') {
+      score -= 12;
+      factors.push(`⚠ 天克地冲 CUNG PHU THÊ (can khắc + chi xung ĐỒNG LÚC) — cổ法 «夫妻宫天克地冲» xem là ĐẠI KỴ hôn nhân: biến động lớn, BẮT BUỘC chọn năm cát cưới + bao dung lớn, không thì duyên mỏng dễ tan.`);
+    }
+  }
 
   // 4b. [loop 22 NEW] 十神 spouse-star cross-check (giới tính): nam lấy 财 làm vợ, nữ lấy 官
   //   làm chồng. Nếu Nhật Chủ A nhìn B đúng sao phối ngẫu (và B nhìn A) → tín hiệu mạnh.

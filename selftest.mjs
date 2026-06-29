@@ -7950,6 +7950,30 @@ import { YI_MA as _YM, HUA_GAI as _HG, BRANCH_GROUP as _BG } from './src/engine/
   else assert(false, `[loop 924] FUZZ INVARIANTS: ${_viol} vi phạm qua ${_charts} lá số`);
 }
 
+// ################## HEHUN 日干相克/天克地冲 [loop 926] — algorithm upgrade guard ##################
+import { computeHehun as _hehun } from './src/engine/hehun.js';
+{
+  const _HE = ['甲己', '乙庚', '丙辛', '丁壬', '戊癸'];
+  let _pairs = 0, _crash = 0, _falseKe = 0, _ganKeN = 0, _tkdcN = 0;
+  let _s2 = 9260926; const _r2 = () => (_s2 = (_s2 * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  for (let _i = 0; _i < 60; _i++) {
+    const _A = analyze(1955 + Math.floor(_r2() * 40), 1 + Math.floor(_r2() * 12), 1 + Math.floor(_r2() * 28), Math.floor(_r2() * 24), 0, _r2() < 0.5 ? 'nam' : 'nữ');
+    const _B = analyze(1955 + Math.floor(_r2() * 40), 1 + Math.floor(_r2() * 12), 1 + Math.floor(_r2() * 28), Math.floor(_r2() * 24), 0, _r2() < 0.5 ? 'nam' : 'nữ');
+    let _h; try { _h = _hehun(_A, _B); _pairs++; } catch (e) { _crash++; continue; }
+    const _dg = _A.chart.dayGan + _B.chart.dayGan, _isHe = _HE.includes(_dg) || _HE.includes([..._dg].reverse().join(''));
+    const _ke = _h.factors.some((f) => f.includes('日干相克两主不和'));
+    const _tkdc = _h.factors.some((f) => f.includes('天克地冲'));
+    if (_ke) _ganKeN++; if (_tkdc) _tkdcN++;
+    if (_isHe && _ke) _falseKe++;                                  // 合 pair MUST NOT trigger 克
+    if (_tkdc && !_ke) _falseKe++;                                 // 天克地冲 requires 克
+    assert(_h.score >= 5 && _h.score <= 98, `[loop 926] hehun score trong [5,98] (got ${_h.score})`);
+  }
+  assert(_crash === 0, `[loop 926] hehun: 0 crash qua ${_pairs} cặp (got ${_crash})`);
+  assert(_falseKe === 0, `[loop 926] hehun: hợp pair không trigger 克 / 天克地冲 yêu 克 (got ${_falseKe} false)`);
+  assert(_ganKeN > 0 && _tkdcN > 0, `[loop 926] hehun 日干相克(${_ganKeN}) + 天克地冲(${_tkdcN}) đều fire được (else logic chết)`);
+  console.log(`   [loop 926] HEHUN ✓ — ${_pairs} cặp, 日干相克×${_ganKeN}, 天克地冲×${_tkdcN}, 0 false`);
+}
+
 console.log('\n' + '='.repeat(70));
 if (FAILS === 0) {
   console.log('🎉 TẤT CẢ KIỂM CHỨNG ĐẠT (0 fail)');
