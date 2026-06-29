@@ -672,8 +672,17 @@ function pBestDays(R, intent) {
   else if (/\b(di xa|xuat hanh|du lich|cong tac)\b/.test(_q)) { _actId = 'travel'; _actLabel = 'Xuất hành'; }
   else if (/\b(ky hop dong|ky ket|giao dich)\b/.test(_q)) { _actId = 'sign'; _actLabel = 'Ký kết'; }
   const _maxDay = new Date(y, mo, 0).getDate();
+  // [loop 897] «tuần này」 → chỉ scan 7 ngày từ hôm nay
+  const _isWeek = /\b(tuan nay|tuan nay ngay)\b/.test(_q);
+  let _startD = 1, _endD = _maxDay, _rangeLabel = `tháng ${mo}/${y}`;
+  if (_isWeek) {
+    const _now = new Date();
+    _startD = _now.getDate();
+    _endD = Math.min(_startD + 6, _maxDay);
+    _rangeLabel = `tuần này (${_startD}–${_endD}/${mo})`;
+  }
   const results = [];
-  for (let d = 1; d <= _maxDay; d++) {
+  for (let d = _startD; d <= _endD; d++) {
     try {
       const ev = evaluateDate(y, mo, d, _actId, userZhi);
       results.push({ d, officer: ev.officerVi, officerTone: ev.tone, rating: ev.rating, score: ev.score, ganZhi: ev.dayGanZhi, clashYou: ev.clashYou });
@@ -683,7 +692,7 @@ function pBestDays(R, intent) {
   const top = results.slice(0, 5);
   const worst = results.slice(-3).reverse();
   const paras = [];
-  paras.push(`📅 **Tháng ${mo}/${y}** — top ngày tốt cho «${_actLabel}» (dựa trực ${top[0]?.officer} + thái tuế + Dụng):`);
+  paras.push(`📅 **${_rangeLabel}** — top ngày tốt cho «${_actLabel}」 (dựa trực ${top[0]?.officer} + thái tuế + Dụng):`);
   top.forEach((r, i) => {
     const d = String(r.d).padStart(2, '0');
     paras.push(`${i + 1}. **${d}/${mo}** (${r.ganZhi}, trực ${r.officer}) → ${r.rating} (${r.score}/100)${r.clashYou ? ' ⚠ xung tuổi' : ''}`);
@@ -694,7 +703,7 @@ function pBestDays(R, intent) {
     paras.push(`  ${d}/${mo} (${r.ganZhi}) → ${r.rating}${r.clashYou ? ' ⚠ xung tuổi' : ''}`);
   });
   paras.push(`💡 Đây là top ngày theo trực (建除) + xung tuổi. Cho việc cụ thể (cưới/khai trương/động thổ) → hỏi AI hoặc mở tab «择日» để chính xác hơn.`);
-  return { title: `Chọn ngày tốt tháng ${mo}/${y}`, lead: `Top ngày tốt tháng ${mo}/${y} cho ${dm.gan} ${dm.vi}:`, paragraphs: paras };
+  return { title: `Chọn ngày tốt ${_rangeLabel}`, lead: `Top ngày tốt ${_rangeLabel} cho ${dm.gan} ${dm.vi}:`, paragraphs: paras };
 }
 function pTenGod(R) {
   // [loop 878] Thập thần bar chart — 10 god personality visualization.
