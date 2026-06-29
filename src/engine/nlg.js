@@ -18,6 +18,7 @@ import { pillarRelation } from './pillar-quality.js';
 import { natalFuyin } from './fuyin.js';
 import { detectAnhe } from './anhe.js';
 import { dailyBriefing } from './daily-briefing.js';
+import { evaluateDate, ACTIVITY } from './zheri.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
@@ -625,6 +626,19 @@ function pDaily(R) {
     paras.push(`🎯 Dụng action: ${_ya.boost || ''}${_ya.reduce ? ' · giảm ' + _ya.reduce : ''}.${_ya.reason ? ' ' + _ya.reason : ''}`);
   }
   if (db.tips) paras.push(`💡 ${db.tips}`);
+  // [loop 833] 通胜 宜忌 — which activities are 宜 (good) vs 忌 (bad) today.
+  try {
+    const _userZhi = R.chart.pillars.year.zhi;
+    const _yi = [], _ji = [];
+    for (const [id, act] of Object.entries(ACTIVITY)) {
+      const _ev = evaluateDate(y, mo, d, id, _userZhi);
+      if (_ev.yi) _yi.push(act.label.split('(')[0].trim());
+      if (_ev.ji) _ji.push(act.label.split('(')[0].trim());
+    }
+    if (_yi.length || _ji.length) {
+      paras.push(`📋 Hôm nay 宜 (nên): ${_yi.join(', ') || '(không rõ)'}. 忌 (kỵ): ${_ji.join(', ') || '(không)'}.`);
+    }
+  } catch (e) {}
   paras.push(`💡 Mở tab «Hôm nay» hoặc AI để chi tiết giờ/phút, 选日 cho việc cụ thể (cưới/khai trương/động thổ).`);
   return { title: 'Vận hôm nay (lưu nhật)', lead: `Vận HÔM NAY của ${dm.gan} ${dm.vi}:`, paragraphs: paras };
 }

@@ -3987,6 +3987,14 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(/身主/.test(_b), '[loop 832] brief có 身主 (ziwei body master)');
   console.log('   [loop 832] 命主/身主 (ziwei life/body master) trong brief ✓');
 }
+// [loop 833] 通胜 宜忌 trong pDaily — hôm nay nên/kỵ làm gì.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _a = composeAnswer('hôm nay tôi nên làm gì?', _QR);
+  assert(_a.paragraphs.some((p) => /宜.*nên|Hôm nay 宜/.test(p)), '[loop 833] pDaily surface 通胜 宜忌 (activities)');
+  assert(!_a.paragraphs.some((p) => /undefined|NaN|\[object/.test(p)), '[loop 833] không leak');
+  console.log('   [loop 833] 通胜 宜忌 trong pDaily (hôm nay nên/kỵ làm gì) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
