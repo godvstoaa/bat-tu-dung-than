@@ -666,11 +666,11 @@ function pBestDays(R, intent) {
   // [loop 885] detect activity
   const _q = (intent?.raw || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
   let _actId = 'marry', _actLabel = 'Cưới hỏi';
-  if (/\b(cuoi|cuoi hoi|hon le|cuoi xon)\b/.test(_q)) { _actId = 'marry'; _actLabel = 'Cưới hỏi'; }
-  else if (/\b(khai truong|mo cua|kinh doanh|buon ban)\b/.test(_q)) { _actId = 'business'; _actLabel = 'Khai trương'; }
-  else if (/\b(dong tho|xay dung|xay nha|xay cua|dip nha|nhap trach|don nha)\b/.test(_q)) { _actId = /\b(dip nha|nhap trach|don nha)\b/.test(_q) ? 'move' : 'build'; _actLabel = /\b(dip nha|nhap trach|don nha)\b/.test(_q) ? 'Dọn nhà' : 'Động thổ'; }
-  else if (/\b(di xa|xuat hanh|du lich|cong tac)\b/.test(_q)) { _actId = 'travel'; _actLabel = 'Xuất hành'; }
-  else if (/\b(ky hop dong|ky ket|giao dich)\b/.test(_q)) { _actId = 'sign'; _actLabel = 'Ký kết'; }
+  if (/\b(cuoi|cuoi hoi|hon le|cuoi xon|wedding|marry|marriage)\b/.test(_q)) { _actId = 'marry'; _actLabel = 'Cưới hỏi'; }
+  else if (/\b(khai truong|mo cua|kinh doanh|buon ban|business|grand opening|open shop)\b/.test(_q)) { _actId = 'business'; _actLabel = 'Khai trương'; }
+  else if (/\b(dong tho|xay dung|xay nha|xay cua|dip nha|nhap trach|don nha|construction|build house|renovat|move house|relocat)\b/.test(_q)) { _actId = /\b(dip nha|nhap trach|don nha|move house|relocat)\b/.test(_q) ? 'move' : 'build'; _actLabel = /\b(dip nha|nhap trach|don nha|move house|relocat)\b/.test(_q) ? 'Dọn nhà' : 'Động thổ'; }
+  else if (/\b(di xa|xuat hanh|du lich|cong tac|travel|trip|journey)\b/.test(_q)) { _actId = 'travel'; _actLabel = 'Xuất hành'; }
+  else if (/\b(ky hop dong|ky ket|giao dich|sign contract|sign deal)\b/.test(_q)) { _actId = 'sign'; _actLabel = 'Ký kết'; }
   const _maxDay = new Date(y, mo, 0).getDate();
   // [loop 897] «tuần này」 → chỉ scan 7 ngày từ hôm nay
   // [loop 899 FIX] cross-month: tuần có thể kéo sang tháng kế (vd 30/6→6/7)
