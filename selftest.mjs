@@ -3628,6 +3628,17 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(detectIntent('tôi khó tính').area !== 'love', '[loop 799] «khó tính» ≠ love (tình removed)');
   console.log('   [loop 799] collision audit CLEAN (đau/đầu outscored, tình removed, không misroute) ✓');
 }
+// [loop 800] «ăn gì»(an gi)⊂«cần gì»(can gi) collision → «khí hậu cần gì»→health.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // «khí hậu mùa sinh cần gì» → tiaohou (không health — ăn gì⊂cần gì fix)
+  assert(composeAnswer('khí hậu mùa sinh tôi cần gì?', _QR).title.includes('Điều hậu'), '[loop 800] «khí hậu cần gì» → tiaohou (không health)');
+  // regression: «ăn uống» still health
+  assert(detectIntent('tôi nên ăn uống gì?').area === 'health', '[loop 800] regression: «ăn uống» → health');
+  // «cần gì» generic không health
+  assert(detectIntent('tôi cần gì để thành công?').area !== 'health', '[loop 800] «cần gì» generic ≠ health (ăn gì⊂cần gì fix)');
+  console.log('   [loop 800] «ăn gì»→«ăn uống» fix collision «cần gì» — «khí hậu cần gì»→tiaohou ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

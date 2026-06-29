@@ -71,7 +71,7 @@ const INTENT_KEYWORDS = {
   // [loop 798 FIX] «tình»→«tình yêu» — 'tình'(love)≡'tính'(nature) cùng→'tinh' (NFD collision),
   //   «khó TÍNH» match «tình» → love ❌. «tình yêu» specific tránh collision.
   love: ['tình yêu', 'tình duyên', 'tình cảm', 'duyên', 'hôn nhân', 'vợ', 'chồng', 'người yêu', 'kết hôn', 'cưới', 'gia đạo', 'ly hôn', 'đào hoa', 'phối ngẫu', 'tái hôn', 'lấy vợ', 'lấy chồng', 'gặp duyên', 'độc thân'],
-  health: ['sức khỏe', 'bệnh', 'ốm', 'tạng', 'dưỡng sinh', 'thể chất', 'số thọ', 'tai nạn', 'đau', 'ăn gì', 'thực phẩm', 'chế độ ăn'],
+  health: ['sức khỏe', 'bệnh', 'ốm', 'tạng', 'dưỡng sinh', 'thể chất', 'số thọ', 'tai nạn', 'đau', 'ăn uống', 'thực phẩm', 'chế độ ăn'],
   study: ['học', 'thi', 'bằng cấp', 'trí tuệ', 'kiến thức', 'sáng tạo', 'trường', 'đại học', 'luận văn', 'nghiên cứu'],
   children: ['con', 'con cái', 'sinh con', 'có con', 'quý tử', 'hậu duệ', 'thai'],
   family: ['gia đình', 'cha mẹ', 'anh em', 'ruột thịt', 'thân thuộc', 'mẹ', 'bố', 'cha'],
