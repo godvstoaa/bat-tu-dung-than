@@ -3527,6 +3527,18 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(_crash === 0 && _leak === 0, `[loop 789] 9 offline composer × 5 thành viên: ${_crash} crash, ${_leak} leak`);
   console.log(`   [loop 789] 9 offline composer × 5 thành viên (${_n} test) — 0 crash/leak ✓`);
 }
+// [loop 791] intent false-negative audit — common variants fire, ambiguous skip.
+{
+  // common variants PHẢI fire
+  assert(detectIntent('cách của tôi là gì?').isPattern === true, '[loop 791] «cách» (ko «cục») → isPattern');
+  assert(detectIntent('xung khắc trong mệnh?').isInteraction === true, '[loop 791] «xung khắc» → isInteraction');
+  assert(detectIntent('khí hậu mệnh tôi?').isTiaohou === true, '[loop 791] «khí hậu» → isTiaohou');
+  assert(detectIntent('nạp âm').isNayin === true, '[loop 791] bare «nạp âm» → isNayin');
+  assert(detectIntent('phục ngâm').isInteraction === true, '[loop 791] bare «phục ngâm» → isInteraction');
+  // ambiguous terms SKIP (defensible — bare «kho» = warehouse/garage, «phúc tinh» uncommon)
+  // → không fix (common forms «tài khố/kho tiền/giữ tiền/sao/quý nhân» đều work)
+  console.log('   [loop 791] intent common-variant coverage (cách/xung khắc/khí hậu/nạp âm/phục ngâm) ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
