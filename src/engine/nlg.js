@@ -710,12 +710,14 @@ function pBestDays(R, intent) {
   paras.push(`📅 **${_rangeLabel}** — top ngày tốt cho «${_actLabel}」 (dựa trực ${top[0]?.officer} + thái tuế + Dụng):`);
   top.forEach((r, i) => {
     const d = String(r.d).padStart(2, '0');
-    paras.push(`${i + 1}. **${d}/${mo}** (${r.ganZhi}, trực ${r.officer}) → ${r.rating} (${r.score}/100)${r.clashYou ? ' ⚠ xung tuổi' : ''}`);
+    const rm = r.mo || mo;
+    paras.push(`${i + 1}. **${d}/${rm}** (${r.ganZhi}, trực ${r.officer}) → ${r.rating} (${r.score}/100)${r.clashYou ? ' ⚠ xung tuổi' : ''}`);
   });
   paras.push(`⚠ Ngày KỴ:`);
   worst.forEach((r) => {
     const d = String(r.d).padStart(2, '0');
-    paras.push(`  ${d}/${mo} (${r.ganZhi}) → ${r.rating}${r.clashYou ? ' ⚠ xung tuổi' : ''}`);
+    const rm = r.mo || mo;
+    paras.push(`  ${d}/${rm} (${r.ganZhi}) → ${r.rating}${r.clashYou ? ' ⚠ xung tuổi' : ''}`);
   });
   paras.push(`💡 Đây là top ngày theo trực (建除) + xung tuổi. Cho việc cụ thể (cưới/khai trương/động thổ) → hỏi AI hoặc mở tab «择日» để chính xác hơn.`);
   return { title: `Chọn ngày tốt ${_rangeLabel}`, lead: `Top ngày tốt ${_rangeLabel} cho ${dm.gan} ${dm.vi}:`, paragraphs: paras };
