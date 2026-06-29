@@ -4742,6 +4742,36 @@ if ($('jk-btn')) {
 $('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run(); });
 $('ask-btn').addEventListener('click', handleAsk);
 $('question').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAsk(); });
+// [loop 931] VOICE INPUT — Web Speech API, không cần backend. Ẩn nút nếu trình duyệt không hỗ trợ.
+(function initVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const btn = $('voice-btn');
+  if (!SR || !btn) return;           // không hỗ trợ → giữ nút hidden (graceful)
+  btn.hidden = false;
+  let recog = null, listening = false;
+  const setUi = (on) => { listening = on; btn.textContent = on ? '⏹' : '🎤'; btn.classList.toggle('listening', on); btn.title = on ? 'Đang nghe... bấm để dừng' : 'Hỏi bằng giọng nói'; };
+  btn.addEventListener('click', () => {
+    if (listening) { try { recog && recog.stop(); } catch (_) {} setUi(false); return; }
+    recog = new SR();
+    recog.lang = 'vi-VN';            // tiếng Việt (Web Speech tự nhận key theo lang)
+    recog.interimResults = true;
+    recog.continuous = false;
+    const inp = $('question');
+    let finalText = inp.value;
+    recog.onresult = (e) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += (finalText && !finalText.endsWith(' ') ? ' ' : '') + t;
+        else interim += t;
+      }
+      inp.value = (finalText + ' ' + interim).trim();
+    };
+    recog.onerror = (e) => { setUi(false); if (e.error === 'not-allowed') inp.placeholder = 'Không truy cập được mic — kiểm tra quyền trình duyệt.'; };
+    recog.onend = () => setUi(false);
+    try { recog.start(); setUi(true); } catch (_) { setUi(false); }
+  });
+})();
 $('ai-settings-btn').addEventListener('click', openModal);
 // [loop 658] clear-chat button — reset hội thoại mà không đổi lá số
 $('ai-chat-clear').addEventListener('click', () => {
