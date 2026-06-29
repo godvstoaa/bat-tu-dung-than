@@ -3447,8 +3447,11 @@ function run() {
   else if (cityVal && !Number.isNaN(parseFloat(cityVal))) longitude = parseFloat(cityVal);
   const tt = trueSolarTime({ year: y0, month: m0, day: d0, hour: hh0, minute: mm0, tzOffset: tz, longitude });
   const y = tt.solar.year, m = tt.solar.month, d = tt.solar.day, hh = tt.solar.hour, mm = tt.solar.minute;
-  // persist birth data
-  try { localStorage.setItem('bazi-birth', JSON.stringify({ date: dateVal, time: timeVal, gender, tz, city: cityVal, long: $('long') ? $('long').value : '' })); } catch (e) {}
+  // [loop 851 PRIVACY] persist birth data — nhưng KHÔNG overwrite nếu đến từ URL share
+  //   (user B mở link user A → KHÔNG đè localStorage user B)
+  if (!window._fromUrlShare) {
+    try { localStorage.setItem('bazi-birth', JSON.stringify({ date: dateVal, time: timeVal, gender, tz, city: cityVal, long: $('long') ? $('long').value : '' })); } catch (e) {}
+  }
   // [loop 391] update URL with birth params for shareable link
   try { const u = new URL(window.location.href); u.searchParams.set('dob', dateVal); u.searchParams.set('time', timeVal); u.searchParams.set('g', gender); history.replaceState(null, '', u); } catch (_) {}
   // hiển thị note 真太阳时
@@ -6107,6 +6110,8 @@ try {
   const params = new URLSearchParams(window.location.search);
   const uDob = params.get('dob'), uTime = params.get('time'), uG = params.get('g');
   if (uDob) { $('date').value = uDob; if (uTime) $('time').value = uTime; if (uG) { const r = document.querySelector(`input[name="gender"][value="${uG}"]`); if (r) r.checked = true; }
+    // [loop 851 PRIVACY] flag: data đến từ URL share → KHÔNG overwrite localStorage
+    window._fromUrlShare = true;
     // skip localStorage restore if URL params present
   } else {
     const saved = JSON.parse(localStorage.getItem('bazi-birth') || 'null');
