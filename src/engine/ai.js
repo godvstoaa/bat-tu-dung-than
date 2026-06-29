@@ -1133,6 +1133,71 @@ function toolLabel(name) {
   })[name] || name;
 }
 
+// [loop 919] SECTION RAG — chia brief thành sections, chọn phần liên quan đến câu hỏi
+function _splitBrief(brief) {
+  // Chia theo header lines (ALL CAPS hoặc có emoji)
+  const lines = brief.split('\n');
+  const sections = [];
+  let cur = '';
+  for (const line of lines) {
+    const isHeader = /^[=★⭐⚠💡①②③④⑤🕐📅📊⚖📋🔍🟢🟡🔴🧭💍🔄🔑👪🔮🎯🏥🛡️💋]/.test(line) ||
+      /^[A-ZÀ-ỹĐ][A-ZÀ-ỹĐ ]{4,}/.test(line) ||
+      /^(== |TÓM TẮT|PHỤC|PHẢN|TAM HÌNH|LỤC HẠI|LỤC XUNG|BÁN HỢP|LỤC HỢP|LỤC THÂN|ĐẠI VẬN|LƯU NIÊN|TỨ TRỤ|NGŨ HÀNH|CÁCH CỤC|DỤNG THẦN|TỔNG LUẬN|THẬP THẦN|THẦN SÁT|HỘI|NẠP ÂM|MỆNH CUNG|TÀI KHỐ|GIA ĐÌNH|THÁI TUẾ|HƯỚNG DẪN|TIỂU HẠN|KHẢO|TỬ VI|河洛|鬼谷|三世|称骨|反吟|LỤC THÂN|SAO HÔN|HOA|源流|调候|进退)/.test(line);
+    if (isHeader && cur.trim()) { sections.push(cur); cur = ''; }
+    cur += line + '\n';
+  }
+  if (cur.trim()) sections.push(cur);
+  return sections;
+}
+
+function _selectRelevantSections(sections, question) {
+  const q = (question || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
+  // Keyword → section title mapping
+  const KW_MAP = [
+    { kw: /dung than|dung than|dụng thần|yong/, titles: [/DỤNG/, /Dụng Thần/, /化气/] },
+    { kw: /cach cuc|cach cuc|cách cục|格局|geju/, titles: [/CÁCH CỤC/, /格局/, /bại cách/] },
+    { kw: /dai van|dai van|đại vận|dayun/, titles: [/ĐẠI VẬN|大运/] },
+    { kw: /luu nien|luu nien|lưu niên|năm nay|năm .{4}/, titles: [/LƯU NIÊN/, /THÁI TUẾ/] },
+    { kw: /thap than|thap than|thập thần|十神/, titles: [/THẬP THẦN/] },
+    { kw: /ngu hanh|ngu hanh|ngũ hành|五行|element/, titles: [/NGŨ HÀNH/] },
+    { kw: /tuong tac|xung|hinh|hai|hop|tương tác/, titles: [/HỘI|HỢP|XUNG|HÌNH|HẠI|BÁN HỢP|反吟|TAM HÌNH|LỤC|LỤC HẠI|暗合/] },
+    { kw: /than sat|thần sát|sao|shensha/, titles: [/THẦN SÁT|SAO/] },
+    { kw: /nap am|nạp âm|nayin/, titles: [/NẠP ÂM|纳音/] },
+    { kw: /menh cung|mệnh cung|ming gong|命宫/, titles: [/MỆNH CUNG|命宫/] },
+    { kw: /tai kho|tài khố|wealth storage|财库/, titles: [/TÀI KHỐ|财库/] },
+    { kw: /gia dinh|gia đình|family|me|bo|em|chau|nguoi than/, titles: [/GIA ĐÌNH|LỤC THÂN/] },
+    { kw: /hon nhan|hôn nhân|tinh duyen|vo|chong|đào hoa/, titles: [/HÔN NHÂN|SAO HÔN|LỤC THÂN|ĐÀO HOA/] },
+    { kw: /suc khoe|sức khỏe|health|bệnh|benh/, titles: [/SỨC KHỎE|天医|BỆNH/] },
+    { kw: /tong luan|tong quan|tổng luận|tổng quan|menh toi|score/, titles: [/TỔNG LUẬN/] },
+    { kw: /tu vi|tử vi|ziwei|紫微/, titles: [/TỬ VI|紫微/] },
+    { kw: /phong thuy|phong thủy|feng shui|hướng/, titles: [/PHONG THỦY|HƯỚNG/] },
+    { kw: /khí hậu|dieu hau|điều hậu|调候/, titles: [/ĐIỀU HẬU|调候/] },
+  ];
+  // Always-include sections (core)
+  const ALWAYS = [/TÓM TẮT|⭐/, /TỨ TRỤ|四柱/, /VƯỢNG SUY/];
+  const matched = new Set();
+  // Core sections
+  for (const re of ALWAYS) {
+    for (let i = 0; i < sections.length; i++) {
+      if (re.test(sections[i].split('\n')[0]) && !matched.has(i)) matched.add(i);
+    }
+  }
+  // Keyword-matched sections
+  for (const { kw, titles } of KW_MAP) {
+    if (kw.test(q)) {
+      for (const re of titles) {
+        for (let i = 0; i < sections.length; i++) {
+          if (re.test(sections[i].substring(0, 100)) && !matched.has(i)) matched.add(i);
+        }
+      }
+    }
+  }
+  // Build result
+  const sorted = [...matched].sort((a, b) => a - b);
+  const text = sorted.map((i) => sections[i]).join('\n');
+  return { text, totalLength: text.length, sectionCount: sorted.length };
+}
+
 // ===========================================================================
 //  4. AGENTIC ASK — streaming + tools + thinking + memory (Z.ai spec)
 //  - history: [{role:'user'|'assistant', content}] bộ nhớ hội thoại
@@ -1153,7 +1218,15 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history } = {
   const _td = new Date();
   const _famKey = (R._family || []).map((f) => `${f.role || ''}:${f.date || ''}:${f.time || ''}`).join(',');
   const _ck = `${R.chart.input.year}-${R.chart.input.month}-${R.chart.input.day}-${R.chart.input.hour}-${R.chart.input.minute}-${R.chart.input.gender}-${_td.getFullYear()}-${_td.getMonth()}-${_td.getDate()}-${_famKey}`;
-  const brief = (_briefCache && _briefCache.key === _ck) ? _briefCache.brief : (_briefCache = { key: _ck, brief: buildChartBrief(R) }).brief;
+  const _fullBrief = (_briefCache && _briefCache.key === _ck) ? _briefCache.brief : (_briefCache = { key: _ck, brief: buildChartBrief(R) }).brief;
+
+  // [loop 919] SECTION RAG — chia brief thành sections, gửi chỉ phần liên quan
+  const _ragSections = _splitBrief(_fullBrief);
+  const _relevantSections = _selectRelevantSections(_ragSections, question);
+  const brief = _relevantSections.totalLength < _fullBrief.length * 0.6
+    ? _relevantSections.text
+    : _fullBrief; // nếu >60% liên quan → gửi full (không có lợi cắt)
+
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
     { role: 'system', content: brief + '\n\n== HƯỚNG DẪN TRẢ LỜI ==\nQUAN TRỌNG: Thông tin lá số ĐÃ CÓ ĐỦ trong context trên. Khi user hỏi về Nhật Chủ, Dụng Thần, Cách Cục, Đại Vận, Lưu Niên, Thập Thần, Ngũ Hành, Tương Tác, Thần Sát, Nạp Âm, Mệnh Cung, Tài Khố... → TRẢ LỜI TRỰC TIẾP từ context, KHÔNG gọi tool. CHỈ gọi tool khi: (1) hỏi NGÀY CỤ THỂ tốt/xấu → find_good_days/best_days_in_year; (2) hỏi VỀ 1 NĂM cụ thể → analyze_year; (3) bói quẻ (梅花/六壬/奇门) → tool tương ứng; (4) hỏi người thân → analyze_relative; (5) hướng/phong thủy → fengshui_direction; (6) giờ tốt hôm nay → analyze_best_hour.' },
