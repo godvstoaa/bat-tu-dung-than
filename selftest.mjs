@@ -3788,6 +3788,20 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   assert(composeAnswer('tương tác tứ trụ của tôi?', _QR).title.includes('Tương tác'), '[loop 812] regression: «tương tác» → interactions');
   console.log('   [loop 812] «có gì đặc biệt»→overview (broad), «xung/hình»→interactions (specific) ✓');
 }
+// [loop 814] garbage input handling — empty/punctuation/emoji/null không crash/leak.
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  const _garbage = ['', '   ', '???', '!!!', '12345', 'aaaa', '!@#$', '啊啊啊', '😅', null, undefined];
+  let _crash = 0, _leak = 0;
+  for (const _g of _garbage) {
+    try {
+      const _a = composeAnswer(_g, _QR);
+      if (_a.paragraphs.some((p) => /undefined|NaN|\[object/.test(p))) _leak++;
+    } catch (e) { _crash++; }
+  }
+  assert(_crash === 0 && _leak === 0, `[loop 814] garbage input: ${_crash} crash, ${_leak} leak (of ${_garbage.length})`);
+  console.log(`   [loop 814] garbage input (${_garbage.length} type: empty/punct/emoji/null) — 0 crash/leak ✓`);
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';
