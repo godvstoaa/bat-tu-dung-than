@@ -3474,6 +3474,7 @@ function openModal() {
   $('cfg-model').value = cfg.model || '';
   fillPresetNote(cur);
   $('ai-modal').classList.remove('hidden');
+  setTimeout(() => { const f = $('cfg-preset') || $('cfg-enabled'); if (f) try { f.focus(); } catch (_) {} }, 50);   // [loop 951] focus cho keyboard users
 }
 function closeModal() { $('ai-modal').classList.add('hidden'); }
 function saveModal() {
@@ -4963,6 +4964,7 @@ $('ai-chat-clear').addEventListener('click', () => {
 $('cfg-cancel').addEventListener('click', closeModal);
 $('cfg-save').addEventListener('click', saveModal);
 $('ai-modal').addEventListener('click', (e) => { if (e.target.id === 'ai-modal') closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('ai-modal').classList.contains('hidden')) closeModal(); });   // [loop 951] Escape đóng modal (a11y)
 // Test kết nối AI (dùng giá trị đang nhập trong modal, chưa cần Lưu)
 $('cfg-test').addEventListener('click', async () => {
   const cfg = {
