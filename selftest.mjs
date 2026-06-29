@@ -3235,6 +3235,20 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   }
   console.log('   [loop 767] 6 intent mới gate domain signal — không hijack wealth/timing/fengshui/flow ✓');
 }
+// [loop 768] 3 routing misroute fix (audit 17 câu đa dạng).
+{
+  const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
+  // #1 «bao giờ mua ĐƯỢC nhà» → timing (không fengshui vì «được»)
+  assert(composeAnswer('bao giờ tôi mua được nhà?', _QR).title.includes('Vận hạn'), '[loop 768] «bao giờ mua được nhà» → timing (bỏ «duoc» khỏi fengshui)');
+  // #2 «thờ thần» → KHÔNG health (thờ/thọ NFD collision)
+  assert(!composeAnswer('tôi thờ thần nào?', _QR).title.includes('Sức khỏe'), '[loop 768] «thờ thần» ≠ health (thờ/thọ collision fix)');
+  // #3 «quẻ hôm nay» → divination (không timing)
+  assert(/梅花|起卦|Quẻ|Dịch/.test(composeAnswer('quẻ hôm nay cho tôi', _QR).title), '[loop 768] «quẻ hôm nay» → divination (thêm que hom)');
+  // regression: legit fengshui/health vẫn route đúng
+  assert(composeAnswer('hướng nào tốt để ở?', _QR).title.includes('Phong thủy'), '[loop 768] regression: «hướng nào tốt» vẫn → fengshui');
+  assert(composeAnswer('sức khoẻ tôi sao?', _QR).title.includes('Sức khỏe'), '[loop 768] regression: «sức khoẻ» vẫn → health');
+  console.log('   [loop 768] 3 misroute fix (mua được nhà/thờ thần/quẻ hôm nay) + regression ✓');
+}
 
 // ################## 52. NHÓM QUÝ NHÂN CAO CẤP (高级神煞贵人组) ##################
 import { analyzeNobleStars, computeTaijiGuoYin, TAIJI, GUO_YIN, NOBLE_INFO } from './src/engine/noble-stars.js';

@@ -66,7 +66,7 @@ const INTENT_KEYWORDS = {
   career: ['sự nghiệp', 'công việc', 'công danh', 'thăng tiến', 'nghề', 'làm ăn', 'kinh doanh', 'chức', 'sếp', 'đi làm', 'nghỉ việc', 'đổi việc', 'thăng chức', 'khởi nghiệp', 'mở công ty'],
   wealth: ['tài', 'tiền', 'của cải', 'giàu', 'lộc', 'đầu tư', 'tài chính', 'phát tài', 'làm giàu', 'kiếm tiền', 'kinh tế', 'nợ', 'lãi'],
   love: ['tình', 'duyên', 'hôn nhân', 'vợ', 'chồng', 'người yêu', 'kết hôn', 'cưới', 'gia đạo', 'ly hôn', 'đào hoa', 'phối ngẫu', 'tái hôn', 'lấy vợ', 'lấy chồng', 'gặp duyên', 'độc thân'],
-  health: ['sức khỏe', 'bệnh', 'ốm', 'tạng', 'dưỡng sinh', 'thể chất', 'thọ', 'tai nạn', 'đau', 'ăn gì', 'thực phẩm', 'chế độ ăn'],
+  health: ['sức khỏe', 'bệnh', 'ốm', 'tạng', 'dưỡng sinh', 'thể chất', 'số thọ', 'tai nạn', 'đau', 'ăn gì', 'thực phẩm', 'chế độ ăn'],
   study: ['học', 'thi', 'bằng cấp', 'trí tuệ', 'kiến thức', 'sáng tạo', 'trường', 'đại học', 'luận văn', 'nghiên cứu'],
   children: ['con', 'con cái', 'sinh con', 'có con', 'quý tử', 'hậu duệ', 'thai'],
   family: ['gia đình', 'cha mẹ', 'anh em', 'ruột thịt', 'thân thuộc', 'mẹ', 'bố', 'cha'],
@@ -99,10 +99,14 @@ export function detectIntent(question) {
   const isFamily = /\b(me toi|bo toi|me cua|bo cua|em toi|em cua|chau toi|con toi|anh toi|chi toi|nguoi than|gia dinh)\b/.test(norm)
     || /\b(me|bo|em|chau|con|anh|chi)\b.*\b(the nao|ra sao|tuong quan|hop khong|menh gi|dung gi)\b/.test(norm);
   // [loop 497] divination intent (起卦/测字 CJK ngắn → confidence <3 → bypass như isCompat)
-  const isDivination = /gieo que|lac que|que dich|boi que|thao que|cham tu|luc nh|ky mon|don giap/.test(norm) || /起卦|测字|占卦|占卜|六壬|奇门|遁甲/.test(question);
+  // [loop 768 FIX] thêm «que hom/xem que/que ngay» — «quẻ hôm nay cho tôi» trước đây → timing (hom nay)
+  //   vì bare «que» không match. Giờ catch «quẻ hôm/xem quẻ».
+  const isDivination = /gieo que|lac que|que dich|boi que|thao que|que hom|que ngay|xem que|cham tu|luc nh|ky mon|don giap/.test(norm) || /起卦|测字|占卦|占卜|六壬|奇门|遁甲/.test(question);
   // [loop 655] fengshui + remedy intent (trước đây → «chưa rõ lĩnh vực» khi API fail)
   const isFengshui = /\b(phong thuy|dinh vi|la ban)\b/.test(norm)
-    || (/\b(huong|nha|tang|giuong|bep|cua chinh)\b/.test(norm) && /\b(tot|xau|hop|nao|cat|hung|nen|duoc|the nao|xung|hinh|hai)\b/.test(norm));
+    || (/\b(huong|nha|tang|giuong|bep|cua chinh)\b/.test(norm) && /\b(tot|xau|hop|nao|cat|hung|nen|the nao|xung|hinh|hai)\b/.test(norm));
+  // [loop 768 FIX] bỏ «duoc» — «bao giờ mua ĐƯỢC nhà?» trước đây trigger fengshui (nha+duoc)
+  //   nhưng là câu TIMING (hỏi KHI NÀO mua được). «tốt/hợp/xấu» vẫn cover fengshui quality.
   const isRemedy = /\b(bot xui|giam xui|bo xui|xui xe|doi van|hoa giai|giai han|giai xui|khai van|may man|phuc duc|lam cai gi|nen lam gi|cuu|cai menh|cai van|bo tui|giam tui|deo da|da quy|mau gi|mau hop|mau sac)\b/.test(norm);
   // [loop 735] isRemedyStrong — ĐỘNG TỪ cải vận RÕ RÀNG (giải hạn/hoá giải/cải mệnh/cải vận/bớt xui/giải xui/khai vận/cứu).
   //   Khi user hỏi «sao giải hạn năm nay?» → isTiming (năm nay) true → isRemedy && !isTiming bị skip → MẤT remedy.
