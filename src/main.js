@@ -3585,6 +3585,18 @@ function updateCardVisibility() {
     kids[i].style.display = hasVisible ? '' : 'none';
   }
 }
+// [loop 955] render deferred (lazy) cards trong 1 nhóm — gọi khi EXPAND nhóm.
+//   Cards display:none (collapsed) không trigger IO → khi expand phải render thủ công.
+function _renderGroupCards(grp) {
+  let el = grp.nextElementSibling;
+  while (el && !el.classList.contains('grp')) {
+    if (el.classList.contains('card') && el.__lazyRender && !_lazyRendered.has(el)) {
+      _lazyRendered.add(el);
+      try { el.__lazyRender(); } catch (e) { console.warn('groupRender', e.message); }
+    }
+    el = el.nextElementSibling;
+  }
+}
 function initCollapsibleGroups() {
   const grps = Array.from(document.querySelectorAll('#result > h2.grp'));
   if (!grps.length) return;
@@ -3596,7 +3608,7 @@ function initCollapsibleGroups() {
       grp.tabIndex = 0;          // [loop 950] keyboard focusable
       grp.setAttribute('role', 'button');
       grp.setAttribute('aria-expanded', 'true');
-      const toggle = () => { grp.classList.toggle('collapsed'); grp.setAttribute('aria-expanded', grp.classList.contains('collapsed') ? 'false' : 'true'); updateCardVisibility(); };
+      const toggle = () => { grp.classList.toggle('collapsed'); grp.setAttribute('aria-expanded', grp.classList.contains('collapsed') ? 'false' : 'true'); updateCardVisibility(); if (!grp.classList.contains('collapsed')) _renderGroupCards(grp); };
       grp.addEventListener('click', toggle);
       grp.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
     }
@@ -3826,7 +3838,7 @@ async function run() {
       a.onclick = (e) => {
         e.preventDefault();
         // [loop 939] tap nav chip → MỞ nhóm nếu đang gập (mobile default-collapse), rồi nhảy tới
-        if (grp.classList.contains('collapsed')) { grp.classList.remove('collapsed'); updateCardVisibility(); }
+        if (grp.classList.contains('collapsed')) { grp.classList.remove('collapsed'); updateCardVisibility(); _renderGroupCards(grp); }
         grp.scrollIntoView({ behavior: 'smooth', block: 'start' });
       };
       qnav.appendChild(a);
