@@ -107,7 +107,7 @@ import { healthAlertScan } from './health-alert.js';
 import { computeHehun } from './hehun.js';
 import { synthesize } from './synthesis.js';
 import { matchBusinessPartners } from './partner-match.js';
-import { analyzeHealth, answerHealth, meridianClock, bodyConstitution } from './tcm.js';
+import { analyzeHealth, answerHealth, meridianClock, bodyConstitution, stageHealth } from './tcm.js';
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
@@ -631,6 +631,10 @@ export const AI_TOOLS = [
     parameters: { type: 'object', properties: {}, required: [] },
   } },
   { type: 'function', function: {
+    name: 'health_today', description: 'ĐÔNG Y THEO NGÀY — 十二长生 sinh khí hôm nay → tạng đang THỊNH/SUY + lời khuyên đông y riêng cho HÔM NAY (kết hợp điểm lưu nhật + kinh mạch giờ). Dùng khi hỏi «hôm nay sức khoẻ sao», «hôm nay tạng nào yếu/mạnh», «nên dưỡng tạng gì hôm nay», «sinh khí hôm nay».',
+    parameters: { type: 'object', properties: {}, required: [] },
+  } },
+  { type: 'function', function: {
     name: 'analyze_day', description: 'Luận lưu nhật của MỘT ngày cụ thể (can-chi, Thập thần, điểm Cát/Hung, lời khuyên, tương tác lưu năm/đại vận). Dùng khi hỏi về 1 ngày.',
     parameters: { type: 'object', properties: {
       year: { type: 'integer', description: 'Năm dương lịch, vd 2026' },
@@ -805,6 +809,26 @@ export function execTool(name, args, R) {
           lifestyle: p.lifestyle.map((l) => _s(l, 180)),
           emotion: p.emotion ? { dominant: _s(p.emotion.dominant, 140), dominantRisk: _s(p.emotion.dominantRisk, 160), vulnerable: _s(p.emotion.vulnerable, 140), advice: _s(p.emotion.advice, 140) } : null,
           note: _s(p.note, 220),
+        };
+      }
+      case 'health_today': { // [loop 1085] đông y THEO NGÀY — 十二长生 sinh khí hôm nay → tạng + advice
+        const _n = new Date();
+        let _lr = null; try { _lr = analyzeLiuRi(R, _n.getFullYear(), _n.getMonth() + 1, _n.getDate(), R.patternQuality); } catch (_) { _lr = null; }
+        const _dmWx = R?.chart?.dayMaster?.wx;
+        const _sh = _lr?.dayStage ? stageHealth(_dmWx, _lr.dayStage, _lr.dayStageWeight || 0) : null;
+        // kinh mạch giờ hiện tại (子午流注) — bổ trợ
+        const _lz = Solar.fromYmdHms(_n.getFullYear(), _n.getMonth() + 1, _n.getDate(), _n.getHours(), _n.getMinutes(), 0).getLunar();
+        const _hz = _lz.getTimeZhi();
+        const _mc = meridianClock(_hz);
+        return {
+          date: `${_n.getDate()}/${_n.getMonth() + 1}/${_n.getFullYear()}`,
+          dayGanZhi: _lr?.ganZhi || null,
+          dayRating: _lr?.rating || null,
+          dayScore: _lr?.score ?? null,
+          stage: _lr?.dayStage || null,
+          stageWeight: _lr?.dayStageWeight ?? null,
+          stageHealth: _sh ? { headline: _sh.headline, advice: _s(_sh.advice, 320) } : null,
+          hourMeridian: _mc ? { zhi: _hz, organ: _mc.organ, advice: _s(_mc.advice, 160) } : null,
         };
       }
       case 'analyze_year': {

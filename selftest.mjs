@@ -296,7 +296,7 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
 //   Trước đây 5 tool bói (analyze_char/meihua/liuren/qimen/guiguzi) FLAT → Z.ai API reject → AI không bao giờ gọi được.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 20, `[loop 623→638] AI_TOOLS có đúng 19 tool (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 21, `[loop 623→1085] AI_TOOLS có đúng 21 tool (got ${AI_TOOLS.length})`);
   const flat = AI_TOOLS.filter((t) => !(t && t.type === 'function' && t.function && t.function.name));
   assert(flat.length === 0, `[loop 623] KHÔNG còn tool FLAT — tất cả phải có wrapper {type:function,function:{name}} (còn ${flat.length} flat: ${flat.map(t=>t&&t.name).join(',')})`);
   const names = AI_TOOLS.map((t) => t.function.name);
@@ -3682,7 +3682,7 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
 // [loop 792] 19 AI tool descriptions — mỗi tool có description + when-to-use guidance.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 20, `[loop 792] 20 tools (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 21, `[loop 792→1085] 21 tools (got ${AI_TOOLS.length})`);
   let _noDesc = 0;
   for (const t of AI_TOOLS) {
     const _d = t.function?.description || t.description || '';
@@ -8268,11 +8268,12 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     ['health_q', {question:'hay thủ dâm sẽ bị gì'}], // [loop 1021] đông-y
     ['health_profile', {}], // [loop 1021] đông-y profile
     ['health_hour', {}], // [loop 1040] đông-y 子午流注
+    ['health_today', {}], // [loop 1085] đông-y THEO NGÀY (十二长生 → tạng)
   ];
   let _ok = 0;
   for (const [_n, _a] of _tests) { const _r = execTool(_n, _a, Ru); if (!_r.error) _ok++; }
-  assert(_ok === 20, `[loop 708] 20/20 tools pass smoke test (got ${_ok}/20)`);
-  console.log(`   20-TOOL SMOKE ✓ — ${_ok}/20 tools trả data với valid params`);
+  assert(_ok === 21, `[loop 708→1085] 21/21 tools pass smoke test (got ${_ok}/21)`);
+  console.log(`   21-TOOL SMOKE ✓ — ${_ok}/21 tools trả data với valid params`);
 }
 // [loop 741] analyze_year / best_days_in_year — year RANGE validation.
 //   Trước đây chỉ Number.isFinite → năm -100 (TCN) / 9999 được luận tự tin gây hiểu nhầm.
@@ -8907,6 +8908,21 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   assert(/思|lo nghĩ/.test(_p.emotion.vulnerable || ''), `[loop 1028] vulnerable 思/lo nghĩ (土 hư)`);
   assert(!/undefined/.test(JSON.stringify(_p.emotion)), '[loop 1028] emotion không undefined');
   console.log(`   [loop 1028] 情志养ổ (五志: «X thương tạng» + dominant/vulnerable) ✓`);
+}
+
+// [loop 1085] health_today AI tool — đông y THEO NGÀY (十二长生 → tạng + kinh mạch giờ)
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { execTool } = await import('./src/engine/ai.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _t = execTool('health_today', {}, _R);
+  assert(_t && !_t.error, `[loop 1085] health_today trả data (got ${_t?.error || 'ok'})`);
+  assert(_t.dayGanZhi && _t.dayRating && typeof _t.dayScore === 'number', `[loop 1085] health_today có dayGanZhi/rating/score`);
+  assert(_t.stage && typeof _t.stageWeight === 'number', `[loop 1085] health_today có stage + stageWeight`);
+  assert(_t.stageHealth && _t.stageHealth.headline && _t.stageHealth.advice, `[loop 1085] health_today có stageHealth (headline+advice)`);
+  assert(/khí (THỊNH|SUY|trung chuyển)/.test(_t.stageHealth.headline), `[loop 1085] stageHealth headline đúng format (got "${_t.stageHealth.headline?.slice(0,40)}")`);
+  assert(_t.hourMeridian && _t.hourMeridian.organ, `[loop 1085] health_today có hourMeridian (子午流注)`);
+  console.log(`   [loop 1085] health_today AI tool — ${_t.dayGanZhi} ${_t.dayRating}(${_t.dayScore}) · ${_t.stageHealth.headline} ✓`);
 }
 
 // [loop 1029] name.js STROKES — 康熙 nét đúng + đỡ dead-end "nhập nét tay"
