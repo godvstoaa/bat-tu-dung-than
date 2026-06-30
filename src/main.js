@@ -98,7 +98,7 @@ import { scanWealthCareerYingqi } from './engine/yingqi-wealth.js';
 import { dominantGod } from './engine/dominant-god.js';
 import { analyzeYanQin } from './engine/yanqin.js';
 import { analyzeHealth } from './engine/health-analysis.js'; // [loop 183] Sức Khoẻ Ngũ Hành card
-import { WUX_ZANG } from './engine/tcm.js'; // [loop 1026] hội chứng 虚/实 đông-y cho health card
+import { WUX_ZANG, seasonalHealth } from './engine/tcm.js'; // [loop 1026/1027] đông-y cho health card
 import { healthAlertScan } from './engine/health-alert.js'; // [loop 224 fix] quickSummary + health card timeline — trước đây KHÔNG import → quickSummary's health alert CHẾT (ReferenceError bị try/catch nuốt)
 import { qinxingOverview, qinxingCycle } from './engine/qinxing.js';
 import { analyzeTongGen } from './engine/tonggen.js';
@@ -1454,6 +1454,11 @@ function renderHealth(R) {
       ${R.shensha && R.shensha.tianYiMed ? `<div class="tiaohou-note" style="border-color:var(--cat,#2a7);background:rgba(46,158,107,0.06)"><b>⚕️ Thiên Y (天医) chiếu @${esc(R.shensha.tianYiMed.at.join(','))}:</b> duyên y tế, thể chất có khả năng tự phục hồi, hợp nghề y/dược/dưỡng sinh. «天医拱照, 可作良医».</div>` : ''}
       ${h.remedyFoods ? `<div class="tiaohou-note"><b>Thực phẩm chữa lành (hành ${esc(h.remedyVi || '')}):</b> ${esc(h.remedyFoods)}</div>` : ''}
       ${h.riskSeason ? `<p class="hint">📅 Mùa phòng bệnh: ${esc(h.riskSeason)}</p>` : ''}
+      ${(() => { try { // [loop 1027] 四季养ổ — dưỡng tạng theo MÙA HIỆN TẠI
+        const _now = new Date(); const _curMz = Solar.fromYmdHms(_now.getFullYear(), _now.getMonth() + 1, _now.getDate(), 12, 0, 0).getLunar().getMonthZhi();
+        const _s = seasonalHealth(_curMz, R);
+        return `<div class="tiaohou-note" style="border-color:var(--gold-bright)"><b>🌿 Mùa ${esc(_s.season)} — dưỡng ${esc(_s.zang)} (${esc(_s.vi)}, ${esc(_s.wx)}):</b> ${esc(_s.advice)}${_s.userTip ? `<br><b>⚠ Cá nhân:</b> ${esc(_s.userTip)}` : ''}</div>`;
+      } catch (_) { return ''; } })()}
       ${h.organRisk ? `<p class="hint">${esc(h.organRisk)}</p>` : ''}
       ${Array.isArray(h.advice) && h.advice.length ? `<p class="hint" style="margin-top:6px">💡 ${h.advice.map((a) => esc(a)).join('<br>💡 ')}</p>` : (h.advice ? `<p class="hint">${esc(h.advice)}</p>` : '')}
       <h4 class="syn-h4" style="margin-top:10px">📅 Năm cần chú ý sức khoẻ (5 năm tới)</h4>

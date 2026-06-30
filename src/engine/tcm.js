@@ -309,3 +309,30 @@ export function answerHealth(q, R) {
   }
   return { ok: true, matched: true, id: hit.id, title: hit.title, reply: reply + personal };
 }
+
+/**
+ * [loop 1027] 四季养ổ (thời tiết dưỡng tạng) — đông-y «春养肝, 夏养心, 秋养肺, 冬养肾»
+ *   (Hoàng Đế Nội Kinh «四气调神大论»: «春夏养阳, 秋冬养阴»).
+ * @param {string} monthZhi — chi tháng (xác định mùa)
+ * @returns {{ season, wx, zang, vi, advice, userTip }}
+ */
+export function seasonalHealth(monthZhi, R) {
+  const SPRING = ['寅', '卯', '辰'], SUMMER = ['巳', '午', '未'], AUTUMN = ['申', '酉', '戌'];
+  let season, wx, zang, vi, advice;
+  if (SPRING.includes(monthZhi)) { season = 'Xuân'; wx = '木'; zang = '肝'; vi = 'Gan';
+    advice = '«Xuân dưỡng can» — can chủ sơ tiết, sinh phát (mộc phồn vượng). Bớt tức giận («nộ thương can»), rau xanh (rau ngót/rau má/atiso), ngủ sớm, vận động nhẹ phát tán sinh khí.'; }
+  else if (SUMMER.includes(monthZhi)) { season = 'Hạ'; wx = '火'; zang = '心'; vi = 'Tim';
+    advice = '«Hạ dưỡng tâm» — tim chủ hoả, sợ nóng. Thanh nhiệt dưỡng tâm: khổ qua, sen tâm, trà xanh, đậu đỏ; tránh nắng gắt/cay nóng/rượu, ngủ trưa («tý/ngọ giác» dưỡng tâm), giữ tâm tĩnh.'; }
+  else if (AUTUMN.includes(monthZhi)) { season = 'Thu'; wx = '金'; zang = '肺'; vi = 'Phổi';
+    advice = '«Thu dưỡng phổi» — phổi chủ khí, sợ táo (thu táo). Nhuận phổi: lê đường phèn, bách hợp, mộc nhĩ trắng, hạnh nhân, kỷ tử; tránh khô lạnh, giữ ẩm, ít cay.'; }
+  else { season = 'Đông'; wx = '水'; zang = '肾'; vi = 'Thận';
+    advice = '«Đông dưỡng thận» — thận chủ tàng tinh, sợ lạnh (thuỷ tương ứng). Ôn bổ: đậu đen, vừng đen, hạt óc chó, hà thủ ô, kỷ tử; giữ ấm thắt lưng/chân, ngủ sớm dậy muộn, tiết dục bảo tinh («đông tàng»).'; }
+  // cá nhân hoá: nếu tạng mùa này LÀ tạng yếu của lá số → càng cần dưỡng
+  let userTip = '';
+  if (R && R.wx && R.wx.pct) {
+    const p = R.wx.pct[wx];
+    const avg = Object.values(R.wx.pct).reduce((a, b) => a + b, 0) / 5;
+    if (p != null && p < avg) userTip = `Lá số của bạn ${zang} (${vi}, ${wx}) vốn thiên HƯ — mùa này ĐÚNG tạng cần dưỡng, nên chú trọng bồi bổ hơn.`;
+  }
+  return { season, wx, zang, vi, advice, userTip };
+}

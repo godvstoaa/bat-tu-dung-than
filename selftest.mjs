@@ -8613,5 +8613,22 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1024] best-hour 时半合日 (三合 bán-hợp) + fuzz clean ✓`);
 }
 
+// [loop 1027] 四季养ổ (thời tiết dưỡng tạng) — 春肝/夏心/秋肺/冬肾
+{
+  const { seasonalHealth } = await import('./src/engine/tcm.js');
+  const _s = seasonalHealth('卯'); // spring
+  assert(_s.season === 'Xuân' && _s.zang === '肝' && _s.wx === '木', `[loop 1027] Xuân → 肝/木 (got ${_s.season}/${_s.zang})`);
+  const _sum = seasonalHealth('午'); assert(_sum.season === 'Hạ' && _sum.zang === '心', `[loop 1027] Hạ → 心 (got ${_sum.season})`);
+  const _au = seasonalHealth('酉'); assert(_au.season === 'Thu' && _au.zang === '肺', `[loop 1027] Thu → 肺 (got ${_au.season})`);
+  const _wi = seasonalHealth('子'); assert(_wi.season === 'Đông' && _wi.zang === '肾', `[loop 1027] Đông → 肾 (got ${_wi.season})`);
+  // cá nhân hoá: userTip khi tạng mùa là tạng yếu
+  const { analyze } = await import('./src/engine/chart.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026); // 水 19.9% — thận
+  const _win = seasonalHealth('子', _R); // đông → thận
+  assert(/thiên HƯ|cần dưỡng/.test(_win.userTip || ''), `[loop 1027] userTip khi tạng mùa = tạng yếu (got "${_win.userTip?.slice(0,40)}")`);
+  assert(!/undefined|NaN/.test(JSON.stringify(_s)), '[loop 1027] seasonalHealth không leak');
+  console.log(`   [loop 1027] 四季养ổ (Xuân肝/Hạ心/Thu肺/Đông肾 + cá nhân hoá) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
