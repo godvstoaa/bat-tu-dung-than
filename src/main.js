@@ -3234,6 +3234,72 @@ function renderGoldenYear(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được năm hoàng kim.</p>'; }
 }
 
+// [loop 1077] CAPSULE LIFE-ARC SPARKLINE — mobile: các biểu đồ vận trục nằm trong
+//   nhóm "📜 Năm nay & Tương lai" bị thu gọn (collapse) trên điện thoại → user không
+//   thấy được. Bù lại: nhúng 1 sparkline thu gọn (8 đại vận + ▼ vị trí hiện tại) vào
+//   capsule (luôn hiện ở nhóm 1). Chạm → mở nhóm + cuộn tới biểu đồ đầy đủ.
+function capsuleDayunSpark(R) {
+  const dayun = R && R.dayun ? R.dayun : [];
+  if (dayun.length < 2) return ''; // không đủ dữ liệu → bỏ qua (graceful)
+  const _now = new Date();
+  const birthYear = (R && R.chart && R.chart.input && R.chart.input.year) || (_now.getFullYear() - 30);
+  const curAge = _now.getFullYear() - birthYear;
+  let curIdx = dayun.findIndex((d) => curAge >= d.startAge && curAge < d.startAge + 10);
+  if (curIdx < 0) {
+    // ngoài khoảng đại vận → chọn thanh gần nhất (trước/sau tuổi hiện tại)
+    let best = -1, bestDist = Infinity;
+    dayun.forEach((d, i) => {
+      const mid = d.startAge + 5;
+      const dist = Math.abs(curAge - mid);
+      if (dist < bestDist) { bestDist = dist; best = i; }
+    });
+    curIdx = best;
+  }
+  const maxAbs = Math.max.apply(null, dayun.map((d) => Math.abs(d.score || 0)).concat([1]));
+  const bars = dayun.map((d, i) => {
+    const s = d.score || 0;
+    const h = Math.max(6, Math.round((Math.abs(s) / maxAbs) * 40));
+    const col = s >= 1 ? '#2a7' : s <= -1 ? '#c33' : '#9a8';
+    const isCur = i === curIdx;
+    return `<div title="${esc(d.ganZhi || '')} [${d.startAge}-${d.startAge + 9}t] ${esc(d.rating || '')}${isCur ? ' ★ ĐẠI VẬN HIỆN TẠI' : ''}" style="flex:1;min-width:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:50px;position:relative">
+      ${isCur ? '<span style="position:absolute;top:-1px;font-size:9px;line-height:1;color:var(--gold-bright,#f4d76e)">▼</span>' : ''}
+      <div style="width:80%;height:${h}px;background:${col};border-radius:2px 2px 0 0;opacity:${isCur ? '1' : '0.65'}${isCur ? ';box-shadow:0 0 5px ' + col : ''}"></div>
+    </div>`;
+  }).join('');
+  return `<div id="capsule-spark" role="button" tabindex="0" aria-label="Xem vận trục đại vận chi tiết (mở nhóm Năm nay & Tương lai)" style="margin-top:10px;padding:8px 10px;border:1px solid rgba(212,175,53,0.28);border-radius:8px;cursor:pointer;background:linear-gradient(180deg,rgba(212,175,53,0.06),rgba(255,255,255,0.01))">
+    <div class="hint" style="font-size:10px;margin-bottom:3px;display:flex;justify-content:space-between;gap:6px"><span>🛤️ Vận trục đời · ${dayun.length} đại vận</span><span style="color:var(--gold-bright,#f4d76e)">▼ vị trí hiện tại · chạm để xem chi tiết →</span></div>
+    <div style="display:flex;align-items:flex-end;gap:1px">${bars}</div>
+    <div class="hint" style="font-size:9px;margin-top:3px;opacity:.7">Xanh = Cát · Đỏ = Hung · Thanh cao = vận mạnh</div>
+  </div>`;
+}
+
+// [loop 1077] mở nhóm chứa #innerId (nếu đang collapse) + lazy-render + cuộn tới.
+function revealCard(innerId) {
+  const inner = typeof innerId === 'string' ? $(innerId) : innerId;
+  const card = inner ? inner.closest('.card') : null;
+  if (!card) return;
+  // tìm h2.grp đứng trước card này
+  let grp = null, node = card;
+  while (node) {
+    node = node.previousElementSibling;
+    if (node && node.classList && node.classList.contains('grp')) { grp = node; break; }
+  }
+  if (grp && grp.classList.contains('collapsed')) {
+    grp.classList.remove('collapsed');
+    grp.setAttribute('aria-expanded', 'true');
+    if (typeof updateCardVisibility === 'function') updateCardVisibility();
+  }
+  // đảm bảo card đã lazy-render trước khi cuộn
+  setTimeout(() => {
+    if (card.__lazyRender && !_lazyRendered.has(card)) {
+      _lazyRendered.add(card);
+      try { card.__lazyRender(); } catch (e) { /* fallback渲染-log bỏ qua */ }
+    }
+    try { inner.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    try { card.classList.add('card-visible'); } catch (e) {}
+  }, 70);
+}
+
 // [loop 1074] Vận Hôm Nay — daily fortune capsule (consolidated quick view)
 function renderDailyCapsule(R) {
   const el = $('daily-capsule');
@@ -3266,7 +3332,15 @@ function renderDailyCapsule(R) {
         ${bestMonth ? `<span class="hint">· 📅 Tháng tốt: <b>T${bestMonth.solarMonth}</b> (${esc(bestMonth.rating||'')})</span>` : ''}
         ${seasonVi ? `<span class="hint">· 🌿 Mùa này: <b>${esc(seasonVi)}</b></span>` : ''}
       </div>
-      ${lr?.advice ? `<p class="hint" style="margin-top:6px">${esc(lr.advice)}</p>` : ''}`;
+      ${lr?.advice ? `<p class="hint" style="margin-top:6px">${esc(lr.advice)}</p>` : ''}
+      ${capsuleDayunSpark(R)}`;
+    // [loop 1077] sparkline → chạm mở nhóm + cuộn tới biểu đồ đại vận đầy đủ
+    const spark = $('capsule-spark');
+    if (spark) {
+      const go = () => revealCard('dayun-chart');
+      spark.addEventListener('click', go);
+      spark.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    }
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận hôm nay.</p>'; }
 }
 
