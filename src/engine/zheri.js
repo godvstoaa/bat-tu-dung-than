@@ -23,6 +23,9 @@ const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌',
 //   phạt 冲/害/刑 mà KHÔNG thưởng 合 → mất cân bằng (best-hour/daily đã có reward từ loop 1006,
 //   zheri bị sót). Cùng bug-class, giờ đóng.
 const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+// [loop 1019] 三合 (bán-hợp) — ngày chi + chi tuổi cùng cụm 三合 (申子辰/亥卯未/寅午戌/巳酉丑)
+//   = «半合» cùng cục, thuận (yếu hơn 六 hợp). Hoàn thiện layer 合.
+const SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
 
 // Việc lớn → các trực CÁT (宜) và HUNG (忌) tương ứng
 const ACTIVITY = {
@@ -86,6 +89,10 @@ export function evaluateDate(year, month, day, activityId, userZhi) {
   if (!clashYou && userZhi && XING[dayZhi] === userZhi && dayZhi !== userZhi) { score -= 12; reasons.push(`• Ngày chi ${dayZhi} (${ZHI[dayZhi].vi}) HÌNH tuổi ${ZHI[userZhi].vi} — "日刑岁" quanphi/thị phi, nên tránh việc lớn.`); }
   // [loop 1014] 六合 thưởng — ngày chi lục hợp tuổi → «日合岁» rất cát (đối xứng 冲罚).
   if (!clashYou && userZhi && LIUHE[dayZhi] === userZhi) { score += 15; reasons.push(`💕 Ngày chi ${dayZhi} (${ZHI[dayZhi].vi}) LỤC HỢP tuổi ${ZHI[userZhi].vi} (${userZhi}) — "日合岁" thuận hoà, quý nhân phù, tăng cát.`); }
+  // [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 (nếu chưa 六 hợp) → «半合» thuận.
+  else if (!clashYou && userZhi && dayZhi !== userZhi && SANHE.some((g) => g.includes(dayZhi) && g.includes(userZhi))) {
+    score += 8; reasons.push(`🔗 Ngày chi ${dayZhi} (${ZHI[dayZhi].vi}) BÁN HỢP (三合) tuổi ${ZHI[userZhi].vi} (${userZhi}) — cùng cục, tăng cát (yếu hơn lục hợp).`);
+  }
 
   score = Math.max(5, Math.min(98, Math.round(score)));
   let rating = 'Bình';

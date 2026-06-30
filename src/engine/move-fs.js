@@ -19,6 +19,8 @@ const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌',
 // [loop 1016 FIX] 六合 — ngày chi lục hợp tuổi chủ nhà = «日合岁» cát cho nhập trạch.
 //   Cùng bug-class loop 1014/1015: trước đây move-fs phạt 冲/害/刑 mà không thưởng 合.
 const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+// [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 = «半合» thuận (yếu hơn 六 hợp).
+const SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
 
 const RITUALS = [
   '① Chọn ngày cát (成/定/开 trực + 宜入宅 + không xung tuổi).',
@@ -96,6 +98,10 @@ export function evaluateMoveDate(year, month, day, userZhi, birthYear, gender) {
   // [loop 1016] 六合 thưởng — ngày chi lục hợp tuổi chủ nhà → «日合岁» cát (đối xứng 冲罚).
   const heYou = !clashYou && LIUHE[dZhi] === userZhi;
   if (heYou) { score += 12; reasons.push(`💕 Hợp tuổi chủ nhà (${ZHI[userZhi]?.vi}) — «日合岁» lục hợp, thuận lợi nhập trạch.`); }
+  // [loop 1019] 三合 bán-hợp (nếu chưa 六 hợp) — cùng cụm 三合, thuận (yếu hơn 六 hợp).
+  else if (!clashYou && dZhi !== userZhi && SANHE.some((g) => g.includes(dZhi) && g.includes(userZhi))) {
+    score += 6; reasons.push(`🔗 Bán-hợp tuổi chủ nhà (${ZHI[userZhi]?.vi}) — «半合» cùng cục, tăng cát nhập trạch.`);
+  }
   if (!clashYou && !bigBad && !haiYou && !xingYou) { score += 8; reasons.push('✓ Không xung/hại/hình tuổi, không đại hung'); }
 
   // Hướng tốt để bước vào

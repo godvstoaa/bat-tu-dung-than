@@ -8489,5 +8489,24 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1018] dayun 六合 (rankDayun +6, checkDayun note) — bug-class 冲/合 đóng ở lõi đại vận ✓`);
 }
 
+// [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 (合 layer completion)
+{
+  const { evaluateDate } = await import('./src/engine/zheri.js');
+  const { Solar } = await import('lunar-javascript');
+  // 子日 user=申 → 申子 cùng cụm 申子辰 (半合, KHÔNG 六 hợp vì LIUHE[申]=巳)
+  let found = false;
+  for (let d = 1; d <= 30 && !found; d++) {
+    if (Solar.fromYmdHms(2026, 6, d, 12, 0, 0).getLunar().getDayZhi() === '子') {
+      const rHe = evaluateDate(2026, 6, d, 'marry', '申');
+      const rNo = evaluateDate(2026, 6, d, 'marry', null);
+      assert(rHe.score - rNo.score === 8, `[loop 1019] 三合 bán-hợp = +8 (got ${rHe.score - rNo.score}, 子日 user=申)`);
+      assert(rHe.reasons.some((x) => /BÁN HỢP|半合/.test(x)), '[loop 1019] bán-hợp reason hiển thị');
+      found = true;
+    }
+  }
+  assert(found, '[loop 1019] tìm ngày 子 để test bán-hợp');
+  console.log(`   [loop 1019] 三合 bán-hợp (zheri +8, wedding/move +6) — 合 layer hoàn thiện ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

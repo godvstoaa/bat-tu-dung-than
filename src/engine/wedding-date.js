@@ -19,6 +19,8 @@ const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌',
 //   hoà, nền tảng hôn nhân). Trước đây chỉ phạt 冲/害/刑 mà bỏ qua 合 — cùng bug-class loop
 //   1014 zheri, và ở module cưới thì 合 là yếu tố quan trọng nhất. Nay đóng.
 const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+// [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 = «半合» thuận (yếu hơn 六 hợp).
+const SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
 
 /**
  * Đánh giá 1 ngày cho cưới — cho 2 người.
@@ -84,6 +86,11 @@ export function evaluateWeddingDate(year, month, day, zhiA, zhiB) {
   const heB = !clashB && LIUHE[dZhi] === zhiB;
   if (heA) { score += 12; reasons.push(`💕 A được合 (日合岁 ${ZHI[zhiA]?.vi || zhiA}) — lục hợp, thuận hoà cưới hỏi`); }
   if (heB) { score += 12; reasons.push(`💕 B được合 (日合岁 ${ZHI[zhiB]?.vi || zhiB}) — lục hợp, thuận hoà cưới hỏi`); }
+  // [loop 1019] 三合 bán-hợp (nếu chưa 六 hợp) — cùng cụm 三合, thuận (yếu hơn 六 hợp).
+  const banA = !clashA && !heA && dZhi !== zhiA && SANHE.some((g) => g.includes(dZhi) && g.includes(zhiA));
+  const banB = !clashB && !heB && dZhi !== zhiB && SANHE.some((g) => g.includes(dZhi) && g.includes(zhiB));
+  if (banA) { score += 6; reasons.push(`🔗 A bán-hợp (三合 ${ZHI[zhiA]?.vi || zhiA}) — cùng cục, tăng cát.`); }
+  if (banB) { score += 6; reasons.push(`🔗 B bán-hợp (三合 ${ZHI[zhiB]?.vi || zhiB}) — cùng cục, tăng cát.`); }
 
   if (!clashA && !clashB && !chongTaiSuiA && !chongTaiSuiB && !haiA && !haiB && !xingA && !xingB) {
     score += 10; reasons.push('✓ Không xung/hại/hình/phạm cả hai');
