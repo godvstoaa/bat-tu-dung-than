@@ -8513,6 +8513,33 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1018] dayun 六合 (rankDayun +6, checkDayun note) — bug-class 冲/合 đóng ở lõi đại vận ✓`);
 }
 
+// [loop 1078] rankDayun.scored — mảng theo thứ tự R.dayun (cùng index) với totalScore giàu logic
+//   (Dụng+十神+冲合+伏吟). Trước đây biểu đồ dùng raw d.score → decade 天克地冲 nhưng khớp Dụng
+//   vẫn hiện thanh xanh cao (SAI). scored[] chấm điểm đầy đủ để visual phản ánh đúng.
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { rankDayun } = await import('./src/engine/dayun-rank.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _rk = rankDayun(_R);
+  assert(Array.isArray(_rk.scored), '[loop 1078] rankDayun.scored là mảng');
+  assert(_rk.scored.length === (_R.dayun || []).length, `[loop 1078] scored cùng độ dài R.dayun (${_rk.scored.length} vs ${(_R.dayun||[]).length})`);
+  // căn index: scored[i].ganZhi === R.dayun[i].ganZhi (thứ tự gốc, KHÔNG sort như ranked)
+  const _aligned = _rk.scored.every((s, i) => s.ganZhi === _R.dayun[i].ganZhi && s.startAge === _R.dayun[i].startAge);
+  assert(_aligned, '[loop 1078] scored[] căn index với R.dayun (giữ thứ tự gốc, không sort)');
+  // totalScore ≠ raw score*10 khi có tương tác (chứng tỏ chấm điểm đầy đủ)
+  const _hasRich = _rk.scored.some((s, i) => Math.abs(s.totalScore - (_R.dayun[i].score || 0) * 10) > 0.5);
+  assert(_hasRich, '[loop 1078] totalScore tích hợp 十神+冲合 (khác raw score×10)');
+  // backward-compat: ranked/best/worst vẫn nguyên
+  assert(_rk.ranked && _rk.best && _rk.worst, '[loop 1078] backward-compat ranked/best/worst vẫn có');
+  // tổng điểm 有-interaction phải khác raw: tìm ptử có interaction, tổng ≠ raw×10
+  const _withIx = _rk.scored.find((s) => s.interaction);
+  if (_withIx) {
+    const _raw = (_R.dayun.find((d) => d.ganZhi === _withIx.ganZhi) || {}).score || 0;
+    assert(_withIx.totalScore !== _raw * 10, `[loop 1078] interaction '${_withIx.interaction}' thay đổi tổng (raw×10=${_raw * 10}, total=${_withIx.totalScore})`);
+  }
+  console.log(`   [loop 1078] rankDayun.scored (căn index, totalScore giàu logic) — visual dayun phản ánh 十神+冲合 ✓`);
+}
+
 // [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 (合 layer completion)
 {
   const { evaluateDate } = await import('./src/engine/zheri.js');

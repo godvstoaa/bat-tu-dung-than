@@ -75,6 +75,9 @@ export function rankDayun(R) {
 
   return {
     ranked,
+    // [loop 1078] scored = items theo thứ tự gốc (cùng index với R.dayun) — để biểu đồ/
+    //   sparkline dùng totalScore giàu logic (Dụng+十神+冲合+伏吟) thay vì raw d.score.
+    scored: items,
     best: ranked[0] || null,
     worst: ranked[ranked.length - 1] || null,
   };

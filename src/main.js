@@ -85,6 +85,7 @@ import { zodiacPairScore, ZODIAC as ZODIAC_DEEP } from './engine/zodiac-deep.js'
 import { interpretZiweiStars } from './engine/ziwei-stars.js';
 import { computeAuxStars } from './engine/ziwei-aux.js';
 import { checkDayunInteractions } from './engine/dayun-check.js';
+import { rankDayun } from './engine/dayun-rank.js'; // [loop 1078] rich totalScore (Dụng+十神+冲合) cho charts
 import { computeMarriageShensha, computeExtraShensha } from './engine/shensha-marriage.js';
 import { viToHan } from './engine/vi2han.js';
 import { askAI, getConfig, setConfig, isAIReady, PRESETS, testAIConnection, suggestFollowups } from './engine/ai.js';
@@ -3234,12 +3235,33 @@ function renderGoldenYear(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được năm hoàng kim.</p>'; }
 }
 
+// [loop 1078] RICH DAYUN SCORE cho visuals — rankDayun tính totalScore đầy đủ (Dụng Thần
+//   + 十神 cat/hung + 天克地冲/六合/三合/伏吟), nhưng trước đây biểu đồ chỉ dùng raw d.score
+//   (can±2/chi±1) → decade xấu (天克地冲) nhưng khớp Dụng vẫn hiển thị thanh xanh cao (SAI).
+//   Giờ memoize rankDayun lên R + fallback an toàn nếu thiếu.
+function getDayunRanked(R) {
+  if (!R || !R.dayun || !R.dayun.length) return null;
+  if (R._dayunRankCache) return R._dayunRankCache;
+  try { R._dayunRankCache = rankDayun(R); } catch (e) { R._dayunRankCache = null; }
+  return R._dayunRankCache;
+}
+// Trả mảng theo thứ tự R.dayun, mỗi ptử có totalScore giàu logic (+ metadata để tooltip).
+// Fallback: nếu rankDayun fail → dùng raw d.score*10 (giữ visual cũ, không crash).
+function dayunScored(R) {
+  const rk = getDayunRanked(R);
+  if (rk && rk.scored && rk.scored.length) return rk.scored;
+  return (R && R.dayun ? R.dayun : []).map((d) => ({
+    ganZhi: d.ganZhi, startAge: d.startAge, rating: d.rating,
+    totalScore: (d.score || 0) * 10, interaction: '', godVi: '', godCat: '',
+  }));
+}
+
 // [loop 1077] CAPSULE LIFE-ARC SPARKLINE — mobile: các biểu đồ vận trục nằm trong
 //   nhóm "📜 Năm nay & Tương lai" bị thu gọn (collapse) trên điện thoại → user không
 //   thấy được. Bù lại: nhúng 1 sparkline thu gọn (8 đại vận + ▼ vị trí hiện tại) vào
 //   capsule (luôn hiện ở nhóm 1). Chạm → mở nhóm + cuộn tới biểu đồ đầy đủ.
 function capsuleDayunSpark(R) {
-  const dayun = R && R.dayun ? R.dayun : [];
+  const dayun = dayunScored(R);
   if (dayun.length < 2) return ''; // không đủ dữ liệu → bỏ qua (graceful)
   const _now = new Date();
   const birthYear = (R && R.chart && R.chart.input && R.chart.input.year) || (_now.getFullYear() - 30);
@@ -3255,13 +3277,19 @@ function capsuleDayunSpark(R) {
     });
     curIdx = best;
   }
-  const maxAbs = Math.max.apply(null, dayun.map((d) => Math.abs(d.score || 0)).concat([1]));
+  // [loop 1078] totalScore giàu logic (Dụng+十神+冲合) — normalize theo maxAbs để thanh cao
+  //   phản ánh tương đối CÁC ĐỀ CƯƠNG, không phụ thuộc thang điểm.
+  const maxAbs = Math.max.apply(null, dayun.map((d) => Math.abs(d.totalScore || 0)).concat([1]));
   const bars = dayun.map((d, i) => {
-    const s = d.score || 0;
+    const s = d.totalScore || 0;
     const h = Math.max(6, Math.round((Math.abs(s) / maxAbs) * 40));
-    const col = s >= 1 ? '#2a7' : s <= -1 ? '#c33' : '#9a8';
+    const col = s > 0 ? '#2a7' : s < 0 ? '#c33' : '#9a8';
     const isCur = i === curIdx;
-    return `<div title="${esc(d.ganZhi || '')} [${d.startAge}-${d.startAge + 9}t] ${esc(d.rating || '')}${isCur ? ' ★ ĐẠI VẬN HIỆN TẠI' : ''}" style="flex:1;min-width:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:50px;position:relative">
+    const tip = `${esc(d.ganZhi || '')} [${d.startAge}-${d.startAge + 9}t] · ${esc(d.rating || '')}` +
+      (d.godVi ? ` · ${esc(d.godVi)}` : '') +
+      (d.interaction ? ` · ${esc(d.interaction)}` : '') +
+      (isCur ? ' · ★ ĐẠI VẬN HIỆN TẠI' : '');
+    return `<div title="${tip}" style="flex:1;min-width:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:50px;position:relative">
       ${isCur ? '<span style="position:absolute;top:-1px;font-size:9px;line-height:1;color:var(--gold-bright,#f4d76e)">▼</span>' : ''}
       <div style="width:80%;height:${h}px;background:${col};border-radius:2px 2px 0 0;opacity:${isCur ? '1' : '0.65'}${isCur ? ';box-shadow:0 0 5px ' + col : ''}"></div>
     </div>`;
@@ -3469,26 +3497,33 @@ function renderDayunChart(R) {
   const el = $('dayun-chart');
   if (!el) return;
   try {
-    const dayun = R.dayun || [];
+    const dayun = dayunScored(R);
     if (!dayun.length) { el.innerHTML = '<p class="hint">Không có dữ liệu đại vận.</p>'; return; }
     const _curAge = new Date().getFullYear() - (R.chart?.input?.year || 1990);
+    // [loop 1078] normalize theo totalScore (giàu logic) — capping height ≤ 34px/thanh
+    //   (nửa container 40px) để KHÔNG overflow dù totalScore tới ~±50.
+    const maxAbs = Math.max.apply(null, dayun.map((d) => Math.abs(d.totalScore || 0)).concat([1]));
     const bars = dayun.map((d) => {
-      const s = d.score || 0;
-      const h = Math.max(4, Math.abs(s) * 18);
-      const col = s >= 1 ? '#2a7' : s <= -1 ? '#c33' : '#9a8';
+      const s = d.totalScore || 0;
+      const h = Math.max(4, Math.round((Math.abs(s) / maxAbs) * 34));
+      const col = s > 0 ? '#2a7' : s < 0 ? '#c33' : '#9a8';
       const isActive = _curAge >= d.startAge && _curAge < d.startAge + 10;
-      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:40px${isActive ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${esc(d.ganZhi||'')} [${d.startAge}-${d.startAge+9}t] ${esc(d.rating||'')} (score ${s})${isActive ? ' ★ ĐẠI VẬN HIỆN TẠI' : ''}">
+      const tip = `${esc(d.ganZhi || '')} [${d.startAge}-${d.startAge + 9}t] · ${esc(d.rating || '')}` +
+        (d.godVi ? ` · ${esc(d.godVi)}(${esc(d.godCat || '')})` : '') +
+        (d.interaction ? ` · ${esc(d.interaction)}` : '') +
+        ` · tổng ${s}${isActive ? ' · ★ ĐẠI VẬN HIỆN TẠI' : ''}`;
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:40px${isActive ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${tip}">
         <div style="position:relative;height:80px;width:100%;display:flex;align-items:center;justify-content:center">
-          <div style="position:absolute;${s>=0?'bottom:50%':'top:50%'};width:60%;max-width:36px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${isActive ? '1' : '0.85'};${isActive ? 'box-shadow:0 0 6px '+col : ''}"></div>
+          <div style="position:absolute;${s >= 0 ? 'bottom:50%' : 'top:50%'};width:60%;max-width:36px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${isActive ? '1' : '0.85'};${isActive ? 'box-shadow:0 0 6px ' + col : ''}"></div>
           <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--gold,dimgray);opacity:0.3"></div>
         </div>
         ${isActive ? '<span style="font-size:8px;color:var(--gold-bright);font-weight:bold">▼ BẠN Ở ĐÂY</span>' : ''}
-        <span class="zh" style="font-size:12px${isActive ? ';font-weight:bold' : ''}">${esc(d.ganZhi||'')}</span>
-        <span class="hint" style="font-size:10px">${d.startAge}–${d.startAge+9}t</span>
-        <span class="hint" style="font-size:10px;color:${col}">${esc((d.rating||'').slice(0,8))}</span>
+        <span class="zh" style="font-size:12px${isActive ? ';font-weight:bold' : ''}">${esc(d.ganZhi || '')}</span>
+        <span class="hint" style="font-size:10px">${d.startAge}–${d.startAge + 9}t</span>
+        <span class="hint" style="font-size:10px;color:${col}">${esc((d.rating || '').slice(0, 8))}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:2px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh (cát/hung). Score từ chart.js: can+chi khớp Dụng.</p>`;
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:2px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh. Tổng điểm = Dụng Thần + 十神 + 冲/合/伏吟 (chu move để xem chi tiết).</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận trục.</p>'; }
 }
 
