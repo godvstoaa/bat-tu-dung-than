@@ -4433,27 +4433,30 @@ function runLiuyao() {
   if (vals.length !== 6) { $('liuyao').innerHTML = '<p class="hint">Nhập đúng 6 giá trị (mỗi cái 6/7/8/9), dưới lên trên. Vd: 7,7,8,9,7,8</p>'; return; }
   const cat = $('ly-cat').value;
   // 月建/日辰 từ ngày gieo
-  let mZhi = '子', dZhi = '子';
+  let mZhi = '子', dZhi = '子', dGan = '', dGanZhi = '';
   const dv = $('ly-date').value;
   if (dv) {
     const [y, mo, d] = dv.split('-').map(Number);
     try {
       const l = Solar.fromYmdHms(y, mo, d, 12, 0, 0).getLunar();
       mZhi = l.getMonthZhi(); dZhi = l.getDayZhi();
+      dGan = l.getDayGan(); dGanZhi = dGan + dZhi;
     } catch (e) {}
   }
-  const r = castLiuYao(vals, cat, mZhi, dZhi);
+  const r = castLiuYao(vals, cat, mZhi, dZhi, dGan, dGanZhi);
   const LQ = { 父母: 'Phụ Mẫu', 兄弟: 'Huynh Đệ', 子孙: 'Tử Tôn', 妻财: 'Thê Tài', 官鬼: 'Quan Quỷ' };
+  const LS = { 青龙: 'TL', 朱雀: 'CT', 勾陈: 'CĐ', 螣蛇: 'TX', 白虎: 'BH', 玄武: 'HV' };
   const luckCls = (l) => l === 'Cát' ? 'rate-cat' : l === 'Hung' ? 'rate-hung' : 'rate-mid';
   $('liuyao').innerHTML = `
-    <div class="ly-head">本卦 <span class="zh big">${esc(r.name)}</span> (宫 ${esc(r.palace)}/${esc(r.gongWx)}) · 世 ${esc(r.shi)} 应 ${esc(r.ying)} · ${esc(r.shiChish)} · ${r.dongCount ? `动 ${esc(r.dongCount)} → 变 ${esc(r.bianName)}` : '静卦'}</div>
+    <div class="ly-head">本卦 <span class="zh big">${esc(r.name)}</span> (宫 ${esc(r.palace)}/${esc(r.gongWx)}) · 世 ${esc(r.shi)} 应 ${esc(r.ying)} · ${esc(r.shiChish)} · ${r.dongCount ? `动 ${esc(r.dongCount)} → 变 ${esc(r.bianName)}` : '静卦'}${r.kong.length ? ` · 旬空 ${esc(r.kong.join(''))}` : ''}</div>
     <div class="ly-lines">${r.lines.slice().reverse().map((l) => `
       <div class="ly-line ${l.yang ? 'yang' : 'yin'} ${l.isShi ? 'shi' : ''} ${l.isYing ? 'ying' : ''}">
         <span class="ly-pos">${esc(l.pos)}</span><span class="ly-gz zh">${esc(l.gan)}${esc(l.zhi)}</span><span class="ly-lq">${esc(LQ[l.liuqin] || l.liuqin)}</span>
-        <span class="ly-mark">${l.isShi ? '世' : ''}${l.isYing ? '应' : ''}${l.dong ? ' ◉' : ''}</span>
+        ${l.shen ? `<span class="zh" title="${esc(LS[l.shen])}">${esc(l.shen)}</span>` : ''}
+        <span class="ly-mark">${l.isShi ? '世' : ''}${l.isYing ? '应' : ''}${l.dong ? ' ◉' : ''}${l.kong ? ' ◯空' : ''}</span>
         <span class="ly-hao">${l.yang ? '——' : '— —'}</span>
       </div>`).join('')}</div>
-    <div class="ly-ys">用神: <b>${esc(r.yongshen.vi)}</b> → hào ${r.yongLines.length ? r.yongLines.map((l) => esc(l.pos) + '.' + esc(l.gan) + esc(l.zhi)).join(', ') : '(không có trong quẻ)'} · 月建${esc(r.monthZhi)} 日辰${esc(r.dayZhi)}</div>
+    <div class="ly-ys">用神: <b>${esc(r.yongshen.vi)}</b> → hào ${r.yongLines.length ? r.yongLines.map((l) => esc(l.pos) + '.' + esc(l.gan) + esc(l.zhi) + (l.kong ? '(空)' : '')).join(', ') : '(không có trong quẻ)'} · 月建${esc(r.monthZhi)} 日辰${esc(r.dayGan || '')}${esc(r.dayZhi)}</div>
     <div class="zr-advice">→ <span class="ln-rate ${luckCls(r.luck)}">${esc(r.luck)}</span> ${esc(r.verdict)}</div>`;
 }
 

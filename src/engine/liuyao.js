@@ -54,6 +54,44 @@ const NAME2PALACE = (() => {
 // Sinh/khắc ngũ hành (Hán)
 const SHENG = { 金: '水', 水: '木', 木: '火', 火: '土', 土: '金' };
 const KE = { 金: '木', 木: '土', 土: '水', 水: '火', 火: '金' };
+
+// ---- [loop 1011] 六神 (六兽) — gán theo 日干 (口诀 «甲乙青龙丙丁雀, 戊日勾陈己蛇出,
+//   庚辛白虎壬癸玄»). Thứ tự dưới→trên: 青龙→朱雀→勾陈→螣蛇→白虎→玄武.
+const LIUSHEN_ORDER = ['青龙', '朱雀', '勾陈', '螣蛇', '白虎', '玄武'];
+const LIUSHEN_START = { 甲: '青龙', 乙: '青龙', 丙: '朱雀', 丁: '朱雀', 戊: '勾陈', 己: '螣蛇', 庚: '白虎', 辛: '白虎', 壬: '玄武', 癸: '玄武' };
+export const LIUSHEN_VI = {
+  青龙: { vi: 'Thanh Long', tone: 'cat', mean: 'tài lộc · hỷ · sinh hoạt cát' },
+  朱雀: { vi: 'Chu Tước', tone: 'mid', mean: 'khẩu thiệt · văn thư · thị phi · hỏa' },
+  勾陈: { vi: 'Cấu Trần', tone: 'mid', mean: 'trì trệ · tranh tụng · điền sản' },
+  螣蛇: { vi: 'Đằng Xà', tone: 'hung', mean: 'hư ảo · kinh sợ · quái dị' },
+  白虎: { vi: 'Bạch Hổ', tone: 'hung', mean: 'huyết quang · bệnh nặng · thương tang' },
+  玄武: { vi: 'Huyền Vũ', tone: 'hung', mean: 'trộm cắp · tiểu nhân · thất thoát' },
+};
+function liushenOf(dayGan, linePos /* 1-6 */) {
+  const start = LIUSHEN_START[dayGan] || '青龙';
+  const si = LIUSHEN_ORDER.indexOf(start);
+  return LIUSHEN_ORDER[(si + (linePos - 1)) % 6];
+}
+
+// ---- [loop 1011] 空亡 (旬空) — 2 chi «không có» trong 10 ngày của旬 ngày.
+//   Công thức: chi首旬 - 1, -2 (mod 12). Vd 甲子旬→戌亥, 甲戌旬→申酉, 甲寅旬→子丑.
+const _BR = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+const _GAN_ARR = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+export function xunkongOf(dayGanZhi) {
+  if (!dayGanZhi || dayGanZhi.length < 2) return [];
+  const gi = _GAN_ARR.indexOf(dayGanZhi[0]);
+  const zi = _BR.indexOf(dayGanZhi[1]);
+  if (gi < 0 || zi < 0) return [];
+  // vị trí 0-59 trong 60 hoa giáp (p%10=gi, p%12=zi)
+  let p = -1;
+  for (let k = 0; k < 6; k++) { const c = gi + k * 10; if (c % 12 === zi) { p = c; break; } }
+  if (p < 0) return [];
+  const xunShouPos = Math.floor(p / 10) * 10;            // vị trí旬首 (甲x)
+  const xunShouBranch = xunShouPos % 12;                  // chi旬首
+  const a = (xunShouBranch - 1 + 12) % 12;
+  const b = (xunShouBranch - 2 + 12) % 12;
+  return [_BR[a], _BR[b]];
+}
 function liuqinOf(gongWx, zhiWx) {
   if (zhiWx === gongWx) return '兄弟';
   if (SHENG[zhiWx] === gongWx) return '父母';   // sinh ta
@@ -90,8 +128,10 @@ const YONGSHEN_MAP = {
  * @param {string} cat - loại câu hỏi (wealth/career/...)
  * @param {string} monthZhi - 月建 chi
  * @param {string} dayZhi - 日辰 chi
+ * @param {string} [dayGan] - 日干 (để gán 六神). Nếu thiếu → không 六神.
+ * @param {string} [dayGanZhi] - 日辰 hoa giáp (để tính 空亡).
  */
-export function castLiuYao(vals, cat, monthZhi, dayZhi) {
+export function castLiuYao(vals, cat, monthZhi, dayZhi, dayGan, dayGanZhi) {
   // [loop 24 sửa CRITICAL] yang = 7 hoặc 9 (少阳/老阳); 6 và 8 là âm (老阴/少阴).
   //   Trước đây 'v >= 7' tính 8(少阴) là DƯƠNG — sai, corrupt quẻ mỗi khi 1 hào =8 (~37.5%).
   const yang = vals.map((v) => ((v === 7 || v === 9) ? 1 : 0)); // 6,8 = âm; 7,9 = dương
@@ -104,12 +144,20 @@ export function castLiuYao(vals, cat, monthZhi, dayZhi) {
   const shi = SHI_BY_POS[palace.pos];
   const ying = ((shi + 2) % 6) + 1; // 世+3, 1-based wrap
 
-  // 纳甲 + 六亲 cho 6 hào
+  // [loop 1011] 空亡 (旬空) của ngày gieo
+  const kongSet = new Set(xunkongOf(dayGanZhi || (dayGan ? dayGan + dayZhi : '')));
+
+  // 纳甲 + 六亲 + 六神 + 空亡 cho 6 hào
   const lo = TRI[lower], up = TRI[upper];
   const lines = [];
   for (let i = 0; i < 3; i++) lines.push({ pos: i + 1, gan: lo.gn, zhi: lo.zn[i], wx: ZHI[lo.zn[i]].wx, yang: !!yang[i], dong: !!dong[i] });
   for (let i = 0; i < 3; i++) lines.push({ pos: i + 4, gan: up.gw, zhi: up.zw[i], wx: ZHI[up.zw[i]].wx, yang: !!yang[i + 3], dong: !!dong[i + 3] });
-  lines.forEach((l) => { l.liuqin = liuqinOf(gongWx, l.wx); l.isShi = l.pos === shi; l.isYing = l.pos === ying; });
+  lines.forEach((l) => {
+    l.liuqin = liuqinOf(gongWx, l.wx);
+    l.isShi = l.pos === shi; l.isYing = l.pos === ying;
+    if (dayGan) l.shen = liushenOf(dayGan, l.pos);
+    l.kong = kongSet.has(l.zhi);
+  });
 
   // 变卦 (lật động hào)
   const bianYang = yang.slice();
@@ -125,29 +173,33 @@ export function castLiuYao(vals, cat, monthZhi, dayZhi) {
   // tìm các hào mang 用神 lục thân
   const yongLines = ys.lq === '世' ? lines.filter((l) => l.isShi) : lines.filter((l) => l.liuqin === ys.lq);
   // 旺衰 用神
-  let bestLv = '无', bestD = -3;
+  let bestLv = '无', bestD = -3, bestLine = null;
   yongLines.forEach((l) => {
     const ws = wangShuai(l.wx, monthWx);
     let d = ws.d;
     if (ZHI[dayZhi] && dayWx === l.wx) d += 1; // 日比
     if (ZHI[dayZhi] && SHENG[dayWx] === l.wx) d += 1; // 日sinh
     if (ZHI[dayZhi] && KE[dayWx] === l.wx) d -= 1.5; // 日khắc
-    if (d > bestD) { bestD = d; bestLv = ws.lv; }
+    // [loop 1011] 空亡: hào 用神 trúng旬空 → có khí không thực lực, chủ trễ.
+    if (l.kong) d -= 1;
+    if (d > bestD) { bestD = d; bestLv = ws.lv; bestLine = l; }
   });
+  const yongKong = bestLine ? bestLine.kong : false;
   // phán
   let verdict, luck;
+  const kongNote = yongKong ? ' [用神空亡 — có khí chưa thực, chủ trễ, đợi ngày出空 (xung/trị旬) mới ứng]' : '';
   if (!yongLines.length) { verdict = `Không có hào ${ys.vi} trong quẻ — việc thiếu "dụng thần", khó thành / phải đợi vận.`; luck = 'Bình'; }
-  else if (bestD >= 1.5) { verdict = `用神 (${ys.vi}) ${bestLv} (+${bestD}) — vượng được sinh phù → CÁT, nên tiến hành.`; luck = 'Cát'; }
-  else if (bestD >= 0) { verdict = `用神 ${bestLv} — trung bình, làm được nhưng cần nỗ lực / đợi ngày更好.`; luck = 'Bình'; }
-  else { verdict = `用神 ${bestLv} (−${Math.abs(bestD)}) — suy/khắc (月破/日伤) → HUNG, nên hoãn/tránh.`; luck = 'Hung'; }
+  else if (bestD >= 1.5) { verdict = `用神 (${ys.vi}) ${bestLv} (+${bestD}) — vượng được sinh phù → CÁT, nên tiến hành.${kongNote}`; luck = yongKong ? 'Bình' : 'Cát'; }
+  else if (bestD >= 0) { verdict = `用神 ${bestLv} — trung bình, làm được nhưng cần nỗ lực / đợi ngày更好.${kongNote}`; luck = 'Bình'; }
+  else { verdict = `用神 ${bestLv} (−${Math.abs(bestD)}) — suy/khắc (月破/日伤${yongKong ? '/空亡' : ''}) → HUNG, nên hoãn/tránh.${kongNote}`; luck = 'Hung'; }
 
   // 六亲持世
   const shiLine = lines.find((l) => l.isShi);
   const shiChish = shiLine ? `${shiLine.liuqin}持世` : '';
 
   return { name, lower, upper, palace: palace.gong, gongWx, shi, ying, lines, bianName,
-    dongCount: dong.filter(Boolean).length, yongshen: ys, yongLines, monthZhi, dayZhi,
-    bestLv, bestD, shiChish, verdict, luck };
+    dongCount: dong.filter(Boolean).length, yongshen: ys, yongLines, monthZhi, dayZhi, dayGan,
+    kong: [...kongSet], yongKong, bestLv, bestD, shiChish, verdict, luck };
 }
 
 export { NAME2PALACE };

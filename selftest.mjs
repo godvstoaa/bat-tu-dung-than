@@ -8296,5 +8296,26 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1010] 犯太歲 범태세 (沖/值/三合/无 — 4 case verified) ✓`);
 }
 
+// [loop 1011] 六爻 deepening — 六神 (by 日干) + 空亡 (旬空) — classical 卜筮正宗
+{
+  const { xunkongOf, castLiuYao } = await import('./src/engine/liuyao.js');
+  const _set = (s) => [...s].sort().join('');
+  // 空亡: 6旬 — 旬首 chi -1, -2 (口诀 甲子旬空戌亥…). So sánh SET (thứ tự không quan trọng).
+  assert(_set(xunkongOf('甲子')) === _set('戌亥'), `[loop 1011] 甲子旬 → 戌亥空 (got ${xunkongOf('甲子').join('')})`);
+  assert(_set(xunkongOf('甲戌')) === _set('申酉'), `[loop 1011] 甲戌旬 → 申酉空 (got ${xunkongOf('甲戌').join('')})`);
+  assert(_set(xunkongOf('甲寅')) === _set('子丑'), `[loop 1011] 甲寅旬 → 子丑空 (got ${xunkongOf('甲寅').join('')})`);
+  assert(_set(xunkongOf('丙寅')) === _set('戌亥'), `[loop 1011] 丙寅 (甲子旬) → 戌亥 (got ${xunkongOf('丙寅').join('')})`);
+  // 六神: 甲日 初=青龙; 庚日 初=白虎; 甲日 line6=玄武 (口诀 甲乙青龙…庚辛白虎壬癸玄)
+  const _a = castLiuYao([7,7,7,7,7,7], 'wealth', '子', '子', '甲', '甲子');
+  assert(_a.lines[0].shen === '青龙' && _a.lines[5].shen === '玄武', `[loop 1011] 甲日 六神 初=青龙 上=玄武 (got ${_a.lines[0].shen}/${_a.lines[5].shen})`);
+  const _g = castLiuYao([7,7,7,7,7,7], 'wealth', '子', '午', '庚', '庚午');
+  assert(_g.lines[0].shen === '白虎', `[loop 1011] 庚日 初=白虎 (got ${_g.lines[0].shen})`);
+  // 空亡 flag + verdict factor: 甲子日 → 戌亥空; lines có .shen/.kong; result.kong present
+  assert(_a.kong.length === 2 && _set(_a.kong.join('')) === '亥戌', `[loop 1011] result.kong = 戌亥 (got ${_a.kong.join('')})`);
+  assert(_a.lines.every((l) => l.shen && typeof l.kong === 'boolean'), '[loop 1011] mỗi hào có 六神 + 空 flag');
+  assert(!/undefined|NaN/.test(JSON.stringify(_a)), '[loop 1011] castLiuYao output không leak undefined/NaN');
+  console.log(`   [loop 1011] 六爻 六神 (甲/庚 start) + 空亡 (6旬 verified) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
