@@ -46,7 +46,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script type="module" crossorigin src="/bat-tu-dung-than/assets/index-D0FslNow.js"></script>
+  <script type="module" crossorigin src="/bat-tu-dung-than/assets/index-CyzARBH5.js"></script>
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/vendor-lunar-Chzur7NX.js">
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-lifestyle-BZ1ApmhF.js">
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-ziwei-a46ajAHr.js">
@@ -290,7 +290,7 @@
       </section>
 
       <section class="card">
-        <h3 class="card-title">🗓️ Lịch Tháng Vận <span class="zh">月历运势 — lịch trực quan</span> <span style="font-size:.7em"><select id="cal-month" style="font-size:.9em"></select> <select id="cal-year" style="font-size:.9em"></select> <button class="btn-ghost" id="cal-btn" style="font-size:.85em;padding:2px 8px">Xem</button></span></h3>
+        <h3 class="card-title">🗓️ Lịch Tháng Vận <span class="zh">月历运势 — lịch trực quan</span> <span style="font-size:.7em"><select id="cal-month" style="font-size:.9em" aria-label="Tháng xem lịch vận"></select> <select id="cal-year" style="font-size:.9em" aria-label="Năm xem lịch vận"></select> <button class="btn-ghost" id="cal-btn" style="font-size:.85em;padding:2px 8px">Xem</button></span></h3>
         <div id="month-calendar"></div>
       </section>
 
@@ -622,7 +622,7 @@
         </div>
         <hr style="border:0;border-top:1px solid rgba(212,175,55,.15);margin:10px 0">
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
-          <select id="fs-compass-sel" class="inp" style="min-width:200px"></select>
+          <select id="fs-compass-sel" class="inp" style="min-width:200px" aria-label="Hướng la bàn phong thủy"></select>
           <input id="fs-compass-deg" type="number" min="0" max="359" placeholder="hoặc độ 0-359" class="inp" style="width:130px">
           <button class="btn-ghost" id="fs-compass-btn">🧭 Luận hướng (AI sâu)</button>
         </div>
@@ -770,10 +770,10 @@
         <h3 class="card-title">Huyền Không Đại Quái <span class="zh">六十四卦 · 配二十四山</span> <span class="hint-inline">(tương hợp toạ–hướng theo 卦運 · 合10 / 生成 / 同運)</span></h3>
         <div class="lyear-row">
           <label>Toạ (sitting)
-            <select id="dg-sit"></select>
+            <select id="dg-sit" aria-label="Toạ sơn (董公)"></select>
           </label>
           <label>Hướng (facing)
-            <select id="dg-face"></select>
+            <select id="dg-face" aria-label="Hướng (董公)"></select>
           </label>
           <button class="btn-ghost" id="dg-btn">So phối toạ–hướng</button>
         </div>
@@ -814,7 +814,7 @@
           <div class="tool-row">
             <label>Ngày<input type="date" id="zr-date" value="2026-11-26" /></label>
             <label>Việc
-              <select id="zr-act">
+              <select id="zr-act" aria-label="Hoạt động cần chọn ngày">
                 <option value="marry">Cưới hỏi</option>
                 <option value="business">Khai trương</option>
                 <option value="move">Dọn nhà</option>
@@ -850,7 +850,7 @@
           <p class="hint">Đã chấm được điểm mệnh → tìm ra lá số Bát Tự đạt điểm <b>CAO NHẤT / THẤP NHẤT</b> có thể (dịch ngược). Dùng tham khảo chọn giờ/ngày sinh hoặc xem "mệnh cực" ra sao.</p>
           <div class="tool-row">
             <label>Chế độ
-              <select id="inv-mode">
+              <select id="inv-mode" aria-label="Chế độ inverse Bát Tự">
                 <option value="max">Điểm CAO nhất (mệnh tốt nhất)</option>
                 <option value="min">Điểm THẤP nhất (mệnh xấu nhất)</option>
                 <option value="target">Gần 1 điểm target</option>
@@ -858,7 +858,7 @@
             </label>
             <label>Target điểm<input type="number" id="inv-target" value="70" min="0" max="100" style="width:5em" /></label>
             <label>Năm quét<input type="number" id="inv-year" value="1990" min="1900" max="2100" style="width:6em" /></label>
-            <label>Bước ngày<select id="inv-step"><option value="3">3 (sát cực, chậm)</option><option value="5" selected>5 (cân bằng)</option><option value="9">9 (nhanh)</option></select></label>
+            <label>Bước ngày<select id="inv-step" aria-label="Bước quét inverse"><option value="3">3 (sát cực, chậm)</option><option value="5" selected>5 (cân bằng)</option><option value="9">9 (nhanh)</option></select></label>
             <button class="btn-ghost" id="inv-btn">🔄 Tìm Bát Tự cực</button>
           </div>
           <div class="tool-out" id="inv-out"></div>
