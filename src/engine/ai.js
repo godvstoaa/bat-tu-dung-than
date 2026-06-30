@@ -951,7 +951,9 @@ export function execTool(name, args, R) {
           //   Trước đây AI thấy «Dụng Hỏa cho Kim nhược» không hiểu sao → có thể phán sai. Nay giải thích rõ.
           yongNote: rel.yong.tiaohou?.override
             ? `⚠ Dụng ${rel.yong.primary} do ĐIỀU HẬU (调候) override Phù Ức — người này sinh tháng hàn/nóng thiên lệch nên ưu tiên điều hòa khí hậu (${rel.yong.tiaohou?.note || ''}). GIẢI THÍCH khi user hỏi «sao Dụng khắc/sinh khác lạ?», KHÔNG phán «Dụng sai».`
-            : (rel.yong.method && rel.yong.method.some((m) => m.includes('LÀM CHỦ')) ? `Dụng ${rel.yong.primary} theo ${rel.yong.method.filter((m) => m.includes('LÀM CHỦ')).join('; ')}.` : null),
+            : (rel.yong.tiaohou?.skipReason
+              ? `ℹ Dụng ${rel.yong.primary} (Phù Ức) — 调候 行 ${rel.yong.tiaohou?.primaryWx} BỊ BỎ QUA vì ${rel.yong.tiaohou.skipReason}: không ép 官杀 làm Dụng cho DM 无根 (sẽ khắc倒). Giải thích khi user hỏi «sao không lấy hành theo mùa?».`
+              : (rel.yong.method && rel.yong.method.some((m) => m.includes('LÀM CHỦ')) ? `Dụng ${rel.yong.primary} theo ${rel.yong.method.filter((m) => m.includes('LÀM CHỦ')).join('; ')}.` : null)),
           diemMenh: relSyn.score + '/100 (' + relSyn.gradeVi + ')',
           cachCuc: rel.pattern?.vi || '?',
           vantageNhuoc: rel.strength.strong ? 'vượng' : 'nhược',

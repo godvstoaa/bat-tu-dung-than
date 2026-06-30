@@ -362,7 +362,22 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
   //   不论调候»). Trước đây 调候 override CHẾT 从財格 用神 (火→Thủy) → Dụng SAI.
   const isSpecial = method.includes('Cách cục đặc biệt');
   let tiaoOverride = false;
-  if (isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary && !isSpecial) {
+  // [loop 993 FIX] 调候 override KHÔNG ép 官杀 (khắc thân) làm Dụng khi Nhật Chủ 极弱无根.
+  //   Cổ法 «寒金喜火炼» chỉ đúng khi thân CÓ căn; còn «无根身弱不能受杀» — ép 官杀 (+喜 Tài
+  //   → 财党杀攻身) sẽ 克倒/破 một DM không căn. Audit loop 992 empirical: 434/6624 chart bị
+  //   ép 官杀 cho DM yếu; subset 极弱 (Thân quá nhược, median root 0.33) là SAI thật → nay
+  //   GIỮ Phù Ức (Ấn) làm chủ, 调候 (官杀) giáng secondary. Chart 弱 có căn vẫn override («寒金喜火»).
+  const _dmWx = chart.dayMaster.wx;
+  const _tiaoIsGuan = tiaoPrimaryWx === KE_BY[_dmWx];            // 调候 hành = 官杀 (khắc DM)
+  // 极弱/无根: level «Thân quá nhược» HOẶC root rất thấp (< 0.5 ≈ 无根). Root=0 có thể
+  //   rơi vào nhãn «Thân nhược» nên xét cả 2 — tín hiệu thật là KHÔNG CÓ CĂN.
+  const _isJiWeak = strength && (strength.level === 'Thân quá nhược' || (strength.root != null && strength.root < 0.5));
+  const _skipForGuan = _tiaoIsGuan && _isJiWeak;
+  if (isExtreme && tiaoPrimaryWx && _skipForGuan) {
+    reasons.push(`🌡️ Điều Hậu (调候) ghi nhận tháng ${chart.monthZhi} cần ${tiaoStemsVi(tiaoRaw)} ${clim ? clim.need : ''}, NHƯNG hành ${tiaoPrimaryWx} là QUAN SÁT (khắc Nhật Chủ) mà Nhật Chủ «${strength.level}» (无根) → «无根身弱不能受杀, 先求印扶身»: KHÔNG ép làm Dụng. Giữ Phù Ức (${primary}) làm chủ; ${tiaoPrimaryWx} xuống secondary — gặp vận ${tiaoPrimaryWx} chỉ lợi khi ĐÃ CÓ Ấn hộ thân (官印相生), không thì khắc hại.`);
+    if (tiaoPrimaryWx !== primary && tiaoPrimaryWx !== secondary) secondary = tiaoPrimaryWx;
+  }
+  if (isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary && !isSpecial && !_skipForGuan) {
     tiaoOverride = true;
     const fuyiPrimary = primary;
     primary = tiaoPrimaryWx;                                  // 调候 lên làm chủ
@@ -438,7 +453,7 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     reasons,
     method: [...new Set(method)],
     relations: { resourceWx: G.yin, sameWx: G.ti, outputWx: G.shi, wealthWx: G.cai, officerWx: G.guan },
-    tiaohou: { raw: tiaoRaw, elems: tiaoElems, primaryWx: tiaoPrimaryWx, note: climateNote, override: tiaoOverride },
+    tiaohou: { raw: tiaoRaw, elems: tiaoElems, primaryWx: tiaoPrimaryWx, note: climateNote, override: tiaoOverride, skipReason: _skipForGuan ? '无根身弱不能受杀 (Quan Sát khắc thân, DM 无根)' : null },
   };
 }
 

@@ -362,14 +362,15 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
 {
   const { execTool } = await import('./src/engine/ai.js');
   const Ru = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
-  // cháu 辛金 丑月 → 调候 override Hỏa
+  // cháu 辛金 丑月 无根 (root ~0.18) + 调候=Hỏa(官杀) → [loop 993] guard SKIP, Dụng=Thổ(Ấn)
+  //   Trước đây [loop 640] ép Dụng=Hỏa (官杀) cho 辛金 无根 → sai «无根不能受杀». Nay skip + yongNote giải thích.
   const ch = execTool('analyze_relative', { relation: 'cháu', year: 2023, month: 1, day: 13, hour: 7, gender: 'nam' }, Ru);
-  assert(ch.yongNote && ch.yongNote.includes('ĐIỀU HẬU'), `[loop 640] cháu (调候 override) có yongNote giải thích (got ${(ch.yongNote||'').slice(0,40)})`);
-  assert(ch.dung === '火', `[loop 640] cháu Dụng = Hỏa (调候)`);
+  assert(ch.yongNote && /BỎ QUA|ĐIỀU HẬU/.test(ch.yongNote), `[loop 640/993] cháu (quyết định 调候) có yongNote giải thích (got ${(ch.yongNote||'').slice(0,50)})`);
+  assert(ch.dung === '土', `[loop 993] cháu 辛金 无根 → Dụng=Thổ (Ấn), KHÔNG ép 官杀 Hỏa`);
   // relative không override (sinh tháng không cực đoan) → yongNote null hoặc method note (không «ĐIỀU HẬU override» nhầm)
   const sib = execTool('analyze_relative', { relation: 'em', year: 2000, month: 4, day: 15, hour: 10, gender: 'nữ' }, Ru); // tháng 4 = 辰 (không cực đoan)
   assert(!/ĐIỀU HẬU.*override/.test(sib.yongNote || ''), `[loop 640] em sinh tháng không cực đoan → không nhầm override (got ${(sib.yongNote||'null').slice(0,40)})`);
-  console.log(`   analyze_relative yongNote ✓ — cháu override Hỏa có giải thích; em không cực đoan không nhầm`);
+  console.log(`   analyze_relative yongNote ✓ — cháu 无根 skip 调候 có giải thích; em không cực đoan không nhầm`);
 }
 // [loop 626] LỤC THÂN ĐOẠN — deduceFromFamily: suy sâu vận mệnh từ gia đình (六亲断/家庭全息).
 //   Khác family.js (chấm điểm), engine này SUY LUẬN + cross-verify với lá thật người thân.
@@ -436,10 +437,17 @@ assert(R1990.yong.reasons.some((r) => /Bệnh Dược.*pattern-quality/.test(r))
 // [loop 51] comprehensive 用神 override test — 调候 fires ONLY for extreme + conflict
 {
   const EXTREME = new Set(['亥','子','丑','巳','午','未']);
-  // winter chart: 1984-12-22 nam 子月 → override=true (tiao 火 ≠ Phù Ức)
-  const _w = analyze(1984, 12, 22, 10, 0, 'nam', 2026);
-  assert(_w.yong.tiaohou?.override === true, `1984 子月 (extreme cold) → override=true`);
-  assert(_w.yong.primary === '火', `1984 子月 调候 → Dụng=Hỏa (noãn)`);
+  // summer chart: 1980-7-25 nam 未月 → DM 己土 CÓ căn (root 1.48) → override=true (tiao 水 ≠ Phù Ức)
+  //   [loop 993] đổi từ 1984-12-22 (庚金 无根 root 0.3) — chart 无根 giờ bị guard skip (xem dưới).
+  const _w = analyze(1980, 7, 25, 12, 0, 'nam', 2026);
+  assert(_w.strength.root >= 0.8, `1980 未月 chart CÓ căn (root ${_w.strength.root}) → guard không fire`);
+  assert(_w.yong.tiaohou?.override === true, `1980 未月 (extreme hot, DM rooted) → override=true`);
+  assert(_w.yong.primary === '水', `1980 未月 调候 → Dụng=Thủy (nhuận)`);
+  // [loop 993] 无根 guard: 1984-12-22 庚金 极弱 (root 0.3) + 调候=火(官杀) → KHÔNG override
+  //   «无根身弱不能受杀» — ép 官杀 sẽ 克倒 DM. Giữ Ấn(土) làm chủ, 调候 xuống secondary.
+  const _ng = analyze(1984, 12, 22, 10, 0, 'nam', 2026);
+  assert(_ng.yong.tiaohou?.override === false, `[993] 1984 庚金 无根 + 调候官杀 → override=false (guard)`);
+  assert(_ng.yong.tiaohou?.skipReason && _ng.yong.primary === '土', `[993] 1984 无根 → Dụng=Thổ(Ấn) + skipReason giải thích`);
   // 调候 agree → no override: 1995 壬午 → tiao 金 = Phù Ức 金 → agree, no override
   const _a = analyze(1995, 6, 20, 8, 0, 'nam', 2026);
   assert(_a.yong.tiaohou?.override === false, `1995 壬午 → tiao=Kim=PhùỨc → agree, KHÔNG override`);
@@ -447,23 +455,23 @@ assert(R1990.yong.reasons.some((r) => /Bệnh Dược.*pattern-quality/.test(r))
   const _n = analyze(2010, 8, 8, 12, 0, 'nu', 2026);
   assert(_n.yong.tiaohou?.override === false, `2010 申月 (không cực đoan) → KHÔNG override`);
   // override → xi/ji/chou recomputed from NEW primary
-  assert(_w.yong.xi === '木' && _w.yong.ji === '水', `1984 override → xi/ji recomputed từ primary Hỏa`);
+  assert(_w.yong.xi === '金' && _w.yong.ji === '土', `1980 override → xi/ji recomputed từ primary Thủy`);
 }
 // [loop 639] 调候 OVERRIDE phải GỠ reason «Kỵ» CŨ của Phù Ức còn liệt kê primary MỚI.
 //   Bug: Dụng=火 (override) nhưng reasons vẫn «Kỵ: ... Quan Sát (火)» → AI nhận mâu thuẫn.
 {
-  // cháu 2023-01-13 辛金 丑月 + 水 41% → hàn thấp → override Hỏa
-  const _c = analyze(2023, 1, 13, 7, 15, 'nam', 2026);
-  assert(_c.yong.tiaohou?.override === true && _c.yong.primary === '火', `[loop 639] cháu 调候 override → Dụng Hỏa`);
+  // [loop 993] đổi sang chart 己土 未月 CÓ căn (rooted) → override Thủy hợp lệ (cháu 辛金 无根 giờ bị guard skip)
+  const _c = analyze(1980, 7, 25, 12, 0, 'nam', 2026);
+  assert(_c.yong.tiaohou?.override === true && _c.yong.primary === '水', `[loop 639] 己土 未月 (rooted) 调候 override → Dụng Thủy`);
   const staleKwy = (_c.yong.reasons || []).filter((r) => /^Kỵ:/.test(r) && r.includes(`(${_c.yong.primary})`));
-  assert(staleKwy.length === 0, `[loop 639] KHÔNG còn reason «Kỵ: ... (${_c.yong.primary}=Hỏa)» mâu thuẫn Dụng (còn ${staleKwy.length})`);
-  // recomputed Kỵ reason vẫn có (nói 水 khắc Hỏa)
-  const newKwy = (_c.yong.reasons || []).some((r) => r.includes('Kỵ Thần') && r.includes('水'));
-  assert(newKwy, `[loop 639] vẫn có reason Kỵ Thần mới (Thủy khắc Hỏa)`);
+  assert(staleKwy.length === 0, `[loop 639] KHÔNG còn reason «Kỵ: ... (${_c.yong.primary}=Thủy)» mâu thuẫn Dụng (còn ${staleKwy.length})`);
+  // recomputed Kỵ reason vẫn có (nói Thổ khắc Thủy)
+  const newKwy = (_c.yong.reasons || []).some((r) => r.includes('Kỵ Thần') && r.includes('土'));
+  assert(newKwy, `[loop 639] vẫn có reason Kỵ Thần mới (Thổ khắc Thủy)`);
   // chart KHÔNG override (Quân) → reasons count không bị cắt
   const _q = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
   assert(_q.yong.reasons.length >= 5, `[loop 639] Quân (không override) reasons không bị cắt (got ${_q.yong.reasons.length})`);
-  console.log(`   调候 override gỡ reason Kỵ cũ ✓ — cháu Dụng Hỏa, không còn «Kỵ: ...Hỏa» mâu thuẫn`);
+  console.log(`   调候 override gỡ reason Kỵ cũ ✓ — 己土 Dụng Thủy, không còn «Kỵ: ...Thủy» mâu thuẫn`);
 }
 // [loop 41] 病药 → PRIMARY (败中有成): 1985 nam (quality='有救', phi cực đoan) → thuốc LÀM CHỦ
 {
