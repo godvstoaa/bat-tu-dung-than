@@ -257,7 +257,12 @@ function computeBingYao(chart, wx, strength) {
   if (strength.strong && (bingWx === dmWx || bingWx === SHENG_BY[dmWx])) {
     yao = SHENG[dmWx]; // tiết (Thực Thương)
   } else if (!strength.strong) {
-    yao = SHENG_BY[dmWx]; // phù (Ấn)
+    // [loop 992 FIX] 病药 nhánh yếu phải phân loại bệnh (audit loop 991 phát hiện).
+    //   Trước đây ép yao=Ấn cho MỌI chart yếu → SAI với «财多身弱»: Tài khắc Ấn (财克印),
+    //   cho Ấn thì bị Tài phá → vô dụng. Cổ法 «身弱财多, 喜比劫以帮身» → 药 = Tỷ Ki劫 (dmWx):
+    //   vừa giúp thân vừa trực tiếp «đoạt/kìm» Tài. Bệnh là Quan/Thực thì Ấn mới đúng
+    //   (官印相生 / 印制食伤 + sinh thân).
+    yao = bingWx === KE[dmWx] ? dmWx : SHENG_BY[dmWx];
   } else {
     yao = KE[bingWx]; // khắc bệnh
   }

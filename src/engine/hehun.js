@@ -104,6 +104,20 @@ export function computeHehun(R1, R2) {
       factors.push(`⚠ 天克地冲 CUNG PHU THÊ (can khắc + chi xung đồng lúc) — «夫妻宫天克地冲» = ĐẠI KỴ: biến động lớn, bắt buộc năm cát cưới + bao dung, không thì duyên mỏng.`);
     }
   }
+  // [loop 992 FIX] 日干 比和 / 相生 — audit loop 991 phát hiện sót 2 quan hệ còn lại.
+  //   Trước đây chỉ chấm 合(+16)/克(−8); 比(cùng hành) và 生(sinh nhau) đều rơi → 0 điểm
+  //   → lệch cổ法 «日干生合吉, 比和次之, 相克为忌». Nay bổ sung (chỉ khi chưa phải hợp/khắc).
+  //   Cổ法 ranking日干: 合 ≈ 生 > 比 > 克.
+  if (!ganHe && !ganKe) {
+    const SHENG5 = { '木': '火', '火': '土', '土': '金', '金': '水', '水': '木' };
+    if (_wxA === _wxB) {
+      score -= 3;
+      factors.push(`• Nhật Can ${a.dayGan}–${b.dayGan} đồng hành (cùng ${_wxA}) → «比和» — cùng bản tính, hơi đối kháng ngầm, cần nhường nhịn.`);
+    } else if (SHENG5[_wxA] === _wxB || SHENG5[_wxB] === _wxA) {
+      score += 6;
+      factors.push(`✓ Nhật Can ${a.dayGan}–${b.dayGan} tương sinh (${_wxA}↔${_wxB}) → «相生为和» — bổ trợ tính cách, thuận hôn.`);
+    }
+  }
 
   // 4b. [loop 22 NEW] 十神 spouse-star cross-check (giới tính): nam lấy 财 làm vợ, nữ lấy 官
   //   làm chồng. Nếu Nhật Chủ A nhìn B đúng sao phối ngẫu (và B nhìn A) → tín hiệu mạnh.

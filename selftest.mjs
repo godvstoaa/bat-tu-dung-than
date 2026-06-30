@@ -547,7 +547,29 @@ console.log(`   择日 OK, 宅 ${z1990.guaName}, 合婚 ${hh.rating}(${hh.score}
   assert(_hh.factors.some((f) => /CUNG PHU THÊ|tương bổ|tổn dụng|Cùng Dụng/i.test(f)), '合婚: factor trọng yếu (日柱/五行/用神)');
 }
 
-console.log('\n################## 12. LUẬN VẬN NĂM ĐA TRƯỜNG PHÁI (sửa lỗi phán ngược) ##################');
+// [loop 992 FIX] 日干 比和/相生 — audit loop 991 phát hiện sót (trước đây = 0 điểm).
+//   相生 (sinh nhau) → +6 «thuận hôn»; 比和 (cùng hành) → −3 «hơi đối kháng».
+{
+  const _renR = analyze(1980, 11, 5, 0, 0, 'nam', 2026);   // 壬水
+  const _jiaR = analyze(1981, 2, 5, 0, 0, 'nam', 2026);    // 甲木  → 壬+甲 = 相生 (水→木)
+  const _yiR  = analyze(1981, 8, 5, 0, 0, 'nu', 2026);     // 乙木  → 甲+乙 = 比和 (cùng 木)
+  const _hSheng = computeHehun(_renR, _jiaR);
+  const _hBi = computeHehun(_jiaR, _yiR);
+  assert(_hSheng.factors.some((f) => f.includes('相生为和')), '合婚 [992]: 壬+甲 相生 → factor «相生为和» (+6)');
+  assert(_hBi.factors.some((f) => f.includes('đồng hành') && f.includes('比和')), '合婚 [992]: 甲+乙 比和 → factor «đồng hành/比和» (−3)');
+  console.log(`   [loop 992] 合婚 日干 相生(+6)/比和(−3) giờ được chấm ✓ (trước đây = 0)`);
+}
+
+// [loop 992 FIX] 病药 «财多身弱» — audit loop 991 phát hiện: trước đây nhánh yếu ép yao=Ấn cho
+//   MỌI chart yếu → SAI (Tài khắc Ấn, cho Ấn vô dụng). 财多身弱 cổ法 «喜比劫帮身任财» → 药 = Tỷ Ki劫.
+{
+  const _caiR = analyze(1981, 10, 13, 8, 0, 'nam', 2026);  // 甲木 weak, 土(Tài) 39% thái quá
+  const _by = (_caiR.yong.reasons || []).find((r) => r.includes('Bệnh của cục'));
+  assert(_by && /hành 土 thái quá/.test(_by), '[992] 财多身弱: 病药 note ghi bệnh = 土 (Tài) thái quá');
+  assert(_by && /Dược: hành 木 /.test(_by), '[992] 财多身弱: 药 = 木 (Tỷ Ki劫 = dmWx), KHÔNG phải Ấn(水)');
+  console.log(`   [loop 992] 病药 «财多身弱» → 药=Tỷ Ki劫(木) đúng cổ法 «比劫帮身任财» ✓ (trước đây sai=Ấn)`);
+}
+
 import { analyzeLiunianDeep } from './src/engine/liunian-pro.js';
 // Bị cáo: 1993-10-21 nam (乙 Mộc, tuổi Dậu). 2026 丙午 = 傷官 + 桃花+红艳 → PHẢI không phải "Cát"
 const RU = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
