@@ -3234,6 +3234,42 @@ function renderGoldenYear(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được năm hoàng kim.</p>'; }
 }
 
+// [loop 1074] Vận Hôm Nay — daily fortune capsule (consolidated quick view)
+function renderDailyCapsule(R) {
+  const el = $('daily-capsule');
+  if (!el) return;
+  try {
+    const _n = new Date();
+    // 1. daily score
+    let lr; try { lr = analyzeLiuRi(R, _n.getFullYear(), _n.getMonth()+1, _n.getDate(), R.patternQuality); } catch(_) { lr = null; }
+    // 2. best hour
+    let bh; try { bh = bestHourToday(R, _n.getFullYear(), _n.getMonth()+1, _n.getDate(), R.patternYong); } catch(_) { bh = null; }
+    // 3. best/worst month
+    let lm; try { lm = computeLiuyue(R, _n.getFullYear(), {}); } catch(_) { lm = null; }
+    // 4. seasonal
+    let sz; try { sz = seasonalHealth(Solar.fromYmdHms(_n.getFullYear(), _n.getMonth()+1, _n.getDate(), 12,0,0).getLunar().getMonthZhi(), R); } catch(_) { sz = null; }
+
+    const dayGz = lr?.ganZhi || bh?.dayGanZhi || '?';
+    const dayRating = lr?.rating || '?';
+    const dayScore = lr?.score;
+    const ratingCol = dayRating === 'Cát' ? '#2a7' : dayRating === 'Hung' || dayRating === 'Hơi kỵ' ? '#c33' : '#9a8';
+    const bestHour = bh?.best?.[0];
+    const bestMonth = lm ? [...lm.months].sort((a,b)=>(b.score||0)-(a.score||0))[0] : null;
+    const seasonVi = sz?.vi || '';
+
+    el.innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="font-size:18px"><b>${_n.getDate()}/${_n.getMonth()+1}</b></span>
+        <span class="zh big">${esc(dayGz)}</span>
+        <span class="ln-rate ${dayRating==='Cát'?'rate-cat':dayRating==='Hung'||dayRating==='Hơi kỵ'?'rate-hung':'rate-mid'}" style="font-size:14px;padding:2px 8px">${esc(dayRating)}${dayScore!=null?` (${dayScore})`:''}</span>
+        ${bestHour ? `<span class="hint">· 🏆 Giờ tốt: <b>${esc(bestHour.vi||bestHour.zhi)}</b> (${esc(bestHour.range||'')}, ${esc(bestHour.rating||'')})</span>` : ''}
+        ${bestMonth ? `<span class="hint">· 📅 Tháng tốt: <b>T${bestMonth.solarMonth}</b> (${esc(bestMonth.rating||'')})</span>` : ''}
+        ${seasonVi ? `<span class="hint">· 🌿 Mùa này: <b>${esc(seasonVi)}</b></span>` : ''}
+      </div>
+      ${lr?.advice ? `<p class="hint" style="margin-top:6px">${esc(lr.advice)}</p>` : ''}`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận hôm nay.</p>'; }
+}
+
 // [loop 1064] Giờ Tốt Hôm Nay — 12-hour bar chart visual
 function renderHourChart(R) {
   const el = $('hour-chart');
@@ -4021,6 +4057,7 @@ async function run() {
   lazyRender('qizheng',        () => { try { renderQizheng(currentResult); } catch (e) { console.warn('qizheng', e.message); } });
   lazyRender('tianxing-zheri', () => { try { renderTianxingZheri(); } catch (e) { console.warn('tianxing', e.message); } });
   lazyRender('golden-year',    () => { try { renderGoldenYear(currentResult); } catch (e) { console.warn('goldenyear', e.message); } });
+  lazyRender('daily-capsule',  () => { try { renderDailyCapsule(currentResult); } catch (e) { console.warn('daily-capsule', e.message); } });
   lazyRender('forecast5',      () => { try { renderForecast5(currentResult); } catch (e) { console.warn('forecast5', e.message); } });
   lazyRender('dayun-chart',    () => { try { renderDayunChart(currentResult); } catch (e) { console.warn('dayun-chart', e.message); } });
   lazyRender('wx-chart',       () => { try { renderWxChart(currentResult); } catch (e) { console.warn('wx-chart', e.message); } });
