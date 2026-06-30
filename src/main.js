@@ -3070,7 +3070,7 @@ function runDonggongMonth() {
 function renderDonggong() {
   // Mặc định: luận hôm nay khi card first render
   const now = new Date();
-  try { renderDonggongDay(); } catch (e) { console.warn('donggong', e.message); }
+  try { renderDonggongDay(donggongDay(now.getFullYear(), now.getMonth() + 1, now.getDate())); } catch (e) { console.warn('donggong', e.message); }
 }
 
 function renderZiweiSanfang(R) {
