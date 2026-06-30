@@ -536,6 +536,16 @@ const in1990 = z1990.inauspicious;
 const inVal = (label) => Object.entries(in1990).find(([k]) => k.startsWith(label))?.[1];
 assert(inVal('Tuyệt Mệnh') === 'Tây Nam' && inVal('Ngũ Quỷ') === 'Đông Bắc' && inVal('Lục Sát') === 'Tây Bắc' && inVal('Họa Hại') === 'Tây',
   `坎命 四凶方 đúng 八宅明镜 (được ${JSON.stringify(Object.values(in1990))})`);
+// [loop 1091] 命卦 2000+ formula (cycle-43 critical fix) — KHÔNG có anchor trước đây!
+//   cycle-43 sửa cho mọi người sinh ≥2000 (cũ digitRoot ra SAI gua, lệch cả Đông/Tây Tứ Mệnh).
+//   2 case chính chú thích cycle-43 nêu «đúng»: 2000 nam → 离, 2025 nữ → 巽.
+const z2000 = computeZhai(2000, 'nam'); // lt=0 → (99−0)%9=0→9 = 离 (Đông); cũ=兑/Tây SAI
+assert(z2000.gua === 9 && z2000.grp === 'east', `[loop 1091] 宅 nam 2000 = 离/9 Đông Tứ (cycle-43), được ${z2000.guaName}`);
+const z2025 = computeZhai(2025, 'nữ'); // lt=25 → (25+6)%9=31%9=4 = 巽 (Đông); cũ=乾/Tây SAI
+assert(z2025.gua === 4 && z2025.grp === 'east', `[loop 1091] 宅 nữ 2025 = 巽/4 Đông Tứ (cycle-43), được ${z2025.guaName}`);
+// gua=5 path (nam→坤2, nữ→艮8): năm cho gua thô=5. 1950 nam: s=digitRoot(1950)=6, (11−6)%9=5→5→2(坤,west)
+const z1950 = computeZhai(1950, 'nam');
+assert(z1950.gua === 2 && z1950.grp === 'west', `[loop 1091] 宅 nam 1950 = 坤/2 Tây Tứ (gua5→2 path), được ${z1950.guaName}`);
 // 合婚: Ngọ–Tý phải phát hiện xung
 const RA = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
 const RB = analyze(1985, 1, 20, 8, 0, 'nu', 2026);
