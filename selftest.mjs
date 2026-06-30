@@ -8359,5 +8359,34 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1013] 六爻 进神/退神 (增删卜易 sourced, 丑↔辰 verified) ✓`);
 }
 
+// [loop 1014] zheri 六合 reward — ngày chi lục hợp tuổi → +15 (đóng bug-class loop 1006 sót zheri)
+{
+  const { evaluateDate } = await import('./src/engine/zheri.js');
+  const { Solar } = await import('lunar-javascript');
+  // tìm ngày 丑 trong 2026-6 → user=子 → 六合
+  let found = false;
+  for (let d = 1; d <= 30 && !found; d++) {
+    const dz = Solar.fromYmdHms(2026, 6, d, 12, 0, 0).getLunar().getDayZhi();
+    if (dz === '丑') {
+      const rUser = evaluateDate(2026, 6, d, 'marry', '子');     // 六合 丑-子
+      const rNone = evaluateDate(2026, 6, d, 'marry', null);      // không user → không reward
+      assert(rUser.score - rNone.score === 15, `[loop 1014] 六合 reward = +15 (got delta ${rUser.score - rNone.score}, 丑日 user=子)`);
+      assert(rUser.reasons.some((x) => /LỤC HỢP/.test(x)), '[loop 1014] 六合 reason hiển thị');
+      found = true;
+    }
+  }
+  assert(found, '[loop 1014] tìm được ngày 丑 trong 2026-6 để test');
+  // 冲 ngày vẫn phạt (không bị 六合 ghi đè): user=午, tìm ngày 子(冲午) → clashYou + phạt
+  for (let d = 1; d <= 30; d++) {
+    const dz = Solar.fromYmdHms(2026, 6, d, 12, 0, 0).getLunar().getDayZhi();
+    if (dz === '子') {
+      const rChong = evaluateDate(2026, 6, d, 'marry', '午');
+      assert(rChong.clashYou === true && rChong.score < 50, `[loop 1014] 冲 ngày vẫn phạt (子日 user=午, score=${rChong.score})`);
+      break;
+    }
+  }
+  console.log(`   [loop 1014] zheri 六合 reward (+15, đối xứng 冲罚) — bug-class loop 1006 đóng ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

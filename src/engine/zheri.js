@@ -19,6 +19,10 @@ const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅'
 // [loop 326] 六害 + 三刑 — 择日 cũng kỵ ngày hại/hình tuổi (trước đây chỉ check 冲 → có thể suggest ngày «cát» mà thực ra hại/hình người dùng)
 const HAI = { 子:'未', 未:'子', 丑:'午', 午:'丑', 寅:'巳', 巳:'寅', 卯:'辰', 辰:'卯', 申:'亥', 亥:'申', 酉:'戌', 戌:'酉' };
 const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌', 戌:'未', 未:'丑', 辰:'辰', 午:'午', 酉:'酉', 亥:'亥' };
+// [loop 1014 FIX] 六合 — ngày chi LỤC HỢP tuổi = rất cát (岁合日). Trước đây zheri chỉ
+//   phạt 冲/害/刑 mà KHÔNG thưởng 合 → mất cân bằng (best-hour/daily đã có reward từ loop 1006,
+//   zheri bị sót). Cùng bug-class, giờ đóng.
+const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
 
 // Việc lớn → các trực CÁT (宜) và HUNG (忌) tương ứng
 const ACTIVITY = {
@@ -80,6 +84,8 @@ export function evaluateDate(year, month, day, activityId, userZhi) {
   // [loop 326] 日害岁 / 日刑岁 — nhẹ hơn 冲 nhưng vẫn giảm (tránh suggest ngày «cát» mà hại/hình tuổi)
   if (!clashYou && userZhi && HAI[dayZhi] === userZhi) { score -= 10; reasons.push(`• Ngày chi ${dayZhi} (${ZHI[dayZhi].vi}) HẠI tuổi ${ZHI[userZhi].vi} — "日害岁" tiểu nhân/trệ, giảm cát.`); }
   if (!clashYou && userZhi && XING[dayZhi] === userZhi && dayZhi !== userZhi) { score -= 12; reasons.push(`• Ngày chi ${dayZhi} (${ZHI[dayZhi].vi}) HÌNH tuổi ${ZHI[userZhi].vi} — "日刑岁" quanphi/thị phi, nên tránh việc lớn.`); }
+  // [loop 1014] 六合 thưởng — ngày chi lục hợp tuổi → «日合岁» rất cát (đối xứng 冲罚).
+  if (!clashYou && userZhi && LIUHE[dayZhi] === userZhi) { score += 15; reasons.push(`💕 Ngày chi ${dayZhi} (${ZHI[dayZhi].vi}) LỤC HỢP tuổi ${ZHI[userZhi].vi} (${userZhi}) — "日合岁" thuận hoà, quý nhân phù, tăng cát.`); }
 
   score = Math.max(5, Math.min(98, Math.round(score)));
   let rating = 'Bình';
