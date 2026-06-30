@@ -2844,6 +2844,58 @@ const wc2 = scanWealthCareerYingqi(spR, 2026, 12);
 assert(wc2.summary === wc.summary, 'scanWealthCareerYingqi deterministic');
 console.log(`   user: Tài kích hoạt 2028(戊)/2029(己) | Quan kích hoạt 2030(庚)/2031(辛) ✓`);
 
+// ################## 46b. XUNG/HỢP CHI 应期 (sao ẩn trong địa chi bị lưu niên xung mở kho / hợp kéo ra) ##################
+import { scanBranchYingqi } from './src/engine/yingqi-branch.js';
+console.log('\n################## 46b. XUNG/HỢP CHI 应期 (nửa ĐỊA CHI của ứng kỳ) ##################');
+const by = scanBranchYingqi(spR, 2026, 12);
+// spR 乙木 (1993-10-21 0:30), natal zhi = 酉 戌 亥 子 → 1 kho: 戌(Hỏa库)
+assert(by.kuBranches.length === 1 && by.kuBranches.some((k) => k.zhi === '戌' && k.kuWx === '火'), '乙木 酉戌亥子 → 1 kho 戌(Hỏa)');
+// 2036 辰 xung 戌 → mở Hỏa库 → Hỏa=乙木 Thực Thương phải có mặt (+ tàng can 戊/辛/丁)
+const by2036 = by.events.find((e) => e.year === 2036);
+assert(by2036 && by2036.type === 'xung mở kho' && by2036.branch === '戌' && by2036.groups.some((g) => g.group === 'shi'), '2036 辰 xung 戌 → mở HỎA kho → kích hoạt THỰC THƯƠNG (木 sinh Hỏa)');
+// 2035 卯 xung 酉 (lục xung) →酉 tàng 辛(七Sát) → Quan Sát
+const by2035 = by.events.find((e) => e.year === 2035 && e.branch === '酉');
+assert(by2035 && by2035.type === 'xung kích tàng can' && by2035.groups.some((g) => g.group === 'guan'), '2035 卯 xung 酉 → kích tàng can 辛 → QUAN SÁT');
+// 2026 午 xung 子 → 子 tàng 癸(偏Ấn) → Ấn Tinh
+const by2026 = by.events.find((e) => e.year === 2026);
+assert(by2026 && by2026.groups.some((g) => g.group === 'yin'), '2026 午 xung 子 → kích tàng can 癸 → ẤN TINH');
+// structural: mọi event có year trong khoảng + groups không rỗng + type hợp lệ
+const _validTypes = new Set(['xung mở kho', 'xung kích tàng can', 'hợp dẫn', 'tam hợp thành cục']);
+const _validGroups = new Set(['ti', 'yin', 'shi', 'cai', 'guan']);
+for (const e of by.events) {
+  assert(e.year >= 2026 && e.year <= 2037, `event year ${e.year} trong khoảng quét`);
+  assert(e.groups.length > 0 && e.groups.every((g) => _validGroups.has(g.group)), `event ${e.year} có nhóm sao hợp lệ`);
+  assert(_validTypes.has(e.type), `event ${e.year} type hợp lệ («${e.type}»)`);
+}
+assert(by.summary.includes('2036'), 'summary nhắc 2036 (mở kho mạnh đầu tiên)');
+const by2 = scanBranchYingqi(spR, 2026, 12);
+assert(JSON.stringify(by2.events) === JSON.stringify(by.events), 'scanBranchYingqi deterministic');
+console.log(`   spR: mở kho 2036(戌→Thực) | xung 2026(子→Ấn)/2035(酉→Quan) | ${by.allCount} kích hoạt trong 12 năm ✓`);
+
+// [loop 989] FUZZ — scanBranchYingqi qua chart đa dạng: 0 crash, mọi event well-formed
+{
+  let _byCrash = 0, _byn = 0;
+  for (let _y = 1960; _y <= 2005; _y += 9) {
+    for (const _m of [2, 6, 11]) {
+      for (const _d of [5, 18, 28]) {
+        for (const _h of [0, 12, 23]) {
+          _byn++;
+          try {
+            const _R = analyze(_y, _m, _d, _h, 0, _byn % 2 ? 'nam' : 'nữ', 2026);
+            const _o = scanBranchYingqi(_R, 2026, 12);
+            if (typeof _o.summary !== 'string' || !_o.summary) _byCrash++;
+            for (const e of _o.events) {
+              if (!(e.year >= 2026 && e.year <= 2037 && e.groups.length > 0 && _validTypes.has(e.type) && e.groups.every((g) => _validGroups.has(g.group)))) _byCrash++;
+            }
+          } catch (e) { _byCrash++; }
+        }
+      }
+    }
+  }
+  assert(_byCrash === 0, `[loop 989] branch-yingqi fuzz ${_byn} chart: ${_byCrash} malformed`);
+  console.log(`   [loop 989] branch-yingqi fuzz ${_byn} chart — 0 crash/malformed ✓`);
+}
+
 // ################## 47. WHY VƯỢNG SUY 得令得地得势 3 pháp ##################
 import { strength3Fa } from './src/engine/strength-3fa.js';
 console.log('\n################## 47. WHY VƯỢNG SUY 得令得地得势 ##################');

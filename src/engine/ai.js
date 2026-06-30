@@ -52,6 +52,7 @@ import { annualTabooOverview } from './annual-taboo.js';
 import { monthlySha } from './monthly-sha.js';
 import { starPower } from './star-power.js';
 import { scanWealthCareerYingqi } from './yingqi-wealth.js';
+import { scanBranchYingqi } from './yingqi-branch.js';
 import { strength3Fa } from './strength-3fa.js';
 import { decadeForecast } from './decade-forecast.js';
 import { analyzeDeRi, deRiInYear, nextDeRi } from './deri.js';
@@ -295,6 +296,7 @@ THẬP THẦN CHỦ ĐẠO 主导十神 (tuýp người + nghề hợp + có thu
 THẬP THẦN KHUYẾT/THIẾU 缺十神 (lĩnh vực đời nào yếu): ${(() => { try { return missingGod(R).summary; } catch (e) { return '(không tính được)'; } })()}
 SAO TRỌNG ĐIỂM 财官印 通根透干 (sao Tài/Quan/Ấn có THẬT lực không hay hư phù): ${(() => { try { return starPower(R).summary; } catch (e) { return '(không tính được)'; } })()}
 TÀI/QUAN THẤU CÁN ỨNG KỲ (năm nào sao TÀI/QUAN ẩn được kích hoạt — đế can cùng hành thấu): ${(() => { try { return scanWealthCareerYingqi(R, curYear, 12).summary; } catch (e) { return '(không tính được)'; } })()}
+XUNG/HỢP CHI ỨNG KỲ (năm nào sao ẨN trong địa chi bẩm sinh bị lưu niên XUNG mở kho / HỢP kéo ra → phát lực): ${(() => { try { return scanBranchYingqi(R, curYear, 12).summary; } catch (e) { return '(không tính được)'; } })()}
 
 HỘI – HỢP – XUNG – HÌNH – HẠI: ${R.interactions.summary}
 
