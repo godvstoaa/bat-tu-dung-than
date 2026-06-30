@@ -8,6 +8,7 @@ import { analyzeWealthStar } from './engine/wealth-star.js';
 import { analyzeCareerStar } from './engine/career-star.js';
 import { analyzeSpouseStar } from './engine/spouse-star.js';
 import { analyzeStudy } from './engine/study-analysis.js';
+import { initBgParticles } from './bg-particles.js';
 import { detectCombos } from './engine/combos.js';
 import { computeFuxing } from './engine/fuxing.js';
 import { healthMonthlyAlert } from './engine/health-monthly.js';
@@ -5683,49 +5684,13 @@ $('yd-bestworst').addEventListener('click', (e) => {
 })();
 
 // ============================================================
-// MOTE FIELD (玄) — hạt vàng trôi + lấp lánh. Cô lập, reduced-motion safe.
+// MOTE FIELD (玄) — particle background THEO DỤNG THẦN (火水木金土).
+// [loop 1008] rewrite: từng là hạt vàng GENERIC (không đổi theo ngũ hành).
+//   Nay element-aware (research loop 1007): lửa bốc/giọt nước/lá rơi/silver mote/bụi,
+//   đọc body.theme-X + đổi particle theo. Tone app cũng shift (style.css).
 // ============================================================
-(() => {
-  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const canvas = document.getElementById('mote-field');
-  if (!canvas || reduce || !canvas.getContext) return;
-  const ctx = canvas.getContext('2d');
-  let w = 0, h = 0, motes = [], raf = 0;
-  const COLORS = ['243,213,122', '212,175,55', '247,236,203', '192,57,43'];
-  const resize = () => { w = canvas.width = innerWidth; h = canvas.height = innerHeight; };
-  const makeMotes = () => {
-    const n = Math.min(70, Math.round(innerWidth / 22));
-    motes = Array.from({ length: n }, () => ({
-      x: Math.random() * w, y: Math.random() * h,
-      r: Math.random() * 1.7 + 0.4,
-      vy: -(Math.random() * 0.32 + 0.08), vx: (Math.random() - 0.5) * 0.18,
-      a: Math.random() * 6.283, tw: Math.random() * 0.025 + 0.004,
-      c: COLORS[(Math.random() * COLORS.length) | 0],
-    }));
-  };
-  const tick = () => {
-    ctx.clearRect(0, 0, w, h);
-    for (const m of motes) {
-      m.y += m.vy; m.x += m.vx; m.a += m.tw;
-      if (m.y < -10) { m.y = h + 10; m.x = Math.random() * w; }
-      if (m.x < -10) m.x = w + 10; else if (m.x > w + 10) m.x = -10;
-      const alpha = (Math.sin(m.a) * 0.4 + 0.5) * 0.7;
-      ctx.beginPath();
-      ctx.arc(m.x, m.y, m.r, 0, 6.283);
-      ctx.fillStyle = 'rgba(' + m.c + ',' + alpha.toFixed(3) + ')';
-      ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(' + m.c + ',0.8)';
-      ctx.fill();
-    }
-    ctx.shadowBlur = 0;
-    raf = requestAnimationFrame(tick);
-  };
-  resize(); makeMotes(); tick();
-  addEventListener('resize', () => { resize(); makeMotes(); });
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) cancelAnimationFrame(raf);
-    else raf = requestAnimationFrame(tick);
-  });
-})();
+initBgParticles();
+
 
 // ---------------------------------------------------------------- ĐẠI LỤC NHÂM
 function runLiuren() {
