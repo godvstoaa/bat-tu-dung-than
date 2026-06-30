@@ -8591,6 +8591,9 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     ['hay lo âu', 'anxiety'], ['trầm cảm chán nản', 'depression'],
     // [loop 1052] common
     ['hay chóng mặt', 'dizziness'], ['béo phì thừa cân', 'obesity'], ['viêm mũi dị ứng', 'allergy'],
+    // [loop 1054-1055] more common + cardiovascular
+    ['hôi miệng', 'bad_breath'], ['bệnh trĩ', 'hemorrhoids'],
+    ['cao huyết áp', 'hypertension'], ['mỡ máu cao', 'high_cholesterol'],
   ];
   let _ok = 0;
   for (const [q, exp] of _cases) {
