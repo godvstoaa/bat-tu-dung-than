@@ -3351,6 +3351,7 @@ function renderDailyCapsule(R) {
     const dayScore = lr?.score;
     const ratingCol = dayRating === 'Cát' ? '#2a7' : dayRating === 'Hung' || dayRating === 'Hơi kỵ' ? '#c33' : '#9a8';
     const bestHour = bh?.best?.[0];
+    const worstHour = bh?.worst?.[0];
     const bestMonth = lm ? [...lm.months].sort((a,b)=>(b.score||0)-(a.score||0))[0] : null;
     const seasonVi = sz?.vi || '';
     // [loop 1084] TCM theo 十二长生 sinh khí ngày — ngũ hành/khi vượng suy → tạng + đông-y
@@ -3364,6 +3365,7 @@ function renderDailyCapsule(R) {
         <span class="zh big">${esc(dayGz)}</span>
         <span class="ln-rate ${dayRating==='Cát'?'rate-cat':dayRating==='Hung'||dayRating==='Hơi kỵ'?'rate-hung':'rate-mid'}" style="font-size:14px;padding:2px 8px">${esc(dayRating)}${dayScore!=null?` (${dayScore})`:''}</span>
         ${bestHour ? `<span class="hint">· 🏆 Giờ tốt: <b>${esc(bestHour.vi||bestHour.zhi)}</b> (${esc(bestHour.range||'')}, ${esc(bestHour.rating||'')})</span>` : ''}
+        ${worstHour && worstHour.zhi !== bestHour?.zhi ? `<span class="hint">· ⚠️ Tránh giờ: <b>${esc(worstHour.vi||worstHour.zhi)}</b> (${esc(worstHour.range||'')}, ${esc(worstHour.rating||'')})</span>` : ''}
         ${bestMonth ? `<span class="hint">· 📅 Tháng tốt: <b>T${bestMonth.solarMonth}</b> (${esc(bestMonth.rating||'')})</span>` : ''}
         ${seasonVi ? `<span class="hint">· 🌿 Mùa này: <b>${esc(seasonVi)}</b></span>` : ''}
       </div>
