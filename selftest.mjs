@@ -8660,5 +8660,22 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1029] name.js STROKES (康熙 nét: ngũ hành + simplified + 清) ✓`);
 }
 
+// [loop 1030] vi2han ↔ name.js stroke consistency (cùng dữ liệu cho 姓名学)
+{
+  const { SURNAME_VI, NAME_VI } = await import('./src/engine/vi2han.js');
+  const { STROKES } = await import('./src/engine/name.js');
+  // 康熙 nét đã fix: 黃=12, 清=12, 鸞=30
+  assert(SURNAME_VI.hoàng.strokes === 12 && SURNAME_VI.huỳnh.strokes === 12, `[loop 1030] hoàng/huỳnh→黃 = 12 (got ${SURNAME_VI.hoàng.strokes})`);
+  assert(NAME_VI.thanh.strokes === 12, `[loop 1030] thanh→清 = 12 (got ${NAME_VI.thanh.strokes})`);
+  assert(STROKES['鸞'] === 30, `[loop 1030] 鸞 = 30 康熙 (got ${STROKES['鸞']})`);
+  // cross-consistency: mọi char có trong cả 2 bảng phải cùng nét
+  let _inc = 0;
+  for (const tbl of [SURNAME_VI, NAME_VI]) for (const [, info] of Object.entries(tbl)) {
+    if (STROKES[info.han] != null && STROKES[info.han] !== info.strokes) _inc++;
+  }
+  assert(_inc === 0, `[loop 1030] vi2han ↔ name.js consistent (got ${_inc} inconsistencies)`);
+  console.log(`   [loop 1030] vi2han ↔ name.js stroke consistency (黃/清/鸞 fixed) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

@@ -9,7 +9,7 @@ const SURNAME_VI = {
   trần: { han: '陳', strokes: 16 }, chen: { han: '陳', strokes: 16 },
   lê: { han: '黎', strokes: 15 },
   phạm: { han: '范', strokes: 11 },
-  hoàng: { han: '黃', strokes: 13 }, huỳnh: { han: '黃', strokes: 13 },
+  hoàng: { han: '黃', strokes: 12 }, huỳnh: { han: '黃', strokes: 12 },
   phan: { han: '潘', strokes: 16 },
   vũ: { han: '武', strokes: 8 }, võ: { han: '武', strokes: 8 },
   đăng: { han: '鄧', strokes: 19 },
@@ -29,7 +29,7 @@ const SURNAME_VI = {
 const NAME_VI = {
   // Tên đệm
   văn: { han: '文', strokes: 4 }, thị: { han: '氏', strokes: 4 }, minh: { han: '明', strokes: 8 },
-  đức: { han: '德', strokes: 15 }, hữu: { han: '有', strokes: 6 }, thanh: { han: '清', strokes: 11 },
+  đức: { han: '德', strokes: 15 }, hữu: { han: '有', strokes: 6 }, thanh: { han: '清', strokes: 12 },
   quang: { han: '光', strokes: 6 }, hoàng: { han: '皇', strokes: 9 }, quốc: { han: '國', strokes: 11 },
   ngọc: { han: '玉', strokes: 5 }, bảo: { han: '寶', strokes: 20 }, gia: { han: '嘉', strokes: 14 },
   tú: { han: '秀', strokes: 7 }, thu: { han: '秋', strokes: 9 }, xuân: { han: '春', strokes: 9 },
