@@ -7,6 +7,8 @@
 //  Tích hợp BaZi: từ ngũ hành vượng suy của lá số → đoán tạng yếu/mạnh + lời khuyên đông y.
 // ============================================================================
 import { GAN, ZHI } from './constants.js';
+import { changSheng } from './core.js';
+import { STAGE_WEIGHT, STAGE_VI } from './dayun-changsheng.js'; // [loop 1086] decade health arc
 
 // ---- Ngũ hành ↔ Tạng phủ + thuộc tính (Hoàng Đế Nội Kinh) ----
 export const WUX_ZANG = {
@@ -539,6 +541,45 @@ export function stageHealth(dayGanWx, stage, stageW) {
     tone: 'chuyen',
     headline: `${zang} khí trung chuyển · ${stage}`,
     advice: `Sinh khí đang chuyển — duy trì điều hoà, nuôi dưỡng ${zang} (tránh cực đoan).`,
+  };
+}
+
+/**
+ * [loop 1086] DECADE HEALTH ARC — sức khoẻ dọc cuộc đời theo 十二长生 các đại vận.
+ *   Nhật Chủ (tạng cốt lõi) đi qua 12長生 ở mỗi thập niên → sinh khí lên/xuống.
+ *   «运逢帝旺如日中天, 运逢墓绝如秋冬»: thập niên 帝旺 = tạng thịnh (đỉnh sức khoẻ),
+ *   thập niên 死/墓/绝 = tạng suy (cần dưỡng/tránh quá sức). Dùng stageHealth cho từng decade.
+ *   Reuse: dayun stages (chart.js computeDaYun) + stageHealth (loop 1084).
+ * @returns {{ items:[{startAge,ganZhi,stage,stageWeight,tone,headline,advice}], current, peak, low } | null}
+ */
+export function decadeHealthArc(R) {
+  const dayGan = R && R.chart && R.chart.dayGan;
+  const dmWx = R && R.chart && R.chart.dayMaster && R.chart.dayMaster.wx;
+  const dayun = R && R.dayun ? R.dayun : [];
+  if (!dayGan || !dmWx || !dayun.length) return null;
+  const items = dayun.map((d) => {
+    const stage = d.zhi ? changSheng(dayGan, d.zhi) : '';
+    const stageW = STAGE_WEIGHT[stage] || 0;
+    const stageVi = STAGE_VI[stage] || '';
+    const sh = stageHealth(dmWx, stageVi, stageW);
+    return { startAge: d.startAge, ganZhi: d.ganZhi, stage: stageVi, stageWeight: stageW, tone: sh ? sh.tone : '', headline: sh ? sh.headline : '', advice: sh ? sh.advice : '' };
+  }).filter((it) => it.stage);
+  if (!items.length) return null;
+  // thập niên hiện tại (theo tuổi)
+  const _yr = new Date().getFullYear();
+  const birthYr = (R && R.chart && R.chart.input && R.chart.input.year) || (_yr - 30);
+  const curAge = _yr - birthYr;
+  let curIdx = items.findIndex((it) => curAge >= it.startAge && curAge < it.startAge + 10);
+  if (curIdx < 0) { // ngoài khoảng → gần nhất
+    let bd = Infinity, bi = -1; items.forEach((it, i) => { const dd = Math.abs(curAge - (it.startAge + 5)); if (dd < bd) { bd = dd; bi = i; } }); curIdx = bi;
+  }
+  const sorted = [...items].sort((a, b) => b.stageWeight - a.stageWeight);
+  return {
+    organ: dmWx, // ngũ hành Nhật Chủ → tạng cốt lõi
+    items: items.map((it) => ({ startAge: it.startAge, ganZhi: it.ganZhi, stage: it.stage, stageWeight: it.stageWeight, tone: it.tone, headline: it.headline, advice: it.advice.slice(0, 180) })),
+    current: curIdx >= 0 ? { ...items[curIdx], idx: curIdx } : null,
+    peak: sorted[0] || null,       // thập niên sinh khí ĐỈNH
+    low: sorted[sorted.length - 1] || null, // thập niên sinh khí SUY nhất
   };
 }
 

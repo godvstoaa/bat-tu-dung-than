@@ -107,7 +107,7 @@ import { healthAlertScan } from './health-alert.js';
 import { computeHehun } from './hehun.js';
 import { synthesize } from './synthesis.js';
 import { matchBusinessPartners } from './partner-match.js';
-import { analyzeHealth, answerHealth, meridianClock, bodyConstitution, stageHealth } from './tcm.js';
+import { analyzeHealth, answerHealth, meridianClock, bodyConstitution, stageHealth, decadeHealthArc } from './tcm.js';
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
@@ -809,8 +809,21 @@ export function execTool(name, args, R) {
           lifestyle: p.lifestyle.map((l) => _s(l, 180)),
           emotion: p.emotion ? { dominant: _s(p.emotion.dominant, 140), dominantRisk: _s(p.emotion.dominantRisk, 160), vulnerable: _s(p.emotion.vulnerable, 140), advice: _s(p.emotion.advice, 140) } : null,
           note: _s(p.note, 220),
+          // [loop 1086] decade health arc — sức khoẻ dọc cuộc đời theo 十二长生 các đại vận
+          decadeArc: (() => {
+            const _a = decadeHealthArc(R);
+            if (!_a) return null;
+            return {
+              organ: _a.organ,
+              current: _a.current ? { startAge: _a.current.startAge, ganZhi: _a.current.ganZhi, stage: _a.current.stage, tone: _a.current.tone, headline: _s(_a.current.headline, 120), advice: _s(_a.current.advice, 200) } : null,
+              peak: _a.peak ? { startAge: _a.peak.startAge, ganZhi: _a.peak.ganZhi, stage: _a.peak.stage, headline: _s(_a.peak.headline, 100) } : null,
+              low: _a.low ? { startAge: _a.low.startAge, ganZhi: _a.low.ganZhi, stage: _a.low.stage, headline: _s(_a.low.headline, 100) } : null,
+            };
+          })(),
         };
       }
+      // [loop 1086] DECADE HEALTH ARC — nếu health_profile được gọi, đính kèm arc sức khoẻ
+      //   dọc cuộc đời (để AI trả lời «sức khoẻ qua các thập niên», «decade nào yếu nhất»).
       case 'health_today': { // [loop 1085] đông y THEO NGÀY — 十二长生 sinh khí hôm nay → tạng + advice
         const _n = new Date();
         let _lr = null; try { _lr = analyzeLiuRi(R, _n.getFullYear(), _n.getMonth() + 1, _n.getDate(), R.patternQuality); } catch (_) { _lr = null; }

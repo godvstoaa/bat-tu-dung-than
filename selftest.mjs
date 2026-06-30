@@ -8925,6 +8925,41 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1085] health_today AI tool — ${_t.dayGanZhi} ${_t.dayRating}(${_t.dayScore}) · ${_t.stageHealth.headline} ✓`);
 }
 
+// [loop 1086] decadeHealthArc — sức khoẻ dọc cuộc đời theo 十二长生 các đại vận
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { decadeHealthArc } = await import('./src/engine/tcm.js');
+  const { rankDayun } = await import('./src/engine/dayun-rank.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _arc = decadeHealthArc(_R);
+  assert(_arc && Array.isArray(_arc.items) && _arc.items.length > 0, '[loop 1086] decadeHealthArc trả items');
+  assert(_arc.peak && _arc.low && _arc.current, '[loop 1086] decadeHealthArc có peak/low/current');
+  // peak = stageWeight cao nhất, low = thấp nhất
+  const _maxW = Math.max(..._arc.items.map((i) => i.stageWeight));
+  const _minW = Math.min(..._arc.items.map((i) => i.stageWeight));
+  assert(_arc.peak.stageWeight === _maxW, `[loop 1086] peak = đỉnh stageWeight (${_arc.peak.stage}=${_arc.peak.stageWeight})`);
+  assert(_arc.low.stageWeight === _minW, `[loop 1086] low = suy nhất (${_arc.low.stage}=${_arc.low.stageWeight})`);
+  // cross-check stages khớp rankDayun.scored (cùng dayun, cùng stage)
+  const _rk = rankDayun(_R);
+  const _stageOk = _arc.items.every((it, i) => { const _s = _rk.scored[i]; return _s && _s.ganZhi === it.ganZhi && _s.stageVi === it.stage; });
+  assert(_stageOk, '[loop 1086] stages decadeHealthArc khớp rankDayun.scored');
+  // every item có tone + headline (tạng thịnh/suy)
+  assert(_arc.items.every((i) => /thinh|suy|chuyen/.test(i.tone) && /khí/.test(i.headline)), '[loop 1086] mọi decade có tone + headline');
+  assert(!/undefined|NaN/.test(JSON.stringify(_arc)), '[loop 1086] decadeHealthArc không leak');
+  console.log(`   [loop 1086] decadeHealthArc — ${_arc.items.length} thập niên, peak=${_arc.peak.stage}@${_arc.peak.startAge}t, low=${_arc.low.stage}@${_arc.low.startAge}t ✓`);
+}
+
+// [loop 1086] health_profile AI tool giờ có decadeArc
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { execTool } = await import('./src/engine/ai.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _p = execTool('health_profile', {}, _R);
+  assert(_p.decadeArc && _p.decadeArc.peak && _p.decadeArc.low, '[loop 1086] health_profile trả decadeArc (peak/low)');
+  assert(_p.decadeArc.current && _p.decadeArc.current.stage, `[loop 1086] decadeArc.current có stage (got ${_p.decadeArc?.current?.stage})`);
+  console.log(`   [loop 1086] health_profile AI tool đính decadeArc (current=${_p.decadeArc.current.stage}, peak=${_p.decadeArc.peak.stage}) ✓`);
+}
+
 // [loop 1029] name.js STROKES — 康熙 nét đúng + đỡ dead-end "nhập nét tay"
 {
   const { STROKES, analyzeName } = await import('./src/engine/name.js');
