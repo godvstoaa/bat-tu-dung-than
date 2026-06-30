@@ -71,6 +71,11 @@ const NAME_VI = {
   vĩ: { han: '偉', strokes: 11 }, hào: { han: '豪', strokes: 14 }, khang: { han: '康', strokes: 11 },
   thiện: { han: '善', strokes: 12 }, nhẫn: { han: '忍', strokes: 7 }, đan: { han: '丹', strokes: 4 },
   tình: { han: '情', strokes: 11 }, tâm: { han: '心', strokes: 4 }, thủy: { han: '水', strokes: 4 },
+  // [loop 1047] +10 chữ tên phổ biến (康熙 confident): Bách/Cao/Chí/Đăng/Định/Đồng/Khắc/Khoa/Tài/Vũ
+  bách: { han: '柏', strokes: 9 }, cao: { han: '高', strokes: 10 }, chí: { han: '志', strokes: 7 },
+  đăng: { han: '登', strokes: 12 }, định: { han: '定', strokes: 8 }, đồng: { han: '同', strokes: 6 },
+  khắc: { han: '克', strokes: 7 }, khoa: { han: '科', strokes: 9 }, tài: { han: '才', strokes: 4 },
+  vũ: { han: '武', strokes: 8 },
   // [loop 1035] bổ sung 8 chữ tên phổ biến còn thiếu (康熙 nét verified): Quỳnh/Phượng/Quyên/Nhiên/Lam/Khôi/Ninh/Thuần
   quỳnh: { han: '瓊', strokes: 20 }, phượng: { han: '鳳', strokes: 14 }, quyên: { han: '娟', strokes: 10 },
   nhiên: { han: '然', strokes: 12 }, lam: { han: '藍', strokes: 20 }, khôi: { han: '魁', strokes: 14 },
