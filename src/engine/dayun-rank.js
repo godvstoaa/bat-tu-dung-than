@@ -12,6 +12,8 @@ const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅'
 // [loop 1018 FIX] 六合 — đại vận chi LỤC HỢP Nhật Chi = thập niên thuận hoà (reward, đối xứng 冲罚).
 //   Cùng bug-class loop 1014-1016, nay ở lõi dayun ranking.
 const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+// [loop 1042] 三合 bán-hợp — đại vận chi cùng cụm 三合 với Nhật Chi = «半合» (yếu hơn 六 hợp).
+const SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
 
 const CAT_BOOST = { cat: 15, volatile: -5, hung: -10, mid: 0 };
 
@@ -48,6 +50,8 @@ export function rankDayun(R) {
     else if (d.gan === dayGan) { interaction = '同气'; intScore += 3; }
     // [loop 1018] 六合 — đại vận chi lục hợp Nhật Chi → thuận hoà (reward, đối xứng 地冲 −8).
     if (!interaction && LIUHE[d.zhi] === dayZhi) { interaction = '💕合日'; intScore += 6; }
+    // [loop 1042] 三合 bán-hợp — cùng cụm 三合 (nếu chưa 六 hợp) → thuận nhẹ.
+    else if (!interaction && d.zhi !== dayZhi && SANHE.some((g) => g.includes(d.zhi) && g.includes(dayZhi))) { interaction = '🔗半合日'; intScore += 4; }
     score += intScore;
 
     // [cycle 48 M1] bỏ bước "Dụng Thần match" riêng — d.score (từ computeDaYun, ×10 ở bước 1) ĐÃ

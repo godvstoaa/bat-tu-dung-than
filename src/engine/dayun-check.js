@@ -13,6 +13,8 @@ const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌',
 // [loop 1018 FIX] 六合 — đại vận chi LỤC HỢP Nhật Chi = thập niên thuận hoà (tín hiệu CÁT,
 //   đối xứng cảnh báo 冲/害/形). Cùng bug-class loop 1014-1016, nay ở lõi đại vận.
 const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+// [loop 1042] 三合 bán-hợp — đại vận chi cùng cụm 三合 với Nhật Chi.
+const SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
 
 /**
  * @param {object} chart - từ analyze()
@@ -76,6 +78,10 @@ export function checkDayunInteractions(chart, dayun) {
     // [loop 1018] 六合 — đại vận chi LỤC HỢP Nhật Chi = thập niên thuận hoà (CÁT, đối xứng 冲罚).
     if (!zhiChong && LIUHE[dayZhi] === dgZhi) {
       notes.push('💕 Đại vận hợp日 — chi LỤC HỢP Nhật Chi: thập niên thuận hoà, được trợ, quý nhân (CÁT).');
+    }
+    // [loop 1042] 三合 bán-hợp — đại vận chi cùng cụm 三合 với Nhật Chi → thuận nhẹ.
+    else if (!zhiChong && dgZhi !== dayZhi && SANHE.some((g) => g.includes(dayZhi) && g.includes(dgZhi))) {
+      notes.push('🔗 Đại vận bán-hợp日 — chi cùng cụm 三合 với Nhật Chi: thập niên khá thuận (yếu hơn lục hợp).');
     }
 
     if (notes.length) {
