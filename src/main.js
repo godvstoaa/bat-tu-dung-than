@@ -3256,7 +3256,7 @@ function renderHourChart(R) {
       </div>`;
     }).join('');
     const best = r.best?.[0], worst = r.worst?.[0];
-    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;height:80px">${bars}</div>
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;overflow-x:auto;overflow-x:auto">${bars}</div>
       <p class="hint" style="margin-top:4px">📊 ${_n.getDate()}/${_n.getMonth()+1} · Tốt nhất: <b>${esc(best?.vi || best?.zhi || '?')} (${best?.rating || ''})</b> · Kỵ: <b>${esc(worst?.vi || worst?.zhi || '?')} (${worst?.rating || ''})</b></p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được giờ tốt.</p>'; }
 }
@@ -3282,7 +3282,7 @@ function renderLiuyueChart(R) {
     const sorted = [...lm.months].sort((a, b) => (b.score || 0) - (a.score || 0));
     const bestMo = best || sorted[0], worstMo = worst || sorted[sorted.length - 1];
     const moLabel = (mo) => `T${mo?.solarMonth || mo?.m + 1 || '?'} (${mo?.rating || ''})`;
-    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;height:80px">${bars}</div>
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;overflow-x:auto;overflow-x:auto">${bars}</div>
       <p class="hint" style="margin-top:4px">📊 ${new Date().getFullYear()} · Tốt nhất: <b>${esc(moLabel(bestMo))}</b> · Yếu nhất: <b>${esc(moLabel(worstMo))}</b></p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được lưu nguyệt.</p>'; }
 }
@@ -3316,7 +3316,7 @@ function renderLiunianChart(R) {
         <span class="hint" style="font-size:9px;color:${col}">${esc((yr.rating||'').slice(0,6))}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0">${bars}</div><p class="hint" style="margin-top:4px">📊 ${curYear}–${curYear+9} · Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh. Click 💬 AI hỏi chi tiết năm nào.</p>`;
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 ${curYear}–${curYear+9} · Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh. Click 💬 AI hỏi chi tiết năm nào.</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận trục lưu niên.</p>'; }
 }
 
@@ -3374,7 +3374,7 @@ function renderDayunChart(R) {
         <span class="hint" style="font-size:10px;color:${col}">${esc((d.rating||'').slice(0,8))}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:2px;padding:8px 0">${bars}</div><p class="hint" style="margin-top:4px">📊 Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh (cát/hung). Score từ chart.js: can+chi khớp Dụng.</p>`;
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:2px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh (cát/hung). Score từ chart.js: can+chi khớp Dụng.</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận trục.</p>'; }
 }
 
