@@ -445,7 +445,9 @@ function pTiming(R, intent) {
         const warns = d.schools.filter((s) => s.d < -8).map((s) => s.note.slice(0, 60)).join('; ');
         // [loop 16] trích 格局 tag từ kết quả
         const gejuTag = d.gejuFavor === '喜' ? ' ★THUẬN CÁCH' : d.gejuFavor === '忌' ? ' ⚠GHÉT CÁCH' : '';
-        lines.push(`📅 Năm ${yr} (${d.ganZhi}, can ${godViShort(d.ganGod)}): ${d.rating} (${d.score}/100)${gejuTag}. ${d.advice}${warns ? ' Lưu ý: ' + warns + '.' : ''}`);
+        // [loop 995] 应期 tag cho năm cụ thể — nếu năm nay xung/hợp chi bẩm sinh → sao ẩn bật ra
+        const yqTag = (d.yingqi && d.yingqi.length) ? d.yingqi.map((e) => `${e.type === 'xung mở kho' ? '★MởKho' : e.type === 'tam hợp thành cục' ? '≡TamHợp' : e.type === 'hợp dẫn' ? '∼Hợp' : '×Xung'}→${e.groups}${e.tone === 'cat' ? ' 🎉Dụng' : e.tone === 'hung' ? ' ⚠Kỵ' : e.tone === 'mixed' ? ' ≡Dụng+Kỵ' : ''}`).join('; ') : '';
+        lines.push(`📅 Năm ${yr} (${d.ganZhi}, can ${godViShort(d.ganGod)}): ${d.rating} (${d.score}/100)${gejuTag}. ${d.advice}${yqTag ? ' 🔓 Kích hoạt: ' + yqTag + '.' : ''}${warns ? ' Lưu ý: ' + warns + '.' : ''}`);
       } catch (e) {
         lines.push(`📅 Năm ${yr}: chưa tính được chi tiết đa phái.`);
       }

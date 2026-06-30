@@ -14,6 +14,7 @@ import { GAN_HE_MAP, ZHI_LIUHE_MAP, ZHI_CHONG_MAP, GAN_CHONG } from './interacti
 import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, SHENSHA_INFO, TIAN_YI, WEN_CHANG, JIANG_XING, TIAN_DE, YUE_DE } from './shensha.js';
 // [loop 19 — elevation] 伏吟/反吟 chuẩn từ module chuyên dụng (4 cặp thất sát, không phải "bất kỳ ngũ hành khắc").
 import { isFuyin, isFanyin } from './fuyin.js';
+import { scanBranchYingqi } from './yingqi-branch.js';
 
 // [loop 19] Nhãn 6 thân theo trụ — cho tầng Phục/Phản ngâm (năm biến cố).
 const QIN_VI = { year: 'Niên Trụ (tổ bối)', month: 'Nguyệt Trụ (phụ mẫu/sự nghiệp)', day: 'Nhật Trụ (bản thân/phối ngẫu)', time: 'Thời Trụ (tử tức)' };
@@ -423,5 +424,17 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
   if (gejuFavor) out.gejuFavor = gejuFavor;
   if (activeDayun) out.activeDayun = activeDayun; // [运年组合] 大运 đang hành cho năm này
   if (dayunPhase) out.dayunPhase = dayunPhase; // [loop 152] 进气/退气
+  // [loop 995] 应期 integration — năm này có kích hoạt sao ẩn (xung/hợp chi bẩm sinh)?
+  //   Bù khoảng trống: analyzeLiunianDeep từng chỉ có 十神应期 cũ, không biết năm nay có «mở kho»
+  //   Dụng (CÁT) hay Kỵ (HUNG). Nay tra scanBranchYingqi cho đúng năm này.
+  try {
+    const yq = scanBranchYingqi(R, solarYear, 1);
+    if (yq.events && yq.events.length) {
+      out.yingqi = yq.events.map((e) => ({
+        type: e.type, tone: e.tone, toneVi: e.toneVi, grade: e.grade,
+        groups: e.groups.map((g) => g.vi).join('+'), note: e.note,
+      }));
+    }
+  } catch (e) {}
   return out;
 }
