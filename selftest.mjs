@@ -8615,6 +8615,44 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1080] 十二长生 NĂM tích hợp analyzeLiunianDeep (yearStage + score, thịnh ${_vib}/suy ${_dec}/10) ✓`);
 }
 
+// [loop 1081] 盖头/截脚 pillar-strength — «盖头截脚其力减半»: trụ vận can-chi KHẮC nhau → lực giảm.
+//   pillarRelation (pillar-quality) giờ dùng cho cả rankDayun + analyzeLiunianDeep.
+{
+  const { pillarRelation } = await import('./src/engine/pillar-quality.js');
+  // 1. deterministic: các cặp kinh điển
+  assert(pillarRelation({ gan: '庚', zhi: '寅' }).type === '盖头', '[loop 1081] 庚寅 = 盖头 (can庚金 khắc chi寅木)');
+  assert(pillarRelation({ gan: '甲', zhi: '申' }).type === '截脚', '[loop 1081] 甲申 = 截脚 (chi申金 khắc can甲木)');
+  assert(pillarRelation({ gan: '甲', zhi: '寅' }).type === '比和', '[loop 1081] 甲寅 = 比和 (cùng Mộc)');
+  assert(pillarRelation({ gan: '甲', zhi: '午' }).type === '干生支', '[loop 1081] 甲午 = 干生支 (Mộc sinh Hỏa)');
+  assert(pillarRelation({ gan: '丙', zhi: '寅' }).type === '支生干', '[loop 1081] 丙寅 = 支生干 (Mộc sinh Hỏa)');
+  assert(pillarRelation({ gan: '庚', zhi: '寅' }).flow === -1 && pillarRelation({ gan: '甲', zhi: '寅' }).flow === 1, '[loop 1081] flow: 盖头/截脚 = -1, sinh/比和 = +1');
+
+  // 2. rankDayun: scored items có pillarStrength + có cả trụ hài hoà lẫn 盖头/截脚
+  const { analyze } = await import('./src/engine/chart.js');
+  const { rankDayun } = await import('./src/engine/dayun-rank.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _rk = rankDayun(_R);
+  const _allPs = _rk.scored.every((s) => typeof s.pillarStrength === 'string');
+  assert(_allPs, '[loop 1081] rankDayun scored có pillarStrength');
+  const _clash = _rk.scored.filter((s) => /盖头|截脚/.test(s.pillarStrength));
+  const _harm = _rk.scored.filter((s) => /比和|干生支|支生干/.test(s.pillarStrength));
+  assert(_clash.length + _harm.length > 0, `[loop 1081] dayun có trụ can-chi quan hệ (clash ${_clash.length}/harm ${_harm.length})`);
+
+  // 3. analyzeLiunianDeep: yearPillarStrength expose + school entry khi 盖头/截脚/sinh
+  const { analyzeLiunianDeep } = await import('./src/engine/liunian-pro.js');
+  let _yPs = 0, _ySchool = 0;
+  for (let y = 2026; y < 2036; y++) {
+    const ln = analyzeLiunianDeep(_R, y, _R.patternYong || _R.patternQuality?.patternYong);
+    if (ln.yearPillarStrength) _yPs++;
+    if (ln.schools.some((s) => /盖头截脚 trụ năm/.test(s.phai))) _ySchool++;
+  }
+  assert(_yPs === 10, `[loop 1081] analyzeLiunianDeep expose yearPillarStrength cho mọi năm (${_yPs}/10)`);
+  assert(_ySchool === 10, `[loop 1081] school «盖头截脚 trụ năm» xuất hiện mọi năm (${_ySchool}/10)`);
+  // 4. no leak
+  assert(!/undefined|NaN/.test(JSON.stringify(_rk.scored)), '[loop 1081] scored không leak undefined/NaN');
+  console.log(`   [loop 1081] 盖头/截脚 pillar-strength tích hợp rankDayun + analyzeLiunianDeep (deterministic + expose) ✓`);
+}
+
 // [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 (合 layer completion)
 {
   const { evaluateDate } = await import('./src/engine/zheri.js');

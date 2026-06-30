@@ -9,6 +9,8 @@ import { tenGod, changSheng } from './core.js';
 import { GOD_DECADE } from './dayun-god.js';
 // [loop 1080] trọng số 十二长生 dùng chung (canonical ở dayun-changsheng) — rankDayun + analyzeLiunianDeep.
 import { STAGE_WEIGHT, STAGE_VI } from './dayun-changsheng.js';
+// [loop 1081] 盖头/截脚 pillar-strength — quan hệ can-chi nội tại trụ đại vận.
+import { pillarRelation } from './pillar-quality.js';
 
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
 // [loop 1018 FIX] 六合 — đại vận chi LỤC HỢP Nhật Chi = thập niên thuận hoà (reward, đối xứng 冲罚).
@@ -67,6 +69,13 @@ export function rankDayun(R) {
     const stageVi = STAGE_VI[stage] || stage || '';
     if (stageW) score = Math.round(score * (1 + stageW / 100)); // 帝旺 ×1.08 … 衰 ×0.97 … 绝 ×0.93
 
+    // [loop 1081] 盖头/截脚 pillar-strength — «盖头截脚其力减半»: can-chi trụ vận KHẮC nhau →
+    //   khí không thông, lực vận giảm; SINH/Bỉ hoà → khí thông, lực đầy. Amplify (cùng mô hình
+    //   1080): trụ hài hoà khuếch đại khuynh hướng, trụ 盖头/截脚 co lực (vận khó phát huy).
+    const _rel = (d.gan && d.zhi) ? pillarRelation({ gan: d.gan, zhi: d.zhi }) : { type: '', vi: '', flow: 0 };
+    const _psFactor = _rel.flow > 0 ? 1.04 : _rel.flow < 0 ? 0.92 : 1.0;
+    if (_psFactor !== 1) score = Math.round(score * _psFactor);
+
     // [cycle 48 M1] bỏ bước "Dụng Thần match" riêng — d.score (từ computeDaYun, ×10 ở bước 1) ĐÃ
     //   bao gồm khớp Dụng cho cả can LẪN chi. Trước đây cộng thêm +8 can → đếm KÉP (can 28, chi 10),
     //   lệch + tổng score/band không tin cậy. Nay chỉ dựa d.score*10 + CAT_BOOST + tương tác + 长生.
@@ -79,7 +88,8 @@ export function rankDayun(R) {
       godTheme: godInfo.theme || '',
       interaction, intScore,
       stage, stageVi, stageWeight: stageW,
-      summary: `${d.ganZhi} [${d.startAge}-${d.startAge + 9}t] ${godVi}(${godInfo.cat}) ${d.rating}${stageVi ? ' · ' + stageVi : ''}${interaction ? ' ' + interaction : ''} → ${score > 20 ? 'RẤT TỐT' : score > 5 ? 'TỐT' : score > -10 ? 'TRUNG BÌNH' : score > -25 ? 'KÉM' : 'XẤU'}`,
+      pillarStrength: _rel.type, pillarStrengthVi: _rel.vi, pillarFlow: _rel.flow,
+      summary: `${d.ganZhi} [${d.startAge}-${d.startAge + 9}t] ${godVi}(${godInfo.cat}) ${d.rating}${stageVi ? ' · ' + stageVi : ''}${_rel.type && _rel.type !== '?' ? ' · ' + _rel.type : ''}${interaction ? ' ' + interaction : ''} → ${score > 20 ? 'RẤT TỐT' : score > 5 ? 'TỐT' : score > -10 ? 'TRUNG BÌNH' : score > -25 ? 'KÉM' : 'XẤU'}`,
     };
   });
 

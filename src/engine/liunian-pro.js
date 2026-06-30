@@ -13,6 +13,7 @@ import { tenGod, godGroup, changSheng } from './core.js';
 import { GAN_HE_MAP, ZHI_LIUHE_MAP, ZHI_CHONG_MAP, GAN_CHONG } from './interactions.js';
 import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, SHENSHA_INFO, TIAN_YI, WEN_CHANG, JIANG_XING, TIAN_DE, YUE_DE } from './shensha.js';
 import { STAGE_WEIGHT, STAGE_VI } from './dayun-changsheng.js'; // [loop 1080] 十二长生 sinh khí năm
+import { pillarRelation } from './pillar-quality.js'; // [loop 1081] 盖头/截脚 pillar-strength năm
 // [loop 19 — elevation] 伏吟/反吟 chuẩn từ module chuyên dụng (4 cặp thất sát, không phải "bất kỳ ngũ hành khắc").
 import { isFuyin, isFanyin } from './fuyin.js';
 import { scanBranchYingqi } from './yingqi-branch.js';
@@ -448,8 +449,23 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
     schools.push({ phai: '十二长生 sinh khí', d: finalScore - _pre, note: `Năm chi ${yZhi} → Nhật Chủ ${yearStageVi} · sinh khí ${_dir} (factor ${_factor.toFixed(2)})` });
   }
 
+  // [loop 1081] 盖头/截脚 pillar-strength NĂM — «盖头截脚其力减半»: can-chi trụ năm KHẮC nhau →
+  //   lực năm giảm; SINH/Bỉ hoà → khí thông. Amplify-from-neutral (cùng mô hình 十二长生).
+  const _yrel = pillarRelation({ gan: yGan, zhi: yZhi });
+  const _ypsFactor = _yrel.flow > 0 ? 1.04 : _yrel.flow < 0 ? 0.92 : 1.0;
+  if (_ypsFactor !== 1) {
+    const _pre2 = finalScore;
+    finalScore = Math.max(2, Math.min(98, Math.round(50 + (finalScore - 50) * _ypsFactor)));
+    finalRating = finalScore >= 70 ? 'Đại cát' : finalScore >= 56 ? 'Cát' : finalScore >= 36 ? 'Bình' : finalScore >= 22 ? 'Hơi kỵ' : finalScore >= 10 ? 'Hung' : 'Đại hung';
+    if (_yrel.type && _yrel.type !== '?') {
+      const _pd = _yrel.flow < 0 ? '盖头/截脚 → khí KHÔNG thông, lực năm giảm (vận khó phát huy trọn vẹn)' : 'can-chi SINH/Bỉ hoà → khí thông, lực năm đầy';
+      schools.push({ phai: '盖头截脚 trụ năm', d: finalScore - _pre2, note: `${yGan}${yZhi} = ${_yrel.vi} · ${_pd} (factor ${_ypsFactor.toFixed(2)})` });
+    }
+  }
+
   const out = { year: solarYear, ganZhi: yGan + yZhi, ganGod, ganWx, zhiWx, score: finalScore, rating: finalRating, schools, advice };
   if (yearStageVi) { out.yearStage = yearStageVi; out.yearStageWeight = yearStageW; } // [loop 1080] expose cho UI chart tooltip
+  if (_yrel && _yrel.type && _yrel.type !== '?') { out.yearPillarStrength = _yrel.vi; out.yearPillarFlow = _yrel.flow; } // [loop 1081]
   if (gejuFavor) out.gejuFavor = gejuFavor;
   if (activeDayun) out.activeDayun = activeDayun; // [运年组合] 大运 đang hành cho năm này
   if (dayunPhase) out.dayunPhase = dayunPhase; // [loop 152] 进气/退气
