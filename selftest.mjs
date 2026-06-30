@@ -8558,6 +8558,8 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     ['hay mệt mỏi', 'fatigue'], ['tay chân lạnh', 'cold_limbs'], ['tai ù a', 'tinnitus'],
     ['đau lưng mỏi', 'back_knee'], ['táo bón', 'constipation'], ['đổ mồ hôi trộm', 'sweat'],
     ['đau dạ dày ợ chua', 'stomach_pain'], ['hay cáu gắt', 'liver_fire'], ['đầy bụng chán ăn', 'spleen_xu'],
+    ['đau bụng kinh quặn', 'dysmenorrhea'], ['kinh nguyệt không đều', 'irregular_period'],
+    ['hiếm muộn muốn con', 'infertility'], ['tiền mãn kinh bốc hoả', 'menopause'],
   ];
   let _ok = 0;
   for (const [q, exp] of _cases) {
@@ -8565,7 +8567,7 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     if (a.matched && a.id === exp) _ok++; else console.log(`     ✗ ${q} → ${a.id} (expect ${exp})`);
   }
   assert(_ok === _cases.length, `[loop 1022] CONDITION_KB match ${_ok}/${_cases.length}`);
-  assert(CONDITION_KB.length >= 13, `[loop 1022] KB ≥ 13 conditions (got ${CONDITION_KB.length})`);
+  assert(CONDITION_KB.length >= 17, `[loop 1022] KB ≥ 17 conditions (got ${CONDITION_KB.length})`);
   // no garbled latin artifacts
   const _kb = JSON.stringify(CONDITION_KB);
   assert(!/\b(green|misc|bak|Tillerson|Needs|pohong|ôleo)\b/.test(_kb), '[loop 1022] KB không garbled artifacts');

@@ -176,6 +176,38 @@ export const CONDITION_KB = [
     symptoms: '(hàn) đau ấm đỡ, bụng lạnh; (nhiệt) đau rát ợ chua, khát, lưỡi vàng; (can phạm) đau lan sườn, buồn nôn khi buồn; (âm hư) đau khi đói, ăn vào đỡ.',
     advice: 'HÀN: ① ôn vị — gừng/đường đỏ/quế/bột gạo nếp. NHIỆT/Ợ CHUA: ② tả vị hoả — bối mẫu, hải phiêu sao, nhân trần; giảm cay/chua/cà phê/rượu. CAN PHẠM: ③ sơ can hoà vị — sài hồ, bạch thược, cam thảo. ÂM Hư: ④ dưỡng vị âm — sa sâm, mạch môn, thạch斛. Ăn đúng giờ, nhai kỹ, 7 phần no, tránh đói quá/no quá.',
   },
+  {
+    id: 'dysmenorrhea',
+    keywords: ['đau bụng kinh', 'đau khi hành kinh', 'đau quặn bụng kinh', 'thống kinh', '痛经', 'đau bụng trước kinh', 'đau bụng dưới kinh'],
+    title: 'Đau bụng kinh (THỐNG KINH — hàn ngưng/khí uất ủ huyết/khí huyết hư)',
+    summary: 'Đông-y chia 3 chứng: (a) HÀN NGƯNG HUYẾT — chịu lạnh/uống lạnh lúc kinh → máu ngưng, đau quặn, nóng đắp đỡ; (b) KHÍ TRỆ HUYẾT Ủ — căng thẳng, can khí uất → đau trước kinh, sườn ngực trướng; (c) KHÍ HUYẾT HƯ — mỏi, máu kinh nhạt ít, đau âm ỉ.',
+    symptoms: '(hàn) đau quặn từng cơn, nóng đắp đỡ, máu cục sẫm; (uất) đau trước kinh, bứt rứt, sườn trướng, cục máu; (hư) đau âm ỉ, mệt, máu nhạt ít.',
+    advice: 'HÀN: ① ôn cung tán hàn — gừng đường đỏ/quế/ngải cứu (ai diệp) nấu ấm lúc kinh; đắp nóng bụng dưới. UẤT: ② sơ can hoạt huyết — sài hồ, hương phụ, ích mẫu thảo, bạch thược. HƯ: ③ bổ khí huyết — táo đỏ, kỷ tử, đương quy, long nhãn. CHUNG: tránh lạnh (nước/uống/điều hoà) trước và trong kinh, giữ ấm bụng dưới + chân, nghỉ ngơi.',
+  },
+  {
+    id: 'irregular_period',
+    keywords: ['kinh nguyệt không đều', 'kinh sớm', 'kinh muộn', 'thiểu kinh', 'đóng kinh', 'bế kinh', 'rối loạn kinh nguyệt', '月经不调', 'vô kinh', 'kinh ra ít'],
+    title: 'Kinh nguyệt không đều (can uất/tỳ hư/thận hư — xung nhâm)',
+    summary: 'Kinh nguyệt do XUNG NHÂM + CAN/TỲ/THẬN. (a) CAN UẤT — căng thẳng → kinh lỡ/sớm, sườn trướng; (b) TỲ HƯ — máu ít/nhạt, mệt, sinh hóa vô nguồn; (c) THẬN HƯ — kinh muộn/ít, thắt lưng mỏi (thận là gốc thiên quý).',
+    symptoms: '(can uất) kinh lỡ/sớm, bứt rứt, ngực sườn trướng; (tỳ hư) máu nhạt ít, mệt, chán ăn; (thận hư) kinh muộn/ít, thắt lưng đầu gối mỏi, choáng.',
+    advice: '① điều can-tỳ-thận: đương quy, bạch thược, ích mẫu thảo, táo đỏ, kỷ tử, sơn dược, ý dĩ. CAN UẤT +cúc hoa/diệp hạ châu; TỲ HƯ +khoai lang/táo đỏ; THẬN HƯ +đậu đen/ốc chó. ② Ngủ sớm (can đởm phục hồi). ③ Giữ ấm, tránh lạnh, bớt lo âu. Đóng kinh >3 tháng hoặc rong kinh → khám phụ khoa.',
+  },
+  {
+    id: 'infertility',
+    keywords: ['hiếm muộn', 'vô sinh', 'không có thai', 'muốn con', 'khó có con', 'chưa có bầu', '不孕', 'khó thụ thai'],
+    title: 'Hiếm muộn / Vô sinh (THẬN + XUNG NHÂM + CAN)',
+    summary: 'Đông-y: thận là gốc «thiên quý» (bản chất sinh dục), xung nhâm nuôi bào tử, can chủ điều đạt (rụng trứng). Nam thường THẬN TINH KHUY (tinh yếu/ít), nữ thường THẬN hư (noãn kém/cung lạnh) + CAN UẤT (rụng trứng không đều) + Ủ HUYẾT.',
+    symptoms: '(thận hư) thắt lưng mỏi, sợ lạnh, kinh muộn/ít, tay chân lạnh; (can uất) PMS nặng, kinh lỡ, ngực sườn trướng; (ủ huyết) cục máu sẫm, đau bụng kinh.',
+    advice: '① BỔ THẬN: nam — đỗ trọng/tục đoạn/ốc chó/đậu đen/hà thủ ô; nữ — thục địa/đương quy/kỷ tử/ngải cứu. ② SƠ CAN (rụng trứng): diệp hạ châu/cúc hoa + giảm stress. ③ ÔN CUNG (cung lạnh): ngải cứu/gừng, giữ ấm bụng dưới. ④ Ngủ sớm, tiết độ, tính ngày rụng trứng. ⑤ Cả 2 vợ chồng — khám hiếm muộn (nội tiết/tinh dịch đồ) nếu >1 năm.',
+  },
+  {
+    id: 'menopause',
+    keywords: ['mãn kinh', 'tiền mãn kinh', 'đình kinh', 'triệu chứng mãn kinh', 'bốc hoả tuổi', 'đổ mồ hôi tuổi', '更年期', 'nóng bừng'],
+    title: 'Mãn kinh / Tiền mãn kinh (THẬN ÂM HƯ — thiên quý tuyệt)',
+    summary: 'Khoảng 45-55 tuổi, THẬN ÂM dần suy, thiên quý (tinh sinh dục) cạn → «âm hư hoả vượng»: bốc hoả/âm đạo khô/kinh rối. Là chuyển giao tự nhiên, không bệnh nếu cân bằng được. Dưỡng thận âm giúp qua giai đoạn êm.',
+    symptoms: 'nóng bừng mặt/cổ, đổ mồ hôi, mất ngủ, bứt rứt/căng thẳng, âm đạo khô, da khô, hay quên, tim trống, kinh rối rồi tắt.',
+    advice: '① DƯỠNG THẬN ÂM: thục địa, sơn dược, sơn thù du, mạch môn, quy bản; đậu đen, vừng đen, kỷ tử. ② THANH HƯ HOẢ: cúc hoa, đậu xanh, sen tâm, khổ qua. ③ Giảm cay nóng/rượu/đường. ④ Vận động nhẹ, yoga, ngủ đủ, bớt lo âu. ⑤ Canxi (sữa/đậu/mè) bảo vệ xương (thận chủ cốt). Triệu chứng nặng → khám nội tiết.',
+  },
 ];
 
 /**
