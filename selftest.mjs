@@ -6779,6 +6779,13 @@ console.log('\n################## U. [loop 71] double-count xung + chart-level g
   console.log(`   double-count xung Nhật Chi: -24→-14 ✓ | dayZhi=yearBirthZhi: -30→-16 ✓ | 天克地冲 -18 còn nguyên ✓`);
   console.log(`   chart-level guard: wx/pct rỗng → "unknown" + 配合流通 không pass sai ✓`);
 }
+// [loop 1007] tier calibration — cháu 2023-1-13 (synthesis 35, structural 4/6, 大败 已制) → KHÔNG «Phú Cách»
+{
+  const _chauR = analyze(2023, 1, 13, 7, 0, 'nam', 2026);
+  const _cl = _classifyLevel(_chauR);
+  assert(_cl.level === '清贵', `[1007] cháu synthesis 35 → Thanh Quý (KHÔNG còn Phú Cách/富豪 sai)`);
+  assert(_cl.passCount === 3 && _cl.rawPassCount === 4, `[1007] cháu capped 4→3 (synthesis<40 → max Thanh Quý)`);
+}
 
 // ################## V. [loop 72] 正官格 败 chong detection (dead-code fix) + 得势 cổ pháp ##################
 import { patternQuality as _pq } from './src/engine/pattern-quality.js';

@@ -59,11 +59,20 @@ export function classifyChartLevel(R) {
 
   // Đếm tiêu chí pass
   const passCount = criteria.filter((c) => c.pass).length;
+  // [loop 1007] 大败 tổ hợp hung cap — 伤官见官/枭夺食/群劫争财/杀攻身 là「大败」patterns
+  //   phá cách cục; chart có các flaws này KHÔNG nên xếp bậc cao (Phú/Quý) dù khác tiêu chí pass.
+  //   Vd cháu 2023-1-13: 3/6 structural nhưng có 伤官见官 + 枭夺食 → cap xuống (tránh «Phú Cách» sai).
+  //   (官杀混杂 guanZha TOO common — chỉ tính khi ≥2 serious khác, không cap một mình.)
+  const SERIOUS = new Set(['shangGuan', 'xiaoShi', 'qunJie', 'shaGong']);
+  const seriousXiong = (synthesis?.combos || []).filter((c) => c.tone === 'xiong' && SERIOUS.has(c.id) && !c.mitigation);
   // [loop 673 FIX] cap by synthesis score — tránh chart điểm thấp bị xếp bậc cao (vd cháu 16/100
   //   nhưng 3/6 tiêu chí structural → «Thanh Quý» sai thực tế). Cổ pháp: mệnh đó low → bậc phải thấp.
   let _effPass = passCount;
   if (synthesis?.score != null && synthesis.score < 22) _effPass = Math.min(_effPass, 1);      // Hạ đặng nặng → max Hạ Cách
   else if (synthesis?.score != null && synthesis.score < 31) _effPass = Math.min(_effPass, 2);  // Hạ đẳng → max Thường Cách
+  else if (synthesis?.score != null && synthesis.score < 40) _effPass = Math.min(_effPass, 3);  // [loop 1007] Trung hạ → max Thanh Quý (tránh «Phú Cách» cho chart điểm 35-39)
+  if (seriousXiong.length >= 2) _effPass = Math.min(_effPass, 2);   // ≥2 大败 (chưa chế) → max Thường Cách
+  else if (seriousXiong.length >= 1) _effPass = Math.min(_effPass, 3); // 1 大败 (chưa chế) → max Thanh Quý
 
   // Phân tầng (dùng _effPass có cap)
   let level, levelVi;
@@ -76,8 +85,12 @@ export function classifyChartLevel(R) {
 
   // [loop 675] capNote — làm rõ khi bậc bị cap thấp hơn passCount thô
   const capped = _effPass < passCount;
+  const capReason = seriousXiong.length >= 1
+    ? `cap: có ${seriousXiong.length} tổ hợp「大败」chưa chế (${seriousXiong.map((c) => c.vi).join(', ')}) — phá cách cục, bậc giới hạn dù structural ${passCount}/6`
+    : (synthesis?.score != null && synthesis.score < 31 ? `cap: điểm mệnh ${synthesis.score}/100 thấp → bậc giới hạn (structural ${passCount}/6 nhưng vận hạn kéo xuống)`
+    : (synthesis?.score != null && synthesis.score < 40 ? `cap: điểm mệnh ${synthesis.score}/100 trung bình → bậc giới hạn tối đa Thanh Quý (structural ${passCount}/6)` : ''));
   const note = `Mệnh cách: ${levelVi}. ${_effPass}/6 tiêu chí cổ pháp đạt (thực tế).` +
-    `${capped ? ` (cap: điểm mệnh ${synthesis?.score ?? '?'}/100 thấp → bậc giới hạn — structural ${passCount}/6 nhưng vận hạn kéo xuống)` : ''} ` +
+    `${capped ? ` (${capReason})` : ''} ` +
     `${_effPass >= 4 ? 'Mệnh có nền tốt — nên phát huy thế mạnh.' : _effPass >= 2 ? 'Mệnh trung bình — cần nỗ lực + cải vận.' : 'Mệnh nhiều khó — cải vận + tích đức là then chốt.'}`;
 
   return { level, levelVi, criteria, passCount: _effPass, rawPassCount: passCount, capped, note };
