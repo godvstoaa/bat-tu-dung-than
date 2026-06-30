@@ -31,6 +31,11 @@ const STAR_VI = { 天蓬: 'thiên bằng (đại hung)', 天芮: 'thiên nhuệ 
 const DOOR_AT = { 1: '休', 8: '生', 3: '伤', 4: '杜', 9: '景', 2: '死', 7: '惊', 6: '开' };
 const DOOR_VI = { 休: 'Hưu (cát — nghỉ/ngơi)', 生: 'Sinh (đại cát — sinh sôi/tài)', 伤: 'Thương (hung — tổn thương)', 杜: 'Đỗ (bình — ẩn náu)', 景: 'Cảnh (bình — văn/thi)', 死: 'Tử (đại hung)', 惊: 'Kinh (hung — kinh sợ)', 开: 'Khai (đại cát — mở/khai trương)' };
 const JI_DOOR = ['开', '休', '生']; // 3吉门
+// [loop 1089] 门迫 (宫克门) — ngũ hành cung (洛书九宫 后天八卦) + 八门 bản vị ngũ hành.
+//   «吉门受宫克为迫, 吉事不吉» — cửa TỐT bị cung KHẮC → cát lực giảm (vd 开门Kim ở 离9 Hỏa → Hỏa khắc Kim).
+const GONG_WX = { 1: '水', 2: '土', 3: '木', 4: '木', 5: '土', 6: '金', 7: '金', 8: '土', 9: '火' };
+const DOOR_WX = { 开: '金', 休: '水', 生: '土', 伤: '木', 杜: '木', 景: '火', 死: '土', 惊: '金' };
+const _WX_KE = { 金: '木', 木: '土', 土: '水', 水: '火', 火: '金' }; // KE[gongWx] === doorWx ⇒ cung khắc门
 
 // 宫 ↔ phương vị (洛书)
 const GONG_DIR = { 1: 'Bắc (坎)', 2: 'Tây Nam (坤)', 3: 'Đông (震)', 4: 'Đông Nam (巽)', 5: 'Trung cung', 6: 'Tây Bắc (乾)', 7: 'Tây (兑)', 8: 'Đông Bắc (艮)', 9: 'Nam (离)' };
@@ -127,6 +132,13 @@ const XIONG_GE = [
     if (xingMap[t] === g) return `${t} @cung${g} thiên hình`;
     return null;
   }, note: 'Mâu thuẫn nội bộ, pháp luật, tổn thương' },
+  { name: '门迫', vi: 'Môn Phách', test: (p) => { // [loop 1089] 吉门 bị cung khắc: «吉门受宫克为迫»
+    const d = p.door, g = p.gong;
+    if (!d || !JI_DOOR.includes(d)) return null; // chỉ 吉门 (cát lực bị triệt)
+    const dw = DOOR_WX[d], gw = GONG_WX[g];
+    if (gw && dw && _WX_KE[gw] === dw) return `${d}门(${dw}) ở cung${g}(${gw}) → cung khắc门`;
+    return null;
+  }, note: '«吉门受宫克为迫, 吉事不吉» — cửa tốt bị cung khắc, cát lực giảm/khó thành' },
 ];
 
 /**
