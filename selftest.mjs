@@ -8527,5 +8527,28 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1020] 流年/流月 合太岁 (liunian +10, liuyue +5/+4) — bug-class 冲/合 đóng ở fortune engine ✓`);
 }
 
+// [loop 1021] đông y / TCM — ngũ hành↔tạng phủ, vượng suy→hư/thực, condition KB (thủ dâm→thận hư)
+{
+  const { analyzeHealth, answerHealth, WUX_ZANG } = await import('./src/engine/tcm.js');
+  const { analyze } = await import('./src/engine/chart.js');
+  // ngũ hành ↔ tạng mapping (Hoàng Đế Nội Kinh)
+  assert(WUX_ZANG['木'].zang.includes('肝') && WUX_ZANG['水'].zang.includes('肾') && WUX_ZANG['火'].zang.includes('心'), '[loop 1021] ngũ hành↔tạng (木→肝, 水→肾, 火→心)');
+  assert(WUX_ZANG['水'].wei.includes('咸') && WUX_ZANG['水'].se.includes('黑'), '[loop 1021] ngũ vị/ngũ sắc (水→咸/黑)');
+  // analyzeHealth từ lá số
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _h = analyzeHealth(_R);
+  assert(_h.ok && _h.weak.length === 2 && _h.strong.length === 2, `[loop 1021] analyzeHealth weak/strong (got ${_h.weak?.length}/${_h.strong?.length})`);
+  assert(_h.dietAdvice.length >= 1 && _h.lifestyle.length >= 1, '[loop 1021] analyzeHealth có diet + lifestyle');
+  // answerHealth — ví dụ user: thủ dâm → thận hư
+  const _a = answerHealth('người hay thủ dâm sẽ bị gì và nên làm thế nào', _R);
+  assert(_a.matched && /肾|THẬN HƯ/.test(_a.title), `[loop 1021] thủ dâm → thận hư KB (matched=${_a.matched}, title=${_a.title?.slice(0,30)})`);
+  assert(/ÂM HƯ/.test(_a.reply) && /DƯƠNG HƯ/.test(_a.reply) && /TIẾT DỤC/.test(_a.reply), '[loop 1021] KB có âm/dương hư + tiết dục');
+  // no-match case
+  const _n = answerHealth('thời tiết hôm nay', _R);
+  assert(!_n.matched, '[loop 1021] câu không liên quan → no-match');
+  assert(!/undefined|NaN/.test(JSON.stringify(_h) + JSON.stringify(_a)), '[loop 1021] TCM output không leak');
+  console.log(`   [loop 1021] đông y / TCM (ngũ hành↔tạng + vượng suy→hư thực + KB thủ dâm→thận hư) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

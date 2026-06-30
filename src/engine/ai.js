@@ -107,6 +107,7 @@ import { healthAlertScan } from './health-alert.js';
 import { computeHehun } from './hehun.js';
 import { synthesize } from './synthesis.js';
 import { matchBusinessPartners } from './partner-match.js';
+import { analyzeHealth, answerHealth } from './tcm.js';
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
@@ -396,6 +397,7 @@ ${(() => { try { const y = curYear; const d = analyzeLiunianDeep(R, y, R.pattern
 
 SỨC KHOẺ LƯU NGUYỆT ${curYear} (治未病 — dùng trả lời "tháng nào yếu/phòng bệnh gì"):
 ${(() => { try { const h = healthMonthlyAlert(R, curYear); return `${h.summary} Tháng yếu nhất: ${h.worstMonth.mVi} (${h.worstMonth.ganZhi}, ${h.worstMonth.godVi}, điểm ${h.worstMonth.score}) — phòng ${h.weakestOrgan.organs}, nguy cơ: ${h.weakestOrgan.risk}. Tháng khoẻ nhất: ${h.bestMonth.mVi} (điểm ${h.bestMonth.score}).`; } catch (e) { return '(không tính được)'; } })()}
+ĐÔNG Y / DƯỢC LÝ (中医): khi user hỏi sức khoẻ theo đông y — «thủ dâm/sinh lý/thận», «căng thẳng/đau đầu/can hoả», «tiêu hoá/tỳ vị», «tạng nào yếu/nên ăn gì», «bị X nên làm sao» — GỌI TOOL: health_q (câu hỏi cụ thể → cơ sở bệnh/lời khuyên đông y + cá nhân hoá theo ngũ hành lá số) HOẶC health_profile (profile tạng hư/thực từ ngũ hành vượng suy + thực疗). KHÔNG bịa bệnh/thuốc — chỉ trả lời từ tool.
 
 PHỤC/PHẢN NGÂM 伏吟反吟 (dùng trả lời "năm nào biến cố/sóng gió" — QUAN TRỌNG, phân biệt với vận thường):
 ${(() => { try { const n = natalFuyin(R); const y = scanFuyin(R, curYear); const d = dayunFuyin(R); const parts = []; if (n.items.length) parts.push('bẩm sinh: ' + n.items.map(i=>`${i.typeVi} ${i.pair}`).join(', ')); parts.push(`năm ${curYear}: ` + (y.items.length ? y.items.map(i=>`${i.typeVi} ${i.pillarVi}(cảnh báo ${i.severity>=7?'NẶNG':'trung'})`).join('; ') : 'không phạm')); if (d.items?.length) parts.push(`đại vận ${d.dayun}: ` + d.items.map(i=>`${i.typeVi} ${i.pillarVi}`).join(', ')); return parts.join(' | ') + '. Cổ quyết «反吟伏吟泪淋淋, 不伤自己损他人»: phạm = năm dễ buồn/hiểm/li tán, đặc biệt Nhật Trụ = bản thân+phối ngẫu; nếu hành trùng = Dụng/Hỷ thì hung giảm. LƯU Ý phân loại: Phản Ngâm (反吟, thiên khắc địa xung) NẶNG nhất; Phục Ngâm (伏吟, trùng cả can+chi) TRUNG — đình trệ; Chi Phục Ngâm (支伏吟, chỉ đồng địa chi) NHẸ — pattern lặp/đình trệ nhẹ, không đáng sợ bằng 2 loại trên.'; } catch (e) { return '(không tính được)'; } })()}
@@ -614,6 +616,16 @@ export const AI_TOOLS = [
     parameters: { type: 'object', properties: {}, required: [] },
   } },
   { type: 'function', function: {
+    name: 'health_q', description: 'ĐÔNG Y / Y HỌC CỔ TRUYỀN — trả lời câu hỏi sức khoẻ theo ngũ hành + khí vượng suy (đ联 hệ ngũ hành↔tạng phủ↔bệnh↔dược lý). Dùng khi user hỏi: thủ dâm/sinh lý/thận, căng thẳng/đau đầu/can hoả, tiêu hoá/tỳ vị, tạng yếu, ăn uống bổ kiểu đông y, «bị X nên làm sao».',
+    parameters: { type: 'object', properties: {
+      question: { type: 'string', description: 'Câu hỏi sức khoẻ đông y nguyên văn của user (vd "hay thủ dâm sẽ bị gì, nên làm sao")' },
+    }, required: ['question'] },
+  } },
+  { type: 'function', function: {
+    name: 'health_profile', description: 'Phân tích SỨC KHOẺ đông y theo LÁ SỐ: ngũ hành vượng suy → tạng yếu (hư) / mạnh (thực) +易患疾病 + thực疗/dược lý lời khuyên. Dùng khi hỏi «sức khoẻ của tôi sao», «tạng nào yếu», «nên ăn gì».',
+    parameters: { type: 'object', properties: {}, required: [] },
+  } },
+  { type: 'function', function: {
     name: 'analyze_day', description: 'Luận lưu nhật của MỘT ngày cụ thể (can-chi, Thập thần, điểm Cát/Hung, lời khuyên, tương tác lưu năm/đại vận). Dùng khi hỏi về 1 ngày.',
     parameters: { type: 'object', properties: {
       year: { type: 'integer', description: 'Năm dương lịch, vd 2026' },
@@ -764,6 +776,22 @@ export function execTool(name, args, R) {
       case 'analyze_day': {
         const d = analyzeLiuRi(R, a.year, a.month, a.day, R.patternQuality);
         return { date: d.solar, ganZhi: d.ganZhi, ganGod: d.ganGod, rating: d.rating, score: d.score, advice: _s(d.advice, 240), gejuDelta: d.gejuDelta, gejuNote: d.gejuNote ? _s(d.gejuNote, 200) : '', interactions: (d.ctx || []) };
+      }
+      case 'health_q': { // [loop 1021] đông y — trả lời câu hỏi sức khoẻ theo ngũ hành + dược lý
+        const h = answerHealth(String(a.question || ''), R);
+        return h.matched ? { matched: true, title: h.title, reply: _s(h.reply, 1600) } : { matched: false, reply: _s(h.reply, 400) };
+      }
+      case 'health_profile': { // [loop 1021] đông y — profile sức khoẻ từ ngũ hành vượng suy
+        const p = analyzeHealth(R);
+        if (!p.ok) return { error: p.error };
+        return {
+          constitution: p.constitution,
+          weak: p.weak.map((w) => ({ zang: w.zang, wx: w.wx, pct: w.pct, syndromes: w.syndromes.map((s) => _s(s, 130)), nourish: _s(w.nourish, 200), motherTip: _s(w.motherTip, 120) })),
+          strong: p.strong.map((s) => ({ zang: s.zang, wx: s.wx, pct: s.pct, syndromes: s.syndromes.map((x) => _s(x, 130)), damage: _s(s.damage, 140) })),
+          diet: p.dietAdvice.map((d) => _s(d, 180)),
+          lifestyle: p.lifestyle.map((l) => _s(l, 180)),
+          note: _s(p.note, 220),
+        };
       }
       case 'analyze_year': {
         // [loop 741 FIX] year range — trước đây chỉ Number.isFinite → năm -100 (TCN) / 9999
