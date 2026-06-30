@@ -3244,15 +3244,17 @@ function renderHourChart(R) {
     const hours = r.hours || [];
     if (!hours.length) { el.innerHTML = '<p class="hint">Không tính được giờ tốt.</p>'; return; }
     const ZHI_VI = ['Tý','Sửu','Dần','Mão','Thìn','Tỵ','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi'];
+    const _curHourZhi = Solar.fromYmdHms(_n.getFullYear(), _n.getMonth()+1, _n.getDate(), _n.getHours(), _n.getMinutes(), 0).getLunar().getTimeZhi();
     const bars = hours.map((h) => {
       const s = h.score || 50;
       const col = h.rating === 'Cát' ? '#2a7' : h.rating === 'Hung' || h.rating === 'Kỵ' ? '#c33' : '#9a8';
       const hgt = Math.max(4, s * 0.7);
       const zhiIdx = '子丑寅卯辰巳午未申酉戌亥'.indexOf(h.zhi || '');
-      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px" title="${esc(h.range||'')} ${esc(h.ganZhi||'')} ${esc(h.rating||'')} (${s})${(()=>{const _mc=meridianClock(h.zhi);return _mc?' | '+_mc.meridian+' '+_mc.organ+' ĐỈNH':'';})()}">
-        <div style="height:${hgt}px;width:70%;max-width:22px;background:${col};border-radius:3px 3px 0 0;opacity:0.85"></div>
-        <span class="hint" style="font-size:9px">${esc(ZHI_VI[zhiIdx] || h.vi || h.zhi || '')}</span>
-        <span class="hint" style="font-size:8px;color:${col}">${esc((h.rating||'').slice(0,4))}</span>
+      const isNow = h.zhi === _curHourZhi;
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${esc(h.range||'')} ${esc(h.ganZhi||'')} ${esc(h.rating||'')} (${s})${isNow ? ' ★ GIỜ HIỆN TẠI' : ''}${(()=>{const _mc=meridianClock(h.zhi);return _mc?' | '+_mc.meridian+' '+_mc.organ+' ĐỈNH':'';})()}">
+        <div style="height:${hgt}px;width:70%;max-width:22px;background:${col};border-radius:3px 3px 0 0;opacity:${isNow ? '1' : '0.85'};${isNow ? 'box-shadow:0 0 6px '+col : ''}"></div>
+        <span class="hint" style="font-size:9px${isNow ? ';font-weight:bold' : ''}">${esc(ZHI_VI[zhiIdx] || h.vi || h.zhi || '')}</span>
+        ${isNow ? '<span style="font-size:7px;color:var(--gold-bright);font-weight:bold">▼ NAY</span>' : `<span class="hint" style="font-size:8px;color:${col}">${esc((h.rating||'').slice(0,4))}</span>`}
       </div>`;
     }).join('');
     const best = r.best?.[0], worst = r.worst?.[0];
