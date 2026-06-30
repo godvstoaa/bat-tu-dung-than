@@ -1910,6 +1910,35 @@ assert(singleFound, 'liuren: tìm thấy lá 1-贼 để guard 贼克 path');
 console.log(`   甲辰亥将卯时: 初传=${lrPan.sanchuan[0].zhi} (${lrPan.zongMen}) | ${lrPan.shehaiDetail.scored.map((s)=>s.up+'='+s.hai).join(', ')} ✓`);
 console.log(`   verdict: ${lrPan.verdict.slice(0, 70)}...`);
 
+// [loop 1090] 伏吟/返吟 课体 — 月将===时支 → 伏吟; 月将 vs 时支 cách 6 (xung) → 返吟
+{
+  // quét tìm 1 case 伏吟 (月将===时支) + 1 case 返吟 (xung) trong vài ngày/giờ
+  let _fu = null, _fan = null;
+  for (let mo = 1; mo <= 12 && !_fu; mo++) {
+    for (let d = 1; d <= 28; d++) {
+      for (let h = 0; h < 24; h += 2) {
+        const p = liurenPan(2026, mo, d, h);
+        if (!_fu && p.keti === '伏吟') _fu = p;
+        if (!_fan && p.keti === '返吟') _fan = p;
+      }
+    }
+  }
+  // 伏吟: 月将 === 时支 → skyArr[pos] === ZHI[pos] (天盘≡地盘)
+  if (_fu) {
+    assert(_fu.keti === '伏吟' && _fu.ketiNote.includes('TĨNH') && _fu.skyArr.every((z, i) => z === ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][i]), `[loop 1090] 伏吟: 月将===时支, skyArr≡地盘 (thực keti=${_fu.keti})`);
+  }
+  // 返吟: 月将 vs 时支 cách 6 → skyArr[pos] = 冲 of 地盘[pos]
+  if (_fan) {
+    const _Z = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    const _chong = (z) => _Z[(_Z.indexOf(z) + 6) % 12];
+    assert(_fan.keti === '返吟' && _fan.ketiNote.includes('ĐẢO ĐIÊN') && _fan.skyArr.every((z, i) => z === _chong(_Z[i])), `[loop 1090] 返吟: 天盘=冲地盘 (thực keti=${_fan.keti})`);
+  }
+  assert(_fu || _fan, `[loop 1090] quét thấy ít nhất 1 case 伏吟/返吟 (fu=${!!_fu}, fan=${!!_fan})`);
+  // normal case (lrPan 甲辰亥将卯时) phải KHÔNG phải 伏吟/返吟 (亥将 vs 卯时 cách 4)
+  assert(!lrPan.keti, `[loop 1090] 甲辰亥将卯时 KHÔNG 伏吟/返吟 (keti rỗng, thực "${lrPan.keti}")`);
+  console.log(`   [loop 1090] 伏吟/返吟 课体 ✓ — fu=${_fu ? _fu.dayGanZhi+'@'+_fu.hourZhi : 'n/a'}, fan=${_fan ? _fan.dayGanZhi+'@'+_fan.hourZhi : 'n/a'}`);
+}
+
 console.log('\n################## 20. KỲ MÔN ĐỘN GIÁP 奇门遁甲 ##################');
 import { qimenPan, qimenDongPan, TERM_JU, QIYI } from './src/engine/qimen.js';
 // 2026-06-07 → 芒种 上元 → 阳遁6局 (芒种[6,3,9], 上元=6). [cycle 59] đổi từ 06-21 (芒种+15=下元, code cũ

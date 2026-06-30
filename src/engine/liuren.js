@@ -223,7 +223,19 @@ export function liurenPan(year, month, day, hour) {
   const tjTone = ['贵人', '六合', '青龙', '太常', '太阴', '天后'].includes(tj1) ? 'cát' : (['螣蛇', '朱雀', '勾陈', '白虎', '玄武'].includes(tj1) ? 'hung' : 'bình');
   const verdict = `初传 ${chuan1}(${ZHI_WX[chuan1]}, ${lq1}) + ${tj1}(${TJ_VI[tj1]}) [${zongMen}]. ${tjTone === 'cát' && ['妻财', '子孙', '兄弟'].includes(lq1) ? '→ CÁT: sự việc có lợi, nên tiến.' : tjTone === 'hung' && ['官鬼', '父母'].includes(lq1) ? '→ HUNG: nên thận trọng/hoãn.' : '→ BÌNH: tùy nỗ lực, cát hung lẫn.'}`;
 
-  return { yuejiang, yuejiangVi: YUEJIANG_VI[yuejiang], dayGanZhi: dGan + dZhi, hourZhi: hZhi, isDay, skyArr, ke4, sanchuan, zongMen, shehaiDetail, tjAt, gui, dayGui: guiRaw, chuan1TianJiang: tj1, verdict, note: '三传用 九宗门 贼克/比用/涉害 (历数→见机→察微→缀瑕); 月将按中气. 遥克/昴星/别责/伏吟/返吟 = fallback/future work.' };
+  // [loop 1090] 伏吟/返吟 课体 — 天盘 vs 地盘: 月将===时支 → 伏吟 (sky≡earth, khí tĩnh);
+  //   月将 vs 时支 cách 6 (xung) → 返吟 (sky=冲earth, khí đảo điên). Cổ法 2 课 thể đặc biệt.
+  const _seDiff = ((yi - hi) % 12 + 12) % 12;
+  const keti = _seDiff === 0 ? '伏吟' : _seDiff === 6 ? '返吟' : '';
+  const KETI_NOTE = {
+    '伏吟': '伏吟课 — 天地盘 trùng, khí TĨNH/TRÌ TRỆ: sự việc kéo dài, ẩn, khó tiến nhanh; nên thủ, kiên nhẫn chờ thời («伏吟伏吟, 伏而未发»).',
+    '返吟': '返吟课 — 天地盘 xung, khí ĐẢO ĐIÊN/反复: sự việc biến động, đi rồi lại, lâu không yên; nên tránh quyết định vội («返吟返吟, 倒而不安»).',
+  };
+  const ketiNote = keti ? KETI_NOTE[keti] : '';
+  // [loop 1090] verdict đính 伏吟/返吟 课 thể (nếu có) lên đầu để AI/UI thấy
+  const verdictWithKeti = keti ? `${ketiNote} ${verdict}` : verdict;
+
+  return { yuejiang, yuejiangVi: YUEJIANG_VI[yuejiang], dayGanZhi: dGan + dZhi, hourZhi: hZhi, isDay, skyArr, ke4, sanchuan, zongMen, shehaiDetail, tjAt, gui, dayGui: guiRaw, chuan1TianJiang: tj1, verdict: verdictWithKeti, keti, ketiNote, note: '三传用 九宗门 贼克/比用/涉害 (历数→见机→察微→缀瑕); 月将按中气. 伏吟/返吟 课体 ĐÃ detect. 遥克/昴星/别责 = fallback (không克时用干上神).' };
 }
 
 export { ZHI, TIANJIANG, TJ_VI, YUEJIANG_VI, sheHaiCount, SHEN as zhiShen, ZHI_JIGAN };
