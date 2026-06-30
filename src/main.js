@@ -3234,6 +3234,33 @@ function renderGoldenYear(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được năm hoàng kim.</p>'; }
 }
 
+// [loop 1064] Giờ Tốt Hôm Nay — 12-hour bar chart visual
+function renderHourChart(R) {
+  const el = $('hour-chart');
+  if (!el) return;
+  try {
+    const _n = new Date();
+    const r = bestHourToday(R, _n.getFullYear(), _n.getMonth() + 1, _n.getDate(), R.patternYong);
+    const hours = r.hours || [];
+    if (!hours.length) { el.innerHTML = '<p class="hint">Không tính được giờ tốt.</p>'; return; }
+    const ZHI_VI = ['Tý','Sửu','Dần','Mão','Thìn','Tỵ','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi'];
+    const bars = hours.map((h) => {
+      const s = h.score || 50;
+      const col = h.rating === 'Cát' ? '#2a7' : h.rating === 'Hung' || h.rating === 'Kỵ' ? '#c33' : '#9a8';
+      const hgt = Math.max(4, s * 0.7);
+      const zhiIdx = '子丑寅卯辰巳午未申酉戌亥'.indexOf(h.zhi || '');
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px" title="${esc(h.range||'')} ${esc(h.ganZhi||'')} ${esc(h.rating||'')} (${s})">
+        <div style="height:${hgt}px;width:70%;max-width:22px;background:${col};border-radius:3px 3px 0 0;opacity:0.85"></div>
+        <span class="hint" style="font-size:9px">${esc(ZHI_VI[zhiIdx] || h.vi || h.zhi || '')}</span>
+        <span class="hint" style="font-size:8px;color:${col}">${esc((h.rating||'').slice(0,4))}</span>
+      </div>`;
+    }).join('');
+    const best = r.best?.[0], worst = r.worst?.[0];
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;height:80px">${bars}</div>
+      <p class="hint" style="margin-top:4px">📊 ${_n.getDate()}/${_n.getMonth()+1} · Tốt nhất: <b>${esc(best?.vi || best?.zhi || '?')} (${best?.rating || ''})</b> · Kỵ: <b>${esc(worst?.vi || worst?.zhi || '?')} (${worst?.rating || ''})</b></p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được giờ tốt.</p>'; }
+}
+
 // [loop 1062] Vận Trục Lưu Nguyệt — 12-month bar chart visual
 function renderLiuyueChart(R) {
   const el = $('liuyue-chart');
@@ -3991,6 +4018,7 @@ async function run() {
   lazyRender('wx-chart',       () => { try { renderWxChart(currentResult); } catch (e) { console.warn('wx-chart', e.message); } });
   lazyRender('liunian-chart',  () => { try { renderLiunianChart(currentResult); } catch (e) { console.warn('liunian-chart', e.message); } });
   lazyRender('liuyue-chart',   () => { try { renderLiuyueChart(currentResult); } catch (e) { console.warn('liuyue-chart', e.message); } });
+  lazyRender('hour-chart',     () => { try { renderHourChart(currentResult); } catch (e) { console.warn('hour-chart', e.message); } });
 
   // quick-nav: jump links — [loop 936 FIX] theo GROUP header (~8) thay vì 165 card
   //   (165 chip overflow trên mobile → nav chính nó không dùng được). + scroll-spy active.
