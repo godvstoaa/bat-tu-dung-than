@@ -1835,7 +1835,7 @@ function renderDayunTimeline(R) {
       <div class="dt-rate">${esc(d.rating)}</div>
     </div>`;
   }).join('');
-  el.innerHTML = `<div class="dt-row">${segs}</div><p class="hint" style="margin-top:6px">Mỗi ô = 1 thập kỷ đại vận, tô màu theo đánh giá (<span class="rate-supercat" style="padding:0 4px">vàng</span>=đại cát · <span class="rate-cat" style="padding:0 4px">xanh</span>=cát · <span class="rate-mid" style="padding:0 4px">xám</span>=bình · <span class="rate-hung" style="padding:0 4px">đỏ</span>=hung). Ô viền sáng ★ = thập kỷ đang hành. <b>Nhấp ô → xem tường thuật giai đoạn đó.</b></p>`;
+  el.innerHTML = `<div class="dt-row" tabindex="0" role="group" aria-label="Dòng thời gian đại vận (cuộn ngang)">${segs}</div><p class="hint" style="margin-top:6px">Mỗi ô = 1 thập kỷ đại vận, tô màu theo đánh giá (<span class="rate-supercat" style="padding:0 4px">vàng</span>=đại cát · <span class="rate-cat" style="padding:0 4px">xanh</span>=cát · <span class="rate-mid" style="padding:0 4px">xám</span>=bình · <span class="rate-hung" style="padding:0 4px">đỏ</span>=hung). Ô viền sáng ★ = thập kỷ đang hành. <b>Nhấp ô → xem tường thuật giai đoạn đó.</b></p>`;
 }
 
 // [loop 522→541] 鬼谷子算命 — 4 pillars + 分定經 multi-layer
