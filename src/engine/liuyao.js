@@ -57,6 +57,11 @@ const KE = { 金: '木', 木: '土', 土: '水', 水: '火', 火: '金' };
 // [loop 1012] 冲 (6 cặp xung) + 合 (6 cặp lục hợp) — cổ pháp verified (tái dùng bảng 토정비결)
 const CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
 const LIUHE = { 子: '丑', 丑: '子', 寅: '亥', 亥: '寅', 卯: '戌', 戌: '卯', 辰: '酉', 酉: '辰', 巳: '申', 申: '巳', 午: '未', 未: '午' };
+// [loop 1013] 进神/退神 — động hào 化进/化退. Nguồn «增删卜易» 036章 (sourced, verified).
+//   进神: 亥→子 寅→卯 巳→午 申→酉 (dương→âm cùng hành, tiến) + 丑→辰→未→戌→丑 (4土 tiến).
+//   退神 = nghịch đảo.
+const JINSHEN = { 亥: '子', 寅: '卯', 巳: '午', 申: '酉', 丑: '辰', 辰: '未', 未: '戌', 戌: '丑' };
+const TUISHEN = { 子: '亥', 卯: '寅', 午: '巳', 酉: '申', 辰: '丑', 未: '辰', 戌: '未', 丑: '戌' };
 
 // ---- [loop 1011] 六神 (六兽) — gán theo 日干 (口诀 «甲乙青龙丙丁雀, 戊日勾陈己蛇出,
 //   庚辛白虎壬癸玄»). Thứ tự dưới→trên: 青龙→朱雀→勾陈→螣蛇→白虎→玄武.
@@ -173,6 +178,19 @@ export function castLiuYao(vals, cat, monthZhi, dayZhi, dayGan, dayGanZhi) {
   const bianUpper = triFromLines3(bianYang[3], bianYang[4], bianYang[5]);
   const bianName = hexName64(bianLower, bianUpper);
 
+  // [loop 1013] 进神/退神 — cho mỗi động hào, xác định chi 变卦 + hoá进/hoá退.
+  //   Chi biến = 纳甲 của quẻ biến tại vị trí đó. JINSHEN/TUISHEN («增删卜易» 036章).
+  const blo = bianLower ? TRI[bianLower] : null;
+  const bup = bianUpper ? TRI[bianUpper] : null;
+  lines.forEach((l) => {
+    if (!l.dong || !blo || !bup) { l.hua = null; l.bianZhi = null; return; }
+    const i = l.pos - 1;
+    l.bianZhi = i < 3 ? blo.zn[i] : bup.zw[i - 3];
+    if (JINSHEN[l.zhi] === l.bianZhi) l.hua = 'jin';        // 化进神 (tiến, mạnh lên)
+    else if (TUISHEN[l.zhi] === l.bianZhi) l.hua = 'tui';   // 化退神 (thoái, suy đi)
+    else l.hua = null;
+  });
+
   // 用神
   const ys = YONGSHEN_MAP[cat] || YONGSHEN_MAP.general;
   const monthWx = ZHI[monthZhi]?.wx || '土';
@@ -193,12 +211,16 @@ export function castLiuYao(vals, cat, monthZhi, dayZhi, dayGan, dayGanZhi) {
     if (l.yuepo) d -= 2;    // 月建冲 = 月破 → phá, gần như vô dụng tháng đó
     if (l.rihe) d += 1;     // 日辰合 = được日助 → nhẹ favour
     if (l.andong) d += 0.5; // 静爻 被 日冲 = 暗动 → có động năng ngầm
+    // [loop 1013] 化进化退 — động hào 用神 hoá进 (mạnh dần) / hoá退 (suy dần)
+    if (l.dong && l.hua === 'jin') d += 1;
+    if (l.dong && l.hua === 'tui') d -= 1;
     if (d > bestD) { bestD = d; bestLv = ws.lv; bestLine = l; }
   });
   const yongKong = bestLine ? bestLine.kong : false;
   const yongYuepo = bestLine ? bestLine.yuepo : false;
   const yongAndong = bestLine ? bestLine.andong : false;
   const yongRihe = bestLine ? bestLine.rihe : false;
+  const yongHua = bestLine ? bestLine.hua : null;
   // phán
   let verdict, luck;
   const notes = [];
@@ -206,6 +228,8 @@ export function castLiuYao(vals, cat, monthZhi, dayZhi, dayGan, dayGanZhi) {
   if (yongYuepo) notes.push('用神月破 — bị月建冲, tháng này suy nặng (xong tháng sau tự hồi)');
   if (yongAndong) notes.push('用神暗动 — tĩnh mà bị日冲, ngầm có động năng');
   if (yongRihe) notes.push('用神合日 — được日辰 trì giúp');
+  if (yongHua === 'jin') notes.push('用神化进神 — động mà hoá tiến, ngày càng mạnh (cát cho việc cần用神)');
+  if (yongHua === 'tui') notes.push('用神化退神 — động mà hoá thoái, dần suy yếu (bất lợi cho việc cần用神)');
   const noteStr = notes.length ? ' [' + notes.join('; ') + ']' : '';
   if (!yongLines.length) { verdict = `Không có hào ${ys.vi} trong quẻ — việc thiếu "dụng thần", khó thành / phải đợi vận.`; luck = 'Bình'; }
   else if (yongYuepo) { verdict = `用神 (${ys.vi}) 月破 (${bestLv}) — bị月建冲, tháng này đại suy → HUNG, nên hoãn đến hết tháng.${noteStr}`; luck = 'Hung'; }

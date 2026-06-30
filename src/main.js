@@ -4451,9 +4451,9 @@ function runLiuyao() {
     <div class="ly-head">本卦 <span class="zh big">${esc(r.name)}</span> (宫 ${esc(r.palace)}/${esc(r.gongWx)}) · 世 ${esc(r.shi)} 应 ${esc(r.ying)} · ${esc(r.shiChish)} · ${r.dongCount ? `动 ${esc(r.dongCount)} → 变 ${esc(r.bianName)}` : '静卦'}${r.kong.length ? ` · 旬空 ${esc(r.kong.join(''))}` : ''}</div>
     <div class="ly-lines">${r.lines.slice().reverse().map((l) => `
       <div class="ly-line ${l.yang ? 'yang' : 'yin'} ${l.isShi ? 'shi' : ''} ${l.isYing ? 'ying' : ''}">
-        <span class="ly-pos">${esc(l.pos)}</span><span class="ly-gz zh">${esc(l.gan)}${esc(l.zhi)}</span><span class="ly-lq">${esc(LQ[l.liuqin] || l.liuqin)}</span>
+        <span class="ly-pos">${esc(l.pos)}</span><span class="ly-gz zh">${esc(l.gan)}${esc(l.zhi)}${l.dong && l.bianZhi ? `<span class="hint-inline">→${esc(l.bianZhi)}</span>` : ''}</span><span class="ly-lq">${esc(LQ[l.liuqin] || l.liuqin)}</span>
         ${l.shen ? `<span class="zh" title="${esc(LS[l.shen])}">${esc(l.shen)}</span>` : ''}
-        <span class="ly-mark">${l.isShi ? '世' : ''}${l.isYing ? '应' : ''}${l.dong ? ' ◉' : ''}${l.kong ? ' ◯空' : ''}${l.yuepo ? ' ✕月破' : ''}${l.andong ? ' ◇暗动' : ''}${l.rihe ? ' ⊙合日' : ''}</span>
+        <span class="ly-mark">${l.isShi ? '世' : ''}${l.isYing ? '应' : ''}${l.dong ? ' ◉' : ''}${l.kong ? ' ◯空' : ''}${l.yuepo ? ' ✕月破' : ''}${l.andong ? ' ◇暗动' : ''}${l.rihe ? ' ⊙合日' : ''}${l.hua === 'jin' ? ' ↑进神' : ''}${l.hua === 'tui' ? ' ↓退神' : ''}</span>
         <span class="ly-hao">${l.yang ? '——' : '— —'}</span>
       </div>`).join('')}</div>
     <div class="ly-ys">用神: <b>${esc(r.yongshen.vi)}</b> → hào ${r.yongLines.length ? r.yongLines.map((l) => esc(l.pos) + '.' + esc(l.gan) + esc(l.zhi) + (l.kong ? '(空)' : '')).join(', ') : '(không có trong quẻ)'} · 月建${esc(r.monthZhi)} 日辰${esc(r.dayGan || '')}${esc(r.dayZhi)}</div>

@@ -8340,5 +8340,24 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1012] 六爻 月破/暗动/日合 (clash/combine verified, 用神月破→Hung) ✓`);
 }
 
+// [loop 1013] 六爻 进神/退神 — động hào hoá进/hoá退 (sourced «增删卜易» 036章)
+{
+  const { castLiuYao } = await import('./src/engine/liuyao.js');
+  // 进神: 兑 lower, hào3 (丑, 老阴动=6) → 变乾, bian 辰 → 化进神
+  const _j = castLiuYao([7,7,6,7,7,7], 'general', '午', '酉', '甲', '甲子');
+  assert(_j.lines[2].hua === 'jin' && _j.lines[2].bianZhi === '辰', `[loop 1013] 进神: 兑 hào3 丑→辰 hoá进 (got hua=${_j.lines[2].hua}, bian=${_j.lines[2].bianZhi})`);
+  // 退神: 乾 lower, hào3 (辰, 老阳动=9) → 变兑, bian 丑 → 化退神
+  const _t = castLiuYao([7,7,9,7,7,7], 'general', '午', '酉', '甲', '甲子');
+  assert(_t.lines[2].hua === 'tui' && _t.lines[2].bianZhi === '丑', `[loop 1013] 退神: 乾 hào3 辰→丑 hoá退 (got hua=${_t.lines[2].hua}, bian=${_t.lines[2].bianZhi})`);
+  // 静卦: tất cả hua null
+  const _s = castLiuYao([7,7,7,7,7,7], 'general', '午', '酉', '甲', '甲子');
+  assert(_s.lines.every((l) => l.hua === null && l.bianZhi === null), '[loop 1013] 静卦: không có hoá进/hoá退');
+  // 动爻 nhưng KHÔNG 进/退 pair → hua null
+  const _n = castLiuYao([9,7,7,7,7,7], 'general', '午', '酉', '甲', '甲子');
+  assert(_n.lines[0].dong === true && _n.lines[0].hua === null, `[loop 1013] 动爻 không pair → null (line1 子→${_n.lines[0].bianZhi})`);
+  assert(!/undefined|NaN/.test(JSON.stringify(_j)), '[loop 1013] castLiuYao output không leak');
+  console.log(`   [loop 1013] 六爻 进神/退神 (增删卜易 sourced, 丑↔辰 verified) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
