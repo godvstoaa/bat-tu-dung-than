@@ -21,6 +21,11 @@ const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅'
 const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌', 戌:'未', 未:'丑', 辰:'辰', 午:'午', 酉:'酉', 亥:'亥' };
 const PO = { 子:'酉', 酉:'子', 丑:'辰', 辰:'丑', 寅:'亥', 亥:'寅', 卯:'午', 午:'卯', 巳:'申', 申:'巳', 戌:'未', 未:'戌' };
 const HAI = { 子:'未', 未:'子', 丑:'午', 午:'丑', 寅:'巳', 巳:'寅', 卯:'辰', 辰:'卯', 申:'亥', 亥:'申', 酉:'戌', 戌:'酉' };
+// [loop 1020 FIX] 六合 + 三合 — tháng chi hợp chi năm sinh/Nhật Chi = tháng thuận (đối xứng
+//   冲/刑/破/ hại tháng). Cùng bug-class 冲/合, nay ở engine 流月.
+const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+const SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
+const _banhe = (a, b) => a !== b && SANHE.some((g) => g.includes(a) && g.includes(b));
 const QIN_VI = { year: 'Niên Trụ (tổ bối)', month: 'Nguyệt Trụ (phụ mẫu/sự nghiệp)', day: 'Nhật Trụ (bản thân/phối ngẫu)', time: 'Thời Trụ (tử tức)' };
 // Trọng số 伏吟/反吟 tháng (nhẹ hơn 流年: tháng ngắn). 反吟 KHÔNG có day (冲日支 đã tính ở Thái tuế).
 const W_FUYIN = { day: 4, month: 3, year: 2, time: 2 };
@@ -97,6 +102,11 @@ export function computeLiuyue(R, solarYear, patternQuality) {
     if (XING[yearBirthZhi] === zhi) { score -= 4; extraNotes.push('刑月太岁 — quan phi/thị phi'); }
     if (PO[yearBirthZhi] === zhi) { score -= 3; extraNotes.push('破月太岁 — hao tài'); }
     if (HAI[yearBirthZhi] === zhi) { score -= 3; extraNotes.push('害月太岁 — tiểu nhân'); }
+    // [loop 1020] 合 — tháng chi hợp năm sinh/Nhật Chi = tháng thuận (đối xứng 冲/刑/破/害).
+    if (LIUHE[yearBirthZhi] === zhi) { score += 5; extraNotes.push('💕 合月太岁 — lục hợp chi năm sinh, tháng thuận'); }
+    else if (LIUHE[dayZhi] === zhi && dayZhi !== yearBirthZhi) { score += 4; extraNotes.push('💕 合日 — lục hợp Nhật Chi'); }
+    else if (_banhe(zhi, yearBirthZhi)) { score += 3; extraNotes.push('🔗 Bán-hợp (三合) chi năm sinh'); }
+    else if (_banhe(zhi, dayZhi)) { score += 2; extraNotes.push('🔗 Bán-hợp (三合) Nhật Chi'); }
   // [loop 368] thần sát CÁT tháng (quý nhân/văn/tướng tới — tháng tốt việc lớn), nhất quán với lưu niên/lưu nhật
   const _grp = BRANCH_GROUP[yearBirthZhi];
   if (TIAN_YI[dayGan] && TIAN_YI[dayGan].includes(zhi)) { score += 3; extraNotes.push('🌟 Thiên Ất quý nhân tháng'); }

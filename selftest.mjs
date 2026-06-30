@@ -8508,5 +8508,24 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1019] 三合 bán-hợp (zheri +8, wedding/move +6) — 合 layer hoàn thiện ✓`);
 }
 
+// [loop 1020] liunian-pro + liuyue 合 reward — bug-class 冲/合 ở engine 流年/流月
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { scoreLiunianYear } = await import('./src/engine/liunian-pro.js');
+  const { computeLiuyue } = await import('./src/engine/liuyue.js');
+  // 1990-6-15 → yearBirthZhi 午; yZhi=未 (LIUHE[午]=未) → 合太岁 +10
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _base = { dayGan: _R.chart.dayGan, dayZhi: _R.chart.pillars.day.zhi, yearBirthZhi: _R.chart.pillars.year.zhi, yong: _R.yong, natalPillars: _R.chart.pillars, kongwang: _R.kongwang };
+  const _rHe = scoreLiunianYear({ ..._base, yGan: '丁', yZhi: '未' }); // 未 合 午
+  const _ts = (_rHe.schools || []).find((s) => s.phai === 'Thái Tuế');
+  assert(_ts && _ts.d === 10 && /合太岁/.test(_ts.note), `[loop 1020] liunian 合太岁 +10 (got Thái Tuế d=${_ts?.d})`);
+  // liuyue: ít nhất 1 tháng có 合 (trong 12 tháng)
+  const _lm = computeLiuyue(_R, 2026, {});
+  const _heMonths = (_lm.months || []).filter((m) => /合/.test(JSON.stringify(m))).length;
+  assert(_heMonths >= 1, `[loop 1020] liuyue có tháng 合 (got ${_heMonths}/12)`);
+  assert(!/undefined|NaN/.test(JSON.stringify(_rHe)), '[loop 1020] scoreLiunianYear không leak');
+  console.log(`   [loop 1020] 流年/流月 合太岁 (liunian +10, liuyue +5/+4) — bug-class 冲/合 đóng ở fortune engine ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

@@ -42,6 +42,11 @@ const HAI = { 子: '未', 未: '子', 丑: '午', 午: '丑', 寅: '巳', 巳: '
 const XING = { 子: '卯', 卯: '子', 寅: '巳', 巳: '申', 申: '寅', 丑: '戌', 戌: '未', 未: '丑', 辰: '辰', 午: '午', 酉: '酉', 亥: '亥' };
 // Phá thái tuế
 const PO = { 子: '酉', 酉: '子', 丑: '辰', 辰: '丑', 寅: '亥', 亥: '寅', 卯: '午', 午: '卯', 巳: '申', 申: '巳', 戌: '未', 未: '戌' };
+// [loop 1020 FIX] 六合 + 三合 — 流年 chi hợp chi năm sinh/Nhật Chi = năm thuận (đối xứng
+//   冲/刑/破/ hại thái tuế). Cùng bug-class 冲/合, nay ở engine 流年.
+const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+const SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
+const _banhe = (a, b) => a !== b && SANHE.some((g) => g.includes(a) && g.includes(b));
 
 // Thập thần năm → hệ số + diễn giải
 const GOD_YEAR_EFFECT = {
@@ -103,6 +108,11 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
   // [loop 71 sửa double-count] chỉ tính khi dayZhi ≠ yearBirthZhi: nếu trùng thì 冲太岁
   //   (dòng trên, -16) đã bao hàm cùng 1 xung → không trừ 2 lần (trước đây -16+-14=-30).
   if (CHONG[dayZhi] === yZhi && dayZhi !== yearBirthZhi) { score -= 14; taiSuiD -= 14; taiSuiNotes.push('⚡日支冲太岁 — tổn bản thân/sức khoẻ, năm "ngày xung".'); }
+  // [loop 1020] 合太岁 — 流年 chi hợp năm sinh/Nhật Chi = năm thuận (đối xứng 冲太岁, guard double-count).
+  if (LIUHE[yearBirthZhi] === yZhi) { score += 10; taiSuiD += 10; taiSuiNotes.push('💕 合太岁 — năm chi LỤC HỢP chi năm sinh: năm thuận hoà, được quý nhân phù.'); }
+  else if (LIUHE[dayZhi] === yZhi && dayZhi !== yearBirthZhi) { score += 8; taiSuiD += 8; taiSuiNotes.push('💕 合日 — năm chi lục hợp Nhật Chi: bản thân thuận, yên bụng.'); }
+  else if (_banhe(yZhi, yearBirthZhi)) { score += 6; taiSuiD += 6; taiSuiNotes.push('🔗 Bán-hợp (三合) chi năm sinh — cùng cục, tăng cát.'); }
+  else if (_banhe(yZhi, dayZhi)) { score += 5; taiSuiD += 5; taiSuiNotes.push('🔗 Bán-hợp (三合) Nhật Chi — cùng cục.'); }
   if (taiSuiNotes.length) schools.push({ phai: 'Thái Tuế', note: taiSuiNotes.join(' '), d: taiSuiD });
 
   // (4) Thần sát năm (đào hoa / hồng diễm / dương nhận / dịch mã + [loop 364] quý nhân/văn/tướng)
