@@ -82,7 +82,7 @@ export const CONDITION_KB = [
   },
   {
     id: 'liver_fire',
-    keywords: ['cáu gắt', 'nóng nảy', 'giận', 'đau đầu', 'mắt đỏ', 'miệng đắng', 'cao huyết áp', '肝火', 'stress', 'áp lực', 'ức chế', 'bứt rứt'],
+    keywords: ['cáu gắt', 'nóng nảy', 'giận', 'đau đầu', 'mắt đỏ', 'miệng đắng', 'cao huyết áp', '肝火', 'stress', 'áp lực', 'ức chế'],
     title: 'Can hoả vượng / Can dương thượng cương (GIẬN DUỘNG)',
     summary: 'Can (mộc) chủ sớ tiết, tính điều đạt. Lo âu/ức chế/cáu gắt → khí uất kết → hoả hoá → can hoả vượng / can dương cương. Can dương cương là cao huyết áp thường gặp.',
     symptoms: 'hay cáu gắt, bứt rứt, mặt mắt đỏ, đau đầu (đỉnh/2 bên), hoa mắt chóng mặt, tai ù, miệng đắng, mất ngủ, kinh nguyệt rối, cổ vai gáy mỏi.',
@@ -249,6 +249,23 @@ export const CONDITION_KB = [
     symptoms: 'tiểu khó/tiểu nhát, dòng yếu, tiểu đêm nhiều, tiểu xong vẫn còn cảm, đôi khi tiểu buốt/đục, tức nặng hạ bộ.',
     advice: '① Bổ thận khí, hoá thấp thông lâm: sơn dược, sơn thù du, phục linh, xa tiền tử, trạch tả, thỏ ty tử. ② Giảm cay nóng/rượu/thức khuya. ③ Bí xanh, râu ngô, mộc nhĩ nấu canh. ④ Không ngồi lâu, vận động (đi bộ), giữ ấm hạ bộ. ⑤ Tiểu khó nặng/đái máu → khám tiết niệu (loại trừ ung thư tiền liệt tuyến).',
   },
+  // [loop 1050] +2 sức khoẻ tâm thần (rất phổ biến hiện đại)
+  {
+    id: 'anxiety',
+    keywords: ['lo âu', 'bứt rứt', 'hoảng hốt', 'rối loạn lo âu', 'anxiety', 'hồi hộp', 'tim đập nhanh', 'panic', 'hoảng sợ', 'khó thở do lo âu'],
+    title: 'Lo âu / Hoảng sợ (TÂM-THẬN BẤT GIAO + can uất hoả hoá)',
+    summary: 'Lo âu = «TÂM THẬN BẤT GIAO» (thận thuỷ không nuôi được tâm hoả → hoả vượng trên) + can uất hoả hoá (stress → can khí uất → hoả). Tim mất dưỡng → hồi hộp, bứt rứt; thận không giao → mất ngủ, sợ hãi vô cớ.',
+    symptoms: 'bứt rứt, lo âu vô cớ, hồi hộp, tim đập nhanh, khó thở (cảm giác nghẹn), mất ngủ, tay chân run, đổ mồ hôi, hoảng sợ đột ngột (panic attack).',
+    advice: '① DƯỠNG TÂM-THẬN: giao thái (sen tâm + đậu đen + táo đỏ) — giao thận thuỷ + tâm hoả. ② AN THẦN: toan táo nhân, viễn chí, long nhãn, bách hợp. ③ SƠ CAN: sài hồ, bạch thược, cúc hoa, diệp hạ châu. ④ Thở sâu (4-7-8), thiền/yoga. ⑤ Giảm cà phê/đường/đồ刺激. ⑥ Tập thể dục đều (nội tiết ổn). ⑦ Lo âu nặng/panic → khám tâm lý (CBT + thuốc nếu cần).',
+  },
+  {
+    id: 'depression',
+    keywords: ['trầm cảm', 'chán nản', 'mất hứng thú', 'bi quan', 'vô vọng', 'depression', 'buồn bã kéo dài', 'không muốn làm gì', 'mệt mỏi tinh thần'],
+    title: 'Trầm cảm / Chán nản (CAN KHÍ UẤT KẾT + TÂM-TỲ LƯỡng HƯ)',
+    summary: 'Trầm cảm = CAN KHÍ UẤT KẾT (sơ tiết bất lợi → uất → dần hoả hoặc tư tảo) + TÂM-TỲ LƯỡng HƯ (tâm huyết hư + tỳ khí hư → không sinh huyết → tâm mất dưỡng). Cảm xúc ức chế lâu → khí trệ → huyết ư → «uất».',
+    symptoms: 'chán nản, mất hứng thú, bi quan, mệt mỏi, mất ngủ (hoặc ngủ nhiều), ăn kém, cảm giác vô vọng, hay khóc, giảm tập trung, đôi khi nghĩ tiêu cực.',
+    advice: '① SƠ CAN GIẢI UẤT: sài hồ, hương phụ, uất kim, bạch thược, cam thảo (tiêu dao tán ý). ② BỔ TÂM-TỲ: đương quy, long nhãn, táo đỏ, sơn dược, kỷ tử (quy tỳ thang ý). ③ HOẠT HUYẾT: đan sâm, xích thược (chống huyết ư uất kết). ④ Vận động NGOÀI TRỜI (mặt trời, thiên nhiên — tăng serotonin). ⑤ Giao tiếp, chia sẻ, tránh cô lập. ⑥ Ngủ đủ, nhịp sống đều. ⑦ Trầm cảm nặng → khám tâm lý (thuốc + liệu pháp).',
+  },
 ];
 
 /**
@@ -333,6 +350,8 @@ const CONDITION_WX = {
   irregular_period: ['木', '土', '水'], infertility: ['水', '木'], menopause: ['水'],
   // [loop 1038] +5 bệnh mãn tính
   xiao_ke: ['土', '水'], gout: ['土'], eczema: ['土', '木'], fatty_liver: ['木', '土'], prostate_bph: ['水', '土'],
+  // [loop 1050] +2 tâm thần
+  anxiety: ['火', '水', '木'], depression: ['木', '火', '土'],
 };
 
 /**
