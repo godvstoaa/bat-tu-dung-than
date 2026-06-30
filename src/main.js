@@ -3591,7 +3591,8 @@ function initCollapsibleGroups() {
       grp.dataset.collapsible = '1';
       grp.classList.add('collapsible-grp');
       grp.tabIndex = 0;          // [loop 950] keyboard focusable
-      grp.setAttribute('role', 'button');
+      // [loop 971] bỏ role=button — axe aria-allowed-role: h2 (heading) không nên override bằng button.
+      //   Giữ aria-expanded + tabindex + keydown → SR đọc «heading, mở rộng/thu gọn» (vẫn interactive).
       grp.setAttribute('aria-expanded', 'true');
       const toggle = () => { grp.classList.toggle('collapsed'); grp.setAttribute('aria-expanded', grp.classList.contains('collapsed') ? 'false' : 'true'); updateCardVisibility(); };
       grp.addEventListener('click', toggle);
