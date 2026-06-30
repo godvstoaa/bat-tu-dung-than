@@ -3249,7 +3249,7 @@ function renderHourChart(R) {
       const col = h.rating === 'Cát' ? '#2a7' : h.rating === 'Hung' || h.rating === 'Kỵ' ? '#c33' : '#9a8';
       const hgt = Math.max(4, s * 0.7);
       const zhiIdx = '子丑寅卯辰巳午未申酉戌亥'.indexOf(h.zhi || '');
-      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px" title="${esc(h.range||'')} ${esc(h.ganZhi||'')} ${esc(h.rating||'')} (${s})">
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px" title="${esc(h.range||'')} ${esc(h.ganZhi||'')} ${esc(h.rating||'')} (${s})${(()=>{const _mc=meridianClock(h.zhi);return _mc?' | '+_mc.meridian+' '+_mc.organ+' ĐỈNH':'';})()}">
         <div style="height:${hgt}px;width:70%;max-width:22px;background:${col};border-radius:3px 3px 0 0;opacity:0.85"></div>
         <span class="hint" style="font-size:9px">${esc(ZHI_VI[zhiIdx] || h.vi || h.zhi || '')}</span>
         <span class="hint" style="font-size:8px;color:${col}">${esc((h.rating||'').slice(0,4))}</span>
