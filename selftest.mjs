@@ -8574,5 +8574,31 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1022] đông-y KB mở rộng (13 conditions, match ${_ok}/${_cases.length}, clean) ✓`);
 }
 
+// [loop 1024] best-hour 时半合日 (三合 bán-hợp) — bug-class 合 layer ở 择时
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { bestHourToday } = await import('./src/engine/best-hour.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  // 2026-6-15 dayZhi=申; giờ 子/辰 cùng cụm 申子辰 → bán-hợp. Quét vài ngày tìm bán-hợp.
+  let _found = false;
+  for (const [y, m, d] of [[2026, 6, 15], [2026, 6, 16], [2026, 6, 20]]) {
+    const _r = bestHourToday(_R, y, m, d, _R.patternYong);
+    const _flat = Array.isArray(_r.ranked) ? _r.ranked : Array.isArray(_r.items) ? _r.items : Array.isArray(_r.hours) ? _r.hours : [];
+    const _json = JSON.stringify(_flat);
+    if (/半合|三合/.test(_json)) { _found = true; break; }
+  }
+  assert(_found, '[loop 1024] best-hour có giờ 时半合日 (三合 bán-hợp)');
+  // fuzz 200: no ex/leak
+  let _ex = 0, _leaks = 0;
+  for (let i = 0; i < 200; i++) {
+    try {
+      const _r = bestHourToday(_R, 2026, 1 + (i * 7) % 12, 1 + (i * 13) % 28, _R.patternYong);
+      if (/undefined|NaN/.test(JSON.stringify(_r).slice(0, 3000))) _leaks++;
+    } catch (e) { _ex++; }
+  }
+  assert(_ex === 0 && _leaks === 0, `[loop 1024] best-hour fuzz 200 clean (ex=${_ex}, leaks=${_leaks})`);
+  console.log(`   [loop 1024] best-hour 时半合日 (三合 bán-hợp) + fuzz clean ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
