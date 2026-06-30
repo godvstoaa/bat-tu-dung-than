@@ -8653,6 +8653,37 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1081] 盖头/截脚 pillar-strength tích hợp rankDayun + analyzeLiunianDeep (deterministic + expose) ✓`);
 }
 
+// [loop 1082] 十二長生 + 盖头/截脚 cho LƯU NGUYỆT — hoàn thiện đối xứng 3 cấp thời gian
+//   (大运 1079/1081 + 流年 1080/1081 + 流月 1082). computeLiuyue giờ amplify theo stage + pillar.
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { computeLiuyue } = await import('./src/engine/liuyue.js');
+  const { changSheng } = await import('./src/engine/core.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _lm = computeLiuyue(_R, 2026, {});
+  assert(_lm && _lm.months && _lm.months.length === 12, '[loop 1082] computeLiuyue trả 12 tháng');
+  // 1. mọi tháng có monthStage + monthPs
+  const _allStage = _lm.months.every((m) => typeof m.monthStage === 'string' && m.monthStage.length);
+  const _allPs = _lm.months.every((m) => typeof m.monthPs === 'string');
+  assert(_allStage, '[loop 1082] mọi tháng có monthStage (十二长生)');
+  assert(_allPs, '[loop 1082] mọi tháng có monthPs (盖头/截脚)');
+  // 2. cross-check monthStage khớp changSheng(dayGan, monthZhi)
+  const _viMap = { '長生':'Trường Sinh','沐浴':'Mộc Dục','冠帶':'Quan Đới','臨官':'Lâm Quan','帝旺':'Đế Vượng','衰':'Suy','病':'Bệnh','死':'Tử','墓':'Mộ','絕':'Tuyệt','胎':'Thai','養':'Dưỡng' };
+  const _stageMatch = _lm.months.every((m) => _viMap[changSheng(_R.chart.dayGan, m.zhi)] === m.monthStage);
+  assert(_stageMatch, '[loop 1082] monthStage khớp changSheng(dayGan, monthZhi)');
+  // 3. 12 tháng có cả THỊNH lẫn SUY (do 12 chi cố định → tuần hoàn đủ stage)
+  const _vib = _lm.months.filter((m) => m.monthStageW > 0).length;
+  const _dec = _lm.months.filter((m) => m.monthStageW < 0).length;
+  assert(_vib > 0 && _dec > 0, `[loop 1082] 12 tháng có sinh khí THỊNH(${_vib}) & SUY(${_dec})`);
+  // 4. có tháng 盖头/截脚 và tháng sinh/比和
+  const _clash = _lm.months.filter((m) => /Cái Đầu|Tiệt Cước/.test(m.monthPs)).length;
+  const _harm = _lm.months.filter((m) => /Bỉ hoà|Can sinh|Chi sinh/.test(m.monthPs)).length;
+  assert(_clash > 0 && _harm > 0, `[loop 1082] 12 tháng có cả 盖头/截脚(${_clash}) & sinh/比和(${_harm})`);
+  // 5. best/worst vẫn nguyên + no leak
+  assert(_lm.best && _lm.worst && !/undefined|NaN/.test(JSON.stringify(_lm.months)), '[loop 1082] best/worst nguyên + không leak');
+  console.log(`   [loop 1082] 十二长生 + 盖头/截脚 tích hợp computeLiuyue (thịnh ${_vib}/suy ${_dec}, clash ${_clash}/harm ${_harm}) ✓`);
+}
+
 // [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 (合 layer completion)
 {
   const { evaluateDate } = await import('./src/engine/zheri.js');

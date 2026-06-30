@@ -6,8 +6,10 @@
 // ============================================================================
 import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI } from './constants.js';
-import { tenGod } from './core.js';
+import { tenGod, changSheng } from './core.js';
 import { adjustLiuyueByGeju } from './pattern-quality.js';
+import { pillarRelation } from './pillar-quality.js'; // [loop 1082] 盖头/截脚 (pillar-quality, KHÔNG phải pattern-quality)
+import { STAGE_WEIGHT, STAGE_VI } from './dayun-changsheng.js'; // [loop 1082] 十二长生 tháng
 // [loop 74 nâng tầng] Phục/Phản ngâm tháng × 4 trụ nguyên cục (mirror 流年 loop 19).
 import { isFuyin, isFanyin } from './fuyin.js';
 import { TIAN_YI, WEN_CHANG, JIANG_XING, BRANCH_GROUP } from './shensha.js';
@@ -145,6 +147,28 @@ export function computeLiuyue(R, solarYear, patternQuality) {
     }
     score += lmDyBase;
 
+    // [loop 1082] 十二長生 sinh khí THÁNG + 盖头/截脚 pillar-strength — «运好不如运旺» +
+    //   «盖头截脚其力减半» cho lưu nguyệt (hoàn thiện đối xứng 3 cấp thời gian: 大运/流年/流月).
+    //   Cùng amplify model loop 1080/1081 — KHÔNG additive (tránh tạo cát từ neut).
+    let monthStageVi = '', monthStageW = 0;
+    {
+      const _st = changSheng(dayGan, zhi);
+      monthStageW = STAGE_WEIGHT[_st] || 0;
+      monthStageVi = STAGE_VI[_st] || '';
+      if (monthStageW) {
+        const _f = 1 + monthStageW / 100;
+        score = Math.round(50 + (score - 50) * _f);
+      }
+    }
+    let monthPsVi = '', monthPsFlow = 0;
+    {
+      const _rel = pillarRelation({ gan, zhi });
+      monthPsFlow = _rel.flow;
+      monthPsVi = _rel.vi || '';
+      const _pf = _rel.flow > 0 ? 1.04 : _rel.flow < 0 ? 0.92 : 1.0;
+      if (_pf !== 1) score = Math.round(50 + (score - 50) * _pf);
+    }
+
     score = Math.max(5, Math.min(95, Math.round(score)));
     let rating;
     // [loop 469→470] recalibrate percentile + unify vocab với 流年 (Kỵ→Hung) + add Đại cát
@@ -155,7 +179,7 @@ export function computeLiuyue(R, solarYear, patternQuality) {
     else if (score >= 34) rating = 'Hơi kỵ';
     else rating = 'Hung';
     const note = [godVi, ...extraNotes, ...fyNotes].filter(Boolean).join(' · ');
-    months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note, taiSui: extraNotes, fuyin: fyNotes });
+    months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note, taiSui: extraNotes, fuyin: fyNotes, monthStage: monthStageVi, monthStageW, monthPs: monthPsVi, monthPsFlow });
   }
 
   // [loop 4 — 格局流月喜忌] Cộng tầng 格局 LÊN TRÊN tầng ngũ hành + thập thần tháng
