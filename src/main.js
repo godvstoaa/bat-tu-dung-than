@@ -3234,6 +3234,36 @@ function renderGoldenYear(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được năm hoàng kim.</p>'; }
 }
 
+// [loop 1060] Ngũ Hành Cân Bằng — 5 colored bars visual
+function renderWxChart(R) {
+  const el = $('wx-chart');
+  if (!el) return;
+  try {
+    const pct = R.wx?.pct;
+    if (!pct) { el.innerHTML = '<p class="hint">Không có dữ liệu ngũ hành.</p>'; return; }
+    const WX_COLOR = { '木': '#4a8', '火': '#e54', '土': '#da3', '金': '#aaa', '水': '#369' };
+    const WX_VI = { '木': 'Mộc', '火': 'Hỏa', '土': 'Thổ', '金': 'Kim', '水': 'Thủy' };
+    const dmWx = R.chart?.dayMaster?.wx;
+    const yongWx = R.yong?.primary;
+    const jiWx = R.yong?.ji;
+    const bars = Object.entries(pct).sort((a, b) => b[1] - a[1]).map(([wx, p]) => {
+      const isDm = wx === dmWx, isYong = wx === yongWx, isJi = wx === jiWx;
+      const tags = [isDm ? '★NHẬT CHỦ' : '', isYong ? '◆DỤNG' : '', isJi ? '✗KỴ' : ''].filter(Boolean).join(' ');
+      const h = Math.max(2, p * 2.5); // scale: 0-40% → 0-100px
+      return `<div style="display:flex;align-items:center;gap:6px;margin:3px 0">
+        <span class="zh" style="width:20px;font-size:14px;color:${WX_COLOR[wx]}">${esc(wx)}</span>
+        <span class="hint" style="width:36px">${esc(WX_VI[wx])}</span>
+        <div style="flex:1;height:22px;background:rgba(128,128,128,0.1);border-radius:3px;overflow:hidden;position:relative">
+          <div style="height:100%;width:${Math.min(100, p * 2.8)}%;background:${WX_COLOR[wx]};opacity:0.75;border-radius:3px"></div>
+          <span style="position:absolute;left:6px;top:1px;font-size:11px;color:#fff;font-weight:bold">${(+p).toFixed(1)}%</span>
+        </div>
+        <span class="hint" style="font-size:10px;min-width:80px;text-align:left">${esc(tags)}</span>
+      </div>`;
+    }).join('');
+    el.innerHTML = `${bars}<p class="hint" style="margin-top:6px">★ = Nhật Chủ · ◆ = Dụng Thần (cần) · ✗ = Kỵ Thần (tránh). Thanh dài = vượng, thanh ngắn = suy. Dụng Thần cần BỔ, Kỵ Thần cần HẠ.</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được ngũ hành.</p>'; }
+}
+
 // [loop 1059] Vận Trục Đại Vận — bar chart visual
 function renderDayunChart(R) {
   const el = $('dayun-chart');
@@ -3901,6 +3931,7 @@ async function run() {
   lazyRender('golden-year',    () => { try { renderGoldenYear(currentResult); } catch (e) { console.warn('goldenyear', e.message); } });
   lazyRender('forecast5',      () => { try { renderForecast5(currentResult); } catch (e) { console.warn('forecast5', e.message); } });
   lazyRender('dayun-chart',    () => { try { renderDayunChart(currentResult); } catch (e) { console.warn('dayun-chart', e.message); } });
+  lazyRender('wx-chart',       () => { try { renderWxChart(currentResult); } catch (e) { console.warn('wx-chart', e.message); } });
 
   // quick-nav: jump links — [loop 936 FIX] theo GROUP header (~8) thay vì 165 card
   //   (165 chip overflow trên mobile → nav chính nó không dùng được). + scroll-spy active.
