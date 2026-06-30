@@ -5927,6 +5927,12 @@ assert(topReasons.length > 0, `giờ tốt nhất (${bh1.best[0].zhi}) có reaso
 // P9. Khác ngày → kết quả khác (chứng minh thực sự phụ thuộc ngày)
 const bh2 = bestHourToday(BH_R, 2026, 6, 24);
 assert(JSON.stringify(bh1) !== JSON.stringify(bh2), 'khác ngày → kết quả khác');
+// [loop 1005] 时合日 reward — giờ chi LỤC HỢP chi ngày → CÁT (đối xứng 日破时)
+{
+  const _bhHe = bestHourToday(BH_R, 2026, 6, 15);
+  const _heHour = (_bhHe.hours || []).find((h) => (h.reasons || []).some((r) => r.includes('时合日')));
+  assert(_heHour, '[1005] có giờ 时合日 (lục hợp chi ngày) được reward CÁT');
+}
 
 // P10. Không crash cho mẫu nữ + ngày biên + mặc định hôm nay
 bhThrew = false;

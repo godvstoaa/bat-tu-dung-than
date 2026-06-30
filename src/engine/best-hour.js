@@ -20,7 +20,7 @@ import { evaluateDate, OFFICER_VI } from './zheri.js';
 import { ziweiLiushi } from './ziwei-liuri.js';
 import { TIAN_YI, WEN_CHANG } from './shensha.js';
 import { tenGod, godGroup } from './core.js';
-import { ZHI_CHONG_MAP } from './interactions.js';
+import { ZHI_CHONG_MAP, ZHI_LIUHE_MAP } from './interactions.js';
 
 const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 // Giờ đại diện cho mỗi thìn (lấy giữa khoảng) — 子 = 23:00 (thuộc ngày kế)
@@ -141,6 +141,12 @@ export function bestHourToday(R, year, month, day, patternYong) {
       if (dayZhi && ZHI_CHONG_MAP[dayZhi] === zhi) {
         dim.huangdao = Math.min(dim.huangdao, 15);
         reasons.push(`⚡ 日破时: giờ ${WX_VI[ZHI[zhi]?.wx] || zhi}(${zhi}) xung chi ngày ${dayZhi} — đại hung, kỵ khởi sự/ký/cưới.`);
+      }
+      // [loop 1005] 时合日 — giờ chi LỤC HỢP chi ngày → CÁT (đối xứng 日破时).
+      //   Cổ法 «时合日柱为吉» — giờ hợp chi ngày → thuận hoà, sự việc hanh thông.
+      else if (dayZhi && ZHI_LIUHE_MAP[dayZhi + zhi]) {
+        dim.huangdao = Math.max(dim.huangdao, 78);
+        reasons.push(`💕 时合日: giờ ${zhi} LỤC HỢP chi ngày ${dayZhi} (hóa ${WX_VI[ZHI_LIUHE_MAP[dayZhi + zhi]]}) → thuận hoà, hanh thông.`);
       }
     } catch (_) {}
 
