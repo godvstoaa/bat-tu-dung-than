@@ -238,4 +238,4 @@ export function liurenPan(year, month, day, hour) {
   return { yuejiang, yuejiangVi: YUEJIANG_VI[yuejiang], dayGanZhi: dGan + dZhi, hourZhi: hZhi, isDay, skyArr, ke4, sanchuan, zongMen, shehaiDetail, tjAt, gui, dayGui: guiRaw, chuan1TianJiang: tj1, verdict: verdictWithKeti, keti, ketiNote, note: '三传用 九宗门 贼克/比用/涉害 (历数→见机→察微→缀瑕); 月将按中气. 伏吟/返吟 课体 ĐÃ detect. 遥克/昴星/别责 = fallback (không克时用干上神).' };
 }
 
-export { ZHI, TIANJIANG, TJ_VI, YUEJIANG_VI, sheHaiCount, SHEN as zhiShen, ZHI_JIGAN };
+export { ZHI, TIANJIANG, TJ_VI, YUEJIANG_VI, sheHaiCount, SHEN as zhiShen, ZHI_JIGAN, GUIREN };

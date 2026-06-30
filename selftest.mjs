@@ -1860,7 +1860,7 @@ assert(castLiuYao([7, 7, 7, 7, 7, 7], 'wealth', '午', '子').name === ly.name, 
 console.log(`   乾卦 ${ly.shiChish} | 六亲 ${ly.lines.map((l) => l.liuqin).join('/')} | 用神${ly.yongshen.vi}→${ly.bestLv} ${ly.luck} ✓`);
 
 console.log('\n################## 19B. ĐẠI LỤC NHÂM 大六壬 九宗门 (贼克/比用/涉害) ##################');
-import { liurenPan, sheHaiCount, zhiShen as lrShen } from './src/engine/liuren.js';
+import { liurenPan, sheHaiCount, zhiShen as lrShen, GUIREN as LR_GUIREN } from './src/engine/liuren.js';
 // [1] 涉害 历数法 — đối chiếu算例 chuẩn 《六壬大全》卷七 / 甲辰亥将卯时:
 //   戌@寅 → 4重害 (寅木·甲木·卯木·乙木 khắc 土)
 //   子@辰 → 5重害 (辰土·戊土·巳土·未土·戌土 khắc 水)
@@ -1869,6 +1869,14 @@ assert(sheHaiCount('戌', '寅') === 4, `涉害: 戌@寅 = 4重害 (thực ${she
 assert(sheHaiCount('子', '辰') === 5, `涉害: 子@辰 = 5重害 (thực ${sheHaiCount('子','辰')})`);
 // [loop 552] giờ Tý (hour=0) — `hour || 12` từng nuốt 0→12 (午). Nay hourZhi phải=子.
 assert(liurenPan(2029, 3, 15, 0).hourZhi === '子', `[loop 552] 六壬 hour=0 = 子时 (trước fix SAI=午 do hour||12)`);
+// [loop 1092] 日干贵人 (cycle-45 fix) — cả 5 nhóm theo「天乙贵人」口诀. 庚 từng SAI=['午','寅']
+//   (của 辛) → 天将 lệch mọi 庚 ngày; test 甲辰 không bắt được. Nay lock cả bảng.
+const _gui = (g) => JSON.stringify(LR_GUIREN[g]);
+assert(_gui('甲') === _gui('戊') && _gui('戊') === _gui('庚') && _gui('庚') === JSON.stringify(['丑','未']), `[loop 1092] 甲戊庚牛羊 → 丑未 (được 庚=${_gui('庚')})`);
+assert(_gui('乙') === _gui('己') && _gui('己') === JSON.stringify(['子','申']), `[loop 1092] 乙己鼠猴乡 → 子申 (được 己=${_gui('己')})`);
+assert(_gui('丙') === _gui('丁') && _gui('丁') === JSON.stringify(['亥','酉']), `[loop 1092] 丙丁猪鸡位 → 亥酉 (được 丁=${_gui('丁')})`);
+assert(_gui('壬') === _gui('癸') && _gui('癸') === JSON.stringify(['卯','巳']), `[loop 1092] 壬癸兔蛇藏 → 卯巳 (được 癸=${_gui('癸')})`);
+assert(_gui('辛') === JSON.stringify(['午','寅']), `[loop 1092] 六辛逢马虎 → 午寅 (được 辛=${_gui('辛')})`);
 // [2] 孟仲季 helper
 assert(lrShen('寅') === '孟' && lrShen('子') === '仲' && lrShen('辰') === '季', '涉害: 孟/仲/季 classification đúng');
 // [3] Lá số 甲辰亥将卯时 thật (2029-03-15 = 甲辰, 卯时 6h, yuejiang=亥) → 初传 PHẢI = 子, zongMen phải nhắc '涉害'
