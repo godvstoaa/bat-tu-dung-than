@@ -107,7 +107,7 @@ import { healthAlertScan } from './health-alert.js';
 import { computeHehun } from './hehun.js';
 import { synthesize } from './synthesis.js';
 import { matchBusinessPartners } from './partner-match.js';
-import { analyzeHealth, answerHealth, meridianClock } from './tcm.js';
+import { analyzeHealth, answerHealth, meridianClock, bodyConstitution } from './tcm.js';
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
@@ -797,6 +797,7 @@ export function execTool(name, args, R) {
         if (!p.ok) return { error: p.error };
         return {
           constitution: p.constitution,
+          bodyType: (() => { const _bc = bodyConstitution(R); return _bc ? { vi: _bc.vi, desc: _s(_bc.desc, 160), advice: _s(_bc.advice, 160) } : null; })(),
           weak: p.weak.map((w) => ({ zang: w.zang, wx: w.wx, pct: w.pct, syndromes: w.syndromes.map((s) => _s(s, 130)), nourish: _s(w.nourish, 200), motherTip: _s(w.motherTip, 120) })),
           strong: p.strong.map((s) => ({ zang: s.zang, wx: s.wx, pct: s.pct, syndromes: s.syndromes.map((x) => _s(x, 130)), damage: _s(s.damage, 140) })),
           diet: p.dietAdvice.map((d) => _s(d, 180)),
