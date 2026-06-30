@@ -594,7 +594,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .syn-lead { font-size: 14.5px; color: var(--silk-dim); margin: 0 0 12px; line-height: 1.75; }
 .syn-advice { font-size: 13.5px; color: var(--gold-bright); background: rgba(212,175,55,0.08); border-left: 3px solid var(--cinnabar); padding: 10px 14px; border-radius: 0 4px 4px 0; margin: 12px 0 0; }
 .syn-h4 { font-size: 14px; color: var(--gold-pale); margin: 16px 0 8px; letter-spacing: 0.3px; }
-.syn-factors summary { cursor: pointer; font-size: 13px; color: var(--silk-muted); }
+.syn-factors summary { cursor: pointer; font-size: 13px; color: var(--silk-muted); min-height: 24px; padding: 6px 2px; display: flex; align-items: center; }   /* [loop 972] WCAG 2.5.8 target-size ≥24px */
 .factor-list { margin: 10px 0 0; display: flex; flex-direction: column; gap: 5px; }
 .factor { font-size: 12.5px; color: var(--silk-dim); padding-left: 14px; position: relative; }
 .factor::before { content: '◆'; position: absolute; left: 0; color: var(--cinnabar); font-size: 8px; top: 5px; }
