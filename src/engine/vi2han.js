@@ -92,6 +92,9 @@ const NAME_VI = {
   danh: { han: '名', strokes: 6 }, giang: { han: '江', strokes: 7 }, lực: { han: '力', strokes: 2 },
   nghị: { han: '議', strokes: 20 }, tân: { han: '辛', strokes: 7 }, vương: { han: '王', strokes: 4 },
   điền: { han: '田', strokes: 5 },
+  // [loop 1049] +4 (康熙): Chiêu/Chương/Cơ/Giáp
+  chiêu: { han: '昭', strokes: 9 }, chương: { han: '章', strokes: 11 }, cơ: { han: '基', strokes: 11 },
+  giáp: { han: '甲', strokes: 5 },
 };
 
 /**
