@@ -108,6 +108,18 @@ function liuqinOf(gongWx, zhiWx) {
   if (KE[zhiWx] === gongWx) return '官鬼';       // khắc ta
   return '?';
 }
+
+// [loop 1017] 本宫八纯 伏神 — mỗi vị trí hào có 1 lục-thân ẩn (theo 纳甲 八纯 vs ngũ hành cung).
+//   Khi 用神 KHÔNG lộ trong quẻ → tìm nó ở 八纯 (nơi ẩn dưới 飞神 = hào hiện tại cùng vị trí).
+//   Nguồn: 卜筮正宗 «伏吟飞伏» — «用神不上卦, 就于本宫八纯寻之».
+function baiChunFu(palace, gongWx) {
+  const t = TRI[palace];
+  if (!t) return [];
+  const fu = [];
+  for (let i = 0; i < 3; i++) fu.push({ pos: i + 1, zhi: t.zn[i], wx: ZHI[t.zn[i]].wx, lq: liuqinOf(gongWx, ZHI[t.zn[i]].wx) });
+  for (let i = 0; i < 3; i++) fu.push({ pos: i + 4, zhi: t.zw[i], wx: ZHI[t.zw[i]].wx, lq: liuqinOf(gongWx, ZHI[t.zw[i]].wx) });
+  return fu;
+}
 // 旺衰 theo 月令: 当令=旺, sinh我=相, 我sinh=休, 克我=囚, 我克=死
 function wangShuai(lineWx, monthWx) {
   if (lineWx === monthWx) return { lv: '旺', d: 2 };
@@ -231,7 +243,26 @@ export function castLiuYao(vals, cat, monthZhi, dayZhi, dayGan, dayGanZhi) {
   if (yongHua === 'jin') notes.push('用神化进神 — động mà hoá tiến, ngày càng mạnh (cát cho việc cần用神)');
   if (yongHua === 'tui') notes.push('用神化退神 — động mà hoá thoái, dần suy yếu (bất lợi cho việc cần用神)');
   const noteStr = notes.length ? ' [' + notes.join('; ') + ']' : '';
-  if (!yongLines.length) { verdict = `Không có hào ${ys.vi} trong quẻ — việc thiếu "dụng thần", khó thành / phải đợi vận.`; luck = 'Bình'; }
+  if (!yongLines.length) {
+    // [loop 1017] 用神 không lộ → tìm 伏神 ở本宫八纯 (ẩn dưới 飞神 = hào hiện tại cùng vị trí).
+    const fu = baiChunFu(palace.gong, gongWx);
+    const fuPos = fu.filter((f) => f.lq === ys.lq); // vị trí 八纯 mang cùng lục thân 用神
+    if (fuPos.length) {
+      const fp = fuPos[0];
+      const fei = lines[fp.pos - 1];                 // 飞神 = hào hiện tại
+      const fuWx = fp.wx, feiWx = fei.wx;
+      let rel = '比和 (cùng hành — 伏thần trôi nổi, nhờ hay không nhờ nửa vời)';
+      if (SHENG[feiWx] === fuWx) rel = '飞生伏 (飞 thần nuôi 伏 → 伏thần đắc sinh, CÓ THỂ DÙNG, cần đợi ngày vượng)';
+      else if (SHENG[fuWx] === feiWx) rel = '伏生飞 (伏thần hao nuôi 飞 → 伏thần suy, khó dùng)';
+      else if (KE[feiWx] === fuWx) rel = '飞克伏 (飞 thần khắc 伏 → 伏bị chế, rất khó dùng)';
+      else if (KE[fuWx] === feiWx) rel = '伏克飞 «出暴» (伏thần khắc ngược 飞 → có thể đột khởi, nhưng bạo)';
+      verdict = `Không có hào ${ys.lq} lộ trong quẻ → tìm 伏神: ${ys.lq} ẩn ở hào ${fp.pos} dưới 飞神 ${fei.gan}${fei.zhi} (${fei.liuqin}). Quan hệ 飞伏: ${rel}.`;
+      luck = (/CÓ THỂ DÙNG|出暴/.test(rel)) ? 'Bình' : 'Hung';
+    } else {
+      verdict = `Không có hào ${ys.vi} trong quẻ — việc thiếu "dụng thần", khó thành / phải đợi vận.`;
+      luck = 'Bình';
+    }
+  }
   else if (yongYuepo) { verdict = `用神 (${ys.vi}) 月破 (${bestLv}) — bị月建冲, tháng này đại suy → HUNG, nên hoãn đến hết tháng.${noteStr}`; luck = 'Hung'; }
   else if (bestD >= 1.5) { verdict = `用神 (${ys.vi}) ${bestLv} (+${bestD.toFixed(1)}) — vượng được sinh phù → CÁT, nên tiến hành.${noteStr}`; luck = (yongKong || yongAndong) ? 'Bình' : 'Cát'; }
   else if (bestD >= 0) { verdict = `用神 ${bestLv} — trung bình, làm được nhưng cần nỗ lực / đợi ngày更好.${noteStr}`; luck = 'Bình'; }
@@ -246,4 +277,4 @@ export function castLiuYao(vals, cat, monthZhi, dayZhi, dayGan, dayGanZhi) {
     kong: [...kongSet], yongKong, bestLv, bestD, shiChish, verdict, luck };
 }
 
-export { NAME2PALACE };
+export { NAME2PALACE, baiChunFu };

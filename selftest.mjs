@@ -8451,5 +8451,20 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1016] move-fs (+12) + liuri (+5/+6) 六合 reward — bug-class 冲/合 đóng ✓`);
 }
 
+// [loop 1017] 六爻 伏神/飞神 — 用神 không lộ → tìm ở本宫八纯 (卜筮正宗 «用神不上卦就于本宫寻之»)
+{
+  const { castLiuYao, baiChunFu } = await import('./src/engine/liuyao.js');
+  // 姤 = 巽(下[0,1,1])乾(上[1,1,1]) → vals=[8,7,7,7,7,7]; 姤六亲缺 妻财
+  const _r = castLiuYao([8,7,7,7,7,7], 'wealth', '午', '酉', '甲', '甲子');
+  assert(_r.name === '姤' && _r.palace === '乾', `[loop 1017] 姤 thuộ乾宫 (got ${_r.name}/${_r.palace})`);
+  assert(_r.yongLines.length === 0, `[loop 1017] 姤 thiếu 妻财 (got ${_r.yongLines.length} 用神 hào)`);
+  assert(/伏神/.test(_r.verdict) && /飞生伏/.test(_r.verdict), `[loop 1017] 伏神/飞生伏 trong verdict`);
+  assert(_r.luck === 'Bình', `[loop 1017] 飞生伏 → CÓ THỂ DÙNG → Bình (got ${_r.luck})`);
+  const _fu = baiChunFu('乾', '金');
+  assert(_fu[1].pos === 2 && _fu[1].zhi === '寅' && _fu[1].lq === '妻财', `[loop 1017] 乾八纯 hào2 = 寅/妻财 (got ${_fu[1].zhi}/${_fu[1].lq})`);
+  assert(!/undefined|NaN/.test(JSON.stringify(_r)), '[loop 1017] output không leak');
+  console.log(`   [loop 1017] 六爻 伏神/飞神 (用神 不上卦 → tìm本宫, 飞伏 verified) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
