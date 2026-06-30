@@ -3268,14 +3268,16 @@ function renderLiuyueChart(R) {
   try {
     const lm = computeLiuyue(R, new Date().getFullYear(), {});
     if (!lm || !lm.months) { el.innerHTML = '<p class="hint">Không tính được lưu nguyệt.</p>'; return; }
+    const _curMonth = new Date().getMonth() + 1;
     const bars = lm.months.map((mo) => {
       const s = mo.score || 50;
       const col = mo.rating === 'Cát' ? '#2a7' : mo.rating === 'Hung' ? '#c33' : '#9a8';
       const h = Math.max(4, s * 0.7);
-      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px" title="${mo.solarMonth}/${new Date().getFullYear()} ${esc(mo.ganZhi||'')} ${esc(mo.rating||'')} (${s})">
-        <div style="height:${h}px;width:70%;max-width:24px;background:${col};border-radius:3px 3px 0 0;opacity:0.85"></div>
-        <span class="zh" style="font-size:9px">${esc((mo.ganZhi||'').slice(0,2))}</span>
-        <span class="hint" style="font-size:9px">T${mo.solarMonth}</span>
+      const isNow = mo.solarMonth === _curMonth;
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${mo.solarMonth}/${new Date().getFullYear()} ${esc(mo.ganZhi||'')} ${esc(mo.rating||'')} (${s})${isNow ? ' ★ THÁNG NÀY' : ''}">
+        <div style="height:${h}px;width:70%;max-width:24px;background:${col};border-radius:3px 3px 0 0;opacity:${isNow ? '1' : '0.85'};${isNow ? 'box-shadow:0 0 6px '+col : ''}"></div>
+        <span class="zh" style="font-size:9px${isNow ? ';font-weight:bold' : ''}">${esc((mo.ganZhi||'').slice(0,2))}</span>
+        ${isNow ? '<span style="font-size:7px;color:var(--gold-bright);font-weight:bold">▼ NAY</span>' : `<span class="hint" style="font-size:9px">T${mo.solarMonth}</span>`}
       </div>`;
     }).join('');
     const best = lm.best, worst = lm.worst;
