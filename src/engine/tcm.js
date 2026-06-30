@@ -397,3 +397,30 @@ export function seasonalHealth(monthZhi, R) {
   }
   return { season, wx, zang, vi, advice, userTip };
 }
+
+/**
+ * [loop 1039] 子午流注 (đồng hồ kinh mạch) — 12 时辰 → 12 kinh mạch khí đỉnh.
+ *   Cổ法 «子午流注纳子法»: mỗi 时辰 (2h) có 1 kinh mạch khí huyết đỉnh.
+ *   Nguồn: «黄帝内经·灵枢» kinh mạch tuần thứ: 寅肺→卯大肠→辰胃→巳脾→午心→未小肠→申膀胱→酉肾→戌心包→亥三焦→子胆→丑肝.
+ * @param {string} hourZhi — chi giờ (子..亥)
+ * @returns {{ zhi, hours, meridian, organ, wx, advice }}
+ */
+export const MERIDIAN_CLOCK = {
+  寅: { hours: '3-5h', meridian: '手太阴肺经', organ: 'Phổi (肺)', wx: '金', advice: 'khí phổi đỉnh → tập thở/yoga/khởi động nhẹ; uống nước ấm; tránh thức dậy quá muộn.' },
+  卯: { hours: '5-7h', meridian: '手阳明大肠经', organ: 'Đại trường (大肠)', wx: '金', advice: 'đại trường đỉnh → giờ VÀNG đi đại tiện; uống nước ấm; vận động sáng.' },
+  辰: { hours: '7-9h', meridian: '足阳明胃经', organ: 'Vị (胃)', wx: '土', advice: 'vị đỉnh → ăn sáng ĐẦY ĐỦ (bữa ăn quan trọng nhất); dinh dưỡng absorption tốt nhất.' },
+  巳: { hours: '9-11h', meridian: '足太阴脾经', organ: 'Tỳ (脾)', wx: '土', advice: 'tỳ đỉnh → làm việc/học tập hiệu quả nhất; chuyển hoá năng lượng tốt; tránh ngọt quá.' },
+  午: { hours: '11-13h', meridian: '手少阴心经', organ: 'Tim (心)', wx: '火', advice: 'tim đỉnh → ngủ trưa ngắn («tý ngọ giác» dưỡng tâm); tránh vận động mạnh/cáu gắt.' },
+  未: { hours: '13-15h', meridian: '手太阳小肠经', organ: 'Tiểu trường (小肠)', wx: '火', advice: 'tiểu trường đỉnh → tiêu hoá trưa; uống nước; tránh ăn quá no trưa.' },
+  申: { hours: '15-17h', meridian: '足太阳膀胱经', organ: 'Bàng quang (膀胱)', wx: '水', advice: 'bàng quang đỉnh → uống nước/thải độc; làm việc cần tập trung; vận động OK.' },
+  酉: { hours: '17-19h', meridian: '足少阴肾经', organ: 'Thận (肾)', wx: '水', advice: 'THẬN ĐỈNH → giờ VÀNG bổ thận (massage thắt lưng, tập chân, ăn tối nhẹ); tiết dục.' },
+  戌: { hours: '19-21h', meridian: '手厥阴心包经', organ: 'Tâm bào (心包)', wx: '火', advice: 'tâm bào đỉnh → thư giãn, giao tiếp, vui vẻ (bảo vệ tim); tránh stress.' },
+  亥: { hours: '21-23h', meridian: '手少阳三焦经', organ: 'Tam tiêu (三焦)', wx: '火', advice: 'tam tiêu đỉnh → CHUẨN BỊ NGỦ; cơ thể bắt đầu nghỉ ngơi; tránh ăn/screen.' },
+  子: { hours: '23-1h', meridian: '足少阳胆经', organ: 'Đởm (胆)', wx: '木', advice: 'đởm đỉnh → PHẢI NGỦ («tý thời» đởm cập tân sinh; thức → hao đởm, ngày mai mệt, tóc bạc).' },
+  丑: { hours: '1-3h', meridian: '足厥阴肝经', organ: 'Can (肝)', wx: '木', advice: 'can đỉnh → GIẤC NGỦ SÂU (can giải độc/giáng huyết lúc này; thức → hao can, mắt mờ, nóng trong).' },
+};
+export function meridianClock(hourZhi) {
+  const m = MERIDIAN_CLOCK[hourZhi];
+  if (!m) return null;
+  return { zhi: hourZhi, ...m };
+}

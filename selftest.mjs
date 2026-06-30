@@ -8811,5 +8811,21 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1038] đông-y KB +5 bệnh mãn tính (tiểu đường/gout/chàm/gan mỡ/tiền liệt) → ${CONDITION_KB.length} tổng ✓`);
 }
 
+// [loop 1039] 子午流注 (meridian clock) — 12 时辰 → 12 kinh mạch, cổ pháp 灵枢
+{
+  const { meridianClock, MERIDIAN_CLOCK } = await import('./src/engine/tcm.js');
+  const _ORDER = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'];
+  const _EXP = ['肺','大肠','胃','脾','心','小肠','膀胱','肾','心包','三焦','胆','肝'];
+  let _ok = 0;
+  for (let i = 0; i < 12; i++) {
+    const m = meridianClock(_ORDER[i]);
+    if (m && m.organ.includes(_EXP[i])) _ok++;
+  }
+  assert(_ok === 12, `[loop 1039] 子午流注 12 kinh mạch đúng thứ tự (got ${_ok}/12)`);
+  assert(MERIDIAN_CLOCK['子'].organ.includes('胆'), `[loop 1039] 子→胆 (tý thời)`);
+  assert(MERIDIAN_CLOCK['丑'].organ.includes('肝'), `[loop 1039] 丑→肝 (can giải độc đêm)`);
+  console.log(`   [loop 1039] 子午流注 (12 时辰→12 kinh mạch, 灵枢 cổ pháp) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
