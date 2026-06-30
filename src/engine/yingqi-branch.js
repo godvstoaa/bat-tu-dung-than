@@ -139,6 +139,44 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
     }
   }
 
+  // [loop 997] 大运 CHI ỨNG KỲ — kích hoạt THEO THẬP KỶ (大运 chi xung/hợp chi bẩm sinh).
+  //   Khác 流年 (1 năm): đại vận chi mở kho = «cửa mở 10 năm» cho sao ẩn phát lực liên tục.
+  //   Cổ法 «运冲则发, 运合则动» — đại vận cũng激活 qua xung/hợp, lực kéo dài cả thập kỷ.
+  const natalSet2 = new Set(natalBranches.map((n) => n.zhi));
+  const _detect = (targetZhi) => {
+    const out = [];
+    for (const nb of natalBranches) {
+      if (ZHI_CHONG_MAP[nb.zhi + targetZhi]) {
+        const g = branchGroups[nb.zhi]; if (g.length) out.push({ type: KU_WX[nb.zhi] ? 'xung mở kho' : 'xung kích tàng can', pillar: nb.pillar, branch: nb.zhi, groups: g });
+      }
+      const hua = ZHI_LIUHE_MAP[nb.zhi + targetZhi];
+      if (hua) {
+        const g = branchGroups[nb.zhi].slice(); const hg = groupOfWx(dmWx, hua); if (hg && !g.includes(hg)) g.push(hg);
+        if (g.length) out.push({ type: 'hợp dẫn', pillar: nb.pillar, branch: nb.zhi, groups: g, hua });
+      }
+    }
+    for (const sh of ZHI_SANHE) {
+      if (!sh.branches.includes(targetZhi)) continue;
+      const others = sh.branches.filter((b) => b !== targetZhi);
+      if (others.every((b) => natalSet2.has(b))) {
+        const grp = groupOfWx(dmWx, sh.wx); if (grp) out.push({ type: 'tam hợp thành cục', pillar: '-', branch: targetZhi, groups: [grp], sanhe: sh });
+      }
+    }
+    return out;
+  };
+  const dayunActivations = [];
+  for (const dy of (Array.isArray(R.dayun) ? R.dayun : [])) {
+    if (!dy || !dy.zhi || dy.startYear == null) continue;
+    for (const a of _detect(dy.zhi)) {
+      let note;
+      if (a.type === 'xung mở kho') note = `Đại vận ${dy.ganZhi} (${dy.zhi}) xung ${a.branch} (${PILLAR_VI[a.pillar]}) → MỞ KHO ${WX_VI[KU_WX[a.branch]]} CẢ THẬP KỶ [${dy.startAge}–${dy.startAge + 9}t], sao ẩn phát lực kéo dài.`;
+      else if (a.type === 'xung kích tàng can') note = `Đại vận ${dy.ganZhi} (${dy.zhi}) xung ${a.branch} (${PILLAR_VI[a.pillar]}) → tàng can bị kích, phát lực cả thập kỷ [${dy.startAge}–${dy.startAge + 9}t].`;
+      else if (a.type === 'hợp dẫn') note = `Đại vận ${dy.ganZhi} (${dy.zhi}) hợp ${a.branch} (${PILLAR_VI[a.pillar]}) → hợp dẫn sao ẩn ra cả thập kỷ, hóa ${WX_VI[a.hua]}.`;
+      else note = `Đại vận ${dy.ganZhi} (${dy.zhi}) + bẩm sinh đủ TAM HỢP ${a.sanhe.name} → cục thành cả thập kỷ, hành ${WX_VI[a.sanhe.wx]} vượng.`;
+      dayunActivations.push({ ganZhi: dy.ganZhi, zhi: dy.zhi, startAge: dy.startAge, startYear: dy.startYear, type: a.type, pillar: a.pillar, branch: a.branch, groups: a.groups, note });
+    }
+  }
+
   // 3) GRADING — 大运为根，流年为苗. Một năm kích hoạt chỉ «phát thật» khi ĐẠI VẬN
   //    (thổ nhưỡng 10 năm) cùng hướng; nếu đại vận nghịch/Kỵ → lực bị suy giảm.
   //    Phân loại mỗi event: «真应期» (đại vận củng cố cùng nhóm sao) / «⚠ giảm lực» (kỵ vận) / «thường».
@@ -178,6 +216,14 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
     else if (unfavor) { e.tone = 'hung'; e.toneVi = 'HUNG'; }
     else { e.tone = 'neutral'; e.toneVi = 'trung'; }
   }
+  // [loop 997] tone + gmap cho dayunActivations (groups đang là string keys)
+  for (const da of dayunActivations) {
+    const favor = da.groups.some((g) => g === dungGrp || g === xiGrp);
+    const unfavor = da.groups.some((g) => g === jiGrp || g === chouGrp);
+    da.tone = (favor && unfavor) ? 'mixed' : favor ? 'cat' : unfavor ? 'hung' : 'neutral';
+    da.toneVi = da.tone === 'cat' ? 'CÁT' : da.tone === 'hung' ? 'HUNG' : da.tone === 'mixed' ? 'TRUNG' : 'trung';
+    da.groups = da.groups.map((g) => ({ group: g, vi: GROUP_VI[g] }));
+  }
 
   // 4) Tổng kết — ưu tiên năm «真应期 + xung mở kho» (mạnh nhất), sau đó các kích hoạt khác.
   const kuOpen = events.filter((e) => e.type === 'xung mở kho');
@@ -216,12 +262,24 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
     }
   }
 
+  // [loop 997] 大运 chi activation summary — thập kỷ nào «mở cửa» sao ẩn (10 năm)
+  const dyKuOpen = dayunActivations.filter((d) => d.type === 'xung mở kho');
+  if (dayunActivations.length) {
+    const dyCat = dayunActivations.filter((d) => d.tone === 'cat').map((d) => d.ganZhi);
+    const dyHung = dayunActivations.filter((d) => d.tone === 'hung').map((d) => d.ganZhi);
+    summary += ` 🔄Đại vận kích hoạt (cả thập kỷ): ${dayunActivations.slice(0, 4).map((d) => `${d.ganZhi}[${d.startAge}–${d.startAge + 9}t] ${d.type === 'xung mở kho' ? '★MởKho' : d.type === 'tam hợp thành cục' ? '≡TamHợp' : d.type === 'hợp dẫn' ? '∼Hợp' : '×Xung'}→${d.groups.map((g) => g.vi).join('+')}${d.tone === 'cat' ? ' 🎉Dụng' : d.tone === 'hung' ? ' ⚠Kỵ' : ''}`).join('; ')}.`;
+    if (dyCat.length) summary += ` 🎉Thập kỷ bật DỤNG: ${dyCat.join(', ')}.`;
+    if (dyHung.length) summary += ` ⚠Thập kỷ bật KỴ: ${dyHung.join(', ')}.`;
+    if (dyKuOpen.length) summary += ` Kho mở cả thập kỷ: ${dyKuOpen.map((d) => d.branch + '(' + d.ganZhi + ')').join(', ')}.`;
+  }
+
   return {
     events: top,
     kuBranches: natalBranches.filter((n) => KU_WX[n.zhi]).map((n) => ({ ...n, kuWx: KU_WX[n.zhi] })),
     zhenYears: zhen.map((e) => e.year),
     catYears,
     hungYears,
+    dayunActivations,
     allCount: events.length,
     summary,
   };

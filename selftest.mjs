@@ -2911,6 +2911,10 @@ assert(by.catYears.includes(2036), '[994] catYears chứa 2036');
 const by2026t = by.events.find((e) => e.year === 2026);
 assert(by2026t && by2026t.tone === 'hung', '[994] 2026 bật Ấn(=仇, sinh Kỵ Tỷ Kiếp) → tone HUNG');
 assert(by.hungYears.includes(2026), '[994] hungYears chứa 2026');
+// [loop 997] 大运 chi activation — thập kỷ 丙辰[55-64t] mở kho 戌 → Tài(Dụng) CÁT cả 10 năm
+assert(Array.isArray(by.dayunActivations) && by.dayunActivations.length >= 3, '[997] có dayunActivations (≥3 thập kỷ kích hoạt)');
+const dyKu = by.dayunActivations.find((d) => d.type === 'xung mở kho' && d.branch === '戌');
+assert(dyKu && dyKu.tone === 'cat' && dyKu.ganZhi === '丙辰', '[997] đại vận 丙辰 mở kho 戌 → bật Tài(Dụng) CÁT cả thập kỷ');
 // 2026 xung 子 → Ấn, nhưng đại vận 己未(Tài, score>0) không cùng hướng → «thường» (không phải zhen)
 const by2026z = by.events.find((e) => e.year === 2026);
 assert(by2026z && by2026z.grade !== 'zhen', '2026 kích hoạt Ấn trong đại vận Tài → KHÔNG phải 真应期 (khác hướng)');
