@@ -8643,5 +8643,22 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1028] 情志养ổ (五志: «X thương tạng» + dominant/vulnerable) ✓`);
 }
 
+// [loop 1029] name.js STROKES — 康熙 nét đúng + đỡ dead-end "nhập nét tay"
+{
+  const { STROKES, analyzeName } = await import('./src/engine/name.js');
+  //康熙 nét: 木4/火4/土3, 东(東)8/马(馬)10/龙(龍)16, 清(水4+青8)=12 (không phải 11 modern)
+  assert(STROKES['木'] === 4 && STROKES['火'] === 4 && STROKES['土'] === 3, `[loop 1029] ngũ hành nét (木/火/土)`);
+  assert(STROKES['东'] === 8 && STROKES['马'] === 10 && STROKES['龙'] === 16, `[loop 1029] simplified→康熙 (东/马/龙)`);
+  assert(STROKES['清'] === 12, `[loop 1029] 清 = 12 康熙 (got ${STROKES['清']}, was 11 modern)`);
+  // analyzeName không còn needStrokes với các chữ phổ biến
+  const _r = analyzeName(['林', '木', '清']);
+  assert(!_r.needStrokes && _r.grids, `[loop 1029] 林木清 → không cần nhập nét tay (needStrokes=${_r.needStrokes})`);
+  if (_r.grids) {
+    const _g = Object.fromEntries(_r.grids.map((x) => [x.key, x.n]));
+    assert(_g.tian === 9 && _g.ren === 12 && _g.di === 16 && _g.zong === 24, `[loop 1029] 五格 林木清 đúng (天${_g.tian}/人${_g.ren}/地${_g.di}/总${_g.zong})`);
+  }
+  console.log(`   [loop 1029] name.js STROKES (康熙 nét: ngũ hành + simplified + 清) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
