@@ -99,7 +99,7 @@ import { scanWealthCareerYingqi } from './engine/yingqi-wealth.js';
 import { dominantGod } from './engine/dominant-god.js';
 import { analyzeYanQin } from './engine/yanqin.js';
 import { analyzeHealth } from './engine/health-analysis.js'; // [loop 183] Sức Khoẻ Ngũ Hành card
-import { WUX_ZANG, seasonalHealth, meridianClock, bodyConstitution } from './engine/tcm.js'; // [loop 1026/1027/1041/1045] đông-y cho health card
+import { WUX_ZANG, seasonalHealth, meridianClock, bodyConstitution, stageHealth } from './engine/tcm.js'; // [loop 1026/1027/1041/1045/1084] đông-y cho health card
 import { healthAlertScan } from './engine/health-alert.js'; // [loop 224 fix] quickSummary + health card timeline — trước đây KHÔNG import → quickSummary's health alert CHẾT (ReferenceError bị try/catch nuốt)
 import { qinxingOverview, qinxingCycle } from './engine/qinxing.js';
 import { analyzeTongGen } from './engine/tonggen.js';
@@ -3353,6 +3353,10 @@ function renderDailyCapsule(R) {
     const bestHour = bh?.best?.[0];
     const bestMonth = lm ? [...lm.months].sort((a,b)=>(b.score||0)-(a.score||0))[0] : null;
     const seasonVi = sz?.vi || '';
+    // [loop 1084] TCM theo 十二长生 sinh khí ngày — ngũ hành/khi vượng suy → tạng + đông-y
+    const _dmWx = R?.chart?.dayMaster?.wx;
+    const sh = lr?.dayStage ? stageHealth(_dmWx, lr.dayStage, lr.dayStageWeight || 0) : null;
+    const shCol = sh?.tone === 'suy' ? '#c33' : sh?.tone === 'thinh' ? '#2a7' : '#9a8';
 
     el.innerHTML = `
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
@@ -3364,6 +3368,7 @@ function renderDailyCapsule(R) {
         ${seasonVi ? `<span class="hint">· 🌿 Mùa này: <b>${esc(seasonVi)}</b></span>` : ''}
       </div>
       ${lr?.advice ? `<p class="hint" style="margin-top:6px">${esc(lr.advice)}</p>` : ''}
+      ${sh ? `<p class="hint" style="margin-top:4px"><b style="color:${shCol}">⚕️ ${esc(sh.headline)}</b> — ${esc(sh.advice)}</p>` : ''}
       ${capsuleDayunSpark(R)}`;
     // [loop 1077] sparkline → chạm mở nhóm + cuộn tới biểu đồ đại vận đầy đủ
     const spark = $('capsule-spark');

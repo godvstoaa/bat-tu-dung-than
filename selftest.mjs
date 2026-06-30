@@ -8717,6 +8717,34 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1083] 十二长生 + 盖头/截脚 tích hợp analyzeLiuRi (đóng đối xứng 4 cấp thời gian, thịnh ${_vib}/suy ${_dec}/12) ✓`);
 }
 
+// [loop 1084] stageHealth — 十二长生 sinh khí → tạng + đông-y (liên kết ngũ hành/khi vượng suy)
+//   user request: «đông y liên quan ngũ hành khí vượng suy». Mỗi hành + stage → tạng + advice.
+{
+  const { stageHealth, WUX_ZANG } = await import('./src/engine/tcm.js');
+  // 1. vibrant stage (帝旺 +8) → tone 'thinh', headline có tên tạng
+  for (const wx of ['木','火','土','金','水']) {
+    const zang = WUX_ZANG[wx].zang;
+    const vib = stageHealth(wx, 'Đế Vượng', 8);
+    assert(vib && vib.tone === 'thinh' && vib.headline.includes(zang) && /THỊNH/.test(vib.headline), `[loop 1084] ${wx} 帝旺 → ${vib?.tone}/${vib?.headline}`);
+    const dec = stageHealth(wx, 'Tuyệt', -7);
+    assert(dec && dec.tone === 'suy' && /SUY/.test(dec.headline) && /nourish|Bổ|Dưỡng|Kiện|Nhuận/.test(dec.advice), `[loop 1084] ${wx} Tuyệt → ${dec?.tone}, advice có dưỡng`);
+    const neu = stageHealth(wx, 'Thai', 0);
+    assert(neu && neu.tone === 'chuyen', `[loop 1084] ${wx} Thai → neutral`);
+  }
+  // 2. 木 帝旺 → 肝 (Gan) — đúng ngũ hành↔tạng mapping
+  const liver = stageHealth('木', '臨官', 8);
+  assert(/肝|Gan/.test(liver.headline), `[loop 1084] Mộc → tạng Gan (肝), got ${liver.headline}`);
+  // 3. 水 Tuyệt → 肾 (Thận) + bổ thận advice
+  const kidney = stageHealth('水', 'Tuyệt', -7);
+  assert(/肾|Thận/.test(kidney.headline) && /thận|đậu đen|kỷ tử|hà thủ ô/i.test(kidney.advice), `[loop 1084] Thủy → tạng Thận (肾) + nourish, got ${kidney.headline}`);
+  // 4. edge cases
+  assert(stageHealth('', 'Đế Vượng', 8) === null, '[loop 1084] thiếu wx → null (graceful)');
+  assert(stageHealth('木', '', 8) === null, '[loop 1084] thiếu stage → null (graceful)');
+  // 5. no leak
+  assert(!/undefined|NaN/.test(JSON.stringify(stageHealth('火', 'Bệnh', -5))), '[loop 1084] stageHealth không leak');
+  console.log(`   [loop 1084] stageHealth — 十二长生 sinh khí → tạng + đông-y (5 hành × 3 tone, ngũ hành↔tạng đúng) ✓`);
+}
+
 // [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 (合 layer completion)
 {
   const { evaluateDate } = await import('./src/engine/zheri.js');

@@ -502,6 +502,48 @@ export function seasonalHealth(monthZhi, R) {
 }
 
 /**
+ * [loop 1084] 十二長生 sinh khí → TCM tạng — liên kết «khí vượng suy» của Nhật Chủ
+ *   (theo day-stage 流日) với tạng tương ứng + lời khuyên đông y. Đúng yêu cầu user:
+ *   «đông y liên quan ngũ hành, khí vượng suy — người hay [mệt/thủ đâm...] nên ntn».
+ *   - stage 旺 (帝旺/臨官/長生/冠帶) → tạng THỰC, khí thịnh → hợp hoạt động, cẩn thận
+ *     «vượng cực sinh nội nhiệt», dễ thiên lệch ngũ chí + hội chứng «thực».
+ *   - stage suy (衰/病/死/墓/絕) → tạng HƯ → giữ sức, bồi bổ (nourish).
+ *   - stage trung chuyển (沐浴/胎/養) → duy trì điều hoà.
+ * @param {string} dayGanWx — ngũ hành Nhật Chủ (R.chart.dayMaster.wx)
+ * @param {string} stage  — 十二长生 stageVi (lr.dayStage)
+ * @param {number} stageW — stage weight (lr.dayStageWeight)
+ * @returns {{ tone, headline, advice } | null}
+ */
+export function stageHealth(dayGanWx, stage, stageW) {
+  if (!dayGanWx || !stage) return null;
+  const z = WUX_ZANG[dayGanWx];
+  if (!z) return null;
+  const zang = z.zang;        // '肝 (Gan)'
+  const emo = z.zhi;          // '怒 (giận)'
+  const _short = (s) => (s ? String(s).split(' — ')[0].split(' ')[0] : '');
+  if (stageW > 0) {
+    return {
+      tone: 'thinh',
+      headline: `${zang} khí THỊNH · ${stage}`,
+      advice: `Hôm nay ${zang} vượng → năng lượng dồi dào, hợp vận động/việc cần thể lực. Cẩn thận «vượng cực hoá nội nhiệt»: dễ thiên ${emo} + ${_short(z.shi[0])}. Điều tiết cảm xúc, tránh bồi bổ quá/tinh dầu dư.`,
+    };
+  }
+  if (stageW < 0) {
+    return {
+      tone: 'suy',
+      headline: `${zang} khí SUY · ${stage}`,
+      advice: `Hôm nay ${zang} suy → giữ sức, ngủ sớm (tránh thức đêm đoạt khí), bồi bổ nhẹ. Dễ ${_short(z.xu[0])}. ${z.nourish}`,
+    };
+  }
+  return {
+    tone: 'chuyen',
+    headline: `${zang} khí trung chuyển · ${stage}`,
+    advice: `Sinh khí đang chuyển — duy trì điều hoà, nuôi dưỡng ${zang} (tránh cực đoan).`,
+  };
+}
+
+
+/**
  * [loop 1039] 子午流注 (đồng hồ kinh mạch) — 12 时辰 → 12 kinh mạch khí đỉnh.
  *   Cổ法 «子午流注纳子法»: mỗi 时辰 (2h) có 1 kinh mạch khí huyết đỉnh.
  *   Nguồn: «黄帝内经·灵枢» kinh mạch tuần thứ: 寅肺→卯大肠→辰胃→巳脾→午心→未小肠→申膀胱→酉肾→戌心包→亥三焦→子胆→丑肝.
