@@ -266,6 +266,31 @@ export const CONDITION_KB = [
     symptoms: 'chán nản, mất hứng thú, bi quan, mệt mỏi, mất ngủ (hoặc ngủ nhiều), ăn kém, cảm giác vô vọng, hay khóc, giảm tập trung, đôi khi nghĩ tiêu cực.',
     advice: '① SƠ CAN GIẢI UẤT: sài hồ, hương phụ, uất kim, bạch thược, cam thảo (tiêu dao tán ý). ② BỔ TÂM-TỲ: đương quy, long nhãn, táo đỏ, sơn dược, kỷ tử (quy tỳ thang ý). ③ HOẠT HUYẾT: đan sâm, xích thược (chống huyết ư uất kết). ④ Vận động NGOÀI TRỜI (mặt trời, thiên nhiên — tăng serotonin). ⑤ Giao tiếp, chia sẻ, tránh cô lập. ⑥ Ngủ đủ, nhịp sống đều. ⑦ Trầm cảm nặng → khám tâm lý (thuốc + liệu pháp).',
   },
+  // [loop 1052] +3 bệnh thường gặp
+  {
+    id: 'dizziness',
+    keywords: ['chóng mặt', 'hoa mắt', 'chóng', 'đầu óc quay', 'vertigo', 'chóng mặt khi đứng', 'မြင်细胞', 'chóng khi đổi tư thế'],
+    title: 'Chóng mặt / Hoa mắt (CAN DƯƠNG THƯỢNG KHANG + khí huyết hư + đàm thấp)',
+    summary: 'Chóng mặt đông-y: (a) CAN DƯƠNG THƯỢNG KHANG — can khí theo dương đi lên (choáng vênh, căng đầu, HA cao); (b) KHÍ HUYẾT HƯ — não thiếu dưỡng (choáng khi đứng, mệt); (c) ĐÀM THẤP — đàm thấp蒙清 khiếu (choáng nặng, buồn nôn, đờm).',
+    symptoms: '(can dương) choáng vênh căng đầu, mắt hoa, HA cao; (khí huyết hư) choáng khi đứng dậy, mặt nhợt, mệt; (đàm thấp) choáng nặng ù tai, buồn nôn, đờm.',
+    advice: 'CAN DƯƠNG: ① bình can tiềm dương — thiên ma, câu đằng, thạch quyết minh, ngọc trúc (theo thầy thuốc). KHÍ HUYẾT HƯ: ② bổ khí huyết — đương quy, thục địa, táo đỏ, kỷ tử, đảng sâm. ĐÀM THẤP: ③ hoá đàm — bán hạ, trần bì, phục linh, thiên ma. ④ Tránh đổi tư thế đột ngột, giảm rượu/cay. ⑤ Chóng mặt kéo dài/nặng → khám (loại trừ tiền đình/não).',
+  },
+  {
+    id: 'obesity',
+    keywords: ['béo phì', 'thừa cân', 'giảm cân', 'mỡ bụng', 'obesity', 'nặng cân', 'béo', 'tập thể dục giảm cân'],
+    title: 'Béo phì / Thừa cân (TỲ HƯ ĐÀM THẤP + khí trệ)',
+    summary: 'Đông-y: TỲ HƯ ĐÀM THẤP là gốc — tỳ vận hoá kém → thuỷ thấp ứ → đàm thấp tích mỡ. Thường kèm khí hư (mệt, lười vận động → vòng luẩn quẩn). «Dục tri phì nhơn, đa đàm thấp».',
+    symptoms: 'thừa cân, mỡ bụng, nặng người, buồn ngủ, mệt, hay ăn ngọt/béo, đại tiện lỏng/nhớt, phù nhẹ.',
+    advice: '① KIỆN TỲ HOÁ ĐÀM: ý dĩ (misc), sơn dược, phục linh, trần bì, trạch tả, sơn tra. ② GIẢM ngọt/béo/tinh bột tinh/đường/sữa. ③ TĂNG rau xanh, đạm nạc, fibre. ④ VẬN ĐỘNG AEROBIC ĐỀU (đi bộ/bơi — 30+ phút/ngày). ⑤ Tránh ăn đêm, nhai kỹ. ⑥ Giấc ngủ đủ (thiếu ngủ → tăng cortisol → béo bụng). ⑦ Có bệnh nền (đường/HA/mỡ máu) → khám + theo dõi.',
+  },
+  {
+    id: 'allergy',
+    keywords: ['dị ứng', 'viêm mũi dị ứng', 'hắt hơi', 'sổ mũi', 'ngứa', 'mẩn ngứa', 'nổi mề đay', 'viêm da dị ứng', 'allergy', 'hen sơ'],
+    title: 'Dị ứng / Mẫn cảm (PHỔI VỆ BẤT CỐ + đặc bẩm chất)',
+    summary: 'Dị ứng = PHỔI VỆ KHÍ BẤT CỐ (phổi chủ bì mao + vệ khí — vệ khí yếu → ngoại tà/dị ứng nguyên xâm nhập dễ). Liên quan THẬN (thận chủ nạp khí, gốc của phổi) + TỲ (sinh hoá vệ khí). Trẻ em hay gặp (vệ khí chưa đầy).',
+    symptoms: 'hắt hơi/sổ mũi (viêm mũi dị ứng), ngứa/mẩn (mề đay), hen (khó thở), viêm da, mắt ngứa/nước mắt. Thời tiết/hoa/phấn hoa/graufoods gây.',
+    advice: '① CỐ BIỂU BỔ KHÍ: hoàng kỳ, bạch truật, phòng phong (ngự bình tán ý) — tăng sức đề kháng. ② Phổi: bách hợp, mạch môn, kê trứng (phụ). ③ TRÁNH dị ứng nguyên (phấn hoa, lông thú, bụi, hải sản). ④ Tăng sức đề kháng: vận động, ngủ đủ, giảm đường. ⑤ Dị ứng nặng/khó thở → khám (kháng histamine/xịt mũi/épinephrine nếu sốc).',
+  },
 ];
 
 /**
@@ -352,6 +377,8 @@ const CONDITION_WX = {
   xiao_ke: ['土', '水'], gout: ['土'], eczema: ['土', '木'], fatty_liver: ['木', '土'], prostate_bph: ['水', '土'],
   // [loop 1050] +2 tâm thần
   anxiety: ['火', '水', '木'], depression: ['木', '火', '土'],
+  // [loop 1052] +3 thường gặp
+  dizziness: ['木', '火'], obesity: ['土'], allergy: ['金', '土'],
 };
 
 /**
