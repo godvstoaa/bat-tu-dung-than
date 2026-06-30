@@ -3234,6 +3234,32 @@ function renderGoldenYear(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được năm hoàng kim.</p>'; }
 }
 
+// [loop 1059] Vận Trục Đại Vận — bar chart visual
+function renderDayunChart(R) {
+  const el = $('dayun-chart');
+  if (!el) return;
+  try {
+    const dayun = R.dayun || [];
+    if (!dayun.length) { el.innerHTML = '<p class="hint">Không có dữ liệu đại vận.</p>'; return; }
+    const bars = dayun.map((d) => {
+      const s = d.score || 0;
+      const h = Math.max(4, Math.abs(s) * 18);
+      const col = s >= 1 ? '#2a7' : s <= -1 ? '#c33' : '#9a8';
+      const bot = s >= 0 ? 'bottom:50%' : `top:50%`;
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:40px" title="${esc(d.ganZhi||'')} [${d.startAge}-${d.startAge+9}t] ${esc(d.rating||'')} (score ${s})">
+        <div style="position:relative;height:80px;width:100%;display:flex;align-items:center;justify-content:center">
+          <div style="position:absolute;${s>=0?'bottom:50%':'top:50%'};width:60%;max-width:36px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:0.85"></div>
+          <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--gold,dimgray);opacity:0.3"></div>
+        </div>
+        <span class="zh" style="font-size:12px">${esc(d.ganZhi||'')}</span>
+        <span class="hint" style="font-size:10px">${d.startAge}–${d.startAge+9}t</span>
+        <span class="hint" style="font-size:10px;color:${col}">${esc((d.rating||'').slice(0,8))}</span>
+      </div>`;
+    }).join('');
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:2px;padding:8px 0">${bars}</div><p class="hint" style="margin-top:4px">📊 Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh (cát/hung). Score từ chart.js: can+chi khớp Dụng.</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận trục.</p>'; }
+}
+
 function renderForecast5(R) {
   const el = $('forecast5');
   if (!el) return;
@@ -3874,6 +3900,7 @@ async function run() {
   lazyRender('tianxing-zheri', () => { try { renderTianxingZheri(); } catch (e) { console.warn('tianxing', e.message); } });
   lazyRender('golden-year',    () => { try { renderGoldenYear(currentResult); } catch (e) { console.warn('goldenyear', e.message); } });
   lazyRender('forecast5',      () => { try { renderForecast5(currentResult); } catch (e) { console.warn('forecast5', e.message); } });
+  lazyRender('dayun-chart',    () => { try { renderDayunChart(currentResult); } catch (e) { console.warn('dayun-chart', e.message); } });
 
   // quick-nav: jump links — [loop 936 FIX] theo GROUP header (~8) thay vì 165 card
   //   (165 chip overflow trên mobile → nav chính nó không dùng được). + scroll-spy active.
