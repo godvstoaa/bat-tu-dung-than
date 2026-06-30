@@ -16,6 +16,9 @@ const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅'
 // [loop 329] 六害 + 三刑 — ngày dọn nhà hại/hình tuổi chủ nhà cũng giảm (cùng bug-class loop 326-328)
 const HAI = { 子:'未', 未:'子', 丑:'午', 午:'丑', 寅:'巳', 巳:'寅', 卯:'辰', 辰:'卯', 申:'亥', 亥:'申', 酉:'戌', 戌:'酉' };
 const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌', 戌:'未', 未:'丑', 辰:'辰', 午:'午', 酉:'酉', 亥:'亥' };
+// [loop 1016 FIX] 六合 — ngày chi lục hợp tuổi chủ nhà = «日合岁» cát cho nhập trạch.
+//   Cùng bug-class loop 1014/1015: trước đây move-fs phạt 冲/害/刑 mà không thưởng 合.
+const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
 
 const RITUALS = [
   '① Chọn ngày cát (成/定/开 trực + 宜入宅 + không xung tuổi).',
@@ -90,6 +93,9 @@ export function evaluateMoveDate(year, month, day, userZhi, birthYear, gender) {
   const xingYou = !clashYou && XING[dZhi] === userZhi && dZhi !== userZhi;
   if (haiYou) { score -= 6; reasons.push(`• Hại tuổi chủ nhà (${ZHI[userZhi]?.vi}) — tiểu nhân/trệ sau khi dọn.`); }
   if (xingYou) { score -= 8; reasons.push(`• Hình tuổi chủ nhà (${ZHI[userZhi]?.vi}) — quanphi/thị phi.`); }
+  // [loop 1016] 六合 thưởng — ngày chi lục hợp tuổi chủ nhà → «日合岁» cát (đối xứng 冲罚).
+  const heYou = !clashYou && LIUHE[dZhi] === userZhi;
+  if (heYou) { score += 12; reasons.push(`💕 Hợp tuổi chủ nhà (${ZHI[userZhi]?.vi}) — «日合岁» lục hợp, thuận lợi nhập trạch.`); }
   if (!clashYou && !bigBad && !haiYou && !xingYou) { score += 8; reasons.push('✓ Không xung/hại/hình tuổi, không đại hung'); }
 
   // Hướng tốt để bước vào

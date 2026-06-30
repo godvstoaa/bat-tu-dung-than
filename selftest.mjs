@@ -8417,5 +8417,39 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1015] wedding-date 六合 reward (+12/spouse) — bug-class loop 1014 đóng ở module cưới ✓`);
 }
 
+// [loop 1016] move-fs + liuri 六合 reward — tiếp tục đóng bug-class 冲/合 (loop 1014/1015)
+{
+  const { evaluateMoveDate } = await import('./src/engine/move-fs.js');
+  const { analyzeLiuRi } = await import('./src/engine/liuri.js');
+  const { analyze } = await import('./src/engine/chart.js');
+  const { Solar } = await import('lunar-javascript');
+  // move-fs: 丑日 user=子 (六合) → +12
+  let mf = false;
+  for (let d = 1; d <= 30 && !mf; d++) {
+    if (Solar.fromYmdHms(2026, 6, d, 12, 0, 0).getLunar().getDayZhi() === '丑') {
+      const rHe = evaluateMoveDate(2026, 6, d, '子', 1990, 'nam');
+      const rNo = evaluateMoveDate(2026, 6, d, '寅', 1990, 'nam');
+      assert(rHe.score - rNo.score === 12, `[loop 1016] move-fs 六合 = +12 (got ${rHe.score - rNo.score})`);
+      mf = true;
+    }
+  }
+  assert(mf, '[loop 1016] tìm ngày 丑 move-fs');
+  // liuri: 合 tuổi → +5 (Hợp tuổi school). Dùng chart 1990 庚午 (午), day 未 (LIUHE[午]=未)
+  const R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const byz = R.chart.pillars.year.zhi; // 午
+  const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+  let lr = false;
+  for (let d = 1; d <= 30 && !lr; d++) {
+    if (Solar.fromYmdHms(2026, 6, d, 12, 0, 0).getLunar().getDayZhi() === LIUHE[byz]) {
+      const r = analyzeLiuRi(R, 2026, 6, d);
+      const he = (r.schools || []).filter((s) => s.phai === 'Hợp tuổi');
+      assert(he.length === 1 && he[0].d === 5, `[loop 1016] liuri 合 tuổi = +5 (got ${he.map((s) => s.d).join(',')})`);
+      lr = true;
+    }
+  }
+  assert(lr, '[loop 1016] tìm ngày hợp tuổi cho liuri');
+  console.log(`   [loop 1016] move-fs (+12) + liuri (+5/+6) 六合 reward — bug-class 冲/合 đóng ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

@@ -21,6 +21,9 @@ const HAI = { 子: '未', 未: '子', 丑: '午', 午: '丑', 寅: '巳', 巳: '
 // [loop 75] Thái tuế ngày đầy đủ (trước đây chỉ 冲+害, thiếu 刑+破) + 伏吟/反吟 trọng số (1 ngày, nhẹ nhất).
 const XING = { 子: '卯', 卯: '子', 寅: '巳', 巳: '申', 申: '寅', 丑: '戌', 戌: '未', 未: '丑', 辰: '辰', 午: '午', 酉: '酉', 亥: '亥' };
 const PO = { 子: '酉', 酉: '子', 丑: '辰', 辰: '丑', 寅: '亥', 亥: '寅', 卯: '午', 午: '卯', 巳: '申', 申: '巳', 戌: '未', 未: '戌' };
+// [loop 1016 FIX] 六合 — ngày chi lục hợp tuổi/Nhật Chi = «日合岁» cát. Cùng bug-class
+//   loop 1014/1015: liuri phạt 冲/刑/破/害 mà không thưởng 合 (dù có thưởng cát thần煞).
+const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
 const QIN_VI = { year: 'Niên Trụ (tổ bối)', month: 'Nguyệt Trụ (phụ mẫu/sự nghiệp)', day: 'Nhật Trụ (bản thân/phối ngẫu)', time: 'Thời Trụ (tử tức)' };
 const W_FUYIN_D = { day: 3, month: 2, year: 2, time: 2 };     // 伏吟 ngày (1 ngày, nhẹ nhất)
 const W_FANYIN_D = { month: 4, year: 3, time: 3 };            // 反吟 ngày (KHÔNG có day — 冲 Nhật Chi đã tính)
@@ -83,6 +86,9 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
   if (XING[birthYearZhi] === dZhi) { score -= 3; schools.push({ phai: 'Ngày刑太岁', d: -3, note: `Chi ngày hình chi tuổi — quan phi/thị phi nhẹ.` }); }
   if (PO[birthYearZhi] === dZhi) { score -= 2; schools.push({ phai: 'Ngày破太岁', d: -2, note: `Chi ngày phá chi tuổi — hao tiền nhẹ.` }); }
   if (HAI[birthYearZhi] === dZhi) { score -= 3; schools.push({ phai: 'Hại tuổi', d: -3, note: `Chi ngày hại chi tuổi — tiểu nhân, hao tốn nhẹ.` }); }
+  // [loop 1016] 六合 thưởng — đối xứng 冲 (合 tuổi +5 / 合 Nhật Chi +6, cùng guard double-count).
+  if (LIUHE[birthYearZhi] === dZhi) { score += 5; schools.push({ phai: 'Hợp tuổi', d: 5, note: `Chi ngày ${ZHI[dZhi].vi} LỤC HỢP chi tuổi ${ZHI[birthYearZhi].vi} — «日合岁» thuận hoà, quý nhân.` }); }
+  if (LIUHE[selfDayZhi] === dZhi && selfDayZhi !== birthYearZhi) { score += 6; schools.push({ phai: 'Hợp Nhật Chi', d: 6, note: `Chi ngày lục hợp Nhật Chi (bản thân) — yên bụng, sự việc trôi chảy.` }); }
 
   // (4) Thần sát ngày
   const grp = BRANCH_GROUP[birthYearZhi];
