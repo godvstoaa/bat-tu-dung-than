@@ -8684,6 +8684,39 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1082] 十二长生 + 盖头/截脚 tích hợp computeLiuyue (thịnh ${_vib}/suy ${_dec}, clash ${_clash}/harm ${_harm}) ✓`);
 }
 
+// [loop 1083] 十二長生 + 盖头/截脚 cho LƯU NHẬT — ĐÓNG đối xứng 4 cấp thời gian
+//   (大运/流年/流月/流日). analyzeLiuRi (feeds daily capsule) amplify theo stage + pillar.
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { analyzeLiuRi } = await import('./src/engine/liuri.js');
+  const { changSheng } = await import('./src/engine/core.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  // quét 10 ngày liên tiếp để có đa dạng stage/pillar
+  let _stageDays = 0, _psDays = 0, _stageSchool = 0, _psSchool = 0;
+  for (let d = 1; d <= 10; d++) {
+    const lr = analyzeLiuRi(_R, 2026, 7, d, _R.patternQuality);
+    if (lr.dayStage) _stageDays++;
+    if (lr.dayPillarStrength) _psDays++;
+    if (lr.schools.some((s) => /十二长生 sinh khí/.test(s.phai))) _stageSchool++;
+    if (lr.schools.some((s) => /盖头截脚 trụ ngày/.test(s.phai))) _psSchool++;
+    // cross-check dayStage khớp changSheng(dayGan, dayZhi) — dayZhi = ganZhi[1]
+    if (lr.dayStage) {
+      const _vi = { '長生':'Trường Sinh','沐浴':'Mộc Dục','冠帶':'Quan Đới','臨官':'Lâm Quan','帝旺':'Đế Vượng','衰':'Suy','病':'Bệnh','死':'Tử','墓':'Mộ','絕':'Tuyệt','胎':'Thai','養':'Dưỡng' }[changSheng(_R.chart.dayGan, lr.ganZhi[1])];
+      assert(_vi === lr.dayStage, `[loop 1083] dayStage khớp changSheng (ngày ${d}: ${_vi} vs ${lr.dayStage})`);
+    }
+  }
+  assert(_stageDays === 10, `[loop 1083] analyzeLiuRi expose dayStage mọi ngày (${_stageDays}/10)`);
+  assert(_psDays === 10, `[loop 1083] analyzeLiuRi expose dayPillarStrength mọi ngày (${_psDays}/10)`);
+  // 10 ngày phải có cả stage THỊNH lẫn SUY (do 12 chi tuần hoàn)
+  const _stages = []; for (let d = 1; d <= 12; d++) _stages.push(analyzeLiuRi(_R, 2026, 7, d, _R.patternQuality).dayStageWeight);
+  const _vib = _stages.filter((w) => w > 0).length, _dec = _stages.filter((w) => w < 0).length;
+  assert(_vib > 0 && _dec > 0, `[loop 1083] 12 ngày có sinh khí THỊNH(${_vib}) & SUY(${_dec})`);
+  // no leak
+  const _lr0 = analyzeLiuRi(_R, 2026, 7, 1, _R.patternQuality);
+  assert(!/undefined|NaN/.test(JSON.stringify(_lr0)), '[loop 1083] analyzeLiuRi không leak undefined/NaN');
+  console.log(`   [loop 1083] 十二长生 + 盖头/截脚 tích hợp analyzeLiuRi (đóng đối xứng 4 cấp thời gian, thịnh ${_vib}/suy ${_dec}/12) ✓`);
+}
+
 // [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 (合 layer completion)
 {
   const { evaluateDate } = await import('./src/engine/zheri.js');

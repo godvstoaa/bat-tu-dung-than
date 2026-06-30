@@ -7,13 +7,16 @@
 // ============================================================================
 import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI } from './constants.js';
-import { tenGod } from './core.js';
+import { tenGod, changSheng } from './core.js';
 import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, TIAN_YI, WEN_CHANG, JIANG_XING } from './shensha.js';
 // [loop 12] 格局流日喜忌 — cộng tầng 格局 LÊN TRÊN 4 trường phái (ngũ hành + thập
 //   thần ngày + xung + thần sát). Optional patternQuality → backward compatible.
 import { adjustLiuriByGeju } from './pattern-quality.js';
 // [loop 75 nâng tầng] 伏吟/反吟 ngày × 4 trụ nguyên cục (mirror 流月 loop 74 / 流年 loop 19).
 import { isFuyin, isFanyin } from './fuyin.js';
+// [loop 1083] 十二长生 + 盖头/截脚 ngày — đối xứng 4 cấp thời gian (大运/流年/流月/流日).
+import { STAGE_WEIGHT, STAGE_VI } from './dayun-changsheng.js';
+import { pillarRelation } from './pillar-quality.js'; // pillar-quality (KHÔNG phải pattern-quality)
 
 const wxVi = (w) => WX_VI[w];
 const CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
@@ -122,6 +125,33 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
   }
   if (fyNotes.length) { score += fyD; schools.push({ phai: 'Phục/Phản Ngâm ngày', d: fyD, note: fyNotes.join(', ') + (mitig ? ' (ngày mang Dụng/Hỷ → hung giảm)' : '') }); }
 
+  // [loop 1083] 十二長生 sinh khí NGÀY + 盖头/截脚 — «运好不如运旺» + «盖头截脚其力减半»
+  //   cho lưu nhật (đóng đối xứng 4 cấp: 大运/流年/流月/流日). Amplify-from-neutral (cùng 1080-1082).
+  let dayStageVi = '', dayStageW = 0;
+  {
+    const _st = changSheng(dayGan, dZhi);
+    dayStageW = STAGE_WEIGHT[_st] || 0;
+    dayStageVi = STAGE_VI[_st] || '';
+    if (dayStageW) {
+      const _pre = score;
+      const _f = 1 + dayStageW / 100;
+      score = Math.round(50 + (score - 50) * _f);
+      schools.push({ phai: '十二长生 sinh khí', d: score - _pre, note: `Ngày chi ${dZhi} → Nhật Chủ ${dayStageVi} · sinh khí ${dayStageW > 0 ? 'THỊNH (khuếch đại vận)' : 'SUY (co về neut)'} (factor ${_f.toFixed(2)})` });
+    }
+  }
+  let dayPsVi = '', dayPsFlow = 0;
+  {
+    const _rel = pillarRelation({ gan: dGan, zhi: dZhi });
+    dayPsFlow = _rel.flow;
+    dayPsVi = _rel.vi || '';
+    const _pf = _rel.flow > 0 ? 1.04 : _rel.flow < 0 ? 0.92 : 1.0;
+    if (_pf !== 1 && _rel.type && _rel.type !== '?') {
+      const _pre2 = score;
+      score = Math.round(50 + (score - 50) * _pf);
+      schools.push({ phai: '盖头截脚 trụ ngày', d: score - _pre2, note: `${dGan}${dZhi} = ${_rel.vi} · ${_rel.flow < 0 ? 'khí KHÔNG thông, lực ngày giảm' : 'can-chi sinh/bỉ hoà, khí thông'} (factor ${_pf.toFixed(2)})` });
+    }
+  }
+
   score = Math.max(5, Math.min(95, Math.round(score)));
   let rating;
   // [loop 469→470] recalibrate percentile + unify vocab (Kỵ→Hung cho khớp 流年/流月).
@@ -137,6 +167,8 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
     : `Hôm nay (${rating}) — bất lợi, giữ mình, tránh đầu tư/cho vay/cãi vã/đi xa liều, bao dung tình cảm.`;
 
   const result = { solar: s.toYmd(), ganZhi: dGan + dZhi, ganGod, ganWx, zhiWx, score, rating, schools, advice };
+  if (dayStageVi) { result.dayStage = dayStageVi; result.dayStageWeight = dayStageW; } // [loop 1083]
+  if (dayPsVi) { result.dayPillarStrength = dayPsVi; result.dayPillarFlow = dayPsFlow; } // [loop 1083]
   // [loop 12] Cộng tầng 格局流日喜忌 (optional, backward compatible).
   //   patternQuality truyền vào → cộng ★格局喜(+2)/⚠格局忌(−2) lên trên 4 trường phái.
   //   Không truyền → adjustLiuriByGeju trả clone với gejuDelta=0 (không thay đổi score).
