@@ -515,9 +515,18 @@ export function computeDaYun(year, month, day, hour, minute, gender, yong) {
     else if (_CH[dgZhi] === zhi) score -= 2; // 地冲 only
     if (gan + zhi === dGan + dgZhi) score -= 1; // 伏吟 — trùng phức
     const rating = _dayunRating(score); // [loop 454] shared scale w/ Đại cát/Đại hung
+    // [loop 998] clashType + mitigation flag — cổ法: 天克地冲 = biến loạn, NHƯNG nếu mang
+    //   hành DỤNG thì «đổi thay có lợi» (useful friction) thay vì đại hung. Ghi nhận nuance
+    //   (KHÔNG đổi score/rating — giữ logic loop 423; chỉ làm rõ cho AI/user).
+    let clashType = null;
+    if (_GC[dGan] === gan && _CH[dgZhi] === zhi) clashType = '天克地冲';
+    else if (_CH[dgZhi] === zhi) clashType = '地冲';
+    else if (gan + zhi === dGan + dgZhi) clashType = '伏吟';
+    const clashMitigated = clashType === '天克地冲' && (favSet.has(ganWx) || favSet.has(zhiWx));
     out.push({ ganZhi: gz, gan, zhi, ganWx, zhiWx,
       startAge: dy.getStartAge(), startYear: dy.getStartYear(),
-      ganGod: tenGod(dGan, gan), zhiGod: tenGod(dGan, HIDDEN[zhi][0]), score, rating });
+      ganGod: tenGod(dGan, gan), zhiGod: tenGod(dGan, HIDDEN[zhi][0]), score, rating,
+      clashType, clashMitigated });
   }
   return out;
 }

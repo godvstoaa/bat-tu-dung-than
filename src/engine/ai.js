@@ -210,6 +210,9 @@ export function buildChartBrief(R) {
       if (d.gejuDelta < 0) tags.push('⚠格局忌');
       if (d.gejuRescue) tags.push('★RESCUES');
       if (d.gejuWorsen) tags.push('⚠WORSENS');
+      if (d.clashType === '天克地冲') tags.push(d.clashMitigated ? '⚡天克地冲(mangDụng→đổithayCÓLỢI)' : '⚡天克地冲(đạiLoạn)');
+      else if (d.clashType === '地冲') tags.push('⚡地冲(biếnĐộng)');
+      else if (d.clashType === '伏吟') tags.push('⚡伏吟(trùPhúc)');
       const tagStr = tags.length ? '|' + tags.join('|') : '';
       return `${hanviet(d.ganZhi)}[${d.startAge}-${d.startAge + 9}t:${d.rating}${tagStr}]`;
     }).join(' ');

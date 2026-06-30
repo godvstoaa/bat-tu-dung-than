@@ -652,6 +652,15 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
     for (const dd of r.dayun) { if (_exp(dd.score) !== dd.rating) { bad++; } }
   }
   assert(bad === 0, `[loop 628] mọi đại vận rating nhất quán với score (threshold Đại cát≥5) — ${bad} lệch`);
+  // [loop 998] clashType + Dụng mitigation — 天克地冲 mang Dụng → mitigated=true (không đổi score)
+  {
+    const _tkR = analyze(1978, 4, 25, 12, 0, 'nam', 2026); // 丁火, dayun 癸亥 = 天克地冲 + 水(=Dụng)
+    const _tk = _tkR.dayun.find((d) => d.ganZhi === '癸亥');
+    assert(_tk && _tk.clashType === '天克地冲', '[998] dayun 癸亥 = 天克地冲 日柱');
+    assert(_tk && _tk.clashMitigated === true, '[998] 天克地冲 mang hành Dụng(水) → mitigated (đổi thay CÓ LỢI)');
+    const _nontk = _tkR.dayun.find((d) => !d.clashType);
+    assert(_nontk, '[998] có dayun không clash (clashType=null)');
+  }
   // specific: Quân 己未 (age 25-34, hiện tại) score≥5 phải = Đại cát (trước fix = «Cát» sai)
   const rq = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
   const jw = rq.dayun.find((dd) => dd.ganZhi === '己未');
