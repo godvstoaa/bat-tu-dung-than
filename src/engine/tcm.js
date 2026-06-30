@@ -146,7 +146,7 @@ export const CONDITION_KB = [
   },
   {
     id: 'back_knee',
-    keywords: ['đau lưng', 'đau thắt lưng', 'đau đầu gối', 'mỏi lưng', 'thắt lưng mỏi', '腰痛', 'khớp', 'đau cột sống'],
+    keywords: ['đau lưng', 'đau thắt lưng', 'đau đầu gối', 'mỏi lưng', 'thắt lưng mỏi', '腰痛', 'đau cột sống'],
     title: 'Đau lưng / Đầu gối (THẬN HƯ — «lưng là phủ của thận»)',
     summary: '«腰为肾之府» (thắt lưng là nhà của thận). Đau lưng mỏi (không phải chấn thương) thường = THẬN HƯ: mỏi ê ẩm, mệt thì nặng, nghỉ thì nhẹ. Cột sống/khớp = thận chủ cốt (xương). Đau lưng cấp/nặng = thấp nhiệt/ủ huyết (thực chứng).',
     symptoms: '(thận hư) thắt lưng/đầu gối mỏi ê ẩm, mệt/đứng lâu nặng, kèm tiểu đêm/tóc rụng/choáng; ( thấp nhiệt) đau trương nặng + tiểu vàng; (ủ huyết) đau nhói cố định.',
@@ -207,6 +207,47 @@ export const CONDITION_KB = [
     summary: 'Khoảng 45-55 tuổi, THẬN ÂM dần suy, thiên quý (tinh sinh dục) cạn → «âm hư hoả vượng»: bốc hoả/âm đạo khô/kinh rối. Là chuyển giao tự nhiên, không bệnh nếu cân bằng được. Dưỡng thận âm giúp qua giai đoạn êm.',
     symptoms: 'nóng bừng mặt/cổ, đổ mồ hôi, mất ngủ, bứt rứt/căng thẳng, âm đạo khô, da khô, hay quên, tim trống, kinh rối rồi tắt.',
     advice: '① DƯỠNG THẬN ÂM: thục địa, sơn dược, sơn thù du, mạch môn, quy bản; đậu đen, vừng đen, kỷ tử. ② THANH HƯ HOẢ: cúc hoa, đậu xanh, sen tâm, khổ qua. ③ Giảm cay nóng/rượu/đường. ④ Vận động nhẹ, yoga, ngủ đủ, bớt lo âu. ⑤ Canxi (sữa/đậu/mè) bảo vệ xương (thận chủ cốt). Triệu chứng nặng → khám nội tiết.',
+  },
+  // [loop 1038] +5 bệnh mãn tính thường gặp
+  {
+    id: 'xiao_ke',
+    keywords: ['tiểu đường', 'đái tháo đường', 'đái nhiều', 'khát nước nhiều', '消渴', 'đường huyết cao', 'huyết đường', 'insulin', 'đường trong máu'],
+    title: 'Tiểu đường (TIÊU KHÁT 消渴 — tam tiêu: thượng/trung/hạ tiêu)',
+    summary: 'Đông-y gọi TIÊU KHÁT, chia TAM TIÊU: (a) THƯỢNG TIÊU — phổi nhiệt, khát uống nhiều; (b) TRUNG TIÊU — vị nhiệt, ăn nhiều hay đói; (c) HẠ TIÊU — thận hư, tiểu nhiều đục. Bệnh ở PHỔI - VỊ - THẬN (âm hư táo nhiệt).',
+    symptoms: 'khát nhiều/uống nhiều/ăn nhiều/tiểu nhiều («tam đa»), miệng khô, người gầy, mệt, da ngứa, vết thương khó lành.',
+    advice: '① Dưỡng âm thanh nhiệt: thiên hoa phấn, mạch môn, ngọc trúc, thạch斛, hoài sơn (sơn dược), kê (millet). ② Hạ tiêu (thận) — ngũ vị tử, sơn thù du, thục địa. ③ Ăn: mướp đắng, khổ qua, bí xanh, yến mạch, đậu đen; GIẢM đường/tinh bột tinh. ④ Vận động đều (đi bộ), kiểm soát cân nặng. ⑤ Theo dõi đường huyết + thuốc y khoa (đông-y bổ trợ, không thay thế insulin).',
+  },
+  {
+    id: 'gout',
+    keywords: ['gout', 'thống phong', 'đau khớp ngón chân cái', 'axit uric', 'viêm khớp cấp', '痛风', 'sưng khớp', 'đau khớp dữ dội'],
+    title: 'Gout / Thống phong (THỐNG PHONG 痛风 — thấp nhiệt tê痹 / đàm trọc ủ huyết)',
+    summary: 'Đông-y THỐNG PHONG (thấp nhiệt痹) — đau khớp dữ dội (thường ngón chân cái), sưng đỏ, về đêm nặng. Do thấp nhiệt + đàm trọc ủ huyết ở kinh lạc. Thường kèm TỲ VỊ thấp nhiệt (ăn giàu purin/đồ uống).',
+    symptoms: 'đau khớp dữ dội (thường ngón chân cái), sưng đỏ nóng, về đêm nặng hơn, da bong, hạn chế vận động. Mạn tính: hạt tophi.',
+    advice: '① Thanh thấp nhiệt, thông lạc: thổ phục linh, xa tiền tử, hoàng bá, thương nhĩ tử, ý dĩ. ② Giảm purin: tránh nội tạng động vật, hải sản, thịt đỏ, rượu bia, nước hầm đặc. ③ Uống nhiều nước ấm. ④ Ý dĩ + bí xanh + mướp đắng nấu canh. ⑤ Cấp tính → khám y khoa (thuốc hạ axit uric/colchicine); đông-y bổ trợ giảm đau + phòng tái phát.',
+  },
+  {
+    id: 'eczema',
+    keywords: ['chàm', 'eczema', 'viêm da cơ địa', 'ngứa da', 'dị ứng da', '湿疹', 'nổi mẩn ngứa', 'da khô ngứa'],
+    title: 'Chàm / Eczema (THẤP CHUYỂN 湿疹 — thấp nhiệt + huyết hư phong táo)',
+    summary: 'Đông-y THẤP CHUYỂN: (a) CẤP — thấp nhiệt uất ở da (mẩn đỏ, chảy nước, ngứa); (b) MẠN — huyết hư phong táo (da khô, dày, ngứa, bong vảy). Liên quan TỲ (thấp) + CAN (huyết) + PHỔI (bì mao).',
+    symptoms: '(cấp) mẩn đỏ, mụn nước, chảy dịch, ngứa nhiều; (mạn) da khô dày, vảy, thâm, ngứa về đêm, tái đi tái lại.',
+    advice: '① Thanh thấp nhiệt (cấp): khổ sâm, địa phu tử, thổ phục linh, kim ngân hoa, ý dĩ. ② Dưỡng huyết nhuận táo (mạn): đương quy, thục địa, hà thủ ô, kinh giới. ③ Tránh dị ứng (hải sản, gia vị, cỏ, lông); giữ ẩm da. ④ Không gãi (lây/nhiễm). ⑤ Tỳ thấp → giảm đường/sữa/dầu.',
+  },
+  {
+    id: 'fatty_liver',
+    keywords: ['gan nhiễm mỡ', 'nhiễm mỡ gan', 'fatty liver', 'men gan cao', '脂肪肝', 'đau tức hạ sườn phải', 'tăng men gan'],
+    title: 'Gan nhiễm mỡ (脂肪肝 — can uất tỳ hư + đàm thấp ứ trệ)',
+    summary: 'Đông-y: CAN UẤT TỲ HƯ + đàm thấp ứ trệ ở can. Ăn nhiều mỡ/đường/đồ uống + ít vận động → tỳ vận hoá kém, đàm thấp sinh, uất ở can. Thường kèm CAN uất (stress) + THẬN hư.',
+    symptoms: 'mệt mỏi, tức nặng hạ sườn phải, chán ăn, đầy bụng, trào ngược, men gan (ALT/AST) tăng, siêu âm thấy gan sáng (nhiễm mỡ).',
+    advice: '① Sơ can kiện tỳ, hoá đàm: sài hồ, ý dĩ, quyết minh tử, sơn tra (tra quả), đan sâm, trạch tả. ② Atiso, chè mát gan, cúc hoa, diệp hạ châu. ③ Giảm mỡ/đường/rượu/tinh bột tinh; tăng rau xanh/cá. ④ Vận động aerobic đều (giảm mỡ gan). ⑤ Giảm cân nếu béo; kiểm soát men gan định kỳ.',
+  },
+  {
+    id: 'prostate_bph',
+    keywords: ['tiền liệt tuyến', 'phì đại tiền liệt tuyến', 'tiểu khó', 'tiểu nhát', 'đái dắt', 'bệnh tiền liệt', '前列腺', 'tiểu đêm nhiều nam'],
+    title: 'Phì đại tiền liệt tuyến / BPH (THẬN HƯ + thấp nhiệt hạ chú)',
+    summary: 'Đông-y thuộc «tinh lỵ»/«lâm trọc»/«u bì»: THẬN KHÍ HƯ (khí hoá kém) + thấp nhiệt hạ chú ở bàng quang. Lớn tuổi → thận dương/khí hư dần, kèm thấp nhiệt (tiểu gắt, đục).',
+    symptoms: 'tiểu khó/tiểu nhát, dòng yếu, tiểu đêm nhiều, tiểu xong vẫn còn cảm, đôi khi tiểu buốt/đục, tức nặng hạ bộ.',
+    advice: '① Bổ thận khí, hoá thấp thông lâm: sơn dược, sơn thù du, phục linh, xa tiền tử, trạch tả, thỏ ty tử. ② Giảm cay nóng/rượu/thức khuya. ③ Bí xanh, râu ngô, mộc nhĩ nấu canh. ④ Không ngồi lâu, vận động (đi bộ), giữ ấm hạ bộ. ⑤ Tiểu khó nặng/đái máu → khám tiết niệu (loại trừ ung thư tiền liệt tuyến).',
   },
 ];
 
@@ -290,6 +331,8 @@ const CONDITION_WX = {
   back_knee: ['水'], constipation: ['金'], sweat: ['金', '水'],
   stomach_pain: ['土', '木'], dysmenorrhea: ['木', '水'],
   irregular_period: ['木', '土', '水'], infertility: ['水', '木'], menopause: ['水'],
+  // [loop 1038] +5 bệnh mãn tính
+  xiao_ke: ['土', '水'], gout: ['土'], eczema: ['土', '木'], fatty_liver: ['木', '土'], prostate_bph: ['水', '土'],
 };
 
 /**

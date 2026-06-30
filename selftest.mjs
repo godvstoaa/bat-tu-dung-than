@@ -4140,7 +4140,7 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   const _QR = analyze(1993, 10, 21, 1, 15, 'nam', 2026);
   const _t = composeAnswer('hôm nay nên làm gì?', _QR).paragraphs.find((p) => /📅/.test(p)) || '';
   const _m = composeAnswer('ngày mai nên làm gì?', _QR).paragraphs.find((p) => /📅/.test(p)) || '';
-  assert(_t.substring(0, 12) !== _m.substring(0, 12), `[loop 834] «hôm nay»(${_t.slice(3, 13)}) ≠ «ngày mai»(${_m.slice(3, 13)}) — date offset đúng`);
+  assert(_t.substring(0, 14) !== _m.substring(0, 14), `[loop 834] «hôm nay»(${_t.slice(3, 13)}) ≠ «ngày mai»(${_m.slice(3, 13)}) — date offset đúng (substring 14 bắt trọn ngày)`);
   console.log('   [loop 834] pDaily date offset («ngày mai» → tomorrow, «hôm qua» → yesterday) ✓');
 }
 // [loop 835] «hôm qua» date offset — yesterday (-1 day from today).
@@ -8793,6 +8793,22 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   for (const tbl of [SURNAME_VI, NAME_VI]) for (const [, info] of Object.entries(tbl)) if (STROKES[info.han] != null && STROKES[info.han] !== info.strokes) _inc++;
   assert(_inc === 0, `[loop 1037] vi2han↔name.js consistent (${_inc})`);
   console.log(`   [loop 1037] vi2han +6 họ phổ biến (Lý/Lương/Tô/Đàm/Chung/Chu) → ${Object.keys(SURNAME_VI).length} họ, ${Object.keys(SURNAME_VI).length + Object.keys(NAME_VI).length} tổng ✓`);
+}
+
+// [loop 1038] đông-y KB +5 bệnh mãn tính (tiểu đường/gout/chàm/gan nhiễm mỡ/tiền liệt tuyến)
+{
+  const { answerHealth, CONDITION_KB } = await import('./src/engine/tcm.js');
+  const _cases = [['tiểu đường','xiao_ke'],['gout đau khớp','gout'],['chàm eczema','eczema'],['gan nhiễm mỡ','fatty_liver'],['phì đại tiền liệt tuyến','prostate_bph']];
+  let _ok = 0;
+  for (const [q, exp] of _cases) {
+    const a = answerHealth(q, null);
+    if (a.matched && a.id === exp) _ok++; else console.log(`     ✗ ${q} → ${a.id}`);
+  }
+  assert(_ok === _cases.length, `[loop 1038] 5 bệnh mãn tính match (got ${_ok}/5)`);
+  assert(CONDITION_KB.length >= 22, `[loop 1038] KB ≥ 22 (got ${CONDITION_KB.length})`);
+  const _kb = JSON.stringify(CONDITION_KB);
+  assert(!/\b(bed|got|kwoc|BANH CAN)\b/i.test(_kb), '[loop 1038] KB không garbled');
+  console.log(`   [loop 1038] đông-y KB +5 bệnh mãn tính (tiểu đường/gout/chàm/gan mỡ/tiền liệt) → ${CONDITION_KB.length} tổng ✓`);
 }
 
 process.exit(FAILS === 0 ? 0 : 1);
