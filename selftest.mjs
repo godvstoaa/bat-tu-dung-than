@@ -4316,7 +4316,11 @@ import { YEAR_WEIGHT } from './src/engine/chenggu.js';
 assert(YEAR_WEIGHT[12] === 1.6, '丙子 year weight 1.6 (loop 517 fix)');
 assert(YEAR_WEIGHT[13] === 0.8, '丁丑 year weight 0.8');
 assert(YEAR_WEIGHT[21] === 1.5, '乙酉 year weight 1.5');
-assert(YEAR_WEIGHT[48] === 0.7, '壬子 year weight 0.7');
+assert(YEAR_WEIGHT[48] === 0.5, '[loop 1031] 壬子 year weight 0.5 (三命通会 chuẩn, 517 từng đặt 0.7 sai)');
+// [loop 1031] verify 4 称骨 year weights fixed vs 三命通会 authoritative
+assert(YEAR_WEIGHT[31] === 0.6, `[loop 1031] 乙未 = 0.6 (got ${YEAR_WEIGHT[31]})`);
+assert(YEAR_WEIGHT[44] === 1.4, `[loop 1031] 戊申 = 1.4 (got ${YEAR_WEIGHT[44]})`);
+assert(YEAR_WEIGHT[57] === 1.6, `[loop 1031] 辛酉 = 1.6 (got ${YEAR_WEIGHT[57]})`);
 // Tất định
 const ssDet = sanshishu(ssR);
 assert(JSON.stringify(ss) === JSON.stringify(ssDet), 'sanshishu deterministic');
