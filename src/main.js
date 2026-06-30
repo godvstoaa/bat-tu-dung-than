@@ -182,6 +182,7 @@ import { dailyBriefing } from './engine/daily-briefing.js';
 import { chenggu } from './engine/chenggu.js';
 import { sanshishu } from './engine/sanshishu.js';
 import { heluo } from './engine/heluo.js';
+import { computeTojeong } from './engine/tojeong.js';
 import { hexagramSynthesis } from './engine/hexagram-synthesis.js';
 import { hexagramMeaning } from './engine/hexagram-meaning.js';
 import { huangdao12, renderHuangdaoCard } from './engine/huangdao.js';
@@ -985,6 +986,43 @@ function renderYizhangjing(R) {
     const yz = yizhangjingCast(R);
     el.innerHTML = renderYizhangjingCard(yz);
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 一掌经.</p>'; }
+}
+
+// [loop 1009] 토정비결 (土亭秘訣) — vận NĂM Hàn Quốc, 144 quẻ thái tuế
+function renderTojeong(R) {
+  const el = $('tojeong');
+  if (!el) return;
+  try {
+    const i = R.chart.input || {};
+    const t = computeTojeong({
+      birthSolarYear: i.year, birthSolarMonth: i.month, birthSolarDay: i.day, hour: (i.hour ?? 12),
+      yong: R.yong ? { primary: R.yong.primary, ji: R.yong.ji, xi: R.yong.xi } : null,
+    });
+    if (!t.ok) { el.innerHTML = `<p class="hint">${esc(t.error || 'Không tính được 토정비결.')}</p>`; return; }
+    const WX_VI = { '木': 'Mộc', '火': 'Hỏa', '土': 'Thổ', '金': 'Kim', '水': 'Thủy' };
+    const HUE = {
+      'cát': ['rate-cat', 'CÁT — ngũ hành năm trúng Dụng/Hỷ, nền vận tốt'],
+      'tiểu-cát': ['rate-mid', 'TIỂU CÁT — một nửa trúng Dụng, khá ổn'],
+      'bình': ['rate-mid', 'BÌNH — ngũ hành năm trung tính'],
+      'tiểu-hung': ['rate-mid', 'TIỂU HUNG — một phần trúng Kỵ, nên cẩn trọng'],
+      'hung': ['rate-hung', 'HUNG — ngũ hành năm trúng Kỵ/Thù, giữ gìn'],
+    };
+    const hueInfo = HUE[t.hue] || ['', ''];
+    const b = t.birth;
+    el.innerHTML = `
+      <div class="cg-head">
+        <div class="cg-total"><span class="zh big" style="letter-spacing:6px">${esc(t.gua)}</span> <span class="hint-inline">(종합괘 · 144 quẻ)</span></div>
+      </div>
+      <p class="cg-breakdown hint">Vận năm <b>${t.targetYear}</b> (${esc(t.targetGanZhi)} · ${esc(GAN[t.targetGanZhi[0]]?.vi)||''} ${esc(ZHI[t.targetGanZhi[1]]?.vi)||''}) · tuổi Hàn <b>${t.koreanAge}</b> · thái tuế ${esc(t.targetGanZhi)}</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0">
+        <div style="text-align:center;padding:6px 4px;background:rgba(247,236,203,0.08);border-radius:4px"><div class="zh big">${t.sang}</div><div class="hint">상괘 · 태세수<br><span class="zh">${esc(t.detail.targetGanZhi)}</span></div></div>
+        <div style="text-align:center;padding:6px 4px;background:rgba(247,236,203,0.08);border-radius:4px"><div class="zh big">${t.jung}</div><div class="hint">중괘 · 월건수<br><span class="zh">${esc(t.detail.wolkun)}</span></div></div>
+        <div style="text-align:center;padding:6px 4px;background:rgba(247,236,203,0.08);border-radius:4px"><div class="zh big">${t.ha}</div><div class="hint">하괘 · 일진수<br><span class="zh">${esc(t.detail.birthDayGanZhi)}</span></div></div>
+      </div>
+      <p class="cg-interp"><b>Sinh (ÂL):</b> ${b.lunarYear} năm, tháng ${b.lunarMonth}${b.isLeap ? ' (nhuận)' : ''}, ngày ${b.lunarDay} (${esc(b.dayGanZhi)}, ${b.dayCount} ngày/tháng).</p>
+      <p class="cg-interp"><b>Ngũ hành năm:</b> can ${WX_VI[t.yearWx.ganWx]||t.yearWx.ganWx} · chi ${WX_VI[t.yearWx.zhiWx]||t.yearWx.zhiWx}.${t.hue ? ` <span class="ln-rate ${hueInfo[0]}">${esc(hueInfo[1])}</span>` : ''}</p>
+      <p class="hint" style="margin-top:6px">${esc(t.note)}</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được 토정비결.</p>'; }
 }
 
 // [loop 546] 六道轮回 (ṣaḍ-gati) — BaZi → tam độc → khuynh hướng 6 đạo
@@ -3724,6 +3762,7 @@ async function run() {
   lazyRender('chenggu',        () => { try { renderChenggu(currentResult); } catch (e) { console.warn('chenggu', e.message); } });
   lazyRender('sanshishu',      () => { try { renderSanshishu(currentResult); } catch (e) { console.warn('sanshishu', e.message); } });
   lazyRender('heluo',          () => { try { renderHeluo(currentResult); } catch (e) { console.warn('heluo', e.message); } });
+  lazyRender('tojeong',        () => { try { renderTojeong(currentResult); } catch (e) { console.warn('tojeong', e.message); } });
   lazyRender('yizhangjing',    () => { try { renderYizhangjing(currentResult); } catch (e) { console.warn('yizhangjing', e.message); } });
   lazyRender('liudao',         () => { try { renderLiuDao(currentResult); } catch (e) { console.warn('liudao', e.message); } });
   lazyRender('consensus',      () => { try { renderConsensus(currentResult); } catch (e) { console.warn('consensus', e.message); } });

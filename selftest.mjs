@@ -8268,5 +8268,23 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   assert(!_ok2.error && _ok2.rating, '[loop 741] analyze_year 2026 → OK');
   console.log('   [loop 741] analyze_year/best_days_in_year year-range (1000-3000) ✓ — reject -100/9999, OK historical/hiện tại');
 }
+// [loop 1009] 토정비결 (土亭秘訣) — thuật toán 작괘법 + 조견표 60갑자, nghiệm chứng
+//   2 ví dụ mẫu của 중앙일보/대자재苑. Pure-math _guaFromLunar (không lệ thuộc đổi ÂL).
+{
+  const { _guaFromLunar, computeTojeong } = await import('./src/engine/tojeong.js');
+  // ① target 2010 庚寅, tuổi 32, ÂL 7/15 소월(29), 일진 丙午 → 232
+  const _a = _guaFromLunar({ targetGanZhi: '庚寅', koreanAge: 32, birthLunarMonth: 7, dayCount: 29, birthLunarDay: 15, birthDayGanZhi: '丙午' });
+  assert(_a.gua === '232' && _a.detail.wolkun === '甲申', `[loop 1009] 토정비결 ex① = 232 (got ${_a.gua}, wolkun ${_a.detail.wolkun})`);
+  // ② target 2012 壬辰, tuổi 40, ÂL 4/5 대월(30), 일진 丙戌 → 362
+  const _b = _guaFromLunar({ targetGanZhi: '壬辰', koreanAge: 40, birthLunarMonth: 4, dayCount: 30, birthLunarDay: 5, birthDayGanZhi: '丙戌' });
+  assert(_b.gua === '362' && _b.detail.wolkun === '乙巳', `[loop 1009] 토정비결 ex② = 362 (got ${_b.gua}, wolkun ${_b.detail.wolkun})`);
+  // 60갑자 조견표 phải có đủ + dạng [태,월일] hợp lệ
+  assert(_a.sang >= 1 && _a.sang <= 8 && _a.jung >= 1 && _a.jung <= 6 && _a.ha >= 1 && _a.ha <= 3, '[loop 1009] 상1-8 / 중1-6 / 하1-3 range');
+  // end-to-end computeTojeong (đổi ÂL) — không leak undefined/NaN, gua đúng dạng 3 số
+  const _c = computeTojeong({ birthSolarYear: 1990, birthSolarMonth: 6, birthSolarDay: 15 });
+  assert(_c.ok && /^\d{3}$/.test(_c.gua) && !/undefined|NaN/.test(JSON.stringify(_c)), `[loop 1009] computeTojeong OK (gua ${_c.gua}, target ${_c.targetGanZhi})`);
+  console.log(`   [loop 1009] 토정비결 작괘법 + 조견표 (232/362 verified) ✓ — current@${_c.targetYear} ${_c.targetGanZhi}`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
