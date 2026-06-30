@@ -139,10 +139,37 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
     }
   }
 
-  // 3) Tổng kết — ưu tiên năm «xung mở kho» (mạnh nhất), sau đó các kích hoạt khác.
+  // 3) GRADING — 大运为根，流年为苗. Một năm kích hoạt chỉ «phát thật» khi ĐẠI VẬN
+  //    (thổ nhưỡng 10 năm) cùng hướng; nếu đại vận nghịch/Kỵ → lực bị suy giảm.
+  //    Phân loại mỗi event: «真应期» (đại vận củng cố cùng nhóm sao) / «⚠ giảm lực» (kỵ vận) / «thường».
+  const dyList = Array.isArray(R.dayun) ? R.dayun : [];
+  const activeDy = (year) => dyList.find((d) => d && d.startYear != null && d.startYear <= year && year < d.startYear + 10) || null;
+  for (const e of events) {
+    const dy = activeDy(e.year);
+    if (!dy) { e.grade = 'chang'; e.viGrade = 'thường'; e.dyNote = ''; e.dy = null; continue; }
+    const dyGroups = new Set([godGroup(dy.ganGod), godGroup(dy.zhiGod)].filter(Boolean));
+    const dyGrpVi = [...dyGroups].map((g) => GROUP_VI[g]).filter(Boolean).join('+') || '?';
+    const aligned = e.groups.some((g) => dyGroups.has(g.group));
+    e.dy = dy.ganZhi;
+    if (aligned) {
+      e.grade = 'zhen'; e.viGrade = '★真应期';
+      e.dyNote = `Đại vận ${dy.ganZhi} (${dyGrpVi}) CÙNG HƯỚNG → khuếch đại, «真应期» (lực mạnh nhất).`;
+    } else if (typeof dy.score === 'number' && dy.score < 0) {
+      e.grade = 'zu'; e.viGrade = '⚠ giảm lực';
+      e.dyNote = `Đại vận ${dy.ganZhi} (${dy.rating || 'nghịch'}) → «kỵ vận» làm giảm lực kích hoạt lưu niên.`;
+    } else {
+      e.grade = 'chang'; e.viGrade = 'thường';
+      e.dyNote = `Đại vận ${dy.ganZhi} (${dyGrpVi}) — không cùng hướng, lực thường.`;
+    }
+  }
+
+  // 4) Tổng kết — ưu tiên năm «真应期 + xung mở kho» (mạnh nhất), sau đó các kích hoạt khác.
   const kuOpen = events.filter((e) => e.type === 'xung mở kho');
+  const zhen = events.filter((e) => e.grade === 'zhen');
   const others = events.filter((e) => e.type !== 'xung mở kho');
-  const top = [...kuOpen, ...others].slice(0, 6);
+  // sắp xếp: 真应期 lên đầu (cùng mở kho), sau đó mở kho, sau định type
+  const rank = (e) => (e.grade === 'zhen' && e.type === 'xung mở kho' ? 0 : e.type === 'xung mở kho' ? 1 : e.grade === 'zhen' ? 2 : 3);
+  const top = events.slice().sort((a, b) => rank(a) - rank(b) || a.year - b.year).slice(0, 6);
 
   let summary = '';
   if (!events.length) {
@@ -158,16 +185,18 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
     const sanhe = byType('tam hợp thành cục');
     if (sanhe.length) parts.push(`Năm TAM HỢP thành cục: ${sanhe.map((e) => e.year).join(', ')}.`);
     summary = parts.join(' ');
+    if (zhen.length) summary += ` ★真应期 (đại vận cùng hướng, phát thật): ${zhen.map((e) => e.year).join(', ')}.`;
     // dòng lĩnh vực nổi bật của năm mạnh nhất
     const first = top[0];
     if (first && first.groups.length) {
-      summary += ` ≫ ${first.year}: kích hoạt «${first.groups.map((g) => g.vi).join('+')}» → ${first.groups.map((g) => g.domain).join(' / ')}.`;
+      summary += ` ≫ ${first.year}: kích hoạt «${first.groups.map((g) => g.vi).join('+')}»${first.grade === 'zhen' ? ' ★真应期' : first.grade === 'zu' ? ' ⚠giảm lực' : ''} → ${first.groups.map((g) => g.domain).join(' / ')}.`;
     }
   }
 
   return {
     events: top,
     kuBranches: natalBranches.filter((n) => KU_WX[n.zhi]).map((n) => ({ ...n, kuWx: KU_WX[n.zhi] })),
+    zhenYears: zhen.map((e) => e.year),
     allCount: events.length,
     summary,
   };

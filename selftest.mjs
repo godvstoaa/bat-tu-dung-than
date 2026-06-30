@@ -2859,18 +2859,28 @@ assert(by2035 && by2035.type === 'xung kích tàng can' && by2035.groups.some((g
 // 2026 午 xung 子 → 子 tàng 癸(偏Ấn) → Ấn Tinh
 const by2026 = by.events.find((e) => e.year === 2026);
 assert(by2026 && by2026.groups.some((g) => g.group === 'yin'), '2026 午 xung 子 → kích tàng can 癸 → ẤN TINH');
-// structural: mọi event có year trong khoảng + groups không rỗng + type hợp lệ
+// structural: mọi event có year trong khoảng + groups không rỗng + type hợp lệ + grade hợp lệ
 const _validTypes = new Set(['xung mở kho', 'xung kích tàng can', 'hợp dẫn', 'tam hợp thành cục']);
 const _validGroups = new Set(['ti', 'yin', 'shi', 'cai', 'guan']);
+const _validGrades = new Set(['zhen', 'zu', 'chang']);
 for (const e of by.events) {
   assert(e.year >= 2026 && e.year <= 2037, `event year ${e.year} trong khoảng quét`);
   assert(e.groups.length > 0 && e.groups.every((g) => _validGroups.has(g.group)), `event ${e.year} có nhóm sao hợp lệ`);
   assert(_validTypes.has(e.type), `event ${e.year} type hợp lệ («${e.type}»)`);
+  assert(_validGrades.has(e.grade) && typeof e.dyNote === 'string', `event ${e.year} có grade hợp lệ`);
 }
+// [loop 990] 真应期 grading — 2036 xung mở kho 戌 TRONG đại vận 戊午 (Tài) → đại vận cùng hướng → 真应期
+const by2036z = by.events.find((e) => e.year === 2036);
+assert(by2036z && by2036z.grade === 'zhen' && by2036z.dy === '戊午', '2036 mở kho 戌 trong đại vận 戊午(Tài) → ★真应期 (đại vận củng cố cùng nhóm Tài)');
+assert(by.zhenYears.includes(2036), 'zhenYears chứa 2036 (真应期)');
+// 2026 xung 子 → Ấn, nhưng đại vận 己未(Tài, score>0) không cùng hướng → «thường» (không phải zhen)
+const by2026z = by.events.find((e) => e.year === 2026);
+assert(by2026z && by2026z.grade !== 'zhen', '2026 kích hoạt Ấn trong đại vận Tài → KHÔNG phải 真应期 (khác hướng)');
+assert(by.summary.includes('真应期'), 'summary nhắc 真应期');
 assert(by.summary.includes('2036'), 'summary nhắc 2036 (mở kho mạnh đầu tiên)');
 const by2 = scanBranchYingqi(spR, 2026, 12);
 assert(JSON.stringify(by2.events) === JSON.stringify(by.events), 'scanBranchYingqi deterministic');
-console.log(`   spR: mở kho 2036(戌→Thực) | xung 2026(子→Ấn)/2035(酉→Quan) | ${by.allCount} kích hoạt trong 12 năm ✓`);
+console.log(`   spR: 真应期 ${JSON.stringify(by.zhenYears)} | mở kho 2036(戌) trong đv 戊午 → Tài phát thật ✓`);
 
 // [loop 989] FUZZ — scanBranchYingqi qua chart đa dạng: 0 crash, mọi event well-formed
 {
@@ -2885,7 +2895,7 @@ console.log(`   spR: mở kho 2036(戌→Thực) | xung 2026(子→Ấn)/2035(�
             const _o = scanBranchYingqi(_R, 2026, 12);
             if (typeof _o.summary !== 'string' || !_o.summary) _byCrash++;
             for (const e of _o.events) {
-              if (!(e.year >= 2026 && e.year <= 2037 && e.groups.length > 0 && _validTypes.has(e.type) && e.groups.every((g) => _validGroups.has(g.group)))) _byCrash++;
+              if (!(e.year >= 2026 && e.year <= 2037 && e.groups.length > 0 && _validTypes.has(e.type) && _validGrades.has(e.grade) && e.groups.every((g) => _validGroups.has(g.group)))) _byCrash++;
             }
           } catch (e) { _byCrash++; }
         }
