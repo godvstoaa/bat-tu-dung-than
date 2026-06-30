@@ -99,6 +99,8 @@ const NAME_VI = {
   thông: { han: '通', strokes: 14 }, hiệp: { han: '協', strokes: 8 },
   // [loop 1067] +3 (康熙 verified): Canh/Chiến/Đạt
   canh: { han: '庚', strokes: 8 }, chiến: { han: '戰', strokes: 16 }, đạt: { han: '達', strokes: 16 },
+  // [loop 1068] +3 final (康熙 verified): Diễm/Nghệ/Thẩm
+  diễm: { han: '艷', strokes: 24 }, nghệ: { han: '藝', strokes: 21 }, thẩm: { han: '審', strokes: 15 },
 };
 
 /**
