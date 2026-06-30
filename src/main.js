@@ -98,7 +98,7 @@ import { scanWealthCareerYingqi } from './engine/yingqi-wealth.js';
 import { dominantGod } from './engine/dominant-god.js';
 import { analyzeYanQin } from './engine/yanqin.js';
 import { analyzeHealth } from './engine/health-analysis.js'; // [loop 183] Sức Khoẻ Ngũ Hành card
-import { WUX_ZANG, seasonalHealth } from './engine/tcm.js'; // [loop 1026/1027] đông-y cho health card
+import { WUX_ZANG, seasonalHealth, meridianClock } from './engine/tcm.js'; // [loop 1026/1027/1041] đông-y cho health card
 import { healthAlertScan } from './engine/health-alert.js'; // [loop 224 fix] quickSummary + health card timeline — trước đây KHÔNG import → quickSummary's health alert CHẾT (ReferenceError bị try/catch nuốt)
 import { qinxingOverview, qinxingCycle } from './engine/qinxing.js';
 import { analyzeTongGen } from './engine/tonggen.js';
@@ -1458,6 +1458,11 @@ function renderHealth(R) {
         const _now = new Date(); const _curMz = Solar.fromYmdHms(_now.getFullYear(), _now.getMonth() + 1, _now.getDate(), 12, 0, 0).getLunar().getMonthZhi();
         const _s = seasonalHealth(_curMz, R);
         return `<div class="tiaohou-note" style="border-color:var(--gold-bright)"><b>🌿 Mùa ${esc(_s.season)} — dưỡng ${esc(_s.zang)} (${esc(_s.vi)}, ${esc(_s.wx)}):</b> ${esc(_s.advice)}${_s.userTip ? `<br><b>⚠ Cá nhân:</b> ${esc(_s.userTip)}` : ''}</div>`;
+      } catch (_) { return ''; } })()}
+      ${(() => { try { // [loop 1041] 子午流注 — kinh mạch theo GIỜ HIỆN TẠI
+        const _n = new Date(); const _hz = Solar.fromYmdHms(_n.getFullYear(), _n.getMonth() + 1, _n.getDate(), _n.getHours(), _n.getMinutes(), 0).getLunar().getTimeZhi();
+        const _mc = meridianClock(_hz);
+        return _mc ? `<div class="tiaohou-note" style="border-color:var(--gold)"><b>🕐 Giờ ${esc(_hz)} (${esc(_mc.hours)}) — ${esc(_mc.meridian)} ${esc(_mc.organ)} ĐỈNH:</b> ${esc(_mc.advice)}</div>` : '';
       } catch (_) { return ''; } })()}
       ${h.organRisk ? `<p class="hint">${esc(h.organRisk)}</p>` : ''}
       ${Array.isArray(h.advice) && h.advice.length ? `<p class="hint" style="margin-top:6px">💡 ${h.advice.map((a) => esc(a)).join('<br>💡 ')}</p>` : (h.advice ? `<p class="hint">${esc(h.advice)}</p>` : '')}
