@@ -8777,5 +8777,23 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1036] vi2han +20 chữ tên + họ Đoan (150→ổng ${Object.keys(SURNAME_VI).length + Object.keys(NAME_VI).length}) ✓`);
 }
 
+// [loop 1037] vi2han +6 họ phổ biến (Lý/Lương/Tô/Đàm/Chung/Chu)
+{
+  const { viToHan, SURNAME_VI, NAME_VI } = await import('./src/engine/vi2han.js');
+  const { STROKES } = await import('./src/engine/name.js');
+  const _cases = { 'ly van an': '李', 'luong thi bich': '梁', 'to minh': '蘇', 'dam ngoc': '譚', 'chung hoang': '鍾', 'chu hai': '朱' };
+  let _ok = 0;
+  for (const [name, expectHan] of Object.entries(_cases)) {
+    const t = viToHan(name);
+    if (!t.missing?.length && t.chars[0]?.han === expectHan) _ok++;
+  }
+  assert(_ok === 6, `[loop 1037] 6 họ mới convert (got ${_ok}/6)`);
+  assert(SURNAME_VI.tô.strokes === 22 && SURNAME_VI.chung.strokes === 17, `[loop 1037] Tô→蘇22, Chung→鍾17`);
+  let _inc = 0;
+  for (const tbl of [SURNAME_VI, NAME_VI]) for (const [, info] of Object.entries(tbl)) if (STROKES[info.han] != null && STROKES[info.han] !== info.strokes) _inc++;
+  assert(_inc === 0, `[loop 1037] vi2han↔name.js consistent (${_inc})`);
+  console.log(`   [loop 1037] vi2han +6 họ phổ biến (Lý/Lương/Tô/Đàm/Chung/Chu) → ${Object.keys(SURNAME_VI).length} họ, ${Object.keys(SURNAME_VI).length + Object.keys(NAME_VI).length} tổng ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

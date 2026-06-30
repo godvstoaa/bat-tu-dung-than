@@ -24,6 +24,9 @@ const SURNAME_VI = {
   hồ: { han: '胡', strokes: 9 },
   đỗ: { han: '杜', strokes: 7 },
   đoan: { han: '端', strokes: 14 }, // [loop 1036] họ Đoan
+  // [loop 1037] +họ phổ biến hơn (康熙 verified): Lý/Lương/Tô/Đàm/Chung/Chu
+  lý: { han: '李', strokes: 7 }, lương: { han: '梁', strokes: 11 }, tô: { han: '蘇', strokes: 22 },
+  đàm: { han: '譚', strokes: 19 }, chung: { han: '鍾', strokes: 17 }, chu: { han: '朱', strokes: 6 },
 };
 
 // Chữ tên đệm/given phổ biến (Việt → Hán Tự + Kangxi)
