@@ -54,6 +54,9 @@ const NAME2PALACE = (() => {
 // Sinh/khắc ngũ hành (Hán)
 const SHENG = { 金: '水', 水: '木', 木: '火', 火: '土', 土: '金' };
 const KE = { 金: '木', 木: '土', 土: '水', 水: '火', 火: '金' };
+// [loop 1012] 冲 (6 cặp xung) + 合 (6 cặp lục hợp) — cổ pháp verified (tái dùng bảng 토정비결)
+const CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
+const LIUHE = { 子: '丑', 丑: '子', 寅: '亥', 亥: '寅', 卯: '戌', 戌: '卯', 辰: '酉', 酉: '辰', 巳: '申', 申: '巳', 午: '未', 未: '午' };
 
 // ---- [loop 1011] 六神 (六兽) — gán theo 日干 (口诀 «甲乙青龙丙丁雀, 戊日勾陈己蛇出,
 //   庚辛白虎壬癸玄»). Thứ tự dưới→trên: 青龙→朱雀→勾陈→螣蛇→白虎→玄武.
@@ -157,6 +160,10 @@ export function castLiuYao(vals, cat, monthZhi, dayZhi, dayGan, dayGanZhi) {
     l.isShi = l.pos === shi; l.isYing = l.pos === ying;
     if (dayGan) l.shen = liushenOf(dayGan, l.pos);
     l.kong = kongSet.has(l.zhi);
+    // [loop 1012] 月破/暗动/日合 — tương tác hào ↔ 月建/日辰
+    l.yuepo = !!CHONG[monthZhi] && CHONG[monthZhi] === l.zhi;          // 月建冲 → 月破 (破, suy nặng)
+    l.rihe = !!LIUHE[dayZhi] && LIUHE[dayZhi] === l.zhi;               // 日辰合 → được trợ
+    l.andong = !l.dong && !!CHONG[dayZhi] && CHONG[dayZhi] === l.zhi;  // 静爻 被 日辰冲 → 暗动
   });
 
   // 变卦 (lật động hào)
@@ -182,16 +189,29 @@ export function castLiuYao(vals, cat, monthZhi, dayZhi, dayGan, dayGanZhi) {
     if (ZHI[dayZhi] && KE[dayWx] === l.wx) d -= 1.5; // 日khắc
     // [loop 1011] 空亡: hào 用神 trúng旬空 → có khí không thực lực, chủ trễ.
     if (l.kong) d -= 1;
+    // [loop 1012] 月破/暗动/日合 — tương tác hào ↔ 月/日 (cổ法 卜筮正宗)
+    if (l.yuepo) d -= 2;    // 月建冲 = 月破 → phá, gần như vô dụng tháng đó
+    if (l.rihe) d += 1;     // 日辰合 = được日助 → nhẹ favour
+    if (l.andong) d += 0.5; // 静爻 被 日冲 = 暗动 → có động năng ngầm
     if (d > bestD) { bestD = d; bestLv = ws.lv; bestLine = l; }
   });
   const yongKong = bestLine ? bestLine.kong : false;
+  const yongYuepo = bestLine ? bestLine.yuepo : false;
+  const yongAndong = bestLine ? bestLine.andong : false;
+  const yongRihe = bestLine ? bestLine.rihe : false;
   // phán
   let verdict, luck;
-  const kongNote = yongKong ? ' [用神空亡 — có khí chưa thực, chủ trễ, đợi ngày出空 (xung/trị旬) mới ứng]' : '';
+  const notes = [];
+  if (yongKong) notes.push('用神空亡 — có khí chưa thực, chủ trễ, đợi出空 mới ứng');
+  if (yongYuepo) notes.push('用神月破 — bị月建冲, tháng này suy nặng (xong tháng sau tự hồi)');
+  if (yongAndong) notes.push('用神暗动 — tĩnh mà bị日冲, ngầm có động năng');
+  if (yongRihe) notes.push('用神合日 — được日辰 trì giúp');
+  const noteStr = notes.length ? ' [' + notes.join('; ') + ']' : '';
   if (!yongLines.length) { verdict = `Không có hào ${ys.vi} trong quẻ — việc thiếu "dụng thần", khó thành / phải đợi vận.`; luck = 'Bình'; }
-  else if (bestD >= 1.5) { verdict = `用神 (${ys.vi}) ${bestLv} (+${bestD}) — vượng được sinh phù → CÁT, nên tiến hành.${kongNote}`; luck = yongKong ? 'Bình' : 'Cát'; }
-  else if (bestD >= 0) { verdict = `用神 ${bestLv} — trung bình, làm được nhưng cần nỗ lực / đợi ngày更好.${kongNote}`; luck = 'Bình'; }
-  else { verdict = `用神 ${bestLv} (−${Math.abs(bestD)}) — suy/khắc (月破/日伤${yongKong ? '/空亡' : ''}) → HUNG, nên hoãn/tránh.${kongNote}`; luck = 'Hung'; }
+  else if (yongYuepo) { verdict = `用神 (${ys.vi}) 月破 (${bestLv}) — bị月建冲, tháng này đại suy → HUNG, nên hoãn đến hết tháng.${noteStr}`; luck = 'Hung'; }
+  else if (bestD >= 1.5) { verdict = `用神 (${ys.vi}) ${bestLv} (+${bestD.toFixed(1)}) — vượng được sinh phù → CÁT, nên tiến hành.${noteStr}`; luck = (yongKong || yongAndong) ? 'Bình' : 'Cát'; }
+  else if (bestD >= 0) { verdict = `用神 ${bestLv} — trung bình, làm được nhưng cần nỗ lực / đợi ngày更好.${noteStr}`; luck = 'Bình'; }
+  else { verdict = `用神 ${bestLv} (${bestD.toFixed(1)}) — suy/khắc → HUNG, nên hoãn/tránh.${noteStr}`; luck = 'Hung'; }
 
   // 六亲持世
   const shiLine = lines.find((l) => l.isShi);

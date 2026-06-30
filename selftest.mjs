@@ -8317,5 +8317,28 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1011] 六爻 六神 (甲/庚 start) + 空亡 (6旬 verified) ✓`);
 }
 
+// [loop 1012] 六爻 deepening II — 月破/暗动/日合 (hào ↔ 月建/日辰, 卜筮正宗)
+{
+  const { castLiuYao } = await import('./src/engine/liuyao.js');
+  // 乾卦 [7×6] 纳甲 lines: 子/寅/辰/午/申/戌
+  // 月破: monthZhi=午 → CHONG[午]=子 → hào1(子) 月破;  日合: dayZhi=酉 → LIUHE[酉]=辰 → hào3(辰) 日合
+  const _r1 = castLiuYao([7,7,7,7,7,7], 'general', '午', '酉', '甲', '甲子');
+  assert(_r1.lines[0].yuepo === true, `[loop 1012] 月破: hào1 子 bị 月建午冲 (got ${_r1.lines[0].yuepo})`);
+  assert(_r1.lines[2].rihe === true, `[loop 1012] 日合: hào3 辰 hợp 日辰酉 (got ${_r1.lines[2].rihe})`);
+  assert(_r1.lines[0].andong === false, '[loop 1012] hào1 tĩnh bị月冲 = 月破 (không phải 暗动)');
+  // 暗动: dayZhi=子 → CHONG[子]=午 → hào4(午, tĩnh) 暗动;  月破: monthZhi=寅 → CHONG[寅]=申 → hào5(申)
+  const _r2 = castLiuYao([7,7,7,7,7,7], 'general', '寅', '子', '甲', '甲子');
+  assert(_r2.lines[3].andong === true, `[loop 1012] 暗动: hào4 午 tĩnh bị 日辰子冲 (got ${_r2.lines[3].andong})`);
+  assert(_r2.lines[4].yuepo === true, `[loop 1012] 月破: hào5 申 bị 月建寅冲 (got ${_r2.lines[4].yuepo})`);
+  // 暗动 KHÔNG áp dụng 动爻: hào động bị日冲 ≠ 暗动 (val 9 = 老阳动). 乾 hào4=午, cho val9 → động
+  const _r3 = castLiuYao([7,7,7,9,7,7], 'general', '寅', '子', '甲', '甲子');
+  assert(_r3.lines[3].andong === false && _r3.lines[3].dong === true, '[loop 1012] 动爻 bị日冲 ≠ 暗动 (chỉ 静爻 mới 暗动)');
+  // 用神月破 → Hung verdict
+  const _r4 = castLiuYao([7,7,7,7,7,7], 'general', '辰', '酉', '甲', '甲子'); // 世=6 戌, month辰冲戌 → 用神月破
+  assert(_r4.luck === 'Hung' && /月破/.test(_r4.verdict), `[loop 1012] 用神月破 → Hung + 月破 verdict (got ${_r4.luck})`);
+  assert(!/undefined|NaN/.test(JSON.stringify(_r1)), '[loop 1012] castLiuYao output không leak');
+  console.log(`   [loop 1012] 六爻 月破/暗动/日合 (clash/combine verified, 用神月破→Hung) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
