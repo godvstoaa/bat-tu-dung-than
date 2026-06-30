@@ -325,6 +325,23 @@ export const CONDITION_KB = [
     symptoms: 'thường KHÔNG có triệu chứng rõ (phát hiện qua xét nghiệm). Có thể: nặng đầu, mệt, phù nhẹ, đầy bụng, ngực tức, gan to (nhiễm mỡ), da vàng quanh mắt (xanthelasma).',
     advice: '① KIỆN TỲ HOÁ ĐÀM: ý dĩ, sơn dược, phục linh, trần bì, trạch tả, quyết minh tử, sơn tra. ② HOẠT HUYẾT (chống vữa xơ): đan sâm, xích thược, hồng hoa, tỏi (nhiều). ③ Giảm MỠ bão hoà/trans-fat/thịt đỏ/nội tạng/trứng nhiều. ④ TĂNG cá (omega-3), yến mạch, các loại hạt, rau xanh, đậu. ⑤ VẬN ĐỘNG AEROBIC (đi bộ/bơi — 30+ phút). ⑥ Giảm cân nếu béo, ngừng hút thuốc. ⑧ Xét nghiệm lipid định kỳ + thuốc y khoa (statin nếu cần).',
   },
+  // [loop 1057] +2 siêu phổ biến (cảm + ho)
+  {
+    id: 'common_cold',
+    keywords: ['cảm', 'cảm lạnh', 'cảm cúm', 'sổ mũi', 'hắt hơi', 'nhức đầu', 'sốt nhẹ', 'ngạt mũi', 'đau họng cảm', '感冒', 'cảm mạo', 'viêm họng'],
+    title: 'Cảm / Cảm cúm (PHONG HÀN / PHONG NHIỆT / KHÍ HƯ CẢM MẠO)',
+    summary: 'Đông-y chia cảm thành: (a) PHONG HÀN — chịu lạnh/gió → sợ lạnh, sổ mũi nước trong, không đổ mồ hôi, nhức đầu; (b) PHONG NHIỆT — thời tiết nóng/giải cảm nóng → sốt, đau họng, khát, mũi vàng; (c) KHÍ HƯ CẢM — thể yếu hay cảm lại (vệ khí bất cố).',
+    symptoms: '(hàn) sợ lạnh, sổ mũi trong, hắt hơi, nhức đầu, không mồ hôi, cơ đau; (nhiệt) sốt, đau họng đỏ, khát, mũi/vàng, tiểu vàng; (khí hư) hay cảm tái đi tái lại, mệt, tự hãn.',
+    advice: 'PHONG HÀN: ① khu phong tán hàn — gừng + đường đỏ + quế nước sôi, hành lá, táo; tắm nước ấm, giữ ấm, xông gió. PHONG NHIỆT: ② sơ phong thanh nhiệt — bạc hà, cúc hoa, ké đầu ngựa, liên kiều,板蓝根 (bản lan căn); trà xanh, khổ qua. KHÍ HƯ: ③ bổ vệ khí — hoàng kỳ, bạch truật, phòng phong (ngự bình tán). CHUNG: ④ nghỉ ngơi, uống nước ấm nhiều, tránh gió lạnh/đám đông. ⑤ Số cao/khó thở/nặng → khám (cúm/viêm phổi).',
+  },
+  {
+    id: 'cough',
+    keywords: ['ho', 'đau họng', 'khàn tiếng', 'ho khan', 'ho có đờm', 'ho lâu', 'viêm phế quản', '咳嗽', 'ho về đêm', 'ho kiệt'],
+    title: 'Ho / Viêm phế quản (PHONG HÀN/PHONG NHIỆT/ĐÀM THẤP/ÂM HƯ)',
+    summary: 'Ho đông-y: (a) PHONG HÀN — ho khan, ngứa họng, sợ lạnh, đờm trong (初起); (b) PHONG NHIỆT — ho đau họng, khát, đờm vàng đặc; (c) ĐÀM THẤP — ho nhiều đờm trắng dãi, khò khè, tức ngực; (d) ÂM HƯ — ho khan lâu, khô họng, đêm nặng (phổi âm hư).',
+    symptoms: '(hàn) ho khan ngứa họng, sợ lạnh, đờm trong; (nhiệt) ho đau họng đỏ, đờm vàng, khát, sốt; (đàm thấp) ho nhiều đờm trắng đặc, khò khè, tức ngực, nặng người; (âm hư) ho khan lâu, khô họng, đổ mồ hôi trộm, đêm nặng.',
+    advice: 'PHONG HÀN: ① tân ôn giải biểu — gừng, tần giao, tử uyển, bách bộ. PHONG NHIỆT: ② sơ phong thanh phế — tang diệp, cúc hoa, liên kiều, bạc hà. ĐÀM THẤP: ③ nh vị hoá đàm — bán hạ, trần bì, phục linh, bạch giới tử. ÂM HƯ: ④ nhuận phổi dưỡng âm — sa sâm, mạch môn, bách hợp, ngọc trúc, xuyên bối mẫu. CHUNG: ⑤ Lê đường phèn hấp (nhuận phổi), gừng + mật ong (ho khan); tránh lạnh/cay. ⑥ Ho lâu >2 tuần/ho máu/khó thở → khám phổi.',
+  },
 ];
 
 /**
@@ -417,6 +434,8 @@ const CONDITION_WX = {
   bad_breath: ['土', '火'], hemorrhoids: ['金', '土'],
   // [loop 1055] +2 tim mạch
   hypertension: ['木', '火', '水'], high_cholesterol: ['土', '木'],
+  // [loop 1057] +2 siêu phổ biến
+  common_cold: ['金', '土'], cough: ['金', '土'],
 };
 
 /**
