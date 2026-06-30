@@ -3303,13 +3303,15 @@ function renderLiunianChart(R) {
     const bars = years.map((yr) => {
       const s = yr.score || 0;
       const col = yr.rating === 'Cát' ? '#2a7' : yr.rating === 'Hung' ? '#c33' : '#9a8';
-      const h = Math.min(70, Math.max(4, Math.abs(s) * 2)); // [loop 1066] cap 70px — tránh overflow container 80px
-      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:32px" title="${yr.year} ${esc(yr.ganZhi)} ${esc(yr.rating)} (score ${s})">
+      const h = Math.min(70, Math.max(4, Math.abs(s) * 2));
+      const isNow = yr.year === curYear;
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:32px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${yr.year} ${esc(yr.ganZhi)} ${esc(yr.rating)} (score ${s})${isNow ? ' ★ NĂM HIỆN TẠI' : ''}">
         <div style="position:relative;height:70px;width:100%;display:flex;align-items:center;justify-content:center">
-          <div style="position:absolute;${s>=0?'bottom:50%':'top:50%'};width:70%;max-width:30px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:0.85"></div>
+          <div style="position:absolute;${s>=0?'bottom:50%':'top:50%'};width:70%;max-width:30px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${isNow ? '1' : '0.85'};${isNow ? 'box-shadow:0 0 6px '+col : ''}"></div>
           <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--gold,dimgray);opacity:0.3"></div>
         </div>
-        <span class="zh" style="font-size:10px">${esc(yr.ganZhi)}</span>
+        ${isNow ? '<span style="font-size:7px;color:var(--gold-bright);font-weight:bold">▼ NAY</span>' : ''}
+        <span class="zh" style="font-size:10px${isNow ? ';font-weight:bold' : ''}">${esc(yr.ganZhi)}</span>
         <span class="hint" style="font-size:9px">${yr.year}</span>
         <span class="hint" style="font-size:9px;color:${col}">${esc((yr.rating||'').slice(0,6))}</span>
       </div>`;
@@ -3355,17 +3357,19 @@ function renderDayunChart(R) {
   try {
     const dayun = R.dayun || [];
     if (!dayun.length) { el.innerHTML = '<p class="hint">Không có dữ liệu đại vận.</p>'; return; }
+    const _curAge = new Date().getFullYear() - (R.chart?.input?.year || 1990);
     const bars = dayun.map((d) => {
       const s = d.score || 0;
       const h = Math.max(4, Math.abs(s) * 18);
       const col = s >= 1 ? '#2a7' : s <= -1 ? '#c33' : '#9a8';
-      const bot = s >= 0 ? 'bottom:50%' : `top:50%`;
-      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:40px" title="${esc(d.ganZhi||'')} [${d.startAge}-${d.startAge+9}t] ${esc(d.rating||'')} (score ${s})">
+      const isActive = _curAge >= d.startAge && _curAge < d.startAge + 10;
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:40px${isActive ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${esc(d.ganZhi||'')} [${d.startAge}-${d.startAge+9}t] ${esc(d.rating||'')} (score ${s})${isActive ? ' ★ ĐẠI VẬN HIỆN TẠI' : ''}">
         <div style="position:relative;height:80px;width:100%;display:flex;align-items:center;justify-content:center">
-          <div style="position:absolute;${s>=0?'bottom:50%':'top:50%'};width:60%;max-width:36px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:0.85"></div>
+          <div style="position:absolute;${s>=0?'bottom:50%':'top:50%'};width:60%;max-width:36px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${isActive ? '1' : '0.85'};${isActive ? 'box-shadow:0 0 6px '+col : ''}"></div>
           <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--gold,dimgray);opacity:0.3"></div>
         </div>
-        <span class="zh" style="font-size:12px">${esc(d.ganZhi||'')}</span>
+        ${isActive ? '<span style="font-size:8px;color:var(--gold-bright);font-weight:bold">▼ BẠN Ở ĐÂY</span>' : ''}
+        <span class="zh" style="font-size:12px${isActive ? ';font-weight:bold' : ''}">${esc(d.ganZhi||'')}</span>
         <span class="hint" style="font-size:10px">${d.startAge}–${d.startAge+9}t</span>
         <span class="hint" style="font-size:10px;color:${col}">${esc((d.rating||'').slice(0,8))}</span>
       </div>`;
