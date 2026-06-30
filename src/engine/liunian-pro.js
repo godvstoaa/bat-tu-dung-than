@@ -14,6 +14,7 @@ import { GAN_HE_MAP, ZHI_LIUHE_MAP, ZHI_CHONG_MAP, GAN_CHONG } from './interacti
 import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, SHENSHA_INFO, TIAN_YI, WEN_CHANG, JIANG_XING, TIAN_DE, YUE_DE } from './shensha.js';
 import { STAGE_WEIGHT, STAGE_VI } from './dayun-changsheng.js'; // [loop 1080] 十二长生 sinh khí năm
 import { pillarRelation } from './pillar-quality.js'; // [loop 1081] 盖头/截脚 pillar-strength năm
+import { stageHealth } from './tcm.js'; // [loop 1093] year-level TCM theme (十二长生 → tạng)
 // [loop 19 — elevation] 伏吟/反吟 chuẩn từ module chuyên dụng (4 cặp thất sát, không phải "bất kỳ ngũ hành khắc").
 import { isFuyin, isFanyin } from './fuyin.js';
 import { scanBranchYingqi } from './yingqi-branch.js';
@@ -465,6 +466,12 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
 
   const out = { year: solarYear, ganZhi: yGan + yZhi, ganGod, ganWx, zhiWx, score: finalScore, rating: finalRating, schools, advice };
   if (yearStageVi) { out.yearStage = yearStageVi; out.yearStageWeight = yearStageW; } // [loop 1080] expose cho UI chart tooltip
+  // [loop 1093] year-level TCM theme — 十二长生 sinh khí năm → tạng cốt lõi + đông-y advice.
+  //   Hoàn thiện TCM 4 cấp thời gian (day 1084 / year 1093 / decade 1086) — AI trả lời được «năm nay tạng nào yếu».
+  if (yearStageVi) {
+    const _yht = stageHealth(c.dayMaster?.wx, yearStageVi, yearStageW);
+    if (_yht) out.yearHealthTheme = { tone: _yht.tone, headline: _yht.headline, advice: _yht.advice.slice(0, 200) };
+  }
   if (_yrel && _yrel.type && _yrel.type !== '?') { out.yearPillarStrength = _yrel.vi; out.yearPillarFlow = _yrel.flow; } // [loop 1081]
   if (gejuFavor) out.gejuFavor = gejuFavor;
   if (activeDayun) out.activeDayun = activeDayun; // [运年组合] 大运 đang hành cho năm này

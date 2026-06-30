@@ -852,7 +852,7 @@ export function execTool(name, args, R) {
         if (!Number.isFinite(_yr)) return { error: `Năm không hợp lệ («${a.year}») — nhập số năm (vd 2026).` };
         if (_yr < 1000 || _yr > 3000) return { error: `Năm «${a.year}» ngoài khoảng hợp lệ (1000-3000) — có thể gõ nhầm. Nhập năm dương lịch thực (vd 2026).` };
         const y = analyzeLiunianDeep(R, a.year, R.patternQuality?.patternYong);
-        return { year: y.year, ganZhi: y.ganZhi, rating: y.rating, score: y.score, advice: _s(y.advice, 260), schools: y.schools.map((sc) => ({ school: sc.phai, delta: sc.d, note: _s(sc.note, 110) })) };
+        return { year: y.year, ganZhi: y.ganZhi, rating: y.rating, score: y.score, advice: _s(y.advice, 260), schools: y.schools.map((sc) => ({ school: sc.phai, delta: sc.d, note: _s(sc.note, 110) })), yearStage: y.yearStage || null, yearHealthTheme: y.yearHealthTheme ? { tone: y.yearHealthTheme.tone, headline: _s(y.yearHealthTheme.headline, 100), advice: _s(y.yearHealthTheme.advice, 220) } : null };
       }
       case 'best_days_in_year': {
         const _yr2 = Number(a.year);

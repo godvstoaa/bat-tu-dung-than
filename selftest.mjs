@@ -8694,6 +8694,24 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   });
   assert(_ampOk, '[loop 1080] stage amplify-from-neutral (vibrant khuếch đại khuynh hướng, KHÔNG tạo cát từ neut)');
   console.log(`   [loop 1080] 十二长生 NĂM tích hợp analyzeLiunianDeep (yearStage + score, thịnh ${_vib}/suy ${_dec}/10) ✓`);
+
+// [loop 1093] year-level TCM theme — analyzeLiunianDeep.yearHealthTheme (十二长生 → tạng)
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { analyzeLiunianDeep } = await import('./src/engine/liunian-pro.js');
+  const { execTool } = await import('./src/engine/ai.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  let _themeYears = 0;
+  for (let y = 2026; y < 2036; y++) {
+    const ln = analyzeLiunianDeep(_R, y, _R.patternYong || _R.patternQuality?.patternYong);
+    if (ln.yearHealthTheme && ln.yearHealthTheme.headline && /khí/.test(ln.yearHealthTheme.headline)) _themeYears++;
+  }
+  assert(_themeYears === 10, `[loop 1093] yearHealthTheme có mặt 10/10 năm (got ${_themeYears})`);
+  // AI analyze_year phải expose yearHealthTheme
+  const _yr = execTool('analyze_year', { year: 2026 }, _R);
+  assert(_yr.yearStage && _yr.yearHealthTheme && _yr.yearHealthTheme.headline, `[loop 1093] AI analyze_year trả yearHealthTheme (got ${_yr.yearHealthTheme?.headline?.slice(0,30)})`);
+  console.log(`   [loop 1093] year-level TCM theme ✓ — analyze_year ${_yr.year}: ${_yr.yearHealthTheme.headline}`);
+}
 }
 
 // [loop 1081] 盖头/截脚 pillar-strength — «盖头截脚其力减半»: trụ vận can-chi KHẮC nhau → lực giảm.
