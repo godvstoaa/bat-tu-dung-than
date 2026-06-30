@@ -163,13 +163,31 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
     }
   }
 
+  // [loop 994] TONE — kích hoạt sao DỤNG (cát) hay KỴ (hung)? Mở kho có thể bật RA đồng thời
+  //   sao Dụng lẫn Kỵ (vd 辰 chứa 戊乙癸 → 3 nhóm) → «mixed». Phân loại theo yong của lá số.
+  const y = R.yong || {};
+  const dungGrp = y.primary ? groupOfWx(dmWx, y.primary) : '';
+  const xiGrp = y.xi ? groupOfWx(dmWx, y.xi) : '';
+  const jiGrp = y.ji ? groupOfWx(dmWx, y.ji) : '';
+  const chouGrp = y.chou ? groupOfWx(dmWx, y.chou) : '';
+  for (const e of events) {
+    const favor = e.groups.some((g) => g.group === dungGrp || g.group === xiGrp);
+    const unfavor = e.groups.some((g) => g.group === jiGrp || g.group === chouGrp);
+    if (favor && unfavor) { e.tone = 'mixed'; e.toneVi = 'TRUNG (Dụng+Kỵ cùng bật)'; }
+    else if (favor) { e.tone = 'cat'; e.toneVi = 'CÁT'; }
+    else if (unfavor) { e.tone = 'hung'; e.toneVi = 'HUNG'; }
+    else { e.tone = 'neutral'; e.toneVi = 'trung'; }
+  }
+
   // 4) Tổng kết — ưu tiên năm «真应期 + xung mở kho» (mạnh nhất), sau đó các kích hoạt khác.
   const kuOpen = events.filter((e) => e.type === 'xung mở kho');
   const zhen = events.filter((e) => e.grade === 'zhen');
-  const others = events.filter((e) => e.type !== 'xung mở kho');
-  // sắp xếp: 真应期 lên đầu (cùng mở kho), sau đó mở kho, sau định type
+  const catYears = events.filter((e) => e.tone === 'cat').map((e) => e.year);
+  const hungYears = events.filter((e) => e.tone === 'hung').map((e) => e.year);
+  // sắp xếp ưu tiên: CÁT+真应期+mở kho > CÁT+mở kho > mở kho > ... HUNG xuống cuối (cảnh báo)
+  const toneRank = (e) => (e.tone === 'hung' ? 5 : e.tone === 'mixed' ? 4 : e.tone === 'cat' ? 0 : 3);
   const rank = (e) => (e.grade === 'zhen' && e.type === 'xung mở kho' ? 0 : e.type === 'xung mở kho' ? 1 : e.grade === 'zhen' ? 2 : 3);
-  const top = events.slice().sort((a, b) => rank(a) - rank(b) || a.year - b.year).slice(0, 6);
+  const top = events.slice().sort((a, b) => toneRank(a) - toneRank(b) || rank(a) - rank(b) || a.year - b.year).slice(0, 6);
 
   let summary = '';
   if (!events.length) {
@@ -186,10 +204,15 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
     if (sanhe.length) parts.push(`Năm TAM HỢP thành cục: ${sanhe.map((e) => e.year).join(', ')}.`);
     summary = parts.join(' ');
     if (zhen.length) summary += ` ★真应期 (đại vận cùng hướng, phát thật): ${zhen.map((e) => e.year).join(', ')}.`;
+    // [loop 994] tone — năm bật Dụng (CÁT) vs bật Kỵ (HUNG)
+    if (catYears.length) summary += ` 🎉Năm bật DỤNG sao (CÁT): ${catYears.join(', ')}.`;
+    if (hungYears.length) summary += ` ⚠Năm bật KỴ sao (HUNG — cẩn trọng): ${hungYears.join(', ')}.`;
     // dòng lĩnh vực nổi bật của năm mạnh nhất
     const first = top[0];
     if (first && first.groups.length) {
-      summary += ` ≫ ${first.year}: kích hoạt «${first.groups.map((g) => g.vi).join('+')}»${first.grade === 'zhen' ? ' ★真应期' : first.grade === 'zu' ? ' ⚠giảm lực' : ''} → ${first.groups.map((g) => g.domain).join(' / ')}.`;
+      const toneTag = first.tone === 'cat' ? ' 🎉CÁT' : first.tone === 'hung' ? ' ⚠HUNG' : first.tone === 'mixed' ? ' ≡TRUNG' : '';
+      const gradeTag = first.grade === 'zhen' ? ' ★真应期' : first.grade === 'zu' ? ' ⚠giảm lực' : '';
+      summary += ` ≫ ${first.year}: kích hoạt «${first.groups.map((g) => g.vi).join('+')}»${gradeTag}${toneTag} → ${first.groups.map((g) => g.domain).join(' / ')}.`;
     }
   }
 
@@ -197,6 +220,8 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
     events: top,
     kuBranches: natalBranches.filter((n) => KU_WX[n.zhi]).map((n) => ({ ...n, kuWx: KU_WX[n.zhi] })),
     zhenYears: zhen.map((e) => e.year),
+    catYears,
+    hungYears,
     allCount: events.length,
     summary,
   };
