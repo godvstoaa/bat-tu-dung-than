@@ -3234,6 +3234,32 @@ function renderGoldenYear(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được năm hoàng kim.</p>'; }
 }
 
+// [loop 1062] Vận Trục Lưu Nguyệt — 12-month bar chart visual
+function renderLiuyueChart(R) {
+  const el = $('liuyue-chart');
+  if (!el) return;
+  try {
+    const lm = computeLiuyue(R, new Date().getFullYear(), {});
+    if (!lm || !lm.months) { el.innerHTML = '<p class="hint">Không tính được lưu nguyệt.</p>'; return; }
+    const bars = lm.months.map((mo) => {
+      const s = mo.score || 50;
+      const col = mo.rating === 'Cát' ? '#2a7' : mo.rating === 'Hung' ? '#c33' : '#9a8';
+      const h = Math.max(4, s * 0.7);
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px" title="${mo.solarMonth}/${new Date().getFullYear()} ${esc(mo.ganZhi||'')} ${esc(mo.rating||'')} (${s})">
+        <div style="height:${h}px;width:70%;max-width:24px;background:${col};border-radius:3px 3px 0 0;opacity:0.85"></div>
+        <span class="zh" style="font-size:9px">${esc((mo.ganZhi||'').slice(0,2))}</span>
+        <span class="hint" style="font-size:9px">T${mo.solarMonth}</span>
+      </div>`;
+    }).join('');
+    const best = lm.best, worst = lm.worst;
+    const sorted = [...lm.months].sort((a, b) => (b.score || 0) - (a.score || 0));
+    const bestMo = best || sorted[0], worstMo = worst || sorted[sorted.length - 1];
+    const moLabel = (mo) => `T${mo?.solarMonth || mo?.m + 1 || '?'} (${mo?.rating || ''})`;
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;height:80px">${bars}</div>
+      <p class="hint" style="margin-top:4px">📊 ${new Date().getFullYear()} · Tốt nhất: <b>${esc(moLabel(bestMo))}</b> · Yếu nhất: <b>${esc(moLabel(worstMo))}</b></p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được lưu nguyệt.</p>'; }
+}
+
 // [loop 1061] Vận Trục Lưu Niên — 10-year bar chart visual
 function renderLiunianChart(R) {
   const el = $('liunian-chart');
@@ -3964,6 +3990,7 @@ async function run() {
   lazyRender('dayun-chart',    () => { try { renderDayunChart(currentResult); } catch (e) { console.warn('dayun-chart', e.message); } });
   lazyRender('wx-chart',       () => { try { renderWxChart(currentResult); } catch (e) { console.warn('wx-chart', e.message); } });
   lazyRender('liunian-chart',  () => { try { renderLiunianChart(currentResult); } catch (e) { console.warn('liunian-chart', e.message); } });
+  lazyRender('liuyue-chart',   () => { try { renderLiuyueChart(currentResult); } catch (e) { console.warn('liuyue-chart', e.message); } });
 
   // quick-nav: jump links — [loop 936 FIX] theo GROUP header (~8) thay vì 165 card
   //   (165 chip overflow trên mobile → nav chính nó không dùng được). + scroll-spy active.
