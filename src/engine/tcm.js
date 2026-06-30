@@ -2,7 +2,7 @@
 //  ĐÔNG Y / Y HỌC CỔ TRUYỀN 中医 — Ngũ hành ↔ Tạng phủ ↔ Khí vượng suy ↔ Dược lý
 //  [loop 1021] Nguồn: «Hoàng Đế Nội Kinh» (素问·阴阳应象大论 / 金匮真言论 / 至真要大论).
 //    Mỗi ngũ hành ↔ 1 tạng (脏) + 1 phủ (腑) + ngũ vị/ngũ sắc/ngũ chí/ngũ quan/ngũ thể.
-//    Khí vượng (mạnh) → tạng THỰC (ứ/dư); khí suy (yếu) → tạng HƯ (thiếu) → dễ bệnh.
+//    Khí vượng (mạnh) → tạng THỰC (ứ/dư); khí suy (yếu) → tạng HƯ (thiếu) → dễ bệnh.
 //    Dược lý: ngũ vị/ngũ sắc nhập tạng (酸→肝, 苦→心, 甘→脾, 辛→肺, 咸→肾) + thực疗.
 //  Tích hợp BaZi: từ ngũ hành vượng suy của lá số → đoán tạng yếu/mạnh + lời khuyên đông y.
 // ============================================================================
@@ -17,12 +17,12 @@ export const WUX_ZANG = {
     shi: ['肝火旺 — hay cáu gắt, mặt mắt đỏ, đau đầu, mất ngủ, miệng đắng, tai ù',
           '肝阳上亢 — chóng mặt căng đầu, cao huyết áp, bứt rứt'],
     disease: 'gan/mật, đau đầu, cao HA, mắt, kinh nguyệt, căng thẳng, cơ cổ vai gáy',
-    nourish: 'Bổ gan huyết: gan động vật, rau xanh (rau ngót, rau má), atiso, táo đỏ, kỷ tử;養 huyết + sơ uất.',
+    nourish: 'Bổ gan huyết: gan động vật, rau xanh (rau ngót, rau má), atiso, táo đỏ, kỷ tử; dưỡng huyết + sơ uất.',
   },
   火: {
     zang: '心 (Tim)', fu: '小肠 (Tiểu trường)', wei: '苦 (đắng)', se: '赤 (đỏ)', zhi: '喜 (vui)', guan: '舌 (lưỡi)', ti: '脉 (mạch)', season: 'Hạ (mùa hè)',
     xu: ['心气虚 — hồi hộp, thở hụt, mệt mỏi, hay vã mồ hôi, mất ngủ',
-         '心血虚 — hồi hộp trống ngực, choáng, mất ngủ hay mơ,面色 nhợt nhạt'],
+         '心血虚 — hồi hộp trống ngực, choáng, mất ngủ hay mơ,mặt nhợt nhạt'],
     shi: ['心火旺 — lở miệng/lưỡi, mất ngủ bồn chồn, tiểu vàng đỏ, mặt đỏ'],
     disease: 'tim/hồi hộp, mất ngủ, tâm thần, lưỡi/miệng, huyết áp',
     nourish: 'Dưỡng tâm an thần: sen tâm (liên tử tâm), táo đỏ, long nhãn, bột sen, chè hạt sen; thanh tâm hoả.',
@@ -31,10 +31,10 @@ export const WUX_ZANG = {
     zang: '脾 (Tỳ)', fu: '胃 (Vị)', wei: '甘 (ngọt)', se: '黄 (vàng)', zhi: '思 (lo nghĩ)', guan: '口 (miệng)', ti: '肉 (cơ/thịt)', season: 'Trường hạ (cuối hạ)',
     xu: ['脾气虚 — mệt mỏi, chán ăn, đầy bụng, phân lỏng, nói yếu',
          '脾阳虚 — bụng lạnh đau, phân lỏng, lạnh tay chân, phù nhẹ'],
-    shi: ['脾胃湿热 — đầy bụng, đắng miệng, phân dính/ôleo, mụn trứng cá',
+    shi: ['脾胃湿热 — đầy bụng, đắng miệng, phân dính/nhớt, mụn trứng cá',
           '湿困脾 — nặng người, buồn ngủ, chán ăn, phù'],
     disease: 'tiêu hoá/dạ dày, mệt mỏi, phù, đường huyết, cơ thể nặng nề',
-    nourish: 'Kiện tỳ vị: khoai lang, gạo tẻ/yến mạch, táo đỏ, hạt ý dĩ (misc/ý dĩ), gừng; tránh sinh lạnh.',
+    nourish: 'Kiện tỳ vị: khoai lang, gạo tẻ/yến mạch, táo đỏ, hạt ý dĩ (ý dĩ), gừng; tránh sinh lạnh.',
   },
   金: {
     zang: '肺 (Phổi)', fu: '大肠 (Đại trường)', wei: '辛 (cay)', se: '白 (trắng)', zhi: '悲 (buồn)', guan: '鼻 (mũi)', ti: '皮 (da)', season: 'Thu (mùa thu)',
@@ -51,7 +51,7 @@ export const WUX_ZANG = {
          '肾阳虚 — thắt lưng/đầu gối lạnh đau, sợ lạnh tay chân, liệt dương, tiểu đêm nhiều, mệt mỏi, hay đi ngoài lỏng, tóc rụng/răng long'],
     shi: ['湿热下注 — tiểu gắt đỏ buốt, đau hạ bộ, đái dắt', '肾实 — phù thũng, đau thắt lưng thực'],
     disease: 'thận/tiết niệu/tiền liệt, thắt lưng, tai ù, tóc/răng, xương, sinh dục/nội tiết',
-    nourish: 'Bổ thận tinh: đậu đen, vừng đen, dâu tây/tằm, hạt óc chó,枸杞 (kỷ tử), sơn dược (củ mài), hà thủ ô; thuỷ tương sinh (kim sinh thuỷ: pohong phổi cũng bổ thận).',
+    nourish: 'Bổ thận tinh: đậu đen, vừng đen, dâu tây/tằm, hạt óc chó,枸杞 (kỷ tử), sơn dược (củ mài), hà thủ ô; thuỷ tương sinh (kim sinh thuỷ: bổ phổi cũng bổ thận).',
   },
 };
 
@@ -90,11 +90,91 @@ export const CONDITION_KB = [
   },
   {
     id: 'spleen_xu',
-    keywords: ['mệt mỏi', 'chán ăn', 'đầy bụng', 'phân lỏng', 'đại tiện lỏng', 'bụng lạnh', 'suy dinh dưỡng', 'tiêu hoá kém', '脾虚', 'đầy hơi', 'phù nhẹ'],
+    keywords: ['chán ăn', 'đầy bụng', 'phân lỏng', 'đại tiện lỏng', 'bụng lạnh', 'suy dinh dưỡng', 'tiêu hoá kém', '脾虚', 'đầy hơi', 'phù nhẹ', 'tỳ vị'],
     title: 'Tỳ vị hư (TIÊU HOÁ KÉM)',
     summary: 'Tỳ (thổ) chủ vận hoá + thăng thanh. Ăn sinh lạnh/quá no/lo nghĩ nhiều → thương tỳ → tỳ khí/dương hư → vận hoá kém.',
     symptoms: 'mệt mỏi hay buồn ngủ, chán ăn, đầy bụng, đại tiện lỏng/nhão, nói yếu, hay phù nhẹ, sức yếu, nghĩ nhiều hay lo.',
     advice: '① KIỆN TỲ: ý dĩ, sơn dược (củ mài), sen hạt, táo đỏ, khoai lang, gạo tẻ/yến mạch, đậu đỏ. ② Tránh sinh lạnh, ngọt béo, quá no. ③ Gừng ấm tỳ vị. ④ Tỳ sợ «ứ» (lo nghĩ nhiều) — bớt suy nghĩ quá mức.',
+  },
+  {
+    id: 'insomnia',
+    keywords: ['mất ngủ', 'khó ngủ', 'thức giấc', 'mơ nhiều', 'ngủ không yên', 'trằn trọc', '失眠', 'rối loạn giấc ngủ'],
+    title: 'Mất ngủ (心肾不交 / 心血虚 / 肝火)',
+    summary: 'Mất ngủ đông-y chia nhiều chứng. Hay gặp: (a) TÂM THẬN GIAO CẢNH («心肾不交») — thận âm hư không nuôi được tâm hoả, hoả vượng trên, không ngủ được + nóng bứt rứt; (b) TÂM HUYẾT HƯ — tim máu kém, hồi hộp, hay mơ, tỉnh giữa đêm; (c) CAN HOẢ — thức vì bứt rứt/cáu gắt.',
+    symptoms: 'khó vào giấc, tỉnh giữa đêm, mơ nhiều, sáng mệt, kèm (âm hư) nóng/bốc hoả đổ mồ hôi trộm, (huyết hư) choáng hoa mắt mặt nhợt, (can hoả) cáu gắt đau đầu.',
+    advice: '① NUÔI TÂM AN THẦN: sen tâm (liên tử tâm), táo đỏ, long nhãn, bột sen, chè hạt sen, bách hợp. ② TÂM-THẬN: giao thái hạp (đậu đen + sen tâm + táo) — giao thận thuỷ + tâm hoả. ③ NGỦ TRƯỚC 23h (tý thời, đởm can phục hồi). ④ Tránh cà phê/è trà đặc/điện thoại đêm. ⑤ «Tâm tĩnh tự nhiên lãnh» — bớt lo nghĩ tối.',
+  },
+  {
+    id: 'hair_loss',
+    keywords: ['rụng tóc', 'thưa tóc', 'hói', 'sớm bạc', 'tóc khô', 'tóc yếu', '脱发', 'rụng lông mày'],
+    title: 'Rụng tóc / Sớm bạc (肾虚 + 血虚)',
+    summary: 'Đông-y: «肾其华在发» (thận hiện vẻ qua tóc) + «发为血之余» (tóc là dư của huyết, can tàng huyết). Tóc rụng/bạc sớm = THẬN TINH KHUY + HUYẾT HƯ (can tỳ sinh huyết kém). Tuổi trẻ rụng nhiều = thường do thức khuya/thủ dâm (hao tinh) + căng thẳng (can uất).',
+    symptoms: 'tóc rụng nhiều, khô xơ, sớm bạc, kèm (thận hư) thắt lưng mỏi/choáng tai ù, (huyết hư) mặt nhợt, móng mềm, hoa mắt.',
+    advice: '① BỔ THẬN + DƯỠNG HUYẾT: hà thủ ô đỏ (chủ药 rụng tóc/bạc), đậu đen, vừng đen, dâu tằm, kỷ tử, sơn dược, táo đỏ, atiso (sơ can). ② Tránh thức khuya (tinh hoá huyết, can tâm/sinh huyết lúc ngủ). ③ Bớt thủ dâm/lo âu. ④ Gội bồ kết/nhân hạt (ngoài da đầu).',
+  },
+  {
+    id: 'acne_skin',
+    keywords: ['mụn', 'mụn trứng cá', 'da xấu', 'nổi mẩn', 'ngứa da', 'viêm da', '痤疮', 'mụn đầu đen', 'lỗ chân lông'],
+    title: 'Mụn / Da xấu (肺 phong phấn + 脾 vị thấp nhiệt + huyết nhiệt)',
+    summary: '«肺主皮毛» (phổi chủ da lông) + tỳ vị thấp nhiệt huân lên mặt + huyết nhiệt. Mụn tuổi dậy thì/nam nữ = thấp nhiệt + hoả độc; mụn kèm kinh nguyệt = xung nhâm (can) uất nhiệt.',
+    symptoms: 'mụn mủ/đầu đen vùng mặt/lưng/ngực, da nhờn, miệng đắng, đại tiện dính/khó, lưỡi vàng dính.',
+    advice: '① THANH PHỔ/GIẢI ĐỘC: nhân trần, diệp hạ châu, kim ngân hoa, kê huyết đằng, atiso, bí xanh, mướp đắng. ② GIẢM cay nóng/đường/sữa/dầu mỡ/rượu. ③ Đừng nặn (lây, thâm). ④ Rửa mặt nhẹ, giữ thông thoáng. ⑤ Liên quan kinh nguyệt → sơ can (cúc hoa, diệp hạ châu).',
+  },
+  {
+    id: 'fatigue',
+    keywords: ['mệt mỏi', 'hơi thở ngắn', 'thở hụt', 'không có sức', 'lười', 'khí huyết kém', '气虚', 'suy nhược', 'kiệt sức', 'uể oải'],
+    title: 'Mệt mỏi / Khí hư (KHÍ HƯ — tỳ/phổi)',
+    summary: '«khí làm đỡn» — khí hư thì mỏi. THƯỜNG LÀ TỲ + PHỔI KHÍ HƯ: tỳ là nguồn sinh khí (cốc khí), phổi chủ khí (tâm phế). Ăn ngủ kém/lo nghĩ/ốm lâu → khí hư. Nam thủ dâm nhiều → khí+tinh cùng hao.',
+    symptoms: 'mỏi mệt, lười nói, thở hụt, vã mồ hôi khi động, hay cảm, chán ăn, phân lỏng, tiếng nói yếu.',
+    advice: '① BỔ KHÍ: nhân sâm/đảng sâm/hoàng kỳ, táo đỏ, kỉ tử, sơn dược, mật ong, gạo tẻ, thịt nạc. ② Bổ tỳ (nguồn khí) trước khi bổ phổi («bổ kim thổ»). ③ Vận động nhẹ (khí huyết hành) — nhưng đừng quá (khí hư sợ tàn). ④ Ngủ đủ, bớt nói nhiều/lo nghĩ.',
+  },
+  {
+    id: 'cold_limbs',
+    keywords: ['tay lạnh', 'chân lạnh', 'tay chân lạnh', 'sợ lạnh', 'run', 'tứ chi lạnh', '阳虚', 'lạnh trong người'],
+    title: 'Tay chân lạnh (DƯƠNG HƯ hoặc CAN UẤT TỨ NGHỊCH)',
+    summary: 'Hai chứng: (a) DƯƠNG HƯ (thận/tỳ dương hư) — dương khí không sưởi ấm tứ chi, lạnh toàn bộ + sợ lạnh/mệt; (b) «TỨ NGHỊCH» (can khí uất, 4 chi không ấm) — chỉ tay chân lạnh nhưng không sợ lạnh toàn thân, kèm cáu gắt/ức chế (can chủ sớ tiết, uất thì khí trệ).',
+    symptoms: '(dương hư) tay chân lạnh + sợ lạnh/mệt/tiểu đêm/đại tiện lỏng; (can uất) chỉ tay chân lạnh + bứt rứt/ngực sườn trướng/đau đầu.',
+    advice: 'DƯƠNG HƯ: ① ôn bổ thận dương — nhục quế/phụ tử/kim quỹ (theo thầy thuốc); ăn ấm: gừng/đường đỏ/thịt dê/hạt óc chó/hành tỏi; giữ ấm thắt lưng/chân. CAN UẤT: ② «TỨ NGHỊCH» — sơ can giải uất:柴胡 (sài hồ)/bạch thược/chỉ xác (tứ nghịch tán ý) + đi bộ nhẹ, bớt ức chế.',
+  },
+  {
+    id: 'tinnitus',
+    keywords: ['tai ù', 'tai ù a', 'iếc', 'giảm thính lực', 'tai kêu', '耳鸣', 'điếc'],
+    title: 'Tai ù / Giảm thính (THẬN HƯ hoặc CAN HOẢ)',
+    summary: '«肾开窍于耳» (thận mở khiếu ở tai) + can đởm mạch vòng tai. Tai ù chia: (a) HƯ chứng (thận tinh khuy — hay gặp tuổi già/thủ dâm) — ù a a âm ỉ, kéo dài, kèm choáng/thắt lưng mỏi; (b) THỰC chứng (can hoả/ngũ bạt thấp nhiệt) — ù to bất ngờ, như sóng/bíp, kèm đau đầu/mắt đỏ.',
+    symptoms: '(thận hư) tai ù kéo dài âm ỉ, choáng, thắt lưng đầu gối mỏi, tóc rụng; (can hoả) ù to đột ngột, đau đầu, mắt đỏ, cáu gắt.',
+    advice: 'THẬN HƯ: ① bổ thận tinh — lục vị địa hoàng hoàn / thông khí hoàn (quy bản, thục địa, sơn dược, kỷ tử); ăn đen (đậu đen, vừng đen). CAN HOẢ: ② long đởm tả can hoả / cúc hoa + diệp hạ châu; giảm cay nóng/ức chế. Tai ù lâu + nhiều triệu → khám chuyên khoa tai mũi họng.',
+  },
+  {
+    id: 'back_knee',
+    keywords: ['đau lưng', 'đau thắt lưng', 'đau đầu gối', 'mỏi lưng', 'thắt lưng mỏi', '腰痛', 'khớp', 'đau cột sống'],
+    title: 'Đau lưng / Đầu gối (THẬN HƯ — «lưng là phủ của thận»)',
+    summary: '«腰为肾之府» (thắt lưng là nhà của thận). Đau lưng mỏi (không phải chấn thương) thường = THẬN HƯ: mỏi ê ẩm, mệt thì nặng, nghỉ thì nhẹ. Cột sống/khớp = thận chủ cốt (xương). Đau lưng cấp/nặng = thấp nhiệt/ủ huyết (thực chứng).',
+    symptoms: '(thận hư) thắt lưng/đầu gối mỏi ê ẩm, mệt/đứng lâu nặng, kèm tiểu đêm/tóc rụng/choáng; ( thấp nhiệt) đau trương nặng + tiểu vàng; (ủ huyết) đau nhói cố định.',
+    advice: '① BỔ THẬN tráng cốt: đỗ trọng/tục đoạn/oa nhĩ (theo thầy thuốc); ăn: hà thủ ô, đậu đen, hạt óc chó, sơn dược, canh xương. ② Tránh đứng/ngồi lâu, mang vác nặng. ③ GIỮ ẤM thắt lưng (thận dương sợ lạnh). ④ Vận động nhẹ (bơi, yoga) — «động thì thông».',
+  },
+  {
+    id: 'constipation',
+    keywords: ['táo bón', 'đại tiện khó', 'phân khô', 'đi ngoài khó', '便秘', 'trĩ', 'đại tiện khô'],
+    title: 'Táo bón (ĐẠI TRƯỜNG — tân dịch khuy/nhiệt/khí hư)',
+    summary: 'Đại trường chủ truyện hóa (thải phân). Táo bón: (a) TÂN DỊCH KHUY (dịch khô, hay gặp thủ dâm/âm hư/già) — phân khô cứng; (b) NHIỆT MẬT — phân khô + nóng miệng/mặt đỏ; (c) KHÍ HƯ (tỳ/phổi) — có phân nhưng rặn无力, mệt; (d) HÀNG (lạnh) — phân khó, lạnh bụng.',
+    symptoms: '(tân khuy) phân khô cứng, khát khô miệng; (nhiệt) mặt đỏ, miệng hôi, tiểu vàng; (khí hư) mệt, rặn yếu, sau đi lại mỏi; (lạnh) bụng lạnh đau.',
+    advice: 'TÂN KHUY: ① nhuận tràng — quyết minh tử, hỏa ma nhân, quỷ bản (sinh tân); uống đủ nước ấm, mật ong sáng. NHIỆT: ② thanh nhiệt — khổ qua, mướp đắng, nhân trần, đậu xanh. KHÍ HƯ: ③ bổ khí — đảng sâm/hoàng kỳ, táo đỏ. ④ Ăn chất xơ (rau xanh, khoai lang, ý dĩ, vừng), vận động, đi đại tiện đúng giờ.',
+  },
+  {
+    id: 'sweat',
+    keywords: ["đổ mồ hôi","mồ hôi trộm", 'tự hãn', 'vã mồ hôi', 'mồ hôi tay', 'mồ hôi đêm', '盗汗', 'nhiều mồ hôi'],
+    title: 'Đổ mồ hôi nhiều (DƯƠNG HƯ tự hãn / ÂM HƯ đạo hãn)',
+    summary: '«dương hư tự hãn, âm hư đạo hãn»: (a) TỰ HÃN (ban ngày, động ra) = KHÍ HƯ (phổi vệ bất cố) — vệ khí không khép lỗ chân lông; (b) ĐẠO HÃN (đêm ngủ đổ, tỉnh thì dứt) = ÂM HƯ HOẢ VƯỢNG — âm không giữ dương, dương dư thoát ra ngoài (thường kèm thủ dâm/thức khuya).',
+    symptoms: '(tự hãn) ban ngày vã mồ hôi, mệt, sợ gió, dễ cảm; (đạo hãn) đêm đổ mồ hôi ướt áo, tỉnh dứt, kèm nóng bốc hoả, khô miệng, đỏ gò má.',
+    advice: 'TỰ HÃN (khí hư): ① bổ khí cố biểu — hoàng kỳ, bạch truật, phòng phong (ngự bình tán ý); táo đỏ, nhân sâm. ĐẠO HÃN (âm hư): ② dưỡng âm thanh nhiệt — sinh địa, mạch môn, đan bì, qui bản (đương quy lục hoàng); đậu đen, sen tâm. ③ Tránh cay nóng/thức khuya. Mồ hôi nhiều kéo dài + sụ cân → khám.',
+  },
+  {
+    id: 'stomach_pain',
+    keywords: ['đau dạ dày', 'đau bao tử', 'ợ chua', 'ợ hơi', 'đau vùng thượng vị', 'chảy máu dạ dày', 'viêm loét', '胃痛', 'tức bụng trên', 'đau khi đói'],
+    title: 'Đau dạ dày / Ợ chua (VỊ — hàn nhiệt uất thực + can phạm vị)',
+    summary: 'Vị (thổ) chủ thu nạp. Đau dạ dày: (a) VỊ HÀN (ăn lạnh/sinh) — đau âm ỉ ấm đỡ; (b) VỊ NHIỆT/Ợ CHUA (hoả) — đau rát, ợ chua, khát; (c) CAN KHÍ PHẠM VỊ (căng thẳng) — đau lan sườn, đau khi buồn/cáu; (d) VỊ ÂM HƯ (thủ dâm/rượu lâu) — đau khi đói, khát.',
+    symptoms: '(hàn) đau ấm đỡ, bụng lạnh; (nhiệt) đau rát ợ chua, khát, lưỡi vàng; (can phạm) đau lan sườn, buồn nôn khi buồn; (âm hư) đau khi đói, ăn vào đỡ.',
+    advice: 'HÀN: ① ôn vị — gừng/đường đỏ/quế/bột gạo nếp. NHIỆT/Ợ CHUA: ② tả vị hoả — bối mẫu, hải phiêu sao, nhân trần; giảm cay/chua/cà phê/rượu. CAN PHẠM: ③ sơ can hoà vị — sài hồ, bạch thược, cam thảo. ÂM Hư: ④ dưỡng vị âm — sa sâm, mạch môn, thạch斛. Ăn đúng giờ, nhai kỹ, 7 phần no, tránh đói quá/no quá.',
   },
 ];
 

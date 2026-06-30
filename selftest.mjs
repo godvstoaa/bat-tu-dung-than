@@ -8550,5 +8550,27 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1021] đông y / TCM (ngũ hành↔tạng + vượng suy→hư thực + KB thủ dâm→thận hư) ✓`);
 }
 
+// [loop 1022] đông-y CONDITION_KB mở rộng — 13 bệnh, keyword match chính xác + không garbled
+{
+  const { answerHealth, CONDITION_KB } = await import('./src/engine/tcm.js');
+  const _cases = [
+    ['mất ngủ kinh niên', 'insomnia'], ['rụng tóc nhiều', 'hair_loss'], ['hay bị mụn', 'acne_skin'],
+    ['hay mệt mỏi', 'fatigue'], ['tay chân lạnh', 'cold_limbs'], ['tai ù a', 'tinnitus'],
+    ['đau lưng mỏi', 'back_knee'], ['táo bón', 'constipation'], ['đổ mồ hôi trộm', 'sweat'],
+    ['đau dạ dày ợ chua', 'stomach_pain'], ['hay cáu gắt', 'liver_fire'], ['đầy bụng chán ăn', 'spleen_xu'],
+  ];
+  let _ok = 0;
+  for (const [q, exp] of _cases) {
+    const a = answerHealth(q, null);
+    if (a.matched && a.id === exp) _ok++; else console.log(`     ✗ ${q} → ${a.id} (expect ${exp})`);
+  }
+  assert(_ok === _cases.length, `[loop 1022] CONDITION_KB match ${_ok}/${_cases.length}`);
+  assert(CONDITION_KB.length >= 13, `[loop 1022] KB ≥ 13 conditions (got ${CONDITION_KB.length})`);
+  // no garbled latin artifacts
+  const _kb = JSON.stringify(CONDITION_KB);
+  assert(!/\b(green|misc|bak|Tillerson|Needs|pohong|ôleo)\b/.test(_kb), '[loop 1022] KB không garbled artifacts');
+  console.log(`   [loop 1022] đông-y KB mở rộng (13 conditions, match ${_ok}/${_cases.length}, clean) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
