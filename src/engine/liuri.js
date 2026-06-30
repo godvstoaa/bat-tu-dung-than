@@ -140,7 +140,13 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
   // [loop 12] Cộng tầng 格局流日喜忌 (optional, backward compatible).
   //   patternQuality truyền vào → cộng ★格局喜(+2)/⚠格局忌(−2) lên trên 4 trường phái.
   //   Không truyền → adjustLiuriByGeju trả clone với gejuDelta=0 (không thay đổi score).
-  return patternQuality ? adjustLiuriByGeju(result, patternQuality, dayGan) : result;
+  // [loop 1044 FIX] adjustLiuriByGeju upgrade RATING nhưng KHÔNG update advice → mismatch.
+  //   Nay sync advice sau geju adjust (advice phải khớp final rating/score).
+  const _adj = patternQuality ? adjustLiuriByGeju(result, patternQuality, dayGan) : result;
+  _adj.advice = _adj.score >= 54 ? `Hôm nay (${_adj.rating}) — thuận, nên làm việc chính/ký kết/gặp quý nhân.`
+    : _adj.score >= 48 ? `Hôm nay (${_adj.rating}) — tạm ổn, làm việc thường, tránh quyết định lớn.`
+    : `Hôm nay (${_adj.rating}) — bất lợi, giữ mình, tránh đầu tư/cho vay/cãi vã/đi xa liều, bao dung tình cảm.`;
+  return _adj;
 }
 
 // Tìm N ngày tốt kế tiếp cho việc cá nhân (vận cá nhân, không theo việc cụ thể)
