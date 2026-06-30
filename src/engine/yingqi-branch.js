@@ -230,8 +230,13 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
   const zhen = events.filter((e) => e.grade === 'zhen');
   const catYears = events.filter((e) => e.tone === 'cat').map((e) => e.year);
   const hungYears = events.filter((e) => e.tone === 'hung').map((e) => e.year);
-  // sắp xếp ưu tiên: CÁT+真应期+mở kho > CÁT+mở kho > mở kho > ... HUNG xuống cuối (cảnh báo)
-  const toneRank = (e) => (e.tone === 'hung' ? 5 : e.tone === 'mixed' ? 4 : e.tone === 'cat' ? 0 : 3);
+  // [loop 1000] 岁运巅峰 — năm CÁT (lưu niên mở Dụng) nằm TRONG thập kỷ CÁT (đại vận cũng mở
+  //   Dụng) = 2 tầng ứng kỳ HỘI TỤ → đỉnh cơ hội. Cổ法 «岁运并用» (lưu niên + đại vận cùng thuận Dụng).
+  const _catDecadeGz = new Set(dayunActivations.filter((d) => d.tone === 'cat').map((d) => d.ganZhi));
+  for (const e of events) e.peak = (e.tone === 'cat' && e.dy && _catDecadeGz.has(e.dy)) ? '岁运巅峰' : null;
+  const peakYears = events.filter((e) => e.peak).map((e) => e.year);
+  // sắp xếp ưu tiên: 岁运巅峰 > CÁT+真应期+mở kho > ... HUNG xuống cuối (cảnh báo)
+  const toneRank = (e) => (e.peak ? -1 : e.tone === 'hung' ? 5 : e.tone === 'mixed' ? 4 : e.tone === 'cat' ? 0 : 3);
   const rank = (e) => (e.grade === 'zhen' && e.type === 'xung mở kho' ? 0 : e.type === 'xung mở kho' ? 1 : e.grade === 'zhen' ? 2 : 3);
   const top = events.slice().sort((a, b) => toneRank(a) - toneRank(b) || rank(a) - rank(b) || a.year - b.year).slice(0, 6);
 
@@ -253,10 +258,12 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
     // [loop 994] tone — năm bật Dụng (CÁT) vs bật Kỵ (HUNG)
     if (catYears.length) summary += ` 🎉Năm bật DỤNG sao (CÁT): ${catYears.join(', ')}.`;
     if (hungYears.length) summary += ` ⚠Năm bật KỴ sao (HUNG — cẩn trọng): ${hungYears.join(', ')}.`;
+    // [loop 1000] 岁运巅峰 — năm CÁT hội tụ với thập kỷ CÁT = ĐỈNH cơ hội
+    if (peakYears.length) summary += ` 👑岁运巅峰 (năm mở Dụng nằm TRONG thập kỷ mở Dụng — 2 tầng hội tụ, đỉnh cơ hội): ${peakYears.join(', ')}.`;
     // dòng lĩnh vực nổi bật của năm mạnh nhất
     const first = top[0];
     if (first && first.groups.length) {
-      const toneTag = first.tone === 'cat' ? ' 🎉CÁT' : first.tone === 'hung' ? ' ⚠HUNG' : first.tone === 'mixed' ? ' ≡TRUNG' : '';
+      const toneTag = first.peak ? ' 👑岁运巅峰' : first.tone === 'cat' ? ' 🎉CÁT' : first.tone === 'hung' ? ' ⚠HUNG' : first.tone === 'mixed' ? ' ≡TRUNG' : '';
       const gradeTag = first.grade === 'zhen' ? ' ★真应期' : first.grade === 'zu' ? ' ⚠giảm lực' : '';
       summary += ` ≫ ${first.year}: kích hoạt «${first.groups.map((g) => g.vi).join('+')}»${gradeTag}${toneTag} → ${first.groups.map((g) => g.domain).join(' / ')}.`;
     }
@@ -279,6 +286,7 @@ export function scanBranchYingqi(R, fromYear, count = 12) {
     zhenYears: zhen.map((e) => e.year),
     catYears,
     hungYears,
+    peakYears,
     dayunActivations,
     allCount: events.length,
     summary,

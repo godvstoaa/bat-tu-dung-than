@@ -2924,6 +2924,15 @@ assert(by.hungYears.includes(2026), '[994] hungYears chứa 2026');
 assert(Array.isArray(by.dayunActivations) && by.dayunActivations.length >= 3, '[997] có dayunActivations (≥3 thập kỷ kích hoạt)');
 const dyKu = by.dayunActivations.find((d) => d.type === 'xung mở kho' && d.branch === '戌');
 assert(dyKu && dyKu.tone === 'cat' && dyKu.ganZhi === '丙辰', '[997] đại vận 丙辰 mở kho 戌 → bật Tài(Dụng) CÁT cả thập kỷ');
+// [loop 1000] 岁运巅峰 — năm CÁT nằm trong thập kỷ CÁT = 2 tầng hội tụ (1985-10-25 nam: 2035-2037)
+{
+  const _pkR = analyze(1985, 10, 25, 12, 0, 'nam', 2026);
+  const _pk = scanBranchYingqi(_pkR, 2026, 12);
+  assert(_pk.peakYears && _pk.peakYears.includes(2035), '[1000] 1985 nam có 岁运巅峰 (2035 CÁT năm + CÁT thập kỷ)');
+  assert(_pk.summary.includes('岁运巅峰'), '[1000] summary nhắc 岁运巅峰');
+  // spR: CÁT thập kỷ (丙辰) nằm ngoài window 12 năm → không peak (chính xác)
+  assert(!by.peakYears || by.peakYears.length === 0 || by.peakYears.every((y) => by.catYears.includes(y)), '[1000] peakYears ⊆ catYears (peak là subset của CÁT)');
+}
 // 2026 xung 子 → Ấn, nhưng đại vận 己未(Tài, score>0) không cùng hướng → «thường» (không phải zhen)
 const by2026z = by.events.find((e) => e.year === 2026);
 assert(by2026z && by2026z.grade !== 'zhen', '2026 kích hoạt Ấn trong đại vận Tài → KHÔNG phải 真应期 (khác hướng)');
