@@ -88,6 +88,10 @@ const NAME_VI = {
   quế: { han: '桂', strokes: 10 }, sen: { han: '蓮', strokes: 17 }, thơ: { han: '詩', strokes: 13 },
   tiết: { han: '節', strokes: 15 }, trinh: { han: '貞', strokes: 9 }, tường: { han: '祥', strokes: 11 },
   tuyết: { han: '雪', strokes: 11 }, viên: { han: '圓', strokes: 13 },
+  // [loop 1048] +7 chữ tên phổ biến (康熙): Danh/Giang/Lực/Nghị/Tân/Vương/Điền
+  danh: { han: '名', strokes: 6 }, giang: { han: '江', strokes: 7 }, lực: { han: '力', strokes: 2 },
+  nghị: { han: '議', strokes: 20 }, tân: { han: '辛', strokes: 7 }, vương: { han: '王', strokes: 4 },
+  điền: { han: '田', strokes: 5 },
 };
 
 /**
