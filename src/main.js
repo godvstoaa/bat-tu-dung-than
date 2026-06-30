@@ -3430,6 +3430,7 @@ async function handleAsk() {
     chatHistory.push({ role: 'user', content: q });
     chatHistory.push({ role: 'assistant', content: text });
     if (chatHistory.length > 16) chatHistory = chatHistory.slice(-16);
+    _updateExportBtn();   // [loop 974] enable export button when chat has content
   } catch (e) {
     if (e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''))) {
       body.textContent = '(⏹ đã dừng — bạn có thể hỏi lại)';
@@ -4965,7 +4966,25 @@ $('ai-chat-clear').addEventListener('click', () => {
   const log = $('chat-log'); if (log) log.innerHTML = '';
   _skipChatReset = true; // tránh reset thêm khi render
   try { const st = $('ai-status'); if (st) st.textContent = '🔄 Đã bắt đầu hội thoại mới.'; } catch (_) {}
+  _updateExportBtn();
 });
+// [loop 974] EXPORT conversation as markdown
+function _updateExportBtn() { const b = $('ai-chat-export'); if (b) b.disabled = !chatHistory.length; }
+function _exportChat() {
+  if (!chatHistory.length) return;
+  const subj = currentResult?.chart?.input;
+  const head = subj ? `# Hội thoại Bát Tự — ${subj.year}/${subj.month}/${subj.day} (${subj.gender})\n\n` : '# Hội thoại Bát Tự\n\n';
+  const body = chatHistory.map(m => m.role === 'user' ? `## ❓ Bạn\n\n${m.content}\n` : `## 💬 Trợ lý\n\n${m.content}\n`).join('\n');
+  const md = head + body + '\n---\n*Xuất từ Bát Tự Dụng Thần · battu.god8.shop*\n';
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ba-tu-hoi-thoai-${new Date().toISOString().slice(0,10)}.md`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  const st = $('ai-status'); if (st) st.textContent = '📥 Đã tải xuống hội thoại (.md)';
+}
+$('ai-chat-export')?.addEventListener('click', _exportChat);
 $('cfg-cancel').addEventListener('click', closeModal);
 $('cfg-save').addEventListener('click', saveModal);
 $('ai-modal').addEventListener('click', (e) => { if (e.target.id === 'ai-modal') closeModal(); });
