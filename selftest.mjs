@@ -8698,15 +8698,14 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1030] vi2han ↔ name.js stroke consistency (黃/清/鸞 fixed) ✓`);
 }
 
-// [loop 1033] chenggu lookupFortune — gap (5.8/5.9) map tới NEAREST, verse luôn defined
+// [loop 1033] chenggu lookupFortune — nearest-key fallback robust + verse luôn defined
 {
   const { chenggu, FORTUNE } = await import('./src/engine/chenggu.js');
   const { analyze } = await import('./src/engine/chart.js');
-  // nearest-key cho gap: 5.8→5.7, 5.9→6.0 (trước đây cả 2 → 5.6 SAI)
+  // nearest-key cho giá trị hypothetical không có (vd 5.85) → map gần nhất
   const _keys = Object.keys(FORTUNE).map(Number);
   const _nearest = (t) => { let b = _keys[0], bd = Math.abs(t - b); for (const k of _keys) { const d = Math.abs(t - k); if (d < bd) { bd = d; b = k; } } return b; };
-  assert(_nearest(5.8) === 5.7, `[loop 1033] gap 5.8 → 5.7 nearest (got ${_nearest(5.8)})`);
-  assert(_nearest(5.9) === 6.0, `[loop 1033] gap 5.9 → 6.0 nearest (got ${_nearest(5.9)})`);
+  assert(_nearest(5.85) === 5.8 || _nearest(5.85) === 5.9, `[loop 1033] nearest fallback (5.85→${_nearest(5.85)})`);
   // fuzz: mọi chart → verse + interpretation đều defined (no undefined fortune)
   let _undef = 0;
   for (let i = 0; i < 200; i++) {
@@ -8715,7 +8714,22 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     if (!_c.verse || !_c.interpretation || _c.totalLiang == null) _undef++;
   }
   assert(_undef === 0, `[loop 1033] chenggu fuzz 200 — verse luôn defined (got ${_undef} undefined)`);
-  console.log(`   [loop 1033] chenggu lookupFortune (gap nearest + fuzz 200 verse defined) ✓`);
+  console.log(`   [loop 1033] chenggu lookupFortune (nearest fallback + fuzz 200) ✓`);
+}
+
+// [loop 1034] 称骨歌 FORTUNE — 51 verses đầy đủ (2.1-7.1 continuous), +5.8/5.9
+{
+  const { FORTUNE } = await import('./src/engine/chenggu.js');
+  const _keys = Object.keys(FORTUNE).map(Number).sort((a, b) => a - b);
+  assert(_keys.length === 51, `[loop 1034] FORTUNE đủ 51 verses (got ${_keys.length})`);
+  // continuous 2.1 → 7.1, no gaps
+  let _gaps = 0;
+  for (let i = 0; i < _keys.length - 1; i++) if (Math.round((_keys[i + 1] - _keys[i]) * 10) !== 1) _gaps++;
+  assert(_keys[0] === 2.1 && _keys[_keys.length - 1] === 7.1 && _gaps === 0, `[loop 1034] FORTUNE continuous 2.1-7.1 (gaps=${_gaps})`);
+  // 5.8 + 5.9 verses (newly added, sourced)
+  assert(/福禄自然来/.test(FORTUNE['5.8']?.verse || ''), `[loop 1034] 5.8 verse (官禄之命)`);
+  assert(/才高礼义通/.test(FORTUNE['5.9']?.verse || ''), `[loop 1034] 5.9 verse (才高礼义)`);
+  console.log(`   [loop 1034] 称骨歌 FORTUNE 51 verses đầy đủ (2.1-7.1 continuous, +5.8/5.9) ✓`);
 }
 
 process.exit(FAILS === 0 ? 0 : 1);

@@ -204,6 +204,15 @@ const FORTUNE = {
     verse: '福寿绵长富贵全，名声赫赫四方传；平生多福多康宁，更有功名达上天。',
     interpretation: 'Phúc thọ dài phú quý toàn, danh tiếng lừng lẫy bốn phương: nhiều phúc nhiều khỏe, công danh đạt trời. Sự nghiệp đỉnh phong, thọ cao.',
   },
+  // [loop 1034] bổ sung 2 verse thiếu (5.8/5.9) — sourced 袁天罡称骨歌 (Baidu/网易通行版).
+  '5.8': {
+    verse: '平生福禄自然来，名利兼全福禄偕；雁塔题名为贵客，紫袍玉带走金阶。',
+    interpretation: '«Quan lộc chi mệnh»: một đời phúc lộc tự đến, danh lợi song toàn. Đậu đạt cao (quý khách tháp nhạn), áo tím đai ngọc bước sân rồng — mệnh quan lộc, sự nghiệp hiển hách, vãn niên hưởng phúc.',
+  },
+  '5.9': {
+    verse: '细推此格妙且清，必定才高礼义通；甲第三人当及第，巍巍独立显宗风。',
+    interpretation: 'Tài cao lễ nghĩa thông, tâm linh thủ xảo, việc có đầu có đuôi. Đậu đạt (giáp ba đệ nhất), sừng sững độc lập rạng tông phong. Nên an phận thủ trách, chân đất phát triển, phúc lộc tự túc.',
+  },
   '6.0': {
     verse: '一朝金榜快题名，显祖荣宗豁眼明；平生福禄真堪羡，万乘之尊遇太平。',
     interpretation: 'Một ngày kim bảng đề danh, rạng tổ vinh tông: phúc lộc đáng ngưỡng mộ, tôn quý bậc vua chúa thái bình. Sự nghiệp cực vượng, tài lộc vô song, thọ rất cao.',
