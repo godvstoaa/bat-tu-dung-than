@@ -8571,6 +8571,17 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   // no garbled latin artifacts
   const _kb = JSON.stringify(CONDITION_KB);
   assert(!/\b(green|misc|bak|Tillerson|Needs|pohong|ôleo)\b/.test(_kb), '[loop 1022] KB không garbled artifacts');
+  // [loop 1025] cá nhân hoá cho MỌI condition (không chỉ kidney_jing) — chart-grounded note
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  let _pers = 0;
+  for (const q of ['mất ngủ', 'rụng tóc', 'đau lưng', 'đau bụng kinh']) {
+    const a = answerHealth(q, _R);
+    if (/Bản LA SỐ/.test(a.reply)) _pers++;
+  }
+  assert(_pers === 4, `[loop 1025] cá nhân hoá mọi condition (got ${_pers}/4 có note Bản LA SỐ)`);
+  // no-R: không crash, không có note cá nhân
+  const _nR = answerHealth('mất ngủ', null);
+  assert(_nR.matched && !/Bản LA SỐ/.test(_nR.reply), '[loop 1025] no-R: match OK, không note');
   console.log(`   [loop 1022] đông-y KB mở rộng (13 conditions, match ${_ok}/${_cases.length}, clean) ✓`);
 }
 

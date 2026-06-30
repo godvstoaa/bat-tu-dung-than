@@ -264,6 +264,16 @@ export function analyzeHealth(R) {
   };
 }
 
+// [loop 1025] CONDITION_WX — ngũ hành/tạng liên quan tới mỗi chứng (để cá nhân hoá theo lá số).
+const CONDITION_WX = {
+  kidney_jing: ['水'], liver_fire: ['木'], spleen_xu: ['土'],
+  insomnia: ['火', '水'], hair_loss: ['水', '木'], acne_skin: ['金', '土'],
+  fatigue: ['土', '金'], cold_limbs: ['水', '土'], tinnitus: ['水', '木'],
+  back_knee: ['水'], constipation: ['金'], sweat: ['金', '水'],
+  stomach_pain: ['土', '木'], dysmenorrhea: ['木', '水'],
+  irregular_period: ['木', '土', '水'], infertility: ['水', '木'], menopause: ['水'],
+};
+
 /**
  * Trả lời câu hỏi sức khoẻ đông y — khớp từ khoá với CONDITION_KB, cá nhân hoá theo lá số.
  * @param {string} q — câu hỏi người dùng
@@ -272,21 +282,30 @@ export function analyzeHealth(R) {
 export function answerHealth(q, R) {
   const ql = (q || '').toLowerCase();
   const hit = CONDITION_KB.find((c) => c.keywords.some((k) => ql.includes(k.toLowerCase())));
-  if (!hit) return { ok: false, matched: false, reply: 'Tôi chưa có cơ sở tri thức đông-y cụ thể cho câu này. Hãy hỏi về: thận hư/thủ dâm/sinh lý, can hoả/stress/đau đầu, tỳ vị/tiêu hoá — hoặc xem phân tích sức khoẻ theo ngũ hành của lá số.' };
+  if (!hit) return { ok: false, matched: false, reply: 'Tôi chưa có cơ sở tri thức đông-y cụ thể cho câu này. Hãy hỏi về: thận hư/thủ dâm/sinh lý, can hoả/stress/đau đầu, tỳ vị/tiêu hoá, mất ngủ/rụng tóc/mụn/kinh nguyệt — hoặc xem phân tích sức khoẻ theo ngũ hành của lá số.' };
   let reply = `【${hit.title}】\n${hit.summary}\n`;
   if (hit.yin) reply += `\n• ${hit.yin}\n`;
   if (hit.yang) reply += `• ${hit.yang}\n`;
   if (hit.symptoms) reply += `\nTriệu chứng: ${hit.symptoms}\n`;
   if (hit.advice) reply += `\nLời khuyên: ${hit.advice}\n`;
   if (hit.related) reply += `\nLiên quan ngũ hành: ${hit.related}\n`;
-  // cá nhân hoá: lá số thuỷ (thận) yếu/mạnh?
+  // [loop 1025] cá nhân hoá cho MỌI condition — ngũ hành liên quan tới chứng, so vượng suy lá số.
   let personal = '';
   if (R && R.wx && R.wx.pct) {
-    const wp = R.wx.pct['水'];
-    if (hit.id === 'kidney_jing' && wp != null) {
-      const avg = Object.values(R.wx.pct).reduce((a, b) => a + b, 0) / 5;
-      personal = `\n Bản LA SỐ: ngũ hành Thủy (肾) chiếm ${(+wp.toFixed(1))}% ${wp < avg ? '— YẾU: thận vốn thiên hư, càng dễ tổn thương khi hao tinh, cần tiết dục + bổ nhiều hơn.' : '— khá:vẫn cần tiết độ nhưng phục hồi nhanh hơn.'}`;
-    }
+    const pct = R.wx.pct;
+    const avg = Object.values(pct).reduce((a, b) => a + b, 0) / 5;
+    const rel = CONDITION_WX[hit.id] || [];
+    const notes = rel.map((wx) => {
+      const p = pct[wx];
+      if (p == null) return '';
+      const zang = WUX_ZANG[wx].zang.split(' ')[0];
+      const pp = (+p.toFixed(1));
+      if (p < avg * 0.8) return `${zang}(${wx}) ${pp}% — YẾU (thiên hư) → dễ mắc/vulnerable, cần bổ ${wx} nhiều hơn`;
+      if (p < avg) return `${zang}(${wx}) ${pp}% — hơi yếu → nên phòng + bổ nhẹ`;
+      if (p > avg * 1.2) return `${zang}(${wx}) ${pp}% — VƯỢNG (thiên thực) → chứng này ít do hư, nhưng tránh «thực chứng» (vd hoả vượng → tả)`;
+      return `${zang}(${wx}) ${pp}% — cân → nguy cơ trung bình`;
+    }).filter(Boolean);
+    if (notes.length) personal = `\n Bản LA SỐ: ${notes.join('; ')}.`;
   }
   return { ok: true, matched: true, id: hit.id, title: hit.title, reply: reply + personal };
 }
