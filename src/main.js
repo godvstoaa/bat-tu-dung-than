@@ -3234,6 +3234,37 @@ function renderGoldenYear(R) {
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được năm hoàng kim.</p>'; }
 }
 
+// [loop 1061] Vận Trục Lưu Niên — 10-year bar chart visual
+function renderLiunianChart(R) {
+  const el = $('liunian-chart');
+  if (!el) return;
+  try {
+    const curYear = new Date().getFullYear();
+    const years = [];
+    for (let y = curYear; y < curYear + 10; y++) {
+      try {
+        const ln = analyzeLiunianDeep(R, y, R.patternYong || R.patternQuality?.patternYong);
+        years.push({ year: y, ganZhi: ln.ganZhi, score: ln.score, rating: ln.rating });
+      } catch (_) { years.push({ year: y, ganZhi: '?', score: 0, rating: '?' }); }
+    }
+    const bars = years.map((yr) => {
+      const s = yr.score || 0;
+      const col = yr.rating === 'Cát' ? '#2a7' : yr.rating === 'Hung' ? '#c33' : '#9a8';
+      const h = Math.max(4, Math.abs(s) * 2);
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:32px" title="${yr.year} ${esc(yr.ganZhi)} ${esc(yr.rating)} (score ${s})">
+        <div style="position:relative;height:70px;width:100%;display:flex;align-items:center;justify-content:center">
+          <div style="position:absolute;${s>=0?'bottom:50%':'top:50%'};width:70%;max-width:30px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:0.85"></div>
+          <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--gold,dimgray);opacity:0.3"></div>
+        </div>
+        <span class="zh" style="font-size:10px">${esc(yr.ganZhi)}</span>
+        <span class="hint" style="font-size:9px">${yr.year}</span>
+        <span class="hint" style="font-size:9px;color:${col}">${esc((yr.rating||'').slice(0,6))}</span>
+      </div>`;
+    }).join('');
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0">${bars}</div><p class="hint" style="margin-top:4px">📊 ${curYear}–${curYear+9} · Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh. Click 💬 AI hỏi chi tiết năm nào.</p>`;
+  } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận trục lưu niên.</p>'; }
+}
+
 // [loop 1060] Ngũ Hành Cân Bằng — 5 colored bars visual
 function renderWxChart(R) {
   const el = $('wx-chart');
@@ -3932,6 +3963,7 @@ async function run() {
   lazyRender('forecast5',      () => { try { renderForecast5(currentResult); } catch (e) { console.warn('forecast5', e.message); } });
   lazyRender('dayun-chart',    () => { try { renderDayunChart(currentResult); } catch (e) { console.warn('dayun-chart', e.message); } });
   lazyRender('wx-chart',       () => { try { renderWxChart(currentResult); } catch (e) { console.warn('wx-chart', e.message); } });
+  lazyRender('liunian-chart',  () => { try { renderLiunianChart(currentResult); } catch (e) { console.warn('liunian-chart', e.message); } });
 
   // quick-nav: jump links — [loop 936 FIX] theo GROUP header (~8) thay vì 165 card
   //   (165 chip overflow trên mobile → nav chính nó không dùng được). + scroll-spy active.
