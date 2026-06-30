@@ -8751,5 +8751,31 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1035] vi2han +8 chữ tên phổ biến (Quỳnh/Phượng/Quyên/Nhiên/Lam/Khôi/Ninh/Thuần) ✓`);
 }
 
+// [loop 1036] vi2han +20 chữ tên phổ biến + họ Đoan (康熙 verified)
+{
+  const { viToHan, SURNAME_VI, NAME_VI } = await import('./src/engine/vi2han.js');
+  const { STROKES } = await import('./src/engine/name.js');
+  // 20 given + Đoan surname convert
+  const _cases = {
+    'nguyen tuyet': '雪', 'tran bich ngoc': '碧', 'le hue trinh': '惠', 'pham cat lien': '吉',
+    'doan tuong vien': '端', 'hoang tho van': '詩', 'nguyen hong': '紅', 'le nguyen': '元',
+  };
+  let _ok = 0;
+  for (const [name, expectHan] of Object.entries(_cases)) {
+    const t = viToHan(name);
+    if (!t.missing?.length && t.chars.some((c) => c.han === expectHan)) _ok++;
+    else console.log(`     ✗ ${name} (expect ${expectHan}) → ${t.missing?.length ? 'MISS' : t.chars.map((c) => c.han).join('')}`);
+  }
+  assert(_ok === Object.keys(_cases).length, `[loop 1036] convert ${_ok}/${Object.keys(_cases).length}`);
+  // 康熙 verified strokes
+  assert(STROKES['碧'] === 14 && STROKES['菊'] === 14 && STROKES['蓮'] === 17 && STROKES['節'] === 15, `[loop 1036] 碧14/菊14/蓮17/節15`);
+  assert(SURNAME_VI.đoan.strokes === 14, `[loop 1036] họ Đoan→端:14`);
+  // consistency vi2han ↔ name.js
+  let _inc = 0;
+  for (const tbl of [SURNAME_VI, NAME_VI]) for (const [, info] of Object.entries(tbl)) if (STROKES[info.han] != null && STROKES[info.han] !== info.strokes) _inc++;
+  assert(_inc === 0, `[loop 1036] vi2han↔name.js consistent (${_inc})`);
+  console.log(`   [loop 1036] vi2han +20 chữ tên + họ Đoan (150→ổng ${Object.keys(SURNAME_VI).length + Object.keys(NAME_VI).length}) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

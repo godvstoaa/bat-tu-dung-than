@@ -23,6 +23,7 @@ const SURNAME_VI = {
   bùi: { han: '裴', strokes: 14 },
   hồ: { han: '胡', strokes: 9 },
   đỗ: { han: '杜', strokes: 7 },
+  đoan: { han: '端', strokes: 14 }, // [loop 1036] họ Đoan
 };
 
 // Chữ tên đệm/given phổ biến (Việt → Hán Tự + Kangxi)
@@ -71,6 +72,14 @@ const NAME_VI = {
   quỳnh: { han: '瓊', strokes: 20 }, phượng: { han: '鳳', strokes: 14 }, quyên: { han: '娟', strokes: 10 },
   nhiên: { han: '然', strokes: 12 }, lam: { han: '藍', strokes: 20 }, khôi: { han: '魁', strokes: 14 },
   ninh: { han: '寧', strokes: 14 }, thuần: { han: '純', strokes: 10 },
+  // [loop 1036] +20 chữ tên phổ biến (康熙 verified): Bích/Cát/Cúc/Diệp/Đoan/Hạnh/Hồng/Huệ/Khuê/Liên/Nguyên/Nhã/Quế/Sen/Thơ/Tiết/Trinh/Tường/Tuyết/Viên
+  bích: { han: '碧', strokes: 14 }, cát: { han: '吉', strokes: 6 }, cúc: { han: '菊', strokes: 14 },
+  diệp: { han: '葉', strokes: 15 }, đoan: { han: '端', strokes: 14 }, hạnh: { han: '幸', strokes: 8 },
+  hồng: { han: '紅', strokes: 9 }, huệ: { han: '惠', strokes: 12 }, khuê: { han: '圭', strokes: 6 },
+  liên: { han: '蓮', strokes: 17 }, nguyên: { han: '元', strokes: 4 }, nhã: { han: '雅', strokes: 12 },
+  quế: { han: '桂', strokes: 10 }, sen: { han: '蓮', strokes: 17 }, thơ: { han: '詩', strokes: 13 },
+  tiết: { han: '節', strokes: 15 }, trinh: { han: '貞', strokes: 9 }, tường: { han: '祥', strokes: 11 },
+  tuyết: { han: '雪', strokes: 11 }, viên: { han: '圓', strokes: 13 },
 };
 
 /**
