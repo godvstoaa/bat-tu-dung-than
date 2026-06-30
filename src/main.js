@@ -6078,8 +6078,15 @@ function renderQuickSummary() {
     }).filter(Boolean);
     if (famOffend.length) alert = (alert ? alert + ' · ' : '') + `⚠ Gia đình phạm thái tuế ${tsYear}: ${famOffend.join(', ')}.`;
   } catch (e) {}
-  // Dụng thần hành động
-  const dungAction = { 木: 'màu xanh, hướng Đông, cây cối', 火: 'màu đỏ, hướng Nam, ánh sáng', 土: 'màu vàng, hướng Tây Nam, gốm đá', 金: 'màu trắng, hướng Tây, vật kim loại', 水: 'màu đen/xanh đậm, hướng Bắc, nước' }[yong.primary] || '';
+  // Dụng thần hành động — [loop 976] enriched: +số (河图), +mùa, +vị (五味)
+  const _dungMap = {
+    木: 'màu xanh lá, hướng Đông, số 3/8, mùa Xuân, vị chua, cây cối/gỗ',
+    火: 'màu đỏ/hồng, hướng Nam, số 2/7, mùa Hạ, vị đắng, ánh sáng/lửa',
+    土: 'màu vàng/nâu, hướng Tây Nam, số 5/0, mùa chuyển (tháng cuối quý), vị ngọt, gốm đá/đất',
+    金: 'màu trắng/bạc, hướng Tây, số 4/9, mùa Thu, vị cay, vật kim loại',
+    水: 'màu đen/xanh đậm, hướng Bắc, số 1/6, mùa Đông, vị mặn, nước/chất lỏng',
+  };
+  const dungAction = _dungMap[yong.primary] || '';
   // [loop 219] Vận hiện tại — đại运 + lưu niên đang hành (ngữ cảnh giai đoạn đời)
   let curDyTxt = '(đang tính)';
   try {
