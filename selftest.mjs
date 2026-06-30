@@ -1805,6 +1805,24 @@ const _uniq = new Set(_samples.map((s) => s.slice(0, 12)));
 assert(_uniq.size >= 3, `[loop 624] finalVerdict đa dạng qua các thời (${_uniq.size} kiểu, không 1 phán cố định)`);
 console.log(`   3-layer synthesis ✓ — processNote/outcomeNote/finalVerdict; ${_uniq.size} kiểu phán đa dạng qua 6 thời`);
 
+// [loop 1088] MAI HOA deterministic regression guards — khóa 2 quy tắc cổ pháp từng bug:
+//   (A) 互卦 formula (hào 2,3,4 / 3,4,5); (B) 变卦 动爻 ở HẠ (loop-552 fix — 50% quẻ từng sai).
+{
+  // 既济 (上坎/下离): lines [1,0,1,0,1,0]. 互卦: 下=hào234=[0,1,0]=坎, 上=hào345=[1,0,1]=离 → 未济
+  const _j = castByNumbers(6, 3); // upN=6坎, lowN=3离, dong=(9)%6=3 (HẠ quái)
+  assert(_j.name === '既济', `[loop 1088] 6,3 → 既济 (thực ${_j.name})`);
+  assert(_j.hu.lower === '坎' && _j.hu.upper === '离' && _j.hu.name === '未济', `[loop 1088] 互卦 既济 → 未济 (thực ${_j.hu.name}, 下${_j.hu.lower}/上${_j.hu.upper})`);
+  // 动爻=3 ở HẠ → 体=上=坎(Thủy), 用=下=离(Hỏa) [本卦 体克用 小吉]
+  assert(_j.dong === 3 && _j.dongInUpper === false, `[loop 1088] 6,3 dong=3 ở HẠ (dongInUpper=false, thực dong=${_j.dong})`);
+  assert(_j.ti.tri === '坎' && _j.yong.tri === '离', `[loop 1088] 体坎/用离 (thực 体${_j.ti.tri}/用${_j.yong.tri})`);
+  // 变卦: flip hào 3 → 下离[1,0,1]→[1,0,0]=震(Mộc). bianRel phải so THỂ(坎Thủy) vs 用 MỚI(震Mộc) = 体生用 不吉
+  //   KHÔNG PHẢI 比和 (loop-552 bug: cũ dùng bian.upper=坎 → relOf(Thủy,Thủy)=比和 SAI)
+  assert(_j.bian.lower === '震', `[loop 1088] 变卦: 下离 flip hào3 → 震 (thực ${_j.bian.lower})`);
+  assert(_j.bianRel.k === '体生用' && _j.bianRel.luck === '不吉', `[loop 1088] bianRel dong-HẠ = 体生用 不吉 (loop-552 fix, thực ${_j.bianRel.k}/${_j.bianRel.luck})`);
+  assert(_j.bianRel.k !== '比和', `[loop 1088] bianRel dong-HẠ KHÔNG 比和 (regression loop-552)`);
+  console.log(`   [loop 1088] mai hoa guards ✓ — 互卦 既济→未济 + 变卦 dong-HẠ 体生用 (loop-552 locked)`);
+}
+
 console.log('\n################## 19. LỤC DIỆU 六爻 (纳甲六亲世应用神) ##################');
 import { castLiuYao } from './src/engine/liuyao.js';
 // 乾卦 (all 少阳=7, tĩnh): 宫乾(金), 世6应3, 六亲 (dưới lên): 子孙妻财父母官鬼兄弟父母
