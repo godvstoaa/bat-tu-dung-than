@@ -296,7 +296,7 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
 //   Trước đây 5 tool bói (analyze_char/meihua/liuren/qimen/guiguzi) FLAT → Z.ai API reject → AI không bao giờ gọi được.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 19, `[loop 623→638] AI_TOOLS có đúng 19 tool (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 20, `[loop 623→638] AI_TOOLS có đúng 19 tool (got ${AI_TOOLS.length})`);
   const flat = AI_TOOLS.filter((t) => !(t && t.type === 'function' && t.function && t.function.name));
   assert(flat.length === 0, `[loop 623] KHÔNG còn tool FLAT — tất cả phải có wrapper {type:function,function:{name}} (còn ${flat.length} flat: ${flat.map(t=>t&&t.name).join(',')})`);
   const names = AI_TOOLS.map((t) => t.function.name);
@@ -3682,7 +3682,7 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
 // [loop 792] 19 AI tool descriptions — mỗi tool có description + when-to-use guidance.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 19, `[loop 792] 19 tools (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 20, `[loop 792] 20 tools (got ${AI_TOOLS.length})`);
   let _noDesc = 0;
   for (const t of AI_TOOLS) {
     const _d = t.function?.description || t.description || '';
@@ -3692,7 +3692,7 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   // majority có when-to-use guidance (Dùng khi/khi user)
   const _withGuide = AI_TOOLS.filter((t) => /Dùng khi|khi user|khi hỏi|when/i.test(t.function?.description || t.description || '')).length;
   assert(_withGuide >= 15, `[loop 792] ≥15 tool có when-to-use guidance (got ${_withGuide})`);
-  console.log(`   [loop 792] 19 tool descriptions đầy đủ (${_withGuide}/19 có when-to-use guidance) ✓`);
+  console.log(`   [loop 792] 20 tool descriptions đầy đủ (${_withGuide}/19 có when-to-use guidance) ✓`);
 }
 // [loop 793] isCaiKu gate !isFamily — «mẹ tôi giữ tiền» về pFamily (chart Mẹ), không pCaiKu(Quân).
 {
@@ -5410,7 +5410,7 @@ assert(QINXING_ANCHOR_YEAR === 1984 && QINXING_ANCHOR_TU === '虚', 'qinxing: an
 
 // ===== CANONICAL CALIBRATION — 演禽 年禽起例 (neo 1984 甲子 = 虚日鼠) =====
 // 6 mốc độc lập từ nguồn thư tịch. Nếu bất kỳ mốc nào FAIL → công thức sai.
-// Nguồn: 中华预测网 zhycw.com (1918/1919/1924/1984) + 知乎演禽 worked example (2021/2022).
+// Nguồn: 中华预测网 zhycw.com (1918/1920/2024/1984) + 知乎演禽 worked example (2021/2022).
 const CALIB = [
   { y: 1918, tu: '角', bird: '角木蛟', src: 'zhycw "1918年角宿值年"' },
   { y: 1919, tu: '亢', bird: '亢金龙', src: 'zhycw "1919年亢宿值年"' },
@@ -8267,11 +8267,12 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     ['fengshui_direction', {mode:'recommend',purpose:'cuakhach'}],
     ['health_q', {question:'hay thủ dâm sẽ bị gì'}], // [loop 1021] đông-y
     ['health_profile', {}], // [loop 1021] đông-y profile
+    ['health_hour', {}], // [loop 1040] đông-y 子午流注
   ];
   let _ok = 0;
   for (const [_n, _a] of _tests) { const _r = execTool(_n, _a, Ru); if (!_r.error) _ok++; }
-  assert(_ok === 19, `[loop 708] 19/19 tools pass smoke test (got ${_ok}/19)`);
-  console.log(`   19-TOOL SMOKE ✓ — ${_ok}/19 tools trả data với valid params`);
+  assert(_ok === 20, `[loop 708] 20/20 tools pass smoke test (got ${_ok}/20)`);
+  console.log(`   20-TOOL SMOKE ✓ — ${_ok}/20 tools trả data với valid params`);
 }
 // [loop 741] analyze_year / best_days_in_year — year RANGE validation.
 //   Trước đây chỉ Number.isFinite → năm -100 (TCN) / 9999 được luận tự tin gây hiểu nhầm.

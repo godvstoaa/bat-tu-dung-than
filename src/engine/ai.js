@@ -107,7 +107,7 @@ import { healthAlertScan } from './health-alert.js';
 import { computeHehun } from './hehun.js';
 import { synthesize } from './synthesis.js';
 import { matchBusinessPartners } from './partner-match.js';
-import { analyzeHealth, answerHealth } from './tcm.js';
+import { analyzeHealth, answerHealth, meridianClock } from './tcm.js';
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
@@ -622,6 +622,10 @@ export const AI_TOOLS = [
     }, required: ['question'] },
   } },
   { type: 'function', function: {
+    name: 'health_hour', description: 'ĐÔNG Y 子午流注 — kinh mạch nào đang hoạt động ở GIỜ NÀY + lời khuyên giờ (ăn/ngủ/tập). Dùng khi hỏi «giờ này tạng nào đỉnh», «nên làm gì giờ này», «kinh mạch giờ», «sao phải ngủ trước 23h».',
+    parameters: { type: 'object', properties: {}, required: [] },
+  } },
+  { type: 'function', function: {
     name: 'health_profile', description: 'Phân tích SỨC KHOẺ đông y theo LÁ SỐ: ngũ hành vượng suy → tạng yếu (hư) / mạnh (thực) +易患疾病 + thực疗/dược lý lời khuyên. Dùng khi hỏi «sức khoẻ của tôi sao», «tạng nào yếu», «nên ăn gì».',
     parameters: { type: 'object', properties: {}, required: [] },
   } },
@@ -780,6 +784,13 @@ export function execTool(name, args, R) {
       case 'health_q': { // [loop 1021] đông y — trả lời câu hỏi sức khoẻ theo ngũ hành + dược lý
         const h = answerHealth(String(a.question || ''), R);
         return h.matched ? { matched: true, title: h.title, reply: _s(h.reply, 1600) } : { matched: false, reply: _s(h.reply, 400) };
+      }
+      case 'health_hour': { // [loop 1040] đông y 子午流注 — kinh mạch giờ hiện tại
+        const _n = new Date();
+        const _lz = Solar.fromYmdHms(_n.getFullYear(), _n.getMonth() + 1, _n.getDate(), _n.getHours(), _n.getMinutes(), 0).getLunar();
+        const _hz = _lz.getTimeZhi();
+        const _mc = meridianClock(_hz);
+        return _mc ? { hourZhi: _hz, hours: _mc.hours, meridian: _mc.meridian, organ: _mc.organ, wx: _mc.wx, advice: _s(_mc.advice, 200) } : { error: 'Không xác định kinh mạch' };
       }
       case 'health_profile': { // [loop 1021] đông y — profile sức khoẻ từ ngũ hành vượng suy
         const p = analyzeHealth(R);
