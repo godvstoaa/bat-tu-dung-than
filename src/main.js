@@ -3303,7 +3303,7 @@ function renderLiunianChart(R) {
     const bars = years.map((yr) => {
       const s = yr.score || 0;
       const col = yr.rating === 'Cát' ? '#2a7' : yr.rating === 'Hung' ? '#c33' : '#9a8';
-      const h = Math.max(4, Math.abs(s) * 2);
+      const h = Math.min(70, Math.max(4, Math.abs(s) * 2)); // [loop 1066] cap 70px — tránh overflow container 80px
       return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:32px" title="${yr.year} ${esc(yr.ganZhi)} ${esc(yr.rating)} (score ${s})">
         <div style="position:relative;height:70px;width:100%;display:flex;align-items:center;justify-content:center">
           <div style="position:absolute;${s>=0?'bottom:50%':'top:50%'};width:70%;max-width:30px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:0.85"></div>
