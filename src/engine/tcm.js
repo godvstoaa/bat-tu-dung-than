@@ -311,7 +311,7 @@ export const CONDITION_KB = [
   // [loop 1055] +2 tim mạch phổ biến
   {
     id: 'hypertension',
-    keywords: ['huyết áp cao', 'tăng huyết áp', 'đo huyết áp', 'huyết áp tâm thu', 'huyết áp tâm trương', '高血压'],
+    keywords: ['cao huyết áp', 'huyết áp cao', 'tăng huyết áp', 'đo huyết áp', 'huyết áp tâm thu', 'huyết áp tâm trương', '高血压'],
     title: 'Cao huyết áp (CAN DƯƠNG THƯỢNG KHANG + đàm thấp ứ + âm hư dương cương)',
     summary: 'Đông-y: CAO HUYẾT ÁP = «CAN DƯƠNG THƯỢNG KHANG» (dương khí bốc lên đầu) + ĐÀM THẤP Ứ TRỆ (mạch máu hẹp) + ÂM HƯ DƯƠNG CƯƠNG (thận âm hư không hàm dương). 3 kiểu: (a) CAN DƯƠNG — căng đầu, mặt đỏ, mắt choáng; (b) ĐÀM THẤP — nặng đầu, phù, choáng; (c) ÂM HƯ — nóng, khô, mất ngủ.',
     symptoms: '(can dương) choáng căng đầu, mặt đỏ, mắt hoa, cáu gắt, cổ gáy cứng; (đàm thấp) đầu nặng, mệt, phù, buồn nôn; (âm hư) nóng bừng, đổ mồ hôi trộm, khô miệng, mất ngủ, thắt lưng mỏi.',
