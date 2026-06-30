@@ -1445,8 +1445,8 @@ function renderTongGen(R) {
     const forceBar = `
       <div style="margin:8px 0">
         <div style="display:flex;height:22px;border-radius:4px;overflow:hidden;border:1px solid rgba(212,175,55,0.3)">
-          <div style="width:${allyPct}%;background:#2e9e5b;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600">Dụng+Hỷ ${allyPct}%</div>
-          <div style="width:${enemyPct}%;background:#e0533d;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600">Kỵ+Thù ${enemyPct}%</div>
+          <div style="width:${allyPct}%;background:#1b7a3a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600">Dụng+Hỷ ${allyPct}%</div>
+          <div style="width:${enemyPct}%;background:#c0392b;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600">Kỵ+Thù ${enemyPct}%</div>
         </div>
         <p class="hint">${esc(lead)}</p>
       </div>`;
@@ -3119,8 +3119,8 @@ function renderTianxingZheri() {
   const opts = TX_MOUNTAINS_24.map((m) => '<option value="' + m + '">' + MOUNTAIN_VI[m] + ' (' + m + ')</option>').join('');
   el.innerHTML =
     '<p class="hint">Chọn sơn <b>TỌA</b> (坐) → module chấm 60 ngày tới theo vị trí thật của 7 chính tinh tới sơn/hướng. 太阳到向 +5, 太阴到山 +4, 恩用仇难, 调候 mùa; cấm 罗计掩日月 (cửa nhật/nguyệt thực). <em>24 sơn neo theo tiết khí (冬至→子).</em></p>' +
-    '<div class="yz-select"><label>Chọn sơn TỌA (坐): </label><select id="tx-sitting">' + opts + '</select>' +
-    '<label style="margin-left:12px">Hệ ngũ hành: </label><select id="tx-system"><option value="huaji">化气 (mặc định)</option><option value="zhengti">正体</option></select></div>' +
+    '<div class="yz-select"><label>Chọn sơn TỌA (坐): </label><select id="tx-sitting" aria-label="Sơn toạ (天星)">' + opts + '</select>' +
+    '<label style="margin-left:12px">Hệ ngũ hành: </label><select id="tx-system" aria-label="Hệ ngũ hành (天星)"><option value="huaji">化气 (mặc định)</option><option value="zhengti">正体</option></select></div>' +
     '<div id="tx-result"></div>';
   function paint(sitting, system) {
     const out = $('tx-result');
@@ -5836,7 +5836,7 @@ function renderYinzhai() {
   el.innerHTML =
     '<div class="yz-head">' + ov.title + '</div>' +
     '<p class="hint">' + ov.note + ' <em>Nguồn: ' + ov.source + '</em></p>' +
-    '<div class="yz-select"><label>Chọn sơn TỌA (坐): </label><select id="yz-mountain">' + opts + '</select></div>' +
+    '<div class="yz-select"><label>Chọn sơn TỌA (坐): </label><select id="yz-mountain" aria-label="Sơn toạ (择日)">' + opts + '</select></div>' +
     '<div id="yz-result"></div>' +
     '<div class="yz-rules">' + rulesHtml + '</div>';
   function paint(zhi) {
