@@ -3116,6 +3116,13 @@ assert(df.summary.includes('TỐT NHẤT') && df.summary.includes('XẤU NHẤT'
 const df2 = decadeForecast(spR, 2026, 10);
 assert(df2.summary === df.summary, 'decadeForecast deterministic');
 console.log(`   user 2026-2035: best ${df.best.year}(${df.best.rating}), worst ${df.worst.year} | 💰2028/29 🎯2030/31 ✓`);
+// [loop 1001] decade-forecast tích hợp 应期 — bảng 10 năm giờ có cờ Dụng/Kỵ/岁运巅峰
+{
+  const _dfpk = decadeForecast(analyze(1985, 10, 25, 12, 0, 'nam', 2026), 2026, 10);
+  const _y2035 = _dfpk.years.find((y) => y.year === 2035);
+  assert(_y2035 && _y2035.flags.some((f) => f.includes('岁运巅峰')), '[1001] decade-forecast 2035 có cờ 👑岁运巅峰');
+  assert(_dfpk.summary.includes('岁运巅峰'), '[1001] decade summary nhắc 岁运巅峰');
+}
 
 // ################## 49. CROSS-MODULE CONSISTENCY (user chart — chống mâu thuẫn giữa module) ##################
 console.log('\n################## 49. CROSS-MODULE CONSISTENCY ##################');
