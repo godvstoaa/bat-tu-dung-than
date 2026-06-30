@@ -62,6 +62,82 @@ body.theme-水 {
   --gold: #2196f3; --gold-bright: #64b5f6; --gold-pale: #bbdefb;
   --gold-soft: rgba(33, 150, 243, 0.12); --hairline: rgba(33, 150, 243, 0.22);
 }
+
+/* [loop 988] ANIMATED ELEMENT BACKGROUNDS — mở rộng .bg-glow theo Dụng Thần */
+/* Fire — flickering glow from bottom (flame-like) */
+body.theme-火 .bg-glow {
+  background: radial-gradient(700px 420px at 50% 100%, rgba(255, 82, 82, 0.22), transparent 65%),
+              radial-gradient(500px 300px at 30% 75%, rgba(255, 138, 128, 0.14), transparent 70%);
+  animation: none;
+}
+body.theme-火 .bg-glow::before {
+  content: ''; position: absolute; inset: 0; will-change: transform, opacity;
+  background: radial-gradient(350px 180px at 50% 100%, rgba(255, 120, 50, 0.18), transparent 55%);
+  animation: fireFlicker 2.8s ease-in-out infinite alternate;
+}
+@keyframes fireFlicker { 0% { opacity: 0.3; transform: scaleY(0.96) scaleX(1.02); } 50% { opacity: 0.55; transform: scaleY(1.04); } 100% { opacity: 0.4; transform: scaleY(0.98) scaleX(1.01); } }
+
+/* Water — flowing wave drift */
+body.theme-水 .bg-glow {
+  background: radial-gradient(600px 400px at 50% 60%, rgba(33, 150, 243, 0.14), transparent 70%),
+              radial-gradient(400px 300px at 25% 85%, rgba(74, 134, 208, 0.1), transparent 70%);
+  animation: none;
+}
+body.theme-水 .bg-glow::before {
+  content: ''; position: absolute; inset: 0; will-change: transform, opacity;
+  background: radial-gradient(500px 250px at 50% 100%, rgba(64, 150, 255, 0.12), transparent 60%);
+  animation: waterFlow 8s ease-in-out infinite alternate;
+}
+@keyframes waterFlow { 0% { transform: translateX(-25px); opacity: 0.2; } 100% { transform: translateX(25px); opacity: 0.35; } }
+
+/* Wood — organic growth drift */
+body.theme-木 .bg-glow {
+  background: radial-gradient(600px 400px at 50% 40%, rgba(76, 175, 80, 0.12), transparent 70%),
+              radial-gradient(400px 500px at 80% 90%, rgba(102, 187, 106, 0.08), transparent 70%);
+  animation: none;
+}
+body.theme-木 .bg-glow::before {
+  content: ''; position: absolute; inset: 0; will-change: transform, opacity;
+  background: radial-gradient(450px 600px at 30% 100%, rgba(76, 175, 80, 0.1), transparent 55%);
+  animation: woodGrow 10s ease-in-out infinite alternate;
+}
+@keyframes woodGrow { 0% { transform: scale(1); opacity: 0.15; } 100% { transform: scale(1.06); opacity: 0.28; } }
+
+/* Metal — shimmer sweep */
+body.theme-金 .bg-glow {
+  background: radial-gradient(500px 350px at 50% 25%, rgba(192, 192, 192, 0.1), transparent 70%),
+              radial-gradient(400px 300px at 75% 60%, rgba(224, 224, 224, 0.06), transparent 70%);
+  animation: none;
+}
+body.theme-金 .bg-glow::before {
+  content: ''; position: absolute; inset: 0; will-change: transform, opacity;
+  background: linear-gradient(115deg, transparent 25%, rgba(240, 240, 250, 0.07) 50%, transparent 75%);
+  animation: metalShimmer 6s linear infinite;
+}
+@keyframes metalShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+/* Earth — mountain silhouettes at bottom (near-static, grounded) */
+body.theme-土 .bg-glow {
+  background: radial-gradient(600px 400px at 50% 75%, rgba(180, 138, 30, 0.1), transparent 70%),
+              radial-gradient(400px 300px at 20% 50%, rgba(139, 90, 43, 0.06), transparent 70%);
+  animation: none;
+}
+body.theme-土 .bg-glow::before {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 45%;
+  background: linear-gradient(to top, rgba(101, 67, 33, 0.18), transparent);
+  clip-path: polygon(0 100%, 0 65%, 10% 45%, 18% 60%, 28% 35%, 38% 55%, 48% 28%, 58% 48%, 68% 20%, 78% 42%, 88% 30%, 100% 50%, 100% 100%);
+}
+body.theme-土 .bg-glow::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30%;
+  background: linear-gradient(to top, rgba(70, 46, 23, 0.15), transparent);
+  clip-path: polygon(0 100%, 0 70%, 12% 50%, 22% 65%, 34% 40%, 44% 60%, 56% 38%, 66% 58%, 78% 35%, 90% 55%, 100% 45%, 100% 100%);
+}
+
+/* Reduced motion — disable element animations (accessibility) */
+@media (prefers-reduced-motion: reduce) {
+  body[class*="theme-"] .bg-glow::before, body[class*="theme-"] .bg-glow::after { animation: none; }
+}
+
 /* Smooth transition khi đổi theme — chỉ elements dùng accent, không ALL (mobile perf) */
 .card, .zh, .btn-primary, .qs-tile, .meta-line, .kicker, .kicker i, .verse-box, .tiaohou-note {
   transition: border-color 0.6s ease, color 0.6s ease, background 0.6s ease, box-shadow 0.6s ease;
