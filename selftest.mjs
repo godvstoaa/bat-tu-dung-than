@@ -8574,7 +8574,7 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1021] đông y / TCM (ngũ hành↔tạng + vượng suy→hư thực + KB thủ dâm→thận hư) ✓`);
 }
 
-// [loop 1022] đông-y CONDITION_KB mở rộng — 13 bệnh, keyword match chính xác + không garbled
+// [loop 1022→1053] đông-y CONDITION_KB — 27 bệnh, keyword match chính xác + không garbled
 {
   const { answerHealth, CONDITION_KB } = await import('./src/engine/tcm.js');
   const _cases = [
@@ -8584,14 +8584,21 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     ['đau dạ dày ợ chua', 'stomach_pain'], ['hay cáu gắt', 'liver_fire'], ['đầy bụng chán ăn', 'spleen_xu'],
     ['đau bụng kinh quặn', 'dysmenorrhea'], ['kinh nguyệt không đều', 'irregular_period'],
     ['hiếm muộn muốn con', 'infertility'], ['tiền mãn kinh bốc hoả', 'menopause'],
+    // [loop 1038] chronic
+    ['tiểu đường', 'xiao_ke'], ['gout đau khớp', 'gout'], ['chàm eczema', 'eczema'],
+    ['gan nhiễm mỡ', 'fatty_liver'], ['phì đại tiền liệt tuyến', 'prostate_bph'],
+    // [loop 1050] mental health
+    ['hay lo âu', 'anxiety'], ['trầm cảm chán nản', 'depression'],
+    // [loop 1052] common
+    ['hay chóng mặt', 'dizziness'], ['béo phì thừa cân', 'obesity'], ['viêm mũi dị ứng', 'allergy'],
   ];
   let _ok = 0;
   for (const [q, exp] of _cases) {
     const a = answerHealth(q, null);
     if (a.matched && a.id === exp) _ok++; else console.log(`     ✗ ${q} → ${a.id} (expect ${exp})`);
   }
-  assert(_ok === _cases.length, `[loop 1022] CONDITION_KB match ${_ok}/${_cases.length}`);
-  assert(CONDITION_KB.length >= 17, `[loop 1022] KB ≥ 17 conditions (got ${CONDITION_KB.length})`);
+  assert(_ok === _cases.length, `[loop 1053] CONDITION_KB match ${_ok}/${_cases.length}`);
+  assert(CONDITION_KB.length >= 27, `[loop 1053] KB ≥ 27 conditions (got ${CONDITION_KB.length})`);
   // no garbled latin artifacts
   const _kb = JSON.stringify(CONDITION_KB);
   assert(!/\b(green|misc|bak|Tillerson|Needs|pohong|ôleo)\b/.test(_kb), '[loop 1022] KB không garbled artifacts');
@@ -8606,7 +8613,7 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   // no-R: không crash, không có note cá nhân
   const _nR = answerHealth('mất ngủ', null);
   assert(_nR.matched && !/Bản LA SỐ/.test(_nR.reply), '[loop 1025] no-R: match OK, không note');
-  console.log(`   [loop 1022] đông-y KB mở rộng (13 conditions, match ${_ok}/${_cases.length}, clean) ✓`);
+  console.log(`   [loop 1053] đông-y KB (27 conditions, match ${_ok}/${_cases.length}, clean) ✓`);
 }
 
 // [loop 1024] best-hour 时半合日 (三合 bán-hợp) — bug-class 合 layer ở 择时

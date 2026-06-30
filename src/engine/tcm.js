@@ -281,7 +281,7 @@ export const CONDITION_KB = [
     title: 'Béo phì / Thừa cân (TỲ HƯ ĐÀM THẤP + khí trệ)',
     summary: 'Đông-y: TỲ HƯ ĐÀM THẤP là gốc — tỳ vận hoá kém → thuỷ thấp ứ → đàm thấp tích mỡ. Thường kèm khí hư (mệt, lười vận động → vòng luẩn quẩn). «Dục tri phì nhơn, đa đàm thấp».',
     symptoms: 'thừa cân, mỡ bụng, nặng người, buồn ngủ, mệt, hay ăn ngọt/béo, đại tiện lỏng/nhớt, phù nhẹ.',
-    advice: '① KIỆN TỲ HOÁ ĐÀM: ý dĩ (misc), sơn dược, phục linh, trần bì, trạch tả, sơn tra. ② GIẢM ngọt/béo/tinh bột tinh/đường/sữa. ③ TĂNG rau xanh, đạm nạc, fibre. ④ VẬN ĐỘNG AEROBIC ĐỀU (đi bộ/bơi — 30+ phút/ngày). ⑤ Tránh ăn đêm, nhai kỹ. ⑥ Giấc ngủ đủ (thiếu ngủ → tăng cortisol → béo bụng). ⑦ Có bệnh nền (đường/HA/mỡ máu) → khám + theo dõi.',
+    advice: '① KIỆN TỲ HOÁ ĐÀM: ý dĩ, sơn dược, phục linh, trần bì, trạch tả, sơn tra. ② GIẢM ngọt/béo/tinh bột tinh/đường/sữa. ③ TĂNG rau xanh, đạm nạc, fibre. ④ VẬN ĐỘNG AEROBIC ĐỀU (đi bộ/bơi — 30+ phút/ngày). ⑤ Tránh ăn đêm, nhai kỹ. ⑥ Giấc ngủ đủ (thiếu ngủ → tăng cortisol → béo bụng). ⑦ Có bệnh nền (đường/HA/mỡ máu) → khám + theo dõi.',
   },
   {
     id: 'allergy',
