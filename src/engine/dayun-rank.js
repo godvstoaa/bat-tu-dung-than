@@ -5,7 +5,7 @@
 //  Nguồn: 滴天髓 运论, 渊海子平 大运比较.
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
-import { tenGod } from './core.js';
+import { tenGod, changSheng } from './core.js';
 import { GOD_DECADE } from './dayun-god.js';
 
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
@@ -16,6 +16,21 @@ const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯'
 const SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
 
 const CAT_BOOST = { cat: 15, volatile: -5, hung: -10, mid: 0 };
+
+// [loop 1079] 十二長生 SINH KHÍ vận — «运好不如运旺»: đại vận Dụng cát NHƯNG rơi 死/墓/绝
+//   thì Dụng khó phát huy; 帝旺/臨官 thì khuếch đại. Modifier CỘNG vào totalScore.
+//   Nguồn: 滴天髓 «运逢长生如苗逢春, 运逢帝旺如日中天, 运逢墓绝如秋冬».
+//   Cân đối: 帝旺=đỉnh nhưng quá vượng dễ kiêu → +8 (không +10); 墓=kho thu nạp → nhẹ hơn 死/绝.
+const STAGE_WEIGHT = {
+  '帝旺': 8, '臨官': 8, '長生': 6, '冠帶': 5,
+  '衰': -3, '病': -5, '死': -6, '墓': -4, '絕': -7,
+  '沐浴': 0, '胎': 0, '養': 0,
+};
+const STAGE_VI = {
+  '長生': 'Trường Sinh', '沐浴': 'Mộc Dục', '冠帶': 'Quan Đới', '臨官': 'Lâm Quan',
+  '帝旺': 'Đế Vượng', '衰': 'Suy', '病': 'Bệnh', '死': 'Tử', '墓': 'Mộ',
+  '絕': 'Tuyệt', '胎': 'Thai', '養': 'Dưỡng',
+};
 
 /**
  * @returns {{ ranked:[{ ganZhi, startAge, rank, totalScore, ratingScore, godCat, godVi,
@@ -54,9 +69,17 @@ export function rankDayun(R) {
     else if (!interaction && d.zhi !== dayZhi && SANHE.some((g) => g.includes(d.zhi) && g.includes(dayZhi))) { interaction = '🔗半合日'; intScore += 4; }
     score += intScore;
 
+    // [loop 1079] 4. 十二長生 SINH KHÍ — Nhật Chủ ở giai đoạn nào của vòng 12長生 khi入 vận.
+    //   Độc lập với Dụng/十神/冲合: «运好不如运旺» — vận Dụng TỐT nhưng 死/墓/绝 → sinh khí kém,
+    //   Dụng khó phát huy; 帝旺/臨官 → sinh khí dồi dào, khuếch đại vận (dù Dụng trung tính).
+    const stage = d.zhi ? changSheng(dayGan, d.zhi) : '';
+    const stageW = STAGE_WEIGHT[stage] || 0;
+    const stageVi = STAGE_VI[stage] || stage || '';
+    score += stageW;
+
     // [cycle 48 M1] bỏ bước "Dụng Thần match" riêng — d.score (từ computeDaYun, ×10 ở bước 1) ĐÃ
     //   bao gồm khớp Dụng cho cả can LẪN chi. Trước đây cộng thêm +8 can → đếm KÉP (can 28, chi 10),
-    //   lệch + tổng score/band không tin cậy. Nay chỉ dựa d.score*10 + CAT_BOOST + tương tác.
+    //   lệch + tổng score/band không tin cậy. Nay chỉ dựa d.score*10 + CAT_BOOST + tương tác + 长生.
 
     return {
       ganZhi: d.ganZhi, startAge: d.startAge, rating: d.rating,
@@ -65,7 +88,8 @@ export function rankDayun(R) {
       god, godVi, godCat: godInfo.cat,
       godTheme: godInfo.theme || '',
       interaction, intScore,
-      summary: `${d.ganZhi} [${d.startAge}-${d.startAge + 9}t] ${godVi}(${godInfo.cat}) ${d.rating}${interaction ? ' ' + interaction : ''} → ${score > 20 ? 'RẤT TỐT' : score > 5 ? 'TỐT' : score > -10 ? 'TRUNG BÌNH' : score > -25 ? 'KÉM' : 'XẤU'}`,
+      stage, stageVi, stageWeight: stageW,
+      summary: `${d.ganZhi} [${d.startAge}-${d.startAge + 9}t] ${godVi}(${godInfo.cat}) ${d.rating}${stageVi ? ' · ' + stageVi : ''}${interaction ? ' ' + interaction : ''} → ${score > 20 ? 'RẤT TỐT' : score > 5 ? 'TỐT' : score > -10 ? 'TRUNG BÌNH' : score > -25 ? 'KÉM' : 'XẤU'}`,
     };
   });
 

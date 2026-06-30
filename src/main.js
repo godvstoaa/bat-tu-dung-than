@@ -3253,6 +3253,7 @@ function dayunScored(R) {
   return (R && R.dayun ? R.dayun : []).map((d) => ({
     ganZhi: d.ganZhi, startAge: d.startAge, rating: d.rating,
     totalScore: (d.score || 0) * 10, interaction: '', godVi: '', godCat: '',
+    stage: '', stageVi: '', stageWeight: 0,
   }));
 }
 
@@ -3287,6 +3288,7 @@ function capsuleDayunSpark(R) {
     const isCur = i === curIdx;
     const tip = `${esc(d.ganZhi || '')} [${d.startAge}-${d.startAge + 9}t] · ${esc(d.rating || '')}` +
       (d.godVi ? ` · ${esc(d.godVi)}` : '') +
+      (d.stageVi ? ` · ${esc(d.stageVi)}(${d.stageWeight > 0 ? '旺' : d.stageWeight < 0 ? 'suy' : 'chuyển'})` : '') +
       (d.interaction ? ` · ${esc(d.interaction)}` : '') +
       (isCur ? ' · ★ ĐẠI VẬN HIỆN TẠI' : '');
     return `<div title="${tip}" style="flex:1;min-width:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:50px;position:relative">
@@ -3510,6 +3512,7 @@ function renderDayunChart(R) {
       const isActive = _curAge >= d.startAge && _curAge < d.startAge + 10;
       const tip = `${esc(d.ganZhi || '')} [${d.startAge}-${d.startAge + 9}t] · ${esc(d.rating || '')}` +
         (d.godVi ? ` · ${esc(d.godVi)}(${esc(d.godCat || '')})` : '') +
+        (d.stageVi ? ` · ${esc(d.stageVi)}(${d.stageWeight > 0 ? '旺' : d.stageWeight < 0 ? 'suy' : 'chuyển'})` : '') +
         (d.interaction ? ` · ${esc(d.interaction)}` : '') +
         ` · tổng ${s}${isActive ? ' · ★ ĐẠI VẬN HIỆN TẠI' : ''}`;
       return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:40px${isActive ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${tip}">
@@ -3523,7 +3526,7 @@ function renderDayunChart(R) {
         <span class="hint" style="font-size:10px;color:${col}">${esc((d.rating || '').slice(0, 8))}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:2px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh. Tổng điểm = Dụng Thần + 十神 + 冲/合/伏吟 (chu move để xem chi tiết).</p>`;
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:2px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh. Tổng điểm = Dụng Thần + 十神 + 冲/合/伏吟 + 十二长生 sinh khí (chu move để xem chi tiết).</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận trục.</p>'; }
 }
 

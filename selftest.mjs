@@ -8540,6 +8540,37 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1078] rankDayun.scored (căn index, totalScore giàu logic) — visual dayun phản ánh 十神+冲合 ✓`);
 }
 
+// [loop 1079] 十二長生 sinh khí tích hợp vào rankDayun — «运好不如运旺»
+//   Mỗi đại vận có stage (帝旺/臨官/長生… hoặc 死/墓/绝) + stageWeight cọng vào totalScore.
+//   Cross-check với dayunChangSheng (module độc lập) — stage phải khớp.
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { rankDayun } = await import('./src/engine/dayun-rank.js');
+  const { dayunChangSheng } = await import('./src/engine/dayun-changsheng.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _rk = rankDayun(_R);
+  const _cs = dayunChangSheng(_R.chart.dayGan, _R.dayun);
+  // 1. mọi scored item có trường stage
+  const _allHaveStage = _rk.scored.every((s) => typeof s.stage === 'string' && typeof s.stageWeight === 'number');
+  assert(_allHaveStage, '[loop 1079] mọi scored item có stage + stageWeight');
+  // 2. ít nhất 1 stage ≠ neutral (đa số chart đều có 旺 hoặc suy)
+  const _hasVibrant = _rk.scored.some((s) => s.stageWeight > 0);
+  const _hasDecline = _rk.scored.some((s) => s.stageWeight < 0);
+  assert(_hasVibrant, '[loop 1079] có đại vận sinh khí THỊNH (帝旺/臨官/長生/冠帶, stageWeight>0)');
+  assert(_hasDecline, '[loop 1079] có đại vận sinh khí SUY (死/墓/绝…, stageWeight<0)');
+  // 3. cross-check stage khớp dayunChangSheng độc lập
+  const _csMap = {}; _cs.items.forEach((it) => { _csMap[it.ganZhi] = it.stage; });
+  const _stageMatch = _rk.scored.every((s) => _csMap[s.ganZhi] === s.stage);
+  assert(_stageMatch, '[loop 1079] stage rankDayun khớp dayunChangSheng (độc lập)');
+  // 4. stageWeight thực sự đổi totalScore: tổng = raw×10 + CAT_BOOST + intScore + stageW (xấp xỉ)
+  //    → verifica: decade 帝旺 có stageWeight=8; decade 绝 có -7 (nếu có trong chart)
+  const _peak = _rk.scored.find((s) => s.stageWeight === 8);
+  if (_peak) assert(/帝旺|臨官/.test(_peak.stage), `[loop 1079] stageWeight 8 ↔ ${_peak.stage} (đỉnh thịnh)`);
+  // 5. no leak (undefined/NaN)
+  assert(!/undefined|NaN/.test(JSON.stringify(_rk.scored)), '[loop 1079] scored không leak undefined/NaN');
+  console.log(`   [loop 1079] 十二长生 sinh khí tích hợp rankDayun (stage + stageWeight, khớp dayunChangSheng) ✓`);
+}
+
 // [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 (合 layer completion)
 {
   const { evaluateDate } = await import('./src/engine/zheri.js');
