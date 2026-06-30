@@ -10,6 +10,7 @@ import { tenGod, changSheng } from './core.js';
 import { adjustLiuyueByGeju } from './pattern-quality.js';
 import { pillarRelation } from './pillar-quality.js'; // [loop 1082] 盖头/截脚 (pillar-quality, KHÔNG phải pattern-quality)
 import { STAGE_WEIGHT, STAGE_VI } from './dayun-changsheng.js'; // [loop 1082] 十二长生 tháng
+import { stageHealth } from './tcm.js'; // [loop 1094] month-level TCM theme
 // [loop 74 nâng tầng] Phục/Phản ngâm tháng × 4 trụ nguyên cục (mirror 流年 loop 19).
 import { isFuyin, isFanyin } from './fuyin.js';
 import { TIAN_YI, WEN_CHANG, JIANG_XING, BRANCH_GROUP } from './shensha.js';
@@ -179,7 +180,9 @@ export function computeLiuyue(R, solarYear, patternQuality) {
     else if (score >= 34) rating = 'Hơi kỵ';
     else rating = 'Hung';
     const note = [godVi, ...extraNotes, ...fyNotes].filter(Boolean).join(' · ');
-    months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note, taiSui: extraNotes, fuyin: fyNotes, monthStage: monthStageVi, monthStageW, monthPs: monthPsVi, monthPsFlow });
+    // [loop 1094] month-level TCM theme — 十二长生 tháng → tạng headline (hoàn thiện 4 cấp TCM).
+    const _mht = monthStageVi ? stageHealth(GAN[dayGan] && GAN[dayGan].wx, monthStageVi, monthStageW) : null;
+    months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note, taiSui: extraNotes, fuyin: fyNotes, monthStage: monthStageVi, monthStageW, monthPs: monthPsVi, monthPsFlow, monthHealth: _mht ? _mht.headline : '' });
   }
 
   // [loop 4 — 格局流月喜忌] Cộng tầng 格局 LÊN TRÊN tầng ngũ hành + thập thần tháng

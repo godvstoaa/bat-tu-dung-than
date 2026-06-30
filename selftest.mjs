@@ -8781,6 +8781,22 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   // 5. best/worst vẫn nguyên + no leak
   assert(_lm.best && _lm.worst && !/undefined|NaN/.test(JSON.stringify(_lm.months)), '[loop 1082] best/worst nguyên + không leak');
   console.log(`   [loop 1082] 十二长生 + 盖头/截脚 tích hợp computeLiuyue (thịnh ${_vib}/suy ${_dec}, clash ${_clash}/harm ${_harm}) ✓`);
+
+// [loop 1094] month-level TCM theme — computeLiuyue months có monthHealth (tạng headline)
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { computeLiuyue } = await import('./src/engine/liuyue.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _lm = computeLiuyue(_R, 2026, {});
+  // 庚日 (Kim) → tạng Phổi (肺); mọi tháng có monthHealth chứa «Phổi» hoặc «肺»
+  const _ok = _lm.months.every((m) => typeof m.monthHealth === 'string' && /Phổi|肺/.test(m.monthHealth));
+  assert(_ok, `[loop 1094] mọi tháng có monthHealth (tạng Phổi cho 庚日) — sample "${_lm.months[0].monthHealth}"`);
+  // có tháng THỊNH + tháng SUY trong monthHealth (do 12 chi tuần hoàn)
+  const _thinh = _lm.months.filter((m) => /THỊNH/.test(m.monthHealth)).length;
+  const _suy = _lm.months.filter((m) => /SUY/.test(m.monthHealth)).length;
+  assert(_thinh > 0 && _suy > 0, `[loop 1094] 12 tháng có cả tạng THỊNH(${_thinh}) & SUY(${_suy})`);
+  console.log(`   [loop 1094] month-level TCM theme ✓ — 庚日→Phổi, thịnh ${_thinh}/suy ${_suy}/12 tháng`);
+}
 }
 
 // [loop 1083] 十二長生 + 盖头/截脚 cho LƯU NHẬT — ĐÓNG đối xứng 4 cấp thời gian

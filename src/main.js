@@ -3424,7 +3424,7 @@ function renderLiuyueChart(R) {
       const col = mo.rating === 'Cát' ? '#2a7' : mo.rating === 'Hung' ? '#c33' : '#9a8';
       const h = Math.max(4, s * 0.7);
       const isNow = mo.solarMonth === _curMonth;
-      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${mo.solarMonth}/${new Date().getFullYear()} ${esc(mo.ganZhi||'')} · ${esc(mo.rating||'')} (${s})${mo.monthStage ? ` · ${esc(mo.monthStage)}(${mo.monthStageW > 0 ? '旺' : mo.monthStageW < 0 ? 'suy' : 'chuyển'})` : ''}${mo.monthPs ? ` · ${esc(mo.monthPs)}` : ''}${isNow ? ' ★ THÁNG NÀY' : ''}">
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${mo.solarMonth}/${new Date().getFullYear()} ${esc(mo.ganZhi||'')} · ${esc(mo.rating||'')} (${s})${mo.monthStage ? ` · ${esc(mo.monthStage)}(${mo.monthStageW > 0 ? '旺' : mo.monthStageW < 0 ? 'suy' : 'chuyển'})` : ''}${mo.monthHealth ? ` · ⚕️${esc(mo.monthHealth)}` : ''}${mo.monthPs ? ` · ${esc(mo.monthPs)}` : ''}${isNow ? ' ★ THÁNG NÀY' : ''}">
         <div style="height:${h}px;width:70%;max-width:24px;background:${col};border-radius:3px 3px 0 0;opacity:${isNow ? '1' : '0.85'};${isNow ? 'box-shadow:0 0 6px '+col : ''}"></div>
         <span class="zh" style="font-size:9px${isNow ? ';font-weight:bold' : ''}">${esc((mo.ganZhi||'').slice(0,2))}</span>
         ${isNow ? '<span style="font-size:7px;color:var(--gold-bright);font-weight:bold">▼ NAY</span>' : `<span class="hint" style="font-size:9px">T${mo.solarMonth}</span>`}
