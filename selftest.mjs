@@ -3039,6 +3039,13 @@ assert(phN.paragraphs.some((p) => p.includes('Nhìn trước')) || true, 'phaseN
 const evN = predictEvents(spR, 2026, 3);
 assert(evN.years && evN.years.length === 3, `predictEvents 3 năm (được ${evN.years?.length})`);
 assert(evN.years.every((y) => ['cat', 'hung', 'neutral'].includes(y.tone)), 'predictEvents mỗi năm có tone cat/hung/neutral');
+// [loop 1003] event-predict tích hợp 应期 — năm peak/kho Dụng/Kỵ có flag
+{
+  const _evYq = predictEvents(analyze(1985, 10, 25, 12, 0, 'nam', 2026), 2030, 7);
+  const _y2035 = _evYq.years.find((y) => y.year === 2035);
+  assert(_y2035 && _y2035.yingqiPeak === true, '[1003] event-predict 2035 có flag yingqiPeak (岁运巅峰)');
+  assert(_y2035 && _y2035.advice.includes('岁运巅峰'), '[1003] event-predict advice nhắc 岁运巅峰');
+}
 console.log(`   qiPhase=${spR.strength.qiPhase} | personality=${pnN.paragraphs.length}p | phase=${phN.paragraphs.length}p | event tones=[${evN.years.map((y) => y.tone).join(',')}] ✓`);
 // [loop 514] 拱夹 coverage
 import { detectGongjia } from './src/engine/gongjia.js';

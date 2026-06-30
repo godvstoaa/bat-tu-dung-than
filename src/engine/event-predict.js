@@ -6,6 +6,7 @@
 import { GAN, ZHI, TEN_GOD_VI, WX_VI, SHENG, KE, SHENG_BY, KE_BY, TEN_GOD_GROUP } from './constants.js';
 import { tenGod } from './core.js';
 import { Solar } from 'lunar-javascript';
+import { scanBranchYingqi } from './yingqi-branch.js';
 
 // [loop 490] god-group → nguyên tố đối với Nhật Chủ (để xét thuận Dụng hay nghịch Kỵ).
 const GROUP_ELEM = (dmWx) => ({ ti: dmWx, yin: SHENG_BY[dmWx], shi: SHENG[dmWx], cai: KE[dmWx], guan: KE_BY[dmWx] });
@@ -38,6 +39,9 @@ export function predictEvents(R, startYear, years = 5) {
   const _ji = new Set([yong.ji, yong.chou].filter(Boolean));
   const _GEL = GROUP_ELEM(dmWx);
   const _tone = (god) => { const e = _GEL[TEN_GOD_GROUP[god]]; if (!e) return 'neutral'; return _dung.has(e) ? 'cat' : _ji.has(e) ? 'hung' : 'neutral'; };
+  // [loop 1003] 应期 (冲合 chi) — chiều kích hoạt thứ 2: năm này có «mở kho» Dụng/Kỵ không
+  //   (bù cho 十神应期 theo lưu niên can). 2 chiều chéo xác nhận.
+  const _yq = (() => { try { const o = scanBranchYingqi(R, startYear, years); return { cat: new Set(o.catYears || []), hung: new Set(o.hungYears || []), peak: new Set(o.peakYears || []), evt: (o.events || []) }; } catch (e) { return { cat: new Set(), hung: new Set(), peak: new Set(), evt: [] }; } })();
   const out = [];
   let lastDayun = '?'; // [loop 24] theo dõi 大运 năm cuối (activeDy giờ per-year trong loop)
 
@@ -75,15 +79,19 @@ export function predictEvents(R, startYear, years = 5) {
     const _ts = (_tw[lnTone] || 0) + (_tw[dyTone] || 0);
     const tone = _ts >= 1 ? 'cat' : _ts <= -1 ? 'hung' : 'neutral';
     const toneVi = tone === 'cat' ? 'CÁT (thuận Dụng)' : tone === 'hung' ? 'HUNG (nghịch, kỵ)' : 'trung';
+    // [loop 1003] 应期 冲/合 flag cho năm này (nếu là năm mở kho)
+    const yqPeak = _yq.peak.has(year), yqCat = _yq.cat.has(year), yqHung = _yq.hung.has(year);
+    const yqTag = yqPeak ? ' 👑岁运巅峰' : yqCat ? ' ✦mởKho Dụng' : yqHung ? ' ⚠mởKho Kỵ' : '';
     const advice = sameGod
-      ? `Năm ${year}: ${lnInfo.vi} NHÂN ĐÔI (lưu niên = đại vận ${dyInfo.vi}) → ${lnInfo.area} cực mạnh: ${combinedEvents.join(', ')}. [${toneVi}]`
-      : `Năm ${year}: Lưu niên ${lnInfo.vi} → ${lnInfo.area}. Đại vận ${dyInfo.vi} → ${dyInfo.area}. [${toneVi}]`;
+      ? `Năm ${year}: ${lnInfo.vi} NHÂN ĐÔI (lưu niên = đại vận ${dyInfo.vi}) → ${lnInfo.area} cực mạnh: ${combinedEvents.join(', ')}. [${toneVi}]${yqTag}`
+      : `Năm ${year}: Lưu niên ${lnInfo.vi} → ${lnInfo.area}. Đại vận ${dyInfo.vi} → ${dyInfo.area}. [${toneVi}]${yqTag}`;
 
     out.push({
       year, ganZhi: lnGan + yearSolar.getLunar().getYearZhi(),
       lnGod, lnGodVi: lnInfo.vi, lnArea: lnInfo.area, lnEvents: lnInfo.events, lnTone,
       dyGod, dyGodVi: dyInfo.vi, dyArea: dyInfo.area, dyEvents: dyInfo.events, dyTone,
       tone, sameGod, combinedEvents, advice,
+      yingqiPeak: yqPeak, yingqiCat: yqCat, yingqiHung: yqHung,
     });
   }
 
