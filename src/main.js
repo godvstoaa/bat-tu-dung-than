@@ -3540,10 +3540,14 @@ function lazyRender(innerId, fn) {
   // Không có IO hoặc không tìm thấy card → render ngay (fallback an toàn)
   if (!_lazyIO || !card) { try { fn(); } catch (e) { console.warn('lazyRender fallback', e.message); } return; }
   if (_lazyRendered.has(card)) { try { fn(); } catch (e) { console.warn('lazyRender', e.message); } return; }
-  // Kiểm tra nhanh: card đã trong viewport?
+  // Kiểm tra nhanh: card đã trong viewport (VÀ đã layout)?
   const rect = card.getBoundingClientRect();
-  const near = rect.top < (window.innerHeight + 300) && rect.bottom > -300;
-  if (near || card.offsetParent === null && rect.top === 0 && rect.bottom === 0) {
+  // [loop 955 FIX] yêu cầu offsetParent !== null (card đã layout). Trước đây #result ẩn
+  //   (display:none) trong khi render → offsetParent=null, rect=0 → near-check TRUE cho mọi card
+  //   → render eager hết (6s). Nay: card chưa layout → defer, IO render sau khi #result hiện.
+  const laidOut = card.offsetParent !== null;
+  const near = laidOut && rect.top < (window.innerHeight + 300) && rect.bottom > -300;
+  if (near) {
     _lazyRendered.add(card);
     try { fn(); } catch (e) { console.warn('lazyRender', e.message); }
     return;
