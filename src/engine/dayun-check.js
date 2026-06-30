@@ -10,6 +10,9 @@ const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅'
 // [loop 328] 六害 + 三刑 — đại vận chi hại/hình Nhật Chi cũng đáng cảnh báo (cùng bug-class loop 290/324-327)
 const HAI = { 子:'未', 未:'子', 丑:'午', 午:'丑', 寅:'巳', 巳:'寅', 卯:'辰', 辰:'卯', 申:'亥', 亥:'申', 酉:'戌', 戌:'酉' };
 const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌', 戌:'未', 未:'丑', 辰:'辰', 午:'午', 酉:'酉', 亥:'亥' };
+// [loop 1018 FIX] 六合 — đại vận chi LỤC HỢP Nhật Chi = thập niên thuận hoà (tín hiệu CÁT,
+//   đối xứng cảnh báo 冲/害/形). Cùng bug-class loop 1014-1016, nay ở lõi đại vận.
+const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
 
 /**
  * @param {object} chart - từ analyze()
@@ -69,6 +72,10 @@ export function checkDayunInteractions(chart, dayun) {
     if (dgZhi === dayZhi && dgGan !== dayGan) {
       notes.push('📌 Trùng chi — đại vận chi = Nhật Chi: gia đạo/căn nguyên trùng lặp.');
       severity += 1;
+    }
+    // [loop 1018] 六合 — đại vận chi LỤC HỢP Nhật Chi = thập niên thuận hoà (CÁT, đối xứng 冲罚).
+    if (!zhiChong && LIUHE[dayZhi] === dgZhi) {
+      notes.push('💕 Đại vận hợp日 — chi LỤC HỢP Nhật Chi: thập niên thuận hoà, được trợ, quý nhân (CÁT).');
     }
 
     if (notes.length) {

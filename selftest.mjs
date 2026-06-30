@@ -8466,5 +8466,28 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1017] 六爻 伏神/飞神 (用神 不上卦 → tìm本宫, 飞伏 verified) ✓`);
 }
 
+// [loop 1018] dayun 六合 — rankDayun reward + checkDayunInteractions note (bug-class 冲/合 ở lõi đại vận)
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { rankDayun } = await import('./src/engine/dayun-rank.js');
+  const { checkDayunInteractions } = await import('./src/engine/dayun-check.js');
+  // 1990-6-15 → dayZhi 亥; 大运 chi 寅 (LIUHE[亥]=寅) hợp 日
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _dz = _R.chart.pillars.day.zhi;
+  const _LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+  const _heDy = (_R.dayun || []).find((d) => _LIUHE[d.zhi] === _dz);
+  assert(_heDy, `[loop 1018] có đại vận chi hợp ${_dz} (LIUHE=${_LIUHE[_dz]})`);
+  if (_heDy) {
+    const _rk = rankDayun(_R);
+    const _item = _rk.ranked.find((r) => r.ganZhi === _heDy.ganZhi);
+    assert(_item && _item.interaction === '💕合日' && _item.intScore === 6, `[loop 1018] rankDayun 合日 +6 (got ${_item?.interaction}/${_item?.intScore})`);
+    const _ck = checkDayunInteractions(_R.chart, _R.dayun);
+    const _ckItem = _ck.find((c) => c.ganZhi === _heDy.ganZhi);
+    assert(_ckItem && _ckItem.notes.some((n) => /LỤC HỢP/.test(n)), '[loop 1018] checkDayunInteractions có note 六 hợp');
+  }
+  assert(!/undefined|NaN/.test(JSON.stringify(rankDayun(_R))), '[loop 1018] rankDayun không leak');
+  console.log(`   [loop 1018] dayun 六合 (rankDayun +6, checkDayun note) — bug-class 冲/合 đóng ở lõi đại vận ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

@@ -9,6 +9,9 @@ import { tenGod } from './core.js';
 import { GOD_DECADE } from './dayun-god.js';
 
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
+// [loop 1018 FIX] 六合 — đại vận chi LỤC HỢP Nhật Chi = thập niên thuận hoà (reward, đối xứng 冲罚).
+//   Cùng bug-class loop 1014-1016, nay ở lõi dayun ranking.
+const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
 
 const CAT_BOOST = { cat: 15, volatile: -5, hung: -10, mid: 0 };
 
@@ -43,6 +46,8 @@ export function rankDayun(R) {
       else { interaction = '⚡地冲'; intScore -= 8; }
     }
     else if (d.gan === dayGan) { interaction = '同气'; intScore += 3; }
+    // [loop 1018] 六合 — đại vận chi lục hợp Nhật Chi → thuận hoà (reward, đối xứng 地冲 −8).
+    if (!interaction && LIUHE[d.zhi] === dayZhi) { interaction = '💕合日'; intScore += 6; }
     score += intScore;
 
     // [cycle 48 M1] bỏ bước "Dụng Thần match" riêng — d.score (từ computeDaYun, ×10 ở bước 1) ĐÃ
