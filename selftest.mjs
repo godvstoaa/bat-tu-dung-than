@@ -8630,5 +8630,18 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1027] 四季养ổ (Xuân肝/Hạ心/Thu肺/Đông肾 + cá nhân hoá) ✓`);
 }
 
+// [loop 1028] 情志养ổ (五志) — cảm xúc nổi trội + «X thương tạng Y»
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { execTool } = await import('./src/engine/ai.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026); // strongest 火(喜), weakest 土(思)
+  const _p = execTool('health_profile', {}, _R);
+  assert(_p.emotion && /喜|vui/.test(_p.emotion.dominant), `[loop 1028] emotion dominant 喜 (got "${_p.emotion?.dominant?.slice(0,30)}")`);
+  assert(/hỉ thương tâm|hỉ/.test(_p.emotion.dominantRisk || ''), `[loop 1028] «hỉ thương tâm» risk (got "${_p.emotion?.dominantRisk?.slice(0,20)}")`);
+  assert(/思|lo nghĩ/.test(_p.emotion.vulnerable || ''), `[loop 1028] vulnerable 思/lo nghĩ (土 hư)`);
+  assert(!/undefined/.test(JSON.stringify(_p.emotion)), '[loop 1028] emotion không undefined');
+  console.log(`   [loop 1028] 情志养ổ (五志: «X thương tạng» + dominant/vulnerable) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

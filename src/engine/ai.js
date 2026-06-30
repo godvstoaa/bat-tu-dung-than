@@ -790,6 +790,7 @@ export function execTool(name, args, R) {
           strong: p.strong.map((s) => ({ zang: s.zang, wx: s.wx, pct: s.pct, syndromes: s.syndromes.map((x) => _s(x, 130)), damage: _s(s.damage, 140) })),
           diet: p.dietAdvice.map((d) => _s(d, 180)),
           lifestyle: p.lifestyle.map((l) => _s(l, 180)),
+          emotion: p.emotion ? { dominant: _s(p.emotion.dominant, 140), dominantRisk: _s(p.emotion.dominantRisk, 160), vulnerable: _s(p.emotion.vulnerable, 140), advice: _s(p.emotion.advice, 140) } : null,
           note: _s(p.note, 220),
         };
       }

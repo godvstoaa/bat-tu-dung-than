@@ -246,6 +246,24 @@ export function analyzeHealth(R) {
   });
 
   const susceptible = [...weakInfo.map((w) => w.disease)];
+  // [loop 1028] 情志养ổ (五志) — cảm xúc nổi trội (tạng vượng) + nguy cơ cảm xúc tổn tạng.
+  //   Cổ法 «nộ thương can, hỉ thương tâm, tư thương tỳ, bi thương phổi, khủng thương thận».
+  const ZHI_VI = { 怒: 'giận', 喜: 'vui mừng', 思: 'lo nghĩ', 悲: 'buồn rầu', 恐: 'sợ hãi' };
+  const ZHI_DMG = {
+    怒: '«nộ thương can» — giận dữ khiến can khí thượng nghịch (đau đầu, mắt đỏ, HA, kinh nguyệt rối).',
+    喜: '«hỉ thương tâm» — vui mừng quá mức làm tâm khí hoãn (hồi hộp, mất ngủ, trống ngực).',
+    思: '«tư thương tỳ» — lo nghĩ quá làm tỳ khí trệ (chán ăn, đầy bụng, mệt, mất ngủ).',
+    悲: '«bi thương phổi» — buồn rầu hao phổi khí (thở hụt, suy nhược, hay cảm).',
+    恐: '«khủng thương thận» — sợ hãi hạ thương thận khí (tiểu không tự chủ, hạ nguyên khí, choáng).',
+  };
+  const domZhi = strong[0] ? WUX_ZANG[strong[0].wx].zhi[0] : ''; // ký tự Hán đầu (怒/喜/思/悲/恐)
+  const vulnZhi = weak[0] ? WUX_ZANG[weak[0].wx].zhi[0] : '';
+  const emotion = domZhi ? {
+    dominant: `${ZHI_VI[domZhi]} (${domZhi}) — do ${WUX_ZANG[strong[0].wx].zang.split(' ')[0]} (${strong[0].wx}) vượng → thiên lệch cảm xúc này.`,
+    dominantRisk: ZHI_DMG[domZhi],
+    vulnerable: weak[0] ? `${WUX_ZANG[weak[0].wx].zang.split(' ')[0]} (${weak[0].wx}) vốn HƯ → dễ bị «${ZHI_VI[vulnZhi]} (${vulnZhi}) thương» nhất, cần điều tiết.` : '',
+    advice: '«情志养ổ»: cảm xúc quá mức tổn tạng tương ứng. Bình tâm, điều tiết — «tâm tĩnh tự nhiên lãnh».',
+  } : null;
   const dietAdvice = weak.map(({ wx }) => `${WUX_ZANG[wx].zang.split(' ')[0]} (${wx}, ${wx === dmWx ? 'NHẬT CHỦ' : 'hành suy'}): thiên ${DIET[wx].color}; ${WUX_ZANG[wx].nourish}`);
   const lifestyle = [
     'Ngủ sớm (trước 23h) — can đởm/tam tiêu phục hồi; «dược bổ bất như thực bổ, thực bổ bất như thuỷ bổ, thuỷ bổ bất như nhân bổ».',
@@ -259,7 +277,7 @@ export function analyzeHealth(R) {
     ok: true,
     constitution: dmWx ? `Nhật chủ ${dmWx} — bản tính liên quan ${WUX_ZANG[dmWx].zang.split(' ')[0]} (${WUX_ZANG[dmWx].zhi}, ${WUX_ZANG[dmWx].season}).` : '',
     weak: weakInfo, strong: strongInfo,
-    susceptible, dietAdvice, lifestyle,
+    susceptible, dietAdvice, lifestyle, emotion,
     note: 'Đông-yProfile suy luận TỪ ngũ hành vượng suy → tạng hư/thực (không thay thế chẩn đoán y khoa). «Hoàng Đế Nội Kinh»: cần kết hợp thực tế + vị bác sĩ đông y.',
   };
 }
