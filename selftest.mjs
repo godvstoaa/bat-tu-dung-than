@@ -8732,5 +8732,24 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1034] 称骨歌 FORTUNE 51 verses đầy đủ (2.1-7.1 continuous, +5.8/5.9) ✓`);
 }
 
+// [loop 1035] vi2han — 8 chữ tên phổ biến (Quỳnh/Phượng/Quyên/Nhiên/Lam/Khôi/Ninh/Thuần)
+{
+  const { viToHan, SURNAME_VI, NAME_VI } = await import('./src/engine/vi2han.js');
+  const { STROKES } = await import('./src/engine/name.js');
+  // 8 syllables convert without missing
+  const _cases = { 'nguyen quynh nhu': '瓊', 'tran phuong nhien': '鳳', 'le lam khoi': '魁', 'pham thuan ninh': '純' };
+  let _ok = 0;
+  for (const [name, expectHan] of Object.entries(_cases)) {
+    const t = viToHan(name);
+    if (!t.missing?.length && t.chars.some((c) => c.han === expectHan)) _ok++;
+    else console.log(`     ✗ ${name} (expect ${expectHan})`);
+  }
+  assert(_ok === Object.keys(_cases).length, `[loop 1035] 8 chữ tên mới convert (got ${_ok}/4 test)`);
+  // 康熙 nét verified: 瓊20/藍20/魁14/娟10/然12/純10
+  assert(STROKES['瓊'] === 20 && STROKES['藍'] === 20 && STROKES['魁'] === 14, `[loop 1035] 瓊/藍/魁 康熙 nét (got ${STROKES['瓊']}/${STROKES['藍']}/${STROKES['魁']})`);
+  assert(NAME_VI.quỳnh.strokes === 20 && NAME_VI.phượng.strokes === 14, `[loop 1035] vi2han quỳnh/phượng nét`);
+  console.log(`   [loop 1035] vi2han +8 chữ tên phổ biến (Quỳnh/Phượng/Quyên/Nhiên/Lam/Khôi/Ninh/Thuần) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
