@@ -7,6 +7,7 @@
 import { analyzeVitality } from './vitality.js';
 import { dayunGodMeaning } from './dayun-god.js';
 import { rankDayun } from './dayun-rank.js';
+import { scanBranchYingqi } from './yingqi-branch.js';
 
 /**
  * @returns {{ decades:[{range, ganZhi, godVi, godCat, theme, vitalityScore,
@@ -25,6 +26,15 @@ export function lifeTimeline(R) {
   for (const r of rk.ranked) rkMap[r.ganZhi] = r;
   const dgMap = {};
   for (const d of dg.items) dgMap[d.ganZhi] = d;
+  // [loop 1002] 应期 dayun activation theo thập kỷ — «cửa mở 10 năm» cho sao ẩn (989-1000)
+  const yqMap = {};
+  try {
+    const yqActs = scanBranchYingqi(R, 2026, 1).dayunActivations || [];
+    for (const a of yqActs) {
+      if (!yqMap[a.ganZhi]) yqMap[a.ganZhi] = [];
+      yqMap[a.ganZhi].push(a);
+    }
+  } catch (e) {}
 
   const decades = (R.dayun || []).map((d) => {
     const gz = d.ganZhi;
@@ -56,6 +66,11 @@ export function lifeTimeline(R) {
 
     const score = v.score || 50;
     const tone = score >= 65 ? '🟢' : score >= 45 ? '🟡' : '🔴';
+    // [loop 1002] 应期 activation cho thập kỷ này (nếu có)
+    const yqActs = yqMap[gz] || [];
+    const yingqiHint = yqActs.length
+      ? yqActs.map((a) => `${a.type === 'xung mở kho' ? '★MởKho' : a.type === 'tam hợp thành cục' ? '≡TamHợp' : a.type === 'hợp dẫn' ? '∼Hợp' : '×Xung'}${a.branch}→${a.groups.map((g2) => g2.vi).join('+')}${a.tone === 'cat' ? '(Dụng)' : a.tone === 'hung' ? '(Kỵ)' : ''}`).join(' ')
+      : '';
 
     return {
       range: `${fromAge}-${fromAge + 9}t`,
@@ -64,7 +79,8 @@ export function lifeTimeline(R) {
       vitalityScore: score, vitalityPhase: v.phase || '',
       lifePhase, tone,
       wealthHint, careerHint,
-      summary: `${lifePhase} ${tone} ${gz} [${g.godVi}] rank #${r.rank || '?'} vit=${score}${wealthHint ? ' ' + wealthHint : ''}${careerHint ? ' ' + careerHint : ''}`,
+      yingqiActivations: yqActs,
+      summary: `${lifePhase} ${tone} ${gz} [${g.godVi}] rank #${r.rank || '?'} vit=${score}${wealthHint ? ' ' + wealthHint : ''}${careerHint ? ' ' + careerHint : ''}${yingqiHint ? ' 🔓' + yingqiHint : ''}`,
     };
   });
 
