@@ -82,7 +82,7 @@ export const CONDITION_KB = [
   },
   {
     id: 'liver_fire',
-    keywords: ['cáu gắt', 'nóng nảy', 'giận', 'đau đầu', 'mắt đỏ', 'miệng đắng', 'cao huyết áp', '肝火', 'stress', 'áp lực', 'ức chế'],
+    keywords: ['cáu gắt', 'nóng nảy', 'giận', 'đau đầu', 'mắt đỏ', 'miệng đắng', '肝火', 'stress', 'áp lực', 'ức chế'],
     title: 'Can hoả vượng / Can dương thượng cương (GIẬN DUỘNG)',
     summary: 'Can (mộc) chủ sớ tiết, tính điều đạt. Lo âu/ức chế/cáu gắt → khí uất kết → hoả hoá → can hoả vượng / can dương cương. Can dương cương là cao huyết áp thường gặp.',
     symptoms: 'hay cáu gắt, bứt rứt, mặt mắt đỏ, đau đầu (đỉnh/2 bên), hoa mắt chóng mặt, tai ù, miệng đắng, mất ngủ, kinh nguyệt rối, cổ vai gáy mỏi.',
@@ -308,6 +308,23 @@ export const CONDITION_KB = [
     symptoms: '(nội trĩ) chảy máu tươi khi đi cầu, sa búi (đẩy lên được); (ngoại trĩ) sưng đau cục ở hậu môn, ẩm ngứa; (thập) đau rát, chảy máu.',
     advice: '① THANH thấp nhiệt: hoàng bá, khổ sâm, địa du, hoè hoa (chống chảy máu). ② THĂNG KHÍ (khí hư sa): hoàng kỳ, sài hồ, thăng ma. ③ CHỮA TÁO BÓN (gốc): uống nước ấm, chất xơ (rau, khoai lang, ý dĩ), tránh rặn mạnh. ④ Ngâm hậu môn nước ấm (15 phút) — giảm sưng. ⑤ Tránh ngồi lâu/đứng lâu/cay nóng/rượu. ⑥ Chảy máu nhiều/sa nặng → khám hậu môn – trực tràng (loại trừ ung thư).',
   },
+  // [loop 1055] +2 tim mạch phổ biến
+  {
+    id: 'hypertension',
+    keywords: ['huyết áp cao', 'tăng huyết áp', 'đo huyết áp', 'huyết áp tâm thu', 'huyết áp tâm trương', '高血压'],
+    title: 'Cao huyết áp (CAN DƯƠNG THƯỢNG KHANG + đàm thấp ứ + âm hư dương cương)',
+    summary: 'Đông-y: CAO HUYẾT ÁP = «CAN DƯƠNG THƯỢNG KHANG» (dương khí bốc lên đầu) + ĐÀM THẤP Ứ TRỆ (mạch máu hẹp) + ÂM HƯ DƯƠNG CƯƠNG (thận âm hư không hàm dương). 3 kiểu: (a) CAN DƯƠNG — căng đầu, mặt đỏ, mắt choáng; (b) ĐÀM THẤP — nặng đầu, phù, choáng; (c) ÂM HƯ — nóng, khô, mất ngủ.',
+    symptoms: '(can dương) choáng căng đầu, mặt đỏ, mắt hoa, cáu gắt, cổ gáy cứng; (đàm thấp) đầu nặng, mệt, phù, buồn nôn; (âm hư) nóng bừng, đổ mồ hôi trộm, khô miệng, mất ngủ, thắt lưng mỏi.',
+    advice: '① BÌNH CAN TIỀM DƯƠNG: thiên ma, câu đằng, thạch quyết minh, ngọc trúc, thảo quyết minh (theo thầy thuốc). ② HOÁ ĐÀM: bán hạ, phục linh, trần bì, biển súng. ③ DƯỠNG ÂM: thục địa, sơn thù du, quy bản (lục vị ý). ④ Giảm MUỐI/mặn (碱	can), giảm mỡ/đường/rượu. ⑤ Quản lý CÂN NẶNG, vận động đều (đi bộ). ⑥ Giảm STRESS — «nộ thương can», «tâm bình khí hoà». ⑦ ĐO HUYẾT ÁP ĐỀU + uống thuốc y khoa đều (không tự ngưng). ⑧ HA > 160/100 hoặc có triệu chứng → khám tim mạch cấp.',
+  },
+  {
+    id: 'high_cholesterol',
+    keywords: ['mỡ máu cao', 'cholesterol cao', 'triglyceride', 'lipid máu', 'mỡ máu', 'cholesterol', '低HDLD', '高LDL', 'tăng lipid', 'vữa xơ động mạch'],
+    title: 'Mỡ máu cao / Rối loạn lipid (ĐÀM THẤP + tỳ hư + can uất huyết ư)',
+    summary: 'Đông-y: «TÂM PHỔ ĐÀM Ứ» — mỡ = đàm thấp do TỲ HƯ vận hoá kém → đàm thấp tích ở mạch máu + CAN UẤT (stress) + HUYẾT Ư (máu ứ → vữa xơ). Liên quan TỲ (sinh đàm) + GAN (khí uất → huyết ư) + THẬN (dương hư → thấp).',
+    symptoms: 'thường KHÔNG có triệu chứng rõ (phát hiện qua xét nghiệm). Có thể: nặng đầu, mệt, phù nhẹ, đầy bụng, ngực tức, gan to (nhiễm mỡ), da vàng quanh mắt (xanthelasma).',
+    advice: '① KIỆN TỲ HOÁ ĐÀM: ý dĩ, sơn dược, phục linh, trần bì, trạch tả, quyết minh tử, sơn tra. ② HOẠT HUYẾT (chống vữa xơ): đan sâm, xích thược, hồng hoa, tỏi (nhiều). ③ Giảm MỠ bão hoà/trans-fat/thịt đỏ/nội tạng/trứng nhiều. ④ TĂNG cá (omega-3), yến mạch, các loại hạt, rau xanh, đậu. ⑤ VẬN ĐỘNG AEROBIC (đi bộ/bơi — 30+ phút). ⑥ Giảm cân nếu béo, ngừng hút thuốc. ⑧ Xét nghiệm lipid định kỳ + thuốc y khoa (statin nếu cần).',
+  },
 ];
 
 /**
@@ -398,6 +415,8 @@ const CONDITION_WX = {
   dizziness: ['木', '火'], obesity: ['土'], allergy: ['金', '土'],
   // [loop 1054] +2 phổ biến
   bad_breath: ['土', '火'], hemorrhoids: ['金', '土'],
+  // [loop 1055] +2 tim mạch
+  hypertension: ['木', '火', '水'], high_cholesterol: ['土', '木'],
 };
 
 /**
