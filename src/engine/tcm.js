@@ -285,7 +285,7 @@ export const CONDITION_KB = [
   },
   {
     id: 'allergy',
-    keywords: ['dị ứng', 'viêm mũi dị ứng', 'hắt hơi', 'sổ mũi', 'ngứa', 'mẩn ngứa', 'nổi mề đay', 'viêm da dị ứng', 'allergy', 'hen sơ'],
+    keywords: ['dị ứng', 'viêm mũi dị ứng', 'hắt hơi', 'ngứa', 'mẩn ngứa', 'nổi mề đay', 'viêm da dị ứng', 'allergy', 'hen sơ'],
     title: 'Dị ứng / Mẫn cảm (PHỔI VỆ BẤT CỐ + đặc bẩm chất)',
     summary: 'Dị ứng = PHỔI VỆ KHÍ BẤT CỐ (phổi chủ bì mao + vệ khí — vệ khí yếu → ngoại tà/dị ứng nguyên xâm nhập dễ). Liên quan THẬN (thận chủ nạp khí, gốc của phổi) + TỲ (sinh hoá vệ khí). Trẻ em hay gặp (vệ khí chưa đầy).',
     symptoms: 'hắt hơi/sổ mũi (viêm mũi dị ứng), ngứa/mẩn (mề đay), hen (khó thở), viêm da, mắt ngứa/nước mắt. Thời tiết/hoa/phấn hoa/graufoods gây.',
