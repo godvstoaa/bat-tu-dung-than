@@ -154,7 +154,7 @@ export const CONDITION_KB = [
   },
   {
     id: 'constipation',
-    keywords: ['táo bón', 'đại tiện khó', 'phân khô', 'đi ngoài khó', '便秘', 'trĩ', 'đại tiện khô'],
+    keywords: ['táo bón', 'đại tiện khó', 'phân khô', 'đi ngoài khó', '便秘', 'đại tiện khô'],
     title: 'Táo bón (ĐẠI TRƯỜNG — tân dịch khuy/nhiệt/khí hư)',
     summary: 'Đại trường chủ truyện hóa (thải phân). Táo bón: (a) TÂN DỊCH KHUY (dịch khô, hay gặp thủ dâm/âm hư/già) — phân khô cứng; (b) NHIỆT MẬT — phân khô + nóng miệng/mặt đỏ; (c) KHÍ HƯ (tỳ/phổi) — có phân nhưng rặn无力, mệt; (d) HÀNG (lạnh) — phân khó, lạnh bụng.',
     symptoms: '(tân khuy) phân khô cứng, khát khô miệng; (nhiệt) mặt đỏ, miệng hôi, tiểu vàng; (khí hư) mệt, rặn yếu, sau đi lại mỏi; (lạnh) bụng lạnh đau.',
@@ -291,6 +291,23 @@ export const CONDITION_KB = [
     symptoms: 'hắt hơi/sổ mũi (viêm mũi dị ứng), ngứa/mẩn (mề đay), hen (khó thở), viêm da, mắt ngứa/nước mắt. Thời tiết/hoa/phấn hoa/graufoods gây.',
     advice: '① CỐ BIỂU BỔ KHÍ: hoàng kỳ, bạch truật, phòng phong (ngự bình tán ý) — tăng sức đề kháng. ② Phổi: bách hợp, mạch môn, kê trứng (phụ). ③ TRÁNH dị ứng nguyên (phấn hoa, lông thú, bụi, hải sản). ④ Tăng sức đề kháng: vận động, ngủ đủ, giảm đường. ⑤ Dị ứng nặng/khó thở → khám (kháng histamine/xịt mũi/épinephrine nếu sốc).',
   },
+  // [loop 1054] +2 phổ biến
+  {
+    id: 'bad_breath',
+    keywords: ['hôi miệng', 'khó thở miệng', 'hơi thở hôi', 'miệng hôi', '口臭', 'hôi miêng', 'hôi mồm'],
+    title: 'Hôi miệng (VỊ NHIỆT + trùng thấp uất + can hoả)',
+    summary: 'Hôi miệng = «VỊ NHIỆT THƯƠNG THỪA» (vị nhiệt bốc lên miệng) HOẶC can hoả (can hoả xông lên) HOẶC thấp nhiệt ở đại trường (táo bón + phân thối). «Vị khai khiếu tại khẩu» — miệng là cửa của vị.',
+    symptoms: 'hơi thở hôi (nhất là sáng), miệng đắng/khô, nổi mụn miệng, khát, tiểu vàng, táo bón hoặc phân dính thối, lưỡi vàng.',
+    advice: '① THANH VỊ NHIỆT: thạch cao, hoàng liên, thạch斛, sinh địa, cam thảo. ② SƠ CAN (nếu giận/mắt đỏ): cúc hoa, diệp hạ châu. ③ Giảm cay nóng/thịt đỏ/rượu/đường. ④ Đánh răng + nha khoa (loại trừ viêm nha chu/răng sâu). ⑤ Trà xanh, bạc hà, ngò — thơm miệng tự nhiên. ⑥ Táo bón → chữa (phân thối bốc ngược).',
+  },
+  {
+    id: 'hemorrhoids',
+    keywords: ['trĩ', 'bệnh trĩ', 'đau rát hậu môn', 'chảy máu hậu môn', 'ẩm hậu môn', 'sa búi trĩ', '痔疮', 'nứt hậu môn', 'trĩ ngoại', 'trĩ nội'],
+    title: 'Bệnh trĩ / Sa trĩ (ĐẠI TRƯỜNG THẤP NHIỆT + khí hư hạ hãm + tràng táo)',
+    summary: 'Trĩ thuộc «THẤP NHIỆT HẠ CHÚ» ở đại trường + khí hư hạ hãm (sa trĩ) + tràng táo (táo bón gây). «Trĩ giả phương bệnh» — càng lâu càng nặng. Liên quan TỲ (khí hãm) + ĐẠI TRƯỜNG (thấp nhiệt) + GAN (chủ sơ tiết, hậu môn là mở khiếu của đại trường dưới).',
+    symptoms: '(nội trĩ) chảy máu tươi khi đi cầu, sa búi (đẩy lên được); (ngoại trĩ) sưng đau cục ở hậu môn, ẩm ngứa; (thập) đau rát, chảy máu.',
+    advice: '① THANH thấp nhiệt: hoàng bá, khổ sâm, địa du, hoè hoa (chống chảy máu). ② THĂNG KHÍ (khí hư sa): hoàng kỳ, sài hồ, thăng ma. ③ CHỮA TÁO BÓN (gốc): uống nước ấm, chất xơ (rau, khoai lang, ý dĩ), tránh rặn mạnh. ④ Ngâm hậu môn nước ấm (15 phút) — giảm sưng. ⑤ Tránh ngồi lâu/đứng lâu/cay nóng/rượu. ⑥ Chảy máu nhiều/sa nặng → khám hậu môn – trực tràng (loại trừ ung thư).',
+  },
 ];
 
 /**
@@ -379,6 +396,8 @@ const CONDITION_WX = {
   anxiety: ['火', '水', '木'], depression: ['木', '火', '土'],
   // [loop 1052] +3 thường gặp
   dizziness: ['木', '火'], obesity: ['土'], allergy: ['金', '土'],
+  // [loop 1054] +2 phổ biến
+  bad_breath: ['土', '火'], hemorrhoids: ['金', '土'],
 };
 
 /**
