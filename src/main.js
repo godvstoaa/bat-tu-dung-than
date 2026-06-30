@@ -98,7 +98,7 @@ import { scanWealthCareerYingqi } from './engine/yingqi-wealth.js';
 import { dominantGod } from './engine/dominant-god.js';
 import { analyzeYanQin } from './engine/yanqin.js';
 import { analyzeHealth } from './engine/health-analysis.js'; // [loop 183] Sức Khoẻ Ngũ Hành card
-import { WUX_ZANG, seasonalHealth, meridianClock } from './engine/tcm.js'; // [loop 1026/1027/1041] đông-y cho health card
+import { WUX_ZANG, seasonalHealth, meridianClock, bodyConstitution } from './engine/tcm.js'; // [loop 1026/1027/1041/1045] đông-y cho health card
 import { healthAlertScan } from './engine/health-alert.js'; // [loop 224 fix] quickSummary + health card timeline — trước đây KHÔNG import → quickSummary's health alert CHẾT (ReferenceError bị try/catch nuốt)
 import { qinxingOverview, qinxingCycle } from './engine/qinxing.js';
 import { analyzeTongGen } from './engine/tonggen.js';
@@ -1446,6 +1446,10 @@ function renderHealth(R) {
     </div>` : '';
     el.innerHTML = `
       <p class="hint">${esc(h.profile || '')}</p>
+      ${(() => { try { // [loop 1045] 中医九种体质 — headline summary
+        const _bc = bodyConstitution(R);
+        return _bc ? `<div class="tiaohou-note" style="border-color:var(--gold-bright);margin:6px 0"><b>🧬 Thể chất đông-y: ${esc(_bc.vi)}</b> — ${esc(_bc.desc)}<br><b>💡 Lời khuyên:</b> ${esc(_bc.advice)}</div>` : '';
+      } catch (_) { return ''; } })()}
       <h4 class="syn-h4" style="margin-top:6px">🔴 Hành yếu nhất (tạng dễ bệnh)</h4>
       ${organ(h.weakest, 'xu')}
       <h4 class="syn-h4" style="margin-top:6px">🟢 Hành mạnh nhất (tạng vượng)</h4>
