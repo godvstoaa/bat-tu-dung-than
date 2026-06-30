@@ -6183,7 +6183,7 @@ function renderWeekPreview() {
   }).join('');
   $('week-preview').innerHTML = `
     <p style="margin:0 0 6px">${w.summary}</p>
-    <div style="display:flex;gap:4px;overflow-x:auto">${cells}</div>`;
+    <div style="display:flex;gap:4px;overflow-x:auto" tabindex="0" role="group" aria-label="Xem trước tuần (cuộn ngang)">${cells}</div>`;
 }
 
 function renderFiveDimRadar() {
