@@ -7986,6 +7986,10 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   // dailyGuide: dailyGuide(R, year, month, day)
   const dg = dailyGuide(spR, 2026, 6, 28);
   assert(dg.date && dg.ganZhi, `[smoke] dailyGuide.date + ganZhi`);
+  // [loop 1006] daily-guide 六合 reward — 2026-1-6 = 辰 day六合(spR tuổi 酉) → score cao hơn
+  const dgHe = dailyGuide(spR, 2026, 1, 6);
+  const dgNonHe = dailyGuide(spR, 2026, 1, 7);
+  assert(dgHe.score > dgNonHe.score || dgHe.score >= 55, '[1006] daily-guide ngày六合 tuổi → score phản ánh reward');
   // dailyDirections: dailyDirections(year, month, day, yong)
   const dd = dailyDirections(2026, 6, 28, spR.yong);
   assert(dd.date && dd.directions, `[smoke] dailyDirections.date + directions`);

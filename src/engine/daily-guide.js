@@ -12,6 +12,8 @@ const ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','
 const OFFICERS = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
 const OFFICER_ROAD = { 建:'black', 满:'black', 平:'black', 收:'black', 破:'black', 闭:'black', 除:'yellow', 危:'yellow', 定:'yellow', 执:'yellow', 成:'yellow', 开:'yellow' };
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
+// [loop 1006] 六合 — chi ngày HỢP tuổi/Nhật Chi = CÁT (đối xứng 冲 penalty)
+const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
 const ZHI_VI_TIME = { 子:'Tý (23-1h)', 丑:'Sửu (1-3h)', 寅:'Dần (3-5h)', 卯:'Mão (5-7h)', 辰:'Thìn (7-9h)', 巳:'Tỵ (9-11h)', 午:'Ngọ (11-13h)', 未:'Mùi (13-15h)', 申:'Thân (15-17h)', 酉:'Dậu (17-19h)', 戌:'Tuất (19-21h)', 亥:'Hợi (21-23h)' };
 
 const WX_DAILY_COLOR = {
@@ -59,6 +61,9 @@ export function dailyGuide(R, year, month, day) {
 
   if (CHONG[dZhi] === birthYearZhi) score -= 6;
   if (CHONG[dZhi] === dayZhi_pillar) score -= 5;
+  // [loop 1006] 六合 reward (cùng fix loop 1004/1005) — chi ngày LỤC HỢP tuổi/Nhật Chi = CÁT
+  if (LIUHE[dZhi] === birthYearZhi) score += 4;
+  if (LIUHE[dZhi] === dayZhi_pillar) score += 3;
 
   // Thông thắng 宜忌
   const tsYi = lunar.getDayYi ? (lunar.getDayYi() || []) : [];

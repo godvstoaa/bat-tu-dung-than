@@ -65,6 +65,10 @@ export function dailyGuidance(R, yy, mm, dd, hh) {
   if (isKy) { score -= 12; reasons.push(`✗ Ngày mang hành KỴ/THÙ (${WX_VI[dayWx]}/${WX_VI[zhiWx]}) → bất lợi.`); ji.push('Tránh quyết định lớn (hành Kỵ Thần)'); }
   if (dayChongUser) { score -= 15; reasons.push(`⚡ Ngày chi ${ZHI_VI[dayZhi]} XUNG chi ngày (${ZHI_VI[userDayZhi]}) của bạn → "日破" bất lợi bản thân.`); ji.push('Tránh ký hợp đồng/cưới/động thổ'); }
   if (yearChongUser) { score -= 8; reasons.push(`Ngày chi xung chi năm (${ZHI_VI[userYearZhi]}) → hơi bất lợi tuổi.`); }
+  // [loop 1006] 六合 reward (cùng fix daily-pro/daily-guide/best-hour) — chi ngày HỢP tuổi/Nhật Chi = CÁT
+  const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+  if (LIUHE[dayZhi] === userDayZhi) { score += 8; reasons.push(`💕 Ngày chi ${ZHI_VI[dayZhi]} LỤC HỢP chi ngày (${ZHI_VI[userDayZhi]}) của bạn → "日合" thuận hoà, hanh thông.`); yi.push('Ký/hợp tác/cưới (chi ngày hợp bản thân)'); }
+  else if (LIUHE[dayZhi] === userYearZhi) { score += 5; reasons.push(`Ngày chi LỤC HỢP chi năm (${ZHI_VI[userYearZhi]}) → thuận tuổi.`); }
   if (['正官','正印','食神','正財'].includes(dayGanVsDm)) { score += 6; reasons.push(`Can ngày = ${dayGanVsDm} (sao cát) → cát tinh chiếu.`); }
   if (['七殺','傷官','劫財','偏印'].includes(dayGanVsDm)) { score -= 4; reasons.push(`Can ngày = ${dayGanVsDm} (sao thiên hung) → cẩn thận.`); }
   // [loop 544 FIX BUG2] score bị clamp [2,98] trong scoreLiunianYear → `score<0` KHÔNG BAO GIỜ
