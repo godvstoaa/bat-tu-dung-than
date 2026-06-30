@@ -119,6 +119,22 @@ export function dayunYongChangSheng(yongWx, xiWx, dayun) {
 
 export { STAGE, TONE_VI };
 
+// [loop 1080] CANONICAL 十二長生 SINH KHÍ weights — «运好不如运旺»: vận/năm Dụng cát
+//   NHƯNG rơi 死/墓/绝 → sinh khí kém, Dụng khó phát huy; 帝旺/臨官 → khuếch đại.
+//   Dùng chung cho rankDayun (đại vận) LẪN analyzeLiunianDeep (lưu niên) — 1 nguồn.
+//   Nguồn: 滴天髓 «运逢长生如苗逢春, 运逢帝旺如日中天, 运逢墓绝如秋冬».
+//   Cân đối: 帝旺=đỉnh nhưng quá vượng dễ kiêu → +8; 墓=kho thu nạp → nhẹ hơn 死/绝.
+export const STAGE_WEIGHT = {
+  '帝旺': 8, '臨官': 8, '長生': 6, '冠帶': 5,
+  '衰': -3, '病': -5, '死': -6, '墓': -4, '絕': -7,
+  '沐浴': 0, '胎': 0, '養': 0,
+};
+export const STAGE_VI = {
+  '長生': 'Trường Sinh', '沐浴': 'Mộc Dục', '冠帶': 'Quan Đới', '臨官': 'Lâm Quan',
+  '帝旺': 'Đế Vượng', '衰': 'Suy', '病': 'Bệnh', '死': 'Tử', '墓': 'Mộ',
+  '絕': 'Tuyệt', '胎': 'Thai', '養': 'Dưỡng',
+};
+
 // [loop 87 — TÍNH NĂNG MỚI] LƯU NGUYỆT thập nhị trường sinh — tháng nào trong năm
 //   Nhật Chủ mạnh (长生/帝旺) vs yếu (死/绝). Đây là NHỊP NĂNG LƯỢNG THÁNG cố định
 //   (12 chi tiết khí = 12 tháng: 寅=T1立春...丑=T12小寒), mỗi chi → 1 stage.

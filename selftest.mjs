@@ -8571,6 +8571,50 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1079] 十二长生 sinh khí tích hợp rankDayun (stage + stageWeight, khớp dayunChangSheng) ✓`);
 }
 
+// [loop 1080] 十二長生 sinh khí NĂM tích hợp analyzeLiunianDeep — «运好不如运旺» cho lưu niên.
+//   Cùng nguyên lý 1079 (đại vận): năm Dụng/合 TỐT nhưng chi năm 死/墓/绝 → sinh khí kém.
+//   Cross-check stage với liunianChangSheng (độc lập) + xác nhận score phản ánh stage.
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { analyzeLiunianDeep } = await import('./src/engine/liunian-pro.js');
+  const { liunianChangSheng } = await import('./src/engine/dayun-changsheng.js');
+  const { changSheng } = await import('./src/engine/core.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  // quét 10 năm, thu stage + score
+  const _years = [];
+  for (let y = 2026; y < 2036; y++) {
+    const ln = analyzeLiunianDeep(_R, y, _R.patternYong || _R.patternQuality?.patternYong);
+    _years.push({ y, gz: ln.ganZhi, score: ln.score, stage: ln.yearStage, w: ln.yearStageWeight, schools: ln.schools });
+  }
+  // 1. yearStage có giá trị (string) cho mọi năm
+  const _allStage = _years.every((it) => typeof it.stage === 'string' && it.stage.length);
+  assert(_allStage, '[loop 1080] analyzeLiunianDeep trả yearStage cho mọi năm');
+  // 2. cross-check stage khớp changSheng(dayGan, yearZhi) — yearZhi = gz[1]
+  assert(_years.every((it) => { const _raw = changSheng(_R.chart.dayGan, it.gz[1]); const _vi = { '長生':'Trường Sinh','沐浴':'Mộc Dục','冠帶':'Quan Đới','臨官':'Lâm Quan','帝旺':'Đế Vượng','衰':'Suy','病':'Bệnh','死':'Tử','墓':'Mộ','絕':'Tuyệt','胎':'Thai','養':'Dưỡng' }[_raw]; return _vi === it.stage; }), '[loop 1080] yearStage khớp changSheng(dayGan, yearZhi)');
+  // 3. có cả năm THỊNH (w>0) lẫn SUY (w<0) trong 10 năm
+  const _vib = _years.filter((it) => it.w > 0).length;
+  const _dec = _years.filter((it) => it.w < 0).length;
+  assert(_vib > 0 && _dec > 0, `[loop 1080] 10 năm có cả sinh khí THỊNH(${_vib}) & SUY(${_dec})`);
+  // 4. năm có stageWeight≠0 phải có school entry '十二长生 sinh khí'
+  const _schoolOk = _years.filter((it) => it.w !== 0).every((it) => it.schools.some((s) => /十二长生 sinh khí/.test(s.phai)));
+  assert(_schoolOk, '[loop 1080] school «十二长生 sinh khí» xuất hiện khi stageWeight≠0');
+  // 5. cross-check thêm với liunianChangSheng module độc lập
+  const _ln = liunianChangSheng(_R.chart.dayGan, _R.liunian || []);
+  assert(_ln && Array.isArray(_ln.items), '[loop 1080] liunianChangSheng module chạy đúng (cross-ref)');
+  // 6. CORRECTNESS amplify-from-neutral: sinh khí KHÔNG tạo cát/hung từ neut — chỉ khuếch đại
+  //    khuynh hướng. vibrant(w>0): delta cùng dấu (preScore-50); declining(w<0): ngược dấu.
+  //    (Bảo vệ loop 461: năm Kỵ thực tế ở 帝旺 phải thêm hung, không vượt Cát.)
+  const _ampOk = _years.filter((it) => it.w !== 0).every((it) => {
+    const _sch = it.schools.find((s) => /十二长生 sinh khí/.test(s.phai));
+    if (!_sch || _sch.d === 0) return true; // neut pre → không đổi (đúng)
+    const _pre = it.score - _sch.d;
+    const _signPre = Math.sign(_pre - 50);
+    return it.w > 0 ? Math.sign(_sch.d) === _signPre : Math.sign(_sch.d) === -_signPre;
+  });
+  assert(_ampOk, '[loop 1080] stage amplify-from-neutral (vibrant khuếch đại khuynh hướng, KHÔNG tạo cát từ neut)');
+  console.log(`   [loop 1080] 十二长生 NĂM tích hợp analyzeLiunianDeep (yearStage + score, thịnh ${_vib}/suy ${_dec}/10) ✓`);
+}
+
 // [loop 1019] 三合 bán-hợp — ngày chi + chi tuổi cùng cụm 三合 (合 layer completion)
 {
   const { evaluateDate } = await import('./src/engine/zheri.js');

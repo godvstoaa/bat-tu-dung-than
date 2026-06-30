@@ -9,9 +9,10 @@
 // ============================================================================
 import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI, SHENG, KE, TEN_GOD_VI } from './constants.js';
-import { tenGod, godGroup } from './core.js';
+import { tenGod, godGroup, changSheng } from './core.js';
 import { GAN_HE_MAP, ZHI_LIUHE_MAP, ZHI_CHONG_MAP, GAN_CHONG } from './interactions.js';
 import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, SHENSHA_INFO, TIAN_YI, WEN_CHANG, JIANG_XING, TIAN_DE, YUE_DE } from './shensha.js';
+import { STAGE_WEIGHT, STAGE_VI } from './dayun-changsheng.js'; // [loop 1080] 十二长生 sinh khí năm
 // [loop 19 — elevation] 伏吟/反吟 chuẩn từ module chuyên dụng (4 cặp thất sát, không phải "bất kỳ ngũ hành khắc").
 import { isFuyin, isFanyin } from './fuyin.js';
 import { scanBranchYingqi } from './yingqi-branch.js';
@@ -430,7 +431,25 @@ export function analyzeLiunianDeep(R, solarYear, patternYong) {
     schools.push({ phai: '进气退气', d: finalScore - score, note: dayunPhase.vi + ` → điểm co về neut ${Math.round((1 - dayunPhase.factor) * 100)}%` });
   }
 
+  // [loop 1080] 十二長生 SINH KHÍ năm — Nhật Chủ ở giai đoạn nào khi nhập năm chi.
+  //   «运好不如运旺»: sinh khí KHÔNG tự tạo cát/hung — nó KHUẾCH ĐẠI khuynh hướng sẵn có
+  //   (cùng semantics 进气退气 loop 164: amplify-from-neutral). Năm Kỵ ở 帝旺 → Kỵ phát mạnh
+  //   (thêm hung), KHÔNG phải bớt hung. Năm ở 死/墓/绝 → co về neut (vận khó phát huy trọn vẹn).
+  //   Fix bug additive cũ: +stageW đẩy năm Kỵ thực tế (2026) vượt ngưỡng Cát (le loop 461).
+  const yearStage = changSheng(c.dayGan, yZhi);
+  const yearStageW = STAGE_WEIGHT[yearStage] || 0;
+  const yearStageVi = STAGE_VI[yearStage] || yearStage || '';
+  if (yearStageW) {
+    const _factor = 1 + yearStageW / 100; // 帝旺 1.08 … 衰 0.97 … 绝 0.93
+    const _pre = finalScore;
+    finalScore = Math.max(2, Math.min(98, Math.round(50 + (finalScore - 50) * _factor)));
+    finalRating = finalScore >= 70 ? 'Đại cát' : finalScore >= 56 ? 'Cát' : finalScore >= 36 ? 'Bình' : finalScore >= 22 ? 'Hơi kỵ' : finalScore >= 10 ? 'Hung' : 'Đại hung';
+    const _dir = yearStageW > 0 ? 'THỊNH — khuếch đại vận (cát thêm cát, hung thêm hung)' : 'SUY — co về neut (vận khó phát huy trọn vẹn, Kỵ cũng giảm bớt)';
+    schools.push({ phai: '十二长生 sinh khí', d: finalScore - _pre, note: `Năm chi ${yZhi} → Nhật Chủ ${yearStageVi} · sinh khí ${_dir} (factor ${_factor.toFixed(2)})` });
+  }
+
   const out = { year: solarYear, ganZhi: yGan + yZhi, ganGod, ganWx, zhiWx, score: finalScore, rating: finalRating, schools, advice };
+  if (yearStageVi) { out.yearStage = yearStageVi; out.yearStageWeight = yearStageW; } // [loop 1080] expose cho UI chart tooltip
   if (gejuFavor) out.gejuFavor = gejuFavor;
   if (activeDayun) out.activeDayun = activeDayun; // [运年组合] 大运 đang hành cho năm này
   if (dayunPhase) out.dayunPhase = dayunPhase; // [loop 152] 进气/退气
