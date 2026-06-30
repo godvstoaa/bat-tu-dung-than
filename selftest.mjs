@@ -7815,6 +7815,10 @@ console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không
   // daily-pro: date string
   const dp = dailyPro(spR, 2026, 6, 15);
   assert(dp.date, `[smoke] daily-pro.date exists`);
+  // [loop 1004] daily-pro 六合 reward — 2026-1-6 = 辰 day, 六合(酉 tuổi spR) → CÁT
+  const dpHe = dailyPro(spR, 2026, 1, 6);
+  const p4He = dpHe.schools.find((s) => s.phai === 'Xung/Hại/Hình/Hợp');
+  assert(p4He && p4He.note.includes('LỤC HỢP') && p4He.d >= 2, '[1004] daily-pro chi ngày六合 tuổi → reward CÁT (+3)');
   console.log(`   Smoke batch 5 ✓ — city-fs + music-therapy + month-calendar + kongwang + daily-pro`);
 }
 

@@ -14,6 +14,10 @@ const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅'
 // Bổ sung cho khớp cổ pháp 择日: chi ngày phạm 害/刑 với tuổi/Nhật Chi cũng giảm cát.
 const HAI = { 子:'未', 未:'子', 丑:'午', 午:'丑', 寅:'巳', 巳:'寅', 卯:'辰', 辰:'卯', 申:'亥', 亥:'申', 酉:'戌', 戌:'酉' };
 const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌', 戌:'未', 未:'丑', 辰:'辰', 午:'午', 酉:'酉', 亥:'亥' };
+// [loop 1004] 六合 (lục hợp) — chi ngày HỢP tuổi/Nhật Chi = CÁT (đối xứng 冲 penalty).
+//   Cổ法 择日 «日支与年命支六合为吉» — ngày chi lục hợp tuổi → thuận hoà, việc trôi chảy.
+//   Trước đây PHÁI 4 chỉ trừ 冲/害/刑, không thưởng 合 → mất tín hiệu CÁT quan trọng.
+const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
 const ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const OFFICERS = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
 const OFFICER_ROAD = { 建:'black', 满:'black', 平:'black', 收:'black', 破:'black', 闭:'black', 除:'yellow', 危:'yellow', 定:'yellow', 执:'yellow', 成:'yellow', 开:'yellow' };
@@ -89,9 +93,12 @@ export function dailyPro(R, year, month, day) {
   // 刑 (刑罚 — cẩn thận quanphi/sức khoẻ)
   if (XING[dZhi] === birthYearZhi || dZhi === XING[birthYearZhi]) { e4 -= 3; e4note += `Chi ${dZhi} hình tuổi ${birthYearZhi} (cẩn thận quanphi). `; }
   if (XING[dZhi] === dayZhi_pillar || dZhi === XING[dayZhi_pillar]) { e4 -= 2; e4note += `Chi hình Nhật Chi. `; }
+  // [loop 1004] 六合 — chi ngày HỢP tuổi/Nhật Chi = CÁT (thuận hoà, đối xứng 冲 penalty)
+  if (LIUHE[dZhi] === birthYearZhi) { e4 += 3; e4note += `Chi ${dZhi} LỤC HỢP tuổi ${birthYearZhi} → thuận hoà, việc trôi chảy. `; }
+  if (LIUHE[dZhi] === dayZhi_pillar) { e4 += 2; e4note += `Chi LỤC HỢP Nhật Chi (bản thân) → chủ nhật hanh thông. `; }
   if (!e4note) e4note = 'Chi ngày không phạm 冲/害/刑 với tuổi.';
   score += e4;
-  schools.push({ phai: 'Xung/Hại/Hình', d: e4, note: e4note });
+  schools.push({ phai: 'Xung/Hại/Hình/Hợp', d: e4, note: e4note });
 
   // PHÁI 5: Thần sát ngày (đào hoa/hồng diễm/dương nhận)
   let e5 = 0, e5note = '', e5YangRen = false; // [loop 27] flag dương nhận (tránh bug case-sensitive)
