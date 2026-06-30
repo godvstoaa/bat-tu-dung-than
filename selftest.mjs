@@ -8284,6 +8284,16 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   const _c = computeTojeong({ birthSolarYear: 1990, birthSolarMonth: 6, birthSolarDay: 15 });
   assert(_c.ok && /^\d{3}$/.test(_c.gua) && !/undefined|NaN/.test(JSON.stringify(_c)), `[loop 1009] computeTojeong OK (gua ${_c.gua}, target ${_c.targetGanZhi})`);
   console.log(`   [loop 1009] 토정비결 작괘법 + 조견표 (232/362 verified) ✓ — current@${_c.targetYear} ${_c.targetGanZhi}`);
+  // [loop 1010] 犯太歲 (범태세) — tương tác chi năm sinh ↔ năm mục tiêu (cổ法 verifiable)
+  const _chong = computeTojeong({ birthSolarYear: 1984, birthSolarMonth: 6, birthSolarDay: 15, targetYear: 2026 }); // 子vs午→沖
+  assert(_chong.taesoo && _chong.taesoo.flags.some((f) => f.k === '沖'), `[loop 1010] 子↔午 = 沖太歲 (got ${_chong.taesoo?.flags.map((f) => f.k).join('/')})`);
+  const _zhi = computeTojeong({ birthSolarYear: 1990, birthSolarMonth: 6, birthSolarDay: 15, targetYear: 2026 }); // 午vs午→值, KHÔNG 三合
+  assert(_zhi.taesoo && _zhi.taesoo.flags.some((f) => f.k === '值') && !_zhi.taesoo.flags.some((f) => f.k === '三合'), `[loop 1010] 午↔午 = 值太歲 (no double 三合) (got ${_zhi.taesoo?.flags.map((f) => f.k).join('/')})`);
+  const _sanhe = computeTojeong({ birthSolarYear: 1974, birthSolarMonth: 6, birthSolarDay: 15, targetYear: 2026 }); // 寅vs午→三合(寅午戌)
+  assert(_sanhe.taesoo && _sanhe.taesoo.flags.some((f) => f.k === '三合'), `[loop 1010] 寅↔午 = 三合太歲 (got ${_sanhe.taesoo?.flags.map((f) => f.k).join('/')})`);
+  const _none = computeTojeong({ birthSolarYear: 1988, birthSolarMonth: 6, birthSolarDay: 15, targetYear: 2026 }); // 辰vs午→không tương tác
+  assert(_none.taesoo === null, `[loop 1010] 辰↔午 = không tương tác太歲 (got ${JSON.stringify(_none.taesoo?.flags?.map((f) => f.k))})`);
+  console.log(`   [loop 1010] 犯太歲 범태세 (沖/值/三合/无 — 4 case verified) ✓`);
 }
 
 process.exit(FAILS === 0 ? 0 : 1);

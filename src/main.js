@@ -1021,6 +1021,10 @@ function renderTojeong(R) {
       </div>
       <p class="cg-interp"><b>Sinh (ÂL):</b> ${b.lunarYear} năm, tháng ${b.lunarMonth}${b.isLeap ? ' (nhuận)' : ''}, ngày ${b.lunarDay} (${esc(b.dayGanZhi)}, ${b.dayCount} ngày/tháng).</p>
       <p class="cg-interp"><b>Ngũ hành năm:</b> can ${WX_VI[t.yearWx.ganWx]||t.yearWx.ganWx} · chi ${WX_VI[t.yearWx.zhiWx]||t.yearWx.zhiWx}.${t.hue ? ` <span class="ln-rate ${hueInfo[0]}">${esc(hueInfo[1])}</span>` : ''}</p>
+      ${t.taesoo ? `<p class="cg-interp"><b>犯太歲 (범태세):</b> chi sinh <span class="zh">${esc(t.taesoo.bYearZhi)}</span> ↔ chi năm <span class="zh">${esc(t.taesoo.targetZhi)}</span> — ${t.taesoo.flags.map((f) => {
+        const cls = f.tone === 'cat' ? 'rate-cat' : f.tone === 'hung' ? 'rate-hung' : 'rate-mid';
+        return `<span class="ln-rate ${cls}" style="margin:2px 4px 2px 0"><b>${esc(f.k)}太歲</b> ${esc(f.vi)}</span>`;
+      }).join('')}</p>` : ''}
       <p class="hint" style="margin-top:6px">${esc(t.note)}</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được 토정비결.</p>'; }
 }

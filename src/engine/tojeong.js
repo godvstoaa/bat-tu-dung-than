@@ -63,19 +63,23 @@ function wuhudun(yearGan, lunarMonth) {
  */
 export function _guaFromLunar(p) {
   const { targetGanZhi, koreanAge, birthLunarMonth, dayCount, birthLunarDay, birthDayGanZhi } = p;
-  const tBase = JIGAM[targetGanZhi] || [10, 10, 10];
-  const sang = mod(tBase[0] + koreanAge, 8);                 // 상괘 (태세수)
+  // [loop 1010 audit] 조견표 phải COVER đủ 60 hoa giáp — miss = bug (sẽ ra gua SAI).
+  //   Trước đây fallback `[10,10,10]` âm thầm → gua sai mà không báo. Nay track miss tường minh.
+  const misses = [];
+  const tBase = JIGAM[targetGanZhi]; if (!tBase) misses.push(`target:${targetGanZhi}`);
   const wolkun = wuhudun(targetGanZhi[0], Math.abs(birthLunarMonth));
-  const mBase = JIGAM[wolkun] || [10, 10, 10];
-  const jung = mod(mBase[1] + dayCount, 6);                  // 중괘 (월건수)
-  const dBase = JIGAM[birthDayGanZhi] || [10, 10, 10];
-  const ha = mod(dBase[2] + birthLunarDay, 3);               // 하괘 (일진수)
+  const mBase = JIGAM[wolkun]; if (!mBase) misses.push(`wolkun:${wolkun}`);
+  const dBase = JIGAM[birthDayGanZhi]; if (!dBase) misses.push(`day:${birthDayGanZhi}`);
+  const sang = mod((tBase?.[0] ?? 0) + koreanAge, 8);        // 상괘 (태세수)
+  const jung = mod((mBase?.[1] ?? 0) + dayCount, 6);         // 중괘 (월건수)
+  const ha = mod((dBase?.[2] ?? 0) + birthLunarDay, 3);      // 하괘 (일진수)
   return {
     gua: String(sang) + String(jung) + String(ha),
     sang, jung, ha,
+    misses,
     detail: {
       targetGanZhi, koreanAge,
-      sangBase: tBase[0], wolkun, wolkunBase: mBase[1], dayCount, birthDayGanZhi, ilBase: dBase[2], birthLunarDay,
+      sangBase: tBase?.[0], wolkun, wolkunBase: mBase?.[1], dayCount, birthDayGanZhi, ilBase: dBase?.[2], birthLunarDay,
     },
   };
 }
@@ -147,14 +151,39 @@ export function computeTojeong(opt) {
     else hue = 'bình';
   }
 
+  // 7. 犯太歲 (범태세) — [loop 1010] tương tác chi năm sinh ↔ chi năm mục tiêu.
+  //   Cổ pháp Hoa/Hàn: 值/沖/破/害 = phạm (cần cẩn trọng); 六合/三合 = được phù trợ.
+  //   Bảng cặp verified (子午沖, 子未害, 子酉破, 子丑六合, 申子辰三合…).
+  const CLASH = { 子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳' };
+  const HARM  = { 子:'未',未:'子',丑:'午',午:'丑',寅:'巳',巳:'寅',卯:'辰',辰:'卯',申:'亥',亥:'申',酉:'戌',戌:'酉' };
+  const BREAK = { 子:'酉',酉:'子',丑:'辰',辰:'丑',寅:'亥',亥:'寅',卯:'午',午:'卯',巳:'申',申:'巳',未:'戌',戌:'未' };
+  const LIUHE = { 子:'丑',丑:'子',寅:'亥',亥:'寅',卯:'戌',戌:'卯',辰:'酉',酉:'辰',巳:'申',申:'巳',午:'未',未:'午' };
+  const SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
+  const bYearZhi = (typeof lunar.getYearZhi === 'function' && lunar.getYearZhi()) || '';
+  const tZhi = targetGanZhi[1];
+  let taesoo = null;
+  if (bYearZhi) {
+    const flags = [];
+    if (bYearZhi === tZhi) flags.push({ k:'值', vi:'本命年 — chi trùng, năm chuyển biến lớn', tone:'hung' });
+    if (CLASH[bYearZhi] === tZhi) flags.push({ k:'沖', vi:'biến động, di chuyển, xung đột', tone:'hung' });
+    if (BREAK[bYearZhi] === tZhi) flags.push({ k:'破', vi:'hao tốn, phá vỡ khuôn mẫu', tone:'mid' });
+    if (HARM[bYearZhi] === tZhi) flags.push({ k:'害', vi:'tiểu nhân, thị phi', tone:'mid' });
+    if (LIUHE[bYearZhi] === tZhi) flags.push({ k:'六合', vi:'六合 — được phù trợ, thuận lợi', tone:'cat' });
+    // [loop 1010 fix] 三合 cần 2 chi KHÁC NHAU cùng cục (vd 寅↔午); cùng chi (值太歲) không tính 三合.
+    if (bYearZhi !== tZhi && SANHE.some((g) => g.includes(bYearZhi) && g.includes(tZhi))) flags.push({ k:'三合', vi:'đồng cục, quý nhân, hài hòa', tone:'cat' });
+    taesoo = flags.length ? { bYearZhi, targetZhi: tZhi, flags } : null;
+  }
+
   return {
     ok: true,
     gua: r.gua, sang: r.sang, jung: r.jung, ha: r.ha,
     targetYear, targetGanZhi, koreanAge,
     birth: { lunarYear: bLunarYear, lunarMonth: bMonthAbs, lunarDay: bLunarDay, dayGanZhi: bDayGanZhi, isLeap, dayCount },
     detail: r.detail,
+    misses: r.misses,
     yearWx: ywx,
     hue,
+    taesoo,
     note: '토정비결 종합괘 (144卦) — thuật toán 작괘법 cổ truyền Hàn Quốc, nghiệm chứng bằng 조견표 (xuất xứ 대자재苑/중앙일보). Phần diễn giải thơ 4언3구 theo từng卦 đang được bổ sung.',
   };
 }
