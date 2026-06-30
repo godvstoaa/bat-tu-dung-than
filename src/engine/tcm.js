@@ -424,3 +424,75 @@ export function meridianClock(hourZhi) {
   if (!m) return null;
   return { zhi: hourZhi, ...m };
 }
+
+// ---- [loop 1043] 中医九种体质 (王琦体质学说) — từ ngũ hành vượng suy ----
+// Nguồn: «中医体质分类与判定» (王琦, 2009中华中医药学会标准).
+const CONSTITUTION_TYPES = {
+  pinghe: { id: 'pinghe', vi: 'Phù Hoà (平和质)', tone: 'cat',
+    desc: 'Ngũ hành cân bằng — thể chất lý tưởng: ngủ ngon, ăn tốt, tinh thần ổn, ít bệnh.',
+    advice: 'Giữ thói quen lành mạnh: ăn uống cân bằng, vận động đều, ngủ đủ. Không cần đặc biệt bổ.' },
+  qixu: { id: 'qixu', vi: 'Khí Hư (气虚质)', tone: 'mid',
+    desc: 'Tỳ + Phổi khí hư — mệt mỏi, thở hụt, hay vã mồ hôi, nói yếu, dễ cảm.',
+    advice: 'Bổ khí: nhân sâm/đảng sâm/hoàng kỳ, táo đỏ, kỷ tử, sơn dược. Vận động nhẹ (khí công/đi bộ). Tránh nói nhiều/lo nghĩ.' },
+  yangxu: { id: 'yangxu', vi: 'Dương Hư (阳虚质)', tone: 'mid',
+    desc: 'Thận/Spleen dương hư — sợ lạnh, tay chân lạnh, tiểu đêm, phân lỏng.',
+    advice: 'Ôn dương: nhục quế, phụ tử (theo thầy thuốc), gừng, hạt óc chó, đậu đen. Giữ ấm, tránh sinh lạnh, ngủ sớm.' },
+  yinxu: { id: 'yinxu', vi: 'Âm Hư (阴虚质)', tone: 'hung',
+    desc: 'Thận âm hư — nóng trong, bốc hoả, đổ mồ hôi trộm, khô miệng, mất ngủ.',
+    advice: 'Dưỡng âm: lục vị địa hoàng, thục địa, mạch môn, đậu đen, sen tâm. Tránh cay nóng/thức khuya/rượu.' },
+  tanshi: { id: 'tanshi', vi: 'Đàm Thấp (痰湿质)', tone: 'mid',
+    desc: 'Tỳ thấp đàm trọc — nặng người, béo, phù, nhiều đờm, buồn ngủ.',
+    advice: 'Kiện tỳ hoá thấp: ý dĩ, sơn dược, trạch tả, trần bì. Giảm ngọt/béo/tinh bột. Vận động mạnh hơn.' },
+  shire: { id: 'shire', vi: 'Thấp Nhiệt (湿热质)', tone: 'hung',
+    desc: 'Thấp nhiệt uất — mặt nhờn, mụn, miệng đắng, tiểu vàng, phân dính.',
+    advice: 'Thanh thấp nhiệt: ý dĩ, khổ qua, đậu xanh, nhân trần, diệp hạ châu. Giảm cay/đường/sữa/rượu.' },
+  xueyu: { id: 'xueyu', vi: 'Huyết Ứ (血瘀质)', tone: 'hung',
+    desc: 'Huyết ứ trệ — da tối/nám, đau cố định, môi tía, kinh cục.',
+    advice: 'Hoạt huyết: đan sâm, xích thược, đào nhân, hồng hoa, sơn tra. Vận động đều (khí huyết hành).' },
+  qiyu: { id: 'qiyu', vi: 'Khí Uất (气郁质)', tone: 'mid',
+    desc: 'Can khí uất kết — bứt rứt, lo âu, ngực sườn trướng, hay thở dài.',
+    advice: 'Sơ can giải uất: sài hồ, hương phụ, cúc hoa, diệp hạ châu. Vận động ngoài trời, giao tiếp, bớt ức chế.' },
+  tebin: { id: 'tebin', vi: 'Đặc Bẩm (特禀质)', tone: 'mid',
+    desc: 'Phổi vệ bất cố — dễ dị ứng, mẩn ngứa, hen, viêm mũi.',
+    advice: 'Cố biểu bổ khí: hoàng kỳ, bạch truật, phòng phong. Tránh dị ứng nguyên. Tăng sức đề kháng.' },
+};
+/**
+ * Phân loại thể chất đông-y TỪ ngũ hành vượng suy (王琦 九种体质).
+ * @param {object} R — analyze() result
+ * @returns {{ id, vi, tone, desc, advice, weakest, strongest }}
+ */
+export function bodyConstitution(R) {
+  if (!R?.wx?.pct) return null;
+  const p = R.wx.pct;
+  const avg = Object.values(p).reduce((a, b) => a + b, 0) / 5;
+  const entries = Object.entries(p).sort((a, b) => b[1] - a[1]);
+  const [maxWx, maxV] = entries[0], [minWx, minV] = entries[entries.length - 1];
+  const low = (wx) => p[wx] < avg * 0.85;
+  const high = (wx) => p[wx] > avg * 1.15;
+
+  // 1. 平和: tất cả gần cân (max-min < avg*0.45)
+  if (maxV - minV < avg * 0.45) return { ...CONSTITUTION_TYPES.pinghe, weakest: minWx, strongest: maxWx };
+  // 2. 痰湿: Thổ cao nhất (>avg*1.2)
+  if (high('土') && p['土'] >= maxV) {
+    // kèm Hoả cao → 湿热
+    if (high('火')) return { ...CONSTITUTION_TYPES.shire, weakest: minWx, strongest: maxWx };
+    return { ...CONSTITUTION_TYPES.tanshi, weakest: minWx, strongest: maxWx };
+  }
+  // 3. 气郁: Mộc cao nhất
+  if (high('木') && p['木'] >= maxV) return { ...CONSTITUTION_TYPES.qiyu, weakest: minWx, strongest: maxWx };
+  // 4. 阳虚: Thủy rất thấp + Thổ thấp
+  if (low('水') && p['水'] <= avg * 0.7) {
+    if (high('火')) return { ...CONSTITUTION_TYPES.yinxu, weakest: minWx, strongest: maxWx }; // âm hư hoả vượng
+    return { ...CONSTITUTION_TYPES.yangxu, weakest: minWx, strongest: maxWx };
+  }
+  // 5. 气虚: Thổ + Kim đều thấp
+  if (low('土') && low('金')) return { ...CONSTITUTION_TYPES.qixu, weakest: minWx, strongest: maxWx };
+  // 6. 特禀: Kim thấp nhất
+  if (minWx === '金') return { ...CONSTITUTION_TYPES.tebin, weakest: minWx, strongest: maxWx };
+  // 7. 血瘀: Mộc thấp (can huyết hư ứ)
+  if (low('木')) return { ...CONSTITUTION_TYPES.xueyu, weakest: minWx, strongest: maxWx };
+  // 8. 阴虚: Thủy thấp (không phải dương hư)
+  if (low('水')) return { ...CONSTITUTION_TYPES.yinxu, weakest: minWx, strongest: maxWx };
+  // fallback
+  return { ...CONSTITUTION_TYPES.qixu, weakest: minWx, strongest: maxWx };
+}

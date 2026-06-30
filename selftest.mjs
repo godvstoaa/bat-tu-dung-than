@@ -8828,5 +8828,24 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1039] 子午流注 (12 时辰→12 kinh mạch, 灵枢 cổ pháp) ✓`);
 }
 
+// [loop 1043] 中医九种体质 (bodyConstitution) — ngũ hành → 体质 type
+{
+  const { bodyConstitution } = await import('./src/engine/tcm.js');
+  const { analyze } = await import('./src/engine/chart.js');
+  const _VALID = new Set(['pinghe', 'qixu', 'yangxu', 'yinxu', 'tanshi', 'shire', 'xueyu', 'qiyu', 'tebin']);
+  let _ok = 0;
+  for (const [y, m, d, h] of [[1990, 6, 15, 12], [1985, 3, 20, 8], [2000, 2, 29, 0], [1995, 9, 10, 6]]) {
+    const _R = analyze(y, m, d, h, 0, 'nam', 2026);
+    const _bc = bodyConstitution(_R);
+    if (_bc && _VALID.has(_bc.id) && _bc.vi && _bc.advice) _ok++;
+    else console.log(`     ✗ ${y}-${m}-${d} → ${_bc?.id}`);
+  }
+  assert(_ok === 4, `[loop 1043] bodyConstitution 4 charts valid (got ${_ok}/4)`);
+  // specific: 1995 (木49% dominant) → 气郁
+  const _r2 = analyze(1995, 9, 10, 6, 0, 'nam', 2026);
+  assert(bodyConstitution(_r2).id === 'qiyu', `[loop 1043] 木 vượng → 气郁 (got ${bodyConstitution(_r2)?.id})`);
+  console.log(`   [loop 1043] 中医九种体质 (bodyConstitution — ngũ hành→体质) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
