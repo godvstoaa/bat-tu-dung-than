@@ -98,6 +98,7 @@ import { scanWealthCareerYingqi } from './engine/yingqi-wealth.js';
 import { dominantGod } from './engine/dominant-god.js';
 import { analyzeYanQin } from './engine/yanqin.js';
 import { analyzeHealth } from './engine/health-analysis.js'; // [loop 183] Sức Khoẻ Ngũ Hành card
+import { WUX_ZANG } from './engine/tcm.js'; // [loop 1026] hội chứng 虚/实 đông-y cho health card
 import { healthAlertScan } from './engine/health-alert.js'; // [loop 224 fix] quickSummary + health card timeline — trước đây KHÔNG import → quickSummary's health alert CHẾT (ReferenceError bị try/catch nuốt)
 import { qinxingOverview, qinxingCycle } from './engine/qinxing.js';
 import { analyzeTongGen } from './engine/tonggen.js';
@@ -1431,17 +1432,24 @@ function renderHealth(R) {
   if (!el) return;
   try {
     const h = analyzeHealth(R);
-    const organ = (o) => o ? `<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:3px 0">
+    // [loop 1026] hội chứng đông-y 虚/实 (từ tcm.js WUX_ZANG) cho tạng yếu/mạnh.
+    const syndromes = (wx, kind) => {
+      const z = WUX_ZANG[wx];
+      if (!z) return '';
+      const list = kind === 'xu' ? z.xu : z.shi;
+      return list.map((s) => `<span class="hint">· ${kind === 'xu' ? 'HƯ' : 'THỰC'}: ${esc(s)}</span>`).join('<br>');
+    };
+    const organ = (o, kind) => o ? `<div class="yz-row" style="border-left:3px solid var(--gold);padding-left:8px;margin:3px 0">
       <b>${esc(o.vi)} (${esc(o.wx)})${o.pct ? ' — ' + esc(o.pct) + '%' : ''}</b> · ${esc(o.organs || '')}<br>
       <span class="hint">⚠ Dễ yếu: ${esc(o.risk || '')}</span><br>
-      <span class="hint">食疗 bổ: ${esc(o.foods || '')}</span>
+      <span class="hint">食疗 bổ: ${esc(o.foods || '')}</span>${syndromes(o.wx, kind) ? '<br>' + syndromes(o.wx, kind) : ''}
     </div>` : '';
     el.innerHTML = `
       <p class="hint">${esc(h.profile || '')}</p>
       <h4 class="syn-h4" style="margin-top:6px">🔴 Hành yếu nhất (tạng dễ bệnh)</h4>
-      ${organ(h.weakest)}
+      ${organ(h.weakest, 'xu')}
       <h4 class="syn-h4" style="margin-top:6px">🟢 Hành mạnh nhất (tạng vượng)</h4>
-      ${organ(h.strongest)}
+      ${organ(h.strongest, 'shi')}
       ${h.constitution ? `<h4 class="syn-h4" style="margin-top:6px">Thể chất ${esc(h.constitutionVi || '')}</h4><p class="hint">${esc(h.constitution)}</p>` : ''}
       ${R.shensha && R.shensha.tianYiMed ? `<div class="tiaohou-note" style="border-color:var(--cat,#2a7);background:rgba(46,158,107,0.06)"><b>⚕️ Thiên Y (天医) chiếu @${esc(R.shensha.tianYiMed.at.join(','))}:</b> duyên y tế, thể chất có khả năng tự phục hồi, hợp nghề y/dược/dưỡng sinh. «天医拱照, 可作良医».</div>` : ''}
       ${h.remedyFoods ? `<div class="tiaohou-note"><b>Thực phẩm chữa lành (hành ${esc(h.remedyVi || '')}):</b> ${esc(h.remedyFoods)}</div>` : ''}
