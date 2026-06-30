@@ -15,6 +15,10 @@ const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅'
 // [loop 327] 六害 + 三刑 — ngày cưới hại/hình tuổi vợ/chồng cũng kỵ (trước đây chỉ check 冲)
 const HAI = { 子:'未', 未:'子', 丑:'午', 午:'丑', 寅:'巳', 巳:'寅', 卯:'辰', 辰:'卯', 申:'亥', 亥:'申', 酉:'戌', 戌:'酉' };
 const XING = { 子:'卯', 卯:'子', 寅:'巳', 巳:'申', 申:'寅', 丑:'戌', 戌:'未', 未:'丑', 辰:'辰', 午:'午', 酉:'酉', 亥:'亥' };
+// [loop 1015 FIX] 六合 — ngày chi lục hợp tuổi vợ/chồng = «日合岁» RẤT cát cho cưới (合 = hợp
+//   hoà, nền tảng hôn nhân). Trước đây chỉ phạt 冲/害/刑 mà bỏ qua 合 — cùng bug-class loop
+//   1014 zheri, và ở module cưới thì 合 là yếu tố quan trọng nhất. Nay đóng.
+const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
 
 /**
  * Đánh giá 1 ngày cho cưới — cho 2 người.
@@ -75,6 +79,11 @@ export function evaluateWeddingDate(year, month, day, zhiA, zhiB) {
   if (haiB) { score -= 6; reasons.push(`• B bị hại (日害岁 ${ZHI[zhiB]?.vi || zhiB})`); }
   if (xingA) { score -= 8; reasons.push(`• A bị hình (日刑岁 ${ZHI[zhiA]?.vi || zhiA})`); }
   if (xingB) { score -= 8; reasons.push(`• B bị hình (日刑岁 ${ZHI[zhiB]?.vi || zhiB})`); }
+  // [loop 1015] 六合 thưởng — ngày chi lục hợp tuổi vợ/chồng → «日合岁» rất cát (đối xứng 冲罚).
+  const heA = !clashA && LIUHE[dZhi] === zhiA;
+  const heB = !clashB && LIUHE[dZhi] === zhiB;
+  if (heA) { score += 12; reasons.push(`💕 A được合 (日合岁 ${ZHI[zhiA]?.vi || zhiA}) — lục hợp, thuận hoà cưới hỏi`); }
+  if (heB) { score += 12; reasons.push(`💕 B được合 (日合岁 ${ZHI[zhiB]?.vi || zhiB}) — lục hợp, thuận hoà cưới hỏi`); }
 
   if (!clashA && !clashB && !chongTaiSuiA && !chongTaiSuiB && !haiA && !haiB && !xingA && !xingB) {
     score += 10; reasons.push('✓ Không xung/hại/hình/phạm cả hai');
