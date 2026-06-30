@@ -274,14 +274,12 @@ function lookupFortune(totalLiang) {
   const rounded = Math.round(totalLiang * 10) / 10;
   const key = rounded.toFixed(1);
   if (FORTUNE[key]) return FORTUNE[key];
-  // Nếu lớn hơn 5.5 thì dùng các bản 5.6..7.1 (đã có sẵn); chỉ 5.8, 5.9, 5.7, v.v. chưa có → kẹp
-  if (rounded >= 6.0) return FORTUNE['6.0'];
-  if (rounded >= 5.6) return FORTUNE['5.6'];
-  if (rounded >= 5.4) return FORTUNE['5.4'];
-  if (rounded >= 5.2) return FORTUNE['5.2'];
-  if (rounded >= 5.1) return FORTUNE['5.1'];
-  // < 2.1 (lý thuyết không tới nhưng phòng hờ)
-  return FORTUNE['2.1'];
+  // [loop 1033 FIX] gap (vd 5.8/5.9 thiếu verse) → map tới key GẦN NHẤT (không phải kẹp xuống 5.6
+  //   như cũ — 5.8 gần 5.7 hơn, 5.9 gần 6.0). Robust cho mọi gap.
+  const _keys = Object.keys(FORTUNE).map(Number);
+  let _best = _keys[0], _bestD = Math.abs(rounded - _best);
+  for (const k of _keys) { const d = Math.abs(rounded - k); if (d < _bestD) { _bestD = d; _best = k; } }
+  return FORTUNE[_best.toFixed(1)];
 }
 
 /**

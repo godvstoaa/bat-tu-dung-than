@@ -8698,5 +8698,25 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1030] vi2han ↔ name.js stroke consistency (黃/清/鸞 fixed) ✓`);
 }
 
+// [loop 1033] chenggu lookupFortune — gap (5.8/5.9) map tới NEAREST, verse luôn defined
+{
+  const { chenggu, FORTUNE } = await import('./src/engine/chenggu.js');
+  const { analyze } = await import('./src/engine/chart.js');
+  // nearest-key cho gap: 5.8→5.7, 5.9→6.0 (trước đây cả 2 → 5.6 SAI)
+  const _keys = Object.keys(FORTUNE).map(Number);
+  const _nearest = (t) => { let b = _keys[0], bd = Math.abs(t - b); for (const k of _keys) { const d = Math.abs(t - k); if (d < bd) { bd = d; b = k; } } return b; };
+  assert(_nearest(5.8) === 5.7, `[loop 1033] gap 5.8 → 5.7 nearest (got ${_nearest(5.8)})`);
+  assert(_nearest(5.9) === 6.0, `[loop 1033] gap 5.9 → 6.0 nearest (got ${_nearest(5.9)})`);
+  // fuzz: mọi chart → verse + interpretation đều defined (no undefined fortune)
+  let _undef = 0;
+  for (let i = 0; i < 200; i++) {
+    const _R = analyze(1960 + (i * 7) % 60, 1 + (i * 5) % 12, 1 + (i * 11) % 28, (i * 2) % 24, 0, 'nam', 2026);
+    const _c = chenggu(_R);
+    if (!_c.verse || !_c.interpretation || _c.totalLiang == null) _undef++;
+  }
+  assert(_undef === 0, `[loop 1033] chenggu fuzz 200 — verse luôn defined (got ${_undef} undefined)`);
+  console.log(`   [loop 1033] chenggu lookupFortune (gap nearest + fuzz 200 verse defined) ✓`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
