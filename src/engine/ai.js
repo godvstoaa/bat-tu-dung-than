@@ -109,7 +109,7 @@ import { computeHehun } from './hehun.js';
 import { synthesize } from './synthesis.js';
 import { matchBusinessPartners } from './partner-match.js';
 import { analyzeHealth, answerHealth, meridianClock, bodyConstitution, stageHealth, decadeHealthArc } from './tcm.js';
-import { evaluateNumber } from './number-fs.js'; // [loop 1137] số lý phong thủy
+import { evaluateNumber, recommendNumbers } from './number-fs.js'; // [loop 1137/1141] số lý phong thủy
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
@@ -791,10 +791,11 @@ export function execTool(name, args, R) {
         const l = s.getLunar(); const ec = l.getEightChar();
         return { solar: s.toYmd(), lunar: l.toString(), year: n.getFullYear(), yearGanZhi: ec.getYearGan() + ec.getYearZhi(), monthGanZhi: ec.getMonthGan() + ec.getMonthZhi() };
       }
-      case 'evaluate_number': { // [loop 1137] số lý phong thủy — đánh giá số điện thoại/biển số
+      case 'evaluate_number': { // [loop 1137/1141] số lý phong thủy — đánh giá + đề xuất
         const ev = evaluateNumber(String(a.number || ''), R);
         if (ev.error) return { error: ev.error };
-        return { input: ev.input, lastDigit: ev.lastDigit, lastWxVi: ev.lastWxVi, sum81: ev.sum81, luckVi: ev.luckVi, dungMatch: ev.dungMatch, kyMatch: ev.kyMatch, dungCount: ev.dungCount, kyCount: ev.kyCount, score: ev.score, rating: ev.rating, advice: _s(ev.advice, 320) };
+        const rec = recommendNumbers(R);
+        return { input: ev.input, lastDigit: ev.lastDigit, lastWxVi: ev.lastWxVi, sum81: ev.sum81, luckVi: ev.luckVi, dungMatch: ev.dungMatch, kyMatch: ev.kyMatch, dungCount: ev.dungCount, kyCount: ev.kyCount, score: ev.score, rating: ev.rating, advice: _s(ev.advice, 320), favNums: rec.favNums, avoidNums: rec.avoidNums, goodCombos: rec.goodCombos };
       }
       case 'analyze_day': {
         const d = analyzeLiuRi(R, a.year, a.month, a.day, R.patternQuality);
