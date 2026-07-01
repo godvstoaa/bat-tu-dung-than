@@ -363,6 +363,25 @@ export const CONDITION_KB = [
     advice: '① HOÀ CAN HÀ VỊ — ô tặc cốt (secuaritee), bé Ngư tinh thảo, trần bì, bán hạ, hoàng cầm, chi tử. ② TRÀ HOÀ CAN — cúc hoa + quyết minh tử + atiso (thanh can hoả). ③ TRÁNH: ăn khuya (trước 19h xong), nằm ngay sau ăn (đợi 2h), cay/nóng/chua/thức ăn chiên/rượu/cafein/trà đặc/socola/cà chua. ④ TĂNG: yến mạch, chuối, gạo tẻ, khoai lang (kiện tỳ). ⑤ VẬN ĐỘNG nhẹ sau ăn (đi bộ). ⑥ Giảm stress (can hoả = stress hoá). ⑦ Nâng đầu giường 15cm khi ngủ. ⑧ Trào ngược >2 lần/tuần kéo dài → khám tiêu hoá (PPI内镜 nếu cần).',
     related: '肝 (mộc) khắc 脾/胃 (thổ): can hoả vượng → khắc hại tỳ vị (mộc khắc thổ). Người 木 vượng: dễ can hoả phạm vị. Người 土 suy: tỳ vị vốn yếu → dễ trào.',
   },
+  // [loop 1148] +2 conditions common in Vietnamese users
+  {
+    id: 'thyroid_nodule',
+    keywords: ['bướu cổ', 'bướu giáp', 'thyroid', 'giáp trạng', 'nang giáp', 'hạch giáp', 'cổ to', 'u giáp', '甲亢', '甲减', 'nhiễm độc giáp', 'suy giáp'],
+    title: 'Bướu cổ / U giáp trạng (CAN KHÍ UẤT KẾT + KHÍ TRỆ ĐÀM NINH)',
+    summary: 'Đông-y: bướu cổ = «nhũ nhuyệt» (thyroid). «CAN KHÍ UẤT KẾT → KHÍ TRỆ → ĐÀM NINH» (can khí uất → khí trệ → đàm đọng thành cục). Thường ở phụ nữ (can chủ sớ tiết → stress/lo âu → uất → đàm ninh ở cổ). Nặng: can hoả vượng (nhiễm độc giáp — hồi hộp, run, sụt cân).',
+    symptoms: 'cổ to/nhô bướu, nuốt vướng, nghẹn họ, hay khàn giọng, hồi hộp/lo âu, mất ngủ, người gầy hoặc béo (thuỷ thủng), rối loạn kinh nguyệt (phụ nữ).',
+    advice: '① SƠ CAN GIẢI UẤT — sài hồ, bạch thược, chỉ xác, uất kim, hương phụ. ② HOÁ ĐÀM TIÊU KẾT — bán hạ, phục linh, trần bì, xạ can, hồ hoàng liên, hải tảo, rong biển. ③ HOÀT HUYẾT — đan sâm, xích thược. ④ Hải tảo + rong biển (tối weekly, iod tự nhiên) + hàu (kẽm). ⑤ Tránh: stress (can uất = nguyên nhân chính), thức khuya, rượu. ⑥ Quản lý cảm xúc — «tâm bình khí hoà, can khí sớ tiết». ⑦ Bướu to/nuốt khó/khàn giọng → khám nội tiết (TSH/T3/T4 + siêu âm giáp).',
+    related: '肝 (mộc) → khí uất → đàm ninh. Người 木 uất: can khí trệ → dễ bướu. Người 土 suy: tỳ sinh đàm → đàm thêm. Người 水 suy: thận tinh không dưỡng can → can dương cương.',
+  },
+  {
+    id: 'skin_aging',
+    keywords: ['lão hóa da', 'nếp nhăn', 'da khô', 'da xỉn màu', 'da chảy xệ', 'thâm nám mới', 'tàn nhang', 'da mỏng', 'chống lão hóa', 'collagen', 'da thiếu đàn hồi', 'da sần'],
+    title: 'Lão hóa da / Da khô nhăn (THẬN TINH KHUY + KHÍ HUYẾT BẤT TÚC)',
+    summary: 'Đông-y: «NHẬT CHỦ THÂN, THẬN CHỦ CỐT, TỲ CHỦ NHỤC, PHỔI CHỦ BÌ MAO». Da = phổi (kim) + nuôi bởi TỲ HUYẾT + nền THẬN TINH. Lão hóa sớm = thận tinh khuy (thuỷ suy) + tỳ huyết hư (không nuôi da) + phế khí yếu. Nắng/stress/thức khuya → hao tinh → da xỉn/nhăn.',
+    symptoms: 'da khô, nhăn quanh mắt/miệng, xỉn màu, chảy xệ, thâm nám mới, tàn nhang tăng, da mỏng dễ bầm, thiếu đàn hồi.',
+    advice: '① BỔ THẬN TINH — đậu đen, vừng đen, sơn dược, kỷ tử, hà thủ ô. ② BỔ TỲ HUYẾT — táo đỏ, long nhãn, kỳ tử, đương quy, thục địa. ③ DƯỠNG PHẾ (da thuộc phổi) — lê, mộc nhĩ trắng, bách hợp, hạnh nhân. ④ TRÀ CHỐNG LÃO HÓA — kỷ tử + táo đỏ + cúc hoa: hãm uống. ⑤ TĂNG COLLAGEN tự nhiên — chân giò nấu (gelatin), cá (omega-3), đậu nành (isoflavone). ⑥ TRÁNH nắng (UV = hao tinh + da), thức khuya (thận phục hồi ban đêm), đường (glycation → nhăn). ⑦ Massage mặt + châm cứu (bổ khí huyết). ⑧ Da nhăn nhanh/chảy xệ → khám da liễu.',
+    related: '肾 (thuỷ) → tinh nuôi nội tiết → da. 肺 (kim) → chủ bì mao. 脾 (thổ) → sinh huyết nuôi da. Người 水 suy: thận tinh khuy → da lão hóa nhanh. Người 金 suy: phế khí yếu → da mỏng/khô.',
+  },
 ];
 
 /**
@@ -459,6 +478,8 @@ const CONDITION_WX = {
   common_cold: ['金', '土'], cough: ['金', '土'],
   // [loop 1145] +2 conditions from loop 1144
   eye_strain: ['木', '水'], acid_reflux: ['木', '土'],
+  // [loop 1148] +2 conditions
+  thyroid_nodule: ['木', '土', '水'], skin_aging: ['水', '土', '金'],
 };
 
 /**
