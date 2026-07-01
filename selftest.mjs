@@ -395,6 +395,18 @@ for (const k of Object.keys(JISHAN_PIAN)) {
   }
   console.log(`   [loop 1206] 八门类象: 8 cửa × (gong/wx/tone/desc/yi), 三吉门 cat ✓ — qimen trinity hoàn thiện`);
 }
+// [loop 1208] 大象传 (周易) — 5 quẻ nền tảng, verse Hán gốc (Wikisource 周易/大象).
+{
+  const { DAXIANG } = await import('./src/engine/hexagram-meaning.js');
+  assert(Object.keys(DAXIANG).length === 5, `DAXIANG: 5 quẻ nền tảng (got ${Object.keys(DAXIANG).length})`);
+  assert(DAXIANG['乾'].verse.includes('天行健') && DAXIANG['坤'].verse.includes('厚德载物'), '大象: 乾=天行健, 坤=厚德载物');
+  assert(DAXIANG['既济'].verse.includes('思患而预防之'), '大象 既济: 思患预防');
+  for (const k of Object.keys(DAXIANG)) {
+    const e = DAXIANG[k];
+    assert(e.verse && e.apply.length > 15, `大象 ${k}: verse + apply`);
+  }
+  console.log(`   [loop 1208] 大象传: 5 quẻ nền tảng (乾/坤/屯/蒙/既济) verse Hán gốc ✓`);
+}
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
 // [loop 1197] 窮通寶鑑 «五行總論» + 5 nguyên lý mùa (Wikisource 窮通寶鑑).

@@ -227,4 +227,14 @@ export function hexagramMeaning(name) {
   return { nameVi: name, nature: '', fortune: '(chưa cài nghĩa VN cho quẻ này)', image: '', tone: 'trung' };
 }
 
+// [loop 1208] 大象传 (周易) — 5 quẻ nền tảng, verse Hán gốc (HEX_MEANING.image là paraphrase Việt).
+//   Nguồn: Wikisource 周易/大象 + 清华大学课程 + 识典古籍.
+export const DAXIANG = {
+  乾: { verse: '天行健，君子以自强不息。', apply: 'thiên đạo cương kiện vận hành không ngừng — quân tử tự cường không nghỉ.' },
+  坤: { verse: '地势坤，君子以厚德载物。', apply: 'địa thế nhu thuận — quân tử lấy hậu đức tải vạn vật.' },
+  屯: { verse: '云雷，屯；君子以经纶。', apply: 'vân lôi giao động, sơ sáng gian nan — quân tử kinh luận thiên hạ.' },
+  蒙: { verse: '山下出泉，蒙；君子以果行育德。', apply: 'núi dưới suối trào, mông muội sơ khai — quân tử quả quyết hành, dục đức.' },
+  既济: { verse: '水在火上，既济；君子以思患而预防之。', apply: 'thuỷ trên hoả, việc đã thành — quân tử tư hoạn mà dự phòng.' },
+};
+
 export { HEX_MEANING, SIMP2TRAD };
