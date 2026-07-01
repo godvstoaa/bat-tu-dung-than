@@ -3326,7 +3326,7 @@ function capsuleDayunSpark(R) {
     </div>`;
   }).join('');
   return `<div id="capsule-spark" role="button" tabindex="0" aria-label="Xem vận trục đại vận chi tiết (mở nhóm Năm nay & Tương lai)" style="margin-top:10px;padding:8px 10px;border:1px solid rgba(212,175,53,0.28);border-radius:8px;cursor:pointer;background:linear-gradient(180deg,rgba(212,175,53,0.06),rgba(255,255,255,0.01))">
-    <div class="hint" style="font-size:10px;margin-bottom:3px;display:flex;justify-content:space-between;gap:6px"><span>🛤️ Vận trục đời · ${dayun.length} đại vận</span><span style="color:var(--gold-bright,#f4d76e)">▼ vị trí hiện tại · chạm để xem chi tiết →</span></div>
+    <div class="hint" style="font-size:10px;margin-bottom:3px;display:flex;justify-content:space-between;gap:6px"><span>🛤️ Vận trục đời · ${dayun.length} đại vận</span><span style="color:var(--gold-bright,#f4d76e)">▼ hiện tại · ★ tốt nhất · ⚠ xấu nhất · chạm →</span></div>
     <div style="display:flex;align-items:flex-end;gap:1px">${bars}</div>
     <div class="hint" style="font-size:9px;margin-top:3px;opacity:.7">Xanh = Cát · Đỏ = Hung · Thanh cao = vận mạnh</div>
   </div>`;
