@@ -24,6 +24,22 @@ function keRel(a, b) { // a vs b: '克' (a克b) / '贼'(b克a=被克) / '生' / 
 // 月将 theo 中气 (登明亥=雨水后 ... 神后子=大寒后)
 const QI_YUEJIANG = { 雨水: '亥', 春分: '戌', 谷雨: '酉', 小满: '申', 夏至: '未', 大暑: '午', 处暑: '巳', 秋分: '辰', 霜降: '卯', 小雪: '寅', 冬至: '丑', 大寒: '子' };
 const YUEJIANG_VI = { 子: '神后', 丑: '大吉', 寅: '功曹', 卯: '太冲', 辰: '天罡', 巳: '太乙', 午: '胜光', 未: '小吉', 申: '传送', 酉: '从魁', 戌: '河魁', 亥: '登明' };
+// [loop 1223] 十二月将 类象 (六壬大全卷二 神将释 + 景祐六壬神定经 + Wikipedia + 知乎).
+//   YUEJIANG_VI chỉ có tên; đây là tầng ngũ hành + 所主 + 类象.
+const YUEJIANG_INFO = {
+  登明: { zhi: '亥', wx: 'thủy', desc: 'tháng 1 tướng — thiên trụ, lâu đài; lâm thân chủ đạo tặc, thừa huyền vũ chủ âm tư' },
+  河魁: { zhi: '戌', wx: 'thổ', desc: 'tháng 2 tướng — tập chúng, tụ hợp; dữ câu trần tịnh lâm chủ toản tập hội chúng' },
+  从魁: { zhi: '酉', wx: 'kim', desc: 'tháng 3 tướng — kim khí, đao phủ, nô tì' },
+  传送: { zhi: '申', wx: 'kim', desc: 'tháng 4 tướng — đạo lộ, di cư, xa mã, hành nhân, tín sứ' },
+  小吉: { zhi: '未', wx: 'thổ', desc: 'tháng 5 tướng — tửu thực, hôn nhân, tế tự, điền trạch' },
+  胜光: { zhi: '午', wx: 'hỏa', desc: 'tháng 6 tướng — quang minh, văn thư, quan sự, mã (ngựa), binh khí' },
+  太乙: { zhi: '巳', wx: 'hỏa', desc: 'tháng 7 tướng — biến hoá, kinh quái, xà trùng chi quái' },
+  天罡: { zhi: '辰', wx: 'thổ', desc: 'tháng 8 tướng — hung thần chi trưởng, đấu tụng, tử táng, sát thương' },
+  太冲: { zhi: '卯', wx: 'mộc', desc: 'tháng 9 tướng — chu xa, môn hộ, tư bôn, đào vong, thụ mộc' },
+  功曹: { zhi: '寅', wx: 'mộc', desc: 'tháng 10 tướng — quan lại, công danh, văn thư, sai khiên' },
+  大吉: { zhi: '丑', wx: 'thổ', desc: 'tháng 11 tướng — trưởng giả, quý nhân, phúc đức, ngưu, kho khố, thổ địa' },
+  神后: { zhi: '子', wx: 'thủy', desc: 'tháng 12 tướng — âm tư, ám muội, đạo tặc, phụ nhân' },
+};
 
 // 十干寄宫 (bảng "干上神" cho 四课)
 const GAN_JI = { 甲: '寅', 乙: '辰', 丙: '巳', 丁: '未', 戊: '巳', 己: '未', 庚: '申', 辛: '戌', 壬: '亥', 癸: '丑' };
@@ -87,7 +103,7 @@ const TJ_INFO = {
   太阴: { wx: 'tân kim', tone: 'cat', desc: 'âm tư, mật mưu, phụ nữ, tì thiếp, ẩn nặc, kim bô, thưởng tứ; cát tướng' },
   天后: { wx: 'quý thủy', tone: 'cat', desc: 'phụ nữ, hôn nhân, ân xá, tha thứ, thuỷ tộc; hậu cung chi chủ, cát' },
 };
-export { TJ_INFO };
+export { TJ_INFO, YUEJIANG_INFO };
 
 // 六亲 (theo 初传 vs 日干 hành)
 function liuqin(chuan, dayGan) {

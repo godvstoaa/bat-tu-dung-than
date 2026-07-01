@@ -361,6 +361,21 @@ for (const k of Object.keys(JISHAN_PIAN)) {
   }
   console.log(`   [loop 1222] 十二天将类象: 12 tướng × (wx/tone/desc) — 六壬大全 ✓`);
 }
+// [loop 1223] 大六壬 十二月将 类象 (六壬大全卷二/景祐六壬神定经).
+{
+  const { YUEJIANG_INFO, YUEJIANG_VI } = await import('./src/engine/liuren.js');
+  assert(Object.keys(YUEJIANG_INFO).length === 12, `YUEJIANG_INFO: 12 nguyệt tướng (got ${Object.keys(YUEJIANG_INFO).length})`);
+  assert(YUEJIANG_INFO['天罡'].desc.includes('hung thần') && YUEJIANG_INFO['神后'].wx === 'thủy' && YUEJIANG_INFO['功曹'].wx === 'mộc', '月将: 天罡 hung thần chi trưởng, 神后 thủy, 功曹 mộc');
+  // mỗi tên trong YUEJIANG_VI phải có INFO
+  const viNames = Object.values(YUEJIANG_VI);
+  const missing = viNames.filter((n) => !YUEJIANG_INFO[n]);
+  assert(missing.length === 0, `YUEJIANG_INFO chứa đủ 12 tên YUEJIANG_VI (thiếu: ${missing.join(',')})`);
+  for (const k of Object.keys(YUEJIANG_INFO)) {
+    const e = YUEJIANG_INFO[k];
+    assert(e.zhi && e.wx && e.desc.length > 15, `月将 ${k}: zhi+wx+desc`);
+  }
+  console.log(`   [loop 1223] 十二月将类象: 12 tướng × (zhi/wx/desc), khớp YUEJIANG_VI — 六壬大全 ✓`);
+}
 // [loop 1204] 奇门遁甲 八神 类象 (知乎/网易«奇门遁甲八神详解») — ý nghĩa thần盘.
 {
   const { BASHEN_VI, GONG_STAR, DOOR_AT } = await import('./src/engine/qimen.js');
