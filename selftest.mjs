@@ -329,6 +329,18 @@ for (const k of Object.keys(WUYAN_DUBU)) {
   assert(xiu.every((k) => XIU_TABLE[k].tone && XIU_TABLE[k].yi && XIU_TABLE[k].ji), '28宿: mỗi túc có tone + 宜 + 忌');
   console.log(`   [loop 1202] 28宿: 28 túc, 4 tượng × 7, đúng thứ tự, đủ tone/宜/忌 ✓`);
 }
+// [loop 1203] 六亲 万物类象 (卜筮正宗卷五/火珠林) — đại biểu người/sự/vật cho luận quẻ 六爻.
+{
+  const { LIUQIN_MEANING } = await import('./src/engine/liuyao.js');
+  assert(Object.keys(LIUQIN_MEANING).length === 5, `LIUQIN_MEANING: 5六亲 (got ${Object.keys(LIUQIN_MEANING).length})`);
+  assert(LIUQIN_MEANING['父母'].relation.includes('生我') && LIUQIN_MEANING['官鬼'].relation.includes('克我'), '六亲 relation: 父母=生我, 官鬼=克我');
+  assert(LIUQIN_MEANING['子孙'].nature.includes('制') && LIUQIN_MEANING['妻财'].nature.includes('养命'), '六亲: 子孙制官鬼, 妻财养命之源');
+  for (const k of Object.keys(LIUQIN_MEANING)) {
+    const e = LIUQIN_MEANING[k];
+    assert(e.relation && e.person && e.thing && e.nature, `六亲 ${k}: relation+person+thing+nature`);
+  }
+  console.log(`   [loop 1203] 六亲类象: 5 lục-thân × (relation/person/thing/nature) — 卜筮正宗 ✓`);
+}
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
 // [loop 1197] 窮通寶鑑 «五行總論» + 5 nguyên lý mùa (Wikisource 窮通寶鑑).

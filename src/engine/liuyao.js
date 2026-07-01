@@ -109,6 +109,42 @@ function liuqinOf(gongWx, zhiWx) {
   return '?';
 }
 
+// ---- 六亲 万物类象 (卜筮正宗 卷五 / 火珠林 / 增删卜易) ----
+// [loop 1203] Mỗi六亲 → đại biểu người/sự/vật + tính chất. Nguồn ≥2 (卜筮正宗卷五, 知乎«六亲类象延伸»).
+// Phụ việc chọn 用神 + luận断 theo lục-thân trì thế/phát động.
+export const LIUQIN_MEANING = {
+  父母: {
+    relation: '生我者 (sinh thể — Ấn)',
+    person: 'cha mẹ, trưởng bối, sư trưởng',
+    thing: 'văn thư, khế ước, chứng chỉ, học nghiệp, thi cử, phòng ốc, xe thuyền, y phục',
+    nature: 'chủ bảo hộ phúc ấm; cũng chủ tân lao hao tài (đầu tư/chi phí lộ phí)',
+  },
+  兄弟: {
+    relation: '比和者 (đồng thể — Tỷ/Kiếp)',
+    person: 'anh em, bạn bè, đồng sự, hợp tác nhân, cạnh tranh giả',
+    thing: 'ngăn cách, phá tài, hợp tác, phân tranh, kiếp hao',
+    nature: '«phá hao chi thần» — chủ đầu tư cầu tài, cũng chủ hợp tác/giữ tài hộ vận',
+  },
+  子孙: {
+    relation: '我生者 (thể sinh — Thực/Thương)',
+    person: 'nhi nữ, vãn bối, học sinh, hạ thuộc',
+    thing: 'phúc đức, hỷ duyệt, y dược, tăng đạo, kỹ nghệ, giải trí',
+    nature: '«phúc đức chi thần», chủ khang thái bình an, giải ưu, 制官鬼 («tử tôn phát động thương quan quỷ, chiếm bệnh cầu y thân tiện thuyên»)',
+  },
+  妻财: {
+    relation: '我克者 (thể khắc — Tài)',
+    person: 'thê tử, nô bộc, hạ thuộc (người ta quản)',
+    thing: 'tiền tài, tài vật, lương thực, thu hoạch, lợi tức',
+    nature: '«养命之源» (dưỡng mệnh chi nguyên) — chủ tài lợi; nam mệnh cũng chủ thê',
+  },
+  官鬼: {
+    relation: '克我者 (khắc thể — Quan/Sát)',
+    person: 'quan phủ, thượng ty, phu quân (nữ chiêm), đạo tặc, tà 祟',
+    thing: 'công danh, chức vị, bệnh tật, ưu nghi, lôi điện quỷ thần, họa ương',
+    nature: 'áp lực/ước thúc/quyền uy — vừa là quan quý vừa là tai họa (卜筮正宗: «phàm chiêm công danh/quan phủ/lôi điện trượng phu/đạo tặc/ta 崇/ưu nghi bệnh, câu dĩ quan quỷ vi dụng thần»)',
+  },
+};
+
 // [loop 1017] 本宫八纯 伏神 — mỗi vị trí hào có 1 lục-thân ẩn (theo 纳甲 八纯 vs ngũ hành cung).
 //   Khi 用神 KHÔNG lộ trong quẻ → tìm nó ở 八纯 (nơi ẩn dưới 飞神 = hào hiện tại cùng vị trí).
 //   Nguồn: 卜筮正宗 «伏吟飞伏» — «用神不上卦, 就于本宫八纯寻之».
