@@ -9256,5 +9256,31 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1043] 中医九种体质 (bodyConstitution — ngũ hành→体质) ✓`);
 }
 
+// [loop 1097] CROSS-MODULE INTEGRATION FUZZ — khóa sức khoẻ tích hợp của các cross-module
+//   changes (loop 1077-1096): rankDayun(1079/1081) + liunian→tcm(1093) + liuyue→tcm(1094) +
+//   liuri(1083) + decadeArc(1086). Đảm bảo các phụ thuộc chéo KHÔNG crash/leak cho diverse charts.
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { rankDayun } = await import('./src/engine/dayun-rank.js');
+  const { analyzeLiunianDeep } = await import('./src/engine/liunian-pro.js');
+  const { computeLiuyue } = await import('./src/engine/liuyue.js');
+  const { analyzeLiuRi } = await import('./src/engine/liuri.js');
+  const { decadeHealthArc } = await import('./src/engine/tcm.js');
+  const _charts = [[1990,6,15,12,0,'nam'],[1985,1,20,8,0,'nữ'],[2000,12,25,23,30,'nam'],[1996,8,8,6,0,'nữ'],[2020,3,3,18,0,'nam'],[1960,11,11,0,0,'nữ']];
+  let _crash = 0, _leak = 0;
+  const _leakChk = (o) => { try { if (o != null && /undefined|NaN/.test(JSON.stringify(o))) _leak++; } catch (_) { _leak++; } };
+  for (const [y, mo, d, h, mi, g] of _charts) {
+    let R; try { R = analyze(y, mo, d, h, mi, g, 2026); } catch (e) { _crash++; continue; }
+    try { const rk = rankDayun(R); _leakChk(rk.scored[0]); assert(rk.scored.every((s) => s.stageVi && s.pillarStrengthVi !== undefined), `[loop 1097] rankDayun có stage+pillar (${y})`); } catch (e) { _crash++; }
+    try { const ln = analyzeLiunianDeep(R, 2026, R.patternYong || R.patternQuality?.patternYong); _leakChk(ln.yearHealthTheme); assert(ln.yearStage && ln.yearHealthTheme, `[loop 1097] liunian yearStage+theme (${y})`); } catch (e) { _crash++; }
+    try { _leakChk(computeLiuyue(R, 2026, {}).months[0].monthHealth); } catch (e) { _crash++; }
+    try { const lr = analyzeLiuRi(R, 2026, 7, 1, R.patternQuality); _leakChk({ s: lr.dayStage, p: lr.dayPillarStrength }); assert(lr.dayStage, `[loop 1097] liuri dayStage (${y})`); } catch (e) { _crash++; }
+    try { const arc = decadeHealthArc(R); _leakChk(arc); assert(arc && arc.peak && arc.low, `[loop 1097] decadeArc peak/low (${y})`); } catch (e) { _crash++; }
+  }
+  assert(_crash === 0, `[loop 1097] cross-module integration: 0 crash (got ${_crash}/${_charts.length} charts)`);
+  assert(_leak === 0, `[loop 1097] cross-module integration: 0 undefined/NaN leak (got ${_leak})`);
+  console.log(`   [loop 1097] cross-module integration fuzz ✓ — ${_charts.length} charts × 5 subsystems, 0 crash/leak`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
