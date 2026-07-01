@@ -8970,6 +8970,9 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     assert(_an.matched && /Bản LA SỐ/.test(_an.reply), `[loop 1155] anemia match + personalization`);
     const _mg = answerHealth('đau nửa đầu migraine', _R1146);
     assert(_mg.matched && /Bản LA SỐ/.test(_mg.reply), `[loop 1155] migraine match + personalization`);
+    // [loop 1161] cervical spondylosis (loop 1160)
+    const _cs = answerHealth('đau mỏi vai gáy ngồi máy', _R1146);
+    assert(_cs.matched && /Bản LA SỐ/.test(_cs.reply), `[loop 1161] cervical_spondylosis match + personalization`);
   }
   // no garbled latin artifacts
   const _kb = JSON.stringify(CONDITION_KB);
