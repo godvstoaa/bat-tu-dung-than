@@ -3551,11 +3551,16 @@ function renderDayunChart(R) {
     // [loop 1078] normalize theo totalScore (giàu logic) — capping height ≤ 34px/thanh
     //   (nửa container 40px) để KHÔNG overflow dù totalScore tới ~±50.
     const maxAbs = Math.max.apply(null, dayun.map((d) => Math.abs(d.totalScore || 0)).concat([1]));
-    const bars = dayun.map((d) => {
+    // [loop 1133] best/worst decade markers (consistent with sparkline loop 1132)
+    let _bIdx = 0, _wIdx = 0;
+    dayun.forEach((d, i) => { if ((d.totalScore||0) > (dayun[_bIdx].totalScore||0)) _bIdx = i; if ((d.totalScore||0) < (dayun[_wIdx].totalScore||0)) _wIdx = i; });
+    const bars = dayun.map((d, idx) => {
       const s = d.totalScore || 0;
       const h = Math.max(4, Math.round((Math.abs(s) / maxAbs) * 34));
       const col = s > 0 ? '#2a7' : s < 0 ? '#c33' : '#9a8';
       const isActive = _curAge >= d.startAge && _curAge < d.startAge + 10;
+      const isBest = idx === _bIdx && !isActive;
+      const isWorst = idx === _wIdx && !isActive;
       const tip = `${esc(d.ganZhi || '')} [${d.startAge}-${d.startAge + 9}t] · ${esc(d.rating || '')}` +
         (d.godVi ? ` · ${esc(d.godVi)}(${esc(d.godCat || '')})` : '') +
         (d.stageVi ? ` · ${esc(d.stageVi)}(${d.stageWeight > 0 ? '旺' : d.stageWeight < 0 ? 'suy' : 'chuyển'})` : '') +
@@ -3567,7 +3572,7 @@ function renderDayunChart(R) {
           <div style="position:absolute;${s >= 0 ? 'bottom:50%' : 'top:50%'};width:60%;max-width:36px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${isActive ? '1' : '0.85'};${isActive ? 'box-shadow:0 0 6px ' + col : ''}"></div>
           <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--gold,dimgray);opacity:0.3"></div>
         </div>
-        ${isActive ? '<span style="font-size:8px;color:var(--gold-bright);font-weight:bold">▼ BẠN Ở ĐÂY</span>' : ''}
+        ${isActive ? '<span style="font-size:8px;color:var(--gold-bright);font-weight:bold">▼ BẠN Ở ĐÂY</span>' : isBest ? '<span style="font-size:8px;color:#2a7" title="Đỉnh vận trục">★ TỐT NHẤT</span>' : isWorst ? '<span style="font-size:8px;color:#c33" title="Đáy vận trục">⚠ XẤU NHẤT</span>' : ''}
         <span class="zh" style="font-size:12px${isActive ? ';font-weight:bold' : ''}">${esc(d.ganZhi || '')}</span>
         <span class="hint" style="font-size:10px">${d.startAge}–${d.startAge + 9}t</span>
         <span class="hint" style="font-size:10px;color:${col}">${esc((d.rating || '').slice(0, 8))}</span>
