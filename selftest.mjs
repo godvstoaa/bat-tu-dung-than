@@ -349,6 +349,18 @@ for (const k of Object.keys(JISHAN_PIAN)) {
   }
   console.log(`   [loop 1203] 六亲类象: 5 lục-thân × (relation/person/thing/nature) — 卜筮正宗 ✓`);
 }
+// [loop 1222] 大六壬 十二天将 类象 sâu (六壬大全卷二 神将释).
+{
+  const { TJ_INFO } = await import('./src/engine/liuren.js');
+  assert(Object.keys(TJ_INFO).length === 12, `TJ_INFO: 12 thiên tướng (got ${Object.keys(TJ_INFO).length})`);
+  assert(TJ_INFO['贵人'].tone === 'cat' && TJ_INFO['白虎'].tone === 'hung' && TJ_INFO['青龙'].tone === 'cat', '十二天将 tone: 贵人/青龙 cát, 白虎 hung');
+  assert(TJ_INFO['青龙'].wx.includes('mộc') && TJ_INFO['白虎'].wx.includes('kim') && TJ_INFO['玄武'].wx.includes('thủy'), '十二天将 wx: 青龙=木, 白虎=金, 玄武=水');
+  for (const k of Object.keys(TJ_INFO)) {
+    const e = TJ_INFO[k];
+    assert(e.wx && e.tone && e.desc.length > 20, `十二天将 ${k}: wx+tone+desc`);
+  }
+  console.log(`   [loop 1222] 十二天将类象: 12 tướng × (wx/tone/desc) — 六壬大全 ✓`);
+}
 // [loop 1204] 奇门遁甲 八神 类象 (知乎/网易«奇门遁甲八神详解») — ý nghĩa thần盘.
 {
   const { BASHEN_VI, GONG_STAR, DOOR_AT } = await import('./src/engine/qimen.js');

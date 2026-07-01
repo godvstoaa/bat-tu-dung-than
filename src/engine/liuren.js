@@ -71,6 +71,23 @@ function sheHaiCount(upZhi, landPos) {
 const GUIREN = { 甲: ['丑', '未'], 戊: ['丑', '未'], 庚: ['丑', '未'], 乙: ['子', '申'], 己: ['子', '申'], 丙: ['亥', '酉'], 丁: ['亥', '酉'], 壬: ['卯', '巳'], 癸: ['卯', '巳'], 辛: ['午', '寅'] };
 const TIANJIANG = ['贵人', '螣蛇', '朱雀', '六合', '勾陈', '青龙', '天空', '白虎', '太常', '玄武', '太阴', '天后'];
 const TJ_VI = { 贵人: 'Quý Nhân (cát)', 螣蛇: 'Đằng Xà (hung,虚惊)', 朱雀: 'Chu Tước (hung,口舌)', 六合: 'Lục Hợp (cát,婚姻)', 勾陈: 'Câu Trần (hung,争执)', 青龙: 'Thanh Long (đại cát, tài)', 天空: 'Thiên Không (空亡)', 白虎: 'Bạch Hổ (đại hung,丧病)', 太常: 'Thái Thường (cát,衣食)', 玄武: 'Huyền Vũ (hung,盗贼)', 太阴: 'Thái Âm (cát,暗助)', 天后: 'Thiên Hậu (cát,妇女)' };
+// [loop 1222] 十二天将 类象 sâu (六壬大全卷二 神将释 + 百度百科 + 知乎). TJ_VI là 1-dòng; đây là tầng đầy đủ.
+//   6吉: 贵人/六合/青龙/太常/太阴/天后; 6凶: 螣蛇/朱雀/勾陈/天空/白虎/玄武.
+const TJ_INFO = {
+  贵人: { wx: 'thổ (trung cung)', tone: 'cat', desc: 'chư thần lãnh tụ, bách ác tiêu tán — chủ thiên tử/thừa tướng/trường quan/quý nhân; tước lộc, chế mệnh, quan chức' },
+  螣蛇: { wx: 'đinh hỏa', tone: 'hung', desc: 'kinh khủng, quái dị, hư kinh, ưu nghi, quấn quýt, mộng mị, yêu tà, khẩu thiệt; hỏa quang, huyết quang' },
+  朱雀: { wx: 'bính hỏa', tone: 'hung', desc: 'văn thư, ấn tín, khẩu thiệt, thị phi, quan ty, biện luận, tin tức; nam phương, hạ' },
+  六合: { wx: 'ất mộc', tone: 'cat', desc: 'hôn nhân, hoà hợp, giao dịch, môi giới, khế ước, thai sản; đông phương, xuân' },
+  勾陈: { wx: 'mậu thổ', tone: 'hung', desc: 'chinh phạt, chiến đấu, quan ải, câu lưu, trở ngại, tranh tụng, điền thổ, thổ mộc' },
+  青龙: { wx: 'giáp mộc', tone: 'cat', desc: 'tài bạch, hỷ sự, hôn nhân, thăng tiến, cốc vật, tửu thực, đạo sĩ; đại cát tướng' },
+  天空: { wx: 'mậu thổ (không vong)', tone: 'hung', desc: 'hư không, trá ngụy, khiếm trá, không hao, vô thành, nô tì, tăng đạo' },
+  白虎: { wx: 'canh kim', tone: 'hung', desc: 'tang phục, tử vong, huyết quang, tật bệnh, đao binh, hình lộc, đạo lộ; đại hung' },
+  太常: { wx: 'kỷ thổ', tone: 'cat', desc: 'quan lộc, thư tịch, ấn thụ, ẩm thực, yến hưởng, y quan, tế tự, vũ chức' },
+  玄武: { wx: 'quý thủy', tone: 'hung', desc: 'đạo tặc, di vong, âm mưu, ám muội, thuỷ tai, đào vong; bắc phương, đông' },
+  太阴: { wx: 'tân kim', tone: 'cat', desc: 'âm tư, mật mưu, phụ nữ, tì thiếp, ẩn nặc, kim bô, thưởng tứ; cát tướng' },
+  天后: { wx: 'quý thủy', tone: 'cat', desc: 'phụ nữ, hôn nhân, ân xá, tha thứ, thuỷ tộc; hậu cung chi chủ, cát' },
+};
+export { TJ_INFO };
 
 // 六亲 (theo 初传 vs 日干 hành)
 function liuqin(chuan, dayGan) {
