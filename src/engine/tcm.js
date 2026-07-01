@@ -523,7 +523,9 @@ export function answerHealth(q, R) {
     }).filter(Boolean);
     if (notes.length) personal = `\n Bản LA SỐ: ${notes.join('; ')}.`;
   }
-  return { ok: true, matched: true, id: hit.id, title: hit.title, reply: reply + personal };
+  // [loop 1151] expose multi-match info for AI to suggest related conditions
+  const _otherMatches = _scored.slice(1, 3).map((x) => ({ id: x.c.id, title: x.c.title }));
+  return { ok: true, matched: true, id: hit.id, title: hit.title, reply: reply + personal, matchedCount: _scored.length, otherMatches: _otherMatches };
 }
 
 /**
