@@ -302,4 +302,16 @@ export const DAXIANG = {
   小过: { verse: '山上有雷，小过；君子以行过乎恭，丧过乎哀，用过乎俭。', apply: 'sấm trên núi, tiểu quá — quân tử hành hơi cung (kính), tang hơi ai, dụng hơi kiệm (hơi quá về tốt).' },
 };
 
+// [loop 1215] 卦辞 (周易) — 7 quẻ nổi bật, verse Hán gốc (HEX_MEANING.fortune là paraphrase Việt).
+//   Nguồn: 清华大学周易原文 + 识典古籍 + 百度百科.
+export const GUA_CI = {
+  乾: { ci: '元，亨，利，贞。', apply: '«元» thiện chi trưởng, «亨» gia chi hội, «利» nghĩa chi hoà, «贞» sự chi cán — 4 đức cương kiện.' },
+  坤: { ci: '元，亨，利牝马之贞。', apply: 'nhu thuận như ngựa cái — tiên mê hậu đắc chủ, lợi tây nam đắc bằng.' },
+  屯: { ci: '元，亨，利，贞。勿用有攸往，利建侯。', apply: 'sơ sáng gian nan — chưa nên tiến vội, nên xây cơ sở (lập hầu).' },
+  泰: { ci: '小往大来，吉，亨。', apply: 'nhỏ đi lớn đến — thiên địa giao, vạn vật thông, cát hanh.' },
+  谦: { ci: '亨，君子有终。', apply: 'khiêm tốn hanh — quân tử khiêm tất có chung (kết quả tốt).' },
+  既济: { ci: '亨小，利贞，初吉终乱。', apply: 'việc đã thành — ban cát nhưng rốt loạn (cảnh giác «chỉ tắc loạn, kỳ đạo cùng»).' },
+  未济: { ci: '亨。小狐汔济，濡其尾，无攸利。', apply: 'việc chưa thành — cáo nhỏ kề qua sông đuôi ướt, chưa lợi («vật bất khả cùng», nên để chưa济 kết thúc).' },
+};
+
 export { HEX_MEANING, SIMP2TRAD };

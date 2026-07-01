@@ -398,6 +398,7 @@ for (const k of Object.keys(JISHAN_PIAN)) {
 // [loop 1208] 大象传 (周易) — 5 quẻ nền tảng, verse Hán gốc (Wikisource 周易/大象).
 {
   const { DAXIANG } = await import('./src/engine/hexagram-meaning.js');
+  const GUA_CI = (await import('./src/engine/hexagram-meaning.js')).GUA_CI;
   assert(Object.keys(DAXIANG).length === 64, `DAXIANG: ĐỦ 64 quẻ (got ${Object.keys(DAXIANG).length})`);
   assert(DAXIANG['乾'].verse.includes('天行健') && DAXIANG['坤'].verse.includes('厚德载物'), '大象: 乾=天行健, 坤=厚德载物');
   assert(DAXIANG['既济'].verse.includes('思患而预防之'), '大象 既济: 思患预防');
@@ -407,6 +408,9 @@ for (const k of Object.keys(JISHAN_PIAN)) {
   assert(DAXIANG['晋'].verse.includes('明出地上') && DAXIANG['损'].verse.includes('惩忿窒欲') && DAXIANG['益'].verse.includes('见善则迁'), '大象 [loop 1212]: 晋=明出地上, 损=惩忿窒欲, 益=见善则迁');
   assert(DAXIANG['革'].verse.includes('泽中有火') && DAXIANG['鼎'].verse.includes('正位凝命') && DAXIANG['困'].verse.includes('致命遂志'), '大象 [loop 1213]: 革=泽中有火, 鼎=正位凝命, 困=致命遂志');
   assert(DAXIANG['震'].verse.includes('恐惧修省') && DAXIANG['艮'].verse.includes('思不出其位') && DAXIANG['中孚'].verse.includes('议狱缓死'), '大象 [loop 1214]: 震=恐惧修省, 艮=思不出其位, 中孚=议狱缓死');
+  // [loop 1215] 卦辞 (周易) — 7 quẻ nổi bật.
+  assert(Object.keys(GUA_CI).length === 7, `GUA_CI: 7 quẻ (got ${Object.keys(GUA_CI).length})`);
+  assert(GUA_CI['乾'].ci === '元，亨，利，贞。' && GUA_CI['未济'].ci.includes('小狐汔济') && GUA_CI['泰'].ci.includes('小往大来'), '卦辞: 乾=元亨利贞, 未济=小狐汔济, 泰=小往大来');
   for (const k of Object.keys(DAXIANG)) {
     const e = DAXIANG[k];
     assert(e.verse && e.apply.length > 15, `大象 ${k}: verse + apply`);
