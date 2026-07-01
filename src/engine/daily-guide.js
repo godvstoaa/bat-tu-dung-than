@@ -29,6 +29,11 @@ export const YI_VI = {
   开市: 'mở hàng', 立券: 'ký hợp đồng', 交易: 'giao dịch', 出行: 'đi xa', 栽种: 'trồng trọt',
   祈福: 'cầu phúc', 祭祀: 'tế tự', 安葬: 'an táng', 破屋: 'phá nhà', 求嗣: 'cầu con', 入学: 'nhập học',
   移徙: 'chuyển nhà', 安床: 'lắp giường', 上梁: 'gác đòn đông', 开仓: 'mở kho', 纳财: 'thu tài',
+  沐浴: 'tắm gội thanh tẩy', 冠笄: 'lễ thành niên', 进人口: 'nhận người ở', 纳采: 'lễ chọn vợ',
+  问名: 'lễ hỏi tên', 纳征: 'lễ nạp tài', 会亲友: 'họp thân hữu', 解除: 'trừ tà/giải',
+  扫舍: 'dọn nhà', 牧养: 'chăn nuôi', 纳畜: 'nhận súc vật', 裁衣: 'may quần áo', 结网: 'dệt lưới',
+  求医疗病: 'chữa bệnh', 疗病: 'chữa bệnh', 启攒: 'khơi mồ', 破土: 'đào huyệt',
+  馀事勿取: 'việc khác không nên', 坏垣: 'phá tường', 塞穴: 'lấp hang', 补垣: 'sửa tường',
 };
 // [loop 1100/1101] phương vị财神/喜神/福神 (lunar getDayPositionCai/Xi/FuDesc) → Việt.
 //   Export cho daily-pro/daily-guide reuse (trước đây leak raw «西南», «正东»).
@@ -161,7 +166,8 @@ export function dailyGuide(R, year, month, day) {
     color, colorAdvice,
     bestDir, caishen, xishen, fushen,
     bestHours, avoidHours, allHours: hours,
-    activities, tsYi: tsYi.slice(0, 6), tsJi: tsJi.slice(0, 4),
+    activities, tsYi: tsYi.slice(0, 6).map((t) => YI_VI[t] || t), tsJi: tsJi.slice(0, 4).map((t) => JI_VI[t] || t), // [loop 1104] dịch raw 宜/忌 arrays
+    officerVi: OFFICER_VI[officer] || officer,
     oneLiner, full,
   };
 }

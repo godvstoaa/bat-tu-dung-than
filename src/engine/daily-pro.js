@@ -8,7 +8,7 @@ import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { tenGod } from './core.js';
 import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, TIAN_YI, WEN_CHANG, JIANG_XING } from './shensha.js';
-import { JI_VI, translateDir } from './daily-guide.js'; // [loop 1096/1101] dịch 忌 list + phương vị
+import { JI_VI, YI_VI, translateDir } from './daily-guide.js'; // [loop 1096/1101/1104] dịch 忌/宜 + phương vị
 import { OFFICER_VI } from './tongsheng.js'; // [loop 1103] dịch 12 trực (建→Kiến...)
 
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
@@ -164,7 +164,7 @@ export function dailyPro(R, year, month, day) {
       ? `Hôm nay BÌNH (${score}/100). ${bestActivity}.`
       : `Hôm nay ${rating} (${score}/100). ${bestActivity}. ${avoidActivity}.`;
 
-  return { date: solar.toYmd(), ganZhi: dGan + dZhi, officer, god: TEN_GOD_VI[god],
-    score, rating, schools, tsYi: tsYi.slice(0, 6), tsJi: tsJi.slice(0, 4),
+  return { date: solar.toYmd(), ganZhi: dGan + dZhi, officer, officerVi: OFFICER_VI[officer] || officer, god: TEN_GOD_VI[god],
+    score, rating, schools, tsYi: tsYi.slice(0, 6).map((t) => YI_VI[t] || t), tsJi: tsJi.slice(0, 4).map((t) => JI_VI[t] || t), // [loop 1104] dịch raw 宜/忌 arrays
     bestActivity, avoidActivity, caishen, xishen, advice };
 }
