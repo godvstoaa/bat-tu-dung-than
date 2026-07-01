@@ -3448,11 +3448,16 @@ function renderLiuyueChart(R) {
     const lm = computeLiuyue(R, new Date().getFullYear(), {});
     if (!lm || !lm.months) { el.innerHTML = '<p class="hint">Không tính được lưu nguyệt.</p>'; return; }
     const _curMonth = new Date().getMonth() + 1;
-    const bars = lm.months.map((mo) => {
+    // [loop 1135] best/worst month markers (consistent with dayun/liunian/sparkline)
+    let _bm = 0, _wm = 0;
+    lm.months.forEach((mo, i) => { if ((mo.score||0) > (lm.months[_bm].score||0)) _bm = i; if ((mo.score||0) < (lm.months[_wm].score||0)) _wm = i; });
+    const bars = lm.months.map((mo, idx) => {
       const s = mo.score || 50;
       const col = mo.rating === 'Cát' ? '#2a7' : mo.rating === 'Hung' ? '#c33' : '#9a8';
       const h = Math.max(4, s * 0.7);
       const isNow = mo.solarMonth === _curMonth;
+      const isBest = idx === _bm && !isNow;
+      const isWorst = idx === _wm && !isNow;
       // [loop 1114] top 冲/合 from taiSui notes (consistent with dayun/liunian charts)
       const _ts = mo.taiSui || [];
       const _clash = _ts.find((t) => /⚡|冲|xung/i.test(t));
@@ -3461,7 +3466,7 @@ function renderLiuyueChart(R) {
       return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${mo.solarMonth}/${new Date().getFullYear()} ${esc(mo.ganZhi||'')} · ${esc(mo.rating||'')} (${s})${mo.monthStage ? ` · ${esc(mo.monthStage)}(${mo.monthStageW > 0 ? '旺' : mo.monthStageW < 0 ? 'suy' : 'chuyển'})` : ''}${mo.monthHealth ? ` · ⚕️${esc(mo.monthHealth)}` : ''}${mo.monthPs ? ` · ${esc(mo.monthPs)}` : ''}${_intLine ? ` · ${esc(_intLine)}` : ''}${isNow ? ' ★ THÁNG NÀY' : ''}">
         <div style="height:${h}px;width:70%;max-width:24px;background:${col};border-radius:3px 3px 0 0;opacity:${isNow ? '1' : '0.85'};${isNow ? 'box-shadow:0 0 6px '+col : ''}"></div>
         <span class="zh" style="font-size:9px${isNow ? ';font-weight:bold' : ''}">${esc((mo.ganZhi||'').slice(0,2))}</span>
-        ${isNow ? '<span style="font-size:7px;color:var(--gold-bright);font-weight:bold">▼ NAY</span>' : `<span class="hint" style="font-size:9px">T${mo.solarMonth}</span>`}
+        ${isNow ? '<span style="font-size:7px;color:var(--gold-bright);font-weight:bold">▼ NAY</span>' : isBest ? '<span style="font-size:7px;color:#2a7" title="Tháng TỐT NHẤT">★</span>' : isWorst ? '<span style="font-size:7px;color:#c33" title="Tháng XẤU NHẤT">⚠</span>' : `<span class="hint" style="font-size:9px">T${mo.solarMonth}</span>`}
       </div>`;
     }).join('');
     const best = lm.best, worst = lm.worst;
