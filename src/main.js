@@ -4387,11 +4387,15 @@ function renderLiuRi(dateStr) {
   const r = analyzeLiuRi(currentResult, y, m, d, currentResult.patternQuality);
   const GOD_VI = { 比肩: 'Tỷ Kiên', 劫財: 'Kiếp Tài', 食神: 'Thực Thần', 傷官: 'Thương Quan', 偏財: 'Thiên Tài', 正財: 'Chính Tài', 七殺: 'Thất Sát', 正官: 'Chính Quan', 偏印: 'Thiên Ấn', 正印: 'Chính Ấn' };
   const cls = /Cát/.test(r.rating) ? 'rate-cat' : /Hung/.test(r.rating) ? 'rate-hung' : 'rate-mid'; // [loop 653] derive từ rating (không score 64/50 cũ — lệch unified 54/48)
+  // [loop 1122] TCM theo 十二长生 sinh khí ngày (consistent với năm 1120 / tháng 1121 / capsule 1084)
+  const _dmWx2 = currentResult?.chart?.dayMaster?.wx;
+  const _sh2 = r.dayStage ? stageHealth(_dmWx2, r.dayStage, r.dayStageWeight || 0) : null;
   $('liuri').innerHTML = `
     <p class="hint" style="margin-bottom:6px">⚡ Vận ngày <b>THEO MỆNH CHỦ</b> (太岁/十神/神煞 tương tác cá nhân với lá số — khác Hoàng Đạo chung ở thẻ «Hôm Nay Tổng Khái»).</p>
     <div class="ly-head"><span class="zh big">${esc(r.ganZhi)}</span> ${esc(r.solar)} · can <b>${esc(GOD_VI[r.ganGod] || r.ganGod)}</b> → <span class="ln-rate ${cls}">${esc(r.rating)} (${esc(String(r.score))}/100)</span></div>
     <div class="ly-schools">${r.schools.map((s) => `<div class="ly-school ${s.d >= 0 ? 'pos' : 'neg'}"><div class="ly-sname">${esc(s.phai)} <span class="ly-d">${s.d >= 0 ? '+' : ''}${esc(String(s.d))}</span></div><div class="ly-snote">${esc(s.note)}</div></div>`).join('')}</div>
     ${r.gejuNote ? `<div class="ly-school ${r.gejuDelta >= 0 ? 'pos' : 'neg'}"><div class="ly-sname">格局流日喜忌 <span class="ly-d">${r.gejuDelta >= 0 ? '+' : ''}${esc(String(r.gejuDelta))}</span></div><div class="ly-snote">${esc(r.gejuNote)}</div></div>` : ''}
+    ${_sh2 ? `<p class="hint" style="margin-top:6px"><b style="color:${_sh2.tone === 'suy' ? '#c33' : _sh2.tone === 'thinh' ? '#2a7' : '#9a8'}">⚕️ ${esc(_sh2.headline)}</b> — ${esc(_sh2.advice)}</p>` : ''}
     <p class="zr-advice">${esc(r.advice)}</p>`;
 }
 
