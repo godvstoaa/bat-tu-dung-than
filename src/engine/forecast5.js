@@ -88,6 +88,7 @@ export function forecast5(R, startYear, years = 5) {
       shen12: shen12.god.zh,
       ziwei: zw ? { palace: zw.palace, palaceVi: zw.palaceVi, stars: zw.stars, tone: zw.tone === 'cat' ? 'cát' : zw.tone === 'hung' ? 'hung' : 'trung', theme: zw.theme } : null,
       dayunGod: activeDg?.godVi || '?',
+      yearStage: ln.yearStage || null, yearHealthTheme: ln.yearHealthTheme || null, // [loop 1106] TCM năm
       positives, alerts, summary, alert,
     });
   }

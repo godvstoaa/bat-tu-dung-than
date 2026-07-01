@@ -1116,6 +1116,8 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
   const dy2017 = (R0.dayun || []).find((d) => d && d.startYear != null && d.startYear <= 2017 && 2017 < d.startYear + 10);
   const f5row = f5.years.find((y) => y.year === 2017);
   assert(f5row && dy2017, 'forecast5 + R0.dayun resolve được 大运 cho 2017');
+  // [loop 1106] forecast5 year object có yearHealthTheme + yearStage (TCM năm)
+  assert(f5.years.every((y) => y.yearStage != null && y.yearHealthTheme != null), `[loop 1106] forecast5 years có yearHealthTheme+yearStage (got ${f5.years.filter(y=>y.yearHealthTheme).length}/${f5.years.length})`);
   // activeDayun trả về (năm cuối) phải là 大运 thật chứa 2021 (năm cuối cửa sổ), không '?'()
   assert(f5.activeDayun && f5.activeDayun !== '?', `forecast5.activeDayun hợp lệ (được ${f5.activeDayun})`);
   // Mỗi row có dayunGod nhất quán (không lệch thập kỷ)

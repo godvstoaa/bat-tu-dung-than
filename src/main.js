@@ -3559,6 +3559,8 @@ function renderForecast5(R) {
       if (y.shen12) ctx.push(`12神: ${esc(y.shen12)}`);
       if (y.dayunGod) ctx.push(`运 ${esc(y.dayunGod)}`);
       if (f5Noble.has(y.ganZhi[1])) ctx.push('<span class="ln-noble" title="Năm có quý nhân (天乙/文昌/将星)">🌟 quý nhân</span>');
+      const _yh = y.yearHealthTheme;
+      const yhHtml = _yh ? `<div class="hint" title="${esc(_yh.advice || '')}">⚕️ ${esc(_yh.headline)}</div>` : '';
       const posHtml = (y.positives || []).length ? `<div class="hint" style="color:#9fe0b8">✓ ${y.positives.map(esc).join('; ')}</div>` : '';
       const alertHtml = (y.alerts || []).length ? `<div class="hint" style="color:#f0a99c">⚠ ${y.alerts.map(esc).join('; ')}</div>` : '';
       const isNow = y.year === new Date().getFullYear();
@@ -3566,7 +3568,7 @@ function renderForecast5(R) {
       <div class="yz-row ${isNow ? 'dy-now' : ''}" style="border-left:3px solid ${isNow ? 'var(--gold)' : y.tone === 'cat' ? 'var(--jade)' : y.tone === 'hung' ? 'var(--cinnabar)' : 'var(--gold)'};margin:4px 0;padding-left:8px">
         <b>${y.year}${isNow ? ' ★' : ''}</b> <span class="zh">${esc(y.ganZhi)}</span> <span class="ln-rate ${rateClass(y.rating)}">${esc(y.rating)} (${y.score}/100)</span>
         ${ctx.length ? ` <span class="hint">${ctx.join(' · ')}</span>` : ''}
-        ${posHtml}${alertHtml}
+        ${yhHtml}${posHtml}${alertHtml}
       </div>`;
     }).join('') + (f5.activeDayun ? `<p class="hint" style="margin-top:4px">Đại vận đang hành: ${f5.activeDayun.ganZhi} [${f5.activeDayun.startAge}-${f5.activeDayun.startAge + 9}t]</p>` : '');
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được forecast 5 năm.</p>'; }
