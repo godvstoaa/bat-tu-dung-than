@@ -489,8 +489,16 @@ const CONDITION_WX = {
  */
 export function answerHealth(q, R) {
   const ql = (q || '').toLowerCase();
-  const hit = CONDITION_KB.find((c) => c.keywords.some((k) => ql.includes(k.toLowerCase())));
-  if (!hit) return { ok: false, matched: false, reply: 'Tôi chưa có cơ sở tri thức đông-y cụ thể cho câu này. Hãy hỏi về: thận hư/thủ dâm/sinh lý, can hoả/stress/đau đầu, tỳ vị/tiêu hoá, mất ngủ/rụng tóc/mụn/kinh nguyệt — hoặc xem phân tích sức khoẻ theo ngũ hành của lá số.' };
+  // [loop 1150] relevance-scored match: trước đây .find() lấy FIRST match → nếu nhiều conditions
+  //   khớp (vd «ợ chua đau bụng» → cả stomach_pain + acid_reflux), có thể lấy sai thứ tự.
+  //   Nay chọn condition có TỔNG ĐỘ DÀI keyword matches CAO NHẤT (relevance).
+  const _scored = CONDITION_KB.map((c) => {
+    let _score = 0;
+    for (const k of c.keywords) { if (ql.includes(k.toLowerCase())) _score += k.length; }
+    return { c, _score };
+  }).filter((x) => x._score > 0).sort((a, b) => b._score - a._score);
+  const hit = _scored.length ? _scored[0].c : null;
+  if (!hit) return { ok: false, matched: false, reply: 'Tôi chưa có cơ sở tri thức đông-y cụ thể cho câu này. Hãy hỏi về: thận hư/thủ dâm/sinh lý, can hoả/stress/đau đầu, tỳ vị/tiêu hoá, mất ngủ/rụng tóc/mụn/kinh nguyệt, mỏi mắt, trào ngược, bướu cổ, lão hóa da — hoặc xem phân tích sức khoẻ theo ngũ hành của lá số.' };
   let reply = `【${hit.title}】\n${hit.summary}\n`;
   if (hit.yin) reply += `\n• ${hit.yin}\n`;
   if (hit.yang) reply += `• ${hit.yang}\n`;
