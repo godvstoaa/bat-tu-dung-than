@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD } from './kb.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { analyzeKongwang } from './kongwang.js';
@@ -272,6 +272,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - 滴天髓 luận ${dm.gan}: ${DITIANSUI[dm.gan].verse} → ${DITIANSUI[dm.gan].nature}
 - «何知章» (滴天髓 chẩn đoán cổ pháp — áp dụng cho lá số này): ${Object.entries(DITIANSUI_HEZHI).map(([k, e]) => `${k}「${e.verse}」`).join(' ')}
 - «通論» (滴天髓 nguyên lý): ${Object.entries(DITIANSUI_TONGLUN).map(([k, e]) => `${k}「${e.verse}」`).join(' ')}
+- «取用神» (子平真詮 5 pháp): ${Object.entries(YONGSHEN_METHOD).map(([k, e]) => `${k}(${e.vi})`).join('; ')} — giải thích VÌ SAO R.yong được chọn.
 - Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
 - Tiết khí gần nhất: ${c.jieqi.prev.name}
 

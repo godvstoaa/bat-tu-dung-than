@@ -292,6 +292,36 @@ export const PATTERN_GUIDE = {
   從旺格: 'Theo vượng thế — một lòng tiến theo thế mạnh, kỵ nghịch.',
 };
 
+// ---- 子平真詮 «取用神» 5 ĐẠI PHÁP + 月令取用 (nguồn cổ) ----
+// Nguồn: 子平真詮評注 (徐乐吾, ctext ch.974137 / 太极书馆), 算准网, 知乎 — ≥2 nguồn.
+// [源流] 扶抑/病药/调候/通关 = 徐乐吾评注归纳; 从化 = hậu nhân bổ sung; 原书核心 = 月令取用神.
+export const YONGSHEN_METHOD = {
+  月令: {
+    vi: 'Nguyệt lệnh thủ dụng',
+    principle: '«真詮以月令用神为经» — dụng thần cốt lấy từ Nguyệt Lệnh: bản khí/tàng can của chi tháng là «dụng» tiềm năng, rồi phối sinh khắc thành cách cục. Bản nghĩa原书.',
+  },
+  扶抑: {
+    vi: 'Phù trảm (hỗ trợ/kìm hãm)',
+    principle: '«虚则补之，盈则损之» — Nhật Chủ nhược thì phù (Ấn/Tỷ), vượng thì trảm (Tài/Quan/Thực Thương). Dùng khi Nhật Chủ mất cân bằng.',
+  },
+  病药: {
+    vi: 'Bệnh dược (bệnh/thuốc)',
+    principle: '«以扶为喜，则以伤其扶者为病；以抑为喜，则以去其抑者为病。除其病神，即谓之药» — tìm «bệnh» (kỵ thần phá dụng), «dược» = thần trừ bệnh chính là dụng thần.',
+  },
+  调候: {
+    vi: 'Điều hậu (khí hậu)',
+    principle: '«金水生于冬令需火暖，木火生于夏令需水润» — đông hàn cần Hỏa noãn, hạ nhiệt cần Thủy nhuận (bảng TIAOHOU — 窮通寶鑑).',
+  },
+  通关: {
+    vi: 'Thông quan (bắc cầu)',
+    principle: '«使克伐双方调和之物» — 2 hành chiến khắc, lấy hành trung gian «thông quan» (vd Thủy–Hỏa chiến → dụng Mộc) cho sinh hoá lưu thông hữu tình.',
+  },
+  从化: {
+    vi: 'Tòng hoá (theo/hoá)',
+    principle: '«从旺从弱，顺其格局取用» — cục chuyên vượng (曲直/炎上/稼穑/从革/润下) hoặc tòng cách (tòng tài/sát/ tử/ hoá) thì thuận thế, kỵ phản nghịch; hoá khí cách dùng hoá thần.',
+  },
+};
+
 // ---- ÁNH XẠ LĨNH VỰC ĐỜI SỐNG ↔ SAO CHỦ SỰ ----
 // Dùng để trả lời câu hỏi tự do: biết lĩnh vực → biết sao/hành nào chủ đạo.
 export const LIFE_AREA_INDEX = {

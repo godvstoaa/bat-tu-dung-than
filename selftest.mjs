@@ -9,7 +9,7 @@ import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
 import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE } from './src/engine/constants.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN } from './src/engine/kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
 import { jinkoujue, renderJinkoujueCard } from './src/engine/jinkoujue.js';
@@ -286,6 +286,13 @@ assert(DITIANSUI_TONGLUN['中和'].verse.includes('命貴中和') && DITIANSUI_T
 for (const k of Object.keys(DITIANSUI_TONGLUN)) {
   const e = DITIANSUI_TONGLUN[k];
   assert(e.verse && e.verse.length > 10 && e.apply.length > 25, `通論 ${k}: verse + apply`);
+}
+// [loop 1195] 子平真詮 «取用神» 5 pháp + 月令取用 (徐乐吾评注 ctext ch.974137).
+assert(Object.keys(YONGSHEN_METHOD).length === 6, 'YONGSHEN_METHOD: 月令 + 5 đại pháp (扶抑/病药/调候/通关/从化)');
+assert(YONGSHEN_METHOD['病药'].principle.includes('除其病神') && YONGSHEN_METHOD['通关'].principle.includes('调和'), '用神法: 病药(除其病神即药) + 通关(调和双方)');
+for (const k of Object.keys(YONGSHEN_METHOD)) {
+  const e = YONGSHEN_METHOD[k];
+  assert(e.vi && e.principle.length > 20, `用神法 ${k}: vi + principle`);
 }
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
