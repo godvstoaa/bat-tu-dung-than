@@ -6537,7 +6537,7 @@ function renderMonthCalendar() {
     const isNoble = d.ganZhi && calNoble.has(d.ganZhi[1]);
     const now = new Date();
     const isToday = year === now.getFullYear() && month === (now.getMonth() + 1) && d.day === now.getDate();
-    return `<div style="min-height:38px;padding:2px 3px;background:${c.bg};border:${isToday ? '2px solid var(--gold,#d4af37)' : '1px solid '+c.border+'40'};border-radius:4px;${isBest ? 'box-shadow:0 0 4px '+c.border+'80;' : ''}${isToday ? 'box-shadow:0 0 6px var(--gold,#d4af37);' : ''}">
+    return `<div title="${esc(d.ganZhi||'')} · ${esc(d.rating||'')} (${d.score})${isBest ? ' ★ TỐT NHẤT' : isWorst ? ' ⚠ XẤU NHẤT' : ''}" style="min-height:38px;padding:2px 3px;background:${c.bg};border:${isToday ? '2px solid var(--gold,#d4af37)' : '1px solid '+c.border+'40'};border-radius:4px;${isBest ? 'box-shadow:0 0 4px '+c.border+'80;' : ''}${isToday ? 'box-shadow:0 0 6px var(--gold,#d4af37);' : ''}">
       <div style="font-size:.75em;font-weight:bold;color:${c.text}">${d.day}${isToday ? ' ★' : ''}</div>
       <div style="font-size:.6em;color:${c.text}">${d.score}</div>
       ${isBest ? '<div style="font-size:.5em;color:#2e9e5b">★</div>' : isWorst ? '<div style="font-size:.5em;color:#e0533d">⚠</div>' : isNoble ? '<div style="font-size:.5em">🌟</div>' : ''}
