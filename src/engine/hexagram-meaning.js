@@ -345,6 +345,21 @@ export const GUA_CI = {
   明夷: { ci: '利艰贞。', apply: 'minh di — lợi gian trinh (giấu sáng, giữ chính trong gian nan).' },
   睽: { ci: '小事吉。', apply: 'quỹ (lệch nhau) — tiểu sự cát (việc nhỏ thì tốt).' },
   蹇: { ci: '利西南，不利东北。利见大人，贞吉。', apply: 'kiên nan — lợi tây nam, bất lợi đông bắc; lợi kiến đại nhân, trinh cát.' },
+  // [loop 1220] thêm 14 quẻ (读典籍/易学网/Wikisource/清华/识典古籍)
+  解: { ci: '利西南，无所往，其来复吉。有攸往，夙吉。', apply: 'giải (tháo gỡ) — lợi tây nam; không đi đâu thì lai phục cát; có đi thì «cạnh cát» (sớm thì tốt).' },
+  夬: { ci: '扬于王庭，孚号，有厉。告自邑，不利即戎，利有攸往。', apply: 'quyết đoán — «dương ư vương đình», phf hiệu hữu lệ; bất lợi tức nhung (vũ lực), lợi hữu du vãnh.' },
+  姤: { ci: '女壮，勿用取女。', apply: 'gặp gỡ — nữ tráng, «vật dụng thú nữ» (không nên cưới).' },
+  萃: { ci: '亨。王假有庙，利见大人，亨，利贞。用大牲吉，利有攸往。', apply: 'tụ tập — hanh; vương giả hữu miếu, lợi kiến đại nhân; dụng đại súc cát.' },
+  升: { ci: '元亨，用见大人，勿恤，南征吉。', apply: 'thăng tiến — nguyên hanh, dụng kiến đại nhân, vật tuất, nam chinh cát.' },
+  困: { ci: '亨，贞，大人吉，无咎。有言不信。', apply: 'khốn cùng — hanh, trinh, đại nhân cát vô cữu; «hữu ngôn bất tín» (nói không ai tin).' },
+  井: { ci: '改邑不改井，无丧无得，往来井井。', apply: 'giếng (nuôi dưỡng) — «cải ấp bất cải tỉnh» (đổi làng không đổi giếng), vô tang vô đắc.' },
+  革: { ci: '巳日乃孚，元亨利贞，悔亡。', apply: 'cách mệnh — «tỵ nhật nãi phf» (đến ngày tỵ mới tin), nguyên hanh lợi trinh, hỗi vong.' },
+  鼎: { ci: '元吉，亨。', apply: 'đỉnh (lập quốc) — nguyên cát, hanh.' },
+  震: { ci: '亨。震来虩虩，笑言哑哑。震惊百里，不丧匕鬯。', apply: 'chấn động — hanh; chấn lai «tích tích» (khiếp), tiếu ngôn «ác ác» (vui); chấn kinh bách lý, bất táng xỉ xưởng.' },
+  艮: { ci: '艮其背，不获其身，行其庭，不见其人，无咎。', apply: 'cấn (dừng) — «cấn kỳ bối», bất hoạch kỳ thân, hành kỳ đình bất kiến kỳ nhân, vô cữu (chỉ dừng đúng vị).' },
+  渐: { ci: '女归吉，利贞。', apply: 'tiệm tiến — nữ quy cát, lợi trinh.' },
+  丰: { ci: '亨，王假之，勿忧，宜日中。', apply: 'phong thịnh — hanh, vương giả chi, vật ưu, «nghi nhật trung» (nên giữ lúc thái dương đỉnh).' },
+  旅: { ci: '小亨，旅贞吉。', apply: 'lưu lạc — tiểu hanh, lữ trinh cát.' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };
