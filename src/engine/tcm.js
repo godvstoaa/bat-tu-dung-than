@@ -344,6 +344,25 @@ export const CONDITION_KB = [
     symptoms: '(hàn) ho khan ngứa họng, sợ lạnh, đờm trong; (nhiệt) ho đau họng đỏ, đờm vàng, khát, sốt; (đàm thấp) ho nhiều đờm trắng đặc, khò khè, tức ngực, nặng người; (âm hư) ho khan lâu, khô họng, đổ mồ hôi trộm, đêm nặng.',
     advice: 'PHONG HÀN: ① tân ôn giải biểu — gừng, tần giao, tử uyển, bách bộ. PHONG NHIỆT: ② sơ phong thanh phế — tang diệp, cúc hoa, liên kiều, bạc hà. ĐÀM THẤP: ③ nh vị hoá đàm — bán hạ, trần bì, phục linh, bạch giới tử. ÂM HƯ: ④ nhuận phổi dưỡng âm — sa sâm, mạch môn, bách hợp, ngọc trúc, xuyên bối mẫu. CHUNG: ⑤ Lê đường phèn hấp (nhuận phổi), gừng + mật ong (ho khan); tránh lạnh/cay. ⑥ Ho lâu >2 tuần/ho máu/khó thở → khám phổi.',
   },
+  // [loop 1144] +2 conditions common modern users
+  {
+    id: 'eye_strain',
+    keywords: ['mỏi mắt', 'mắt mỏi', 'giảm thị lực', 'mờ mắt', 'cận thị', 'chong chóng', 'khô mắt', 'thị lực', 'hay chớp', 'mắt nhìn mờ', 'viễn thị', 'loạn thị', 'đau mắt', '眼'],
+    title: 'Mỏi mắt / Giảm thị lực (CAN HUYẾT HƯ + THẬN TINH KHUY) — do dùng máy/điện thoại nhiều',
+    summary: '«CAN KHAI VIỆT TRÊN MẮT» (肝开窍于目) — mắt do CAN HUYẾT nuôi + THẬN TINH (thuỷ sinh mộc) làm nền. Dùng mắt quá nhiều (màn hình) → hao can huyết + thận tinh → mắt mỏi, khô, mờ, cận. Nặng: can hoả vượng (đau đầu, đỏ mắt, cận tiến triển nhanh).',
+    symptoms: 'mắt mỏi/nhức/cát khô, nhìn mờ tạm thời, chảy nước mắt, nhạy sáng, cận tiến triển, đau đầu trán, chất lượng giấc ngủ kém.',
+    advice: '① BỔ CAN HUYẾT — cà rốt, gan, đậu đen, kỷ tử, táo đỏ, atiso, cúc hoa (trà cúc hoa kỷ tử = kinh điển). ② BỔ THẬN TINH — dâu tằm, vừng đen, hạt óc chó (thuỷ sinh mộc → nuôi mắt). ③ TRÀ THANH CAN MINH MẮT — cúc hoa (杭菊) + quyết minh tử (sao) + kỷ tử: hãm uống thay nước. ④ QUY TẮC 20-20-20: mỗi 20 phút nhìn xa 20 feet (6m) trong 20 giây. ⑤ NGỦ TRƯỚC 23h (can đởm phục hồi lúc 1-3h sáng). ⑥ Massage huyệt Tinh minh (睛明) + thái dương. ⑦ Cận >6 đi-ốp hoặc tăng nhanh → khám nhãn khoa.',
+    related: '肝 (mộc) → mắt; 肾 (thuỷ) → thuỷ sinh mộc (nuôi can → nuôi mắt). Người 木 vượng: dễ can hoả (đỏ mắt, cận nhanh). Người 水 suy: thận tinh kém → nền mắt yếu.',
+  },
+  {
+    id: 'acid_reflux',
+    keywords: ['trào ngược', 'ợ chua', 'ợ hơi', 'nóng rát ngực', 'chảy nước bọt', 'đắng miệng sáng', 'viêm thực quản', 'GERD', 'trào ngược dạ dày', 'axit dạ dày', 'nóng rát thượng vị'],
+    title: 'Trào ngược dạ dày / GERD (CAN HOẢ PHẠM VỊ + TỲ VẬN HOÁ KÉM)',
+    summary: 'Đông-y: «CAN HOẢ PHẠM VỊ» (can hoả xâm phạm vị) — vị thuộc dương (thuộc hoả), nhận được can hoả thêm → vị hoả vượng → nghịch (khí đi lên thay vì xuống) → trào ngược, ợ chua. Kèm TỲ HƯ (vận hoá kém → thấp trệ → đờm). Thường gặp ở người stress + ăn khuya + nằm ngay sau ăn.',
+    symptoms: 'ợ chua/nóng rát sau ức, đầy bụng, đắng miệng sáng sớm, chảy nước bọt đêm, ho khan (trào ngược ymax ẩn), khàn giọng, buồn nôn.',
+    advice: '① HOÀ CAN HÀ VỊ — ô tặc cốt (secuaritee), bé Ngư tinh thảo, trần bì, bán hạ, hoàng cầm, chi tử. ② TRÀ HOÀ CAN — cúc hoa + quyết minh tử + atiso (thanh can hoả). ③ TRÁNH: ăn khuya (trước 19h xong), nằm ngay sau ăn (đợi 2h), cay/nóng/chua/thức ăn chiên/rượu/cafein/trà đặc/socola/cà chua. ④ TĂNG: yến mạch, chuối, gạo tẻ, khoai lang (kiện tỳ). ⑤ VẬN ĐỘNG nhẹ sau ăn (đi bộ). ⑥ Giảm stress (can hoả = stress hoá). ⑦ Nâng đầu giường 15cm khi ngủ. ⑧ Trào ngược >2 lần/tuần kéo dài → khám tiêu hoá (PPI内镜 nếu cần).',
+    related: '肝 (mộc) khắc 脾/胃 (thổ): can hoả vượng → khắc hại tỳ vị (mộc khắc thổ). Người 木 vượng: dễ can hoả phạm vị. Người 土 suy: tỳ vị vốn yếu → dễ trào.',
+  },
 ];
 
 /**
