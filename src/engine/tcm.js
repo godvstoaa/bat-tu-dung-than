@@ -401,6 +401,16 @@ export const CONDITION_KB = [
     advice: '① BÌNH CAN TIỀM DƯƠNG — thiên ma (gastrodia), câu đằng (uncaria), thạch quyết minh, ngọc trúc, sinh địa. ② HOẠT HUYẾT THÔNG LẠC — đan sâm, xích thược, xuyên khung (川芎 = thần dược đau đầu). ③ TRÀ THANH CAN — cúc hoa (10g) + quyết minh tử (10g) + bạc hà (5g). ④ HUYỆT CHÂM — Thái dương, Phong trì, Hợp cốc, Thái xung. Massage huyệt Thái dương + gáy khi đau. ⑤ TRÁNH: stress (trigger #1), thiếu ngủ, cà phê/rượu/thức ăn mặn/phô mai/chocolate (trigger migraine), nắng gắt, tiếng ồn. ⑥ NHỊP: ngủ đủ (thận phục hồi), giảm screen time. ⑦ Đau >72h / nôn nhiều / liệt / co giật → cấp cứu.',
     related: '肝 (mộc) → can dương thượng kháng. 肾 (thuỷ) → thuỷ bất涵 mộc → can dương cương. Người 木 vượng: dễ can hoả → migraine. Người 水 suy: thận không nuôi can → can dương.',
   },
+  // [loop 1160] cervical spondylosis — extremely common in modern screen users
+  {
+    id: 'cervical_spondylosis',
+    keywords: ['đau mỏi vai gáy', 'thoái hóa đốt sống cổ', 'cứng cổ', 'đau cổ vai gáy', 'tê tay do cổ', 'chóng mặt xoay cổ', 'thoái hóa cổ', 'vôi hóa cổ', 'đau gáy', 'mỏi gáy', 'cervical', 'đau bả vai', 'tê ngón tay', 'khó quay cổ', '颈'],
+    title: 'Đau mỏi vai gáy / Thoái hóa đốt sống cổ (CAN THẬN BẤT TÚC + KHÍ TRỆ Ứ HUYẾT)',
+    summary: 'Đông-y: cổ gáy = vùng KINH CAN + KINH ĐỞM đi qua. «CAN CHỦ CÂN» (gân), «THẬN CHỦ CỐT» (xương). Ngồi máy/điện thoại lâu → khí trệ ở cổ vai gáy → ứ huyết → đau mỏi. Nặng: thoái hóa đốt sống (xương = thận), chèn dây thần kinh → tê tay. Can khí uất + thận tinh khuy → gân xương yếu → thoái hóa.',
+    symptoms: 'đau mỏi vai gáy (nhất là sau ngồi lâu), cứng cổ buổi sáng, tê/buốt tay (chèn dây thần kinh), chóng mặt khi quay cổ, đau đầu cổ gáy, khò khè âm thanh (đôi khi), mệt mỏi.',
+    advice: '① BỔ CAN THẬN — đậu đen, vừng đen, kỷ tử, sơn dược, hà thủ ô (nuôi gân xương). ② HOÀT HUYẾT THÔNG LẠC — đan sâm, xích thược, xuyên khung, xuyên tục đoạn, cốt toái bổ (bổ xương). ③ TRÀ CAN THẬN — cúc hoa + kỷ tử + đậu đen rang (hãm uống). ④ MASSAGE CỔ GÁY — day huyệt Phong trì (風池), Thiên trụ, Hợp cốc; xoa nóng lòng bàn tay áp cổ. ⑤ VẬN ĐỘNG CỔ — xoay cổ chậm 8-10 lần/chiều, kéo giãn vai gáy mỗi 30 phút ngồi máy. ⑥ TRÁNH: ngồi/nằm sai tư thế, gập cổ xem điện thoại («text neck»), ngủ gối cao. ⑦ CHIẾU ĐÈN ĐỎ (hồng ngoại) hoặc châm cứu vùng cổ gáy. ⑧ Tê tay kéo dài/chóng mặt nặng → khám thần kinh (cervical MRI nếu cần).',
+    related: '肝 (mộc) → chủ cân (gân) → cổ gáy. 肾 (thuỷ) → chủ cốt (xương) → đốt sống. Người 木 uất: can khí trệ → đau gáy. Người 水 suy: thận tinh khuy → xương thoái hóa.',
+  },
 ];
 
 /**
@@ -501,6 +511,8 @@ const CONDITION_WX = {
   thyroid_nodule: ['木', '土', '水'], skin_aging: ['水', '土', '金'],
   // [loop 1154] +2 conditions
   anemia: ['土', '水'], migraine: ['木', '火', '水'],
+  // [loop 1160] cervical spondylosis
+  cervical_spondylosis: ['木', '水'],
 };
 
 /**
