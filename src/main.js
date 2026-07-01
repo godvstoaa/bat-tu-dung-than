@@ -158,7 +158,7 @@ import { socialStrategy } from './engine/social-fs.js';
 import { spiritualPractice } from './engine/spiritual-fs.js';
 import { cureByElement } from './engine/fs-cure.js';
 import { findNoblePerson } from './engine/emperor-star.js';
-import { recommendNumbers } from './engine/number-fs.js';
+import { recommendNumbers, evaluateNumber } from './engine/number-fs.js';
 import { sleepOptimization } from './engine/sleep-fs.js';
 import { checkNatalActivation } from './engine/shensha-activation.js';
 import { flyingSihua } from './engine/flying-sihua.js';
@@ -2619,6 +2619,8 @@ function renderFengshuiExtra(R) {
     const combos = (nm.goodCombos || []).slice(0, 4).join('/');
     if (fav) html += `<p class="hint"><b>🔢 Số hợp:</b> ${esc(fav)} (combo ${esc(combos)}), tránh ${esc(avoid)}. ${esc((nm.tips || [])[0] || '')}</p>`;
   } catch (e) {}
+  // [loop 1142] đánh giá số (phone/biển/số nhà) — interactive UI
+  html += `<div style="margin-top:6px"><input type="text" id="num-eval-input" placeholder="Nhập số (vd 0912345678)" style="width:60%;padding:4px 8px;border:1px solid var(--gold,dimgray);border-radius:4px;background:var(--bg-card,#1a1a2e);color:var(--silk,#f0e6d2);font-size:13px" /> <button class="btn-ghost" id="num-eval-btn" style="padding:4px 12px;font-size:13px">Đánh giá</button> <span id="num-eval-result"></span></div>`;
   // Hướng ngủ (sleep-fs)
   try {
     const sl = sleepOptimization(R, R.chart.input.year, R.chart.input.gender);
@@ -2626,6 +2628,21 @@ function renderFengshuiExtra(R) {
     if (t) html += `<p class="hint"><b>😴 Giấc ngủ:</b> ${esc(t)}</p>`;
   } catch (e) {}
   el.innerHTML = html || '<p class="hint">Không tính được phong thủy định vị.</p>';
+  // [loop 1142] wire number evaluation button
+  const _neBtn = $('num-eval-btn');
+  if (_neBtn) {
+    _neBtn.addEventListener('click', () => {
+      const _inp = $('num-eval-input');
+      const _res = $('num-eval-result');
+      if (!_inp || !_res) return;
+      try {
+        const ev = evaluateNumber(_inp.value, R);
+        if (ev.error) { _res.innerHTML = `<span class="hint" style="color:#c33">${esc(ev.error)}</span>`; return; }
+        const _col = ev.score >= 65 ? '#2a7' : ev.score >= 50 ? '#9a8' : '#c33';
+        _res.innerHTML = `<span style="color:${_col};font-weight:bold">${esc(ev.rating)} (${ev.score}/100)</span> <span class="hint">· cuối ${ev.lastDigit}=${ev.lastWxVi} · sum→${ev.sum81} (${ev.luckVi})</span>`;
+      } catch (_) { _res.innerHTML = '<span class="hint" style="color:#c33">Lỗi.</span>'; }
+    });
+  }
 }
 
 function renderShenshaActivation(R) {
