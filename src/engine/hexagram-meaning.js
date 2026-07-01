@@ -312,6 +312,17 @@ export const GUA_CI = {
   谦: { ci: '亨，君子有终。', apply: 'khiêm tốn hanh — quân tử khiêm tất có chung (kết quả tốt).' },
   既济: { ci: '亨小，利贞，初吉终乱。', apply: 'việc đã thành — ban cát nhưng rốt loạn (cảnh giác «chỉ tắc loạn, kỳ đạo cùng»).' },
   未济: { ci: '亨。小狐汔济，濡其尾，无攸利。', apply: 'việc chưa thành — cáo nhỏ kề qua sông đuôi ướt, chưa lợi («vật bất khả cùng», nên để chưa济 kết thúc).' },
+  // [loop 1217] thêm 10 quẻ (知乎64卦原文 + Wikisource 周易 + 南京博物院)
+  蒙: { ci: '亨。匪我求童蒙，童蒙求我。初筮告，再三渎，渎则不告。利贞。', apply: 'khởi mông — không ta tìm trẻ, trẻ tìm ta; lần đầu bói thì bảo, bói lại ba lần là báng, «độc tắc bất cáo».' },
+  复: { ci: '亨。出入无疾，朋来无咎。反复其道，七日来复。利有攸往。', apply: 'phục hồi — ra vào không bệnh, bạn tới không lỗi; «thất nhật lai phục» (7 ngày quay lại).' },
+  无妄: { ci: '元亨利贞。其匪正，有眚，不利有攸往。', apply: 'vô vọng (không vọng động) — nguyên hanh lợi trinh; nếu không chính则有 tai hoạ.' },
+  咸: { ci: '亨，利贞。取女吉。', apply: 'cảm ứng — hanh lợi trinh, thú nữ cát (hôn nhân).' },
+  恒: { ci: '亨，无咎，利贞。利有攸往。', apply: 'hằng cửu — hanh vô cữu lợi trinh, lợi tiến.' },
+  晋: { ci: '康侯用锡马蕃庶，昼日三接。', apply: 'tiến thăng — khanh hầu được thưởng ngựa nhiều, một ngày tiếp 3 lần.' },
+  家人: { ci: '利女贞。', apply: 'gia nhân — lợi nữ trinh (nữ tử giữ chính, gia đạo trật tự).' },
+  损: { ci: '有孚，元吉，无咎，可贞。利有攸往。曷之用？二簋可用享。', apply: 'tổn giảm — có thành, nguyên cát vô cữu; «nhị quĩ khả dụng hưởng» (giản dị cũng thành).' },
+  益: { ci: '利有攸往，利涉大川。', apply: 'ích lợi — lợi tiến hành, lợi thiệp đại xuyên (vượt việc lớn).' },
+  坎: { ci: '习坎：有孚，维心亨，行有尚。', apply: 'tập hãm (nước chồng nước, hiểm) — có thành, «duy tâm hanh» (chỉ tâm hanh thông), hành có thưởng.' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };
