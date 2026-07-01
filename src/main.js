@@ -3400,7 +3400,7 @@ function renderDailyCapsule(R) {
     el.innerHTML = `
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
         <span style="font-size:18px"><b>${_n.getDate()}/${_n.getMonth()+1}</b></span>
-        <span class="zh big">${esc(dayGz)}</span>
+        <span class="zh big">${esc(dayGz)}</span> ${(() => { const n = ganZhiNayin(dayGz); return n ? `<span class="hint-inline" title="${esc(nayinInfo(n)?.meaning || '')}">${esc(n)}</span>` : ''; })()}
         ${lr?.ganGod ? `<span class="hint" style="font-size:.75em">· ${esc(TEN_GOD_VI[lr.ganGod] || lr.ganGod)}</span>` : ''}
         <span class="ln-rate ${dayRating==='Cát'?'rate-cat':dayRating==='Hung'||dayRating==='Hơi kỵ'?'rate-hung':'rate-mid'}" style="font-size:14px;padding:2px 8px">${esc(dayRating)}${dayScore!=null?` (${dayScore})`:''}</span>
         ${bestHour ? `<span class="hint">· 🏆 Giờ tốt: <b>${esc(bestHour.vi||bestHour.zhi)}</b> (${esc(bestHour.range||'')}, ${esc(bestHour.rating||'')})</span>` : ''}
