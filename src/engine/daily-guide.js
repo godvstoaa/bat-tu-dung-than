@@ -29,6 +29,15 @@ export const YI_VI = {
   祈福: 'cầu phúc', 祭祀: 'tế tự', 安葬: 'an táng', 破屋: 'phá nhà', 求嗣: 'cầu con', 入学: 'nhập học',
   移徙: 'chuyển nhà', 安床: 'lắp giường', 上梁: 'gác đòn đông', 开仓: 'mở kho', 纳财: 'thu tài',
 };
+// [loop 1100/1101] phương vị财神/喜神/福神 (lunar getDayPositionCai/Xi/FuDesc) → Việt.
+//   Export cho daily-pro/daily-guide reuse (trước đây leak raw «西南», «正东»).
+export const DIR_VI = { '正东': 'chính Đông', '正南': 'chính Nam', '正西': 'chính Tây', '正北': 'chính Bắc', '东北': 'Đông Bắc', '东南': 'Đông Nam', '西北': 'Tây Bắc', '西南': 'Tây Nam', '东': 'Đông', '南': 'Nam', '西': 'Tây', '北': 'Bắc', '中宫': 'giữa', '中': 'giữa', '财神': 'Tài thần', '喜神': 'Hỷ thần', '福神': 'Phúc thần', '方': 'hướng' };
+export function translateDir(s) {
+  if (!s || s === '?') return s || '?';
+  let r = String(s);
+  for (const k of ['正东', '正南', '正西', '正北', '东北', '东南', '西北', '西南', '中宫', '财神', '喜神', '福神', '东', '南', '西', '北', '中', '方']) r = r.split(k).join(DIR_VI[k]);
+  return r;
+}
 const ZHI_VI_TIME = { 子:'Tý (23-1h)', 丑:'Sửu (1-3h)', 寅:'Dần (3-5h)', 卯:'Mão (5-7h)', 辰:'Thìn (7-9h)', 巳:'Tỵ (9-11h)', 午:'Ngọ (11-13h)', 未:'Mùi (13-15h)', 申:'Thân (15-17h)', 酉:'Dậu (17-19h)', 戌:'Tuất (19-21h)', 亥:'Hợi (21-23h)' };
 
 const WX_DAILY_COLOR = {
@@ -97,10 +106,10 @@ export function dailyGuide(R, year, month, day) {
     ? `Hôm nay can ${WX_VI[dgWx]} (Kỵ/Thù) → mặc MÀU ${color.primary} (Dụng ${WX_VI[yong.primary]}) để hóa giải + tăng vượng.`
     : `Mặc màu ${color.primary} (Dụng ${WX_VI[deityColorWx]}) → tăng vận.`;
 
-  // --- Direction ---
-  const caishen = lunar.getDayPositionCaiDesc ? lunar.getDayPositionCaiDesc() : '?';
-  const xishen = lunar.getDayPositionXiDesc ? lunar.getDayPositionXiDesc() : '?';
-  const fushen = lunar.getDayPositionFuDesc ? lunar.getDayPositionFuDesc() : '?';
+  // --- Direction --- ([loop 1101] dịch raw Chinese → Việt)
+  const caishen = translateDir(lunar.getDayPositionCaiDesc ? lunar.getDayPositionCaiDesc() : '?');
+  const xishen = translateDir(lunar.getDayPositionXiDesc ? lunar.getDayPositionXiDesc() : '?');
+  const fushen = translateDir(lunar.getDayPositionFuDesc ? lunar.getDayPositionFuDesc() : '?');
   const bestDir = score >= 50 ? caishen : fushen;
 
   // --- Hours ---
