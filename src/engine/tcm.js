@@ -74,7 +74,7 @@ export const DIET = {
 export const CONDITION_KB = [
   {
     id: 'kidney_jing',
-    keywords: ['thủ dâm', 'thủ đâm', 'thủ dam', 'di tinh', 'mộng tinh', 'liệt dương', 'sớm xuất', 'sớm', 'yếu sinh lý', 'thận yếu', '肾', 'khoa nam', 'phòng sự', 'sex', 'đêm xuất', 'cuồng dâm', ' xuất tinh'],
+    keywords: ['thủ dâm', 'thủ đâm', 'thủ dam', 'di tinh', 'mộng tinh', 'liệt dương', 'sớm xuất', 'sớm', 'yếu sinh lý', 'thận yếu', '肾', 'khoa nam', 'phòng sự', 'sex', 'đêm xuất', 'cuồng dâm', ' xuất tinh', 'hay quên', 'trí nhớ kém'],
     title: '肾 Tinh hao tổn (THẬN HƯ) — do phòng sự/thủ dâm quá độ',
     summary: 'Theo đông y, 肾 (thuỷ) là «tiên thiên chi bản (先天之本)» — gốc tinh khiết, chủ TÀNG TINH (cất giữ tinh). Thủ dâm/phòng sự quá độ → hao 肾 tinh → THẬN HƯ. Tinh hao kéo theo: thuỷ suy → Mộc (can) mất nuôi (can huyết hư) → hoả vượng → hệ quả toàn thân.',
     yin: '肾 ÂM HƯ (hay gặp nếu ra tinh nhiều + thức khuya/nóng): thắt lưng/đầu gối mỏi, choáng tai ù, mất ngủ nhiều mơ, nóng trong bốc hoả, đổ mồ hôi trộm ban đêm, di tinh/sớm xuất, khô miệng, gò má đỏ, lưỡi đỏ ít rêu.',
@@ -132,7 +132,7 @@ export const CONDITION_KB = [
   },
   {
     id: 'cold_limbs',
-    keywords: ['tay lạnh', 'chân lạnh', 'tay chân lạnh', 'sợ lạnh', 'run', 'tứ chi lạnh', '阳虚', 'lạnh trong người'],
+    keywords: ['tay lạnh', 'chân lạnh', 'tay chân lạnh', 'sợ lạnh', 'run', 'tứ chi lạnh', '阳虚', 'lạnh trong người', 'tê tay chân', 'tê bì chân tay', 'buốt tay chân'],
     title: 'Tay chân lạnh (DƯƠNG HƯ hoặc CAN UẤT TỨ NGHỊCH)',
     summary: 'Hai chứng: (a) DƯƠNG HƯ (thận/tỳ dương hư) — dương khí không sưởi ấm tứ chi, lạnh toàn bộ + sợ lạnh/mệt; (b) «TỨ NGHỊCH» (can khí uất, 4 chi không ấm) — chỉ tay chân lạnh nhưng không sợ lạnh toàn thân, kèm cáu gắt/ức chế (can chủ sớ tiết, uất thì khí trệ).',
     symptoms: '(dương hư) tay chân lạnh + sợ lạnh/mệt/tiểu đêm/đại tiện lỏng; (can uất) chỉ tay chân lạnh + bứt rứt/ngực sườn trướng/đau đầu.',
@@ -148,7 +148,7 @@ export const CONDITION_KB = [
   },
   {
     id: 'back_knee',
-    keywords: ['đau lưng', 'đau thắt lưng', 'đau đầu gối', 'mỏi lưng', 'thắt lưng mỏi', '腰痛', 'đau cột sống'],
+    keywords: ['đau lưng', 'đau thắt lưng', 'đau đầu gối', 'mỏi lưng', 'thắt lưng mỏi', '腰痛', 'đau cột sống', 'đau khớp', 'viêm khớp', 'khớp đau'],
     title: 'Đau lưng / Đầu gối (THẬN HƯ — «lưng là phủ của thận»)',
     summary: '«腰为肾之府» (thắt lưng là nhà của thận). Đau lưng mỏi (không phải chấn thương) thường = THẬN HƯ: mỏi ê ẩm, mệt thì nặng, nghỉ thì nhẹ. Cột sống/khớp = thận chủ cốt (xương). Đau lưng cấp/nặng = thấp nhiệt/ủ huyết (thực chứng).',
     symptoms: '(thận hư) thắt lưng/đầu gối mỏi ê ẩm, mệt/đứng lâu nặng, kèm tiểu đêm/tóc rụng/choáng; ( thấp nhiệt) đau trương nặng + tiểu vàng; (ủ huyết) đau nhói cố định.',
@@ -172,7 +172,7 @@ export const CONDITION_KB = [
   },
   {
     id: 'stomach_pain',
-    keywords: ['đau dạ dày', 'đau bao tử', 'ợ chua', 'ợ hơi', 'đau vùng thượng vị', 'chảy máu dạ dày', 'viêm loét', '胃痛', 'tức bụng trên', 'đau khi đói'],
+    keywords: ['đau dạ dày', 'đau bao tử', 'đau bụng', 'ợ chua', 'ợ hơi', 'đau vùng thượng vị', 'chảy máu dạ dày', 'viêm loét', '胃痛', 'tức bụng trên', 'đau khi đói'],
     title: 'Đau dạ dày / Ợ chua (VỊ — hàn nhiệt uất thực + can phạm vị)',
     summary: 'Vị (thổ) chủ thu nạp. Đau dạ dày: (a) VỊ HÀN (ăn lạnh/sinh) — đau âm ỉ ấm đỡ; (b) VỊ NHIỆT/Ợ CHUA (hoả) — đau rát, ợ chua, khát; (c) CAN KHÍ PHẠM VỊ (căng thẳng) — đau lan sườn, đau khi buồn/cáu; (d) VỊ ÂM HƯ (thủ dâm/rượu lâu) — đau khi đói, khát.',
     symptoms: '(hàn) đau ấm đỡ, bụng lạnh; (nhiệt) đau rát ợ chua, khát, lưỡi vàng; (can phạm) đau lan sườn, buồn nôn khi buồn; (âm hư) đau khi đói, ăn vào đỡ.',
@@ -338,7 +338,7 @@ export const CONDITION_KB = [
   },
   {
     id: 'cough',
-    keywords: ['ho', 'đau họng', 'khàn tiếng', 'ho khan', 'ho có đờm', 'ho lâu', 'viêm phế quản', '咳嗽', 'ho về đêm', 'ho kiệt'],
+    keywords: ['ho', 'đau họng', 'khàn tiếng', 'ho khan', 'ho có đờm', 'ho lâu', 'viêm phế quản', '咳嗽', 'ho về đêm', 'ho kiệt', 'thở khò khè', 'khò khè', 'hen suyễn', 'khó thở'],
     title: 'Ho / Viêm phế quản (PHONG HÀN/PHONG NHIỆT/ĐÀM THẤP/ÂM HƯ)',
     summary: 'Ho đông-y: (a) PHONG HÀN — ho khan, ngứa họng, sợ lạnh, đờm trong (初起); (b) PHONG NHIỆT — ho đau họng, khát, đờm vàng đặc; (c) ĐÀM THẤP — ho nhiều đờm trắng dãi, khò khè, tức ngực; (d) ÂM HƯ — ho khan lâu, khô họng, đêm nặng (phổi âm hư).',
     symptoms: '(hàn) ho khan ngứa họng, sợ lạnh, đờm trong; (nhiệt) ho đau họng đỏ, đờm vàng, khát, sốt; (đàm thấp) ho nhiều đờm trắng đặc, khò khè, tức ngực, nặng người; (âm hư) ho khan lâu, khô họng, đổ mồ hôi trộm, đêm nặng.',
@@ -347,7 +347,7 @@ export const CONDITION_KB = [
   // [loop 1144] +2 conditions common modern users
   {
     id: 'eye_strain',
-    keywords: ['mỏi mắt', 'mắt mỏi', 'giảm thị lực', 'mờ mắt', 'cận thị', 'chong chóng', 'khô mắt', 'thị lực', 'hay chớp', 'mắt nhìn mờ', 'viễn thị', 'loạn thị', 'đau mắt', '眼'],
+    keywords: ['mỏi mắt', 'mắt mỏi', 'giảm thị lực', 'mờ mắt', 'mắt mờ', 'cận thị', 'chong chóng', 'khô mắt', 'thị lực', 'thị lực giảm', 'hay chớp', 'mắt nhìn mờ', 'viễn thị', 'loạn thị', 'đau mắt', '眼'],
     title: 'Mỏi mắt / Giảm thị lực (CAN HUYẾT HƯ + THẬN TINH KHUY) — do dùng máy/điện thoại nhiều',
     summary: '«CAN KHAI VIỆT TRÊN MẮT» (肝开窍于目) — mắt do CAN HUYẾT nuôi + THẬN TINH (thuỷ sinh mộc) làm nền. Dùng mắt quá nhiều (màn hình) → hao can huyết + thận tinh → mắt mỏi, khô, mờ, cận. Nặng: can hoả vượng (đau đầu, đỏ mắt, cận tiến triển nhanh).',
     symptoms: 'mắt mỏi/nhức/cát khô, nhìn mờ tạm thời, chảy nước mắt, nhạy sáng, cận tiến triển, đau đầu trán, chất lượng giấc ngủ kém.',
