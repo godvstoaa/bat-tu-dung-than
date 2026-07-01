@@ -4997,6 +4997,7 @@ function renderLyear(year) {
         <div class="ly-sname">${esc(s.phai)} <span class="ly-d">${esc(dHanzi(s.d))}</span></div>
         <div class="ly-snote">${esc(s.note)}</div>
       </div>`).join('')}</div>
+    ${r.yearHealthTheme ? `<p class="hint" style="margin-top:6px"><b style="color:${r.yearHealthTheme.tone === 'suy' ? '#c33' : r.yearHealthTheme.tone === 'thinh' ? '#2a7' : '#9a8'}">⚕️ ${esc(r.yearHealthTheme.headline)}</b> — ${esc(r.yearHealthTheme.advice)}</p>` : ''}
     <p class="zr-advice">${esc(r.advice)}</p>`;
 }
 
