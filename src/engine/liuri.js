@@ -58,7 +58,7 @@ const GOD_DAY = {
  */
 export function analyzeLiuRi(R, year, month, day, patternQuality) {
   const c = R.chart;
-  const dayGan = c.dayGan, birthYearZhi = c.pillars.year.zhi, selfDayZhi = c.pillars.day.zhi;
+  const dayGan = c.dayGan, birthYearZhi = c.pillars.year.zhi, selfDayZhi = c.pillars.day.zhi, birthMonthZhi = c.pillars.month.zhi; // [loop 1111] +月柱(提纲)
   const yong = R.yong;
 
   const s = Solar.fromYmdHms(year, month, day, 12, 0, 0);
@@ -95,6 +95,9 @@ export function analyzeLiuRi(R, year, month, day, patternQuality) {
   // [loop 1016] 六合 thưởng — đối xứng 冲 (合 tuổi +5 / 合 Nhật Chi +6, cùng guard double-count).
   if (LIUHE[birthYearZhi] === dZhi) { score += 5; schools.push({ phai: 'Hợp tuổi', d: 5, note: `Chi ngày ${ZHI[dZhi].vi} LỤC HỢP chi tuổi ${ZHI[birthYearZhi].vi} — «日合岁» thuận hoà, quý nhân.` }); }
   if (LIUHE[selfDayZhi] === dZhi && selfDayZhi !== birthYearZhi) { score += 6; schools.push({ phai: 'Hợp Nhật Chi', d: 6, note: `Chi ngày lục hợp Nhật Chi (bản thân) — yên bụng, sự việc trôi chảy.` }); }
+  // [loop 1111] 日冲/合月令 — chi ngày 冲/合 月柱(提纲) = sự nghiệp biến động hôm nay (mirror 1107/1109/1110).
+  if (CHONG[birthMonthZhi] === dZhi && birthMonthZhi !== selfDayZhi && birthMonthZhi !== birthYearZhi) { score -= 2; schools.push({ phai: 'Xung月令', d: -2, note: `Chi ngày xung chi tháng sinh (提纲) — sự nghiệp/cơ nghiệp nhẹ biến động hôm nay.` }); }
+  else if (LIUHE[birthMonthZhi] === dZhi && birthMonthZhi !== selfDayZhi && birthMonthZhi !== birthYearZhi) { score += 2; schools.push({ phai: 'Hợp月令', d: 2, note: `Chi ngày lục hợp chi tháng sinh (提纲) — sự nghiệp thuận hôm nay.` }); }
   // [loop 1042] 三合 bán-hợp — chi ngày cùng cụm 三合 với chi tuổi/Nhật Chi (yếu hơn 六 hợp).
   if (_banhe(dZhi, birthYearZhi)) { score += 3; schools.push({ phai: 'Bán-hợp tuổi', d: 3, note: `Chi ngày bán-hợp (三合) chi tuổi — cùng cục, tăng cát nhẹ.` }); }
   else if (selfDayZhi !== birthYearZhi && _banhe(dZhi, selfDayZhi)) { score += 2; schools.push({ phai: 'Bán-hợp Nhật', d: 2, note: `Chi ngày bán-hợp (三合) Nhật Chi — cùng cục.` }); }

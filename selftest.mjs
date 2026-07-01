@@ -9348,5 +9348,22 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1110] 流月 月冲/合月令 ✓ — ${_hits}/4 chart, vd ${_sample}`);
 }
 
+// [loop 1111] 流日 日冲/合月令 — analyzeLiuRi xét 月柱(提纲) → 4-time-scale 3-pillar complete
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { analyzeLiuRi } = await import('./src/engine/liuri.js');
+  let _hits = 0, _sample = null;
+  for (const [y, mo, d, h, g] of [[1992,9,9,15,'nam'],[1988,1,5,6,'nam'],[1995,11,11,18,'nữ']]) {
+    const _R = analyze(y, mo, d, h, 0, g, 2026);
+    for (let dd = 1; dd <= 28; dd++) {
+      const lr = analyzeLiuRi(_R, 2026, 7, dd, _R.patternQuality);
+      const s = lr.schools.find((sc) => /月令/.test(sc.phai));
+      if (s) { _hits++; if (!_sample) _sample = `${g}${y} 7/${dd}: ${s.phai}`; break; }
+    }
+  }
+  assert(_hits > 0, `[loop 1111] analyzeLiuRi phát hiện 日冲/合月令 (${_hits}/3 chart) — vd ${_sample}`);
+  console.log(`   [loop 1111] 流日 日冲/合月令 ✓ — ${_hits}/3 chart, vd ${_sample} → 3-pillar ĐỦ 4 cấp thời gian`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
