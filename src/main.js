@@ -3382,11 +3382,12 @@ function renderDailyCapsule(R) {
         ${worstHour && worstHour.zhi !== bestHour?.zhi ? `<span class="hint">· ⚠️ Tránh giờ: <b>${esc(worstHour.vi||worstHour.zhi)}</b> (${esc(worstHour.range||'')}, ${esc(worstHour.rating||'')})</span>` : ''}
         ${bestMonth ? `<span class="hint">· 📅 Tháng tốt: <b>T${bestMonth.solarMonth}</b> (${esc(bestMonth.rating||'')})</span>` : ''}
         ${seasonVi ? `<span class="hint">· 🌿 Mùa này: <b>${esc(seasonVi)}</b></span>` : ''}
+        ${_dayColor ? `<span class="hint">· 👕 Màu: <b>${esc(_dayColor)}</b></span>` : ''}
+        ${dg2 && dg2.caishen ? `<span class="hint">· 💰 Hướng tài: <b>${esc(dg2.caishen)}</b></span>` : ''}
       </div>
       ${lr?.advice ? `<p class="hint" style="margin-top:6px">${esc(lr.advice)}</p>` : ''}
       ${sh ? `<p class="hint" style="margin-top:4px"><b style="color:${shCol}">⚕️ ${esc(sh.headline)}</b> — ${esc(sh.advice)}</p>` : ''}
       ${(yiList.length || jiList.length) ? `<p class="hint" style="margin-top:4px">✓ <b style="color:#2a7">宜</b>: ${yiList.length ? esc(yiList.join(', ')) : '—'} · ✗ <b style="color:#c33">忌</b>: ${jiList.length ? esc(jiList.join(', ')) : '—'} <span style="opacity:.6">(通胜宜忌 — xem chi tiết «Hôm nay làm gì»)</span></p>` : ''}
-      ${_dayColor ? `<p class="hint" style="margin-top:4px">👕 Màu nay: <b>${esc(_dayColor)}</b></p>` : ''}
       ${_intLine ? `<p class="hint" style="margin-top:4px">🜂 Trụ hôm nay: ${_intLine}</p>` : ''}
       ${capsuleDayunSpark(R)}`;
     // [loop 1077] sparkline → chạm mở nhóm + cuộn tới biểu đồ đại vận đầy đủ
