@@ -128,8 +128,8 @@ export const PRESETS = [
     note: 'Đi qua proxy cùng-origin → KHÔNG bị CORS. Chạy được cả npm run dev (Vite proxy) LẪN trên web production (Cloudflare Pages Function /zai). Nên dùng.' },
   { id: 'zai-general', label: 'Z.ai — API chung (glm-5.2) [CORS: chỉ chạy qua backend]', endpoint: 'https://api.z.ai/api/paas/v4', model: 'glm-5.2',
     note: 'Endpoint thẳng — trình duyệt sẽ CHẶN CORS. Chỉ dùng nếu app có backend/proxy, hoặc chạy qua server-side.' },
-  { id: 'zai-coding', label: 'Z.ai — GLM Coding Plan (glm-5.2) [CORS]', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2',
-    note: 'Endpoint Coding Plan — CORS sẽ chặn khi gọi từ web. Ưu tiên preset PROXY DEV ở trên.' },
+  { id: 'zai-coding', label: 'Z.ai — GLM Coding Plan (glm-5.2) [proxy]', endpoint: '/zai/api/coding/paas/v4', model: 'glm-5.2',
+    note: 'Endpoint Coding Plan — đi qua proxy /zai (cùng-origin, tránh CORS). Chạy được cả dev (Vite proxy) LẪN production (Cloudflare /zai). Dùng API key gói Coding Plan. [loop 1186 FIX: trước đây gọi thẳng api.z.ai → CORS chặn web].' },
   { id: 'cf-glm', label: '★ Cloudflare Workers AI — GLM-5.2 [proxy]', endpoint: '/cf-ai/client/v4/accounts/bc101a2962ca21a084172c5334ad7dad/ai/v1', model: '@cf/zai-org/glm-5.2',
     note: 'Cloudflare Workers AI chạy GLM-5.2. Đi qua proxy /cf-ai (cùng-origin) — tránh CORS. Dùng Cloudflare API Token làm key.' },
   { id: 'bigmodel', label: 'BigModel (智谱 glm-4.6)', endpoint: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4.6', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
@@ -140,10 +140,18 @@ export const PRESETS = [
 ];
 
 export function getConfig() {
+  let cfg = null;
   try {
     const raw = (typeof localStorage !== 'undefined') ? localStorage.getItem(CFG_KEY) : null;
-    if (raw) return JSON.parse(raw);
+    if (raw) cfg = JSON.parse(raw);
   } catch (e) {}
+  // [loop 1186 FIX] migrate endpoint Z.ai THẲNG (CORS-block trên web) → proxy /zai (cùng-origin).
+  //   Trước đây preset zai-coding/zai-general lưu https://api.z.ai/... → trình duyệt chặn CORS.
+  //   /zai proxy forward đúng tới api.z.ai (cả Vite dev LẪN Cloudflare worker production).
+  if (cfg && typeof cfg.endpoint === 'string' && /^https?:\/\/api\.z\.ai\//.test(cfg.endpoint)) {
+    cfg.endpoint = cfg.endpoint.replace(/^https?:\/\/api\.z\.ai\//, '/zai/');
+  }
+  if (cfg) return cfg;
   // [loop 903] Mặc định: Cloudflare Workers AI GLM-5.2 (proxy /cf-ai — chạy trên worker cùng origin).
   // [loop 905] enabled: true — key nhúng server-side, user KHÔNG cần nhập gì.
   const cfPreset = PRESETS.find((p) => p.id === 'cf-glm') || PRESETS[0];
@@ -1441,22 +1449,29 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   const endpoint = cfg.endpoint.replace(/\/$/, '');
   const url = endpoint.endsWith('/chat/completions') ? endpoint : endpoint + '/chat/completions';
   const headers = { 'Content-Type': 'application/json', ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}) };
-  const isGlm = /glm|z\.ai|bigmodel/i.test((cfg.model || '') + (cfg.endpoint || ''));
-  const buildBody = (msgs, toolsOn) => ({
+  // [loop 1186 FIX] thinking là param BẢN ĐỊA Z.ai/BigModel — KHÔNG gửi cho Cloudflare Workers AI.
+  //   api.cloudflare.com không hiểu thinking → 400. Model @cf/zai-org/glm-5.2 chứa chữ «glm» nhưng
+  //   chạy qua host CF (proxy /cf-ai) → phải phân biệt theo HOST endpoint, KHÔNG theo tên model.
+  const _ep = cfg.endpoint || '';
+  const _isCf = /\/cf-ai|cloudflare/i.test(_ep);
+  const isZaiNative = !_isCf && /glm|z\.ai|bigmodel/i.test((cfg.model || '') + _ep);
+  const buildBody = (msgs, toolsOn, thinkOn) => ({
     model: cfg.model, messages: msgs, temperature: 0.5, stream: true,
-    ...(isGlm ? { thinking: { type: 'enabled' } } : {}),       // GLM: bật deep thinking bản địa
+    ...(thinkOn && isZaiNative ? { thinking: { type: 'enabled' } } : {}),  // chỉ host Z.ai/BigModel
     ...(toolsOn ? { tools: AI_TOOLS, tool_choice: 'auto' } : {}),
   });
 
-  let toolsOn = true;
+  let toolsOn = true, thinkOn = true;
   try {
     for (let step = 0; step < 6; step++) {
       let round;
       try {
-        round = await streamRound(url, headers, buildBody(messages, toolsOn), onToken, onStatus, signal);
+        round = await streamRound(url, headers, buildBody(messages, toolsOn, thinkOn), onToken, onStatus, signal);
       } catch (e) {
-        // Lượt đầu: nếu model không hỗ trợ tools/thinking → tắt cả 2 và thử lại
-        if (step === 0 && toolsOn) { toolsOn = false; step = -1; continue; }
+        // [loop 1186 FIX] leo thang: tắt tools trước, rồi tắt thinking, rồi bỏ cuộc.
+        //   Trước đây chỉ tắt tools → nếu thinking gây lỗi (vd host CF) retry vẫn lỗi → fallback sớm.
+        if (toolsOn) { toolsOn = false; step = -1; continue; }
+        if (thinkOn) { thinkOn = false; step = -1; continue; }
         throw e;
       }
       const { content, toolCalls } = round;
@@ -1478,6 +1493,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
 
       if (!content) {
         if (toolsOn) { toolsOn = false; step = -1; continue; } // thử lại không tool
+        if (thinkOn) { thinkOn = false; step = -1; continue; } // [loop 1186] thử lại không thinking
         throw new Error('Phản hồi rỗng');
       }
       return { source: 'ai', text: content };
