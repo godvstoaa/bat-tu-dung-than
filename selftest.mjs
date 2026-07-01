@@ -8960,6 +8960,11 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     assert(_es.matched && /Bản LA SỐ/.test(_es.reply), `[loop 1146] eye_strain match + personalization`);
     const _ar = answerHealth('trào ngược GERD nóng rát ngực', _R1146);
     assert(_ar.matched && /Bản LA SỐ/.test(_ar.reply), `[loop 1146] acid_reflux match + personalization`);
+    // [loop 1149] thyroid + skin_aging (loop 1148)
+    const _th = answerHealth('bướu cổ tuyến giáp', _R1146);
+    assert(_th.matched && /Bản LA SỐ/.test(_th.reply), `[loop 1149] thyroid_nodule match + personalization`);
+    const _sk = answerHealth('lão hóa da nếp nhăn', _R1146);
+    assert(_sk.matched && /Bản LA SỐ/.test(_sk.reply), `[loop 1149] skin_aging match + personalization`);
   }
   // no garbled latin artifacts
   const _kb = JSON.stringify(CONDITION_KB);
