@@ -248,6 +248,16 @@ export const DAXIANG = {
   临: { verse: '泽上有地，临；君子以教思无穷，容保民无疆。', apply: 'đất trên đầm, cao lâm — quân tử giáo hoá tư lự vô cùng, dung bảo dân vô cương.' },
   观: { verse: '风行地上，观；先王以省方、观民、设教。', apply: 'gió thổi khắp đất, quan sát — tiên vương tuần tứ bốn phương, quan dân tình, thiết giáo hoá.' },
   复: { verse: '雷在地中，复；先王以至日闭关，商旅不行，后不省方。', apply: 'sấm ẩn trong đất, dương khí phục phản — tiên vương ngày đông chí bế quan tĩnh dưỡng.' },
+  // [loop 1211] thêm 9大象 (ctext 象传 + Wikisource 周易/大象)
+  噬嗑: { verse: '雷电，噬嗑；先王以明罚敕法。', apply: 'sấm chớp cắn hợp — tiên vương minh hình phạt, chấn chỉnh pháp lệnh.' },
+  贲: { verse: '山下有火，贲；先王以明庶政，无敢折狱。', apply: 'lửa dưới núi, văn sức — tiên vương minh bách chính, không dám dễ dàng phán ngục.' },
+  剥: { verse: '山附于地，剥；上以厚下安宅。', apply: 'núi phụ trên đất, bạt lạc — bậc trên hậu đãi kẻ dưới, an cư.' },
+  无妄: { verse: '天下雷行，物与无妄；先王以茂对时，育万物。', apply: 'sấm chạy dưới trời, vạn vật ứng thời mà sinh, vô vọng — tiên vương nỗ lực thuận thời, dưỡng vạn vật.' },
+  大畜: { verse: '天在山中，大畜；君子以多识前言往行，以畜其德。', apply: 'trời trong núi, đại súc — quân tử ghi nhớ tiền ngôn vãng hành (lời nói/cách làm bậc tiền nhân) để súc đức.' },
+  颐: { verse: '山下有雷，颐；君子以慎言语，节饮食。', apply: 'sấm dưới núi, di dưỡng — quân tử thận ngôn ngữ, tiết ẩm thực.' },
+  大过: { verse: '泽灭木，大过；君子以独立不惧，遁世无闷。', apply: 'đầm nước chìm gỗ, đại quá — quân tử độc lập không sợ, ẩn độn không buồn.' },
+  咸: { verse: '山上有泽，咸；君子以虚受人。', apply: 'đầm trên núi, cảm ứng — quân tử hư tâm tiếp nhận người.' },
+  恒: { verse: '雷风，恒；君子以立不易方。', apply: 'sấm gió tương dữ, hằng cửu — quân tử lập thân không đổi phương hướng.' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };
