@@ -3187,6 +3187,18 @@ assert(ggR && ggR.yearJiaZi && ggR.nayin, `guiguzi returns yearJiaZi + nayin (go
 assert(['CÁT','HUNG','BÌNH'].includes(ggR.toneVi), `guiguzi toneVi hợp lệ (got ${ggR.toneVi})`);
 assert(ggR.fortune.length > 20, 'guiguzi fortune có nội dung');
 console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi} ✓`);
+// [loop 1196 FIX] GUIGUZI_NAYIN từng key lệch 砂/沙, 薄/箔 với ganZhiNayin (loop 563 chuẩn lunar-javascript)
+//   → lookup miss cho 6 năm (甲午/乙未/壬寅/癸卯/丙辰/丁巳) → nhận fallback rỗng. Nay sửa key.
+{
+  const ggFix = (y) => guiguziFortune(analyze(y, 6, 15, 12, 0, 'nam', 2026));
+  const gJiaWu = ggFix(2014);    // 甲午 → 沙中金
+  const gRenYin = ggFix(2022);   // 壬寅 → 金箔金
+  const gBingChen = ggFix(1976); // 丙辰 → 沙中土
+  assert(gJiaWu.nayin === '沙中金' && gJiaWu.vi === 'Kim Trong Cát', `甲午 năm: guiguzi 沙中金 không fallback (got ${gJiaWu.nayin}/${gJiaWu.vi})`);
+  assert(gRenYin.nayin === '金箔金' && gRenYin.vi === 'Kim Lá Mỏng', `壬寅 năm: guiguzi 金箔金 không fallback (got ${gRenYin.nayin}/${gRenYin.vi})`);
+  assert(gBingChen.nayin === '沙中土' && gBingChen.vi === 'Đất Trong Cát', `丙辰 năm: guiguzi 沙中土 không fallback (got ${gBingChen.nayin}/${gBingChen.vi})`);
+  console.log(`   [loop 1196] guiguzi nayin fix: 甲午→沙中金/壬寅→金箔金/丙辰→沙中土 (không còn fallback rỗng) ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);
