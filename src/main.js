@@ -4401,7 +4401,7 @@ function renderLiuyue(year) {
   const curMonth = (year === now.getFullYear()) ? now.getMonth() : -1;
   $('liuyue').innerHTML = `
     <p class="hint">Tháng CÁT (nên tiến thủ): <b>${lm.best.map((m) => `T${esc(String(m.m + 1))} ${esc(m.ganZhi)}`).join(', ')}</b> · Tháng KỴ (cẩn thận): <b>${lm.worst.map((m) => `T${esc(String(m.m + 1))} ${esc(m.ganZhi)}`).join(', ')}</b></p>
-    <p class="hint" style="margin-top:2px;opacity:.7">Hover: 十二长生 + 冲/合月令 + tạng (⚕️)</p>`;
+    <p class="hint" style="margin-top:2px;opacity:.7">Hover: 十二长生 + 冲/合月令 + tạng (⚕️)</p>
     <div class="lm-grid">${lm.months.map((m) => {
       const cls = rateClass(m.rating); // [loop 470] dùng rateClass (handle Đại cát/Hung mọi vocab)
       const gejuTag = m.gejuDelta > 0 ? '<span class="geju-xi" title="' + esc(m.gejuNote || '') + '">★格局喜</span>'
