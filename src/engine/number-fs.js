@@ -127,7 +127,7 @@ export function recommendNumbers(R) {
       `Biển số: kết thúc ${WX_FAV_NUMS[dungWx].join('/')}, tránh ${WX_FAV_NUMS[kyWx].join('/')}.`,
       `Tầng nhà: tầng có số đuôi ${WX_FAV_NUMS[dungWx].join('/')} tốt; ${WX_FAV_NUMS[kyWx].join('/')} kỵ.`,
       `Số tài khoản: mở bằng/đóng bằng ${WX_FAV_NUMS[dungWx].join('/')}.`,
-      `Tổng các chữ số: ưu tiên tổng = 1,3,5,6,7,8,11,13,15,16,21,23,24,25,31,32 (số lý cát).`,
+      `Tổng các chữ số: ưu tiên tổng = 1,3,5,6,7,8,11,13,15,16,18,21,23,24,25,31,32 (số lý cát).`,
     ],
   };
 }
