@@ -9,7 +9,7 @@ import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
 import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN } from './src/engine/constants.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM } from './src/engine/kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
 import { jinkoujue, renderJinkoujueCard } from './src/engine/jinkoujue.js';
@@ -296,6 +296,13 @@ for (const k of Object.keys(YONGSHEN_METHOD)) {
 }
 // [loop 1199] 子平 «用神 bất khả» danh quyết (滴天髓阐微 知命章, 任铁樵引).
 assert(ZIPING_YONG_MAXIM.protect.includes('用之为财不可劫') && ZIPING_YONG_MAXIM.inverse.includes('不用财星尽可劫'), 'ZIPING_YONG_MAXIM: 用 protect + inverse (阐微 知命章)');
+// [loop 1200] «五言独步» (渊海子平 卷四) — Wikisource + ctext ch.901791.
+assert(Object.keys(WUYAN_DUBU).length === 3, 'WUYAN_DUBU: 3 stanza (病药/建禄/方局)');
+assert(WUYAN_DUBU['病药'].verse.includes('有病方为贵') && WUYAN_DUBU['病药'].verse.includes('格中如去病，财禄两相随'), '五言独步 病药 stanza');
+for (const k of Object.keys(WUYAN_DUBU)) {
+  const e = WUYAN_DUBU[k];
+  assert(e.verse && e.vi && e.apply.length > 20, `五言独步 ${k}: verse + vi + apply`);
+}
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
 // [loop 1197] 窮通寶鑑 «五行總論» + 5 nguyên lý mùa (Wikisource 窮通寶鑑).

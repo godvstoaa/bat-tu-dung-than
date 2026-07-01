@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU } from './kb.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { analyzeKongwang } from './kongwang.js';
@@ -274,6 +274,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - «通論» (滴天髓 nguyên lý): ${Object.entries(DITIANSUI_TONGLUN).map(([k, e]) => `${k}「${e.verse}」`).join(' ')}
 - «取用神» (子平真詮 5 pháp): ${Object.entries(YONGSHEN_METHOD).map(([k, e]) => `${k}(${e.vi})`).join('; ')} — giải thích VÌ SAO R.yong được chọn.
 - «用神 bất khả» (滴天髓阐微 知命章): ${ZIPING_YONG_MAXIM.protect} | NGƯỢC: ${ZIPING_YONG_MAXIM.inverse}.
+- «五言独步» (渊海子平): 「${WUYAN_DUBU['病药'].verse}」— 有病=有忌神 phá cách, 去病=dụng thần trừ kỵ → tài lộc đến.
 - Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
 - Tiết khí gần nhất: ${c.jieqi.prev.name}
 

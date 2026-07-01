@@ -330,6 +330,26 @@ export const ZIPING_YONG_MAXIM = {
   essence: 'Thần (Tài/Quan/Ấn/Thực) không vốn cát hung — giá trị tùy nó CÓ phải Dụng Thần hay không. Là dụng → phải bảo vệ; phi dụng → khắc chế cũng vô phòng.',
 };
 
+// ---- «五言独步» (渊海子平 卷四) — danh quyết luận mệnh 5 chữ ----
+// [loop 1200] Nguồn: Wikisource 渊海子平 + ctext ch.901791. Trích 3 đoạn nổi bật nhất.
+export const WUYAN_DUBU = {
+  病药: {
+    verse: '有病方为贵，无伤不是奇；格中如去病，财禄两相随。',
+    vi: 'Có «bệnh» mới quý, không «thương» chẳng kỳ; trong cách như trừ được bệnh, tài lộc hai đằng theo.',
+    apply: 'Bệnh = kỵ thần phá cách. Mệnh có «bệnh» (kỵ thần) mà có «dược» (dụng thần trừ bệnh) mới thật quý — «去 bệnh» thì tài lộc đến. Mệnh hoàn toàn vô thương thường bình phàm. (Cốt pháp 病药 — liên kết YONGSHEN_METHOD/ZIPING_YONG_MAXIM).',
+  },
+  建禄: {
+    verse: '建禄生提月，财官喜透天；不宜身再旺，唯喜茂财源。',
+    vi: 'Kiến lộc sinh tháng đề — Tài/Quan hỷ lộ thiên; không hợp thân lại vượng, chỉ hỷ tài nguồn tươi tốt.',
+    apply: 'Cách 建禄 (nhật can đắc lộc tại nguyệt lệnh) — thân đã vượng, hỷ Tài/Quan lộ thiên, kỵ thân thêm vượng (Tỷ/Ấn), hỷ Thực Thương sinh Tài làm nguồn.',
+  },
+  方局: {
+    verse: '寅卯多金丑，贫富高低走；南地怕逢申，北方休见酉。',
+    vi: 'Dần/Mão nhiều Kim/Sửu — giàu nghèo lên xuống; phương Nam sợ gặp Thân, phương Bắc chớ thấy Dậu.',
+    apply: 'Mộc (Dần/Mão) gặp nhiều Kim (Sửu/Thân/Dậu) khắc phạt → biến động giàu nghèo «cao thấp tẩu». Khẩu quyết phương-vị: Nam (Hỏa) kỵ Thân, Bắc (Thủy) kỵ Dậu — xung khắc phương.',
+  },
+};
+
 // ---- ÁNH XẠ LĨNH VỰC ĐỜI SỐNG ↔ SAO CHỦ SỰ ----
 // Dùng để trả lời câu hỏi tự do: biết lĩnh vực → biết sao/hành nào chủ đạo.
 export const LIFE_AREA_INDEX = {
