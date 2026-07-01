@@ -26,6 +26,19 @@ const YUAN_VI = ['上元', '中元', '下元'];
 const QIYI = ['戊', '己', '庚', '辛', '壬', '癸', '丁', '丙', '乙'];
 const GONG_STAR = { 1: '天蓬', 2: '天芮', 3: '天冲', 4: '天辅', 5: '天禽', 6: '天心', 7: '天柱', 8: '天任', 9: '天英' };
 const STAR_VI = { 天蓬: 'thiên bằng (đại hung)', 天芮: 'thiên nhuệ (bệnh)', 天冲: 'thiên xung (hung)', 天辅: '天phụ (cát, văn)', 天禽: 'thiên cầm (bình/trung)', 天心: 'thiên tâm (đại cát, y)', 天柱: 'thiên trụ (hung)', 天任: 'thiên nhậm (cát)', 天英: 'thiên anh (hỏa, trung)' };
+// [loop 1205] 九星 类象 sâu (知乎/360doc«奇门遁甲九星含义») — ý nghĩa天盘, bổ cho GONG_STAR/STAR_VI.
+//   吉: 天辅/天禽/天心 (上吉) + 天冲/天任 (小吉); 凶: 天蓬/天芮 (大凶) + 天柱/天英 (小凶).
+const STAR_INFO = {
+  天蓬: { gong: '1 坎 (bắc)', wx: 'thủy', tone: 'hung', desc: 'đạo tặc, hành động ngầm, mạo hiểm, quân sự phương bắc; hung thì chủ đạo tặc / tổn thất / ám muội' },
+  天芮: { gong: '2 坤 (tây nam)', wx: 'thổ', tone: 'hung', desc: 'bệnh tật, vấn đề, ẩn hoạn, học tập; cũng chủ tu hành — thường là dụng thần khi đoán bệnh' },
+  天冲: { gong: '3 chấn (đông)', wx: 'mộc', tone: 'cat', desc: 'xung động, võ lực, việc đột phát, hành động vội; chấn động phấn tiến' },
+  天辅: { gong: '4 tốn (đông nam)', wx: 'mộc', tone: 'cat', desc: 'văn hoá giáo dục, văn chức, thi cử, văn thư; chủ văn vận hưng thịnh' },
+  天禽: { gong: '5 trung cung', wx: 'thổ', tone: 'cat', desc: 'trọng ổn, bao dung, cân bằng; thường ký khôn cung, chủ đại cát' },
+  天心: { gong: '6 càn (tây bắc)', wx: 'kim', tone: 'cat', desc: 'quản lý, lãnh đạo, y liệu cứu trị, quyết sách cốt lõi; chủ năng lực giải vấn đề' },
+  天柱: { gong: '7 đoài (tây)', wx: 'kim', tone: 'hung', desc: 'phá hoại, phá bại, kinh khủng, khẩu thiệt tranh đấu; cũng chủ chống đỡ trụ cột' },
+  天任: { gong: '8 cấn (đông bắc)', wx: 'thổ', tone: 'cat', desc: 'trách nhiệm, gánh vác, ổn định, kinh doanh phát triển, tử tôn; chủ cát lợi' },
+  天英: { gong: '9 ly (nam)', wx: 'hỏa', tone: 'hung', desc: 'danh tiếng, văn thư, hoả khí, lễ nghi; cũng chủ bạo táo, huyết quang, hoả hiểm' },
+};
 
 // 八门 định cung (静盘): 休1 生8 伤3 杜4 景9 死2 惊7 开6
 const DOOR_AT = { 1: '休', 8: '生', 3: '伤', 4: '杜', 9: '景', 2: '死', 7: '惊', 6: '开' };
@@ -85,7 +98,7 @@ export function qimenPan(year, month, day, hour = 12) {
   return { term, yuan: YUAN_VI[yuanIdx], yinYang, ju, pan, gige, advice, note: '局盘静盘 (时辰天盘飞旋 + 置闰 tinh tế = bước cải tiến sau).' };
 }
 
-export { TERM_JU, QIYI, GONG_STAR, DOOR_AT, GONG_DIR, BASHEN_VI };
+export { TERM_JU, QIYI, GONG_STAR, DOOR_AT, GONG_DIR, BASHEN_VI, STAR_INFO };
 
 // ============================================================================
 //  天盘三奇六仪 (Heavenly Plate) — 转盘法 [cycle 60 ADD]

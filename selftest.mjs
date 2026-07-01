@@ -356,6 +356,20 @@ for (const k of Object.keys(WUYAN_DUBU)) {
   assert(DOOR_AT[1] === '休' && DOOR_AT[6] === '开' && DOOR_AT[8] === '生', '八门 phân cung chuẩn (1休/6开/8生)');
   console.log(`   [loop 1204] 八神类象: 8 thần × (vi/tone/wx/desc) + verify 九星/八门 phân cung ✓`);
 }
+// [loop 1205] 奇门遁甲 九星 类象 sâu (知乎/360doc«九星含义»).
+{
+  const { STAR_INFO, GONG_STAR } = await import('./src/engine/qimen.js');
+  assert(Object.keys(STAR_INFO).length === 9, `STAR_INFO: 9 sao (got ${Object.keys(STAR_INFO).length})`);
+  assert(STAR_INFO['天心'].tone === 'cat' && STAR_INFO['天蓬'].tone === 'hung' && STAR_INFO['天辅'].tone === 'cat', '九星 tone: 天心/天辅 cát, 天蓬 hung');
+  assert(STAR_INFO['天心'].desc.includes('lãnh đạo') && STAR_INFO['天芮'].desc.includes('bệnh'), '九星: 天心 lãnh đạo/y, 天芮 bệnh tật');
+  // tương thích GONG_STAR: mỗi cung → đúng sao có INFO
+  for (const g of Object.keys(GONG_STAR)) assert(STAR_INFO[GONG_STAR[g]], `STAR_INFO có sao của cung ${g} (${GONG_STAR[g]})`);
+  for (const k of Object.keys(STAR_INFO)) {
+    const e = STAR_INFO[k];
+    assert(e.gong && e.wx && e.tone && e.desc.length > 15, `九星 ${k}: gong+wx+tone+desc`);
+  }
+  console.log(`   [loop 1205] 九星类象: 9 sao × (gong/wx/tone/desc), tương thích GONG_STAR ✓`);
+}
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
 // [loop 1197] 窮通寶鑑 «五行總論» + 5 nguyên lý mùa (Wikisource 窮通寶鑑).
