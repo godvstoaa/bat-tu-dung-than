@@ -9,7 +9,7 @@ import { ZHI } from './constants.js';
 const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 const CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
 const OFFICERS = ['建', '除', '满', '平', '定', '执', '破', '危', '成', '收', '开', '闭'];
-const OFFICER_VI = { 建:'Kiến', 除:'Trừ', 满:'Mãn', 平:'Bình', 定:'Định', 执:'Chấp', 破:'Phá', 危:'Nguy', 成:'Thành', 收:'Thu', 开:'Khai', 闭:'Bế' };
+const OFFICER_VI = { 建:'Kiến', 除:'Trừ', 满:'Mãn', 平:'Bình', 定:'Định', 执:'Chấp', 破:'Phá', 危:'Nguy', 成:'Thành', 收:'Thu', 开:'Khai', 闭:'Bế' }; // exported line below (loop 1103 reuse)
 // 黄道(吉)/黑道(凶) theo 口诀 "建满平收黑, 除危定执黄, 成开皆可用, 破闭不可当"
 const OFFICER_ROAD = { 建: 'black', 满: 'black', 平: 'black', 收: 'black', 破: 'black', 闭: 'black', 除: 'yellow', 危: 'yellow', 定: 'yellow', 执: 'yellow', 成: 'yellow', 开: 'yellow' };
 

@@ -7,6 +7,7 @@
 import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { tenGod } from './core.js';
+import { OFFICER_VI } from './tongsheng.js'; // [loop 1103] dịch 12 trực (建→Kiến...)
 
 const ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const OFFICERS = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
@@ -143,7 +144,7 @@ export function dailyGuide(R, year, month, day) {
   const oneLiner = `${rating} (${score}) · ${TEN_GOD_VI[god]} · mặc ${color.primary.split('/')[0]} · hướng ${bestDir} · giờ tốt ${bestHours.slice(0,2).join(', ')}`;
 
   // --- Full summary ---
-  const full = `📅 ${solar.toYmd()} (${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}) ${dGan}${dZhi} | ${TEN_GOD_VI[god]} | Trực ${officer} (${OFFICER_ROAD[officer] === 'yellow' ? '黄道' : '黑道'})\n` +
+  const full = `📅 ${solar.toYmd()} (${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}) ${dGan}${dZhi} | ${TEN_GOD_VI[god]} | Trực ${OFFICER_VI[officer] || officer} (${OFFICER_ROAD[officer] === 'yellow' ? 'Hoàng Đạo' : 'Hắc Đạo'})\n` +
     `📊 Điểm: ${score}/100 (${rating})\n` +
     `👕 Màu: ${colorAdvice}\n` +
     `🧭 Hướng: Tài→${caishen} · Hỷ→${xishen} · Phúc→${fushen}\n` +

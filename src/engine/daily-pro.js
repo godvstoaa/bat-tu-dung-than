@@ -9,6 +9,7 @@ import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { tenGod } from './core.js';
 import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, TIAN_YI, WEN_CHANG, JIANG_XING } from './shensha.js';
 import { JI_VI, translateDir } from './daily-guide.js'; // [loop 1096/1101] dịch 忌 list + phương vị
+import { OFFICER_VI } from './tongsheng.js'; // [loop 1103] dịch 12 trực (建→Kiến...)
 
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
 // [loop 290] 六害 (穿) + 三刑 — daily-pro từng thiếu (chỉ có 冲) nên nông hơn cả liuri (light).
@@ -22,7 +23,7 @@ const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯'
 const ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const OFFICERS = ['建','除','满','平','定','执','破','危','成','收','开','闭'];
 const OFFICER_ROAD = { 建:'black', 满:'black', 平:'black', 收:'black', 破:'black', 闭:'black', 除:'yellow', 危:'yellow', 定:'yellow', 执:'yellow', 成:'yellow', 开:'yellow' };
-const TONE_WORD = { yellow: '黄道', black: '黑道' };
+const TONE_WORD = { yellow: 'Hoàng Đạo', black: 'Hắc Đạo' }; // [loop 1103] dịch raw Chinese
 
 // 12 thần (daily version - simpler than annual, based on day chi vs birth chi)
 const DAILY_GOD = {
@@ -81,7 +82,7 @@ export function dailyPro(R, year, month, day) {
   const road = OFFICER_ROAD[officer];
   let e3 = road === 'yellow' ? 3 : -2;
   score += e3;
-  schools.push({ phai: 'Trực', d: e3, note: `Trực ${officer} (${TONE_WORD[road]}): ${road === 'yellow' ? 'nền cát' : 'nền hắc đạo, hạn chế việc lớn'}.` });
+  schools.push({ phai: 'Trực', d: e3, note: `Trực ${OFFICER_VI[officer] || officer} (${TONE_WORD[road]}): ${road === 'yellow' ? 'nền cát' : 'nền hắc đạo, hạn chế việc lớn'}.` });
 
   // PHÁI 4: Chi 冲/害/刑 tuổi (cổ pháp 择日 — chi ngày phạm cả 3 dạng đều giảm cát)
   let e4 = 0, e4note = '';
