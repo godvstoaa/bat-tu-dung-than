@@ -370,6 +370,23 @@ for (const k of Object.keys(WUYAN_DUBU)) {
   }
   console.log(`   [loop 1205] 九星类象: 9 sao × (gong/wx/tone/desc), tương thích GONG_STAR ✓`);
 }
+// [loop 1206] 奇门遁甲 八门 类象 sâu (百度百科/知乎«八门含义与象意») — hoàn thiện qimen trinity.
+{
+  const { DOOR_INFO, DOOR_AT } = await import('./src/engine/qimen.js');
+  const JI = ['开', '休', '生']; // 三吉门
+  assert(Object.keys(DOOR_INFO).length === 8, `DOOR_INFO: 8 cửa (got ${Object.keys(DOOR_INFO).length})`);
+  assert(DOOR_INFO['生'].tone === 'cat' && DOOR_INFO['死'].tone === 'hung' && DOOR_INFO['杜'].tone === 'mid', '八门 tone: 生 cát, 死 hung, 杜 mid');
+  assert(DOOR_INFO['开'].desc.includes('khai sáng') && DOOR_INFO['生'].desc.includes('tài'), '八门: 开 khai sáng, 生 tài vận');
+  // 三吉门 都是 cat
+  for (const d of JI) assert(DOOR_INFO[d].tone === 'cat', `三吉门 ${d} tone=cat`);
+  // tương thích DOOR_AT: mỗi cung → đúng cửa có INFO
+  for (const g of Object.keys(DOOR_AT)) assert(DOOR_INFO[DOOR_AT[g]], `DOOR_INFO có cửa của cung ${g} (${DOOR_AT[g]})`);
+  for (const k of Object.keys(DOOR_INFO)) {
+    const e = DOOR_INFO[k];
+    assert(e.gong && e.wx && e.tone && e.desc.length > 15 && e.yi, `八门 ${k}: gong+wx+tone+desc+yi`);
+  }
+  console.log(`   [loop 1206] 八门类象: 8 cửa × (gong/wx/tone/desc/yi), 三吉门 cat ✓ — qimen trinity hoàn thiện`);
+}
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
 // [loop 1197] 窮通寶鑑 «五行總論» + 5 nguyên lý mùa (Wikisource 窮通寶鑑).

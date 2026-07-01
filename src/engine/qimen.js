@@ -43,6 +43,18 @@ const STAR_INFO = {
 // 八门 định cung (静盘): 休1 生8 伤3 杜4 景9 死2 惊7 开6
 const DOOR_AT = { 1: '休', 8: '生', 3: '伤', 4: '杜', 9: '景', 2: '死', 7: '惊', 6: '开' };
 const DOOR_VI = { 休: 'Hưu (cát — nghỉ/ngơi)', 生: 'Sinh (đại cát — sinh sôi/tài)', 伤: 'Thương (hung — tổn thương)', 杜: 'Đỗ (bình — ẩn náu)', 景: 'Cảnh (bình — văn/thi)', 死: 'Tử (đại hung)', 惊: 'Kinh (hung — kinh sợ)', 开: 'Khai (đại cát — mở/khai trương)' };
+// [loop 1206] 八门 类象 sâu (百度百科/知乎«八门含义与象意») — ý nghĩa人盘, hoàn thiện qimen trinity.
+//   三吉: 开/休/生; 三凶: 死/惊/伤; 中平: 杜/景. (khớp DOOR_VI tone + DOOR_WX)
+const DOOR_INFO = {
+  开: { gong: '6 càn (tây bắc)', wx: 'kim', tone: 'cat', desc: 'khai sáng, công khai, thông đạt — vạn vật sát tận nhi phục sinh; quý nhân, quan chức, khai trương, sự nghiệp tiền đồ', yi: 'khai nghiệp / cầu danh / mưu sự / kiến quý nhân / viễn hành / gia thú' },
+  休: { gong: '1 khảm (bắc)', wx: 'thủy', tone: 'cat', desc: 'hu dưỡng, dưỡng tinh túc duệ — âm cực sinh dương, thuỷ khí hội lưu; nghỉ ngơi điều chỉnh, tích thế đãi phát', yi: 'cầu ổn định / hu dưỡng / tích tụ / hòa đàm / kiến quý nhân; bất nghi cấp tiến' },
+  生: { gong: '8 cấn (đông bắc)', wx: 'thổ', tone: 'cat', desc: 'vạn vật sinh trưởng — sinh phát, sinh cơ, tài vận; sinh dục, phát triển, phú quý', yi: 'kinh doanh cầu tài / cầu chức / gia thú / kiến tạo' },
+  伤: { gong: '3 chấn (đông)', wx: 'mộc', tone: 'hung', desc: 'thương tai, bệnh tật, tổn thương, biến động; thanh âm, tàn tật, xe cộ, tranh đấu', yi: 'săn bắn (捕猎) / đòi nợ (讨债) / cạnh tranh; kỵ gia thú / kinh doanh / viễn hành' },
+  杜: { gong: '4 tốn (đông nam)', wx: 'mộc', tone: 'mid', desc: 'bế tắc, ẩn giấu, ngăn đoạn; ẩn trang, tech thuật nghiên cứu, phòng thủ', yi: 'ẩn nấp / trốn tai / nghiên cứu kỹ thuật; bất nghi công khai cầu sự' },
+  景: { gong: '9 ly (nam)', wx: 'hỏa', tone: 'mid', desc: 'quang minh, văn thư, tin tức, hư kinh; văn hoá, thi cử, huyết quang hoả hiểm', yi: 'phúc khảo / văn thư / bái phỏng; phòng khẩu thiệt / hư kinh' },
+  死: { gong: '2 khôn (tây nam)', wx: 'thổ', tone: 'hung', desc: 'tử vong, chung kết, suy lão; tang sự, phần mộ, ai điếu, hình sát', yi: 'tang tá / điếu viếng / kết thúc cựu sự; bách sự bất nghi, kỵ gia thú / cầu tài' },
+  惊: { gong: '7 đoài (tây)', wx: 'kim', tone: 'hung', desc: 'kinh khủng, ưu lự, khẩu thiệt quan phi; hủy tổn, tranh tụng', yi: 'cáo trạng / tụng sự / biện luận; bất nghi gia thú / cầu tài / viễn hành' },
+};
 const JI_DOOR = ['开', '休', '生']; // 3吉门
 // [loop 1089] 门迫 (宫克门) — ngũ hành cung (洛书九宫 后天八卦) + 八门 bản vị ngũ hành.
 //   «吉门受宫克为迫, 吉事不吉» — cửa TỐT bị cung KHẮC → cát lực giảm (vd 开门Kim ở 离9 Hỏa → Hỏa khắc Kim).
@@ -98,7 +110,7 @@ export function qimenPan(year, month, day, hour = 12) {
   return { term, yuan: YUAN_VI[yuanIdx], yinYang, ju, pan, gige, advice, note: '局盘静盘 (时辰天盘飞旋 + 置闰 tinh tế = bước cải tiến sau).' };
 }
 
-export { TERM_JU, QIYI, GONG_STAR, DOOR_AT, GONG_DIR, BASHEN_VI, STAR_INFO };
+export { TERM_JU, QIYI, GONG_STAR, DOOR_AT, GONG_DIR, BASHEN_VI, STAR_INFO, DOOR_INFO };
 
 // ============================================================================
 //  天盘三奇六仪 (Heavenly Plate) — 转盘法 [cycle 60 ADD]
