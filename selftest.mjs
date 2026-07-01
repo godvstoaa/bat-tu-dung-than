@@ -376,6 +376,17 @@ for (const k of Object.keys(JISHAN_PIAN)) {
   }
   console.log(`   [loop 1223] 十二月将类象: 12 tướng × (zhi/wx/desc), khớp YUEJIANG_VI — 六壬大全 ✓`);
 }
+// [loop 1224] 测字十法 (《测字秘牒》程省).
+{
+  const { CEZI_METHOD } = await import('./src/engine/cezi.js');
+  assert(Object.keys(CEZI_METHOD).length === 10, `CEZI_METHOD: 10 pháp (got ${Object.keys(CEZI_METHOD).length})`);
+  assert(CEZI_METHOD['装头'].example.includes('古→苦') && CEZI_METHOD['观梅'].principle.includes('tâm kính'), '测字法: 装头 古→苦, 观梅 tâm kính');
+  for (const k of Object.keys(CEZI_METHOD)) {
+    const e = CEZI_METHOD[k];
+    assert(e.vi && e.principle.length > 10, `测字法 ${k}: vi + principle`);
+  }
+  console.log(`   [loop 1224] 测字十法: 10 pháp × (vi/principle/example) — 测字秘牒 ✓`);
+}
 // [loop 1204] 奇门遁甲 八神 类象 (知乎/网易«奇门遁甲八神详解») — ý nghĩa thần盘.
 {
   const { BASHEN_VI, GONG_STAR, DOOR_AT } = await import('./src/engine/qimen.js');

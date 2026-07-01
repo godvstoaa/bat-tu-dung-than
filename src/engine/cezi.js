@@ -20,6 +20,21 @@
 import { WX_VI } from './constants.js';
 import { STROKES } from './name.js';
 
+// ---- 测字十法 (《测字秘牒》程省·卷一) — 10 phương pháp拆字, nền tảng lý luận ----
+// [loop 1224] Nguồn: Wikisource 測字秘牒 + ctext + 百度百科 + 知乎«梅花易数测字十法».
+export const CEZI_METHOD = {
+  装头: { vi: 'Trang Đầu', principle: 'thêm nét/bộ ở ĐẦU chữ → thành chữ khác', example: '古→苦 (加艹), 里→童 (加立)' },
+  接脚: { vi: 'Tiếp Cước', principle: 'thêm nét/bộ ở CHÂN (dưới) chữ', example: '千→舌 (加口), 合→拿 (加手)' },
+  穿心: { vi: 'Xuyên Tâm', principle: 'xuyên nét qua GIỮA chữ', example: '日→申/由/甲' },
+  包笼: { vi: 'Bao Lung', principle: 'bao quanh chữ, bản thể bất động', example: '稚→穫, 石→磨, 弓→泼' },
+  破解: { vi: 'Phá Giải', principle: 'phân tách chữ thành các phần để đoán', example: '明→日+月, 好→女+子' },
+  添笔: { vi: 'Thêm Bút', principle: 'thêm nét ở bất kỳ vị trí, ứng所问之事' },
+  减笔: { vi: 'Giảm Bút', principle: 'bớt nét chữ để显 ý thật', example: '富→畐' },
+  对关: { vi: 'Đối Quan', principle: 'chia đầu-đuôi, khép/mở như cửa («môn chi khai bế») — pháp giản tiện nhất' },
+  摘字: { vi: 'Trích Tự', principle: 'trích lấy 1 phần trọng điểm của chữ để断 sự' },
+  观梅: { vi: 'Quan Mai', principle: 'linh cảm tức thời (梅花 tâm pháp) — «tâm kính quang minh, tuỳ vật đỗ chiếu», bất cố định thức' },
+};
+
 // ---------------------------------------------------------------------------
 // 8 QUÁI (theo 先天 số 1-8). lines: 3 hào từ dưới lên (1=dương, 0=âm).
 // Map số 1-8 → quái (sau modulo 8, ta sẽ +1 và dùng index này).
