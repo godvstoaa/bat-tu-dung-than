@@ -1468,6 +1468,7 @@ QUAN TRỌNG: Thông tin lá số ĐÃ CÓ ĐỦ trong context trên. Khi user h
         <div class="ly-sname">${r($.phai)} <span class="ly-d">${r(a($.d))}</span></div>
         <div class="ly-snote">${r($.note)}</div>
       </div>`).join("")}</div>
+    ${i.yearHealthTheme?`<p class="hint" style="margin-top:6px"><b style="color:${i.yearHealthTheme.tone==="suy"?"#c33":i.yearHealthTheme.tone==="thinh"?"#2a7":"#9a8"}">⚕️ ${r(i.yearHealthTheme.headline)}</b> — ${r(i.yearHealthTheme.advice)}</p>`:""}
     <p class="zr-advice">${r(i.advice)}</p>`}function Je(t){if(!z)return;const i=be(z,t),n=s=>s==="cat"?"rate-cat":s==="hung"?"rate-hung":"rate-mid",h=s=>s==="cat"?"Cát":s==="hung"?"Kỵ":"Trung",a=i.bodyStrong?"Thân vượng":"Thân nhược",e=s=>({year:"Niên",month:"Nguyệt",day:"Nhật",time:"Thời"})[s]||s;H("ly-ev").innerHTML=`
     <div class="ly-head"><span class="zh big">${r(i.ganZhi)}</span> ${r(t)} · sao <b>${r(i.yearGodVi)}</b> (${r(i.yearGod)}) · ${r(a)}${i.yearGod==="七殺"?` · Sát ${i.shaZhiHua?"CÓ chế/hóa":"VÔ chế ⚠"}`:""}
     </div>
