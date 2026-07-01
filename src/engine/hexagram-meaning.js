@@ -235,6 +235,12 @@ export const DAXIANG = {
   屯: { verse: '云雷，屯；君子以经纶。', apply: 'vân lôi giao động, sơ sáng gian nan — quân tử kinh luận thiên hạ.' },
   蒙: { verse: '山下出泉，蒙；君子以果行育德。', apply: 'núi dưới suối trào, mông muội sơ khai — quân tử quả quyết hành, dục đức.' },
   既济: { verse: '水在火上，既济；君子以思患而预防之。', apply: 'thuỷ trên hoả, việc đã thành — quân tử tư hoạn mà dự phòng.' },
+  // [loop 1209] thêm 5 quẻ nổi tiếng (Wikipedia 周易六十四卦 + Wikisource 周易/大象)
+  泰: { verse: '天地交，泰；后以财成天地之道，辅相天地之宜。', apply: 'thiên địa giao hiệp, thông thái — bậc vương giả tài thành thiên địa chi đạo, phù trợ thiên địa chi nghi.' },
+  否: { verse: '天地不交，否；君子以俭德辟难，不可荣以禄。', apply: 'thiên địa bất giao, bế tắc — quân tử kiệm đức tị nạn, không tham vinh hoa lộc vị.' },
+  未济: { verse: '火在水上，未济；君子以慎辨物居方。', apply: 'hoả trên thuỷ, việc chưa thành — quân tử thận trọng biện biệt sự vật, đặt đúng vị.' },
+  谦: { verse: '地中有山，谦；君子以裒多益寡，称物平施。', apply: 'núi giấu trong đất, khiêm tốn (nội cao ngoại bình) — quân tử bớt (裒) chỗ nhiều bù chỗ ít, cân nhắc công bằng.' },
+  大有: { verse: '火在天上，大有；君子以遏恶扬善，顺天休命。', apply: 'lửa (mặt trời) trên trời, đại hữu quang minh — quân tử ngăn (遏) ác dương thiện, thuận thiên hưu mệnh.' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };
