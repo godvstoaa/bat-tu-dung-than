@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI } from './kb.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { analyzeKongwang } from './kongwang.js';
@@ -270,6 +270,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - BẢN MỆNH HÀM 演禽 (28 túc con-vật-tinh, như con giáp 28-fold): ${(() => { try { return analyzeYanQin(R).summary; } catch (e) { return '(không tính được)'; } })()}
 - 禽星 NĂN ${curYear} (annual bird rotation — con vật tinh trụ trị năm nay, feng shui timing): ${(() => { try { return qinxingOverview(R, curYear).summary; } catch (e) { return '(không tính được)'; } })()}
 - 滴天髓 luận ${dm.gan}: ${DITIANSUI[dm.gan].verse} → ${DITIANSUI[dm.gan].nature}
+- «何知章» (滴天髓 chẩn đoán cổ pháp — áp dụng cho lá số này): ${Object.entries(DITIANSUI_HEZHI).map(([k, e]) => `${k}「${e.verse}」`).join(' ')}
 - Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
 - Tiết khí gần nhất: ${c.jieqi.prev.name}
 

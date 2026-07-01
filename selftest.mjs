@@ -9,7 +9,7 @@ import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
 import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU } from './src/engine/constants.js';
-import { DITIANSUI } from './src/engine/kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
 import { jinkoujue, renderJinkoujueCard } from './src/engine/jinkoujue.js';
@@ -268,6 +268,15 @@ console.log('\n################## 9. 滴天髓 + KHÍ HẬU (nội dung kinh đi
 assert(Object.keys(DITIANSUI).length === 10, 'DITIANSUI đủ 10 thiên can');
 for (const g of Object.keys(DITIANSUI)) {
   assert(DITIANSUI[g].verse && DITIANSUI[g].verse.length > 10 && DITIANSUI[g].nature.length > 40, `${g}: có verse + luận giải sâu`);
+}
+// [loop 1190] 丙 verse đối chiếu 滴天髓 cổ bản: 侮雪 + 成慈 + «甲木若來，必當焚滅» — bản cũ «甲木若狂» KHÔNG có trong nguồn cổ.
+assert(DITIANSUI['丙'].verse.includes('侮雪') && DITIANSUI['丙'].verse.includes('成慈') && DITIANSUI['丙'].verse.includes('甲木若來，必當焚滅') && !DITIANSUI['丙'].verse.includes('甲木若狂'), '丙 verse đối chiếu 滴天髓 cổ bản (侮雪/成慈/甲木若來必當焚滅, loại 甲木若狂)');
+// [loop 1190] 滴天髓 «何知章» — 8 chẩn đoán phú/quý/bần/tiện/cát/hung/thọ/yểu (Wikisource 滴天髓/41 + ctext 阐微).
+assert(Object.keys(DITIANSUI_HEZHI).length === 8, 'DITIANSUI_HEZHI đủ 8 chương 何知 (富貴貧賤吉凶壽夭)');
+assert(DITIANSUI_HEZHI['富'].verse.includes('財氣通門戶') && DITIANSUI_HEZHI['貴'].verse.includes('官星有理會'), '何知章: 富=财气通门户, 贵=官星有理会');
+for (const k of Object.keys(DITIANSUI_HEZHI)) {
+  const e = DITIANSUI_HEZHI[k];
+  assert(e.verse && e.verse.startsWith('何知') && e.criterion.length > 20 && e.note.length > 15, `何知章 ${k}: verse + criterion + note`);
 }
 assert(CLIMATE && Object.keys(CLIMATE).length === 12, 'CLIMATE đủ 12 nguyệt chi');
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic

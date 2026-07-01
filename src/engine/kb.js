@@ -22,10 +22,13 @@ export const DITIANSUI = {
     need: 'thích Hỏa (Đinh/丙) thắp sáng; ẩm quá cần dương; có Giáp tựa thì vượng',
   },
   丙: {
-    verse: '丙火猛烈，欺霜傲雪。能煅庚金，逢辛反怯。土眾生慈，水猖顯節。虎馬犬鄉，甲木若狂。',
-    vi: 'Bính Hỏa mãnh liệt, khinh sương ngạo tuyết — luyện được Canh Kim.',
-    nature: 'Bính là mặt trời, dương hỏa thuần, mãnh liệt, không sợ Thủy khắc (khinh sương ngạo tuyết). Luyện được Canh Kim thành vật dụng. Nhưng gặp Tân (âm kim, châu ngọc) thì "phùng Tân phản khiếp" — Bính hợp Tân hoá Thủy, mất thế hỏa. Thổ nhiều thì giảm mãnh, sinh từ bi; Thủy vượng thì càng tỏ khí tiết. Dần-Ngọ-Tuất (hổ-mã-khuyển) tam hợp Hỏa thêm Giáp Mộc nuôi → Hỏa bùng cháy dữ, cần cẩn thận thái quá.',
-    need: 'thích Canh Kim để luyện; kỵ Tân (hợp hoá Thủy); cần Ra Hỏa tiết hoặc Nhâm Thủy hiệp',
+    // [loop 1190] verse đối chiếu 滴天髓 cổ bản (Wikisource 滴天髓/02 + ctext 滴天髓阐微 ch.126492):
+    //   侮雪 (bản cũ 傲雪 là dị bản hiếm), 成慈 (bản cũ 生慈 sai),
+    //   «虎馬犬鄉，甲木若來，必當焚滅» — bản cũ ghi «甲木若狂» KHÔNG có trong nguồn cổ → sửa lại.
+    verse: '丙火猛烈，欺霜侮雪。能煅庚金，逢辛反怯。土眾成慈，水猖顯節。虎馬犬鄉，甲木若來，必當焚滅。',
+    vi: 'Bính Hỏa mãnh liệt, khinh sương coi thường tuyết — luyện được Canh Kim.',
+    nature: 'Bính là mặt trời, dương hỏa thuần, mãnh liệt, không sợ Thủy khắc (khinh sương nhục tuyết). Luyện được Canh Kim thành vật dụng. Nhưng gặp Tân (âm kim, châu ngọc) thì "phùng Tân phản khiếp" — Bính hợp Tân hoá Thủy, mất thế hỏa. Thổ nhiều thì giảm mãnh, sinh từ bi; Thủy vượng thì càng tỏ khí tiết. Dần-Ngọ-Tuất (hổ-mã-khuyển = hỏa cục) mà Giáp Mộc lại đến thêm nhiên liệu → «甲木若來，必當焚滅» — Hỏa bùng dữ đến mức thiêu rụi, cần cẩn thận thái quá.',
+    need: 'thích Canh Kim để luyện; kỵ Tân (hợp hoá Thủy); cần Thổ tiết Hỏa hoặc Nhâm Thủy hiệp',
   },
   丁: {
     verse: '丁火柔中，內性昭融。抱乙而孝，合壬而忠。旺而不烈，衰而不窮。如有嫡母，可秋可冬。',
@@ -68,6 +71,61 @@ export const DITIANSUI = {
     vi: 'Quý Thủy chí nhược, tới tận Thiên Tân — rồng đức mà vận, hoá mưa mới thành.',
     nature: 'Quý là mưa móng/sương, âm thủy, chí nhược nhưng linh hoạt. Đạt "Thiên Tân" (thượng nguồn) — không sợ Hỏa/Thổ (âm thủy nhu hoà, hoá hơi thấm vào), không cần bàn Kim (Khắc/sinh nhẹ — "bất luận canh tân"). "Long đức nhi vận" — gặp Thìn (rồng) thì hoá mưa; Quý cần Mộc để tiết (nuôi mộc) hoặc Hỏa để cân (thủy hỏa ký tế). "Hợp Mộc kiến Hỏa" — Quý hợp Bính? không, Quý hợp Mậu (bính? ) → gặp Hỏa thì hoá Hỏa chân (Mậu Quý hoả hoá Hỏa). Quý mềm dẻo, phải giữ thế nhược mới tốt; kỵ Kim sinh làm mất đặc tính mưa.',
     need: 'thích Mộc tiết hoặc Hỏa ký tế; kỵ Kim sinh quá (làm thành thủy trầm); hợp Mậu hoá Hỏa',
+  },
+};
+
+// ---- 滴天髓 «何知章» (8 chẩn đoán phú – quý – bần – tiện – cát – hung – thọ – yểu) ----
+// Nguồn: 滴天髓 (Wikisource 滴天髓/41 + ctext 滴天髓阐微 ch.126492), 原注 刘基, 疏 任铁樵.
+// Đối chiếu ≥2 nguồn độc lập → đồng thuận; «官星有理會» (KHÔNG phải «自理會»), «財神終不真» (một số bản «反不真», đồng nghĩa).
+// Mỗi mục: verse cổ + tiêu chí chẩn đoán (criterion) + ghi chú nguyên chú. Bổ sung (không thay) cho LIFE_AREA_INDEX.
+export const DITIANSUI_HEZHI = {
+  富: {
+    verse: '何知其人富，財氣通門戶。',
+    vi: 'Biết người sao thì giàu? — khí Tài lưu thông ra cửa ngõ.',
+    criterion: 'Tài vượng mà Nhật Chủ cũng vượng (財旺身強), có Quan tinh vệ tài, Tài không bị Tỷ/Kiếp đoạt; cửa ngõ = Nguyệt Lệnh hoặc giờ có Tài thông đạt → Tài khí có sinh có泄, vượng suy điều hoà.',
+    note: '原注: «財旺身強，官星衛財，忌印而財能壞印，喜印而財能生官，傷官重而財神流通，無財而暗成財局» — quy về "tài khí lưu thông".',
+  },
+  貴: {
+    verse: '何知其人貴，官星有理會。',
+    vi: 'Biết người sao thì quý? — Quan tinh «có lý hội» (có sinh có泄, vượng suy适中).',
+    criterion: 'Lấy Quan/Sát làm dụng, Quan tinh có sinh (Tài sinh Quan) có泄 (Ấn hoá), vượng nhược适中, Nhật Chủ vượng đủ nhậm quan; không bị Thương Quan khắc phá.',
+    note: '«官星有理會» = Quan tinh đắc vị, có sinh hữu泄, vượng suy适中 (Wikisource 滴天髓/41).',
+  },
+  貧: {
+    verse: '何知其人貧，財神終不真。',
+    vi: 'Biết người sao thì nghèo? — «Thần Tài rốt cuộc không thật».',
+    criterion: 'Tài tinh hư — hoặc vô tài, hoặc bị Tỷ/Kiếp đoạt, hoặc quá suy không có căn, hoặc泄 tận. Tài «không chân» → nghèo.',
+    note: 'Cổ bản «財神終不真» (dị bản «反不真», đồng nghĩa). Tài bất chân = nghèo mệnh.',
+  },
+  賤: {
+    verse: '何知其人賤，官星總不見。',
+    vi: 'Biết người sao thì hạ? — Quan tinh «tổng không thấy».',
+    criterion: 'Nguyên cục vô Quan/Sát hoặc bị Thương Quan khắc tận, không có khí quý làm chủ tể danh vị → hạ tiện.',
+    note: '«官星總不見» — vô quan (hoặc quan bị thương) thì không có quý khí.',
+  },
+  吉: {
+    verse: '何知其人吉，喜神為輔弼。',
+    vi: 'Biết người sao thì cát? — Hỷ thần làm phụ tá.',
+    criterion: 'Hỷ/Dụng thần đắc vị (gần Nhật Chủ, ở tháng/giờ), được sinh phù không bị khắc → làm «phụ弼» cho Nhật Chủ → cát tường.',
+    note: 'Hỷ thần (= dụng thần tương ứng) đắc vị, phụ tá Nhật Chủ.',
+  },
+  凶: {
+    verse: '何知其人凶，忌神輾轉攻。',
+    vi: 'Biết người sao thì hung? — Kỵ thần lần lượt đến công.',
+    criterion: 'Kỵ thần nhiều, ở thế sinh vượng thuận, «輾轉» (xoay vần) khắc/thiên Nhật Chủ hoặc đoạt dụng thần → hung hiểm.',
+    note: 'Kỵ thần «輾轉» đến công phạt Nhật Chủ = hung.',
+  },
+  壽: {
+    verse: '何知其人壽，性定元神厚。',
+    vi: 'Biết người sao thì thọ? — Tính yên định, nguyên thần dày.',
+    criterion: 'Ngũ hành trung hoà, Nhật Chủ (nguyên thần) có căn hữu khí, thân vượng mà không thái quá; tính tình ổn định, mệnh cục yên → thọ.',
+    note: '«性定» (tính yên) + «元神厚» (nguyên thần = Nhật Chủ dày) → thọ.',
+  },
+  夭: {
+    verse: '何知其人夭，氣濁神枯了。',
+    vi: 'Biết người sao thì yểu? — Khí uế, thần khô.',
+    criterion: 'Ngũ hành nghịch loạn («氣濁»), Nhật Chủ vô căn hữu khí («神枯»), chiến khắc quá nặng không chế hoá → yểu.',
+    note: '«氣濁» (khí uế loạn) + «神枯» (nguyên thần khô kiệt) → yểu.',
   },
 };
 
