@@ -1380,6 +1380,8 @@ export function suggestFollowups(question, R) {
   if (has(/nghe|con duong|cong viec|career/)) return [_dung ? `Nghề nào hợp Dụng ${_dung}?` : 'Nghề nào hợp Dụng Thần tôi?', 'Khi nào sự nghiệp bứt phá?', _dyTxt ? `Đại vận ${_dyTxt} thuận nghề?` : 'Đại vận thuận nghề nào?'];
   if (has(/suc khoe|benh|health|bệnh/)) return ['Cẩn thận bệnh gì theo mệnh?', 'Năm/đại vận nào yếu sức?', _dung ? `Cách bồi bổ theo Dụng ${_dung}?` : 'Cách bồi bổ theo Dụng?'];
   if (has(/phong thuy|huong|feng shui/)) return ['Hướng nhà/hướng bàn làm việc hợp?', _dung ? `Màu sắc may mắn (Dụng ${_dung})?` : 'Màu sắc may mắn của tôi?', 'Vật phẩm phong thủy bổ Dụng?'];
+  // [loop 1165] cải vận branch — discover clothing/direction/crystal/number
+  if (has(/cai van|cai yun|bot xui|may man|cải vận|xui xeo|han lam|gi cai van|lam sao bot xui/)) return [_dung ? `Màu + hướng may mắn (Dụng ${_dung})?` : 'Màu + hướng may mắn?', 'Số điện thoại hợp mệnh?', 'Đá phong thủy hợp mệnh?', 'Đại vận nào thuận để hành sự?'];
   if (has(/tong|quy dao|doi toi|cuoc doi|overview|synthesis|chot/)) return ['Đỉnh cao đời tôi lúc nào?', 'Cẩn thận năm nào nhất?', 'Lời khuyên hành động cho tôi?'];
   if (has(/luu nien|nam nay|2026|2027|2028/)) return ['Tháng nào trong năm tốt nhất?', 'Năm này cẩn thận điều gì?', 'Đại vận đang hành có thuận không?'];
   // [loop 1116] hôm nay/day followups → discover health_today + best_hour + 3-pillar interaction
