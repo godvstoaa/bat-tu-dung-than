@@ -258,6 +258,17 @@ export const DAXIANG = {
   大过: { verse: '泽灭木，大过；君子以独立不惧，遁世无闷。', apply: 'đầm nước chìm gỗ, đại quá — quân tử độc lập không sợ, ẩn độn không buồn.' },
   咸: { verse: '山上有泽，咸；君子以虚受人。', apply: 'đầm trên núi, cảm ứng — quân tử hư tâm tiếp nhận người.' },
   恒: { verse: '雷风，恒；君子以立不易方。', apply: 'sấm gió tương dữ, hằng cửu — quân tử lập thân không đổi phương hướng.' },
+  // [loop 1212] thêm 10大象 (清华周易大象 + 易界/儒家网 冯国栋)
+  遁: { verse: '天下有山，遁；君子以远小人，不恶而严。', apply: 'trời dưới có núi, thoái tị — quân tử xa tiểu nhân, không tỏ ghét nhưng giữ nghiêm.' },
+  大壮: { verse: '雷在天上，大壮；君子以非礼弗履。', apply: 'sấm trên trời, đại tráng — quân tử hợp lễ mới làm, trái lễ không làm.' },
+  晋: { verse: '明出地上，晋；君子以自昭明德。', apply: 'mặt trời mọc trên đất, tiến — quân tử tự chiếu minh đức.' },
+  明夷: { verse: '明入地中，明夷；君子以莅众，用晦而明。', apply: 'sáng lún trong đất, minh di — quân tử trị chúng, giấu sáng tỏ vẻ ngu, trong giữ minh.' },
+  家人: { verse: '风自火出，家人；君子以言有物而行有恒。', apply: 'gió từ lửa sinh, gia nhân — quân tử nói có thực, hành có hằng.' },
+  睽: { verse: '上火下泽，睽；君子以同而异。', apply: 'lửa trên đầm dưới, lệch nhau — quân tử «đồng nhi dị» (cầu đồng giữ dị).' },
+  蹇: { verse: '山上有水，蹇；君子以反身修德。', apply: 'nước trên núi, kiên nan — quân tử phản thân (tự xét mình) tu đức.' },
+  解: { verse: '雷雨作，解；君子以赦过宥罪。', apply: 'sấm mưa交作, giải trừ — quân tử tha lỗi, giảm hình.' },
+  损: { verse: '山下有泽，损；君子以惩忿窒欲。', apply: 'đầm dưới núi, tổn — quân tử kìm sự giận (惩忿), kiềm dục vọng (窒欲).' },
+  益: { verse: '风雷，益；君子以见善则迁，有过则改。', apply: 'gió sấm tương kích, ích — quân tử thấy thiện thì theo, có lỗi thì sửa.' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };
