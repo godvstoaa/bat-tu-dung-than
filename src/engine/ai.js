@@ -1383,6 +1383,8 @@ export function suggestFollowups(question, R) {
   if (has(/luu nien|nam nay|2026|2027|2028/)) return ['Tháng nào trong năm tốt nhất?', 'Năm này cẩn thận điều gì?', 'Đại vận đang hành có thuận không?'];
   // [loop 1116] hôm nay/day followups → discover health_today + best_hour + 3-pillar interaction
   if (has(/hom nay|today|gio nao|truc|ngay nao/)) return ['Hôm nay tạng nào yếu, nên dưỡng gì?', 'Giờ nào tốt nhất hôm nay, hướng nào kỵ?', 'Hôm nay xung/hợp trụ nào (日/月/年)?'];
+  // [loop 1139] số lý followups — discover evaluate_number (loop 1137)
+  if (has(/so dien thoai|bien so|so nha|so ly|so thang|number|chon so/)) return ['Số điện thoại nào hợp mệnh tôi?', 'Biển số xe nào tốt?', 'Màu may mắn + hướng tài của tôi?'];
   // default — khám phá lá số
   return ['Dụng Thần của tôi là gì?', 'Đại vận sắp tới ra sao?', 'Tổng quan quỹ đạo đời tôi?', 'Năm nay có gì đáng chú ý?'];
 }
