@@ -269,6 +269,19 @@ export const DAXIANG = {
   解: { verse: '雷雨作，解；君子以赦过宥罪。', apply: 'sấm mưa交作, giải trừ — quân tử tha lỗi, giảm hình.' },
   损: { verse: '山下有泽，损；君子以惩忿窒欲。', apply: 'đầm dưới núi, tổn — quân tử kìm sự giận (惩忿), kiềm dục vọng (窒欲).' },
   益: { verse: '风雷，益；君子以见善则迁，有过则改。', apply: 'gió sấm tương kích, ích — quân tử thấy thiện thì theo, có lỗi thì sửa.' },
+  // [loop 1213] thêm 12大象 (Wikisource 周易/大象 + ctext 象传 + 清华)
+  需: { verse: '云上于天，需；君子以饮食宴乐。', apply: 'mây trên trời (chưa mưa), chờ đợi — quân tử ăn uống yến lạc, dưỡng sức chờ thời.' },
+  履: { verse: '上天下泽，履；君子以辩上下，定民志。', apply: 'trời trên đầm dưới, cẩn trọng bước đi — quân tử biện phân thượng hạ, định chí dân.' },
+  小畜: { verse: '风行天上，小畜；君子以懿文德。', apply: 'gió đi trên trời, tiểu súc — quân tử «ý văn đức» (làm đẹp văn đức).' },
+  同人: { verse: '天与火，同人；君子以类族辨物。', apply: 'trời với lửa, đồng nhân — quân tử phân loại tộc loại, biện biệt sự vật.' },
+  夬: { verse: '泽上于天，夬；君子以施禄及下，居德则忌。', apply: 'đầm nước dâng trên trời, quyết — quân tử ban lộc xuống dưới, ở đức thì kiêng.' },
+  姤: { verse: '天下有风，姤；后以施命诰四方。', apply: 'gió thổi dưới trời, cấu (gặp gỡ) — bậc vương hậu thi mệnh cáo tứ phương.' },
+  萃: { verse: '泽上于地，萃；君子以除戎器，戒不虞。', apply: 'đầm trên đất, tụ tập — quân tử sửa sang nhung khí, phòng bất trắc.' },
+  升: { verse: '地中生木，升；君子以顺德，积小以高大。', apply: 'cây mọc từ đất, thăng — quân tử thuận đức, tích tiểu để thành cao đại.' },
+  困: { verse: '泽无水，困；君子以致命遂志。', apply: 'đầm cạn nước, khốn cùng — quân tử «trí mệnh toại chí» (liều mạng toại nguyện chí hướng).' },
+  井: { verse: '木上有水，井；君子以劳民劝相。', apply: 'nước trên gỗ, giếng (nuôi dưỡng) — quân tử lao dân khuyến tướng (lao lực nuôi dân, khuyên giúp nhau).' },
+  革: { verse: '泽中有火，革；君子以治历明时。', apply: 'lửa trong đầm, cách (cách mệnh) — quân tử trị lịch minh thời.' },
+  鼎: { verse: '木上有火，鼎；君子以正位凝命。', apply: 'lửa trên gỗ, đỉnh — quân tử «chính vị ngưng mệnh» (đứng đúng vị, giữ vững mệnh lệnh).' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };
