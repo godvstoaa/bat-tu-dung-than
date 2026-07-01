@@ -9,7 +9,7 @@ import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
 import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU } from './src/engine/constants.js';
-import { DITIANSUI, DITIANSUI_HEZHI } from './src/engine/kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
 import { jinkoujue, renderJinkoujueCard } from './src/engine/jinkoujue.js';
@@ -279,6 +279,13 @@ assert(DITIANSUI_HEZHI['富'].verse.includes('財氣通門戶') && DITIANSUI_HEZ
 for (const k of Object.keys(DITIANSUI_HEZHI)) {
   const e = DITIANSUI_HEZHI[k];
   assert(e.verse && e.verse.startsWith('何知') && e.criterion.length > 20 && e.note.length > 15, `何知章 ${k}: verse + criterion + note`);
+}
+// [loop 1192] 滴天髓 «通論» — 6 nguyên lý chẩn đoán (任鐵樵闡微 ctext ch.126492).
+assert(Object.keys(DITIANSUI_TONGLUN).length === 6, 'DITIANSUI_TONGLUN đủ 6 nguyên lý (中和/顺逆/进退/冲机/阴阳支/生库败)');
+assert(DITIANSUI_TONGLUN['中和'].verse.includes('命貴中和') && DITIANSUI_TONGLUN['冲机'].verse.includes('旺者衝衰衰者拔'), '通論: 中和 + 冲机 verse cổ bản');
+for (const k of Object.keys(DITIANSUI_TONGLUN)) {
+  const e = DITIANSUI_TONGLUN[k];
+  assert(e.verse && e.verse.length > 10 && e.apply.length > 25, `通論 ${k}: verse + apply`);
 }
 assert(CLIMATE && Object.keys(CLIMATE).length === 12, 'CLIMATE đủ 12 nguyệt chi');
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic

@@ -79,6 +79,42 @@ export const DITIANSUI = {
   },
 };
 
+// ---- 滴天髓 «通論» (6 nguyên lý chẩn đoán xuyên suốt) ----
+// Nguồn: 任鐵樵闡微 (ctext ch.126492) — verse + 原注/任氏注 đã đối chiếu trực tiếp.
+// Bổ sung tầng nguyên lý cho điểm «trung hoà», luận xung, thuận-nghịch, tiến-thoái.
+export const DITIANSUI_TONGLUN = {
+  中和: {
+    verse: '命貴中和，偏枯終於有損；理求平正，奇異不足為憑。',
+    vi: 'Mệnh quý ở trung hoà — thiên khô rốt cuộc tổn hại; lẽ cầu ngay thẳng, kỳ dị không đủ tin.',
+    apply: 'Bốn trụ Ngũ hành cân bằng, sinh hoá lưu thông thì cát; thiên lệch (một hành quá vượng/quá suy) thì hung. Cơ sở của điểm «trung hoà» trong lá số.',
+  },
+  顺逆: {
+    verse: '要與人間開聾聵，順逆之機須理會。',
+    vi: 'Muốn mở tai điếc cho đời — phải理会 cơ «thuận nghịch».',
+    apply: 'Thuận = sinh hoá tiếp nối有情; nghịch = phản khắc chiến xung. Cốt ở Dụng Thần: hỷ dụng sinh thuận thì cát, phản nghịch kỵ thần thì hung.',
+  },
+  进退: {
+    verse: '理承氣行豈有常，進兮退兮宜抑揚。',
+    vi: 'Lý thừa khí mà hành đâu có thường — tiến,lùi nên kìm/nâng.',
+    apply: 'Ngũ hành có tiến-thoái (tương lai giả tiến=khí đang đến; thoái nhi vô khí=khí đang lui). Hỷ dụng nên vượng tướng (đang tiến), kỵ nên休囚 (đang thoái). «相妙於旺» — khí đang tiến quý hơn khí đang đỉnh (sắp thoái).',
+  },
+  冲机: {
+    verse: '旺者衝衰衰者拔，衰神衝旺旺神發。',
+    vi: 'Vượng xung suy — suy bị bật gốc; thần suy xung thần vượng — vượng lại phát.',
+    apply: 'Xung mạnh→yếu: yếu bị bật (tổn). Yếu→mạnh: mạnh bị kích phát thêm — phát thành phúc nếu là hỷ dụng, thành hoạ nếu là kỵ thần. Mấu chốt khi luận xung nguyên cục và đại vận/lưu niên vs trụ.',
+  },
+  阴阳支: {
+    verse: '陽支動且強，速達顯災祥；陰支靜且專，否泰每經年。',
+    vi: 'Dương chi động mạnh — ứng nhanh, rõ tai/cát; âm chi tĩnh chuyên — họa phúc mỗi phải qua năm mới thấy.',
+    apply: 'Tý/Dần/Thìn/Ngọ/Thân/Tuất (dương chi) ứng nghiệm nhanh; Sửu/Mão/Tỵ/Mùi/Dậu/Hợi (âm chi) ứng chậm, phải đợi lâu mới hiện.',
+  },
+  生库败: {
+    verse: '生方怕動庫宜開，敗地逢衝仔細推。',
+    vi: 'Phương sinh sợ động, kho nên mở; đất bại gặp xung phải đoán kỹ.',
+    apply: 'Dần/Thân/Tỵ/Hợi = sinh phương, kỵ xung (lưỡng bại câu thương); Thìn/Tuất/Sửu/Mùi = tứ khố, thường nên xung mở (mở kho tài/quan); Tý/Ngọ/Mão/Dậu = bại (độc khí), gặp xung phải xét hỷ/kỵ mà định.',
+  },
+};
+
 // ---- 滴天髓 «何知章» (8 chẩn đoán phú – quý – bần – tiện – cát – hung – thọ – yểu) ----
 // Nguồn: 滴天髓 (Wikisource 滴天髓/41 + ctext 滴天髓阐微 ch.126492), 原注 刘基, 疏 任铁樵.
 // Đối chiếu ≥2 nguồn độc lập → đồng thuận; «官星有理會» (KHÔNG phải «自理會»), «財神終不真» (một số bản «反不真», đồng nghĩa).
