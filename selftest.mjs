@@ -9,7 +9,7 @@ import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
 import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN } from './src/engine/constants.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD } from './src/engine/kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
 import { jinkoujue, renderJinkoujueCard } from './src/engine/jinkoujue.js';
@@ -294,6 +294,8 @@ for (const k of Object.keys(YONGSHEN_METHOD)) {
   const e = YONGSHEN_METHOD[k];
   assert(e.vi && e.principle.length > 20, `用神法 ${k}: vi + principle`);
 }
+// [loop 1199] 子平 «用神 bất khả» danh quyết (滴天髓阐微 知命章, 任铁樵引).
+assert(ZIPING_YONG_MAXIM.protect.includes('用之为财不可劫') && ZIPING_YONG_MAXIM.inverse.includes('不用财星尽可劫'), 'ZIPING_YONG_MAXIM: 用 protect + inverse (阐微 知命章)');
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
 // [loop 1197] 窮通寶鑑 «五行總論» + 5 nguyên lý mùa (Wikisource 窮通寶鑑).

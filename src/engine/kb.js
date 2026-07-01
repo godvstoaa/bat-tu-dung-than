@@ -322,6 +322,14 @@ export const YONGSHEN_METHOD = {
   },
 };
 
+// ---- 子平 «用神 bất khả» DANH QUYẾT (nguồn: 滴天髓闡微 «知命章», 任铁樵引) ----
+// [loop 1199] Nguyên lý «dụng» bảo vệ — cốt lõi của 取用神. Đối chiếu ctext 阐微 ch.126492.
+export const ZIPING_YONG_MAXIM = {
+  protect: '«用之为财不可劫，用之为官不可伤，用之印绶不可坏，用之食神不可夺» — 4 thần (Tài/Quan/Ấn/Thực) KHI là DỤNG thì không được để bị khắc phá: Tỷ đoạt Tài, Thương khắc Quan, Tài phá Ấn, Kiêu đoạt Thực.',
+  inverse: '«不用财星尽可劫，不用官星尽可伤，不用印绶尽可坏，不用食神尽可夺» — 4 thần KHI KHÔNG là dụng thì dẫu bị khắc phá cũng không hại. Mấu chốt ở 1 chữ «用».',
+  essence: 'Thần (Tài/Quan/Ấn/Thực) không vốn cát hung — giá trị tùy nó CÓ phải Dụng Thần hay không. Là dụng → phải bảo vệ; phi dụng → khắc chế cũng vô phòng.',
+};
+
 // ---- ÁNH XẠ LĨNH VỰC ĐỜI SỐNG ↔ SAO CHỦ SỰ ----
 // Dùng để trả lời câu hỏi tự do: biết lĩnh vực → biết sao/hành nào chủ đạo.
 export const LIFE_AREA_INDEX = {
