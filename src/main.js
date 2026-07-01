@@ -3490,17 +3490,22 @@ function renderLiunianChart(R) {
         years.push({ year: y, ganZhi: ln.ganZhi, score: ln.score, rating: ln.rating, yearStage: ln.yearStage || '', yearStageWeight: ln.yearStageWeight || 0, pillarStrength: ln.yearPillarStrength || '', topInt: _topInt });
       } catch (_) { years.push({ year: y, ganZhi: '?', score: 0, rating: '?', yearStage: '', yearStageWeight: 0, pillarStrength: '', topInt: '' }); }
     }
-    const bars = years.map((yr) => {
+    // [loop 1134] best/worst year markers (consistent with dayun chart 1133 + sparkline 1132)
+    let _by = 0, _wy = 0;
+    years.forEach((yr, i) => { if ((yr.score||0) > (years[_by].score||0)) _by = i; if ((yr.score||0) < (years[_wy].score||0)) _wy = i; });
+    const bars = years.map((yr, idx) => {
       const s = yr.score || 0;
       const col = yr.rating === 'Cát' ? '#2a7' : yr.rating === 'Hung' ? '#c33' : '#9a8';
       const h = Math.min(70, Math.max(4, Math.abs(s) * 2));
       const isNow = yr.year === curYear;
+      const isBest = idx === _by && !isNow;
+      const isWorst = idx === _wy && !isNow;
       return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:32px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${yr.year} ${esc(yr.ganZhi)} · ${esc(yr.rating)} (score ${s})${yr.yearStage ? ` · ${esc(yr.yearStage)}(${yr.yearStageWeight > 0 ? '旺' : yr.yearStageWeight < 0 ? 'suy' : 'chuyển'})` : ''}${yr.pillarStrength ? ` · ${esc(yr.pillarStrength)}` : ''}${yr.topInt ? ` · ${esc(yr.topInt)}` : ''}${isNow ? ' ★ NĂM HIỆN TẠI' : ''}">
         <div style="position:relative;height:70px;width:100%;display:flex;align-items:center;justify-content:center">
           <div style="position:absolute;${s>=0?'bottom:50%':'top:50%'};width:70%;max-width:30px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${isNow ? '1' : '0.85'};${isNow ? 'box-shadow:0 0 6px '+col : ''}"></div>
           <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--gold,dimgray);opacity:0.3"></div>
         </div>
-        ${isNow ? '<span style="font-size:7px;color:var(--gold-bright);font-weight:bold">▼ NAY</span>' : ''}
+        ${isNow ? '<span style="font-size:7px;color:var(--gold-bright);font-weight:bold">▼ NAY</span>' : isBest ? '<span style="font-size:7px;color:#2a7" title="Năm TỐT NHẤT">★</span>' : isWorst ? '<span style="font-size:7px;color:#c33" title="Năm XẤU NHẤT">⚠</span>' : ''}
         <span class="zh" style="font-size:10px${isNow ? ';font-weight:bold' : ''}">${esc(yr.ganZhi)}</span>
         <span class="hint" style="font-size:9px">${yr.year}</span>
         <span class="hint" style="font-size:9px;color:${col}">${esc((yr.rating||'').slice(0,6))}</span>
