@@ -4995,7 +4995,7 @@ function renderLyear(year) {
   const nobleH = _noble.has(_yz) ? '<span class="ln-noble" title="Năm có quý nhân">🌟</span>' : '';
   $('lyear').innerHTML = `
     <div class="ly-head"><span class="zh big">${esc(r.ganZhi)}</span> ${(() => { const n = ganZhiNayin(r.ganZhi); return n ? `<span class="hint-inline" title="${esc(nayinInfo(n)?.meaning || '')}">${esc(n)}</span>` : ''; })()} ${esc(year)} · can <b>${esc(GOD_VI[r.ganGod] || r.ganGod)}</b>${r.activeDayun ? ` · đại运 <span class="zh">${esc(r.activeDayun)}</span>` : ''}
-      → <span class="ln-rate ${cls}">${esc(r.rating)} (${esc(r.score)}/100)</span> ${phaseBadge} ${gejuBadge}${tsH}${nobleH}</div>
+      → <span class="ln-rate ${cls}">${esc(r.rating)} (${esc(r.score)}/100)</span> ${phaseBadge} ${gejuBadge}${tsH}${nobleH}${r.yearStage ? ` <span class="hint" style="font-size:.8em" title="十二长生 sinh khí năm">🌿${esc(r.yearStage)}</span>` : ''}${r.yearPillarStrength ? ` <span class="hint" style="font-size:.8em" title="盖头截脚 trụ năm">${esc(r.yearPillarStrength.split(' ')[0])}</span>` : ''}</div>
     <div class="ly-schools">${r.schools.map((s) => `
       <div class="ly-school ${s.d >= 0 ? 'pos' : 'neg'}">
         <div class="ly-sname">${esc(s.phai)} <span class="ly-d">${esc(dHanzi(s.d))}</span></div>
