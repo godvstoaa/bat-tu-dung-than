@@ -323,6 +323,15 @@ export const GUA_CI = {
   损: { ci: '有孚，元吉，无咎，可贞。利有攸往。曷之用？二簋可用享。', apply: 'tổn giảm — có thành, nguyên cát vô cữu; «nhị quĩ khả dụng hưởng» (giản dị cũng thành).' },
   益: { ci: '利有攸往，利涉大川。', apply: 'ích lợi — lợi tiến hành, lợi thiệp đại xuyên (vượt việc lớn).' },
   坎: { ci: '习坎：有孚，维心亨，行有尚。', apply: 'tập hãm (nước chồng nước, hiểm) — có thành, «duy tâm hanh» (chỉ tâm hanh thông), hành có thưởng.' },
+  // [loop 1218] thêm 8 quẻ (国学网周易 + 知乎 + 识典古籍)
+  师: { ci: '贞，丈人吉，无咎。', apply: 'quân đội — trinh, dùng «trưởng nhân» (bậc lão thành hiền minh) thống suất thì cát vô cữu.' },
+  比: { ci: '吉。原筮，元永贞，无咎。不宁方来，后夫凶。', apply: 'thân phụ — cát; nguyên phệ, nguyên vĩnh trinh vô cữu; «bất ninh phương lai, hậu phu hung» (đến muộn thì hung).' },
+  需: { ci: '有孚，光亨，贞吉。利涉大川。', apply: 'chờ đợi — có thành, quang hanh trinh cát, lợi thiệp đại xuyên.' },
+  履: { ci: '履虎尾，不咥人，亨。', apply: 'cẩn bước — đạp đuôi hổ mà hổ không cắn, hanh (hành sự cẩn thận).' },
+  同人: { ci: '同人于野，亨。利涉大川，利君子贞。', apply: 'đồng nhân — «đồng nhân ư dã» (hợp lòng giữa đồng), hanh, lợi thiệp đại xuyên.' },
+  大有: { ci: '元亨。', apply: 'đại hữu — nguyên hanh (phú thịnh lớn).' },
+  随: { ci: '元亨利贞，无咎。', apply: 'tòng thuận — nguyên hanh lợi trinh vô cữu.' },
+  观: { ci: '盥而不荐，有孚顒若。', apply: 'quan ngưỡng — «quán nhi bất cửu» (rửa tay chưa dâng tế), tâm thành ngưng trọng.' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };
