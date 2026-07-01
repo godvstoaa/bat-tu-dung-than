@@ -8965,6 +8965,11 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     assert(_th.matched && /Bản LA SỐ/.test(_th.reply), `[loop 1149] thyroid_nodule match + personalization`);
     const _sk = answerHealth('lão hóa da nếp nhăn', _R1146);
     assert(_sk.matched && /Bản LA SỐ/.test(_sk.reply), `[loop 1149] skin_aging match + personalization`);
+    // [loop 1155] anemia + migraine (loop 1154)
+    const _an = answerHealth('thiếu máu xanh xao', _R1146);
+    assert(_an.matched && /Bản LA SỐ/.test(_an.reply), `[loop 1155] anemia match + personalization`);
+    const _mg = answerHealth('đau nửa đầu migraine', _R1146);
+    assert(_mg.matched && /Bản LA SỐ/.test(_mg.reply), `[loop 1155] migraine match + personalization`);
   }
   // no garbled latin artifacts
   const _kb = JSON.stringify(CONDITION_KB);
