@@ -3536,7 +3536,7 @@ function renderLiunianChart(R) {
         <span class="hint" style="font-size:9px;color:${col}">${esc((yr.rating||'').slice(0,6))}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 ${curYear}–${curYear+9} · Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh. Click 💬 AI hỏi chi tiết năm nào.</p>`;
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 ${curYear}–${curYear+9} · Xanh = Cát · Đỏ = Hung · Xám = Bình. Hover: 十二长生 + 冲/合 + 盖头截脚. Click 💬 AI hỏi chi tiết năm nào.</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận trục lưu niên.</p>'; }
 }
 
