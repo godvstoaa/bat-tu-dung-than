@@ -4375,7 +4375,7 @@ function renderLiuyue(year) {
             return '';
           }).join('') + '</div>'
         : '';
-      return `<div class="lm-cell${rowCls}"><div class="lm-m">T${esc(String(m.m + 1))}${mark}</div><div class="zh">${esc(m.ganZhi)}</div><div class="lm-g">${esc(GOD_VI[m.ganGod] || m.ganGod)}</div>${tsBadge}${gejuTag}<div class="ln-rate ${cls}">${esc(m.rating)}</div></div>`;
+      return `<div class="lm-cell${rowCls}" title="${m.monthHealth ? esc(m.monthHealth) : ''}"><div class="lm-m">T${esc(String(m.m + 1))}${mark}</div><div class="zh">${esc(m.ganZhi)}</div><div class="lm-g">${esc(GOD_VI[m.ganGod] || m.ganGod)}</div>${tsBadge}${gejuTag}<div class="ln-rate ${cls}">${esc(m.rating)}</div>${m.monthHealth ? '<div class="hint" style="font-size:.55em;opacity:.7">⚕️' + esc((m.monthHealth.split(' · ')[0] || '').slice(0, 20)) + '</div>' : ''}</div>`;
     }).join('')}</div>`;
 }
 
