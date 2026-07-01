@@ -241,6 +241,13 @@ export const DAXIANG = {
   未济: { verse: '火在水上，未济；君子以慎辨物居方。', apply: 'hoả trên thuỷ, việc chưa thành — quân tử thận trọng biện biệt sự vật, đặt đúng vị.' },
   谦: { verse: '地中有山，谦；君子以裒多益寡，称物平施。', apply: 'núi giấu trong đất, khiêm tốn (nội cao ngoại bình) — quân tử bớt (裒) chỗ nhiều bù chỗ ít, cân nhắc công bằng.' },
   大有: { verse: '火在天上，大有；君子以遏恶扬善，顺天休命。', apply: 'lửa (mặt trời) trên trời, đại hữu quang minh — quân tử ngăn (遏) ác dương thiện, thuận thiên hưu mệnh.' },
+  // [loop 1210] thêm 6大象 (知乎«周易大象» + Wikisource 周易/大象)
+  师: { verse: '地中有水，师；君子以容民畜众。', apply: 'nước chứa trong đất, dân chúng tiềm ẩn — quân tử dung dân súc chúng (chứa nuôi dân, tụ lực).' },
+  比: { verse: '地上有水，比；先王以建万国，亲诸侯。', apply: 'nước chảy trên đất, thân phụ mật thiết — tiên vương kiến vạn quốc, thân chư hầu.' },
+  随: { verse: '泽中有雷，随；君子以向晦入宴息。', apply: 'sấm ẩn trong đầm, tòng thuận thời tiết — quân tử tối (hướng hối) thì vào nghỉ.' },
+  临: { verse: '泽上有地，临；君子以教思无穷，容保民无疆。', apply: 'đất trên đầm, cao lâm — quân tử giáo hoá tư lự vô cùng, dung bảo dân vô cương.' },
+  观: { verse: '风行地上，观；先王以省方、观民、设教。', apply: 'gió thổi khắp đất, quan sát — tiên vương tuần tứ bốn phương, quan dân tình, thiết giáo hoá.' },
+  复: { verse: '雷在地中，复；先王以至日闭关，商旅不行，后不省方。', apply: 'sấm ẩn trong đất, dương khí phục phản — tiên vương ngày đông chí bế quan tĩnh dưỡng.' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };

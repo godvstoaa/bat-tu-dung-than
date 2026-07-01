@@ -398,10 +398,11 @@ for (const k of Object.keys(JISHAN_PIAN)) {
 // [loop 1208] 大象传 (周易) — 5 quẻ nền tảng, verse Hán gốc (Wikisource 周易/大象).
 {
   const { DAXIANG } = await import('./src/engine/hexagram-meaning.js');
-  assert(Object.keys(DAXIANG).length === 10, `DAXIANG: 10 quẻ (5 nền tảng + 5 nổi tiếng) (got ${Object.keys(DAXIANG).length})`);
+  assert(Object.keys(DAXIANG).length === 16, `DAXIANG: 16 quẻ (got ${Object.keys(DAXIANG).length})`);
   assert(DAXIANG['乾'].verse.includes('天行健') && DAXIANG['坤'].verse.includes('厚德载物'), '大象: 乾=天行健, 坤=厚德载物');
   assert(DAXIANG['既济'].verse.includes('思患而预防之'), '大象 既济: 思患预防');
   assert(DAXIANG['泰'].verse.includes('天地交') && DAXIANG['否'].verse.includes('天地不交') && DAXIANG['谦'].verse.includes('地中有山'), '大象 [loop 1209]: 泰=天地交, 否=天地不交, 谦=地中有山');
+  assert(DAXIANG['师'].verse.includes('地中有水') && DAXIANG['复'].verse.includes('雷在地中') && DAXIANG['观'].verse.includes('风行地上'), '大象 [loop 1210]: 师=地中有水, 复=雷在地中, 观=风行地上');
   for (const k of Object.keys(DAXIANG)) {
     const e = DAXIANG[k];
     assert(e.verse && e.apply.length > 15, `大象 ${k}: verse + apply`);
