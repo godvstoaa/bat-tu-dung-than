@@ -1160,6 +1160,7 @@ QUAN TRỌNG: Thông tin lá số ĐÃ CÓ ĐỦ trong context trên. Khi user h
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
         <span style="font-size:18px"><b>${n.getDate()}/${n.getMonth()+1}</b></span>
         <span class="zh big">${r(c)}</span>
+        ${h?.ganGod?`<span class="hint" style="font-size:.75em">· ${r(P[h.ganGod]||h.ganGod)}</span>`:""}
         <span class="ln-rate ${o==="Cát"?"rate-cat":o==="Hung"||o==="Hơi kỵ"?"rate-hung":"rate-mid"}" style="font-size:14px;padding:2px 8px">${r(o)}${u!=null?` (${u})`:""}</span>
         ${p?`<span class="hint">· 🏆 Giờ tốt: <b>${r(p.vi||p.zhi)}</b> (${r(p.range||"")}, ${r(p.rating||"")})</span>`:""}
         ${g&&g.zhi!==p?.zhi?`<span class="hint">· ⚠️ Tránh giờ: <b>${r(g.vi||g.zhi)}</b> (${r(g.range||"")}, ${r(g.rating||"")})</span>`:""}
