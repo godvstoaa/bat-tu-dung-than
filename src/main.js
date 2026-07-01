@@ -3285,11 +3285,16 @@ function capsuleDayunSpark(R) {
   // [loop 1078] totalScore giàu logic (Dụng+十神+冲合) — normalize theo maxAbs để thanh cao
   //   phản ánh tương đối CÁC ĐỀ CƯƠNG, không phụ thuộc thang điểm.
   const maxAbs = Math.max.apply(null, dayun.map((d) => Math.abs(d.totalScore || 0)).concat([1]));
+  // [loop 1132] best/worst decade markers (life peak ★ / trough ⚠)
+  let _bestIdx = 0, _worstIdx = 0;
+  dayun.forEach((d, i) => { if ((d.totalScore||0) > (dayun[_bestIdx].totalScore||0)) _bestIdx = i; if ((d.totalScore||0) < (dayun[_worstIdx].totalScore||0)) _worstIdx = i; });
   const bars = dayun.map((d, i) => {
     const s = d.totalScore || 0;
     const h = Math.max(6, Math.round((Math.abs(s) / maxAbs) * 40));
     const col = s > 0 ? '#2a7' : s < 0 ? '#c33' : '#9a8';
     const isCur = i === curIdx;
+    const isBest = i === _bestIdx && i !== curIdx;
+    const isWorst = i === _worstIdx && i !== curIdx;
     const tip = `${esc(d.ganZhi || '')} [${d.startAge}-${d.startAge + 9}t] · ${esc(d.rating || '')}` +
       (d.godVi ? ` · ${esc(d.godVi)}` : '') +
       (d.stageVi ? ` · ${esc(d.stageVi)}(${d.stageWeight > 0 ? '旺' : d.stageWeight < 0 ? 'suy' : 'chuyển'})` : '') +
@@ -3298,7 +3303,9 @@ function capsuleDayunSpark(R) {
       (isCur ? ' · ★ ĐẠI VẬN HIỆN TẠI' : '');
     return `<div title="${tip}" style="flex:1;min-width:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:50px;position:relative">
       ${isCur ? '<span style="position:absolute;top:-1px;font-size:9px;line-height:1;color:var(--gold-bright,#f4d76e)">▼</span>' : ''}
-      <div style="width:80%;height:${h}px;background:${col};border-radius:2px 2px 0 0;opacity:${isCur ? '1' : '0.65'}${isCur ? ';box-shadow:0 0 5px ' + col : ''}"></div>
+      ${isBest ? '<span style="position:absolute;top:-1px;font-size:8px;line-height:1;color:#2a7" title="Đỉnh vận trục">★</span>' : ''}
+      ${isWorst ? '<span style="position:absolute;top:-1px;font-size:8px;line-height:1;color:#c33" title="Đáy vận trục">⚠</span>' : ''}
+      <div style="width:80%;height:${h}px;background:${col};border-radius:2px 2px 0 0;opacity:${isCur || isBest || isWorst ? '1' : '0.65'}${isCur ? ';box-shadow:0 0 5px ' + col : ''}"></div>
     </div>`;
   }).join('');
   return `<div id="capsule-spark" role="button" tabindex="0" aria-label="Xem vận trục đại vận chi tiết (mở nhóm Năm nay & Tương lai)" style="margin-top:10px;padding:8px 10px;border:1px solid rgba(212,175,53,0.28);border-radius:8px;cursor:pointer;background:linear-gradient(180deg,rgba(212,175,53,0.06),rgba(255,255,255,0.01))">
