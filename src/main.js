@@ -3358,6 +3358,10 @@ function renderDailyCapsule(R) {
     const _dmWx = R?.chart?.dayMaster?.wx;
     const sh = lr?.dayStage ? stageHealth(_dmWx, lr.dayStage, lr.dayStageWeight || 0) : null;
     const shCol = sh?.tone === 'suy' ? '#c33' : sh?.tone === 'thinh' ? '#2a7' : '#9a8';
+    // [loop 1095] 宜/忌 hoạt động (từ daily-guide, từng buried trong collapsed card mobile)
+    let dg2; try { dg2 = dailyGuide(R, _n.getFullYear(), _n.getMonth() + 1, _n.getDate()); } catch (_) { dg2 = null; }
+    const yiList = (dg2 && dg2.activities && dg2.activities.go) ? dg2.activities.go.slice(0, 2) : [];
+    const jiList = (dg2 && dg2.activities && dg2.activities.avoid) ? dg2.activities.avoid.slice(0, 2) : [];
 
     el.innerHTML = `
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
@@ -3371,6 +3375,7 @@ function renderDailyCapsule(R) {
       </div>
       ${lr?.advice ? `<p class="hint" style="margin-top:6px">${esc(lr.advice)}</p>` : ''}
       ${sh ? `<p class="hint" style="margin-top:4px"><b style="color:${shCol}">⚕️ ${esc(sh.headline)}</b> — ${esc(sh.advice)}</p>` : ''}
+      ${(yiList.length || jiList.length) ? `<p class="hint" style="margin-top:4px">✓ <b style="color:#2a7">宜</b>: ${yiList.length ? esc(yiList.join(', ')) : '—'} · ✗ <b style="color:#c33">忌</b>: ${jiList.length ? esc(jiList.join(', ')) : '—'} <span style="opacity:.6">(通胜宜忌 — xem chi tiết «Hôm nay làm gì»)</span></p>` : ''}
       ${capsuleDayunSpark(R)}`;
     // [loop 1077] sparkline → chạm mở nhóm + cuộn tới biểu đồ đại vận đầy đủ
     const spark = $('capsule-spark');
