@@ -2,7 +2,7 @@ import { analyze } from './engine/chart.js';
 import { Solar } from 'lunar-javascript';
 import { TOPICS, answer, hanviet, wxVi } from './engine/interpret.js';
 import { GAN, ZHI, ZHI_ORDER, WX_VI, WX_COLOR, TEN_GOD_VI, CHANGSHENG_VI } from './engine/constants.js';
-import { tenGod } from './engine/core.js';
+import { tenGod, changSheng } from './engine/core.js';
 import { dayunGodMeaning } from './engine/dayun-god.js';
 import { analyzeWealthStar } from './engine/wealth-star.js';
 import { analyzeCareerStar } from './engine/career-star.js';
@@ -127,7 +127,7 @@ import { dayNayinPersonality } from './engine/nayin-personality.js';
 import { phaseNarrative } from './engine/phase-narrative.js';
 import { personalityNarrative } from './engine/personality-narrative.js';
 import { analyzeHuaQi } from './engine/huaqi.js';
-import { dayunChangSheng, liunianChangSheng, dayunYongChangSheng, liuyueChangSheng } from './engine/dayun-changsheng.js';
+import { dayunChangSheng, liunianChangSheng, dayunYongChangSheng, liuyueChangSheng, STAGE_VI, STAGE_WEIGHT } from './engine/dayun-changsheng.js';
 import { analyzeHanNuan } from './engine/han-nuan.js';
 import { analyzeWxFlow } from './engine/wx-flow.js';
 import { classifyChartLevel } from './engine/chart-level.js';
@@ -3404,7 +3404,7 @@ function renderHourChart(R) {
       const hgt = Math.max(4, s * 0.7);
       const zhiIdx = '子丑寅卯辰巳午未申酉戌亥'.indexOf(h.zhi || '');
       const isNow = h.zhi === _curHourZhi;
-      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${esc(h.range||'')} ${esc(h.ganZhi||'')} ${esc(h.rating||'')} (${s})${isNow ? ' ★ GIỜ HIỆN TẠI' : ''}${(()=>{const _mc=meridianClock(h.zhi);return _mc?' | '+_mc.meridian+' '+_mc.organ+' ĐỈNH':'';})()}">
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:28px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${esc(h.range||'')} ${esc(h.ganZhi||'')} ${esc(h.rating||'')} (${s})${isNow ? ' ★ GIỜ HIỆN TẠI' : ''}${(()=>{const _mc=meridianClock(h.zhi);return _mc?' | '+_mc.meridian+' '+_mc.organ+' ĐỈNH':'';})()}${(()=>{const _st=h.zhi?changSheng(R.chart.dayGan,h.zhi):'';const _w=STAGE_WEIGHT[_st]||0;const _vi=STAGE_VI[_st]||'';return _vi?' | sinh khí '+_vi+'('+(_w>0?'旺':_w<0?'suy':'chuyển')+')':'';})()}">
         <div style="height:${hgt}px;width:70%;max-width:22px;background:${col};border-radius:3px 3px 0 0;opacity:${isNow ? '1' : '0.85'};${isNow ? 'box-shadow:0 0 6px '+col : ''}"></div>
         <span class="hint" style="font-size:9px${isNow ? ';font-weight:bold' : ''}">${esc(ZHI_VI[zhiIdx] || h.vi || h.zhi || '')}</span>
         ${isNow ? '<span style="font-size:7px;color:var(--gold-bright);font-weight:bold">▼ NAY</span>' : `<span class="hint" style="font-size:8px;color:${col}">${esc((h.rating||'').slice(0,4))}</span>`}
