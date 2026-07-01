@@ -14,13 +14,20 @@ const OFFICER_ROAD = { 建:'black', 满:'black', 平:'black', 收:'black', 破:'
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
 // [loop 1006] 六合 — chi ngày HỢP tuổi/Nhật Chi = CÁT (đối xứng 冲 penalty)
 const LIUHE = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
-// [loop 1095] 忌 hoạt động (通胜 getDayJi) → Việt (trước đây avoid list raw Chinese).
-const JI_VI = {
+// [loop 1095/1096] 忌/宜 hoạt động (通胜 getDayJi/getDayYi) → Việt. Export để daily-pro/
+//   move-fs/wedding-date reuse (trước đây các module này leak raw Chinese vào UI Việt).
+export const JI_VI = {
   嫁娶: 'cưới hỏi', 入宅: 'dọn nhà mới', 移徙: 'chuyển nhà', 动土: 'động thổ', 修造: 'sửa chữa/xây',
   安葬: 'an táng', 破土: 'đào huyệt', 出行: 'đi xa', 开市: 'mở hàng', 立券: 'ký hợp đồng', 交易: 'giao dịch',
   栽种: 'trồng trọt', 伐木: 'chặt gỗ', 开渠: 'đào kênh', 穿井: 'đào giếng', 破屋: 'phá nhà', 词讼: 'kiện tụng',
   安床: 'lắp giường', 安机: 'lắp máy', 上梁: 'gác đòn đông', 求医: 'khám bệnh', 针灸: 'châm cứu',
   冠笄: 'lễ thành niên', 出火: 'di chuyển bếp', 进人口: 'nhận người ở', 搬家: 'dọn nhà', 赴任: 'nhận chức',
+};
+export const YI_VI = {
+  嫁娶: 'cưới hỏi', 入宅: 'dọn nhà mới', 移徙: 'chuyển nhà', 动土: 'động thổ', 修造: 'sửa chữa/xây',
+  开市: 'mở hàng', 立券: 'ký hợp đồng', 交易: 'giao dịch', 出行: 'đi xa', 栽种: 'trồng trọt',
+  祈福: 'cầu phúc', 祭祀: 'tế tự', 安葬: 'an táng', 破屋: 'phá nhà', 求嗣: 'cầu con', 入学: 'nhập học',
+  移徙: 'chuyển nhà', 安床: 'lắp giường', 上梁: 'gác đòn đông', 开仓: 'mở kho', 纳财: 'thu tài',
 };
 const ZHI_VI_TIME = { 子:'Tý (23-1h)', 丑:'Sửu (1-3h)', 寅:'Dần (3-5h)', 卯:'Mão (5-7h)', 辰:'Thìn (7-9h)', 巳:'Tỵ (9-11h)', 午:'Ngọ (11-13h)', 未:'Mùi (13-15h)', 申:'Thân (15-17h)', 酉:'Dậu (17-19h)', 戌:'Tuất (19-21h)', 亥:'Hợi (21-23h)' };
 

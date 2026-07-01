@@ -63,8 +63,8 @@ export function evaluateWeddingDate(year, month, day, zhiA, zhiB) {
   if (hasMarryYi && !hasMarryJi) { score += 20; reasons.push('✓ Trực/宜 cát cho cưới'); }
   else if (hasMarryJi) { score -= 15; reasons.push('✗ Trực/忌 kỵ cưới'); }
 
-  if (tsYi.includes('嫁娶')) { score += 10; reasons.push('✓ Thông thắng 宜嫁娶'); }
-  if (tsJi.includes('嫁娶')) { score -= 10; reasons.push('✗ Thông thắng 忌嫁娶'); }
+  if (tsYi.includes('嫁娶')) { score += 10; reasons.push('✓ Thông thắng 宜 cưới hỏi (嫁娶)'); }
+  if (tsJi.includes('嫁娶')) { score -= 10; reasons.push('✗ Thông thắng 忌 cưới hỏi (嫁娶)'); }
 
   if (clashA) { score -= 15; reasons.push(`✗ Xung tuổi A (${ZHI[zhiA]?.vi || zhiA})`); }
   if (clashB) { score -= 15; reasons.push(`✗ Xung tuổi B (${ZHI[zhiB]?.vi || zhiB})`); }

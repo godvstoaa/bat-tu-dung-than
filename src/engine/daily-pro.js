@@ -8,6 +8,7 @@ import { Solar } from 'lunar-javascript';
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { tenGod } from './core.js';
 import { TAO_HUA, HONG_YAN, YANG_REN, YI_MA, BRANCH_GROUP, TIAN_YI, WEN_CHANG, JIANG_XING } from './shensha.js';
+import { JI_VI } from './daily-guide.js'; // [loop 1096] dịch 忌 list (trước đây raw Chinese)
 
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
 // [loop 290] 六害 (穿) + 三刑 — daily-pro từng thiếu (chỉ có 冲) nên nông hơn cả liuri (light).
@@ -150,7 +151,7 @@ export function dailyPro(R, year, month, day) {
 
   // Best activity / avoid
   const bestActivity = score >= 54 ? 'tiến thủ, ký kết, gặp quý nhân, làm việc lớn' : score >= 48 ? 'làm việc thường, tránh quyết định lớn' : 'giữ ổn định, tránh đầu tư/cãi vã/đi xa';
-  const avoidActivity = `tránh ${tsJi.slice(0, 3).join(',')}${avoid.has(dgWx) ? ', đầu tư' : ''}${e5YangRen ? ', nguy hiểm (dương nhận — huyết quang)' : ''}`;
+  const avoidActivity = `tránh ${tsJi.slice(0, 3).map((j) => JI_VI[j] || j).join(', ')}${avoid.has(dgWx) ? ', đầu tư' : ''}${e5YangRen ? ', nguy hiểm (dương nhận — huyết quang)' : ''}`;
 
   // Best direction
   const caishen = lunar.getDayPositionCaiDesc ? lunar.getDayPositionCaiDesc() : '?';

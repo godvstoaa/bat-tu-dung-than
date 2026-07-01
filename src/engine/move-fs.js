@@ -86,7 +86,7 @@ export function evaluateMoveDate(year, month, day, userZhi, birthYear, gender) {
   let score = 50;
   const reasons = [];
   if (hasMoveYi && !hasMoveJi) { score += 20; reasons.push('✓ Trực/宜 cát cho nhập trạch'); }
-  if (tsYi.includes('入宅') || tsYi.includes('移徙')) { score += 10; reasons.push('✓ Thông thắng 宜入宅/移徙'); }
+  if (tsYi.includes('入宅') || tsYi.includes('移徙')) { score += 10; reasons.push('✓ Thông thắng 宜 dọn nhà (入宅/移徙)'); }
   if (hasMoveJi) { score -= 15; reasons.push('✗ Trực/忌 kỵ nhập trạch'); }
   if (clashYou) { score -= 15; reasons.push(`✗ Xung tuổi chủ nhà (${ZHI[userZhi]?.vi})`); }
   if (bigBad) { score -= 20; reasons.push(`✗ ${bigBad} — ĐẠI HUNG`); }
