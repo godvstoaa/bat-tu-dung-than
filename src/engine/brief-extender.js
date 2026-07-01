@@ -15,6 +15,7 @@ import { analyzeSpouseStar } from './spouse-star.js';
 import { analyzeWealthStar } from './wealth-star.js';
 import { analyzeCareerStar } from './career-star.js';
 import { analyzeHealth } from './health-analysis.js';
+import { bodyConstitution } from './tcm.js'; // [loop 1147] nine body constitution in brief
 import { analyzeStudy } from './study-analysis.js';
 import { dayunGodMeaning } from './dayun-god.js';
 import { detectCombos } from './combos.js';
@@ -361,7 +362,10 @@ export function extendBrief(R) {
   try {
     const h = analyzeHealth(R);
     const _weakDir = { 木: 'Đông', 火: 'Nam', 土: 'Tây Nam', 金: 'Tây', 水: 'Bắc' }[h.weakest.wx] || '?';
-    parts.push(`SỨC KHOẺ: yếu=${h.weakest.vi}(${h.weakest.pct}%) → ${h.weakest.organs.split(',')[0]} | vượng=${h.strongest.vi}(${h.strongest.pct}%) | dưỡng=${h.remedyVi} | mùa rủi ro=${h.riskSeason} | hướng sức khoẻ: ${_weakDir} (bổ tạng yếu qua hướng ngũ hành)`);
+    parts.push(`SỨC KHOẺ: yếu=${h.weakest.vi}(${h.weakest.pct}%) → ${h.weakest.organs.split(',')[0]} | vượng=${h.strongest.vi}(${h.strongest.pct}%) | dưỡng=${h.remedyVi} | mùa rủi ro=${h.riskSeason} | hướng sức khoẻ: ${_weakDir}`);
+    // [loop 1147] nine body constitution — «体质» from ngũ hành vượng suy
+    const _bc = bodyConstitution(R);
+    if (_bc && _bc.vi) parts.push(`THỂ CHẤT (九种体质): ${_bc.vi} — ${(_bc.desc || '').slice(0, 60)}. ${(_bc.advice || '').slice(0, 60)}`);
   } catch (e) {}
 
   // Học vấn
