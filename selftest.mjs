@@ -9333,5 +9333,20 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1109] 流年 年冲/合月令 ✓ — ${_hits}/5 chart, vd ${_sample}`);
 }
 
+// [loop 1110] 流月 月冲/合月令 — computeLiuyue xét 月柱(提纲) (mirror dayun 1107/liunian 1109)
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { computeLiuyue } = await import('./src/engine/liuyue.js');
+  let _hits = 0, _sample = null;
+  for (const [y, mo, d, h, g] of [[1992,9,9,15,'nam'],[1988,1,5,6,'nam'],[1995,11,11,18,'nữ'],[1985,3,20,8,'nữ']]) {
+    const _R = analyze(y, mo, d, h, 0, g, 2026);
+    const _lm = computeLiuyue(_R, 2026, {});
+    const _hit = _lm.months.find((m) => (m.taiSui || []).some((t) => /月令/.test(t)));
+    if (_hit) { _hits++; if (!_sample) _sample = `${g}${y} T${_hit.solarMonth}: ${(_hit.taiSui.find(t=>/月令/.test(t))||'').slice(0,30)}`; }
+  }
+  assert(_hits > 0, `[loop 1110] computeLiuyue phát hiện 月冲/合月令 (${_hits}/4 chart) — vd ${_sample}`);
+  console.log(`   [loop 1110] 流月 月冲/合月令 ✓ — ${_hits}/4 chart, vd ${_sample}`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

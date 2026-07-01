@@ -64,6 +64,7 @@ export function computeLiuyue(R, solarYear, patternQuality) {
   const avoid = new Set([R.yong.ji, R.yong.chou]);
   const dayZhi = R.chart.pillars.day.zhi;           // [loop 74] Thái tuế tháng
   const yearBirthZhi = R.chart.pillars.year.zhi;
+  const monthZhi = R.chart.pillars.month.zhi;       // [loop 1110] 提纲 (sự nghiệp)
   const months = [];
 
   for (let i = 0; i < 12; i++) {
@@ -102,6 +103,9 @@ export function computeLiuyue(R, solarYear, patternQuality) {
     if (zhi === yearBirthZhi) { score -= 3; extraNotes.push('值月太岁'); }
     if (CHONG[dayZhi] === zhi && dayZhi !== yearBirthZhi) { score -= 7; extraNotes.push('⚡月支冲日支 — biến động bản thân/sức khoẻ'); }
     if (CHONG[yearBirthZhi] === zhi) { score -= 5; extraNotes.push('冲年支 (thái tuế tháng)'); }
+    // [loop 1110] 月冲月令 — lưu nguyệt chi 冲/合 月柱(提纲) = sự nghiệp biến động tháng đó (mirror dayun 1107/liunian 1109).
+    if (CHONG[monthZhi] === zhi && monthZhi !== dayZhi && monthZhi !== yearBirthZhi) { score -= 4; extraNotes.push('⚡月冲月令 — sự nghiệp/cơ nghiệp biến động tháng này'); }
+    else if (LIUHE[monthZhi] === zhi && monthZhi !== dayZhi && monthZhi !== yearBirthZhi) { score += 3; extraNotes.push('💕月合月令 — sự nghiệp thuận tháng này'); }
     if (XING[yearBirthZhi] === zhi) { score -= 4; extraNotes.push('刑月太岁 — quan phi/thị phi'); }
     if (PO[yearBirthZhi] === zhi) { score -= 3; extraNotes.push('破月太岁 — hao tài'); }
     if (HAI[yearBirthZhi] === zhi) { score -= 3; extraNotes.push('害月太岁 — tiểu nhân'); }
