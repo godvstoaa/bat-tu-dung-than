@@ -213,7 +213,7 @@ export const CONDITION_KB = [
   // [loop 1038] +5 bệnh mãn tính thường gặp
   {
     id: 'xiao_ke',
-    keywords: ['tiểu đường', 'đái tháo đường', 'đái nhiều', 'khát nước nhiều', '消渴', 'đường huyết cao', 'huyết đường', 'insulin', 'đường trong máu'],
+    keywords: ['tiểu đường', 'đái tháo đường', 'đái nhiều', 'đái ngọt', 'khát nhiều', 'khát nước', 'khát nước nhiều', 'ăn nhiều hay đói', '消渴', 'đường huyết cao', 'huyết đường', 'insulin', 'đường trong máu'],
     title: 'Tiểu đường (TIÊU KHÁT 消渴 — tam tiêu: thượng/trung/hạ tiêu)',
     summary: 'Đông-y gọi TIÊU KHÁT, chia TAM TIÊU: (a) THƯỢNG TIÊU — phổi nhiệt, khát uống nhiều; (b) TRUNG TIÊU — vị nhiệt, ăn nhiều hay đói; (c) HẠ TIÊU — thận hư, tiểu nhiều đục. Bệnh ở PHỔI - VỊ - THẬN (âm hư táo nhiệt).',
     symptoms: 'khát nhiều/uống nhiều/ăn nhiều/tiểu nhiều («tam đa»), miệng khô, người gầy, mệt, da ngứa, vết thương khó lành.',
