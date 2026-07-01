@@ -457,6 +457,8 @@ const CONDITION_WX = {
   hypertension: ['木', '火', '水'], high_cholesterol: ['土', '木'],
   // [loop 1057] +2 siêu phổ biến
   common_cold: ['金', '土'], cough: ['金', '土'],
+  // [loop 1145] +2 conditions from loop 1144
+  eye_strain: ['木', '水'], acid_reflux: ['木', '土'],
 };
 
 /**
