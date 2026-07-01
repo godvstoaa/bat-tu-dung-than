@@ -332,6 +332,19 @@ export const GUA_CI = {
   大有: { ci: '元亨。', apply: 'đại hữu — nguyên hanh (phú thịnh lớn).' },
   随: { ci: '元亨利贞，无咎。', apply: 'tòng thuận — nguyên hanh lợi trinh vô cữu.' },
   观: { ci: '盥而不荐，有孚顒若。', apply: 'quan ngưỡng — «quán nhi bất cửu» (rửa tay chưa dâng tế), tâm thành ngưng trọng.' },
+  // [loop 1219] thêm 12 quẻ (Wikisource 周易 + ctext + 百度百科 + 易学界)
+  临: { ci: '元，亨，利，贞。至于八月有凶。', apply: 'cao lâm — nguyên hanh lợi trinh; «chí vu bát nguyệt hữu hung» (thịnh cực tất suy, cảnh báo).' },
+  噬嗑: { ci: '亨。利用狱。', apply: 'cắn hợp — hanh, lợi dụng ngục (minh phạt sắc pháp).' },
+  贲: { ci: '亨。小利有攸往。', apply: 'văn sức — hanh, tiểu lợi hữu du vãng.' },
+  剥: { ci: '不利有攸往。', apply: 'bạt lạc — bất lợi hữu du vãng (nên thủ).' },
+  颐: { ci: '贞吉。观颐，自求口实。', apply: 'di dưỡng — trinh cát; «quan di, tự cầu khẩu thực» (xem cách nuôi, tự tìm nuôi mình).' },
+  大过: { ci: '栋桡。利有攸往，亨。', apply: 'đại quá — «động nhiêu» (cột nhà cong, gánh quá nặng); lợi hữu du vãng, hanh.' },
+  离: { ci: '利贞，亨。畜牝牛，吉。', apply: 'ly (phụ lập) — lợi trinh hanh; súcẫn mã (nuôi ngựa cái, nhu thuận), cát.' },
+  遁: { ci: '亨。小利贞。', apply: 'thoái tị — hanh, tiểu lợi trinh.' },
+  大壮: { ci: '利贞。', apply: 'đại tráng — lợi trinh (mạnh càng phải giữ chính).' },
+  明夷: { ci: '利艰贞。', apply: 'minh di — lợi gian trinh (giấu sáng, giữ chính trong gian nan).' },
+  睽: { ci: '小事吉。', apply: 'quỹ (lệch nhau) — tiểu sự cát (việc nhỏ thì tốt).' },
+  蹇: { ci: '利西南，不利东北。利见大人，贞吉。', apply: 'kiên nan — lợi tây nam, bất lợi đông bắc; lợi kiến đại nhân, trinh cát.' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };
