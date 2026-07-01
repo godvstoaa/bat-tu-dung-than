@@ -282,6 +282,24 @@ export const DAXIANG = {
   井: { verse: '木上有水，井；君子以劳民劝相。', apply: 'nước trên gỗ, giếng (nuôi dưỡng) — quân tử lao dân khuyến tướng (lao lực nuôi dân, khuyên giúp nhau).' },
   革: { verse: '泽中有火，革；君子以治历明时。', apply: 'lửa trong đầm, cách (cách mệnh) — quân tử trị lịch minh thời.' },
   鼎: { verse: '木上有火，鼎；君子以正位凝命。', apply: 'lửa trên gỗ, đỉnh — quân tử «chính vị ngưng mệnh» (đứng đúng vị, giữ vững mệnh lệnh).' },
+  // [loop 1214] hoàn thành nốt 17大象 — ĐỦ 64 quẻ (清华周易大象 + 知乎 + 百度百科)
+  讼: { verse: '天与水违行，讼；君子以作事谋始。', apply: 'trời nước đi ngược nhau, tranh tụng — quân tử làm việc phải mưu tính từ đầu.' },
+  豫: { verse: '雷出地奋，豫；先王以作乐崇德，殷荐之上帝，以配祖考。', apply: 'sấm nổ đất dâng, du dự — tiên vương làm nhạc sùng đức, thịnh cúng thượng đế/tổ khảo.' },
+  蛊: { verse: '山下有风，蛊；君子以振民育德。', apply: 'gió dưới núi, cỗ (sửa suy bại) — quân tử chấn dân dục đức.' },
+  坎: { verse: '水洊至，习坎；君子以常德行，习教事。', apply: 'nước chồng nước (tập hãm), hiểm trở — quân tử «thường đức hành, tập giáo sự» (đức hạnh hằng, luyện việc giáo hoá).' },
+  离: { verse: '明两作，离；大人以继明照于四方。', apply: 'sáng chồng sáng, ly — đại nhân tiếp nối ánh sáng chiếu bốn phương.' },
+  震: { verse: '洊雷，震；君子以恐惧修省。', apply: 'sấm chồng sấm, chấn động — quân tử «khủng cụ tu tỉnh» (khiếp sợ mà tự tu tỉnh).' },
+  艮: { verse: '兼山，艮；君子以思不出其位。', apply: 'núi chồng núi, cấn (dừng) — quân tử «tư bất xuất kỳ vị» (nghĩ không ra ngoài vị mình).' },
+  渐: { verse: '山上有木，渐；君子以居贤德善俗。', apply: 'cây trên núi, tiệm tiến — quân tử cư hiền đức, thiện hoá phong tục.' },
+  归妹: { verse: '泽上有雷，归妹；君子以永终知敝。', apply: 'sấm trên đầm, quy muội — quân tử «vĩnh chung tri tệ» (kết thúc bền lâu, biết trước suy tàn).' },
+  丰: { verse: '雷电皆至，丰；君子以折狱致刑。', apply: 'sấm chớp cùng tới, phong (phong thịnh) — quân tử phán ngục, thi hành hình phạt.' },
+  旅: { verse: '山上有火，旅；君子以明慎用刑而不留狱。', apply: 'lửa trên núi, lữ (lưu lạc) — quân tử minh thận dụng hình, không án treo.' },
+  巽: { verse: '随风，巽；君子以申命行事。', apply: 'gió theo gió, tốn (thuận) — quân tử «thân mệnh hành sự» (lặp mệnh lệnh, thi hành).' },
+  兑: { verse: '丽泽，兑；君子以朋友讲习。', apply: 'hai đầm liền nhau, đoài (vui) — quân tử cùng bằng hữu giảng tập.' },
+  涣: { verse: '风行水上，涣；先王以享于帝立庙。', apply: 'gió thổi mặt nước, hoán (tan) — tiên vương cúng thượng đế, lập tông miếu.' },
+  节: { verse: '泽上有水，节；君子以制数度，议德行。', apply: 'nước trên đầm, tiết (tiết độ) — quân tử «chế sổ độ, nghị đức hành» (định mức độ, bàn đức hạnh).' },
+  中孚: { verse: '泽上有风，中孚；君子以议狱缓死。', apply: 'gió trên đầm, trung phù (lòng thực) — quân tử nghị ngục hoãn tử (xét ngục, hoãn án tử).' },
+  小过: { verse: '山上有雷，小过；君子以行过乎恭，丧过乎哀，用过乎俭。', apply: 'sấm trên núi, tiểu quá — quân tử hành hơi cung (kính), tang hơi ai, dụng hơi kiệm (hơi quá về tốt).' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };
