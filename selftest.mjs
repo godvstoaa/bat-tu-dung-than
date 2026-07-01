@@ -409,18 +409,22 @@ for (const k of Object.keys(JISHAN_PIAN)) {
   assert(DAXIANG['革'].verse.includes('泽中有火') && DAXIANG['鼎'].verse.includes('正位凝命') && DAXIANG['困'].verse.includes('致命遂志'), '大象 [loop 1213]: 革=泽中有火, 鼎=正位凝命, 困=致命遂志');
   assert(DAXIANG['震'].verse.includes('恐惧修省') && DAXIANG['艮'].verse.includes('思不出其位') && DAXIANG['中孚'].verse.includes('议狱缓死'), '大象 [loop 1214]: 震=恐惧修省, 艮=思不出其位, 中孚=议狱缓死');
   // [loop 1215] 卦辞 (周易) — 7 quẻ nổi bật.
-  assert(Object.keys(GUA_CI).length === 51, `GUA_CI: 51 quẻ (got ${Object.keys(GUA_CI).length})`);
+  assert(Object.keys(GUA_CI).length === 64, `GUA_CI: ĐỦ 64 quẻ (got ${Object.keys(GUA_CI).length})`);
   assert(GUA_CI['乾'].ci === '元，亨，利，贞。' && GUA_CI['未济'].ci.includes('小狐汔济') && GUA_CI['泰'].ci.includes('小往大来'), '卦辞: 乾=元亨利贞, 未济=小狐汔济, 泰=小往大来');
   assert(GUA_CI['蒙'].ci.includes('童蒙求我') && GUA_CI['复'].ci.includes('七日来复') && GUA_CI['损'].ci.includes('二簋'), '卦辞 [loop 1217]: 蒙=童蒙求我, 复=七日来复, 损=二簋可用享');
   assert(GUA_CI['师'].ci.includes('丈人') && GUA_CI['履'].ci.includes('不咥人') && GUA_CI['比'].ci.includes('不宁方来'), '卦辞 [loop 1218]: 师=丈人, 履=不咥人, 比=不宁方来');
   assert(GUA_CI['临'].ci.includes('八月有凶') && GUA_CI['明夷'].ci === '利艰贞。' && GUA_CI['蹇'].ci.includes('利西南'), '卦辞 [loop 1219]: 临=八月有凶, 明夷=利艰贞, 蹇=利西南');
   assert(GUA_CI['革'].ci.includes('巳日乃孚') && GUA_CI['震'].ci.includes('震惊百里') && GUA_CI['井'].ci.includes('改邑不改井'), '卦辞 [loop 1220]: 革=巳日乃孚, 震=震惊百里, 井=改邑不改井');
+  assert(GUA_CI['否'].ci.includes('大往小来') && GUA_CI['蛊'].ci.includes('先甲三日') && GUA_CI['中孚'].ci.includes('豚鱼吉'), '卦辞 [loop 1221]: 否=大往小来, 蛊=先甲三日, 中孚=豚鱼吉');
   // [loop 1216] regression guard: 64 DAXIANG keys khớp HEX_MEANING (chống typo tên quẻ).
   const HM = (await import('./src/engine/hexagram-meaning.js'));
   const hexKeySet = new Set([...Object.keys(HM.HEX_MEANING), ...Object.keys(HM.SIMP2TRAD)]);
   const daxMissing = Object.keys(DAXIANG).filter((k) => !hexKeySet.has(k));
   assert(daxMissing.length === 0, `DAXIANG keys đều hợp lệ trong HEX_MEANING (lệch: ${daxMissing.join(',')})`);
   assert(Object.keys(HM.HEX_MEANING).length === 64, `HEX_MEANING đủ 64 quẻ (got ${Object.keys(HM.HEX_MEANING).length})`);
+  // guard: GUA_CI keys ⊆ HEX_MEANING (hexKeySet đã định nghĩa ở trên)
+  const gciMissing = Object.keys(GUA_CI).filter((k) => !hexKeySet.has(k));
+  assert(gciMissing.length === 0, `GUA_CI keys đều hợp lệ HEX_MEANING (lệch: ${gciMissing.join(',')})`);
   for (const k of Object.keys(DAXIANG)) {
     const e = DAXIANG[k];
     assert(e.verse && e.apply.length > 15, `大象 ${k}: verse + apply`);

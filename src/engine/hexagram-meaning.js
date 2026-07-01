@@ -360,6 +360,20 @@ export const GUA_CI = {
   渐: { ci: '女归吉，利贞。', apply: 'tiệm tiến — nữ quy cát, lợi trinh.' },
   丰: { ci: '亨，王假之，勿忧，宜日中。', apply: 'phong thịnh — hanh, vương giả chi, vật ưu, «nghi nhật trung» (nên giữ lúc thái dương đỉnh).' },
   旅: { ci: '小亨，旅贞吉。', apply: 'lưu lạc — tiểu hanh, lữ trinh cát.' },
+  // [loop 1221] hoàn thành nốt 13卦辞 — ĐỦ 64/64 quẻ (周易本义/ctext/Wikisource/读典籍)
+  讼: { ci: '有孚，窒惕，中吉，终凶。利见大人，不利涉大川。', apply: 'tranh tụng — «trất trắc», trung cát chung hung; lợi kiến đại nhân, bất lợi thiệp đại xuyên.' },
+  小畜: { ci: '亨。密云不雨，自我西郊。', apply: 'tiểu súc — hanh; «mật vân bất vũ, tự ngã tây giao» (mây dày chưa mưa).' },
+  否: { ci: '否之匪人，不利君子贞，大往小来。', apply: 'bĩ (bế tắc) — bỉ chi phi nhân, bất lợi quân tử trinh, đại vãng tiểu lai (thiên địa bất giao).' },
+  豫: { ci: '利建侯行师。', apply: 'du dự — lợi kiến hầu, hành sư (phong hầu, xuất binh).' },
+  蛊: { ci: '元亨，利涉大川。先甲三日，后甲三日。', apply: 'cỗ (sửa suy bại) — nguyên hanh; «tiên giáp tam nhật, hậu giáp tam nhật» (trước/sau giáp 3 ngày — mưu tính + chỉnh đốn).' },
+  大畜: { ci: '利贞，不家食，吉。利涉大川。', apply: 'đại súc — lợi trinh; «bất gia thực» (ra làm quan hưởng lộc triều), cát.' },
+  归妹: { ci: '征凶，无攸利。', apply: 'quy muội — chinh hung, vô du lợi.' },
+  巽: { ci: '小亨，利有攸往，利见大人。', apply: 'tốn (nhập/thuận) — tiểu hanh, lợi hữu du vãng, lợi kiến đại nhân.' },
+  兑: { ci: '亨，利贞。', apply: 'đoài (vui) — hanh, lợi trinh.' },
+  涣: { ci: '亨。王假有庙，利涉大川，利贞。', apply: 'hoán (tan/phân tán) — hanh; vương giả hữu miếu, lợi thiệp đại xuyên, lợi trinh.' },
+  节: { ci: '亨。苦节，不可贞。', apply: 'tiết độ — hanh; «khổ tiết bất khả trinh» (tiết quá khổ thì không thể giữ).' },
+  中孚: { ci: '豚鱼吉。利涉大川。利贞。', apply: 'trung phù (lòng thực) — «đồn ngư cát» (tín đến tận cá heo), lợi thiệp đại xuyên, lợi trinh.' },
+  小过: { ci: '亨，可小事，不可大事。飞鸟遗之音，不宜上，宜下，大吉。', apply: 'tiểu quá — hanh, khả tiểu sự bất khả đại sự; «phi điểu di chi âm», bất nghi thượng, nghi hạ, đại cát.' },
 };
 
 export { HEX_MEANING, SIMP2TRAD };
