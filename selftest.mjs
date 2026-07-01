@@ -315,6 +315,20 @@ for (const k of Object.keys(WUYAN_DUBU)) {
   }
   console.log(`   [loop 1201] 八卦万物类象: 8 quái × (自然/身体/动物/家人/方位/季节/德) ✓`);
 }
+// [loop 1202] 二十八宿 regression guard — lock 28 túc + 4 tượng × 7 + đúng thứ tự 角→轸.
+{
+  const { XIU_TABLE } = await import('./src/engine/ershibaxiu.js');
+  const xiu = Object.keys(XIU_TABLE);
+  assert(xiu.length === 28, `28宿 đủ 28 túc (got ${xiu.length})`);
+  const order = '角亢氐房心尾箕斗牛女虚危室壁奎娄胃昴毕觜参井鬼柳星张翼轸';
+  assert(xiu.join('') === order, `28宿 đúng thứ tự Đông→Bắc→Tây→Nam (got ${xiu.join('')})`);
+  const beasts = {};
+  for (const k of xiu) beasts[XIU_TABLE[k].beast] = (beasts[XIU_TABLE[k].beast] || 0) + 1;
+  const ok = Object.keys(beasts).length === 4 && Object.values(beasts).every((n) => n === 7);
+  assert(ok, `28宿: 4 tượng × 7 túc (got ${JSON.stringify(beasts)})`);
+  assert(xiu.every((k) => XIU_TABLE[k].tone && XIU_TABLE[k].yi && XIU_TABLE[k].ji), '28宿: mỗi túc có tone + 宜 + 忌');
+  console.log(`   [loop 1202] 28宿: 28 túc, 4 tượng × 7, đúng thứ tự, đủ tone/宜/忌 ✓`);
+}
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
 // [loop 1197] 窮通寶鑑 «五行總論» + 5 nguyên lý mùa (Wikisource 窮通寶鑑).
