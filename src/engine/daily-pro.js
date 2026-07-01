@@ -153,9 +153,11 @@ export function dailyPro(R, year, month, day) {
   const bestActivity = score >= 54 ? 'tiến thủ, ký kết, gặp quý nhân, làm việc lớn' : score >= 48 ? 'làm việc thường, tránh quyết định lớn' : 'giữ ổn định, tránh đầu tư/cãi vã/đi xa';
   const avoidActivity = `tránh ${tsJi.slice(0, 3).map((j) => JI_VI[j] || j).join(', ')}${avoid.has(dgWx) ? ', đầu tư' : ''}${e5YangRen ? ', nguy hiểm (dương nhận — huyết quang)' : ''}`;
 
-  // Best direction
-  const caishen = lunar.getDayPositionCaiDesc ? lunar.getDayPositionCaiDesc() : '?';
-  const xishen = lunar.getDayPositionXiDesc ? lunar.getDayPositionXiDesc() : '?';
+  // Best direction (财神/喜神) — [loop 1100] dịch raw Chinese → Việt (trước đây leak «西南»)
+  const _DIR_VI = { '正东': 'chính Đông', '正南': 'chính Nam', '正西': 'chính Tây', '正北': 'chính Bắc', '东北': 'Đông Bắc', '东南': 'Đông Nam', '西北': 'Tây Bắc', '西南': 'Tây Nam', '东': 'Đông', '南': 'Nam', '西': 'Tây', '北': 'Bắc', '中宫': 'giữa', '中': 'giữa', '财神': 'Tài thần', '喜神': 'Hỷ thần', '方': 'hướng' };
+  const _trDir = (s) => { if (!s || s === '?') return s || '?'; let r = String(s); for (const k of ['正东','正南','正西','正北','东北','东南','西北','西南','中宫','财神','喜神','东','南','西','北','中','方']) r = r.split(k).join(_DIR_VI[k]); return r; };
+  const caishen = _trDir(lunar.getDayPositionCaiDesc ? lunar.getDayPositionCaiDesc() : '?');
+  const xishen = _trDir(lunar.getDayPositionXiDesc ? lunar.getDayPositionXiDesc() : '?');
 
   const advice = score >= 54
     ? `Hôm nay CÁT (${score}/100). Nên: ${bestActivity}. Hướng: ${caishen} (tài) / ${xishen} (hỷ).`
