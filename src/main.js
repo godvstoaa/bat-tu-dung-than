@@ -3362,7 +3362,11 @@ function renderDailyCapsule(R) {
     let dg2; try { dg2 = dailyGuide(R, _n.getFullYear(), _n.getMonth() + 1, _n.getDate()); } catch (_) { dg2 = null; }
     const yiList = (dg2 && dg2.activities && dg2.activities.go) ? dg2.activities.go.slice(0, 2) : [];
     const jiList = (dg2 && dg2.activities && dg2.activities.avoid) ? dg2.activities.avoid.slice(0, 2) : [];
-
+    // [loop 1112] tóm tắt tương tác trụ hôm nay (冲/合 với 日/月/年 trụ) — actionable at-a-glance
+    const _schools = (lr && lr.schools) || [];
+    const _clash = _schools.filter((s) => /Xung|xung|冲|Hại|Hình/i.test(s.phai)).sort((a, b) => a.d - b.d)[0];
+    const _harm = _schools.filter((s) => /Hợp|hợp|合/i.test(s.phai)).sort((a, b) => b.d - a.d)[0];
+    const _intLine = [_clash ? `⚡ ${esc(_clash.phai)}` : '', _harm ? `💕 ${esc(_harm.phai)}` : ''].filter(Boolean).join(' · ');
     el.innerHTML = `
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
         <span style="font-size:18px"><b>${_n.getDate()}/${_n.getMonth()+1}</b></span>
@@ -3376,6 +3380,7 @@ function renderDailyCapsule(R) {
       ${lr?.advice ? `<p class="hint" style="margin-top:6px">${esc(lr.advice)}</p>` : ''}
       ${sh ? `<p class="hint" style="margin-top:4px"><b style="color:${shCol}">⚕️ ${esc(sh.headline)}</b> — ${esc(sh.advice)}</p>` : ''}
       ${(yiList.length || jiList.length) ? `<p class="hint" style="margin-top:4px">✓ <b style="color:#2a7">宜</b>: ${yiList.length ? esc(yiList.join(', ')) : '—'} · ✗ <b style="color:#c33">忌</b>: ${jiList.length ? esc(jiList.join(', ')) : '—'} <span style="opacity:.6">(通胜宜忌 — xem chi tiết «Hôm nay làm gì»)</span></p>` : ''}
+      ${_intLine ? `<p class="hint" style="margin-top:4px">🜂 Trụ hôm nay: ${_intLine}</p>` : ''}
       ${capsuleDayunSpark(R)}`;
     // [loop 1077] sparkline → chạm mở nhóm + cuộn tới biểu đồ đại vận đầy đủ
     const spark = $('capsule-spark');
