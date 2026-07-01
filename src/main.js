@@ -3366,6 +3366,8 @@ function renderDailyCapsule(R) {
     let dg2; try { dg2 = dailyGuide(R, _n.getFullYear(), _n.getMonth() + 1, _n.getDate()); } catch (_) { dg2 = null; }
     const yiList = (dg2 && dg2.activities && dg2.activities.go) ? dg2.activities.go.slice(0, 2) : [];
     const jiList = (dg2 && dg2.activities && dg2.activities.avoid) ? dg2.activities.avoid.slice(0, 2) : [];
+    // [loop 1130] màu may mắn hôm nay (từ dailyGuide color — Dụng Thần ngũ hành)
+    const _dayColor = dg2 && dg2.color ? (Array.isArray(dg2.color.primary) ? dg2.color.primary[0] : dg2.color.primary) : '';
     // [loop 1112] tóm tắt tương tác trụ hôm nay (冲/合 với 日/月/年 trụ) — actionable at-a-glance
     const _schools = (lr && lr.schools) || [];
     const _clash = _schools.filter((s) => /Xung|xung|冲|Hại|Hình/i.test(s.phai)).sort((a, b) => a.d - b.d)[0];
@@ -3384,6 +3386,7 @@ function renderDailyCapsule(R) {
       ${lr?.advice ? `<p class="hint" style="margin-top:6px">${esc(lr.advice)}</p>` : ''}
       ${sh ? `<p class="hint" style="margin-top:4px"><b style="color:${shCol}">⚕️ ${esc(sh.headline)}</b> — ${esc(sh.advice)}</p>` : ''}
       ${(yiList.length || jiList.length) ? `<p class="hint" style="margin-top:4px">✓ <b style="color:#2a7">宜</b>: ${yiList.length ? esc(yiList.join(', ')) : '—'} · ✗ <b style="color:#c33">忌</b>: ${jiList.length ? esc(jiList.join(', ')) : '—'} <span style="opacity:.6">(通胜宜忌 — xem chi tiết «Hôm nay làm gì»)</span></p>` : ''}
+      ${_dayColor ? `<p class="hint" style="margin-top:4px">👕 Màu nay: <b>${esc(_dayColor)}</b></p>` : ''}
       ${_intLine ? `<p class="hint" style="margin-top:4px">🜂 Trụ hôm nay: ${_intLine}</p>` : ''}
       ${capsuleDayunSpark(R)}`;
     // [loop 1077] sparkline → chạm mở nhóm + cuộn tới biểu đồ đại vận đầy đủ
