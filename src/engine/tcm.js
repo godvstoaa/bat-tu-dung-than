@@ -522,14 +522,14 @@ const CONDITION_WX = {
  */
 export function answerHealth(q, R) {
   const ql = (q || '').toLowerCase();
-  // [loop 1150] relevance-scored match: trước đây .find() lấy FIRST match → nếu nhiều conditions
-  //   khớp (vd «ợ chua đau bụng» → cả stomach_pain + acid_reflux), có thể lấy sai thứ tự.
-  //   Nay chọn condition có TỔNG ĐỘ DÀI keyword matches CAO NHẤT (relevance).
+  // [loop 1150/1162] relevance-scored match: tổng keyword-length CHÍNH + keyword-count
+  //   PHỤ (tiebreak). Vd «đau khớp sưng» → gout (2 keywords: đau khớp + sưng khớp)
+  //   thắng back_knee (1 keyword: đau khớp) dù cùng tổng length.
   const _scored = CONDITION_KB.map((c) => {
-    let _score = 0;
-    for (const k of c.keywords) { if (ql.includes(k.toLowerCase())) _score += k.length; }
-    return { c, _score };
-  }).filter((x) => x._score > 0).sort((a, b) => b._score - a._score);
+    let _score = 0, _count = 0;
+    for (const k of c.keywords) { if (ql.includes(k.toLowerCase())) { _score += k.length; _count++; } }
+    return { c, _score, _count };
+  }).filter((x) => x._score > 0).sort((a, b) => b._score - a._score || b._count - a._count);
   const hit = _scored.length ? _scored[0].c : null;
   if (!hit) return { ok: false, matched: false, reply: 'Tôi chưa có cơ sở tri thức đông-y cụ thể cho câu này. Hãy hỏi về: thận hư/thủ dâm/sinh lý, can hoả/stress/đau đầu, tỳ vị/tiêu hoá, mất ngủ/rụng tóc/mụn/kinh nguyệt, mỏi mắt, trào ngược, bướu cổ, lão hóa da, thiếu máu, đau nửa đầu/migraine, ho/khò khè, huyết áp cao, mỡ máu, đau khớp/thắt lưng — hoặc xem phân tích sức khoẻ theo ngũ hành của lá số.' };
   let reply = `【${hit.title}】\n${hit.summary}\n`;
