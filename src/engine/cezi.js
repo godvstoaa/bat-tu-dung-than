@@ -35,6 +35,18 @@ export const CEZI_METHOD = {
   观梅: { vi: 'Quan Mai', principle: 'linh cảm tức thời (梅花 tâm pháp) — «tâm kính quang minh, tuỳ vật đỗ chiếu», bất cố định thức' },
 };
 
+// ---- 心易六法 (《测字秘牒》卷二, 借庖羲六义) — 6 法 ứng dụng六书 vào测字 ----
+// [loop 1225] Nguồn: Wikisource 測字秘牒 + ctext + 百度百科. Note: 程省 dùng «借意» thay
+//   «假借» (六书 truyền thống) —贴合测字 thực tế.
+export const CEZI_XINYI = {
+  象形: { vi: 'Tượng Hình', principle: 'lấy hình chữ tượng vật (山 như núi, 水 như sông) để đoán cát hung' },
+  会意: { vi: 'Hội Ý', principle: 'hợp chữ/nghĩa, hội thông ý để đoán (vd 人+言=信)' },
+  借意: { vi: 'Tịch Ý', principle: 'mượn nghĩa dẫn申 / liên quan của chữ để giải (khác 假借 truyền thống)' },
+  指事: { vi: 'Chỉ Sự', principle: 'từ cấu tạo chữ nhận ra sự vật được chỉ (vd 本/末/上/下)' },
+  形声: { vi: 'Hình Thanh', principle: 'kết hợp hình bô + thanh bô để phân tích (vd 江=水+工)' },
+  转注: { vi: 'Chuyển Chú', principle: 'chú thích cho nhau, dẫn申辗转 ý nghĩa để đoán (vd 老/考)' },
+};
+
 // ---------------------------------------------------------------------------
 // 8 QUÁI (theo 先天 số 1-8). lines: 3 hào từ dưới lên (1=dương, 0=âm).
 // Map số 1-8 → quái (sau modulo 8, ta sẽ +1 và dùng index này).

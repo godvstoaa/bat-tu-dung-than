@@ -387,6 +387,17 @@ for (const k of Object.keys(JISHAN_PIAN)) {
   }
   console.log(`   [loop 1224] 测字十法: 10 pháp × (vi/principle/example) — 测字秘牒 ✓`);
 }
+// [loop 1225] 心易六法 (《测字秘牒》卷二).
+{
+  const { CEZI_XINYI } = await import('./src/engine/cezi.js');
+  assert(Object.keys(CEZI_XINYI).length === 6, `CEZI_XINYI: 6 pháp (got ${Object.keys(CEZI_XINYI).length})`);
+  assert(CEZI_XINYI['借意'] && CEZI_XINYI['会意'].principle.includes('人+言=信'), '心易六法: có 借意 (thay 假借), 会意 ví dụ 人+言=信');
+  for (const k of Object.keys(CEZI_XINYI)) {
+    const e = CEZI_XINYI[k];
+    assert(e.vi && e.principle.length > 10, `心易六法 ${k}: vi + principle`);
+  }
+  console.log(`   [loop 1225] 心易六法: 6 pháp (象形/会意/借意/指事/形声/转注) — 测字秘牒卷二 ✓`);
+}
 // [loop 1204] 奇门遁甲 八神 类象 (知乎/网易«奇门遁甲八神详解») — ý nghĩa thần盘.
 {
   const { BASHEN_VI, GONG_STAR, DOOR_AT } = await import('./src/engine/qimen.js');
