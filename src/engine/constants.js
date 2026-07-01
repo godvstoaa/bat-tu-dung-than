@@ -113,6 +113,17 @@ export const TIAOHOU = {
   癸: { 寅:['辛','丙'], 卯:['庚','辛'], 辰:['丙','辛','甲'], 巳:['辛'], 午:['庚','辛','壬','癸'], 未:['庚','辛','壬','癸'], 申:['丁'], 酉:['辛','丙'], 戌:['辛','甲','壬','癸'], 亥:['庚','辛','戊','丁'], 子:['丙','辛'], 丑:['丙','丁'] },
 };
 
+// ---- 窮通寶鑑 «調候» NGUYÊN LÝ (đối chiếu ctext 窮通寶鑑 ch.208379) ----
+// [loop 1193] TIAOHOU (trên) đã spot-verify vs 窮通寶鑑: 甲寅=丙主癸佐, 甲卯/辰,
+// 庚申=丁主甲佐, 丙午=壬主庚佐 → bảng ĐÚNG. Đây là tầng nguyên lý (WHY) bổ sung.
+export const TIAOHOU_PRINCIPLE = {
+  rule: '調候 cốt lấy khí hậu (寒暖燥濕) của nguyệt lệnh làm tiên — «天時優先», sau mới phối vượng suy Nhật Chủ.',
+  jianlu: '同是月令建禄，一則喜泄不喜克，一則喜克不喜泄 — 甲生寅 (建禄) 喜丙火泄秀; 庚生申 (建禄) 喜丁火克煉. Cùng建禄 mà 用 ngược nhau → tùy bản chất Nhật Chủ.',
+  chunmu: '春月之木漸有生長之象，初春猶寒當以火暖之 (丙)；水多則克、損精神。木旺重見必用庚金斲鑿，可成棟梁。',
+  gengshen: '七月庚金剛銳最緊，要用丁火鍛鍊 (非丁不能造庚)，次用甲木引丁 — 忌壬癸水克丁。',
+  bingwu: '午月丙火愈炎，得壬庚高透方為上命 — 壬水既濟為主，庚金生壬為佐；防戊己克壬、丁壬化合。',
+};
+
 // ---- VÒNG TRƯỜNG SINH (十二長生) cho Nhật Chủ tại Địa Chi ----
 // Thứ tự 12 trạng thái theo chiều thuận của can Dương.
 export const CHANGSHENG_STAGES = [

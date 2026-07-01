@@ -8,7 +8,7 @@ import { composeAnswer, detectIntent } from './src/engine/nlg.js';
 import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
-import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU } from './src/engine/constants.js';
+import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE } from './src/engine/constants.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
@@ -287,6 +287,12 @@ for (const k of Object.keys(DITIANSUI_TONGLUN)) {
   const e = DITIANSUI_TONGLUN[k];
   assert(e.verse && e.verse.length > 10 && e.apply.length > 25, `通論 ${k}: verse + apply`);
 }
+// [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
+assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
+assert(TIAOHOU['甲']['寅'].join() === '丙,癸', '穷通宝鑑 甲寅: 丙主癸佐 (初春猶寒，丙暖癸潤)');
+assert(TIAOHOU['甲']['辰'].join() === '庚,丁,壬', '穷通宝鑑 甲辰: 庚丁壬 (季春木老，用庚必須有丁，無庚用壬)');
+assert(TIAOHOU['庚']['申'].join() === '丁,甲', '穷通宝鑑 庚申: 丁主甲佐 (秋金剛銳，丁鍊甲引)');
+assert(TIAOHOU['丙']['午'].join() === '壬,庚', '穷通宝鑑 丙午: 壬主庚佐 (夏火炎，壬既濟庚生壬)');
 assert(CLIMATE && Object.keys(CLIMATE).length === 12, 'CLIMATE đủ 12 nguyệt chi');
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic
 const R1990 = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
