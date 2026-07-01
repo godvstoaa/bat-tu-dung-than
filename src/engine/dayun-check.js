@@ -24,6 +24,8 @@ const SANHE = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳
 export function checkDayunInteractions(chart, dayun) {
   const dayGan = chart.dayGan;
   const dayZhi = chart.pillars.day.zhi;
+  const monthZhi = chart.pillars.month.zhi; // [loop 1108] 提纲 (sự nghiệp)
+  const yearZhi = chart.pillars.year.zhi;   // [loop 1108] 本命 (gia căn)
   const dayGanZhi = dayGan + dayZhi;
   const results = [];
 
@@ -82,6 +84,20 @@ export function checkDayunInteractions(chart, dayun) {
     // [loop 1042] 三合 bán-hợp — đại vận chi cùng cụm 三合 với Nhật Chi → thuận nhẹ.
     else if (!zhiChong && dgZhi !== dayZhi && SANHE.some((g) => g.includes(dayZhi) && g.includes(dgZhi))) {
       notes.push('🔗 Đại vận bán-hợp日 — chi cùng cụm 三合 với Nhật Chi: thập niên khá thuận (yếu hơn lục hợp).');
+    }
+    // [loop 1108] 冲/合 月柱(提纲) + 年柱(本命) — mirror rankDayun loop 1107.
+    //   «运冲提纲动摇事业根基», «冲本命伤长辈/根». Mỗi chi 1 冲 → loại trừ nhau với nhật trụ.
+    if (!zhiChong && CHONG[monthZhi] === dgZhi) {
+      notes.push('⚡ 大运冲提纲 (月柱) — ĐỘNG YẾU SỰ NGHIỆP/cơ nghiệp («运冲提纲动摇根基»): biến động công việc/nền tảng.');
+      severity += 1;
+    } else if (!zhiChong && CHONG[yearZhi] === dgZhi) {
+      notes.push('⚡ 大运冲本命 (年柱) — thương trưởng bối/gia căn: biến động gia đình/người lớn tuổi.');
+      severity += 1;
+    }
+    if (LIUHE[monthZhi] === dgZhi) {
+      notes.push('💕 大运合月 (提纲) — thuận hoà sự nghiệp, nền tảng được trợ.');
+    } else if (LIUHE[yearZhi] === dgZhi) {
+      notes.push('💕 大运合年 (本命) — thuận hoà gia căn, được长辈/quý nhân phù.');
     }
 
     if (notes.length) {
