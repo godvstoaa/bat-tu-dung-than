@@ -109,6 +109,7 @@ import { computeHehun } from './hehun.js';
 import { synthesize } from './synthesis.js';
 import { matchBusinessPartners } from './partner-match.js';
 import { analyzeHealth, answerHealth, meridianClock, bodyConstitution, stageHealth, decadeHealthArc } from './tcm.js';
+import { evaluateNumber } from './number-fs.js'; // [loop 1137] số lý phong thủy
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
@@ -636,6 +637,12 @@ export const AI_TOOLS = [
     parameters: { type: 'object', properties: {}, required: [] },
   } },
   { type: 'function', function: {
+    name: 'evaluate_number', description: 'SỐ LÝ PHONG THỦY — đánh giá số điện thoại, biển số xe, số nhà, số tài khoản theo ngũ hành + 81 số lý + Dụng Thần. Dùng khi hỏi «số điện thoại X tốt không», «biển số xe», «số nhà», «chọn số gì hợp mệnh».',
+    parameters: { type: 'object', properties: {
+      number: { type: 'string', description: 'Chuỗi số cần đánh giá, vd «0912345678»' },
+    }, required: ['number'] },
+  } },
+  { type: 'function', function: {
     name: 'analyze_day', description: 'Luận lưu nhật của MỘT ngày cụ thể (can-chi, Thập thần, điểm Cát/Hung, lời khuyên, tương tác lưu năm/đại vận). Dùng khi hỏi về 1 ngày.',
     parameters: { type: 'object', properties: {
       year: { type: 'integer', description: 'Năm dương lịch, vd 2026' },
@@ -782,6 +789,11 @@ export function execTool(name, args, R) {
         const s = Solar.fromYmdHms(n.getFullYear(), n.getMonth() + 1, n.getDate(), 12, 0, 0);
         const l = s.getLunar(); const ec = l.getEightChar();
         return { solar: s.toYmd(), lunar: l.toString(), year: n.getFullYear(), yearGanZhi: ec.getYearGan() + ec.getYearZhi(), monthGanZhi: ec.getMonthGan() + ec.getMonthZhi() };
+      }
+      case 'evaluate_number': { // [loop 1137] số lý phong thủy — đánh giá số điện thoại/biển số
+        const ev = evaluateNumber(String(a.number || ''), R);
+        if (ev.error) return { error: ev.error };
+        return { input: ev.input, lastDigit: ev.lastDigit, lastWxVi: ev.lastWxVi, sum81: ev.sum81, luckVi: ev.luckVi, dungMatch: ev.dungMatch, kyMatch: ev.kyMatch, dungCount: ev.dungCount, kyCount: ev.kyCount, score: ev.score, rating: ev.rating, advice: _s(ev.advice, 320) };
       }
       case 'analyze_day': {
         const d = analyzeLiuRi(R, a.year, a.month, a.day, R.patternQuality);
