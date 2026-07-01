@@ -8945,6 +8945,11 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     ['cao huyết áp', 'hypertension'], ['mỡ máu cao', 'high_cholesterol'],
     // [loop 1057] siêu phổ biến
     ['cảm lạnh sổ mũi', 'common_cold'], ['ho có đờm', 'cough'],
+    // [loop 1174] +7 new conditions (loops 1144/1148/1154/1160)
+    ['mỏi mắt nhìn máy', 'eye_strain'], ['ợ chua trào ngược GERD', 'acid_reflux'],
+    ['bướu cổ giáp', 'thyroid_nodule'], ['lão hóa da nhăn', 'skin_aging'],
+    ['thiếu máu xanh', 'anemia'], ['đau nửa đầu migraine', 'migraine'],
+    ['đau mỏi vai gáy', 'cervical_spondylosis'],
   ];
   let _ok = 0;
   for (const [q, exp] of _cases) {
