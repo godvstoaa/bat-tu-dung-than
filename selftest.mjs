@@ -411,6 +411,12 @@ for (const k of Object.keys(JISHAN_PIAN)) {
   // [loop 1215] 卦辞 (周易) — 7 quẻ nổi bật.
   assert(Object.keys(GUA_CI).length === 7, `GUA_CI: 7 quẻ (got ${Object.keys(GUA_CI).length})`);
   assert(GUA_CI['乾'].ci === '元，亨，利，贞。' && GUA_CI['未济'].ci.includes('小狐汔济') && GUA_CI['泰'].ci.includes('小往大来'), '卦辞: 乾=元亨利贞, 未济=小狐汔济, 泰=小往大来');
+  // [loop 1216] regression guard: 64 DAXIANG keys khớp HEX_MEANING (chống typo tên quẻ).
+  const HM = (await import('./src/engine/hexagram-meaning.js'));
+  const hexKeySet = new Set([...Object.keys(HM.HEX_MEANING), ...Object.keys(HM.SIMP2TRAD)]);
+  const daxMissing = Object.keys(DAXIANG).filter((k) => !hexKeySet.has(k));
+  assert(daxMissing.length === 0, `DAXIANG keys đều hợp lệ trong HEX_MEANING (lệch: ${daxMissing.join(',')})`);
+  assert(Object.keys(HM.HEX_MEANING).length === 64, `HEX_MEANING đủ 64 quẻ (got ${Object.keys(HM.HEX_MEANING).length})`);
   for (const k of Object.keys(DAXIANG)) {
     const e = DAXIANG[k];
     assert(e.verse && e.apply.length > 15, `大象 ${k}: verse + apply`);
