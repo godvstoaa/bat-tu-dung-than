@@ -111,6 +111,11 @@ export function scoreLiunianYear({ dayGan, dayZhi, yearBirthZhi, yong, yGan, yZh
   // [loop 71 sửa double-count] chỉ tính khi dayZhi ≠ yearBirthZhi: nếu trùng thì 冲太岁
   //   (dòng trên, -16) đã bao hàm cùng 1 xung → không trừ 2 lần (trước đây -16+-14=-30).
   if (CHONG[dayZhi] === yZhi && dayZhi !== yearBirthZhi) { score -= 14; taiSuiD -= 14; taiSuiNotes.push('⚡日支冲太岁 — tổn bản thân/sức khoẻ, năm "ngày xung".'); }
+  // [loop 1109] 年冲月令 — 流年 chi 冲 月柱(提纲) = động yếu sự nghiệp («年冲月令, 其年不利»).
+  //   Mỗi chi 1 冲 → yZhi 冲 ĐÚNG 1 trong {月,日,年} (loại trừ nhau; guard trùng chi).
+  const _mZhi = natalPillars && natalPillars.month ? natalPillars.month.zhi : '';
+  if (_mZhi && _mZhi !== dayZhi && _mZhi !== yearBirthZhi && CHONG[_mZhi] === yZhi) { score -= 6; taiSuiD -= 6; taiSuiNotes.push('⚡年冲月令 — tháng sinh bị xung: SỰ NGHIỆP/cơ nghiệp biến động năm này.'); }
+  else if (_mZhi && _mZhi !== dayZhi && _mZhi !== yearBirthZhi && LIUHE[_mZhi] === yZhi) { score += 5; taiSuiD += 5; taiSuiNotes.push('💕年合月令 — tháng sinh được hợp: sự nghiệp thuận, nền tảng vững.'); }
   // [loop 1020] 合太岁 — 流年 chi hợp năm sinh/Nhật Chi = năm thuận (đối xứng 冲太岁, guard double-count).
   if (LIUHE[yearBirthZhi] === yZhi) { score += 10; taiSuiD += 10; taiSuiNotes.push('💕 合太岁 — năm chi LỤC HỢP chi năm sinh: năm thuận hoà, được quý nhân phù.'); }
   else if (LIUHE[dayZhi] === yZhi && dayZhi !== yearBirthZhi) { score += 8; taiSuiD += 8; taiSuiNotes.push('💕 合日 — năm chi lục hợp Nhật Chi: bản thân thuận, yên bụng.'); }

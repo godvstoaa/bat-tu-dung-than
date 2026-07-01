@@ -9316,5 +9316,22 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1107] rankDayun 冲/合 月柱+年柱 ✓ — ${_monthYearHits}/5 chart, vd ${_sample}`);
 }
 
+// [loop 1109] 流年 年冲/合月令 — analyzeLiunianDeep xét 月柱(提纲) (mirror dayun loop 1107)
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { analyzeLiunianDeep } = await import('./src/engine/liunian-pro.js');
+  let _hits = 0, _sample = null;
+  for (const [y, mo, d, h, g] of [[1990,6,15,12,'nam'],[1992,9,9,15,'nam'],[1988,1,5,6,'nam'],[1995,11,11,18,'nữ'],[1985,3,20,8,'nữ']]) {
+    const _R = analyze(y, mo, d, h, 0, g, 2026);
+    for (let yr = 2026; yr < 2036 && !_sample; yr++) {
+      const ln = analyzeLiunianDeep(_R, yr, _R.patternYong || _R.patternQuality?.patternYong);
+      const s = ln.schools.find((sc) => /月令/.test(sc.note || ''));
+      if (s) { _hits++; if (!_sample) _sample = `${g}${y}@${yr}: ${s.note.slice(0, 40)}`; break; }
+    }
+  }
+  assert(_hits > 0, `[loop 1109] analyzeLiunianDeep phát hiện 年冲/合月令 (${_hits}/5 chart) — vd ${_sample}`);
+  console.log(`   [loop 1109] 流年 年冲/合月令 ✓ — ${_hits}/5 chart, vd ${_sample}`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 
