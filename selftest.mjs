@@ -271,6 +271,8 @@ for (const g of Object.keys(DITIANSUI)) {
 }
 // [loop 1190] 丙 verse đối chiếu 滴天髓 cổ bản: 侮雪 + 成慈 + «甲木若來，必當焚滅» — bản cũ «甲木若狂» KHÔNG có trong nguồn cổ.
 assert(DITIANSUI['丙'].verse.includes('侮雪') && DITIANSUI['丙'].verse.includes('成慈') && DITIANSUI['丙'].verse.includes('甲木若來，必當焚滅') && !DITIANSUI['丙'].verse.includes('甲木若狂'), '丙 verse đối chiếu 滴天髓 cổ bản (侮雪/成慈/甲木若來必當焚滅, loại 甲木若狂)');
+// [loop 1191] 己 verse đối chiếu 任鐵樵闡微 (ctext ch.126492): «火少火晦，金多金光» — bản cũ «火多火光» SAI (原注 xác nhận 金多而金光彩).
+assert(DITIANSUI['己'].verse.includes('火少火晦，金多金光') && !DITIANSUI['己'].verse.includes('火多火光'), '己 verse đối chiếu 闡微 cổ bản (火少火晦/金多金光, loại 火多火光)');
 // [loop 1190] 滴天髓 «何知章» — 8 chẩn đoán phú/quý/bần/tiện/cát/hung/thọ/yểu (Wikisource 滴天髓/41 + ctext 阐微).
 assert(Object.keys(DITIANSUI_HEZHI).length === 8, 'DITIANSUI_HEZHI đủ 8 chương 何知 (富貴貧賤吉凶壽夭)');
 assert(DITIANSUI_HEZHI['富'].verse.includes('財氣通門戶') && DITIANSUI_HEZHI['貴'].verse.includes('官星有理會'), '何知章: 富=财气通门户, 贵=官星有理会');

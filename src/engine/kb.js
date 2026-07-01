@@ -43,9 +43,11 @@ export const DITIANSUI = {
     need: 'thích Thủy nhuận sinh tài; kỵ Hỏa quá táo; sợ hình xung ở Dần/Thân',
   },
   己: {
-    verse: '己土卑濕，中正蓄藏。不愁木盛，不畏水狂。火少火晦，火多火光。若要物旺，宜助宜幫。',
+    // [loop 1191] verse đối chiếu 任鐵樵闡微 (ctext ch.126492): câu 3 là «火少火晦，金多金光»
+    //   (bản cũ «火多火光» SAI). 原注: «無根之火，不能生濕土，故火少而火反晦；濕土能潤金氣，故金多而金光彩».
+    verse: '己土卑濕，中正蓄藏。不愁木盛，不畏水狂。火少火晦，金多金光。若要物旺，宜助宜幫。',
     vi: 'Kỷ Thổ thấp ẩm, ôn hoà chứa đựng — không sợ Mộc thịnh, không sợ Thủy cuồng.',
-    nature: 'Kỷ là đất ruộng, âm thổ thấp ẩm, nhuận chứa đựng nuôi dưỡng. Vì mềm ẩm nên không sợ Mộc khắc thịnh (đất ẩm nuôi mộc), không sợ Thủy cuồng (đất hút nước). Nhưng Hỏa ít thì Thổ tối u, Hỏa nhiều thì Thổ cằn — cần Hỏa vừa đủ. "Muốn vạn vật vượng thì nên phù trợ" — Kỷ nhược cần Hỏa (Ấn) + Tỷ phù trợ mới nuôi dưỡng tốt. Kỷ khác Mậu: Kỷ nhu hoà, Mậu cương kiện.',
+    nature: 'Kỷ là đất ruộng, âm thổ thấp ẩm, nhuận chứa đựng nuôi dưỡng. Vì mềm ẩm nên không sợ Mộc khắc thịnh (đất ẩm nuôi mộc), không sợ Thủy cuồng (đất hút nước). Hỏa vô căn ít thì tự tối u (không sinh được thấp thổ); Kim nhiều thì Kim thêm quang thải (thấp thổ nhuận Kim) — «火少火晦，金多金光». "Muốn vạn vật vượng thì nên phù trợ" — Kỷ nhược cần Hỏa (Ấn) + Tỷ phù trợ mới nuôi dưỡng tốt. Kỷ khác Mậu: Kỷ nhu hoà, Mậu cương kiện.',
     need: 'thích Hỏa (tùy lượng) + Tỷ phù trợ; kỵ quá ẩm hoặc quá táo',
   },
   庚: {
@@ -67,6 +69,9 @@ export const DITIANSUI = {
     need: 'thích Mộc tiết hoặc Thổ đê ngăn; kỵ quá vượng không chế; hợp Đinh hoá Mộc',
   },
   癸: {
+    // [loop 1191] verse theo truyền bản phổ thông («龍德而運，化雨斯成 / 化斯真矣»).
+    //   任鐵樵闡微 (ctext ch.126492) ghi dị bản «得龍而運，功化斯神 ... 化象斯真» — đồng nghĩa
+    //   (đều: Quý nhược, gặp Thìn=rồng thì hoá, hợp Mậu kiến Hỏa thì hoá chân). Giữ cả vế [variant].
     verse: '癸水至弱，達於天津。龍德而運，化雨斯成。不愁火土，不論庚辛。合戊見火，化斯真矣。',
     vi: 'Quý Thủy chí nhược, tới tận Thiên Tân — rồng đức mà vận, hoá mưa mới thành.',
     nature: 'Quý là mưa móng/sương, âm thủy, chí nhược nhưng linh hoạt. Đạt "Thiên Tân" (thượng nguồn) — không sợ Hỏa/Thổ (âm thủy nhu hoà, hoá hơi thấm vào), không cần bàn Kim (Khắc/sinh nhẹ — "bất luận canh tân"). "Long đức nhi vận" — gặp Thìn (rồng) thì hoá mưa; Quý cần Mộc để tiết (nuôi mộc) hoặc Hỏa để cân (thủy hỏa ký tế). "Hợp Mộc kiến Hỏa" — Quý hợp Bính? không, Quý hợp Mậu (bính? ) → gặp Hỏa thì hoá Hỏa chân (Mậu Quý hoả hoá Hỏa). Quý mềm dẻo, phải giữ thế nhược mới tốt; kỵ Kim sinh làm mất đặc tính mưa.',
