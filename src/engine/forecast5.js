@@ -62,6 +62,9 @@ export function forecast5(R, startYear, years = 5) {
       const typeStr = (ts.types || []).map((t) => typeof t === 'string' ? t : (t.vi || t.name || JSON.stringify(t))).join('+');
       alerts.push(`⚡ Phạm thái tuế (${typeStr}): ${(ts.msg || '').slice(0, 40)}`);
     }
+    // [loop 1115] 年冲月令 — năm chi 冲 提纲 (sự nghiệp biến động, loop 1109)
+    const _tsSchool = (ln.schools || []).find((s) => s.phai === 'Thái Tuế');
+    if (_tsSchool && /年冲月令/.test(_tsSchool.note || '')) alerts.push('⚡ 年冲月令 — tháng sinh bị xung: SỰ NGHIỆP biến động năm này.');
 
     // 4. Tử vi lưu niên
     let zw = null;
