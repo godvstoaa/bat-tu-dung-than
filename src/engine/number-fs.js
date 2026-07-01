@@ -19,14 +19,14 @@ const WX_FAV_NUMS = {
 
 const NUM81_LUCK = {
   1:'cat', 3:'cat', 5:'cat', 6:'cat', 7:'cat', 8:'cat', 11:'cat', 13:'cat', 15:'cat', 16:'cat', 17:'cat',
-  18:'mid', 21:'cat', 23:'cat', 24:'cat', 25:'cat', 29:'cat', 31:'cat', 32:'cat', 33:'cat',
-  35:'cat', 37:'cat', 38:'mid', 39:'cat', 41:'cat', 45:'cat', 47:'cat', 48:'cat', 51:'mid',
+  18:'cat', 21:'cat', 23:'cat', 24:'cat', 25:'cat', 29:'cat', 31:'cat', 32:'cat', 33:'cat',
+  35:'cat', 37:'cat', 38:'mid', 39:'cat', 41:'cat', 45:'cat', 47:'cat', 48:'cat', 51:'hung',
   52:'cat', 57:'cat', 58:'mid', 61:'cat', 63:'cat', 65:'cat', 67:'cat', 68:'cat', 73:'mid',
   75:'mid', 81:'cat',
   2:'hung', 4:'hung', 9:'hung', 10:'hung', 12:'hung', 14:'hung', 19:'hung', 20:'hung',
   22:'hung', 26:'hung', 27:'hung', 28:'hung', 30:'hung', 34:'hung', 36:'hung', 40:'hung',
   42:'hung', 43:'hung', 44:'hung', 46:'hung', 49:'mid', 50:'hung', 53:'hung', 54:'hung',
-  55:'mid', 56:'hung', 59:'hung', 60:'hung', 62:'hung', 64:'hung', 66:'hung', 69:'hung',
+  55:'hung', 56:'hung', 59:'hung', 60:'hung', 62:'hung', 64:'hung', 66:'hung', 69:'hung',
   70:'hung', 71:'hung', 72:'hung', 74:'hung', 76:'hung', 77:'hung', 78:'hung', 79:'hung', 80:'hung',
 };
 const LUCK_VI = { cat: 'Cát', mid: 'Bình', hung: 'Hung' };
