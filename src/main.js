@@ -1889,11 +1889,15 @@ function renderDayunTimeline(R) {
   // [loop 478] 十二长生 stage mỗi đại vận (长生=khởi, 帝旺=đỉnh, 墓=táng/suy...)
   const stages = {};
   try { dayunChangSheng(R.chart.dayGan, dys).items.forEach((it) => { stages[it.startAge] = it; }); } catch (e) {}
+  // [loop 1127] 3-pillar interactions (冲提纲/冲本命/合月/合年) cho dayun-timeline tooltip
+  const _dyInt = {};
+  try { checkDayunInteractions(R.chart, dys).forEach((ck) => { _dyInt[ck.startAge] = ck.notes; }); } catch (e) {}
   const segs = dys.map((d) => {
     const isNow = curAge >= d.startAge && curAge < d.startAge + 10;
     const nayin = (() => { try { const n = ganZhiNayin(d.ganZhi); return n || ''; } catch (e) { return ''; } })();
     const st = stages[d.startAge];
-    const tip = `${d.ganZhi} · ${d.startAge}–${d.startAge + 9}t · ${d.rating}${nayin ? ' · ' + nayin : ''}${st ? ' · ' + st.stage + ' (' + st.stageVi + ')' : ''}${d._ylNote ? ' · ' + d._ylNote : ''}`;
+    const _intNote = _dyInt[d.startAge] ? ' · ' + _dyInt[d.startAge].slice(0, 2).join('; ').slice(0, 60) : '';
+    const tip = `${d.ganZhi} · ${d.startAge}–${d.startAge + 9}t · ${d.rating}${nayin ? ' · ' + nayin : ''}${st ? ' · ' + st.stage + ' (' + st.stageVi + ')' : ''}${_intNote}${d._ylNote ? ' · ' + d._ylNote : ''}`;
     return `<div class="dt-seg ${rateClass(d.rating)}${isNow ? ' dt-now' : ''}" data-sy="${d.startYear}" title="${esc(tip)} — nhấp xem tường thuật giai đoạn này">
       <div class="dt-gz zh">${esc(d.ganZhi)}</div>
       <div class="dt-stage zh${st && /帝旺|臨官|長生/.test(st.stage) ? ' dt-stage-peak' : ''}">${st ? esc(st.stage) : ''}</div>
