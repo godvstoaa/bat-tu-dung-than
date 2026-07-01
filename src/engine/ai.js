@@ -1368,6 +1368,8 @@ export function suggestFollowups(question, R) {
   if (has(/phong thuy|huong|feng shui/)) return ['Hướng nhà/hướng bàn làm việc hợp?', _dung ? `Màu sắc may mắn (Dụng ${_dung})?` : 'Màu sắc may mắn của tôi?', 'Vật phẩm phong thủy bổ Dụng?'];
   if (has(/tong|quy dao|doi toi|cuoc doi|overview|synthesis|chot/)) return ['Đỉnh cao đời tôi lúc nào?', 'Cẩn thận năm nào nhất?', 'Lời khuyên hành động cho tôi?'];
   if (has(/luu nien|nam nay|2026|2027|2028/)) return ['Tháng nào trong năm tốt nhất?', 'Năm này cẩn thận điều gì?', 'Đại vận đang hành có thuận không?'];
+  // [loop 1116] hôm nay/day followups → discover health_today + best_hour + 3-pillar interaction
+  if (has(/hom nay|today|gio nao|truc|ngay nao/)) return ['Hôm nay tạng nào yếu, nên dưỡng gì?', 'Giờ nào tốt nhất hôm nay, hướng nào kỵ?', 'Hôm nay xung/hợp trụ nào (日/月/年)?'];
   // default — khám phá lá số
   return ['Dụng Thần của tôi là gì?', 'Đại vận sắp tới ra sao?', 'Tổng quan quỹ đạo đời tôi?', 'Năm nay có gì đáng chú ý?'];
 }
