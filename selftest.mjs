@@ -9296,5 +9296,25 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1102] analyze_day directions ✓ — cai=${_d.directions.cai} xi=${_d.directions.xi} fu=${_d.directions.fu} (0 raw Han)`);
 }
 
+// [loop 1107] rankDayun 冲/合 月柱(提纲) + 年柱(本命) — cổ法 «运冲提纲动摇根基»
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { rankDayun } = await import('./src/engine/dayun-rank.js');
+  // quét vài chart, tìm ít nhất 1 dayun 冲/合 month hoặc year (KHÔNG phải day — mở rộng 3 trụ)
+  let _monthYearHits = 0, _sample = null;
+  for (const [y, mo, d, h, g] of [[1990,6,15,12,'nam'],[1985,3,20,8,'nữ'],[1992,9,9,15,'nam'],[1988,1,5,6,'nam'],[1995,11,11,18,'nữ']]) {
+    const _R = analyze(y, mo, d, h, 0, g, 2026);
+    const _rk = rankDayun(_R);
+    const _hit = _rk.scored.find((s) => /冲提纲|冲本命|合月|合年/.test(s.interaction || ''));
+    if (_hit) { _monthYearHits++; if (!_sample) _sample = `${g}${y}: ${_hit.interaction}@${_hit.startAge}t`; }
+  }
+  assert(_monthYearHits > 0, `[loop 1107] rankDayun phát hiện 冲/合 月/年 trụ (${_monthYearHits}/5 chart) — vd ${_sample}`);
+  // mỗi chi chỉ 1 冲 → dayun 冲 ĐÚNG 1 trụ (interaction không double-count cùng loại 冲)
+  const _R0 = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _doubleOk = rankDayun(_R0).scored.every((s) => { const m = (s.interaction||'').match(/⚡/g); return !m || m.length <= 1; });
+  assert(_doubleOk, '[loop 1107] dayun interaction không double-count (mỗi chi 1 冲)');
+  console.log(`   [loop 1107] rankDayun 冲/合 月柱+年柱 ✓ — ${_monthYearHits}/5 chart, vd ${_sample}`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

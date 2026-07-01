@@ -30,6 +30,8 @@ export function rankDayun(R) {
   const { chart, yong, dayun } = R;
   const dayGan = chart.dayGan;
   const dayZhi = chart.pillars.day.zhi;
+  const monthZhi = chart.pillars.month.zhi; // [loop 1107] 提纲 (sự nghiệp/cơ nghiệp)
+  const yearZhi = chart.pillars.year.zhi;   // [loop 1107] 本命 (gia căn/trưởng bối)
 
   const items = (dayun || []).map((d) => {
     // 1. Base score from Dụng Thần rating
@@ -57,6 +59,12 @@ export function rankDayun(R) {
     if (!interaction && LIUHE[d.zhi] === dayZhi) { interaction = '💕合日'; intScore += 6; }
     // [loop 1042] 三合 bán-hợp — cùng cụm 三合 (nếu chưa 六 hợp) → thuận nhẹ.
     else if (!interaction && d.zhi !== dayZhi && SANHE.some((g) => g.includes(d.zhi) && g.includes(dayZhi))) { interaction = '🔗半合日'; intScore += 4; }
+    // [loop 1107] 冲/合 月柱(提纲) + 年柱(本命) — cổ法: «运冲提纲动摇事业根基», «冲本命伤长辈/根».
+    //   Mỗi chi chỉ có 1 đối 冲 → dayun chi 冲 ĐÚNG 1 trong {日,月,年} trụ (loại trừ nhau).
+    else if (!interaction && CHONG[d.zhi] === monthZhi) { interaction = '⚡冲提纲(月)'; intScore -= 6; }
+    else if (!interaction && CHONG[d.zhi] === yearZhi) { interaction = '⚡冲本命(年)'; intScore -= 4; }
+    else if (!interaction && LIUHE[d.zhi] === monthZhi) { interaction = '💕合月(提纲)'; intScore += 5; }
+    else if (!interaction && LIUHE[d.zhi] === yearZhi) { interaction = '💕合年(本命)'; intScore += 4; }
     score += intScore;
 
     // [loop 1079→1080] 4. 十二長生 SINH KHÍ — Nhật Chủ ở giai đoạn nào của vòng 12長生 khi入 vận.
