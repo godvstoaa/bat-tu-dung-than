@@ -124,6 +124,18 @@ export const TIAOHOU_PRINCIPLE = {
   bingwu: '午月丙火愈炎，得壬庚高透方為上命 — 壬水既濟為主，庚金生壬為佐；防戊己克壬、丁壬化合。',
 };
 
+// ---- 窮通寶鑑 «五行總論» + 季節調候原理 (nguồn cổ) ----
+// [loop 1197] Nền tảng triết lý điều hậu — đối chiếu Wikisource 窮通寶鑑 + 百度百科.
+// 5 nguyên lý mùa (三春/三夏/三秋/三冬/四季土) = WHY phía sau bảng TIAOHOU.
+export const QIONGTONG_ZONGLUN = {
+  origin: '«五行者，本乎天地之間而不窮者也，故謂之行» — 北方陰極生寒→水; 南方陽極生熱→火; 東方陽散生風→木; 西方陰止生燥→金; 中央陰陽交生濕→土.',
+  春木: '春 Mộc vượng dương thăng — hỷ Hỏa ôn dương, dụng Thủy nhuận Mộc. «火透水潤» thành «既濟» mới căn nhuận mộc vinh. Dụng Hỏa không thể thiếu Thủy, dụng Thủy không thể không Hỏa.',
+  夏火: 'Hạ Hỏa viêm thổ táo — điều hậu vi cấp. Chủ dụng Quý/Nhâm Thủy giáng ôn nhuận trạch. «三春丙火…專用壬水，為扶陽，名曰天和地潤，既濟功成».',
+  秋金: 'Thu Kim thu liễm — cần Đinh Hỏa luyện kim thành khí, Nhâm Thủy tẩy kim tăng thải («剛健得火則銳，得水則清»).',
+  冬水: 'Đông Thủy lãnh kim hàn — cần Bính Hỏa noãn cục giải đông. «冬月之木盤屈在地…火重見溫暖有功» — dù Mộc sinh đông cũng trọng Hỏa noãn.',
+  季土: 'Thổ vượng tứ quý — tam Hạ táo thổ hỷ Thủy nhuận, đông hàn thổ hỷ Hỏa noãn; Thìn/Tuất/Sửu/Mùi tùy nguyệt phối hợp.',
+};
+
 // ---- VÒNG TRƯỜNG SINH (十二長生) cho Nhật Chủ tại Địa Chi ----
 // Thứ tự 12 trạng thái theo chiều thuận của can Dương.
 export const CHANGSHENG_STAGES = [

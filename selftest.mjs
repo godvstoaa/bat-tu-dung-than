@@ -8,7 +8,7 @@ import { composeAnswer, detectIntent } from './src/engine/nlg.js';
 import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
-import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE } from './src/engine/constants.js';
+import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN } from './src/engine/constants.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
@@ -296,6 +296,9 @@ for (const k of Object.keys(YONGSHEN_METHOD)) {
 }
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
+// [loop 1197] 窮通寶鑑 «五行總論» + 5 nguyên lý mùa (Wikisource 窮通寶鑑).
+assert(QIONGTONG_ZONGLUN && QIONGTONG_ZONGLUN.origin.includes('五行者'), 'QIONGTONG_ZONGLUN: 五行總論 origin');
+assert(Object.keys(QIONGTONG_ZONGLUN).length === 6 && QIONGTONG_ZONGLUN['夏火'].includes('既濟') && QIONGTONG_ZONGLUN['冬水'].includes('溫暖'), 'QIONGTONG_ZONGLUN: origin + 5 mùa (春木/夏火/秋金/冬水/季土)');
 assert(TIAOHOU['甲']['寅'].join() === '丙,癸', '穷通宝鑑 甲寅: 丙主癸佐 (初春猶寒，丙暖癸潤)');
 assert(TIAOHOU['甲']['辰'].join() === '庚,丁,壬', '穷通宝鑑 甲辰: 庚丁壬 (季春木老，用庚必須有丁，無庚用壬)');
 assert(TIAOHOU['庚']['申'].join() === '丁,甲', '穷通宝鑑 庚申: 丁主甲佐 (秋金剛銳，丁鍊甲引)');
