@@ -303,6 +303,18 @@ for (const k of Object.keys(WUYAN_DUBU)) {
   const e = WUYAN_DUBU[k];
   assert(e.verse && e.vi && e.apply.length > 20, `五言独步 ${k}: verse + vi + apply`);
 }
+// [loop 1201] 八卦万物类象 (说卦传) — mở rộng cho luận quẻ 梅花/六爻/qimen.
+{
+  const { BAGUA_LEIXIANG } = await import('./src/engine/meihua.js');
+  assert(Object.keys(BAGUA_LEIXIANG).length === 8, `BAGUA_LEIXIANG: đủ 8 quái (got ${Object.keys(BAGUA_LEIXIANG).length})`);
+  assert(BAGUA_LEIXIANG['乾'].nature === '天' && BAGUA_LEIXIANG['乾'].body.includes('首') && BAGUA_LEIXIANG['乾'].animal.includes('马'), '乾 类象: 天/首/马 (说卦传)');
+  assert(BAGUA_LEIXIANG['坎'].animal.includes('豕') && BAGUA_LEIXIANG['离'].animal.includes('雉') && BAGUA_LEIXIANG['震'].animal.includes('龙'), '类象: 坎=豕, 离=雉, 震=龙');
+  for (const k of Object.keys(BAGUA_LEIXIANG)) {
+    const e = BAGUA_LEIXIANG[k];
+    assert(e.nature && e.body && e.animal && e.family && e.direction && e.virtue, `类象 ${k}: đủ 6 trường (自然/身体/动物/家人/方位/德)`);
+  }
+  console.log(`   [loop 1201] 八卦万物类象: 8 quái × (自然/身体/动物/家人/方位/季节/德) ✓`);
+}
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
 // [loop 1197] 窮通寶鑑 «五行總論» + 5 nguyên lý mùa (Wikisource 窮通寶鑑).

@@ -17,6 +17,20 @@ export const TRIGRAMS = {
   艮: { num: 7, vi: 'Cấn', wx: 'Thổ', img: '☶', ele: 'Núi', lines: [0, 0, 1], nature: 'dừng lại, vững, thiểu nam' },
   坤: { num: 8, vi: 'Khôn', wx: 'Thổ', img: '☷', ele: 'Đất', lines: [0, 0, 0], nature: 'nhu thuận, bao dung, mẹ' },
 };
+
+// ---- 八卦萬物類象 (說卦傳) — mở rộng cho TRIGRAMS ----
+// [loop 1201] Nguồn: 說卦傳 + 维基百科/百度百科/知乎 «八卦万物类象» — ≥2 nguồn độc lập.
+// Dùng cho luận quẻ 梅花/六爻/qimen: mỗi quái → tự nhiên/thân thể/dộng vật/gia nhân/phương/vũ đức.
+export const BAGUA_LEIXIANG = {
+  乾: { nature: '天', body: '首 (đầu)', animal: '马 (ngựa)', family: 'phụ (cha)', direction: 'tây bắc', season: 'thu đông giao', virtue: '健 (kiện)', extras: 'quân, vương, kim, ngọc, viên mãn, cương' },
+  坤: { nature: '地', body: '腹 (phúc)', animal: '牛 (ngưu)', family: 'mẫu (mẹ)', direction: 'tây nam', season: 'hạ thu giao', virtue: '顺 (thuận)', extras: 'chúng, bố bác, phò, ph釜, nhu' },
+  震: { nature: '雷', body: '足 (túc)', animal: '龙 (long)', family: 'trưởng nam', direction: 'đông', season: 'xuân', virtue: '动 (động)', extras: 'quyết, thanh sắc, rẽ, sinh cơ, hào phóng' },
+  巽: { nature: '风 (phong)', body: '股 (cổ)', animal: '鸡 (kê)', family: 'trưởng nữ', direction: 'đông nam', season: 'xuân hạ giao', virtue: '入 (nhập)', extras: 'thẳng,绳, mộc, trường, nhập' },
+  坎: { nature: '水', body: '耳 (nhĩ)', animal: '豕 (thỉ - lợn)', family: 'trung nam', direction: 'bắc', season: 'đông', virtue: '陷 (hiểm)', extras: 'huyết, xa, nguyệt,险 trở, u ám' },
+  离: { nature: '火', body: '目 (mục)', animal: '雉 (trĩ)', family: 'trung nữ', direction: 'nam', season: 'hạ', virtue: '丽 (phụ/lệ)', extras: 'nhật, điện, giáp trụ, văn minh' },
+  艮: { nature: '山', body: '手 (thủ)', animal: '狗 (cẩu)', family: 'thiếu nam', direction: 'đông bắc', season: 'đông xuân giao', virtue: '止 (chỉ)', extras: 'môn, kính, thạch, đốc, stopped' },
+  兑: { nature: '泽 (trạch)', body: '口 (khẩu)', animal: '羊 (dương)', family: 'thiếu nữ', direction: 'tây', season: 'thu', virtue: '悦 (duyệt)', extras: 'ngôn, khẩu thiệt, 巫, thưởng' },
+};
 const NUM2TRI = ['坤', '乾', '兑', '离', '震', '巽', '坎', '艮', '坤']; // index 0→8 (0=坤)
 
 // 64 hexagram theo [hạ][thượng] (King Wen)
