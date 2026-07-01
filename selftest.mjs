@@ -8952,7 +8952,15 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     if (a.matched && a.id === exp) _ok++; else console.log(`     ✗ ${q} → ${a.id} (expect ${exp})`);
   }
   assert(_ok === _cases.length, `[loop 1053] CONDITION_KB match ${_ok}/${_cases.length}`);
-  assert(CONDITION_KB.length >= 27, `[loop 1053] KB ≥ 33 conditions (got ${CONDITION_KB.length})`);
+  assert(CONDITION_KB.length >= 27, `[loop 1053/1144] KB ≥ 35 conditions (got ${CONDITION_KB.length})`);
+  // [loop 1146] new conditions (eye_strain + acid_reflux) match + personalization
+  {
+    const _R1146 = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+    const _es = answerHealth('mỏi mắt dùng máy tính nhiều', _R1146);
+    assert(_es.matched && /Bản LA SỐ/.test(_es.reply), `[loop 1146] eye_strain match + personalization`);
+    const _ar = answerHealth('trào ngược GERD nóng rát ngực', _R1146);
+    assert(_ar.matched && /Bản LA SỐ/.test(_ar.reply), `[loop 1146] acid_reflux match + personalization`);
+  }
   // no garbled latin artifacts
   const _kb = JSON.stringify(CONDITION_KB);
   assert(!/\b(green|misc|bak|Tillerson|Needs|pohong|ôleo)\b/.test(_kb), '[loop 1022] KB không garbled artifacts');
