@@ -3202,6 +3202,18 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   assert(gBingChen.nayin === '沙中土' && gBingChen.vi === 'Đất Trong Cát', `丙辰 năm: guiguzi 沙中土 không fallback (got ${gBingChen.nayin}/${gBingChen.vi})`);
   console.log(`   [loop 1196] guiguzi nayin fix: 甲午→沙中金/壬寅→金箔金/丙辰→沙中土 (không còn fallback rỗng) ✓`);
 }
+// [loop 1198] nạp âm nhất quán toàn engine — ganZhiNayin ↔ NAYIN_MEANING (chống variant-key bug như 1196).
+{
+  const { ganZhiNayin, NAYIN_MEANING } = await import('./src/engine/nayin.js');
+  const GAN = '甲乙丙丁戊己庚辛壬癸'.split(''), ZHI = '子丑寅卯辰巳午未申酉戌亥'.split('');
+  const allGZ = []; for (const g of GAN) for (const z of ZHI) allGZ.push(g + z);
+  const names = new Set(allGZ.map((gz) => ganZhiNayin(gz)).filter(Boolean));
+  assert(names.size === 30, `ganZhiNayin sản xuất đúng 30 nạp âm distinct (got ${names.size})`);
+  const missing = [...names].filter((n) => !NAYIN_MEANING[n]);
+  assert(missing.length === 0, `NAYIN_MEANING chứa đủ 30 tên canonical ganZhiNayin sản xuất (missing: ${missing.join(',')})`);
+  assert(Object.keys(NAYIN_MEANING).length === 30, `NAYIN_MEANING đúng 30 keys không dư/thiếu (got ${Object.keys(NAYIN_MEANING).length})`);
+  console.log(`   [loop 1198] nạp âm nhất quán: ganZhiNayin ↔ NAYIN_MEANING (${names.size} names, 0 variant-key) ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);
