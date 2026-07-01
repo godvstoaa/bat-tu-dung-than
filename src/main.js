@@ -3459,15 +3459,19 @@ function renderLiunianChart(R) {
     for (let y = curYear; y < curYear + 10; y++) {
       try {
         const ln = analyzeLiunianDeep(R, y, R.patternYong || R.patternQuality?.patternYong);
-        years.push({ year: y, ganZhi: ln.ganZhi, score: ln.score, rating: ln.rating, yearStage: ln.yearStage || '', yearStageWeight: ln.yearStageWeight || 0, pillarStrength: ln.yearPillarStrength || '' });
-      } catch (_) { years.push({ year: y, ganZhi: '?', score: 0, rating: '?', yearStage: '', yearStageWeight: 0, pillarStrength: '' }); }
+        const _schools = ln.schools || [];
+        const _clash = _schools.filter((sc) => /Xung|xung|冲|Hại|Hình|太岁/i.test(sc.phai)).sort((a, b) => a.d - b.d)[0];
+        const _harm = _schools.filter((sc) => /Hợp|hợp|合/i.test(sc.phai)).sort((a, b) => b.d - a.d)[0];
+        const _topInt = [_clash ? `⚡${_clash.phai}` : '', _harm ? `💕${_harm.phai}` : ''].filter(Boolean).join(' ');
+        years.push({ year: y, ganZhi: ln.ganZhi, score: ln.score, rating: ln.rating, yearStage: ln.yearStage || '', yearStageWeight: ln.yearStageWeight || 0, pillarStrength: ln.yearPillarStrength || '', topInt: _topInt });
+      } catch (_) { years.push({ year: y, ganZhi: '?', score: 0, rating: '?', yearStage: '', yearStageWeight: 0, pillarStrength: '', topInt: '' }); }
     }
     const bars = years.map((yr) => {
       const s = yr.score || 0;
       const col = yr.rating === 'Cát' ? '#2a7' : yr.rating === 'Hung' ? '#c33' : '#9a8';
       const h = Math.min(70, Math.max(4, Math.abs(s) * 2));
       const isNow = yr.year === curYear;
-      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:32px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${yr.year} ${esc(yr.ganZhi)} · ${esc(yr.rating)} (score ${s})${yr.yearStage ? ` · ${esc(yr.yearStage)}(${yr.yearStageWeight > 0 ? '旺' : yr.yearStageWeight < 0 ? 'suy' : 'chuyển'})` : ''}${yr.pillarStrength ? ` · ${esc(yr.pillarStrength)}` : ''}${isNow ? ' ★ NĂM HIỆN TẠI' : ''}">
+      return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:32px${isNow ? ';background:rgba(196,175,53,0.12);border-radius:4px' : ''}" title="${yr.year} ${esc(yr.ganZhi)} · ${esc(yr.rating)} (score ${s})${yr.yearStage ? ` · ${esc(yr.yearStage)}(${yr.yearStageWeight > 0 ? '旺' : yr.yearStageWeight < 0 ? 'suy' : 'chuyển'})` : ''}${yr.pillarStrength ? ` · ${esc(yr.pillarStrength)}` : ''}${yr.topInt ? ` · ${esc(yr.topInt)}` : ''}${isNow ? ' ★ NĂM HIỆN TẠI' : ''}">
         <div style="position:relative;height:70px;width:100%;display:flex;align-items:center;justify-content:center">
           <div style="position:absolute;${s>=0?'bottom:50%':'top:50%'};width:70%;max-width:30px;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${isNow ? '1' : '0.85'};${isNow ? 'box-shadow:0 0 6px '+col : ''}"></div>
           <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--gold,dimgray);opacity:0.3"></div>
