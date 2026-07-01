@@ -9,7 +9,7 @@ import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
 import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN } from './src/engine/constants.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU } from './src/engine/kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
 import { jinkoujue, renderJinkoujueCard } from './src/engine/jinkoujue.js';
@@ -302,6 +302,14 @@ assert(WUYAN_DUBU['病药'].verse.includes('有病方为贵') && WUYAN_DUBU['病
 for (const k of Object.keys(WUYAN_DUBU)) {
   const e = WUYAN_DUBU[k];
   assert(e.verse && e.vi && e.apply.length > 20, `五言独步 ${k}: verse + vi + apply`);
+}
+// [loop 1207] «继善篇» (渊海子平 卷二) — ctext ch.524726 + 知乎/算准网.
+assert(Object.keys(JISHAN_PIAN).length === 5, `JISHAN_PIAN: 5 đoạn (got ${Object.keys(JISHAN_PIAN).length})`);
+assert(JISHAN_PIAN['月令'].verse.includes('先观月令') && JISHAN_PIAN['用神'].verse.includes('用神不可损伤'), '继善篇: 月令提纲 + 用神不可损伤');
+assert(JISHAN_PIAN['日主'].verse.includes('专用日干') && JISHAN_PIAN['富贵'].verse.includes('富贵双全'), '继善篇: 专用日干 + 财生官...富贵双全');
+for (const k of Object.keys(JISHAN_PIAN)) {
+  const e = JISHAN_PIAN[k];
+  assert(e.verse && e.apply.length > 15, `继善篇 ${k}: verse + apply`);
 }
 // [loop 1201] 八卦万物类象 (说卦传) — mở rộng cho luận quẻ 梅花/六爻/qimen.
 {

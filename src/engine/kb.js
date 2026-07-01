@@ -350,6 +350,16 @@ export const WUYAN_DUBU = {
   },
 };
 
+// ---- «继善篇» (渊海子平 卷二) — 子平方法论纲领 ----
+// [loop 1207] Trích đoạn mở đầu nổi tiếng. Nguồn: ctext 渊海子平 ch.524726 + 知乎/算准网.
+export const JISHAN_PIAN = {
+  总纲: { verse: '人禀天地，命属阴阳，生居覆载之内，尽在五行之中。', apply: 'Người禀 thiên địa, mệnh thuộc âm dương — sống trong trời đất, đều trong ngũ hành. Cơ sở vũ trụ luận của tử bình.' },
+  月令: { verse: '欲知贵贱，先观月令乃提纲，次断吉凶。', apply: 'Muốn biết quý tiện — TRƯỚC xem Nguyệt Lệnh (提纲 = cương lĩnh), sau đoán cát hung. Nguyệt lệnh là «lệnh» của nguyên cục (khớp CLIMATE + 月令取用).' },
+  日主: { verse: '专用日干为主本；三元要成格局，四柱喜见财官。', apply: 'Chuyên dụng NHẬT CAN làm chủ bản; tam nguyên (thiên/địa/nhân) phải thành cách cục, tứ trụ hỷ thấy Tài/Quan.' },
+  用神: { verse: '用神不可损伤。', apply: 'Dụng thần không được tổn thương (khớp ZIPING_YONG_MAXIM «用之为财不可劫»).' },
+  富贵: { verse: '财生官，官生印，印生身，富贵双全。', apply: 'Tài sinh Quan, Quan sinh Ấn, Ấn sinh thân — sinh hoá lưu thông tới thân → phú quý song toàn (cát cách điển hình).' },
+};
+
 // ---- ÁNH XẠ LĨNH VỰC ĐỜI SỐNG ↔ SAO CHỦ SỰ ----
 // Dùng để trả lời câu hỏi tự do: biết lĩnh vực → biết sao/hành nào chủ đạo.
 export const LIFE_AREA_INDEX = {
