@@ -9282,5 +9282,17 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [loop 1097] cross-module integration fuzz ✓ — ${_charts.length} charts × 5 subsystems, 0 crash/leak`);
 }
 
+// [loop 1102] analyze_day AI tool — directions (caishen/xishen/fushen, dịch loop 1101) + dayStage
+{
+  const { analyze } = await import('./src/engine/chart.js');
+  const { execTool } = await import('./src/engine/ai.js');
+  const _R = analyze(1990, 6, 15, 12, 0, 'nam', 2026);
+  const _d = execTool('analyze_day', { year: 2026, month: 7, day: 1 }, _R);
+  assert(_d.directions && _d.directions.cai && _d.directions.xi && _d.directions.fu, `[loop 1102] analyze_day có directions cai/xi/fu (got ${JSON.stringify(_d.directions)})`);
+  assert(!/[正东西南北]{2,}/.test(JSON.stringify(_d.directions)), `[loop 1102] directions KHÔNG raw Chinese (got ${JSON.stringify(_d.directions)})`);
+  assert(_d.dayStage && _d.dayPillarStrength, `[loop 1102] analyze_day có dayStage (${_d.dayStage}) + dayPillarStrength`);
+  console.log(`   [loop 1102] analyze_day directions ✓ — cai=${_d.directions.cai} xi=${_d.directions.xi} fu=${_d.directions.fu} (0 raw Han)`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

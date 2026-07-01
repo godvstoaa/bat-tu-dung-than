@@ -16,6 +16,7 @@ import { nayinInfo } from './nayin.js';
 import { analyzeChangsheng } from './changsheng-deep.js';
 import { computeLiuyue } from './liuyue.js';
 import { analyzeLiuRi, findGoodDays } from './liuri.js';
+import { dailyGuide } from './daily-guide.js'; // [loop 1102] directions (caishen/xishen/fushen) cho analyze_day
 import { computeYearDaily } from './year-daily.js';
 import { inverseBaZiSolve, labelResult } from './inverse-bazi.js'; // [loop 21] 逆推 inverse solver
 import { buildLifeTrajectory } from './life-trajectory.js';
@@ -784,7 +785,10 @@ export function execTool(name, args, R) {
       }
       case 'analyze_day': {
         const d = analyzeLiuRi(R, a.year, a.month, a.day, R.patternQuality);
-        return { date: d.solar, ganZhi: d.ganZhi, ganGod: d.ganGod, rating: d.rating, score: d.score, advice: _s(d.advice, 240), gejuDelta: d.gejuDelta, gejuNote: d.gejuNote ? _s(d.gejuNote, 200) : '', interactions: (d.ctx || []) };
+        // [loop 1102] thêm phương vị财神/喜神/福神 (từ dailyGuide) — AI trả lời «hướng tài/hỷ hôm nay»
+        let _dirs = null;
+        try { const g = dailyGuide(R, a.year, a.month, a.day); _dirs = { cai: g.caishen, xi: g.xishen, fu: g.fushen, best: g.bestDir }; } catch (_) {}
+        return { date: d.solar, ganZhi: d.ganZhi, ganGod: d.ganGod, rating: d.rating, score: d.score, advice: _s(d.advice, 240), gejuDelta: d.gejuDelta, gejuNote: d.gejuNote ? _s(d.gejuNote, 200) : '', interactions: (d.ctx || []), dayStage: d.dayStage || null, dayPillarStrength: d.dayPillarStrength || '', directions: _dirs };
       }
       case 'health_q': { // [loop 1021] đông y — trả lời câu hỏi sức khoẻ theo ngũ hành + dược lý
         const h = answerHealth(String(a.question || ''), R);
