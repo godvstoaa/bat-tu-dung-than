@@ -341,6 +341,21 @@ for (const k of Object.keys(WUYAN_DUBU)) {
   }
   console.log(`   [loop 1203] 六亲类象: 5 lục-thân × (relation/person/thing/nature) — 卜筮正宗 ✓`);
 }
+// [loop 1204] 奇门遁甲 八神 类象 (知乎/网易«奇门遁甲八神详解») — ý nghĩa thần盘.
+{
+  const { BASHEN_VI, GONG_STAR, DOOR_AT } = await import('./src/engine/qimen.js');
+  assert(Object.keys(BASHEN_VI).length === 8, `BASHEN_VI: 8 thần (got ${Object.keys(BASHEN_VI).length})`);
+  assert(BASHEN_VI['值符'].tone === 'cat' && BASHEN_VI['白虎'].tone === 'hung' && BASHEN_VI['九天'].tone === 'cat', '八神 tone: 值符/九天 cát, 白虎 hung');
+  assert(BASHEN_VI['值符'].desc.includes('贵') && BASHEN_VI['白虎'].desc.includes('血'), '八神: 值符 quý nhân, 白虎 huyết quang');
+  for (const k of Object.keys(BASHEN_VI)) {
+    const e = BASHEN_VI[k];
+    assert(e.vi && e.tone && e.wx && e.desc.length > 15, `八神 ${k}: vi+tone+wx+desc`);
+  }
+  // verify 九星/八门 phân cung chuẩn (天蓬本坎, 休门本坎, 开门本乾)
+  assert(GONG_STAR[1] === '天蓬' && GONG_STAR[9] === '天英' && GONG_STAR[6] === '天心', '九星 phân cung chuẩn (1天蓬/9天英/6天心)');
+  assert(DOOR_AT[1] === '休' && DOOR_AT[6] === '开' && DOOR_AT[8] === '生', '八门 phân cung chuẩn (1休/6开/8生)');
+  console.log(`   [loop 1204] 八神类象: 8 thần × (vi/tone/wx/desc) + verify 九星/八门 phân cung ✓`);
+}
 // [loop 1193] TIAOHOU 调候表 đối chiếu 窮通寶鑑 (ctext ch.208379) — regression guard các combo đã verify.
 assert(TIAOHOU_PRINCIPLE && TIAOHOU_PRINCIPLE.jianlu.includes('建禄'), 'TIAOHOU_PRINCIPLE: nguyên lý 建禄 (穷通宝鑑)');
 // [loop 1197] 窮通寶鑑 «五行總論» + 5 nguyên lý mùa (Wikisource 窮通寶鑑).
