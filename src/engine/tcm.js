@@ -544,9 +544,14 @@ export function answerHealth(q, R) {
     }).filter(Boolean);
     if (notes.length) personal = `\n Bản LA SỐ: ${notes.join('; ')}.`;
   }
-  // [loop 1151] expose multi-match info for AI to suggest related conditions
+  // [loop 1151/1156] expose multi-match info + surface in reply text
   const _otherMatches = _scored.slice(1, 3).map((x) => ({ id: x.c.id, title: x.c.title }));
-  return { ok: true, matched: true, id: hit.id, title: hit.title, reply: reply + personal, matchedCount: _scored.length, otherMatches: _otherMatches };
+  let _relatedHint = '';
+  if (_scored.length > 1) {
+    const _others = _scored.slice(1, 3).map((x) => x.c.title.split(' — ')[0].split('(')[0].trim()).join('; ');
+    _relatedHint = `\n\n💡 Có thể bạn cũng quan tâm: ${_others}.`;
+  }
+  return { ok: true, matched: true, id: hit.id, title: hit.title, reply: reply + personal + _relatedHint, matchedCount: _scored.length, otherMatches: _otherMatches };
 }
 
 /**
