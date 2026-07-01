@@ -804,9 +804,9 @@ export function execTool(name, args, R) {
         try { const g = dailyGuide(R, a.year, a.month, a.day); _dirs = { cai: g.caishen, xi: g.xishen, fu: g.fushen, best: g.bestDir }; } catch (_) {}
         return { date: d.solar, ganZhi: d.ganZhi, ganGod: d.ganGod, rating: d.rating, score: d.score, advice: _s(d.advice, 240), gejuDelta: d.gejuDelta, gejuNote: d.gejuNote ? _s(d.gejuNote, 200) : '', interactions: (d.ctx || []), dayStage: d.dayStage || null, dayPillarStrength: d.dayPillarStrength || '', directions: _dirs };
       }
-      case 'health_q': { // [loop 1021] đông y — trả lời câu hỏi sức khoẻ theo ngũ hành + dược lý
+      case 'health_q': { // [loop 1021/1152] đông y — trả lời câu hỏi sức khoẻ theo ngũ hành + dược lý
         const h = answerHealth(String(a.question || ''), R);
-        return h.matched ? { matched: true, title: h.title, reply: _s(h.reply, 1600) } : { matched: false, reply: _s(h.reply, 400) };
+        return h.matched ? { matched: true, title: h.title, reply: _s(h.reply, 1600), matchedCount: h.matchedCount || 1, otherMatches: (h.otherMatches || []).map((m) => _s(m.title, 60)) } : { matched: false, reply: _s(h.reply, 400) };
       }
       case 'health_hour': { // [loop 1040] đông y 子午流注 — kinh mạch giờ hiện tại
         const _n = new Date();
