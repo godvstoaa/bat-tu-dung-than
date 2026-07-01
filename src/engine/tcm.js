@@ -519,7 +519,7 @@ export function answerHealth(q, R) {
     return { c, _score };
   }).filter((x) => x._score > 0).sort((a, b) => b._score - a._score);
   const hit = _scored.length ? _scored[0].c : null;
-  if (!hit) return { ok: false, matched: false, reply: 'Tôi chưa có cơ sở tri thức đông-y cụ thể cho câu này. Hãy hỏi về: thận hư/thủ dâm/sinh lý, can hoả/stress/đau đầu, tỳ vị/tiêu hoá, mất ngủ/rụng tóc/mụn/kinh nguyệt, mỏi mắt, trào ngược, bướu cổ, lão hóa da — hoặc xem phân tích sức khoẻ theo ngũ hành của lá số.' };
+  if (!hit) return { ok: false, matched: false, reply: 'Tôi chưa có cơ sở tri thức đông-y cụ thể cho câu này. Hãy hỏi về: thận hư/thủ dâm/sinh lý, can hoả/stress/đau đầu, tỳ vị/tiêu hoá, mất ngủ/rụng tóc/mụn/kinh nguyệt, mỏi mắt, trào ngược, bướu cổ, lão hóa da, thiếu máu, đau nửa đầu/migraine, ho/khò khè, huyết áp cao, mỡ máu, đau khớp/thắt lưng — hoặc xem phân tích sức khoẻ theo ngũ hành của lá số.' };
   let reply = `【${hit.title}】\n${hit.summary}\n`;
   if (hit.yin) reply += `\n• ${hit.yin}\n`;
   if (hit.yang) reply += `• ${hit.yang}\n`;
