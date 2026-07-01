@@ -401,6 +401,8 @@ export function extendBrief(R) {
         let _note = `12 TRƯỜNG SINH CONTEXT: Đại vận hiện tại ${_curDy.ganZhi} = ${_curStage} → ${_meaning}.`;
         if (_nextStage === '長生' || _nextStage === '臨官' || _nextStage === '帝旺') {
           _note += ` ⭐ Đại vận KẾ TIẾP ${_nextDy?.ganZhi} = ${_nextStage} → ${_stageMeaning[_nextStage] || 'đỉnh'} — chuẩn bị SẴN SÀNG cho giai đoạn bứt phá!`;
+        } else if (['死', '墓', '絕'].includes(_nextStage)) {
+          _note += ` ⚠️ Đại vận KẾ TIẾP ${_nextDy?.ganZhi} = ${_nextStage} → ${_stageMeaning[_nextStage] || 'suy'} — ĐỈNH ĐANG KẾT THÚC: chuẩn bị cho giai đoạn suy giảm (thủ/bảo toàn, tránh mở rộng lớn, tích lũy nguồn lực).`;
         }
         parts.push(_note);
       }
