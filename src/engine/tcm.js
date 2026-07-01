@@ -382,6 +382,25 @@ export const CONDITION_KB = [
     advice: '① BỔ THẬN TINH — đậu đen, vừng đen, sơn dược, kỷ tử, hà thủ ô. ② BỔ TỲ HUYẾT — táo đỏ, long nhãn, kỳ tử, đương quy, thục địa. ③ DƯỠNG PHẾ (da thuộc phổi) — lê, mộc nhĩ trắng, bách hợp, hạnh nhân. ④ TRÀ CHỐNG LÃO HÓA — kỷ tử + táo đỏ + cúc hoa: hãm uống. ⑤ TĂNG COLLAGEN tự nhiên — chân giò nấu (gelatin), cá (omega-3), đậu nành (isoflavone). ⑥ TRÁNH nắng (UV = hao tinh + da), thức khuya (thận phục hồi ban đêm), đường (glycation → nhăn). ⑦ Massage mặt + châm cứu (bổ khí huyết). ⑧ Da nhăn nhanh/chảy xệ → khám da liễu.',
     related: '肾 (thuỷ) → tinh nuôi nội tiết → da. 肺 (kim) → chủ bì mao. 脾 (thổ) → sinh huyết nuôi da. Người 水 suy: thận tinh khuy → da lão hóa nhanh. Người 金 suy: phế khí yếu → da mỏng/khô.',
   },
+  // [loop 1154] +2 conditions common in Vietnamese users
+  {
+    id: 'anemia',
+    keywords: ['thiếu máu', 'máu ít', 'xanh xao', 'mệt mỏi kéo dài', 'chóng mặt khi đứng', 'khí hư', 'huyết hư', 'kinh nguyệt nhiều', 'mặt nhợt', 'mắt mờ do máu kém', 'sức đề', 'huyết sắc tố thấp', 'ferritin thấp', 'sắt thấp', 'chán ăn', '气虚', '血虚'],
+    title: 'Thiếu máu / Khí huyết lưỡng hư (TỲ KHÔNG SINH HUYẾT + THẬN TINH KHUY)',
+    summary: 'Đông-y: «TỲ VIÊU HẬU THIÊN CHI BẢN, CHỦ VẬN HOÁ → SINH HUYẾT». Máu do TỲ (đất) vận hoá + vật liệu từ THẬN TINH (nước). Khí hư → không sinh được huyết. Huyết hư → khí không chỗ依附 → lưỡng hư. Phụ nữ mất máu (kinh/sinh) + ăn kém → dễ thiếu máu.',
+    symptoms: 'mặt nhợt/xanh xao, môi nhạt, móng trắng giòn, chóng mặt khi đứng, mệt mỏi, hơi thở ngắn, tim đập nhanh, mắt mờ, kinh nguyệt ít/nhiều/không đều, sắt thấp (ferritin/huyết sắc tố).',
+    advice: '① BỔ KHÍ SINH HUYẾT — đương quy, thục địa, bạch thược, kỷ tử, táo đỏ, long nhãn, sâm (nhân sâm/đảng sâm), hoàng kỳ. ② THỰC PHẨM GIÀU SẮT — gan, thịt đỏ, rau muống, rau ngót, đậu đen, mồng tơi, lòng đỏ trứng. ③ KẾT HỢP VITAMIN C (cam, chanh, ổi) → tăng hấp thu sắt. ④ TRÁNH: trà/cà phê ngay sau ăn (tanin ức chế sắt), ăn kiêng thiếu protein. ⑤ THANG KINH ĐIỂN: Bát trân thang / Quy tỳ thang / Tứ vật thang. ⑥ Phụ nữ kinh nhiều → điều kinh + bổ huyết (kế tục). ⑦ Huyết sắc tố <90 g/L → khám y khoa (sắt/uống sắt/yếu tố).',
+    related: '脾 (thổ) → sinh huyết. 肾 (thuỷ) → tinh → tủy → huyết. Người 土 suy: tỳ không sinh huyết. Người 水 suy: thận tinh kém → tủy kém → huyết kém.',
+  },
+  {
+    id: 'migraine',
+    keywords: ['đau nửa đầu', 'đau một bên đầu', 'migraine', 'đau đầu giật', 'đau đầu từng cơn', 'đau đầu_khiển nảy', 'nhạy sáng', 'buồn nôn khi đau đầu', 'đau đầu_before kinh', 'chóng mặt nặng', 'đau đầu_pound', '偏头'],
+    title: 'Đau nửa đầu / Migraine (CAN DƯƠNG THƯỢNG KHÁNG + Ứ HUYẾT + PHONG)',
+    summary: 'Đông-y: «CAN DƯƠNG THƯỢNG KHÁNG» (can dương lên cao) + «PHONG HOẢ» (gió lửa) → đau giật một bên đầu. Stress/mệt/căng thẳng → can khí uất → can dương cương → phong hoả theo kinh can lên đầu. Nặng: buồn nôn, nhạy sáng/âm thanh. Có type kinh nguyệt (trước kinh → huyết hư → can dương mất chế → đau).',
+    symptoms: 'đau giật/nhói một bên (thường h Thái dương), có «aura» (chớp sáng, mờ tạm), buồn nôn/nôn, nhạy sáng + tiếng ồn, đau tăng khi vận động, có thể liên quan kinh nguyệt.',
+    advice: '① BÌNH CAN TIỀM DƯƠNG — thiên ma (gastrodia), câu đằng (uncaria), thạch quyết minh, ngọc trúc, sinh địa. ② HOẠT HUYẾT THÔNG LẠC — đan sâm, xích thược, xuyên khung (川芎 = thần dược đau đầu). ③ TRÀ THANH CAN — cúc hoa (10g) + quyết minh tử (10g) + bạc hà (5g). ④ HUYỆT CHÂM — Thái dương, Phong trì, Hợp cốc, Thái xung. Massage huyệt Thái dương + gáy khi đau. ⑤ TRÁNH: stress (trigger #1), thiếu ngủ, cà phê/rượu/thức ăn mặn/phô mai/chocolate (trigger migraine), nắng gắt, tiếng ồn. ⑥ NHỊP: ngủ đủ (thận phục hồi), giảm screen time. ⑦ Đau >72h / nôn nhiều / liệt / co giật → cấp cứu.',
+    related: '肝 (mộc) → can dương thượng kháng. 肾 (thuỷ) → thuỷ bất涵 mộc → can dương cương. Người 木 vượng: dễ can hoả → migraine. Người 水 suy: thận không nuôi can → can dương.',
+  },
 ];
 
 /**
@@ -480,6 +499,8 @@ const CONDITION_WX = {
   eye_strain: ['木', '水'], acid_reflux: ['木', '土'],
   // [loop 1148] +2 conditions
   thyroid_nodule: ['木', '土', '水'], skin_aging: ['水', '土', '金'],
+  // [loop 1154] +2 conditions
+  anemia: ['土', '水'], migraine: ['木', '火', '水'],
 };
 
 /**
