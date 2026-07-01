@@ -3558,7 +3558,7 @@ function renderDayunChart(R) {
         <span class="hint" style="font-size:10px;color:${col}">${esc((d.rating || '').slice(0, 8))}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:2px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh. Tổng điểm = Dụng Thần + 十神 + 冲/合/伏吟 + 十二长生 sinh khí (chu move để xem chi tiết).</p>`;
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:2px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 Xanh = Cát · Đỏ = Hung · Xám = Bình. Thanh cao = vận mạnh. Tổng điểm = Dụng Thần + 十神 + 冲/合 (日/月/年 trụ) + 伏吟 + 十二长生 sinh khí + 盖头截脚 (chu move để xem chi tiết).</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận trục.</p>'; }
 }
 
