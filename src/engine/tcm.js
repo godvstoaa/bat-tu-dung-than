@@ -221,7 +221,7 @@ export const CONDITION_KB = [
   },
   {
     id: 'gout',
-    keywords: ['gout', 'thống phong', 'đau khớp ngón chân cái', 'axit uric', 'viêm khớp cấp', '痛风', 'sưng khớp', 'đau khớp dữ dội'],
+    keywords: ['gout', 'thống phong', 'đau khớp ngón chân cái', 'axit uric', 'viêm khớp cấp', '痛风', 'sưng khớp', 'đau khớp dữ dội', 'đau khớp', 'viêm khớp'],
     title: 'Gout / Thống phong (THỐNG PHONG 痛风 — thấp nhiệt tê痹 / đàm trọc ủ huyết)',
     summary: 'Đông-y THỐNG PHONG (thấp nhiệt痹) — đau khớp dữ dội (thường ngón chân cái), sưng đỏ, về đêm nặng. Do thấp nhiệt + đàm trọc ủ huyết ở kinh lạc. Thường kèm TỲ VỊ thấp nhiệt (ăn giàu purin/đồ uống).',
     symptoms: 'đau khớp dữ dội (thường ngón chân cái), sưng đỏ nóng, về đêm nặng hơn, da bong, hạn chế vận động. Mạn tính: hạt tophi.',
