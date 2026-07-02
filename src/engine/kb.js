@@ -176,6 +176,7 @@ export const DITIANSUI_TONGLUN = {
     apply: 'Mạnh cứng (đắc lệnh vượng) → cần «泄» (thực thương tiết tú) không «khắc» (ngược kích). Yếu mềm (thất lệnh) → cần «sinh phù» (ấn/tỷ) không «khắc». «Dẫn» = dẫn tính tình ngũ hành, không cưỡng chế.',
   },
   震兑离坎: {
+    cue: 'Chấn(木)-Đoài(金) xung → sự nghiệp (thắng bại); Ly(火)-Khảm(水) giao → sức khoẻ/mệnh (tử sinh)',
     verse: '震兌之機，主勝負；離坎之際，定死生。',
     vi: 'Cơ Chấn-Đoài (Mộc-Kim) chủ thắng bại; ranh Ly-Khảm (Hỏa-Thủy) định tử sinh.',
     apply: 'Chấn(木)-Đoài( Kim) xung = chủ thắng bại (sự nghiệp). Ly(Hỏa)-Khảm(Thủy) giao = chủ tử sinh (sức khoẻ/mệnh). Hai cặp này xung khắc dữ → ảnh hưởng lớn nhất đến mệnh.',
