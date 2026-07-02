@@ -313,6 +313,13 @@ export const PATTERN_DEEP = {
   從殺格: { use: 'tòng (thuận sát thế)', yong: 'Sát', xiang: 'Tài sinh sát (thuận)', ji: 'Thực chế sát / Ấn hoá (nghịch — phá cách)' },
   從兒格: { use: 'tòng (thuận thực thương thế)', yong: 'Thực Thương', xiang: 'Tài («nhi hựu sinh nhi», lưu thông); bất phạ Tỷ Kiếp (vì tỷ sinh thực)', ji: 'Ấn đoạt thực (phá cách)' },
   從旺格: { use: 'tòng chuyên vượng (thuận thế)', yong: 'Ấn / Tỷ (thuận thế bang thân)', xiang: 'Thực Thương tiết tú (thuận tiết)', ji: 'Quan / Sát / Tài nghịch thế (khắc phạt phá cách)' },
+  // [loop 1256] 5 chuyên vượng cách (mỗi ngũ hành 1格). Nguồn: 知乎«格局详解» + 百度百科«特殊命局».
+  //   共通: hỷ Ấn (sinh vượng thần) + Tỷ (thuận thế) + Thực Thương tiết tú; kỵ Quan Sát (khắc vượng thần → phá cách).
+  曲直格: { use: 'chuyên vượng mộc (mộc khí chuyên tụ)', yong: 'Mộc (tỷ)', xiang: 'Thủy (ấn sinh mộc) / Hoả (tiết tú)', ji: 'Kim (quan sát khắc mộc phá cách)', alias: '曲直仁壽' },
+  炎上格: { use: 'chuyên vượng hoả', yong: 'Hoả', xiang: 'Mộc (ấn) / Thổ (tiết)', ji: 'Thủy (quan sát)', alias: '率性炎上' },
+  稼穡格: { use: 'chuyên vượng thổ', yong: 'Thổ', xiang: 'Hoả (ấn) / Kim (tiết)', ji: 'Mộc (quan sát)', alias: '稼穡篤實' },
+  從革格: { use: 'chuyên vượng kim', yong: 'Kim', xiang: 'Thổ (ấn) / Thủy (tiết)', ji: 'Hoả (quan sát)', alias: '金剛從革' },
+  潤下格: { use: 'chuyên vượng thuỷ', yong: 'Thủy', xiang: 'Kim (ấn) / Mộc (tiết)', ji: 'Thổ (quan sát)', alias: '潤下靈秀' },
 };
 
 // ---- 子平 «六神» PHÂN CẤP quanh dụng thần (《子平真诠》) ----
