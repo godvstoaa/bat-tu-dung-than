@@ -81,7 +81,8 @@ import { physiognomyOverview } from './physiognomy.js';
 import { yinzhaiOverview } from './yinzhai.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
-import { DAXIANG, GUA_CI } from './hexagram-meaning.js';
+import { DAXIANG, GUA_CI, SIMP2TRAD } from './hexagram-meaning.js';
+const SIMP2TRAD_REV = Object.fromEntries(Object.entries(SIMP2TRAD).map(([s, t]) => [t, s])); // trad→simp
 import { liurenPan } from './liuren.js';
 import { qimenDongPan } from './qimen.js';
 import { qizheng, longitudeToMansion } from './qizheng.js';
@@ -1180,6 +1181,9 @@ export function execTool(name, args, R) {
             geMing: fdg.geMing, stars: fdg.stars, starDesc: _s(fdg.starDesc || '', 160),
             shuYun: _s(fdg.shuYun || '', 200), geShi: _s(fdg.geShi || '', 200),
             summary: _s(fdg.summary || '', 240),
+            // [loop 1295] enrichment: 大象传 + 卦辞 cho quẻ 分定經 (xử lý phồn→giản)
+            daxiang: DAXIANG[fdg.gua]?.verse || DAXIANG[SIMP2TRAD_REV[fdg.gua]]?.verse || '',
+            guaci: GUA_CI[fdg.gua]?.ci || GUA_CI[SIMP2TRAD_REV[fdg.gua]]?.ci || '',
           } : '(không đủ dữ liệu trụ giờ)',
           note: 'Quỷ Cốc Tử = hệ cổ phái (鬼谷子). Hệ nạp âm (system1) luận tone cát hung; 分定經 两头钳 (system2) ghép năm×giờ → quẻ + 格诗 luận mệnh.',
         };
