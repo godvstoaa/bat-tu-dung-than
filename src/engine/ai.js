@@ -81,6 +81,7 @@ import { physiognomyOverview } from './physiognomy.js';
 import { yinzhaiOverview } from './yinzhai.js';
 import { cezi } from './cezi.js';
 import { castByTime, solarToMhNums } from './meihua.js';
+import { DAXIANG, GUA_CI } from './hexagram-meaning.js';
 import { liurenPan } from './liuren.js';
 import { qimenDongPan } from './qimen.js';
 import { qizheng, longitudeToMansion } from './qizheng.js';
@@ -922,6 +923,9 @@ export function execTool(name, args, R) {
           rel: r.rel, huRel: r.huRel, bianRel: r.bianRel, verdict: r.verdict,
           // [loop 624] 3-layer synthesis — CỔ PHÁP 本卦→互卦→变卦 (đây là kết luận chính)
           processNote: r.processNote, outcomeNote: r.outcomeNote, finalVerdict: r.finalVerdict,
+          // [loop 1279] DAXIANG + GUA_CI cho 3 quẻ (本/互/变) — enrichment cổ điển
+          benDaxiang: DAXIANG[r.ben?.name]?.verse || '', benGuaci: GUA_CI[r.ben?.name]?.ci || '',
+          bianDaxiang: DAXIANG[r.bian?.name]?.verse || '', bianGuaci: GUA_CI[r.bian?.name]?.ci || '',
         };
       }
       case 'analyze_liuren': { // [loop 508] 大六壬 四课三传
