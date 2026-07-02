@@ -103,7 +103,20 @@ const TJ_INFO = {
   太阴: { wx: 'tân kim', tone: 'cat', desc: 'âm tư, mật mưu, phụ nữ, tì thiếp, ẩn nặc, kim bô, thưởng tứ; cát tướng' },
   天后: { wx: 'quý thủy', tone: 'cat', desc: 'phụ nữ, hôn nhân, ân xá, tha thứ, thuỷ tộc; hậu cung chi chủ, cát' },
 };
-export { TJ_INFO, YUEJIANG_INFO };
+// [loop 1227] 大六壬 九宗门 (9 pháp suy 三传, lý luận nền). Nguồn: 百度百科 + 知乎«九宗门系列».
+//   Thứ tự判定: 贼克→比用→涉害→遥克→昴星→别责→八专→伏吟→返吟 (先取直接 khắc, 无则放宽).
+const LIUREN_9ZONG = {
+  贼克: { order: 1, principle: 'lấy «hạ khắc thượng» làm sơ truyền (tặc=hạ khắc thượng, khắc=thượng khắc hạ)', when: 'tứ課 chỉ 1 khắc-tặc' },
+  比用: { order: 2, principle: '≥2 khắc-tặc → lấy thần cùng âm dương với nhật can (dương nhật thủ dương thần, âm nhật thủ âm thần)', when: 'tứ課 có ≥2 khắc' },
+  涉害: { order: 3, principle: 'vẫn ≥2 → so涉害 sâu cạn (mạnh:dần-thân-tỵ-hợi > quýnh:tý-ngọ-mão-dậu > quý:thìn-tuất-sửu-mùi)', when: 'tỷ dụng vẫn chưa định' },
+  遥克: { order: 4, principle: 'không khắc trực tiếp → lấy «dao khắc»: thượng khắc nhật can (vô thì nhật can sở khắc)', when: 'tứ課 vô trực tiếp khắc' },
+  昴星: { order: 5, principle: 'vô khắc vô dao khắc → mão tinh ngưỡng/phủ thị, thủ dậu (mão tinh bản vị) thượng-hạ thần', when: 'tứ課 vô khắc vô dao' },
+  别责: { order: 6, principle: 'tứ課 bất tề (chỉ 3課) → y theo can hợp (can chi combinational) thủ sơ truyền', when: 'tứ課 thiếu (chỉ 3)' },
+  八专: { order: 7, principle: 'nhật can-chi đồng vị (giáp-dần/ất-mão...) → thủ can/trợ thượng thần', when: 'can chi đồng vị' },
+  伏吟: { order: 8, principle: 'thiên-địa bàn trùng hợp (thần quy bản vị) → thủ theo nhật can thượng thần', when: 'thiên=địa bàn (trùng)' },
+  返吟: { order: 9, principle: 'thiên-địa bàn đối xung (lâm xung vị) → thủ khắc-tặc hoặc dịch mã', when: 'thiên đối xung địa' },
+};
+export { TJ_INFO, YUEJIANG_INFO, LIUREN_9ZONG };
 
 // 六亲 (theo 初传 vs 日干 hành)
 function liuqin(chuan, dayGan) {

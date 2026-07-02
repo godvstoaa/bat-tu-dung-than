@@ -383,6 +383,19 @@ for (const k of Object.keys(PATTERN_DEEP)) {
   }
   console.log(`   [loop 1223] 十二月将类象: 12 tướng × (zhi/wx/desc), khớp YUEJIANG_VI — 六壬大全 ✓`);
 }
+// [loop 1227] 大六壬 九宗门 (9 pháp suy 三传, 百度百科/知乎).
+{
+  const { LIUREN_9ZONG } = await import('./src/engine/liuren.js');
+  assert(Object.keys(LIUREN_9ZONG).length === 9, `LIUREN_9ZONG: 9 tông môn (got ${Object.keys(LIUREN_9ZONG).length})`);
+  const ordered = Object.values(LIUREN_9ZONG).sort((a, b) => a.order - b.order);
+  assert(ordered[0].order === 1 && ordered[0].principle.includes('hạ khắc thượng'), '九宗门 #1 贼克 (hạ khắc thượng)');
+  assert(ordered[8].order === 9 && ordered[8].principle.includes('đối xung'), '九宗门 #9 返吟 (đối xung)');
+  for (const k of Object.keys(LIUREN_9ZONG)) {
+    const e = LIUREN_9ZONG[k];
+    assert(e.order >= 1 && e.order <= 9 && e.principle.length > 15 && e.when, `九宗门 ${k}: order+principle+when`);
+  }
+  console.log(`   [loop 1227] 九宗门: 9 pháp suy 三传 (贼克→...→返吟) — 百度百科/知乎 ✓`);
+}
 // [loop 1224] 测字十法 (《测字秘牒》程省).
 {
   const { CEZI_METHOD } = await import('./src/engine/cezi.js');
