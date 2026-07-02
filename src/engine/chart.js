@@ -94,6 +94,7 @@ export function buildChart(year, month, day, hour, minute, gender) {
     },
     pillars,
     dayGan,
+    dayZhi: pillars.day.zhi,
     dayMaster: { gan: dayGan, ...GAN[dayGan] },
     monthZhi: pillars.month.zhi,
   };
