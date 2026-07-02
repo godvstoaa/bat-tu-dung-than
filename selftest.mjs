@@ -3580,6 +3580,21 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   assert(missing.length === 0, `NAYIN_KOUJUE cặp nào cũng hợp lệ NAYIN_MEANING (lệch: ${missing.join(',')})`);
   console.log(`   [loop 1245] 纳音口诀: 30 cặp giáp-tý→nạp âm, khớp NAYIN_MEANING — 《三命通会》 ✓`);
 }
+// [loop 1246] 空亡口诀 (六甲旬空).
+{
+  const { KONGWANG_KOUJUE, KONGWANG_INFO, XUN_KONG } = await import('./src/engine/kongwang.js');
+  // 每 旬 trong口诀 phải khớp XUN_KONG
+  const re = [...KONGWANG_KOUJUE.matchAll(/(甲[子戌申午辰寅])旬中空(..)/g)];
+  assert(re.length === 6, `空亡口诀: 6旬 (got ${re.length})`);
+  let ok = true;
+  for (const m of re) {
+    const xun = m[1] + '旬'.replace('旬', ''); // m[1] is like 甲子
+    if (XUN_KONG[m[1]] && XUN_KONG[m[1]].join('') !== m[2]) ok = false;
+  }
+  assert(ok, '空亡口诀 6旬 khớp XUN_KONG data');
+  assert(KONGWANG_INFO.includes('旬空') && KONGWANG_INFO.includes('hữu dực nan phi'), 'KONGWANG_INFO:旬空 + hữu dực nan phi');
+  console.log(`   [loop 1246] 空亡口诀 6旬 (khớp XUN_KONG) + KONGWANG_INFO — 《三命通会》 ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);

@@ -16,6 +16,11 @@ const XUN_KONG = {
   甲辰: ['寅', '卯'],  // 甲辰旬 (41-50): 寅卯 không
   甲寅: ['子', '丑'],  // 甲寅旬 (51-60): 子丑 không
 };
+// [loop 1246] 空亡口诀 (六甲旬空, mnemonic). Nguồn: XUN_KONG verified (kongwang tests) + 《三命通会》.
+//   «Không vong» = 2 địa chi KHÔNG CÓ trong 60甲子旬 của nhật can chi → «treo/phiệt», tạm không active,
+//   vận đáo thì thực. Chủ: hữu dực nan phi, hữu chí nan triển, ngẫu nhiên/bất định.
+export const KONGWANG_KOUJUE = '甲子旬中空戌亥，甲戌旬中空申酉，甲申旬中空午未，甲午旬中空辰巳，甲辰旬中空寅卯，甲寅旬中空子丑。';
+export const KONGWANG_INFO = 'Không vong (旬空) — 2 địa chi vắng trong 60甲子旬 của nhật trụ; «treo/phiệt» tạm không phát huy, «hữu dực nan phi, hữu chí nan triển»; đợi vận/sơn đến thì «đ출 không» mới thực. Hung thần nhập không không tác họa, cát thần nhập không không tác phúc.';
 
 // Tìm旬首 của một干支
 const GAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
