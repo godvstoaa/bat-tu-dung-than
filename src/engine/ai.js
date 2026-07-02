@@ -330,14 +330,14 @@ SAO TRỌNG ĐIỂM 财官印 通根透干 (sao Tài/Quan/Ấn có THẬT lực 
 TÀI/QUAN THẤU CÁN ỨNG KỲ (năm nào sao TÀI/QUAN ẩn được kích hoạt — đế can cùng hành thấu): ${(() => { try { return scanWealthCareerYingqi(R, curYear, 12).summary; } catch (e) { return '(không tính được)'; } })()}
 XUNG/HỢP CHI ỨNG KỲ (năm nào sao ẨN trong địa chi bẩm sinh bị lưu niên XUNG mở kho / HỢP kéo ra → phát lực): ${(() => { try { return scanBranchYingqi(R, curYear, 12).summary; } catch (e) { return '(không tính được)'; } })()}
 
-HỘI – HỢP – XUNG – HÌNH – HẠI: ${R.interactions.summary}
+HỘI – HỢP – XUNG – HÌNH – HẠI: ${(() => { const I = R.interactions || {}; const out = []; for (const t of ['ganHe','ganChong','zhiHe','sanHe','banHe','sanHui','chong','xing','hai']) (I[t]||[]).forEach(e => out.push(`${e.vi||e.name||t} ${(e.a&&e.b)?e.a+'-'+e.b:''}${e.at?'@'+e.at:''}${e.meaning?' — '+e.meaning:''}`)); return out.length ? out.join('; ') : (I.summary||'không có'); })()}
 
 CHẤT LƯỢNG TRỤ 盖头截脚 (can-chi có khắc-nhau trong trụ không — đọc "sao hay vấp"):
 ${(() => { try { return analyzePillarQuality(R).summary; } catch (e) { return '(không tính được)'; } })()}
 
 THẦN SÁT: ${shenshaList}
 
-LỤC THÂN (cung vị + tinh): ${(R.liuqin || []).map((l) => `${l.relVi}(${l.mainStar || '-'}, cung ${l.palaceGod}${l.stable ? '' : ', xung'})`).join('; ') || '(không)'}
+LỤC THÂN (cung vị + tinh): ${(R.liuqin || []).map((l) => `${l.relVi}(${l.mainStar || '-'}, cung ${l.palaceGod}${l.stable ? '' : ', xung'}): ${l.verdict || ''}`).join('; ') || '(không)'}
 
 SAO HÔN NHÂN CỔ (theo trụ — 孤鸾/阴阳差错/八专/九丑; dùng trả lời "cớ sao duyên trắc/kết hôn sao 选"):
 ${(() => { try { return marriageStars(R).summary; } catch (e) { return '(không tính được)'; } })()}
