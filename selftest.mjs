@@ -600,6 +600,10 @@ for (const k of Object.keys(SHEN_HIERARCHY)) {
   // guard: GUA_CI keys ⊆ HEX_MEANING (hexKeySet đã định nghĩa ở trên)
   const gciMissing = Object.keys(GUA_CI).filter((k) => !hexKeySet.has(k));
   assert(gciMissing.length === 0, `GUA_CI keys đều hợp lệ HEX_MEANING (lệch: ${gciMissing.join(',')})`);
+  // [loop 1266] cross-guard: DAXIANG + GUA_CI cùng đủ 64 khớp HEX_MEANING.
+  assert(Object.keys(DAXIANG).length === 64 && Object.keys(GUA_CI).length === 64, 'DAXIANG + GUA_CI đều đủ 64');
+  const daxNotInGua = Object.keys(DAXIANG).filter((k) => !GUA_CI[k]);
+  assert(daxNotInGua.length === 0, `DAXIANG keys đều có trong GUA_CI (thiếu: ${daxNotInGua.join(',')})`);
   for (const k of Object.keys(DAXIANG)) {
     const e = DAXIANG[k];
     assert(e.verse && e.apply.length > 15, `大象 ${k}: verse + apply`);
