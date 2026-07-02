@@ -3656,6 +3656,15 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   assert(ok, '天德合: 干-type→干合 / 支-type→支六合 (mechanical derivation verified)');
   console.log(`   [loop 1253] 天德合 12月 (干/支混合 hợp) — 《三命通会» ✓`);
 }
+// [loop 1257] 五合化气口诀 + audit toàn diện.
+{
+  const { HUAQI_KOUJUE, GAN_HE } = await import('./src/engine/huaqi.js');
+  assert(HUAQI_KOUJUE.includes('甲己化土') && HUAQI_KOUJUE.includes('戊癸化火'), '化气口诀: 甲己化土/戊癸化火');
+  // verify口诀 khớp GAN_HE data
+  const pairs = [...HUAQI_KOUJUE.matchAll(/(.)(.)化(.)/g)];
+  for (const m of pairs) assert(GAN_HE[m[1] + m[2]] === m[3], `化气 ${m[1]}${m[2]}→${m[3]} khớp GAN_HE`);
+  console.log(`   [loop 1257] 五合化气口诀 (khớp GAN_HE data) + audit PASS — 《三命通会» ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);

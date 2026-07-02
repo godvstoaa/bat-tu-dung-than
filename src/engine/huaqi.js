@@ -21,6 +21,8 @@ const SHENG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
 const KE = { 木: '土', 火: '金', 土: '水', 金: '木', 水: '火' };
 const GAN_HE = { '甲己': '土', '己甲': '土', '乙庚': '金', '庚乙': '金', '丙辛': '水', '辛丙': '水', '丁壬': '木', '壬丁': '木', '戊癸': '火', '癸戊': '火' };
 const HUA_NAME = { 土: 'Hóa Thổ cách (甲己)', 金: 'Hóa Kim cách (乙庚)', 水: 'Hóa Thủy cách (丙辛)', 木: 'Hóa Mộc cách (丁壬)', 火: 'Hóa Hỏa cách (戊癸)' };
+// [loop 1257] 五合化气口诀 (《三命通会》化气十段锦).
+export const HUAQI_KOUJUE = '甲己化土，乙庚化金，丙辛化水，丁壬化木，戊癸化火。';
 
 /**
  * @returns {{ hasHe, pairs:[{withGan,with,hua,monthOk,rootOk,poHua,breakers}], huaQiGe, huaWx, dung, summary }}
