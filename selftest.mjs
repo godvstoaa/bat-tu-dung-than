@@ -8,7 +8,7 @@ import { composeAnswer, detectIntent } from './src/engine/nlg.js';
 import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
-import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN } from './src/engine/constants.js';
+import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG } from './src/engine/constants.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
@@ -566,6 +566,13 @@ assert(TIAOHOU['丙']['午'].join() === '壬,庚', '穷通宝鑑 丙午: 壬主�
   assert(JIN_YU['甲'] === '辰' && JIN_YU['辛'] === '亥' && JIN_YU['癸'] === '寅', '金舆: 甲龙辛猪癸虎');
 }
 assert(CLIMATE && Object.keys(CLIMATE).length === 12, 'CLIMATE đủ 12 nguyệt chi');
+// [loop 1233] 十二地支 类象 (Wikipedia/百度百科/搜狐/香港天文台).
+assert(Object.keys(ZHI_LEIXIANG).length === 12, `ZHI_LEIXIANG: 12 địa chi (got ${Object.keys(ZHI_LEIXIANG).length})`);
+assert(ZHI_LEIXIANG['子'].hour === '23-01' && ZHI_LEIXIANG['子'].direction === 'bắc' && ZHI_LEIXIANG['午'].direction === 'nam', '地支类象: 子=23-01/bắc, 午=nam');
+for (const k of Object.keys(ZHI_LEIXIANG)) {
+  const e = ZHI_LEIXIANG[k];
+  assert(e.hour && e.direction && e.month && e.season, `地支 ${k}: hour+direction+month+season`);
+}
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic
 const R1990 = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
 assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴天髓 辛');

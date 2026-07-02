@@ -49,6 +49,24 @@ export const ZHI = {
   亥: { vi: 'Hợi',  wx: '水', yin: false, con: 'Heo'   },
 };
 
+// ---- 十二地支 类象 (时辰/方位/月份/季节) ----
+// [loop 1233] Nguồn: Wikipedia 地支 + 百度百科 + 搜狐 + 香港天文台. wx/yin/con đã có trong ZHI;
+//   đây bổ sung hour/direction/month/season.
+export const ZHI_LEIXIANG = {
+  子: { hour: '23-01', direction: 'bắc', month: '11 (đông nguyệt)', season: 'đông' },
+  丑: { hour: '01-03', direction: 'đông bắc (thiên bắc)', month: '12 (lạp nguyệt)', season: 'đông' },
+  寅: { hour: '03-05', direction: 'đông bắc (thiên đông)', month: '1 (chính nguyệt)', season: 'xuân' },
+  卯: { hour: '05-07', direction: 'đông', month: '2', season: 'xuân' },
+  辰: { hour: '07-09', direction: 'đông nam (thiên đông)', month: '3', season: 'xuân' },
+  巳: { hour: '09-11', direction: 'đông nam (thiên nam)', month: '4', season: 'hạ' },
+  午: { hour: '11-13', direction: 'nam', month: '5', season: 'hạ' },
+  未: { hour: '13-15', direction: 'tây nam (thiên nam)', month: '6', season: 'hạ' },
+  申: { hour: '15-17', direction: 'tây nam (thiên tây)', month: '7', season: 'thu' },
+  酉: { hour: '17-19', direction: 'tây', month: '8', season: 'thu' },
+  戌: { hour: '19-21', direction: 'tây bắc (thiên tây)', month: '9', season: 'thu' },
+  亥: { hour: '21-23', direction: 'tây bắc (thiên bắc)', month: '10', season: 'đông' },
+};
+
 // ---- TÀNG CAN (藏干) — Can ẩn trong Địa Chi ----
 // Thứ tự: Bản khí → Trung khí → Dư khí. Trọng số theo độ dài.
 export const HIDDEN = {
