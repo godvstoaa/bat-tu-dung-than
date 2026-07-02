@@ -345,6 +345,21 @@ for (const k of Object.keys(SHEN_HIERARCHY)) {
   assert(MEIHUA_SANYAO['耳'] && MEIHUA_SANYAO['心'].includes('tâm nãi') && MEIHUA_SHIYING['天时应'].includes('thiên tượng'), '三要: 耳/目/心; 十应: 天时应 thiên tượng');
   console.log(`   [loop 1228] 梅花 三要 (耳/目/心) + 十应 — ctext 梅花易數卷三 ✓`);
 }
+// [loop 1235] 二十四山 正体五行 + 红黑阴阳 (知乎/百度百科).
+{
+  const { SHAN_WX, SHAN_YINYANG } = await import('./src/engine/fengshui-compass.js');
+  assert(Object.keys(SHAN_WX).length === 8, `SHAN_WX: 8 cung (got ${Object.keys(SHAN_WX).length})`);
+  assert(SHAN_WX['坎'].wx === '水' && SHAN_WX['离'].wx === '火' && SHAN_WX['兑'].wx === '金', '24山正五行: 坎水/离火/兑金');
+  // mỗi cung 3 sơn, đúng 口诀 壬子癸/丙午丁
+  assert(SHAN_WX['坎'].shan === '壬子癸' && SHAN_WX['离'].shan === '丙午丁', '24山: 坎=壬子癸, 离=丙午丁');
+  // 红黑阴阳 đủ 12+12=24字
+  assert(SHAN_YINYANG['阳'].length === 12 && SHAN_YINYANG['阴'].length === 12, `24山阴阳: 12+12 (got ${SHAN_YINYANG['阳'].length}+${SHAN_YINYANG['阴'].length})`);
+  for (const k of Object.keys(SHAN_WX)) {
+    const e = SHAN_WX[k];
+    assert(e.shan && e.wx && e.dir, `24山 ${k}: shan+wx+dir`);
+  }
+  console.log(`   [loop 1235] 24山正五行 (8 cung×3 sơn) + 红黑阴阳 (12+12) — 知乎/百度百科 ✓`);
+}
 // [loop 1229] 河图洛书 口诀 (《周易·系辞》/Wikisource/Wikipedia).
 {
   const { HELU_KOUJUE } = await import('./src/engine/heluo.js');

@@ -35,6 +35,27 @@ const SHAN_24 = [
 // so sánh được qua ranh 0°. [loop 631 FIX] trước đây mod 360 → 225°/270° sai về 壬.
 const SHAN_START = SHAN_24.map((_, i) => 337.5 + i * 15);
 
+// ---- 二十四山 正体五行 (地盘正针,八卦统三山 — mỗi卦 3山共五行) ----
+// [loop 1235] Nguồn: 知乎«二十四山分金立向» + 三六风水网 + 百度百科.
+//   Khẩu quyết: 壬子癸水/丑艮寅土/甲卯乙木/辰巽巳木/丙午丁火/未坤申土/庚酉辛金/戌乾亥水.
+//   [nuance 1] đây là phong thuỷ 正体五行 (lập hướng);寅/巳/申 theo卦, KHÁC子平地支正五行 (寅木/巳火/申金).
+//   [nuance 2] 乾卦 «正体五行» quy thuỷ (三合/地盘), «八卦本体» 乾=金 — 2 truyền thống.
+export const SHAN_WX = {
+  坎: { shan: '壬子癸', wx: '水', dir: 'bắc' },
+  艮: { shan: '丑艮寅', wx: '土', dir: 'đông bắc' },
+  震: { shan: '甲卯乙', wx: '木', dir: 'đông' },
+  巽: { shan: '辰巽巳', wx: '木', dir: 'đông nam' },
+  离: { shan: '丙午丁', wx: '火', dir: 'nam' },
+  坤: { shan: '未坤申', wx: '土', dir: 'tây nam' },
+  兑: { shan: '庚酉辛', wx: '金', dir: 'tây' },
+  乾: { shan: '戌乾亥', wx: '水 [variant: 八卦本体 乾=金]', dir: 'tây bắc' },
+};
+// [loop 1235] 红黑阴阳 (玄空立向):红=dương, 黑=âm.
+export const SHAN_YINYANG = {
+  阳: '乾亥壬艮寅甲巽巳丙坤申庚',
+  阴: '子癸丑卯乙辰午丁未酉辛戌',
+};
+
 // Ngũ hành của trung quái (quẻ giữa mỗi hướng) — để đối chiếu Dụng Thần
 const QUAI_WX = { 子: 'Thủy', 艮: 'Thổ', 卯: 'Mộc', 巽: 'Mộc', 午: 'Hỏa', 坤: 'Thổ', 酉: 'Kim', 乾: 'Kim' };
 
