@@ -280,9 +280,10 @@ for (const k of Object.keys(DITIANSUI_HEZHI)) {
   const e = DITIANSUI_HEZHI[k];
   assert(e.verse && e.verse.startsWith('何知') && e.criterion.length > 20 && e.note.length > 15, `何知章 ${k}: verse + criterion + note`);
 }
-// [loop 1192→1319] 滴天髓 «通論» — 10 nguyên lý (任鐵樵闡微 ctext/quanxue.cn).
-assert(Object.keys(DITIANSUI_TONGLUN).length === 17, `DITIANSUI_TONGLUN đủ 17 nguyên lý (got ${Object.keys(DITIANSUI_TONGLUN).length})`);
+// [loop 1192→1326] 滴天髓 «通論» — 18 nguyên lý (任鐵樵闡微 ctext/quanxue.cn/wikisource).
+assert(Object.keys(DITIANSUI_TONGLUN).length === 18, `DITIANSUI_TONGLUN đủ 18 nguyên lý (got ${Object.keys(DITIANSUI_TONGLUN).length})`);
 assert(DITIANSUI_TONGLUN['中和'].verse.includes('命貴中和') && DITIANSUI_TONGLUN['冲机'].verse.includes('旺者衝衰衰者拔'), '通論: 中和 + 冲机 verse cổ bản');
+assert(DITIANSUI_TONGLUN['精神'].verse.includes('人有精神') && DITIANSUI_TONGLUN['精神'].cue, '通論 [loop 1326]: 精神 verse (quanxue 第14章) + cue áp dụng');
 assert(DITIANSUI_TONGLUN['衰旺'] && DITIANSUI_TONGLUN['源流'] && DITIANSUI_TONGLUN['通关'] && DITIANSUI_TONGLUN['寒暖燥湿'], '通論 [loop 1319]: 衰旺/源流/通关/寒暖燥湿');
 for (const k of Object.keys(DITIANSUI_TONGLUN)) {
   const e = DITIANSUI_TONGLUN[k];

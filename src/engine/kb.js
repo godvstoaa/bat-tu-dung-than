@@ -173,6 +173,13 @@ export const DITIANSUI_TONGLUN = {
     vi: 'Cơ Chấn-Đoài (Mộc-Kim) chủ thắng bại; ranh Ly-Khảm (Hỏa-Thủy) định tử sinh.',
     apply: 'Chấn(木)-Đoài( Kim) xung = chủ thắng bại (sự nghiệp). Ly(Hỏa)-Khảm(Thủy) giao = chủ tử sinh (sức khoẻ/mệnh). Hai cặp này xung khắc dữ → ảnh hưởng lớn nhất đến mệnh.',
   },
+  // [loop 1326] thêm 精神 (quanxue.cn 第14章 + wikisource 阐微 §十四 — verse đối chiếu ≥5 nguồn độc lập)
+  精神: {
+    verse: '人有精神，不可以一偏求也，要在損之益之得其中。',
+    vi: 'Mệnh có «tinh (精) – thần (神)», không thể thiên một bên; phải «tổn/gia» (giảm/bù) sao đạt trung hoà.',
+    apply: '«Tinh» = Kim/Thuỷ (chất chứa, gốc), «thần» = Mộc/Hoả (linh hoạt, phát lộ), «thổ» = nền thật. Lá số cần tinh-thần tương xứng — có tinh thiếu thần = khô khan; có thần thiếu tinh = hư phù. «Tổn chi ích chi» = giảm (kỵ quá vượng) hay bù (kỵ quá suy) để đạt trung (liên kết 中和). Tinh-thần cân → mệnh có «quý khí».',
+    cue: '精(金水)+thần(木火)+thổ phải cân; tổn/gia đạt trung, đừng thiên lệch',
+  },
 };
 
 // ---- 滴天髓 «何知章» (8 chẩn đoán phú – quý – bần – tiện – cát – hung – thọ – yểu) ----
