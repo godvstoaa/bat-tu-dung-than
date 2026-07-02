@@ -743,6 +743,15 @@ assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.ke
   }
   console.log(`   [loop 1273] 禄神→羊刃 diff=1 (临官→帝旺) 10 can cross-guard ✓`);
 }
+// [loop 1274] XUE_TANG == CHANGSHENG_START (学堂=长生位) cross-guard.
+{
+  const { XUE_TANG } = await import('./src/engine/shensha.js');
+  const { CHANGSHENG_START } = await import('./src/engine/constants.js');
+  for (const g of Object.keys(XUE_TANG)) {
+    assert(XUE_TANG[g] === CHANGSHENG_START[g], `${g}: 学堂(${XUE_TANG[g]}) == 长生位(${CHANGSHENG_START[g]})`);
+  }
+  console.log(`   [loop 1274] 学堂=长生位 10 can cross-guard ✓`);
+}
 assert(QIHOU['立春'].hou.length === 3 && QIHOU['立春'].hou[0] === '东风解冻' && QIHOU['冬至'].hou[2] === '水泉动', '七十二候: 立春 初候=东风解冻, 冬至 三候=水泉动');
 for (const k of Object.keys(QIHOU)) {
   const e = QIHOU[k];
