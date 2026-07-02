@@ -282,6 +282,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - «调候» nguyên lý (窮通寶鑑): ${R.yong?.tiaohou?.override ? `override → ${R.yong.tiaohou.override}` : '(theo vượng suy chuẩn)'} | ${TIAOHOU_PRINCIPLE.jianlu}
 - «继善篇» (渊海子平 卷二): 「${JISHAN_PIAN['月令'].verse}」— ${JISHAN_PIAN['日主'].apply}
 - «伤官» 5 dụng pháp (任铁樵): ${Object.entries(SHANGGUAN_5YONG).map(([k, e]) => `${k}(${e.condition})`).join('; ')}
+- «十神 chuyên luận» (滴天髓阐微 官杀混杂/伤官/清浊/真假): ${Object.entries(DITIANSUI_SHISHEN).map(([k, e]) => `${k}「${e.verse}」→${e.cue || e.apply.split('.')[0]}`).join(' | ')}
 - Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
 - Tiết khí gần nhất: ${c.jieqi.prev.name}
 
