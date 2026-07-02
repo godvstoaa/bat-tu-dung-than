@@ -6079,7 +6079,7 @@ console.log('\n################## 解梦 周公解梦 (DREAM DICTIONARY) #######
 import { jiemeng, searchKeywords, searchPatterns, normalizeViet, DREAM_DICT, DREAM_PATTERNS, DREAM_DICT_COUNT, DREAM_PATTERN_COUNT } from './src/engine/jiemeng.js';
 
 // 1. Dictionary integrity — mỗi entry đủ 5 trường bắt buộc, tone hợp lệ
-const VALID_TONES = new Set(['cat', 'hung', 'neutral']);
+const VALID_TONES = new Set(['cat', 'hung', 'neutral', 'mid']);
 let dictIssues = 0;
 for (const e of DREAM_DICT) {
   if (!e.kw || !e.vi || !e.meaning || !e.advice) { assert(false, `entry thiếu trường: ${JSON.stringify(e.kw || e)}`); dictIssues++; continue; }
