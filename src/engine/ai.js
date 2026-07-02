@@ -84,7 +84,7 @@ import { castByTime, solarToMhNums } from './meihua.js';
 import { DAXIANG, GUA_CI, SIMP2TRAD } from './hexagram-meaning.js';
 const SIMP2TRAD_REV = Object.fromEntries(Object.entries(SIMP2TRAD).map(([s, t]) => [t, s])); // trad→simp
 import { liurenPan } from './liuren.js';
-import { qimenDongPan } from './qimen.js';
+import { qimenDongPan, STAR_INFO, DOOR_INFO } from './qimen.js';
 import { qizheng, longitudeToMansion } from './qizheng.js';
 // 天星择日 (cycle 38) — chọn ngày theo vị trí thật của 7 chính tinh tới 坐向
 import { tianxingZheri } from './tianxing-zheri.js';
@@ -958,6 +958,9 @@ export function execTool(name, args, R) {
           gige: r.gige, catGe: r.catGe, xiongGe: r.xiongGe, advice: r.advice,
           // [loop 1291] enrichment: 三奇六仪 + 格局 ý nghĩa
           sanqi: r.pan?.filter((p) => p.isCat)?.map((p) => `${p.dir}:${p.door}门+${p.qiyi}+${p.star}`) || [],
+          // [loop 1313] enrichment: 九星+八门 ý nghĩa sâu cho cung cát
+          catStarDesc: r.pan?.filter((p) => p.isCat)?.map((p) => STAR_INFO[p.star]?.desc || '') || [],
+          catDoorDesc: r.pan?.filter((p) => p.isCat)?.map((p) => DOOR_INFO[p.door]?.desc || '') || [],
         };
       }
       case 'inverse_bazi': {
