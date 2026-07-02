@@ -8,7 +8,7 @@ import { composeAnswer, detectIntent } from './src/engine/nlg.js';
 import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
-import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12, SANSI_OVERVIEW, SANHE_HUAQI, LIUHE_HUAQI, XIAOXI_12, JIEQI_24 } from './src/engine/constants.js';
+import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12, SANSI_OVERVIEW, SANHE_HUAQI, LIUHE_HUAQI, XIAOXI_12, JIEQI_24, QIHOU } from './src/engine/constants.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
@@ -669,6 +669,13 @@ assert(JIEQI_24['立春'] && JIEQI_24['冬至'] && JIEQI_24['夏至'], '24节气
 for (const k of Object.keys(JIEQI_24)) {
   const e = JIEQI_24[k];
   assert(e.season && e.meaning.length > 10, `节气 ${k}: season+meaning`);
+}
+// [loop 1247] 七十二候 (5节气×3候 tiêu biểu, 《月令七十二候集解》).
+assert(Object.keys(QIHOU).length === 5, `QIHOU: 5节气 (got ${Object.keys(QIHOU).length})`);
+assert(QIHOU['立春'].hou.length === 3 && QIHOU['立春'].hou[0] === '东风解冻' && QIHOU['冬至'].hou[2] === '水泉动', '七十二候: 立春 初候=东风解冻, 冬至 三候=水泉动');
+for (const k of Object.keys(QIHOU)) {
+  const e = QIHOU[k];
+  assert(e.hou.length === 3 && e.note, `候 ${k}: 3候 + note`);
 }
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic
 const R1990 = analyze(1990, 6, 15, 14, 30, 'nam', 2026);

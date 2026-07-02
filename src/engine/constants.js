@@ -168,6 +168,18 @@ export const JIEQI_24 = {
   大寒: { season: 'đông', meaning: 'năm lạnh nhất' },
 };
 
+// ---- 七十二候 (5 节气 nền tảng × 3候, verified) ----
+// [loop 1247] Nguồn: 《月令七十二候集解》(元·吴澄) + 《逸周书·时训解》 + 百度百科/新华网.
+//   Framework: «ngũ nhật vi hậu, tam hậu vi khí, lục khí vi thời, tứ thời vi tuế» → 24节气 × 3候 = 72候.
+//   Mỗi候 = 1 vật hậu (5 ngày). Đây là 5节气 tiêu biểu (lập xuân + nhị phân nhị chí); 19节气 còn lại theo cùng thể thức.
+export const QIHOU = {
+  立春: { hou: ['东风解冻', '蛰虫始振', '鱼陟负冰'], note: 'mở đầu xuân — đông phong giải đông, trệ trùng chấn động, ngư thiếm phụ băng' },
+  春分: { hou: ['玄鸟至', '雷乃发声', '始电'], note: 'nhị phân — yến quy (huyền điểu), lôi thanh, thủy hữu sét' },
+  夏至: { hou: ['鹿角解', '蜩始鸣', '半夏生'], note: 'nhị chí — hươu đực rụng sừng (cảm âm sinh), ve kêu, bán hạ sinh' },
+  秋分: { hou: ['雷始收声', '蛰虫坯户', '水始涸'], note: 'nhị phân — lôi thu thanh, trệ trùng bồi hộ (bịt hang), thuỷ thuỷ khô' },
+  冬至: { hou: ['蚯蚓结', '麋角解', '水泉动'], note: 'nhị chí — giun đất cuộn kết (cảm dương động), ly rụng sừng, thuỷ tuyền lưu' },
+};
+
 // ---- TÀNG CAN (藏干) — Can ẩn trong Địa Chi ----
 // Thứ tự: Bản khí → Trung khí → Dư khí. Trọng số theo độ dài.
 export const HIDDEN = {
