@@ -142,6 +142,18 @@ export const SIYU_INFO = {
 };
 // [nuance] «Tứ dư xâm dương» — tứ dư là tiểu nhân/tăng đạo tinh, kỵ giao hội thái dương (chủ che lấp quang minh, tiểu nhân đương đạo).
 
+// ---- 七政 类象 (7 chính tinh: 日月火水木金土) ----
+// [loop 1231] Nguồn: Wikipedia 七政/七政四馀 + 知乎«七政四余论命术» + 张果星宗(ctext) + 搜狐.
+export const QIZHENG_INFO = {
+  太阳: { body: '日', wx: 'hỏa', tone: 'cat', desc: 'dương cương chi cực, chủ quý tôn — quân phụ/đế vương/quyền uy/quang minh; quan lộc, công danh, tiền trình, trượng phu (nữ mệnh)' },
+  太阴: { body: '月', wx: 'thủy', tone: 'cat', desc: 'âm nhu, hậu phi chi tượng — mẫu nghi, ôn nhu, thông minh; hoá giải hung sát, phúc thọ khang ninh, thê (nam mệnh)' },
+  荧惑: { body: '火星', wx: 'hỏa', tone: 'hung', desc: 'táo liệt, cương mãnh — chiến hoả, binh qua, tai hoạ, bạo liệt; chiến tranh, xung đột, ý ngoại, cấp chứng' },
+  辰星: { body: '水星', wx: 'thủy', tone: 'cat', desc: 'trí, nhu — trí tuệ, văn thái, khẩu tài, lưu thông; văn chương, học nghiệp, ngôn ngữ, mưu lược' },
+  岁星: { body: '木星', wx: 'mộc', tone: 'cat', desc: 'nhân, sinh trưởng, «đệ nhất cát tinh» — nhân đức, khuếch trương, cát lợi, tuế công; phúc lộc, thọ, tử tôn, quý nhân' },
+  太白: { body: '金星', wx: 'kim', tone: 'mid', desc: 'nghĩa, cương nghị — võ lực, nghĩa khí, túc sát; quân sự, hôn nhân (nữ chủ phu), tài bạch. Diệc cát diệc hung (thị miếu vượng)' },
+  镇星: { body: '土星', wx: 'thổ', tone: 'hung', desc: 'tín, hậu trọng — thổ địa, căn cơ, trì trú, thủ thành; điền trạch, phong ấp, trở ngại, thọ nguyên' },
+};
+
 // J2000.0 epoch (JD 2451545.0) → Date
 const J2000 = new Date(Date.UTC(2000, 0, 1, 12, 0, 0));
 

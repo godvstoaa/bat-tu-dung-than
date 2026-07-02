@@ -357,6 +357,17 @@ for (const k of Object.keys(PATTERN_DEEP)) {
   }
   console.log(`   [loop 1230] 四余类象: 4 dư (紫气吉/月孛/罗睺/计都) × wx/tone/astro/desc — Wikipedia/果老星宗 ✓`);
 }
+// [loop 1231] 七政 类象 (7 chính tinh 日月火水木金土).
+{
+  const { QIZHENG_INFO } = await import('./src/engine/qizheng.js');
+  assert(Object.keys(QIZHENG_INFO).length === 7, `QIZHENG_INFO: 7 chính (got ${Object.keys(QIZHENG_INFO).length})`);
+  assert(QIZHENG_INFO['太阳'].tone === 'cat' && QIZHENG_INFO['荧惑'].tone === 'hung' && QIZHENG_INFO['岁星'].desc.includes('đệ nhất cát tinh'), '七政: 太阳 cát, 荧惑 hung, 岁星 đệ nhất cát tinh');
+  for (const k of Object.keys(QIZHENG_INFO)) {
+    const e = QIZHENG_INFO[k];
+    assert(e.body && e.wx && e.tone && e.desc.length > 20, `七政 ${k}: body+wx+tone+desc`);
+  }
+  console.log(`   [loop 1231] 七政类象: 7 chính (日月火水木金土) × body/wx/tone/desc — Wikipedia/果老星宗 ✓`);
+}
 // [loop 1202] 二十八宿 regression guard — lock 28 túc + 4 tượng × 7 + đúng thứ tự 角→轸.
 {
   const { XIU_TABLE } = await import('./src/engine/ershibaxiu.js');
