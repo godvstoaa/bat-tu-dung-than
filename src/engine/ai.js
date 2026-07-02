@@ -938,6 +938,9 @@ export function execTool(name, args, R) {
           ke4: (r.ke4 || []).map((k) => `${k.n}:${k.up}/${k.down}(${k.rel})`),
           sanchuan: (r.sanchuan || []).map((s) => `${s.n}:${s.zhi}(${s.rel})`),
           zongMen: r.zongMen,
+          // [loop 1291] enrichment: sanchuan chi + thập thần (dành cho AI luận sâu hơn)
+          sanchuanZhi: (r.sanchuan || []).map((s) => s.zhi || '').filter(Boolean),
+          sanchuanRel: (r.sanchuan || []).map((s) => s.rel || '').filter(Boolean),
         };
       }
       case 'analyze_qimen': { // [loop 509] 奇门遁甲
@@ -946,6 +949,8 @@ export function execTool(name, args, R) {
         return {
           term: r.term, yuan: r.yuan, ju: r.ju, yinYang: r.yinYang,
           gige: r.gige, catGe: r.catGe, xiongGe: r.xiongGe, advice: r.advice,
+          // [loop 1291] enrichment: 三奇六仪 + 格局 ý nghĩa
+          sanqi: r.pan?.filter((p) => p.isCat)?.map((p) => `${p.dir}:${p.door}门+${p.qiyi}+${p.star}`) || [],
         };
       }
       case 'inverse_bazi': {
