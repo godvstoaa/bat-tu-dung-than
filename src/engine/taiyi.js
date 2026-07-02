@@ -47,6 +47,29 @@ const YEARS_PER_GONG = 3; // Thái Nhất ở mỗi cung 3 năm
 // Lưu ý: theo《金镜》, dương đ遁 cung 1 = 乾 (khác hậu thiên). Đánh chỉ số 0-7.
 const TAIYI_GONG_PATH = [1, 2, 3, 4, 6, 7, 8, 9]; // 8 cung Thái Nhất (bỏ trung 5)
 
+// ---- 太乙十六神 (《太乙金镜式经»十六神所主法) ----
+// [loop 1268] 12 chi + 4 tứ duy = 16 vị. Nguồn: 百度百科 + ctext ch.275091 + 太乙淘金歌.
+//   太乙 thiên đế chi thần, chủ sử 16 thần, tri phong vũ/thủy hạn/binh cách/khiến/cổ dịch.
+export const TAIYI_16SHEN = {
+  子: { shen: '地主', zhu: 'động diêu ngôn ngữ sự (biến động, ngôn luận)' },
+  丑: { shen: '阳德', zhu: 'thí ân dục vật sự (ban ân, nuôi dưỡng)' },
+  艮: { shen: '和德', zhu: 'hoà duyệt tụ tập sự (hoà hợp, tụ họp)' },
+  寅: { shen: '吕申', zhu: 'vận dụng chủ tể sự (vận dụng, chủ tể)' },
+  卯: { shen: '高丛', zhu: 'sinh khí phồn vinh sự (sinh khí, phồn vinh)' },
+  辰: { shen: '太阳', zhu: 'uy vũ trương dương sự (uy vũ, trương dương)' },
+  巽: { shen: '大炅', zhu: 'thân minh hiệu lệnh sự (minh lệnh)' },
+  巳: { shen: '大神', zhu: 'yêu tường huỷ trất sự (yêu quái, huỷ bại)' },
+  午: { shen: '大威', zhu: 'uy vũ kiêu cuồng sự (uy h赫, kiêu cuồng)' },
+  未: { shen: '天道', zhu: 'âm tư mưu nghị sự (âm tư, mưu lược)' },
+  坤: { shen: '大武', zhu: 'hình sát kích phạt sự (hình sát, chinh phạt)' },
+  申: { shen: '武德', zhu: 'truyền tống thiên di sự (truyền tống, thiên di)' },
+  酉: { shen: '太簇', zhu: 'cánh cải phân dị sự (thay đổi, phân dị)' },
+  戌: { shen: '阴主', zhu: 'nguy động âm u sự (nguy hiển, ám u)' },
+  乾: { shen: '阴德', zhu: 'thí oán hưng ác sự (thí ân, hưng ác)' },
+  亥: { shen: '大义', zhu: 'ẩn tị động tức sự (ẩn giấu, động tĩnh)' },
+};
+export const TAIYI_16SHEN_KOUJUE = '子为地主丑阳德，艮称和德吕申寅。高丛卯位太阳辰，大炅为巽巳大神。大威是午天道未，大武为坤武德申。酉宫太簇戌阴主，阴德大义乾亥神。';
+
 // Tên + ngũ hành + quái của 8 cung Thái Nhất (theo thái nhất bản đồ)
 const GONG_INFO = {
   1: { name: '乾', gua: 'Qián/Càn', wx: 'Kim', dir: 'Tây Bắc', nature: 'trời/quân' },

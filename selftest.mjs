@@ -693,6 +693,19 @@ assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.ke
   assert(totalHou === 72, `QIHOU tổng 72候 (got ${totalHou})`);
   console.log(`   [loop 1265] QIHOU ↔ JIEQI_24 cross-guard: 24节气/72候 locked ✓`);
 }
+// [loop 1268] 太乙十六神 (《太乙金镜式经», ctext ch.275091).
+{
+  const { TAIYI_16SHEN, TAIYI_16SHEN_KOUJUE } = await import('./src/engine/taiyi.js');
+  assert(Object.keys(TAIYI_16SHEN).length === 16, `TAIYI_16SHEN: 16 vị (got ${Object.keys(TAIYI_16SHEN).length})`);
+  assert(TAIYI_16SHEN['子'].shen === '地主' && TAIYI_16SHEN['亥'].shen === '大义' && TAIYI_16SHEN['乾'].shen === '阴德', '太乙16神: 子=地主, 亥=大义, 乾=阴德');
+  for (const k of Object.keys(TAIYI_16SHEN)) {
+    const e = TAIYI_16SHEN[k];
+    assert(e.shen && e.zhu.length > 10, `太乙16神 ${k}(${e.shen}): shen+zhu`);
+  }
+  // verify口诀 contains each shen name
+  for (const e of Object.values(TAIYI_16SHEN)) assert(TAIYI_16SHEN_KOUJUE.includes(e.shen), `口诀 contains ${e.shen}`);
+  console.log(`   [loop 1268] 太乙十六神 (16 vị: 子地主→亥大义) + 口诀 — 《太乙金镜式经» ✓`);
+}
 assert(QIHOU['立春'].hou.length === 3 && QIHOU['立春'].hou[0] === '东风解冻' && QIHOU['冬至'].hou[2] === '水泉动', '七十二候: 立春 初候=东风解冻, 冬至 三候=水泉动');
 for (const k of Object.keys(QIHOU)) {
   const e = QIHOU[k];
