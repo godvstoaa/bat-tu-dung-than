@@ -8,7 +8,7 @@ import { composeAnswer, detectIntent } from './src/engine/nlg.js';
 import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
-import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12, SANSI_OVERVIEW, SANHE_HUAQI, LIUHE_HUAQI, XIAOXI_12 } from './src/engine/constants.js';
+import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12, SANSI_OVERVIEW, SANHE_HUAQI, LIUHE_HUAQI, XIAOXI_12, JIEQI_24 } from './src/engine/constants.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
@@ -662,6 +662,13 @@ assert(XIAOXI_12['子'].gua === '复' && XIAOXI_12['子'].yang === 1 && XIAOXI_1
 for (const k of Object.keys(XIAOXI_12)) {
   const e = XIAOXI_12[k];
   assert(e.gua && e.yang + e.yin === 6 && e.meaning && e.jieqi, `消息卦 ${k}(${e.gua}): yang+yin=6`);
+}
+// [loop 1244] 二十四节气 + 物候 (百度百科/中科院/Wikipedia).
+assert(Object.keys(JIEQI_24).length === 24, `JIEQI_24: 24节气 (got ${Object.keys(JIEQI_24).length})`);
+assert(JIEQI_24['立春'] && JIEQI_24['冬至'] && JIEQI_24['夏至'], '24节气: 立春/冬至/夏至 có');
+for (const k of Object.keys(JIEQI_24)) {
+  const e = JIEQI_24[k];
+  assert(e.season && e.meaning.length > 10, `节气 ${k}: season+meaning`);
 }
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic
 const R1990 = analyze(1990, 6, 15, 14, 30, 'nam', 2026);

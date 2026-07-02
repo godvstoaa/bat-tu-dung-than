@@ -137,6 +137,37 @@ export const XIAOXI_12 = {
   亥: { gua: '坤', yang: 0, yin: 6, meaning: 'thuần âm chi thể', jieqi: 'tiểu tuyết' },
 };
 
+// ---- 二十四节气 + 物候 ----
+// [loop 1244] Nguồn: 百度百科 + 中科院地理所 + Wikipedia. [分类] 寒暑8 + 气温5 + 降水7 + 物候4.
+//   12节令 (lập kinh...): 立春/惊蛰/清明/立夏/芒种/小暑/立秋/白露/寒露/立冬/大雪/小寒.
+//   12中气: 雨水/春分/谷雨/小满/夏至/大暑/处暑/秋分/霜降/小雪/冬至/大寒.
+export const JIEQI_24 = {
+  立春: { season: 'xuân', meaning: 'vạn vật khởi thuỷ, xuân bắt đầu' },
+  雨水: { season: 'xuân', meaning: 'mùa mưa bắt đầu, khí ôn hồi thăng, giáng thuỷ tăng' },
+  惊蛰: { season: 'xuân', meaning: 'xuân lôi thị minh, kinh tỉnh đông miên trệ trùng, vạn vật phục tô' },
+  春分: { season: 'xuân', meaning: 'trú dạ bình phân, xuân quá nửa' },
+  清明: { season: 'xuân', meaning: 'khí ôn noãn, thiên thanh địa minh, thảo mộc tân lục' },
+  谷雨: { season: 'xuân', meaning: '«vũ sinh bách cốc», thuỷ phân sung沛, lợi cốc vật sinh trưởng' },
+  立夏: { season: 'hạ', meaning: 'hạ bắt đầu, khí ôn hiển thăng' },
+  小满: { season: 'hạ', meaning: 'mạch loại hạt bắt đầu no đầy nhưng chưa chín' },
+  芒种: { season: 'hạ', meaning: '«hữu mang chi cốc khả chủng», vụ bận rộn gieo trồng' },
+  夏至: { season: 'hạ', meaning: 'bắc bán cầu ban ngày dài nhất, thịnh hạ' },
+  小暑: { season: 'hạ', meaning: 'vào mùa nóng nhưng chưa cực' },
+  大暑: { season: 'hạ', meaning: 'năm nóng nhất' },
+  立秋: { season: 'thu', meaning: 'thu bắt đầu, thử khứ lương lai' },
+  处暑: { season: 'thu', meaning: '«xử» vi chỉ, nắng nóng sắp qua' },
+  白露: { season: 'thu', meaning: 'khí ôn giáng, ban đêm lộ thuỷ ngưng phát bạch' },
+  秋分: { season: 'thu', meaning: 'trú dạ tái bình phân, thu quá nửa' },
+  寒露: { season: 'thu', meaning: 'khí ôn kế tục hạ giáng, lộ thuỷ cánh lương' },
+  霜降: { season: 'thu', meaning: 'trời dần lạnh, bắt đầu xuất hiện sương phong' },
+  立冬: { season: 'đông', meaning: 'đông bắt đầu, vạn vật thu tàng' },
+  小雪: { season: 'đông', meaning: 'bắt đầu giáng tuyết nhưng không lớn' },
+  大雪: { season: 'đông', meaning: 'tuyết nhiều, mặt đất có thể tích tuyết' },
+  冬至: { season: 'đông', meaning: 'ban ngày ngắn nhất, vào kỳ lạnh nhất' },
+  小寒: { season: 'đông', meaning: 'trời lạnh nhưng chưa cực' },
+  大寒: { season: 'đông', meaning: 'năm lạnh nhất' },
+};
+
 // ---- TÀNG CAN (藏干) — Can ẩn trong Địa Chi ----
 // Thứ tự: Bản khí → Trung khí → Dư khí. Trọng số theo độ dài.
 export const HIDDEN = {
