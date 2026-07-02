@@ -96,7 +96,12 @@ export function buildChart(year, month, day, hour, minute, gender) {
     dayGan,
     dayZhi: pillars.day.zhi,
     dayMaster: { gan: dayGan, ...GAN[dayGan] },
+    monthGan: pillars.month.gan,
     monthZhi: pillars.month.zhi,
+    yearGan: pillars.year.gan,
+    yearZhi: pillars.year.zhi,
+    hourGan: pillars.time.gan,
+    hourZhi: pillars.time.zhi,
   };
 }
 
