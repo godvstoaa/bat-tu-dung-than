@@ -145,6 +145,12 @@ export const DITIANSUI_TONGLUN = {
     vi: 'Nguyệt lệnh = phủ提綱, như cửa thành — không vào cửa mà tìm trong thành, sao được?',
     apply: 'Nguyệt lệnh = cương lĩnh nguyên cục. Dụng thần TRƯỚC HẾT tìm tại nguyệt lệnh (bản khí + tàng can). Nếu nguyệt lệnh không dùng được, mới tìm elsewhere. «真神» = thần đắc nguyệt lệnh.',
   },
+  // [loop 1323] thêm 生时 (quanxue.cn 第16章)
+  生时: {
+    verse: '生時乃歸宿之地，譬之墓也，人元為用事之神，墓之定方也，不可以不辨。',
+    vi: 'Giờ sinh = nơi quy túc, ví như mộ — nhân nguyên (tàng can) là thần dụng sự, định phương mộ, phải biện.',
+    apply: 'Trụ giờ = «nơi quy túc» của lá số — tàng can giờ cũng là «dụng sự thần». Giờ sinh hỷ dụng = «huyệt cát hướng cát»; giờ kỵ = giảm cát. Quan trọng nhưng KHÔNG hơn nguyệt lệnh.',
+  },
 };
 
 // ---- 滴天髓 «何知章» (8 chẩn đoán phú – quý – bần – tiện – cát – hung – thọ – yểu) ----
