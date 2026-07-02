@@ -306,6 +306,18 @@ export const PATTERN_DEEP = {
   伤官格: { use: 'nghịch dụng (cần chế hoá)', yong: 'Thương Quan', xiang: 'Ấn («thương quan bội ấn») hoặc Tài (thương sinh tài thông quan)', ji: '«thương quan kiến quan» (gặp chính quan thì hung); thân nhược thương vượng kỵ vô ấn' },
 };
 
+// ---- 子平 «六神» PHÂN CẤP quanh dụng thần (《子平真诠》) ----
+// [loop 1232] Nguồn: 知乎«子平用神变化» + 百度百科«子平术». 6 thần (khác thập thần) xoay quanh dụng thần.
+//   Thành cách: dụng ← tương ← hỷ. Phá cách: kỵ ← cừu → phá dụng/tương.
+export const SHEN_HIERARCHY = {
+  用神: { role: 'cách cục hạch tâm — thủ tự nguyệt lệnh', relation: 'cách chi chủ' },
+  相神: { role: 'phụ tá dụng thần thành cách («luận cát hung dĩ tương thần vi trọng»)', relation: 'quân chi hữu tướng — vô tương thần thì cách phá' },
+  喜神: { role: 'sinh phù dụng thần + điều hoà/chế hoá/thiên hậu (thông quan, dưỡng mệnh)', relation: 'hộ vệ dụng/tương' },
+  忌神: { role: 'phá cách chi tự — khắc tổn dụng thần hoặc tương thần', relation: 'nguyên hung phá cách' },
+  仇神: { role: 'sinh trợ kỵ thần (bang hung gián tiếp)', relation: 'kỵ thần chi lai nguyên' },
+  闲神: { role: 'không sinh không khắc dụng thần — vô quan cách cục', relation: 'trung lập, ảnh hưởng nhỏ' },
+};
+
 // ---- 子平真詮 «取用神» 5 ĐẠI PHÁP + 月令取用 (nguồn cổ) ----
 // Nguồn: 子平真詮評注 (徐乐吾, ctext ch.974137 / 太极书馆), 算准网, 知乎 — ≥2 nguồn.
 // [源流] 扶抑/病药/调候/通关 = 徐乐吾评注归纳; 从化 = hậu nhân bổ sung; 原书核心 = 月令取用神.

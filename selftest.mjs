@@ -9,7 +9,7 @@ import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
 import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN } from './src/engine/constants.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP } from './src/engine/kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
 import { jinkoujue, renderJinkoujueCard } from './src/engine/jinkoujue.js';
@@ -317,6 +317,13 @@ assert(PATTERN_DEEP['七杀格'].xiang.includes('Thực Thần') && PATTERN_DEEP
 for (const k of Object.keys(PATTERN_DEEP)) {
   const e = PATTERN_DEEP[k];
   assert(e.use && e.yong && e.xiang && e.ji, `八格 ${k}: use+yong+xiang+ji`);
+}
+// [loop 1232] 子平 «六神» phân cấp (知乎/百度百科/子平真诠).
+assert(Object.keys(SHEN_HIERARCHY).length === 6, `SHEN_HIERARCHY: 6 thần (got ${Object.keys(SHEN_HIERARCHY).length})`);
+assert(SHEN_HIERARCHY['相神'].role.includes('tương thần vi trọng') && SHEN_HIERARCHY['忌神'].role.includes('phá cách'), '六神: 相神 vi trọng, 忌神 phá cách');
+for (const k of Object.keys(SHEN_HIERARCHY)) {
+  const e = SHEN_HIERARCHY[k];
+  assert(e.role && e.relation, `六神 ${k}: role+relation`);
 }
 // [loop 1201] 八卦万物类象 (说卦传) — mở rộng cho luận quẻ 梅花/六爻/qimen.
 {
