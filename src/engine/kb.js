@@ -134,6 +134,17 @@ export const DITIANSUI_TONGLUN = {
     vi: 'Thiên đạo có hàn noãn — phát dục vạn vật; nhân đạo hành, không thể quá.',
     apply: 'Hàn = kim thuỷ/đông/bắc; Noãn = mộc hoả/hạ/nam. «Hàn rất thịnh thì phải có noãn khí; noãn đến cực thì phải có hàn căn» — không thể thuần hàn hay thuần noãn. Liên kết 调候 (TIAOHOU).',
   },
+  // [loop 1322] thêm 体用 + 月令 (quanxue.cn 第16-18章)
+  体用: {
+    verse: '道有體用，不可以一端求也。要在隨方解物，於微處見其眞。',
+    vi: 'Đạo có thể/dụng — không thể cầu một phía. Phải theo phương mà giải vật, thấy chân ở chỗ vi tế.',
+    apply: '«Thể» = Nhật Chủ (bản thân); «Dụng» = dụng thần (công cụ). Thể vượng → dụng tài/quan; thể nhược → dụng ấn/tỷ. Thể/dụng tương sinh = cát; tương khắc = hung.',
+  },
+  月令: {
+    verse: '月令乃提綱之府，譬如州邑之有門戶；人不得門戶而入，而於州邑之內，復求州邑，豈可得乎？',
+    vi: 'Nguyệt lệnh = phủ提綱, như cửa thành — không vào cửa mà tìm trong thành, sao được?',
+    apply: 'Nguyệt lệnh = cương lĩnh nguyên cục. Dụng thần TRƯỚC HẾT tìm tại nguyệt lệnh (bản khí + tàng can). Nếu nguyệt lệnh không dùng được, mới tìm elsewhere. «真神» = thần đắc nguyệt lệnh.',
+  },
 };
 
 // ---- 滴天髓 «何知章» (8 chẩn đoán phú – quý – bần – tiện – cát – hung – thọ – yểu) ----
