@@ -291,6 +291,18 @@ for (const k of Object.keys(DITIANSUI_TONGLUN)) {
   const e = DITIANSUI_TONGLUN[k];
   assert(e.verse && e.verse.length > 10 && e.apply.length > 25, `通論 ${k}: verse + apply`);
 }
+// [loop 1342] regression guard — buildChartBrief phải surface đủ block đã wire (loop 1326-1341)
+{
+  const { buildChartBrief } = await import('./src/engine/ai.js');
+  const _GR = analyze(1990, 6, 15, 8, 30, 'male', 2026);
+  const _GB = buildChartBrief(_GR);
+  const _h = (s) => _GB.includes(s);
+  assert(_h('«通論»') && _h('«何知章»') && _h('«十神 chuyên luận»') && _h('«十神 bản chất»'), '[loop 1342] brief có cụm tri thức 滴天髓 + 十神');
+  assert(_h('«Lĩnh vực cuộc sống»') && _h('«Cách cục hướng dẫn»') && _h('«Tương tác can chi»') && _h('«源流»') && _h('«Chất lượng trụ»'), '[loop 1342] brief có 5 block wired (LIFE_AREA/PATTERN_GUIDE/INTERACTION/yuanliu/pillarQuality)');
+  assert(/Thiên Ất|Tướng Tinh|Thiên Đức|Kim Dư/.test(_GB), '[loop 1342] brief THẦN SÁT dùng tên Việt (không pinyin thô)');
+  assert(!/\bundefined\b|\bNaN\b/.test(_GB), '[loop 1342] brief không leak undefined/NaN');
+  console.log('   [loop 1342] buildChartBrief surface đủ block wired + không leak ✓');
+}
 // [loop 1320] 滴天髓阐微 thập thần chuyên luận (官杀/伤官/清浊/真假).
 assert(Object.keys(DITIANSUI_SHISHEN).length === 4, `DITIANSUI_SHISHEN: 4 chương (got ${Object.keys(DITIANSUI_SHISHEN).length})`);
 assert(DITIANSUI_SHISHEN['官杀混杂'].verse.includes('有可有不可') && DITIANSUI_SHISHEN['伤官'].verse.includes('傷官傷盡'), '十神论: 官杀混杂 + 伤官伤尽');
