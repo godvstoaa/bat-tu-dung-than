@@ -24,6 +24,13 @@ const YUAN_VI = ['上元', '中元', '下元'];
 
 // 三奇六仪 + 九星本位 (天蓬本坎1 … 天英本离9 — FIXED to洛书宫, không随六仪)
 const QIYI = ['戊', '己', '庚', '辛', '壬', '癸', '丁', '丙', '乙'];
+// [loop 1239] 三奇六仪 ý nghĩa (《奇门遁甲统宗》Wikisource + 知乎 + 搜狐). QIYI/XUN_YI là array; đây là tầng giải thích.
+export const SANYI_LIUYI = {
+  dunJia: '«Độn giáp» — giáp (nguyên soái/quân chủ) ẩn dưới «lục nghi», không trực tiếp lộ (kỵ trực tiếp nhận khắc).',
+  liuYi: '六仪 戊/己/庚/辛/壬/癸 = 6 甲旬首 ẩn tàng: 甲子→戊, 甲戌→己, 甲申→庚, 甲午→辛, 甲辰→壬, 甲寅→癸.',
+  sanQi: '三奇 乙(日奇)/丙(月奇)/丁(星奇) = nhật/nguyệt/tinh — nguyên soái (giáp) thủ hạ tả hữu + ảnh tử.',
+  order: 'Cố định顺序 戊→己→庚→辛→壬→癸→丁→丙→乙 (âm/dương độn đều bố cục theo thứ tự này).',
+};
 const GONG_STAR = { 1: '天蓬', 2: '天芮', 3: '天冲', 4: '天辅', 5: '天禽', 6: '天心', 7: '天柱', 8: '天任', 9: '天英' };
 const STAR_VI = { 天蓬: 'thiên bằng (đại hung)', 天芮: 'thiên nhuệ (bệnh)', 天冲: 'thiên xung (hung)', 天辅: '天phụ (cát, văn)', 天禽: 'thiên cầm (bình/trung)', 天心: 'thiên tâm (đại cát, y)', 天柱: 'thiên trụ (hung)', 天任: 'thiên nhậm (cát)', 天英: 'thiên anh (hỏa, trung)' };
 // [loop 1205] 九星 类象 sâu (知乎/360doc«奇门遁甲九星含义») — ý nghĩa天盘, bổ cho GONG_STAR/STAR_VI.

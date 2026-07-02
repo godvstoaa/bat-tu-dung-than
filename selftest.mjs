@@ -374,6 +374,13 @@ for (const k of Object.keys(SHEN_HIERARCHY)) {
   }
   console.log(`   [loop 1236] 八宅游星↔九星 (8: 4吉+4凶) + 东四/西四 — 百度百科/知乎 ✓`);
 }
+// [loop 1239] 奇门 三奇六仪 ý nghĩa (《奇门遁甲统宗》/知乎/搜狐).
+{
+  const { SANYI_LIUYI } = await import('./src/engine/qimen.js');
+  assert(['dunJia', 'liuYi', 'sanQi', 'order'].every((k) => SANYI_LIUYI[k] && SANYI_LIUYI[k].length > 15), 'SANYI_LIUYI: đủ 4 trường');
+  assert(SANYI_LIUYI.liuYi.includes('甲子→戊') && SANYI_LIUYI.sanQi.includes('日奇') && SANYI_LIUYI.order.includes('戊→己→庚'), '三奇六仪: 甲子→戊, 三奇日奇, 顺序戊→己→庚');
+  console.log(`   [loop 1239] 三奇六仪 ý nghĩa (遁甲/六仪遁藏/三奇日月星/固定顺序) — Wikisource/知乎 ✓`);
+}
 // [loop 1229] 河图洛书 口诀 (《周易·系辞》/Wikisource/Wikipedia).
 {
   const { HELU_KOUJUE } = await import('./src/engine/heluo.js');
