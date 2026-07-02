@@ -3682,6 +3682,12 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   assert(YIMA_KOUJUE.includes('申子辰马在寅') && YIMA_KOUJUE.includes('亥卯未马在巳'), '驿马口诀: 申子辰马在寅, 亥卯未马在巳');
   console.log(`   [loop 1259] 桃花/驿马口诀 (khớp TAO_HUA/YI_MA) ✓`);
 }
+// [loop 1260] 魁罡口诀.
+{
+  const { KUI_GANG_KOUJUE, KUI_GANG } = await import('./src/engine/shensha.js');
+  for (const gz of KUI_GANG) assert(KUI_GANG_KOUJUE.includes(gz), `魁罡口诀 contains ${gz}`);
+  console.log(`   [loop 1260] 魁罡口诀 (4 ngày khớp KUI_GANG data) ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);
