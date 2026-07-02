@@ -330,6 +330,14 @@ for (const k of Object.keys(PATTERN_DEEP)) {
   }
   console.log(`   [loop 1201] 八卦万物类象: 8 quái × (自然/身体/动物/家人/方位/季节/德) ✓`);
 }
+// [loop 1228] 梅花易数 三要 + 十应 (ctext 梅花易數卷三).
+{
+  const { MEIHUA_SANYAO, MEIHUA_SHIYING } = await import('./src/engine/meihua.js');
+  assert(Object.keys(MEIHUA_SANYAO).length === 3, `MEIHUA_SANYAO: 3 yếu (got ${Object.keys(MEIHUA_SANYAO).length})`);
+  assert(Object.keys(MEIHUA_SHIYING).length === 10, `MEIHUA_SHIYING: 10 ứng (got ${Object.keys(MEIHUA_SHIYING).length})`);
+  assert(MEIHUA_SANYAO['耳'] && MEIHUA_SANYAO['心'].includes('tâm nãi') && MEIHUA_SHIYING['天时应'].includes('thiên tượng'), '三要: 耳/目/心; 十应: 天时应 thiên tượng');
+  console.log(`   [loop 1228] 梅花 三要 (耳/目/心) + 十应 — ctext 梅花易數卷三 ✓`);
+}
 // [loop 1202] 二十八宿 regression guard — lock 28 túc + 4 tượng × 7 + đúng thứ tự 角→轸.
 {
   const { XIU_TABLE } = await import('./src/engine/ershibaxiu.js');

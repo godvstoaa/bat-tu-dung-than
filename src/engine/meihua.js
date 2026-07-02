@@ -31,6 +31,27 @@ export const BAGUA_LEIXIANG = {
   艮: { nature: '山', body: '手 (thủ)', animal: '狗 (cẩu)', family: 'thiếu nam', direction: 'đông bắc', season: 'đông xuân giao', virtue: '止 (chỉ)', extras: 'môn, kính, thạch, đốc, stopped' },
   兑: { nature: '泽 (trạch)', body: '口 (khẩu)', animal: '羊 (dương)', family: 'thiếu nữ', direction: 'tây', season: 'thu', virtue: '悦 (duyệt)', extras: 'ngôn, khẩu thiệt, 巫, thưởng' },
 };
+
+// ---- 梅花易数 «三要灵篇» 三要 + «十应» (lý luận ngoại ứng) ----
+// [loop 1228] Nguồn: ctext 梅花易數卷三 + 知乎«三要十应»«十应».
+//   «Nhân vi vạn vật chi linh, tâm nãi nhất thân chi chủ» — vận 3 quan để bắt ngoại ứng.
+export const MEIHUA_SANYAO = {
+  耳: 'thính âm thanh động tĩnh (nghe) — «nhĩ chi sứu vi thính»',
+  目: 'quan hình sắc biến hoá (nhìn) — «mục dụ nhi vi hình vi sắc»',
+  心: 'tổng nhiếp tư duy — «tâm nãi nhất thân chi chủ», tổng hồ thông minh',
+};
+export const MEIHUA_SHIYING = {
+  正应: 'cảm ứng bản quái (chính quái)',
+  互应: 'cảm ứng hổ quái',
+  变应: 'cảm ứng biến quái',
+  方应: 'cảm ứng phương vị (đông/tây/nam/bắc) ↔ quái',
+  日应: 'cảm ứng thời lệnh tiết khí (xuân mộc vượng, hạ hỏa vượng...)',
+  刻应: 'cảm ứng khắc/thời điểm chiêm',
+  外应: 'cảm ứng ngoại vật (vạn vật loại tượng — động thực vật, khí cụ)',
+  天时应: 'cảm ứng thiên tượng/thời tiết (tình chủ cát, bạo phong chủ hung)',
+  地理应: 'cảm ứng môi trường/địa lý (sơn/thuỷ/phương vị)',
+  人事应: 'cảm ứng sự việc người xung quanh («ngẫu ngộ nhân sự chi cát vi cát, hung vi hung»)',
+};
 const NUM2TRI = ['坤', '乾', '兑', '离', '震', '巽', '坎', '艮', '坤']; // index 0→8 (0=坤)
 
 // 64 hexagram theo [hạ][thượng] (King Wen)
