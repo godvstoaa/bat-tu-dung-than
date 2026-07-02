@@ -89,16 +89,19 @@ export const DITIANSUI_TONGLUN = {
     apply: 'Bốn trụ Ngũ hành cân bằng, sinh hoá lưu thông thì cát; thiên lệch (một hành quá vượng/quá suy) thì hung. Cơ sở của điểm «trung hoà» trong lá số.',
   },
   顺逆: {
+    cue: 'cốt ở Dụng Thần: hỷ dụng được sinh-thuận (tiếp nối)=cát; kỵ thần phản-nghịch chiến xung=hung',
     verse: '要與人間開聾聵，順逆之機須理會。',
     vi: 'Muốn mở tai điếc cho đời — phải理会 cơ «thuận nghịch».',
     apply: 'Thuận = sinh hoá tiếp nối有情; nghịch = phản khắc chiến xung. Cốt ở Dụng Thần: hỷ dụng sinh thuận thì cát, phản nghịch kỵ thần thì hung.',
   },
   进退: {
+    cue: 'hỷ dụng nên đang TIẾN (tướng/vượng, khí đến); kỵ nên đang THOÁI (khí lui). Khí tiến quý hơn đỉnh sắp thoái',
     verse: '理承氣行豈有常，進兮退兮宜抑揚。',
     vi: 'Lý thừa khí mà hành đâu có thường — tiến,lùi nên kìm/nâng.',
     apply: 'Ngũ hành có tiến-thoái (tương lai giả tiến=khí đang đến; thoái nhi vô khí=khí đang lui). Hỷ dụng nên vượng tướng (đang tiến), kỵ nên休囚 (đang thoái). «相妙於旺» — khí đang tiến quý hơn khí đang đỉnh (sắp thoái).',
   },
   冲机: {
+    cue: 'vượng xung suy→suy bật gốc (tổn); suy xung vượng→vượng KÍCH PHÁT thêm (hỷ=phúc, kỵ=hoạ)',
     verse: '旺者衝衰衰者拔，衰神衝旺旺神發。',
     vi: 'Vượng xung suy — suy bị bật gốc; thần suy xung thần vượng — vượng lại phát.',
     apply: 'Xung mạnh→yếu: yếu bị bật (tổn). Yếu→mạnh: mạnh bị kích phát thêm — phát thành phúc nếu là hỷ dụng, thành hoạ nếu là kỵ thần. Mấu chốt khi luận xung nguyên cục và đại vận/lưu niên vs trụ.',
@@ -130,17 +133,20 @@ export const DITIANSUI_TONGLUN = {
     apply: 'Hai hành chiến khắc trong cục → cần «thông quan» = hành trung gian hoà giải (vd Thủy-Hỏa chiến → Mộc thông quan, Mộc sinh Hỏa + Thủy sinh Mộc). Có thông quan = cục «hoà» → phú quý.',
   },
   寒暖燥湿: {
+    cue: 'KHÔNG thuần hàn(Kim/Thủy) hay thuần noãn(Mộc/Hỏa); cực hàn phải có noãn, cực noãn phải có hàn (liên kết 调候)',
     verse: '天道有寒暖，發育萬物，人道行之，不可過也。',
     vi: 'Thiên đạo có hàn noãn — phát dục vạn vật; nhân đạo hành, không thể quá.',
     apply: 'Hàn = kim thuỷ/đông/bắc; Noãn = mộc hoả/hạ/nam. «Hàn rất thịnh thì phải có noãn khí; noãn đến cực thì phải có hàn căn» — không thể thuần hàn hay thuần noãn. Liên kết 调候 (TIAOHOU).',
   },
   // [loop 1322] thêm 体用 + 月令 (quanxue.cn 第16-18章)
   体用: {
+    cue: 'thể(日主) vượng→dụng TÀI/QUAN; thể nhược→dụng ẤN/TỶ. Thể-dụng tương sinh=cát, tương khắc=hung',
     verse: '道有體用，不可以一端求也。要在隨方解物，於微處見其眞。',
     vi: 'Đạo có thể/dụng — không thể cầu một phía. Phải theo phương mà giải vật, thấy chân ở chỗ vi tế.',
     apply: '«Thể» = Nhật Chủ (bản thân); «Dụng» = dụng thần (công cụ). Thể vượng → dụng tài/quan; thể nhược → dụng ấn/tỷ. Thể/dụng tương sinh = cát; tương khắc = hung.',
   },
   月令: {
+    cue: 'dụng thần tìm TRƯỚC TIÊN tại nguyệt lệnh (bản khí+tàng can); thần đắc nguyệt lệnh=«chân thần»',
     verse: '月令乃提綱之府，譬如州邑之有門戶；人不得門戶而入，而於州邑之內，復求州邑，豈可得乎？',
     vi: 'Nguyệt lệnh = phủ提綱, như cửa thành — không vào cửa mà tìm trong thành, sao được?',
     apply: 'Nguyệt lệnh = cương lĩnh nguyên cục. Dụng thần TRƯỚC HẾT tìm tại nguyệt lệnh (bản khí + tàng can). Nếu nguyệt lệnh không dùng được, mới tìm elsewhere. «真神» = thần đắc nguyệt lệnh.',
@@ -164,6 +170,7 @@ export const DITIANSUI_TONGLUN = {
   },
   // [loop 1325] thêm 刚柔 + 震兑/离坎 (quanxue.cn 第27/33-34章)
   刚柔: {
+    cue: 'vượng-cứng→tiết (thực thương) ĐỪNG khắc; nhược-mềm→sinh phù (ấn/tỷ) ĐỪNG khắc («dẫn» tính tình)',
     verse: '柔剛不一也，善為制者，但引其性情而已矣。',
     vi: 'Mềm cứng khác nhau — giỏi chế chỉ dẫn tính tình mà thôi.',
     apply: 'Mạnh cứng (đắc lệnh vượng) → cần «泄» (thực thương tiết tú) không «khắc» (ngược kích). Yếu mềm (thất lệnh) → cần «sinh phù» (ấn/tỷ) không «khắc». «Dẫn» = dẫn tính tình ngũ hành, không cưỡng chế.',
