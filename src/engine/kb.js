@@ -216,6 +216,17 @@ export const DITIANSUI_SHISHEN = {
   },
 };
 
+// ---- 滴天髓阐微 «伤官» 5 dụng pháp (loop 1321, quanxue.cn 第22章) ----
+// [核心] «伤官见官为祸百端» chỉ khi thân nhược; nếu có ấn thì kiến quan 反有福.
+// 任铁樵 phân 5 cách dụng: 伤官用印/用财/用劫/用伤/用官.
+export const SHANGGUAN_5YONG = {
+  用印: { condition: 'thân nhược + thương quan vượng', desc: 'dùng Ấn chế thương sinh thân — «thương quan bội ấn» đại cát; kiến quan phản hữu phúc (không phải hoạ)' },
+  用财: { condition: 'thân vượng + thương quan vượng', desc: 'dùng Tài — thương sinh tài, lưu thông; kỵ ấn đoạt tài + kiếp tài phá cách' },
+  用劫: { condition: 'thân nhược + tài trọng thương nhẹ', desc: 'dùng Tỷ Kiếp chế tài vệ thương; mệnh danh «dụng kiếp»' },
+  用伤: { condition: 'thân vượng + vô tài quan', desc: 'dùng Thương发泄 tinh hoa, hỷ hành tài vận; kỵ ấn quan' },
+  用官: { condition: 'thân vượng + tỷ kiếp nhiều + tài nhẹ thương nhẹ', desc: 'dùng Quan chế tỷ kiếp; «thương quan dụng quan» nghịch dụng đặc biệt' },
+};
+
 // ---- Ý NGHĨA SÂU CỦA THẬP THẦN ----
 // Mỗi sao: { vi, nature, vượng, nhược, areas }
 export const TEN_GOD_DEEP = {

@@ -9,7 +9,7 @@ import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
 import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12, SANSI_OVERVIEW, SANHE_HUAQI, LIUHE_HUAQI, XIAOXI_12, JIEQI_24, QIHOU, XINGCI_12 } from './src/engine/constants.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY, DITIANSUI_SHISHEN } from './src/engine/kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY, DITIANSUI_SHISHEN, SHANGGUAN_5YONG } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
 import { jinkoujue, renderJinkoujueCard } from './src/engine/jinkoujue.js';
@@ -294,6 +294,13 @@ assert(DITIANSUI_SHISHEN['官杀混杂'].verse.includes('有可有不可') && DI
 for (const k of Object.keys(DITIANSUI_SHISHEN)) {
   const e = DITIANSUI_SHISHEN[k];
   assert(e.verse && e.vi && e.apply.length > 20, `十神论 ${k}: verse + vi + apply`);
+}
+// [loop 1321] 伤官 5 dụng pháp.
+assert(Object.keys(SHANGGUAN_5YONG).length === 5, `SHANGGUAN_5YONG: 5 dụng pháp (got ${Object.keys(SHANGGUAN_5YONG).length})`);
+assert(SHANGGUAN_5YONG['用印'].desc.includes('thương quan bội ấn') && SHANGGUAN_5YONG['用财'].desc.includes('thương sinh tài'), '伤官: 用印= bội ấn, 用财= sinh tài');
+for (const k of Object.keys(SHANGGUAN_5YONG)) {
+  const e = SHANGGUAN_5YONG[k];
+  assert(e.condition && e.desc.length > 20, `伤官 ${k}: condition + desc`);
 }
 // [loop 1195] 子平真詮 «取用神» 5 pháp + 月令取用 (徐乐吾评注 ctext ch.974137).
 assert(Object.keys(YONGSHEN_METHOD).length === 6, 'YONGSHEN_METHOD: 月令 + 5 đại pháp (扶抑/病药/调候/通关/从化)');
