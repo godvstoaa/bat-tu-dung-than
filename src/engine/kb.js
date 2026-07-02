@@ -304,6 +304,10 @@ export const PATTERN_DEEP = {
   偏印格: { use: 'nghịch (khi đoạt thực) / thuận (khi hoá sát)', yong: 'Thiên Ấn', xiang: 'bản thân hoá sát sinh thân thì cát', ji: 'Kiêu đoạt thực (khi thực là dụng thì kỵ)' },
   食神格: { use: 'thuận dụng', yong: 'Thực Thần', xiang: 'Tài (thực sinh tài) / thân vượng', ji: 'Kiêu thần (thiên ấn) đoạt thực' },
   伤官格: { use: 'nghịch dụng (cần chế hoá)', yong: 'Thương Quan', xiang: 'Ấn («thương quan bội ấn») hoặc Tài (thương sinh tài thông quan)', ji: '«thương quan kiến quan» (gặp chính quan thì hung); thân nhược thương vượng kỵ vô ấn' },
+  // [loop 1254] 3 cách đặc biệt (nguyệt lệnh = nhật can đồng khí, 《子平真诠评注»ctext ch.974137)
+  建禄格: { use: 'thuận dụng (nguyệt lệnh=nhật can lộc, thân đã vượng)', yong: 'Tài/Quan', xiang: 'Tài/Quan lộ thiên, Thực Thương tiết tú («tài quan hỷ lộ thiên»)', ji: 'thân tái vượng, Tỷ/Kiếp trọng重, vô y' },
+  月劫格: { use: 'thuận dụng (nguyệt lệnh=kiếp tài, đồng luận với kiến lộc)', yong: 'Quan (chế kiếp)', xiang: 'Tài sinh quan (hộ quan)', ji: 'Thương Quan phá quan' },
+  羊刃格: { use: 'nghịch dụng (nguyệt lệnh=đế vượng dương can, sát khí trọng)', yong: 'Quan/Sát chế nhận', xiang: '«dương nhận giá sát» — nhận cường sát vượng vi mỹ; hoặc Thực chế / Ấn hoá', ji: 'sát bị hợp (không chế nhận), quan bị thương, vô chế tất bại' },
 };
 
 // ---- 子平 «六神» PHÂN CẤP quanh dụng thần (《子平真诠》) ----
