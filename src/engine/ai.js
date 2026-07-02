@@ -5,7 +5,7 @@
 //  - Không có cấu hình / lỗi → fallback về tầng NLG cục bộ (composeAnswer).
 //  Hỗ trợ: OpenAI, GLM/Z.ai, DeepSeek, Ollama, bất kỳ endpoint /chat/completions.
 // ============================================================================
-import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
+import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY } from './kb.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
@@ -278,6 +278,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - «五言独步» (渊海子平): 「${WUYAN_DUBU['病药'].verse}」— 有病=有忌神 phá cách, 去病=dụng thần trừ kỵ → tài lộc đến.
 - «八格» 用神/喜忌 (子平真诠): ${R.pattern && PATTERN_DEEP[R.pattern.name] ? `${R.pattern.name}: dụng=${PATTERN_DEEP[R.pattern.name].yong}, hỷ=${PATTERN_DEEP[R.pattern.name].xiang}, kỵ=${PATTERN_DEEP[R.pattern.name].ji}` : '(cách không trong PATTERN_DEEP)'}
 - «六神» phân cấp: ${Object.entries(SHEN_HIERARCHY).map(([k, e]) => `${k}=${e.role}`).join('; ')}
+- «调候» nguyên lý (窮通寶鑑): ${R.yong?.tiaohou?.override ? `override → ${R.yong.tiaohou.override}` : '(theo vượng suy chuẩn)'} | ${TIAOHOU_PRINCIPLE.jianlu}
 - Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
 - Tiết khí gần nhất: ${c.jieqi.prev.name}
 
