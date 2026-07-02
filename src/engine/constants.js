@@ -195,6 +195,12 @@ export const QIHOU = {
   白露: { hou: ['鸿雁来', '玄鸟归', '群鸟养羞'], note: 'hồng nhạn nam phi; huyền điểu (yến) nam quy; quần điểu tích lương thực («tu»=thực)' },
   寒露: { hou: ['鸿雁来宾', '雀入大水为蛤', '菊有黄华'], note: 'hồng nhạn muộn (như khách); tước nhập thuỷ hoá cá; cúc hoàng hoa nở' },
   霜降: { hou: ['豺乃祭兽', '草木黄落', '蛰虫咸俯'], note: 'sói bắt thú bày như tế; thảo mộc hoàng lạc; trệ trùng hàm phủ (ẩn nghỉ đông)' },
+  // [loop 1264] thêm 5 mùa đông — HOÀN THÀNH ĐỦ 24节气 × 3候 = 72候
+  立冬: { hou: ['水始冰', '地始冻', '雉入大水为蜃'], note: 'thuỷ thuỷ băng; địa thuỷ đông; trĩ nhập thuỷ hoà sò (tưởng tượng cổ)' },
+  小雪: { hou: ['虹藏不见', '天气上升地气下降', '闭塞而成冬'], note: 'cầu vồng ẩn; thiên khí thăng địa khí giáng (âm dương cách tuyệt); bế tắc thành đông' },
+  大雪: { hou: ['鹖鴠不鸣', '虎始交', '荔挺出'], note: 'hạt đán (hàn hào điểu) nín kêu; hổ giao phối; lệ (mã lan thảo) mầm nảy' },
+  小寒: { hou: ['雁北乡', '鹊始巢', '雉始鸲'], note: 'nhạn bắc hương (cảm dương); thuỷỉ鹊 lấp tổ; trĩ鸲 (kêu cầu bạn)' },
+  大寒: { hou: ['鸡始乳', '征鸟厉疾', '水泽腹坚'], note: 'gà mái ấp trứng; chinh điểu (ưng) bay lướt nhanh săn; thuỷ trạch bụng kiên (băng dày cực)' },
 };
 
 // ---- 十二星次 (12 trạm Mộc tinh, dùng cho 七政四余/大六壬日躔) ----
