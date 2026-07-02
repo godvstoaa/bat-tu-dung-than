@@ -298,6 +298,7 @@ VƯỢNG SUY: ${R.strength.level} (tỉ lệ phù trợ thân ${(R.strength.rati
 WHY VƯỢNG SUY 得令/得地/得势 3 pháp (mạnh nhờ lệnh/địa/thế hay nhờ Ấn?): ${(() => { try { return strength3Fa(R).summary; } catch (e) { return '(không tính được)'; } })()}
 
 NGŨ HÀNH: ${wx}
+- «源流» (R.yuanliu — nguồn + dòng ngũ hành của lá số): ${R.yuanliu ? `nguồn=${wxVi(R.yuanliu.source)} | dòng ${(R.yuanliu.chain || []).map((c) => wxVi(c.wx) + ' ' + Math.round((c.pct || 0) * 100) + '%').join('→')} | khuyết(gap)=${R.yuanliu.gap ? wxVi(R.yuanliu.gap) : '(đủ 5 hành — lưu thông)'} | 归宿=${wxVi(R.yuanliu.endpoint)} | ảnh hưởng ${R.yuanliu.aspectKey}${R.yuanliu.verdict ? ' · ' + R.yuanliu.verdict : ''}` : '(không tính)'}
 
 CÁCH CỤC (格局): ${R.pattern.vi} — ${R.pattern.name}
 HÓA KHÍ (化气格 — can hợp có hóa không; nếu thành → Dụng đổi hẳn): ${(() => { try { const h = analyzeHuaQi(R); return h.huaQiGe ? `⚠ ${h.summary}` : h.summary; } catch (e) { return '(không tính được)'; } })()}
