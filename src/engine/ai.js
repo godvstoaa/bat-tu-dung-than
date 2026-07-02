@@ -905,10 +905,15 @@ export function execTool(name, args, R) {
         if (!ch || !/[一-鿿㐀-䶿]/.test(ch)) return { error: 'Cần đúng 1 chữ Hán (Hán tự) để测字.' };
         const cz = cezi(ch);
         if (!cz) return { error: `Chữ «${ch}» chưa có trong dữ liệu测字 — thử chữ Hán phổ biến khác.` };
+        const hexName = cz.hexagram?.name;
         return {
           char: ch,
           radical: cz.radical, strokes: cz.strokes, wx: cz.wx, wxVi: cz.wxVi,
-          hexagram: cz.hexagram ? { name: cz.hexagram.name, vi: cz.hexagram.nameVi, meaning: cz.hexagram.meaning } : null,
+          hexagram: cz.hexagram ? { name: hexName, vi: cz.hexagram.nameVi, meaning: cz.hexagram.meaning } : null,
+          // [loop 1292] enrichment: 大象传 + 卦辞 + baseMeaning
+          daxiang: DAXIANG[hexName]?.verse || '',
+          guaci: GUA_CI[hexName]?.ci || '',
+          baseMeaning: cz.baseMeaning || cz.decomposition || '',
           reading: cz.reading || cz.summary || '',
         };
       }
