@@ -92,6 +92,8 @@ export const TIAN_DE = {
 export const YUE_DE = { A: '壬', B: '丙', C: '庚', D: '甲' }; // A=申子辰 B=寅午戌 C=巳酉丑 D=亥卯未
 // [loop 1252] 月德合 = 月德 干 hợp (五 hợp: 甲己/乙庚/丙辛/丁壬/戊癸). Nguồn: 《三命通会»(de hoá khí).
 export const YUE_DE_HE = { A: '丁', B: '辛', C: '乙', D: '己' }; // 月德(壬丙庚甲)各自的干合
+// [loop 1253] 天德合 = 天德 合 (天德 是干→干合; 是地支→地支六合). Nguồn: 《三命通会».
+export const TIAN_DE_HE = { 寅:'壬', 卯:'巳', 辰:'丁', 巳:'丙', 午:'寅', 未:'己', 申:'戊', 酉:'亥', 戌:'辛', 亥:'庚', 子:'申', 丑:'乙' };
 // ---- KIM DƯ (金舆) — tra theo Nhật Can (địa chi tương ứng) ----
 export const JIN_YU = {
   甲: '辰', 乙: '巳', 丙: '未', 丁: '申', 戊: '未', 己: '申',

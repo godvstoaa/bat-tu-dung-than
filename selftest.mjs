@@ -3640,6 +3640,19 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   }
   console.log(`   [loop 1252] 月德合 = 月德 干合 (壬→丁/丙→辛/庚→乙/甲→己) — 《三命通会» ✓`);
 }
+// [loop 1253] 天德合 (干-type→干合, 支-type→支六合).
+{
+  const { TIAN_DE, TIAN_DE_HE } = await import('./src/engine/shensha.js');
+  const ganHe = { 甲:'己', 乙:'庚', 丙:'辛', 丁:'壬', 戊:'癸', 己:'甲', 庚:'乙', 辛:'丙', 壬:'丁', 癸:'戊' };
+  const zhiHe = { 子:'丑', 丑:'子', 寅:'亥', 亥:'寅', 卯:'戌', 戌:'卯', 辰:'酉', 酉:'辰', 巳:'申', 申:'巳', 午:'未', 未:'午' };
+  let ok = true;
+  for (const [k, v] of Object.entries(TIAN_DE)) {
+    const expected = ganHe[v] || zhiHe[v];
+    if (TIAN_DE_HE[k] !== expected) ok = false;
+  }
+  assert(ok, '天德合: 干-type→干合 / 支-type→支六合 (mechanical derivation verified)');
+  console.log(`   [loop 1253] 天德合 12月 (干/支混合 hợp) — 《三命通会» ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);
