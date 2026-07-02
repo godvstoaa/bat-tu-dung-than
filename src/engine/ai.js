@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY } from './kb.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { analyzeKongwang } from './kongwang.js';
@@ -276,6 +276,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - «用神 bất khả» (滴天髓阐微 知命章): ${ZIPING_YONG_MAXIM.protect} | NGƯỢC: ${ZIPING_YONG_MAXIM.inverse}.
 - «五言独步» (渊海子平): 「${WUYAN_DUBU['病药'].verse}」— 有病=有忌神 phá cách, 去病=dụng thần trừ kỵ → tài lộc đến.
 - «八格» 用神/喜忌 (子平真诠): ${R.pattern && PATTERN_DEEP[R.pattern.name] ? `${R.pattern.name}: dụng=${PATTERN_DEEP[R.pattern.name].yong}, hỷ=${PATTERN_DEEP[R.pattern.name].xiang}, kỵ=${PATTERN_DEEP[R.pattern.name].ji}` : '(cách không trong PATTERN_DEEP)'}
+- «六神» phân cấp: ${Object.entries(SHEN_HIERARCHY).map(([k, e]) => `${k}=${e.role}`).join('; ')}
 - Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
 - Tiết khí gần nhất: ${c.jieqi.prev.name}
 
