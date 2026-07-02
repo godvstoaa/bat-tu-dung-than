@@ -722,6 +722,17 @@ assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.ke
   }
   console.log(`   [loop 1270] 子午流注 12经络 cross-guard ✓`);
 }
+// [loop 1271] WUX_ZANG cross-guard (5 hành × 脏腑).
+{
+  const { WUX_ZANG } = await import('./src/engine/tcm.js');
+  const _wx5 = ['木', '火', '土', '金', '水'];
+  assert(_wx5.every((w) => WUX_ZANG[w]), 'WUX_ZANG: đủ 5 ngũ hành');
+  for (const w of _wx5) {
+    const e = WUX_ZANG[w];
+    assert(e.zang && e.fu && e.wei && e.se && e.zhi && e.guan && e.ti && e.season, `脏腑 ${w}: đủ zang/fu/wei/se/zhi/guan/ti/season`);
+  }
+  console.log(`   [loop 1271] WUX_ZANG 5 hành × 脏腑表里 cross-guard ✓`);
+}
 assert(QIHOU['立春'].hou.length === 3 && QIHOU['立春'].hou[0] === '东风解冻' && QIHOU['冬至'].hou[2] === '水泉动', '七十二候: 立春 初候=东风解冻, 冬至 三候=水泉动');
 for (const k of Object.keys(QIHOU)) {
   const e = QIHOU[k];
