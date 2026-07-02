@@ -338,6 +338,13 @@ for (const k of Object.keys(PATTERN_DEEP)) {
   assert(MEIHUA_SANYAO['耳'] && MEIHUA_SANYAO['心'].includes('tâm nãi') && MEIHUA_SHIYING['天时应'].includes('thiên tượng'), '三要: 耳/目/心; 十应: 天时应 thiên tượng');
   console.log(`   [loop 1228] 梅花 三要 (耳/目/心) + 十应 — ctext 梅花易數卷三 ✓`);
 }
+// [loop 1229] 河图洛书 口诀 (《周易·系辞》/Wikisource/Wikipedia).
+{
+  const { HELU_KOUJUE } = await import('./src/engine/heluo.js');
+  assert(HELU_KOUJUE.hetu.includes('天一生水') && HELU_KOUJUE.hetu.includes('地十成之'), '河图口诀: 天一生水...地十成之');
+  assert(HELU_KOUJUE.luoshu.includes('戴九履一') && HELU_KOUJUE.hetuShort.includes('一六共宗'), '洛书口诀 戴九履一 + 河图简记 一六共宗');
+  console.log(`   [loop 1229] 河图洛书口诀: hetu(天一生水) + luoshu(戴九履一) — 周易系辞 ✓`);
+}
 // [loop 1202] 二十八宿 regression guard — lock 28 túc + 4 tượng × 7 + đúng thứ tự 角→轸.
 {
   const { XIU_TABLE } = await import('./src/engine/ershibaxiu.js');
