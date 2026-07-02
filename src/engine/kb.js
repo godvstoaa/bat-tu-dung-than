@@ -191,6 +191,31 @@ export const DITIANSUI_HEZHI = {
   },
 };
 
+// ---- 滴天髓阐微 «官杀 + 伤官 + 清浊 + 真假» (loop 1320, quanxue.cn/ctext) ----
+// Các chương chuyên sâu về thập thần luận từ 滴天髓阐微 第21-26章.
+export const DITIANSUI_SHISHEN = {
+  官杀混杂: {
+    verse: '官殺混雜來問我，有可有不可。',
+    vi: 'Quan Sát hỗn tạp — có thể hỗn, có thể không.',
+    apply: 'Thân vượng thì Sát làm Quan dùng (có thể hỗn); thân nhược thì Quan cũng thành Sát (không thể hỗn). «格格推详，以杀为重» — luận cách cục trước hết phải giải quyết vấn đề Sát. Lấy thực chế / ấn hoá / hợp lưu là các pháp chính.',
+  },
+  伤官: {
+    verse: '傷官見官，禍百端；傷官傷盡，則為吉。',
+    vi: 'Thương Quan kiến Quan → trăm hoạ; Thương Quan «thương tận» thì cát.',
+    apply: '«Thương Quan kiến Quan» = hung chỉ khi Quan là dụng thần; nếu Thương Quan thịnh mà không thấy Quan (thương tận) thì反而 cát. Thương Quan bội ấn = dùng ấn chế thương, đại cát.',
+  },
+  清浊: {
+    verse: '一清到底顯精神，管取平生富貴真；滿局濁令人壽夭，他家安好也淪傾。',
+    vi: 'Một清新 đến đáy = phú quý chân; đầy cục浊 = yểu.',
+    apply: '«Thanh» = ngũ hành thuần nhất, sinh hoá lưu thông, không tạp; «Trọc» = ngũ hành lộn xộn, khắc chiến, kỵ thần vương. Mệnh thanh = phú quý; mệnh trọc = bần tiện/yểu.',
+  },
+  真假: {
+    verse: '令上尋其得其真，假神休要亂真神。',
+    vi: 'Tìm chân thần tại nguyệt lệnh; giả thần đừng lẫn chân thần.',
+    apply: '«Chân thần» = thần đắc lệnh tại nguyệt lệnh (dụng thần chân chính); «giả thần» = thần không đắc lệnh. Mệnh có chân thần = phú quý dài lâu; chỉ có giả thần = hư danh.',
+  },
+};
+
 // ---- Ý NGHĨA SÂU CỦA THẬP THẦN ----
 // Mỗi sao: { vi, nature, vượng, nhược, areas }
 export const TEN_GOD_DEEP = {

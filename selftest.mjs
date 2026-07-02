@@ -9,7 +9,7 @@ import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
 import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12, SANSI_OVERVIEW, SANHE_HUAQI, LIUHE_HUAQI, XIAOXI_12, JIEQI_24, QIHOU, XINGCI_12 } from './src/engine/constants.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY } from './src/engine/kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY, DITIANSUI_SHISHEN } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
 import { jinkoujue, renderJinkoujueCard } from './src/engine/jinkoujue.js';
@@ -287,6 +287,13 @@ assert(DITIANSUI_TONGLUN['衰旺'] && DITIANSUI_TONGLUN['源流'] && DITIANSUI_T
 for (const k of Object.keys(DITIANSUI_TONGLUN)) {
   const e = DITIANSUI_TONGLUN[k];
   assert(e.verse && e.verse.length > 10 && e.apply.length > 25, `通論 ${k}: verse + apply`);
+}
+// [loop 1320] 滴天髓阐微 thập thần chuyên luận (官杀/伤官/清浊/真假).
+assert(Object.keys(DITIANSUI_SHISHEN).length === 4, `DITIANSUI_SHISHEN: 4 chương (got ${Object.keys(DITIANSUI_SHISHEN).length})`);
+assert(DITIANSUI_SHISHEN['官杀混杂'].verse.includes('有可有不可') && DITIANSUI_SHISHEN['伤官'].verse.includes('傷官傷盡'), '十神论: 官杀混杂 + 伤官伤尽');
+for (const k of Object.keys(DITIANSUI_SHISHEN)) {
+  const e = DITIANSUI_SHISHEN[k];
+  assert(e.verse && e.vi && e.apply.length > 20, `十神论 ${k}: verse + vi + apply`);
 }
 // [loop 1195] 子平真詮 «取用神» 5 pháp + 月令取用 (徐乐吾评注 ctext ch.974137).
 assert(Object.keys(YONGSHEN_METHOD).length === 6, 'YONGSHEN_METHOD: 月令 + 5 đại pháp (扶抑/病药/调候/通关/从化)');
