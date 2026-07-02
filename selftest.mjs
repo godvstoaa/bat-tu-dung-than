@@ -777,6 +777,20 @@ assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.ke
   }
   console.log(`   [loop 1276] 阳干 12-stage 长生→帝旺 5 can ✓`);
 }
+// [loop 1277] SHENSHA 5 tables structural guard (天乙/文昌/禄/羊刃/学堂 × 10 can).
+{
+  const { TIAN_YI, WEN_CHANG, LU_SHEN, YANG_REN, XUE_TANG } = await import('./src/engine/shensha.js');
+  const ZHI = new Set(['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥']);
+  const gans = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  for (const g of gans) {
+    assert(TIAN_YI[g] && TIAN_YI[g].length === 2 && TIAN_YI[g].every((z) => ZHI.has(z)), `天乙 ${g}: 2 valid chi`);
+    assert(WEN_CHANG[g] && ZHI.has(WEN_CHANG[g]), `文昌 ${g}: valid chi`);
+    assert(LU_SHEN[g] && ZHI.has(LU_SHEN[g]), `禄神 ${g}: valid chi`);
+    assert(YANG_REN[g] && ZHI.has(YANG_REN[g]), `羊刃 ${g}: valid chi`);
+    assert(XUE_TANG[g] && ZHI.has(XUE_TANG[g]), `学堂 ${g}: valid chi`);
+  }
+  console.log(`   [loop 1277] SHENSHA 5 tables × 10 can structural guard ✓`);
+}
 for (const k of Object.keys(QIHOU)) {
   const e = QIHOU[k];
   assert(e.hou.length === 3 && e.note, `候 ${k}: 3候 + note`);
