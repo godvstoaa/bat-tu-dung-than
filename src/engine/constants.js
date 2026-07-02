@@ -33,6 +33,23 @@ export const GAN = {
   癸: { vi: 'Quý',  wx: '水', yin: true  },
 };
 
+// ---- 十天干 类象 (方位/季节/脏腑/身体) ----
+// [loop 1234] Nguồn: 《针灸大成》+ 鍼灸聚英(Wikisource) + 知乎 + 搜狐. wx/yin đã có trong GAN.
+//   [规律] dương can phó phủ (甲丙戊庚壬→đởm/tiểu trường/vị/đại trường/bàng quang), âm can phó tạng.
+//   Khẩu quyết: «甲胆乙肝丙小肠，丁心戊胃己脾乡；庚属大肠辛属肺，壬属膀胱癸肾脏».
+export const GAN_LEIXIANG = {
+  甲: { direction: 'đông', season: 'xuân', organ: 'đởm (胆)', body: 'đầu' },
+  乙: { direction: 'đông', season: 'xuân', organ: 'can (肝)', body: 'cổ/yết hầu' },
+  丙: { direction: 'nam', season: 'hạ', organ: 'tiểu trường (小肠)', body: 'vai' },
+  丁: { direction: 'nam', season: 'hạ', organ: 'tâm (心)', body: 'tim' },
+  戊: { direction: 'trung cung', season: 'trường hạ', organ: 'vị (胃)', body: 'sườn' },
+  己: { direction: 'trung cung', season: 'trường hạ', organ: 'tỳ (脾)', body: 'bụng' },
+  庚: { direction: 'tây', season: 'thu', organ: 'đại trường (大肠)', body: 'rốn' },
+  辛: { direction: 'tây', season: 'thu', organ: 'phế (肺)', body: 'đùi' },
+  壬: { direction: 'bắc', season: 'đông', organ: 'bàng quang (膀胱, tam tiêu)', body: 'cẳng chân' },
+  癸: { direction: 'bắc', season: 'đông', organ: 'thận (肾, tâm bào)', body: 'bàn chân' },
+};
+
 // ---- ĐỊA CHI (地支) ----
 export const ZHI = {
   子: { vi: 'Tý',   wx: '水', yin: true,  con: 'Chuột' },

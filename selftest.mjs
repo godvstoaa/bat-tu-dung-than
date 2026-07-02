@@ -8,7 +8,7 @@ import { composeAnswer, detectIntent } from './src/engine/nlg.js';
 import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
-import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG } from './src/engine/constants.js';
+import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG } from './src/engine/constants.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
@@ -572,6 +572,13 @@ assert(ZHI_LEIXIANG['子'].hour === '23-01' && ZHI_LEIXIANG['子'].direction ===
 for (const k of Object.keys(ZHI_LEIXIANG)) {
   const e = ZHI_LEIXIANG[k];
   assert(e.hour && e.direction && e.month && e.season, `地支 ${k}: hour+direction+month+season`);
+}
+// [loop 1234] 十天干 类象 (针灸大成/鍼灸聚英).
+assert(Object.keys(GAN_LEIXIANG).length === 10, `GAN_LEIXIANG: 10 thiên can (got ${Object.keys(GAN_LEIXIANG).length})`);
+assert(GAN_LEIXIANG['甲'].organ.includes('đởm') && GAN_LEIXIANG['乙'].organ.includes('can') && GAN_LEIXIANG['癸'].organ.includes('thận'), '天干配脏腑: 甲胆/乙肝/癸肾');
+for (const k of Object.keys(GAN_LEIXIANG)) {
+  const e = GAN_LEIXIANG[k];
+  assert(e.direction && e.season && e.organ && e.body, `天干 ${k}: direction+season+organ+body`);
 }
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic
 const R1990 = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
