@@ -189,6 +189,12 @@ export const QIHOU = {
   芒种: { hou: ['螳螂生', '鵙始鸣', '反舌无声'], note: 'mantis nở; bá lao chim kêu; phản thiệt (bách thiệt) nín kêu' },
   小暑: { hou: ['温风至', '蟋蟀居宇', '鹰始鸷'], note: 'ôn phong chí (gió noãn cực); dế crickets vào nhà; ưng con học bay săn' },
   大暑: { hou: ['腐草为萤', '土润溽暑', '大雨时行'], note: 'phụ thảo hoá đom đóm; thổ nhậm thử (đất ẩm nắng); đại vũ thời hành (mưa lớn giảm thử)' },
+  // [loop 1263] thêm 5 mùa thu (đủ mùa thu 6 tiết khí)
+  立秋: { hou: ['凉风至', '白露降', '寒蝉鸣'], note: 'lương phong chí; bạch lộ giáng (lộ trắng); hàn thiền kêu (cảm âm)' },
+  处暑: { hou: ['鹰乃祭鸟', '天地始肃', '禾乃登'], note: 'ưng điểu săn bày như tế; thiên địa thu túc (khí thu sát); hà nãi đăng (lúa chín gặt)' },
+  白露: { hou: ['鸿雁来', '玄鸟归', '群鸟养羞'], note: 'hồng nhạn nam phi; huyền điểu (yến) nam quy; quần điểu tích lương thực («tu»=thực)' },
+  寒露: { hou: ['鸿雁来宾', '雀入大水为蛤', '菊有黄华'], note: 'hồng nhạn muộn (như khách); tước nhập thuỷ hoá cá; cúc hoàng hoa nở' },
+  霜降: { hou: ['豺乃祭兽', '草木黄落', '蛰虫咸俯'], note: 'sói bắt thú bày như tế; thảo mộc hoàng lạc; trệ trùng hàm phủ (ẩn nghỉ đông)' },
 };
 
 // ---- 十二星次 (12 trạm Mộc tinh, dùng cho 七政四余/大六壬日躔) ----
