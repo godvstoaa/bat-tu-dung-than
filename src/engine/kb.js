@@ -292,6 +292,20 @@ export const PATTERN_GUIDE = {
   從旺格: 'Theo vượng thế — một lòng tiến theo thế mạnh, kỵ nghịch.',
 };
 
+// ---- 子平真詮 «八格» 用神/相神/忌 SÂU (PATTERN_GUIDE là 1-dòng) ----
+// [loop 1226] Nguồn: ctext 子平真詮評注 + 知乎«论相神紧要» + 搜狐«论用神成败救应».
+//   Cốt法: «用神 có sinh có hộ, có chế có hoá» — thiện (tài/quan/ấn/thực) thuận dụng, bất thiện (sát/thương/kiêu/kiếp) nghịch dụng.
+export const PATTERN_DEEP = {
+  正官格: { use: 'thuận dụng (thiện)', yong: 'Chính Quan', xiang: 'Tài (sinh quan) + Ấn (hộ quan, chế thương)', ji: 'Thương Quan khắc quan, hình xung phá hại' },
+  七杀格: { use: 'nghịch dụng (bất thiện)', yong: 'Thất Sát', xiang: 'Thực Thần (chế sát) hoặc Ấn (hoá sát sinh thân)', ji: 'Tài ấn tịnh kiến (tài sinh sát, ấn đoạt thực)' },
+  正财格: { use: 'thuận dụng', yong: 'Chính Tài', xiang: 'Thực Thần (sinh tài) + Quan (chế tỷ kiếp hộ tài)', ji: 'Tỷ Kiếp đoạt tài' },
+  偏财格: { use: 'thuận dụng', yong: 'Thiên Tài', xiang: 'Thực Thương sinh tài + Quan hộ tài', ji: 'Tỷ Kiếp đoạt tài' },
+  正印格: { use: 'thuận dụng', yong: 'Chính Ấn', xiang: 'Quan Sát (sinh ấn) + Tỷ Kiếp (chế tài hộ ấn)', ji: 'Tài phá ấn' },
+  偏印格: { use: 'nghịch (khi đoạt thực) / thuận (khi hoá sát)', yong: 'Thiên Ấn', xiang: 'bản thân hoá sát sinh thân thì cát', ji: 'Kiêu đoạt thực (khi thực là dụng thì kỵ)' },
+  食神格: { use: 'thuận dụng', yong: 'Thực Thần', xiang: 'Tài (thực sinh tài) / thân vượng', ji: 'Kiêu thần (thiên ấn) đoạt thực' },
+  伤官格: { use: 'nghịch dụng (cần chế hoá)', yong: 'Thương Quan', xiang: 'Ấn («thương quan bội ấn») hoặc Tài (thương sinh tài thông quan)', ji: '«thương quan kiến quan» (gặp chính quan thì hung); thân nhược thương vượng kỵ vô ấn' },
+};
+
 // ---- 子平真詮 «取用神» 5 ĐẠI PHÁP + 月令取用 (nguồn cổ) ----
 // Nguồn: 子平真詮評注 (徐乐吾, ctext ch.974137 / 太极书馆), 算准网, 知乎 — ≥2 nguồn.
 // [源流] 扶抑/病药/调候/通关 = 徐乐吾评注归纳; 从化 = hậu nhân bổ sung; 原书核心 = 月令取用神.

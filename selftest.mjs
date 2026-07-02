@@ -9,7 +9,7 @@ import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
 import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN } from './src/engine/constants.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN } from './src/engine/kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
 import { jinkoujue, renderJinkoujueCard } from './src/engine/jinkoujue.js';
@@ -310,6 +310,13 @@ assert(JISHAN_PIAN['日主'].verse.includes('专用日干') && JISHAN_PIAN['富�
 for (const k of Object.keys(JISHAN_PIAN)) {
   const e = JISHAN_PIAN[k];
   assert(e.verse && e.apply.length > 15, `继善篇 ${k}: verse + apply`);
+}
+// [loop 1226] 子平真诠 八格 用神/相神/忌 sâu (ctext/知乎/搜狐).
+assert(Object.keys(PATTERN_DEEP).length === 8, `PATTERN_DEEP: 8正格 (got ${Object.keys(PATTERN_DEEP).length})`);
+assert(PATTERN_DEEP['七杀格'].xiang.includes('Thực Thần') && PATTERN_DEEP['食神格'].ji.includes('Kiêu') && PATTERN_DEEP['正财格'].ji.includes('Tỷ Kiếp'), '八格: 七杀=食神制, 食神忌枭夺食, 正财忌比劫');
+for (const k of Object.keys(PATTERN_DEEP)) {
+  const e = PATTERN_DEEP[k];
+  assert(e.use && e.yong && e.xiang && e.ji, `八格 ${k}: use+yong+xiang+ji`);
 }
 // [loop 1201] 八卦万物类象 (说卦传) — mở rộng cho luận quẻ 梅花/六爻/qimen.
 {
