@@ -180,6 +180,13 @@ export const QIHOU = {
   冬至: { hou: ['蚯蚓结', '麋角解', '水泉动'], note: 'nhị chí — giun đất cuộn kết (cảm dương động), ly rụng sừng, thuỷ tuyền lưu' },
 };
 
+// ---- 十二星次 (12 trạm Mộc tinh, dùng cho 七政四余/大六壬日躔) ----
+// [loop 1249] Nguồn: 《汉书·律历志》 + Baidu Baike «twelve Jupiter-stations». Mộc tinh nghịch hành (丑→子→亥...).
+export const XINGCI_12 = {
+  丑: '星纪', 子: '玄枵', 亥: '娵訾', 戌: '降娄', 酉: '大梁', 申: '实沈',
+  未: '鹑首', 午: '鹑火', 巳: '鹑尾', 辰: '寿星', 卯: '大火', 寅: '析木',
+};
+
 // ---- TÀNG CAN (藏干) — Can ẩn trong Địa Chi ----
 // Thứ tự: Bản khí → Trung khí → Dư khí. Trọng số theo độ dài.
 export const HIDDEN = {
