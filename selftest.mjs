@@ -360,6 +360,20 @@ for (const k of Object.keys(SHEN_HIERARCHY)) {
   }
   console.log(`   [loop 1235] 24山正五行 (8 cung×3 sơn) + 红黑阴阳 (12+12) — 知乎/百度百科 ✓`);
 }
+// [loop 1236] 八宅 大游年 八游星↔九星 (百度百科/知乎/搜狐).
+{
+  const { BAZHAI_YOUXING, BAZHAI_GROUP } = await import('./src/engine/fengshui-compass.js');
+  assert(Object.keys(BAZHAI_YOUXING).length === 8, `BAZHAI_YOUXING: 8游星 (got ${Object.keys(BAZHAI_YOUXING).length})`);
+  assert(BAZHAI_YOUXING['生气'].jiuxing === '贪狼' && BAZHAI_YOUXING['绝命'].jiuxing === '破军' && BAZHAI_YOUXING['五鬼'].jiuxing === '廉贞', '游星-九星: 生气贪狼/绝命破军/五鬼廉贞');
+  const jiCount = Object.values(BAZHAI_YOUXING).filter((e) => e.tone === 'cat').length;
+  assert(jiCount === 4, `4吉4凶 (cát=${jiCount})`);
+  assert(BAZHAI_GROUP.dongSi.length === 4 && BAZHAI_GROUP.xiSi.length === 4, '东四/西四 各 4');
+  for (const k of Object.keys(BAZHAI_YOUXING)) {
+    const e = BAZHAI_YOUXING[k];
+    assert(e.jiuxing && e.wx && e.tone && e.desc, `游星 ${k}: jiuxing+wx+tone+desc`);
+  }
+  console.log(`   [loop 1236] 八宅游星↔九星 (8: 4吉+4凶) + 东四/西四 — 百度百科/知乎 ✓`);
+}
 // [loop 1229] 河图洛书 口诀 (《周易·系辞》/Wikisource/Wikipedia).
 {
   const { HELU_KOUJUE } = await import('./src/engine/heluo.js');

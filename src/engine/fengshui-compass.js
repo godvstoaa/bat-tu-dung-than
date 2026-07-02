@@ -56,6 +56,21 @@ export const SHAN_YINYANG = {
   阴: '子癸丑卯乙辰午丁未酉辛戌',
 };
 
+// ---- 八宅 大游年 八游星 ↔ 九星 (百度百科/知乎/搜狐) ----
+// [loop 1236] 4吉 (生气/天医/延年/伏位) + 4凶 (绝命/五鬼/六煞/祸害). Đối song family-sync (1-dòng).
+export const BAZHAI_YOUXING = {
+  生气: { jiuxing: '贪狼', wx: '木', tone: 'cat', desc: 'đinh tài, sinh dục, sinh cơ (dương mộc đại cát)' },
+  天医: { jiuxing: '巨门', wx: '土', tone: 'cat', desc: 'y dược, sức khoẻ, hoá giải bệnh tai' },
+  延年: { jiuxing: '武曲', wx: '金', tone: 'cat', desc: 'hôn nhân, hỷ khánh, tài bạch, phúc thọ' },
+  伏位: { jiuxing: '辅弼', wx: '木', tone: 'cat', desc: 'an ổn, bình yên (tiểu cát)' },
+  绝命: { jiuxing: '破军', wx: '金', tone: 'hung', desc: 'tổn đinh, phá tài, ý ngoại (đại hung)' },
+  五鬼: { jiuxing: '廉贞', wx: '火', tone: 'hung', desc: 'hoả tai, quan phi, khẩu thiệt' },
+  六煞: { jiuxing: '文曲', wx: '水', tone: 'hung', desc: 'đào hoa, thị phi, phiền não' },
+  祸害: { jiuxing: '禄存', wx: '土', tone: 'hung', desc: 'bệnh tai, thị phi, quan tụng' },
+};
+// 东四命/宅 (坎离震巽) ↔ 西四命/宅 (乾坤艮兑) — bất khả hỗn.
+export const BAZHAI_GROUP = { dongSi: ['坎', '离', '震', '巽'], xiSi: ['乾', '坤', '艮', '兑'] };
+
 // Ngũ hành của trung quái (quẻ giữa mỗi hướng) — để đối chiếu Dụng Thần
 const QUAI_WX = { 子: 'Thủy', 艮: 'Thổ', 卯: 'Mộc', 巽: 'Mộc', 午: 'Hỏa', 坤: 'Thổ', 酉: 'Kim', 乾: 'Kim' };
 
