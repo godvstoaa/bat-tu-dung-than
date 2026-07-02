@@ -3611,6 +3611,15 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   assert(MINGGONG_INFO.meaning.includes('trụ thứ 5') && MINGGONG_INFO.qili.includes('tháng sinh - giờ chi') && MINGGONG_INFO.note.length > 20, 'MINGGONG_INFO: meaning+qili+note');
   console.log(`   [loop 1248] 命宫 ý nghĩa (trụ thứ 5) + 起例 ((月-时) mod 12) — 《三命通会》 ✓`);
 }
+// [loop 1250] 词馆 (《三命通会》卷三).
+{
+  const { CIGUAN_INFO, LU_SHEN, XUE_TANG } = await import('./src/engine/shensha.js');
+  assert(CIGUAN_INFO.qili.includes('临官') && CIGUAN_INFO.qili.includes('LU_SHEN'), '词馆: 临官 vị = lộc thần');
+  // 词馆 vị = LU_SHEN (临官), đối song 学堂 (长生)
+  assert(LU_SHEN['甲'] === '寅' && XUE_TANG['甲'] === '亥', '词馆(临官)=寅 vs 学堂(长生)=亥 (đối song)');
+  assert(['meaning', 'qili', 'zheng', 'note'].every((k) => CIGUAN_INFO[k] && CIGUAN_INFO[k].length > 15), 'CIGUAN_INFO: 4 trường');
+  console.log(`   [loop 1250] 词馆 (临官=lộc vị, đối song 学堂长生) — 《三命通会》卷三 ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);

@@ -37,6 +37,16 @@ export const XUE_TANG = {
   甲: '亥', 乙: '午', 丙: '寅', 戊: '寅', 丁: '酉', 己: '酉',
   庚: '巳', 辛: '子', 壬: '申', 癸: '卯',
 };
+// [loop 1250] 词馆 (đối song 学堂). Nguồn: 《三命通会》卷三·论学堂词馆第四十八.
+//   学堂 = ngũ hành 长生 vị (XUE_TANG trên); 词馆 = ngũ hành 临官 vị (= LU_SHEN lộc vị).
+//   Cả 2 主 học nghiệp tinh chuyên, văn chương xuất chúng, khoa cử công danh.
+//   [正位] cột đó nạp âm đồng ngũ hành với mệnh chủ → «正学堂/正词馆» lực mạnh.
+export const CIGUAN_INFO = {
+  meaning: 'Từ quán (词馆) = «nay quan hàn lâm chi vị» — chủ học nghiệp tinh chuyên, văn chương xuất chúng, quan chức thanh quý; đối song 学堂 (trường học).',
+  qili: '词馆 = ngũ hành 临官 vị (= lộc thần vị LU_SHEN): 金/庚辛→申, 木/甲乙→寅, 水/壬癸→亥, 火/丙丁+土/戊己→巳.',
+  zheng: '正词馆/正学堂 = cột đó nạp âm đồng ngũ hành với mệnh chủ → lực mạnh (vd kim mệnh见壬申 nạp âm kim = chính từ quán).',
+  note: '《三命通会»主流: 学堂=长生, 词馆=临官 (帝旺 vị là dị bản thiểu số).',
+};
 
 // ---- Dựa vào ĐỊA CHI NĂM hoặc NGÀY (tam hợp cục) ----
 // Bảng tra theo nhóm tam hợp: 申子辰 / 寅午戌 / 巳酉丑 / 亥卯未
