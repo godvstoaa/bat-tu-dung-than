@@ -675,6 +675,14 @@ for (const k of Object.keys(JIEQI_24)) {
 }
 // [loop 1247] 七十二候 (5节气×3候 tiêu biểu, 《月令七十二候集解》).
 assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.keys(QIHOU).length})`);
+// [loop 1265] cross-guard: mọi JIEQI_24节气 đều có trong QIHOU (lock consistency).
+{
+  const missing = Object.keys(JIEQI_24).filter((j) => !QIHOU[j]);
+  assert(missing.length === 0, `QIHOU chứa đủ 24 JIEQI_24 (thiếu: ${missing.join(',')})`);
+  const totalHou = Object.values(QIHOU).reduce((s, e) => s + e.hou.length, 0);
+  assert(totalHou === 72, `QIHOU tổng 72候 (got ${totalHou})`);
+  console.log(`   [loop 1265] QIHOU ↔ JIEQI_24 cross-guard: 24节气/72候 locked ✓`);
+}
 assert(QIHOU['立春'].hou.length === 3 && QIHOU['立春'].hou[0] === '东风解冻' && QIHOU['冬至'].hou[2] === '水泉动', '七十二候: 立春 初候=东风解冻, 冬至 三候=水泉动');
 for (const k of Object.keys(QIHOU)) {
   const e = QIHOU[k];
