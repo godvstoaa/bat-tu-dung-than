@@ -293,6 +293,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 
 TỨ TRỤ:
 ${pillars}
+- «Chất lượng trụ» (R.pillarQuality — 盖头/截脚/干生支, can-chi tương quan mỗi trụ): ${(() => { const pp = R.pillarQuality && R.pillarQuality.perPillar; if (!pp) return '(không tính)'; const pv = { year: 'Năm', month: 'Tháng', day: 'Ngày', time: 'Giờ' }; return Object.entries(pp).map(([pos, p]) => `${pv[pos] || pos}:${p.vi || p.type || '?'}${p.flow < 0 ? '⚠' : (p.flow > 0 ? '✓' : '')}${p.impact ? '(' + p.impact + ')' : ''}`).join('; '); })()}
 
 VƯỢNG SUY: ${R.strength.level} (tỉ lệ phù trợ thân ${(R.strength.ratio * 100).toFixed(1)}%${R.strength.sanFaBonus > 0 ? ` → hiệu dụng ${(R.strength.effRatio * 100).toFixed(1)}% do 得令/得地 (cổ法 «得令者旺» cộng +${R.strength.sanFaBonus})` : ''}, ${R.strength.deLenh ? 'đắc lệnh' : 'thất lệnh'}${R.strength.qiPhase ? ` (${R.strength.qiPhase})` : ''}${R.strength.deDia ? ' + đắc địa (thông căn)' : ''})
 WHY VƯỢNG SUY 得令/得地/得势 3 pháp (mạnh nhờ lệnh/địa/thế hay nhờ Ấn?): ${(() => { try { return strength3Fa(R).summary; } catch (e) { return '(không tính được)'; } })()}
