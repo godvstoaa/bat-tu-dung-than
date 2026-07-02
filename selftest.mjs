@@ -752,6 +752,21 @@ assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.ke
   }
   console.log(`   [loop 1274] 学堂=长生位 10 can cross-guard ✓`);
 }
+// [loop 1275] CHANGSHENG 临官 == LU_SHEN cross-guard (注意: 阴干帝旺≠羊刃 — 2 truyền thống).
+{
+  const { CHANGSHENG_START, CHANGSHENG_STAGES, ZHI_ORDER } = await import('./src/engine/constants.js');
+  const { LU_SHEN } = await import('./src/engine/shensha.js');
+  const GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  const yinSet = ['乙','丁','己','辛','癸'];
+  for (const g of GAN) {
+    const startIdx = ZHI_ORDER.indexOf(CHANGSHENG_START[g]);
+    const yin = yinSet.includes(g);
+    const lqStep = CHANGSHENG_STAGES.indexOf('臨官');
+    const lqZhiIdx = yin ? ((startIdx - lqStep) % 12 + 12) % 12 : (startIdx + lqStep) % 12;
+    assert(ZHI_ORDER[lqZhiIdx] === LU_SHEN[g], `${g}: 临官(${ZHI_ORDER[lqZhiIdx]}) == 禄神(${LU_SHEN[g]})`);
+  }
+  console.log(`   [loop 1275] 临官==禄神 10 can cross-guard ✓ (阴干帝旺≠羊刃 — variant noted)`);
+}
 assert(QIHOU['立春'].hou.length === 3 && QIHOU['立春'].hou[0] === '东风解冻' && QIHOU['冬至'].hou[2] === '水泉动', '七十二候: 立春 初候=东风解冻, 冬至 三候=水泉动');
 for (const k of Object.keys(QIHOU)) {
   const e = QIHOU[k];
