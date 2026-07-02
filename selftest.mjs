@@ -3602,6 +3602,12 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   assert(KONGWANG_INFO.includes('旬空') && KONGWANG_INFO.includes('hữu dực nan phi'), 'KONGWANG_INFO:旬空 + hữu dực nan phi');
   console.log(`   [loop 1246] 空亡口诀 6旬 (khớp XUN_KONG) + KONGWANG_INFO — 《三命通会》 ✓`);
 }
+// [loop 1248] 命宫 ý nghĩa + 起例 (《三命通会》).
+{
+  const { MINGGONG_INFO } = await import('./src/engine/bazi-minggong.js');
+  assert(MINGGONG_INFO.meaning.includes('trụ thứ 5') && MINGGONG_INFO.qili.includes('tháng sinh - giờ chi') && MINGGONG_INFO.note.length > 20, 'MINGGONG_INFO: meaning+qili+note');
+  console.log(`   [loop 1248] 命宫 ý nghĩa (trụ thứ 5) + 起例 ((月-时) mod 12) — 《三命通会》 ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);

@@ -17,6 +17,13 @@ const WUHU = { 甲:'丙', 己:'丙', 乙:'戊', 庚:'戊', 丙:'庚', 辛:'庚',
  * @returns {{ ganZhi, gan, zhi, ganVi, zhiVi, wx, god, godVi, nayin,
  *            interactionWithDay, strength, meaning }}
  */
+// [loop 1248] 命宫 ý nghĩa + 起例 (《三命通会》«命宫» + 知乎).
+export const MINGGONG_INFO = {
+  meaning: 'Mệnh cung (命宫) = «trụ thứ 5» sau tứ trụ + thai nguyên — chủ khí chất bẩm sinh, tiềm thức, «thần minh cư trú chi xứ». Bổ túc nhật chủ cho bức tranh mệnh.',
+  qili: 'Khởi lệ: (tháng sinh - giờ chi) mod 12 → mệnh cung địa chi; thiên can «ngũ hổ đào» từ năm can → dần cung → tiến tới mệnh cung chi.',
+  note: 'Mệnh cung xung khắc nhật trụ → nội tâm với bề ngoài bất nhất; mệnh cung đắc dụng → chủ quan phương hướng phát triển.',
+};
+
 export function baziMingGong(R) {
   const chart = R.chart;
   // [loop 178] 子时换日 — đồng bộ buildChart: chart.input giữ giờ thật, roll cho tính âm lịch
