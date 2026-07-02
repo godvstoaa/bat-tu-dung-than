@@ -151,6 +151,17 @@ export const DITIANSUI_TONGLUN = {
     vi: 'Giờ sinh = nơi quy túc, ví như mộ — nhân nguyên (tàng can) là thần dụng sự, định phương mộ, phải biện.',
     apply: 'Trụ giờ = «nơi quy túc» của lá số — tàng can giờ cũng là «dụng sự thần». Giờ sinh hỷ dụng = «huyệt cát hướng cát»; giờ kỵ = giảm cát. Quan trọng nhưng KHÔNG hơn nguyệt lệnh.',
   },
+  // [loop 1324] thêm 隐显 + 众寡 (quanxue.cn 第31-32章)
+  隐显: {
+    verse: '吉神太露，起爭奪之風；凶物深藏，成養虎之患。',
+    vi: 'Cát thần quá lộ → khởi tranh đoạt; hung vật ẩn sâu → nuôi hổ thành hoạ.',
+    apply: 'Hỷ thần lộ thiên can → dễ bị kiếp đoạt (cần quan/hợp chế vệ); kỵ thần ẩn tàng chi → khó chế, «nuôi hổ». «Cát thần thâm tàng = chung thân chi phúc; hung vật thâm tàng = thủy chung vi hoạ».',
+  },
+  众寡: {
+    verse: '強眾而敵寡者，削去可以興旺；強寡而敵眾者，少制可以從旺。',
+    vi: 'Mạnh nhiều địch ít →削弱 bớt rồi hưng; mạnh ít địch nhiều → ít chế rồi theo vượng.',
+    apply: 'Đảng mạnh (nhiều hành/hào) gặp ít địch → cứ cắt bớt địch thì hưng; đảng yếu gặp nhiều địch → khó chế, nên «tòng vượng» (thuận theo). Liên kết «tòng cách».',
+  },
 };
 
 // ---- 滴天髓 «何知章» (8 chẩn đoán phú – quý – bần – tiện – cát – hung – thọ – yểu) ----
