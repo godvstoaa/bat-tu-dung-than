@@ -200,6 +200,19 @@ export const DITIANSUI_TONGLUN = {
     apply: 'Can chi phải «phối hợp» (sinh/kị/hợp/hình/xung hài hoà, có lý). Xét kỹ «cơ tiến-thoái» (khí đến/lui) của từng cặp can-chi → đoán phúc hoạ. Nguyên cục can chi phối hợp lưu thông thì cát; tán loạn hay canh khắc lẫn nhau thì hung. Liên kết 干支总论 + 源流.',
     cue: 'can chi phải phối hợp hài hoà (sinh/hợp/khắc có lý); xét tiến-thoái từng cặp → đoán phúc hoạ',
   },
+  // [loop 1330] thêm 形象 + 方局 (quanxue.cn 第10/11章 + wikisource 阐微 §十/§十一 — verse đối chiếu ≥2 nguồn)
+  形象: {
+    verse: '兩氣合而成象，象不可破也。',
+    vi: 'Hai khí hợp mà thành «tượng» (hình tượng) — tượng KHÔNG được phá.',
+    apply: '«Tượng» = nguyên cục chỉ 2 hành hợp thành một tượng thuần (vd thiên can Mộc + địa chi Hỏa = Mộc-Hỏa tượng). Tượng đã thành thì KHÔNG được «phá» = xuất hiện hành khắc tượng (vd Mộc-Hỏa tượng kỵ Thủy phá). Bao gồm: 从象 (Nhật Chủ cô lập vô khí → «tòng» theo Tài/Quan mà hưởng phú quý), 化象 (can hợp mà hoá khí). Liên kết «tòng cách» + pattern.',
+    cue: '2 hành hợp thành «tượng» thuần → KHÔNG được hành khác phá (vd Mộc-Hỏa tượng kỵ Thủy)',
+  },
+  方局: {
+    verse: '方是方兮局是局，要得方兮莫混局。',
+    vi: 'Phương là phương, cục là cục — muốn lấy phương thì đừng lẫn cục.',
+    apply: '«Phương» = tam phương cùng hướng: DầnMãoThìn=Mộc(Đông), TỵNgọVi=Hỏa(Nam), ThânDậuTuất=Kim(Tây), HợiTýSửu=Thủy(Bắc). «Cục» = tam hợp: HợiMãoMùi=Mộc, DầnNgọTuất=Hỏa, ThânTýThìn=Thủy, TỵDậuSửu=Kim. Đã lấy «phương» thì ĐỪNG trộn «cục» (vd DầnMãoThìn phương Mộc + thêm Mùi/Hợi → «hỗn cục», khí quá/thừa, giảm uy). Phải thuần thì khí mới vượng.',
+    cue: '«phương»(3 chi cùng hướng: DầnMãoThìn…) khác «cục»(tam hợp: HợiMãoMùi…); lấy phương đừng trộn cục',
+  },
 };
 
 // ---- 滴天髓 «何知章» (8 chẩn đoán phú – quý – bần – tiện – cát – hung – thọ – yểu) ----
