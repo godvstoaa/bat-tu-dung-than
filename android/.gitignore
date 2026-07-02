@@ -4,3 +4,4 @@ out/
 local.properties
 *.apk
 *.aab
+.host-tools/
