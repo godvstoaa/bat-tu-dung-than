@@ -674,7 +674,7 @@ for (const k of Object.keys(JIEQI_24)) {
   assert(e.season && e.meaning.length > 10, `节气 ${k}: season+meaning`);
 }
 // [loop 1247] 七十二候 (5节气×3候 tiêu biểu, 《月令七十二候集解》).
-assert(Object.keys(QIHOU).length === 9, `QIHOU: 9节气 (got ${Object.keys(QIHOU).length})`);
+assert(Object.keys(QIHOU).length === 14, `QIHOU: 14节气 (got ${Object.keys(QIHOU).length})`);
 assert(QIHOU['立春'].hou.length === 3 && QIHOU['立春'].hou[0] === '东风解冻' && QIHOU['冬至'].hou[2] === '水泉动', '七十二候: 立春 初候=东风解冻, 冬至 三候=水泉动');
 for (const k of Object.keys(QIHOU)) {
   const e = QIHOU[k];

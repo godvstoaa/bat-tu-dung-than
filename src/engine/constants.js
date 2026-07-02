@@ -183,6 +183,12 @@ export const QIHOU = {
   惊蛰: { hou: ['桃始华', '仓庚鸣', '鹰化为鸠'], note: 'đào nở hoa; hoàng ly kêu; ưng hoá thành cưu (ẩn ưng, hiện cưu)' },
   清明: { hou: ['桐始华', '田鼠化为鴽', '虹始见'], note: 'ng đồng (phao đồng) nở; điền thử hoá cun (chim cun); cầu vồng bắt đầu hiện' },
   谷雨: { hou: ['萍始生', '鸣鸠拂其羽', '戴胜降于桑'], note: 'bình (bèo) bắt đầu sinh; chim cưu vỗ cánh kêu; chim đãi thắng đẳng dâu (tằm sự sắp khởi)' },
+  // [loop 1262] thêm 5 mùa hạ (đủ mùa hạ 6 tiết khí)
+  立夏: { hou: ['蝼蝈鸣', '蚯蚓出', '王瓜生'], note: 'dế nỉ kêu; giun đất chui lên; vương qua sinh trưởng' },
+  小满: { hou: ['苦菜秀', '靡草死', '麦秋至'], note: 'khổ thái hoa thạnh; mi thảo khô (chí âm bất thắng chí dương); mạch thu chí (mạch chín gặt)' },
+  芒种: { hou: ['螳螂生', '鵙始鸣', '反舌无声'], note: 'mantis nở; bá lao chim kêu; phản thiệt (bách thiệt) nín kêu' },
+  小暑: { hou: ['温风至', '蟋蟀居宇', '鹰始鸷'], note: 'ôn phong chí (gió noãn cực); dế crickets vào nhà; ưng con học bay săn' },
+  大暑: { hou: ['腐草为萤', '土润溽暑', '大雨时行'], note: 'phụ thảo hoá đom đóm; thổ nhậm thử (đất ẩm nắng); đại vũ thời hành (mưa lớn giảm thử)' },
 };
 
 // ---- 十二星次 (12 trạm Mộc tinh, dùng cho 七政四余/大六壬日躔) ----
