@@ -272,7 +272,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - BẢN MỆNH HÀM 演禽 (28 túc con-vật-tinh, như con giáp 28-fold): ${(() => { try { return analyzeYanQin(R).summary; } catch (e) { return '(không tính được)'; } })()}
 - 禽星 NĂN ${curYear} (annual bird rotation — con vật tinh trụ trị năm nay, feng shui timing): ${(() => { try { return qinxingOverview(R, curYear).summary; } catch (e) { return '(không tính được)'; } })()}
 - 滴天髓 luận ${dm.gan}: ${DITIANSUI[dm.gan].verse} → ${DITIANSUI[dm.gan].nature}
-- «何知章» (滴天髓 chẩn đoán cổ pháp — áp dụng cho lá số này): ${Object.entries(DITIANSUI_HEZHI).map(([k, e]) => `${k}「${e.verse}」`).join(' ')}
+- «何知章» (滴天髓 chẩn đoán — verse + tiêu chí): ${Object.entries(DITIANSUI_HEZHI).map(([k, e]) => `${k}「${e.verse}」→${e.criterion}`).join(' | ')}
 - «通論» (滴天髓 nguyên lý + cách áp dụng): ${Object.entries(DITIANSUI_TONGLUN).map(([k, e]) => `${k}「${e.verse}」→${e.cue || e.apply.split('.')[0]}`).join(' | ')}
 - «取用神» (子平真詮 5 pháp): ${Object.entries(YONGSHEN_METHOD).map(([k, e]) => `${k}(${e.vi})`).join('; ')} — giải thích VÌ SAO R.yong được chọn.
 - «用神 bất khả» (滴天髓阐微 知命章): ${ZIPING_YONG_MAXIM.protect} | NGƯỢC: ${ZIPING_YONG_MAXIM.inverse}.
