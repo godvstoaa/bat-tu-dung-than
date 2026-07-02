@@ -3665,6 +3665,16 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   for (const m of pairs) assert(GAN_HE[m[1] + m[2]] === m[3], `化气 ${m[1]}${m[2]}→${m[3]} khớp GAN_HE`);
   console.log(`   [loop 1257] 五合化气口诀 (khớp GAN_HE data) + audit PASS — 《三命通会» ✓`);
 }
+// [loop 1258] 禄神/羊刃口诀.
+{
+  const { LU_KOUJUE, YANGREN_KOUJUE, LU_SHEN, YANG_REN } = await import('./src/engine/shensha.js');
+  // 禄口诀 each 甲→寅 etc. matches LU_SHEN
+  const luPairs = [...LU_KOUJUE.matchAll(/(.)禄(.)/g)];
+  for (const m of luPairs) assert(LU_SHEN[m[1]] === m[2], `禄口诀 ${m[1]}→${m[2]} khớp LU_SHEN`);
+  // 羊刃口诀 matches YANG_REN
+  assert(YANGREN_KOUJUE.includes('甲卯') && YANGREN_KOUJUE.includes('壬子'), '羊刃口诀: 甲卯/壬子');
+  console.log(`   [loop 1258] 禄神/羊刃口诀 (khớp LU_SHEN/YANG_REN) — 《渊海子平» ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);
