@@ -297,15 +297,15 @@ export const PATTERN_GUIDE = {
 //   Cốt法: «用神 có sinh có hộ, có chế có hoá» — thiện (tài/quan/ấn/thực) thuận dụng, bất thiện (sát/thương/kiêu/kiếp) nghịch dụng.
 export const PATTERN_DEEP = {
   正官格: { use: 'thuận dụng (thiện)', yong: 'Chính Quan', xiang: 'Tài (sinh quan) + Ấn (hộ quan, chế thương)', ji: 'Thương Quan khắc quan, hình xung phá hại' },
-  七杀格: { use: 'nghịch dụng (bất thiện)', yong: 'Thất Sát', xiang: 'Thực Thần (chế sát) hoặc Ấn (hoá sát sinh thân)', ji: 'Tài ấn tịnh kiến (tài sinh sát, ấn đoạt thực)' },
-  正财格: { use: 'thuận dụng', yong: 'Chính Tài', xiang: 'Thực Thần (sinh tài) + Quan (chế tỷ kiếp hộ tài)', ji: 'Tỷ Kiếp đoạt tài' },
-  偏财格: { use: 'thuận dụng', yong: 'Thiên Tài', xiang: 'Thực Thương sinh tài + Quan hộ tài', ji: 'Tỷ Kiếp đoạt tài' },
+  七殺格: { use: 'nghịch dụng (bất thiện)', yong: 'Thất Sát', xiang: 'Thực Thần (chế sát) hoặc Ấn (hoá sát sinh thân)', ji: 'Tài ấn tịnh kiến (tài sinh sát, ấn đoạt thực)' },
+  正財格: { use: 'thuận dụng', yong: 'Chính Tài', xiang: 'Thực Thần (sinh tài) + Quan (chế tỷ kiếp hộ tài)', ji: 'Tỷ Kiếp đoạt tài' },
+  偏財格: { use: 'thuận dụng', yong: 'Thiên Tài', xiang: 'Thực Thương sinh tài + Quan hộ tài', ji: 'Tỷ Kiếp đoạt tài' },
   正印格: { use: 'thuận dụng', yong: 'Chính Ấn', xiang: 'Quan Sát (sinh ấn) + Tỷ Kiếp (chế tài hộ ấn)', ji: 'Tài phá ấn' },
   偏印格: { use: 'nghịch (khi đoạt thực) / thuận (khi hoá sát)', yong: 'Thiên Ấn', xiang: 'bản thân hoá sát sinh thân thì cát', ji: 'Kiêu đoạt thực (khi thực là dụng thì kỵ)' },
   食神格: { use: 'thuận dụng', yong: 'Thực Thần', xiang: 'Tài (thực sinh tài) / thân vượng', ji: 'Kiêu thần (thiên ấn) đoạt thực' },
-  伤官格: { use: 'nghịch dụng (cần chế hoá)', yong: 'Thương Quan', xiang: 'Ấn («thương quan bội ấn») hoặc Tài (thương sinh tài thông quan)', ji: '«thương quan kiến quan» (gặp chính quan thì hung); thân nhược thương vượng kỵ vô ấn' },
+  傷官格: { use: 'nghịch dụng (cần chế hoá)', yong: 'Thương Quan', xiang: 'Ấn («thương quan bội ấn») hoặc Tài (thương sinh tài thông quan)', ji: '«thương quan kiến quan» (gặp chính quan thì hung); thân nhược thương vượng kỵ vô ấn' },
   // [loop 1254] 3 cách đặc biệt (nguyệt lệnh = nhật can đồng khí, 《子平真诠评注»ctext ch.974137)
-  建禄格: { use: 'thuận dụng (nguyệt lệnh=nhật can lộc, thân đã vượng)', yong: 'Tài/Quan', xiang: 'Tài/Quan lộ thiên, Thực Thương tiết tú («tài quan hỷ lộ thiên»)', ji: 'thân tái vượng, Tỷ/Kiếp trọng重, vô y' },
+  建祿格: { use: 'thuận dụng (nguyệt lệnh=nhật can lộc, thân đã vượng)', yong: 'Tài/Quan', xiang: 'Tài/Quan lộ thiên, Thực Thương tiết tú («tài quan hỷ lộ thiên»)', ji: 'thân tái vượng, Tỷ/Kiếp trọng重, vô y' },
   月劫格: { use: 'thuận dụng (nguyệt lệnh=kiếp tài, đồng luận với kiến lộc)', yong: 'Quan (chế kiếp)', xiang: 'Tài sinh quan (hộ quan)', ji: 'Thương Quan phá quan' },
   羊刃格: { use: 'nghịch dụng (nguyệt lệnh=đế vượng dương can, sát khí trọng)', yong: 'Quan/Sát chế nhận', xiang: '«dương nhận giá sát» — nhận cường sát vượng vi mỹ; hoặc Thực chế / Ấn hoá', ji: 'sát bị hợp (không chế nhận), quan bị thương, vô chế tất bại' },
   // [loop 1255] 4 tòng cách (tòng = thuận theo thế mạnh, kỵ nghịch thế). Nguồn: 百度百科·从格 + 子平真诠评注.

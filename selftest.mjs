@@ -313,13 +313,19 @@ for (const k of Object.keys(JISHAN_PIAN)) {
 }
 // [loop 1226] 子平真诠 八格 用神/相神/忌 sâu (ctext/知乎/搜狐).
 assert(Object.keys(PATTERN_DEEP).length === 20, `PATTERN_DEEP: 8正+3 đặc biệt+4 tòng+5 chuyên vượng (got ${Object.keys(PATTERN_DEEP).length})`);
-assert(PATTERN_DEEP['七杀格'].xiang.includes('Thực Thần') && PATTERN_DEEP['食神格'].ji.includes('Kiêu') && PATTERN_DEEP['正财格'].ji.includes('Tỷ Kiếp'), '八格: 七杀=食神制, 食神忌枭夺食, 正财忌比劫');
-assert(PATTERN_DEEP['建禄格'].xiang.includes('lộ thiên') && PATTERN_DEEP['羊刃格'].xiang.includes('giá sát'), '建禄=财官露天, 羊刃=驾杀');
+assert(PATTERN_DEEP['七殺格'].xiang.includes('Thực Thần') && PATTERN_DEEP['食神格'].ji.includes('Kiêu') && PATTERN_DEEP['正財格'].ji.includes('Tỷ Kiếp'), '八格: 七杀=食神制, 食神忌枭夺食, 正财忌比劫');
+assert(PATTERN_DEEP['建祿格'].xiang.includes('lộ thiên') && PATTERN_DEEP['羊刃格'].xiang.includes('giá sát'), '建禄=财官露天, 羊刃=驾杀');
 assert(PATTERN_DEEP['從兒格'].ji.includes('Ấn đoạt thực') && PATTERN_DEEP['從財格'].ji.includes('Tỷ Kiếp'), '从格: 從兒忌印夺食, 從財忌比劫');
 assert(PATTERN_DEEP['曲直格'].alias === '曲直仁壽' && PATTERN_DEEP['曲直格'].ji.includes('Kim') && PATTERN_DEEP['潤下格'].xiang.includes('Kim'), '专旺: 曲直忌金克木, 潤下喜金生水');
 for (const k of Object.keys(PATTERN_DEEP)) {
   const e = PATTERN_DEEP[k];
   assert(e.use && e.yong && e.xiang && e.ji, `八格 ${k}: use+yong+xiang+ji`);
+}
+// [loop 1267] cross-guard: PATTERN_DEEP keys ⊆ PATTERN_GUIDE.
+{
+  const PATTERN_GUIDE = (await import('./src/engine/kb.js')).PATTERN_GUIDE;
+  const notMatch = Object.keys(PATTERN_DEEP).filter((k) => !PATTERN_GUIDE[k]);
+  assert(notMatch.length === 0, `PATTERN_DEEP ⊆ PATTERN_GUIDE (lệch: ${notMatch.join(',')})`);
 }
 // [loop 1232] 子平 «六神» phân cấp (知乎/百度百科/子平真诠).
 assert(Object.keys(SHEN_HIERARCHY).length === 6, `SHEN_HIERARCHY: 6 thần (got ${Object.keys(SHEN_HIERARCHY).length})`);
