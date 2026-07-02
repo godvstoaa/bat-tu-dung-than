@@ -187,6 +187,19 @@ export const DITIANSUI_TONGLUN = {
     apply: '«Tinh» = Kim/Thuỷ (chất chứa, gốc), «thần» = Mộc/Hoả (linh hoạt, phát lộ), «thổ» = nền thật. Lá số cần tinh-thần tương xứng — có tinh thiếu thần = khô khan; có thần thiếu tinh = hư phù. «Tổn chi ích chi» = giảm (kỵ quá vượng) hay bù (kỵ quá suy) để đạt trung (liên kết 中和). Tinh-thần cân → mệnh có «quý khí».',
     cue: '精(金水)+thần(木火)+thổ phải cân; tổn/gia đạt trung, đừng thiên lệch',
   },
+  // [loop 1328] thêm 贞元 + 配合 (quanxue.cn 第29/第七章 + wikisource 阐微 — verse đối chiếu ≥2 nguồn)
+  贞元: {
+    verse: '造化起於元，亦止於貞。再肇貞元之會，胚胎嗣續之機。',
+    vi: 'Tạo hoá khởi từ «nguyên» (nguồn/đầu) cũng tận ở «trinh» (đích/cuối). Lập lại hội nguyên-trinh — cơ phôi thai nối tiếp (hậu duệ).',
+    apply: '«Nguyên-trinh» = 4 pha 元亨利贞. Xem TỨ TRỤ: Niên=nguyên, Nguyệt=hanh, Nhật=lợi, Thời=trinh. Xem ĐẠI VẬN: cứ 15 năm = 1 pha (nguyên→hanh→lợi→trinh). «Nguyên-hanh vận cát» = nửa đời trước tốt; «lợi-trinh vận cát» = nửa đời sau tốt. Dùng đo KHI NÀO trong đời phúc/họa ứng — link với dayun stage.',
+    cue: 'đo THỜI ĐIỂM ứng phúc/họa: năm=nguyên→giờ=trinh; mỗi 15 năm đại vận = 1 pha nguyên-hanh-lợi-trinh',
+  },
+  配合: {
+    verse: '配合干支仔細詳，定人福禍與災祥。',
+    vi: 'Phối hợp can chi phải xét kỹ — định phúc/hoạ/tai/cát của người.',
+    apply: 'Can chi phải «phối hợp» (sinh/kị/hợp/hình/xung hài hoà, có lý). Xét kỹ «cơ tiến-thoái» (khí đến/lui) của từng cặp can-chi → đoán phúc hoạ. Nguyên cục can chi phối hợp lưu thông thì cát; tán loạn hay canh khắc lẫn nhau thì hung. Liên kết 干支总论 + 源流.',
+    cue: 'can chi phải phối hợp hài hoà (sinh/hợp/khắc có lý); xét tiến-thoái từng cặp → đoán phúc hoạ',
+  },
 };
 
 // ---- 滴天髓 «何知章» (8 chẩn đoán phú – quý – bần – tiện – cát – hung – thọ – yểu) ----
