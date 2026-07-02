@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP } from './kb.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { analyzeKongwang } from './kongwang.js';
@@ -283,6 +283,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - «继善篇» (渊海子平 卷二): 「${JISHAN_PIAN['月令'].verse}」— ${JISHAN_PIAN['日主'].apply}
 - «伤官» 5 dụng pháp (任铁樵): ${Object.entries(SHANGGUAN_5YONG).map(([k, e]) => `${k}(${e.condition})`).join('; ')}
 - «十神 chuyên luận» (滴天髓阐微 官杀混杂/伤官/清浊/真假): ${Object.entries(DITIANSUI_SHISHEN).map(([k, e]) => `${k}「${e.verse}」→${e.cue || e.apply.split('.')[0]}`).join(' | ')}
+- «十神 bản chất» (TEN_GOD_DEEP — chỉ các sao CÓ MẶT trong lá số): ${(() => { const g = new Set(); for (const pos of ['year','month','day','time']) { const pl = c.pillars[pos]; if (pl.ganGod) g.add(pl.ganGod); (pl.hidden||[]).forEach(h => { if (h.god) g.add(h.god); }); } return [...g].filter(x => TEN_GOD_DEEP[x]).map(x => `${x}(${TEN_GOD_DEEP[x].vi}): ${TEN_GOD_DEEP[x].nature}`).join('; '); })()}
 - Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
 - Tiết khí gần nhất: ${c.jieqi.prev.name}
 
