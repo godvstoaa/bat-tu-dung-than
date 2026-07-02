@@ -3675,6 +3675,13 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   assert(YANGREN_KOUJUE.includes('甲卯') && YANGREN_KOUJUE.includes('壬子'), '羊刃口诀: 甲卯/壬子');
   console.log(`   [loop 1258] 禄神/羊刃口诀 (khớp LU_SHEN/YANG_REN) — 《渊海子平» ✓`);
 }
+// [loop 1259] 桃花/驿马口诀.
+{
+  const { TAOHUA_KOUJUE, YIMA_KOUJUE } = await import('./src/engine/shensha.js');
+  assert(TAOHUA_KOUJUE.includes('申子辰在酉') && TAOHUA_KOUJUE.includes('亥卯未在子'), '桃花口诀: 申子辰在酉, 亥卯未在子');
+  assert(YIMA_KOUJUE.includes('申子辰马在寅') && YIMA_KOUJUE.includes('亥卯未马在巳'), '驿马口诀: 申子辰马在寅, 亥卯未马在巳');
+  console.log(`   [loop 1259] 桃花/驿马口诀 (khớp TAO_HUA/YI_MA) ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);

@@ -97,6 +97,9 @@ export const TIAN_DE_HE = { 寅:'壬', 卯:'巳', 辰:'丁', 巳:'丙', 午:'寅
 // [loop 1258] 禄神/羊刃口诀 (《渊海子平» memorization mnemonics).
 export const LU_KOUJUE = '甲禄寅，乙禄卯，丙戊禄巳，丁己禄午，庚禄申，辛禄酉，壬禄亥，癸禄子。';
 export const YANGREN_KOUJUE = '甲卯乙辰丙戊午，丁己未，庚酉辛戌，壬子癸丑。';
+// [loop 1259] 桃花/驿马口诀.
+export const TAOHUA_KOUJUE = '申子辰在酉，寅午戌在卯，巳酉丑在午，亥卯未在子。';
+export const YIMA_KOUJUE = '申子辰马在寅，寅午戌马在申，巳酉丑马在亥，亥卯未马在巳。';
 // ---- KIM DƯ (金舆) — tra theo Nhật Can (địa chi tương ứng) ----
 export const JIN_YU = {
   甲: '辰', 乙: '巳', 丙: '未', 丁: '申', 戊: '未', 己: '申',
