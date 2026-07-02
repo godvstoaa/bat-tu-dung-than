@@ -3569,6 +3569,17 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   assert(Object.keys(NAYIN_MEANING).length === 30, `NAYIN_MEANING đúng 30 keys không dư/thiếu (got ${Object.keys(NAYIN_MEANING).length})`);
   console.log(`   [loop 1198] nạp âm nhất quán: ganZhiNayin ↔ NAYIN_MEANING (${names.size} names, 0 variant-key) ✓`);
 }
+// [loop 1245] 纳音口诀 (《三命通会》) — 30 cặp, khớp NAYIN_MEANING.
+{
+  const { NAYIN_KOUJUE, NAYIN_MEANING } = await import('./src/engine/nayin.js');
+  // tách 30 cặp, mỗi cặp 6 chữ (2 甲子 + 3 nạp âm)
+  const pairs = [...NAYIN_KOUJUE.matchAll(/([甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]){2}([一-鿿]{3})/g)].map((m) => m[0]);
+  assert(pairs.length === 30, `NAYIN_KOUJUE: 30 cặp (got ${pairs.length})`);
+  const nayinNames = pairs.map((p) => p.slice(4));
+  const missing = nayinNames.filter((n) => !NAYIN_MEANING[n]);
+  assert(missing.length === 0, `NAYIN_KOUJUE cặp nào cũng hợp lệ NAYIN_MEANING (lệch: ${missing.join(',')})`);
+  console.log(`   [loop 1245] 纳音口诀: 30 cặp giáp-tý→nạp âm, khớp NAYIN_MEANING — 《三命通会》 ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);
