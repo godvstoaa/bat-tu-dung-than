@@ -705,6 +705,11 @@ assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.ke
   // verify口诀 contains each shen name
   for (const e of Object.values(TAIYI_16SHEN)) assert(TAIYI_16SHEN_KOUJUE.includes(e.shen), `口诀 contains ${e.shen}`);
   console.log(`   [loop 1268] 太乙十六神 (16 vị: 子地主→亥大义) + 口诀 — 《太乙金镜式经» ✓`);
+  // [loop 1269] structural guard: 12 chi + 4 四维.
+  const _shiwei = ['乾', '艮', '巽', '坤'];
+  const _dizhi12 = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+  assert(_dizhi12.every((z) => TAIYI_16SHEN[z]), '太乙16神: đủ 12 địa chi');
+  assert(_shiwei.every((g) => TAIYI_16SHEN[g]), '太乙16神: đủ 4 四维 (乾艮巽坤)');
 }
 assert(QIHOU['立春'].hou.length === 3 && QIHOU['立春'].hou[0] === '东风解冻' && QIHOU['冬至'].hou[2] === '水泉动', '七十二候: 立春 初候=东风解冻, 冬至 三候=水泉动');
 for (const k of Object.keys(QIHOU)) {
