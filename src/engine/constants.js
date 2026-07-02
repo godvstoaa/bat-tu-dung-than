@@ -111,6 +111,14 @@ export const SANSI_OVERVIEW = {
   大六壬: { sanCai: 'nhân (nhân nguyên)', zhuShi: 'nhân sự', good: 'nhật dụng cụ thể sự cát hung thành bại, nhân tế việc vặt', gong: '12 cung (thiên/địa bàn + tứ tam truyề)' },
 };
 
+// ---- 地支 三合化气 + 六合化气 (《三命通会》) ----
+// [loop 1241] Nguồn: 百度百科·地支三合 + 知乎 + 搜狐. BRANCH_GROUP nhóm; đây là tầng hoá khí + ý nghĩa.
+//   三合口诀: «申子辰水，亥卯未木，寅午戌火，巳酉丑金»; 缺一字 = bán hợp (lực yếu).
+//   六合 hoà hợp/kế hợp — 代表和谐/合作/ám trợ.
+export const SANHE_HUAQI = { '申子辰': '水', '亥卯未': '木', '寅午戌': '火', '巳酉丑': '金' };
+export const LIUHE_HUAQI = { '子丑': '土', '寅亥': '木', '卯戌': '火', '辰酉': '金', '巳申': '水', '午未': '土 [争议:火]' };
+// [nuance] hợp hoá cần điều kiện (hoá thần lộ/đắc lệnh...) — không phải thấy hợp là hoá khí.
+
 // ---- TÀNG CAN (藏干) — Can ẩn trong Địa Chi ----
 // Thứ tự: Bản khí → Trung khí → Dư khí. Trọng số theo độ dài.
 export const HIDDEN = {
