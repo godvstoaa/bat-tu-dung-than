@@ -119,6 +119,24 @@ export const SANHE_HUAQI = { '申子辰': '水', '亥卯未': '木', '寅午戌'
 export const LIUHE_HUAQI = { '子丑': '土', '寅亥': '木', '卯戌': '火', '辰酉': '金', '巳申': '水', '午未': '土 [争议:火]' };
 // [nuance] hợp hoá cần điều kiện (hoá thần lộ/đắc lệnh...) — không phải thấy hợp là hoá khí.
 
+// ---- 十二消息卦/辟卦 (《周易》卦气, 12 tháng) ----
+// [loop 1243] Nguồn: 百度百科·十二辟卦 + 《归藏》 + 《周易参同契》.
+//   息卦(阳长): 复→临→泰→大壮→夬→乾 (子→巳). 消卦(阳消): 姤→遁→否→观→剥→坤 (午→亥).
+export const XIAOXI_12 = {
+  子: { gua: '复', yang: 1, yin: 5, meaning: 'nhất dương sơ sinh (đông chí nhất dương sinh)', jieqi: 'đông chí' },
+  丑: { gua: '临', yang: 2, yin: 4, meaning: 'nhị dương tức', jieqi: 'đại hàn' },
+  寅: { gua: '泰', yang: 3, yin: 3, meaning: 'tam dương khai thái', jieqi: 'lập xuân' },
+  卯: { gua: '大壮', yang: 4, yin: 2, meaning: 'tứ dương tức', jieqi: 'xuân phân' },
+  辰: { gua: '夬', yang: 5, yin: 1, meaning: 'ngũ dương quyết âm', jieqi: 'cốc vũ' },
+  巳: { gua: '乾', yang: 6, yin: 0, meaning: 'thuần dương chi thể', jieqi: 'tiểu mãn' },
+  午: { gua: '姤', yang: 5, yin: 1, meaning: 'nhất âm sơ sinh (hạ chí nhất âm sinh)', jieqi: 'hạ chí' },
+  未: { gua: '遁', yang: 4, yin: 2, meaning: 'nhị âm tiêu dương', jieqi: 'đại thử' },
+  申: { gua: '否', yang: 3, yin: 3, meaning: 'tam âm tiêu thoái (thiên địa bất giao)', jieqi: 'xử thử' },
+  酉: { gua: '观', yang: 2, yin: 4, meaning: 'tứ âm tiêu dương', jieqi: 'thu phân' },
+  戌: { gua: '剥', yang: 1, yin: 5, meaning: 'ngũ âm bạt dương', jieqi: 'sương giáng' },
+  亥: { gua: '坤', yang: 0, yin: 6, meaning: 'thuần âm chi thể', jieqi: 'tiểu tuyết' },
+};
+
 // ---- TÀNG CAN (藏干) — Can ẩn trong Địa Chi ----
 // Thứ tự: Bản khí → Trung khí → Dư khí. Trọng số theo độ dài.
 export const HIDDEN = {

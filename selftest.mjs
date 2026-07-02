@@ -8,7 +8,7 @@ import { composeAnswer, detectIntent } from './src/engine/nlg.js';
 import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
-import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12, SANSI_OVERVIEW, SANHE_HUAQI, LIUHE_HUAQI } from './src/engine/constants.js';
+import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12, SANSI_OVERVIEW, SANHE_HUAQI, LIUHE_HUAQI, XIAOXI_12 } from './src/engine/constants.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
@@ -656,6 +656,13 @@ for (const k of Object.keys(SANSI_OVERVIEW)) {
 assert(Object.keys(SANHE_HUAQI).length === 4, `SANHE_HUAQI: 4三合局 (got ${Object.keys(SANHE_HUAQI).length})`);
 assert(SANHE_HUAQI['申子辰'] === '水' && SANHE_HUAQI['寅午戌'] === '火' && SANHE_HUAQI['巳酉丑'] === '金', '三合化气: 申子辰水/寅午戌火/巳酉丑金');
 assert(Object.keys(LIUHE_HUAQI).length === 6 && LIUHE_HUAQI['子丑'] === '土' && LIUHE_HUAQI['巳申'] === '水', '六合化气: 6组, 子丑土, 巳申水');
+// [loop 1243] 十二消息卦/辟卦 (百度百科/《归藏》).
+assert(Object.keys(XIAOXI_12).length === 12, `XIAOXI_12: 12辟卦 (got ${Object.keys(XIAOXI_12).length})`);
+assert(XIAOXI_12['子'].gua === '复' && XIAOXI_12['子'].yang === 1 && XIAOXI_12['午'].gua === '姤' && XIAOXI_12['巳'].gua === '乾' && XIAOXI_12['亥'].gua === '坤', '消息卦: 子=复(一阳), 午=姤(一阴), 巳=乾(纯阳), 亥=坤(纯阴)');
+for (const k of Object.keys(XIAOXI_12)) {
+  const e = XIAOXI_12[k];
+  assert(e.gua && e.yang + e.yin === 6 && e.meaning && e.jieqi, `消息卦 ${k}(${e.gua}): yang+yin=6`);
+}
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic
 const R1990 = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
 assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴天髓 辛');
