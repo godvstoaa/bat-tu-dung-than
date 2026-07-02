@@ -415,10 +415,7 @@ const DREAM_DICT = [
     tone: 'cat',
     meaning: 'Sách là tri thức, sự thật cần đọc. Mộng đọc sách = cần học hỏi; sách cũ là thông tin quá khứ.',
     advice: 'Đọc thêm, học thêm — có sự thật cần nhận ra.' },
-  { kw: '伞', vi: 'Ô/Dù', aliases: ['伞', 'o', 'ô', 'du', 'dù'],
-    tone: 'neutral',
-    meaning: 'Ô là sự che chở, bảo vệ. Mộng ô hỏng = mất sự bảo vệ; ô mới có người che trở.',
-    advice: 'Tìm sự che chở, đề phòng mất chỗ dựa.' },
+  // [loop 1288] 伞 duplicate removed — merged into entry at line ~479 (richer version)
   { kw: '手机', vi: 'Điện thoại', aliases: ['手机', 'dien thoai', 'điện thoại'],
     tone: 'neutral',
     meaning: 'Điện thoại là giao tiếp, tin nhắn. Mộng điện thoại hỏng = mất liên lạc / không nói lên điều cần; chuông = tin đến.',
