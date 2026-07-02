@@ -48,6 +48,18 @@ export const CIGUAN_INFO = {
   note: '《三命通会»主流: 学堂=长生, 词馆=临官 (帝旺 vị là dị bản thiểu số).',
 };
 
+// ---- 德秀贵人 (《三命通会》卷三·论德秀) ----
+// [loop 1251] Nguồn: ctext + 劝学网 + 百度百科. Xem 月支 (三合局) → 天干.
+//   德 (德星) = 本月生旺之德 = 三合局 hành chi lộc → 逢凶 hoá cát, giải ách tiêu tai.
+//   秀 (秀气) = thiên địa trung hoà thanh tú khí → thông tuệ minh đạt, văn chương cẩm tú.
+export const DEXIU = {
+  '寅午戌': { de: '丙', xiu: '戊', note: 'hoả cục — 德=丙(hoả lộc)' },
+  '申子辰': { de: '壬', xiu: '甲', note: 'thuỷ cục — 德=壬(thuỷ lộc)' },
+  '巳酉丑': { de: '庚', xiu: '癸', note: 'kim cục — 德=庚(kim lộc)' },
+  '亥卯未': { de: '甲', xiu: '丁', note: 'mộc cục — 德=甲(mộc lộc)' },
+};
+// [variant] 秀 khí 一说: 寅午戌含丁/癸, 申子辰含乙, 巳酉丑含乙.
+
 // ---- Dựa vào ĐỊA CHI NĂM hoặc NGÀY (tam hợp cục) ----
 // Bảng tra theo nhóm tam hợp: 申子辰 / 寅午戌 / 巳酉丑 / 亥卯未
 export const BRANCH_GROUP = {

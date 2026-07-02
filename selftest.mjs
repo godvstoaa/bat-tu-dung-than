@@ -3620,6 +3620,17 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   assert(['meaning', 'qili', 'zheng', 'note'].every((k) => CIGUAN_INFO[k] && CIGUAN_INFO[k].length > 15), 'CIGUAN_INFO: 4 trường');
   console.log(`   [loop 1250] 词馆 (临官=lộc vị, đối song 学堂长生) — 《三命通会》卷三 ✓`);
 }
+// [loop 1251] 德秀贵人 (《三命通会》卷三).
+{
+  const { DEXIU } = await import('./src/engine/shensha.js');
+  assert(Object.keys(DEXIU).length === 4, `DEXIU: 4三合局 (got ${Object.keys(DEXIU).length})`);
+  assert(DEXIU['寅午戌'].de === '丙' && DEXIU['申子辰'].de === '壬' && DEXIU['巳酉丑'].de === '庚' && DEXIU['亥卯未'].de === '甲', '德星口诀: 寅午戌丙/申子辰壬/巳酉丑庚/亥卯未甲 (三合局禄)');
+  for (const k of Object.keys(DEXIU)) {
+    const e = DEXIU[k];
+    assert(e.de && e.xiu && e.note, `德秀 ${k}: de+xiu+note`);
+  }
+  console.log(`   [loop 1251] 德秀贵人 4三合局 (德=禄/秀=中和气) — 《三命通会»卷三 ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);
