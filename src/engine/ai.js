@@ -8,6 +8,7 @@
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING } from './kb.js';
+import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { analyzeKongwang } from './kongwang.js';
@@ -214,7 +215,7 @@ export function buildChartBrief(R) {
     .map(([w, p]) => `${wxVi(w)}(${w}):${p}%`).join(', ');
 
   const shenshaList = R.shensha ? Object.entries(R.shensha)
-    .map(([k, v]) => `${k}(${v.at.join('/')})`).join(', ') || 'không nổi' : 'không';
+    .map(([k, v]) => { const i = SHENSHA_INFO[k]; return `${i ? i.vi + '(' + i.zh + ')' : k}@${v.at.join('/')}${i ? ' — ' + i.desc : ''}`; }).join(', ') || 'không nổi' : 'không';
 
   const dayunStr = (R.dayun || []).slice(0, 8)
     .map((d) => {
