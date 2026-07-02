@@ -381,6 +381,19 @@ for (const k of Object.keys(SHEN_HIERARCHY)) {
   assert(SANYI_LIUYI.liuYi.includes('甲子→戊') && SANYI_LIUYI.sanQi.includes('日奇') && SANYI_LIUYI.order.includes('戊→己→庚'), '三奇六仪: 甲子→戊, 三奇日奇, 顺序戊→己→庚');
   console.log(`   [loop 1239] 三奇六仪 ý nghĩa (遁甲/六仪遁藏/三奇日月星/固定顺序) — Wikisource/知乎 ✓`);
 }
+// [loop 1240] 奇门格局 (famous 吉格/凶格).
+{
+  const { QIMEN_GEJU } = await import('./src/engine/qimen.js');
+  assert(Object.keys(QIMEN_GEJU).length === 9, `QIMEN_GEJU: 9格局 (got ${Object.keys(QIMEN_GEJU).length})`);
+  assert(QIMEN_GEJU['青龙返首'].cond === '戊加丙' && QIMEN_GEJU['白虎猖狂'].cond === '辛加乙', '奇门格局: 青龙返首=戊加丙, 白虎猖狂=辛加乙');
+  const catCount = Object.values(QIMEN_GEJU).filter((e) => e.tone === 'cat').length;
+  assert(catCount === 4, `吉格4 + 凶格5 (cat=${catCount})`);
+  for (const k of Object.keys(QIMEN_GEJU)) {
+    const e = QIMEN_GEJU[k];
+    assert(e.tone && e.cond && e.meaning, `格局 ${k}: tone+cond+meaning`);
+  }
+  console.log(`   [loop 1240] 奇门格局 9 (4吉: 青龙返首/飞鸟跌穴/玉女守门/青龙转光 + 5凶) — 知乎/Wikisource ✓`);
+}
 // [loop 1229] 河图洛书 口诀 (《周易·系辞》/Wikisource/Wikipedia).
 {
   const { HELU_KOUJUE } = await import('./src/engine/heluo.js');

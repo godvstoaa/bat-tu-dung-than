@@ -31,6 +31,21 @@ export const SANYI_LIUYI = {
   sanQi: '三奇 乙(日奇)/丙(月奇)/丁(星奇) = nhật/nguyệt/tinh — nguyên soái (giáp) thủ hạ tả hữu + ảnh tử.',
   order: 'Cố định顺序 戊→己→庚→辛→壬→癸→丁→丙→乙 (âm/dương độn đều bố cục theo thứ tự này).',
 };
+
+// ---- 奇门格局 (famous 吉格/凶格) ----
+// [loop 1240] Nguồn: 知乎«81格局精讲» + Wikisource 奇门遁甲元灵经 + ctext 统宗.
+//   [KEY] 吉格若逢 门迫/入墓/击刑 → cát chuyển hung (điều kiện quan trọng).
+export const QIMEN_GEJU = {
+  青龙返首: { tone: 'cat', cond: '戊加丙', meaning: 'giáp mộc sinh bính hoả, mẫu cố tử — mưu sự đại cát', note: 'phùng 迫/墓/击刑 thì cát chuyển hung' },
+  飞鸟跌穴: { tone: 'cat', cond: '丙加戊 (dị bản: 乙加戊)', meaning: 'tử quy mẫu biên, tự điểu quy sào — bách sự cát, mưu đại sự' },
+  玉女守门: { tone: 'cat', cond: '丁奇 lâm 开门 (trực sử)', meaning: 'ngọc nữ thủ môn — hôn nhân, mưu sự cát' },
+  青龙转光: { tone: 'cat', cond: '戊加丁', meaning: 'phú quý vinh diệu, chủ ấp trưởng/huyện lệnh chi mệnh' },
+  白虎猖狂: { tone: 'hung', cond: '辛加乙', meaning: 'nhân vong gia bại, viễn đắc đa ương, tôn trưởng bất hỉ' },
+  腾蛇夭矫: { tone: 'hung', cond: '癸加丁', meaning: 'di dời thị bệnh nhân, chủ hung (hư kinh)' },
+  朱雀投江: { tone: 'hung', cond: '丁加癸', meaning: 'kê minh phi quái — khẩu thiệt, chủ hung' },
+  青龙逃走: { tone: 'hung', cond: '乙加辛', meaning: 'thất thoát đào vong, chủ hung' },
+  青龙折足: { tone: 'hung', cond: '戊加辛', meaning: 'cát môn trợ thì mưu được; hung môn chủ chiêu tai/thất tài/túc tật' },
+};
 const GONG_STAR = { 1: '天蓬', 2: '天芮', 3: '天冲', 4: '天辅', 5: '天禽', 6: '天心', 7: '天柱', 8: '天任', 9: '天英' };
 const STAR_VI = { 天蓬: 'thiên bằng (đại hung)', 天芮: 'thiên nhuệ (bệnh)', 天冲: 'thiên xung (hung)', 天辅: '天phụ (cát, văn)', 天禽: 'thiên cầm (bình/trung)', 天心: 'thiên tâm (đại cát, y)', 天柱: 'thiên trụ (hung)', 天任: 'thiên nhậm (cát)', 天英: 'thiên anh (hỏa, trung)' };
 // [loop 1205] 九星 类象 sâu (知乎/360doc«奇门遁甲九星含义») — ý nghĩa天盘, bổ cho GONG_STAR/STAR_VI.
