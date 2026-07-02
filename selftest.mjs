@@ -8,7 +8,7 @@ import { composeAnswer, detectIntent } from './src/engine/nlg.js';
 import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
-import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG } from './src/engine/constants.js';
+import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12 } from './src/engine/constants.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
@@ -608,6 +608,13 @@ assert(GAN_LEIXIANG['甲'].organ.includes('đởm') && GAN_LEIXIANG['乙'].organ
 for (const k of Object.keys(GAN_LEIXIANG)) {
   const e = GAN_LEIXIANG[k];
   assert(e.direction && e.season && e.organ && e.body, `天干 ${k}: direction+season+organ+body`);
+}
+// [loop 1237] 十二建星 黄黑道 + 宜忌 (百度百科/Wikipedia/知乎).
+assert(Object.keys(JIANXING_12).length === 12, `JIANXING_12: 12建星 (got ${Object.keys(JIANXING_12).length})`);
+assert(JIANXING_12['破'].tone === 'hung(黑)' && JIANXING_12['成'].tone === 'cat(黄)' && JIANXING_12['开'].tone === 'cat(黄)', '建星: 破黑/成黄/开黄 (建满平收黑,除危定执黄,成开皆可用)');
+for (const k of Object.keys(JIANXING_12)) {
+  const e = JIANXING_12[k];
+  assert(e.tone && e.yi && e.ji, `建星 ${k}: tone+yi+ji`);
 }
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic
 const R1990 = analyze(1990, 6, 15, 14, 30, 'nam', 2026);

@@ -84,6 +84,24 @@ export const ZHI_LEIXIANG = {
   亥: { hour: '21-23', direction: 'tây bắc (thiên bắc)', month: '10', season: 'đông' },
 };
 
+// ---- 十二建星 (建除十二神) 黄黑道 + 宜忌 ----
+// [loop 1237] Nguồn: 百度百科 + Wikipedia 建除十二神 + 知乎. Khẩu quyết: «建满平收黑，除危定执黄，成开皆可用，闭破不相当».
+//   [nuance] 黄道≠万事皆宜, 黑道≠万事皆凶 — mỗi建星 có 宜/忌 riêng theo sự việc.
+export const JIANXING_12 = {
+  建: { tone: 'hung(黑)', yi: 'khai thị, lập khoán, giao dịch, nạp tài, xuất hành, thượng lương', ji: 'động thổ' },
+  除: { tone: 'cat(黄)', yi: 'trị bệnh, thanh tẩy, trừ tà', ji: 'khai thị' },
+  满: { tone: 'hung(黑)', yi: 'kỳ phúc, tế tự, bổ nhiệm', ji: 'kết thân, hôn nhân' },
+  平: { tone: 'hung(黑)', yi: '(bình)', ji: 'đại sự bất nghi' },
+  定: { tone: 'cat(黄)', yi: 'quan đới, ký ước, định thân, gia lập', ji: 'tụng sự, tranh chấp' },
+  执: { tone: 'cat(黄)', yi: 'săn bắn, cố thủ, bắt giữ', ji: 'khai thị, xuất hành' },
+  破: { tone: 'hung(黑)', yi: '(cẩu phá)', ji: 'đại hung — xung nguyệt lệnh, kỵ tuyệt đối đại sự' },
+  危: { tone: 'cat(黄)', yi: 'tế tự, an táng', ji: 'đăng sơn, phiêu lưu' },
+  成: { tone: 'cat(黄)', yi: 'kết hôn, khai thị, nhập học — vạn sự thành', ji: 'sơ cáo, từ chức' },
+  收: { tone: 'hung(黑)', yi: 'thu liễm, nạp tài, mua đồ', ji: 'xuất hành, đi xa' },
+  开: { tone: 'cat(黄)', yi: 'khai thị, phó nhậm, cầu danh — khai bạt', ji: 'táng, an táng' },
+  闭: { tone: 'hung(黑)', yi: 'trúc đê, mai táng, kết cấu', ji: 'khai thị, mở mang' },
+};
+
 // ---- TÀNG CAN (藏干) — Can ẩn trong Địa Chi ----
 // Thứ tự: Bản khí → Trung khí → Dư khí. Trọng số theo độ dài.
 export const HIDDEN = {
