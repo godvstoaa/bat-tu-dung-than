@@ -280,9 +280,10 @@ for (const k of Object.keys(DITIANSUI_HEZHI)) {
   const e = DITIANSUI_HEZHI[k];
   assert(e.verse && e.verse.startsWith('何知') && e.criterion.length > 20 && e.note.length > 15, `何知章 ${k}: verse + criterion + note`);
 }
-// [loop 1192] 滴天髓 «通論» — 6 nguyên lý chẩn đoán (任鐵樵闡微 ctext ch.126492).
-assert(Object.keys(DITIANSUI_TONGLUN).length === 6, 'DITIANSUI_TONGLUN đủ 6 nguyên lý (中和/顺逆/进退/冲机/阴阳支/生库败)');
+// [loop 1192→1319] 滴天髓 «通論» — 10 nguyên lý (任鐵樵闡微 ctext/quanxue.cn).
+assert(Object.keys(DITIANSUI_TONGLUN).length === 10, `DITIANSUI_TONGLUN đủ 10 nguyên lý (got ${Object.keys(DITIANSUI_TONGLUN).length})`);
 assert(DITIANSUI_TONGLUN['中和'].verse.includes('命貴中和') && DITIANSUI_TONGLUN['冲机'].verse.includes('旺者衝衰衰者拔'), '通論: 中和 + 冲机 verse cổ bản');
+assert(DITIANSUI_TONGLUN['衰旺'] && DITIANSUI_TONGLUN['源流'] && DITIANSUI_TONGLUN['通关'] && DITIANSUI_TONGLUN['寒暖燥湿'], '通論 [loop 1319]: 衰旺/源流/通关/寒暖燥湿');
 for (const k of Object.keys(DITIANSUI_TONGLUN)) {
   const e = DITIANSUI_TONGLUN[k];
   assert(e.verse && e.verse.length > 10 && e.apply.length > 25, `通論 ${k}: verse + apply`);

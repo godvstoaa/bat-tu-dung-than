@@ -113,6 +113,27 @@ export const DITIANSUI_TONGLUN = {
     vi: 'Phương sinh sợ động, kho nên mở; đất bại gặp xung phải đoán kỹ.',
     apply: 'Dần/Thân/Tỵ/Hợi = sinh phương, kỵ xung (lưỡng bại câu thương); Thìn/Tuất/Sửu/Mùi = tứ khố, thường nên xung mở (mở kho tài/quan); Tý/Ngọ/Mão/Dậu = bại (độc khí), gặp xung phải xét hỷ/kỵ mà định.',
   },
+  // [loop 1319] thêm 4 chương quan trọng từ 滴天髓阐微 (quanxue.cn/ctext verified)
+  衰旺: {
+    verse: '陰陽順逆之說，其理出《洛書》。',
+    vi: 'Thuyết âm dương thuận nghịch — lý từ Lạc Thư.',
+    apply: '«长生沐浴 등 danh từ giả tá hình dung» — không lấy trường sinh đoán vượng suy. Phải xem «đắc lệnh/đắc địa/đắc thế» + «khí tiến/thoái» (相妙於旺 = khí đang tiến quý hơn khí đỉnh sắp lui). Nhận diện vượng nhược = nền tảng luận mệnh.',
+  },
+  源流: {
+    verse: '何處起根源？流到何方住？機括此中求，知來亦知去。',
+    vi: 'Nguồn khởi từ đâu? Chảy đến phương nào dừng? Cơ quan cầu trong đó — biết tới cũng biết lui.',
+    apply: 'Tìm «đầu nguồn» = hành mạnh nhất nguyên cục (thường đắc lệnh/đắc địa). Theo dòng sinh khắc xem «chảy» đến đâu. Dừng ở hỷ dụng = «tốt quy lộ»; dừng ở kỵ = hung. Dòng lưu thông = mệnh tốt.',
+  },
+  通关: {
+    verse: '關上有關，關心始交；節外生枝，後來結果。',
+    vi: 'Quan thượng hữu quan — tâm mới giao; tiết ngoại sinh chi — sau mới kết quả.',
+    apply: 'Hai hành chiến khắc trong cục → cần «thông quan» = hành trung gian hoà giải (vd Thủy-Hỏa chiến → Mộc thông quan, Mộc sinh Hỏa + Thủy sinh Mộc). Có thông quan = cục «hoà» → phú quý.',
+  },
+  寒暖燥湿: {
+    verse: '天道有寒暖，發育萬物，人道行之，不可過也。',
+    vi: 'Thiên đạo có hàn noãn — phát dục vạn vật; nhân đạo hành, không thể quá.',
+    apply: 'Hàn = kim thuỷ/đông/bắc; Noãn = mộc hoả/hạ/nam. «Hàn rất thịnh thì phải có noãn khí; noãn đến cực thì phải có hàn căn» — không thể thuần hàn hay thuần noãn. Liên kết 调候 (TIAOHOU).',
+  },
 };
 
 // ---- 滴天髓 «何知章» (8 chẩn đoán phú – quý – bần – tiện – cát – hung – thọ – yểu) ----
