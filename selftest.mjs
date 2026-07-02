@@ -345,6 +345,18 @@ for (const k of Object.keys(PATTERN_DEEP)) {
   assert(HELU_KOUJUE.luoshu.includes('戴九履一') && HELU_KOUJUE.hetuShort.includes('一六共宗'), '洛书口诀 戴九履一 + 河图简记 一六共宗');
   console.log(`   [loop 1229] 河图洛书口诀: hetu(天一生水) + luoshu(戴九履一) — 周易系辞 ✓`);
 }
+// [loop 1230] 四余 类象 (七政四余, Wikipedia/百度百科/知乎/张果星宗).
+{
+  const { SIYU_INFO } = await import('./src/engine/qizheng.js');
+  assert(Object.keys(SIYU_INFO).length === 4, `SIYU_INFO: 4 dư (got ${Object.keys(SIYU_INFO).length})`);
+  assert(SIYU_INFO['紫气'].tone === 'cat' && SIYU_INFO['罗睺'].tone === 'hung' && SIYU_INFO['计都'].tone === 'hung', '四余 tone: 紫气 cát, 罗睺/计都 hung');
+  assert(SIYU_INFO['紫气'].wx === 'mộc' && SIYU_INFO['月孛'].wx === 'thủy' && SIYU_INFO['罗睺'].wx === 'hỏa' && SIYU_INFO['计都'].wx === 'thổ', '四余 wx: 紫气木/月孛水/罗睺火/计都土');
+  for (const k of Object.keys(SIYU_INFO)) {
+    const e = SIYU_INFO[k];
+    assert(e.wx && e.tone && e.astro && e.desc.length > 20, `四余 ${k}: wx+tone+astro+desc`);
+  }
+  console.log(`   [loop 1230] 四余类象: 4 dư (紫气吉/月孛/罗睺/计都) × wx/tone/astro/desc — Wikipedia/果老星宗 ✓`);
+}
 // [loop 1202] 二十八宿 regression guard — lock 28 túc + 4 tượng × 7 + đúng thứ tự 角→轸.
 {
   const { XIU_TABLE } = await import('./src/engine/ershibaxiu.js');

@@ -132,6 +132,16 @@ const SI_YU = [
   { name: '紫气', vi: 'Tử Khí',  wx: '木', epochLon: 276.04,    ratePerYear:  12.2034, retrograde: false },
 ];
 
+// ---- 四余 类象 (七政四余 chiêm tinh) ----
+// [loop 1230] Nguồn: Wikipedia 七政四馀 + 百度百科 + 知乎 + 张果星宗(ctext). Bổ tầng ý nghĩa cho SIYU.
+export const SIYU_INFO = {
+  紫气: { wx: 'mộc', tone: 'cat', astro: 'cảnh tinh/thiên 乙 —月轨 viễn địa điểm (hoặc nhuận nguyệt)', desc: 'Mộc chi dư — văn chương, học vấn, đạo đức, tu đạo, ẩn dật, hiền sĩ/tăng đạo; «thanh quý chi cát», chủ phúc thọ' },
+  月孛: { wx: 'thủy', tone: 'hung', astro: 'thái 乙/ám nguyệt —月远 điểm (Lilith)', desc: 'Thủy chi dư — khẩu thiệt thị phi, ám muội, dâm dục, quỷ trá (cũng thông tuệ); chủ tai hoạ, ám bệnh, đào hoa, biến động' },
+  罗睺: { wx: 'hỏa', tone: 'hung', astro: 'thủ diệu — bạch đạo↔hoàng đạo BẮC giao điểm (Rāhu, thăng giao)', desc: 'Hỏa chi dư — chiến tranh, tranh đấu, tai kiếp, giao thực («thực nhật», nhật thực); tổn quang minh, phá bại, quan phi, hoành hoạ, huyết quang' },
+  计都: { wx: 'thổ', tone: 'hung', astro: 'vĩ diệu — NAM giao điểm (Ketu, giáng giao)', desc: 'Thổ chi dư — tật bệnh, tử vong, ám hại, táng thất, trở ngại («thực nguyệt», nguyệt thực); chủ phá tài, tang, tách ly' },
+};
+// [nuance] «Tứ dư xâm dương» — tứ dư là tiểu nhân/tăng đạo tinh, kỵ giao hội thái dương (chủ che lấp quang minh, tiểu nhân đương đạo).
+
 // J2000.0 epoch (JD 2451545.0) → Date
 const J2000 = new Date(Date.UTC(2000, 0, 1, 12, 0, 0));
 
