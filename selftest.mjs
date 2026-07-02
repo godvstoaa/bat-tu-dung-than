@@ -791,6 +791,15 @@ assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.ke
   }
   console.log(`   [loop 1277] SHENSHA 5 tables × 10 can structural guard ✓`);
 }
+// [loop 1281] analyze_meihua tool enrichment verify (DAXIANG+GUA_CI).
+{
+  const { execTool } = await import('./src/engine/ai.js');
+  const r = execTool('analyze_meihua', {});
+  assert(r.benDaxiang && r.benDaxiang.length > 5, 'meihua tool: benDaxiang có nội dung');
+  assert(r.benGuaci && r.benGuaci.length > 5, 'meihua tool: benGuaci có nội dung');
+  assert(r.bianDaxiang && r.bianDaxiang.length > 5, 'meihua tool: bianDaxiang có nội dung');
+  console.log(`   [loop 1281] analyze_meihua tool enrichment (DAXIANG+GUA_CI 本/变卦) ✓`);
+}
 for (const k of Object.keys(QIHOU)) {
   const e = QIHOU[k];
   assert(e.hou.length === 3 && e.note, `候 ${k}: 3候 + note`);
