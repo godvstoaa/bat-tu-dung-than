@@ -178,6 +178,11 @@ export const QIHOU = {
   夏至: { hou: ['鹿角解', '蜩始鸣', '半夏生'], note: 'nhị chí — hươu đực rụng sừng (cảm âm sinh), ve kêu, bán hạ sinh' },
   秋分: { hou: ['雷始收声', '蛰虫坯户', '水始涸'], note: 'nhị phân — lôi thu thanh, trệ trùng bồi hộ (bịt hang), thuỷ thuỷ khô' },
   冬至: { hou: ['蚯蚓结', '麋角解', '水泉动'], note: 'nhị chí — giun đất cuộn kết (cảm dương động), ly rụng sừng, thuỷ tuyền lưu' },
+  // [loop 1261] thêm 4 mùa xuân (đủ mùa xuân 6 tiết khí)
+  雨水: { hou: ['獭祭鱼', '候雁北', '草木萌动'], note: 'thủy liệt bắt cá bày bến như tế; nhạn bắc phi; thảo mộc mầm nảy' },
+  惊蛰: { hou: ['桃始华', '仓庚鸣', '鹰化为鸠'], note: 'đào nở hoa; hoàng ly kêu; ưng hoá thành cưu (ẩn ưng, hiện cưu)' },
+  清明: { hou: ['桐始华', '田鼠化为鴽', '虹始见'], note: 'ng đồng (phao đồng) nở; điền thử hoá cun (chim cun); cầu vồng bắt đầu hiện' },
+  谷雨: { hou: ['萍始生', '鸣鸠拂其羽', '戴胜降于桑'], note: 'bình (bèo) bắt đầu sinh; chim cưu vỗ cánh kêu; chim đãi thắng đẳng dâu (tằm sự sắp khởi)' },
 };
 
 // ---- 十二星次 (12 trạm Mộc tinh, dùng cho 七政四余/大六壬日躔) ----
