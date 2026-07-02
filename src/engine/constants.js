@@ -102,6 +102,15 @@ export const JIANXING_12 = {
   闭: { tone: 'hung(黑)', yi: 'trúc đê, mai táng, kết cấu', ji: 'khai thị, mở mang' },
 };
 
+// ---- 三式 总览 (天地人三才) ----
+// [loop 1238] Nguồn: 百度百科·三式占卜 + 搜狐«三式绝学PK» + 中华网 + Wikipedia.
+//   «Thông tam thức» =融会太乙+奇门+六壬 → thiên-địa-nhân kiêm bị.
+export const SANSI_OVERVIEW = {
+  太乙神数: { sanCai: 'thiên (thiên nguyên)', zhuShi: 'quốc vận, thiên đạo', good: 'thiên tượng, thiên tai, quốc sự hưng suy', gong: '16 cung — cổ đại cấm dân gian (đế vương术)' },
+  奇门遁甲: { sanCai: 'địa (địa nguyên)', zhuShi: 'địa lợi, tập thể sự', good: 'bài binh bố trận, phương vị, thương nghiệp quyết sách, khuỷ cát tị hung', gong: '9 cung (thiên/địa/nhân/thần bàn)' },
+  大六壬: { sanCai: 'nhân (nhân nguyên)', zhuShi: 'nhân sự', good: 'nhật dụng cụ thể sự cát hung thành bại, nhân tế việc vặt', gong: '12 cung (thiên/địa bàn + tứ tam truyề)' },
+};
+
 // ---- TÀNG CAN (藏干) — Can ẩn trong Địa Chi ----
 // Thứ tự: Bản khí → Trung khí → Dư khí. Trọng số theo độ dài.
 export const HIDDEN = {

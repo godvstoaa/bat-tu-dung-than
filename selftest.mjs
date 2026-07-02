@@ -8,7 +8,7 @@ import { composeAnswer, detectIntent } from './src/engine/nlg.js';
 import { buildChartBrief } from './src/engine/ai.js';
 import { detectInteractions } from './src/engine/interactions.js';
 import { detectCombos } from './src/engine/combos.js';
-import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12 } from './src/engine/constants.js';
+import { SHENG_BY, KE_BY, CLIMATE, TIAOHOU, TIAOHOU_PRINCIPLE, QIONGTONG_ZONGLUN, ZHI_LEIXIANG, GAN_LEIXIANG, JIANXING_12, SANSI_OVERVIEW } from './src/engine/constants.js';
 import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, JISHAN_PIAN, PATTERN_DEEP, SHEN_HIERARCHY } from './src/engine/kb.js';
 import { xiaoliuren, xiaoliurenDetail, solarToXlrNums, POSITIONS as XLR_POSITIONS } from './src/engine/xiaoliuren.js';
 import { yizhangjing, renderYizhangjingCard } from './src/engine/yizhangjing.js';
@@ -615,6 +615,13 @@ assert(JIANXING_12['破'].tone === 'hung(黑)' && JIANXING_12['成'].tone === 'c
 for (const k of Object.keys(JIANXING_12)) {
   const e = JIANXING_12[k];
   assert(e.tone && e.yi && e.ji, `建星 ${k}: tone+yi+ji`);
+}
+// [loop 1238] 三式 总览 (天地人三才, 百度百科/搜狐/中华网).
+assert(Object.keys(SANSI_OVERVIEW).length === 3, `SANSI_OVERVIEW: 3 thức (got ${Object.keys(SANSI_OVERVIEW).length})`);
+assert(SANSI_OVERVIEW['太乙神数'].sanCai.includes('thiên') && SANSI_OVERVIEW['奇门遁甲'].sanCai.includes('địa') && SANSI_OVERVIEW['大六壬'].sanCai.includes('nhân'), '三式: 太乙=thiên, 奇门=địa, 六壬=nhân');
+for (const k of Object.keys(SANSI_OVERVIEW)) {
+  const e = SANSI_OVERVIEW[k];
+  assert(e.sanCai && e.zhuShi && e.good && e.gong, `三式 ${k}: sanCai+zhuShi+good+gong`);
 }
 // Mẫu Nam1990 (辛) phải có verse 辛金軟弱... trong brief và classic
 const R1990 = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
