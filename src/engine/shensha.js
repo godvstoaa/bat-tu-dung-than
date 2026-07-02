@@ -90,6 +90,8 @@ export const TIAN_DE = {
 };
 // ---- NGUYỆT ĐỨC QUÝ NHÂN (月德贵人) — tra theo nhóm tam hợp Nguyệt Chi ----
 export const YUE_DE = { A: '壬', B: '丙', C: '庚', D: '甲' }; // A=申子辰 B=寅午戌 C=巳酉丑 D=亥卯未
+// [loop 1252] 月德合 = 月德 干 hợp (五 hợp: 甲己/乙庚/丙辛/丁壬/戊癸). Nguồn: 《三命通会»(de hoá khí).
+export const YUE_DE_HE = { A: '丁', B: '辛', C: '乙', D: '己' }; // 月德(壬丙庚甲)各自的干合
 // ---- KIM DƯ (金舆) — tra theo Nhật Can (địa chi tương ứng) ----
 export const JIN_YU = {
   甲: '辰', 乙: '巳', 丙: '未', 丁: '申', 戊: '未', 己: '申',

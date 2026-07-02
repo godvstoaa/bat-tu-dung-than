@@ -3631,6 +3631,15 @@ console.log(`   guiguzi: ${ggR.yearJiaZi} (${ggR.nayin}/${ggR.vi}) ${ggR.toneVi}
   }
   console.log(`   [loop 1251] 德秀贵人 4三合局 (德=禄/秀=中和气) — 《三命通会»卷三 ✓`);
 }
+// [loop 1252] 月德合 (干合 của 月德).
+{
+  const { YUE_DE, YUE_DE_HE } = await import('./src/engine/shensha.js');
+  const he = { 甲: '己', 乙: '庚', 丙: '辛', 丁: '壬', 戊: '癸', 己: '甲', 庚: '乙', 辛: '丙', 壬: '丁', 癸: '戊' };
+  for (const g of Object.keys(YUE_DE)) {
+    assert(YUE_DE_HE[g] === he[YUE_DE[g]], `月德合 ${g}: ${YUE_DE[g]}→${YUE_DE_HE[g]} (= 干合)`);
+  }
+  console.log(`   [loop 1252] 月德合 = 月德 干合 (壬→丁/丙→辛/庚→乙/甲→己) — 《三命通会» ✓`);
+}
 // [loop 527] dayNayinPersonality coverage
 import { dayNayinPersonality } from './src/engine/nayin-personality.js';
 const dnpR = dayNayinPersonality(spR);
