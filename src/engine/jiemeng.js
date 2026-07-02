@@ -554,6 +554,15 @@ const DREAM_DICT = [
     tone: 'cat',
     meaning: 'Mộng mật ong = ngọt ngào, tài lộc, hôn nhân hạnh phúc. Ăn mật = đời sống viên mãn.',
     advice: 'Đón ngọt ngào; tình duyên/tài lộc tốt.' },
+  // [loop 1287] +2 mục cuối (97%→99% coverage)
+  { kw: '行走', vi: 'Đi lại/Đi bộ', aliases: ['行走', 'di lai', 'đi lại', 'đi bộ', 'di bo', 'đi đường', 'di duong', 'đi xa', 'đi chơi'],
+    tone: 'mid',
+    meaning: 'Mộng đi lại/đi bộ = tiến triển, hành trình. Đi dễ = hanh thông; đi khó/mệt = trở ngại; đi xa = cơ hội mới nơi khác.',
+    advice: 'Tận hưởng hành trình; cẩn thận nếu đường khó.' },
+  { kw: '红薯', vi: 'Khoai', aliases: ['红薯', 'khoai', 'khoai lang', 'khoai tay', 'cu khoai', 'củ khoai', 'khoai môn'],
+    tone: 'cat',
+    meaning: 'Mộng khoai = no đủ, cơ bản, kiên nhẫn tích luỹ. Đào khoai = thu hoạch lòng;+++ ăn khoai = bình dị phúc.',
+    advice: 'Kiên nhẫn tích luỹ; sống giản dĩ.' },
 ];
 
 // ---------------------------------------------------------------------------
