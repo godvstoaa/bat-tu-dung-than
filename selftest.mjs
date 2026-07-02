@@ -394,6 +394,15 @@ for (const k of Object.keys(SHEN_HIERARCHY)) {
   }
   console.log(`   [loop 1240] 奇门格局 9 (4吉: 青龙返首/飞鸟跌穴/玉女守门/青龙转光 + 5凶) — 知乎/Wikisource ✓`);
 }
+// [loop 1242] 地支六破 (百度百科/知乎) — hoàn thiện tương tác địa chi.
+{
+  const { ZHI_PO, ZHI_PO_MAP, PO_MEANING } = await import('./src/engine/interactions.js');
+  assert(ZHI_PO.length === 6, `ZHI_PO: 6 cặp (got ${ZHI_PO.length})`);
+  assert(ZHI_PO_MAP['子酉'] && ZHI_PO_MAP['酉子'] && ZHI_PO_MAP['寅亥'], '六破 map đối xứng: 子酉/酉子/寅亥');
+  assert(Object.keys(PO_MEANING).length === 6 && PO_MEANING['巳申'].includes('hợp trung hữu phá'), 'PO_MEANING: 6 cặp, 巳申 hợp trung hữu phá');
+  for (const p of ZHI_PO) assert(PO_MEANING[p] && PO_MEANING[p].length > 10, `六破 ${p}: có meaning`);
+  console.log(`   [loop 1242] 六破 6 cặp (子酉/丑辰/寅亥/卯午/巳申/未戌) + PO_MEANING — 百度百科 ✓`);
+}
 // [loop 1229] 河图洛书 口诀 (《周易·系辞》/Wikisource/Wikipedia).
 {
   const { HELU_KOUJUE } = await import('./src/engine/heluo.js');

@@ -134,6 +134,21 @@ const _HAI_LOOKUP = (() => {
   return m;
 })();
 
+// ---- LỤC PHÁ 六破 (6 cặp tương phá) ----
+// [loop 1242] Nguồn: 百度百科·地支相破 + 知乎«地支六破». Hoàn thiện bộ tương tác địa chi (合/会/冲/刑/害/破).
+//   «Phá» = ngầm hao tổn/nội bộ mâu thuẫn (ẩn, không như xung/hình rõ). 寅亥/巳申 bản là六合 — hợp trung hữu phá.
+export const ZHI_PO = ['子酉', '丑辰', '寅亥', '卯午', '巳申', '未戌'];
+export const ZHI_PO_MAP = (() => { const m = {}; for (const p of ZHI_PO) { m[p] = true; m[p[1] + p[0]] = true; } return m; })();
+export const PO_MEANING = {
+  '子酉': 'thuỷ phá kim — âm nhân tai huý, khẩu thiệt ám muội, kinh tế khó khăn',
+  '丑辰': 'thổ phá thổ (đồng loại tương tàn) — điền/trường sản tranh chấp',
+  '寅亥': 'mộc phá thuỷ (bản tương sinh lại khiên chế) — ưu nhu ngoại đoán, nhĩ căn mềm',
+  '卯午': 'mộc phá hoả — môn hộ phá tài, gia đình bất hoà',
+  '巳申': 'hoả phá kim (bản tương hợp lại phá, hợp trung hữu phá) — nhân tế tiên hợp hậu phân',
+  '未戌': 'thổ phá thổ (táo thổ/khố thổ) — hình thương phá hao (lục phá ảnh hưởng lớn nhất)',
+};
+const _PO_LOOKUP = (() => { const m = {}; for (const [pair, info] of Object.entries(PO_MEANING)) { m[pair] = info; m[pair[1] + pair[0]] = info; } return m; })();
+
 // ============================================================================
 //  HÀM PHÁT HIỆN TƯƠNG TÁC TRONG LÁ SỐ
 //  Quét tất cả cặp Địa Chi & cặp Thiên Can giữa 4 trụ (Năm/Tháng/Ngày/Giờ).
