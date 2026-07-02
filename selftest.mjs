@@ -312,9 +312,10 @@ for (const k of Object.keys(JISHAN_PIAN)) {
   assert(e.verse && e.apply.length > 15, `继善篇 ${k}: verse + apply`);
 }
 // [loop 1226] 子平真诠 八格 用神/相神/忌 sâu (ctext/知乎/搜狐).
-assert(Object.keys(PATTERN_DEEP).length === 11, `PATTERN_DEEP: 8正格+3 đặc biệt (got ${Object.keys(PATTERN_DEEP).length})`);
+assert(Object.keys(PATTERN_DEEP).length === 15, `PATTERN_DEEP: 8正+3 đặc biệt+4 tòng (got ${Object.keys(PATTERN_DEEP).length})`);
 assert(PATTERN_DEEP['七杀格'].xiang.includes('Thực Thần') && PATTERN_DEEP['食神格'].ji.includes('Kiêu') && PATTERN_DEEP['正财格'].ji.includes('Tỷ Kiếp'), '八格: 七杀=食神制, 食神忌枭夺食, 正财忌比劫');
 assert(PATTERN_DEEP['建禄格'].xiang.includes('lộ thiên') && PATTERN_DEEP['羊刃格'].xiang.includes('giá sát'), '建禄=财官露天, 羊刃=驾杀');
+assert(PATTERN_DEEP['從兒格'].ji.includes('Ấn đoạt thực') && PATTERN_DEEP['從財格'].ji.includes('Tỷ Kiếp'), '从格: 從兒忌印夺食, 從財忌比劫');
 for (const k of Object.keys(PATTERN_DEEP)) {
   const e = PATTERN_DEEP[k];
   assert(e.use && e.yong && e.xiang && e.ji, `八格 ${k}: use+yong+xiang+ji`);

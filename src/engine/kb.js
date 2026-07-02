@@ -308,6 +308,11 @@ export const PATTERN_DEEP = {
   建禄格: { use: 'thuận dụng (nguyệt lệnh=nhật can lộc, thân đã vượng)', yong: 'Tài/Quan', xiang: 'Tài/Quan lộ thiên, Thực Thương tiết tú («tài quan hỷ lộ thiên»)', ji: 'thân tái vượng, Tỷ/Kiếp trọng重, vô y' },
   月劫格: { use: 'thuận dụng (nguyệt lệnh=kiếp tài, đồng luận với kiến lộc)', yong: 'Quan (chế kiếp)', xiang: 'Tài sinh quan (hộ quan)', ji: 'Thương Quan phá quan' },
   羊刃格: { use: 'nghịch dụng (nguyệt lệnh=đế vượng dương can, sát khí trọng)', yong: 'Quan/Sát chế nhận', xiang: '«dương nhận giá sát» — nhận cường sát vượng vi mỹ; hoặc Thực chế / Ấn hoá', ji: 'sát bị hợp (không chế nhận), quan bị thương, vô chế tất bại' },
+  // [loop 1255] 4 tòng cách (tòng = thuận theo thế mạnh, kỵ nghịch thế). Nguồn: 百度百科·从格 + 子平真诠评注.
+  從財格: { use: 'tòng (thuận tài thế)', yong: 'Tài', xiang: 'Thực Thương sinh tài (thuận)', ji: 'Tỷ Kiếp đoạt tài (nghịch — phá cách)' },
+  從殺格: { use: 'tòng (thuận sát thế)', yong: 'Sát', xiang: 'Tài sinh sát (thuận)', ji: 'Thực chế sát / Ấn hoá (nghịch — phá cách)' },
+  從兒格: { use: 'tòng (thuận thực thương thế)', yong: 'Thực Thương', xiang: 'Tài («nhi hựu sinh nhi», lưu thông); bất phạ Tỷ Kiếp (vì tỷ sinh thực)', ji: 'Ấn đoạt thực (phá cách)' },
+  從旺格: { use: 'tòng chuyên vượng (thuận thế)', yong: 'Ấn / Tỷ (thuận thế bang thân)', xiang: 'Thực Thương tiết tú (thuận tiết)', ji: 'Quan / Sát / Tài nghịch thế (khắc phạt phá cách)' },
 };
 
 // ---- 子平 «六神» PHÂN CẤP quanh dụng thần (《子平真诠》) ----
