@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE } from './kb.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { analyzeKongwang } from './kongwang.js';
@@ -285,6 +285,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - «十神 chuyên luận» (滴天髓阐微 官杀混杂/伤官/清浊/真假): ${Object.entries(DITIANSUI_SHISHEN).map(([k, e]) => `${k}「${e.verse}」→${e.cue || e.apply.split('.')[0]}`).join(' | ')}
 - «十神 bản chất» (TEN_GOD_DEEP — chỉ các sao CÓ MẶT trong lá số): ${(() => { const g = new Set(); for (const pos of ['year','month','day','time']) { const pl = c.pillars[pos]; if (pl.ganGod) g.add(pl.ganGod); (pl.hidden||[]).forEach(h => { if (h.god) g.add(h.god); }); } return [...g].filter(x => TEN_GOD_DEEP[x]).map(x => `${x}(${TEN_GOD_DEEP[x].vi}): ${TEN_GOD_DEEP[x].nature}`).join('; '); })()}
 - «Lĩnh vực cuộc sống» (LIFE_AREA_INDEX — quy tắc chủ mỗi lĩnh vực): ${Object.entries(LIFE_AREA_INDEX).map(([k, e]) => `${e.title}→${e.focus}`).join('; ')}
+- «Cách cục hướng dẫn» (PATTERN_GUIDE — định hướng sự nghiệp/đời sống cho cách cục này): ${R.pattern && PATTERN_GUIDE[R.pattern.name] ? PATTERN_GUIDE[R.pattern.name] : '(cách không có guide)'}
 - Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
 - Tiết khí gần nhất: ${c.jieqi.prev.name}
 
