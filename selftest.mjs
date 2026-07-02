@@ -711,6 +711,17 @@ assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.ke
   assert(_dizhi12.every((z) => TAIYI_16SHEN[z]), '太乙16神: đủ 12 địa chi');
   assert(_shiwei.every((g) => TAIYI_16SHEN[g]), '太乙16神: đủ 4 四维 (乾艮巽坤)');
 }
+// [loop 1270] MERIDIAN_CLOCK cross-guard (12 经络/子午流注).
+{
+  const { MERIDIAN_CLOCK } = await import('./src/engine/tcm.js');
+  const _zhi12 = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+  assert(_zhi12.every((z) => MERIDIAN_CLOCK[z]), '子午流注: đủ 12 địa chi × kinh lạc');
+  for (const z of _zhi12) {
+    const e = MERIDIAN_CLOCK[z];
+    assert(e.meridian && e.organ && e.wx && e.advice.length > 20, `经络 ${z}: meridian+organ+wx+advice`);
+  }
+  console.log(`   [loop 1270] 子午流注 12经络 cross-guard ✓`);
+}
 assert(QIHOU['立春'].hou.length === 3 && QIHOU['立春'].hou[0] === '东风解冻' && QIHOU['冬至'].hou[2] === '水泉动', '七十二候: 立春 初候=东风解冻, 冬至 三候=水泉动');
 for (const k of Object.keys(QIHOU)) {
   const e = QIHOU[k];
