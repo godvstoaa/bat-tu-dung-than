@@ -733,6 +733,16 @@ assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.ke
   }
   console.log(`   [loop 1271] WUX_ZANG 5 hành × 脏腑表里 cross-guard ✓`);
 }
+// [loop 1273] SHENSHA cross-guard: LU_SHEN→YANG_REN diff=1 (临官→帝旺).
+{
+  const { LU_SHEN, YANG_REN } = await import('./src/engine/shensha.js');
+  const ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  for (const g of Object.keys(LU_SHEN)) {
+    const diff = ((ZHI.indexOf(YANG_REN[g]) - ZHI.indexOf(LU_SHEN[g])) + 12) % 12;
+    assert(diff === 1, `${g}: 羊刃(${YANG_REN[g]}) = 临官(${LU_SHEN[g]}) + 1`);
+  }
+  console.log(`   [loop 1273] 禄神→羊刃 diff=1 (临官→帝旺) 10 can cross-guard ✓`);
+}
 assert(QIHOU['立春'].hou.length === 3 && QIHOU['立春'].hou[0] === '东风解冻' && QIHOU['冬至'].hou[2] === '水泉动', '七十二候: 立春 初候=东风解冻, 冬至 三候=水泉动');
 for (const k of Object.keys(QIHOU)) {
   const e = QIHOU[k];
