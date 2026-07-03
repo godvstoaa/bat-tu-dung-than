@@ -5522,7 +5522,7 @@ function openAIPopup() {
   p.classList.remove('hidden');
   const fab = $('ai-fab'); if (fab) fab.classList.add('hidden');
   const cs = $('chat-suggest'); if (cs) cs.style.display = ''; // re-show chips when reopening
-  setTimeout(() => { const q = $('question'); if (q) q.focus(); }, 50);
+  setTimeout(() => { const q = $('question'); if (q && !window.matchMedia('(pointer: coarse)').matches) q.focus(); }, 50); // [UI fix] mobile (coarse pointer) KHÔNG auto-focus → tránh keyboard bật + page scroll «trôi xuống cuối»
   const cl = $('chat-log');
   if (cl && !cl.childElementCount) appendMsg('assistant', 'Xin chào! Tôi là trợ lý Bát Tự AI. Bạn đã lập lá số — hãy hỏi tôi bất cứ điều gì về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà… (Bấm ⚙ để bật AI thật; chưa bật thì tôi dùng bộ luân giải cục bộ.)');
 }
