@@ -316,6 +316,18 @@ for (const k of Object.keys(DITIANSUI_TONGLUN)) {
   assert(_bad === 0, `[loop 1347] nlg user-facing không raw code (got ${_bad} intent leak)`);
   console.log('   [loop 1347] nlg.js user-facing output sạch (no raw pinyin/undefined) ✓');
 }
+// [loop 1348] shape-contract — khóa kiểu trả về forecast5/bestHourToday (ngăn type-mismatch render bug)
+{
+  const _SR = analyze(1990, 6, 15, 8, 30, 'male', 2026);
+  const { forecast5 } = await import('./src/engine/forecast5.js');
+  const _f5 = forecast5(_SR, 2026, 5);
+  assert(typeof _f5.activeDayun === 'string' || _f5.activeDayun === undefined, '[loop 1348] forecast5.activeDayun là STRING (main.js dùng trực tiếp, KHÔNG .ganZhi)');
+  const { bestHourToday } = await import('./src/engine/best-hour.js');
+  const _bh = bestHourToday(_SR, 2026, 7, 4, _SR.patternQuality && _SR.patternQuality.patternYong);
+  assert(Array.isArray(_bh && _bh.best), '[loop 1348] bestHourToday.best là ARRAY (dùng best[0].vi, KHÔNG .best.vi)');
+  if (_bh && _bh.best && _bh.best[0]) assert(_bh.best[0].vi && _bh.best[0].range, '[loop 1348] best[0] có {vi, range}');
+  console.log('   [loop 1348] shape-contract forecast5.activeDayun(string) + bestHourToday.best(array) ✓');
+}
 // [loop 1320] 滴天髓阐微 thập thần chuyên luận (官杀/伤官/清浊/真假).
 assert(Object.keys(DITIANSUI_SHISHEN).length === 4, `DITIANSUI_SHISHEN: 4 chương (got ${Object.keys(DITIANSUI_SHISHEN).length})`);
 assert(DITIANSUI_SHISHEN['官杀混杂'].verse.includes('有可有不可') && DITIANSUI_SHISHEN['伤官'].verse.includes('傷官傷盡'), '十神论: 官杀混杂 + 伤官伤尽');
