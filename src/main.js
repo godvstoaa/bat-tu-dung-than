@@ -4166,6 +4166,7 @@ async function run() {
   // [UI P1] countUp — animate numeric scores/% ("số mệnh hiện ra"). Vanilla, reduced-motion aware.
   (function countUpAll() {
     const root = $('result'); if (!root || !window.requestAnimationFrame) return;
+    const _gen = (countUpAll.gen = (countUpAll.gen || 0) + 1); // [UI #2] run-token: hủy anim cũ khi submit mới
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     root.querySelectorAll('.v-value, [data-countup]').forEach((el) => {
       const raw = (el.textContent || '').trim();
@@ -4178,6 +4179,7 @@ async function run() {
       const dur = 900, t0 = performance.now();
       const ease = (t) => 1 - Math.pow(1 - t, 3);
       (function frame(now) {
+        if (_gen !== countUpAll.gen) return; // newer submit → cancel stale anim
         const p = Math.min(1, (now - t0) / dur);
         const v = num * ease(p);
         el.textContent = (isFloat ? v.toFixed(1) : Math.round(v)) + suffix;
