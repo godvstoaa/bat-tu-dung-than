@@ -1878,3 +1878,24 @@ body::before {
   100% { opacity: 0; transform: translateY(-140px) scale(1.15) rotate(6deg); }
 }
 @media (prefers-reduced-motion: reduce) { .flying-han { display: none; } }
+
+/* =======================================================================
+   [UI Phase 4] gold-foil cho chữ Hán lớn (.zh.big) + animated shine
+   ======================================================================= */
+.zh.big {
+  background: linear-gradient(110deg,
+    var(--gold-deep) 0%, var(--gold) 25%, var(--gold-foil) 50%,
+    #f5e6b8 65%, var(--gold) 85%, var(--gold-deep) 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.28));
+  animation: foilShine 5.5s ease-in-out infinite alternate;
+}
+@keyframes foilShine {
+  from { background-position: 0% 50%; }
+  to   { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zh.big { animation: none; background-position: 50% 50%; }
+}
