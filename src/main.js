@@ -4167,7 +4167,7 @@ async function run() {
   (function countUpAll() {
     const root = $('result'); if (!root || !window.requestAnimationFrame) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    root.querySelectorAll('.v-value, .wx-pct, [data-countup]').forEach((el) => {
+    root.querySelectorAll('.v-value, [data-countup]').forEach((el) => {
       const raw = (el.textContent || '').trim();
       const m = raw.match(/^(-?\d+(?:\.\d+)?)/);
       if (!m) return;
