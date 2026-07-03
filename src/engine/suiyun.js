@@ -6,6 +6,7 @@
 // ============================================================================
 import { GAN, ZHI } from './constants.js';
 import { tenGod } from './core.js';
+import { getActiveDayun } from './dayun-active.js';
 
 const GAN_HE_MAP = { 甲:'己', 己:'甲', 乙:'庚', 庚:'乙', 丙:'辛', 辛:'丙', 丁:'壬', 壬:'丁', 戊:'癸', 癸:'戊' };
 const CHONG = { 子:'午', 午:'子', 丑:'未', 未:'丑', 寅:'申', 申:'寅', 卯:'酉', 酉:'卯', 辰:'戌', 戌:'辰', 巳:'亥', 亥:'巳' };
@@ -82,7 +83,8 @@ export function scanSuiyun(chart, dayun, liunianList, currentAge) {
     // fallback cuối cùng (không đáng tin — chỉ dùng nếu không có gì khác)
     age = (liunianList?.[0]?.age) || 0;
   }
-  const activeDy = dayun?.find((d) => age >= d.startAge && age < d.startAge + 10) || dayun?.[0];
+  const _yr = (chart && chart.input && chart.input.year ? chart.input.year : 0) + age;
+  const activeDy = getActiveDayun({ dayun }, _yr) || dayun?.[0] || null;
   if (!activeDy) return { activeDayun: null, specialYears: [] };
 
   const dyGanZhi = activeDy.ganZhi;

@@ -321,12 +321,15 @@ for (const k of Object.keys(DITIANSUI_TONGLUN)) {
   const _SR = analyze(1990, 6, 15, 8, 30, 'male', 2026);
   const { forecast5 } = await import('./src/engine/forecast5.js');
   const _f5 = forecast5(_SR, 2026, 5);
-  assert(typeof _f5.activeDayun === 'string' || _f5.activeDayun === undefined, '[loop 1348] forecast5.activeDayun là STRING (main.js dùng trực tiếp, KHÔNG .ganZhi)');
+  assert(_f5.activeDayun === null || (typeof _f5.activeDayun === 'object' && _f5.activeDayun.ganZhi && typeof _f5.activeDayun.startAge === 'number'), '[loop 1349] forecast5.activeDayun là OBJECT {ganZhi,startAge} (unify via getActiveDayun)');
+  const { getActiveDayun } = await import('./src/engine/dayun-active.js');
+  const _ady = getActiveDayun(_SR, 2026);
+  assert(_ady === null || (typeof _ady === 'object' && _ady.ganZhi && typeof _ady.startYear === 'number'), '[loop 1349] getActiveDayun(R,year) trả dayun entry object|null');
   const { bestHourToday } = await import('./src/engine/best-hour.js');
   const _bh = bestHourToday(_SR, 2026, 7, 4, _SR.patternQuality && _SR.patternQuality.patternYong);
   assert(Array.isArray(_bh && _bh.best), '[loop 1348] bestHourToday.best là ARRAY (dùng best[0].vi, KHÔNG .best.vi)');
   if (_bh && _bh.best && _bh.best[0]) assert(_bh.best[0].vi && _bh.best[0].range, '[loop 1348] best[0] có {vi, range}');
-  console.log('   [loop 1348] shape-contract forecast5.activeDayun(string) + bestHourToday.best(array) ✓');
+  console.log('   [loop 1349] shape-contract forecast5.activeDayun(object) + getActiveDayun(object|null) + bestHourToday.best(array) ✓');
 }
 // [loop 1320] 滴天髓阐微 thập thần chuyên luận (官杀/伤官/清浊/真假).
 assert(Object.keys(DITIANSUI_SHISHEN).length === 4, `DITIANSUI_SHISHEN: 4 chương (got ${Object.keys(DITIANSUI_SHISHEN).length})`);
@@ -851,7 +854,7 @@ assert(Object.keys(QIHOU).length === 24, `QIHOU: ĐỦ 24节气 (got ${Object.ke
   const { execTool } = await import('./src/engine/ai.js');
   const r = execTool('analyze_meihua', {});
   assert(r.benDaxiang && r.benDaxiang.length > 5, 'meihua tool: benDaxiang có nội dung');
-  assert(r.benGuaci && r.benGuaci.length > 5, 'meihua tool: benGuaci có nội dung');
+  assert(r.benGuaci && r.benGuaci.length > 2, 'meihua tool: benGuaci có nội dung (một số quẻ卦辞 ngắn hợp lệ vd «利艰贞。» 4 chars)');
   assert(r.bianDaxiang && r.bianDaxiang.length > 5, 'meihua tool: bianDaxiang có nội dung');
   console.log(`   [loop 1281] analyze_meihua tool enrichment (DAXIANG+GUA_CI 本/变卦) ✓`);
 }

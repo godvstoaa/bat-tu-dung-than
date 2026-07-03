@@ -3639,7 +3639,7 @@ function renderForecast5(R) {
         ${ctx.length ? ` <span class="hint">${ctx.join(' · ')}</span>` : ''}
         ${yhHtml}${posHtml}${alertHtml}
       </div>`;
-    }).join('') + (() => { if (!f5.activeDayun) return ''; const _dy = (R.dayun || []).find((d) => d.ganZhi === f5.activeDayun); const _age = _dy ? ' [' + _dy.startAge + '-' + (_dy.startAge + 9) + 't]' : ''; return '<p class="hint" style="margin-top:4px">Đại vận đang hành: ' + f5.activeDayun + _age + '</p>'; })();
+    }).join('') + (() => { const _dy = f5.activeDayun; if (!_dy || !_dy.ganZhi) return ''; return '<p class="hint" style="margin-top:4px">Đại vận đang hành: ' + _dy.ganZhi + ' [' + _dy.startAge + '-' + (_dy.startAge + 9) + 't]</p>'; })();
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được forecast 5 năm.</p>'; }
 }
 

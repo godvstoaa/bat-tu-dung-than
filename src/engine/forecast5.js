@@ -12,6 +12,7 @@ import { personalTaSui } from './taisui.js';
 import { dayunGodMeaning } from './dayun-god.js';
 import { suiyunCheck } from './suiyun.js';
 import { GAN, ZHI, TEN_GOD_VI } from './constants.js';
+import { getActiveDayun } from './dayun-active.js';
 
 /**
  * @param {object} R - kết quả analyze()
@@ -39,7 +40,7 @@ export function forecast5(R, startYear, years = 5) {
 
   for (let i = 0; i < years; i++) {
     const year = startYear + i;
-    const activeDy = (dayun || []).find((d) => d && d.startYear != null && d.startYear <= year && year < d.startYear + 10) || null;
+    const activeDy = getActiveDayun(R, year);
     dyGanZhi = activeDy?.ganZhi || '?';
     const alerts = [];
     const positives = [];
@@ -96,5 +97,5 @@ export function forecast5(R, startYear, years = 5) {
     });
   }
 
-  return { years: out, activeDayun: dyGanZhi };
+  return { years: out, activeDayun: getActiveDayun(R, startYear) };
 }
