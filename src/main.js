@@ -6518,7 +6518,7 @@ function renderQuickSummary() {
   let todayScore = '?', todayRating = '?', todayOneLiner = '', todayYi = '', bestHourVi = '';
   try { const b = dailyBriefing(c, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate(), c.patternQuality); todayScore = b.rating?.score ?? '?'; todayRating = b.rating?.level ?? '?'; todayOneLiner = (b.oneLiner || '').slice(0, 60); const _m = (b.rating?.summary || '').match(/chủ\s*["']([^"'']{2,40})["']/); if (_m) todayYi = _m[1]; } catch (e) {}
   // [loop 515] best hour today — actionable timing
-  try { const _bh = bestHourToday(c, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate(), c.patternQuality?.patternYong); if (_bh?.best) bestHourVi = `${_bh.best.vi} (${_bh.best.range})`; } catch (e) {}
+  try { const _bh = bestHourToday(c, new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate(), c.patternQuality?.patternYong); if (_bh?.best?.[0]) bestHourVi = `${_bh.best[0].vi} (${_bh.best[0].range})`; } catch (e) {}
   // [loop 651 FIX] todayTone theo RATING (không score threshold 60/45 cũ — lệch unified scale 54/48).
   //   Trước đây score 56 rating «Cát» nhưng emoji 🟡 (mâu thuẫn). Nay tone = chính rating.
   const todayTone = /Cát/.test(todayRating) ? '🟢' : /Hung/.test(todayRating) ? '🔴' : '🟡';
