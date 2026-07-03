@@ -99,7 +99,7 @@ body {
     radial-gradient(1100px 620px at 50% -12%, #211a2e 0%, var(--ink-black) 60%),
     var(--ink-black);
   color: var(--silk);
-  min-height: 100vh;
+  min-height: 100dvh;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -1142,7 +1142,7 @@ html{scroll-behavior:smooth}
 @keyframes aiFabPulse{0%,100%{box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 0 rgba(212,175,55,.4)}50%{box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 12px rgba(212,175,55,0)}}
 .ai-popup{
   position:fixed; right:22px; bottom:22px; z-index:70;
-  width:min(400px,calc(100vw - 32px)); height:min(560px,calc(100vh - 44px));
+  width:min(400px,calc(100vw - 32px)); height:min(560px,calc(100dvh - 44px));
   display:flex; flex-direction:column;
   background:linear-gradient(180deg,rgba(21,18,30,.98),rgba(10,9,19,.99));
   border:1px solid var(--gold,#d4af37); border-radius:16px; overflow:hidden;
@@ -1672,8 +1672,8 @@ html{scroll-behavior:smooth}
   /* dashboard quick-summary — stack vertical on mobile */
   #quick-summary > div, .qs-tile { min-width: 100% !important; flex: 1 1 100% !important; }
   /* AI modal — full screen on mobile */
-  #ai-modal { width: 100% !important; height: 100% !important; border-radius: 0 !important; max-height: 100vh !important; }
-  #ai-chat { height: calc(100vh - 140px) !important; }
+  #ai-modal { width: 100% !important; height: 100% !important; border-radius: 0 !important; max-height: 100dvh !important; }
+  #ai-chat { height: calc(100dvh - 140px) !important; }
   /* TOC — horizontal scroll on mobile */
   .toc { position: sticky; top: 4px; overflow-x: auto; flex-wrap: nowrap; }
   .toc a { white-space: nowrap; font-size: 11px; padding: 3px 7px; }
