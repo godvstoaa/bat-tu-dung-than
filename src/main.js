@@ -4163,6 +4163,28 @@ async function run() {
   renderDayunInteract(currentResult);
   renderLiuNian(currentResult.liunian);
   try { renderDailyBriefing(currentResult); } catch (e) { console.warn('dailyBriefing', e.message); }
+  // [UI P1] countUp — animate numeric scores/% ("số mệnh hiện ra"). Vanilla, reduced-motion aware.
+  (function countUpAll() {
+    const root = $('result'); if (!root || !window.requestAnimationFrame) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    root.querySelectorAll('.v-value, .wx-pct, [data-countup]').forEach((el) => {
+      const raw = (el.textContent || '').trim();
+      const m = raw.match(/^(-?\d+(?:\.\d+)?)/);
+      if (!m) return;
+      const num = parseFloat(m[0]); if (!isFinite(num) || num === 0) return;
+      if (reduced) return;
+      const suffix = raw.slice(m[0].length);
+      const isFloat = m[0].includes('.');
+      const dur = 900, t0 = performance.now();
+      const ease = (t) => 1 - Math.pow(1 - t, 3);
+      (function frame(now) {
+        const p = Math.min(1, (now - t0) / dur);
+        const v = num * ease(p);
+        el.textContent = (isFloat ? v.toFixed(1) : Math.round(v)) + suffix;
+        if (p < 1) requestAnimationFrame(frame);
+      })(t0);
+    });
+  })();
   // ====== Lazy-render: các card nặng phía dưới (Task 2) ======
   // Giữ TOP ~13 card immediate; phần còn lại render khi cuộn tới (IO) hoặc fallback render ngay.
   lazyRender('life-reading',   () => { try { renderLifeReading(currentResult); } catch (e) { console.warn('lifeReading', e.message); } });
