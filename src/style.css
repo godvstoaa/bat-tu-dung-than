@@ -1761,3 +1761,50 @@ html{scroll-behavior:smooth}
   #compass-heading { font-size: 24px !important; }
   #compass-shan-display { font-size: 18px !important; }
 }
+
+/* =======================================================================
+   [UI Phase 1] Imperial Lacquer Foil — grok plan (button micro + shimmer + foil)
+   ======================================================================= */
+:root {
+  --gold-foil: #f1d98a;
+  --gold-deep: #b48a1e;
+  --lacquer-deep: #111017;
+}
+
+/* Gold-foil gradient text (opt-in: thêm class .foil-text cho chữ Hán lớn/seal) */
+.foil-text {
+  background: linear-gradient(135deg, var(--gold-foil) 0%, var(--gold) 38%, var(--gold-deep) 72%, var(--gold-foil) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.28));
+}
+
+/* Button micro — press feedback (cảm giác ấn chỉ) */
+.btn-primary:not(:disabled):active,
+button[type="submit"]:not(:disabled):active,
+.btn-ghost:not(:disabled):active {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.4), inset 0 2px 7px rgba(0, 0, 0, 0.45);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+/* Card hover — gold glow + lift (GPU-only) */
+.card { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+@media (hover: hover) {
+  .card:hover { transform: translateY(-2px); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55), 0 0 22px rgba(212, 175, 55, 0.14); }
+}
+
+/* Shimmer loading (cho nút "Luận giải" / skeleton) */
+@keyframes ui-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.ui-shimmer {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0) 0%, rgba(212, 175, 55, 0.16) 50%, rgba(212, 175, 55, 0) 100%);
+  background-size: 200% 100%;
+  animation: ui-shimmer 1.4s linear infinite;
+}
+
+/* Reduced motion — tắt animation nặng cho accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .ui-shimmer { animation: none; }
+  .card { transition: none; will-change: auto; }
+  * { scroll-behavior: auto !important; }
+}
