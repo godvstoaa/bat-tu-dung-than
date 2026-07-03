@@ -722,7 +722,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .modal-mask { position: fixed; inset: 0; z-index: 100; background: rgba(5, 4, 10, 0.72); display: grid; place-items: center; padding: 20px; backdrop-filter: blur(6px); }
 .modal-mask:not(.hidden) { animation: maskIn .2s ease both; }
 .modal-mask:not(.hidden) .modal { animation: modalIn .34s var(--ease-spring) both; }
-.modal { position: relative; background: linear-gradient(180deg, var(--lacquer), var(--ink)); border: 1px solid var(--hairline); border-radius: 6px; padding: 24px; max-width: 460px; width: 100%; box-shadow: 0 24px 70px rgba(0,0,0,0.65), inset 0 1px 0 rgba(247,236,203,0.06); }
+.modal { position: relative; background: linear-gradient(180deg, var(--lacquer), var(--ink)); border: 1px solid var(--hairline); border-radius: 6px; padding: 24px; max-width: 460px; width: 100%; max-height: calc(100dvh - 40px); overflow-y: auto; -webkit-overflow-scrolling: touch; box-shadow: 0 24px 70px rgba(0,0,0,0.65), inset 0 1px 0 rgba(247,236,203,0.06); }
 .modal::before { content:''; position:absolute; left:22px; right:22px; top:0; height:2px; background: linear-gradient(90deg, transparent, var(--cinnabar), var(--gold), var(--cinnabar), transparent); opacity:.6; }
 .modal h3 { margin: 0 0 8px; font-size: 18px; color: var(--gold-bright); }
 .modal-hint { color: var(--silk-muted); font-size: 12.5px; line-height: 1.6; margin: 0 0 16px; }
