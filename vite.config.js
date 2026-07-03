@@ -56,6 +56,7 @@ export default defineConfig({
           if (id.includes('/src/engine/ziwei')) return 'engine-ziwei';       // 10+ file Tử Vi
           if (id.match(/\/src\/engine\/(meihua|cezi|liuren|qimen|heluo|guiguzi|jinkoujue|hexagram)/)) return 'engine-divination';
           if (id.match(/\/src\/engine\/(bazi-diet|bazi-workout|aroma|crystal|cloth|space-fs|city-fs|health)/)) return 'engine-lifestyle';
+          if (id.includes('/src/engine/tcm')) return 'engine-tcm';          // [loop 1350] 99KB TCM/health — cache riêng, returning users re-download ít hơn
         },
       },
     },
