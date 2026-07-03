@@ -1847,11 +1847,12 @@ body::before {
   filter: drop-shadow(0 0 7px rgba(212, 175, 55, 0.32));
 }
 
-/* Form → result step transition */
-#result.step-in { animation: resultRise 0.5s cubic-bezier(.2, .85, .25, 1) both; }
-@keyframes resultRise {
-  from { opacity: 0; transform: translateY(26px); }
-  to   { opacity: 1; transform: none; }
+/* Form → result step transition — opacity-only (KHÔNG dùng transform: #result có transform
+   sẽ tạo containing-block → vỡ position:fixed của #ai-popup nằm trong #result) */
+#result.step-in { animation: resultFade 0.5s ease both; }
+@keyframes resultFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
