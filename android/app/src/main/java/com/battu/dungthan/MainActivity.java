@@ -6,6 +6,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -20,11 +21,21 @@ import android.widget.ProgressBar;
  * service worker (sw.js) handles offline caching.
  *
  * UX: top ProgressBar while loading (no black screen), overflow menu with
- * "Tải lại" / "Trang chủ" so the user can manually pull new content.
+ * "Tải lại" / "Trang chủ", and a friendly offline page on network error.
  */
 public class MainActivity extends Activity {
 
     private static final String HOME_URL = "https://battu.god8.shop/";
+
+    private static final String OFFLINE_HTML =
+        "<html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
+        + "<style>body{background:#0a0913;color:#d4af37;font-family:sans-serif;"
+        + "display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;padding:28px}"
+        + "h2{margin:0 0 10px;font-weight:600}p{color:#9a8a6a;margin:0;line-height:1.6}</style></head>"
+        + "<body><div><h2>Không có kết nối mạng</h2>"
+        + "<p>App cần mạng để tải <b>Bát Tự Dụng Thần</b>.<br>"
+        + "Kiểm tra Wi-Fi/4G rồi mở menu ⋮ → <b>Tải lại</b>.</p></div></body></html>";
+
     private WebView webView;
     private ProgressBar progress;
 
@@ -43,7 +54,6 @@ public class MainActivity extends Activity {
         ws.setAllowFileAccess(true);
         ws.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-        // Top loading bar.
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int p) {
@@ -52,11 +62,18 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Keep navigation in-app.
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {
                 return false;
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError error) {
+                // Only replace the page on a main-frame failure (not sub-resources).
+                if (req.isForMainFrame()) {
+                    webView.loadDataWithBaseURL(HOME_URL, OFFLINE_HTML, "text/html", "utf-8", null);
+                }
             }
         });
 
