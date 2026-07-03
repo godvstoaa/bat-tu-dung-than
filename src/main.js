@@ -4185,6 +4185,25 @@ async function run() {
       })(t0);
     });
   })();
+  // [UI P2+3] pillar entrance + result step-in + flying-Hán burst (re-trigger mỗi run)
+  (function () {
+    const _p = $('pillars'); if (_p) { _p.classList.remove('run'); void _p.offsetWidth; _p.classList.add('run'); }
+    const _r = $('result'); if (_r) { _r.classList.remove('step-in'); void _r.offsetWidth; _r.classList.add('step-in'); }
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const chars = ['命', '運', '福', '祿', '吉'];
+      const n = 4 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < n; i++) {
+        const s = document.createElement('span');
+        s.className = 'flying-han';
+        s.textContent = chars[Math.floor(Math.random() * chars.length)];
+        s.style.left = (38 + Math.random() * 24) + 'vw';
+        s.style.top = (42 + Math.random() * 16) + 'vh';
+        s.style.animationDelay = (i * 80) + 'ms';
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 2200);
+      }
+    }
+  })();
   // ====== Lazy-render: các card nặng phía dưới (Task 2) ======
   // Giữ TOP ~13 card immediate; phần còn lại render khi cuộn tới (IO) hoặc fallback render ngay.
   lazyRender('life-reading',   () => { try { renderLifeReading(currentResult); } catch (e) { console.warn('lifeReading', e.message); } });

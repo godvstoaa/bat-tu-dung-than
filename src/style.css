@@ -1808,3 +1808,73 @@ button[type="submit"]:not(:disabled):active,
   .card { transition: none; will-change: auto; }
   * { scroll-behavior: auto !important; }
 }
+
+/* =======================================================================
+   [UI Phase 2] pillar entrance + lacquer texture + seal foil
+   ======================================================================= */
+
+/* Pillar entrance stagger — "trụ mọc lên" khi render. Trigger: thêm class .run cho #pillars */
+@keyframes pillarRise {
+  from { opacity: 0; transform: translateY(20px) rotateX(-14deg); }
+  to   { opacity: 1; transform: none; }
+}
+#pillars { perspective: 900px; }
+#pillars.run .pillar {
+  animation: pillarRise 0.55s cubic-bezier(.2, .85, .25, 1) both;
+}
+#pillars.run .pillar:nth-child(1) { animation-delay: 0ms; }
+#pillars.run .pillar:nth-child(2) { animation-delay: 90ms; }
+#pillars.run .pillar:nth-child(3) { animation-delay: 180ms; }
+#pillars.run .pillar:nth-child(4) { animation-delay: 270ms; }
+
+/* Lacquer atmosphere — lớp sơn mài sâu + hào quang mờ 4 góc */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 18% 8%,  rgba(192, 57, 43, 0.07), transparent 42%),
+    radial-gradient(ellipse at 82% 92%, rgba(212, 175, 55, 0.06), transparent 46%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+  mix-blend-mode: screen;
+}
+
+/* Seal foil — vàng lá gradient cho dấu son */
+.seal-stamp,
+.seal .foil-text {
+  background: linear-gradient(135deg, var(--gold-foil) 0%, var(--gold) 40%, var(--gold-deep) 75%, var(--gold-foil) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  filter: drop-shadow(0 0 7px rgba(212, 175, 55, 0.32));
+}
+
+/* Form → result step transition */
+#result.step-in { animation: resultRise 0.5s cubic-bezier(.2, .85, .25, 1) both; }
+@keyframes resultRise {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #pillars.run .pillar,
+  #result.step-in { animation: none; }
+}
+
+/* =======================================================================
+   [UI Phase 3] flying Hán burst — chữ Hán bay lên khi render xong (signature wow)
+   ======================================================================= */
+.flying-han {
+  position: fixed; z-index: 60; pointer-events: none;
+  font-size: clamp(22px, 6vw, 34px); font-weight: 700;
+  background: linear-gradient(135deg, var(--gold-foil), var(--gold), var(--gold-deep));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.55));
+  opacity: 0; will-change: transform, opacity;
+  animation: hanFloat 1.9s cubic-bezier(.2, .7, .3, 1) forwards;
+}
+@keyframes hanFloat {
+  0%   { opacity: 0; transform: translateY(0) scale(.5) rotate(-4deg); }
+  18%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-140px) scale(1.15) rotate(6deg); }
+}
+@media (prefers-reduced-motion: reduce) { .flying-han { display: none; } }
