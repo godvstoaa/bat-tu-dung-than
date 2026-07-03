@@ -4058,7 +4058,7 @@ async function run() {
   if (!dateVal) return;
   // [loop 447] loading state — visual feedback during compute+render
   const _btn = document.querySelector('#birth-form button[type="submit"]');
-  if (_btn) { const _orig = _btn.innerHTML; _btn.innerHTML = '⏳ Đang luận giải…'; _btn.disabled = true; setTimeout(() => { _btn.innerHTML = _orig; _btn.disabled = false; }, 2000); }
+  if (_btn) { const _orig = _btn.innerHTML; _btn.innerHTML = '⏳ Đang luận giải…'; _btn.disabled = true; _btn.classList.add('btn-loading'); setTimeout(() => { _btn.innerHTML = _orig; _btn.disabled = false; _btn.classList.remove('btn-loading'); }, 6000); }
   // [loop 954] yield to PAINT «⏳ Đang luận giải» trước khi chạy compute+render nặng (~5s).
   //   Trước đây run() sync → main thread blocked → UI đóng băng, loading state không kịp vẽ.
   await new Promise((r) => setTimeout(r, 0));
