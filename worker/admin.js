@@ -144,6 +144,18 @@ async function adminStats(env, url) {
     }
   }
   const topReferrers = Object.entries(refmap).map(([r, n]) => ({ referrer: r, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
+  // [loop 1351] device breakdown
+  const devCount = { iPhone: 0, Android: 0, Windows: 0, Mac: 0, iPad: 0, other: 0 };
+  for (const e of events) {
+    const ua = (e.ua || '').toLowerCase();
+    if (/iphone/.test(ua)) devCount.iPhone++;
+    else if (/ipad/.test(ua)) devCount.iPad++;
+    else if (/android/.test(ua)) devCount.Android++;
+    else if (/windows/.test(ua)) devCount.Windows++;
+    else if (/mac/.test(ua)) devCount.Mac++;
+    else devCount.other++;
+  }
+  const devices = Object.entries(devCount).filter(([, n]) => n > 0).map(([d, n]) => ({ device: d, count: n })).sort((a, b) => b.count - a.count);
   // [loop 1351] session tracking — group events per IP (gap >30min = new session)
   const ipTs = {};
   for (const e of events) { const ip = e.ip || '?'; if (!ipTs[ip]) ipTs[ip] = []; ipTs[ip].push(e.ts); }
@@ -186,7 +198,7 @@ async function adminStats(env, url) {
   const BOT_RE = /bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i;
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers };
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers, devices };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
