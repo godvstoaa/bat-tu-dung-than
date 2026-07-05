@@ -39,8 +39,13 @@ async function logEvent(env, request, type, data) {
   const country = (request.cf && request.cf.country) || '';
   const city = (request.cf && request.cf.city) || '';
   const ts = Date.now();
-  const id = Math.random().toString(36).slice(2, 10);
-  await env.ADMIN_KV.put(`ev:${ts}-${id}`, JSON.stringify({ ts, type, ip, ua, country, city, data: data || {} }), { expirationTtl: TTL_EVENT });
+  // [loop 1351 perf] store trong 1 KV key (JSON array, cap 100) — tránh 100+ KV gets trong stats
+  const logRaw = await env.ADMIN_KV.get('events:log');
+  let log = [];
+  try { log = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
+  log.unshift({ ts, type, ip, ua, country, city, data: data || {} });
+  if (log.length > 100) log.length = 100;
+  await env.ADMIN_KV.put('events:log', JSON.stringify(log));
   const day = new Date(ts).toISOString().slice(0, 10);
   for (const k of [`cnt:${type}`, 'cnt:all', `daily:${day}:${type}`]) {
     const cur = parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
@@ -100,12 +105,9 @@ async function adminStats(env) {
   // [loop 1351 perf] cache 15s — 100+ KV gets tuần tự rất chậm, cache giúp dashboard refresh nhanh
   if (env.ADMIN_KV) { const cached = await env.ADMIN_KV.get('cache:stats'); if (cached) { try { return json(JSON.parse(cached)); } catch (e) {} } }
   const ai = await isAiEnabled(env);
-  const list = await env.ADMIN_KV.list({ prefix: 'ev:', limit: 100, reverse: true });
-  const events = [];
-  for (const k of list.keys) {
-    const v = await env.ADMIN_KV.get(k.name);
-    if (v) { try { events.push(JSON.parse(v)); } catch (e) {} }
-  }
+  const logRaw = env.ADMIN_KV ? await env.ADMIN_KV.get('events:log') : null;
+  let events = [];
+  try { events = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
   const get = async (k) => parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
   const totals = { visit: await get('cnt:visit'), chart: await get('cnt:chart'), ai_question: await get('cnt:ai_question'), error: await get('cnt:error'), all: await get('cnt:all') };
   const ips = new Set(events.map((e) => e.ip));
