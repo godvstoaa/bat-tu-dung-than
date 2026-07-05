@@ -31,6 +31,9 @@ ok(Array.isArray(st.daily), 'stats.daily (7 ngày)');
 ok(Array.isArray(st.topCountries), 'stats.topCountries (geo)');
 ok(st.uniqueIps >= 1, 'stats.uniqueIps ≥ 1');
 ok(st.activeNow !== undefined, 'stats.activeNow (live)');
+ok(st.funnel && st.funnel.visitors >= 0, 'stats.funnel (conversion visitor→chart→AI)');
+ok(st.engagement && st.engagement.bounceRate !== undefined, 'stats.engagement (bounce rate)');
+ok(st.realUniqueIps !== undefined && st.bots !== undefined, 'stats.realUniqueIps + bots (bot filter)');
 ok(appeared, 'audit visit logged + xuất hiện (retry KV consistency)');
 
 // 3. AI toggle off → proxy 503 → on
