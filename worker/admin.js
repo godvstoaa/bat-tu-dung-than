@@ -76,6 +76,7 @@ export async function handleAdminRoute(request, env, url) {
     if (path === '/admin' || path === '/admin/') return adminDashboard();
     if (path === '/admin/api/stats') return adminStats(env);
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
+    if (path === '/admin/api/token' && method === 'POST') return adminChangeToken(env, request);
     return new Response('Not found', { status: 404 });
   }
   return null;
@@ -100,6 +101,14 @@ async function adminToggleAi(env, request) {
   const enabled = body && body.enabled ? '1' : '0';
   await env.ADMIN_KV.put('ai:enabled', enabled);
   return json({ ok: true, aiEnabled: enabled === '1' });
+}
+
+async function adminChangeToken(env, request) {
+  const body = await request.json().catch(() => ({}));
+  const t = body && body.new && String(body.new).length >= 8 ? String(body.new) : null;
+  if (!t) return json({ ok: false, err: 'Cần body {new: "..."} độ dài ≥ 8 ký tự' }, 400);
+  if (env.ADMIN_KV) await env.ADMIN_KV.put('admin:token', t);
+  return json({ ok: true, msg: 'Token đã đổi. Dùng /admin?token=<new>' });
 }
 
 function adminDashboard() {
