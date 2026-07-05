@@ -17,14 +17,21 @@ const rid = randomBytes(4).toString('hex');
 const r1 = await fetch(BASE + '/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'visit', data: { audit: rid } }) }).then((r) => r.json());
 ok(r1.ok, 'POST /api/event log');
 
-// 2. stats
-const st = await fetch(BASE + '/admin/api/stats?token=' + TOKEN).then((r) => r.json());
+// 2. stats — retry cho KV eventual consistency (visit viết xong có thể chưa list ngay)
+let st = null;
+let appeared = false;
+for (let i = 0; i < 5; i++) {
+  st = await fetch(BASE + '/admin/api/stats?token=' + TOKEN).then((r) => r.json());
+  if (st && st.events && st.events.some((e) => e.data && e.data.audit === rid)) { appeared = true; break; }
+  await new Promise((r) => setTimeout(r, 2000));
+}
 ok(st && Array.isArray(st.events), 'GET /admin/api/stats');
 ok(Array.isArray(st.byIp), 'stats.byIp (per-visitor)');
 ok(Array.isArray(st.daily), 'stats.daily (7 ngày)');
 ok(Array.isArray(st.topCountries), 'stats.topCountries (geo)');
 ok(st.uniqueIps >= 1, 'stats.uniqueIps ≥ 1');
-ok(st.events.some((e) => e.data && e.data.audit === rid), 'audit visit logged + xuất hiện trong events');
+ok(st.activeNow !== undefined, 'stats.activeNow (live)');
+ok(appeared, 'audit visit logged + xuất hiện (retry KV consistency)');
 
 // 3. AI toggle off → proxy 503 → on
 await fetch(BASE + '/admin/api/ai?token=' + TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: false }) });
