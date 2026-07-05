@@ -28,8 +28,13 @@ export async function isAiEnabled(env) {
 }
 
 async function logEvent(env, request, type, data) {
-  if (!env.ADMIN_KV) return;
+  if (!env.ADMIN_KV) return true;
   const ip = clientIP(request);
+  // [loop 1351] rate-limit: max 30 events/phút/IP (anti-spam flood KV). KV approx (eventual-consistent).
+  const rlKey = 'rl:' + ip + ':' + Math.floor(Date.now() / 60000);
+  const rlCount = parseInt((await env.ADMIN_KV.get(rlKey)) || '0', 10);
+  if (rlCount >= 30) return false; // rate-limited → silent drop
+  await env.ADMIN_KV.put(rlKey, String(rlCount + 1), { expirationTtl: 120 });
   const ua = (request.headers.get('User-Agent') || '').slice(0, 200);
   const country = (request.cf && request.cf.country) || '';
   const city = (request.cf && request.cf.city) || '';
@@ -41,6 +46,7 @@ async function logEvent(env, request, type, data) {
     const cur = parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
     await env.ADMIN_KV.put(k, String(cur + 1));
   }
+  return true;
 }
 
 export async function handleAdminRoute(request, env, url) {
@@ -52,8 +58,8 @@ export async function handleAdminRoute(request, env, url) {
     try {
       const body = await request.json();
       const type = ['visit', 'chart', 'ai_question'].includes(body && body.type) ? body.type : 'other';
-      await logEvent(env, request, type, body && body.data);
-      return json({ ok: true });
+      const ok = await logEvent(env, request, type, body && body.data);
+      return json(ok ? { ok: true } : { ok: false, err: 'rate_limited (max 30/phút/IP)' }, ok ? 200 : 429);
     } catch (e) { return json({ ok: false, err: e.message }, 400); }
   }
 
@@ -107,7 +113,13 @@ async function adminStats(env) {
     if (e.ts < g.firstTs) g.firstTs = e.ts;
   }
   const byIpArr = Object.values(byIp).sort((a, b) => b.lastTs - a.lastTs);
-  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, events, byIp: byIpArr });
+  // [loop 1351] daily breakdown — 7 ngày gần nhất
+  const daily = [];
+  for (let i = 6; i >= 0; i--) {
+    const dstr = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    daily.push({ date: dstr, visit: await get('daily:' + dstr + ':visit'), chart: await get('daily:' + dstr + ':chart'), ai_question: await get('daily:' + dstr + ':ai_question') });
+  }
+  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, events, byIp: byIpArr, daily });
 }
 
 async function adminToggleAi(env, request) {
@@ -150,6 +162,8 @@ function adminDashboard() {
   <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
   <h3>Theo visitor (IP) <span class="tiny">— mỗi IP: visit count, charts xem, câu hỏi AI</span></h3>
   <div id="byip"></div>
+  <h3>Hoạt động 7 ngày</h3>
+  <div id="daily"></div>
   <script>
   const TOKEN = new URLSearchParams(location.search).get('token');
   const H = { 'X-Admin-Token': TOKEN };
@@ -191,6 +205,18 @@ function adminDashboard() {
         if (v.charts.length) card.appendChild(el('div','tiny','📊 Lá số xem ('+v.charts.length+'): '+v.charts.map(function(c){return (c.dob||'?')+' '+(c.gender||'');}).join('; ').slice(0,400)));
         if (v.questions.length) card.appendChild(el('div','tiny','💬 AI hỏi ('+v.questions.length+'): '+v.questions.map(function(q){return '«'+String(q).slice(0,90)+'»';}).join(' ').slice(0,500)));
         bip.appendChild(card);
+      });
+    }
+    // [loop 1351] daily breakdown — mini bar chart 7 ngày
+    const dl=document.getElementById('daily'); if (dl && d.daily) { dl.textContent='';
+      const maxv=Math.max.apply(null, d.daily.map(function(x){return x.visit+x.chart+x.ai_question;}).concat([1]));
+      d.daily.forEach(function(dy){
+        const tot=dy.visit+dy.chart+dy.ai_question;
+        const row=el('div'); row.style.cssText='display:flex;align-items:center;gap:8px;margin:3px 0;font-size:12px';
+        row.appendChild(el('span','tiny',dy.date));
+        const bar=el('div'); bar.style.cssText='height:14px;width:'+Math.max(4,Math.round(tot/maxv*200))+'px;border-radius:3px;background:#d4af37'; row.appendChild(bar);
+        row.appendChild(el('span','tiny',tot+' (v:'+dy.visit+' c:'+dy.chart+' q:'+dy.ai_question+')'));
+        dl.appendChild(row);
       });
     }
   }
