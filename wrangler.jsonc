@@ -6,7 +6,7 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "none"
   },
   "kv_namespaces": [{ "binding": "ADMIN_KV", "id": "fa5ff6c7198f48999bcfeeeba6f8d264" }],
   "observability": { "enabled": false }
