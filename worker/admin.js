@@ -147,8 +147,6 @@ async function adminStats(env) {
     totalSessions++; dur.push(prev - start);
   }
   const avgSessionMin = dur.length ? Math.round(dur.reduce((a, b) => a + b, 0) / dur.length / 60000) : 0;
-  engagement.sessions = totalSessions;
-  engagement.avgSessionMin = avgSessionMin;
   // [loop 1351] daily breakdown — 7 ngày gần nhất
   const daily = [];
   for (let i = 6; i >= 0; i--) {
@@ -170,6 +168,8 @@ async function adminStats(env) {
     avgEvents: byIpArr.length ? (events.length / byIpArr.length).toFixed(1) : '0',
     avgCharts: byIpArr.length ? (totals.chart / byIpArr.length).toFixed(1) : '0',
     avgLoadMs: avgLoadMs,
+    sessions: totalSessions,
+    avgSessionMin: avgSessionMin,
   };
   const fiveMinAgo = Date.now() - 5 * 60 * 1000;
   const activeNow = new Set(events.filter((e) => e.ts > fiveMinAgo).map((e) => e.ip)).size;
