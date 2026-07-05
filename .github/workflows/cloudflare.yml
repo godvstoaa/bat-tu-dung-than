@@ -29,8 +29,10 @@ jobs:
           CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler deploy
-      - name: Set ADMIN_TOKEN secret (admin dashboard auth — loop 1351)
-        if: env.CF_KEY_SET == 'true' && secrets.ADMIN_TOKEN != ''
+      - name: Check ADMIN_TOKEN GH secret
+        run: echo "ADM_SET=${{ secrets.ADMIN_TOKEN != '' }}" >> $GITHUB_ENV
+      - name: Set ADMIN_TOKEN wrangler secret
+        if: env.CF_KEY_SET == 'true' && env.ADM_SET == 'true'
         env:
           CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
           CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
