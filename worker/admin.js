@@ -130,7 +130,10 @@ async function adminStats(env) {
   }
   const fiveMinAgo = Date.now() - 5 * 60 * 1000;
   const activeNow = new Set(events.filter((e) => e.ts > fiveMinAgo).map((e) => e.ip)).size;
-  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, activeNow, events, byIp: byIpArr, daily, topCountries, topQuestions });
+  const BOT_RE = /bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i;
+  let botCount = 0; const realIps = new Set();
+  for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
+  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, events, byIp: byIpArr, daily, topCountries, topQuestions });
 }
 
 async function adminToggleAi(env, request) {
@@ -207,7 +210,7 @@ function adminDashboard() {
     st.appendChild(statBlock(d.totals.chart,'lá số'));
     st.appendChild(statBlock(d.totals.ai_question,'AI hỏi'));
     if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
-    st.appendChild(statBlock(d.uniqueIps,'IP unique'));
+    st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     const c=document.getElementById('controls'); c.textContent='';
