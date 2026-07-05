@@ -118,13 +118,17 @@ async function adminStats(env) {
   const ctry = {};
   for (const e of events) { const c = e.country || '?'; ctry[c] = (ctry[c] || 0) + 1; }
   const topCountries = Object.entries(ctry).map(([c, n]) => ({ country: c, count: n })).sort((a, b) => b.count - a.count);
+  // top AI questions (insight mối quan tâm user)
+  const qmap = {};
+  for (const e of events) { if (e.type === 'ai_question' && e.data && e.data.q) { const q = String(e.data.q).slice(0, 80); qmap[q] = (qmap[q] || 0) + 1; } }
+  const topQuestions = Object.entries(qmap).map(([q, n]) => ({ q, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
   // [loop 1351] daily breakdown — 7 ngày gần nhất
   const daily = [];
   for (let i = 6; i >= 0; i--) {
     const dstr = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
     daily.push({ date: dstr, visit: await get('daily:' + dstr + ':visit'), chart: await get('daily:' + dstr + ':chart'), ai_question: await get('daily:' + dstr + ':ai_question') });
   }
-  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, events, byIp: byIpArr, daily, topCountries });
+  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, events, byIp: byIpArr, daily, topCountries, topQuestions });
 }
 
 async function adminToggleAi(env, request) {
@@ -185,6 +189,8 @@ function adminDashboard() {
   <div id="byip"></div>
   <h3>Hoạt động 7 ngày</h3>
   <div id="daily"></div>
+  <h3>Top câu hỏi AI & quốc gia</h3>
+  <div id="topq" style="display:flex;gap:24px;flex-wrap:wrap"></div>
   <script>
   const TOKEN = new URLSearchParams(location.search).get('token');
   const H = { 'X-Admin-Token': TOKEN };
@@ -241,6 +247,16 @@ function adminDashboard() {
         row.appendChild(el('span','tiny',tot+' (v:'+dy.visit+' c:'+dy.chart+' q:'+dy.ai_question+')'));
         dl.appendChild(row);
       });
+    }
+    // [loop 1351] top questions + countries
+    const tq=document.getElementById('topq'); if (tq) { tq.textContent='';
+      const col1=el('div'); col1.style.cssText='flex:1;min-width:240px'; col1.appendChild(el('h4',null,'💬 Câu hỏi AI hay gặp'));
+      (d.topQuestions||[]).forEach(function(q){ col1.appendChild(el('div','tiny', q.count+'× «'+q.q+'»')); });
+      if (!(d.topQuestions||[]).length) col1.appendChild(el('div','tiny','(chưa có)'));
+      tq.appendChild(col1);
+      const col2=el('div'); col2.style.cssText='flex:1;min-width:200px'; col2.appendChild(el('h4',null,'🌍 Quốc gia'));
+      (d.topCountries||[]).forEach(function(c){ col2.appendChild(el('div','tiny', c.count+'× '+(c.country||'?'))); });
+      tq.appendChild(col2);
     }
   }
   async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); }
