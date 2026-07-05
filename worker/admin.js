@@ -208,16 +208,13 @@ async function adminChangeToken(env, request) {
 
 async function adminExport(env) {
   if (!env.ADMIN_KV) return new Response('no store', { status: 500 });
-  const list = await env.ADMIN_KV.list({ prefix: 'ev:', limit: 1000, reverse: true });
+  const logRaw = await env.ADMIN_KV.get('events:log');
+  let events = [];
+  try { events = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
   const esc = (s) => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
   const rows = [['timestamp', 'type', 'ip', 'country', 'city', 'ua', 'data'].join(',')];
-  for (const k of list.keys) {
-    const v = await env.ADMIN_KV.get(k.name);
-    if (!v) continue;
-    try {
-      const e = JSON.parse(v);
-      rows.push([new Date(e.ts).toISOString(), e.type, e.ip, e.country || '', e.city || '', e.ua || '', JSON.stringify(e.data || {})].map(esc).join(','));
-    } catch (e2) {}
+  for (const e of events) {
+    rows.push([new Date(e.ts).toISOString(), e.type, e.ip, e.country || '', e.city || '', e.ua || '', JSON.stringify(e.data || {})].map(esc).join(','));
   }
   return new Response(rows.join('\n'), { headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="batu-events.csv"' } });
 }
