@@ -114,13 +114,17 @@ async function adminStats(env) {
     if (e.ts < g.firstTs) g.firstTs = e.ts;
   }
   const byIpArr = Object.values(byIp).sort((a, b) => b.lastTs - a.lastTs);
+  // [loop 1351] top countries (geo distribution)
+  const ctry = {};
+  for (const e of events) { const c = e.country || '?'; ctry[c] = (ctry[c] || 0) + 1; }
+  const topCountries = Object.entries(ctry).map(([c, n]) => ({ country: c, count: n })).sort((a, b) => b.count - a.count);
   // [loop 1351] daily breakdown — 7 ngày gần nhất
   const daily = [];
   for (let i = 6; i >= 0; i--) {
     const dstr = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
     daily.push({ date: dstr, visit: await get('daily:' + dstr + ':visit'), chart: await get('daily:' + dstr + ':chart'), ai_question: await get('daily:' + dstr + ':ai_question') });
   }
-  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, events, byIp: byIpArr, daily });
+  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, events, byIp: byIpArr, daily, topCountries });
 }
 
 async function adminToggleAi(env, request) {
