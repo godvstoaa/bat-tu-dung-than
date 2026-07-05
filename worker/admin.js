@@ -97,6 +97,8 @@ export async function handleAdminRoute(request, env, url) {
 }
 
 async function adminStats(env) {
+  // [loop 1351 perf] cache 15s — 100+ KV gets tuần tự rất chậm, cache giúp dashboard refresh nhanh
+  if (env.ADMIN_KV) { const cached = await env.ADMIN_KV.get('cache:stats'); if (cached) { try { return json(JSON.parse(cached)); } catch (e) {} } }
   const ai = await isAiEnabled(env);
   const list = await env.ADMIN_KV.list({ prefix: 'ev:', limit: 100, reverse: true });
   const events = [];
@@ -183,7 +185,9 @@ async function adminStats(env) {
   const BOT_RE = /bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i;
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
-  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers });
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers };
+  if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 15 });
+  return json(result);
 }
 
 async function adminToggleAi(env, request) {
