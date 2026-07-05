@@ -92,7 +92,7 @@ export async function handleAdminRoute(request, env, url) {
       return new Response('Unauthorized', { status: 401 });
     }
     if (path === '/admin' || path === '/admin/') return adminDashboard();
-    if (path === '/admin/api/stats') { try { return await adminStats(env); } catch (e) { return json({ error: e.message }, 500); } }
+    if (path === '/admin/api/stats') { try { return await adminStats(env, url); } catch (e) { return json({ error: e.message }, 500); } }
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
     if (path === '/admin/api/token' && method === 'POST') return adminChangeToken(env, request);
     if (path === '/admin/api/export' && method === 'GET') return adminExport(env);
@@ -101,9 +101,9 @@ export async function handleAdminRoute(request, env, url) {
   return null;
 }
 
-async function adminStats(env) {
-  // [loop 1351 perf] cache 15s — 100+ KV gets tuần tự rất chậm, cache giúp dashboard refresh nhanh
-  if (env.ADMIN_KV) { const cached = await env.ADMIN_KV.get('cache:stats'); if (cached) { try { return json(JSON.parse(cached)); } catch (e) {} } }
+async function adminStats(env, url) {
+  const nocache = url && url.searchParams.get('nocache');
+  if (!nocache && env.ADMIN_KV) { const cached = await env.ADMIN_KV.get('cache:stats'); if (cached) { try { return json(JSON.parse(cached)); } catch (e) {} } }
   const ai = await isAiEnabled(env);
   const logRaw = env.ADMIN_KV ? await env.ADMIN_KV.get('events:log') : null;
   let events = [];

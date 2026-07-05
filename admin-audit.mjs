@@ -21,7 +21,7 @@ ok(r1.ok, 'POST /api/event log');
 let st = null;
 let appeared = false;
 for (let i = 0; i < 5; i++) {
-  st = await fetch(BASE + '/admin/api/stats?token=' + TOKEN).then((r) => r.json());
+  st = await fetch(BASE + '/admin/api/stats?token=' + TOKEN + '&nocache=1').then((r) => r.json());
   if (st && st.events && st.events.some((e) => e.data && e.data.audit === rid)) { appeared = true; break; }
   await new Promise((r) => setTimeout(r, 2000));
 }
