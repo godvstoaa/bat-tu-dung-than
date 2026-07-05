@@ -98,7 +98,7 @@ export async function handleAdminRoute(request, env, url) {
 
 async function adminStats(env) {
   const ai = await isAiEnabled(env);
-  const list = await env.ADMIN_KV.list({ prefix: 'ev:', limit: 200, reverse: true });
+  const list = await env.ADMIN_KV.list({ prefix: 'ev:', limit: 100, reverse: true });
   const events = [];
   for (const k of list.keys) {
     const v = await env.ADMIN_KV.get(k.name);
