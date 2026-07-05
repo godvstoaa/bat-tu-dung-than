@@ -29,6 +29,13 @@ jobs:
           CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler deploy
+      - name: Set ADMIN_TOKEN secret (admin dashboard auth — loop 1351)
+        if: env.CF_KEY_SET == 'true' && secrets.ADMIN_TOKEN != ''
+        env:
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: printf '%s' "${{ secrets.ADMIN_TOKEN }}" | npx wrangler secret put ADMIN_TOKEN
       - name: Skip (chưa set creds)
         if: env.CF_KEY_SET != 'true'
         run: echo "⚠ CLOUDFLARE_API_KEY/CLOUDFLARE_EMAIL secret chưa set → bỏ qua (GitHub Pages vẫn deploy). Thêm secret để battu.god8.shop auto-update."

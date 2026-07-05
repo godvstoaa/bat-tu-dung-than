@@ -1512,6 +1512,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
       } catch (e) {
         // [loop 1186 FIX] leo thang: tắt tools trước, rồi tắt thinking, rồi bỏ cuộc.
         //   Trước đây chỉ tắt tools → nếu thinking gây lỗi (vd host CF) retry vẫn lỗi → fallback sớm.
+        if (e.aiDisabled) throw e; // [admin loop 1351] AI bị admin tắt → KHÔNG retry, fallback local ngay
         if (toolsOn) { toolsOn = false; step = -1; continue; }
         if (thinkOn) { thinkOn = false; step = -1; continue; }
         throw e;
@@ -1590,6 +1591,11 @@ function _reasonStageLabel(reasonLen) {
 // Theo docs Z.ai (interleaved thinking + stream tool call).
 async function streamRound(url, headers, body, onToken, onStatus, signal) {
   const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal });
+  if (res.status === 503) { // [admin loop 1351] AI bị admin tắt → fallback local NGAY (không retry)
+    const err = new Error('AI bị tắt bởi quản trị viên (503)');
+    err.aiDisabled = true;
+    throw err;
+  }
   if (!res.ok || !res.body) {
     let t = ''; try { t = await res.text(); } catch (_) {}
     throw new Error('HTTP ' + res.status + (t ? ': ' + t.slice(0, 140) : ''));

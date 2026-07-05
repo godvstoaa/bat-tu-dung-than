@@ -3826,6 +3826,7 @@ async function handleAsk() {
   }
   const q = $('question').value.trim();
   if (!q) return;
+  _logEvent('ai_question', { q: q }); // [admin loop 1351]
   $('question').value = '';
   _aiBusy = true;
   _aiAbort = new AbortController();
@@ -4065,6 +4066,7 @@ async function run() {
   const [y0, m0, d0] = dateVal.split('-').map(Number);
   const [hh0, mm0] = timeVal.split(':').map(Number);
   const gender = (document.querySelector('input[name="gender"]:checked') || {}).value || 'nam';   // [loop 961] defensive: nếu không radio nào checked → fallback 'nam' (tránh crash run)
+  _logEvent('chart', { dob: dateVal, time: timeVal, gender: gender }); // [admin loop 1351]
   // [loop 23] Múi giờ + 真太阳时 (giờ Mặt Trời thật theo kinh độ nơi sinh).
   //   Bát Tự dùng 真太阳时 — đồng hồ múi giờ chỉ là xấp xỉ. Sinh gần ranh 时辰 thì sai vài
   //   phút có đổi 时柱. Có city/longitude → hiệu chỉnh; không thì dùng giờ nhập y nguyên.
@@ -6969,3 +6971,9 @@ function init3DTilt() {
     card.addEventListener('mouseleave', onLeave);
   });
 }
+
+// [admin loop 1351] visitor analytics — log tới worker (fire-and-forget, không block UI)
+function _logEvent(type, data) {
+  try { fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: type, data: data || {} }) }).catch(function () {}); } catch (e) {}
+}
+_logEvent('visit', { ref: document.referrer || '', path: location.pathname });
