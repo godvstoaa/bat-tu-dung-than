@@ -6983,4 +6983,4 @@ window.addEventListener('error', function (ev) {
 window.addEventListener('unhandledrejection', function (ev) {
   var r = ev.reason; _logEvent('error', { msg: 'reject: ' + String((r && r.message) || r || '').slice(0, 200) });
 });
-_logEvent('visit', { ref: document.referrer || '', path: location.pathname });
+_logEvent('visit', { ref: document.referrer || '', path: location.pathname, loadMs: Math.round(performance.now()) });

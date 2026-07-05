@@ -136,10 +136,13 @@ async function adminStats(env) {
   };
   // [loop 1351] engagement: bounce rate (% visitor chỉ 1 event rồi đi) + avg events
   const bounceCount = byIpArr.filter((v) => v.count <= 1).length;
+  const loadTimes = events.filter((e) => e.type === 'visit' && e.data && e.data.loadMs).map((e) => e.data.loadMs);
+  const avgLoadMs = loadTimes.length ? Math.round(loadTimes.reduce((a, b) => a + b, 0) / loadTimes.length) : 0;
   const engagement = {
     bounceRate: byIpArr.length ? Math.round((bounceCount / byIpArr.length) * 100) : 0,
     avgEvents: byIpArr.length ? (events.length / byIpArr.length).toFixed(1) : '0',
     avgCharts: byIpArr.length ? (totals.chart / byIpArr.length).toFixed(1) : '0',
+    avgLoadMs: avgLoadMs,
   };
   const fiveMinAgo = Date.now() - 5 * 60 * 1000;
   const activeNow = new Set(events.filter((e) => e.ts > fiveMinAgo).map((e) => e.ip)).size;
@@ -226,7 +229,7 @@ function adminDashboard() {
     if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
     st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
-    if (d.engagement) { st.appendChild(statBlock(d.engagement.bounceRate+'%','bounce', d.engagement.bounceRate>60?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.avgEvents,'events/IP')); }
+    if (d.engagement) { st.appendChild(statBlock(d.engagement.bounceRate+'%','bounce', d.engagement.bounceRate>60?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.avgEvents,'events/IP')); if (d.engagement.avgLoadMs) st.appendChild(statBlock(d.engagement.avgLoadMs+'ms','⏱ load', d.engagement.avgLoadMs>3000?'#c0392b':'#7fbf7f')); }
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     const c=document.getElementById('controls'); c.textContent='';
     // [loop 1351] conversion funnel
