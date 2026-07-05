@@ -57,7 +57,7 @@ export async function handleAdminRoute(request, env, url) {
   if (path === '/api/event' && method === 'POST') {
     try {
       const body = await request.json();
-      const type = ['visit', 'chart', 'ai_question'].includes(body && body.type) ? body.type : 'other';
+      const type = ['visit', 'chart', 'ai_question', 'error'].includes(body && body.type) ? body.type : 'other';
       const ok = await logEvent(env, request, type, body && body.data);
       return json(ok ? { ok: true } : { ok: false, err: 'rate_limited (max 30/phút/IP)' }, ok ? 200 : 429);
     } catch (e) { return json({ ok: false, err: e.message }, 400); }
@@ -98,7 +98,7 @@ async function adminStats(env) {
     if (v) { try { events.push(JSON.parse(v)); } catch (e) {} }
   }
   const get = async (k) => parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
-  const totals = { visit: await get('cnt:visit'), chart: await get('cnt:chart'), ai_question: await get('cnt:ai_question'), all: await get('cnt:all') };
+  const totals = { visit: await get('cnt:visit'), chart: await get('cnt:chart'), ai_question: await get('cnt:ai_question'), error: await get('cnt:error'), all: await get('cnt:all') };
   const ips = new Set(events.map((e) => e.ip));
   // [loop 1351] byIp — group events theo visitor (đúng nhu cầu «người nào xem gì hỏi gì»)
   const byIp = {};
@@ -180,7 +180,7 @@ function adminDashboard() {
   .stat span{font-size:11px;color:#9a8a6a}
   .filter{padding:5px 10px;background:rgba(0,0,0,.3);border:1px solid rgba(212,175,55,.2);color:#e8d9b0;border-radius:4px}
   .badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700}
-  .b-visit{background:rgba(127,191,127,.2);color:#7fbf7f}.b-chart{background:rgba(212,175,55,.2);color:#d4af37}.b-ai_question{background:rgba(180,120,200,.2);color:#b478c8}.b-other{background:rgba(150,150,150,.2);color:#aaa}
+  .b-visit{background:rgba(127,191,127,.2);color:#7fbf7f}.b-chart{background:rgba(212,175,55,.2);color:#d4af37}.b-ai_question{background:rgba(180,120,200,.2);color:#b478c8}.b-other{background:rgba(150,150,150,.2);color:#aaa}.b-error{background:rgba(192,57,43,.25);color:#e0533d}
   </style></head><body>
   <h1>🛡️ Admin — Bát Tự Dụng Thần</h1>
   <div id="status">Đang tải…</div>
@@ -206,6 +206,7 @@ function adminDashboard() {
     st.appendChild(statBlock(d.totals.visit,'visits'));
     st.appendChild(statBlock(d.totals.chart,'lá số'));
     st.appendChild(statBlock(d.totals.ai_question,'AI hỏi'));
+    if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
     st.appendChild(statBlock(d.uniqueIps,'IP unique'));
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));

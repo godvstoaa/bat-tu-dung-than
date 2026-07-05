@@ -6976,4 +6976,11 @@ function init3DTilt() {
 function _logEvent(type, data) {
   try { fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: type, data: data || {} }) }).catch(function () {}); } catch (e) {}
 }
+// [loop 1351] JS error logging — admin thấy lỗi thật user gặp (window.onerror + unhandledrejection)
+window.addEventListener('error', function (ev) {
+  _logEvent('error', { msg: String(ev.message || '').slice(0, 200), file: String(ev.filename || '').slice(0, 120), line: ev.lineno, col: ev.colno });
+});
+window.addEventListener('unhandledrejection', function (ev) {
+  var r = ev.reason; _logEvent('error', { msg: 'reject: ' + String((r && r.message) || r || '').slice(0, 200) });
+});
 _logEvent('visit', { ref: document.referrer || '', path: location.pathname });
