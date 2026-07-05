@@ -188,7 +188,7 @@ async function adminStats(env) {
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
   const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers };
-  if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 15 });
+  if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
 
