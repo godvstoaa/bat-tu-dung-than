@@ -128,12 +128,18 @@ async function adminStats(env) {
     const dstr = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
     daily.push({ date: dstr, visit: await get('daily:' + dstr + ':visit'), chart: await get('daily:' + dstr + ':chart'), ai_question: await get('daily:' + dstr + ':ai_question') });
   }
+  // [loop 1351] conversion funnel: visitor → chart → AI question (% engagement)
+  const funnel = {
+    visitors: byIpArr.length,
+    chartUsers: byIpArr.filter((v) => v.charts.length > 0).length,
+    aiUsers: byIpArr.filter((v) => v.questions.length > 0).length,
+  };
   const fiveMinAgo = Date.now() - 5 * 60 * 1000;
   const activeNow = new Set(events.filter((e) => e.ts > fiveMinAgo).map((e) => e.ip)).size;
   const BOT_RE = /bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i;
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
-  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, events, byIp: byIpArr, daily, topCountries, topQuestions });
+  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, events, byIp: byIpArr, daily, topCountries, topQuestions });
 }
 
 async function adminToggleAi(env, request) {
@@ -188,6 +194,7 @@ function adminDashboard() {
   <h1>🛡️ Admin — Bát Tự Dụng Thần</h1>
   <div id="status">Đang tải…</div>
   <div id="controls" style="margin:12px 0"></div>
+  <div id="funnel" style="margin:8px 0 16px"></div>
   <h3>Sự kiện gần đây <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option></select> <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})"> <button class="btn" style="padding:5px 12px;font-size:12px" onclick="load()">↻</button></h3>
   <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
   <h3>Theo visitor (IP) <span class="tiny">— mỗi IP: visit count, charts xem, câu hỏi AI</span></h3>
@@ -214,6 +221,17 @@ function adminDashboard() {
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     const c=document.getElementById('controls'); c.textContent='';
+    // [loop 1351] conversion funnel
+    const fn=document.getElementById('funnel'); if (fn && d.funnel) { fn.textContent='';
+      var denom=d.funnel.visitors||1;
+      [['👥 Visit',d.funnel.visitors],['📊 Lập lá số',d.funnel.chartUsers],['💬 Hỏi AI',d.funnel.aiUsers]].forEach(function(it){
+        var row=el('div'); row.style.cssText='display:flex;align-items:center;gap:8px;margin:2px 0;font-size:12px';
+        row.appendChild(el('span','tiny',it[0]));
+        var bar=el('div'); bar.style.cssText='height:16px;border-radius:3px;background:#d4af37;min-width:4px;width:'+Math.round(it[1]/denom*200)+'px'; row.appendChild(bar);
+        row.appendChild(el('span','tiny',it[1]+' ('+Math.round(it[1]/denom*100)+'%)'));
+        fn.appendChild(row);
+      });
+    }
     const btn=el('button', d.aiEnabled?'btn off':'btn', d.aiEnabled?'⏸ Tắt AI toàn cục':'▶ Bật AI'); btn.onclick=()=>toggle(!d.aiEnabled); c.appendChild(btn);
     const exp=el('a','btn','📥 Export CSV'); exp.href='/admin/api/export?token='+encodeURIComponent(TOKEN); exp.style.cssText='margin-left:8px;text-decoration:none;padding:9px 14px;display:inline-block'; c.appendChild(exp);
     const chg=el('button','btn','🔑 Đổi token'); chg.style.marginLeft='8px'; chg.onclick=function(){ var n=prompt('Token mới (≥8 ký tự):'); if(!n||n.length<8){if(n!==null)alert('Cần ≥8 ký tự');return;} fetch('/admin/api/token?token='+encodeURIComponent(TOKEN),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({new:n})}).then(function(r){return r.json()}).then(function(j){ if(j.ok){alert('Đã đổi! Đang chuyển sang token mới…'); location.href='/admin?token='+encodeURIComponent(n);} else alert('Lỗi: '+(j.err||'?')); }); }; c.appendChild(chg);
