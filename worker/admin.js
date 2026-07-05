@@ -58,9 +58,20 @@ export async function handleAdminRoute(request, env, url) {
   }
 
   if (path === '/admin' || path.startsWith('/admin/')) {
+    // POST /admin/setup {token} — one-time self-service (chỉ khi chưa đặt token). Ưu tiên wrangler
+    //   secret env.ADMIN_TOKEN nếu có; KHÔNG thì KV admin:token. Tránh cần wrangler secret put.
+    if (path === '/admin/setup' && method === 'POST') {
+      const existing = env.ADMIN_TOKEN || (env.ADMIN_KV && await env.ADMIN_KV.get('admin:token'));
+      if (existing) return json({ ok: false, err: 'Token đã đặt rồi — dùng /admin?token=<token>' }, 403);
+      const body = await request.json().catch(() => ({}));
+      const t = body && body.token && String(body.token).length >= 8 ? String(body.token) : null;
+      if (!t) return json({ ok: false, err: 'Cần body {token: "..."} độ dài ≥ 8 ký tự' }, 400);
+      if (env.ADMIN_KV) await env.ADMIN_KV.put('admin:token', t);
+      return json({ ok: true, msg: 'Đã đặt. Mở /admin?token=<token>' });
+    }
     const token = url.searchParams.get('token') || request.headers.get('X-Admin-Token') || '';
-    const expected = env.ADMIN_TOKEN || '';
-    if (!expected) return new Response('ADMIN_TOKEN secret chưa đặt. Chạy: wrangler secret put ADMIN_TOKEN', { status: 500, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+    const expected = env.ADMIN_TOKEN || (env.ADMIN_KV && await env.ADMIN_KV.get('admin:token')) || '';
+    if (!expected) return json({ ok: false, err: 'Chưa đặt token admin. POST /admin/setup {token:"<chọn-≥8-ký-tự>"} để tạo (chỉ lần đầu).', needSetup: true }, 401);
     if (token !== expected) return new Response('Unauthorized', { status: 401 });
     if (path === '/admin' || path === '/admin/') return adminDashboard();
     if (path === '/admin/api/stats') return adminStats(env);
