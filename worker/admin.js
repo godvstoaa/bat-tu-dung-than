@@ -128,7 +128,9 @@ async function adminStats(env) {
     const dstr = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
     daily.push({ date: dstr, visit: await get('daily:' + dstr + ':visit'), chart: await get('daily:' + dstr + ':chart'), ai_question: await get('daily:' + dstr + ':ai_question') });
   }
-  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, events, byIp: byIpArr, daily, topCountries, topQuestions });
+  const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+  const activeNow = new Set(events.filter((e) => e.ts > fiveMinAgo).map((e) => e.ip)).size;
+  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, activeNow, events, byIp: byIpArr, daily, topCountries, topQuestions });
 }
 
 async function adminToggleAi(env, request) {
@@ -205,6 +207,7 @@ function adminDashboard() {
     st.appendChild(statBlock(d.totals.chart,'lá số'));
     st.appendChild(statBlock(d.totals.ai_question,'AI hỏi'));
     st.appendChild(statBlock(d.uniqueIps,'IP unique'));
+    st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     const c=document.getElementById('controls'); c.textContent='';
     const btn=el('button', d.aiEnabled?'btn off':'btn', d.aiEnabled?'⏸ Tắt AI toàn cục':'▶ Bật AI'); btn.onclick=()=>toggle(!d.aiEnabled); c.appendChild(btn);
