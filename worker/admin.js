@@ -93,7 +93,21 @@ async function adminStats(env) {
   const get = async (k) => parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
   const totals = { visit: await get('cnt:visit'), chart: await get('cnt:chart'), ai_question: await get('cnt:ai_question'), all: await get('cnt:all') };
   const ips = new Set(events.map((e) => e.ip));
-  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, events });
+  // [loop 1351] byIp — group events theo visitor (đúng nhu cầu «người nào xem gì hỏi gì»)
+  const byIp = {};
+  for (const e of events) {
+    const ip = e.ip || '?';
+    if (!byIp[ip]) byIp[ip] = { ip, country: e.country || '', city: e.city || '', ua: (e.ua || '').slice(0, 80), count: 0, visits: 0, charts: [], questions: [], firstTs: e.ts, lastTs: 0 };
+    const g = byIp[ip];
+    g.count++;
+    if (e.type === 'visit') g.visits++;
+    else if (e.type === 'chart') g.charts.push(e.data || {});
+    else if (e.type === 'ai_question') g.questions.push((e.data && e.data.q) || '');
+    if (e.ts > g.lastTs) g.lastTs = e.ts;
+    if (e.ts < g.firstTs) g.firstTs = e.ts;
+  }
+  const byIpArr = Object.values(byIp).sort((a, b) => b.lastTs - a.lastTs);
+  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, events, byIp: byIpArr });
 }
 
 async function adminToggleAi(env, request) {
@@ -134,6 +148,8 @@ function adminDashboard() {
   <div id="controls" style="margin:12px 0"></div>
   <h3>Sự kiện gần đây <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option></select> <button class="btn" style="padding:5px 12px;font-size:12px" onclick="load()">↻</button></h3>
   <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
+  <h3>Theo visitor (IP) <span class="tiny">— mỗi IP: visit count, charts xem, câu hỏi AI</span></h3>
+  <div id="byip"></div>
   <script>
   const TOKEN = new URLSearchParams(location.search).get('token');
   const H = { 'X-Admin-Token': TOKEN };
@@ -163,6 +179,20 @@ function adminDashboard() {
       tr.appendChild(el('td','tiny', e.data?JSON.stringify(e.data).slice(0,250):''));
       tb.appendChild(tr);
     });
+    // [loop 1351] by-IP view — mỗi visitor (IP) + charts xem + câu hỏi AI
+    const bip=document.getElementById('byip'); if (bip) { bip.textContent='';
+      (d.byIp||[]).forEach(function(v){
+        const card=el('div'); card.style.cssText='background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.18);border-radius:8px;padding:10px 12px;margin:6px 0';
+        const head=el('div'); head.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap';
+        const ipE=el('span','ip', v.ip); ipE.style.cssText='font-size:14px;font-weight:700'; head.appendChild(ipE);
+        head.appendChild(el('span','tiny', (v.country||'?')+(v.city?' / '+v.city:'')+' · '+v.count+' sự kiện ('+v.visits+' visits)'));
+        card.appendChild(head);
+        card.appendChild(el('div','tiny','⏱ '+new Date(v.firstTs).toLocaleString('vi-VN')+' → '+new Date(v.lastTs).toLocaleString('vi-VN')));
+        if (v.charts.length) card.appendChild(el('div','tiny','📊 Lá số xem ('+v.charts.length+'): '+v.charts.map(function(c){return (c.dob||'?')+' '+(c.gender||'');}).join('; ').slice(0,400)));
+        if (v.questions.length) card.appendChild(el('div','tiny','💬 AI hỏi ('+v.questions.length+'): '+v.questions.map(function(q){return '«'+String(q).slice(0,90)+'»';}).join(' ').slice(0,500)));
+        bip.appendChild(card);
+      });
+    }
   }
   async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); }
   load(); setInterval(load, 15000);
