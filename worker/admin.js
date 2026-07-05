@@ -78,7 +78,14 @@ export async function handleAdminRoute(request, env, url) {
     const token = url.searchParams.get('token') || request.headers.get('X-Admin-Token') || '';
     const expected = env.ADMIN_TOKEN || (env.ADMIN_KV && await env.ADMIN_KV.get('admin:token')) || '';
     if (!expected) return json({ ok: false, err: 'Chưa đặt token admin. POST /admin/setup {token:"<chọn-≥8-ký-tự>"} để tạo (chỉ lần đầu).', needSetup: true }, 401);
-    if (token !== expected) return new Response('Unauthorized', { status: 401 });
+    if (token !== expected) {
+      // [loop 1351] rate-limit failed auth (chống brute-force token): 10 fail / 5ph / IP
+      const fk = 'fail:' + clientIP(request);
+      const fc = parseInt((env.ADMIN_KV && await env.ADMIN_KV.get(fk)) || '0', 10);
+      if (fc >= 10) return new Response('Too many failed attempts — thử lại sau 5 phút', { status: 429 });
+      if (env.ADMIN_KV) await env.ADMIN_KV.put(fk, String(fc + 1), { expirationTtl: 300 });
+      return new Response('Unauthorized', { status: 401 });
+    }
     if (path === '/admin' || path === '/admin/') return adminDashboard();
     if (path === '/admin/api/stats') return adminStats(env);
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
