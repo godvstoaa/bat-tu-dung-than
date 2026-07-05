@@ -51,7 +51,41 @@ async function logEvent(env, request, type, data) {
     const cur = parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
     await env.ADMIN_KV.put(k, String(cur + 1));
   }
+  // [loop 1351] Telegram alert cho chart/ai_question/error (fire-and-forget, không block)
+  if (type === 'chart' || type === 'ai_question' || type === 'error') {
+    notifyTelegram(env, { ts, type, ip, ua, country, city, data: data || {} }).catch(function () {});
+  }
   return true;
+}
+
+// [loop 1351] Telegram notification — admin nhận alert ngay khi user lập lá số / hỏi AI
+async function notifyTelegram(env, event) {
+  if (!env.ADMIN_KV) return;
+  const token = await env.ADMIN_KV.get('notify:tg_token');
+  const chatId = await env.ADMIN_KV.get('notify:tg_chat');
+  if (!token || !chatId) return;
+  var msg = '🔔 <b>' + event.type + '</b>\n';
+  msg += '🌍 ' + (event.country || '?') + (event.city ? ' / ' + event.city : '') + '\n';
+  msg += '🌐 ' + event.ip + '\n';
+  if (event.type === 'chart' && event.data) msg += '📊 Lá số: ' + (event.data.dob || '?') + ' ' + (event.data.gender || '') + '\n';
+  if (event.type === 'ai_question' && event.data) msg += '💬 Hỏi: ' + String(event.data.q || '').slice(0, 200) + '\n';
+  if (event.type === 'error' && event.data) msg += '⚠ Lỗi: ' + String(event.data.msg || '').slice(0, 200) + '\n';
+  msg += '⏰ ' + new Date(event.ts).toLocaleString('vi-VN');
+  try {
+    await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'HTML' }),
+    });
+  } catch (e) {}
+}
+
+async function adminNotifyConfig(env, request) {
+  const body = await request.json().catch(() => ({}));
+  if (body.tg_token) await env.ADMIN_KV.put('notify:tg_token', String(body.tg_token));
+  if (body.tg_chat) await env.ADMIN_KV.put('notify:tg_chat', String(body.tg_chat));
+  if (body.disable) { await env.ADMIN_KV.delete('notify:tg_token'); await env.ADMIN_KV.delete('notify:tg_chat'); }
+  const token = await env.ADMIN_KV.get('notify:tg_token');
+  return json({ ok: true, enabled: !!token });
 }
 
 export async function handleAdminRoute(request, env, url) {
@@ -96,6 +130,7 @@ export async function handleAdminRoute(request, env, url) {
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
     if (path === '/admin/api/token' && method === 'POST') return adminChangeToken(env, request);
     if (path === '/admin/api/export' && method === 'GET') return adminExport(env);
+    if (path === '/admin/api/notify' && method === 'POST') return adminNotifyConfig(env, request);
     return new Response('Not found', { status: 404 });
   }
   return null;
