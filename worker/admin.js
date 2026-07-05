@@ -122,6 +122,17 @@ async function adminStats(env) {
   const qmap = {};
   for (const e of events) { if (e.type === 'ai_question' && e.data && e.data.q) { const q = String(e.data.q).slice(0, 80); qmap[q] = (qmap[q] || 0) + 1; } }
   const topQuestions = Object.entries(qmap).map(([q, n]) => ({ q, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
+  // [loop 1351] top referrers — nguồn traffic (FB/Google/direct)
+  const refmap = {};
+  for (const e of events) {
+    if (e.type === 'visit' && e.data) {
+      var ref = e.data.ref || '';
+      try { ref = new URL(ref).hostname.replace(/^www\./, ''); } catch (_) { ref = ref ? ref.slice(0, 50) : '(direct)'; }
+      ref = ref || '(direct)';
+      refmap[ref] = (refmap[ref] || 0) + 1;
+    }
+  }
+  const topReferrers = Object.entries(refmap).map(([r, n]) => ({ referrer: r, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
   // [loop 1351] daily breakdown — 7 ngày gần nhất
   const daily = [];
   for (let i = 6; i >= 0; i--) {
@@ -149,7 +160,7 @@ async function adminStats(env) {
   const BOT_RE = /bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i;
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
-  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions });
+  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers });
 }
 
 async function adminToggleAi(env, request) {
@@ -293,6 +304,9 @@ function adminDashboard() {
       const col2=el('div'); col2.style.cssText='flex:1;min-width:200px'; col2.appendChild(el('h4',null,'🌍 Quốc gia'));
       (d.topCountries||[]).forEach(function(c){ col2.appendChild(el('div','tiny', c.count+'× '+(c.country||'?'))); });
       tq.appendChild(col2);
+      const col3=el('div'); col3.style.cssText='flex:1;min-width:200px'; col3.appendChild(el('h4',null,'🔗 Nguồn traffic'));
+      (d.topReferrers||[]).forEach(function(r){ col3.appendChild(el('div','tiny', r.count+'× '+r.referrer)); });
+      tq.appendChild(col3);
     }
   }
   async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); }
