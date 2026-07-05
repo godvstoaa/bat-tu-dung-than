@@ -92,7 +92,7 @@ export async function handleAdminRoute(request, env, url) {
       return new Response('Unauthorized', { status: 401 });
     }
     if (path === '/admin' || path === '/admin/') return adminDashboard();
-    if (path === '/admin/api/stats') return adminStats(env);
+    if (path === '/admin/api/stats') { try { return await adminStats(env); } catch (e) { return json({ error: e.message }, 500); } }
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
     if (path === '/admin/api/token' && method === 'POST') return adminChangeToken(env, request);
     if (path === '/admin/api/export' && method === 'GET') return adminExport(env);
