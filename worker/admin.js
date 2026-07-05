@@ -133,6 +133,22 @@ async function adminStats(env) {
     }
   }
   const topReferrers = Object.entries(refmap).map(([r, n]) => ({ referrer: r, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
+  // [loop 1351] session tracking — group events per IP (gap >30min = new session)
+  const ipTs = {};
+  for (const e of events) { const ip = e.ip || '?'; if (!ipTs[ip]) ipTs[ip] = []; ipTs[ip].push(e.ts); }
+  let totalSessions = 0; const dur = [];
+  for (const ip of Object.keys(ipTs)) {
+    const arr = ipTs[ip].sort((a, b) => a - b);
+    let start = arr[0], prev = arr[0];
+    for (let i = 1; i < arr.length; i++) {
+      if (arr[i] - prev > 30 * 60 * 1000) { totalSessions++; dur.push(prev - start); start = arr[i]; }
+      prev = arr[i];
+    }
+    totalSessions++; dur.push(prev - start);
+  }
+  const avgSessionMin = dur.length ? Math.round(dur.reduce((a, b) => a + b, 0) / dur.length / 60000) : 0;
+  engagement.sessions = totalSessions;
+  engagement.avgSessionMin = avgSessionMin;
   // [loop 1351] daily breakdown — 7 ngày gần nhất
   const daily = [];
   for (let i = 6; i >= 0; i--) {
@@ -240,7 +256,7 @@ function adminDashboard() {
     if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
     st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
-    if (d.engagement) { st.appendChild(statBlock(d.engagement.bounceRate+'%','bounce', d.engagement.bounceRate>60?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.avgEvents,'events/IP')); if (d.engagement.avgLoadMs) st.appendChild(statBlock(d.engagement.avgLoadMs+'ms','⏱ load', d.engagement.avgLoadMs>3000?'#c0392b':'#7fbf7f')); }
+    if (d.engagement) { st.appendChild(statBlock(d.engagement.bounceRate+'%','bounce', d.engagement.bounceRate>60?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.avgEvents,'events/IP')); if (d.engagement.avgLoadMs) st.appendChild(statBlock(d.engagement.avgLoadMs+'ms','⏱ load', d.engagement.avgLoadMs>3000?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.sessions||0,'sessions')); st.appendChild(statBlock((d.engagement.avgSessionMin||0)+'min','⏱/sess')); }
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     const c=document.getElementById('controls'); c.textContent='';
     // [loop 1351] conversion funnel
