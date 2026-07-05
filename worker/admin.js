@@ -158,12 +158,11 @@ async function adminStats(env) {
     totalSessions++; dur.push(prev - start);
   }
   const avgSessionMin = dur.length ? Math.round(dur.reduce((a, b) => a + b, 0) / dur.length / 60000) : 0;
-  // [loop 1351] daily breakdown — 7 ngày gần nhất
-  const daily = [];
-  for (let i = 6; i >= 0; i--) {
-    const dstr = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-    daily.push({ date: dstr, visit: await get('daily:' + dstr + ':visit'), chart: await get('daily:' + dstr + ':chart'), ai_question: await get('daily:' + dstr + ':ai_question') });
-  }
+  // [loop 1351 perf] daily — tính TỪ events (0 KV gets thêm)
+  const dailyMap = {};
+  for (let i = 6; i >= 0; i--) { const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10); dailyMap[d] = { date: d, visit: 0, chart: 0, ai_question: 0 }; }
+  for (const e of events) { const d = new Date(e.ts).toISOString().slice(0, 10); if (dailyMap[d]) { if (e.type === 'visit') dailyMap[d].visit++; else if (e.type === 'chart') dailyMap[d].chart++; else if (e.type === 'ai_question') dailyMap[d].ai_question++; } }
+  const daily = Object.values(dailyMap);
   // [loop 1351] conversion funnel: visitor → chart → AI question (% engagement)
   const funnel = {
     visitors: byIpArr.length,
