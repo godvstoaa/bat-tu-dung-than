@@ -10,7 +10,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;                       // POST (AI API) luôn đi thẳng
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;          // không đụng cross-origin (font, v.v.)
-  if (url.pathname.startsWith('/zai') || url.pathname.startsWith('/openai') || url.pathname.startsWith('/deepseek') || url.pathname.startsWith('/bigmodel')) return; // proxy API: không cache
+  if (url.pathname.startsWith('/zai') || url.pathname.startsWith('/openai') || url.pathname.startsWith('/deepseek') || url.pathname.startsWith('/bigmodel') || url.pathname.startsWith('/admin') || url.pathname.startsWith('/api/')) return; // proxy API + admin + event log: KHÔNG cache (luôn network)
   // network-first, fallback cache (chỉ khi mất mạng)
   e.respondWith(
     fetch(req).then((res) => {
