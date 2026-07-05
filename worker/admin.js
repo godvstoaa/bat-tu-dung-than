@@ -288,6 +288,14 @@ function adminDashboard() {
   <div id="status">Đang tải…</div>
   <div id="controls" style="margin:12px 0"></div>
   <div id="funnel" style="margin:8px 0 16px"></div>
+  <details style="margin:8px 0"><summary style="cursor:pointer;color:#d4af37;font-size:13px">📱 Telegram Alert — nhận thông báo khi user lập lá số/hỏi AI</summary>
+  <div style="padding:8px;background:rgba(0,0,0,.2);border-radius:8px;margin-top:4px">
+  <input class="filter" id="tg-token" placeholder="Bot Token (123:ABC...)" style="width:100%;margin:3px 0;box-sizing:border-box">
+  <input class="filter" id="tg-chat" placeholder="Chat ID" style="width:60%;box-sizing:border-box">
+  <button class="btn" style="padding:4px 10px;font-size:12px" onclick="tgSave()">Bật Alert</button>
+  <button class="btn" style="padding:4px 10px;font-size:12px" onclick="tgOff()">Tắt</button>
+  <p class="tiny">Tạo bot: @BotFather → /newbot → lấy token. Chat ID: gửi tin cho bot rồi vào /getUpdates.</p>
+  </div></details>
   <h3>Sự kiện gần đây <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option></select> <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})"> <button class="btn" style="padding:5px 12px;font-size:12px" onclick="load()">↻</button></h3>
   <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
   <h3>Theo visitor (IP) <span class="tiny">— mỗi IP: visit count, charts xem, câu hỏi AI</span></h3>
@@ -383,5 +391,7 @@ function adminDashboard() {
   }
   async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); }
   load(); setInterval(load, 15000);
+  async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
+  async function tgOff(){ await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable:true})}); alert('Telegram alert đã tắt'); }
   </script></body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
