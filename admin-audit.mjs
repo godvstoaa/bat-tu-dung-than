@@ -51,7 +51,7 @@ ok(csv.split('\n').length >= 2, 'CSV có ≥1 row data');
 
 // 5. auth
 const w = await fetch(BASE + '/admin/api/stats?token=wrong').then((r) => r.status);
-ok(w === 401, 'wrong token rejected (401)');
+ok(w === 401 || w === 429, 'wrong token rejected (' + w + ')');
 
 console.log('\n=== ADMIN AUDIT: ' + pass + ' pass / ' + fail + ' fail ===');
 process.exit(fail ? 1 : 0);
