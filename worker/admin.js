@@ -83,6 +83,7 @@ export async function handleAdminRoute(request, env, url) {
     if (path === '/admin/api/stats') return adminStats(env);
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
     if (path === '/admin/api/token' && method === 'POST') return adminChangeToken(env, request);
+    if (path === '/admin/api/export' && method === 'GET') return adminExport(env);
     return new Response('Not found', { status: 404 });
   }
   return null;
@@ -137,6 +138,22 @@ async function adminChangeToken(env, request) {
   return json({ ok: true, msg: 'Token đã đổi. Dùng /admin?token=<new>' });
 }
 
+async function adminExport(env) {
+  if (!env.ADMIN_KV) return new Response('no store', { status: 500 });
+  const list = await env.ADMIN_KV.list({ prefix: 'ev:', limit: 1000, reverse: true });
+  const esc = (s) => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
+  const rows = [['timestamp', 'type', 'ip', 'country', 'city', 'ua', 'data'].join(',')];
+  for (const k of list.keys) {
+    const v = await env.ADMIN_KV.get(k.name);
+    if (!v) continue;
+    try {
+      const e = JSON.parse(v);
+      rows.push([new Date(e.ts).toISOString(), e.type, e.ip, e.country || '', e.city || '', e.ua || '', JSON.stringify(e.data || {})].map(esc).join(','));
+    } catch (e2) {}
+  }
+  return new Response(rows.join('\n'), { headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="batu-events.csv"' } });
+}
+
 function adminDashboard() {
   // Dashboard JS dùng DOM createElement + textContent (KHÔNG innerHTML → XSS-safe,
   //   user data — IP/AI-question — được escape tự động bởi textContent).
@@ -158,7 +175,7 @@ function adminDashboard() {
   <h1>🛡️ Admin — Bát Tự Dụng Thần</h1>
   <div id="status">Đang tải…</div>
   <div id="controls" style="margin:12px 0"></div>
-  <h3>Sự kiện gần đây <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option></select> <button class="btn" style="padding:5px 12px;font-size:12px" onclick="load()">↻</button></h3>
+  <h3>Sự kiện gần đây <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option></select> <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})"> <button class="btn" style="padding:5px 12px;font-size:12px" onclick="load()">↻</button></h3>
   <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
   <h3>Theo visitor (IP) <span class="tiny">— mỗi IP: visit count, charts xem, câu hỏi AI</span></h3>
   <div id="byip"></div>
@@ -181,6 +198,7 @@ function adminDashboard() {
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     const c=document.getElementById('controls'); c.textContent='';
     const btn=el('button', d.aiEnabled?'btn off':'btn', d.aiEnabled?'⏸ Tắt AI toàn cục':'▶ Bật AI'); btn.onclick=()=>toggle(!d.aiEnabled); c.appendChild(btn);
+    const exp=el('a','btn','📥 Export CSV'); exp.href='/admin/api/export?token='+encodeURIComponent(TOKEN); exp.style.cssText='margin-left:8px;text-decoration:none;padding:9px 14px;display:inline-block'; c.appendChild(exp);
     const ft=document.getElementById('ftype').value;
     const evs = ft ? d.events.filter(e=>e.type===ft) : d.events;
     const tb=document.getElementById('events'); tb.textContent='';
