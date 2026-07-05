@@ -134,12 +134,19 @@ async function adminStats(env) {
     chartUsers: byIpArr.filter((v) => v.charts.length > 0).length,
     aiUsers: byIpArr.filter((v) => v.questions.length > 0).length,
   };
+  // [loop 1351] engagement: bounce rate (% visitor chỉ 1 event rồi đi) + avg events
+  const bounceCount = byIpArr.filter((v) => v.count <= 1).length;
+  const engagement = {
+    bounceRate: byIpArr.length ? Math.round((bounceCount / byIpArr.length) * 100) : 0,
+    avgEvents: byIpArr.length ? (events.length / byIpArr.length).toFixed(1) : '0',
+    avgCharts: byIpArr.length ? (totals.chart / byIpArr.length).toFixed(1) : '0',
+  };
   const fiveMinAgo = Date.now() - 5 * 60 * 1000;
   const activeNow = new Set(events.filter((e) => e.ts > fiveMinAgo).map((e) => e.ip)).size;
   const BOT_RE = /bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i;
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
-  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, events, byIp: byIpArr, daily, topCountries, topQuestions });
+  return json({ aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions });
 }
 
 async function adminToggleAi(env, request) {
@@ -219,6 +226,7 @@ function adminDashboard() {
     if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
     st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
+    if (d.engagement) { st.appendChild(statBlock(d.engagement.bounceRate+'%','bounce', d.engagement.bounceRate>60?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.avgEvents,'events/IP')); }
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     const c=document.getElementById('controls'); c.textContent='';
     // [loop 1351] conversion funnel
