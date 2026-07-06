@@ -228,6 +228,14 @@ async function adminStats(env, url) {
     else devCount.other++;
   }
   const devices = Object.entries(devCount).filter(([, n]) => n > 0).map(([d, n]) => ({ device: d, count: n })).sort((a, b) => b.count - a.count);
+  // [loop 1351] hourly activity (giờ VN — UTC+7) — biết giờ user active nhất
+  const hourly = new Array(24).fill(0);
+  for (const e of events) {
+    if (e.type === 'visit' && !BOT_RE.test(e.ua || '')) {
+      const h = (new Date(e.ts).getUTCHours() + 7) % 24;
+      hourly[h]++;
+    }
+  }
   // [loop 1351] session tracking — group events per IP (gap >30min = new session)
   const ipTs = {};
   for (const e of events) { const ip = e.ip || '?'; if (!ipTs[ip]) ipTs[ip] = []; ipTs[ip].push(e.ts); }
@@ -271,7 +279,7 @@ async function adminStats(env, url) {
   const BOT_RE = /bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i;
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers, devices };
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers, devices, hourly };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
@@ -350,6 +358,8 @@ function adminDashboard() {
   <div id="byip"></div>
   <h3>Hoạt động 7 ngày</h3>
   <div id="daily"></div>
+  <h3>Giờ hoạt động (VN, UTC+7)</h3>
+  <div id="hourly" style="display:flex;align-items:flex-end;gap:1px;height:40px;margin:4px 0 12px"></div>
   <h3>Top câu hỏi AI & quốc gia</h3>
   <div id="topq" style="display:flex;gap:24px;flex-wrap:wrap"></div>
   <script>
@@ -407,6 +417,8 @@ function adminDashboard() {
       tr.appendChild(el('td','tiny', e.data?JSON.stringify(e.data).slice(0,250):''));
       tb.appendChild(tr);
     });
+    // [loop 1351] hourly activity — 24 bars (giờ VN)
+    var hl=document.getElementById('hourly'); if (hl && d.hourly) { hl.textContent=''; var mx=Math.max.apply(null,d.hourly.concat([1])); d.hourly.forEach(function(n,h){ var bar=el('div'); bar.style.cssText='flex:1;min-width:4px;background:'+(n>0?'#d4af37':'rgba(212,175,55,.1)')+';height:'+Math.max(2,Math.round(n/mx*36))+'px'; bar.title=h+'h: '+n+' visits'; hl.appendChild(bar); }); }
     // [loop 1351] by-IP view — mỗi visitor (IP) + charts xem + câu hỏi AI
     const bip=document.getElementById('byip'); if (bip) { bip.textContent='';
       (d.byIp||[]).forEach(function(v){
