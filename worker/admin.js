@@ -249,6 +249,19 @@ async function adminStats(env, url) {
     }
   }
   const topReferrers = Object.entries(refmap).map(([r, n]) => ({ referrer: r, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
+  // [loop 1351] referrer conversion — traffic source nào convert tốt nhất (visit → chart)
+  const refConv = {};
+  for (const ip in byIp) {
+    const v = byIp[ip];
+    const visitEv = v.timeline && v.timeline.find((t) => t.type === 'visit' && t.data && t.data.ref);
+    let ref = '(direct)';
+    if (visitEv && visitEv.data.ref) { try { ref = new URL(visitEv.data.ref).hostname.replace(/^www\./, ''); } catch (_) { ref = visitEv.data.ref.slice(0, 30); } }
+    if (!refConv[ref]) refConv[ref] = { visits: 0, charts: 0, questions: 0 };
+    refConv[ref].visits++;
+    if (v.charts.length > 0) refConv[ref].charts++;
+    if (v.questions.length > 0) refConv[ref].questions++;
+  }
+  const referrerConversion = Object.entries(refConv).map(([r, d]) => ({ referrer: r, visits: d.visits, charts: d.charts, questions: d.questions, chartRate: d.visits ? Math.round((d.charts / d.visits) * 100) : 0 })).sort((a, b) => b.visits - a.visits);
   // [loop 1351] device breakdown
   const devCount = { iPhone: 0, Android: 0, Windows: 0, Mac: 0, iPad: 0, other: 0 };
   for (const e of events) {
@@ -314,7 +327,7 @@ async function adminStats(env, url) {
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
   const eventsLite = events.map(function (e) { var c = { ts: e.ts, type: e.type, ip: e.ip, country: e.country, city: e.city, data: e.data }; return c; });
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers, devices, hourly, topClicks };
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
@@ -533,9 +546,7 @@ function adminDashboard() {
       (d.topReferrers||[]).forEach(function(r){ col3.appendChild(el('div','tiny', r.count+'× '+r.referrer)); });
       tq.appendChild(col3);
       if (d.topClicks && d.topClicks.length) { var col4=el('div'); col4.style.cssText='flex:1;min-width:180px'; col4.appendChild(el('h4',null,'🖱 Feature clicks')); d.topClicks.forEach(function(c){ col4.appendChild(el('div','tiny', c.count+'× '+c.id)); }); tq.appendChild(col4); }
-      var _endCol=false;
-      (d.topReferrers||[]).forEach(function(r){ col3.appendChild(el('div','tiny', r.count+'× '+r.referrer)); });
-      tq.appendChild(col3);
+      if (d.referrerConversion && d.referrerConversion.length) { d.referrerConversion.forEach(function(r){ col3.appendChild(el('div','tiny', '  → '+r.chartRate+'% chart ('+r.charts+'/'+r.visits+')')); }); }
     }
   }
   async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); }
