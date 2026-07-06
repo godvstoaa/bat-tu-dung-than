@@ -264,6 +264,7 @@ async function adminStats(env, url) {
     avgLoadMs: avgLoadMs,
     sessions: totalSessions,
     avgSessionMin: avgSessionMin,
+    aiSuccessRate: totals.ai_question > 0 ? Math.round((totals.ai_chat / totals.ai_question) * 100) : null,
   };
   const fiveMinAgo = Date.now() - 5 * 60 * 1000;
   const activeNow = new Set(events.filter((e) => e.ts > fiveMinAgo).map((e) => e.ip)).size;
@@ -364,6 +365,7 @@ function adminDashboard() {
     st.appendChild(statBlock(d.totals.chart,'lá số'));
     st.appendChild(statBlock(d.totals.ai_question,'AI hỏi'));
     if (d.totals.ai_chat) st.appendChild(statBlock(d.totals.ai_chat, '💬 chats', '#b478c8'));
+    if (d.engagement && d.engagement.aiSuccessRate !== null) st.appendChild(statBlock(d.engagement.aiSuccessRate+'%', 'AI rate', d.engagement.aiSuccessRate < 50 ? '#c0392b' : '#7fbf7f'));
     if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
     st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
