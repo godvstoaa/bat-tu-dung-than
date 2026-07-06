@@ -6985,3 +6985,10 @@ window.addEventListener('unhandledrejection', function (ev) {
   var r = ev.reason; _logEvent('error', { msg: 'reject: ' + String((r && r.message) || r || '').slice(0, 200) });
 });
 _logEvent('visit', { ref: document.referrer || '', path: location.pathname, loadMs: Math.round(performance.now()) });
+// [admin loop 1351] admin AI config — auto-enable cf-glm nếu admin có key (user không cần tự setup)
+fetch('/api/ai-config').then(function (r) { return r.json(); }).then(function (c) {
+  if (c.hasKey && c.mode !== 'off') {
+    var cfg = getConfig();
+    if (!cfg.enabled) { setConfig(Object.assign({}, (PRESETS['cf-glm'] || {}), { enabled: true })); }
+  }
+}).catch(function () {});
