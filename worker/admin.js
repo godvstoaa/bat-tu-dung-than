@@ -338,6 +338,7 @@ function adminDashboard() {
   <h1>🛡️ Admin — Bát Tự Dụng Thần</h1>
   <div id="status">Đang tải…</div>
   <div id="health" style="margin:6px 0;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,.2);font-size:13px"></div>
+  <div id="alerts"></div>
   <div id="controls" style="margin:12px 0"></div>
   <div id="funnel" style="margin:8px 0 16px"></div>
   <details style="margin:8px 0"><summary style="cursor:pointer;color:#d4af37;font-size:13px">📱 Telegram Alert — nhận thông báo khi user lập lá số/hỏi AI</summary>
@@ -391,6 +392,11 @@ function adminDashboard() {
       if (d.engagement && d.engagement.avgLoadMs) hItems.push([(d.engagement.avgLoadMs<5000)+'', 'Load TB: '+(d.engagement.avgLoadMs/1000).toFixed(1)+'s']);
       if (d.engagement && d.engagement.bounceRate!=null) hItems.push([(d.engagement.bounceRate<60)+'', 'Bounce: '+d.engagement.bounceRate+'%']);
       hItems.forEach(function(it){ var r=el('div','tiny',(it[0]==='true'?'✅':'⚠️')+' '+it[1]); r.style.padding='2px 0'; hb.appendChild(r); });
+    }
+    // [loop 1351] action alerts — guide admin fix issues
+    var al=document.getElementById('alerts'); if (al) { al.textContent='';
+      if (d.engagement && d.engagement.aiSuccessRate !== null && d.engagement.aiSuccessRate < 50 && d.totals.ai_question > 2) { var wa=el('div'); wa.style.cssText='padding:8px 12px;background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.3);border-radius:8px;margin:6px 0;font-size:13px'; wa.appendChild(el('span',null,'⚠️ AI FAIL ('+d.engagement.aiSuccessRate+'%) — '+d.totals.ai_question+' câu hỏi không có trả lời. Mở «🤖 AI Config» thêm API key.')); al.appendChild(wa); }
+      if (d.engagement && d.engagement.avgLoadMs > 5000) { var wl=el('div'); wl.style.cssText='padding:8px 12px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.2);border-radius:8px;margin:6px 0;font-size:13px'; wl.appendChild(el('span',null,'⚠️ Load chậm ('+(d.engagement.avgLoadMs/1000).toFixed(1)+'s TB) — cân nhắc tối ưu bundle.')); al.appendChild(wl); }
     }
     if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
     st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
