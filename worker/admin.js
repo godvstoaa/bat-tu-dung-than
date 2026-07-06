@@ -698,6 +698,14 @@ function adminDashboard() {
     var fu=document.getElementById('free-usage'); if (fu && d.freeUsage) { fu.textContent='';
       var u=d.freeUsage;
       var summary=el('div','tiny', 'Tổng: '+u.calls+' calls · ✅ '+u.ok+' OK · ❌ '+u.err+' lỗi · Hôm nay: '+u.today+' · Mode: '+(u.enabled?'BẬT':'TẮT')); summary.style.marginBottom='6px'; fu.appendChild(summary);
+      // [loop 1359] 7-day free calls sparkline (từ trend.dayagg free_calls) — xem growth quota
+      if (d.trend) {
+        var last7=d.trend.slice(-7);
+        var fmax=Math.max.apply(null,last7.map(function(x){return x.free_calls;}).concat([1]));
+        var sb=el('div'); sb.style.cssText='display:flex;align-items:flex-end;gap:2px;height:36px;margin:4px 0 8px';
+        last7.forEach(function(x){ var b=el('div'); b.style.cssText='flex:1;min-width:18px;background:'+(x.free_calls>0?'#64b4ff':'rgba(100,180,255,.12)')+';height:'+Math.max(2,Math.round(x.free_calls/fmax*32))+'px;border-radius:2px'; b.title=x.date+': '+x.free_calls+' free calls'+(x.free_err?' ('+x.free_err+' lỗi)':''); sb.appendChild(b); });
+        fu.appendChild(sb);
+      }
       if (u.topIps && u.topIps.length) {
         var tip=el('div','tiny','🌐 Top IP dùng free:'); tip.style.marginTop='4px'; fu.appendChild(tip);
         u.topIps.forEach(function(t){ var r=el('div','tiny', t.count+'× '+t.ip); r.style.paddingLeft='10px'; fu.appendChild(r); });
