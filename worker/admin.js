@@ -96,7 +96,7 @@ export async function handleAdminRoute(request, env, url) {
   if (path === '/api/event' && method === 'POST') {
     try {
       const body = await request.json();
-      const type = ['visit', 'chart', 'ai_question', 'error'].includes(body && body.type) ? body.type : 'other';
+      const type = ['visit', 'chart', 'ai_question', 'ai_chat', 'error'].includes(body && body.type) ? body.type : 'other';
       const ok = await logEvent(env, request, type, body && body.data);
       return json(ok ? { ok: true } : { ok: false, err: 'rate_limited (max 30/phút/IP)' }, ok ? 200 : 429);
     } catch (e) { return json({ ok: false, err: e.message }, 400); }
@@ -144,7 +144,7 @@ async function adminStats(env, url) {
   let events = [];
   try { events = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
   const get = async (k) => parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
-  const totals = { visit: await get('cnt:visit'), chart: await get('cnt:chart'), ai_question: await get('cnt:ai_question'), error: await get('cnt:error'), all: await get('cnt:all') };
+  const totals = { visit: await get('cnt:visit'), chart: await get('cnt:chart'), ai_question: await get('cnt:ai_question'), ai_chat: await get('cnt:ai_chat'), error: await get('cnt:error'), all: await get('cnt:all') };
   const ips = new Set(events.map((e) => e.ip));
   // [loop 1351] byIp — group events theo visitor (đúng nhu cầu «người nào xem gì hỏi gì»)
   const byIp = {};
