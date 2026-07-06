@@ -40,6 +40,35 @@ export async function isAiEnabled(env) {
   return v === null || v === '1' || v === 'true';
 }
 
+// [loop 1357] Free glm-5.2 model toggle — riêng biệt với kill-switch AI toàn cục.
+//   «ai cũng dùng được» = free CF glm-5.2 (CF_AI_KEY public). Admin có thể tắt khi hết quota.
+export async function isFreeAiEnabled(env) {
+  if (!env.ADMIN_KV) return true;
+  const v = await env.ADMIN_KV.get('ai:free_enabled');
+  return v === null || v === '1' || v === 'true';
+}
+
+// [loop 1357] Track usage free model — đếm calls (ok/err) + per-IP + per-day + recent log.
+//   Cloudflare Workers AI free tier = 10k Neurons/ngày → call count là metric quota thực tế.
+export async function logFreeUsage(env, ip, status) {
+  if (!env.ADMIN_KV) return;
+  const ok = status >= 200 && status < 300;
+  const ts = Date.now();
+  for (const k of ['cnt:free_calls', ok ? 'cnt:free_ok' : 'cnt:free_err']) {
+    const cur = parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
+    await env.ADMIN_KV.put(k, String(cur + 1));
+  }
+  const day = new Date(ts).toISOString().slice(0, 10);
+  let agg = {}; try { agg = JSON.parse((await env.ADMIN_KV.get('dayagg:' + day)) || '{}'); } catch (e) {}
+  agg.free_calls = (agg.free_calls || 0) + 1;
+  if (!ok) agg.free_err = (agg.free_err || 0) + 1;
+  await env.ADMIN_KV.put('dayagg:' + day, JSON.stringify(agg), { expirationTtl: TTL_EVENT });
+  let log = []; try { log = JSON.parse((await env.ADMIN_KV.get('free:log')) || '[]'); } catch (e) {}
+  log.unshift({ ts, ip, status });
+  if (log.length > 200) log.length = 200;
+  await env.ADMIN_KV.put('free:log', JSON.stringify(log));
+}
+
 async function logEvent(env, request, type, data) {
   if (!env.ADMIN_KV) return true;
   const ip = clientIP(request);
@@ -161,7 +190,7 @@ export async function handleAdminRoute(request, env, url) {
   if (path === '/api/ai-config' && method === 'GET') {
     let config = {};
     try { const raw = env.ADMIN_KV ? await env.ADMIN_KV.get('ai:config') : null; config = raw ? JSON.parse(raw) : {}; } catch (e) {}
-    return json({ mode: config.mode || 'free', endpoint: config.endpoint || '', hasKey: !!config.apiKey || !!env.CF_AI_KEY, model: config.model || '' });
+    return json({ mode: config.mode || 'free', endpoint: config.endpoint || '', hasKey: !!config.apiKey || !!env.CF_AI_KEY, model: config.model || '', freeEnabled: await isFreeAiEnabled(env) });
   }
 
   if (path === '/admin' || path.startsWith('/admin/')) {
@@ -190,6 +219,7 @@ export async function handleAdminRoute(request, env, url) {
     if (path === '/admin' || path === '/admin/') return adminDashboard();
     if (path === '/admin/api/stats') { try { return await adminStats(env, url); } catch (e) { return json({ error: e.message }, 500); } }
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
+    if (path === '/admin/api/ai-free' && method === 'POST') return adminToggleFreeAi(env, request);
     if (path === '/admin/api/token' && method === 'POST') return adminChangeToken(env, request);
     if (path === '/admin/api/export' && method === 'GET') return adminExport(env);
     if (path === '/admin/api/events' && method === 'GET') {
@@ -207,7 +237,8 @@ export async function handleAdminRoute(request, env, url) {
       if (env.ADMIN_KV) {
         await env.ADMIN_KV.delete('events:log');
         await env.ADMIN_KV.delete('cache:stats');
-        for (const k of ['cnt:visit','cnt:chart','cnt:ai_question','cnt:ai_chat','cnt:error','cnt:all']) await env.ADMIN_KV.delete(k);
+        await env.ADMIN_KV.delete('free:log');
+        for (const k of ['cnt:visit','cnt:chart','cnt:ai_question','cnt:ai_chat','cnt:error','cnt:all','cnt:free_calls','cnt:free_ok','cnt:free_err']) await env.ADMIN_KV.delete(k);
         // [loop 1352] cleanup dayagg + legacy daily:type keys (list + batch delete)
         for (const prefix of ['dayagg:', 'daily:']) {
           let cursor = undefined;
@@ -349,7 +380,7 @@ async function adminStats(env, url) {
   const trendRaw = await Promise.all(trend30.map((d) => env.ADMIN_KV.get('dayagg:' + d)));
   const trend = trend30.map(function (d, i) {
     var a = {}; try { a = trendRaw[i] ? JSON.parse(trendRaw[i]) : {}; } catch (e) {}
-    return { date: d, visit: a.visit || 0, chart: a.chart || 0, ai_question: a.ai_question || 0, ai_chat: a.ai_chat || 0, error: a.error || 0, all: a.all || 0 };
+    return { date: d, visit: a.visit || 0, chart: a.chart || 0, ai_question: a.ai_question || 0, ai_chat: a.ai_chat || 0, error: a.error || 0, all: a.all || 0, free_calls: a.free_calls || 0, free_err: a.free_err || 0 };
   });
   // [loop 1352] AI latency — durationMs aggregation (admin thấy AI chậm hay nhanh).
   //   156589ms (2.6 phút) là outlier nghiêm trọng — trước đây invisible.
@@ -362,6 +393,20 @@ async function adminStats(env, url) {
     maxMs: dSorted[dSorted.length - 1],
     bailCount: events.filter((e) => e.type === 'ai_chat' && e.data && e.data.bailed).length,
   } : null;
+  // [loop 1357] free glm-5.2 usage stats (calls ok/err + today + top IP + recent)
+  let freeLog = []; try { freeLog = JSON.parse((await env.ADMIN_KV.get('free:log')) || '[]'); } catch (e) {}
+  const freeByIp = {};
+  for (const fe of freeLog) { if (fe.ip) freeByIp[fe.ip] = (freeByIp[fe.ip] || 0) + 1; }
+  const freeTopIps = Object.entries(freeByIp).map(([ip, n]) => ({ ip, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
+  const _todayStr = new Date().toISOString().slice(0, 10);
+  const freeUsage = {
+    enabled: await isFreeAiEnabled(env),
+    calls: await get('cnt:free_calls'),
+    ok: await get('cnt:free_ok'),
+    err: await get('cnt:free_err'),
+    today: (trend.find((t) => t.date === _todayStr) || {}).free_calls || 0,
+    topIps: freeTopIps,
+  };
   // [loop 1351] conversion funnel: visitor → chart → AI question (% engagement)
   const funnel = {
     visitors: byIpArr.length,
@@ -388,7 +433,7 @@ async function adminStats(env, url) {
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
   const eventsLite = events.map(function (e) { var c = { ts: e.ts, type: e.type, ip: e.ip, country: e.country, city: e.city, data: e.data }; return c; });
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, freeUsage, freeRecent: freeLog.slice(0, 30), topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
@@ -399,6 +444,15 @@ async function adminToggleAi(env, request) {
   await env.ADMIN_KV.put('ai:enabled', enabled);
   await auditLog(env, request, 'ai_toggle', { enabled: enabled === '1' });
   return json({ ok: true, aiEnabled: enabled === '1' });
+}
+
+// [loop 1357] toggle free glm-5.2 model (riêng với kill-switch AI toàn cục)
+async function adminToggleFreeAi(env, request) {
+  const body = await request.json().catch(() => ({}));
+  const enabled = body && body.enabled ? '1' : '0';
+  await env.ADMIN_KV.put('ai:free_enabled', enabled);
+  await auditLog(env, request, 'free_ai_toggle', { enabled: enabled === '1' });
+  return json({ ok: true, freeEnabled: enabled === '1' });
 }
 
 async function adminChangeToken(env, request) {
@@ -488,6 +542,8 @@ function adminDashboard() {
   <div id="topq" style="display:flex;gap:24px;flex-wrap:wrap"></div>
   <h3>🔒 Audit log — admin actions <span class="tiny">— truy vết toggle/block/clear/config (ai, khi nào, IP nào)</span> <button class="btn" style="padding:3px 10px;font-size:11px" onclick="loadAudit()">↻</button></h3>
   <div id="audit"></div>
+  <h3>🆓 Free glm-5.2 usage <span class="tiny">— Cloudflare Workers AI (model ai cũng dùng được, CF_AI_KEY public) · 10k Neurons/ngày free</span></h3>
+  <div id="free-usage"></div>
   <script>
   const TOKEN = new URLSearchParams(location.search).get('token');
   const H = { 'X-Admin-Token': TOKEN };
@@ -532,6 +588,7 @@ function adminDashboard() {
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
     if (d.engagement) { st.appendChild(statBlock(d.engagement.bounceRate+'%','bounce', d.engagement.bounceRate>60?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.avgEvents,'events/IP')); if (d.engagement.avgLoadMs) st.appendChild(statBlock(d.engagement.avgLoadMs+'ms','⏱ load', d.engagement.avgLoadMs>3000?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.sessions||0,'sessions')); st.appendChild(statBlock((d.engagement.avgSessionMin||0)+'min','⏱/sess')); }
     if (d.aiLatency) { st.appendChild(statBlock(fmtMs(d.aiLatency.avgMs), 'AI ⏱ avg', d.aiLatency.avgMs>30000?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(fmtMs(d.aiLatency.p95Ms), 'AI ⏱ p95', d.aiLatency.p95Ms>60000?'#c0392b':'#d4af37')); st.appendChild(statBlock(fmtMs(d.aiLatency.maxMs), 'AI ⏱ max', '#9a8a6a')); if (d.aiLatency.bailCount>0) st.appendChild(statBlock(d.aiLatency.bailCount, '⏱ bị cắt 60s', '#e0533d')); }
+    if (d.freeUsage) { st.appendChild(statBlock(d.freeUsage.calls, '🆓 free glm-5.2', '#64b4ff')); if (d.freeUsage.today) st.appendChild(statBlock(d.freeUsage.today, '🆓 free hôm nay', '#64b4ff')); if (d.freeUsage.err) st.appendChild(statBlock(d.freeUsage.err, '🆓 free lỗi', d.freeUsage.err>0?'#e0533d':'#9a8a6a')); st.appendChild(statBlock(d.freeUsage.enabled?'BẬT':'TẮT', '🆓 free mode', d.freeUsage.enabled?'#7fbf7f':'#c0392b')); }
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     const c=document.getElementById('controls'); c.textContent='';
     // [loop 1351] conversion funnel
@@ -546,6 +603,7 @@ function adminDashboard() {
       });
     }
     const btn=el('button', d.aiEnabled?'btn off':'btn', d.aiEnabled?'⏸ Tắt AI toàn cục':'▶ Bật AI'); btn.onclick=()=>toggle(!d.aiEnabled); c.appendChild(btn);
+    if (d.freeUsage) { const fb=el('button', d.freeUsage.enabled?'btn off':'btn', d.freeUsage.enabled?'🆫 Tắt free glm-5.2':'🆫 Bật free glm-5.2'); fb.style.marginLeft='8px'; fb.onclick=()=>toggleFree(!d.freeUsage.enabled); c.appendChild(fb); }
     const exp=el('a','btn','📥 Export CSV'); exp.href='/admin/api/export?token='+encodeURIComponent(TOKEN); exp.style.cssText='margin-left:8px;text-decoration:none;padding:9px 14px;display:inline-block'; c.appendChild(exp);
     const chg=el('button','btn','🔑 Đổi token'); chg.style.marginLeft='8px'; chg.onclick=function(){ var n=prompt('Token mới (≥8 ký tự):'); if(!n||n.length<8){if(n!==null)alert('Cần ≥8 ký tự');return;} fetch('/admin/api/token?token='+encodeURIComponent(TOKEN),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({new:n})}).then(function(r){return r.json()}).then(function(j){ if(j.ok){alert('Đã đổi! Đang chuyển sang token mới…'); location.href='/admin?token='+encodeURIComponent(n);} else alert('Lỗi: '+(j.err||'?')); }); }; c.appendChild(chg);
     const ft=document.getElementById('ftype').value;
@@ -636,6 +694,22 @@ function adminDashboard() {
       });
       tr.appendChild(bars);
     }
+    // [loop 1357] free glm-5.2 usage — summary + top IP + recent calls
+    var fu=document.getElementById('free-usage'); if (fu && d.freeUsage) { fu.textContent='';
+      var u=d.freeUsage;
+      var summary=el('div','tiny', 'Tổng: '+u.calls+' calls · ✅ '+u.ok+' OK · ❌ '+u.err+' lỗi · Hôm nay: '+u.today+' · Mode: '+(u.enabled?'BẬT':'TẮT')); summary.style.marginBottom='6px'; fu.appendChild(summary);
+      if (u.topIps && u.topIps.length) {
+        var tip=el('div','tiny','🌐 Top IP dùng free:'); tip.style.marginTop='4px'; fu.appendChild(tip);
+        u.topIps.forEach(function(t){ var r=el('div','tiny', t.count+'× '+t.ip); r.style.paddingLeft='10px'; fu.appendChild(r); });
+      }
+      if (d.freeRecent && d.freeRecent.length) {
+        var rl=el('details'); rl.style.marginTop='4px';
+        var rs=el('summary','tiny','Lịch sử calls gần đây ('+Math.min(d.freeRecent.length,20)+')'); rs.style.cursor='pointer'; rs.style.color='#d4af37'; rl.appendChild(rs);
+        d.freeRecent.slice(0,20).forEach(function(c){ var row=el('div','tiny', new Date(c.ts).toLocaleString('vi-VN')+' · '+c.ip+' · HTTP '+c.status+(c.status>=200&&c.status<300?' ✅':' ❌')); row.style.padding='1px 0 1px 8px'; row.style.borderLeft='1px solid rgba(100,180,255,.15)'; rl.appendChild(row); });
+        fu.appendChild(rl);
+      }
+      if (!u.calls) fu.appendChild(el('div','tiny','(chưa có call nào — user chưa dùng AI free, hoặc admin đang dùng custom key)'));
+    }
     // [loop 1351] top questions + countries
     const tq=document.getElementById('topq'); if (tq) { tq.textContent='';
       const col1=el('div'); col1.style.cssText='flex:1;min-width:240px'; col1.appendChild(el('h4',null,'💬 Câu hỏi AI hay gặp'));
@@ -653,6 +727,7 @@ function adminDashboard() {
     }
   }
   async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
+  async function toggleFree(en){ await fetch('/admin/api/ai-free?token='+TOKEN, { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
   var _lastCount = 0; var _soundOn = false;
   load(); setInterval(load, 3000);
   async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }

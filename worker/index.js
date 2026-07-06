@@ -1,6 +1,6 @@
 // Cloudflare Worker — serve static app + proxy LLM + admin + anti-scraping + anti-abuse.
 import { makeProxy } from '../functions/_proxy.js';
-import { handleAdminRoute, isAiEnabled } from './admin.js';
+import { handleAdminRoute, isAiEnabled, isFreeAiEnabled, logFreeUsage } from './admin.js';
 
 const PROXIES = [
   ['/cf-ai', 'https://api.cloudflare.com'],
@@ -81,10 +81,19 @@ export default {
         if (prefix === '/cf-ai') {
           let adminKey = null;
           try { const c = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); adminKey = c.apiKey || null; } catch (e) {}
+          // [loop 1357] free model = KHÔNG có admin custom key → dùng CF_AI_KEY public (glm-5.2)
+          const isFree = !adminKey;
+          if (isFree && !(await isFreeAiEnabled(env))) {
+            return new Response(JSON.stringify({ error: { message: 'Model free glm-5.2 đang bị TẮT bởi quản trị viên.', type: 'free_ai_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' } });
+          }
           const headers = new Headers(request.headers);
           const key = adminKey || env.CF_AI_KEY;
           if (!headers.get('Authorization') && key) headers.set('Authorization', `Bearer ${key}`);
           request = new Request(request, { headers });
+          const out = await makeProxy(host)({ request, params, env });
+          // [loop 1357] track usage free model (calls ok/err + IP + day) — fire-and-forget
+          if (isFree && env.ADMIN_KV) logFreeUsage(env, ip, out.status).catch(function () {});
+          return out;
         }
         return makeProxy(host)({ request, params, env });
       }

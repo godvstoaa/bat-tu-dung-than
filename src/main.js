@@ -6994,9 +6994,11 @@ document.addEventListener('click', function (e) {
 }, true);
 _logEvent('visit', { ref: document.referrer || '', path: location.pathname, loadMs: Math.round(performance.now()) });
 // [admin loop 1351] admin AI config — auto-enable cf-glm nếu admin có key (user không cần tự setup)
+// [loop 1357] mode=free → chỉ auto-enable nếu free model đang BẬT (admin có thể tắt free glm-5.2)
 fetch('/api/ai-config').then(function (r) { return r.json(); }).then(function (c) {
   if (c.hasKey && c.mode !== 'off') {
+    var allow = c.mode === 'custom' || c.freeEnabled !== false; // free off → không auto cf-glm
     var cfg = getConfig();
-    if (!cfg.enabled) { setConfig(Object.assign({}, (PRESETS['cf-glm'] || {}), { enabled: true })); }
+    if (allow && !cfg.enabled) { setConfig(Object.assign({}, (PRESETS['cf-glm'] || {}), { enabled: true })); }
   }
 }).catch(function () {});

@@ -81,6 +81,19 @@ await fetch(BASE + '/admin/api/ai?token=' + TOKEN, { method: 'POST', headers: { 
 const back = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then((r) => r.status);
 ok(back !== 503, 'AI on → proxy không còn 503 (got ' + back + ')');
 
+// [loop 1357] free glm-5.2 model — toggle off → /cf-ai 503 → toggle on; + usage tracking
+await fetch(BASE + '/admin/api/ai-free?token=' + TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: false }) });
+const freeBlocked = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then((r) => r.status);
+ok(freeBlocked === 503, 'free glm-5.2 off → /cf-ai trả 503 (got ' + freeBlocked + ')');
+await fetch(BASE + '/admin/api/ai-free?token=' + TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: true }) });
+const freeBack = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then((r) => r.status);
+ok(freeBack !== 503, 'free glm-5.2 on → /cf-ai không còn 503 (got ' + freeBack + ')');
+// free usage có trong stats + /api/ai-config trả freeEnabled
+ok(st.freeUsage && typeof st.freeUsage.calls === 'number' && typeof st.freeUsage.enabled === 'boolean', 'stats.freeUsage shape {calls,enabled}');
+ok(Array.isArray(st.freeRecent), 'stats.freeRecent (recent calls log)');
+const aiPub2 = await fetch(BASE + '/api/ai-config').then((r) => r.json());
+ok(typeof aiPub2.freeEnabled === 'boolean', 'public /api/ai-config trả freeEnabled boolean');
+
 // [loop 1355] admin audit log — verify toggle được ghi với IP (accountability)
 const aud = await fetch(BASE + '/admin/api/audit?token=' + TOKEN).then((r) => r.json());
 ok(Array.isArray(aud.audit), 'GET /admin/api/audit returns array');
