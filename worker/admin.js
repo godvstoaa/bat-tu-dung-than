@@ -87,10 +87,11 @@ export async function isFreeAiEnabled(env) {
 
 // [loop 1357] Track usage free model — đếm calls (ok/err) + per-IP + per-day + recent log.
 //   Cloudflare Workers AI free tier = 10k Neurons/ngày → call count là metric quota thực tế.
-export async function logFreeUsage(env, ip, status) {
+export async function logFreeUsage(env, ip, status, backend) {
   if (!env.ADMIN_KV) return;
   const ok = status >= 200 && status < 300;
   const ts = Date.now();
+  const be = backend || 'cf-glm';
   for (const k of ['cnt:free_calls', ok ? 'cnt:free_ok' : 'cnt:free_err']) {
     const cur = parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
     await env.ADMIN_KV.put(k, String(cur + 1));
@@ -101,7 +102,7 @@ export async function logFreeUsage(env, ip, status) {
   if (!ok) agg.free_err = (agg.free_err || 0) + 1;
   await env.ADMIN_KV.put('dayagg:' + day, JSON.stringify(agg), { expirationTtl: TTL_EVENT });
   let log = []; try { log = JSON.parse((await env.ADMIN_KV.get('free:log')) || '[]'); } catch (e) {}
-  log.unshift({ ts, ip, status });
+  log.unshift({ ts, ip, status, backend: be });
   if (log.length > 200) log.length = 200;
   await env.ADMIN_KV.put('free:log', JSON.stringify(log));
 }
@@ -211,7 +212,26 @@ async function adminAiConfigGet(env) {
   let config = {};
   try { config = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); } catch (e) {}
   const masked = Object.assign({}, config, { apiKey: config.apiKey ? '***' + config.apiKey.slice(-4) : '' });
+  // [loop 1376] freePool — mask key mỗi backend (admin-only, không public)
+  if (Array.isArray(masked.freePool)) masked.freePool = masked.freePool.map(function (p) { return Object.assign({}, p, { apiKey: p.apiKey ? '***' + String(p.apiKey).slice(-4) : '' }); });
   return json({ config: masked });
+}
+
+// [loop 1376] free pool — admin quản lý nhiều free backend (NVIDIA/Groq/...). Server-side key,
+//   user không cần key («ai cũng dùng được»). freeRoute (index.js) thử pool + cf-glm fallback.
+async function adminFreePoolSet(env, request) {
+  const body = await request.json().catch(() => ({}));
+  let old = {}; try { old = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); } catch (e) {}
+  const oldPool = Array.isArray(old.freePool) ? old.freePool : [];
+  const newPool = Array.isArray(body.pool) ? body.pool : [];
+  const mergedPool = newPool.filter(function (p) { return p && p.endpoint && p.model; }).map(function (p, i) {
+    const oldEntry = oldPool[i] || oldPool.find(function (o) { return o.endpoint === p.endpoint; });
+    return { name: String(p.name || '').slice(0, 40), endpoint: String(p.endpoint).slice(0, 200), model: String(p.model).slice(0, 80), apiKey: p.apiKey ? String(p.apiKey) : (oldEntry ? oldEntry.apiKey : '') };
+  }).filter(function (p) { return p.apiKey; });
+  old.freePool = mergedPool;
+  await env.ADMIN_KV.put('ai:config', JSON.stringify(old));
+  await auditLog(env, request, 'free_pool', { count: mergedPool.length, names: mergedPool.map(function (p) { return p.name; }) });
+  return json({ ok: true, pool: mergedPool.map(function (p) { return Object.assign({}, p, { apiKey: p.apiKey ? '***' + String(p.apiKey).slice(-4) : '' }); }) });
 }
 
 export async function handleAdminRoute(request, env, url) {
@@ -303,6 +323,7 @@ export async function handleAdminRoute(request, env, url) {
     }
     if (path === '/admin/api/notify' && method === 'POST') return adminNotifyConfig(env, request);
     if (path === '/admin/api/ai-config' && method === 'POST') return adminAiConfigSet(env, request);
+    if (path === '/admin/api/free-pool' && method === 'POST') return adminFreePoolSet(env, request);
     if (path === '/admin/api/ai-config' && method === 'GET') { try { return await adminAiConfigGet(env); } catch (e) { return json({ error: e.message }, 500); } }
     if (path === '/admin/api/clear' && method === 'POST') {
       if (env.ADMIN_KV) {
@@ -757,6 +778,20 @@ function adminDashboard() {
           <button class="btn sm" onclick="aiSave()">💾 Lưu Config</button>
           <p class="tiny" id="ai-status">Đang tải...</p>
         </div></details>
+        <details><summary>🌐 Free model pool — gộp free provider (NVIDIA/Groq...), ai cũng dùng được</summary>
+        <div class="details-body">
+          <p class="tiny">Admin dán key FREE (NVIDIA/Groq/...) → app thử pool + cf-glm theo thứ tự, fallback khi 1 provider fail. User <b>KHÔNG cần key</b> — dùng chung. Lấy key NVIDIA: <b>build.nvidia.com/settings/api-keys</b> (free 5000 credit).</p>
+          <div id="free-pool-list"></div>
+          <div class="toolbar" style="margin-top:8px">
+            <input class="filter" id="fp-name" placeholder="Tên (NVIDIA)" style="width:90px">
+            <input class="filter" id="fp-endpoint" placeholder="endpoint (/nvidia/v1)" style="width:150px">
+            <input class="filter" id="fp-model" placeholder="model (z-ai/glm-5.2)" style="width:140px">
+            <input class="filter" id="fp-key" placeholder="API key free" style="width:130px">
+            <button class="btn sm" onclick="fpAdd()">+ Thêm</button>
+          </div>
+          <button class="btn sm" onclick="fpSave()" style="margin-top:6px">💾 Lưu pool</button>
+          <span id="fp-status" class="tiny"></span>
+        </div></details>
       </section>
       <!-- ===== HỆ THỐNG ===== -->
       <section class="tab" id="tab-system">
@@ -1020,7 +1055,13 @@ function adminDashboard() {
   async function aiLoad(){ var r=await fetch('/admin/api/ai-config?token='+TOKEN).then(function(r){return r.json()}); var c=r.config||{}; document.getElementById('ai-mode').value=c.mode||'free'; document.getElementById('ai-endpoint').value=c.endpoint||'https://api.z.ai/api/coding/paas/v4'; document.getElementById('ai-apikey').value=''; document.getElementById('ai-apikey').placeholder=c.apiKey?'Đã đặt ('+c.apiKey+')':'API Key (dán từ z.ai/model-api)'; document.getElementById('ai-model').value=c.model||'glm-5.2'; document.getElementById('ai-status').textContent='Mode: '+(c.mode||'free')+(c.apiKey?' | Key: '+c.apiKey:' | No key'); aiModeChange(); }
   function aiModeChange(){ var m=document.getElementById('ai-mode').value; var dis=m==='off'; ['ai-endpoint','ai-apikey','ai-model'].forEach(function(id){document.getElementById(id).disabled=dis;}); }
   async function aiSave(){ var body={mode:document.getElementById('ai-mode').value}; if(document.getElementById('ai-endpoint').value)body.endpoint=document.getElementById('ai-endpoint').value; if(document.getElementById('ai-apikey').value)body.apiKey=document.getElementById('ai-apikey').value; if(document.getElementById('ai-model').value)body.model=document.getElementById('ai-model').value; var r=await fetch('/admin/api/ai-config?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}); alert(r.ok?'✅ AI config đã lưu!':'❌ Lỗi'); aiLoad(); load(); }
-  aiLoad();
+  // [loop 1376] free model pool — load + render + add + save
+  var _freePool = [];
+  async function fpLoad(){ var r=await fetch('/admin/api/ai-config?token='+TOKEN).then(function(r){return r.json()}).catch(function(){return {config:{}}}); var c=r.config||{}; _freePool=Array.isArray(c.freePool)?c.freePool:[]; fpRender(); }
+  function fpRender(){ var lst=document.getElementById('free-pool-list'); if(!lst)return; lst.textContent=''; if(!_freePool.length){lst.appendChild(el('div','tiny','(chưa có backend free nào — thêm NVIDIA/Groq bên dưới. cf-glm luôn là fallback cuối.)'));return;} _freePool.forEach(function(p,i){ var row=el('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(212,175,55,.08);flex-wrap:wrap'; var info=el('span','tiny',(p.name||'?')+' · '+p.endpoint+' · '+p.model+(p.apiKey?' · '+p.apiKey:'')); row.appendChild(info); var rm=el('button','btn off'); rm.textContent='✕'; rm.style.cssText='padding:2px 7px;font-size:10px'; rm.onclick=(function(idx){return function(){_freePool.splice(idx,1);fpRender();};})(i); row.appendChild(rm); lst.appendChild(row); }); }
+  function fpAdd(){ var name=document.getElementById('fp-name').value.trim(), endpoint=document.getElementById('fp-endpoint').value.trim(), model=document.getElementById('fp-model').value.trim(), key=document.getElementById('fp-key').value.trim(); if(!endpoint||!model||!key){alert('Cần endpoint + model + key');return;} _freePool.push({name:name||'backend-'+(_freePool.length+1),endpoint:endpoint,model:model,apiKey:key}); document.getElementById('fp-name').value='';document.getElementById('fp-endpoint').value='';document.getElementById('fp-model').value='';document.getElementById('fp-key').value=''; fpRender(); }
+  async function fpSave(){ var st=document.getElementById('fp-status'); if(st){st.textContent='⏳ đang lưu...';st.style.color='#d4af37';} var r=await fetch('/admin/api/free-pool?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({pool:_freePool})}).then(function(r){return r.json()}).catch(function(e){return {ok:false,err:e.message};}); if(r.ok&&st){_freePool=r.pool||_freePool;fpRender();st.textContent='✅ Đã lưu '+(_freePool.length)+' backend. App tự dùng pool + cf-glm.';st.style.color='#7fbf7f';} else if(st){st.textContent='❌ '+(r.err||'lỗi');st.style.color='#e0533d';} }
+  aiLoad(); fpLoad();
   async function clearData(){ var r=await fetch('/admin/api/clear?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json()}); alert(r.ok?'✅ Data cleared':'❌ '+r.err); load(); loadAudit(); }
   async function blockList(){ var r=await fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({list:true})}).then(function(r){return r.json()}); alert('Blocked IPs: '+((r.blocked||[]).join(', ')||'(không có)')); }
   function blockIp(ip,block){ fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip,block:block})}).then(function(){load();loadAudit();}); }

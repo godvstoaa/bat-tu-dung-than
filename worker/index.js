@@ -34,6 +34,41 @@ function withSecurityHeaders(res) {
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
 }
 
+// [loop 1376] FREE model pool — multi-backend gateway. Admin thêm free provider keys (NVIDIA,
+//   Groq...) vào ai:config.freePool → app thử pool + cf-glm theo thứ tự, fallback khi 1 provider
+//   fail (401/429/500/timeout). Ai cũng dùng được (key server-side, user không cần key).
+const CF_FREE_BASE = 'https://api.cloudflare.com/client/v4/accounts/bc101a2962ca21a084172c5334ad7dad/ai/v1';
+async function freeRoute(request, env, ip, aiCfg) {
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'authorization, content-type' } });
+  let bodyObj = {};
+  try { bodyObj = await request.json(); } catch (e) { try { bodyObj = JSON.parse(await request.text()); } catch (_) {} }
+  const pool = Array.isArray(aiCfg && aiCfg.freePool) ? aiCfg.freePool.filter(function (p) { return p && p.apiKey && p.endpoint && p.model; }) : [];
+  const backends = [].concat(
+    pool.map(function (p) { return { name: p.name || 'pool', endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey) }; }),
+    [{ name: 'cf-glm', endpoint: CF_FREE_BASE, model: '@cf/zai-org/glm-5.2', apiKey: env.CF_AI_KEY || '' }]
+  );
+  for (let i = 0; i < backends.length; i++) {
+    const b = backends[i];
+    if (!b.apiKey) continue;
+    var ac = new AbortController();
+    var timer = setTimeout(function () { ac.abort(); }, 12000); // 12s cho status/TTFT
+    try {
+      bodyObj.model = b.model;
+      const res = await fetch(b.endpoint + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + b.apiKey }, body: JSON.stringify(bodyObj), signal: ac.signal });
+      clearTimeout(timer);
+      if (res.status === 200 && res.body) {
+        if (env.ADMIN_KV) logFreeUsage(env, ip, 200, b.name).catch(function () {});
+        return new Response(res.body, { status: 200, headers: { 'Content-Type': res.headers.get('Content-Type') || 'text/event-stream', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store', 'X-Free-Backend': b.name } });
+      }
+      if (env.ADMIN_KV) logFreeUsage(env, ip, res.status, b.name).catch(function () {});
+    } catch (e) {
+      clearTimeout(timer);
+      if (env.ADMIN_KV) logFreeUsage(env, ip, 0, b.name).catch(function () {});
+    }
+  }
+  return new Response(JSON.stringify({ error: { message: 'Tất cả free backend đều thất bại — thử lại, hoặc admin thêm key ở «AI Config».', type: 'free_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' } });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -80,22 +115,18 @@ export default {
         const sub = url.pathname.slice(prefix.length);
         const params = { path: sub.split('/').filter(Boolean) };
         if (prefix === '/cf-ai') {
-          let adminKey = null;
-          try { const c = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); adminKey = c.apiKey || null; } catch (e) {}
-          // [loop 1357] free model = KHÔNG có admin custom key → dùng CF_AI_KEY public (glm-5.2)
-          const isFree = !adminKey;
-          if (isFree && !(await isFreeAiEnabled(env))) {
-            return new Response(JSON.stringify({ error: { message: 'Model free glm-5.2 đang bị TẮT bởi quản trị viên.', type: 'free_ai_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' } });
+          // [loop 1376] FREE pool: KHÔNG có admin custom key → freeRoute (NVIDIA/Groq/... + cf-glm fallback)
+          let adminKey = null, aiCfg = {};
+          try { aiCfg = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); adminKey = aiCfg.apiKey || null; } catch (e) {}
+          if (!adminKey) {
+            if (!(await isFreeAiEnabled(env))) return new Response(JSON.stringify({ error: { message: 'Model free đang bị TẮT.', type: 'free_ai_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' } });
+            return await freeRoute(request, env, ip, aiCfg);
           }
+          // admin custom key (single backend, như cũ)
           const headers = new Headers(request.headers);
-          const key = adminKey || env.CF_AI_KEY;
-          if (!headers.get('Authorization') && key) headers.set('Authorization', `Bearer ${key}`);
+          if (!headers.get('Authorization') && adminKey) headers.set('Authorization', `Bearer ${adminKey}`);
           request = new Request(request, { headers });
-          const out = await makeProxy(host)({ request, params, env });
-          // [loop 1357] track usage free model (calls ok/err + IP + day).
-          //   Dùng ctx.waitUntil — KHÔNG fire-and-forget (Worker kill isolate sau return → KV write bị cắt).
-          if (isFree && env.ADMIN_KV && ctx && ctx.waitUntil) ctx.waitUntil(logFreeUsage(env, ip, out.status));
-          return out;
+          return makeProxy(host)({ request, params, env });
         }
         return makeProxy(host)({ request, params, env });
       }
