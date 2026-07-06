@@ -542,22 +542,30 @@ function adminDashboard() {
   .pagehead h2{font-size:20px;color:var(--gold);font-weight:700;letter-spacing:.2px}
   .pagehead .tiny{font-size:12px;color:var(--muted)}
   /* === CARDS === */
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px;transition:border-color .15s}
+  .card:hover{border-color:var(--border2)}
+  .empty{color:var(--muted);font-size:12px;padding:8px 0;text-align:center;font-style:italic}
   .card h3{margin:0 0 12px;color:var(--gold);font-size:13px;text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:8px}
   .card .card-actions{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:11px;text-transform:none;letter-spacing:0}
   .row-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
   .row-3col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
   /* === KPI grid (.stat → auto card) === */
   .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px;margin-bottom:14px}
-  .stat{display:flex;flex-direction:column;justify-content:center;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);min-width:0}
-  .stat b{display:block;font-size:26px;color:var(--gold);line-height:1.1;font-weight:700;margin-bottom:5px}
-  .stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;line-height:1.3}
-  .stat:hover{border-color:var(--border2)}
+  .stat{display:flex;flex-direction:column;justify-content:center;padding:15px 16px;background:linear-gradient(180deg,var(--surface),#13111c);border:1px solid var(--border);border-radius:var(--r);min-width:0;transition:border-color .15s,transform .15s}
+  .stat b{display:block;font-size:28px;color:var(--gold);line-height:1;font-weight:800;margin-bottom:6px;letter-spacing:-.5px}
+  .stat span{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;line-height:1.3}
+  .stat:hover{border-color:var(--border2);transform:translateY(-1px)}
+  /* scrollbar polish */
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:rgba(212,175,55,.25);border-radius:5px;border:2px solid var(--bg)}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(212,175,55,.4)}
   /* === TABLE / IP / tiny === */
   table{width:100%;border-collapse:collapse;font-size:12.5px}
-  th,td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
-  th{color:var(--gold);font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
-  tr:hover td{background:rgba(212,175,55,.04)}
+  th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+  th{color:var(--gold);font-size:10px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;background:rgba(212,175,55,.04);position:sticky;top:0}
+  tbody tr:nth-child(even) td{background:rgba(212,175,55,.025)}
+  tr:hover td{background:rgba(212,175,55,.07)!important}
   .ip{font-family:ui-monospace,"SF Mono",monospace;color:var(--green);font-size:12px}
   .tiny{color:var(--muted);font-size:11px}
   /* === BUTTONS / INPUTS === */
