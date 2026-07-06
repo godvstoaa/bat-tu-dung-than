@@ -6985,6 +6985,13 @@ window.addEventListener('error', function (ev) {
 window.addEventListener('unhandledrejection', function (ev) {
   var r = ev.reason; _logEvent('error', { msg: 'reject: ' + String((r && r.message) || r || '').slice(0, 200) });
 });
+// [admin loop 1351] feature usage tracking — track button clicks
+document.addEventListener('click', function (e) {
+  var el = e.target.closest('button[id], a[id]');
+  if (el && el.id && !/ai-fab|ai-popup|ask-btn|voice-btn|cfg-|ai-chat-|suggest-/.test(el.id)) {
+    _logEvent('click', { id: el.id, txt: (el.textContent || '').trim().slice(0, 40) });
+  }
+}, true);
 _logEvent('visit', { ref: document.referrer || '', path: location.pathname, loadMs: Math.round(performance.now()) });
 // [admin loop 1351] admin AI config — auto-enable cf-glm nếu admin có key (user không cần tự setup)
 fetch('/api/ai-config').then(function (r) { return r.json(); }).then(function (c) {

@@ -128,7 +128,7 @@ export async function handleAdminRoute(request, env, url) {
   if (path === '/api/event' && method === 'POST') {
     try {
       const body = await request.json();
-      const type = ['visit', 'chart', 'ai_question', 'ai_chat', 'error'].includes(body && body.type) ? body.type : 'other';
+      const type = ['visit', 'chart', 'ai_question', 'ai_chat', 'error', 'click'].includes(body && body.type) ? body.type : 'other';
       const ok = await logEvent(env, request, type, body && body.data);
       return json(ok ? { ok: true } : { ok: false, err: 'rate_limited (max 30/phút/IP)' }, ok ? 200 : 429);
     } catch (e) { return json({ ok: false, err: e.message }, 400); }
