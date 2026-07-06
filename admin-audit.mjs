@@ -53,27 +53,22 @@ ok(todayTrend && todayTrend.all > 0, 'dayagg hôm nay có ghi (all=' + (todayTre
 // [loop 1352] AI latency aggregation (avg/p95/max durationMs) + [1354] bailCount
 ok(st.aiLatency === null || (st.aiLatency && typeof st.aiLatency.avgMs === 'number' && typeof st.aiLatency.p95Ms === 'number' && typeof st.aiLatency.maxMs === 'number' && typeof st.aiLatency.bailCount === 'number'), 'stats.aiLatency shape {avgMs,p95Ms,maxMs,bailCount}');
 // [loop 1352] full chat response retained (không bị truncate ở storage) + durationMs trong byIp
-let chatSeen = false, durInByIp = false;
+// [loop 1361] check ai_chat telemetry qua RAW /admin/api/events (vì stats giờ LỌC test events)
+let chatSeen = false, durOk = false, roundsOk = false, fullRespOk = false;
 for (let i = 0; i < 5 && !chatSeen; i++) {
-  const st2 = await fetch(BASE + '/admin/api/stats?token=' + TOKEN + '&nocache=1').then((r) => r.json());
-  for (const v of (st2.byIp || [])) {
-    for (const c of (v.chats || [])) {
-      if (c.q && c.q.indexOf(rid) >= 0) {
-        chatSeen = true;
-        if (String(c.response || '').indexOf(rid) >= 0 && String(c.response).length > 1000) {
-          // full response giữ nguyên (audit test response ~900 chars + rid tail)
-        }
-        if (c.durationMs === 4242) durInByIp = true;
-      }
-    }
+  const ev = await fetch(BASE + '/admin/api/events?token=' + TOKEN + '&limit=200').then((r) => r.json()).catch(() => ({ events: [] }));
+  const chat = (ev.events || []).find((e) => e.type === 'ai_chat' && e.data && e.data.q && String(e.data.q).indexOf(rid) >= 0);
+  if (chat) {
+    chatSeen = true;
+    if (chat.data.durationMs === 4242) durOk = true;
+    if (chat.data.rounds === 3) roundsOk = true;
+    if (String(chat.data.response || '').indexOf(rid) >= 0 && String(chat.data.response).length > 1000) fullRespOk = true;
   }
   if (!chatSeen) await new Promise((r) => setTimeout(r, 2000));
 }
-ok(chatSeen, 'ai_chat full response retained + xuất hiện trong byIp (retry KV)');
-ok(durInByIp, 'byIp chat object có durationMs field (=4242)');
-let roundsInByIp = false;
-for (const v of (st.byIp || [])) for (const c of (v.chats || [])) { if (c.q && c.q.indexOf(rid) >= 0 && c.rounds === 3) roundsInByIp = true; }
-ok(roundsInByIp, 'byIp chat object có rounds field (=3) — [loop 1354 telemetry]');
+ok(chatSeen && fullRespOk, 'ai_chat full response retained (raw events, >1000 chars, retry KV)');
+ok(durOk, 'ai_chat event có durationMs field (=4242)');
+ok(roundsOk, 'ai_chat event có rounds field (=3) — [loop 1354 telemetry]');
 
 // 3. AI toggle off → proxy 503 → on
 await fetch(BASE + '/admin/api/ai?token=' + TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: false }) });
