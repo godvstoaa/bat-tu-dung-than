@@ -3879,7 +3879,7 @@ async function handleAsk() {
     body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? 'Trợ lý AI' : 'Trợ lý (cục bộ)';
-    _logEvent('ai_chat', { q: q, response: text, source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed, detail: meta && meta.detail, toolsOn0: meta && meta.toolsOn0, error: meta && meta.error }); // [loop 1379] response ĐẦY ĐỦ (không slice)
+    if (source !== 'ai') _logEvent('ai_chat', { q: q, response: text, source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed, detail: meta && meta.detail, toolsOn0: meta && meta.toolsOn0, error: meta && meta.error }); // [loop 1381] AI responses logged SERVER-SIDE by Worker tee (full, bypass truncation); chỉ log local fallback
     // [loop 947] message actions (refactored → addMsgActions helper, dùng cả cho restore)
     addMsgActions(body, text);
     // [loop 928] gợi ý câu hỏi kế tiếp theo ngữ cảnh (cảm giác ông thầy tư vấn)
