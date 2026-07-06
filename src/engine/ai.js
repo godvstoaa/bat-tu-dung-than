@@ -1631,7 +1631,14 @@ function _reasonStageLabel(reasonLen) {
 // ---- 1 vòng streaming SSE: gom content (→ onToken) + tool_calls + bỏ qua reasoning_content ----
 // Theo docs Z.ai (interleaved thinking + stream tool call).
 async function streamRound(url, headers, body, onToken, onStatus, signal) {
-  const _sig = signal ? AbortSignal.any([signal, AbortSignal.timeout(12000)]) : AbortSignal.timeout(12000);
+  // [loop 1370] TTFT(25s) + idle(30s) timeout — flat 12s cũ cắt prompt nặng + answer dài giữa dòng.
+  //   25s chờ token ĐẦU (brief BaZi nặng cần thời gian xử lý). Chunk đầu → idle 30s/giữa chunk
+  //   → answer dài stream hết, stall thì abort → fallback. Fix «signal timed out» câu thật.
+  const _ac = new AbortController();
+  var _timer = setTimeout(function () { _ac.abort(); }, 25000);
+  function _resetIdle() { clearTimeout(_timer); _timer = setTimeout(function () { _ac.abort(); }, 30000); }
+  const _sig = signal ? AbortSignal.any([signal, _ac.signal]) : _ac.signal;
+  try {
   const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal: _sig });
   if (res.status === 503) { // [admin loop 1351] AI bị admin tắt → fallback local NGAY (không retry)
     const err = new Error('AI bị tắt bởi quản trị viên (503)');
@@ -1652,6 +1659,7 @@ async function streamRound(url, headers, body, onToken, onStatus, signal) {
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
+    _resetIdle(); // chunk tới → reset (TTFT 25s lần đầu → idle 30s sau)
     buf += decoder.decode(value, { stream: true });
     const lines = buf.split('\n'); buf = lines.pop();
     for (const line of lines) {
@@ -1690,4 +1698,5 @@ async function streamRound(url, headers, body, onToken, onStatus, signal) {
     }
   }
   return { content: full.trim(), toolCalls };
+  } finally { clearTimeout(_timer); }
 }
