@@ -93,6 +93,9 @@ ok(st.freeUsage && typeof st.freeUsage.calls === 'number' && typeof st.freeUsage
 ok(Array.isArray(st.freeRecent), 'stats.freeRecent (recent calls log)');
 const aiPub2 = await fetch(BASE + '/api/ai-config').then((r) => r.json());
 ok(typeof aiPub2.freeEnabled === 'boolean', 'public /api/ai-config trả freeEnabled boolean');
+// [loop 1360] free model test endpoint — Worker gọi free glm-5.2 thật, báo status/timing
+const ft = await fetch(BASE + '/admin/api/free-test?token=' + TOKEN, { method: 'POST', headers: { 'X-Admin-Token': TOKEN } }).then((r) => r.json()).catch((e) => ({ ok: false, err: e.message }));
+ok(ft && typeof ft.durationMs === 'number' && typeof ft.ok === 'boolean', 'POST /admin/api/free-test trả {ok,durationMs} — ' + (ft.ok ? '✅ sống ' + ft.durationMs + 'ms' : '❌ ' + (ft.err || 'HTTP ' + ft.status) + ' ' + (ft.durationMs || '?') + 'ms'));
 
 // [loop 1355] admin audit log — verify toggle được ghi với IP (accountability)
 const aud = await fetch(BASE + '/admin/api/audit?token=' + TOKEN).then((r) => r.json());

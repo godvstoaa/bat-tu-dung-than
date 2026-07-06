@@ -220,6 +220,7 @@ export async function handleAdminRoute(request, env, url) {
     if (path === '/admin/api/stats') { try { return await adminStats(env, url); } catch (e) { return json({ error: e.message }, 500); } }
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
     if (path === '/admin/api/ai-free' && method === 'POST') return adminToggleFreeAi(env, request);
+    if (path === '/admin/api/free-test' && method === 'POST') { try { return await adminFreeTest(env, request); } catch (e) { return json({ ok: false, err: e.message }, 500); } }
     if (path === '/admin/api/token' && method === 'POST') return adminChangeToken(env, request);
     if (path === '/admin/api/export' && method === 'GET') return adminExport(env);
     if (path === '/admin/api/events' && method === 'GET') {
@@ -455,6 +456,31 @@ async function adminToggleFreeAi(env, request) {
   return json({ ok: true, freeEnabled: enabled === '1' });
 }
 
+// [loop 1360] Test free glm-5.2 — Worker gọi thật free model (server-side, non-stream, max_tokens 20)
+//   → báo status + timing + preview. Admin thấy model còn sống / tốc độ / lỗi gì. Rẻ (1 call nhỏ).
+async function adminFreeTest(env, request) {
+  const t0 = Date.now();
+  const key = env.CF_AI_KEY;
+  if (!key) return json({ ok: false, err: 'CF_AI_KEY chưa set (không test được free model)' });
+  const account = 'bc101a2962ca21a084172c5334ad7dad';
+  const url = 'https://api.cloudflare.com/client/v4/accounts/' + account + '/ai/v1/chat/completions';
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
+      body: JSON.stringify({ model: '@cf/zai-org/glm-5.2', messages: [{ role: 'user', content: 'Trả lời đúng 1 chữ «OK».' }], stream: false, max_tokens: 20 }),
+    });
+    const durationMs = Date.now() - t0;
+    const text = await res.text();
+    let preview = '', tokens = null;
+    try { const j = JSON.parse(text); preview = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || ''; tokens = (j.usage && j.usage.total_tokens) || null; } catch (e) { preview = text.slice(0, 120); }
+    await auditLog(env, request, 'free_test', { status: res.status, durationMs });
+    return json({ ok: res.ok, status: res.status, durationMs, preview: preview.slice(0, 120), tokens });
+  } catch (e) {
+    return json({ ok: false, err: e.message, durationMs: Date.now() - t0 });
+  }
+}
+
 async function adminChangeToken(env, request) {
   const body = await request.json().catch(() => ({}));
   const t = body && body.new && String(body.new).length >= 8 ? String(body.new) : null;
@@ -542,7 +568,7 @@ function adminDashboard() {
   <div id="topq" style="display:flex;gap:24px;flex-wrap:wrap"></div>
   <h3>🔒 Audit log — admin actions <span class="tiny">— truy vết toggle/block/clear/config (ai, khi nào, IP nào)</span> <button class="btn" style="padding:3px 10px;font-size:11px" onclick="loadAudit()">↻</button></h3>
   <div id="audit"></div>
-  <h3>🆓 Free glm-5.2 usage <span class="tiny">— Cloudflare Workers AI (model ai cũng dùng được, CF_AI_KEY public) · 10k Neurons/ngày free</span></h3>
+  <h3>🆓 Free glm-5.2 usage <span class="tiny">— Cloudflare Workers AI (model ai cũng dùng được, CF_AI_KEY public) · 10k Neurons/ngày free</span> <button class="btn" style="padding:3px 10px;font-size:11px" onclick="freeTest()">🧪 Test model</button> <span id="free-test-result" class="tiny"></span></h3>
   <div id="free-usage"></div>
   <script>
   const TOKEN = new URLSearchParams(location.search).get('token');
@@ -736,6 +762,12 @@ function adminDashboard() {
   }
   async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
   async function toggleFree(en){ await fetch('/admin/api/ai-free?token='+TOKEN, { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
+  // [loop 1360] test free glm-5.2 trực tiếp — admin thấy model sống/chết + tốc độ
+  async function freeTest(){
+    var rEl=document.getElementById('free-test-result'); if(rEl){rEl.textContent='⏳ đang test...';rEl.style.color='#d4af37';}
+    var r=await fetch('/admin/api/free-test?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json();}).catch(function(e){return {ok:false,err:e.message};});
+    if(rEl){ rEl.textContent = r.ok ? ('✅ HTTP '+r.status+' · '+r.durationMs+'ms'+(r.tokens?' · '+r.tokens+' tokens':'')+(r.preview?' · «'+String(r.preview).slice(0,40)+'»':'')) : ('❌ '+(r.err||('HTTP '+r.status))+' · '+(r.durationMs||'?')+'ms'); rEl.style.color=r.ok?'#7fbf7f':'#e0533d'; }
+  }
   var _lastCount = 0; var _soundOn = false;
   load(); setInterval(load, 3000);
   async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
