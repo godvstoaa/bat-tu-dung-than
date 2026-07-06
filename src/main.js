@@ -3845,6 +3845,7 @@ async function handleAsk() {
       gender: m.gender, hourUnknown: m.hourUnknown,
     }));
     currentResult._family = _famData.length ? _famData : undefined;
+    const _aiStart = Date.now();
     const { source, text } = await askAI(q, currentResult, cfg, {
       history: chatHistory,
       signal: _aiAbort.signal,   // [loop 948] cho phép cancel
@@ -3854,7 +3855,7 @@ async function handleAsk() {
     body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? 'Trợ lý AI' : 'Trợ lý (cục bộ)';
-    _logEvent('ai_chat', { q: q, response: text.slice(0, 1200), source: source }); // [admin loop 1351] full chat history (Q+A)
+    _logEvent('ai_chat', { q: q, response: text.slice(0, 1200), source: source, durationMs: Date.now() - _aiStart }); // [admin loop 1351] full chat history (Q+A + duration)
     // [loop 947] message actions (refactored → addMsgActions helper, dùng cả cho restore)
     addMsgActions(body, text);
     // [loop 928] gợi ý câu hỏi kế tiếp theo ngữ cảnh (cảm giác ông thầy tư vấn)
