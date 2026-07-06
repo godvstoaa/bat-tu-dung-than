@@ -1590,7 +1590,8 @@ function _reasonStageLabel(reasonLen) {
 // ---- 1 vòng streaming SSE: gom content (→ onToken) + tool_calls + bỏ qua reasoning_content ----
 // Theo docs Z.ai (interleaved thinking + stream tool call).
 async function streamRound(url, headers, body, onToken, onStatus, signal) {
-  const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal });
+  const _sig = signal ? AbortSignal.any([signal, AbortSignal.timeout(20000)]) : AbortSignal.timeout(20000);
+  const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal: _sig });
   if (res.status === 503) { // [admin loop 1351] AI bị admin tắt → fallback local NGAY (không retry)
     const err = new Error('AI bị tắt bởi quản trị viên (503)');
     err.aiDisabled = true;
