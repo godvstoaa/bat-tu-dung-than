@@ -3847,6 +3847,7 @@ async function handleAsk() {
     currentResult._family = _famData.length ? _famData : undefined;
     const _aiStart = Date.now();
     const { source, text, meta } = await askAI(q, currentResult, cfg, {
+      style: getAIStyle(),
       history: chatHistory,
       signal: _aiAbort.signal,   // [loop 948] cho phép cancel
       onStatus: (s) => { lastStatus = s; body.textContent = s + ' …'; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
@@ -5429,6 +5430,21 @@ if ($('jk-btn')) {
 $('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run(); });
 $('ask-btn').addEventListener('click', handleAsk);
 $('question').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAsk(); });
+// [loop 1372] AI style selector — Gần gũi / Cân bằng / Chuyên gia (per-user, localStorage)
+function getAIStyle() {
+  try { return localStorage.getItem('bazi-ai-style') || 'gan-guoi'; } catch (e) { return 'gan-guoi'; }
+}
+(function initAIStyle() {
+  const bar = document.getElementById('ai-style'); if (!bar) return;
+  const saved = getAIStyle();
+  bar.querySelectorAll('.seg-btn').forEach((b) => b.classList.toggle('active', b.dataset.style === saved));
+  bar.addEventListener('click', (e) => {
+    const btn = e.target.closest('.seg-btn'); if (!btn) return;
+    bar.querySelectorAll('.seg-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    try { localStorage.setItem('bazi-ai-style', btn.dataset.style); } catch (e) {}
+  });
+})();
 // [loop 931] VOICE INPUT — Web Speech API, không cần backend. Ẩn nút nếu trình duyệt không hỗ trợ.
 (function initVoice() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
