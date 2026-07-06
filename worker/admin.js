@@ -85,6 +85,23 @@ export async function isFreeAiEnabled(env) {
   return v === null || v === '1' || v === 'true';
 }
 
+// [loop 1378 MOAT] Feedback flywheel — user rate 👍/👎 câu trả lời → dataset chart↔outcome
+//   độc quyền (không model nào có). Cộng dồn theo thời gian → refine engine/KB.
+export async function logFeedback(env, ip, body) {
+  if (!env.ADMIN_KV) return true;
+  const rating = body && body.rating === 'good' ? 'good' : 'bad';
+  const ts = Date.now();
+  for (const k of ['cnt:feedback', 'cnt:feedback_' + rating]) {
+    const cur = parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
+    await env.ADMIN_KV.put(k, String(cur + 1));
+  }
+  let log = []; try { log = JSON.parse((await env.ADMIN_KV.get('feedback:log')) || '[]'); } catch (e) {}
+  log.unshift({ ts, rating, ip, q: String((body && body.q) || '').slice(0, 150), chartHash: String((body && body.chartHash) || '').slice(0, 32), source: (body && body.source) || '', aspect: (body && body.aspect) || '' });
+  if (log.length > 500) log.length = 500;
+  await env.ADMIN_KV.put('feedback:log', JSON.stringify(log));
+  return true;
+}
+
 // [loop 1357] Track usage free model — đếm calls (ok/err) + per-IP + per-day + recent log.
 //   Cloudflare Workers AI free tier = 10k Neurons/ngày → call count là metric quota thực tế.
 export async function logFreeUsage(env, ip, status, backend) {
@@ -246,6 +263,11 @@ export async function handleAdminRoute(request, env, url) {
       const ok = await logEvent(env, request, type, body && body.data);
       return json(ok ? { ok: true } : { ok: false, err: 'rate_limited (max 30/phút/IP)' }, ok ? 200 : 429);
     } catch (e) { return json({ ok: false, err: e.message }, 400); }
+  }
+  // [loop 1378 MOAT] /api/feedback — public, log 👍/👎 (data flywheel)
+  if (path === '/api/feedback' && method === 'POST') {
+    try { const body = await request.json(); await logFeedback(env, clientIP(request), body); return json({ ok: true }); }
+    catch (e) { return json({ ok: false }, 400); }
   }
 
   // [loop 1351] GET /api/ai-config (public) — frontend biết AI config admin đặt
@@ -573,7 +595,12 @@ async function adminStats(env, url) {
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
   const eventsLite = events.map(function (e) { var c = { ts: e.ts, type: e.type, ip: e.ip, country: e.country, city: e.city, data: e.data }; return c; });
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, freeUsage, freeRecent: freeLog.slice(0, 30), destiny, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
+  // [loop 1378 MOAT] feedback flywheel — data độc quyền chart↔outcome
+  const fbTotal = await get('cnt:feedback');
+  const fbGood = await get('cnt:feedback_good');
+  const feedback = { total: fbTotal, good: fbGood, bad: await get('cnt:feedback_bad'), rate: fbTotal ? Math.round((fbGood / fbTotal) * 100) : null };
+  let feedbackLog = []; try { feedbackLog = JSON.parse((await env.ADMIN_KV.get('feedback:log')) || '[]'); } catch (e) {}
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, freeUsage, freeRecent: freeLog.slice(0, 30), feedback, feedbackRecent: feedbackLog.slice(0, 30), destiny, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }

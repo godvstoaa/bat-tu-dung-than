@@ -3778,6 +3778,29 @@ function addMsgActions(body, text) {
       else _fallbackCopy(_clean, _done);
     });
     _act.appendChild(_cp);
+    // [loop 1378 MOAT] 👍/👎 feedback flywheel — user rate → dataset chart↔outcome độc quyền
+    const _fbGood = document.createElement('button');
+    _fbGood.type = 'button'; _fbGood.className = 'msg-action-btn'; _fbGood.textContent = '👍';
+    _fbGood.title = 'Câu trả lời này tốt';
+    const _fbBad = document.createElement('button');
+    _fbBad.type = 'button'; _fbBad.className = 'msg-action-btn'; _fbBad.textContent = '👎';
+    _fbBad.title = 'Câu trả lời này chưa tốt — giúp thầy cải thiện';
+    let _fbSent = false;
+    const _sendFb = (rating) => {
+      if (_fbSent) return; _fbSent = true;
+      _fbGood.disabled = _fbBad.disabled = true;
+      _fbGood.style.opacity = _fbBad.style.opacity = '0.4';
+      _fbGood.textContent = rating === 'good' ? '✓' : '👍';
+      _fbBad.textContent = rating === 'bad' ? '✓' : '👎';
+      try {
+        const _ch = currentResult ? ((currentResult.chart && currentResult.chart.input ? currentResult.chart.input.year + '-' + currentResult.chart.input.month + '-' + currentResult.chart.input.day + '-' + currentResult.chart.input.hour + '-' + currentResult.chart.input.gender : '') || '') : '';
+        fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rating, q: (text || '').slice(0, 200), chartHash: _ch, source: 'ai' }) }).catch(() => {});
+      } catch (_) {}
+    };
+    _fbGood.addEventListener('click', () => _sendFb('good'));
+    _fbBad.addEventListener('click', () => _sendFb('bad'));
+    _act.appendChild(_fbGood);
+    _act.appendChild(_fbBad);
     body.parentElement.appendChild(_act);
   } catch (_) {}
 }

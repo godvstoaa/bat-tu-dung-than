@@ -103,7 +103,7 @@ export default {
     }
 
     // 1) Admin + logging routes
-    if (url.pathname === '/api/event' || url.pathname === '/api/ai-config' || url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+    if (url.pathname === '/api/event' || url.pathname === '/api/feedback' || url.pathname === '/api/ai-config' || url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
       return handleAdminRoute(request, env, url);
     }
 
