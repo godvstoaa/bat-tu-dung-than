@@ -269,6 +269,18 @@ export async function handleAdminRoute(request, env, url) {
     try { const body = await request.json(); await logFeedback(env, clientIP(request), body); return json({ ok: true }); }
     catch (e) { return json({ ok: false }, 400); }
   }
+  // [loop 1380] /api/inbox — user poll tin nhắn admin inject (can thiệp chat real-time)
+  if (path === '/api/inbox' && method === 'GET') {
+    const sid = url.searchParams.get('sid');
+    if (!sid || !env.ADMIN_KV) return json({ message: null });
+    const key = 'inbox:' + String(sid).slice(0, 64);
+    const raw = await env.ADMIN_KV.get(key);
+    if (raw) {
+      await env.ADMIN_KV.delete(key); // one-shot delivery
+      try { return json({ message: JSON.parse(raw) }); } catch (e) { return json({ message: null }); }
+    }
+    return json({ message: null });
+  }
 
   // [loop 1351] GET /api/ai-config (public) — frontend biết AI config admin đặt
   if (path === '/api/ai-config' && method === 'GET') {
@@ -341,11 +353,22 @@ export async function handleAdminRoute(request, env, url) {
       const visits = ipEvents.filter(function (e) { return e.type === 'visit'; }).length;
       const clicks = ipEvents.filter(function (e) { return e.type === 'click'; }).map(function (e) { return { id: (e.data && e.data.id) || '', ts: e.ts }; });
       const refEv = ipEvents.find(function (e) { return e.type === 'visit' && e.data && e.data.ref; });
-      return json({ ok: true, ip: ip, country: last.country || '', city: last.city || '', ua: last.ua || '', device: parseUA(last.ua), firstTs: ipEvents[0].ts, lastTs: last.ts, count: ipEvents.length, visits: visits, referrer: (refEv && refEv.data && refEv.data.ref) || '', charts: charts, questions: questions, chats: chats, clicks: clicks, timeline: ipEvents.map(function (e) { return { ts: e.ts, type: e.type, data: e.data || {} }; }) });
+      var sidEv = ipEvents.filter(function (e) { return e.data && e.data.sid; }).slice(-1)[0];
+      return json({ ok: true, ip: ip, sid: (sidEv && sidEv.data && sidEv.data.sid) || '', country: last.country || '', city: last.city || '', ua: last.ua || '', device: parseUA(last.ua), firstTs: ipEvents[0].ts, lastTs: last.ts, count: ipEvents.length, visits: visits, referrer: (refEv && refEv.data && refEv.data.ref) || '', charts: charts, questions: questions, chats: chats, clicks: clicks, timeline: ipEvents.map(function (e) { return { ts: e.ts, type: e.type, data: e.data || {} }; }) });
     }
     if (path === '/admin/api/notify' && method === 'POST') return adminNotifyConfig(env, request);
     if (path === '/admin/api/ai-config' && method === 'POST') return adminAiConfigSet(env, request);
     if (path === '/admin/api/free-pool' && method === 'POST') return adminFreePoolSet(env, request);
+    // [loop 1380] admin inject message vào chat user (can thiệp real-time)
+    if (path === '/admin/api/inject' && method === 'POST') {
+      const body = await request.json().catch(() => ({}));
+      if (!body.sid || !body.text) return json({ ok: false, err: 'Cần {sid, text}' }, 400);
+      if (!env.ADMIN_KV) return json({ ok: false, err: 'no store' }, 500);
+      const msg = { ts: Date.now(), text: String(body.text).slice(0, 2000), from: 'admin' };
+      await env.ADMIN_KV.put('inbox:' + String(body.sid).slice(0, 64), JSON.stringify(msg), { expirationTtl: 3600 });
+      await auditLog(env, request, 'inject_msg', { sid: String(body.sid).slice(0, 16), len: msg.text.length });
+      return json({ ok: true, msg: 'Đã gửi — user sẽ thấy trong chat (poll 8s)' });
+    }
     if (path === '/admin/api/ai-config' && method === 'GET') { try { return await adminAiConfigGet(env); } catch (e) { return json({ error: e.message }, 500); } }
     if (path === '/admin/api/clear' && method === 'POST') {
       if (env.ADMIN_KV) {
@@ -1181,6 +1204,26 @@ function adminDashboard() {
       box.appendChild(tl);
     }
     if (!r.chats.length && !r.charts.length) box.appendChild(el('div','tiny','(visitor chỉ xem, chưa lập lá số/chat)'));
+    // [loop 1380] 📨 inject message — admin can thiệp chat (gửi tin hiện sau câu luận giải)
+    if (r.sid) {
+      var inj = el('div'); inj.style.cssText = 'margin-top:12px;padding:10px;background:rgba(100,180,255,.08);border:1px solid rgba(100,180,255,.25);border-radius:8px';
+      inj.appendChild(el('div',null,'📨 NHẮN TIN RIÊNG')).style.cssText='color:#64b4ff;font-size:12px;font-weight:700;margin-bottom:4px';
+      inj.appendChild(el('div','tiny','Tin hiện TRONG chat của visitor (sau câu luận giải), real-time (poll 8s). sid: '+r.sid.slice(0,16)+'…'));
+      var ta = el('textarea'); ta.placeholder = 'Nhập tin nhắn... (vd: «Thầy thấy con hỏi về hôn nhân — thầy muốn thêm 1 điều riêng...»)';
+      ta.style.cssText = 'width:100%;height:64px;margin:6px 0;background:rgba(0,0,0,.3);border:1px solid rgba(212,175,55,.2);color:#e8d9b0;border-radius:6px;padding:8px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical';
+      var send = el('button','btn','📨 Gửi'); send.style.cssText = 'padding:6px 16px;font-size:12px';
+      send.onclick = (function (sid) { return function () {
+        if (!ta.value.trim()) return;
+        send.textContent = '⏳...'; send.disabled = true;
+        fetch('/admin/api/inject?token=' + TOKEN, { method: 'POST', headers: { ...H, 'Content-Type': 'application/json' }, body: JSON.stringify({ sid: sid, text: ta.value.trim() }) }).then(function (r) { return r.json(); }).then(function (j) {
+          send.textContent = '📨 Gửi'; send.disabled = false;
+          if (j.ok) { ta.value = ''; alert('✅ Đã gửi! Visitor sẽ thấy trong chat (~8 giây).'); }
+          else alert('❌ ' + (j.err || 'lỗi'));
+        }).catch(function () { send.textContent = '📨 Gửi'; send.disabled = false; });
+      }; })(r.sid);
+      inj.appendChild(ta); inj.appendChild(send);
+      box.appendChild(inj);
+    }
   }
   // [loop 1355] audit log loader — truy vết admin actions
   async function loadAudit(){

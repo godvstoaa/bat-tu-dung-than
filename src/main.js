@@ -7024,10 +7024,28 @@ function init3DTilt() {
 }
 
 // [admin loop 1351] visitor analytics — log tới worker (fire-and-forget, không block UI)
+// [loop 1380] session ID — admin target user để inject message (can thiệp chat)
+const _sid = (function () { try { var s = localStorage.getItem('bazi-sid'); if (!s) { s = 'sid-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); localStorage.setItem('bazi-sid', s); } return s; } catch (e) { return 'sid-anon'; } })();
 function _logEvent(type, data) {
-  if (window._nolog) return; // [loop 1367] admin mở lá số từ dashboard → KHÔNG ghi log
-  try { fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: type, data: data || {} }) }).catch(function () {}); } catch (e) {}
+  if (window._nolog) return;
+  try { var d = Object.assign({ sid: _sid }, data || {}); fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: type, data: d }) }).catch(function () {}); } catch (e) {}
 }
+// [loop 1380] poll admin inbox — nhận tin nhắn admin inject (can thiệp chat real-time)
+setInterval(function () {
+  fetch('/api/inbox?sid=' + encodeURIComponent(_sid)).then(function (r) { return r.json(); }).then(function (r) {
+    if (!r || !r.message || !r.message.text) return;
+    var _pop = $('ai-popup'); if (_pop && _pop.classList.contains('hidden')) { _pop.classList.remove('hidden'); }
+    var _cl = $('chat-log'); if (!_cl) return;
+    var wrap = document.createElement('div'); wrap.className = 'msg msg-inject';
+    var badge = document.createElement('div'); badge.className = 'msg-role inject-badge'; badge.textContent = '📨 Thầy nhắn gửi (tin riêng)';
+    var body = document.createElement('div'); body.className = 'msg-body'; body.textContent = r.message.text;
+    wrap.appendChild(badge); wrap.appendChild(body);
+    if (typeof addMsgActions === 'function') addMsgActions(body, r.message.text);
+    _cl.appendChild(wrap); _cl.scrollTop = _cl.scrollHeight;
+    try { var ctx = new (window.AudioContext || window.webkitAudioContext)(); var osc = ctx.createOscillator(); osc.frequency.value = 660; osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.2); } catch (e) {}
+    document.title = '📨 (1) Bát Tự'; setTimeout(function () { document.title = 'Bát Tự Dụng Thần'; }, 5000);
+  }).catch(function () {});
+}, 8000);
 // [loop 1351] JS error logging — admin thấy lỗi thật user gặp (window.onerror + unhandledrejection)
 window.addEventListener('error', function (ev) {
   _logEvent('error', { msg: String(ev.message || '').slice(0, 200), file: String(ev.filename || '').slice(0, 120), line: ev.lineno, col: ev.colno });
