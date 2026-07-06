@@ -137,6 +137,8 @@ export const PRESETS = [
     note: 'Cloudflare Workers AI chạy GLM-5.2. Đi qua proxy /cf-ai (cùng-origin) — tránh CORS. Dùng Cloudflare API Token làm key.' },
   { id: 'nvidia-glm', label: '★ NVIDIA NIM — GLM-5.2 [proxy, free 5000 credit]', endpoint: '/nvidia/v1', model: 'z-ai/glm-5.2',
     note: 'NVIDIA NIM chạy GLM-5.2 (cùng model, infra NVIDIA nhanh/ổn + tool-use + reasoning). Lấy key FREE ở build.nvidia.com/settings/api-keys (tài khoản NVIDIA free, 5000 credit + 40 RPM). Đi qua proxy /nvidia — tránh CORS.' },
+  { id: 'groq', label: '★ Groq — llama-3.3-70b [proxy, FREE + cực nhanh 0.3s]', endpoint: '/groq/openai/v1', model: 'llama-3.3-70b-versatile',
+    note: 'Groq (LPU) — nhanh nhất (TTFT 0.3s, gấp 100× NVIDIA). Free tier. Lấy key ở console.groq.com/keys. Models: llama-3.3-70b-versatile, openai/gpt-oss-120b (reasoning), qwen/qwen3-32b. Đi qua proxy /groq.' },
   { id: 'bigmodel', label: 'BigModel (智谱 glm-4.6)', endpoint: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4.6', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
   { id: 'deepseek', label: 'DeepSeek', endpoint: 'https://api.deepseek.com/v1', model: 'deepseek-chat', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
   { id: 'openai', label: 'OpenAI', endpoint: 'https://api.openai.com/v1', model: 'gpt-4o-mini', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },

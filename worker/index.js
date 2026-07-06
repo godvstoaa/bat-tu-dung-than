@@ -5,6 +5,7 @@ import { handleAdminRoute, isAiEnabled, isFreeAiEnabled, logFreeUsage } from './
 const PROXIES = [
   ['/cf-ai', 'https://api.cloudflare.com'],
   ['/zai', 'https://api.z.ai'],
+  ['/groq', 'https://api.groq.com'],
   ['/nvidia', 'https://integrate.api.nvidia.com'],
   ['/openai', 'https://api.openai.com'],
   ['/deepseek', 'https://api.deepseek.com'],
