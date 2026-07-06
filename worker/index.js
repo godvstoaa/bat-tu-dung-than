@@ -16,7 +16,7 @@ export default {
     const url = new URL(request.url);
 
     // 1) Admin + logging routes (/api/event, /admin*) — trước proxy & assets
-    if (url.pathname === '/api/event' || url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+    if (url.pathname === '/api/event' || url.pathname === '/api/ai-config' || url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
       return handleAdminRoute(request, env, url);
     }
 
