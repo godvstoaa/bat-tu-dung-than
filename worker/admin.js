@@ -186,12 +186,13 @@ async function adminStats(env, url) {
   const byIp = {};
   for (const e of events) {
     const ip = e.ip || '?';
-    if (!byIp[ip]) byIp[ip] = { ip, country: e.country || '', city: e.city || '', ua: (e.ua || '').slice(0, 80), count: 0, visits: 0, charts: [], questions: [], firstTs: e.ts, lastTs: 0 };
+    if (!byIp[ip]) byIp[ip] = { ip, country: e.country || '', city: e.city || '', ua: (e.ua || '').slice(0, 80), count: 0, visits: 0, charts: [], questions: [], chats: [], firstTs: e.ts, lastTs: 0 };
     const g = byIp[ip];
     g.count++;
     if (e.type === 'visit') g.visits++;
     else if (e.type === 'chart') g.charts.push(e.data || {});
     else if (e.type === 'ai_question') g.questions.push((e.data && e.data.q) || '');
+    else if (e.type === 'ai_chat') g.chats.push({ q: (e.data && e.data.q) || '', response: (e.data && e.data.response) || '', source: (e.data && e.data.source) || '' });
     if (e.ts > g.lastTs) g.lastTs = e.ts;
     if (e.ts < g.firstTs) g.firstTs = e.ts;
   }
@@ -405,6 +406,7 @@ function adminDashboard() {
         card.appendChild(el('div','tiny','⏱ '+new Date(v.firstTs).toLocaleString('vi-VN')+' → '+new Date(v.lastTs).toLocaleString('vi-VN')));
         if (v.charts.length) card.appendChild(el('div','tiny','📊 Lá số xem ('+v.charts.length+'): '+v.charts.map(function(c){return (c.dob||'?')+' '+(c.gender||'');}).join('; ').slice(0,400)));
         if (v.questions.length) card.appendChild(el('div','tiny','💬 AI hỏi ('+v.questions.length+'): '+v.questions.map(function(q){return '«'+String(q).slice(0,90)+'»';}).join(' ').slice(0,500)));
+        if (v.chats.length) { v.chats.forEach(function(ch){ var cd=el('div','tiny','💬 «'+String(ch.q).slice(0,80)+'» → '+(ch.source==='ai'?'🤖':'📦')+' '+(ch.response||'').slice(0,200)+'...'); cd.style.cssText='border-left:2px solid rgba(212,175,55,.3);padding-left:6px;margin:2px 0'; card.appendChild(cd); }); }
         bip.appendChild(card);
       });
     }
