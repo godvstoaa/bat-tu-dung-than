@@ -133,7 +133,7 @@ export async function handleAdminRoute(request, env, url) {
   if (path === '/api/ai-config' && method === 'GET') {
     let config = {};
     try { const raw = env.ADMIN_KV ? await env.ADMIN_KV.get('ai:config') : null; config = raw ? JSON.parse(raw) : {}; } catch (e) {}
-    return json({ mode: config.mode || 'free', endpoint: config.endpoint || '', hasKey: !!config.apiKey, model: config.model || '' });
+    return json({ mode: config.mode || 'free', endpoint: config.endpoint || '', hasKey: !!config.apiKey || !!env.CF_AI_KEY, model: config.model || '' });
   }
 
   if (path === '/admin' || path.startsWith('/admin/')) {
