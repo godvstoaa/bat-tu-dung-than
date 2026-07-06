@@ -210,7 +210,8 @@ export async function handleAdminRoute(request, env, url) {
       if (env.ADMIN_KV) await env.ADMIN_KV.put('admin:token', t);
       return json({ ok: true, msg: 'Đã đặt. Mở /admin?token=<token>' });
     }
-    const token = url.searchParams.get('token') || request.headers.get('X-Admin-Token') || '';
+    const ck = (request.headers.get('Cookie') || '').match(/btu_admin=([^;]+)/);
+    const token = url.searchParams.get('token') || request.headers.get('X-Admin-Token') || (ck ? decodeURIComponent(ck[1]) : '') || '';
     const expected = env.ADMIN_TOKEN || (env.ADMIN_KV && await env.ADMIN_KV.get('admin:token')) || '';
     if (!expected) return json({ ok: false, err: 'Chưa đặt token admin. POST /admin/setup {token:"<chọn-≥8-ký-tự>"} để tạo (chỉ lần đầu).', needSetup: true }, 401);
     if (token !== expected) {
@@ -221,7 +222,16 @@ export async function handleAdminRoute(request, env, url) {
       if (env.ADMIN_KV) await env.ADMIN_KV.put(fk, String(fc + 1), { expirationTtl: 300 });
       return new Response('Unauthorized', { status: 401 });
     }
-    if (path === '/admin' || path === '/admin/') return adminDashboard();
+    // [loop 1364] auth thành công → clear fail counter IP này (user hợp lệ không bị lock cumulate)
+    if (env.ADMIN_KV) env.ADMIN_KV.delete('fail:' + clientIP(request)).catch(function () {});
+    // [loop 1364] session cookie — auth lần đầu (URL/header token) → set cookie HttpOnly+Secure.
+    //   Reload /admin (URL đã strip token khỏi history) vẫn work qua cookie. URL sạch + reload OK.
+    if (path === '/admin' || path === '/admin/') {
+      const _d = adminDashboard();
+      const _h = new Headers(_d.headers);
+      _h.append('Set-Cookie', 'btu_admin=' + encodeURIComponent(expected) + '; Path=/admin; HttpOnly; Secure; SameSite=Strict; Max-Age=86400');
+      return new Response(_d.body, { status: _d.status, headers: _h });
+    }
     if (path === '/admin/api/stats') { try { return await adminStats(env, url); } catch (e) { return json({ error: e.message }, 500); } }
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
     if (path === '/admin/api/ai-free' && method === 'POST') return adminToggleFreeAi(env, request);
@@ -674,7 +684,7 @@ function adminDashboard() {
     </main>
   </div>
   <script>
-  const TOKEN = new URLSearchParams(location.search).get('token');
+  const TOKEN = new URLSearchParams(location.search).get('token') || '';
   const H = { 'X-Admin-Token': TOKEN };
   function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
   function statBlock(val, label, accent){ const s=el('span','stat'); const b=el('b'); b.textContent=val; if(accent) b.style.color=accent; s.appendChild(b); s.appendChild(el('span',null,label)); return s; }
