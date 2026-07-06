@@ -1058,7 +1058,14 @@ function adminDashboard() {
     dv.appendChild(el('div','tiny','💻 DEVICE')); dv.appendChild(el('div',null,(r.device&&r.device.icon||'💻')+' '+(r.device&&r.device.os||'?')+' · '+(r.device&&r.device.browser||'?')+' · '+(r.device&&r.device.type||'?')+(r.device&&r.device.brand?' · '+r.device.brand:'')));
     if(r.ua){ var ua=el('div','tiny','UA: '+r.ua); ua.style.cssText='word-break:break-all;opacity:.65;margin-top:3px'; dv.appendChild(ua); }
     box.appendChild(dv);
-    if (r.charts.length) { var cc=el('div'); cc.style.cssText='margin:10px 0'; cc.appendChild(el('div','tiny','📊 LÁ SỐ ĐÃ XEM ('+r.charts.length+')')); r.charts.forEach(function(c){ cc.appendChild(el('div','tiny',(c.dob||'?')+' '+(c.time||'')+' '+(c.gender||''))); }); box.appendChild(cc); }
+    if (r.charts.length) { var cc=el('div'); cc.style.cssText='margin:10px 0'; cc.appendChild(el('div','tiny','📊 LÁ SỐ ĐÃ XEM ('+r.charts.length+') · «Mở» xem lá số tab mới (KHÔNG ghi log)')); r.charts.forEach(function(c){
+      var row=el('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(212,175,55,.06)';
+      row.appendChild(el('span','tiny',(c.dob||'?')+' '+(c.time||'')+' '+(c.gender||'')+(c.score!=null?' · '+c.score+'/100':'')));
+      var a=el('a','btn'); a.textContent='🔗 Mở lá số'; a.target='_blank'; a.rel='noopener';
+      a.href='/?dob='+encodeURIComponent(c.dob||'')+'&time='+encodeURIComponent(c.time||'12:00')+'&g='+encodeURIComponent(c.gender||'nam')+'&from=admin&nolog=1';
+      a.style.cssText='padding:3px 9px;font-size:11px;text-decoration:none;white-space:nowrap';
+      row.appendChild(a); cc.appendChild(row);
+    }); box.appendChild(cc); }
     if (r.chats.length) {
       var ch=el('div'); ch.style.cssText='margin:10px 0'; ch.appendChild(el('div','tiny','💬 CHAT AI ('+r.chats.length+') — mở để xem full trả lời'));
       r.chats.forEach(function(c){

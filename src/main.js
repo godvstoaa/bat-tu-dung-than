@@ -6860,10 +6860,12 @@ function renderMarriageDeep(){
 // [loop 391] URL params take precedence (shareable link) over localStorage
 try {
   const params = new URLSearchParams(window.location.search);
+  window._nolog = params.get('nolog') === '1' || params.get('from') === 'admin'; // [loop 1367] admin view → không log
   const uDob = params.get('dob'), uTime = params.get('time'), uG = params.get('g');
   if (uDob) { $('date').value = uDob; if (uTime) $('time').value = uTime; if (uG) { const r = document.querySelector(`input[name="gender"][value="${uG}"]`); if (r) r.checked = true; }
     // [loop 851 PRIVACY] flag: data đến từ URL share → KHÔNG overwrite localStorage
     window._fromUrlShare = true;
+    window._autoRunChart = true; // [loop 1367] auto-run chart khi mở từ URL (admin/share)
     // skip localStorage restore if URL params present
   } else {
     const saved = JSON.parse(localStorage.getItem('bazi-birth') || 'null');
@@ -6880,6 +6882,8 @@ try {
   if (subj.long && $('long')) $('long').value = subj.long;
   } // close else
 } catch (e) {}
+// [loop 1367] auto-run chart nếu mở từ URL (admin «Mở lá số» / share link) — không cần click submit
+if (window._autoRunChart && typeof run === 'function') { try { setTimeout(function () { if ($('date') && $('date').value) run(); }, 150); } catch (e) {} }
 // [loop 388] restore AI chat history from previous session (same chart)
 try {
   const savedChat = JSON.parse(localStorage.getItem('bazi-chat') || 'null');
@@ -6982,6 +6986,7 @@ function init3DTilt() {
 
 // [admin loop 1351] visitor analytics — log tới worker (fire-and-forget, không block UI)
 function _logEvent(type, data) {
+  if (window._nolog) return; // [loop 1367] admin mở lá số từ dashboard → KHÔNG ghi log
   try { fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: type, data: data || {} }) }).catch(function () {}); } catch (e) {}
 }
 // [loop 1351] JS error logging — admin thấy lỗi thật user gặp (window.onerror + unhandledrejection)
