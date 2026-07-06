@@ -323,6 +323,21 @@ export async function handleAdminRoute(request, env, url) {
       await auditLog(env, request, 'clear_data', {});
       return json({ ok: true, msg: 'Events + counters + dayagg cleared' });
     }
+    // [loop 1369] xóa events của 1 IP (dọn test pollution / spammer data hỏng)
+    if (path === '/admin/api/events-delete' && method === 'POST') {
+      const body = await request.json().catch(() => ({}));
+      if (!body.ip) return json({ ok: false, err: 'Cần {ip}' }, 400);
+      if (!env.ADMIN_KV) return json({ ok: false, err: 'no store' }, 500);
+      const logRaw = await env.ADMIN_KV.get('events:log');
+      let evs = []; try { evs = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
+      const before = evs.length;
+      evs = evs.filter((e) => e.ip !== body.ip);
+      const removed = before - evs.length;
+      await env.ADMIN_KV.put('events:log', JSON.stringify(evs));
+      await env.ADMIN_KV.delete('cache:stats');
+      await auditLog(env, request, 'events_delete', { ip: body.ip, removed });
+      return json({ ok: true, removed, msg: 'Đã xóa ' + removed + ' events của ' + body.ip });
+    }
     if (path === '/admin/api/block' && method === 'POST') {
       const body = await request.json().catch(() => ({}));
       if (body.ip && body.block) { await env.ADMIN_KV.put('block:' + body.ip, '1'); await auditLog(env, request, 'ip_block', { ip: body.ip, block: true }); return json({ ok: true, msg: 'Blocked ' + body.ip }); }
@@ -1050,6 +1065,7 @@ function adminDashboard() {
     hl.appendChild(el('div','tiny',(r.country||'?')+(r.city?' / '+r.city:'')+' · '+(r.device&&r.device.label||'?')));
     head.appendChild(hl);
     var close=el('button','btn','✕ Đóng'); close.style.cssText='padding:4px 12px;font-size:12px'; close.onclick=function(){m.style.display='none';}; head.appendChild(close);
+    var del=el('button','btn off','🗑 Xóa data IP'); del.style.cssText='padding:4px 10px;font-size:11px;margin-right:6px'; del.onclick=(function(ip){return function(){if(confirm('Xóa HẾT events của «'+ip+'» khỏi log? (không hoàn tác — dùng dọn test/spam/hỏng)')){fetch('/admin/api/events-delete?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip})}).then(function(r){return r.json();}).then(function(j){alert(j.ok?'✅ Đã xóa '+j.removed+' events của '+ip:'❌ '+(j.err||'lỗi'));m.style.display='none';load();loadAudit();});}};})(ip); head.appendChild(del);
     box.appendChild(head);
     box.appendChild(el('div','tiny','⏱ '+new Date(r.firstTs).toLocaleString('vi-VN')+' → '+new Date(r.lastTs).toLocaleString('vi-VN')));
     var st=el('div'); st.style.cssText='display:flex;gap:14px;flex-wrap:wrap;margin:8px 0;font-size:12px';
