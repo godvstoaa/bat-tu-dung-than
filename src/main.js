@@ -5575,7 +5575,24 @@ function openAIPopup() {
   const cs = $('chat-suggest'); if (cs) cs.style.display = ''; // re-show chips when reopening
   setTimeout(() => { const q = $('question'); if (q && !window.matchMedia('(pointer: coarse)').matches) q.focus(); }, 50); // [UI fix] mobile (coarse pointer) KHÔNG auto-focus → tránh keyboard bật + page scroll «trôi xuống cuối»
   const cl = $('chat-log');
-  if (cl && !cl.childElementCount) appendMsg('assistant', 'Xin chào! Tôi là trợ lý Bát Tự AI. Bạn đã lập lá số — hãy hỏi tôi bất cứ điều gì về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà… (Bấm ⚙ để bật AI thật; chưa bật thì tôi dùng bộ luân giải cục bộ.)');
+  if (cl && !cl.childElementCount) {
+    // [loop 1382 MOAT] personalization — «thầy nhớ con» returning user greeting
+    try {
+      const saved = JSON.parse(localStorage.getItem('bazi-chat') || '[]');
+      if (Array.isArray(saved) && saved.length >= 2) {
+        const lastUser = saved.filter((m) => m.role === 'user').slice(-1)[0];
+        const lastTopic = lastUser ? String(lastUser.content || '').slice(0, 50) : '';
+        const greet = lastTopic
+          ? '👋 Con quay lại rồi! Thầy vẫn nhớ — lần trước con hỏi về «' + lastTopic + '…». Lá số con thầy đã giữ sẵn, hỏi thêm gì cũng được.'
+          : '👋 Con quay lại rồi! Lá số con thầy vẫn giữ. Hôm nay muốn biết thêm gì?';
+        appendMsg('assistant', greet);
+      } else {
+        appendMsg('assistant', 'Xin chào! Tôi là trợ lý Bát Tự AI. Bạn đã lập lá số — hãy hỏi tôi bất cứ điều gì về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà…');
+      }
+    } catch (_) {
+      appendMsg('assistant', 'Xin chào! Tôi là trợ lý Bát Tự AI. Bạn đã lập lá số — hãy hỏi tôi bất cứ điều gì về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà…');
+    }
+  }
 }
 function closeAIPopup() {
   const p = $('ai-popup'); if (p) p.classList.add('hidden');
