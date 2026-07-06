@@ -21,15 +21,10 @@ function clientIP(request) {
     || 'unknown';
 }
 
-// [loop 1351 perf] isolate-level cache cho isAiEnabled (tránh KV get mỗi proxy request)
-let _aiCache = null; let _aiTs = 0;
 export async function isAiEnabled(env) {
-  if (_aiCache !== null && Date.now() - _aiTs < 5000) return _aiCache;
-  if (!env.ADMIN_KV) { _aiCache = true; _aiTs = Date.now(); return true; }
+  if (!env.ADMIN_KV) return true;
   const v = await env.ADMIN_KV.get('ai:enabled');
-  _aiCache = v === null || v === '1' || v === 'true';
-  _aiTs = Date.now();
-  return _aiCache;
+  return v === null || v === '1' || v === 'true';
 }
 
 async function logEvent(env, request, type, data) {
@@ -298,7 +293,6 @@ async function adminToggleAi(env, request) {
   const body = await request.json().catch(() => ({}));
   const enabled = body && body.enabled ? '1' : '0';
   await env.ADMIN_KV.put('ai:enabled', enabled);
-  _aiCache = enabled === '1'; _aiTs = Date.now(); // invalidate cache ngay
   return json({ ok: true, aiEnabled: enabled === '1' });
 }
 
