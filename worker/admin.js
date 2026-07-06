@@ -301,7 +301,8 @@ async function adminStats(env, url) {
   const BOT_RE = /bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i;
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers, devices, hourly, topClicks };
+  const eventsLite = events.map(function (e) { var c = { ts: e.ts, type: e.type, ip: e.ip, country: e.country, city: e.city, data: e.data }; return c; });
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers, devices, hourly, topClicks };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
