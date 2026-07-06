@@ -169,6 +169,14 @@ export async function handleAdminRoute(request, env, url) {
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
     if (path === '/admin/api/token' && method === 'POST') return adminChangeToken(env, request);
     if (path === '/admin/api/export' && method === 'GET') return adminExport(env);
+    if (path === '/admin/api/events' && method === 'GET') {
+      const type = url.searchParams.get('type');
+      const limit = Math.min(parseInt(url.searchParams.get('limit') || '200', 10), 200);
+      const logRaw = env.ADMIN_KV ? await env.ADMIN_KV.get('events:log') : null;
+      let events = []; try { events = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
+      const filtered = type ? events.filter((e) => e.type === type) : events;
+      return json({ events: filtered.slice(0, limit), total: filtered.length });
+    }
     if (path === '/admin/api/notify' && method === 'POST') return adminNotifyConfig(env, request);
     if (path === '/admin/api/ai-config' && method === 'POST') return adminAiConfigSet(env, request);
     if (path === '/admin/api/ai-config' && method === 'GET') { try { return await adminAiConfigGet(env); } catch (e) { return json({ error: e.message }, 500); } }
