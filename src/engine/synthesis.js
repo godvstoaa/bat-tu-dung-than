@@ -144,25 +144,40 @@ export function synthesize(R) {
   // [loop 458→587] RECALIBRATE theo percentile 2160 lá post-Thông-Quan-fix (loop 575).
   //   Nay neo percentile: 上 = top ~10% (≥62), 中 = quanh median 47 (≥41), 下 = bottom ~6% (<31).
   let grade, gradeVi, percentile;
-  // [loop 587] percentile neo theo phân bố thực 2160 lá: 下=p0-7, 中下=p7-31, 中=p31-65, 中上=p65-90, 上=p90-100
-  if (score >= 62) { grade = '上'; gradeVi = 'Thượng đẳng (mệnh tốt, hiếm)'; percentile = 90 + Math.round(10 * (score - 62) / 21); }
-  else if (score >= 52) { grade = '中上'; gradeVi = 'Trung thượng (khá tốt)'; percentile = 65 + Math.round(25 * (score - 52) / 10); }
-  else if (score >= 41) { grade = '中'; gradeVi = 'Trung đẳng (cân bằng)'; percentile = 31 + Math.round(34 * (score - 41) / 11); }
-  else if (score >= 31) { grade = '中下'; gradeVi = 'Trung hạ (khá vất vả)'; percentile = 7 + Math.round(24 * (score - 31) / 10); }
-  else { grade = '下'; gradeVi = 'Hạ đẳng — nhiều thử thách nhưng CÓ CƠ HỘI đổi vận'; percentile = Math.max(1, Math.round(7 * (score - 14) / 17)); }
+  // [loop 587] percentile neo phân bố thực 2160 lá (giữ anchor: 14→1, 31→7, 41→31, 52→65, 62→90, 83→99)
+  if (score >= 62) percentile = 90 + Math.round(10 * (score - 62) / 21);
+  else if (score >= 52) percentile = 65 + Math.round(25 * (score - 52) / 10);
+  else if (score >= 41) percentile = 31 + Math.round(34 * (score - 41) / 11);
+  else if (score >= 31) percentile = 7 + Math.round(24 * (score - 31) / 10);
+  else percentile = Math.max(1, Math.round(7 * (score - 14) / 17));
   percentile = Math.max(1, Math.min(99, percentile));
+  // [loop 1373] 10 TIER — ngôn từ phong phú + độ hiếm TƯƠNG ĐỐI (cao hơn = hiếm hơn).
+  //   grade 上/中上/中/中下/下 GIỮ NGUYÊN (consensus tone phụ thuộc). 84=«CỰC HIẾM», ≥86=«CỰC PHẨM».
+  if (score >= 86) { grade = '上'; gradeVi = 'ĐỈNH CAO HUYỀN THOẠI · CỰC PHẨM (vạn lá khó một cái — mệnh truyền kiếp)'; }
+  else if (score >= 80) { grade = '上'; gradeVi = 'THƯỢNG ĐẲNG XUẤT CHÚNG · CỰC HIẾM (top đầu, rất hiếm gặp)'; }
+  else if (score >= 73) { grade = '上'; gradeVi = 'THƯỢNG ĐẲNG · Rất hiếm (mệnh tốt rõ, trên đa số)'; }
+  else if (score >= 66) { grade = '上'; gradeVi = 'THƯỢNG ĐẲNG · Hiếm (mệnh tốt, nền vững)'; }
+  else if (score >= 58) { grade = '中上'; gradeVi = 'TRUNG THƯỢNG CAO · Khá hiếm (trên trung bình rõ)'; }
+  else if (score >= 50) { grade = '中上'; gradeVi = 'TRUNG THƯỢNG · Khá tốt (trên đa số)'; }
+  else if (score >= 43) { grade = '中'; gradeVi = 'TRUNG ĐẲNG THUẬN · Cân bằng tốt, ổn định'; }
+  else if (score >= 36) { grade = '中'; gradeVi = 'TRUNG ĐẲNG · Cân bằng, cần nỗ lực'; }
+  else if (score >= 28) { grade = '中下'; gradeVi = 'TRUNG HẠ · Khá vất vả, có Dụng thì bứt phá được'; }
+  else { grade = '下'; gradeVi = 'HẠ ĐẲNG · Nhiều thử thách, «có bệnh mới quý» — CÓ CƠ HỘI đổi vận nếu nắm đúng Dụng'; }
 
   // --- Phú quý bần tiện (xu hướng) ---
   // [loop 458→589] neo percentile + soften wording cho low-score (đặc biệt trẻ em).
   //   Trước đây dùng «bần tiện» — quá harsh. Nay «khởi sắc muộn» + constructive advice.
   let fortune, fortuneVi;
-  if (score >= 55 && catCombos.length >= 1) { fortune = 'phú quý'; fortuneVi = 'Phú/Qúy — danh lợi đều có, đáng tiến thủ'; }
-  else if (score >= 41) { fortune = 'tiểu phú quý'; fortuneVi = 'Tiểu phú/qúy — ấm no, có thành tựu vừa'; }
-  else if (score >= 31) { fortune = 'bình'; fortuneVi = 'Bình thường — no ấm, cần nỗ lực nhiều'; }
-  else { fortune = 'tiềm năng ẩn'; fortuneVi = 'Khởi đầu vất vả nhưng có tiềm năng — cần đúng Dụng Thần + đúng thời điểm để bứt phá (大运 lưu niên mang Dụng sẽ chuyển vận)'; }
+  // [loop 1373] fortune 6 tier — phú quý language phong phú, theo score + catCombos
+  if (score >= 75 && catCombos.length >= 1) { fortune = 'đại phú quý'; fortuneVi = 'ĐẠI PHÚ/QÚY — danh lợi lẫy lừng, mệnh cầm quyền/làm lớn khi vận tới'; }
+  else if (score >= 60 && catCombos.length >= 1) { fortune = 'phú quý'; fortuneVi = 'Phú/Qúy — danh lợi đều có, đáng tiến thủ lớn'; }
+  else if (score >= 50) { fortune = 'tiểu phú quý'; fortuneVi = 'Tiểu phú/qúy — ấm no dư dả, thành tựu vừa phải'; }
+  else if (score >= 41) { fortune = 'khá no'; fortuneVi = 'Khá no ấm — có thành tựu nếu biết nắm đúng vận'; }
+  else if (score >= 31) { fortune = 'bình'; fortuneVi = 'Bình thường — no ấm, cần nỗ lực nhiều + đúng thời điểm'; }
+  else { fortune = 'tiềm năng ẩn'; fortuneVi = 'Khởi đầu vất vả nhưng có tiềm năng — cần đúng Dụng Thần + đúng thời điểm để bứt phá (đại vận/lưu niên mang Dụng sẽ chuyển vận)'; }
 
   const paragraphs = [
-    `Mệnh bạn xếp ở ${gradeVi} — điểm tổng hợp ${score}/100 (top ${percentile}% người cùng tuổi mệnh).`,
+    `Mệnh bạn xếp ở ${gradeVi} — điểm tổng hợp ${score}/100 (cao hơn ${percentile}% lá số cùng thời — top ${Math.max(1, 100 - percentile)}%).`,
     `Trục cốt lõi: Dụng Thần ${wxVi(yong.primary)}, Hỷ ${wxVi(yong.xi)} (trợ), Kỵ ${wxVi(yong.ji)} (hại), 仇 ${wxVi(yong.chou)} (hại gián tiếp). Xu hướng: ${fortuneVi}.`,
     factors.map((f) => '• ' + f).join('\n'),
     score >= 58
