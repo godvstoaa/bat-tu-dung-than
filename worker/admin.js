@@ -237,8 +237,8 @@ async function adminStats(env, url) {
     }
   }
   // [loop 1351] session tracking — group events per IP (gap >30min = new session)
-  const ipTs = {};
-  for (const e of events) { const ip = e.ip || '?'; if (!ipTs[ip]) ipTs[ip] = []; ipTs[ip].push(e.ts); }
+  const ipTs = {}; const ipDays = {};
+  for (const e of events) { const ip = e.ip || '?'; if (!ipTs[ip]) ipTs[ip] = []; ipTs[ip].push(e.ts); const d2 = new Date(e.ts).toISOString().slice(0,10); if (!ipDays[ip]) ipDays[ip] = new Set(); ipDays[ip].add(d2); }
   let totalSessions = 0; const dur = [];
   for (const ip of Object.keys(ipTs)) {
     const arr = ipTs[ip].sort((a, b) => a - b);
@@ -273,6 +273,7 @@ async function adminStats(env, url) {
     sessions: totalSessions,
     avgSessionMin: avgSessionMin,
     aiSuccessRate: totals.ai_question > 0 ? Math.round((totals.ai_chat / totals.ai_question) * 100) : null,
+    returningVisitors: Object.values(ipDays).filter((s) => s.size > 1).length,
   };
   const fiveMinAgo = Date.now() - 5 * 60 * 1000;
   const activeNow = new Set(events.filter((e) => e.ts > fiveMinAgo).map((e) => e.ip)).size;
