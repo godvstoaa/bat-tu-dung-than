@@ -82,19 +82,19 @@ ok(roundsOk, 'ai_chat event có rounds field (=3) — [loop 1354 telemetry]');
 
 // 3. AI toggle off → proxy 503 → on
 await fetch(BASE + '/admin/api/ai?token=' + TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: false }) });
-const blocked = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then((r) => r.status);
-ok(blocked === 503, 'AI off → proxy /cf-ai trả 503 (got ' + blocked + ')');
+const blocked = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({messages:[{role:'user',content:'hi'}],stream:false}) }).then(async (r) => { const t = await r.text(); return r.status + '|' + (t.includes('free_ai_disabled') ? 'kill' : t.includes('free_disabled') ? 'allfail' : 'ok'); });
+ok(blocked.startsWith('503|kill'), 'AI off → kill-switch 503 (got ' + blocked + ')');
 await fetch(BASE + '/admin/api/ai?token=' + TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: true }) });
-const back = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then((r) => r.status);
-ok(back !== 503, 'AI on → proxy không còn 503 (got ' + back + ')');
+const back = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({messages:[{role:'user',content:'hi'}],stream:false}) }).then(async (r) => { const t = await r.text(); return r.status + '|' + (t.includes('free_ai_disabled') ? 'kill' : t.includes('free_disabled') ? 'allfail' : 'ok'); });
+ok(!back.startsWith('503|kill'), 'AI on → kill-switch TẮT (got ' + back + ')');
 
 // [loop 1357] free glm-5.2 model — toggle off → /cf-ai 503 → toggle on; + usage tracking
 await fetch(BASE + '/admin/api/ai-free?token=' + TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: false }) });
-const freeBlocked = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then((r) => r.status);
-ok(freeBlocked === 503, 'free glm-5.2 off → /cf-ai trả 503 (got ' + freeBlocked + ')');
+const freeBlocked = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({messages:[{role:'user',content:'hi'}],stream:false}) }).then(async (r) => { const t = await r.text(); return r.status + '|' + (t.includes('free_ai_disabled') ? 'kill' : t.includes('free_disabled') ? 'allfail' : 'ok'); });
+ok(freeBlocked.startsWith('503|kill'), 'free off → kill-switch 503 (got ' + freeBlocked + ')');
 await fetch(BASE + '/admin/api/ai-free?token=' + TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: true }) });
-const freeBack = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then((r) => r.status);
-ok(freeBack !== 503, 'free glm-5.2 on → /cf-ai không còn 503 (got ' + freeBack + ')');
+const freeBack = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({messages:[{role:'user',content:'hi'}],stream:false}) }).then(async (r) => { const t = await r.text(); return r.status + '|' + (t.includes('free_ai_disabled') ? 'kill' : t.includes('free_disabled') ? 'allfail' : 'ok'); });
+ok(!freeBack.startsWith('503|kill'), 'free on → kill-switch TẮT (got ' + freeBack + ')');
 // free usage có trong stats + /api/ai-config trả freeEnabled
 ok(st.freeUsage && typeof st.freeUsage.calls === 'number' && typeof st.freeUsage.enabled === 'boolean', 'stats.freeUsage shape {calls,enabled}');
 ok(Array.isArray(st.freeRecent), 'stats.freeRecent (recent calls log)');
