@@ -549,9 +549,9 @@ function adminDashboard() {
   .row-3col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
   /* === KPI grid (.stat → auto card) === */
   .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px;margin-bottom:14px}
-  .stat{display:block;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);min-width:0}
-  .stat b{display:block;font-size:26px;color:var(--gold);line-height:1.1;font-weight:700;margin-bottom:3px}
-  .stat span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .stat{display:flex;flex-direction:column;justify-content:center;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);min-width:0}
+  .stat b{display:block;font-size:26px;color:var(--gold);line-height:1.1;font-weight:700;margin-bottom:5px}
+  .stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;line-height:1.3}
   .stat:hover{border-color:var(--border2)}
   /* === TABLE / IP / tiny === */
   table{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -605,10 +605,8 @@ function adminDashboard() {
           <div class="card"><h3>🜂 Funnel <span class="card-actions tiny">visitor → lá số → AI</span></h3><div id="funnel"></div></div>
         </div>
         <div class="card"><h3>📊 Engagement <span class="card-actions tiny">chất lượng & sâu traffic</span></h3><div id="engagement" class="kpi-grid"></div></div>
-        <div class="row-2col">
-          <div class="card"><h3>📈 Hoạt động 7 ngày</h3><div id="daily"></div></div>
-          <div class="card"><h3>📉 Xu hướng 30 ngày <span class="card-actions tiny">dayagg TTL 90d</span></h3><div id="trend30"></div></div>
-        </div>
+        <div class="card"><h3>📈 Hoạt động 7 ngày <span class="card-actions tiny">số liệu gần đây</span></h3><div id="daily"></div></div>
+        <div class="card"><h3>📉 Xu hướng 30 ngày <span class="card-actions tiny">dayagg TTL 90d · retention dài</span></h3><div id="trend30"></div></div>
         <div class="card"><h3>⏰ Giờ hoạt động (VN, UTC+7)</h3><div id="hourly" style="display:flex;align-items:flex-end;gap:1px;height:44px;margin-top:4px"></div></div>
         <div class="card"><h3>🌍 Quốc gia · nguồn traffic · clicks</h3><div id="topq" style="display:flex;gap:20px;flex-wrap:wrap"></div></div>
       </section>
@@ -701,7 +699,7 @@ function adminDashboard() {
       hItems.push([(d.totals.error===0)+'', 'JS errors: '+d.totals.error]);
       if (d.engagement && d.engagement.avgLoadMs) hItems.push([(d.engagement.avgLoadMs<5000)+'', 'Load TB: '+(d.engagement.avgLoadMs/1000).toFixed(1)+'s']);
       if (d.engagement && d.engagement.bounceRate!=null) hItems.push([(d.engagement.bounceRate<60)+'', 'Bounce: '+d.engagement.bounceRate+'%']);
-      hItems.forEach(function(it){ var r=el('div','tiny',(it[0]==='true'?'✅':'⚠️')+' '+it[1]); r.style.padding='2px 0'; hb.appendChild(r); });
+      hItems.forEach(function(it){ var r=el('div',null,(it[0]==='true'?'✅':'⚠️')+' '+it[1]); r.style.cssText='padding:3px 0;font-size:12px;color:var(--text)'; hb.appendChild(r); });
     }
     // [loop 1351] action alerts — guide admin fix issues
     var al=document.getElementById('alerts'); if (al) { al.textContent='';
@@ -725,9 +723,10 @@ function adminDashboard() {
     const fn=document.getElementById('funnel'); if (fn && d.funnel) { fn.textContent='';
       var denom=d.funnel.visitors||1;
       [['👥 Visit',d.funnel.visitors],['📊 Lập lá số',d.funnel.chartUsers],['💬 Hỏi AI',d.funnel.aiUsers]].forEach(function(it){
-        var row=el('div'); row.style.cssText='display:flex;align-items:center;gap:8px;margin:2px 0;font-size:12px';
-        row.appendChild(el('span','tiny',it[0]));
-        var bar=el('div'); bar.style.cssText='height:16px;border-radius:3px;background:#d4af37;min-width:4px;width:'+Math.round(it[1]/denom*200)+'px'; row.appendChild(bar);
+        var row=el('div'); row.style.cssText='display:flex;align-items:center;gap:8px;margin:4px 0;font-size:12px';
+        var lab=el('span','tiny',it[0]); lab.style.flex='0 0 92px'; row.appendChild(lab);
+        var track=el('div'); track.style.cssText='flex:1;height:16px;background:rgba(212,175,55,.08);border-radius:3px;overflow:hidden;min-width:0';
+        var bar=el('div'); bar.style.cssText='height:100%;width:'+(denom?Math.round(it[1]/denom*100):0)+'%;background:#d4af37;min-width:3px'; track.appendChild(bar); row.appendChild(track);
         row.appendChild(el('span','tiny',it[1]+' ('+Math.round(it[1]/denom*100)+'%)'));
         fn.appendChild(row);
       });
@@ -798,8 +797,9 @@ function adminDashboard() {
       d.daily.forEach(function(dy){
         const tot=dy.visit+dy.chart+dy.ai_question;
         const row=el('div'); row.style.cssText='display:flex;align-items:center;gap:8px;margin:3px 0;font-size:12px';
-        row.appendChild(el('span','tiny',dy.date));
-        const bar=el('div'); bar.style.cssText='height:14px;width:'+Math.max(4,Math.round(tot/maxv*200))+'px;border-radius:3px;background:#d4af37'; row.appendChild(bar);
+        var dt=el('span','tiny',dy.date); dt.style.flex='0 0 72px'; row.appendChild(dt);
+        var track=el('div'); track.style.cssText='flex:1;height:14px;background:rgba(212,175,55,.06);border-radius:3px;overflow:hidden;min-width:0';
+        const bar=el('div'); bar.style.cssText='height:100%;width:'+Math.round(tot/maxv*100)+'%;background:#d4af37'; track.appendChild(bar); row.appendChild(track);
         row.appendChild(el('span','tiny',tot+' (v:'+dy.visit+' c:'+dy.chart+' q:'+dy.ai_question+')'));
         dl.appendChild(row);
       });
