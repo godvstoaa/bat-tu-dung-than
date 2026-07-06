@@ -45,6 +45,16 @@ ok(st.engagement && st.engagement.bounceRate !== undefined, 'stats.engagement (b
 ok(st.realUniqueIps !== undefined && st.bots !== undefined, 'stats.realUniqueIps + bots (bot filter)');
 ok(appeared, 'audit visit logged + xuất hiện (retry KV consistency)');
 
+// [loop 1365] visitor detail endpoint — click IP load hết + device parse
+const realIp = (st.byIp && st.byIp.length) ? st.byIp[0].ip : null;
+if (realIp) {
+  const vis = await fetch(BASE + '/admin/api/visitor?token=' + TOKEN + '&ip=' + encodeURIComponent(realIp)).then((r) => r.json()).catch(() => ({ ok: false }));
+  ok(vis.ok && vis.ip === realIp && Array.isArray(vis.timeline) && vis.device && typeof vis.device.label === 'string', 'GET /admin/api/visitor?ip → full record {timeline,device}');
+  ok(vis.chats.every((c) => typeof c.response === 'string'), 'visitor.chats có full response (không truncate)');
+} else {
+  ok(false, 'cần ≥1 real IP để test visitor endpoint (clear data? chạy lại khi có traffic)');
+}
+
 // [loop 1352] retention + dayagg trend (30 ngày từ dayagg, độc lập cap 1500)
 ok(Array.isArray(st.trend) && st.trend.length === 30, 'stats.trend (30 ngày từ dayagg, length=' + (st.trend ? st.trend.length : 'n/a') + ')');
 const todayStr = new Date().toISOString().slice(0, 10);
