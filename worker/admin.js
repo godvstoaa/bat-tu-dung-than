@@ -336,6 +336,12 @@ function adminDashboard() {
   .b-visit{background:rgba(127,191,127,.2);color:#7fbf7f}.b-chart{background:rgba(212,175,55,.2);color:#d4af37}.b-ai_question{background:rgba(180,120,200,.2);color:#b478c8}.b-other{background:rgba(150,150,150,.2);color:#aaa}.b-error{background:rgba(192,57,43,.25);color:#e0533d}.b-ai_chat{background:rgba(100,180,255,.2);color:#64b4ff}
   </style></head><body>
   <h1>🛡️ Admin — Bát Tự Dụng Thần</h1>
+  <details><summary style="cursor:pointer;color:#d4af37;font-size:13px">📋 Quick Start — 3 bước setup</summary>
+  <div style="padding:8px;font-size:12.5px;line-height:1.8">
+  <b>1. 🤖 AI:</b> Mở «🤖 AI Config» dưới → chọn Custom → dán API key (z.ai/model-api) → Lưu.<br>
+  <b>2. 📱 Telegram:</b> @BotFather → /newbot → copy token → dán vào «📱 Telegram Alert» → Bật.<br>
+  <b>3. 📊 Monitor:</b> Dashboard auto-refresh 15s. Xem visitor, chat history, health. Export CSV khi cần.
+  </div></details>
   <div id="status">Đang tải…</div>
   <div id="health" style="margin:6px 0;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,.2);font-size:13px"></div>
   <div id="alerts"></div>
