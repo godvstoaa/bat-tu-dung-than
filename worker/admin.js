@@ -45,7 +45,7 @@ async function logEvent(env, request, type, data) {
   try { log = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
   const isNewIp = type === 'visit' && !log.some((e) => e.ip === ip);
   log.unshift({ ts, type, ip, ua, country, city, data: data || {} });
-  if (log.length > 100) log.length = 100;
+  if (log.length > 200) log.length = 200;
   await env.ADMIN_KV.put('events:log', JSON.stringify(log));
   const day = new Date(ts).toISOString().slice(0, 10);
   for (const k of [`cnt:${type}`, 'cnt:all', `daily:${day}:${type}`]) {
