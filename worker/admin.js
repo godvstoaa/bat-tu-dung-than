@@ -515,69 +515,156 @@ function adminDashboard() {
   // Dashboard JS dùng DOM createElement + textContent (KHÔNG innerHTML → XSS-safe,
   //   user data — IP/AI-question — được escape tự động bởi textContent).
   return new Response(`<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin — Bát Tự</title><style>
-  body{background:#0a0913;color:#e8d9b0;font-family:system-ui,sans-serif;margin:0;padding:20px;line-height:1.5}
-  h1{color:#d4af37;margin:0 0 8px} h3{color:#d4af37;margin-top:24px}
+  :root{--bg:#0a0913;--surface:#15131f;--surface2:#1c1928;--border:rgba(212,175,55,.14);--border2:rgba(212,175,55,.28);--text:#e8d9b0;--muted:#9a8a6a;--gold:#d4af37;--green:#7fbf7f;--red:#e0533d;--blue:#64b4ff;--purple:#b478c8;--r:12px;--rs:8px}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;line-height:1.5;font-size:14px;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{margin:0}
+  h3{color:var(--gold);font-size:14px}
+  /* === LAYOUT: sidebar + main === */
+  .app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+  .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:18px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:10px}
+  .brand{font-size:17px;font-weight:800;color:var(--gold);line-height:1.15;padding:4px 8px}
+  .brand span{display:block;font-size:10px;color:var(--muted);font-weight:500;letter-spacing:3px;margin-top:2px}
+  .live{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);padding:5px 12px;background:rgba(127,191,127,.08);border:1px solid rgba(127,191,127,.2);border-radius:20px;width:fit-content;margin:0 4px}
+  #live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  nav{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:none;background:transparent;color:var(--text);border-radius:var(--rs);cursor:pointer;font-size:14px;text-align:left;font-family:inherit;width:100%}
+  .nav-item:hover{background:rgba(212,175,55,.07)}
+  .nav-item.active{background:rgba(212,175,55,.14);color:var(--gold);font-weight:600;box-shadow:inset 2px 0 0 var(--gold)}
+  .nav-item .ni-badge{margin-left:auto;font-size:10px;background:var(--surface2);color:var(--muted);padding:1px 6px;border-radius:8px}
+  .sidebar-footer{margin-top:auto;padding:8px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--muted)}
+  .main{padding:22px 26px;max-width:1180px;animation:fade .25s}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .tab{display:none}
+  .tab.active{display:block}
+  .pagehead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+  .pagehead h2{font-size:18px;color:var(--gold)}
+  .pagehead .tiny{font-size:12px}
+  /* === CARDS === */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px}
+  .card h3{margin:0 0 12px;color:var(--gold);font-size:13px;text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:8px}
+  .card .card-actions{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:11px;text-transform:none;letter-spacing:0}
+  .row-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .row-3col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+  /* === KPI grid (.stat → auto card) === */
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px;margin-bottom:14px}
+  .stat{display:block;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);min-width:0}
+  .stat b{display:block;font-size:26px;color:var(--gold);line-height:1.1;font-weight:700;margin-bottom:3px}
+  .stat span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .stat:hover{border-color:var(--border2)}
+  /* === TABLE / IP / tiny === */
   table{width:100%;border-collapse:collapse;font-size:12.5px}
-  th,td{padding:6px 8px;border-bottom:1px solid rgba(212,175,55,.15);text-align:left;vertical-align:top}
-  th{color:#d4af37} .ip{font-family:monospace;color:#7fbf7f} .tiny{color:#9a8a6a;font-size:11px}
-  .btn{padding:9px 18px;border:1px solid #d4af37;background:rgba(212,175,55,.12);color:#d4af37;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600}
-  .btn:hover{background:rgba(212,175,55,.22)} .btn.off{border-color:#c0392b;color:#c0392b;background:rgba(192,57,43,.12)}
-  .stat{display:inline-block;padding:10px 18px;margin:4px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.2);border-radius:8px;min-width:90px}
-  .stat b{display:block;font-size:26px;color:#d4af37;line-height:1.1}
-  .stat span{font-size:11px;color:#9a8a6a}
-  .filter{padding:5px 10px;background:rgba(0,0,0,.3);border:1px solid rgba(212,175,55,.2);color:#e8d9b0;border-radius:4px}
-  .badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700}
+  th,td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+  th{color:var(--gold);font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+  tr:hover td{background:rgba(212,175,55,.04)}
+  .ip{font-family:ui-monospace,"SF Mono",monospace;color:var(--green);font-size:12px}
+  .tiny{color:var(--muted);font-size:11px}
+  /* === BUTTONS / INPUTS === */
+  .btn{padding:8px 14px;border:1px solid var(--gold);background:rgba(212,175,55,.1);color:var(--gold);border-radius:var(--rs);cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:background .15s}
+  .btn:hover{background:rgba(212,175,55,.2)}
+  .btn.off{border-color:var(--red);color:var(--red);background:rgba(192,57,43,.12)}
+  .btn.sm{padding:4px 10px;font-size:11px}
+  .filter{padding:7px 10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--rs);font-size:13px;font-family:inherit}
+  .filter:focus{outline:none;border-color:var(--gold)}
+  .toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+  .badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
   .b-visit{background:rgba(127,191,127,.2);color:#7fbf7f}.b-chart{background:rgba(212,175,55,.2);color:#d4af37}.b-ai_question{background:rgba(180,120,200,.2);color:#b478c8}.b-other{background:rgba(150,150,150,.2);color:#aaa}.b-error{background:rgba(192,57,43,.25);color:#e0533d}.b-ai_chat{background:rgba(100,180,255,.2);color:#64b4ff}.b-click{background:rgba(100,200,150,.2);color:#64c896}
+  details{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px}
+  details>summary{cursor:pointer;color:var(--gold);font-size:13px;padding:12px 16px;list-style:none}
+  details>summary::-webkit-details-marker{display:none}
+  details>summary:before{content:"▸ ";color:var(--muted)}
+  details[open]>summary:before{content:"▾ "}
+  details>div,.details-body{padding:0 16px 14px}
+  /* === MOBILE === */
+  @media(max-width:820px){.app{grid-template-columns:1fr}.sidebar{position:sticky;top:0;height:auto;flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 12px;z-index:10}.brand{padding:0}.live{margin:0}nav{flex-direction:row;flex-wrap:wrap;margin:0;flex:1}.nav-item{width:auto;padding:6px 10px;font-size:13px}.nav-item .ni-badge{display:none}.sidebar-footer{margin:0;flex-direction:row}.main{padding:14px}.row-2col,.row-3col{grid-template-columns:1fr}}
   </style></head><body>
-  <h1>🛡️ Admin — Bát Tự Dụng Thần <span id="live-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7fbf7f;animation:pulse 1.5s infinite;margin-left:6px"></span> <span id="live-txt" style="font-size:12px;color:#7fbf7f">LIVE</span></h1>
-  <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}</style>
-  <details><summary style="cursor:pointer;color:#d4af37;font-size:13px">📋 Quick Start — 3 bước setup</summary>
-  <div style="padding:8px;font-size:12.5px;line-height:1.8">
-  <b>1. 🤖 AI:</b> Mở «🤖 AI Config» dưới → chọn Custom → dán API key (z.ai/model-api) → Lưu.<br>
-  <b>2. 📱 Telegram:</b> @BotFather → /newbot → copy token → dán vào «📱 Telegram Alert» → Bật.<br>
-  <b>3. 📊 Monitor:</b> Dashboard auto-refresh 3s (real-time). Xem visitor, chat history (click vào AI chat xem đầy đủ), health, latency. Export CSV khi cần.
-  </div></details>
-  <div id="status">Đang tải…</div>
-  <div id="health" style="margin:6px 0;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,.2);font-size:13px"></div>
-  <div id="alerts"></div>
-  <div id="controls" style="margin:12px 0"></div>
-  <div id="funnel" style="margin:8px 0 16px"></div>
-  <details style="margin:8px 0"><summary style="cursor:pointer;color:#d4af37;font-size:13px">📱 Telegram Alert — nhận thông báo khi user lập lá số/hỏi AI</summary>
-  <div style="padding:8px;background:rgba(0,0,0,.2);border-radius:8px;margin-top:4px">
-  <input class="filter" id="tg-token" placeholder="Bot Token (123:ABC...)" style="width:100%;margin:3px 0;box-sizing:border-box">
-  <input class="filter" id="tg-chat" placeholder="Chat ID" style="width:60%;box-sizing:border-box">
-  <button class="btn" style="padding:4px 10px;font-size:12px" onclick="tgSave()">Bật Alert</button>
-  <button class="btn" style="padding:4px 10px;font-size:12px" onclick="tgOff()">Tắt</button>
-  <button class="btn off" style="padding:4px 10px;font-size:12px;float:right" onclick="if(confirm('Xoá TẤT CẢ events + counters?')){clearData()}">🗑 Clear Data</button>
-  <button class="btn" style="padding:4px 10px;font-size:12px;float:right;margin-right:4px" onclick="blockList()">🚫 Blocked IPs</button>
-  <button class="btn" id="sound-btn" style="padding:4px 10px;font-size:12px;float:right;margin-right:4px" onclick="_soundOn=!_soundOn;this.textContent=_soundOn?'🔊 Sound ON':'🔇 Sound OFF';this.style.color=_soundOn?'#7fbf7f':''">🔇 Sound OFF</button>
-  <p class="tiny">Tạo bot: @BotFather → /newbot → lấy token. Chat ID: gửi tin cho bot rồi vào /getUpdates.</p>
-  </div></details>
-  <details style="margin:8px 0"><summary style="cursor:pointer;color:#d4af37;font-size:13px">🤖 AI Config — kiểm soát AI (free/custom/off)</summary>
-  <div style="padding:8px;background:rgba(0,0,0,.2);border-radius:8px;margin-top:4px" id="ai-cfg-box">
-  <select class="filter" id="ai-mode" onchange="aiModeChange()"><option value="free">Free (cf-glm)</option><option value="custom">Custom API Key</option><option value="off">Tắt AI</option></select>
-  <input class="filter" id="ai-endpoint" placeholder="Endpoint (vd https://api.z.ai/api/coding/paas/v4)" style="width:100%;margin:3px 0;box-sizing:border-box">
-  <input class="filter" id="ai-apikey" placeholder="API Key" style="width:100%;margin:3px 0;box-sizing:border-box">
-  <input class="filter" id="ai-model" placeholder="Model (vd glm-5.2)" style="width:60%;box-sizing:border-box">
-  <button class="btn" style="padding:4px 10px;font-size:12px" onclick="aiSave()">💾 Lưu Config</button>
-  <p class="tiny" id="ai-status">Đang tải...</p>
-  </div></details>
-  <h3>Sự kiện gần đây <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option><option value="ai_chat">ai_chat (Q+A)</option><option value="error">error</option><option value="click">click</option></select> <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})"> <button class="btn" style="padding:5px 12px;font-size:12px" onclick="load()">↻</button></h3>
-  <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
-  <h3>Theo visitor (IP) <span class="tiny">— mỗi IP: visit count, charts xem, câu hỏi AI</span> <input class="filter" id="ipsearch" placeholder="🔍 tìm IP..." oninput="var q=this.value.toLowerCase();document.querySelectorAll('#byip > div').forEach(function(c){c.style.display=!q||c.textContent.toLowerCase().indexOf(q)>=0?'':'none'})" style="width:120px;font-size:11px"></h3>
-  <div id="byip"></div>
-  <h3>Hoạt động 7 ngày</h3>
-  <div id="daily"></div>
-  <h3>Xu hướng 30 ngày <span class="tiny">— retention dài (dayagg, TTL 90 ngày, không phụ thuộc cap 1500)</span></h3>
-  <div id="trend30"></div>
-  <h3>Giờ hoạt động (VN, UTC+7)</h3>
-  <div id="hourly" style="display:flex;align-items:flex-end;gap:1px;height:40px;margin:4px 0 12px"></div>
-  <h3>Top câu hỏi AI & quốc gia</h3>
-  <div id="topq" style="display:flex;gap:24px;flex-wrap:wrap"></div>
-  <h3>🔒 Audit log — admin actions <span class="tiny">— truy vết toggle/block/clear/config (ai, khi nào, IP nào)</span> <button class="btn" style="padding:3px 10px;font-size:11px" onclick="loadAudit()">↻</button></h3>
-  <div id="audit"></div>
-  <h3>🆓 Free glm-5.2 usage <span class="tiny">— Cloudflare Workers AI (model ai cũng dùng được, CF_AI_KEY public) · 10k Neurons/ngày free</span> <button class="btn" style="padding:3px 10px;font-size:11px" onclick="freeTest()">🧪 Test model</button> <span id="free-test-result" class="tiny"></span></h3>
-  <div id="free-usage"></div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">🛡️ Bát Tự<span>ADMIN</span></div>
+      <div class="live"><span id="live-dot"></span> <span id="live-txt">LIVE</span></div>
+      <nav>
+        <button class="nav-item active" data-tab="overview">📊 <span>Tổng quan</span></button>
+        <button class="nav-item" data-tab="visitors">👥 <span>Visitors</span></button>
+        <button class="nav-item" data-tab="ai">🤖 <span>AI</span></button>
+        <button class="nav-item" data-tab="system">⚙️ <span>Hệ thống</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn sm" id="sound-btn" onclick="_soundOn=!_soundOn;this.textContent=_soundOn?'🔊 Sound':'🔇 Sound';this.style.color=_soundOn?'#7fbf7f':''">🔇 Sound</button>
+        <div>↻ auto-refresh 3s · realtime</div>
+      </div>
+    </aside>
+    <main class="main">
+      <!-- ===== TỔNG QUAN ===== -->
+      <section class="tab active" id="tab-overview">
+        <div class="pagehead"><h2>📊 Tổng quan</h2><span class="tiny">Snapshot realtime · 5 giây nắm tình hình</span></div>
+        <div id="alerts"></div>
+        <div id="status" class="kpi-grid">Đang tải…</div>
+        <div class="row-2col">
+          <div class="card"><h3>💚 Health</h3><div id="health"></div></div>
+          <div class="card"><h3>🜂 Funnel <span class="card-actions tiny">visitor → lá số → AI</span></h3><div id="funnel"></div></div>
+        </div>
+        <div class="card"><h3>📊 Engagement <span class="card-actions tiny">chất lượng & sâu traffic</span></h3><div id="engagement" class="kpi-grid"></div></div>
+        <div class="row-2col">
+          <div class="card"><h3>📈 Hoạt động 7 ngày</h3><div id="daily"></div></div>
+          <div class="card"><h3>📉 Xu hướng 30 ngày <span class="card-actions tiny">dayagg TTL 90d</span></h3><div id="trend30"></div></div>
+        </div>
+        <div class="card"><h3>⏰ Giờ hoạt động (VN, UTC+7)</h3><div id="hourly" style="display:flex;align-items:flex-end;gap:1px;height:44px;margin-top:4px"></div></div>
+        <div class="card"><h3>🌍 Quốc gia · nguồn traffic · clicks</h3><div id="topq" style="display:flex;gap:20px;flex-wrap:wrap"></div></div>
+      </section>
+      <!-- ===== VISITORS ===== -->
+      <section class="tab" id="tab-visitors">
+        <div class="pagehead"><h2>👥 Visitors</h2><span class="tiny">Ai xem gì, hỏi gì, từ đâu tới</span></div>
+        <div class="toolbar">
+          <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option><option value="ai_chat">ai_chat (Q+A)</option><option value="error">error</option><option value="click">click</option></select>
+          <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})">
+          <input class="filter" id="ipsearch" placeholder="🔍 lọc visitor" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#byip > div').forEach(function(c){c.style.display=!q||c.textContent.toLowerCase().indexOf(q)>=0?'':'none'})" style="width:140px">
+          <button class="btn sm" onclick="load()">↻</button>
+        </div>
+        <div class="card"><h3>Sự kiện gần đây <span class="card-actions tiny">click dòng ai_chat → xem full Q+A</span></h3><table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table></div>
+        <div class="card"><h3>Theo visitor (IP) <span class="card-actions tiny">timeline · lá số · chat</span></h3><div id="byip"></div></div>
+      </section>
+      <!-- ===== AI ===== -->
+      <section class="tab" id="tab-ai">
+        <div class="pagehead"><h2>🤖 AI</h2><span class="tiny">Free glm-5.2 · latency · config</span></div>
+        <div class="card"><h3>⚡ Latency & free model <span class="card-actions tiny">avg / p95 / max / quota</span></h3><div id="ai-kpis" class="kpi-grid"></div></div>
+        <div class="card"><h3>🆓 Free glm-5.2 usage <span class="card-actions"><button class="btn sm" onclick="freeTest()">🧪 Test model</button><span id="free-test-result" class="tiny"></span></span></h3><div id="free-usage"></div></div>
+        <details><summary>🤖 AI Config — mode / endpoint / key / model</summary>
+        <div class="details-body" id="ai-cfg-box">
+          <select class="filter" id="ai-mode" onchange="aiModeChange()"><option value="free">Free (cf-glm)</option><option value="custom">Custom API Key</option><option value="off">Tắt AI</option></select>
+          <input class="filter" id="ai-endpoint" placeholder="Endpoint (vd https://api.z.ai/api/coding/paas/v4)" style="width:100%;margin:6px 0;box-sizing:border-box">
+          <input class="filter" id="ai-apikey" placeholder="API Key (dán từ z.ai/model-api)" style="width:100%;margin:6px 0;box-sizing:border-box">
+          <input class="filter" id="ai-model" placeholder="Model (vd glm-5.2)" style="width:60%;box-sizing:border-box">
+          <button class="btn sm" onclick="aiSave()">💾 Lưu Config</button>
+          <p class="tiny" id="ai-status">Đang tải...</p>
+        </div></details>
+      </section>
+      <!-- ===== HỆ THỐNG ===== -->
+      <section class="tab" id="tab-system">
+        <div class="pagehead"><h2>⚙️ Hệ thống</h2><span class="tiny">Controls · Telegram · audit · security</span></div>
+        <div class="card"><h3>🎛️ Controls <span class="card-actions tiny">toggle AI · free · export · token</span></h3><div id="controls"></div></div>
+        <details><summary>📱 Telegram Alert — nhận TB khi user lập lá số / hỏi AI</summary>
+        <div class="details-body">
+          <input class="filter" id="tg-token" placeholder="Bot Token (123:ABC...)" style="width:100%;margin:4px 0;box-sizing:border-box">
+          <input class="filter" id="tg-chat" placeholder="Chat ID" style="width:50%;box-sizing:border-box">
+          <button class="btn sm" onclick="tgSave()">Bật Alert</button>
+          <button class="btn sm" onclick="tgOff()">Tắt</button>
+          <p class="tiny">@BotFather → /newbot → token. Chat ID: nhắn bot rồi /getUpdates.</p>
+        </div></details>
+        <div class="card"><h3>🔒 Audit log — admin actions <span class="card-actions"><button class="btn sm" onclick="loadAudit()">↻</button></span></h3><div id="audit"></div></div>
+        <div class="card"><h3>🚧 Security actions</h3>
+          <button class="btn sm" onclick="blockList()">🚫 Blocked IPs</button>
+          <button class="btn sm off" onclick="if(confirm('Xoá TẤT CẢ events + counters?')){clearData()}">🗑 Clear Data</button>
+        </div>
+        <details><summary>📋 Quick Start — 3 bước setup</summary>
+        <div class="details-body" style="font-size:13px;line-height:1.8">
+          <b>1. 🤖 AI:</b> tab «AI» → chọn Custom → dán key (z.ai/model-api) → Lưu.<br>
+          <b>2. 📱 Telegram:</b> @BotFather → /newbot → token → dán trên → Bật.<br>
+          <b>3. 📊 Monitor:</b> refresh 3s realtime. Click AI chat (tab Visitors) xem full Q+A. Export CSV ở «Controls».
+        </div></details>
+      </section>
+    </main>
+  </div>
   <script>
   const TOKEN = new URLSearchParams(location.search).get('token');
   const H = { 'X-Admin-Token': TOKEN };
@@ -596,12 +683,17 @@ function adminDashboard() {
     }
     _lastCount = d.totals.all;
     const st=document.getElementById('status'); st.textContent='';
+    var eng=document.getElementById('engagement'); if(eng) eng.textContent='';
+    var aik=document.getElementById('ai-kpis'); if(aik) aik.textContent='';
+    // [loop 1362] PRIMARY KPI (overview headline — 5-second glance)
     st.appendChild(statBlock(d.totals.visit,'visits'));
     st.appendChild(statBlock(d.totals.chart,'lá số'));
     st.appendChild(statBlock(d.totals.ai_question,'AI hỏi'));
     if (d.totals.ai_chat) st.appendChild(statBlock(d.totals.ai_chat, '💬 chats', '#b478c8'));
-    if (d.engagement && d.engagement.aiSuccessRate !== null) st.appendChild(statBlock(d.engagement.aiSuccessRate+'%', 'AI rate', d.engagement.aiSuccessRate < 50 ? '#c0392b' : '#7fbf7f'));
-    if (d.engagement && d.engagement.returningVisitors) st.appendChild(statBlock(d.engagement.returningVisitors, '🔄 quay lại', '#7fbf7f'));
+    if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
+    st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
+    st.appendChild(statBlock(d.activeNow||0,'🔴 active', (d.activeNow||0)>0?'#7fbf7f':'#666'));
+    st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     var hb=document.getElementById('health'); if (hb) { hb.textContent='';
       var hItems=[];
       if (d.engagement && d.engagement.aiSuccessRate !== null) hItems.push([(d.engagement.aiSuccessRate>=50)+'', 'AI trả lời: '+d.engagement.aiSuccessRate+'%']);
@@ -613,17 +705,21 @@ function adminDashboard() {
     }
     // [loop 1351] action alerts — guide admin fix issues
     var al=document.getElementById('alerts'); if (al) { al.textContent='';
-      if (d.engagement && d.engagement.aiSuccessRate !== null && d.engagement.aiSuccessRate < 50 && d.totals.ai_question > 2) { var wa=el('div'); wa.style.cssText='padding:8px 12px;background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.3);border-radius:8px;margin:6px 0;font-size:13px'; wa.appendChild(el('span',null,'⚠️ AI FAIL ('+d.engagement.aiSuccessRate+'%) — '+d.totals.ai_question+' câu hỏi không có trả lời. Mở «🤖 AI Config» thêm API key.')); al.appendChild(wa); }
-      if (d.engagement && d.engagement.avgLoadMs > 5000) { var wl=el('div'); wl.style.cssText='padding:8px 12px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.2);border-radius:8px;margin:6px 0;font-size:13px'; wl.appendChild(el('span',null,'⚠️ Load chậm ('+(d.engagement.avgLoadMs/1000).toFixed(1)+'s TB) — cân nhắc tối ưu bundle.')); al.appendChild(wl); }
-      if (d.aiLatency && d.aiLatency.count >= 3 && (d.aiLatency.maxMs > 90000 || d.aiLatency.p95Ms > 60000)) { var ws=el('div'); ws.style.cssText='padding:8px 12px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);border-radius:8px;margin:6px 0;font-size:13px'; ws.appendChild(el('span',null,'🐢 AI CHẬM — max '+fmtMs(d.aiLatency.maxMs)+', p95 '+fmtMs(d.aiLatency.p95Ms)+'. User phải đợi lâu — xem «🤖 AI Config» đổi model/endpoint nhanh hơn.')); al.appendChild(ws); }
+      if (d.engagement && d.engagement.aiSuccessRate !== null && d.engagement.aiSuccessRate < 50 && d.totals.ai_question > 2) { var wa=el('div'); wa.style.cssText='padding:10px 14px;background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.35);border-radius:8px;margin:0 0 10px;font-size:13px'; wa.appendChild(el('span',null,'⚠️ AI FAIL ('+d.engagement.aiSuccessRate+'%) — '+d.totals.ai_question+' câu hỏi không trả lời. Mở tab «AI» thêm API key.')); al.appendChild(wa); }
+      if (d.engagement && d.engagement.avgLoadMs > 5000) { var wl=el('div'); wl.style.cssText='padding:10px 14px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.25);border-radius:8px;margin:0 0 10px;font-size:13px'; wl.appendChild(el('span',null,'⚠️ Load chậm ('+(d.engagement.avgLoadMs/1000).toFixed(1)+'s TB) — cân nhắc tối ưu bundle.')); al.appendChild(wl); }
+      if (d.aiLatency && d.aiLatency.count >= 3 && (d.aiLatency.maxMs > 90000 || d.aiLatency.p95Ms > 60000)) { var ws=el('div'); ws.style.cssText='padding:10px 14px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);border-radius:8px;margin:0 0 10px;font-size:13px'; ws.appendChild(el('span',null,'🐢 AI CHẬM — max '+fmtMs(d.aiLatency.maxMs)+', p95 '+fmtMs(d.aiLatency.p95Ms)+'. User đợi lâu — tab «AI» đổi model/endpoint.')); al.appendChild(ws); }
     }
-    if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
-    st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
-    st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
-    if (d.engagement) { st.appendChild(statBlock(d.engagement.bounceRate+'%','bounce', d.engagement.bounceRate>60?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.avgEvents,'events/IP')); if (d.engagement.avgLoadMs) st.appendChild(statBlock(d.engagement.avgLoadMs+'ms','⏱ load', d.engagement.avgLoadMs>3000?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.sessions||0,'sessions')); st.appendChild(statBlock((d.engagement.avgSessionMin||0)+'min','⏱/sess')); }
-    if (d.aiLatency) { st.appendChild(statBlock(fmtMs(d.aiLatency.avgMs), 'AI ⏱ avg', d.aiLatency.avgMs>30000?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(fmtMs(d.aiLatency.p95Ms), 'AI ⏱ p95', d.aiLatency.p95Ms>60000?'#c0392b':'#d4af37')); st.appendChild(statBlock(fmtMs(d.aiLatency.maxMs), 'AI ⏱ max', '#9a8a6a')); if (d.aiLatency.bailCount>0) st.appendChild(statBlock(d.aiLatency.bailCount, '⏱ bị cắt 60s', '#e0533d')); }
-    if (d.freeUsage) { st.appendChild(statBlock(d.freeUsage.calls, '🆓 free glm-5.2', '#64b4ff')); if (d.freeUsage.today) st.appendChild(statBlock(d.freeUsage.today, '🆓 free hôm nay', '#64b4ff')); if (d.freeUsage.err) st.appendChild(statBlock(d.freeUsage.err, '🆓 free lỗi', d.freeUsage.err>0?'#e0533d':'#9a8a6a')); st.appendChild(statBlock(d.freeUsage.enabled?'BẬT':'TẮT', '🆓 free mode', d.freeUsage.enabled?'#7fbf7f':'#c0392b')); }
-    st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
+    // [loop 1362] ENGAGEMENT metrics → #engagement card (detail, tránh metric wall ở headline)
+    if (eng) {
+      if (d.engagement && d.engagement.aiSuccessRate !== null) eng.appendChild(statBlock(d.engagement.aiSuccessRate+'%', 'AI rate', d.engagement.aiSuccessRate < 50 ? '#c0392b' : '#7fbf7f'));
+      if (d.engagement && d.engagement.returningVisitors) eng.appendChild(statBlock(d.engagement.returningVisitors, '🔄 quay lại', '#7fbf7f'));
+      if (d.engagement) { eng.appendChild(statBlock(d.engagement.bounceRate+'%','bounce', d.engagement.bounceRate>60?'#c0392b':'#7fbf7f')); eng.appendChild(statBlock(d.engagement.avgEvents,'events/IP')); if (d.engagement.avgLoadMs) eng.appendChild(statBlock(d.engagement.avgLoadMs+'ms','⏱ load', d.engagement.avgLoadMs>3000?'#c0392b':'#7fbf7f')); eng.appendChild(statBlock(d.engagement.sessions||0,'sessions')); eng.appendChild(statBlock((d.engagement.avgSessionMin||0)+'min','⏱/sess')); }
+    }
+    // [loop 1362] AI latency + free model → #ai-kpis (tab AI)
+    if (aik) {
+      if (d.aiLatency) { aik.appendChild(statBlock(fmtMs(d.aiLatency.avgMs), 'AI ⏱ avg', d.aiLatency.avgMs>30000?'#c0392b':'#7fbf7f')); aik.appendChild(statBlock(fmtMs(d.aiLatency.p95Ms), 'AI ⏱ p95', d.aiLatency.p95Ms>60000?'#c0392b':'#d4af37')); aik.appendChild(statBlock(fmtMs(d.aiLatency.maxMs), 'AI ⏱ max', '#9a8a6a')); if (d.aiLatency.bailCount>0) aik.appendChild(statBlock(d.aiLatency.bailCount, '⏱ cắt 60s', '#e0533d')); }
+      if (d.freeUsage) { aik.appendChild(statBlock(d.freeUsage.calls, '🆓 free calls', '#64b4ff')); if (d.freeUsage.today) aik.appendChild(statBlock(d.freeUsage.today, '🆓 free hôm nay', '#64b4ff')); if (d.freeUsage.err) aik.appendChild(statBlock(d.freeUsage.err, '🆓 free lỗi', d.freeUsage.err>0?'#e0533d':'#9a8a6a')); aik.appendChild(statBlock(d.freeUsage.enabled?'BẬT':'TẮT', '🆓 free mode', d.freeUsage.enabled?'#7fbf7f':'#c0392b')); }
+    }
     const c=document.getElementById('controls'); c.textContent='';
     // [loop 1351] conversion funnel
     const fn=document.getElementById('funnel'); if (fn && d.funnel) { fn.textContent='';
@@ -835,6 +931,15 @@ function adminDashboard() {
     });
   }
   loadAudit();
+  // [loop 1362] tab switching — sidebar nav đổi section (redesign)
+  document.querySelectorAll('.nav-item').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('active');});
+      document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');
+      var t=document.getElementById('tab-'+b.dataset.tab); if(t) t.classList.add('active');
+    });
+  });
   // [loop 1355] token URL hygiene — strip token khỏi URL sau load (chống leak via history/share)
   if (location.search && location.search.indexOf('token=') >= 0) {
     var _u = new URL(location.href); _u.searchParams.delete('token');
