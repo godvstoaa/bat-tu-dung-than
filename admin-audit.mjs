@@ -93,10 +93,14 @@ ok(dh.headers.get('strict-transport-security'), 'dashboard có HSTS');
 ok(dh.headers.get('x-frame-options') === 'DENY', 'dashboard X-Frame-Options DENY (chống clickjacking)');
 ok(dh.headers.get('referrer-policy') === 'no-referrer', 'dashboard Referrer-Policy no-referrer (chống leak token qua Referer)');
 ok(!!dh.headers.get('x-content-type-options'), 'dashboard X-Content-Type-Options nosniff');
-const mh = await fetch(BASE + '/');
-ok(!!mh.headers.get('strict-transport-security'), 'main app có HSTS');
+const mh = await fetch(BASE + '/', { headers: { 'User-Agent': 'Mozilla/5.0 (admin-audit)' } });
+ok(mh.status === 200, 'main app / trả 200 cho browser UA (got ' + mh.status + ')');
+ok(!!mh.headers.get('strict-transport-security'), 'main app có HSTS (run_worker_first inject)');
 ok(mh.headers.get('x-content-type-options') === 'nosniff', 'main app X-Content-Type-Options nosniff');
 ok(!!mh.headers.get('referrer-policy'), 'main app có Referrer-Policy');
+// [loop 1355] run_worker_first → anti-scraping áp dụng cả main document (trước đây edge bypass)
+const scraper = await fetch(BASE + '/', { headers: { 'User-Agent': 'curl/8.0 audit-scraper-test' } });
+ok(scraper.status === 403, 'scraper UA bị block ở / (anti-scraping giờ áp dụng mọi route, got ' + scraper.status + ')');
 
 // 4. CSV export
 const csv = await fetch(BASE + '/admin/api/export?token=' + TOKEN).then((r) => r.text());
