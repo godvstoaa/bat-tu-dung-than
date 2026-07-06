@@ -184,6 +184,13 @@ export async function handleAdminRoute(request, env, url) {
       if (env.ADMIN_KV) { await env.ADMIN_KV.delete('events:log'); await env.ADMIN_KV.delete('cache:stats'); for (const k of ['cnt:visit','cnt:chart','cnt:ai_question','cnt:ai_chat','cnt:error','cnt:all']) await env.ADMIN_KV.delete(k); }
       return json({ ok: true, msg: 'Events + counters cleared' });
     }
+    if (path === '/admin/api/block' && method === 'POST') {
+      const body = await request.json().catch(() => ({}));
+      if (body.ip && body.block) { await env.ADMIN_KV.put('block:' + body.ip, '1'); return json({ ok: true, msg: 'Blocked ' + body.ip }); }
+      if (body.ip && !body.block) { await env.ADMIN_KV.delete('block:' + body.ip); return json({ ok: true, msg: 'Unblocked ' + body.ip }); }
+      if (body.list) { const ks = await env.ADMIN_KV.list({ prefix: 'block:' }); return json({ blocked: ks.keys.map((k) => k.name.slice(6)) }); }
+      return json({ ok: false, err: 'Cần {ip, block:true/false} hoặc {list:true}' }, 400);
+    }
     return new Response('Not found', { status: 404 });
   }
   return null;
@@ -353,7 +360,8 @@ function adminDashboard() {
   .badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700}
   .b-visit{background:rgba(127,191,127,.2);color:#7fbf7f}.b-chart{background:rgba(212,175,55,.2);color:#d4af37}.b-ai_question{background:rgba(180,120,200,.2);color:#b478c8}.b-other{background:rgba(150,150,150,.2);color:#aaa}.b-error{background:rgba(192,57,43,.25);color:#e0533d}.b-ai_chat{background:rgba(100,180,255,.2);color:#64b4ff}.b-click{background:rgba(100,200,150,.2);color:#64c896}
   </style></head><body>
-  <h1>🛡️ Admin — Bát Tự Dụng Thần</h1>
+  <h1>🛡️ Admin — Bát Tự Dụng Thần <span id="live-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7fbf7f;animation:pulse 1.5s infinite;margin-left:6px"></span> <span id="live-txt" style="font-size:12px;color:#7fbf7f">LIVE</span></h1>
+  <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}</style>
   <details><summary style="cursor:pointer;color:#d4af37;font-size:13px">📋 Quick Start — 3 bước setup</summary>
   <div style="padding:8px;font-size:12.5px;line-height:1.8">
   <b>1. 🤖 AI:</b> Mở «🤖 AI Config» dưới → chọn Custom → dán API key (z.ai/model-api) → Lưu.<br>
@@ -372,6 +380,7 @@ function adminDashboard() {
   <button class="btn" style="padding:4px 10px;font-size:12px" onclick="tgSave()">Bật Alert</button>
   <button class="btn" style="padding:4px 10px;font-size:12px" onclick="tgOff()">Tắt</button>
   <button class="btn off" style="padding:4px 10px;font-size:12px;float:right" onclick="if(confirm('Xoá TẤT CẢ events + counters?')){clearData()}">🗑 Clear Data</button>
+  <button class="btn" style="padding:4px 10px;font-size:12px;float:right;margin-right:4px" onclick="blockList()">🚫 Blocked IPs</button>
   <p class="tiny">Tạo bot: @BotFather → /newbot → lấy token. Chat ID: gửi tin cho bot rồi vào /getUpdates.</p>
   </div></details>
   <details style="margin:8px 0"><summary style="cursor:pointer;color:#d4af37;font-size:13px">🤖 AI Config — kiểm soát AI (free/custom/off)</summary>
@@ -465,6 +474,7 @@ function adminDashboard() {
         head.appendChild(el('span','tiny', (v.country||'?')+(v.city?' / '+v.city:'')+' · '+v.count+' sự kiện ('+v.visits+' visits)'));
         card.appendChild(head);
         card.appendChild(el('div','tiny','⏱ '+new Date(v.firstTs).toLocaleString('vi-VN')+' → '+new Date(v.lastTs).toLocaleString('vi-VN')));
+        var bk=el('button','btn'); bk.textContent='🚫 Block'; bk.style.cssText='padding:2px 6px;font-size:10px;float:right'; bk.onclick=(function(ip){return function(){if(confirm('Block IP '+ip+'?'))blockIp(ip,1);};})(v.ip); card.appendChild(bk);
         if (v.charts.length) card.appendChild(el('div','tiny','📊 Lá số xem ('+v.charts.length+'): '+v.charts.map(function(c){return (c.dob||'?')+' '+(c.gender||'');}).join('; ').slice(0,400)));
         if (v.questions.length) card.appendChild(el('div','tiny','💬 AI hỏi ('+v.questions.length+'): '+v.questions.map(function(q){return '«'+String(q).slice(0,90)+'»';}).join(' ').slice(0,500)));
         if (v.chats.length) { v.chats.forEach(function(ch){ var cd=el('div','tiny','💬 «'+String(ch.q).slice(0,80)+'» → '+(ch.source==='ai'?'🤖':'📦')+' '+(ch.response||'').slice(0,200)+'...'); cd.style.cssText='border-left:2px solid rgba(212,175,55,.3);padding-left:6px;margin:2px 0'; card.appendChild(cd); }); }
@@ -502,7 +512,7 @@ function adminDashboard() {
     }
   }
   async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); }
-  load(); setInterval(load, 15000);
+  load(); setInterval(load, 5000);
   async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
   async function tgOff(){ await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable:true})}); alert('Telegram alert đã tắt'); }
   async function aiLoad(){ var r=await fetch('/admin/api/ai-config?token='+TOKEN).then(function(r){return r.json()}); var c=r.config||{}; document.getElementById('ai-mode').value=c.mode||'free'; document.getElementById('ai-endpoint').value=c.endpoint||'https://api.z.ai/api/coding/paas/v4'; document.getElementById('ai-apikey').value=''; document.getElementById('ai-apikey').placeholder=c.apiKey?'Đã đặt ('+c.apiKey+')':'API Key (dán từ z.ai/model-api)'; document.getElementById('ai-model').value=c.model||'glm-5.2'; document.getElementById('ai-status').textContent='Mode: '+(c.mode||'free')+(c.apiKey?' | Key: '+c.apiKey:' | No key'); aiModeChange(); }
@@ -510,5 +520,7 @@ function adminDashboard() {
   async function aiSave(){ var body={mode:document.getElementById('ai-mode').value}; if(document.getElementById('ai-endpoint').value)body.endpoint=document.getElementById('ai-endpoint').value; if(document.getElementById('ai-apikey').value)body.apiKey=document.getElementById('ai-apikey').value; if(document.getElementById('ai-model').value)body.model=document.getElementById('ai-model').value; var r=await fetch('/admin/api/ai-config?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}); alert(r.ok?'✅ AI config đã lưu!':'❌ Lỗi'); aiLoad(); load(); }
   aiLoad();
   async function clearData(){ var r=await fetch('/admin/api/clear?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json()}); alert(r.ok?'✅ Data cleared':'❌ '+r.err); load(); }
+  async function blockList(){ var r=await fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({list:true})}).then(function(r){return r.json()}); alert('Blocked IPs: '+((r.blocked||[]).join(', ')||'(không có)')); }
+  function blockIp(ip,block){ fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip,block:block})}).then(function(){load();}); }
   </script></body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
