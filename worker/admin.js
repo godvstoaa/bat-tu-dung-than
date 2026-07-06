@@ -124,7 +124,7 @@ export async function logFreeUsage(env, ip, status, backend) {
   await env.ADMIN_KV.put('free:log', JSON.stringify(log));
 }
 
-async function logEvent(env, request, type, data) {
+export async function logEvent(env, request, type, data) {
   if (!env.ADMIN_KV) return true;
   const ip = clientIP(request);
   // [loop 1351] rate-limit: max 30 events/phút/IP (anti-spam flood KV). KV approx (eventual-consistent).
