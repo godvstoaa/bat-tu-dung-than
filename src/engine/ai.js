@@ -1361,6 +1361,7 @@ export function _isSynthesisQuestion(question) {
   const SYN = [
     //.request "chốt lại / tóm lại / đúc kết" toàn bộ
     /chot lai|tom lai|tom tat|tong (quan|hop)|toan canh|duc ket|dai cuong|khai quat/,
+
     //.quỹ đạo / đời / câu chuyện
     /quy (dao|tich)|doi (toi|nay|ca)|cuoc doi|cau chuyen|ke lai (tu|cuoc)|dan dat/,
     //."nhìn thế ai hiểu / tổng tất cả phương pháp"
@@ -1375,6 +1376,21 @@ export function _isSynthesisQuestion(question) {
   if (/^(menh|la so|bai tu|tu vi).*(the nao|ra sao|luan g[ii]up)/.test(q)) return true;
   // "luận/xem/phân tích cho tôi cả... / hết... / nhiều năm" (rộng)
   if (/(luan|xem|noi|phan tich).*(cho|giup).*toi.*(ca|het|nhieu nam|ca doi)/.test(q)) return true;
+  return false;
+}
+
+// [loop 1358 SPEED] câu trivial (greeting/confirm/rất ngắn KHÔNG có topic keyword) →
+//   tool-free round 1 → 1 round thay vì 3 (nhanh hơn). CONSERVATIVE → 0 risk chất lượng:
+//   chỉ trivial khi ≤3 từ VÀ KHÔNG chứa topic keyword (menh/ngay/nam/cuoi/tai...).
+//   Topic keyword dùng \b (word boundary) để tránh false-match như «am» trùng «c-am».
+export function _isTrivial(question) {
+  const q = (question || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').trim();
+  if (!q) return true; // rỗng
+  // topic keyword (có thể cần tool/xử lý đầy đủ) → KHÔNG trivial. \b = word boundary.
+  if (/\b(menh|dung|ngay|thang|nam|nu|gio|huong|que|cuoi|vo|chong|me|bo|phong|tai|quyen|nghe|hoc|thi|tinh|hon|con|khoe|phuong|dai|luu|thap|than|sinh|khac|van|phuc|dia|khi|ngu)\b/.test(' ' + q + ' ')) return false;
+  const words = q.split(/\s+/).filter(Boolean);
+  // greeting/confirm/short (≤3 từ) không có topic keyword → trivial (tool-free 1 round)
+  if (words.length <= 3) return true;
   return false;
 }
 
@@ -1507,7 +1523,11 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
     ...(toolsOn ? { tools: AI_TOOLS, tool_choice: 'auto' } : {}),
   });
 
-  let toolsOn = true, thinkOn = true;
+  // [loop 1358 SPEED] trivial question (greeting/confirm/very-short KHÔNG có keyword tool)
+  //   → tool-free ngay round 1 → 1 round thay vì 3. Chẩn đoán: durations 25-73s với 12s/round
+  //   cap = multi-round là nguồn chậm. «ok»/«cảm ơn»/«chào thầy» không bao giờ cần tool → 0 risk chất lượng.
+  let toolsOn = !_isTrivial(question), thinkOn = true;
+  const _roundsDetail = []; // [loop 1358] telemetry: mỗi round làm gì (tool/empty/done)
   // [loop 1353 LATENCY GUARD] admin insight aiLatency: p95=156s, max=156s (count=12).
   //   Root cause: `step=-1; continue` reset vòng lặp mỗi lần tắt tools/thinking → tối đa
   //   18 rounds × 12s/round = 216s. Không có total cap → user chờ 2.6 phút.
@@ -1536,6 +1556,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
       const { content, toolCalls } = round;
 
       if (toolCalls && toolCalls.length && toolsOn) {
+        _roundsDetail.push('tool:' + toolCalls.map((tc) => tc.name).join(','));
         messages.push({
           role: 'assistant', content: content || '',
           tool_calls: toolCalls.map((tc) => ({ id: tc.id, type: 'function', function: { name: tc.name, arguments: tc.arguments } })),
@@ -1551,11 +1572,13 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
       }
 
       if (!content) {
+        _roundsDetail.push('empty');
         if (toolsOn) { toolsOn = false; step = -1; continue; } // thử lại không tool
         if (thinkOn) { thinkOn = false; step = -1; continue; } // [loop 1186] thử lại không thinking
         throw new Error('Phản hồi rỗng');
       }
-      return { source: 'ai', text: content, meta: { rounds: _roundsDone, totalMs: Date.now() - _tStart } };
+      _roundsDetail.push('done');
+      return { source: 'ai', text: content, meta: { rounds: _roundsDone, totalMs: Date.now() - _tStart, detail: _roundsDetail, toolsOn0: !_isTrivial(question) } };
     }
     return _bail('AI vượt quá số vòng tối đa');
   } catch (e) {
