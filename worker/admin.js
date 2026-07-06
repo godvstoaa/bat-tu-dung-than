@@ -386,6 +386,7 @@ function adminDashboard() {
   <button class="btn" style="padding:4px 10px;font-size:12px" onclick="tgOff()">Tắt</button>
   <button class="btn off" style="padding:4px 10px;font-size:12px;float:right" onclick="if(confirm('Xoá TẤT CẢ events + counters?')){clearData()}">🗑 Clear Data</button>
   <button class="btn" style="padding:4px 10px;font-size:12px;float:right;margin-right:4px" onclick="blockList()">🚫 Blocked IPs</button>
+  <button class="btn" id="sound-btn" style="padding:4px 10px;font-size:12px;float:right;margin-right:4px" onclick="_soundOn=!_soundOn;this.textContent=_soundOn?'🔊 Sound ON':'🔇 Sound OFF';this.style.color=_soundOn?'#7fbf7f':''">🔇 Sound OFF</button>
   <p class="tiny">Tạo bot: @BotFather → /newbot → lấy token. Chat ID: gửi tin cho bot rồi vào /getUpdates.</p>
   </div></details>
   <details style="margin:8px 0"><summary style="cursor:pointer;color:#d4af37;font-size:13px">🤖 AI Config — kiểm soát AI (free/custom/off)</summary>
@@ -399,7 +400,7 @@ function adminDashboard() {
   </div></details>
   <h3>Sự kiện gần đây <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option><option value="ai_chat">ai_chat (Q+A)</option><option value="error">error</option><option value="click">click</option></select> <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})"> <button class="btn" style="padding:5px 12px;font-size:12px" onclick="load()">↻</button></h3>
   <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
-  <h3>Theo visitor (IP) <span class="tiny">— mỗi IP: visit count, charts xem, câu hỏi AI</span></h3>
+  <h3>Theo visitor (IP) <span class="tiny">— mỗi IP: visit count, charts xem, câu hỏi AI</span> <input class="filter" id="ipsearch" placeholder="🔍 tìm IP..." oninput="var q=this.value.toLowerCase();document.querySelectorAll('#byip > div').forEach(function(c){c.style.display=!q||c.textContent.toLowerCase().indexOf(q)>=0?'':'none'})" style="width:120px;font-size:11px"></h3>
   <div id="byip"></div>
   <h3>Hoạt động 7 ngày</h3>
   <div id="daily"></div>
@@ -536,6 +537,9 @@ function adminDashboard() {
   }
   async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); }
   load(); setInterval(load, 3000);
+  // [loop 1351] sound notification — beep khi có event mới
+  var _lastCount = 0; var _soundOn = false;
+  var _origLoad = load; load = async function() { await _origLoad(); try { var d = await fetch('/admin/api/stats?nocache=1', { headers: H }).then(function(r){return r.json()}); if (_lastCount > 0 && d.totals.all > _lastCount && _soundOn) { var ctx = new (window.AudioContext||window.webkitAudioContext)(); var osc = ctx.createOscillator(); osc.frequency.value = 880; osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.15); } _lastCount = d.totals.all; } catch(e) {} };
   async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
   async function tgOff(){ await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable:true})}); alert('Telegram alert đã tắt'); }
   async function aiLoad(){ var r=await fetch('/admin/api/ai-config?token='+TOKEN).then(function(r){return r.json()}); var c=r.config||{}; document.getElementById('ai-mode').value=c.mode||'free'; document.getElementById('ai-endpoint').value=c.endpoint||'https://api.z.ai/api/coding/paas/v4'; document.getElementById('ai-apikey').value=''; document.getElementById('ai-apikey').placeholder=c.apiKey?'Đã đặt ('+c.apiKey+')':'API Key (dán từ z.ai/model-api)'; document.getElementById('ai-model').value=c.model||'glm-5.2'; document.getElementById('ai-status').textContent='Mode: '+(c.mode||'free')+(c.apiKey?' | Key: '+c.apiKey:' | No key'); aiModeChange(); }
