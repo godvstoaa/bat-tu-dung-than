@@ -221,7 +221,11 @@ async function adminStats(env, url) {
     if (e.ts > g.lastTs) g.lastTs = e.ts;
     if (e.ts < g.firstTs) g.firstTs = e.ts;
   }
-  const byIpArr = Object.values(byIp).sort((a, b) => b.lastTs - a.lastTs);
+  const byIpArr = Object.values(byIp).sort((a, b) => b.lastTs - a.lastTs).map(function(v) {
+    // [loop 1351 perf] truncate timeline to last 15 events (reduce response size)
+    if (v.timeline && v.timeline.length > 15) v.timeline = v.timeline.slice(0, 15);
+    return v;
+  });
   // [loop 1351] top countries (geo distribution)
   const ctry = {};
   for (const e of events) { const c = e.country || '?'; ctry[c] = (ctry[c] || 0) + 1; }
