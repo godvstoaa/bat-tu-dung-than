@@ -332,6 +332,15 @@ function adminDashboard() {
   <button class="btn" style="padding:4px 10px;font-size:12px" onclick="tgOff()">Tắt</button>
   <p class="tiny">Tạo bot: @BotFather → /newbot → lấy token. Chat ID: gửi tin cho bot rồi vào /getUpdates.</p>
   </div></details>
+  <details style="margin:8px 0"><summary style="cursor:pointer;color:#d4af37;font-size:13px">🤖 AI Config — kiểm soát AI (free/custom/off)</summary>
+  <div style="padding:8px;background:rgba(0,0,0,.2);border-radius:8px;margin-top:4px" id="ai-cfg-box">
+  <select class="filter" id="ai-mode" onchange="aiModeChange()"><option value="free">Free (cf-glm)</option><option value="custom">Custom API Key</option><option value="off">Tắt AI</option></select>
+  <input class="filter" id="ai-endpoint" placeholder="Endpoint (vd https://api.z.ai/api/coding/paas/v4)" style="width:100%;margin:3px 0;box-sizing:border-box">
+  <input class="filter" id="ai-apikey" placeholder="API Key" style="width:100%;margin:3px 0;box-sizing:border-box">
+  <input class="filter" id="ai-model" placeholder="Model (vd glm-5.2)" style="width:60%;box-sizing:border-box">
+  <button class="btn" style="padding:4px 10px;font-size:12px" onclick="aiSave()">💾 Lưu Config</button>
+  <p class="tiny" id="ai-status">Đang tải...</p>
+  </div></details>
   <h3>Sự kiện gần đây <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option></select> <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})"> <button class="btn" style="padding:5px 12px;font-size:12px" onclick="load()">↻</button></h3>
   <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
   <h3>Theo visitor (IP) <span class="tiny">— mỗi IP: visit count, charts xem, câu hỏi AI</span></h3>
@@ -429,5 +438,9 @@ function adminDashboard() {
   load(); setInterval(load, 15000);
   async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
   async function tgOff(){ await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable:true})}); alert('Telegram alert đã tắt'); }
+  async function aiLoad(){ var r=await fetch('/admin/api/ai-config?token='+TOKEN).then(function(r){return r.json()}); var c=r.config||{}; document.getElementById('ai-mode').value=c.mode||'free'; document.getElementById('ai-endpoint').value=c.endpoint||''; document.getElementById('ai-apikey').value=''; document.getElementById('ai-apikey').placeholder=c.apiKey?'Đã đặt ('+c.apiKey+')':'API Key'; document.getElementById('ai-model').value=c.model||''; document.getElementById('ai-status').textContent='Mode: '+(c.mode||'free')+(c.apiKey?' | Key: '+c.apiKey:' | No key'); aiModeChange(); }
+  function aiModeChange(){ var m=document.getElementById('ai-mode').value; var dis=m==='off'; ['ai-endpoint','ai-apikey','ai-model'].forEach(function(id){document.getElementById(id).disabled=dis;}); }
+  async function aiSave(){ var body={mode:document.getElementById('ai-mode').value}; if(document.getElementById('ai-endpoint').value)body.endpoint=document.getElementById('ai-endpoint').value; if(document.getElementById('ai-apikey').value)body.apiKey=document.getElementById('ai-apikey').value; if(document.getElementById('ai-model').value)body.model=document.getElementById('ai-model').value; var r=await fetch('/admin/api/ai-config?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}); alert(r.ok?'✅ AI config đã lưu!':'❌ Lỗi'); aiLoad(); load(); }
+  aiLoad();
   </script></body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
