@@ -1526,7 +1526,10 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   // [loop 1358 SPEED] trivial question (greeting/confirm/very-short KHÔNG có keyword tool)
   //   → tool-free ngay round 1 → 1 round thay vì 3. Chẩn đoán: durations 25-73s với 12s/round
   //   cap = multi-round là nguồn chậm. «ok»/«cảm ơn»/«chào thầy» không bao giờ cần tool → 0 risk chất lượng.
-  let toolsOn = !_isTrivial(question), thinkOn = true;
+  // [loop 1359 SPEED] synthesis cũng tool-free — MASTER_SYNTHESIS_GUIDE đã yêu cầu «KHÔNG gọi tool»
+  //   (trả lời từ full brief). Ép tools OFF đảm bảo tuân thủ → 1 round. _isSynthesis đã compute ở trên.
+  //   Synthesis đọc từ brief đầy đủ → 0 risk chất lượng.
+  let toolsOn = !_isTrivial(question) && !_isSynthesis, thinkOn = true;
   const _roundsDetail = []; // [loop 1358] telemetry: mỗi round làm gì (tool/empty/done)
   // [loop 1353 LATENCY GUARD] admin insight aiLatency: p95=156s, max=156s (count=12).
   //   Root cause: `step=-1; continue` reset vòng lặp mỗi lần tắt tools/thinking → tối đa
