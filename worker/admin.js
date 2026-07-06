@@ -231,7 +231,7 @@ async function adminStats(env, url) {
   // [loop 1351] hourly activity (giờ VN — UTC+7) — biết giờ user active nhất
   const hourly = new Array(24).fill(0);
   for (const e of events) {
-    if (e.type === 'visit' && !BOT_RE.test(e.ua || '')) {
+    if (e.type === 'visit' && !/bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i.test(e.ua || '')) {
       const h = (new Date(e.ts).getUTCHours() + 7) % 24;
       hourly[h]++;
     }
