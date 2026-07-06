@@ -1,85 +1,105 @@
 # 🛡️ Admin System — Bát Tự Dụng Thần (loop 1351+)
 
-Hệ thống admin production-grade: thống kê visitor + AI control sâu + chat history + Telegram alerts.
+Hệ thống admin production-grade: thống kê visitor + AI control sâu + chat history + Telegram + chống cào/phá + real-time.
 
 ## Truy cập Dashboard
 ```
 https://battu.god8.shop/admin?token=<ADMIN_TOKEN>
 ```
-Token lưu trong Cloudflare KV (`admin:token`).
 
-## Tính năng
+## Quick Start (3 bước)
+1. **🤖 AI**: Mở «🤖 AI Config» → chọn Custom → dán API key (z.ai/model-api) → endpoint + model pre-filled → Lưu.
+2. **📱 Telegram**: @BotFather → /newbot → copy token → dán vào «📱 Telegram Alert» → Bật.
+3. **📊 Monitor**: Dashboard auto-refresh 3s. 🔴 LIVE + 🔊 Sound + 🔔 title flash khi event mới.
+
+## Tính năng (37+)
 
 ### Analytics
 | | |
 |---|---|
-| **Thống kê** | visits / lá số / AI hỏi / 💬 chats / IP thật / 🔴 active now / ⏱ load |
-| **Conversion funnel** | visitor → chart → AI (% engagement) |
-| **Engagement** | bounce rate / sessions / avgSessionMin / avgEvents |
-| **Sự kiện** | bảng + 🔍 search (IP/câu hỏi) + lọc loại |
-| **Theo visitor (IP)** | mỗi IP → geo + charts xem + **full chat history (Q+A)** + timeline |
-| **7 ngày** | mini bar chart hoạt động |
-| **Top** | câu hỏi AI + quốc gia + **nguồn traffic (referrer)** + **thiết bị** |
-| **Bot filter** | loại crawler, chỉ đếm visitor thật |
+| **Stats** | visits / charts / AI / chats / errors / clicks / IP / 🔴 active / bounce / load / sessions / AI-rate / returning |
+| **Health Check** | AI rate ✅/⚠ · errors ✅/⚠ · load ✅/⚠ · bounce ✅/⚠ |
+| **Action Alerts** | banner đỏ «AI FAIL» + vàng «Load chậm» |
+| **Funnel** | visitor → chart → AI (% conversion) |
+| **Engagement** | bounceRate / sessions / avgSessionMin / avgEvents / avgCharts / avgLoadMs / aiSuccessRate / returningVisitors |
+| **Events** | bảng + 🔍 search + filter 6 loại (visit/chart/ai_question/ai_chat/error/click) |
+| **By IP** | mỗi IP → geo + charts + full chat Q+A + 📅 timeline (chronological journey) + 🚫 Block button |
+| **7 ngày** | mini bar chart |
+| **24 giờ** | hourly activity (VN UTC+7) |
+| **Top** | câu hỏi AI + quốc gia + nguồn traffic + **conversion rate** + thiết bị + feature clicks |
+| **Referrer Conversion** | FB vs direct vs Google → % chart conversion per source |
+| **Bot Filter** | loại crawler, chỉ đếm visitor thật |
 
-### AI Control (KIỂM SOÁT SÂU)
+### AI Control (sâu)
 | | |
 |---|---|
-| **AI kill-switch** | ⏸ Tắt / ▶ Bật AI toàn cục (proxy 503 khi tắt) |
-| **🤖 AI Config** | chọn mode: **Free** (cf-glm) / **Custom** (API key riêng) / **Off** |
-| **Thêm API** | nhập endpoint + apiKey + model → worker proxy dùng key admin |
-| **Auto-enable** | user tự động nhận AI khi admin có key (transparent qua proxy) |
+| **Kill-switch** | ⏸ Tắt / ▶ Bật AI toàn cục |
+| **🤖 AI Config** | mode: Free (cf-glm) / Custom (API key) / Off |
+| **Custom Key** | nhập endpoint + apiKey + model → proxy dùng key admin |
+| **Auto-enable** | user tự nhận AI khi admin có key |
+| **Fetch Timeout** | 12s per attempt + skip thinking retry → fallback nhanh (24s max) |
 
-### Tiện ích
+### Chống cào + Chống phá
 | | |
 |---|---|
-| **📱 Telegram Alert** | nhận thông báo ngay khi user lập lá số/hỏi AI/lỗi |
+| **Anti-scraping** | Block scraper UA (scrapy/python/wget/curl/headless/puppeteer...) |
+| **Bot whitelist** | Googlebot/Bingbot OK (SEO) |
+| **Global rate-limit** | 120 req/phút/IP cho main site |
+| **Event rate-limit** | 30 events/phút/IP cho /api/event |
+| **Auth rate-limit** | 10 fail/5ph/IP cho /admin/* |
+| **IP Blacklist** | 🚫 Block button per visitor + 🚫 Blocked IPs list |
+| **Cloudflare** | Bật Bot Fight Mode + WAF rules trong Dashboard (edge-level) |
+
+### Real-time + Alerts
+| | |
+|---|---|
+| **Poll 3s nocache** | TRUE real-time (<3s delay) |
+| **🔴 LIVE** | pulsing indicator |
+| **🔊 Sound** | beep 880Hz khi event mới (toggle) |
+| **🔔 Title flash** | «🔔 (N) Admin» 3s khi activity mới |
+| **📱 Telegram** | alert ngay: chart/ai_question/ai_chat/error/🆕 new visitor |
+
+### Tools
+| | |
+|---|---|
 | **📥 CSV Export** | download events |
-| **🔑 Đổi token** | đổi admin token trong dashboard |
-| **Rate-limit** | events: 30/phút/IP; auth: 10 fail/5ph/IP |
+| **🔍 IP Search** | filter visitor cards theo IP |
+| **🗑 Clear Data** | reset events + counters |
+| **🔑 Change Token** | đổi admin token trong dashboard |
 
 ## API Endpoints
 | Endpoint | Auth | Chức năng |
 |---|---|---|
-| `POST /api/event {type,data}` | public | log visit/chart/ai_question/ai_chat/error |
-| `GET /api/ai-config` | public | {mode, hasKey, endpoint, model} cho frontend |
+| `POST /api/event {type,data}` | public | log visit/chart/ai_question/ai_chat/error/click |
+| `GET /api/ai-config` | public | {mode, hasKey} cho frontend auto-enable |
 | `GET /admin?token=X` | token | dashboard HTML |
-| `GET /admin/api/stats?token=X[&nocache=1]` | token | JSON (totals/byIp/daily/funnel/engagement/devices/topQ/topC/topRef/activeNow/events/chats) |
-| `POST /admin/api/ai?token=X {enabled}` | token | toggle AI (kill-switch cũ) |
-| `POST /admin/api/ai-config?token=X {mode,endpoint,apiKey,model}` | token | cấu hình AI sâu (free/custom/off) |
-| `GET /admin/api/ai-config?token=X` | token | xem AI config (key masked) |
+| `GET /admin/api/stats?token=X&nocache=1` | token | full JSON (30+ fields) |
+| `GET /admin/api/events?token=X&type=&limit=` | token | filtered events |
+| `POST /admin/api/ai?token=X {enabled}` | token | kill-switch |
+| `POST /admin/api/ai-config?token=X {mode,endpoint,apiKey,model}` | token | AI config sâu |
 | `POST /admin/api/token?token=X {new}` | token | đổi token |
-| `POST /admin/api/notify?token=X {tg_token,tg_chat}` | token | cấu hình Telegram alert |
-| `POST /admin/setup {token}` | one-time | tạo token lần đầu |
+| `POST /admin/api/notify?token=X {tg_token,tg_chat}` | token | Telegram config |
+| `POST /admin/api/block?token=X {ip,block/list}` | token | IP blacklist |
+| `POST /admin/api/clear?token=X` | token | clear data |
 | `GET /admin/api/export?token=X` | token | CSV export |
+| `POST /admin/setup {token}` | one-time | tạo token |
 
-## Frontend instrumentation (main.js)
-- `_logEvent('visit', {ref,path,loadMs})` — load trang.
-- `_logEvent('chart', {dob,time,gender})` — submit lá số.
-- `_logEvent('ai_question', {q})` — gửi câu hỏi AI.
-- `_logEvent('ai_chat', {q,response,source})` — **AI trả lời xong** (Q+A đầy đủ).
-- `_logEvent('error', {msg,file,line})` — JS error.
-- `window.onerror` + `unhandledrejection` → auto-log errors.
-- Auto-enable AI: fetch `/api/ai-config` → nếu admin có key → set cf-glm preset.
+## Frontend Instrumentation (main.js)
+- `_logEvent('visit', {ref,path,loadMs})` — load
+- `_logEvent('chart', {dob,time,gender})` — submit lá số
+- `_logEvent('ai_question', {q})` — gửi câu hỏi
+- `_logEvent('ai_chat', {q,response,source,durationMs})` — AI trả lời (Q+A+duration)
+- `_logEvent('error', {msg,file,line})` — JS error + unhandledrejection
+- `_logEvent('click', {id,txt})` — button clicks (feature usage)
+- Auto-enable AI: fetch `/api/ai-config` → cf-glm preset nếu admin có key
 
-## Quản lý token
-- **Đổi**: dashboard → 🔑 Đổi token, HOẶC `POST /admin/api/token?token=<cur> {new:"<≥8 ký tự>"}`.
-- **Quên token**: GH secret ADMIN_TOKEN (CI auto-set), HOẶC CF Dashboard → KV → xóa `admin:token` → `/admin/setup`.
-
-## Self-audit (repeatable)
+## Self-audit (19 checks)
 ```bash
-node admin-audit.mjs <token>   # 16 checks: log/stats/byIp/daily/geo/funnel/engagement/botFilter/activeNow/AI-toggle/CSV/auth
+node admin-audit.mjs <token>
 ```
 
 ## Kiến trúc
-- **Worker** (worker/index.js + worker/admin.js): routes /api/* + /admin* + proxy AI + kill-switch + Telegram.
-- **Storage**: Cloudflare KV `ADMIN_KV`:
-  - `events:log` — JSON array 100 events gần nhất (single key, fast read).
-  - `cnt:*` — cumulative counters (visit/chart/ai_question/ai_chat/error/all).
-  - `ai:enabled` — kill-switch (1/0).
-  - `ai:config` — {mode, endpoint, apiKey, model}.
-  - `admin:token` — auth token.
-  - `notify:tg_token` / `notify:tg_chat` — Telegram config.
-  - `cache:stats` — stats cache (60s TTL).
-- **Frontend** (main.js): fire-and-forget logging + auto-enable AI.
-- **CI** (.github/workflows/cloudflare.yml): deploy + set ADMIN_TOKEN secret.
+- **Worker** (worker/index.js): anti-scraping + rate-limit + IP block + proxy + assets
+- **Admin** (worker/admin.js): 13 endpoints + dashboard + analytics + Telegram
+- **KV ADMIN_KV**: events:log (200 events), counters, ai:config, ai:enabled, admin:token, notify:*, block:*, cache:stats
+- **CI**: deploy + set ADMIN_TOKEN (GH secret)
