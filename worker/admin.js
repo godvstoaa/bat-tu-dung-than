@@ -214,6 +214,10 @@ async function adminStats(env, url) {
   const qmap = {};
   for (const e of events) { if (e.type === 'ai_question' && e.data && e.data.q) { const q = String(e.data.q).slice(0, 80); qmap[q] = (qmap[q] || 0) + 1; } }
   const topQuestions = Object.entries(qmap).map(([q, n]) => ({ q, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
+  // [loop 1351] top clicks — feature nào được dùng nhiều nhất
+  const clickMap = {};
+  for (const e of events) { if (e.type === 'click' && e.data && e.data.id) { clickMap[e.data.id] = (clickMap[e.data.id] || 0) + 1; } }
+  const topClicks = Object.entries(clickMap).map(([id, n]) => ({ id, count: n })).sort((a, b) => b.count - a.count).slice(0, 10);
   // [loop 1351] top referrers — nguồn traffic (FB/Google/direct)
   const refmap = {};
   for (const e of events) {
@@ -289,7 +293,7 @@ async function adminStats(env, url) {
   const BOT_RE = /bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i;
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers, devices, hourly };
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers, devices, hourly, topClicks };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
@@ -338,7 +342,7 @@ function adminDashboard() {
   .stat span{font-size:11px;color:#9a8a6a}
   .filter{padding:5px 10px;background:rgba(0,0,0,.3);border:1px solid rgba(212,175,55,.2);color:#e8d9b0;border-radius:4px}
   .badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700}
-  .b-visit{background:rgba(127,191,127,.2);color:#7fbf7f}.b-chart{background:rgba(212,175,55,.2);color:#d4af37}.b-ai_question{background:rgba(180,120,200,.2);color:#b478c8}.b-other{background:rgba(150,150,150,.2);color:#aaa}.b-error{background:rgba(192,57,43,.25);color:#e0533d}.b-ai_chat{background:rgba(100,180,255,.2);color:#64b4ff}
+  .b-visit{background:rgba(127,191,127,.2);color:#7fbf7f}.b-chart{background:rgba(212,175,55,.2);color:#d4af37}.b-ai_question{background:rgba(180,120,200,.2);color:#b478c8}.b-other{background:rgba(150,150,150,.2);color:#aaa}.b-error{background:rgba(192,57,43,.25);color:#e0533d}.b-ai_chat{background:rgba(100,180,255,.2);color:#64b4ff}.b-click{background:rgba(100,200,150,.2);color:#64c896}
   </style></head><body>
   <h1>🛡️ Admin — Bát Tự Dụng Thần</h1>
   <details><summary style="cursor:pointer;color:#d4af37;font-size:13px">📋 Quick Start — 3 bước setup</summary>
@@ -370,7 +374,7 @@ function adminDashboard() {
   <button class="btn" style="padding:4px 10px;font-size:12px" onclick="aiSave()">💾 Lưu Config</button>
   <p class="tiny" id="ai-status">Đang tải...</p>
   </div></details>
-  <h3>Sự kiện gần đây <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option><option value="ai_chat">ai_chat (Q+A)</option><option value="error">error</option></select> <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})"> <button class="btn" style="padding:5px 12px;font-size:12px" onclick="load()">↻</button></h3>
+  <h3>Sự kiện gần đây <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option><option value="ai_chat">ai_chat (Q+A)</option><option value="error">error</option><option value="click">click</option></select> <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})"> <button class="btn" style="padding:5px 12px;font-size:12px" onclick="load()">↻</button></h3>
   <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
   <h3>Theo visitor (IP) <span class="tiny">— mỗi IP: visit count, charts xem, câu hỏi AI</span></h3>
   <div id="byip"></div>
@@ -480,6 +484,10 @@ function adminDashboard() {
       (d.topCountries||[]).forEach(function(c){ col2.appendChild(el('div','tiny', c.count+'× '+(c.country||'?'))); });
       tq.appendChild(col2);
       const col3=el('div'); col3.style.cssText='flex:1;min-width:200px'; col3.appendChild(el('h4',null,'🔗 Nguồn traffic'));
+      (d.topReferrers||[]).forEach(function(r){ col3.appendChild(el('div','tiny', r.count+'× '+r.referrer)); });
+      tq.appendChild(col3);
+      if (d.topClicks && d.topClicks.length) { var col4=el('div'); col4.style.cssText='flex:1;min-width:180px'; col4.appendChild(el('h4',null,'🖱 Feature clicks')); d.topClicks.forEach(function(c){ col4.appendChild(el('div','tiny', c.count+'× '+c.id)); }); tq.appendChild(col4); }
+      var _endCol=false;
       (d.topReferrers||[]).forEach(function(r){ col3.appendChild(el('div','tiny', r.count+'× '+r.referrer)); });
       tq.appendChild(col3);
     }
