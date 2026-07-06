@@ -21,10 +21,15 @@ function clientIP(request) {
     || 'unknown';
 }
 
+// [loop 1351 perf] isolate-level cache cho isAiEnabled (tránh KV get mỗi proxy request)
+let _aiCache = null; let _aiTs = 0;
 export async function isAiEnabled(env) {
-  if (!env.ADMIN_KV) return true;
+  if (_aiCache !== null && Date.now() - _aiTs < 5000) return _aiCache;
+  if (!env.ADMIN_KV) { _aiCache = true; _aiTs = Date.now(); return true; }
   const v = await env.ADMIN_KV.get('ai:enabled');
-  return v === null || v === '1' || v === 'true';
+  _aiCache = v === null || v === '1' || v === 'true';
+  _aiTs = Date.now();
+  return _aiCache;
 }
 
 async function logEvent(env, request, type, data) {
