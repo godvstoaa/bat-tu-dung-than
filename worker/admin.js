@@ -298,6 +298,7 @@ async function adminToggleAi(env, request) {
   const body = await request.json().catch(() => ({}));
   const enabled = body && body.enabled ? '1' : '0';
   await env.ADMIN_KV.put('ai:enabled', enabled);
+  _aiCache = enabled === '1'; _aiTs = Date.now(); // invalidate cache ngay
   return json({ ok: true, aiEnabled: enabled === '1' });
 }
 
