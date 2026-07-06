@@ -527,6 +527,8 @@ function adminDashboard() {
   .brand span{display:block;font-size:10px;color:var(--muted);font-weight:500;letter-spacing:3px;margin-top:2px}
   .live{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);padding:5px 12px;background:rgba(127,191,127,.08);border:1px solid rgba(127,191,127,.2);border-radius:20px;width:fit-content;margin:0 4px}
   #live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:14px;font-size:11px;background:rgba(212,175,55,.07);border:1px solid var(--border);color:var(--text);font-weight:500;letter-spacing:.2px;white-space:nowrap}
+  .pill .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
   nav{display:flex;flex-direction:column;gap:2px;margin-top:6px}
   .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:none;background:transparent;color:var(--text);border-radius:var(--rs);cursor:pointer;font-size:14px;text-align:left;font-family:inherit;width:100%}
@@ -605,7 +607,7 @@ function adminDashboard() {
     <main class="main">
       <!-- ===== TỔNG QUAN ===== -->
       <section class="tab active" id="tab-overview">
-        <div class="pagehead"><h2>📊 Tổng quan</h2><span class="tiny">Snapshot realtime · 5 giây nắm tình hình</span></div>
+        <div class="pagehead"><h2>📊 Tổng quan</h2><span class="pill"><span class="dot"></span>Snapshot realtime · 5s nắm tình hình</span></div>
         <div id="alerts"></div>
         <div id="status" class="kpi-grid">Đang tải…</div>
         <div class="row-2col">
@@ -620,7 +622,7 @@ function adminDashboard() {
       </section>
       <!-- ===== VISITORS ===== -->
       <section class="tab" id="tab-visitors">
-        <div class="pagehead"><h2>👥 Visitors</h2><span class="tiny">Ai xem gì, hỏi gì, từ đâu tới</span></div>
+        <div class="pagehead"><h2>👥 Visitors</h2><span class="pill">Ai xem gì · hỏi gì · từ đâu</span></div>
         <div class="toolbar">
           <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option><option value="ai_chat">ai_chat (Q+A)</option><option value="error">error</option><option value="click">click</option></select>
           <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})">
@@ -632,7 +634,7 @@ function adminDashboard() {
       </section>
       <!-- ===== AI ===== -->
       <section class="tab" id="tab-ai">
-        <div class="pagehead"><h2>🤖 AI</h2><span class="tiny">Free glm-5.2 · latency · config</span></div>
+        <div class="pagehead"><h2>🤖 AI</h2><span class="pill">Free glm-5.2 · latency · config</span></div>
         <div class="card"><h3>⚡ Latency & free model <span class="card-actions tiny">avg / p95 / max / quota</span></h3><div id="ai-kpis" class="kpi-grid"></div></div>
         <div class="card"><h3>🆓 Free glm-5.2 usage <span class="card-actions"><button class="btn sm" onclick="freeTest()">🧪 Test model</button><span id="free-test-result" class="tiny"></span></span></h3><div id="free-usage"></div></div>
         <details><summary>🤖 AI Config — mode / endpoint / key / model</summary>
@@ -647,7 +649,7 @@ function adminDashboard() {
       </section>
       <!-- ===== HỆ THỐNG ===== -->
       <section class="tab" id="tab-system">
-        <div class="pagehead"><h2>⚙️ Hệ thống</h2><span class="tiny">Controls · Telegram · audit · security</span></div>
+        <div class="pagehead"><h2>⚙️ Hệ thống</h2><span class="pill">Controls · Telegram · audit</span></div>
         <div class="card"><h3>🎛️ Controls <span class="card-actions tiny">toggle AI · free · export · token</span></h3><div id="controls"></div></div>
         <details><summary>📱 Telegram Alert — nhận TB khi user lập lá số / hỏi AI</summary>
         <div class="details-body">
