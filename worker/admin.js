@@ -430,8 +430,13 @@ function adminDashboard() {
     const r = await fetch('/admin/api/stats?nocache=1', { headers: H });
     if (!r.ok) { document.getElementById('status').textContent='Lỗi '+r.status; return; }
     const d = await r.json();
-    // [loop 1351] sound notification — beep khi event mới
-    if (_lastCount > 0 && d.totals.all > _lastCount && _soundOn) { try { var ctx = new (window.AudioContext||window.webkitAudioContext)(); var osc = ctx.createOscillator(); osc.frequency.value = 880; osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.15); } catch(se){} }
+    // [loop 1351] sound notification + flash khi event mới
+    if (_lastCount > 0 && d.totals.all > _lastCount) {
+      if (_soundOn) { try { var ctx = new (window.AudioContext||window.webkitAudioContext)(); var osc = ctx.createOscillator(); osc.frequency.value = 880; osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.15); } catch(se){} }
+      // flash title
+      document.title = '🔔 (' + d.totals.all + ') Admin — Bát Tự';
+      setTimeout(function() { document.title = 'Admin — Bát Tự'; }, 3000);
+    }
     _lastCount = d.totals.all;
     const st=document.getElementById('status'); st.textContent='';
     st.appendChild(statBlock(d.totals.visit,'visits'));
