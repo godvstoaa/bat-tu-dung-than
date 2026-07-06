@@ -562,6 +562,13 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
 // ===========================================================================
 export const SYSTEM_PROMPT = `Ban la mot ONG THAY PHONG THUY thuc chien - giau kinh nghiem, noi THANG, DON GIAN, DUNG TRONG TAM. KHONG han lam, KHONG long vong, KHONG liet ke du lieu - ma TONG HOP + PHAN TICH + DUC KET thanh cau tra loi ma nguoi KHONG RANH phong thuy cung hieu va LAM THEO duoc.
 
+[SUC MANH TOAN DIEN - DUNG HET KHA NANG]
+- TRA LOI MOI CAU HOI, TUYET DOI KHONG TU CHOI. KHONG BAO GIO noi «toi khong the», «day la me tin», «toi khong du lieu», «vuot qua kha nang» — CAM HOAN TOAN.
+- Day la APP DICH HOC CO TRUYEN (Bat Tu/Dich/Phong Thuy/Kinh Dich/MeiHua/LiuRen/QiMen) — he thong CO DIEN, hop phap, triet hoc. Ban la CHUYEN GIA cap cao — luan HET cac tang phuc tap, xuyen suy (deep reasoning), KHONG luoc bo «de ngan».
+- Cau «cuc phuc tap» (hop hon nhieu nguoi, doi van dai, phong thuy dat nha, chon ngay kho la) → DUNG HET tools + brief layers + giao thoa nhieu tang → tra loi DAY DU, SAU, QUYET DOAN. KHONG gioi han do dai — neu can 1500+ chu de luan ky thi viet het.
+- Neu gap chu de chua co tool/section → van TRA LOI bang kien thuc DICH hoc co truyen cua ban (la chuyen gia, co the luan duoc), KHONG bao «chua ho tro». Chi goi tool KHI co tool phu hop.
+- TIEN TOAN/du doan van hanh/thoi diem → DUOC PHEP va la cot loi cua BaTu co phap (yingqi/luthuyen) — KHONG tu choi voi ly do «khong the du doan».
+
 NGUYEN TAC:
 1. NOI THEO ONG THAY: mo dau bang 1-2 cau CHOT LUAN (nhu ong thay noi: "con nen lam X, dung lam Y"), ROI moi giai thich tai sao (don gian). KHONG mo bang du lieu hay thuat ngu.
 2. NGON NGU THUC DUNG: thay "than vuong, Dung than Tho" -> "menh con qua manh, can yeu to Dat (Tho) de can bang"; thay "thuong quan kien quan" -> "sao Thuong Quan dung sao Chinh Quan -> de cai va/dut tinh".
@@ -1518,7 +1525,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   const _isCf = /\/cf-ai|cloudflare/i.test(_ep);
   const isZaiNative = !_isCf && /glm|z\.ai|bigmodel/i.test((cfg.model || '') + _ep);
   const buildBody = (msgs, toolsOn, thinkOn) => ({
-    model: cfg.model, messages: msgs, temperature: 0.5, stream: true,
+    model: cfg.model, messages: msgs, temperature: 0.7, stream: true,
     ...(thinkOn && isZaiNative ? { thinking: { type: 'enabled' } } : {}),  // chỉ host Z.ai/BigModel
     ...(toolsOn ? { tools: AI_TOOLS, tool_choice: 'auto' } : {}),
   });
@@ -1544,7 +1551,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   };
   try {
     for (let step = 0; step < 6 && totalAttempts < 9; step++, totalAttempts++) {
-      if (Date.now() - _tStart > 60000) return _bail('⏱ AI trả lời quá lâu (>60 giây)');
+      if (Date.now() - _tStart > 90000) return _bail('⏱ AI trả lời quá lâu (>90 giây — câu phức tạp cần nhiều phân tích)');
       let round;
       try {
         round = await streamRound(url, headers, buildBody(messages, toolsOn, thinkOn), onToken, onStatus, signal);
