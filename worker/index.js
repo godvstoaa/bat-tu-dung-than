@@ -35,13 +35,14 @@ export default {
       }
     }
 
-    // 0b) Block scraper UAs (trừ legit crawlers)
-    if (SCRAPER_RE.test(ua) && !GOOD_BOT_RE.test(ua)) {
+    // 0b) Block scraper UAs — CHỈ cho main site (KHÔNG cho /api/ /admin/ — admin dùng curl/CLI OK)
+    const isAdminOrApi = url.pathname.startsWith('/api/') || url.pathname.startsWith('/admin');
+    if (!isAdminOrApi && SCRAPER_RE.test(ua) && !GOOD_BOT_RE.test(ua)) {
       return new Response('Forbidden', { status: 403 });
     }
 
-    // 0c) Global rate-limit: 120 req/phút/IP (normal browsing <20/min; scraper >100/min)
-    if (env.ADMIN_KV && url.pathname !== '/favicon.ico' && !url.pathname.startsWith('/assets/')) {
+    // 0c) Global rate-limit: 120 req/phút/IP (CHỈ cho main site, không /api/ /admin/ /assets/)
+    if (env.ADMIN_KV && !isAdminOrApi && url.pathname !== '/favicon.ico' && !url.pathname.startsWith('/assets/')) {
       const rlKey = 'grl:' + ip + ':' + Math.floor(Date.now() / 60000);
       const rlCount = parseInt((await env.ADMIN_KV.get(rlKey)) || '0', 10);
       if (rlCount >= 120) {
