@@ -29,10 +29,13 @@ export default {
         }
         const sub = url.pathname.slice(prefix.length);
         const params = { path: sub.split('/').filter(Boolean) };
-        // [loop 905] /cf-ai: inject key server-side — user không cần nhập
+        // [loop 905/1351] /cf-ai: inject key — ưu tiên ADMIN custom key (KV ai:config), fallback CF_AI_KEY
         if (prefix === '/cf-ai') {
+          let adminKey = null;
+          try { const c = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); adminKey = c.apiKey || null; } catch (e) {}
           const headers = new Headers(request.headers);
-          if (!headers.get('Authorization') && env.CF_AI_KEY) headers.set('Authorization', `Bearer ${env.CF_AI_KEY}`);
+          const key = adminKey || env.CF_AI_KEY;
+          if (!headers.get('Authorization') && key) headers.set('Authorization', `Bearer ${key}`);
           request = new Request(request, { headers });
         }
         return makeProxy(host)({ request, params, env });

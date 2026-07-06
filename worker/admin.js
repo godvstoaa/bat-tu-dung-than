@@ -88,6 +88,33 @@ async function adminNotifyConfig(env, request) {
   return json({ ok: true, enabled: !!token });
 }
 
+// [loop 1351] AI config — admin kiểm soát sâu AI (mode/endpoint/apiKey/model)
+async function adminAiConfigSet(env, request) {
+  const body = await request.json().catch(() => ({}));
+  const config = {};
+  if (body.mode) config.mode = String(body.mode); // 'off' | 'free' | 'custom'
+  if (body.endpoint) config.endpoint = String(body.endpoint);
+  if (body.apiKey) config.apiKey = String(body.apiKey);
+  if (body.model) config.model = String(body.model);
+  if (body.disable) { await env.ADMIN_KV.delete('ai:config'); return json({ ok: true, config: { mode: 'free' } }); }
+  // merge với config cũ
+  let old = {};
+  try { old = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); } catch (e) {}
+  const merged = Object.assign({}, old, config);
+  await env.ADMIN_KV.put('ai:config', JSON.stringify(merged));
+  // nếu mode='off' → cũng set ai:enabled=0 (kill-switch cũ tương thích)
+  if (merged.mode === 'off') await env.ADMIN_KV.put('ai:enabled', '0');
+  else await env.ADMIN_KV.put('ai:enabled', '1');
+  return json({ ok: true, config: Object.assign({}, merged, { apiKey: merged.apiKey ? '***' + merged.apiKey.slice(-4) : '' }) });
+}
+
+async function adminAiConfigGet(env) {
+  let config = {};
+  try { config = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); } catch (e) {}
+  const masked = Object.assign({}, config, { apiKey: config.apiKey ? '***' + config.apiKey.slice(-4) : '' });
+  return json({ config: masked });
+}
+
 export async function handleAdminRoute(request, env, url) {
   const path = url.pathname;
   const method = request.method;
@@ -100,6 +127,13 @@ export async function handleAdminRoute(request, env, url) {
       const ok = await logEvent(env, request, type, body && body.data);
       return json(ok ? { ok: true } : { ok: false, err: 'rate_limited (max 30/phút/IP)' }, ok ? 200 : 429);
     } catch (e) { return json({ ok: false, err: e.message }, 400); }
+  }
+
+  // [loop 1351] GET /api/ai-config (public) — frontend biết AI config admin đặt
+  if (path === '/api/ai-config' && method === 'GET') {
+    let config = {};
+    try { const raw = env.ADMIN_KV ? await env.ADMIN_KV.get('ai:config') : null; config = raw ? JSON.parse(raw) : {}; } catch (e) {}
+    return json({ mode: config.mode || 'free', endpoint: config.endpoint || '', hasKey: !!config.apiKey, model: config.model || '' });
   }
 
   if (path === '/admin' || path.startsWith('/admin/')) {
@@ -131,6 +165,8 @@ export async function handleAdminRoute(request, env, url) {
     if (path === '/admin/api/token' && method === 'POST') return adminChangeToken(env, request);
     if (path === '/admin/api/export' && method === 'GET') return adminExport(env);
     if (path === '/admin/api/notify' && method === 'POST') return adminNotifyConfig(env, request);
+    if (path === '/admin/api/ai-config' && method === 'POST') return adminAiConfigSet(env, request);
+    if (path === '/admin/api/ai-config' && method === 'GET') { try { return await adminAiConfigGet(env); } catch (e) { return json({ error: e.message }, 500); } }
     return new Response('Not found', { status: 404 });
   }
   return null;
