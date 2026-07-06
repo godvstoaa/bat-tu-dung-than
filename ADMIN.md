@@ -1,4 +1,4 @@
-# 🛡️ Admin System — Bát Tự Dụng Thần (loop 1351+)
+# 🛡️ Admin System — Bát Tự Dụng Thần (loop 1352+)
 
 Hệ thống admin production-grade: thống kê visitor + AI control sâu + chat history + Telegram + chống cào/phá + real-time.
 
@@ -12,19 +12,21 @@ https://battu.god8.shop/admin?token=<ADMIN_TOKEN>
 2. **📱 Telegram**: @BotFather → /newbot → copy token → dán vào «📱 Telegram Alert» → Bật.
 3. **📊 Monitor**: Dashboard auto-refresh 3s. 🔴 LIVE + 🔊 Sound + 🔔 title flash khi event mới.
 
-## Tính năng (37+)
+## Tính năng (40+)
 
 ### Analytics
 | | |
 |---|---|
-| **Stats** | visits / charts / AI / chats / errors / clicks / IP / 🔴 active / bounce / load / sessions / AI-rate / returning |
-| **Health Check** | AI rate ✅/⚠ · errors ✅/⚠ · load ✅/⚠ · bounce ✅/⚠ |
-| **Action Alerts** | banner đỏ «AI FAIL» + vàng «Load chậm» |
+| **Stats** | visits / charts / AI / chats / errors / clicks / IP / 🔴 active / bounce / load / sessions / AI-rate / returning / **AI latency avg/p95/max** |
+| **Health Check** | AI rate ✅/⚠ · **AI latency p95 ✅/⚠** · errors ✅/⚠ · load ✅/⚠ · bounce ✅/⚠ |
+| **Action Alerts** | banner đỏ «AI FAIL» + vàng «Load chậm» + **🐢 «AI CHẬM»** (max>90s / p95>60s) |
 | **Funnel** | visitor → chart → AI (% conversion) |
 | **Engagement** | bounceRate / sessions / avgSessionMin / avgEvents / avgCharts / avgLoadMs / aiSuccessRate / returningVisitors |
-| **Events** | bảng + 🔍 search + filter 6 loại (visit/chart/ai_question/ai_chat/error/click) |
-| **By IP** | mỗi IP → geo + charts + full chat Q+A + 📅 timeline (chronological journey) + 🚫 Block button |
-| **7 ngày** | mini bar chart |
+| **Events** | bảng + 🔍 search + filter 6 loại (visit/chart/ai_question/ai_chat/error/click) + **click row ai_chat → modal full Q+A** |
+| **By IP** | mỗi IP → geo + charts + **full chat Q+A (click mở modal, có durationMs)** + 📅 timeline (chronological journey) + 🚫 Block button |
+| **Retention** | **events:log cap 1500** (~1-2 tuần) + **dayagg:<date> TTL 90 ngày** → 30-day trend không phụ thuộc cap |
+| **7 ngày** | mini bar chart (từ events) |
+| **30 ngày** | **sparkline trend từ dayagg** (retention dài, độc lập cap 1500) |
 | **24 giờ** | hourly activity (VN UTC+7) |
 | **Top** | câu hỏi AI + quốc gia + nguồn traffic + **conversion rate** + thiết bị + feature clicks |
 | **Referrer Conversion** | FB vs direct vs Google → % chart conversion per source |
@@ -93,7 +95,7 @@ https://battu.god8.shop/admin?token=<ADMIN_TOKEN>
 - `_logEvent('click', {id,txt})` — button clicks (feature usage)
 - Auto-enable AI: fetch `/api/ai-config` → cf-glm preset nếu admin có key
 
-## Self-audit (19 checks)
+## Self-audit (24 checks)
 ```bash
 node admin-audit.mjs <token>
 ```
@@ -101,5 +103,5 @@ node admin-audit.mjs <token>
 ## Kiến trúc
 - **Worker** (worker/index.js): anti-scraping + rate-limit + IP block + proxy + assets
 - **Admin** (worker/admin.js): 13 endpoints + dashboard + analytics + Telegram
-- **KV ADMIN_KV**: events:log (200 events), counters, ai:config, ai:enabled, admin:token, notify:*, block:*, cache:stats
+- **KV ADMIN_KV**: events:log (1500 events), dayagg:<date> (TTL 90d), counters (cnt:*), ai:config, ai:enabled, admin:token, notify:*, block:*, cache:stats
 - **CI**: deploy + set ADMIN_TOKEN (GH secret)

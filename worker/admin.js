@@ -39,16 +39,24 @@ async function logEvent(env, request, type, data) {
   const country = (request.cf && request.cf.country) || '';
   const city = (request.cf && request.cf.city) || '';
   const ts = Date.now();
-  // [loop 1351 perf] store trong 1 KV key (JSON array, cap 100) — tránh 100+ KV gets trong stats
+  // [loop 1352] events:log cap 1500 (KV value limit 25MB → 1500 events ≈ 700KB, thừa sức).
+  //   Cap cũ 200 → lịch sử chat/lá số bị xóa vĩnh viễn sau vài giờ, phá «thống kê chi tiết».
   const logRaw = await env.ADMIN_KV.get('events:log');
   let log = [];
   try { log = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
   const isNewIp = type === 'visit' && !log.some((e) => e.ip === ip);
   log.unshift({ ts, type, ip, ua, country, city, data: data || {} });
-  if (log.length > 200) log.length = 200;
+  if (log.length > 1500) log.length = 1500;
   await env.ADMIN_KV.put('events:log', JSON.stringify(log));
+  // [loop 1352] dayagg:<date> — 1 JSON key thay cho 3 key daily:day:type cũ (ít KV op hơn,
+  //   richer, TTL 90 ngày cho long-term trend). events:log chỉ giữ recent 1500.
   const day = new Date(ts).toISOString().slice(0, 10);
-  for (const k of [`cnt:${type}`, 'cnt:all', `daily:${day}:${type}`]) {
+  let agg = {};
+  try { agg = JSON.parse((await env.ADMIN_KV.get('dayagg:' + day)) || '{}'); } catch (e) {}
+  agg[type] = (agg[type] || 0) + 1;
+  agg.all = (agg.all || 0) + 1;
+  await env.ADMIN_KV.put('dayagg:' + day, JSON.stringify(agg), { expirationTtl: TTL_EVENT });
+  for (const k of ['cnt:' + type, 'cnt:all']) {
     const cur = parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
     await env.ADMIN_KV.put(k, String(cur + 1));
   }
@@ -181,8 +189,21 @@ export async function handleAdminRoute(request, env, url) {
     if (path === '/admin/api/ai-config' && method === 'POST') return adminAiConfigSet(env, request);
     if (path === '/admin/api/ai-config' && method === 'GET') { try { return await adminAiConfigGet(env); } catch (e) { return json({ error: e.message }, 500); } }
     if (path === '/admin/api/clear' && method === 'POST') {
-      if (env.ADMIN_KV) { await env.ADMIN_KV.delete('events:log'); await env.ADMIN_KV.delete('cache:stats'); for (const k of ['cnt:visit','cnt:chart','cnt:ai_question','cnt:ai_chat','cnt:error','cnt:all']) await env.ADMIN_KV.delete(k); }
-      return json({ ok: true, msg: 'Events + counters cleared' });
+      if (env.ADMIN_KV) {
+        await env.ADMIN_KV.delete('events:log');
+        await env.ADMIN_KV.delete('cache:stats');
+        for (const k of ['cnt:visit','cnt:chart','cnt:ai_question','cnt:ai_chat','cnt:error','cnt:all']) await env.ADMIN_KV.delete(k);
+        // [loop 1352] cleanup dayagg + legacy daily:type keys (list + batch delete)
+        for (const prefix of ['dayagg:', 'daily:']) {
+          let cursor = undefined;
+          do {
+            const ls = await env.ADMIN_KV.list({ prefix, limit: 1000, cursor });
+            await Promise.all(ls.keys.map((k) => env.ADMIN_KV.delete(k.name)));
+            cursor = ls.list_complete ? undefined : ls.cursor;
+          } while (cursor);
+        }
+      }
+      return json({ ok: true, msg: 'Events + counters + dayagg cleared' });
     }
     if (path === '/admin/api/block' && method === 'POST') {
       const body = await request.json().catch(() => ({}));
@@ -217,7 +238,7 @@ async function adminStats(env, url) {
     if (e.type === 'visit') g.visits++;
     else if (e.type === 'chart') g.charts.push(e.data || {});
     else if (e.type === 'ai_question') g.questions.push((e.data && e.data.q) || '');
-    else if (e.type === 'ai_chat') g.chats.push({ q: (e.data && e.data.q) || '', response: (e.data && e.data.response) || '', source: (e.data && e.data.source) || '' });
+    else if (e.type === 'ai_chat') g.chats.push({ q: (e.data && e.data.q) || '', response: (e.data && e.data.response) || '', source: (e.data && e.data.source) || '', durationMs: (e.data && e.data.durationMs) || null, ts: e.ts });
     if (e.ts > g.lastTs) g.lastTs = e.ts;
     if (e.ts < g.firstTs) g.firstTs = e.ts;
   }
@@ -301,6 +322,25 @@ async function adminStats(env, url) {
   for (let i = 6; i >= 0; i--) { const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10); dailyMap[d] = { date: d, visit: 0, chart: 0, ai_question: 0 }; }
   for (const e of events) { const d = new Date(e.ts).toISOString().slice(0, 10); if (dailyMap[d]) { if (e.type === 'visit') dailyMap[d].visit++; else if (e.type === 'chart') dailyMap[d].chart++; else if (e.type === 'ai_question') dailyMap[d].ai_question++; } }
   const daily = Object.values(dailyMap);
+  // [loop 1352] 30-day trend từ dayagg (retention dài — events:log chỉ giữ recent 1500).
+  //   Promise.all → 30 KV get song song (stats cached 60s nên chấp nhận được).
+  const trend30 = [];
+  for (let i = 29; i >= 0; i--) trend30.push(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10));
+  const trendRaw = await Promise.all(trend30.map((d) => env.ADMIN_KV.get('dayagg:' + d)));
+  const trend = trend30.map(function (d, i) {
+    var a = {}; try { a = trendRaw[i] ? JSON.parse(trendRaw[i]) : {}; } catch (e) {}
+    return { date: d, visit: a.visit || 0, chart: a.chart || 0, ai_question: a.ai_question || 0, ai_chat: a.ai_chat || 0, error: a.error || 0, all: a.all || 0 };
+  });
+  // [loop 1352] AI latency — durationMs aggregation (admin thấy AI chậm hay nhanh).
+  //   156589ms (2.6 phút) là outlier nghiêm trọng — trước đây invisible.
+  const durs = events.filter((e) => e.type === 'ai_chat' && e.data && e.data.durationMs).map((e) => e.data.durationMs);
+  const dSorted = durs.slice().sort((a, b) => a - b);
+  const aiLatency = durs.length ? {
+    count: durs.length,
+    avgMs: Math.round(durs.reduce((a, b) => a + b, 0) / durs.length),
+    p95Ms: dSorted[Math.min(dSorted.length - 1, Math.floor(dSorted.length * 0.95))],
+    maxMs: dSorted[dSorted.length - 1],
+  } : null;
   // [loop 1351] conversion funnel: visitor → chart → AI question (% engagement)
   const funnel = {
     visitors: byIpArr.length,
@@ -327,7 +367,7 @@ async function adminStats(env, url) {
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
   const eventsLite = events.map(function (e) { var c = { ts: e.ts, type: e.type, ip: e.ip, country: e.country, city: e.city, data: e.data }; return c; });
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
@@ -384,7 +424,7 @@ function adminDashboard() {
   <div style="padding:8px;font-size:12.5px;line-height:1.8">
   <b>1. 🤖 AI:</b> Mở «🤖 AI Config» dưới → chọn Custom → dán API key (z.ai/model-api) → Lưu.<br>
   <b>2. 📱 Telegram:</b> @BotFather → /newbot → copy token → dán vào «📱 Telegram Alert» → Bật.<br>
-  <b>3. 📊 Monitor:</b> Dashboard auto-refresh 15s. Xem visitor, chat history, health. Export CSV khi cần.
+  <b>3. 📊 Monitor:</b> Dashboard auto-refresh 3s (real-time). Xem visitor, chat history (click vào AI chat xem đầy đủ), health, latency. Export CSV khi cần.
   </div></details>
   <div id="status">Đang tải…</div>
   <div id="health" style="margin:6px 0;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,.2);font-size:13px"></div>
@@ -417,6 +457,8 @@ function adminDashboard() {
   <div id="byip"></div>
   <h3>Hoạt động 7 ngày</h3>
   <div id="daily"></div>
+  <h3>Xu hướng 30 ngày <span class="tiny">— retention dài (dayagg, TTL 90 ngày, không phụ thuộc cap 1500)</span></h3>
+  <div id="trend30"></div>
   <h3>Giờ hoạt động (VN, UTC+7)</h3>
   <div id="hourly" style="display:flex;align-items:flex-end;gap:1px;height:40px;margin:4px 0 12px"></div>
   <h3>Top câu hỏi AI & quốc gia</h3>
@@ -448,6 +490,7 @@ function adminDashboard() {
     var hb=document.getElementById('health'); if (hb) { hb.textContent='';
       var hItems=[];
       if (d.engagement && d.engagement.aiSuccessRate !== null) hItems.push([(d.engagement.aiSuccessRate>=50)+'', 'AI trả lời: '+d.engagement.aiSuccessRate+'%']);
+      if (d.aiLatency && d.aiLatency.count >= 3) hItems.push([(d.aiLatency.p95Ms<60000)+'', 'AI latency p95: '+fmtMs(d.aiLatency.p95Ms)+' ('+d.aiLatency.count+' chat)']);
       hItems.push([(d.totals.error===0)+'', 'JS errors: '+d.totals.error]);
       if (d.engagement && d.engagement.avgLoadMs) hItems.push([(d.engagement.avgLoadMs<5000)+'', 'Load TB: '+(d.engagement.avgLoadMs/1000).toFixed(1)+'s']);
       if (d.engagement && d.engagement.bounceRate!=null) hItems.push([(d.engagement.bounceRate<60)+'', 'Bounce: '+d.engagement.bounceRate+'%']);
@@ -457,11 +500,13 @@ function adminDashboard() {
     var al=document.getElementById('alerts'); if (al) { al.textContent='';
       if (d.engagement && d.engagement.aiSuccessRate !== null && d.engagement.aiSuccessRate < 50 && d.totals.ai_question > 2) { var wa=el('div'); wa.style.cssText='padding:8px 12px;background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.3);border-radius:8px;margin:6px 0;font-size:13px'; wa.appendChild(el('span',null,'⚠️ AI FAIL ('+d.engagement.aiSuccessRate+'%) — '+d.totals.ai_question+' câu hỏi không có trả lời. Mở «🤖 AI Config» thêm API key.')); al.appendChild(wa); }
       if (d.engagement && d.engagement.avgLoadMs > 5000) { var wl=el('div'); wl.style.cssText='padding:8px 12px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.2);border-radius:8px;margin:6px 0;font-size:13px'; wl.appendChild(el('span',null,'⚠️ Load chậm ('+(d.engagement.avgLoadMs/1000).toFixed(1)+'s TB) — cân nhắc tối ưu bundle.')); al.appendChild(wl); }
+      if (d.aiLatency && d.aiLatency.count >= 3 && (d.aiLatency.maxMs > 90000 || d.aiLatency.p95Ms > 60000)) { var ws=el('div'); ws.style.cssText='padding:8px 12px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.3);border-radius:8px;margin:6px 0;font-size:13px'; ws.appendChild(el('span',null,'🐢 AI CHẬM — max '+fmtMs(d.aiLatency.maxMs)+', p95 '+fmtMs(d.aiLatency.p95Ms)+'. User phải đợi lâu — xem «🤖 AI Config» đổi model/endpoint nhanh hơn.')); al.appendChild(ws); }
     }
     if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
     st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
     if (d.engagement) { st.appendChild(statBlock(d.engagement.bounceRate+'%','bounce', d.engagement.bounceRate>60?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.avgEvents,'events/IP')); if (d.engagement.avgLoadMs) st.appendChild(statBlock(d.engagement.avgLoadMs+'ms','⏱ load', d.engagement.avgLoadMs>3000?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.sessions||0,'sessions')); st.appendChild(statBlock((d.engagement.avgSessionMin||0)+'min','⏱/sess')); }
+    if (d.aiLatency) { st.appendChild(statBlock(fmtMs(d.aiLatency.avgMs), 'AI ⏱ avg', d.aiLatency.avgMs>30000?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(fmtMs(d.aiLatency.p95Ms), 'AI ⏱ p95', d.aiLatency.p95Ms>60000?'#c0392b':'#d4af37')); st.appendChild(statBlock(fmtMs(d.aiLatency.maxMs), 'AI ⏱ max', '#9a8a6a')); }
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     const c=document.getElementById('controls'); c.textContent='';
     // [loop 1351] conversion funnel
@@ -487,7 +532,9 @@ function adminDashboard() {
       const td2=el('td'); const badge=el('span','badge b-'+(e.type||'other'), e.type); td2.appendChild(badge); tr.appendChild(td2);
       tr.appendChild(el('td','ip', e.ip||'?'));
       tr.appendChild(el('td','tiny', (e.country||'?')+(e.city?' / '+e.city:'')));
-      tr.appendChild(el('td','tiny', (function(){ if(!e.data) return ''; if(e.type==='ai_chat') return 'Q: '+String(e.data.q||'').slice(0,60)+' → '+(e.data.source==='ai'?'🤖':'📦')+' '+String(e.data.response||'').slice(0,150); if(e.type==='ai_question') return 'Q: '+String(e.data.q||'').slice(0,200); if(e.type==='chart') return '📊 '+String(e.data.dob||'')+' '+String(e.data.time||'')+' '+String(e.data.gender||''); if(e.type==='error') return '⚠ '+String(e.data.msg||'').slice(0,200); if(e.type==='click') return '🖱 '+String(e.data.id||'')+' ('+String(e.data.txt||'').slice(0,30)+')'; if(e.type==='visit'&&e.data.ref) return '← '+String(e.data.ref).slice(0,80); return JSON.stringify(e.data).slice(0,200); })()));
+      tr.appendChild(el('td','tiny', (function(){ if(!e.data) return ''; if(e.type==='ai_chat') return 'Q: '+String(e.data.q||'').slice(0,60)+' → '+(e.data.source==='ai'?'🤖':'📦')+(e.data.durationMs!=null?' '+fmtMs(e.data.durationMs):'')+' — «click xem đầy đủ»'; if(e.type==='ai_question') return 'Q: '+String(e.data.q||'').slice(0,200); if(e.type==='chart') return '📊 '+String(e.data.dob||'')+' '+String(e.data.time||'')+' '+String(e.data.gender||''); if(e.type==='error') return '⚠ '+String(e.data.msg||'').slice(0,200); if(e.type==='click') return '🖱 '+String(e.data.id||'')+' ('+String(e.data.txt||'').slice(0,30)+')'; if(e.type==='visit'&&e.data.ref) return '← '+String(e.data.ref).slice(0,80); return JSON.stringify(e.data).slice(0,200); })()));
+      // [loop 1352] ai_chat row click → modal full Q+A (không truncate)
+      if (e.type==='ai_chat' && e.data) { tr.style.cursor='pointer'; tr.onmouseenter=function(){tr.style.background='rgba(212,175,55,.08)';}; tr.onmouseleave=function(){tr.style.background='';}; tr.onclick=function(){showChat(e.data.q, e.data.response, e.data.source, e.data.durationMs, e.ts, e.ip);}; }
       tb.appendChild(tr);
     });
     // [loop 1351] hourly activity — 24 bars (giờ VN)
@@ -522,7 +569,13 @@ function adminDashboard() {
         }
         if (v.charts.length) card.appendChild(el('div','tiny','📊 Lá số xem ('+v.charts.length+'): '+v.charts.map(function(c){return (c.dob||'?')+' '+(c.gender||'');}).join('; ').slice(0,400)));
         if (v.questions.length) card.appendChild(el('div','tiny','💬 AI hỏi ('+v.questions.length+'): '+v.questions.map(function(q){return '«'+String(q).slice(0,90)+'»';}).join(' ').slice(0,500)));
-        if (v.chats.length) { v.chats.forEach(function(ch){ var cd=el('div','tiny','💬 «'+String(ch.q).slice(0,80)+'» → '+(ch.source==='ai'?'🤖':'📦')+' '+(ch.response||'').slice(0,200)+'...'); cd.style.cssText='border-left:2px solid rgba(212,175,55,.3);padding-left:6px;margin:2px 0'; card.appendChild(cd); }); }
+        if (v.chats.length) { v.chats.forEach(function(ch){
+          var cd=el('div','tiny','💬 «'+String(ch.q).slice(0,80)+'» → '+(ch.source==='ai'?'🤖':'📦')+(ch.durationMs!=null?' '+fmtMs(ch.durationMs):'')+' '+String(ch.response||'').slice(0,140)+(String(ch.response||'').length>140?'…':''));
+          cd.style.cssText='border-left:2px solid rgba(212,175,55,.3);padding-left:6px;margin:2px 0;cursor:pointer';
+          cd.title='Click xem đầy đủ'; cd.onmouseenter=function(){cd.style.background='rgba(212,175,55,.06)';}; cd.onmouseleave=function(){cd.style.background='';};
+          cd.onclick=(function(c){return function(){showChat(c.q, c.response, c.source, c.durationMs, c.ts, v.ip);};})(ch);
+          card.appendChild(cd);
+        }); }
         bip.appendChild(card);
       });
     }
@@ -537,6 +590,26 @@ function adminDashboard() {
         row.appendChild(el('span','tiny',tot+' (v:'+dy.visit+' c:'+dy.chart+' q:'+dy.ai_question+')'));
         dl.appendChild(row);
       });
+    }
+    // [loop 1352] 30-day trend — sparkline bars từ dayagg (retention dài hạn)
+    var tr=document.getElementById('trend30'); if (tr && d.trend) { tr.textContent='';
+      var active=d.trend.filter(function(x){return x.all>0;});
+      var tmax=Math.max.apply(null,d.trend.map(function(x){return x.all;}).concat([1]));
+      var sumAll=d.trend.reduce(function(a,x){return a+x.all;},0);
+      var sumVis=d.trend.reduce(function(a,x){return a+x.visit;},0);
+      var sumChart=d.trend.reduce(function(a,x){return a+x.chart;},0);
+      var sumAi=d.trend.reduce(function(a,x){return a+x.ai_chat;},0);
+      var sumErr=d.trend.reduce(function(a,x){return a+x.error;},0);
+      var hdr=el('div','tiny','30 ngày: '+sumAll+' events · '+sumVis+' visits · '+sumChart+' lá số · '+sumAi+' AI chat'+(sumErr?' · '+sumErr+' lỗi':'')+' · '+active.length+'/'+30+' ngày có activity'); hdr.style.cssText='margin-bottom:6px';
+      tr.appendChild(hdr);
+      var bars=el('div'); bars.style.cssText='display:flex;align-items:flex-end;gap:1px;height:48px;margin:4px 0 8px';
+      d.trend.forEach(function(x){
+        var bar=el('div'); var h=Math.max(2,Math.round(x.all/tmax*44));
+        bar.style.cssText='flex:1;min-width:6px;background:'+(x.all>0?'#d4af37':'rgba(212,175,55,.08)')+';height:'+h+'px;border-radius:1px';
+        bar.title=x.date+': '+x.all+' (v:'+x.visit+' c:'+x.chart+' q:'+x.ai_question+(x.error?' e:'+x.error:'')+')';
+        bars.appendChild(bar);
+      });
+      tr.appendChild(bars);
     }
     // [loop 1351] top questions + countries
     const tq=document.getElementById('topq'); if (tq) { tq.textContent='';
@@ -566,5 +639,29 @@ function adminDashboard() {
   async function clearData(){ var r=await fetch('/admin/api/clear?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json()}); alert(r.ok?'✅ Data cleared':'❌ '+r.err); load(); }
   async function blockList(){ var r=await fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({list:true})}).then(function(r){return r.json()}); alert('Blocked IPs: '+((r.blocked||[]).join(', ')||'(không có)')); }
   function blockIp(ip,block){ fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip,block:block})}).then(function(){load();}); }
-  </script></body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
+  // [loop 1352] full-chat modal — admin xem TOÀN BỘ Q+A (không bị truncate 200 chars).
+  function fmtMs(ms){ if(ms==null)return ''; if(ms<1000)return ms+'ms'; var s=ms/1000; return s<60?(s.toFixed(1)+'s'):(Math.round(s/60)+'m'+String(Math.round(s%60)).padStart(2,'0')+'s'); }
+  function showChat(q, resp, src, dur, ts, ip){
+    var m=document.getElementById('chat-modal'); m.textContent='';
+    var box=el('div'); box.style.cssText='background:#15131f;border:1px solid #d4af37;border-radius:10px;padding:18px 22px;max-width:780px;width:calc(100% - 40px);max-height:85vh;overflow:auto';
+    var meta=el('div'); meta.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;border-bottom:1px solid rgba(212,175,55,.2);padding-bottom:8px';
+    var left=el('div'); left.style.cssText='font-size:13px';
+    left.appendChild(el('span',null, (src==='ai'?'🤖 AI trả lời':'📦 Local (offline)') + (ip?'  ·  ':'')));
+    if(ip){var ipE=el('span','ip',ip); ipE.style.fontSize='12px'; left.appendChild(ipE);}
+    left.appendChild(el('div','tiny', (ts?new Date(ts).toLocaleString('vi-VN'):'') + (dur!=null?'  ·  ⏱ '+fmtMs(dur):'')));
+    meta.appendChild(left);
+    var close=el('button','btn','✕ Đóng'); close.style.cssText='padding:4px 12px;font-size:12px'; close.onclick=function(){m.style.display='none';}; meta.appendChild(close);
+    box.appendChild(meta);
+    var qb=el('div'); qb.style.cssText='margin:10px 0;padding:8px 10px;background:rgba(180,120,200,.1);border-left:3px solid #b478c8;border-radius:4px';
+    qb.appendChild(el('div','tiny','❓ CÂU HỎI')); qb.appendChild(el('div',null, q||'(trống)')); box.appendChild(qb);
+    var rb=el('div'); rb.style.cssText='margin:10px 0;padding:8px 10px;background:rgba(0,0,0,.25);border-left:3px solid #d4af37;border-radius:4px;white-space:pre-wrap;line-height:1.6';
+    rb.appendChild(el('div','tiny','💬 TRẢ LỜI')); rb.appendChild(document.createTextNode(resp||'(không có)')); box.appendChild(rb);
+    var actions=el('div'); actions.style.cssText='margin-top:8px;text-align:right';
+    var copy=el('button','btn','📋 Copy'); copy.style.cssText='padding:4px 12px;font-size:12px'; copy.onclick=function(){navigator.clipboard.writeText((q||'')+'\n\n'+(resp||''));copy.textContent='✓ Copied';setTimeout(function(){copy.textContent='📋 Copy';},1500);}; actions.appendChild(copy);
+    box.appendChild(actions);
+    m.appendChild(box); m.style.display='flex';
+  }
+  </script>
+  <div id="chat-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
+  </body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
