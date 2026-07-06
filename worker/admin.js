@@ -238,7 +238,7 @@ async function adminStats(env, url) {
     if (e.type === 'visit') g.visits++;
     else if (e.type === 'chart') g.charts.push(e.data || {});
     else if (e.type === 'ai_question') g.questions.push((e.data && e.data.q) || '');
-    else if (e.type === 'ai_chat') g.chats.push({ q: (e.data && e.data.q) || '', response: (e.data && e.data.response) || '', source: (e.data && e.data.source) || '', durationMs: (e.data && e.data.durationMs) || null, ts: e.ts });
+    else if (e.type === 'ai_chat') g.chats.push({ q: (e.data && e.data.q) || '', response: (e.data && e.data.response) || '', source: (e.data && e.data.source) || '', durationMs: (e.data && e.data.durationMs) || null, rounds: (e.data && e.data.rounds) || 0, bailed: (e.data && e.data.bailed) || null, ts: e.ts });
     if (e.ts > g.lastTs) g.lastTs = e.ts;
     if (e.ts < g.firstTs) g.firstTs = e.ts;
   }
@@ -340,6 +340,7 @@ async function adminStats(env, url) {
     avgMs: Math.round(durs.reduce((a, b) => a + b, 0) / durs.length),
     p95Ms: dSorted[Math.min(dSorted.length - 1, Math.floor(dSorted.length * 0.95))],
     maxMs: dSorted[dSorted.length - 1],
+    bailCount: events.filter((e) => e.type === 'ai_chat' && e.data && e.data.bailed).length,
   } : null;
   // [loop 1351] conversion funnel: visitor → chart → AI question (% engagement)
   const funnel = {
@@ -506,7 +507,7 @@ function adminDashboard() {
     st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
     if (d.engagement) { st.appendChild(statBlock(d.engagement.bounceRate+'%','bounce', d.engagement.bounceRate>60?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.avgEvents,'events/IP')); if (d.engagement.avgLoadMs) st.appendChild(statBlock(d.engagement.avgLoadMs+'ms','⏱ load', d.engagement.avgLoadMs>3000?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(d.engagement.sessions||0,'sessions')); st.appendChild(statBlock((d.engagement.avgSessionMin||0)+'min','⏱/sess')); }
-    if (d.aiLatency) { st.appendChild(statBlock(fmtMs(d.aiLatency.avgMs), 'AI ⏱ avg', d.aiLatency.avgMs>30000?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(fmtMs(d.aiLatency.p95Ms), 'AI ⏱ p95', d.aiLatency.p95Ms>60000?'#c0392b':'#d4af37')); st.appendChild(statBlock(fmtMs(d.aiLatency.maxMs), 'AI ⏱ max', '#9a8a6a')); }
+    if (d.aiLatency) { st.appendChild(statBlock(fmtMs(d.aiLatency.avgMs), 'AI ⏱ avg', d.aiLatency.avgMs>30000?'#c0392b':'#7fbf7f')); st.appendChild(statBlock(fmtMs(d.aiLatency.p95Ms), 'AI ⏱ p95', d.aiLatency.p95Ms>60000?'#c0392b':'#d4af37')); st.appendChild(statBlock(fmtMs(d.aiLatency.maxMs), 'AI ⏱ max', '#9a8a6a')); if (d.aiLatency.bailCount>0) st.appendChild(statBlock(d.aiLatency.bailCount, '⏱ bị cắt 60s', '#e0533d')); }
     st.appendChild(statBlock(d.aiEnabled?'BẬT':'TẮT','AI mode', d.aiEnabled?'#7fbf7f':'#c0392b'));
     const c=document.getElementById('controls'); c.textContent='';
     // [loop 1351] conversion funnel
@@ -532,9 +533,9 @@ function adminDashboard() {
       const td2=el('td'); const badge=el('span','badge b-'+(e.type||'other'), e.type); td2.appendChild(badge); tr.appendChild(td2);
       tr.appendChild(el('td','ip', e.ip||'?'));
       tr.appendChild(el('td','tiny', (e.country||'?')+(e.city?' / '+e.city:'')));
-      tr.appendChild(el('td','tiny', (function(){ if(!e.data) return ''; if(e.type==='ai_chat') return 'Q: '+String(e.data.q||'').slice(0,60)+' → '+(e.data.source==='ai'?'🤖':'📦')+(e.data.durationMs!=null?' '+fmtMs(e.data.durationMs):'')+' — «click xem đầy đủ»'; if(e.type==='ai_question') return 'Q: '+String(e.data.q||'').slice(0,200); if(e.type==='chart') return '📊 '+String(e.data.dob||'')+' '+String(e.data.time||'')+' '+String(e.data.gender||''); if(e.type==='error') return '⚠ '+String(e.data.msg||'').slice(0,200); if(e.type==='click') return '🖱 '+String(e.data.id||'')+' ('+String(e.data.txt||'').slice(0,30)+')'; if(e.type==='visit'&&e.data.ref) return '← '+String(e.data.ref).slice(0,80); return JSON.stringify(e.data).slice(0,200); })()));
+      tr.appendChild(el('td','tiny', (function(){ if(!e.data) return ''; if(e.type==='ai_chat') return (e.data.bailed?'⏱ ':'')+String(e.data.q||'').slice(0,60)+' → '+(e.data.source==='ai'?'🤖':'📦')+(e.data.durationMs!=null?' '+fmtMs(e.data.durationMs):'')+(e.data.rounds?' · '+e.data.rounds+' vòng':'')+' — «click xem đầy đủ»'; if(e.type==='ai_question') return 'Q: '+String(e.data.q||'').slice(0,200); if(e.type==='chart') return '📊 '+String(e.data.dob||'')+' '+String(e.data.time||'')+' '+String(e.data.gender||''); if(e.type==='error') return '⚠ '+String(e.data.msg||'').slice(0,200); if(e.type==='click') return '🖱 '+String(e.data.id||'')+' ('+String(e.data.txt||'').slice(0,30)+')'; if(e.type==='visit'&&e.data.ref) return '← '+String(e.data.ref).slice(0,80); return JSON.stringify(e.data).slice(0,200); })()));
       // [loop 1352] ai_chat row click → modal full Q+A (không truncate)
-      if (e.type==='ai_chat' && e.data) { tr.style.cursor='pointer'; tr.onmouseenter=function(){tr.style.background='rgba(212,175,55,.08)';}; tr.onmouseleave=function(){tr.style.background='';}; tr.onclick=function(){showChat(e.data.q, e.data.response, e.data.source, e.data.durationMs, e.ts, e.ip);}; }
+      if (e.type==='ai_chat' && e.data) { tr.style.cursor='pointer'; tr.onmouseenter=function(){tr.style.background='rgba(212,175,55,.08)';}; tr.onmouseleave=function(){tr.style.background='';}; tr.onclick=function(){showChat(e.data.q, e.data.response, e.data.source, e.data.durationMs, e.ts, e.ip, e.data.rounds, e.data.bailed);}; }
       tb.appendChild(tr);
     });
     // [loop 1351] hourly activity — 24 bars (giờ VN)
@@ -570,10 +571,10 @@ function adminDashboard() {
         if (v.charts.length) card.appendChild(el('div','tiny','📊 Lá số xem ('+v.charts.length+'): '+v.charts.map(function(c){return (c.dob||'?')+' '+(c.gender||'');}).join('; ').slice(0,400)));
         if (v.questions.length) card.appendChild(el('div','tiny','💬 AI hỏi ('+v.questions.length+'): '+v.questions.map(function(q){return '«'+String(q).slice(0,90)+'»';}).join(' ').slice(0,500)));
         if (v.chats.length) { v.chats.forEach(function(ch){
-          var cd=el('div','tiny','💬 «'+String(ch.q).slice(0,80)+'» → '+(ch.source==='ai'?'🤖':'📦')+(ch.durationMs!=null?' '+fmtMs(ch.durationMs):'')+' '+String(ch.response||'').slice(0,140)+(String(ch.response||'').length>140?'…':''));
-          cd.style.cssText='border-left:2px solid rgba(212,175,55,.3);padding-left:6px;margin:2px 0;cursor:pointer';
+          var cd=el('div','tiny',(ch.bailed?'⏱ ':'💬 ')+String(ch.q).slice(0,80)+' → '+(ch.source==='ai'?'🤖':'📦')+(ch.durationMs!=null?' '+fmtMs(ch.durationMs):'')+(ch.rounds?' · '+ch.rounds+'v':'')+' '+String(ch.response||'').slice(0,140)+(String(ch.response||'').length>140?'…':''));
+          cd.style.cssText='border-left:2px solid '+(ch.bailed?'rgba(192,57,43,.4)':'rgba(212,175,55,.3)')+';padding-left:6px;margin:2px 0;cursor:pointer';
           cd.title='Click xem đầy đủ'; cd.onmouseenter=function(){cd.style.background='rgba(212,175,55,.06)';}; cd.onmouseleave=function(){cd.style.background='';};
-          cd.onclick=(function(c){return function(){showChat(c.q, c.response, c.source, c.durationMs, c.ts, v.ip);};})(ch);
+          cd.onclick=(function(c){return function(){showChat(c.q, c.response, c.source, c.durationMs, c.ts, v.ip, c.rounds, c.bailed);};})(ch);
           card.appendChild(cd);
         }); }
         bip.appendChild(card);
@@ -641,14 +642,14 @@ function adminDashboard() {
   function blockIp(ip,block){ fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip,block:block})}).then(function(){load();}); }
   // [loop 1352] full-chat modal — admin xem TOÀN BỘ Q+A (không bị truncate 200 chars).
   function fmtMs(ms){ if(ms==null)return ''; if(ms<1000)return ms+'ms'; var s=ms/1000; return s<60?(s.toFixed(1)+'s'):(Math.round(s/60)+'m'+String(Math.round(s%60)).padStart(2,'0')+'s'); }
-  function showChat(q, resp, src, dur, ts, ip){
+  function showChat(q, resp, src, dur, ts, ip, rounds, bailed){
     var m=document.getElementById('chat-modal'); m.textContent='';
-    var box=el('div'); box.style.cssText='background:#15131f;border:1px solid #d4af37;border-radius:10px;padding:18px 22px;max-width:780px;width:calc(100% - 40px);max-height:85vh;overflow:auto';
+    var box=el('div'); box.style.cssText='background:#15131f;border:1px solid '+(bailed?'#c0392b':'#d4af37')+';border-radius:10px;padding:18px 22px;max-width:780px;width:calc(100% - 40px);max-height:85vh;overflow:auto';
     var meta=el('div'); meta.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;border-bottom:1px solid rgba(212,175,55,.2);padding-bottom:8px';
     var left=el('div'); left.style.cssText='font-size:13px';
     left.appendChild(el('span',null, (src==='ai'?'🤖 AI trả lời':'📦 Local (offline)') + (ip?'  ·  ':'')));
     if(ip){var ipE=el('span','ip',ip); ipE.style.fontSize='12px'; left.appendChild(ipE);}
-    left.appendChild(el('div','tiny', (ts?new Date(ts).toLocaleString('vi-VN'):'') + (dur!=null?'  ·  ⏱ '+fmtMs(dur):'')));
+    left.appendChild(el('div','tiny', (ts?new Date(ts).toLocaleString('vi-VN'):'') + (dur!=null?'  ·  ⏱ '+fmtMs(dur):'') + (rounds?'  ·  🔄 '+rounds+' vòng':'') + (bailed?'  ·  ⚠ BỊ CẮT: '+bailed:'')));
     meta.appendChild(left);
     var close=el('button','btn','✕ Đóng'); close.style.cssText='padding:4px 12px;font-size:12px'; close.onclick=function(){m.style.display='none';}; meta.appendChild(close);
     box.appendChild(meta);

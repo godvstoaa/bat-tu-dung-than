@@ -3846,7 +3846,7 @@ async function handleAsk() {
     }));
     currentResult._family = _famData.length ? _famData : undefined;
     const _aiStart = Date.now();
-    const { source, text } = await askAI(q, currentResult, cfg, {
+    const { source, text, meta } = await askAI(q, currentResult, cfg, {
       history: chatHistory,
       signal: _aiAbort.signal,   // [loop 948] cho phép cancel
       onStatus: (s) => { lastStatus = s; body.textContent = s + ' …'; if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
@@ -3855,7 +3855,7 @@ async function handleAsk() {
     body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? 'Trợ lý AI' : 'Trợ lý (cục bộ)';
-    _logEvent('ai_chat', { q: q, response: text.slice(0, 1200), source: source, durationMs: Date.now() - _aiStart }); // [admin loop 1351] full chat history (Q+A + duration)
+    _logEvent('ai_chat', { q: q, response: text.slice(0, 1200), source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed }); // [loop 1354] +rounds/bailed telemetry
     // [loop 947] message actions (refactored → addMsgActions helper, dùng cả cho restore)
     addMsgActions(body, text);
     // [loop 928] gợi ý câu hỏi kế tiếp theo ngữ cảnh (cảm giác ông thầy tư vấn)

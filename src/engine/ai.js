@@ -1450,10 +1450,14 @@ export function suggestFollowups(question, R) {
 // ===========================================================================
 export async function askAI(question, R, cfg, { onToken, onStatus, history, signal } = {}) {
   cfg = cfg || getConfig();
-  const localFallback = (note) => {
+  // [loop 1354] telemetry — track rounds + total elapsed để log vào admin ai_chat event
+  //   (admin thấy: query này mất mấy round? có bị guard cắt ở 60s không?)
+  let totalAttempts = 0, _roundsDone = 0;
+  const _tStart = Date.now();
+  const localFallback = (note, meta) => {
     const block = composeAnswer(question, R);
     const text = `${block.lead}\n\n${block.paragraphs.map((p) => '• ' + p).join('\n')}${note ? '\n\n' + note : ''}`;
-    return { source: 'local', text };
+    return { source: 'local', text, meta: meta || { rounds: _roundsDone, totalMs: Date.now() - _tStart } };
   };
 
   if (!isAIReady(cfg)) {
@@ -1509,12 +1513,11 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   //   18 rounds × 12s/round = 216s. Không có total cap → user chờ 2.6 phút.
   //   Fix: (1) totalAttempts hard cap (không reset khi retry), (2) total elapsed 60s →
   //   fallback êm (giữ content partial nếu có). Bounds worst case ~60s thay vì 216s.
-  let totalAttempts = 0;
-  const _tStart = Date.now();
   const _bail = (reason) => {
     const last = [...messages].reverse().find((m) => m.role === 'assistant' && m.content);
-    if (last && last.content) return { source: 'ai', text: last.content + '\n\n_(' + reason + ')_' };
-    return localFallback(reason + ' — đã trả lời bằng bộ luân giải cục bộ.');
+    const meta = { rounds: _roundsDone, totalMs: Date.now() - _tStart, bailed: reason };
+    if (last && last.content) return { source: 'ai', text: last.content + '\n\n_(' + reason + ')_', meta };
+    return localFallback(reason + ' — đã trả lời bằng bộ luân giải cục bộ.', meta);
   };
   try {
     for (let step = 0; step < 6 && totalAttempts < 9; step++, totalAttempts++) {
@@ -1529,6 +1532,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
         if (toolsOn) { toolsOn = false; step = -1; continue; }
         throw e;
       }
+      _roundsDone++;
       const { content, toolCalls } = round;
 
       if (toolCalls && toolCalls.length && toolsOn) {
@@ -1551,7 +1555,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
         if (thinkOn) { thinkOn = false; step = -1; continue; } // [loop 1186] thử lại không thinking
         throw new Error('Phản hồi rỗng');
       }
-      return { source: 'ai', text: content };
+      return { source: 'ai', text: content, meta: { rounds: _roundsDone, totalMs: Date.now() - _tStart } };
     }
     return _bail('AI vượt quá số vòng tối đa');
   } catch (e) {

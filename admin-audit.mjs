@@ -18,7 +18,8 @@ const r1 = await fetch(BASE + '/api/event', { method: 'POST', headers: { 'Conten
 ok(r1.ok, 'POST /api/event log');
 
 // [loop 1352] log ai_chat với durationMs — verify full chat retention + latency aggregation
-const chatBody = { type: 'ai_chat', data: { q: 'audit test question ' + rid, response: 'audit test response '.repeat(60) + rid, source: 'ai', durationMs: 4242 } };
+// [loop 1354] + rounds/bailed telemetry
+const chatBody = { type: 'ai_chat', data: { q: 'audit test question ' + rid, response: 'audit test response '.repeat(60) + rid, source: 'ai', durationMs: 4242, rounds: 3, bailed: null } };
 const r1b = await fetch(BASE + '/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(chatBody) }).then((r) => r.json());
 ok(r1b.ok, 'POST /api/event ai_chat (full response + durationMs)');
 
@@ -46,8 +47,8 @@ ok(Array.isArray(st.trend) && st.trend.length === 30, 'stats.trend (30 ngày t�
 const todayStr = new Date().toISOString().slice(0, 10);
 const todayTrend = st.trend && st.trend.find((t) => t.date === todayStr);
 ok(todayTrend && todayTrend.all > 0, 'dayagg hôm nay có ghi (all=' + (todayTrend ? todayTrend.all : '?') + ')');
-// [loop 1352] AI latency aggregation (avg/p95/max durationMs)
-ok(st.aiLatency === null || (st.aiLatency && typeof st.aiLatency.avgMs === 'number' && typeof st.aiLatency.p95Ms === 'number' && typeof st.aiLatency.maxMs === 'number'), 'stats.aiLatency shape {avgMs,p95Ms,maxMs}');
+// [loop 1352] AI latency aggregation (avg/p95/max durationMs) + [1354] bailCount
+ok(st.aiLatency === null || (st.aiLatency && typeof st.aiLatency.avgMs === 'number' && typeof st.aiLatency.p95Ms === 'number' && typeof st.aiLatency.maxMs === 'number' && typeof st.aiLatency.bailCount === 'number'), 'stats.aiLatency shape {avgMs,p95Ms,maxMs,bailCount}');
 // [loop 1352] full chat response retained (không bị truncate ở storage) + durationMs trong byIp
 let chatSeen = false, durInByIp = false;
 for (let i = 0; i < 5 && !chatSeen; i++) {
@@ -67,6 +68,9 @@ for (let i = 0; i < 5 && !chatSeen; i++) {
 }
 ok(chatSeen, 'ai_chat full response retained + xuất hiện trong byIp (retry KV)');
 ok(durInByIp, 'byIp chat object có durationMs field (=4242)');
+let roundsInByIp = false;
+for (const v of (st.byIp || [])) for (const c of (v.chats || [])) { if (c.q && c.q.indexOf(rid) >= 0 && c.rounds === 3) roundsInByIp = true; }
+ok(roundsInByIp, 'byIp chat object có rounds field (=3) — [loop 1354 telemetry]');
 
 // 3. AI toggle off → proxy 503 → on
 await fetch(BASE + '/admin/api/ai?token=' + TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: false }) });
