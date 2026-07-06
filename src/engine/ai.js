@@ -1501,7 +1501,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   const localFallback = (note, meta) => {
     const block = composeAnswer(question, R);
     const text = `${block.lead}\n\n${block.paragraphs.map((p) => '• ' + p).join('\n')}${note ? '\n\n' + note : ''}`;
-    return { source: 'local', text, meta: meta || { rounds: _roundsDone, totalMs: Date.now() - _tStart } };
+    return { source: 'local', text, meta: Object.assign({ rounds: _roundsDone, totalMs: Date.now() - _tStart }, meta || {}) };
   };
 
   if (!isAIReady(cfg)) {
@@ -1618,7 +1618,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
     const hint = isCors
       ? `Không gọi được AI — CORS: trình duyệt chặn ${cfg.endpoint}. Mở ⚙ chọn "★ PROXY DEV" (npm run dev) hoặc backend.`
       : `Không gọi được AI: ${e.message}.`;
-    return localFallback(hint + ' Hiện trả lời bằng bộ luân giải cục bộ.');
+    return localFallback(hint + ' Hiện trả lời bằng bộ luân giải cục bộ.', { error: String(e.message || e).slice(0, 200) }); // [loop 1374] log error reason
   }
 }
 
