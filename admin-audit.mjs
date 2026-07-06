@@ -5,6 +5,7 @@
 //  → CSV export → auth reject. Mỗi deploy chạy lại để chắc không regress.
 // ============================================================================
 import { randomBytes } from 'crypto';
+import vm from 'node:vm';
 const BASE = 'https://battu.god8.shop';
 const TOKEN = process.argv[2] || '';
 if (!TOKEN) { console.error('Cần token: node admin-audit.mjs <admin-token>'); process.exit(1); }
@@ -98,6 +99,15 @@ ok(mh.status === 200, 'main app / trả 200 cho browser UA (got ' + mh.status + 
 ok(!!mh.headers.get('strict-transport-security'), 'main app có HSTS (run_worker_first inject)');
 ok(mh.headers.get('x-content-type-options') === 'nosniff', 'main app X-Content-Type-Options nosniff');
 ok(!!mh.headers.get('referrer-policy'), 'main app có Referrer-Policy');
+// [loop 1355] CRITICAL regression guard: dashboard inline script phải parse không lỗi syntax.
+//   Bug từng gặp: '\n' trong template literal → Worker evaluate thành newline thật → browser
+//   nhận string literal đứt dòng → SyntaxError → toàn bộ script chết → "Đang tải…" vĩnh viễn.
+//   (Source-level check false-pass trước đây; giờ check DEPLOYED HTML qua vm.Script compile-only.)
+const dhHtml = await fetch(BASE + '/admin?token=' + TOKEN).then((r) => r.text());
+const sMatch = dhHtml.match(/<script>([\s\S]*?)<\/script>/);
+let scriptParses = false, parseErr = '';
+if (sMatch) { try { new vm.Script(sMatch[1]); scriptParses = true; } catch (e) { parseErr = e.message; } }
+ok(scriptParses, 'dashboard inline script parses không lỗi (regression guard template-escape)' + (parseErr ? ' — ERR: ' + parseErr : ''));
 // [loop 1355] run_worker_first → anti-scraping áp dụng cả main document (trước đây edge bypass)
 const scraper = await fetch(BASE + '/', { headers: { 'User-Agent': 'curl/8.0 audit-scraper-test' } });
 ok(scraper.status === 403, 'scraper UA bị block ở / (anti-scraping giờ áp dụng mọi route, got ' + scraper.status + ')');

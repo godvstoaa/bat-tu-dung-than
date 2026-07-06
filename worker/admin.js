@@ -682,7 +682,7 @@ function adminDashboard() {
     var rb=el('div'); rb.style.cssText='margin:10px 0;padding:8px 10px;background:rgba(0,0,0,.25);border-left:3px solid #d4af37;border-radius:4px;white-space:pre-wrap;line-height:1.6';
     rb.appendChild(el('div','tiny','💬 TRẢ LỜI')); rb.appendChild(document.createTextNode(resp||'(không có)')); box.appendChild(rb);
     var actions=el('div'); actions.style.cssText='margin-top:8px;text-align:right';
-    var copy=el('button','btn','📋 Copy'); copy.style.cssText='padding:4px 12px;font-size:12px'; copy.onclick=function(){navigator.clipboard.writeText((q||'')+'\n\n'+(resp||''));copy.textContent='✓ Copied';setTimeout(function(){copy.textContent='📋 Copy';},1500);}; actions.appendChild(copy);
+    var copy=el('button','btn','📋 Copy'); copy.style.cssText='padding:4px 12px;font-size:12px'; copy.onclick=function(){navigator.clipboard.writeText((q||'')+'\\n\\n'+(resp||''));copy.textContent='✓ Copied';setTimeout(function(){copy.textContent='📋 Copy';},1500);}; actions.appendChild(copy);
     box.appendChild(actions);
     m.appendChild(box); m.style.display='flex';
   }
