@@ -324,6 +324,7 @@ function adminDashboard() {
   </style></head><body>
   <h1>🛡️ Admin — Bát Tự Dụng Thần</h1>
   <div id="status">Đang tải…</div>
+  <div id="health" style="margin:6px 0;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,.2);font-size:13px"></div>
   <div id="controls" style="margin:12px 0"></div>
   <div id="funnel" style="margin:8px 0 16px"></div>
   <details style="margin:8px 0"><summary style="cursor:pointer;color:#d4af37;font-size:13px">📱 Telegram Alert — nhận thông báo khi user lập lá số/hỏi AI</summary>
@@ -366,6 +367,14 @@ function adminDashboard() {
     st.appendChild(statBlock(d.totals.ai_question,'AI hỏi'));
     if (d.totals.ai_chat) st.appendChild(statBlock(d.totals.ai_chat, '💬 chats', '#b478c8'));
     if (d.engagement && d.engagement.aiSuccessRate !== null) st.appendChild(statBlock(d.engagement.aiSuccessRate+'%', 'AI rate', d.engagement.aiSuccessRate < 50 ? '#c0392b' : '#7fbf7f'));
+    var hb=document.getElementById('health'); if (hb) { hb.textContent='';
+      var hItems=[];
+      if (d.engagement && d.engagement.aiSuccessRate !== null) hItems.push([(d.engagement.aiSuccessRate>=50)+'', 'AI trả lời: '+d.engagement.aiSuccessRate+'%']);
+      hItems.push([(d.totals.error===0)+'', 'JS errors: '+d.totals.error]);
+      if (d.engagement && d.engagement.avgLoadMs) hItems.push([(d.engagement.avgLoadMs<5000)+'', 'Load TB: '+(d.engagement.avgLoadMs/1000).toFixed(1)+'s']);
+      if (d.engagement && d.engagement.bounceRate!=null) hItems.push([(d.engagement.bounceRate<60)+'', 'Bounce: '+d.engagement.bounceRate+'%']);
+      hItems.forEach(function(it){ var r=el('div','tiny',(it[0]==='true'?'✅':'⚠️')+' '+it[1]); r.style.padding='2px 0'; hb.appendChild(r); });
+    }
     if (d.totals.error) st.appendChild(statBlock(d.totals.error, '⚠ lỗi JS', '#e0533d'));
     st.appendChild(statBlock(d.realUniqueIps||d.uniqueIps,'IP thật'+((d.bots||0)>0?' (bot:'+d.bots+')':'')));
     st.appendChild(statBlock(d.activeNow||0,'🔴 active now', (d.activeNow||0)>0?'#7fbf7f':'#666'));
