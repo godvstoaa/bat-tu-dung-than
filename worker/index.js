@@ -34,7 +34,7 @@ function withSecurityHeaders(res) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const ua = request.headers.get('User-Agent') || '';
     const ip = clientIP(request);
@@ -91,8 +91,9 @@ export default {
           if (!headers.get('Authorization') && key) headers.set('Authorization', `Bearer ${key}`);
           request = new Request(request, { headers });
           const out = await makeProxy(host)({ request, params, env });
-          // [loop 1357] track usage free model (calls ok/err + IP + day) — fire-and-forget
-          if (isFree && env.ADMIN_KV) logFreeUsage(env, ip, out.status).catch(function () {});
+          // [loop 1357] track usage free model (calls ok/err + IP + day).
+          //   Dùng ctx.waitUntil — KHÔNG fire-and-forget (Worker kill isolate sau return → KV write bị cắt).
+          if (isFree && env.ADMIN_KV && ctx && ctx.waitUntil) ctx.waitUntil(logFreeUsage(env, ip, out.status));
           return out;
         }
         return makeProxy(host)({ request, params, env });
