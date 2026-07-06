@@ -378,6 +378,7 @@ function adminDashboard() {
     st.appendChild(statBlock(d.totals.ai_question,'AI hỏi'));
     if (d.totals.ai_chat) st.appendChild(statBlock(d.totals.ai_chat, '💬 chats', '#b478c8'));
     if (d.engagement && d.engagement.aiSuccessRate !== null) st.appendChild(statBlock(d.engagement.aiSuccessRate+'%', 'AI rate', d.engagement.aiSuccessRate < 50 ? '#c0392b' : '#7fbf7f'));
+    if (d.engagement && d.engagement.returningVisitors) st.appendChild(statBlock(d.engagement.returningVisitors, '🔄 quay lại', '#7fbf7f'));
     var hb=document.getElementById('health'); if (hb) { hb.textContent='';
       var hItems=[];
       if (d.engagement && d.engagement.aiSuccessRate !== null) hItems.push([(d.engagement.aiSuccessRate>=50)+'', 'AI trả lời: '+d.engagement.aiSuccessRate+'%']);
