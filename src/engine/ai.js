@@ -135,6 +135,8 @@ export const PRESETS = [
     note: 'Endpoint Coding Plan — đi qua proxy /zai (cùng-origin, tránh CORS). Chạy được cả dev (Vite proxy) LẪN production (Cloudflare /zai). Dùng API key gói Coding Plan. [loop 1186 FIX: trước đây gọi thẳng api.z.ai → CORS chặn web].' },
   { id: 'cf-glm', label: '★ Cloudflare Workers AI — GLM-5.2 [proxy]', endpoint: '/cf-ai/client/v4/accounts/bc101a2962ca21a084172c5334ad7dad/ai/v1', model: '@cf/zai-org/glm-5.2',
     note: 'Cloudflare Workers AI chạy GLM-5.2. Đi qua proxy /cf-ai (cùng-origin) — tránh CORS. Dùng Cloudflare API Token làm key.' },
+  { id: 'nvidia-glm', label: '★ NVIDIA NIM — GLM-5.2 [proxy, free 5000 credit]', endpoint: '/nvidia/v1', model: 'z-ai/glm-5.2',
+    note: 'NVIDIA NIM chạy GLM-5.2 (cùng model, infra NVIDIA nhanh/ổn + tool-use + reasoning). Lấy key FREE ở build.nvidia.com/settings/api-keys (tài khoản NVIDIA free, 5000 credit + 40 RPM). Đi qua proxy /nvidia — tránh CORS.' },
   { id: 'bigmodel', label: 'BigModel (智谱 glm-4.6)', endpoint: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4.6', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
   { id: 'deepseek', label: 'DeepSeek', endpoint: 'https://api.deepseek.com/v1', model: 'deepseek-chat', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
   { id: 'openai', label: 'OpenAI', endpoint: 'https://api.openai.com/v1', model: 'gpt-4o-mini', note: 'CORS sẽ chặn từ web — cần backend/proxy.' },
@@ -1544,7 +1546,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   //   chạy qua host CF (proxy /cf-ai) → phải phân biệt theo HOST endpoint, KHÔNG theo tên model.
   const _ep = cfg.endpoint || '';
   const _isCf = /\/cf-ai|cloudflare/i.test(_ep);
-  const isZaiNative = !_isCf && /glm|z\.ai|bigmodel/i.test((cfg.model || '') + _ep);
+  const isZaiNative = !_isCf && !/nvidia/i.test(_ep) && /glm|z\.ai|bigmodel/i.test((cfg.model || '') + _ep); // [loop 1375] nvidia除外 — hosting NVIDIA có thể không chấp nhận param thinking
   const buildBody = (msgs, toolsOn, thinkOn) => ({
     model: cfg.model, messages: msgs, temperature: 0.7, stream: true,
     ...(thinkOn && isZaiNative ? { thinking: { type: 'enabled' } } : {}),  // chỉ host Z.ai/BigModel
