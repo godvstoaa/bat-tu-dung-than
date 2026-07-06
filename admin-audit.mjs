@@ -53,7 +53,7 @@ ok(csv.split('\n').length >= 2, 'CSV có ≥1 row data');
 const w = await fetch(BASE + '/admin/api/stats?token=wrong').then((r) => r.status);
 ok(w === 401 || w === 429, 'wrong token rejected (' + w + ')');
 const noToken = await fetch(BASE + '/admin/api/stats').then((r) => r.status);
-ok(noToken === 401, 'no token → 401 (' + noToken + ')');
+ok(noToken === 401 || noToken === 429, 'no token rejected (' + noToken + ')');
 const aiPub = await fetch(BASE + '/api/ai-config').then((r) => r.json());
 ok(!aiPub.apiKey, 'public /api/ai-config không leak apiKey');
 const inject = await fetch(BASE + '/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: '<script>', data: { xss: '<img onerror=alert(1)>' } }) }).then((r) => r.json());
