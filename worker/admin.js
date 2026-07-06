@@ -421,7 +421,7 @@ function adminDashboard() {
       const td2=el('td'); const badge=el('span','badge b-'+(e.type||'other'), e.type); td2.appendChild(badge); tr.appendChild(td2);
       tr.appendChild(el('td','ip', e.ip||'?'));
       tr.appendChild(el('td','tiny', (e.country||'?')+(e.city?' / '+e.city:'')));
-      tr.appendChild(el('td','tiny', e.data?JSON.stringify(e.data).slice(0,250):''));
+      tr.appendChild(el('td','tiny', (function(){ if(!e.data) return ''; if(e.type==='ai_chat') return 'Q: '+String(e.data.q||'').slice(0,60)+' → '+(e.data.source==='ai'?'🤖':'📦')+' '+String(e.data.response||'').slice(0,150); if(e.type==='ai_question') return 'Q: '+String(e.data.q||'').slice(0,200); if(e.type==='chart') return '📊 '+String(e.data.dob||'')+' '+String(e.data.time||'')+' '+String(e.data.gender||''); if(e.type==='error') return '⚠ '+String(e.data.msg||'').slice(0,200); if(e.type==='visit'&&e.data.ref) return '← '+String(e.data.ref).slice(0,80); return JSON.stringify(e.data).slice(0,200); })()));
       tb.appendChild(tr);
     });
     // [loop 1351] hourly activity — 24 bars (giờ VN)
