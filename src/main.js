@@ -4068,7 +4068,7 @@ async function run() {
   const [y0, m0, d0] = dateVal.split('-').map(Number);
   const [hh0, mm0] = timeVal.split(':').map(Number);
   const gender = (document.querySelector('input[name="gender"]:checked') || {}).value || 'nam';   // [loop 961] defensive: nếu không radio nào checked → fallback 'nam' (tránh crash run)
-  _logEvent('chart', { dob: dateVal, time: timeVal, gender: gender }); // [admin loop 1351]
+  // [loop 1366] chart event log dời SAU compute (xem dưới) để kèm mệnh cách score.
   // [loop 23] Múi giờ + 真太阳时 (giờ Mặt Trời thật theo kinh độ nơi sinh).
   //   Bát Tự dùng 真太阳时 — đồng hồ múi giờ chỉ là xấp xỉ. Sinh gần ranh 时辰 thì sai vài
   //   phút có đổi 时柱. Có city/longitude → hiệu chỉnh; không thì dùng giờ nhập y nguyên.
@@ -4116,6 +4116,12 @@ async function run() {
     if (res) res.scrollIntoView({ behavior: 'smooth' });
     return;
   }
+  // [loop 1366] log chart với mệnh cách score — admin tổng hợp «số mệnh» tập thể những người hỏi.
+  //   R.synthesis.score = điểm mệnh cách 0-100 (đã tính sẵn cho mỗi lá số).
+  try {
+    const _s = currentResult.synthesis || {};
+    _logEvent('chart', { dob: dateVal, time: timeVal, gender: gender, score: (_s.score != null ? _s.score : null), grade: _s.gradeVi || null, fortune: _s.fortuneVi || null, percentile: (_s.percentile != null ? _s.percentile : null), patternQ: (currentResult.patternQuality && currentResult.patternQuality.quality) || null, strong: !!(currentResult.strength && currentResult.strength.strong), yong: (currentResult.yong && currentResult.yong.primary) || null });
+  } catch (e) {}
   const c = currentResult.chart;
   // [loop 915] DỤNG THẦN THEME — đổi accent màu app theo Dụng Thần (may mắn)
   const _dungWx = currentResult.yong?.primary;

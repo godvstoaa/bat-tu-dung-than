@@ -481,6 +481,36 @@ async function adminStats(env, url) {
     today: (trend.find((t) => t.date === _todayStr) || {}).free_calls || 0,
     topIps: freeTopIps,
   };
+  // [loop 1366] Mệnh cách aggregate — tổng hợp «số mệnh» tập thể những người lập lá số.
+  //   score từ R.synthesis.score (0-100) — frontend log khi submit chart.
+  const scored = events.filter((e) => e.type === 'chart' && e.data && e.data.score != null);
+  const scores = scored.map((e) => e.data.score);
+  const sSorted = scores.slice().sort((a, b) => a - b);
+  const dGrades = {}, dPat = {}, dFort = {};
+  let strongCnt = 0, yongMap = {};
+  scored.forEach((e) => {
+    if (e.data.grade) dGrades[e.data.grade] = (dGrades[e.data.grade] || 0) + 1;
+    if (e.data.patternQ) dPat[e.data.patternQ] = (dPat[e.data.patternQ] || 0) + 1;
+    if (e.data.fortune) dFort[e.data.fortune] = (dFort[e.data.fortune] || 0) + 1;
+    if (e.data.strong) strongCnt++;
+    if (e.data.yong) yongMap[e.data.yong] = (yongMap[e.data.yong] || 0) + 1;
+  });
+  const destiny = scores.length ? {
+    count: scores.length,
+    avg: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
+    min: sSorted[0], max: sSorted[sSorted.length - 1],
+    median: sSorted[Math.floor(sSorted.length / 2)],
+    p25: sSorted[Math.min(sSorted.length - 1, Math.floor(sSorted.length * 0.25))],
+    p75: sSorted[Math.min(sSorted.length - 1, Math.floor(sSorted.length * 0.75))],
+    strongRate: Math.round((strongCnt / scores.length) * 100),
+    grades: Object.entries(dGrades).map(([g, n]) => ({ grade: g, count: n })).sort((a, b) => b.count - a.count),
+    patternQs: Object.entries(dPat).map(([q, n]) => ({ q, count: n })).sort((a, b) => b.count - a.count),
+    fortunes: Object.entries(dFort).map(([f, n]) => ({ f, count: n })).sort((a, b) => b.count - a.count).slice(0, 5),
+    yongs: Object.entries(yongMap).map(([y, n]) => ({ y, count: n })).sort((a, b) => b.count - a.count),
+    histogram: [0, 1, 2, 3, 4].map(function (b) { var lo = b * 20, hi = (b + 1) * 20; var cnt = scores.filter(function (s) { return b === 4 ? (s >= lo && s <= 100) : (s >= lo && s < hi); }).length; return { bucket: lo + '-' + (b === 4 ? 100 : hi), count: cnt }; }),
+    top: scored.map((e) => ({ dob: e.data.dob, gender: e.data.gender, score: e.data.score, grade: e.data.grade })).sort((a, b) => b.score - a.score).slice(0, 5),
+    bottom: scored.map((e) => ({ dob: e.data.dob, gender: e.data.gender, score: e.data.score, grade: e.data.grade })).sort((a, b) => a.score - b.score).slice(0, 5),
+  } : null;
   // [loop 1351] conversion funnel: visitor → chart → AI question (% engagement)
   const funnel = {
     visitors: byIpArr.length,
@@ -507,7 +537,7 @@ async function adminStats(env, url) {
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
   const eventsLite = events.map(function (e) { var c = { ts: e.ts, type: e.type, ip: e.ip, country: e.country, city: e.city, data: e.data }; return c; });
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, freeUsage, freeRecent: freeLog.slice(0, 30), topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, freeUsage, freeRecent: freeLog.slice(0, 30), destiny, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
@@ -683,6 +713,7 @@ function adminDashboard() {
         <div class="card"><h3>📈 Hoạt động 7 ngày <span class="card-actions tiny">số liệu gần đây</span></h3><div id="daily"></div></div>
         <div class="card"><h3>📉 Xu hướng 30 ngày <span class="card-actions tiny">dayagg TTL 90d · retention dài</span></h3><div id="trend30"></div></div>
         <div class="card"><h3>⏰ Giờ hoạt động (VN, UTC+7)</h3><div id="hourly" style="display:flex;align-items:flex-end;gap:1px;height:44px;margin-top:4px"></div></div>
+        <div class="card"><h3>🔮 Mệnh cách tổng hợp <span class="card-actions tiny">số mệnh tập thể người lập lá số</span></h3><div id="destiny"></div></div>
         <div class="card"><h3>🌍 Quốc gia · nguồn traffic · clicks</h3><div id="topq" style="display:flex;gap:20px;flex-wrap:wrap"></div></div>
       </section>
       <!-- ===== VISITORS ===== -->
@@ -917,6 +948,30 @@ function adminDashboard() {
       }
       if (!u.calls) fu.appendChild(el('div','tiny','(chưa có call nào — user chưa dùng AI free, hoặc admin đang dùng custom key)'));
     }
+    // [loop 1366] mệnh cách tổng hợp — «số mệnh» tập thể những người lập lá số
+    var dy=document.getElementById('destiny'); if (dy && d.destiny) { dy.textContent='';
+      var dd=d.destiny;
+      var head=el('div'); head.style.cssText='display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:8px';
+      var ab=el('div'); ab.style.cssText='text-align:center;min-width:64px';
+      var avgN=el('div'); avgN.style.cssText='font-size:38px;font-weight:800;color:'+(dd.avg>=60?'#7fbf7f':dd.avg>=40?'#d4af37':'#e0533d')+';line-height:1'; avgN.textContent=dd.avg; ab.appendChild(avgN);
+      ab.appendChild(el('div','tiny','avg /100')); head.appendChild(ab);
+      var stt=el('div'); stt.style.cssText='font-size:11.5px;line-height:1.7;color:var(--muted)';
+      stt.appendChild(el('div',null,'min '+dd.min+' · max '+dd.max+' · median '+dd.median+' · p25 '+dd.p25+' · p75 '+dd.p75));
+      stt.appendChild(el('div',null,dd.count+' lá số có điểm · 日主 vượng '+dd.strongRate+'%')); head.appendChild(stt);
+      dy.appendChild(head);
+      var hmax=Math.max.apply(null, dd.histogram.map(function(h){return h.count;}).concat([1]));
+      var hb=el('div'); hb.style.cssText='display:flex;align-items:flex-end;gap:6px;height:52px;margin:6px 0 2px';
+      dd.histogram.forEach(function(h){ var col=h.bucket.indexOf('80')===0?'#7fbf7f':h.bucket.indexOf('60')===0?'#d4af37':h.bucket.indexOf('40')===0?'#c8a44a':'#9a8a6a'; var b=el('div'); b.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;gap:2px'; var bar=el('div'); bar.style.cssText='width:100%;max-width:64px;background:'+col+';height:'+Math.max(2,Math.round(h.count/hmax*44))+'px;border-radius:3px 3px 0 0'; bar.title=h.bucket+': '+h.count+' lá'; b.appendChild(bar); b.appendChild(el('div','tiny',h.count)); hb.appendChild(b); });
+      dy.appendChild(hb);
+      var hl=el('div'); hl.style.cssText='display:flex;gap:6px'; dd.histogram.forEach(function(h){var l=el('span','tiny',h.bucket);l.style.cssText='flex:1;text-align:center';hl.appendChild(l);}); dy.appendChild(hl);
+      var grid=el('div'); grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-top:14px';
+      if (dd.grades.length) { var g=el('div'); g.appendChild(el('div','tiny','PHÂN BỐ GRADE')); g.firstChild.style.cssText='color:#d4af37;font-weight:600;margin-bottom:4px'; dd.grades.slice(0,6).forEach(function(x){g.appendChild(el('div','tiny',x.count+'× '+x.grade));}); grid.appendChild(g); }
+      if (dd.patternQs.length) { var p=el('div'); p.appendChild(el('div','tiny','CÁCH CỤC')); p.firstChild.style.cssText='color:#d4af37;font-weight:600;margin-bottom:4px'; var map={'成格':'成格 nguyên vẹn','有救':'有救 có cứu','败格':'败格 vỡ','特殊':'特殊 đặc biệt'}; dd.patternQs.forEach(function(x){p.appendChild(el('div','tiny',x.count+'× '+(map[x.q]||x.q)));}); grid.appendChild(p); }
+      if (dd.yongs.length) { var yc=el('div'); yc.appendChild(el('div','tiny','DỤNG THẦN')); yc.firstChild.style.cssText='color:#d4af37;font-weight:600;margin-bottom:4px'; dd.yongs.forEach(function(x){yc.appendChild(el('div','tiny',x.count+'× '+x.y));}); grid.appendChild(yc); }
+      dy.appendChild(grid);
+      if (dd.top.length) { var t=el('details'); t.style.cssText='margin-top:10px'; var ts=el('summary','tiny','🏆 Mệnh cao nhất ('+dd.top.length+')'); ts.style.cssText='color:#d4af37;cursor:pointer'; t.appendChild(ts); dd.top.forEach(function(x){t.appendChild(el('div','tiny',x.score+'/100 · '+(x.dob||'?')+' '+(x.gender||'')+(x.grade?' · '+x.grade:'')));}); dy.appendChild(t); }
+      if (dd.bottom.length) { var bo=el('details'); bo.style.cssText='margin-top:4px'; var bs=el('summary','tiny','🔻 Mệnh thấp nhất ('+dd.bottom.length+')'); bs.style.cssText='color:#d4af37;cursor:pointer'; bo.appendChild(bs); dd.bottom.forEach(function(x){bo.appendChild(el('div','tiny',x.score+'/100 · '+(x.dob||'?')+' '+(x.gender||'')+(x.grade?' · '+x.grade:'')));}); dy.appendChild(bo); }
+    } else if (dy) { dy.textContent=''; dy.appendChild(el('div','tiny','(chưa có lá số nào có điểm — user mới lập lá số sẽ hiện đây. Điểm mệnh cách tính khi user submit.)')); }
     // [loop 1351] top questions + countries
     const tq=document.getElementById('topq'); if (tq) { tq.textContent='';
       const col1=el('div'); col1.style.cssText='flex:1;min-width:240px'; col1.appendChild(el('h4',null,'💬 Câu hỏi AI hay gặp'));
