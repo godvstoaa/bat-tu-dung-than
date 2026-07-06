@@ -1504,8 +1504,21 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   });
 
   let toolsOn = true, thinkOn = true;
+  // [loop 1353 LATENCY GUARD] admin insight aiLatency: p95=156s, max=156s (count=12).
+  //   Root cause: `step=-1; continue` reset vòng lặp mỗi lần tắt tools/thinking → tối đa
+  //   18 rounds × 12s/round = 216s. Không có total cap → user chờ 2.6 phút.
+  //   Fix: (1) totalAttempts hard cap (không reset khi retry), (2) total elapsed 60s →
+  //   fallback êm (giữ content partial nếu có). Bounds worst case ~60s thay vì 216s.
+  let totalAttempts = 0;
+  const _tStart = Date.now();
+  const _bail = (reason) => {
+    const last = [...messages].reverse().find((m) => m.role === 'assistant' && m.content);
+    if (last && last.content) return { source: 'ai', text: last.content + '\n\n_(' + reason + ')_' };
+    return localFallback(reason + ' — đã trả lời bằng bộ luân giải cục bộ.');
+  };
   try {
-    for (let step = 0; step < 6; step++) {
+    for (let step = 0; step < 6 && totalAttempts < 9; step++, totalAttempts++) {
+      if (Date.now() - _tStart > 60000) return _bail('⏱ AI trả lời quá lâu (>60 giây)');
       let round;
       try {
         round = await streamRound(url, headers, buildBody(messages, toolsOn, thinkOn), onToken, onStatus, signal);
@@ -1540,8 +1553,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
       }
       return { source: 'ai', text: content };
     }
-    const last = [...messages].reverse().find((m) => m.role === 'assistant' && m.content);
-    return { source: 'ai', text: (last?.content) || '(AI không trả lời được)' };
+    return _bail('AI vượt quá số vòng tối đa');
   } catch (e) {
     if (e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''))) throw e;  // [loop 948] user cancel — propagate, no fallback
     const isCors = /Failed to fetch|NetworkError|Load failed/i.test(e.message);
