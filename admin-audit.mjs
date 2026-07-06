@@ -14,22 +14,24 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ✓', m); } else { fail++
 
 const rid = randomBytes(4).toString('hex');
 
-// 1. log event
-const r1 = await fetch(BASE + '/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'visit', data: { audit: rid } }) }).then((r) => r.json());
+// 1. log event — đánh dấu test:true để stats LỌC ra (không pollute production)
+const r1 = await fetch(BASE + '/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'visit', data: { audit: rid, test: true } }) }).then((r) => r.json());
 ok(r1.ok, 'POST /api/event log');
 
 // [loop 1352] log ai_chat với durationMs — verify full chat retention + latency aggregation
-// [loop 1354] + rounds/bailed telemetry
-const chatBody = { type: 'ai_chat', data: { q: 'audit test question ' + rid, response: 'audit test response '.repeat(60) + rid, source: 'ai', durationMs: 4242, rounds: 3, bailed: null } };
+// [loop 1354] + rounds/bailed telemetry. [loop 1361] test:true để stats lọc ra
+const chatBody = { type: 'ai_chat', data: { q: 'audit test question ' + rid, response: 'audit test response '.repeat(60) + rid, source: 'ai', durationMs: 4242, rounds: 3, bailed: null, test: true } };
 const r1b = await fetch(BASE + '/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(chatBody) }).then((r) => r.json());
 ok(r1b.ok, 'POST /api/event ai_chat (full response + durationMs)');
 
-// 2. stats — retry cho KV eventual consistency (visit viết xong có thể chưa list ngay)
+// 2. stats — retry cho KV eventual consistency. [loop 1361] appeared-check dùng RAW /admin/api/events
+//   (vì stats giờ LỌC test events ra → phải check raw endpoint)
 let st = null;
 let appeared = false;
 for (let i = 0; i < 5; i++) {
   st = await fetch(BASE + '/admin/api/stats?token=' + TOKEN + '&nocache=1').then((r) => r.json());
-  if (st && st.events && st.events.some((e) => e.data && e.data.audit === rid)) { appeared = true; break; }
+  const ev = await fetch(BASE + '/admin/api/events?token=' + TOKEN + '&limit=200').then((r) => r.json()).catch(() => ({ events: [] }));
+  if (ev && ev.events && ev.events.some((e) => e.data && e.data.audit === rid)) { appeared = true; break; }
   await new Promise((r) => setTimeout(r, 2000));
 }
 ok(st && Array.isArray(st.events), 'GET /admin/api/stats');
@@ -140,7 +142,7 @@ const noToken = await fetch(BASE + '/admin/api/stats').then((r) => r.status);
 ok(noToken === 401 || noToken === 429, 'no token rejected (' + noToken + ')');
 const aiPub = await fetch(BASE + '/api/ai-config').then((r) => r.json());
 ok(!aiPub.apiKey, 'public /api/ai-config không leak apiKey');
-const inject = await fetch(BASE + '/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: '<script>', data: { xss: '<img onerror=alert(1)>' } }) }).then((r) => r.json());
+const inject = await fetch(BASE + '/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: '<script>', data: { xss: '<img onerror=alert(1)>', test: true } }) }).then((r) => r.json());
 ok(inject.ok !== undefined, 'event injection handled (type sanitized)');
 
 console.log('\n=== ADMIN AUDIT: ' + pass + ' pass / ' + fail + ' fail ===');

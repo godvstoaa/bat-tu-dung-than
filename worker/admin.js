@@ -90,17 +90,22 @@ async function logEvent(env, request, type, data) {
   log.unshift({ ts, type, ip, ua, country, city, data: data || {} });
   if (log.length > 1500) log.length = 1500;
   await env.ADMIN_KV.put('events:log', JSON.stringify(log));
-  // [loop 1352] dayagg:<date> — 1 JSON key thay cho 3 key daily:day:type cũ (ít KV op hơn,
-  //   richer, TTL 90 ngày cho long-term trend). events:log chỉ giữ recent 1500.
-  const day = new Date(ts).toISOString().slice(0, 10);
-  let agg = {};
-  try { agg = JSON.parse((await env.ADMIN_KV.get('dayagg:' + day)) || '{}'); } catch (e) {}
-  agg[type] = (agg[type] || 0) + 1;
-  agg.all = (agg.all || 0) + 1;
-  await env.ADMIN_KV.put('dayagg:' + day, JSON.stringify(agg), { expirationTtl: TTL_EVENT });
-  for (const k of ['cnt:' + type, 'cnt:all']) {
-    const cur = parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
-    await env.ADMIN_KV.put(k, String(cur + 1));
+  // [loop 1361] test events (data.test/audit/xss) — log vào events:log (cho raw endpoint check)
+  //   NHƯNG KHÔNG đếm cnt:/dayagg → không inflate production stats. Chống audit/test pollute.
+  const isTest = data && (data.test || data.audit || data.xss);
+  if (!isTest) {
+    // [loop 1352] dayagg:<date> — 1 JSON key thay cho 3 key daily:day:type cũ (ít KV op hơn,
+    //   richer, TTL 90 ngày cho long-term trend). events:log chỉ giữ recent 1500.
+    const day = new Date(ts).toISOString().slice(0, 10);
+    let agg = {};
+    try { agg = JSON.parse((await env.ADMIN_KV.get('dayagg:' + day)) || '{}'); } catch (e) {}
+    agg[type] = (agg[type] || 0) + 1;
+    agg.all = (agg.all || 0) + 1;
+    await env.ADMIN_KV.put('dayagg:' + day, JSON.stringify(agg), { expirationTtl: TTL_EVENT });
+    for (const k of ['cnt:' + type, 'cnt:all']) {
+      const cur = parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
+      await env.ADMIN_KV.put(k, String(cur + 1));
+    }
   }
   // [loop 1351] Telegram alert cho chart/ai_question/error (fire-and-forget, không block)
   if (type === 'chart' || type === 'ai_question' || type === 'error') {
@@ -276,6 +281,9 @@ async function adminStats(env, url) {
   const logRaw = env.ADMIN_KV ? await env.ADMIN_KV.get('events:log') : null;
   let events = [];
   try { events = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
+  // [loop 1361] lọc test events (data.test/audit/xss + q chứa 'audit test') ra khỏi stats
+  //   — production sạch. (Raw /admin/api/events vẫn trả tất cả, cho audit self-check.)
+  events = events.filter((e) => !(e.data && (e.data.test || e.data.audit || e.data.xss || (typeof e.data.q === 'string' && e.data.q.indexOf('audit test') >= 0))));
   const get = async (k) => parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
   const totals = { visit: await get('cnt:visit'), chart: await get('cnt:chart'), ai_question: await get('cnt:ai_question'), ai_chat: await get('cnt:ai_chat'), error: await get('cnt:error'), all: await get('cnt:all') };
   const ips = new Set(events.map((e) => e.ip));
