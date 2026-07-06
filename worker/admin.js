@@ -538,9 +538,9 @@ function adminDashboard() {
   @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   .tab{display:none}
   .tab.active{display:block}
-  .pagehead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
-  .pagehead h2{font-size:18px;color:var(--gold)}
-  .pagehead .tiny{font-size:12px}
+  .pagehead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:6px 14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+  .pagehead h2{font-size:20px;color:var(--gold);font-weight:700;letter-spacing:.2px}
+  .pagehead .tiny{font-size:12px;color:var(--muted)}
   /* === CARDS === */
   .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px}
   .card h3{margin:0 0 12px;color:var(--gold);font-size:13px;text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:8px}
@@ -815,14 +815,18 @@ function adminDashboard() {
       var sumErr=d.trend.reduce(function(a,x){return a+x.error;},0);
       var hdr=el('div','tiny','30 ngày: '+sumAll+' events · '+sumVis+' visits · '+sumChart+' lá số · '+sumAi+' AI chat'+(sumErr?' · '+sumErr+' lỗi':'')+' · '+active.length+'/'+30+' ngày có activity'); hdr.style.cssText='margin-bottom:6px';
       tr.appendChild(hdr);
-      var bars=el('div'); bars.style.cssText='display:flex;align-items:flex-end;gap:1px;height:48px;margin:4px 0 8px';
+      var bars=el('div'); bars.style.cssText='display:flex;align-items:flex-end;gap:2px;height:56px;margin:6px 0 4px;padding-bottom:2px;border-bottom:1px solid var(--border)';
       d.trend.forEach(function(x){
-        var bar=el('div'); var h=Math.max(2,Math.round(x.all/tmax*44));
-        bar.style.cssText='flex:1;min-width:6px;background:'+(x.all>0?'#d4af37':'rgba(212,175,55,.08)')+';height:'+h+'px;border-radius:1px';
+        var bar=el('div'); var h=Math.max(3,Math.round(x.all/tmax*52));
+        bar.style.cssText='flex:1;min-width:5px;background:'+(x.all>0?'linear-gradient(180deg,#e6c14a,#d4af37)':'rgba(212,175,55,.07)')+';height:'+h+'px;border-radius:2px 2px 0 0;transition:opacity .15s';
         bar.title=x.date+': '+x.all+' (v:'+x.visit+' c:'+x.chart+' q:'+x.ai_question+(x.error?' e:'+x.error:'')+')';
+        bar.onmouseenter=function(){bar.style.opacity='.7';}; bar.onmouseleave=function(){bar.style.opacity='1';};
         bars.appendChild(bar);
       });
       tr.appendChild(bars);
+      var xlab=el('div','tiny',''); xlab.style.cssText='display:flex;justify-content:space-between;margin-top:2px';
+      xlab.appendChild(el('span',null,d.trend[0].date.slice(5))); xlab.appendChild(el('span',null,'hôm nay'));
+      tr.appendChild(xlab);
     }
     // [loop 1357] free glm-5.2 usage — summary + top IP + recent calls
     var fu=document.getElementById('free-usage'); if (fu && d.freeUsage) { fu.textContent='';
@@ -931,15 +935,16 @@ function adminDashboard() {
     });
   }
   loadAudit();
-  // [loop 1362] tab switching — sidebar nav đổi section (redesign)
+  // [loop 1362] tab switching — sidebar nav đổi section (redesign). [1363] +hash deep-link
+  function switchTab(name){
+    document.querySelectorAll('.nav-item').forEach(function(x){x.classList.toggle('active', x.dataset.tab===name);});
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    var t=document.getElementById('tab-'+name); if(t) t.classList.add('active');
+  }
   document.querySelectorAll('.nav-item').forEach(function(b){
-    b.addEventListener('click', function(){
-      document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('active');});
-      document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
-      b.classList.add('active');
-      var t=document.getElementById('tab-'+b.dataset.tab); if(t) t.classList.add('active');
-    });
+    b.addEventListener('click', function(){ switchTab(b.dataset.tab); if(history.replaceState) history.replaceState(null,'',location.pathname+location.search+'#'+b.dataset.tab); });
   });
+  (function(){var h=location.hash.replace('#',''); if(h && ['overview','visitors','ai','system'].indexOf(h)>=0) switchTab(h);})();
   // [loop 1355] token URL hygiene — strip token khỏi URL sau load (chống leak via history/share)
   if (location.search && location.search.indexOf('token=') >= 0) {
     var _u = new URL(location.href); _u.searchParams.delete('token');
