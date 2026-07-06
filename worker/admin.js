@@ -850,7 +850,7 @@ function adminDashboard() {
       const td2=el('td'); const badge=el('span','badge b-'+(e.type||'other'), e.type); td2.appendChild(badge); tr.appendChild(td2);
       var tdIp=el('td','ip', e.ip||'?'); if(e.ip){tdIp.style.cursor='pointer';tdIp.title='Click xem chi tiết visitor';tdIp.onclick=function(){showVisitor(e.ip);};tdIp.onmouseenter=function(){tdIp.style.textDecoration='underline';};tdIp.onmouseleave=function(){tdIp.style.textDecoration='none';};} tr.appendChild(tdIp);
       tr.appendChild(el('td','tiny', (e.country||'?')+(e.city?' / '+e.city:'')));
-      tr.appendChild(el('td','tiny', (function(){ if(!e.data) return ''; if(e.type==='ai_chat') return (e.data.bailed?'⏱ ':'')+String(e.data.q||'').slice(0,60)+' → '+(e.data.source==='ai'?'🤖':'📦')+(e.data.durationMs!=null?' '+fmtMs(e.data.durationMs):'')+(e.data.rounds?' · '+e.data.rounds+' vòng':'')+' — «click xem đầy đủ»'; if(e.type==='ai_question') return 'Q: '+String(e.data.q||'').slice(0,200); if(e.type==='chart') return '📊 '+String(e.data.dob||'')+' '+String(e.data.time||'')+' '+String(e.data.gender||''); if(e.type==='error') return '⚠ '+String(e.data.msg||'').slice(0,200); if(e.type==='click') return '🖱 '+String(e.data.id||'')+' ('+String(e.data.txt||'').slice(0,30)+')'; if(e.type==='visit'&&e.data.ref) return '← '+String(e.data.ref).slice(0,80); return JSON.stringify(e.data).slice(0,200); })()));
+      tr.appendChild(el('td','tiny', (function(){ if(!e.data) return ''; if(e.type==='ai_chat') return (e.data.bailed?'⏱ ':'')+String(e.data.q||'').slice(0,60)+' → '+(e.data.source==='ai'?'🤖':'📦')+(e.data.durationMs!=null?' '+fmtMs(e.data.durationMs):'')+(e.data.rounds?' · '+e.data.rounds+' vòng':'')+' — «click xem đầy đủ»'; if(e.type==='ai_question') return 'Q: '+String(e.data.q||'').slice(0,200); if(e.type==='chart') return '📊 '+String(e.data.dob||'')+' '+String(e.data.time||'')+' '+String(e.data.gender||'')+(e.data.score!=null?' · 🔢 '+e.data.score+'/100'+(e.data.grade?' ('+e.data.grade+')':''):''); if(e.type==='error') return '⚠ '+String(e.data.msg||'').slice(0,200); if(e.type==='click') return '🖱 '+String(e.data.id||'')+' ('+String(e.data.txt||'').slice(0,30)+')'; if(e.type==='visit'&&e.data.ref) return '← '+String(e.data.ref).slice(0,80); return JSON.stringify(e.data).slice(0,200); })()));
       // [loop 1352] ai_chat row click → modal full Q+A (không truncate)
       if (e.type==='ai_chat' && e.data) { tr.style.cursor='pointer'; tr.onmouseenter=function(){tr.style.background='rgba(212,175,55,.08)';}; tr.onmouseleave=function(){tr.style.background='';}; tr.onclick=function(){showChat(e.data.q, e.data.response, e.data.source, e.data.durationMs, e.ts, e.ip, e.data.rounds, e.data.bailed, e.data.detail);}; }
       tb.appendChild(tr);
@@ -870,7 +870,9 @@ function adminDashboard() {
         left.appendChild(el('span','tiny', (v.country||'?')+(v.city?' / '+v.city:'')));
         if (v.device) left.appendChild(el('span','tiny', v.device));
         row.appendChild(left);
-        const right=el('span','tiny', v.count+' ev · '+v.visits+' visit · '+(v.charts&&v.charts.length?v.charts.length+'📊 · ':'')+(v.chats&&v.chats.length?v.chats.length+'💬 · ':'')+'→');
+        var lastScore = (v.charts && v.charts.length && v.charts[0] && v.charts[0].score != null) ? v.charts[0].score : null;
+        var lastGrade = (v.charts && v.charts.length && v.charts[0] && v.charts[0].grade) ? v.charts[0].grade : '';
+        const right=el('span','tiny', v.count+' ev · '+v.visits+' visit · '+(v.charts&&v.charts.length?v.charts.length+'📊':'')+(lastScore!=null?' '+lastScore+(lastGrade?' '+lastGrade:''):'')+(v.chats&&v.chats.length?' · '+v.chats.length+'💬':'')+' →');
         right.style.whiteSpace='nowrap'; row.appendChild(right);
         card.appendChild(row);
         card.appendChild(el('div','tiny','⏱ '+new Date(v.firstTs).toLocaleString('vi-VN')+' → '+new Date(v.lastTs).toLocaleString('vi-VN')));
@@ -1083,7 +1085,7 @@ function adminDashboard() {
       r.timeline.slice().reverse().forEach(function(t){
         var icon=t.type==='visit'?'👀':t.type==='chart'?'📊':t.type==='ai_question'?'💬':t.type==='ai_chat'?'🤖':t.type==='error'?'⚠️':t.type==='click'?'🖱':'•';
         var det='';
-        if(t.type==='chart'&&t.data) det=(t.data.dob||'')+' '+(t.data.gender||'');
+        if(t.type==='chart'&&t.data) det=(t.data.dob||'')+' '+(t.data.gender||'')+(t.data.score!=null?' · '+t.data.score+'/100':'');
         else if(t.type==='ai_question'&&t.data) det=String(t.data.q||'').slice(0,60);
         else if(t.type==='ai_chat'&&t.data) det='→ '+(t.data.source==='ai'?'AI':'local');
         else if(t.type==='click'&&t.data) det=t.data.id;
