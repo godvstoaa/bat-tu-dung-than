@@ -167,6 +167,10 @@ export async function handleAdminRoute(request, env, url) {
     if (path === '/admin/api/notify' && method === 'POST') return adminNotifyConfig(env, request);
     if (path === '/admin/api/ai-config' && method === 'POST') return adminAiConfigSet(env, request);
     if (path === '/admin/api/ai-config' && method === 'GET') { try { return await adminAiConfigGet(env); } catch (e) { return json({ error: e.message }, 500); } }
+    if (path === '/admin/api/clear' && method === 'POST') {
+      if (env.ADMIN_KV) { await env.ADMIN_KV.delete('events:log'); await env.ADMIN_KV.delete('cache:stats'); for (const k of ['cnt:visit','cnt:chart','cnt:ai_question','cnt:ai_chat','cnt:error','cnt:all']) await env.ADMIN_KV.delete(k); }
+      return json({ ok: true, msg: 'Events + counters cleared' });
+    }
     return new Response('Not found', { status: 404 });
   }
   return null;
@@ -342,6 +346,7 @@ function adminDashboard() {
   <input class="filter" id="tg-chat" placeholder="Chat ID" style="width:60%;box-sizing:border-box">
   <button class="btn" style="padding:4px 10px;font-size:12px" onclick="tgSave()">Bật Alert</button>
   <button class="btn" style="padding:4px 10px;font-size:12px" onclick="tgOff()">Tắt</button>
+  <button class="btn off" style="padding:4px 10px;font-size:12px;float:right" onclick="if(confirm('Xoá TẤT CẢ events + counters?')){clearData()}">🗑 Clear Data</button>
   <p class="tiny">Tạo bot: @BotFather → /newbot → lấy token. Chat ID: gửi tin cho bot rồi vào /getUpdates.</p>
   </div></details>
   <details style="margin:8px 0"><summary style="cursor:pointer;color:#d4af37;font-size:13px">🤖 AI Config — kiểm soát AI (free/custom/off)</summary>
@@ -470,5 +475,6 @@ function adminDashboard() {
   function aiModeChange(){ var m=document.getElementById('ai-mode').value; var dis=m==='off'; ['ai-endpoint','ai-apikey','ai-model'].forEach(function(id){document.getElementById(id).disabled=dis;}); }
   async function aiSave(){ var body={mode:document.getElementById('ai-mode').value}; if(document.getElementById('ai-endpoint').value)body.endpoint=document.getElementById('ai-endpoint').value; if(document.getElementById('ai-apikey').value)body.apiKey=document.getElementById('ai-apikey').value; if(document.getElementById('ai-model').value)body.model=document.getElementById('ai-model').value; var r=await fetch('/admin/api/ai-config?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}); alert(r.ok?'✅ AI config đã lưu!':'❌ Lỗi'); aiLoad(); load(); }
   aiLoad();
+  async function clearData(){ var r=await fetch('/admin/api/clear?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json()}); alert(r.ok?'✅ Data cleared':'❌ '+r.err); load(); }
   </script></body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
