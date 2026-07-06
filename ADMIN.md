@@ -1,4 +1,4 @@
-# 🛡️ Admin System — Bát Tự Dụng Thần (loop 1352+)
+# 🛡️ Admin System — Bát Tự Dụng Thần (loop 1355+)
 
 Hệ thống admin production-grade: thống kê visitor + AI control sâu + chat history + Telegram + chống cào/phá + real-time.
 
@@ -51,6 +51,10 @@ https://battu.god8.shop/admin?token=<ADMIN_TOKEN>
 | **Auth rate-limit** | 10 fail/5ph/IP cho /admin/* |
 | **IP Blacklist** | 🚫 Block button per visitor + 🚫 Blocked IPs list |
 | **Cloudflare** | Bật Bot Fight Mode + WAF rules trong Dashboard (edge-level) |
+| **🔒 Audit log** | mọi admin action (toggle/block/clear/token/config) ghi KV `audit:log` (IP+ts, TTL 90d) — dashboard «🔒 Audit log» |
+| **Security headers** | dashboard: **strict CSP** + HSTS + nosniff + X-Frame DENY + Referrer no-referrer · main app: HSTS + nosniff + Referrer (qua `run_worker_first`) |
+| **Token URL hygiene** | `history.replaceState` strip token khỏi URL + Referrer no-referrer (chống leak history/share/Referer) |
+| **Anti-scraping mọi route** | `run_worker_first=true` → scraper block áp dụng cả main document (trước đây edge bypass) |
 
 ### Real-time + Alerts
 | | |
@@ -95,7 +99,7 @@ https://battu.god8.shop/admin?token=<ADMIN_TOKEN>
 - `_logEvent('click', {id,txt})` — button clicks (feature usage)
 - Auto-enable AI: fetch `/api/ai-config` → cf-glm preset nếu admin có key
 
-## Self-audit (24 checks)
+## Self-audit (39 checks)
 ```bash
 node admin-audit.mjs <token>
 ```
