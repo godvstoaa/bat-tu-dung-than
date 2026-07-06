@@ -43,6 +43,7 @@ async function logEvent(env, request, type, data) {
   const logRaw = await env.ADMIN_KV.get('events:log');
   let log = [];
   try { log = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
+  const isNewIp = type === 'visit' && !log.some((e) => e.ip === ip);
   log.unshift({ ts, type, ip, ua, country, city, data: data || {} });
   if (log.length > 100) log.length = 100;
   await env.ADMIN_KV.put('events:log', JSON.stringify(log));
@@ -54,6 +55,9 @@ async function logEvent(env, request, type, data) {
   // [loop 1351] Telegram alert cho chart/ai_question/error (fire-and-forget, không block)
   if (type === 'chart' || type === 'ai_question' || type === 'error') {
     notifyTelegram(env, { ts, type, ip, ua, country, city, data: data || {} }).catch(function () {});
+  }
+  if (isNewIp) {
+    notifyTelegram(env, { ts, type: 'new_visitor', ip, ua: '', country, city, data: data || {} }).catch(function () {});
   }
   return true;
 }
@@ -70,6 +74,7 @@ async function notifyTelegram(env, event) {
   if (event.type === 'chart' && event.data) msg += '📊 Lá số: ' + (event.data.dob || '?') + ' ' + (event.data.gender || '') + '\n';
   if (event.type === 'ai_question' && event.data) msg += '💬 Hỏi: ' + String(event.data.q || '').slice(0, 200) + '\n';
   if (event.type === 'error' && event.data) msg += '⚠ Lỗi: ' + String(event.data.msg || '').slice(0, 200) + '\n';
+  if (event.type === 'new_visitor') msg = '🆕 <b>Visitor mới!</b>\n';
   msg += '⏰ ' + new Date(event.ts).toLocaleString('vi-VN');
   try {
     await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
