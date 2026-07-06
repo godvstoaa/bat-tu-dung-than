@@ -19,6 +19,20 @@ function clientIP(request) {
   return request.headers.get('CF-Connecting-IP') || (request.headers.get('X-Forwarded-For') || '').split(',')[0].trim() || 'unknown';
 }
 
+// [loop 1355] security headers cho main app HTML (HSTS/nosniff/Referrer/X-Frame — zero breakage risk).
+//   KHÔNG thêm CSP strict ở đây vì app có inline script → CSP có thể gây trắng trang (bug từng gặp).
+//   CSP strict chỉ áp dụng cho admin dashboard (nơi chứa token + user data).
+function withSecurityHeaders(res) {
+  const ct = res.headers.get('Content-Type') || '';
+  if (ct.indexOf('text/html') < 0) return res; // chỉ inject cho HTML document, không mỗi asset
+  const h = new Headers(res.headers);
+  h.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  h.set('X-Content-Type-Options', 'nosniff');
+  h.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  h.set('X-Frame-Options', 'SAMEORIGIN');
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -77,9 +91,9 @@ export default {
     }
 
     // 3) static assets (SPA fallback)
-    const res = await env.ASSETS.fetch(request);
+    const res = withSecurityHeaders(await env.ASSETS.fetch(request));
     if (res.status === 404) {
-      return env.ASSETS.fetch(new Request(new URL('/index.html', url), request));
+      return withSecurityHeaders(await env.ASSETS.fetch(new Request(new URL('/index.html', url), request)));
     }
     return res;
   },

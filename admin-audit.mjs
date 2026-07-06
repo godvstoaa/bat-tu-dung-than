@@ -80,6 +80,24 @@ await fetch(BASE + '/admin/api/ai?token=' + TOKEN, { method: 'POST', headers: { 
 const back = await fetch(BASE + '/cf-ai/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then((r) => r.status);
 ok(back !== 503, 'AI on → proxy không còn 503 (got ' + back + ')');
 
+// [loop 1355] admin audit log — verify toggle được ghi với IP (accountability)
+const aud = await fetch(BASE + '/admin/api/audit?token=' + TOKEN).then((r) => r.json());
+ok(Array.isArray(aud.audit), 'GET /admin/api/audit returns array');
+ok(aud.audit.some((a) => a.action === 'ai_toggle' && a.ip && a.ts), 'audit log ghi ai_toggle (có IP + ts)');
+ok(aud.audit.every((a) => a.action !== 'token_change' || JSON.stringify(a.detail || {}) === '{}'), 'token_change KHÔNG lộ giá trị token (detail rỗng)');
+
+// [loop 1355] security headers — dashboard (CSP strict) + main app (HSTS/nosniff)
+const dh = await fetch(BASE + '/admin?token=' + TOKEN);
+ok(!!dh.headers.get('content-security-policy'), 'dashboard có CSP header');
+ok(dh.headers.get('strict-transport-security'), 'dashboard có HSTS');
+ok(dh.headers.get('x-frame-options') === 'DENY', 'dashboard X-Frame-Options DENY (chống clickjacking)');
+ok(dh.headers.get('referrer-policy') === 'no-referrer', 'dashboard Referrer-Policy no-referrer (chống leak token qua Referer)');
+ok(!!dh.headers.get('x-content-type-options'), 'dashboard X-Content-Type-Options nosniff');
+const mh = await fetch(BASE + '/');
+ok(!!mh.headers.get('strict-transport-security'), 'main app có HSTS');
+ok(mh.headers.get('x-content-type-options') === 'nosniff', 'main app X-Content-Type-Options nosniff');
+ok(!!mh.headers.get('referrer-policy'), 'main app có Referrer-Policy');
+
 // 4. CSV export
 const csv = await fetch(BASE + '/admin/api/export?token=' + TOKEN).then((r) => r.text());
 ok(csv.startsWith('timestamp,type,ip'), 'CSV export header OK');

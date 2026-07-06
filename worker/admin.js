@@ -21,6 +21,19 @@ function clientIP(request) {
     || 'unknown';
 }
 
+// [loop 1355] Admin audit log — accountability: ghi mọi action admin làm (toggle/block/clear/...)
+//   để truy vết «ai đã đổi gì, khi nào, từ IP nào». Cap 200, TTL 90 ngày.
+async function auditLog(env, request, action, detail) {
+  if (!env.ADMIN_KV) return;
+  const ip = clientIP(request);
+  const ts = Date.now();
+  let log = [];
+  try { log = JSON.parse((await env.ADMIN_KV.get('audit:log')) || '[]'); } catch (e) {}
+  log.unshift({ ts, action, ip, detail: detail || {} });
+  if (log.length > 200) log.length = 200;
+  await env.ADMIN_KV.put('audit:log', JSON.stringify(log), { expirationTtl: TTL_EVENT });
+}
+
 export async function isAiEnabled(env) {
   if (!env.ADMIN_KV) return true;
   const v = await env.ADMIN_KV.get('ai:enabled');
@@ -98,6 +111,7 @@ async function adminNotifyConfig(env, request) {
   if (body.tg_chat) await env.ADMIN_KV.put('notify:tg_chat', String(body.tg_chat));
   if (body.disable) { await env.ADMIN_KV.delete('notify:tg_token'); await env.ADMIN_KV.delete('notify:tg_chat'); }
   const token = await env.ADMIN_KV.get('notify:tg_token');
+  await auditLog(env, request, 'notify_config', { enabled: !!token });
   return json({ ok: true, enabled: !!token });
 }
 
@@ -118,6 +132,7 @@ async function adminAiConfigSet(env, request) {
   // nếu mode='off' → cũng set ai:enabled=0 (kill-switch cũ tương thích)
   if (merged.mode === 'off') await env.ADMIN_KV.put('ai:enabled', '0');
   else await env.ADMIN_KV.put('ai:enabled', '1');
+  await auditLog(env, request, 'ai_config', { mode: merged.mode, hasKey: !!merged.apiKey, model: merged.model || '', endpoint: merged.endpoint || '' });
   return json({ ok: true, config: Object.assign({}, merged, { apiKey: merged.apiKey ? '***' + merged.apiKey.slice(-4) : '' }) });
 }
 
@@ -203,14 +218,19 @@ export async function handleAdminRoute(request, env, url) {
           } while (cursor);
         }
       }
+      await auditLog(env, request, 'clear_data', {});
       return json({ ok: true, msg: 'Events + counters + dayagg cleared' });
     }
     if (path === '/admin/api/block' && method === 'POST') {
       const body = await request.json().catch(() => ({}));
-      if (body.ip && body.block) { await env.ADMIN_KV.put('block:' + body.ip, '1'); return json({ ok: true, msg: 'Blocked ' + body.ip }); }
-      if (body.ip && !body.block) { await env.ADMIN_KV.delete('block:' + body.ip); return json({ ok: true, msg: 'Unblocked ' + body.ip }); }
+      if (body.ip && body.block) { await env.ADMIN_KV.put('block:' + body.ip, '1'); await auditLog(env, request, 'ip_block', { ip: body.ip, block: true }); return json({ ok: true, msg: 'Blocked ' + body.ip }); }
+      if (body.ip && !body.block) { await env.ADMIN_KV.delete('block:' + body.ip); await auditLog(env, request, 'ip_block', { ip: body.ip, block: false }); return json({ ok: true, msg: 'Unblocked ' + body.ip }); }
       if (body.list) { const ks = await env.ADMIN_KV.list({ prefix: 'block:' }); return json({ blocked: ks.keys.map((k) => k.name.slice(6)) }); }
       return json({ ok: false, err: 'Cần {ip, block:true/false} hoặc {list:true}' }, 400);
+    }
+    if (path === '/admin/api/audit' && method === 'GET') {
+      let log = []; try { log = JSON.parse((await env.ADMIN_KV.get('audit:log')) || '[]'); } catch (e) {}
+      return json({ audit: log });
     }
     return new Response('Not found', { status: 404 });
   }
@@ -377,6 +397,7 @@ async function adminToggleAi(env, request) {
   const body = await request.json().catch(() => ({}));
   const enabled = body && body.enabled ? '1' : '0';
   await env.ADMIN_KV.put('ai:enabled', enabled);
+  await auditLog(env, request, 'ai_toggle', { enabled: enabled === '1' });
   return json({ ok: true, aiEnabled: enabled === '1' });
 }
 
@@ -385,6 +406,7 @@ async function adminChangeToken(env, request) {
   const t = body && body.new && String(body.new).length >= 8 ? String(body.new) : null;
   if (!t) return json({ ok: false, err: 'Cần body {new: "..."} độ dài ≥ 8 ký tự' }, 400);
   if (env.ADMIN_KV) await env.ADMIN_KV.put('admin:token', t);
+  await auditLog(env, request, 'token_change', {}); // KHÔNG log giá trị token mới
   return json({ ok: true, msg: 'Token đã đổi. Dùng /admin?token=<new>' });
 }
 
@@ -464,6 +486,8 @@ function adminDashboard() {
   <div id="hourly" style="display:flex;align-items:flex-end;gap:1px;height:40px;margin:4px 0 12px"></div>
   <h3>Top câu hỏi AI & quốc gia</h3>
   <div id="topq" style="display:flex;gap:24px;flex-wrap:wrap"></div>
+  <h3>🔒 Audit log — admin actions <span class="tiny">— truy vết toggle/block/clear/config (ai, khi nào, IP nào)</span> <button class="btn" style="padding:3px 10px;font-size:11px" onclick="loadAudit()">↻</button></h3>
+  <div id="audit"></div>
   <script>
   const TOKEN = new URLSearchParams(location.search).get('token');
   const H = { 'X-Admin-Token': TOKEN };
@@ -628,7 +652,7 @@ function adminDashboard() {
       if (d.referrerConversion && d.referrerConversion.length) { d.referrerConversion.forEach(function(r){ col3.appendChild(el('div','tiny', '  → '+r.chartRate+'% chart ('+r.charts+'/'+r.visits+')')); }); }
     }
   }
-  async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); }
+  async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
   var _lastCount = 0; var _soundOn = false;
   load(); setInterval(load, 3000);
   async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
@@ -637,9 +661,9 @@ function adminDashboard() {
   function aiModeChange(){ var m=document.getElementById('ai-mode').value; var dis=m==='off'; ['ai-endpoint','ai-apikey','ai-model'].forEach(function(id){document.getElementById(id).disabled=dis;}); }
   async function aiSave(){ var body={mode:document.getElementById('ai-mode').value}; if(document.getElementById('ai-endpoint').value)body.endpoint=document.getElementById('ai-endpoint').value; if(document.getElementById('ai-apikey').value)body.apiKey=document.getElementById('ai-apikey').value; if(document.getElementById('ai-model').value)body.model=document.getElementById('ai-model').value; var r=await fetch('/admin/api/ai-config?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}); alert(r.ok?'✅ AI config đã lưu!':'❌ Lỗi'); aiLoad(); load(); }
   aiLoad();
-  async function clearData(){ var r=await fetch('/admin/api/clear?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json()}); alert(r.ok?'✅ Data cleared':'❌ '+r.err); load(); }
+  async function clearData(){ var r=await fetch('/admin/api/clear?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json()}); alert(r.ok?'✅ Data cleared':'❌ '+r.err); load(); loadAudit(); }
   async function blockList(){ var r=await fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({list:true})}).then(function(r){return r.json()}); alert('Blocked IPs: '+((r.blocked||[]).join(', ')||'(không có)')); }
-  function blockIp(ip,block){ fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip,block:block})}).then(function(){load();}); }
+  function blockIp(ip,block){ fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip,block:block})}).then(function(){load();loadAudit();}); }
   // [loop 1352] full-chat modal — admin xem TOÀN BỘ Q+A (không bị truncate 200 chars).
   function fmtMs(ms){ if(ms==null)return ''; if(ms<1000)return ms+'ms'; var s=ms/1000; return s<60?(s.toFixed(1)+'s'):(Math.round(s/60)+'m'+String(Math.round(s%60)).padStart(2,'0')+'s'); }
   function showChat(q, resp, src, dur, ts, ip, rounds, bailed){
@@ -662,7 +686,44 @@ function adminDashboard() {
     box.appendChild(actions);
     m.appendChild(box); m.style.display='flex';
   }
+  // [loop 1355] audit log loader — truy vết admin actions
+  async function loadAudit(){
+    var r = await fetch('/admin/api/audit?token='+TOKEN, { headers: H }).then(function(r){return r.json();}).catch(function(){return {audit:[]};});
+    var al = document.getElementById('audit'); if (!al) return; al.textContent='';
+    var rows = r.audit || [];
+    if (!rows.length) { al.appendChild(el('div','tiny','(chưa có action nào được log)')); return; }
+    rows.slice(0, 50).forEach(function(a){
+      var row = el('div'); row.style.cssText='display:flex;gap:10px;padding:4px 8px;border-bottom:1px solid rgba(212,175,55,.1);font-size:12px;flex-wrap:wrap;align-items:center';
+      var icon = a.action==='ai_toggle'?'🤖':a.action==='ip_block'?'🚫':a.action==='clear_data'?'🗑':a.action==='token_change'?'🔑':a.action==='ai_config'?'⚙️':a.action==='notify_config'?'📱':'•';
+      row.appendChild(el('span','tiny', new Date(a.ts).toLocaleString('vi-VN')));
+      row.appendChild(el('span',null, icon + ' ' + a.action));
+      row.appendChild(el('span','ip', a.ip || '?'));
+      var det = '';
+      if (a.detail) {
+        if (a.action==='ai_toggle') det = a.detail.enabled ? 'BẬT AI' : 'TẮT AI';
+        else if (a.action==='ip_block') det = (a.detail.block?'Block ':'Unblock ')+(a.detail.ip||'');
+        else if (a.action==='ai_config') det = 'mode='+(a.detail.mode||'?')+(a.detail.hasKey?' · có key':'')+(a.detail.model?' · '+a.detail.model:'')+(a.detail.endpoint?' · '+a.detail.endpoint:'');
+        else if (a.action==='notify_config') det = a.detail.enabled ? 'Bật Telegram' : 'Tắt Telegram';
+        else det = JSON.stringify(a.detail);
+      }
+      row.appendChild(el('span','tiny', det));
+      al.appendChild(row);
+    });
+  }
+  loadAudit();
+  // [loop 1355] token URL hygiene — strip token khỏi URL sau load (chống leak via history/share)
+  if (location.search && location.search.indexOf('token=') >= 0) {
+    var _u = new URL(location.href); _u.searchParams.delete('token');
+    history.replaceState(null, '', _u.pathname + (_u.search || '') + (_u.hash || ''));
+  }
   </script>
   <div id="chat-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
-  </body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
+  </body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer',
+    // [loop 1355] security headers — CSP cho admin dashboard (inline script/style cần 'unsafe-inline';
+    //   connect chỉ same-origin, chặn framing/external). HSTS + nosniff cho mọi response.
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  } });
 }
