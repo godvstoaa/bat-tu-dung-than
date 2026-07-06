@@ -825,15 +825,21 @@ function adminDashboard() {
       var sumErr=d.trend.reduce(function(a,x){return a+x.error;},0);
       var hdr=el('div','tiny','30 ngày: '+sumAll+' events · '+sumVis+' visits · '+sumChart+' lá số · '+sumAi+' AI chat'+(sumErr?' · '+sumErr+' lỗi':'')+' · '+active.length+'/'+30+' ngày có activity'); hdr.style.cssText='margin-bottom:6px';
       tr.appendChild(hdr);
-      var bars=el('div'); bars.style.cssText='display:flex;align-items:flex-end;gap:2px;height:56px;margin:6px 0 4px;padding-bottom:2px;border-bottom:1px solid var(--border)';
-      d.trend.forEach(function(x){
-        var bar=el('div'); var h=Math.max(3,Math.round(x.all/tmax*52));
-        bar.style.cssText='flex:1;min-width:5px;background:'+(x.all>0?'linear-gradient(180deg,#e6c14a,#d4af37)':'rgba(212,175,55,.07)')+';height:'+h+'px;border-radius:2px 2px 0 0;transition:opacity .15s';
-        bar.title=x.date+': '+x.all+' (v:'+x.visit+' c:'+x.chart+' q:'+x.ai_question+(x.error?' e:'+x.error:'')+')';
-        bar.onmouseenter=function(){bar.style.opacity='.7';}; bar.onmouseleave=function(){bar.style.opacity='1';};
-        bars.appendChild(bar);
-      });
-      tr.appendChild(bars);
+      // [loop 1363] 30-day trend — SVG area+line (mượt, chuyên nghiệp hơn thin bars)
+      var SVGNS='http://www.w3.org/2000/svg', W=100, H=42;
+      var coords=d.trend.map(function(x,i){return [(i/(d.trend.length-1))*W, H-(x.all/tmax*(H-4))-2];});
+      var polyPts=coords.map(function(p){return p[0].toFixed(2)+','+p[1].toFixed(2);}).join(' ');
+      var svg=document.createElementNS(SVGNS,'svg');
+      svg.setAttribute('viewBox','0 0 '+W+' '+H); svg.setAttribute('preserveAspectRatio','none');
+      svg.style.cssText='width:100%;height:64px;display:block;margin:6px 0 2px';
+      var area=document.createElementNS(SVGNS,'polygon');
+      area.setAttribute('points','0,'+H+' '+polyPts+' '+W+','+H);
+      area.setAttribute('fill','rgba(212,175,55,.16)'); svg.appendChild(area);
+      var ln=document.createElementNS(SVGNS,'polyline');
+      ln.setAttribute('points',polyPts); ln.setAttribute('fill','none'); ln.setAttribute('stroke','#e6c14a');
+      ln.setAttribute('stroke-width','2'); ln.setAttribute('vector-effect','non-scaling-stroke');
+      ln.setAttribute('stroke-linejoin','round'); ln.setAttribute('stroke-linecap','round'); svg.appendChild(ln);
+      tr.appendChild(svg);
       var xlab=el('div','tiny',''); xlab.style.cssText='display:flex;justify-content:space-between;margin-top:2px';
       xlab.appendChild(el('span',null,d.trend[0].date.slice(5))); xlab.appendChild(el('span',null,'hôm nay'));
       tr.appendChild(xlab);
