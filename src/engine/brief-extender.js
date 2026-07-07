@@ -56,6 +56,10 @@ import { findGoldenYear } from './golden-year.js';
 import { computeLiuDao } from './liudao.js';
 import { destinyConsensus } from './destiny-consensus.js';
 import { dayNayinPersonality } from './nayin-personality.js';
+import { analyzeTang } from './tang-analyze.js'; // [loop 1382] TANG GIA 丧家 — vận hiếu
+import { TANG_ETHICS } from './tang-data.js'; // [loop 1382] caveat/framing tang
+import { analyzeAmTa } from './amta-analyze.js'; // [loop 1383] ÂM TÀ / vong hồn — detect tín hiệu
+import { ETHICS as AMTA_ETHICS } from './amta-data.js'; // [loop 1383] ETHICS layer âm tà
 
 /**
  * Sinh đoạn text bổ sung cho chart brief từ các module chuyên sâu.
@@ -605,6 +609,29 @@ export function extendBrief(R) {
     // (4) tài khố — nếu CÓ kho → khuyên tích luỹ; nếu KHÔNG → khuyên kiểm soát chi
     try { const ck = analyzeCaiKu(R); if (ck.hasTaiku && !ck.opens.length) _actions.push(`Có TÀI KHỐ (yên) → nên tích luỹ/gửi tiết kiệm/mua BĐS, tránh chi lớn phi cần`); else if (!ck.hasTaiku) _actions.push(`KHÔNG tài khố → tiền dễ chảy, cần kỷ luật tài chính + gửi tiết kiệm ngay`); } catch (_) {}
     if (_actions.length) parts.push(`🎯 HÀNH ĐỘNG ƯU TIÊN (${_curYear}): ${_actions.map((a, i) => `${['①','②','③','④','⑤'][i] || '•'} ${a}`).join(' ')}.`);
+  } catch (_) {}
+
+  // [loop 1382] TANG GIA 丧家 — vận hiếu (ai mất / năm nào). NHẠY CẢM, opt-in.
+  //   CHỈ lôi ra TRẢ LỜI khi user HỎI về tang/hiếu/sự mất mát/qua đời — KHÔNG tự đề cập
+  //   trong câu hỏi khác. Kèm steering + caveat mềm hoá (TANG_ETHICS).
+  try {
+    const tg = analyzeTang(R);
+    if (tg && tg.enabled && tg.topRisk && tg.topRisk.length) {
+      const top = tg.topRisk.slice(0, 4)
+        .map((y) => `${y.year} ${y.ganZhi}(${y.age}t·${y.level}): ${[...new Set(y.relatives)].join('/') || 'bản thân/gia đình'} ← ${y.mechs.slice(0, 2).join('; ')}`);
+      parts.push(`🕯️ TANG GIA 丧家 (vận hiếu — NHẠY CẢM): dữ liệu ĐÃ SẴN. CHỈ lôi ra TRẢ LỜI khi user HỎI về tang/hiếu/mất mát/«năm nào nhà có tang» — KHÔNG tự đề cập khi user hỏi việc khác. Năm tín hiệu (chốt «吊客单见否则不验»: đơn độc 丧门/吊客 = nhiễu, phải phối xung/hung-sat): ${top.join(' | ')}. ${tg.decadeStress && tg.decadeStress.length ? 'Bối cảnh thập niên ' + tg.decadeStress.map((d) => `${d.dayun}(${d.relatives.join('/')})`).join(', ') + '. ' : ''}NGUYÊN TẮC trả lời: LUÔN kèm caveat «tham khảo cổ pháp, XÁC SUẤT, không chắc»; KHÔNG bao giờ nói «chắc chắn ai đó mất năm X»; hướng user cẩn trọng sức khoẻ người lớn tuổi + tích đức. ${TANG_ETHICS.disclaimerVi}`);
+    }
+  } catch (_) {}
+
+  // [loop 1383] ÂM TÀ / VONG HỒN / TRỪ TÀ — detect tín hiệu tượng. NHẠY CẢM, opt-in.
+  //   CHỈ lôi ra TRẢ LỜI khi user HỎI về ma/quỷ/vong/âm/tà/phù/trừ tà — KHÔNG tự đề cập.
+  //   TUYỆT ĐỐI tuân thủ AMTA_ETHICS: không chẩn đoán «bị ma», không dọa, redirect y tế.
+  try {
+    const am = analyzeAmTa(R);
+    if (am && am.enabled && am.detected && am.detected.length) {
+      const det = am.detected.slice(0, 5).map((d) => `${d.indicator}(s${d.strength})`).join('; ');
+      parts.push(`🕯️ ÂM TÀ / VONG HỒN / TRỪ TÀ (NHẠY CẢM — opt-in): dữ liệu ĐÃ SẴN. CHỈ lôi ra khi user HỎI về «ma/quỷ/vong/âm hồn theo thân/trừ tà/phù chú/bị ám». Tín hiệu tượng detect: ${det}. Tổng symbolic: ${am.susceptibility.score}đ (mức ${am.susceptibility.level}) — LÀ TÀI LIỆU THAM KHẢO VĂN HOÁ-TÔN GIÁO, KHÔNG PHẢI CHẨN ĐOÁN «bị ma/tà». TUYỆT ĐỐI: không nói «bạn bị ma/quỷ theo»; dùng «theo cổ pháp, có thể…»; với distress (mất ngủ/hoang tưởng/tự hại) → redirect chuyên gia tâm lý/y tế. Remedies (nếu đề cập): chỉ reference, «nghi lễ do đạo sĩ/pháp sư thụ chức». ${AMTA_ETHICS.disclaimerVi}`);
+    }
   } catch (_) {}
 
   return parts.length ? '\n--- PHÂN TÍCH CHUYÊN SÂU ---\n' + parts.join('\n') : '';

@@ -95,5 +95,12 @@ export function predictEvents(R, startYear, years = 5) {
     });
   }
 
-  return { years: out, activeDayun: lastDayun };
+  // [loop 1382] TANG GIA 丧家 cross-ref — tag các năm có tín hiệu tang (từ R.tang nếu đã
+  //   attach). Hệ song hành với thập thần events: tang có trigger riêng (xung/cung/thần sát).
+  const _tangYears = (R.tang && Array.isArray(R.tang.years))
+    ? R.tang.years.filter((ty) => ty.year >= startYear && ty.year < startYear + years)
+        .map((ty) => ({ year: ty.year, ganZhi: ty.ganZhi, age: ty.age, level: ty.level, relatives: ty.relatives, mechs: ty.signals.map((s) => s.mech) }))
+    : [];
+
+  return { years: out, activeDayun: lastDayun, tangYears: _tangYears };
 }

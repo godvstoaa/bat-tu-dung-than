@@ -1,0 +1,116 @@
+{
+  "_work_item": "W8",
+  "_type": "mantra_fragment_v8",
+  "_assembly_target": "src/engine/amta-data.js -> shenzhou[] (Round 8)",
+  "_textual_honesty_notes": [
+    "八大神咒 (金光/净心/净口) 出自《太上玄门早晚功课经》(Ming/Qing 编纂本) — 该经 NOT 收入明代《正统道藏》。任务要求 'verifiable against 《道藏》/ctext/wikisource' 已满足: 经文全文在 ctext + wikisource 可逐字核对, 不属于《道藏》本但不影响可验证性。",
+    "净心神咒 有第二个独立经典出处: 《太上三元赐福赦罪解厄消灾延生保命妙经》(三官经) 亦收此咒 (wikisource), 满足 ≥2 独立来源。",
+    "北帝杀鬼咒 规范形态 = 天蓬咒 (Tianpeng Zhou). 见于 DZ 1412《太上元始天尊说北帝伏魔神咒妙经》卷四 斩鬼品, 并由南朝陶弘景《真诰》卷十最早记载 (称'北帝煞鬼大法')。多版本异文存在, 已标注。",
+    "洞渊神咒 = 文本不确定性案例 (TEXTUAL UNCERTAINTY): '洞渊神咒' 并非单一标准化的短咒 (不像八大神咒固定文本), 而是指《太上洞渊神咒经》(DZ 0335, 洞玄部本文类, 二十卷) 中 遣鬼/缚鬼/杀鬼/禁鬼/斩鬼 等品的神咒集合。下文提供最代表的 杀鬼品 神咒节选, 须标注为 '经文节选, 非单一固定咒'。"
+  ],
+  "_ethics_overlay": {
+    "framing": "本片段为传统文化/宗教学术参考资料, 非医疗/精神科替代。神咒诵读属宗教文化行为, 不应作为诊断'中邪/附身'的依据。",
+    "performance_caveat": "正式科仪诵读/书符须由受箓道士 (正一/全真) 主持; 本 app 仅作文化知识呈现。",
+    "opt_in": "仅在用户明确开启 'Âm Tà / Vong Hồn / Trừ Tà' 模块后显示。"
+  },
+  "mantras": [
+    {
+      "id": "JIN_GUANG_ZHOU",
+      "name_han": "金光神咒 (金光咒)",
+      "name_vi": "Chú Kim Quang (Thần chú Ánh Sáng Vàng)",
+      "school": "通用 / 早晚功课 (八大神咒之七)",
+      "han_text": "天地玄宗，万炁本根。广修亿劫，证吾神通。三界内外，惟道独尊。体有金光，覆映吾身。视之不见，听之不闻。包罗天地，养育群生。诵持万遍，身有光明。三界侍卫，五帝司迎。万神朝礼，役使雷霆。鬼妖丧胆，精怪亡形。内有霹雳，雷神隐名。洞慧交彻，五炁腾腾。金光速现，覆护真人。",
+      "han_text_notes": "末句在家人/信士念'覆护真人'; 受度道士另有念法。异文极少, 文本稳定。",
+      "vi_translation": "Trời Đất là cội nguồn huyền diệu, vạn khí đều bắt nguồn từ đây. Tu tập qua muôn kiếp, chứng lấy thần thông. Trong ngoài Tam giới, chỉ Đạo là tôn. Thân ta có ánh sáng vàng, bao phủ chiếu soi. Nhìn không thấy, nghe không được. Bao trùm trời đất, nuôi dưỡng chúng sinh. Tụng đọc muôn lần, thân phát ánh sáng. Tam giới hầu cận, Ngũ Đế nghênh đón. Vạn thần triều bái, sai khiến sấm sét. Quỷ yêu mất胆, tinh quái tan hình. Trong có sấm sét, sấm thần ẩn danh. Trí tuệ sáng suốt, ngũ khí bừng bừng. Ánh vàng mau hiện, che chở chân nhân.",
+      "meaning": "Phụ thân chú hộ thân - lấy ánh sáng vàng của Đạo bao phủ thân thể, trừ tà hộ mệnh, an định tâm thần.",
+      "use": "護身 / 淨化 / 驅邪 (hộ thân chính, kiêm tịnh hóa + khu tà)",
+      "recitation_context": "早课八大神咒之一, 日常诵持, 无禁忌 (bất kỳ ai/cơ thời nào cũng tụng được theo truyền thống)",
+      "sources": [
+        "https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%96%80%E6%AD%A3%E4%B8%80%E6%97%A5%E8%AA%B5%E6%97%A9%E8%AA%B2 (《太上玄门正一日诵早课》维基文库 - 含金光咒全文)",
+        "http://www.taoist.org.cn/getDjzsByC2Action.do?c2=csjd (中国道教协会·常诵经典 - 官方收录八大神咒)",
+        "https://ctext.org/wiki.pl?if=gb&res=190395 (中国哲学书电子化计划 - 道教功课经典检索)"
+      ],
+      "verification_status": "verified_2plus_independent",
+      "textual_certainty": "high"
+    },
+    {
+      "id": "JING_XIN_SHEN_ZHOU",
+      "name_han": "净心神咒",
+      "name_vi": "Thần chú Tịnh Tâm",
+      "school": "通用 / 早晚功课 (八大神咒之首)",
+      "han_text": "太上台星，应变无停。驱邪缚魅，保命护身。智慧明净，心神安宁。三魂永久，魄无丧倾。急急如律令。",
+      "han_text_notes": "末句'急急如律令'在三官经本与早课本个别版本有/无差异; 主体八字句稳定。",
+      "vi_translation": "Sao Thai Cực ở trên cao, ứng biến không ngừng. Trừ tà trói quỷ, giữ mạng hộ thân. Trí tuệ sáng tịnh, tâm thần an ninh. Ba hồn bền vững, bảy phách không sụt mất. Nhanh nhanh như luật lệnh.",
+      "meaning": "Tịnh hóa tâm ý -排除杂念, 安定心神, bảo hồn hộ phách (ý nghiệp tịnh hóa).",
+      "use": "淨化 (tịnh tâm trước khi tụng kinh/hành pháp)",
+      "recitation_context": "早晚功课开头首咒, 学炼符法前必诵",
+      "sources": [
+        "https://zh.wikisource.org/zh-hans/%E5%A4%AA%E4%B8%8A%E4%B8%89%E5%85%83%E8%B5%90%E7%A6%8F%E8%B5%A6%E7%BD%AA%E8%A7%A3%E5%8E%84%E6%B6%88%E7%81%BE%E5%BB%B6%E7%94%9F%E4%BF%9D%E5%91%BD%E5%A6%99%E7%BB%8F (《太上三元赐福赦罪解厄消灾延生保命妙经》即三官经 - 维基文库, 独立第二经典出处 收录净心神咒全文)",
+        "https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%96%80%E6%AD%A3%E4%B8%80%E6%97%A5%E8%AA%B5%E6%97%A9%E8%AA%B2 (《太上玄门正一日诵早课》维基文库 - 八大神咒标准来源)",
+        "https://baike.baidu.com/item/%E9%81%93%E6%95%99%E5%85%AB%E5%A4%A7%E7%A5%9E%E5%92%92/1190054 (百度百科·道教八大神咒 - 辅证)"
+      ],
+      "verification_status": "verified_2plus_independent",
+      "textual_certainty": "high (双经典出处)"
+    },
+    {
+      "id": "JING_KOU_SHEN_ZHOU",
+      "name_han": "净口神咒",
+      "name_vi": "Thần chú Tịnh Khẩu",
+      "school": "通用 / 早晚功课 (八大神咒之二)",
+      "han_text": "丹朱口神，吐秽除氛。舌神正伦，通命养神。罗千齿神，却邪卫真。喉神虎贲，炁神引津。心神丹元，令我通真。思神炼液，道炁常存。急急如律令。",
+      "han_text_notes": "维基文库《正一日诵早课》本与道音文化本一致, 文本稳定。'丹朱口神'指口神名 Đan Chu.",
+      "vi_translation": "Khẩu thần tên Đan Chu, nhổ bỏ uế khí trừ mùi hôi. Thiệt thần tên Chánh Luân, thông mệnh dưỡng thần. Răng thần La Thiên, trừ tà vệ chân. Hầu thần Hổ Bôn, khí thần dẫn tân. Tâm thần Đan Nguyên, khiến ta thông chân. Tư thần luyện dịch, đạo khí thường còn. Nhanh nhanh như luật lệnh.",
+      "meaning": "Tịnh hóa khẩu nghiệp -涤除口中秽气, 请本命神安镇, 令诵经通真 (口业 tịnh hóa).",
+      "use": "淨化 (tịnh khẩu, tụng kinh前行)",
+      "recitation_context": "紧接净心神咒之后, 诵经前净口",
+      "sources": [
+        "https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%96%80%E6%AD%A3%E4%B8%80%E6%97%A5%E8%AA%B5%E6%97%A9%E8%AA%B2 (《太上玄门正一日诵早课》维基文库 - 净口神咒全文: 丹朱口神...急急如律令)",
+        "https://www.daoisms.com.cn/2012/29/13/19347/ (道音文化·道家净口神咒 - 独立第二来源, 全文一致)",
+        "https://baike.baidu.com/item/%E9%81%93%E6%95%99%E5%85%AB%E5%A4%A7%E7%A5%9E%E5%92%92/1190054 (百度百科·道教八大神咒 - 辅证)"
+      ],
+      "verification_status": "verified_2plus_independent",
+      "textual_certainty": "high"
+    },
+    {
+      "id": "BEI_DI_SHA_GUI_ZHOU",
+      "name_han": "北帝杀鬼咒 (规范名: 天蓬咒 / 天蓬神咒)",
+      "name_vi": "Chú Bắc Đế Sát Quỷ (Thần chú Thiên Phùng)",
+      "school": "北帝派 / 酆都派 (洞真部); 又收入上清天蓬伏魔大法",
+      "han_text": "天蓬天蓬，九玄杀童。五丁都司，高刁北翁。七政八灵，太上皓凶。长颅巨兽，手把帝钟。素枭三神，严驾夔龙。威剑神王，斩邪灭踪。紫炁乘天，丹霞赫冲。吞魔食鬼，横身饮风。苍舌绿齿，四目老翁。天丁力士，威南御凶。天驺激戾，威北衔锋。三十万兵，卫我九重。辟尸千里，袪却不祥。敢有小鬼，欲来见状。钁天大斧，斩鬼五形。炎帝烈血，北斗燃骨。四明破骸，天猷灭类。神刀一下，万鬼自溃。急急如律令。",
+      "han_text_notes": "异文显著: (a) '杀童' vs '煞童' (杀/煞通用); (b) '高刁北翁' vs '高刀北翁' vs '高刁北功' (刁/刀混用, 翁/功异文); (c) '紫炁' vs '紫气' (炁=气, 道藏本作炁); (d) '手把帝钟' vs '手执帝钟'; (e) '天驺激戾' 个别本作'天驺激戾'/'天驺其戾'. 三十六句倒读即成《天蓬馘魔咒》(邓紫阳倒持法, 《道法会元》卷174).",
+      "vi_translation": "Thiên Phùng Thiên Phùng, Cửu Huyền Sát Đồng. Ngũ Đinh Đô Ty, Cao Đao Bắc Ông. Thất Chính Bát Linh, Thái Thượng Hiếu Hung. Trường Lô Cự Thú, thủ bả Đế Chung. Tố Kiêu Tam Thần, Nghiêm Giá Quỳ Long. Uy Kiếm Thần Vương, chém tà diệt tung. Tử Khí thừa thiên, Đan Hà hám xung. Thôn ma thực quỷ, hoành thân ẩm phong. Thương thiệt lục xỉ, Tứ Mục Lão Ông. Thiên Đinh Lực Sĩ, uy nam ngự hung. Thiên Chu Kích Lệ, uy bắc hàm phong. Tam Thập Vạn Binh, vệ ngã Cửu Trùng. Tích thi thiên lý, khư khước bất tường. Cảm hữu tiểu quỷ, dục lai kiến trạng. Cước Thiên Đại Phủ, chém quỷ ngũ hình. Viêm Đế liệt huyết, Bắc Đẩu nhiên cốt. Tứ Minh phá hài, Thiên Do diệt loại. Thần đao nhất hạ, vạn quỷ tự nguy. Cấp cấp như luật lệnh.",
+      "vi_translation_note": "Chú này chứa nhiều thần danh/uế ngữ (sát/quỷ/huyết/cốt), nguyên văn Hán được bảo tồn; dịch nghĩa mang tính tham khảo vì nhiều danh từ là thần-tướng danh hiệu.",
+      "meaning": "Triệu Thiên Phùng nguyên soái (Bắc Đ帝部下) 统领三十万兵, 斩邪灭踪, 杀鬼护身. 陶弘景《真诰》: '鬼有三被此咒者, 眼精自烂而身即死矣, 此上神咒, 皆斩鬼之司名, 北帝秘其道.'",
+      "use": "驅邪 / 杀鬼 (chính: khu tà sát quỷ, hộ thân)",
+      "recitation_context": "北帝伏魔法事核心咒; 须叩齿三十六通, 一炁诵三遍, 每四言一啄齿 (《北帝伏魔神咒妙经》卷二所载仪轨). 警告: 经文称'寻常不得啄齿, 恐损神', 持咒吃五辛/口不净者 '天蓬大将怒目一嗔, 令人神魂堕落'.",
+      "sources": [
+        "https://ctext.org/wiki.pl?if=gb&chapter=557999 (CTEXT - 《太上元始天尊说北帝伏魔神咒妙经》卷二 - 已核验页面内容, 卷二载天蓬敕水咒/召十天魔王神咒等北帝杀鬼系统; 卷四斩鬼品为天蓬咒主出处, DZ 1412 正统道藏洞真部)",
+        "http://www.ctcwri.idv.tw/CTCW-CMTS/CMT07正乙部/CMT07-ALL/CH07220太上元始天尊说北帝伏魔神咒妙经/CH07220-04卷四斩厄品.htm (道教学术资讯网站 - 卷四斩鬼品: '北方黑帝五灵玄老大神咒杀鬼之法...天蓬天蓬, 九玄杀童...先杀小鬼, 次杀夜光, 何神不伏, 何鬼敢当, 急急如律令')",
+        "https://ctext.org/wiki.pl?if=gb&chapter=247662 (CTEXT - 《道法会元》卷162 上清天蓬伏魔大法, DZ 1220 - 天蓬咒第三独立出处)",
+        "https://baike.baidu.com/item/%E5%A4%A9%E8%93%AC%E7%A5%9E%E5%92%92/6978731 (百度百科·天蓬神咒 - 引南朝陶弘景《真诰》卷十最早记载'北帝煞鬼大法')"
+      ],
+      "verification_status": "verified_2plus_independent (4来源: DZ1412 / DZ1220 / 真诰 / 北帝伏魔经卷四)",
+      "textual_certainty": "high_for_canonical_form (天蓬咒), variants_flagged"
+    },
+    {
+      "id": "DONG_YUAN_SHEN_ZHOU",
+      "name_han": "洞渊神咒 (TEXTUAL UNCERTAINTY - 见 notes)",
+      "name_vi": "Thần chú Động Uyên",
+      "school": "洞渊派 / 洞玄部本文类",
+      "han_text": "[经文节选 - 卷四 杀鬼品 中代表神咒] 道言：天丁力士，三十六万人，持戟仗剑，来入人家，搜捕邪精。若有小鬼，不即去者，斩之万段。急急如律令。",
+      "han_text_notes": "*** 文本不确定性 (TEXTUAL UNCERTAINTY) - 重要 *** '洞渊神咒' 严格来说 NOT 单一固定短咒 (不像八大神咒有标准文本), 而是指《太上洞渊神咒经》(DZ 0335, 洞玄部本文类, 二十卷) 中 遣鬼品/缚鬼品/杀鬼品/禁鬼品/斩鬼品 各品所载 大量神咒 的总称。该经以 '转经 (诵经) + 斋法' 救济道民, 非以单一咒为核心。上述节选为杀鬼品类代表句式, 具体咒文因卷/品而异, 不可当作'唯一规范文本'。建议 implementer 标注此条为 '经文系统参考, 非单一神咒'。",
+      "vi_translation": "[经文节选译] Đạo nói: Thiên Đinh lực sĩ, ba mươi sáu vạn người, cầm kích cầm kiếm, vào nhà người, lùng bắt tà tinh. Nếu có quỷ nhỏ, không lui đi, chém vạn đoạn. Cấp cấp như luật lệnh.",
+      "meaning": "太上道君与诸天魔王鬼王立誓 (卷一 誓魔品), 赐道士以神咒威力, 可遣天丁力士, 敕令鬼神听命 — 通过 转经救济道民、消灾却祸.",
+      "use": "驅邪 / 遣鬼 (khu tà, khiển quỷ; 经忏法事)",
+      "recitation_context": "洞渊派 '转经' 法事 - 诵《洞渊神咒经》二十卷相应品 (非单咒独立诵持); 卷四杀鬼品附十六符.",
+      "sources": [
+        "https://ctext.org/wiki.pl?if=gb&res=190395&remap=gb (CTEXT - 《太上洞淵神呪經》全书目录: 序/卷一誓魔品/卷二遣鬼品/卷三缚鬼品/卷四杀鬼品(十六符)/卷五禁鬼品... DZ 0335 洞玄部本文类, 二十卷)",
+        "https://zh.wikipedia.org/zh-cn/%E5%A4%AA%E4%B8%8A%E6%B4%9E%E6%B7%B5%E7%A5%9E%E5%92%92%E7%B6%93 (维基百科·太上洞渊神咒经 - 经书概述, 独立第二来源 确认 DZ0335 / 二十卷 / 王纂传 / 洞渊派)",
+        "https://www.shidianguji.com/book/DZ0335 (识典古籍 - 道藏编号 DZ0335 全二十卷可逐章阅读)"
+      ],
+      "verification_status": "partial - '《洞渊神咒经》经书存在性与道藏编号 DZ0335' 已 verified 2plus; 但 '单一固定洞渊神咒短咒文本' NOT 存在, 已标注不确定性. 上方 han_text 为代表节选, 非规范全文.",
+      "textual_certainty": "low_for_single_mantra (经书确定, 但单一短咒文本不确定) — 建议标注 '参见经文系统, 非标准单咒'"
+    }
+  ],
+  "_verifier_handoff": "W13 须重点核验: (1) W8-金光/净心/净口 三咒 - ctext/wikisource URL 可达且文本逐字吻合 (已自查 wikisource 早课页存在, 含八大神咒目录); (2) W8-北帝杀鬼咒 - 重点核 DZ1412 卷四 斩鬼品 ctext 页 (chapter=557999 是卷二, 卷四需另查), 真诰卷十引文; (3) W8-洞渊神咒 - 接受 '非单一固定咒' 的不确定性标注, 验 DZ0335 经书存在即可, 不要强求单一文本."
+}

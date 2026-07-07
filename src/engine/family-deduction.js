@@ -11,7 +11,9 @@
 //  Cổ pháp: 子平真诠(十神六亲) · 渊海子平(宫位) · 大宗师六亲反推(全息融合).
 //  NGUỒN (crawled/researched loop 626): starbook.ai/wiki/liuqin-duanfa,
 //    zhuanlan.zhihu.com 六亲推断, 渊海子平·六亲第四, ifeng 论六亲原则.
-//  KHÔNG dự đoán y tế/chết chóc — chỉ xu hướng + khuyến nghị. Disclaimer rõ.
+//  [loop 1382] Module này tập trung HIỂU + đối chiếu lục thân (xu hướng/khuyến nghị).
+//    Luận tang CỤ THỂ (ai/năm) nằm ở module tang-analyze.js riêng (opt-in, caveat cổ pháp).
+//    Tinh thần: tham khảo xác suất, KHÔNG thay thế y tế/chuyên gia, KHÔNG dùng dọa nạt.
 // ============================================================================
 import { WX_VI, TEN_GOD_VI, SHENG, KE } from './constants.js';
 import { elementForRole, ROLE, PALACE_VI } from './family.js';
@@ -273,6 +275,6 @@ export function deduceFromFamily(subject, members) {
     summary: results.length
       ? `Đã duyệt ${results.length} người thân qua song trục «sao十神 × cung宫位» của lá chủ thể, rồi đối chiếu lá thật → ${results.filter((r) => r.verify.includes('XÁC NHẬN')).length} tương ứng全息 được xác nhận, ${results.filter((r) => r.verify.includes('BẤT NGỜ')).length} bất ngờ cần lưu ý. ${holographic.length ? 'Có ' + holographic.length + ' insight holographic (suy ngược về chủ thể).' : ''}`
       : '(cần ít nhất 1 người thân có ngày sinh)',
-    disclaimer: '六亲断/家庭全息 là kỹ thuật cổ pháp tham chiếu — dùng để HIỂU + đối chiếu, KHÔNG dự đoán y tế/tử vong/sự kiện cụ thể. Vận mệnh chịu tác động đa nhân (cá nhân, hoàn cảnh, nỗ lực).',
+    disclaimer: '六亲断/家庭全息 là kỹ thuật cổ pháp tham chiếu — dùng để HIỂU + đối chiếu lục thân (xu hướng, khuyến nghị). Nếu user muốn luận tang CỤ THỂ (ai/năm), xem riêng module tang-gia (opt-in, kèm caveat «tham khảo cổ pháp, xác suất»). Mọi luận lyric chịu tác động đa nhân (cá nhân, hoàn cảnh, nỗ lực) — không thay thế y tế/chuyên gia.',
   };
 }

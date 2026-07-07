@@ -64,6 +64,8 @@ import { analyzeMarriageDeep } from './engine/marriage-deep.js';
 import { buildFullProfile } from './engine/partner-profile.js';
 import { analyzeFamily } from './engine/family.js';
 import { deduceFromFamily } from './engine/family-deduction.js'; // [loop 626] 六亲断 — suy sâu vận mệnh từ gia đình
+import { analyzeTang } from './engine/tang-analyze.js'; // [loop 1382] TANG GIA 丧家 — vận hiếu
+import { analyzeAmTa } from './engine/amta-analyze.js'; // [loop 1383] ÂM TÀ / vong hồn — detect tín hiệu
 import { compassReading, bestDirection, shanFromDegree } from './engine/fengshui-compass.js'; // [loop 631] la bàn 24 sơn
 import { bestGraveDirectionDeep } from './engine/yinzhai-deep.js'; // [loop 634] Âm Trạch (mộ)
 import { radialData, matrixData } from './engine/family-diagram.js';
@@ -4133,6 +4135,11 @@ async function run() {
     if (!currentResult.chart.pillars.day.gan || !currentResult.chart.pillars.year.gan) {
       throw new Error('Ngày sinh ngoài khoảng hỗ trợ (≈1900–2100). Vui lòng nhập ngày trong khoảng này.');
     }
+    // [loop 1382] TANG GIA 丧家 — attach R.tang cho UI/consumer (AI brief tính riêng trong extendBrief).
+    //   Defensive: tang là tầng opt-in bonus, KHÔNG được làm crash parse lá số.
+    try { currentResult.tang = analyzeTang(currentResult); } catch (_) { currentResult.tang = null; }
+    // [loop 1383] ÂM TÀ / VONG HỒN — attach R.amta (opt-in, ETHICS wrapper). Defensive.
+    try { currentResult.amta = analyzeAmTa(currentResult); } catch (_) { currentResult.amta = null; }
   } catch (e) {
     currentResult = null;
     const res = $('result');
@@ -6485,7 +6492,7 @@ function renderSuiyun() {
   const el = document.getElementById('suiyun-out');
   if (!el) return;
   const age = (new Date().getFullYear() - R.chart.input.year);
-  const out = scanSuiyun(R.chart, R.dayun, R.liunian, age);
+  const out = scanSuiyun(R.chart, R.dayun, R.liunian, age, R.yong); // [loop 1382] truyền yong → 岁运并临 có hướng Dụng/Kỵ
   if (!out || !out.activeDayun) { el.innerHTML = '<p class="hint">Không xác định được đại vận đang hành.</p>'; return; }
   // [loop 165] Phân loại «hướng» từng năm: cát (hòa/hợp/đồng khí Dụng) vs hung (xung/并临 Kỵ).
   const curYear = new Date().getFullYear();

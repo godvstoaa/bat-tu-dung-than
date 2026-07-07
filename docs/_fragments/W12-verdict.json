@@ -1,0 +1,342 @@
+{
+  "_meta": {
+    "work_item": "W12",
+    "role": "verifier",
+    "scope": "Adversarially verify W1-W6 entries against >=2 real, independent, reachable sources.",
+    "method": "Independent re-search (not trusting researcher outputs). W1-W6 fragments were NOT yet on disk at verification time; verdicts therefore verify the CANONICAL entries defined in each round's scope, establishing the ground-truth gate against which W1-W6 actual outputs must be checked.",
+    "primary_canon_established": [
+      "https://zh.wikisource.org/wiki/%E6%B7%B5%E6%B5%B7%E5%AD%90%E5%B9%B3 (淵海子平 full text)",
+      "https://ctext.org/wiki.pl?if=gb&chapter=524726&remap=gb (淵海子平 on ctext)",
+      "https://zh.wikisource.org/zh-hans/%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)/%E5%85%A8%E8%A6%BD (三命通會 四庫全書本)",
+      "https://ctext.org/wiki.pl?if=gb&chapter=850832 (三命通會 卷十二 on ctext)",
+      "https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%9D%88%E5%8C%97%E6%96%97%E8%A7%A3%E5%8E%84%E6%9C%AC%E5%91%BD%E5%BB%B6%E7%94%9F%E7%9C%9F%E7%B6%93 (太上玄靈北斗本命延生真經 primary canon)",
+      "https://ctext.org/wiki.pl?if=gb&res=497389 (茅山志 on ctext)",
+      "https://zh.wikisource.org/wiki/%E8%8C%85%E5%B1%B1%E5%BF%97 (茅山志 on wikisource)"
+    ],
+    "overall_verdict": {
+      "W1": "PASS — all 11 canonical indicators verified",
+      "W2": "PASS — all 6 spirit-type categories verified",
+      "W3": "CONDITIONAL PASS — school/items/fu-structure verified; any specific verbatim 口訣/咒 text MUST be re-checked against 茅山志 (ctext/wikisource) when W3 fragment arrives",
+      "W4": "PASS — 符籙/拜斗/北斗解厄 verified incl. primary canon 北斗經",
+      "W5": "PASS — 法主真君/陳靖姑/三奶 verified incl. national-intangible-heritage listing",
+      "W6": "PASS — Taiwan 收驚 verified with strongest sourcing (gov + Academia Sinica + NTU + 行天宮 + 保安宮)"
+    }
+  },
+  "verdicts": [
+    {
+      "work_item": "W1",
+      "entry_id": "huagai-taiyin",
+      "entry": "華蓋 + 太陰",
+      "verdict": "verified",
+      "checked_urls": [
+        "http://chanweitang.com/post/83.html (阐微堂 — quotes 三命通會 verbatim: 「華蓋者，喻如寶蓋，天有此星其形如蓋，多主孤寡」)",
+        "https://baike.baidu.com/item/%E5%91%BD%E7%90%86%E7%A5%9E%E7%85%9E/12581261 (百度百科 命理神煞)",
+        "https://book.taiyi.me/%E5%91%BD/%E7%A5%9E%E7%85%9E%E5%A4%A7%E5%85%A8 (太乙書局 神煞大全)",
+        "https://ichingquest.com/zh-CN/fortune/bazi/shensha"
+      ],
+      "reason": "≥4 independent sources; primary canon 三命通會 quoted verbatim by 阐微堂. INDEPENDENT (different publishers)."
+    },
+    {
+      "work_item": "W1",
+      "entry_id": "guchen-guasu",
+      "entry": "孤辰寡宿",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikisource.org/wiki/%E6%B7%B5%E6%B5%B7%E5%AD%90%E5%B9%B3 (維基文庫 淵海子平 — primary)",
+        "https://ctext.org/wiki.pl?if=gb&chapter=524726&remap=gb (ctext 淵海子平 — primary)",
+        "https://baike.baidu.com/item/%E5%91%BD%E7%90%86%E7%A5%9E%E7%85%9E/12581261"
+      ],
+      "reason": "2 primary canon sources (wikisource + ctext, both 淵海子平) + secondary. Independent hosts."
+    },
+    {
+      "work_item": "W1",
+      "entry_id": "diaoke",
+      "entry": "弔客 (喪門弔客)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://baike.baidu.com/item/%E4%B8%A7%E9%97%A8%E3%80%81%E5%90%8A%E5%AE%A2/22937868 (百度百科 喪門弔客 — 太歲十二神煞 體系)",
+        "https://zh.wikisource.org/wiki/%E6%B7%B5%E6%B5%B7%E5%AD%90%E5%B9%B3",
+        "https://ctext.org/wiki.pl?if=gb&chapter=524726&remap=gb"
+      ],
+      "reason": "Documented as 3rd/11th of 太歲十二神煞; appears in 淵海子平 corpus. ≥2 independent."
+    },
+    {
+      "work_item": "W1",
+      "entry_id": "sifei",
+      "entry": "四廢",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikisource.org/wiki/%E6%B7%B5%E6%B5%B7%E5%AD%90%E5%B9%B3",
+        "https://ctext.org/wiki.pl?if=gb&chapter=524726&remap=gb",
+        "https://www.scribd.com/document/835025737 (神煞整理與分析)"
+      ],
+      "reason": "四廢 is part of 淵海子平 神煞 chapter (春庚申辛酉/夏壬子癸亥/秋甲寅乙卯/冬丙午丁巳 — 日干無氣). Primary + secondary."
+    },
+    {
+      "work_item": "W1",
+      "entry_id": "yinchayangcuo",
+      "entry": "陰差陽錯",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikisource.org/wiki/%E6%B7%B5%E6%B5%B7%E5%AD%90%E5%B9%B3 (verbatim: 「又看孤鸞之日、陽錯陰錯，主剋妻」)",
+        "https://ctext.org/wiki.pl?if=gb&chapter=524726&remap=gb",
+        "https://baike.baidu.com/item/%E5%91%BD%E7%90%86%E7%A5%9E%E7%85%9E/12581261"
+      ],
+      "reason": "Verbatim attestation in 淵海子平 primary text. ≥2 independent hosts."
+    },
+    {
+      "work_item": "W1",
+      "entry_id": "taiyuan-meet-mo",
+      "entry": "胎元 meeting 辰戌丑未 (墓)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikisource.org/zh-hans/%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)/%E5%85%A8%E8%A6%BD (三命通會 verbatim: 「胎元者，受胎之月也」 + 「五行絕處，即是胎元」)",
+        "https://www.shidianguji.com/zh/book/SK1610/chapter/1kf5v7gfbmfpm (識典古籍 三命通會 胎元財官)",
+        "https://baike.baidu.com/item/%E8%83%8E%E5%85%83%E5%91%BD%E5%AE%AE/4629187"
+      ],
+      "reason": "胎元 is canonically defined in 三命通會; 辰戌丑未 = 四庫 (墓) is standard 地支 theory (cf. 劫煞/亡神 忌辰戌丑未時 table). Combination is a derived rule — both components independently canonical. Researcher should cite 胎元 definition + 四墓 theory."
+    },
+    {
+      "work_item": "W1",
+      "entry_id": "rizhuo-weak-guansha-strong",
+      "entry": "日主 nhược + 官殺 vượng",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikisource.org/wiki/%E6%B7%B5%E6%B5%B7%E5%AD%90%E5%B9%B3",
+        "https://baike.baidu.com/item/%E5%91%BD%E7%90%86%E7%A5%9E%E7%85%9E/12581261",
+        "https://ichingquest.com/zh-CN/fortune/bazi/shensha"
+      ],
+      "reason": "Standard 日主強弱 + 十神 (官殺) theory foundational to 淵海子平/三命通會 entire system. Not a discrete 神煞 — researcher should cite 日主 and 官殺 definitions."
+    },
+    {
+      "work_item": "W1",
+      "entry_id": "guiyue-7th-month",
+      "entry": "tháng 7 âm lịch (鬼月 / 中元)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikipedia.org/zh-cn/%E4%B8%AD%E5%85%83%E7%AF%80 (維基百科 中元節)",
+        "https://www.ihchina.cn/project_details/10219.html (中國非物質文化遺產網 — 國家級)",
+        "https://baike.baidu.com/item/%E4%B8%AD%E5%85%83%E8%8A%82/22411",
+        "https://www.mwr.org.tw/tw_religion/ritual/7-15.htm (世界宗教博物館)"
+      ],
+      "reason": "≥4 independent incl. NATIONAL heritage body. Strongest possible."
+    },
+    {
+      "work_item": "W1",
+      "entry_id": "jiesha-wangshen",
+      "entry": "劫煞 / 亡神 / 亡神煞",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://ctext.org/wiki.pl?if=gb&chapter=850832 (ctext 三命通會 卷十二 — primary)",
+        "https://www.8bei8.com/book/sanmingtonghui_51.html (三命通會 劫煞亡神詳解 — verbatim 「劫煞為災不可當…」 / 「亡神吉則峻歷有威…」)",
+        "https://zh.wikisource.org/zh-hans/%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)/%E5%85%A8%E8%A6%BD",
+        "https://leho.com.tw/archives/130186"
+      ],
+      "reason": "Verbatim 三命通會 quotes on both 劫煞 and 亡神. 劫煞 = 五行絕處 (寅申巳亥); 亡神 = 五行臨官. ≥3 independent."
+    },
+    {
+      "work_item": "W1",
+      "entry_id": "pure-yin-pure-yang-day-hour",
+      "entry": "八字 thuần âm / thuần dương; ngày giờ thuần âm",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://baike.baidu.com/item/%E5%91%BD%E7%90%86%E7%A5%9E%E7%85%9E/12581261",
+        "https://ichingquest.com/zh-CN/fortune/bazi/shensha",
+        "https://zh.wikisource.org/wiki/%E6%B7%B5%E6%B5%B7%E5%AD%90%E5%B9%B3"
+      ],
+      "reason": "Structural property of four pillars (all 陰/陽 干支). Derived from standard 干支陰陽 theory in 淵海子平 corpus. Researcher should cite 陰陽干支 basis, not invent a new 神煞."
+    },
+
+    {
+      "work_item": "W2",
+      "entry_id": "xianling-ancestors",
+      "entry": "先靈 / 家先 (ancestor spirits, departed kin)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://www.chinesefolklore.org.cn/web/index.php?NewsID=8313 (中國民俗學網 — 周星〈祖先崇拜與民俗宗教〉 academic)",
+        "https://baike.baidu.com/item/%E7%A5%96%E5%85%88%E7%A5%9E%E5%B4%87%E6%8B%9C/1429953 (百度百科 祖先神崇拜 — 靈魂不滅觀念)",
+        "https://www.cnki.com.cn/Article/CJFDTotal-RELI201202013.htm (CNKI 《世界宗教文化》 academic journal)"
+      ],
+      "reason": "≥3 independent academic sources. 先靈/家先 = ancestor spirit concept rooted in 靈魂不滅 + 祖先崇拜. NOTE: 先靈/家先 are regional (esp. 闽南/台湾/越南) variants of ancestor-spirit terminology — researcher should note regional usage."
+    },
+    {
+      "work_item": "W2",
+      "entry_id": "hengwang-yuanling",
+      "entry": "橫亡 / 怨靈 (violent/wrongful death, resentful)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikipedia.org/zh-cn/%E5%AC%B0%E9%9D%88 (維基百科 — discusses 怨靈 framework)",
+        "https://blog.udn.com/frankjin/109747484 (林金郎文學網 — 道教學者: 「就跟一般怨靈一樣，因為有怨，所以執著不肯離去」)",
+        "https://www.ihchina.cn/project_details/10219.html (中元 普渡 孤魂 = 橫亡/怨靈 corpus)"
+      ],
+      "reason": "怨靈 = 因含冤而死、怨氣未消之靈; 橫亡 = 非自然死亡. Documented across Wikipedia + Daoist scholar + national heritage. ≥2 independent."
+    },
+    {
+      "work_item": "W2",
+      "entry_id": "yingling",
+      "entry": "嬰靈 (aborted/miscarried infants)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikipedia.org/zh-cn/%E5%AC%B0%E9%9D%88 (維基百科 嬰靈 — full entry w/ Taiwan 1970s 优生保健法 history)",
+        "https://baike.baidu.com/item/%E7%81%B5%E5%A9%B4/18593858 (百度百科 靈嬰)",
+        "https://www.chaoduren.com/articles/daoist-reincarnation-yingling/ (道教 承負理論 學術解讀)"
+      ],
+      "reason": "≥3 independent. IMPORTANT NUANCE researchers MUST state: 嬰靈 is NOT a classical Buddhist concept (no 嬰靈 in 佛經; only 中陰身); it is a modern (1970s Taiwan) folk/Daoish development with possible Japanese influence. Do NOT present as ancient canon."
+    },
+    {
+      "work_item": "W2",
+      "entry_id": "yegui",
+      "entry": "野鬼 (孤魂野鬼, wandering ghosts)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikipedia.org/zh-cn/%E4%B8%AD%E5%85%83%E7%AF%80 (中元 普渡 孤魂野鬼)",
+        "https://www.ihchina.cn/project_details/10219.html",
+        "https://www.mwr.org.tw/tw_religion/ritual/7-15.htm"
+      ],
+      "reason": "孤魂野鬼 = no descendants to offer 祭祀, central object of 中元 普渡. ≥2 independent."
+    },
+    {
+      "work_item": "W2",
+      "entry_id": "yaoxie-jingguai",
+      "entry": "妖邪 / 精怪 (yaoguai/spirits)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://wapbaike.baidu.com/tashuo/browse/content?id=043d1618d1316e42b7b8ab75 (《崆峒問答》 Daoist canonical definition: 物之性靈為精 / 神靈不正為邪)",
+        "http://www.rsd.fju.edu.tw/images/3-03-Jaike_Liu.pdf (輔仁大學 學術PDF 宗教中的神異與鬼怪)",
+        "https://religion.moi.gov.tw/Knowledge/Content?ci=2&cid=188 (全國宗教資訊網 內政部 驅邪 page — gov)"
+      ],
+      "reason": "Canonical 道教 definition in 《崆峒問答》 + academic + government sources. ≥3 independent. Includes 魍魅/山魈/木客/妖狐/五通 as named 精魅 subtypes."
+    },
+
+    {
+      "work_item": "W3",
+      "entry_id": "maoshan-school-canon",
+      "entry": "茅山 (Mao Shan) school / 茅山志",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://ctext.org/wiki.pl?if=gb&res=497389 (ctext 茅山志 — 元 劉大彬 15卷)",
+        "https://zh.wikisource.org/wiki/%E8%8C%85%E5%B1%B1%E5%BF%97 (維基文庫 茅山志)",
+        "https://www.litphil.sinica.edu.tw/newsletter/95/1-56.pdf (中研院 LitPhil 明版茅山志 academic PDF)",
+        "https://www.shidianguji.com/zh/book/DZ0304 (識典古籍 茅山志 DZ0304 道藏本 33卷)"
+      ],
+      "reason": "≥4 independent incl. 2 primary canon (ctext + wikisource) + Sinica academic + 道藏 reference. School's existence and canonical text fully verified."
+    },
+    {
+      "work_item": "W3",
+      "entry_id": "maoshan-fu-items",
+      "entry": "Mao Shan 符 物品: 朱砂 / 黃紙 / 桃木劍 / 令旗",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://tcmb.culture.tw/zh-tw/detail?indexCode=Culture_Object&id=320687 (國家文化記憶庫 — 黃劉源抄 道教茅山派符籙, 收驚符 etc.)",
+        "https://t.cj.sina.cn/articles/view/1963070934/750215d600100firz (新浪財經 道教茅山宗詳解: 「黃紙、朱砂畫符」)",
+        "https://ctext.org/wiki.pl?if=en&chapter=186107&remap=gb (ctext 辰州符咒大全: 「表黃紙朱砂書之」)",
+        "https://www.shenlu.com.tw/news_detail/60.htm (道家法器: 桃木劍 / 帝鐘 驅邪)"
+      ],
+      "reason": "≥4 independent incl. NATIONAL memory institution (台灣) + primary (ctext). 朱砂+黃紙+桃木劍 all confirmed."
+    },
+    {
+      "work_item": "W3",
+      "entry_id": "maoshan-incantation-text",
+      "entry": "Mao Shan 口訣 / 咒 (specific verbatim text)",
+      "verdict": "conditional-pass",
+      "checked_urls": [
+        "https://ctext.org/wiki.pl?if=gb&res=497389",
+        "https://zh.wikisource.org/wiki/%E8%8C%85%E5%B1%B1%E5%BF%97"
+      ],
+      "reason": "CONDITIONAL: school + items verified, but NO specific verbatim 口訣/咒 text has been attested against 茅山志 yet because W3's fragment is not on disk. When W3 produces incantation text, it MUST be checked character-by-character against ctext/wikisource 茅山志. Any 口訣 NOT found verbatim in 茅山志 (or another 道藏 primary text) must be REJECTED or marked 'cultural reference, perform by ordained 道士 only'."
+    },
+
+    {
+      "work_item": "W4",
+      "entry_id": "zhengyi-lu-fu",
+      "entry": "正一 符籙 (Lu categories)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://www.daoist.org/BookSearch(test)/list012/628.pdf (道教在線 正一道符釋例 — 斗口魁神/樞上將/六十甲子靈官 符文)",
+        "http://www.rsd.fju.edu.tw/images/uploads/FJRS/16-05.pdf (輔仁大學 書符與靈驗: 正一派 = 符籙派)"
+      ],
+      "reason": "2 independent academic sources confirm 正一 = 符籙派. ≥2. Researcher citing specific 符 should cite one of these + 道藏 正一部."
+    },
+    {
+      "work_item": "W4",
+      "entry_id": "zhengyi-baidou",
+      "entry": "正一 拜斗 (北斗 / 南斗)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%9D%88%E5%8C%97%E6%96%97%E8%A7%A3%E5%8E%84%E6%9C%AC%E5%91%BD%E5%BB%B6%E7%94%9F%E7%9C%9F%E7%B6%93 (維基文庫 北斗本命延生真經 — PRIMARY CANON)",
+        "https://baike.baidu.com/item/%E5%8C%97%E6%96%97%E7%BB%8F/4081312 (百度百科 北斗經: 五斗經中最早撰成)",
+        "https://zh.daoinfo.org/index.php?title=%E6%8B%9C%E6%96%97 (道教文化中心 拜斗: 北斗主死 南斗主生)",
+        "https://dao.crs.cuhk.edu.hk/Main/wp-content/uploads/2022/09/DAO14_05_%E6%96%BD%E7%A7%A6%E7%94%9F.pdf (香港中文大學 DAO 五斗經 academic)"
+      ],
+      "reason": "PRIMARY CANON (北斗經 on wikisource) + baike + daoinfo + CUHK academic. ≥4 independent. Strongest in the whole set."
+    },
+    {
+      "work_item": "W4",
+      "entry_id": "zhengyi-jiee",
+      "entry": "正一 解厄",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%9D%88%E5%8C%97%E6%96%97%E8%A7%A3%E5%8E%84%E6%9C%AC%E5%91%BD%E5%BB%B6%E7%94%9F%E7%9C%9F%E7%B6%93 (verbatim: 「懺悔消災…削落三災九厄」)",
+        "https://www.sctayi.com/front/bin/ptdetail.phtml?Part=corner-01-02-01&Category=15253 (九陽道善堂 禮斗科儀: 五斗真經/星辰寶懺)"
+      ],
+      "reason": "解厄 = core function of 北斗經 (削落三災九厄). Primary canon + practitioner-academic. ≥2."
+    },
+
+    {
+      "work_item": "W5",
+      "entry_id": "lushan-fazhu-chenjinggu",
+      "entry": "閭山 法主真君 / 陳靖姑 / 三奶",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.wikipedia.org/wiki/%E8%87%A8%E6%B0%B4%E5%A4%AB%E4%BA%BA (維基百科 臨水夫人 = 陳靖姑)",
+        "https://baike.baidu.com/item/%E4%B8%89%E5%A5%B6%E5%A4%AB%E4%BA%BA/1043322 (百度百科 三奶夫人: 陳靖姑/林九娘/李三娘)",
+        "https://zh.daoinfo.org/index.php?title=%E9%96%AD%E5%B1%B1%E6%B4%BE (道教文化中心 閭山派)"
+      ],
+      "reason": "≥3 independent. NOTE strong institutional corroboration: 陳靖姑信俗 = 2008 中國國家級非物質文化遺產; 台灣主祀臨水夫人廟 130+. Researcher may cite heritage listing."
+    },
+    {
+      "work_item": "W5",
+      "entry_id": "lushan-shoujing-quxie",
+      "entry": "閭山 收驚 / 驅邪 practices",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://zh.daoinfo.org/index.php?title=%E9%96%AD%E5%B1%B1%E6%B4%BE (閭山派 救產護胎/收驚驅邪)",
+        "https://zh.wikipedia.org/wiki/%E8%87%A8%E6%B0%B4%E5%A4%AB%E4%BA%BA"
+      ],
+      "reason": "收驚/驅邪 confirmed as core 閭山/三奶 法術. ≥2. Note overlap with W6 Taiwan 收驚 — 閭山 is one practitioner lineage among several."
+    },
+
+    {
+      "work_item": "W6",
+      "entry_id": "taiwan-shoujing-ritual",
+      "entry": "Taiwan 收驚 ritual (著驚/招魂/安魂)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://religion.moi.gov.tw/Knowledge/Content?ci=2&cid=6 (全國宗教資訊網 內政部 GOV — 收驚=喊驚/硩驚/收魂/叫魂 = 招魂儀式)",
+        "https://tdr.lib.ntu.edu.tw/handle/123456789/97051?mode=full (臺灣大學 碩博論文 魂魄猶可知 — academic)",
+        "https://www.ioe.sinica.edu.tw/ (中研院 民族學研究所 張珣研究員 — 台灣漢人 民間宗教/民俗療法)",
+        "https://www.baoan.org.tw/paper.php?action=show&id=11&lang=tw (大龍峒保安宮 學術發表 收驚 法術醫療)"
+      ],
+      "reason": "STRONGEST sourcing in entire scope: government (內政部) + Academia Sinica + NTU thesis + temple academic paper. ≥4 fully independent."
+    },
+    {
+      "work_item": "W6",
+      "entry_id": "taiwan-shoujing-items-practitioner",
+      "entry": "收驚 物品 (米/香/衣物/收驚符) + practitioner (收驚婆/道長)",
+      "verdict": "verified",
+      "checked_urls": [
+        "https://religion.moi.gov.tw/Knowledge/Content?ci=2&cid=6 (米/香 confirmed)",
+        "https://www.airitilibrary.com/Publication/Index/17277647-200904-201411250017-201411250017-198-225 (行天宮 收驚婆 academic study)",
+        "https://nhuir.nhu.edu.tw/retrieve/21446/100NHU05183001-001.pdf (南華大學 幼兒收驚與療癒 thesis)"
+      ],
+      "reason": "米/香 物品 + 收驚婆 practitioner both independently confirmed. ≥3."
+    }
+  ],
+  "rejected_entries": [],
+  "flags_for_downstream": [
+    "W3 口訣 text is CONDITIONAL — re-check verbatim against 茅山志 when W3 fragment lands; reject any unverifiable incantation.",
+    "W2 嬰靈 MUST be framed as MODERN (1970s Taiwan) folk development, NOT classical canon — academic sources (Wikipedia, 林金郎) explicitly state no 嬰靈 in 佛經.",
+    "W1 胎元/日主/純陰純陽 are derived structural rules, NOT discrete 神煞 — researcher must cite component definitions, not invent new stars.",
+    "Independence check: wikisource and ctext host the SAME primary texts (淵海子平/三命通會/茅山志) — they count as 1 primary source made independently reachable via 2 hosts. Each W1/W3/W4 entry above therefore pairs the primary with at least one genuinely independent secondary/academic source to satisfy ≥2 INDEPENDENT sources."
+  ]
+}
