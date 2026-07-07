@@ -95,7 +95,7 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
             }
             if (fullContent.length > 5) {
               var um = (bodyObj.messages || []).filter(function (m) { return m.role === 'user'; });
-              var qText = um.length ? String(um[um.length - 1].content || '').slice(0, 200) : '';
+              var qText = um.length ? String(um[um.length - 1].content || '') : ''; // [loop 1385] full question (không cắt)
               await logEvent(env, request, 'ai_chat', { q: qText, response: fullContent, source: 'ai', durationMs: Date.now() - _streamStart, backend: b.name });
             }
           } catch (ce) {}
