@@ -223,7 +223,7 @@ async function adminAiConfigSet(env, request) {
   if (merged.mode === 'off') await env.ADMIN_KV.put('ai:enabled', '0');
   else await env.ADMIN_KV.put('ai:enabled', '1');
   await auditLog(env, request, 'ai_config', { mode: merged.mode, hasKey: !!merged.apiKey, model: merged.model || '', endpoint: merged.endpoint || '' });
-  return json({ ok: true, config: Object.assign({}, merged, { apiKey: merged.apiKey ? '***' + merged.apiKey.slice(-4) : '' }) });
+  return json({ ok: true, config: Object.assign({}, merged, { apiKey: merged.apiKey ? '***' + merged.apiKey.slice(-4) : '', zaiKey: merged.zaiKey ? '***' + String(merged.zaiKey).slice(-4) : '' }) });
 }
 
 async function adminAiConfigGet(env) {
