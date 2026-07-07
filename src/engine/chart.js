@@ -375,12 +375,20 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
   //   GIỮ Phù Ức (Ấn) làm chủ, 调候 (官杀) giáng secondary. Chart 弱 có căn vẫn override («寒金喜火»).
   const _dmWx = chart.dayMaster.wx;
   const _tiaoIsGuan = tiaoPrimaryWx === KE_BY[_dmWx];            // 调候 hành = 官杀 (khắc DM)
-  // 极弱/无根: level «Thân quá nhược» HOẶC root rất thấp (< 0.5 ≈ 无根). Root=0 có thể
-  //   rơi vào nhãn «Thân nhược» nên xét cả 2 — tín hiệu thật là KHÔNG CÓ CĂN.
-  const _isJiWeak = strength && (strength.level === 'Thân quá nhược' || (strength.root != null && strength.root < 0.5));
-  const _skipForGuan = _tiaoIsGuan && _isJiWeak;
+  // [loop 1385 FIX BUG] tổng quát hoá loop 993: 调候 element KHÔNG được là Kỵ-thân theo Phù Ức
+  //   (cùng nguyên lý _strengthKỵ loop 1384). Strong → tránh 调候 Tỷ/Ấn (làm vượng thêm); weak →
+  //   tránh 调候 Quan/Tài/Thực (khắc/hao/tiết làm nhược thêm). Trước đây chỉ guard Quan+cực nhược
+  //   → bỏ lọt (vd 甲木«nhược» tháng 亥 庚 Kim «tỉa mộc vượng» bị ép làm Dụng chính → khắc hại mộc nhược).
+  const _tiaoHarmful = strength && (
+    (strength.strong && (tiaoPrimaryWx === _dmWx || tiaoPrimaryWx === SHENG_BY[_dmWx])) ||
+    (strength.strong === false && (tiaoPrimaryWx === KE[_dmWx] || tiaoPrimaryWx === KE_BY[_dmWx] || tiaoPrimaryWx === SHENG[_dmWx]))
+  );
+  const _skipForGuan = _tiaoHarmful;
   if (isExtreme && tiaoPrimaryWx && _skipForGuan) {
-    reasons.push(`🌡️ Điều Hậu (调候) ghi nhận tháng ${chart.monthZhi} cần ${tiaoStemsVi(tiaoRaw)} ${clim ? clim.need : ''}, NHƯNG hành ${tiaoPrimaryWx} là QUAN SÁT (khắc Nhật Chủ) mà Nhật Chủ «${strength.level}» (无根) → «无根身弱不能受杀, 先求印扶身»: KHÔNG ép làm Dụng. Giữ Phù Ức (${primary}) làm chủ; ${tiaoPrimaryWx} xuống secondary — gặp vận ${tiaoPrimaryWx} chỉ lợi khi ĐÃ CÓ Ấn hộ thân (官印相生), không thì khắc hại.`);
+    const _why = strength.strong
+      ? `Nhật Chủ VƯỢNG nên hành ${tiaoPrimaryWx} (${tiaoPrimaryWx === _dmWx ? 'Tỷ' : 'Ấn'}) làm thân vượng thêm`
+      : `Nhật Chủ NHƯỢC nên hành ${tiaoPrimaryWx} (${_tiaoIsGuan ? 'Quan khắc' : tiaoPrimaryWx === KE[_dmWx] ? 'Tài hao' : 'Thực tiết'}) làm thân thêm suy`;
+    reasons.push(`🌡️ Điều Hậu (调候) tháng ${chart.monthZhi} cần ${tiaoStemsVi(tiaoRaw)} ${clim ? clim.need : ''}, NHƯNG ${_why} → KHÔNG ép làm Dụng CHÍNH (Phù Ức ưu tiên). Giữ Phù Ức (${primary}) làm chủ; ${tiaoPrimaryWx} xuống secondary — chỉ phối khi ĐÃ đủ Dụng chính (vd 官印相生), không thì khắc/hao thân.`);
     if (tiaoPrimaryWx !== primary && tiaoPrimaryWx !== secondary) secondary = tiaoPrimaryWx;
   }
   if (isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary && !isSpecial && !_skipForGuan) {
