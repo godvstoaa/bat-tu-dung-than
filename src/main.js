@@ -7324,13 +7324,16 @@ _logEvent('visit', { ref: document.referrer || '', path: location.pathname, load
 // [loop 1357] mode=free → chỉ auto-enable nếu free model đang BẬT (admin có thể tắt free glm-5.2)
 fetch('/api/ai-config').then(function (r) { return r.json(); }).then(function (c) {
   if (c.hasKey && c.mode !== 'off') {
-    var allow = c.mode === 'custom' || c.freeEnabled !== false; // free off → không auto cf-glm
-    var cfg = getConfig();
-    if (allow && !cfg.enabled) {
-      // [loop 1387 FIX BUG] PRESETS là ARRAY → dùng .find (trước đây PRESETS['cf-glm'] = undefined
-      //   → setConfig({enabled:true}) thiếu endpoint/model → isAIReady FALSE → AI toàn local fallback).
-      var _cfP = PRESETS.find(function (p) { return p.id === 'cf-glm'; }) || PRESETS[0];
+    var _cfP = PRESETS.find(function (p) { return p.id === 'cf-glm'; }) || PRESETS[0];
+    if (c.mode === 'free' && c.freeEnabled !== false) {
+      // [loop 1393] admin set FREE → FORCE cf-glm cho MỌI user (override localStorage)
+      //   → /cf-ai path → freeRoute → Groq/cf-glm (ổn định). z.ai rate-limit reset sau.
       setConfig({ enabled: true, endpoint: _cfP.endpoint, apiKey: '', model: _cfP.model, preset: 'cf-glm' });
+    } else if (c.mode === 'custom') {
+      var cfg = getConfig();
+      if (!cfg.enabled) {
+        setConfig({ enabled: true, endpoint: _cfP.endpoint, apiKey: '', model: _cfP.model, preset: 'cf-glm' });
+      }
     }
   }
 }).catch(function () {});
