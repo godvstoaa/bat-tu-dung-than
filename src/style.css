@@ -4,11 +4,16 @@
    ============================================================ */
 :root {
   scroll-behavior: smooth;
-  --ink-black: #0a0913;
-  --ink: #0f0d1a;
-  --lacquer: #15121e;
-  --panel: rgba(245, 236, 203, 0.035);
-  --panel-deep: rgba(10, 9, 19, 0.45);
+  /* Deep onyx cohesive surface (60%) — not pure black */
+  --ink-black: #111018;
+  --ink: #12121a;
+  --lacquer: #16151f;
+  /* Surface tint elevation system (replace heavy shadows) */
+  --surface-1: #12121a;
+  --surface-2: #16151f;
+  --surface-3: #1a1924;
+  --panel: rgba(245, 236, 203, 0.02);
+  --panel-deep: rgba(18, 18, 26, 0.6);
   --gold: #d4af37;
   --gold-bright: #f3d57a;
   --gold-pale: #f7eccb;
@@ -16,12 +21,12 @@
   --cinnabar-deep: #7d1a14;
   --cinnabar-glow: rgba(192, 57, 43, 0.5);
   --jade: #2e9e6b;
-  --cat: var(--jade);     /* [loop 182] cát accent — unify var(--cat,…) usages with theme (trước đây fallback #2a7 lệch --jade) */
-  --hung: var(--cinnabar); /* hung accent — unify với --cinnabar (trước đây fallback #c33) */
+  --cat: var(--jade);
+  --hung: var(--cinnabar);
   --silk: #f3ead2;
   --silk-dim: #d8cba8;
   --silk-muted: #948864;
-  --hairline: rgba(212, 175, 55, 0.22);
+  --hairline: rgba(243, 234, 210, 0.08); /* very faint default */
   --radius: 6px;
   --wx-moc: #3aa15b;
   --wx-hoa: #e0463a;
@@ -30,31 +35,28 @@
   --wx-thuy: #4a86d0;
   --ease-out: cubic-bezier(.22, .61, .36, 1);
   --ease-spring: cubic-bezier(.34, 1.4, .5, 1);
-  /* [loop 144 — StyleSeed] fix missing vars (đã từng bị orphan do edit loop 915/916) */
-  --shadow-card: 0 3px 10px -6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(247,236,203,0.035); /* legacy, now use --frame-shadow */
-  --shadow-edict: 0 3px 10px -6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(247,236,203,0.035);
-  --shadow-gold: 0 4px 12px rgba(212, 175, 55, 0.25); /* lighter */
-  --gold-soft: rgba(212, 175, 55, 0.12);
+  --gold-soft: rgba(212, 175, 55, 0.10);
   --muted: #6b6480;
-  --glass: rgba(245, 236, 203, 0.055);
-  --glass-border: rgba(212, 175, 55, 0.18);
-  /* AT-inspired refined scale (mobile-first, restraint) */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
+  /* Thin consistent dark glass — ONLY for main floating cards/sheets */
+  --glass: rgba(245, 236, 203, 0.035);
+  --glass-border: rgba(243, 234, 210, 0.09);
+  /* AT-inspired refined scale (mobile-first, restraint) — increased breathing */
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 22px;
+  --space-6: 28px;
 
-  /* UNIFIED FRAME SYSTEM — one disciplined frame for all surfaces (card/tab/grp/tool/panel/sub) */
-  --frame-radius: 6px;
-  --frame-radius-sm: 4px;
-  --frame-pad: 14px 16px;
-  --frame-pad-sm: 10px 12px;
-  --frame-border: 1px solid rgba(243, 234, 210, 0.10); /* faint silk hairline — default */
-  --frame-border-gold: 1px solid rgba(212, 175, 55, 0.32);
-  --frame-shadow: 0 3px 10px -6px rgba(0,0,0,0.50), inset 0 1px 0 rgba(247,236,203,0.035);
-  --frame-shadow-hover: 0 6px 16px -8px rgba(0,0,0,0.58), inset 0 1px 0 rgba(247,236,203,0.05);
+  /* UNIFIED FRAME — minimal single shadow, faint border, surface tint for elevation */
+  --frame-radius: 8px;
+  --frame-radius-sm: 6px;
+  --frame-pad: 18px 18px;
+  --frame-pad-sm: 12px 14px;
+  --frame-border: 1px solid rgba(243, 234, 210, 0.07);
+  --frame-border-gold: 1px solid rgba(212, 175, 55, 0.28);
+  --frame-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.38);
+  --frame-shadow-hover: 0 6px 18px -6px rgba(0, 0, 0, 0.42);
 }
 
 /* [loop 915] DỤNG THẦN THEME — đổi accent màu theo Dụng Thần (mang lại may mắn) */
@@ -112,9 +114,8 @@ html, body { margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
   font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-  background:
-    radial-gradient(1100px 620px at 50% -12%, #211a2e 0%, var(--ink-black) 60%),
-    var(--ink-black);
+  /* Deep cohesive onyx (60-30-10) — no pure black */
+  background: var(--ink-black);
   color: var(--silk);
   min-height: 100dvh;
   line-height: 1.65;
@@ -125,53 +126,30 @@ body {
 .card-hidden { opacity: 0; transform: translateY(18px); }
 .card-visible { opacity: 1; transform: none; transition: opacity .4s var(--ease-out), transform .4s var(--ease-out); }
 
-/* [loop 532] Animated particle background — gold floating particles */
+/* Reduced particle noise — minimal, low opacity, no stacked dots (per research: less = more) */
 body::before {
   content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image:
-    radial-gradient(3px 3px at 20% 30%, rgba(212,175,55,0.25), transparent),
-    radial-gradient(2px 2px at 60% 70%, rgba(212,175,55,0.18), transparent),
-    radial-gradient(4px 4px at 80% 15%, rgba(192,57,43,0.12), transparent),
-    radial-gradient(2px 2px at 35% 85%, rgba(212,175,55,0.2), transparent),
-    radial-gradient(3px 3px at 90% 50%, rgba(212,175,55,0.15), transparent),
-    radial-gradient(2px 2px at 10% 60%, rgba(247,236,203,0.1), transparent),
-    radial-gradient(3px 3px at 50% 40%, rgba(212,175,55,0.15), transparent),
-    radial-gradient(2px 2px at 75% 90%, rgba(192,57,43,0.1), transparent);
-  background-size: 300px 300px;
-  animation: particleFloat 24s linear infinite;
-  opacity: 0.7;
+    radial-gradient(2px 2px at 25% 35%, rgba(212,175,55,0.06), transparent),
+    radial-gradient(1.5px 1.5px at 70% 65%, rgba(212,175,55,0.04), transparent);
+  background-size: 420px 420px;
+  animation: particleFloat 48s linear infinite;
+  opacity: 0.35;
 }
 @keyframes particleFloat {
   0% { background-position: 0 0; }
-  100% { background-position: 300px -300px; }
+  100% { background-position: 420px -420px; }
 }
 .zh { font-family: 'Noto Serif SC', serif; color: var(--gold-bright); font-weight: 600; }
 .hidden { display: none !important; }
 
-/* ===== LỚP BỐI CẢNH (huyền bí) ===== */
+/* ===== LỚP BỐI CẢNH — minimal, cohesive onyx only (reduce noise) ===== */
 .bg-glow {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background:
-    radial-gradient(620px 360px at 12% 88%, rgba(192, 57, 43, 0.12), transparent 70%),
-    radial-gradient(560px 320px at 88% 12%, rgba(212, 175, 55, 0.1), transparent 70%);
-  animation: glowDrift 24s ease-in-out infinite alternate;
+  background: radial-gradient(820px 480px at 50% 108%, rgba(192,57,43,0.04), transparent 62%);
+  animation: none;
 }
-.bg-clouds {
-  position: fixed; left: 50%; top: 52%; width: 1280px; height: 1280px;
-  margin: -640px 0 0 -640px; z-index: 0; pointer-events: none; opacity: 0.05;
-  background:
-    radial-gradient(circle, transparent 28%, rgba(212, 175, 55, 0.6) 28.4%, transparent 28.9%),
-    radial-gradient(circle, transparent 44%, rgba(212, 175, 55, 0.4) 44.4%, transparent 44.9%),
-    radial-gradient(circle, transparent 60%, rgba(192, 57, 43, 0.35) 60.4%, transparent 60.9%),
-    radial-gradient(circle, transparent 76%, rgba(212, 175, 55, 0.25) 76.4%, transparent 76.9%);
-  border-radius: 50%; filter: blur(0.6px);
-  animation: spin 220s linear infinite;
-}
-.bg-grain {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  opacity: 0.06; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
+.bg-clouds, .bg-grain { display: none; } /* removed layered noise per minimalism research */
 .mote-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
 /* ===== HERO ===== */
@@ -183,13 +161,13 @@ body::before {
 .kicker i:last-child { background: linear-gradient(90deg, var(--gold), transparent); }
 
 .hero-mandala { position: relative; width: 236px; height: 236px; margin: 0 auto 28px; filter: drop-shadow(0 6px 18px rgba(0,0,0,0.5)); }
-.bagua-ring { position: absolute; inset: 0; animation: spin 90s linear infinite; border: 1px solid rgba(212,175,55,0.12); border-radius: 50%; box-shadow: none; }
+.bagua-ring { position: absolute; inset: 0; animation: spin 90s linear infinite; border: 1px solid rgba(212,175,55,0.08); border-radius: 50%; box-shadow: none; }
 .bagua-ring.outer {
-  inset: -7px; border: 1px dashed rgba(212, 175, 55, 0.18); border-radius: 50%;
+  inset: -6px; border: 1px dashed rgba(212, 175, 55, 0.12); border-radius: 50%;
   animation: spin 140s linear infinite reverse;
 }
 .bagua-ring.outer::before {
-  content: ''; position: absolute; inset: 14px; border: 1px solid rgba(212, 175, 55, 0.08); border-radius: 50%;
+  content: ''; position: absolute; inset: 12px; border: 1px solid rgba(212, 175, 55, 0.05); border-radius: 50%;
 }
 .bagua-ring span {
   position: absolute; left: 50%; top: 50%;
@@ -198,9 +176,9 @@ body::before {
   text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
 .mandala-core {
-  position: absolute; inset: 40px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(192, 57, 43, 0.12), transparent 70%);
-  border: 1px solid rgba(212, 175, 55, 0.16);
+  position: absolute; inset: 38px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(192, 57, 43, 0.07), transparent 72%);
+  border: 1px solid rgba(212, 175, 55, 0.09);
   box-shadow: none;
 }
 .seal {
@@ -248,30 +226,31 @@ body::before {
 #result > .card:nth-child(4n+2) { border-top-color: rgba(46, 158, 107, 0.16); }
 #result > .card:nth-child(4n+3) { border-top-color: rgba(192, 57, 43, 0.16); }
 #result > .card:nth-child(4n+4) { border-top-color: rgba(74, 134, 208, 0.16); }
-.container { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; padding: 6px 18px 60px; }
-/* UNIFIED FRAME: .card — one disciplined surface (faint silk border, single light shadow, generous space) */
+.container { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; padding: 8px 18px 64px; }
+/* UNIFIED FRAME: .card — surface tint + THIN dark glass ONLY here (no heavy stack) */
 .card {
   position: relative;
-  background: linear-gradient(180deg, rgba(247,236,203,0.028) 0%, var(--panel-deep) 38%);
+  background: var(--surface-2);
   border: var(--frame-border);
   border-radius: var(--frame-radius);
   padding: var(--frame-pad);
-  margin-bottom: 16px;
-  backdrop-filter: blur(3px);
+  margin-bottom: 18px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   box-shadow: var(--frame-shadow);
   scroll-margin-top: 20px;
-  transition: transform .18s var(--ease-out), border-color .18s var(--ease-out);
+  transition: transform .16s var(--ease-out), border-color .16s var(--ease-out);
 }
-/* unified hover: translateY(-2px) + gold accent border ONLY for key frames */
+/* hover: single lift + gold ONLY on border for primary cards */
 .card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(212,175,55,0.32);
+  transform: translateY(-1px);
+  border-color: rgba(212,175,55,0.22);
   box-shadow: var(--frame-shadow-hover);
 }
 .card::before {
-  content: '玄'; position: absolute; right: 8px; bottom: -10px;
-  font-family: 'Ma Shan Zheng', serif; font-size: 108px; line-height: 1;
-  color: rgba(212, 175, 55, 0.035); pointer-events: none; z-index: 0;
+  content: '玄'; position: absolute; right: 10px; bottom: -8px;
+  font-family: 'Ma Shan Zheng', serif; font-size: 92px; line-height: 1;
+  color: rgba(212, 175, 55, 0.022); pointer-events: none; z-index: 0;
   text-shadow: none;
 }
 .card > * { position: relative; z-index: 1; }
@@ -287,13 +266,14 @@ body::before {
 .name-card::before { content: '名'; }
 .ai-card::before { content: '問'; }
 .form-card::before { content: '生'; }
-/* TYPO HIERARCHY — kicker → title (gold accent) → body → hint (disciplined, restrained) */
-.card-title { margin: 0 0 12px; font-size: 15.5px; font-weight: 600; color: var(--gold-pale); display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; letter-spacing: 0.15px; }
-.card-title::before { content: '◆'; color: var(--cinnabar); font-size: 8px; transform: translateY(-1px); }
-.card-title .zh { font-size: 12px; opacity: .65; font-weight: 500; }
+/* TYPO HIERARCHY RÕ — title bold+large (gold ONLY here), body ≥15px, hint small muted */
+.card-title { margin: 0 0 14px; font-size: 17px; font-weight: 700; color: var(--gold-pale); display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; letter-spacing: 0.1px; }
+.card-title::before { content: '◆'; color: var(--cinnabar); font-size: 9px; transform: translateY(-1px); }
+.card-title .zh { font-size: 12.5px; opacity: .6; font-weight: 500; }
 
-/* special cards keep subtle seal stamp but use unified frame (gold only on title/cta, not border flood) */
+/* special cards — same thin surface treatment, no extra gold borders */
 .verdict-card, .remedy-card, .qianli-card, .classic-card, .synthesis-card {
+  background: var(--surface-2);
   border: var(--frame-border);
   box-shadow: var(--frame-shadow);
 }
@@ -311,10 +291,10 @@ body::before {
 .form-card::after { content: none; }
 .birth-form { display: grid; grid-template-columns: 1.2fr 1fr 1.2fr auto; gap: 14px; align-items: end; }
 .field { display: flex; flex-direction: column; gap: 6px; }
-.field label { font-size: 11.5px; color: var(--silk-muted); letter-spacing: 0.4px; text-transform: uppercase; }
+.field label { font-size: 12px; color: var(--silk-muted); letter-spacing: 0.3px; text-transform: uppercase; }
 input[type="date"], input[type="time"], input[type="text"] {
-  background: rgba(0, 0, 0, 0.32); border: 1px solid rgba(212, 175, 55, 0.18);
-  color: var(--silk); padding: 10px 12px; border-radius: 4px; font-size: 14.5px;
+  background: var(--surface-1); border: 1px solid rgba(243,234,210,0.10);
+  color: var(--silk); padding: 11px 13px; border-radius: 6px; font-size: 15px;
   font-family: inherit; color-scheme: dark;
   transition: border-color .2s var(--ease-out), box-shadow .2s var(--ease-out);
 }
@@ -324,11 +304,10 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 }
 .seg { 
   display: flex; 
-  background: var(--glass); 
-  border: 1px solid var(--glass-border); 
+  background: var(--surface-1); 
+  border: 1px solid rgba(243,234,210,0.07); 
   border-radius: 6px; 
   overflow: hidden; 
-  box-shadow: inset 0 1px 0 rgba(247,236,203,0.04);
 }
 .seg input { display: none; }
 .seg label { 
@@ -358,25 +337,24 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.08); box-shadow: 0 10px 26px -6px rgba(192, 57, 43, 0.7), inset 0 1px 0 rgba(247, 236, 203, 0.3); }
 .btn-primary:hover::after { transform: translateX(130%); transition: transform .65s var(--ease-out); }
 .btn-primary:active { transform: translateY(0) scale(.98); }
-.hint { color: var(--silk-muted); font-size: 12.5px; margin: 10px 0 0; letter-spacing: 0.2px; }
+.hint { color: var(--silk-muted); font-size: 12.5px; margin: 12px 0 0; letter-spacing: 0.2px; opacity: 0.85; }
 
 /* ===== TỨ TRỤ (kiểu cột bia đá) ===== */
 .meta-line { color: var(--silk-muted); font-size: 13px; margin: -4px 0 12px; letter-spacing: 0.2px; }
 .pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .pillar {
   position: relative; overflow: hidden;
-  background: linear-gradient(180deg, #1e1828 0%, #0f0c16 100%);
-  border-top: 2px solid var(--gold); /* subtle gold top accent ONLY for pillars */
-  /* inherits unified frame from above selector */
+  background: var(--surface-1);
+  /* no default heavy gold top — gold only on active or titles */
 }
 .pillar:hover { z-index: 5; } /* keep minimal lift via unified rule */
-.pillar-head { text-align: center; padding: 7px 6px; font-size: 11.5px; color: var(--gold-pale); letter-spacing: 0.8px; border-bottom: 1px solid rgba(212, 175, 55, 0.14); }
-.pillar-yueling { border-top: 3px solid var(--gold-bright, var(--gold)); box-shadow: inset 0 1px 0 rgba(247,236,203,0.08), 0 0 12px rgba(212,175,55,0.15); }
+.pillar-head { text-align: center; padding: 8px 6px; font-size: 12px; color: var(--gold-pale); letter-spacing: 0.6px; border-bottom: 1px solid rgba(243,234,210,0.08); }
+.pillar-yueling { border-top: 2px solid var(--gold); }
 .yueling-tag { display: inline-block; margin-left: 4px; font-size: 9px; font-weight: 700; color: var(--gold-bright, var(--gold)); background: rgba(212,175,55,0.22); padding: 1px 5px; border-radius: 8px; letter-spacing: 0; }
 .gz { text-align: center; padding: 12px 6px; }
 .gz .han { font-family: 'Noto Serif SC', serif; font-size: 40px; font-weight: 700; line-height: 1.05; text-shadow: 0 0 22px currentColor, 0 0 4px rgba(0, 0, 0, 0.6); }
-.gz .vi { font-size: 12.5px; color: var(--silk-dim); }
-.gz .god { font-size: 11.5px; margin-top: 3px; color: var(--gold-bright); }
+.gz .vi { font-size: 13px; color: var(--silk-dim); }
+.gz .god { font-size: 12px; margin-top: 3px; color: var(--gold-bright); }
 .gz.zhi { border-top: 1px dashed rgba(212, 175, 55, 0.14); }
 .pillar-foot { font-size: 11.5px; color: var(--silk-muted); padding: 9px 10px; border-top: 1px solid rgba(212, 175, 55, 0.1); background: rgba(0, 0, 0, 0.18); }
 .pillar-foot b { color: var(--silk); font-weight: 500; }
@@ -404,25 +382,24 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 /* ===== VERDICT ===== */
 .verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .verdict-card .verdict { padding-top: 4px; }
-/* UNIFIED FRAME: sub-tiles/panels/tools — all share exact same frame treatment as .card (restraint: 1 shadow layer, faint default border, NO heavy glass) */
+/* UNIFIED SUB-SURFACES — surface-1/2 + minimal border, NO glass, NO stacked shadow (reduce noise) */
 .v-box, .pillar, .dy, .ln, .lm-cell, .ss, .lq, .tier, .law, .ql-step, .zr-item, .ly-school, .zh-col, .factor, .sp-item, .tool, .dt-seg,
 .bh-cell, .qm-cell, .sf-cell, .pa-cell, .xlr-stage, .xlr-final, .mh-ti, .mh-yong, .zw-cell, .zw-dx, .lr-ke, .lr-tj, .hl-yi, .hl-ji,
 .yz-row, .suggest-chip, .chat-suggest, .capsule-spark, #capsule-spark,
 .card-search {
-  background: linear-gradient(180deg, rgba(247,236,203,0.018) 0%, rgba(0,0,0,0.22) 42%);
+  background: var(--surface-1);
   border: var(--frame-border);
   border-radius: var(--frame-radius-sm);
   box-shadow: var(--frame-shadow);
-  transition: transform .16s var(--ease-out), border-color .16s var(--ease-out);
+  transition: transform .14s var(--ease-out), border-color .14s var(--ease-out);
 }
-.v-box { padding: 12px 14px; }
+.v-box { padding: 13px 15px; }
 .v-box:hover, .tool:hover, .zr-item:hover, .pillar:hover, .dy:hover, .ln:hover, .lm-cell:hover, .ss:hover, .lq:hover, .tier:hover, .law:hover, .ql-step:hover, .ly-school:hover, .zh-col:hover, .factor:hover, .sp-item:hover, .dt-seg:hover {
-  transform: translateY(-2px);
-  border-color: rgba(212,175,55,0.32);
-  box-shadow: var(--frame-shadow-hover);
+  transform: translateY(-1px);
+  border-color: rgba(212,175,55,0.18);
 }
-.v-box .v-label { font-size: 11px; color: var(--silk-muted); letter-spacing: 0.4px; text-transform: uppercase; }
-.v-box .v-value { font-size: 21px; font-weight: 700; margin-top: 3px; color: var(--gold-pale); font-variant-numeric: tabular-nums; }
+.v-box .v-label { font-size: 11.5px; color: var(--silk-muted); letter-spacing: 0.3px; text-transform: uppercase; }
+.v-box .v-value { font-size: 20px; font-weight: 700; margin-top: 2px; color: var(--gold-pale); font-variant-numeric: tabular-nums; }
 .v-box.full { grid-column: 1 / -1; }
 .v-box .reasons { margin: 9px 0 0; padding-left: 16px; font-size: 13.5px; color: var(--silk-dim); }
 .v-box .reasons li { margin-bottom: 5px; }
@@ -556,39 +533,38 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 
 /* TABS — treated as frame controls (unified radius/border logic, gold ONLY on active) */
 .tabs { 
-  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; 
-  padding: 3px; 
-  background: rgba(0,0,0,0.18);
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; 
+  padding: 4px; 
+  background: var(--surface-1);
   border: var(--frame-border);
   border-radius: var(--frame-radius);
 }
 .tab { 
-  background: rgba(0,0,0,0.32); 
-  border: 1px solid rgba(243,234,210,0.08);
+  background: transparent; 
+  border: 1px solid rgba(243,234,210,0.06);
   color: var(--silk-muted);
-  padding: 6px 13px; 
+  padding: 7px 14px; 
   border-radius: var(--frame-radius-sm); 
   cursor: pointer; 
-  font-size: 12.5px; 
+  font-size: 13px; 
   font-family: inherit; 
-  transition: transform .16s var(--ease-out), border-color .16s, background .16s;
+  transition: transform .14s var(--ease-out), border-color .14s, background .14s;
 }
 .tab:hover { 
   color: var(--gold-pale); 
-  transform: translateY(-1px);
-  border-color: rgba(212,175,55,0.28);
+  border-color: rgba(212,175,55,0.18);
 }
 .tab:active { transform: scale(.985); }
 .tab.active { 
-  background: linear-gradient(145deg, var(--gold-bright), var(--gold)); 
+  background: var(--gold); 
   color: var(--cinnabar-deep); 
   font-weight: 700; 
-  border: 1px solid var(--gold-bright);
+  border-color: var(--gold);
   transform: none;
 }
 .tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.topic-body h3 { margin: 0 0 10px; color: var(--gold-bright); font-size: 16px; }
-.topic-body p { margin: 0 0 10px; font-size: 14px; color: var(--silk-dim); }
+.topic-body h3 { margin: 0 0 12px; color: var(--gold-pale); font-size: 16px; font-weight: 600; }
+.topic-body p { margin: 0 0 11px; font-size: 15px; color: var(--silk-dim); line-height: 1.6; }
 .topic-body p:last-child { margin-bottom: 0; }
 
 /* ===== ASK ===== */
@@ -654,7 +630,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .ql-source a { color: var(--gold-bright); }
 
 /* ===== LUẬN VẬN NĂM / TOOLS / THÁI TUẾ / TÊN ===== */
-.lyear-card, .tools-card, .ts-card, .name-card { border-color: rgba(212, 175, 55, 0.32); }
+.lyear-card, .tools-card, .ts-card, .name-card { border-color: var(--frame-border); }
 .lyear-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
 .lyear-row input { width: 100px; background: rgba(0,0,0,0.32); border: 1px solid rgba(212, 175, 55, 0.18); color: var(--silk); padding: 8px 10px; border-radius: 4px; font-size: 14px; font-family: inherit; color-scheme: dark; }
 .ly-head { font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--silk-dim); }
@@ -953,7 +929,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .modal-mask { position: fixed; inset: 0; z-index: 100; background: rgba(5, 4, 10, 0.72); display: grid; place-items: center; padding: 20px; backdrop-filter: blur(6px); }
 .modal-mask:not(.hidden) { animation: maskIn .2s ease both; }
 .modal-mask:not(.hidden) .modal { animation: modalIn .34s var(--ease-spring) both; }
-.modal { position: relative; background: linear-gradient(180deg, var(--lacquer), var(--ink)); border: 1px solid var(--hairline); border-radius: 6px; padding: 24px; max-width: 460px; width: 100%; max-height: calc(100dvh - 40px); overflow-y: auto; -webkit-overflow-scrolling: touch; box-shadow: 0 24px 70px rgba(0,0,0,0.65), inset 0 1px 0 rgba(247,236,203,0.06); }
+.modal { position: relative; background: var(--surface-3); border: 1px solid var(--frame-border); border-radius: 8px; padding: 22px; max-width: 460px; width: 100%; max-height: calc(100dvh - 40px); overflow-y: auto; -webkit-overflow-scrolling: touch; box-shadow: var(--frame-shadow); }
 .modal::before { content:''; position:absolute; left:22px; right:22px; top:0; height:2px; background: linear-gradient(90deg, transparent, var(--cinnabar), var(--gold), var(--cinnabar), transparent); opacity:.6; }
 .modal h3 { margin: 0 0 8px; font-size: 18px; color: var(--gold-bright); }
 .modal-hint { color: var(--silk-muted); font-size: 12.5px; line-height: 1.6; margin: 0 0 16px; }
@@ -970,11 +946,11 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .modal-actions .btn-primary { padding: 10px 18px; height: auto; }
 
 @media (max-width: 760px) {
-  .hero { padding: 32px 14px 18px; }
-  .hero-mandala { width: 178px; height: 178px; }
-  .bagua-ring span { transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg)) translateY(-80px); font-size: 17px; }
-  .seal { width: 68px; height: 68px; font-size: 40px; }
-  .birth-form { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .hero { padding: 28px 12px 16px; }
+  .hero-mandala { width: 172px; height: 172px; }
+  .bagua-ring span { transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg)) translateY(-76px); font-size: 16px; }
+  .seal { width: 64px; height: 64px; font-size: 38px; }
+  .birth-form { grid-template-columns: 1fr 1fr; gap: 11px; }
   .btn-primary { grid-column: 1 / -1; }
   .pillars { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .verdict { grid-template-columns: 1fr; }
@@ -982,20 +958,21 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
   .liunian { grid-template-columns: repeat(5, 1fr); gap: 4px; }
   .shensha { grid-template-columns: 1fr 1fr; }
   .msg-user, .msg-assistant { max-width: 95%; }
-  .card { padding: 16px 15px 14px; margin-bottom: 14px; }
-  .container { padding: 2px 12px 56px; }
+  .card { padding: 16px 14px 13px; margin-bottom: 14px; }
+  .container { padding: 4px 11px 54px; }
 }
-/* 390px mobile-first perfection — tight but premium, no breakage */
+/* 390px mobile-first — generous breathing, no cramped, premium restraint */
 @media (max-width: 390px) {
-  .hero { padding: 26px 12px 14px; }
-  .hero-mandala { width: 162px; height: 162px; }
-  .kicker { font-size: 10px; letter-spacing: 3.5px; gap: 10px; margin-bottom: 14px; }
-  .card { padding: 12px 12px 10px; margin-bottom: 10px; border-radius: var(--frame-radius); }
-  .card-title { font-size: 15.5px; margin-bottom: 10px; }
-  .gz .han { font-size: 36px; }
-  .birth-form { gap: 10px; }
-  .dayun, .liunian { gap: 4px; }
-  .container { padding-left: 10px; padding-right: 10px; padding-bottom: 52px; }
+  .hero { padding: 22px 10px 12px; }
+  .hero-mandala { width: 156px; height: 156px; }
+  .kicker { font-size: 9.5px; letter-spacing: 3px; gap: 8px; margin-bottom: 11px; }
+  .card { padding: 15px 13px 12px; margin-bottom: 12px; }
+  .card-title { font-size: 16px; margin-bottom: 11px; }
+  .gz .han { font-size: 34px; }
+  .birth-form { gap: 9px; }
+  .dayun, .liunian { gap: 5px; }
+  .container { padding-left: 10px; padding-right: 10px; padding-bottom: 50px; }
+  .v-box { padding: 11px 12px; }
 }
 
 /* ============================================================
@@ -1389,9 +1366,9 @@ html{scroll-behavior:smooth}
   position:fixed; right:22px; bottom:22px; z-index:70;
   width:min(400px,calc(100vw - 32px)); height:min(560px,calc(100dvh - 44px));
   display:flex; flex-direction:column;
-  background:linear-gradient(180deg,rgba(21,18,30,.98),rgba(10,9,19,.99));
-  border:1px solid var(--gold,#d4af37); border-radius:16px; overflow:hidden;
-  box-shadow:0 24px 60px rgba(0,0,0,.7), 0 0 30px rgba(212,175,55,.18);
+  background:var(--surface-3);
+  border:1px solid var(--frame-border); border-radius:12px; overflow:hidden;
+  box-shadow:var(--frame-shadow);
   animation:aiPopIn .28s var(--ease-spring) both;
 }
 @keyframes aiPopIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
@@ -1692,10 +1669,10 @@ html{scroll-behavior:smooth}
    Glass morphism + shimmer + glow + gradient text + loading states
    ============================================================ */
 
-/* --- Glass morphism cards --- */
+/* Thin glass only on main cards (already set in .card rule) — override late heavy */
 .card {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 .card:hover {
   box-shadow:
@@ -1705,13 +1682,11 @@ html{scroll-behavior:smooth}
     0 0 35px -12px rgba(212, 175, 55, 0.08);
 }
 
-/* --- Gradient gold text for card titles --- */
+/* Card title — clean gold accent (sparing, not gradient flood) */
 .card-title {
-  background: linear-gradient(135deg, var(--gold-pale) 0%, var(--gold) 50%, var(--gold-bright) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-fill-color: transparent;
+  color: var(--gold-pale);
+  background: none;
+  -webkit-text-fill-color: unset;
 }
 
 /* --- Wuxing bar shimmer sweep --- */
@@ -2180,7 +2155,7 @@ header { animation-delay: 0ms; }
   position: sticky; top: 0; z-index: 200;
   background: linear-gradient(180deg, rgba(10,9,19,0.96), rgba(15,13,26,0.94));
   border-bottom: 1px solid rgba(212,175,55,0.12);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(3px);
   font-size: 11px;
 }
 .lab-bar-inner {
@@ -2242,55 +2217,52 @@ input:focus, select:focus {
 .btn-primary:hover { filter: brightness(1.08) saturate(1.05); transform: translateY(-1px); }
 .btn-primary:active { transform: translateY(0); }
 
-/* Elevated cards — deeper glass, more sophisticated edges (lab specimen cards) */
+/* Late overrides — enforce minimal surface + single light shadow + restrained gold */
 .card {
-  padding: 22px 22px 19px;
-  border: 1px solid var(--hairline);
+  padding: var(--frame-pad);
+  border: var(--frame-border);
   box-shadow: var(--frame-shadow);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 .card:hover {
-  transform: translateY(-2px); border-color: rgba(212,175,55,0.32);
-  box-shadow: var(--frame-shadow);
+  transform: translateY(-1px); border-color: rgba(212,175,55,0.22);
 }
-/* re-assert unified frame + light hover (later overrides neutralized) */
 .card, .pillar, .v-box, .dy, .ln, .tool { box-shadow: var(--frame-shadow); border-radius: var(--frame-radius); }
-.card:hover, .pillar:hover { transform: translateY(-2px); border-color: rgba(212,175,55,0.32); }
-.pillars { gap: 12px; }
-.pillar { border-top: 2px solid var(--gold); }
-.card::before { opacity: 0.028; font-size: 92px; right: 9px; bottom: -8px; }
-.pillar-head { padding: 8px 6px; font-size: 10.5px; letter-spacing: 1px; }
-.gz .han { font-size: 42px; text-shadow: 0 0 26px currentColor, 0 0 6px rgba(0,0,0,0.75); }
-.pillar-foot { padding: 8px 10px; font-size: 11px; }
+.card:hover, .pillar:hover { transform: translateY(-1px); border-color: rgba(212,175,55,0.18); }
+.pillars { gap: 11px; }
+.pillar { border-top: none; }
+.card::before { opacity: 0.022; font-size: 88px; }
+.pillar-head { padding: 8px 6px; font-size: 11.5px; letter-spacing: 0.5px; }
+.gz .han { font-size: 40px; text-shadow: 0 0 18px currentColor, 0 0 4px rgba(0,0,0,0.6); }
+.pillar-foot { padding: 9px 10px; font-size: 11px; }
 
-/* Wuxing bars refinement */
-.wx-row { padding: 5px 8px; }
-.wx-track { height: 13px; background: rgba(0,0,0,0.42); }
-.wx-fill { filter: drop-shadow(0 0 4px rgba(255,255,255,0.18)); }
+/* Wuxing bars clean */
+.wx-row { padding: 6px 7px; }
+.wx-track { height: 14px; background: rgba(0,0,0,0.38); }
 
-/* Quick nav & search — command palette / lab filter */
+/* Quick nav & search — clean */
 .quick-nav {
   padding: 5px 6px;
-  background: linear-gradient(180deg, rgba(10,9,19,0.98), rgba(15,13,26,0.95));
-  border: 1px solid rgba(212,175,55,0.16);
+  background: var(--surface-1);
+  border: var(--frame-border);
 }
 .quick-nav a {
-  font-size: 10px; padding: 2px 8px;
-  border: 1px solid rgba(212,175,55,0.1);
+  font-size: 10.5px; padding: 3px 9px;
+  border: 1px solid rgba(212,175,55,0.08);
 }
 .card-search {
-  max-width: 560px; padding: 8px 14px; font-size: 12px;
-  background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.18);
+  max-width: 520px; padding: 9px 13px; font-size: 13px;
+  background: var(--surface-1); border: 1px solid rgba(243,234,210,0.09);
   border-radius: 6px;
 }
 .card-search:focus {
-  border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.1);
+  border-color: var(--gold); box-shadow: 0 0 0 2px rgba(212,175,55,0.09);
 }
 
-/* grp section labels — architectural */
+/* grp — restrained */
 .grp {
-  font-size: 11px; letter-spacing: 2.5px; color: var(--gold); opacity: .75;
-  margin: 22px 0 8px; text-transform: uppercase;
+  font-size: 12px; letter-spacing: 1.5px; color: var(--gold-pale); opacity: .88;
+  margin: 20px 0 10px;
 }
 
 /* Subtle lab data polish */
@@ -2301,15 +2273,12 @@ button:focus-visible, .lab-btn:focus-visible {
   outline: 2px solid rgba(212,175,55,0.65); outline-offset: 1px;
 }
 
-/* Mobile refinements */
+/* Mobile refinements (390px priority) */
 @media (max-width: 640px) {
-  .lab-bar-inner { padding: 5px 12px; }
-  .lab-name { font-size: 11px; }
-  .hero { padding-top: 8px; }
-  .hero-mandala { width: 176px; height: 176px; margin-bottom: 16px; }
+  .hero-mandala { width: 168px; height: 168px; margin-bottom: 14px; }
   .birth-form { grid-template-columns: 1fr 1fr; }
   .btn-primary { grid-column: 1 / -1; }
-  .card { padding: 18px 16px 15px; }
+  .card { padding: 15px 13px 12px; }
   .pillars { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .verdict { grid-template-columns: 1fr; }
 }
