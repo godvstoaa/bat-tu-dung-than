@@ -1406,7 +1406,18 @@ html{scroll-behavior:smooth}
 .ai-popup .ask{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--hairline);background:rgba(0,0,0,.25)}
 .ai-popup .ask input{flex:1;padding:9px 12px;background:rgba(0,0,0,.35);color:var(--silk,#f3ead2);border:1px solid var(--hairline);border-radius:10px;font-size:13.5px}
 .ai-popup-hint{padding:6px 14px 10px;font-size:10.5px;color:var(--silk-muted,#948864);margin:0;line-height:1.4}
-@media(max-width:560px){.ai-fab{right:14px;bottom:14px;padding:11px 14px}.ai-popup{right:8px;bottom:8px;left:8px;width:auto}}
+@media(max-width:560px){
+  .ai-fab{right:14px;bottom:14px;padding:11px 14px}
+  /* [user] popup full-height trên mobile + slim chrome → chat-log (đọc Luận giải) tối đa */
+  .ai-popup{right:8px;bottom:8px;left:8px;top:8px;width:auto;height:auto;max-height:none;border-radius:14px}
+  .ai-popup .ai-status{display:none}
+  .ai-popup-hint{display:none}
+  .ai-popup-head{padding:9px 12px}
+  .ai-popup-title{font-size:13.5px}
+  .ai-style-bar{padding:4px 10px}
+  .ai-popup .ask{padding:8px 10px}
+  .ai-popup .chat-log{padding:10px 12px;gap:9px}
+}
 /* [loop 1372] AI style selector — segmented control (Gần gũi / Cân bằng / Chuyên gia) */
 .ai-style-bar{display:flex;align-items:center;gap:8px;padding:5px 12px;border-top:1px solid var(--silk-line,rgba(212,175,55,.12));flex-wrap:wrap;background:rgba(0,0,0,.15)}
 .ai-style-label{font-size:10.5px;color:var(--silk-muted,#948864);white-space:nowrap;letter-spacing:.3px}
