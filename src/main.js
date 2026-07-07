@@ -117,6 +117,7 @@ import { analyzeTaohua } from './engine/taohua.js';
 import { buildRemedy } from './engine/remedy.js';
 import { wuTai } from './engine/tonggen.js';
 import { dailyGuide } from './engine/daily-guide.js';
+import { todayEnergy } from './engine/today.js'; // [plan #6] birth-free "vận thế hôm nay" hero
 import { dailyDirections } from './engine/daily-directions.js';
 import { personalFengShui } from './engine/family-sync.js';
 import { strength3Fa } from './engine/strength-3fa.js';
@@ -513,6 +514,29 @@ function renderSynthesis(R) {
     })()}`;
 }
 
+// [plan #4] NGŨ HÀNH tap-to-explore — fixed sinh/khắc cycle + role advice.
+//   Lets users tap any element row → see meaning, sinh/khắc relations, and a
+//   personal hint based on Dụng/Hỷ/Kỵ/Thù. Turns the static chart into a
+//   discovery surface. Pure data, no deps.
+const WX_CYCLE = {
+  '木': { sinh: '火', bySinh: '水', khac: '土', byKhac: '金' },
+  '火': { sinh: '土', bySinh: '木', khac: '金', byKhac: '水' },
+  '土': { sinh: '金', bySinh: '火', khac: '水', byKhac: '木' },
+  '金': { sinh: '水', bySinh: '土', khac: '木', byKhac: '火' },
+  '水': { sinh: '木', bySinh: '金', khac: '火', byKhac: '土' },
+};
+const WX_VI_X = { '木': 'Mộc', '火': 'Hỏa', '土': 'Thổ', '金': 'Kim', '水': 'Thủy' };
+const WX_COLOR_X = { '木': '#4a8', '火': '#e54', '土': '#da3', '金': '#aaa', '水': '#369' };
+const WX_ROLE_MEANING = {
+  dung: 'Hành mệnh bạn THIẾU — cần BỔ (màu, phương vị, nghề, năm vận trúng). Bổ nó → vận thông suốt, quý nhân đến.',
+  hy:   'Hành phò trợ Dụng Thần — cùng bồi thì hiệu quả tăng, giữ được cân bằng.',
+  ky:   'Hành làm mệnh nặng / nhiễm — nên TRÁNH / HẠ (giảm màu, phương, vật phẩm hành này).',
+  thu:  'Hành khắc hại Dụng Thần — hạn chế tối đa khi chọn màu / hướng / vận.',
+  '':   'Trung tính trong mệnh — không gấp phải bồi cũng không hại. Quan trọng là cân bằng tổng thể.',
+};
+// tiny DOM helper → explore panel/hint built without innerHTML (sanitizer-hook safe; data is internal anyway)
+const _wxE = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+
 // ---------------------------------------------------------------- NGŨ HÀNH
 function renderWuXing(wx, yong) {
   const max = Math.max(...Object.values(wx.pct));
@@ -552,7 +576,7 @@ function renderWuXing(wx, yong) {
       const tagColor = fav.has(p.w) ? '#2e9e5b' : avoid.has(p.w) ? '#e0533d' : '#948864';
       return `<text x="${p.labelX.toFixed(1)}" y="${p.labelY.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${colors[p.w]}" font-weight="bold">${p.w}${p.pct}%</text>${tag ? `<text x="${p.labelX.toFixed(1)}" y="${(p.labelY + 11).toFixed(1)}" text-anchor="middle" font-size="7" fill="${tagColor}">${tag}</text>` : ''}`;
     }).join('');
-    return `<div style="text-align:center;margin:8px 0"><svg width="180" height="180" viewBox="0 0 160 160" style="max-width:100%;height:auto">${gridPoly}${axes}<polygon points="${polyPts}" fill="rgba(212,175,55,0.15)" stroke="rgba(212,175,55,0.6)" stroke-width="1.5"/>${pts.map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.5" fill="${colors[p.w]}"/>`).join('')}${labels}</svg></div>`;
+    return `<div style="text-align:center;margin:8px 0"><svg width="180" height="180" viewBox="0 0 160 160" style="max-width:100%;height:auto">${gridPoly}${axes}<polygon class="wx-radar-poly" points="${polyPts}" fill="rgba(212,175,55,0.15)" stroke="rgba(212,175,55,0.6)" stroke-width="1.5"/>${pts.map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.5" fill="${colors[p.w]}"/>`).join('')}${labels}</svg></div>`;
   })() + ['木', '火', '土', '金', '水'].map((w) => {
     const pct = wx.pct[w];
     const width = max > 0 ? (pct / max) * 100 : 0;
@@ -560,8 +584,10 @@ function renderWuXing(wx, yong) {
     const tagColor = fav.has(w) ? '#2e9e5b' : avoid.has(w) ? '#e0533d' : '';
     const wt = monthWx ? wuTai(w, monthWx) : '';
     const wtBadge = wt ? `<span style="color:${WT_COLOR[wt]||'#888'};font-size:10px;border:1px solid ${WT_COLOR[wt]||'#888'};border-radius:3px;padding:0 3px;margin-left:3px">${WT_VI[wt]||wt}</span>` : '';
+    // [plan #4] role for tap-to-explore (dung/hy/ky/thu/neutral) baked into data-role
+    const rk = w === yong?.primary ? 'dung' : w === yong?.xi ? 'hy' : w === yong?.ji ? 'ky' : w === yong?.chou ? 'thu' : '';
     return `
-      <div class="wx-row">
+      <div class="wx-row wx-row-tap" data-wx="${w}" data-pct="${pct}" data-role="${rk}" role="button" tabindex="0" aria-label="Xem ý nghĩa hành ${WX_VI[w]}">
         <div class="wx-name"><span class="dot" style="background:${WX_COLOR[w]}"></span>${w} ${WX_VI[w]}${tag ? ` <span style="color:${tagColor};font-weight:700;font-size:11px">${tag}</span>` : ''}${wtBadge}</div>
         <div class="wx-track"><div class="wx-fill" style="width:${width}%;background:${WX_COLOR[w]}"></div></div>
         <div class="wx-pct">${pct}%</div>
@@ -578,7 +604,56 @@ function renderWuXing(wx, yong) {
     }).join('');
     return `<details class="syn-factors" style="margin-top:8px"><summary>Chi tiết nguồn lực (${det.length} nguồn)</summary>${rows}</details>`;
   })();
+  // [plan #4] append tap-to-explore panel via DOM (sanitizer-hook safe; rebuilt each render)
+  const _exp = document.createElement('div');
+  _exp.id = 'wx-explore'; _exp.className = 'wx-explore'; _exp.setAttribute('aria-live', 'polite');
+  const _h = _wxE('p', 'hint'); _h.style.margin = '6px 0';
+  _h.appendChild(document.createTextNode('👆 '));
+  _h.appendChild(_wxE('b', null, 'Chạm một hành'));
+  _h.appendChild(document.createTextNode(' để xem ý nghĩa, quan hệ '));
+  _h.appendChild(_wxE('i', null, 'sinh-khắc'));
+  _h.appendChild(document.createTextNode(' & lời khuyên riêng cho mệnh bạn.'));
+  _exp.appendChild(_h);
+  $('wuxing').appendChild(_exp);
 }
+
+// [plan #4] Ngũ hành tap-to-explore — delegation on #wuxing (stable parent; survives innerHTML re-renders).
+(function () {
+  const box = $('wuxing');
+  if (!box) return;
+  const ROLE_LABEL = { dung: 'Dụng Thần', hy: 'Hỷ Thần', ky: 'Kỵ Thần', thu: 'Thù Thần', '': 'Trung tính' };
+  const ROLE_CLS   = { dung: 'rate-good', hy: 'rate-good', ky: 'rate-hung', thu: 'rate-hung', '': 'rate-mid' };
+  const fill = (row) => {
+    const w = row.dataset.wx, pct = row.dataset.pct, role = row.dataset.role || '';
+    const c = WX_CYCLE[w]; if (!c) return;
+    const pan = $('wx-explore'); if (!pan) return;
+    pan.textContent = ''; // clear previous (hook-safe)
+    const head = _wxE('div', 'wx-exp-head');
+    const zh = _wxE('span', 'zh', w); zh.style.color = WX_COLOR_X[w]; head.appendChild(zh);
+    head.appendChild(document.createTextNode(' '));
+    head.appendChild(_wxE('b', null, WX_VI_X[w]));
+    head.appendChild(document.createTextNode(' · ' + pct + '% '));
+    head.appendChild(_wxE('span', 'ln-rate ' + (ROLE_CLS[role] || 'rate-mid'), ROLE_LABEL[role] || 'Trung tính'));
+    pan.appendChild(head);
+    const rel = _wxE('div', 'wx-exp-rel');
+    const seg = (pre, v) => { rel.appendChild(document.createTextNode(pre)); rel.appendChild(_wxE('b', null, v)); };
+    seg('Sinh ra: ', WX_VI_X[c.sinh] + ' (' + c.sinh + ')');
+    seg(' · Được sinh bởi: ', WX_VI_X[c.bySinh] + ' (' + c.bySinh + ')');
+    rel.appendChild(document.createElement('br'));
+    seg('Khắc: ', WX_VI_X[c.khac] + ' (' + c.khac + ')');
+    seg(' · Bị khắc bởi: ', WX_VI_X[c.byKhac] + ' (' + c.byKhac + ')');
+    pan.appendChild(rel);
+    pan.appendChild(_wxE('p', 'wx-exp-mean', WX_ROLE_MEANING[role]));
+    box.querySelectorAll('.wx-row-sel').forEach((r) => r.classList.remove('wx-row-sel'));
+    row.classList.add('wx-row-sel');
+  };
+  box.addEventListener('click', (e) => { const r = e.target.closest && e.target.closest('.wx-row-tap'); if (r && box.contains(r)) fill(r); });
+  box.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const r = e.target.closest && e.target.closest('.wx-row-tap');
+    if (r && box.contains(r)) { e.preventDefault(); fill(r); }
+  });
+})();
 
 // ---------------------------------------------------------------- HỘI – HỢP – XUNG
 function renderInteractions(R) {
@@ -883,6 +958,43 @@ function renderDailyBriefing(R) {
       ${b.yearEvent.god !== '?' ? `<p class="hint" style="margin:4px 0"><b>📆 Lưu niên ${new Date().getFullYear()}:</b> sao ${b.yearEvent.god}${b.yearEvent.event ? ' → ' + b.yearEvent.event : ''}${b.yearEvent.who ? ' (' + b.yearEvent.who + ')' : ''}</p>` : ''}
       <div style="margin-top:6px">${b.tips.map((t) => `<p class="hint" style="margin:2px 0">▸ ${esc(t)}</p>`).join('')}</div>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được每日简报.</p>'; }
+}
+
+// [plan #6] VẬN THẾ HÔM NAY — birth-free landing hook (deterministic, instant, no AI).
+//   Drives discovery: first-time visitors see today's energy → enter birth → unlocks
+//   the existing personalized daily (renderDailyBriefing / renderDailyCapsule).
+function renderTodayHero() {
+  const hero = document.querySelector('.hero');
+  if (!hero || $('today-hero')) return; // missing hero or already injected
+  let e; try { e = todayEnergy(); } catch (_) { return; } // fail silent → no card (graceful)
+  if (!e || !e.ganZhi) return;
+  const card = document.createElement('div');
+  card.id = 'today-hero'; card.className = 'today-hero tone-' + e.tone;
+
+  const head = _wxE('div', 'th-head');
+  head.appendChild(_wxE('span', 'th-title', '🌤 Vận thế hôm nay'));
+  head.appendChild(_wxE('span', 'th-date', e.dateVi + (e.lunarVi ? ' · ÂL ' + e.lunarVi : '')));
+  head.appendChild(_wxE('span', 'ln-rate ' + (e.tone === 'cat' ? 'rate-cat' : e.tone === 'hung' ? 'rate-hung' : 'rate-mid'), e.toneVi));
+  card.appendChild(head);
+
+  const core = _wxE('div', 'th-core');
+  core.appendChild(_wxE('span', 'th-gz zh', e.ganZhi));
+  core.appendChild(_wxE('span', 'th-gzvi', e.ganZhiVi));
+  const wx = _wxE('span', 'th-wx'); wx.style.color = e.wxColor; wx.textContent = '· hành ' + e.wxVi; core.appendChild(wx);
+  core.appendChild(_wxE('span', 'th-officer', 'trực ' + e.officerVi));
+  card.appendChild(core);
+
+  card.appendChild(_wxE('p', 'th-liner', e.oneLiner));
+
+  const grid = _wxE('div', 'th-grid');
+  const cell = (b, t) => { const c = _wxE('div', 'th-cell'); c.appendChild(_wxE('b', null, b)); c.appendChild(document.createTextNode(' ' + t)); return c; };
+  grid.appendChild(cell('✓ 宜', e.yi.length ? e.yi.join(', ') : '—'));
+  grid.appendChild(cell('✗ Kỵ', e.ji.length ? e.ji.join(', ') : '—'));
+  grid.appendChild(cell('🧭 Hướng tài', e.caiDir));
+  card.appendChild(grid);
+
+  card.appendChild(_wxE('p', 'th-cta', '↓ Nhập ngày sinh bên dưới rồi bấm «Luận giải» để xem vận RIÊNG của bạn.'));
+  hero.parentNode.insertBefore(card, hero.nextSibling);
 }
 
 // ---------------------------------------------------------------- 称骨算命 (BONE-WEIGHT DIVINATION)
@@ -5459,6 +5571,7 @@ if ($('jk-btn')) {
 }
 $('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run(); });
 $('ask-btn').addEventListener('click', handleAsk);
+try { renderTodayHero(); } catch (e) { console.warn('todayHero', e.message); } // [plan #6] landing hook (once, on load)
 $('question').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAsk(); });
 // [loop 1372] AI style selector — Gần gũi / Cân bằng / Chuyên gia (per-user, localStorage)
 function getAIStyle() {

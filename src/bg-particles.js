@@ -7,7 +7,7 @@
 //  Perf: capped count, simple shapes, pauses on tab-hidden + prefers-reduced-motion.
 // ============================================================================
 let canvas, ctx, raf = null, particles = [], currentTheme = null, W = 0, H = 0, dpr = 1;
-let lastT = 0, reduced = false, observer = null;
+let lastT = 0, reduced = false, observer = null, scrollY = 0, viewOY = 0;
 
 const RAND = (a, b) => a + Math.random() * (b - a);
 
@@ -89,8 +89,14 @@ function tick(t) {
   raf = requestAnimationFrame(tick);
   const dt = lastT ? Math.min((t - lastT) / 16.67, 2.5) : 1;
   lastT = t;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // reset each frame (parallax translate must not accumulate)
   ctx.clearRect(0, 0, W, H);
   if (!currentTheme) return;
+  // Parallax depth: field drifts subtly with scroll (Active-Theory "space"). Capped ±20px
+  // + eased so it never reveals edges or causes nausea; effectively off under reduced-motion.
+  const targetOY = Math.max(-20, Math.min(20, -scrollY * 0.015));
+  viewOY += (targetOY - viewOY) * 0.1;
+  if (viewOY) ctx.translate(0, viewOY);
   const f = FACTORIES[currentTheme];
   for (let i = 0; i < particles.length; i++) {
     const p = particles[i];
@@ -166,6 +172,9 @@ const DRAW = {
     ctx.fillStyle = `hsla(${p.hue}, 45%, 55%, ${a})`;
     ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.2832); ctx.fill();
   },
+  // default — gold rising motes, additive radial glow (no shadowBlur = mobile-friendly).
+  //   shadowBlur per-frame was a perf killer on low-end Android; radialGradient matches
+  //   火/金 pattern (consistent glow) while costing less. Default theme = first-load bg.
   default: (p, dt) => {
     p.x += p.vx * dt; p.y += p.vy * dt; p.a += p.tw * dt;
     if (p.y < -10) p.y = H + 10;
@@ -175,10 +184,13 @@ const DRAW = {
     const alpha = (Math.sin(p.a) * 0.4 + 0.5) * 0.7 * fade;
     if (alpha <= 0) return;
     ctx.globalCompositeOperation = 'lighter';
-    ctx.shadowBlur = 8; ctx.shadowColor = `rgba(${p.c},0.8)`;
-    ctx.fillStyle = `rgba(${p.c},${alpha.toFixed(3)})`;
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.2832); ctx.fill();
-    ctx.shadowBlur = 0;
+    const r = p.size * 4;
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+    g.addColorStop(0, `rgba(${p.c},${alpha.toFixed(3)})`);
+    g.addColorStop(0.4, `rgba(${p.c},${(alpha * 0.35).toFixed(3)})`);
+    g.addColorStop(1, `rgba(${p.c},0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.2832); ctx.fill();
   },
 };
 
@@ -205,6 +217,8 @@ export function initBgParticles() {
   reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   resize();
   window.addEventListener('resize', resize, { passive: true });
+  window.addEventListener('scroll', () => { scrollY = window.scrollY || 0; }, { passive: true });
+  scrollY = window.scrollY || 0;
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = null; } }
     else if (currentTheme && !reduced && !raf) { lastT = 0; raf = requestAnimationFrame(tick); }
