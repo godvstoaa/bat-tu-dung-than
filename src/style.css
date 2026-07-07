@@ -1409,7 +1409,8 @@ html{scroll-behavior:smooth}
 @media(max-width:560px){
   .ai-fab{right:14px;bottom:14px;padding:11px 14px}
   /* [user] popup full-height trên mobile + slim chrome → chat-log (đọc Luận giải) tối đa */
-  .ai-popup{right:8px;bottom:8px;left:8px;top:8px;width:auto;height:auto;max-height:none;border-radius:14px}
+  .ai-popup{right:8px;left:8px;top:max(env(safe-area-inset-top),8px);bottom:max(env(safe-area-inset-bottom),8px);width:auto;height:auto;max-height:none;border-radius:14px}
+  .ai-popup-close{width:34px;height:34px;font-size:16px}
   .ai-popup .ai-status{display:none}
   .ai-popup-hint{display:none}
   .ai-popup-head{padding:9px 12px}
