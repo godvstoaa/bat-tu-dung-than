@@ -7,7 +7,7 @@
 //  API mirrored from engine/daily-guide.js (verified lunar-javascript method names).
 // ============================================================================
 import { Solar } from 'lunar-javascript';
-import { GAN, WX_VI } from './constants.js';
+import { GAN, WX_VI, SHENG, SHENG_BY, KE_BY } from './constants.js';
 import { YI_VI, JI_VI, translateDir } from './daily-guide.js';
 
 const ZHI_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
@@ -58,4 +58,38 @@ export function todayEnergy() {
     tone, toneVi,
     yi, ji, caiDir, oneLiner,
   };
+}
+
+// ============================================================================
+//  [loop 1388] VẬN THẾ HÔM NAY THEO LÁ SỐ — cá nhân hoá today 日 vs Dụng/Hỷ/Kỵ
+//    + Nhật Chủ của chart. Đồng bộ logic với hệ thống (R.yong, R.chart.dayMaster).
+//    Trước đây hero card chỉ show generic date-only → «mở lá nào cũng vậy».
+//    @returns {{tag,tone,line,dungVi,dungHan}|null}
+// ============================================================================
+export function todayForChart(R) {
+  if (!R || !R.yong || !R.yong.primary || !R.chart || !R.chart.dayMaster) return null;
+  try {
+    const now = new Date();
+    const lunar = Solar.fromYmdHms(now.getFullYear(), now.getMonth() + 1, now.getDate(), 12, 0, 0).getLunar();
+    const dGan = lunar.getDayGan();
+    const dGanWx = GAN[dGan] ? GAN[dGan].wx : null;
+    if (!dGanWx) return null;
+    const dung = R.yong.primary, hy = R.yong.xi, ky = R.yong.ji;
+    const dmWx = R.chart.dayMaster.wx;
+    let tag, tone, line;
+    if (dGanWx === dung) { tag = '★ DỤNG THẦN'; tone = 'cat'; line = `Hôm nay can ngày ${dGan} (${WX_VI[dGanWx]}) mang đúng DỤNG thần của bạn → năng lượng thuận, dễ tiến hành việc cần Dụng.`; }
+    else if (dGanWx === hy) { tag = 'HỶ THẦN'; tone = 'cat'; line = `Hôm nay can ${dGan} = HỶ thần → khá thuận, hỗ trợ Dụng.`; }
+    else if (dGanWx === SHENG_BY[dung]) { tag = 'SINH DỤNG'; tone = 'cat'; line = `Hôm nay can ${dGan} sinh DỤng thần → nuôi Dụng, thuận.`; }
+    else if (dGanWx === ky) { tag = '⚠ KỴ THẦN'; tone = 'hung'; line = `Hôm nay can ${dGan} = KỴ thần → cẩn trọng, hạn chế quyết định lớn cần Dụng.`; }
+    else if (dGanWx === KE_BY[dung]) { tag = '⚠ KHẮC DỤNG'; tone = 'hung'; line = `Hôm nay can ${dGan} khắc DỤng thần → giảm lợi, nên giữ ổn.`; }
+    else { tag = 'Trung tính'; tone = 'mid'; line = `Hôm nay can ${dGan} (${WX_VI[dGanWx]}) trung tính với Dụng ${WX_VI[dung]} — không thuận không kỵ rõ.`; }
+    // can ngày vs Nhật Chủ (năng lượng thân/trợ/áp)
+    let dmNote = '';
+    if (dmWx) {
+      if (dGanWx === dmWx) dmNote = ' Can ngày đồng hành Nhật Chủ → năng lượng thân.';
+      else if (dGanWx === SHENG_BY[dmWx]) dmNote = ' Can ngày sinh Nhật Chủ → được trợ.';
+      else if (dGanWx === KE_BY[dmWx]) dmNote = ' Can ngày khắc Nhật Chủ → hơi áp.';
+    }
+    return { tag, tone, line: line + dmNote, dungVi: WX_VI[dung] || '?', dungHan: dung };
+  } catch (_) { return null; }
 }

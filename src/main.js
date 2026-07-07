@@ -117,7 +117,7 @@ import { analyzeTaohua } from './engine/taohua.js';
 import { buildRemedy } from './engine/remedy.js';
 import { wuTai } from './engine/tonggen.js';
 import { dailyGuide } from './engine/daily-guide.js';
-import { todayEnergy } from './engine/today.js'; // [plan #6] "vận thế hôm nay" (gated: chỉ hiện khi có lá số)
+import { todayEnergy, todayForChart } from './engine/today.js'; // [plan #6] "vận thế hôm nay" + [loop 1388] cá nhân hoá theo lá số
 import { dailyDirections } from './engine/daily-directions.js';
 import { personalFengShui } from './engine/family-sync.js';
 import { strength3Fa } from './engine/strength-3fa.js';
@@ -537,6 +537,34 @@ const WX_ROLE_MEANING = {
 // tiny DOM helper → explore panel/hint built without innerHTML (sanitizer-hook safe; data is internal anyway)
 const _wxE = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
 
+// [user] Ngũ hành interactive radar — state + renderer (vertex tap → highlight + dây sinh/khắc).
+let _wxState = null, _wxSel = null;
+function _renderWxRadar(wx, yong, selected) {
+  const ELEMS = ['木', '火', '土', '金', '水'];
+  const colors = { 木: WX_COLOR['木'], 火: WX_COLOR['火'], 土: WX_COLOR['土'], 金: WX_COLOR['金'], 水: WX_COLOR['水'] };
+  const max = Math.max(...Object.values(wx.pct));
+  const cx = 80, cy = 80, R = 65, ang = (i) => (-90 + i * 72) * Math.PI / 180;
+  const pts = ELEMS.map((w, i) => { const val = max > 0 ? (wx.pct[w] || 0) / max : 0; const r = R * Math.max(0.08, val); return { x: cx + r * Math.cos(ang(i)), y: cy + r * Math.sin(ang(i)), lx: cx + (R + 15) * Math.cos(ang(i)), ly: cy + (R + 15) * Math.sin(ang(i)), w, pct: wx.pct[w] || 0 }; });
+  const ptOf = (w) => pts[ELEMS.indexOf(w)];
+  const polyPts = pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const grid = [0.25, 0.5, 0.75, 1.0].map((lvl) => { const gp = ELEMS.map((_, i) => `${(cx + R * lvl * Math.cos(ang(i))).toFixed(1)},${(cy + R * lvl * Math.sin(ang(i))).toFixed(1)}`).join(' '); return `<polygon points="${gp}" fill="none" stroke="rgba(212,175,55,${0.07 + lvl * 0.07})" stroke-width="0.5"/>`; }).join('');
+  const axes = ELEMS.map((_, i) => `<line x1="${cx}" y1="${cy}" x2="${(cx + R * Math.cos(ang(i))).toFixed(1)}" y2="${(cy + R * Math.sin(ang(i))).toFixed(1)}" stroke="rgba(212,175,55,0.1)" stroke-width="0.5"/>`).join('');
+  const TAG = { [yong && yong.primary]: '★Dụng', [yong && yong.xi]: '♥Hỷ', [yong && yong.ji]: '⚠Kỵ', [yong && yong.chou]: '⚔Thù' };
+  const fav = new Set([yong && yong.primary, yong && yong.xi].filter(Boolean)), avoid = new Set([yong && yong.ji, yong && yong.chou].filter(Boolean));
+  const labels = pts.map((p) => { const tag = TAG[p.w] || ''; const tc = fav.has(p.w) ? '#2e9e5b' : avoid.has(p.w) ? '#e0533d' : '#948864'; const dim = selected && selected !== p.w ? ' opacity="0.35"' : ''; return `<text${dim} x="${p.lx.toFixed(1)}" y="${p.ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${colors[p.w]}" font-weight="bold">${p.w}${p.pct}%</text>${tag ? `<text${dim} x="${p.lx.toFixed(1)}" y="${(p.ly + 11).toFixed(1)}" text-anchor="middle" font-size="7" fill="${tc}">${tag}</text>` : ''}`; }).join('');
+  let rels = '';
+  if (selected && WX_CYCLE[selected]) {
+    const c = WX_CYCLE[selected];
+    const ln = (from, to, color, dash, mk) => { const f = ptOf(from), t = ptOf(to); if (!f || !t) return ''; return `<line x1="${f.x.toFixed(1)}" y1="${f.y.toFixed(1)}" x2="${t.x.toFixed(1)}" y2="${t.y.toFixed(1)}" stroke="${color}" stroke-width="1.3" opacity="0.9"${dash ? ' stroke-dasharray="3 2.5"' : ''}${mk ? ` marker-end="url(#wxarr-${mk})"` : ''}/>`; };
+    rels = ln(selected, c.sinh, '#2e9e5b', false, 'g') + ln(c.bySinh, selected, '#2e9e5b', true, '') + ln(selected, c.khac, '#e0533d', false, 'r') + ln(c.byKhac, selected, '#e0533d', true, '');
+  }
+  const markers = `<marker id="wxarr-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e9e5b"/></marker><marker id="wxarr-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e0533d"/></marker>`;
+  const vgrads = ELEMS.map((w, i) => `<radialGradient id="wxv${i}" cx="35%" cy="28%" r="75%"><stop offset="0%" stop-color="rgba(255,255,255,0.95)"/><stop offset="42%" stop-color="${colors[w]}"/><stop offset="100%" stop-color="rgba(0,0,0,0.55)"/></radialGradient>`).join('');
+  const defs = `<defs><radialGradient id="wxradar" cx="50%" cy="38%" r="62%"><stop offset="0%" stop-color="rgba(247,236,203,0.62)"/><stop offset="55%" stop-color="rgba(212,175,55,0.34)"/><stop offset="100%" stop-color="rgba(70,50,10,0.08)"/></radialGradient><filter id="wxglow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>${vgrads}${markers}</defs>`;
+  const verts = pts.map((p, i) => { const sel = selected === p.w, dim = selected && selected !== p.w; const cls = 'wx-vertex' + (sel ? ' wx-vsel' : '') + (dim ? ' wx-vdim' : ''); return `<circle class="${cls}" data-wx="${p.w}" data-pct="${p.pct}" tabindex="0" role="button" aria-label="Hành ${WX_VI_X[p.w]}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${sel ? 6.4 : 4.6}" fill="url(#wxv${i})" stroke="rgba(0,0,0,0.4)" stroke-width="0.5"/>`; }).join('');
+  return `<svg class="wx-radar" width="180" height="180" viewBox="0 0 160 160" style="max-width:100%;height:auto">${defs}${grid}${axes}<polygon class="wx-radar-poly" points="${polyPts}" fill="url(#wxradar)" stroke="rgba(247,236,203,0.8)" stroke-width="1.7" filter="url(#wxglow)"/>${rels}${verts}${labels}</svg>`;
+}
+
 // ---------------------------------------------------------------- NGŨ HÀNH
 function renderWuXing(wx, yong) {
   const max = Math.max(...Object.values(wx.pct));
@@ -547,39 +575,8 @@ function renderWuXing(wx, yong) {
   const monthWx = window._currentResult?.strength?.monthMainWx || '';
   const WT_VI = { 旺: 'Vượng', 相: 'Tướng', 休: 'Hưu', 囚: 'Tù', 死: 'Tử' };
   const WT_COLOR = { 旺: '#2e9e5b', 相: '#5cb85c', 休: '#caa14a', 囚: '#e8a23d', 死: '#e0533d' };
-  $('wuxing').innerHTML = (() => {
-    // [loop 426] 五行 radar chart (SVG pentagon) — trực quan hơn bar chart cho cân bằng
-    const ELEMS = ['木', '火', '土', '金', '水'];
-    const colors = { 木: WX_COLOR['木'], 火: WX_COLOR['火'], 土: WX_COLOR['土'], 金: WX_COLOR['金'], 水: WX_COLOR['水'] };
-    const cx = 80, cy = 80, R = 65;
-    const pts = ELEMS.map((w, i) => {
-      const angle = (-90 + i * 72) * Math.PI / 180;
-      const val = max > 0 ? (wx.pct[w] || 0) / max : 0;
-      const r = R * Math.max(0.08, val);
-      return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle), labelX: cx + (R + 14) * Math.cos(angle), labelY: cy + (R + 14) * Math.sin(angle), w, pct: wx.pct[w] || 0, angle };
-    });
-    const polyPts = pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-    const gridLevels = [0.25, 0.5, 0.75, 1.0];
-    const gridPoly = gridLevels.map((lvl) => {
-      const gp = ELEMS.map((_, i) => {
-        const a = (-90 + i * 72) * Math.PI / 180;
-        return `${(cx + R * lvl * Math.cos(a)).toFixed(1)},${(cy + R * lvl * Math.sin(a)).toFixed(1)}`;
-      }).join(' ');
-      return `<polygon points="${gp}" fill="none" stroke="rgba(212,175,55,${0.08 + lvl * 0.08})" stroke-width="0.5"/>`;
-    }).join('');
-    const axes = ELEMS.map((_, i) => {
-      const a = (-90 + i * 72) * Math.PI / 180;
-      return `<line x1="${cx}" y1="${cy}" x2="${(cx + R * Math.cos(a)).toFixed(1)}" y2="${(cy + R * Math.sin(a)).toFixed(1)}" stroke="rgba(212,175,55,0.12)" stroke-width="0.5"/>`;
-    }).join('');
-    const labels = pts.map((p) => {
-      const tag = TAG[p.w] || '';
-      const tagColor = fav.has(p.w) ? '#2e9e5b' : avoid.has(p.w) ? '#e0533d' : '#948864';
-      return `<text x="${p.labelX.toFixed(1)}" y="${p.labelY.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${colors[p.w]}" font-weight="bold">${p.w}${p.pct}%</text>${tag ? `<text x="${p.labelX.toFixed(1)}" y="${(p.labelY + 11).toFixed(1)}" text-anchor="middle" font-size="7" fill="${tagColor}">${tag}</text>` : ''}`;
-    }).join('');
-    const vgrads = ELEMS.map((w, i) => `<radialGradient id="wxv${i}" cx="35%" cy="28%" r="75%"><stop offset="0%" stop-color="rgba(255,255,255,0.95)"/><stop offset="42%" stop-color="${colors[w]}"/><stop offset="100%" stop-color="rgba(0,0,0,0.55)"/></radialGradient>`).join('');
-    const defs = `<defs><radialGradient id="wxradar" cx="50%" cy="38%" r="62%"><stop offset="0%" stop-color="rgba(247,236,203,0.62)"/><stop offset="55%" stop-color="rgba(212,175,55,0.34)"/><stop offset="100%" stop-color="rgba(70,50,10,0.08)"/></radialGradient><filter id="wxglow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>${vgrads}</defs>`;
-    return `<div class="wx-radar-wrap" style="text-align:center;margin:10px 0"><svg class="wx-radar" width="180" height="180" viewBox="0 0 160 160" style="max-width:100%;height:auto">${defs}${gridPoly}${axes}<polygon class="wx-radar-poly" points="${polyPts}" fill="url(#wxradar)" stroke="rgba(247,236,203,0.8)" stroke-width="1.7" filter="url(#wxglow)"/>${pts.map((p, i) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.6" fill="url(#wxv${i})" stroke="rgba(0,0,0,0.4)" stroke-width="0.5"/>`).join('')}${labels}</svg></div>`;
-  })() + ['木', '火', '土', '金', '水'].map((w) => {
+  _wxState = { wx, yong }; _wxSel = null;
+  $('wuxing').innerHTML = `<div class="wx-radar-wrap" id="wx-radar-box" style="text-align:center;margin:10px 0">${_renderWxRadar(wx, yong, null)}</div>` + ['木', '火', '土', '金', '水'].map((w) => {
     const pct = wx.pct[w];
     const width = max > 0 ? (pct / max) * 100 : 0;
     const tag = TAG[w] || '';
@@ -619,17 +616,16 @@ function renderWuXing(wx, yong) {
   $('wuxing').appendChild(_exp);
 }
 
-// [plan #4] Ngũ hành tap-to-explore — delegation on #wuxing (stable parent; survives innerHTML re-renders).
+// [plan #4 + user] Ngũ hành interactive — vertex/bar tap → select → highlight + dây sinh/khắc + panel.
 (function () {
   const box = $('wuxing');
   if (!box) return;
   const ROLE_LABEL = { dung: 'Dụng Thần', hy: 'Hỷ Thần', ky: 'Kỵ Thần', thu: 'Thù Thần', '': 'Trung tính' };
   const ROLE_CLS   = { dung: 'rate-good', hy: 'rate-good', ky: 'rate-hung', thu: 'rate-hung', '': 'rate-mid' };
-  const fill = (row) => {
-    const w = row.dataset.wx, pct = row.dataset.pct, role = row.dataset.role || '';
+  const fillPanel = (w, pct, role) => {
     const c = WX_CYCLE[w]; if (!c) return;
     const pan = $('wx-explore'); if (!pan) return;
-    pan.textContent = ''; // clear previous (hook-safe)
+    pan.textContent = '';
     const head = _wxE('div', 'wx-exp-head');
     const zh = _wxE('span', 'zh', w); zh.style.color = WX_COLOR_X[w]; head.appendChild(zh);
     head.appendChild(document.createTextNode(' '));
@@ -646,14 +642,30 @@ function renderWuXing(wx, yong) {
     seg(' · Bị khắc bởi: ', WX_VI_X[c.byKhac] + ' (' + c.byKhac + ')');
     pan.appendChild(rel);
     pan.appendChild(_wxE('p', 'wx-exp-mean', WX_ROLE_MEANING[role]));
-    box.querySelectorAll('.wx-row-sel').forEach((r) => r.classList.remove('wx-row-sel'));
-    row.classList.add('wx-row-sel');
   };
-  box.addEventListener('click', (e) => { const r = e.target.closest && e.target.closest('.wx-row-tap'); if (r && box.contains(r)) fill(r); });
+  const selectWx = (w) => {
+    if (!w || !_wxState) return;
+    _wxSel = (_wxSel === w) ? null : w; // chọn lại → bỏ chọn
+    const rb = $('wx-radar-box'); if (rb) rb.innerHTML = _renderWxRadar(_wxState.wx, _wxState.yong, _wxSel);
+    box.querySelectorAll('.wx-row-sel').forEach((r) => r.classList.remove('wx-row-sel'));
+    if (_wxSel) {
+      const pct = (_wxState.wx.pct[_wxSel] != null) ? _wxState.wx.pct[_wxSel] : 0;
+      const role = _wxSel === (_wxState.yong && _wxState.yong.primary) ? 'dung' : _wxSel === (_wxState.yong && _wxState.yong.xi) ? 'hy' : _wxSel === (_wxState.yong && _wxState.yong.ji) ? 'ky' : _wxSel === (_wxState.yong && _wxState.yong.chou) ? 'thu' : '';
+      fillPanel(_wxSel, pct, role);
+      const row = box.querySelector('.wx-row-tap[data-wx="' + _wxSel + '"]'); if (row) row.classList.add('wx-row-sel');
+    } else {
+      const pan = $('wx-explore');
+      if (pan) { pan.textContent = ''; pan.appendChild(document.createTextNode('👆 Chạm một hành (trên radar hoặc thanh) để xem quan hệ sinh-khắc.')); }
+    }
+  };
+  box.addEventListener('click', (e) => {
+    const v = e.target.closest && e.target.closest('.wx-vertex'); if (v && box.contains(v)) { selectWx(v.dataset.wx); return; }
+    const r = e.target.closest && e.target.closest('.wx-row-tap'); if (r && box.contains(r)) selectWx(r.dataset.wx);
+  });
   box.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    const r = e.target.closest && e.target.closest('.wx-row-tap');
-    if (r && box.contains(r)) { e.preventDefault(); fill(r); }
+    const v = e.target.closest && e.target.closest('.wx-vertex'); if (v && box.contains(v)) { e.preventDefault(); selectWx(v.dataset.wx); return; }
+    const r = e.target.closest && e.target.closest('.wx-row-tap'); if (r && box.contains(r)) { e.preventDefault(); selectWx(r.dataset.wx); }
   });
 })();
 
@@ -965,9 +977,33 @@ function renderDailyBriefing(R) {
 // [plan #6] VẬN THẾ HÔM NAY — birth-free landing hook (deterministic, instant, no AI).
 //   Drives discovery: first-time visitors see today's energy → enter birth → unlocks
 //   the existing personalized daily (renderDailyBriefing / renderDailyCapsule).
+// [loop 1388] refresh section «📋 Theo lá số bạn» trong hero card — today 日 vs Dụng/Hỷ/Kỵ + Nhật Chủ.
+//   Khi user đã có lá số, card «Vận thế hôm nay» giờ CÁ NHÂN HOÁ (không còn «mở lá nào cũng vậy»).
+function _refreshTodayPersonal(card) {
+  const old = card.querySelector('.th-personal'); if (old) old.remove();
+  if (!currentResult) return;
+  const pers = todayForChart(currentResult);
+  if (!pers) return;
+  const s = document.createElement('div');
+  s.className = 'th-personal tone-' + pers.tone;
+  const h = document.createElement('p'); h.className = 'th-phead';
+  h.appendChild(document.createTextNode('📋 Theo lá số của bạn · Dụng '));
+  const b = document.createElement('b'); b.textContent = pers.dungVi; h.appendChild(b);
+  h.appendChild(document.createTextNode(' · '));
+  const rate = document.createElement('span');
+  rate.className = 'ln-rate ' + (pers.tone === 'cat' ? 'rate-cat' : pers.tone === 'hung' ? 'rate-hung' : 'rate-mid');
+  rate.textContent = pers.tag; h.appendChild(rate);
+  s.appendChild(h);
+  const l = document.createElement('p'); l.className = 'th-pline'; l.textContent = pers.line;
+  s.appendChild(l);
+  card.appendChild(s);
+}
+
 function renderTodayHero() {
   const hero = document.querySelector('.hero');
-  if (!hero || $('today-hero')) return; // missing hero or already injected
+  const _existingHero = $('today-hero');
+  if (_existingHero) { _refreshTodayPersonal(_existingHero); return; } // [loop 1388] đã có card → chỉ refresh phần cá nhân hoá theo lá số mới
+  if (!hero) return; // missing hero
   let e; try { e = todayEnergy(); } catch (_) { return; } // fail silent → no card (graceful)
   if (!e || !e.ganZhi) return;
   const card = document.createElement('div');
@@ -1017,6 +1053,7 @@ function renderTodayHero() {
     setTimeout(() => { const tt = $('hh-out'); if (tt) { try { tt.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} } }, 90);
   });
   card.appendChild(_hh);
+  _refreshTodayPersonal(card); // [loop 1388] append section «Theo lá số bạn» nếu đã có chart
   // [USER FEEDBACK] chỉ hiện khi CÓ lá số → đặt TRONG #result (ẩn đến khi bấm Luận giải xong).
   //   Trước đây hiện pre-birth trên landing = "linh tinh vớ vẩn" — giờ gate đúng.
   const _res = $('result');
