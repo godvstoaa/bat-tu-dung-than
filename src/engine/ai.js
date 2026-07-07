@@ -185,7 +185,17 @@ export function getConfig() {
   if (cfg && typeof cfg.endpoint === 'string' && /^https?:\/\/api\.z\.ai\//.test(cfg.endpoint)) {
     cfg.endpoint = cfg.endpoint.replace(/^https?:\/\/api\.z\.ai\//, '/zai/');
   }
-  if (cfg) return cfg;
+  if (cfg) {
+    // [loop 1387 FIX BUG SIÊU NGHIÊM TRỌNG] heal cfg hỏng: enabled nhưng THIẾU endpoint/model
+    //   (do bug main.js PRESETS['cf-glm'] từng set {enabled:true}) → isAIReady FALSE → AI toàn
+    //   local fallback («Trợ lý cục bộ») → khách rời. Tự sửa + persist cho user đã stuck.
+    if (cfg.enabled && (!cfg.endpoint || !cfg.model)) {
+      const _cf = PRESETS.find((p) => p.id === 'cf-glm') || PRESETS[0];
+      cfg = { enabled: true, endpoint: _cf.endpoint, apiKey: '', model: _cf.model, preset: 'cf-glm' };
+      try { if (typeof localStorage !== 'undefined') localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
+    }
+    return cfg;
+  }
   // [loop 903] Mặc định: Cloudflare Workers AI GLM-5.2 (proxy /cf-ai — chạy trên worker cùng origin).
   // [loop 905] enabled: true — key nhúng server-side, user KHÔNG cần nhập gì.
   const cfPreset = PRESETS.find((p) => p.id === 'cf-glm') || PRESETS[0];

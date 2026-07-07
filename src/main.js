@@ -7249,6 +7249,11 @@ fetch('/api/ai-config').then(function (r) { return r.json(); }).then(function (c
   if (c.hasKey && c.mode !== 'off') {
     var allow = c.mode === 'custom' || c.freeEnabled !== false; // free off → không auto cf-glm
     var cfg = getConfig();
-    if (allow && !cfg.enabled) { setConfig(Object.assign({}, (PRESETS['cf-glm'] || {}), { enabled: true })); }
+    if (allow && !cfg.enabled) {
+      // [loop 1387 FIX BUG] PRESETS là ARRAY → dùng .find (trước đây PRESETS['cf-glm'] = undefined
+      //   → setConfig({enabled:true}) thiếu endpoint/model → isAIReady FALSE → AI toàn local fallback).
+      var _cfP = PRESETS.find(function (p) { return p.id === 'cf-glm'; }) || PRESETS[0];
+      setConfig({ enabled: true, endpoint: _cfP.endpoint, apiKey: '', model: _cfP.model, preset: 'cf-glm' });
+    }
   }
 }).catch(function () {});
