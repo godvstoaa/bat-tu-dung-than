@@ -118,7 +118,6 @@ import { buildRemedy } from './engine/remedy.js';
 import { wuTai } from './engine/tonggen.js';
 import { dailyGuide } from './engine/daily-guide.js';
 import { todayEnergy } from './engine/today.js'; // [plan #6] "vận thế hôm nay" (gated: chỉ hiện khi có lá số)
-import { initHeroWebGL } from './hero-webgl.js'; // [user pick] WebGL khói/mực hero (perf-bounded)
 import { dailyDirections } from './engine/daily-directions.js';
 import { personalFengShui } from './engine/family-sync.js';
 import { strength3Fa } from './engine/strength-3fa.js';
@@ -4525,9 +4524,11 @@ async function run() {
   }
   // [loop 937] collapsible groups (mobile default-collapse secondary) — sau quick-nav (grp.id đã set)
   initCollapsibleGroups();
-  // reveal print button
+  // reveal print button (lab bar)
   const pbtn = $('print-btn');
   if (pbtn) pbtn.classList.remove('hidden');
+  const pbtnLab = $('print-btn-lab');
+  if (pbtnLab) pbtnLab.classList.remove('hidden');
   const curYear = new Date().getFullYear();
   $('ly-year').value = curYear;
   renderLyear(curYear);
@@ -5616,7 +5617,6 @@ if ($('jk-btn')) {
 }
 $('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run(); });
 $('ask-btn').addEventListener('click', handleAsk);
-try { initHeroWebGL(); } catch (e) { console.warn('heroWebgl', e.message); } // [user pick] WebGL khói/mực hero (perf-bounded)
 $('question').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAsk(); });
 // [loop 1372] AI style selector — Gần gũi / Cân bằng / Chuyên gia (per-user, localStorage)
 function getAIStyle() {
@@ -5663,7 +5663,8 @@ function getAIStyle() {
     try { recog.start(); setUi(true); } catch (_) { setUi(false); }
   });
 })();
-$('ai-settings-btn').addEventListener('click', openModal);
+$('ai-settings-btn')?.addEventListener('click', openModal);
+$('settings-btn')?.addEventListener('click', openModal);
 // [loop 935] back-to-top floating button — hiện khi cuộn xuống, click về đầu trang (mobile scroll-fatigue)
 (function initToTop() {
   const btn = $('to-top');
@@ -6315,6 +6316,7 @@ $('yd-btn').addEventListener('click', () => {
 });
 
 $('print-btn')?.addEventListener('click', () => window.print());
+$('print-btn-lab')?.addEventListener('click', () => window.print());
 // [loop 278] force-open all <details> for print — CSS display:block !important
 //   doesn't override browser's built-in details hiding. Without this, all
 //   collapsible sections (factors/tonggen roots/sanyuan/jiaoyun/etc.) are
