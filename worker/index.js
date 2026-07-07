@@ -55,7 +55,7 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
     const b = backends[i];
     if (!b.apiKey) continue;
     var ac = new AbortController();
-    var timer = setTimeout(function () { ac.abort(); }, 12000); // 12s cho status/TTFT
+    var timer = setTimeout(function () { ac.abort(); }, 45000); // [loop 1394] 45s — brief 20K tokens cần thời gian process
     try {
       bodyObj.model = b.model;
       // [loop 1383] pool backends (Groq) — bỏ tools/tool_choice (payload quá lớn → HTTP 413).

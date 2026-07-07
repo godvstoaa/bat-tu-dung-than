@@ -1710,7 +1710,7 @@ async function streamRound(url, headers, body, onToken, onStatus, signal) {
   //   25s chờ token ĐẦU (brief BaZi nặng cần thời gian xử lý). Chunk đầu → idle 30s/giữa chunk
   //   → answer dài stream hết, stall thì abort → fallback. Fix «signal timed out» câu thật.
   const _ac = new AbortController();
-  var _timer = setTimeout(function () { _ac.abort(); }, 25000);
+  var _timer = setTimeout(function () { _ac.abort(); }, 45000); // [loop 1394] 45s TTFT — brief 20K tokens
   function _resetIdle() { clearTimeout(_timer); _timer = setTimeout(function () { _ac.abort(); }, 30000); }
   const _sig = signal ? AbortSignal.any([signal, _ac.signal]) : _ac.signal;
   try {
