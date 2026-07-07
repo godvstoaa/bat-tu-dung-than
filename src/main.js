@@ -994,6 +994,27 @@ function renderTodayHero() {
   card.appendChild(grid);
 
   card.appendChild(_wxE('p', 'th-cta', '↓ Nhập ngày sinh bên dưới rồi bấm «Luận giải» để xem vận RIÊNG của bạn.'));
+  // [plan #8] discoverable quick-access to hợp tuổi (合婚) — buried tool surfaced as a romantic hook
+  const _hh = _wxE('button', 'th-hehun btn-ghost');
+  _hh.type = 'button'; _hh.textContent = '💕 Xem hợp tuổi hai người →';
+  _hh.addEventListener('click', () => {
+    // hehun is a standalone tool (own A/B inputs) but lives inside #result, which is hidden
+    // until birth entry. Reveal #result + open the Phong Thủy group + scroll to the tool.
+    const _res = $('result');
+    if (_res && _res.classList.contains('hidden')) _res.classList.remove('hidden');
+    const _t = $('hh-out');
+    if (_t) {
+      let _n = _t;
+      while (_n && _n !== document.body) {
+        if (_n.classList && _n.classList.contains('grp') && _n.classList.contains('collapsed')) { _n.classList.remove('collapsed'); _n.setAttribute('aria-expanded', 'true'); }
+        _n = _n.parentElement;
+      }
+    }
+    try { revealCard('hh-out'); } catch (e) {}
+    if (typeof updateCardVisibility === 'function') { try { updateCardVisibility(); } catch (e) {} }
+    setTimeout(() => { const tt = $('hh-out'); if (tt) { try { tt.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} } }, 90);
+  });
+  card.appendChild(_hh);
   hero.parentNode.insertBefore(card, hero.nextSibling);
 }
 
@@ -5316,6 +5337,24 @@ function runHehun() {
     → <span class="ln-rate ${cls}">${h.rating} (${h.score}/100)</span></div>
     <ul class="zr-reasons">${h.factors.map((f) => `<li>${f}</li>`).join('')}</ul>
     <p class="zr-advice">${h.verdict}</p>`;
+  // [plan #8] share/copy button (DOM-built, no innerHTML) → virality lever. Reuses clipboard + _fallbackCopy.
+  const _share = document.createElement('button');
+  _share.type = 'button'; _share.className = 'btn-ghost hh-share-btn';
+  _share.textContent = '📋 Chép / chia sẻ kết quả hợp';
+  _share.addEventListener('click', () => {
+    const _txt =
+      '💕 HỢP TUỔI 合婚 — ' + h.rating + ' (' + h.score + '/100)\n' +
+      'A: ' + R1.chart.dayMaster.vi + ' (' + R1.chart.pillars.year.gan + R1.chart.pillars.year.zhi + ') × ' +
+      'B: ' + R2.chart.dayMaster.vi + ' (' + R2.chart.pillars.year.gan + R2.chart.pillars.year.zhi + ')\n\n' +
+      h.factors.map((f) => '• ' + String(f).replace(/^•\s*/, '')).join('\n') + '\n\n' +
+      h.verdict + '\n\n— Bát Tự Dụng Thần · battu.god8.shop';
+    const _done = () => { const b = document.querySelector('.hh-share-btn'); if (b) { const t = b.textContent; b.textContent = '✓ Đã sao chép!'; setTimeout(() => { b.textContent = t; }, 2000); } };
+    const _fb = (typeof _fallbackCopy === 'function') ? _fallbackCopy : null;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(_txt).then(_done).catch(() => { if (_fb) _fb(_txt, _done); else _done(); });
+    } else if (_fb) { _fb(_txt, _done); } else { _done(); }
+  });
+  $('hh-out').appendChild(_share);
 }
 
 // ---------------------------------------------------------------- 逆推八字 [loop 21] — tìm lá số điểm cực
