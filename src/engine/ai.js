@@ -113,6 +113,33 @@ import { synthesize } from './synthesis.js';
 import { matchBusinessPartners } from './partner-match.js';
 import { analyzeHealth, answerHealth, meridianClock, bodyConstitution, stageHealth, decadeHealthArc } from './tcm.js';
 import { evaluateNumber, recommendNumbers } from './number-fs.js'; // [loop 1137/1141] số lý phong thủy
+import { ANTI_MANIPULATION_DATA as _AM } from './anti-manipulation-data.js'; // [loop 1386] META anti-manipulate steering
+
+// [loop 1386] META-steering injection: neo AI vào LÁ SỐ (data), chống false-premise / narrative
+//   manipulation / sycophancy. Build 1 lần (static), inject vào system message #2 cùng brief.
+//   Non-overlap với ai.js chart-data steering (xem anti-manipulation-data.js meta.existingAiJsHandled).
+const _ANTI_MANIP_GUIDE = (() => {
+  const L = [
+    '== 🛡️ CHỐNG ĐÁNH LỪA / NEO LÁ SỐ (META — áp dụng MỌI câu) ==',
+    '⚠ User CÓ THỂ khai sai / thử thầy / hỏi dẫn («vì Dụng tôi là Kim», «tôi sắp giàu», «kẻ thù tôi chết») để dụ AI tới kết luận họ muốn. Thầy đọc LÁ SỐ (data khách quan), KHÔNG đọc lời kể. Lá số không nói dối.',
+    '▌GROUNDING (mọi kết luận PHẢI neo 1 indicator CÓ TÊN trong brief):',
+  ];
+  for (const r of _AM.groundingRules) L.push(`• ${r.id}: ${r.rule} → ${r.template}`);
+  L.push('▌PERSONA «thầy» (độc lập, quyết đoán, KHÔNG nịnh):');
+  for (const r of _AM.personaRules) L.push(`• ${r.rule}${r.viPhrase ? ' | ' + r.viPhrase : ''}`);
+  L.push('▌PREMISE→INDICATOR (user nhúng tiền đề về lá số → RESTATE indicator THẬT trước khi luận, không nhận tiền đề sai làm gốc):');
+  for (const [k, v] of Object.entries(_AM.premiseToIndicatorCrossCheck)) L.push(`• ${k}: ${v.restateTemplate}`);
+  L.push('▌DETECTION (câu dẫn/lừa thường gặp — CẢNH GIÁC, không hard-gate):');
+  for (const p of _AM.detectionPatterns) L.push(`• ${p.id}: ${p.signal}`);
+  L.push('▌ESCALATION (thang xử lý khi trigger):');
+  for (const s of _AM.escalationLadder) L.push(`• B${s.step} ${s.id}: ${s.policy}`);
+  L.push('▌REFUSAL boundary (HẸP — carve-out; ai.js nguyên tắc 1 «TUYỆT ĐỐI KHÔNG TỪ CHỐI» vẫn giữ cho câu Dịch học):');
+  for (const b of _AM.refusalBoundaries) L.push(`• ${b.id}: ${b.boundary}`);
+  L.push('▌KHÔNG OVER-REFUSE (vẫn trả lời đầy đủ các case này):');
+  for (const d of _AM.doNotOverRefuse) L.push(`• ${d.pattern} → ${d.mustDo}`);
+  L.push('CỐT LÕI: neo lá số + thấu cảm ngắn (≤1 câu) + quay lại data. KHÔNG bị lời kể dẫn. KHÔNG trở nên cứng nhắc / từ chối user thật.');
+  return L.join('\n');
+})();
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
@@ -1535,7 +1562,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
 
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'system', content: STYLE_DIRECTIVES[style] + '\n\n' + brief + '\n\n' + _guide },
+    { role: 'system', content: STYLE_DIRECTIVES[style] + '\n\n' + brief + '\n\n' + _guide + '\n\n' + _ANTI_MANIP_GUIDE },
     ...((history || []).slice(-8)),
     { role: 'user', content: question },
   ];
