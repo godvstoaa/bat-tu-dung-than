@@ -1409,14 +1409,14 @@ html{scroll-behavior:smooth}
 @media(max-width:560px){
   .ai-fab{right:14px;bottom:14px;padding:11px 14px}
   /* [user] popup full-height trên mobile + slim chrome → chat-log (đọc Luận giải) tối đa */
-  .ai-popup{right:8px;left:8px;top:max(env(safe-area-inset-top),8px);bottom:max(env(safe-area-inset-bottom),8px);width:auto;height:auto;max-height:none;border-radius:14px}
-  .ai-popup-close{width:34px;height:34px;font-size:16px}
+  .ai-popup{right:0;left:0;top:auto;bottom:0;width:100%;max-width:none;height:calc(100dvh - 52px);border-radius:18px 18px 0 0;border-left:0;border-right:0;border-bottom:0}
+  .ai-popup-close{width:38px;height:38px;font-size:18px;background:rgba(224,83,61,.22);border-color:rgba(224,83,61,.5)}
+  .ai-popup .ask{padding:8px 10px max(env(safe-area-inset-bottom),10px)}
   .ai-popup .ai-status{display:none}
   .ai-popup-hint{display:none}
   .ai-popup-head{padding:9px 12px}
   .ai-popup-title{font-size:13.5px}
   .ai-style-bar{padding:4px 10px}
-  .ai-popup .ask{padding:8px 10px}
   .ai-popup .chat-log{padding:10px 12px;gap:9px}
 }
 /* [loop 1372] AI style selector — segmented control (Gần gũi / Cân bằng / Chuyên gia) */
