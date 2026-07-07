@@ -1572,7 +1572,8 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
 
   const messages = [
     { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'system', content: STYLE_DIRECTIVES[style] + '\n\n' + brief + '\n\n' + _guide + '\n\n' + _ANTI_MANIP_GUIDE },
+    { role: 'system', content: brief + '\n\n' + _guide + '\n\n' + _ANTI_MANIP_GUIDE },
+    { role: 'system', content: (STYLE_DIRECTIVES[style] || STYLE_DIRECTIVES['gan-guoi']) + '\n\n⚠ REMEMBER THIS STYLE WHEN ANSWERING — áp dụng cho Câu trả lời này.' },
     ...((history || []).slice(-8)),
     { role: 'user', content: question },
   ];
