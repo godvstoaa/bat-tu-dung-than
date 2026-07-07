@@ -1015,12 +1015,14 @@ function renderTodayHero() {
     setTimeout(() => { const tt = $('hh-out'); if (tt) { try { tt.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} } }, 90);
   });
   card.appendChild(_hh);
-  // [plan #6 FIX] insert INSIDE <main.container> so the card shares the centered 1040px
-  // content column (same as form/results). Before, it was a body-level sibling of .hero →
-  // full viewport width → misaligned ("lung tung") with the cards below.
+  // [plan #6 FIX] insert INSIDE <main.container> AND after the birth form (form = primary
+  // action on landing → must stay first; today-hero is secondary content, below it).
   const _main = document.querySelector('main.container') || document.querySelector('main');
-  if (_main) _main.insertBefore(card, _main.firstChild);
-  else if (hero) hero.parentNode.insertBefore(card, hero.nextSibling);
+  if (_main) {
+    const _formCard = _main.querySelector('.form-card');
+    if (_formCard) _formCard.after(card);                       // sau form → không cản action chính
+    else _main.insertBefore(card, _main.firstChild);
+  } else if (hero) { hero.parentNode.insertBefore(card, hero.nextSibling); }
 }
 
 // ---------------------------------------------------------------- 称骨算命 (BONE-WEIGHT DIVINATION)
