@@ -1654,7 +1654,13 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
     }
     return _bail('AI vượt quá số vòng tối đa');
   } catch (e) {
-    if (e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''))) throw e;  // [loop 948] user cancel — propagate, no fallback
+    // [loop 1389 FIX CRITICAL] chỉ propagate AbortError khi USER cancel (signal.aborted).
+    //   System timeout (max-duration 60s, idle 30s, TTFT 25s) = _ac.abort() → KHÔNG phải user
+    //   → fallback local, KHÔNG throw. Trước đây catch re-throw CẢ system timeout → AI chết.
+    if (e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''))) {
+      if (signal && signal.aborted) throw e; // USER cancel → propagate, no fallback
+      // system timeout → fallback (KHÔNG throw)
+    }
     const isCors = /Failed to fetch|NetworkError|Load failed/i.test(e.message);
     const hint = isCors
       ? `Không gọi được AI — CORS: trình duyệt chặn ${cfg.endpoint}. Mở ⚙ chọn "★ PROXY DEV" (npm run dev) hoặc backend.`
