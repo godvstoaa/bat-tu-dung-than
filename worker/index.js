@@ -55,7 +55,11 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
     var timer = setTimeout(function () { ac.abort(); }, 12000); // 12s cho status/TTFT
     try {
       bodyObj.model = b.model;
-      const res = await fetch(b.endpoint + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + b.apiKey }, body: JSON.stringify(bodyObj), signal: ac.signal });
+      // [loop 1383] pool backends (Groq) — bỏ tools/tool_choice (payload quá lớn → HTTP 413).
+      //   cf-glm (built-in) giữ tools. Pool backends trả lời từ brief (engine đã tính sẵn).
+      var bodySend = bodyObj;
+      if (b.name !== 'cf-glm') { bodySend = Object.assign({}, bodyObj); delete bodySend.tools; delete bodySend.tool_choice; }
+      const res = await fetch(b.endpoint + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + b.apiKey }, body: JSON.stringify(bodySend), signal: ac.signal });
       clearTimeout(timer);
       if (res.status === 200 && res.body) {
         if (env.ADMIN_KV) logFreeUsage(env, ip, 200, b.name).catch(function () {});
