@@ -1015,7 +1015,12 @@ function renderTodayHero() {
     setTimeout(() => { const tt = $('hh-out'); if (tt) { try { tt.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} } }, 90);
   });
   card.appendChild(_hh);
-  hero.parentNode.insertBefore(card, hero.nextSibling);
+  // [plan #6 FIX] insert INSIDE <main.container> so the card shares the centered 1040px
+  // content column (same as form/results). Before, it was a body-level sibling of .hero →
+  // full viewport width → misaligned ("lung tung") with the cards below.
+  const _main = document.querySelector('main.container') || document.querySelector('main');
+  if (_main) _main.insertBefore(card, _main.firstChild);
+  else if (hero) hero.parentNode.insertBefore(card, hero.nextSibling);
 }
 
 // ---------------------------------------------------------------- 称骨算命 (BONE-WEIGHT DIVINATION)
