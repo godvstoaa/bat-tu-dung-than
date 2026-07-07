@@ -3934,16 +3934,52 @@ function addMsgActions(body, text) {
     _act.className = 'msg-actions';
     if ('speechSynthesis' in window) {
       const _sp = document.createElement('button');
-      _sp.type = 'button'; _sp.className = 'msg-action-btn'; _sp.textContent = '🔊 Đọc to';
+      _sp.type = 'button'; _sp.className = 'msg-action-btn'; _sp.textContent = '🔊 Đọc';
       let _on = false;
       _sp.addEventListener('click', () => {
-        if (_on) { window.speechSynthesis.cancel(); return; }
-        const _u = new SpeechSynthesisUtterance(_stripMd(text));
-        _u.lang = 'vi-VN'; _u.rate = 1.02;
-        _u.onend = () => { _on = false; _sp.textContent = '🔊 Đọc to'; _sp.classList.remove('active'); };
-        _u.onerror = _u.onend;
-        window.speechSynthesis.cancel(); window.speechSynthesis.speak(_u);
+        if (_on) { window.speechSynthesis.cancel(); _on = false; _sp.textContent = '🔊 Đọc'; _sp.classList.remove('active'); return; }
+        // [loop 1391] FIX TTS — tìm voice VN tốt nhất + clean text cho đọc tự nhiên
+        var _voices = window.speechSynthesis.getVoices() || [];
+        var _viVoice = _voices.find(function(v){return v.lang && v.lang.toLowerCase().startsWith('vi');})
+                   || _voices.find(function(v){return v.lang && v.lang.toLowerCase().includes('vi');});
+        // [loop 1391] clean text: bỏ markdown, bullet, số mục → text tự nhiên đọc được
+        var _cleanText = _stripMd(text)
+          .replace(/[•▪▶←↓↑]/g, ', ')
+          .replace(/\*\*/g, '')
+          .replace(/^[\d]+[.)]\s*/gm, '')
+          .replace(/^[─-]+\s*/gm, '')
+          .replace(/\n{3,}/g, '\n\n')
+          .replace(/«|»/g, '')
+          .trim();
+        // chunk text dài (< 200 chars/chunk — browser TTS giới hạn)
+        var _chunks = _cleanText.match(/[^.!?]+[.!?]*/g) || [_cleanText];
+        var _queue = [];
+        for (var ci = 0; ci < _chunks.length; ci++) {
+          var _sentence = _chunks[ci].trim();
+          if (!_sentence) continue;
+          // gom câu ngắn thành chunk ~150 chars
+          if (_queue.length && (_queue[_queue.length - 1] + ' ' + _sentence).length < 150) {
+            _queue[_queue.length - 1] += '. ' + _sentence;
+          } else {
+            _queue.push(_sentence);
+          }
+        }
+        var _chunkIdx = 0;
+        function _speakNext() {
+          if (_chunkIdx >= _queue.length || !_on) {
+            _on = false; _sp.textContent = '🔊 Đọc'; _sp.classList.remove('active');
+            return;
+          }
+          var _u = new SpeechSynthesisUtterance(_queue[_chunkIdx]);
+          _u.lang = 'vi-VN'; _u.rate = 0.92; _u.pitch = 1.0;
+          if (_viVoice) _u.voice = _viVoice;
+          _u.onend = function() { _chunkIdx++; setTimeout(_speakNext, 80); };
+          _u.onerror = _u.onend;
+          window.speechSynthesis.speak(_u);
+        }
+        window.speechSynthesis.cancel();
         _on = true; _sp.textContent = '⏹ Dừng'; _sp.classList.add('active');
+        _speakNext();
       });
       _act.appendChild(_sp);
     }
