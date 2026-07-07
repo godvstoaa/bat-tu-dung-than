@@ -10,11 +10,9 @@ export function initHeroWebGL() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const hero = document.querySelector('.hero');
   if (!hero) return;
-
-  // bảo vệ UX mobile yếu (như đã cảnh báo): skip để không giật
-  const cores = navigator.hardwareConcurrency || 4;
-  const coarse = matchMedia('(pointer: coarse)').matches;
-  if (coarse && cores <= 4) return;
+  // [fix điểm mù] KHÔNG skip mobile theo cores nữa — trước đây skip touch+≤4core → user mobile
+  //   không thấy gì (test chỉ desktop). Nay dựa vào: reduced-motion (trên) + no-WebGL fallback +
+  //   perf bounds (nửa-res 0.55x, cap 30fps, pause khi out-of-view/hidden) để vừa hiện vừa an toàn.
 
   const canvas = document.createElement('canvas');
   canvas.id = 'hero-webgl';
