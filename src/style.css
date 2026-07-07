@@ -159,6 +159,9 @@ body::before {
 
 /* ===== HERO ===== */
 .hero { position: relative; z-index: 1; padding: 54px 20px 30px; text-align: center; animation: fadeDown .7s var(--ease-out) both; }
+/* [user pick] HERO WEBGL khói/mực (perf-bounded; fallback nền cũ nếu không WebGL) */
+#hero-webgl { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.55; }
+.hero > *:not(#hero-webgl) { position: relative; z-index: 1; }
 .hero-inner { max-width: 780px; margin: 0 auto; }
 .kicker { display: flex; align-items: center; justify-content: center; gap: 16px; color: var(--gold); letter-spacing: 5px; font-size: 11.5px; margin-bottom: 26px; opacity: 0.9; font-family: 'Noto Serif SC', serif; }
 .kicker i { width: 70px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }

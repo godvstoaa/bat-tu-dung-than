@@ -117,7 +117,8 @@ import { analyzeTaohua } from './engine/taohua.js';
 import { buildRemedy } from './engine/remedy.js';
 import { wuTai } from './engine/tonggen.js';
 import { dailyGuide } from './engine/daily-guide.js';
-import { todayEnergy } from './engine/today.js'; // [plan #6] birth-free "vận thế hôm nay" hero
+import { todayEnergy } from './engine/today.js'; // [plan #6] "vận thế hôm nay" (gated: chỉ hiện khi có lá số)
+import { initHeroWebGL } from './hero-webgl.js'; // [user pick] WebGL khói/mực hero (perf-bounded)
 import { dailyDirections } from './engine/daily-directions.js';
 import { personalFengShui } from './engine/family-sync.js';
 import { strength3Fa } from './engine/strength-3fa.js';
@@ -1015,14 +1016,11 @@ function renderTodayHero() {
     setTimeout(() => { const tt = $('hh-out'); if (tt) { try { tt.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} } }, 90);
   });
   card.appendChild(_hh);
-  // [plan #6 FIX] insert INSIDE <main.container> AND after the birth form (form = primary
-  // action on landing → must stay first; today-hero is secondary content, below it).
-  const _main = document.querySelector('main.container') || document.querySelector('main');
-  if (_main) {
-    const _formCard = _main.querySelector('.form-card');
-    if (_formCard) _formCard.after(card);                       // sau form → không cản action chính
-    else _main.insertBefore(card, _main.firstChild);
-  } else if (hero) { hero.parentNode.insertBefore(card, hero.nextSibling); }
+  // [USER FEEDBACK] chỉ hiện khi CÓ lá số → đặt TRONG #result (ẩn đến khi bấm Luận giải xong).
+  //   Trước đây hiện pre-birth trên landing = "linh tinh vớ vẩn" — giờ gate đúng.
+  const _res = $('result');
+  if (_res) _res.insertBefore(card, _res.firstChild);
+  else if (hero) { hero.parentNode.insertBefore(card, hero.nextSibling); }
 }
 
 // ---------------------------------------------------------------- 称骨算命 (BONE-WEIGHT DIVINATION)
@@ -4344,6 +4342,7 @@ async function run() {
   renderDayunInteract(currentResult);
   renderLiuNian(currentResult.liunian);
   try { renderDailyBriefing(currentResult); } catch (e) { console.warn('dailyBriefing', e.message); }
+  try { renderTodayHero(); } catch (e) { console.warn('todayHero', e.message); } // [user feedback] chỉ hiện khi có lá số (gated trong #result)
   // [UI P1] countUp — animate numeric scores/% ("số mệnh hiện ra"). Vanilla, reduced-motion aware.
   (function countUpAll() {
     const root = $('result'); if (!root || !window.requestAnimationFrame) return;
@@ -5617,7 +5616,7 @@ if ($('jk-btn')) {
 }
 $('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run(); });
 $('ask-btn').addEventListener('click', handleAsk);
-try { renderTodayHero(); } catch (e) { console.warn('todayHero', e.message); } // [plan #6] landing hook (once, on load)
+try { initHeroWebGL(); } catch (e) { console.warn('heroWebgl', e.message); } // [user pick] WebGL khói/mực hero (perf-bounded)
 $('question').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAsk(); });
 // [loop 1372] AI style selector — Gần gũi / Cân bằng / Chuyên gia (per-user, localStorage)
 function getAIStyle() {
