@@ -211,6 +211,7 @@ async function adminAiConfigSet(env, request) {
   if (body.mode) config.mode = String(body.mode); // 'off' | 'free' | 'custom'
   if (body.endpoint) config.endpoint = String(body.endpoint);
   if (body.apiKey) config.apiKey = String(body.apiKey);
+  else if (body.mode === 'free') config.apiKey = ''; // [loop 1393] mode=free → clear apiKey (freeRoute path)
   if (body.model) config.model = String(body.model);
   if (body.zaiKey) config.zaiKey = String(body.zaiKey); // [loop 1384] z.ai paid key (last resort)
   if (body.disable) { await env.ADMIN_KV.delete('ai:config'); return json({ ok: true, config: { mode: 'free' } }); }
