@@ -212,6 +212,7 @@ async function adminAiConfigSet(env, request) {
   if (body.endpoint) config.endpoint = String(body.endpoint);
   if (body.apiKey) config.apiKey = String(body.apiKey);
   if (body.model) config.model = String(body.model);
+  if (body.zaiKey) config.zaiKey = String(body.zaiKey); // [loop 1384] z.ai paid key (last resort)
   if (body.disable) { await env.ADMIN_KV.delete('ai:config'); return json({ ok: true, config: { mode: 'free' } }); }
   // merge với config cũ
   let old = {};
@@ -228,7 +229,7 @@ async function adminAiConfigSet(env, request) {
 async function adminAiConfigGet(env) {
   let config = {};
   try { config = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); } catch (e) {}
-  const masked = Object.assign({}, config, { apiKey: config.apiKey ? '***' + config.apiKey.slice(-4) : '' });
+  const masked = Object.assign({}, config, { apiKey: config.apiKey ? '***' + config.apiKey.slice(-4) : '', zaiKey: config.zaiKey ? '***' + String(config.zaiKey).slice(-4) : '' });
   // [loop 1376] freePool — mask key mỗi backend (admin-only, không public)
   if (Array.isArray(masked.freePool)) masked.freePool = masked.freePool.map(function (p) { return Object.assign({}, p, { apiKey: p.apiKey ? '***' + String(p.apiKey).slice(-4) : '' }); });
   return json({ config: masked });

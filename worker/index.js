@@ -46,7 +46,9 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
   const pool = Array.isArray(aiCfg && aiCfg.freePool) ? aiCfg.freePool.filter(function (p) { return p && p.apiKey && p.endpoint && p.model; }) : [];
   const backends = [].concat(
     pool.map(function (p) { return { name: p.name || 'pool', endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey) }; }),
-    [{ name: 'cf-glm', endpoint: CF_FREE_BASE, model: '@cf/zai-org/glm-5.2', apiKey: env.CF_AI_KEY || '' }]
+    [{ name: 'cf-glm', endpoint: CF_FREE_BASE, model: '@cf/zai-org/glm-5.2', apiKey: env.CF_AI_KEY || '' }],
+    // [loop 1384] z.ai PAID — last resort (GLM-5.2 chính chủ, luôn ổn định). Chỉ kick in khi free fail hết.
+    (aiCfg.zaiKey ? [{ name: 'z.ai-paid', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2', apiKey: String(aiCfg.zaiKey) }] : [])
   );
   for (let i = 0; i < backends.length; i++) {
     const b = backends[i];
