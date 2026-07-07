@@ -478,6 +478,13 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .wx-fill::after { content: ''; position: absolute; left: 1px; top: 1px; bottom: 1px; width: 2px; background: rgba(255,255,255,0.55); border-radius: 2px; filter: blur(0.5px); }
 @media (prefers-reduced-motion: reduce) { .wuxing-bars .wx-radar { transform: none; } }
 
+/* [user] Ngũ hành interactive vertices */
+.wuxing-bars .wx-vertex { cursor: pointer; transition: opacity .25s ease; }
+.wuxing-bars .wx-vertex:hover { filter: drop-shadow(0 0 5px rgba(247,236,203,0.85)); }
+.wuxing-bars .wx-vdim { opacity: 0.3; }
+.wuxing-bars .wx-vsel { transform-box: fill-box; transform-origin: center; animation: wxVPulse 1.5s ease-in-out infinite; }
+@keyframes wxVPulse { 0%, 100% { filter: drop-shadow(0 0 5px rgba(247,236,203,0.7)); } 50% { filter: drop-shadow(0 0 11px rgba(247,236,203,1)); } }
+
 /* [plan #6] Vận thế hôm nay — birth-free landing hero card */
 .today-hero { margin: 0 0 12px; padding: 10px 12px; border-radius: var(--frame-radius); border: var(--frame-border); background: rgba(0,0,0,0.18); }
 .today-hero.tone-cat { border-color: rgba(46,158,91,0.42); }
