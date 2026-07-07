@@ -671,6 +671,16 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   const yong = findYongShen(chart, wx, strength, pattern, interactions);
   let patternQualityResult = null;
   try { patternQualityResult = patternQuality({ chart, pattern, strength, interactions }); } catch (e) { patternQualityResult = null; }
+  // [loop 1384 FIX BUG SIÊU NGHIÊM TRỌNG] Kỵ-thân AUTHORITATIVE theo Phù Ức (KHÔNG mutate như
+  //   yong.avoid — tránh race với enrichment bên dưới): strong → Tỷ(dmWx)+Ấn; weak → Tài+Quan+Thực.
+  //   Rescue drugs của patternQuality rơi vào nhóm này = sai phân loại (vd 1989 癸水 vượng bị rescue
+  //   Tỷ→Thủy; 1985 金 nhược bị rescue Thực→Thủy) → PHẢI reject, không cho làm primary/secondary.
+  const _dmWx1384 = chart.dayMaster.wx;
+  const _strengthKỵ = strength.strong
+    ? [_dmWx1384, SHENG_BY[_dmWx1384]]                               // strong: Tỷ + Ấn
+    : strength.strong === false
+      ? [KE[_dmWx1384], KE_BY[_dmWx1384], SHENG[_dmWx1384]]          // weak: Tài + Quan + Thực
+      : [];
   // [loop 37] 病药 UNIFICATION — feed pattern-quality rescues vào yong (SAFE: enrich secondary +
   //   method, KHÔNG đổi primary). Đóng gap loop 34: 2 hệ 病药 (computeBingYi pct-based vs
   //   pattern-quality structural) giờ thống nhất — rescue structural ưu tiên secondary.
@@ -682,7 +692,7 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
         const drugGroups = r.drug || [];
         if (!drugGroups.length) continue;
         const drugWx = GROUP_WX[drugGroups[0]];
-        if (drugWx && drugWx !== yong.primary && drugWx !== yong.secondary) {
+        if (drugWx && drugWx !== yong.primary && drugWx !== yong.secondary && !_strengthKỵ.includes(drugWx)) {
           yong.secondary = drugWx;
           yong.reasons.push(`💊 Bệnh Dược (病药 từ pattern-quality): «${(r.diseaseNote || r.note || '').slice(0, 60)}» → thuốc nhóm ${drugGroups[0]} (hành ${drugWx}) → ưu tiên làm Dụng thứ cấp (chữa bệnh cách cục).`);
           if (!yong.method.includes('Bệnh Dược (病药)')) yong.method.push('Bệnh Dược (病药)');
@@ -707,7 +717,11 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
       const GROUP_WX = { ti: dmWx, yin: SHENG_BY[dmWx], shi: SHENG[dmWx], cai: KE[dmWx], guan: KE_BY[dmWx] };
       const firstRescue = patternQualityResult.rescues[0];
       const drugWx = firstRescue.drug?.length ? GROUP_WX[firstRescue.drug[0]] : null;
-      if (drugWx && drugWx !== yong.primary) {
+      // [loop 1384 FIX BUG SIÊU NGHIÊM TRỌNG] thuốc rescue KHÔNG được là Kỵ thân (Tỷ/Ấn cho
+      //   thân VƯỢNG; Quan/Sát/Thực/Tài cho thân NHƯỢC) — nếu không sẽ ĐẢO Dụng/Kỵ (vd 1989-08-11
+      //   癸水 vượng bị gán Dụng=Thủy=Tỷ → AI phải đính chính Thổ). computeFuYi đã set yong.avoid
+      //   theo Phù Ức chuẩn → drug ∈ avoid = rescue sai → KHÔNG override (Cách đặc biệt đã return sớm).
+      if (drugWx && drugWx !== yong.primary && !_strengthKỵ.includes(drugWx)) {
         const oldPrimary = yong.primary;
         yong.primary = drugWx;                                    // 药 → Dụng chính
         yong.secondary = oldPrimary;                              // Phù Ức cũ → secondary
