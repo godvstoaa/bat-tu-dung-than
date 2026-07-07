@@ -66,36 +66,9 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
       clearTimeout(timer);
       if (res.status === 200 && res.body) {
         if (env.ADMIN_KV) logFreeUsage(env, ip, 200, b.name).catch(function () {});
-        // [loop 1381 SERVER-SIDE CAPTURE] tee stream → log FULL response server-side
-        //   (bypass frontend truncation entirely — old bundle / mid-reload đều OK)
-        var _streamStart = Date.now();
-        var _tee = res.body.tee();
-        if (ctx && ctx.waitUntil) ctx.waitUntil((async function () {
-          try {
-            var reader = _tee[1].getReader();
-            var decoder = new TextDecoder();
-            var sbuf = '', fullContent = '';
-            while (true) {
-              var chunk = await reader.read();
-              if (chunk.done) break;
-              sbuf += decoder.decode(chunk.value, { stream: true });
-              var slines = sbuf.split('\n'); sbuf = slines.pop();
-              for (var li = 0; li < slines.length; li++) {
-                var sl = slines[li].trim();
-                if (sl.indexOf('data:') !== 0) continue;
-                var sp = sl.slice(5).trim();
-                if (!sp || sp === '[DONE]') continue;
-                try { var sj = JSON.parse(sp); var sd = sj.choices && sj.choices[0] && sj.choices[0].delta; if (sd && sd.content) fullContent += sd.content; } catch (pe) {}
-              }
-            }
-            if (fullContent.length > 5) {
-              var um = (bodyObj.messages || []).filter(function (m) { return m.role === 'user'; });
-              var qText = um.length ? String(um[um.length - 1].content || '') : ''; // [loop 1385] full question (không cắt)
-              await logEvent(env, request, 'ai_chat', { q: qText, response: fullContent, source: 'ai', durationMs: Date.now() - _streamStart, backend: b.name });
-            }
-          } catch (ce) {}
-        })());
-        return new Response(_tee[0], { status: 200, headers: { 'Content-Type': res.headers.get('Content-Type') || 'text/event-stream', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store', 'X-Free-Backend': b.name } });
+        // [loop 1395] BỎ tee/server-side capture — gây backpressure → BodyStreamBuffer aborted.
+        //   Frontend đã log full response (loop 1387). Trả response TRỰC TIẾP → không tee.
+        return new Response(res.body, { status: 200, headers: { 'Content-Type': res.headers.get('Content-Type') || 'text/event-stream', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store', 'X-Free-Backend': b.name } });
       }
       if (env.ADMIN_KV) logFreeUsage(env, ip, res.status, b.name).catch(function () {});
     } catch (e) {
