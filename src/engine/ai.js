@@ -1668,6 +1668,7 @@ async function streamRound(url, headers, body, onToken, onStatus, signal) {
   //   → answer dài stream hết, stall thì abort → fallback. Fix «signal timed out» câu thật.
   const _ac = new AbortController();
   var _timer = setTimeout(function () { _ac.abort(); }, 25000);
+  var _maxDur = setTimeout(function () { _ac.abort(); }, 60000); // [loop 1386] max 60s total stream (chống z.ai think 138s)
   function _resetIdle() { clearTimeout(_timer); _timer = setTimeout(function () { _ac.abort(); }, 30000); }
   const _sig = signal ? AbortSignal.any([signal, _ac.signal]) : _ac.signal;
   try {
@@ -1730,5 +1731,5 @@ async function streamRound(url, headers, body, onToken, onStatus, signal) {
     }
   }
   return { content: full.trim(), toolCalls };
-  } finally { clearTimeout(_timer); }
+  } finally { clearTimeout(_timer); clearTimeout(_maxDur); }
 }
