@@ -44,18 +44,13 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
   let bodyObj = {};
   try { bodyObj = await request.json(); } catch (e) { try { bodyObj = JSON.parse(await request.text()); } catch (_) {} }
   const pool = Array.isArray(aiCfg && aiCfg.freePool) ? aiCfg.freePool.filter(function (p) { return p && p.apiKey && p.endpoint && p.model; }) : [];
-  // [loop 1385] SMART ROUTING — câu phức tạp → z.ai GLM-5.2 TRƯỚC (ổn định + chất lượng);
-  //   câu đơn giản → Groq (nhanh, free). Detect bằng độ dài + keyword BaZi.
-  var userMsgs = (bodyObj.messages || []).filter(function (m) { return m.role === 'user'; });
-  var lastQ = userMsgs.length ? String(userMsgs[userMsgs.length - 1].content || '') : '';
-  var qNorm = lastQ.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
-  var isComplex = qNorm.length > 60 || /hop hon|dai van|phong thuy|dau tu|gia dinh|khi nao|nam nao|ngay nao|cai van|suc khoe|con cai|nghe nghiep|tai loc|quy nhan|dao hoa|huong(?: nha|ngu)?|cuoi|sinh con|dung than|menh cach|tu vi|bat tu|luan|phan tich|xem/g.test(qNorm);
-  var zaiBackend = aiCfg.zaiKey ? [{ name: 'z.ai-paid', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2', apiKey: String(aiCfg.zaiKey) }] : [];
-  var cfBackend = [{ name: 'cf-glm', endpoint: CF_FREE_BASE, model: '@cf/zai-org/glm-5.2', apiKey: env.CF_AI_KEY || '' }];
+  // [loop 1392 FIX] BỎ smart routing — z.ai thinking 30-138s → Worker kill → abort → fallback local.
+  //   Mọi câu → Groq (fast) → cf-glm (GLM-5.2 không thinking, 3-12s, ổn định) → z.ai (LAST resort).
+  //   cf-glm CŨNG là GLM-5.2 (cùng model) nhưng KHÔNG thinking → nhanh hơn z.ai cho mọi câu.
   var poolBackends = pool.map(function (p) { return { name: p.name || 'pool', endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey) }; });
-  // complex → z.ai FIRST (GLM-5.2 stable + quality), cf-glm fallback, skip Groq (llama yếu cho BaZi)
-  // simple → Groq (fast, free) → cf-glm → z.ai (last resort)
-  const backends = isComplex ? [].concat(zaiBackend, cfBackend) : [].concat(poolBackends, cfBackend, zaiBackend);
+  var cfBackend = [{ name: 'cf-glm', endpoint: CF_FREE_BASE, model: '@cf/zai-org/glm-5.2', apiKey: env.CF_AI_KEY || '' }];
+  var zaiBackend = aiCfg.zaiKey ? [{ name: 'z.ai-paid', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2', apiKey: String(aiCfg.zaiKey) }] : [];
+  const backends = [].concat(poolBackends, cfBackend, zaiBackend);
   for (let i = 0; i < backends.length; i++) {
     const b = backends[i];
     if (!b.apiKey) continue;
