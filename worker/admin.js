@@ -624,7 +624,23 @@ async function adminStats(env, url) {
   const fbGood = await get('cnt:feedback_good');
   const feedback = { total: fbTotal, good: fbGood, bad: await get('cnt:feedback_bad'), rate: fbTotal ? Math.round((fbGood / fbTotal) * 100) : null };
   let feedbackLog = []; try { feedbackLog = JSON.parse((await env.ADMIN_KV.get('feedback:log')) || '[]'); } catch (e) {}
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, freeUsage, freeRecent: freeLog.slice(0, 30), feedback, feedbackRecent: feedbackLog.slice(0, 30), destiny, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
+  // [loop 1388] device fingerprint — group theo sid (cùng thiết bị = cùng sid), detect nhiều IP
+  const bySid = {};
+  for (const e of events) {
+    const sid = e.data && e.data.sid;
+    if (!sid || sid === 'sid-anon') continue;
+    if (!bySid[sid]) bySid[sid] = { sid, ips: {}, count: 0, firstTs: e.ts, lastTs: 0, ua: e.ua || '', country: e.country || '', city: e.city || '' };
+    const g = bySid[sid];
+    g.count++;
+    if (e.ip) g.ips[e.ip] = (g.ips[e.ip] || 0) + 1;
+    if (e.ts > g.lastTs) g.lastTs = e.ts;
+    if (e.ts < g.firstTs) g.firstTs = e.ts;
+  }
+  const deviceGroups = Object.values(bySid).map(function (v) {
+    var ipArr = Object.entries(v.ips).map(function (kv) { return { ip: kv[0], count: kv[1] }; }).sort(function (a, b) { return b.count - a.count; });
+    return { sid: v.sid.slice(0, 20), ips: ipArr, ipCount: ipArr.length, count: v.count, firstTs: v.firstTs, lastTs: v.lastTs, device: parseUA(v.ua).label, country: v.country, city: v.city };
+  }).sort(function (a, b) { return b.ipCount - a.ipCount || b.lastTs - a.lastTs; }).slice(0, 50);
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, freeUsage, freeRecent: freeLog.slice(0, 30), feedback, feedbackRecent: feedbackLog.slice(0, 30), destiny, deviceGroups, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
@@ -801,6 +817,7 @@ function adminDashboard() {
         <div class="card"><h3>📉 Xu hướng 30 ngày <span class="card-actions tiny">dayagg TTL 90d · retention dài</span></h3><div id="trend30"></div></div>
         <div class="card"><h3>⏰ Giờ hoạt động (VN, UTC+7)</h3><div id="hourly" style="display:flex;align-items:flex-end;gap:1px;height:44px;margin-top:4px"></div></div>
         <div class="card"><h3>🔮 Mệnh cách tổng hợp <span class="card-actions tiny">số mệnh tập thể người lập lá số</span></h3><div id="destiny"></div></div>
+        <div class="card"><h3>📱 Thiết bị <span class="card-actions tiny">cùng thiết bị dùng nhiều IP = VPN/chuyển mạng</span></h3><div id="device-groups"></div></div>
         <div class="card"><h3>🌍 Quốc gia · nguồn traffic · clicks</h3><div id="topq" style="display:flex;gap:20px;flex-wrap:wrap"></div></div>
       </section>
       <!-- ===== VISITORS ===== -->
@@ -1075,6 +1092,25 @@ function adminDashboard() {
       if (dd.top.length) { var t=el('details'); t.style.cssText='margin-top:10px'; var ts=el('summary','tiny','🏆 Mệnh cao nhất ('+dd.top.length+')'); ts.style.cssText='color:#d4af37;cursor:pointer'; t.appendChild(ts); dd.top.forEach(function(x){t.appendChild(el('div','tiny',x.score+'/100 · '+(x.dob||'?')+' '+(x.gender||'')+(x.grade?' · '+x.grade:'')));}); dy.appendChild(t); }
       if (dd.bottom.length) { var bo=el('details'); bo.style.cssText='margin-top:4px'; var bs=el('summary','tiny','🔻 Mệnh thấp nhất ('+dd.bottom.length+')'); bs.style.cssText='color:#d4af37;cursor:pointer'; bo.appendChild(bs); dd.bottom.forEach(function(x){bo.appendChild(el('div','tiny',x.score+'/100 · '+(x.dob||'?')+' '+(x.gender||'')+(x.grade?' · '+x.grade:'')));}); dy.appendChild(bo); }
     } else if (dy) { dy.textContent=''; dy.appendChild(el('div','tiny','(chưa có lá số nào có điểm — user mới lập lá số sẽ hiện đây. Điểm mệnh cách tính khi user submit.)')); }
+    // [loop 1388] device fingerprint — group theo sid, detect nhiều IP
+    var dg=document.getElementById('device-groups'); if (dg && d.deviceGroups) { dg.textContent='';
+      var multi=d.deviceGroups.filter(function(g){return g.ipCount>1;});
+      if (multi.length) { var warn=el('div'); warn.style.cssText='padding:8px 12px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.25);border-radius:8px;margin-bottom:8px;font-size:12px'; warn.appendChild(el('span',null,'⚠️ '+multi.length+' thiết bị dùng nhiều IP (VPN/chuyển mạng) — xem dưới')); dg.appendChild(warn); }
+      if (!d.deviceGroups.length) { dg.appendChild(el('div','tiny','(chưa có data — visitor mới (có sid) sẽ hiện)')); }
+      d.deviceGroups.slice(0, 20).forEach(function(g) {
+        var card=el('div'); card.style.cssText='background:'+(g.ipCount>1?'rgba(192,57,43,.06)':'rgba(212,175,55,.04)')+';border:1px solid '+(g.ipCount>1?'rgba(192,57,43,.2)':'rgba(212,175,55,.12)')+';border-radius:8px;padding:8px 12px;margin:5px 0';
+        var head=el('div'); head.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap';
+        head.appendChild(el('span','tiny',(g.ipCount>1?'⚠ ':'📱 ')+g.device+' · '+g.count+' events · '+g.ipCount+' IP'));
+        head.appendChild(el('span','tiny',new Date(g.firstTs).toLocaleDateString('vi-VN')+' → '+new Date(g.lastTs).toLocaleDateString('vi-VN')));
+        card.appendChild(head);
+        g.ips.forEach(function(ip) {
+          var ipRow=el('div','tiny','  '+ip.ip+' ('+ip.count+'×)');
+          ipRow.style.cssText='padding:1px 0 1px 12px;font-family:monospace;color:#7fbf7f';
+          card.appendChild(ipRow);
+        });
+        dg.appendChild(card);
+      });
+    }
     // [loop 1351] top questions + countries
     const tq=document.getElementById('topq'); if (tq) { tq.textContent='';
       const col1=el('div'); col1.style.cssText='flex:1;min-width:240px'; col1.appendChild(el('h4',null,'💬 Câu hỏi AI hay gặp'));
