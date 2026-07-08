@@ -625,7 +625,7 @@ function renderWx3D(wx, yong) {
     const pct = wx.pct[w] || 0;
     const size = Math.max(34, Math.min(76, pct * 2.6));
     const isDung = w === (yong && yong.primary);
-    return `<div class="wx3d-orb${isDung ? ' wx3d-dung' : ''}" style="--c:${WX_C[w]};--s:${size};animation-delay:${(i * 0.45).toFixed(2)}s">
+    return `<div class="wx3d-orb wx3d-tap${isDung ? ' wx3d-dung' : ''}" data-wx="${w}" tabindex="0" role="button" aria-label="Hành ${WX_VI[w]}" style="--c:${WX_C[w]};--s:${size};animation-delay:${(i * 0.45).toFixed(2)}s">
       <div class="wx3d-sphere"></div>
       <div class="wx3d-han" style="color:${WX_C[w]}">${w}</div>
       <div class="wx3d-pct">${pct}%</div>
@@ -640,6 +640,12 @@ function renderWx3D(wx, yong) {
     const old = wux.parentNode.querySelector('.wx3d-wrap');
     if (old) old.remove();
     wux.parentNode.insertBefore(wrap, wux);
+    // [loop] tap orb → trigger radar vertex click (reuse selectWx interactivity)
+    wrap.addEventListener('click', (e) => {
+      const orb = e.target.closest('.wx3d-tap'); if (!orb) return;
+      const v = document.querySelector('.wx-vertex[data-wx="' + orb.dataset.wx + '"]');
+      if (v) v.click();
+    });
   }
 }
 function renderWuXing(wx, yong) {
