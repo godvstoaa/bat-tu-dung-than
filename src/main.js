@@ -527,6 +527,8 @@ const WX_CYCLE = {
 };
 const WX_VI_X = { '木': 'Mộc', '火': 'Hỏa', '土': 'Thổ', '金': 'Kim', '水': 'Thủy' };
 const WX_COLOR_X = { '木': '#4a8', '火': '#e54', '土': '#da3', '金': '#aaa', '水': '#369' };
+// [user] bespoke gold-foil element icons (grok image_gen) — thay dot màu bằng icon custom
+const WX_ICON = { '木': '/icons/moc.webp', '火': '/icons/hoa.webp', '土': '/icons/tho.webp', '金': '/icons/kim.webp', '水': '/icons/thuy.webp' };
 const WX_ROLE_MEANING = {
   dung: 'Hành mệnh bạn THIẾU — cần BỔ (màu, phương vị, nghề, năm vận trúng). Bổ nó → vận thông suốt, quý nhân đến.',
   hy:   'Hành phò trợ Dụng Thần — cùng bồi thì hiệu quả tăng, giữ được cân bằng.',
@@ -587,7 +589,7 @@ function renderWuXing(wx, yong) {
     const rk = w === yong?.primary ? 'dung' : w === yong?.xi ? 'hy' : w === yong?.ji ? 'ky' : w === yong?.chou ? 'thu' : '';
     return `
       <div class="wx-row wx-row-tap" data-wx="${w}" data-pct="${pct}" data-role="${rk}" role="button" tabindex="0" aria-label="Xem ý nghĩa hành ${WX_VI[w]}">
-        <div class="wx-name"><span class="dot" style="background:${WX_COLOR[w]}"></span>${w} ${WX_VI[w]}${tag ? ` <span style="color:${tagColor};font-weight:700;font-size:11px">${tag}</span>` : ''}${wtBadge}</div>
+        <div class="wx-name"><img class="wx-icon" src="${WX_ICON[w]}" alt="${WX_VI[w]}" width="26" height="26" loading="lazy">${w} ${WX_VI[w]}${tag ? ` <span style="color:${tagColor};font-weight:700;font-size:11px">${tag}</span>` : ''}${wtBadge}</div>
         <div class="wx-track"><div class="wx-fill" style="width:${width}%;background:${WX_COLOR[w]}"></div></div>
         <div class="wx-pct">${pct}%</div>
       </div>`;
@@ -599,7 +601,7 @@ function renderWuXing(wx, yong) {
       const sources = det.filter((d) => d.wx === w);
       if (!sources.length) return '';
       const total = sources.reduce((a, d) => a + d.pts, 0);
-      return `<div class="wx-row"><div class="wx-name"><span class="dot" style="background:${WX_COLOR[w]}"></span>${w} ${WX_VI[w]}</div> <b>${total.toFixed(1)}</b> <span class="hint">${sources.map((s) => esc(s.src) + ' ' + esc(s.gan) + '=' + s.pts).join(' · ')}</span></div>`;
+      return `<div class="wx-row"><div class="wx-name"><img class="wx-icon" src="${WX_ICON[w]}" alt="${WX_VI[w]}" width="26" height="26" loading="lazy">${w} ${WX_VI[w]}</div> <b>${total.toFixed(1)}</b> <span class="hint">${sources.map((s) => esc(s.src) + ' ' + esc(s.gan) + '=' + s.pts).join(' · ')}</span></div>`;
     }).join('');
     return `<details class="syn-factors" style="margin-top:8px"><summary>Chi tiết nguồn lực (${det.length} nguồn)</summary>${rows}</details>`;
   })();

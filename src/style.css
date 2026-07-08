@@ -440,7 +440,8 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
   transition: background .15s, border-color .15s, transform .22s var(--ease-spring);
 }
 .wx-row:hover { background: rgba(212,175,55,0.045); border-color: rgba(212,175,55,0.22); transform: translateY(-1px); }
-.wx-name { font-size: 13.5px; color: var(--silk-dim); font-family: 'Noto Serif SC', serif; }
+.wx-name { font-size: 13.5px; color: var(--silk-dim); font-family: 'Noto Serif SC', serif; display: flex; align-items: center; gap: 6px; }
+.wx-icon { width: 26px; height: 26px; flex-shrink: 0; mix-blend-mode: screen; filter: drop-shadow(0 0 4px rgba(212,175,55,0.3)); }
 .wx-track { background: rgba(0,0,0,0.35); border: 1px solid rgba(212, 175, 55, 0.14); border-radius: 20px; height: 15px; overflow: hidden; }
 .wx-fill { height: 100%; border-radius: 20px; transition: width .9s var(--ease-out); filter: drop-shadow(0 0 5px rgba(255,255,255,0.22)) brightness(1.04); box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -1px 3px rgba(0,0,0,0.35); }
 .wx-pct { text-align: right; font-size: 12.5px; color: var(--gold-pale); font-variant-numeric: tabular-nums; font-weight: 600; }
