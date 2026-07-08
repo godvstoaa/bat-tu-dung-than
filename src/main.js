@@ -3806,6 +3806,30 @@ function renderWxChart(R) {
 }
 
 // [loop 1059] Vận Trục Đại Vận — bar chart visual
+// [user] ĐẠI VẬN 3D — bar chart 3D perspective, màu cát/hung, highlight hiện tại
+function renderDayun3D(R) {
+  const dayun = (typeof dayunScored === 'function') ? dayunScored(R) : [];
+  if (!dayun || !dayun.length) return;
+  const curAge = new Date().getFullYear() - ((R.chart && R.chart.input && R.chart.input.year) || 1990);
+  const maxAbs = Math.max.apply(null, dayun.map((d) => Math.abs(d.totalScore || 0)).concat([1]));
+  const cols = dayun.map((d) => {
+    const s = d.totalScore || 0;
+    const h = Math.max(20, Math.round((Math.abs(s) / maxAbs) * 64));
+    const col = s > 0 ? '#3fb86b' : s < 0 ? '#e0533d' : '#9a8c64';
+    const isActive = curAge >= d.startAge && curAge < d.startAge + 10;
+    return `<div class="dy3d-col${isActive ? ' dy3d-active' : ''}" style="--h:${h};--c:${col}">
+      <div class="dy3d-bar"><div class="dy3d-face"></div></div>
+      <div class="dy3d-gz" style="color:${col}">${d.ganZhi || ''}</div>
+      <div class="dy3d-age">${d.startAge}–${d.startAge + 9}t</div>
+      ${isActive ? '<div class="dy3d-now">▼ NAY</div>' : ''}
+    </div>`;
+  }).join('');
+  const wrap = document.createElement('div');
+  wrap.className = 'dy3d-wrap';
+  wrap.innerHTML = `<div class="dy3d"><div class="dy3d-stage">${cols}</div></div>`;
+  const dc = $('dayun-chart');
+  if (dc && dc.parentNode) { const old = dc.parentNode.querySelector('.dy3d-wrap'); if (old) old.remove(); dc.parentNode.insertBefore(wrap, dc); }
+}
 function renderDayunChart(R) {
   const el = $('dayun-chart');
   if (!el) return;
@@ -4611,7 +4635,7 @@ async function run() {
   lazyRender('golden-year',    () => { try { renderGoldenYear(currentResult); } catch (e) { console.warn('goldenyear', e.message); } });
   lazyRender('daily-capsule',  () => { try { renderDailyCapsule(currentResult); } catch (e) { console.warn('daily-capsule', e.message); } });
   lazyRender('forecast5',      () => { try { renderForecast5(currentResult); } catch (e) { console.warn('forecast5', e.message); } });
-  lazyRender('dayun-chart',    () => { try { renderDayunChart(currentResult); } catch (e) { console.warn('dayun-chart', e.message); } });
+  lazyRender('dayun-chart',    () => { try { renderDayunChart(currentResult); renderDayun3D(currentResult); } catch (e) { console.warn('dayun-chart', e.message); } });
   lazyRender('wx-chart',       () => { try { renderWxChart(currentResult); } catch (e) { console.warn('wx-chart', e.message); } });
   lazyRender('liunian-chart',  () => { try { renderLiunianChart(currentResult); } catch (e) { console.warn('liunian-chart', e.message); } });
   lazyRender('liuyue-chart',   () => { try { renderLiuyueChart(currentResult); } catch (e) { console.warn('liuyue-chart', e.message); } });
