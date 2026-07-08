@@ -232,7 +232,7 @@ function renderTuzu3D(chart) {
   const cols = order.map((key) => {
     const p = chart.pillars[key];
     const gC = WX_C[GAN[p.gan].wx] || '#d4af37', zC = WX_C[ZHI[p.zhi].wx] || '#d4af37';
-    return `<div class="tuzu-col${key === 'day' ? ' tuzu-dm' : ''}" style="--gc:${gC};--zc:${zC}">
+    return `<div class="tuzu-col tuzu-tap${key === 'day' ? ' tuzu-dm' : ''}" data-key="${key}" tabindex="0" role="button" aria-label="Trụ ${labelsVi[key]}" style="--gc:${gC};--zc:${zC}">
       <div class="tuzu-label">${labelsZh[key]}<span>${labelsVi[key]}</span></div>
       <div class="tuzu-gan" style="color:${gC}">${p.gan}</div>
       <div class="tuzu-sep"></div>
@@ -248,6 +248,15 @@ function renderTuzu3D(chart) {
     const old = pillars.parentNode.querySelector('.tuzu-3d-wrap');
     if (old) old.remove();
     pillars.parentNode.insertBefore(wrap, pillars);
+    // [loop] tap pillar → highlight + scroll tới detail
+    wrap.addEventListener('click', (e) => {
+      const col = e.target.closest('.tuzu-tap'); if (!col) return;
+      wrap.querySelectorAll('.tuzu-sel').forEach((c) => c.classList.remove('tuzu-sel'));
+      col.classList.add('tuzu-sel');
+      const idx = ['year', 'month', 'day', 'time'].indexOf(col.dataset.key);
+      const cards = pillars.querySelectorAll('.pillar');
+      if (cards[idx]) cards[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
   }
 }
 function renderPillars(chart) {

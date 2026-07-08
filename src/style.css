@@ -2422,3 +2422,6 @@ button:focus-visible, .lab-btn:focus-visible {
 .dy3d-col { transition: transform .2s ease; cursor: pointer; }
 .dy3d-col:hover { transform: translateY(-3px); }
 .dy3d-col:hover .dy3d-face { box-shadow: inset 0 2px 0 rgba(255,255,255,0.3), inset -3px 0 7px rgba(0,0,0,0.3), 0 0 18px var(--c), 0 6px 12px rgba(0,0,0,0.4); }
+
+/* [loop] Tứ trụ 3D tap-select — highlight pillar + bridge to detail */
+.tuzu-col.tuzu-sel { transform: translateY(-4px) scale(1.05); border-top-color: var(--gold-bright, #f3d57a); border-top-width: 3px; box-shadow: 0 16px 32px rgba(0,0,0,0.65), 0 0 26px rgba(212,175,55,0.4), inset 0 1px 0 rgba(247,236,203,0.18), inset 0 -3px 10px rgba(0,0,0,0.45); }
