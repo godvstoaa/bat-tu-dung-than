@@ -2429,3 +2429,9 @@ button:focus-visible, .lab-btn:focus-visible {
 
 /* [loop] PERF: content-visibility auto — browser skips off-screen card rendering (3D anims paused when scrolled away) */
 #result .card { content-visibility: auto; contain-intrinsic-size: auto 350px; }
+
+/* [loop] 3D section titles — cohesive labeling (CSS ::before, no JS) */
+.tuzu-3d-wrap::before, .wx3d-wrap::before, .dy3d-wrap::before { display: block; text-align: center; font-size: 10px; font-weight: 700; color: var(--gold, #d4af37); letter-spacing: 2px; text-transform: uppercase; margin: 10px 0 2px; opacity: 0.85; font-family: 'Noto Serif SC', serif; }
+.tuzu-3d-wrap::before { content: '⚡ Tứ Trụ 3D · 四柱'; }
+.wx3d-wrap::before { content: '⚡ Ngũ Hành 3D · 五行'; }
+.dy3d-wrap::before { content: '⚡ Đại Vận 3D · 大运'; }
