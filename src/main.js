@@ -3854,7 +3854,7 @@ function renderDayun3D(R) {
   wrap.className = 'dy3d-wrap';
   wrap.innerHTML = `<div class="dy3d"><div class="dy3d-stage">${cols}</div></div>`;
   const dc = $('dayun-chart');
-  if (dc && dc.parentNode) { const old = dc.parentNode.querySelector('.dy3d-wrap'); if (old) old.remove(); dc.parentNode.insertBefore(wrap, dc); }
+  if (dc && dc.parentNode) { const old = dc.parentNode.querySelector('.dy3d-wrap'); if (old) old.remove(); dc.parentNode.insertBefore(wrap, dc); wrap.addEventListener('click', (e) => { const col = e.target.closest('.dy3d-col'); if (!col) return; wrap.querySelectorAll('.dy3d-sel').forEach((c) => c.classList.remove('dy3d-sel')); col.classList.add('dy3d-sel'); dc.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); }
 }
 function renderDayunChart(R) {
   const el = $('dayun-chart');
