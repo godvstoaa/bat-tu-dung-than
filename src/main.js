@@ -596,6 +596,32 @@ function _renderWxRadar(wx, yong, selected) {
 }
 
 // ---------------------------------------------------------------- NGŨ HÀNH
+// [user] NGŨ HÀNH 3D — 5 cầu 3D size theo % cân bằng, màu ngũ hành, float (data-driven)
+function renderWx3D(wx, yong) {
+  if (!wx || !wx.pct) return;
+  const ELEMS = ['木', '火', '土', '金', '水'];
+  const WX_C = { '木': '#5bba6a', '火': '#ff6b4a', '土': '#e8b94a', '金': '#c8c8d8', '水': '#5a9ee0' };
+  const orbs = ELEMS.map((w, i) => {
+    const pct = wx.pct[w] || 0;
+    const size = Math.max(34, Math.min(76, pct * 2.6));
+    const isDung = w === (yong && yong.primary);
+    return `<div class="wx3d-orb${isDung ? ' wx3d-dung' : ''}" style="--c:${WX_C[w]};--s:${size};animation-delay:${(i * 0.45).toFixed(2)}s">
+      <div class="wx3d-sphere"></div>
+      <div class="wx3d-han" style="color:${WX_C[w]}">${w}</div>
+      <div class="wx3d-pct">${pct}%</div>
+      <div class="wx3d-name">${WX_VI[w]}</div>
+    </div>`;
+  }).join('');
+  const wrap = document.createElement('div');
+  wrap.className = 'wx3d-wrap';
+  wrap.innerHTML = `<div class="wx3d"><div class="wx3d-stage">${orbs}</div></div>`;
+  const wux = $('wuxing');
+  if (wux && wux.parentNode) {
+    const old = wux.parentNode.querySelector('.wx3d-wrap');
+    if (old) old.remove();
+    wux.parentNode.insertBefore(wrap, wux);
+  }
+}
 function renderWuXing(wx, yong) {
   const max = Math.max(...Object.values(wx.pct));
   const fav = new Set([yong?.primary, yong?.xi].filter(Boolean));
@@ -4437,6 +4463,7 @@ async function run() {
   renderRemedy(currentResult);
   window._currentResult = currentResult; // [loop 140] cho renderWuXing truy cập monthMainWx
   renderWuXing(currentResult.wx, currentResult.yong);
+  renderWx3D(currentResult.wx, currentResult.yong);
   renderInteractions(currentResult);
   renderShensha(currentResult);
   renderShenshaExtra(currentResult);
