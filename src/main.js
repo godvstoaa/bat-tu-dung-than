@@ -222,6 +222,34 @@ const YD_RATE_CLS = { 'Cát': 'rate-cat', 'Bình': 'rate-mid', 'Hơi kỵ': 'rat
 const YD_CHIP_CLS = { 'Cát': 'cat', 'Bình': 'binh', 'Hơi kỵ': 'hky', 'Kỵ': 'ky' };
 
 // ---------------------------------------------------------------- TỨ TRỤ
+// [user] TỨ TRỤ 3D — 4 trụ thành cột 3D xoay, 天干/地支 màu ngũ hành (data-driven, expressive bát tự)
+function renderTuzu3D(chart) {
+  if (!chart || !chart.pillars) return;
+  const labelsZh = { year: '年柱', month: '月柱', day: '日柱', time: '时柱' };
+  const labelsVi = { year: 'Trụ Năm', month: 'Trụ Tháng', day: 'Trụ Ngày', time: 'Trụ Giờ' };
+  const order = ['year', 'month', 'day', 'time'];
+  const WX_C = { '木': '#5bba6a', '火': '#ff6b4a', '土': '#e8b94a', '金': '#c8c8d8', '水': '#5a9ee0' }; // sáng cho 3D
+  const cols = order.map((key) => {
+    const p = chart.pillars[key];
+    const gC = WX_C[GAN[p.gan].wx] || '#d4af37', zC = WX_C[ZHI[p.zhi].wx] || '#d4af37';
+    return `<div class="tuzu-col${key === 'day' ? ' tuzu-dm' : ''}" style="--gc:${gC};--zc:${zC}">
+      <div class="tuzu-label">${labelsZh[key]}<span>${labelsVi[key]}</span></div>
+      <div class="tuzu-gan" style="color:${gC}">${p.gan}</div>
+      <div class="tuzu-sep"></div>
+      <div class="tuzu-zhi" style="color:${zC}">${p.zhi}</div>
+      <div class="tuzu-name">${GAN[p.gan].vi} ${ZHI[p.zhi].vi}</div>
+    </div>`;
+  }).join('');
+  const wrap = document.createElement('div');
+  wrap.className = 'tuzu-3d-wrap';
+  wrap.innerHTML = `<div class="tuzu-3d"><div class="tuzu-stage">${cols}</div></div>`;
+  const pillars = $('pillars');
+  if (pillars && pillars.parentNode) {
+    const old = pillars.parentNode.querySelector('.tuzu-3d-wrap');
+    if (old) old.remove();
+    pillars.parentNode.insertBefore(wrap, pillars);
+  }
+}
 function renderPillars(chart) {
   const labels = { year: 'Trụ Năm', month: 'Trụ Tháng', day: 'Trụ Ngày', time: 'Trụ Giờ' };
   const order = ['year', 'month', 'day', 'time'];
@@ -4385,6 +4413,7 @@ async function run() {
     `Dương lịch: ${c.solar} · Âm lịch: ${c.lunar.year}/${c.lunar.month}/${c.lunar.day} · ` +
     `Tiết khí: ${c.jieqi.prev.name} · Thai nguyên: ${ty.ganZhi} (${ty.ganVi} ${ty.zhiVi} — ${ty.wx})`;
 
+  renderTuzu3D(c);
   renderPillars(c);
   renderVerdict(currentResult);
   renderSynthesis(currentResult);
