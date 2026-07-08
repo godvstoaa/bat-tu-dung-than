@@ -2426,3 +2426,6 @@ button:focus-visible, .lab-btn:focus-visible {
 /* [loop] Tứ trụ 3D tap-select — highlight pillar + bridge to detail */
 .tuzu-col.tuzu-sel { transform: translateY(-4px) scale(1.05); border-top-color: var(--gold-bright, #f3d57a); border-top-width: 3px; box-shadow: 0 16px 32px rgba(0,0,0,0.65), 0 0 26px rgba(212,175,55,0.4), inset 0 1px 0 rgba(247,236,203,0.18), inset 0 -3px 10px rgba(0,0,0,0.45); }
 .wx3d-tap { cursor: pointer; }
+
+/* [loop] PERF: content-visibility auto — browser skips off-screen card rendering (3D anims paused when scrolled away) */
+#result .card { content-visibility: auto; contain-intrinsic-size: auto 350px; }
