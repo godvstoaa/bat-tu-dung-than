@@ -2439,3 +2439,6 @@ button:focus-visible, .lab-btn:focus-visible {
 
 /* [loop] gold divider after 3D sections — separates overview from detail */
 .tuzu-3d-wrap::after, .wx3d-wrap::after, .dy3d-wrap::after { content: ''; display: block; height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.25), transparent); margin: 8px 0 6px; }
+
+/* [loop] Nhật Chủ highlight — day pillar = self, most important */
+.tuzu-col.tuzu-dm .tuzu-label::after { content: '· NHẬT CHỦ'; display: block; font-size: 7.5px; color: var(--cinnabar, #c0392b); font-weight: 700; letter-spacing: 0.5px; margin-top: 1px; }
