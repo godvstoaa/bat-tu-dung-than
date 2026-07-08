@@ -228,7 +228,7 @@ function renderTuzu3D(chart) {
   const labelsZh = { year: '年柱', month: '月柱', day: '日柱', time: '时柱' };
   const labelsVi = { year: 'Trụ Năm', month: 'Trụ Tháng', day: 'Trụ Ngày', time: 'Trụ Giờ' };
   const order = ['year', 'month', 'day', 'time'];
-  const WX_C = { '木': '#5bba6a', '火': '#ff6b4a', '土': '#e8b94a', '金': '#c8c8d8', '水': '#5a9ee0' }; // sáng cho 3D
+  const WX_C = { '木': '#5fd870', '火': '#ff6a4a', '土': '#f0c050', '金': '#d8d8e8', '水': '#60a8e8' }; // sáng cho 3D
   const cols = order.map((key) => {
     const p = chart.pillars[key];
     const gC = WX_C[GAN[p.gan].wx] || '#d4af37', zC = WX_C[ZHI[p.zhi].wx] || '#d4af37';
@@ -611,7 +611,7 @@ function _renderWxRadar(wx, yong, selected) {
 function renderWx3D(wx, yong) {
   if (!wx || !wx.pct) return;
   const ELEMS = ['木', '火', '土', '金', '水'];
-  const WX_C = { '木': '#5bba6a', '火': '#ff6b4a', '土': '#e8b94a', '金': '#c8c8d8', '水': '#5a9ee0' };
+  const WX_C = { '木': '#5fd870', '火': '#ff6a4a', '土': '#f0c050', '金': '#d8d8e8', '水': '#60a8e8' };
   const orbs = ELEMS.map((w, i) => {
     const pct = wx.pct[w] || 0;
     const size = Math.max(34, Math.min(76, pct * 2.6));
