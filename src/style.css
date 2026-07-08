@@ -2442,3 +2442,7 @@ button:focus-visible, .lab-btn:focus-visible {
 
 /* [loop] Nhật Chủ highlight — day pillar = self, most important */
 .tuzu-col.tuzu-dm .tuzu-label::after { content: '· NHẬT CHỦ'; display: block; font-size: 7.5px; color: var(--cinnabar, #c0392b); font-weight: 700; letter-spacing: 0.5px; margin-top: 1px; }
+
+/* [loop] ambient gold glow on results — warm cohesive atmosphere */
+#result { position: relative; }
+#result >::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 200px; background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.05), transparent 70%); pointer-events: none; z-index: 0; }
