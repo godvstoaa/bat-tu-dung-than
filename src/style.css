@@ -482,6 +482,17 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .dy3d-gz { font-size: 13px; font-weight: 700; font-family: 'Noto Serif SC', serif; margin-top: 4px; }
 .dy3d-age { font-size: 9px; color: var(--silk-dim, #c9bfa0); }
 .dy3d-now { font-size: 8px; font-weight: 700; color: var(--gold-bright, #f3d57a); }
+
+/* [user] VERDICT 3D — Dụng Thần seal 3D (gold-foil embossed, float + ring xoay) */
+.vd3d-wrap { margin: 4px 0 8px; }
+.vd3d { perspective: 700px; text-align: center; }
+.vd3d-seal { display: inline-block; width: 86px; height: 86px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f7eccb, #d4af37 50%, #7a5e15 100%); box-shadow: 0 0 26px rgba(212,175,55,0.5), inset 0 3px 7px rgba(255,255,255,0.35), inset 0 -5px 12px rgba(0,0,0,0.45); transform-style: preserve-3d; animation: vdFloat 5s ease-in-out infinite; position: relative; }
+.vd3d-ring { position: absolute; inset: -6px; border: 1px dashed rgba(212,175,55,0.45); border-radius: 50%; animation: vdSpin 14s linear infinite; }
+.vd3d-char { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; font-family: 'Noto Serif SC', serif; color: var(--cinnabar-deep, #8b2a1a); text-shadow: 0 0 10px rgba(192,57,43,0.5), 0 1px 2px rgba(0,0,0,0.5); }
+.vd3d-label { font-size: 11px; font-weight: 700; color: var(--gold, #d4af37); letter-spacing: 1.5px; margin-top: 8px; text-transform: uppercase; }
+@keyframes vdFloat { 0%, 100% { transform: translateY(0) rotateY(-10deg); } 50% { transform: translateY(-6px) rotateY(10deg); } }
+@keyframes vdSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .vd3d-seal, .vd3d-ring { animation: none; } }
 .wx-track { background: rgba(0,0,0,0.35); border: 1px solid rgba(212, 175, 55, 0.14); border-radius: 20px; height: 15px; overflow: hidden; }
 .wx-fill { height: 100%; border-radius: 20px; transition: width .9s var(--ease-out); filter: drop-shadow(0 0 5px rgba(255,255,255,0.22)) brightness(1.04); box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -1px 3px rgba(0,0,0,0.35); }
 .wx-pct { text-align: right; font-size: 12.5px; color: var(--gold-pale); font-variant-numeric: tabular-nums; font-weight: 600; }

@@ -293,6 +293,17 @@ function renderPillars(chart) {
 }
 
 // ---------------------------------------------------------------- VERDICT (+ CÁCH CỤC + 用喜忌仇)
+// [user] VERDICT 3D — Dụng Thần seal 3D (gold-foil embossed, char ngũ hành, float + ring)
+function renderVerdict3D(R) {
+  if (!R || !R.yong || !R.yong.primary) return;
+  const el = $('verdict'); if (!el) return;
+  const w = R.yong.primary;
+  const seal = document.createElement('div');
+  seal.className = 'vd3d-wrap';
+  seal.innerHTML = `<div class="vd3d"><div class="vd3d-seal"><div class="vd3d-ring"></div><div class="vd3d-char">${w}</div></div><div class="vd3d-label">DỤNG THẦN · ${WX_VI[w] || ''}</div></div>`;
+  const old = el.querySelector('.vd3d-wrap'); if (old) old.remove();
+  el.insertBefore(seal, el.firstChild);
+}
 function renderVerdict(R) {
   const { chart, strength, yong, pattern } = R;
   const dm = chart.dayMaster;
@@ -4466,6 +4477,7 @@ async function run() {
   renderTuzu3D(c);
   renderPillars(c);
   renderVerdict(currentResult);
+  renderVerdict3D(currentResult);
   renderSynthesis(currentResult);
   renderPersonalityNarrative(currentResult); // [loop 488] natal «bạn là ai»
   renderPhaseNarrative(currentResult); // [loop 472] narrative ngay sau tổng luận
