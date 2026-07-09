@@ -2648,3 +2648,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .dy { contain: layout; }
 .wx-row { contain: layout; }
 .ln { contain: layout; }
+.tool { contain: layout; }
