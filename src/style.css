@@ -2734,3 +2734,6 @@ main.container { contain: layout style paint; }
 .dy3d-active { animation: dyPulse 2.5s ease-in-out infinite; }
 @keyframes dyPulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.2); } }
 @media (prefers-reduced-motion: reduce) { .dy3d-active { animation: none; } }
+.tuzu-dm { animation: dmGlow 3s ease-in-out infinite; }
+@keyframes dmGlow { 0%,100% { box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 22px rgba(212,175,55,0.25), inset 0 1px 0 rgba(247,236,203,0.18), inset 0 -3px 10px rgba(0,0,0,0.45); } 50% { box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 32px rgba(212,175,55,0.4), inset 0 1px 0 rgba(247,236,203,0.25), inset 0 -3px 10px rgba(0,0,0,0.45); } }
+@media (prefers-reduced-motion: reduce) { .tuzu-dm { animation: none; } }
