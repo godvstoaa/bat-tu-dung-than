@@ -2656,3 +2656,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .syn-factors { contain: layout; }
 .ix-group { contain: layout; }
 .msg-text { contain: layout; }
+.chat-log { contain: layout; }
