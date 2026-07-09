@@ -2536,3 +2536,6 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .wx3d-sphere::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.3) 50%, transparent 65%); animation: orbShimmer 3s ease-in-out infinite; }
 @keyframes orbShimmer { 0%,100% { opacity: 0; transform: translateX(-15px); } 50% { opacity: 1; transform: translateX(15px); } }
 @media (prefers-reduced-motion: reduce) { .wx3d-sphere::after { animation: none; opacity: 0; } }
+
+/* [loop] hh3d-score gold-foil gradient text */
+.hh3d-score { background: linear-gradient(165deg, #f7eccb, #d4af37 50%, #8a6d1a); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
