@@ -574,7 +574,7 @@ const WX_CYCLE = {
   '水': { sinh: '木', bySinh: '金', khac: '火', byKhac: '土' },
 };
 const WX_VI_X = { '木': 'Mộc', '火': 'Hỏa', '土': 'Thổ', '金': 'Kim', '水': 'Thủy' };
-const WX_COLOR_X = { '木': '#4a8', '火': '#e54', '土': '#da3', '金': '#aaa', '水': '#369' };
+const WX_COLOR_X = { '木': '#5fd870', '火': '#ff6a4a', '土': '#f0c050', '金': '#d8d8e8', '水': '#60a8e8' };
 // [user] bespoke gold-foil element icons (grok image_gen) — thay dot màu bằng icon custom
 const WX_ICON = { '木': '/icons/moc.webp', '火': '/icons/hoa.webp', '土': '/icons/tho.webp', '金': '/icons/kim.webp', '水': '/icons/thuy.webp' };
 const WX_ROLE_MEANING = {
