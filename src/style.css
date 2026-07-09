@@ -2751,3 +2751,4 @@ main.container { contain: layout style paint; }
 .dy3d-gz { animation: charGlow 3.5s ease-in-out infinite alternate; }
 .wx3d-han { animation: charGlow 3s ease-in-out infinite alternate; }
 .hh3d-han { animation: charGlow 3s ease-in-out infinite alternate; }
+.vd3d-label { animation: charGlow 4s ease-in-out infinite alternate; }
