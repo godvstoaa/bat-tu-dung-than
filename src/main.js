@@ -594,15 +594,35 @@ function _renderWxRadar(wx, yong, selected) {
   const ELEMS = ['木', '火', '土', '金', '水'];
   const colors = { 木: WX_COLOR['木'], 火: WX_COLOR['火'], 土: WX_COLOR['土'], 金: WX_COLOR['金'], 水: WX_COLOR['水'] };
   const max = Math.max(...Object.values(wx.pct));
-  const cx = 80, cy = 80, R = 65, ang = (i) => (-90 + i * 72) * Math.PI / 180;
-  const pts = ELEMS.map((w, i) => { const val = max > 0 ? (wx.pct[w] || 0) / max : 0; const r = R * Math.max(0.08, val); return { x: cx + r * Math.cos(ang(i)), y: cy + r * Math.sin(ang(i)), lx: cx + (R + 15) * Math.cos(ang(i)), ly: cy + (R + 15) * Math.sin(ang(i)), w, pct: wx.pct[w] || 0 }; });
+  // viewBox 220×220 + label radius R+28 → nhãn %/tag không bị cắt mép (trước: 160×160, R+15 = dính viền)
+  const cx = 110, cy = 110, R = 68, LR = R + 28;
+  const ang = (i) => (-90 + i * 72) * Math.PI / 180;
+  const pts = ELEMS.map((w, i) => {
+    const val = max > 0 ? (wx.pct[w] || 0) / max : 0;
+    const r = R * Math.max(0.08, val);
+    const a = ang(i);
+    return {
+      x: cx + r * Math.cos(a), y: cy + r * Math.sin(a),
+      lx: cx + LR * Math.cos(a), ly: cy + LR * Math.sin(a),
+      w, pct: wx.pct[w] || 0,
+    };
+  });
   const ptOf = (w) => pts[ELEMS.indexOf(w)];
   const polyPts = pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
   const grid = [0.25, 0.5, 0.75, 1.0].map((lvl) => { const gp = ELEMS.map((_, i) => `${(cx + R * lvl * Math.cos(ang(i))).toFixed(1)},${(cy + R * lvl * Math.sin(ang(i))).toFixed(1)}`).join(' '); return `<polygon points="${gp}" fill="none" stroke="rgba(212,175,55,${0.07 + lvl * 0.07})" stroke-width="0.5"/>`; }).join('');
   const axes = ELEMS.map((_, i) => `<line x1="${cx}" y1="${cy}" x2="${(cx + R * Math.cos(ang(i))).toFixed(1)}" y2="${(cy + R * Math.sin(ang(i))).toFixed(1)}" stroke="rgba(212,175,55,0.1)" stroke-width="0.5"/>`).join('');
   const TAG = { [yong && yong.primary]: '★Dụng', [yong && yong.xi]: '♥Hỷ', [yong && yong.ji]: '⚠Kỵ', [yong && yong.chou]: '⚔Thù' };
   const fav = new Set([yong && yong.primary, yong && yong.xi].filter(Boolean)), avoid = new Set([yong && yong.ji, yong && yong.chou].filter(Boolean));
-  const labels = pts.map((p) => { const tag = TAG[p.w] || ''; const tc = fav.has(p.w) ? '#2e9e5b' : avoid.has(p.w) ? '#e0533d' : '#948864'; const dim = selected && selected !== p.w ? ' opacity="0.35"' : ''; return `<text${dim} x="${p.lx.toFixed(1)}" y="${p.ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${colors[p.w]}" font-weight="bold">${p.w}${p.pct}%</text>${tag ? `<text${dim} x="${p.lx.toFixed(1)}" y="${(p.ly + 11).toFixed(1)}" text-anchor="middle" font-size="7" fill="${tc}">${tag}</text>` : ''}`; }).join('');
+  // 2 dòng: 金 + 35.2% (rồi tag) — tránh 1 chuỗi dài bị clip
+  const labels = pts.map((p) => {
+    const tag = TAG[p.w] || '';
+    const tc = fav.has(p.w) ? '#2e9e5b' : avoid.has(p.w) ? '#e0533d' : '#948864';
+    const dim = selected && selected !== p.w ? ' opacity="0.35"' : '';
+    const x = p.lx.toFixed(1), y = p.ly.toFixed(1);
+    return `<text${dim} x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="${colors[p.w]}" font-weight="bold">${p.w}</text>`
+      + `<text${dim} x="${x}" y="${(p.ly + 12).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="${colors[p.w]}" font-weight="600">${p.pct}%</text>`
+      + (tag ? `<text${dim} x="${x}" y="${(p.ly + 22).toFixed(1)}" text-anchor="middle" font-size="8" fill="${tc}">${tag}</text>` : '');
+  }).join('');
   let rels = '';
   if (selected && WX_CYCLE[selected]) {
     const c = WX_CYCLE[selected];
@@ -613,7 +633,7 @@ function _renderWxRadar(wx, yong, selected) {
   const vgrads = ELEMS.map((w, i) => `<radialGradient id="wxv${i}" cx="35%" cy="28%" r="75%"><stop offset="0%" stop-color="rgba(255,255,255,0.95)"/><stop offset="42%" stop-color="${colors[w]}"/><stop offset="100%" stop-color="rgba(0,0,0,0.55)"/></radialGradient>`).join('');
   const defs = `<defs><radialGradient id="wxradar" cx="50%" cy="38%" r="62%"><stop offset="0%" stop-color="rgba(247,236,203,0.62)"/><stop offset="55%" stop-color="rgba(212,175,55,0.34)"/><stop offset="100%" stop-color="rgba(70,50,10,0.08)"/></radialGradient><filter id="wxglow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>${vgrads}${markers}</defs>`;
   const verts = pts.map((p, i) => { const sel = selected === p.w, dim = selected && selected !== p.w; const cls = 'wx-vertex' + (sel ? ' wx-vsel' : '') + (dim ? ' wx-vdim' : ''); return `<circle class="${cls}" data-wx="${p.w}" data-pct="${p.pct}" tabindex="0" role="button" aria-label="Hành ${WX_VI_X[p.w]}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${sel ? 6.4 : 4.6}" fill="url(#wxv${i})" stroke="rgba(0,0,0,0.4)" stroke-width="0.5"/>`; }).join('');
-  return `<svg class="wx-radar" width="180" height="180" viewBox="0 0 160 160" style="max-width:100%;height:auto">${defs}${grid}${axes}<polygon class="wx-radar-poly" points="${polyPts}" fill="url(#wxradar)" stroke="rgba(247,236,203,0.8)" stroke-width="1.7" filter="url(#wxglow)"/>${rels}${verts}${labels}</svg>`;
+  return `<svg class="wx-radar" width="240" height="240" viewBox="0 0 220 220" style="max-width:100%;height:auto;overflow:visible">${defs}${grid}${axes}<polygon class="wx-radar-poly" points="${polyPts}" fill="url(#wxradar)" stroke="rgba(247,236,203,0.8)" stroke-width="1.7" filter="url(#wxglow)"/>${rels}${verts}${labels}</svg>`;
 }
 
 // ---------------------------------------------------------------- NGŨ HÀNH
@@ -621,8 +641,16 @@ function _renderWxRadar(wx, yong, selected) {
 const _wx3dScenes = [];
 function renderWx3D(wx, yong) {
   if (!wx || !wx.pct) return;
-  // cleanup old scenes
-  _wx3dScenes.forEach(s => { try { s.renderer.dispose(); } catch(_) {} });
+  // cleanup old scenes (cancel RAF + force-lose WebGL context — tránh blank canvas sau re-render)
+  _wx3dScenes.forEach((s) => {
+    try { if (s.stop) s.stop(); } catch (_) {}
+    try { s.renderer.dispose(); } catch (_) {}
+    try {
+      const gl = s.renderer.getContext && s.renderer.getContext();
+      const lose = gl && gl.getExtension && gl.getExtension('WEBGL_lose_context');
+      if (lose) lose.loseContext();
+    } catch (_) {}
+  });
   _wx3dScenes.length = 0;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -633,11 +661,12 @@ function renderWx3D(wx, yong) {
   function createScene(canvas, type, pct, isDung) {
     const W = canvas.width, H = canvas.height;
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 100);
-    camera.position.set(0, 2, 6);
+    const camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
+    camera.position.set(0, 1.6, 5.2);
+    camera.lookAt(0, 0.6, 0);
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setSize(W, H);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setSize(W, H, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.setClearColor(0x000000, 0);
     scene.add(new THREE.AmbientLight(0xffffff, 1.2));
     const dl = new THREE.DirectionalLight(0xffffff, 2.0);
@@ -711,8 +740,9 @@ function renderWx3D(wx, yong) {
       }
     }
 
-    let time = 0, raf = null;
+    let time = 0, raf = null, alive = true;
     function animate() {
+      if (!alive) return;
       raf = requestAnimationFrame(animate);
       time += 0.016;
       if (!reduced) {
@@ -732,7 +762,10 @@ function renderWx3D(wx, yong) {
       renderer.render(scene, camera);
     }
     animate();
-    _wx3dScenes.push({ renderer, raf: () => cancelAnimationFrame(raf) });
+    _wx3dScenes.push({
+      renderer,
+      stop: () => { alive = false; if (raf) cancelAnimationFrame(raf); },
+    });
   }
 
   const cols = ELEMS.map((w) => {
@@ -759,10 +792,10 @@ function renderWx3D(wx, yong) {
     const old = wux.parentNode.querySelector('[data-wx3d]');
     if (old) old.remove();
     wux.parentNode.insertBefore(wrap, wux);
-    // init Three.js scenes
+    // init Three.js scenes — type must be 木/火/土/金/水 (createScene compares Chinese keys)
     ELEMS.forEach((w) => {
       const c = wrap.querySelector('canvas[data-wx3d-canvas="' + w + '"]');
-      if (c) createScene(c, w === '木' ? 'moc' : w === '火' ? 'hoa' : w === '土' ? 'tho' : w === '金' ? 'kim' : 'thuy', wx.pct[w] || 0, w === (yong && yong.primary));
+      if (c) createScene(c, w, wx.pct[w] || 0, w === (yong && yong.primary));
     });
     wrap.addEventListener('click', (e) => {
       const col = e.target.closest('[data-wx]'); if (!col) return;
