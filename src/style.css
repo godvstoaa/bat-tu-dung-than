@@ -2707,3 +2707,4 @@ html { contain: layout; }
 .ai-popup,.chat-log { contain: strict; }
 #result { contain: strict; }
 main.container { contain: strict; }
+.bg-clouds,.bg-glow,.bg-grain,#mote-field { contain: strict; }
