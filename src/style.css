@@ -2498,3 +2498,5 @@ body::before {
   }
   .bagua-ring, .bagua-ring.outer { animation: none !important; }
 }
+/* cache-bust: force new hash */
+.hero { min-height: 320px; }
