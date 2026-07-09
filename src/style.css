@@ -2610,3 +2610,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .dy3d-age { transition: color .2s; }
 .dy3d-now { transition: color .2s; }
 .vd3d-label { transition: color .2s; }
+.tuzu-gan,.tuzu-zhi,.wx3d-han,.hh3d-han,.vd3d-char,.dy3d-gz,.vd3d-label,.tuzu-label { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
