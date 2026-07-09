@@ -2545,3 +2545,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 
 /* [loop] subtle gold glow on ALL Hán tự (.zh) — mystical atmosphere */
 .zh { text-shadow: 0 0 8px rgba(212,175,55,0.12); }
+.th-hehun { border-color: rgba(212,175,55,0.35) !important; color: var(--gold-pale,#f7eccb) !important; }
