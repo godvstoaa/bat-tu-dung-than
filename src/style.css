@@ -2463,3 +2463,8 @@ button:focus-visible, .lab-btn:focus-visible {
 .hh3d-bar { height: 5px; background: linear-gradient(90deg, #e0533d, #e8b94a 45%, #3fb86b); border-radius: 3px; margin: 6px auto 4px; width: 72px; position: relative; }
 .hh3d-marker { position: absolute; top: -3px; width: 11px; height: 11px; background: var(--gold-bright, #f3d57a); border-radius: 50%; box-shadow: 0 0 8px var(--gold, #d4af37); }
 .hh3d-rating { font-size: 10px; }
+
+/* [loop] GLOBAL reduced-motion — nuclear guard for ALL animations (a11y) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
