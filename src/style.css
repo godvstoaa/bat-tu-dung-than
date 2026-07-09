@@ -2552,3 +2552,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .vd3d-label { background: linear-gradient(90deg, transparent, rgba(212,175,55,0.1), transparent); padding: 4px 14px; border-radius: 4px; display: inline-block; }
 .hh3d { perspective: 700px; }
 .tuzu-col:hover { border-color: rgba(247,236,203,0.25); }
+.tuzu-stage { background: linear-gradient(180deg, rgba(212,175,55,0.02), transparent); border-radius: 8px; }
