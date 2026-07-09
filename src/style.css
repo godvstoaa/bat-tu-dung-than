@@ -2721,3 +2721,5 @@ main.container { contain: strict; }
 .wx3d-orb::before { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: radial-gradient(circle, var(--c, transparent), transparent 70%); opacity: 0.08; pointer-events: none; z-index: -1; }
 .wx3d-orb { position: relative; }
 .vd3d-seal::before { content: ""; position: absolute; inset: -8px; border-radius: 50%; background: radial-gradient(circle, rgba(212,175,55,0.08), transparent 70%); pointer-events: none; z-index: -1; }
+.dy3d-col::before { content: ""; position: absolute; inset: 0; border-radius: 4px; background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent 50%); pointer-events: none; z-index: 0; }
+.dy3d-col { position: relative; }
