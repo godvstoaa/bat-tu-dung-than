@@ -2611,3 +2611,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .dy3d-now { transition: color .2s; }
 .vd3d-label { transition: color .2s; }
 .tuzu-gan,.tuzu-zhi,.wx3d-han,.hh3d-han,.vd3d-char,.dy3d-gz,.vd3d-label,.tuzu-label { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+.wx3d-pct,.hh3d-score,.tuzu-name,.wx3d-name,.hh3d-label,.dy3d-age,.dy3d-now { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
