@@ -2500,3 +2500,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--gold-bright, #f
 
 /* [loop] hero→form gold gradient separator */
 .hero { border-bottom: 1px solid; border-image: linear-gradient(90deg, transparent, rgba(212,175,55,0.25), transparent) 1; }
+
+/* [loop] section header hover feedback (interactive accordion) */
+h2.grp { transition: background .2s, color .2s; cursor: pointer; }
+h2.grp:hover { background: linear-gradient(90deg, transparent, rgba(212,175,55,0.14), transparent) !important; color: var(--gold-bright, #f3d57a); }
+h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
