@@ -2686,3 +2686,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .wx-pct { contain: layout; }
 .wx-name { contain: layout; }
 .dot { contain: layout; }
+.hidden-stems { contain: layout; }
