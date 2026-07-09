@@ -2446,3 +2446,8 @@ button:focus-visible, .lab-btn:focus-visible {
 /* [loop] ambient gold glow on results — warm cohesive atmosphere */
 #result { position: relative; }
 #result >::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 200px; background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.05), transparent 70%); pointer-events: none; z-index: 0; }
+
+/* [loop] deeper 3D: tuzuSway with translateZ pop + stronger orb glow + seal */
+@keyframes tuzuSway { 0%,100% { transform: rotateY(-22deg) translateZ(15px); } 50% { transform: rotateY(22deg) translateZ(15px); } }
+.wx3d-sphere { box-shadow: 0 0 calc(var(--s) * 0.5 * 1px) var(--c), 0 8px 16px rgba(0,0,0,0.5), inset -4px -7px 12px rgba(0,0,0,0.45), inset 3px 4px 8px rgba(255,255,255,0.2); }
+.vd3d-seal { width: 92px; height: 92px; box-shadow: 0 0 32px rgba(212,175,55,0.6), inset 0 3px 7px rgba(255,255,255,0.4), inset 0 -5px 12px rgba(0,0,0,0.45); }
