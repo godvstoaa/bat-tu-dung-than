@@ -2505,3 +2505,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--gold-bright, #f
 h2.grp { transition: background .2s, color .2s; cursor: pointer; }
 h2.grp:hover { background: linear-gradient(90deg, transparent, rgba(212,175,55,0.14), transparent) !important; color: var(--gold-bright, #f3d57a); }
 h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
+
+/* [loop] CTA pulse — hợp tuổi button invites tap */
+.th-hehun { animation: thPulse 2.5s ease-in-out infinite; }
+@keyframes thPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); } 50% { box-shadow: 0 0 14px 2px rgba(212,175,55,0.22); } }
+@media (prefers-reduced-motion: reduce) { .th-hehun { animation: none; } }
