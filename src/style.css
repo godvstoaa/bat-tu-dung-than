@@ -2628,3 +2628,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 #verdict { contain: layout; }
 #dayun-chart { contain: layout; }
 .today-hero { contain: layout; }
+.ai-popup { contain: layout; }
