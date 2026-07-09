@@ -2598,3 +2598,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .tuzu-col { transition: transform .25s var(--ease-out,ease), box-shadow .25s, border-color .2s; }
 .dy3d-col { transition: transform .2s ease, border-color .2s; }
 .vd3d-ring { transition: border-color .3s; }
+.vd3d-char { transition: text-shadow .3s; }
