@@ -2468,3 +2468,6 @@ button:focus-visible, .lab-btn:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* [loop] FIX: tools-card exempt from content-visibility (hh-btn must be clickable) */
+.card.tools-card { content-visibility: visible !important; contain-intrinsic-size: none; }
