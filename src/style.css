@@ -2654,3 +2654,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .card-search { contain: layout; }
 .capsule-spark, #capsule-spark { contain: layout; }
 .syn-factors { contain: layout; }
+.ix-group { contain: layout; }
