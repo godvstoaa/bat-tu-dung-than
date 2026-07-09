@@ -2490,3 +2490,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--gold-bright, #f
 .grp { background: linear-gradient(90deg, transparent, rgba(212,175,55,0.06), transparent); border-radius: 4px; padding: 6px 10px; margin-left: -4px; margin-right: -4px; }
 .card-title { text-shadow: 0 0 10px rgba(212,175,55,0.15); }
 .verdict-card { border-color: rgba(212,175,55,0.35); }
+
+/* [loop] verdict seal stamp entrance — scale + rotate (seal being stamped) */
+.vd3d-wrap { animation: vdStamp .6s cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes vdStamp { from { opacity: 0; transform: scale(0.2) rotate(-25deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
