@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE, PATTERN_SHUN_NI, THUONG_GUAN_5_TYPES, PATTERN_SUCCESS_FAIL, PATTERN_QUALITY_RANKING, YONGSHEN_VARIATION } from './kb.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
@@ -663,6 +663,18 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "THẦN SÁT CHI TIẾT: " + (shenshaDeep || '(không có thần煞 sâu trong lá số)') + "\n" +
       "HUYỀN HỌC CƠ BẢN (triết lý để trả lời sâu): " + (METAPHYSICS_CORE || []).slice(0, 3).join(' | ');
   } catch (e) { brief += "\n--- 12 TRƯỜNG SINH + THẦN SÁT: [lỗi load] ---"; }
+
+  // ---- [round 5] CÁCH CỤC THUẬN NGHỊCH + DỤNG THẦN BIẾN + CHẤT LƯỢNG CÁCH ----
+  try {
+    const patVi = R.pattern?.vi || R.synthesis?.gradeVi || '';
+    const patZh = R.pattern?.zh || R.synthesis?.grade || '';
+    const shunNi = patZh ? (PATTERN_SHUN_NI[patZh] || null) : null;
+    const qualityRank = (PATTERN_QUALITY_RANKING || []).join(' / ');
+    brief += "\n--- CÁCH CỤC THUẬN/NGHỊCH + DỤNG THẦN (round 5) ---\n" +
+      "CÁCH CỤC " + patVi + "(" + patZh + "): " + (shunNi ? shunNi.type + " — Dụng: " + shunNi.yong + " | Hỷ: " + shunNi.hy.join(', ') + " | Kỵ: " + shunNi.ky.join(', ') + " | Cổ quyết: " + shunNi.note : '(không có trong bảng') + "\n" +
+      "DỤNG THẦN BIẾN (子平真詮): " + (YONGSHEN_VARIATION || []).slice(0, 3).join(' ') + "\n" +
+      "CHẤT LƯỢNG CÁCH (子平真詮 ch.8): " + qualityRank;
+  } catch (e) { brief += "\n--- CÁCH CỤC: [lỗi load] ---"; }
 
   if (fcParts.length) {
     brief += '\n--- DỰ BÁO & THỜI ĐIỂM ---\n' + fcParts.join('\n');

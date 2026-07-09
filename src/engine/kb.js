@@ -974,3 +974,56 @@ export const METAPHYSICS_CORE = [
   'Vật Cực Tất Phản: cực thịnh tất suy, cực suy tất thịnh. 「日中则昃，月盈则食」— mặt trời đứng bóng rồi nghiêng, trăng tròn rồi khuyết.',
   'Tri Mệnh Cải Vận: 「不知命无以为君子」— không biết mệnh không thể làm quân tử. Biết mệnh → thuận thiên → cải vận.',
 ];
+
+// ============================================================
+//  ROUND 5 CRAWL — 子平格局順用逆用 + 格局成破 + 傷官5格
+//  Nguồn: 子平真詮評注 (8bei8.com), deeporacle.ai, zhihu, baike
+// ============================================================
+
+// ---- 格局順用/逆用: Dụng → Hỷ → Kỵ → Thù ----
+export const PATTERN_SHUN_NI = {
+  '正官格': { type: 'thuận', yong: 'Chính Quan', hy: ['Tài (sinh Quan)', 'Ấn (hộ Quan)'], ky: ['Thương Quan (khắc Quan)', 'Thất Sát (hỗn Quan)'], note: '「官來就我」— quan tinh thuần nhất, không tạp sát. Thương quan kiến quan = phá cách (trừ khi có ấn chế).' },
+  '七殺格': { type: 'nghịch', yong: 'Thất Sát', hy: ['Thực Thần (chế sát)', 'Dương Nhận (hợp sát)'], ky: ['Tài (tài sinh sát → sát mạnh thêm)', 'Ấn (tư phù sát)'], note: '「殺來攻身」— sát khắc nhật chủ, cần THỰC THẦN chế hoặc thực/Dương Nhận hợp. 「制殺留財」= cao thủ.' },
+  '正財格': { type: 'thuận', yong: 'Chính Tài', hy: ['Thực Thần (sinh tài)', 'Quan (hộ tài)'], ky: ['Tỷ Kiên/Kiếp Tài (tranh tài)', 'Thất Sát (tài sinh sát → tài hao)'], note: 'Thân cường tài vượng = phú quý. Thân nhược tài đa = 「tài đa thân nhược」.' },
+  '偏財格': { type: 'thuận', yong: 'Thiên Tài', hy: ['Thực Thần', 'Quan'], ky: ['Tỷ/Kiếp (phá thiên tài)'], note: 'Thiên tài = tài lớn, đầu tư, kinh doanh. Dễ đến dễ đi — cần Quan hộ.' },
+  '正印格': { type: 'thuận', yong: 'Chính Ấn', hy: ['Quan/Sát (sinh ấn)', 'Tỷ Kiên (hộ ấn)'], ky: ['Tài (tài hoại ấn)'], note: '「印赖官生」— ấn cần quan sinh. Tài khắc ấn = phá cách (trừ khi có quan sát giữa tài-ấn).' },
+  '偏印格': { type: 'nghịch', yong: 'Phiên Ấn (枭神)', hy: ['Tài (chế枭)', 'Thực Thần (cần nhưng bị枭 đoạt)'], ky: ['Ấn vượng quá (khiến thực thần bị đoạt)'], note: '「枭神夺食」— rất xấu khi phiên ấn vượng + thực thần yếu. Cần TÀI chế枭.' },
+  '食神格': { type: 'thuận', yong: 'Thực Thần', hy: ['Tài (thực sinh tài)', 'Thân vượng'], ky: ['Phiên Ấn/枭神 (đoạt thực)'], note: '「食神喜身旺」— thực thần cần thân vượng mới sinh tài được. 枭神夺食 = phá cách.' },
+  '傷官格': { type: 'nghịch', yong: 'Thương Quan', hy: ['Ấn (chế thương = 「佩印」)', 'Tài (thương sinh tài = hóa)'], ky: ['Chính Quan (thương kiến quan = "vị祸百端")'], note: '5 subtype: 佩印/生財/傷盡/喜官/駕殺 — xem THUONG_GUAN_5_TYPES.' },
+  '月刃格/建祿格': { type: 'nghịch', yong: 'Dương Nhận / Lộc', hy: ['Quan/Sát (chế nhẫn)', 'Thực Thần (tiết khí)'], ky: ['Tài (tài sinh sát → quá mạnh)', 'Ấn (quá ướp)'], note: '「阳刃喜官煞」— dương nhận cương mãnh, cần quan/sát chế.' },
+};
+
+// ---- 傷官 5 subtype ----
+export const THUONG_GUAN_5_TYPES = {
+  '伤官佩印': { vi: 'Thương Quan Bội Ấn', condition: 'thân nhược + ấn hữu căn + thương thực cường vượng', ky: 'tài (tài hoại ấn), quan (thương kiến quan)', best: 'học thuật, nghệ thuật, nghiên cứu — 「一印三用」' },
+  '伤官生财': { vi: 'Thương Quan Sinh Tài', condition: 'thân cường + tài hữu căn', ky: 'tỷ kiếp (tranh tài), ấn (chế thương không cho sinh tài)', best: 'kinh doanh, đầu tư, buôn bán — thân cường thương vượng sinh tài = phú' },
+  '伤官伤尽': { vi: 'Thương Quan Thương Tận', condition: 'không còn một chút quan tinh nào trong tứ trụ + đại vận', ky: 'quan tinh đến (khi quan đến = họa)', best: 'nghệ thuật, sáng tạo, tự do — 「傷盡」= không bị quan quản' },
+  '伤官喜官': { vi: 'Thương Quan Hỷ Quan', condition: 'thân vượng + quan tinh hữu căn + thương quan chế lượng quan', ky: 'thân nhược (không gánh được)', best: '「傷官見官，妙在王侯」— chỉ tốt khi thân VƯỢNG' },
+  '伤官驾杀': { vi: 'Thương Quan Già Sát', condition: 'thân cường + sát cường + thương quan chế sát', ky: 'ấn (ấn sinh sát → sát mạnh)', best: 'quân sự, kinh doanh mạo hiểm, quyền lực — thương + sát = 「将相之才」' },
+};
+
+// ---- 格局 thành/bại conditions ----
+export const PATTERN_SUCCESS_FAIL = {
+  '成格': 'Dụng thần hữu căn (có gốc ở tàng can), không bị xung/khắc/hợp hóa, có Hỷ thần bảo vệ = cách cục THÀNH → phúc lộc.',
+  '破格': 'Dụng thần bị xung (冲), khắc (克), hoặc Kỵ thần quá mạnh không chế = cách cục PHÁ → cần đại vận bổ cứu.',
+  '变格': 'Dụng thần ban đầu bị biến do透 can khác hoặc hợp hóa → dùng thần mới = BIẾN CÁCH (không hẳn xấu).',
+  '救应': 'Kỵ thần khắc Dụng nhưng có Hỷ thần chế Kỵ = 「救应」→ cách cục tuy không hoàn hảo nhưng vẫn dùng được.',
+};
+
+// ---- 格局高低 ranking (子平真詮 ch.8) ----
+export const PATTERN_QUALITY_RANKING = [
+  'CAO: Dụng thuần nhất + Hỷ rõ + Kỵ bị chế + đại vận thuận → 「清」= cách cục thanh cao, phúc lộc song toàn',
+  'TRUNG: Dụng hữu căn nhưng có tạp + đại vận xen kẽ cát/hung → phúc lộc nhưng sóng gió',
+  'THẤP: Dụng bị phá + Kỵ mạnh không chế + đại vận nghịch → cần nỗ lực gấp đôi, 「浊」= cách cục trọc',
+  'ĐẶC BIỆT: 「從格」(tòng cách) — toàn cục 1 hành/thần → dùng thần = hành/thần vượng nhất, cần thuận theo (從). 「從財」= giàu; 「從殺」= quý; 「從兒」= nghệ sĩ.',
+];
+
+// ---- 用神變化 (dụng thần có thể thay đổi) ----
+export const YONGSHEN_VARIATION = [
+  '用神 định ban đầu theo Nguyệt Lệnh → nhưng có thể BIẾN khi:',
+  '1. Nguyệt Lệnh tàng can được 「透」(lộ can) → dùng can lộ thay zhi',
+  '2. Hợp hóa (can hợp → hóa hành khác) → dụng thần đổi theo hành hóa',
+  '3. Xung (chi bị xung) → Nguyệt Lệnh bị phá → tìm dụng thần khác',
+  '4. Đại vận đến mang Hỷ/Kỵ → tạm thời ưu tiên chế Kỵ/hộ Dụng',
+  '「用神變化」là tính thực tế của Tử Bình — không phải 1 lá số chỉ có 1 Dụng cố định. Dụng có thể đổi theo đại vận.',
+];
