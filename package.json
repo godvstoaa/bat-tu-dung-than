@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",
-    "lunar-javascript": "^1.7.3"
+    "lunar-javascript": "^1.7.3",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "playwright": "^1.61.0",
