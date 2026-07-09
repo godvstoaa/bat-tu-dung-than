@@ -2674,3 +2674,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .btn-ghost { contain: layout; }
 .ai-fab { contain: layout; }
 .chip { contain: layout; }
+.ln-rate { contain: layout; }
