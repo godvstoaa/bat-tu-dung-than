@@ -4,16 +4,16 @@
    ============================================================ */
 :root {
   scroll-behavior: smooth;
-  /* Deep onyx cohesive surface (60%) — not pure black */
-  --ink-black: #111018;
-  --ink: #12121a;
-  --lacquer: #16151f;
-  /* Surface tint elevation system (replace heavy shadows) */
-  --surface-1: #12121a;
-  --surface-2: #16151f;
-  --surface-3: #1a1924;
+  /* [user] Default = Thổ (Earth) warm tones — Dụng Thần Thổ */
+  --ink-black: #110d05;
+  --ink: #15110a;
+  --lacquer: #1a160e;
+  /* Surface tint elevation system — warm earthy brown */
+  --surface-1: #15110a;
+  --surface-2: #1a160e;
+  --surface-3: #221d16;
   --panel: rgba(245, 236, 203, 0.02);
-  --panel-deep: rgba(18, 18, 26, 0.6);
+  --panel-deep: rgba(21, 17, 10, 0.6);
   --gold: #d4af37;
   --gold-bright: #f3d57a;
   --gold-pale: #f7eccb;
