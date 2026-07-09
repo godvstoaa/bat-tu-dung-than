@@ -2592,3 +2592,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .hh3d-han { font-family: 'Noto Serif SC', serif; }
 .hh3d-score { font-family: 'Noto Serif SC', serif; }
 .hh3d-rating { font-family: 'Noto Serif SC', serif; }
+.hh3d-orb:hover .hh3d-sphere { box-shadow: 0 0 28px var(--c), inset -3px -5px 10px rgba(0,0,0,0.4), inset 3px 4px 8px rgba(255,255,255,0.2); }
