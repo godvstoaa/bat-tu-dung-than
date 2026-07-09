@@ -2630,3 +2630,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .today-hero { contain: layout; }
 .ai-popup { contain: layout; }
 .hero { contain: layout; }
+.form-card { contain: layout; }
