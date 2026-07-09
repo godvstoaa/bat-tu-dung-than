@@ -2669,3 +2669,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .kicker { contain: layout; }
 .subtitle { contain: layout; }
 .card-title { contain: layout; }
+.hint { contain: layout; }
