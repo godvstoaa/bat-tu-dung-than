@@ -2708,3 +2708,4 @@ html { contain: layout; }
 #result { contain: strict; }
 main.container { contain: strict; }
 .bg-clouds,.bg-glow,.bg-grain,#mote-field { contain: strict; }
+.hero { contain: strict; }
