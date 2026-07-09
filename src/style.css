@@ -2740,3 +2740,6 @@ main.container { contain: layout style paint; }
 .wx3d-dung .wx3d-sphere { animation: orbFloat 4.5s ease-in-out infinite, orbGlow 2.5s ease-in-out infinite alternate, dungPulse 2s ease-in-out infinite; }
 @keyframes dungPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 @media (prefers-reduced-motion: reduce) { .wx3d-dung .wx3d-sphere { animation: orbFloat 4.5s ease-in-out infinite !important; } }
+.vd3d-char { animation: charGlow 3s ease-in-out infinite alternate; }
+@keyframes charGlow { from { text-shadow: 0 0 10px rgba(192,57,43,0.5), 0 1px 2px rgba(0,0,0,0.5); } to { text-shadow: 0 0 18px rgba(192,57,43,0.8), 0 0 6px rgba(247,236,203,0.4), 0 1px 2px rgba(0,0,0,0.5); } }
+@media (prefers-reduced-motion: reduce) { .vd3d-char { animation: none; } }
