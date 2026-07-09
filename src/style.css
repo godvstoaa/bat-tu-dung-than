@@ -2683,3 +2683,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .v-box { contain: layout; }
 .wx-track { contain: layout; }
 .wx-fill { contain: layout; }
+.wx-pct { contain: layout; }
