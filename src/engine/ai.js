@@ -603,18 +603,18 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const careerHint = topGods[0] ? (CAREER_BY_GOD[topGods[0].god] || []).join(', ') : '(không)';
     brief += '
 --- KIẾN THỨC CỔ PHÁP MỞ RỘNG (crawled) ---
-'
-      + '穷通宝鉴 調候: ' + tiaohou + '
-'
-      + '滴天髓 CỔ QUYẾT (top 5): ' + (DITIANSUI_MAXIMS || []).slice(0, 5).join(' | ') + '
-'
-      + '三命通会 ĐẠI VẬN (top 5): ' + (SANMING_DAYUN_RULES || []).slice(0, 5).join(' | ') + '
-'
-      + 'NGŨ HÀNH LUẬN BỆNH: hành yếu nhất = ' + (weakestWx ? weakestWx[0] + ' (' + weakestWx[1] + '%)' : '?') + (healthInfo ? ' → tạng: ' + healthInfo.organs + ' | triệu chứng: ' + healthInfo.symptoms + ' | nên ăn: ' + healthInfo.diet + ' | cảm xúc hại: ' + healthInfo.emotion + ' | khắc phục: ' + healthInfo.remedy : '') + '
-'
-      + 'SỰ NGHIỆP THEO THẬP THẦN: vượng nhất = ' + (topGods[0] ? topGods[0].vi : '?') + ' → nghề: ' + careerHint + '
-'
-      + 'ĐA TRƯỜNG PHÁI: ' + Object.entries(DIVINATION_SCHOOLS).map(([k,v]) => k + ': ' + v).join(' | ');
+' +
+      '穷通宝鉴 調候: ' + tiaohou + '
+' +
+      '滴天髓 CỔ QUYẾT (top 5): ' + (DITIANSUI_MAXIMS || []).slice(0, 5).join(' | ') + '
+' +
+      '三命通会 ĐẠI VẬN (top 5): ' + (SANMING_DAYUN_RULES || []).slice(0, 5).join(' | ') + '
+' +
+      'NGŨ HÀNH LUẬN BỆNH: hành yếu nhất = ' + (weakestWx ? weakestWx[0] + ' (' + weakestWx[1] + '%)' : '?') + (healthInfo ? ' > tạng: ' + healthInfo.organs + ' | triệu chứng: ' + healthInfo.symptoms + ' | nên ăn: ' + healthInfo.diet + ' | cảm xúc hại: ' + healthInfo.emotion + ' | khắc phục: ' + healthInfo.remedy : '') + '
+' +
+      'SỰ NGHIỆP THEO THẬP THẦN: vượng nhất = ' + (topGods[0] ? topGods[0].vi : '?') + ' > nghề: ' + careerHint + '
+' +
+      'ĐA TRƯỜNG PHÁI: ' + Object.entries(DIVINATION_SCHOOLS).map(([k,v]) => k + ': ' + v).join(' | ')
   } catch (e) { brief += '
 --- KIẾN THỨC CỔ PHÁP: [lỗi load] ---'; }
 
