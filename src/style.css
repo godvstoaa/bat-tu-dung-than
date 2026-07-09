@@ -2729,3 +2729,4 @@ main.container { contain: strict; }
 .wx3d-sphere { animation: orbFloat 4.5s ease-in-out infinite, orbGlow 3s ease-in-out infinite alternate; }
 @keyframes orbGlow { from { filter: brightness(1); } to { filter: brightness(1.15); } }
 @media (prefers-reduced-motion: reduce) { .wx3d-sphere { animation: none !important; } }
+.vd3d-seal { animation: vdFloat 5s ease-in-out infinite, orbGlow 3.5s ease-in-out infinite alternate; }
