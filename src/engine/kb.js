@@ -1027,3 +1027,66 @@ export const YONGSHEN_VARIATION = [
   '4. Đại vận đến mang Hỷ/Kỵ → tạm thời ưu tiên chế Kỵ/hộ Dụng',
   '「用神變化」là tính thực tế của Tử Bình — không phải 1 lá số chỉ có 1 Dụng cố định. Dụng có thể đổi theo đại vận.',
 ];
+
+// ============================================================
+//  ROUND 6 CRAWL — 六亲断法 + 宮位法 + 星宮配合
+//  Nguồn: zhihu六亲推断, 渊海子平六亲第四, starbook.ai, suanming.com.tw
+// ============================================================
+
+// ---- 六亲十神代表 (渊海子平) ----
+export const LIUQIN_STAR = {
+  male: { // nam mệnh
+    father: 'Thiên Tài (偏財)', mother: 'Chính Ấn (正印)', grandfather: 'Thiên Ấn (偏印)',
+    wife: 'Chính Tài (正財)', concubine: 'Thiên Tài (偏財)',
+    brothers: 'Tỷ Kiên (比肩)', sisters: 'Kiếp Tài (劫財)',
+    sons: 'Thất Sát (七殺)/Chính Quan (正官)', daughters: 'Thương Quan (傷官)/Thực Thần (食神)',
+    superiors: 'Chính Quan (正官)', subordinates: 'Kiếp Tài (劫財)',
+  },
+  female: { // nữ mệnh
+    father: 'Thiên Tài (偏財)', mother: 'Chính Ấn (正印)',
+    husband: 'Chính Quan (正官)', lover: 'Thất Sát (七殺)',
+    brothers: 'Tỷ Kiên (比肩)', sisters: 'Kiếp Tài (劫財)',
+    sons: 'Thương Quan (傷官)', daughters: 'Thực Thần (食神)',
+    mother_in_law: 'Thực Thần (食神)', father_in_law: 'Chính Quan (正官)',
+  },
+};
+
+// ---- 六亲宮位: trụ nào = người nào ----
+export const LIUQIN_PALACE = {
+  year: { vi: 'Niên Trụ (Năm)', represents: 'ông bà, tổ tiên, cha mẹ (nam: Thiên Tài vị)', note: 'Niên Can = cha; Niên Chi = ông bà. Ngũ hành vượng = gia thế mạnh.' },
+  month: { vi: 'Nguyệt Trụ (Tháng)', represents: 'cha mẹ, anh chị em, xuất thân', note: 'Nguyệt Lệnh = Dụng Thần → xuất thân tốt, gia đình giúp đỡ. Kỵ thần → xuất thân khó.' },
+  day: { vi: 'Nhật Trụ (Ngày)', represents: 'BẢN THÂN + PHỐI NGẪU', note: 'Nhật Can = mình; Nhật Chi = cung Phu Thê (bạn đời). Xung/hợp Nhật Chi = biến động hôn nhân.' },
+  time: { vi: 'Thời Trụ (Giờ)', represents: 'con cái, vãn niên, cấp dưới', note: 'Thời Trụ = Dụng → con cái có tài/phúc; vãn niên an hưởng. Kỵ thần → con cái bất hiếu hoặc vãn niên gian nan.' },
+};
+
+// ---- 星宮配合 nguyên tắc ----
+export const STAR_PALACE_RULES = [
+  'CUNG vượng + TINH cát → người đó tốt, phúc lộc → ví dụ: cung Phu Thê (Nhật Chi) vượng + Tài tinh (nam) hiển → vợ đẹp/giỏi.',
+  'CUNG suy + TINH hung → người đó khó → ví dụ: cung Tử Nữ (Thời Chi) bị xung + Quan sát bị thương → con cái bất lợi.',
+  'CUNG cát + TINH hung → môi trường tốt nhưng người xấu → ví dụ: Nhật Chi ủ Ấn (tốt) nhưng Tài tinh bị khắc → vợ nhà tốt nhưng tính cách xấu.',
+  'CUNG hung + TINH cát → môi trường xấu nhưng người tốt → ví dụ: Nhật Chi bị xung nhưng Tài tinh vượng → vợ tính tốt nhưng hoàn cảnh khó.',
+  '「星宫同参」— lúc nào cũng xem CẢ cung lẫn tinh, không chỉ xem 1 thứ. Cung = hoàn cảnh; Tinh = con người.',
+  'Tinh không xuất hiện trong tứ trụ → người đó "không hiển" (có thể mất sớm, hoặc xa cách, hoặc không nổi bật).',
+  'Tinh bị xung/khếtn trong cung đối ứng → người đó dễ có biến cố/sức khỏe vấn đề.',
+];
+
+// ---- 六亲 biến thông: khi sao không có trong tứ trụ ----
+export const LIUQIN_FALLBACK = [
+  'Nam không có Tài tinh → xem Nhật Chi (cung Phu Thê) + Thực Thương (tài nguyên sinh tài).',
+  'Nữ không có Quan tinh → xem Nhật Chi + Tài tinh (tài sinh quan).',
+  'Không có Ấn tinh → xem Thực Thương (khắc Ấn = "cái gì khắc Ấn cũng liên quan mẹ").',
+  'Không có Tỷ Kiên → xem Nhật Can bản thân (Tỷ Kiên = sao huynh đệ, không có = ít anh chị em hoặc xa cách).',
+  'Không có Quan/Sát → nam: xem Ấn (Ấn sinh thân, tính chất quản thúc); nữ: thiếu sao chồng.',
+  '「星不现看宫，宫不现看星」— sao không thấy xem cung; cung không rõ xem sao. Luôn có cách đọc.',
+];
+
+// ---- 六亲 vận: đại vận tác động lên người nhà ----
+export const LIUQIN_DAYUN_EFFECT = [
+  'Đại vận xung Niên Trụ → biến động liên quan ông bà/cha mẹ (nếu Niên = cung cha mẹ).',
+  'Đại vận xung Nguyệt Trụ → biến động cha mẹ/anh chị em.',
+  'Đại vận xung Nhật Chi → biến động HÔN NHÂN (cung Phu Thê bị xung = sóng gió tình cảm).',
+  'Đại vận xung Thời Trụ → biến động con cái/vãn niên.',
+  'Đại vận mang Kỵ thần vào cung nào → người nhà对应 tổn thương (ví dụ: Kỵ = Mộc vào Nguyệt → mẹ/anh chị em ảnh hưởng).',
+  'Đại vận mang Dụng vào cung nào → người đó được phúc → ví dụ: Dụng vào Thời → con cái phát đạt.',
+  'Lưu niên xung/khắc sao nào → năm đó người对应 gặp biến (Thương Quan kiến quan lưu niên → chồng/vợ biến).',
+];

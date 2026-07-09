@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE, PATTERN_SHUN_NI, THUONG_GUAN_5_TYPES, PATTERN_SUCCESS_FAIL, PATTERN_QUALITY_RANKING, YONGSHEN_VARIATION } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE, PATTERN_SHUN_NI, THUONG_GUAN_5_TYPES, PATTERN_SUCCESS_FAIL, PATTERN_QUALITY_RANKING, YONGSHEN_VARIATION, LIUQIN_STAR, LIUQIN_PALACE, STAR_PALACE_RULES, LIUQIN_FALLBACK, LIUQIN_DAYUN_EFFECT } from './kb.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
@@ -675,6 +675,17 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "DỤNG THẦN BIẾN (子平真詮): " + (YONGSHEN_VARIATION || []).slice(0, 3).join(' ') + "\n" +
       "CHẤT LƯỢNG CÁCH (子平真詮 ch.8): " + qualityRank;
   } catch (e) { brief += "\n--- CÁCH CỤC: [lỗi load] ---"; }
+  // ---- [round 6] LỤC THÂN 斷法 + CUNG VỊ + TINH CUNG PHỐI HỢP ----
+  try {
+    const isMale = c.input?.gender === 'nam';
+    const lqStar = isMale ? LIUQIN_STAR.male : LIUQIN_STAR.female;
+    brief += "\n--- LỤC THÂN 斷法 (round 6) ---\n" +
+      "SAO LỤC THÂN: cha=" + lqStar.father + " | mẹ=" + lqStar.mother + " | " + (isMale ? "vợ=" + lqStar.wife : "chồng=" + lqStar.husband) + " | con=" + (isMale ? lqStar.sons : lqStar.sons) + " | anh chị em=" + lqStar.brothers + "\n" +
+      "CUNG VỊ: Niên=" + LIUQIN_PALACE.year.represents + " | Nguyệt=" + LIUQIN_PALACE.month.represents + " | Nhật Chi=" + LIUQIN_PALACE.day.represents + " | Thời=" + LIUQIN_PALACE.time.represents + "\n" +
+      "TINH-CUNG PHỐI HỢP: " + (STAR_PALACE_RULES || []).slice(0, 3).join(' | ') + "\n" +
+      "BIẾN THÔNG (sao không có): " + (LIUQIN_FALLBACK || []).slice(0, 3).join(' | ') + "\n" +
+      "ĐẠI VẬN TÁC ĐỘNG LỤC THÂN: " + (LIUQIN_DAYUN_EFFECT || []).slice(0, 3).join(' | ');
+  } catch (e) { brief += "\n--- LỤC THÂN: [lỗi load] ---"; }
 
   if (fcParts.length) {
     brief += '\n--- DỰ BÁO & THỜI ĐIỂM ---\n' + fcParts.join('\n');
