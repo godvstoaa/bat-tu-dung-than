@@ -2725,3 +2725,4 @@ main.container { contain: strict; }
 .dy3d-col { position: relative; }
 .hh3d-orb::before { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: radial-gradient(circle, var(--c, transparent), transparent 70%); opacity: 0.1; pointer-events: none; z-index: -1; }
 .hh3d-orb { position: relative; }
+.tuzu-col { overflow: visible; } .tuzu-col > * { position: relative; z-index: 1; }
