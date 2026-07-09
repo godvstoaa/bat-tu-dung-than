@@ -2638,3 +2638,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .verdict-card { contain: layout; }
 .wx-radar { contain: layout; }
 .card { contain: layout; }
+.grp { contain: layout; }
