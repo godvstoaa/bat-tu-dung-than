@@ -2650,3 +2650,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .ln { contain: layout; }
 .tool { contain: layout; }
 .tool-out { contain: layout; }
+.quick-nav { contain: layout; }
