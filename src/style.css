@@ -2662,3 +2662,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .ai-style-bar { contain: layout; }
 .seg { contain: layout; }
 .birth-form { contain: layout; }
+.hero-inner { contain: layout; }
