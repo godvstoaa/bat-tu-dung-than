@@ -741,7 +741,7 @@ function renderWx3D(wx, yong) {
     return `<div data-wx="${w}" role="button" tabindex="0" style="flex:1;min-width:0;text-align:center;cursor:pointer;padding:4px 0;position:relative;">
       ${isDung ? '<div style="position:absolute;top:0;right:4px;font-size:10px;color:#c0392b;text-shadow:0 0 4px #c0392b;z-index:2">★DỤNG</div>' : ''}
       <div style="font-size:15px;font-weight:700;font-family:'Noto Serif SC',serif;color:${color};margin-bottom:2px">${w}</div>
-      <canvas data-wx3d-canvas="${w}" width="120" height="120" style="width:100%;max-width:120px;border-radius:12px;"></canvas>
+      <canvas data-wx3d-canvas="${w}" width="140" height="140" style="width:100%;max-width:140px;border-radius:12px;"></canvas>
       <div style="font-size:8px;font-weight:600;color:${color};margin-top:2px">${st}</div>
       <div style="font-size:12px;font-weight:700;color:${color}">${pct}%</div>
       <div style="font-size:8px;color:var(--silk-dim,#c9b896)">${WX_VI[w]}</div>
