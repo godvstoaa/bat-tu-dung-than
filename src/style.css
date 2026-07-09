@@ -2606,3 +2606,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .tuzu-gan, .tuzu-zhi { transition: color .2s; }
 .tuzu-name { transition: color .2s; }
 .wx3d-name { transition: color .2s; }
+.hh3d-label { transition: color .2s; }
