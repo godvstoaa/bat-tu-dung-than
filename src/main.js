@@ -4514,7 +4514,7 @@ async function run() {
   renderRemedy(currentResult);
   window._currentResult = currentResult; // [loop 140] cho renderWuXing truy cập monthMainWx
   renderWuXing(currentResult.wx, currentResult.yong);
-  renderWx3D(currentResult.wx, currentResult.yong);
+  
   renderInteractions(currentResult);
   renderShensha(currentResult);
   renderShenshaExtra(currentResult);
