@@ -2652,3 +2652,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .tool-out { contain: layout; }
 .quick-nav { contain: layout; }
 .card-search { contain: layout; }
+.capsule-spark, #capsule-spark { contain: layout; }
