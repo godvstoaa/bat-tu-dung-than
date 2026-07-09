@@ -2481,3 +2481,7 @@ button:focus-visible, .lab-btn:focus-visible {
 ::selection { background: rgba(212,175,55,0.25); color: #f7eccb; }
 a:focus-visible, button:focus-visible { outline: 2px solid var(--gold-bright, #f3d57a); outline-offset: 2px; }
 .tool-row input:focus, .tool-row select:focus { border-color: var(--gold, #d4af37) !important; box-shadow: 0 0 0 2px rgba(212,175,55,0.1) !important; }
+
+/* [loop] premium loading shimmer on Luận button */
+.btn-loading { position: relative; overflow: hidden; background: linear-gradient(90deg, rgba(40,34,55,0.9), rgba(60,50,80,0.95), rgba(40,34,55,0.9)) !important; background-size: 200% 100% !important; animation: btnShimmer 1.5s linear infinite; color: var(--gold-bright, #f3d57a) !important; border-color: rgba(212,175,55,0.4) !important; }
+@keyframes btnShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
