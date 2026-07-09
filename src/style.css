@@ -4,16 +4,16 @@
    ============================================================ */
 :root {
   scroll-behavior: smooth;
-  /* [user] Default = Thổ (Earth) warm BRIGHT tones — Dụng Thần Thổ */
-  --ink-black: #1c1610;
-  --ink: #231e16;
-  --lacquer: #2a251c;
-  /* Surface tint elevation system — warm earthy brown BRIGHT */
-  --surface-1: #231e16;
-  --surface-2: #2a251c;
-  --surface-3: #332e25;
+  /* Deep onyx cohesive surface (60%) — not pure black */
+  --ink-black: #111018;
+  --ink: #12121a;
+  --lacquer: #16151f;
+  /* Surface tint elevation system (replace heavy shadows) */
+  --surface-1: #12121a;
+  --surface-2: #16151f;
+  --surface-3: #1a1924;
   --panel: rgba(245, 236, 203, 0.02);
-  --panel-deep: rgba(28, 22, 16, 0.6);
+  --panel-deep: rgba(18, 18, 26, 0.6);
   --gold: #d4af37;
   --gold-bright: #f3d57a;
   --gold-pale: #f7eccb;
@@ -75,7 +75,7 @@ body.theme-火 {
 body.theme-土 {
   --gold: #d4af37; --gold-bright: #f3d57a; --gold-pale: #f7eccb;
   --gold-soft: rgba(212, 175, 55, 0.12); --hairline: rgba(212, 175, 55, 0.22);
-  --ink-black: #1c1610; /* earthy warm BRIGHT tone */
+  --ink-black: #110d05; /* earthy warm tone */
 }
 body.theme-金 {
   --gold: #c0c0c0; --gold-bright: #e0e0e0; --gold-pale: #f5f5f5;
@@ -141,6 +141,7 @@ body::before {
   0% { background-position: 0 0; }
   100% { background-position: 420px -420px; }
 }
+.zh { font-family: 'Noto Serif SC', serif; color: var(--gold-bright); font-weight: 600; }
 .hidden { display: none !important; }
 
 /* ===== LỚP BỐI CẢNH — minimal, cohesive onyx only (reduce noise) ===== */
@@ -153,7 +154,7 @@ body::before {
 .mote-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
 /* ===== HERO ===== */
-.hero { position: relative; z-index: 1; padding: 18px 18px 28px; text-align: center; animation: fadeDown .7s var(--ease-out) both; }
+.hero { position: relative; z-index: 1; padding: 18px 18px 28px; text-align: center; animation: fadeDown .7s var(--ease-out) both; background-image: linear-gradient(180deg, rgba(17,16,24,0.58) 0%, rgba(17,16,24,0.78) 60%, rgba(17,16,24,0.92) 100%), url('/hero-art.webp'); background-size: cover; background-position: center 25%; background-repeat: no-repeat; }
 .hero-inner { max-width: 780px; margin: 0 auto; }
 /* AT: disciplined typography — kicker as architectural accent */
 .kicker { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--gold); letter-spacing: 5px; font-size: 10.5px; margin-bottom: 16px; opacity: 0.9; font-family: 'Noto Serif SC', serif; font-weight: 500; }
@@ -207,6 +208,7 @@ body::before {
   -webkit-background-clip: text; background-clip: text; color: transparent;
   text-shadow: 0 1px 3px rgba(0,0,0,0.55), 0 0 12px rgba(212,175,55,0.25);
 }
+.title-zh { font-family: 'Ma Shan Zheng', serif; -webkit-text-fill-color: var(--cinnabar); color: var(--cinnabar); font-size: 1.16em; margin: 0 5px; text-shadow: 0 0 22px rgba(192, 57, 43, 0.55); }
 .subtitle { margin: 0; color: var(--silk-dim); font-size: 13.5px; letter-spacing: 0.3px; }
 .subtitle .zh { color: var(--gold); }
 
@@ -364,6 +366,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .pillar-yueling { border-top: 2px solid var(--gold); }
 .yueling-tag { display: inline-block; margin-left: 4px; font-size: 9px; font-weight: 700; color: var(--gold-bright, var(--gold)); background: rgba(212,175,55,0.22); padding: 1px 5px; border-radius: 8px; letter-spacing: 0; }
 .gz { text-align: center; padding: 12px 6px; }
+.gz .han { font-family: 'Noto Serif SC', serif; font-size: 40px; font-weight: 700; line-height: 1.05; text-shadow: 0 0 22px currentColor, 0 0 4px rgba(0, 0, 0, 0.6); }
 .gz .vi { font-size: 11.5px; color: var(--silk-dim); opacity: 0.75; }
 .gz .god { font-size: 11px; margin-top: 2px; color: var(--gold-bright); opacity: 0.85; }
 .gz.zhi { border-top: 1px dashed rgba(212, 175, 55, 0.14); }
@@ -439,54 +442,6 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .wx-row:hover { background: rgba(212,175,55,0.045); border-color: rgba(212,175,55,0.22); transform: translateY(-1px); }
 .wx-name { font-size: 13.5px; color: var(--silk-dim); font-family: 'Noto Serif SC', serif; display: flex; align-items: center; gap: 6px; }
 .wx-icon { width: 26px; height: 26px; flex-shrink: 0; mix-blend-mode: screen; filter: drop-shadow(0 0 4px rgba(212,175,55,0.3)); }
-
-/* [user] TỨ TRỤ 3D — 4 cột trụ 3D xoay, 干/支 màu ngũ hành (data-driven bát tự) */
-.tuzu-3d-wrap { margin: 6px 0 14px; }
-.tuzu-3d { perspective: 1100px; padding: 14px 0 6px; }
-.tuzu-stage { display: flex; gap: 9px; transform-style: preserve-3d; animation: tuzuSway 14s ease-in-out infinite; transform: rotateY(-14deg); }
-@keyframes tuzuSway { 0%,100% { transform: rotateY(-22deg); } 50% { transform: rotateY(22deg); } }
-.tuzu-col { flex: 1; min-width: 0; transform-style: preserve-3d; background: linear-gradient(180deg, rgba(40,34,55,0.92), rgba(20,18,30,0.96)); border: 1px solid rgba(212,175,55,0.3); border-top: 2px solid var(--gold,#d4af37); border-radius: 10px; padding: 12px 5px 11px; text-align: center; box-shadow: 0 12px 28px rgba(0,0,0,0.6), inset 0 1px 0 rgba(247,236,203,0.12), inset 0 -3px 10px rgba(0,0,0,0.45); position: relative; overflow: hidden; }
-.tuzu-col::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 35%, var(--gc,transparent), transparent 65%); opacity: 0.12; pointer-events: none; }
-.tuzu-col.tuzu-dm { border-top-color: var(--cinnabar,#c0392b); border-top-width: 3px; box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 22px rgba(212,175,55,0.25), inset 0 1px 0 rgba(247,236,203,0.18); }
-.tuzu-label { font-size: 13px; color: var(--gold,#d4af37); margin-bottom: 5px; font-family: 'Noto Serif SC',serif; line-height: 1.1; }
-.tuzu-label span { display: block; font-size: 8.5px; opacity: 0.55; letter-spacing: 0.3px; margin-top: 1px; }
-.tuzu-gan, .tuzu-zhi { font-size: 36px; font-weight: 700; font-family: 'Noto Serif SC', serif; line-height: 1; text-shadow: 0 0 22px currentColor, 0 0 8px currentColor, 0 2px 5px rgba(0,0,0,0.7); }
-.tuzu-sep { height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.45), transparent); margin: 7px auto; width: 55%; }
-.tuzu-name { font-size: 10.5px; color: var(--silk-dim,#c9bfa0); margin-top: 6px; letter-spacing: 0.2px; }
-
-/* [user] NGŨ HÀNH 3D — 5 cầu 3D size theo %, màu ngũ hành, float */
-.wx3d-wrap { margin: 4px 0 8px; }
-.wx3d { perspective: 900px; }
-.wx3d-stage { display: flex; align-items: flex-end; justify-content: center; gap: 9px; transform-style: preserve-3d; padding: 12px 4px 4px; }
-.wx3d-orb { text-align: center; transform-style: preserve-3d; animation: orbFloat 4.5s ease-in-out infinite; }
-.wx3d-sphere { width: calc(var(--s) * 1px); height: calc(var(--s) * 1px); border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.7), var(--c) 42%, rgba(0,0,0,0.55) 100%); box-shadow: 0 0 calc(var(--s) * 0.35 * 1px) var(--c), 0 6px 14px rgba(0,0,0,0.5), inset -4px -7px 12px rgba(0,0,0,0.45); margin: 0 auto 5px; }
-.wx3d-dung .wx3d-sphere { box-shadow: 0 0 calc(var(--s) * 0.6 * 1px) var(--c), 0 0 calc(var(--s) * 0.25 * 1px) #fff8, 0 6px 14px rgba(0,0,0,0.5), inset -4px -7px 12px rgba(0,0,0,0.45); }
-.wx3d-han { font-size: 17px; font-weight: 700; font-family: 'Noto Serif SC', serif; }
-.wx3d-pct { font-size: 12.5px; font-weight: 700; color: var(--gold-pale, #f7eccb); }
-.wx3d-name { font-size: 9.5px; color: var(--silk-dim, #c9bfa0); letter-spacing: 0.2px; }
-@keyframes orbFloat { 0%, 100% { transform: translateY(0) translateZ(0); } 50% { transform: translateY(-7px) translateZ(20px); } }
-
-/* [user] ĐẠI VẬN 3D — bar chart perspective, màu cát/hung, highlight hiện tại */
-.dy3d-wrap { margin: 6px 0 8px; }
-.dy3d { perspective: 850px; }
-.dy3d-stage { display: flex; align-items: flex-end; gap: 5px; transform-style: preserve-3d; transform: rotateX(10deg); padding: 10px 6px 6px; overflow-x: auto; }
-.dy3d-col { flex: 0 0 44px; text-align: center; }
-.dy3d-bar { height: calc(var(--h) * 1px); display: flex; align-items: flex-end; }
-.dy3d-face { width: 70%; height: 100%; margin: 0 auto; background: linear-gradient(180deg, var(--c), rgba(0,0,0,0.4)); border-radius: 4px 4px 2px 2px; box-shadow: inset 0 2px 0 rgba(255,255,255,0.25), inset -3px 0 7px rgba(0,0,0,0.35), 0 0 10px var(--c), 0 4px 8px rgba(0,0,0,0.4); }
-.dy3d-active .dy3d-face { box-shadow: inset 0 2px 0 rgba(255,255,255,0.35), inset -3px 0 7px rgba(0,0,0,0.3), 0 0 18px var(--c), 0 0 6px #fff8, 0 4px 8px rgba(0,0,0,0.4); }
-.dy3d-gz { font-size: 13px; font-weight: 700; font-family: 'Noto Serif SC', serif; margin-top: 4px; }
-.dy3d-age { font-size: 9px; color: var(--silk-dim, #c9bfa0); }
-.dy3d-now { font-size: 8px; font-weight: 700; color: var(--gold-bright, #f3d57a); }
-
-/* [user] VERDICT 3D — Dụng Thần seal 3D (gold-foil embossed, float + ring xoay) */
-.vd3d-wrap { margin: 4px 0 8px; }
-.vd3d { perspective: 700px; text-align: center; }
-.vd3d-seal { display: inline-block; width: 86px; height: 86px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f7eccb, #d4af37 50%, #7a5e15 100%); box-shadow: 0 0 26px rgba(212,175,55,0.5), inset 0 3px 7px rgba(255,255,255,0.35), inset 0 -5px 12px rgba(0,0,0,0.45); transform-style: preserve-3d; animation: vdFloat 5s ease-in-out infinite; position: relative; }
-.vd3d-ring { position: absolute; inset: -6px; border: 1px dashed rgba(212,175,55,0.45); border-radius: 50%; animation: vdSpin 14s linear infinite; }
-.vd3d-char { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; font-family: 'Noto Serif SC', serif; color: var(--cinnabar-deep, #8b2a1a); text-shadow: 0 0 10px rgba(192,57,43,0.5), 0 1px 2px rgba(0,0,0,0.5); }
-.vd3d-label { font-size: 11px; font-weight: 700; color: var(--gold, #d4af37); letter-spacing: 1.5px; margin-top: 8px; text-transform: uppercase; }
-@keyframes vdFloat { 0%, 100% { transform: translateY(0) rotateY(-10deg); } 50% { transform: translateY(-6px) rotateY(10deg); } }
-@keyframes vdSpin { to { transform: rotate(360deg); } }
 .wx-track { background: rgba(0,0,0,0.35); border: 1px solid rgba(212, 175, 55, 0.14); border-radius: 20px; height: 15px; overflow: hidden; }
 .wx-fill { height: 100%; border-radius: 20px; transition: width .9s var(--ease-out); filter: drop-shadow(0 0 5px rgba(255,255,255,0.22)) brightness(1.04); box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -1px 3px rgba(0,0,0,0.35); }
 .wx-pct { text-align: right; font-size: 12.5px; color: var(--gold-pale); font-variant-numeric: tabular-nums; font-weight: 600; }
@@ -515,6 +470,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .wx-fill { position: relative; overflow: hidden; }
 .wx-fill::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0) 40%, rgba(0,0,0,0.30) 100%); pointer-events: none; }
 .wx-fill::after { content: ''; position: absolute; left: 1px; top: 1px; bottom: 1px; width: 2px; background: rgba(255,255,255,0.55); border-radius: 2px; filter: blur(0.5px); }
+@media (prefers-reduced-motion: reduce) { .wuxing-bars .wx-radar { transform: none; } }
 
 /* [user] Ngũ hành interactive vertices */
 .wuxing-bars .wx-vertex { cursor: pointer; transition: opacity .25s ease; }
@@ -551,6 +507,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
   /* inherits unified frame */
 }
 .dy:hover { /* unified translateY + border */ }
+.dy .dy-gz { font-family: 'Noto Serif SC', serif; font-size: 22px; font-weight: 700; }
 .dy .dy-vi { font-size: 10.5px; color: var(--silk-muted); }
 .dy .dy-nayin { font-size: 9px; color: var(--silk-dim, #8a7e5a); margin-top: 1px; }
 .dy .dy-age { font-size: 10px; color: var(--silk-muted); margin-top: 2px; font-variant-numeric: tabular-nums; opacity: 0.65; }
@@ -585,6 +542,8 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
   box-shadow: 0 0 10px rgba(243,213,122,0.45), 0 0 0 1px rgba(212,175,55,0.25);
   background: rgba(212,175,55,0.06);
 }
+.dt-gz { font-family: 'Noto Serif SC', serif; font-size: 15px; font-weight: 700; }
+.dt-stage { font-family: 'Noto Serif SC', serif; font-size: 10px; opacity: .7; margin-top: 1px; }
 .dt-stage-peak { color: var(--gold-bright); opacity: 1; font-weight: 700; }
 .dt-age { font-size: 10px; opacity: .85; margin: 2px 0; }
 .dt-rate { font-size: 9.5px; font-weight: 600; }
@@ -654,6 +613,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
   /* unified */
 }
 .lm-cell:hover { transform: translateY(-2px); border-color: rgba(212,175,55,0.32); }
+.lm-cell .zh { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 700; margin: 2px 0; }
 .lm-ts { font-size: 10px; line-height: 1.1; margin: 1px 0; }
 .lm-ts-cat { filter: drop-shadow(0 0 2px rgba(46,158,107,0.5)); }
 .lm-ts-hung { filter: grayscale(0.3); opacity: 0.85; }
@@ -676,6 +636,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 @media (max-width: 760px) { .lm-grid { grid-template-columns: repeat(4, 1fr); } }
 
 /* ===== 韋千里 BÁT BỘ ===== */
+.ql-quote { font-family: 'Noto Serif SC', serif; font-size: 14px; color: var(--gold-bright); background: rgba(212,175,55,0.06); border-left: 3px solid var(--cinnabar); padding: 12px 16px; border-radius: 0 4px 4px 0; margin-bottom: 12px; line-height: 1.75; }
 .ql-soul { font-size: 14px; margin-bottom: 14px; color: var(--silk-dim); }
 .ql-steps { display: flex; flex-direction: column; gap: 9px; }
 .ql-step { display: flex; gap: 12px; background: rgba(0,0,0,0.22); border-radius: 4px; padding: 11px 14px; border-left: 2px solid var(--gold); transition: transform .2s var(--ease-out), border-left-color .2s; }
@@ -825,27 +786,33 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .laws { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 8px; }
 .law { font-size: 12.5px; color: var(--silk-dim); background: rgba(0,0,0,0.28); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 4px; padding: 9px 12px; line-height: 1.55; transition: transform .2s var(--ease-out), border-color .2s; }
 .law:hover { transform: translateY(-2px); border-color: rgba(212,175,55,.32); }
+.remedy-quote { font-family: 'Noto Serif SC', serif; font-size: 14.5px; color: var(--gold-bright); background: rgba(0,0,0,0.32); border: 1px solid rgba(212,175,55,0.28); border-radius: 4px; padding: 13px 16px; margin-top: 14px; line-height: 1.75; }
 .remedy-core { font-size: 12.5px; color: var(--silk); margin-top: 10px; font-style: italic; }
 @media (max-width: 760px) { .laws { grid-template-columns: 1fr; } .liuqin { grid-template-columns: 1fr; } }
 
 /* ===== BẢN MỆNH KINH ĐIỂN ===== */
 .classic-dm { font-size: 22px; font-weight: 700; margin-bottom: 14px; color: var(--gold-pale); }
+.classic-dm .zh { font-family: 'Ma Shan Zheng', 'Noto Serif SC', serif; color: var(--cinnabar); font-size: 30px; margin: 0 4px; text-shadow: 0 0 18px var(--cinnabar-glow); }
 .verse-box { background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(192,57,43,0.05));
   border: 1px solid rgba(212,175,55,0.25); border-radius: 4px; padding: 18px 20px; margin-bottom: 14px; }
+.verse-zh { font-family: 'Noto Serif SC', serif; font-size: 19px; color: var(--gold-bright); line-height: 1.95; font-weight: 600; letter-spacing: 1px; }
 .verse-vi { font-size: 13.5px; color: var(--silk-muted); margin-top: 8px; font-style: italic; }
 .classic-nature { font-size: 14.5px; color: var(--silk-dim); line-height: 1.8; margin: 0 0 10px; }
 
 /* --- 称骨算命 (Bone-Weight Divination) --- */
 .cg-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+.cg-total .zh.big { font-family: 'Noto Serif SC', serif; font-size: 30px; color: var(--gold-bright); font-weight: 700; letter-spacing: 1px; text-shadow: 0 0 18px var(--cinnabar-glow); }
 .cg-tier { margin-left: auto; }
 .cg-breakdown { font-size: 12.5px; line-height: 1.7; }
 .cg-interp { font-size: 14px; color: var(--silk-dim); line-height: 1.85; margin: 4px 0; }
 
 .classic-need { font-size: 13.5px; color: var(--silk); margin: 0 0 12px; }
+.verse { font-family: 'Noto Serif SC', serif; color: var(--gold-bright); font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
 
 /* ===== TỔNG LUẬN MỆNH ===== */
 .syn-head { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; }
 .syn-grade { display: flex; align-items: center; gap: 12px; padding: 10px 18px; border-radius: 4px; background: rgba(0,0,0,0.3); border: 1px solid rgba(212, 175, 55, 0.2); }
+.syn-grade .big { font-family: 'Ma Shan Zheng', 'Noto Serif SC', serif; font-size: 40px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 22px currentColor; }
 .syn-grade.cat { border-color: rgba(46,158,107,0.45); } .syn-grade.cat .big { color: #7ee2a4; }
 .syn-grade.mid { border-color: rgba(212,175,55,0.45); } .syn-grade.mid .big { color: var(--gold-bright); }
 .syn-grade.warn { border-color: rgba(224,70,58,0.45); } .syn-grade.warn .big { color: #ff9b89; }
@@ -867,6 +834,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .interactions { display: flex; flex-direction: column; gap: 8px; }
 .ix-group { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; font-size: 13.5px; }
 .ix-label { font-size: 11.5px; color: var(--silk-muted); min-width: 84px; }
+.ix-chip { font-family: 'Noto Serif SC', serif; padding: 3px 9px; border-radius: 4px; background: rgba(212, 175, 55, 0.08); font-size: 13px; transition: transform .2s var(--ease-out); }
 .ix-group:hover .ix-chip { transform: translateY(-1px); }
 .ix-group.cat .ix-chip { background: rgba(46,158,107,0.16); color: #9fe0b8; }
 .ix-group.warn .ix-chip { background: rgba(224,70,58,0.16); color: #f0a99c; }
@@ -878,6 +846,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .ss:hover { transform: translateY(-2px); border-color: rgba(212,175,55,0.32); }
 .ss.cat { border-color: rgba(46,158,107,0.28); }
 .ss.volatile { border-color: rgba(224,70,58,0.28); }
+.ss-zh { font-family: 'Noto Serif SC', serif; font-size: 18px; color: var(--gold-bright); text-shadow: 0 0 12px rgba(212,175,55,.35); }
 .ss-vi { font-size: 13px; color: var(--silk); margin-top: 2px; }
 .ss-at { color: var(--silk-muted); font-size: 11.5px; }
 .ss-desc { font-size: 12px; color: var(--silk-muted); margin-top: 5px; line-height: 1.5; }
@@ -900,6 +869,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .ln-best, .ln-worst { font-size: 11px; margin-left: 1px; }
 .dy-now { box-shadow: 0 0 0 1.5px var(--gold); background: rgba(212,175,55,0.08); }
 .lm-now { box-shadow: 0 0 0 1.5px var(--gold); background: rgba(212,175,55,0.08); }
+.ln-gz { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 700; margin-top: 3px; }
 .ln-age { font-size: 9.5px; color: var(--silk-muted); font-variant-numeric: tabular-nums; opacity: 0.65; }
 .ln-rate { 
   font-size: 10px; 
@@ -1133,6 +1103,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .zw-cell.shen { border-color: rgba(58,123,213,0.5); }
 .zw-palace { font-size: 12.5px; font-weight: 600; color: var(--silk); }
 .zw-pvi { display: block; font-size: 10px; color: var(--muted); font-weight: 400; }
+.zw-gz { font-family: 'Noto Serif SC', serif; font-size: 16px; color: var(--gold-soft); margin-top: 3px; }
 .zw-gz span { margin: 0 1px; }
 .zw-dxrow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
 .zw-dx { font-size: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 6px 9px; }
@@ -1166,6 +1137,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .xlr-detail { font-size: 13px; color: var(--silk); margin-top: 8px; line-height: 1.55; }
 
 /* 14 chính tinh trong ô Tử Vi */
+.zw-stars { font-family: 'Noto Serif SC', serif; font-size: 11px; color: #b8d8ff; margin-top: 4px; min-height: 14px; line-height: 1.3; }
 
 /* ===== LỤC DIỆU 六爻 ===== */
 .ly-card { border-color: rgba(212,175,55,0.4); }
@@ -1208,10 +1180,12 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .ly-line { display: grid; grid-template-columns: 18px 56px 70px 28px 1fr; align-items: center; gap: 8px; font-size: 13px; padding: 2px 0; }
 .ly-line.shi .ly-lq, .ly-line.ying .ly-lq { color: var(--gold-bright); }
 .ly-line .ly-mark { font-size: 11px; color: var(--cinnabar); }
+.ly-line .ly-hao { font-family: 'Noto Serif SC', serif; letter-spacing: -2px; color: var(--silk-dim); }
 .ly-ys { font-size: 13.5px; margin-bottom: 8px; }
 
 /* 四化 (禄权科忌) chips */
 .zw-sihua { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.zw-sh { font-family: 'Noto Serif SC', serif; font-size: 13px; padding: 5px 12px; border-radius: 18px; border: 1px solid currentColor; }
 .zw-sh.cat { background: rgba(46,158,91,0.16); color: #9fe0b8; }
 .zw-sh.hung { background: rgba(224,83,61,0.18); color: #ff9b89; }
 
@@ -1244,6 +1218,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .bh-cell.bh-best { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(212,175,55,0.45); background: rgba(212,175,55,0.12); }
 .bh-cell.bh-worst { border-color: rgba(220,70,70,0.5); background: rgba(220,70,70,0.08); }
 .bh-m { font-size: 13px; font-weight: 600; }
+.bh-m .zh { font-family: 'Noto Serif SC', serif; font-size: 19px; font-weight: 700; margin-right: 2px; }
 .bh-range { font-size: 11px; color: var(--silk-muted); margin: 3px 0; }
 .bh-range .zh { color: var(--gold-bright); }
 .bh-score { font-size: 13px; font-weight: 700; padding: 3px 7px; border-radius: 3px; display: inline-block; }
@@ -2135,6 +2110,7 @@ body::before {
   18%  { opacity: 1; }
   100% { opacity: 0; transform: translateY(-140px) scale(1.15) rotate(6deg); }
 }
+@media (prefers-reduced-motion: reduce) { .flying-han { display: none; } }
 
 /* =======================================================================
    [UI Phase 4] gold-foil cho chữ Hán lớn (.zh.big) + animated shine
@@ -2166,6 +2142,7 @@ body::before {
   background-size: 200% 100%;
   animation: ui-shimmer 1.3s linear infinite;
 }
+@media (prefers-reduced-motion: reduce) { .btn-loading, .btn-loading::after { animation: none; } }
 
 /* =======================================================================
    [UI Phase 5] Hero entrance — form/header rise+fade khi load (first impression)
@@ -2387,214 +2364,3 @@ button:focus-visible, .lab-btn:focus-visible {
   }
   .card, .grp { animation: none !important; }
 }
-
-/* [loop] 3D hover/tap tactile feedback */
-.tuzu-col { transition: transform .25s var(--ease-out, ease), box-shadow .25s; cursor: pointer; }
-.tuzu-col:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 16px 32px rgba(0,0,0,0.65), 0 0 22px rgba(212,175,55,0.3), inset 0 1px 0 rgba(247,236,203,0.15), inset 0 -3px 10px rgba(0,0,0,0.45); }
-.dy3d-col { transition: transform .2s ease; cursor: pointer; }
-.dy3d-col:hover { transform: translateY(-3px); }
-.dy3d-col:hover .dy3d-face { box-shadow: inset 0 2px 0 rgba(255,255,255,0.3), inset -3px 0 7px rgba(0,0,0,0.3), 0 0 18px var(--c), 0 6px 12px rgba(0,0,0,0.4); }
-
-/* [loop] Tứ trụ 3D tap-select — highlight pillar + bridge to detail */
-.tuzu-col.tuzu-sel { transform: translateY(-4px) scale(1.05); border-top-color: var(--gold-bright, #f3d57a); border-top-width: 3px; box-shadow: 0 16px 32px rgba(0,0,0,0.65), 0 0 26px rgba(212,175,55,0.4), inset 0 1px 0 rgba(247,236,203,0.18), inset 0 -3px 10px rgba(0,0,0,0.45); }
-.wx3d-tap { cursor: pointer; }
-
-/* [loop] PERF: content-visibility auto — browser skips off-screen card rendering (3D anims paused when scrolled away) */
-#result .card { content-visibility: auto; contain-intrinsic-size: auto 350px; }
-
-/* [loop] 3D section titles — cohesive labeling (CSS ::before, no JS) */
-.tuzu-3d-wrap::before, .wx3d-wrap::before, .dy3d-wrap::before { display: block; text-align: center; font-size: 10px; font-weight: 700; color: var(--gold, #d4af37); letter-spacing: 2px; text-transform: uppercase; margin: 10px 0 2px; opacity: 0.85; font-family: 'Noto Serif SC', serif; }
-.tuzu-3d-wrap::before { content: '⚡ Tứ Trụ 3D · 四柱'; }
-.wx3d-wrap::before { content: '⚡ Ngũ Hành 3D · 五行'; }
-.dy3d-wrap::before { content: '⚡ Đại Vận 3D · 大运'; }
-.dy3d-col.dy3d-sel .dy3d-face { box-shadow: inset 0 2px 0 rgba(255,255,255,0.4), inset -3px 0 7px rgba(0,0,0,0.3), 0 0 22px var(--c), 0 0 8px #fff8, 0 4px 8px rgba(0,0,0,0.4); }
-
-/* [loop] gold divider after 3D sections — separates overview from detail */
-.tuzu-3d-wrap::after, .wx3d-wrap::after, .dy3d-wrap::after { content: ''; display: block; height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.25), transparent); margin: 8px 0 6px; }
-
-/* [loop] Nhật Chủ highlight — day pillar = self, most important */
-.tuzu-col.tuzu-dm .tuzu-label::after { content: '· NHẬT CHỦ'; display: block; font-size: 7.5px; color: var(--cinnabar, #c0392b); font-weight: 700; letter-spacing: 0.5px; margin-top: 1px; }
-
-/* [loop] ambient gold glow on results — warm cohesive atmosphere */
-#result { position: relative; }
-#result >::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 200px; background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.05), transparent 70%); pointer-events: none; z-index: 0; }
-
-/* [loop] deeper 3D: tuzuSway with translateZ pop + stronger orb glow + seal */
-@keyframes tuzuSway { 0%,100% { transform: rotateY(-22deg) translateZ(15px); } 50% { transform: rotateY(22deg) translateZ(15px); } }
-.wx3d-sphere { box-shadow: 0 0 calc(var(--s) * 0.5 * 1px) var(--c), 0 8px 16px rgba(0,0,0,0.5), inset -4px -7px 12px rgba(0,0,0,0.45), inset 3px 4px 8px rgba(255,255,255,0.2); }
-.vd3d-seal { width: 92px; height: 92px; box-shadow: 0 0 32px rgba(212,175,55,0.6), inset 0 3px 7px rgba(255,255,255,0.4), inset 0 -5px 12px rgba(0,0,0,0.45); }
-
-/* [loop] HỢP TUỔI 3D — 2 element orbs + score gauge */
-.hh3d { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 10px 0; }
-.hh3d-orb { text-align: center; }
-.hh3d-sphere { width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.7), var(--c) 42%, rgba(0,0,0,0.55)); box-shadow: 0 0 18px var(--c), inset -3px -5px 10px rgba(0,0,0,0.4); margin: 0 auto 3px; animation: orbFloat 4.5s ease-in-out infinite; }
-.hh3d-han { font-size: 16px; font-weight: 700; font-family: 'Noto Serif SC', serif; }
-.hh3d-label { font-size: 9px; color: var(--silk-dim, #c9bfa0); }
-.hh3d-bond { text-align: center; min-width: 70px; }
-.hh3d-score { font-size: 30px; font-weight: 700; color: var(--gold-pale, #f7eccb); text-shadow: 0 0 12px rgba(212,175,55,0.4); line-height: 1; }
-.hh3d-bar { height: 5px; background: linear-gradient(90deg, #e0533d, #e8b94a 45%, #3fb86b); border-radius: 3px; margin: 6px auto 4px; width: 72px; position: relative; }
-.hh3d-marker { position: absolute; top: -3px; width: 11px; height: 11px; background: var(--gold-bright, #f3d57a); border-radius: 50%; box-shadow: 0 0 8px var(--gold, #d4af37); }
-.hh3d-rating { font-size: 10px; }
-
-/* [loop] GLOBAL reduced-motion — nuclear guard for ALL animations (a11y) */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-}
-
-/* [loop] FIX: tools-card exempt from content-visibility (hh-btn must be clickable) */
-.card.tools-card { content-visibility: visible !important; contain-intrinsic-size: none; }
-
-/* [loop] premium polish: input focus + scrollbar + selection */
-.birth-form input:focus, .birth-form select:focus { border-color: var(--gold, #d4af37) !important; box-shadow: 0 0 0 3px rgba(212,175,55,0.12) !important; outline: none !important; }
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(212,175,55,0.5); }
-::selection { background: rgba(212,175,55,0.25); color: #f7eccb; }
-a:focus-visible, button:focus-visible { outline: 2px solid var(--gold-bright, #f3d57a); outline-offset: 2px; }
-.tool-row input:focus, .tool-row select:focus { border-color: var(--gold, #d4af37) !important; box-shadow: 0 0 0 2px rgba(212,175,55,0.1) !important; }
-
-/* [loop] premium loading shimmer on Luận button */
-.btn-loading { position: relative; overflow: hidden; background: linear-gradient(90deg, rgba(40,34,55,0.9), rgba(60,50,80,0.95), rgba(40,34,55,0.9)) !important; background-size: 200% 100% !important; animation: btnShimmer 1.5s linear infinite; color: var(--gold-bright, #f3d57a) !important; border-color: rgba(212,175,55,0.4) !important; }
-@keyframes btnShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-/* [loop] section header polish — gold tint on .grp */
-.grp { background: linear-gradient(90deg, transparent, rgba(212,175,55,0.06), transparent); border-radius: 4px; padding: 6px 10px; margin-left: -4px; margin-right: -4px; }
-.card-title { text-shadow: 0 0 10px rgba(212,175,55,0.15); }
-.verdict-card { border-color: rgba(212,175,55,0.35); }
-
-/* [loop] verdict seal stamp entrance — scale + rotate (seal being stamped) */
-.vd3d-wrap { animation: vdStamp .6s cubic-bezier(.2,1.4,.4,1) both; }
-@keyframes vdStamp { from { opacity: 0; transform: scale(0.2) rotate(-25deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
-
-/* [loop] today-hero premium border/glow */
-.today-hero { border-color: rgba(212,175,55,0.32); box-shadow: 0 4px 14px rgba(0,0,0,0.35), 0 0 18px rgba(212,175,55,0.06), inset 0 1px 0 rgba(247,236,203,0.06); }
-
-/* [loop] hero→form gold gradient separator */
-.hero { border-bottom: 1px solid; border-image: linear-gradient(90deg, transparent, rgba(212,175,55,0.25), transparent) 1; }
-
-/* [loop] section header hover feedback (interactive accordion) */
-h2.grp { transition: background .2s, color .2s; cursor: pointer; }
-h2.grp:hover { background: linear-gradient(90deg, transparent, rgba(212,175,55,0.14), transparent) !important; color: var(--gold-bright, #f3d57a); }
-h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
-
-/* [loop] CTA pulse — hợp tuổi button invites tap */
-.th-hehun { animation: thPulse 2.5s ease-in-out infinite; }
-@keyframes thPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); } 50% { box-shadow: 0 0 14px 2px rgba(212,175,55,0.22); } }
-
-/* [loop] today-hero subtle 3D tilt */
-.today-hero { transform: perspective(800px) rotateX(2deg); transform-origin: center top; transition: transform .3s var(--ease-out, ease); }
-.today-hero:hover { transform: perspective(800px) rotateX(0deg); }
-
-/* [loop] syn-factors summary gold + interactive */
-.syn-factors summary { color: var(--gold, #d4af37); cursor: pointer; font-size: 11px; transition: color .2s; padding: 4px 0; }
-.syn-factors summary:hover { color: var(--gold-bright, #f3d57a); }
-.syn-factors[open] summary { margin-bottom: 6px; }
-
-/* [loop] share button gold-foil */
-.hh-share-btn { background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(247,236,203,0.06)) !important; border-color: rgba(212,175,55,0.3) !important; color: var(--gold-pale, #f7eccb) !important; }
-.hh-share-btn:hover { background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(247,236,203,0.1)) !important; }
-
-/* [loop] primary button gold glow (main CTA) */
-.btn-primary { box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 20px rgba(212,175,55,0.15); }
-.btn-primary:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 26px rgba(212,175,55,0.25); }
-
-/* [loop] AI popup bottom-sheet grab handle (mobile) */
-@media (max-width:560px) { .ai-popup::before { content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: 40px; height: 4px; background: rgba(212,175,55,0.3); border-radius: 2px; z-index: 1; } }
-
-/* [loop] orb holographic shimmer — light sweep on ngũ hành spheres */
-.wx3d-sphere { position: relative; overflow: hidden; }
-.wx3d-sphere::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.3) 50%, transparent 65%); animation: orbShimmer 3s ease-in-out infinite; }
-@keyframes orbShimmer { 0%,100% { opacity: 0; transform: translateX(-15px); } 50% { opacity: 1; transform: translateX(15px); } }
-
-/* [loop] hh3d-score gold-foil gradient text */
-.hh3d-score { background: linear-gradient(165deg, #f7eccb, #d4af37 50%, #8a6d1a); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
-
-/* [loop] dy3d bars 3D extrusion depth */
-.dy3d-face { box-shadow: inset 0 2px 0 rgba(255,255,255,0.25), inset -3px 0 7px rgba(0,0,0,0.35), 0 0 10px var(--c), 3px 3px 0 rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.4); }
-
-/* [loop] subtle gold glow on ALL Hán tự (.zh) — mystical atmosphere */
-.zh { text-shadow: 0 0 8px rgba(212,175,55,0.12); }
-.th-hehun { border-color: rgba(212,175,55,0.35) !important; color: var(--gold-pale,#f7eccb) !important; }
-.verdict-card { box-shadow: inset 0 0 30px rgba(212,175,55,0.04), 0 8px 20px rgba(0,0,0,0.4) !important; }
-.wx3d-stage { background: radial-gradient(ellipse at 50% 80%, rgba(212,175,55,0.03), transparent 60%); border-radius: 8px; }
-.dy3d-active .dy3d-face { box-shadow: inset 0 2px 0 rgba(255,255,255,0.35), inset -3px 0 7px rgba(0,0,0,0.3), 0 0 24px var(--c), 0 0 10px #fff7, 3px 3px 0 rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.4) !important; }
-.vd3d-label { background: linear-gradient(90deg, transparent, rgba(212,175,55,0.1), transparent); padding: 4px 14px; border-radius: 4px; display: inline-block; }
-.hh3d { perspective: 700px; }
-.tuzu-col:hover { border-color: rgba(247,236,203,0.25); }
-.tuzu-stage { background: linear-gradient(180deg, rgba(212,175,55,0.02), transparent); border-radius: 8px; }
-.dy3d-stage { background: linear-gradient(180deg, rgba(212,175,55,0.02), transparent); border-radius: 8px; }
-.vd3d { background: linear-gradient(180deg, rgba(212,175,55,0.02), transparent); border-radius: 8px; padding: 8px 8px 4px; }
-.hh3d { background: linear-gradient(180deg, rgba(212,175,55,0.02), transparent); border-radius: 8px; padding: 8px; }
-.tuzu-3d-wrap, .wx3d-wrap, .dy3d-wrap, .vd3d-wrap { transition: opacity .3s ease; }
-.hh3d-marker { animation: hhMarkerPulse 2s ease-in-out infinite; }
-@keyframes hhMarkerPulse { 0%,100% { box-shadow: 0 0 6px var(--gold,#d4af37); } 50% { box-shadow: 0 0 14px var(--gold,#d4af37), 0 0 4px #fff8; } }
-.hh3d-sphere { box-shadow: 0 0 22px var(--c), inset -3px -5px 10px rgba(0,0,0,0.4), inset 3px 4px 8px rgba(255,255,255,0.2); }
-.hh3d-sphere { position: relative; overflow: hidden; }
-.hh3d-sphere::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.3) 50%, transparent 65%); animation: orbShimmer 3s ease-in-out infinite; }
-.hh3d-bar { box-shadow: 0 0 8px rgba(212,175,55,0.15); }
-.hh3d { border: 1px solid rgba(212,175,55,0.12); }
-.tuzu-label { background: linear-gradient(165deg,#f7eccb,#d4af37,#8a6d1a); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
-.tuzu-name { color: var(--gold-pale,#e8d9a8) !important; }
-.dy3d-gz { text-shadow: 0 0 10px currentColor, 0 1px 2px rgba(0,0,0,0.6); }
-.dy3d-age { text-shadow: 0 0 6px rgba(212,175,55,0.1); }
-.hh3d-orb { transition: transform .2s ease; cursor: pointer; } .hh3d-orb:hover { transform: scale(1.08); }
-.vd3d-label { text-shadow: 0 0 8px rgba(212,175,55,0.2); }
-.wx3d-orb { cursor: pointer; }
-.wx3d-orb:hover .wx3d-sphere { box-shadow: 0 0 calc(var(--s) * 0.8 * 1px) var(--c), 0 0 calc(var(--s) * 0.3 * 1px) #fff8, 0 8px 16px rgba(0,0,0,0.5), inset -4px -7px 12px rgba(0,0,0,0.45), inset 3px 4px 8px rgba(255,255,255,0.2); }
-.wx3d-han { text-shadow: 0 0 10px currentColor; }
-.wx3d-pct { text-shadow: 0 0 8px rgba(247,236,203,0.2); }
-.hh3d-han { text-shadow: 0 0 10px currentColor; }
-.hh3d-label { text-shadow: 0 0 6px rgba(212,175,55,0.1); }
-.tuzu-name { text-shadow: 0 0 6px rgba(247,236,203,0.1); }
-.today-hero { transition: border-color .3s, box-shadow .3s, background .3s, transform .3s var(--ease-out,ease); }
-.wx3d-name { text-shadow: 0 0 4px rgba(212,175,55,0.08); }
-.dy3d-now { text-shadow: 0 0 6px rgba(243,213,122,0.3); }
-.tuzu-sep { box-shadow: 0 0 4px rgba(212,175,55,0.2); }
-.hh3d-rating { text-shadow: 0 0 4px currentColor; }
-.tuzu-col.tuzu-dm .tuzu-label::after { text-shadow: 0 0 6px rgba(192,57,43,0.3); }
-.hh3d-orb:hover .hh3d-sphere { box-shadow: 0 0 28px var(--c), inset -3px -5px 10px rgba(0,0,0,0.4), inset 3px 4px 8px rgba(255,255,255,0.2); }
-.hh3d-sphere { transition: box-shadow .2s ease; }
-.wx3d-sphere { transition: box-shadow .2s ease; }
-.tuzu-col { transition: transform .25s var(--ease-out,ease), box-shadow .25s, border-color .2s; }
-.dy3d-col { transition: transform .2s ease, border-color .2s; }
-.vd3d-ring { transition: border-color .3s; }
-.vd3d-char { transition: text-shadow .3s; }
-.tuzu-gan, .tuzu-zhi { transition: color .2s; }
-.vd3d-label { transition: color .2s; }
-.hh3d { transform-style: preserve-3d; }
-.vd3d { transform-style: preserve-3d; }
-.today-hero { transform-style: preserve-3d; }
-.wx-radar-wrap { transform-style: preserve-3d; }
-* { contain: layout style paint; }
-.tuzu-col::before { content: ""; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 40%); pointer-events: none; z-index: 0; }
-.wx3d-orb::before { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: radial-gradient(circle, var(--c, transparent), transparent 70%); opacity: 0.08; pointer-events: none; z-index: -1; }
-.wx3d-orb { position: relative; }
-.vd3d-seal::before { content: ""; position: absolute; inset: -8px; border-radius: 50%; background: radial-gradient(circle, rgba(212,175,55,0.08), transparent 70%); pointer-events: none; z-index: -1; }
-.dy3d-col::before { content: ""; position: absolute; inset: 0; border-radius: 4px; background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent 50%); pointer-events: none; z-index: 0; }
-.dy3d-col { position: relative; }
-.hh3d-orb::before { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: radial-gradient(circle, var(--c, transparent), transparent 70%); opacity: 0.1; pointer-events: none; z-index: -1; }
-.hh3d-orb { position: relative; }
-.tuzu-col { overflow: visible; } .tuzu-col > * { position: relative; z-index: 1; }
-.wx3d-sphere { animation: orbFloat 4.5s ease-in-out infinite, orbGlow 3s ease-in-out infinite alternate; }
-@keyframes orbGlow { from { filter: brightness(1); } to { filter: brightness(1.15); } }
-.vd3d-seal { animation: vdFloat 5s ease-in-out infinite, orbGlow 3.5s ease-in-out infinite alternate; }
-.hh3d-sphere { animation: orbFloat 4.5s ease-in-out infinite, orbGlow 3s ease-in-out infinite alternate; }
-.dy3d-active { animation: dyPulse 2.5s ease-in-out infinite; }
-@keyframes dyPulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.2); } }
-.tuzu-dm { animation: dmGlow 3s ease-in-out infinite; }
-@keyframes dmGlow { 0%,100% { box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 22px rgba(212,175,55,0.25), inset 0 1px 0 rgba(247,236,203,0.18), inset 0 -3px 10px rgba(0,0,0,0.45); } 50% { box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 32px rgba(212,175,55,0.4), inset 0 1px 0 rgba(247,236,203,0.25), inset 0 -3px 10px rgba(0,0,0,0.45); } }
-.wx3d-dung .wx3d-sphere { animation: orbFloat 4.5s ease-in-out infinite, orbGlow 2.5s ease-in-out infinite alternate, dungPulse 2s ease-in-out infinite; }
-@keyframes dungPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-.vd3d-char { animation: charGlow 3s ease-in-out infinite alternate; }
-@keyframes charGlow { from { text-shadow: 0 0 10px rgba(192,57,43,0.5), 0 1px 2px rgba(0,0,0,0.5); } to { text-shadow: 0 0 18px rgba(192,57,43,0.8), 0 0 6px rgba(247,236,203,0.4), 0 1px 2px rgba(0,0,0,0.5); } }
-.dy3d-sel .dy3d-face { animation: dyPulse 1.5s ease-in-out infinite; }
-.tuzu-sel { animation: dmGlow 2s ease-in-out infinite; }
-.hh3d-marker { animation: hhMarkerPulse 2s ease-in-out infinite, orbGlow 3s ease-in-out infinite alternate; }
-.tuzu-gan, .tuzu-zhi { animation: charGlow 4s ease-in-out infinite alternate; }
-.dy3d-gz { animation: charGlow 3.5s ease-in-out infinite alternate; }
-.wx3d-han { animation: charGlow 3s ease-in-out infinite alternate; }
-.hh3d-han { animation: charGlow 3s ease-in-out infinite alternate; }
-.vd3d-label { animation: charGlow 4s ease-in-out infinite alternate; }
-/* dedup: universal * already covers contain — remove all redundant individual rules */
-.tuzu-col,.wx3d-orb,.vd3d-seal,.hh3d-orb,.dy3d-col,.tuzu-stage,.wx3d-stage { backface-visibility: hidden; }
