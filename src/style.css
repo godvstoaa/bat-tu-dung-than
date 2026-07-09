@@ -2485,3 +2485,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--gold-bright, #f
 /* [loop] premium loading shimmer on Luận button */
 .btn-loading { position: relative; overflow: hidden; background: linear-gradient(90deg, rgba(40,34,55,0.9), rgba(60,50,80,0.95), rgba(40,34,55,0.9)) !important; background-size: 200% 100% !important; animation: btnShimmer 1.5s linear infinite; color: var(--gold-bright, #f3d57a) !important; border-color: rgba(212,175,55,0.4) !important; }
 @keyframes btnShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* [loop] section header polish — gold tint on .grp */
+.grp { background: linear-gradient(90deg, transparent, rgba(212,175,55,0.06), transparent); border-radius: 4px; padding: 6px 10px; margin-left: -4px; margin-right: -4px; }
+.card-title { text-shadow: 0 0 10px rgba(212,175,55,0.15); }
+.verdict-card { border-color: rgba(212,175,55,0.35); }
