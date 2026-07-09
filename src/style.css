@@ -2560,16 +2560,7 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .dy3d-col { transition: transform .2s ease, border-color .2s; }
 .vd3d-ring { transition: border-color .3s; }
 .vd3d-char { transition: text-shadow .3s; }
-.wx3d-pct { transition: color .2s; }
-.wx3d-han { transition: color .2s; }
-.hh3d-han { transition: color .2s; }
-.dy3d-gz { transition: color .2s; }
 .tuzu-gan, .tuzu-zhi { transition: color .2s; }
-.tuzu-name { transition: color .2s; }
-.wx3d-name { transition: color .2s; }
-.hh3d-label { transition: color .2s; }
-.dy3d-age { transition: color .2s; }
-.dy3d-now { transition: color .2s; }
 .vd3d-label { transition: color .2s; }
 .hh3d { transform-style: preserve-3d; }
 .vd3d { transform-style: preserve-3d; }
