@@ -2615,3 +2615,649 @@ input:focus, .birth-form input:focus, .birth-form select:focus {
 .dy3d-wrap::before { content: "Dai Van 3D"; }
 .wuxing-bars .wx-radar { filter: drop-shadow(0 10px 18px rgba(0,0,0,0.6)) !important; transform: rotateX(12deg) !important; }
 .wuxing-bars .wx-radar-poly { filter: drop-shadow(0 0 9px rgba(212,175,55,0.7)) !important; }
+/* ═══════════════════════════════════════════════════════════
+   3D VIZ PREMIUM UPGRADE — dark-luxury sơn son thếp vàng
+   Append sau restore block; mobile-first 390px; no contain
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Keyframes (restore + premium) ── */
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes tuzuSway {
+  0%, 100% { transform: rotateY(-14deg) rotateX(2deg); }
+  50% { transform: rotateY(-8deg) rotateX(4deg); }
+}
+@keyframes vdSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes vdFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.02); }
+}
+@keyframes vdStamp {
+  0% { opacity: 0; transform: scale(1.35) rotate(-12deg); }
+  60% { opacity: 1; transform: scale(0.94) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes orbHaloPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--c, #d4af37) 45%, transparent),
+      0 0 10px color-mix(in srgb, var(--c, #d4af37) 35%, transparent),
+      0 0 22px color-mix(in srgb, var(--c, #d4af37) 18%, transparent);
+    opacity: 0.85;
+  }
+  50% {
+    box-shadow:
+      0 0 0 1.5px color-mix(in srgb, var(--c, #d4af37) 70%, transparent),
+      0 0 16px color-mix(in srgb, var(--c, #d4af37) 55%, transparent),
+      0 0 36px color-mix(in srgb, var(--c, #d4af37) 28%, transparent);
+    opacity: 1;
+  }
+}
+@keyframes dungRingSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes nowPulseGlow {
+  0%, 100% {
+    text-shadow: 0 0 6px rgba(192, 57, 43, 0.7), 0 0 14px rgba(212, 175, 55, 0.45);
+    opacity: 0.9;
+  }
+  50% {
+    text-shadow: 0 0 12px rgba(192, 57, 43, 1), 0 0 28px rgba(212, 175, 55, 0.75), 0 0 40px rgba(247, 236, 203, 0.35);
+    opacity: 1;
+  }
+}
+@keyframes sealRingGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.35), inset 0 0 6px rgba(247, 236, 203, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(212, 175, 55, 0.7), 0 0 32px rgba(192, 57, 43, 0.2), inset 0 0 10px rgba(247, 236, 203, 0.25);
+  }
+}
+
+/* ══════════════════════════════════
+   1. NGŨ HÀNH ORBS — .wx3d-sphere
+   ══════════════════════════════════ */
+.wx3d-stage {
+  gap: 10px !important;
+  padding: 18px 4px 8px !important;
+}
+.wx3d-orb {
+  transform-style: preserve-3d;
+}
+.wx3d-sphere {
+  position: relative !important;
+  overflow: visible !important;
+  /* multi-layer sphere: specular + body + rim dark */
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.25) 14%, transparent 32%),
+    radial-gradient(circle at 68% 72%, rgba(0, 0, 0, 0.55) 0%, transparent 42%),
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--c, #d4af37) 92%, #fff) 0%, var(--c, #d4af37) 48%, color-mix(in srgb, var(--c, #d4af37) 55%, #000) 100%) !important;
+  border: 1.5px solid color-mix(in srgb, var(--c, #d4af37) 55%, #f7eccb) !important;
+  box-shadow:
+    /* outer glow */
+    0 0 calc(var(--s, 40) * 0.55 * 1px) color-mix(in srgb, var(--c, #d4af37) 55%, transparent),
+    0 0 calc(var(--s, 40) * 0.9 * 1px) color-mix(in srgb, var(--c, #d4af37) 22%, transparent),
+    /* drop */
+    0 10px 18px rgba(0, 0, 0, 0.55),
+    0 4px 6px rgba(0, 0, 0, 0.4),
+    /* metallic rim: top highlight / bottom shadow */
+    inset 0 2px 3px rgba(255, 255, 255, 0.45),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.55),
+    inset 3px 3px 6px rgba(255, 255, 255, 0.18),
+    inset -3px -5px 10px rgba(0, 0, 0, 0.4) !important;
+  filter: saturate(1.08);
+}
+
+/* Halo glow ring */
+.wx3d-sphere::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: -7px !important;
+  border-radius: 50% !important;
+  border: 1px solid color-mix(in srgb, var(--c, #d4af37) 40%, transparent) !important;
+  background: transparent !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c, #d4af37) 25%, transparent),
+    0 0 12px color-mix(in srgb, var(--c, #d4af37) 40%, transparent),
+    0 0 28px color-mix(in srgb, var(--c, #d4af37) 18%, transparent),
+    inset 0 0 10px color-mix(in srgb, var(--c, #d4af37) 15%, transparent) !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+  animation: orbHaloPulse 3.2s ease-in-out infinite !important;
+}
+
+/* Inner texture (pentagram / star motif) + shimmer sweep */
+.wx3d-sphere::after {
+  content: "✦" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  font-size: calc(var(--s, 40) * 0.32 * 1px) !important;
+  line-height: 1 !important;
+  color: rgba(255, 255, 255, 0.22) !important;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.15),
+    0 1px 0 rgba(0, 0, 0, 0.25) !important;
+  background:
+    /* subtle star spokes */
+    conic-gradient(
+      from 0deg,
+      transparent 0deg 28deg,
+      rgba(255, 255, 255, 0.06) 28deg 36deg,
+      transparent 36deg 100deg,
+      rgba(255, 255, 255, 0.05) 100deg 108deg,
+      transparent 108deg 172deg,
+      rgba(255, 255, 255, 0.05) 172deg 180deg,
+      transparent 180deg 244deg,
+      rgba(255, 255, 255, 0.05) 244deg 252deg,
+      transparent 252deg 316deg,
+      rgba(255, 255, 255, 0.05) 316deg 324deg,
+      transparent 324deg 360deg
+    ) !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  mix-blend-mode: soft-light;
+}
+
+/* Shimmer light bar via background-position on a dedicated layer —
+   use orb::after clip with animated linear gradient overlay via mask trick:
+   re-purpose with animated pseudo on orb container */
+/* Shimmer light sweep on orb */
+.wx3d-orb::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 50% !important;
+  width: calc(var(--s, 40) * 1px) !important;
+  height: calc(var(--s, 40) * 1px) !important;
+  margin-left: calc(var(--s, 40) * -0.5 * 1px) !important;
+  border-radius: 50% !important;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.45) 48%,
+    rgba(255, 255, 255, 0.12) 52%,
+    transparent 65%
+  ) !important;
+  background-size: 220% 100% !important;
+  animation: orbShimmerSweep 4.8s ease-in-out infinite !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+  mix-blend-mode: overlay;
+  opacity: 0.7;
+}
+@keyframes orbShimmerSweep {
+  0% { background-position: 140% 0; opacity: 0; }
+  12% { opacity: 0.75; }
+  45% { opacity: 0.55; }
+  100% { background-position: -80% 0; opacity: 0; }
+}
+
+/* Dụng Thần orb — brighter halo + rotating seal ring */
+.wx3d-dung .wx3d-sphere {
+  box-shadow:
+    0 0 calc(var(--s, 40) * 0.75 * 1px) color-mix(in srgb, var(--c, #d4af37) 80%, transparent),
+    0 0 calc(var(--s, 40) * 1.25 * 1px) color-mix(in srgb, var(--c, #d4af37) 40%, transparent),
+    0 0 calc(var(--s, 40) * 1.8 * 1px) rgba(247, 236, 203, 0.2),
+    0 10px 20px rgba(0, 0, 0, 0.55),
+    inset 0 2px 4px rgba(255, 255, 255, 0.55),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.5),
+    inset 3px 3px 8px rgba(255, 255, 255, 0.22),
+    inset -3px -5px 12px rgba(0, 0, 0, 0.42) !important;
+  border-color: color-mix(in srgb, var(--c, #d4af37) 40%, #f7eccb) !important;
+}
+.wx3d-dung .wx3d-sphere::before {
+  inset: -10px !important;
+  border: 1.5px dashed color-mix(in srgb, var(--c, #d4af37) 65%, #f7eccb) !important;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--c, #d4af37) 30%, transparent),
+    0 0 18px color-mix(in srgb, var(--c, #d4af37) 60%, transparent),
+    0 0 36px color-mix(in srgb, var(--c, #d4af37) 35%, transparent),
+    inset 0 0 14px color-mix(in srgb, var(--c, #d4af37) 22%, transparent) !important;
+  animation: dungRingSpin 12s linear infinite, orbHaloPulse 2.4s ease-in-out infinite !important;
+}
+.wx3d-dung .wx3d-sphere::after {
+  color: rgba(255, 255, 255, 0.38) !important;
+  text-shadow: 0 0 10px rgba(247, 236, 203, 0.45) !important;
+  font-size: calc(var(--s, 40) * 0.38 * 1px) !important;
+}
+.wx3d-dung .wx3d-han {
+  text-shadow: 0 0 14px currentColor, 0 0 28px color-mix(in srgb, var(--c, #d4af37) 50%, transparent) !important;
+  font-weight: 800 !important;
+}
+
+/* ══════════════════════════════════
+   2. TỨ TRỤ 3D — .tuzu-col
+   ══════════════════════════════════ */
+.tuzu-stage {
+  padding: 18px 2px 8px !important;
+  gap: 8px !important;
+}
+.tuzu-col {
+  position: relative !important;
+  overflow: visible !important;
+  transform: rotateX(7deg) translateZ(0) !important;
+  transform-style: preserve-3d !important;
+  /* inner gradient: top sheen → bottom dark */
+  background:
+    linear-gradient(180deg,
+      rgba(80, 68, 42, 0.35) 0%,
+      rgba(40, 34, 55, 0.55) 18%,
+      rgba(28, 24, 40, 0.94) 55%,
+      rgba(12, 10, 18, 0.98) 100%) !important;
+  border: 1px solid rgba(212, 175, 55, 0.32) !important;
+  /* top gold-foil gradient (not solid) */
+  border-top: none !important;
+  border-radius: 11px !important;
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.62),
+    0 4px 10px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(247, 236, 203, 0.18),
+    inset 0 -4px 14px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(212, 175, 55, 0.08) !important;
+  padding-top: 14px !important;
+}
+/* Gold-foil top bar + glow */
+.tuzu-col::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 6% !important;
+  right: 6% !important;
+  height: 3px !important;
+  border-radius: 0 0 3px 3px !important;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    #8a6a1a 8%,
+    #f7eccb 28%,
+    #d4af37 50%,
+    #f3d57a 72%,
+    #8a6a1a 92%,
+    transparent 100%) !important;
+  box-shadow:
+    0 0 10px rgba(212, 175, 55, 0.65),
+    0 0 22px rgba(212, 175, 55, 0.35),
+    0 2px 6px rgba(212, 175, 55, 0.25) !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+}
+/* Inner top sheen veil */
+.tuzu-col::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  background:
+    linear-gradient(165deg, rgba(247, 236, 203, 0.12) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 28%) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+.tuzu-col > * {
+  position: relative;
+  z-index: 1;
+}
+.tuzu-col:hover {
+  transform: rotateX(4deg) translateY(-5px) scale(1.035) !important;
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(212, 175, 55, 0.18),
+    inset 0 1px 0 rgba(247, 236, 203, 0.22),
+    inset 0 -4px 14px rgba(0, 0, 0, 0.5) !important;
+}
+/* 干/支 3D raised shadow */
+.tuzu-gan, .tuzu-zhi {
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12),
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 4px 2px rgba(0, 0, 0, 0.45),
+    0 8px 14px rgba(0, 0, 0, 0.55),
+    0 0 22px currentColor,
+    0 0 40px color-mix(in srgb, currentColor 35%, transparent) !important;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.55));
+  letter-spacing: 0.02em;
+}
+.tuzu-label {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  color: #e8d9a8;
+}
+.tuzu-sep {
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(212, 175, 55, 0.15),
+    rgba(247, 236, 203, 0.55),
+    rgba(212, 175, 55, 0.15),
+    transparent) !important;
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.25);
+  height: 1.5px !important;
+}
+
+/* Nhật Chủ — cinnabar foil + glow ring */
+.tuzu-col.tuzu-dm {
+  border-color: rgba(192, 57, 43, 0.45) !important;
+  background:
+    linear-gradient(180deg,
+      rgba(120, 40, 32, 0.42) 0%,
+      rgba(55, 28, 36, 0.7) 22%,
+      rgba(28, 18, 26, 0.96) 60%,
+      rgba(14, 10, 14, 0.99) 100%) !important;
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(192, 57, 43, 0.25),
+    0 0 24px rgba(192, 57, 43, 0.28),
+    0 0 48px rgba(192, 57, 43, 0.12),
+    inset 0 1px 0 rgba(247, 180, 160, 0.15),
+    inset 0 -4px 14px rgba(0, 0, 0, 0.55) !important;
+}
+.tuzu-col.tuzu-dm::before {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    #6b1a14 8%,
+    #e0533d 26%,
+    #f7b4a0 48%,
+    #c0392b 70%,
+    #6b1a14 92%,
+    transparent 100%) !important;
+  box-shadow:
+    0 0 12px rgba(192, 57, 43, 0.75),
+    0 0 28px rgba(192, 57, 43, 0.4),
+    0 2px 8px rgba(192, 57, 43, 0.35) !important;
+  height: 3.5px !important;
+}
+/* Extra cinnabar glow ring around day master card */
+.tuzu-col.tuzu-dm {
+  outline: 1px solid rgba(192, 57, 43, 0.35);
+  outline-offset: 3px;
+}
+
+/* ══════════════════════════════════
+   3. ĐẠI VẬN 3D — .dy3d-face
+   ══════════════════════════════════ */
+.dy3d-stage {
+  padding: 16px 6px 10px !important;
+  gap: 6px !important;
+}
+.dy3d-col {
+  transform-style: preserve-3d;
+}
+.dy3d-bar {
+  position: relative;
+  transform-style: preserve-3d;
+  padding-top: 8px;
+}
+.dy3d-face {
+  position: relative !important;
+  overflow: visible !important;
+  border-radius: 3px 3px 2px 2px !important;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--c, #d4af37) 100%, #fff) 0%,
+      var(--c, #d4af37) 28%,
+      color-mix(in srgb, var(--c, #d4af37) 70%, #000) 72%,
+      rgba(0, 0, 0, 0.55) 100%) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+    inset -4px 0 8px rgba(0, 0, 0, 0.35),
+    inset 2px 0 4px rgba(255, 255, 255, 0.1),
+    0 0 12px color-mix(in srgb, var(--c, #d4af37) 45%, transparent),
+    0 6px 12px rgba(0, 0, 0, 0.45) !important;
+  transform-style: preserve-3d;
+}
+
+/* Top cap — isometric parallelogram */
+.dy3d-face::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -7px !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 8px !important;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--c, #d4af37) 70%, #fff) 0%,
+    color-mix(in srgb, var(--c, #d4af37) 90%, #f7eccb) 40%,
+    color-mix(in srgb, var(--c, #d4af37) 60%, #000) 100%) !important;
+  transform: skewX(-32deg) translateX(4px) !important;
+  border-radius: 1px !important;
+  box-shadow:
+    0 0 8px color-mix(in srgb, var(--c, #d4af37) 40%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3) !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+
+/* Side face — right extrusion darker */
+.dy3d-face::after {
+  content: "" !important;
+  position: absolute !important;
+  top: -1px !important;
+  right: -6px !important;
+  width: 6px !important;
+  height: calc(100% + 1px) !important;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--c, #d4af37) 55%, #000) 0%,
+    color-mix(in srgb, var(--c, #d4af37) 35%, #000) 50%,
+    rgba(0, 0, 0, 0.7) 100%) !important;
+  transform: skewY(-38deg) !important;
+  transform-origin: top left !important;
+  border-radius: 0 1px 1px 0 !important;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.35) !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+/* Active bar — stronger glow + brighter top cap */
+.dy3d-col.dy3d-active {
+  transform: translateY(-3px) scale(1.04);
+}
+.dy3d-col.dy3d-active .dy3d-face {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.35),
+    inset -4px 0 8px rgba(0, 0, 0, 0.3),
+    0 0 16px color-mix(in srgb, var(--c, #d4af37) 70%, transparent),
+    0 0 32px color-mix(in srgb, var(--c, #d4af37) 40%, transparent),
+    0 0 48px rgba(247, 236, 203, 0.18),
+    0 8px 16px rgba(0, 0, 0, 0.5) !important;
+  filter: brightness(1.12) saturate(1.1);
+}
+.dy3d-col.dy3d-active .dy3d-face::before {
+  background: linear-gradient(135deg,
+    #fff8e0 0%,
+    color-mix(in srgb, var(--c, #d4af37) 50%, #fff) 30%,
+    color-mix(in srgb, var(--c, #d4af37) 85%, #f7eccb) 70%,
+    color-mix(in srgb, var(--c, #d4af37) 55%, #000) 100%) !important;
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--c, #d4af37) 70%, transparent),
+    0 0 24px rgba(247, 236, 203, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+  height: 9px !important;
+  top: -8px !important;
+}
+
+/* Marker ⬇ NAY — pulsing glow */
+.dy3d-now {
+  margin-top: 3px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #f3d57a !important;
+  font-family: "Noto Serif SC", serif;
+  animation: nowPulseGlow 1.6s ease-in-out infinite !important;
+  filter: drop-shadow(0 0 6px rgba(192, 57, 43, 0.55));
+}
+.dy3d-col.dy3d-active .dy3d-gz {
+  text-shadow: 0 0 12px currentColor, 0 0 24px color-mix(in srgb, var(--c, #d4af37) 50%, transparent) !important;
+  font-weight: 800 !important;
+}
+
+/* ══════════════════════════════════
+   4. VERDICT SEAL — .vd3d-seal
+   ══════════════════════════════════ */
+.vd3d-seal {
+  position: relative !important;
+  overflow: visible !important;
+  background:
+    /* specular */
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 18%, transparent 36%),
+    /* body gold */
+    radial-gradient(circle at 50% 48%, #f7eccb 0%, #e8c96a 28%, #d4af37 55%, #8a6a1a 82%, #4a380c 100%) !important;
+  border: 2px solid rgba(247, 236, 203, 0.55) !important;
+  box-shadow:
+    0 0 28px rgba(212, 175, 55, 0.55),
+    0 0 52px rgba(212, 175, 55, 0.28),
+    0 10px 22px rgba(0, 0, 0, 0.5),
+    inset 0 3px 8px rgba(255, 255, 255, 0.45),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.5),
+    inset 2px 2px 6px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Concentric rings + radial spokes texture */
+.vd3d-seal::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 7px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid rgba(139, 42, 26, 0.35) !important;
+  box-shadow:
+    0 0 0 4px rgba(212, 175, 55, 0.12),
+    inset 0 0 0 1px rgba(139, 42, 26, 0.2),
+    inset 0 0 0 6px rgba(212, 175, 55, 0.08) !important;
+  background:
+    /* radial spokes from center */
+    conic-gradient(
+      from 0deg,
+      transparent 0deg 8deg,
+      rgba(139, 42, 26, 0.08) 8deg 10deg,
+      transparent 10deg 26deg,
+      rgba(139, 42, 26, 0.07) 26deg 28deg,
+      transparent 28deg 44deg,
+      rgba(139, 42, 26, 0.08) 44deg 46deg,
+      transparent 46deg 62deg,
+      rgba(139, 42, 26, 0.07) 62deg 64deg,
+      transparent 64deg 80deg,
+      rgba(139, 42, 26, 0.08) 80deg 82deg,
+      transparent 82deg 98deg,
+      rgba(139, 42, 26, 0.07) 98deg 100deg,
+      transparent 100deg 116deg,
+      rgba(139, 42, 26, 0.08) 116deg 118deg,
+      transparent 118deg 134deg,
+      rgba(139, 42, 26, 0.07) 134deg 136deg,
+      transparent 136deg 152deg,
+      rgba(139, 42, 26, 0.08) 152deg 154deg,
+      transparent 154deg 170deg,
+      rgba(139, 42, 26, 0.07) 170deg 172deg,
+      transparent 172deg 188deg,
+      rgba(139, 42, 26, 0.08) 188deg 190deg,
+      transparent 190deg 206deg,
+      rgba(139, 42, 26, 0.07) 206deg 208deg,
+      transparent 208deg 224deg,
+      rgba(139, 42, 26, 0.08) 224deg 226deg,
+      transparent 226deg 242deg,
+      rgba(139, 42, 26, 0.07) 242deg 244deg,
+      transparent 244deg 260deg,
+      rgba(139, 42, 26, 0.08) 260deg 262deg,
+      transparent 262deg 278deg,
+      rgba(139, 42, 26, 0.07) 278deg 280deg,
+      transparent 280deg 296deg,
+      rgba(139, 42, 26, 0.08) 296deg 298deg,
+      transparent 298deg 314deg,
+      rgba(139, 42, 26, 0.07) 314deg 316deg,
+      transparent 316deg 332deg,
+      rgba(139, 42, 26, 0.08) 332deg 334deg,
+      transparent 334deg 350deg,
+      rgba(139, 42, 26, 0.07) 350deg 352deg,
+      transparent 352deg 360deg
+    ) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+/* Outer thin concentric ring */
+.vd3d-seal::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -4px !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(212, 175, 55, 0.4) !important;
+  box-shadow:
+    0 0 0 3px rgba(212, 175, 55, 0.1),
+    0 0 12px rgba(212, 175, 55, 0.25) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* Spinning ring with glow */
+.vd3d-ring {
+  inset: -9px !important;
+  border: 1.5px dashed rgba(212, 175, 55, 0.55) !important;
+  box-shadow:
+    0 0 10px rgba(212, 175, 55, 0.4),
+    0 0 22px rgba(212, 175, 55, 0.2),
+    inset 0 0 8px rgba(247, 236, 203, 0.12) !important;
+  animation: vdSpin 14s linear infinite, sealRingGlow 3s ease-in-out infinite !important;
+  z-index: 0 !important;
+}
+
+/* Char multi-layer depth */
+.vd3d-char {
+  z-index: 2 !important;
+  color: #7a2214 !important;
+  text-shadow:
+    /* emboss highlight */
+    0 -1px 0 rgba(255, 220, 180, 0.35),
+    /* carved depth layers */
+    0 1px 0 rgba(60, 10, 5, 0.5),
+    0 2px 0 rgba(40, 8, 4, 0.45),
+    0 3px 1px rgba(20, 4, 2, 0.4),
+    0 5px 4px rgba(0, 0, 0, 0.45),
+    0 8px 12px rgba(0, 0, 0, 0.35),
+    /* red-gold glow */
+    0 0 14px rgba(192, 57, 43, 0.45),
+    0 0 28px rgba(139, 42, 26, 0.25) !important;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
+}
+.vd3d-label {
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.45), 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .wx3d-sphere::before,
+  .wx3d-dung .wx3d-sphere::before,
+  .wx3d-orb::after,
+  .vd3d-ring,
+  .dy3d-now,
+  .wx3d-orb,
+  .vd3d-seal,
+  .tuzu-stage {
+    animation: none !important;
+  }
+}
+
+/* ── Mobile 390px polish ── */
+@media (max-width: 420px) {
+  .wx3d-stage { gap: 7px !important; padding: 14px 2px 6px !important; }
+  .tuzu-stage { gap: 6px !important; padding: 14px 1px 6px !important; }
+  .tuzu-gan, .tuzu-zhi { font-size: 30px !important; }
+  .tuzu-col { padding: 11px 3px 10px !important; }
+  .dy3d-col { flex: 0 0 40px !important; }
+  .dy3d-face { width: 68% !important; }
+  .dy3d-face::after { width: 5px !important; right: -5px !important; }
+  .vd3d-seal { width: 84px !important; height: 84px !important; }
+  .vd3d-char { font-size: 36px !important; }
+  .wx3d-sphere::before { inset: -5px !important; }
+  .wx3d-dung .wx3d-sphere::before { inset: -8px !important; }
+}
