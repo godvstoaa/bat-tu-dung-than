@@ -2530,3 +2530,9 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 
 /* [loop] AI popup bottom-sheet grab handle (mobile) */
 @media (max-width:560px) { .ai-popup::before { content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: 40px; height: 4px; background: rgba(212,175,55,0.3); border-radius: 2px; z-index: 1; } }
+
+/* [loop] orb holographic shimmer — light sweep on ngũ hành spheres */
+.wx3d-sphere { position: relative; overflow: hidden; }
+.wx3d-sphere::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.3) 50%, transparent 65%); animation: orbShimmer 3s ease-in-out infinite; }
+@keyframes orbShimmer { 0%,100% { opacity: 0; transform: translateX(-15px); } 50% { opacity: 1; transform: translateX(15px); } }
+@media (prefers-reduced-motion: reduce) { .wx3d-sphere::after { animation: none; opacity: 0; } }
