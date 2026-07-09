@@ -2679,3 +2679,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .followup-chip { contain: layout; }
 .meta-line { contain: layout; }
 .field { contain: layout; }
+.gz { contain: layout; }
