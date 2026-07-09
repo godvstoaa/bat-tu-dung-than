@@ -633,16 +633,17 @@ function renderWx3D(wx, yong) {
   function createScene(canvas, type, pct, isDung) {
     const W = canvas.width, H = canvas.height;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0d0a08);
     const camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 100);
     camera.position.set(0, 2, 6);
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: true });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setSize(W, H);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.setClearColor(0x0d0a08, 1);
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    const dl = new THREE.DirectionalLight(0xffffff, 1.3);
+    renderer.setClearColor(0x000000, 0);
+    scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+    const dl = new THREE.DirectionalLight(0xffffff, 2.0);
     dl.position.set(5, 10, 7); scene.add(dl);
+    const dl2 = new THREE.DirectionalLight(0xffeecc, 0.8);
+    dl2.position.set(-5, 5, -3); scene.add(dl2);
     const group = new THREE.Group(); scene.add(group);
     const scale = Math.max(0.35, Math.min(1.1, 0.35 + pct / 55));
     group.scale.setScalar(scale);
