@@ -652,23 +652,56 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 }
 
 /* ===== NGŨ HÀNH BARS ===== */
-.wuxing-bars { display: flex; flex-direction: column; gap: 13px; }
-.wx-row { 
-  display: grid; 
-  grid-template-columns: 110px 1fr 48px; 
-  align-items: center; 
-  gap: 12px; 
-  padding: 6px 8px;
-  border-radius: 5px;
+.wuxing-bars { display: flex; flex-direction: column; gap: 10px; }
+.wx-row {
+  display: grid;
+  /* tên/badge đủ chỗ — thanh bar không đè chữ (trước: 110px quá hẹp) */
+  grid-template-columns: minmax(148px, max-content) minmax(72px, 1fr) 3.4rem;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 8px 10px;
+  border-radius: 6px;
   border: 1px solid transparent;
   transition: background .15s, border-color .15s, transform .22s var(--ease-spring);
 }
 .wx-row:hover { background: rgba(212,175,55,0.045); border-color: rgba(212,175,55,0.22); transform: translateY(-1px); }
-.wx-name { font-size: 13.5px; color: var(--silk-dim); font-family: 'Noto Serif SC', serif; display: flex; align-items: center; gap: 6px; }
+.wx-name {
+  font-size: 13.5px;
+  color: var(--silk-dim);
+  font-family: 'Noto Serif SC', serif;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-width: 0;
+  line-height: 1.35;
+}
+.wx-name-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  color: var(--silk);
+  font-weight: 600;
+}
+.wx-name-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.wx-name-tags > span { flex-shrink: 0; white-space: nowrap; }
 .wx-icon { width: 26px; height: 26px; flex-shrink: 0; mix-blend-mode: screen; filter: drop-shadow(0 0 4px rgba(212,175,55,0.3)); }
-.wx-track { background: rgba(0,0,0,0.35); border: 1px solid rgba(212, 175, 55, 0.14); border-radius: 20px; height: 15px; overflow: hidden; }
+.wx-track {
+  min-width: 0; /* cho phép co trong grid, không tràn đè cột tên */
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(212, 175, 55, 0.14);
+  border-radius: 20px;
+  height: 14px;
+  overflow: hidden;
+}
 .wx-fill { height: 100%; border-radius: 20px; transition: width .9s var(--ease-out); filter: drop-shadow(0 0 5px rgba(255,255,255,0.22)) brightness(1.04); box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -1px 3px rgba(0,0,0,0.35); }
-.wx-pct { text-align: right; font-size: 12.5px; color: var(--gold-pale); font-variant-numeric: tabular-nums; font-weight: 600; }
+.wx-pct { text-align: right; font-size: 12.5px; color: var(--gold-pale); font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
 
 /* [plan #4] Ngũ hành tap-to-explore + radar entrance */
 .wuxing-bars .wx-row-tap { cursor: pointer; border-radius: 6px; transition: background .15s ease, transform .12s ease; }
@@ -676,12 +709,33 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 .wuxing-bars .wx-row-tap:active { transform: scale(0.985); }
 .wuxing-bars .wx-row-tap:focus-visible { outline: 2px solid var(--gold-bright, #f3d57a); outline-offset: 2px; }
 .wuxing-bars .wx-row-sel { background: rgba(212, 175, 55, 0.14); box-shadow: inset 3px 0 0 var(--gold, #d4af37); }
-.wx-explore { margin-top: 12px; padding: 10px 12px; border: 1px solid rgba(212, 175, 55, 0.22); border-radius: 8px; background: linear-gradient(180deg, rgba(212,175,55,0.05), rgba(0,0,0,0.18)); }
-.wx-exp-head { font-size: 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.wx-explore {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(40, 34, 22, 0.72), rgba(16, 14, 12, 0.55));
+  color: #e6dcc0; /* không dùng --ink (đang là nền tối #12121a) */
+}
+.wx-explore .hint { color: #cfc3a0; opacity: 0.95; }
+.wx-exp-head { font-size: 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; color: #f0e6c8; }
 .wx-exp-head .zh { font-size: 18px; font-weight: 700; }
-.wx-exp-rel { font-size: 11.5px; line-height: 1.65; color: var(--muted, #9a8f6a); }
-.wx-exp-rel b { color: var(--gold-pale, #e8d9a8); font-weight: 600; }
-.wx-exp-mean { font-size: 12.5px; margin: 8px 0 0; line-height: 1.55; color: var(--ink, #e9e2c8); }
+.wx-exp-head b { color: #f3ead2; }
+.wx-exp-rel { font-size: 12.5px; line-height: 1.7; color: #d4c9a8; }
+.wx-exp-rel b { color: #f0d78a; font-weight: 600; }
+.wx-exp-mean { font-size: 13px; margin: 8px 0 0; line-height: 1.6; color: #efe6c8; font-weight: 500; }
+@media (max-width: 520px) {
+  .wx-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name pct"
+      "track track";
+    gap: 6px 10px;
+  }
+  .wx-name { grid-area: name; }
+  .wx-pct { grid-area: pct; align-self: start; }
+  .wx-track { grid-area: track; }
+}
 @media (prefers-reduced-motion: no-preference) {
   .wuxing-bars .wx-radar-poly { transform-box: fill-box; transform-origin: center; animation: wxRadarIn .6s cubic-bezier(.2,.85,.25,1) both; }
   @keyframes wxRadarIn { from { opacity: 0; transform: scale(.35); } to { opacity: 1; transform: scale(1); } }

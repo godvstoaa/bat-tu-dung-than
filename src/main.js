@@ -727,7 +727,10 @@ function renderWuXing(wx, yong) {
     const rk = w === yong?.primary ? 'dung' : w === yong?.xi ? 'hy' : w === yong?.ji ? 'ky' : w === yong?.chou ? 'thu' : '';
     return `
       <div class="wx-row wx-row-tap" data-wx="${w}" data-pct="${pct}" data-role="${rk}" role="button" tabindex="0" aria-label="Xem ý nghĩa hành ${WX_VI[w]}">
-        <div class="wx-name"><img class="wx-icon" src="${WX_ICON[w]}" alt="${WX_VI[w]}" width="26" height="26" loading="lazy">${w} ${WX_VI[w]}${tag ? ` <span style="color:${tagColor};font-weight:700;font-size:11px">${tag}</span>` : ''}${wtBadge}</div>
+        <div class="wx-name">
+          <span class="wx-name-main"><img class="wx-icon" src="${WX_ICON[w]}" alt="${WX_VI[w]}" width="26" height="26" loading="lazy">${w} ${WX_VI[w]}</span>
+          ${(tag || wtBadge) ? `<span class="wx-name-tags">${tag ? `<span style="color:${tagColor};font-weight:700;font-size:11px">${tag}</span>` : ''}${wtBadge}</span>` : ''}
+        </div>
         <div class="wx-track"><div class="wx-fill" style="width:${width}%;background:${WX_COLOR[w]}"></div></div>
         <div class="wx-pct">${pct}%</div>
       </div>`;
