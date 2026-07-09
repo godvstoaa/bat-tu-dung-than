@@ -2364,3 +2364,76 @@ button:focus-visible, .lab-btn:focus-visible {
   }
   .card, .grp { animation: none !important; }
 }
+
+/* ==========================
+   PREMIUM PATTERN + GOLD FOIL (từ CSS-Trics/Dribbble patterns)
+   ========================== */
+
+/* Gold foil text gradient (CSS-Tricks gorgeous gold) */
+.hero-title, .card-title, .vd3d-label, .tuzu-label {
+  background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)) drop-shadow(0 0 8px rgba(191,149,63,0.2));
+}
+
+/* Subtle gold dot pattern background (Hero Patterns style) */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(212,175,55,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Card: glass + gold rim + subtle inner glow (Dribbble dark-gold pattern) */
+.card, .verdict-card, .form-card, .tools-card {
+  background: linear-gradient(135deg, rgba(30,25,18,0.85), rgba(20,16,12,0.9)) !important;
+  border: 1px solid rgba(212,175,55,0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25), inset 0 1px 0 rgba(212,175,55,0.08) !important;
+  backdrop-filter: blur(4px);
+}
+
+/* CTA: gold foil button (gorgeous gold gradient) */
+.btn-primary {
+  background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 30%, #d4af37 50%, #b38728 70%, #fbf5b7 100%) !important;
+  color: #1a1410 !important;
+  border: none !important;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+  box-shadow: 0 4px 12px rgba(191,149,63,0.3), inset 0 1px 0 rgba(255,255,255,0.3) !important;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #fcf6ba 0%, #d4af37 30%, #b38728 50%, #bf953f 70%, #fbf5b7 100%) !important;
+  box-shadow: 0 6px 18px rgba(191,149,63,0.4) !important;
+}
+
+/* Form input: gold border focus (Dribbble style) */
+.birth-form input, .birth-form select, .tool input, .tool select {
+  background: rgba(20,16,12,0.6) !important;
+  border: 1px solid rgba(212,175,55,0.15) !important;
+  border-radius: 8px;
+  color: #f5ead0 !important;
+}
+.birth-form input:focus, .birth-form select:focus, .tool input:focus, .tool select:focus {
+  border-color: #d4af37 !important;
+  box-shadow: 0 0 0 2px rgba(212,175,55,0.15) !important;
+}
+
+/* Text: warm cream readable (sơn mài style) */
+body, p, .hint, .meta-line { color: #e8dcc0; }
+.hint { color: #c9b896; }
+
+/* Section header: gold foil underline */
+h2.grp {
+  color: transparent;
+  background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728);
+  -webkit-background-clip: text;
+  background-clip: text;
+  border-bottom: 1px solid rgba(212,175,55,0.15);
+  padding-bottom: 4px;
+}
