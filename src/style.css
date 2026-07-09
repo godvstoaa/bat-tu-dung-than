@@ -2705,3 +2705,4 @@ html { contain: layout; }
 .wx3d-orb,.hh3d-orb,.tuzu-col,.dy3d-col,.vd3d-seal { contain: layout style paint; }
 .tuzu-3d-wrap,.wx3d-wrap,.dy3d-wrap,.vd3d-wrap { contain: strict; }
 .ai-popup,.chat-log { contain: strict; }
+#result { contain: strict; }
