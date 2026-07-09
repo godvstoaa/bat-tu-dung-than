@@ -469,6 +469,188 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
 }
 .tiaohou-note { margin-top: 12px; font-size: 13.5px; color: var(--gold-bright); background: rgba(212,175,55,0.08); border-left: 3px solid var(--gold); padding: 10px 14px; border-radius: 0 4px 4px 0; }
 
+/* ===== NGŨ HÀNH FOIL CARDS (premium — thay Three.js low-poly) ===== */
+.wx-foil-wrap {
+  margin: 8px 0 16px;
+  padding: 14px 10px 12px;
+  border-radius: 10px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,175,55,0.06), transparent 70%),
+    linear-gradient(180deg, rgba(28,24,18,0.55), rgba(10,9,7,0.25));
+  border: 1px solid rgba(180,155,100,0.16);
+  box-shadow: inset 0 1px 0 rgba(247,236,203,0.05);
+}
+.wx-foil-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  perspective: 900px;
+}
+.wx-foil-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 14px 8px 12px;
+  border: 1px solid rgba(180,160,120,0.16);
+  border-radius: 12px;
+  background:
+    linear-gradient(165deg, rgba(40,36,28,0.55) 0%, rgba(14,12,10,0.72) 100%);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: center;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .25s, box-shadow .35s;
+  animation: wxFoilIn .55s cubic-bezier(.2,.85,.25,1) both;
+  animation-delay: var(--wx-delay, 0s);
+}
+.wx-foil-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 28%, var(--wx-soft), transparent 72%);
+  pointer-events: none;
+}
+.wx-foil-card:hover, .wx-foil-card:focus-visible {
+  transform: translateY(-4px) rotateX(4deg) scale(1.02);
+  border-color: color-mix(in srgb, var(--wx-c) 55%, transparent);
+  box-shadow:
+    0 14px 28px -12px rgba(0,0,0,0.65),
+    0 0 0 1px color-mix(in srgb, var(--wx-c) 35%, transparent),
+    0 0 28px -6px var(--wx-glow);
+  outline: none;
+}
+.wx-foil-card.is-dung {
+  border-color: rgba(168,56,48,0.45);
+  box-shadow: inset 0 0 0 1px rgba(168,56,48,0.2), 0 0 24px -8px rgba(168,56,48,0.35);
+}
+.wx-foil-seal {
+  position: absolute; top: 8px; right: 8px; z-index: 2;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+  color: #e8c48a;
+  font-family: 'Noto Serif SC', serif;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: linear-gradient(145deg, rgba(168,56,48,0.85), rgba(100,28,22,0.9));
+  border: 1px solid rgba(247,236,203,0.28);
+  box-shadow: 0 2px 8px rgba(120,30,20,0.4);
+}
+.wx-foil-card.is-hy .wx-foil-seal { background: linear-gradient(145deg, rgba(46,120,80,0.85), rgba(24,70,48,0.9)); }
+.wx-foil-card.is-ky .wx-foil-seal { background: linear-gradient(145deg, rgba(140,70,40,0.85), rgba(80,36,16,0.9)); }
+.wx-foil-zh {
+  position: relative; z-index: 1;
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+  font-size: 22px; font-weight: 600;
+  color: var(--wx-c);
+  text-shadow: 0 0 18px var(--wx-glow);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.wx-foil-orb {
+  position: relative; z-index: 1;
+  width: min(100%, 118px);
+  aspect-ratio: 1;
+  margin: 2px auto 6px;
+}
+.wx-foil-ring {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 6px var(--wx-glow));
+}
+.wx-foil-track {
+  fill: none;
+  stroke: rgba(212,175,55,0.1);
+  stroke-width: 3.5;
+}
+.wx-foil-prog {
+  fill: none;
+  stroke: var(--wx-c);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: stroke-dasharray .9s cubic-bezier(.2,.85,.25,1);
+  filter: drop-shadow(0 0 4px var(--wx-glow));
+}
+.wx-foil-icon-wrap {
+  position: absolute; inset: 16%;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 40% 35%, rgba(247,236,203,0.12), transparent 55%),
+    radial-gradient(circle at 50% 55%, rgba(0,0,0,0.35), rgba(0,0,0,0.55));
+  box-shadow:
+    inset 0 1px 0 rgba(247,236,203,0.12),
+    0 8px 20px rgba(0,0,0,0.35);
+  animation: wxFoilFloat 4.5s ease-in-out infinite;
+  animation-delay: var(--wx-delay, 0s);
+}
+.wx-foil-icon {
+  width: 62%; height: 62%;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 10px var(--wx-glow)) brightness(1.08);
+  pointer-events: none;
+  user-select: none;
+}
+.wx-foil-status {
+  position: relative; z-index: 1;
+  font-size: 10.5px; letter-spacing: 0.06em;
+  color: var(--wx-c); opacity: 0.78; font-weight: 500;
+}
+.wx-foil-pct {
+  position: relative; z-index: 1;
+  font-size: 17px; font-weight: 700;
+  color: var(--wx-c);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 12px var(--wx-glow);
+}
+.wx-foil-name {
+  position: relative; z-index: 1;
+  font-size: 12px;
+  color: rgba(200,186,150,0.78);
+  font-family: 'Noto Serif SC', serif;
+  margin-top: 1px;
+}
+.wx-foil-bar {
+  position: relative; z-index: 1;
+  width: 72%; height: 3px; margin-top: 8px;
+  border-radius: 99px;
+  background: rgba(0,0,0,0.35);
+  overflow: hidden;
+  border: 1px solid rgba(212,175,55,0.1);
+}
+.wx-foil-bar i {
+  display: block; height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--wx-c) 70%, #000), var(--wx-c));
+  box-shadow: 0 0 8px var(--wx-glow);
+  transition: width .9s cubic-bezier(.2,.85,.25,1);
+}
+@keyframes wxFoilIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes wxFoilFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@media (max-width: 720px) {
+  .wx-foil-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .wx-foil-zh { font-size: 18px; }
+  .wx-foil-pct { font-size: 15px; }
+}
+@media (max-width: 420px) {
+  .wx-foil-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wx-foil-card, .wx-foil-icon-wrap { animation: none !important; }
+  .wx-foil-card:hover, .wx-foil-card:focus-visible { transform: none; }
+}
+
 /* ===== NGŨ HÀNH BARS ===== */
 .wuxing-bars { display: flex; flex-direction: column; gap: 13px; }
 .wx-row { 
