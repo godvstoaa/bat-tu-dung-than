@@ -2557,3 +2557,5 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .vd3d { background: linear-gradient(180deg, rgba(212,175,55,0.02), transparent); border-radius: 8px; padding: 8px 8px 4px; }
 .hh3d { background: linear-gradient(180deg, rgba(212,175,55,0.02), transparent); border-radius: 8px; padding: 8px; }
 .tuzu-3d-wrap, .wx3d-wrap, .dy3d-wrap, .vd3d-wrap { transition: opacity .3s ease; }
+.hh3d-marker { animation: hhMarkerPulse 2s ease-in-out infinite; }
+@keyframes hhMarkerPulse { 0%,100% { box-shadow: 0 0 6px var(--gold,#d4af37); } 50% { box-shadow: 0 0 14px var(--gold,#d4af37), 0 0 4px #fff8; } }
