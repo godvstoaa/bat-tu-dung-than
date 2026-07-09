@@ -2712,3 +2712,4 @@ main.container { contain: strict; }
 .form-card,.tools-card { contain: strict; }
 .today-hero { contain: strict; }
 #wuxing { contain: strict; }
+#pillars,#verdict,#dayun-chart,#hh-out { contain: strict; }
