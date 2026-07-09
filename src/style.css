@@ -2527,3 +2527,6 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 /* [loop] primary button gold glow (main CTA) */
 .btn-primary { box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 20px rgba(212,175,55,0.15); }
 .btn-primary:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 26px rgba(212,175,55,0.25); }
+
+/* [loop] AI popup bottom-sheet grab handle (mobile) */
+@media (max-width:560px) { .ai-popup::before { content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: 40px; height: 4px; background: rgba(212,175,55,0.3); border-radius: 2px; z-index: 1; } }
