@@ -163,28 +163,37 @@ body::before {
     radial-gradient(ellipse 70% 55% at 50% 38%, rgba(40, 32, 18, 0.55) 0%, transparent 70%),
     linear-gradient(180deg, rgba(12, 10, 14, 0.2) 0%, rgba(12, 10, 14, 0.75) 55%, rgba(12, 10, 14, 0.96) 100%);
 }
-/* Biểu tượng geometry lớn phía sau — quay tròn chậm */
+/* Biểu tượng geometry lớn phía sau — quay tròn chậm
+   Clip tròn + screen blend: hero-art là vuông nền đen → khi quay sẽ hiện “hình thoi/chữ nhật”
+   nếu không cắt góc và không khử nền đen. */
 .hero-bg-mandala {
   position: absolute;
   left: 50%; top: 42%;
-  width: min(92vw, 680px);
-  height: min(92vw, 680px);
+  width: min(88vw, 620px);
+  height: min(88vw, 620px);
   margin: 0;
   transform: translate(-50%, -50%);
-  background: url('/hero-art.webp') center / contain no-repeat;
-  opacity: 0.42;
+  background: url('/hero-art.webp') center / 92% 92% no-repeat;
+  opacity: 0.55;
   pointer-events: none;
   z-index: 0;
-  filter: drop-shadow(0 0 48px rgba(212, 175, 55, 0.18)) saturate(1.05);
+  border-radius: 50%;
+  overflow: hidden;
+  /* nền đen của file ảnh biến mất, chỉ còn nét vàng */
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(circle at center, #000 58%, transparent 72%);
+  mask-image: radial-gradient(circle at center, #000 58%, transparent 72%);
   animation: heroBgSpin 48s linear infinite;
   will-change: transform;
 }
 .hero-bg-mandala::after {
   content: '';
-  position: absolute; inset: 8%;
+  position: absolute; inset: 0;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 68%);
+  background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 62%);
   animation: heroBgPulse 6s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: normal;
 }
 @keyframes heroBgSpin {
   from { transform: translate(-50%, -50%) rotate(0deg); }
@@ -2630,7 +2639,7 @@ button:focus-visible, .lab-btn:focus-visible {
   .hero-bg-mandala, .bagua-ring, .bagua-ring.outer, .mandala-core {
     animation: none !important;
   }
-  .hero-bg-mandala { transform: translate(-50%, -50%); opacity: 0.32; }
+  .hero-bg-mandala { transform: translate(-50%, -50%); opacity: 0.4; }
   .card, .grp, .btn-primary, .tab, .seg-btn, .wx-row, .verdict .v-box,
   .pillar, .v-box, .dy, .ln, .tool, .ss, .lq, .tier, .lm-cell,
   .qs-tile, #result > .card, #result > .grp {
