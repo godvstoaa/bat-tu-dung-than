@@ -13,46 +13,46 @@ const RAND = (a, b) => a + Math.random() * (b - a);
 
 // ---- per-element particle factories (spawn at a position) ----
 const FACTORIES = {
-  // 火 FIRE — glowing embers rising from bottom, flickering, color shifts yellow→red
+  // 火 朱砂 — soft cinnabar embers (not neon orange)
   '火': () => ({
     x: RAND(0, W), y: H + RAND(0, 40),
     vx: RAND(-0.25, 0.25), vy: -RAND(0.5, 1.6),
-    size: RAND(1.2, 3.2), life: 0, max: RAND(90, 160),
-    hue: RAND(18, 45), drift: RAND(0.5, 1.5),
+    size: RAND(1.2, 3.0), life: 0, max: RAND(90, 160),
+    hue: RAND(8, 22), drift: RAND(0.5, 1.5),
   }),
-  // 水 WATER — translucent droplets/bubbles drifting horizontally w/ wave motion
+  // 水 花青 — indigo wash droplets
   '水': () => ({
     x: RAND(-20, W), y: RAND(H * 0.45, H),
     vx: RAND(0.3, 0.9), vy: 0, baseY: 0, amp: RAND(6, 16), freq: RAND(0.01, 0.03), phase: RAND(0, 6.28),
-    size: RAND(1.5, 4), life: 0, max: RAND(200, 360), hue: RAND(195, 215), alpha: RAND(0.25, 0.55),
+    size: RAND(1.5, 4), life: 0, max: RAND(200, 360), hue: RAND(200, 215), alpha: RAND(0.22, 0.48),
   }),
-  // 木 WOOD — green leaves falling slowly, swaying + rotating
+  // 木 黛绿 — muted jade leaves
   '木': () => ({
     x: RAND(0, W), y: -RAND(0, 40),
     vx: RAND(-0.2, 0.2), vy: RAND(0.25, 0.7),
     size: RAND(3, 6), rot: RAND(0, 6.28), spin: RAND(-0.03, 0.03),
     sway: RAND(0.5, 1.4), swayPhase: RAND(0, 6.28),
-    life: 0, max: RAND(300, 460), hue: RAND(95, 140),
+    life: 0, max: RAND(300, 460), hue: RAND(110, 145),
   }),
-  // 金 METAL — bright shimmering motes drifting diagonally, pulsing
+  // 金 银白泥金 — soft metallic motes
   '金': () => ({
     x: RAND(0, W), y: RAND(0, H),
     vx: RAND(0.1, 0.4), vy: RAND(-0.15, 0.15),
     size: RAND(0.8, 2.2), life: 0, max: RAND(160, 280),
     pulse: RAND(0, 6.28), pulseSpeed: RAND(0.04, 0.09),
   }),
-  // 土 EARTH — warm dust/sand settling downward slowly
+  // 土 赭石 — warm sand dust
   '土': () => ({
     x: RAND(0, W), y: -RAND(0, 40),
     vx: RAND(-0.1, 0.1), vy: RAND(0.15, 0.45),
-    size: RAND(0.8, 2.2), life: 0, max: RAND(320, 520), hue: RAND(32, 52), alpha: RAND(0.2, 0.5),
+    size: RAND(0.8, 2.2), life: 0, max: RAND(320, 520), hue: RAND(28, 48), alpha: RAND(0.18, 0.45),
   }),
-  // default (no Dụng Thần yet) — gold rising motes, twinkling (classic mote-field)
+  // default — 泥金 + 朱砂 (pre-analyze)
   default: () => ({
     x: RAND(0, W), y: RAND(0, H),
     vx: RAND(-0.18, 0.18), vy: -RAND(0.08, 0.4),
     size: RAND(0.4, 2.1), life: 0, max: RAND(300, 600), a: RAND(0, 6.28), tw: RAND(0.004, 0.029),
-    c: ['243,213,122', '212,175,55', '247,236,203', '192,57,43'][(Math.random() * 4) | 0],
+    c: ['232,210,138', '201,168,76', '243,230,192', '184,66,50'][(Math.random() * 4) | 0],
   }),
 };
 
