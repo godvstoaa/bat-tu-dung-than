@@ -636,9 +636,10 @@ function renderWx3D(wx, yong) {
     scene.background = new THREE.Color(0x0d0a08);
     const camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 100);
     camera.position.set(0, 2, 6);
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: true });
     renderer.setSize(W, H);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setClearColor(0x0d0a08, 1);
     scene.add(new THREE.AmbientLight(0xffffff, 0.7));
     const dl = new THREE.DirectionalLight(0xffffff, 1.3);
     dl.position.set(5, 10, 7); scene.add(dl);
