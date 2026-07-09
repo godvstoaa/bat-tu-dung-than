@@ -2627,3 +2627,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 #pillars { contain: layout; }
 #verdict { contain: layout; }
 #dayun-chart { contain: layout; }
+.today-hero { contain: layout; }
