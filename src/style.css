@@ -4,16 +4,16 @@
    ============================================================ */
 :root {
   scroll-behavior: smooth;
-  /* [user] Default = Thổ (Earth) warm tones — Dụng Thần Thổ */
-  --ink-black: #110d05;
-  --ink: #15110a;
-  --lacquer: #1a160e;
-  /* Surface tint elevation system — warm earthy brown */
-  --surface-1: #15110a;
-  --surface-2: #1a160e;
-  --surface-3: #221d16;
+  /* [user] Default = Thổ (Earth) warm BRIGHT tones — Dụng Thần Thổ */
+  --ink-black: #1c1610;
+  --ink: #231e16;
+  --lacquer: #2a251c;
+  /* Surface tint elevation system — warm earthy brown BRIGHT */
+  --surface-1: #231e16;
+  --surface-2: #2a251c;
+  --surface-3: #332e25;
   --panel: rgba(245, 236, 203, 0.02);
-  --panel-deep: rgba(21, 17, 10, 0.6);
+  --panel-deep: rgba(28, 22, 16, 0.6);
   --gold: #d4af37;
   --gold-bright: #f3d57a;
   --gold-pale: #f7eccb;
@@ -75,7 +75,7 @@ body.theme-火 {
 body.theme-土 {
   --gold: #d4af37; --gold-bright: #f3d57a; --gold-pale: #f7eccb;
   --gold-soft: rgba(212, 175, 55, 0.12); --hairline: rgba(212, 175, 55, 0.22);
-  --ink-black: #110d05; /* earthy warm tone */
+  --ink-black: #1c1610; /* earthy warm BRIGHT tone */
 }
 body.theme-金 {
   --gold: #c0c0c0; --gold-bright: #e0e0e0; --gold-pale: #f5f5f5;

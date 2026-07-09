@@ -5917,6 +5917,9 @@ $('cfg-test').addEventListener('click', async () => {
     el.style.color = '#e0533d';
   }
 });
+// [user fix] Move ai-fab + ai-popup OUTSIDE #result → visible on landing (before birth entry)
+(function () { const fab = $('ai-fab'), pop = $('ai-popup'); if (fab) document.body.appendChild(fab); if (pop) document.body.appendChild(pop); })();
+
 // AI popup (chat widget nổi): mở/đóng. [loop 358] Dùng event DELEGATION (gắn vào document)
 //   thay vì addEventListener trực tiếp — fix bug «sau Luận giải, bấm Trợ lý AI không hoạt động»:
 //   listener trực tiếp bị mất nếu element bị thay thế (innerHTML #result lúc error, hoặc re-render).
