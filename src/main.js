@@ -616,58 +616,130 @@ function _renderWxRadar(wx, yong, selected) {
 }
 
 // ---------------------------------------------------------------- NGŨ HÀNH
-// [user] NGŨ HÀNH 3D — 5 cầu 3D size theo % cân bằng, màu ngũ hành, float (data-driven)
+// [user] NGŨ HÀNH VIZ — 5 SVG riêng từng hành (lửa/cây/núi/kim/nước), thay đổi theo % sức mạnh
 function renderWx3D(wx, yong) {
   if (!wx || !wx.pct) return;
   const ELEMS = ['木', '火', '土', '金', '水'];
-  const WX_C = { '木': '#5fd870', '火': '#ff6a4a', '土': '#f0c050', '金': '#d8d8e8', '水': '#60a8e8' };
-  // [user] status theo %: yếu/nhược/trung bình/vượng/rất vượng
+  const WX_C = { '木': '#4caf50', '火': '#ff5722', '土': '#ffb300', '金': '#90a4ae', '水': '#2196f3' };
   const STATUS = (pct) => {
-    if (pct < 5) return { vi: 'Yếu', cls: 'st-yeu', icon: '△' };
-    if (pct < 15) return { vi: 'Nhược', cls: 'st-nhuoc', icon: '◔' };
-    if (pct < 30) return { vi: 'Trung bình', cls: 'st-trung', icon: '○' };
-    if (pct < 50) return { vi: 'Vượng', cls: 'st-vuong', icon: '◉' };
-    return { vi: 'Rất vượng', cls: 'st-rvuong', icon: '★' };
+    if (pct < 5) return { vi: 'Yếu', icon: '▽' };
+    if (pct < 15) return { vi: 'Nhược', icon: '◔' };
+    if (pct < 30) return { vi: 'Trung bình', icon: '○' };
+    if (pct < 50) return { vi: 'Vượng', icon: '◉' };
+    return { vi: 'Rất vượng', icon: '★' };
   };
-  const cols = ELEMS.map((w, i) => {
+  // scale factor: 0 (0%) → 1.2 (50%+)
+  const SCALE = (pct) => Math.max(0.3, Math.min(1.2, 0.3 + pct / 50));
+  const GLOW = (pct) => (3 + pct * 0.5).toFixed(0);
+  const OPACITY = (pct) => (0.35 + Math.min(1, pct / 40) * 0.65).toFixed(2);
+
+  // SVG generators — mỗi hành 1 hình riêng, thay đổi theo sức mạnh
+  const SVGS = {
+    '火': (pct, color) => {
+      const s = SCALE(pct);
+      const h = Math.round(70 * s);
+      const w2 = Math.round(35 * s);
+      const flames = pct > 25 ? 3 : pct > 10 ? 2 : 1;
+      let paths = `<path d="M0,${h} Q${-w2*0.3},${h*0.5} ${-w2*0.1},${h*0.2} Q0,0 0,${-h*0.1} Q${w2*0.2},${h*0.2} ${w2*0.3},${h*0.5} Q${w2*0.1},${h*0.8} 0,${h}Z" fill="${color}" opacity="${OPACITY(pct)}"/>`;
+      if (flames >= 2) paths += `<path d="M${-w2*0.4},${h} Q${-w2*0.5},${h*0.6} ${-w2*0.35},${h*0.3} Q${-w2*0.2},${-h*0.05} ${-w2*0.1},${h*0.15} Q0,${h*0.5} ${-w2*0.4},${h}Z" fill="${color}" opacity="${OPACITY(pct)*0.7}"/>`;
+      if (flames >= 3) paths += `<path d="M${w2*0.4},${h} Q${w2*0.5},${h*0.6} ${w2*0.45},${h*0.3} Q${w2*0.3},${h*0.05} ${w2*0.2},${h*0.2} Q${w2*0.1},${h*0.5} ${w2*0.4},${h}Z" fill="${color}" opacity="${OPACITY(pct)*0.6}"/>`;
+      // inner bright core for strong
+      if (pct > 20) paths += `<ellipse cx="0" cy="${h*0.4}" rx="${w2*0.15}" ry="${h*0.2}" fill="#fff8" opacity="0.5"/>`;
+      return `<g transform="translate(50,${90-h})">${paths}</g>`;
+    },
+    '木': (pct, color) => {
+      const s = SCALE(pct);
+      const trunkH = Math.round(55 * s);
+      const trunkW = Math.round(8 * s);
+      const canopyR = Math.round(25 * s);
+      const wilt = pct < 10 ? 0.5 : 1;
+      let paths = `<rect x="${50-trunkW/2}" y="${85-trunkH}" width="${trunkW}" height="${trunkH}" rx="2" fill="#6d4c41" opacity="${OPACITY(pct)}"/>`;
+      // canopy: lush if strong, sparse if weak
+      if (pct > 15) {
+        paths += `<circle cx="50" cy="${85-trunkH-canopyR*0.5}" r="${canopyR}" fill="${color}" opacity="${OPACITY(pct)*0.8}"/>`;
+        paths += `<circle cx="${50-canopyR*0.6}" cy="${85-trunkH-canopyR*0.3}" r="${canopyR*0.7}" fill="${color}" opacity="${OPACITY(pct)*0.6}"/>`;
+        paths += `<circle cx="${50+canopyR*0.6}" cy="${85-trunkH-canopyR*0.3}" r="${canopyR*0.7}" fill="${color}" opacity="${OPACITY(pct)*0.6}"/>`;
+      } else {
+        // sparse/wilting
+        paths += `<circle cx="50" cy="${85-trunkH-canopyR*0.3}" r="${canopyR*0.5*wilt}" fill="${color}" opacity="${OPACITY(pct)*0.5}"/>`;
+        if (pct > 5) paths += `<circle cx="${50-canopyR*0.4}" cy="${85-trunkH-canopyR*0.1}" r="${canopyR*0.3}" fill="${color}" opacity="${OPACITY(pct)*0.4}"/>`;
+      }
+      // roots if strong
+      if (pct > 25) { paths += `<path d="M${50-trunkW/2},85 Q${48},90 ${45},92 M${50+trunkW/2},85 Q${52},90 ${55},92" stroke="#6d4c41" stroke-width="2" fill="none" opacity="0.6"/>`; }
+      return `<g>${paths}</g>`;
+    },
+    '土': (pct, color) => {
+      const s = SCALE(pct);
+      const peakH = Math.round(60 * s);
+      const baseW = Math.round(50 * s);
+      let paths = `<polygon points="50,${85-peakH} ${50+baseW/2},85 ${50-baseW/2},85" fill="${color}" opacity="${OPACITY(pct)}"/>`;
+      // layered peaks if strong
+      if (pct > 15) { paths += `<polygon points="${50-baseW*0.3},${85} ${50},${85-peakH*0.6} ${50+baseW*0.3},${85}" fill="${color}" opacity="${OPACITY(pct)*0.7}"/>`; }
+      if (pct > 30) { paths += `<polygon points="${50-baseW*0.15},${85-peakH*0.3} ${50},${85-peakH*0.85} ${50+baseW*0.15},${85-peakH*0.3}" fill="#fff6" opacity="0.3"/>`; }
+      // snow cap for very strong
+      if (pct > 40) { paths += `<polygon points="50,${85-peakH} ${50+8},${85-peakH+12} ${50-8},${85-peakH+12}" fill="#fff" opacity="0.4"/>`; }
+      return `<g>${paths}</g>`;
+    },
+    '金': (pct, color) => {
+      const s = SCALE(pct);
+      const sz = Math.round(40 * s);
+      const cy = 85 - sz / 2;
+      // diamond/gem shape
+      let paths = `<polygon points="50,${cy-sz/2} ${50+sz/2},${cy} 50,${cy+sz/2} ${50-sz/2},${cy}" fill="${color}" opacity="${OPACITY(pct)}"/>`;
+      // facets if strong
+      if (pct > 15) {
+        paths += `<polygon points="50,${cy-sz/2} ${50+sz/4},${cy-sz/8} 50,${cy} ${50-sz/4},${cy-sz/8}" fill="#fff" opacity="0.25"/>`;
+        paths += `<line x1="50" y1="${cy-sz/2}" x2="50" y2="${cy+sz/2}" stroke="#fff" stroke-width="0.5" opacity="0.3"/>`;
+      }
+      // sparkle for very strong
+      if (pct > 35) { paths += `<circle cx="${50+sz*0.2}" cy="${cy-sz*0.2}" r="2" fill="#fff" opacity="0.8"/>`; }
+      if (pct > 45) { paths += `<circle cx="${50-sz*0.15}" cy="${cy+sz*0.1}" r="1.5" fill="#fff" opacity="0.6"/>`; }
+      return `<g>${paths}</g>`;
+    },
+    '水': (pct, color) => {
+      const s = SCALE(pct);
+      const dropH = Math.round(45 * s);
+      const dropW = Math.round(22 * s);
+      const cy = 85 - dropH / 2;
+      // teardrop shape
+      let paths = `<path d="M50,${cy-dropH/2} Q${50+dropW},${cy-dropH*0.1} ${50+dropW*0.6},${cy+dropH*0.3} Q50,${cy+dropH/2} ${50-dropW*0.6},${cy+dropH*0.3} Q${50-dropW},${cy-dropH*0.1} 50,${cy-dropH/2}Z" fill="${color}" opacity="${OPACITY(pct)}"/>`;
+      // highlight
+      paths += `<ellipse cx="${50-dropW*0.15}" cy="${cy-dropH*0.1}" rx="${dropW*0.15}" ry="${dropH*0.12}" fill="#fff" opacity="0.35"/>`;
+      // waves below if strong
+      if (pct > 15) { paths += `<path d="M${50-dropW*1.2},${85} Q${50-dropW*0.5},${82} 50,${85} Q${50+dropW*0.5},${88} ${50+dropW*1.2},${85}" stroke="${color}" stroke-width="2" fill="none" opacity="${OPACITY(pct)*0.5}"/>`; }
+      if (pct > 30) { paths += `<path d="M${50-dropW*1.5},${88} Q${50-dropW*0.7},${85} 50,${88} Q${50+dropW*0.7},${91} ${50+dropW*1.5},${88}" stroke="${color}" stroke-width="1.5" fill="none" opacity="${OPACITY(pct)*0.3}"/>`; }
+      // droplets for very strong
+      if (pct > 40) { paths += `<circle cx="${50-dropW}" cy="${78}" r="2" fill="${color}" opacity="0.5"/><circle cx="${50+dropW}" cy="${75}" r="1.5" fill="${color}" opacity="0.4"/>`; }
+      return `<g>${paths}</g>`;
+    },
+  };
+
+  const cols = ELEMS.map((w) => {
     const pct = wx.pct[w] || 0;
     const st = STATUS(pct);
     const isDung = w === (yong && yong.primary);
     const color = WX_C[w];
-    // height scale: 5%→30px, 50%+→120px
-    const h = Math.max(30, Math.min(120, pct * 2.4));
-    // glow scale theo sức mạnh
-    const glow = (pct / 100 * 30 + 5).toFixed(0);
-    // saturation: yếu=mờ, vượng=sắc
-    const sat = 0.4 + (pct / 100) * 0.6; // 0.4→1.0
-    const dorje = isDung ? '★ DỤNG' : '';
-    // INLINE STYLES (không thể bị cascade override)
-    return `<div class="wx3d-col" data-wx="${w}" role="button" tabindex="0" style="
-      flex:1;min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-      cursor:pointer;padding:8px 2px;
-    ">
-      <div style="font-size:18px;font-weight:700;font-family:'Noto Serif SC',serif;color:${color};opacity:${sat};text-shadow:0 0 ${glow}px ${color};margin-bottom:4px">${w}</div>
-      <div class="${st.cls}" style="font-size:8.5px;font-weight:600;letter-spacing:.3px;margin-bottom:6px;opacity:${0.5 + sat * 0.5}">${st.icon} ${st.vi}${dorje ? ' ★' : ''}</div>
-      <div style="
-        width:70%;max-width:48px;height:${h}px;
-        background:linear-gradient(180deg,${color},rgba(0,0,0,0.3));
-        border-radius:4px 4px 2px 2px;
-        box-shadow:0 0 ${glow}px ${color},inset 0 2px 0 rgba(255,255,255,${0.2 + sat * 0.3}),inset 0 -4px 8px rgba(0,0,0,0.3);
-        opacity:${0.45 + sat * 0.55};
-        transition:all .3s ease;
-      "></div>
-      <div style="font-size:13px;font-weight:700;color:${color};margin-top:4px;opacity:${sat}">${pct}%</div>
-      <div style="font-size:9px;color:var(--silk-dim,#c9b896);margin-top:1px">${WX_VI[w]}</div>
+    const glow = GLOW(pct);
+    const svgContent = SVGS[w] ? SVGS[w](pct, color) : '';
+    const dungMark = isDung ? `<div style="position:absolute;top:-2px;right:-2px;font-size:9px;color:#c0392b;font-weight:700;text-shadow:0 0 4px #c0392b">★</div>` : '';
+    return `<div data-wx="${w}" role="button" tabindex="0" style="flex:1;min-width:0;text-align:center;cursor:pointer;position:relative;padding:4px 0;">
+      ${dungMark}
+      <div style="font-size:16px;font-weight:700;font-family:'Noto Serif SC',serif;color:${color};text-shadow:0 0 ${glow}px ${color};margin-bottom:2px">${w}</div>
+      <svg viewBox="0 0 100 100" style="width:100%;max-width:70px;height:90px;filter:drop-shadow(0 0 ${glow}px ${color}80);">${svgContent}</svg>
+      <div style="font-size:8px;font-weight:600;color:${color};opacity:0.9;margin-top:2px">${st.icon} ${st.vi}</div>
+      <div style="font-size:13px;font-weight:700;color:${color};text-shadow:0 0 ${glow}px ${color}">${pct}%</div>
+      <div style="font-size:8.5px;color:var(--silk-dim,#c9b896)">${WX_VI[w]}</div>
     </div>`;
   }).join('');
+
   const wrap = document.createElement('div');
-  wrap.style.cssText = 'margin:8px 0;padding:12px 6px;background:linear-gradient(180deg,rgba(212,175,55,0.03),transparent);border-radius:8px;border:1px solid rgba(212,175,55,0.12);';
-  wrap.innerHTML = `<div style="display:flex;align-items:flex-end;gap:4px;min-height:180px">${cols}</div>`;
+  wrap.style.cssText = 'margin:8px 0;padding:10px 4px;background:linear-gradient(180deg,rgba(212,175,55,0.03),transparent);border-radius:8px;border:1px solid rgba(212,175,55,0.12);';
+  wrap.innerHTML = `<div style="display:flex;align-items:flex-end;gap:2px">${cols}</div>`;
+  wrap.setAttribute('data-wx3d', '');
   const wux = $('wuxing');
   if (wux && wux.parentNode) {
     const old = wux.parentNode.querySelector('[data-wx3d]');
     if (old) old.remove();
-    wrap.setAttribute('data-wx3d', '');
     wux.parentNode.insertBefore(wrap, wux);
     wrap.addEventListener('click', (e) => {
       const col = e.target.closest('[data-wx]'); if (!col) return;
