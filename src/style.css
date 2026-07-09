@@ -2690,3 +2690,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .pillar-head { contain: layout; }
 .pillar-foot { contain: layout; }
 .dayun { contain: layout; }
+.tool-row { contain: layout; }
