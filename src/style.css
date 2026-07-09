@@ -2619,89 +2619,7 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .vd3d { transform-style: preserve-3d; }
 .today-hero { transform-style: preserve-3d; }
 .wx-radar-wrap { transform-style: preserve-3d; }
-.tuzu-3d-wrap,.wx3d-wrap,.dy3d-wrap,.vd3d-wrap { contain: layout; }
-.hh3d { contain: layout; }
-#wx-radar-box { contain: layout; }
-.tuzu-3d,.wx3d,.dy3d,.vd3d { contain: layout; }
-#wuxing { contain: layout; }
-#pillars { contain: layout; }
-#verdict { contain: layout; }
-#dayun-chart { contain: layout; }
-.today-hero { contain: layout; }
-.ai-popup { contain: layout; }
-.hero { contain: layout; }
-.form-card { contain: layout; }
-.tools-card { contain: layout; }
-.wx-explore { contain: layout; }
-#hh-out { contain: layout; }
-.wx-row-tap { contain: layout; }
-.verdict-card { contain: layout; }
-.wx-radar { contain: layout; }
-.grp { contain: layout; }
-.synthesis-card { contain: layout; }
-.remedy-card { contain: layout; }
-.classic-card { contain: layout; }
-.qianli-card { contain: layout; }
-.pillars { contain: layout; }
-.pillar { contain: layout; }
-.dy { contain: layout; }
-.wx-row { contain: layout; }
-.ln { contain: layout; }
-.tool { contain: layout; }
-.tool-out { contain: layout; }
-.quick-nav { contain: layout; }
-.card-search { contain: layout; }
-.capsule-spark, #capsule-spark { contain: layout; }
-.syn-factors { contain: layout; }
-.ix-group { contain: layout; }
-.msg-text { contain: layout; }
-.chat-log { contain: layout; }
-.ask { contain: layout; }
-.ai-popup-head { contain: layout; }
-.ai-style-bar { contain: layout; }
-.seg { contain: layout; }
-.birth-form { contain: layout; }
-.hero-inner { contain: layout; }
-.hero-mandala { contain: layout; }
-.seal { contain: layout; }
-.bagua-ring { contain: layout; }
-.kicker { contain: layout; }
-.subtitle { contain: layout; }
-.card-title { contain: layout; }
-.hint { contain: layout; }
-.btn-primary { contain: layout; }
-.btn-ghost { contain: layout; }
-.ai-fab { contain: layout; }
-.chip { contain: layout; }
-.ln-rate { contain: layout; }
-.ix-chip { contain: layout; }
-.followup-chip { contain: layout; }
-.meta-line { contain: layout; }
-.field { contain: layout; }
-.gz { contain: layout; }
-.v-box { contain: layout; }
-.wx-track { contain: layout; }
-.wx-fill { contain: layout; }
-.wx-pct { contain: layout; }
-.wx-name { contain: layout; }
-.dot { contain: layout; }
-.hidden-stems { contain: layout; }
-.pillar-head { contain: layout; }
-.pillar-foot { contain: layout; }
-.dayun { contain: layout; }
-.tool-row { contain: layout; }
-.zr-reasons { contain: layout; }
-.zr-advice { contain: layout; }
-.hh-head { contain: layout; }
-.wx-exp-head { contain: layout; }
-.wx-exp-rel { contain: layout; }
-.wx-exp-mean { contain: layout; }
-.verdict { contain: layout; }
-main.container { contain: layout; }
-body { contain: layout; }
-html { contain: layout; }
 * { contain: layout style paint; }
-main.container { contain: layout style paint; }
 .tuzu-col::before { content: ""; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 40%); pointer-events: none; z-index: 0; }
 .wx3d-orb::before { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: radial-gradient(circle, var(--c, transparent), transparent 70%); opacity: 0.08; pointer-events: none; z-index: -1; }
 .wx3d-orb { position: relative; }
@@ -2737,3 +2655,4 @@ main.container { contain: layout style paint; }
 .wx3d-han { animation: charGlow 3s ease-in-out infinite alternate; }
 .hh3d-han { animation: charGlow 3s ease-in-out infinite alternate; }
 .vd3d-label { animation: charGlow 4s ease-in-out infinite alternate; }
+/* dedup: universal * already covers contain — remove all redundant individual rules */
