@@ -2637,7 +2637,6 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .wx-row-tap { contain: layout; }
 .verdict-card { contain: layout; }
 .wx-radar { contain: layout; }
-.card { contain: layout style paint; }
 .grp { contain: layout; }
 .synthesis-card { contain: layout; }
 .remedy-card { contain: layout; }
@@ -2702,21 +2701,7 @@ main.container { contain: layout; }
 body { contain: layout; }
 html { contain: layout; }
 * { contain: layout style paint; }
-.wx3d-orb,.hh3d-orb,.tuzu-col,.dy3d-col,.vd3d-seal { contain: layout style paint; }
-.tuzu-3d-wrap,.wx3d-wrap,.dy3d-wrap,.vd3d-wrap { contain: layout style paint; }
-.ai-popup,.chat-log { contain: layout style paint; }
-#result { contain: layout style paint; }
 main.container { contain: layout style paint; }
-.bg-clouds,.bg-glow,.bg-grain,#mote-field { contain: layout style paint; }
-.hero { contain: layout style paint; }
-.form-card,.tools-card { contain: layout style paint; }
-.today-hero { contain: layout style paint; }
-#wuxing { contain: layout style paint; }
-#pillars,#verdict,#dayun-chart,#hh-out { contain: layout style paint; }
-.wx-explore,.syn-factors,.quick-nav,.card-search { contain: layout style paint; }
-.capsule-spark,.ix-group,.ix-chip,.ln-rate,.followup-chip,.msg-text { contain: layout style paint; }
-.chat-log,.ask,.ai-popup-head,.ai-style-bar,.seg,.birth-form { contain: layout style paint; }
-.pillars,.pillar,.dy,.wx-row,.wx-track,.wx-fill,.wx-pct,.wx-name,.gz,.v-box,.verdict,.dayun,.tool,.tool-row,.tool-out,.syn-factors,.zr-reasons,.zr-advice,.hh-head,.hint,.meta-line,.field,.btn-primary,.btn-ghost,.ai-fab,.chip,.dot,.hidden-stems,.pillar-head,.pillar-foot { contain: layout style paint; }
 .tuzu-col::before { content: ""; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 40%); pointer-events: none; z-index: 0; }
 .wx3d-orb::before { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: radial-gradient(circle, var(--c, transparent), transparent 70%); opacity: 0.08; pointer-events: none; z-index: -1; }
 .wx3d-orb { position: relative; }
