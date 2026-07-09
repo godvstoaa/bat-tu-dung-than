@@ -2646,3 +2646,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .pillars { contain: layout; }
 .pillar { contain: layout; }
 .dy { contain: layout; }
+.wx-row { contain: layout; }
