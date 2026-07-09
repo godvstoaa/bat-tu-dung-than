@@ -2745,3 +2745,4 @@ main.container { contain: layout style paint; }
 @media (prefers-reduced-motion: reduce) { .vd3d-char { animation: none; } }
 .dy3d-sel .dy3d-face { animation: dyPulse 1.5s ease-in-out infinite; }
 .tuzu-sel { animation: dmGlow 2s ease-in-out infinite; }
+.hh3d-marker { animation: hhMarkerPulse 2s ease-in-out infinite, orbGlow 3s ease-in-out infinite alternate; }
