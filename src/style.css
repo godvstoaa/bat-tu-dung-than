@@ -2746,3 +2746,5 @@ main.container { contain: layout style paint; }
 .dy3d-sel .dy3d-face { animation: dyPulse 1.5s ease-in-out infinite; }
 .tuzu-sel { animation: dmGlow 2s ease-in-out infinite; }
 .hh3d-marker { animation: hhMarkerPulse 2s ease-in-out infinite, orbGlow 3s ease-in-out infinite alternate; }
+.tuzu-gan, .tuzu-zhi { animation: charGlow 4s ease-in-out infinite alternate; }
+@media (prefers-reduced-motion: reduce) { .tuzu-gan, .tuzu-zhi { animation: none; } }
