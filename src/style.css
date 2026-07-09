@@ -2634,3 +2634,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .tools-card { contain: layout; }
 .wx-explore { contain: layout; }
 #hh-out { contain: layout; }
+.wx-row-tap { contain: layout; }
