@@ -2668,3 +2668,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .bagua-ring { contain: layout; }
 .kicker { contain: layout; }
 .subtitle { contain: layout; }
+.card-title { contain: layout; }
