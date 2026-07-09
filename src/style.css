@@ -2701,3 +2701,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 main.container { contain: layout; }
 body { contain: layout; }
 html { contain: layout; }
+* { contain: layout; }
