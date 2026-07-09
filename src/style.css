@@ -154,34 +154,75 @@ body::before {
 .mote-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
 /* ===== HERO ===== */
-.hero { position: relative; z-index: 1; padding: 18px 18px 28px; text-align: center; animation: fadeDown .7s var(--ease-out) both; background-image: linear-gradient(180deg, rgba(17,16,24,0.58) 0%, rgba(17,16,24,0.78) 60%, rgba(17,16,24,0.92) 100%), url('/hero-art.webp'); background-size: cover; background-position: center 25%; background-repeat: no-repeat; }
-.hero-inner { max-width: 780px; margin: 0 auto; }
+.hero {
+  position: relative; z-index: 1; padding: 18px 18px 28px; text-align: center;
+  animation: fadeDown .7s var(--ease-out) both;
+  overflow: hidden;
+  /* nền tối + gradient — mandala không còn bị cover-crop méo */
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 38%, rgba(40, 32, 18, 0.55) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(12, 10, 14, 0.2) 0%, rgba(12, 10, 14, 0.75) 55%, rgba(12, 10, 14, 0.96) 100%);
+}
+/* Biểu tượng geometry lớn phía sau — quay tròn chậm */
+.hero-bg-mandala {
+  position: absolute;
+  left: 50%; top: 42%;
+  width: min(92vw, 680px);
+  height: min(92vw, 680px);
+  margin: 0;
+  transform: translate(-50%, -50%);
+  background: url('/hero-art.webp') center / contain no-repeat;
+  opacity: 0.42;
+  pointer-events: none;
+  z-index: 0;
+  filter: drop-shadow(0 0 48px rgba(212, 175, 55, 0.18)) saturate(1.05);
+  animation: heroBgSpin 48s linear infinite;
+  will-change: transform;
+}
+.hero-bg-mandala::after {
+  content: '';
+  position: absolute; inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 68%);
+  animation: heroBgPulse 6s ease-in-out infinite;
+}
+@keyframes heroBgSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes heroBgPulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+.hero-inner { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; }
 /* AT: disciplined typography — kicker as architectural accent */
 .kicker { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--gold); letter-spacing: 5px; font-size: 10.5px; margin-bottom: 16px; opacity: 0.9; font-family: 'Noto Serif SC', serif; font-weight: 500; }
 .kicker i { width: 58px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
 .kicker i:last-child { background: linear-gradient(90deg, var(--gold), transparent); }
 
 .hero-mandala { position: relative; width: 236px; height: 236px; margin: 0 auto 24px; filter: drop-shadow(0 4px 22px rgba(212,175,55,0.38)) drop-shadow(0 10px 32px rgba(0,0,0,0.45)); }
-.bagua-ring { position: absolute; inset: 0; animation: spin 90s linear infinite; border: 1px solid rgba(212,175,55,0.11); border-radius: 50%; box-shadow: 0 0 12px rgba(212,175,55,0.12); }
+/* Vòng bát quái quay rõ (trước 90s gần như đứng) */
+.bagua-ring { position: absolute; inset: 0; animation: spin 28s linear infinite; border: 1px solid rgba(212,175,55,0.22); border-radius: 50%; box-shadow: 0 0 16px rgba(212,175,55,0.16), inset 0 0 20px rgba(212,175,55,0.05); }
 .bagua-ring.outer {
-  inset: -6px; border: 1px dashed rgba(212, 175, 55, 0.16); border-radius: 50%;
-  animation: spin 140s linear infinite reverse;
-  box-shadow: 0 0 18px rgba(212,175,55,0.09);
+  inset: -10px; border: 1px dashed rgba(212, 175, 55, 0.28); border-radius: 50%;
+  animation: spin 42s linear infinite reverse;
+  box-shadow: 0 0 22px rgba(212,175,55,0.12);
 }
 .bagua-ring.outer::before {
-  content: ''; position: absolute; inset: 12px; border: 1px solid rgba(212, 175, 55, 0.05); border-radius: 50%;
+  content: ''; position: absolute; inset: 12px; border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 50%;
 }
 .bagua-ring span {
   position: absolute; left: 50%; top: 50%;
   font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 19px; color: var(--gold);
   transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg)) translateY(-96px);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6), 0 0 10px rgba(212,175,55,0.35);
 }
 .mandala-core {
   position: absolute; inset: 38px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(192, 57, 43, 0.07), transparent 72%);
-  border: 1px solid rgba(212, 175, 55, 0.09);
+  background: radial-gradient(circle, rgba(192, 57, 43, 0.1), transparent 72%);
+  border: 1px solid rgba(212, 175, 55, 0.14);
   box-shadow: none;
+  animation: spin 60s linear infinite reverse;
 }
 .seal {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
@@ -191,6 +232,7 @@ body::before {
   border: 1px solid var(--gold-bright); border-radius: 8px;
   box-shadow: 0 4px 14px -4px rgba(0,0,0,0.65), 0 0 0 1px rgba(212,175,55,0.35), 0 0 18px rgba(212,175,55,0.22);
   animation: sealPulse 4s var(--ease-out) infinite;
+  z-index: 2;
 }
 .seal-stamp {
   position: absolute; right: -8px; bottom: 2px;
@@ -2349,6 +2391,10 @@ button:focus-visible, .lab-btn:focus-visible {
    A11Y: DISABLE ALL MOTION (prefers-reduced-motion)
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
+  .hero-bg-mandala, .bagua-ring, .bagua-ring.outer, .mandala-core {
+    animation: none !important;
+  }
+  .hero-bg-mandala { transform: translate(-50%, -50%); opacity: 0.32; }
   .card, .grp, .btn-primary, .tab, .seg-btn, .wx-row, .verdict .v-box,
   .pillar, .v-box, .dy, .ln, .tool, .ss, .lq, .tier, .lm-cell,
   .qs-tile, #result > .card, #result > .grp {
