@@ -2696,3 +2696,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .hh-head { contain: layout; }
 .wx-exp-head { contain: layout; }
 .wx-exp-rel { contain: layout; }
+.wx-exp-mean { contain: layout; }
