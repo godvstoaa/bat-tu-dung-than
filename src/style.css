@@ -2615,3 +2615,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .tuzu-stage,.wx3d-orb,.vd3d-seal,.hh3d-sphere,.vd3d-ring { will-change: transform; }
 .dy3d-face,.wx3d-sphere::after,.hh3d-sphere::after { will-change: box-shadow,opacity; }
 .tuzu-col,.wx3d-orb,.vd3d-seal,.hh3d-orb,.dy3d-col { backface-visibility: hidden; }
+.hh3d { transform-style: preserve-3d; }
