@@ -2631,3 +2631,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .ai-popup { contain: layout; }
 .hero { contain: layout; }
 .form-card { contain: layout; }
+.tools-card { contain: layout; }
