@@ -2523,3 +2523,7 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 /* [loop] share button gold-foil */
 .hh-share-btn { background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(247,236,203,0.06)) !important; border-color: rgba(212,175,55,0.3) !important; color: var(--gold-pale, #f7eccb) !important; }
 .hh-share-btn:hover { background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(247,236,203,0.1)) !important; }
+
+/* [loop] primary button gold glow (main CTA) */
+.btn-primary { box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 20px rgba(212,175,55,0.15); }
+.btn-primary:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 26px rgba(212,175,55,0.25); }
