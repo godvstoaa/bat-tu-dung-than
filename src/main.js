@@ -621,29 +621,57 @@ function renderWx3D(wx, yong) {
   if (!wx || !wx.pct) return;
   const ELEMS = ['木', '火', '土', '金', '水'];
   const WX_C = { '木': '#5fd870', '火': '#ff6a4a', '土': '#f0c050', '金': '#d8d8e8', '水': '#60a8e8' };
-  const orbs = ELEMS.map((w, i) => {
+  // [user] status theo %: yếu/nhược/trung bình/vượng/rất vượng
+  const STATUS = (pct) => {
+    if (pct < 5) return { vi: 'Yếu', cls: 'st-yeu', icon: '△' };
+    if (pct < 15) return { vi: 'Nhược', cls: 'st-nhuoc', icon: '◔' };
+    if (pct < 30) return { vi: 'Trung bình', cls: 'st-trung', icon: '○' };
+    if (pct < 50) return { vi: 'Vượng', cls: 'st-vuong', icon: '◉' };
+    return { vi: 'Rất vượng', cls: 'st-rvuong', icon: '★' };
+  };
+  const cols = ELEMS.map((w, i) => {
     const pct = wx.pct[w] || 0;
-    const size = Math.max(34, Math.min(76, pct * 2.6));
+    const st = STATUS(pct);
     const isDung = w === (yong && yong.primary);
-    return `<div class="wx3d-orb wx3d-tap${isDung ? ' wx3d-dung' : ''}" data-wx="${w}" tabindex="0" role="button" aria-label="Hành ${WX_VI[w]}" style="--c:${WX_C[w]};--s:${size};animation-delay:${(i * 0.45).toFixed(2)}s">
-      <div class="wx3d-sphere"></div>
-      <div class="wx3d-han" style="color:${WX_C[w]}">${w}</div>
-      <div class="wx3d-pct">${pct}%</div>
-      <div class="wx3d-name">${WX_VI[w]}</div>
+    const color = WX_C[w];
+    // height scale: 5%→30px, 50%+→120px
+    const h = Math.max(30, Math.min(120, pct * 2.4));
+    // glow scale theo sức mạnh
+    const glow = (pct / 100 * 30 + 5).toFixed(0);
+    // saturation: yếu=mờ, vượng=sắc
+    const sat = 0.4 + (pct / 100) * 0.6; // 0.4→1.0
+    const dorje = isDung ? '★ DỤNG' : '';
+    // INLINE STYLES (không thể bị cascade override)
+    return `<div class="wx3d-col" data-wx="${w}" role="button" tabindex="0" style="
+      flex:1;min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+      cursor:pointer;padding:8px 2px;
+    ">
+      <div style="font-size:18px;font-weight:700;font-family:'Noto Serif SC',serif;color:${color};opacity:${sat};text-shadow:0 0 ${glow}px ${color};margin-bottom:4px">${w}</div>
+      <div class="${st.cls}" style="font-size:8.5px;font-weight:600;letter-spacing:.3px;margin-bottom:6px;opacity:${0.5 + sat * 0.5}">${st.icon} ${st.vi}${dorje ? ' ★' : ''}</div>
+      <div style="
+        width:70%;max-width:48px;height:${h}px;
+        background:linear-gradient(180deg,${color},rgba(0,0,0,0.3));
+        border-radius:4px 4px 2px 2px;
+        box-shadow:0 0 ${glow}px ${color},inset 0 2px 0 rgba(255,255,255,${0.2 + sat * 0.3}),inset 0 -4px 8px rgba(0,0,0,0.3);
+        opacity:${0.45 + sat * 0.55};
+        transition:all .3s ease;
+      "></div>
+      <div style="font-size:13px;font-weight:700;color:${color};margin-top:4px;opacity:${sat}">${pct}%</div>
+      <div style="font-size:9px;color:var(--silk-dim,#c9b896);margin-top:1px">${WX_VI[w]}</div>
     </div>`;
   }).join('');
   const wrap = document.createElement('div');
-  wrap.className = 'wx3d-wrap';
-  wrap.innerHTML = `<div class="wx3d"><div class="wx3d-stage">${orbs}</div></div>`;
+  wrap.style.cssText = 'margin:8px 0;padding:12px 6px;background:linear-gradient(180deg,rgba(212,175,55,0.03),transparent);border-radius:8px;border:1px solid rgba(212,175,55,0.12);';
+  wrap.innerHTML = `<div style="display:flex;align-items:flex-end;gap:4px;min-height:180px">${cols}</div>`;
   const wux = $('wuxing');
   if (wux && wux.parentNode) {
-    const old = wux.parentNode.querySelector('.wx3d-wrap');
+    const old = wux.parentNode.querySelector('[data-wx3d]');
     if (old) old.remove();
+    wrap.setAttribute('data-wx3d', '');
     wux.parentNode.insertBefore(wrap, wux);
-    // [loop] tap orb → trigger radar vertex click (reuse selectWx interactivity)
     wrap.addEventListener('click', (e) => {
-      const orb = e.target.closest('.wx3d-tap'); if (!orb) return;
-      const v = document.querySelector('.wx-vertex[data-wx="' + orb.dataset.wx + '"]');
+      const col = e.target.closest('[data-wx]'); if (!col) return;
+      const v = document.querySelector('.wx-vertex[data-wx="' + col.dataset.wx + '"]');
       if (v) v.click();
     });
   }
@@ -4514,6 +4542,7 @@ async function run() {
   renderRemedy(currentResult);
   window._currentResult = currentResult; // [loop 140] cho renderWuXing truy cập monthMainWx
   renderWuXing(currentResult.wx, currentResult.yong);
+  renderWx3D(currentResult.wx, currentResult.yong);
   
   renderInteractions(currentResult);
   renderShensha(currentResult);

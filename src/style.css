@@ -1564,7 +1564,7 @@ html{scroll-behavior:smooth}
   font-size: 0.7em !important;       /* smaller than the Vietnamese lead */
   opacity: .55 !important;            /* dimmer */
   font-weight: 500 !important;
-  color: var(--gold, #d4af37) !important;
+  color: var(--gold, #d4af37);
   letter-spacing: .5px;
   transition: opacity .2s ease;
 }
@@ -1687,7 +1687,7 @@ html{scroll-behavior:smooth}
   color: var(--silk) !important;
 }
 .quick-summary-card > div > div > div > div:first-child {
-  color: var(--gold-bright) !important;
+  color: var(--gold-bright);
 }
 .quick-summary-card > div > div > div > div:last-child {
   color: var(--silk) !important;
@@ -1802,9 +1802,9 @@ html{scroll-behavior:smooth}
 
 /* --- Quick-nav link active glow on scroll (overridden by premium rules above for depth) --- */
 .quick-nav a.active {
-  background: linear-gradient(145deg, var(--gold-bright), var(--gold)) !important;
+  background: linear-gradient(145deg, var(--gold-bright), var(--gold));
   color: var(--cinnabar-deep) !important;
-  border-color: var(--gold-bright) !important;
+  border-color: var(--gold-bright);
 }
 
 /* --- Combo badge subtle float --- */
