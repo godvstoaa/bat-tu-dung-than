@@ -1090,3 +1090,45 @@ export const LIUQIN_DAYUN_EFFECT = [
   'Đại vận mang Dụng vào cung nào → người đó được phúc → ví dụ: Dụng vào Thời → con cái phát đạt.',
   'Lưu niên xung/khắc sao nào → năm đó người对应 gặp biến (Thương Quan kiến quan lưu niên → chồng/vợ biến).',
 ];
+
+// ============================================================
+//  ROUND 7 CRAWL — 干支 interaction rules (合化/冲/刑/害 + đại vận tác động)
+//  Nguồn: deeporacle.ai, zhihu, fatemaster.ai, ifeng.com, suanzhun.net
+// ============================================================
+
+// ---- 合化 CONDITIONS: khi nào hợp mới hóa? ----
+export const HEHUA_CONDITIONS = [
+  '化神 phải vượng tại Nguyệt Lệnh (tháng sinh) → mới đủ lực hóa',
+  'Hợp thần không bị xung (冲) → nếu bị xung, hợp bị phân tán',
+  'Hợp tốt nhất khi 2 can/chi LIỀN NHAU (cùng trụ hoặc kế tiếp) → xa nhau lực yếu',
+  '天干五合: 甲己→土, 乙庚→金, 丙辛→水, 丁壬→木, 戊癸→火. Phải đủ điều kiện mới hóa.',
+  '地支六合: 子丑→土, 寅亥→木, 卯戌→火, 辰酉→金, 巳申→水, 午未→火. Tương tự.',
+  '「合而不化」= hợp nhưng không hóa → sao vẫn bị trói (không hoạt động) nhưng không biến hành → "hợp inhibits" chứ không "hợp transforms".',
+  '三合 (申子辰/寅午戌/巳酉丑/亥卯未): KHÔNG cần hóa thần tại nguyệt lệnh — chỉ cần đủ 3 chi → tự thành cục. Lực mạnh hơn六合.',
+  '三会 (寅卯辰/巳午未/申酉戌/亥子丑): phương vị cục → lực mạnh NHẤT. Đủ 3 chi cùng phương = hành đó cực vượng.',
+];
+
+// ---- 冲 刑 害 rules ----
+export const CHONG_XING_HAI_RULES = [
+  '六冲 (冲): 子午, 丑未, 寅申, 卯酉, 辰戌, 巳亥. Xung = đối lập + xung đột + biến động. 「旺者冲衰衰者拔，衰者冲旺旺者发」.',
+  '三刑 (刑): 寅巳申 (vô ân), 丑戌未 (trì thế), 子卯 (vô lễ). Xing = hình phạt, rắc rối pháp lý, tổn thương.',
+  '自刑: 辰辰, 午午, 酉酉, 亥亥. Tự hình = tự làm khổ mình, ám ảnh, trầm cảm.',
+  '六害 (害): 子未, 丑午, 寅巳, 卯辰, 申亥, 酉戌. Hại = ngấm ngầm phá hoại, âm mưu, bội phản.',
+  'XUNG > HẠI > HÌNH (ưu tiên tác động): Xung mạnh nhất (đối trọng trực tiếp); Hại ngầm (âm ỉ); Hình kéo dài (pháp lý, sức khỏe).',
+  'Đại vận/lưu niên XUNG Nhật Chi = biến động HÔN NHÂN mạnh nhất. XUNG Niên Chi = biến động gia đình/ông bà.',
+  'Lưu niên XUNG Nguyệt Chi = biến động sự nghiệp/cha mẹ. XUNG Thời Chi = biến động con cái.',
+];
+
+// ---- 大运-流年-命局 TAM TẦNG TÁC ĐỘNG (君臣民 model) ----
+export const LUCK_INTERACTION_RULES = [
+  '「流年为君，大运为臣，命局为民」— Lưu niên = vua (quyết định năm nay), Đại vận = quan (môi trường 10 năm), Mệnh = dân (nền tảng bẩm sinh).',
+  'Vua (lưu niên) có quyền sinh/khắc HẦN (đại vận) và DÂN (mệnh). Nhưng dân không thể khắc vua.',
+  'Ưu tiên tác động: Tam hợp/Tam hội > Thiên hợp địa hợp > Thiên can tương hợp > Xung > Hình > Hại.',
+  '大运 mang Dụng → 10 năm thuận (vua tốt gặp quan tốt). 大运 mang Kỵ → 10 năm khó (vua tốt nhưng quan xấu cản).',
+  '流年 mang Dụng → năm đó thuận. 流年 mang Kỵ → năm đó khó. Vua quyết định năm nay cát/hung.',
+  '当 大运+流年 ĐỀU mang Dụng → năm cực thuận 「岁运并临」(cần phân biệt: nếu cả 2 trùng nhau = 「岁运并临」có thể rất cát hoặc rất hung tùy Dụng/Kỵ).',
+  '当 大运+流年 ĐỀU mang Kỵ → năm cực khó, cần phòng biến cố lớn.',
+  '当 大运 Kỵ nhưng 流年 Dụng → năm được cứu (khó nhưng có lối thoát).',
+  '当 大运 Dụng nhưng 流年 Kỵ → năm bị cản (thuận nhưng có trắc trở).',
+  '「命好不如运好」— mệnh tốt (dân mạnh) không bằng vận tốt (quan + vua ủng hộ). Đại vận QUYẾT ĐỊNH hơn mệnh gốc.',
+];
