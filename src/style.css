@@ -2713,3 +2713,4 @@ main.container { contain: strict; }
 .today-hero { contain: strict; }
 #wuxing { contain: strict; }
 #pillars,#verdict,#dayun-chart,#hh-out { contain: strict; }
+.wx-explore,.syn-factors,.quick-nav,.card-search { contain: strict; }
