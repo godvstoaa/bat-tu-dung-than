@@ -2565,3 +2565,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .hh3d-bar { box-shadow: 0 0 8px rgba(212,175,55,0.15); }
 .hh3d { border: 1px solid rgba(212,175,55,0.12); }
 .tuzu-label { background: linear-gradient(165deg,#f7eccb,#d4af37,#8a6d1a); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+.tuzu-name { color: var(--gold-pale,#e8d9a8) !important; }
