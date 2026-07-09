@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE } from './kb.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
@@ -647,6 +647,22 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "12 PHÁP CẢI VẬN: " + TWELVE_LUCK_METHODS.slice(0, 4).map(m => m.name).join(", ") + "... (hỏi chi tiết để nhận đầy đủ)\n" +
       "DƯỠNG SINH: " + (qg || '(không)');
   } catch (e) { brief += "\n--- LƯU NIÊN + PHONG THỦY: [lỗi load] ---"; }
+
+  // ---- [round 4] 12 TRƯỜNG SINH + THẦN SÁT + HUYỀN HỌC CƠ BẢN ----
+  try {
+    const csInfo = (R.dayun || []).slice(0, 3).map(d => {
+      const stage = d.stageVi || '?';
+      const app = CHANGSHENG_AGE_APPLICATION[d.stage] || {};
+      return stage + (app.best ? '(' + app.best + ')' : '');
+    }).join(' → ');
+    const shenshaKeys = R.shensha ? Object.keys(R.shensha).filter(k => SHENSHA_DEEP_MEANING[k]) : [];
+    const shenshaDeep = shenshaKeys.map(k => k + '(' + (SHENSHA_DEEP_MEANING[k].vi || '') + '): ' + (SHENSHA_DEEP_MEANING[k].effect || '').slice(0, 100)).join(' | ');
+    brief += "\n--- 12 TRƯỜNG SINH + THẦN SÁT NÂNG CAO (round 4) ---\n" +
+      "ĐẠI VẬN 12 TRƯỜNG SINH (3 thập kỷ tới): " + csInfo + "\n" +
+      "NGUYÊN TẮC: " + (DAYUN_CHANGSHENG_NOTE || []).slice(0, 3).join(' | ') + "\n" +
+      "THẦN SÁT CHI TIẾT: " + (shenshaDeep || '(không có thần煞 sâu trong lá số)') + "\n" +
+      "HUYỀN HỌC CƠ BẢN (triết lý để trả lời sâu): " + (METAPHYSICS_CORE || []).slice(0, 3).join(' | ');
+  } catch (e) { brief += "\n--- 12 TRƯỜNG SINH + THẦN SÁT: [lỗi load] ---"; }
 
   if (fcParts.length) {
     brief += '\n--- DỰ BÁO & THỜI ĐIỂM ---\n' + fcParts.join('\n');

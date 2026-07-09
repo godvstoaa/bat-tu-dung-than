@@ -895,3 +895,82 @@ export const QIGONG_BY_ELEMENT = {
   '金': 'Hít thở: hít ngắn, thở dứt khoát (sắc bén như dao). Tập: thở bụng sâu, bài tập phổi. Giờ tốt: 3-7h sáng (Dậu-Tuất).',
   '水': 'Hít thở: hít sâu, thở chảy (uyển chuyển như nước). Tập: bơi, duỗi người. Giờ tốt: 15-19h (Thân-Dậu).',
 };
+
+// ============================================================
+//  ROUND 4 CRAWL — 12 trưởng sinh + thần煞 nâng cao
+//  Nguồn: zhihu专栏, baike.baidu, fatemaster.ai, scribd
+// ============================================================
+
+// ---- 12 TRƯỜNG SINH: ứng dụng theo độ tuổi ----
+export const CHANGSHENG_AGE_APPLICATION = {
+  '长生': { vi: 'Trường Sinh', meaning: 'mới sinh, nảy mầm — đầy sinh khí, khởi đầu', best: 'thiếu niên (1-20t) — tốt cho học, phát triển', worst: 'vãn niên (60+t) — sinh khí dư thừa, bứt rứt' },
+  '沐浴': { vi: 'Mộc Dục', meaning: 'tắm rửa — chưa ổn định, dễ tổn thương, phiêu lưu', best: 'thanh niên (16-25t) — khám phá, thử thách', worst: 'trung niên (35-55t) — bất ổn sự nghiệp' },
+  '冠带': { vi: 'Quan Đái', meaning: 'đội mũ — trang phục chỉnh tề, trưởng thành,仪表', best: 'thanh niên (18-30t) — tốt cho giao tiếp, ngoại giao', worst: 'không rõ' },
+  '临官': { vi: 'Lâm Quan', meaning: 'làm quan — bắt đầu có quyền,踏入 xã hội', best: 'trung niên (25-45t) — thăng tiến sự nghiệp', worst: 'thiếu niên — quá trẻ để có quyền' },
+  '帝旺': { vi: 'Đế Vượng', meaning: 'đỉnh thịnh — cực vượng, như nhật trung thiên', best: 'trung niên (30-50t) — đỉnh sự nghiệp', worst: 'vãn niên (60+t) — quá cứng, dễ gãy' },
+  '衰': { vi: 'Suy', meaning: 'bắt đầu suy — từ đỉnh đi xuống', best: 'không ai muốn', worst: 'trung niên — vận bắt đầu giảm' },
+  '病': { vi: 'Bệnh', meaning: 'mắc bệnh — yếu ớt, khó khăn', best: 'không ai muốn', worst: 'mọi tuổi — sức khỏe + sự nghiệp cùng giảm' },
+  '死': { vi: 'Tử', meaning: 'chết — tĩnh lặng, hết sinh khí', best: 'vãn niên — tự nhiên', worst: 'thiếu niên/trung niên — rất xấu' },
+  '墓': { vi: 'Mộ', meaning: 'nhập mộ — bị chôn vùi, ẩn tàng', best: 'không ai muốn', worst: 'trung niên — bị kìm hãm, đình trệ' },
+  '绝': { vi: 'Tuyệt', meaning: 'tuyệt tự — hết hoàn toàn, kiệt', best: 'không ai muốn', worst: 'mọi tuổi — đáy vận' },
+  '胎': { vi: 'Thai', meaning: 'thai nghén — chuẩn bị tái sinh, ấp ủ', best: 'sau Tuyệt — khởi đầu vòng mới', worst: 'không rõ' },
+  '养': { vi: 'Dưỡng', meaning: 'nuôi dưỡng — được chăm sóc, hồi phục', best: 'sau Thai — chuẩn bị trưởng sinh', worst: 'không rõ' },
+};
+
+// ---- SÁU CẶP THẦN SÁT: ứng dụng nâng cao ----
+export const SHENSHA_DEEP_MEANING = {
+  '天乙贵人': {
+    vi: 'Thiên Quý Nhân',
+    effect: '「逢凶化吉」— gặp hung hóa cát. Người có quý nhân: lúc khó nhất tự nhiên có người giúp (thông tin, giới thiệu, chỉ đường — không nhất thiết vật chất).',
+    timing: 'Đại vận/lưu niên đi vào chi quý nhân → năm đó gặp quý nhân. Chi quý nhân ở Nhật Trụ = bạn đời là quý nhân. Ở Niên Trụ = quý nhân bẩm sinh (ông bà giúp).',
+    weaken: 'Bị xung (冲) / hình (刑) / không vương (空亡) → quý nhân yếu, đến chậm hoặc qua mặt.',
+  },
+  '文昌': {
+    vi: 'Văn Xương',
+    effect: 'Quản văn chương, nghệ thuật, học vấn, thi cử. Có Văn Xương → thông minh, giỏi chữ, dễ đỗ đạt.',
+    application: 'Học sinh có Văn Xương → thi cử thuận. Người lớn → viết lách, truyền thông, sáng tạo. Văn Xương + Ấn → học thuật sâu.',
+  },
+  '驿马': {
+    vi: 'Dịch Mã',
+    effect: '「贵人驿马多升迁，常人驿马多奔波」— người có quý nhân gặp Dịch Mã → thăng tiến/đi công tác nước ngoài. Người thường → chạy vạy, bận rộn.',
+    timing: 'Đại vận/lưu niên đi vào chi Dịch Mã → năm biến động: chuyển việc, chuyển nhà, đi xa, du học. Dịch Mã + Tài → kiếm tiền xa. Dịch Mã + Dụng → cơ hội mở.',
+  },
+  '桃花': {
+    vi: 'Đào Hoa',
+    effect: 'Nội đào hoa (Niên/Nguyệt trụ) → duyên bẩm sinh, hợp công chúng, nghệ sĩ. Ngoại đào hoa (Nhật/Thời trụ) → duyên bên ngoài sau hôn nhân, đa tình.',
+    timing: 'Đại vận/lưu niên đi vào chi Đào Hoa → năm duyên nồng. Đào Hoa + Dụng → duyên tốt (lãng mạn, thu hút). Đào Hoa + Kỵ → thị phi tình cảm, bôi nhọ.',
+    warning: 'Đào Hoa + Thương Quan / Thất Sát → duyên độc hại, dễ tổn thương. Đào Hoa + Kiếp Tài → tranh giành tình cảm.',
+  },
+  '华盖': {
+    vi: 'Hoa Cái',
+    effect: '「艺术之星」+ 「孤独之星」— tài năng nghệ thuật/khởi thuật THẾ nhưng cô độc, khác biệt, khó hòa nhập.',
+    positive: 'Thiên về triết học, tôn giáo, huyền học, nghệ thuật, tâm linh. Thích độc lập sáng tạo. Hoa Cái + Ấn vượng → học giả/nghệ sĩ lớn.',
+    negative: 'Cô độc, kiêu ngạo, khó gần. Hoa Cái gặp Không Vương → xuất gia, tu hành, lìa thế tục.',
+  },
+  '空亡': {
+    vi: 'Không Vương',
+    effect: '「空」= rỗng, hão, không thực. Cát thần gặp Không → cát giảm hung tăng. Hung thần gặp Không → hung giảm.',
+    application: 'Dụng Thần gặp Không Vương → Dụng bị treo, không phát huy. Kỵ Thần gặp Không Vương → Kỵ bị triệt (tốt!). Quý Nhân gặp Không → quý nhân đến trễ/không đến.',
+    remedy: 'Khi đại vận/lưu niên xung hợp chi Không Vương → Không bị lấp → Dụng/Kỵ phục hồi tác dụng.',
+  },
+};
+
+// ---- ĐẠI VẬN GIAI ĐOẠN: 12 trưởng sinh của đại vận chi ----
+export const DAYUN_CHANGSHENG_NOTE = [
+  'Đại vận chi ở Trường Sinh / Quan Đái / Lâm Quan / Đế Vượng → 10 năm thuận lợi, sinh khí dồi dào.',
+  'Đại vận chi ở Suy / Bệnh / Tử / Mộ / Tuyệt → 10 năm khó khăn, cần kiên nhẫn + giữ sức.',
+  'Đại vận chi ở Thai / Dưỡng → giai đoạn ấp ủ, chuẩn bị, chưa bộc lộ — tốt cho kế hoạch dài hạn.',
+  'Thiếu niên (1-20t) cần Trường Sinh / Quan Đái → môi trường nuôi dưỡng tốt.',
+  'Trung niên (25-55t) cần Lâm Quan / Đế Vượng → đỉnh sự nghiệp.',
+  'Vãn niên (55+t) KHÔNG cần Đế Vượng → quá cứng dễ gãy; cần Suy/Tử tự nhiên = thuận đạo.',
+];
+
+// ---- HUYỀN HỌC CƠ BẢN: triết lý âm dương + thái cực cho AI trả lời sâu ----
+export const METAPHYSICS_CORE = [
+  'Âm Dương: vạn vật đều có 2 mặt (âm-dương). Cát-hung, mạnh-yếu, nóng-lạnh, sáng-tối — luôn tồn tại song hành. 「孤阴不生，独阳不长」.',
+  'Ngũ Hành Sinh Khắc: sinh = nuôi dưỡng (Mộc→Hỏa→Thổ→Kim→Thủy→Mộc). Khắc = kiểm soát (Mộc→Thổ, Thổ→Thủy, Thủy→Hỏa, Hỏa→Kim, Kim→Mộc).',
+  'Thiên Nh Địa Lợi: 「天时不如地利，地利不如人和」— thời vận < địa lợi < nhân hòa. Con người là quyết định cuối cùng.',
+  'Luật Nhân Quả: 「积善之家必有余庆」— nhà tích thiện ắt có dư phúc. 「了凡四训」: nghịch thiên bằng thiện hạnh.',
+  'Vật Cực Tất Phản: cực thịnh tất suy, cực suy tất thịnh. 「日中则昃，月盈则食」— mặt trời đứng bóng rồi nghiêng, trăng tròn rồi khuyết.',
+  'Tri Mệnh Cải Vận: 「不知命无以为君子」— không biết mệnh không thể làm quân tử. Biết mệnh → thuận thiên → cải vận.',
+];
