@@ -2658,3 +2658,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .msg-text { contain: layout; }
 .chat-log { contain: layout; }
 .ask { contain: layout; }
+.ai-popup-head { contain: layout; }
