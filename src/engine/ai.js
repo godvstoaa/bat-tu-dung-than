@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS } from './kb.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
@@ -590,6 +590,33 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const top = (red[0] || (ha.alerts || [])[0]);
     fcParts.push(`SỨC KHOẺ 10 NĂM: ${ha.summary}${top ? ` | Năm rủi ro cao nhất: ${top.year}(${top.ganZhi},${top.level})` : ''}`);
   } catch (e) { fcParts.push('SỨC KHOẺ 10 NĂM: [lỗi]'); }
+
+  // ---- [research crawl] KIẾN THỨC CỔ PHÁP MỞ RỘNG ----
+  try {
+    const dmGan = c.dayMaster.gan || '';
+    const monthZhi = c.pillars.month.zhi || '';
+    const tiaohouKey = dmGan + monthZhi + '月';
+    const tiaohou = QIONGTONG_TIAOHOU[tiaohouKey] || '(không có cổ quyết cụ thể)';
+    const weakestWx = Object.entries(R.wx?.pct || {}).sort(([,a],[,b]) => a - b)[0];
+    const healthInfo = weakestWx ? WUXING_HEALTH[weakestWx[0]] : null;
+    const topGods = (typeof dominantGods === 'function') ? dominantGods(c) : [];
+    const careerHint = topGods[0] ? (CAREER_BY_GOD[topGods[0].god] || []).join(', ') : '(không)';
+    brief += '
+--- KIẾN THỨC CỔ PHÁP MỞ RỘNG (crawled) ---
+'
+      + '穷通宝鉴 調候: ' + tiaohou + '
+'
+      + '滴天髓 CỔ QUYẾT (top 5): ' + (DITIANSUI_MAXIMS || []).slice(0, 5).join(' | ') + '
+'
+      + '三命通会 ĐẠI VẬN (top 5): ' + (SANMING_DAYUN_RULES || []).slice(0, 5).join(' | ') + '
+'
+      + 'NGŨ HÀNH LUẬN BỆNH: hành yếu nhất = ' + (weakestWx ? weakestWx[0] + ' (' + weakestWx[1] + '%)' : '?') + (healthInfo ? ' → tạng: ' + healthInfo.organs + ' | triệu chứng: ' + healthInfo.symptoms + ' | nên ăn: ' + healthInfo.diet + ' | cảm xúc hại: ' + healthInfo.emotion + ' | khắc phục: ' + healthInfo.remedy : '') + '
+'
+      + 'SỰ NGHIỆP THEO THẬP THẦN: vượng nhất = ' + (topGods[0] ? topGods[0].vi : '?') + ' → nghề: ' + careerHint + '
+'
+      + 'ĐA TRƯỜNG PHÁI: ' + Object.entries(DIVINATION_SCHOOLS).map(([k,v]) => k + ': ' + v).join(' | ');
+  } catch (e) { brief += '
+--- KIẾN THỨC CỔ PHÁP: [lỗi load] ---'; }
 
   if (fcParts.length) {
     brief += '\n--- DỰ BÁO & THỜI ĐIỂM ---\n' + fcParts.join('\n');

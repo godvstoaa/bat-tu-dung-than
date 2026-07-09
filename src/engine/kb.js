@@ -572,3 +572,141 @@ export function dominantGods(chart, topN = 3) {
 }
 
 export { WX_VI, TEN_GOD_VI };
+
+// ============================================================
+//  [research crawl] KIẾN THỨC HUYỀN HỌC MỞ RỘNG — đa trường phái
+//  Nguồn: 渊海子平, 滴天髓, 穷通宝鉴, 三命通会, 紫微斗数全书, 子平真诠
+//  Crawl từ: openfate.ai, bazifortune.app, fortunetell.ai, mingming3.com, kaigold.vn
+//  Mục đích: nạp vào AI brief → LLM trả lời sâu hơn, đa góc nhìn
+// ============================================================
+
+// ---- 穷通宝鉴: 調候 (seasonal priority) cho từng Nhật Chủ × tháng ----
+export const QIONGTONG_TIAOHOU = {
+  // 木 Day Master
+  '甲寅月': 'Mộc vượng mùa xuân → cần KIM cắt gọt hoặc HỎA tiết. Ưu tiên: Canh (庚) + Hỏa (丙).',
+  '甲卯月': 'Dương Mộc rực rỡ → Geng-Kim cắt tỉa thành tài. Không kim → cần Hỏa tiết khí.',
+  '甲巳月': 'Mộc mùa hè khô → gấp NƯỚC (癸) tưới. Không Thủy → Mộc héo, tài lộc hao.',
+  '甲午月': 'Mộc bị Hỏa thiêu → cần 癸-Thủy +壬-Thủy ướt. Ưu tiên chính: Thủy dưỡng Mộc.',
+  '甲申月': 'Mộc mùa thu Kim vượng → Mộc bị khắc → cần THỦY thông quan (Thủy hóa Kim sinh Mộc).',
+  '甲亥月': 'Mộc mùa đông ướt lạnh → cần HỎA (丙) sưởi ấm. Quá nhiều Thủy → Mộc trôi, cần Thổ ngăn.',
+  '乙寅月': 'Âm Mộc mùa xuân → ÍT Kim (chỉ Tân). Ưu tiên 丙-Hỏa cho Ất Mộc nở hoa.',
+  '乙巳月': 'Âm Mộc mùa hạ → gấp 癸-Thủy. Không Thủy → hoa tàn nhanh, duyên ngắn.',
+  '乙申月': 'Âm Mộc mùa thu → cần 丙-Hỏa + 壬-Thủy. "乙木申月,丙壬两全" — cổ诀.',
+  '乙亥月': 'Âm Mộc mùa đông → 丙-Hỏa ưu tiên số 1. Thủy quá → Mộc trôi.',
+  // 火 Day Master
+  '丙寅月': 'Dương Hỏa mùa xuân Mộc sinh → Hỏa vượng → cần 壬-Thủy chế, 戊-Thổ泄.',
+  '丙巳月': 'Hỏa mùa hạ cực vượng → GẤP 壬-Thủy + 庚-Kim. "丙火巳月,壬庚为上".',
+  '丙申月': 'Hỏa mùa thu → Tài (Kim) vượng. Thân nhược cần Giáp-Mộc / 丙-Hỏa trợ.',
+  '丙亥月': 'Hỏa mùa đông yếu → cần 甲-Mộc sinh Hỏa (Mộc là ấn = sinh ta). Ưu tiên Mộc.',
+  '丁寅月': 'Âm Hỏa mùa xuân → 甲-Mộc là sinh mẫu. "丁火甲木,嫡母也" — cần Mộc.',
+  '丁午月': 'Âm Hỏa mùa hạ cực thịnh → 壬-Thủy phối. "丁壬合" → vừa chế vừa hợp = đẹp.',
+  '丁酉月': 'Tài vượng mùa thu → cần 甲-Mộc + 丙-Hỏa. "甲丙两全" cho Đinh thu.',
+  '丁子月': 'Đinh gặp Tý mùa đông → "丁火逢冬,大忌水多" → cần 甲-Mộc + 戊-Thổ.',
+  // 土 Day Master
+  '戊寅月': 'Dương Thổ mùa xuân Mộc khắc → cần 丙-Hỏa sinh Thổ + 甲-Giáp tiết Mộc.',
+  '戊巳月': 'Thổ mùa hạ → "戊土夏月,先看壬癸" → Thủy tưới Thổ mới sinh vạn vật.',
+  '戊申月': 'Thổ mùa thu Kim thực → Thổ nhược → cần 丙-Hỏa + 丁-Hỏa trợ.',
+  '戊亥月': 'Thổ mùa đông → Thổ lạnh cần 丙-Hỏa sưởi + 甲-Mộc xới Thổ.',
+  '己寅月': 'Âm Thổ mùa xuân → 丙-Hỏa sinh + 癸-Thủy ướt + 甲-Mộc phối.',
+  '己午月': 'Âm Thổ mùa hạ → gấp 癸-Thủy. "己土午月,先取癸水" — cổ诀.',
+  '己酉月': 'Thổ mùa thu Kim thực → 丙-Hỏa ưu tiên. Kim quá → Thổ kiệt.',
+  '己子月': 'Thổ mùa đông → 丙-Hỏa + 戊-Thổ trợ. "己土冬月,丙火为先".',
+  // 金 Day Master
+  '庚寅月': 'Dương Kim mùa xuân → cần 丁-Hỏa luyện + 甲-Mộc + 丙-Hỏa phối. "庚金劈甲引丁".',
+  '庚巳月': 'Kim mùa hạ → 壬-Thủy + 癸-Thủy ưu tiên. Kim bị Hỏa khắc, cần Thủy chế Hỏa.',
+  '庚申月': 'Kim mùa thu cực vượng → cần 丁-Hỏa luyện thành khí cụ + 甲-Mộc để Kim có việc.',
+  '庚亥月': 'Kim mùa đông → "金寒水冷" → cần 丙-Hỏa + 丁-Hỏa sưởi ấm. Ưu tiên Hỏa.',
+  '辛寅月': 'Âm Kim mùa xuân → 壬-Thủy + 甲-Mộc. "辛金寅月,壬甲为用".',
+  '辛巳月': 'Âm Kim mùa hạ → 壬-Thủy + 己-Thổ + 癸-Thủy. "己壬两全".',
+  '辛酉月': 'Tự vượng → cần 壬-Thủy tẩy rửa + 甲-Mộc. "辛金秋月,壬水淘洗".',
+  '辛子月': 'Kim mùa đông → "金水伤官" → GẤP 丙-Hỏa + 丁-Hỏa. Nhiệt độ quyết định.',
+  // 水 Day Master
+  '壬寅月': 'Dương Thủy mùa xuân → Mộc tiết Thủy → cần 戊-Thổ + 丙-Hỏa + 庚-Kim.',
+  '壬巳月': 'Thủy gặp Tài mùa hạ → "壬水巳月,戊癸并用" → Thổ ngăn + Thủy dưỡng.',
+  '壬申月': 'Thủy mùa thu nguồn vượng → "壬水秋月,戊土为堤" → Thổ đắp đê ngăn Thủy.',
+  '壬亥月': 'Thủy mùa đông cực vượng → "壬水冬月,戊丙并用" → Thổ + Hỏa phối.',
+  '癸寅月': 'Âm Thủy mùa xuân → 庚-Kim + 丙-Hỏa + 甲-Mộc. "癸水寅月,辛金为源".',
+  '癸巳月': 'Âm Thủy mùa hạ → 庚-Kim sinh + 壬-Thủy trợ + 丙-Hỏa.',
+  '癸酉月': 'Thủy mùa thu Kim sinh → "金白水清" → cần 丙-Hỏa + 甲-Mộc phối.',
+  '癸子月': 'Thủy mùa đông → "癸水冬月,丙火解冻" → Hỏa sưởi là ưu tiên số 1.',
+};
+
+// ---- 滴天髓 core maxims (任铁樵注) ----
+export const DITIANSUI_MAXIMS = [
+  '「欲识三元万法宗，先观帝载与神功」— Đầu tiên xem Nhật Chủ (đế) + Thập Thần (thần công) xung quanh.',
+  '「坤元合德机缄通，五气偏全定吉凶」— Ngũ hành thiên lệch quyết định cát hung cả đời.',
+  '「始终阴阳气流行，不必分老少与枯荣」— Khí chất Âm-Dương lưu thông là then chốt, không nhất thiết phân tuổi.',
+  '「配合干支仔细详，定人福禄与寿夭」— Phối hợp Can-Chi của tứ trụ + đại vận → định phúc lộc thọ yểu.',
+  '「寒甚暖至，燥甚湿至」— Lạnh quá cần ấm (调候), khô quá cần ướt. Đây là nguyên lý cốt lõi 穷通宝鉴.',
+  '「旺者冲衰衰者拔，衰者冲旺旺者发」— Vượng xung suy → suy đổ; Suy xung vượng → vượng phát (cổ诀 xung).',
+  '「何知其人富，财气通门户」— Biết người giàu: khí Tài thông cửa (Tài vượng + Dụng đến).',
+  '「何知其人贵，官星有理会」— Biết người quý: Quan tinh có lý hội (Chính Quan thuần + Ấn hộ).',
+  '「何知其人贫，财神反不真」— Biết người nghèo: Tài tinh bất chân (Tài bị khắc/xung/không vượng).',
+  '「何知其人贱，官星还不见」— Biết người hèn: Quan tinh bất kiến (không Chính Quan hoặc bị thương).',
+  '「何知其人寿，性定元神厚」— Biết người thọ: tính định, nguyên thần dày (Ấn vượng + Nhật Chủ vững).',
+  '「何知其人夭，气息无所培养」— Biết người yểu: khí tức không dưỡng (Nhật Chủ nhược + Ấn bị khắc).',
+  '「伤官见官，为祸百端」— Thương Quan gặp Chính Quan → họa (trừ khi "thương quan kiến quan" có Dụng đặc biệt).',
+  '「官杀混杂，为人好色」— Quan/Sát hỗn tạp → tính phức tạp, duyên bên ngoài.',
+  '「杀临身旺，职居方面」— Thất Sát gặp thân vượng → quyền chức lớn, lãnh đạo một phương.',
+  '「财多身弱，富屋贫人」— Tài nhiều thân nhược → như người ở nhà giàu mà nghèo (chết đói giữa kho vàng).',
+  '「印赖官生，官赖印护」— Ấn nhờ Quan sinh, Quan nhờ Ấn hộ. Quan-Ấn tương sinh = thăng tiến.',
+  '「群比争财，财为祸胎」— Nhiều Tỷ Kiên tranh Tài → tài lộc là mầm họa (chia gia sản, tranh giành).',
+];
+
+// ---- 三命通会: đại vận nhập cảnh (大运入局) ----
+export const SANMING_DAYUN_RULES = [
+  'Đại vận thuận hành (âm-dương nam/nu都得): can quản 5 năm đầu, chi quản 5 năm sau → 10 năm = 1 đại vận.',
+  'Can đại vận ưu tiên xem Thập Thần + Dụng/Kỵ. Chi đại vận ưu tiên xem 12 trưởng sinh + xung/hợp/hình.',
+  'Đại vận Thiên khắc Địa xung với nhật trụ (天克地冲) = thập kỷ biến động lớn — tốt nếu mang Dụng, xấu nếu mang Kỵ.',
+  'Đại vận 伏吟 (trùng nguyên cục) = đình trệ, buồn bã, "phản ngâm phục ngâm,泪淋淋".',
+  'Đại vận 反吟 (thiên khắc địa xung với trụ cục) = động loạn, thay đổi đột ngột.',
+  'Giai đoạn 25-45 tuổi = 2-3 đại vận quan trọng nhất → định sự nghiệp + hôn nhân.',
+  'Giai đoạn 45-65 tuổi = đại vận vãn niên → sức khỏe + tích lũy + con cái.',
+  'Đại vận đi vào cung Tài = cơ hội tài chính. Đi vào cung Quan = cơ hội sự nghiệp/thăng tiến.',
+  'Đại vận đi vào cung Ấn = học tập/bằng cấp/nhà cửa/quý nhân. Đi vào Tỷ = cạnh tranh/hợp tác.',
+  'Vận Tỵ-Dậu-Sửu (Kim cục) → người mệnh cần Kim sẽ phát. Vận Hợi-Mão-Mùi (Mộc cục) → người cần Mộc phát.',
+];
+
+// ---- 紫微斗数: 12 cung life reading (cross-reference với BaZi) ----
+export const ZIWEI_PALACE_LIFE = {
+  'Mệnh': { aspect: 'bản thân, tính cách, tiềm năng tổng quát', crossRef: 'Nhật Chủ + Thập Thần vượng' },
+  'Huynh Đệ': { aspect: 'anh chị em, bạn bè, đồng nghiệp', crossRef: 'Tỷ Kiên / Kiếp Tài' },
+  'Phu Thê': { aspect: 'vợ/chồng, hôn nhân, tình cảm', crossRef: 'Tài (nam) / Quan (nữ)' },
+  'Tử Nữ': { aspect: 'con cái, sản phẩm sáng tạo', crossRef: 'Thực Thần / Thương Quan' },
+  'Tài Bạch': { aspect: 'tiền bạc, tài lộc', crossRef: 'Chính Tài / Thiên Tài' },
+  'Tật Ách': { aspect: 'sức khỏe, bệnh tật, tai nạn', crossRef: 'ngũ hành yếu + Thất Sát xung' },
+  'Thiên Di': { aspect: 'du lịch, xuất ngoại', crossRef: 'Dịch Mã (驛馬)' },
+  'Quan Lộc': { aspect: 'sự nghiệp, công danh', crossRef: 'Chính Quan / Thất Sát' },
+  'Điền Trạch': { aspect: 'nhà cửa, đất đai', crossRef: 'Ấn + Thổ (nếu Thổ=Dụng)' },
+  'Phúc Đức': { aspect: 'phúc đức, tâm linh, may mắn', crossRef: 'Ấn chính + Niên Trụ' },
+  'Phụ Mẫu': { aspect: 'cha mẹ, người trên', crossRef: 'Ấn thiên can Niên/Nguyệt' },
+};
+
+export const WUXING_HEALTH = {
+  '木': { organs: 'Gan, Mật, gân, mắt', symptoms: 'Đau đầu, tức giận, móng giòn, kinh không đều', diet: 'Ăn xanh/chua, tránh rượu+cay', emotion: 'Giận (怒伤肝)', remedy: 'Đi rừng, hít thở, thiền' },
+  '火': { organs: 'Tim, Ruột non, mạch, lưỡi', symptoms: 'Hồi hộp, mất ngủ, lở miệng, đỏ mặt', diet: 'Ăn đỏ/đắng, tránh cafein', emotion: 'Vui thái quá (喜伤心)', remedy: 'Tĩnh tâm, nhạc nhẹ' },
+  '土': { organs: 'Lách, Dạ dày, cơ, miệng', symptoms: 'Đau dạ dày, đầy bụng, lo âu', diet: 'Ăn vàng/ngọt tự nhiên, tránh lạnh', emotion: 'Lo âu (思伤脾)', remedy: 'Yoga, ăn ấm' },
+  '金': { organs: 'Phổi, Đại tràng, da, mũi', symptoms: 'Ho, hen, xoang, táo bón, buồn', diet: 'Ăn trắng/cay nhẹ, tránh chiên', emotion: 'Buồn (悲伤肺)', remedy: 'Khí công, bơi' },
+  '水': { organs: 'Thận, Bàng quang, xương, tai', symptoms: 'Đau lưng, tiểu đêm, tai ù', diet: 'Ăn đen/mặn nhẹ, tránh lạnh', emotion: 'Sợ (恐伤肾)', remedy: 'Ngâm chân nóng, đậu đen' },
+};
+
+export const CAREER_BY_GOD = {
+  '正官': ['Quan chức', 'Quản lý', 'Luật sư', 'Hành chính', 'Giáo dục'],
+  '七殺': ['Quân đội', 'Kinh doanh mạo hiểm', 'CEO', 'Bác sĩ phẫu thuật'],
+  '正財': ['Kế toán', 'Tài chính', 'Ngân hàng', 'Bất động sản'],
+  '偏財': ['Đầu tư', 'Chứng khoán', 'Sales', 'Marketing', 'Giải trí'],
+  '正印': ['Giáo sư', 'Nghiên cứu', 'Y sĩ', 'Tôn giáo', 'Tâm lý'],
+  '偏印': ['Nghệ sĩ', 'Huyền học', 'IT', 'Thiết kế', 'Nhà văn'],
+  '比肩': ['Hợp tác', 'Quản lý nhân sự', 'Tổ chức cộng đồng'],
+  '劫財': ['Sales', 'Môi giới', 'Bảo hiểm', 'Đấu giá'],
+  '食神': ['Ẩm thực', 'Nghệ thuật', 'Giáo dục', 'Spa'],
+  '傷官': ['Luật biện hộ', 'Diễn viên', 'Kỹ thuật cao', 'Khởi nghiệp'],
+};
+
+export const DIVINATION_SCHOOLS = {
+  '八字': 'Mệnh lý — bản đồ đời. Mạnh: tổng quan + timing đại vận.',
+  '紫微斗数': 'Mệnh lý — 12 cung + 14 chính tinh. Bổ sung chi tiết từng lĩnh vực cho BaZi.',
+  '六爻': 'Chiêm sự — 6 hào + 6 thân. Mạnh: trả lời cụ thể 1 việc (có nên? kết quả?).',
+  '梅花易数': 'Chiêm sự — khởi quẻ nhanh từ số/tên. Linh hoạt,万物可起卦.',
+  '奇门遁甲': 'Chiêm sự + chiến lược — chọn thời điểm + hướng + chiến thuật.',
+};
