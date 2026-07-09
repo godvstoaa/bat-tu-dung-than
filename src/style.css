@@ -2621,3 +2621,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .wx-radar-wrap { transform-style: preserve-3d; }
 .tuzu-3d-wrap,.wx3d-wrap,.dy3d-wrap,.vd3d-wrap { contain: layout; }
 .hh3d { contain: layout; }
+#wx-radar-box { contain: layout; }
