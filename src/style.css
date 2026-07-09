@@ -2519,3 +2519,7 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .syn-factors summary { color: var(--gold, #d4af37); cursor: pointer; font-size: 11px; transition: color .2s; padding: 4px 0; }
 .syn-factors summary:hover { color: var(--gold-bright, #f3d57a); }
 .syn-factors[open] summary { margin-bottom: 6px; }
+
+/* [loop] share button gold-foil */
+.hh-share-btn { background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(247,236,203,0.06)) !important; border-color: rgba(212,175,55,0.3) !important; color: var(--gold-pale, #f7eccb) !important; }
+.hh-share-btn:hover { background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(247,236,203,0.1)) !important; }
