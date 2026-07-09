@@ -2749,3 +2749,4 @@ main.container { contain: layout style paint; }
 .tuzu-gan, .tuzu-zhi { animation: charGlow 4s ease-in-out infinite alternate; }
 @media (prefers-reduced-motion: reduce) { .tuzu-gan, .tuzu-zhi { animation: none; } }
 .dy3d-gz { animation: charGlow 3.5s ease-in-out infinite alternate; }
+.wx3d-han { animation: charGlow 3s ease-in-out infinite alternate; }
