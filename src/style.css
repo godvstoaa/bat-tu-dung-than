@@ -2582,3 +2582,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .dy3d-now { text-shadow: 0 0 6px rgba(243,213,122,0.3); }
 .tuzu-sep { box-shadow: 0 0 4px rgba(212,175,55,0.2); }
 .hh3d-rating { text-shadow: 0 0 4px currentColor; }
+.wx3d-name { font-family: 'Noto Serif SC', serif; letter-spacing: 0.3px; }
