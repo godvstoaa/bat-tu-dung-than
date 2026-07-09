@@ -2548,3 +2548,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .th-hehun { border-color: rgba(212,175,55,0.35) !important; color: var(--gold-pale,#f7eccb) !important; }
 .verdict-card { box-shadow: inset 0 0 30px rgba(212,175,55,0.04), 0 8px 20px rgba(0,0,0,0.4) !important; }
 .wx3d-stage { background: radial-gradient(ellipse at 50% 80%, rgba(212,175,55,0.03), transparent 60%); border-radius: 8px; }
+.dy3d-active .dy3d-face { box-shadow: inset 0 2px 0 rgba(255,255,255,0.35), inset -3px 0 7px rgba(0,0,0,0.3), 0 0 24px var(--c), 0 0 10px #fff7, 3px 3px 0 rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.4) !important; }
