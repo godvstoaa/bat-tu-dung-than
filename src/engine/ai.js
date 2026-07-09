@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES } from './kb.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
@@ -609,6 +609,28 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "SỰ NGHIỆP: " + (topGods[0] ? topGods[0].vi : "?") + " > " + careerHint + "\n" +
       "ĐA TRƯỜNG PHÁI: " + Object.entries(DIVINATION_SCHOOLS).map(([k,v]) => k + ": " + v).join(" | ");
   } catch (e) { brief += "\n--- KIẾN THỨC CỔ PHÁP: [lỗi load] ---"; }
+
+  // ---- [round 2 crawl] HÔN NHÂN + TÀI VẬN + QUÝ NHÂN ----
+  try {
+    const dayZhi = c.pillars.day.zhi || '';
+    const spouseReading = SPOUSE_PALACE_READING[dayZhi] || null;
+    const nobleChars = NOBLE_STAR_RULES[c.dayMaster.gan] || [];
+    const hasNobleInChart = nobleChars.some(ch => Object.values(c.pillars).some(p => p.zhi === ch));
+    const peachKey = Object.keys(PEACH_BLOSSOM_RULES).find(k => k.includes(c.pillars.year.zhi));
+    const peachZhi = peachKey ? PEACH_BLOSSOM_RULES[peachKey] : '?';
+    const dayZhiIsPeach = dayZhi === peachZhi.split(' ')[0];
+    const currentDecade = phases => phases.find(p => p.isCurrent) || {};
+    const ageRange = (() => { const a = new Date().getFullYear() - (c.input?.year || 1990); return `${Math.floor(a/10)*10+1}-${Math.floor(a/10)*10+10}t`; })();
+    const decadeTheme = DECADE_LIFE_THEMES[ageRange] || '';
+    brief += "\n--- HÔN NHÂN + TÀI VẬN + QUÝ NHÂN (round 2 crawl) ---\n" +
+      "PHỐI NGẪU (日支=" + dayZhi + "): " + (spouseReading ? spouseReading.traits + " | Hôn nhân: " + spouseReading.marriage : "(không có dữ liệu)") + "\n" +
+      "KẾT HÔN TIMING: " + MARRIAGE_TIMING_SIGNALS.slice(0, 4).join(" • ") + "\n" +
+      "TÀI VẬN CẤP: xem thân cường/nhược + Tài vượng/suy + Tài khố (辰戌丑未) + đại vận Tài → phân cấp giàu/nghèo. " + WEALTH_TIERS.map(t => t.tier + "(" + t.level + ")").join(" / ") + "\n" +
+      "TÀI KHỐ: " + (['辰','戌','丑','未'].includes(dayZhi) ? "Nhật Chi = " + dayZhi + " → " + (WEALTH_KU[dayZhi] ? WEALTH_KU[dayZhi].note : '') : "Nhật Chi không phải辰戌丑未") + "\n" +
+      "QUÝ NHÂN 天乙: can " + c.dayMaster.gan + " → quý nhân tại " + nobleChars.join(", ") + ". Có trong lá số: " + (hasNobleInChart ? "CÓ ✓" : "không") + ". " + NOBLE_STAR_NOTE + "\n" +
+      "ĐÀO HOA 桃花: " + peachZhi + (dayZhiIsPeach ? " (NHẬT CHI LÀ ĐÀO HOA → duyên bẩm sinh mạnh)" : "") + ". " + PEACH_NOTE + "\n" +
+      "GIAI ĐOẠN ĐỜI " + ageRange + ": " + decadeTheme;
+  } catch (e) { brief += "\n--- HÔN NHÂN + TÀI VẬN: [lỗi load] ---"; }
 
   if (fcParts.length) {
     brief += '\n--- DỰ BÁO & THỜI ĐIỂM ---\n' + fcParts.join('\n');

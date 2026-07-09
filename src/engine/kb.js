@@ -710,3 +710,84 @@ export const DIVINATION_SCHOOLS = {
   '梅花易数': 'Chiêm sự — khởi quẻ nhanh từ số/tên. Linh hoạt,万物可起卦.',
   '奇门遁甲': 'Chiêm sự + chiến lược — chọn thời điểm + hướng + chiến thuật.',
 };
+
+// ============================================================
+//  ROUND 2 CRAWL — hôn nhân + tài vận + quý nhân chi tiết
+//  Nguồn: discoveringrncp.hk, deeporacle.ai, openfate.ai, easternfate.com, zhihu
+// ============================================================
+
+// ---- HÔN NHÂN:配偶宫 (日支) đọc tính cách bạn đời ----
+export const SPOUSE_PALACE_READING = {
+  '子': { vi: 'Tý', traits: 'bạn đời thông minh, hoạt bát, có duyên bên ngoài, giao tiếp tốt. Thường đẹp/ngoại hình ưa nhìn.', marriage: 'hôn nhân cần không gian riêng, dễ ghen tuông nếu kìm kẹp' },
+  '丑': { vi: 'Sửu', traits: 'bạn đời cần mẫn, kiên nhẫn, truyền thống, tiết kiệm. Có thể hơi bảo thủ.', marriage: 'hôn nhân bền vững, nhưng cần thêm lãng mạn' },
+  '寅': { vi: 'Dần', traits: 'bạn đời can đảm, lãnh đạo, độc lập, có tham vọng sự nghiệp.', marriage: 'cần tôn trọng sự độc lập của nhau, tránh tranh giành quyền' },
+  '卯': { vi: 'Mão', traits: 'bạn đời hiền lành, nghệ sĩ, duyên dáng, thích cái đẹp, nhẹ nhàng.', marriage: 'tình cảm nồng nàn nhưng dễ tổn thương — cần nâng niu' },
+  '辰': { vi: 'Thìn', traits: 'bạn đời bao dung, thực tế, có uy, quản lý giỏi tài chính.', marriage: 'ổn định, nhưng bạn đời có thể hơi độc đoán' },
+  '巳': { vi: 'Tỵ', traits: 'bạn đời sâu sắc, bí ẩn, trực giác mạnh, khôn ngoan.', marriage: 'cần tin tưởng tuyệt đối — bạn đời hay nghi' },
+  '午': { vi: 'Ngọ', traits: 'bạn đời nhiệt huyết, thẳng thắn, quảng giao, đẹp trai/gái.', marriage: 'hôn nhân sôi nổi, cần kiểm soát cái tôi' },
+  '未': { vi: 'Mùi', traits: 'bạn đời hiền hậu, chăm chỉ, gia đình là trên hết, nấu ăn giỏi.', marriage: 'ấm áp, bền lâu, nhưng thiếu bất ngờ' },
+  '申': { vi: 'Thân', traits: 'bạn đời lanh lợi, hài hước, linh hoạt, thích phiêu lưu.', marriage: 'vui vẻ, nhưng cần cam kết lâu dài' },
+  '酉': { vi: 'Dậu', traits: 'bạn đời sắc sảo, hoàn hảo, chú trọng ngoại hình, tự trọng cao.', marriage: 'đẹp đôi nhưng cái tôi mạnh — cần nhượng bộ' },
+  '戌': { vi: 'Tuất', traits: 'bạn đời trung thành, nghĩa khí, bảo vệ gia đình, trực tính.', marriage: 'trung thành tuyệt đối, nhưng cứng đầu' },
+  '亥': { vi: 'Hợi', traits: 'bạn đời lương thiện, bao dung, trí tuệ, thích giúp người.', marriage: 'êm đềm, nhưng bạn đời có thể quá tốt với người ngoài' },
+};
+
+// ---- KẾT HÔN TIMING: dấu hiệu đại vận/lưu niên kích hoạt hôn nhân ----
+export const MARRIAGE_TIMING_SIGNALS = [
+  'Đại vận mang Tài tinh (nam) / Quan sát (nữ) + Cát → cửa sổ hôn nhân mở',
+  'Đại vận hợp Nhật Chi (Lục hợp / Tam hợp) → duyên đến',
+  'Đại vận xung Nhật Chi → biến động hôn nhân (có thể kết hôn nếu chưa, hoặc biến cố nếu đã có)',
+  'Lưu niên gặp Đào Hoa (寅午戌→卯, 申子辰→酉, 巳酉丑→午, 亥卯未→子) → duyên bên ngoài nồng',
+  'Đại vận đi vào cung Phu Thê (紫微) hoặc Thiên Tài (nam) → ý nghĩa hôn nhân mạnh',
+  'Lưu niên 天合地合 với Nhật Trụ → năm cực thuận hôn nhân',
+  'Đại vận mang Thực Thần / Thương Quan (nữ) + Dụng → có con + duyên tốt',
+  'Đại vận mang Ấn (nam/nữ) + Cát → mua nhà, ổn định, môi trường thuận hôn nhân',
+  'Tuổi 25-35: cửa sổ hôn nhân tự nhiên (theo chu kỳ xã hội + đại vận)',
+  'Phạm Phục Ngâm/Phản Ngâm Nhật Trụ trong đại vận → biến cố lớn hôn nhân (cần thận)',
+];
+
+// ---- TÀI VẬN:财富等级 (wealth tier) ----
+export const WEALTH_TIERS = [
+  { tier: 'Đại phú', conditions: ['Thân vượng + Tài vượng + Dụng = Tài', 'Tài có khố (辰戌丑未)', 'Thực thương sinh tài', 'Đại vận đi Tài/Thực thương 20-30 năm'], level: '9-10位数+' },
+  { tier: 'Trung phú', conditions: ['Thân vượng + Tài bình vượng', 'Có Tài tinh + Dụng Hỷ tương trợ', 'Đại vận có 1-2 thập kỷ Tài Cát'], level: '8-9位数' },
+  { tier: 'Tiểu phú', conditions: ['Thân bình + Tài bình', 'Tài tinh hiển nhưng không vượng quá', 'Đại vận có vài năm Tài Cát'], level: '6-8位数' },
+  { tier: 'Trung bình', conditions: ['Thân Tài cân bằng', 'Không có Tài khố hoặc khố bị khóa', 'Đại vận bình thường'], level: '5-6位数' },
+  { tier: 'Khó khăn', conditions: ['Thân nhược + Tài đa (tài đa thân nhược)', 'Tài bị xung/khắc', 'Đại vận Kỵ thần'], level: '<5位数' },
+];
+
+// ---- TÀI KHỐ (辰戌丑未) — kho chứa tài lộc ----
+export const WEALTH_KU = {
+  '辰': { vi: 'Thìn', stores: 'Thủy', note: 'Kho Thủy — tài lộc tích lũy qua giao tiếp, network, trí tuệ. Mở khi gặp Tuất (xung).' },
+  '戌': { vi: 'Tuất', stores: 'Hỏa', note: 'Kho Hỏa — tài lộc qua nhiệt huyết, danh tiếng, sáng tạo. Mở khi gặp Thìn.' },
+  '丑': { vi: 'Sửu', stores: 'Kim', note: 'Kho Kim — tài lộc qua kỷ luật, hệ thống, quản lý. Mở khi gặp Mùi.' },
+  '未': { vi: 'Mùi', stores: 'Mộc', note: 'Kho Mộc — tài lộc qua phát triển, nuôi trồng, giáo dục. Mở khi gặp Sửu.' },
+};
+
+// ---- QUÝ NHÂN THẦN SÁT (天乙贵人) — ai giúp mình nhất ----
+export const NOBLE_STAR_RULES = {
+  '甲': ['丑', '未'], '乙': ['子', '申'], '丙': ['酉', '亥'], '丁': ['酉', '亥'],
+  '戊': ['丑', '未'], '己': ['子', '申'], '庚': ['丑', '未'], '辛': ['寅', '午'],
+  '壬': ['卯', '巳'], '癸': ['卯', '巳'],
+};
+export const NOBLE_STAR_NOTE = '天乙贵人 = người giúp mình khi khó khăn nhất. Chi năm sinh thuộc nhóm quý nhân = năm gặp贵人. Đại vận/lưu niên đi vào chi quý nhân → năm có người giúp. Chi quý nhân ở Nhật Trụ = bạn đời là quý nhân của mình.';
+
+// ---- ĐÀO HOA (桃花) — duyên bên ngoài, hấp dẫn ----
+export const PEACH_BLOSSOM_RULES = {
+  '寅午戌': 'Mão (卯) — đào hoa tại Mão → duyên bên ngoài, hoa đào phương Đông',
+  '申子辰': 'Dậu (酉) — đào hoa tại Dậu → duyên sang trọng, phương Tây',
+  '巳酉丑': 'Ngọ (午) — đào hoa tại Ngọ → duyên rực rỡ, phương Nam',
+  '亥卯未': 'Tý (子) — đào hoa tại Tý → duyên bí ẩn, phương Bắc',
+};
+export const PEACH_NOTE = 'Đào hoa = sao duyên, hấp dẫn giới tính. Có trong lá số = duyên tốt, dễ thu hút. Nhiều đào hoa = đa tình, cần tiết chế. Vị trí: Niên = duyên bẩm sinh, Nhật = duyên trong hôn nhân, Thời = duyên vãn niên.';
+
+// ---- ĐẠI VẬN CỤ THỂ: từng thập niên chính yếu ----
+export const DECADE_LIFE_THEMES = {
+  '1-10t': 'Thiếu thời — nền móng gia đình + học vấn sơ khai. Ưu tiên: Ấn (mẹ, học).',
+  '11-20t': 'Thanh xuân — học vấn, định hướng, tình cảm sơ khai. Ưu tiên: Ấn + Thực thương.',
+  '21-30t': 'Khởi đầu đời — sự nghiệp, độc lập, hôn nhân. Ưu tiên: Tài/Quan + Đào hoa.',
+  '31-40t': 'Phát triển — thăng tiến, tích lũy, gia đình. Ưu tiên: Tài + Quan + Dụng.',
+  '41-50t': 'Đỉnh sự nghiệp — quyền lực, tài sản đỉnh. Ưu tiên: Quan/Sát + Dụng.',
+  '51-60t': 'Thu hoạch — thành tựu, con cái trưởng thành. Ưu tiên: Ấn + Tỷ.',
+  '61-70t': 'Vãn niên — sức khỏe, phúc đức, hưởng thụ. Ưu tiên: Ấn + Thực thần.',
+  '71+': 'Cao niên — tâm linh, di sản, an hưởng. Ưu tiên: Thủy (trí tuệ) + Ấn.',
+};
