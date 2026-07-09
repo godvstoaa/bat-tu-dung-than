@@ -2471,3 +2471,13 @@ button:focus-visible, .lab-btn:focus-visible {
 
 /* [loop] FIX: tools-card exempt from content-visibility (hh-btn must be clickable) */
 .card.tools-card { content-visibility: visible !important; contain-intrinsic-size: none; }
+
+/* [loop] premium polish: input focus + scrollbar + selection */
+.birth-form input:focus, .birth-form select:focus { border-color: var(--gold, #d4af37) !important; box-shadow: 0 0 0 3px rgba(212,175,55,0.12) !important; outline: none !important; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(212,175,55,0.5); }
+::selection { background: rgba(212,175,55,0.25); color: #f7eccb; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--gold-bright, #f3d57a); outline-offset: 2px; }
+.tool-row input:focus, .tool-row select:focus { border-color: var(--gold, #d4af37) !important; box-shadow: 0 0 0 2px rgba(212,175,55,0.1) !important; }
