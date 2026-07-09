@@ -2731,3 +2731,6 @@ main.container { contain: layout style paint; }
 @media (prefers-reduced-motion: reduce) { .wx3d-sphere { animation: none !important; } }
 .vd3d-seal { animation: vdFloat 5s ease-in-out infinite, orbGlow 3.5s ease-in-out infinite alternate; }
 .hh3d-sphere { animation: orbFloat 4.5s ease-in-out infinite, orbGlow 3s ease-in-out infinite alternate; }
+.dy3d-active { animation: dyPulse 2.5s ease-in-out infinite; }
+@keyframes dyPulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.2); } }
+@media (prefers-reduced-motion: reduce) { .dy3d-active { animation: none; } }
