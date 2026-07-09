@@ -2497,3 +2497,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--gold-bright, #f
 
 /* [loop] today-hero premium border/glow */
 .today-hero { border-color: rgba(212,175,55,0.32); box-shadow: 0 4px 14px rgba(0,0,0,0.35), 0 0 18px rgba(212,175,55,0.06), inset 0 1px 0 rgba(247,236,203,0.06); }
+
+/* [loop] hero→form gold gradient separator */
+.hero { border-bottom: 1px solid; border-image: linear-gradient(90deg, transparent, rgba(212,175,55,0.25), transparent) 1; }
