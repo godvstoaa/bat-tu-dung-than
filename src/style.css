@@ -2715,3 +2715,4 @@ main.container { contain: strict; }
 #pillars,#verdict,#dayun-chart,#hh-out { contain: strict; }
 .wx-explore,.syn-factors,.quick-nav,.card-search { contain: strict; }
 .capsule-spark,.ix-group,.ix-chip,.ln-rate,.followup-chip,.msg-text { contain: strict; }
+.chat-log,.ask,.ai-popup-head,.ai-style-bar,.seg,.birth-form { contain: strict; }
