@@ -2617,3 +2617,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .tuzu-col,.wx3d-orb,.vd3d-seal,.hh3d-orb,.dy3d-col { backface-visibility: hidden; }
 .hh3d { transform-style: preserve-3d; }
 .vd3d { transform-style: preserve-3d; }
+.today-hero { transform-style: preserve-3d; }
