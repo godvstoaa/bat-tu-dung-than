@@ -2612,7 +2612,6 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .vd3d-label { transition: color .2s; }
 .tuzu-gan,.tuzu-zhi,.wx3d-han,.hh3d-han,.vd3d-char,.dy3d-gz,.vd3d-label,.tuzu-label { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .wx3d-pct,.hh3d-score,.tuzu-name,.wx3d-name,.hh3d-label,.dy3d-age,.dy3d-now { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-.tuzu-col,.wx3d-orb,.vd3d-seal,.hh3d-orb,.dy3d-col { backface-visibility: hidden; }
 .hh3d { transform-style: preserve-3d; }
 .vd3d { transform-style: preserve-3d; }
 .today-hero { transform-style: preserve-3d; }
@@ -2654,3 +2653,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .hh3d-han { animation: charGlow 3s ease-in-out infinite alternate; }
 .vd3d-label { animation: charGlow 4s ease-in-out infinite alternate; }
 /* dedup: universal * already covers contain — remove all redundant individual rules */
+.tuzu-col,.wx3d-orb,.vd3d-seal,.hh3d-orb,.dy3d-col,.tuzu-stage,.wx3d-stage { backface-visibility: hidden; }
