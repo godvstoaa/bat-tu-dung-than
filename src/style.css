@@ -2706,3 +2706,4 @@ html { contain: layout; }
 .tuzu-3d-wrap,.wx3d-wrap,.dy3d-wrap,.vd3d-wrap { contain: strict; }
 .ai-popup,.chat-log { contain: strict; }
 #result { contain: strict; }
+main.container { contain: strict; }
