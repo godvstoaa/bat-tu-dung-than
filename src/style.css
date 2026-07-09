@@ -2556,3 +2556,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .dy3d-stage { background: linear-gradient(180deg, rgba(212,175,55,0.02), transparent); border-radius: 8px; }
 .vd3d { background: linear-gradient(180deg, rgba(212,175,55,0.02), transparent); border-radius: 8px; padding: 8px 8px 4px; }
 .hh3d { background: linear-gradient(180deg, rgba(212,175,55,0.02), transparent); border-radius: 8px; padding: 8px; }
+.tuzu-3d-wrap, .wx3d-wrap, .dy3d-wrap, .vd3d-wrap { transition: opacity .3s ease; }
