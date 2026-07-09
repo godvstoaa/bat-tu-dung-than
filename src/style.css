@@ -2559,3 +2559,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .tuzu-3d-wrap, .wx3d-wrap, .dy3d-wrap, .vd3d-wrap { transition: opacity .3s ease; }
 .hh3d-marker { animation: hhMarkerPulse 2s ease-in-out infinite; }
 @keyframes hhMarkerPulse { 0%,100% { box-shadow: 0 0 6px var(--gold,#d4af37); } 50% { box-shadow: 0 0 14px var(--gold,#d4af37), 0 0 4px #fff8; } }
+.hh3d-sphere { box-shadow: 0 0 22px var(--c), inset -3px -5px 10px rgba(0,0,0,0.4), inset 3px 4px 8px rgba(255,255,255,0.2); }
