@@ -2547,3 +2547,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .zh { text-shadow: 0 0 8px rgba(212,175,55,0.12); }
 .th-hehun { border-color: rgba(212,175,55,0.35) !important; color: var(--gold-pale,#f7eccb) !important; }
 .verdict-card { box-shadow: inset 0 0 30px rgba(212,175,55,0.04), 0 8px 20px rgba(0,0,0,0.4) !important; }
+.wx3d-stage { background: radial-gradient(ellipse at 50% 80%, rgba(212,175,55,0.03), transparent 60%); border-radius: 8px; }
