@@ -2748,3 +2748,4 @@ main.container { contain: layout style paint; }
 .hh3d-marker { animation: hhMarkerPulse 2s ease-in-out infinite, orbGlow 3s ease-in-out infinite alternate; }
 .tuzu-gan, .tuzu-zhi { animation: charGlow 4s ease-in-out infinite alternate; }
 @media (prefers-reduced-motion: reduce) { .tuzu-gan, .tuzu-zhi { animation: none; } }
+.dy3d-gz { animation: charGlow 3.5s ease-in-out infinite alternate; }
