@@ -2639,3 +2639,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .wx-radar { contain: layout; }
 .card { contain: layout; }
 .grp { contain: layout; }
+.synthesis-card { contain: layout; }
