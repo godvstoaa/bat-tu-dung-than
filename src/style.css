@@ -2644,3 +2644,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .classic-card { contain: layout; }
 .qianli-card { contain: layout; }
 .pillars { contain: layout; }
+.pillar { contain: layout; }
