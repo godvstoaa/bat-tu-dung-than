@@ -2514,3 +2514,8 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 /* [loop] today-hero subtle 3D tilt */
 .today-hero { transform: perspective(800px) rotateX(2deg); transform-origin: center top; transition: transform .3s var(--ease-out, ease); }
 .today-hero:hover { transform: perspective(800px) rotateX(0deg); }
+
+/* [loop] syn-factors summary gold + interactive */
+.syn-factors summary { color: var(--gold, #d4af37); cursor: pointer; font-size: 11px; transition: color .2s; padding: 4px 0; }
+.syn-factors summary:hover { color: var(--gold-bright, #f3d57a); }
+.syn-factors[open] summary { margin-bottom: 6px; }
