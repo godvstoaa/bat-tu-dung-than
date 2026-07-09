@@ -2702,3 +2702,4 @@ main.container { contain: layout; }
 body { contain: layout; }
 html { contain: layout; }
 * { contain: layout style paint; }
+.wx3d-orb,.hh3d-orb,.tuzu-col,.dy3d-col,.vd3d-seal { contain: layout style paint; }
