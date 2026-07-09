@@ -2569,3 +2569,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .dy3d-gz { text-shadow: 0 0 10px currentColor, 0 1px 2px rgba(0,0,0,0.6); }
 .dy3d-age { text-shadow: 0 0 6px rgba(212,175,55,0.1); }
 .hh3d-orb { transition: transform .2s ease; cursor: pointer; } .hh3d-orb:hover { transform: scale(1.08); }
+.vd3d-label { text-shadow: 0 0 8px rgba(212,175,55,0.2); }
