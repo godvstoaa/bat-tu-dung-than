@@ -2613,3 +2613,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .tuzu-gan,.tuzu-zhi,.wx3d-han,.hh3d-han,.vd3d-char,.dy3d-gz,.vd3d-label,.tuzu-label { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .wx3d-pct,.hh3d-score,.tuzu-name,.wx3d-name,.hh3d-label,.dy3d-age,.dy3d-now { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 .tuzu-stage,.wx3d-orb,.vd3d-seal,.hh3d-sphere,.vd3d-ring { will-change: transform; }
+.dy3d-face,.wx3d-sphere::after,.hh3d-sphere::after { will-change: box-shadow,opacity; }
