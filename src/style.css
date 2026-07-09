@@ -2567,3 +2567,51 @@ input:focus, .birth-form input:focus, .birth-form select:focus {
 }
 /* cache-bust: force new hash */
 .hero { min-height: 320px; }
+
+/* 3D VISUALIZATION RESTORE — sau cascade lock */
+.tuzu-3d-wrap { margin: 6px 0 14px; }
+.tuzu-3d { perspective: 1100px; }
+.tuzu-stage { display: flex; gap: 9px; transform-style: preserve-3d; animation: tuzuSway 14s ease-in-out infinite; transform: rotateY(-14deg); padding: 14px 4px 4px; }
+.tuzu-col { flex: 1; min-width: 0; transform-style: preserve-3d; background: linear-gradient(180deg, rgba(40,34,55,0.92), rgba(20,18,30,0.96)) !important; border: 1px solid rgba(212,175,55,0.3) !important; border-top: 2px solid #d4af37 !important; border-radius: 10px; padding: 12px 5px 11px; text-align: center; box-shadow: 0 12px 28px rgba(0,0,0,0.6), inset 0 1px 0 rgba(247,236,203,0.12), inset 0 -3px 10px rgba(0,0,0,0.45) !important; position: relative; overflow: hidden; transition: transform .25s ease, box-shadow .25s, border-color .2s; cursor: pointer; }
+.tuzu-col:hover { transform: translateY(-4px) scale(1.03) !important; }
+.tuzu-col.tuzu-dm { border-top: 3px solid #c0392b !important; }
+.tuzu-col.tuzu-dm .tuzu-label::after { content: "NHAT CHU"; display: block; font-size: 7.5px; color: #c0392b; font-weight: 700; }
+.tuzu-label { font-size: 13px; margin-bottom: 5px; font-family: "Noto Serif SC",serif; }
+.tuzu-gan, .tuzu-zhi { font-size: 36px; font-weight: 700; font-family: "Noto Serif SC",serif; text-shadow: 0 0 22px currentColor, 0 2px 5px rgba(0,0,0,0.7) !important; }
+.tuzu-sep { height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.45), transparent); margin: 7px auto; width: 55%; }
+.tuzu-name { font-size: 10.5px; color: #e8d9a8 !important; margin-top: 6px; }
+.wx3d-wrap { margin: 4px 0 8px; }
+.wx3d { perspective: 900px; }
+.wx3d-stage { display: flex; align-items: flex-end; justify-content: center; gap: 9px; transform-style: preserve-3d; padding: 12px 4px 4px; }
+.wx3d-orb { text-align: center; transform-style: preserve-3d; animation: orbFloat 4.5s ease-in-out infinite; position: relative; cursor: pointer; }
+.wx3d-sphere { width: calc(var(--s,40) * 1px) !important; height: calc(var(--s,40) * 1px) !important; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.7), var(--c,#d4af37) 42%, rgba(0,0,0,0.55)) !important; box-shadow: 0 0 calc(var(--s,40) * 0.5 * 1px) var(--c,#d4af37), 0 8px 16px rgba(0,0,0,0.5), inset -4px -7px 12px rgba(0,0,0,0.45), inset 3px 4px 8px rgba(255,255,255,0.2) !important; margin: 0 auto 5px; }
+.wx3d-han { font-size: 17px; font-weight: 700; font-family: "Noto Serif SC",serif; text-shadow: 0 0 10px currentColor !important; }
+.wx3d-pct { font-size: 12.5px; font-weight: 700; color: #f7eccb; }
+.wx3d-name { font-size: 9.5px; color: #c9b896; }
+.vd3d-wrap { animation: vdStamp .6s cubic-bezier(.2,1.4,.4,1) both; }
+.vd3d { perspective: 700px; text-align: center; }
+.vd3d-seal { display: inline-block; width: 92px !important; height: 92px !important; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f7eccb, #d4af37 50%, #7a5e15 100%) !important; box-shadow: 0 0 32px rgba(212,175,55,0.6), inset 0 3px 7px rgba(255,255,255,0.4), inset 0 -5px 12px rgba(0,0,0,0.45) !important; animation: vdFloat 5s ease-in-out infinite; position: relative; }
+.vd3d-ring { position: absolute; inset: -6px; border: 1px dashed rgba(212,175,55,0.45); border-radius: 50%; animation: vdSpin 14s linear infinite; }
+.vd3d-char { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; font-family: "Noto Serif SC",serif; color: #8b2a1a !important; text-shadow: 0 0 10px rgba(192,57,43,0.5), 0 1px 2px rgba(0,0,0,0.5); }
+.vd3d-label { font-size: 11px; font-weight: 700; color: #d4af37; letter-spacing: 1.5px; margin-top: 8px; font-family: "Noto Serif SC",serif; }
+.dy3d-wrap { margin: 6px 0 8px; }
+.dy3d { perspective: 850px; }
+.dy3d-stage { display: flex; align-items: flex-end; gap: 5px; transform-style: preserve-3d; transform: rotateX(10deg); padding: 10px 6px 6px; overflow-x: auto; }
+.dy3d-col { flex: 0 0 44px; text-align: center; transition: transform .2s ease; cursor: pointer; }
+.dy3d-bar { height: calc(var(--h,40) * 1px); display: flex; align-items: flex-end; }
+.dy3d-face { width: 70%; height: 100%; margin: 0 auto; background: linear-gradient(180deg, var(--c,#d4af37), rgba(0,0,0,0.4)) !important; border-radius: 4px; box-shadow: inset 0 2px 0 rgba(255,255,255,0.25), inset -3px 0 7px rgba(0,0,0,0.35), 0 0 10px var(--c,#d4af37), 3px 3px 0 rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.4) !important; }
+.dy3d-gz { font-size: 13px; font-weight: 700; font-family: "Noto Serif SC",serif; margin-top: 4px; text-shadow: 0 0 10px currentColor !important; }
+.dy3d-age { font-size: 9px; color: #c9b896; }
+.hh3d { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 10px 0; }
+.hh3d-orb { text-align: center; cursor: pointer; }
+.hh3d-sphere { width: 54px !important; height: 54px !important; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.7), var(--c,#d4af37) 42%, rgba(0,0,0,0.55)) !important; box-shadow: 0 0 22px var(--c,#d4af37), inset -3px -5px 10px rgba(0,0,0,0.4) !important; margin: 0 auto 3px; animation: orbFloat 4.5s ease-in-out infinite; }
+.hh3d-han { font-size: 16px; font-weight: 700; font-family: "Noto Serif SC",serif; text-shadow: 0 0 10px currentColor !important; }
+.hh3d-score { font-size: 30px; font-weight: 700; font-family: "Noto Serif SC",serif; }
+.hh3d-bar { height: 5px; background: linear-gradient(90deg,#e0533d,#e8b94a 45%,#3fb86b); border-radius: 3px; margin: 6px auto; width: 72px; position: relative; }
+.hh3d-marker { position: absolute; top: -3px; width: 11px; height: 11px; background: #f3d57a; border-radius: 50%; box-shadow: 0 0 8px #d4af37; }
+.tuzu-3d-wrap::before, .wx3d-wrap::before, .dy3d-wrap::before { display: block; text-align: center; font-size: 10px; font-weight: 700; color: #d4af37; letter-spacing: 2px; text-transform: uppercase; margin: 10px 0 2px; font-family: "Noto Serif SC",serif; }
+.tuzu-3d-wrap::before { content: "Tuv Truv 3D"; }
+.wx3d-wrap::before { content: "Ngu Hanh 3D"; }
+.dy3d-wrap::before { content: "Dai Van 3D"; }
+.wuxing-bars .wx-radar { filter: drop-shadow(0 10px 18px rgba(0,0,0,0.6)) !important; transform: rotateX(12deg) !important; }
+.wuxing-bars .wx-radar-poly { filter: drop-shadow(0 0 9px rgba(212,175,55,0.7)) !important; }
