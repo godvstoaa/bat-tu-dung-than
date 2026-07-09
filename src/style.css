@@ -2699,3 +2699,4 @@ h2.grp[aria-expanded="true"] { color: var(--gold-bright, #f3d57a); }
 .wx-exp-mean { contain: layout; }
 .verdict { contain: layout; }
 main.container { contain: layout; }
+body { contain: layout; }
