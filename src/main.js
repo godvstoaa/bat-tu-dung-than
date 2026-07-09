@@ -5523,7 +5523,10 @@ function runHehun() {
   const R2 = analyze(by, bm, bdy, bh, bmi, bg);
   const h = computeHehun(R1, R2);
   const cls = h.score >= 62 ? 'rate-cat' : h.score >= 45 ? 'rate-mid' : 'rate-hung';
+  const _hhC = { '木':'#5fd870','火':'#ff6a4a','土':'#f0c050','金':'#d8d8e8','水':'#60a8e8' };
+  const hhCA = _hhC[R1.chart.dayMaster.wx] || '#d4af37', hhCB = _hhC[R2.chart.dayMaster.wx] || '#d4af37';
   $('hh-out').innerHTML = `
+    <div class="hh3d"><div class="hh3d-orb" style="--c:${hhCA}"><div class="hh3d-sphere"></div><div class="hh3d-han" style="color:${hhCA}">${R1.chart.dayMaster.wx}</div><div class="hh3d-label">A · ${R1.chart.dayMaster.vi}</div></div><div class="hh3d-bond"><div class="hh3d-score">${h.score}</div><div class="hh3d-bar"><div class="hh3d-marker" style="left:calc(${h.score}% - 5px)"></div></div><div class="hh3d-rating ln-rate ${cls}">${h.rating}</div></div><div class="hh3d-orb" style="--c:${hhCB}"><div class="hh3d-sphere"></div><div class="hh3d-han" style="color:${hhCB}">${R2.chart.dayMaster.wx}</div><div class="hh3d-label">B · ${R2.chart.dayMaster.vi}</div></div></div>
     <div class="hh-head">A ${R1.chart.dayMaster.vi} (${R1.chart.pillars.year.gan}${R1.chart.pillars.year.zhi}) × B ${R2.chart.dayMaster.vi} (${R2.chart.pillars.year.gan}${R2.chart.pillars.year.zhi})
     → <span class="ln-rate ${cls}">${h.rating} (${h.score}/100)</span></div>
     <ul class="zr-reasons">${h.factors.map((f) => `<li>${f}</li>`).join('')}</ul>

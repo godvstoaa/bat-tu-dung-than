@@ -2451,3 +2451,15 @@ button:focus-visible, .lab-btn:focus-visible {
 @keyframes tuzuSway { 0%,100% { transform: rotateY(-22deg) translateZ(15px); } 50% { transform: rotateY(22deg) translateZ(15px); } }
 .wx3d-sphere { box-shadow: 0 0 calc(var(--s) * 0.5 * 1px) var(--c), 0 8px 16px rgba(0,0,0,0.5), inset -4px -7px 12px rgba(0,0,0,0.45), inset 3px 4px 8px rgba(255,255,255,0.2); }
 .vd3d-seal { width: 92px; height: 92px; box-shadow: 0 0 32px rgba(212,175,55,0.6), inset 0 3px 7px rgba(255,255,255,0.4), inset 0 -5px 12px rgba(0,0,0,0.45); }
+
+/* [loop] HỢP TUỔI 3D — 2 element orbs + score gauge */
+.hh3d { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 10px 0; }
+.hh3d-orb { text-align: center; }
+.hh3d-sphere { width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.7), var(--c) 42%, rgba(0,0,0,0.55)); box-shadow: 0 0 18px var(--c), inset -3px -5px 10px rgba(0,0,0,0.4); margin: 0 auto 3px; animation: orbFloat 4.5s ease-in-out infinite; }
+.hh3d-han { font-size: 16px; font-weight: 700; font-family: 'Noto Serif SC', serif; }
+.hh3d-label { font-size: 9px; color: var(--silk-dim, #c9bfa0); }
+.hh3d-bond { text-align: center; min-width: 70px; }
+.hh3d-score { font-size: 30px; font-weight: 700; color: var(--gold-pale, #f7eccb); text-shadow: 0 0 12px rgba(212,175,55,0.4); line-height: 1; }
+.hh3d-bar { height: 5px; background: linear-gradient(90deg, #e0533d, #e8b94a 45%, #3fb86b); border-radius: 3px; margin: 6px auto 4px; width: 72px; position: relative; }
+.hh3d-marker { position: absolute; top: -3px; width: 11px; height: 11px; background: var(--gold-bright, #f3d57a); border-radius: 50%; box-shadow: 0 0 8px var(--gold, #d4af37); }
+.hh3d-rating { font-size: 10px; }
