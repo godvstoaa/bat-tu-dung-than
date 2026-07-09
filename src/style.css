@@ -2726,3 +2726,6 @@ main.container { contain: strict; }
 .hh3d-orb::before { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: radial-gradient(circle, var(--c, transparent), transparent 70%); opacity: 0.1; pointer-events: none; z-index: -1; }
 .hh3d-orb { position: relative; }
 .tuzu-col { overflow: visible; } .tuzu-col > * { position: relative; z-index: 1; }
+.wx3d-sphere { animation: orbFloat 4.5s ease-in-out infinite, orbGlow 3s ease-in-out infinite alternate; }
+@keyframes orbGlow { from { filter: brightness(1); } to { filter: brightness(1.15); } }
+@media (prefers-reduced-motion: reduce) { .wx3d-sphere { animation: none !important; } }
