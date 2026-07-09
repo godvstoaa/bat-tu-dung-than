@@ -637,11 +637,10 @@ function _renderWxRadar(wx, yong, selected) {
 }
 
 // ---------------------------------------------------------------- NGŨ HÀNH
-// [user] NGŨ HÀNH TRUE 3D — Three.js, 5 canvas riêng từng hành, data-driven theo pct
+// [user] NGŨ HÀNH 3D premium — soft PBR + multi-layer flame/tree/mountain/gem/water (không còn cone đồ chơi)
 const _wx3dScenes = [];
 function renderWx3D(wx, yong) {
   if (!wx || !wx.pct) return;
-  // cleanup old scenes (cancel RAF + force-lose WebGL context — tránh blank canvas sau re-render)
   _wx3dScenes.forEach((s) => {
     try { if (s.stop) s.stop(); } catch (_) {}
     try { s.renderer.dispose(); } catch (_) {}
@@ -655,89 +654,196 @@ function renderWx3D(wx, yong) {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const ELEMS = ['木', '火', '土', '金', '水'];
-  const COLORS = { '木': 0x4caf50, '火': 0xff5722, '土': 0xffb300, '金': 0x90a4ae, '水': 0x2196f3 };
+  const COLORS = { '木': 0x5fd870, '火': 0xff6a4a, '土': 0xf0c050, '金': 0xd4af37, '水': 0x60a8e8 };
   const STATUS = (pct) => pct < 5 ? 'Yếu' : pct < 15 ? 'Nhược' : pct < 30 ? 'Trung bình' : pct < 50 ? 'Vượng' : 'Rất vượng';
 
-  function createScene(canvas, type, pct, isDung) {
-    const W = canvas.width, H = canvas.height;
+  const matStd = (opts) => new THREE.MeshStandardMaterial(opts);
+  const matPhong = (opts) => new THREE.MeshPhongMaterial(opts);
+
+  function createScene(canvas, type, pct) {
+    const W = canvas.width || 140, H = canvas.height || 140;
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
-    camera.position.set(0, 1.6, 5.2);
-    camera.lookAt(0, 0.6, 0);
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 100);
+    camera.position.set(0, 1.35, 4.6);
+    camera.lookAt(0, 0.55, 0);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
     renderer.setSize(W, H, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.setClearColor(0x000000, 0);
-    scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-    const dl = new THREE.DirectionalLight(0xffffff, 2.0);
-    dl.position.set(5, 10, 7); scene.add(dl);
-    const dl2 = new THREE.DirectionalLight(0xffeecc, 0.8);
-    dl2.position.set(-5, 5, -3); scene.add(dl2);
+    if (renderer.outputEncoding !== undefined && THREE.sRGBEncoding !== undefined) renderer.outputEncoding = THREE.sRGBEncoding;
+
+    // Ánh sáng studio ấm — không thrash kim loại thành đốm trắng
+    scene.add(new THREE.AmbientLight(0x2a2430, 0.55));
+    const key = new THREE.DirectionalLight(0xfff2d6, 1.15);
+    key.position.set(3.2, 5.5, 4.2); scene.add(key);
+    const fill = new THREE.DirectionalLight(0xa8c4ff, 0.35);
+    fill.position.set(-4, 2.5, -2); scene.add(fill);
+    const rim = new THREE.PointLight(0xd4af37, 0.55, 12);
+    rim.position.set(0, 2.2, 2.5); scene.add(rim);
+
     const group = new THREE.Group(); scene.add(group);
-    const scale = Math.max(0.35, Math.min(1.1, 0.35 + pct / 55));
+    // Scale mềm theo % (không co quá nhỏ khi nhược)
+    const scale = Math.max(0.55, Math.min(1.05, 0.55 + pct / 90));
     group.scale.setScalar(scale);
+    group.position.y = -0.15;
 
-    let parts = null, pdata = null;
+    // Đế hào quang màu hành
+    const glowHue = { '木': 0x2e9e5b, '火': 0xff6a4a, '土': 0xd4a017, '金': 0xd4af37, '水': 0x3b9eff }[type] || 0xd4af37;
+    const pedestal = new THREE.Mesh(
+      new THREE.CircleGeometry(1.35, 48),
+      matStd({ color: glowHue, emissive: glowHue, emissiveIntensity: 0.22, transparent: true, opacity: 0.18, roughness: 1, metalness: 0, side: THREE.DoubleSide })
+    );
+    pedestal.rotation.x = -Math.PI / 2;
+    pedestal.position.y = -0.85;
+    group.add(pedestal);
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(1.05, 1.28, 48),
+      matStd({ color: glowHue, emissive: glowHue, emissiveIntensity: 0.45, transparent: true, opacity: 0.35, roughness: 0.3, metalness: 0.6, side: THREE.DoubleSide })
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = -0.84;
+    group.add(ring);
 
-    if (type === '火') {
-      const flame = new THREE.Mesh(new THREE.ConeGeometry(0.9, 3, 24),
-        new THREE.MeshPhongMaterial({ color: 0xff4500, emissive: 0xff8800, shininess: 8, transparent: true, opacity: 0.9 }));
-      group.add(flame);
-      if (pct > 3) {
-        const n = Math.floor(180 * pct / 100) + 30;
-        const g = new THREE.BufferGeometry();
-        const pos = new Float32Array(n * 3), vel = new Float32Array(n * 3), col = new Float32Array(n * 3);
-        for (let i = 0; i < n; i++) {
-          pos[i*3] = (Math.random()-0.5)*1.4; pos[i*3+1] = Math.random()*0.5-0.3; pos[i*3+2] = (Math.random()-0.5)*1.4;
-          vel[i*3] = (Math.random()-0.5)*0.03; vel[i*3+1] = 0.12+Math.random()*0.14; vel[i*3+2] = (Math.random()-0.5)*0.03;
-          const c = new THREE.Color().setHSL(0.05+Math.random()*0.1, 1, 0.7+Math.random()*0.3);
-          col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
-        }
-        g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-        g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-        parts = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending }));
-        group.add(parts); pdata = { pos, vel, n };
-      }
-    } else if (type === '木') {
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 2.5, 8), new THREE.MeshPhongMaterial({ color: 0x8b5a2b }));
-      trunk.position.y = 0.5; group.add(trunk);
-      const layers = pct < 10 ? 2 : pct < 25 ? 3 : pct < 45 ? 4 : 5;
+    let parts = null, pdata = null, spinMeshes = [];
+
+    if (type === '木') {
+      // Thân gỗ + 3 lớp tán xanh ngọc (không còn cyan plastic)
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.18, 0.28, 1.35, 12),
+        matStd({ color: 0x6b4226, roughness: 0.55, metalness: 0.05 })
+      );
+      trunk.position.y = -0.15; group.add(trunk);
+      const leafColors = [0x1f8a4c, 0x2eb86a, 0x5fd870];
+      const layers = pct < 12 ? 3 : pct < 28 ? 4 : 5;
       for (let i = 0; i < layers; i++) {
-        const leaf = new THREE.Mesh(new THREE.ConeGeometry(1.3 - i * 0.22, 1.6, 8), new THREE.MeshPhongMaterial({ color: 0x22c55e, emissive: 0x1a8c3f }));
-        leaf.position.y = 1.4 + i * 0.7; group.add(leaf);
+        const leaf = new THREE.Mesh(
+          new THREE.ConeGeometry(1.15 - i * 0.16, 1.15, 14),
+          matStd({ color: leafColors[i % 3], emissive: 0x0d3d22, emissiveIntensity: 0.18, roughness: 0.42, metalness: 0.08, flatShading: false })
+        );
+        leaf.position.y = 0.55 + i * 0.52;
+        group.add(leaf);
+        spinMeshes.push(leaf);
       }
+      // Lá rơi nhẹ
+      const n = 18 + Math.floor(pct / 4);
+      const g = new THREE.BufferGeometry();
+      const pos = new Float32Array(n * 3), vel = new Float32Array(n * 3), col = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) {
+        pos[i*3] = (Math.random() - 0.5) * 2; pos[i*3+1] = Math.random() * 2.2; pos[i*3+2] = (Math.random() - 0.5) * 2;
+        vel[i*3] = (Math.random() - 0.5) * 0.01; vel[i*3+1] = -0.008 - Math.random() * 0.01; vel[i*3+2] = (Math.random() - 0.5) * 0.01;
+        const c = new THREE.Color(leafColors[i % 3]); col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
+      }
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+      parts = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.07, vertexColors: true, transparent: true, opacity: 0.85, depthToAttenuation: true }));
+      group.add(parts); pdata = { pos, vel, n, mode: 'leaf' };
+    } else if (type === '火') {
+      // Lửa đa lớp: lõi vàng → cam → đỏ ngoài + spark
+      const layers = [
+        { r: 0.42, h: 2.35, col: 0xfff0a8, em: 0xffe066, op: 0.95, y: 0.15 },
+        { r: 0.68, h: 2.55, col: 0xff8a2b, em: 0xff6a00, op: 0.72, y: 0.05 },
+        { r: 0.95, h: 2.2,  col: 0xe03a1a, em: 0xb81c0a, op: 0.42, y: -0.05 },
+      ];
+      layers.forEach((L, i) => {
+        const flame = new THREE.Mesh(
+          new THREE.ConeGeometry(L.r, L.h, 28, 1, true),
+          matPhong({ color: L.col, emissive: L.em, shininess: 40, transparent: true, opacity: L.op, side: THREE.DoubleSide })
+        );
+        flame.position.y = L.y;
+        flame.rotation.y = i * 0.4;
+        group.add(flame);
+        spinMeshes.push(flame);
+      });
+      // Đế than
+      const base = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.55, 0.7, 0.22, 16),
+        matStd({ color: 0x2a1810, roughness: 0.9, metalness: 0.1, emissive: 0x3a1008, emissiveIntensity: 0.3 })
+      );
+      base.position.y = -0.85; group.add(base);
+      const n = 40 + Math.floor(pct * 1.2);
+      const g = new THREE.BufferGeometry();
+      const pos = new Float32Array(n * 3), vel = new Float32Array(n * 3), col = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) {
+        pos[i*3] = (Math.random()-0.5)*0.9; pos[i*3+1] = Math.random()*0.4-0.4; pos[i*3+2] = (Math.random()-0.5)*0.9;
+        vel[i*3] = (Math.random()-0.5)*0.02; vel[i*3+1] = 0.04+Math.random()*0.08; vel[i*3+2] = (Math.random()-0.5)*0.02;
+        const c = new THREE.Color().setHSL(0.07 + Math.random()*0.06, 1, 0.55 + Math.random()*0.35);
+        col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
+      }
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+      parts = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.09, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true }));
+      group.add(parts); pdata = { pos, vel, n, mode: 'fire' };
     } else if (type === '土') {
-      const m = new THREE.Mesh(new THREE.ConeGeometry(2.2, 3.8, 8), new THREE.MeshPhongMaterial({ color: 0xb45309, flatShading: true }));
-      group.add(m);
-      if (pct > 15) for (let i = 0; i < 5; i++) {
-        const r = new THREE.Mesh(new THREE.ConeGeometry(0.35+Math.random()*0.25, 0.7, 6), new THREE.MeshPhongMaterial({ color: 0xa16207, flatShading: true }));
-        r.position.set((Math.random()-0.5)*1.6, 0.8+Math.random()*1.2, (Math.random()-0.5)*1.6);
-        r.rotation.set(Math.random(),Math.random(),Math.random()); group.add(r);
+      // Núi thổ amber + đỉnh sáng + đá nhỏ
+      const body = new THREE.Mesh(
+        new THREE.ConeGeometry(1.55, 2.55, 7),
+        matStd({ color: 0xc4892a, roughness: 0.78, metalness: 0.12, flatShading: true, emissive: 0x3a2208, emissiveIntensity: 0.12 })
+      );
+      body.position.y = 0.2; group.add(body);
+      const cap = new THREE.Mesh(
+        new THREE.ConeGeometry(0.72, 1.05, 6),
+        matStd({ color: 0xf3d27a, roughness: 0.45, metalness: 0.25, flatShading: true, emissive: 0xb8860b, emissiveIntensity: 0.25 })
+      );
+      cap.position.y = 1.35; group.add(cap);
+      for (let i = 0; i < 4; i++) {
+        const rock = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(0.18 + Math.random() * 0.12, 0),
+          matStd({ color: 0x8b6914, roughness: 0.85, metalness: 0.05, flatShading: true })
+        );
+        const a = (i / 4) * Math.PI * 2 + 0.3;
+        rock.position.set(Math.cos(a) * 1.05, -0.55, Math.sin(a) * 1.05);
+        rock.rotation.set(Math.random(), Math.random(), Math.random());
+        group.add(rock);
       }
+      spinMeshes.push(body, cap);
     } else if (type === '金') {
-      const metal = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 1),
-        new THREE.MeshPhongMaterial({ color: 0xe2e8f0, specular: 0xffffff, shininess: 140, emissive: 0x888899 }));
-      group.add(metal);
-      if (pct > 5) {
-        const n = Math.floor(80 * pct / 100) + 25;
-        const g = new THREE.BufferGeometry(); const pos = new Float32Array(n * 3);
-        for (let i = 0; i < n; i++) { pos[i*3]=(Math.random()-0.5)*2.2; pos[i*3+1]=(Math.random()-0.5)*2.2; pos[i*3+2]=(Math.random()-0.5)*2.2; }
-        g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-        parts = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.08, color: 0xffffff, transparent: true, blending: THREE.AdditiveBlending }));
-        group.add(parts);
+      // Ngọc kim vàng — không trắng lóa
+      const gem = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(1.05, 1),
+        matStd({ color: 0xe8d48b, roughness: 0.18, metalness: 0.92, emissive: 0x5a4810, emissiveIntensity: 0.15 })
+      );
+      group.add(gem); spinMeshes.push(gem);
+      const core = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.42, 0),
+        matStd({ color: 0xfff6d0, roughness: 0.08, metalness: 1, emissive: 0xd4af37, emissiveIntensity: 0.55 })
+      );
+      group.add(core); spinMeshes.push(core);
+      const n = 28 + Math.floor(pct / 3);
+      const g = new THREE.BufferGeometry();
+      const pos = new Float32Array(n * 3), vel = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) {
+        const th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1), rr = 1.3 + Math.random() * 0.5;
+        pos[i*3] = rr * Math.sin(ph) * Math.cos(th); pos[i*3+1] = rr * Math.cos(ph); pos[i*3+2] = rr * Math.sin(ph) * Math.sin(th);
+        vel[i*3] = th; vel[i*3+1] = 0.004 + Math.random() * 0.006; vel[i*3+2] = ph;
       }
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      parts = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.055, color: 0xffe9a0, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true }));
+      group.add(parts); pdata = { pos, vel, n, mode: 'orbit' };
     } else if (type === '水') {
-      const drop = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 28),
-        new THREE.MeshPhongMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.85, shininess: 90 }));
-      drop.scale.set(0.6, 1.3, 0.6); group.add(drop);
-      if (pct > 3) {
-        const n = Math.floor(120 * pct / 100) + 20;
-        const g = new THREE.BufferGeometry(); const pos = new Float32Array(n * 3), vel = new Float32Array(n * 3);
-        for (let i = 0; i < n; i++) { pos[i*3]=0; pos[i*3+1]=1.2; pos[i*3+2]=0; vel[i*3]=(Math.random()-0.5)*0.2; vel[i*3+1]=0.3+Math.random()*0.35; vel[i*3+2]=(Math.random()-0.5)*0.2; }
-        g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-        parts = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.1, color: 0x67e8f9, transparent: true, blending: THREE.AdditiveBlending }));
-        group.add(parts); pdata = { pos, vel, n };
+      // Giọt nước sapphire + vòng sóng
+      const drop = new THREE.Mesh(
+        new THREE.SphereGeometry(0.85, 36, 36),
+        matStd({ color: 0x1e8fd6, roughness: 0.12, metalness: 0.35, transparent: true, opacity: 0.82, emissive: 0x0a3a6a, emissiveIntensity: 0.25 })
+      );
+      drop.scale.set(0.72, 1.22, 0.72);
+      drop.position.y = 0.15;
+      group.add(drop); spinMeshes.push(drop);
+      const highlight = new THREE.Mesh(
+        new THREE.SphereGeometry(0.22, 16, 16),
+        matStd({ color: 0xffffff, roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.45, emissive: 0xa8e0ff, emissiveIntensity: 0.4 })
+      );
+      highlight.position.set(-0.22, 0.55, 0.35);
+      group.add(highlight);
+      const n = 30 + Math.floor(pct);
+      const g = new THREE.BufferGeometry();
+      const pos = new Float32Array(n * 3), vel = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) {
+        pos[i*3] = (Math.random()-0.5)*0.5; pos[i*3+1] = 0.8 + Math.random()*0.6; pos[i*3+2] = (Math.random()-0.5)*0.5;
+        vel[i*3] = (Math.random()-0.5)*0.015; vel[i*3+1] = -0.02 - Math.random()*0.03; vel[i*3+2] = (Math.random()-0.5)*0.015;
       }
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      parts = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.07, color: 0x9ad8ff, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true }));
+      group.add(parts); pdata = { pos, vel, n, mode: 'water' };
     }
 
     let time = 0, raf = null, alive = true;
@@ -746,16 +852,40 @@ function renderWx3D(wx, yong) {
       raf = requestAnimationFrame(animate);
       time += 0.016;
       if (!reduced) {
-        group.rotation.y = Math.sin(time * 0.5) * 0.08 + time * 0.0015;
-        group.scale.setScalar(scale * (1 + Math.sin(time * 2) * 0.012));
+        group.rotation.y = Math.sin(time * 0.35) * 0.12 + time * 0.12;
+        if (type === '火') {
+          spinMeshes.forEach((m, i) => {
+            m.scale.y = 1 + Math.sin(time * (4 + i)) * 0.06;
+            m.scale.x = 1 + Math.sin(time * (3.2 + i) + 1) * 0.04;
+            m.rotation.y += 0.01 * (i + 1);
+          });
+        } else if (type === '金') {
+          spinMeshes.forEach((m, i) => { m.rotation.y += 0.008 + i * 0.004; m.rotation.x = Math.sin(time * 0.6) * 0.08; });
+        } else if (type === '水') {
+          spinMeshes.forEach((m) => { m.scale.y = 1.22 + Math.sin(time * 2.2) * 0.04; });
+        }
+        ring.scale.setScalar(1 + Math.sin(time * 1.8) * 0.04);
       }
-      if ((type === '火' || type === '水') && parts && pdata) {
-        const p = pdata.pos, v = pdata.vel;
+      if (parts && pdata) {
+        const p = pdata.pos, v = pdata.vel, mode = pdata.mode;
         for (let i = 0; i < pdata.n; i++) {
-          p[i*3] += v[i*3]; p[i*3+1] += v[i*3+1]; p[i*3+2] += v[i*3+2];
-          v[i*3+1] -= type === '火' ? 0.003 : 0.012;
-          if (type === '火' && p[i*3+1] > 3.5) { p[i*3]=(Math.random()-0.5)*1.4; p[i*3+1]=-1; p[i*3+2]=(Math.random()-0.5)*1.4; v[i*3+1]=0.12+Math.random()*0.14; }
-          if (type === '水' && p[i*3+1] < -2.2) { p[i*3]=0; p[i*3+1]=1.2; p[i*3+2]=0; v[i*3]=(Math.random()-0.5)*0.2; v[i*3+1]=0.3+Math.random()*0.35; v[i*3+2]=(Math.random()-0.5)*0.2; }
+          if (mode === 'fire') {
+            p[i*3] += v[i*3]; p[i*3+1] += v[i*3+1]; p[i*3+2] += v[i*3+2];
+            v[i*3+1] -= 0.0012;
+            if (p[i*3+1] > 2.4) { p[i*3]=(Math.random()-0.5)*0.8; p[i*3+1]=-0.5; p[i*3+2]=(Math.random()-0.5)*0.8; v[i*3+1]=0.04+Math.random()*0.08; }
+          } else if (mode === 'water') {
+            p[i*3] += v[i*3]; p[i*3+1] += v[i*3+1]; p[i*3+2] += v[i*3+2];
+            if (p[i*3+1] < -0.9) { p[i*3]=(Math.random()-0.5)*0.4; p[i*3+1]=1.1; p[i*3+2]=(Math.random()-0.5)*0.4; v[i*3+1]=-0.02-Math.random()*0.03; }
+          } else if (mode === 'leaf') {
+            p[i*3] += v[i*3]; p[i*3+1] += v[i*3+1]; p[i*3+2] += v[i*3+2];
+            if (p[i*3+1] < -0.9) { p[i*3]=(Math.random()-0.5)*1.6; p[i*3+1]=2.2; p[i*3+2]=(Math.random()-0.5)*1.6; }
+          } else if (mode === 'orbit') {
+            v[i*3] += v[i*3+1];
+            const rr = 1.35, th = v[i*3], ph = v[i*3+2] + time * 0.15;
+            p[i*3] = rr * Math.sin(ph) * Math.cos(th);
+            p[i*3+1] = rr * Math.cos(ph) * 0.7;
+            p[i*3+2] = rr * Math.sin(ph) * Math.sin(th);
+          }
         }
         parts.geometry.attributes.position.needsUpdate = true;
       }
@@ -773,29 +903,30 @@ function renderWx3D(wx, yong) {
     const isDung = w === (yong && yong.primary);
     const color = '#' + COLORS[w].toString(16).padStart(6, '0');
     const st = STATUS(pct);
-    return `<div data-wx="${w}" role="button" tabindex="0" style="flex:1;min-width:0;text-align:center;cursor:pointer;padding:4px 0;position:relative;">
-      ${isDung ? '<div style="position:absolute;top:0;right:4px;font-size:10px;color:#c0392b;text-shadow:0 0 4px #c0392b;z-index:2">★DỤNG</div>' : ''}
-      <div style="font-size:15px;font-weight:700;font-family:'Noto Serif SC',serif;color:${color};margin-bottom:2px">${w}</div>
-      <canvas data-wx3d-canvas="${w}" width="140" height="140" style="width:100%;max-width:140px;border-radius:12px;"></canvas>
-      <div style="font-size:8px;font-weight:600;color:${color};margin-top:2px">${st}</div>
-      <div style="font-size:12px;font-weight:700;color:${color}">${pct}%</div>
-      <div style="font-size:8px;color:var(--silk-dim,#c9b896)">${WX_VI[w]}</div>
+    const glow = isDung ? `box-shadow:0 0 18px ${color}44, inset 0 0 0 1px ${color}55;` : 'box-shadow:inset 0 0 0 1px rgba(212,175,55,0.12);';
+    return `<div data-wx="${w}" role="button" tabindex="0" class="wx3d-col" style="flex:1;min-width:0;text-align:center;cursor:pointer;padding:8px 4px 6px;position:relative;border-radius:14px;${glow}transition:transform .2s ease,box-shadow .2s ease;">
+      ${isDung ? `<div style="position:absolute;top:4px;right:6px;font-size:9px;font-weight:700;letter-spacing:.04em;color:#ff6b5a;text-shadow:0 0 8px #ff6b5a88;z-index:2">★DỤNG</div>` : ''}
+      <div style="font-size:18px;font-weight:700;font-family:'Noto Serif SC',serif;color:${color};margin-bottom:2px;text-shadow:0 0 12px ${color}66">${w}</div>
+      <canvas data-wx3d-canvas="${w}" width="160" height="160" style="width:100%;max-width:150px;height:auto;aspect-ratio:1;border-radius:16px;display:block;margin:0 auto;background:radial-gradient(ellipse at 50% 70%,${color}14 0%,transparent 70%);"></canvas>
+      <div style="font-size:10px;font-weight:600;color:${color};margin-top:4px;opacity:.9">${st}</div>
+      <div style="font-size:14px;font-weight:700;color:${color};font-variant-numeric:tabular-nums">${pct}%</div>
+      <div style="font-size:11px;color:var(--silk-dim,#c9b896);margin-top:1px">${WX_VI[w]}</div>
     </div>`;
   }).join('');
 
   const wrap = document.createElement('div');
-  wrap.style.cssText = 'margin:8px 0;padding:8px 2px;background:linear-gradient(180deg,rgba(212,175,55,0.03),transparent);border-radius:8px;';
-  wrap.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px">${cols}</div>`;
+  wrap.className = 'wx3d-wrap';
+  wrap.style.cssText = 'margin:10px 0 14px;padding:12px 8px 10px;background:linear-gradient(180deg,rgba(212,175,55,0.06),rgba(0,0,0,0.18));border:1px solid rgba(212,175,55,0.14);border-radius:16px;';
+  wrap.innerHTML = `<div style="display:flex;align-items:flex-end;gap:6px">${cols}</div>`;
   wrap.setAttribute('data-wx3d', '');
   const wux = $('wuxing');
   if (wux && wux.parentNode) {
     const old = wux.parentNode.querySelector('[data-wx3d]');
     if (old) old.remove();
     wux.parentNode.insertBefore(wrap, wux);
-    // init Three.js scenes — type must be 木/火/土/金/水 (createScene compares Chinese keys)
     ELEMS.forEach((w) => {
       const c = wrap.querySelector('canvas[data-wx3d-canvas="' + w + '"]');
-      if (c) createScene(c, w, wx.pct[w] || 0, w === (yong && yong.primary));
+      if (c) createScene(c, w, wx.pct[w] || 0);
     });
     wrap.addEventListener('click', (e) => {
       const col = e.target.closest('[data-wx]'); if (!col) return;
