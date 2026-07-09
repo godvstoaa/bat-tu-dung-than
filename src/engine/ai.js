@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT } from './kb.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
@@ -631,6 +631,22 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "ĐÀO HOA 桃花: " + peachZhi + (dayZhiIsPeach ? " (NHẬT CHI LÀ ĐÀO HOA → duyên bẩm sinh mạnh)" : "") + ". " + PEACH_NOTE + "\n" +
       "GIAI ĐOẠN ĐỜI " + ageRange + ": " + decadeTheme;
   } catch (e) { brief += "\n--- HÔN NHÂN + TÀI VẬN: [lỗi load] ---"; }
+
+  // ---- [round 3] LƯU NIÊN CHI TIẾT + PHONG THỦY THỰC DỤNG + DƯỠNG SINH ----
+  try {
+    const dungWx = R.yong?.primary || '';
+    const curYearGan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'][(_now.getFullYear() - 4) % 10];
+    const curYearZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][(_now.getFullYear() - 4) % 12];
+    const ganEff = ANNUAL_GANZHI_EFFECT[curYearGan] || null;
+    const zhiEff = ANNUAL_ZHI_EFFECT[curYearZhi] || null;
+    const fs = FENGSHUI_PRACTICAL[dungWx] || null;
+    const qg = QIGONG_BY_ELEMENT[dungWx] || null;
+    brief += "\n--- LƯU NIÊN + PHONG THỦY + DƯỠNG SINH (round 3) ---\n" +
+      "LƯU NIÊN " + _now.getFullYear() + " " + curYearGan + curYearZhi + ": can " + curYearGan + (ganEff ? " → " + ganEff.effect : '') + " | chi " + curYearZhi + (zhiEff ? " → " + zhiEff.effect : '') + "\n" +
+      "PHONG THỦY DỤNG=" + (WX_VI[dungWx] || dungWx) + ": " + (fs ? "Hướng: " + fs.direction + " | Màu: " + fs.colors + " | Số: " + fs.numbers + " | Vật phẩm: " + fs.items + " | Tránh: " + fs.avoid + " | Mẹo: " + fs.tip : '(không)') + "\n" +
+      "12 PHÁP CẢI VẬN: " + TWELVE_LUCK_METHODS.slice(0, 4).map(m => m.name).join(", ") + "... (hỏi chi tiết để nhận đầy đủ)\n" +
+      "DƯỠNG SINH: " + (qg || '(không)');
+  } catch (e) { brief += "\n--- LƯU NIÊN + PHONG THỦY: [lỗi load] ---"; }
 
   if (fcParts.length) {
     brief += '\n--- DỰ BÁO & THỜI ĐIỂM ---\n' + fcParts.join('\n');

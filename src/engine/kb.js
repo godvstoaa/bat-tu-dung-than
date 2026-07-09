@@ -791,3 +791,107 @@ export const DECADE_LIFE_THEMES = {
   '61-70t': 'Vãn niên — sức khỏe, phúc đức, hưởng thụ. Ưu tiên: Ấn + Thực thần.',
   '71+': 'Cao niên — tâm linh, di sản, an hưởng. Ưu tiên: Thủy (trí tuệ) + Ấn.',
 };
+
+// ============================================================
+//  ROUND 3 CRAWL — lưu niên chi tiết + phong thủy thực dụng
+//  Nguồn: therainbow.hk, discoveringrncp.hk, wenyistudio.com, zhihu, 163.com
+// ============================================================
+
+// ---- LƯU NIÊN: từng năm 干支 → ngũ hành → tác động ----
+export const ANNUAL_GANZHI_EFFECT = {
+  '甲': { wx: '木', effect: 'năm Mộc — sinh trưởng, học hỏi, kế hoạch dài hạn. Thuận: cần Mộc/Khắc Thổ. Kỵ: Mộc vượng thêm.' },
+  '乙': { wx: '木', effect: 'năm Âm Mộc — mềm mại, ngoại giao, nuôi dưỡng. Khác 甲: từ từ, tinh tế hơn.' },
+  '丙': { wx: '火', effect: 'năm Dương Hỏa — rực rỡ, bộc lộ, danh tiếng. Thuận: cần Hỏa. Kỵ: Hỏa quá thiêu tài.' },
+  '丁': { wx: '火', effect: 'năm Âm Hỏa — ấm áp, chiếu sáng, tâm linh. Thuận: cần Hỏa nhẹ. Kỵ: Hỏa trêu cợt Kim.' },
+  '戊': { wx: '土', effect: 'năm Dương Thổ — ổn định, bất động sản, xây dựng. Thuận: cần Thổ. Kỵ: Thổ chôn Mộc/Thủy.' },
+  '己': { wx: '土', effect: 'năm Âm Thổ — nuôi dưỡng, bao dung, nông nghiệp. Thuận: cần Thổ ẩm.' },
+  '庚': { wx: '金', effect: 'năm Dương Kim — quyết đoán, cải cách, luật pháp. Thuận: cần Kim. Kỵ: Kim khắc Mộc.' },
+  '辛': { wx: '金', effect: 'năm Âm Kim — trang sức, thẩm mỹ, tinh xảo. Thuận: cần Kim nhẹ.' },
+  '壬': { wx: '水', effect: 'năm Dương Thủy — lưu thông, giao dịch, trí tuệ. Thuận: cần Thủy. Kỵ: Thủy quá ngập.' },
+  '癸': { wx: '水', effect: 'năm Âm Thủy — mưa móc, nhu thuận, ẩn mình. Thuận: cần Thủy nhẹ.' },
+};
+
+// ---- 12 ĐỊA CHI NĂM → xung/hợp với tuổi ----
+export const ANNUAL_ZHI_EFFECT = {
+  '子': { effect: 'Tý — Thủy vượng. Xung Ngọ, hợp Sửu/Thân/Thìn. Đào hoa nhóm Thân-Tý-Thìn.' },
+  '丑': { effect: 'Sửu — Thổ ẩm. Xung Mùi, hợp Tý/Tỵ/Dậu. Kim khố.' },
+  '寅': { effect: 'Dần — Mộc vượng. Xung Thân, hợp Hợi/Mão/Mùi. Khởi đầu mùa xuân.' },
+  '卯': { effect: 'Mão — Mộc cực vượng. Xung Dậu, hợp Tuất/Hợi/Mùi. Đào hoa.' },
+  '辰': { effect: 'Thìn — Thổ ẩm. Xung Tuất, hợp Dậu/Tý/Thân. Thủy khố.' },
+  '巳': { effect: 'Tỵ — Hỏa khởi. Xung Hợi, hợp Thân/Dậu/Sửu.' },
+  '午': { effect: 'Ngọ — Hỏa cực vượng. Xung Tý, hợp Mùi/Dần/Tuất. Đào hoa.' },
+  '未': { effect: 'Mùi — Thổ khô. Xung Sửu, hợp Ngọ/Mão/Hợi. Mộc khố.' },
+  '申': { effect: 'Thân — Kim khởi. Xung Dần, hợp Tý/Thìn/Tỵ.' },
+  '酉': { effect: 'Dậu — Kim cực. Xung Mão, hợp Thìn/Tỵ/Sửu. Đào hoa.' },
+  '戌': { effect: 'Tuất — Thổ khô. Xung Thìn, hợp Mão/Dần/Ngọ. Hỏa khố.' },
+  '亥': { effect: 'Hợi — Thủy khởi. Xung Tỵ, hợp Dần/Mão/Mùi.' },
+};
+
+// ---- PHONG THỦY THỰC DỤNG theo ngũ hành Dụng Thần ----
+export const FENGSHUI_PRACTICAL = {
+  '木': {
+    direction: 'Đông / Đông Nam',
+    colors: 'Xanh lá, xanh ngọc, nâu xanh',
+    numbers: '3, 8',
+    items: 'cây xanh, gỗ, giấy, sách',
+    avoid: 'kim loại (đồ kim cắt Mộc), quá nhiều Hỏa',
+    tip: 'Đặt cây cảnh ở phương Đông. Ngủ quay đầu Đông. Mặc xanh lá. Nuôi thú lông.',
+  },
+  '火': {
+    direction: 'Nam',
+    colors: 'Đỏ, hồng, cam, tím',
+    numbers: '2, 7',
+    items: 'đèn sáng, nến, đồ điện tử, ảnh gia đình',
+    avoid: 'nước (Thủy khắc Hỏa), quá nhiều đất',
+    tip: 'Đèn sáng ở phương Nam. Màu đỏ trong phòng khách. Hình tam giác.',
+  },
+  '土': {
+    direction: 'Trung tâm / Đông Bắc / Tây Nam',
+    colors: 'Vàng, nâu, be, vàng kem',
+    numbers: '5, 0',
+    items: 'gốm sứ, đá, pha lê, đồ bằng đất',
+    avoid: 'gỗ (Mộc khắc Thổ), quá nhiều kim loại',
+    tip: 'Pha lê ở trung tâm nhà. Gốm sứ trang trí. Hình vuông.',
+  },
+  '金': {
+    direction: 'Tây / Tây Bắc',
+    colors: 'Trắng, xám, bạc, vàng kim',
+    numbers: '4, 9',
+    items: 'kim loại, đồng hồ, chuông, đồ sắc bén',
+    avoid: 'lửa (Hỏa khắc Kim), quá nhiều nước',
+    tip: 'Đồng hồ kim loại ở phương Tây. Đồ inox/bạc. Hình tròn.',
+  },
+  '水': {
+    direction: 'Bắc',
+    colors: 'Đen, navy, xanh đậm, xám than',
+    numbers: '1, 6',
+    items: 'nước, bể cá, đài phun nước, gương',
+    avoid: 'đất (Thổ khắc Thủy), quá nhiều cây',
+    tip: 'Bể cá/đài phun ở phương Bắc. Gương phản chiếu. Sóng/uốn lượn.',
+  },
+};
+
+// ---- CẢI VẬN 12 PHÁP (12 ways to improve luck) ----
+export const TWELVE_LUCK_METHODS = [
+  { name: 'Đổi hướng ngủ', detail: 'Quay đầu ngủ về hướng Dụng Thần (Đông=Mộc, Nam=Hỏa, Tây=Kim, Bắc=Thủy, Trung tâm=Thổ). 1/3 đời nằm ngủ = hấp th năng lượng 8 tiếng/ngày.' },
+  { name: 'Màu sắc', detail: 'Mặc/đeo/trang trí màu Dụng Thần. Ảnh hưởng thị giác + tâm lý + năng lượng.' },
+  { name: 'Phương vị', detail: 'Làm việc/ngồi hướng Dụng Thần. Bàn làm việc, ghế, giường — hướng tiếp nhận năng lượng.' },
+  { name: 'Số điện thoại', detail: 'Số đuôi hợp ngũ hành Dụng (1,6=Thủy; 2,7=Hỏa; 3,8=Mộc; 4,9=Kim; 5,0=Thổ).' },
+  { name: 'Thức - ngủ', detail: 'Giờ Dụng = giờ hành đó vượng (Tý/Hợi=Thủy, Ngọ/Tỵ=Hỏa, Dần/Mão=Mộc, Thân/Dậu=Kim, Thìn/Tuất/Sửu/Mùi=Thổ). Thức lúc đó = hấp th.' },
+  { name: 'Ăn uống', detail: 'Thực phẩm ngũ hành: xanh/chua=Mộc, đỏ/cay=Hỏa, vàng/ngọt=Thổ, trắng/cay(Kim)=Kim, đen/mặn=Thủy.' },
+  { name: 'Vận động', detail: 'Mộc: đi bộ/yoga; Hỏa: chạy/Cardio; Thổ: leo núi; Kim: tạ/đấu; Thủy: bơi/đạp xe.' },
+  { name: 'Nghề nghiệp', detail: 'Nghề thuộc hành Dụng: Mộc=giáo dục/nông; Hỏa=IT/nghệ thuật; Thổ=BĐS/xây; Kim=tài chính/kỹ thuật; Thủy=giao thông/logistics.' },
+  { name: 'Bạn bè', detail: 'Kết giao người mang Dụng Thần (xem lá số họ). Quý nhân tự đến.' },
+  { name: 'Từ thiện', detail: 'Tích đức = cải vận cốt lõi. 「了凡四训」: nghịch thiên bằng thiện hạnh.' },
+  { name: 'Tu học', detail: 'Học vấn/mở mang = Ấn (dưỡng Mộc/Thủy). Tri thức = năng lượng bền vững.' },
+  { name: 'Phong thủy không gian', detail: 'Bố trí nhà theo Dụng Thần: hướng cửa, vị trí giường/bàn, màu tường, vật phẩm hóa giải.' },
+];
+
+// ---- DƯỠNG SINH:气功/ дыхание theo ngũ hành ----
+export const QIGONG_BY_ELEMENT = {
+  '木': 'Hít thở: hít vào sâu (sinh trưởng như cây), thở ra nhẹ. Tập: kéo giãn cơ, vươn người. Giờ tốt: 3-7h sáng (Dần-Mão).',
+  '火': 'Hít thở: hít nhanh, thở mạnh (như lửa bùng). Tập: tim mở rộng, cardio. Giờ tốt: 9-13h (Tỵ-Ngọ).',
+  '土': 'Hít thở: hít đều, thở chậm (ổn định như đất). Tập: đứng yên/thái cực, tập trung trung tâm. Giờ tốt: 7-9h sáng (Thìn).',
+  '金': 'Hít thở: hít ngắn, thở dứt khoát (sắc bén như dao). Tập: thở bụng sâu, bài tập phổi. Giờ tốt: 3-7h sáng (Dậu-Tuất).',
+  '水': 'Hít thở: hít sâu, thở chảy (uyển chuyển như nước). Tập: bơi, duỗi người. Giờ tốt: 15-19h (Thân-Dậu).',
+};
