@@ -1242,3 +1242,44 @@ export const MONTHLY_THEME_GUIDE = {
   winter: { vi: "Dong (3 thang)", focus: "Thuy vuong — an tinh, luu tru, chuan bi, nghi ngoi, tam linh" },
   transition: { vi: "Chuyen mua", focus: "Tho vuong — on dinh, bao dung, tieu hoa, chuyen giao" },
 };
+// ROUND 12: Nayin 30 types + Thai Tue interaction
+export const NAYIN_PERSONALITY = {
+  "HaiZhongJin": { vi: "Kim Trong Bien", meaning: "tai an giau, can dung kien thuc/kinh nghiem moi toi sang. Can dai nhan ho tro." },
+  "JianFengJin": { vi: "Kim Them Che", meaning: "sac ben, quyet doan, dut dao. Nghe luat/quan su/phau thuat." },
+  "BaiLaJin": { vi: "Bach La Kim", meaning: "trang suc — tinh te, nghe thuat, mong manh dep." },
+  "ShaZhongJin": { vi: "Kim Trong Cat", meaning: "tiem nang tho, can tinh che." },
+  "JinBoJin": { vi: "Kim Bac Vang", meaning: "sang ben ngoai, mong manh dep ben trong." },
+  "ChaiChuanJin": { vi: "Kim Tram Xuyen", meaning: "tinh te, trang tri, thanh lich." },
+  "LuZhongHuo": { vi: "Hoa Trong Lo", meaning: "am ap, manh, can nhien lieu (moc) de duy tri." },
+  "ShanTouHuo": { vi: "Hoa Dinh Nui", meaning: "chieu sang lon, bung no nhanh, mau tat." },
+  "PiLiHuo": { vi: "Hoa Set", meaning: "dot phat, Dien sach, kho luong." },
+  "ShanXiaHuo": { vi: "Hoa Chan Nui", meaning: "am ap on dinh, thuc te, kien tri." },
+  "FuDengHuo": { vi: "Hoa Den", meaning: "tap trung, chieu sang trong toi, tam linh." },
+  "TianShangHuo": { vi: "Hoa Tren Troi", meaning: "uy quyen, chieu xa, anh huong rong." },
+  "DaLinMu": { vi: "Moc rung lon", meaning: "tap the, phat trien deu, bao ve." },
+  "SongBaiMu": { vi: "Moc Thong Bang", meaning: "xanh quanh nam, kien cuong, ngay le." },
+  "YangLiuMu": { vi: "Moc Lieu", meaning: "ung bien, mem mai, nhuong bo." },
+  "ShiLiuMu": { vi: "Moc Luu", meaning: "co trai gia tri, can trong moi." },
+  "PingDiMu": { vi: "Moc Dong Bang", meaning: "goc tham, kien nhan yen lang." },
+  "SangZheMu": { vi: "Moc Duong", meaning: "soi cung, chiu kho, thuc dung." },
+  "JianXiaShui": { vi: "Thuy Khe Non", meaning: "suoi an, chieu sau, kien nhan." },
+  "ChangLiuShui": { vi: "Thuy Dai Luu", meaning: "chay lien, dong luc kien cuong." },
+  "TianHeShui": { vi: "Thuy Tinh Ha", meaning: "nuoc troi, thanh tinh, phuc khi." },
+  "JingQuanShui": { vi: "Thuy Gieng", meaning: "yem, sau, nuoi song." },
+  "DaHaiShui": { vi: "Thuy Bien Lon", meaning: "rộng lon, manh, bat cuong." },
+  "LuPangTu": { vi: "Tho Ben Duong", meaning: "ho tro, phuc vu cong, de tiep can." },
+  "ChengTouTu": { vi: "Tho Thanh Noi", meaning: "bao ve, co cau, phong ngu." },
+  "BiShangTu": { vi: "Tho Tuong", meaning: "doc lap, chiu dung yen lang." },
+  "DaYiTu": { vi: "Tho Tram", meaning: "giao thong, lien lac, ket noi." },
+  "WuShangTu": { vi: "Tho Mai Nha", meaning: "cap lang, gia dinh, nen tang." },
+  "BiShangTu2": { vi: "Tho Dat Rung", meaning: "phan dau yen binh." },
+};
+
+export const TAISUI_EFFECT = [
+  'Thai Tue (Thai Tuy) = chi nam nay ke voi chi nam sinh → xung Thai Tuy: nam bien dong lon (chuyen viec/chuyen nha/loi nhuan/suc khoe).'
+  'Xung: Ty<->Ngo, Suuse<->Mui, Dan<->Than, Mao<->Dau, Thin<->Tuat, Ty<->Hoi. 6 cap xung chi.'
+  'Thai Tuy khong phai xau hoan toan: neu mang Dung → bien dong dep. Mang Ky → bien dong kho.'
+  'Hai: chi nam hai ke vi chi nam sinh (vd: dan sinh gap Mao = hai). Nhe hon xung.'
+  'Pha: chi nam khac chi cua cung (vd: Thin gap Tuat = pha). Nhe.'
+  'Xung+Dung = nam bien dong dep. Xung+Ky = nam kho. Khong xung = nam on.'
+];
