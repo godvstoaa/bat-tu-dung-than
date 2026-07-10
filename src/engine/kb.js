@@ -1219,8 +1219,8 @@ export const ZIWEI_AUX_STARS = {
 };
 
 export const ZIWEI_AUX_PRINCIPLES = [
-  "Sao khong co tot/xau tuyet doi — moi sao la modifier, hieu ung phu thuoc cung + chinh tinh + tu hoa."
-  "Sat tinh dung dung: quan su/kinh doanh mao hien/phau thuat = canh sat tinh de co canh.",
+  'Sao khong co tot/xau tuyet doi — moi sao la modifier, hieu ung phu thuoc cung + chinh tinh + tu hoa.',
+  'Sat tinh dung dung: quan su/kinh doanh mao hien/phau thuat = canh sat tinh de co canh.',
   "Cat tinh qua nhieu cung Phu The = hoa don hon nhan (ngoai tinh).",
   "Dia Khong/Dia Kiep = VUA sat tinh — lam yeu ca cat lan lan sat, co the dung de diet sat nhung cung diet cat.",
   "Khi Duong + Hoa Tinh = bom no (nguy hiem). Linh Tinh + Da La = am uom thu dai.",
