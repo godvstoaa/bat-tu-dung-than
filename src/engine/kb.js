@@ -1466,3 +1466,66 @@ export const CEZI_METHOD = [
   "Buoc 5: Y nghia tong hop: chu tot cho van nao? xau cho van nao?",
   "Ung dung: chon ten con, chon ten cong ty, chon chu may men, xem 1 chu bat ky.",
 ];
+
+// ROUND 18: hehun 4 chieu + 8 trai phong thuy + qi men brief
+export const HEHUN_4_DIMENSIONS = {
+  wxComplement: {
+    vi: "Ngu Hanh Bo Xung",
+    principle: "Menh A thieu hanh X → B co nhieu X = BO XUNG. Khong phai giong nhau ma la BO TRO.",
+    good: "A yeu Thuy, B co nhieu Thuy. A yeu Hoa, B co nhieu Hoa → bo tro tot.",
+    bad: "Ca 2 cung yeu cung 1 hanh → cung thieu → KHONG bo tro, ca 2 kho.",
+    score: "+15 (bo xung tot) / -10 (cung thieu) / +0 (trung tinh)",
+  },
+  dayPillar: {
+    vi: "Nhat Tru Phoi Hop",
+    principle: "Can A + Can B: thien hop (甲己/乙庚/丙辛/丁壬/戊癸) = tot nhat. Tuong sinh = tot. Xung/khac = xau.",
+    good: "Thien can ngu hop + chi ngu hop = thuong hon. Can tuong sinh = phu the ai tinh.",
+    bad: "Thien khac dia xung (天克地冲) = bien dong lon. Hinh/hai = xau.",
+    score: "+20 (ngu hop) / +10 (tuong sinh) / -15 (khac/xung) / -10 (hinh/hai)",
+  },
+  spouseStar: {
+    vi: "Phoi Nguu Tinh",
+    principle: "Nam: Chinh Tai = vo. Nu: Chinh Quan = chong. Tinh vung/khong xung = hon nhan on.",
+    good: "Sao phoi ngau vung + khong bi khac/xung = vo/chong tot, gia dinh on.",
+    bad: "Sao phoi ngau yeu/bi xung/khac = vo/chong suc yeu/duyen ngoai. Thuong quan kiem quan = phan bien.",
+    score: "+10 (sao vung) / -10 (sao yeu/xung) / -5 (khong co sao)",
+  },
+  spousePalace: {
+    vi: "Phoi Nguu Cung",
+    principle: "Nhat Chi = cung phu the. 2 nguoi Nhat Chi: hop = tot, xung = xau, hinh = rac roi.",
+    good: "Chi ngu hop/luc hop/tam hop = ai tinh. Chi tuong sinh = on.",
+    bad: "Chi xung (6 cap xung) = hon nhan bien dong. Chi hinh = tranh chap. Chi hai = am muu.",
+    score: "+10 (hop) / -15 (xung) / -10 (hinh) / -5 (hai)",
+  },
+};
+
+export const BAZHAI_8_HOUSE = {
+  concept: "Bat Trai = 8 huong bao ngu (4 cat + 4 hung) dua vao que trach. Chon huong nha/phong theo cung menh.",
+  favorable: {
+    "Sinh Khi": { vi: "Sinh Khi", direction: "tot cho suc khoe, nang luong, sinh son", note: "huong tot nhat cho ngu" },
+    "Thien Y": { vi: "Thien Y", direction: "tot cho suc khoe, chua benh, bao thu", note: "huong phong ngu/tot cho phu nu" },
+    "Dien Nien": { vi: "Dien Nien", direction: "tot cho su nghiep, on dinh, cuoc song", note: "huong phong khach/hoc" },
+    "Phuc Vi": { vi: "Phuc Vi", direction: "tot cho tinh than, binh an, phuc duc", note: "huong phong tho" },
+  },
+  unfavorable: {
+    "Tuyet Menh": { vi: "Tuyet Menh", direction: "CUC HUNG — suc khoe, mang song", note: "KHONG ngu/kiem o huong nay" },
+    "Ngu Quy": { vi: "Ngu Quy", direction: "HUNG — tai hoa, dac biet suc khoe", note: "tranh cai tao" },
+    "Luc Sat": { vi: "Luc Sat", direction: "HUNG — tai chinh, luat phap, ranh co", note: "tranh kinh doanh" },
+    "Hoa Hai": { vi: "Hoa Hai", direction: "XAU — tai hoa, phan ly, that lac", note: "tranh chuyen nha/kiem" },
+  },
+};
+
+export const QIMEN_BRIEF = {
+  concept: "Khi Mon Don Gia = 1 trong 3 thuc (三式). Chon thoi diem + huong + chien thuat.",
+  structure: "4 phuong: Thien (thoi diem) + Dia (huong) + Nhan (ban than) + Than (tro giup).",
+  use: "Chon ngay khoi su, chon huong an phong, chon luc dien trinh, chon vi tri ghe ngoi.",
+  note: "Khi Mon kho hoc nhat trong tat ca thuat so. Chi brief cho AI tham khao — tinh toan chi tiet can module rieng.",
+};
+
+export const LIUYAO_BRIEF = {
+  concept: "Luu Dao = 6 hao + 6 than + 6 thu. Dung de tra loi 1 cau hoi cu the.",
+  structure: "6 hao: so (初→上). 6 than: huynh de/phu mau/tu ton/quan quy/thien tai/the than.",
+  method: "Khoi que: 3 dong tien (6 hao) → xac dinh the (dong/tinh) → noi dung the/am hao.",
+  use: "Tra loi: co nen khong? ket qua the nao? thanh cong that bai? thoi gian?",
+  note: "Luu Dao manh ve su kien cu the. BaZi manh ve tong quan doi. Ket hop ca 2 = tot nhat.",
+};
