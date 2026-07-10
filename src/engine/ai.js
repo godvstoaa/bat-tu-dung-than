@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE, PATTERN_SHUN_NI, THUONG_GUAN_5_TYPES, PATTERN_SUCCESS_FAIL, PATTERN_QUALITY_RANKING, YONGSHEN_VARIATION, LIUQIN_STAR, LIUQIN_PALACE, STAR_PALACE_RULES, LIUQIN_FALLBACK, LIUQIN_DAYUN_EFFECT, HEHUA_CONDITIONS, CHONG_XING_HAI_RULES, LUCK_INTERACTION_RULES, ZIWEI_14_STARS, SIHUA_MEANING, ZIWEI_LUCK_RULES, STAR_BRIGHTNESS_MEANING, LIAOFAN_4_LESSONS, TCM_HEALTH_DEEP, ZIWEI_AUX_STARS, ZIWEI_AUX_PRINCIPLES } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE, PATTERN_SHUN_NI, THUONG_GUAN_5_TYPES, PATTERN_SUCCESS_FAIL, PATTERN_QUALITY_RANKING, YONGSHEN_VARIATION, LIUQIN_STAR, LIUQIN_PALACE, STAR_PALACE_RULES, LIUQIN_FALLBACK, LIUQIN_DAYUN_EFFECT, HEHUA_CONDITIONS, CHONG_XING_HAI_RULES, LUCK_INTERACTION_RULES, ZIWEI_14_STARS, SIHUA_MEANING, ZIWEI_LUCK_RULES, STAR_BRIGHTNESS_MEANING, LIAOFAN_4_LESSONS, TCM_HEALTH_DEEP, ZIWEI_AUX_STARS, ZIWEI_AUX_PRINCIPLES, TEN_GAN_DAYMASTER_PERSONALITY, WUXING_IMBALANCE_PERSONALITY, WUXING_PAIR_PERSONALITY, TEN_GOD_SPOUSE_DETAIL, DAYUN_HANDOVER_DETAIL } from './kb.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
@@ -729,6 +729,32 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "LỤC CÁT (Ta Phụ/Hữu Bật/Văn Xương/Văn Khúc/Thiên Khôi/Thiên Việt) + LỤC SÁT (Kình Dương/Đà La/Hỏa Tinh/Linh Tinh/Địa Không/Địa Kiếp) trong lá số: " + (auxInChart.length ? auxInChart.join(', ') : '(kiểm tra tử vi tính để biết)') + "\n" +
       "NGUYÊN TẮC: " + (ZIWEI_AUX_PRINCIPLES || []).slice(0, 3).join(' | ');
   } catch (e) { brief += "\n--- LỤC CÁT/SÁT: [lỗi load] ---"; }
+
+  // ---- [round 21] NGŨ HÀNH NHÂN CÁCH SÂU (10 can nhật chủ) + THẬP THẦN PHỐI NGẪU + ĐẠI VẬN GIAO TẾP ----
+  try {
+    const dm = c.dayMaster?.gan || '';
+    const dmP = TEN_GAN_DAYMASTER_PERSONALITY[dm];
+    const wxEntries = Object.entries(R.wx?.pct || {}).sort(([, a], [, b]) => b - a);
+    const domWx = wxEntries[0]?.[0] || '';
+    const weakWx = wxEntries[wxEntries.length - 1]?.[0] || '';
+    const domImb = WUXING_IMBALANCE_PERSONALITY[domWx];
+    const weakImb = WUXING_IMBALANCE_PERSONALITY[weakWx];
+    const dayHidden0 = c.pillars?.day?.hidden?.[0];
+    const palaceGod = dayHidden0?.god || '';
+    const palaceSpouse = TEN_GOD_SPOUSE_DETAIL?.palaceByGod?.gods?.[palaceGod];
+    const qiyun = DAYUN_HANDOVER_DETAIL?.qiyun;
+    // Sắp xếp 2 hành nổi bật theo thứ tự Mộc→Hỏa→Thổ→Kim→Thủy để khớp key của WUXING_PAIR_PERSONALITY
+    const wxOrder = ['木', '火', '土', '金', '水'];
+    const pairKey = domWx && wxEntries[1]?.[0] ? [domWx, wxEntries[1][0]].sort((x, y) => wxOrder.indexOf(x) - wxOrder.indexOf(y)).join('') : '';
+    brief += "\n--- NGŨ HÀNH NHÂN CÁCH SÂU + PHỐI NGẪU + GIAO VẬN (round 21) ---\n" +
+      "NHẬT CHỦ " + dm + (dmP ? "(" + dmP.vi + " · " + dmP.xiang + "): " + dmP.nature + " | Mạnh: " + dmP.strengths.join(", ") + " | Yếu: " + dmP.weaknesses.join(", ") + " | Bí: " + dmP.secret : "(—)") + "\n" +
+      "HÀNH CHỦ ĐẠO " + (WX_VI[domWx] || domWx) + (domImb ? " → quá mạnh: " + domImb.tooMuch + " | quá yếu: " + domImb.tooLittle : "") + "\n" +
+      "HÀNH YẾU NHẤT " + (WX_VI[weakWx] || weakWx) + (weakImb ? " → cần bồi (quá yếu biểu hiện: " + weakImb.tooLittle + ")" : "") + "\n" +
+      (WUXING_PAIR_PERSONALITY[pairKey] ? "TÍNH CÁCH KẾT HỢP " + pairKey + ": " + WUXING_PAIR_PERSONALITY[pairKey] + "\n" : "") +
+      "CUNG PHỐI NGẪU (Nhật Chi bản khí " + (dayHidden0?.gan || '?') + " = " + (TEN_GOD_VI[palaceGod] || palaceGod || '?') + ")" + (palaceSpouse ? ": " + palaceSpouse.spouse : "") + ". " + (TEN_GOD_SPOUSE_DETAIL?.spouseStar?.rule || '') + "\n" +
+      "KHỞI VẬN " + (qiyun ? "(3 ngày = 1 tuổi) " + qiyun.direction + " | " + qiyun.ageCalc : '?') + "\n" +
+      "GIAO VẬN " + (DAYUN_HANDOVER_DETAIL?.jiaoyun?.what || '') + " → " + (DAYUN_HANDOVER_DETAIL?.jiaoyun?.taboo || []).slice(0, 2).join("; ");
+  } catch (e) { brief += "\n--- ROUND 21: [lỗi load] ---"; }
 
   return brief;
 }

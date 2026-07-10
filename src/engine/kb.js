@@ -1602,3 +1602,117 @@ export const ZHERI_PRINCIPLES = [
   "7. Dong Chi → duong khi bat dau tang. Ha Chi → am khi bat dau tang. 2 diem xoay chon cua 1 nam.",
   "8. 「tuy nhat bat tuy cuoc」— chon ngay tot nhung khong phu thuoc hoan toan. Nhan luc van la quan trong.",
 ];
+
+// ROUND 21: Ngu hanh nhan cac SAU (10 can nhat chu + that khu + cap hanh) + thap than phoi ngu CHI TIET + dai van giao tiep CHI TIET
+
+// 21a1. 十干日主性情 — CAN nhat chu → nhan cach (lop NGU HANH NHAN CAC SAU nhat, vi 10 can khac nhau)
+export const TEN_GAN_DAYMASTER_PERSONALITY = {
+  "甲": { vi: "Giap Moc", xiang: "參天之木 (cay dai thap)", nature: "thang, nhan tu, hien ngang, bao ve, phat trien", strengths: ["lanh dao", "trung thuc", "co dinh huong", "tu tin", "tu bo"], weaknesses: ["cung dau", "ngang buoc", "kho nghe y kien", "de phan xet"], secret: "Ben ngoai cung nhung ben trong mem — nhu cay lon: than thang nhung re chim, co the uon." },
+  "乙": { vi: "At Moc", xiang: "花草之木 (co hoa)", nature: "mem mai, uyen chuyen, duyen dang, thich ung tot", strengths: ["linh hoat", "kien cuong ben trong", "giao tiep", "tuong tuong", "cham soc"], weaknesses: ["phu thuoc", "de bi an huong", "thieu quyet doan", "lac quan that"], secret: "Mem nhu co hoa nhung ran re chim sau vao dat — kien cuong ngam, khong de pha." },
+  "丙": { vi: "Binh Hoa", xiang: "太阳之火 (mat troi)", nature: "nhiet huyet, sang sủa, phong khoang, loi cuon, chieu sang", strengths: ["lanh dao", "truyen cam hung", "quang dai", "loi cuon"], weaknesses: ["bao dong", "kieu ngao", "thieu kien nhan", "de buc phan", "hien ngoai"], secret: "Choi sang cho moi nguoi nhung de dot chay het suc luc — can biet giu nang luong." },
+  "丁": { vi: "Dinh Hoa", xiang: "灯烛之火 (den/nen/sao)", nature: "am ap, tinh te, biet quan tam, co tu min", strengths: ["sang tao", "truc giac", "tuong tuong", "cham soc", "tinh te"], weaknesses: ["da sou", "nhay cam", "de lo lang", "thieu kien dinh"], secret: "Khong choi giat nhu Binh nhung am ap, sang tao, co tu min va truc giac manh." },
+  "戊": { vi: "Mau Tho", xiang: "城墙之土 (tuong thanh)", nature: "vung chai, tin cay, khoan dung, bao thu, co trac nhiem", strengths: ["tin nen", "bao dung", "chac chan", "co trac nhiem", "kinh"], weaknesses: ["bao thu", "cham chap", "kho thay doi", "ngai moi", "cung nhu"], secret: "Nhu tuong thanh — kho pha nhung cung kho di chuyen, can thoi gian de chiu." },
+  "己": { vi: "Ky Tho", xiang: "田园之土 (dat ruong)", nature: "khiem ton, nuoi duong, nhan nai, cham chi, tu bo", strengths: ["cham chi", "nuoi duong", "khiem ton", "tu bo", "cham soc"], weaknesses: ["tu ti", "de bi tham lung", "thieu uy", "thieu kien dinh"], secret: "Dat me nuoi cay — im lang nhung sinh moi thu, gia tri nam o su nuoi duong." },
+  "庚": { vi: "Canh Kim", xiang: "刀剑之金 (dao kiem)", nature: "cung quyet, manh me, dung cam, chinh nghia, ky luat", strengths: ["quyet doan", "dung cam", "chinh nghia", "ky luat", "thuc luc"], weaknesses: ["cung ran", "vo tinh", "de cat", "kho gan ket", "nghiem khac"], secret: "Dao kiem — dung duoc (che sat, bao ve) nhung de lam trung thuong nguoi khac." },
+  "辛": { vi: "Tan Kim", xiang: "珠宝之金 (trang suc)", nature: "tinh te, thanh cao, yeu cai dep, nhay cam, trong tinh", strengths: ["my giac", "tinh te", "trong tinh", "duyen dang", "nghe thuat"], weaknesses: ["kieu ham", "de vo", "nhay cam qua", "dam vi", "kho hoa nhap"], secret: "Trang suc — dep, thanh cao nhung de vo, can duoc bao ve va tron trong." },
+  "壬": { vi: "Nham Thuy", xiang: "江河之水 (song giang/bien)", nature: "thong minh, tri tue, luu dong, phong khoang, tu do", strengths: ["trong thong", "tu do", "linh hoat", "khon ngoan", "kien thuc"], weaknesses: ["lang dang", "kho dinh", "de bo cuoc", "phuc tap", "kho kiem che"], secret: "Song giang — chay manh, tu do, kho kiem che; can biet co muc tieu." },
+  "癸": { vi: "Quy Thuy", xiang: "雨露之水 (mui bom/suong)", nature: "uyen chuyen, te ny, co truc giac, nhu hoa, mong mo", strengths: ["truc giac", "nghe thuat", "te ny", "uong chuyen", "sang tao"], weaknesses: ["mong mo", "am uu", "thieu luc", "de bi an huong", "kho khan"], secret: "Mui bom — te ny, thoa man vat, co tai nghe thuat va truc giac than." },
+};
+
+// 21a2. 五行偏枯性格 — ngu hanh QUA MANH / QUA NHUOC → nhan cach lech
+export const WUXING_IMBALANCE_PERSONALITY = {
+  "木": { tooMuch: "co chap, ngang buoc, khong nghe loi, de phan xet, kho hop tac, cuc cuc", tooLittle: "thieu quyet doan, de bi an huong, u li, thieu suc song, nhat nat" },
+  "火": { tooMuch: "nong nay, bao dong, hien ngoai, thieu kien nhan, de kieu ngao, lang phi", tooLittle: "lanh nat, thieu nhiet huyet, de bi quan, thieu dong luc, vo cam" },
+  "土": { tooMuch: "bao thu, co chap, u li, kho thay doi, de u me, nang ne", tooLittle: "vo tin, khong dang tin, thieu lap truong, nong noi, vo dinh huong" },
+  "金": { tooMuch: "sac sao qua thanh doc dia, nghiem khac, de cat dut, vo tinh, thu doan", tooLittle: "thieu quyet doan, y lai, nhu nhuoc, de bo cuoc, kem y chi" },
+  "水": { tooMuch: "lang dang, khong chan thuc, da mou nhung thieu thuc, luo bi, phuc tap", tooLittle: "thieu linh hoat, co chap, kem giao tiep, kho hoc, tri luc kho phat" },
+};
+
+// 21a3. 五行双配性格 — 2 hanh noi bat nhat → nhan cach ket hop
+export const WUXING_PAIR_PERSONALITY = {
+  "木火": "Moc sinh Hoa — nhiet huyet, sang tao, ly tuong, truyen cam hung; de bao dong, lac quan that.",
+  "木土": "Moc khac Tho (va nguoc lai) — noi tam mau thuan, co chau giua phat trien va an dinh; kiem cuong ben trong.",
+  "木金": "Kim khac Moc — chinh nghia nhung cung ran, dam hanh dong, de xung dot; co y chi manh.",
+  "木水": "Thuy sinh Moc — thong minh, linh hoat, truc giac + ly tri, thich hoc; de suy nghi nhieu.",
+  "火土": "Hoa sinh Tho — am ap, thuc te, dang tin, co trac nhiem; hoi bao thu.",
+  "火金": "Hoa khac Kim — manh me, dut khoat, dam noi dam lam; de bao dong, nong.",
+  "火水": "Thuy khac Hoa — cam xuc manh, noi tam bat on, tai nang nhung linh dong; de bat on tinh cam.",
+  "土金": "Tho sinh Kim — vung chai + quyet doan, dang tin, co quyen luc; hoi lan lanh.",
+  "土水": "Tho khac Thuy — nang ne, mau thuan, giang xe giu on dinh va dong chay; can hoc linh hoat.",
+  "金水": "Kim sinh Thuy — thong minh, lanh lanh, sac sao, duyen dang; co tai nang nhung kho gan.",
+};
+
+// 21b. 十神看配偶 CHI TIET — tinh phoi ngau + cung phoi ngau theo thap than
+export const TEN_GOD_SPOUSE_DETAIL = {
+  spouseStar: {
+    rule: "Nam: Tai = vo (Chinh Tai = chinh vo, Thien Tai = vo le / tinh nhan / cuoi lan sau). Nu: Quan Sat = chong (Chinh Quan = chinh phu, That Sat = phu le / duyen bat on).",
+    gods: {
+      "正财": { vi: "Chinh Tai", spouse: "vo on dinh, cham chi, tiet kiem, trong gia dinh, trung thanh", marriage: "ON DINH, truyen thong, trung thanh" },
+      "偏财": { vi: "Thien Tai", spouse: "vo thoang dang, giao tiep tot, co dau kinh doanh, co the da tinh", marriage: "co dong, de bat on, co the la nguoi da tung ket hon" },
+      "正官": { vi: "Chinh Quan", spouse: "chong chinh phai, co trac nhiem, theo luat, nghe nghiep chinh dang", marriage: "ON DINH, dang tin cay, co danh phan" },
+      "七杀": { vi: "That Sat", spouse: "chong manh me, co phong doat, quyem luc, de bao chua", marriage: "co lua hon nhung bat on, can boc chat, de tranh chap" },
+    },
+  },
+  palaceByGod: {
+    rule: "Nhat Chi = cung phu the. Xem thap than cua CHINH KHI (ban khi) cua Nhat Chi → cach phoi ngau + chat luong hon nhan.",
+    gods: {
+      "正官": { vi: "Chinh Quan", spouse: "phoi ngau co trac nhiem, on dinh, gia dinh tot" },
+      "七杀": { vi: "That Sat", spouse: "phoi ngau manh me, de bat on, can boc chat, xung dot" },
+      "正财": { vi: "Chinh Tai", spouse: "phoi ngau cham chi, hien di, tot cua, gioi giao" },
+      "偏财": { vi: "Thien Tai", spouse: "phoi ngau thoang dang, giao tiep, de da tinh" },
+      "正印": { vi: "Chinh An", spouse: "phoi ngau tu bi, bao dung, trong tinh than, nhu me" },
+      "偏印": { vi: "Thien An", spouse: "phoi ngau doc lap, ky la, de ky vong, kho hieu" },
+      "食神": { vi: "Thuc Than", spouse: "phoi ngau on hoa, co phuc, huong thu cuoc song, de thuong" },
+      "伤官": { vi: "Thuong Quan", spouse: "phoi ngau thong minh nhung nghich lai, de tranh tinh, ky vong cao" },
+      "比肩": { vi: "Tu Hien", spouse: "phoi ngau doc lap, nhu ban be, de tranh chap vi cung y kien" },
+      "劫财": { vi: "Kiet Tai", spouse: "phoi ngau de tranh tai san, de xuat hien nguoi thu 3" },
+    },
+  },
+  position: {
+    rule: "Vi tri cua sao phoi ngau (trong tru nao) bao nguon goc / do lech tuoi cua phoi ngau.",
+    "year": "sao o Nien Tru → phoi ngau tuoi lech lon, hoac tu xa den. Nien co Tai/Quan → de cuoi nguoi da tung ket hon.",
+    "month": "sao o Nguyet Tru → phoi ngau la dong huong / ban hoc / dong nghiep, tuoi gan. Nguyet vung vung → phoi ngau cao, dep.",
+    "day": "sao o Nhat Tru / Nhat Chi → phoi ngau gan gui nhat, anh huong truc tiep hon nhan.",
+    "time": "sao o Thoi Tru → phoi ngau tre tuoi hon, hoac tu xa den gap.",
+  },
+  prosperity: {
+    rule: "Sao phoi ngau VUONG (duoc Nguyet Lenh sinh tro) → phoi ngau cao, dep, dieu kien tot. Sao o TU/DIEC/DUYET/TUYET → phoi ngau dieu kien kem, suc yeu.",
+    bonus: "Sao phoi ngau + Dao hoa → phoi ngau dep / dep trai, duyn gioi khac. Sao phoi ngau cung tru voi Tai tinh → phoi ngau gia dinh giau.",
+  },
+};
+
+// 21c. 大运交接 CHI TIET — khoi van + giao van + chuyen goc van
+export const DAYUN_HANDOVER_DETAIL = {
+  qiyun: {
+    rule: "Khoi van dua vao CAN NAM SINH + gioi tinh. Dem tu ngay sinh den KE (tiet khi) gan nhat.",
+    direction: "Duong nam + Am nu = THUAN (dem xuoi den ke TIEP). Am nam + Duong nu = NGHICH (dem nguoc den ke TRUOC). Can nam 甲丙戊庚壬 = duong, 乙丁己辛癸 = am.",
+    ageCalc: "Quy doi: 3 ngay = 1 tuoi | 1 ngay = 4 thang | 1 thoi (2 gio) = 10 ngay. Vd: 23 ngay → 7 tuoi 8 thang khoi van.",
+    note: "Tiet khi (khong phai trung khi) la moc dem: Lap Xuan, Kinh Tran, Thanh Minh… moi tiet cach 30 ngay.",
+  },
+  jiaoyun: {
+    what: "Giao van (交运) = thoi diem CHINH XAC chuyen tu dai van cu sang dai van moi. Tinh den GIO (thoi), khong chi den ngay.",
+    taboo: [
+      "Ngay giao van: tranh gap nguoi sinh nam XUNG voi minh (xung Thai Tue).",
+      "Tranh di xa, den noi la, dong duc nhieu.",
+      "Nen yen tinh o nha, tranh quyet dinh lon trong ngay ay.",
+      "Tranh cuoi hoi, ky ket, dau tu lon ngay giao van.",
+      "Neu ngay giao van trung 'thien khac dia xung' nhat tru → nam CUC bien dong.",
+    ],
+    feel: "「giao van thai van, bat tu cuong」— quan dan: nam giao van co the khoac, om dau. Nhung KHONG phai luc nao cung xau — van tot thi bao ton, van xau thi dot bien.",
+  },
+  zhuanjiao: {
+    what: "Chuyen goc van (转角运) = 2-3 nam o giao thoa 2 dai van. Day la thoi ky QUYET DINH huong doi.",
+    signal: "Dai van moi KHAC / XUNG nhat tru (cung phu the) → bien dong hon nhan / suc khoe / su nghiep.",
+    rule: "Dai van moi la DUNG → 10 nam vung buoc len. La KY → 10 nam can than, kho khan.",
+  },
+  principles: [
+    "1. Khoi van: duong nam/am nu dem xuoi den ke tiep; am nam/duong nu dem nguoc den ke truoc. Quy doi 3 ngay = 1 tuoi.",
+    "2. Giao van tinh den GIO — khong chi nam. Ngay giao van can yen tinh, tranh xung, tranh quyet dinh lon.",
+    "3. Nam chuyen goc (giao 2 dai van) = 2-3 nam dinh huong doi. Dai van moi = thap than + 12 truong sinh cua can/chi dai van.",
+    "4. Thien khac dia xung (can khac + chi xung nhat tru) dung nam giao van = bien dong LON: cuoi / ly hon / chuyen viec / di chuyen.",
+    "5. Dung nhap menh = 10 nam thinh vuong. Ky nhap menh = 10 nam can than. Ky khong nhat thiet xau neu than vuong co the chiu.",
+    "6. Dai van cuoi (65+) = van tho / binh an. Giam theo duoi tai quyen, chong sung duong, trong suc khoe.",
+    "7. Xet 3 lop: CAN dai van (5 nam dau) + CHI dai van (5 nam sau) + luu nien → xac dinh nam cuc thinh / cuc kho.",
+    "8. 「menh hao bang van hao」— menh la ban nen, van la thoi co. Van TOT trong 10 nam thuong QUYET DINH hon menh goc.",
+  ],
+};
