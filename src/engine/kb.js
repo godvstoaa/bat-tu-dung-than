@@ -1422,3 +1422,47 @@ export const BAZI_WEALTH_TIMING = [
   "Con cai khi nao? Xem: 1. Sao con (Quan nam/Thuc Thuong nu) trong dai van. 2. Thoi Trụ (cung con). 3. 12 truong sinh.",
   "Suc khoe khi nao yeu? Xem: 1. Ngu hanh yeu nhat trong dai van. 2. Xung nhat chi. 3. That sat/Kiep tai vao van.",
 ];
+
+// ROUND 17: Yizhangjing 12 stars + face reading 12 palaces + ceczi
+export const YIZHANGJING_12_STARS = {
+  "TianGui": { vi: "Thien Quy", dao: "Phat dao", meaning: "cau ky, thanh cao, phuc duc. Tich duc nhieu, duoc quy nhan ho. Tinh cam binh thuan." },
+  "TianE": { vi: "Thien A", dao: "Quy dao", meaning: "kho nan nho, nhieu chuong ngai. Nhung co y chi kien cuong. Can hoc nhan nhu." },
+  "TianQuan": { vi: "Thien Quyen", dao: "Nhan dao", meaning: "quyen luc, lanh dao, co uy. Thich quyet doan. Can hoc khiem nhu." },
+  "TianPo": { vi: "Thien Pha", dao: "Suc dao", meaning: "de pha tai, bat on, hao phi. Can hoc tiet kiem, kien nhan." },
+  "TianJian": { vi: "Thien Gian", dao: "Tu la dao", meaning: "tinh te, tinh doi, kho than. Thich chien luoc. Can hoc thanh that." },
+  "TianWen": { vi: "Thien Van", dao: "Tien dao", meaning: "hoc van, tri tue, tam linh. Thien ve nghien cuu, dao hoc, huyen hoc." },
+  "TianFu": { vi: "Thien Phuc", dao: "Phat dao", meaning: "phuc duc, tu bi, thien tai. Cuoc song binh an, duoc bao." },
+  "TianYi": { vi: "Thien Dich", dao: "Quy dao", meaning: "di chuyen nhieu, dong ngoai, bat on cu. Can dinh cu." },
+  "TianGu": { vi: "Thien Co", dao: "Nhan dao", meaning: "co doc, doc lap, rieng le. Co the thanh cong nhung co don." },
+  "TianRen": { vi: "Thien Nhan", dao: "Suc dao", meaning: "manh me, bao luc, de tranh chap. Can hoc dieu le." },
+  "TianYi_Art": { vi: "Thien Nghe", dao: "Tu la dao", meaning: "nghe thuat, tai hoa, ky thuat. Sang tao nhung de tranh cai." },
+  "TianShou": { vi: "Thien Thu", dao: "Tien dao", meaning: "tho, binh an, tram dinh. Cuoc song lau dai, yen on." },
+};
+
+export const FACE_12_PALACES = {
+  positions: [
+    { vi: "Menh Cung", pos: "giua tran (an moc)", meaning: "bản than, su nghiep, su menh 13-35 tuoi" },
+    { vi: "Tai Loc", pos: "mui (chanh trung)", meaning: "tai chinh, 15-50 tuoi" },
+    { vi: "Quan Loc", pos: "_tran (cao nhat)", meaning: "cong danh, 25-50 tuoi" },
+    { vi: "Phu The", pos: "duoi mat, phia ngoai mat", meaning: "vo chong, 20-50 tuoi" },
+    { vi: "Tu Nu", pos: "duoi mat, phia trong mat", meaning: "con cai, 30-60 tuoi" },
+    { vi: "Phu Me", pos: "canh mui, duoi mat", meaning: "cha me, 1-20, 50-70 tuoi" },
+    { vi: "Huynh De", pos: "chanh tren tran, ben trai", meaning: "anh chi em" },
+    { vi: "Dien Trach", pos: "canh tran, ben phai", meaning: "nha cua, bat dong san" },
+    { vi: "Phuc Duc", pos: "tai", meaning: "phuc duc to tien, may man" },
+    { vi: "Tat Ach", pos: "chanh duoi mat, giua", meaning: "suc khoe, benh tat" },
+    { vi: "Thien Di", pos: "ben canh tran, hai ben", meaning: "du lich, dong ngoai" },
+    { vi: "Ngu Boc", pos: "huong cam", meaning: "cap duoi, ban be" },
+  ],
+  note: "12 cung mat doc cuoc doi qua net mat. Dac diem: dep/xau, sang/toi, day/mong = phuc/hung tuong ung. Day net mat can chuyen gia xem.",
+};
+
+export const CEZI_METHOD = [
+  "Cezi (Chat Tu) = chon 1 chu Han → phan tich bo thu + net + ngu hanh + khoi que.",
+  "Buoc 1: Chon 1 chu (vd: 福, 财, 爱, 命).",
+  "Buoc 2: Phan tich bo (radical) → y nghia cua bo đo.",
+  "Buoc 3: Dem net → tong net → que Kinh Dich (64 que).",
+  "Buoc 4: Ngu hanh cua chu (Moc/Hoa/Tho/Kim/Thuy) → phoi hop voi Dung Than.",
+  "Buoc 5: Y nghia tong hop: chu tot cho van nao? xau cho van nao?",
+  "Ung dung: chon ten con, chon ten cong ty, chon chu may men, xem 1 chu bat ky.",
+];
