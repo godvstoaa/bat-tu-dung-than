@@ -1330,3 +1330,33 @@ export const TONGSHENG_12_VI = {
   开: "Khai (mo cua) — tot mo cua, khoi su, di xa",
   闭: "Be (dong cua) — xau, phong dong kinh, an tang, cho ngu",
 };
+// ROUND 14: Huyen Khong Phi Tinh 9 cung + 9 sao
+export const FLYING_STAR_9 = {
+  1: { vi: "Nhat Bach", wx: "Thuy", effect: "quan loc, giao tiep, duyen, su nghiep phat trien", cat: true },
+  2: { vi: "Nhi Hac", wx: "Tho", effect: "benh tat, suc khoe, phu nu", cat: false },
+  3: { vi: "Tam Bich", wx: "Moc", effect: "khau thi, tranh cai, xu pham", cat: false },
+  4: { vi: "Tu Luc", wx: "Moc", effect: "hoc van, thi cu, duyen tinh", cat: true },
+  5: { vi: "Ngu Hoang", wx: "Tho", effect: "DICH HONG NAM — cuc hung, tai hoa, benh nang", cat: false },
+  6: { vi: "Luc Bach", wx: "Kim", effect: "quyen luc, quoc su, vo trang", cat: true },
+  7: { vi: "That Xich", wx: "Kim", effect: "daokiem, thu doan, hung bao", cat: false },
+  8: { vi: "Bat Bach", wx: "Tho", effect: "TAI LOC CHINH — tai chinh, giau co", cat: true },
+  9: { vi: "Cuu Tu", wx: "Hoa", effect: "HI KHANH — cuoi hoi, de con, danh vong", cat: true },
+};
+
+export const FLYING_STAR_2026 = {
+  center: { star: 1, vi: "Nhat Bach (Trung cung) — su nghiep tien bo, giao tiep tot" },
+  north: { star: 6, vi: "Luc Bach (Bac) — quyen luc, phat trien" },
+  northeast: { star: 2, vi: "Nhi Hac (Dong Bac) — benh tat, can phong" },
+  east: { star: 8, vi: "Bat Bach (Chinh Dong) — TAI LOC CHINH — phat tai chinh" },
+  southeast: { star: 9, vi: "Cuu Tu (Dong Nam) — HI KHANH — cuoi hoi, de con, danh vong" },
+  south: { star: 5, vi: "Ngu Hoang (Chinh Nam) — DICH HONG — cuc hung, phong cai tao" },
+  southwest: { star: 7, vi: "That Xich (Tay Nam) — thu doan, hung bao, can than" },
+  west: { star: 3, vi: "Tam Bich (Chinh Tay) — khau thi, tranh cai" },
+  northwest: { star: 4, vi: "Tu Luc (Tay Bac) — hoc van, duyen tinh" },
+};
+
+export const FENGSHUI_CURE_5_YELLOW = [
+  'Ngu Hoang (5 vang) 2026 tai CHINH NAM — CUC HUNG: KHONG cai tao, KHONG dao dat, KHONG khoan otrong. Dem dong bac de hoa giai.'
+  'Cach hoa giai: dat dong bac/kim loai/khan vang o huong NAM. Treo luc phong. KHONG dung do do.'
+  'Nhi Hac (2 den) tai DONG BAC: benh tat — dat dong bac luc phong hoac vang 6 dong.'
+];
