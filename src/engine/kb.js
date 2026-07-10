@@ -1529,3 +1529,30 @@ export const LIUYAO_BRIEF = {
   use: "Tra loi: co nen khong? ket qua the nao? thanh cong that bai? thoi gian?",
   note: "Luu Dao manh ve su kien cu the. BaZi manh ve tong quan doi. Ket hop ca 2 = tot nhat.",
 };
+
+// ROUND 19: Than sat nang cao (Jiangxing/Wangshen/Jiesha/etc) + GuChen + GouJiao
+export const ADVANCED_SHENSHA = {
+  "将星": { vi: "Tuong Tinh", nature: "cat", effect: "lanh dao, quyen luc, uy quyen. Co kha nang phat lenh, chi huy nguoi khac. Khi tot: quoc su/lanh dao. Khi xau: doc doan." },
+  "亡神": { vi: "Vong Than", nature: "hung", effect: "am muu, bi mat, chinh tri. Nguoi co Vong Than: gio tinh te, kho than, am uu. De lo lang trong am." },
+  "劫煞": { vi: "Kiet Sat", nature: "hung", effect: "dot phat, thua ro, manh me. De bi cuop/doat. Tinh cach bao dong nhung cung dung cam." },
+  "灾煞": { vi: "Tai Sat", nature: "hung", effect: "tai hoa, benh nang, tai nan. Hinh thanh khi Tuong Tinh bi xung. Can de phong suc khoe." },
+  "孤辰": { vi: "Co Tran", nature: "hung", effect: "nam co doc, kho tim hieu doi. But: co Tuong Tinh/Quy Nhan → 「co tran mang quan an → lam lanh dao」." },
+  "寡宿": { vi: "Qua Tuc", nature: "hung", effect: "nu qua tu, kho hon nhan. But: co Quy Nhan → doc lap thanh cong." },
+  "咸池": { vi: "Ham Trieu/Dao Hoa", nature: "trung tinh", effect: "duyen tinh, hap dan, nghe si. Tai Nien/Nguyet = bẩm sinh. Tai Nhat = trong hon nhan. Tai Thoi = van nien." },
+  "勾绞": { vi: "Cau Giao", nature: "hung", effect: "luat phap, phan ly, rac roi. De bi tham gia vu an/ tranh chap." },
+  "红艳": { vi: "Hong Diem", nature: "trung tinh", effect: "duyen am muu, tinh cam manh, de hap dan gioi khac. Nghe si/ giai tri phu hop." },
+  "阴差阳错": { vi: "Am Sai Duong Nham", nature: "hung", effect: "nham lan, ky la, cuoi hoi gap kho khan. De lam sai viec, cuoi nham nguoi." },
+  "天罗地网": { vi: "Thien La Dia Vong", nature: "hung", effect: "bi troi buoc, khong du tu do. Can co Quy Nhan giai." },
+  "羊刃": { vi: "Duong Nhan", nature: "hung/cat tuy bien", effect: "manh me, de chay mau, nguy hiem. Khi than vuong = dung duoc (che sat). Khi than nhuoc = nguy." },
+};
+
+export const SHENSHA_PRINCIPLE_ADVANCED = [
+  "1. Than sat la PHU — khong thay the ngu hanh/thap than. Core la ngu hanh + cach cuc. Than sat chi la chi tiet bo xung.",
+  "2. Cat than (天乙/文昌/将星) tot khi o cung Dung. Hung sat (亡神/劫煞/灾煞) nguy khi o cung Ky.",
+  "3. Co Tran Qua Tuc khong phai luc nao cung xau — co Quy Nhan/Tuong Tinh → doc lap thanh cong, lam lanh dao.",
+  "4. Duong Nhan = 2 mat: than vuong = dung duoc (lam tuong/quan). Than nhuoc = nguy (de bi thuong).",
+  "5. Am Sai Duong Nham (阴差阳错) o Nhat Tru = cuoi hoi gap van de, nham lan tinh cam. Can chon ngay ky ket cuoi hoi ky ky.",
+  "6. Hong Diem + Dao Hoa = duyennhieu nhung de da tinh. Can 1 An tinh che (印) de can bang.",
+  "7. Than sat tinh toan tu CHI nam sinh (tru 天乙 tinh toan tu CAN nam/ngay sinh).",
+  "8. 「孤辰寡宿 mang quan an → lam rung lam chua」 — co sat mang quyen → quyen luc thay vi co don.",
+];
