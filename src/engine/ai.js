@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE, PATTERN_SHUN_NI, THUONG_GUAN_5_TYPES, PATTERN_SUCCESS_FAIL, PATTERN_QUALITY_RANKING, YONGSHEN_VARIATION, LIUQIN_STAR, LIUQIN_PALACE, STAR_PALACE_RULES, LIUQIN_FALLBACK, LIUQIN_DAYUN_EFFECT, HEHUA_CONDITIONS, CHONG_XING_HAI_RULES, LUCK_INTERACTION_RULES, ZIWEI_14_STARS, SIHUA_MEANING, ZIWEI_LUCK_RULES, STAR_BRIGHTNESS_MEANING } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE, PATTERN_SHUN_NI, THUONG_GUAN_5_TYPES, PATTERN_SUCCESS_FAIL, PATTERN_QUALITY_RANKING, YONGSHEN_VARIATION, LIUQIN_STAR, LIUQIN_PALACE, STAR_PALACE_RULES, LIUQIN_FALLBACK, LIUQIN_DAYUN_EFFECT, HEHUA_CONDITIONS, CHONG_XING_HAI_RULES, LUCK_INTERACTION_RULES, ZIWEI_14_STARS, SIHUA_MEANING, ZIWEI_LUCK_RULES, STAR_BRIGHTNESS_MEANING, LIAOFAN_4_LESSONS, TCM_HEALTH_DEEP } from './kb.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
@@ -710,6 +710,15 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "ĐẠI HẠN/LƯU NIÊN TỬ VI: " + (ZIWEI_LUCK_RULES || []).slice(0, 4).join(' | ') + "\n" +
       "MIẾU VƯỢNG BÌNH HÃM: " + Object.entries(STAR_BRIGHTNESS_MEANING || {}).map(([k,v]) => k + '=' + v.vi + '(' + v.effect.slice(0, 40) + ')').join(' | ');
   } catch (e) { brief += "\n--- TỬ VI 14 TINH: [lỗi load] ---"; }
+
+  // ---- [round 9] LIÊU PHÀM + TCM NGŨ HÀNH LUẬN BỆNH SÂU ----
+  try {
+    const weakestWx9 = Object.entries(R.wx?.pct || {}).sort(([,a],[,b]) => a - b)[0];
+    const tcmDeep = weakestWx9 ? (TCM_HEALTH_DEEP[weakestWx9[0] === '木' ? 'Moc' : weakestWx9[0] === '火' ? 'Hoa' : weakestWx9[0] === '土' ? 'Tho' : weakestWx9[0] === '金' ? 'Kim' : 'Thuy'] || null) : null;
+    brief += "\n--- LIÊU PHÀM + TCM LUẬN BỆNH (round 9) ---\n" +
+      "LIÊU PHÀM 4 HUẤN: " + (LIAOFAN_4_LESSONS?.LapMenh?.summary || 'mệnh không cố định, tích đức cải vận') + " | " + (LIAOFAN_4_LESSONS?.TichThien?.summary || '') + "\n" +
+      "TCM SÂU: hành yếu nhất " + (weakestWx9 ? weakestWx9[0] + '(' + weakestWx9[1] + '%)' : '?') + (tcmDeep ? " -> " + tcmDeep.organ + " | bệnh lý: " + tcmDeep.pathology + " | thảo dược: " + tcmDeep.herb + " | cảm xúc hại: " + tcmDeep.emotion + " | kinh mạch: " + tcmDeep.meridian + " | mùa: " + tcmDeep.season : '');
+  } catch (e) { brief += "\n--- LIÊU PHÀM + TCM: [lỗi load] ---"; }
 
   return brief;
 }

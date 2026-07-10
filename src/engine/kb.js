@@ -1185,3 +1185,17 @@ export const STAR_BRIGHTNESS_MEANING = {
   '平': { vi: 'Bình', effect: 'sao yếu → ý nghĩa giảm. Cần xét kèm sát tinh.' },
   '落陷': { vi: 'Loạn hãm', effect: 'sao cực yếu → ý nghĩa ĐẢO NGHĨA hoặc không phát huy. 「陷」= sao rơi vào hang → tính chất tiêu cực nổi bật.' },
 };
+// ROUND 9: Liêu Phàm + TCM deep
+export const LIAOFAN_4_LESSONS = {
+  'LapMenh': { vi: 'Lập Mệnh', summary: 'Mệnh KHONG co dinh. Biet menh -> thuan thien -> cai van bang thien hanh.', application: 'Khi AI tra loi van xau -> ket thuc: van la xu huong, KHONG phai tat dinh. Tich duc = cai van.' },
+  'CaiQua': { vi: 'Cai Qua', summary: 'Truoc tich thien phai sua loi. 3 tam: xau ho, kinh so, dung manh. 3 tang: sua viec, sua ly, sua tam.', application: 'Khi hoi cai van -> khuyen sua loi truoc.' },
+  'TichThien': { vi: 'Tich Thien', summary: 'Tich luy viec thien ca doi. Am duc (giau) manh hon duong duc (lo).', application: 'Cai van cot loi = TU THIEN.' },
+  'KhiemDuc': { vi: 'Khiem Duc', summary: 'KHIEM = nen tang giu moi thu. Kieu ngao = ngan tien bo + ruoc hoa.', application: 'Van tot + khiem = ben. Van tot + kieu = do.' },
+};
+export const TCM_HEALTH_DEEP = {
+  'Moc': { organ: 'Can+Dam', pathology: 'Can duong thinh: dau dau, hoa mat, cao huyet ap. Can am hu: mo mat, chot rut. Can uat: tuc nguc, tram cam.', herb: 'Atiso, nhan tran, sai ho', emotion: 'GIAN harai can', meridian: '1-3h sang (Suuse) - ngu truoc 23h', season: 'Xuan - thanh can giai uat' },
+  'Hoa': { organ: 'Tam+Tieu truong', pathology: 'Tam hoa thinh: lo au, mat ngu, lo mieng, tim dap nhanh. Tam am hu: do mo hoi dem, kho hong.', herb: 'Sen tam, toan tao nhan, dan sam', emotion: 'VUI thai qua hai tam', meridian: '11-13h (Ngo) - nghi trua', season: 'Ha - thanh nhiet duong am' },
+  'Tho': { organ: 'Ty+Vi', pathology: 'Ty hu: day bung, tieu chay, suy nhuoc co. Vi nhiet: doi nhung khong an duoc, hoi mieng.', herb: 'Hoai son, bach truật, dang sam', emotion: 'LO AU hai ty vi', meridian: '7-11h sang - an sang quan trong', season: 'Chuyen mua - thuc pham am, kho' },
+  'Kim': { organ: 'Phe+Dai truong', pathology: 'Phe khi hu: ho kinh nien, tho ngan. Phe nhiet: ho dam vang. Phong han: cam lanh.', herb: 'Bach hop, ty ba diep, cat canh', emotion: 'BUON hai phe', meridian: '3-7h sang - tap tho', season: 'Thu - duong am: le ham, mat ong' },
+  'Thuy': { organ: 'Than+Bang quang', pathology: 'Than duong hu: lanh lung goi, tieu dem, suy tinh duc. Than am hu: not but rut, do mo hoi dem, tinh nitus.', herb: 'Thuc dia, nhuc que, tho ty tu', emotion: 'SO HAI hai than', meridian: '17-19h (Dau) - uong nuoc am', season: 'Dong - ngu som, giu am lung-bung-chan' },
+};
