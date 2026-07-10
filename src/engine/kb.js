@@ -1228,11 +1228,11 @@ export const ZIWEI_AUX_PRINCIPLES = [
 ];
 // ROUND 11: Luu Nguyet (monthly fortune) + luu nien themes
 export const LIUYUE_METHOD = [
-  'Luu nguyet = thang theo tiet khi (khong phai thang duong). Moi thang co 1 can-chi rieng.'
-  'Cach doc: luu nguyet can-chi tuong tac voi (1) nguyet lenh nguyen cuc, (2) dai van dang hanh, (3) luu nien. 3 tang.'
-  'Luu nguyet mang Dung = thang thuan. Mang Ky = thang kho. Hop/Nghiem/Xung voi nguyet lenh = bien dong.'
-  'Tai tinh (nam)/Quan sat (nu) xuat hien trong luu nguyet = thang co duyen/tien.'
-  'Thuc thuong trong luu nguyet = sang tao/duy tu. An tinh = hoc van/bang cap. Ty kien = canh tranh.'
+  'Luu nguyet = thang theo tiet khi (khong phai thang duong). Moi thang co 1 can-chi rieng.',
+  'Cach doc: luu nguyet can-chi tuong tac voi (1) nguyet lenh nguyen cuc, (2) dai van dang hanh, (3) luu nien. 3 tang.',
+  'Luu nguyet mang Dung = thang thuan. Mang Ky = thang kho. Hop/Nghiem/Xung voi nguyet lenh = bien dong.',
+  'Tai tinh (nam)/Quan sat (nu) xuat hien trong luu nguyet = thang co duyen/tien.',
+  'Thuc thuong trong luu nguyet = sang tao/duy tu. An tinh = hoc van/bang cap. Ty kien = canh tranh.',
 ];
 
 export const MONTHLY_THEME_GUIDE = {
