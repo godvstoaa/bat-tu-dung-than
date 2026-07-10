@@ -1199,3 +1199,30 @@ export const TCM_HEALTH_DEEP = {
   'Kim': { organ: 'Phe+Dai truong', pathology: 'Phe khi hu: ho kinh nien, tho ngan. Phe nhiet: ho dam vang. Phong han: cam lanh.', herb: 'Bach hop, ty ba diep, cat canh', emotion: 'BUON hai phe', meridian: '3-7h sang - tap tho', season: 'Thu - duong am: le ham, mat ong' },
   'Thuy': { organ: 'Than+Bang quang', pathology: 'Than duong hu: lanh lung goi, tieu dem, suy tinh duc. Than am hu: not but rut, do mo hoi dem, tinh nitus.', herb: 'Thuc dia, nhuc que, tho ty tu', emotion: 'SO HAI hai than', meridian: '17-19h (Dau) - uong nuoc am', season: 'Dong - ngu som, giu am lung-bung-chan' },
 };
+
+// ROUND 10: 六吉星 + 六煞星
+export const ZIWEI_AUX_STARS = {
+  // 6 cát tinh
+  "左辅": { vi: "Ta Phụ", type: "cat", effect: "trợ lực bên ngoài — hợp tác, hỗ trợ, người giúp. Tại cung Mệnh = được người ta giúp. Tại Phu Thê = người thứ 3 xen vào." },
+  "右弼": { vi: "Hữu Bật", type: "cat", effect: "mềm mại, linh hoạt — tạo quan hệ hòa hợp, network. Tại Mệnh = quý nhân đông." },
+  "文昌": { vi: "Văn Xương", type: "cat", effect: "học vấn chính thống, thi cử, viết lách có cấu trúc. Tại Mệnh = thông minh, học giỏi." },
+  "文曲": { vi: "Văn Khúc", type: "cat", effect: "nghệ thuật, hùng biện, thẩm mỹ, huyền học, tài năng phi truyền thống." },
+  "天魁": { vi: "Thiên Khôi", type: "cat", effect: "quý nhân NAM — sếp/mentor nam mở đường. Cấp cao help." },
+  "天钺": { vi: "Thiên Việt", type: "cat", effect: "quý nhân NỮ — người nữ giúp ngầm, tinh tế." },
+  // 6 sát tinh
+  "擎羊": { vi: "Kình Dương", type: "sat", effect: "dương kim, hóa KHIÊN — bạo liệt, quyết đoán, tấn công, dũng cảm. Tích cực: tiên phong, đột phá. Tiêu cực: xung đột, thương tích, kiện tụng." },
+  "陀罗": { vi: "Đà La", type: "sat", effect: "âm kim, hóa HẠI — do dự, dây dưa, mâu thuẫn, nghĩ nhiều. Tích cực: phân tích sâu. Tiêu cực: chần chừ, tự hủy." },
+  "火星": { vi: "Hỏa Tinh", type: "sat", effect: "bùng nổ, nhiệt huyết, cáu gắt nhanh. Tích cực: nhiệt tình, chủ động. Tiêu cực: nóng nảy, phung phí." },
+  "铃星": { vi: "Linh Tinh", type: "sat", effect: "lửa ngầm — ôm hận, tính toán, tối. Tích cực: chiến lược sâu. Tiêu cực: thù dai, u uất." },
+  "地空": { vi: "Địa Không", type: "sat", effect: "rỗng — mất tiền, không giữ được, nhưng tâm linh sâu, sáng tạo. Tích cực: nghệ sĩ/tâm linh. Tiêu cực: tài chính bất ổn." },
+  "地劫": { vi: "Địa Kiếp", type: "sat", effect: "cướp đoạt — bị lấy đi, đột ngột mất. Nhưng cũng phá vỡ convention, đổi mới." },
+};
+
+export const ZIWEI_AUX_PRINCIPLES = [
+  "Sao khong co tot/xau tuyet doi — moi sao la modifier, hieu ung phu thuoc cung + chinh tinh + tu hoa."
+  "Sat tinh dung dung: quan su/kinh doanh mao hien/phau thuat = canh sat tinh de co canh.",
+  "Cat tinh qua nhieu cung Phu The = hoa don hon nhan (ngoai tinh).",
+  "Dia Khong/Dia Kiep = VUA sat tinh — lam yeu ca cat lan lan sat, co the dung de diet sat nhung cung diet cat.",
+  "Khi Duong + Hoa Tinh = bom no (nguy hiem). Linh Tinh + Da La = am uom thu dai.",
+  "Sat tinh tai cung Tai Bach = ton tai. Tai cung Quan Loc = tranh chap cong viec. Tai cung Tat Ach = benh.",
+];
