@@ -1556,3 +1556,49 @@ export const SHENSHA_PRINCIPLE_ADVANCED = [
   "7. Than sat tinh toan tu CHI nam sinh (tru 天乙 tinh toan tu CAN nam/ngay sinh).",
   "8. 「孤辰寡宿 mang quan an → lam rung lam chua」 — co sat mang quyen → quyen luc thay vi co don.",
 ];
+
+// ROUND 20: Luu nhat + zheri + 24 tiet khi + hoang dao
+export const LIURI_METHOD = [
+  "1. Luu nhat = can-chi cua ngay hom nay. Doc: can luu nhat x Nhat Chu (thap than) → tot/xau ban than hom nay.",
+  "2. Luu nhat xung Nhat Chi = ngay bien dong ban than/hon nhan. Hop Nhat Chi = ngay tot.",
+  "3. Luu nhat mang Dung = ngay tot (lam viec lon, ky ket). Mang Ky = ngay can than.",
+  "4. Luu nhat + luu nguyet cung Dung = ngay CUC tot. Cung Ky = ngay can than.",
+  "5. Luu nhat thuong quan/that sat = ngay de tranh tranh chap/suc khoe. Chinh tai = ngay co tien.",
+];
+
+export const HUANGDAO_12 = {
+  cat: {
+    "除": "Tru — tot don dep, cat tia, giam bot",
+    "危": "Nguuy — tot xay dung, sua chua (phong nguy hiem)",
+    "定": "Dinh — tot hop dong, mua ban, an dinh",
+    "执": "Chap — tot nam giu, bat dau, ky ket",
+    "成": "Thanh — tot hoan thanh, khai truong, cuoi hoi",
+    "开": "Khai — tot mo cua, khoi su, di xa, dau tu",
+  },
+  hung: {
+    "建": "Kien — trung tinh (xay dung nhung de phan bien)",
+    "满": "Man — trung tinh (day du nhung de thua)",
+    "平": "Binh — trung tinh (binh thuong)",
+    "收": "Thu — trung tinh (thu hoach nhung de mat)",
+    "破": "Pha — XAU: khong nen khoi su/dau tu/cuoi hoi",
+    "闭": "Be — XAU: khong nen dong kinh/mo cua/an tang",
+  },
+};
+
+export const JIEQI_24 = [
+  "Xuan: Lap Xuan → Vu Thuy → Kin Tran → Xuan Phan → Thanh Minh → Coc Vu",
+  "Ha: Lap Ha → Tieu Man → Mang Chung → Ha Chi → Tieu Thu → Dai Thu",
+  "Thu: Lap Thu → Cu Thu → Bo Su → Thu Phan → Han Lo → Suong Giang",
+  "Dong: Lap Dong → Tieu Tuyet → Dai Tuyet → Dong Chi → Tieu Han → Dai Han",
+];
+
+export const ZHERI_PRINCIPLES = [
+  "1. Chon ngay: xem tru (12 kien/tru/man/binh/dinh/chap/pha/nguy/thanh/thu/khai/be) + hoang dao/hac dao.",
+  "2. Chon ngay tot cho VIEC CUOI: can-nam nam sinh khong xung ngay. Ngay Dinh/Thanh/Khai. Tranh Pha/Be.",
+  "3. Chon ngay tot cho KINH DOANH: ngay Dinh/Thanh/Khai + can ngay = Tai tinh cua minh.",
+  "4. Chon ngay tot cho DI XA: ngay Khai + Dung Than. Tranh ngay xung chi nam sinh.",
+  "5. Chon ngay tot cho KHI BENH: ngay Dinh + An tinh. Tranh ngay Pha/Nguuy.",
+  "6. 24 tiet khi: moi tiet khi 15 ngay → ngu hanh thay doi. Tiet khi quan trong: Dong Chi (am cuc → du sinh), Ha Chi (duong cuc → am sinh).",
+  "7. Dong Chi → duong khi bat dau tang. Ha Chi → am khi bat dau tang. 2 diem xoay chon cua 1 nam.",
+  "8. 「tuy nhat bat tuy cuoc」— chon ngay tot nhung khong phu thuoc hoan toan. Nhan luc van la quan trong.",
+];
