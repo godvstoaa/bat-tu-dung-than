@@ -1356,7 +1356,7 @@ export const FLYING_STAR_2026 = {
 };
 
 export const FENGSHUI_CURE_5_YELLOW = [
-  'Ngu Hoang (5 vang) 2026 tai CHINH NAM — CUC HUNG: KHONG cai tao, KHONG dao dat, KHONG khoan otrong. Dem dong bac de hoa giai.'
-  'Cach hoa giai: dat dong bac/kim loai/khan vang o huong NAM. Treo luc phong. KHONG dung do do.'
-  'Nhi Hac (2 den) tai DONG BAC: benh tat — dat dong bac luc phong hoac vang 6 dong.'
+  'Ngu Hoang (5 vang) 2026 tai CHINH NAM — CUC HUNG: KHONG cai tao, KHONG dao dat. Dem dong bac de hoa giai.',
+  'Cach hoa giai: dat dong bac/kim loai/khan vang o huong NAM. Treo luc phong.',
+  'Nhi Hac (2 den) tai DONG BAC: benh tat. Dat luc phong hoac vang 6 dong.',
 ];
