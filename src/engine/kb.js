@@ -1360,3 +1360,29 @@ export const FENGSHUI_CURE_5_YELLOW = [
   'Cach hoa giai: dat dong bac/kim loai/khan vang o huong NAM. Treo luc phong.',
   'Nhi Hac (2 den) tai DONG BAC: benh tat. Dat luc phong hoac vang 6 dong.',
 ];
+// ROUND 15: Chenggu tiers + Sandishu + Karma
+export const CHENGGU_TIERS = [
+  { min: 2.1, max: 2.4, tier: "Ngheo kho", note: "cuoc song kho khan, can co gang nhieu." },
+  { min: 2.5, max: 2.7, tier: "Trung binh kem", note: "vua du, can tietkiem." },
+  { min: 2.8, max: 3.0, tier: "Trung binh", note: "on dinh, khong thieu khong du." },
+  { min: 3.1, max: 3.4, tier: "Kha", note: "kha quan, tien du." },
+  { min: 3.5, max: 3.9, tier: "Gioi", note: "giau, tien nhieu." },
+  { min: 4.0, max: 4.3, tier: "Phu quy", note: "danh tieng, quyen luc." },
+  { min: 4.4, max: 5.0, tier: "Cuc phu", note: "cuc phu quy." },
+  { min: 5.1, max: 7.1, tier: "Sieu phu", note: "cuc hiem — cuoc song sieu phu." },
+];
+
+export const SANDISHU_3_LIVES = {
+  intro: "Tam The Thu - doc 3 doi: tien the, kim sinh, hau the. dua vao ngay sinh.",
+  pastLifeGood: ["Tu tien/dao - tich duc", "Phat tu - tu bi", "Nha tu thien - gia dinh nghiep tot", "Quan nhan - chinh truc"],
+  pastLifeNeutral: ["Thuong nhan - buon ban", "Nong dan - cham chi", "Nghe si - tai hoa", "Hoc gia - hoc van"],
+  pastLifeBad: ["Cuop/bao duc - nghiep nang", "Gian hoan - lam ac", "Ke trom - tham lam"],
+};
+
+export const KARMA_LAWS = [
+  "1. Nhan qua: gieo gi gat nay.",
+  "2. Tang truong: qua thoi gian cham/nhanh.",
+  "3. 3 doi: tien the tich duc, kim sinh phuc, hau the thua huong.",
+  "4. Y CHINH giai nghiep (Lieu Pham): y chi quyet dinh, khong phai tat dinh.",
+  "5. Thien: 30% menh + 70% nhan luc.",
+];
