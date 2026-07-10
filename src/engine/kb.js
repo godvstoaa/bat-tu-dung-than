@@ -1276,10 +1276,10 @@ export const NAYIN_PERSONALITY = {
 };
 
 export const TAISUI_EFFECT = [
-  'Thai Tue (Thai Tuy) = chi nam nay ke voi chi nam sinh → xung Thai Tuy: nam bien dong lon (chuyen viec/chuyen nha/loi nhuan/suc khoe).'
-  'Xung: Ty<->Ngo, Suuse<->Mui, Dan<->Than, Mao<->Dau, Thin<->Tuat, Ty<->Hoi. 6 cap xung chi.'
-  'Thai Tuy khong phai xau hoan toan: neu mang Dung → bien dong dep. Mang Ky → bien dong kho.'
-  'Hai: chi nam hai ke vi chi nam sinh (vd: dan sinh gap Mao = hai). Nhe hon xung.'
-  'Pha: chi nam khac chi cua cung (vd: Thin gap Tuat = pha). Nhe.'
-  'Xung+Dung = nam bien dong dep. Xung+Ky = nam kho. Khong xung = nam on.'
+  'Thai Tue (Thai Tuy) = chi nam nay ke voi chi nam sinh. Xung Thai Tuy: nam bien dong lon.',
+  'Xung: Ty-Ngo, Suu-Mui, Dan-Than, Mao-Dau, Thin-Tuat, Ty-Hoi. 6 cap xung chi.',
+  'Thai Tuy khong phai xau hoan toan: neu mang Dung, bien dong dep. Mang Ky, bien dong kho.',
+  'Hai: chi nam hai ke vi chi nam sinh. Nhe hon xung.',
+  'Pha: chi nam khac chi cua cung. Nhe.',
+  'Xung+Dung = nam bien dong dep. Xung+Ky = nam kho. Khong xung = nam on.',
 ];
