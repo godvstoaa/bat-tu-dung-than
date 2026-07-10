@@ -1386,3 +1386,39 @@ export const KARMA_LAWS = [
   "4. Y CHINH giai nghiep (Lieu Pham): y chi quyet dinh, khong phai tat dinh.",
   "5. Thien: 30% menh + 70% nhan luc.",
 ];
+
+// ROUND 16: Ngu hanh nhan cach + ngoai hinh + dai van quy luat
+export const WUXING_APPEARANCE = {
+  "木": { face: "mat dai, cung nhon, ham nhon", body: "cao, mong, lung thang, vai rong, tay chan nho", complexion: "xanh nhat", note: "go nguoi thang, nhu cay — nhieu nang luong" },
+  "火": { face: "mat hinh trai tim, gò má nhoi, cằm nhọn, mat sang", body: "mong, de pog, tay chan thanh tu", complexion: "do/ hong", note: "nang dong, bung no, pha cach" },
+  "土": { face: "mat vuong, tai to,mui tuoi", body: "co the chac, be ngang, co dang", complexion: "vang/sau", note: "vung chai, dinh lang, dáng dấp dat me" },
+  "金": { face: "mat oval/vuong, cung guong mat canh", body: "mong, xuong nhon, khop nhin ro", complexion: "trang/bach", note: "dang dep, nhan tinh te, chinh xac" },
+  "水": { face: "mat tron, má day, dac diem uom wave", body: "mem, day, de tang can", complexion: "sam/hơi đen", note: "di de mai, uyen chuyen, nhu nuoc" },
+};
+
+export const WUXING_PERSONALITY_DEEP = {
+  "木": { strengths: ["nhan tu", "phat trien", "ke hoach dai han", "trung thuc", "bao quan"], weaknesses: ["cứng đầu", "ngang bướng", "khi tuong thai thì phan ung cham", "de bi tham lung"], growth: "can hoc MEM mai, nghe y kien, giam su đoi" },
+  "火": { strengths: ["nhiet huyet", "sang tao", "lam thu hut", "bieu dat manh", "lanh dao"], weaknesses: ["nong nat", "de buc phan", "thieu kien nhan", "dot phat"], growth: "can tap binh tinh, nghi truoc noi, giam phan ung cam xuc" },
+  "土": { strengths: ["on dinh", "tin nen", "cham chi", "bao dung", "thuc te"], weaknesses: ["bao thu", "de an co", "ngai thay doi", "tuong dja"], growth: "can chiu thay doi, mo ngoi, hoc cach mao hiem" },
+  "金": { strengths: ["ky luat", "quyet doan", "chinh xac", "cong bang", "ngoi sao"], weaknesses: ["lanh lanh", "kho gank", "qua nghiem khac", "de cat"], growth: "can mem mai, hoc long thong, giam phan xet" },
+  "水": { strengths: ["tri tue", "linh hoat", "giao tiep", "uyen chuyen", "tuong tuong"], weaknesses: ["de dao nay", "thieu kien dinh", "con cam xuc", "phuc tap"], growth: "can tap tap trung, quyet doan, giam lan dot" },
+};
+
+export const DAYUN_TIMING_LAWS = [
+  "1. Dai van 10 nam = 1 thoi ky. Can 5 nam = can quan ly, Chi 5 nam = chi đia luu.",
+  "2. Can dai van = thap than + Dung/Ky. Chi dai van = 12 truong sinh + xung/hop/hinh.",
+  "3. 'Minh khong bang van hao' — menh tot khong bang van tot. Dai van QUYET DINH hon menh goc.",
+  "4. 25-45 tuoi = 2-3 dai van quan trong nhat → dinh su nghiep + hon nhan.",
+  "5. Van tot + luu nien tot = nam cuc thinh. Van xau + luu nien xau = nam cuc kho.",
+  "6. 'Van ky nhap menh' = khi ky than vao dai van → nam can than de, giam quyet doan lon.",
+  "7. 'Van dung nhap menh' = khi dung than vao dai van → nam thinh vuong, tien bo lon.",
+  "8. Giao van (交运) = ngay chuyen tu dai van cu sang moi → ngay nay can y trong, tranh xung khac.",
+];
+
+export const BAZI_WEALTH_TIMING = [
+  "Khi nao phat tai? Xem: 1. Tinh tai (Chinh/Thien) xuat hien trong dai van. 2. Thuc thuong sinh tai. 3. Tai kho (辰戌丑未) mo.",
+  "Nghe nghiep thang tien? Xem: 1. Quan sat trong dai van. 2. An sinh quan. 3. Sat luc thuc (制殺留財).",
+  "Cuoi hoi khi nao? Xem: 1. Sao phoi ngau (Tài nam/Quan nu) trong dai van. 2. Hop/xung nhat chi. 3. Dao hoa.",
+  "Con cai khi nao? Xem: 1. Sao con (Quan nam/Thuc Thuong nu) trong dai van. 2. Thoi Trụ (cung con). 3. 12 truong sinh.",
+  "Suc khoe khi nao yeu? Xem: 1. Ngu hanh yeu nhat trong dai van. 2. Xung nhat chi. 3. That sat/Kiep tai vao van.",
+];
