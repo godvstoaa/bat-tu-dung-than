@@ -1132,3 +1132,56 @@ export const LUCK_INTERACTION_RULES = [
   '当 大运 Dụng nhưng 流年 Kỵ → năm bị cản (thuận nhưng có trắc trở).',
   '「命好不如运好」— mệnh tốt (dân mạnh) không bằng vận tốt (quan + vua ủng hộ). Đại vận QUYẾT ĐỊNH hơn mệnh gốc.',
 ];
+
+// ============================================================
+//  ROUND 8 CRAWL — 紫微斗数 14 chính tinh + 四化 + sát/bần/triêu
+//  Nguồn: baike.baidu, zhihu, sng-mia.com, purplestarmapper.com
+// ============================================================
+
+// ---- 14 CHÍNH TINH: tính cách + sự nghiệp ----
+export const ZIWEI_14_STARS = {
+  '紫微': { vi: 'Tử Vi', type: 'Đế vương', wx: 'Kỷ Thổ', personality: 'tôn quý, uy nghi, lãnh đạo bẩm sinh, kiêu ngạo, thích được tôn trọng', career: 'quản lý cấp cao, quan chức, giám đốc, lãnh đạo', love: 'bạn đời tôn trọng mình, cần người hầu cận' },
+  '天机': { vi: 'Thiên Cơ', type: 'Quân sư', wx: 'Ất Mộc', personality: 'thông minh, phân tích, mưu lược, hay suy nghĩ quá nhiều, thần kinh', career: 'công nghệ, R&D, tư vấn, kế hoạch, đầu tư phân tích', love: 'bạn đời trí tuệ, cần không gian riêng' },
+  '太阳': { vi: 'Thái Dương', type: 'Mặt Trời', wx: 'Bính Hỏa', personality: 'nhiệt huyết, bao dung, tỏa sáng, thích giúp người, dễ kiệt sức', career: 'giáo dục, chính trị, truyền thông, bán hàng, lãnh đạo', love: 'bạn đời ấm áp, hay hy sinh cho đối phương' },
+  '武曲': { vi: 'Vũ Khúc', type: 'Tướng quân', wx: 'Tân Kim', personality: 'kỷ luật, cương nghị, chính trực, lạnh lùng, kiên nhẫn tài chính', career: 'quân đội, tài chính, kế toán, thể thao, phẫu thuật', love: 'bạn đời thực tế, ít lãng mạn, bền lâu' },
+  '天同': { vi: 'Thiên Đồng', type: 'Phúc tinh', wx: 'Nhâm Thủy', personality: 'nhẹ nhàng, vui vẻ, an nhàn, cảm xúc, né tránh trách nhiệm, lười', career: 'công chức, giáo dục, tư vấn, dịch vụ, nhân sự', love: 'bạn đời hiền lành, ấm áp, cần người chủ động' },
+  '廉贞': { vi: 'Liêm Trinh', type: 'Thứ đào hoa', wx: 'Đinh Hỏa+Quý Thủy', personality: 'nhiệt tình, kiêu ngạo, cố chấp nội tâm, bí ẩn, 「tù tinh」= bị giam trong cảm xúc', career: 'luật, chính trị, quân đội, nghệ thuật, thi đấu', love: 'bạn đời mãnh liệt, dễ ghen, cần tin tưởng tuyệt đối' },
+  '天府': { vi: 'Thiên Phủ', type: 'Kho bạc', wx: 'Mậu Thổ', personality: 'ổn định, thực tế, hào phóng, thích tiện nghi, chiếm hữu', career: 'tài chính, ngân hàng, BĐS, quản lý, khách sạn', love: 'bạn đời chu đáo, vật chất tốt, cần tự do tài chính' },
+  '太阴': { vi: 'Thái Âm', type: 'Mặt Trăng', wx: 'Quý Thủy', personality: 'nhẹ nhàng, nhạy cảm, nuôi dưỡng, nghệ sĩ, trực giác mạnh,né tránh xung đột', career: 'nghệ thuật, văn học, mỹ phẩm, BĐS, chăm sóc', love: 'bạn đời dịu dàng, lãng mạn, cần an toàn' },
+  '贪狼': { vi: 'Tham Lang', type: 'Đào hoa chính', wx: 'Giáp Mộc+Quý Thủy', personality: 'duyên dáng, giao tiếp, tham vọng, hưởng thụ, nghệ sĩ, đa tài', career: 'giải trí, nghệ thuật, PR, marketing, sales, chính trị', love: 'bạn đời quyến rũ, đa tình, cần kích thích liên tục' },
+  '巨门': { vi: 'Cự Môn', type: 'Ám tinh', wx: 'Quý Thủy', personality: 'sắc bén, hùng biện, phân tích, đa nghi, hay cãi, khẩu thiệt', career: 'luật, báo chí, tranh biện, nghiên cứu, phê bình', love: 'bạn đời hay cãi vã, cần kiên nhẫn + giao tiếp mở' },
+  '天相': { vi: 'Thiên Tướng', type: 'Thừa tướng', wx: 'Nhâm Thủy', personality: 'ngoại giao, tinh tế, đứng đắn, khéo hòa giải, quan tâm hình ảnh', career: 'luật, tư vấn, công chức, PR, phó giám đốc', love: 'bạn đời lịch sự, bề ngoài đẹp, cần chân thành' },
+  '天梁': { vi: 'Thiên Lương', type: 'Lão nhân tinh', wx: 'Mậu Thổ', personality: 'khôn ngoan, nguyên tắc, bảo vệ, từ thiện, hay thuyết giáo', career: 'y học, luật, học thuật, tôn giáo, an sinh xã hội', love: 'bạn đời trưởng thành, hay lo cho người khác' },
+  '七杀': { vi: 'Thất Sát', type: 'Khai sáng', wx: 'Canh Kim', personality: 'can đảm, quyết đoán, độc lập, liều lĩnh, cứng đầu, chính nghĩa', career: 'khởi nghiệp, quân đội, thể thao competitive, phẫu thuật, quản lý khủng hoảng', love: 'bạn đời mạnh mẽ, ít lãng mạn, cạnh tranh' },
+  '破军': { vi: 'Phá Quân', type: 'Tiên phong', wx: 'Quý Thủy', personality: 'phản nghịch, đổi mới, khó lường, đam mê phá cũ xây mới, cảm xúc mạnh', career: 'startup, R&D sáng tạo, quân đội tiền tuyến, khám phá', love: 'bạn đời phức tạp, cần không gian + sự mới mẻ' },
+};
+
+// ---- 四化: Hóa Lộc/Quyền/Khoa/Kỵ ----
+export const SIHUA_MEANING = {
+  '化禄': { vi: 'Hóa Lộc', effect: 'Phú quý — mở rộng tài lộc, duyên, cơ hội. Sao bị Hóa Lộc = lĩnh vực đó ĐƯỢC LỢI. 「禄」= lương thực dồi dào.', timing: 'Cung bị Lộc = lĩnh vực phất lên. Lưu niên Lộc = năm đó thuận.' },
+  '化权': { vi: 'Hóa Quyền', effect: 'Quyền lực — kiểm soát, chủ động, định đoạt. Sao bị Hóa Quyền = lĩnh vực đó CÓ THẾ LỰC/CHỦ ĐỘNG.', timing: 'Cung bị Quyền = lĩnh vực mình nắm quyền. Lưu niên Quyền = năm quyết định lớn.' },
+  '化科': { vi: 'Hóa Khoa', effect: 'Danh vọng — tiếng tăm, học vấn, quý nhân. Sao bị Hóa Khoa = lĩnh vực đó CÓ DANH/QUÝ NHÂN.', timing: 'Cung bị Khoa = lĩnh vực nổi danh. Lưu niên Khoa = năm được công nhận.' },
+  '化忌': { vi: 'Hóa Kỵ', effect: 'TRỞ NGẠI — trở ngại, thiệt hại, gút mắt, tổn thương. Sao bị Hóa Kỵ = lĩnh vực đó KHÓ KHĂN. 「忌」= kỵ → dính líu, phiền não.', timing: 'Cung bị Kỵ = lĩnh vực đau đầu nhất cả đời. Lưu niên Kỵ = năm khó. NHƯNG: Hóa Kỵ ở cung Tật Ách = bệnh nhẹ (Kỵ = can thiệp y tế → hóa giải).' },
+};
+
+// ---- 大限 (10 năm) + 流年 (1 năm) tử vi ----
+export const ZIWEI_LUCK_RULES = [
+  '大限 (đại hạn) 10 năm: cung xoay theo tuổi — nam thuận/nữ nghịch. Đại hạn Cát → 10 năm thuận. Hung → 10 năm khó.',
+  '流年 (lưu niên) 1 năm: cung xoay theo chi năm. Lưu niên Cát → năm thuận.',
+  '大限 + 流年 cùng Cát → năm cực thuận. Cùng Hung → năm khó nhất.',
+  '四化 nhập cung: Lộc/Quyền/Khoa vào cung = lĩnh vực đó được kích hoạt tích cực. Kỵ vào cung = lĩnh vực bị trở ngại.',
+  '生年四化 (bẩm sinh): Hóa nào rơi vào cung nào = lĩnh vực gốc của cuộc đời.',
+  '大限四化: 10 năm đó hóa nào rơi vào cung nào = lĩnh vực được/bị tác động trong thập kỷ.',
+  '流年四化: năm đó hóa nào → lĩnh vực được/khó năm đó. QUAN TRỌNG NHẤT cho dự báo năm.',
+  '「忌入命」= năm khó bản thân. 「忌入财帛」= năm hao tài. 「忌入夫妻」= năm tình cảm xấu. 「忌入疾厄」= năm sức khỏe.',
+  '「禄入命」= năm tốt bản thân. 「禄入财帛」= năm kiếm tiền. 「禄入官禄」= năm sự nghiệp thuận.',
+];
+
+// ---- 庙旺平陷: sao mạnh hay yếu ----
+export const STAR_BRIGHTNESS_MEANING = {
+  '庙': { vi: 'Miếu', effect: 'sao cực mạnh → ý nghĩa CHÍNH diện phát huy đầy đủ. Tử Vi miếu = vua thực sự.' },
+  '旺': { vi: 'Vượng', effect: 'sao mạnh → ý nghĩa tốt. Không cực như miếu nhưng vẫn chủ đạo.' },
+  '得地': { vi: 'Đắc địa', effect: 'sao vừa đủ → ý nghĩa bình thường, không nổi bật.' },
+  '平': { vi: 'Bình', effect: 'sao yếu → ý nghĩa giảm. Cần xét kèm sát tinh.' },
+  '落陷': { vi: 'Loạn hãm', effect: 'sao cực yếu → ý nghĩa ĐẢO NGHĨA hoặc không phát huy. 「陷」= sao rơi vào hang → tính chất tiêu cực nổi bật.' },
+};
