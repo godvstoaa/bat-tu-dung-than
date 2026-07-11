@@ -145,15 +145,23 @@ export function nayinRelations(chart) {
 function isKe(a, b) { const m = { '木':'土','土':'水','水':'火','火':'金','金':'木' }; return m[a] === b; }
 
 // === 尊凶卑吉 (大運=ton, luu nien=by) — CO PHAP timing tu 珞琭子 ===
+
 export function zunXiongBeiJi(R) {
   try {
-    const dayun = (R?.dayun || []).find(d => d.isCurrent) || (R?.dayun || [])[0];
-    if (!dayun) return '';
-    const dung = dayun.yong === 'yong' || dayun.favor === true || dayun.useful === true;
-    const ky = dayun.yong === 'ji' || dayun.unfavor === true;
-    if (dung) return 'Đai van hien tai = DUNG (ton CAT) → 珞琭子「尊吉卑凶，逢災自愈»: đai van tot giup tu lanh bat ke luu nien.';
-    if (ky) return 'Đai van hien tai = KY (ton HUNG) → 珞琭子「尊凶卑吉，救療無功»: luu nien tot cung kho cuu, đe phong.';
-    return '';
+    const dy = R?.dayun || [];
+    if (!dy.length) return '';
+    const age = new Date().getFullYear() - (R?.input?.year || R?.chart?.input?.year || 1990);
+    let cur = dy[0];
+    for (const d of dy) { if ((d.startAge || 0) <= age) cur = d; }
+    const yong = R?.yong?.primary || '';
+    if (!yong) return '';
+    const dwx = [cur.ganWx, cur.zhiWx].filter(Boolean);
+    if (!dwx.length) return '';
+    const isDung = dwx.some(w => w === yong || WUXING_GEN[w] === yong);
+    const isKy = dwx.some(w => isKe(w, yong));
+    const gz = cur.ganZhi || (cur.gan||'')+(cur.zhi||'');
+    if (isDung && !isKy) return `Đai van hien tai ${gz} (can/chi ${dwx.join('/')}) la DUNG (hop ${yong}) → 珞琭子「尊吉卑凶逢災自愈」: đai van tot giup tu lanh bat ke luu nien.`;
+    if (isKy) return `Đai van hien tai ${gz} (can/chi ${dwx.join('/')}) khac DUNG (${yong}) = KY → 珞琭子「尊凶卑吉救療無功」: luu nien tot cung kho cuu, đe phong.`;
+    return `Đai van hien tai ${gz} (${dwx.join('/')}) trung tinh voi dung ${yong}.`;
   } catch (_) { return ''; }
 }
-
