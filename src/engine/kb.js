@@ -2410,3 +2410,23 @@ export const LANTAI_PATTERNS = [
   { id: "huozhen", name: "火震雷霆", vi: "Hỏa chấn lôi đình", cat: "cat", detect: { and: [ { hasHuo: true }, { branch: "卯" } ] }, judgment: "Nhaps am Hoa + chi Mao (loi đinh) → 'hoa chan loi đinh', uy quyen.", source: "lan dai" },
   { id: "heisha", name: "黑煞朝北斗", vi: "Hắc sát triêu bắc đẩu", cat: "cat", detect: { and: [ { ganAny: ["壬", "癸"] }, { branch: "丑" } ] }, judgment: "Nham/Quy (bach huyen vu = hac sat) + chi Suu (bach đau) → 'hac sat trieu bach đau', tri khi cái can khun.", source: "lan dai" },  { id: "tuoti", name: "脫體化神/超凡入聖", vi: "Thoát thể hóa thần", cat: "cat", detect: { tuotiHuashen: true }, judgment: "1 tru nhaps am 'yeu' + 1 tru khac nhaps am 'manh' CUNG HANH → 'thoat the hoa than/sieu pham nhap thanh', thanh tuu lon.", source: "lan dai" },
 ];
+
+// ROUND 33: 三命指迷赋 (Ngạc Kha bổ chú, THAT TRUYEN tan quyen tu Vinh Lac Đai Đien) — ban do SACH THAT TRUYEN duoc bao ton
+// Nguon: ctext chapter 2736591. Day la anthologize giu lai nhieu sach da mat.
+export const SANMING_ZHIMI_LOST_TEXTS = {
+  source: "三命指迷赋 (Tống·Ngạc Kha bổ chú). ctext. 'gốc thất truyền, trích Vĩnh Lạc Đại Điển'.",
+  nature: "Anthologize bảo tồn trích đoạn của nhiều SÁCH THẤT TRUYỀN (đã mất, chỉ còn qua đây):",
+  lostTexts: {
+    "鬼谷子": "Tử tinh/mệnh gốc (cũng là 李虚中命书的 attribution). Trích: '本音生旺须知福胜于休囚'.",
+    "唐沈芝": "Sách Đường (mất). Trích nhiều khẩu quyết (vd '格多纯粹遇德合而方荣').",
+    "袁天纲": "Sơ đời Đường, master. Trích: '干为禄本定一生职位高低'.",
+    "阎东叟书": "Mất. Trích: '三元论其富贵，五行知其消息'.",
+    "林开五命": "Mất (tinh mệnh). Trích: '生旺发来墓绝死，墓绝发来生旺终'.",
+    "神白经": "Mất. Trích ngũ âm + nam-nữ hợp.",
+    "烛神经": "Mất. Trích: '水者所以产万物，火者成万物' + âm-dương tương thắng.",
+    "采真歌/理愚歌/造微赋/混元赋": "Ca quyết cổ pháp (mất/mớm).",
+    "太乙统纪/广信集/广録/宰公要诀/鬼谷遗文": "Cổ pháp sách (mất).",
+  },
+  overlap: "Nội dung trùng hệ cổ pháp với 兰台妙选/珞琭子 (cùng hư trung phap) — xác nhận tính liên tục cổ pháp.",
+  note: "Đây là nguồn CHỨNG cho việc các sách cổ pháp đã mất (袁天纲/阎东叟/林开/神白经/烛神经...) — chỉ còn片段 trong 三命指迷赋/五行精纪. Day la phan 'su hoc bí truyền' cua co phap.",
+};
