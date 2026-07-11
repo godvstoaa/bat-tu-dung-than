@@ -16,6 +16,7 @@ import { assessHuangji } from './huangji-engine.js'; // [round 34] 皇极经世 
 import { assessTaiyi } from './taiyi-engine.js'; // [round 36] 太乙神数 (quoc van, tam thuc cam ky)
 import { assessChenggu } from './chenggu-engine.js'; // [round 37] 袁天罡称骨算命 (bí truyền)
 import { assessWuyunLiuqi } from './wuyun-liuqi.js'; // [round 42] 五运六气 (y-thiên văn cấm kị)
+import { PENGZU_BAIJI } from './kb.js'; // [round 43] 彭祖百忌 (cấm kị dân gian)
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
 import { nayinInfo } from './nayin.js';
@@ -924,6 +925,14 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const wl = assessWuyunLiuqi(yr);
     brief += "\n--- 五运六气 (y-thiên văn cấm kị, round 42) ---\n" + wl.verdict;
   } catch (e) { brief += "\n--- ROUND 42: [lỗi load] ---"; }
+
+  // ---- [round 43] 彭祖百忌 (CẤM KỴ dân gian — kiêng kỵ mỗi ngày) ----
+  try {
+    const dayGan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'][(_now.getFullYear() - 4) % 10];
+    const dayZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][(_now.getFullYear() - 4) % 12];
+    const bj = PENGZU_BAIJI.getDaily(dayGan, dayZhi);
+    brief += `\n--- 彭祖百忌 (cấm kị dân gian, round 43) ---\nNăm ${_now.getFullYear()} (${dayGan}${dayZhi}) kiêng: ${bj.combined}`;
+  } catch (e) { brief += "\n--- ROUND 43: [lỗi load] ---"; }
 
   return brief;
 }

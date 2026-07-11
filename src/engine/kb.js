@@ -2543,3 +2543,40 @@ export const MAQIANKE_SHAOBINGE = {
   },
   note: "Bộ 3 tiên tri cấm: 推背图 (Đường·Lý Thuần Phong) + 马前课 (Tam Quốc·Gia Cát Lượng) + 烧饼歌 (Minh·Lưu Bá Ôn). Tat ca đeu INTERPRETIVE (không compute chính xác) → app tham chieu trung thực, không 'nhét bừa'.",
 };
+
+// ROUND 43: 彭祖百忌 (CẤM KỴ dân gian) — mỗi can/chi → 1 điều kiêng kỵ. Dùng cho trạch nhật.
+export const PENGZU_BAIJI = {
+  source: "彭祖百忌 (dân gian, 'Không xả ..., Không vấn bốc ...'). He thong CAM KY cuoi cung: moi ngay = 2 kieng ky (can + chi).",
+  ganJi: {
+    "甲": "Giap bat khai thuong (KHONG mo kho — de mat tai)",
+    "乙": "At bat tai tri (KHONG trong cay - khong song)",
+    "丙": "Binh bat tac tao (KHONG lam bep - de chay)",
+    "丁": "Dinh bat che đao (KHONG cat toc - de suy)",
+    "戊": "Mau bat thien đia (KHONG nhan đat - de mat)",
+    "己": "Ky bat pha quan (KHONG pha hop đong - de ranh)",
+    "庚": "Canh bat kinh lac (KHONG may va - de sac)",
+    "辛": "Tan bat hop tuong (KHONG lam tuong - de huong)",
+    "壬": "Nham bat quyêt thuy (KHONG đap đe song - de ngap)",
+    "癸": "Quy bat tuong tuong (KHONG ke kien - de thua)",
+  },
+  zhiJi: {
+    "子": "Tu bat van bocc (KHONG hoi bói - de sai)",
+    "丑": "Suu bat quan đai (KHONG mac ao mao - de suy)",
+    "寅": "Dan bat te tuong (KHONG te tuong - de phan)",
+    "卯": "Mao bat xuyen tinh (KHONG đong gieng - de can)",
+    "辰": "Then bat khoc loc (KHONG an tang - de xui)",
+    "巳": "Ty bat viễn hanh (KHONG đi xa - de lac)",
+    "午": "Ngo bat phem cái (KHONG lap mai nha - de rot)",
+    "未": "Vi bat phuc duoc (KHONG uong thuoc - de doc)",
+    "申": "Than bat an thuong (KHONG đat giuong - de met)",
+    "酉": "Dau bat hoi khanh (KHONG tiep khach - de tranh)",
+    "戌": "Tuat bat khau quan (KHONG an cho - de om)",
+    "亥": "Hoi bat gia toi (KHONG cuoi hoi - de ly)",
+  },
+  // combine: moi ngay = ganJi[can] + zhiJi[chi] = 2 kieng ky
+  getDaily: function(gan, zhi) {
+    const g = this.ganJi[gan] || '';
+    const z = this.zhiJi[zhi] || '';
+    return { gan: g, zhi: z, combined: (g + ' | ' + z).trim() };
+  },
+};
