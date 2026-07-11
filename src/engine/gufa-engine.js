@@ -123,6 +123,8 @@ export function assessGufa(R) {
   const jiuming = assessJiuming(chart);
   const nayinRel = nayinRelations(chart);
   const zunBei = zunXiongBeiJi(R);
+  const upDown = wuxingUpDown(chart);
+  const imb = wuxingImbalance(chart);
   const cat = lantai.filter(p => p.cat === 'cat');
   const hung = lantai.filter(p => p.cat === 'hung');
   let verdict = 'CO PHAP (古法 nhaps am): ';
@@ -136,7 +138,9 @@ export function assessGufa(R) {
     verdict += `Nien menh nhaps am (${nayinRel.yearMing}) ${sup?'DUOC '+sup+' tru sinh (đuoc giup)':'khong đuoc sinh'}${atk?', bi '+atk+' tru khac (bi che)':''}. `;
   }
   if (zunBei) verdict += zunBei + ' ';
-  return { lantai: { cat, hung }, shenTouLu: stl, jiuming, nayinRelations: nayinRel, zunBei, verdict, model: GUFA_MODEL.note };
+  if (upDown.doc) verdict += 'NGU HANH HUONG: ' + upDown.doc + ' ';
+  if (imb.notes.length && imb.notes[0] && !imb.notes[0].includes('can bang')) verdict += 'THAI QUA/BAT CAP: ' + imb.notes.join(' ') + ' ';
+  return { lantai: { cat, hung }, shenTouLu: stl, jiuming, nayinRelations: nayinRel, zunBei, wuxingUpDown: upDown, wuxingImbalance: imb, verdict, model: GUFA_MODEL.note };
 }
 
 // === nhaps am sinhk giua cac tru (CO PHAP doc nien-menh nhaps am vs cac tru) ===
@@ -183,4 +187,54 @@ export function zunXiongBeiJi(R) {
     if (isKy) return `Đai van hien tai ${gz} (can/chi ${dwx.join('/')}) khac DUNG (${yong}) = KY → 珞琭子「尊凶卑吉救療無功」: luu nien tot cung kho cuu, đe phong.`;
     return `Đai van hien tai ${gz} (${dwx.join('/')}) trung tinh voi dung ${yong}.`;
   } catch (_) { return ''; }
+}
+
+
+// === 五行上下生克 (五行精纪 卷9) — pillar DIRECTION sinh/khac (year=top→time=bottom) ===
+export function wuxingUpDown(chart) {
+  const c = chart?.chart ? chart.chart : chart;
+  const pillars = pillarList(c);
+  if (pillars.length < 2) return {};
+  const order = ['year', 'month', 'day', 'time']; // top → bottom
+  const byPos = {}; order.forEach(p => { const pl = pillars.find(x => x.pos === p); if (pl) byPos[p] = wxOf(pl.nayin); });
+  const res = { zhuqi: 0, daoqi: 0, chenzhi: 0, weishi: 0, pairs: [] };
+  for (let i = 0; i < order.length - 1; i++) {
+    const up = byPos[order[i]], lo = byPos[order[i + 1]];
+    if (!up || !lo || up === lo) continue;
+    let kind = '';
+    if (WUXING_GEN[lo] === up) { kind = '助气'; res.zhuqi++; }       // duoi sinh tren = tro khi (tot)
+    else if (WUXING_GEN[up] === lo) { kind = '盗气'; res.daoqi++; }   // tren sinh duoi = dao khi (hao)
+    else if (isKe(lo, up)) { kind = '下克上'; res.chenzhi++; }        // duoi khac tren = tram tri
+    else if (isKe(up, lo)) { kind = '上克下'; res.weishi++; }         // tren khac duoi = uy the
+    if (kind) res.pairs.push(`${order[i]}(${up})→${order[i+1]}(${lo}):${kind}`);
+  }
+  let doc = '';
+  if (res.zhuqi > res.daoqi + res.weishi) doc = 'Duoi SINH tren nhieu (助气) → "nhat huong huong phuc, đeu duoc giup". ';
+  if (res.daoqi >= 2) doc += 'Tren SINH duoi nhieu (盗气) → "lam cho nguoi khac, phu on nguoi". ';
+  if (res.chenzhi >= 2) doc += 'Duoi KHAC tren nhieu → "tram tri kho phat". ';
+  if (res.weishi >= 2) doc += 'Tren KHAC duoi nhieu (威势) → "uy quyen nhung bat loi vo/con". ';
+  res.doc = doc || 'Trung hoa (sinh/khac huong can bang).';
+  return res;
+}
+
+// === 五行太过不及 (五行精纪 卷9) — nhaps am hanh DEM, phat hien 1-vs-3 / 4-cung-hanh ===
+export function wuxingImbalance(chart) {
+  const c = chart?.chart ? chart.chart : chart;
+  const pillars = pillarList(c);
+  const cnt = {};
+  for (const p of pillars) { const w = wxOf(p.nayin); if (w) cnt[w] = (cnt[w] || 0) + 1; }
+  const entries = Object.entries(cnt).sort((a, b) => b[1] - a[1]);
+  const notes = [];
+  // 4 cung hanh
+  if (entries.length === 1) notes.push('4 tru CUNG 1 hanh (nhat khi) → cuc manh, can trung hoa.');
+  // 1-vs-3: hanh A(1) sinh hanh B(3) → A hut can (枯槁)
+  for (const [a, ca] of entries) {
+    if (ca !== 1) continue;
+    for (const [b, cb] of entries) {
+      if (cb >= 3 && WUXING_GEN[a] === b) notes.push(`1 ${a} sinh 3 ${b} → "${a} hut can/kho co" (qua tai, ton ${a}).`);
+      if (cb >= 3 && WUXING_GEN[b] === a) notes.push(`3 ${b} sinh 1 ${a} → "${a} phuc thinh" (đuoc nuoi day).`);
+      if (cb >= 3 && isKe(a, b)) notes.push(`1 ${a} khac 3 ${b} → "nho lot lon, tu tao hoa" (bat tuong).`);
+    }
+  }
+  return { counts: cnt, notes: notes.length ? notes : ['Ngu hanh nhaps am phan bo tuong doi can bang, khong thai qua/bat cap.'] };
 }
