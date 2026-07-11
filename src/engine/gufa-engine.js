@@ -51,6 +51,20 @@ function matchDetect(pillars, monthZhi, spec) {
   if (spec.ganSetAny) { const gans = pillars.map(p => p.gan); return spec.ganSetAny.some(set => set.every(g => gans.includes(g))); }
   if (spec.allSameWx) { const wxs = pillars.map(p => wxOf(p.nayin)).filter(Boolean); return wxs.length >= 2 && wxs.every(w => w === wxs[0]); }
   if (spec.branchAny) return spec.branchAny.some(b => pillars.some(p => p.zhi === b));
+  if (spec.ganLianzhu) {
+    const ganOrder = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const gans = pillars.map(p => p.gan).filter(Boolean);
+    if (gans.length < 2) return false;
+    const indices = gans.map(g => ganOrder.indexOf(g));
+    for (let i = 1; i < indices.length; i++) { if (indices[i] !== (indices[i-1] + 1) % 10) return false; }
+    return true;
+  }
+  if (spec.tripleGanzhi) {
+    const gzs = pillars.map(p => p.gz);
+    const counts = {};
+    for (const g of gzs) counts[g] = (counts[g] || 0) + 1;
+    return Object.values(counts).some(c => c >= 3);
+  }
   if (spec.tuotiHuashen) {
     // 脱体化神/超凡入圣: PHAI cung hanh — 1 tru nhaps am 'yeu' + 1 tru 'manh' CUNG HANH
     const SETS = {

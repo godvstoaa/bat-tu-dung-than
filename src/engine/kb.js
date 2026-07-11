@@ -2431,6 +2431,13 @@ export const LANTAI_PATTERNS = [
   { id: "shuiju", name: "水居湖海", vi: "Thủy cư hồ hải", cat: "cat", detect: { and: [ { branch: "子" }, { nayin: "大海水" } ] }, judgment: "Chi Tu (ho) + Đai Ha Thuy (hai) → 'thuy cu ho hai', chi luong uong duong.", source: "lan dai" },
   { id: "huozhen", name: "火震雷霆", vi: "Hỏa chấn lôi đình", cat: "cat", detect: { and: [ { hasHuo: true }, { branch: "卯" } ] }, judgment: "Nhaps am Hoa + chi Mao (loi đinh) → 'hoa chan loi đinh', uy quyen.", source: "lan dai" },
   { id: "heisha", name: "黑煞朝北斗", vi: "Hắc sát triêu bắc đẩu", cat: "cat", detect: { and: [ { ganAny: ["壬", "癸"] }, { branch: "丑" } ] }, judgment: "Nham/Quy (bach huyen vu = hac sat) + chi Suu (bach đau) → 'hac sat trieu bach đau', tri khi cái can khun.", source: "lan dai" },  { id: "tuoti", name: "脫體化神/超凡入聖", vi: "Thoát thể hóa thần", cat: "cat", detect: { tuotiHuashen: true }, judgment: "1 tru nhaps am 'yeu' + 1 tru khac nhaps am 'manh' CUNG HANH → 'thoat the hoa than/sieu pham nhap thanh', thanh tuu lon.", source: "lan dai" },
+  { id: "baomao", name: "拔茅連茹", vi: "Bạt mao liên nhu", cat: "cat", detect: {"ganLianzhu":true}, judgment: "4 tru thien can lien tiep (vd Giap→At→Binh→Dinh) → «bat mao lien nhu», cong danh lien tuc.", source: "lan dai" },
+  { id: "andeng", name: "暗燈添油", vi: "Ám đăng thêm dầu", cat: "cat", detect: {"and":[{"nayin":"覆灯火"},{"branchAny":["亥","子","丑"]}]}, judgment: "Phuc Đang Hoa + gio đêm (Hai/Tu/Suu) → «am dang them dau», cuc quy (sang tu dieu).", source: "lan dai" },
+  { id: "diefeng", name: "疊鳳池", vi: "Điệp phượng trì", cat: "cat", detect: {"tripleGanzhi":true}, judgment: "3+ tru CUNG 1 can-chi → «diep phong tri», cuc quy (phong vi đac biet).", source: "lan dai" },
+  { id: "huotutang", name: "火土入堂", vi: "Hỏa thổ nhập đường", cat: "cat", detect: {"and":[{"nayin":"覆灯火"},{"nayin":"屋上土"}]}, judgment: "Phuc Đang Hoa + Oc Thuong Tho → «hoa tho nhat đuong», ban phu quy (đem phu phu quy).", source: "lan dai" },
+  { id: "sanqiLongHu", name: "三奇會龍虎", vi: "Tam kỳ hội long hổ", cat: "cat", detect: {"and":[{"ganSetAny":[["乙","丙","丁"],["甲","戊","庚"],["壬","癸","辛"]]},{"branchesAll":["寅","辰"]}]}, judgment: "Tam ky + Dan(ho)/Then(long) → «tam ky hoi long ho», cuc quy (co long ho ho tro).", source: "lan dai" },
+  { id: "jinshaJiaGui", name: "金殺夾貴", vi: "Kim sát giáp quý", cat: "cat", detect: {"and":[{"ganzhiAny":["丁酉","丁亥","壬午","壬辰"]},{"hasKim":true}]}, judgment: "Kim Than Sat + quí nhan → «kim sat gia quy», cuc quy (co uy quyen + quí nhan ho).", source: "lan dai" },
+
 ];
 
 // ROUND 33: 三命指迷赋 (Ngạc Kha bổ chú, THAT TRUYEN tan quyen tu Vinh Lac Đai Đien) — ban do SACH THAT TRUYEN duoc bao ton
