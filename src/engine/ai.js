@@ -16,7 +16,8 @@ import { assessHuangji } from './huangji-engine.js'; // [round 34] 皇极经世 
 import { assessTaiyi } from './taiyi-engine.js'; // [round 36] 太乙神数 (quoc van, tam thuc cam ky)
 import { assessChenggu } from './chenggu-engine.js'; // [round 37] 袁天罡称骨算命 (bí truyền)
 import { assessWuyunLiuqi } from './wuyun-liuqi.js'; // [round 42] 五运六气 (y-thiên văn cấm kị)
-import { PENGZU_BAIJI } from './kb.js'; // [round 43] 彭祖百忌 (cấm kị dân gian)
+import { PENGZU_BAIJI } from './kb.js';
+import { assessAppearance } from './appearance-engine.js'; // [R48] diện mạo time-variable // [round 43] 彭祖百忌 (cấm kị dân gian)
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
 import { nayinInfo } from './nayin.js';
@@ -1279,6 +1280,11 @@ export const AI_TOOLS = [
     }, required: ['mode'] },
   } },
   { type: 'function', function: {
+    name: 'analyze_appearance', description: 'DIỆN MẠO BÁT TỰ (thập can thể tượng + THỜI GIAN): nhật chủ → diện mạo cơ bản (10 can → cụ thể) + hành chủ đạo modifier + nhan sắc combos (kim thủy phùng/mộc hỏa thông minh) + ĐẠI VẬN HIỆN TẠI thay đổi diện mạo. Dùng khi user hỏi «diện mạo/ngoại hình/đẹp không/mặt ra sao/tướng mạo». KHÁC WUXING_APPEARANCE cũ (tĩnh) — đây là TIME-VARIABLE.',
+    parameters: { type: 'object', properties: {} },
+  } },
+,
+  { type: 'function', function: {
     name: 'log_error', description: '[R46] LOG LỖI — khi AI nhận ra mình luận SAI (sau khi user sửa) → gọi tool này để GHI NHẬN lỗi có cấu trúc. Admin dùng log này để fix hệ thống.',
     parameters: { type: 'object', properties: {
       wrong_claim: { type: 'string', description: 'AI đã nói gì sai' },
@@ -1447,6 +1453,10 @@ export function execTool(name, args, R) {
         const yr = Number(a.year) || _now.getFullYear();
         const wl = assessWuyunLiuqi(yr);
         return { year: wl.year, yearGanZhi: wl.yearGanZhi, wuyun: wl.wuyun, liuqi: wl.liuqi, verdict: wl.verdict, note: wl.note };
+      }
+      case 'analyze_appearance': { // [R48] diện mạo BÁT TỰ (thập can + thời gian)
+        const ap = assessAppearance(c, R);
+        return { dayMaster: ap.dayMaster, base: ap.base, elementBalance: ap.elementBalance, beauty: ap.beauty, currentDayun: ap.currentDayun, verdict: ap.verdict };
       }
       case 'log_error': { // [R46] AI tự log lỗi khi bị user sửa — structured error report + POST to server KV
         try { fetch('/api/log-error', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).catch(() => {}); } catch (_) {}
