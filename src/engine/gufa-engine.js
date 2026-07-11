@@ -102,6 +102,8 @@ export function assessGufa(R) {
   const lantai = detectLantai(chart);
   const stl = shenTouLu(chart);
   const jiuming = assessJiuming(chart);
+  const nayinRel = nayinRelations(chart);
+  const zunBei = zunXiongBeiJi(R);
   const cat = lantai.filter(p => p.cat === 'cat');
   const hung = lantai.filter(p => p.cat === 'hung');
   let verdict = 'CO PHAP (古法 nhaps am): ';
@@ -109,5 +111,49 @@ export function assessGufa(R) {
   else if (cat.length === 1) verdict += `1 cach cuc nhaps am cat (${cat[0].vi}). `;
   else verdict += 'Khong gap cach cuc nhaps am cat đac biet. ';
   if (hung.length) verdict += `CAN THAN: ${hung.length} cach cuc HUNG (${hung.map(p=>p.vi).join(', ')}) → đe phong. `;
-  return { lantai: { cat, hung }, shenTouLu: stl, jiuming, verdict, model: GUFA_MODEL.note };
+  if (nayinRel.yearMing) {
+    const sup = (nayinRel.relations||[]).filter(r => r.rel === 'shengBy').length;
+    const atk = (nayinRel.relations||[]).filter(r => r.rel === 'keBy').length;
+    verdict += `Nien menh nhaps am (${nayinRel.yearMing}) ${sup?'DUOC '+sup+' tru sinh (đuoc giup)':'khong đuoc sinh'}${atk?', bi '+atk+' tru khac (bi che)':''}. `;
+  }
+  if (zunBei) verdict += zunBei + ' ';
+  return { lantai: { cat, hung }, shenTouLu: stl, jiuming, nayinRelations: nayinRel, zunBei, verdict, model: GUFA_MODEL.note };
 }
+
+// === nhaps am sinhk giua cac tru (CO PHAP doc nien-menh nhaps am vs cac tru) ===
+export function nayinRelations(chart) {
+  const c = chart?.chart ? chart.chart : chart;
+  const pillars = pillarList(c);
+  const yearP = pillars.find(p => p.pos === 'year');
+  if (!yearP || !yearP.nayin) return {};
+  const yearWx = wxOf(yearP.nayin);
+  if (!yearWx) return {};
+  const rels = [];
+  for (const p of pillars) {
+    if (p.pos === 'year') continue;
+    const w = wxOf(p.nayin); if (!w) continue;
+    let rel = 'same';
+    if (WUXING_GEN[w] === yearWx) rel = 'shengBy';
+    else if (WUXING_GEN[yearWx] === w) rel = 'sheng';
+    else if (isKe(w, yearWx)) rel = 'keBy';
+    else if (isKe(yearWx, w)) rel = 'ke';
+    if (w === yearWx) rel = 'same';
+    rels.push({ pillar: p.pos, nayin: p.nayin, wx: w, rel });
+  }
+  return { yearMing: yearP.nayin + '(' + yearWx + ')', relations: rels };
+}
+function isKe(a, b) { const m = { '木':'土','土':'水','水':'火','火':'金','金':'木' }; return m[a] === b; }
+
+// === 尊凶卑吉 (大運=ton, luu nien=by) — CO PHAP timing tu 珞琭子 ===
+export function zunXiongBeiJi(R) {
+  try {
+    const dayun = (R?.dayun || []).find(d => d.isCurrent) || (R?.dayun || [])[0];
+    if (!dayun) return '';
+    const dung = dayun.yong === 'yong' || dayun.favor === true || dayun.useful === true;
+    const ky = dayun.yong === 'ji' || dayun.unfavor === true;
+    if (dung) return 'Đai van hien tai = DUNG (ton CAT) → 珞琭子「尊吉卑凶，逢災自愈»: đai van tot giup tu lanh bat ke luu nien.';
+    if (ky) return 'Đai van hien tai = KY (ton HUNG) → 珞琭子「尊凶卑吉，救療無功»: luu nien tot cung kho cuu, đe phong.';
+    return '';
+  } catch (_) { return ''; }
+}
+
