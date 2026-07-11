@@ -13,6 +13,7 @@ import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { assessGufa } from './gufa-engine.js'; // [round 31] CO PHAP deep-logic (兰台妙选 nhaps am cach cuc detect)
 import { assessHuangji } from './huangji-engine.js'; // [round 34] 皇极经世 值年卦 (prophetic/cam ky)
+import { assessTaiyi } from './taiyi-engine.js'; // [round 36] 太乙神数 (quoc van, tam thuc cam ky)
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
 import { nayinInfo } from './nayin.js';
@@ -890,6 +891,13 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       `NAM ${yr} = quẻ「${hj.hexagram} ${hj.vi}」(${hj.meaning}). Đai van: 鼎卦 (1984-2043 = cam che + bien đoi). Hoi: 午会 (大过卦, con ~6560 nam). Tone: ${hj.tone}. (Goc 邵雍 tiên tri — dùng cho trị quốc + 铁板神数. Tool analyze_huangji cho nam khac.)`;
   } catch (e) { brief += "\n--- ROUND 34: [lỗi load] ---"; }
 
+  // ---- [round 36] 太乙神数 (tam thức QUỐC VẬN, cấm kị) ----
+  try {
+    const yr = _now.getFullYear();
+    const ty = assessTaiyi(yr);
+    brief += `\n--- 太乙神数 (quốc vận tiên tri, round 36) ---\nNam ${yr}: 太乙积年=${ty.taiyiJiNian}, 阳局=${ty.yangJu}/72, 太乙 ở ${ty.taiyiGong.name}. ${ty.zhuKe} (三式: kỳ môn + 六壬 + 太乙; 太乙 = quốc vận, cấm kị nhất. Tool analyze_taiyi.)`;
+  } catch (e) { brief += "\n--- ROUND 36: [lỗi load] ---"; }
+
   return brief;
 }
 
@@ -1121,6 +1129,10 @@ export const AI_TOOLS = [
     name: 'analyze_huangji', description: '皇极经世 值年卦 (邵雍 TIEN TRI = bí truyền/cấm kị): quẻ chủ quản 1 NĂM (theo nguyên-hội-vận-thế + tiên thiên phương viên đồ, 60 năm 1 chu kỳ, bỏ 乾坤离坎). Dùng khi user hỏi «năm X quẻ gì / 值年卦 / 皇极 / 邵雍 / tiên tri năm / vận thế thế giới năm». Trả quẻ năm + ý nghĩa + vị trí nguyên-hội-vận-thế. Khác tử bình (đây là tiên tri vĩ mô/quốc gia, không cần lá số).',
     parameters: { type: 'object', properties: { year: { type: 'integer', description: 'Năm (bỏ trống = năm nay)' } } },
   } },
+  { type: 'function', function: { // [round 36] 太乙神数 (quoc van)
+    name: 'analyze_taiyi', description: '太乙神数 (TAM THUC = kỷ môn + lục nhâm + THÁI ẤT; thái ất = QUỐC VẬN, cấm kị nhất): 太乙积年 + 阳局(72) + 太乙行九宫 → 主/客 năm (nội lực on đinh vs ngoại lực biến động). Dùng khi user hỏi «thái ất / quốc vận năm X / tam thức / ngoại giao chiến sự năm». Trả 太乙 cung + 主客. Khác tử bình (đây là tiên tri quốc gia vĩ mô).',
+    parameters: { type: 'object', properties: { year: { type: 'integer', description: 'Năm (bỏ trống = năm nay)' } } },
+  } },
   { type: 'function', function: { // [loop 496→623 FIX] 梅花易数 起卦 by time
     name: 'analyze_meihua', description: '梅花易数 起卦 (time-based divination): gieo quẻ theo thời điểm → 本卦/互卦/变卦 + 体用 ngũ hành sinh khắc + verdict cát/hung. Dùng khi user hỏi «gieo quẻ», «起卦 about X», «占 [chủ đề]», «xem quẻ hôm nay». Trả quẻ +体用 + cát hung.',
     parameters: { type: 'object', properties: {
@@ -1318,6 +1330,11 @@ export function execTool(name, args, R) {
           year: hj.year, hexagram: hj.hexagram, vi: hj.vi, meaning: hj.meaning,
           tone: hj.tone, cycleNote: hj.cycleNote, yuanHuiYunShi: hj.yuanHuiYunShi, verdict: hj.verdict,
         };
+      }
+      case 'analyze_taiyi': { // [round 36] 太乙神数 (quoc van, tam thuc cam ky)
+        const yr = Number(a.year) || _now.getFullYear();
+        const ty = assessTaiyi(yr);
+        return { year: ty.year, taiyiJiNian: ty.taiyiJiNian, yangJu: ty.yangJu, taiyiGong: ty.taiyiGong, zhuKe: ty.zhuKe, secretLayer: ty.secretLayer, verdict: ty.verdict, note: ty.note };
       }
       case 'analyze_meihua': { // [loop 496] 梅花易数 起卦 by time
         const n = new Date();
