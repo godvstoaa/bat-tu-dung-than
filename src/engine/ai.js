@@ -12,6 +12,7 @@ import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { assessGufa } from './gufa-engine.js'; // [round 31] CO PHAP deep-logic (兰台妙选 nhaps am cach cuc detect)
+import { assessHuangji } from './huangji-engine.js'; // [round 34] 皇极经世 值年卦 (prophetic/cam ky)
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
 import { nayinInfo } from './nayin.js';
@@ -881,6 +882,14 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "CỬU MỆNH nhaps am hanh: " + gf.jiuming.dominantNayinWx + " | nhat nhaps am = " + gf.jiuming.dayNayinWx + " | phan bo: " + JSON.stringify(gf.jiuming.nayinWx);
   } catch (e) { brief += "\n--- ROUND 31: [lỗi load] ---"; }
 
+  // ---- [round 34] 皇极经世 值年卦 (BÍ TRUYEN/CAM KY — tiên tri,邵雍) ----
+  try {
+    const yr = _now.getFullYear();
+    const hj = assessHuangji(yr);
+    brief += "\n--- 皇极经世 值年卦 (bí truyền/cấm kị tiên tri, round 34) ---\n" +
+      `NAM ${yr} = quẻ「${hj.hexagram} ${hj.vi}」(${hj.meaning}). Đai van: 鼎卦 (1984-2043 = cam che + bien đoi). Hoi: 午会 (大过卦, con ~6560 nam). Tone: ${hj.tone}. (Goc 邵雍 tiên tri — dùng cho trị quốc + 铁板神数. Tool analyze_huangji cho nam khac.)`;
+  } catch (e) { brief += "\n--- ROUND 34: [lỗi load] ---"; }
+
   return brief;
 }
 
@@ -1108,6 +1117,10 @@ export const AI_TOOLS = [
     name: 'analyze_gufa', description: 'CỔ PHÁP (古法 = pre-子平, nhaps am luan menh): phát hiện CÁCH CỤC NẠP ÂM (兰台妙选: bảo kiếm xung ngưu đấu / mã hóa long câu / xà hóa thanh long / thủy nhiễu hoa đê / phục thể hóa thần...) trên lá số + THẦN ĐẦU LỘC (nhaps am từng giáp-tý) + CỬU MỆNH (3 nguyên+4 tru+loc ma). LOGIC TINH TOÁN, không phai nhet du lieu. Dùng khi user hỏi «cổ pháp / nhaps am / cuu menh / hư trung phap / 珞琭子 / 兰台 / than đau loc», hoặc muốn góc nhìn KHÁC tử bình (năm-trụ+nhaps am+thần sát thay vì nhật-trụ+dụng thần).',
     parameters: { type: 'object', properties: {} },
   } },
+  { type: 'function', function: { // [round 34] 皇极经世 值年卦 (prophetic/cam ky)
+    name: 'analyze_huangji', description: '皇极经世 值年卦 (邵雍 TIEN TRI = bí truyền/cấm kị): quẻ chủ quản 1 NĂM (theo nguyên-hội-vận-thế + tiên thiên phương viên đồ, 60 năm 1 chu kỳ, bỏ 乾坤离坎). Dùng khi user hỏi «năm X quẻ gì / 值年卦 / 皇极 / 邵雍 / tiên tri năm / vận thế thế giới năm». Trả quẻ năm + ý nghĩa + vị trí nguyên-hội-vận-thế. Khác tử bình (đây là tiên tri vĩ mô/quốc gia, không cần lá số).',
+    parameters: { type: 'object', properties: { year: { type: 'integer', description: 'Năm (bỏ trống = năm nay)' } } },
+  } },
   { type: 'function', function: { // [loop 496→623 FIX] 梅花易数 起卦 by time
     name: 'analyze_meihua', description: '梅花易数 起卦 (time-based divination): gieo quẻ theo thời điểm → 本卦/互卦/变卦 + 体用 ngũ hành sinh khắc + verdict cát/hung. Dùng khi user hỏi «gieo quẻ», «起卦 about X», «占 [chủ đề]», «xem quẻ hôm nay». Trả quẻ +体用 + cát hung.',
     parameters: { type: 'object', properties: {
@@ -1296,6 +1309,14 @@ export function execTool(name, args, R) {
           shenTouLu: gf.shenTouLu,
           jiuming: { dominantNayinWx: gf.jiuming.dominantNayinWx, dayNayinWx: gf.jiuming.dayNayinWx, nayinWx: gf.jiuming.nayinWx },
           model: gf.model,
+        };
+      }
+      case 'analyze_huangji': { // [round 34] 皇极经世 值年卦 (prophetic/cam ky) — tiên tri nam,邵雍
+        const yr = Number(a.year) || _now.getFullYear();
+        const hj = assessHuangji(yr);
+        return {
+          year: hj.year, hexagram: hj.hexagram, vi: hj.vi, meaning: hj.meaning,
+          tone: hj.tone, cycleNote: hj.cycleNote, yuanHuiYunShi: hj.yuanHuiYunShi, verdict: hj.verdict,
         };
       }
       case 'analyze_meihua': { // [loop 496] 梅花易数 起卦 by time
