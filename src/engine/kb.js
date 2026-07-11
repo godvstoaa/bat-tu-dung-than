@@ -2430,3 +2430,18 @@ export const SANMING_ZHIMI_LOST_TEXTS = {
   overlap: "Nội dung trùng hệ cổ pháp với 兰台妙选/珞琭子 (cùng hư trung phap) — xác nhận tính liên tục cổ pháp.",
   note: "Đây là nguồn CHỨNG cho việc các sách cổ pháp đã mất (袁天纲/阎东叟/林开/神白经/烛神经...) — chỉ còn片段 trong 三命指迷赋/五行精纪. Day la phan 'su hoc bí truyền' cua co phap.",
 };
+
+// ROUND 35: 铁板神数 (Thiết Bản Thần Số) — BÍ TRUYỀN/CẤM KỴ "đệ nhất thần số" (tham chiếu, không giả tính)
+export const TIEBAN_SHENSHU = {
+  source: "wikipedia/baike/多 nguồn. Hệ đoán chính xác sự kiện đời (12000 điều văn). Cấm truyền.",
+  concept: "铁板神数 = 'thiết bản' (sắt) — đoán CHÍNH XÁC sự kiện đời (cha/mẹ/vo chong/con tuổi gì, tài sản, sự kiện năm). Bát tự → quẻ → số → 12000 điều văn.",
+  methods: {
+    baguaJiaze: "八卦加则法 (phổ biến): bát tự → thượng/hạ quẻ → 八卦加则表 →数序 ×(100+1) → điều văn số. 8 quẻ×6=48 điều.",
+    guayaoHe: "卦爻干支和数法: 太玄数取数 (mỗi can/chi/quẻ = số 太玄).",
+    kaoshiDingke: "考时定刻取数法: tinh đến刻(15') — BÍ MẬT: 核对 lục thân (cha/mẹ/anh chị/vo chong/con) THẬN TẾ (生肖) → định khắc → mở 'khóa điều văn'.",
+    sizhuTiangan: "四柱天干取数法: 4 trụ thiên can → số.",
+  },
+  secret: "12000 điều văn (条文) = bảng số→câu tiên tri (vd 'cha tuổi sửu mẹ tuổi dần', '6x tuổi Y', 'tài sản Z'). Day la phan CAM — moi so = 1 su kien cu the. 考时定刻 (luc than than tiet) la 'chia khoa' mo đung dieu van.",
+  foundation: "Dùng 皇极经世 nguyên-hội-vận-thế + 声音唱和图 làm nền số lý (xem huangji-engine).",
+  honestyFlag: "⚠ NHIEU thuat toan tranh nhau (các 'ban' khac nhau) + 12000 đieu van la BI MAT → KHONG the tinh ra chinh xac neu thieu (a) đung thuat toan truong phai + (b) bang đieu van + (c) luc than than tiet. App CHI tham chieu he thong, KHONG gia tinh (tranh 'nhet bua').",
+};
