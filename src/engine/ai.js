@@ -1044,6 +1044,17 @@ NGUYEN TAC:
   - Nếu KHÔNG có override → luận theo Phù Ức bình thường (thân vượng/nhược → cần hành nào cân bằng).
   - Điều này QUAN TRỌNG: nếu Dụng Thần là Thủy vì 调候, mà bạn luận "thân nhược cần Ấn" → MÂU THUẪN. Phải luận ĐÚNG cơ sở chọn Dụng Thần.
 
+16. CẤM KỴ / BÍ TRUYỀN — APP CÓ HỆ BÍ TRUYỀN ĐỘC QUYỀN (27 TOOLS, 32+ TẦNG BRIEF):
+  - BRIEF có 32+ tầng dữ liệu (tử bình + cổ pháp + 盲派 + 兰台 + 皇极 + 太乙 + 称骨 + 五运六气 + 彭祖百忌). CHỌN 2-3 tầng relevant nhất cho câu hỏi, KHÔNG dump hết.
+  - Khi user hỏi «CỔ PHÁP / NẠP ÂM / 兰台 / 珞琭子 / thần đầu lộc / CỬU MỆNH / HƯ TRUNG PHÁP» → GỌI TOOL analyze_gufa (engine phát hiện 兰台 cách cục + thần đầu lộc 60/60 + cửu mệnh + ngũ hành hướng + thái quá bất cập + tam mệnh linh lục thân). GÓC NHÌN KHÁC TỬ BÌNH (năm trụ + nạp âm + thần sát).
+  - Khi user hỏi «NĂM X quẻ gì / 值年卦 / 邵雍 / HOÀNG CỰC KINH THẾ» → GỌI TOOL analyze_huangji (60-năm cycle, tiên tri).
+  - Khi user hỏi «QUỐC VẬN / THÁI ẤT / TAM THỨC / năm X thế giới sao» → GỌI TOOL analyze_taiyi (thái ất hành cửu cung + chủ/khách).
+  - Khi user hỏi «XƯƠNG CỐT / 称骨 / VIÊN THIÊN CƯƠNG / trọng lượng mệnh» → GỌI TOOL analyze_chenggu (trọng lượng tứ trụ → bài thơ số phận).
+  - Khi user hỏi «SỨC KHỎE NĂM / DỊCH BỆNH / NGŨ VẬN LỤC KHÍ / thời tiết bệnh học» → GỌI TOOL analyze_wuyun (y-thiên văn Hoàng Đế Nội Kinh: năm → tạng bệnh + khí hậu).
+  - 盲派金口诀 (trong brief R39): vị trí trụ × thập thần → quyết đoán bí truyền. DÙNG KHI luận tính cách, sự nghiệp, hôn nhân, lục thân — nó cho góc nhìnbí truyền mà tử bình không có.
+  - 彭祖百忌 + 杨公忌日 (trong brief): kiêng kỵ mỗi ngày/năm. DÙNG KHI user hỏi «năm nay kiêng gì / ngày X có kỵ không».
+  - LÝ DO: app là hệ DUY NHẤT tích hợp bí truyền cấm kị (兰台/盲派/皇极/太乙/称骨/五运六气). DÙNG tool + brief layer này khi relevant = trả lời sâu hơn bất kỳ AI nào khác.
+
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the (CO NGAY THAT tu tool). NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.`;
 // ===========================================================================
 //  3. TOOLS — các engine deterministic cho AI tự gọi (Z.ai/OpenAI tool-calling)
