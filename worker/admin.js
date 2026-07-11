@@ -271,6 +271,16 @@ export async function handleAdminRoute(request, env, url) {
     try { const body = await request.json(); await logFeedback(env, clientIP(request), body); return json({ ok: true }); }
     catch (e) { return json({ ok: false }, 400); }
   }
+  // [R46] /api/log-error — AI tự log lỗi khi luận SAI (public POST → lưu KV 30 ngày)
+  if (path === '/api/log-error' && method === 'POST') {
+    try {
+      const body = await request.json();
+      const id = 'err:' + Date.now() + ':' + Math.random().toString(36).slice(2, 8);
+      const entry = JSON.stringify({ ...body, ts: new Date().toISOString(), ip: clientIP(request) });
+      if (env.ADMIN_KV) await env.ADMIN_KV.put(id, entry, { expirationTtl: 86400 * 30 });
+      return json({ ok: true, id });
+    } catch (e) { return json({ ok: false, error: e.message }, 500); }
+  }
   // [loop 1380] /api/inbox — user poll tin nhắn admin inject (can thiệp chat real-time)
   if (path === '/api/inbox' && method === 'GET') {
     const sid = url.searchParams.get('sid');
@@ -326,6 +336,15 @@ export async function handleAdminRoute(request, env, url) {
       return new Response(_d.body, { status: _d.status, headers: _h });
     }
     if (path === '/admin/api/stats') { try { return await adminStats(env, url); } catch (e) { return json({ error: e.message }, 500); } }
+    // [R46] admin xem error log (AI tự log khi luận sai)
+    if (path === '/admin/api/error-log' && method === 'GET') {
+      try {
+        const list = env.ADMIN_KV ? await env.ADMIN_KV.list({ prefix: 'err:', limit: 100 }) : { keys: [] };
+        const errors = [];
+        for (const k of list.keys) { const v = await env.ADMIN_KV.get(k.name); if (v) errors.push(JSON.parse(v)); }
+        return json({ count: errors.length, errors: errors.sort((a, b) => (b.ts || '').localeCompare(a.ts || '')) });
+      } catch (e) { return json({ error: e.message }, 500); }
+    }
     if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
     if (path === '/admin/api/ai-free' && method === 'POST') return adminToggleFreeAi(env, request);
     if (path === '/admin/api/free-test' && method === 'POST') { try { return await adminFreeTest(env, request); } catch (e) { return json({ ok: false, err: e.message }, 500); } }

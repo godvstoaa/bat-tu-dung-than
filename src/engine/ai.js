@@ -1441,7 +1441,8 @@ export function execTool(name, args, R) {
         const wl = assessWuyunLiuqi(yr);
         return { year: wl.year, yearGanZhi: wl.yearGanZhi, wuyun: wl.wuyun, liuqi: wl.liuqi, verdict: wl.verdict, note: wl.note };
       }
-      case 'log_error': { // [R46] AI tự log lỗi khi bị user sửa — structured error report
+      case 'log_error': { // [R46] AI tự log lỗi khi bị user sửa — structured error report + POST to server KV
+        try { fetch('/api/log-error', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).catch(() => {}); } catch (_) {}
         return {
           logged: true,
           timestamp: new Date().toISOString(),
