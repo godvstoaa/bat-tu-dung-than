@@ -11,7 +11,7 @@ import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
-import { assessGufa } from './gufa-engine.js'; // [round 31] CO PHAP deep-logic (兰台妙选 nhaps am cach cuc detect)
+import { assessGufa, mangpaiKoujue } from './gufa-engine.js'; // [round 31] CO PHAP deep-logic + [R39] 盲派金口诀
 import { assessHuangji } from './huangji-engine.js'; // [round 34] 皇极经世 值年卦 (prophetic/cam ky)
 import { assessTaiyi } from './taiyi-engine.js'; // [round 36] 太乙神数 (quoc van, tam thuc cam ky)
 import { assessChenggu } from './chenggu-engine.js'; // [round 37] 袁天罡称骨算命 (bí truyền)
@@ -904,6 +904,12 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const cg = assessChenggu(c.input.year, c.input.month, c.input.day, c.input.hour);
     brief += `\n--- 称骨算命 (袁天罡, round 37) ---\nTrong luong = ${cg.weights.year}+${cg.weights.month}+${cg.weights.day}+${cg.weights.hour} = ${cg.weights.total} tien = ${cg.boneWeight}. [${cg.tone}] ${cg.viGloss}. Lunar: ${cg.lunar.year}/${cg.lunar.month}/${cg.lunar.day}. (Bí truyền Đường·袁天罡, bo sung tu binh/ho phap. Tool analyze_chenggu.)`;
   } catch (e) { brief += "\n--- ROUND 37: [lỗi load] ---"; }
+
+  // ---- [round 39] 盲派金口诀 (bí truyền: vị trí trụ × thập thần → quyết đoán) ----
+  try {
+    const mk = mangpaiKoujue(c);
+    brief += "\n--- 盲派金口诀 (bí truyền, round 39) ---\n" + mk.readings.map(r => `${r.pos} [${r.god}]: ${r.verse}`).join(' | ');
+  } catch (e) { brief += "\n--- ROUND 39: [lỗi load] ---"; }
 
   return brief;
 }
