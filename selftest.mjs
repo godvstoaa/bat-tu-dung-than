@@ -9081,6 +9081,7 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     ['analyze_taiyi', {year:2026}], // [R36] 太乙神数 quốc vận
     ['analyze_chenggu', {year:1990,month:5,day:15,hour:10}], // [R37] 称骨
     ['analyze_wuyun', {year:2026}], // [R42] 五运六气
+    ['log_error', {wrong_claim:'test', root_cause:'test'}], // [R46] log lỗi
   ];
   let _ok = 0;
   for (const [_n, _a] of _tests) { const _r = execTool(_n, _a, Ru); if (!_r.error) _ok++; }
