@@ -1168,7 +1168,6 @@ export const AI_TOOLS = [
     name: 'analyze_wuyun', description: '五运六气 (Hoàng Đế Nội Kinh, Y-THIÊN VĂN cấm kị): năm CAN → vận (thái quá/bất cập) + năm CHI → 6 khí (tư thiên/tại tuyền) → tạng phủ bệnh + khí hậu năm. Dùng khi user hỏi «sức khỏe năm X / dịch bệnh / ngũ vận lục khí / thời tiết bệnh học / nội kinh vận khí». Trả vận + khí + tạng bệnh. Góc Y-thiên văn (khác tử bình).',
     parameters: { type: 'object', properties: { year: { type: 'integer', description: 'Năm (bỏ trống = năm nay)' } } },
   } },
-,
   { type: 'function', function: { // [loop 496→623 FIX] 梅花易数 起卦 by time
     name: 'analyze_meihua', description: '梅花易数 起卦 (time-based divination): gieo quẻ theo thời điểm → 本卦/互卦/变卦 + 体用 ngũ hành sinh khắc + verdict cát/hung. Dùng khi user hỏi «gieo quẻ», «起卦 about X», «占 [chủ đề]», «xem quẻ hôm nay». Trả quẻ +体用 + cát hung.',
     parameters: { type: 'object', properties: {
