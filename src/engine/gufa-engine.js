@@ -49,6 +49,8 @@ function matchDetect(pillars, monthZhi, spec) {
   if (spec.nayinMocCount) return countWx(pillars, '木') >= spec.nayinMocCount;
   if (spec.nayinKimCount) return countWx(pillars, '金') >= spec.nayinKimCount;
   if (spec.ganSetAny) { const gans = pillars.map(p => p.gan); return spec.ganSetAny.some(set => set.every(g => gans.includes(g))); }
+  if (spec.allSameWx) { const wxs = pillars.map(p => wxOf(p.nayin)).filter(Boolean); return wxs.length >= 2 && wxs.every(w => w === wxs[0]); }
+  if (spec.branchAny) return spec.branchAny.some(b => pillars.some(p => p.zhi === b));
   if (spec.motherGenerates) {
     const dayWx = wxOf(c_dayNayin(pillars));
     if (!dayWx) return false;
