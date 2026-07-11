@@ -1455,7 +1455,7 @@ export function execTool(name, args, R) {
         return { year: wl.year, yearGanZhi: wl.yearGanZhi, wuyun: wl.wuyun, liuqi: wl.liuqi, verdict: wl.verdict, note: wl.note };
       }
       case 'analyze_appearance': { // [R48] diện mạo BÁT TỰ (thập can + thời gian)
-        const ap = assessAppearance(c, R);
+        const ap = assessAppearance(R.chart, R);
         return { dayMaster: ap.dayMaster, base: ap.base, elementBalance: ap.elementBalance, beauty: ap.beauty, currentDayun: ap.currentDayun, verdict: ap.verdict };
       }
       case 'log_error': { // [R46] AI tự log lỗi khi bị user sửa — structured error report + POST to server KV
