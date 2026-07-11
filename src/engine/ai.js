@@ -333,6 +333,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - «十神 chuyên luận» (滴天髓阐微 官杀混杂/伤官/清浊/真假): ${Object.entries(DITIANSUI_SHISHEN).map(([k, e]) => `${k}「${e.verse}」→${e.cue || e.apply.split('.')[0]}`).join(' | ')}
 - «十神 bản chất» (TEN_GOD_DEEP — chỉ các sao CÓ MẶT trong lá số): ${(() => { const g = new Set(); for (const pos of ['year','month','day','time']) { const pl = c.pillars[pos]; if (pl.ganGod) g.add(pl.ganGod); (pl.hidden||[]).forEach(h => { if (h.god) g.add(h.god); }); } return [...g].filter(x => TEN_GOD_DEEP[x]).map(x => `${x}(${TEN_GOD_DEEP[x].vi}): ${TEN_GOD_DEEP[x].nature} [lĩnh vực: ${TEN_GOD_DEEP[x].areas}]`).join('; '); })()}
 - THẬP THẦN ĐẾM (kể TÀNG CAN — KHÔNG BỎ SÓT): ${(() => { const counts = {}; for (const pos of ['year','month','day','time']) { const pl = c.pillars[pos]; const posVi = {year:'năm',month:'tháng',day:'ngày',time:'giờ'}[pos]; if (pl.ganGod && pl.ganGod !== '日主') { const k = pl.ganGod; if (!counts[k]) counts[k] = []; counts[k].push(`${posVi} lộ(${pl.gan})`); } (pl.hidden||[]).forEach(h => { if (h.god && h.god !== '日主') { const k = h.god; if (!counts[k]) counts[k] = []; counts[k].push(`${posVi} tàng(${h.gan})`); } }); } return Object.entries(counts).sort((a,b) => b[1].length - a[1].length).map(([god, positions]) => { const vi = TEN_GOD_VI[god] || god; return `${god}(${vi}): ${positions.length}/4 [${positions.join(' + ')}]`; }).join(' | '); })()}
+- TỔ HỢP KINH ĐIỂN (pre-compute — AI KHÔNG ĐƯỢC BỎ SÓT khi luận học vấn/sự nghiệp/hôn nhân): ${(() => { const gods = new Set(); for (const pos of ['year','month','day','time']) { const pl = c.pillars[pos]; if (pl.ganGod && pl.ganGod !== '日主') gods.add(pl.ganGod); (pl.hidden||[]).forEach(h => { if (h.god && h.god !== '日主') gods.add(h.god); }); } const has = g => gods.has(g); const hasAn = has('正印') || has('偏印'); const hasTai = has('正财') || has('偏财'); const hasTy = has('比肩') || has('劫财'); const combos = []; if (has('伤官') && hasAn) combos.push('✓伤官配印(thương quan + ấn = HỌC VẤN CAO, trí tuệ được công nhận — KHÔNG nói khó lấy bằng!)'); if (has('七杀') && hasAn) combos.push('✓杀印相生(sát + ấn = QUYỀN LỰC + HỌC VẤN, cách cục quan lớn)'); if (has('食神') && has('七杀')) combos.push('✓食制杀(thực + sát = KỸ NĂNG chế ngự uy quyền)'); if (hasTai && has('正官')) combos.push('✓财生官(tài + quan = TÀI LỘC hỗ trợ SỰ NGHIỆP)'); if (has('正官') && has('七杀')) combos.push('⚠官煞混杂(quan + sát = QUYỀN LỰC LỘN XỘN, hôn nhân bất ổn)'); if (hasTy && hasTai) combos.push('⚠比劫争财(tỷ + tài = TRANH TÀI, dễ mất tiền/đối tác)'); if (has('偏印') && has('食神')) combos.push('⚠枭夺食(kiều + thực = TÀI NĂNG bị ÈM, cần giải)'); return combos.length ? combos.join(' | ') : '(không có tổ hợp kinh điển rõ)'; })()}
 - «Lĩnh vực cuộc sống» (LIFE_AREA_INDEX — quy tắc chủ mỗi lĩnh vực): ${Object.entries(LIFE_AREA_INDEX).map(([k, e]) => `${e.title}→${e.focus}`).join('; ')}
 - «Cách cục hướng dẫn» (PATTERN_GUIDE — định hướng sự nghiệp/đời sống cho cách cục này): ${R.pattern && PATTERN_GUIDE[R.pattern.name] ? PATTERN_GUIDE[R.pattern.name] : '(cách không có guide)'}
 - «Tương tác can chi» (INTERACTION_MEANING — ý nghĩa hợp/xung/hình/hại): ${Object.entries(INTERACTION_MEANING).map(([k, e]) => `${k}→${String(e).split('.')[0]}`).join('; ')}
@@ -1058,6 +1059,13 @@ NGUYEN TAC:
 
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the (CO NGAY THAT tu tool). NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.
 
+18. LOG LỖI KHI SAI — KHI USER SỬA PHÂN TÍCH CỦA BẠN (BAT BUOC):
+  - KHI user nói «thầy luận sai», «không phải vậy», «con không giống», «thầy bỏ sót» → BẠN PHẢI:
+    1. RE-READ brief data trên đúng chủ đề user chỉ (tàng can? ngũ hành? tổ hợp? timing?).
+    2. NẾU BẠN THẬT SỰ SAI → GỌI TOOL log_error với: wrong_claim (bạn nói gì sai), user_correction (user sửa gì), root_cause (tại sao sai — vd «bỏ sót tàng can», «chỉ nhìn 1 hành», «bỏ sót tổ hợp kinh điển», «hùa theo user»), correct_analysis (phân tích đúng).
+    3. NẾU BẠN ĐÚNG → KHÔNG gọi log_error → DEFEND bằng DATA CỤ THỂ (can-chi, tàng can, thập thần, đại vận).
+    4. log_error giúp ADMIN (người chủ app) THẤY lỗi → fix hệ thống → AI giỏi hơn lần sau.
+
 17. PHAN TICH KY THUAT — KHONG BO SOT DU LIEU (RAT QUAN TRONG — tranh luan sai):
   A. KHI LUAN BAT KY SAO NAO (An/Quan/Tai/Thuc/Thuong/Sat) → PHAI DEM O TAT CA 4 TRU + TANG CAN (an can trong chi). "An mong/vuong" → CHI KHI da dem LO + TANG o ca 4 tru. KHONG ket luan "An mong" chi vi khong thay o can chinh — TANG CAN trong chi (vd Ngo tàng Dinh = Chinh An ngay duoi Nhat Chu) CO THE lam An VUONG. Truoc khi noi "khong co sao X" → KIEM TRA tang can cua TAT CA 4 chi.
   B. KHI LUAN NGOAI HINH/TINH CACH → XET TAT CA NGU HANH (chinh + tang + nhaps am), KHONG chi hanh dominant. Vd: Tho vuong nhung Hoa (Dinh) vuong → Hoa MEM dinh hinh ve ngoai, KHONG phai Tho cung. Moi hanh co 1 dac trung ngoai hinh rieng (Moc=cao mong, Hoa=sang đo, Tho=chac nang, Kim=trang thanh, Thuy=den uyen) → PHOI HOP tat ca, khong lay 1 hanh dua ra ket luan.
@@ -1407,6 +1415,19 @@ export function execTool(name, args, R) {
         const yr = Number(a.year) || _now.getFullYear();
         const wl = assessWuyunLiuqi(yr);
         return { year: wl.year, yearGanZhi: wl.yearGanZhi, wuyun: wl.wuyun, liuqi: wl.liuqi, verdict: wl.verdict, note: wl.note };
+      }
+      case 'log_error': { // [R46] AI tự log lỗi khi bị user sửa — structured error report
+        return {
+          logged: true,
+          timestamp: new Date().toISOString(),
+          error: {
+            wrong_claim: a.wrong_claim || '(không ghi)',
+            user_correction: a.user_correction || '(không ghi)',
+            root_cause: a.root_cause || '(chưa xác định)',
+            correct_analysis: a.correct_analysis || '(chưa ghi)',
+          },
+          note: 'Lỗi đã được log. Admin có thể xem lỗi này để cải thiện hệ thống.',
+        };
       }
       case 'analyze_meihua': { // [loop 496] 梅花易数 起卦 by time
         const n = new Date();
@@ -2139,7 +2160,16 @@ async function streamRound(url, headers, body, onToken, onStatus, signal) {
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buf = '', full = '';
-  const toolCalls = [];
+  const toolCalls = [  { type: 'function', function: {
+    name: 'log_error', description: '[R46] LOG LỖI — khi AI nhận ra mình luận SAI (sau khi user sửa/phản biện) → gọi tool này để GHI NHẬN lỗi có cấu trúc. Admin dùng log này để fix hệ thống. Dùng KHI: user nói «thầy luận sai», «không phải vậy», «con không giống», và KIỂM TRA lại thấy ĐÚNG là AI sai.',
+    parameters: { type: 'object', properties: {
+      wrong_claim: { type: 'string', description: 'AI đã nói gì sai (vd «Ấn mỏng»)'},
+      user_correction: { type: 'string', description: 'User sửa gì (vd «Đinh ở 3/4 trụ gồm tàng can»)'},
+      root_cause: { type: 'string', description: 'Tại sao AI sai (vd «bỏ sót tàng can» / «chỉ nhìn 1 hành» / «bỏ sót tổ hợp» / «hùa theo user»)'},
+      correct_analysis: { type: 'string', description: 'Phân tích ĐÚNG sau khi sửa'},
+    }, required: ['wrong_claim', 'root_cause'] },
+  } },
+];
   // [loop 920] reasoning_content preview — tránh UI "đứng" 18-20s khi GLM đang suy nghĩ
   let reasoning = '';
   let lastReasonLen = 0, lastReasonAt = 0;
