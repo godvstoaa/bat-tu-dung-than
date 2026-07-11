@@ -1056,6 +1056,7 @@ NGUYEN TAC:
   - 盲派金口诀 (trong brief R39): vị trí trụ × thập thần → quyết đoán bí truyền. DÙNG KHI luận tính cách, sự nghiệp, hôn nhân, lục thân — nó cho góc nhìnbí truyền mà tử bình không có.
   - 彭祖百忌 + 杨公忌日 (trong brief): kiêng kỵ mỗi ngày/năm. DÙNG KHI user hỏi «năm nay kiêng gì / ngày X có kỵ không».
   - LÝ DO: app là hệ DUY NHẤT tích hợp bí truyền cấm kị (兰台/盲派/皇极/太乙/称骨/五运六气). DÙNG tool + brief layer này khi relevant = trả lời sâu hơn bất kỳ AI nào khác.
+  - GIẢI THÍCH ĐƯỢC TẤT CẢ: bạn là CHUYÊN GIA về toàn bộ hệ cấm kị. Khi user hỏi «兰台妙选 là gì» / «称骨算 mệnh sao» / «thái ất đoán quốc vận thế nào» / «五运六 khí là gì» / «彭祖百忌 kiêng gì» / «皇极 kinh thế đoán sao» / «盲派 khác tử bình chỗ nào» → GIẢI THÍCH bằng kiến thức chuyên gia (định nghĩa + phương pháp + ứng dụng). KHÔNG nói «không rõ» — bạn BIẾT các hệ này.
 
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the (CO NGAY THAT tu tool). NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.
 
@@ -1254,6 +1255,15 @@ export const AI_TOOLS = [
       purpose: { type: 'string', enum: ['cuakhach', 'giuong', 'banlamviec', 'bep', 'dongtho', 'khaitruong', 'khach'], description: 'mục đích (mode=recommend). cuakhach=cửa chính, giuong=giường ngủ, banlamviec=bàn, bep=bếp, dongtho/khaitruong=động thổ' },
       direction: { type: 'string', description: 'hướng cần luận (mode=read): tên sơn Hán (vd 子,坤) hoặc độ 0-359 hoặc palace (vd Bắc,Tây Nam)' },
     }, required: ['mode'] },
+  } },
+  { type: 'function', function: {
+    name: 'log_error', description: '[R46] LOG LỖI — khi AI nhận ra mình luận SAI (sau khi user sửa) → gọi tool này để GHI NHẬN lỗi có cấu trúc. Admin dùng log này để fix hệ thống.',
+    parameters: { type: 'object', properties: {
+      wrong_claim: { type: 'string', description: 'AI đã nói gì sai' },
+      user_correction: { type: 'string', description: 'User sửa gì' },
+      root_cause: { type: 'string', description: 'Tại sao sai (vd bỏ sót tàng can / chỉ nhìn 1 hành / bỏ sót tổ hợp / hùa theo)' },
+      correct_analysis: { type: 'string', description: 'Phân tích ĐÚNG' },
+    }, required: ['wrong_claim', 'root_cause'] },
   } },
 ];
 
