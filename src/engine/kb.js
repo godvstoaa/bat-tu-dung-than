@@ -2580,3 +2580,28 @@ export const PENGZU_BAIJI = {
     return { gan: g, zhi: z, combined: (g + ' | ' + z).trim() };
   },
 };
+
+// ROUND 44: 杨公忌日 (Dương Công kỵ nhật) — 13 ngày "bách sự kỵ" (CẤM KỴ dùng cho trạch nhật)
+export const YANGGONG_JIRI = {
+  source: "杨公忌日 (dân gian). 13 ngày trong năm âm lịch — 'bách sự kỵ' (kiêng MỌI việc lớn: cuoi hoi/khai truong/di chuyen/ky ket). Truyền Đường·Dương Cứu Tùng.",
+  days: [
+    { lunar: "1/13", note: "Chinh nguyet thap tam (正月十三) — bat kyeng toan" },
+    { lunar: "2/11", note: "Nhi nguyet thap nhat (二月十一)" },
+    { lunar: "3/9", note: "Tam nguyet so cuu (三月初九)" },
+    { lunar: "4/7", note: "Tu nguyet so that (四月初七)" },
+    { lunar: "5/5", note: "Ngu nguyet so ngu (五月初五) — coincides with Đoan Ngọ" },
+    { lunar: "6/3", note: "Luc nguyet so tam (六月初三)" },
+    { lunar: "7/1", note: "That nguyet so nhat (七月初一)" },
+    { lunar: "7/29", note: "That nguyet nhi thap cuu (七月廿九)" },
+    { lunar: "8/27", note: "Bat nguyet nhi thap that (八月廿七)" },
+    { lunar: "9/25", note: "Cuu nguyet nhi thap ngu (九月廿五)" },
+    { lunar: "10/23", note: "Thap nguyet nhi thap tam (十月廿三)" },
+    { lunar: "11/21", note: "Thap nhat nguyet nhi thap nhat (十一月廿一)" },
+    { lunar: "12/19", note: "Thap nhi nguyet nhi thap cuu (十二月十九)" },
+  ],
+  check: function(lunarMonth, lunarDay) {
+    const key = lunarMonth + '/' + lunarDay;
+    return this.days.find(d => d.lunar === key) || null;
+  },
+  note: "13 ngày na y đeu la 'bách sự kỵ' — kiêng MỌI việc lon: cuoi hoi, khai truong, đong nha, di chuyen, ky ket hop đong. Dung KEM hoang đao/hac đao + 彭祖百忌.",
+};
