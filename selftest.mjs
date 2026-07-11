@@ -891,7 +891,7 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
 //   Trước đây 5 tool bói (analyze_char/meihua/liuren/qimen/guiguzi) FLAT → Z.ai API reject → AI không bao giờ gọi được.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 22, `[loop 623→1085] AI_TOOLS có đúng 22 tool (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 24, `[loop 623→1085→R34] AI_TOOLS có đúng 24 tool (got ${AI_TOOLS.length}) — +analyze_gufa(R31) +analyze_huangji(R34)`);
   const flat = AI_TOOLS.filter((t) => !(t && t.type === 'function' && t.function && t.function.name));
   assert(flat.length === 0, `[loop 623] KHÔNG còn tool FLAT — tất cả phải có wrapper {type:function,function:{name}} (còn ${flat.length} flat: ${flat.map(t=>t&&t.name).join(',')})`);
   const names = AI_TOOLS.map((t) => t.function.name);
@@ -4489,7 +4489,7 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
 // [loop 792] 19 AI tool descriptions — mỗi tool có description + when-to-use guidance.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 22, `[loop 792→1085→1137] 22 tools (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 24, `[loop 792→1085→1137→R34] 24 tools (got ${AI_TOOLS.length})`);
   let _noDesc = 0;
   for (const t of AI_TOOLS) {
     const _d = t.function?.description || t.description || '';
@@ -9076,11 +9076,13 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     ['health_profile', {}], // [loop 1021] đông-y profile
     ['health_hour', {}], // [loop 1040] đông-y 子午流注
     ['health_today', {}], ['evaluate_number', {number:'0912345678'}],
+    ['analyze_gufa', {}], // [R31] cổ pháp nhaps am cach cuc
+    ['analyze_huangji', {year:2026}], // [R34] 皇极经世 值年卦
   ];
   let _ok = 0;
   for (const [_n, _a] of _tests) { const _r = execTool(_n, _a, Ru); if (!_r.error) _ok++; }
-  assert(_ok === 22, `[loop 708→1085] 22/22 tools pass smoke test (got ${_ok}/22)`);
-  console.log(`   22-TOOL SMOKE ✓ — ${_ok}/22 tools trả data với valid params`);
+  assert(_ok === 24, `[loop 708→1085→R34] 24/24 tools pass smoke test (got ${_ok}/24)`);
+  console.log(`   24-TOOL SMOKE ✓ — ${_ok}/24 tools trả data với valid params`);
 }
 // [loop 741] analyze_year / best_days_in_year — year RANGE validation.
 //   Trước đây chỉ Number.isFinite → năm -100 (TCN) / 9999 được luận tự tin gây hiểu nhầm.
