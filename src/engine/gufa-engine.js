@@ -155,13 +155,13 @@ export function nayinRelations(chart) {
   for (const p of pillars) {
     if (p.pos === 'year') continue;
     const w = wxOf(p.nayin); if (!w) continue;
-    let rel = 'same';
-    if (WUXING_GEN[w] === yearWx) rel = 'shengBy';
-    else if (WUXING_GEN[yearWx] === w) rel = 'sheng';
-    else if (isKe(w, yearWx)) rel = 'keBy';
-    else if (isKe(yearWx, w)) rel = 'ke';
-    if (w === yearWx) rel = 'same';
-    rels.push({ pillar: p.pos, nayin: p.nayin, wx: w, rel });
+    let rel = 'same', guqi = '比';
+    if (WUXING_GEN[w] === yearWx) { rel = 'shengBy'; guqi = '禄(印/me)'; }       // sinh nien menh = Loc
+    else if (WUXING_GEN[yearWx] === w) { rel = 'sheng'; guqi = '库(子)'; }        // nien menh sinh = Kho
+    else if (isKe(yearWx, w)) { rel = 'ke'; guqi = '财'; }                        // nien menh khac = Tai
+    else if (isKe(w, yearWx)) { rel = 'keBy'; guqi = '思(官/quỷ)'; }              // khac nien menh = Tu
+    if (w === yearWx) { rel = 'same'; guqi = '比'; }
+    rels.push({ pillar: p.pos, nayin: p.nayin, wx: w, rel, guqi });
   }
   return { yearMing: yearP.nayin + '(' + yearWx + ')', relations: rels };
 }
