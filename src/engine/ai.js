@@ -936,6 +936,21 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     brief += `\n--- 彭祖百忌 (cấm kị dân gian, round 43) ---\nNăm ${_now.getFullYear()} (${dayGan}${dayZhi}) kiêng: ${bj.combined}`;
   } catch (e) { brief += "\n--- ROUND 43: [lỗi load] ---"; }
 
+  // CẤM KỴ CONCEPT INDEX — 1 dòng định nghĩa mỗi hệ (AI dùng khi user hỏi «X là gì»)
+  brief += "\n--- CẤM KỴ CONCEPT INDEX (AI dùng khi GIẢI THÍCH) ---\n" +
+    "古法/兰台妙选: HỆ TIỀN-TỬ-BÌNH — luận mệnh qua NẠP ÂM (không dùng nhật can vượng suy). 42 cách cục nạp âm (兰台 patterns) + thần đầu lộc 60 giáp-tý +九命. Gọi analyze_gufa.\n" +
+    "盲派 (段建业): KHẨU TRUYỀN — bỏ dụng thần/vượng suy, đọc qua 'cấu trúc làm công' (做功 6 mode) +类象 + 金口诀 40 câu (vị trí trụ × thập thần). Khác tử bình hoàn toàn.\n" +
+    "皇极经世 (邵雍): TIÊN TRI — nguyên-hội-vận-thế (1元=129600 năm) + 值年卦 (60-năm cycle, bỏ 乾坤离坎). Gọi analyze_huangji cho năm nào.\n" +
+    "太乙神数: TAM THỨC QUỐC VẬN (cấm kị nhất) — thái 乙 hành cửu cung → chủ/khách năm. Dùng cho dự đoán quốc gia/dịch loạn. Gọi analyze_taiyi.\n" +
+    "称骨算命 (袁天罡): trọng lượng năm+tháng+ngày+giờ (lunar) → tổng骨重 → bài thơ số phận. Gọi analyze_chenggu.\n" +
+    "铁板神数: 'ĐỆ NHẤT THẦN SỐ' — bí mật, 12000 điều văn. Cần 考时定刻 (lục thân生肖) + bảng điều văn. App chỉ reference.\n" +
+    "五运六气: Y-THIÊN VĂN (Hoàng Đế Nội Kinh) — năm CAN → vận (thái quá/bất cập → tạng bệnh) + năm CHI → 6 khí (tư thiên/tại tuyền). Gọi analyze_wuyun.\n" +
+    "彭祖百忌: CẤM KỴ DÂN GIAN — mỗi can/chi → 1 điều kiêng. 杨公忌日: 13 ngày 'bách sự kỵ' trong năm.\n" +
+    "河图洛书: GỐC RỄ thuật số — sinh số/thành số (Thủy1-6/Hỏa2-7/Mộc3-8/Kim4-9/Thổ5-10) + 五行大义 tương ứng (hướng/màu/vị/tạng/tinh/âm).\n" +
+    "推背图/马前课/烧饼歌: BỘ 3 TIÊN TRI CẤM — interpretive (không compute chính xác). App chỉ tham chiếu cấu trúc.\n" +
+    "葬经 (郭璞): NỀN TẢNG phong thủy — khí遇风则散/界水则止 + tang táng ảnh hưởng con cháu.\n" +
+    "三式: kỳ môn (định hướng hành sự) + lục nhâm (sự kiện) + thái 乙 (quốc vận) — 3 hệ cấm kị nhất lịch sử.";
+
   return brief;
 }
 
