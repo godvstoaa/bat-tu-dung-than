@@ -1430,7 +1430,7 @@ export function execTool(name, args, R) {
         return {
           logged: true,
           timestamp: new Date().toISOString(),
-          error: {
+          errorReport: {
             wrong_claim: a.wrong_claim || '(không ghi)',
             user_correction: a.user_correction || '(không ghi)',
             root_cause: a.root_cause || '(chưa xác định)',
