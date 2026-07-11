@@ -44,6 +44,11 @@ function matchDetect(pillars, monthZhi, spec) {
   if (spec.hasThuy) return countWx(pillars, '水') >= 1;
   if (spec.hasTho) return countWx(pillars, '土') >= 1;
   if (spec.nayinWaterCount) return countWx(pillars, '水') >= spec.nayinWaterCount;
+  if (spec.nayinFireCount) return countWx(pillars, '火') >= spec.nayinFireCount;
+  if (spec.nayinEarthCount) return countWx(pillars, '土') >= spec.nayinEarthCount;
+  if (spec.nayinMocCount) return countWx(pillars, '木') >= spec.nayinMocCount;
+  if (spec.nayinKimCount) return countWx(pillars, '金') >= spec.nayinKimCount;
+  if (spec.ganSetAny) { const gans = pillars.map(p => p.gan); return spec.ganSetAny.some(set => set.every(g => gans.includes(g))); }
   if (spec.motherGenerates) {
     const dayWx = wxOf(c_dayNayin(pillars));
     if (!dayWx) return false;
