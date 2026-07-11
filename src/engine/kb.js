@@ -2136,3 +2136,70 @@ export const WUXING_TANYUAN_THESIS = {
   proposedScale: "Ngu hanh vuong suy chia 7 档 (1 nguon phu noi 5 档 — BAT NHAT QUAN trong nguon thu cap) + dung than chia 10 cap.",
   unverifiedFlag: "⚠ DINH NGHIA CU THE cua 7 档/10 cap KHONG cong khai — chi co claim, khong co method. KHONG duoc bia ten 档/级 neu implement.",
 };
+
+// ROUND 27: CO PHAP (古法) — he TIEN-TU-BINH (pre-子平): 珞琭子赋注 (Song) + 李虚中命书 (Tang)
+// Nguon: NLC/Wikimedia scan, OCR Grok-4 Heavy. Day la he MENH LY BI TRUYEN bi mat — nam-tru/tam-nguyen/nhap-am/than-sat,
+// BI THUONG THEO NGHIEN CUU VI tu Tu Binh (Nham Thiet Trieu/Tran To Am) da 'chuan hoa' (ha cap nhaps am + luc bac than sat)
+// nen CO PHAP (nam-tru/nhap-am/than-sat trong tam) tro thanh 'phan bi an'.
+
+// 27a. GUFA_MODEL — CO PHAP (李虚中/珞琭子) vs KIM PHAP (子平). Su khac bieu cot.
+export const GUFA_MODEL = {
+  source: "李虚中命書 (Tang, 鬼谷子 truyen) + 珞琭子賦注 (Song, 王廷光/曇瑩/徐子平 chu). Grok-4 Heavy OCR.",
+  principle: "「以人之始生年月日所值日辰支干相生勝衰死王相斟酌推人壽夭貴賤，百不失一二」(韩愈 mộ chí cho Lý Hư Trung).",
+  vsZiPing: {
+    "tru chu (主柱)": { gufa: "NIEN TRU (năm sinh) lam chu — 'lap nien vi ton'", ziping: "NHAT TRU (ngày) lam chu" },
+    "ngu hanh": { gufa: "NHAP AM (nhaps am) sinh khac lam noi + chinh ngu hanh", ziping: "chinh ngu hanh sinh khac, nhaps am bi ha cap" },
+    "than sat": { gufa: "TRONG TAM (than sat = thien/dia nhi khi, loc ma) — khong the bo", ziping: "bi ha cap (Uoc Ngon 'luc bac')" },
+    "trong tam": { gufa: "TAM NGUYEN (thien/dia/nhan nguyen) + Loc Ma + Loc", ziping: "NHAT CAN vuong suy + dung than" },
+    "doc tinh": { gufa: "nam + nhaps am + than sat = 'huyen kho luan' (sau, kho)", ziping: "dung than/phu-uc/cach cuc = 'cat tiet'" },
+  },
+  note: "GUFA la 'co phap/hư trung phap' (Lý Hư Trung). Tu Tu Binh (Ngũ Đại/Tong) chuyen sang 'nhat can' = KIM PHAP. Uoc Ngon (Thanh) 'chuan hoa' KIM PHAP bang cach LUC BAC than sat + HA CAP nhaps am → CO PHAP tro thanh phan 'bi an'.",
+};
+
+// 27b. LUOLUZI_VERSES — 珞琭子三命消息赋 (goc loc menh) — ngu van SACH tu Grok OCR
+export const LUOLUZI_VERSES = {
+  source: "珞琭子賦注 卷上/下 (Song). Goc cua toan bo menh ly. Grok-4 Heavy OCR NLC scan.",
+  verses: {
+    "五行通道": "「是知五行通道，取用多門；理于賢人，亂于不肖；成于妙用，敗于不能」— ngu hanh la dao, lay dung da cach; nguoi hieu thanh, ke ngay nhao; dung tot thanh cong, dung hong that bai.",
+    "尊凶卑吉": "「尊凶卑吉，救療無功；尊吉卑凶，逢災自愈」— ton (dai van/nien) hung ma by (luu nien/tieu van) cat → cuu chang thau; ton cat ma by hung → gap tai tu lanh. → DAI VAN quyet dinh hon LUU NIEN.",
+    "祿有三會": "「祿有三會者，長生、帝旺、庫也，其爲至吉之地」(vd kim 見巳酉丑, moc 居亥卯未, hoa 寅午戌, thuy 申子辰) → 3 vi truong sinh/de vuong/mo = cuc cat.",
+    "災有五期": "「災有五期者，衰、病、死、敗、絕，其爲至凶之地」→ 5 vi suy/benh/tu/bach/tuyet = cuc hung. (Luu 'ngu quy' lien ket voi day.)",
+    "火快水土遲": "「聞朝歡而旋泣，爲盛火之炎陽；剋禍福之賒遙，則多因于水土」— Hoa/Moc tinh nhanh (sang chieu khoc cuoi), len phat/phe nhanh. Thuy/Tho tinh cham → hoa/phuc cham, lau thanh cung lau bay.",
+    "金木未成器": "「金木未能成器，聽哀樂以難名；似木盛而花繁，狀密雲而不雨」— Kim/Moc khong tu chuyen, phai 'gia vat' (hoa/sau) moi thanh khi (hop dung).",
+    "北人運南": "「北人運至南方，貿易獲其厚利」— Thuy (bac) chay van den Hoa (nam) = tai loc (phuong/van hop ngu hanh sinh khac).",
+  },
+  sanyuanWugui: "「三元逢五鬼，閻羅三使追」— tam nguyen gap ngu quy (5 vi suy/benh/tu/bach/tuyet) → nguy cuc.",
+};
+
+// 27c. JIUMING_SYSTEM — 'Cuu Menh' (9 phan tu luan menh) cua CO PHAP + than sat thien-dia nhi khi + tu tru phan so
+export const JIUMING_SYSTEM = {
+  source: "李虚中命書 卷中/下. Grok-4 Heavy OCR.",
+  jiuming: "「三元四柱祿馬爲九命」— 9 phan tu: TAM NGUYEN (thien nguyen + dia nguyen + nhan nguyen) + TU TRU (thai/nguyet/nhat/thoi) + LOC + MA. Phai set 'nang khong san suy, ton nghich thuan nghich, tinh y tuong'.",
+  shenshaTiandi: "「干中所用神煞乃天之清氣；支中所用神煞乃地之濁氣。凡言神煞各分天地二氣」— than sat co 2 lop: THIEN (can) = thanh khi; DIA (chi) = doc khi. Day la vi sao CO PHAP trong than sat — chung phan biet thien/dia.",
+  sizhuFenshu: "「胎主父母祖宗者十分，月主事者八分，時主事者十分」— CO PHAP chia trong so: THAI (= nguyen khi, xem bo me/to tong) 10 phan, NGUYET 8 phan, THOI 10 phan. (Nhan 「根在苗先，實從花後」— goc truoc non, qua sau hoa.)",
+  tayuan: "CO PHAP dung 5 truc: THAI + NGUYET + NHAT + THOI (them THAI NGUYEN). Khac KIM PHAP (4 truc). Thai nguyen = thang con - 9 (hoac +9) → moc cua phu nu sinh con, xem phu the/con cai.",
+};
+
+// 27d. SHENTOU_LU_NAYIN — 'Than Dau Loc' (神頭祿) = nhaps am tung giap-ty → doc tinh BI TRUYEN
+export const SHENTOU_LU_NAYIN = {
+  source: "李虚中命書 卷中. Grok-4 Heavy OCR. Day la bang nhaps am 'than dau loc' — moi cap nhaps am co 1 doc tinh rieng (BI TRUYEN cua co phap).",
+  principle: "「神頭祿」= moi nhaps am (vd Hai Trung Kim, Phong Hoa) deu co 1 'loc than' + tinh cach rieng, xem de doan cuoc doi. Khac 'nhaps am chi la ten goi' cua kim phap.",
+  examples: {
+    "甲寅": "Giap-Than = nhaps am 'Đai Khe Thuy' → 「潤深處靜之水」— nuoc chim sau yen tinh. Gia Moc vuong + Tho suy → ky dac qui di.",
+    "癸丑": "Quy-Suu = 'Tang Dot Moc' → 「剛柔相濟之木，水土承於旺方則生育利物」— mem cung tuong ung, thuy-tho sung vuong → sinh vat loi.",
+    "乙卯": "At-Mao = 'Dai Khac Thuy' → 「死中受氣之水，雖敗無妨」— nuoc chet ma van co khi, bai nhung khong ngai.",
+    "丙辰": "Binh-Then = 'Sa Trung Tho' → 「發施養生之土」— dat sinh tuong, thich Hoa tro, 'khong quan tu du'.",
+    "戊午": "Mau-Ngo = 'Thien Thang Hoa' → 「神發離明之火，旺中受絕」— hoa sang can, vuong trung chua tuyet.",
+    "辛酉": "Tan-Dau = 'Thach Lau Moc' → 「包秀結英之木，喜生旺，忌見金多」— moc chua anh, thich vuong, so kim nhieu.",
+  },
+  note: "Day la phan 'nhaps am luan menh' bi Uoc Ngon HA CAP — nhung trong CO PHAP no la COT NGOI. Luc pair voi nhan 'tinh' (doc tinh) rieng = bí truyền.",
+};
+
+// 27e. GUFA_LINEAGE — co phap → kim phap (bi an cua co phap)
+export const GUFA_LINEAGE = [
+  { era: "Tong tien / Than tien", text: "《珞琭子三命消息赋》", note: "GOC cua toan bo loc menh. 'Cuu menh' (3 nguyen + 4 tru + loc ma). An not: 王廷光/曇瑩/李同/徐子平 4 nha chu." },
+  { era: "唐 (Tang)", figure: "李虚中 (762-813)", note: "「CO PHAP」dai bieu. Nam-tru lam chu + nhaps am + than sat. 韩愈 mộ chi: 'bach bat thatt nhat nhi'. = 'hư trung phap'." },
+  { era: "Ngũ Đại → Tong", figure: "徐子平 (徐居易)", note: "「KIM PHAP」/ TU BINH. Chuyen NIEN → NHAT, nhaps am → chinh ngu hanh, them THOI TRU = bat tu. 'Dan gian goi tu binh thuat'.", debate: "Luu Quoc Trung(2009): su tich Tu Tu Binh la 'tich luy tao thanh' (chua chung minh)." },
+  { era: "Tong", text: "《五行精纪》(Lieu Trung, 30 quyen)", note: "Bach khoa CO PHAP (hư trung phap). Uoc Ngon trich 《广录》= sach nay. Tap hop nhaps am/than sat/loc ma co phap day du." },
+  { era: "Minh-Thanh", figures: "三命通会/渊海子平/穷通宝鉴/子平真诠", note: "KIM PHAP thanh thuc. Nhaps am & than sat BI HA CAP (dac biet Uoc Ngon 'luc bac'). CO PHAP tro thanh 'phan bi an'." },
+];
