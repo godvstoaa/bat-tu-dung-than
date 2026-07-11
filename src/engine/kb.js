@@ -2408,9 +2408,5 @@ export const LANTAI_PATTERNS = [
   { id: "xuehai", name: "學海波深", vi: "Học hải ba thâm", cat: "cat", detect: { and: [ { hasThuy: true }, { branchesAll: ["申", "子", "辰"] } ] }, judgment: "Nhaps am Thuy + hop Than-Tu-Then (thuy cu) → 'hoc hai ba tham', tai hoa sieu trac.", source: "lan dai" },
   { id: "shuiju", name: "水居湖海", vi: "Thủy cư hồ hải", cat: "cat", detect: { and: [ { branch: "子" }, { nayin: "大海水" } ] }, judgment: "Chi Tu (ho) + Đai Ha Thuy (hai) → 'thuy cu ho hai', chi luong uong duong.", source: "lan dai" },
   { id: "huozhen", name: "火震雷霆", vi: "Hỏa chấn lôi đình", cat: "cat", detect: { and: [ { hasHuo: true }, { branch: "卯" } ] }, judgment: "Nhaps am Hoa + chi Mao (loi đinh) → 'hoa chan loi đinh', uy quyen.", source: "lan dai" },
-  { id: "heisha", name: "黑煞朝北斗", vi: "Hắc sát triêu bắc đẩu", cat: "cat", detect: { and: [ { ganAny: ["壬", "癸"] }, { branch: "丑" } ] }, judgment: "Nham/Quy (bach huyen vu = hac sat) + chi Suu (bach đau) → 'hac sat trieu bach đau', tri khi cái can khun.", source: "lan dai" },
+  { id: "heisha", name: "黑煞朝北斗", vi: "Hắc sát triêu bắc đẩu", cat: "cat", detect: { and: [ { ganAny: ["壬", "癸"] }, { branch: "丑" } ] }, judgment: "Nham/Quy (bach huyen vu = hac sat) + chi Suu (bach đau) → 'hac sat trieu bach đau', tri khi cái can khun.", source: "lan dai" },  { id: "tuoti", name: "脫體化神/超凡入聖", vi: "Thoát thể hóa thần", cat: "cat", detect: { tuotiHuashen: true }, judgment: "1 tru nhaps am 'yeu' + 1 tru khac nhaps am 'manh' CUNG HANH → 'thoat the hoa than/sieu pham nhap thanh', thanh tuu lon.", source: "lan dai" },
 ];
-
-
-
-

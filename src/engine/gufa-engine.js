@@ -51,6 +51,12 @@ function matchDetect(pillars, monthZhi, spec) {
   if (spec.ganSetAny) { const gans = pillars.map(p => p.gan); return spec.ganSetAny.some(set => set.every(g => gans.includes(g))); }
   if (spec.allSameWx) { const wxs = pillars.map(p => wxOf(p.nayin)).filter(Boolean); return wxs.length >= 2 && wxs.every(w => w === wxs[0]); }
   if (spec.branchAny) return spec.branchAny.some(b => pillars.some(p => p.zhi === b));
+  if (spec.tuotiHuashen) {
+    const base = ['甲子','乙丑','壬寅','癸卯','庚辰','辛巳','甲午','乙未','壬子','癸丑','壬午','癸未','庚申','辛酉','戊戌','己亥','庚子','辛丑','丙辰','丁巳','庚午','辛未','戊申','己酉','丙寅','丁卯','甲辰','乙巳','丙申','丁酉','甲戌','乙亥','丙子','丁丑','甲寅','乙卯','壬辰','癸巳','壬戌','癸亥'];
+    const trans = ['壬申','癸酉','庚戌','辛亥','庚寅','辛卯','戊辰','己巳','丙戌','丁亥','戊寅','己卯','戊子','己丑','戊午','己未','丙午','丁未'];
+    const gzs = pillars.map(p => p.gz);
+    return gzs.some(g => base.includes(g)) && gzs.some(g => trans.includes(g));
+  }
   if (spec.motherGenerates) {
     const dayWx = wxOf(c_dayNayin(pillars));
     if (!dayWx) return false;
