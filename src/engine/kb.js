@@ -2627,3 +2627,23 @@ export const YANGGONG_JIRI = {
   },
   note: "13 ngày na y đeu la 'bách sự kỵ' — kiêng MỌI việc lon: cuoi hoi, khai truong, đong nha, di chuyen, ky ket hop đong. Dung KEM hoang đao/hac đao + 彭祖百忌.",
 };
+
+// ROUND 45: 葬经 (Quách Phác, Tấn) — PHONG THỦY nền tảng CẤM KỴ (tang táng ảnh hưởng con cháu)
+export const ZANGJING = {
+  source: "葬经 (Tấn·Quách Phúc). Nền tảng của TOÀN BỘ phong thủy. Cấm kị vì: tang tách ảnh hưởng khí con cháu.",
+  corePrinciples: {
+    "khí": "「Khí принимать gió thì tán, giới thủy thì chỉ」— khí gặp gió thì tán, gặp nước thì dừng. Phong thủy = điều khiển khí này.",
+    "tang": "「Tang giả, thừa sinh khí dã」— chôn cất = cưỡi (đón) sinh khí. Chọn đất có sinh khí → con cháu thịnh vượng.",
+    "thủy phong": "「Phong thủy chi pháp, đắc thủy vi thượng, tàng phong thứ chi」— được NƯỚC là tốt nhất, GIẤU GIÓ là thứ nhì. Ưu tiên nước > gió.",
+    "thổ": "「Thổ vi khí chi mẫu, hữu thổ tư hữu khí」— đất là mẹ của khí. Có đất mới có khí.",
+    "thế hình": "「Thế lai hình chỉ, thị vi toàn khí」— thế (động lực) đến, hình (dáng) dừng = khí toàn. Nơi có núi tựa, nước ôm = tốt.",
+    "phương vị": "「Khí dĩ long hành, thể dĩ lang chỉ」— khí đi theo long (núi), dừng theo đường. Hướng = phương vị long thủy.",
+  },
+  fiveElements: {
+    principle: "5 hành thổ: sơn (núi) = long (rồng đất), thủy (nước) = mạch. Sơn quản nhân đinh, thủy quản tài.",
+    mountain: "Sơn (núi/long) → ảnh hưởng NHÂN ĐINH (sức khỏe, con cái). Sơn đẹp = đinh vượng.",
+    water: "Thủy (nước) → ảnh hưởng TÀI LỘC. Nước trong chảy quanh = tài vượng.",
+    direction: "Hướng = long + thủy giao hội. 24 sơn (24 hướng). Mỗi hướng 15 độ.",
+  },
+  note: "Tang phong thủy (âm trạch) bị coi là cấm kị vì: (1) chọn huyệt sai → con cháu suy; (2) thời xưa chỉ vương hầu được xem; (3) liên quan đến thi thể → kiêng kỵ văn hóa. Nền tảng: khí → gió/nước → đất/hướng → con cháu.",
+};
