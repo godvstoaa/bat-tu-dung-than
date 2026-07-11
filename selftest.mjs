@@ -9084,7 +9084,7 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   ];
   let _ok = 0;
   for (const [_n, _a] of _tests) { const _r = execTool(_n, _a, Ru); if (!_r.error) _ok++; }
-  assert(_ok === 26, `[loop 708→R37] 27/27 tools pass smoke test (got ${_ok}/26)`);
+  assert(_ok === 27, `[loop 708→R42] 27/27 tools pass smoke test (got ${_ok}/27)`);
   console.log(`   27-TOOL SMOKE ✓ — ${_ok}/27 tools trả data với valid params`);
 }
 // [loop 741] analyze_year / best_days_in_year — year RANGE validation.
