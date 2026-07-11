@@ -2361,5 +2361,37 @@ export const XINGMING_MASTERS = [
   { name: "林开 (Tong)", method: "Tinh menh (十一曜). Xuất hien trong '蔡元 độ con truyen' (xingming bo danh nhan).", note: "Phai 'tinh menh' (khac tu binh)." },
 ];
 
+// ROUND 31: 兰台妙选 (Lan Đài Diệu Tuyển, Minh·西窗老人) — CO PHAP nhaps am luan menh (hu trung phap di ton)
+// Nguon: ctext chapter 747132 (full text). Day la he CO PHAP nhaps am van hanh — moi nhaps am/chi → 1 'tuong' → 1 phan doan.
+// 31a. LANTAI_PATTERNS — cac 'nhaps am cach cuc' (nhaps am lay tuong) co the DETECT duoc tren la so.
+// detect spec (gufa-engine.js interpret): {nayin:'X'} | {ganzhi:'甲子'} | {branch:'午'} | {gan:'甲'} | {branches:['午','辰']} | {and:[...]} | {nayinAny:['X','Y']} | {branchesAll:['x','y']} | {month:'spring'|...}
+export const LANTAI_PATTERNS = [
+  // ---- CAT (吉格) ----
+  { id: "baojian", name: "寶劍沖牛斗", vi: "Bảo kiếm xung ngưu đấu", cat: "cat", detect: { and: [ { nayin: "劍鋒金" }, { branch: "丑" } ] }, judgment: "Nhat tru nhaps am 'Kiem Phong Kim' (Nham-Than/Tan-Dau) + gap chi Suu (nguu đau) → 'khi kiem xung nguu đau', cuc quy. Quy-Suu = kiem hop (chinh).", source: "lan dai" },
+  { id: "mahualongju", name: "馬化龍駒奔鳳闕", vi: "Mã hóa long câu", cat: "cat", detect: { branchesAll: ["午", "辰"] }, judgment: "Ngo(ma) + Then(long) (+ Dau=phung) → 'khí ngiep tranh rong', quy. (vd Binh-Ngo/Nham-Then hop Dau).", source: "lan dai" },
+  { id: "shehualong", name: "蛇化青龍入天池", vi: "Xà hóa thanh long nhập thiên trì", cat: "cat", detect: { and: [ { branchesAll: ["巳", "辰"] }, { nayin: "天河水" } ] }, judgment: "Ty(xa) + Then(long) + Thien Ha Thuy (Binh-Ngo/Dinh-Vi = thiên tri) → 'cong danh hach dich'. (can đac thoi).", source: "lan dai" },
+  { id: "cangzhu", name: "藏珠於淵海", vi: "Tàng châu ư uyên hải", cat: "cat", detect: { and: [ { nayin: "大海水" }, { branch: "子" } ] }, judgment: "Nhaps am Đai Ha Thuy (Quy-Hai/Nham-Tuat) + chi Tu (chau) → 'tang chau giua bien', quy.", source: "lan dai" },
+  { id: "lingcha", name: "靈槎入於天河", vi: "Linh tra nhập thiên hà", cat: "cat", detect: { and: [ { nayin: "天河水" }, { nayinAny: ["大林木", "桑柘木", "楊柳木", "松柏木", "石榴木", "平地木"] } ] }, judgment: "Moc vo goc (nhaps am Moc) + Thien Ha Thuy → 'lam ke ho hai', ky nhan ho dan.", source: "lan dai" },
+  { id: "tuyuegong", name: "兔入月宮", vi: "Thố nhập nguyệt cung", cat: "cat", detect: { and: [ { branch: "卯" }, { ganzhi: "己未" } ] }, judgment: "At/Mao (tho) + Ky-Vi (nguyet cung) → 'tho nhap nguyet cung', quy. (Tan-Mao = ngoc tho tot nhat).", source: "lan dai" },
+  { id: "linfeng", name: "麟逢鳳沼", vi: "Lân phượng phượng chiểu", cat: "cat", detect: { branchesAll: ["辰", "酉"] }, judgment: "Then(long/lan) + Dau(phung) → 'lan phung phung chieu', quy. (Tru 乙酉-庚辰 la 'tu am đai sat' → ngoai le).", source: "lan dai" },
+  { id: "shuirao", name: "水繞花堤", vi: "Thủy nhiễu hoa đê", cat: "cat", detect: { and: [ { nayinAny: ["大林木", "桑柘木", "楊柳木", "松柏木", "石榴木", "平地木"] }, { nayinAny: ["天河水", "大海水", "大溪水", "长流水", "井泉水", "涧下水"] } ] }, judgment: "2 Moc (noi) + 2 Thuy (ngoai) → 'thuy nhieu hoa đe', phu quy, nhân-tri tuong tu.", source: "lan dai" },
+  { id: "jinma", name: "金馬嘶風", vi: "Kim mã ti phong", cat: "cat", detect: { and: [ { ganzhiAny: ["庚午", "甲午"] }, { branch: "巳" } ] }, judgment: "Canh-Ngo/Giap-Ngo (kim ma) + Ty (ton phong) → 'choi sieu quan'. Tan-Ty tot nhat.", source: "lan dai" },
+  { id: "yunlong", name: "雲龍風虎", vi: "Vân long phong hổ", cat: "cat", detect: { branchesAll: ["寅", "卯", "辰", "巳"] }, judgment: "Dan(ho)+Mao(loi)+Then(long)+Ty(phong) đeu co (thuan) → 'com đac đac khoa'. Dao luan → luc nhe.", source: "lan dai" },
+  { id: "sangliu", name: "桑柳成林", vi: "Tang dương thành lâm", cat: "cat", detect: { and: [ { nayin: "桑柘木" }, { nayin: "楊柳木" } ] }, judgment: "Tang Dot Moc (Nham-Tu/Quy-Suu) + Duong Lieu Moc (Nham-Ngo/Quy-Vi) → 'hoai nhan trong chi tai'.", source: "lan dai" },
+  { id: "cangsong", name: "蒼松冬秀", vi: "Thương tùng đông tú", cat: "cat", detect: { and: [ { nayin: "松柏木" }, { month: "winter" } ] }, judgment: "Tung Bach Moc (Canh-Dan/Tan-Mao) + sinh đong (Hai/Tu/Suu) → 'tiet cao cung cuc', ky nhan.", source: "lan dai" },
+  { id: "huoming", name: "火明木秀", vi: "Hỏa minh mộc tú", cat: "cat", detect: { and: [ { nayinAny: ["炉中火", "爐中火", "天上火", "霹靂火", "覆燈火", "山下火", "山頭火", "桑柘木", "大林木", "松柏木", "楊柳木", "石榴木", "平地木"] }, { month: "spring" }, { hasHuo: true }, { hasMoc: true } ] }, judgment: "Hoa + Moc + xuan (Dan/Mao/Then) → 'hoa minh moc tu', van hoa, quy.", source: "lan dai" },
+  { id: "jinbai", name: "金白水清", vi: "Kim bạch thủy thanh", cat: "cat", detect: { and: [ { month: "autumn" }, { hasKim: true }, { hasThuy: true } ] }, judgment: "Kim + Thuy + thu (Than/Dau/Tuat) → 'kim bach thuy thanh', cuc quy, van tu.", source: "lan dai" },
+  { id: "shuihuojiji", name: "水火既濟", vi: "Thủy hỏa ký tế", cat: "cat", detect: { and: [ { hasHuo: true }, { hasThuy: true } ] }, judgment: "Hoa (nam/nien tru) + Thuy (bac/nhat-thoi tru) → 'thuy hoa ky te', cong danh. (nam/thang = tren, ngay/gio = duoi).", source: "lan dai" },
+  { id: "longyuetian", name: "龍躍天門", vi: "Long dược thiên môn", cat: "cat", detect: { and: [ { nayin: "长流水" }, { branch: "亥" } ] }, judgment: "Truong Luu Thuy (Nham-Then/Quy-Ty) + chi Hai (thien mon) → 'long dut thien mon', quy.", source: "lan dai" },
+  { id: "yuezhao", name: "月照寒潭", vi: "Nguyệt chiếu hàn đàm", cat: "cat", detect: { and: [ { ganzhi: "己未" }, { hasThuy: true }, { nayinAny: ["剑锋金", "劍鋒金", "白蜡金", "白蠟金", "砂中金", "金泊金", "钗钏金", "釵釧金"] } ] }, judgment: "Ky-Vi (nguyet) + Thuy (han đam) + Kim (than) → 'nguyet chieu han đam', cuc quy (thuy luc thu).", source: "lan dai" },
+  { id: "ziguimu", name: "子歸母腹", vi: "Tử quy mẫu phúc", cat: "cat", detect: { motherGenerates: true }, judgment: "Nhaps am cua 1 tru SINH nhaps am nhat tru (me) → 'tu quy mau phuc', quy phu the/con cai. (vd nhat KIM + tru THO = mau phuc).", source: "lan dai" },
+  // ---- HUNG (凶格) ----
+  { id: "baihuxianshi", name: "白虎銜屍", vi: "Bạch hổ hàm thi", cat: "hung", detect: { and: [ { ganAny: ["甲", "乙"] }, { ganAny: ["庚", "辛"] }, { branchesAll: ["寅", "卯", "辰"] } ] }, judgment: "Giap/At (Moc than) + Canh/Tan (Kim = bach ho) + Dan-Mao-Then → 'bach ho ham thi', cuc hung nguy.", source: "lan dai" },
+  { id: "fengdongdeng", name: "風動燈滅", vi: "Phong động đăng diệt", cat: "hung", detect: { and: [ { nayin: "覆燈火" }, { nayinAny: ["大林木", "桑柘木", "松柏木", "楊柳木", "石榴木", "平地木"] } ] }, judgment: "Phuc Đang Hoa (Giap-Then/At-Ty) + Moc nhieu (moc chieu phong) → 'phong dang dang yet', moc nat, tien binh.", source: "lan dai" },
+  { id: "taiyangsunming", name: "太陽損明", vi: "Thái dương tổn minh", cat: "hung", detect: { and: [ { ganzhi: "戊午" }, { nayinWaterCount: 2 } ] }, judgment: "Mau-Ngo (thai duong hoa) + 2+ Thuy → 'thai duong ton minh', quang bi giam, hung.", source: "lan dai" },
+  { id: "gui toumu", name: "鬼投母腹", vi: "Quỷ đầu mẫu phúc", cat: "hung", detect: { nayinWaterCount: 4 }, judgment: "4 tru đeu Thuy + thai vo Tho → 'quy đau mau phuc', thoi nho mo coi som.", source: "lan dai" },
+];
+
+
 
 

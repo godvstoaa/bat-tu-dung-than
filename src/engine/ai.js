@@ -11,6 +11,7 @@ import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
+import { assessGufa } from './gufa-engine.js'; // [round 31] CO PHAP deep-logic (兰台妙选 nhaps am cach cuc detect)
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
 import { nayinInfo } from './nayin.js';
@@ -866,6 +867,20 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "盲派 HỢP: thiên can ngũ hợp CHỈ HỢP KHÔNG HÓA; nhật can hợp = hợp quan(.sep) / hợp tài(lấy tiền). | HỢP = ứng kỳ hôn nhân.";
   } catch (e) { brief += "\n--- ROUND 29: [lỗi load] ---"; }
 
+  // ---- [round 31] CỔ PHÁP DEEP LOGIC — 兰台妙选 nhaps am cach cuc (DETECT tren la so) + than đau loc ----
+  try {
+    const gf = assessGufa(R);
+    const cat = gf.lantai.cat.map(p => p.vi + '(' + p.id + ')');
+    const hung = gf.lantai.hung.map(p => p.vi);
+    const stl = gf.shenTouLu;
+    brief += "\n--- CỔ PHÁP DEEP LOGIC (兰台妙选 nhaps am, round 31) ---\n" +
+      "PHÁN ĐOÁN CỔ PHÁP (logic tinh toan, khong phai nhet): " + gf.verdict + "\n" +
+      (cat.length ? "CÁCH CỤC NẠP ÂM CAT đap trung: " + cat.join(', ') + "\n" : "Không đap cach cuc nhaps am cat đac biet.\n") +
+      (hung.length ? "CÁCH CỤC HUNG (can than): " + hung.join(', ') + "\n" : "") +
+      "THẦN ĐẦU LỘC: " + (stl.day ? "nhat tru " + stl.day.ganzhi + " → " + stl.day.reading : "(nhat tru khong trong bang)") + (stl.year ? " | nien tru " + stl.year.ganzhi + " → " + stl.year.reading : "") + "\n" +
+      "CỬU MỆNH nhaps am hanh: " + gf.jiuming.dominantNayinWx + " | nhat nhaps am = " + gf.jiuming.dayNayinWx + " | phan bo: " + JSON.stringify(gf.jiuming.nayinWx);
+  } catch (e) { brief += "\n--- ROUND 31: [lỗi load] ---"; }
+
   return brief;
 }
 
@@ -1089,6 +1104,10 @@ export const AI_TOOLS = [
       char: { type: 'string', description: '1 chữ Hán cần测 (vd 福, 财, 发)' },
     }, required: ['char'] },
   } },
+  { type: 'function', function: { // [round 31] CO PHAP deep-logic
+    name: 'analyze_gufa', description: 'CỔ PHÁP (古法 = pre-子平, nhaps am luan menh): phát hiện CÁCH CỤC NẠP ÂM (兰台妙选: bảo kiếm xung ngưu đấu / mã hóa long câu / xà hóa thanh long / thủy nhiễu hoa đê / phục thể hóa thần...) trên lá số + THẦN ĐẦU LỘC (nhaps am từng giáp-tý) + CỬU MỆNH (3 nguyên+4 tru+loc ma). LOGIC TINH TOÁN, không phai nhet du lieu. Dùng khi user hỏi «cổ pháp / nhaps am / cuu menh / hư trung phap / 珞琭子 / 兰台 / than đau loc», hoặc muốn góc nhìn KHÁC tử bình (năm-trụ+nhaps am+thần sát thay vì nhật-trụ+dụng thần).',
+    parameters: { type: 'object', properties: {} },
+  } },
   { type: 'function', function: { // [loop 496→623 FIX] 梅花易数 起卦 by time
     name: 'analyze_meihua', description: '梅花易数 起卦 (time-based divination): gieo quẻ theo thời điểm → 本卦/互卦/变卦 + 体用 ngũ hành sinh khắc + verdict cát/hung. Dùng khi user hỏi «gieo quẻ», «起卦 about X», «占 [chủ đề]», «xem quẻ hôm nay». Trả quẻ +体用 + cát hung.',
     parameters: { type: 'object', properties: {
@@ -1266,6 +1285,17 @@ export function execTool(name, args, R) {
           guaci: GUA_CI[hexName]?.ci || '',
           baseMeaning: cz.baseMeaning || cz.decomposition || '',
           reading: cz.reading || cz.summary || '',
+        };
+      }
+      case 'analyze_gufa': { // [round 31] CO PHAP deep-logic (兰台妙选 nhaps am cach cuc) — AI goi khi hoi ve "co phap/nhaps am/cuu menh/than đau loc"
+        const gf = assessGufa(R);
+        return {
+          verdict: gf.verdict,
+          catPatterns: gf.lantai.cat.map(p => ({ id: p.id, name: p.name, vi: p.vi, judgment: p.judgment })),
+          hungPatterns: gf.lantai.hung.map(p => ({ vi: p.vi, judgment: p.judgment })),
+          shenTouLu: gf.shenTouLu,
+          jiuming: { dominantNayinWx: gf.jiuming.dominantNayinWx, dayNayinWx: gf.jiuming.dayNayinWx, nayinWx: gf.jiuming.nayinWx },
+          model: gf.model,
         };
       }
       case 'analyze_meihua': { // [loop 496] 梅花易数 起卦 by time
