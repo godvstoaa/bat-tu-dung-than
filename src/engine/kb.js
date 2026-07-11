@@ -2445,3 +2445,19 @@ export const TIEBAN_SHENSHU = {
   foundation: "Dùng 皇极经世 nguyên-hội-vận-thế + 声音唱和图 làm nền số lý (xem huangji-engine).",
   honestyFlag: "⚠ NHIEU thuat toan tranh nhau (các 'ban' khac nhau) + 12000 đieu van la BI MAT → KHONG the tinh ra chinh xac neu thieu (a) đung thuat toan truong phai + (b) bang đieu van + (c) luc than than tiet. App CHI tham chieu he thong, KHONG gia tinh (tranh 'nhet bua').",
 };
+
+// ROUND 38: 推背图 (Thối Bối Đồ) — tiên tri BỊ CẤM kinh điển (Lý Thuần Phong·袁天罡, Đường)
+// Nguon: 推背图 60 tượng. Day la sach TIEN TRI bi cam nhat (du doan tri loạn/nghiep ky).
+export const TUIBEITU = {
+  source: "推背图 (Lý Thuần Phong + 袁天罡, Đường). 60 tượng (mỗi tượng = 1 quẻ + 1 thơ + 1 chu).",
+  concept: "60 tượng tiên tri lịch sử từ Đường trở đi. Moi tượng = 1 卦 + 1 谶 (thơ tiên tri) + 1 颂 (4 cầu giải). Dùng hexagram + thơ ám chỉ sự kiện lịch sử.",
+  structure: "60 tượng = 60甲子 cycle (1 tượng ứng ~... năm, NHUNG KHOA HOC tranh cai). Tong the: tuong 1-30 = qua khu (co xac minh), 31-60 = tuong lai (BIEN LAY/cam ky).",
+  famousXiang: {
+    "象2 (坤)": "Đường khởi (Thái Tổ ra đời). Đã ứng.",
+    "象39 (咸)": "'鸟无足, 月有翼' — thường bị cho ám chỉ sự kiện thế kỷ 20 (tranh cai).",
+    "象44 (未济)": "'日月丽天' — thường bị gán cho thời đại hiện tại (tranh cai moc nam).",
+    "象60 (萃)": "Tượng cuối = '万万千千说不尽, 不如推背去归休' — kết thúc tiên tri, quay về.",
+  },
+  honestyFlag: "⚠ 象-thời điểm/era tương ứng LA TRANH CAI (chính vì vậy bị cấm — mỗi phái gán khác nhau). App CHI tham chieu CAU TRUC + tuong da ung (lich su), KHONG suy đoán tuong lai = tránh 'nhét bừa'/miên hoặc. Day la huyền học dân gian, KHÔNG phai khoa học.",
+  note: "推背图 + 马前课(诸葛) + 烧饼歌(刘伯温) = bộ 3 tiên tri cấm. Đều interpretive (không compute chính xác).",
+};
