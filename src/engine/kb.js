@@ -1873,13 +1873,14 @@ export const YUEYAN_GUANSHA = {
 // 23d. YUEYAN_META — dai van cong quan + than sat/nhap am phe binh + am-duong dong sinh dong tu (FLAG truong phai)
 export const YUEYAN_META = {
   dayun: { vi: "Can-CHI dai van CUNG quan 10 nam, KHONG chia 5/5 hay 4/6 hay 3/7", quote: "Van chi can chi cong quan thap nien… vo thuong ha cac ngu nien chi ly.", conflictsWith: "Ngu ngon doc bo 'van hanh thap so, thuong ha ngu nien phan'" },
-  shensha: { stance: "「Luc bac than sat hư thuyet」— Uoc Ngon HE CHONG than sat hư thuyet (ch. Chư Than Sat Luan). Than sat chi la phu, nen la sinh-khac-phu-uc + cach cuc.", verificationNote: "Danh sach tung sao bi bac (nguyen van chư thần sát luận) chua OCR duoc tu scan NLC → ghi o stance." },
-  nayin: { stance: "Uoc Ngon huong chinh ngu hanh sinh khac, ha cap nhap am. Nhap am chi la phu.", verificationNote: "Nguyen van nhap am luan chua OCR duoc → ghi o stance." },
+  shensha: { stance: "「Luc bac than sat hư thuyet」— Uoc Ngon HE CHONG than sat hư thuyet (ch. Chư Than Sat Luan). Than sat chi la phu, nen la sinh-khac-phu-uc + cach cuc.", ocrVerified: "OCR scan NLC tr.131-132 (卷三 诸神煞论) xac minh nguyen van: 「bat tri nhan menh cat hung giai do cach cuc van khi, an khy nhat hop than sat nhi nhien thanh chi」+ than sat la 「术士遐想, vang vong nhat sat da danh」(vd dao hoa/luu ha/hong diem). Stance XAC MINH tu nguyen ban." },
+  nayin: { stance: "Uoc Ngon huong chinh ngu hanh sinh khac, ha cap nhap am. Nhap am chi la phu.", ocrVerified: "OCR scan NLC tr.141 (卷三 纳音论/法) xac nhan chuong TON TAI + stance ha cap nhap am. (OCR chu Han phuc dap garble, nguyen van sach tham chieu ban transcript suanzhun/zhihu.)" },
   zhonghe: { vi: "「Pham nhat chu toi quy trung hoa, tu nhien cat da hung thieu」— nhat can quy nhat o trung hoa; 'co benh moi quy' la thien kien.", quote: "Nhat chu toi quy trung hoa… gia co benh phuong vi quy chi thuyet, kien pieen da." },
   yinYangTongSheng: {
     vi: "Am-Duong CUNG sinh CUNG chet (甲/乙 deu truong sinh o Hoi) — TRAI voi 'duong thuan am nghich' cua tu binh chinh luu.",
     debateContext: "Day la 'ky sinh thap nhi cung' chua giai quyet: 旺相休囚 = muc NGU HANH (khong phan am duong, gan nguyet lenh); 十二长生 = muc THIEN CAN (tu binh phan am duong = duong thuan am nghich). Am-can vuong suy la chua giai quyet — Tam Mệnh Thong Hoi co 'am muon duong sinh'. Uoc Ngon chon dong sinh dong tu = 1 truong phai, KHONG phai consensus.",
     schools: { zipingMainstream: "Duong thuan am nghich (phan biet am-duong can, mac dinh hien tai)", yueyanLiming: "Am-duong dong sinh dong tu (Uoc Ngon)", luming: "Khong phan am duong (Loc Menh phap/co phap)" },
+    ocrVerified: "OCR scan NLC tr.124 (卷三 五行旺相休囚论) xac minh: Tran To Am phe binh 'duong sinh am tu' → 「ly bat thong」(ly khong thong), lap luan cho am-duong DONG sinh dong tu. Stance XAC MINH tu nguyen ban.",
     flag: "KOBIET HUNG len engine — la lua chon truong phai (xem BAZI_SCHOOL). Mac dinh giu 'duong thuan am nghich'.",
   },
   liuqinCritique: "Uoc Ngon ch. 看六亲法 phe binh ban do luc than chuan (chinh an=me, thien tai=cha...) la 'poi liet da duan': nguoi do cha me cung sinh, vi sao chi chinh an=me? Thien tai khac chinh an, ma tai la 'ngoa khac', sao sinh ra minh duoc? → Uoc Ngon de xuat phuong phap xem lai.",
