@@ -1,7 +1,7 @@
 // gufa-engine.js — CO PHAP (古法) DEEP-LOGIC engine: phat hien cach cuc nhaps am (兰台妙选)
 // + than đau loc + cuu menh trên LA SO THUC. Day la LOGIC TINH TOAN, khong chi tra cuu.
 // Nguon: 珞琭子赋注 / 李虚中命书 / 兰台妙选 (Round 27-31 kb.js).
-import { LANTAI_PATTERNS, SHENTOU_LU_NAYIN, GUFA_MODEL, JIUMING_SYSTEM } from './kb.js';
+import { LANTAI_PATTERNS, SHENTOU_LU_NAYIN, GUFA_MODEL, JIUMING_SYSTEM, MANGPAI_KOUJUE } from './kb.js';
 
 // trad → simp cho cac chu nhaps am (xu ly 2 dang chart)
 const T2S = { '劍':'剑','鋒':'锋','燈':'灯','楊':'杨','頭':'头','蠟':'蜡','釵':'钗','釧':'钏','霹':'霹','靂':'雳','澗':'涧','長':'长','寶':'宝','馬':'马','龍':'龙','駒':'驹','鳳':'凤','闕':'阙','靈':'灵','淵':'渊','躍':'跃','門':'门','鑛':'矿','鑛':'矿','釱':'','鍾':'钟','鎮':'镇' };
@@ -237,4 +237,23 @@ export function wuxingImbalance(chart) {
     }
   }
   return { counts: cnt, notes: notes.length ? notes : ['Ngu hanh nhaps am phan bo tuong doi can bang, khong thai qua/bat cap.'] };
+}
+
+
+// === 盲派金口诀 (BÍ TRUYEN): vi tri tru × thap than → quyết đoán ===
+const GOD_T2S = { '財':'财', '殺':'杀', '傷':'伤', '梟':'枭', '沖':'冲' };
+function normGod(g) { return (g || '').split('').map(c => GOD_T2S[c] || c).join(''); }
+export function mangpaiKoujue(chart) {
+  const c = chart?.chart ? chart.chart : chart;
+  const out = [];
+  for (const pos of ['year', 'month', 'day', 'time']) {
+    const p = c?.pillars?.[pos];
+    if (!p) continue;
+    const god = normGod(p.ganGod || '');
+    if (god === '日主' || !god) continue;
+    const verse = MANGPAI_KOUJUE.gods[god]?.[pos];
+    if (verse) out.push({ pos, god: p.ganGod, verse });
+    else out.push({ pos, god: p.ganGod, verse: '(khong co koujue cho ' + god + ')' });
+  }
+  return { readings: out, duanYun: MANGPAI_KOUJUE.duanYun };
 }

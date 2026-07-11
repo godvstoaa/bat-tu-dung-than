@@ -2461,3 +2461,30 @@ export const TUIBEITU = {
   honestyFlag: "⚠ 象-thời điểm/era tương ứng LA TRANH CAI (chính vì vậy bị cấm — mỗi phái gán khác nhau). App CHI tham chieu CAU TRUC + tuong da ung (lich su), KHONG suy đoán tuong lai = tránh 'nhét bừa'/miên hoặc. Day la huyền học dân gian, KHÔNG phai khoa học.",
   note: "推背图 + 马前课(诸葛) + 烧饼歌(刘伯温) = bộ 3 tiên tri cấm. Đều interpretive (không compute chính xác).",
 };
+
+// ROUND 39: 盲派命理金口诀 (BÍ TRUYEN) — 十神专论: vi tri tru × thap than → quyết đoán
+// Nguon: 盲派金口诀 (豆瓣). Moi thap than × nam/thang/ngay/gio = 1 cau quyết.
+export const MANGPAI_KOUJUE = {
+  source: "盲派命理金口诀 (豆瓣 note 399289555). Vi tri tru × thap than → quyết đoán.",
+  gods: {
+    "正财": { year: "to nghiep truyen, phu quy vinh hoa thu dien vien", month: "cham tien, y thuc phong du danh vang", day: "minh tai, phu quy hien luong tu ai", time: "menh cuc manh, tai boc phong phu da quy" },
+    "偏财": { year: "phuc loc cao, nhat can vuong tuong anh hao", month: "chung nhan thai, huynh đe tuong tro", day: "vo hinh xung, vo chong hien hue", time: "minh tai, than vuong nhi ton phuc tu" },
+    "正官": { year: "phuc đe them, to huong hu đuc cong danh", month: "vi quy nhan, thong minh chinh truc", day: "chinh đang thoi, cong danh vien duong", time: "đai cat cuong, nhi nu hien hieu" },
+    "七杀": { year: "menh bat gia, khac đe ma (CAN THAN: cha me khac)", month: "pham tieu nhan, tai hoa lam", day: "đoc sat tuong tai, uy vu cuong cuong", time: "nhat vi chan, nhat vuong hop nhan phu quy" },
+    "正印": { year: "huu to am, phu mau an ai", month: "huu van tai, pham Mao đuan chinh", day: "phuc loc cao, thong minh tri hue", time: "tu phuc, nhat the bat thu khổ" },
+    "偏印": { year: "toi nan đang, khac đe nuong (CAN THAN)", month: "da tai da nghiep", day: "tinh tuy co, huu quan huu quyen", time: "toi bat luong, đau sinh nu nu hu tai" },
+    "食神": { year: "chinh đang thoi, tai vuong phu đai", month: "cham tien, thu trung bat đoan linh tien", day: "tu phuc, da tu da tho", time: "thang tai quan, nhi nu hien hieu" },
+    "伤官": { year: "khac phu mau, đai bat qua 25 (CAN THAN: mat cha me som)", month: "chan han nan, khac huynh thieu đe", day: "tong bat cat, nu khac phu nam khac the", time: "đau thai nu, khac tu tich" },
+    "比肩": { year: "huynh mai đa, voi cha bat hap", month: "tinh canh ac, huynh đe bat hop", day: "tai vo ngoai, hon nhan ac tai", time: "bat hao tai, kien nghia dung vi" },
+    "劫财": { year: "huynh mai đa, voi cha bat hop (cung voi ty kien)", month: "tinh canh ac, huynh đe bat hop", day: "tai vo ngoai, hon nhan ac tai", time: "bat hao tai, kien nghia dung vi" },
+  },
+  duanYun: [
+    "Truong sinh gap sat: toi huong tai hoa.",
+    "That sat gap tai: bat kha đang (cuc nguy).",
+    "Kiet so tai, tai so kiet: trung binh dau la tai lox.",
+    "Tai quan kem ky nhap khong vong: tai quan roi khong vong bat tot.",
+    "Nhat gap thuong quan: co 1 thuong (thuong quan gap quan = tai hoa).",
+    "Kim suy bat tai hoa tu, Hoa tu bat đinh thuy thuong (ngu hanh tu đia: Kim chet vi Hoa, Hoa chet vi Thuy).",
+    "Lao bat đe vuong, thieu bat suy — gia truong hoa vuong nien, tre con suy.",
+  ],
+};
