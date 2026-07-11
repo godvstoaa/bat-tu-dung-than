@@ -7,7 +7,7 @@
 // ============================================================================
 import { GAN, ZHI, WX_VI, TEN_GOD_VI, TIAOHOU_PRINCIPLE } from './constants.js';
 import { composeAnswer } from './nlg.js';
-import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE, PATTERN_SHUN_NI, THUONG_GUAN_5_TYPES, PATTERN_SUCCESS_FAIL, PATTERN_QUALITY_RANKING, YONGSHEN_VARIATION, LIUQIN_STAR, LIUQIN_PALACE, STAR_PALACE_RULES, LIUQIN_FALLBACK, LIUQIN_DAYUN_EFFECT, HEHUA_CONDITIONS, CHONG_XING_HAI_RULES, LUCK_INTERACTION_RULES, ZIWEI_14_STARS, SIHUA_MEANING, ZIWEI_LUCK_RULES, STAR_BRIGHTNESS_MEANING, LIAOFAN_4_LESSONS, TCM_HEALTH_DEEP, ZIWEI_AUX_STARS, ZIWEI_AUX_PRINCIPLES, TEN_GAN_DAYMASTER_PERSONALITY, WUXING_IMBALANCE_PERSONALITY, WUXING_PAIR_PERSONALITY, TEN_GOD_SPOUSE_DETAIL, DAYUN_HANDOVER_DETAIL } from './kb.js';
+import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_YONG_MAXIM, WUYAN_DUBU, PATTERN_DEEP, SHEN_HIERARCHY, JISHAN_PIAN, DITIANSUI_SHISHEN, SHANGGUAN_5YONG, TEN_GOD_DEEP, LIFE_AREA_INDEX, PATTERN_GUIDE, INTERACTION_MEANING, QIONGTONG_TIAOHOU, DITIANSUI_MAXIMS, SANMING_DAYUN_RULES, ZIWEI_PALACE_LIFE, WUXING_HEALTH, CAREER_BY_GOD, DIVINATION_SCHOOLS, SPOUSE_PALACE_READING, MARRIAGE_TIMING_SIGNALS, WEALTH_TIERS, WEALTH_KU, NOBLE_STAR_RULES, NOBLE_STAR_NOTE, PEACH_BLOSSOM_RULES, PEACH_NOTE, DECADE_LIFE_THEMES, ANNUAL_GANZHI_EFFECT, ANNUAL_ZHI_EFFECT, FENGSHUI_PRACTICAL, TWELVE_LUCK_METHODS, QIGONG_BY_ELEMENT, CHANGSHENG_AGE_APPLICATION, SHENSHA_DEEP_MEANING, DAYUN_CHANGSHENG_NOTE, METAPHYSICS_CORE, PATTERN_SHUN_NI, THUONG_GUAN_5_TYPES, PATTERN_SUCCESS_FAIL, PATTERN_QUALITY_RANKING, YONGSHEN_VARIATION, LIUQIN_STAR, LIUQIN_PALACE, STAR_PALACE_RULES, LIUQIN_FALLBACK, LIUQIN_DAYUN_EFFECT, HEHUA_CONDITIONS, CHONG_XING_HAI_RULES, LUCK_INTERACTION_RULES, ZIWEI_14_STARS, SIHUA_MEANING, ZIWEI_LUCK_RULES, STAR_BRIGHTNESS_MEANING, LIAOFAN_4_LESSONS, TCM_HEALTH_DEEP, ZIWEI_AUX_STARS, ZIWEI_AUX_PRINCIPLES, TEN_GAN_DAYMASTER_PERSONALITY, WUXING_IMBALANCE_PERSONALITY, WUXING_PAIR_PERSONALITY, TEN_GOD_SPOUSE_DETAIL, DAYUN_HANDOVER_DETAIL, PATTERN_CHENG_BAI, XIANGSHEN_LAW, PATTERN_QUALITY_DEEP, JIXIONG_FANLI, ZAQI_TIANGAN_USE, YUEYAN_QUGE, YUEYAN_YONGSHEN, YUEYAN_GUANSHA, YUEYAN_META, BAZI_SCHOOL, SANMING_LIUQIN_FU, SANMING_SHENSHA_AXIOMS, SANMING_NV_BAFA, SANMING_NAYIN_XIJI, SANMING_TAISUI_RULES, SANMING_GANHE_HUAMEANING, MINGLI_CRITICAL_EVALUATION, MINGLI_HISTORY_LINEAGE, BAZI_FACTION_MAP } from './kb.js';
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
@@ -755,6 +755,82 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "KHỞI VẬN " + (qiyun ? "(3 ngày = 1 tuổi) " + qiyun.direction + " | " + qiyun.ageCalc : '?') + "\n" +
       "GIAO VẬN " + (DAYUN_HANDOVER_DETAIL?.jiaoyun?.what || '') + " → " + (DAYUN_HANDOVER_DETAIL?.jiaoyun?.taboo || []).slice(0, 2).join("; ");
   } catch (e) { brief += "\n--- ROUND 21: [lỗi load] ---"; }
+
+  // ---- [round 22] TỬ BÌNH CHÂN THUYỀN — CÁCH CỤC ĐỘ SÂU (thành/bại/cứu ứng + tương thần + đảo luận) ----
+  try {
+    const patName = R.pattern?.name || '';
+    const cb = PATTERN_CHENG_BAI[patName];
+    const monthZhi = c.pillars?.month?.zhi || '';
+    const isZaqi = ['辰','戌','丑','未'].includes(monthZhi);
+    const zaqiInfo = isZaqi ? ZAQI_TIANGAN_USE[monthZhi] : null;
+    brief += "\n--- TỬ BÌNH CHÂN THUYỀN: CÁCH CỤC ĐỘ SÂU (round 22) ---\n" +
+      "THÀNH/BẠI/CỨU ỨNG cổ pháp (" + patName + "): " + (cb ? "✓Thành khi: " + cb.cheng.join('; ') + " | ✗Bại khi: " + cb.bai.join('; ') + (cb.jiu.jiu?.length ? " | Cứu ứng: " + cb.jiu.jiu.join('; ') : '') : "(cách không trong 8 chính cách — xem đặc biệt/ngoại cách)") + "\n" +
+      "TƯƠNG THẦN (ch.15): " + XIANGSHEN_LAW.decisive.slice(0, 2).join(' | ') + "\n" +
+      "CHẤT LƯỢNG CÁCH (2-trục Tình×Lực): " + PATTERN_QUALITY_DEEP.highest + " | " + PATTERN_QUALITY_DEEP.lowLi + "\n" +
+      "ĐẢO LUẬN 吉凶 (ch.18/19): 4吉 thần cũng PHÁ cách, 4凶 thần cũng THÀNH cách — " + JIXIONG_FANLI.principle + "\n" +
+      (zaqiInfo ? "TẠP KHÍ 月令=" + monthZhi + ": " + zaqiInfo.principle + " | " + (zaqiInfo.mainQi ? "Bản khí=" + zaqiInfo.mainQi + ", tàng=" + (zaqiInfo.hidden || '?') : zaqiInfo.note) : "THUẬN/NGHỊCH DỤNG: thiện thần (tài/quan/ấn/thực) thuận=sinh phù+hộ vệ; bất thiện (sát/thương/khiếu/nhận) nghịch=chế phục+hóa giải");
+  } catch (e) { brief += "\n--- ROUND 22: [lỗi load] ---"; }
+
+  // ---- [round 23] MỆNH LÝ ƯỚC NGÔN (陈素庵) — chuẩn hóa + BAZI_SCHOOL toggle ----
+  try {
+    const allGods = new Set();
+    for (const pos of ['year', 'month', 'day', 'time']) {
+      const pl = c.pillars[pos];
+      if (pl.ganGod) allGods.add(pl.ganGod);
+      (pl.hidden || []).forEach(h => { if (h.god) allGods.add(h.god); });
+    }
+    const hasGuanSha = allGods.has('正官') && allGods.has('七杀');
+    const guanshaCase = hasGuanSha ? Object.entries(YUEYAN_GUANSHA.cases).map(([k, v]) => v.vi).join(' | ') : '';
+    brief += "\n--- MỆNH LÝ ƯỚC NGÔN (陈素庵) + TRƯỜNG PHÁI (round 23) ---\n" +
+      "TRƯỜNG PHÁI hiện tại: " + (BAZI_SCHOOL.current) + " — " + (BAZI_SCHOOL.options[BAZI_SCHOOL.current]?.label || '') + ". Lưu ý: có thể toggle (xem BAZI_SCHOOL).\n" +
+      "LẤY CÁCH (Ước Ngôn thang 4 bậc): " + YUEYAN_QUGE.ladder.slice(1, 4).join(' → ') + " | " + YUEYAN_QUGE.rule + "\n" +
+      "DỤNG THẦN (Ước Ngôn đệ quy): " + YUEYAN_YONGSHEN.weak + "\n" +
+      (hasGuanSha ? "QUAN-SÁT ĐI/LƯU (chính quan + thất sát cùng có): " + guanshaCase + "\n" : "") +
+      "ĐẠI VẬN cổ pháp: " + YUEYAN_META.dayun.vi + "\n" +
+      "THẦN SÁT/ NẠP ÂM (Ước Ngôn): " + YUEYAN_META.shensha.stance + " | " + YUEYAN_META.nayin.stance + "\n" +
+      "ÂM-DƯƠNG ĐỒNG SINH ĐỒNG TỬ (FLAG): " + YUEYAN_META.yinYangTongSheng.vi + " → " + YUEYAN_META.yinYangTongSheng.flag;
+  } catch (e) { brief += "\n--- ROUND 23: [lỗi load] ---"; }
+
+  // ---- [round 24] TAM MỆNH THÔNG HỘI (万民英) — lục thân phú + thần sát nguyên tắc + nạp âm hỉ kỵ ----
+  try {
+    const gender = c.input?.gender || 'male';
+    const dayNayin = c.pillars?.day?.nayin || '';
+    const nayinInfo = SANMING_NAYIN_XIJI[dayNayin] || (dayNayin ? Object.values(SANMING_NAYIN_XIJI).find(v => dayNayin.includes(Object.keys(SANMING_NAYIN_XIJI).find(k => dayNayin.includes(k)))) : null);
+    const isFemale = gender === 'female' || gender === 'nu' || gender === '女';
+    // LOGIC SÂU: thái tuế (lưu niên can) ↔ nhật can → mức độ họa theo 卷二 「tuế thương nhat can hoă nhe, nhat pham tuoi quan tai nang」
+    const taisuiVerdict = (() => {
+      try {
+        const dmGan = c.dayMaster?.gan;
+        if (!dmGan) return '';
+        const yearGan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'][(_now.getFullYear() - 4) % 10];
+        const wxOf = g => ({甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'})[g];
+        const kePairs = {木:'土',土:'水',水:'火',火:'金',金:'木'};
+        const a = wxOf(yearGan), b = wxOf(dmGan);
+        if (a === b) return `Năm ${_now.getFullYear()} (${yearGan}) ↔ nhật ${dmGan}: CÙNG HÀNH (${a}) → trung tính.`;
+        if (kePairs[a] === b) return `Năm ${_now.getFullYear()} (${yearGan}) KHẮC nhật ${dmGan} (${a}→${b}) = 「TUẾ THƯƠNG NHẬT CAN」→ họa NHẸ (trên trị dưới = thuận).`;
+        if (kePairs[b] === a) return `Năm ${_now.getFullYear()} (${yearGan}) bị nhật ${dmGan} KHẮC (${b}→${a}) = 「NHẬT PHẠM TUẾ QUÂN」→ họa NẶNG (dưới phạm trên = nghịch) — năm cẩn thận.`;
+        return `Năm ${_now.getFullYear()} (${yearGan}) ↔ nhật ${dmGan}: tương sinh (${a}/${b}) → không phạm thái tuế.`;
+      } catch (_) { return ''; }
+    })();
+    brief += "\n--- TAM MỆNH THÔNG HỘI (万民英) — lục thân/thần sát/nạp âm (round 24) ---\n" +
+      "LỤC THÂN phú诀 (top): " + SANMING_LIUQIN_FU.slice(0, 3).map(r => r.vi).join(' | ') + "\n" +
+      "THẦN SÁT nguyên tắc (卷三): " + SANMING_SHENSHA_AXIOMS[0] + " | " + SANMING_SHENSHA_AXIOMS[3] + "\n" +
+      (nayinInfo ? "NẠP ÂM nhật trụ (" + dayNayin + "): Hỉ=" + nayinInfo.yi + " | Kỵ=" + nayinInfo.ji + " | Tính=" + nayinInfo.nature + "\n" : "") +
+      (isFemale ? "NỮ MỆNH cổ pháp (卷七 八法): " + SANMING_NV_BAFA.he + " | " + SANMING_NV_BAFA.zhuo + "\n" : "") +
+      "THÁI TUẾ hierarchy (卷二): " + SANMING_TAISUI_RULES[0] + (taisuiVerdict ? "\n  → ÁP DỤNG năm nay: " + taisuiVerdict : "") + "\n" +
+      "THIÊN CAN NGŨ HỢP hóa khí: " + Object.entries(SANMING_GANHE_HUAMEANING).map(([k, v]) => k + '=' + v.name).join(', ');
+  } catch (e) { brief += "\n--- ROUND 24: [lỗi load] ---"; }
+
+  // ---- [round 25] LỚP META (洪丕谟) — phê phán nhận thức luận + khung lịch sử ----
+  try {
+    const hp = MINGLI_HISTORY_LINEAGE.find(e => e.era.includes('1989')) || {};
+    brief += "\n--- LỚP META / PHÊ PHÁN HỌC THUẬT (洪丕谟, round 25) ---\n" +
+      "THÁI ĐỘ HỌC THUẬT: " + MINGLI_CRITICAL_EVALUATION.stance + "\n" +
+      "PHÊ PHÁN NHẬN THỨC LUẬN: 象征律=" + MINGLI_CRITICAL_EVALUATION.epistemicCritique.xiangzhenglv + " | 演绎法=" + MINGLI_CRITICAL_EVALUATION.epistemicCritique.yanxifafa + "\n" +
+      "GIỚI HẠN ĐỘ CHÍNH XÁC: " + MINGLI_CRITICAL_EVALUATION.accuracyCaveat + "\n" +
+      "MỐC LỊCH SỬ: " + (hp.significance || '(1989 milestone)') + "\n" +
+      "ĐỊNH VỊ CÁC TRƯỜNG PHÁI (round 26): " + Object.entries(BAZI_FACTION_MAP).map(([k, v]) => k + '=' + v.name.split('(')[0].trim()).join(' | ');
+  } catch (e) { brief += "\n--- ROUND 25/26: [lỗi load] ---"; }
 
   return brief;
 }

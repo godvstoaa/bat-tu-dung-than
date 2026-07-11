@@ -1716,3 +1716,422 @@ export const DAYUN_HANDOVER_DETAIL = {
     "8. 「menh hao bang van hao」— menh la ban nen, van la thoi co. Van TOT trong 10 nam thuong QUYET DINH hon menh goc.",
   ],
 };
+
+// ROUND 22: Tu Binh Chan Thuyen (子平真诠 - Than Hieu Triem) — CACH CUC DO SAU
+// Nguon: ctext.org chapter 974137 (nguyen ban 47/48 chuong) + 搜狐 giang. Toan bo verified primary-source.
+
+// 22a. PATTERN_CHENG_BAI — thanh/bai/cuu ung PER-CACH (8 cach x 3 trang thai). Engine-ready.
+export const PATTERN_CHENG_BAI = {
+  "正官": {
+    cheng: ["Quan gap Tai/An + KHONG hinh xung pha hai"],
+    bai: ["Gap Thuong khac / hinh xung"],
+    jiu: { daiji: ["Phat tai lai phat thuong", "To quan lai phat hop", "Tai vuong sinh quan lai phat thuong/hop"], jiu: ["Phat thuong → to an giai", "Tap sat → hop sat thanh", "Hinh xung → hoi hop giai"] },
+    yuanwen: "Quan phat tai an, huu vo hinh xung pha hai, quan cach thanh da; quan phat thuong khac hinh xung, quan cach bai da.",
+  },
+  "正财": {
+    cheng: ["Tai sinh quan vuong", "Tai phat thuc sinh ma than cuong dai ti", "Tai to An ma vi tri thoa thiet, luong bat tuong khac"],
+    bai: ["Tai khinh ti trong", "Tai to that sat"],
+    jiu: { daiji: ["Tai vuong sinh quan lai phat thuong/hop"], jiu: ["Phat kiet → to thuc hoa / sinh quan che", "Phat sat → thuc che sat sinh tai / ton tai hop sat"] },
+    yuanwen: "Tai sinh quan vuong…tai cach thanh da; tai khinh ti trong, tai to that sat, tai cach bai da.",
+  },
+  "正印": {
+    cheng: ["An khinh phat sat", "Quan an song toan", "Than an luong vuong dung thuc thuong tiet khi", "An nhieu phat tai ma tai to can khinh"],
+    bai: ["An khinh phat tai", "Than cuong an nang to sat"],
+    jiu: { jiu: ["Phat tai → kiet tai giai / hop tai ton an"] },
+    yuanwen: "…an cach thanh da; an khinh phat tai…an cach bai da.",
+  },
+  "食神": {
+    cheng: ["Thuc than sinh tai", "Thuc dai sat vo tai, ky thuc tuu sat ma to an"],
+    bai: ["Thuc than phat kieu", "Sinh tai lo sat"],
+    jiu: { jiu: ["Phat kieu → tuu sat thanh cach / sinh tai ho thuc"] },
+    yuanwen: "…thuc cach thanh da; thuc than phat kieu…thuc cach bai da.",
+  },
+  "七杀": {
+    cheng: ["Than cuong that sat phat che"],
+    bai: ["Phat tai vo che"],
+    jiu: { daiji: ["Phat thuc che lai phat an", "Thuc dai sat an lai phat tai"], jiu: ["An ho sat → phat tai kh An ton thuc"] },
+    yuanwen: "…sat cach thanh da; that sat phat tai vo che, that sat cach bai da.",
+  },
+  "伤官": {
+    cheng: ["Thuong quan sinh tai", "Pei an ma thuong vuong an hu can", "Thuong vuong than nhac to sat an", "Dai sat vo tai"],
+    bai: ["Phi kim thuy ma gap quan", "Sinh tai dai sat", "Pei an ma thuong khinh than vuong"],
+    jiu: { jiu: ["Sinh tai to sat → sat phat hop"] },
+    yuanwen: "…thuong quan cach thanh da; thuong quan phi kim thuy nhi gap quan…thuong quan cach bai da.",
+  },
+  "阳刃": {
+    cheng: ["To quan sat lo tai an, bat hien thuong quan"],
+    bai: ["Vo quan sat"],
+    jiu: { jiu: ["Dung quan sat dai thuong thuc → trong an ho"] },
+    yuanwen: "…duong nhan cach thanh da; duong nhan vo quan sat, nhan cach bai da.",
+  },
+  "建禄月劫": {
+    cheng: ["To quan phung tai an", "To tai phung thuc thuong", "To sat nguc che phuc"],
+    bai: ["Vo tai quan, to sat an"],
+    jiu: { jiu: ["Dung quan ngu thuong → thuong bi hop", "Dung tai dai sat → sat bi hop"] },
+    yuanwen: "…kien loc nguyet kiet chi cach thanh da; … chi cach bai da.",
+  },
+};
+
+// 22b. XIANGSHEN_LAW — luat "tuong than" quyet dinh (chan thuyen ch.15). "Thuong tuong thậm hon thuong dung".
+export const XIANGSHEN_LAW = {
+  definition: "Phan toan cuc cach, chu 1 chu thanh nen cach = TUONG THAN (vd quan phat tai sinh → quan=dung, tai tuong). Nhu giong co tuong phu.",
+  decisive: [
+    "Thuong dung than thậm hon thuong than (dung than con hon khi bi pha).",
+    "Thuong tuong thậm hon thuong dung (pha tuong than con nguy hon pha dung than).",
+    "Tuong than vo pha → quy cach da thanh.",
+    "Tuong than bi thuong → lap bai ky cach.",
+  ],
+  examples: [
+    "Quan phat tai sinh → Quan=DUNG, Tai=TUONG (tai sinh quan giup quan).",
+    "Sat phat thuc che → Sat=DUNG, Thuc=TUONG (thuc che sat giup than).",
+    "An phat quan sinh → An=DUNG, Quan=TUONG (quan sinh an giup than).",
+  ],
+};
+
+// 22c. PATTERN_QUALITY_DEEP — cach cuc cao/thap = hu tinh (tinh cam) x hu luc (suc luc). 2 truc doc lap.
+export const PATTERN_QUALITY_DEEP = {
+  axes: "2 TRUC DOC LAP: TINH (dung than co duoc phu/lo thanh, hop dac dia) x LUC (can goc sau/nong, nguyet lenh vuong/nhuoc).",
+  highest: "HU TINH + HU LUC (vd Nham hop Dinh thanh quan + Nham goc sau / Tan Dinh dong goc nguyet lenh) → cach cuc toi cao.",
+  high: "Hu tinh ma phung tinh chi toi / Hu luc ma phung luc chi toan → cach cao nhung khong cuc.",
+  lowQing: "VO TINH (than cuong an vuong to sat → co phan; thuong quan pei an ma than vuong thuong xem an thai trong) → cach thap.",
+  lowLi: "VO LUC (sat cuong thuc vuong than vo goc → yeu; than cuong ti trong tai vo khi → ngheo) → cach thap nguy.",
+  note: "Thay the/ban bo sung cho PATTERN_QUALITY_RANKING (4 bac nau). Day la phan tich 2-truc cua Chan Thuyen ch.12.",
+};
+
+// 22d. JIXIONG_FANLI — DAO LUAN: 4 cat than cung PHA cach, 4 hung than cung THANH cach. Paradigm shift cua Chan Thuyen ch.18/19.
+export const JIXIONG_FANLI = {
+  jishenPos: { // 四吉神能破格
+    "财": "Thuc than dai sat to tai → TAI pha cach.",
+    "官": "Xuan moc hoa vuong gap quan → QUAN pha cach.",
+    "印": "Sat phat thuc che to an → AN pha cach.",
+    "食": "Tai vuong sinh quan lo thuc tap → THUC pha cach.",
+  },
+  xiongshenPos: { // 四凶神能成格
+    "煞": "An goc khinh to sat tro than → SAT thanh cach.",
+    "伤": "Tai phat ti kiet, thuong hoa kiet → THUONG thanh cach.",
+    "枭": "Thuc dai sat linh kieu duoc dung → KIEU thanh cach.",
+    "刃": "Tai phat that sat, nhan giai ac → NHAN thanh cach.",
+  },
+  principle: "「Tai bat ky thuong, quan bat ky kieu, sat bat ky nhan」— dung dac nghi thi than nao cung tot, bat phan cat/hung nguyen ban. Day la vut bo mac nhien 'cat than=tot, hung than=xau'.",
+  chunza: {
+    chun: "THUAN = ho dung luong tuong dac (vd Tan sinh Dan, Giap-Binh to = tai quan tuong sinh → thuan → quy).",
+    za: "TAP = luong bat tuong mau (vd Nham sinh Mui, At-Ky to = quan thuong tuong khac → tap → hung).",
+  },
+  shengkeXianhou: "Cung Tai+Thuong to: TAI TRUOC THUONG SAU = tai hoa thuong → hau van co ket. THUONG TRUOC TAI SAU = thuong pha tai → chung vo ket, kho tu. Engine phai luu vi tri: nam > thang > ngay > gio.",
+};
+
+// 22e. ZAQI_TIANGAN_USE — tap khi (辰戌丑未) thu dung: to can hoi chi lay thanh. Chan thuyen ch.16.
+export const ZAQI_TIANGAN_USE = {
+  principle: "「Tu mo = tap khi…to can hoi chi lay thanh ma dung, tap ma bat tap」+「Tu mo bat ky hinh xung, hinh xung bat nhat thanh cach」(phan bo ngoai loi 'tai quan nha khong phat').",
+  "辰": { mainQi: "Mau (vo)", hidden: "Mau/At/Quy", variants: { "toMau": "Thien Tai cach", "toQuy": "Chinh An cach", "toAt": "Nguyet Kiet cach", "hoiShenTu": "Thuy An cach", "hoiHaiMao": "Thuong Quan (moc) cach" } },
+  "戌": { mainQi: "Mau (vo)", hidden: "Mau/Tan/Dinh", note: "Hoa kho + Tan du khi. Dinh/Tan to → tai an luong thuong = vo tinh." },
+  "丑": { mainQi: "Ky (vo)", hidden: "Ky/Quy/Tan", note: "Kim kho + Quy du khi. Tan to + hoi Ty Dau kim → thanh cach; to Ky tai sinh quan = hu tinh." },
+  "未": { mainQi: "Ky (vo)", hidden: "Ky/Dinh/At", note: "Moc kho + Dinh du khi. Ky to quan + hoi Hai Mao thuong = to quan voi hoi chi vo tinh." },
+  youQing: "Tho quan/tai (Mau Ky) → xung thi kho khi co the phat. Thuy quan/tai → xung thi nguoc lai bi thuong (vd Dinh sinh Chen to Nham quan, Tuat xung → thuong quan hai).",
+};
+
+// ROUND 23: Mệnh Lý Ước Ngôn (命理约言 - Tran To Am / Tran Chi Tram, Thanh so) — CHUAN HOA + PHÊ BÌNH
+// Nguon: 韦千里 1933 tuyen ban《Tuyen Mệnh Lý Ước Ngôn》, cross-check suanzhun + 2 zhihu.
+// NOTE: 1 vai cau nguyen van (chư thần sát luận / nạp âm) chua OCR duoc tu scan NLC → ghi o muc stance.
+
+// 23a. YUEYAN_QUGE — thang lay cach 4 bac + 6 chinh/6 bien cua Uoc Ngon (ch. 看命总法 + 看格局法)
+export const YUEYAN_QUGE = {
+  ladder: [
+    "1) Lap tu tru, xem NHAT CAN la hanh gi, roi xem CHI THANG.",
+    "2) CHINH KHI chi thang TO CAN → lay lam cach (vd Dan to Giap, Ngo to Dinh).",
+    "3) Chinh khi KHONG to hoac bi khac → dung TANG CAN (vd Dan dung Binh/Mau, Ngo dung Ky).",
+    "4) Tang cung khong to/bi khac → dung 'can chi the thinh luc vuong nhat' lam cach.",
+    "5) LOC/ NHAN / TY / KIET chi giup nhat can, KHONG lay lam cach.",
+  ],
+  zheng: { count: 6, members: ["Chinh Quan", "Thien Sat (That Sat)", "Chinh An/Thien An", "Chinh Tai/Thien Tai", "Thuc Than", "Thuong Quan"], nature: "Chinh cach = ngu hanh chi thuong ly" },
+  bian: { count: 6, members: ["Tong (tong cach)", "Hoa (hoa cach)", "Nhat hanh dac khi", "Luong than thanh tuong", "Am xung", "Am hop"], nature: "Bien cach = lay dung thi khac" },
+  rule: "「Loc nhan ty kiet… cung bat dong ky de lay cach, chi dung vi nhat can chi tro」— loc/nhan/ty/kiet KHONG lap cach.",
+  demystify: "「Dac thi dac cuc, sat thuong kyy phu quy; that thi that cuc, quan an kyy ban tien」— sat/thuong CUNG co the phu quy; quan/an CUNG co the ban tien. Bat bo mac nhien 'chuyen luan tai quan'.",
+};
+
+// 23b. YUEYAN_YONGSHEN — dung than de quy phu/uc + da dung than
+export const YUEYAN_YONGSHEN = {
+  core: "「Khanh menh dai phap, bat qua sinh khac phu uc nhi da」— xem mệnh chi la sinh-khắc-phù-ức. Dung than = hanh Phù/ức de can bang nhat can (hoac luc than).",
+  weak: "Nhat can YEU → Phù; PHÙ QUA → uc kẻ phù; PHÙ BAT CAP → phù kẻ phù. (vd Moc yeu phu bang Thuy; Thuy phu qua → che Thuy bang Tho; Thuy phu bat cap → sinh Thuy bang Kim.)",
+  strong: "Nhat can MANH → Uc; UC QUA → uc kẻ uc; UC BAT CAP → phu kẻ uc.",
+  multi: "「Dai phu quy chi menh, bat thu nhat than vi dung. Ky chuyen thu nhat than gia, nai bo pien cuu te chi menh」— mệnh dai phu quy dung NHIEU dung than; mệnh chi co 1 dung than = 'mệnh bo pien cuu te' (chua va cham).",
+  types: { riZhu: "Nhat Chu chi dung than (luc than phu/uc nhat can)", liuShen: "Luc than chi dung than (luc than phu/uc lan nhau)", xingYun: "Hanh van chi dung than = nguyen cuc dung than mang theo vao van" },
+  vsBingyao: "Uoc Ngon CHONG 'huu benh phuong vi quy' (Zhang Shen Phong bệnh dược thuyet) → cho la thien kien. Nhat can quy nhat o TRUNG HOA.",
+};
+
+// 23c. YUEYAN_GUANSHA — Quan-Sat di/luu decision tree (ch. 看官煞去留法)
+export const YUEYAN_GUANSHA = {
+  rule: "Quan = thanh khiết (KHONG duoc pha); Sat = hung cuong (khong so pha).",
+  cases: {
+    guanHeavy_shaLight: { action: "去煞留官", vi: "Quan nang, Sat nhe → BO Sat (giu Quan thanh)", quote: "Quan trong sat nhe, tat dang kh sat, coi quan la thanh khiết chi khi, bat kha hon da." },
+    shaHeavy_guanLight: { action: "不去官", vi: "Sat nang, Quan nhe → KHONG can bo Quan (Sat cuong khong so pha)", quote: "Sat trong quan nhe, bat bat kh quan, sat la hung cuong chi khi, bat ue hon da." },
+    balanced_shangGuan: { action: "去官用煞", vi: "Quan-Sat can bang + Thuong Quan manh → bo Quan dung Sat", quote: "Thuong quan hu luc, tac kh quan dung sat." },
+    balanced_shiShen: { action: "去煞用官", vi: "Quan-Sat can bang + Thuc Than manh → bo Sat dung Quan", quote: "Thuc than hu luc, tac kh sat dung quan." },
+  },
+};
+
+// 23d. YUEYAN_META — dai van cong quan + than sat/nhap am phe binh + am-duong dong sinh dong tu (FLAG truong phai)
+export const YUEYAN_META = {
+  dayun: { vi: "Can-CHI dai van CUNG quan 10 nam, KHONG chia 5/5 hay 4/6 hay 3/7", quote: "Van chi can chi cong quan thap nien… vo thuong ha cac ngu nien chi ly.", conflictsWith: "Ngu ngon doc bo 'van hanh thap so, thuong ha ngu nien phan'" },
+  shensha: { stance: "「Luc bac than sat hư thuyet」— Uoc Ngon HE CHONG than sat hư thuyet (ch. Chư Than Sat Luan). Than sat chi la phu, nen la sinh-khac-phu-uc + cach cuc.", verificationNote: "Danh sach tung sao bi bac (nguyen van chư thần sát luận) chua OCR duoc tu scan NLC → ghi o stance." },
+  nayin: { stance: "Uoc Ngon huong chinh ngu hanh sinh khac, ha cap nhap am. Nhap am chi la phu.", verificationNote: "Nguyen van nhap am luan chua OCR duoc → ghi o stance." },
+  zhonghe: { vi: "「Pham nhat chu toi quy trung hoa, tu nhien cat da hung thieu」— nhat can quy nhat o trung hoa; 'co benh moi quy' la thien kien.", quote: "Nhat chu toi quy trung hoa… gia co benh phuong vi quy chi thuyet, kien pieen da." },
+  yinYangTongSheng: {
+    vi: "Am-Duong CUNG sinh CUNG chet (甲/乙 deu truong sinh o Hoi) — TRAI voi 'duong thuan am nghich' cua tu binh chinh luu.",
+    debateContext: "Day la 'ky sinh thap nhi cung' chua giai quyet: 旺相休囚 = muc NGU HANH (khong phan am duong, gan nguyet lenh); 十二长生 = muc THIEN CAN (tu binh phan am duong = duong thuan am nghich). Am-can vuong suy la chua giai quyet — Tam Mệnh Thong Hoi co 'am muon duong sinh'. Uoc Ngon chon dong sinh dong tu = 1 truong phai, KHONG phai consensus.",
+    schools: { zipingMainstream: "Duong thuan am nghich (phan biet am-duong can, mac dinh hien tai)", yueyanLiming: "Am-duong dong sinh dong tu (Uoc Ngon)", luming: "Khong phan am duong (Loc Menh phap/co phap)" },
+    flag: "KOBIET HUNG len engine — la lua chon truong phai (xem BAZI_SCHOOL). Mac dinh giu 'duong thuan am nghich'.",
+  },
+  liuqinCritique: "Uoc Ngon ch. 看六亲法 phe binh ban do luc than chuan (chinh an=me, thien tai=cha...) la 'poi liet da duan': nguoi do cha me cung sinh, vi sao chi chinh an=me? Thien tai khac chinh an, ma tai la 'ngoa khac', sao sinh ra minh duoc? → Uoc Ngon de xuat phuong phap xem lai.",
+};
+
+// 23e. BAZI_SCHOOL — che do TRUONG PHAI (toggle) cho cac luat co thu xung dot
+export const BAZI_SCHOOL = {
+  current: "ziping-mainstream",
+  note: "Toggle chuyen truong phai. Cac luat co thu xung dot giua co thu (am-duong dong sinh dong tu, dai van chia 5-5, trong luc than sat) chi kich hoat khi doi 'current'. Mac dinh ziping-mainstream (khop code hien tai).",
+  options: {
+    "ziping-mainstream": { label: "Tu Binh chinh luu (mac dinh)", changsheng: "Duong thuan am nghich (phan biet am-duong can)", dayun: "Can-CHI cung quan 10 nam", shensha: "Phu (thu yeu)", nayin: "Co dung, thu yeu" },
+    "yueyan-liming": { label: "Mệnh Lý Ước Ngôn / Luc Menh", changsheng: "Am-duong DONG sinh dong tu", dayun: "Can-CHI cung quan 10 nam (phu hop Uoc Ngon)", shensha: "Luc bac (demote)", nayin: "Demote" },
+    "geju-zhenyuan": { label: "Cach Cuc phai (Tu Binh Chan Thuyen)", changsheng: "Duong thuan am nghich", dayun: "Can-CHI cung quan 10 nam", shensha: "「Tinh cau vo quan cach cuc」(gan khong dung)", nayin: "Khong dung" },
+    "mangpai": { label: "Manh phai (Doan Kien Nghiep)", changsheng: "Bo vuong suy", dayun: "Bo vong suy/dung than, doc cau truc", shensha: "Bo than sat", nayin: "Khong dung" },
+  },
+  conflicts: ["Am-duong dong sinh dong tu (Uoc Ngon) vs duong thuan am nghich (chinh luu)", "Dai van chia 5/5 (Ngu ngon doc bo) vs cong quan 10 nam (Uoc Ngon/Chan Thuyen)", "Than sat trong nang (co phap) vs luc bac (Uoc Ngon) vs bo (Manh phai)"],
+};
+
+// ROUND 24: Tam Menh Thong Hoi (三命通会 - Van Dan Anh, Minh) — SAU (kb.js truoc chi khai thac ~2%)
+// Nguon: tu kho nguon ban quanxue.cn + 8bei8.com + guwendao.net (cung tu kho四库). Verified.
+
+// 24a. SANMING_LIUQIN_FU — luc than phu quyet (8 luat nhan-qua). Nguon: Tam Menh Thong Hoi 卷七 赋云.
+export const SANMING_LIUQIN_FU = [
+  { line: "Nien phung nhan sat, au nien tong sang die lang", vi: "Nien tru co Duong Nhan + Sat → nho mo coi cha me.", tag: "parents" },
+  { line: "Thoi ngu nhan thuong, vi nhan khuem nhi nu", vi: "Thoi tru Nhan + Thuong → van nien mat con.", tag: "children" },
+  { line: "Xung gia vo huynh de, hinh gia ton luc than", vi: "Luc xung → it/khong anh chi em; Tam hinh → ton thuong nguoi nha.", tag: "siblings" },
+  { line: "Thuong quan kien tai nhi huu tu, that sat huu che nai da nhi", vi: "Thuong Quan gap Tai → co con; That Sat co che (Thuc/An) → nhieu con.", tag: "children", override: true },
+  { line: "Kiet tai trong trong phu tong tang, pha an thai trong mau tien vong", vi: "Kiet Tai nang → mat cha som; An bi pha nang → mat me som.", tag: "parents" },
+  { line: "Thien quan/thien an/thien tai die phung, tat nhien thien thue", vi: "Thien Quan/An/Tai deu trung → con thu/hai/ben.", tag: "lineage" },
+  { line: "Tai nguyen dac dia, nhan vo chi phuc thanh gia", vi: "Thuc Thuong (tai nguyen) dac dia → nho vo ma giau.", tag: "marriage-wealth" },
+  { line: "Nhat ha thuong quan tri nhan, phu tac ac vong", vi: "Nhat chi Thuong Quan + Duong Nhan → chong chet du.", tag: "spouse-death" },
+];
+
+// 24b. SANMING_SHENSHA_FULL — +25 sao hiem (vuot ADVANCED_SHENSHA). Nguon: 卷三 总论诸神煞.
+export const SANMING_SHENSHA_FULL = {
+  "自缢煞": { vi: "Tu Yem Sat", nature: "hung", effect: "tu treo col. Dac hung khi khac than + ngo thuong + khong vong.", lookup: "Nien chi → nguoc he chi." },
+  "水溺煞": { vi: "Thuy Noai Sat", nature: "hung", effect: "nguy hiem chem nuoc.", lookup: "Binh-Tu / Quy-Wei / Quy-Chou + dao hoa + kim nhan." },
+  "挂剑煞": { vi: "Qua Kiem Sat", nature: "hung", effect: "sat nhan / bi sat. Cung quan phu/nguyen than/bach ho/kim than.", lookup: "Si-You-Chou-Shen 4 tru du toan hoac nang gap." },
+  "天火煞": { vi: "Thien Hoa Sat", nature: "hung", effect: "hoa hoa khi van den hoa sinh vuong.", lookup: "Yin-Wu-Tuat du + can co Binh/Dinh + 5 vi khong Thuy." },
+  "天屠煞": { vi: "Thien Do Sat", nature: "hung", effect: "om ngu la, mat chi; nang → luu day.", lookup: "ngay-chi x gio-chi cach 2 vi." },
+  "天刑煞": { vi: "Thien Hinh Sat", nature: "hung", effect: "bi hinh phat, co om.", lookup: "Nien chi → gio (tu/suu→Y, dan→Canh...)." },
+  "雷霆煞": { vi: "Loi Dinh Sat", nature: "dual", effect: "gap loc/quy → tot (phap quan/dao); gap nhan/sat/phi lien → hung (loi tran ho can).", lookup: "thang → chi (1/7→Tu, 2/8→Dan...)." },
+  "官符煞": { vi: "Quan Phu Sat", nature: "hung", effect: "nhieu quan tai, cung duong nhan → luat.", lookup: "Thai tue + 5 chi (truoc)." },
+  "病符煞": { vi: "Benh Phu Sat", nature: "hung", effect: "nhieu benh.", lookup: "Thai tue - 1 chi." },
+  "死符煞": { vi: "Tu Phu Sat", nature: "hung", effect: "hung ac dot ngan, khong quy giai → yeu.", lookup: "Benh phu doi xung." },
+  "丧吊煞": { vi: "Tang Dieu Sat (Hoang Quan)", nature: "hung", effect: "thai tue sat cung → hoa, luu nien cuc hung.", lookup: "Menh+2 chi=Tang Mon; Menh-2 chi=Dieu Khach." },
+  "宅墓煞": { vi: "Trach Mo Sat", nature: "hung", effect: "sue/tue sat pha → om than (than trach).", lookup: "Menh+5 chi=tai; Menh-5 chi=mo." },
+  "返本煞": { vi: "Phan Bon Sat", nature: "hung", effect: "co lap, 1 vong → khac cha me ton truong.", lookup: "Ngu hanh khong quy khi, ha khac thuong (ngay/thoi khac nam)." },
+  "阴阳煞": { vi: "Am Duong Sat", nature: "cat/hung", effect: "Nam Binh-Tu nhat → nhieu dep gai; Nu Vo-Ngo nhat → nhieu dep trai; ky cung dao hoa/nguyen than → dam.", lookup: "Nam = Binh-Tu nhat; Nu = Vo-Ngo nhat." },
+  "八专": { vi: "Bat Chuyen", nature: "hung", effect: "ngay co vo khong chinh, gio co con khong chinh; nu → khong chon than su.", lookup: "Nhat = Giap-Dan/At-Mao/Ky-Vi/Dinh-Vi/Canh-Than/Tan-Dau/Mau-Tuat/Quy-Suu." },
+  "九丑": { vi: "Cuu So", nature: "hung", effect: "nu → san nan; nam → khong tot chung.", lookup: "Nhat = Nham-Tu/Nham-Ngo/Mau-Tu/Mau-Ngo/Ky-Dau/Ky-Mao/At-Mao/Tan-Dau/Tan-Mao." },
+  "孤鸾寡鹊": { vi: "Co Loan Qua Tac", nature: "hung", effect: "nam khac vo, nu khac chong.", lookup: "Nhat = At-Ty/Dinh-Ty/Tan-Hoi/Mau-Than/Giap-Dan/Binh-Ngo/Mau-Ngo/Nham-Tu." },
+  "破煞": { vi: "Pha Sat", nature: "hung", effect: "thieu nien ai tri, tai san hao tan, mat thuong.", lookup: "Mao-Ngo, Suu-Chen, Tu-Dau, Vi-Tuat tuong pha." },
+  "浮沉煞": { vi: "Phuc Tram Sat", nature: "dual", effect: "o tai bach cung = truyen tien (phu); con lai hung.", lookup: "Tu Tuat xuat, Tu ngu hanh den nam chi." },
+  "短寿煞": { vi: "Doan Thu Sat", nature: "hung", effect: "thuong vo con.", lookup: "Phan am gap Kieu (thien an)." },
+};
+
+// 24c. SANMING_SHENSHA_AXIOMS — 4 nguyen tac tong cua than sat (卷三 总论诸神煞)
+export const SANMING_SHENSHA_AXIOMS = [
+  "1. Cat than muon o SINH VUONG vi → vinh quy; hung sat muon o TU TUYET vi → lanh (thien chung). Nguoc lai nghich.",
+  "2. Thai tue nay am = than. Than bi khac/bi lam o tu-bai-tuyet → bat bat chi tai. Nhung thoi nay am khac sat → giao.",
+  "3. Menh vao quy cach + noi then co sat + co phuc than tro → QUYEN BILH (lam sep/quan). Khong phuc than + sat thua vong → ha tien ac tu.",
+  "4. 「Quan tu cach trung cung pham that sat duong nhan; tieu nhan menh noi cung co chinh an quan tinh」— than sat la PHU, KHONG thay the ngu hanh/cach cuc.",
+];
+
+// 24d. SANMING_NV_BAFA + SANMING_NV_BAGE — nu menh 8 phap + 8 cach (卷七 论女命)
+export const SANMING_NV_BAFA = {
+  pure: "Thuan (纯): 1 quan (hoac 1 sat), co tai/vo an, khong giao cham, khong hon tap → quy phu.",
+  he: "Hoa (和): than nhac, 1 chong tinh, khong xung pha → tot voi chong con.",
+  qing: "Thanh (清): 1 quan 1 sat khong hon, tai sinh quan, an tro than → thanh quy.",
+  gui: "Quy (贵): quan co tai tro, 3 ky, khong qui binh → phu nhan cap cao.",
+  zhuo: "Doc (浊): ngu hanh that vi, than qua vuong, chong chinh khong hien, nhieu chong thien → ha tien.",
+  lan: "Lam (滥): nhieu chong (minh+am), tai vuong, co sat → tham tai tu am (tinh giao).",
+  chang: "Xuong (娼): than vuong + chong tuyet + thuc thuong vuong → co vuong su ni.",
+  yin: "Dam (淫): than dac dia + chong tinh minh am giao tap → dam.",
+};
+export const SANMING_NV_BAGE = [
+  "Vong phu thuong tu: thuc than bi thuong → vong phu, thuong tu.",
+  "Vong tu thuong phu: quan sat that vi/thoi + thuc thuong vuong o thoi → vong tu, thuong phu.",
+  "Thuong phu khac tu: quan/thuc deu that vi + an trung → ca chong con deu khac.",
+  "An tinh thu phan: than vuong + chong vuong, khong xung khac → vo chong hoa.",
+  "Phuc tho luong bi: than vuong + tai/quan/an deu dac vi + thuc than → phuc tho.",
+  "Chinh thien tu xu: vo chong voi vo thu (ty kien tranh) → ai vuong lam chinh, ai nhac lam thien.",
+  "Chieu gia bat dinh: chong tinh hop minh nhuong chong khong vuong → cuoi tre, cuoi khong ro, hoac co tinh ngoai.",
+];
+
+// 24e. SANMING_NAYIN_XIJI — 30 cap nap am hich/ky (卷一 论纳音取象). Engine lookup nap am → hich/ky.
+export const SANMING_NAYIN_XIJI = {
+  "海中金": { yi: "Giap-Tu gap Quy-Hai (Chau tang duyen hai) → quy", ji: "khong hinh xung", nature: "bao tàng, them tai khong hien" },
+  "金泊金": { yi: "thuy moc; binh dia tu", ji: "lo trung hoa, them long vang than", nature: "mong manh, giong sao" },
+  "白蜡金": { yi: "lo trung hoa; canh thinh binh dan", ji: "khong thay nuoc → binh thien", nature: "phong ngau, tao doa" },
+  "砂中金": { yi: "lo hoa + thanh thuy", ji: "lo hoa khong che → tai", nature: "non toc, phai loi" },
+  "剑锋金": { yi: "DAI KHI/DAI HAI thuy; thuy thanh", ji: "hoa (dac biet Dan-Ty tam hinh) → cuc hung", nature: "sat nhat, quyet doa" },
+  "钗钏金": { yi: "tinh thuy; vo phu/hue tu", ji: "binh ngo that hoa; hai thuy → binh thien", nature: "my vi, trang suc" },
+  "霹雳火": { yi: "phong/loi/thuy (Giai Hai, Dai Khi, Chen Ty)", ji: "pham thuy cung duoc (than hoa)", nature: "dot phat, bien dong, quyen luc" },
+  "炉中火": { yi: "binh dia moc (dac biet Tan Mao); kim = cai", ji: "qua nhieu moc khong thuy → thien tai", nature: "on hoa, luyen tep" },
+  "覆灯火": { yi: "thuy (cam dau) + moc; binh kim", ji: "phong (chen ty trung) → dot nat → thien", nature: "dem sang, tu duy" },
+  "天上火": { yi: "binh dia moc; ngo/than kim = cot sang", ji: "qua nhieu moc → lao cot → hung", nature: "cuong nhu nhat/trang" },
+  "山下火": { yi: "son moc + phong (giap dan, tan mao); thanh thuy", ji: "that hoa, dai hai, binh van thien → hung", nature: "am ap, linh hoat" },
+  "山头火": { yi: "son moc (Giai Suu); phong; binh dia", ji: "khong son/moc → ha tien; hinh xung cuc so", nature: "manh, phan tam" },
+  "桑柘木": { yi: "sa trung tu; dai ha thuy", ji: "thue hoa lua → hung", nature: "phuc vu, che tap" },
+  "松柏木": { yi: "son (Giai Suu, Tan Suu) + thuy; binh tu", ji: "lo trung hoa + phong moc → phanh phoi → hung", nature: "tuan bi, cuong truc" },
+  "大林木": { yi: "Giai Suu = son; binh kim + vo/phuong tu = dong luong", ji: "that hoa (Giap-Tuat At-Hoi) dot → hung thien", nature: "phat trien, bao ve" },
+  "杨柳木": { yi: "sa tu; thanh thuy; gieu dao", ji: "Ngo-Vi nhap mo + binh ngo → hung", nature: "uyen chuyen, dep" },
+  "石榴木": { yi: "thanh ha va + binh thuy", ji: "vo/phuong/kim/sa cung → hung", nature: "con trai, sinh de" },
+  "平地木": { yi: "lo/tru tu (canh dan, tan mao) = dong luong; thanh thuy", ji: "kiem kim; dai ha khong moc → hung", nature: "nen nha, cung cap" },
+  "涧下水": { yi: "sa trung/kiem phong kim; Giap-At moc 1 vi", ji: "vo thuy (Chen-Tuat-Suu-Vi) → cuc hung", nature: "cam khit, trong sang" },
+  "大溪水": { yi: "CAM SAU kim; binh tu = co quy", ji: "than dau/ty (le phong) → bien dong → hung", nature: "manh me, chay tu do" },
+  "长流水": { yi: "bach lap/kiem phong kim; gieu dao/duong du + luu = QUY", ji: "Tuat xung → phan lam → hung", nature: "lien tuc, khong dut" },
+  "天河水": { yi: "dai ha/truong luu (Quy-Hai = long vu thien); binh lo", ji: "qua nhieu = lam lao → hai", nature: "bom tuoi, sinh vat" },
+  "井泉水": { yi: "sa trung kim + moc (binh moc = ngoc dang tu); vo/thuong tu", ji: "phia tu = dong dot → hung", nature: "cam lap, cuon vui" },
+  "大海水": { yi: "Giai Suu = son → Hai tinh; lo = trau; binh dia tu = chan", ji: "thien binh Hoa → hung", nature: "lon, tong hop" },
+  "壁上土": { yi: "binh kim/thuong tu = goc; moc = cot dong", ji: "pham hoa + moc → hung thien", nature: "chang, bao ve" },
+  "城头土": { yi: "duong tu (Giai Suu) = thanh; binh moc (Quy-Vi) = tot; sa tu", ji: "canh dan/tan mao (cung khu) = thanh beng → bat an", nature: "vung chai, kinh dai" },
+  "砂中土": { yi: "kiem phong/sa kim = nuoi; binh thuy = cam", ji: "vo phuong tu → chon vuit", nature: "long song, bien doi" },
+  "路旁土": { yi: "vo/dau; gieu dao (Canh-Dan) = tot nhat", ji: "bat khi khong vuong hoa → hung", nature: "cho menh, phuc vu" },
+  "大驿土": { yi: "tru vo binh tu = ky binh; vo binh = goc", ji: "hai thuy khong son → hung thien", nature: "phat trien, dai dao" },
+  "屋上土": { yi: "binh dia moc; Giap-Chen At-Ty = vao nha cach; kiem phong kim", ji: "lo trung hoa (Binh-Dan) cuc hung", nature: "phu che, an dinh" },
+};
+
+// 24f. SANMING_DAYUN_STAGE — dai van 12 truong sinh giai doan doan (卷二). + 24g XIAOYUN + 24h TAISUI
+export const SANMING_DAYUN_STAGE = {
+  changsheng: "Truong Sinh → tao lap, khoi su moi, sang tao",
+  guanjian: "Lam Quan → thinh vuong, vui ve, bat dau co thanh tuu",
+  diwang: "De Vuong → cuc thinh, phat tai, sinh con, co庆",
+  shuai: "Suy → lui bac, mat co",
+  bing: "Benh → om om, that bai tien",
+  si: "Tu → tang toc nguoi nha, ban than bat tac, nut me",
+  jue: "Tuyet → cung Tu nhung nang hon, cuc be tac",
+  mu: "Mo/kho → bang dat, an dinh",
+  taifu: "Thai + Quan Dai → moi viec deu trung, binh an",
+  note: "Ap dung cho tung GIAI DOAN 10 nam cua dai van (chi dai van). Ket hop voi Dung/Ky de xet tot/xau.",
+};
+export const SANMING_XIAOYUN = {
+  method: "Tieu van = phap Tuy Tinh Tu: xuat phat tu THOI TRU, 1 vi = 1 nam, thuan/nghich dua vao NAM CAN (duong nam/am nu thuan; am nam/duong nu nghich).",
+  use: "Bo sung cho dai van. Dong han (chua giao dai van) dung RIENG phap nay. Quy tac: 「dai van tuy cat, tieu van bat thong, vi kha ngon cat」— dai van tot + tieu van khong thong → chua tinh tot.",
+};
+export const SANMING_TAISUI_RULES = [
+  "「Tuoi thuong nhat can co hoa bat khong; nhat pham tuoi quan tai duong bat trong」— Luu nien thai tue khac nhat can → hoa NHE; nhat can khac thai tue → hoa NANG (tren tri duoi=thuan; duoi len tren=nghich).",
+  "Tu van tinh lam (luu nien = dai van): chi Duong Nhan/That Sat la hung; Tai/Quan/An lai la cat — KHONG phai luc nao cung xau.",
+  "Huy Khi: nhat can/thoi can hop thai tue thien can → ten HUY KHI (toi tam, khong minh). Can nhat hop tuoi → hoa nang; tuoi hop nhat → hoa nhe.",
+  "Chan thai tue/Chuyen chi sat: luu nien = nam tru sinh → than cung; hinh xung pha hai → hung cuc.",
+];
+
+// 24i. SANMING_GANHE_HUAMEANING — thien can ngu hop hoa khi y nghia + 24j JINJIAOTUIFU
+export const SANMING_GANHE_HUAMEANING = {
+  "甲己": { name: "中正之合", vi: "Ton trong, rong ruong, binh thang. Nhuoc: co tiem, de phan." },
+  "乙庚": { name: "仁义之合", vi: "Quyet doa, co thu, nhan nghia. Nhuoc: dung suc thue hoanh, tuong mau xau." },
+  "丙辛": { name: "威制之合", vi: "Nghiem khac, de so. Nhuoc: qua tinh, dam hiem, de dam." },
+  "丁壬": { name: "淫慝之合", vi: "Nhieu tinh, de dong, tham nap. Nu: de bi moi cuoc / cuoi lech tuoi (lao phu thieu phu)." },
+  "戊癸": { name: "无情之合", vi: "Vo tinh (lao phu thieu phu / thieu phu lao phu). Nam cuoi vo tre, nu cuoi chong gia." },
+};
+export const SANMING_JINJIAOTUIFU = {
+  "进神": { jiazi: ["甲子", "己卯", "甲午", "己酉"], vi: "Phat tich, bang nhanh, hanh thong" },
+  "交神": { jiazi: ["丙子", "辛卯", "丙午", "辛酉"], vi: "Mo vieu deu bat xung (trung binh)" },
+  "退神": { jiazi: ["丁丑", "壬辰", "丁未", "壬戌"], vi: "Lui bac, giang chat, that bai" },
+  "伏神": { jiazi: ["戊寅", "癸巳", "戊申", "癸亥"], vi: "Dinh tri, hoan ai, bat tac" },
+};
+
+// ROUND 25: LOP META — Hong Phi Mo《Trung Quoc Co Dao Toan Menh Thuat》(1989) + pha he lich su
+// Nguon: WeRead TOC + 暨南大学 程佩/张其凡(2013)述评 + 陆致极《Trung Quoc Menh Ly Hoc Su Luan》.
+
+// 25a. MINGLI_HISTORY_LINEAGE — pha he lich su menh ly (9 thoi ky)
+export const MINGLI_HISTORY_LINEAGE = [
+  { era: "Tien Tan", stage: "Thien menh quan manh phat", figures: "Khong Tu 知天命 / Manh Tu 立命 / Trang Tu / Mac Tu 非命", idea: "「Tu sinh hu menh, phu quy tai thien」. Mac Tu phi menh = tieng noi phan bien noi tai (Hong Phi Mo Ch.4§1 dung lai)." },
+  { era: "Dong Han", stage: "Khai niem co ban thanh hinh", figures: "Vuong Sung《Luận Heng》", idea: "Can chi x am-duong ngu hanh bat dau gan voi nhan su. Menh dinh luan so khai." },
+  { era: "Duong", stage: "CO PHAP nen tang — Tam Tru", figures: "Ly Hu Trung (762-813)", idea: "Lay NAM/THANG/NGAY (tam tru) day menh, NIEN tru lam chu. Han Du mo chi minh: 「bach bat thatt nhat nhi」. Giai doan tam tru." },
+  { era: "Tong ★", stage: "KIM PHAP cach tan & thanh thuc", figures: "Tu Tu Binh (Tu Cu Dich)", idea: "① Trong tam: nien tru → NHAT tru. ② Tam tru → TU TRU (giai thoi tru) = 「bat tu」. Dan gian goi 「tu binh thuat」. Diem ngoat.", note: "Canh bao hoc thuat: Luu Quoc Trung(2009) cho rang su tich Tu Tu Binh la「tich luy tao thanh」; Dong Huong Tue(2011) phan bien." },
+  { era: "Minh — dinh", stage: "Tap dai thanh", texts: "《Tam Menh Thong Hoi》(Van Dan Anh) — bach khoa; 《Uyen Hai Tu Binh》; 《Khung Thong Bao Giam》— dieu hou" },
+  { era: "Thanh — sau", stage: "Phuong phap luan thanh thuc", texts: "《Tu Binh Chan Thuyen》(Tham Hieu Triem) — cach cuc; 《Menh Ly Uoc Ngon》(Tran To Am) — chuan hoa; 《Trich Thien Tủy》+ Nhan Thiet Trieu xiển vi — dinh triet ly" },
+  { era: "Dan Quoc (1916-49)", stage: "Chuyen hinh 1 — pho cap + hoc thuat", figures: "Vien Thuc San《Menh Ly Tham Nguyen》(1916); Vi Thien Ly《Thien Ly Menh Cao》(1935); Tu Lac Ngo《Tu Binh Tuy Ngon》(1938); Pan Tu Doan《Menh Hoc Tan Nghia》(1937,首引 Jung)" },
+  { era: "1989 ★Hong Phi Mo", stage: "Dai Luc hau Van Cach khoi phuc", figure: "Hong Phi Mo + Khong Ngoc Tran", work: "《Trung Quoc Co Dao Toan Menh Thuat》, Thuong Hai Nhan Dan Xuat Ban 1989, phu de 「Co Kim The Tuc Nghien Cuu 1」", significance: "Dai Luc hau 文革 de nhat ban. Khung 4 chuong: 缘起→基础→具体方法→批判. Lop phê binh (Ch.4) la required de qua kiem duyet 1989; noi dung day nghiem tuc." },
+  { era: "2000s+", stage: "Da nganh / vi mo", figures: "Luc Tri Cuc《Trung Quoc Menh Ly Hoc Su Luan》(2008, duy nhat thong su); Ha Le Da — triet ly; Luu Quoc Trung — van hien khao" },
+];
+
+// 25b. MINGLI_CRITICAL_EVALUATION — lop phe binh nhan thuan luan (Hong Phi Mo Ch.4)
+export const MINGLI_CRITICAL_EVALUATION = {
+  stance: "「Tinh toan menh la mot loai me tin」(tu nhan) — NHUNG noi dung giang nghiem tuc. Lap truong: the tuc nghien cuu, KHONG phai tin nguong. Dich den: SU VIEC O CON NGUOI (事在人为).",
+  dualLayer: { surface: "Khung phê binh Ch.4 (can thiet de xuat ban 1989 Dai Luc)", reality: "Vuong Duc Phong: 「cai phê binh do toan la gia」— thuc te la trinh bay chinh dien he thong." },
+  epistemicCritique: {
+    xiangzhenglv: "「Hai thi san lau」— lien ket tuong trungg (can chi↔ngu hanh↔van menh) nhu ao anh, hu ao khong vung.",
+    yanxifafa: "「Phong vu phiêu dao」— qua trinh suy luan tu bat tu → van menh thieu nen tang logic vung chac.",
+  },
+  bigQuestion: "「Hoc thuat ho? Me tin ho?」— dan nguoi doc tu van nghi van, KHONG cho cau tra loi don gian.",
+  landing: "SU VIEC O CON NGUOI — de cao chu quan nang dong, khong menh do troi dinh.",
+  selfProofLimit: { who: "Hong Phi Mo tu phe menh (Canh Than nhat chu, sinh 1940)", predicted: "Tho 84 tuoi", actual: "Mat 2005, tho 65 (ung thu phoi giai doan muon)", lesson: "「Hong Phi Mo dai tai nhu vay, cho minh phe menh con the, huong ho nga boi ho」— minh chung thuc tien cho「dien sat phap phong vu phiêu dao」." },
+  practitionerEthics: "Ch.3§17 旧时Tinh Menh Gia dao duc yeu cau — nguoi xem menh xua co chuan dao duc nghe nghiep (kb.js chua co).",
+  accuracyCaveat: "Ly Cu Chuong (Dai Loan): menh ly khong 100% chinh xac, do du bao khoang 50-70%. Vien Thuc San dan Trieu Chan Nhu: 「Loc menh chi thuyet, vi bat tan nghiem. Nhan gia thuong thap chi bat that」.",
+};
+
+// 25c. MINGLI_CLASSICS_GUIDE — 「doc gi tiep theo」+ so sanh 8 bo co thu
+export const MINGLI_CLASSICS_GUIDE = {
+  levels: {
+    nhapMon: ["《Thien Ly Menh Cao》— giao trinh the le, van tu tinh", "《Trung Quoc Co Dao Toan Menh Thuat》— tu hoc, du phu luc lich tiet khi 100 nam"],
+    tienGiai: ["《Tu Binh Chan Thuyen》— cach cuc + dung than, logic nghiem", "《Menh Ly Uoc Ngon》— van nghia xuong dat, thien ban so hoc"],
+    sau: ["《Trich Thien Tủy》(Nhan Thiet Trieu Xiển Vi) — dinh triet ly, can chu giai", "《Khung Thong Bao Giam》— dieu hou, nghia ly tinh", "《Tam Menh Thong Hoi》— tham khao bach khoa, the le tap"],
+  },
+  comparativeEval: {
+    "《Tam Menh Thong Hoi》": "Thu la quang bac,惜 the le bat tinh (bach khoa nhung tap).",
+    "《Uyen Hai Tu Binh》": "Thu gia punch hop, mat tinh hoa doc dao.",
+    "《Khung Thong Bao Giam》": "Nghia ly toi tinh ma tu bat dat y.",
+    "《Tu Binh Chan Thuyen》/《Menh Ly Uoc Ngon》": "Xuat tu van nhan chi thu, van nghia xuong dat,惜 that chi thai qien.",
+    "《Trich Thuyen Tủy》": "Nghia ly tinh tham…co y tang dau lo vi (cao tham nhung kho hieu).",
+  },
+};
+
+// ROUND 26: NHANH KIN — luu phai khau truyen / phi main-stream. ⚠ Co tranh cai — co CO canh bao.
+// Nguon: Doan Kien Nghiep《Doan Thi Ly Tuong Hoc》, Ly Ham Than《Bat Tu Du Chan Tong》, 英熊无名 zhihu column.
+
+// 26a. BAZI_FACTION_MAP — ban do luu phai menh ly (it tranh cai, an toan)
+export const BAZI_FACTION_MAP = {
+  geju: { name: "Cach Cuc phai (Tu Binh Chan Thuyen/Menh Ly Uoc Ngon)", core: "Nguyet lenh → to can → lay cach cuc = dung than. Cat than thuan dung, hung than nghich dung. 8 chinh cach.", weakness: "Chi hop 「thuong tao」phu quy; thanh cach cuc hiem → vo dung voi dan thuong." },
+  wangs: { name: "Vuong Suy phai / Trich Thien Tủy phai (Nhan Thiet Trieu)", core: "Khong cu cach, khong than sat, chi ngu hanh sinh khac. Nhat chu vuong suy → dung than phu uc. + thong quan/dieu hou/benh duoc.", weakness: "「Me trung hoa」— Nhan khong noi ro thang do vuong suy → hau hoc bat nghiem." },
+  mangpai: { name: "Manh phai (Doan Kien Nghiep he thong hoa ~2002, su Hao Kim Duong)", core: "KHONG dung dung than/vuong suy. Doc cau truc 做功 + loai tuong. 3 phap: ly/tuong/ky.", flag: "⚠ tinh xac thuc truyen khau chua chung minh; Doan co the pha tu sang tao." },
+  xinpai: { name: "Tan phai (Ly Ham Than 2003, Tran Quoc Nhat he thong)", core: "5 luan: bach than / phan doan / hu thuc / khong vong / noi-ngoai moi. Van dung vuong suy-dung ky.", flag: "⚠ cuc ky tranh cai, bi goi 「thousand-year toi nhan」; gia tri du bao chua validate; ly thuyet hay doi." },
+};
+
+// 26b. MANGPAI_ZUOGONG — manh phai 做功 (⚠ truyen thua chua chung minh, CO che cong khai mach lac)
+export const MANGPAI_ZUOGONG = {
+  flag: "⚠ NGUON: truyen khau mu, Doan Kien Nghiep he thong hoa ~2002. Tinh xac thuc truyen thua KHONG chung minh duoc, nhung co che KY THUAT cong khai & mach lac. Danh gia 「phi-mainstream, dung tham khao」.",
+  premise: "Manh phai 弃 vuong suy、废 dung ky — KHONG dung dung than/vuong suy. Moi thu doc qua 「cau truc 做功」+ 「loai tuong」.",
+  binZhu: { zhu: "Nhat chu + nhat chi (±thoi tru) = 「CUA MINH」(chu)", bin: "Cac can chi khac = 「CUA NGUOI KHAC / ben ngoai」(khach)", question: "Chu co bat/cai/khong che duoc Khach khong? → do la 做功." },
+  tiYong: { note: "⚠ KHAC 体用 trong kb.js (L142 = tu binh: the=nhat chu, dung=dung than). Manh phai: the=cong cu, dung=muc tieu.", ti: "The = cong cu san co: Ty Kien, Loc, An, Thuc", yong: "Dung = muc tieu theo duoi: Tai, Quan, Thuong", zuogong: "「Dung the ma lay dung」= 做功 (lam cong)." },
+  gongFei: { gongshen: "Cong than = can chi TIEU HAO nang luong NHUNG SINH HIEU QUA (co lam viec).", feishen: "Phe than = tieu hao nang luong ma KHONG sinh hieu qua (ro ri/phe).", rule: "La so tot ∝ ty le Cong than/Phe than cao. 「La so cang差 thi phe than cang nhieu」." },
+  modes: {
+    zhiyong: "Che dung (khong che): chu KHAC khach de chiem — Ty kien di tai/Thuong quan di quan/Thuc thuong che sat/An che thuc thuong/Tai che an. Pho bien nhat.",
+    huayong: "Hoa dung (bien hoa): An hoa quan sat → An → than. Quan-lo nhieu = lam quan.",
+    shengyong: "Sinh dung/phe dung: Thuc thuong sinh tai (phat tai) hoac thuc thuong phe tuu. 「Noi thuc than」(thuc an sinh tai an) = doanh nhan.",
+    heyong: "Hop dung (ket): Nhat can/nhat chi HOP muc tieu (hop tai/hop quan). NGOAI LE: day Manh phai moi xet Than cuong than nhac — hop tai nhu vac nang, than vuong thang tai.",
+    muyong: "Mo dung (nhap mo): Nhap mo = thau/tien ca/so huu/quan ly. 「Xung=kho(song), khong xung=khiem(chet)」.",
+    fuhe: "Phuc hop: nhieu mode cung lam cong → nhieu nghe.",
+  },
+  zhengFan: { zhengju: "Chinh cuc = 做功 cua Nhat tru KHOP voi y do nguyen cuc → thuan.", fanju: "Phan cuc = 做功 cua Nhat tru TRAI nguoc y nguyen cuc → be tac/lo do." },
+};
+
+// 26c. XINPAI_FIVE_THEORIES — tan phai ngu luan (⚠ CUC KY TRANH CAI, co khi hoa duoc)
+export const XINPAI_FIVE_THEORIES = {
+  flag: "⚠ CUC KY TRANH CAI: bi goi 「thousand-year toi nhan」vi phan doan/hu thuc; main-stream truyen thong coi la tu sang/thuong mai hoa. Co che CONG KHAI & co khi hoa duoc, nhung gia tri du bao CHUA validate. Danh gia 「tham khao co canh bao」.",
+  baishen: { name: "Bach Than Luan (thay the luc than)", problem: "Khi thap than cua mot luc than KHONG xuat hien → doc sao?", rule: "Thay bang mot thap than CO MAT cung am-duong (dong tinh). Nam-trai/nu-phai de gan chinh/thien. KHONG dat luc than thay the len nien can.", precedent: "Tien le:《Di An》phi cung luan than (nen KHONG han do Ly sang tao)." },
+  fanduan: { name: "Phan Doan Luan (dao nguoc)", rule: "Dieu kien cu the → dung than ↔ ky than DAO NGUOC. Co so: ngu hanh cuong (cuc roi thi phan).", conditions: "Phu-uc格: Nguyet can/Thoi can THAY bi khac-phe-hao HOAC khong vong → phan doan. NHUNG Nguyet can duoc Nien can/Nien chi sinh → KHONG phan. Phan doan roi thi toa ha van phan. Nien can KHONG phan. Tong cach thien can KHONG phan." },
+  xushi: { name: "Hu Thuc Luan (thuc/khong)", rule: "Thuc = can chi CO trong nguyen cuc; Hu = KHONG co. Phan: thuc-dung/thuc-ky/hu-dung/hu-ky.", dayun: "Than-thuc bi tac dong TRUOC → doan 1 ket qua; sau do ap dung luat dai van/luu nien binh thuong → doan ket qua thu 2 (thuong nguoc). 「Thuc-thuc tac dung, cat hung giai hu」." },
+  kongwang: { name: "Khong Vong Luan", rule: "Tra tu nhat nguyen; khong vong = khong co; nien chi khong vong ≠ khong; nguyet lenh khong vong → xet vuong suy dung nien chi cho 50% trong so; dai van dia chi dien thuc khong vong; luu nien dien thuc → doan dang「khong ngo… tuong… nhung…」." },
+  neiWai: { name: "Noi-Ngoai Moi Truong Luan", rule: "Thien can = ngoai moi (co khong? ben ngoai the nao?); Dia chi = noi moi (co bao nhieu? xu huong?). Trai(nien)=xa hoi, Phai(nhat)=noi bo/gia dinh." },
+};
+
+// 26d. WUXING_TANYUAN_THESIS — 《Ngu Hanh Tham Uyen》(Duong Nien Le 1997) — CHI CLAIM, co che KHONG cong khai
+export const WUXING_TANYUAN_THESIS = {
+  flag: "⚠ SACH THUC (Duong Nien Le, 1997) nhung CO CHE 7-档/10-级 KHONG lay duoc. Day la CLAIM cua columnist 「英熊无名」, CHUA phai hoc thuat chuan consensus. KHONG duoc bia ten 档/级.",
+  book: "《Ngu Hanh Tham Uyen》", author: "Duong Nien Le (Dong Bac Loc Linh, nien du co that 1997)", year: "1997 (Dinh Suu) thang 9",
+  nature: "Menh hoc nhap mon giao trinh (sach nhap mon) — KHONG phai bi dien",
+  lineage: "Dong Nhan Thiet Trieu/Khung Thong Bao Giam + Tran To Am《Menh Ly Uoc Ngon》 (vo tinh trungg duong, khong biet Uoc Ngon khi viet)",
+  thesisClaim: "CHO RANG: 「Trung hoa chi me」ton tai vi co thu (Trich Thien Tủy/Khung Thong Bao Giam) noi 「boi dac trung hoa phuong kyy phu quy」nhung KHONG BAO GIO dinh nghia thang do. Nhan Thiet Trieu cang lam cang nham mo. → Duong de xuat luong tu hoa.",
+  proposedScale: "Ngu hanh vuong suy chia 7 档 (1 nguon phu noi 5 档 — BAT NHAT QUAN trong nguon thu cap) + dung than chia 10 cap.",
+  unverifiedFlag: "⚠ DINH NGHIA CU THE cua 7 档/10 cap KHONG cong khai — chi co claim, khong co method. KHONG duoc bia ten 档/级 neu implement.",
+};
