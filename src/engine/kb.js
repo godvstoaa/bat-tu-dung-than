@@ -2331,4 +2331,35 @@ export const MANGPAI_ZHIFA = {
   note: "Manh phai luon hoi: 'CONG nao lam viec? Hieu suat bao nhieu?' → do phu quy. Day la 'dinh luong' cua manh phai (khac 'dung than vuong suy' cua kim phap).",
 };
 
+// ROUND 30: 地理→五行→體質 (五方五民) + 十一曜餘氣 phê bình (tu OCR Grok 古今圖書集成 星命部)
+// 30a. GEO_WUXING_PERSON — 五方五民: dia ly → ngu hanh → the chat/tinh cach (bí truyền, bo sung WUXING_APPEARANCE)
+export const GEO_WUXING_PERSON = {
+  source: "欽定古今圖書集成·星命部 (NLC scan). Grok-4 Heavy OCR.",
+  principle: "Ngu hanh khong chi o 'nhat chu' ma con o 'DIA LY' — nguoi sinh o cac vung dia hinh khac → inh huong ngu hanh khac → the chat/tinh cach khac. (Bo sung WUXING_APPEARANCE — ay la muc 'dia-ngu-hanh'.)",
+  wufang: {
+    "山林 (rung nui)": "DUOC MOC khi nhieu → 「毛而方」— long toc day, mat vuong. Tinh cach: nhien tu, truc (giong Moc).",
+    "川澤 (song ho)": "DUOC THUY khi nhieu → 「黑而津」— da den, am uot. Tinh cach: thong minh, uyen chuyen (giong Thuy).",
+    "丘陵 (doi nui)": "DUOC HOA khi nhieu → 「專而長」— chuyen, cao dai. Tinh cach: nhiet huyet (giong Hoa).",
+    "墳衍 (dat cao)": "DUOC KIM khi nhieu → 「皙而瘠」— trang, om. Tinh cach: cung quyet (giong Kim).",
+    "原隰 (dong bang)": "DUOC THO khi nhieu → 「豐肉而痺」— thit day, cham. Tinh cach: on dinh (giong Tho).",
+  },
+  apply: "Xem nguoi → hoi que quan/dia hinh → them 1 lop 'dia-ngu-hanh' ben canh 'nhat-chu-ngu-hanh'. Vd que ven song + nhat chu Thuy → Thuy KEP → tinh cach 'Thuy' cuc manh.",
+};
+
+// 30b. SHIYIYAO_CRITIQUE — 十一曜/五星餘氣 phê bình (tu 星命部) — goc 'tinh menh' (kha giong tu vi)
+export const SHIYIYAO_CRITIQUE = {
+  source: "古今圖書集成·星命部. Grok-4 Heavy OCR.",
+  yuqi: "五星 4 행 co 'du khi' (羅/計/孛/气): 木→氣, 土→計, 水→孛, 火→羅. NHUNG: 「奈何金獨無餘氣乎」— KIM khong co du khi → phan bien (sao Kim la ngoai le?). 'Tuong sinh co du, tuong khac khong co' cung 'phi thong luan'.",
+  fenyvsZhanming: "「有分星而無分野；占國者不可盡泥，況占命乎」— co 'phan tinh' (12 quoc/phuong vi ↔ tinh tu) nhung KHONG phai 'phan da';占 quoc da khong chinh xac, huong hon 占 menh. → phe binh 'tinh-tu-luan-menh' (占星命) that nhu tu vi.",
+  note: "Day la goc 'TINH MENH' (占星, 11曜) — khac TU BINH (干支). Tu vi ket hop ca 2. Bí truyền: hieu 'tinh menh' bi phe binh tu co de hieu su khac biet voi tu binh.",
+};
+
+// 30c. XINGMING_MASTERS — cac thay menh co phap (bí truyền: truyen thuyyet) — tu 星命部 danh nhan
+export const XINGMING_MASTERS = [
+  { name: "邹元佐 (Tong, Tan Xuong)", method: "「以人之年月日時分配金木水火土而推其生旺休囚，附以官貴祿馬刑殺」— CO PHAP chuan: nam can-chi + ngu hanh vuong tu + quan quy loc ma + hinh sat.", works: "《洪範福極彝倫奧旨》5 quyen + 《貴命四十九格》. Danh xung 'Tan Xuong tam ky'.", note: "Bí truyền: 「凡看命須隨所見即談，無不奇中；若稍涉思慮則相去遂遠」— xem menh phai 'truc gian', nghien lung thi sai." },
+  { name: "李虚中 (Tang)", method: "Goc CO PHAP (nam-tru/nhaps am/than sat). 韓愈 mộ chi.", note: "Xem GUFA_MODEL / SHENTOU_LU_NAYIN." },
+  { name: "林开 (Tong)", method: "Tinh menh (十一曜). Xuất hien trong '蔡元 độ con truyen' (xingming bo danh nhan).", note: "Phai 'tinh menh' (khac tu binh)." },
+];
+
+
 
