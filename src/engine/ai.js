@@ -11,7 +11,7 @@ import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
-import { assessGufa, mangpaiKoujue } from './gufa-engine.js'; // [round 31] CO PHAP deep-logic + [R39] 盲派金口诀
+import { assessGufa, mangpaiKoujue, hetuReading } from './gufa-engine.js'; // [round 31] CO PHAP + [R39] 盲派金口诀 + [R40] 河图洛书
 import { assessHuangji } from './huangji-engine.js'; // [round 34] 皇极经世 值年卦 (prophetic/cam ky)
 import { assessTaiyi } from './taiyi-engine.js'; // [round 36] 太乙神数 (quoc van, tam thuc cam ky)
 import { assessChenggu } from './chenggu-engine.js'; // [round 37] 袁天罡称骨算命 (bí truyền)
