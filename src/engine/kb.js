@@ -2235,3 +2235,25 @@ export const GUFA_LINEAGE = [
   { era: "Tong", text: "《五行精纪》(Lieu Trung, 30 quyen)", note: "Bach khoa CO PHAP (hư trung phap). Uoc Ngon trich 《广录》= sach nay. Tap hop nhaps am/than sat/loc ma co phap day du." },
   { era: "Minh-Thanh", figures: "三命通会/渊海子平/穷通宝鉴/子平真诠", note: "KIM PHAP thanh thuc. Nhaps am & than sat BI HA CAP (dac biet Uoc Ngon 'luc bac'). CO PHAP tro thanh 'phan bi an'." },
 ];
+
+// ROUND 28: CO PHAP nang cao — 天乙貴人 bản gia + ngũ âm nạp âm (tu OCR Grok《李虚中命书》卷上)
+// 28a. GUFA_NOBLE_BENJIA — 天乙貴人 bản gia + 貴合/貴食 + quý thần ưu liệt (bí truyền cổ pháp)
+export const GUFA_NOBLE_BENJIA = {
+  source: "李虚中命書 卷上. Grok-4 Heavy OCR.",
+  tianyiPositions: "天乙貴人 (cat than cuc tot): 甲戊庚 → 丑未; 乙己 → 子申; 丙丁 → 亥酉; 壬癸 → 卯巳; 六辛 → 寅午. (Tra tu CAN nam/ngay sinh → chi co quy nhan.)",
+  benjia: "「本家貴人」— vd 甲人 co 戊+庚+丑+未 = ĐẠI QUÝ (甲戊庚 deu la duong, cung nhom quy than). 甲 duoc 丁丑辛未 la cap 2. Nguyen tac: cung nhom can (甲戊庚/乙己/丙丁/壬癸/六辛) cung hien quy nhan = 'ban gia' → phuc rat nang.",
+  guiheGuishi: "「有貴合則多稱意，有貴食則祿多稱意；二者無之，官高祿重無往不利」— QUÝ HỢP (can nam ngũ hợp voi can cua quy nhan) → moi viec y; QUÝ THỰC (can nam sinh ra quy nhan) → lu loc y. Ca 2 khong co thi cung 'quan cao lu trong'.",
+  guishenYoulie: "貴神分 loai (theo cap quy nhan, thu cong/du lieu Grok OCR): 乙丑=文星, 乙未=華蓋, 乙亥=截路空亡, 辛未=華蓋, 癸未=伏神華蓋, 甲子=進神, 丙子=交神, 戊子=伏神, 庚子=德合, 壬子=羊刃, 甲申=截路空亡, 戊申=伏馬, 庚申=建祿馬, 壬申=大敗... → khong phai quy nhan nao cung giong nhau, co 'van tinh/hoa cai/khong vong/duong nhan' phan biet.",
+  note: "Day la lop 'quy nhan BI TRUYEN' cua CO PHAP: khong chi xem co quy nhan khong, ma con xem BAN GIA (cung nhom) + QUY HOP/QUY THUC + UU/LIET (van tinh/hoa cai/khong vong). Kim phap thuong chi tra 'co/khong quy nhan' → mat lop sau nay.",
+};
+
+// 28b. NAYIN_WUYIN_THEORY — ngũ âm nạp âm (宫商角徵羽 ↔ thiên can ngũ hợp) + ngũ hành số
+export const NAYIN_WUYIN_THEORY = {
+  source: "李虚中命書 卷上. Grok-4 Heavy OCR.",
+  wuyin: "「甲己真宮，乙庚真商，丙辛真羽，丁壬真角，戊癸真徵」— THIEN CAN NGU HOP ↔ NGU AM (宫/商/角/徵/羽). Day la GOC cua nhaps am: moi cap ngu hop = 1 am.",
+  wuxingShu: "「火得一，土得二，木得三，金得四，水得五」— NGU HANH SINH SO: Hoa=1, Tho=2, Moc=3, Kim=4, Thuy=5. (So sinh → nap vao 60 giap ty thanh 30 nhaps am.)",
+  nayinMechanics: "「納音者，配由十干十二支，周而終之數也；干支相乘」— nhaps am = 10 can × 12 chi = 60 giap ty, chia 2 = 30 cap nhaps am, moi cap 1 'am' (ngu am) + 1 hanh.",
+  tiedao: "「金土同體而異名」(Kim-Tho cung the khac ten) — lay vi du: Cung=Tho, Thương=Kim... → ngu am cung ngu hanh, nhung 'kim tho dong the'.",
+  note: "Nhaps am khong phai 'phu' nhu kim phap noi — no la 1 HE THONG doc lap: ngũ âm + ngũ hành số + 60 giap ty → 30 nhaps am, moi nhaps am 1 tinh (xem SHENTOU_LU_NAYIN). Uoc Ngon ha cap nhaps am = mat lop 'ngu am luan' nay.",
+};
+
