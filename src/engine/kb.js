@@ -2520,3 +2520,26 @@ export const HELU_LUOSHU = {
     },
   },
 };
+
+// ROUND 41: 马前课 (Gia Cát Lượng) + 烧饼歌 (Lưu Bá Ôn) — hoàn thiện "bộ 3 tiên tri bị cấm"
+export const MAQIANKE_SHAOBINGE = {
+  source: "马前课 (三国·诸葛亮, 14课) + 烧饼歌 (明·刘伯温). Cùng 推背图 = 'bộ 3 tiên tri bị cấm'.",
+  maqianke: {
+    concept: "马前课 = 14 bài toán tiên tri (Gia Cát Lượng_PREDICTIONS). Moi bài = 1 que + 1 thơ ám chi sự kiện lịch su.",
+    structure: "14 bài: bài 1-9 = qua khu (đã ứng:魏/晋/唐/Song/Nguyên/Minh), bài 10-14 = tuong lai (BIÊN LAY/cam ky). Bai cuối (14) = 'pháp cừu quy bảo' → kết.",
+    keyLessons: {
+      "bai 2": "Quẻ 坤 → ám chi Tấn (đã ứng).",
+      "bai 4": "Quẻ 剥 → ám chi Đường khởi (đã ứng).",
+      "bai 11": "Quẻ 离 → thường bị cho ám chi 'thời đại không chiến / hỏa hoảng' (TRANH CAI).",
+      "bai 14": "Quẻ 革 → 'cứu áo quy bảo' → tiên tri chấm dứt.",
+    },
+    honestyFlag: "⚠ Bai-thời điểm tương ứng LA TRANH CAI (cấm chính vì vậy). App CHI tham chieu cau truc + bai da ung (lịch su), KHONG suy đoán bai tuong lai.",
+  },
+  shaobingge: {
+    concept: "烧饼歌 = Lưu Bá Ôn (Minh) đáp 朱元璋 hỏi → thơ tiên tri lịch su từ Minh trở đi.",
+    structure: "Dạng Hỏi-Đáp (Châu Nguyên Chương hỏi, Lưu Bá Ôn đáp) + thơ 4 câu. Ám chi: Minh mạt/Thanh khởi/Canh Tý/đến hiện tại.",
+    keyVerses: "'Thành tây thùy cúc nhất chi hoa' = ám chi 李自成 (đã ứng). Nhiều câu ám chi sự kiện Thanh/Dân Quốc (tranh cai).",
+    honestyFlag: "⚠ Cùng tinh chất 推背图/马前课 — tiên tri CẤM, giải đoán tranh cai. App chi tham chieu.",
+  },
+  note: "Bộ 3 tiên tri cấm: 推背图 (Đường·Lý Thuần Phong) + 马前课 (Tam Quốc·Gia Cát Lượng) + 烧饼歌 (Minh·Lưu Bá Ôn). Tat ca đeu INTERPRETIVE (không compute chính xác) → app tham chieu trung thực, không 'nhét bừa'.",
+};
