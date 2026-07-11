@@ -2257,3 +2257,78 @@ export const NAYIN_WUYIN_THEORY = {
   note: "Nhaps am khong phai 'phu' nhu kim phap noi — no la 1 HE THONG doc lap: ngũ âm + ngũ hành số + 60 giap ty → 30 nhaps am, moi nhaps am 1 tinh (xem SHENTOU_LU_NAYIN). Uoc Ngon ha cap nhaps am = mat lop 'ngu am luan' nay.",
 };
 
+// ROUND 29: MANH PHAI (盲派) NANG CAO — chi tiet bí truyền (tu 算准网 盲派初级命理学 = 段建业)
+// Bo sung Round 26 (MANGPAI_ZUOGONG chi co framework). Day la CHI TIET van hanh.
+
+// 29a. MANGPAI_SANFA — 盲派 3 phap: ly/tuong/ky
+export const MANGPAI_SANFA = {
+  source: "段建业《盲派初级命理学》. 算准网.",
+  sanfa: {
+    lifa: "LY PHAP (理法) — hieu 'bai van' cua bat tu: doc ra cau truc, ai lam chu, lam cong gi, huong toi gi.",
+    xiangfa: "TUONG PHAP (象法) — chuyen can chi/thap than thanh 'hinh anh' (vd Giap Moc = cay lon, At Moc = co; chinh quan = sep/con chong). Moi can chi/thap than = 1 bieu tuong.",
+    jifa: "KY PHAP (技法) — ky nang ung dung: dinh thoi diem (ung ky), dinh su kien, phan biet chinh/phu.",
+  },
+  vsTraditional: "Manh phai BO 'dung than' (khong co khai niem dung than) → dung LY+TUONG+KY 3 phap + 'lam cong' thay the.",
+};
+
+// 29b. MANGPAI_GONGWEI_XIANG — 4 tru cung vi + lay tuong (bí truyền: doc cuoc doi qua 'cung vi')
+export const MANGPAI_GONGWEI_XIANG = {
+  source: "盲派初级 ch.2 四柱宫位取象.",
+  palaces: {
+    year: "NIEN TRU = TO THUONG / CHA ME. (1-18 tuoi). Xem: nguyen khi, phuc toc to tien, than phan som.",
+    month: "NGUYET TRU = CHA ME / ANH CHI EM. (18-35 tuoi). Xem: nguon goc gia dinh, su nghiep som.",
+    day: "NHAT TRU = BAN THAN (+ NGAY CHI = VO/CHONG). (35-55 tuoi). Xem: ban than, phoi ngau.",
+    time: "THOI TRU = CON CAI / VAN NIEN. (55+ tuoi). Xem: con cai, ket qua cuoc doi, van nien.",
+  },
+  xiangPrinciple: "Manh phai doc cuoc doi qua CUNG VI (tru nao) + THAP THAN (sao nao) + HANH (ngu hanh). Vd 'Thien Tai o Nhat Tru' = ban than nhieu tai; 'o Thoi Tru' = con cai giu tai.",
+};
+
+// 29c. MANGPAI_GANZHI_XIANG — can chi lay tuong (moi can/chi = 1 bieu tuong rieng)
+export const MANGPAI_GANZHI_XIANG = {
+  source: "盲派初级 ch.4 干支详解.",
+  gan: {
+    "甲": "Giap Moc = CAY LON, moc thang. Dieu kien song: PHAI CO GOC + GAP THUY. Khong gap Thuy = 'chết moc' (khong song). Giap-Tu = vo goc.",
+    "乙": "At Moc = CO / MAM / DAY LEO, moc cong. Phai co goc; vo goc bo khong xem, xem toa chi.",
+    "丙": "Binh Hoa = MAT TROI (chinh)/ lua lon — sang, chieu, cong khai.",
+    "丁": "Dinh Hoa = DEN / NEN / SAO — am ap, som dem, sinh tu goc (cay chay).",
+    "戊": "Mau Tho = NUI / TUONG THANH — co, nang, chong đe.",
+    "己": "Ky Tho = DAT RUONG / Khuon vuon — nuoi duong, mem.",
+    "庚": "Canh Kim = DAO KIEM / quang kim — cung, sat.",
+    "辛": "Tan Kim = TRANG SUC / kim non — dep, mong manh.",
+    "壬": "Nham Thuy = SONG GIANG / bien — manh, chay tu do.",
+    "癸": "Quy Thuy = MUI BOM / SUONG — te ny, chim.",
+  },
+  note: "Manh phai KHONG chi xem 'hanh' (moc/hoa...) ma xem 'TUONG' (cay lon/co, mat troi/den...). 2 moc (Giap/At) khac tuong hoan toan → doc khac.",
+};
+
+// 29d. MANGPAI_HE_RULE — 盲派 luat hop: chi HOP khong HOA + hop quan/hop tai + am hop
+export const MANGPAI_HE_RULE = {
+  source: "盲派初级 ch.4(3-4) 天干合/地支合.",
+  tianganHe: "「天干五合 CHI GIANG HOP, BAT GIANG HOA」(Giap-Ky/At-Canh/Binh-Tan/Dinh-Nham/Mau-Quy). Manh phai chi nhin 'HOP' (ket/bam/lay), KHONG nhin 'HOA' (bien hanh). KHAC truyen thong (co hoa khac).",
+  heGuanHeCai: "Nhat can HOP → chi 2 truong hop: HOP QUAN (lam sep/quan) hoac HOP TAI (lay tai). Nhat can tim hop = 'muc tieu' cua ban than.",
+  dizhiAnhe: "DIA CHI AN HOP (暗合, bí truyền): cap chi co 'ban than an hop' (vd Dan-Hoi, Ngo-Hai... cap ban than). An hop = 'tin tinh am gia', giong nhu loan tinh bi an, xem ngoai tinh/vo chong cam.",
+  liuheMarriage: "DIA CHI LUC HOP = 'UNG KY HON NHAN'. Luc hop = ket than (ket hon), cung la moc tinh cuoi hoi.",
+};
+
+// 29e. MANGPAI_DAXIAN_YINGQI — 盲派 大限 ứng kỳ (timing qua tuoi cua tung tru) — BÍ TRUYEN
+export const MANGPAI_DAXIAN_YINGQI = {
+  source: "盲派初级 ch.7 应期.",
+  daxian: "「大限应期」— moi TRU quan 1 khoang tuoi: NIEN TRU 1-18t, NGUYET TRU 18-35t, NHAT TRU 35-55t, THOI TRU 55+t. Su kien o tru nao → xay ra trong khoang tuoi do.",
+  rule: "「大限应凶，大运应吉，此运不克，过运则凶」— neu dai HAN (tru) bao hung, nhung dai VAN dang cat → chua xay ra; qua van thi hung xay. (Dai han = dinh 'cai gi', dai van = dinh 'khi nao'.)",
+  yingqi: "UNG KY (dinh thoi diem chinh xac): hop = moc tinh (vd luc hop = cuoi); xung = bien dong; cong than len luc = thanh cong; phe than len luc = that bai. Dai van + luu nien cham vao 'tu trung' cua cong/phe than = nam xay ra.",
+};
+
+// 29f. MANGPAI_ZHIFA — 盲派 制法 (hieu suat lam cong = phu quy cap do)
+export const MANGPAI_ZHIFA = {
+  source: "盲派初级 ch.6 制法明析.",
+  principle: "Trong 'che dung' (chế phục muc tieu) cau truc, HIEU SUAT su dung nang luong = phu quy cap do. Hieu suat cao = dai phu quy, thap = dan thuong.",
+  zhifa: {
+    heZhi: "HOP CHE (合制) — dia chi luc hop/an hop che phuc muc tieu. Hieu suat CAO (hop = chechat).",
+    xingZhi: "HINH CHE (刑制) — hinh che phuc. Hieu suat trung binh.",
+    chongZhi: "XUNG CHE (冲制) — xung che phuc. Manh nhung bat on.",
+    keZhi: "KHAC CHE (克制) — ngu hanh khac che.",
+  },
+  note: "Manh phai luon hoi: 'CONG nao lam viec? Hieu suat bao nhieu?' → do phu quy. Day la 'dinh luong' cua manh phai (khac 'dung than vuong suy' cua kim phap).",
+};
+
+
