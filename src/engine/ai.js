@@ -15,6 +15,7 @@ import { assessGufa, mangpaiKoujue, hetuReading } from './gufa-engine.js'; // [r
 import { assessHuangji } from './huangji-engine.js'; // [round 34] 皇极经世 值年卦 (prophetic/cam ky)
 import { assessTaiyi } from './taiyi-engine.js'; // [round 36] 太乙神数 (quoc van, tam thuc cam ky)
 import { assessChenggu } from './chenggu-engine.js'; // [round 37] 袁天罡称骨算命 (bí truyền)
+import { assessWuyunLiuqi } from './wuyun-liuqi.js'; // [round 42] 五运六气 (y-thiên văn cấm kị)
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
 import { nayinInfo } from './nayin.js';
@@ -917,6 +918,13 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     brief += "\n--- 河图洛书 数理 (đạo tạng, round 40) ---\n" + hr.verdict;
   } catch (e) { brief += "\n--- ROUND 40: [lỗi load] ---"; }
 
+  // ---- [round 42] 五运六气 (y-thiên văn CẤM KỴ, Hoàng Đế Nội Kinh) ----
+  try {
+    const yr = _now.getFullYear();
+    const wl = assessWuyunLiuqi(yr);
+    brief += "\n--- 五运六气 (y-thiên văn cấm kị, round 42) ---\n" + wl.verdict;
+  } catch (e) { brief += "\n--- ROUND 42: [lỗi load] ---"; }
+
   return brief;
 }
 
@@ -1156,6 +1164,11 @@ export const AI_TOOLS = [
     name: 'analyze_chenggu', description: '袁天罡称骨算命 (BÍ TRUYEN Đường): cộng trọng lượng năm+tháng+ngày+giờ (lunar) → tổng骨重 (两/钱) → 称骨歌 (số phận). Dùng khi user hỏi «xương cốt mấy nam / 称骨 / 袁天罡 / trọng lượng mệnh». Trả骨重 + bài thơ số phận. Góc nhìn BO SUNG (khác tử bình).',
     parameters: { type: 'object', properties: { year: { type: 'integer' }, month: { type: 'integer' }, day: { type: 'integer' }, hour: { type: 'integer' } } },
   } },
+  { type: 'function', function: { // [round 42] 五运六气
+    name: 'analyze_wuyun', description: '五运六气 (Hoàng Đế Nội Kinh, Y-THIÊN VĂN cấm kị): năm CAN → vận (thái quá/bất cập) + năm CHI → 6 khí (tư thiên/tại tuyền) → tạng phủ bệnh + khí hậu năm. Dùng khi user hỏi «sức khỏe năm X / dịch bệnh / ngũ vận lục khí / thời tiết bệnh học / nội kinh vận khí». Trả vận + khí + tạng bệnh. Góc Y-thiên văn (khác tử bình).',
+    parameters: { type: 'object', properties: { year: { type: 'integer', description: 'Năm (bỏ trống = năm nay)' } } },
+  } },
+,
   { type: 'function', function: { // [loop 496→623 FIX] 梅花易数 起卦 by time
     name: 'analyze_meihua', description: '梅花易数 起卦 (time-based divination): gieo quẻ theo thời điểm → 本卦/互卦/变卦 + 体用 ngũ hành sinh khắc + verdict cát/hung. Dùng khi user hỏi «gieo quẻ», «起卦 about X», «占 [chủ đề]», «xem quẻ hôm nay». Trả quẻ +体用 + cát hung.',
     parameters: { type: 'object', properties: {
@@ -1362,6 +1375,11 @@ export function execTool(name, args, R) {
       case 'analyze_chenggu': { // [round 37] 袁天罡称骨算命 (bí truyền)
         const cg = assessChenggu(Number(a.year)||c.input.year, Number(a.month)||c.input.month, Number(a.day)||c.input.day, Number(a.hour)??c.input.hour);
         return { lunar: cg.lunar, boneWeight: cg.boneWeight, tone: cg.tone, verse: cg.verse, viGloss: cg.viGloss, verdict: cg.verdict, note: cg.note };
+      }
+      case 'analyze_wuyun': { // [round 42] 五运六气 (y-thiên văn cấm kị)
+        const yr = Number(a.year) || _now.getFullYear();
+        const wl = assessWuyunLiuqi(yr);
+        return { year: wl.year, yearGanZhi: wl.yearGanZhi, wuyun: wl.wuyun, liuqi: wl.liuqi, verdict: wl.verdict, note: wl.note };
       }
       case 'analyze_meihua': { // [loop 496] 梅花易数 起卦 by time
         const n = new Date();
