@@ -2488,3 +2488,35 @@ export const MANGPAI_KOUJUE = {
     "Lao bat đe vuong, thieu bat suy — gia truong hoa vuong nien, tre con suy.",
   ],
 };
+
+// ROUND 40: 河图洛书 数理 (ĐẠO TẠNG — gốc rễ TAT CA thuat so: hoang cuc/thiet ban/thai at deu tu day)
+// Nguon: 《五行大义》(Tuy·Tieu Cat) + 道藏. Day la HE THONG SO LY co tim nhat.
+export const HELU_LUOSHU = {
+  source: "河图洛书 + 《五行大义》(Tuy·Tieu Cat). Goc re cua tat ca thuat so (皇极经世/铁板神数/太乙/梅花 deu xay dung tren day).",
+  hetu: {
+    principle: "河图: '天 1 sinh nuoc đay o 6, đay 2 sinh hoa đay o 7, đay 3 sinh moc đay o 8, đay 4 sinh kim đay o 9, đay 5 sinh tho đay o 10'. So sinh (1-5) = trong; so thanh (6-10) = ngoai. Moi hanh = 1 cap sinh-thanh.",
+    numbers: {
+      "水": { sinh: 1, thanh: 6, pair: "1-6 (cung Bac)" },
+      "火": { sinh: 2, thanh: 7, pair: "2-7 (cung Nam)" },
+      "木": { sinh: 3, thanh: 8, pair: "3-8 (cung Đong)" },
+      "金": { sinh: 4, thanh: 9, pair: "4-9 (cung Tay)" },
+      "土": { sinh: 5, thanh: 10, pair: "5-10 (Trung cung)" },
+    },
+    note: "Sinh so = ban the (noi tam), Thanh so = hien hinh (ngoai giac). Cap sinh-thanh cung hanh = 'thien sanh đia thanh' (troi sinh đat đay). Day la co so cua nhaps am (5 sinh so × 2 = 10 → 60 giap ty nhaps am).",
+  },
+  luoshu: {
+    principle: "洛书: 'Đai 9, 履 1, 左 3, 右 7, 2-4 vi kiem, 6-8 vi tuc, 5 cu trung.' → 9 cung so: 4-9-2 / 3-5-7 / 8-1-6. Moi cung = 1 que/1 huong.",
+    layout: { "Bac": 1, "Đong Bac": 8, "Đong": 3, "Đong Nam": 4, "Nam": 9, "Tay Nam": 2, "Tay": 7, "Tay Bac": 6, "Trung": 5 },
+    note: "洛书 = co so cua: Cuu cung (太乙/phi tinh), bat trai (8 huong), que cuu cung. So 5 = trung tam. Tong moi hang/cot = 15.",
+  },
+  correspondences: {
+    principle: "Ngu hanh ↔ moi thu trong vu tru: '五行大义' lap ban tuong ung DAY DU.",
+    matrix: {
+      "木": { number: "3/8", direction: "Đong", color: "xanh", taste: "chua", organ: "can/dam", planet: "Moc-tinh(Jupiter)", emotion: "noi gian", virtue: "nhan", season: "xuan", sound: "gioc(角)" },
+      "火": { number: "2/7", direction: "Nam", color: "đo", taste: "đang", organ: "tim/tieu", planet: "Hoa-tinh(Mars)", emotion: "vui", virtue: "le", season: "ha", sound: "chuong(徵)" },
+      "土": { number: "5/10", direction: "Trung", color: "vang", taste: "ngot", organ: "ty/vi", planet: "Tho-tinh(Saturn)", emotion: "tuong tu", virtue: "tin", season: "chuyen giao", sound: "cung(宫)" },
+      "金": { number: "4/9", direction: "Tay", color: "trang", taste: "cay", organ: "phoi/đai", planet: "Kim-tinh(Venus)", emotion: "au", virtue: "nghia", season: "thu", sound: "thuong(商)" },
+      "水": { number: "1/6", direction: "Bac", color: "den", taste: "man", organ: "than/bang-quang", planet: "Thuy-tinh(Mercury)", emotion: "so", virtue: "tri", season: "đong", sound: "vu(羽)" },
+    },
+  },
+};

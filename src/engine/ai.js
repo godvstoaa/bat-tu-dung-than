@@ -911,6 +911,12 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     brief += "\n--- 盲派金口诀 (bí truyền, round 39) ---\n" + mk.readings.map(r => `${r.pos} [${r.god}]: ${r.verse}`).join(' | ');
   } catch (e) { brief += "\n--- ROUND 39: [lỗi load] ---"; }
 
+  // ---- [round 40] 河图洛书 数理 (đạo tạng, gốc rễ thuật số) ----
+  try {
+    const hr = hetuReading(c);
+    brief += "\n--- 河图洛书 数理 (đạo tạng, round 40) ---\n" + hr.verdict;
+  } catch (e) { brief += "\n--- ROUND 40: [lỗi load] ---"; }
+
   return brief;
 }
 

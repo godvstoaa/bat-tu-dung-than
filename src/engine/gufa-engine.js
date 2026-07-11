@@ -1,7 +1,7 @@
 // gufa-engine.js — CO PHAP (古法) DEEP-LOGIC engine: phat hien cach cuc nhaps am (兰台妙选)
 // + than đau loc + cuu menh trên LA SO THUC. Day la LOGIC TINH TOAN, khong chi tra cuu.
 // Nguon: 珞琭子赋注 / 李虚中命书 / 兰台妙选 (Round 27-31 kb.js).
-import { LANTAI_PATTERNS, SHENTOU_LU_NAYIN, GUFA_MODEL, JIUMING_SYSTEM, MANGPAI_KOUJUE } from './kb.js';
+import { LANTAI_PATTERNS, SHENTOU_LU_NAYIN, GUFA_MODEL, JIUMING_SYSTEM, MANGPAI_KOUJUE, HELU_LUOSHU } from './kb.js';
 
 // trad → simp cho cac chu nhaps am (xu ly 2 dang chart)
 const T2S = { '劍':'剑','鋒':'锋','燈':'灯','楊':'杨','頭':'头','蠟':'蜡','釵':'钗','釧':'钏','霹':'霹','靂':'雳','澗':'涧','長':'长','寶':'宝','馬':'马','龍':'龙','駒':'驹','鳳':'凤','闕':'阙','靈':'灵','淵':'渊','躍':'跃','門':'门','鑛':'矿','鑛':'矿','釱':'','鍾':'钟','鎮':'镇' };
@@ -256,4 +256,23 @@ export function mangpaiKoujue(chart) {
     else out.push({ pos, god: p.ganGod, verse: '(khong co koujue cho ' + god + ')' });
   }
   return { readings: out, duanYun: MANGPAI_KOUJUE.duanYun };
+}
+
+
+// === 河图洛书 数理 (ĐẠO TẠNG): day master hanh → so sinh/thanh + tuong ung 五行大义 ===
+export function hetuReading(chart) {
+  const c = chart?.chart ? chart.chart : chart;
+  const dmGan = c?.dayMaster?.gan || '';
+  const wxOf = (g) => ({甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'})[g] || '?';
+  const wx = wxOf(dmGan);
+  const hetu = HELU_LUOSHU.hetu.numbers[wx];
+  const corr = HELU_LUOSHU.correspondences.matrix[wx];
+  if (!hetu || !corr) return { wx, note: 'khong co du lieu ho tu cho hanh nay' };
+  return {
+    dayMaster: dmGan, wx,
+    hetu: { sinhSo: hetu.sinh, thanhSo: hetu.thanh, pair: hetu.pair },
+    correspondence: corr,
+    verdict: `Nhật chu ${dmGan}(${wx}) → Hà Đồ: sinh so=${hetu.sinh}, thanh so=${hetu.thanh} (cap ${hetu.pair}). ` +
+      `Tuong ung: huong ${corr.direction} | mau ${corr.color} | vi ${corr.taste} | tang ${corr.organ} | tinh ${corr.planet} | cam xuc ${corr.emotion} | đuc ${corr.virtue} | mua ${corr.season} | am ${corr.sound}.`,
+  };
 }
