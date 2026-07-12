@@ -267,6 +267,7 @@ export function buildOutput(conclusions, facts, category) {
 export function think(question, chart, R, gender) {
   try {
     const facts = extractFacts(chart, R, gender);
+    if (!facts.dayMaster) return null; // invalid chart → graceful null
     const conclusions = evaluateRules(facts);
     const category = classifyQuestion(question);
     const output = buildOutput(conclusions, facts, category);
