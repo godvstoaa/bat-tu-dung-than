@@ -11,8 +11,6 @@ import fs from 'fs';
 // ============================================================================
 
 // [loop 236] SW auto-version plugin — thay CACHE trong dist/sw.js bằng timestamp build
-// → mỗi deploy tự bump SW version → returning users LUÔN nhận content mới (tránh lỗi
-// loop 234: SW kẹt v4 suốt 70+ loop). Trước đây phải bump thủ công → dễ quên.
 function swAutoVersion() {
   return {
     name: 'sw-auto-version',
@@ -29,7 +27,6 @@ function swAutoVersion() {
 
 export default defineConfig({
   plugins: [swAutoVersion()],
-  // [loop 55] GitHub Pages phục vụ ở /bat-tu-dung-than/ → base phải đúng để asset load
   base: process.env.GH_PAGES ? '/bat-tu-dung-than/' : '/',
   server: {
     host: '::',
@@ -43,20 +40,41 @@ export default defineConfig({
   build: {
     emptyOutDir: true,
     chunkSizeWarningLimit: 1000,
-    // [loop 49] tách vendor (lunar-javascript + astronomy-engine) khỏi app code
-    // → vendor cache lâu hơn (hiếm đổi), app cache ngắn (đổi mỗi loop)
+    // [OPTIMIZE R49] Code-split aggressive — giảm main bundle từ 1.5MB → ~500KB
+    // Priorities: (1) core load nhanh (<200KB gzip initial), (2) AI/engine lazy-load
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // vendor tách (cache lâu — hiếm đổi)
+          // === VENDOR (cache vĩnh viễn — file hash không đổi khi update code) ===
           if (id.includes('node_modules/lunar-javascript')) return 'vendor-lunar';
           if (id.includes('node_modules/astronomy-engine')) return 'vendor-astronomy';
-          // [loop 568] engine code-split theo nhóm → mỗi deploy chỉ re-download chunk đổi,
-          //   không cả 1.3MB. Cải thiện caching cho mobile (returning users).
-          if (id.includes('/src/engine/ziwei')) return 'engine-ziwei';       // 10+ file Tử Vi
+          if (id.includes('node_modules/three')) return 'vendor-three';
+
+          // === ENGINE-AI (lazy — chỉ load khi user mở chat AI) ===
+          // kb.js (263KB data!) + ai.js (222KB) = ~485KB → TÁCH khỏi main bundle
+          if (id.includes('/src/engine/kb.js')) return 'engine-kb';
+          if (id.includes('/src/engine/ai.js')) return 'engine-ai';
+          if (id.includes('/src/engine/brief-extender.js')) return 'engine-ai';
+          if (id.includes('/src/engine/nlg.js')) return 'engine-ai';
+
+          // === ENGINE-CAMKY (lazy — cấm kị engines, chỉ load khi gọi tool) ===
+          if (id.match(/\/src\/engine\/(gufa-engine|huangji-engine|taiyi-engine|chenggu-engine|wuyun-liuqi|appearance-engine)/)) return 'engine-camky';
+          if (id.includes('/src/engine/flying-sihua.js')) return 'engine-camky';
+          if (id.includes('/src/engine/ziwei-liunian')) return 'engine-camky';
+
+          // === ENGINE-DIVINATION (lazy — meihua/cezi/liuren/qimen) ===
+          if (id.includes('/src/engine/ziwei')) return 'engine-ziwei';
           if (id.match(/\/src\/engine\/(meihua|cezi|liuren|qimen|heluo|guiguzi|jinkoujue|hexagram)/)) return 'engine-divination';
+
+          // === ENGINE-LIFESTYLE (lazy — diet/workout/aroma/crystal) ===
           if (id.match(/\/src\/engine\/(bazi-diet|bazi-workout|aroma|crystal|cloth|space-fs|city-fs|health)/)) return 'engine-lifestyle';
-          if (id.includes('/src/engine/tcm')) return 'engine-tcm';          // [loop 1350] 99KB TCM/health — cache riêng, returning users re-download ít hơn
+          if (id.includes('/src/engine/tcm')) return 'engine-tcm';
+
+          // === ENGINE-NAYIN (lazy — nạp âm reference) ===
+          if (id.match(/\/src\/engine\/(nayin|nayin-personality|nayin-relation)/)) return 'engine-nayin';
+
+          // === main.js (core: chart.js + constants + interactions + main app UI) ===
+          // Everything else stays in main — but now MUCH smaller without kb/ai/divination
         },
       },
     },

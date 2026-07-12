@@ -142,10 +142,28 @@ export default {
       }
     }
 
-    // 3) static assets (SPA fallback)
+    // 3) static assets (SPA fallback) — [R49] Cache-Control cho /assets/ (immutable 1 năm)
     const res = withSecurityHeaders(await env.ASSETS.fetch(request));
     if (res.status === 404) {
       return withSecurityHeaders(await env.ASSETS.fetch(new Request(new URL('/index.html', url), request)));
+    }
+    // [R49 OPTIMIZE] /assets/*.js + *.css có hash → immutable cache 1 năm
+    if (url.pathname.startsWith('/assets/')) {
+      const headers = new Headers(res.headers);
+      headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+      return new Response(res.body, { status: res.status, headers });
+    }
+    // [R49 OPTIMIZE] PNG/WebP → cache 1 ngày
+    if (/\.(png|webp|jpg|jpeg|gif|svg)$/.test(url.pathname)) {
+      const headers = new Headers(res.headers);
+      headers.set('Cache-Control', 'public, max-age=86400');
+      return new Response(res.body, { status: res.status, headers });
+    }
+    // [R49 OPTIMIZE] fonts → immutable 1 năm
+    if (/\.(woff2?|ttf|eot)$/.test(url.pathname)) {
+      const headers = new Headers(res.headers);
+      headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+      return new Response(res.body, { status: res.status, headers });
     }
     return res;
   },
