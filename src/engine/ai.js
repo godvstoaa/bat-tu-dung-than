@@ -17,7 +17,8 @@ import { assessTaiyi } from './taiyi-engine.js'; // [round 36] 太乙神数 (quo
 import { assessChenggu } from './chenggu-engine.js'; // [round 37] 袁天罡称骨算命 (bí truyền)
 import { assessWuyunLiuqi } from './wuyun-liuqi.js'; // [round 42] 五运六气 (y-thiên văn cấm kị)
 import { PENGZU_BAIJI } from './kb.js';
-import { assessAppearance } from './appearance-engine.js'; // [R48] diện mạo time-variable // [round 43] 彭祖百忌 (cấm kị dân gian)
+import { assessAppearance } from './appearance-engine.js';
+import { think as brainThink } from '../brain/brain.js';
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
 import { nayinInfo } from './nayin.js';
@@ -951,6 +952,12 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     "推背图/马前课/烧饼歌: BỘ 3 TIÊN TRI CẤM — interpretive (không compute chính xác). App chỉ tham chiếu cấu trúc.\n" +
     "葬经 (郭璞): NỀN TẢNG phong thủy — khí遇风则散/界水则止 + tang táng ảnh hưởng con cháu.\n" +
     "三式: kỳ môn (định hướng hành sự) + lục nhâm (sự kiện) + thái 乙 (quốc vận) — 3 hệ cấm kị nhất lịch sử.";
+
+  // === [BRAIN] Module NÃO — knowledge graph reasoning (additive, graceful fallback) ===
+  try {
+    const brainOut = brainThink('', c, R, c?.input?.gender);
+    if (brainOut) brief += `\n--- NÃO (BRAIN GRAPH — kết luận determinist) ---\n${brainOut}`;
+  } catch (_) { /* brain crash = skip, don't break brief */ }
 
   return brief;
 }
