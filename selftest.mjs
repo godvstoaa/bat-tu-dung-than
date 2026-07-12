@@ -4489,7 +4489,7 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
 // [loop 792] 19 AI tool descriptions — mỗi tool có description + when-to-use guidance.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 28, `[loop 792→R42] 27 tools (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 28, `[loop 792→R49] 30 tools (got ${AI_TOOLS.length})`);
   let _noDesc = 0;
   for (const t of AI_TOOLS) {
     const _d = t.function?.description || t.description || '';
