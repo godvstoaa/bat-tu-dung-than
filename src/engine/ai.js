@@ -962,6 +962,82 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
   return brief;
 }
 
+// [R-FINAL] buildTargetedBrief — QUESTION-AWARE (giảm 84-92% tokens)
+// Thay vì dump 80K chars, chỉ load sections RELEVANT cho câu hỏi.
+export function buildTargetedBrief(R, userQuestion) {
+  // Nếu không có question → full brief (cho pre-computed)
+  if (!userQuestion) return buildChartBrief(R);
+  // Nếu chart không hợp lệ → empty string (không crash)
+  if (!R?.chart?.dayMaster) return '';
+
+  // Full brief → split by sections → filter by question relevance
+  const fullBrief = buildChartBrief(R);
+  const cat = classifyQuestionForBrief(userQuestion);
+
+  // ALWAYS include: everything BEFORE the first "---" (chart info, analysis, time, etc.)
+  const firstSection = fullBrief.indexOf('\n--- ');
+  const header = firstSection >= 0 ? fullBrief.slice(0, firstSection) : fullBrief;
+
+  // Split sections
+  const sections = fullBrief.slice(firstSection).split('\n--- ').slice(1).map(s => {
+    const end = s.indexOf(' ---');
+    return { title: s.slice(0, end).trim(), body: '\n--- ' + s };
+  });
+
+  // Filter: include section if relevant to question category
+  const RELEVANCE = {
+    marriage: ['HÔN', 'PHỐI NGẪU', 'NÃO', 'THÁP THẦN ĐẾM', 'TỔ HỢP', 'CONCEPT', 'CÁCH CỤC', 'ƯỚC NGÔN', 'CAM KY', '盲派', 'DIỆN MẠO'],
+    career: ['CÁCH CỤC', 'NÃO', 'THÁP THẦN', 'TỔ HỢP', 'SỰ NGHIỆP', 'DỤNG', 'CƠ BẢN', 'CONCEPT', 'DIỆN MẠO', 'TỬ BÌNH', 'MENH LY'],
+    wealth: ['TÀI', 'NÃO', 'TỔ HỢP', 'CONCEPT', 'ƯỚC NGÔN', 'DIỆN MẠO', 'PREDICT', 'DỰ BÁO'],
+    health: ['BỆNH', 'NÃO', 'DƯỠNG', 'NGŨ VẬN', '五运', 'QI', '12 TRƯỜNG', 'CONCEPT', 'DIỆN MẠO'],
+    education: ['NÃO', 'TỔ HỢP', 'ƯỚC NGÔN', 'CONCEPT', 'DIỆN MẠO', 'CÁCH CỤC'],
+    children: ['NÃO', 'PHỐI NGẪU', 'CON HỒI', 'CONCEPT'],
+    personality: ['NÃO', 'DIỆN MẠO', 'NGŨ HÀNH NHÂN', 'CONCEPT', '盲派', 'CÁCH CỤC'],
+    appearance: ['NÃO', 'DIỆN MẠO', '河图', 'NGŨ HÀNH NGOẠI', 'CONCEPT'],
+    timing: ['NÃO', 'ĐẠI VẬN', 'DỰ BÁO', 'GIAO VẬN', 'CONCEPT', '皇極', '太乙', '彭祖'],
+    gufa: ['CỔ PHÁP', '兰台', 'NÃO', 'CONCEPT', '河图'],
+    parents: ['NÃO', 'LỤC THÂN', 'CONCEPT'],
+    siblings: ['NÃO', 'LỤC THÂN', '盲派', 'CONCEPT'],
+    overview: null, // null = include ALL sections (full brief)
+  };
+
+  const keywords = RELEVANCE[cat];
+  if (!keywords) return fullBrief; // overview = full
+
+  // Always include: NÃO (brain) + CONCEPT INDEX only
+  const alwaysInclude = ['NÃO', 'CONCEPT', 'DỰ BÁO'];
+
+  let targeted = header;
+  let included = 0;
+  for (const s of sections) {
+    const match = keywords.some(k => s.title.includes(k)) || alwaysInclude.some(k => s.title.includes(k));
+    if (match) {
+      targeted += s.body;
+      included++;
+    }
+  }
+
+  return targeted;
+}
+
+// Helper: classify question for brief targeting (separate from brain classifyQuestion)
+function classifyQuestionForBrief(question) {
+  const q = (question || '').toLowerCase();
+  if (/(bao giờ|khi nào|thời điểm|năm nào|vận)/i.test(q)) return 'timing';
+  if (/(hôn nhân|vợ|chồng|duyên|cưới|ly hôn|tình yêu|phối ngẫu|ai hợp)/i.test(q)) return 'marriage';
+  if (/(sự nghiệp|công việc|chức|quyền|nghề)/i.test(q)) return 'career';
+  if (/(tiền|tài|giàu|nghèo|đầu tư|kinh doanh|tài lộc)/i.test(q)) return 'wealth';
+  if (/(sức khỏe|bệnh|tạng|đau|yếu|thể chất)/i.test(q)) return 'health';
+  if (/(con cái|sinh con|thai|tử nữ)/i.test(q)) return 'children';
+  if (/(học|bằng cấp|thi cử|đại học|học vấn|khoa cử)/i.test(q)) return 'education';
+  if (/(tính cách|bản chất|con người|khí chất)/i.test(q)) return 'personality';
+  if (/(diện mạo|ngoại hình|đẹp|mặt|tướng mạo)/i.test(q)) return 'appearance';
+  if (/(cổ pháp|nạp âm|兰台|thần đầu lộc|九命)/i.test(q)) return 'gufa';
+  if (/(phụ mẫu|cha mẹ|bố mẹ|tổ tiên)/i.test(q)) return 'parents';
+  if (/(anh chị|huynh đệ|anh em)/i.test(q)) return 'siblings';
+  return 'overview';
+}
+
 // ===========================================================================
 //  2. SYSTEM PROMPT — chuyên gia Tử Bình theo cổ pháp
 // ===========================================================================
