@@ -314,6 +314,67 @@ const RULES = [
   { id: 'edu_dung_thuan', category: ['education','timing'], priority: 75, condition: (f) => f.dayunIsDung && (f.has_正印 || f.has_偏印), conclusion: { result: 'hoc_thuan', message: 'Dai van Dung + An → hoc van THUAN', confidence: 70, evidence: ['dung+An'], links: ['education','timing'] } },
   { id: 'children_dung_thuan', category: ['children','timing'], priority: 72, condition: (f) => f.dayunIsDung, conclusion: { result: 'con_thuan', message: 'Dai van Dung → de sinh con/duyen con tot', confidence: 60, evidence: ['dung'], links: ['children','timing'] } },
 
+  // === BATCH 4: RULES 157-200 (final) ===
+
+  // --- MORE POSITION (complete 40 盲派金口诀) ---
+  { id: 'nien_an_lac_am', category: ['parents','personality'], priority: 63, condition: (f) => (f['正印_positions']||[]).concat(f['偏印_positions']||[]).some(p => p.startsWith('năm')), conclusion: { result: 'nien_an', message: 'Năm trụ có Ấn → tổ ấm, mẹ hiền, bẩm sinh được bảo vệ', confidence: 62, evidence: ['Ấn at năm'], links: ['parents','personality'] } },
+  { id: 'nguyet_thuc_sinh_tai', category: ['wealth'], priority: 68, condition: (f) => f['食神_positions']?.some(p => p.startsWith('tháng')) && (f.has_正财 || f.has_偏财), conclusion: { result: 'thuc_sinh_tai', message: 'Tháng có Thục + Tài → thực sinh tài, phát tài từ trung niên', confidence: 65, evidence: ['食神+Tài at tháng'], links: ['wealth'] } },
+  { id: 'nhat_an_co_quyen', category: ['career','personality'], priority: 68, condition: (f) => f['正印_positions']?.some(p => p.startsWith('ngày')), conclusion: { result: 'nhat_an', message: 'Ngày có Chính Ấn → thông minh, phúc lộc, vợ/chồng giúp', confidence: 66, evidence: ['正印 at ngày'], links: ['career','personality'] } },
+  { id: 'thoi_an_phuc', category: ['children','personality'], priority: 65, condition: (f) => (f['正印_positions']||[]).concat(f['偏印_positions']||[]).some(p => p.startsWith('giờ')), conclusion: { result: 'thoi_an', message: 'Giờ có Ấn → con hiếu thảo, đời sống ổn, không cực khổ', confidence: 62, evidence: ['Ấn at giờ'], links: ['children','personality'] } },
+  { id: 'nguyet_zhengguan_tai_sinh', category: ['career','wealth'], priority: 70, condition: (f) => f['正官_positions']?.some(p => p.startsWith('tháng')) && (f.has_正财 || f.has_偏财), conclusion: { result: 'tai_sinh_quan_nguyet', message: 'Tháng Chính Quan + Tài sinh → sự nghiệp mạnh từ trẻ (tài lực hỗ trợ)', confidence: 68, evidence: ['Quan+Tài at tháng'], links: ['career','wealth'] } },
+  { id: 'thoi_zhengguan_dai_cat', category: ['children','career'], priority: 68, condition: (f) => f['正官_positions']?.some(p => p.startsWith('giờ')), conclusion: { result: 'thoi_quan', message: 'Giờ có Chính Quan → con cái hiếu thảo, đời sống ổn định, lộc thọ', confidence: 66, evidence: ['正官 at giờ'], links: ['children'] } },
+
+  // --- INTERACTION RULES (刑/冲/合/害) ---
+  { id: 'interaction_ty_nhieu', category: ['personality','wealth'], priority: 72, condition: (f) => (f['比肩_count'] + f['劫财_count']) >= 3, conclusion: { result: 'ty_kiet_nhieu', message: 'Tỷ Kiếp >=3 → quá nhiều cạnh tranh, khó hợp tác, cần độc lập', confidence: 68, evidence: ['Tỷ+Kiếp >=3'], links: ['personality','wealth'] } },
+  { id: 'interaction_an_nhieu', category: ['personality','education'], priority: 72, condition: (f) => (f['正印_count'] + f['偏印_count']) >= 3, conclusion: { result: 'an_nhieu', message: 'Ấn >=3 → quá nhiều bảo vệ → ỷ lại, thiếu tự lập, nhưng học giỏi', confidence: 68, evidence: ['An >=3'], links: ['personality','education'] } },
+  { id: 'interaction_quan_sat_nhieu', category: ['career','marriage'], priority: 75, condition: (f) => (f['正官_count'] + f['七杀_count']) >= 3, conclusion: { result: 'quan_sat_nhieu', message: 'Quan+Sat >=3 → quá nhiều quyền lực → áp lực, hôn nhân bất ổn', confidence: 72, evidence: ['Quan+Sat >=3'], links: ['career','marriage'] } },
+  { id: 'interaction_tai_nhieu', category: ['wealth','marriage'], priority: 73, condition: (f) => (f['正财_count'] + f['偏财_count']) >= 4, conclusion: { result: 'tai_nhieu', message: 'Tài >=4 → tài nhiều nhưng than khong nham → tài hại thân hoặc đa phu/thê', confidence: 70, evidence: ['Tài >=4'], links: ['wealth','marriage'] } },
+  { id: 'interaction_thuc_thuong_nhieu', category: ['personality','health'], priority: 70, condition: (f) => (f['食神_count'] + f['伤官_count']) >= 4, conclusion: { result: 'thuc_thuong_nhieu', message: 'Thực+Thương >=4 → sáng tạo quá nhưng phung phí năng lượng, lười', confidence: 65, evidence: ['Thực+Thương >=4'], links: ['personality','health'] } },
+
+  // --- DETAIL: MARRIAGE ---
+  { id: 'marriage_ly_hon_signal', category: ['marriage'], priority: 82, condition: (f) => f.isFemale && (f['伤官_count'] >= 2) && !f.has_正印, conclusion: { result: 'ly_hon_risk', message: 'Nữ mệnh Thương Quan >=2 không Ấn → RẤT dễ ly hôn, cần Ấn đại vận', confidence: 78, evidence: ['female+Thuong >=2 no An'], links: ['marriage'] } },
+  { id: 'marriage_vo_chong_hoa', category: ['marriage'], priority: 75, condition: (f) => (f.has_正官 || f.has_七杀) && (f.has_正财 || f.has_偏财), conclusion: { result: 'cai_quan_hoa', message: 'Tài + Quan/Sat → tài sinh quan, vợ chồng hòa (nam = có tài nuôi vợ; nữ = chồng có tài)', confidence: 70, evidence: ['Tài+Quan'], links: ['marriage','wealth'] } },
+
+  // --- DETAIL: CAREER ---
+  { id: 'career_sang_tao', category: ['career','personality'], priority: 72, condition: (f) => f['伤官_count'] >= 1 && !f.has_正官, conclusion: { result: 'nghe_sang_tao', message: 'Thương Quan không Quan → nên làm nghề sáng tạo/tự do (không hợp công chức)', confidence: 68, evidence: ['Thuong no Quan'], links: ['career'] } },
+  { id: 'career_on_dinh', category: ['career'], priority: 75, condition: (f) => f.has_正官 && f.has_正印 && !f.has_伤官, conclusion: { result: 'nghe_on_dinh', message: 'Quan + Ấn không Thương Quan → sự nghiệp ổn định, nên công chức/quan chức', confidence: 72, evidence: ['Quan+An no Thuong'], links: ['career'] } },
+
+  // --- DETAIL: HEALTH ---
+  { id: 'health_tho_kim_giao_chien', category: ['health'], priority: 72, condition: (f) => f.wx_土_strong && f.wx_木_strong, conclusion: { result: 'tho_moc_xung', message: 'Thổ Mộc giao chiến → tỳ/vị + gan cùng lúc gặp vấn đề (tiêu hóa + tức giận)', confidence: 68, evidence: ['Tho+Moc xung'], links: ['health'] } },
+  { id: 'health_kim_thuy_giao_chien', category: ['health'], priority: 72, condition: (f) => f.wx_金_strong && f.wx_火_strong, conclusion: { result: 'kim_hoa_xung', message: 'Kim Hỏa giao chiến → phổi + tim cùng lúc (hô hấp + huyết áp)', confidence: 68, evidence: ['Kim+Hoa xung'], links: ['health'] } },
+
+  // --- DETAIL: EDUCATION ---
+  { id: 'edu_sang_tao', category: ['education','personality'], priority: 73, condition: (f) => f.has_伤官 && (f.has_正印 || f.has_偏印), conclusion: { result: 'hoc_sang_tao', message: 'Thương Quan + Ấn → học sáng tạo, giỏi viết/nghiên cứu, nên học cao', confidence: 70, evidence: ['Thuong+An'], links: ['education','personality'] } },
+  { id: 'edu_thuc_ky_nang', category: ['education','career'], priority: 70, condition: (f) => f.has_食神 && !f.has_正官 && !f.has_七杀, conclusion: { result: 'hoc_ky_nang', message: 'Thực Thần không Quan/Sat → học qua kỹ năng/thực hành, không hàn lâm', confidence: 65, evidence: ['Thuc no Quan/Sat'], links: ['education','career'] } },
+
+  // --- DETAIL: PARENTS ---
+  { id: 'parents_thuong_nien', category: ['parents'], priority: 70, condition: (f) => f['伤官_positions']?.some(p => p.startsWith('năm')) && !f.has_正印, conclusion: { result: 'khac_cha_me_manh', message: 'Thương Quan năm + không Ấn → khắc cha mẹ mạnh, cần远离/过房', confidence: 65, evidence: ['Thuong at năm no An'], links: ['parents'] } },
+  { id: 'parents_tai_nien', category: ['parents'], priority: 68, condition: (f) => (f['正财_positions']||f['偏财_positions']||[]).some(p => p.startsWith('năm')), conclusion: { result: 'cha_co_dieu_kien', message: 'Tài ở năm → cha có điều kiện/nghiệp tổ (tài = cha)', confidence: 62, evidence: ['Tài at năm'], links: ['parents','wealth'] } },
+
+  // --- DETAIL: WEALTH ---
+  { id: 'wealth_ty_nhieu_ngheo', category: ['wealth','siblings'], priority: 75, condition: (f) => (f['比肩_count'] + f['劫财_count']) >= 2 && f.isWeak, conclusion: { result: 'ty_nhieu_ngheo', message: 'Tỷ Kiếp nhiều + thân nhược → nghèo, tiền bị chia sẻ/mất', confidence: 70, evidence: ['Tỷ/Kięp >=2 + weak'], links: ['wealth','siblings'] } },
+  { id: 'wealth_tai_vuong_giau', category: ['wealth'], priority: 78, condition: (f) => f.isStrong && (f['正财_count'] + f['偏财_count']) >= 2, conclusion: { result: 'than_manh_tai_vuong', message: 'Thân mạnh + Tài vượng → giàu có (thân nhậm tài)', confidence: 75, evidence: ['strong+Tài >=2'], links: ['wealth'] } },
+
+  // --- DETAIL: CHILDREN ---
+  { id: 'children_sat_thoi', category: ['children'], priority: 75, condition: (f) => f['七杀_positions']?.some(p => p.startsWith('giờ')), conclusion: { result: 'sat_con_kho', message: 'Thất Sát ở giờ → khó sinh con, con khắc cha mẹ', confidence: 65, evidence: ['Sat at giờ'], links: ['children'] } },
+  { id: 'children_thuc_thoi', category: ['children'], priority: 70, condition: (f) => (f['食神_positions']||f['伤官_positions']||[]).some(p => p.startsWith('giờ')), conclusion: { result: 'con_nhieu', message: 'Thực/Thương ở giờ → nhiều con, duyên con tốt', confidence: 65, evidence: ['Thuc/Thuong at giờ'], links: ['children'] } },
+
+  // --- COMPREHENSIVE OVERVIEW ---
+  { id: 'overview_than_manh_tot', category: ['overview'], priority: 85, condition: (f) => f.isStrong && f.dayunIsDung && (f.has_正官 || f.has_正财) && f.has_正印, conclusion: { result: 'cuoc_doi_tot', message: 'Thân mạnh + vận Dụng + Quan/Tài/Ấn đủ → cuộc đời ĐANG TỐT (tài+quyền+học)', confidence: 85, evidence: ['strong+dung+Quan/Tai/An'], links: ['overview'] } },
+  { id: 'overview_than_nhieu_nguy', category: ['overview'], priority: 88, condition: (f) => f.isWeak && f.dayunIsKy && (f['正财_count'] + f['偏财_count']) >= 2, conclusion: { result: 'cuoc_doi_nguy', message: 'Thân nhược + vận Kỵ + Tài nhiều → cuộc đời ĐANG NGUY (sức khỏe/tài)', confidence: 82, evidence: ['weak+ky+Tài'], links: ['overview'] } },
+
+  // --- DAY MASTER SPECIFIC (10 can) ---
+  { id: 'dm_giap', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '甲', conclusion: { result: 'giap_moc', message: 'Giáp Mộc (cây lớn) → thẳng thắn, cương trực, cao, vai rộng, tóc dày', confidence: 68, evidence: ['dm=甲'], links: ['personality','appearance'] } },
+  { id: 'dm_at', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '乙', conclusion: { result: 'at_moc', message: 'Ất Mộc (cỏ) → mềm mại, uyển chuyển, duyên dáng, thích ứng', confidence: 68, evidence: ['dm=乙'], links: ['personality','appearance'] } },
+  { id: 'dm_binh', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '丙', conclusion: { result: 'binh_hoa', message: 'Bính Hỏa (mặt trời) → rạng rỡ, nhiệt tình, phóng khoáng', confidence: 68, evidence: ['dm=丙'], links: ['personality','appearance'] } },
+  { id: 'dm_dinh', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '丁', conclusion: { result: 'dinh_hoa', message: 'Đinh Hỏa (ngọn đèn) → ấm áp, tinh tế, trực giác, sáng tạo', confidence: 68, evidence: ['dm=丁'], links: ['personality','appearance'] } },
+  { id: 'dm_mau', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '戊', conclusion: { result: 'mau_tho', message: 'Mậu Thổ (tường thành) → vững chãi, tin cậy, bao dung', confidence: 68, evidence: ['dm=戊'], links: ['personality','appearance'] } },
+  { id: 'dm_ky', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '己', conclusion: { result: 'ky_tho', message: 'Kỷ Thổ (đất ruộng) → khiêm tốn, nuôi dưỡng, nhẫn nại', confidence: 68, evidence: ['dm=己'], links: ['personality','appearance'] } },
+  { id: 'dm_canh', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '庚', conclusion: { result: 'canh_kim', message: 'Canh Kim (vũ khí) → cương quyết, mạnh mẽ, chính nghĩa', confidence: 68, evidence: ['dm=庚'], links: ['personality','appearance'] } },
+  { id: 'dm_tan', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '辛', conclusion: { result: 'tan_kim', message: 'Tân Kim (trang sức) → thanh tú, tinh tế, kiêu hãnh', confidence: 68, evidence: ['dm=辛'], links: ['personality','appearance'] } },
+  { id: 'dm_nham', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '壬', conclusion: { result: 'nham_thuy', message: 'Nhâm Thủy (sông lớn) → thông minh, phóng khoáng, quyền lực', confidence: 68, evidence: ['dm=壬'], links: ['personality','appearance'] } },
+  { id: 'dm_quy', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '癸', conclusion: { result: 'quy_thuy', message: 'Quý Thủy (mưa sương) → uyển chuyển, tế nhị, trực giác', confidence: 68, evidence: ['dm=癸'], links: ['personality','appearance'] } },
+
 ];
 
 function wxOrgan(wx) {
