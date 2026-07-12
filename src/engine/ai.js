@@ -2137,11 +2137,16 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   const _isSynthesis = _isSynthesisQuestion(question);
   const _ragSections = _splitBrief(_fullBrief);
   const _relevantSections = _selectRelevantSections(_ragSections, question);
-  const brief = _isSynthesis
+  const _ragBrief = _isSynthesis
     ? _fullBrief
     : (_relevantSections.totalLength < _fullBrief.length * 0.6
         ? _relevantSections.text
-        : _fullBrief); // nếu >60% liên quan → gửi full (không có lợi cắt)
+        : _fullBrief);
+
+  // [R-FINAL] BRAIN: question-aware deterministic reasoning (additive to RAG brief)
+  let _brainOut = '';
+  try { _brainOut = brainThink(question || '', R.chart, R, R.chart?.input?.gender) || ''; } catch(_) {}
+  const brief = _brainOut ? (_ragBrief + '\n--- NÃO (QUESTION-AWARE GRAPH) ---\n' + _brainOut) : _ragBrief;
   // [loop 921] guide theo loại câu: tổng hợp → khung ông thầy 体用应期; hẹp → luật tool đơn giản
   const _guide = _isSynthesis
     ? MASTER_SYNTHESIS_GUIDE
