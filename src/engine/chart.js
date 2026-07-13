@@ -375,13 +375,17 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
   //   GIỮ Phù Ức (Ấn) làm chủ, 调候 (官杀) giáng secondary. Chart 弱 có căn vẫn override («寒金喜火»).
   const _dmWx = chart.dayMaster.wx;
   const _tiaoIsGuan = tiaoPrimaryWx === KE_BY[_dmWx];            // 调候 hành = 官杀 (khắc DM)
-  // [loop 1385 FIX BUG] tổng quát hoá loop 993: 调候 element KHÔNG được là Kỵ-thân theo Phù Ức
-  //   (cùng nguyên lý _strengthKỵ loop 1384). Strong → tránh 调候 Tỷ/Ấn (làm vượng thêm); weak →
-  //   tránh 调候 Quan/Tài/Thực (khắc/hao/tiết làm nhược thêm). Trước đây chỉ guard Quan+cực nhược
-  //   → bỏ lọt (vd 甲木«nhược» tháng 亥 庚 Kim «tỉa mộc vượng» bị ép làm Dụng chính → khắc hại mộc nhược).
+  // [tiaohou synthesis] Nguyên lý tổng hợp — guard CHỈ block những case cổ pháp cấm rõ:
+  //   • Strong DM + 调候 Tỷ/Ấn → tránh làm vượng thêm («太旺则损»).
+  //   • Weak DM + 调候 官杀 (KE_BY) → «无根身弱不能受杀»: 官杀 khắc DM nhược sẽ 克倒/破.
+  //   Tài (KE) và Thực (SHENG) KHÔNG bị flag — tin 窮通寶鑭 (đã index theo dayGan = DM-specific).
+  //   Loop 1385 generalise sang KE/SHENG là OVER-REACH: bắt nhầm 辛金«乐水之盈» (Thực cho kim)
+  //   — 辛 cần nước mài dù nhược, trái ngược nếu lấy Ấn (土: «畏土之多» = sợ nhiều đất vùi 辛).
+  //   Vẫn giữ block 官杀 → case 甲木«nhược»亥+庚 (commit d386443) tiếp tục được bảo vệ,
+  //   cùng 434 chart audit loop 992 (11797c0).
   const _tiaoHarmful = strength && (
     (strength.strong && (tiaoPrimaryWx === _dmWx || tiaoPrimaryWx === SHENG_BY[_dmWx])) ||
-    (strength.strong === false && (tiaoPrimaryWx === KE[_dmWx] || tiaoPrimaryWx === KE_BY[_dmWx] || tiaoPrimaryWx === SHENG[_dmWx]))
+    (strength.strong === false && tiaoPrimaryWx === KE_BY[_dmWx])
   );
   const _skipForGuan = _tiaoHarmful;
   if (isExtreme && tiaoPrimaryWx && _skipForGuan) {
@@ -467,7 +471,7 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     reasons,
     method: [...new Set(method)],
     relations: { resourceWx: G.yin, sameWx: G.ti, outputWx: G.shi, wealthWx: G.cai, officerWx: G.guan },
-    tiaohou: { raw: tiaoRaw, elems: tiaoElems, primaryWx: tiaoPrimaryWx, note: climateNote, override: tiaoOverride, skipReason: _skipForGuan ? '无根身弱不能受杀 (Quan Sát khắc thân, DM 无根)' : null },
+    tiaohou: { raw: tiaoRaw, elems: tiaoElems, primaryWx: tiaoPrimaryWx, note: climateNote, override: tiaoOverride, skipReason: _skipForGuan ? (strength.strong ? 'Thân vượng — 调候 Tỷ/Ấn làm vượng thêm (太旺则损)' : '无根身弱不能受杀 (Quan Sát khắc thân, DM 无根)') : null },
   };
 }
 
