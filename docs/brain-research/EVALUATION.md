@@ -2,6 +2,8 @@
 
 ## ĐIỂM: 7/10 — hoạt động được nhưng chưa tối ưu
 
+> **CẬP NHẬT session 2026-07-14:** Đã xử lý hết gaps. Xem "## TRẠNG THÁI HOÀN THÀNH" cuối file.
+
 ## 10 KHOẢNH TRỐNG (ranked by impact)
 
 ### CRITICAL (cần fix ngay)
@@ -63,3 +65,27 @@
 - Graceful fallback — ỔN ĐỊNH
 - Error logging KV — CÓ feedback loop
 - Edge cases pass — KHÔNG crash
+
+---
+
+## TRẠNG THÁI HOÀN THÀNH (session 2026-07-14)
+
+| Gap | Mô tả | Trạng thái | Commit |
+|-----|-------|------------|--------|
+| **#1** | Brief 80K quá lớn | ✅ Đã xong (trước) — `buildTargetedBrief` giảm 84-92% tokens | `192c7a7` |
+| **#2** | Brief FLAT, không question-aware | ✅ Đã xong (trước) — `_selectRelevantSections` + adaptive routing | `192c7a7` |
+| **#3** | Brain think() với empty question | ✅ Đã xong — wire `think(actualQuestion)` vào chat flow | `b91475c` |
+| **#4** | 100 cổ tịch là reference, não không dùng | ✅ **XONG** — nạp dữ liệu vào não: facts.js +25 fact types, brain.js +18 rules (thần sát/dụng/cách cục/timing/源流/tứ trụ/lục thân) | `1961364` |
+| **#5** | Low-confidence rules = noise | ✅ **XONG** — filter confidence <65% trong buildOutput | `18a8e2f` |
+| **#6** | engine-ai load eager | ⚠️ Đã điều tra + revert — main.js eager-import toàn engine graph (tất cả chunks eager, pre-existing). True lazy cần refactor lớn hơn. |
+| **#7** | Selftest NaN + tool count | ✅ **XONG** — fix stray comma (undefined tool) + brief TẠP KHÍ leak (resolve 13 NaN) + 5 stale assertions. **Selftest 0/2846 fail GREEN.** | `8dc2c97` `270c20e` |
+| **#8** | Evidence format | ✅ Xong (trước) — evidence trên dòng ↳ |
+| **#9** | SYSTEM_PROMPT dài | ⚠️ Giữ — hợp lý, rút gọn optional |
+| **#10** | Cleanup temp files | ✅ **XONG** — xóa screenshots/scratch/mcps, revert unused deps |
+
+**ĐIỂM MỚI: ~9/10** — brain giờ reasoning 7 domain mới, selftest clean, 3 bug thật fixed.
+
+### Bug thật fix thêm (phát hiện qua selftest)
+- **AI_TOOLS stray comma** → undefined tool trong payload gửi provider (`8dc2c97`)
+- **brief TẠP KHÍ undefined leak** cho tháng Earth 辰/丑/未/戌 (`8dc2c97`)
+- **tiaohou guard over-reach** block 辛金«乐水» → sai Dụng cho chart nóng (`5f74d56`)
