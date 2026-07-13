@@ -385,7 +385,10 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
   //   cùng 434 chart audit loop 992 (11797c0).
   const _tiaoHarmful = strength && (
     (strength.strong && (tiaoPrimaryWx === _dmWx || tiaoPrimaryWx === SHENG_BY[_dmWx])) ||
-    (strength.strong === false && tiaoPrimaryWx === KE_BY[_dmWx])
+    // [AUDIT FIX MED] chỉ block 官杀 cho DM 极弱无根 (root<0.5 hoặc «Thân quá nhược») —
+    //   loop 993 cổ pháp «Chart 弱 có căn vẫn override (寒金喜火)»: 辛丑 có căn cần 丙火,
+    //   trước đây block sai (broad strong===false) → primary=土(Ấn) là hành 辛«畏».
+    (((strength.root ?? 1) < 0.5 || strength.level === 'Thân quá nhược') && tiaoPrimaryWx === KE_BY[_dmWx])
   );
   const _skipForGuan = _tiaoHarmful;
   if (isExtreme && tiaoPrimaryWx && _skipForGuan) {
@@ -464,6 +467,10 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
   //   cố ý assert điều này). Khi hiếm secondary===ji/chou (đụng 调候/通关), kỵ/仇 vẫn ưu tiên
   //   trong avoid list. Bug 3 audit = tranh luận cổ pháp, KHÔNG đổi thiết kế này.
   for (const w of [ji, chou]) if (w && !avoid.includes(w)) avoid.push(w);
+  // [AUDIT FIX MED] secondary KHÔNG publish nếu ∈ avoid (vd secondary===ji/chou, ~29% chart)
+  //   — tránh mâu thuẫn «Dụng thần phụ» lại nằm trong avoid (break hehun: phạt partner mang
+  //   đúng Dụng user). avoid giữ nguyên ji/chou (thiết kế loop 550 + regression test).
+  if (secondary && avoid.includes(secondary)) secondary = '';
 
   return {
     primary, secondary, avoid,
@@ -471,7 +478,7 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     reasons,
     method: [...new Set(method)],
     relations: { resourceWx: G.yin, sameWx: G.ti, outputWx: G.shi, wealthWx: G.cai, officerWx: G.guan },
-    tiaohou: { raw: tiaoRaw, elems: tiaoElems, primaryWx: tiaoPrimaryWx, note: climateNote, override: tiaoOverride, skipReason: _skipForGuan ? (strength.strong ? 'Thân vượng — 调候 Tỷ/Ấn làm vượng thêm (太旺则损)' : '无根身弱不能受杀 (Quan Sát khắc thân, DM 无根)') : null },
+    tiaohou: { raw: tiaoRaw, elems: tiaoElems, primaryWx: tiaoPrimaryWx, note: climateNote, override: tiaoOverride, skipReason: _skipForGuan ? (strength.strong ? 'Thân vượng — 调候 Tỷ/Ấn làm vượng thêm (太旺则损)' : '无根身弱不能受杀 (Quan Sát khắc thân) — DM 极弱无根') : null },
   };
 }
 
@@ -527,7 +534,7 @@ export function computeDaYun(year, month, day, hour, minute, gender, yong) {
     //   bất kể ngũ hành. Trước đây score CHỈ xét ngũ hành → 大运 天克地冲 vẫn «Cát» nếu
     //   hành Dụng → sai thực tế (thập kỷ biến loạn lớn dù hành tốt). Nay: trừ theo mức.
     const dgZhi = ec.getDayZhi();
-    const _GC = { 甲:'庚',庚:'甲',乙:'辛',辛:'乙',丙:'壬',壬:'丙',丁:'癸',癸:'丁' };
+    const _GC = { 甲:'庚',乙:'辛',丙:'壬',丁:'癸',戊:'甲',己:'乙',庚:'丙',辛:'丁',壬:'戊',癸:'己' }; // [AUDIT FIX HIGH] 天克 map chuẩn 七杀 (trước thiếu 戊/己 + reverse entries sai flag 财) → 天克地冲 giờ detect cho mọi day master
     const _CH = { 子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳' };
     if (_GC[dGan] === gan && _CH[dgZhi] === zhi) score -= 4; // 天克地冲 — severe
     else if (_CH[dgZhi] === zhi) score -= 2; // 地冲 only
@@ -569,7 +576,7 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
   for (let i = 1; i < dayunList.length; i++) {
     const dy = dayunList[i];
     if (!dy.getGanZhi()) continue;
-    if (dy.getStartAge() <= age && age < dy.getStartAge() + 10) { active = dy; break; }
+    if (dy.getStartAge() <= age + 1 && age + 1 < dy.getStartAge() + 10) { active = dy; break; } // [AUDIT FIX HIGH] +1 xusui age (startAge là mũ tuổi) — trước đây chọn dayun cũ 1 năm trong transition year (4/5 chart sai)
     if (!active && i <= 8) active = dy; // dự phòng
   }
   if (!active) return [];
@@ -751,8 +758,8 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
     }
   } catch (e) { /* 病药 promotion không bắt buộc */ }
   let dayun = [], liunian = [];
-  try { dayun = computeDaYun(year, month, day, hour, minute, gender, yong); } catch (e) { dayun = []; }
-  try { liunian = computeLiuNian(year, month, day, hour, minute, gender, yong, refYear); } catch (e) { liunian = []; }
+  try { dayun = computeDaYun(year, month, day, hh, mm, gender, yong); } catch (e) { dayun = []; } // [AUDIT FIX CRITICAL] dùng hh,mm normalized (hour=null→12 noon) thay raw hour,minute (null→0 midnight) → 起运 age đúng cho unknown-hour births
+  try { liunian = computeLiuNian(year, month, day, hh, mm, gender, yong, refYear); } catch (e) { liunian = []; }
   // [loop 2 — 格局大运喜忌] Cộng tầng 格局 LÊN TRÊN tầng ngũ hành (子平真詮 ch.10-11).
   //   patternQuality đã tính xong ở trên → giờ mới điều chỉnh dayun (giải sequencing).
   try {

@@ -72,7 +72,7 @@ export function assessAppearance(chart, R) {
   const dayun = (R?.dayun || []);
   const age = new Date().getFullYear() - (c?.input?.year || 1990);
   let curDayun = dayun[0];
-  for (const d of dayun) { if ((d.startAge || 0) <= age) curDayun = d; }
+  for (const d of dayun) { if ((d.startAge || 0) <= age + 1) curDayun = d; } // [AUDIT FIX] +1 xusui age
   const curDayunWx = curDayun?.ganWx || curDayun?.zhiWx || '';
   const dayunEffect = DAYUN_APPEARANCE[curDayunWx] || '';
 

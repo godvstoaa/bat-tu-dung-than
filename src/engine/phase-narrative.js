@@ -51,7 +51,7 @@ export function phaseNarrative(R, refYear) {
   const phase = { age, dayun: null, liunian: null, liuyue: null };
 
   // --- ĐẠI VẬN (nền thập kỷ) ---
-  const dy = (R.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
+  const dy = (R.dayun || []).find((d) => age + 1 >= d.startAge && age + 1 < d.startAge + 10); // [AUDIT FIX HIGH] +1 xusui
   phase.dayun = dy;
   if (!dy) {
     // [loop 477] phân loại message: tuổi nhỏ chưa mở vận / tuổi già qua vận cuối / lạ

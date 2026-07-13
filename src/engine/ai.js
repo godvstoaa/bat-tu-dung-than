@@ -313,7 +313,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 == LÁ SỐ BÁT TỰ (đã tính chính xác, dùng để luân giải) ==
 ⭐ TÓM TẮT MỆNH: ${(() => { try {
   const _age = curYear - R.chart.input.year;
-  const _dy = (R.dayun || []).find((d) => _age >= d.startAge && _age < d.startAge + 10);
+  const _dy = (R.dayun || []).find((d) => _age + 1 >= d.startAge && _age + 1 < d.startAge + 10); // [AUDIT FIX] +1 xusui age
   let _gy = ''; try { const g = findGoldenYear(R, curYear, 10); const tg = (g.ranked || []).filter((r) => r.isTrulyGolden).map((r) => r.year); if (tg.length) _gy = `, năm vàng ${tg.join('/')}`; } catch (_) {}
   const _qy = (R.dayun || [])[0]?.startAge;
   return `Nhật Chủ ${dm.vi} (${R.strength?.strong ? 'vượng' : 'nhược'}), Dụng ${wxVi(R.yong.primary)}${R.yong.tiaohou?.override ? ' (调候)' : ''}, điểm ${R.synthesis?.score ?? '?'}/100 (${R.synthesis?.gradeVi ?? '?'}${R.synthesis?.percentile ? ', cao hơn ' + R.synthesis.percentile + '% lá số' : ''})${_qy ? `, 起运 ${_qy}t` : ''}${_dy ? `, đại vận ${_dy.ganZhi}[${_dy.rating}]` : ''}${_gy}.`;
@@ -609,14 +609,14 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const tiaohou = QIONGTONG_TIAOHOU[tiaohouKey] || '(không có cổ quyết cụ thể)';
     const weakestWx = Object.entries(R.wx?.pct || {}).sort(([,a],[,b]) => a - b)[0];
     const healthInfo = weakestWx ? WUXING_HEALTH[weakestWx[0]] : null;
-    const topGods = (typeof dominantGods === 'function') ? dominantGods(c) : [];
+    const topGods = (typeof dominantGod === 'function') ? (dominantGod(R).ranked || []) : []; // [AUDIT FIX] dominantGods(plural, không tồn tại) → dominantGod(R).ranked
     const careerHint = topGods[0] ? (CAREER_BY_GOD[topGods[0].god] || []).join(', ') : '(không)';
     brief += "\n--- KIẾN THỨC CỔ PHÁP MỞ RỘNG (crawled) ---\n" +
       "穷通宝鉴 調候: " + tiaohou + "\n" +
       "滴天髓 CỔ QUYẾT (top 5): " + (DITIANSUI_MAXIMS || []).slice(0, 5).join(" | ") + "\n" +
       "三命通会 ĐẠI VẬN (top 5): " + (SANMING_DAYUN_RULES || []).slice(0, 5).join(" | ") + "\n" +
       "NGŨ HÀNH LUẬN BỆNH: " + (weakestWx ? weakestWx[0] + " (" + weakestWx[1] + "%)" : "?") + (healthInfo ? " > " + healthInfo.organs + " | " + healthInfo.symptoms + " | " + healthInfo.diet + " | " + healthInfo.emotion + " | " + healthInfo.remedy : "") + "\n" +
-      "SỰ NGHIỆP: " + (topGods[0] ? topGods[0].vi : "?") + " > " + careerHint + "\n" +
+      "SỰ NGHIỆP: " + (topGods[0] ? topGods[0].godVi : "?") + " > " + careerHint + "\n" +
       "ĐA TRƯỜNG PHÁI: " + Object.entries(DIVINATION_SCHOOLS).map(([k,v]) => k + ": " + v).join(" | ");
   } catch (e) { brief += "\n--- KIẾN THỨC CỔ PHÁP: [lỗi load] ---"; }
 
@@ -1399,6 +1399,11 @@ export const AI_TOOLS = [
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
 export function execTool(name, args, R) {
   const a = args || {};
+  // [AUDIT FIX HIGH] _now + c trong scope cho 4 bí-truyền tools (huangji/taiyi/wuyun/chenggu)
+  //   fallback «năm nay»/birth-time. Trước đây _now/c chỉ define trong buildChartBrief →
+  //   execTool('analyze_huangji',{}) throw «_now is not defined» (đúng cái call SYSTEM_PROMPT khuyến khích).
+  const _now = new Date();
+  const c = R?.chart || {};
   // [loop 558 FIX BUG2] validate required params TRƯỚC khi gọi engine — tránh crash rác
   //   (vd analyze_day thiếu year → «wrong solar year undefined» tiếng Anh). Trả error VN sạch.
   const _tool = AI_TOOLS.find((t) => t?.function?.name === name);
@@ -1547,7 +1552,7 @@ export function execTool(name, args, R) {
         return { year: ty.year, taiyiJiNian: ty.taiyiJiNian, yangJu: ty.yangJu, taiyiGong: ty.taiyiGong, zhuKe: ty.zhuKe, secretLayer: ty.secretLayer, verdict: ty.verdict, note: ty.note };
       }
       case 'analyze_chenggu': { // [round 37] 袁天罡称骨算命 (bí truyền)
-        const cg = assessChenggu(Number(a.year)||c.input.year, Number(a.month)||c.input.month, Number(a.day)||c.input.day, Number(a.hour)??c.input.hour);
+        const cg = assessChenggu(Number(a.year)||c.input.year, Number(a.month)||c.input.month, Number(a.day)||c.input.day, Number(a.hour)||c.input.hour);
         return { lunar: cg.lunar, boneWeight: cg.boneWeight, tone: cg.tone, verse: cg.verse, viGloss: cg.viGloss, verdict: cg.verdict, note: cg.note };
       }
       case 'analyze_wuyun': { // [round 42] 五运六气 (y-thiên văn cấm kị)
@@ -1693,7 +1698,7 @@ export function execTool(name, args, R) {
         const h = computeHehun(R, pR);
         // [loop 647] MARRIAGE TIMING — tìm năm CẢ HAI đương đại vận Cát (cửa sổ cưới tốt).
         //   Cổ法 «婚期看运»: năm cưới nên cả hai đang vận tốt + không冲/phạm năm xấu.
-        const _dyAt = (res, yr) => { const dy = (res.dayun || []).find((d) => { const a = yr - res.chart.input.year; return a >= d.startAge && a < d.startAge + 10; }); return dy?.rating || '?'; };
+        const _dyAt = (res, yr) => { const dy = (res.dayun || []).find((d) => { const a = yr - res.chart.input.year; return a + 1 >= d.startAge && a + 1 < d.startAge + 10; }); return dy?.rating || '?'; }; // [AUDIT FIX] +1 xusui
         // [loop 726 FIX] «Bình hòa» cũng OK cho hôn nhân — trước đây yêu cầu CẢ HAI «Cát»
         //   → partner «Bình hòa» (trung tính, KHÔNG xấu) bị loại → 0 năm tốt → note lừa.
         const _isOk = (r) => r === 'Đại cát' || r === 'Cát' || r === 'Hơi thuận' || r === 'Bình hòa';
@@ -1758,7 +1763,7 @@ export function execTool(name, args, R) {
           // [loop 617] current phase — AI trả lời ngay «đang ở vận nào» mà không cần parse
           currentPhase: (() => {
             const age = new Date().getFullYear() - a.year;
-            const d = (rel.dayun || []).find((dd) => age >= dd.startAge && age < dd.startAge + 10);
+            const d = (rel.dayun || []).find((dd) => age + 1 >= dd.startAge && age + 1 < dd.startAge + 10);
             return d ? `${d.ganZhi} (${d.startAge}-${d.startAge+9}t, ${d.rating})` : '(ngoài phạm vi đại vận)';
           })(),
           peakYears: (() => { try { const gy = findGoldenYear(rel, new Date().getFullYear(), 12); const tg = gy.ranked.filter((r) => r.isTrulyGolden).map((r) => r.year); return tg.length ? '★ ' + tg.join(', ') : 'top: ' + gy.ranked.slice(0, 3).map((r) => r.year).join(', '); } catch (_) { return '(chưa tính)'; } })(),
@@ -2309,7 +2314,12 @@ async function streamRound(url, headers, body, onToken, onStatus, signal) {
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buf = '', full = '';
-  const toolCalls = [  { type: 'function', function: {
+  // [AUDIT FIX CRITICAL] toolCalls phải = []. Trước đây seed bằng log_error tool *definition*
+  //   → mọi text-answer bị read là tool-call (phantom round → loop chạy tới cap = p95 156s latency,
+  //   loop 1353/1354), VÀ toolCalls[0].arguments bắt đầu undefined → args thật bị corrupt
+  //   "undefined{...}" → JSON.parse throw → tool gọi với args rỗng. Xóa seed (log_error vẫn còn
+  //   đầy đủ trong AI_TOOLS line ~1389).
+  const toolCalls = [ /* seed-removed — was: { type: 'function', function: {
     name: 'log_error', description: '[R46] LOG LỖI — khi AI nhận ra mình luận SAI (sau khi user sửa/phản biện) → gọi tool này để GHI NHẬN lỗi có cấu trúc. Admin dùng log này để fix hệ thống. Dùng KHI: user nói «thầy luận sai», «không phải vậy», «con không giống», và KIỂM TRA lại thấy ĐÚNG là AI sai.',
     parameters: { type: 'object', properties: {
       wrong_claim: { type: 'string', description: 'AI đã nói gì sai (vd «Ấn mỏng»)'},
@@ -2317,8 +2327,7 @@ async function streamRound(url, headers, body, onToken, onStatus, signal) {
       root_cause: { type: 'string', description: 'Tại sao AI sai (vd «bỏ sót tàng can» / «chỉ nhìn 1 hành» / «bỏ sót tổ hợp» / «hùa theo user»)'},
       correct_analysis: { type: 'string', description: 'Phân tích ĐÚNG sau khi sửa'},
     }, required: ['wrong_claim', 'root_cause'] },
-  } },
-];
+  } }, */ ];
   // [loop 920] reasoning_content preview — tránh UI "đứng" 18-20s khi GLM đang suy nghĩ
   let reasoning = '';
   let lastReasonLen = 0, lastReasonAt = 0;

@@ -392,7 +392,7 @@ export function extendBrief(R) {
     // [loop 709] 12 trường sinh CONTEXT cho đại vận hiện tại — AI biết user đang ở «giai đoạn đời» nào
     try {
       const _age = new Date().getFullYear() - R.chart.input.year;
-      const _curDy = (R.dayun || []).find((d) => _age >= d.startAge && _age < d.startAge + 10);
+      const _curDy = (R.dayun || []).find((d) => _age + 1 >= d.startAge && _age + 1 < d.startAge + 10); // [AUDIT FIX] +1 xusui age
       const _nextDy = (R.dayun || []).find((d) => d.startAge === _curDy?.startAge + 10);
       if (_curDy) {
         const _curStage = changSheng(R.chart.dayGan, _curDy.zhi);
@@ -587,7 +587,7 @@ export function extendBrief(R) {
     const _actions = [];
     const _curYear = new Date().getFullYear();
     const _age = _curYear - R.chart.input.year;
-    const _dy = (R.dayun || []).find((d) => _age >= d.startAge && _age < d.startAge + 10);
+    const _dy = (R.dayun || []).find((d) => _age + 1 >= d.startAge && _age + 1 < d.startAge + 10); // [AUDIT FIX] +1 xusui
     // (1) đỉnh vận / vận khó
     if (_dy?.rating === 'Đại cát') {
       const _god = _dy.zhiGod || _dy.ganGod || '';

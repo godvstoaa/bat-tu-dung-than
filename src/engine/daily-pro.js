@@ -133,7 +133,7 @@ export function dailyPro(R, year, month, day) {
   //   Applied silently (no visible school) to avoid repetition with 流年/流月 cards.
   try {
     const _dyAge = (year - R.chart.input.year);
-    const _ad = (R.dayun || []).find((d) => _dyAge >= d.startAge && _dyAge < d.startAge + 10);
+    const _ad = (R.dayun || []).find((d) => _dyAge + 1 >= d.startAge && _dyAge + 1 < d.startAge + 10); // [AUDIT FIX] +1 xusui
     if (_ad && _ad.gan && _ad.zhi) {
       const _dgWx = GAN[_ad.gan]?.wx, _dzWx = ZHI[_ad.zhi]?.wx;
       const _fav = new Set([yong.primary, yong.xi].filter(Boolean));

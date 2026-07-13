@@ -87,7 +87,7 @@ export function extractFacts(chart, R, gender) {
   const age = new Date().getFullYear() - (c?.input?.year || 1990);
   const dayun = R?.dayun || [];
   let curDayun = dayun[0] || {};
-  for (const d of dayun) { if ((d.startAge || 0) <= age) curDayun = d; }
+  for (const d of dayun) { if ((d.startAge || 0) <= age + 1) curDayun = d; } // [AUDIT FIX HIGH] +1 = xusui age (startAge là mũ tuổi, age là intl); trước đây chọn dayun cũ thêm 1 năm trong transition year
   facts.currentDayunGz = curDayun.ganZhi || '';
   facts.currentDayunGanWx = curDayun.ganWx || '';
   facts.currentDayunZhiWx = curDayun.zhiWx || '';
@@ -150,7 +150,7 @@ export function extractFacts(chart, R, gender) {
   // === CHẤT LƯỢNG CÁCH CỤC (成/败 + cứu ứng + tướng thần) ===
   const pq = R?.patternQuality || {};
   facts.patternCheng = pq.quality === '成格';
-  facts.patternBai = pq.quality === '败格';
+  facts.patternBai = pq.quality === '败格' || pq.quality === '有救'; // [AUDIT FIX HIGH] 有救 = broken CÓ cứu ứng — vẫn là «败» shape, rule pq_bai_rescued phải fire (trước đây bỏ lọt ~nửa chart broken)
   facts.patternRescued = !!(pq.rescues && pq.rescues.length);
   facts.patternRescueCount = pq.rescues?.length || 0;
   facts.patternKeyStarGod = pq.keyStar?.god || '';

@@ -141,7 +141,7 @@ export function computeLiuyue(R, solarYear, patternQuality) {
     //   Trước đây computeLiuyue không xét chất lượng đại vận tổng thể.
     if (!lmDyBase) { // tính 1 lần (đại vận không đổi qua 12 tháng)
       const age = solarYear - R.chart.input.year;
-      const ad = (R.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
+      const ad = (R.dayun || []).find((d) => age + 1 >= d.startAge && age + 1 < d.startAge + 10);
       if (ad && ad.gan && ad.zhi) {
         const _dgWx = GAN[ad.gan]?.wx, _dzWx = ZHI[ad.zhi]?.wx;
         if (fav.has(_dzWx)) lmDyBase += 2;

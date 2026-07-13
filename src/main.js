@@ -392,7 +392,7 @@ $('copy-summary-btn') && document.addEventListener('click', (e) => {
       // [loop 661] thêm insight mới (ĐỈNH VẬN + năm vàng) vào copy summary
       (() => {
         const age = new Date().getFullYear() - c.input.year;
-        const dy = (currentResult.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
+        const dy = (currentResult.dayun || []).find((d) => age + 1 >= d.startAge && age + 1 < d.startAge + 10); // [AUDIT FIX] +1 xusui
         let line = '';
         if (dy) line += `Đại vận hiện tại (${age}t): ${dy.ganZhi} [${dy.rating}]${dy.rating === 'Đại cát' ? ' — ĐỈNH VẬN' : ''}`;
         try { const gy = findGoldenYear(currentResult, new Date().getFullYear(), 10); const tg = (gy.ranked || []).filter((r) => r.isTrulyGolden).map((r) => r.year); if (tg.length) line += (line ? ' · ' : '') + `Năm vàng: ${tg.join(', ')}`; } catch (_) {}
@@ -958,7 +958,7 @@ function renderDaYun(dayun) {
   if (_dySs) { ['tianYi','wenChang','jiangXing'].forEach((k) => { if (_dySs[k] && _dySs[k].at) _dySs[k].at.forEach((z) => dyNoble.add(z)); }); }
   let curDetail = '';
   const cells = dayun.map((d) => {
-    const isNow = curAge >= d.startAge && curAge < d.startAge + 10;
+    const isNow = curAge + 1 >= d.startAge && curAge + 1 < d.startAge + 10; // [AUDIT FIX HIGH] +1 xusui — ★ marker đúng trong transition year
     const isBest = d.score === maxS && maxS >= 2;
     const isWorst = d.score === minS && minS <= -2;
     const mark = isNow ? ' ★' : '';
@@ -2214,7 +2214,7 @@ function renderDayunTimeline(R) {
   const _dyInt = {};
   try { checkDayunInteractions(R.chart, dys).forEach((ck) => { _dyInt[ck.startAge] = ck.notes; }); } catch (e) {}
   const segs = dys.map((d) => {
-    const isNow = curAge >= d.startAge && curAge < d.startAge + 10;
+    const isNow = curAge + 1 >= d.startAge && curAge + 1 < d.startAge + 10; // [AUDIT FIX HIGH] +1 xusui — ★ marker đúng trong transition year
     const nayin = (() => { try { const n = ganZhiNayin(d.ganZhi); return n || ''; } catch (e) { return ''; } })();
     const st = stages[d.startAge];
     const _intNote = _dyInt[d.startAge] ? ' · ' + _dyInt[d.startAge].slice(0, 2).join('; ').slice(0, 60) : '';
@@ -5792,8 +5792,10 @@ if ($('zlr-btn')) $('zlr-btn').addEventListener('click', () => renderZiweiLiuri(
 if ($('bh-btn')) $('bh-btn').addEventListener('click', () => renderBestHour($('bh-date').value));
 $('lr-find').addEventListener('click', () => {
   if (!currentResult) return;
+  if (!$('lr-date').value) return; // [AUDIT FIX MED] guard empty date → tránh findGoodDaysRi(NaN) crash
   const [y, m, d] = ($('lr-date').value || '').split('-').map(Number);
-  const list = findGoodDaysRi(currentResult, y, m, d, 14, 6);
+  let list;
+  try { list = findGoodDaysRi(currentResult, y, m, d, 14, 6); } catch (e) { list = []; }
   $('liuri').innerHTML = `<p class="hint">Top ${list.length} ngày VẬN CÁ NHÂN tốt nhất trong 14 ngày tới:</p>
     <div class="zr-list">${list.map((g) => `<div class="zr-item"><b>${g.solar}</b> <span class="zh">${g.ganZhi}</span> <span class="ln-rate ${g.score >= 64 ? 'rate-cat' : 'rate-mid'}">${g.rating} ${g.score}</span></div>`).join('')}</div>`;
 });

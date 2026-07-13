@@ -216,11 +216,11 @@ export function deduceFromFamily(subject, members) {
   const curYear = new Date().getFullYear();
   const famFortune = [];
   // chủ thể
-  const subjDy = (S.dayun || []).find((d) => { const a = curYear - S.chart.input.year; return a >= d.startAge && a < d.startAge + 10; });
+  const subjDy = (S.dayun || []).find((d) => { const a = curYear - S.chart.input.year; return a + 1 >= d.startAge && a + 1 < d.startAge + 10; }); // [AUDIT FIX] +1 xusui
   if (subjDy) famFortune.push({ who: 'chủ thể', r: subjDy.rating });
   for (const m of validMembers) {
     const age = curYear - m.R.chart.input.year;
-    const dy = (m.R.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
+    const dy = (m.R.dayun || []).find((d) => age + 1 >= d.startAge && age + 1 < d.startAge + 10);
     if (dy) famFortune.push({ who: m.label || ROLE_VI_LONG[m.role], r: dy.rating });
   }
   if (famFortune.length) {
@@ -237,7 +237,7 @@ export function deduceFromFamily(subject, members) {
           const _yr = _isSubj ? S.chart.input.year : _src.R.chart.input.year;
           const _dm = _isSubj ? S.chart.dayGan : _src.R.chart.dayGan;
           const _age = curYear - _yr;
-          const _dy = (_allDy||[]).find(dd => _age >= dd.startAge && _age < dd.startAge + 10);
+          const _dy = (_allDy||[]).find(dd => _age + 1 >= dd.startAge && _age + 1 < dd.startAge + 10);
           const _next = (_allDy||[]).find(dd => dd.startAge === _dy?.startAge + 10);
           if (_dy && _dm) {
             const _cs = changSheng(_dm, _dy.zhi);
@@ -256,7 +256,7 @@ export function deduceFromFamily(subject, members) {
       const hardDetail = famFortune.filter((f) => /Hung|nghịch/.test(f.r)).map((f) => {
         const m = validMembers.find(mm => (mm.label||'') === f.who || ROLE_VI_LONG[mm.role] === f.who);
         if (!m) return f.who;
-        const dy = (m.R.dayun||[]).find(d => { const a = curYear - m.R.chart.input.year; return a >= d.startAge && a < d.startAge + 10; });
+        const dy = (m.R.dayun||[]).find(d => { const a = curYear - m.R.chart.input.year; return a + 1 >= d.startAge && a + 1 < d.startAge + 10; });
         const next = (m.R.dayun||[])[(m.R.dayun||[]).indexOf(dy)+1];
         const endYear = dy ? (m.R.chart.input.year + dy.startAge + 10) : '?';
         return `${f.who} (đến ~${endYear})${next ? ` → chuyển ${next.ganZhi}[${next.rating}]` : ''}`;

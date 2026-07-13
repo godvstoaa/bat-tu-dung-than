@@ -16,7 +16,7 @@ const QUESTION_MAP = [
   { tags: ['bao giờ','khi nào','thời điểm','năm nào','vận'], category: 'timing' },
   { tags: ['hôn nhân','vợ','chồng','duyên','cưới','ly hôn','tình yêu','phối ngẫu','ai hợp'], category: 'marriage' },
   { tags: ['sự nghiệp','công việc','chức','quyền','nghề','nghề nghiệp'], category: 'career' },
-  { tags: ['tiền','tài','giàu','nghèo','đầu tư','kinh doanh','tài lộc'], category: 'wealth' },
+  { tags: ['tiền','tiền bạc','tài lộc','tài chính','tài vận','phát tài','giàu','nghèo','đầu tư','kinh doanh','lộc'], category: 'wealth' }, // [AUDIT FIX] bỏ bare 'tài' (over-match «tài xế/tài liệu»)
   { tags: ['sức khỏe','bệnh','tạng','đau','yếu','thể chất'], category: 'health' },
   { tags: ['con cái','sinh con','thai','tử nữ'], category: 'children' },
   { tags: ['học','bằng cấp','thi cử','đại học','học vấn','khoa cử'], category: 'education' },
@@ -214,7 +214,7 @@ const RULES = [
   { id: 'nguyet_pian_yin', category: ['personality'], priority: 65, condition: (f) => f['偏印_positions']?.some(p => p.startsWith('tháng')), conclusion: { result: 'da_tai_nhieu_nghe', message: 'Tháng trụ có Thiên Ấn → đa tài đa nghệ, nhưng lười', confidence: 60, evidence: ['偏印 at tháng'], links: ['personality'] } },
   { id: 'nhat_pian_yin', category: ['personality','marriage'], priority: 66, condition: (f) => f['偏印_positions']?.some(p => p.startsWith('ngày')), conclusion: { result: 'tinh_co_quyen', message: 'Ngày trụ có Thiên Ấn → có quyền nhưng cô đơn, hôn nhân khó hòa', confidence: 62, evidence: ['偏印 at ngày'], links: ['personality','marriage'] } },
   { id: 'thoi_pian_yin', category: ['children'], priority: 63, condition: (f) => f['偏印_positions']?.some(p => p.startsWith('giờ')), conclusion: { result: 'thoi_bat_luong', message: 'Giờ trụ có Thiên Ấn → đầu thai con gái có tai họa,晚年 cô', confidence: 56, evidence: ['偏印 at giờ'], links: ['children'] } },
-  { id: 'nguyet_zhengcai', category: ['wealth'], priority: 68, condition: (f) => f['正财_positions']?.some(p => p.startsWith('tháng')), conclusion: { result: 'tai_nguyet', message: 'Tháng trụ có Chính Tài → tài chính mạnh, lương ổn định từ trẻ', confidence: 66, evidence: ['正财 at tháng'], links: ['wealth'] } },
+  { id: 'nguyet_zhengcai_tre', category: ['wealth'], priority: 68, condition: (f) => f['正财_positions']?.some(p => p.startsWith('tháng')), conclusion: { result: 'tai_nguyet_tre', message: 'Tháng trụ có Chính Tài → tài chính mạnh, lương ổn định từ trẻ', confidence: 66, evidence: ['正财 at tháng'], links: ['wealth'] } }, // [AUDIT FIX] rename id (dup với line 158 → bị dedup shadow)
   { id: 'thoi_zhengcai', category: ['wealth','children'], priority: 67, condition: (f) => f['正财_positions']?.some(p => p.startsWith('giờ')), conclusion: { result: 'tai_thoi', message: 'Giờ trụ có Chính Tài → tài lộc晚niên, con đầu con trai', confidence: 64, evidence: ['正财 at giờ'], links: ['wealth','children'] } },
 
   // --- THÊM TIMING ---
@@ -234,11 +234,11 @@ const RULES = [
   // --- SPOUSE DETAIL ---
   { id: 'spouse_vuong', category: ['marriage'], priority: 78, condition: (f) => { const sc = f.isFemale ? (f['正官_count'] + f['七杀_count']) : (f['正财_count'] + f['偏财_count']); return sc >= 2; }, conclusion: { result: 'phoi_ngau_vuong', message: 'Sao phối ngẫu ≥2 → phối ngẫu vượng, duyên mạnh, nhưng dễ đa phu/thê', confidence: 72, evidence: ['spouse star ≥2'], links: ['marriage'] } },
   { id: 'spouse_nhieu', category: ['marriage'], priority: 80, condition: (f) => { const sc = f.isFemale ? (f['正官_count'] + f['七杀_count']) : (f['正财_count'] + f['偏财_count']); return sc >= 4; }, conclusion: { result: 'phoi_ngau_nhieu', message: 'Sao phối ngẫu ≥4 → phối ngẫu QUÁ NHIỀU → dễ ly hôn/đa phu/thê', confidence: 75, evidence: ['spouse star ≥4'], links: ['marriage'] } },
-  { id: 'spouse_khong', category: ['marriage'], priority: 82, condition: (f) => { const sc = f.isFemale ? (f['正官_count'] + f['七杀_count']) : (f['正财_count'] + f['偏财_count']); return sc === 0; }, conclusion: { result: 'phoi_ngau_khong', message: 'Sao phối ngẫu KHÔNG có → hôn nhân rất khó/khuter, cần đại vận mang sao', confidence: 78, evidence: ['spouse star = 0'], links: ['marriage'] } },
+  { id: 'spouse_khong', category: ['marriage'], priority: 82, condition: (f) => { const sc = f.isFemale ? (f['正官_count'] + f['七杀_count']) : (f['正财_count'] + f['偏财_count']); return sc === 0; }, conclusion: { result: 'phoi_ngau_khong', message: 'Sao phối ngẫu KHÔNG có → hôn nhân rất khó/khó khăn, cần đại vận mang sao', confidence: 78, evidence: ['spouse star = 0'], links: ['marriage'] } },
   { id: 'spouse_tang_only', category: ['marriage'], priority: 75, condition: (f) => { const positions = f.isFemale ? (f['正官_positions']||[]).concat(f['七杀_positions']||[]) : (f['正财_positions']||[]).concat(f['偏财_positions']||[]); return positions.length > 0 && positions.every(p => p.includes('tàng')); }, conclusion: { result: 'spouse_tang_only', message: 'Sao phối ngẫu CHỈ ở tàng can → duyên ẩn, khó kết hôn hoặc bạn đời khiêm nhường', confidence: 68, evidence: ['spouse star tàng only'], links: ['marriage'] } },
 
   // --- WEALTH DETAIL ---
-  { id: 'tai_kho', category: ['wealth'], priority: 75, condition: (f) => f['正官_count'] >= 1 && f['七杀_count'] >= 1, conclusion: { result: 'tai_kho_sat', message: 'Có Thất Sát → tài có kho (sat = kho), giữ được tiền nếu có chế', confidence: 65, evidence: ['has 七杀'], links: ['wealth'] } },
+  { id: 'tai_kho', category: ['wealth'], priority: 75, condition: (f) => f['七杀_count'] >= 1, conclusion: { result: 'tai_kho_sat', message: 'Có Thất Sát → tài có kho (sat = kho), giữ được tiền nếu có chế', confidence: 65, evidence: ['has 七杀'], links: ['wealth'] } }, // [AUDIT FIX] condition khớp message (chỉ cần 七杀, không cần cả 正官)
   { id: 'than_nhieu_tai_co_kho', category: ['wealth'], priority: 73, condition: (f) => f.isStrong && f.has_正财, conclusion: { result: 'than_manh_tai_co_kho', message: 'Thân mạnh + Chính Tài → có khả năng tích lũy, giữ tiền', confidence: 70, evidence: ['isStrong', 'has 正财'], links: ['wealth'] } },
 
   // --- EDUCATION DETAIL ---
@@ -407,7 +407,7 @@ const RULES = [
 
   // --- NGUỒN LƯU (源流 — dòng ngũ hành) ---
   { id: 'yl_aspect_wealth', category: ['wealth','overview'], priority: 75, condition: (f) => f.yuanliuAspect === 'Tài', conclusion: { result: 'dong_chay_huong_tai', message: '源流 (dòng ngũ hành) đổ về TÀI → trọng tâm tự nhiên của mệnh là tiền bạc/kinh doanh (năng lượng đời chảy về đó)', confidence: 72, evidence: ['yuanliu aspect=Tài'], links: ['wealth','overview'] } },
-  { id: 'yl_aspect_power', category: ['career','overview'], priority: 75, condition: (f) => f.yuanliuAspect === 'Quan' || f.yuanliuAspect === 'Quyền', conclusion: { result: 'dong_chay_huong_quyen', message: '源流 đổ về QUAN/QUYỀN → trọng tâm mệnh là sự nghiệp/quyền lực/chức vụ', confidence: 72, evidence: ['yuanliu aspect=Quan/Quyền'], links: ['career','overview'] } },
+  { id: 'yl_aspect_power', category: ['career','overview'], priority: 75, condition: (f) => f.yuanliuAspect === 'Quan/Sát', conclusion: { result: 'dong_chay_huong_quyen', message: '源流 đổ về QUAN/SÁT → trọng tâm mệnh là sự nghiệp/quyền lực/chức vụ', confidence: 72, evidence: ['yuanliu aspect=Quan/Sát'], links: ['career','overview'] } },
   { id: 'yl_gap', category: ['health','overview'], priority: 76, condition: (f) => !!f.yuanliuGap, conclusion: { result: 'menh_co_benh_thong_quan', message: '源流 có ĐỨT ĐOẠN (ngũ hành không liền mạch) → mệnh có "bệnh", cần hành "thông quan" (nối ngũ hành đứt) để giải', confidence: 72, evidence: ['yuanliu has gap'], links: ['health','overview'] } },
 
   // --- TỨ TRỤ tổn thương (盖头/截脚) ---
