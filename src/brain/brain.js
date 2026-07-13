@@ -375,6 +375,51 @@ const RULES = [
   { id: 'dm_nham', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '壬', conclusion: { result: 'nham_thuy', message: 'Nhâm Thủy (sông lớn) → thông minh, phóng khoáng, quyền lực', confidence: 68, evidence: ['dm=壬'], links: ['personality','appearance'] } },
   { id: 'dm_quy', category: ['personality','appearance'], priority: 72, condition: (f) => f.dayMaster === '癸', conclusion: { result: 'quy_thuy', message: 'Quý Thủy (mưa sương) → uyển chuyển, tế nhị, trực giác', confidence: 68, evidence: ['dm=癸'], links: ['personality','appearance'] } },
 
+  // =========================================================================
+  // [gap #4 NẠP DỮ LIỆU VÀO NÃO] — rules dùng facts THẦN SÁT / DỤNG ĐẦY ĐỦ /
+  //   CÁCH CỤC CHẤT LƯỢNG / THỜI ĐIỂM VÀNG / NGUỒN LƯU / TỨ TRỤ / LỤC THÂN.
+  //   Trước đây não mù các domain này (facts.js không extract) → AI "quên logic".
+  // =========================================================================
+
+  // --- THẦN SÁT (神煞) — priority 75-80 ---
+  { id: 'ss_tianyi', category: ['career','overview'], priority: 80, condition: (f) => f.has_tianYi, conclusion: { result: 'quy_nhan_tro_giup', message: '天乙贵人 (thiên quý nhân) → gặp dữ hóa lành, sự nghiệp được quý nhân nâng đỡ, dễ thành quan chức/lãnh đạo', confidence: 82, evidence: ['has 天乙贵人'], links: ['career','overview'] } },
+  { id: 'ss_huagai', category: ['personality','overview'], priority: 76, condition: (f) => f.has_huaGai, conclusion: { result: 'tam linh_sang_tao', message: '华盖 (hoa cái) → tâm linh/tôn giáo/nghệ thuật, thông minh độc đáo nhưng dễ cô đơn, hợp nghiên cứu/tôn giáo', confidence: 78, evidence: ['has 华盖'], links: ['personality','education'] } },
+  { id: 'ss_jiangxing', category: ['career','overview'], priority: 78, condition: (f) => f.has_jiangXing, conclusion: { result: 'quan_su_lanh_dao', message: '将星 (tướng tinh) → khí chất quân sự/quyền lực, quyết đoán, hợp quân đội/công an/quản lý', confidence: 78, evidence: ['has 将星'], links: ['career'] } },
+  { id: 'ss_taohua', category: ['marriage','appearance'], priority: 76, condition: (f) => f.has_taoHua || f.has_xianchi || f.has_taoHuaHong, conclusion: { result: 'dao_hoa_nan_sac', message: '桃花 (đào hoa) → nhan sắc/hấp dẫn giới tính, duyên độ, dễ có nhiều cơ hội tình cảm (cần cân nhắc hôn nhân)', confidence: 75, evidence: ['has 桃花'], links: ['marriage','appearance'] } },
+  { id: 'ss_yima', category: ['career','wealth'], priority: 74, condition: (f) => f.has_yiMa, conclusion: { result: 'di_chuyen_xa_que', message: '驿马 (dịch mã) → đời sống di chuyển/xa quê/phát đạt nhờ đi lại, hợp kinh doanh xứ người/xuất khẩu/logistic', confidence: 72, evidence: ['has 驿马'], links: ['career','wealth'] } },
+  { id: 'ss_jinyu', category: ['wealth','overview'], priority: 76, condition: (f) => f.has_jinYu, conclusion: { result: 'xe_sang_phu_quy', message: '金舆 (kim dư) → xe cộ sang/tài lộc vượng, phú quý, được người phục vụ', confidence: 75, evidence: ['has 金舆'], links: ['wealth'] } },
+  { id: 'ss_tiande', category: ['overview','health'], priority: 74, condition: (f) => f.has_tianDe || f.has_yueDe, conclusion: { result: 'phuc_duc_hoa_giai', message: '天/月 đức → phúc đức tổ tiên, hóa giải hung họa, gặp nạn được cứu', confidence: 73, evidence: ['has 天德/月德'], links: ['overview','health'] } },
+  { id: 'ss_wenchang', category: ['education','career'], priority: 78, condition: (f) => f.has_wenChang, conclusion: { result: 'hoc_van_tai_hoa', message: '文昌 (văn xương) → tài văn chương/học vấn, hợp viết/nghiên cứu/giáo dục', confidence: 76, evidence: ['has 文昌'], links: ['education','career'] } },
+
+  // --- KHÔNG VƯƠNG (空亡) ---
+  { id: 'ss_kongwang', category: ['overview','timing'], priority: 70, condition: (f) => f.hasKongwang && f.kongwangAffectedCount > 0, conclusion: { result: 'khong_vuong_treo', message: '空亡 (không vương) ảnh hưởng trụ → lĩnh vực tương ứng bị "treo"/hư, cầu danh khó đạt, cần điền thực', confidence: 68, evidence: ['has 空亡 affecting pillar'], links: ['overview'] } },
+
+  // --- CHẤT LƯỢNG CÁCH CỤC (成/败 + cứu ứng) — priority 85-90 ---
+  { id: 'pq_cheng', category: ['overview','career'], priority: 88, condition: (f) => f.patternCheng, conclusion: { result: 'cach_cuc_thuan', message: '成格 (cách cục THÀNH) → mệnh thuận, tướng thần vững, cấu trúc tốt → dễ thành tựu trong lĩnh vực cách cục', confidence: 85, evidence: ['quality=成格'], links: ['overview','career'] } },
+  { id: 'pq_bai', category: ['overview'], priority: 85, condition: (f) => f.patternBai && !f.patternRescued, conclusion: { result: 'cach_cuc_vo', message: '败格 (cách cục VỠ, không cứu) → mệnh nghịch, cơ hội khó giữ, cần nỗ lực gấp đôi + dùng Dụng Thần bù', confidence: 80, evidence: ['quality=败格, no rescue'], links: ['overview'] } },
+  { id: 'pq_bai_rescued', category: ['overview'], priority: 86, condition: (f) => f.patternBai && f.patternRescued, conclusion: { result: 'cach_cuc_vo_co_cuu', message: '败格 nhưng CÓ cứu ứng (病药) → vỡ nhưng được行 (tướng thần/rescue) bù → nguy rồi an, cần bám cứu ứng để hồi phục', confidence: 82, evidence: ['quality=败格, has rescues'], links: ['overview','health'] } },
+  { id: 'pq_keystar_rooted', category: ['career','overview'], priority: 80, condition: (f) => f.patternKeyStarGod && f.patternKeyStarRooted, conclusion: { result: 'tuong_than_co_can', message: 'Tướng thần CÓ căn (rooted) → sức mạnh cách cục vững, lĩnh vực tương ứng sao đó dễ thành tựu', confidence: 78, evidence: ['keyStar rooted'], links: ['career'] } },
+
+  // --- THỜI ĐIỂM VÀNG (lưu niên Cát) — timing ---
+  { id: 'tm_golden_soon', category: ['timing','overview'], priority: 82, condition: (f) => f.hasGoldenYearSoon, conclusion: { result: 'nam_vang_sap_toi', message: 'Sắp tới NĂM VÀNG (lưu niên Cát) → cơ hội lớn, nên hành sự/khởi nghiệp/ký hợp đồng đúng窗口 này', confidence: 80, evidence: ['golden year upcoming'], links: ['timing','wealth','career'] } },
+  { id: 'tm_hung_soon', category: ['timing','health'], priority: 78, condition: (f) => f.hasHungYearSoon, conclusion: { result: 'can_tham_nam_xau', message: 'Có năm HUNG sắp tới trong khung 10 năm → cẩn thận sức khỏe/tài chính, tránh hành sự lớn năm đó', confidence: 72, evidence: ['hung year upcoming'], links: ['timing','health'] } },
+  { id: 'tm_no_golden', category: ['timing'], priority: 68, condition: (f) => f.goldenYearCount === 0, conclusion: { result: 'chua_co_nam_vang', message: 'Chưa có lưu niên Cát trong khung 10 năm → cần chủ động tạo cơ hội, đừng thụ động chờ vận', confidence: 66, evidence: ['goldenYearCount=0'], links: ['timing'] } },
+
+  // --- NGUỒN LƯU (源流 — dòng ngũ hành) ---
+  { id: 'yl_aspect_wealth', category: ['wealth','overview'], priority: 75, condition: (f) => f.yuanliuAspect === 'Tài', conclusion: { result: 'dong_chay_huong_tai', message: '源流 (dòng ngũ hành) đổ về TÀI → trọng tâm tự nhiên của mệnh là tiền bạc/kinh doanh (năng lượng đời chảy về đó)', confidence: 72, evidence: ['yuanliu aspect=Tài'], links: ['wealth','overview'] } },
+  { id: 'yl_aspect_power', category: ['career','overview'], priority: 75, condition: (f) => f.yuanliuAspect === 'Quan' || f.yuanliuAspect === 'Quyền', conclusion: { result: 'dong_chay_huong_quyen', message: '源流 đổ về QUAN/QUYỀN → trọng tâm mệnh là sự nghiệp/quyền lực/chức vụ', confidence: 72, evidence: ['yuanliu aspect=Quan/Quyền'], links: ['career','overview'] } },
+  { id: 'yl_gap', category: ['health','overview'], priority: 76, condition: (f) => !!f.yuanliuGap, conclusion: { result: 'menh_co_benh_thong_quan', message: '源流 có ĐỨT ĐOẠN (ngũ hành không liền mạch) → mệnh có "bệnh", cần hành "thông quan" (nối ngũ hành đứt) để giải', confidence: 72, evidence: ['yuanliu has gap'], links: ['health','overview'] } },
+
+  // --- TỨ TRỤ tổn thương (盖头/截脚) ---
+  { id: 'pl_jiejiao', category: ['health','overview'], priority: 72, condition: (f) => f.hasJiejiao && f.damagedPillarCount >= 2, conclusion: { result: 'noi_bo_mau_thuan', message: 'Nhiều trụ 截脚 (chi khắc can) → nội bộ mâu thuẫn, ý-trí đánh nhau, cần rèn kỷ luật nội tâm', confidence: 68, evidence: ['has 截脚, multiple damaged pillars'], links: ['health','personality'] } },
+
+  // --- DỤNG THẦN ĐẦY ĐỦ (用喜忌仇) — tương tác với vận ---
+  { id: 'yg_xi_dung', category: ['timing','overview'], priority: 84, condition: (f) => f.yong_xi && f.dayunIsDung && f.yong_xi === f.currentDayunGanWx, conclusion: { result: 'van_hy_than_toi', message: 'Đại vận mang HY THẦN (hành sinh Dụng) tới → vận RẤT THUẬN, Dụng thêm vững, là窗口 vàng để phát triển', confidence: 82, evidence: ['yong_xi == dayun gan wx'], links: ['timing','overview'] } },
+  { id: 'yg_ji_dung', category: ['timing','health'], priority: 80, condition: (f) => f.yong_ji && (f.currentDayunGanWx === f.yong_ji || f.currentDayunZhiWx === f.yong_ji), conclusion: { result: 'van_ky_than_toi', message: 'Đại vận mang KỴ THẦN tới → vận KHẮC, cẩn thận lĩnh vực Kỵ khắc, giữ thấp rủi ro', confidence: 76, evidence: ['yong_ji in dayun'], links: ['timing','health'] } },
+
+  // --- LỤC THÂN (六亲) — quan hệ gia đình thiếu sao ---
+  { id: 'lq_missing_many', category: ['overview','marriage'], priority: 72, condition: (f) => f.liuqinMissingCount >= 2, conclusion: { result: 'duyen_gia_dinh_mong', message: 'Nhiều lục thân THIẾU sao chủ → duyên gia đình mỏng, quan hệ đó cần nỗ lực vun đắp', confidence: 68, evidence: ['liuqin missing >= 2 stars'], links: ['overview','marriage','parents'] } },
+
 ];
 
 function wxOrgan(wx) {

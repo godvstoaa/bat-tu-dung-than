@@ -122,5 +122,74 @@ export function extractFacts(chart, R, gender) {
   facts.combo_kieu_doat_thuc = has('偏印') && has('食神');
   facts.combo_cai_pha_an = hasTai && hasAn && facts.isStrong;
 
+  // === [gap #4 NẠP DỮ LIỆU VÀO NÃO] THẦN SÁT (shensha) ===
+  // Trước đây não mù về quý nhân/hoa cái/đào hoa/đếνη... giờ nạp đủ.
+  const shensha = R?.shensha || {};
+  facts.shenshaCount = 0;
+  for (const [name, info] of Object.entries(shensha)) {
+    const at = info?.at || info?.positions || [];
+    if (at.length) {
+      facts[`has_${name}`] = true;
+      facts[`${name}_at`] = at;
+      facts.shenshaCount++;
+    }
+  }
+
+  // === DỤNG THẦN ĐẦY ĐỦ (用喜忌仇闲) + ĐIỀU HẬU ===
+  const yong = R?.yong || {};
+  facts.yong_xi = yong.xi || '';
+  facts.yong_ji = yong.ji || '';
+  facts.yong_chou = yong.chou || '';
+  facts.yong_xian = yong.xian || '';
+  facts.yong_secondary = yong.secondary || '';
+  facts.yong_avoid = yong.avoid || [];
+  facts.yong_relations = yong.relations || {};
+  facts.tiaohouWx = yong.tiaohou?.primaryWx || '';
+  facts.tiaohouOverride = yong.tiaohou?.override || false;
+
+  // === CHẤT LƯỢNG CÁCH CỤC (成/败 + cứu ứng + tướng thần) ===
+  const pq = R?.patternQuality || {};
+  facts.patternCheng = pq.quality === '成格';
+  facts.patternBai = pq.quality === '败格';
+  facts.patternRescued = !!(pq.rescues && pq.rescues.length);
+  facts.patternRescueCount = pq.rescues?.length || 0;
+  facts.patternKeyStarGod = pq.keyStar?.god || '';
+  facts.patternKeyStarRooted = !!pq.keyStar?.rooted;
+  facts.patternKeyStarTransparent = !!pq.keyStar?.transparent;
+
+  // === THỜI ĐIỂM VÀNG (lưu niên Cát / Đại cát) ===
+  const _now = new Date().getFullYear();
+  const golden = (R?.remedy?.timing || []).filter((t) => t.rating === 'Cát' || t.rating === 'Đại cát');
+  facts.goldenYearCount = golden.length;
+  facts.hasGoldenYearSoon = golden.some((t) => (t.year || 0) >= _now);
+  facts.nextGoldenYear = golden.find((t) => (t.year || 0) >= _now)?.year || null;
+  facts.hasHungYearSoon = (R?.remedy?.timing || []).some((t) => /Hung|Kỵ|大凶/i.test(t.rating || '') && (t.year || 0) >= _now);
+
+  // === KHÔNG VƯƠNG (空亡) ===
+  const kw = R?.kongwang || {};
+  facts.hasKongwang = !!((kw.kong && kw.kong.length) || (kw.affected && kw.affected.length));
+  facts.kongwangAffectedCount = kw.affected?.length || 0;
+
+  // === NGUỒN LƯU (源流 — dòng chảy ngũ hành) ===
+  const yl = R?.yuanliu || {};
+  facts.yuanliuSourceWx = yl.source || '';
+  facts.yuanliuEndpointWx = yl.endpoint || '';
+  facts.yuanliuAspect = yl.aspectKey || '';
+  facts.yuanliuGap = yl.gap || null;          // gap = ngũ hành đứt đoạn (bệnh của mệnh)
+
+  // === LỤC THÂN (六亲 — quan hệ gia đình qua palace + star) ===
+  const liuqin = R?.liuqin || [];
+  facts.liuqinMissingStar = [];               // các quan hệ THIẾU sao (khắc/hao)
+  for (const lq of liuqin) {
+    if (!lq.hasStar) facts.liuqinMissingStar.push(lq.relation || lq.relVi || '');
+  }
+  facts.liuqinMissingCount = facts.liuqinMissingStar.length;
+
+  // === CHẤT LƯỢNG TỨ TRỤ (盖头/截脚 — can-chi khắc, tổn thương) ===
+  const perPillar = R?.pillarQuality?.perPillar || {};
+  facts.damagedPillarCount = Object.values(perPillar).filter((p) => p?.damaged).length;
+  facts.hasGaitou = Object.values(perPillar).some((p) => /盖头|thượng khắc|can khắc chi/i.test(p?.vi || ''));
+  facts.hasJiejiao = Object.values(perPillar).some((p) => /截脚|tiệt cước|chi khắc can/i.test(p?.vi || ''));
+
   return facts;
 }
