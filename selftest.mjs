@@ -891,7 +891,7 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
 //   Trước đây 5 tool bói (analyze_char/meihua/liuren/qimen/guiguzi) FLAT → Z.ai API reject → AI không bao giờ gọi được.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 28, `[loop 623→R42] AI_TOOLS có đúng 27 tool (got ${AI_TOOLS.length}) — +gufa/huangji/taiyi/chenggu`);
+  assert(AI_TOOLS.length === 29, `[loop 623→R42] AI_TOOLS có đúng 29 tool (got ${AI_TOOLS.length})`);
   const flat = AI_TOOLS.filter((t) => !(t && t.type === 'function' && t.function && t.function.name));
   assert(flat.length === 0, `[loop 623] KHÔNG còn tool FLAT — tất cả phải có wrapper {type:function,function:{name}} (còn ${flat.length} flat: ${flat.map(t=>t&&t.name).join(',')})`);
   const names = AI_TOOLS.map((t) => t.function.name);
@@ -4489,7 +4489,7 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
 // [loop 792] 19 AI tool descriptions — mỗi tool có description + when-to-use guidance.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 28, `[loop 792→R49] 30 tools (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 29, `[loop 792→R49] 29 tools (got ${AI_TOOLS.length})`);
   let _noDesc = 0;
   for (const t of AI_TOOLS) {
     const _d = t.function?.description || t.description || '';

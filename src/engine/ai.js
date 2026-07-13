@@ -778,7 +778,7 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "TƯƠNG THẦN (ch.15): " + XIANGSHEN_LAW.decisive.slice(0, 2).join(' | ') + "\n" +
       "CHẤT LƯỢNG CÁCH (2-trục Tình×Lực): " + PATTERN_QUALITY_DEEP.highest + " | " + PATTERN_QUALITY_DEEP.lowLi + "\n" +
       "ĐẢO LUẬN 吉凶 (ch.18/19): 4吉 thần cũng PHÁ cách, 4凶 thần cũng THÀNH cách — " + JIXIONG_FANLI.principle + "\n" +
-      (zaqiInfo ? "TẠP KHÍ 月令=" + monthZhi + ": " + zaqiInfo.principle + " | " + (zaqiInfo.mainQi ? "Bản khí=" + zaqiInfo.mainQi + ", tàng=" + (zaqiInfo.hidden || '?') : zaqiInfo.note) : "THUẬN/NGHỊCH DỤNG: thiện thần (tài/quan/ấn/thực) thuận=sinh phù+hộ vệ; bất thiện (sát/thương/khiếu/nhận) nghịch=chế phục+hóa giải");
+      (zaqiInfo ? "TẠP KHÍ 月令=" + monthZhi + ": " + (ZAQI_TIANGAN_USE.principle || '') + " | " + (zaqiInfo.mainQi ? "Bản khí=" + zaqiInfo.mainQi + ", tàng=" + (zaqiInfo.hidden || '?') : zaqiInfo.note) : "THUẬN/NGHỊCH DỤNG: thiện thần (tài/quan/ấn/thực) thuận=sinh phù+hộ vệ; bất thiện (sát/thương/khiếu/nhận) nghịch=chế phục+hóa giải");
   } catch (e) { brief += "\n--- ROUND 22: [lỗi load] ---"; }
 
   // ---- [round 23] MỆNH LÝ ƯỚC NGÔN (陈素庵) — chuẩn hóa + BAZI_SCHOOL toggle ----
@@ -1385,7 +1385,6 @@ export const AI_TOOLS = [
     name: 'analyze_appearance', description: 'DIỆN MẠO BÁT TỰ (thập can thể tượng + THỜI GIAN): nhật chủ → diện mạo cơ bản (10 can → cụ thể) + hành chủ đạo modifier + nhan sắc combos (kim thủy phùng/mộc hỏa thông minh) + ĐẠI VẬN HIỆN TẠI thay đổi diện mạo. Dùng khi user hỏi «diện mạo/ngoại hình/đẹp không/mặt ra sao/tướng mạo». KHÁC WUXING_APPEARANCE cũ (tĩnh) — đây là TIME-VARIABLE.',
     parameters: { type: 'object', properties: {} },
   } },
-,
   { type: 'function', function: {
     name: 'log_error', description: '[R46] LOG LỖI — khi AI nhận ra mình luận SAI (sau khi user sửa) → gọi tool này để GHI NHẬN lỗi có cấu trúc. Admin dùng log này để fix hệ thống.',
     parameters: { type: 'object', properties: {
