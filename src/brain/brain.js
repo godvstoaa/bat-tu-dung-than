@@ -403,6 +403,10 @@ export function evaluateRules(facts) {
 }
 
 // === BUILD OUTPUT (graph → structured text for AI) ===
+// [Phase 2 / gap #5] Ngưỡng confidence tối thiểu cho output tới AI.
+//   Rules <65% thêm noise (đoán,mạnh thừa), không thêm signal → drop trước khi gửi AI.
+const MIN_CONFIDENCE = 65;
+
 export function buildOutput(conclusions, facts, category) {
   // Filter conclusions relevant to the question category
   let relevant = conclusions;
@@ -414,6 +418,10 @@ export function buildOutput(conclusions, facts, category) {
     const overview = conclusions.filter(c => c.priority >= 90 && !relevant.includes(c));
     relevant = [...relevant, ...overview];
   }
+
+  // [Phase 2 / gap #5] Drop low-confidence noise BEFORE dedup/slice
+  //   (đảm bảo top-8 luôn là rules chất lượng cao nhất, không bị chiếm chỗ bởi rules yếu)
+  relevant = relevant.filter(c => (c.confidence || 0) >= MIN_CONFIDENCE);
 
   // Deduplicate by id
   const seen = new Set();
