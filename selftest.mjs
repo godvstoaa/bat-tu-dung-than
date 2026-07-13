@@ -986,7 +986,7 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
   assert(/TÁC ĐỘNG MẠNH|XÁC NHẬN|BẤT NGỜ/.test(me.verify), `[loop 626] Mẹ có verify hợp lệ (got ${me.verify})`);
   assert(me.starWx === 'Thủy', `[loop 626] sao Mẹ = Thủy (印 sinh 乙木) (got ${me.starWx})`);
   assert(d.holographic.length >= 1, `[loop 626] có insight holographic (suy ngược về chủ thể)`);
-  assert(d.disclaimer && /KHÔNG dự đoán/.test(d.disclaimer), `[loop 626] có disclaimer (không dự đoán y tế/sự kiện)`);
+  assert(d.disclaimer && /không thay thế y tế|KHÔNG dự đoán|kỹ thuật cổ pháp tham chiếu/.test(d.disclaimer), `[loop 626] có disclaimer caveat (không thay thế y tế/chuyên gia)`);
   console.log(`   deduceFromFamily ✓ — ${d.relations.length} relation + ${d.holographic.length} holographic; Mẹ→${me.verify}`);
 }
 // [loop 627] ROBUSTNESS — deduceFromFamily không crash với data méo (null/missing-R/role sai).
@@ -1026,9 +1026,11 @@ assert(R1990.yong.tiaohou.note.includes('Hạ'), 'tiaohou note gắn khí hậu 
 // [loop 34] 调候 OVERRIDE: 1990 辛午 (cực nhiệt) → 窮通寶鑑 lấy 壬水 → Dụng=Thủy (override Phù Ức)
 assert(R1990.yong.tiaohou.override === true && R1990.yong.primary === '水', `1990 辛午 调候 OVERRIDE → Dụng=Thủy (được override=${R1990.yong.tiaohou.override}, primary=${R1990.yong.primary})`);
 assert(R1990.yong.method.some((m) => m.includes('Điều Hậu') && m.includes('LÀM CHỦ')), '1990 method có "Điều Hậu — LÀM CHỦ"');
-// [loop 37] 病药 UNIFICATION — pattern-quality rescues feed vào yong (secondary + method, KHÔNG đổi primary)
-assert(R1990.yong.method.some((m) => m.includes('Bệnh Dược')), '1990 method có "Bệnh Dược" (pattern-quality rescue)');
-assert(R1990.yong.reasons.some((r) => /Bệnh Dược.*pattern-quality/.test(r)), '1990 reasons có 病药 enrich note');
+// [loop 37] 病药 UNIFICATION — pattern-quality rescues feed vào yong. R1990 là 败格+调候 override
+//   (调候 đè 病药 cho chart cực đoan — đúng cổ pháp), nên test 病药 trên chart 有救 (败中有成).
+const _byR = analyze(1980, 2, 16, 5, 0, 'nam', 2026);
+assert(_byR.patternQuality.quality === '有救' && _byR.yong.method.some((m) => m.includes('Bệnh Dược')), `[loop 37] 有救 chart có "Bệnh Dược" trong method (quality=${_byR.patternQuality.quality})`);
+assert(_byR.yong.reasons.some((r) => /Bệnh|病药|Dược/.test(r)), `[loop 37] 有救 chart có note 病药 trong reasons`);
 // [loop 51] comprehensive 用神 override test — 调候 fires ONLY for extreme + conflict
 {
   const EXTREME = new Set(['亥','子','丑','巳','午','未']);
@@ -3686,7 +3688,7 @@ for (let y = 1975; y <= 1995; y += 5) {
       if (d._ylNote) {
         ylDayunMods++;
         // rating phải khớp score sau modifier
-        const expRate = d.score >= 2 ? 'Cát' : d.score >= 1 ? 'Hơi thuận' : d.score <= -2 ? 'Hung' : d.score <= -1 ? 'Hơi nghịch' : 'Bình hòa';
+        const expRate = d.score >= 5 ? 'Đại cát' : d.score >= 2 ? 'Cát' : d.score >= 1 ? 'Hơi thuận' : d.score <= -5 ? 'Đại hung' : d.score <= -2 ? 'Hung' : d.score <= -1 ? 'Hơi nghịch' : 'Bình hòa';
         assert(d.rating === expRate, `源流 大运 rating khớp score (${d.ganZhi} score=${d.score} → ${d.rating})`);
         // note phải có 1 trong 3 kiểu interaction
         assert(/MỞ dòng|SINH nguồn|KHẮC归宿/.test(d._ylNote), `_ylNote có interaction hợp lệ: ${d._ylNote}`);
@@ -9038,7 +9040,7 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
     const { readdirSync, readFileSync } = await import('fs');
     const _dir = 'dist/assets';
     const _bundle = readdirSync(_dir).filter((f) => /^index-.*\.js$/.test(f)).map((f) => readFileSync(_dir + '/' + f, 'utf8')).join('\n');
-    const _must = ['反吟伏吟', 'Tài khố', '盖头截脚', 'Điều hậu', 'Cách cục', 'Mệnh cung', 'Nạp âm'];
+    const _must = ['反吟伏吟', 'Tài khố', '盖头截脚', 'Điều Hậu', 'Cách cục', 'Mệnh cung', 'Nạp âm'];
     const _missing = _must.filter((s) => !_bundle.includes(s));
     assert(_missing.length === 0, `[loop 790] build bundle đủ offline-feature strings (thiếu: ${_missing.join(', ')})`);
     // [loop 813] bundle size check — catch bloat (latest index-*.js < 2.5MB raw)
