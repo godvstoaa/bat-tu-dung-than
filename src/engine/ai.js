@@ -606,7 +606,10 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const dmGan = c.dayMaster.gan || '';
     const monthZhi = c.pillars.month.zhi || '';
     const tiaohouKey = dmGan + monthZhi + '月';
-    const tiaohou = QIONGTONG_TIAOHOU[tiaohouKey] || '(không có cổ quyết cụ thể)';
+    // [AUDIT FIX] fallback dùng tiaohou.note computed (R.yong.tiaohou — full coverage cho mọi
+    //   chart) thay vì generic «không có cổ quyết cụ thể». QIONGTONG_TIAOHOU chỉ cover 42/120 combo
+    //   → 78 combo (vd 戊子/壬子) rơi fallback. Note computed chính xác per-chart (theo TIAOHOU table).
+    const tiaohou = QIONGTONG_TIAOHOU[tiaohouKey] || R.yong?.tiaohou?.note || '(không có cổ quyết cụ thể)';
     const weakestWx = Object.entries(R.wx?.pct || {}).sort(([,a],[,b]) => a - b)[0];
     const healthInfo = weakestWx ? WUXING_HEALTH[weakestWx[0]] : null;
     const topGods = (typeof dominantGod === 'function') ? (dominantGod(R).ranked || []) : []; // [AUDIT FIX] dominantGods(plural, không tồn tại) → dominantGod(R).ranked

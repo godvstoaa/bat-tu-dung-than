@@ -161,7 +161,9 @@ const RULES = [
   // --- ADDITIONAL COMBINATION RULES ---
   { id: 'thuc_sinh_tai', category: ['wealth'], priority: 82, condition: (f) => f.has_食神 && (f.has_正财 || f.has_偏财), conclusion: { result: 'phat_tai', message: 'Thực Thần sinh Tài → phát tài qua kỹ năng/sáng tạo', confidence: 80, evidence: ['食神+Tài'], links: ['wealth','career'] } },
   { id: 'tai_pha_an', category: ['education'], priority: 78, condition: (f) => f.combo_cai_pha_an, conclusion: { result: 'hoc_gian_doan', message: 'Tài phá Ấn (thân cường+tài+ấn) → học gián đoạn do theo đuổi tiền', confidence: 68, evidence: ['正/偏财+正印, isStrong'], links: ['education'] } },
-  { id: 'nhat_zhi_xung', category: ['marriage','health'], priority: 75, condition: (f) => { try { const dc = f.dayMaster ? '' : ''; return false; } catch(_) { return false; } }, conclusion: { result: 'noop', message: '', confidence: 0, evidence: [], links: [] } },
+  // [AUDIT FIX] removed dead stub nhat_zhi_xung (condition luôn return false, confidence 0 —
+  //   never fired). 日支冲 (spouse palace clash) là real signal nhưng cần branch-clash facts
+  //   (facts.js chưa extract) → feature riêng nếu muốn.
 
   // --- GENDER-SPECIFIC RULES ---
   { id: 'nu_quan_sat_hon_ta', category: ['marriage'], priority: 85, condition: (f) => f.isFemale && f.combo_guan_sha_hon_ta, conclusion: { result: 'hon_nhan_bat_on_nu', message: 'NỮ mệnh Quan Sát hỗn tạp → hôn nhân RẤT bất ổn, chọn chồng cẩn thận', confidence: 82, evidence: ['female + 正官+七杀'], links: ['marriage'] } },
@@ -218,7 +220,7 @@ const RULES = [
   { id: 'thoi_zhengcai', category: ['wealth','children'], priority: 67, condition: (f) => f['正财_positions']?.some(p => p.startsWith('giờ')), conclusion: { result: 'tai_thoi', message: 'Giờ trụ có Chính Tài → tài lộc晚niên, con đầu con trai', confidence: 64, evidence: ['正财 at giờ'], links: ['wealth','children'] } },
 
   // --- THÊM TIMING ---
-  { id: 'dayun_ganzhi_xung_nhat', category: ['timing','health'], priority: 78, condition: (f) => { try { const dg = f.currentDayunGz; if (!dg || dg.length < 2) return false; const dz = f.dayMaster ? '' : ''; return false; } catch(_) { return false; } }, conclusion: { result: 'noop', message: '', confidence: 0, evidence: [], links: [] } },
+  // [AUDIT FIX] removed dead stub dayun_ganzhi_xung_nhat (luôn return false, confidence 0).
   { id: 'nam_than_manh', category: ['personality'], priority: 70, condition: (f) => f.isStrong && (f['正官_count'] + f['七杀_count']) >= 1, conclusion: { result: 'than_manh_co_quan', message: 'Thân mạnh + có Quan/Sat → gánh vác được quyền, không bị áp', confidence: 72, evidence: ['isStrong', 'has Quan/Sat'], links: ['career','personality'] } },
   { id: 'than_nhược_vo_quan', category: ['career'], priority: 72, condition: (f) => f.isWeak && !f.has_正官 && !f.has_七杀, conclusion: { result: 'than_nhieu_vo_quan', message: 'Thân nhược + không Quan/Sat → sự nghiệp khó, cần Ấn/Tỷ giúp', confidence: 68, evidence: ['isWeak', 'no Quan/Sat'], links: ['career'] } },
   { id: 'than_manh_co_tai', category: ['wealth'], priority: 72, condition: (f) => f.isStrong && (f.has_正财 || f.has_偏财), conclusion: { result: 'than_manh_nham_tai', message: 'Thân mạnh + có Tài → thân nhậm tài được → giàu', confidence: 75, evidence: ['isStrong', 'has Tài'], links: ['wealth'] } },

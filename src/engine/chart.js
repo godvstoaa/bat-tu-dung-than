@@ -757,6 +757,9 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
       }
     }
   } catch (e) { /* 病药 promotion không bắt buộc */ }
+  // [AUDIT FIX] secondary∈avoid clear CUỐI CÙNG — bắt path 病药 promotion (line 746 set secondary
+  //   = oldPrimary, line 754 re-add ji/chou có thể trùng secondary → residual 3.5%).
+  if (yong.secondary && yong.avoid.includes(yong.secondary)) yong.secondary = '';
   let dayun = [], liunian = [];
   try { dayun = computeDaYun(year, month, day, hh, mm, gender, yong); } catch (e) { dayun = []; } // [AUDIT FIX CRITICAL] dùng hh,mm normalized (hour=null→12 noon) thay raw hour,minute (null→0 midnight) → 起运 age đúng cho unknown-hour births
   try { liunian = computeLiuNian(year, month, day, hh, mm, gender, yong, refYear); } catch (e) { liunian = []; }
