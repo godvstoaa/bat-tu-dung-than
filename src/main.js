@@ -193,6 +193,7 @@ import { hexagramMeaning } from './engine/hexagram-meaning.js';
 import { huangdao12, renderHuangdaoCard } from './engine/huangdao.js';
 import { donggongDay, donggongInMonth } from './engine/donggong.js';
 import { qizheng, renderQizhengCard } from './engine/qizheng.js';
+import { computeWesternChart, renderWesternCard } from './engine/western-astro.js';
 import { tianxingZheri, renderTianxingCard, MOUNTAINS_24 as TX_MOUNTAINS_24, MOUNTAIN_VI } from './engine/tianxing-zheri.js';
 import {
   FACE_PALACES, MOLE_POSITIONS, AGE_FACE_MAP,
@@ -3518,6 +3519,24 @@ function renderQizheng(R) {
   }
 }
 
+function renderWestern(R) {
+  const el = $('western');
+  if (!el) return;
+  try {
+    const inp = R.chart.input;
+    const locVal = ($('western-loc')?.value || '21.03,105.85').split(',').map(Number);
+    const [lat, lng] = locVal.length === 2 ? locVal : [21.03, 105.85];
+    // Local solar time (Bát Tự) → UT: UT = local − lng/15 giờ
+    const baseDay = new Date(Date.UTC(inp.year || 1990, (inp.month || 1) - 1, inp.day || 15, 0, 0, 0));
+    baseDay.setUTCMinutes(baseDay.getUTCMinutes() + ((inp.hour ?? 12) * 60 + (inp.minute || 0)) - (lng / 15) * 60);
+    const chart = computeWesternChart(baseDay, lat, lng);
+    el.innerHTML = renderWesternCard(chart);
+  } catch (e) {
+    el.innerHTML = '<p class="hint">Không tính được bản đồ sao phương Tây.</p>';
+    console.warn('western', e.message);
+  }
+}
+
 // ---------------------------------------------------------------- 天星择日 (TIAN XING ZHE RI — star date selection)
 // Module tương tác: user chọn 24-mountain sitting → chấm 60 ngày tới → top 5 tốt + 3 kỵ.
 function renderTianxingZheri() {
@@ -4720,6 +4739,7 @@ async function run() {
   lazyRender('donggong',       () => { try { renderDonggong(); } catch (e) { console.warn('donggong', e.message); } });
   lazyRender('ziwei-sanfang',  () => { try { renderZiweiSanfang(currentResult); } catch (e) { console.warn('ziweisanfang', e.message); } });
   lazyRender('qizheng',        () => { try { renderQizheng(currentResult); } catch (e) { console.warn('qizheng', e.message); } });
+  lazyRender('western',        () => { try { renderWestern(currentResult); } catch (e) { console.warn('western', e.message); } });
   lazyRender('tianxing-zheri', () => { try { renderTianxingZheri(); } catch (e) { console.warn('tianxing', e.message); } });
   lazyRender('golden-year',    () => { try { renderGoldenYear(currentResult); } catch (e) { console.warn('goldenyear', e.message); } });
   lazyRender('daily-capsule',  () => { try { renderDailyCapsule(currentResult); } catch (e) { console.warn('daily-capsule', e.message); } });
@@ -5801,6 +5821,7 @@ $('lr-find').addEventListener('click', () => {
 });
 $('ts-btn').addEventListener('click', () => renderTaisui(parseInt($('ts-year').value, 10) || new Date().getFullYear()));
 $('lns-btn').addEventListener('click', () => renderLiunianShen(parseInt($('lns-year').value, 10) || new Date().getFullYear()));
+$('western-loc')?.addEventListener('change', () => { if (currentResult) renderWestern(currentResult); });
 $('lns12-btn').addEventListener('click', () => renderLiunian12Shen(parseInt($('lns12-year').value, 10) || new Date().getFullYear()));
 $('nm-btn').addEventListener('click', renderName);
 if($('nm-vi-btn')){$('nm-vi-btn').addEventListener('click', ()=>{ const vi=$('nm-vi').value.trim(); if(!vi) return; const r=viToHan(vi); if(r.ok){ $('nm-input').value=r.hanString; renderName(); } else { $('nm-input').value=r.hanString; $('nm-strokes').value=r.strokes.map((s,i)=>r.chars[i].han+'='+s).join(','); renderName(); } });}

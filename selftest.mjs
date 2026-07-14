@@ -891,7 +891,7 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
 //   Trước đây 5 tool bói (analyze_char/meihua/liuren/qimen/guiguzi) FLAT → Z.ai API reject → AI không bao giờ gọi được.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 29, `[loop 623→R42] AI_TOOLS có đúng 29 tool (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 30, `[loop 623→R42] AI_TOOLS có đúng 30 tool (got ${AI_TOOLS.length})`);
   const flat = AI_TOOLS.filter((t) => !(t && t.type === 'function' && t.function && t.function.name));
   assert(flat.length === 0, `[loop 623] KHÔNG còn tool FLAT — tất cả phải có wrapper {type:function,function:{name}} (còn ${flat.length} flat: ${flat.map(t=>t&&t.name).join(',')})`);
   const names = AI_TOOLS.map((t) => t.function.name);
@@ -4491,7 +4491,7 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
 // [loop 792] 19 AI tool descriptions — mỗi tool có description + when-to-use guidance.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 29, `[loop 792→R49] 29 tools (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 30, `[loop 792→R49] 30 tools (got ${AI_TOOLS.length})`);
   let _noDesc = 0;
   for (const t of AI_TOOLS) {
     const _d = t.function?.description || t.description || '';
@@ -10122,6 +10122,32 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   }
   assert(_hits > 0, `[loop 1111] analyzeLiuRi phát hiện 日冲/合月令 (${_hits}/3 chart) — vd ${_sample}`);
   console.log(`   [loop 1111] 流日 日冲/合月令 ✓ — ${_hits}/3 chart, vd ${_sample} → 3-pillar ĐỦ 4 cấp thời gian`);
+}
+
+// ============================================================================
+// [WESTERN ASTRO] — module bản đồ sao phương Tây (đối chiếu với Bát Tự)
+// ============================================================================
+{
+  const { computeWesternChart, renderWesternCard } = await import('./src/engine/western-astro.js');
+  const { SUN_IN_SIGN, MOON_IN_SIGN, ASCENDANT_MEANING, BAZI_WESTERN_MAP } = await import('./src/engine/western-kb.js');
+  const { AI_TOOLS, execTool } = await import('./src/engine/ai.js');
+  // 14:30 local VN = 07:30 UT, 1990-06-15, Hà Nội
+  const c = computeWesternChart(new Date(Date.UTC(1990, 5, 15, 7, 30)), 21.03, 105.85);
+  assert(AI_TOOLS.some((t) => t?.function?.name === 'analyze_western'), '[western] AI_TOOLS có analyze_western');
+  assert(c.sun.signVi === 'Song Tử', `[western] 1990-06-15 Sun = Song Tử (got ${c.sun.signVi})`);
+  assert(c.saturn.signVi === 'Ma Kết' && c.uranus.signVi === 'Ma Kết' && c.neptune.signVi === 'Ma Kết', `[western] 1990 outer planets Saturn/Uranus/Neptune đều Ma Kết (got ${c.saturn.signVi}/${c.uranus.signVi}/${c.neptune.signVi})`);
+  assert(c.pluto.signVi === 'Thiên Yết', `[western] 1990 Pluto = Thiên Yết (got ${c.pluto.signVi})`);
+  assert(c.summary.bigThree.split(' / ').length === 3, `[western] bigThree có 3 (got ${c.summary.bigThree})`);
+  assert(c.aspects.length > 0, `[western] có aspects (got ${c.aspects.length})`);
+  assert(c.houses.length === 12, `[western] 12 houses (got ${c.houses.length})`);
+  assert(SUN_IN_SIGN[c.sun.signVi] && MOON_IN_SIGN[c.moon.signVi] && ASCENDANT_MEANING[c.ascendant.signVi], '[western] KB có reading cho Sun/Moon/Asc');
+  assert(BAZI_WESTERN_MAP.COMPARISON_NOTES?.length >= 5, `[western] BAZI_WESTERN_MAP có >=5 comparison notes (got ${BAZI_WESTERN_MAP.COMPARISON_NOTES?.length})`);
+  assert(renderWesternCard(c).includes('Song Tử'), '[western] renderWesternCard có nội dung');
+  // execTool analyze_western
+  const R = analyze(1990, 6, 15, 14, 30, 'nam', 2026);
+  const tw = execTool('analyze_western', {}, R);
+  assert(!tw.error && tw.interpretation?.bigThree, `[western] execTool analyze_western ok (got ${tw.error || tw.interpretation?.bigThree})`);
+  console.log(`   [western] bản đồ sao 1990-06-15 ✓ — ${c.summary.bigThree}, outer planets Ma Kết/Thiên Yết (historical accuracy), ${c.aspects.length} aspects`);
 }
 
 process.exit(FAILS === 0 ? 0 : 1);
