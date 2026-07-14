@@ -10226,5 +10226,18 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   assert(/Luận giải/.test(html) || /Big Three/.test(html), `[western-interp] render có section luận giải`);
   console.log("   [western-interp] luận giải ✓ — 3 bigThree + 10 planets (sign reading) + aspects + element, render OK");
 }
+
+// [NEW SCHOOLS] tarot/numerology/rune/iching/coffee tools (grok research)
+{
+  const { execTool, AI_TOOLS } = await import("./src/engine/ai.js");
+  const R = analyze(1993, 10, 27, 14, 30, "nu", 2026);
+  for (const t of ["analyze_tarot","analyze_numerology","analyze_rune","analyze_iching","analyze_coffee"]) {
+    const r = execTool(t, {count:3,name:"Test"}, R);
+    assert(!r.error, `[new-schools] ${t} ok (got ${r.error||"ok"})`);
+  }
+  assert(["analyze_tarot","analyze_numerology","analyze_rune","analyze_iching","analyze_coffee"].every(t=>AI_TOOLS.some(x=>x?.function?.name===t)), `[new-schools] 5 tools registered`);
+  console.log("   [new-schools] 5 tools ✓ — tarot/numerology/rune/iching/coffee (grok research, 11 schools crawled)");
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

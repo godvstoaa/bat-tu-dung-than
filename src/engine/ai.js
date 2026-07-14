@@ -22,6 +22,12 @@ import { computeWesternChart, westernSummary } from './western-astro.js';
 import { computeWesternForecast, forecastSummary } from './western-predict.js';
 import { synthesisDimensions, synthesisTimeline } from './western-synthesis.js';
 import { SUN_IN_SIGN, MOON_IN_SIGN, ASCENDANT_MEANING, WESTERN_PLANETS, BAZI_WESTERN_MAP } from './western-kb.js';
+// [NEW SCHOOLS] Tarot / Numerology / Runes / IChing64 / Coffee — grok research
+import { drawTarot, tarotSummary, TAROT_MAJOR, TAROT_SUITS } from './tarot-kb.js';
+import { numerologyReading, lifePathNumber, LIFE_PATH } from './numerology.js';
+import { drawRune, RUNES } from './runes-kb.js';
+import { ichingRandom, ICHING_64 } from './iching64-kb.js';
+import { coffeeRead, COFFEE_SYMBOLS } from './coffee-kb.js';
 import { think as brainThink } from '../brain/brain.js';
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
@@ -972,6 +978,7 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
   try {
     const notes = (BAZI_WESTERN_MAP?.COMPARISON_NOTES || []).join(' ');
     brief += `\n--- PHƯƠNG TÂY ĐỐI CHIẾU (framework) ---\nHệ Bát Tự (tài liệu trên) có thể ĐỐI CHIẾU với chiêm tinh phương Tây qua tool \`analyze_western\` (tính Sun/Moon/Mercury.../Pluto + Ascendant + 12 houses + aspects từ cùng giờ sinh). Mapping: Nhật Chủ ≈ Mặt Trời (cái tôi), 阴/Ấn ≈ Mặt Trăng (cảm xúc, gần), Dụng Thần KHÔNG có tương đương Western, Ascendant KHÔNG có trong BaZi, Ngũ hành (5) ≠ 4 nguyên tố. ${notes} Khi user hỏi «so sánh/đối chiếu/phương Tây/chiêm tinh» → gọi analyze_western (hỏi nơi sinh nếu cần Ascendant chính xác).`;
+    brief += `\n--- CÁC TRƯỜNG PHÁI BÓI TOÁN KHÁC (tools sẵn có — gọi khi user hỏi) ---\n• TAROT (22 Major Arcana, Rider-Waite): tool \`analyze_tarot\` rút 3 lá Quá khứ-Hiện tại-Tương lai (upright/reversed).\n• THẦN SỐ HỌC (Numerology Pythagorean): tool \`analyze_numerology\` Life Path từ ngày sinh + Expression từ tên.\n• RUNES (24 Elder Futhark Bắc Âu): tool \`analyze_rune\` rút rune.\n• KINH DỊCH 64 quẻ: tool \`analyze_iching\` rút 1 quẻ (gọn; cho chi tiết dùng 河洛/鬼谷卦 tool).\n• ĐỌC BÃ CÀ PHÊ/TRÀ: tool \`analyze_coffee\` 3 ký hiệu.\n→ Khi user hỏi «bói tarot/số đường đời/rune/quẻ cà phê» → gọi tool tương ứng. Các trường phái này đều tham khảo, không định mệnh — luôn nói rõ.`;
   } catch (_) {}
 
   return brief;
@@ -1431,6 +1438,26 @@ export const AI_TOOLS = [
       lng: { type: 'number', description: 'Kinh độ nơi sinh (mặc định 105.85 Hà Nội).' },
     }, required: [] },
   } },
+  { type: 'function', function: {
+    name: 'analyze_tarot', description: 'TAROT — rút 3 (hoặc N) lá Major Arcana Rider-Waite (Quá khứ-Hiện tại-Tương lai) kèm luận upright/reversed. Dùng khi user hỏi «bói bài tarot/rút tarot/xem bài tây phương Tây». Args: count (1-5, mặc định 3). Truyền thống Tây, tham khảo — không định mệnh.',
+    parameters: { type: 'object', properties: { count: { type: 'number', description: 'Số lá (1-5, mặc định 3).' } }, required: [] },
+  } },
+  { type: 'function', function: {
+    name: 'analyze_numerology', description: 'THẦN SỐ HỌC (Numerology Pythagorean) — Life Path Number (từ ngày sinh) + Expression (từ tên). Dùng khi user hỏi «số đường đời/con số may mắn/numerology/thần số học/sinh ngày X số mấy». Args: name (tên, tùy chọn — để tính Expression).',
+    parameters: { type: 'object', properties: { name: { type: 'string', description: 'Tên (để tính Expression Number, tùy chọn).' } }, required: [] },
+  } },
+  { type: 'function', function: {
+    name: 'analyze_rune', description: 'RUNES — rút 1-3 rune cổ Bắc Âu (Elder Futhark, 24 rune) kèm ý nghĩa. Dùng khi user hỏi «bói rune/rune casting/phép bói Bắc Âu». Args: count (1-3, mặc định 1).',
+    parameters: { type: 'object', properties: { count: { type: 'number', description: 'Số rune (1-3, mặc định 1).' } }, required: [] },
+  } },
+  { type: 'function', function: {
+    name: 'analyze_iching', description: 'KINH DỊCH — rút 1 quẻ trong 64 quẻ cho câu hỏi hiện tại. Dùng khi user hỏi «bói quẻ kinh dịch/xem quẻ Dịch/lấy 1 quẻ». (App đã có 河洛+鬼谷卦 tool khác — tool này cho quẻ đơn giản nhanh.)',
+    parameters: { type: 'object', properties: {}, required: [] },
+  } },
+  { type: 'function', function: {
+    name: 'analyze_coffee', description: 'ĐỌC BÃ CÀ PHÊ/TRÀ — 3 ký hiệu ngẫu nhiên + ý nghĩa. Dùng khi user hỏi «đọc bã cà phê/bói cà phê/đọc lá trà». Truyền thống Thổ Nhĩ Kỳ/Phương Đông.',
+    parameters: { type: 'object', properties: { count: { type: 'number', description: 'Số ký hiệu (1-5, mặc định 3).' } }, required: [] },
+  } },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -1645,6 +1672,41 @@ export function execTool(name, args, R) {
             note: 'Sơ đồ tổng hợp BaZi↔Western. Dimensions verdict: resonance(2 hệ khớp)/approx(gần)/gap(lech/không map). Timeline convergence = 2 hệ cùng cát/hung hay lệch. Cả 2 hệ tham khảo, không validate khoa học.',
           };
         } catch (e) { return { error: 'lỗi tính analyze_synthesis: ' + e.message }; }
+      }
+      case 'analyze_tarot': { // [TAROT] rút 3 lá Major Arcana (quá khứ-hiện tại-tương lai) + luận
+        try {
+          const n = Math.min(Math.max(Number(a.count) || 3, 1), 5);
+          const draw = drawTarot(n);
+          return { spread: tarotSummary(draw), cards: draw, note: 'Tarot Major Arcana (Rider-Waite). Rút ngẫu nhiên past-present-future. Mỗi lá có upright/reversed. Tham khảo — không định mệnh.' };
+        } catch (e) { return { error: 'lỗi rút tarot: ' + e.message }; }
+      }
+      case 'analyze_numerology': { // [NUMEROLOGY] Life Path + Expression từ ngày sinh + tên
+        try {
+          const inp = R.chart?.input || {};
+          const name = a.name || inp.name || '';
+          const r = numerologyReading(inp.year || 1990, inp.month || 1, inp.day || 15, name);
+          return { ...r, note: 'Thần số học Pythagorean. Life Path từ ngày sinh, Expression từ tên. Tham khảo.' };
+        } catch (e) { return { error: 'lỗi numerology: ' + e.message }; }
+      }
+      case 'analyze_rune': { // [RUNES] rút rune cổ Bắc Âu (Elder Futhark)
+        try {
+          const n = Math.min(Math.max(Number(a.count) || 1, 1), 3);
+          const draw = drawRune(n);
+          return { runes: draw, summary: draw.map(r => r.symbol + ' ' + r.name + (r.reversed ? ' (đảo)' : '') + ' — ' + r.text).join(' | '), note: 'Elder Futhark runes (24). Rút ngẫu nhiên. Tham khảo.' };
+        } catch (e) { return { error: 'lỗi runes: ' + e.message }; }
+      }
+      case 'analyze_iching': { // [ICHING] rút 1 quẻ Kinh Dịch (64 quẻ)
+        try {
+          const q = ichingRandom();
+          return { hexagram: q, note: 'Kinh Dịch — 64 quẻ. Rút ngẫu nhiên 1 quẻ cho câu hỏi. Tham khảo.' };
+        } catch (e) { return { error: 'lỗi iching: ' + e.message }; }
+      }
+      case 'analyze_coffee': { // [COFFEE] đọc bã cà phê — 3 ký hiệu ngẫu nhiên
+        try {
+          const n = Math.min(Math.max(Number(a.count) || 3, 1), 5);
+          const read = coffeeRead(n);
+          return { symbols: read, summary: read.map(s => s.symbol + ' (' + s.position + ') — ' + s.text).join(' | '), note: 'Đọc bã cà phê/trà — ký hiệu ngẫu nhiên. Truyền thống Thổ Nhĩ Kỳ/Phương Đông. Tham khảo.' };
+        } catch (e) { return { error: 'lỗi coffee reading: ' + e.message }; }
       }
       case 'log_error': { // [R46] AI tự log lỗi khi bị user sửa — structured error report + POST to server KV
         try { fetch('/api/log-error', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).catch(() => {}); } catch (_) {}
