@@ -2920,3 +2920,43 @@ h2.grp {
 /* HỢP TUỔI 3D */
 .hh3d { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 10px 0; }
 .hh3d-sphere { width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.7), var(--c,#d4af37) 42%, rgba(0,0,0,0.55)); box-shadow: 0 0 18px var(--c,#d4af37); margin: 0 auto 3px; }
+
+/* ===== SYNTHESIS DIAGRAM — Sơ Đồ Tổng Hợp (BaZi ⟷ Western) ===== */
+.synthesis-diagram { padding: 4px 0; }
+.syn-header { text-align: center; margin-bottom: 10px; }
+.syn-crest { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 1.05em; margin-bottom: 4px; }
+.syn-title-bazi { color: var(--gold, #d4af37); font-weight: 700; }
+.syn-title-west { color: #9ab8d4; font-weight: 700; }
+.syn-vs { color: var(--gold-soft, #b89740); font-size: 1.2em; }
+.syn-dims { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.syn-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: stretch; background: rgba(212,175,55,0.04); border: 1px solid rgba(212,175,55,0.15); border-radius: 6px; padding: 8px; }
+.syn-side { display: flex; flex-direction: column; gap: 2px; font-size: .88em; }
+.syn-bazi b { color: var(--gold, #d4af37); }
+.syn-west b { color: #9ab8d4; }
+.syn-side .syn-label { font-size: .72em; color: var(--gold-soft, #9a8040); text-transform: uppercase; letter-spacing: .5px; }
+.syn-west { text-align: right; align-items: flex-end; }
+.syn-mid { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 110px; max-width: 160px; font-size: .78em; text-align: center; }
+.syn-badge { padding: 2px 8px; border-radius: 10px; font-size: .78em; font-weight: 600; white-space: nowrap; }
+.syn-badge.rate-cat { background: rgba(42,158,107,0.18); color: #5fd49a; }
+.syn-badge.rate-mid { background: rgba(212,175,55,0.15); color: var(--gold, #d4af37); }
+.syn-badge.rate-bad { background: rgba(232,90,58,0.18); color: #f08a6a; }
+.syn-dim { font-weight: 600; color: var(--gold-bright, #e8c870); font-size: .82em; }
+.syn-note { color: var(--gold-soft, #8a7338); font-size: .72em; line-height: 1.35; }
+.syn-tl { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.syn-tl-row { display: grid; grid-template-columns: 60px 1fr 1fr 90px; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; font-size: .8em; background: rgba(212,175,55,0.03); border-left: 3px solid var(--gold-soft, #8a7338); }
+.syn-tl-row.syn-conv-cat { border-left-color: #2a9e6b; background: rgba(42,158,107,0.07); }
+.syn-tl-row.syn-conv-hung { border-left-color: #e85a3a; background: rgba(232,90,58,0.07); }
+.syn-tl-row.syn-conv-cat-light { border-left-color: #5fd49a; }
+.syn-tl-row.syn-conv-hung-light { border-left-color: #f08a6a; }
+.syn-tl-year { font-weight: 700; color: var(--gold-bright, #e8c870); }
+.syn-tl-side { font-size: .8em; color: var(--gold-soft, #b89740); line-height: 1.4; }
+.syn-tl-side .hint-inline { color: #7a6a40; font-size: .9em; }
+.syn-tl-conv { font-size: .76em; font-weight: 600; text-align: center; }
+@media (max-width: 600px) {
+  .syn-row { grid-template-columns: 1fr; gap: 4px; }
+  .syn-mid { max-width: none; flex-direction: row; justify-content: center; flex-wrap: wrap; }
+  .syn-west { text-align: left; align-items: flex-start; }
+  .syn-tl-row { grid-template-columns: 50px 1fr; grid-template-areas: 'year conv' 'bazi bazi' 'west west'; gap: 4px; }
+  .syn-tl-year { grid-area: year; } .syn-tl-conv { grid-area: conv; text-align: right; }
+  .syn-tl-side:nth-of-type(2) { grid-area: bazi; } .syn-tl-side:nth-of-type(3) { grid-area: west; }
+}

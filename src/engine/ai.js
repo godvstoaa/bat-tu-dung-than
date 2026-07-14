@@ -19,6 +19,8 @@ import { assessWuyunLiuqi } from './wuyun-liuqi.js'; // [round 42] 五运六气 
 import { PENGZU_BAIJI } from './kb.js';
 import { assessAppearance } from './appearance-engine.js';
 import { computeWesternChart, westernSummary } from './western-astro.js';
+import { computeWesternForecast, forecastSummary } from './western-predict.js';
+import { synthesisDimensions, synthesisTimeline } from './western-synthesis.js';
 import { SUN_IN_SIGN, MOON_IN_SIGN, ASCENDANT_MEANING, WESTERN_PLANETS, BAZI_WESTERN_MAP } from './western-kb.js';
 import { think as brainThink } from '../brain/brain.js';
 import { analyzeKongwang } from './kongwang.js';
@@ -198,7 +200,7 @@ export function getConfig() {
   if (cfg) {
     // [loop 1387 FIX BUG SIÊU NGHIÊM TRỌNG] heal cfg hỏng: enabled nhưng THIẾU endpoint/model
     //   (do bug main.js PRESETS['cf-glm'] từng set {enabled:true}) → isAIReady FALSE → AI toàn
-    //   local fallback («Trợ lý cục bộ») → khách rời. Tự sửa + persist cho user đã stuck.
+    //   local fallback («Giải Mệnh cục bộ») → khách rời. Tự sửa + persist cho user đã stuck.
     if (cfg.enabled && (!cfg.endpoint || !cfg.model)) {
       const _cf = PRESETS.find((p) => p.id === 'cf-glm') || PRESETS[0];
       cfg = { enabled: true, endpoint: _cf.endpoint, apiKey: '', model: _cf.model, preset: 'cf-glm' };
@@ -1412,6 +1414,13 @@ export const AI_TOOLS = [
       lng: { type: 'number', description: 'Kinh độ nơi sinh (độ, +Đông). Mặc định 105.85 (Hà Nội).' },
     }, required: [] },
   } },
+  { type: 'function', function: {
+    name: 'analyze_synthesis', description: 'SƠ ĐỒ TỔNG HỢP BaZi↔Western — đối chiếu trực quan 2 trường phái cho CÙNG lá số. Trả: (1) 8 chiều tính cách [BaZi value ⟷ verdict ⟷ Western value] (resonance/approx/gap), (2) DỰ BÁO TƯƠNG LAI 10 năm: Đại vận/Lưu niên BaZi ⟷ Annual Profections/Transits Western + convergence từng năm (2 hệ cùng cát/hung hay lệch). Dùng khi user muốn «so sánh tổng quan/đối chiếu cả 2 hệ/xem 2 hệ giống khác ra sao/vận trình 2 góc nhìn». Kèm BAZI_WESTERN_MAP + honest caveats (không map 1:1, không khoa học). Args lat/lng tùy chọn (mặc định Hà Nội).',
+    parameters: { type: 'object', properties: {
+      lat: { type: 'number', description: 'Vĩ độ nơi sinh (mặc định 21.03 Hà Nội).' },
+      lng: { type: 'number', description: 'Kinh độ nơi sinh (mặc định 105.85 Hà Nội).' },
+    }, required: [] },
+  } },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -1605,6 +1614,27 @@ export function execTool(name, args, R) {
           const compare = BAZI_WESTERN_MAP;
           return { chart: wc, interpretation: interp, summary: westernSummary(wc), baziWesternComparison: compare, note: 'Bản đồ sao phương Tây (tropical). Mặc định toạ độ Hà Nội nếu user không cho —Ascendant nhạy địa điểm. BaZi (trong brief) ↔ Western (tool này) để đối chiếu.' };
         } catch (e) { return { error: 'lỗi tính analyze_western: ' + e.message }; }
+      }
+      case 'analyze_synthesis': { // [SYNTHESIS] sơ đồ tổng hợp BaZi↔Western (tính cách + dự báo tương lai)
+        try {
+          const inp = R.chart?.input || {};
+          const lat = Number(a.lat) || 21.03;
+          const lng = Number(a.lng) || 105.85;
+          const baseDay = new Date(Date.UTC(inp.year || 1990, (inp.month || 1) - 1, inp.day || 15, 0, 0, 0));
+          baseDay.setUTCMinutes(baseDay.getUTCMinutes() + ((inp.hour ?? 12) * 60 + (inp.minute || 0)) - (lng / 15) * 60);
+          const W = computeWesternChart(baseDay, lat, lng);
+          const fc = computeWesternForecast(W, baseDay, new Date().getFullYear(), 10);
+          const dims = synthesisDimensions(R, W);
+          const tl = synthesisTimeline(R, fc, new Date().getFullYear());
+          return {
+            bigThree: W.summary.bigThree,
+            dimensions: dims.map(d => ({ dim: d.dim, bazi: d.bazi.value, western: d.western.value, verdict: d.verdict, note: d.note })),
+            timeline: tl.map(t => ({ year: t.year, age: t.age, bazi: t.bazi.dayun + ' / ' + t.bazi.liunian + (t.bazi.isGolden ? ' ★vàng' : ''), western: t.western.profection + (t.western.topTransit ? ' / ' + t.western.topTransit : ''), convergence: t.convergence })),
+            forecast: forecastSummary(fc),
+            comparisonFramework: BAZI_WESTERN_MAP,
+            note: 'Sơ đồ tổng hợp BaZi↔Western. Dimensions verdict: resonance(2 hệ khớp)/approx(gần)/gap(lech/không map). Timeline convergence = 2 hệ cùng cát/hung hay lệch. Cả 2 hệ tham khảo, không validate khoa học.',
+          };
+        } catch (e) { return { error: 'lỗi tính analyze_synthesis: ' + e.message }; }
       }
       case 'log_error': { // [R46] AI tự log lỗi khi bị user sửa — structured error report + POST to server KV
         try { fetch('/api/log-error', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).catch(() => {}); } catch (_) {}
@@ -2242,7 +2272,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   };
   try {
     for (let step = 0; step < 6 && totalAttempts < 9; step++, totalAttempts++) {
-      if (Date.now() - _tStart > 180000) return _bail('⏱ AI trả lời quá lâu (>3 phút)');
+      if (Date.now() - _tStart > 180000) return _bail('⏱ Luận giải trực tuyến trả lời quá lâu (>3 phút)');
       let round;
       try {
         round = await streamRound(url, headers, buildBody(messages, toolsOn, thinkOn), onToken, onStatus, signal);
@@ -2292,8 +2322,8 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
     }
     const isCors = /Failed to fetch|NetworkError|Load failed/i.test(e.message);
     const hint = isCors
-      ? `Không gọi được AI — CORS: trình duyệt chặn ${cfg.endpoint}. Mở ⚙ chọn "★ PROXY DEV" (npm run dev) hoặc backend.`
-      : `Không gọi được AI: ${e.message}.`;
+      ? `Không kết nối được luận giải trực tuyến — trình duyệt chặn kết nối. Mở ⚙ chọn nguồn mặc định.`
+      : `Không kết nối được luận giải trực tuyến: ${e.message}.`;
     return localFallback(hint + ' Hiện trả lời bằng bộ luân giải cục bộ.', { error: String(e.message || e).slice(0, 200) }); // [loop 1374] log error reason
   }
 }
@@ -2310,7 +2340,7 @@ export async function testAIConnection(cfg) {
       headers: { 'Content-Type': 'application/json', ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}) },
       body: JSON.stringify({ model: cfg.model, messages: [{ role: 'user', content: 'ping' }], max_tokens: 100, stream: false }),
     });
-    if (res.ok) return { ok: true, detail: `✅ Kết nối OK (HTTP ${res.status}). AI sẵn sàng — hãy bật AI và hỏi.` };
+    if (res.ok) return { ok: true, detail: `✅ Kết nối OK. Luận giải trực tuyến sẵn sàng — hãy bật và hỏi.` };
     let t = ''; try { t = (await res.text()).slice(0, 160); } catch (_) {}
     if (res.status === 401 || res.status === 403) return { ok: false, detail: `❌ HTTP ${res.status} — API key sai/hết hạn. ${t}` };
     return { ok: false, detail: `❌ HTTP ${res.status} ${res.statusText}. ${t}` };
@@ -2345,7 +2375,7 @@ async function streamRound(url, headers, body, onToken, onStatus, signal) {
   try {
   const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal: _sig });
   if (res.status === 503) { // [admin loop 1351] AI bị admin tắt → fallback local NGAY (không retry)
-    const err = new Error('AI bị tắt bởi quản trị viên (503)');
+    const err = new Error('Luận giải trực tuyến bị tắt bởi quản trị viên');
     err.aiDisabled = true;
     throw err;
   }

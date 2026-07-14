@@ -891,7 +891,7 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
 //   Trước đây 5 tool bói (analyze_char/meihua/liuren/qimen/guiguzi) FLAT → Z.ai API reject → AI không bao giờ gọi được.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 30, `[loop 623→R42] AI_TOOLS có đúng 30 tool (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 31, `[loop 623→R42] AI_TOOLS có đúng 31 tool (got ${AI_TOOLS.length})`);
   const flat = AI_TOOLS.filter((t) => !(t && t.type === 'function' && t.function && t.function.name));
   assert(flat.length === 0, `[loop 623] KHÔNG còn tool FLAT — tất cả phải có wrapper {type:function,function:{name}} (còn ${flat.length} flat: ${flat.map(t=>t&&t.name).join(',')})`);
   const names = AI_TOOLS.map((t) => t.function.name);
@@ -4491,7 +4491,7 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
 // [loop 792] 19 AI tool descriptions — mỗi tool có description + when-to-use guidance.
 {
   const { AI_TOOLS } = await import('./src/engine/ai.js');
-  assert(AI_TOOLS.length === 30, `[loop 792→R49] 30 tools (got ${AI_TOOLS.length})`);
+  assert(AI_TOOLS.length === 31, `[loop 792→R49] 31 tools (got ${AI_TOOLS.length})`);
   let _noDesc = 0;
   for (const t of AI_TOOLS) {
     const _d = t.function?.description || t.description || '';
@@ -10148,6 +10148,36 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   const tw = execTool('analyze_western', {}, R);
   assert(!tw.error && tw.interpretation?.bigThree, `[western] execTool analyze_western ok (got ${tw.error || tw.interpretation?.bigThree})`);
   console.log(`   [western] bản đồ sao 1990-06-15 ✓ — ${c.summary.bigThree}, outer planets Ma Kết/Thiên Yết (historical accuracy), ${c.aspects.length} aspects`);
+}
+
+// ============================================================================
+// [SYNTHESIS + PREDICT] — sơ đồ tổng hợp + dự báo Western
+// ============================================================================
+{
+  const { computeWesternForecast, annualProfection } = await import('./src/engine/western-predict.js');
+  const { synthesisDimensions, synthesisTimeline, renderSynthesisCard } = await import('./src/engine/western-synthesis.js');
+  const { computeWesternChart } = await import('./src/engine/western-astro.js');
+  const { execTool, AI_TOOLS } = await import('./src/engine/ai.js');
+  const prof = annualProfection(4, 33);
+  assert(prof.profectionSignVi === 'Kim Ngưu' && prof.profectionHouseNum === 10, `[synth] profection Asc-Leo age33 = Kim Ngưu/cung10 (got ${prof.profectionSignVi}/${prof.profectionHouseNum})`);
+  assert(/Sao Kim/.test(prof.rulerOfYear), `[synth] profection ruler = Sao Kim (got ${prof.rulerOfYear})`);
+  const birth = new Date(Date.UTC(1993, 9, 21, 0, 0, 0)); birth.setUTCMinutes((1 * 60 + 10) - (105.85 / 15) * 60);
+  const W = computeWesternChart(birth, 21.03, 105.85);
+  const fc = computeWesternForecast(W, birth, 2026, 10);
+  assert(fc.years.length === 10, `[synth] forecast 10 năm (got ${fc.years.length})`);
+  assert(fc.years.every(y => y.profection && y.topTransits), '[synth] mỗi năm có profection + transits');
+  const Rb = analyze(1993, 10, 21, 1, 10, 'nam', 2026);
+  const dims = synthesisDimensions(Rb, W);
+  assert(dims.length === 8, `[synth] 8 dimension rows (got ${dims.length})`);
+  assert(/Ất Mộc/.test(dims[0].bazi.value), `[synth] dim0 bazi = Ất Mộc (got ${dims[0].bazi.value})`);
+  const tl = synthesisTimeline(Rb, fc, 2026);
+  assert(tl.length === 10 && tl.every(t => t.convergence), '[synth] timeline 10 năm có convergence');
+  const html = renderSynthesisCard(Rb, birth, 21.03, 105.85, 2026);
+  assert(/Dimension Bridge/.test(html) && /Timeline 10 năm/.test(html), '[synth] renderSynthesisCard có 2 phần');
+  assert(AI_TOOLS.some(t => t?.function?.name === 'analyze_synthesis'), '[synth] AI_TOOLS có analyze_synthesis');
+  const ts = execTool('analyze_synthesis', {}, Rb);
+  assert(!ts.error && ts.dimensions?.length === 8 && ts.timeline?.length === 10, `[synth] execTool analyze_synthesis ok (got ${ts.error || ts.dimensions?.length + 'd/' + ts.timeline?.length + 't'})`);
+  console.log(`   [synth] sơ đồ tổng hợp + forecast ✓ — 8 dims, 10 năm timeline, bigThree ${ts.bigThree}, AI tool analyze_synthesis`);
 }
 
 process.exit(FAILS === 0 ? 0 : 1);

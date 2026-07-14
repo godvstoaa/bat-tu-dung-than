@@ -3537,6 +3537,22 @@ function renderWestern(R) {
   }
 }
 
+function renderWesternSynthesis(R) {
+  const el = $('western-synthesis');
+  if (!el) return;
+  try {
+    const inp = R.chart.input;
+    const locVal = ($('western-loc')?.value || '21.03,105.85').split(',').map(Number);
+    const [lat, lng] = locVal.length === 2 ? locVal : [21.03, 105.85];
+    const baseDay = new Date(Date.UTC(inp.year || 1990, (inp.month || 1) - 1, inp.day || 15, 0, 0, 0));
+    baseDay.setUTCMinutes(baseDay.getUTCMinutes() + ((inp.hour ?? 12) * 60 + (inp.minute || 0)) - (lng / 15) * 60);
+    el.innerHTML = renderSynthesisCard(R, baseDay, lat, lng, new Date().getFullYear());
+  } catch (e) {
+    el.innerHTML = '<p class="hint">Không tính được sơ đồ tổng hợp.</p>';
+    console.warn('western-synthesis', e.message);
+  }
+}
+
 // ---------------------------------------------------------------- 天星择日 (TIAN XING ZHE RI — star date selection)
 // Module tương tác: user chọn 24-mountain sitting → chấm 60 ngày tới → top 5 tốt + 3 kỵ.
 function renderTianxingZheri() {
@@ -3877,7 +3893,7 @@ function renderLiunianChart(R) {
         <span class="hint" style="font-size:9px;color:${col}">${esc((yr.rating||'').slice(0,6))}</span>
       </div>`;
     }).join('');
-    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 ${curYear}–${curYear+9} · Xanh = Cát · Đỏ = Hung · Xám = Bình. Hover: 十二长生 + 冲/合 + 盖头截脚. Click 💬 AI hỏi chi tiết năm nào.</p>`;
+    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:1px;padding:8px 0;overflow-x:auto">${bars}</div><p class="hint" style="margin-top:4px">📊 ${curYear}–${curYear+9} · Xanh = Cát · Đỏ = Hung · Xám = Bình. Hover: 十二长生 + 冲/合 + 盖头截脚. Click 💬 để hỏi chi tiết năm nào.</p>`;
   } catch (e) { el.innerHTML = '<p class="hint">Không tính được vận trục lưu niên.</p>'; }
 }
 
@@ -4209,7 +4225,7 @@ function appendMsg(role, text) {
   wrap.className = `msg msg-${role}`;
   const badge = document.createElement('div');
   badge.className = 'msg-badge';
-  badge.textContent = role === 'user' ? 'Bạn' : 'Trợ lý';
+  badge.textContent = role === 'user' ? 'Bạn' : 'Giải Mệnh';
   const body = document.createElement('div');
   body.className = 'msg-text';
   if (role === 'assistant') body.innerHTML = _md(text); else body.textContent = text;
@@ -4222,7 +4238,7 @@ function appendMsg(role, text) {
 function updateAIStatus() {
   const cfg = getConfig();
   $('ai-status').textContent = isAIReady(cfg)
-    ? `✓ Đang dùng AI (${cfg.model})` : '⊘ Chưa cấu hình AI — đang dùng bộ luân giải cục bộ. Bấm ⚙ để bật AI.';
+    ? `✓ Đang dùng luận giải trực tuyến` : '⊘ Chưa kết nối luận giải trực tuyến — đang dùng bộ luân giải cục bộ. Bấm ⚙ để bật.';
 }
 
 let _aiBusy = false;
@@ -4278,7 +4294,7 @@ async function handleAsk() {
     });
     body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
     body.classList.remove('streaming');
-    badge.textContent = source === 'ai' ? 'Trợ lý AI' : 'Trợ lý (cục bộ)';
+    badge.textContent = source === 'ai' ? 'Giải Mệnh (trực tuyến)' : 'Giải Mệnh (cục bộ)';
     _logEvent('ai_chat', { q: q, response: text, source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed, detail: meta && meta.detail, toolsOn0: meta && meta.toolsOn0, error: meta && meta.error }); // [loop 1387] LUÔN log frontend (server capture ko reliable response dài)
     // [loop 947] message actions (refactored → addMsgActions helper, dùng cả cho restore)
     addMsgActions(body, text);
@@ -4308,7 +4324,7 @@ async function handleAsk() {
     if (e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''))) {
       body.textContent = '(⏹ đã dừng — bạn có thể hỏi lại)';
       body.classList.remove('streaming');
-      badge.textContent = 'Trợ lý';
+      badge.textContent = 'Giải Mệnh';
     } else {
       body.textContent = 'Lỗi: ' + e.message;
       body.classList.remove('streaming');
@@ -4740,6 +4756,7 @@ async function run() {
   lazyRender('ziwei-sanfang',  () => { try { renderZiweiSanfang(currentResult); } catch (e) { console.warn('ziweisanfang', e.message); } });
   lazyRender('qizheng',        () => { try { renderQizheng(currentResult); } catch (e) { console.warn('qizheng', e.message); } });
   lazyRender('western',        () => { try { renderWestern(currentResult); } catch (e) { console.warn('western', e.message); } });
+  lazyRender('western-synthesis', () => { try { renderWesternSynthesis(currentResult); } catch (e) { console.warn('western-synthesis', e.message); } });
   lazyRender('tianxing-zheri', () => { try { renderTianxingZheri(); } catch (e) { console.warn('tianxing', e.message); } });
   lazyRender('golden-year',    () => { try { renderGoldenYear(currentResult); } catch (e) { console.warn('goldenyear', e.message); } });
   lazyRender('daily-capsule',  () => { try { renderDailyCapsule(currentResult); } catch (e) { console.warn('daily-capsule', e.message); } });
@@ -5821,7 +5838,7 @@ $('lr-find').addEventListener('click', () => {
 });
 $('ts-btn').addEventListener('click', () => renderTaisui(parseInt($('ts-year').value, 10) || new Date().getFullYear()));
 $('lns-btn').addEventListener('click', () => renderLiunianShen(parseInt($('lns-year').value, 10) || new Date().getFullYear()));
-$('western-loc')?.addEventListener('change', () => { if (currentResult) renderWestern(currentResult); });
+$('western-loc')?.addEventListener('change', () => { if (currentResult) { renderWestern(currentResult); renderWesternSynthesis(currentResult); } });
 $('lns12-btn').addEventListener('click', () => renderLiunian12Shen(parseInt($('lns12-year').value, 10) || new Date().getFullYear()));
 $('nm-btn').addEventListener('click', renderName);
 if($('nm-vi-btn')){$('nm-vi-btn').addEventListener('click', ()=>{ const vi=$('nm-vi').value.trim(); if(!vi) return; const r=viToHan(vi); if(r.ok){ $('nm-input').value=r.hanString; renderName(); } else { $('nm-input').value=r.hanString; $('nm-strokes').value=r.strokes.map((s,i)=>r.chars[i].han+'='+s).join(','); renderName(); } });}
@@ -5966,7 +5983,7 @@ function _exportChat() {
   if (!chatHistory.length) return;
   const subj = currentResult?.chart?.input;
   const head = subj ? `# Hội thoại Bát Tự — ${subj.year}/${subj.month}/${subj.day} (${subj.gender})\n\n` : '# Hội thoại Bát Tự\n\n';
-  const body = chatHistory.map(m => m.role === 'user' ? `## ❓ Bạn\n\n${m.content}\n` : `## 💬 Trợ lý\n\n${m.content}\n`).join('\n');
+  const body = chatHistory.map(m => m.role === 'user' ? `## ❓ Bạn\n\n${m.content}\n` : `## 💬 Giải Mệnh\n\n${m.content}\n`).join('\n');
   const md = head + body + '\n---\n*Xuất từ Bát Tự Dụng Thần · battu.god8.shop*\n';
   const blob = new Blob([md], { type: 'text/markdown' });
   const a = document.createElement('a');
@@ -6006,7 +6023,7 @@ $('cfg-test').addEventListener('click', async () => {
 (function () { const fab = $('ai-fab'), pop = $('ai-popup'); if (fab) document.body.appendChild(fab); if (pop) document.body.appendChild(pop); })();
 
 // AI popup (chat widget nổi): mở/đóng. [loop 358] Dùng event DELEGATION (gắn vào document)
-//   thay vì addEventListener trực tiếp — fix bug «sau Luận giải, bấm Trợ lý AI không hoạt động»:
+//   thay vì addEventListener trực tiếp — fix bug «sau Luận giải, bấm Giải Mệnh không hoạt động»:
 //   listener trực tiếp bị mất nếu element bị thay thế (innerHTML #result lúc error, hoặc re-render).
 //   Delegation survive mọi thay thế element → click luôn hoạt động.
 function openAIPopup() {
@@ -6028,10 +6045,10 @@ function openAIPopup() {
           : '👋 Con quay lại rồi! Lá số con thầy vẫn giữ. Hôm nay muốn biết thêm gì?';
         appendMsg('assistant', greet);
       } else {
-        appendMsg('assistant', 'Xin chào! Tôi là trợ lý Bát Tự AI. Bạn đã lập lá số — hãy hỏi tôi bất cứ điều gì về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà…');
+        appendMsg('assistant', 'Xin chào! Tôi là Giải Mệnh Bát Tự — thầy giúp con giải mã lá số. Hỏi thầy về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà…');
       }
     } catch (_) {
-      appendMsg('assistant', 'Xin chào! Tôi là trợ lý Bát Tự AI. Bạn đã lập lá số — hãy hỏi tôi bất cứ điều gì về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà…');
+      appendMsg('assistant', 'Xin chào! Tôi là Giải Mệnh Bát Tự — thầy giúp con giải mã lá số. Hỏi thầy về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà…');
     }
   }
 }
