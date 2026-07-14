@@ -10210,5 +10210,21 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log("   [samesex] cùng/khác giới path ✓ — spouse peer vs Tài/Quan, hehun skip gendered, child giữ birth-sex");
 }
 
+
+// [WESTERN-INTERP] luận giải bản đồ sao phương Tây (grok research)
+{
+  const { computeWesternChart } = await import("./src/engine/western-astro.js");
+  const { interpretWestern, renderInterpretation } = await import("./src/engine/western-interpretation.js");
+  const birth = new Date(Date.UTC(1993,9,21,0,0,0)); birth.setUTCMinutes((1*60+10)-(105.85/15)*60);
+  const W = computeWesternChart(birth, 21.03, 105.85);
+  const interp = interpretWestern(W);
+  assert(interp.bigThree.length === 3, `[western-interp] 3 Big Three`);
+  assert(interp.planets.length === 10, `[western-interp] 10 planets (got ${interp.planets.length})`);
+  assert(interp.planets.every(p => p.signReading && p.signReading.length > 10), `[western-interp] mỗi planet có sign reading`);
+  assert(interp.aspects.length > 0, `[western-interp] aspects match (got ${interp.aspects.length})`);
+  const html = renderInterpretation(W);
+  assert(/Luận giải/.test(html) || /Big Three/.test(html), `[western-interp] render có section luận giải`);
+  console.log("   [western-interp] luận giải ✓ — 3 bigThree + 10 planets (sign reading) + aspects + element, render OK");
+}
 process.exit(FAILS === 0 ? 0 : 1);
 

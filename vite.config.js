@@ -76,7 +76,7 @@ export default defineConfig({
           // === ENGINE-WESTERN (BaZi↔Western synthesis + predict + astro + qizheng) ===
           // [FIX] các file western-* mới không được route trước đây → rollup tree-shake/thôi body
           //   → renderSynthesisCard undefined runtime → «Không tính được sơ đồ tổng hợp».
-          if (id.match(/\/src\/engine\/(western-astro|western-predict|western-synthesis|western-kb|qizheng)/)) return 'engine-western';
+          if (id.match(/\/src\/engine\/(western-astro|western-predict|western-synthesis|western-kb|western-interpretation|qizheng)/)) return 'engine-western';
 
           // === main.js (core: chart.js + constants + interactions + main app UI) ===
           // Everything else stays in main — but now MUCH smaller without kb/ai/divination

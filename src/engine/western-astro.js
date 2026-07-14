@@ -9,6 +9,7 @@
 //  Hệ cung: Whole Sign (cổ, Hellene — Asc sign = cung 1). Aspects: 5 major.
 // ============================================================================
 import * as A from 'astronomy-engine';
+import { renderInterpretation } from './western-interpretation.js';
 
 // === 12 CUNG HOÀNG ĐẠO (tropical) ===
 export const SIGNS = [
@@ -250,12 +251,8 @@ export function renderWesternCard(chart) {
         <div style="flex:1;min-width:120px;background:rgba(200,200,230,0.08);padding:8px;border-radius:6px"><div class="hint-inline">☾ Mặt Trăng (Moon)</div><b style="font-size:1.05em">${esc(c.moon.signSymbol)} ${esc(c.moon.signVi)}</b> <span class="hint-inline">${esc(c.moon.degree)}°</span></div>
         <div style="flex:1;min-width:120px;background:rgba(212,175,55,0.08);padding:8px;border-radius:6px"><div class="hint-inline">↑ Ascendant (Rising)</div><b style="font-size:1.05em">${esc(c.ascendant.signSymbol)} ${esc(c.ascendant.signVi)}</b> <span class="hint-inline">${esc(c.ascendant.degree)}°</span></div>
       </div>
-      <details open><summary class="card-title" style="cursor:pointer;font-size:.95em">🌟 Big Three — bản chất cốt lõi</summary>
-        <div style="margin:6px 0;font-size:.92em">
-          <p><b>☀ Sun ${esc(c.sun.signVi)}:</b> ${esc(SUN_IN_SIGN[c.sun.signVi] || '')}</p>
-          <p><b>☾ Moon ${esc(c.moon.signVi)}:</b> ${esc(MOON_IN_SIGN[c.moon.signVi] || '')}</p>
-          <p><b>↑ Rising ${esc(c.ascendant.signVi)}:</b> ${esc(ASCENDANT_MEANING[c.ascendant.signVi] || '')}</p>
-        </div></details>
+      <details open><summary class="card-title" style="cursor:pointer;font-size:.95em">📖 Luận giải lá số phương Tây (natal reading)</summary>
+        ${renderInterpretation(c)}</details>
       <details><summary class="card-title" style="cursor:pointer;font-size:.95em">🪐 10 hành tinh + cung chiếm đóng</summary>
         <table style="width:100%;font-size:.9em;margin-top:6px;border-collapse:collapse">${planetRows}</table></details>
       <details><summary class="card-title" style="cursor:pointer;font-size:.95em">⚡ Aspects (góc hành tinh)</summary>
