@@ -10196,5 +10196,19 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [liuyue] label tháng đúng hệ ✓ — 甲午=«tháng Ngọ/tháng 6 dương» (không «tháng 6 âm»), 12 tháng có mVi`);
 }
 
+
+// [SAME-SEX] integration — cùng/khác giới path
+{
+  const { elementForRole } = await import("./src/engine/family.js");
+  const Rm = analyze(1990, 6, 15, 14, 30, "nam", 2026);
+  assert(elementForRole(Rm.chart.dayGan, true, "spouse").gods.join() === "正財,偏財", "[samesex] khác-giới spouse = Tài (no regression)");
+  assert(elementForRole(Rm.chart.dayGan, true, "spouse", "nam").gods.join() === "比肩,劫財", "[samesex] cùng-giới spouse = peer Tỷ/Kiếp");
+  assert(elementForRole(Rm.chart.dayGan, true, "child", "nam").gods.join() === "七殺,正官", "[samesex] child giữ birth-sex (Quan Sát)");
+  const { computeHehun } = await import("./src/engine/hehun.js");
+  const ssNote = (computeHehun(analyze(1990,6,15,14,30,"nam",2026), analyze(1992,9,27,14,30,"nam",2026)).factors||[]).find(f=>/cùng giới/.test(f));
+  assert(ssNote, "[samesex] hehun cùng-giới có note bỏ gendered cross-check");
+  console.log("   [samesex] cùng/khác giới path ✓ — spouse peer vs Tài/Quan, hehun skip gendered, child giữ birth-sex");
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

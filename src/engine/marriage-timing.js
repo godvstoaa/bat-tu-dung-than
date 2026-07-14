@@ -33,6 +33,14 @@ export function scanMarriageTiming(R, fromYear, count = 12) {
   const dayZhi = R.chart.pillars.day.zhi;       // 配偶 cung
   const yearZhiBirth = R.chart.pillars.year.zhi; // 本命
   const spouseGods = isMale ? ['正財', '偏財'] : ['正官', '七殺'];
+  // [SAME-SEX] nếu user khai đối tượng cùng giới → đọc «sao phối ngẫu» từ NGÀY CHI (Phu Thê cung,
+  //   universal) thay vì Tài/Quan gendered. (Phương pháp day-branch universal — defensible.)
+  const _normG = (g) => ({ nam: 'nam', 'nữ': 'nu', nu: 'nu', male: 'nam', female: 'nu' })[String(g || '').toLowerCase()] || '';
+  const _partner = _normG(R.chart.input.partner);
+  const _sameSex = !!(_partner && _partner === _normG(R.chart.input.gender));
+  const spouseGodsFinal = _sameSex
+    ? (R.chart.pillars.day.hidden || []).map((h) => h.god).filter((g) => g && g !== '日主')
+    : spouseGods;
 
   const years = [];
   // [loop 28 sửa CRITICAL] 红鸾/天喜 là sao CỐ ĐỊNH theo NĂM SINH (年命), KHÔNG phải năm lưu.
@@ -54,7 +62,7 @@ export function scanMarriageTiming(R, fromYear, count = 12) {
     if (zhi === tianXiStar) { score += 2; signals.push(`天喜(${tianXiStar}) ĐẾN → cát hỉ, dễ có việc vui (hôn/thai)`); }
     // 2) 配偶 tinh thấu can
     const g = tenGod(dayGan, gan);
-    if (spouseGods.includes(g)) { score += 2; signals.push(`配偶 tinh (${g}) thấu can năm → sao vợ/chồng hiện`); }
+    if (spouseGodsFinal.includes(g)) { score += 2; signals.push(_sameSex ? `ngày chi (Phu Thê cung) god (${g}) thấu can năm → partner signal` : `配偶 tinh (${g}) thấu can năm → sao vợ/chồng hiện`); }
     // 3) 桃花 năm = chi năm TRÙNG vị đào hoa BẢN MỆNH. [cycle 60 sửa H1] trước đây `taoHua === dayZhi`
     //   ĐẢO (tính đào hoa của NĂM rồi so ngày chi → sai hướng). Đúng: chi năm == TAOHUA[ngày chi/năm sinh chi].
     if (zhi === TAOHUA[dayZhi] || zhi === TAOHUA[yearZhiBirth]) { score += 1; signals.push(`桃花(${zhi}) đến → duyên tình (hôn nhẹ)`); }

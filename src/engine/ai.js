@@ -309,6 +309,7 @@ export function buildChartBrief(R) {
 - THÁNG NAY (lưu nguyệt) = ${curMonthGZ} (${hanviet(curMonthGZ)}) — rating ${curMonthRating}${curMonthNote}
 - ⚠ LƯU NGUYỆT = tháng TIẾT KHÍ (vd ${curMonthGZ} = tháng «${({子:'Tý',丑:'Sửu',寅:'Dần',卯:'Mão',辰:'Thìn',巳:'Tỵ',午:'Ngọ',未:'Mùi',申:'Thân',酉:'Dậu',戌:'Tuất',亥:'Hợi'})[curMonthGZ[1]]}»), GẦN tháng DƯƠNG lịch, KHÔNG PHẢI tháng ÂM lịch (tháng âm lệch 1-2 tháng vs tiết-khí). Khi nói «tháng», PHẢI dùng TÊN CHI-THÁNG (tháng Ngọ/Mùi/Tý...) hoặc «tháng X dương» — KHÔNG BAO GIỜ ghi «tháng X âm» cho lưu nguyệt (sai hệ).
 - Khi user hỏi "tháng này / năm nay" → PHẢI dùng ${curYear} và lưu nguyệt ${curMonthGZ} ở trên.
+- ĐỐI TƯỢNG QUAN TÂM: ${(() => { const p = R.chart?.input?.partner; const g = R.chart?.input?.gender; if (!p) return 'không chỉ định (mặc định khác giới — luận Tài/Quan gendered bình thường)'; const same = (g === 'nam' && p === 'nam') || (g !== 'nam' && p !== 'nam'); return same ? 'CÙNG GIỚI → luận tình duyên qua NGÀY CHI (Phu Thê cung, universal) + ngũ hành, KHÔNG gendered Tài/Quan (xem rule 15b + caveat chống hại)' : 'khác giới — luận Tài/Quan gendered bình thường'; })()}
 - TRỊ NIÊN THÁI TUẾ ${curYear}: ${(() => { try { const o = taiSuiOverview(R, curYear); return `${o.current.ganZhi} = ${o.current.name} (vị ${o.current.index}/60). ${o.current.note} Bản mệnh TS (năm sinh) = ${o.natal.name}.`; } catch (e) { return '(không tính được)'; } })()}
 
 == 📅 HÔM NAY TỔNG KHÁI (DAILY BRIEFING — QUAN TRỌNG NHẤT, ĐỌC TRƯỚC) ==
@@ -1159,6 +1160,13 @@ NGUYEN TAC:
   - Nếu brief ghi "Bệnh Dược — LÀM CHỦ (败中有成)" → giải thích: "mệnh có bệnh cách cục, hành X là thuốc chữa («có bệnh mới là quý»)".
   - Nếu KHÔNG có override → luận theo Phù Ức bình thường (thân vượng/nhược → cần hành nào cân bằng).
   - Điều này QUAN TRỌNG: nếu Dụng Thần là Thủy vì 调候, mà bạn luận "thân nhược cần Ấn" → MÂU THUẪN. Phải luận ĐÚNG cơ sở chọn Dụng Thần.
+
+15b. [SAME-SEX] KHI USER KHAI «ĐỐI TƯỢNG QUAN TÂM CÙNG GIỚI» (brief ghi «Đối tượng: cùng giới»):
+  - LUẬN partner qua NGÀY CHI (Phu Thê cung, universal) + ngũ hành tương tác — KHÔNG dùng quy tắc gendered «nam=Tài vợ, nữ=Quan chồng» (không áp dụng cho cùng giới).
+  - ⚠ CẤM pathologize / suy đoán orientation: KHÔNG BAO GIỜ nói sao nào «chỉ» đồng tính (cấm «Cô Quả/Hóa Kỵ/Phá Quân/Thất Sát = gay») — đó pseudo, phản đạo đức. Đồng tính KHÔNG phải bệnh (Bộ Y tế VN 2022).
+  - Dùng từ «bạn đời/đối tác/quan hệ», KHÔNG «hôn nhân» (VN không công nhận hôn nhân cùng giới).
+  - ⚠ NGUYÊN TẮC CHỐNG HẠI: app luận lá số CỦA user (xu hướng duyên, đặc điểm cá nhân), KHÔNG luận «mối quan hệ này có hạnh phúc/bền không» — đó do 2 người + hoàn cảnh, KHÔNG do số. Luôn kèm caveat này khi luận tình duyên cùng giới.
+  - Trung lập, không «propaganda»: chỉ đọc lá số, không bình phẩm/đánh giá lựa chọn.
 
 16. CẤM KỴ / BÍ TRUYỀN — APP CÓ HỆ BÍ TRUYỀN ĐỘC QUYỀN (27 TOOLS, 32+ TẦNG BRIEF):
   - BRIEF có 32+ tầng dữ liệu (tử bình + cổ pháp + 盲派 + 兰台 + 皇极 + 太乙 + 称骨 + 五运六气 + 彭祖百忌). CHỌN 2-3 tầng relevant nhất cho câu hỏi, KHÔNG dump hết.

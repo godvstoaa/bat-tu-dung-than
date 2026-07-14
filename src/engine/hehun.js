@@ -121,16 +121,22 @@ export function computeHehun(R1, R2) {
 
   // 4b. [loop 22 NEW] 十神 spouse-star cross-check (giới tính): nam lấy 财 làm vợ, nữ lấy 官
   //   làm chồng. Nếu Nhật Chủ A nhìn B đúng sao phối ngẫu (và B nhìn A) → tín hiệu mạnh.
+  //   [SAME-SEX] chỉ cho cặp KHÁC giới. Cặp cùng giới → bỏ (gendered rule không khớp);
+  //   tương hợp luận qua ngũ hành (4a) + ngày chi + dụng thần — đã gender-neutral.
   const aMale = (a.input && a.input.gender) === 'nam';
   const bMale = (b.input && b.input.gender) === 'nam';
-  const wifeGods = ['正財', '偏財']; // nam → vợ = Tài
-  const husbGods = ['正官', '七殺']; // nữ → chồng = Quan Sát
-  const aSeesB = tenGod(a.dayGan, b.dayGan);
-  const bSeesA = tenGod(b.dayGan, a.dayGan);
-  const aHit = (aMale ? wifeGods : husbGods).includes(aSeesB);
-  const bHit = (bMale ? wifeGods : husbGods).includes(bSeesA);
-  if (aHit && bHit) { score += 14; factors.push(`★ Sao phối ngẫu tương ứng: A (nhìn B = ${aSeesB}) đúng sao vợ/chồng, B (nhìn A = ${bSeesA}) cũng vậy → duyên "sao mệnh đối ứng" rất mạnh.`); }
-  else if (aHit || bHit) { score += 7; factors.push(`✓ Một bên nhìn đối phương đúng sao phối ngẫu (${aHit ? 'A' : 'B'}) → duyên có chiều.`); }
+  if (aMale !== bMale) {
+    const wifeGods = ['正財', '偏財']; // nam → vợ = Tài
+    const husbGods = ['正官', '七殺']; // nữ → chồng = Quan Sát
+    const aSeesB = tenGod(a.dayGan, b.dayGan);
+    const bSeesA = tenGod(b.dayGan, a.dayGan);
+    const aHit = (aMale ? wifeGods : husbGods).includes(aSeesB);
+    const bHit = (bMale ? wifeGods : husbGods).includes(bSeesA);
+    if (aHit && bHit) { score += 14; factors.push(`★ Sao phối ngẫu tương ứng: A (nhìn B = ${aSeesB}) đúng sao vợ/chồng, B (nhìn A = ${bSeesA}) cũng vậy → duyên "sao mệnh đối ứng" rất mạnh.`); }
+    else if (aHit || bHit) { score += 7; factors.push(`✓ Một bên nhìn đối phương đúng sao phối ngẫu (${aHit ? 'A' : 'B'}) → duyên có chiều.`); }
+  } else {
+    factors.push(`ℹ Cặp cùng giới — tương hợp luận ngũ hành/ngày chi (gender-neutral), bỏ «sao phối ngẫu» gendered.`);
+  }
 
   // [loop 357] 命卦 (八宅) compat — cùng nhóm Đông/Tứ Tứ Mệnh → thuận sống chung; khác nhóm → trệ phong thuỷ ở chung.
   try {

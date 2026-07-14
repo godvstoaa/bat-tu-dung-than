@@ -83,7 +83,7 @@ export function deduceFromFamily(subject, members) {
   for (const m of members) {
     if (!m || !m.R || !m.role) continue;
     const role = m.role;
-    const need = elementForRole(S.chart.dayGan, isMale, role);
+    const need = elementForRole(S.chart.dayGan, isMale, role, S.chart.input?.partner);
     if (!need || !PALACE_PILLAR[role]) continue; // [loop 627] role không hợp lệ → bỏ qua (không crash)
     const palKey = PALACE_PILLAR[role];
     const pillar = S.chart.pillars[palKey];

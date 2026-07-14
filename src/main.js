@@ -206,6 +206,7 @@ import { destinyConsensus } from './engine/destiny-consensus.js';
 import { scanHours } from './engine/hour-scan.js';
 
 let currentResult = null;
+let currentPartner = '';  // [SAME-SEX] đối tượng quan tâm (''|'nam'|'nu') — opt-in, chỉ đổi diễn giải tình duyên
 let currentTopic = 'general';
 let chatHistory = []; // bộ nhớ hội thoại AI: [{role:'user'|'assistant', content}]
 let _skipChatReset = false; // [loop 389] flag: skip chatHistory reset on initial auto-render (same chart)
@@ -4508,6 +4509,7 @@ async function run() {
   const [y0, m0, d0] = dateVal.split('-').map(Number);
   const [hh0, mm0] = timeVal.split(':').map(Number);
   const gender = (document.querySelector('input[name="gender"]:checked') || {}).value || 'nam';   // [loop 961] defensive: nếu không radio nào checked → fallback 'nam' (tránh crash run)
+  currentPartner = ($('partner')?.value || '').toLowerCase();  // [SAME-SEX] opt-in đối tượng quan tâm (''|'nam'|'nu')
   // [loop 1366] chart event log dời SAU compute (xem dưới) để kèm mệnh cách score.
   // [loop 23] Múi giờ + 真太阳时 (giờ Mặt Trời thật theo kinh độ nơi sinh).
   //   Bát Tự dùng 真太阳时 — đồng hồ múi giờ chỉ là xấp xỉ. Sinh gần ranh 时辰 thì sai vài
@@ -4544,6 +4546,7 @@ async function run() {
   //   nhưng bọc try/catch để hiện lỗi thân thiện thay vì crash cả trang.
   try {
     currentResult = analyze(y, m, d, hh, mm, gender);
+    if (currentResult?.chart?.input) currentResult.chart.input.partner = currentPartner; // [SAME-SEX] attach opt-in partner cho engine đọc
     // [loop 421] validate: lunar-javascript silently returns undefined cho năm ngoài ~1900-2100
     //   → tất cả trụ = undefined → user thấy lá số rác mà không có error. Verify explicitly.
     if (!currentResult.chart.pillars.day.gan || !currentResult.chart.pillars.year.gan) {
@@ -7267,7 +7270,7 @@ function renderSensitivity() {
 function renderIdealMatch() {
   if (!currentResult) return;
   const i = currentResult.chart.input;
-  const partnerGender = i.gender === 'nam' ? 'nu' : 'nam';
+  const partnerGender = currentPartner || (i.gender === 'nam' ? 'nu' : 'nam'); // [SAME-SEX] dùng currentPartner nếu user khai, mặc định khác giới
   const userYr = i.year;
   const m = findIdealPartners(currentResult, { ageMin: -15, ageMax: 30, gender: partnerGender });
   const ct = idealChildTiming(currentResult);
