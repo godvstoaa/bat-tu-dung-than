@@ -7,7 +7,7 @@
 import { Solar } from 'lunar-javascript';
 import { analyze } from './chart.js';
 import { computeHehun } from './hehun.js';
-import { GAN, ZHI, WX_VI, KE, KE_BY } from './constants.js';
+import { GAN, ZHI, WX_VI, KE, KE_BY, SHENG, SHENG_BY } from './constants.js';
 
 const ZHI12 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 const SANHE = [['申','子','辰'],['寅','午','戌'],['巳','酉','丑'],['亥','卯','未']];
@@ -129,45 +129,213 @@ function buildNameHint(element) {
   return names[element] || names['土'];
 }
 
+// ---- THỜI ĐIỂM SINH CON — exhaustive scan + scoring 0-100 THẬT ----
+// [upgrade] Trước đây chỉ sample year-pillar (trần 78, clamp 95 không tới, không tìm max thật).
+//   Nay SCAN TOÀN CỤC 16 năm × 31 ngày × 12 giờ (lunar lightweight ~0.02ms/lá số ≈ 1.5s tổng),
+//   chấm điểm CẢ (a) phù hợp phụ huynh LẪN (b) chất lượng lá số con (Thân trung hòa).
+//   → surface lá số ĐIỂM CAO NHẤT thực sự, thang 0-100 thật, cache theo lá số phụ huynh.
+const CHONG_MAP = {子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳'};
+const GAN_HE = {甲:'己',己:'甲',乙:'庚',庚:'乙',丙:'辛',辛:'丙',丁:'壬',壬:'丁',戊:'癸',癸:'戊'};
+const _SHICHEN = [0,2,4,6,8,10,12,14,16,18,20,22];
+let _childCache = null; // { key, scan: Map<year, chartArr> }
+
+function _childKey(R) {
+  const i = R.chart.input || {};
+  return [R.chart.dayGan, R.chart.dayZhi, i.gender, i.year, R.yong && R.yong.primary].join('|');
+}
+
+// Chấm điểm 1 lá số con (8 chữ khí chính) từ góc nhìn phụ huynh R — thang 0-100 thật.
+function _scoreChild(p, R) {
+  const userYong = R.yong || {};
+  const userDayGan = R.chart.dayGan;
+  const userYearZhi = R.chart.pillars.year.zhi;
+  const userDayZhi = R.chart.dayZhi;
+  const dmGan = p.dayGan, dmWx = GAN[dmGan].wx;
+  const isMale = (R.chart.input && R.chart.input.gender) === 'nam';
+  const childWx = isMale ? KE_BY[R.chart.dayMaster.wx] : SHENG[R.chart.dayMaster.wx]; // sao con của PHỤ HUYNH
+
+  // Phân bố ngũ hành 8 chữ (khí chính; tàng can bỏ qua cho tốc độ)
+  const wx = { 木:0, 火:0, 土:0, 金:0, 水:0 };
+  for (const g of [p.yearGan,p.monthGan,p.dayGan,p.timeGan]) wx[GAN[g].wx]++;
+  for (const z of [p.yearZhi,p.monthZhi,p.dayZhi,p.timeZhi]) wx[ZHI[z].wx]++;
+  const total = 8;
+
+  // (b) CHẤT LƯỢNG lá số con — Thân trung hòa (ratio ~0.5) là lý tưởng [0..40]
+  const resourceWx = SHENG_BY[dmWx];
+  const ratio = (wx[dmWx] + wx[resourceWx]) / total;
+  const balance = Math.max(0, 1 - Math.abs(ratio - 0.5) * 2);
+  let quality = balance * 40;
+  const maxWx = Math.max.apply(null, Object.values(wx));
+  if (maxWx / total > 0.5) quality -= 5; // 1 hành độc tôn → bớt tốt
+
+  // (a) PHÙ HỢP PHỤ HUYNH [0..25]
+  const goodForUser = [userYong.primary, userYong.xi].filter(Boolean);
+  const avoid = userYong.avoid || [userYong.ji, userYong.chou].filter(Boolean);
+  let parentFit = 0;
+  if (goodForUser.includes(dmWx)) parentFit += 15;          // Nhật Chủ con = Dụng/Hỷ → BỔ MỆNH
+  if (avoid.length && wx[avoid[0]] >= 3) parentFit -= 8;    // con mang nhiều Kỵ của bạn
+  if (CHONG_MAP[userYearZhi] === p.yearZhi) parentFit -= 5; // năm con xung tuổi bạn
+  parentFit = Math.max(0, Math.min(25, parentFit));
+
+  // sao con [0..10]
+  const hasChildStar = dmWx === childWx || ZHI[p.dayZhi].wx === childWx || ZHI[p.yearZhi].wx === childWx || ZHI[p.monthZhi].wx === childWx;
+  const childStar = hasChildStar ? 10 : 0;
+
+  // (c) HÒA HỢP phụ huynh-con [0..15]
+  let harmony = 8;
+  if (CHONG_MAP[userDayZhi] === p.dayZhi) harmony -= 8;   // trụ ngày xung nhau
+  if (GAN_HE[userDayGan] === p.dayGan) harmony += 7;      // can ngày hợp (tâm đầu)
+  harmony = Math.max(0, Math.min(15, harmony));
+
+  const score = Math.max(0, Math.min(100, Math.round(10 + parentFit + quality + childStar + harmony)));
+
+  const notes = [];
+  if (goodForUser.includes(dmWx)) notes.push(`Nhật Chủ con = ${WX_VI[dmWx]} (Dụng/Hỷ bạn) → BỔ MỆNH`);
+  notes.push(`Mệnh con: ${ratio >= 0.55 ? 'vượng' : ratio <= 0.45 ? 'nhược' : 'TRUNG HOÀ'} (${Math.round(ratio*100)}%)`);
+  if (hasChildStar) notes.push(`Mang hành sao con (${WX_VI[childWx]}) → duyên con tốt`);
+  if (CHONG_MAP[userYearZhi] === p.yearZhi) notes.push(`⚠ Năm con xung tuổi bạn`);
+  if (CHONG_MAP[userDayZhi] === p.dayZhi) notes.push(`⚠ Trụ ngày xung trụ ngày bạn`);
+  if (GAN_HE[userDayGan] === p.dayGan) notes.push(`Can ngày con hợp can bạn (tâm đầu)`);
+  return { score, ratio, dmWx, notes };
+}
+
+// Chấm điểm RICH lá số con — dùng analyze() thật (tàng can, effRatio, xung nội tại, cách cục).
+// Đây là bộ PHÂN BIỆT thật: 2 chart cùng "cân bằng" khí chính sẽ khác nhau ở tàng can/clashes/cách cục.
+function _scoreChildRich(cR, R) {
+  const userYong = R.yong || {};
+  const userDayGan = R.chart.dayGan;
+  const userDayZhi = R.chart.dayZhi;
+  const userYearZhi = R.chart.pillars.year.zhi;
+  const dmWx = cR.chart.dayMaster.wx;
+
+  // (b) CHẤT LƯỢNG lá số con (real, từ analyze) [0..55]
+  const eff = (cR.strength && typeof cR.strength.effRatio === 'number') ? cR.strength.effRatio : 0.5;
+  const balance = Math.max(0, 1 - Math.abs(eff - 0.5) * 2);     // Thân trung hòa (effRatio~0.5) = tốt nhất
+  let quality = balance * 30;                                    // 0..30
+
+  const ws = (cR.wx && cR.wx.score) || {};                       // wx thật (có tàng can)
+  const total = Object.values(ws).reduce((a, b) => a + (b || 0), 0) || 1;
+  const maxPct = Math.max.apply(null, Object.values(ws).map((v) => (v || 0) / total));
+  quality += Math.max(0, 1 - Math.max(0, maxPct - 0.35) * 2) * 10; // ngũ hành không độc tôn (>35% bị trừ) [0..10]
+
+  const ix = cR.interactions || {};                              // xung/hình/hại nội tại → trừ
+  const clashes = (ix.chong||[]).length + (ix.ganChong||[]).length + (ix.xing||[]).length + (ix.hai||[]).length + (ix.zhiChong||[]).length + (ix.zhiHai||[]).length;
+  quality -= Math.min(15, clashes * 4);                          // mỗi xung/hình -4, tối đa -15
+  quality = Math.max(0, Math.min(55, quality));
+
+  // cách cục thuận dụng = bonus [0..5]
+  let patternBonus = 0;
+  try { if (cR.pattern && cR.pattern.pref && cR.pattern.pref.shun) patternBonus = 5; } catch (e) {}
+
+  // (a) PHÙ HỢP PHỤ HUYNH [0..25]
+  const goodForUser = [userYong.primary, userYong.xi].filter(Boolean);
+  const avoid = userYong.avoid || [userYong.ji, userYong.chou].filter(Boolean);
+  let parentFit = 0;
+  if (goodForUser.includes(dmWx)) parentFit += 15;               // Nhật Chủ con = Dụng/Hỷ → BỔ MỆNH
+  if (avoid.length && (ws[avoid[0]] || 0) / total > 0.3) parentFit -= 8; // con mang nhiều Kỵ
+  if (CHONG_MAP[userYearZhi] === cR.chart.pillars.year.zhi) parentFit -= 5;
+  parentFit = Math.max(0, Math.min(25, parentFit));
+
+  // sao con [0..5]
+  const isMale = (R.chart.input && R.chart.input.gender) === 'nam';
+  const childWx = isMale ? KE_BY[R.chart.dayMaster.wx] : SHENG[R.chart.dayMaster.wx];
+  const childStar = (ws[childWx] || 0) > 0 ? 5 : 0;
+
+  // (c) HÒA HỢP phụ huynh-con [0..10]
+  let harmony = 5;
+  if (CHONG_MAP[userDayZhi] === cR.chart.pillars.day.zhi) harmony -= 5;
+  if (GAN_HE[userDayGan] === cR.chart.dayGan) harmony += 5;
+  harmony = Math.max(0, Math.min(10, harmony));
+
+  const score = Math.max(0, Math.min(100, Math.round(quality + patternBonus + parentFit + childStar + harmony)));
+
+  const notes = [];
+  if (goodForUser.includes(dmWx)) notes.push(`Nhật Chủ con = ${WX_VI[dmWx]} (Dụng/Hỷ bạn) → BỔ MỆNH`);
+  notes.push(`Mệnh con: ${(cR.strength && cR.strength.level) || '?'} (eff ${eff.toFixed(2)})`);
+  if (clashes > 0) notes.push(`⚠ ${clashes} xung/hình/hại nội tại`);
+  if (patternBonus) notes.push(`Cách cục thuận dụng`);
+  if (childStar) notes.push(`Mang hành sao con (${WX_VI[childWx]})`);
+  if (CHONG_MAP[userYearZhi] === cR.chart.pillars.year.zhi) notes.push(`⚠ Năm con xung tuổi bạn`);
+  if (CHONG_MAP[userDayZhi] === cR.chart.pillars.day.zhi) notes.push(`⚠ Trụ ngày xung trụ ngày bạn`);
+  if (GAN_HE[userDayGan] === cR.chart.dayGan) notes.push(`Can ngày con hợp can bạn`);
+  return { score, eff, clashes, notes };
+}
+
+// Quét toàn cục + cache. 2 GIAI ĐOẠN: (1) lightweight exhaustive lấy top 25/năm theo score thô,
+//   (2) analyze() thật trên 25 đó → rich score (tàng can/clashes/cách cục) → sort lại. Trả Map<year, arr>.
+// NOTE: gender child = 'nam' placeholder — chất lượng chart (vượng suy/clatches/cách cục) không phụ thuộc gender.
+function _fullChildScan(R) {
+  const key = _childKey(R);
+  if (_childCache && _childCache.key === key) return _childCache.scan;
+  const byYear = new Map();
+  for (let yr = 2025; yr <= 2040; yr++) {
+    // (1) stage thô — lightweight, toàn 31 ngày × 12 giờ
+    const coarse = [];
+    for (let m = 1; m <= 12; m++) {
+      for (let d = 1; d <= 31; d++) {
+        let dayOk = false;
+        for (const h of _SHICHEN) {
+          try {
+            const l = Solar.fromYmdHms(yr, m, d, h, 0, 0).getLunar();
+            const p = {
+              yearGan: l.getYearGan(), yearZhi: l.getYearZhi(),
+              monthGan: l.getMonthGan(), monthZhi: l.getMonthZhi(),
+              dayGan: l.getDayGan(), dayZhi: l.getDayZhi(),
+              timeGan: l.getTimeGan(), timeZhi: l.getTimeZhi(),
+            };
+            const sc = _scoreChild(p, R);
+            coarse.push(Object.assign({ month: m, day: d, hour: h }, p, sc));
+            dayOk = true;
+          } catch (e) {}
+        }
+        if (!dayOk) break;
+      }
+    }
+    coarse.sort((a, b) => b.score - a.score);
+    // (2) stage rich — analyze() thật trên top 25 coarse
+    const rich = [];
+    for (const c of coarse.slice(0, 25)) {
+      try {
+        const cR = analyze(yr, c.month, c.day, c.hour, 0, 'nam', yr);
+        const rs = _scoreChildRich(cR, R);
+        rich.push({
+          month: c.month, day: c.day, hour: c.hour,
+          yearGan: c.yearGan, yearZhi: c.yearZhi,
+          dayGan: c.dayGan, dayZhi: c.dayZhi,
+          score: rs.score, eff: rs.eff, clashes: rs.clashes, notes: rs.notes,
+        });
+      } catch (e) {}
+    }
+    rich.sort((a, b) => b.score - a.score);
+    byYear.set(yr, rich);
+  }
+  _childCache = { key, scan: byYear };
+  return byYear;
+}
+
 /**
- * Tính thời điểm SINH CON lý tưởng.
+ * Tính thời điểm SINH CON lý tưởng — best lá số/năm từ exhaustive scan (0-100 thật).
+ * Score giờ = điểm lá số TỐT NHẤT trong năm đó (đã quét hết 31 ngày × 12 giờ).
  * @param {object} R - user's chart
- * @returns [{ year, ganZhi, score, note, nameHint }]
+ * @returns [{ year, ganZhi, ganWx, zhiWx, score, notes, nameHint, isBest, bestDate, bestGanZhi }]
  */
 export function idealChildTiming(R) {
-  const isMale = R.chart.input.gender === 'nam';
-  // Child star: nam = 官杀 (Kim for 乙), nữ = 食伤 (Hỏa for 乙)
-  const childWx = isMale ? KE_BY[R.chart.dayMaster.wx] : (function(){ const dm=R.chart.dayMaster.wx; const SHENG={木:'火',火:'土',土:'金',金:'水',水:'木'}; return SHENG[dm]; })();
-  const userYong = R.yong;
+  const scan = _fullChildScan(R);
   const results = [];
-  const ZHI_ORDER = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  const GAN_ORDER = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-
-  for (let yr = 2025; yr <= 2040; yr++) {
-    const gIdx = ((yr - 4) % 10 + 10) % 10;
-    const zIdx = ((yr - 4) % 12 + 12) % 12;
-    const yGan = GAN_ORDER[gIdx], yZhi = ZHI_ORDER[zIdx];
-    const ganWx = GAN[yGan].wx, zhiWx = ZHI[yZhi].wx;
-    let score = 50;
-    const notes = [];
-    // Year should bring Dụng/Hỷ for the PARENT (user)
-    if ([userYong.primary, userYong.xi].includes(ganWx)) { score += 10; notes.push(`Can năm ${WX_VI[ganWx]} = Dụng/Hỷ của bạn`); }
-    if ([userYong.primary, userYong.xi].includes(zhiWx)) { score += 10; notes.push(`Chi năm ${WX_VI[zhiWx]} = Dụng/Hỷ của bạn`); }
-    // Year should bring child star element (good for child-parent relationship)
-    if (ganWx === childWx || zhiWx === childWx) { score += 8; notes.push(`Mang hành sao con (${WX_VI[childWx]}) → duyên con tốt`); }
-    // Year should NOT bring Kỵ
-    if ([userYong.ji, userYong.chou].includes(ganWx)) { score -= 8; notes.push(`⚠ Can Kỵ`); }
-    if ([userYong.ji, userYong.chou].includes(zhiWx)) { score -= 8; notes.push(`⚠ Chi Kỵ`); }
-    // Thai Tuế check
-    const userYearZhi = R.chart.pillars.year.zhi;
-    const chong = {子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳'};
-    if (chong[userYearZhi] === yZhi) { score -= 10; notes.push(`⚠ Xung thái tuế tuổi bạn`); }
-
-    score = Math.max(10, Math.min(95, Math.round(score)));
+  for (const [yr, arr] of scan) {
+    const best = arr[0];
+    if (!best) continue;
     results.push({
-      year: yr, ganZhi: yGan + yZhi, ganWx: WX_VI[ganWx], zhiWx: WX_VI[zhiWx],
-      score, notes, nameHint: buildNameHint(userYong.primary),
+      year: yr,
+      ganZhi: best.yearGan + best.yearZhi,
+      ganWx: WX_VI[GAN[best.yearGan].wx],
+      zhiWx: WX_VI[ZHI[best.yearZhi].wx],
+      score: best.score,
+      notes: best.notes,
+      nameHint: buildNameHint((R.yong || {}).primary),
       isBest: false,
+      bestDate: `${yr}-${String(best.month).padStart(2,'0')}-${String(best.day).padStart(2,'0')} ${String(best.hour).padStart(2,'0')}:00`,
+      bestGanZhi: best.dayGan + best.dayZhi,
     });
   }
   results.sort((a, b) => b.score - a.score);
@@ -241,42 +409,18 @@ export function buildPartnerProfile(match, userR) {
 }
 
 /**
- * Tính NGÀY/THÁNG/GIỜ sinh con cụ thể cho năm tốt nhất.
+ * Top NGÀY/THÁNG/GIỜ sinh con cụ thể trong 1 năm — từ exhaustive scan đã cache.
+ * Trả đúng top lá số điểm CAO NHẤT của năm (all 31 ngày × 12 giờ), không còn sample ngày 15.
  */
 export function idealChildDates(R, year) {
-  const userYong = R.yong;
-  const isMale = R.chart.input.gender === 'nam';
-  const childWx = isMale ? KE_BY[R.chart.dayMaster.wx] : (function(){ const dm=R.chart.dayMaster.wx; const SHENG={木:'火',火:'土',土:'金',金:'水',水:'木'}; return SHENG[dm]; })();
-  const results = [];
-  const times = [0, 6, 12, 18]; // 4 giờ đại diện
-
-  for (let m = 1; m <= 12; m++) {
-    for (const h of times) {
-      try {
-        const solar = Solar.fromYmdHms(year, m, 15, h, 0, 0);
-        const lunar = solar.getLunar();
-        const dayGan = lunar.getDayGan(), dayZhi = lunar.getDayZhi();
-        const ganWx = GAN[dayGan].wx, zhiWx = ZHI[dayZhi].wx;
-        let score = 50;
-        if ([userYong.primary, userYong.xi].includes(ganWx)) score += 12;
-        if ([userYong.primary, userYong.xi].includes(zhiWx)) score += 12;
-        if (ganWx === childWx || zhiWx === childWx) score += 8;
-        if ([userYong.ji, userYong.chou].includes(ganWx)) score -= 8;
-        if ([userYong.ji, userYong.chou].includes(zhiWx)) score -= 8;
-        score = Math.max(10, Math.min(95, Math.round(score)));
-        if (score >= 60) {
-          results.push({
-            year, month: m, day: 15, hour: h,
-            date: year + '-' + String(m).padStart(2,'0') + '-15 ' + String(h).padStart(2,'0') + ':00',
-            ganZhi: dayGan + dayZhi,
-            ganWx: WX_VI[ganWx], zhiWx: WX_VI[zhiWx],
-            score,
-            nameHint: buildNameHint(userYong.primary),
-          });
-        }
-      } catch(e) {}
-    }
-  }
-  results.sort((a,b) => b.score - a.score);
-  return results.slice(0, 5);
+  const scan = _fullChildScan(R);
+  const arr = scan.get(year) || [];
+  return arr.slice(0, 5).map((c) => ({
+    year, month: c.month, day: c.day, hour: c.hour,
+    date: `${year}-${String(c.month).padStart(2,'0')}-${String(c.day).padStart(2,'0')} ${String(c.hour).padStart(2,'0')}:00`,
+    ganZhi: c.dayGan + c.dayZhi,
+    ganWx: WX_VI[GAN[c.dayGan].wx], zhiWx: WX_VI[ZHI[c.dayZhi].wx],
+    score: c.score,
+    nameHint: buildNameHint((R.yong || {}).primary),
+  }));
 }
