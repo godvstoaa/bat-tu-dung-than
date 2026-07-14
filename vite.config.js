@@ -64,7 +64,7 @@ export default defineConfig({
 
           // === ENGINE-DIVINATION (lazy — meihua/cezi/liuren/qimen) ===
           if (id.includes('/src/engine/ziwei')) return 'engine-ziwei';
-          if (id.match(/\/src\/engine\/(meihua|cezi|liuren|qimen|heluo|guiguzi|jinkoujue|hexagram|tarot-kb|numerology|runes-kb|iching64-kb|coffee-kb|physiognomy-extra)/)) return 'engine-divination';
+          if (id.match(/\/src\/engine\/(meihua|cezi|liuren|qimen|heluo|guiguzi|jinkoujue|hexagram|tarot-kb|numerology|runes-kb|iching64-kb|coffee-kb|physiognomy-extra|naming)/)) return 'engine-divination';
 
           // === ENGINE-LIFESTYLE (lazy — diet/workout/aroma/crystal) ===
           if (id.match(/\/src\/engine\/(bazi-diet|bazi-workout|aroma|crystal|cloth|space-fs|city-fs|health)/)) return 'engine-lifestyle';

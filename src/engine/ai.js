@@ -28,6 +28,7 @@ import { numerologyReading, lifePathNumber, LIFE_PATH } from './numerology.js';
 import { drawRune, RUNES } from './runes-kb.js';
 import { ichingRandom, ICHING_64 } from './iching64-kb.js';
 import { coffeeRead, COFFEE_SYMBOLS } from './coffee-kb.js';
+import { analyzeName } from './naming.js';
 import { think as brainThink } from '../brain/brain.js';
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
@@ -1458,6 +1459,10 @@ export const AI_TOOLS = [
     name: 'analyze_coffee', description: 'ĐỌC BÃ CÀ PHÊ/TRÀ — 3 ký hiệu ngẫu nhiên + ý nghĩa. Dùng khi user hỏi «đọc bã cà phê/bói cà phê/đọc lá trà». Truyền thống Thổ Nhĩ Kỳ/Phương Đông.',
     parameters: { type: 'object', properties: { count: { type: 'number', description: 'Số ký hiệu (1-5, mặc định 3).' } }, required: [] },
   } },
+  { type: 'function', function: {
+    name: 'analyze_name', description: 'HỌ TÊN HỌC (姓名学) — luận tên: (1) Letter numerology (Expression/Soul Urge/Personality — Pythagorean, áp dụng mọi tên incl. Quốc Ngữ) + (2) 5格 Ngũ Cách (Thiên-Nhân-Địa-Ngoại-Tổng + 81 nét cát/hung — cần tên Hán-Việt map nét Khang Hy). Dùng khi user hỏi «luận tên/xem tên có đẹp không/phân tích tên/姓名/5 cách».',
+    parameters: { type: 'object', properties: { name: { type: 'string', description: 'Họ tên đầy đủ cần luận (vd "Nguyễn Minh Anh").' } }, required: ['name'] },
+  } },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -1707,6 +1712,20 @@ export function execTool(name, args, R) {
           const read = coffeeRead(n);
           return { symbols: read, summary: read.map(s => s.symbol + ' (' + s.position + ') — ' + s.text).join(' | '), note: 'Đọc bã cà phê/trà — ký hiệu ngẫu nhiên. Truyền thống Thổ Nhĩ Kỳ/Phương Đông. Tham khảo.' };
         } catch (e) { return { error: 'lỗi coffee reading: ' + e.message }; }
+      }
+      case 'analyze_name': { // [NAMING] 姓名 học — letter numerology + 5格 ngũ cách
+        try {
+          const name = a.name || '';
+          if (!name || name.length < 2) return { error: 'cần tên (arg name) để luận — vd "Nguyễn Minh Anh" hoặc tên Hán-Việt' };
+          const r = analyzeName(name);
+          return {
+            name,
+            letter: r.letter,
+            fiveGrid: r.grid && !r.grid.unmapped ? { tian: r.grid.tian, ren: r.grid.ren, dia: r.grid.dia, wai: r.grid.wai, total: r.grid.total } : null,
+            fiveGridNote: r.grid?.unmapped ? ('5格 bỏ qua — token không map nét Khang Hy: ' + r.grid.missing.join(', ') + '. Cần tên Hán-Việt chính xác (vd Nguyễn=阮, Trần=陳).') : null,
+            note: r.note,
+          };
+        } catch (e) { return { error: 'lỗi analyze_name: ' + e.message }; }
       }
       case 'log_error': { // [R46] AI tự log lỗi khi bị user sửa — structured error report + POST to server KV
         try { fetch('/api/log-error', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).catch(() => {}); } catch (_) {}
