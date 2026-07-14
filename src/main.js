@@ -194,6 +194,7 @@ import { huangdao12, renderHuangdaoCard } from './engine/huangdao.js';
 import { donggongDay, donggongInMonth } from './engine/donggong.js';
 import { qizheng, renderQizhengCard } from './engine/qizheng.js';
 import { computeWesternChart, renderWesternCard } from './engine/western-astro.js';
+import { renderSynthesisCard } from './engine/western-synthesis.js';
 import { tianxingZheri, renderTianxingCard, MOUNTAINS_24 as TX_MOUNTAINS_24, MOUNTAIN_VI } from './engine/tianxing-zheri.js';
 import {
   FACE_PALACES, MOLE_POSITIONS, AGE_FACE_MAP,
