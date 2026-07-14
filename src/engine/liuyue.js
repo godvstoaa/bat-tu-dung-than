@@ -33,6 +33,8 @@ const QIN_VI = { year: 'Niên Trụ (tổ bối)', month: 'Nguyệt Trụ (phụ
 // Trọng số 伏吟/反吟 tháng (nhẹ hơn 流年: tháng ngắn). 反吟 KHÔNG có day (冲日支 đã tính ở Thái tuế).
 const W_FUYIN = { day: 4, month: 3, year: 2, time: 2 };
 const W_FANYIN = { month: 6, year: 5, time: 5 };
+// [AUDIT FIX] tên chi-tháng Việt — để label lưu nguyệt rõ ràng («tháng Ngọ» thay vì số dễ nhầm âm/dương)
+const ZHI_VI = { 子: 'Tý', 丑: 'Sửu', 寅: 'Dần', 卯: 'Mão', 辰: 'Thìn', 巳: 'Tỵ', 午: 'Ngọ', 未: 'Mùi', 申: 'Thân', 酉: 'Dậu', 戌: 'Tuất', 亥: 'Hợi' };
 
 // Thập thần lưu nguyệt → độ倾斜 (nhẹ hơn lưu niên vì chỉ 30 ngày)
 const GOD_MONTH = {
@@ -186,7 +188,7 @@ export function computeLiuyue(R, solarYear, patternQuality) {
     const note = [godVi, ...extraNotes, ...fyNotes].filter(Boolean).join(' · ');
     // [loop 1094] month-level TCM theme — 十二长生 tháng → tạng headline (hoàn thiện 4 cấp TCM).
     const _mht = monthStageVi ? stageHealth(GAN[dayGan] && GAN[dayGan].wx, monthStageVi, monthStageW) : null;
-    months.push({ m: i, solarMonth: gMonth, ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note, taiSui: extraNotes, fuyin: fyNotes, monthStage: monthStageVi, monthStageW, monthPs: monthPsVi, monthPsFlow, monthHealth: _mht ? _mht.headline : '' });
+    months.push({ m: i, solarMonth: gMonth, mVi: 'tháng ' + (ZHI_VI[zhi] || zhi) + ' (' + gan + zhi + ')', solarMonthVi: 'tháng ' + gMonth + ' dương', ganZhi: gan + zhi, gan, zhi, ganGod, ganWx, zhiWx, score, rating, note, taiSui: extraNotes, fuyin: fyNotes, monthStage: monthStageVi, monthStageW, monthPs: monthPsVi, monthPsFlow, monthHealth: _mht ? _mht.headline : '' });
   }
 
   // [loop 4 — 格局流月喜忌] Cộng tầng 格局 LÊN TRÊN tầng ngũ hành + thập thần tháng

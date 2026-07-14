@@ -10180,5 +10180,20 @@ import { suggestFollowups as _sf } from './src/engine/ai.js';
   console.log(`   [synth] sơ đồ tổng hợp + forecast ✓ — 8 dims, 10 năm timeline, bigThree ${ts.bigThree}, AI tool analyze_synthesis`);
 }
 
+// ============================================================================
+// [LIUYUE LABEL] — tháng Bát Tự = tiết-khí, phải label «tháng Ngọ»+«tháng X dương», KHÔNG «âm»
+// ============================================================================
+{
+  const { computeLiuyue } = await import('./src/engine/liuyue.js');
+  const ly = computeLiuyue(analyze(1992, 9, 27, 14, 30, 'female', 2026), 2026);
+  assert(ly.months.length === 12, `[liuyue] 12 tháng (got ${ly.months.length})`);
+  assert(ly.months.every(m => m.mVi && /dương/.test(m.solarMonthVi), `[liuyue] mỗi tháng có mVi + solarMonthVi dương`);
+  const jw = ly.months.find(m => m.ganZhi === '甲午');
+  assert(jw && jw.mVi === 'tháng Ngọ (甲午)', `[liuyue] 甲午 = «tháng Ngọ» (got ${jw?.mVi})`);
+  assert(!/âm/i.test(jw.mVi + jw.solarMonthVi), `[liuyue] 甲午 label KHÔNG chứa «âm» (tránh nhầm tháng âm)`);
+  assert(jw.solarMonthVi === 'tháng 6 dương', `[liuyue] 甲午 = «tháng 6 dương» (got ${jw.solarMonthVi})`);
+  console.log(`   [liuyue] label tháng đúng hệ ✓ — 甲午=«tháng Ngọ/tháng 6 dương» (không «tháng 6 âm»), 12 tháng có mVi`);
+}
+
 process.exit(FAILS === 0 ? 0 : 1);
 

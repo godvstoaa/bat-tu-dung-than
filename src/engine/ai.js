@@ -253,8 +253,8 @@ export function buildChartBrief(R) {
     if (cm) {
       // [loop 4] Thêm tag 格局 喜忌 của tháng hiện tại vào ghi chú (giúp AI nắm tháng thuận/nghịch cách).
       const gejuTag = cm.gejuDelta > 0 ? ' ★格局喜' : cm.gejuDelta < 0 ? ' ⚠格局忌' : '';
-      curMonthRating = `${cm.ganZhi} — ${cm.rating}${gejuTag}`;
-      curMonthNote = ` (tháng CÁT trong năm: ${lm.best.map((b) => 'T' + (b.m + 1)).join(', ')}; tháng KỴ: ${lm.worst.map((b) => 'T' + (b.m + 1)).join(', ')})`;
+      curMonthRating = `${cm.ganZhi} (${cm.mVi || ''}) — ${cm.rating}${gejuTag}`;
+      curMonthNote = ` (tháng CÁT: ${lm.best.map((b) => b.mVi || ('T'+(b.m+1))).join(', ')}; tháng KỴ: ${lm.worst.map((b) => b.mVi || ('T'+(b.m+1))).join(', ')})`;
     }
   } catch (e) {}
   const pillars = ['year', 'month', 'day', 'time'].map((k) => {
@@ -307,6 +307,7 @@ export function buildChartBrief(R) {
 - Âm lịch: ${nowLunar.toString()}
 - NĂM NAY = ${curYear} = ${curYearGZ} (${hanviet(curYearGZ)}). ĐÂY LÀ NĂM ĐANG DIỄN RA, KHÔNG PHẢI TƯƠNG LAI. Từ "năm nay" / "năm này" LUÔN là ${curYear} — KHÔNG được mặc định 2024 hay bất kỳ năm nào khác.
 - THÁNG NAY (lưu nguyệt) = ${curMonthGZ} (${hanviet(curMonthGZ)}) — rating ${curMonthRating}${curMonthNote}
+- ⚠ LƯU NGUYỆT = tháng TIẾT KHÍ (vd ${curMonthGZ} = tháng «${({子:'Tý',丑:'Sửu',寅:'Dần',卯:'Mão',辰:'Thìn',巳:'Tỵ',午:'Ngọ',未:'Mùi',申:'Thân',酉:'Dậu',戌:'Tuất',亥:'Hợi'})[curMonthGZ[1]]}»), GẦN tháng DƯƠNG lịch, KHÔNG PHẢI tháng ÂM lịch (tháng âm lệch 1-2 tháng vs tiết-khí). Khi nói «tháng», PHẢI dùng TÊN CHI-THÁNG (tháng Ngọ/Mùi/Tý...) hoặc «tháng X dương» — KHÔNG BAO GIỜ ghi «tháng X âm» cho lưu nguyệt (sai hệ).
 - Khi user hỏi "tháng này / năm nay" → PHẢI dùng ${curYear} và lưu nguyệt ${curMonthGZ} ở trên.
 - TRỊ NIÊN THÁI TUẾ ${curYear}: ${(() => { try { const o = taiSuiOverview(R, curYear); return `${o.current.ganZhi} = ${o.current.name} (vị ${o.current.index}/60). ${o.current.note} Bản mệnh TS (năm sinh) = ${o.natal.name}.`; } catch (e) { return '(không tính được)'; } })()}
 
@@ -1147,6 +1148,7 @@ NGUYEN TAC:
 14. [loop 12] LUÔN KHAM KHIT CAC TANG SAU KHI TRINH BAY:
   - Khi luận cấu trúc mệnh: TRÍCH 格局成败 verdict (成格/bại/có cứu) + diseases + rescues. NÊU bệnh cách + cách cứu.
   - Khi luận thời điểm: TRÍCH tags ★格局喜 / ⚠格局忌 / ★RESCUES / ⚠WORSENS per đại vận/lưu niên/lưu nguyệt/giờ. NÊU "vận/năm/tháng/giờ này thuộc cách-thần hỷ → thuận CÁCH".
+  - ⚠ LUẬN THÁNG (lưu nguyệt): tháng Bát Tự là tháng TIẾT KHÍ (vd 甲午=tháng Ngọ≈tháng 6 DƯƠNG, ~Mang Chủng-Tiểu Thử), KHÔNG PHẢI tháng âm lịch (tháng âm lệch 1-2 tháng). KHI NÊU THÁNG: dùng TÊN CHI-THÁNG (tháng Ngọ/Mùi/Dậu...) hoặc «tháng X dương» + ghi can-chi. KHÔNG BAO GIỜ viết «tháng X ÂM» khi luận lưu nguyệt — đó là HỆ KHÁC, sẽ sai (vd «tháng 6 âm» thực ra = tháng 7-8 dương = tháng Mùi/Thân, KHÔNG phải 甲午). Nếu user nói «tháng 6 âm», PHẢI đổi ra tiết-khí tương ứng trước khi luận.
   - Khi luận Tử Vi: TRÍCH 宫干自化 (cung nào tự biến đổi) + 飞星化入/化出 (lĩnh vực nào kết nối) + 大限宫干四化 (thập kỷ này kích hoạt gì).
   - KHÔNG BỎ QUA các tầng sâu — đây là điểm KHÁC BIỆT của app so với các app phong thủy khác.
 

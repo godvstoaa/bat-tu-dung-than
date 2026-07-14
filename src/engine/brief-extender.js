@@ -514,10 +514,12 @@ export function extendBrief(R) {
     // [loop 209 fix] truyền patternQuality — bật tầng 格局流月喜忌 (gejuDelta). Trước đây
     //   THIẾU patternQuality → brief's LƯU THÁNG thiếu 1 tầng, lệch thẻ «Lưu Nguyệt» + AI tool.
     const ly = computeLiuyue(R, now.getFullYear(), R.patternQuality);
-    const curMonth = now.getMonth(); // 0-11
-    const m = ly.months.find((mm) => mm.m === curMonth) || ly.months[0];
+    const curSolarMonth = now.getMonth() + 1; // 1-12 dương
+    // [AUDIT FIX] match theo solarMonth (dương) — trước đây mm.m===curMonth (m=BaZi index 0-11) lệch 1 tháng
+    const m = ly.months.find((mm) => mm.solarMonth === curSolarMonth) || ly.months.find((mm) => mm.m === now.getMonth()) || ly.months[0];
     if (m) {
-      parts.push(`LƯU THÁNG ${now.getMonth() + 1} (${m.ganZhi}): ${m.rating} (${m.score}/100) — ${(m.note || '').slice(0, 80)}${m.taiSui?.length ? ' | ' + m.taiSui.join(', ') : ''}${m.fuyin?.length ? ' | ' + m.fuyin.join(', ') : ''}`);
+      // [AUDIT FIX] dùng mVi (tên chi-tháng tiết-khí) — ĐỪNG nhầm «tháng N âm» (lưu nguyệt = tháng tiết-khí, gần tháng DƯƠNG, lệch 1-2 vs tháng âm)
+      parts.push(`LƯU THÁNG ${m.mVi} ≈ ${m.solarMonthVi}: ${m.rating} (${m.score}/100) — ${(m.note || '').slice(0, 80)}${m.taiSui?.length ? ' | ' + m.taiSui.join(', ') : ''}${m.fuyin?.length ? ' | ' + m.fuyin.join(', ') : ''}`);
     }
   } catch (e) {}
 
