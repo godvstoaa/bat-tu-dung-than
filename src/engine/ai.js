@@ -29,7 +29,7 @@ import { drawRune, RUNES } from './runes-kb.js';
 import { ichingRandom, ICHING_64 } from './iching64-kb.js';
 import { coffeeRead, COFFEE_SYMBOLS } from './coffee-kb.js';
 import { analyzeName } from './naming.js';
-import { getRemedyForChart, meritLedger, remedySummary, LIAOFAN_STORY, REMEDY_QUOTES, TEN_THIEN, REMEDY_METHODS, CONG_QUA, CHART_REMEDY } from './remedy-fate.js';
+import { getRemedyForChart, getYeguoForChart, meritLedger, remedySummary, LIAOFAN_STORY, REMEDY_QUOTES, YEGUO, BAZI_HUAJIE, CHAN_HUI, CHANHUI_PRINCIPLE, ZHUNTI, JING_ZHOU, GAI_XIN, GAI_LEVELS, GAI_PRINCIPLE, DAO_JIA } from './remedy-fate.js';
 import { think as brainThink } from '../brain/brain.js';
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
@@ -981,7 +981,7 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const notes = (BAZI_WESTERN_MAP?.COMPARISON_NOTES || []).join(' ');
     brief += `\n--- PHƯƠNG TÂY ĐỐI CHIẾU (framework) ---\nHệ Bát Tự (tài liệu trên) có thể ĐỐI CHIẾU với chiêm tinh phương Tây qua tool \`analyze_western\` (tính Sun/Moon/Mercury.../Pluto + Ascendant + 12 houses + aspects từ cùng giờ sinh). Mapping: Nhật Chủ ≈ Mặt Trời (cái tôi), 阴/Ấn ≈ Mặt Trăng (cảm xúc, gần), Dụng Thần KHÔNG có tương đương Western, Ascendant KHÔNG có trong BaZi, Ngũ hành (5) ≠ 4 nguyên tố. ${notes} Khi user hỏi «so sánh/đối chiếu/phương Tây/chiêm tinh» → gọi analyze_western (hỏi nơi sinh nếu cần Ascendant chính xác).`;
     brief += `\n--- CÁC TRƯỜNG PHÁI BÓI TOÁN KHÁC (tools sẵn có — gọi khi user hỏi) ---\n• TAROT (22 Major Arcana, Rider-Waite): tool \`analyze_tarot\` rút 3 lá Quá khứ-Hiện tại-Tương lai (upright/reversed).\n• THẦN SỐ HỌC (Numerology Pythagorean): tool \`analyze_numerology\` Life Path từ ngày sinh + Expression từ tên.\n• RUNES (24 Elder Futhark Bắc Âu): tool \`analyze_rune\` rút rune.\n• KINH DỊCH 64 quẻ: tool \`analyze_iching\` rút 1 quẻ (gọn; cho chi tiết dùng 河洛/鬼谷卦 tool).\n• ĐỌC BÃ CÀ PHÊ/TRÀ: tool \`analyze_coffee\` 3 ký hiệu.\n→ Khi user hỏi «bói tarot/số đường đời/rune/quẻ cà phê» → gọi tool tương ứng. Các trường phái này đều tham khảo, không định mệnh — luôn nói rõ.`;
-    brief += `\n--- NGHỊCH THIÊN CẢI MỆNH (改命 — QUAN TRỌNG) ---\nLá số trên = TIÊN THIÊN (quỹ đạo bẩm sinh «bói thấy»). Nhưng «Mệnh do ta tạo, phúc do ta cầu» (Liễu Phàm Tứ Huấn) — MỆNH CÓ THỂ CẢI bằng tích đức (HẬU THIÊN). Liễu Phàm bị đoán chết 53t/không con → tích 3000 công → sinh con, 6000 công → đỗ tiến sĩ, sống 74t. → KHÔNG BAO GIỜ tuyệt đối hóa lá số. Khi user hỏi «mệnh xấu có cải được không/đổi vận/cải mệnh» HOẶC khi luận xong thấy phần tiêu cực (败格/thân nhược/khắc phối) → gọi tool \`analyze_remedy_fate\` lấy biện pháp (10 thiện, Công Qua Cách sổ công–quá, map vấn đề lá số→remedy) + neo «tiên thiên vậy, hậu thiên CẢI ĐƯỢC» để KHÔNG khiến user tuyệt vọng.`;
+    brief += `\n--- NGHỊCH THIÊN CẢI MỆNH (改命 — QUAN TRỌNG, ROOT-LEVEL) ---\nLá số trên = TIÊN THIÊN (quỹ đạo). «Mệnh do ta tạo» — CẢI ĐƯỢC. Cốt lõi: TÂM→NIỆM→HÀNH→NGHIỆP→MỆNH; sửa tận TÂM+NGHIỆP = sửa tận GỐC.\n⚠ NGUYÊN TẮC LUẬN CẢI MỆNH: KHÔNG platitude «làm việc thiện / tích âm đức» chung chung. PHẢI bắt bệnh TẬN GỐC: vấn đề lá số → dấu ác nghiệp (nhân quả quá khứ) → THUỐC GIẢI NGHIỆP TRỰC TIẾP (戒 cụ thể + 经咒 cụ thể + 忏悔 cụ thể). Vd: Thất Sát/sát nghiệp → phóng sinh+不杀戒+药师咒+礼忏杀业; Tài nhược/偷盗 nghiệp → 不与取戒+布施+地藏经+忏悔盗业; hôn nhân khắc/邪淫 nghiệp → 不邪淫戒+准提咒+不净观; Thương Quan/口业 → 柔软语+忍辱+大悲咒.\nKhi user hỏi «cải mệnh/đổi vận/mệnh xấu có sửa được không» HOẶC khi luận xong thấy tiêu cực → gọi \`analyze_remedy_fate\` lấy: 业果 ROOT diagnosis + 八字化解 3层 (形/心/业) + 忏悔法门 + 准提法门 + 经咒-per-vấn + 改心 5步. Nói TẬN GỐC, KHÔNG sáo rỗng.`;
   } catch (_) {}
 
   return brief;
@@ -1466,7 +1466,7 @@ export const AI_TOOLS = [
     parameters: { type: 'object', properties: { name: { type: 'string', description: 'Họ tên đầy đủ cần luận (vd "Nguyễn Minh Anh").' } }, required: ['name'] },
   } },
   { type: 'function', function: {
-    name: 'analyze_remedy_fate', description: 'NGHỊCH THIÊN CẢI MỆNH (改命) — giáo lý cải mệnh từ kinh điển Á Đông (Liễu Phàm Tứ Huấn, 寒窑赋, Thái Thượng Cảm Ứng, Âm Chú Văn, Tâm Mệnh Thi) + Công Qua Cách (sổ công–quá). Trả: nguyên lý «mệnh do ta tạo», điển cố Liễu Phàm, biện pháp cải mệnh THEO LÁ SỐ user (10 thiện, 10 phương pháp, map vấn đề lá số→remedy), framework Công Qua Cách, 8 danh ngôn. Dùng khi user hỏi «mệnh xấu có cải được không/cách cải mệnh/làm sao đổi vận/mệnh đã an chưa/đừng tuyệt vọng» HOẶC khi luận xong thấy phần tiêu cực cần «neo hi vọng». Khuyên dùng CUỐI mỗi lá số tiêu cực — «tiên thiên vậy, hậu thiên cải được».',
+    name: 'analyze_remedy_fate', description: 'NGHỊCH THIÊN CẢI MỆNH (逆天改命) — ROOT-LEVEL, KHÔNG platitude. Trả: (1) 业果 ROOT diagnosis — map vấn đề lá số → dấu ác nghiệp quá khứ (10 ác nghiệp: sát/thâu/tà/vọng/...) → THUỐC GIẢI NGHIỆP trực tiếp (戒+经咒+忏悔 cụ thể, vd 杀业→放生+不杀戒+药师咒+礼忏); (2) 八字化解 3 TẦNG (形法:sửa ngoại cảnh / 心法:sửa tâm / 业法:giải nghiệp gốc); (3) 忏悔法门 5法 (八十八佛/金刚萨埵百字明/...); (4) 准提法门 (Liễu Phàm thật method); (5) 经咒 theo vấn đề (病→药师,业→地藏,执→金刚,灾→普门,贫→准提); (6) 改心 5步 + 改命vs改运 3层. Dùng khi user hỏi «cải mệnh/đổi vận/mệnh xấu có sửa được không» HOẶC khi luận xong thấy tiêu cực — BẮT BỆNH TẬN GỐC (vấn đề→nghiệp nhân→thuốc), KHÔNG nói chung chung «làm việc thiện/tích đức».',
     parameters: { type: 'object', properties: {}, required: [] },
   } },
 ];
@@ -1733,20 +1733,27 @@ export function execTool(name, args, R) {
           };
         } catch (e) { return { error: 'lỗi analyze_name: ' + e.message }; }
       }
-      case 'analyze_remedy_fate': { // [REMEDY] nghịch thiên cải mệnh — Liễu Phàm + Công Qua Cách
+      case 'analyze_remedy_fate': { // [REMEDY] nghịch thiên cải mệnh — ROOT-LEVEL (业果 + 3层化解)
         try {
+          const yk = getYeguoForChart(R);
           const rec = getRemedyForChart(R);
           return {
-            principle: '«Mệnh do ta tạo, phúc do ta cầu» (Liễu Phàm). Lá số = TIÊN THIÊN (quỹ đạo hiện tại); cải mệnh = HẬU THIÊN qua tích đức. KHÔNG tuyệt vọng — có thể cải.',
+            principle: LIAOFAN_STORY.rootChain + ' — «Mệnh do ta tạo». Lá số = QUỸ ĐẠO hiện tại, KHÔNG kết cục. Cốt lõi: CHUYỂN TÂM + GIẢI NGHIỆP.',
             liaofanStory: LIAOFAN_STORY,
-            chartRemedies: rec.relevant,
-            needLevel: rec.needLevel,
-            tenThien: TEN_THIEN,
-            methods: REMEDY_METHODS,
-            meritLedgerFramework: 'Công Qua Cách: ghi công (+) — quá (-) hàng ngày. thiện: ' + CONG_QUA.thien.map(x => x.a + '(+' + x.p + ')').join(', ') + '. ác: ' + CONG_QUA.ac.map(x => x.a + '(-' + x.p + ')').join(', ') + '. Net công dương = cải mệnh (Liễu Phàm tích 3000 công → sinh con, 6000 → đỗ tiến sĩ).',
-            quotes: REMEDY_QUOTES,
+            ROOT_diagnosis: yk,
+            ROOT_note: 'Bắt bệnh tận GỐC: mỗi vấn đề lá số → dấu ác nghiệp quá khứ → thuốc giải nghiệp TRỰC TIẾP (戒+经咒+忏悔). KHÔNG platitude «làm thiện».',
+            threeLayer_cure: rec.relevant,
+            threeLayer_note: '3 lớp: 形法 (sửa ngoại cảnh) + 心法 (sửa tâm) + 业法 (giải nghiệp gốc).',
+            chanhui: CHAN_HUI,
+            chanhuiPrinciple: CHANHUI_PRINCIPLE,
+            zhunti: ZHUNTI,
+            jingzhou: JING_ZHOU,
+            gaiXin: GAI_XIN,
+            gaiLevels: GAI_LEVELS,
+            gaiPrinciple: GAI_PRINCIPLE,
+            daoJia: DAO_JIA,
             summary: remedySummary(R),
-            note: 'Kinh điển: Liễu Phàm Tứ Huấn, 寒窑赋, 太上感应篇, 阴骘文, Tâm Mệnh Thi. Cải mệnh = tham khảo, kết quả tùy每个人的thực hành — không đảm báo.',
+            note: 'Kinh điển: 华严经/十善业道经/了凡四训/准提法门/药师经/地藏经/金刚经/普门品/楞严咒/八十八佛忏悔文/金刚萨埵/清静经 + 八字化解3层. Cải mệnh = tham khảo, kết quả tùy thực hành — không đảm bảo.',
           };
         } catch (e) { return { error: 'lỗi analyze_remedy_fate: ' + e.message }; }
       }

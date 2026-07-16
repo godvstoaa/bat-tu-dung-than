@@ -195,7 +195,7 @@ import { donggongDay, donggongInMonth } from './engine/donggong.js';
 import { qizheng, renderQizhengCard } from './engine/qizheng.js';
 import { computeWesternChart, renderWesternCard } from './engine/western-astro.js';
 import { renderSynthesisCard } from './engine/western-synthesis.js';
-import { getRemedyForChart, LIAOFAN_STORY, REMEDY_QUOTES, TEN_THIEN, REMEDY_METHODS, CONG_QUA } from './engine/remedy-fate.js';
+import { getRemedyForChart, getYeguoForChart, LIAOFAN_STORY, REMEDY_QUOTES, YEGUO, BAZI_HUAJIE, ZHUNTI, JING_ZHOU, GAI_XIN, GAI_LEVELS, CHAN_HUI } from './engine/remedy-fate.js';
 import { tianxingZheri, renderTianxingCard, MOUNTAINS_24 as TX_MOUNTAINS_24, MOUNTAIN_VI } from './engine/tianxing-zheri.js';
 import {
   FACE_PALACES, MOLE_POSITIONS, AGE_FACE_MAP,
@@ -3561,20 +3561,25 @@ function renderCaiMenh(R) {
   if (!el) return;
   try {
     const rec = getRemedyForChart(R);
+    const yk = getYeguoForChart(R);
     const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    const remedies = (rec.relevant.length ? rec.relevant : [{ when: 'Mệnh tổng thể', remedy: 'Tích thiện chung + khiêm đức' }]).map(r => `<div class="rm-row"><b>${esc(r.when)}</b> → <span class="wi-text">${esc(r.remedy)}</span></div>`).join('');
-    const tenThien = TEN_THIEN.map(t => `<div class="rm-mini"><b class="zh">${esc(t.han)}</b> ${esc(t.vi)} <span class="hint-inline">— ${esc(t.practice)}</span></div>`).join('');
-    const congQua = [...CONG_QUA.thien.map(x => `<span class="rm-cq rm-cq-thien">${esc(x.a)} +${x.p}</span>`), ...CONG_QUA.ac.map(x => `<span class="rm-cq rm-cq-ac">${esc(x.a)} -${x.p}</span>`)].join(' ');
+    const rootDiag = (yk.length ? yk : []).map(y => `<div class="rm-row"><b>${esc(y.why || y.karma)}</b><br><span class="hint-inline">→ dấu ${esc(y.karma)}: ${esc(y.result)}</span><br><span class="wi-text">💊 ${esc(y.cure)}</span></div>`).join('');
+    const threeLayer = rec.relevant.map(h => `<div class="rm-row"><b>${esc(h.when)}</b><br><span class="hint-inline">形 (ngoại cảnh):</span> <span class="wi-text">${esc(h.xing)}</span><br><span class="hint-inline">心 (tâm):</span> <span class="wi-text">${esc(h.xin)}</span><br><span class="hint-inline">业 (nghiệp gốc):</span> <span class="wi-text">${esc(h.ye)}</span></div>`).join('');
+    const jingzhou = JING_ZHOU.map(j => `<div class="rm-mini"><b>${esc(j.problem)}</b> → <span class="zh">${esc(j.cure)}</span><br><span class="hint-inline">${esc(j.method)}</span></div>`).join('');
+    const gaiXin = GAI_XIN.steps.map(s => `<span class="rm-cq rm-cq-thien">${esc(s.s)} ${esc(s.d)}</span>`).join(' ');
+    const levels = GAI_LEVELS.map(l => `<div class="rm-mini"><b>${esc(l.lv)}</b> — ${esc(l.depth)},${esc(l.ease)} — ${esc(l.methods)} <span class="hint-inline">(${esc(l.time)})</span></div>`).join('');
     const quotes = REMEDY_QUOTES.slice(0, 4).map(q => `<div class="rm-quote"><span class="zh">${esc(q.han)}</span> — ${esc(q.vi)} <span class="hint-inline">${esc(q.src)}</span></div>`).join('');
     el.innerHTML = `
       <div class="remedy-card">
-        <p class="rm-lead">«Mệnh do ta tạo, phúc do ta cầu» <span class="zh">命由我作，福自己求</span> — lá số chỉ thấy <b>TIÊN THIÊN</b> (quỹ đạo bẩm sinh). <b>HẬU THIÊN</b> cải được qua tích đức.</p>
-        <p class="hint-inline" style="display:block;margin:4px 0">${esc(LIAOFAN_STORY.story)} <b>${esc(LIAOFAN_STORY.lesson)}</b></p>
-        <details open><summary class="card-title" style="cursor:pointer">🎯 Biện pháp theo lá số của bạn (độ cần: <b>${esc(rec.needLevel)}</b>)</summary><div class="rm-list" style="margin-top:6px">${remedies}</div></details>
-        <details><summary class="card-title" style="cursor:pointer">🔟 10 thiện (积善之方 — Liễu Phàm)</summary><div class="rm-grid" style="margin-top:6px">${tenThien}</div></details>
-        <details><summary class="card-title" style="cursor:pointer">📜 Công Qua Cách (sổ công–quá hàng ngày)</summary><p class="hint-inline" style="margin-top:6px">Ghi mỗi việc: thiện (+công) — ác (−quá). Net công dương = cải mệnh (Liễu Phàm tích 3000 công → sinh con, 6000 → đỗ tiến sĩ).</p><div class="rm-cq-list">${congQua}</div></details>
-        <details><summary class="card-title" style="cursor:pointer">💬 Danh ngôn cải mệnh</summary><div class="rm-quotes" style="margin-top:6px">${quotes}</div></details>
-        <p class="hint-inline" style="display:block;margin-top:6px">Kinh điển: Liễu Phàm Tứ Huấn · 寒窑赋 · 太上感应篇 · 阴骘文 · Tâm Mệnh Thi. Cải mệnh = tham khảo, kết quả tùy thực hành — không đảm bảo.</p>
+        <p class="rm-lead">${esc(LIAOFAN_STORY.rootChain)} — «Mệnh do ta tạo». Lá số = <b>QUỸ ĐẠO</b> hiện tại, KHÔNG kết cục. Cốt lõi: <b>CHUYỂN TÂM + GIẢI NGHIỆP</b> = đổi tận gốc. <span class="hint-inline">(KHÔNG platitude «làm thiện» — mỗi vấn đề có thuốc giải nghiệp cụ thể)</span></p>
+        <details open><summary class="card-title" style="cursor:pointer">🩺 Bắt bệnh tận GỐC — vấn đề lá số → ác nghiệp → thuốc giải nghiệp</summary>${rootDiag ? `<div class="rm-list" style="margin-top:6px">${rootDiag}</div>` : '<p class="hint-inline" style="margin-top:6px">Lá số bạn không dấu ác nghiệp rõ — xem 3 lớp hóa giải dưới.</p>'}</details>
+        <details open><summary class="card-title" style="cursor:pointer">🎯 八字 hóa giải 3 TẦNG (形/心/业) — độ cần: <b>${esc(rec.needLevel)}</b></summary><div class="rm-list" style="margin-top:6px">${threeLayer}</div></details>
+        <details><summary class="card-title" style="cursor:pointer">📜 经咒 theo vấn đề (病→药师,业→地藏,执→金刚,灾→普门,贫→准提)</summary><div class="rm-grid" style="margin-top:6px">${jingzhou}</div></details>
+        <details><summary class="card-title" style="cursor:pointer">🧘 改心 5 bước (sâu nhất — TÂM là GỐC)</summary><p class="hint-inline" style="margin-top:6px">Principle: ${esc(GAI_XIN.principle)}</p><div class="rm-cq-list" style="margin-top:4px">${gaiXin}</div><p class="hint-inline" style="margin-top:4px">4 chìa khóa chuyển niệm: ${esc(GAI_XIN.keys4.join(' · '))}</p></details>
+        <details><summary class="card-title" style="cursor:pointer">🎚️ 改命 vs 改运 (3 lớp — đừng lẫn)</summary><div class="rm-grid" style="margin-top:6px">${levels}</div></details>
+        <details><summary class="card-title" style="cursor:pointer">🪷 准提法门 (Liễu Phàm thật method)</summary><p class="hint-inline" style="margin-top:6px">${esc(ZHUNTI.principle)}</p><p class="rm-mini" style="margin-top:4px"><b>Chú:</b> ${esc(ZHUNTI.mantra)}</p><p class="rm-mini"><b>Cách:</b> ${esc(ZHUNTI.how)}</p><p class="rm-mini">${esc(ZHUNTI.fit)}</p></details>
+        <details><summary class="card-title" style="cursor:pointer">💬 Danh ngôn</summary><div class="rm-quotes" style="margin-top:6px">${quotes}</div></details>
+        <p class="hint-inline" style="display:block;margin-top:6px">Kinh điển: 华严经/十善业道经/了凡四训/准提法门/药师经/地藏经/金刚经/普门品/楞严咒/八十八佛忏悔/清静经 + 八字化解3层. Cải mệnh = tham khảo, kết quả tùy thực hành — không đảm bảo.</p>
       </div>`;
   } catch (e) {
     el.innerHTML = '<p class="hint">Không tính được phần cải mệnh.</p>';
