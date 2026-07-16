@@ -195,6 +195,7 @@ import { donggongDay, donggongInMonth } from './engine/donggong.js';
 import { qizheng, renderQizhengCard } from './engine/qizheng.js';
 import { computeWesternChart, renderWesternCard } from './engine/western-astro.js';
 import { renderSynthesisCard } from './engine/western-synthesis.js';
+import { getRemedyForChart, LIAOFAN_STORY, REMEDY_QUOTES, TEN_THIEN, REMEDY_METHODS, CONG_QUA } from './engine/remedy-fate.js';
 import { tianxingZheri, renderTianxingCard, MOUNTAINS_24 as TX_MOUNTAINS_24, MOUNTAIN_VI } from './engine/tianxing-zheri.js';
 import {
   FACE_PALACES, MOLE_POSITIONS, AGE_FACE_MAP,
@@ -3555,7 +3556,31 @@ function renderWesternSynthesis(R) {
   }
 }
 
-// ---------------------------------------------------------------- 天星择日 (TIAN XING ZHE RI — star date selection)
+function renderCaiMenh(R) {
+  const el = $('remedy-fate');
+  if (!el) return;
+  try {
+    const rec = getRemedyForChart(R);
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const remedies = (rec.relevant.length ? rec.relevant : [{ when: 'Mệnh tổng thể', remedy: 'Tích thiện chung + khiêm đức' }]).map(r => `<div class="rm-row"><b>${esc(r.when)}</b> → <span class="wi-text">${esc(r.remedy)}</span></div>`).join('');
+    const tenThien = TEN_THIEN.map(t => `<div class="rm-mini"><b class="zh">${esc(t.han)}</b> ${esc(t.vi)} <span class="hint-inline">— ${esc(t.practice)}</span></div>`).join('');
+    const congQua = [...CONG_QUA.thien.map(x => `<span class="rm-cq rm-cq-thien">${esc(x.a)} +${x.p}</span>`), ...CONG_QUA.ac.map(x => `<span class="rm-cq rm-cq-ac">${esc(x.a)} -${x.p}</span>`)].join(' ');
+    const quotes = REMEDY_QUOTES.slice(0, 4).map(q => `<div class="rm-quote"><span class="zh">${esc(q.han)}</span> — ${esc(q.vi)} <span class="hint-inline">${esc(q.src)}</span></div>`).join('');
+    el.innerHTML = `
+      <div class="remedy-card">
+        <p class="rm-lead">«Mệnh do ta tạo, phúc do ta cầu» <span class="zh">命由我作，福自己求</span> — lá số chỉ thấy <b>TIÊN THIÊN</b> (quỹ đạo bẩm sinh). <b>HẬU THIÊN</b> cải được qua tích đức.</p>
+        <p class="hint-inline" style="display:block;margin:4px 0">${esc(LIAOFAN_STORY.story)} <b>${esc(LIAOFAN_STORY.lesson)}</b></p>
+        <details open><summary class="card-title" style="cursor:pointer">🎯 Biện pháp theo lá số của bạn (độ cần: <b>${esc(rec.needLevel)}</b>)</summary><div class="rm-list" style="margin-top:6px">${remedies}</div></details>
+        <details><summary class="card-title" style="cursor:pointer">🔟 10 thiện (积善之方 — Liễu Phàm)</summary><div class="rm-grid" style="margin-top:6px">${tenThien}</div></details>
+        <details><summary class="card-title" style="cursor:pointer">📜 Công Qua Cách (sổ công–quá hàng ngày)</summary><p class="hint-inline" style="margin-top:6px">Ghi mỗi việc: thiện (+công) — ác (−quá). Net công dương = cải mệnh (Liễu Phàm tích 3000 công → sinh con, 6000 → đỗ tiến sĩ).</p><div class="rm-cq-list">${congQua}</div></details>
+        <details><summary class="card-title" style="cursor:pointer">💬 Danh ngôn cải mệnh</summary><div class="rm-quotes" style="margin-top:6px">${quotes}</div></details>
+        <p class="hint-inline" style="display:block;margin-top:6px">Kinh điển: Liễu Phàm Tứ Huấn · 寒窑赋 · 太上感应篇 · 阴骘文 · Tâm Mệnh Thi. Cải mệnh = tham khảo, kết quả tùy thực hành — không đảm bảo.</p>
+      </div>`;
+  } catch (e) {
+    el.innerHTML = '<p class="hint">Không tính được phần cải mệnh.</p>';
+    console.warn('remedy-fate', e.message);
+  }
+}
 // Module tương tác: user chọn 24-mountain sitting → chấm 60 ngày tới → top 5 tốt + 3 kỵ.
 function renderTianxingZheri() {
   const el = $('tianxing-zheri');
@@ -4761,6 +4786,7 @@ async function run() {
   lazyRender('qizheng',        () => { try { renderQizheng(currentResult); } catch (e) { console.warn('qizheng', e.message); } });
   lazyRender('western',        () => { try { renderWestern(currentResult); } catch (e) { console.warn('western', e.message); } });
   lazyRender('western-synthesis', () => { try { renderWesternSynthesis(currentResult); } catch (e) { console.warn('western-synthesis', e.message); } });
+  lazyRender('remedy-fate',     () => { try { renderCaiMenh(currentResult); } catch (e) { console.warn('remedy-fate', e.message); } });
   lazyRender('tianxing-zheri', () => { try { renderTianxingZheri(); } catch (e) { console.warn('tianxing', e.message); } });
   lazyRender('golden-year',    () => { try { renderGoldenYear(currentResult); } catch (e) { console.warn('goldenyear', e.message); } });
   lazyRender('daily-capsule',  () => { try { renderDailyCapsule(currentResult); } catch (e) { console.warn('daily-capsule', e.message); } });

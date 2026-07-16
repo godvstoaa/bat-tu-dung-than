@@ -2979,3 +2979,18 @@ h2.grp {
 .wi-aspects { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
 .wi-asp { font-size: .87em; line-height: 1.5; color: var(--silk, #f2e8d0); }
 .wi-asp b { color: var(--gold-bright, #e8d28a); }
+
+/* ===== Cải Mệnh (Nghịch Thiên Cải Mệnh) ===== */
+.remedy-card { padding: 4px 0; }
+.rm-lead { font-size: 14.5px; color: var(--silk, #f2e8d0); line-height: 1.6; }
+.rm-lead .zh { color: var(--gold-bright, #e8d28a); }
+.rm-row { font-size: 13px; padding: 5px 0; border-bottom: 1px solid rgba(212,175,55,0.1); color: var(--silk-dim, #d4c7a4); }
+.rm-row .wi-text { color: var(--silk, #f2e8d0); }
+.rm-mini { font-size: 12px; padding: 3px 0; color: var(--silk-dim, #d4c7a4); }
+.rm-mini .zh { color: var(--gold-bright, #e8d28a); font-weight: 600; }
+.rm-cq-list { margin-top: 6px; line-height: 1.9; }
+.rm-cq { display: inline-block; font-size: 11.5px; padding: 2px 7px; margin: 2px 3px; border-radius: 5px; }
+.rm-cq-thien { background: rgba(42,158,107,0.15); color: #7fd9a8; }
+.rm-cq-ac { background: rgba(232,90,58,0.14); color: #f0a08a; }
+.rm-quote { font-size: 12.5px; padding: 4px 0; color: var(--silk-dim, #d4c7a4); }
+.rm-quote .zh { color: var(--gold-bright, #e8d28a); font-weight: 600; }

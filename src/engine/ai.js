@@ -29,6 +29,7 @@ import { drawRune, RUNES } from './runes-kb.js';
 import { ichingRandom, ICHING_64 } from './iching64-kb.js';
 import { coffeeRead, COFFEE_SYMBOLS } from './coffee-kb.js';
 import { analyzeName } from './naming.js';
+import { getRemedyForChart, meritLedger, remedySummary, LIAOFAN_STORY, REMEDY_QUOTES, TEN_THIEN, REMEDY_METHODS, CONG_QUA, CHART_REMEDY } from './remedy-fate.js';
 import { think as brainThink } from '../brain/brain.js';
 import { analyzeKongwang } from './kongwang.js';
 import { analyzePillarAges } from './pillar-age.js';
@@ -980,6 +981,7 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const notes = (BAZI_WESTERN_MAP?.COMPARISON_NOTES || []).join(' ');
     brief += `\n--- PHƯƠNG TÂY ĐỐI CHIẾU (framework) ---\nHệ Bát Tự (tài liệu trên) có thể ĐỐI CHIẾU với chiêm tinh phương Tây qua tool \`analyze_western\` (tính Sun/Moon/Mercury.../Pluto + Ascendant + 12 houses + aspects từ cùng giờ sinh). Mapping: Nhật Chủ ≈ Mặt Trời (cái tôi), 阴/Ấn ≈ Mặt Trăng (cảm xúc, gần), Dụng Thần KHÔNG có tương đương Western, Ascendant KHÔNG có trong BaZi, Ngũ hành (5) ≠ 4 nguyên tố. ${notes} Khi user hỏi «so sánh/đối chiếu/phương Tây/chiêm tinh» → gọi analyze_western (hỏi nơi sinh nếu cần Ascendant chính xác).`;
     brief += `\n--- CÁC TRƯỜNG PHÁI BÓI TOÁN KHÁC (tools sẵn có — gọi khi user hỏi) ---\n• TAROT (22 Major Arcana, Rider-Waite): tool \`analyze_tarot\` rút 3 lá Quá khứ-Hiện tại-Tương lai (upright/reversed).\n• THẦN SỐ HỌC (Numerology Pythagorean): tool \`analyze_numerology\` Life Path từ ngày sinh + Expression từ tên.\n• RUNES (24 Elder Futhark Bắc Âu): tool \`analyze_rune\` rút rune.\n• KINH DỊCH 64 quẻ: tool \`analyze_iching\` rút 1 quẻ (gọn; cho chi tiết dùng 河洛/鬼谷卦 tool).\n• ĐỌC BÃ CÀ PHÊ/TRÀ: tool \`analyze_coffee\` 3 ký hiệu.\n→ Khi user hỏi «bói tarot/số đường đời/rune/quẻ cà phê» → gọi tool tương ứng. Các trường phái này đều tham khảo, không định mệnh — luôn nói rõ.`;
+    brief += `\n--- NGHỊCH THIÊN CẢI MỆNH (改命 — QUAN TRỌNG) ---\nLá số trên = TIÊN THIÊN (quỹ đạo bẩm sinh «bói thấy»). Nhưng «Mệnh do ta tạo, phúc do ta cầu» (Liễu Phàm Tứ Huấn) — MỆNH CÓ THỂ CẢI bằng tích đức (HẬU THIÊN). Liễu Phàm bị đoán chết 53t/không con → tích 3000 công → sinh con, 6000 công → đỗ tiến sĩ, sống 74t. → KHÔNG BAO GIỜ tuyệt đối hóa lá số. Khi user hỏi «mệnh xấu có cải được không/đổi vận/cải mệnh» HOẶC khi luận xong thấy phần tiêu cực (败格/thân nhược/khắc phối) → gọi tool \`analyze_remedy_fate\` lấy biện pháp (10 thiện, Công Qua Cách sổ công–quá, map vấn đề lá số→remedy) + neo «tiên thiên vậy, hậu thiên CẢI ĐƯỢC» để KHÔNG khiến user tuyệt vọng.`;
   } catch (_) {}
 
   return brief;
@@ -1463,6 +1465,10 @@ export const AI_TOOLS = [
     name: 'analyze_name', description: 'HỌ TÊN HỌC (姓名学) — luận tên: (1) Letter numerology (Expression/Soul Urge/Personality — Pythagorean, áp dụng mọi tên incl. Quốc Ngữ) + (2) 5格 Ngũ Cách (Thiên-Nhân-Địa-Ngoại-Tổng + 81 nét cát/hung — cần tên Hán-Việt map nét Khang Hy). Dùng khi user hỏi «luận tên/xem tên có đẹp không/phân tích tên/姓名/5 cách».',
     parameters: { type: 'object', properties: { name: { type: 'string', description: 'Họ tên đầy đủ cần luận (vd "Nguyễn Minh Anh").' } }, required: ['name'] },
   } },
+  { type: 'function', function: {
+    name: 'analyze_remedy_fate', description: 'NGHỊCH THIÊN CẢI MỆNH (改命) — giáo lý cải mệnh từ kinh điển Á Đông (Liễu Phàm Tứ Huấn, 寒窑赋, Thái Thượng Cảm Ứng, Âm Chú Văn, Tâm Mệnh Thi) + Công Qua Cách (sổ công–quá). Trả: nguyên lý «mệnh do ta tạo», điển cố Liễu Phàm, biện pháp cải mệnh THEO LÁ SỐ user (10 thiện, 10 phương pháp, map vấn đề lá số→remedy), framework Công Qua Cách, 8 danh ngôn. Dùng khi user hỏi «mệnh xấu có cải được không/cách cải mệnh/làm sao đổi vận/mệnh đã an chưa/đừng tuyệt vọng» HOẶC khi luận xong thấy phần tiêu cực cần «neo hi vọng». Khuyên dùng CUỐI mỗi lá số tiêu cực — «tiên thiên vậy, hậu thiên cải được».',
+    parameters: { type: 'object', properties: {}, required: [] },
+  } },
 ];
 
 // Executor — gọi engine deterministic, trả JSON trim gọn (tránh phình context)
@@ -1726,6 +1732,23 @@ export function execTool(name, args, R) {
             note: r.note,
           };
         } catch (e) { return { error: 'lỗi analyze_name: ' + e.message }; }
+      }
+      case 'analyze_remedy_fate': { // [REMEDY] nghịch thiên cải mệnh — Liễu Phàm + Công Qua Cách
+        try {
+          const rec = getRemedyForChart(R);
+          return {
+            principle: '«Mệnh do ta tạo, phúc do ta cầu» (Liễu Phàm). Lá số = TIÊN THIÊN (quỹ đạo hiện tại); cải mệnh = HẬU THIÊN qua tích đức. KHÔNG tuyệt vọng — có thể cải.',
+            liaofanStory: LIAOFAN_STORY,
+            chartRemedies: rec.relevant,
+            needLevel: rec.needLevel,
+            tenThien: TEN_THIEN,
+            methods: REMEDY_METHODS,
+            meritLedgerFramework: 'Công Qua Cách: ghi công (+) — quá (-) hàng ngày. thiện: ' + CONG_QUA.thien.map(x => x.a + '(+' + x.p + ')').join(', ') + '. ác: ' + CONG_QUA.ac.map(x => x.a + '(-' + x.p + ')').join(', ') + '. Net công dương = cải mệnh (Liễu Phàm tích 3000 công → sinh con, 6000 → đỗ tiến sĩ).',
+            quotes: REMEDY_QUOTES,
+            summary: remedySummary(R),
+            note: 'Kinh điển: Liễu Phàm Tứ Huấn, 寒窑赋, 太上感应篇, 阴骘文, Tâm Mệnh Thi. Cải mệnh = tham khảo, kết quả tùy每个人的thực hành — không đảm báo.',
+          };
+        } catch (e) { return { error: 'lỗi analyze_remedy_fate: ' + e.message }; }
       }
       case 'log_error': { // [R46] AI tự log lỗi khi bị user sửa — structured error report + POST to server KV
         try { fetch('/api/log-error', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).catch(() => {}); } catch (_) {}
