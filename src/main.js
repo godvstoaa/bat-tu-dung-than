@@ -542,7 +542,31 @@ function renderSynthesis(R) {
       <span class="combo ${allyPct >= 55 ? 'cat' : allyPct <= 45 ? 'xiong' : ''}">敌我: Dụng ${allyPct}% / Kỵ ${100 - allyPct}%</span>
       <span class="combo">Dụng ${esc(R.yong ? WX_VI[R.yong.primary] || '' : '')}</span>
     </div>`;
+  // [user request] NGHỊCH THIÊN CẢI MỆNH callout cho lá số THẤP ĐIỂM — nổi bật ngay vùng điểm,
+  //   để user điểm thấp THẤY NGAY «cải mệnh được» (không bỏ cuộc) + bắt bệnh tận gốc + nút tới phần đầy đủ.
+  //   (Các card cải mệnh nằm cuối trang; không chèn callout thì user điểm thấp bỏ cuộc trước khi cuộn tới.)
+  let ntcmHtml = '';
+  if (typeof s.score === 'number' && s.score < 46) {
+    let topCures = '';
+    try {
+      const _yk = (getYeguoForChart(R) || []).slice(0, 2);
+      if (_yk.length) topCures = _yk.map((y) => `<div class="ntcm-cure"><b>${esc(y.why || y.karma)}</b> → dấu <b>${esc(y.karma)}</b>: ${esc(y.result)} <span class="ntcm-pill">💊 ${esc(y.cure)}</span></div>`).join('');
+    } catch (e) { /* giữ banner hiện kể cả khi yeguo lỗi */ }
+    ntcmHtml = `
+      <div class="ntcm-alert" role="note">
+        <div class="ntcm-head">
+          <span class="ntcm-seal zh">逆天改命</span>
+          <div class="ntcm-head-txt">
+            <div class="ntcm-title">⚡ NGHỊCH THIÊN CẢI MỆNH</div>
+            <div class="ntcm-sub">Điểm mệnh thấp — <b> KHÔNG phải kết cục.</b> Lá số chỉ là <b>QUỈ ĐẠO</b> («mệnh do ta tạo», ${esc('《了凡四训》')}). Đổi tận gốc = <b>CHUYỂN TÂM + GIẢI NGHIỆP</b> — không phải «làm việc thiện» chung chung.</div>
+          </div>
+        </div>
+        ${topCures ? `<div class="ntcm-cures"><div class="ntcm-cures-t">🩺 Bắt bệnh tận GỐC — vấn đề lá số → ác nghiệp → thuốc giải nghiệp:</div>${topCures}</div>` : ''}
+        <div class="ntcm-cta"><button type="button" class="btn-ntcm" id="ntcm-goto">📜 Xem đầy đủ Nghịch Thiên Cải Mệnh 逆天改命 ↓</button></div>
+      </div>`;
+  }
   $('synthesis').innerHTML = `
+    ${ntcmHtml}
     <div class="syn-head">
       <div class="syn-grade ${gradeTone}"><span class="zh big">${esc(s.grade)}</span><span>${esc(s.gradeVi)}</span></div>
       <div class="syn-fortune"><b>${esc(s.fortuneVi)}</b> · điểm <b>${esc(s.score)}/100</b></div>
@@ -564,6 +588,15 @@ function renderSynthesis(R) {
       const extras = ps.slice(Math.max(adviceIdx + 1, 4)).filter(Boolean);
       return `<p class="syn-advice">${esc(advice)}</p>${extras.map((p) => `<p class="hint" style="margin-top:4px">${esc(p)}</p>`).join('')}`;
     })()}`;
+  // [user request] nút callout Nghịch Thiên Cải Mệnh → cuộn tới #remedy-fate + flash highlight
+  const _ntcmGoto = document.getElementById('ntcm-goto');
+  if (_ntcmGoto) _ntcmGoto.addEventListener('click', () => {
+    const t = document.getElementById('remedy-fate');
+    if (!t) return;
+    t.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    t.classList.add('ntcm-flash');
+    setTimeout(() => t.classList.remove('ntcm-flash'), 1600);
+  });
 }
 
 // [plan #4] NGŨ HÀNH tap-to-explore — fixed sinh/khắc cycle + role advice.
