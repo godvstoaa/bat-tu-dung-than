@@ -1812,7 +1812,9 @@ html{scroll-behavior:smooth}
 .to-top.show { opacity: 1; }
 .to-top:hover { transform: translateY(-2px); border-color: var(--gold); }
 @media (max-width: 720px) { .to-top { left: 14px; bottom: 18px; width: 40px; height: 40px; } }
-.ai-fab-label{font-family:'Be Vietnam Pro',sans-serif}
+.ai-fab-label{font-family:'Be Vietnam Pro',sans-serif;white-space:nowrap}
+/* [user] FAB vermilion khi lá số thấp — «Nghịch Thiên Cải Mệnh» portal (đồng bộ seal đỏ callout) */
+.ai-fab.ai-fab-low{background:linear-gradient(145deg,#c0392b,#7a1f1a);border-color:#e8b15a;box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 22px rgba(232,90,58,.45)}
 @keyframes aiFabPulse{0%,100%{box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 0 rgba(212,175,55,.4)}50%{box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 12px rgba(212,175,55,0)}}
 .ai-popup{
   position:fixed; right:22px; bottom:22px; z-index:70;

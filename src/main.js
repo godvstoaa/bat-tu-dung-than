@@ -4290,7 +4290,7 @@ function appendMsg(role, text) {
   wrap.className = `msg msg-${role}`;
   const badge = document.createElement('div');
   badge.className = 'msg-badge';
-  badge.textContent = role === 'user' ? 'Bạn' : 'Giải Mệnh';
+  badge.textContent = role === 'user' ? 'Bạn' : chatBrand().short;
   const body = document.createElement('div');
   body.className = 'msg-text';
   if (role === 'assistant') body.innerHTML = _md(text); else body.textContent = text;
@@ -4359,7 +4359,7 @@ async function handleAsk() {
     });
     body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
     body.classList.remove('streaming');
-    badge.textContent = source === 'ai' ? 'Giải Mệnh (trực tuyến)' : 'Giải Mệnh (cục bộ)';
+    badge.textContent = source === 'ai' ? chatBrand().short + ' (trực tuyến)' : chatBrand().short + ' (cục bộ)';
     _logEvent('ai_chat', { q: q, response: text, source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed, detail: meta && meta.detail, toolsOn0: meta && meta.toolsOn0, error: meta && meta.error }); // [loop 1387] LUÔN log frontend (server capture ko reliable response dài)
     // [loop 947] message actions (refactored → addMsgActions helper, dùng cả cho restore)
     addMsgActions(body, text);
@@ -4389,7 +4389,7 @@ async function handleAsk() {
     if (e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''))) {
       body.textContent = '(⏹ đã dừng — bạn có thể hỏi lại)';
       body.classList.remove('streaming');
-      badge.textContent = 'Giải Mệnh';
+      badge.textContent = chatBrand().short;
     } else {
       body.textContent = 'Lỗi: ' + e.message;
       body.classList.remove('streaming');
@@ -4623,6 +4623,7 @@ async function run() {
     try { currentResult.amta = analyzeAmTa(currentResult); } catch (_) { currentResult.amta = null; }
   } catch (e) {
     currentResult = null;
+    applyChatBrand(); // [user] reset brand popup về «Giải Mệnh» (chưa có lá số hợp lệ)
     const res = $('result');
     if (res) res.innerHTML = '<p class="hint" style="color:var(--cinnabar);padding:16px">⚠ Không tính được lá số cho ' + esc(y + '/' + m + '/' + d + ' ' + hh + ':' + String(mm).padStart(2, '0')) + ': ' + esc(e.message) + '. Thử ngày/giờ khác (có thể do ranh tiết khí hoặc ngoài khoảng hỗ trợ).</p>';
     if (res) res.scrollIntoView({ behavior: 'smooth' });
@@ -4657,6 +4658,7 @@ async function run() {
   renderVerdict(currentResult);
   renderVerdict3D(currentResult);
   renderSynthesis(currentResult);
+  applyChatBrand(); // [user] popup chat → «Nghịch Thiên Cải Mệnh» khi điểm thấp, «Giải Mệnh» khi cao
   renderPersonalityNarrative(currentResult); // [loop 488] natal «bạn là ai»
   renderPhaseNarrative(currentResult); // [loop 472] narrative ngay sau tổng luận
   renderDayunTimeline(currentResult); // [loop 475] timeline trực quan thập kỷ
@@ -6051,7 +6053,7 @@ function _exportChat() {
   if (!chatHistory.length) return;
   const subj = currentResult?.chart?.input;
   const head = subj ? `# Hội thoại Bát Tự — ${subj.year}/${subj.month}/${subj.day} (${subj.gender})\n\n` : '# Hội thoại Bát Tự\n\n';
-  const body = chatHistory.map(m => m.role === 'user' ? `## ❓ Bạn\n\n${m.content}\n` : `## 💬 Giải Mệnh\n\n${m.content}\n`).join('\n');
+  const body = chatHistory.map(m => m.role === 'user' ? `## ❓ Bạn\n\n${m.content}\n` : `## 💬 ${chatBrand().vi}\n\n${m.content}\n`).join('\n');
   const md = head + body + '\n---\n*Xuất từ Bát Tự Dụng Thần · battu.god8.shop*\n';
   const blob = new Blob([md], { type: 'text/markdown' });
   const a = document.createElement('a');
@@ -6094,6 +6096,37 @@ $('cfg-test').addEventListener('click', async () => {
 //   thay vì addEventListener trực tiếp — fix bug «sau Luận giải, bấm Giải Mệnh không hoạt động»:
 //   listener trực tiếp bị mất nếu element bị thay thế (innerHTML #result lúc error, hoặc re-render).
 //   Delegation survive mọi thay thế element → click luôn hoạt động.
+// [user request] Branding popup chat theo điểm mệnh — lá số THẤP/XẤU → popup «Giải Mệnh» đổi thành
+//   «Nghịch Thiên Cải Mệnh» (empowerment: «mệnh do ta tạo», KHÔNG kết cục) thay vì chỉ «luận giải».
+//   Đồng bộ ngưỡng với callout tổng luận (< 46). Đọc currentResult — chưa có lá số → mặc định «Giải Mệnh».
+function chatBrand() {
+  const _s = (currentResult && currentResult.synthesis) || {};
+  const low = typeof _s.score === 'number' && _s.score < 46;
+  if (low) return {
+    vi: 'Nghịch Thiên Cải Mệnh', zh: '逆天改命', short: 'Cải Mệnh',
+    greet: '🙏 Con vẻ mặt ưu tư — thầy hiểu. Lá số nền thấp nhưng «MỆNH DO TA TẠO» (了凡四训): đây chỉ là QUỈ ĐẠO, KHÔNG phải kết cục. Thầy là «Nghịch Thiên Cải Mệnh», giúp con ĐỔI VẬN tận gốc — hỏi về ác nghiệp cần hóa giải, 改心转念, 准提法门, hay tài lộc/tình duyên/thời điểm tốt…',
+  };
+  return {
+    vi: 'Giải Mệnh', zh: '解命', short: 'Giải Mệnh',
+    greet: '📜 Xin chào! Tôi là Giải Mệnh Bát Tự — thầy giúp con giải mã lá số. Hỏi thầy về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà…',
+  };
+}
+// Áp dụng brand hiện tại lên các phần tử tĩnh của popup chat (FAB, tiêu đề, aria). Gọi mỗi lần tính lá số.
+function applyChatBrand() {
+  const b = chatBrand();
+  const low = b.zh === '逆天改命';
+  const fab = $('ai-fab');
+  if (fab) {
+    fab.classList.toggle('ai-fab-low', low);
+    fab.setAttribute('title', b.vi + ' Bát Tự');
+    fab.setAttribute('aria-label', 'Mở ' + b.vi);
+    const lb = fab.querySelector('.ai-fab-label'); if (lb) lb.textContent = b.vi;
+  }
+  const pop = $('ai-popup'); if (pop) pop.setAttribute('aria-label', b.vi + ' Bát Tự');
+  const tt = document.querySelector('.ai-popup-title');
+  if (tt) tt.innerHTML = (low ? '🙏 ' : '📜 ') + esc(b.vi) + ' <span class="zh">' + esc(b.zh) + '</span>';
+  const cl = $('chat-log'); if (cl) cl.setAttribute('aria-label', 'Hội thoại ' + b.vi);
+}
 function openAIPopup() {
   const p = $('ai-popup'); if (!p) return;
   p.classList.remove('hidden');
@@ -6113,7 +6146,7 @@ function openAIPopup() {
           : '👋 Con quay lại rồi! Lá số con thầy vẫn giữ. Hôm nay muốn biết thêm gì?';
         appendMsg('assistant', greet);
       } else {
-        appendMsg('assistant', 'Xin chào! Tôi là Giải Mệnh Bát Tự — thầy giúp con giải mã lá số. Hỏi thầy về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà…');
+        appendMsg('assistant', chatBrand().greet);
       }
     } catch (_) {
       appendMsg('assistant', 'Xin chào! Tôi là Giải Mệnh Bát Tự — thầy giúp con giải mã lá số. Hỏi thầy về vận mệnh, sự nghiệp, tình duyên, tài lộc, thời điểm cưới/con/mua nhà…');
