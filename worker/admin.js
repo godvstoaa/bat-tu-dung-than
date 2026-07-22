@@ -1295,7 +1295,7 @@ function adminDashboard() {
       (d.tagCloud||[]).slice(0,20).forEach(function(t){ var chip=el('span','badge','🏷 '+t.tag+' '+t.count); chip.style.cssText='background:rgba(100,180,255,.12);color:#64b4ff;cursor:pointer;margin:2px'; chip.title='Lọc theo tag «'+t.tag+'»'; chip.onclick=function(){document.getElementById('vq').value=t.tag;vRender();}; tc.appendChild(chip); });
       if(!(d.tagCloud||[]).length) tc.appendChild(el('span','tiny','(chưa có tag — thêm ở nút ✏️ mỗi visitor)'));
     }
-    var csel=document.getElementById('vf-country'); if(csel && !csel.options.length){ var cs={}; (d.byIp||[]).forEach(function(v){if(v.country)cs[v.country]=1;}); Object.keys(cs).sort().forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;csel.appendChild(o);}); }
+    var csel=document.getElementById('vf-country'); if(csel && !csel.options.length){ var ph=document.createElement('option'); ph.value=''; ph.textContent='Mọi quốc gia'; csel.appendChild(ph); var cs={}; (d.byIp||[]).forEach(function(v){if(v.country)cs[v.country]=1;}); Object.keys(cs).sort().forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;csel.appendChild(o);}); }
     var pr=document.getElementById('profiles'); if(pr){pr.textContent='';
       var profs=(d.profiles||[]);
       var pf=profs.filter(function(p){if(!f.q)return true;var hay=((p.name||'')+' '+(p.dob||'')+' '+(p.gender||'')+' '+(p.grade||'')+' '+(p.score!=null?p.score:'')).toLowerCase();return f.q.split(/\\s+/).every(function(t){return t&&hay.indexOf(t)>=0;});});
