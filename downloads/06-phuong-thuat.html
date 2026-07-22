@@ -1,0 +1,90 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"/>
+<title>Phương Thuật 方術</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Be+Vietnam+Pro:wght@400;600&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 18mm 16mm; }
+* { box-sizing: border-box; }
+body { font-family: 'Be Vietnam Pro', sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 11pt; }
+.zh, .han { font-family: 'Noto Serif SC', serif; }
+h1 { font-size: 22pt; border-bottom: 2px solid #9b6a2a; padding-bottom: 6px; }
+h1 .zh { color: #9b6a2a; }
+h2 { font-size: 14pt; margin: 18px 0 2px; }
+h2 .han { font-size: 17pt; color: #7a4a12; font-weight: 700; }
+h2 small { color: #555; font-weight: 400; font-size: 10pt; }
+.meta { font-size: 9pt; color: #666; margin-bottom: 6px; }
+.school { background: #f3e9d2; padding: 1px 6px; border-radius: 8px; }
+.cert-high { color: #1a7f4c; } .cert-partial { color: #9b6a2a; } .cert-low { color: #9b2c2c; }
+.han-box { background: #f7f1e3; border-left: 3px solid #9b6a2a; padding: 8px 12px; margin: 8px 0; }
+.han-box .zh { font-size: 12pt; line-height: 1.9; white-space: pre-wrap; }
+.struct { background: #faf6ed; padding: 8px 12px; border-radius: 6px; font-size: 9.5pt; }
+.struct div { margin-top: 3px; }
+.muted { color: #555; font-size: 9.5pt; }
+.src { margin-top: 8px; font-size: 9pt; }
+.src ul { margin: 4px 0; padding-left: 18px; }
+.src a { color: #9b6a2a; word-break: break-all; }
+.entry { page-break-inside: avoid; border-bottom: 1px dashed #ccc; padding-bottom: 14px; margin-bottom: 14px; }
+.scan { max-height: 280px; border: 1px solid #ccc; padding: 6px; background: #f4ecd8; }
+.ethics { background: #fdf3f3; border: 1px solid #d9a3a3; border-radius: 8px; padding: 10px 14px; font-size: 9pt; color: #5a2a2a; margin: 12px 0; }
+.foot { margin-top: 24px; font-size: 8.5pt; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
+</style></head><body>
+<h1>Phương Thuật <span class="zh">方術</span></h1>
+<div class="ethics"><b>⚠ Tham chiếu văn hoá-tôn giáo.</b> Nội dung «Âm Tà / Vong Hồn / Trừ Tà» chỉ là TÀI LIỆU THAM KHẢO VĂN HOÁ-TÔN GIÁO, tổng hợp từ nhiều trường phái (Mao Shan, Zheng Yi, Lü Shan, Đài Loan, Hồng Kông, 《道藏》). KHÔNG phải chẩn đoán y tế / tâm thần, KHÔNG thay thế bác sĩ, chuyên gia tâm lý, hay đạo sĩ / pháp sư thụ chức. Mọi «tty hiệu» dưới đây chỉ là TƯỢNG / xác suất theo cổ pháp — KHÔNG chắc chắn, KHÔNG dùng để dọa nạt. Nếu bạn đang đau khổ, mất ngủ kéo dài, hoang tưởng, hay có ý nghĩ tự hại, hãy liên hệ chuyên gia tâm lý / y tế hoặc đường dây hỗ trợ khẩn cấp. Tính năng chỉ hiển thị khi bạn tự bật (opt-in) và có thể tắt bất cứ lúc nào. 符 chỉ mô tả cấu trúc/thị giác; nghi lễ do đạo sĩ <span class="zh">受箓</span> chủ trì.</div>
+<section class="entry"><h2><span class="zh han">奇門遁甲</span> <small>Kỳ Môn Độn Giáp</small></h2>
+<div class="meta"><span class="school">三式之首 — 奇門遁甲 (Hoàng đế / Binh gia)</span> · <span class="cert cert-partial">● partial</span></div>
+<div class="han-box"><span class="zh">（三式之一 — 天盤九星 / 地盤八門 / 八神 / 奇儀; 1080局 → 18局）</span></div>
+<p>«Bóng tối ba kỳ sáu nghi» — tam thức đứng đầu, truyền Hoàng đế chiến Xi Vưu. Dùng cho binh pháp/thời/ phương vị cát hung. Lập trời(9 tinh)/đất(8 môn)/thần(8 thần)+can kỳ(乙丙丁) + six nghi(戊己庚辛壬癸). (ĐÃ implement trong app: công cụ Kỳ Môn — main.js runQimen.)</p>
+<p class="muted"><b>Dùng:</b> Tham chiếu lựa thời/ phương / binh pháp.</p>
+<p class="muted"><i>Hệ chuẩn; 1080→18局 lịch sử (cải bởi Trương Lượng). Cross-ref engine app.</i></p>
+<div class="src"><b>Nguồn (3):</b><ul><li><a href="https://zh.wikipedia.org/wiki/%E5%A5%87%E9%96%80%E9%81%81%E7%94%B2">維基百科 奇門遁甲</a> — <span class="muted">https://zh.wikipedia.org/wiki/%E5%A5%87%E9%96%80%E9%81%81%E7%94%B2</span></li><li><a href="https://ctext.org/wiki.pl?if=gb&res=54917">CTEXT 奇門遁甲 相關</a> — <span class="muted">https://ctext.org/wiki.pl?if=gb&amp;res=54917</span></li><li>docs/ (app engine: src/engine/qimen — main.js runQimen)</li></ul></div></section>
+<section class="entry"><h2><span class="zh han">大六壬</span> <small>Đại Lục Nhâm</small></h2>
+<div class="meta"><span class="school">三式 — 大六壬 (thiên văn / chiêm nghiệm)</span> · <span class="cert cert-partial">● partial</span></div>
+<div class="han-box"><span class="zh">（三式之一 — 四課 / 三傳 / 天將 / 天地盤; 720課）</span></div>
+<p>Tam thức (cùng 太乙/奇門), thiên văn-lịch pháp. Lập 4 khoá (四課) + 3 truyền (三傳) + 12 thiên tướng + thiên/địa bàn. Dùng chiêm sự việc cát hung. (app: công cụ Lục Nhâm — main.js runLiuren.)</p>
+<p class="muted"><b>Dùng:</b> Tham chiếu chiêm sự cát hung.</p>
+<p class="muted"><i>Hệ chuẩn; cross-ref engine app.</i></p>
+<div class="src"><b>Nguồn (3):</b><ul><li><a href="https://zh.wikipedia.org/wiki/%E5%85%AD%E5%A3%AC">維基百科 六壬</a> — <span class="muted">https://zh.wikipedia.org/wiki/%E5%85%AD%E5%A3%AC</span></li><li><a href="https://ctext.org/">CTEXT 六壬 toàn書</a> — <span class="muted">https://ctext.org/</span></li><li>docs/ (app engine: src/engine/liuren — main.js runLiuren)</li></ul></div></section>
+<section class="entry"><h2><span class="zh han">梅花易數</span> <small>Mai Hoa Dịch Số</small></h2>
+<div class="meta"><span class="school">梅花易數 — 邵雍 (北宋)</span> · <span class="cert cert-high">● high</span></div>
+<div class="han-box"><span class="zh">（心易 — 取象起卦: thời/số/ziyet/vạn vật đều khả khởi）</span></div>
+<p>邵雍 (康節, 1011–1077, 北宋) truyền. «心易» — khởi quẻ từ tượng/số (đều là dự: thời gian, số, chữ, cảnh vật), linh hoạt hơn gieo quẻ cổ pháp. «Thể-dụng» luận cát hung. (app: công cụ Mai Hoa — main.js runMeihuaTime/Num.)</p>
+<p class="muted"><b>Dùng:</b> Tham chiếu dự đoán (thể/dụng).</p>
+<p class="muted"><i>Tác giả 邵康節/北宋 chuẩn. Cross-ref engine app.</i></p>
+<div class="src"><b>Nguồn (3):</b><ul><li><a href="https://zh.wikipedia.org/wiki/%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B0">維基百科 梅花易數</a> — <span class="muted">https://zh.wikipedia.org/wiki/%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B0</span></li><li><a href="https://zh.wikisource.org/">維基文库 梅花易數</a> — <span class="muted">https://zh.wikisource.org/</span></li><li>docs/ (app engine: src/engine/meihua — main.js runMeihua)</li></ul></div></section>
+<section class="entry"><h2><span class="zh han">太乙神数</span> <small>Thái Ất Thần Số</small></h2>
+<div class="meta"><span class="school">三式 — 太乙神数 (quốc vận / tam thức)</span> · <span class="cert cert-partial">● partial</span></div>
+<div class="han-box"><span class="zh">（三式之首 — luận quốc vận / quân chủ-khách; 太乙十神 / 积年算）</span></div>
+<p>Tam thức chuyên luận quốc vận/thiên tượng/chủ-khách (bình chiến). Thái ất thập thần + tích niên toán (元/紀/運). (app ĐÃ implement engine: analyze_taiyi trong FEATURE-INDEX.)</p>
+<p class="muted"><b>Dùng:</b> Tham chiếu quốc vận / chủ-khách.</p>
+<p class="muted"><i>Hệ chuẩn; ĐÃ implement engine app.</i></p>
+<div class="src"><b>Nguồn (2):</b><ul><li><a href="https://zh.wikipedia.org/wiki/%E5%A4%AA%E4%B9%99%E7%A5%9E%E6%95%B0">維基百科 太乙神数</a> — <span class="muted">https://zh.wikipedia.org/wiki/%E5%A4%AA%E4%B9%99%E7%A5%9E%E6%95%B0</span></li><li>docs/FEATURE-INDEX.md (app engine analyze_taiyi)</li></ul></div></section>
+<section class="entry"><h2><span class="zh han">祝由十三科</span> <small>Chú Do Thập Tam Khoa</small></h2>
+<div class="meta"><span class="school">祝由十三科 — y thuật thần bí (Hoàng đế)</span> · <span class="cert cert-partial">● partial</span></div>
+<div class="han-box"><span class="zh">（咒 ngữ + 符 — thượng cổ y thuật; «移精変気»治病）</span></div>
+<p>Thượng cổ y-đạo (truyền 黃帝). «祝由» = niệm chú+dùng phù «移精変気» điều trị (chủ yếu chứng bị ét 邪/tâm thần thề). 13 khoa (cổ truyền ghi). 元-Ming từng thuộc y quan, sau bị loại. Hiện là văn hoá-dân gian, KHÔNG thay thế y tế.</p>
+<p class="muted"><b>Dùng:</b> Tham chiếu y-dân gian (KHÔNG trị bệnh).</p>
+<p class="muted"><i>Hệ + 13 khoa lịch sử chuẩn (nguyên-Ming y quan). KHÔNG trị bệnh — ETHICS.</i></p>
+<div class="src"><b>Nguồn (3):</b><ul><li><a href="https://zh.wikipedia.org/wiki/%E7%A5%9D%E7%94%B1%E7%A7%91">維基百科 祝由科</a> — <span class="muted">https://zh.wikipedia.org/wiki/%E7%A5%9D%E7%94%B1%E7%A7%91</span></li><li><a href="https://baike.baidu.com/item/%E7%A5%9D%E7%94%B1%E5%8D%81%E4%B8%89%E7%A7%91">百度百科 祝由十三科</a> — <span class="muted">https://baike.baidu.com/item/%E7%A5%9D%E7%94%B1%E5%8D%81%E4%B8%89%E7%A7%91</span></li><li><a href="https://ctext.org/wiki.pl?if=gb&res=54910">CTEXT 祝由 科 — 辰州符咒大全 相關</a> — <span class="muted">https://ctext.org/wiki.pl?if=gb&amp;res=54910</span></li></ul></div></section>
+<section class="entry"><h2><span class="zh han">太素脉</span> <small>Thái Tố Mạch</small></h2>
+<div class="meta"><span class="school">太素脉 — mạch đoán mệnh (mystical)</span> · <span class="cert cert-low">● low</span></div>
+<div class="han-box"><span class="zh">（取 mạch đoán mệnh — 3 quan × 9 hầu + ngũ hành; thượng cổ thần mạch）</span></div>
+<p>Mạch-đoán-mệnh huyền bí: ngoài y-mạch, đoán quý tiện thọ yểu (cổ truyền). Truyền 樵 phi / 黄帝. «Thai Tố» = chất nguyên thủy của vạn vật. Hiện đa dân gian/huyền học, không y chuẩn.</p>
+<p class="muted"><b>Dùng:</b> Tham chiếu (huyền học — phi y chuẩn).</p>
+<p class="muted"><i>Huyền học dân gian; nguồn học thuật mỏng. textual_certainty=low (cờ).</i></p>
+<div class="src"><b>Nguồn (2):</b><ul><li><a href="https://baike.baidu.com/item/%E5%A4%AA%E7%B4%A0%E8%84%89">百度百科 太素脉</a> — <span class="muted">https://baike.baidu.com/item/%E5%A4%AA%E7%B4%A0%E8%84%89</span></li><li><a href="https://zh.wikipedia.org/">維基百科 太素脉 参考</a> — <span class="muted">https://zh.wikipedia.org/</span></li></ul></div></section>
+<section class="entry"><h2><span class="zh han">鐵板神數</span> <small>Thiết Bản Thần Số</small></h2>
+<div class="meta"><span class="school">铁板神数 — bí truyền (thần số)</span> · <span class="cert cert-partial">● partial</span></div>
+<div class="han-box"><span class="zh">（12,000+ 条 thần số — từ bát tự sinh; «章» đối ứng «số»）</span></div>
+<p>Thần số bí truyền: từ bát tự suy «số», đối chiếu 12,000+ điều (hoặc hơn) thơ-văn đoán mệnh. Truyền 邵雍 → đời sau. Tính «bàn tính» + «khẩu quyết». (app ĐÃ có reference: TIEBAN_SHENSHU trong kb.js / FEATURE-INDEX.)</p>
+<p class="muted"><b>Dùng:</b> Tham chiếu (bí truyền reference).</p>
+<p class="muted"><i>Hệ bí truyền; nguồn học thuật + app reference.</i></p>
+<div class="src"><b>Nguồn (2):</b><ul><li><a href="https://zh.wikipedia.org/wiki/%E9%90%B5%E6%9D%BF%E7%A5%9E%E6%95%B8">維基百科 铁板神数</a> — <span class="muted">https://zh.wikipedia.org/wiki/%E9%90%B5%E6%9D%BF%E7%A5%9E%E6%95%B8</span></li><li>docs/FEATURE-INDEX.md (app: TIEBAN_SHENSHU reference trong kb.js)</li></ul></div></section>
+<section class="entry"><h2><span class="zh han">方士·隱士（職業譜系）</span> <small>Phương Sĩ · Ẩn Sĩ</small></h2>
+<div class="meta"><span class="school">方士 / ẩn sĩ truyền thống</span> · <span class="cert cert-partial">● partial</span></div>
+<div class="han-box"><span class="zh">（方士: 戰國-漢 尋仙炼丹; 隱士: 避世修道 — 終南/華山/武當）</span></div>
+<p>Phương sĩ (戰國-漢): Từ Phúc, Lư Sanh... phụng mệnh tìm tiên/luyện đan (Tần-Hoàng/Hán-Vũ). Ẩn sĩ:Trời đất tu hành (chân nhân/đạo sĩ) — 終南/華山/武當/long hổ. Hệ phái (正一/全真/茅山/閭山...) phát triển qua các ẩn sĩ-phương sĩ.</p>
+<p class="muted"><b>Dùng:</b> Tham chiếu ngữ cảnh lịch sử-tôn giáo.</p>
+<p class="muted"><i>Tiểu sử phương sĩ(戰國-漢)/ẩn sĩ — tài liệu lịch sử chuẩn.</i></p>
+<div class="src"><b>Nguồn (3):</b><ul><li><a href="https://zh.wikipedia.org/wiki/%E6%96%B9%E5%A3%AB">維基百科 方士</a> — <span class="muted">https://zh.wikipedia.org/wiki/%E6%96%B9%E5%A3%AB</span></li><li><a href="https://zh.wikipedia.org/wiki/%E9%9A%B1%E5%A3%AB">維基百科 隱士</a> — <span class="muted">https://zh.wikipedia.org/wiki/%E9%9A%B1%E5%A3%AB</span></li><li><a href="https://zh.wikipedia.org/wiki/%E9%81%93%E6%95%99">維基百科 道教</a> — <span class="muted">https://zh.wikipedia.org/wiki/%E9%81%93%E6%95%99</span></li></ul></div></section>
+<div class="foot">Thư viện Huyền học — corpus verify ≥2 nguồn độc lập · textual_certainty đi kèm mỗi mục · sinh 2026-07-22 · nguồn cổ PD (Kanripo/ctext/wikisource) + OCR Grok-4.5.</div>
+</body></html>
