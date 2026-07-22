@@ -18,16 +18,18 @@ import { ETHICS } from './amta-data.js';
 import { TALISMANS } from './talisman-data.js';
 import { CULTIVATION } from './cultivation-data.js';     // Phase 3
 import { PHUONGTHUAT } from './phuongthuat-data.js';     // Phase 4
+import { BITRUYEN } from './bitruyen-data.js';           // bí truyền/thất truyền/tàn quyển
 
 export { ETHICS };
 
 export const LAYERS = [
   { id: 'fu',          zh: '符籙', vi: 'Phù bùa' },
   { id: 'mantra',      zh: '神咒', vi: 'Thần chú' },
-  { id: 'ritual',      zh: '科儀', vi: 'Nghi thức' },
-  { id: 'classic',     zh: '經典', vi: 'Kinh điển Bát Tự' },
+  { id: 'ritual',      zh: '科儀', vi: 'Nghi thức · Ấn' },
   { id: 'cultivation', zh: '功法', vi: 'Công pháp tu hành' },
   { id: 'phuongthuat', zh: '方術', vi: 'Phương thuật' },
+  { id: 'bitruyen',    zh: '秘傳', vi: 'Bí truyền · Thất truyền' },
+  { id: 'classic',     zh: '經典', vi: 'Kinh điển Bát Tự' },
 ];
 
 // CLASSIC (Bát Tự) — ported từ Phase 0 demo; Phase 5 mở rộng từ các OCR sẵn.
@@ -48,7 +50,7 @@ const CLASSICS = [
   },
 ];
 
-export const LIBRARY = [...TALISMANS, ...CLASSICS, ...CULTIVATION, ...PHUONGTHUAT];
+export const LIBRARY = [...TALISMANS, ...CULTIVATION, ...PHUONGTHUAT, ...BITRUYEN, ...CLASSICS];
 
 export function countByLayer(entries = LIBRARY) {
   const c = {};

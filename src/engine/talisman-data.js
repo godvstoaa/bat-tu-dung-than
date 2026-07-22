@@ -264,6 +264,71 @@ const _RITUALS = [
     ],
     textual_certainty: 'partial', notes: 'AM-TA Round 9.4;tuân thủ luật động vật hoang dã địa phương.',
   },
+  {
+    id: 'FA_SHOUJUE', layer: 'ritual', school: '通用 / 各派 — 手诀 · 手印 (ấn truyền)',
+    name_han: '手訣 · 手印', name_vi: 'Thủ Quyết · Thủ Ấn (ấn truyền)',
+    han_text: '（掐訣: 各指節配神將/星斗/五行 — 師傳 khẩu quyết, ít ghi chép）',
+    meaning: 'ẤN TRUYỀN — các tư thế tay (手诀/手印) «kíp» thần tướng tinh đấu: mỗi đốt ngón tay = một thần/sao/hành, «掐诀» (bấm quyết) để triệu/d遣/sách. Hệ mật truyền khẩu, ít văn tự. Ví dụ: 五雷诀/天蓬诀/紫微诀/剑诀. Phối hợp 符+咒+罡+诀 thành «四秘».',
+    use: 'tham chiếu ấn truyền (KHÔNG tự kết — cần sư truyền).', recitation_context: '«四秘» = 符+咒+罡+诀 phối hợp hành pháp; thực do 受箓 道士.',
+    sources: [
+      'https://ctext.org/wiki.pl?if=gb&chapter=247662 (CTEXT 道法會元 卷162 上清天蓬伏魔大法 — 天蓬诀)',
+      'https://zh.daoinfo.org/index.php?title=%E6%89%8B%E6%B1%BA (道教文化中心 手诀)',
+      'https://www.shidianguji.com/book/DZ1220 (識典古籍 道法會元 DZ1220 — 雷法/手诀 hệ)',
+    ],
+    textual_certainty: 'partial', notes: 'Ấn truyền khẩu; mỗi诀 khó verify verbatim. Chỉ mô tả hệ.',
+  },
+  {
+    id: 'FA_GANGBU', layer: 'ritual', school: '通用 / 各派 — 罡步 · 步罡踏斗 (禹步)',
+    name_han: '罡步 · 步罡踏斗（禹步）', name_vi: 'Cương Bộ · Bộ Cương Đạp Đẩu (Vũ Bộ)',
+    han_text: '（禹步三九: 配 北斗/二十八宿 — 法師踏「罡」布炁）',
+    meaning: 'LÀM PHÉP — pháp sư «步罡踏斗» (bước theo sao Cương, đạp北斗/二十八宿) để «lấy khí tinh tú». Bắt nguồn «禹步» (Vũ vương bước — truyền Đại Vũ trị thủy). Phối hợp 符咒诀 thành pháp sự.',
+    use: 'tham chiếu nghi thức (do 道士).', recitation_context: 'Mao Sơn/正一 法事 bước Cương; 茅山志載. Thực do 受箓 道士.',
+    sources: [
+      'https://ctext.org/wiki.pl?if=gb&res=497389 (CTEXT 茅山志 — 禹步/罡步)',
+      'https://zh.wikipedia.org/wiki/%E7%A6%B9%E6%AD%A5 (維基百科 禹步)',
+      'https://zh.daoinfo.org/index.php?title=%E6%AD%A5%E7%BD%A1%E8%B8%8F%E6%96%97 (道教文化中心 步罡踏斗)',
+    ],
+    textual_certainty: 'partial', notes: '禹步 lịch sử chuẩn; quy chi tiết mỗi phái khác.',
+  },
+  {
+    id: 'FA_LEIFA', layer: 'ritual', school: '雷法 — 清微 · 神霄 · 天蓬 (五雷正法)',
+    name_han: '雷法（五雷正法）', name_vi: 'Lôi Pháp (Ngũ Lôi Chính Pháp)',
+    han_text: '（内丹为体, 符咒为用 — «以我之本炁, 合天地之造化»; 召雷/祈雨/驱邪）',
+    meaning: 'LÀM PHÉP đỉnh cao Đạo giáo — 雷法 (清微/神霄 phái, Tống phát triển): «内丹为体, 符咒为用» — lấy nội đan công lực làm gốc, phối 符+咒+诀+罡 triệu lôi. «五雷正法» = trời-lửa-lôi-thủy-thần (hoặc 5 phương). Thiên蓬 nguyên soái hệ 北帝雷法.',
+    use: 'tham chiếu pháp thuật tối cao (do 高道).', recitation_context: 'DZ1220 道法会元 = đại biên 雷法; 须高道内丹功底. KHÔNG tự hành.',
+    sources: [
+      'https://ctext.org/wiki.pl?if=gb&chapter=247662 (CTEXT 道法會元 卷162 上清天蓬伏魔大法 DZ1220)',
+      'https://zh.wikipedia.org/wiki/%E9%9B%B7%E6%B3%95 (維基百科 雷法 — 清微/神霄)',
+      'https://www.shidianguji.com/book/DZ1220 (識典古籍 道法會元 DZ1220)',
+    ],
+    textual_certainty: 'partial', notes: '雷法 = nội đan+符咒; «以我本炁合天地造化» doc. Tống phát triển.',
+  },
+  {
+    id: 'FA_FAQI', layer: 'ritual', school: '通用 — 法器 (đạo cụ hành pháp)',
+    name_han: '法器（桃木劍 · 帝鐘 · 令旗 · 法印 · 拷鬼棒）', name_vi: 'Pháp Khí (đạo cụ)',
+    han_text: '（朱砂/黃紙 + 桃木劍 + 帝鐘 + 令旗(五營) + 法印 + 淨水缽 + 拷鬼棒）',
+    meaning: 'Bộ đạo cụ hành pháp: 朱砂+黃紙 (vẽ符), 桃木劍 (trừ tà), 帝鐘/三清鈴 (chấn tà thông thần), 令旗 (triệu ngũ dinh binh tướng), 法印 (quyền thần — «ấn»), 淨水 (tịnh), 拷鬼棒 (chế ngụy/tà).',
+    use: 'tham chiếu đạo cụ.', recitation_context: 'AM-TA Round 3.3 verified: 朱砂/黃紙/桃木剑/令旗/帝钟.',
+    sources: [
+      'https://www.shenlu.com.tw/news_detail/60.htm (神盧 道家法器 桃木劍/帝鐘)',
+      'https://tcmb.culture.tw/zh-tw/detail?indexCode=Culture_Object&id=320687 (國家文化記憶庫 茅山派符籙 — 朱砂黃紙)',
+      'docs/AM-TA-SPEC.md (Round 3.3 法器 verified W12)',
+    ],
+    textual_certainty: 'high', notes: '法器 bộ chuẩn, verified AM-TA Round 3.3.',
+  },
+  {
+    id: 'FA_FAYIN', layer: 'ritual', school: '正一 / 各派 — 法印 · 神印 (ấn quyền)',
+    name_han: '法印 · 神印', name_vi: 'Pháp Ấn · Thần Ấn',
+    han_text: '（印文: «道經師寶»/«北極驅邪»/«天蓬印»… — 蓋符/牒,「神權» chứng）',
+    meaning: 'ẤN QUYỀN — 法印 (đạo ấn) = «thần quyền» chứng: «道經師寶印» (tổng), «北極驅邪印»/«天蓬印» (trừ tà), «城隍印» (địa phương)...盖 lên 符/牒 mới «linh». Tượng trưng quyền pháp sư (đã thụ 箓).',
+    use: 'tham chiếu ấn quyền.', recitation_context: 'Phải 受箓 道士 mới có/quản ấn;盖符 nghi thức «敕符».',
+    sources: [
+      'https://www.daoist.org/BookSearch(test)/list012/628.pdf (道教在線 正一道符釋例 — 印 văn)',
+      'http://www.rsd.fju.edu.tw/images/uploads/FJRS/16-05.pdf (輔仁大學 書符與靈驗 — 法印)',
+      'docs/AM-TA-SPEC.md (Round 3/4 符籙 hệ — ấn)',
+    ],
+    textual_certainty: 'partial', notes: '印 văn hệ chính一; mỗi ấn quyền khác. Verified doctrine.',
+  },
 ];
 
 // ----------------------------------------------------------------------------

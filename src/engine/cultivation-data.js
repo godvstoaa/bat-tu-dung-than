@@ -95,4 +95,58 @@ export const CULTIVATION = [
     ],
     textual_certainty: 'partial', notes: 'Kinh tồn tại; doctrine 内觀/觀心 chuẩn.',
   },
+
+  // ── Phương thức tu hành cụ thể (功法 thực hành) ─────────────────────────
+  {
+    id: 'GONG_DAOYIN', layer: 'cultivation',
+    school: '导引 (thể dục khí — cổ pháp dưỡng sinh)',
+    name_han: '導引', name_vi: 'Đạo Dẫn',
+    han_text: '（肢體屈伸 + 吐纳 — «導氣令和,引體令柔»; 華佗五禽戲/馬王堆導引圖）',
+    meaning: 'Phương thức tu hành thể-chất: «導氣令和,引體令柔» (dẫn khí cho hòa, dẫn thân cho mềm). Phối hợp động tác + hô hấp. Cổ: 華佗五禽戲 (5 loài thú), 馬王堆導引圖 (Tây Hán, 44 tư thế). Nền tảng thái-cực/khí-công.',
+    use: 'Tham chiếu dưỡng sinh (an toàn, dân sự).',
+    sources: [
+      'https://zh.wikipedia.org/wiki/%E5%B0%8E%E5%BC%95 (維基百科 導引)',
+      'https://zh.wikipedia.org/wiki/%E4%BA%94%E7%A6%BD%E6%88%B2 (維基百科 五禽戲 — 華佗)',
+    ],
+    textual_certainty: 'high', notes: 'Dưỡng sinh dân sự, an toàn. 馬王堆導引圖 (Tây Hán) xác.',
+  },
+  {
+    id: 'GONG_TUNA', layer: 'cultivation',
+    school: '吐纳 / 行气 (khí công hô hấp)',
+    name_han: '吐納 · 行氣', name_vi: 'Thổ Nạp · Hành Khí',
+    han_text: '（呼吸吐納 — «吐故納新»; 行氣玉銘「行氣,深則蓄,蓄則伸…」戰國）',
+    meaning: 'Tu hành hô hấp-khí: «吐故納新» (thổ cũ nạp mới). 《行氣玉銘》(戰國, khắc trên ngọc) = sớm nhất ghi «行氣»: «行氣,深則蓄,蓄則伸,伸則下…». Phối nội đan «炼精化氣».',
+    use: 'Tham chiếu khí công (cần sư chỉ sai tư thế).',
+    sources: [
+      'https://zh.wikipedia.org/wiki/%E8%A1%8C%E6%B0%94 (維基百科 行氣 + 行氣玉銘)',
+      'https://baike.baidu.com/item/%E5%90%90%E7%BA%B3 (百度百科 吐纳)',
+    ],
+    textual_certainty: 'partial', notes: '行氣玉銘 (戰國) xác; thực hành cần sư chỉ.',
+  },
+  {
+    id: 'GONG_CUNXIANG', layer: 'cultivation',
+    school: '存想 / 内观 (thiền quan Đạo giáo)',
+    name_han: '存想 · 內觀', name_vi: 'Tồn Tưởng · Nội Quan',
+    han_text: '（存思身中神 — «黃庭經» 五臟神; 内觀本心）',
+    meaning: 'Tu hành tâm-thần: «存想» (tưởng tượng/tập trung vào thân trung thần — 《黃庭經》: 5 tạng thần), «内觀» (quán nội tâm). Đạo giáo tương đương thiền. Phối 《黃庭內景經》《內觀經》.',
+    use: 'Tham chiếu tĩnh tọa/thiền Đạo.',
+    sources: [
+      'https://zh.wikipedia.org/wiki/%E9%BB%83%E5%BA%AD%E7%B6%93 (維基百科 黃庭經 — 五臟神)',
+      'https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E8%80%81%E5%90%9B%E5%85%A7%E8%A7%80%E7%B6%93 (維基文库 内觀經)',
+    ],
+    textual_certainty: 'partial', notes: '黃庭經 (Đường/Jin) xác; 存思 pháp hệ thượng thanh.',
+  },
+  {
+    id: 'GONG_BIGU', layer: 'cultivation',
+    school: '辟谷 (tránh hạt — nhịn ăn khí nuôi)',
+    name_han: '辟穀', name_vi: 'Tịch Cốc',
+    han_text: '（斷五穀 + 食氣/服餌 — «辟穀食氣»; 馬王堆帛書«卻穀食氣»）',
+    meaning: 'Tu hành «tịch cốc»: tránh ngũ cốc, «食氣» (nuốt khí) + «服餌» (uống dược). 《馬王堆帛書卻穀食氣》 (Tây Hán) sớm nhất. Đạo giáo cho rằng ngũ cốc sinh «tam thi»/trọc khí → tránh để thanh tu.',
+    use: 'Tham chiếu (KHÔNG tự nhịn — nguy y tế).',
+    sources: [
+      'https://zh.wikipedia.org/wiki/%E8%BE%9F%E8%B0%B7 (維基百科 辟谷)',
+      'https://baike.baidu.com/item/%E5%8D%B4%E8%B0%B7%E9%A3%9F%E6%B0%94 (百度百科 卻穀食氣 馬王堆帛書)',
+    ],
+    textual_certainty: 'partial', notes: 'KHÔNG tự thực hành — nguy y tế; chỉ tham chiếu.',
+  },
 ];

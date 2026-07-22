@@ -28,9 +28,10 @@ const TOPICS = [
   { layer: 'classic',     slug: '01-kinh-dien-bat-tu', title: 'Kinh Điển Bát Tự', zh: '經典' },
   { layer: 'fu',          slug: '02-phu-chu-talismans', title: 'Phù Bùa · Ấn', zh: '符籙' },
   { layer: 'mantra',      slug: '03-than-chu', title: 'Thần Chú', zh: '神咒' },
-  { layer: 'ritual',      slug: '04-nghi-thuc', title: 'Nghi Thức · 科儀', zh: '科儀' },
+  { layer: 'ritual',      slug: '04-nghi-thuc', title: 'Nghi Thức · Ấn · 雷法', zh: '科儀' },
   { layer: 'cultivation', slug: '05-cong-phap', title: 'Công Pháp Tu Hành', zh: '功法' },
   { layer: 'phuongthuat', slug: '06-phuong-thuat', title: 'Phương Thuật', zh: '方術' },
+  { layer: 'bitruyen',    slug: '07-bi-truyen-that-truyen', title: 'Bí Truyền · Thất Truyền · Tàn Quyển', zh: '秘傳' },
 ];
 
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
