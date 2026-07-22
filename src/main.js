@@ -68,6 +68,7 @@ import { analyzeTang } from './engine/tang-analyze.js'; // [loop 1382] TANG GIA 
 import { analyzeAmTa } from './engine/amta-analyze.js'; // [loop 1383] ÂM TÀ / vong hồn — detect tín hiệu
 import { LIBRARY, LAYERS, countByLayer, ETHICS as LIB_ETHICS } from './engine/library-data.js'; // [library] Thư viện Huyền học
 import { suggestByAmTa } from './engine/talisman-data.js'; // [amta] chart-aware 符咒 suggestion
+import { SCHOOLS, COMPARE_DIMS, compareMatrix } from './engine/schools-data.js'; // [schools] đối chiếu trường phái
 import { compassReading, bestDirection, shanFromDegree } from './engine/fengshui-compass.js'; // [loop 631] la bàn 24 sơn
 import { bestGraveDirectionDeep } from './engine/yinzhai-deep.js'; // [loop 634] Âm Trạch (mộ)
 import { radialData, matrixData } from './engine/family-diagram.js';
@@ -6095,6 +6096,35 @@ function renderLibrary() {
     _h('button', { class: 'btn-ghost', id: 'lib-off-btn', onClick: () => { _libSetOptIn(false); renderLibrary(); } }, 'Đóng thư viện')));
   root.appendChild(grid);
 }
+// ============================================================================
+//  ĐỐI CHIẾU TRƯỜNG PHÁI — interactive comparison matrix (12 phái × 9 chiều).
+//  Toggle phái để so sánh chéo. DOM-API only.
+// ============================================================================
+let _schoolsActive = new Set(SCHOOLS.map((s) => s.id));
+function renderSchoolsCompare() {
+  const root = $('schools-compare'); if (!root) return;
+  root.textContent = '';
+  const chips = _h('div', { class: 'seg-bar lib-chips sch-chips' },
+    ...SCHOOLS.map((s) => _h('button', {
+      class: 'seg-btn' + (_schoolsActive.has(s.id) ? ' active' : ''),
+      onClick: () => { if (_schoolsActive.has(s.id)) _schoolsActive.delete(s.id); else _schoolsActive.add(s.id); renderSchoolsCompare(); },
+    }, _h('span', { class: 'zh' }, s.zh), ' ' + s.vi.split(/[ (]/)[0])),
+  );
+  const active = SCHOOLS.filter((s) => _schoolsActive.has(s.id));
+  const matrix = compareMatrix(active.map((s) => s.id));
+  const table = _h('table', { class: 'sch-table' });
+  table.appendChild(_h('tr', {}, _h('th', { class: 'sch-dim-h' }, 'Chiều \\ Phái'),
+    ...active.map((s) => _h('th', {}, _h('div', { class: 'zh' }, s.zh), _h('div', { class: 'sch-vi' }, s.vi)))));
+  matrix.forEach((row) => table.appendChild(_h('tr', {},
+    _h('th', { class: 'sch-dim' }, row.dim.vi),
+    ...row.cells.map((c) => _h('td', {}, c.value || '—')),
+  )));
+  root.appendChild(chips);
+  root.appendChild(_h('p', { class: 'hint', style: 'margin:8px 0' }, 'Không phái nào «đúng nhất» — đây là đối chiếu đặc trưng, ghi nhận biến thể khu vực/trường phái. Bấm phái để thêm/bỏ khỏi bảng.'));
+  root.appendChild(_h('div', { class: 'sch-table-wrap' }, table));
+}
+renderSchoolsCompare(); // top-level init (module load)
+
 renderLibrary(); // top-level init (module load)
 
 // ============================================================================

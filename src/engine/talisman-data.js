@@ -84,6 +84,66 @@ const _MANTRAS = [
     ],
     textual_certainty: 'low', notes: 'TEXTUAL UNCERTAINTY:「洞淵神咒」非單一固定短咒,乃《洞淵神咒經》各品神咒總稱.上方為殺鬼品代表節選,非規範全文(W8/W13 cờ).',
   },
+  {
+    id: 'ZHOU_JING_SHEN', layer: 'mantra', school: '通用 / 早晚功課（八大神咒之三）',
+    name_han: '净身神咒', name_vi: 'Thần Chú Tịnh Thân',
+    han_text: '灵宝天尊，安慰身形。弟子魂魄，五脏玄冥。青龙白虎，队仗纷纭。朱雀玄武，侍卫我真。急急如律令。',
+    meaning: 'Tịnh hoá thân thể — mời thanh long/bạch hổ/chu tước/huyền vũ (tứ linh) thị vệ bản thân, an ủi hồn phách, tịnh ngũ tạng. Dùng sau 净心/净口, trước hành pháp.',
+    use: '淨化 · 護身', recitation_context: '緊接净口神咒;書符/設壇前行身淨.',
+    sources: [
+      'https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%96%80%E6%AD%A3%E4%B8%80%E6%97%A5%E8%AA%B5%E6%97%A9%E8%AA%B2 (維基文庫 太上玄門正一日誦早課 — 八大神咒)',
+      'https://baike.baidu.com/item/%E9%81%93%E6%95%99%E5%85%AB%E5%A4%A7%E7%A5%9E%E5%92%92/1190054 (百度百科 道教八大神咒 — 輔證)',
+    ],
+    textual_certainty: 'high', notes: '5 câu ổn định, phổ biến早課本. Đối chiếu wikisource 早課 để verify từng chữ.',
+  },
+  {
+    id: 'ZHOU_AN_TUDI', layer: 'mantra', school: '通用 / 早晚功課（八大神咒之四）',
+    name_han: '安土地神咒', name_vi: 'Thần Chú An Thổ Địa',
+    han_text: '元始安镇，普告万灵。岳渎真官，土地祗灵。左社右稷，不得妄惊。回向正道，内外澄清。各安方位，备守坛庭。太上有命，搜捕邪精。护法神王，保卫诵经。皈依大道，元亨利贞。急急如律令。',
+    meaning: 'An trấn thổ địa — cáo giới nhạc độc chân quan / thổ địa kỳ linh «đừng vọng kinh», an vị các phương, thủ đàn, săn tà tinh. Dùng khi thiết đàn để an thổ.',
+    use: '安鎮 · 設壇 · 淨化', recitation_context: '設壇前安土地/方 vị thần; bảo vệ đàn trường.',
+    sources: [
+      'https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%96%80%E6%AD%A3%E4%B8%80%E6%97%A5%E8%AA%B5%E6%97%A9%E8%AA%B2 (維基文庫 早課 — 安土地神咒)',
+      'https://baike.baidu.com/item/%E9%81%93%E6%95%99%E5%85%AB%E5%A4%A7%E7%A5%9E%E5%92%92/1190054 (百度百科 八大神咒 — 輔證)',
+    ],
+    textual_certainty: 'high', notes: '穩 định;「皈依大道,元亨利贞» chuẩn. Verify wikisource.',
+  },
+  {
+    id: 'ZHOU_JING_TIANDI', layer: 'mantra', school: '通用 / 早晚功課（八大神咒之五）',
+    name_han: '净天地神咒', name_vi: 'Thần Chú Tịnh Thiên Địa',
+    han_text: '天地自然，秽气分散。洞中玄虚，晃朗太元。八方威神，使我自然。灵宝符命，普告九天。乾罗怛那，洞罡太玄。斩妖缚邪，度人万千。中山神咒，元始玉文。持诵一遍，却病延年。按行五岳，八海知闻。魔王束首，侍卫我轩。凶秽消散，道炁常存。急急如律令。',
+    meaning: 'Tịnh thiên địa — «bát phương uy thần» trảm yêu trói tà, «độ nhân vạn thiên», tẩy uế, «đạo khí thường tồn». Một trong chú mạnh nhất (trừ tà/độ vong).',
+    use: '淨天地 · 驅邪 · 度亡', recitation_context: '淨化 đại không gian/法會;度亡法事.',
+    sources: [
+      'https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%96%80%E6%AD%A3%E4%B8%80%E6%97%A5%E8%AA%B5%E6%97%A9%E8%AA%B2 (維基文庫 早課 — 净天地神咒)',
+      'https://baike.baidu.com/item/%E9%81%93%E6%95%99%E5%85%AB%E5%A4%A7%E7%A5%9E%E5%92%92/1190054 (百度百科 八大神咒 — 輔證)',
+    ],
+    textual_certainty: 'partial', notes: 'Biến thể:「乾羅怛那» vs «乾羅達那»(怛/達);chính thể ổn định. Đối chiếu wikisource 早課.',
+  },
+  {
+    id: 'ZHOU_ZHUXIANG', layer: 'mantra', school: '通用 / 早晚功課（八大神咒之六）',
+    name_han: '祝香神咒', name_vi: 'Thần Chú Chúc Hương',
+    han_text: '道由心学，心假香传。香爇玉炉，心存帝前。真灵下盼，仙旆临轩。令臣关告，迳达九天。',
+    meaning: 'Chúc hương — «đạo do tâm học, tâm giả hương truyền»: dùng hương làm vật chuyển tâm ý lên đế tiền, «trinh linh hạ盼», «đạt cửu thiên». Đốt hương trước tụng kinh.',
+    use: '通神 · 誦經前行', recitation_context: '焚香後,誦經前;không có«急急如律令» (kết tại «九天»).',
+    sources: [
+      'https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%96%80%E6%AD%A3%E4%B8%80%E6%97%A5%E8%AA%B5%E6%97%A9%E8%AA%B2 (維基文庫 早課 — 祝香神咒)',
+      'https://baike.baidu.com/item/%E9%81%93%E6%95%99%E5%85%AB%E5%A4%A7%E7%A5%9E%E5%92%92/1190054 (百度百科 八大神咒 — 輔證)',
+    ],
+    textual_certainty: 'high', notes: '4 câu ổn định, không«急急如律令». Verify wikisource.',
+  },
+  {
+    id: 'ZHOU_XUANYUN', layer: 'mantra', school: '通用 / 早晚功課（八大神咒之八 — 开经玄蕴咒）',
+    name_han: '玄蕴咒（开经玄蕴咒）', name_vi: 'Chú Huyền Uẩn (Khai Kinh)',
+    han_text: '云篆太虚，浩劫之初。乍遐乍迩，或沉或浮。五方徘徊，一丈之余。天真皇人，按笔乃书。以演太虚之风，大梵之炁；结空成梵，自然成文。',
+    meaning: 'Khai kinh huyền uẩn — «vân tri thái hư» = chữ «vân tri» (âm thanh thiên nhiên) do thiên chân hoàng nhân «án bút nãi thư». Dùng trước khai kinh (mở kinh tụng).',
+    use: '开经 · 通玄', recitation_context: '八大神咒 cuối;開經前誦.«云篆»= đạo giáo thần văn.',
+    sources: [
+      'https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E7%8E%84%E9%96%80%E6%AD%A3%E4%B8%80%E6%97%A5%E8%AA%B5%E6%97%A9%E8%AA%B2 (維基文庫 早課 — 玄蕴咒)',
+      'https://baike.baidu.com/item/%E9%81%93%E6%95%99%E5%85%AB%E5%A4%A7%E7%A5%9E%E5%92%92/1190054 (百度百科 八大神咒 — 輔證)',
+    ],
+    textual_certainty: 'partial', notes: 'Câu đầu«云篆太虚…天真皇人按笔乃书» ổn định; nửa sau có biến thể (大梵之炁 / 八威龙文...). Đối chiếu wikisource 早課 cho toàn văn.',
+  },
 ];
 
 // ----------------------------------------------------------------------------
