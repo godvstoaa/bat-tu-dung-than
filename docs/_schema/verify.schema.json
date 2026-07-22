@@ -1,0 +1,62 @@
+{
+  "type": "object",
+  "required": [
+    "verdicts",
+    "overall"
+  ],
+  "properties": {
+    "verdicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "verdict",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "conditional",
+              "rejected"
+            ]
+          },
+          "checked_sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "overall": {
+      "type": "object",
+      "properties": {
+        "verified": {
+          "type": "integer"
+        },
+        "conditional": {
+          "type": "integer"
+        },
+        "rejected": {
+          "type": "integer"
+        }
+      }
+    },
+    "flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

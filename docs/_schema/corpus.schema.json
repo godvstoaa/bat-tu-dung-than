@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://battu.local/_schema/corpus.schema.json",
+  "title": "Corpus fragment — on-disk envelope (docs/_fragments/*.json)",
+  "description": "The stored form: meta wrapper + ETHICS overlay + entries[]. Entries share the shape defined in talisman.schema.json (id/name_han/school/layer/sources/textual_certainty required). The harness validates Grok output against talisman.schema.json, then wraps it into this envelope on disk.",
+  "type": "object",
+  "required": ["_work_item", "_type", "_assembly_target", "entries"],
+  "properties": {
+    "_work_item": { "type": "string", "description": "e.g. FU-001, DAN-003, JING-渊海子平." },
+    "_type": {
+      "type": "string",
+      "enum": ["talisman_fragment", "mantra_fragment", "ritual_fragment", "cultivation_fragment", "classic_fragment"]
+    },
+    "_assembly_target": { "type": "string", "description": "Target module + array, e.g. src/engine/talisman-data.js -> talismans[]." },
+    "_textual_honesty_notes": { "type": "array", "items": { "type": "string" } },
+    "_ethics_overlay": {
+      "type": "object",
+      "required": ["framing", "performance_caveat", "opt_in"],
+      "properties": {
+        "framing": { "type": "string" },
+        "performance_caveat": { "type": "string" },
+        "opt_in": { "type": "boolean" }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name_han", "school", "layer", "meaning", "sources", "textual_certainty"],
+        "properties": {
+          "id": { "type": "string" },
+          "name_han": { "type": "string" },
+          "name_vi": { "type": "string" },
+          "school": { "type": "string" },
+          "layer": { "type": "string", "enum": ["fu", "mantra", "ritual", "cultivation", "classic"] },
+          "ocr_text": { "type": "string" },
+          "structure": { "type": "object" },
+          "visual_description": { "type": "string" },
+          "meaning": { "type": "string" },
+          "use": { "type": "string" },
+          "recitation_context": { "type": "string" },
+          "sources": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+          "verification_status": { "type": "string" },
+          "textual_certainty": { "type": "string", "enum": ["high", "partial", "low"] },
+          "scan_path": { "type": "string" }
+        }
+      }
+    },
+    "notes": { "type": "string" },
+    "_verifier_verdict": {
+      "type": "object",
+      "description": "Filled by the adversarial verifier pass (verify.md). null until verified.",
+      "properties": {
+        "overall": { "type": "object" },
+        "verdicts": { "type": "array" },
+        "flags": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

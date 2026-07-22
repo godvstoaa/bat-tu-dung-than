@@ -1,0 +1,80 @@
+{
+  "_work_item": "FU-001",
+  "_type": "talisman_fragment",
+  "_assembly_target": "src/engine/talisman-data.js -> talismans[]",
+  "_textual_honesty_notes": [],
+  "_ethics_overlay": {
+    "framing": "Tài liệu tham khảo văn hoá-tôn giáo. KHÔNG phải y tế/tâm thần/chẩn đoán; KHÔNG thay thế bác sĩ/chuyên gia tâm lý/đạo sĩ thụ chức. Mọi «tín hiệu» chỉ là TƯỢNG/xác suất theo cổ pháp — không chắc chắn, không dọa nạt.",
+    "performance_caveat": "Nghi lễ / 書符 / 科儀 thực sự phải do đạo sĩ / pháp sư đã thụ 箓 (受箓) chủ trì. App chỉ trình bày tri thức văn hoá, KHÔNG hướng dẫn tự thực hành, KHÔNG cung cấp 笫 để in/ve.",
+    "opt_in": true
+  },
+  "entries": [
+    {
+      "id": "FU_HE_JING_PING_AN",
+      "name_han": "合境平安符",
+      "name_vi": "Phù Hợp Cảnh Bình An",
+      "school": "通用／正一系民俗符籙（臺閩黃紙平安符類型）",
+      "layer": "fu",
+      "ocr_text": "八｜東｜〔左脇難辨一字，或讀「獄／嶽」，未定〕｜〔中央大字雲篆／複合符體，非常楷可定讀〕｜平安｜合境｜〔符腳環結內小字，形態近「急急如律令」，筆畫擁擠〕",
+      "structure": {
+        "head": "頂端有圓點／墨點開筆痕跡，左右分置可讀字「八」「東」；整體屬窄長條黃紙符頭區，非清晰三清連點，亦無標準「敕令」楷書橫額。",
+        "body": "中段主體為一巨形屈曲雲篆式複合符字（上段筆勢略近「紫」形構件，下段化為開張曲線與結體），乃符身主神／敕令意象之視覺中心，非可逐字楷讀之常字。",
+        "belly": "主符兩脇與中下交接處有小字與筆勢延伸；左側見一較密字（或「獄／嶽」類，墨漬與解析度限制，未敢定讀）；右側上方為「東」。",
+        "core": "中下部雙環／結繩式曲線交匯處，似符竅／符膽位置，內嵌極小豎排字列；外有朱色方印（法印／廟印）半透蓋於符身與符腹交界。",
+        "foot": "最下為雙環垂腳與押腳曲線（符腳畫押形態）；左旁楷書「平安」，右旁楷書「合境」；環結內小字傳統上多為「急急如律令」類結語，此件筆畫擁擠僅能作形態比對。"
+      },
+      "visual_description": "窄長豎幅黃紙（約高三倍於寬），黑墨粗筆。頂有一小圓墨點。主體一巨大屈曲符字自上貫下，上段密而重，中段開張如翼／結，下段化為雙層環結與垂腳曲線，整體似一體書成之雲篆符圖而非分行楷書。主符左上可見「八」，右上可見「東」；左中脇有一較密小字（解析度不足）。主符中下段被一方形朱色印半覆（印文本身在掃描解析度下難以逐字辨讀）。環結內有豎排細字；環結左外側「平安」二字，右外側「合境」二字，字體相對清晰、小於主符。紙面有污漬與歲月痕跡；掃描約 224×741 px，邊緣裁切緊。",
+      "meaning": "Theo truyền thống dân gian Đạo giáo / tín ngưỡng dân gian Hoa–Đài, dạng phù giấy vàng in/viết kiểu này thường được hiểu là phù hộ thân hoặc trấn trạch cầu bình an cho cá nhân hoặc cả cảnh (合境). Chữ chức năng「合境」「平安」khớp với công thức phổ biến trên 平安符;「急急如律令」(nếu đúng là chuỗi kết) theo truyền thống là công thức kết lệnh theo kiểu công văn Hán, sau được Đạo giáo dùng để nhấn mạnh lệnh phải thi hành tức thì. Thân phù trung tâm mang tính 雲篆 / asemic — theo nghiên cứu, tính khó đọc cố ý là một đặc trưng của 符籙, không phải lỗi OCR thuần. Một số trường phái gán phù loại này cho hệ 正一 / miếu vũ dân gian; không khẳng định bản quét này thuộc một bản kinh 道藏 cụ thể.",
+      "use": "護身｜鎮宅｜合境平安｜驅邪（tham chiếu văn hóa; không phải hướng dẫn thực hành）",
+      "recitation_context": "Theo truyền thống, phù loại 平安／合境 thường được thỉnh từ miếu hoặc do đạo sĩ đã 受箓 viết/ấn, có thể gấp bỏ túi hương hỏa mang theo, dán cửa, hoặc để bàn thờ; việc 書符／科儀 chân truyền phải do 受箓 道士 hoặc pháp sư được truyền pháp thực hiện — đây chỉ là tư liệu tham chiếu tôn giáo–văn hóa, không phải cẩm nang vẽ/in/niệm cho người ngoài truyền thừa.",
+      "sources": [
+        "https://dict.th.gov.tw/detailPage.aspx?ID=904&Ca=117 (臺灣民俗文物辭典｜辭條「平安符」— cấu trúc 符頭/符身(符膽)/符腳; liệt kê công thức「合境平安」「合家平安」v.v.)",
+        "https://en.wikipedia.org/wiki/Fulu (English Wikipedia「Fulu」— dùng chính ảnh TaoistCharm.JPG làm ví dụ 符籙; thảo luận tính asemic/khó đọc của talismanic script)",
+        "https://zh.wikipedia.org/wiki/%E7%AC%A6%E7%B1%99 (中文維基「符籙」— dùng cùng ảnh; định nghĩa 符/籙, nguồn 三山符籙／正一)",
+        "https://en.wikipedia.org/wiki/Jiji_ru_l%C3%BCling (English Wikipedia「Jiji ru lüling」— nguồn gốc Hán công văn → kết ngữ 符咒; trích 道法會元 minh họa)",
+        "https://commons.wikimedia.org/wiki/File:TaoistCharm.JPG (Wikimedia Commons File:TaoistCharm.JPG — nguồn scan PD; chú thích Chinese charm from www.lib.ntu.edu.tw)",
+        "https://thjcs.site.nthu.edu.tw/var/file/452/1452/img/1303/THJCS403-2.pdf (清華學報｜李豐楙、張智雄〈書符與符號：正一符法的圖像及其象徵〉— nghiên cứu học thuật 正一 符圖)"
+      ],
+      "verification_status": "verified_2plus_independent",
+      "textual_certainty": "partial",
+      "scan_path": "docs/_scans/commons/TaoistCharm.jpg"
+    }
+  ],
+  "notes": "Scan khớp File:TaoistCharm.JPG (Commons, 224×741, ~52KB; PD; chú thích nguồn lib.ntu.edu.tw). OCR:「合境」「平安」「東」độ tin cậy cao;「八」khá chắc; chữ trái giữa thân phù (hoặc「獄/嶽」) và chuỗi nhỏ trong vòng kết (hình thái gần「急急如律令」) chỉ partial vì mực/độ phân giải; thân lớn là 雲篆/composite — KHÔNG bịa chữ Hán chuẩn cho toàn thân. verification_status=verified_2plus_independent áp dụng cho loại hình 合境平安/平安符 + cấu trúc 符 + công thức kết 急急如律令 (dict.th.gov.tw độc lập với Wikipedia/Fulu/Jiji + NTHU PDF); không xác nhận khớp nguyên văn một lá 道藏 cụ thể. Ảnh dùng rộng trên wiki 符籙/Fulu/Zhengyi nhưng không có catalogue name chính thức ngoài mô tả generic. Mọi mô tả chỉ cấu trúc–thị giác–tham chiếu văn hóa; không cung cấp bước vẽ/in/niệm thao tác.",
+  "_verifier_verdict": {
+    "verdicts": [
+      {
+        "id": "FU_HE_JING_PING_AN",
+        "verdict": "conditional",
+        "checked_sources": [
+          "https://dict.th.gov.tw/detailPage.aspx?ID=904&Ca=117",
+          "https://commons.wikimedia.org/wiki/File:TaoistCharm.JPG",
+          "docs/_scans/commons/TaoistCharm.jpg (local 224×741, 53646 bytes)",
+          "https://en.wikipedia.org/wiki/Fulu",
+          "https://zh.wikipedia.org/wiki/符籙",
+          "https://en.wikipedia.org/wiki/Jiji_ru_lüling",
+          "https://web.archive.org/web/20190609015353/http://thjcs.web.nthu.edu.tw/files/14-1662-40964,r2929-1.php (THJCS 40.3 李豐楙·張智雄 abstract/landing; PDF path confirmed)",
+          "https://thjcs.site.nthu.edu.tw/var/file/452/1452/img/1303/THJCS403-2.pdf (cited; live TLS SKI/cert failure on this host)"
+        ],
+        "reason": "Not rejected: cultural-reference framing holds; no stroke-by-stroke 書符 DIY, no printable 符 template, no fear/absolute claims. Local scan matches Commons File:TaoistCharm.JPG (224×741, ~52KB, PD; NTU lib caption). Independent re-read of the scan supports high-confidence 八、東、平安、合境; left mid character is legible as 獄 (entry’s 「獄／嶽，未定」 under-reads the glyph); central mass is correctly left as 雲篆/composite, not fabricated kaishu; foot micro-graph is only morphological toward 「急急如律令」, not confirmed OCR. Typology (黃紙平安符; 符頭/符身·符膽/符腳; formulas including 「合境平安」; red 法印; 急急如律令 as genre closing) is supported by dict.th.gov.tw 平安符 entry independently of Wikipedia, plus Jiji-ru-lüling scholarship and Zhengyi 書符 research (李豐楙 et al.). However, strict verbatim-primary-canon bar fails: this is a folk/museum scan, not a ctext DZ / 《道法會元》 leaf; en/zh Wikipedia re-use the same Commons file (not independent for the specimen); school 「正一系」 is genre-plausible, not proven for this uncatalogued leaf; live NTHU PDF URL is TLS-broken (use archive mirror). Self-field verification_status=verified_2plus_independent overclaims relative to verbatim-canon rule; textual_certainty=partial is correct. Re-check: (1) upgrade left glyph to 「獄」 with second reader; (2) do not promote 急急如律令 beyond morphology without higher-res/NTU original; (3) keep school as 通用／民俗黃紙平安符, Zhengyi only as traditional association; (4) demote self-status to conditional/partial."
+      }
+    ],
+    "overall": {
+      "verified": 0,
+      "conditional": 1,
+      "rejected": 0
+    },
+    "flags": [
+      "self_verification_overclaim: verified_2plus_independent vs strict verbatim-canon bar",
+      "no_DZ_or_Daofa_Huiyuan_leaf_match_for_this_specimen",
+      "wiki_en_zh_share_same_Commons_image_not_independent_for_specimen",
+      "nthu_pdf_direct_url_tls_failure_use_wayback_mirror",
+      "left_mid_glyph_likely_獄_stronger_than_entry_admits",
+      "jiji_ru_luling_on_this_leaf_remains_unconfirmed_OCR",
+      "school_zhengyi_genre_not_specimen_proven",
+      "ethics_pass_cultural_reference_only_no_operative_drawing_steps"
+    ]
+  },
+  "_cost_usd": 0.4250612,
+  "_model": "grok-4.5-build"
+}

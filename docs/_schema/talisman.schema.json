@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://battu.local/_schema/talisman.schema.json",
+  "title": "Talisman (符) OCR/encode batch — output contract for Grok",
+  "description": "What `grok --json-schema` must produce when OCR+encoding a batch of 符 (talisman) scan images. Reused for mantra/ritual/cultivation/classic via `layer`. Every entry MUST carry ≥2 independent `sources` and a `textual_certainty`. 符 is described structurally + visually only — NEVER operational draw/print instructions (practitioner caveat).",
+  "type": "object",
+  "required": ["entries"],
+  "properties": {
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name_han", "school", "layer", "meaning", "sources", "textual_certainty"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable UPPER_SNAKE id, e.g. FU_JIN_GUANG. Prefix by layer: FU_/ZHOU_/FA_/DAN_/JING_."
+          },
+          "name_han": { "type": "string", "description": "Original Hán name (繁體/簡體 as in source)." },
+          "name_vi": { "type": "string", "description": "Sino-Vietnamese reading (e.g. Phù Kim Quang). Optional but preferred." },
+          "school": {
+            "type": "string",
+            "description": "傳承: 茅山|正一|閭山|全真|北帝|洞淵|清微|神霄|通用… + region if relevant."
+          },
+          "layer": {
+            "type": "string",
+            "enum": ["fu", "mantra", "ritual", "cultivation", "classic"],
+            "description": "fu=符籙, mantra=神咒/口訣, ritual=科儀步驟, cultivation=功法/內丹外丹, classic=經典原文."
+          },
+          "ocr_text": {
+            "type": "string",
+            "description": "Verbatim Hán text OCR'd from the scan (咒/口訣原文, or any text written on the 符). Empty string if the image has no legible text. Preserve 繁/簡 as in source; note variants in textual_certainty/notes."
+          },
+          "structure": {
+            "type": "object",
+            "description": "符 structural decomposition (符 only; omit/null for other layers). Descriptive, NOT a drawing guide.",
+            "properties": {
+              "head": { "type": "string", "description": "符頭 — 點三清/敕令 etc." },
+              "body": { "type": "string", "description": "符身 — 主神名諱 + 功能字." },
+              "belly": { "type": "string", "description": "符腹 — 八卦/星象/罡步符號." },
+              "core": { "type": "string", "description": "符膽 — 三才五行之氣樞紐." },
+              "foot": { "type": "string", "description": "符腳 — 押煞/急急如律令." }
+            }
+          },
+          "visual_description": {
+            "type": "string",
+            "description": "Faithful visual description of the 符 strokes/symbols as seen (for SVG/reference). No fabrication."
+          },
+          "meaning": { "type": "string", "description": "What it traditionally does / symbolises (hedged: 'theo truyền thống…')." },
+          "use": { "type": "string", "description": "Traditional use category: 護身|驅邪|淨化|治病|招財|和合|鎮宅… (reference only)." },
+          "recitation_context": { "type": "string", "description": "When/how traditionally recited or deployed; include 受箓 caveat if relevant." },
+          "sources": {
+            "type": "array",
+            "minItems": 2,
+            "items": { "type": "string" },
+            "description": "≥2 INDEPENDENT reachable sources (prefer primary canon: ctext DZ#### / wikisource / 道藏; then academic/gov). Each item = full URL + parenthetical label."
+          },
+          "verification_status": {
+            "type": "string",
+            "enum": ["verified_2plus_independent", "partial", "unverified"],
+            "description": "verified_2plus_independent = ≥2 independent sources confirmed reachable & text matched."
+          },
+          "textual_certainty": {
+            "type": "string",
+            "enum": ["high", "partial", "low"],
+            "description": "high=verbatim matches primary canon; partial=variants/uncertainty flagged; low=representative excerpt only."
+          },
+          "scan_path": { "type": "string", "description": "Local scan file this entry was OCR'd from (relative to app root)." }
+        }
+      }
+    },
+    "notes": { "type": "string", "description": "Batch-level notes: legibility issues, variant conflicts, anything the verifier should re-check." }
+  }
+}

@@ -78,6 +78,9 @@ export default defineConfig({
           //   → renderSynthesisCard undefined runtime → «Không tính được sơ đồ tổng hợp».
           if (id.match(/\/src\/engine\/(western-astro|western-predict|western-synthesis|western-kb|western-interpretation|qizheng)/)) return 'engine-western';
 
+          // === ENGINE-LIBRARY (lazy — Thư viện Huyền học: 符籙/神咒/經典/功法 + Âm Tà data) ===
+          if (id.match(/\/src\/engine\/(library-data|talisman-data|cultivation-data|phuongthuat-data|amta-data|amta-analyze)/)) return 'engine-library';
+
           // === main.js (core: chart.js + constants + interactions + main app UI) ===
           // Everything else stays in main — but now MUCH smaller without kb/ai/divination
         },

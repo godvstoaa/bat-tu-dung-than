@@ -3044,3 +3044,42 @@ h2.grp {
   .ntcm-alert { animation: none; }
   .ntcm-flash { animation: none; }
 }
+
+/* ──────────────────────────────────────────────────────────────────────
+   THƯ VIỆN HUYỀN HỌC (library-card) — 符籙 · 神咒 · 經典 · 功法
+   ────────────────────────────────────────────────────────────────────── */
+.library-card { border-top: 2px solid var(--gold, #c9a86a); }
+.lib-ethics { background: color-mix(in srgb, var(--crimson, #9b2c2c) 8%, transparent); border: 1px solid color-mix(in srgb, var(--crimson, #9b2c2c) 30%, transparent); border-radius: 8px; padding: 8px 12px; }
+.lib-ethics > summary { list-style: revert; }
+.lib-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.lib-chips { flex-wrap: wrap; gap: 4px; }
+.lib-chips .seg-btn { font-size: 12px; padding: 4px 10px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--gold, #c9a86a) 45%, transparent); background: transparent; color: var(--silk-dim, #b9a98c); cursor: pointer; }
+.lib-chips .seg-btn.active { background: color-mix(in srgb, var(--gold, #c9a86a) 22%, transparent); color: var(--silk, #ece0c8); border-color: var(--gold, #c9a86a); }
+#lib-q { flex: 1; min-width: 150px; padding: 6px 10px; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--gold, #c9a86a) 35%, transparent); background: rgba(0,0,0,.18); color: var(--silk, #ece0c8); font-size: 13px; }
+.lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.lib-item { border: 1px solid color-mix(in srgb, var(--gold, #c9a86a) 28%, transparent); border-radius: 10px; padding: 12px 14px; background: linear-gradient(180deg, color-mix(in srgb, var(--gold, #c9a86a) 6%, transparent), rgba(0,0,0,.12)); }
+.lib-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.lib-layer { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: color-mix(in srgb, var(--gold, #c9a86a) 18%, transparent); color: var(--silk-dim, #b9a98c); white-space: nowrap; }
+.lib-name { font-family: 'Noto Serif SC', serif; font-size: 19px; font-weight: 700; color: var(--gold-bright, #e8d28a); }
+.lib-name-vi { font-size: 13px; color: var(--silk-dim, #b9a98c); }
+.lib-cert { font-size: 11px; margin-left: auto; white-space: nowrap; }
+.lib-han { background: rgba(0,0,0,.22); border-radius: 6px; padding: 8px 10px; margin: 6px 0; }
+.lib-han .zh { font-size: 15px; line-height: 1.8; color: var(--silk, #ece0c8); font-weight: 500; white-space: pre-wrap; }
+.lib-struct, .lib-src { margin-top: 6px; font-size: 12px; }
+.lib-struct > summary, .lib-src > summary { cursor: pointer; color: var(--gold, #c9a86a); }
+.lib-src ul { margin: 6px 0 0 16px; }
+.lib-src a { color: var(--gold-bright, #e8d28a); text-decoration: none; word-break: break-all; }
+.lib-src a:hover { text-decoration: underline; }
+.lib-scan { display: block; max-height: 260px; max-width: 100%; margin: 8px auto; border: 1px solid color-mix(in srgb, var(--gold, #c9a86a) 30%, transparent); border-radius: 6px; padding: 6px; background: #f4ecd8; box-shadow: 0 1px 6px rgba(0,0,0,.25); filter: contrast(1.05); }
+.lib-body .hint { color: var(--silk-dim, #b9a98c); font-size: 12px; line-height: 1.6; margin-top: 3px; }
+.lib-item.hidden { display: none; }
+
+/* AM-TA card (chart-aware, opt-in) */
+.amta-card { border-top: 2px solid color-mix(in srgb, var(--crimson, #9b2c2c) 55%, var(--gold, #c9a86a)); }
+.amta-level { font-weight: 600; font-size: 14px; margin: 6px 0 8px; }
+.amta-list { margin: 6px 0 6px 18px; font-size: 12.5px; line-height: 1.7; }
+.amta-list li { margin-bottom: 4px; }
+.amta-sug { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; margin-top: 6px; }
+.amta-sug-item { border: 1px solid color-mix(in srgb, var(--gold, #c9a86a) 28%, transparent); border-radius: 8px; padding: 8px 10px; background: color-mix(in srgb, var(--gold, #c9a86a) 6%, rgba(0,0,0,.1)); }
+.amta-sug-item .lib-cert { margin-left: 6px; }
+.amta-card .lib-ethics { background: color-mix(in srgb, var(--crimson, #9b2c2c) 10%, transparent); border-color: color-mix(in srgb, var(--crimson, #9b2c2c) 35%, transparent); }

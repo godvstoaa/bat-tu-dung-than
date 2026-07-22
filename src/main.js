@@ -66,6 +66,8 @@ import { analyzeFamily } from './engine/family.js';
 import { deduceFromFamily } from './engine/family-deduction.js'; // [loop 626] 六亲断 — suy sâu vận mệnh từ gia đình
 import { analyzeTang } from './engine/tang-analyze.js'; // [loop 1382] TANG GIA 丧家 — vận hiếu
 import { analyzeAmTa } from './engine/amta-analyze.js'; // [loop 1383] ÂM TÀ / vong hồn — detect tín hiệu
+import { LIBRARY, LAYERS, countByLayer, ETHICS as LIB_ETHICS } from './engine/library-data.js'; // [library] Thư viện Huyền học
+import { suggestByAmTa } from './engine/talisman-data.js'; // [amta] chart-aware 符咒 suggestion
 import { compassReading, bestDirection, shanFromDegree } from './engine/fengshui-compass.js'; // [loop 631] la bàn 24 sơn
 import { bestGraveDirectionDeep } from './engine/yinzhai-deep.js'; // [loop 634] Âm Trạch (mộ)
 import { radialData, matrixData } from './engine/family-diagram.js';
@@ -4678,6 +4680,7 @@ async function run() {
   try { renderLnSihua(currentResult); } catch (e) { console.warn('lnSihua', e.message); }
   renderLiuqin(currentResult);
   renderRemedy(currentResult);
+  try { renderAmTa(currentResult); } catch (e) { console.warn('amta', e.message); }
   window._currentResult = currentResult; // [loop 140] cho renderWuXing truy cập monthMainWx
   renderWuXing(currentResult.wx, currentResult.yong);
   renderWx3D(currentResult.wx, currentResult.yong);
@@ -5975,6 +5978,195 @@ if ($('jk-btn')) {
   $('jk-dt').value = _jn.getFullYear() + '-' + _jp(_jn.getMonth() + 1) + '-' + _jp(_jn.getDate()) + 'T' + _jp(_jn.getHours()) + ':00';
   runJinkoujue();
 }
+// ============================================================================
+//  THƯ VIỆN HUYỀN HỌC — standalone browse module (NOT chart-dependent).
+//  Opt-in gate (ETHICS) + layer filter + search. Reuses library-data.js.
+//  Top-level wiring (not inside run()) — same pattern as divination tools.
+//  DOM-API only (createElement/textContent) — no innerHTML with data (XSS-safe).
+// ============================================================================
+const LIB_OPTIN_KEY = 'bazi-library-optin';
+function _libOptedIn() { try { return localStorage.getItem(LIB_OPTIN_KEY) === '1'; } catch (e) { return false; } }
+function _libSetOptIn(v) { try { v ? localStorage.setItem(LIB_OPTIN_KEY, '1') : localStorage.removeItem(LIB_OPTIN_KEY); } catch (e) {} }
+// tiny hyperscript helper — all text goes through textContent (safe).
+function _h(tag, attrs, ...kids) {
+  const n = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (v == null) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') { n.textContent = v; continue; }
+    else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  for (const kid of kids) {
+    if (kid == null || kid === false) continue;
+    if (Array.isArray(kid)) kid.forEach((k) => k && n.appendChild(k.nodeType ? k : document.createTextNode(String(k))));
+    else n.appendChild(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  }
+  return n;
+}
+
+function _renderLibGate() {
+  const g = $('library-gate'); if (!g) return;
+  g.textContent = '';
+  if (_libOptedIn()) { g.classList.add('hidden'); return; }
+  g.classList.remove('hidden');
+  const box = _h('details', { class: 'lib-ethics', open: '' },
+    _h('summary', { class: 'card-title', style: 'cursor:pointer' }, '⚠ Nội dung tham chiếu văn hoá-tôn giáo — vui lòng đọc trước khi mở'),
+    _h('div', { style: 'font-size:13px;line-height:1.7;color:var(--silk-dim);padding:8px 4px' },
+      document.createTextNode(LIB_ETHICS.disclaimerVi),
+      _h('div', { style: 'margin-top:8px' },
+        _h('b', {}, 'Lưu ý: '),
+        document.createTextNode('符 chỉ được mô tả cấu trúc / thị giác (tham chiếu); nghi lễ / 書符 / 科儀 thực sự phải do đạo sĩ / pháp sư đã '),
+        _h('span', { class: 'zh' }, '受箓'),
+        document.createTextNode(' chủ trì. Đây không phải công cụ chẩn đoán «âm tà» hay thay thế y tế / tâm lý.'),
+      ),
+      _h('button', { class: 'btn-ghost', id: 'lib-optin-btn', style: 'margin-top:10px', onClick: () => { _libSetOptIn(true); renderLibrary(); } }, 'Tôi đã hiểu — mở Thư viện Huyền học'),
+    ),
+  );
+  g.appendChild(box);
+}
+
+const _LIB_STRUCT_ZH = { head: '符頭', body: '符身', belly: '符腹', core: '符膽', foot: '符腳' };
+const _LIB_CERT_COLOR = { high: 'var(--jade)', partial: 'var(--gold)', low: 'var(--crimson)' };
+const _LIB_CERT_VI = { high: 'Xác cao', partial: 'Một phần', low: 'Thấp' };
+
+function _libSourceLi(s) {
+  const m = s.match(/^(https?:\/\/\S+)\s*\(([^)]*)\)/);
+  if (m) return _h('li', {}, _h('a', { href: m[1], target: '_blank', rel: 'noopener noreferrer' }, m[2] || m[1]));
+  return _h('li', {}, s);
+}
+
+function _renderLibEntry(e) {
+  const lp = LAYERS.find((l) => l.id === e.layer) || {};
+  const kids = [];
+  // head row
+  kids.push(_h('div', { class: 'lib-head' },
+    _h('span', { class: 'lib-layer', 'data-layer': e.layer }, `${lp.vi || e.layer} `, _h('span', { class: 'zh' }, lp.zh || '')),
+    _h('span', { class: 'lib-name zh' }, e.name_han),
+    e.name_vi ? _h('span', { class: 'lib-name-vi' }, e.name_vi) : null,
+    _h('span', { class: 'lib-cert', style: 'color:' + (_LIB_CERT_COLOR[e.textual_certainty] || 'var(--silk-dim)') }, '● ' + (_LIB_CERT_VI[e.textual_certainty] || e.textual_certainty)),
+  ));
+  if (e.scan_path) kids.push(_h('img', { class: 'lib-scan', src: e.scan_path, alt: e.name_han, loading: 'lazy' }));
+  const body = [];
+  if (e.han_text) body.push(_h('div', { class: 'lib-han' }, _h('span', { class: 'zh' }, e.han_text)));
+  if (e.layer === 'fu' && e.structure) {
+    const sd = _h('div', { style: 'font-size:12px;line-height:1.7;color:var(--silk-dim)' });
+    for (const k of ['head', 'body', 'belly', 'core', 'foot']) {
+      if (e.structure[k]) sd.appendChild(_h('div', {}, _h('b', { class: 'zh' }, _LIB_STRUCT_ZH[k] + ': '), document.createTextNode(e.structure[k])));
+    }
+    body.push(_h('details', { class: 'lib-struct' }, _h('summary', {}, 'Cấu trúc 符 (符頭/身/腹/膽/腳) — mô tả, không phải hướng dẫn vẽ'), sd));
+  }
+  if (e.visual) body.push(_h('div', { class: 'hint', style: 'margin-top:4px' }, _h('b', {}, 'Thị giác: '), document.createTextNode(e.visual)));
+  if (e.meaning) body.push(_h('div', { style: 'margin-top:6px;line-height:1.7' }, e.meaning));
+  if (e.use) body.push(_h('div', { class: 'hint' }, _h('b', {}, 'Dùng: '), document.createTextNode(e.use)));
+  if (e.recitation_context) body.push(_h('div', { class: 'hint' }, _h('b', {}, 'Context: '), document.createTextNode(e.recitation_context)));
+  if (e.notes) body.push(_h('div', { class: 'hint', style: 'opacity:.85' }, _h('i', {}, e.notes)));
+  const sul = _h('ul', { style: 'font-size:11px;line-height:1.6' });
+  (e.sources || []).forEach((s) => sul.appendChild(_libSourceLi(s)));
+  body.push(_h('details', { class: 'lib-src' }, _h('summary', {}, `Nguồn (${(e.sources || []).length} — ≥2 độc lập)`), sul));
+  kids.push(_h('div', { class: 'lib-body' }, body));
+  const hay = (e.name_han + e.name_vi + e.school + e.meaning + e.use).toLowerCase();
+  return _h('div', { class: 'lib-item', 'data-search': hay }, kids);
+}
+
+let _libLayer = 'all';
+function renderLibrary() {
+  _renderLibGate();
+  const root = $('library'); if (!root) return;
+  root.textContent = '';
+  if (!_libOptedIn()) { root.classList.add('hidden'); return; }
+  root.classList.remove('hidden');
+  const byL = countByLayer();
+  const chips = _h('div', { class: 'seg-bar lib-chips' },
+    _h('button', { class: 'seg-btn' + (_libLayer === 'all' ? ' active' : ''), 'data-layer': 'all', onClick: () => { _libLayer = 'all'; renderLibrary(); } }, `Tất cả (${LIBRARY.length})`),
+    ...LAYERS.map((l) => _h('button', { class: 'seg-btn' + (_libLayer === l.id ? ' active' : ''), 'data-layer': l.id, onClick: () => { _libLayer = l.id; renderLibrary(); } },
+      `${l.vi} `, _h('span', { class: 'zh' }, l.zh), ` (${byL[l.id] || 0})`)),
+  );
+  const q = _h('input', { id: 'lib-q', type: 'text', placeholder: 'lọc theo tên / nội dung…' });
+  q.addEventListener('input', () => {
+    const v = q.value.trim().toLowerCase();
+    root.querySelectorAll('.lib-item').forEach((it) => it.classList.toggle('hidden', !!v && !(it.dataset.search || '').includes(v)));
+  });
+  const grid = _h('div', { class: 'lib-grid' });
+  const list = LIBRARY.filter((e) => _libLayer === 'all' || e.layer === _libLayer).map(_renderLibEntry);
+  if (list.length) list.forEach((n) => grid.appendChild(n));
+  else grid.appendChild(_h('p', { class: 'hint' }, 'Chưa có mục ở lớp này (Phase 1+ sẽ bổ sung).'));
+  root.appendChild(_h('div', { class: 'lib-toolbar' }, chips, q,
+    _h('button', { class: 'btn-ghost', id: 'lib-off-btn', onClick: () => { _libSetOptIn(false); renderLibrary(); } }, 'Đóng thư viện')));
+  root.appendChild(grid);
+}
+renderLibrary(); // top-level init (module load)
+
+// ============================================================================
+//  ÂM TÀ / VONG HỒN / TRỪ TÀ — chart-aware card (consumes R.amta). Opt-in gate
+//  RIÊNG (bazi-amta-optin), ETHICS mạnh (nhạy cảm). DOM-API only.
+// ============================================================================
+const AMTA_OPTIN_KEY = 'bazi-amta-optin';
+function _amtaOptedIn() { try { return localStorage.getItem(AMTA_OPTIN_KEY) === '1'; } catch (e) { return false; } }
+function _amtaSetOptIn(v) { try { v ? localStorage.setItem(AMTA_OPTIN_KEY, '1') : localStorage.removeItem(AMTA_OPTIN_KEY); } catch (e) {} }
+const _AMTA_CERT_VI = { high: 'Xác cao', partial: 'Một phần', low: 'Thấp' };
+
+function _amtaGateNode(onOpen) {
+  return _h('details', { class: 'lib-ethics', open: '' },
+    _h('summary', { class: 'card-title', style: 'cursor:pointer' }, '⚠ Âm Tà / Vong Hồn / Trừ Tà — nội dung nhạy cảm, vui lòng đọc trước'),
+    _h('div', { style: 'font-size:13px;line-height:1.7;color:var(--silk-dim);padding:8px 4px' },
+      document.createTextNode('Nội dung «Âm Tà / Trừ Tà» là THAM CHIẾU VĂN HOÁ-TÔN GIÁO từ nhiều trường phái. KHÔNG phải chẩn đoán y tế/tâm thần, KHÔNG khẳng định «bạn bị ma / quỷ / âm khí». Mọi «tín hiệu» chỉ là TƯỢNG / xác suất theo cổ pháp. Nếu bạn đang đau khổ, mất ngủ kéo dài, hoang tưởng, hay có ý nghĩ tự hại → liên hệ chuyên gia tâm lý / y tế hoặc đường dây khẩn cấp. Nghi lễ (nếu muốn) do đạo sĩ / pháp sư thụ chức chủ trì.'),
+      _h('div', { style: 'margin-top:8px' },
+        _h('button', { class: 'btn-ghost', onClick: onOpen }, 'Tôi đã hiểu — xem phân tích Âm Tà / Trừ Tà'),
+      ),
+    ),
+  );
+}
+
+function renderAmTa(R) {
+  const root = $('amta'); if (!root) return;
+  root.textContent = '';
+  if (!_amtaOptedIn()) { root.appendChild(_amtaGateNode(() => { _amtaSetOptIn(true); renderAmTa(R); })); return; }
+  const amta = R && R.amta;
+  const box = _h('div', { class: 'amta-body' });
+  box.appendChild(_h('div', { class: 'lib-ethics', style: 'margin-bottom:8px' },
+    _h('b', {}, 'Tham chiếu văn hoá-tôn giáo — KHÔNG chẩn đoán. '),
+    document.createTextNode('Mọi tín hiệu dưới đây là TƯỢNG / xác suất theo cổ pháp, không phải «độ bị ma». Nếu distress thật → chuyên gia tâm lý / y tế.'),
+  ));
+  if (!amta || !amta.enabled) { box.appendChild(_h('p', { class: 'hint' }, '(Chưa tính được tín hiệu — thiếu dữ liệu lá số.)')); root.appendChild(box); return; }
+  const s = amta.susceptibility || {};
+  const lvlColor = { minimal: 'var(--jade)', low: 'var(--jade)', medium: 'var(--gold)', high: 'var(--crimson)' }[s.level] || 'var(--silk-dim)';
+  box.appendChild(_h('div', { class: 'amta-level', style: 'color:' + lvlColor }, `Mức tín hiệu tượng: ${s.level || '?'} (${s.score || 0}đ) — tổng symbolic, không phải «độ bị ma».`));
+  if ((amta.detected || []).length) {
+    const ul = _h('ul', { class: 'amta-list' });
+    amta.detected.forEach((d) => ul.appendChild(_h('li', {},
+      _h('b', { class: 'zh' }, (d.indicator || '').split('(')[0].trim() + ' '),
+      document.createTextNode('— ' + ((d.meaning || '').split('。')[0]) + ' '),
+      _h('span', { class: 'hint' }, `(cường ${d.strength || 1})`),
+    )));
+    box.appendChild(_h('details', { open: '' }, _h('summary', {}, `Tín hiệu cổ điển (${amta.detected.length}) — tham chiếu, KHÔNG chẩn đoán`), ul));
+  } else {
+    box.appendChild(_h('p', { class: 'hint' }, 'Ít / không có tín hiệu tượng nổi bật — theo cổ pháp không có gì đáng lưu tâm âm-tà.'));
+  }
+  if ((amta.referencedTypes || []).length) {
+    const tul = _h('ul', { class: 'amta-list hint' });
+    amta.referencedTypes.forEach((t) => tul.appendChild(_h('li', {}, _h('b', {}, (t.type || '') + ' '), document.createTextNode('— ' + (t.signs || '') + ' (tham chiếu ngữ cảnh, KHÔNG chẩn đoán «bị loại này»)'))));
+    box.appendChild(_h('details', {}, _h('summary', {}, 'Loại hồn / vong liên quan ngữ cảnh (tham chiếu)'), tul));
+  }
+  const sug = suggestByAmTa(amta);
+  if (sug.length) {
+    const sg = _h('div', { class: 'amta-sug' });
+    sug.forEach((e) => {
+      const cert = _AMTA_CERT_VI[e.textual_certainty];
+      sg.appendChild(_h('div', { class: 'amta-sug-item' },
+        _h('span', { class: 'lib-name zh', style: 'font-size:15px' }, e.name_han),
+        _h('span', { class: 'hint' }, ` ${e.name_vi || ''} · ${e.use || ''}`),
+        cert ? _h('span', { class: 'lib-cert', style: 'font-size:10px' }, '● ' + cert) : null,
+        _h('div', { class: 'hint', style: 'margin-top:2px' }, e.meaning),
+      ));
+    });
+    box.appendChild(_h('details', { open: '' }, _h('summary', {}, `Phù / Chú / Nghi thức tham chiếu (${sug.length}) — do đạo sĩ 受箓 chủ trì`), sg));
+  }
+  box.appendChild(_h('p', { class: 'hint', style: 'margin-top:8px' }, _h('i', {}, 'Nếu bạn đang gặp khó khăn tâm lý / mất ngủ / hoang tưởng kéo dài, hãy ưu tiên chuyên gia y tế / tâm lý. Nghi lễ tôn giáo (nếu muốn) song hành — không thay thế chăm sóc y tế.')));
+  box.appendChild(_h('button', { class: 'btn-ghost', style: 'margin-top:8px', onClick: () => { _amtaSetOptIn(false); renderAmTa(R); } }, 'Đóng phân tích Âm Tà'));
+  root.appendChild(box);
+}
+
 $('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run(); });
 $('ask-btn').addEventListener('click', handleAsk);
 $('question').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAsk(); });
