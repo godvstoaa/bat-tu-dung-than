@@ -4580,6 +4580,7 @@ async function run() {
   //   phút có đổi 时柱. Có city/longitude → hiệu chỉnh; không thì dùng giờ nhập y nguyên.
   const tz = parseFloat($('tz').value) || 7;
   const cityVal = $('city').value;
+  const nameVal = (($('birth-name') || {}).value || '').trim().slice(0, 40); // [visitor-finder] tên tùy chọn (admin tìm lại)
   let longitude = null;
   if (cityVal === 'manual') { const lv = parseFloat($('long').value); longitude = Number.isFinite(lv) && lv >= -180 && lv <= 180 ? lv : null; }
   else if (cityVal && !Number.isNaN(parseFloat(cityVal))) longitude = parseFloat(cityVal);
@@ -4590,7 +4591,7 @@ async function run() {
   // [loop 852 FIX] clear _fromUrlShare SAU lần save đầu — user B tự nhập data riêng
   //   lần sau → save ĐÚNG (không bị skip vì flag cũ).
   if (!window._fromUrlShare) {
-    try { localStorage.setItem('bazi-birth', JSON.stringify({ date: dateVal, time: timeVal, gender, tz, city: cityVal, long: $('long') ? $('long').value : '' })); } catch (e) {}
+    try { localStorage.setItem('bazi-birth', JSON.stringify({ date: dateVal, time: timeVal, gender, tz, city: cityVal, long: $('long') ? $('long').value : '', name: nameVal })); } catch (e) {}
   }
   window._fromUrlShare = false; // clear — lần submit kế (user tự nhập) → save bình thường
   // [loop 391] update URL with birth params for shareable link
@@ -4633,7 +4634,7 @@ async function run() {
   //   R.synthesis.score = điểm mệnh cách 0-100 (đã tính sẵn cho mỗi lá số).
   try {
     const _s = currentResult.synthesis || {};
-    _logEvent('chart', { dob: dateVal, time: timeVal, gender: gender, score: (_s.score != null ? _s.score : null), grade: _s.gradeVi || null, fortune: _s.fortuneVi || null, percentile: (_s.percentile != null ? _s.percentile : null), patternQ: (currentResult.patternQuality && currentResult.patternQuality.quality) || null, strong: !!(currentResult.strength && currentResult.strength.strong), yong: (currentResult.yong && currentResult.yong.primary) || null });
+    _logEvent('chart', { dob: dateVal, time: timeVal, gender: gender, score: (_s.score != null ? _s.score : null), grade: _s.gradeVi || null, fortune: _s.fortuneVi || null, percentile: (_s.percentile != null ? _s.percentile : null), patternQ: (currentResult.patternQuality && currentResult.patternQuality.quality) || null, strong: !!(currentResult.strength && currentResult.strength.strong), yong: (currentResult.yong && currentResult.yong.primary) || null, ...(nameVal ? { name: nameVal } : {}) });
   } catch (e) {}
   const c = currentResult.chart;
   // [loop 915] DỤNG THẦN THEME — đổi accent màu app theo Dụng Thần (may mắn)
@@ -7496,6 +7497,7 @@ try {
   if (subj.tz && $('tz')) $('tz').value = String(subj.tz);
   if (subj.city && $('city')) $('city').value = subj.city;
   if (subj.long && $('long')) $('long').value = subj.long;
+  if (subj.name && $('birth-name')) $('birth-name').value = subj.name; // [visitor-finder] prefill tên
   } // close else
 } catch (e) {}
 // [loop 1367] auto-run chart nếu mở từ URL (admin «Mở lá số» / share link) — không cần click submit

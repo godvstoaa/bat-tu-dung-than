@@ -145,6 +145,14 @@ export async function logEvent(env, request, type, data) {
   log.unshift({ ts, type, ip, ua, country, city, data: data || {} });
   if (log.length > 1500) log.length = 1500;
   await env.ADMIN_KV.put('events:log', JSON.stringify(log));
+  // [visitor-finder] profile bền vững — chart identity (dob|time|gender) sống qua events:log rollover + đổi IP.
+  //   Chỉ upsert khi chart có name → admin tìm theo tên dài hạn. Không TTL (persistent).
+  if (type === 'chart' && data && data.name) {
+    try {
+      const pk = 'vprof:' + String(data.dob || '?') + '|' + String(data.time || 'na') + '|' + String(data.gender || '?');
+      await env.ADMIN_KV.put(pk, JSON.stringify({ name: String(data.name).slice(0, 40), dob: data.dob || '', time: data.time || '', gender: data.gender || '', ip: ip, score: data.score != null ? data.score : null, grade: data.grade || '', patternQ: data.patternQ || '', yong: data.yong || '', lastTs: ts }));
+    } catch (e) {}
+  }
   // [loop 1361] test events (data.test/audit/xss) — log vào events:log (cho raw endpoint check)
   //   NHƯNG KHÔNG đếm cnt:/dayagg → không inflate production stats. Chống audit/test pollute.
   const isTest = data && (data.test || data.audit || data.xss);
@@ -398,7 +406,7 @@ export async function handleAdminRoute(request, env, url) {
         await env.ADMIN_KV.delete('free:log');
         for (const k of ['cnt:visit','cnt:chart','cnt:ai_question','cnt:ai_chat','cnt:error','cnt:all','cnt:free_calls','cnt:free_ok','cnt:free_err']) await env.ADMIN_KV.delete(k);
         // [loop 1352] cleanup dayagg + legacy daily:type keys (list + batch delete)
-        for (const prefix of ['dayagg:', 'daily:']) {
+        for (const prefix of ['dayagg:', 'daily:', 'vnote:', 'vprof:']) {
           let cursor = undefined;
           do {
             const ls = await env.ADMIN_KV.list({ prefix, limit: 1000, cursor });
@@ -422,8 +430,22 @@ export async function handleAdminRoute(request, env, url) {
       const removed = before - evs.length;
       await env.ADMIN_KV.put('events:log', JSON.stringify(evs));
       await env.ADMIN_KV.delete('cache:stats');
+      await env.ADMIN_KV.delete('vnote:' + body.ip); // [visitor-finder] dọn ghi chú theo IP luôn
       await auditLog(env, request, 'events_delete', { ip: body.ip, removed });
       return json({ ok: true, removed, msg: 'Đã xóa ' + removed + ' events của ' + body.ip });
+    }
+    // [visitor-finder] note + tag per visitor — bộ nhớ dài hạn admin «ai là ai». Lưu/xóa vnote:<ip>.
+    if (path === '/admin/api/note' && method === 'POST') {
+      const body = await request.json().catch(() => ({}));
+      const ip = String((body && body.ip) || '').slice(0, 64);
+      if (!ip) return json({ ok: false, err: 'Cần {ip}' }, 400);
+      const note = String((body && body.note) || '').slice(0, 500);
+      const tags = Array.isArray(body && body.tags) ? body.tags.filter((t) => typeof t === 'string' && t.trim()).map((t) => t.trim().slice(0, 20)).slice(0, 10) : [];
+      if (!note && !tags.length) await env.ADMIN_KV.delete('vnote:' + ip);
+      else await env.ADMIN_KV.put('vnote:' + ip, JSON.stringify({ note: note, tags: tags, ts: Date.now() }));
+      await env.ADMIN_KV.delete('cache:stats'); // note mới phải phản ánh ngay (bypass cache 60s)
+      await auditLog(env, request, 'visitor_note', { ip: ip, hasNote: !!note, tagCount: tags.length });
+      return json({ ok: true });
     }
     if (path === '/admin/api/block' && method === 'POST') {
       const body = await request.json().catch(() => ({}));
@@ -474,6 +496,27 @@ async function adminStats(env, url) {
     if (v.timeline && v.timeline.length > 15) v.timeline = v.timeline.slice(0, 15);
     return v;
   });
+  // [visitor-finder] load notes (vnote:<ip>) + durable profiles (vprof:<chartkey>) + tag cloud;
+  //   đính kèm note/tags/name/returning vào mỗi byIp entry (cho filter/search client-side).
+  let notesMap = {}, profiles = [];
+  if (env.ADMIN_KV) {
+    const [nl, pl] = await Promise.all([ env.ADMIN_KV.list({ prefix: 'vnote:', limit: 1000 }), env.ADMIN_KV.list({ prefix: 'vprof:', limit: 1000 }) ]);
+    const nRaw = await Promise.all(nl.keys.map((k) => env.ADMIN_KV.get(k.name)));
+    nl.keys.forEach((k, i) => { try { notesMap[k.name.slice(6)] = JSON.parse(nRaw[i] || '{}'); } catch (e) {} });
+    const pRaw = await Promise.all(pl.keys.map((k) => env.ADMIN_KV.get(k.name)));
+    pl.keys.forEach((k, i) => { try { const p = JSON.parse(pRaw[i] || '{}'); if (p && p.name) profiles.push(p); } catch (e) {} });
+  }
+  const _tagCount = {};
+  for (const nip in notesMap) (notesMap[nip].tags || []).forEach((t) => { _tagCount[t] = (_tagCount[t] || 0) + 1; });
+  const tagCloud = Object.entries(_tagCount).map(([t, n]) => ({ tag: t, count: n })).sort((a, b) => b.count - a.count);
+  byIpArr.forEach((v) => {
+    const n = notesMap[v.ip] || {};
+    v.note = n.note || ''; v.tags = n.tags || []; v.noteTs = n.ts || 0;
+    const namedChart = (v.charts || []).find((c) => c && c.name);
+    v.name = namedChart ? namedChart.name : '';
+    v.returning = new Date(v.firstTs).toISOString().slice(0, 10) !== new Date(v.lastTs).toISOString().slice(0, 10);
+  });
+  profiles.sort((a, b) => (b.lastTs || 0) - (a.lastTs || 0));
   // [loop 1351] top countries (geo distribution)
   const ctry = {};
   for (const e of events) { const c = e.country || '?'; ctry[c] = (ctry[c] || 0) + 1; }
@@ -660,7 +703,7 @@ async function adminStats(env, url) {
     var ipArr = Object.entries(v.ips).map(function (kv) { return { ip: kv[0], count: kv[1] }; }).sort(function (a, b) { return b.count - a.count; });
     return { sid: v.sid.slice(0, 20), ips: ipArr, ipCount: ipArr.length, count: v.count, firstTs: v.firstTs, lastTs: v.lastTs, device: parseUA(v.ua).label, country: v.country, city: v.city };
   }).sort(function (a, b) { return b.ipCount - a.ipCount || b.lastTs - a.lastTs; }).slice(0, 50);
-  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, freeUsage, freeRecent: freeLog.slice(0, 30), feedback, feedbackRecent: feedbackLog.slice(0, 30), destiny, deviceGroups, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks };
+  const result = { aiEnabled: ai, totals, uniqueIps: ips.size, realUniqueIps: realIps.size, bots: botCount, activeNow, funnel, engagement, events: eventsLite, byIp: byIpArr, daily, trend, aiLatency, freeUsage, freeRecent: freeLog.slice(0, 30), feedback, feedbackRecent: feedbackLog.slice(0, 30), destiny, deviceGroups, topCountries, topQuestions, topReferrers, referrerConversion, devices, hourly, topClicks, notes: notesMap, profiles, tagCloud };
   if (env.ADMIN_KV) await env.ADMIN_KV.put('cache:stats', JSON.stringify(result), { expirationTtl: 60 });
   return json(result);
 }
@@ -842,15 +885,53 @@ function adminDashboard() {
       </section>
       <!-- ===== VISITORS ===== -->
       <section class="tab" id="tab-visitors">
-        <div class="pagehead"><h2>👥 Visitors</h2><span class="pill">Ai xem gì · hỏi gì · từ đâu</span></div>
-        <div class="toolbar">
-          <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option><option value="ai_chat">ai_chat (Q+A)</option><option value="error">error</option><option value="click">click</option></select>
-          <input class="filter" id="sq" placeholder="🔍 tìm IP / câu hỏi" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})">
-          <input class="filter" id="ipsearch" placeholder="🔍 lọc visitor" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#byip > div').forEach(function(c){c.style.display=!q||c.textContent.toLowerCase().indexOf(q)>=0?'':'none'})" style="width:140px">
-          <button class="btn sm" onclick="load()">↻</button>
+        <div class="pagehead"><h2>👥 Visitors</h2><span class="pill">Tìm lại bất kỳ ai · tên / ngày sinh / câu hỏi / ghi chú / tag</span></div>
+
+        <!-- 🔎 VISITOR FINDER -->
+        <div class="card">
+          <h3>🔎 Tìm visitor <span class="card-actions tiny">tìm + lọc + sắp xếp · gõ bất kỳ đặc điểm nào admin nhớ</span></h3>
+          <div class="toolbar">
+            <input class="filter" id="vq" placeholder="🔍 tên / ngày sinh / IP / câu hỏi / trả lời AI / ghi chú / tag…" oninput="vRender()" style="flex:1;min-width:220px">
+            <select class="filter" id="vf-gender" onchange="vRender()"><option value="">Mọi giới</option><option value="nam">Nam</option><option value="nữ">Nữ</option></select>
+            <select class="filter" id="vf-country" onchange="vRender()"></select>
+            <select class="filter" id="vf-sort" onchange="vRender()">
+              <option value="recent">Gần nhất</option><option value="old">Cũ nhất</option><option value="scorehi">Điểm cao</option><option value="scorelo">Điểm thấp</option><option value="charts">Nhiều lá số</option><option value="qs">Nhiều câu hỏi</option><option value="named">Có tên</option><option value="note">Có ghi chú</option>
+            </select>
+            <span class="tiny" id="vcount" style="margin-left:auto;white-space:nowrap"></span>
+            <button class="btn sm" onclick="vReset()">✕ lọc</button>
+          </div>
+          <div class="toolbar" style="font-size:11px;gap:10px;align-items:center">
+            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-chart" onchange="vRender()"> lá số</label>
+            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-chat" onchange="vRender()"> chat</label>
+            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-q" onchange="vRender()"> câu hỏi</label>
+            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-note" onchange="vRender()"> ghi chú</label>
+            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-tag" onchange="vRender()"> tag</label>
+            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-name" onchange="vRender()"> có tên</label>
+            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-ret" onchange="vRender()"> quay lại</label>
+            <span style="margin-left:6px">điểm</span>
+            <input class="filter" id="vf-smin" type="number" min="0" max="100" placeholder="từ" oninput="vRender()" style="width:50px">
+            <span>–</span>
+            <input class="filter" id="vf-smax" type="number" min="0" max="100" placeholder="đến" oninput="vRender()" style="width:50px">
+            <span style="margin-left:4px">thăm</span>
+            <input class="filter" id="vf-from" type="date" oninput="vRender()" style="width:128px">
+            <span>→</span>
+            <input class="filter" id="vf-to" type="date" oninput="vRender()" style="width:128px">
+          </div>
+          <div id="vtagcloud" class="tiny" style="margin-top:6px;line-height:2"></div>
+          <div id="byip"></div>
         </div>
-        <div class="card"><h3>Sự kiện gần đây <span class="card-actions tiny">click dòng ai_chat → xem full Q+A</span></h3><table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table></div>
-        <div class="card"><h3>Theo visitor (IP) <span class="card-actions tiny">timeline · lá số · chat</span></h3><div id="byip"></div></div>
+
+        <!-- 📒 DANH BẠ TÊN (profiles bền vững — sống qua rollover log) -->
+        <div class="card"><h3>📒 Danh bạ tên <span class="card-actions tiny">bền vững · tìm theo tên dù đã lâu (sống qua rollover log 1500 events)</span></h3><div id="profiles"></div></div>
+
+        <!-- SỰ KIỆN (chi tiết) -->
+        <div class="card"><h3>Sự kiện gần đây <span class="card-actions tiny">click dòng ai_chat → xem full Q+A</span></h3>
+          <div class="toolbar">
+            <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option><option value="ai_chat">ai_chat (Q+A)</option><option value="error">error</option><option value="click">click</option></select>
+            <input class="filter" id="sq" placeholder="🔍 tìm trong sự kiện" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})">
+          </div>
+          <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
+        </div>
       </section>
       <!-- ===== AI ===== -->
       <section class="tab" id="tab-ai">
@@ -995,32 +1076,8 @@ function adminDashboard() {
     });
     // [loop 1351] hourly activity — 24 bars (giờ VN)
     var hl=document.getElementById('hourly'); if (hl && d.hourly) { hl.textContent=''; var mx=Math.max.apply(null,d.hourly.concat([1])); d.hourly.forEach(function(n,h){ var bar=el('div'); bar.style.cssText='flex:1;min-width:4px;background:'+(n>0?'#d4af37':'rgba(212,175,55,.1)')+';height:'+Math.max(2,Math.round(n/mx*36))+'px'; bar.title=h+'h: '+n+' visits'; hl.appendChild(bar); }); }
-    // [loop 1351] by-IP view — mỗi visitor (IP) + charts xem + câu hỏi AI
-    const bip=document.getElementById('byip'); if (bip) { bip.textContent='';
-      (d.byIp||[]).forEach(function(v){
-        // [loop 1365] compact clickable card — click → modal load HẾT (device/timeline/chats)
-        const card=el('div'); card.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin:6px 0;cursor:pointer;transition:border-color .15s,transform .1s';
-        card.onmouseenter=function(){card.style.borderColor='var(--border2)';card.style.transform='translateX(2px)';}; card.onmouseleave=function(){card.style.borderColor='var(--border)';card.style.transform='none';};
-        card.onclick=(function(ip){return function(){showVisitor(ip);};})(v.ip);
-        const row=el('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap';
-        const left=el('div'); left.style.cssText='display:flex;align-items:center;gap:8px;flex-wrap:wrap';
-        const ipE=el('span','ip', v.ip); ipE.style.cssText='font-weight:700'; left.appendChild(ipE);
-        left.appendChild(el('span','tiny', (v.country||'?')+(v.city?' / '+v.city:'')));
-        if (v.device) left.appendChild(el('span','tiny', v.device));
-        row.appendChild(left);
-        var lastScore = (v.charts && v.charts.length && v.charts[0] && v.charts[0].score != null) ? v.charts[0].score : null;
-        var lastGrade = (v.charts && v.charts.length && v.charts[0] && v.charts[0].grade) ? v.charts[0].grade : '';
-        const right=el('span','tiny', v.count+' ev · '+v.visits+' visit · '+(v.charts&&v.charts.length?v.charts.length+'📊':'')+(lastScore!=null?' '+lastScore+(lastGrade?' '+lastGrade:''):'')+(v.chats&&v.chats.length?' · '+v.chats.length+'💬':'')+' →');
-        right.style.whiteSpace='nowrap'; row.appendChild(right);
-        card.appendChild(row);
-        card.appendChild(el('div','tiny','⏱ '+new Date(v.firstTs).toLocaleString('vi-VN')+' → '+new Date(v.lastTs).toLocaleString('vi-VN')));
-        // block button (không trigger card click)
-        var bk=el('button','btn'); bk.textContent='🚫'; bk.style.cssText='position:absolute;right:8px;top:8px;padding:1px 5px;font-size:10px;opacity:.5'; card.style.position='relative';
-        bk.onmouseenter=function(){bk.style.opacity='1';}; bk.onmouseleave=function(){bk.style.opacity='.5';};
-        bk.onclick=(function(ip){return function(e){e.stopPropagation();if(confirm('Block IP '+ip+'?'))blockIp(ip,1);};})(v.ip); card.appendChild(bk);
-        bip.appendChild(card);
-      });
-    }
+    // [visitor-finder] render visitor cards qua engine search/filter/sort (hàm vRender)
+    _lastD = d; vRender();
     // [loop 1351] daily breakdown — mini bar chart 7 ngày
     const dl=document.getElementById('daily'); if (dl && d.daily) { dl.textContent='';
       const maxv=Math.max.apply(null, d.daily.map(function(x){return x.visit+x.chart+x.ai_question;}).concat([1]));
@@ -1147,6 +1204,133 @@ function adminDashboard() {
       if (d.referrerConversion && d.referrerConversion.length) { d.referrerConversion.forEach(function(r){ col3.appendChild(el('div','tiny', '  → '+r.chartRate+'% chart ('+r.charts+'/'+r.visits+')')); }); }
     }
   }
+  // ===== [visitor-finder] SEARCH + FILTER + SORT + NOTE/TAG ENGINE =====
+  var _lastD = null;
+  function _vf(){ return {
+    q:(document.getElementById('vq').value||'').toLowerCase().trim(),
+    gender:document.getElementById('vf-gender').value,
+    country:document.getElementById('vf-country').value,
+    sort:document.getElementById('vf-sort').value,
+    chart:document.getElementById('vf-chart').checked, chat:document.getElementById('vf-chat').checked, hasQ:document.getElementById('vf-q').checked,
+    note:document.getElementById('vf-note').checked, tag:document.getElementById('vf-tag').checked, name:document.getElementById('vf-name').checked, ret:document.getElementById('vf-ret').checked,
+    smin:document.getElementById('vf-smin').value!==''?parseInt(document.getElementById('vf-smin').value,10):null,
+    smax:document.getElementById('vf-smax').value!==''?parseInt(document.getElementById('vf-smax').value,10):null,
+    from:document.getElementById('vf-from').value?new Date(document.getElementById('vf-from').value).getTime():null,
+    to:document.getElementById('vf-to').value?new Date(document.getElementById('vf-to').value).getTime()+86400000:null,
+  }; }
+  function _bestScore(v){ var sc=(v.charts||[]).map(function(c){return c.score;}).filter(function(s){return s!=null;}); return sc.length?Math.max.apply(null,sc):null; }
+  function _vHay(v){ var refEv=(v.timeline||[]).find(function(t){return t.type==='visit'&&t.data&&t.data.ref;}); var ref=refEv?(' '+refEv.data.ref):'';
+    return [v.name,v.ip,v.country,v.city,v.device,v.note,(v.tags||[]).join(' '),(v.charts||[]).map(function(c){return (c.dob||'')+' '+(c.time||'')+' '+(c.gender||'')+' '+(c.name||'')+' '+(c.score!=null?c.score:'')+' '+(c.grade||'')+' '+(c.patternQ||'')+' '+(c.yong||'');}).join(' '),(v.questions||[]).join(' '),(v.chats||[]).map(function(c){return (c.q||'')+' '+(c.response||'');}).join(' '),ref].join(' ').toLowerCase(); }
+  function _vHit(v,f){ if(!f.q)return true; var hay=_vHay(v); return f.q.split(/\\s+/).every(function(t){return t&&hay.indexOf(t)>=0;}); }
+  function _vMatch(v,f){
+    if(!_vHit(v,f))return false;
+    if(f.gender&&!(v.charts||[]).some(function(c){return c.gender===f.gender;}))return false;
+    if(f.country&&v.country!==f.country)return false;
+    if(f.chart&&!(v.charts&&v.charts.length))return false;
+    if(f.chat&&!(v.chats&&v.chats.length))return false;
+    if(f.hasQ&&!(v.questions&&v.questions.length))return false;
+    if(f.note&&!v.note)return false;
+    if(f.tag&&!(v.tags&&v.tags.length))return false;
+    if(f.name&&!v.name)return false;
+    if(f.ret&&!v.returning)return false;
+    var sc=_bestScore(v);
+    if(f.smin!=null&&(sc==null||sc<f.smin))return false;
+    if(f.smax!=null&&(sc==null||sc>f.smax))return false;
+    if(f.from!=null&&v.lastTs<f.from)return false;
+    if(f.to!=null&&v.firstTs>f.to)return false;
+    return true;
+  }
+  function _vCard(v){
+    var card=el('div'); card.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin:6px 0;cursor:pointer;transition:border-color .15s,transform .1s;position:relative';
+    card.onmouseenter=function(){card.style.borderColor='var(--border2)';card.style.transform='translateX(2px)';}; card.onmouseleave=function(){card.style.borderColor='var(--border)';card.style.transform='none';};
+    card.onclick=function(){showVisitor(v.ip);};
+    var r1=el('div'); r1.style.cssText='display:flex;align-items:center;gap:8px;flex-wrap:wrap';
+    if(v.name){var nm=el('span',null,v.name); nm.style.cssText='color:var(--gold);font-weight:700'; r1.appendChild(nm);}
+    var ipE=el('span','ip',v.ip); ipE.style.cssText='font-weight:700'; r1.appendChild(ipE);
+    if(v.returning){var rb=el('span','badge','🔄 quen'); rb.style.cssText='background:rgba(127,191,127,.2);color:#7fbf7f'; r1.appendChild(rb);}
+    if(v.note){var nb=el('span','badge','📝'); nb.style.cssText='background:rgba(212,175,55,.2);color:#d4af37'; nb.title=v.note; r1.appendChild(nb);}
+    (v.tags||[]).forEach(function(t){var tb=el('span','badge','🏷 '+t); tb.style.cssText='background:rgba(100,180,255,.15);color:#64b4ff'; r1.appendChild(tb);});
+    card.appendChild(r1);
+    var r2=el('div','tiny',(v.country||'?')+(v.city?' / '+v.city:'')+' · '+(v.device||''));
+    card.appendChild(r2);
+    (v.charts||[]).slice(0,3).forEach(function(c){
+      var cr=el('div','tiny','📊 '+(c.dob||'?')+' '+(c.time||'')+' '+(c.gender||'')+(c.name?' · '+c.name:'')+(c.score!=null?' · 🔢 '+c.score+'/100':'')+(c.grade?' ('+c.grade+')':'')+(c.patternQ?' '+c.patternQ:'')+(c.yong?' Dụng '+c.yong:''));
+      var a=el('a','btn'); a.textContent='🔗'; a.target='_blank'; a.rel='noopener'; a.href='/?dob='+encodeURIComponent(c.dob||'')+'&time='+encodeURIComponent(c.time||'12:00')+'&g='+encodeURIComponent(c.gender||'nam')+'&from=admin&nolog=1'; a.style.cssText='padding:1px 6px;font-size:10px;text-decoration:none;margin-left:6px'; a.onclick=function(e){e.stopPropagation();}; cr.appendChild(a); card.appendChild(cr);
+    });
+    var sc=_bestScore(v);
+    card.appendChild(el('div','tiny',(v.count||0)+' ev · '+(v.visits||0)+' visit · '+(v.charts||[]).length+'📊'+(sc!=null?' '+sc:'')+' · '+(v.questions||[]).length+'❓ · '+(v.chats||[]).length+'💬'));
+    if(v.note){var np=el('div','tiny','📝 '+(v.note.length>90?v.note.slice(0,90)+'…':v.note)); np.style.cssText='font-style:italic;color:#d4af37'; card.appendChild(np);}
+    if((v.questions||[]).length){var qp=el('div','tiny','❓ «'+String(v.questions[v.questions.length-1]).slice(0,80)+'»'); qp.style.cssText='color:var(--muted)'; card.appendChild(qp);}
+    card.appendChild(el('div','tiny','⏱ '+new Date(v.firstTs).toLocaleString('vi-VN')+' → '+new Date(v.lastTs).toLocaleString('vi-VN')));
+    var ed=el('button','btn'); ed.textContent='✏️'; ed.style.cssText='position:absolute;right:8px;top:8px;padding:1px 7px;font-size:11px;opacity:.6';
+    ed.onmouseenter=function(){ed.style.opacity='1';}; ed.onmouseleave=function(){ed.style.opacity='.6';};
+    ed.onclick=(function(ip){return function(e){e.stopPropagation();editNote(ip);};})(v.ip); card.appendChild(ed);
+    var bk=el('button','btn'); bk.textContent='🚫'; bk.style.cssText='position:absolute;right:42px;top:8px;padding:1px 5px;font-size:10px;opacity:.4';
+    bk.onmouseenter=function(){bk.style.opacity='1';}; bk.onmouseleave=function(){bk.style.opacity='.4';};
+    bk.onclick=(function(ip){return function(e){e.stopPropagation();if(confirm('Block IP '+ip+'?'))blockIp(ip,1);};})(v.ip); card.appendChild(bk);
+    return card;
+  }
+  function vRender(){
+    var d=_lastD; if(!d)return; var f=_vf();
+    var arr=(d.byIp||[]).slice();
+    arr.sort(function(a,b){
+      switch(f.sort){
+        case 'old':return a.lastTs-b.lastTs;
+        case 'scorehi':return (_bestScore(b)||-1)-(_bestScore(a)||-1);
+        case 'scorelo':return (_bestScore(a)||101)-(_bestScore(b)||101);
+        case 'charts':return (b.charts||[]).length-(a.charts||[]).length;
+        case 'qs':return (b.questions||[]).length-(a.questions||[]).length;
+        case 'named':return (a.name?0:1)-(b.name?0:1)||b.lastTs-a.lastTs;
+        case 'note':return (a.note?0:1)-(b.note?0:1)||b.lastTs-a.lastTs;
+        default:return b.lastTs-a.lastTs;
+      }
+    });
+    var matched=arr.filter(function(v){return _vMatch(v,f);});
+    var bip=document.getElementById('byip'); if(bip){bip.textContent='';
+      var vc=document.getElementById('vcount'); if(vc) vc.textContent=matched.length+' / '+arr.length+' visitor';
+      if(!matched.length) bip.appendChild(el('div','tiny','(không khớp — bớt filter hoặc bấm «✕ lọc»)'));
+      matched.slice(0,200).forEach(function(v){ bip.appendChild(_vCard(v)); });
+    }
+    var tc=document.getElementById('vtagcloud'); if(tc){tc.textContent='';
+      (d.tagCloud||[]).slice(0,20).forEach(function(t){ var chip=el('span','badge','🏷 '+t.tag+' '+t.count); chip.style.cssText='background:rgba(100,180,255,.12);color:#64b4ff;cursor:pointer;margin:2px'; chip.title='Lọc theo tag «'+t.tag+'»'; chip.onclick=function(){document.getElementById('vq').value=t.tag;vRender();}; tc.appendChild(chip); });
+      if(!(d.tagCloud||[]).length) tc.appendChild(el('span','tiny','(chưa có tag — thêm ở nút ✏️ mỗi visitor)'));
+    }
+    var csel=document.getElementById('vf-country'); if(csel && !csel.options.length){ var cs={}; (d.byIp||[]).forEach(function(v){if(v.country)cs[v.country]=1;}); Object.keys(cs).sort().forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;csel.appendChild(o);}); }
+    var pr=document.getElementById('profiles'); if(pr){pr.textContent='';
+      var profs=(d.profiles||[]);
+      var pf=profs.filter(function(p){if(!f.q)return true;var hay=((p.name||'')+' '+(p.dob||'')+' '+(p.gender||'')+' '+(p.grade||'')+' '+(p.score!=null?p.score:'')).toLowerCase();return f.q.split(/\\s+/).every(function(t){return t&&hay.indexOf(t)>=0;});});
+      if(!pf.length){pr.appendChild(el('div','tiny','(chưa có tên nào — khách nhập tên (tùy chọn) khi lập lá số sẽ hiện đây, bền vững qua rollover)'));}
+      else{ var cnt=el('div','tiny',pf.length+' tên'+(pf.length<profs.length?' (trong '+profs.length+' đã lưu)':'')); cnt.style.marginBottom='6px'; pr.appendChild(cnt);
+        pf.slice(0,100).forEach(function(p){ var row=el('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(212,175,55,.06);flex-wrap:wrap';
+          row.appendChild(el('span','tiny','👤 '+(p.name||'?')+' · '+(p.dob||'?')+' '+(p.time||'')+' '+(p.gender||'')+(p.score!=null?' · '+p.score+'/100':'')+(p.grade?' '+p.grade:'')+(p.yong?' Dụng '+p.yong:'')));
+          var a=el('a','btn'); a.textContent='🔗 Mở lá số'; a.target='_blank'; a.rel='noopener'; a.href='/?dob='+encodeURIComponent(p.dob||'')+'&time='+encodeURIComponent(p.time||'12:00')+'&g='+encodeURIComponent(p.gender||'nam')+'&from=admin&nolog=1'; a.style.cssText='padding:3px 9px;font-size:11px;text-decoration:none;white-space:nowrap'; row.appendChild(a); pr.appendChild(row); });
+      }
+    }
+  }
+  function vReset(){ ['vq','vf-smin','vf-smax','vf-from','vf-to'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';}); ['vf-gender','vf-country','vf-sort'].forEach(function(id){var e=document.getElementById(id);if(e)e.selectedIndex=0;}); ['vf-chart','vf-chat','vf-q','vf-note','vf-tag','vf-name','vf-ret'].forEach(function(id){var e=document.getElementById(id);if(e)e.checked=false;}); vRender(); }
+  function editNote(ip){
+    var d=_lastD||{}; var n=(d.notes&&d.notes[ip])||{}; var note=n.note||''; var tags=((n.tags)||[]).slice();
+    var m=document.getElementById('note-modal'); if(!m)return; m.textContent='';
+    var box=el('div'); box.style.cssText='background:#15131f;border:1px solid #d4af37;border-radius:12px;padding:18px 22px;max-width:560px;width:calc(100% - 40px);max-height:85vh;overflow:auto';
+    var h=el('div'); h.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;border-bottom:1px solid rgba(212,175,55,.2);padding-bottom:8px;flex-wrap:wrap';
+    var hl=el('div'); hl.appendChild(el('div',null,'📝 Ghi chú & 🏷️ Tag')); var ipE=el('div','ip',ip); ipE.style.fontSize='12px'; hl.appendChild(ipE); h.appendChild(hl);
+    var close=el('button','btn','✕ Đóng'); close.style.cssText='padding:4px 12px;font-size:12px'; close.onclick=function(){m.style.display='none';}; h.appendChild(close); box.appendChild(h);
+    var ta=el('textarea'); ta.value=note; ta.placeholder='Ghi chú tự do — vd: «Nguyễn A — hỏi hôn nhân 2026, khuyên quay lại tháng 8»...'; ta.style.cssText='width:100%;height:90px;margin:6px 0;background:rgba(0,0,0,.3);border:1px solid rgba(212,175,55,.2);color:#e8d9b0;border-radius:6px;padding:8px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical'; box.appendChild(ta);
+    box.appendChild(el('div','tiny','🏷 Tag (gõ + Enter, hoặc click gợi ý / ✕ để xóa) — tối đa 10 tag'));
+    var chipBox=el('div'); chipBox.style.cssText='display:flex;flex-wrap:wrap;gap:5px;margin:4px 0 8px'; box.appendChild(chipBox);
+    function renderChips(){ chipBox.textContent=''; tags.forEach(function(t,i){ var c=el('span','badge','🏷 '+t); c.style.cssText='background:rgba(100,180,255,.15);color:#64b4ff;display:inline-flex;align-items:center;gap:4px'; var x=el('span',null,'✕'); x.style.cursor='pointer'; x.onclick=function(){tags.splice(i,1);renderChips();}; c.appendChild(x); chipBox.appendChild(c); }); }
+    renderChips();
+    var sug=el('div','tiny','Gợi ý:'); sug.style.marginTop='4px';
+    (((_lastD||{}).tagCloud)||[]).slice(0,12).forEach(function(t){ var s=el('span','badge','+'+t.tag); s.style.cssText='background:rgba(212,175,55,.1);color:#d4af37;cursor:pointer;margin:2px'; s.onclick=function(){if(tags.indexOf(t.tag)<0&&tags.length<10)tags.push(t.tag);renderChips();}; sug.appendChild(s); });
+    box.appendChild(sug);
+    var inp=el('input','filter'); inp.placeholder='thêm tag…'; inp.style.cssText='width:160px;margin-top:6px'; inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();var v=inp.value.trim();if(v&&tags.indexOf(v)<0&&tags.length<10)tags.push(v.slice(0,20));inp.value='';renderChips();}}); box.appendChild(inp);
+    var act=el('div'); act.style.cssText='margin-top:10px;display:flex;gap:8px;justify-content:flex-end';
+    var dl=el('button','btn off','🗑 Xóa'); dl.style.cssText='padding:6px 12px;font-size:12px'; dl.onclick=function(){ if(confirm('Xóa ghi chú + tag của «'+ip+'»?')){ _saveNote(ip,'',[]); } };
+    var sv=el('button','btn','💾 Lưu'); sv.style.cssText='padding:6px 16px;font-size:13px'; sv.onclick=function(){ _saveNote(ip, ta.value.trim(), tags); };
+    act.appendChild(dl); act.appendChild(sv); box.appendChild(act);
+    m.appendChild(box); m.style.display='flex';
+    function _saveNote(ip2,note2,tags2){ sv.textContent='⏳...'; sv.disabled=true; fetch('/admin/api/note?token='+TOKEN,{method:'POST',headers:Object.assign({},H,{'Content-Type':'application/json'}),body:JSON.stringify({ip:ip2,note:note2,tags:tags2})}).then(function(r){return r.json();}).then(function(j){ sv.textContent='💾 Lưu'; sv.disabled=false; if(j.ok){m.style.display='none';load();loadAudit();} else alert('❌ '+(j.err||'lỗi')); }).catch(function(){sv.textContent='💾 Lưu';sv.disabled=false;alert('❌ lỗi mạng');}); }
+  }
   async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
   async function toggleFree(en){ await fetch('/admin/api/ai-free?token='+TOKEN, { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
   // [loop 1360] test free glm-5.2 trực tiếp — admin thấy model sống/chết + tốc độ
@@ -1220,6 +1404,17 @@ function adminDashboard() {
     st.appendChild(el('span','tiny','📊 '+r.count+' events')); st.appendChild(el('span','tiny','👀 '+r.visits+' visits')); st.appendChild(el('span','tiny','📊 '+r.charts.length+' lá số')); st.appendChild(el('span','tiny','💬 '+r.chats.length+' chat'));
     if(r.referrer) st.appendChild(el('span','tiny','← '+String(r.referrer).slice(0,50)));
     box.appendChild(st);
+    // [visitor-finder] tên (nếu khách nhập) + ghi chú/tag (từ _lastD.notes) + nút sửa
+    var _firstName = (r.charts||[]).map(function(c){return c.name;}).filter(function(nx){return nx;})[0];
+    if(_firstName){ var _nm=el('div',null,'👤 '+_firstName); _nm.style.cssText='font-size:16px;color:var(--gold);font-weight:700;margin:4px 0'; box.appendChild(_nm); }
+    var _nd=(_lastD&&_lastD.notes&&_lastD.notes[ip])||{};
+    var _nbox=el('div'); _nbox.style.cssText='background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.2);border-radius:8px;padding:8px 12px;margin:8px 0';
+    var _nth=el('div','tiny','📝 GHI CHÚ & 🏷️ TAG'); _nth.style.color='#d4af37'; _nbox.appendChild(_nth);
+    if(_nd.note){var _nt=el('div',null,_nd.note); _nt.style.cssText='font-style:italic;margin:3px 0'; _nbox.appendChild(_nt);}
+    if(_nd.tags&&_nd.tags.length){var _tg=el('div'); _nd.tags.forEach(function(t){var c=el('span','badge','🏷 '+t); c.style.cssText='background:rgba(100,180,255,.15);color:#64b4ff;margin:2px'; _tg.appendChild(c);}); _nbox.appendChild(_tg);}
+    if(!_nd.note&&!(_nd.tags&&_nd.tags.length)) _nbox.appendChild(el('div','tiny','(chưa có — bấm «✏️ Sửa» thêm ghi chú/tag để tìm lại visitor sau này)'));
+    var _eb=el('button','btn','✏️ Sửa ghi chú/tag'); _eb.style.cssText='margin-top:6px;padding:4px 12px;font-size:12px'; _eb.onclick=function(){editNote(ip);}; _nbox.appendChild(_eb);
+    box.appendChild(_nbox);
     var dv=el('div'); dv.style.cssText='background:rgba(100,180,255,.06);border-left:3px solid #64b4ff;padding:7px 11px;margin:6px 0 12px;font-size:12px';
     dv.appendChild(el('div','tiny','💻 DEVICE')); dv.appendChild(el('div',null,(r.device&&r.device.icon||'💻')+' '+(r.device&&r.device.os||'?')+' · '+(r.device&&r.device.browser||'?')+' · '+(r.device&&r.device.type||'?')+(r.device&&r.device.brand?' · '+r.device.brand:'')));
     if(r.ua){ var ua=el('div','tiny','UA: '+r.ua); ua.style.cssText='word-break:break-all;opacity:.65;margin-top:3px'; dv.appendChild(ua); }
@@ -1325,6 +1520,7 @@ function adminDashboard() {
   </script>
   <div id="chat-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
   <div id="visitor-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
+  <div id="note-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:10000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
   </body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer',
     // [loop 1355] security headers — CSP cho admin dashboard (inline script/style cần 'unsafe-inline';
     //   connect chỉ same-origin, chặn framing/external). HSTS + nosniff cho mọi response.

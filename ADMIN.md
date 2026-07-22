@@ -24,6 +24,9 @@ https://battu.god8.shop/admin?token=<ADMIN_TOKEN>
 | **Engagement** | bounceRate / sessions / avgSessionMin / avgEvents / avgCharts / avgLoadMs / aiSuccessRate / returningVisitors |
 | **Events** | bảng + 🔍 search + filter 6 loại (visit/chart/ai_question/ai_chat/error/click) + **click row ai_chat → modal full Q+A** |
 | **By IP** | mỗi IP → geo + charts + **full chat Q+A (click mở modal, có durationMs)** + 📅 timeline (chronological journey) + 🚫 Block button |
+| **🔎 Visitor Finder** | 🔍 tìm tổng (tên / ngày sinh / IP / câu hỏi / trả lời AI / ghi chú / tag) + lọc (giới tính · quốc gia · «có»: lá số/chat/❓/ghi chú/tag/tên/quay lại · khoảng điểm · khoảng thời gian) + sort (gần nhất/điểm/nhiều lá số…) + đếm kết quả + tag cloud click-to-filter |
+| **📝 Note + 🏷️ Tag** | mỗi visitor: ghi chú tự do + tag phân loại (KV `vnote:<ip>`) — **bộ nhớ dài hạn admin «ai là ai»** → tìm lại theo ghi chú/tag |
+| **📒 Danh bạ tên** | profiles bền vững (`vprof:<dob>\|<time>\|<gender>`) — tìm theo tên **dù events:log đã rollover** (1500 events) |
 | **Retention** | **events:log cap 1500** (~1-2 tuần) + **dayagg:<date> TTL 90 ngày** → 30-day trend không phụ thuộc cap |
 | **7 ngày** | mini bar chart (từ events) |
 | **30 ngày** | **sparkline trend từ dayagg** (retention dài, độc lập cap 1500) |
@@ -86,13 +89,14 @@ https://battu.god8.shop/admin?token=<ADMIN_TOKEN>
 | `POST /admin/api/token?token=X {new}` | token | đổi token |
 | `POST /admin/api/notify?token=X {tg_token,tg_chat}` | token | Telegram config |
 | `POST /admin/api/block?token=X {ip,block/list}` | token | IP blacklist |
+| `POST /admin/api/note?token=X {ip,note,tags[]}` | token | ghi chú + tag visitor (lưu/xóa `vnote:<ip>`, bust cache) |
 | `POST /admin/api/clear?token=X` | token | clear data |
 | `GET /admin/api/export?token=X` | token | CSV export |
 | `POST /admin/setup {token}` | one-time | tạo token |
 
 ## Frontend Instrumentation (main.js)
 - `_logEvent('visit', {ref,path,loadMs})` — load
-- `_logEvent('chart', {dob,time,gender})` — submit lá số
+- `_logEvent('chart', {dob,time,gender})` — submit lá số (+ `name` nếu khách nhập ô «Tên» tùy chọn → upsert profile bền vững `vprof:<dob>|<time>|<gender>`)
 - `_logEvent('ai_question', {q})` — gửi câu hỏi
 - `_logEvent('ai_chat', {q,response,source,durationMs})` — AI trả lời (Q+A+duration)
 - `_logEvent('error', {msg,file,line})` — JS error + unhandledrejection
@@ -107,5 +111,5 @@ node admin-audit.mjs <token>
 ## Kiến trúc
 - **Worker** (worker/index.js): anti-scraping + rate-limit + IP block + proxy + assets
 - **Admin** (worker/admin.js): 13 endpoints + dashboard + analytics + Telegram
-- **KV ADMIN_KV**: events:log (1500 events), dayagg:<date> (TTL 90d), counters (cnt:*), ai:config, ai:enabled, admin:token, notify:*, block:*, cache:stats
+- **KV ADMIN_KV**: events:log (1500 events), dayagg:<date> (TTL 90d), counters (cnt:*), ai:config, ai:enabled, admin:token, notify:*, block:*, cache:stats, **vnote:<ip>** (ghi chú+tag visitor), **vprof:<dob>|<time>|<gender>** (profile tên bền vững)
 - **CI**: deploy + set ADMIN_TOKEN (GH secret)
