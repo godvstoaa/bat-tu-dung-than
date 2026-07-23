@@ -6,13 +6,14 @@
 - **Pipeline chính = GROK CLI** (WebSearch quota đã hết; subagent chỉ khi Grok kẹt). Web search mặc định ON (`--disable-web-search` mới tắt).
 - **Batch 14 đang chạy (bg `betg93t0n`)** — 14 tựa: 历世真仙通鉴续编·终南山碑记·太上老君戒经·初真戒·三洞奉道科戒营始·太上助国救民总真秘卷·清微元降大法·法海遗珠·道德真经指归·老子铭·早晚功课经·金莲正宗记·道德经义疏(成玄英)·南斗六司延寿经. Output: `docs/_fragments/grok-batch14.json`.
 
-## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 19)
-- **daozang = 259 kinh** đã chưng cất / ~1500 (≈**17.3%**), ~220 đã verify số hiệu DZ# trong notes.
-- **id-collision FIXED** (batch19): normalizer giờ dùng `id = DZ_<toàn-bộ-tên-Hán>` + uniqueness guard → 259/259 id duy nhất (trước đó 229/259 do tiền tố `太上洞玄灵宝` va nhau). DZ# vẫn lưu trong `notes`. Deploy mới nhất `066fd27c`.
-- **Batch 13–19 đã ship** (Grok CLI): 13(+12)·14(+12)·15(+14)·16(+13)·17(+16)·18(+15)·19(+16). Tăng từ 161→259 (+98 kinh) trong 1 session.
-- App tổng: **~279 entry / 8 lớp** (daozang 259 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
-- engine-library chunk ~399KB. PDF 08-đạo-tạng = 259 mục (3.38MB). Build ✓ ~2.3s, selftest ✓ exit 0 mỗi batch.
-- **CHƯA hoàn thành** — full 1500 cần ~80+ batch nữa (long-haul, multi-session).
+## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 28)
+- **daozang = 390 kinh** đã chưng cất / ~1500 (≈**26.0%**), ~350 đã verify số hiệu DZ# trong notes. Deploy mới nhất `e3b346bb`.
+- **Chiến lược = CATALOG-DRIVEN (batch 23+)**: `daozang-promptgen.mjs <N> "focus"` → Grok `--reasoning-effort high` tự chọn 16 kinh THẬT có DZ# verify (tỷ lệ verified ~100%, 0 dup). Tránh tựa-đoán như batch 22 (bị bỏ 9 unverifiable).
+- **Pipeline 1 lệnh**: `promptgen → grok(bg) → daozang-tolerant(parse) → daozang-append → build-pdfs → build → selftest → commit → deploy`. `daozang-tolerant.mjs` giờ skip empty `{entries:[]}` placeholder + chọn object có entries không rỗng.
+- **id-collision FIXED** (batch19): normalizer `id = DZ_<toàn-bộ-tên-Hán>` + uniqueness guard → id duy nhất. DZ# trong `notes`.
+- App tổng: **~410 entry / 8 lớp** (daozang 390 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
+- engine-library chunk ~528KB (gzip 173KB, lazy-loaded OK). PDF 08-đạo-tạng = 390 mục (4.67MB). Build ✓ ~2.4s, selftest ✓ exit 0.
+- **CHƯA hoàn thành** — full 1500 cần ~70+ batch nữa (long-haul, multi-session).
 
 ## 2. PIPELINE CHƯNG CẤT (lặp mỗi batch) — **GROK CLI = CHÍNH**
 0. **Dup-check**: `node -e "..."` dump `DAOZANG.map(e=>e.name_han)` → `docs/_fragments/_done-titles.json`, grep ứng viên trước khi launch.
