@@ -2,8 +2,12 @@
 
 > Mục tiêu `/goal`: chưng cất TOÀN BỘ ~1500 kinh 道藏 → tinh túy → encode vào app. Đọc file này đầu mỗi session để resume.
 
-## 0. IN-FLIGHT
-KHÔNG agent in-flight — batch 9 hoàn tất (142 kinh). Context kế: tiếp batch 10 theo §6.
+## 0. IN-FLIGHT (thu ở context kế!)
+Batch 10 ĐÃ LAUNCH (4 agent):
+- `ab2ab2943f21da2af` — 经典杂 (报父母恩重经·安宅八阳·天妃救苦·救苦妙经)
+- `ab194e168fc6a06bc` — 养生外丹 (幼真服气·三十六水法·天师口诀·黄庭遁甲DZ873)
+- `a3b6bac0ac1e46181` — 全真more (磻溪集·云光集·孙不二法语·丹阳神光灿)
+- `a79fcd69330c21caf` — 道法方术 (黄帝龙首经·金匮玉衡·洞渊二十方·通占大象历星)
 
 ## 1. TRẠNG THÁI HIỆN TẠI (snapshot)
 - **daozang = 142 kinh** đã chưng cất / ~1500 (≈**7.5%**), ~97 đã verify số hiệu DZ# (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
