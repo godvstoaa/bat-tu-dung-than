@@ -766,6 +766,28 @@ const DAOZANG_RAW = [
     key_text: null, use: 'trung tâm «tiệm tu» pháp môn 马丹阳 (đối chiếu «đốn ngộ» 丘长春)',
     sources: ['https://ctext.org/wiki.pl?if=gb&res=178181 (CTEXT DZ1142)', 'https://zh.daoinfo.org/wiki/渐悟集 (daoinfo)'],
     textual_certainty: 'high', notes: 'DZ1142 太平部; 马钰/全真七真之首; >340 từ khúc; «tiệm ngộ».' },
+
+  // ── BATCH 9 — 老学注宋元 (agent distilled, DZ-verified) ──────────────────
+  { dz: 'DZ691', name_han: '道德真经注（苏辙）', name_vi: 'Tô Triệt · Đạo Đức Chú', bu: '洞神', author: '苏辙 (1039-1112)', era: 'Bắc Tống (~1100)', topic: 'philosophy',
+    essence: 'Chú Lão tiêu biểu «TAM GIÁO ĐỒNG NGUYÊN» Bắc Tống — Tô Triệt dùng nhân nghĩa Nho giáo giải đạo đức kinh, chủ Nho-Phật-Đạo đồng nguyên; lấy «tâm tính» làm phương pháp giải Đạo, nối «cùng lý→tận tính→phục mệnh».',
+    key_text: '莫非道也。而可道者不可常，惟不可道，而后可常耳。', use: 'tam giáo dung hợp Bắc Tống · «dĩ tâm tính giải Lão»',
+    sources: ['https://www.shidianguji.com/book/DZ0691 (識典古籍 DZ691)', 'https://ctext.org/wiki.pl?if=gb&res=90512&remap=gb (CTEXT DZ691)'],
+    textual_certainty: 'high', notes: 'DZ691 洞神部玉诀類; 苏辙/Bắc Tống; tam giáo đồng nguyên.' },
+  { dz: 'DZ686', name_han: '道德真经传（吕惠卿）', name_vi: 'Lã Huệ Khanh · Đạo Đức Truyện', bu: '洞神', author: '吕惠卿 (1032-1111)', era: 'Bắc Tống (1078, nguyên phong nguyên niên)', topic: 'philosophy',
+    essence: '«Truyện» giải Lão thiên về TRỊ QUỐC CHI ĐẠO — dâng vua thuyết minh «dĩ đạo đức vi trị». Lấy «thập lục tự tâm truyền»(Thượng thư·Đại Vũ Mô) làm khung, tham Nho-Đạo, bàn tu thân-trị quốc, xưng «Đạo» = «hoàng vương chi tông».',
+    key_text: '凡幽而不测者，阴也；明而可见者，阳也。', use: 'Lão học Bắc Tống gắn biến pháp + chính trị luận',
+    sources: ['https://www.shidianguji.com/zh/book/DZ0686 (識典古籍 DZ686)', 'https://ctext.org/wiki.pl?if=gb&res=460797&remap=gb (CTEXT DZ686)'],
+    textual_certainty: 'high', notes: 'DZ686 洞神部玉诀類; 吕惠卿/Bắc Tống 1078; «dĩ đạo đức vi trị».' },
+  { dz: null, name_han: '老子注（王安石）', name_vi: 'Vương An Thạch · Lão Tử Chú', bu: '四库', author: '王安石 (1021-1086)', era: 'Bắc Tống', topic: 'philosophy',
+    essence: 'Chú Lão của VƯƠNG AN THẠCH nay chỉ còn 11 chương đầu + dật văn phục dựng qua tập chú. Tư tưởng: «ĐẠO BẢN BẤT KHẢ ĐẠO», phân biệt «đạo thể» với «tích» (dấu vết), điều hòa hình thượng học Đạo gia + danh giáo Nho gia — «dĩ Nho giải Đạo» đặc trưng thời Bắc Tống (Kinh Công Tân học). ⚠ KHÔNG thu正统道藏 (nguyên thư thất truyền, dật văn qua DZ714 彭耜集注 etc.).',
+    key_text: '道本不可道，若其可道，则是其迹也。', use: 'Lão học phái Kinh Công (Tân học) + biến pháp Bắc Tống',
+    sources: ['https://baike.baidu.com/item/%E7%8E%8B%E5%AE%89%E7%9F%B3%E8%80%81%E5%AD%90%E6%B3%A8%E8%BE%91%E4%BD%87%E4%BC%9A%E9%92%9E/56396064 (百度百科)', 'https://homeinmists.ilotus.org/DaoZang/Tiyao4.pdf (homeinmists)'],
+    textual_certainty: 'partial', notes: '⚠ KHÔNG thu正统道藏 (thất truyền, chỉ 11 chương + dật văn qua tập chú); 王安石/Bắc Tống Kinh Công.' },
+  { dz: 'DZ704', name_han: '道德真经注（吴澄）', name_vi: 'Ngô Trừng · Đạo Đức Chú', bu: '洞神', author: '吴澄 (1249-1333, hiệu thảo lư)', era: 'Nguyên (~đại đức-chí đại)', topic: 'philosophy',
+    essence: 'Chú Lão đại biểu thời Nguyên của LÝ HỌC GIA — dùng thể-dụng luận Tống-Nguyên lý học giải đạo đức kinh: «hư vô tự nhiên vi thể, nhược nhuy bất doanh vi dụng». Chú giải tinh xác minh晰; cải biên 81 chương Lão → 68 chương. Mẫu hình điển hình «dĩ lý giải Lão»; được đánh giá «tất độc» cho Lão học.',
+    key_text: '万物始于微而后成，始于无而后生。故常无欲空虚，可以观其始物之妙。', use: 'Lão học thời Nguyên · hội thông lý học-đạo gia · «dĩ lý giải Lão»',
+    sources: ['https://ctext.org/dao-de-jing-zhu/zhs (CTEXT DZ704)', 'https://www.shidianguji.com/zh/book/DZ0704 (識典古籍 DZ704)'],
+    textual_certainty: 'high', notes: 'DZ704 洞神部玉诀類; 吴澄/Nguyên; 68 chương; lý học giải Lão.' },
 ];
 
 export const DAOZANG = DAOZANG_RAW.map((e) => ({
