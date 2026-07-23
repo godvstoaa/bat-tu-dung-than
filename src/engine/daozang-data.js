@@ -1330,23 +1330,35 @@ const DAOZANG_RAW = [
     textual_certainty: 'high', notes: 'batch19 · Grok-4.5 web-search' },
 ];
 
-export const DAOZANG = DAOZANG_RAW.map((e) => ({
-  id: 'DZ_' + (e.dz ? String(e.dz).replace(/\D/g, '') : (e.name_han || '').replace(/[^一-龥]/g, '').slice(0, 6)),
-  layer: 'daozang',
-  name_han: e.name_han,
-  name_vi: e.name_vi || '',
-  school: `${e.bu || '道藏'} bộ` + (e.author ? ` · ${e.author}` : '') + (e.era ? ` · ${e.era}` : ''),
-  han_text: e.key_text || '',
-  meaning: e.essence || '',
-  use: e.use || '',
-  sources: Array.isArray(e.sources) ? e.sources.filter(Boolean) : [],
-  textual_certainty: e.textual_certainty || 'partial',
-  bu: e.bu || '',
-  author: e.author || '',
-  era: e.era || '',
-  topic: e.topic || '',
-  notes: (e.dz ? `道藏 ${e.dz}` : '道藏 kinh') + (e.notes ? ' · ' + e.notes : ''),
-})).filter((e) => e.name_han && e.sources.length >= 2);
+// id base = full Hán of name_han (unique per entry, since dup-filter enforces unique
+// name_han); guarded against any residual collision with a numeric suffix.
+const _daozangSeenIds = new Set();
+function _daozangUniqId(base) {
+  let id = base, n = 2;
+  while (_daozangSeenIds.has(id)) id = `${base}_${n++}`;
+  _daozangSeenIds.add(id);
+  return id;
+}
+
+export const DAOZANG = DAOZANG_RAW
+  .filter((e) => e && e.name_han && Array.isArray(e.sources) && e.sources.length >= 2)
+  .map((e) => ({
+    id: _daozangUniqId('DZ_' + (e.name_han || '').replace(/[^一-龥]/g, '')),
+    layer: 'daozang',
+    name_han: e.name_han,
+    name_vi: e.name_vi || '',
+    school: `${e.bu || '道藏'} bộ` + (e.author ? ` · ${e.author}` : '') + (e.era ? ` · ${e.era}` : ''),
+    han_text: e.key_text || '',
+    meaning: e.essence || '',
+    use: e.use || '',
+    sources: Array.isArray(e.sources) ? e.sources.filter(Boolean) : [],
+    textual_certainty: e.textual_certainty || 'partial',
+    bu: e.bu || '',
+    author: e.author || '',
+    era: e.era || '',
+    topic: e.topic || '',
+    notes: (e.dz ? `道藏 ${e.dz}` : '道藏 kinh') + (e.notes ? ' · ' + e.notes : ''),
+  }));
 
 export function daozangByBu(entries = DAOZANG) {
   const c = {};
