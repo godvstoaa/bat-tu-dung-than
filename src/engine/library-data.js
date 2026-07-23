@@ -19,10 +19,12 @@ import { TALISMANS } from './talisman-data.js';
 import { CULTIVATION } from './cultivation-data.js';     // Phase 3
 import { PHUONGTHUAT } from './phuongthuat-data.js';     // Phase 4
 import { BITRUYEN } from './bitruyen-data.js';           // bí truyền/thất truyền/tàn quyển
+import { DAOZANG } from './daozang-data.js';             // 道藏 chưng cất (bulk pipeline)
 
 export { ETHICS };
 
 export const LAYERS = [
+  { id: 'daozang',     zh: '道藏', vi: 'Đạo Tạng (chưng cất)' },
   { id: 'fu',          zh: '符籙', vi: 'Phù bùa' },
   { id: 'mantra',      zh: '神咒', vi: 'Thần chú' },
   { id: 'ritual',      zh: '科儀', vi: 'Nghi thức · Ấn' },
@@ -50,7 +52,7 @@ const CLASSICS = [
   },
 ];
 
-export const LIBRARY = [...TALISMANS, ...CULTIVATION, ...PHUONGTHUAT, ...BITRUYEN, ...CLASSICS];
+export const LIBRARY = [...DAOZANG, ...TALISMANS, ...CULTIVATION, ...PHUONGTHUAT, ...BITRUYEN, ...CLASSICS];
 
 export function countByLayer(entries = LIBRARY) {
   const c = {};
