@@ -2,9 +2,9 @@
 //  ĐẠO TẠNG — CHƯNG CẤT TINH TÚY (distilled canon essence)
 //  Batch 1: 22 kinh then chốt, subagent-verified (DZ#/部/verbatim) + tự chưng cất.
 //  ≥2 nguồn/entry. Normalize → shape LIBRARY. `node --check`.
+//  (ETHICS import bỏ — gãy circular chunk engine-daozang↔engine-library;
+//   library-data lấy ETHICS trực tiếp từ amta-data, không ai import từ đây.)
 // ============================================================================
-import { ETHICS } from './amta-data.js';
-export { ETHICS };
 
 const DAOZANG_RAW = [
   // ── 太玄部 (triết lý) — agent distilled ─────────────────────────────────
