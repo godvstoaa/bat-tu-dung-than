@@ -2,6 +2,14 @@
 
 > Mục tiêu `/goal`: chưng cất TOÀN BỘ ~1500 kinh 道藏 → tinh túy → encode vào app. Đọc file này đầu mỗi session để resume.
 
+## 0. IN-FLIGHT BATCH 7 (thu kết quả đầu tiên ở context kế!)
+4 agent batch 7 ĐÃ LAUNCH (đang chạy nền, kết quả persist ra .output file). Context kế: poll/TaskOutput từng ID để lấy JSON → assemble vào daozang-data.js theo §2 (bỏ dup §4) → build/deploy. Nếu đã notify xong, đọc JSON từ completion notification.
+- `ae7964b1241e53f42` — 老学注/列仙传 (河上公章句·王弼注·列仙传·老子变化经)
+- `aef483f34a1d9405e` — 上清/神谱 (真灵位业图·上清握中诀·八素真经·登仙箓)
+- `aea83729654146191` — 仙传/谱录 (三洞群仙录DZ1238·甘水仙源录·玄天上帝启圣录·神仙传)
+- `aedb25f9e817bd890` — 戒律/神霄 (三坛大戒·九幽玉匮明真科·神霄玉诀·孝道明王经)
+Output dir: `C:\Users\User\AppData\Local\Temp\claude\c--Users-User--gemini-antigravity-scratch-app-b-i-to-n\d951f5a5-2fd2-43ad-a6d2-c134a51bc428\tasks\<id>.output` (⚠ .output = JSONL transcript KHÔNG đọc bằng Read/shell; dùng TaskOutput(id,block=true) hoặc đợi notification).
+
 ## 1. TRẠNG THÁI HIỆN TẠI (snapshot)
 - **daozang = 98 kinh** đã chưng cất / ~1500 (≈**6.5%**), **82 đã verify số hiệu DZ#** (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
 - **6 batch đã ship** (commit + push origin/main + deploy live `battu` trên battu.god8.shop).
