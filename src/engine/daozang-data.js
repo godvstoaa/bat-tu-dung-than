@@ -610,6 +610,23 @@ const DAOZANG_RAW = [
     key_text: '黃素交光，垂芒照耀，映於月宮，故号月宮太陰元君孝道仙王灵宝净明黄素天尊。', use: 'tịnh minh đạo hiếu đạo tu tiên · nhật dụng tu trì · hoàng tố pháp',
     sources: ['https://zh.wikisource.org/zh-hans/%E9%AB%98%E4%B8%8A%E6%9C%88%E5%AE%AE%E5%A4%AA%E9%99%B0%E5%85%83%E5%90%9B%E5%AD%9D%E9%81%93%E4%BB%99%E7%8E%8B%E9%9D%88%E5%AF%B6%E6%B7%A8%E6%98%8E%E9%BB%83%E7%B4%A0%E6%9B%B8 (維基文库)', 'https://www.shidianguji.com/book/DZ0555 (識典古籍 DZ555)'],
     textual_certainty: 'partial', notes: 'DZ555 洞玄部方法類 (10卷); ⚠ thay «孝道明王经» (kinh đó chưa verify trong đạo tạng); 傅飞卿 chú.' },
+
+  // ── BATCH 7 — 上清/神谱 (agent distilled, DZ-verified; 登真隐诀DZ421 đã có → skip) ──
+  { dz: 'DZ167', name_han: '洞玄灵宝真灵位业图', name_vi: 'Chân Linh Vị Nghiệp Đồ', bu: '洞真', author: '陶弘景 纂 (唐·闾丘方远 校 định bản truyền thế)', era: 'Nam triều Lương (~499-517)', topic: 'classic',
+    essence: 'Đạo giáo ĐẦU TIÊN lập hệ THẦN CHỨC CÓ CẤP BẬC rõ ràng — chia tiên chân 7 phẩm giai tầng, mỗi phẩm có «trung vị» chủ thần + tả/hữu vị. Đỉnh = Nguyên Thỉ Thiên Tôn ở Ngọc Thanh. DỌN NỀN toàn bộ thần phổ đạo giáo sau. (陶弘景 biên, cùng tác giả Chân Cáo + Đăng Chân Ẩn Quyết.)',
+    key_text: '玉清三元宫，上第一中位：上合虚皇道君应号元始天尊。', use: 'tra thần vị/bậc phẩm/danh xưng tiên chân · nền thần phổ đạo giáo lục triều',
+    sources: ['https://zh.wikisource.org/zh-hans/%E6%B4%9E%E7%8E%84%E9%9D%88%E5%AF%B6%E7%9C%9F%E9%9D%88%E4%BD%8D%E6%A5%AD%E5%9C%96 (維基文库)', 'https://ctext.org/wiki.pl?if=gb&res=758084 (CTEXT DZ167)'],
+    textual_certainty: 'high', notes: 'DZ167 洞真部谱录類 (腾字号); 陶弘景/梁 + 闾丘方远/Đường; 7 phẩm thần phổ.' },
+  { dz: 'DZ140', name_han: '上清握中诀', name_vi: 'Thượng Thanh Ức Trung Quyết', bu: '洞真', author: ' (khuyết danh; 《通志·艺文略》 ghi 陶弘景; thực Lục triều tập tục)', era: 'Nam Bắc Triều (thượng thanh phái tập)', topic: 'cultivation',
+    essence: 'Tập hợp BÍ QUYẾT tu luyện sớm phái thượng thanh: PHỤC NHẬT KHÍ/PHỤC TINH NGUYỆT + CÚC TAM HỒN/CHẾ THẤT PHÁCH + thủ huyền đan + bộ tinh đẩu + tồn thần nội quán. Văn ghi «đây là quyết của Chu quân» → liên hệ dòng Chu Tử Dương.',
+    key_text: '玄上太微，北极紫盖，下有太真，游翔九外。', use: 'công pháp tu luyện thượng thanh · tồn tưởng/phù chú/nội quán lục triều',
+    sources: ['https://ctext.org/wiki.pl?if=gb&res=112133 (CTEXT DZ140)', 'https://zh.wikisource.org/wiki/%E4%B8%8A%E6%B8%85%E6%8F%A1%E4%B8%AD%E8%A8%A3 (維基文库)'],
+    textual_certainty: 'high', notes: 'DZ140 洞真部玉诀類 (3卷); thượng thanh bí quyết tập.' },
+  { dz: 'DZ426', name_han: '上清太上八素真经', name_vi: 'Bát Tố Chân Kinh', bu: '洞玄', author: ' (khuyết danh; thượng thanh sớm)', era: 'Đông Tấn-Nam triều (bát tố hệ kinh)', topic: 'cultivation',
+    essence: 'Một biến «BÁT TỐ CHÂN KINH» (kinh của 8 tinh khiết) = đạo Huyền Thanh Ngọc Hoàng. Thuật dòng truyền: Thượng Hoàng Thiên Đế → Thái Vi Thiên Đế Quân → Tam Nguyên Tử Tinh Đạo Quân → Chân Dương Nguyên Lão Quân → Thái Thượng Đạo Quân. Liệt kinh tịch cần tu theo bậc thượng/trung/hạ chân để đăng thăng.',
+    key_text: '《太上隐书八素真经》者，乃玄清玉皇之道也。', use: 'giáo lý thượng thanh «bát tố» hệ · tu chân phẩm vị thời lục triều',
+    sources: ['https://zh.wikisource.org/zh-hans/%E4%B8%8A%E6%B8%85%E5%A4%AA%E4%B8%8A%E5%85%AB%E7%B4%A0%E7%9C%9F%E7%B6%93 (維基文库)', 'https://brill.com/display/book/9781684175161/BP000011.pdf (Brill bibliography)'],
+    textual_certainty: 'high', notes: 'DZ426 洞玄部玉诀類; bát tố hệ kinh thượng thanh.' },
 ];
 
 export const DAOZANG = DAOZANG_RAW.map((e) => ({
