@@ -293,6 +293,33 @@ const DAOZANG_RAW = [
     key_text: '老子之号，因元而出，在天地之前，无衰老之期，故曰老子。', use: 'Lão Tử/Lão Quân thần thoại phổ · đạo giáo tự thần thánh sử quan',
     sources: ['https://ctext.org/wiki.pl?if=gb&res=466275 (CTEXT DZ770)', 'https://zh.daoinfo.org/index.php?title=%E7%8C%B6%E9%BE%8D%E5%82%B3 (daoinfo)'],
     textual_certainty: 'high', notes: 'DZ770 洞神部谱录類; 贾善翔/北 Tống.' },
+
+  // ── BATCH 3 — 内丹南宗五祖 (agent distilled, DZ-verified) ─────────────────
+  { dz: 'DZ240', name_han: '玉清金笥青华秘文金宝内炼丹诀（青华秘文）', name_vi: 'Thanh Hoa Bí Văn', bu: '洞真', author: ' (đề 张伯端; 门人 王邦叔 辑; học giới nghi ngụy托)', era: 'Bắc Tống (11-12c)', topic: 'cultivation',
+    essence: 'Bí văn nội đan nam tông — hệ thống theo tinh-khí-thần, «tâm vi quân, thần vi chủ»: lấy nguyên thần làm chủ tể, nguyên tinh/khí làm kim đan đại dược. «Học đạo tiên tu liễu tâm kiến tính». Thiền-đạo dung hợp. Các thiên «tâm vi quân luận/thần vi chủ luận/khí vi dụng thuyết/tinh tòng khí thuyết/ý vi môi thuyết» kèm đồ.',
+    key_text: '心者，神之舍也，为万化纲维枢纽。', use: 'nền tâm-tính nội đan hạ thủ · thu tâm tĩnh định',
+    sources: ['https://zh.wikisource.org/zh-hans/玉清金笥青华秘文金宝内炼丹诀 (維基文库)', 'https://www.shidianguji.com/book/DZ0240 (識典古籍 DZ240)'],
+    textual_certainty: 'high', notes: 'DZ240 洞真部方法類; đề张伯端/王邦叔辑 (nghi ngụy托).' },
+  { dz: 'DZ1081', name_han: '金丹四百字', name_vi: 'Kim Đan Tứ Bách Tự', bu: '太玄', author: ' (đề 张伯端; 黄自如 chú 1241)', era: 'Bắc Tống (nguyên) / Nam Tống (chú)', topic: 'cultivation',
+    essence: 'Đúc kết yếu chỉ kim đan trong ~400 chữ ca quyết — chân thổ cầm chân chì, chân chì chế chân thủy, «đồng quy chân thổ». Dùng chì-thủy-thổ làm ẩn ngữ cho tiên thiên nhất khí. Chú 黄自如 giải dược-vật-hỏa hầu.',
+    key_text: '真土擒真铅，真铅制真汞；铅汞归真土，身心寂不动。', use: 'khẩu quyết dược-vật(thổ/铅/汞) · thủ ý',
+    sources: ['https://ctext.org/wiki.pl?if=gb&chapter=456536 (CTEXT DZ1081)', 'https://www.shidianguji.com/book/DZ1081 (識典古籍 DZ1081)'],
+    textual_certainty: 'high', notes: 'DZ1081 太玄部; 张伯端/黄自如注.' },
+  { dz: 'DZ1091', name_han: '还源篇', name_vi: 'Hoàn Nguyên Thiên', bu: '太玄', author: '石泰 (字得之, 杏林/翠玄子, 南宗二祖)', era: 'Bắc Tống', topic: 'cultivation',
+    essence: '81 bài ngũ ngôn tuyệt cú (ứng 9×9 dương số) của NHỊ TỔ Thạch Thái — tự thuật sau «kim dịch giao kết, thánh thai viên thành» được 张伯端 truyền khẩu. Chủ ý «hoàn nguyên» (trả bản nguồn), khuyến tu giả mau tầm sư luyện kim đan («lão lai chì hư thủy thiểu»).',
+    key_text: '及其金液交结、圣胎圆成，泰故作《还源篇》八十一章。', use: 'giáo khoa 81 Arya tiến cảnh · Nam tông nhị tổ đích truyền',
+    sources: ['https://zh.wikisource.org/wiki/還源篇 (維基文库)', 'https://ctext.org/wiki.pl?if=gb&chapter=907600 (CTEXT DZ1091)'],
+    textual_certainty: 'high', notes: 'DZ1091 太玄部; 石泰/南宗二祖; sư 张伯端.' },
+  { dz: null, name_han: '还丹复命篇（附丹髓歌）', name_vi: 'Hoàn Đơn Phục Mệnh Thiên', bu: '太玄', author: '薛道光 (紫贤/道源, 南宗三祖, 1078–1191)', era: 'Bắc Tống末-Nam Tống初 (序 1126)', topic: 'cultivation',
+    essence: 'Ngũ ngôn tuyệt cú (16) + thất ngôn tuyệt cú (32) + «đan tủy ca» của TAM TỔ Tiết Đạo Quang (原 tăng pháp hiệu tử hiền, sau ngộ 石泰 được kim đan khẩu quyết chuyển đạo). Tông thừa «ngộ chân thiên», luận thái dược-trừu thêm-hỏa hầu-cân lượng, «phiến thời kiến hiệu».',
+    key_text: null, use: 'khẩu quyết hỏa hầu-trừu thêm · Nam tông tam tổ đích truyền',
+    sources: ['https://zh.wikisource.org/zh-hans/还丹复命篇 (維基文库)', 'https://zh.daoinfo.org/wiki/還丹復命篇 (daoinfo)'],
+    textual_certainty: 'partial', notes: '太玄部 (正统道藏 742; 中华道藏 1077 — hệ khác); DZ Schipper chưa xác nhận → null.' },
+  { dz: 'DZ1090', name_han: '翠虚篇（紫清指玄集 — 白玉蟾, 藏外）', name_vi: 'Thúy Hư Thiên', bu: '太玄', author: '翠虚篇: 陈楠 (南木, 翠虚/陈泥丸, 南宗四祖) / 紫清指玄集: 白玉蟾 (葛长庚, 紫清, 南宗五祖)', era: 'Nam Tống', topic: 'cultivation',
+    essence: '翠虚篇 1 quyển (紫庭经/大道歌/罗浮翠虚吟/金丹诗诀) — cốt «thiên cú vạn cú hội nhất ngôn: giáo nhân chỉ tại tầm chì-thủy nhị vật, thái nhập đỉnh trung tiễn». Truyền THÁI ẤT ĐAO QUÂ kim đan quyết cho ngũ tổ 白玉蟾. 紫清指玄集 (Bạch Ngọc Đường) KHÔNG độc lập trong正统道藏 (nội dung tương quan trong DZ1088 修真十书).',
+    key_text: '篇篇皆露金丹旨，千句万句会一言。', use: 'kim châm «thái chì-thủy nhị vật nhập đỉnh» · Nam tông tứ-ngũ tổ đích truyền',
+    sources: ['https://zh.wikisource.org/zh-hans/翠虚篇 (維基文库)', 'https://baike.baidu.com/item/翠虚篇/9687021 (百度百科)'],
+    textual_certainty: 'high', notes: 'DZ1090 太玄部 (陈楠四祖); 紫清指玄集(白玉蟾五祖)=藏外, tương quan DZ1088.' },
 ];
 
 export const DAOZANG = DAOZANG_RAW.map((e) => ({
