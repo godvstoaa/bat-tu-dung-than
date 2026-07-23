@@ -688,6 +688,28 @@ const DAOZANG_RAW = [
     key_text: '炁结为形，形是受炁之本宗，炁是形之根元。', use: 'phục nguyên khí · dưỡng thần-kết thai · đạo y trừ cửu trùng',
     sources: ['https://ctext.org/wiki.pl?if=gb&chapter=957608 (CTEXT DZ1405)', 'https://www.shidianguji.com/zh/book/DZ1405 (識典古籍 DZ1405)'],
     textual_certainty: 'high', notes: 'DZ1405 正一部 (Schipper=1394); Đường; trích sao 嵩山太无气经.' },
+
+  // ── BATCH 8 — 老学注唐宋 (agent distilled, DZ-verified) ──────────────────
+  { dz: 'DZ677', name_han: '唐玄宗御注道德真经', name_vi: 'Đường Huyền Tông Ngự Chú', bu: '洞神', author: '李隆基 (唐玄宗)', era: 'Đường (Khai nguyên ~732-735)', topic: 'philosophy',
+    essence: 'Bản chú giải ĐẦU TIÊN do HOÀNG ĐẾ Trung Hoa đích thân soạn — ban hành Khai Nguyên, xuống chiếu nhà nhà phải có để đọc. Thần chỉ «LÝ THÂN LÝ QUỐC»: tu thân + trị quốc đồng nhất thể. Lấy 河上公 bản làm底 bản → đưa đạo giáo thành Ý THỨC HỆ QUỐC GIA nhà Đường, đặt khuôn mẫu «tứ đế ngự chú» (Đường Huyền Tông/Tống Huy Tông/Minh Thái Tổ/Thanh Thế Tổ).',
+    key_text: null, use: 'khuôn mẫu hoàng gia chú Lão · tham chiếu truyền thống «lý thân lý quốc»',
+    sources: ['https://zh.wikisource.org/wiki/%E5%94%90%E7%8E%84%E5%AE%97%E5%BE%A1%E8%A8%BB%E9%81%93%E5%BE%B7%E7%9C%9F%E7%B6%93 (維基文库)', 'https://www.shidianguji.com/zh/book/DZ0677 (識典古籍 DZ677)'],
+    textual_certainty: 'high', notes: 'DZ677 洞神部玉诀類; Đường Huyền Tông ~732-735; first emperor 注; «lý thân lý quốc».' },
+  { dz: 'DZ685', name_han: '道德真经传（陆希声）', name_vi: 'Lục Hy Thanh · Đạo Đức Truyện', bu: '洞神', author: '陆希声', era: 'Đường (~880-895, mạt Đường)', topic: 'philosophy',
+    essence: 'Lấy NHO GIÁO kinh nghĩa giải Lão tử — «LÃO TỬ CHI THUẬT BẢN Ư CHẤT, CHẤT DĨ PHỤC TÍNH»: gốc đạo Lão là chất phác, mục đích là phục tính. Động cơ «hóa tình phục tính, dĩ tính chính tình». Tự序 điều hòa Khổng-Lão: hai thánh cùng cứu thế, chỉ khác văn-chất. Đại biểu «DĨ NHO GIẢI LÃO» đời Đường (đối trọng thành huyền anh/đỗ quang đình trọng đạo phái).',
+    key_text: '老子之术本于质，质以复性。', use: 'khuynh hướng «dĩ Nho giải Lão» Đường · hội thông Nho-Đạo',
+    sources: ['https://zh.wikisource.org/zh-hans/%E9%81%93%E5%BE%B7%E7%9C%9F%E7%B6%93%E5%82%B3_(%E9%99%B8%E5%B8%8C%E8%81%B2) (維基文库)', 'https://www.shidianguji.com/book/DZ0685 (識典古籍 DZ685)'],
+    textual_certainty: 'high', notes: 'DZ685 洞神部玉诀類; 陆希声/mạt Đường; «dĩ Nho giải Lão».' },
+  { dz: 'DZ680', name_han: '宋徽宗御解道德真经', name_vi: 'Tống Huy Tông Ngự Giải', bu: '洞神', author: '赵佶 (宋徽宗)', era: 'Bắc Tống (1118, trọng hòa nguyên niên)', topic: 'philosophy',
+    essence: 'Hoang đế Tống Huy Tông hạ chiếu 1118 — dung hợp TAM GIÁO (Nho-Thích-Đạo), dẫn庄子/列子/Luận ngữ/Mạnh/Thi/Thư giải Lão. Tự định nghĩa «ĐẠO giả nhân chi sở cộng do, ĐỨC giả tâm chi sở tự đắc»; Đạo亘 vạn thế bất hao, Đức đầy trọn nhất tính thường còn. Biến Lão tử thành cơ sở triết học-thần thánh hóa chính sách «tôn Đạo hưng giáo». Một trong «tứ đế ngự chú».',
+    key_text: '道者，人之所共由；德者，心之所自得。', use: 'chính sách hưng Đạo + tam giáo dung hợp cuối Bắc Tống · «tứ đế ngự chú»',
+    sources: ['https://zh.wikisource.org/wiki/%E5%AE%8B%E5%BE%BD%E5%AE%97%E5%BE%A1%E8%A7%A3%E9%81%93%E5%BE%B7%E7%9C%9F%E7%B6%93 (維基文库)', 'https://www.shidianguji.com/book/DZ680 (識典古籍 DZ680)'],
+    textual_certainty: 'high', notes: 'DZ680 洞神部玉诀類; 宋徽宗 1118; tam giáo dung hợp; sớ giải DZ683 章安.' },
+  { dz: 'DZ689', name_han: '道德真经论（司马光）', name_vi: 'Tư Mã Quang · Đạo Đức Luận', bu: '洞神', author: '司马光 (1019-1086)', era: 'Bắc Tống', topic: 'philosophy',
+    essence: 'Tư Mã Quang (tác giả Tư Trị Thông Giám) đọc Lão tử theo lăng kính NHO GIA CHÍNH THỐNG nhưng độc lập. Cho «ĐẠO ĐỨC LIÊN THỂ, BẤT KHẢ THIÊN CỬ» → phục hồi bản danh nguyên thủy, không chia thượng/hạ thành đạo kinh-đức kinh. Khác đa số chú gia, chủ «đạo diệc khả ngôn đạo» (đạo vẫn có thể nói được) → giảm thần bí hóa Lão. Đại biểu «dĩ Nho lý giải Lão» Bắc Tống (đối trọng Vương An Thạch phái).',
+    key_text: '夫道德连体，不可偏举，今从本名。', use: 'Lão học Bắc Tống Nho gia chính thống · đối chiếu Vương An Thạch/Tô Trách',
+    sources: ['https://zh.wikisource.org/zh-hans/%E9%81%93%E5%BE%B7%E7%9C%9F%E7%B6%93%E8%AB%96 (維基文库)', 'https://www.shidianguji.com/zh/book/DZ689 (識典古籍 DZ689)'],
+    textual_certainty: 'high', notes: 'DZ689 洞神部玉诀類; 司马光/Bắc Tống; «dĩ Nho lý giải Lão» chính thống.' },
 ];
 
 export const DAOZANG = DAOZANG_RAW.map((e) => ({
