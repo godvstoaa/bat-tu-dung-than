@@ -6,12 +6,13 @@
 - **Pipeline chính = GROK CLI** (WebSearch quota đã hết; subagent chỉ khi Grok kẹt). Web search mặc định ON (`--disable-web-search` mới tắt).
 - **Batch 14 đang chạy (bg `betg93t0n`)** — 14 tựa: 历世真仙通鉴续编·终南山碑记·太上老君戒经·初真戒·三洞奉道科戒营始·太上助国救民总真秘卷·清微元降大法·法海遗珠·道德真经指归·老子铭·早晚功课经·金莲正宗记·道德经义疏(成玄英)·南斗六司延寿经. Output: `docs/_fragments/grok-batch14.json`.
 
-## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 13)
-- **daozang = 173 kinh** đã chưng cất / ~1500 (≈**11.5%**), **147** đã verify số hiệu DZ# trong notes.
-- **Batch 13 đã ship**: commit + push origin/main + deploy live `battu` (version `99ced8c2`). Batch 12 `d1fe817`, batch 10 partial `43a0fdf`.
-- App tổng: **~193 entry / 8 lớp** (daozang 173 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
-- engine-library chunk ~298KB. PDF 08-đạo-tạng = 173 mục (2.48MB). Build ✓ 2.4s, selftest ✓ exit 0.
-- **CHƯA hoàn thành** — full 1500 cần ~110+ batch nữa (long-haul, multi-session).
+## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 19)
+- **daozang = 259 kinh** đã chưng cất / ~1500 (≈**17.3%**), ~220 đã verify số hiệu DZ# trong notes.
+- **id-collision FIXED** (batch19): normalizer giờ dùng `id = DZ_<toàn-bộ-tên-Hán>` + uniqueness guard → 259/259 id duy nhất (trước đó 229/259 do tiền tố `太上洞玄灵宝` va nhau). DZ# vẫn lưu trong `notes`. Deploy mới nhất `066fd27c`.
+- **Batch 13–19 đã ship** (Grok CLI): 13(+12)·14(+12)·15(+14)·16(+13)·17(+16)·18(+15)·19(+16). Tăng từ 161→259 (+98 kinh) trong 1 session.
+- App tổng: **~279 entry / 8 lớp** (daozang 259 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
+- engine-library chunk ~399KB. PDF 08-đạo-tạng = 259 mục (3.38MB). Build ✓ ~2.3s, selftest ✓ exit 0 mỗi batch.
+- **CHƯA hoàn thành** — full 1500 cần ~80+ batch nữa (long-haul, multi-session).
 
 ## 2. PIPELINE CHƯNG CẤT (lặp mỗi batch) — **GROK CLI = CHÍNH**
 0. **Dup-check**: `node -e "..."` dump `DAOZANG.map(e=>e.name_han)` → `docs/_fragments/_done-titles.json`, grep ứng viên trước khi launch.
