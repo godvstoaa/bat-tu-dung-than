@@ -671,6 +671,23 @@ const DAOZANG_RAW = [
     key_text: '元始自然，青阳郁冥，玄化空洞，无量无形，结气凝国，芬世为名。', use: 'thần thánh địa lý thượng thanh · tồn tư phù lục · vũ trụ quan thần tiên hóa thế giới',
     sources: ['https://zh.daoinfo.org/index.php?title=%E4%B8%8A%E6%B8%85%E5%A4%96%E5%9C%8B%E6%94%BE%E5%93%81%E9%9D%92%E7%AB%A5%E5%85%A7%E6%96%87 (daoinfo)', 'https://www.shidianguji.com/book/DZ1373 (識典古籍 DZ1373)'],
     textual_certainty: 'high', notes: 'DZ1373 (vật lý 正一; nội dung thượng thanh kỳ thư); 《Thượng Thanh đại chân kinh mục》trước 500 ghi.' },
+
+  // ── BATCH 8 — 太清/气法/道医 (agent distilled; 胎息经注DZ130 已有 → skip dup) ──
+  { dz: 'DZ824', name_han: '嵩山太无先生气经', name_vi: 'Tung Sơn Thái Vô Khí Kinh', bu: '洞神', author: ' (khuyết danh; truyền từ Vương công núi La phù)', era: 'Đường (Đại lịch ~766-779)', topic: 'cultivation',
+    essence: 'Kinh phân biệt rõ NGOẠI KHÍ (các pháp phục khí như nhị cảnh/ngũ nha/lục vật — cương kính khó phục) với NỘI KHÍ/ĐẠI TỨC sẵn có trong thân. Cốt: phục dưỡng nội khí kết thành huyền châu ở đan điền = «đại tức», KHÔNG cần mượn ngoài. >16 khẩu quyết (phục-tiến-đào-điều-yết-hành-luyện-ủy-bế-bố khí + lục khí ha-hư-xuy-hu...). «Mệnh ở ta không ở trời đất».',
+    key_text: '至如内气已正，一是曰胎息；身中自有，非假外求。', use: 'phục khí/đại tức · dưỡng sinh diên niên · nội đan cơ sở',
+    sources: ['https://ctext.org/wiki.pl?if=gb&chapter=853568 (CTEXT DZ824)', 'https://baike.baidu.com/item/嵩山太无先生气经/8582036 (百度百科)'],
+    textual_certainty: 'high', notes: 'DZ824 洞神部方法類; 唐 大历; «mệnh ở ta» khẩu quyết.' },
+  { dz: 'DZ872', name_han: '太上肘后玉经方', name_vi: 'Trửu Hậu Ngọc Kinh Phương', bu: '洞神', author: '卢遵元 (hiệu 霞栖子/栖霞子) biên', era: 'Đường (825, bảo lịch ất mùi)', topic: 'cultivation',
+    essence: 'Phương thư PHỤC THỰC dưỡng sinh — lấy BÁT QUÁI làm cương, liệt 8 phương thuốc huyền diệu («Thái Thượng Bát Phương Yên Uẩn Huyền Bảo»): Càn-thất tinh tán / Khôn-tứ phiến tán / Cấn-hà xa phương / Tốn-tứ đồng tán / Ly-lộc giác phân / Đoái-kiếm kim đan / Khảm-nam nhạc chân nhân phương / Chấn... Truyền Sào Cư Tử phụng sự Đông Hải Thanh Đồng Quân 20 năm mới khẩu thụ.',
+    key_text: '宝历乙未岁，霞栖子卢遵元持太上八方絪縕玄宝一轴以授隐栖施君。', use: 'phục thực dược-đan · thảo mộc/khoáng vật dưỡng sinh diên niên',
+    sources: ['https://zh.wikisource.org/zh-hans/太上肘后玉经方 (維基文库)', 'https://zh.daoinfo.org/index.php?title=太上肘后玉经方 (daoinfo)'],
+    textual_certainty: 'high', notes: 'DZ872 洞神部方法類; 卢遵元/Đường 825; bát quái 8 phương thuốc.' },
+  { dz: 'DZ1405', name_han: '长生胎元神用经', name_vi: 'Trường Sinh Thai Nguyên Thần Dụng Kinh', bu: '正一', author: ' (kinh khuyết danh Đường; 仵任郎赵 chú)', era: 'Đường', topic: 'cultivation',
+    essence: 'Luận PHỤC KHÍ-HÀNH KHÍ — trích sao từ 嵩山太无先生气经 + 幼真先生服内元气诀. Cốt: thần-khí = mẹ-con («khí kết thành hình, hình là gốc nhận khí, khí là rễ của hình»); thủ hạ nguyên «huyền châu» + thần nội thị + «thai từ phục khí mà kết» + «hoàn tinh bổ não». Kèm điều khí/hành khí khẩu quyết + tồn tưởng 24 thần + phương trừ cửu trùng (cửu trùng/thi).',
+    key_text: '炁结为形，形是受炁之本宗，炁是形之根元。', use: 'phục nguyên khí · dưỡng thần-kết thai · đạo y trừ cửu trùng',
+    sources: ['https://ctext.org/wiki.pl?if=gb&chapter=957608 (CTEXT DZ1405)', 'https://www.shidianguji.com/zh/book/DZ1405 (識典古籍 DZ1405)'],
+    textual_certainty: 'high', notes: 'DZ1405 正一部 (Schipper=1394); Đường; trích sao 嵩山太无气经.' },
 ];
 
 export const DAOZANG = DAOZANG_RAW.map((e) => ({
