@@ -3,7 +3,12 @@
 > Mục tiêu `/goal`: chưng cất TOÀN BỘ ~1500 kinh 道藏 → tinh túy → encode vào app. Đọc file này đầu mỗi session để resume.
 
 ## 0. IN-FLIGHT (thu kết quả đầu tiên ở context kế!)
-**KHÔNG có agent in-flight** — batch 7 ĐÃ THU ĐỦ + ship (113 kinh, deploy `4105abfe`). Context kế: tiếp batch 8 theo §6, spawn 3-4 subagent no-spawn theo §3.
+Batch 8 ĐÃ LAUNCH (4 agent chạy nền, kết quả persist ra .output). Context kế: TaskOutput(id,block=true) hoặc đọc notification → assemble vào daozang-data.js theo §2 (bỏ dup §4) → build/deploy.
+- `ae35f71186666c891` — 老学注唐宋 (唐玄宗御注·陆希声传·宋徽宗解·司马光论)
+- `ad3249044504601ed` — 太清/气法/道医 (嵩山太无气经·肘后玉经·幻真胎息注·长生胎元)
+- `a558738b1c967981c` — 洞真/上清 sâu (二十四神回元经·紫微七元·三九素语·外国放品青童)
+- `a852625bc7ed159ec` — 雷法/仙传 (火师汪真君法·天心正法·七真年谱DZ175·终南山祖庭内传)
+Output dir: `C:\Users\User\AppData\Local\Temp\claude\c--Users-User--gemini-antigravity-scratch-app-b-i-to-n\d951f5a5-2fd2-43ad-a6d2-c134a51bc428\tasks\<id>.output` (⚠ .output = JSONL transcript KHÔNG đọc bằng Read/shell; dùng TaskOutput(id,block=true) hoặc đợi notification).
 
 ## 1. TRẠNG THÁI HIỆN TẠI (snapshot)
 - **daozang = 113 kinh** đã chưng cất / ~1500 (≈**7.5%**), ~97 đã verify số hiệu DZ# (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
