@@ -30,11 +30,32 @@ function extractFirstObject(s) {
   return null;
 }
 
+function extractAllObjects(s) {
+  const out = [];
+  let i = 0;
+  while (i < s.length) {
+    if (s[i] !== '{') { i++; continue; }
+    let depth = 0, inStr = false, esc = false, start = i;
+    for (; i < s.length; i++) {
+      const c = s[i];
+      if (inStr) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') inStr = false; }
+      else { if (c === '"') inStr = true; else if (c === '{') depth++; else if (c === '}') { depth--; if (depth === 0) { out.push(s.slice(start, i + 1)); break; } } }
+    }
+    i++;
+  }
+  return out;
+}
+
 let entries = env.structuredOutput && env.structuredOutput.entries;
-if (!entries) {
-  const obj = extractFirstObject(env.text || '');
-  if (!obj) { console.error('no JSON object found in text'); process.exit(2); }
-  entries = JSON.parse(obj).entries;
+if (!entries || !entries.length) {
+  // Grok sometimes emits empty { "entries":[] } placeholders before the real object.
+  // Parse all top-level objects and pick the one with a non-empty entries array.
+  const objs = extractAllObjects(env.text || '');
+  let chosen = null;
+  for (const o of objs) {
+    try { const e = JSON.parse(o).entries; if (Array.isArray(e) && e.length) { chosen = e; break; } } catch (_) {}
+  }
+  entries = chosen || [];
 }
 entries = Array.isArray(entries) ? entries : [];
 
