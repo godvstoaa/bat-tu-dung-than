@@ -78,6 +78,9 @@ export default defineConfig({
           //   → renderSynthesisCard undefined runtime → «Không tính được sơ đồ tổng hợp».
           if (id.match(/\/src\/engine\/(western-astro|western-predict|western-synthesis|western-kb|western-interpretation|qizheng)/)) return 'engine-western';
 
+          // === ENGINE-DAOZANG (lazy — 道藏 chưng cất bulk ~840 kinh, tách riêng khỏi engine-library) ===
+          if (id.includes('/src/engine/daozang-data.js')) return 'engine-daozang';
+
           // === ENGINE-LIBRARY (lazy — Thư viện Huyền học: 符籙/神咒/經典/功法 + Âm Tà data) ===
           if (id.match(/\/src\/engine\/(library-data|talisman-data|cultivation-data|phuongthuat-data|bitruyen-data|schools-data|amta-data|amta-analyze|amta-tuluyen-data)/)) return 'engine-library';
 
