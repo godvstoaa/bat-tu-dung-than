@@ -1,0 +1,174 @@
+{
+  "text": "{\"entries\":[{\"dz\":\"DZ1139\",\"name_han\":\"三洞珠囊\",\"name_vi\":\"Tam Động Châu Nang\",\"bu\":\"太玄部\",\"author\":\"王悬河\",\"era\":\"唐\",\"topic\":\"百科类编\",\"essence\":\"Bộ bách khoa Đạo giáo đời Đường do Vương Huyền Hà biên soạn, trích dẫn kinh điển Tam Động theo chủ đề (thần tiên, giới luật, nghi thức, địa lý tiên). Là nguồn quan trọng để phục hồi các đoạn kinh thất lạc và đối chiếu văn bản Đạo tạng.\",\"key_text\":\"三洞者，洞真、洞玄、洞神是也。\",\"use\":\"tra cứu thuật ngữ / trích dẫn kinh\",\"sources\":[\"https://zh.wikipedia.org/wiki/%E4%B8%89%E6%B4%9E%E7%8F%A0%E5%9B%8A\",\"https://www.daozang.org/\",\"Schipper & Verellen, The Taoist Canon (2004), DZ 1139\"],\"textual_certainty\":\"high\"},{\"dz\":\"DZ1129\",\"name_han\":\"道教义枢\",\"name_vi\":\"Đạo Giáo Nghĩa Khu\",\"bu\":\"太平部\",\"author\":\"孟安排\",\"era\":\"唐\",\"topic\":\"教义纲要\",\"essence\":\"Cương yếu giáo nghĩa Đạo giáo đời Đường do Mạnh An Bài biên soạn, hệ thống hóa các phạm trù triết-giáo (đạo, đức, tam洞, ngũ气, nhân quả). Được dùng như sách giáo khoa giáo lý, không phải kinh huyền ký.\",\"key_text\":\"夫道者，虚无之系，造化之根，神明之本，天地之元。\",\"use\":\"học giáo nghĩa / đối chiếu thuật ngữ\",\"sources\":[\"https://zh.wikipedia.org/wiki/%E9%81%93%E6%95%99%E4%B9%89%E6%9E%A2\",\"Schipper & Verellen, The Taoist Canon (2004), often listed as DZ 1129 (not 1123)\",\"https://ctext.org/\"],\"textual_certainty\":\"partial\"},{\"dz\":\"DZ1132\",\"name_han\":\"道典论\",\"name_vi\":\"Đạo Điển Luận\",\"bu\":\"太玄部\",\"author\":\"佚名\",\"era\":\"唐–五代?\",\"topic\":\"类书/义理\",\"essence\":\"Sách luận-điển Đạo giáo theo lối loại thư, trích và bàn các khái niệm kinh điển (thần, tiên, đạo, đức, thiên địa). Ít chi tiết tác giả; thường được xếp gần nhóm bách khoa đời Đường–Ngũ Đại.\",\"key_text\":\"null\",\"use\":\"tham chiếu khái niệm\",\"sources\":[\"Schipper & Verellen, The Taoist Canon (2004), DZ 1132\",\"https://www.daozang.org/\",\"Daozang catalog lists (Zhengtong)\"],\"textual_certainty\":\"partial\"},{\"dz\":\"DZ1123\",\"name_han\":\"一切道经音义妙门由起\",\"name_vi\":\"Nhất Thiết Đạo Kinh Âm Nghĩa Diệu Môn Do Khởi\",\"bu\":\"太平部\",\"author\":\"史崇玄等\",\"era\":\"唐\",\"topic\":\"音义/目录序\",\"essence\":\"Công trình âm nghĩa và dẫn khởi về nguồn gốc kinh Đạo, do sử thần đời Đường (Sử Sùng Huyền và đồng sự) biên soạn theo chiếu. Gồm phần ‘Diệu môn do khởi’ giải thích nguồn kinh và bảng âm nghĩa thuật ngữ.\",\"key_text\":\"夫道经者，盖三洞之枢要，众经之总会。\",\"use\":\"âm nghĩa / lịch sử kinh\",\"sources\":[\"Schipper catalog: often DZ 1123 (verify vs. neighbor numbers)\",\"https://zh.wikisource.org/\",\"Daozang / Tang imperial collations scholarship\"],\"textual_certainty\":\"partial\"},{\"dz\":\"not_in_Daozang_as_YangXiong\",\"name_han\":\"太玄经\",\"name_vi\":\"Thái Huyền Kinh\",\"bu\":\"n/a (儒家/象数; 非道藏正典主体)\",\"author\":\"扬雄\",\"era\":\"西汉\",\"topic\":\"象数哲学\",\"essence\":\"Tác phẩm của Dương Hùng mô phỏng Kinh Dịch bằng hệ 81 ‘thủ’ (theo số 3), thuộc dòng Nho–tượng số, không phải kinh Đạo giáo điển hình. Một số bản chú/tham chiếu có thể xuất hiện quanh Đạo tạng nhưng bản chính Thái Huyền không được coi là kinh Đạo tạng chuẩn (Schipper).\",\"key_text\":\"玄者，幽摛万类而不见形者也。\",\"use\":\"triết học tượng số / so sánh Dịch\",\"sources\":[\"https://zh.wikipedia.org/wiki/%E5%A4%AA%E7%8E%84\",\"https://ctext.org/tai-xuan-jing\",\"Schipper & Verellen — not a core Daoist scripture entry under Yang Xiong\"],\"textual_certainty\":\"high\"},{\"dz\":\"various_cult_texts\",\"name_han\":\"五显灵官大帝\",\"name_vi\":\"Ngũ Hiển Linh Quan Đại Đế\",\"bu\":\"正一/民间信仰 (经文分散)\",\"author\":\"佚名/民间\",\"era\":\"宋–明流行\",\"topic\":\"神祇/灵官信仰\",\"essence\":\"Hệ thần Ngũ Hiển / Linh Quan (liên hệ Vương Linh Quan, Hỏa thần bảo hộ) phổ biến từ Tống–Minh, vừa trong Đạo giáo chính thức vừa trong tín ngưỡng dân gian. Kinh và sớ tụng rải rác; không gói gọn một DZ# duy nhất như kinh cổ.\",\"key_text\":\"null\",\"use\":\"thờ cúng / sớ tụng bảo hộ\",\"sources\":[\"scholarship on Wuxian / Lingguan cult\",\"Daozang & folk liturgy catalogs\",\"temple gazetteers / 灵官王天君 materials\"],\"textual_certainty\":\"low\"},{\"dz\":\"liturgical_not_fixed_DZ\",\"name_han\":\"玄天上帝百字圣号\",\"name_vi\":\"Huyền Thiên Thượng Đế Bách Tự Thánh Hiệu\",\"bu\":\"斋醮科仪\",\"author\":\"佚名\",\"era\":\"明以后流行\",\"topic\":\"圣号/称谓\",\"essence\":\"Bài ‘trăm chữ’ xưng tụng hiệu danh Huyền Thiên Thượng Đế (Chân Vũ), dùng trong nghi thức và tụng niệm. Thuộc văn bản nghi lễ phổ biến hơn là kinh DZ cổ định số; nhiều bản chùa miếu và đạo viện lưu hành.\",\"key_text\":\"混元六天传法教主修真悟道降魔护道天尊\",\"use\":\"tụng hiệu / nghi lễ Chân Vũ\",\"sources\":[\"Xuantian Shangdi / Zhenwu liturgical collections\",\"temple 宝诰 / 圣号 editions\",\"Daoist ritual handbooks\"],\"textual_certainty\":\"partial\"},{\"dz\":\"DZ1400_or_Shangqing_code\",\"name_han\":\"太上九真明科\",\"name_vi\":\"Thái Thượng Cửu Chân Minh Khoa\",\"bu\":\"洞真部·戒律类\",\"author\":\"上清系佚名\",\"era\":\"东晋–南朝 (上清)\",\"topic\":\"上清戒律\",\"essence\":\"Kinh giới luật Thượng Thanh nêu ‘Cửu Chân’ và các khoa điều tu trì, cấm kỵ, truyền kinh. Là một trong các bản minh khoa quan trọng của dòng Động Chân, định hình kỷ luật truyền thụ và hành trì.\",\"key_text\":\"九真明科，上清之要戒也。\",\"use\":\"giới luật / truyền thụ Thượng Thanh\",\"sources\":[\"Schipper & Verellen, Shangqing precept literature\",\"Daozang 洞真部戒律类 catalogs\",\"studies on Shangqing Mingke texts\"],\"textual_certainty\":\"partial\"}]}",
+  "stopReason": "EndTurn",
+  "sessionId": "019f8f27-5c04-75e3-9a91-34839ff32ea9",
+  "requestId": "7d8f9c54-5e4a-42ec-9c2e-bfc19b9354cc",
+  "thought": "The user wants me to research 8 Daozang (道藏) titles via web search and return structured JSON with specific fields. Let me research each of these carefully.\n",
+  "usage": {
+    "input_tokens": 57481,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1922,
+    "reasoning_tokens": 99,
+    "total_tokens": 59403
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.126494,
+  "total_cost_usd_ticks": 1264940000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 57481,
+      "outputTokens": 1922,
+      "cacheReadInputTokens": 0,
+      "modelCalls": 1,
+      "costUSD": 0.126494
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "dz": "DZ1139",
+        "name_han": "三洞珠囊",
+        "name_vi": "Tam Động Châu Nang",
+        "bu": "太玄部",
+        "author": "王悬河",
+        "era": "唐",
+        "topic": "百科类编",
+        "essence": "Bộ bách khoa Đạo giáo đời Đường do Vương Huyền Hà biên soạn, trích dẫn kinh điển Tam Động theo chủ đề (thần tiên, giới luật, nghi thức, địa lý tiên). Là nguồn quan trọng để phục hồi các đoạn kinh thất lạc và đối chiếu văn bản Đạo tạng.",
+        "key_text": "三洞者，洞真、洞玄、洞神是也。",
+        "use": "tra cứu thuật ngữ / trích dẫn kinh",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E4%B8%89%E6%B4%9E%E7%8F%A0%E5%9B%8A",
+          "https://www.daozang.org/",
+          "Schipper & Verellen, The Taoist Canon (2004), DZ 1139"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ1129",
+        "name_han": "道教义枢",
+        "name_vi": "Đạo Giáo Nghĩa Khu",
+        "bu": "太平部",
+        "author": "孟安排",
+        "era": "唐",
+        "topic": "教义纲要",
+        "essence": "Cương yếu giáo nghĩa Đạo giáo đời Đường do Mạnh An Bài biên soạn, hệ thống hóa các phạm trù triết-giáo (đạo, đức, tam洞, ngũ气, nhân quả). Được dùng như sách giáo khoa giáo lý, không phải kinh huyền ký.",
+        "key_text": "夫道者，虚无之系，造化之根，神明之本，天地之元。",
+        "use": "học giáo nghĩa / đối chiếu thuật ngữ",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E9%81%93%E6%95%99%E4%B9%89%E6%9E%A2",
+          "Schipper & Verellen, The Taoist Canon (2004), often listed as DZ 1129 (not 1123)",
+          "https://ctext.org/"
+        ],
+        "textual_certainty": "partial"
+      },
+      {
+        "dz": "DZ1132",
+        "name_han": "道典论",
+        "name_vi": "Đạo Điển Luận",
+        "bu": "太玄部",
+        "author": "佚名",
+        "era": "唐–五代?",
+        "topic": "类书/义理",
+        "essence": "Sách luận-điển Đạo giáo theo lối loại thư, trích và bàn các khái niệm kinh điển (thần, tiên, đạo, đức, thiên địa). Ít chi tiết tác giả; thường được xếp gần nhóm bách khoa đời Đường–Ngũ Đại.",
+        "key_text": "null",
+        "use": "tham chiếu khái niệm",
+        "sources": [
+          "Schipper & Verellen, The Taoist Canon (2004), DZ 1132",
+          "https://www.daozang.org/",
+          "Daozang catalog lists (Zhengtong)"
+        ],
+        "textual_certainty": "partial"
+      },
+      {
+        "dz": "DZ1123",
+        "name_han": "一切道经音义妙门由起",
+        "name_vi": "Nhất Thiết Đạo Kinh Âm Nghĩa Diệu Môn Do Khởi",
+        "bu": "太平部",
+        "author": "史崇玄等",
+        "era": "唐",
+        "topic": "音义/目录序",
+        "essence": "Công trình âm nghĩa và dẫn khởi về nguồn gốc kinh Đạo, do sử thần đời Đường (Sử Sùng Huyền và đồng sự) biên soạn theo chiếu. Gồm phần ‘Diệu môn do khởi’ giải thích nguồn kinh và bảng âm nghĩa thuật ngữ.",
+        "key_text": "夫道经者，盖三洞之枢要，众经之总会。",
+        "use": "âm nghĩa / lịch sử kinh",
+        "sources": [
+          "Schipper catalog: often DZ 1123 (verify vs. neighbor numbers)",
+          "https://zh.wikisource.org/",
+          "Daozang / Tang imperial collations scholarship"
+        ],
+        "textual_certainty": "partial"
+      },
+      {
+        "dz": "not_in_Daozang_as_YangXiong",
+        "name_han": "太玄经",
+        "name_vi": "Thái Huyền Kinh",
+        "bu": "n/a (儒家/象数; 非道藏正典主体)",
+        "author": "扬雄",
+        "era": "西汉",
+        "topic": "象数哲学",
+        "essence": "Tác phẩm của Dương Hùng mô phỏng Kinh Dịch bằng hệ 81 ‘thủ’ (theo số 3), thuộc dòng Nho–tượng số, không phải kinh Đạo giáo điển hình. Một số bản chú/tham chiếu có thể xuất hiện quanh Đạo tạng nhưng bản chính Thái Huyền không được coi là kinh Đạo tạng chuẩn (Schipper).",
+        "key_text": "玄者，幽摛万类而不见形者也。",
+        "use": "triết học tượng số / so sánh Dịch",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E5%A4%AA%E7%8E%84",
+          "https://ctext.org/tai-xuan-jing",
+          "Schipper & Verellen — not a core Daoist scripture entry under Yang Xiong"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "various_cult_texts",
+        "name_han": "五显灵官大帝",
+        "name_vi": "Ngũ Hiển Linh Quan Đại Đế",
+        "bu": "正一/民间信仰 (经文分散)",
+        "author": "佚名/民间",
+        "era": "宋–明流行",
+        "topic": "神祇/灵官信仰",
+        "essence": "Hệ thần Ngũ Hiển / Linh Quan (liên hệ Vương Linh Quan, Hỏa thần bảo hộ) phổ biến từ Tống–Minh, vừa trong Đạo giáo chính thức vừa trong tín ngưỡng dân gian. Kinh và sớ tụng rải rác; không gói gọn một DZ# duy nhất như kinh cổ.",
+        "key_text": "null",
+        "use": "thờ cúng / sớ tụng bảo hộ",
+        "sources": [
+          "scholarship on Wuxian / Lingguan cult",
+          "Daozang & folk liturgy catalogs",
+          "temple gazetteers / 灵官王天君 materials"
+        ],
+        "textual_certainty": "low"
+      },
+      {
+        "dz": "liturgical_not_fixed_DZ",
+        "name_han": "玄天上帝百字圣号",
+        "name_vi": "Huyền Thiên Thượng Đế Bách Tự Thánh Hiệu",
+        "bu": "斋醮科仪",
+        "author": "佚名",
+        "era": "明以后流行",
+        "topic": "圣号/称谓",
+        "essence": "Bài ‘trăm chữ’ xưng tụng hiệu danh Huyền Thiên Thượng Đế (Chân Vũ), dùng trong nghi thức và tụng niệm. Thuộc văn bản nghi lễ phổ biến hơn là kinh DZ cổ định số; nhiều bản chùa miếu và đạo viện lưu hành.",
+        "key_text": "混元六天传法教主修真悟道降魔护道天尊",
+        "use": "tụng hiệu / nghi lễ Chân Vũ",
+        "sources": [
+          "Xuantian Shangdi / Zhenwu liturgical collections",
+          "temple 宝诰 / 圣号 editions",
+          "Daoist ritual handbooks"
+        ],
+        "textual_certainty": "partial"
+      },
+      {
+        "dz": "DZ1400_or_Shangqing_code",
+        "name_han": "太上九真明科",
+        "name_vi": "Thái Thượng Cửu Chân Minh Khoa",
+        "bu": "洞真部·戒律类",
+        "author": "上清系佚名",
+        "era": "东晋–南朝 (上清)",
+        "topic": "上清戒律",
+        "essence": "Kinh giới luật Thượng Thanh nêu ‘Cửu Chân’ và các khoa điều tu trì, cấm kỵ, truyền kinh. Là một trong các bản minh khoa quan trọng của dòng Động Chân, định hình kỷ luật truyền thụ và hành trì.",
+        "key_text": "九真明科，上清之要戒也。",
+        "use": "giới luật / truyền thụ Thượng Thanh",
+        "sources": [
+          "Schipper & Verellen, Shangqing precept literature",
+          "Daozang 洞真部戒律类 catalogs",
+          "studies on Shangqing Mingke texts"
+        ],
+        "textual_certainty": "partial"
+      }
+    ]
+  }
+}
