@@ -79,7 +79,7 @@ export default defineConfig({
           if (id.match(/\/src\/engine\/(western-astro|western-predict|western-synthesis|western-kb|western-interpretation|qizheng)/)) return 'engine-western';
 
           // === ENGINE-LIBRARY (lazy — Thư viện Huyền học: 符籙/神咒/經典/功法 + Âm Tà data) ===
-          if (id.match(/\/src\/engine\/(library-data|talisman-data|cultivation-data|phuongthuat-data|bitruyen-data|schools-data|amta-data|amta-analyze)/)) return 'engine-library';
+          if (id.match(/\/src\/engine\/(library-data|talisman-data|cultivation-data|phuongthuat-data|bitruyen-data|schools-data|amta-data|amta-analyze|amta-tuluyen-data)/)) return 'engine-library';
 
           // === main.js (core: chart.js + constants + interactions + main app UI) ===
           // Everything else stays in main — but now MUCH smaller without kb/ai/divination

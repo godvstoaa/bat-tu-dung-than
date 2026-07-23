@@ -69,6 +69,7 @@ import { analyzeAmTa } from './engine/amta-analyze.js'; // [loop 1383] ÂM TÀ /
 import { LIBRARY, LAYERS, countByLayer, ETHICS as LIB_ETHICS } from './engine/library-data.js'; // [library] Thư viện Huyền học
 import { suggestByAmTa } from './engine/talisman-data.js'; // [amta] chart-aware 符咒 suggestion
 import { SCHOOLS, COMPARE_DIMS, compareMatrix } from './engine/schools-data.js'; // [schools] đối chiếu trường phái
+import { AMTA_TU_LUYEN } from './engine/amta-tuluyen-data.js'; // [amta-tuluyen] module riêng Âm Tà · Tu Luyện
 import { compassReading, bestDirection, shanFromDegree } from './engine/fengshui-compass.js'; // [loop 631] la bàn 24 sơn
 import { bestGraveDirectionDeep } from './engine/yinzhai-deep.js'; // [loop 634] Âm Trạch (mộ)
 import { radialData, matrixData } from './engine/family-diagram.js';
@@ -6191,6 +6192,33 @@ function renderAmTa(R) {
       ));
     });
     box.appendChild(_h('details', { open: '' }, _h('summary', {}, `Phù / Chú / Nghi thức tham chiếu (${sug.length}) — do đạo sĩ 受箓 chủ trì`), sg));
+  }
+  // ── module «Âm Tà · Tu Luyện»: curated reference sub-sections (static, opt-in) ──
+  const sp = AMTA_TU_LUYEN.spiritTypes || [];
+  if (sp.length) {
+    const sd = _h('div', { class: 'amta-list hint' });
+    sp.forEach((t) => sd.appendChild(_h('div', { style: 'margin-bottom:4px' },
+      _h('b', { class: 'zh' }, (t.type || t.name_han || t.id) + ' '),
+      document.createTextNode(((t.definition || t.origin || '') + ' ' + (t.distinctFrom || '')).trim() + ' (tham chiếu ngữ cảnh, KHÔNG chẩn đoán «bị loại này»)'))));
+    box.appendChild(_h('details', {}, _h('summary', {}, `Phân loại quỷ / vong / yêu (âm tà) — ${sp.length} loại`), sd));
+  }
+  const cul = AMTA_TU_LUYEN.cultivation || [];
+  if (cul.length) {
+    const cg = _h('div', { class: 'amta-sug' });
+    cul.forEach((e) => cg.appendChild(_h('div', { class: 'amta-sug-item' },
+      _h('span', { class: 'lib-name zh', style: 'font-size:14px' }, e.name_han),
+      e.name_vi ? _h('span', { class: 'hint' }, ' ' + e.name_vi) : null,
+      _h('div', { class: 'hint', style: 'margin-top:2px' }, (e.meaning || '').split('。')[0]))));
+    box.appendChild(_h('details', {}, _h('summary', {}, `Công pháp tu luyện — ${cul.length} (tu luyện cần sư thừa)`), cg));
+  }
+  const fuc = AMTA_TU_LUYEN.fuChu || [];
+  if (fuc.length) {
+    const fg = _h('div', { class: 'amta-sug' });
+    fuc.forEach((e) => fg.appendChild(_h('div', { class: 'amta-sug-item' },
+      _h('span', { class: 'lib-name zh', style: 'font-size:14px' }, e.name_han),
+      e.use ? _h('span', { class: 'hint' }, ' · ' + e.use) : null,
+      _h('div', { class: 'hint', style: 'margin-top:2px' }, (e.meaning || '').split('。')[0]))));
+    box.appendChild(_h('details', {}, _h('summary', {}, `符 / Chú / Nghi thức trừ tà — ${fuc.length} (do 受箓 đạo sĩ chủ trì)`), fg));
   }
   box.appendChild(_h('p', { class: 'hint', style: 'margin-top:8px' }, _h('i', {}, 'Nếu bạn đang gặp khó khăn tâm lý / mất ngủ / hoang tưởng kéo dài, hãy ưu tiên chuyên gia y tế / tâm lý. Nghi lễ tôn giáo (nếu muốn) song hành — không thay thế chăm sóc y tế.')));
   box.appendChild(_h('button', { class: 'btn-ghost', style: 'margin-top:8px', onClick: () => { _amtaSetOptIn(false); renderAmTa(R); } }, 'Đóng phân tích Âm Tà'));
