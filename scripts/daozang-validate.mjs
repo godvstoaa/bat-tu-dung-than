@@ -16,7 +16,7 @@ const src = readFileSync('src/engine/daozang-data.js', 'utf8');
 const closeIdx = src.lastIndexOf(']', src.indexOf('.map(', src.indexOf('DAOZANG_RAW')));
 const rawSection = src.slice(0, closeIdx);
 const existingDz = new Set();
-for (const m of rawSection.matchAll(/dz:\s*'?(DZ0*\d+)/gi)) existingDz.add('DZ' + parseInt(m[1].replace(/^DZ/i, '')));
+for (const m of rawSection.matchAll(/dz:\s*['"]?(DZ0*\d+)/gi)) existingDz.add('DZ' + parseInt(m[1].replace(/^DZ/i, '')));
 
 const libNames = new Set(LIBRARY.map((e) => (e.name_han || '').replace(/[（(].*$/, '')));
 
