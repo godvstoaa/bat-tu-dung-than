@@ -588,6 +588,28 @@ const DAOZANG_RAW = [
     key_text: '化生玄妙玉女。自玄妙玉女生后，三气变化，五色玄黄，大如弹丸，入玄妙口中。', use: 'Lão-quân hóa-thân giáo nghĩa · thần thoại vũ trụ luận',
     sources: ['https://baike.baidu.com/item/老子变化经/18832712 (百度百科)', 'https://zh.daoinfo.org/index.php?title=老子變化經(敦煌本) (daoinfo)'],
     textual_certainty: 'high', notes: '⚠ KHÔNG thu正统道藏; chỉ 敦煌 S.2295 (bản sao 612); lục triều.' },
+
+  // ── BATCH 7 — 戒律/神霄/净明 (agent distilled, DZ-verified) ───────────────
+  { dz: 'DZ180', name_han: '三坛圆满天仙大戒（初真戒·中极戒·天仙大戒）', name_vi: 'Tam Đàn Đại Giới', bu: '洞真', author: ' (戒本 khuyết danh Lục triều-Đường sơ; 制度 清·王常月 hệ thống hóa)', era: '戒本 Đông Tấn-Nam triều-Đường sơ; 制度 Thanh sơ (1656)', topic: 'ritual',
+    essence: 'Hệ thống GIỚI LUẬT TỐI CAO toàn chân đạo — 王常月 thanh sơ định hình 3 cấp thụ: SƠ CHÂN (10 giới, nhập đạo chi môn) → TRUNG CỰC (300 giới, dựa 智慧观身大戒文 DZ1364) → THIÊN TIÊN (viên mãn giới). Lấy giới luật nền tu tâm; chỉ ai trì Trung Cực vô phạm mới tiến thọ Thiên Tiên → «Diệu Đạo Sư».',
+    key_text: '出家超俗，皆宿有良契……若慎终如始，精至修炼，当福及七祖，庆流一门。', use: 'toàn chân thụ giới · luật tông · đạo sĩ nhật dụng',
+    sources: ['https://zh.wikisource.org/zh-hans/%E8%99%9B%E7%9A%87%E5%A4%A9%E5%B0%8A%E5%88%9D%E7%9C%9F%E5%8D%81%E6%88%92%E6%96%87 (維基 初真十戒文)', 'https://zh.wikisource.org/zh-hans/%E4%B8%8A%E6%B8%85%E6%B4%9E%E7%9C%9F%E6%99%BA%E6%85%A7%E8%A7%80%E8%BA%AB%E5%A4%A7%E6%88%92%E6%96%87 (維基 智慧观身大戒文 DZ1364)'],
+    textual_certainty: 'high', notes: 'DZ180 初真戒文 (洞真戒律) + DZ1364 中极戒; 制度 清·王常月 1656.' },
+  { dz: 'DZ1411', name_han: '洞玄灵宝长夜之府九幽玉匮明真科', name_vi: 'Cửu U Ngọc Quỹ Minh Chân Khoa', bu: '正一', author: ' (khuyết danh; cổ linh bảo kinh)', era: 'Đông Tấn末-Nam triều初 (陆修静灵宝经目)', topic: 'ritual',
+    essence: 'CỔ LINH BẢO kinh cốt tủy ĐỘ VONG — Nguyên Thỉ Thiên Tôn vì 7240 đồng tử tuyên tội phúc nhân quả/thiện ác báo ứng. Mô tả vô số tội nhân chịu hình CỬU U địa ngục + thiết 24 điều khoa giới (10 thiện nhân duyên + tội phúc duyên đối). NGUỒN GỐC Minh Chân trai khoa nghi sau.',
+    key_text: null, use: 'linh bảo độ亡 · minh chân trai khoa nghi · cứu抜 cô hồn/giải tội/độ thất tổ',
+    sources: ['https://zh.wikisource.org/zh-hans/%E6%B4%9E%E7%8E%84%E9%9D%88%E5%AF%B6%E9%95%B7%E5%A4%9C%E4%B9%8B%E5%BA%9C%E4%B9%9D%E5%B9%BD%E7%8E%89%E5%8C%B1%E6%98%8E%E7%9C%9F%E7%A7%91 (維基文库)', 'https://www.shidianguji.com/book/DZ1411 (識典古籍 DZ1411)'],
+    textual_certainty: 'high', notes: 'DZ1411 (正一部, bản源 cổ linh bảo); 24 khoa giới; cửu u địa ngục.' },
+  { dz: 'DZ1219', name_han: '高上神霄玉清真王紫书大法', name_vi: 'Thần Tiêu Tử Thư Đại Pháp', bu: '正一', author: ' (khuyết danh; thần tiêu phái, liên hệ 王文卿 1093-1153 truyền)', era: 'Bắc Tống末-Nam Tống初', topic: 'fu',
+    essence: 'Kinh CỐT TỦY THẦN TIÊU PHÁI — 神霄玉清真王 (Nam cực trường sinh đại đế) năng thụ pháp. Chủ «NỘI ĐAN VI THỂ, LÔI PHÁP VI DỤNG»: nội luyện tinh-khí-thần nền, cảm thông thiên lôi. NGŨ LÔI THẦN PHÙ triệu役 lôi bộ chư tướng (cửu thiên lôi bộ đại tướng), cầu vũ/trừ tà/trị bệnh. 12 quyển. (⚠ thay «神霄玉诀» — kinh đó KHÔNG tồn tại độc lập, chỉ trích引).',
+    key_text: null, use: 'thần tiêu ngũ lôi đại pháp · cầu vũ/trừ tà/trị bệnh · sư thụ phù lục',
+    sources: ['https://zh.wikisource.org/wiki/%E9%AB%98%E4%B8%8A%E7%A5%9E%E9%9C%84%E7%8E%89%E6%B8%85%E7%9C%9F%E7%8E%8B%E7%B4%AB%E6%9B%B8%E5%A4%A7%E6%B3%95 (維基文库)', 'https://www.shidianguji.com/book/DZ1219 (識典古籍 DZ1219)'],
+    textual_certainty: 'partial', notes: 'DZ1219 正一部 (12卷); ⚠ thay «神霄玉诀» (kinh đó phi độc lập, chỉ trích引 trong玉匣记序/道法会元).' },
+  { dz: 'DZ555', name_han: '高上月宫太阴元君孝道仙王灵宝净明黄素书', name_vi: 'Tịnh Minh Hoàng Tố Thư', bu: '洞玄', author: ' (khuyết danh Tống-Nguyên tịnh minh đạo; 元·傅飞卿 chú)', era: 'Tống-Nguyên', topic: 'classic',
+    essence: 'Kinh TRUNG TÂM TỊNH MINH TRUNG HIẾU ĐẠO — nguyệt cung thái âm nguyên quân tôn xưng «HIẾU ĐẠO TIÊN VƯƠNG/MINH VƯƠNG linh bảo tịnh minh hoàng tố thiên tôn». Lấy TRUNG HIẾU làm gốc thành tiên + kết hợp phù lục khoa nghi với nội đan. 10 quyển (含 hoàng tố thư nhập đạo phẩm) = giáo nghĩa cốt tủy tịnh minh phái 刘玉. (⚠ thay «孝道明王经» — kinh đó chưa verify đích xác trong đạo tạng).',
+    key_text: '黃素交光，垂芒照耀，映於月宮，故号月宮太陰元君孝道仙王灵宝净明黄素天尊。', use: 'tịnh minh đạo hiếu đạo tu tiên · nhật dụng tu trì · hoàng tố pháp',
+    sources: ['https://zh.wikisource.org/zh-hans/%E9%AB%98%E4%B8%8A%E6%9C%88%E5%AE%AE%E5%A4%AA%E9%99%B0%E5%85%83%E5%90%9B%E5%AD%9D%E9%81%93%E4%BB%99%E7%8E%8B%E9%9D%88%E5%AF%B6%E6%B7%A8%E6%98%8E%E9%BB%83%E7%B4%A0%E6%9B%B8 (維基文库)', 'https://www.shidianguji.com/book/DZ0555 (識典古籍 DZ555)'],
+    textual_certainty: 'partial', notes: 'DZ555 洞玄部方法類 (10卷); ⚠ thay «孝道明王经» (kinh đó chưa verify trong đạo tạng); 傅飞卿 chú.' },
 ];
 
 export const DAOZANG = DAOZANG_RAW.map((e) => ({
