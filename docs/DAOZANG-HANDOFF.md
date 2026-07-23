@@ -3,16 +3,13 @@
 > Mục tiêu `/goal`: chưng cất TOÀN BỘ ~1500 kinh 道藏 → tinh túy → encode vào app. Đọc file này đầu mỗi session để resume.
 
 ## 0. IN-FLIGHT (thu kết quả đầu tiên ở context kế!)
-Batch 7 đã ship 110 kinh (3/4 agent xong). CÒN 1 agent 上清/神谱 ĐANG CHẠY — kết quả persist ra .output. Context kế: TaskOutput(id,block=true) hoặc đọc notification → assemble vào daozang-data.js theo §2 (bỏ dup §4) → build/deploy.
-- `aef483f34a1d9405e` — 上清/神谱 (真灵位业图·上清握中诀·八素真经·登仙箓)
-Output dir: `C:\Users\User\AppData\Local\Temp\claude\c--Users-User--gemini-antigravity-scratch-app-b-i-to-n\d951f5a5-2fd2-43ad-a6d2-c134a51bc428\tasks\<id>.output` (⚠ .output = JSONL transcript KHÔNG đọc bằng Read/shell; dùng TaskOutput(id,block=true) hoặc đợi notification).
-- (ĐÃ THU + ship: ae7964b1241e53f42 老学注/列仙传, aea83729654146191 仙传/谱录, aedb25f9e817bd890 戒律/神霄.)
+**KHÔNG có agent in-flight** — batch 7 ĐÃ THU ĐỦ + ship (113 kinh, deploy `4105abfe`). Context kế: tiếp batch 8 theo §6, spawn 3-4 subagent no-spawn theo §3.
 
 ## 1. TRẠNG THÁI HIỆN TẠI (snapshot)
-- **daozang = 110 kinh** đã chưng cất / ~1500 (≈**7.3%**), ~94 đã verify số hiệu DZ# (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
-- **7 batch đã ship** (commit + push origin/main + deploy live `battu` trên battu.god8.shop; bản mới `804f50d4`).
-- App tổng: **~170 entry / 8 lớp** (daozang 110 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
-- engine-library chunk ~226KB. Build ✓, selftest ✓ exit 0 mỗi batch.
+- **daozang = 113 kinh** đã chưng cất / ~1500 (≈**7.5%**), ~97 đã verify số hiệu DZ# (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
+- **7 batch đã ship** (commit + push origin/main + deploy live `battu` trên battu.god8.shop; bản mới `4105abfe`).
+- App tổng: **~173 entry / 8 lớp** (daozang 113 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
+- engine-library chunk ~228KB. Build ✓, selftest ✓ exit 0 mỗi batch.
 - **CHƯA hoàn thành** — full 1500 cần ~65+ batch nữa (long-haul, multi-session).
 
 ## 2. PIPELINE CHƯNG CẤT (lặp mỗi batch)
