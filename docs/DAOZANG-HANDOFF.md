@@ -2,15 +2,13 @@
 
 > Mục tiêu `/goal`: chưng cất TOÀN BỘ ~1500 kinh 道藏 → tinh túy → encode vào app. Đọc file này đầu mỗi session để resume.
 
-## 0. IN-FLIGHT (thu kết quả đầu tiên ở context kế!)
-Batch 9: 3/4 agent xong (洞玄+道医+全真), ship 138 kinh. CÒN 1 agent:
-- `a5682a6af7808b5c0` — 老学注宋元 (苏辙DZ691·吕惠卿·王安石·吴澄)
-Thu xong → assemble → build/deploy batch 9 complete.
+## 0. IN-FLIGHT
+KHÔNG agent in-flight — batch 9 hoàn tất (142 kinh). Context kế: tiếp batch 10 theo §6.
 
 ## 1. TRẠNG THÁI HIỆN TẠI (snapshot)
-- **daozang = 128 kinh** đã chưng cất / ~1500 (≈**7.5%**), ~97 đã verify số hiệu DZ# (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
+- **daozang = 142 kinh** đã chưng cất / ~1500 (≈**7.5%**), ~97 đã verify số hiệu DZ# (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
 - **8 batch (partial) đã ship** (commit + push origin/main + deploy live `battu` trên battu.god8.shop; bản mới `4105abfe`).
-- App tổng: **~181 entry / 8 lớp** (daozang 128 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
+- App tổng: **~181 entry / 8 lớp** (daozang 142 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
 - engine-library chunk ~228KB. Build ✓, selftest ✓ exit 0 mỗi batch.
 - **CHƯA hoàn thành** — full 1500 cần ~65+ batch nữa (long-haul, multi-session).
 
