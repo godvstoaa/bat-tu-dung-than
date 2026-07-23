@@ -32,6 +32,7 @@ const TOPICS = [
   { layer: 'cultivation', slug: '05-cong-phap', title: 'Công Pháp Tu Hành', zh: '功法' },
   { layer: 'phuongthuat', slug: '06-phuong-thuat', title: 'Phương Thuật', zh: '方術' },
   { layer: 'bitruyen',    slug: '07-bi-truyen-that-truyen', title: 'Bí Truyền · Thất Truyền · Tàn Quyển', zh: '秘傳' },
+  { layer: 'daozang',     slug: '08-dao-tang-chung-cat', title: 'Đạo Tạng (chưng cất)', zh: '道藏' },
 ];
 
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
