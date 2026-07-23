@@ -3,16 +3,16 @@
 > Mục tiêu `/goal`: chưng cất TOÀN BỘ ~1500 kinh 道藏 → tinh túy → encode vào app. Đọc file này đầu mỗi session để resume.
 
 ## 0. IN-FLIGHT (thu kết quả đầu tiên ở context kế!)
-Batch 8 đã ship 121 kinh (2/4 agent xong: 雷法仙传 + 洞真上清). CÒN 1 agent ĐANG CHẠY — kết quả persist ra .output. Context kế: TaskOutput(id,block=true) hoặc đọc notification → assemble vào daozang-data.js theo §2 (bỏ dup §4) → build/deploy.
-- `ae35f71186666c891` — 老学注唐宋 (唐玄宗御注·陆希声传·宋徽宗解·司马光论)
+Batch 8 đã ship 121 kinh (2/4 agent xong: 雷法仙传 + 洞真上清). KHÔNG agent in-flight — batch 8 hoàn tất — kết quả persist ra .output. Context kế: TaskOutput(id,block=true) hoặc đọc notification → assemble vào daozang-data.js theo §2 (bỏ dup §4) → build/deploy.
+- (ĐÃ THU + ship: cả 4 agent batch 8.)
 - (ĐÃ THU + ship: a852625bc7ed159ec 雷法仙传, a558738b1c967981c 洞真上清, ad3249044504601ed 太清气法.)
 - (ĐÃ THU + ship: a852625bc7ed159ec 雷法仙传, a558738b1c967981c 洞真上清.)
 Output dir: `C:\Users\User\AppData\Local\Temp\claude\c--Users-User--gemini-antigravity-scratch-app-b-i-to-n\d951f5a5-2fd2-43ad-a6d2-c134a51bc428\tasks\<id>.output` (⚠ .output = JSONL transcript KHÔNG đọc bằng Read/shell; dùng TaskOutput(id,block=true) hoặc đợi notification).
 
 ## 1. TRẠNG THÁI HIỆN TẠI (snapshot)
-- **daozang = 124 kinh** đã chưng cất / ~1500 (≈**7.5%**), ~97 đã verify số hiệu DZ# (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
+- **daozang = 128 kinh** đã chưng cất / ~1500 (≈**7.5%**), ~97 đã verify số hiệu DZ# (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
 - **8 batch (partial) đã ship** (commit + push origin/main + deploy live `battu` trên battu.god8.shop; bản mới `4105abfe`).
-- App tổng: **~181 entry / 8 lớp** (daozang 124 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
+- App tổng: **~181 entry / 8 lớp** (daozang 128 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
 - engine-library chunk ~228KB. Build ✓, selftest ✓ exit 0 mỗi batch.
 - **CHƯA hoàn thành** — full 1500 cần ~65+ batch nữa (long-haul, multi-session).
 
