@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "properties": {
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "dz": { "type": "string", "description": "DZ### Schipper-Verellen number, null if unsure / not in 正统道藏" },
+          "name_han": { "type": "string" },
+          "name_vi": { "type": "string", "description": "Sino-Vietnamese reading" },
+          "bu": { "type": "string", "description": "三洞四辅 bộ: 洞真/洞玄/洞神/太玄/太平/太清/正一/续道藏" },
+          "author": { "type": "string" },
+          "era": { "type": "string", "description": "dynasty / century" },
+          "topic": { "type": "string", "description": "cultivation|classic|fu|ritual|mantra|philosophy|外丹|服气|仙传|戒律|类书" },
+          "essence": { "type": "string", "description": "2-4 câu TIẾNG VIỆT, cốt tủy" },
+          "key_text": { "type": "string", "description": "1 câu HÁN verbatim hoặc null" },
+          "use": { "type": "string" },
+          "sources": { "type": "array", "items": { "type": "string" }, "description": "≥2 reachable URLs (ctext/wikisource/kanripo/baike/dao.crs.cuhk.edu.hk)" },
+          "textual_certainty": { "type": "string", "enum": ["high", "partial", "low"] }
+        },
+        "required": ["dz", "name_han", "name_vi", "bu", "essence", "sources", "textual_certainty"]
+      }
+    }
+  },
+  "required": ["entries"]
+}

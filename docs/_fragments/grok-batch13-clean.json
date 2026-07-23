@@ -1,0 +1,218 @@
+[
+ {
+  "dz": "DZ828",
+  "name_han": "幼真先生服內元炁訣",
+  "name_vi": "Ấu Chân tiên sinh phục nội nguyên khí quyết",
+  "bu": "洞神",
+  "author": "佚名（序稱天寶中得羅浮王公傳；《新唐書》或聯康仲熊）",
+  "era": "唐",
+  "topic": "服气",
+  "essence": "Kinh phục khí thai tức thời Đường, còn gọi là 幻真/服內元炁訣, chép khoảng 15 quyết: tiến thủ, đào khí, điều khí, yến khí, hành khí, luyện khí, ủy khí, bế khí, bố khí, lục khí, điều dịch, ẩm thực, hưu lương, thủ chân, thai tức. Cốt lõi là phục nội khí (thai tức) sẵn trong thân, không cậy ngoại khí; nội dung gần với 《嵩山太无先生气经》. Trong chính thống đạo tạng thuộc 洞神部方法類; 中华道藏 xếp nhóm Thái Thanh nhiếp dưỡng. Số 道藏提要 (khoảng 822) khác hệ Schipper DZ828.",
+  "key_text": "外氣剛勁，非俗中之士所宜服也。至如內炁，是曰胎息，身中自有，非假外求。",
+  "use": "Module phục khí/thai tức: checklist 15 quyết, phân biệt nội–ngoại khí, cảnh báo không luyện mù.",
+  "sources": [
+   "https://zh.daoinfo.org/index.php?title=%E5%B9%BC%E7%9C%9F%E5%85%88%E7%94%9F%E6%9C%8D%E5%85%A7%E5%85%83%E7%82%81%E8%A8%A3&variant=zh-hans (daoinfo)",
+   "https://www.shidianguji.com/zh/book/DZ0828 (shidianguji)",
+   "https://crta.info/wiki/%E5%B9%BC%E7%9C%9F%E5%85%88%E7%94%9F%E6%9C%8D%E5%85%A7%E5%85%83%E7%82%81%E8%A8%A3_-_D52.12 (crta)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "DZ930",
+  "name_han": "三十六水法",
+  "name_vi": "Tam thập lục thủy pháp",
+  "bu": "洞神",
+  "author": "佚名",
+  "era": "魏晋南北朝",
+  "topic": "外丹",
+  "essence": "Sách thủy pháp ngoại đan cổ: hóa khoáng thạch (phàn thạch, hùng hoàng, thư hoàng, đan sa, tằng thanh… v.v.) thành “thủy” bằng trúc thùng, tiêu thạch, hoa trì (dấm đặc) hoặc chôn đất. Gốc gắn 《抱朴子·遐览》 《三十六水经》; bản chính thống 洞神部众术類. Có 36 pháp gốc và phần bổ sung (thạch đảm, đồng thanh…); dùng làm dung môi/phụ liệu luyện đan, không phải “dược uống” hiện đại.",
+  "key_text": "取礬石一斤，無膽而馬齒者，納青竹筒中，薄削筒表，以硝石四兩，覆薦上下，深固其口，納華池中，三十日成水。",
+  "use": "Từ điển thuật ngữ ngoại đan/thủy pháp; hiển thị công thức tóm tắt + cảnh báo độc hại, không hướng dẫn thực hành.",
+  "sources": [
+   "https://zh.wikisource.org/wiki/%E4%B8%89%E5%8D%81%E5%85%AD%E6%B0%B4%E6%B3%95 (zh.wikisource)",
+   "https://zh.daoinfo.org/index.php?title=%E4%B8%89%E5%8D%81%E5%85%AD%E6%B0%B4%E6%B3%95&variant=zh-hans (daoinfo)",
+   "https://www.shidianguji.com/zh/book/DZ0930 (shidianguji)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "DZ883",
+  "name_han": "太清經天師口訣",
+  "name_vi": "Thái Thanh kinh Thiên Sư khẩu quyết",
+  "bu": "洞神",
+  "author": "佚名",
+  "era": "南北朝",
+  "topic": "外丹",
+  "essence": "Một quyển 洞神部众术類: nửa đầu khẩu quyết Thái Thanh thần đan (hoa trì, thủy chân châu, tiêu chì thiếc thành thủy ngân, hùng tuyết…), gần 《抱朴子·金丹》; nửa sau 《赤松子肘后药诀》 mười tán/cao (độ tai linh phi tán, ngọc linh phi hà tán…). Nhấn mạnh chọn sơn lâm tĩnh xứ, phù dược trừ tà khi hợp đại dược. Tiêu đề rút gọn “天师口诀” dễ nhầm; tên chuẩn trong tạng là 《太清經天師口訣》.",
+  "key_text": "經名：太清經天師口訣。撰人不詳，約出於南北朝。",
+  "use": "Lược đồ khẩu quyết ngoại đan + danh mục 10 phương Xích Tùng; chỉ khảo cứu lịch sử, cấm hướng dẫn chế dược.",
+  "sources": [
+   "https://zh.wikisource.org/zh-hans/%E5%A4%AA%E6%B8%85%E7%B6%93%E5%A4%A9%E5%B8%AB%E5%8F%A3%E8%A8%A3 (zh.wikisource)",
+   "https://zh.daoinfo.org/index.php?title=%E5%A4%AA%E6%B8%85%E7%B6%93%E5%A4%A9%E5%B8%AB%E5%8F%A3%E8%A8%A3&variant=zh-hans (daoinfo)",
+   "https://www.shidianguji.com/zh/book/DZ0883 (shidianguji)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "DZ873",
+  "name_han": "黃庭遁甲緣身經",
+  "name_vi": "Hoàng Đình độn giáp duyên thân kinh",
+  "bu": "太玄",
+  "author": "佚名（託名老子/黃庭系統）",
+  "era": "唐宋间",
+  "topic": "cultivation",
+  "essence": "Kinh dưỡng sinh–trừ tà gắn Hoàng Đình và lục giáp: bệnh tật, ác mộng thì bế khí tụng danh thần lục giáp theo can chi; viết phù lục giáp/lục bính… để tị quỷ, binh tặc, thủy hỏa. Phần sau giải thuật ngữ 《黃庭外景》, chỉ vị tạng phủ và nội thị trị bệnh (ưu thương can → tư tâm dưỡng…), kèm tụng 《黃庭》 và tồn tư thần diện/tạng. Chính thống xếp 太玄部 (không phải 洞玄 như một số nhãn phụ); CRTA xác nhận DZ873.",
+  "key_text": "老子《黃庭遁甲緣身經》，若有疾病腫痛惡夢，各徵眾怪，皆讀之。",
+  "use": "Map lục giáp + Hoàng Đình nội thị trị liệu; UI đọc/tụng + sơ đồ tạng thần (phi y khoa).",
+  "sources": [
+   "https://zh.daoinfo.org/index.php?title=%E9%BB%83%E5%BA%AD%E9%81%81%E7%94%B2%E7%B7%A3%E8%BA%AB%E7%B6%93&variant=zh-hans (daoinfo)",
+   "https://crta.info/wiki/%E9%BB%83%E5%BA%AD%E9%81%81%E7%94%B2%E7%B7%A3%E8%BA%AB%E7%B6%93_-_C89 (crta)",
+   "https://zh.wikisource.org/wiki/%E9%BB%83%E5%BA%AD%E9%81%81%E7%94%B2%E7%B7%A3%E8%BA%AB%E7%B6%93 (zh.wikisource)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "DZ824",
+  "name_han": "嵩山太無先生氣經",
+  "name_vi": "Tung Sơn Thái Vô tiên sinh khí kinh",
+  "bu": "洞神",
+  "author": "佚名（序：大曆中羅浮王公傳；或題李奉時）",
+  "era": "唐",
+  "topic": "服气",
+  "essence": "Hai quyển 洞神部方法類 về hình–khí tương tu: thượng quyển ~16 quyết (phục khí, tiến thủ, đào khí, điều khí, yến khí, hành khí, luyện khí, ủy khí, bế khí, bố khí, lục khí…); hạ quyển tu tồn và thận khí. Cương lĩnh: khí toàn tắc hình toàn; trọng nội khí thai tức, coi ngũ nha/lục mậu là ngoại khí không nên cậy. Không phải DZ829; shidianguji và hệ số Schipper gắn DZ824 (đề yếu ~818 khác hệ).",
+  "key_text": "夫形之所恃者氣也，氣之所依者形也。氣全即形全，氣竭即形斃。",
+  "use": "Bộ cẩm nang phục khí đầy đủ nhất trong lô này; timeline 1–3 năm + lục khí trị liệu biểu tượng.",
+  "sources": [
+   "https://zh.wikisource.org/zh-hans/%E5%B5%A9%E5%B1%B1%E5%A4%AA%E7%84%A1%E5%85%88%E7%94%9F%E6%B0%A3%E7%B6%93 (zh.wikisource)",
+   "https://zh.daoinfo.org/index.php?title=%E5%B5%A9%E5%B1%B1%E5%A4%AA%E6%97%A0%E5%85%88%E7%94%9F%E6%B0%A3%E7%B6%93&variant=zh-hans (daoinfo)",
+   "https://www.shidianguji.com/book/DZ0824 (shidianguji)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "DZ820",
+  "name_han": "太清調氣經",
+  "name_vi": "Thái Thanh điều khí kinh",
+  "bu": "洞神",
+  "author": "佚名",
+  "era": "唐",
+  "topic": "服气",
+  "essence": "Một quyển 洞神部方法類: nửa đầu bác bỏ pháp phục khí cũ (đếm theo giờ tử–ngọ, sinh khí/tử khí ngày, tồn tưởng ngũ phương, bế khí công bệnh mù quáng, cố khí không tiết…); nửa sau trình bày điều khí–thai tức lấy nguyên khí, cửa mũi–miệng, lục khí (hý/ha/hô/hu/xuy/hi) và chế độ ẩm thực dần. CRTA và shidianguji thống nhất DZ820.",
+  "key_text": "蓋由不服元氣，不識深根，諸如此流，舉世共矣。",
+  "use": "FAQ “sai lầm phổ biến khi tập khí” + so sánh với các kinh phục khí khác.",
+  "sources": [
+   "https://zh.wikisource.org/zh-hans/%E5%A4%AA%E6%B8%85%E8%AA%BF%E6%B0%A3%E7%B6%93 (zh.wikisource)",
+   "https://zh.daoinfo.org/index.php?title=%E5%A4%AA%E6%B8%85%E8%AA%BF%E6%B0%A3%E7%B6%93&variant=zh-hans (daoinfo)",
+   "https://crta.info/wiki/%E5%A4%AA%E6%B8%85%E8%AA%BF%E6%B0%A3%E7%B6%93_-_D52.04 (crta)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "DZ847",
+  "name_han": "太上肘後玉經方",
+  "name_vi": "Thái Thượng trụ hậu ngọc kinh phương",
+  "bu": "洞神",
+  "author": "盧遵元（霞栖子）編",
+  "era": "晚唐",
+  "topic": "外丹",
+  "essence": "Một quyển phương phục thực Thượng Thanh theo Bát quái: thất tinh tán, tứ phiến tán, hà xa phương, tứ đồng tán, mi lộc phấn, hạnh kim đan, câu kỷ tiễn, sàm mễ…—chủ yếu thảo dược/động vật, không phải lô đan khoáng độc điển hình. Hệ truyền thụ Thanh Đồng quân → Sào Cư tử → Hàn Thê tử → Hà Thê tử (Lư) → Ẩn Thê tử (Thi Kiên Ngô). Tên đầy đủ có “方”; Komjathy DZ847 (CRTA đôi chỗ ghi 848—ưu tiên 847).",
+  "key_text": "昔巢居子奉事東海青童君，以節苦心寂奉師禮，冒暑雨祁寒，無懈無息，僅二十年，乃口授玄法，手錄聖方。",
+  "use": "Catalog 8 phương bát quái + dòng truyền thụ; gắn module phục thực lịch sử, không khuyến khích pha chế.",
+  "sources": [
+   "https://zh.daoinfo.org/index.php?title=%E5%A4%AA%E4%B8%8A%E8%82%98%E5%BE%8C%E7%8E%89%E7%B6%93%E6%96%B9&variant=zh-hans (daoinfo)",
+   "https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E8%82%98%E5%BE%8C%E7%8E%89%E7%B6%93%E6%96%B9 (zh.wikisource)",
+   "https://www.jstor.org/stable/26768560 (Komjathy Zhonghua Daozang index)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "DZ682",
+  "name_han": "老子河上公章句",
+  "name_vi": "Lão Tử Hà Thượng Công chương cú",
+  "bu": "太玄",
+  "author": "河上公（託名；近人多定東漢黃老）",
+  "era": "东汉（託漢文帝時）",
+  "topic": "philosophy",
+  "essence": "Chú 《道德經》 sớm nhất còn truyền rộng: vô vi trị quốc + thanh tĩnh dưỡng sinh; thường song song trị thân/trị quốc. Dưỡng sinh nhấn hành khí, cố tinh, dưỡng thần. Trong tạng thường đề 《道德真經註》 (河上公), Schipper/Komjathy/Pregadio thống nhất DZ682, thuộc khối Thái Huyền (lão học).",
+  "key_text": "道可道，非常道；名可名，非常名。",
+  "use": "Chú giải chương–cú Lão Tử trong app; trích dẫn song song bản Vương Bật/Tưởng Nhĩ để so sánh.",
+  "sources": [
+   "https://ctext.org/heshanggong/zh (ctext)",
+   "https://zh.wikipedia.org/wiki/%E8%80%81%E5%AD%90%E6%B2%B3%E4%B8%8A%E5%85%AC%E7%AB%A0%E5%8F%A5 (zh.wikipedia)",
+   "https://blackmoonharbor.com/uploads/1/1/5/3/115363763/daoist_texts_in_translation._komjathy.pdf (Komjathy translations list)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "DZ294",
+  "name_han": "列仙傳",
+  "name_vi": "Liệt Tiên truyện",
+  "bu": "洞真",
+  "author": "舊題劉向（學界多定東漢–魏晉方士託名）",
+  "era": "汉（託西汉；成書爭議東漢）",
+  "topic": "仙传",
+  "essence": "Bộ tiên truyện hệ thống sớm: khoảng 70 tiên (xích tùng tử → huyền tục), mỗi truyện thường kèm tán. Nguồn mẫu cho 《神仙傳》 và văn hóa tiên thoại sau này; bản 道藏 ~70 thì, 《云笈七签》 rút 48. Tác giả Lưu Hướng bị nghi; Schipper/Campany/Kaltenmark dùng DZ294. Vị trí tạng gần khối ký truyện Động Chân (không phải Thái Huyền thuần lão học).",
+  "key_text": "老子姓李名耳，字伯陽，楚苦縣厲鄉曲仁里人也。",
+  "use": "Database tiểu sử tiên: thẻ tên–thời–pháp–chỗ; nguồn cho bói/truyện kể.",
+  "sources": [
+   "https://zh.wikisource.org/zh-hans/%E5%88%97%E4%BB%99%E5%82%B3 (zh.wikisource)",
+   "https://zh.daoinfo.org/index.php?title=%E5%88%97%E4%BB%99%E5%82%B3&variant=zh-hans (daoinfo)",
+   "http://www.chinaknowledge.de/Literature/Daoists/liexianzhuan.html (chinaknowledge)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "DZ167",
+  "name_han": "洞玄靈寶真靈位業圖",
+  "name_vi": "Động Huyền Linh Bảo chân linh vị nghiệp đồ",
+  "bu": "洞真",
+  "author": "陶弘景纂；閭丘方遠校定",
+  "era": "南朝梁（唐人校）",
+  "topic": "神谱",
+  "essence": "Phả hệ thần tiên Đạo giáo kinh điển: ~700 danh, bảy bậc (ngọc thanh Nguyên Thủy → thượng thanh → thái cực → thái thanh Lão Quân → cửu cung → địa tiên → Phong Đô). Mỗi bậc trung vị + tả/hữu/tán/nữ. Dựa 《真诰》 và thượng thanh lục; dù đề “洞玄靈寶” nhưng thu 洞真部谱录類. Không phải ~DZ304; shidianguji/daoinfo–Schipper: DZ167 (đề yếu ~166).",
+  "key_text": "夫仰鏡玄精，睹景耀之巨細，俯盼平區，見巖海之崇深，搜訪人綱，究朝班之品序，研綜天經，測真靈之階業。",
+  "use": "Cây thần phổ tương tác 7 tầng; tra cứu phẩm giai khi đọc thượng thanh/linh bảo.",
+  "sources": [
+   "https://zh.wikisource.org/wiki/%E6%B4%9E%E7%8E%84%E9%9D%88%E5%AF%B6%E7%9C%9F%E9%9D%88%E4%BD%8D%E6%A5%AD%E5%9C%96 (zh.wikisource)",
+   "https://zh.daoinfo.org/index.php?title=%E6%B4%9E%E7%8E%84%E9%9D%88%E5%AF%B6%E7%9C%9F%E9%9D%88%E4%BD%8D%E6%A5%AD%E5%9C%96&variant=zh-hans (daoinfo)",
+   "https://www.shidianguji.com/zh/book/DZ0167 (shidianguji)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "DZ140",
+  "name_han": "上清握中訣",
+  "name_vi": "Thượng Thanh ác trung quyết",
+  "bu": "洞真",
+  "author": "佚名（上清派；與茅山/真誥系統相關）",
+  "era": "六朝–唐（上清修煉彙編）",
+  "topic": "cultivation",
+  "essence": "Cẩm nang “nắm trong tay” của Thượng Thanh: phục nhật khí/nguyệt tinh, câu tam hồn, chế thất phách, bộ ngũ tinh, triều tứ cực, du hành tam mệnh…—tồn tư và khẩu chú ngắn để hành trì hàng ngày. Thu 洞真部玉訣類. Schipper/Komjathy/Brill thống nhất DZ140; ước ~DZ243 là sai số danh mục.",
+  "key_text": "玄上太微，北極紫蓋，下有太真，遊翔九外。",
+  "use": "Checklist nhật khóa Thượng Thanh: hồn phách–nhật nguyệt–tinh bộ; gắn module tồn tư.",
+  "sources": [
+   "https://zh.wikisource.org/wiki/%E4%B8%8A%E6%B8%85%E6%8F%A1%E4%B8%AD%E8%A8%A3 (zh.wikisource)",
+   "https://ctext.org/wiki.pl?if=gb&res=112133 (ctext)",
+   "https://www.jstor.org/stable/26768560 (Komjathy: 上清握中訣 DZ140)"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "null",
+  "name_han": "神仙傳",
+  "name_vi": "Thần Tiên truyện",
+  "bu": "太玄",
+  "author": "葛洪",
+  "era": "东晋",
+  "topic": "仙传",
+  "essence": "Tiên truyện Cát Hồng (sau 《抱朴子》), khoảng 84 nhân vật, chứng minh tiên thực hữu và nhấn minh sư–thử luyện. KHÔNG thu trong 《正統道藏》 (nhiều thư mục ghi “道藏未收”); lưu truyền qua 《汉魏丛书》《四库全书》《道藏精华录》… Nên dz=null; đừng gán nhầm số DZ của 《列仙傳》 hay truyện khác. Dùng làm nguồn văn hóa/tiên thoại song song với DZ294.",
+  "key_text": "予今復抄集古之仙者，見於仙經服食方及百家之書、先師所說、耆儒所論，以為十卷，以傳知真識遠之士。",
+  "use": "Corpus tiên truyện ngoại tạng: so sánh với 《列仙傳》; ghi rõ “ngoài chính thống đạo tạng”.",
+  "sources": [
+   "https://zh.wikisource.org/wiki/%E7%A5%9E%E4%BB%99%E5%82%B3 (zh.wikisource)",
+   "https://zh.daoinfo.org/index.php?title=%E7%A5%9E%E4%BB%99%E5%82%B3&variant=zh-hans (daoinfo)",
+   "https://www.daoist.org/BookSearch(test)/list012/038-1.pdf (daoist.org: 道藏未收)"
+  ],
+  "textual_certainty": "high"
+ }
+]
