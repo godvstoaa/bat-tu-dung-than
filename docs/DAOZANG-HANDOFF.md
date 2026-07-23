@@ -2,23 +2,48 @@
 
 > Mục tiêu `/goal`: chưng cất TOÀN BỘ ~1500 kinh 道藏 → tinh túy → encode vào app. Đọc file này đầu mỗi session để resume.
 
-## 0. IN-FLIGHT (thu ở context kế!)
-Batch 10 ĐÃ LAUNCH (4 agent):
-- `ab2ab2943f21da2af` — 经典杂 (报父母恩重经·安宅八阳·天妃救苦·救苦妙经)
-- `ab194e168fc6a06bc` — 养生外丹 (幼真服气·三十六水法·天师口诀·黄庭遁甲DZ873)
-- `a3b6bac0ac1e46181` — 全真more (磻溪集·云光集·孙不二法语·丹阳神光灿)
-- `a79fcd69330c21caf` — 道法方术 (黄帝龙首经·金匮玉衡·洞渊二十方·通占大象历星)
+## 0. IN-FLIGHT / SAU CÙNG
+- **Pipeline chính = GROK CLI** (WebSearch quota đã hết; subagent chỉ khi Grok kẹt). Web search mặc định ON (`--disable-web-search` mới tắt).
+- **Batch 14 đang chạy (bg `betg93t0n`)** — 14 tựa: 历世真仙通鉴续编·终南山碑记·太上老君戒经·初真戒·三洞奉道科戒营始·太上助国救民总真秘卷·清微元降大法·法海遗珠·道德真经指归·老子铭·早晚功课经·金莲正宗记·道德经义疏(成玄英)·南斗六司延寿经. Output: `docs/_fragments/grok-batch14.json`.
 
-## 1. TRẠNG THÁI HIỆN TẠI (snapshot)
-- **daozang = 142 kinh** đã chưng cất / ~1500 (≈**7.5%**), ~97 đã verify số hiệu DZ# (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
-- **8 batch (partial) đã ship** (commit + push origin/main + deploy live `battu` trên battu.god8.shop; bản mới `4105abfe`).
-- App tổng: **~181 entry / 8 lớp** (daozang 142 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
-- engine-library chunk ~228KB. Build ✓, selftest ✓ exit 0 mỗi batch.
-- **CHƯA hoàn thành** — full 1500 cần ~65+ batch nữa (long-haul, multi-session).
+## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 13)
+- **daozang = 173 kinh** đã chưng cất / ~1500 (≈**11.5%**), **147** đã verify số hiệu DZ# trong notes.
+- **Batch 13 đã ship**: commit + push origin/main + deploy live `battu` (version `99ced8c2`). Batch 12 `d1fe817`, batch 10 partial `43a0fdf`.
+- App tổng: **~193 entry / 8 lớp** (daozang 173 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
+- engine-library chunk ~298KB. PDF 08-đạo-tạng = 173 mục (2.48MB). Build ✓ 2.4s, selftest ✓ exit 0.
+- **CHƯA hoàn thành** — full 1500 cần ~110+ batch nữa (long-haul, multi-session).
 
-## 2. PIPELINE CHƯNG CẤT (lặp mỗi batch)
-1. **Spawn 3-4 subagent general-purpose** (Song SONG, ⚠ **no-spawn** để tránh 429 rate-limit như batch1 đầu):
-   - Prompt mẫu (cho mỗi agent, ~4 tựa/bộ): xem §3.
+## 2. PIPELINE CHƯNG CẤT (lặp mỗi batch) — **GROK CLI = CHÍNH**
+0. **Dup-check**: `node -e "..."` dump `DAOZANG.map(e=>e.name_han)` → `docs/_fragments/_done-titles.json`, grep ứng viên trước khi launch.
+1. **Launch Grok CLI 1 lượt** (web search verify nguồn, ~$1/batch, ~6-10 turns):
+   ```bash
+   cd "c:/Users/User/.gemini/antigravity/scratch/app bói toán"
+   /c/Users/User/.grok/bin/grok \
+     --cwd "c:/Users/User/.gemini/antigravity/scratch/app bói toán" \
+     --reasoning-effort medium --max-turns 30 \
+     --always-approve --permission-mode bypassPermissions \
+     --json-schema "$(cat docs/_fragments/grok-batch13-schema.json)" \
+     --prompt-file docs/_fragments/grok-batch<N>-prompt.md \
+     > docs/_fragments/grok-batch<N>.json 2> docs/_fragments/grok-batch<N>.err
+   # run_in_background: true → parse khi notification completed
+   ```
+   Schema: `docs/_fragments/grok-batch13-schema.json` (object{entries:[{dz,name_han,name_vi,bu,author,era,topic,essence,key_text,use,sources[],textual_certainty}]}). Prompt mẫu: copy `grok-batch14-prompt.md`, đổi list tựa.
+2. **Parse + dup-filter + verify**: `node -e` đọc `.structuredOutput.entries` (fallback `JSON.parse(.text).entries`), lọc `name_han && sources.length>=2`, bỏ dup với `_done-titles.json`, in dz/tên/bu/certainty → save `grok-batch<N>-clean.json`.
+3. **Append** vào `src/engine/daozang-data.js` `DAOZANG_RAW` (chèn trước `];` đóng mảng — tìm `.map(` sau `DAOZANG_RAW`, lùi tới `]` gần nhất). Dùng script node viết file (Edit tool hay fail do linter). Field: normalizer tự build `notes` từ `dz` → DZ#-count regex `/DZ ?\d+/i.test(e.notes)` hoạt động tự động. Shape raw: `{dz,name_han,name_vi,bu,author,era,topic,essence,key_text,use,sources,textual_certainty,notes}`.
+4. `node --check src/engine/daozang-data.js` + count (daozang / DZ# / daozangByBu).
+5. `node scripts/build-pdfs.mjs --topic daozang` (regen PDF 08).
+6. `npm run build` + `node selftest.mjs` (exit 0).
+7. `git add src/engine/daozang-data.js public/downloads/08-* && git commit -m "feat(daozang): batch N (Grok CLI) — +X kinh ...; daozang=N" && npm run deploy && git push origin main`.
+
+### Lệnh nhanh (verify + count)
+```bash
+cd "c:/Users/User/.gemini/antigravity/scratch/app bói toán"
+node --input-type=module -e "import('./src/engine/daozang-data.js').then(m=>console.log('daozang:',m.DAOZANG.length,'| DZ:',m.DAOZANG.filter(e=>/DZ ?\d+/i.test(e.notes||'')).length,'| by-bu:',JSON.stringify(m.daozangByBu())))"
+git log --oneline -6   # xem batch đã ship
+```
+
+### Fallback: SUBAGENT (chỉ khi Grok kẹt)
+Spawn 3-4 subagent general-purpose (Song SONG, ⚠ **no-spawn** để tránh 429): prompt mẫu §3.
 2. Mỗi agent: WebSearch + WebFetch (ctext/wikisource/kanripo/baike/shidianguji) → chưng cất essence (2-4 câu VIỆT) + 1 câu HÁN verbatim + DZ# (verify Schipper/CRTA) + ≥2 nguồn + textual_certainty → return JSON `{entries:[...]}`.
 3. **Assemble**: append entries vào `src/engine/daozang-data.js` `DAOZANG_RAW` (giữ shape {dz,name_han,name_vi,bu,author,era,topic,essence,key_text,use,sources,textual_certainty,notes}); **BỎ DUP** với đã có (xem §4 dup-skip).
 4. `node --check src/engine/daozang-data.js` + runtime count.
@@ -53,7 +78,9 @@ RULES: ≥2 reachable sources. No fabrication (note if not in正统道藏 / titl
 ## 4. DUP-SKIP LIST (ĐÃ CÓ — không add lại)
 太清导引养生经(DZ818) · 抱朴子内篇(cultivation-data DAN_BAOPUZI) · 太上三五正一盟威籙(DZ1208) · 三官经(DZ1442) · 参同契/悟真篇/抱朴子/云笈七签/清静经/内观经(cultivation-data) · (mỗi lần agent trả, grep name_han trong daozang-data.js + library-data trước khi add).
 
-## 5. ĐÃ CHƯNG CẤT — 98 KINH THEO BỘ (xem `daozang-data.js` cho raw; tóm tắt)
+## 5. ĐÃ CHƯNG CẤT — 173 KINH (snapshot §1); phân bổ theo bộ xem live:
+`node --input-type=module -e "import('./src/engine/daozang-data.js').then(m=>console.log(JSON.stringify(m.daozangByBu(),null,1)))"`
+(vd batch13: 洞真40·洞神41·洞玄19·太玄16·正一16·太平13·太清7 + sổ nhỏ). Danh sách tựa đầy đủ: `DAOZANG.map(e=>e.name_han)`. Tóm tắt cổ (batch ≤9, ~142):
 - **太玄 (12)**: 道德经·南华经(庄子)·冲虚经(列子)·通玄经(文子)·淮南子·真诰DZ1016·西升经DZ666·金丹四百字DZ1081·还源篇DZ1091·还丹复命篇·翠虚篇DZ1090·晋真人语录DZ1056.
 - **洞玄 (13)**: 度人经DZ0001·九天生神DZ0318·玉京山步虚DZ1439·登真隐诀DZ421·黄庭内景DZ331·灵宝济度金书DZ466·五岳真形图DZ441·智慧罪根大戒DZ457·升玄经DZ1122·定观经DZ400·洞渊神咒经DZ335·灵剑子DZ570·服饵丹石行药法DZ420.
 - **洞真 (25)**: 心印经DZ13·阴符经DZ31·入药镜DZ135·胎息经DZ130·钟吕传道集DZ263·玉枢经DZ16·清微仙谱DZ171·历世真仙通鉴DZ296·青华秘文DZ240·诸天灵书度命DZ23·度人经四注DZ87·五老赤书DZ22·三天易髓DZ250·大通经DZ105·功过格DZ186·玉皇经DZ10·虚皇经DZ18·玄都妙本DZ35·续仙传DZ295·疑仙传DZ299·海空经DZ9·三洞神咒DZ78·修真十书DZ263·灵宝度人大法·大洞真经.
