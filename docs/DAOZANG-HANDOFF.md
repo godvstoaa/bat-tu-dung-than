@@ -3,12 +3,9 @@
 > Mục tiêu `/goal`: chưng cất TOÀN BỘ ~1500 kinh 道藏 → tinh túy → encode vào app. Đọc file này đầu mỗi session để resume.
 
 ## 0. IN-FLIGHT (thu kết quả đầu tiên ở context kế!)
-Batch 9 ĐÃ LAUNCH (4 agent chạy nền, kết quả persist ra .output). Context kế: TaskOutput(id,block=true) hoặc đọc notification -> assemble vào daozang-data.js theo §2 (bỏ dup §4) -> build/deploy.
+Batch 9: 3/4 agent xong (洞玄+道医+全真), ship 138 kinh. CÒN 1 agent:
 - `a5682a6af7808b5c0` — 老学注宋元 (苏辙DZ691·吕惠卿·王安石·吴澄)
-- `a557fa7e81a739395` — 洞玄灵宝深度 (诸天内音·三元品戒·灭度五炼生尸·度人经别注)
-- `a193c143298a0bb1c` — 全真仙传 (金莲正宗记·太古集·水云集·渐悟集)
-- `a89d079124a16b533` — 道医/太清/方术 (太清中黄真经·五厨经·皇极经世·遁甲玄枢)
-Output dir: `C:UsersUserAppDataLocalTempclaudec--Users-User--gemini-antigravity-scratch-app-b-i-to-nd951f5a5-2fd2-43ad-a6d2-c134a51bc428	asks<id>.output` (⚠ .output = JSONL transcript KHÔNG đọc bằng Read/shell; dùng TaskOutput(id,block=true) hoặc đợi notification).
+Thu xong → assemble → build/deploy batch 9 complete.
 
 ## 1. TRẠNG THÁI HIỆN TẠI (snapshot)
 - **daozang = 128 kinh** đã chưng cất / ~1500 (≈**7.5%**), ~97 đã verify số hiệu DZ# (Schipper-Verellen / CRTA / Komjathy / Pregadio concordance).
