@@ -3584,6 +3584,27 @@ const DAOZANG_RAW = [
     key_text: '真铅真汞，非指五金八石……而是采取太阴之精，诱会太阳之炁', use: 'Đọc cặp với Tham Đồng Khế; học pháp tượng long hổ / chu thiên hỏa hầu.',
     sources: ['https://zh.daoinfo.org/index.php?title=%E5%8F%A4%E6%96%87%E9%BE%8D%E8%99%8E%E7%B6%93%E8%A8%BB%E7%96%8F', 'https://zh.wikisource.org/zh-hans/%E5%8F%A4%E6%96%87%E9%BE%8D%E8%99%8E%E7%B6%93%E8%A8%BB%E7%96%8F', 'https://www.shidianguji.com/book/DZ0996'],
     textual_certainty: 'high', notes: 'batch50 · Grok-4.5 focused 内丹经典注疏' },
+
+  { dz: 'DZ578', name_han: '攝生纂錄', name_vi: 'Nhiếp Sinh Toản Lục', bu: '洞玄', author: '王仲丘', era: 'Đường', topic: '养生',
+    essence: 'Vương Trọng Khâu biên soạn, thu thập các phép nhiếp sinh về ẩm thực, tứ thời, đạo dẫn và phòng bị tật bệnh. Nội dung mang tính thực dụng, nhấn mạnh điều chỉnh sinh hoạt hằng ngày để giữ tinh khí thần. Thuộc nhóm sách dưỡng sinh thực tiễn trong Đạo tạng.',
+    key_text: 'null', use: 'Tham khảo khung nhiếp sinh đời Đường về ăn uống, tứ thời và đạo dẫn.',
+    sources: ['https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf', 'https://crta.info/wiki/Daozang_-_DZ', 'https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F'],
+    textual_certainty: 'high', notes: 'batch51 · Grok-4.5 focused 道医方书' },
+  { dz: 'DZ842', name_han: '抱朴子養生論', name_vi: 'Bão Phác Tử Dưỡng Sinh Luận', bu: '洞神', author: '葛洪', era: 'Tấn', topic: '养生',
+    essence: 'Cát Hồng ví thân người như một nước: thần là vua, huyết là thần, khí là dân; trị thân như trị quốc. Luận về giữ thần, điều khí, tiết dục và phòng bị tổn hại để trường sinh. Văn bản ngắn nhưng khái quát triết lý dưỡng sinh Đạo giáo.',
+    key_text: '抱朴子曰：一人之身，一國之象也。', use: 'Đọc nền tảng triết lý dưỡng sinh Cát Hồng, so sánh thân–quốc.',
+    sources: ['https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf', 'https://zh.wikisource.org/zh-hant/%E6%8A%B1%E6%9C%B4%E5%AD%90%E9%A4%8A%E7%94%9F%E8%AB%96', 'https://ctext.org/library.pl?if=gb&res=84520'],
+    textual_certainty: 'high', notes: 'batch51 · Grok-4.5 focused 道医方书' },
+  { dz: 'DZ853', name_han: '養生辯疑訣', name_vi: 'Dưỡng Sinh Biện Nghi Quyết', bu: '洞神', author: '施肩吾', era: 'Đường', topic: '养生',
+    essence: 'Thi Kiên Ngô biện chính các nghi vấn về dưỡng sinh và nội luyện, phân biệt chân pháp với vọng truyền. Nhấn mạnh tinh khí thần và điều độ sinh hoạt hơn là cầu kỳ. Văn quyết ngắn, mang tính phản biện và chỉ đạo thực tu.',
+    key_text: 'null', use: 'Đọc để phân biệt chân–ngụy trong dưỡng sinh và tránh lệch pháp.',
+    sources: ['https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf', 'https://crta.info/wiki/Daozang_-_DZ', 'https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F'],
+    textual_certainty: 'high', notes: 'batch51 · Grok-4.5 focused 道医方书' },
+  { dz: 'DZ1427', name_han: '太清道林攝生論', name_vi: 'Thái Thanh Đạo Lâm Nhiếp Sinh Luận', bu: '正一', author: '不詳（或題支遁/道林）', era: 'Ngụy–Tấn trở đi', topic: '养生',
+    essence: 'Luận nhiếp sinh toàn diện: ăn uống, ngủ nghỉ, đạo dẫn, phòng phòng sự và tứ thời. Nhấn mạnh “biết dưỡng tính” quan trọng hơn chỉ phục dược. Nhiều đoạn gần với chương dưỡng tính trong Thiên Kim, phản ánh giao thoa đạo–y.',
+    key_text: '真人曰：雖常餌藥而不知養性之術，亦難以長生也。', use: 'Học nguyên tắc nhiếp sinh: không chỉ phục dược mà phải dưỡng tính.',
+    sources: ['https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf', 'https://dollyyang.com/taiqing-daolin-shesheng-lun-%E5%A4%AA%E6%B8%85%E9%81%93%E6%9E%97%E6%94%9D%E7%94%9F%E8%AB%96-discussion-of-conserving-health-according-to-daolin-dz-1427/', 'https://zh.daoinfo.org/index.php?title=%E5%A4%AA%E6%B8%85%E9%81%93%E6%9E%97%E6%94%9D%E7%94%9F%E8%AB%96'],
+    textual_certainty: 'high', notes: 'batch51 · Grok-4.5 focused 道医方书' },
 ];
 
 // id base = full Hán of name_han (unique per entry, since dup-filter enforces unique
