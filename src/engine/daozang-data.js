@@ -3430,6 +3430,12 @@ const DAOZANG_RAW = [
     key_text: 'null', use: 'Nội đan hội chân; nghiên cứu đan đạo Kim–Nguyên',
     sources: ['https://simple.taolibrary.com/category95.aspx', 'http://www.chinaknowledge.de/Literature/Daoists/daozang.html', 'https://www.jstor.org/stable/26768560'],
     textual_certainty: 'partial', notes: 'batch46 · Grok-4.5 catalog-driven' },
+
+  { dz: 'DZ1471', name_han: '儒门崇理折衷堪舆完孝录', name_vi: 'Nho Môn Sùng Lý Chiết Trung Kham Dư Hoàn Hiếu Lục', bu: '续道藏', author: '佚名', era: '明', topic: '方术',
+    essence: 'Sách kham dư (phong thủy) mang khẩu vị Nho giáo, “sùng lý chiết trung”, gắn chọn đất mộ với hiếu đạo “hoàn hiếu”. Tám quyển, tiêu biểu cho sự hòa trộn Nho–Đạo trong thuật số dân gian Minh. Dùng chọn huyệt, an táng, bàn lý khí hình thế.',
+    key_text: 'null', use: 'Chọn đất mộ, phong thủy hiếu đạo, tham khảo thuật kham dư',
+    sources: ['https://zh.wikisource.org/zh-hans/%E8%90%AC%E6%9B%86%E7%BA%8C%E9%81%93%E8%97%8F', 'https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf', 'http://www.ctcwri.idv.tw/CTCW-CMTS/CMT08%E7%BA%8C%E9%81%93%E8%97%8F/CH08-C.htm'],
+    textual_certainty: 'high', notes: 'batch47b · Grok-4.5 (1 new after DZ#-dedup; 续道藏 range已覆盖)' },
 ];
 
 // id base = full Hán of name_han (unique per entry, since dup-filter enforces unique
