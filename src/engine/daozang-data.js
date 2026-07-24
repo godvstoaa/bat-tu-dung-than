@@ -4832,6 +4832,22 @@ const DAOZANG_RAW = [
     key_text: 'null', use: 'Tra cứu dị văn–chú sớ cổ khi làm nghiên cứu văn bản *Trang Tử*.',
     sources: ['https://zh.wikisource.org/wiki/%E8%8E%8A%E5%AD%90%E9%9B%86%E9%87%8B', 'https://ctext.org/wiki.pl?if=gb&res=795476'],
     textual_certainty: 'high', notes: 'batch75 · Grok-4.5 老庄藏外注疏' },
+
+  { dz: '藏外', name_han: '摄生消息论', name_vi: 'Nhiếp Sinh Tiêu Tức Luận', bu: '太清', author: '丘处机（题）', era: '金元（题名）/流传明清', topic: '道医',
+    essence: 'Dưỡng sinh tứ thời theo Xuân–Hạ–Thu–Đông, kết hợp tạng phủ–ngũ hành và ẩm thực khởi cư. Ngắn gọn, thực dụng, mang dấu ấn y đạo Toàn Chân. Lưu truyền rộng ngoài tàng, thường gán cho Khâu Xử Cơ.',
+    key_text: 'null', use: 'Dưỡng sinh tứ thời, phòng bệnh theo mùa; đối chiếu Nội kinh–Thiên kim; giáo dục y đạo dân gian.',
+    sources: ['https://baike.baidu.com/item/%E6%91%84%E7%94%9F%E6%B6%88%E6%81%AF%E8%AE%BA/3101847', 'http://www.taoist.org.cn/showInfoContent.do?id=1416&p=%27p%27', 'https://cmpaca.org/Html/?4999.html'],
+    textual_certainty: 'partial', notes: 'batch76 · Grok-4.5 辑要/全真/道医 剩余' },
+  { dz: '藏外', name_han: '千金翼方', name_vi: 'Thiên Kim Dực Phương', bu: '太清', author: '孙思邈', era: '唐（约682）', topic: '道医',
+    essence: 'Tiếp Bị cấp thiên kim yếu phương, 30 quyển, bổ dược liệu–thương hàn–trúng phong–sang ung. \'Dực\' nghĩa cánh hổ, tóm kết kinh nghiệm cuối đời Tôn Tư Mạc. Y–đạo giao thoa, có thực trị, dưỡng tính, châm cứu.',
+    key_text: 'null', use: 'Lâm sàng cổ phương, dược liệu; đối chiếu Thiên kim yếu phương; nghiên cứu y đạo Đường.',
+    sources: ['https://zh.wikipedia.org/zh-hans/%E5%8D%83%E9%87%91%E7%BF%BC%E6%96%B9', 'https://ctext.org/wiki.pl?if=gb&res=358699', 'https://baike.baidu.com/item/%E5%8D%83%E9%87%91%E7%BF%BC%E6%96%B9/8454861'],
+    textual_certainty: 'high', notes: 'batch76 · Grok-4.5 辑要/全真/道医 剩余' },
+  { dz: '藏外', name_han: '修龄要旨', name_vi: 'Tu Linh Yếu Chỉ', bu: '太清', author: '冷谦', era: '元末明初', topic: '道医',
+    essence: 'Sách dưỡng sinh–khí công của Lãnh Khiêm (Long Dương tử): tứ thời, khởi cư, lục tự quyết, thập lục đoạn cẩm, bát đoạn cẩm, đạo dẫn ca. Ngắn gọn, thực hành, đại diện dưỡng sinh đạo gia Minh sơ ngoài tàng.',
+    key_text: 'null', use: 'Khí công–đạo dẫn thực hành; lục tự–bát đoạn cẩm; đối chiếu Tuân sinh bát tiên.',
+    sources: ['https://zh.wikisource.org/zh-hans/%E4%BF%AE%E9%BD%A1%E8%A6%81%E6%97%A8', 'https://ctext.org/wiki.pl?if=gb&res=301647', 'https://baike.baidu.com/item/%E4%BF%AE%E9%BE%84%E8%A6%81%E6%97%A8/6546112'],
+    textual_certainty: 'high', notes: 'batch76 · Grok-4.5 辑要/全真/道医 剩余' },
 ];
 
 // id base = full Hán of name_han (unique per entry, since dup-filter enforces unique
