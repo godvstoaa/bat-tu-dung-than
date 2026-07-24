@@ -509,7 +509,7 @@ const DAOZANG_RAW = [
     essence: 'ĐẠI TỔNG TẬP nội đan 60 quyển chia 10 thư, thu >60 loại thư tịch Tùy-Đường→Tống-Nguyên. Nòng cốt nam tông (Bạch Ngọc Thàm hệ: 张伯端/钟吕/白玉蟾) — «thượng phẩm đan pháp vô quái hào, chân hỏa bản vô hậu». NGUỒN TIÊN LƯỢNG nội đan nam tông/dưỡng sinh/khí công. (⚠ DZ263 = 修真十书; DZ1017 thực là 道枢 — net nhầm).',
     key_text: null, use: 'nguồn tiên lượng nội đan nam tông · dưỡng sinh · khí công',
     sources: ['https://zh.daoinfo.org/wiki/修真十书 (daoinfo)', 'https://baike.baidu.com/item/修真十书/9682294 (百度百科)'],
-    textual_certainty: 'high', notes: 'DZ263 洞真部方法類 (Schipper tr.816); 60卷; 包钟吕传道集 q.39-41.' },
+    textual_certainty: 'partial', notes: 'DZ263 洞真部方法類 (Schipper tr.816); 60卷; 包钟吕传道集 q.39-41.' },
   { dz: 'DZ1056', name_han: '晋真人语录', name_vi: 'Tấn Chân Nhân Ngữ Lục', bu: '太玄', author: ' (晋真人 thuật; đệ tử 马丹阳 biên tập)', era: 'Kim (12c, toàn chân sơ kỳ)', topic: 'cultivation',
     essence: 'Văn hiến ngữ lục QUAN TRỌNG BẬC NHẤT toàn chân giáo sơ kỳ. Định nghĩa KINH ĐIỂN về «TOÀN CHÂN»: «phù toàn chân giả, hợp thiên tâm chi đạo» — thần bất tẩu/khí bất tán/tinh bất lậu, tam giả câu bị, ngũ hành đô tụ → «vi chi toàn chân». Dùng Trùng Dương + Đàm Xứ Đoan huấn đồ.',
     key_text: '夫全真者，合天心之道也……神不走，气不散，精不漏，三者俱备，五行都聚，四象安和，为之全真也。', use: 'giáo nghĩa/tâm pháp/toàn chân tu trì sơ kỳ',
@@ -4602,7 +4602,7 @@ const DAOZANG_RAW = [
     essence: 'Bảy ngôn tuyệt cú của Trương Kế Tiên: từ đạo sinh thiên địa nhân đến thân tam bảo, tâm hợp thần. Phá vọng chấp, chỉ ra chân cơ lôi pháp trong thân.',
     key_text: '真心動處是雷機，神合神兮妙更奇', use: 'Đối chiếu tâm – thần – lôi pháp; phá mê chấp ngoại cầu',
     sources: ['https://zh.daoinfo.org/index.php?title=%E6%98%8E%E7%9C%9F%E7%A0%B4%E5%A6%84%E7%AB%A0%E9%A0%8C&variant=zh-hans', 'https://zh.wikisource.org/wiki/%E6%98%8E%E7%9C%9F%E7%A0%B4%E5%A6%84%E7%AB%A0%E9%A0%8C', 'https://ctext.org/wiki.pl?if=gb&res=793000', 'https://www.shidianguji.com/book/DZ0979'],
-    textual_certainty: 'high', notes: 'batch73 · Grok-4.5 focused DZ960-1000' },
+    textual_certainty: 'partial', notes: 'batch73 · Grok-4.5 focused DZ960-1000' },
   { dz: 'DZ984', name_han: '玄精碧匣靈寶聚玄經', name_vi: 'Huyền Tinh Bích Hạp Linh Bảo Tụ Huyền Kinh', bu: '太玄', author: '佚名', era: '唐–宋（太玄部）', topic: 'classic',
     essence: 'Kinh Thái Huyền bộ, lấy huyền tinh – bích hạp làm tượng tụ linh bảo. Nói về tụ huyền khí, tinh hoa đạo thể làm nền triết cho dưỡng sinh và huyền học.',
     key_text: 'null', use: 'Đọc nền Thái Huyền; tham chiếu tụ khí – huyền quan',
@@ -6560,7 +6560,7 @@ const DAOZANG_RAW = [
     essence: 'Loại thư tổng hợp Minh triều 60 quyển, đặt tên theo núi Thiên Trung gần nơi ở tác giả. Thu thập quảng bác từ cửu lưu, sấm vĩ, sách hiếm; có mục thần tiên–thích đạo, bổ sung nhiều dị văn không thấy ở loại thư Tống. Giá trị khảo dị văn và tra cứu huyền học cao.',
     key_text: '其居近天中山，故以名書。', use: 'Bổ sung trích dẫn thần tiên/đạo thích ngoài Thái Bình Ngự Lãm; tra cứu sấm vĩ và dị sự',
     sources: ['https://ctext.org/wiki.pl?if=gb&res=798023', 'https://baike.baidu.com/item/%E5%A4%A9%E4%B8%AD%E8%AE%B0/9635898', 'https://archive.org/details/06057732.cn'],
-    textual_certainty: 'high', notes: 'batch101 · Grok-4.5 类书+笔记+金石' },
+    textual_certainty: 'partial', notes: 'batch101 · Grok-4.5 类书+笔记+金石' },
   { dz: '类书', name_han: '艺文类聚·灵异部', name_vi: 'Nghệ Văn Loại Tụ · Linh Dị Bộ', bu: '类书', author: '欧阳询等奉敕纂', era: '唐·武德（成书约624）', topic: '类书',
     essence: 'Loại thư quan tu đầu Đường 100 quyển; Linh dị bộ (quyển 78–79) gồm tiên đạo, thần, quỷ, mộng, hồn phách. Thể lệ “sự cư tiền, văn liệt hậu” bảo tồn nhiều đoạn văn, phú về linh dị và tiên đạo trước Đường.',
     key_text: '靈異部上·仙道', use: 'Đối chiếu trích dẫn tiên đạo–linh dị tiền Đường; nguồn văn tuyển cho điển cố thần quái',
@@ -7839,6 +7839,16 @@ export function daozangByBu(entries = DAOZANG) {
   for (const e of entries) c[e.bu] = (c[e.bu] || 0) + 1;
   return c;
 }
+
+// ── [QUALITY] essence verify: downgrade certainty cho 9 inaccurate entries ──
+const _DOWNGRADE = ['晋真人语录', '道法心传', '玉皇本行经髓', '碧虚子亲传直指', '玄精碧匣', '艺文类聚', '高坡异纂', '李娃传', '相鹤经'];
+DAOZANG.forEach((e) => {
+  if (e.textual_certainty === 'high') {
+    for (const t of _DOWNGRADE) {
+      if (e.name_han.includes(t)) { e.textual_certainty = 'partial'; break; }
+    }
+  }
+});
 
 // ── chart-aware: lá số → gợi ý kinh 道藏 liên quan theo AM-TA indicators ──
 // Biến corpus 1500+ kinh thành «kiến thức DÙNG TRONG app»: khi lá số có
