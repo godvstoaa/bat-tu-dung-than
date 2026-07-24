@@ -31,3 +31,6 @@ _rag*.mjs
 _syn*.mjs
 _stream*.mjs
 _verify-*.mjs
+.gstack/
+public/kinh/
+public/sitemap-kinh.xml

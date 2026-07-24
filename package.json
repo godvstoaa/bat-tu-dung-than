@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node selftest.mjs",
-    "deploy": "rm -rf dist && vite build && npx wrangler deploy",
+    "deploy": "rm -rf dist && node scripts/build-seo-pages.mjs && vite build && npx wrangler deploy",
     "deploy:worker": "npx wrangler deploy"
   },
   "dependencies": {
