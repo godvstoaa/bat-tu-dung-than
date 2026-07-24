@@ -1108,7 +1108,7 @@ const DAOZANG_RAW = [
     essence: 'Kinh thuộc dòng Lão Quân thuyết pháp, nói về Thất Nguyên chân nhân và “kim hiên ngọc tự” — chữ ngọc huyền cơ dùng tu chân. Nội dung kết hợp tín ngưỡng tinh quân/thất nguyên với giáo huấn tu đạo, hộ mệnh. Ít phổ biến hơn Bắc Đẩu kinh, nhưng nằm trong nhóm kinh Thái Huyền/Lão học dân gian.',
     key_text: '七元真宰，金轩玉字。', use: 'Tụng cầu hộ mệnh, tu chân theo hệ Lão Quân/thất nguyên.',
     sources: ['https://zh.wikisource.org/', 'https://ctext.org/', 'https://baike.baidu.com/'],
-    textual_certainty: 'low', notes: 'batch17 · Grok-4.5 web-search' },
+    textual_certainty: 'low', notes: 'Q3-verify: title/key_text 未见于正统道藏目录, questionable — cần verify thêm' },
   { dz: null, name_han: '灵宝自然经诀', name_vi: 'Linh Bảo Tự Nhiên Kinh Quyết', bu: '洞玄', author: '佚名（灵宝派）', era: '南北朝–唐', topic: 'ritual',
     essence: 'Kinh quyết Linh Bảo trình bày “tự nhiên” đạo thể và các quyết yếu khoa nghi Linh Bảo: tụng kinh, lập đàn, thỉnh thần, sám hối. Bản văn mang tính cẩm nang nghi thức hơn là triết luận dài, phục vụ hành trì Động Huyền. Dùng làm nền cho khoa nghi Linh Bảo và hiểu về tự nhiên chi đạo trong hành pháp.',
     key_text: '自然之教，灵宝为先。', use: 'Khoa nghi Linh Bảo, tụng kinh lập đàn, quyết hành trì.',
@@ -7810,6 +7810,24 @@ export const DAOZANG = DAOZANG_RAW
     topic: e.topic || '',
     notes: (e.dz ? `道藏 ${e.dz}` : '道藏 kinh') + (e.notes ? ' · ' + e.notes : ''),
   }));
+
+// ── [QUALITY] DZ# correction map (verified Schipper/Komjathy/Pregadio) ──
+// Applied post-normalization to fix DZ# mis-assignments found by verifier pass.
+const _DZ_FIX = {
+  '道典论': 'DZ1130', '太上九真明科': 'DZ1409', '云光集': 'DZ1152',
+  '太上老君说百病崇百药经': null, '太上说东斗护命妙经': 'DZ625',
+  '太上说西斗记名护身妙经': 'DZ626', '磻溪集（长春子磻溪集）': 'DZ1159',
+  '太上紫微玄都雷霆玉经': 'DZ15', '洞玄灵宝定观经注': 'DZ401',
+  '谷神篇': 'DZ252', '三洞众戒文': 'DZ178',
+  '仙乐集': 'DZ1151', '黃庭內景玉經注': 'DZ402',
+};
+DAOZANG.forEach((e) => {
+  const key = e.name_han.replace(/[（(].*$/, '');
+  if (key in _DZ_FIX) {
+    const fix = _DZ_FIX[key];
+    e.notes = (fix ? `道藏 ${fix}` : '道藏 kinh (DZ contested)') + (e.notes ? ' · ' + e.notes.split(' · ').slice(1).join(' · ') : '');
+  }
+});
 
 export function daozangByBu(entries = DAOZANG) {
   const c = {};
