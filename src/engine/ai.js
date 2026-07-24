@@ -638,7 +638,13 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "三命通会 ĐẠI VẬN (top 5): " + (SANMING_DAYUN_RULES || []).slice(0, 5).join(" | ") + "\n" +
       "NGŨ HÀNH LUẬN BỆNH: " + (weakestWx ? weakestWx[0] + " (" + weakestWx[1] + "%)" : "?") + (healthInfo ? " > " + healthInfo.organs + " | " + healthInfo.symptoms + " | " + healthInfo.diet + " | " + healthInfo.emotion + " | " + healthInfo.remedy : "") + "\n" +
       "SỰ NGHIỆP: " + (topGods[0] ? topGods[0].godVi : "?") + " > " + careerHint + "\n" +
-      "ĐA TRƯỜNG PHÁI: " + Object.entries(DIVINATION_SCHOOLS).map(([k,v]) => k + ": " + v).join(" | ");
+      "ĐA TRƯỜNG PHÁI: " + Object.entries(DIVINATION_SCHOOLS).map(([k,v]) => k + ": " + v).join(" | ") + "\n" +
+      "LIFESTYLE INDEX (khi user hỏi — gọi tool hoặc dùng data này):\n" +
+      "  → ẨM THỰC: thực phẩm " + (yong?.god || '?') + " hành tốt, " + (yong?.ji || '?') + " hành kỵ (tool health_profile)\n" +
+      "  → THỂ THAO: bài tập " + (yong?.god || '?') + " hành (bơi/thủy, chạy/hỏa, yoga/mộc, tạ/kim, đi bộ/thổ — theo Dụng)\n" +
+      "  → TINH DẦU/ĐÁ QUÝ: " + (yong?.god || '?') + " hành (dầu/đá cùng hành Dụng Thần → bổ trợ năng lượng)\n" +
+      "  → ĐẶT TÊN: chữ Hán có hành " + (yong?.god || '?') + " + tránh hành " + (yong?.ji || '?') + " (tool analyze_name)\n" +
+      "  → PHONG THỦY: hướng " + ({'木':'Đông','火':'Nam','土':'Trung','金':'Tây','水':'Bắc'}[yong?.god] || '?') + " tốt, hướng kỵ theo " + (yong?.ji || '?') + " (tool fengshui_direction)";
   } catch (e) { brief += "\n--- KIẾN THỨC CỔ PHÁP: [lỗi load] ---"; }
 
   // ---- [round 2 crawl] HÔN NHÂN + TÀI VẬN + QUÝ NHÂN ----
