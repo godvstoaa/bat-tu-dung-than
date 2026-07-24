@@ -403,6 +403,7 @@ export async function handleAdminRoute(request, env, url) {
       if (env.ADMIN_KV) {
         await env.ADMIN_KV.delete('events:log');
         await env.ADMIN_KV.delete('cache:stats');
+        await env.ADMIN_KV.delete('cache:vdata');
         await env.ADMIN_KV.delete('free:log');
         for (const k of ['cnt:visit','cnt:chart','cnt:ai_question','cnt:ai_chat','cnt:error','cnt:all','cnt:free_calls','cnt:free_ok','cnt:free_err']) await env.ADMIN_KV.delete(k);
         // [loop 1352] cleanup dayagg + legacy daily:type keys (list + batch delete)
@@ -444,6 +445,7 @@ export async function handleAdminRoute(request, env, url) {
       if (!note && !tags.length) await env.ADMIN_KV.delete('vnote:' + ip);
       else await env.ADMIN_KV.put('vnote:' + ip, JSON.stringify({ note: note, tags: tags, ts: Date.now() }));
       await env.ADMIN_KV.delete('cache:stats'); // note mới phải phản ánh ngay (bypass cache 60s)
+      await env.ADMIN_KV.delete('cache:vdata'); // [PERF] rebuild vdata cache để note/tag mới hiện ngay
       await auditLog(env, request, 'visitor_note', { ip: ip, hasNote: !!note, tagCount: tags.length });
       return json({ ok: true });
     }
@@ -498,17 +500,27 @@ async function adminStats(env, url) {
   });
   // [visitor-finder] load notes (vnote:<ip>) + durable profiles (vprof:<chartkey>) + tag cloud;
   //   đính kèm note/tags/name/returning vào mỗi byIp entry (cho filter/search client-side).
-  let notesMap = {}, profiles = [];
+  let notesMap = {}, profiles = [], tagCloud = [];
   if (env.ADMIN_KV) {
-    const [nl, pl] = await Promise.all([ env.ADMIN_KV.list({ prefix: 'vnote:', limit: 1000 }), env.ADMIN_KV.list({ prefix: 'vprof:', limit: 1000 }) ]);
-    const nRaw = await Promise.all(nl.keys.map((k) => env.ADMIN_KV.get(k.name)));
-    nl.keys.forEach((k, i) => { try { notesMap[k.name.slice(6)] = JSON.parse(nRaw[i] || '{}'); } catch (e) {} });
-    const pRaw = await Promise.all(pl.keys.map((k) => env.ADMIN_KV.get(k.name)));
-    pl.keys.forEach((k, i) => { try { const p = JSON.parse(pRaw[i] || '{}'); if (p && p.name) profiles.push(p); } catch (e) {} });
+    // [PERF] cache 30s (cache:vdata) — dashboard poll stats mỗi 3s nocache=1; nếu list+get tất cả
+    //   notes/profiles mỗi lần → chậm (hồi quy tốc độ). notes đổi hiếm → cache an toàn. Note save
+    //   busts cache:vdata; chart+name upsert vprof: → hiện trong ≤30s (cache miss rebuild).
+    let vdata = null;
+    try { const _c = await env.ADMIN_KV.get('cache:vdata'); if (_c) vdata = JSON.parse(_c); } catch (e) {}
+    if (!vdata) {
+      const [nl, pl] = await Promise.all([ env.ADMIN_KV.list({ prefix: 'vnote:', limit: 1000 }), env.ADMIN_KV.list({ prefix: 'vprof:', limit: 1000 }) ]);
+      const nRaw = await Promise.all(nl.keys.map((k) => env.ADMIN_KV.get(k.name)));
+      nl.keys.forEach((k, i) => { try { notesMap[k.name.slice(6)] = JSON.parse(nRaw[i] || '{}'); } catch (e) {} });
+      const pRaw = await Promise.all(pl.keys.map((k) => env.ADMIN_KV.get(k.name)));
+      pl.keys.forEach((k, i) => { try { const p = JSON.parse(pRaw[i] || '{}'); if (p && p.name) profiles.push(p); } catch (e) {} });
+      const _tc = {};
+      for (const nip in notesMap) (notesMap[nip].tags || []).forEach((t) => { _tc[t] = (_tc[t] || 0) + 1; });
+      tagCloud = Object.entries(_tc).map(([t, n]) => ({ tag: t, count: n })).sort((a, b) => b.count - a.count);
+      try { await env.ADMIN_KV.put('cache:vdata', JSON.stringify({ notesMap: notesMap, profiles: profiles, tagCloud: tagCloud }), { expirationTtl: 30 }); } catch (e) {}
+    } else {
+      notesMap = vdata.notesMap || {}; profiles = vdata.profiles || []; tagCloud = vdata.tagCloud || [];
+    }
   }
-  const _tagCount = {};
-  for (const nip in notesMap) (notesMap[nip].tags || []).forEach((t) => { _tagCount[t] = (_tagCount[t] || 0) + 1; });
-  const tagCloud = Object.entries(_tagCount).map(([t, n]) => ({ tag: t, count: n })).sort((a, b) => b.count - a.count);
   byIpArr.forEach((v) => {
     const n = notesMap[v.ip] || {};
     v.note = n.note || ''; v.tags = n.tags || []; v.noteTs = n.ts || 0;
