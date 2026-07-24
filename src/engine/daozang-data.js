@@ -7885,3 +7885,39 @@ export function suggestDaozangByAmTa(amta, limit = 10) {
   return scored.slice(0, limit).map((s) => ({ id: s.e.id, name_han: s.e.name_han, name_vi: s.e.name_vi, notes: s.e.notes, hits: s.hits }));
 }
 
+// ── AI integration: user question (VN) → daozang kinh liên quan ──
+// Maps Vietnamese question keywords → Hán keywords → surface relevant entries
+const _Q2HAN = [
+  [/trừ\s*tà|đuổi\s*tà|âm\s*tà|quỷ|vong|tà\s*mã|bán\s*giá|pháp\s*sư/i, ['驱邪','伏魔','北帝','女青','鬼律','治瘟','辞瘟','豁落','火雷','神虎','金光','杀鬼','咒鬼','考召']],
+  [/cầu\s*an|bình\s*an|giải\s* hạn|chống\s*|xông\s*đất|cầu\s*thọ/i, ['护命','消灾','解厄','延寿','益算','禳灾','镇宅','安宅','北斗','延生','保命']],
+  [/phong\s*thủy|đất|đại|hướng|nhà|mộ|part\s* grave|tang/i, ['堪舆','宅经','撼龙','雪心','葬','青囊','天玉','地理','阳宅','玄空','风水']],
+  [/tu\s*luyện|tu\s*tiên|nội\s*đan|công\s*pháp|thiền|khí\s*công|đạo\s*đức|vô\s*vi/i, ['内丹','修真','悟真','参同','黄庭','道德','坐忘','化书','仙学','金丹','胎息','导引','养性']],
+  [/kinh|cầu\s*kinh|tụng|niệm|sám|hồi|độ/i, ['经','妙经','真经','宝经','宝忏','救度','拔罪','度厄']],
+  [/bói|toán|số\s*mệnh|tử\s*bình|giải\s*mệnh|xem\s*chữ|bát\s*tự/i, ['命理','子平','斗数','六壬','奇门','太乙','滴天','穷通','渊海','三命']],
+  [/chú|phù|bùa|thần\s*chú|linh\s*phiển|niệm\s*chú/i, ['符','咒','神咒','金光','八大','洞渊','北帝']],
+  [/tài|lộc|phát|giàu|kinh\s*doanh/i, ['财神','财','禄','富','宝']],
+  [/duyên|tình|yêu|hôn|phối/i, ['和合','姻缘','桃花','月老']],
+  [/siêu\s*độ|cầu\s*siêu|cúng|giỗ|thấp|độ\s*vong/i, ['超度','拔罪','施食','幽科','度厄','水陆','焰口','盂兰']],
+  [/bệnh|đau|yếu|thuốc|chữa|y\s*học|dược/i, ['医','方','本草','伤寒','温病','针灸','养生','药']],
+  [/chuyển\s*vận|thay\s*đổi\s*vận|cải\s*mệnh|tích\s*đức/i, ['功过格','阴骘','感应','功','德','善','福田','因果']],
+];
+
+export function suggestDaozangByQuestion(question, limit = 8) {
+  if (!question) return [];
+  const kws = new Set();
+  for (const [re, words] of _Q2HAN) if (re.test(question)) words.forEach((w) => kws.add(w));
+  if (!kws.size) return [];
+  const scored = [];
+  for (const e of DAOZANG) {
+    const text = (e.name_han || '') + (e.topic || '') + (e.meaning || '');
+    let hits = 0;
+    for (const w of kws) if (text.includes(w)) hits++;
+    if (hits) scored.push({ e, hits });
+  }
+  scored.sort((a, b) => b.hits - a.hits);
+  return scored.slice(0, limit).map((s) => ({
+    id: s.e.id, name_han: s.e.name_han, name_vi: s.e.name_vi,
+    notes: s.e.notes, essence: (s.e.meaning || '').slice(0, 150), hits: s.hits,
+  }));
+}
+
