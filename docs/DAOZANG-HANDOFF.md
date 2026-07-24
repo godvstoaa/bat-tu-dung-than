@@ -6,8 +6,8 @@
 - **Pipeline chính = GROK CLI** (WebSearch quota đã hết; subagent chỉ khi Grok kẹt). Web search mặc định ON (`--disable-web-search` mới tắt).
 - **Batch 14 đang chạy (bg `betg93t0n`)** — 14 tựa: 历世真仙通鉴续编·终南山碑记·太上老君戒经·初真戒·三洞奉道科戒营始·太上助国救民总真秘卷·清微元降大法·法海遗珠·道德真经指归·老子铭·早晚功课经·金莲正宗记·道德经义疏(成玄英)·南斗六司延寿经. Output: `docs/_fragments/grok-batch14.json`.
 
-## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 88)
-- **daozang = 1111 kinh** đã chưng cất / ~1500 (≈**74.1%** — VƯỢT 1100), ~800 verify DZ#. Deploy mới nhất `500a13dd`.
+## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 90)
+- **daozang = 1143 kinh** đã chưng cất / ~1500 (≈**76.2%**), ~800 verify DZ#. Deploy mới nhất `fcca7a57`.
 - **Phạm vi mở rộng rất rộng** (vượt正统道藏 1500): + 续道藏民间信仰 + 藏外/辑要 内丹各派(伍柳/东西/全真龙门/千峰/仙学陈撄宁/女丹) + 注疏(老庄/悟真/参同/黄庭/阴符/清净/心印/玉枢 各master) + 道医方书 + 善书 + 科仪施食幽科 + 仙传谱录 + 山志 + 神魔小说(邓志谟/西游补/后西游/西洋记) + 地方神谱(妈祖/保生/临水/广泽/清水/三山国王/华光/开漳) + 民间宗教宝卷各sect(罗教/弘阳/圆顿/闻香/黄天道/长生/八卦/先天/在理/西大乘/大成/还源) + 一贯道(王觉一) + 扶鸞(清微三品/地狱天堂游记) + 近代民间宗教(天帝教/德教/轩辕教/真佛宗/天德圣教/道德学社/万国道德会) + 仙学期刊.
 - **Chiến lược = FOCUSED SUB-CORPORA + 藏外/辑要 vein (batch 47-69)**: in-canon clusters (DZ1-1487) bão hòa → pivot sang mỏ 藏外/道藏辑要 (内丹 Minh-Thanh: 伍柳/东西派/全真龙门/千峰/仙学陈撄宁 + 女丹) giàu giá trị, ~0 dup. Batch 67+ bắt đầu bão hòa cả 藏外 (yield 5-14, cross-vein trad/simpl dups tăng).
 - **Đã tách chunk** (batch 64): `engine-daozang` (~891KB/261KB-gzip lazy) riêng khỏi `engine-library` (~116KB). Bỏ ETHICS re-export dừ → gãy circular.
