@@ -6,8 +6,9 @@
 - **Pipeline chính = GROK CLI** (WebSearch quota đã hết; subagent chỉ khi Grok kẹt). Web search mặc định ON (`--disable-web-search` mới tắt).
 - **Batch 14 đang chạy (bg `betg93t0n`)** — 14 tựa: 历世真仙通鉴续编·终南山碑记·太上老君戒经·初真戒·三洞奉道科戒营始·太上助国救民总真秘卷·清微元降大法·法海遗珠·道德真经指归·老子铭·早晚功课经·金莲正宗记·道德经义疏(成玄英)·南斗六司延寿经. Output: `docs/_fragments/grok-batch14.json`.
 
-## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 105)
-- **daozang = 1344 kinh** đã chưng cất / ~1500 (≈**89.6%**), ~800 verify DZ#. Deploy mới nhất `a7ada570`.
+## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 119)
+- **daozang = 1511 kinh** đã chưng cất — **🎯 VƯỢT MỐC 1500** (~1500 正统道藏 target). ~830 verify DZ#. Deploy mới nhất `579664ec`.
+- **Corpus đồ sộ toàn diện 中华玄学** (vượt正统道藏): 道教全谱系(正统道藏+续道藏+藏外内丹各派+注疏+科仪+仙传+山志+老君传+金石) + 方术全(堪舆/相术/命理/择日/三式/紫微/易学/占星/历法/兵农占/梦占/六爻/五行) + 中医全(经典+金元四大家+温病+本草+针灸+道医方) + 民间宗教全(宝卷各sect+一贯道+扶鸞+近代) + 台湾/华南regional + 笔记神魔小说全(志怪60+/唐宋传奇/话本/明清小说) + 类书 + 佛道交融 + 史志 + 少数民族宗教(瑶/壮/苗/彝/纳西东巴) + 现代道教研究 + 道教音乐美术政策 + 子书注疏.
 - **Corpus cực toàn diện** (vượt正统道藏 1500): 道教全谱系(正统道藏+续道藏+藏外内丹各派+注疏+科仪+仙传+山志) + 方术全(堪舆/相术/命理/择日/三式/紫微/易学/占星/历法/兵农占/梦占) + 中医/道医方书 + 民间宗教宝卷各sect + 一贯道 + 扶鸞 + 近代 + 台湾/华南regional + 笔记神魔小说 + 类书 + 金石 + 佛道交融 + 史志 + 少数民族宗教(瑶/壮/苗/彝/纳西东巴) + 现代道教研究 + 道教音乐美术政策 + 志怪笔记.
 - **Phạm vi mở rộng rất rộng** (vượt正统道藏 1500): + 续道藏民间信仰 + 藏外/辑要 内丹各派(伍柳/东西/全真龙门/千峰/仙学陈撄宁/女丹) + 注疏(老庄/悟真/参同/黄庭/阴符/清净/心印/玉枢 各master) + 道医方书 + 善书 + 科仪施食幽科 + 仙传谱录 + 山志 + 神魔小说(邓志谟/西游补/后西游/西洋记) + 地方神谱(妈祖/保生/临水/广泽/清水/三山国王/华光/开漳) + 民间宗教宝卷各sect(罗教/弘阳/圆顿/闻香/黄天道/长生/八卦/先天/在理/西大乘/大成/还源) + 一贯道(王觉一) + 扶鸞(清微三品/地狱天堂游记) + 近代民间宗教(天帝教/德教/轩辕教/真佛宗/天德圣教/道德学社/万国道德会) + 仙学期刊.
 - **Chiến lược = FOCUSED SUB-CORPORA + 藏外/辑要 vein (batch 47-69)**: in-canon clusters (DZ1-1487) bão hòa → pivot sang mỏ 藏外/道藏辑要 (内丹 Minh-Thanh: 伍柳/东西派/全真龙门/千峰/仙学陈撄宁 + 女丹) giàu giá trị, ~0 dup. Batch 67+ bắt đầu bão hòa cả 藏外 (yield 5-14, cross-vein trad/simpl dups tăng).

@@ -7686,6 +7686,12 @@ const DAOZANG_RAW = [
     key_text: 'null', use: 'Tra nguồn gốc thuật ngữ lễ tục, khí vật, thuật số; bổ sung loại thư ngoài Thái Bình/Ngọc Hải.',
     sources: ['https://zh.wikipedia.org/wiki/%E4%BA%8B%E7%89%A9%E7%B4%80%E5%8E%9F', 'https://ctext.org/wiki.pl?if=gb&res=632723', 'https://zh.wikisource.org/zh-hans/%E4%BA%8B%E7%89%A9%E7%B4%80%E5%8E%9F_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)/%E5%85%A8%E8%A6%BD'],
     textual_certainty: 'high', notes: 'batch119 · Grok-4.5 老君传/金石/占星' },
+
+  { dz: '藏外', name_han: '黄石公素书', name_vi: 'Hoàng Thạch Công Tố Thư', bu: '太清', author: '旧题黄石公撰、宋张商英序注', era: '秦漢传说/宋定本；四库子部兵家', topic: 'philosophy',
+    essence: 'Sáu thiên luận đạo đức, nhân nghĩa, quyền biến, an nguy. Tương truyền Hoàng Thạch Công trao Trương Lương; Trương Thương Anh đời Tống định bản chú. Giao thoa đạo–binh–tâm thuật.',
+    key_text: '夫道、德、仁、义、礼，五者一体也。', use: 'Tâm thuật trị thế, đạo đức–quyền biến, tử thư binh–đạo',
+    sources: ['https://zh.wikisource.org/wiki/%E9%BB%84%E7%9F%B3%E5%85%AC%E7%B4%A0%E6%9B%B8_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)', 'https://ctext.org/library.pl?if=gb&res=111109', 'https://ctext.org/wiki.pl?if=gb&chapter=399958'],
+    textual_certainty: 'high', notes: 'batch120 · Grok-4.5 deep saturation' },
 ];
 
 // id base = full Hán of name_han (unique per entry, since dup-filter enforces unique
