@@ -23,7 +23,7 @@ import { computeWesternForecast, forecastSummary } from './western-predict.js';
 import { synthesisDimensions, synthesisTimeline } from './western-synthesis.js';
 import { SUN_IN_SIGN, MOON_IN_SIGN, ASCENDANT_MEANING, WESTERN_PLANETS, BAZI_WESTERN_MAP } from './western-kb.js';
 // [HUYỀN HỌC] Thư viện 1523 kinh — suggest theo câu hỏi user
-import { suggestDaozangByQuestion } from './daozang-data.js';
+import { suggestDaozangByQuestion, suggestDaozangChartAware } from './daozang-data.js';
 // [NEW SCHOOLS] Tarot / Numerology / Runes / IChing64 / Coffee — grok research
 import { drawTarot, tarotSummary, TAROT_MAJOR, TAROT_SUITS } from './tarot-kb.js';
 import { numerologyReading, lifePathNumber, LIFE_PATH } from './numerology.js';
@@ -1032,10 +1032,16 @@ export function buildTargetedBrief(R, userQuestion) {
   if (!keywords) {
     // overview hoặc huyenhoc → full brief + thêm thư viện huyền học nếu question match
     if (cat === 'huyenhoc' || cat === 'overview') {
-      const dzKinh = suggestDaozangByQuestion(userQuestion, 8);
-      if (dzKinh.length) {
-        let dzSection = '\n--- THƯ VIỆN HUYỀN HỌC — KINH/VĂN HIẾN LIÊN QUAN (tham chiếu, tra cứu) ---\n';
-        dzKinh.forEach((e) => { dzSection += `• ${e.name_han} (${e.name_vi || ''}): ${(e.essence || '').slice(0, 120)}\n`; });
+      const dzAware = suggestDaozangChartAware(R, userQuestion);
+      if (dzAware.kinh.length || dzAware.yongAdvice || dzAware.chartAdvice) {
+        let dzSection = '\n--- PHỐI HỢP BÁT TỰ + THƯ VIỆN HUYỀN HỌC (kinh + lời khuyên tu luyện CÁ NHÂN HÓA theo lá số) ---\n';
+        if (dzAware.yongAdvice) dzSection += dzAware.yongAdvice + '\n';
+        if (dzAware.chartAdvice) dzSection += dzAware.chartAdvice + '\n';
+        if (dzAware.amtaAdvice) dzSection += dzAware.amtaAdvice + '\n';
+        if (dzAware.kinh.length) {
+          dzSection += 'KINH/VĂN HIẾN LIÊN QUAN:\n';
+          dzAware.kinh.forEach((e) => { dzSection += `• ${e.name_han} (${e.name_vi || ''}): ${(e.essence || '').slice(0, 120)}${e.fromChart ? ' ← từ Dụng Thần' : ''}\n`; });
+        }
         return fullBrief + dzSection;
       }
     }
