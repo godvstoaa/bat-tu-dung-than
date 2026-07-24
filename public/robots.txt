@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /kinh/
+Disallow: /admin
+Disallow: /cf-ai
+Disallow: /zai
+Disallow: /groq
+
+# Legit crawlers — full access
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://battu.god8.shop/sitemap-kinh.xml
