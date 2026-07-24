@@ -6648,6 +6648,17 @@ const DAOZANG_RAW = [
     key_text: '顯慶六年，道士郭行真奉敕為高宗、武后建醮造像。', use: 'Nghiên cứu đạo giáo triều Đường và nghi tế Thái Sơn qua bi ký liên tục',
     sources: ['https://baike.baidu.com/item/%E5%8F%8C%E6%9D%9F%E7%A2%91/3715839', 'https://www.dpm.org.cn/Uploads/pdf/1510/T00093_00.pdf', 'http://www.sd-aiguo.com/hdql/index/detail?id=12730736'],
     textual_certainty: 'high', notes: 'batch101 · Grok-4.5 类书+笔记+金石' },
+
+  { dz: 'null', name_han: '仙传外科集验方（赵宜真道医方）', name_vi: 'Tiên truyền ngoại khoa tập nghiệm phương', bu: '太平', author: '杨清叟述；赵宜真集（刘渊然系传）', era: '元–明初（洪武戊午1378序）', topic: '医方',
+    essence: 'Phương thư ngoại khoa do đạo y Triệu Nghi Chân tập: ung thư, đinh độc, đắp thuốc… Hàng trăm nghiệm phương, giao điểm đạo giáo–ngoại khoa.',
+    key_text: '夫雜病有方，傷寒有法，二者兼盡其道，乃為良醫。', use: 'Đạo y, lịch sử ngoại khoa, phương dược đạo gia.',
+    sources: ['https://zh.daoinfo.org/wiki/%E4%BB%99%E5%82%B3%E5%A4%96%E7%A7%91%E9%9B%86%E9%A9%97%E6%96%B9', 'https://zh.wikisource.org/zh-hans/%E4%BB%99%E5%82%B3%E5%A4%96%E7%A7%91%E7%A7%98%E6%96%B9', 'https://baike.baidu.com/item/%E5%A4%96%E7%A7%91%E9%9B%86%E9%AA%8C%E6%96%B9/15551757'],
+    textual_certainty: 'high', notes: 'batch102 · Grok-4.5 高道专传(饱和)' },
+  { dz: '藏外', name_han: '月波洞中记（相术）', name_vi: 'Nguyệt Ba động trung ký', bu: '太玄', author: '撰人不详（托老君记于太白山月波洞；唐任逍遥得书传说）', era: '唐–宋间著录（通志·艺文略、晁公武著录）', topic: '相',
+    essence: 'Cổ thư tướng thuật “tứ đại tướng thư”: luận cốt tướng, khí sắc, đoán quý tiện thọ yểu. Khác hệ Ma Y/Thần tướng toàn biên đời sau; thuộc tầng tướng pháp lịch sử sớm.',
+    key_text: '老君記於太白山月波洞，凡九篇。', use: 'Lịch sử tướng thuật, đối chiếu với Ngọc quản chiếu thần cục.',
+    sources: ['https://zh.wikisource.org/wiki/%E6%9C%88%E6%B3%A2%E6%B4%9E%E4%B8%AD%E8%A8%98', 'https://ctext.org/wiki.pl?if=en&chapter=698605&remap=gb', 'https://zhuanlan.zhihu.com/p/651472528'],
+    textual_certainty: 'high', notes: 'batch102 · Grok-4.5 高道专传(饱和)' },
 ];
 
 // id base = full Hán of name_han (unique per entry, since dup-filter enforces unique
