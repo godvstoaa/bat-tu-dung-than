@@ -264,11 +264,11 @@ NGŨ HÀNH LUẬN BỆNH: `+(_?_[0]+" ("+_[1]+"%)":"?")+(H?" > "+H.organs+" | "+
 SỰ NGHIỆP: `+(C[0]?C[0].godVi:"?")+" > "+I+`
 ĐA TRƯỜNG PHÁI: `+Object.entries(As).map(([S,D])=>S+": "+D).join(" | ")+`
 LIFESTYLE INDEX (khi user hỏi — gọi tool hoặc dùng data này):
-  → ẨM THỰC: thực phẩm `+(yong?.god||"?")+" hành tốt, "+(yong?.ji||"?")+` hành kỵ (tool health_profile)
-  → THỂ THAO: bài tập `+(yong?.god||"?")+` hành (bơi/thủy, chạy/hỏa, yoga/mộc, tạ/kim, đi bộ/thổ — theo Dụng)
-  → TINH DẦU/ĐÁ QUÝ: `+(yong?.god||"?")+` hành (dầu/đá cùng hành Dụng Thần → bổ trợ năng lượng)
-  → ĐẶT TÊN: chữ Hán có hành `+(yong?.god||"?")+" + tránh hành "+(yong?.ji||"?")+` (tool analyze_name)
-  → PHONG THỦY: hướng `+({木:"Đông",火:"Nam",土:"Trung",金:"Tây",水:"Bắc"}[yong?.god]||"?")+" tốt, hướng kỵ theo "+(yong?.ji||"?")+" (tool fengshui_direction)"}catch{m+=`
+  → ẨM THỰC: thực phẩm `+(n.yong?.primary||"?")+" hành tốt, "+(n.yong?.ji||"?")+` hành kỵ (tool health_profile)
+  → THỂ THAO: bài tập `+(n.yong?.primary||"?")+` hành (bơi/thủy, chạy/hỏa, yoga/mộc, tạ/kim, đi bộ/thổ — theo Dụng)
+  → TINH DẦU/ĐÁ QUÝ: `+(n.yong?.primary||"?")+` hành (dầu/đá cùng hành Dụng Thần → bổ trợ năng lượng)
+  → ĐẶT TÊN: chữ Hán có hành `+(n.yong?.primary||"?")+" + tránh hành "+(n.yong?.ji||"?")+` (tool analyze_name)
+  → PHONG THỦY: hướng `+({木:"Đông",火:"Nam",土:"Trung",金:"Tây",水:"Bắc"}[n.yong?.primary]||"?")+" tốt, hướng kỵ theo "+(n.yong?.ji||"?")+" (tool fengshui_direction)"}catch{m+=`
 --- KIẾN THỨC CỔ PHÁP: [lỗi load] ---`}try{const o=i.pillars.day.zhi||"",p=Ms[o]||null,N=qs[i.dayMaster.gan]||[],b=N.some(x=>Object.values(i.pillars).some(M=>M.zhi===x)),_=Object.keys(Yh).find(x=>x.includes(i.pillars.year.zhi)),H=_?Yh[_]:"?",C=o===H.split(" ")[0],I=x=>x.find(M=>M.isCurrent)||{},S=(()=>{const x=new Date().getFullYear()-(i.input?.year||1990);return`${Math.floor(x/10)*10+1}-${Math.floor(x/10)*10+10}t`})(),D=Os[S]||"";m+=`
 --- HÔN NHÂN + TÀI VẬN + QUÝ NHÂN (round 2 crawl) ---
 PHỐI NGẪU (日支=`+o+"): "+(p?p.traits+" | Hôn nhân: "+p.marriage:"(không có dữ liệu)")+`
