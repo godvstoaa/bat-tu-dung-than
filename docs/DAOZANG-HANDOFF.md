@@ -6,8 +6,8 @@
 - **Pipeline chính = GROK CLI** (WebSearch quota đã hết; subagent chỉ khi Grok kẹt). Web search mặc định ON (`--disable-web-search` mới tắt).
 - **Batch 14 đang chạy (bg `betg93t0n`)** — 14 tựa: 历世真仙通鉴续编·终南山碑记·太上老君戒经·初真戒·三洞奉道科戒营始·太上助国救民总真秘卷·清微元降大法·法海遗珠·道德真经指归·老子铭·早晚功课经·金莲正宗记·道德经义疏(成玄英)·南斗六司延寿经. Output: `docs/_fragments/grok-batch14.json`.
 
-## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 69)
-- **daozang = 887 kinh** đã chưng cất / ~1500 (≈**59.1%**), ~720 verify DZ#. Deploy mới nhất `78b72407`.
+## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 76)
+- **daozang = 952 kinh** đã chưng cất / ~1500 (≈**63.5%**), ~770 verify DZ#. Deploy mới nhất `c759a743`.
 - **Chiến lược = FOCUSED SUB-CORPORA + 藏外/辑要 vein (batch 47-69)**: in-canon clusters (DZ1-1487) bão hòa → pivot sang mỏ 藏外/道藏辑要 (内丹 Minh-Thanh: 伍柳/东西派/全真龙门/千峰/仙学陈撄宁 + 女丹) giàu giá trị, ~0 dup. Batch 67+ bắt đầu bão hòa cả 藏外 (yield 5-14, cross-vein trad/simpl dups tăng).
 - **Đã tách chunk** (batch 64): `engine-daozang` (~891KB/261KB-gzip lazy) riêng khỏi `engine-library` (~116KB). Bỏ ETHICS re-export dừ → gãy circular.
 - **Pipeline 1 lệnh**: `focused-prompt → grok(bg,high) → daozang-tolerant(parse) → daozang-validate(dedup) → daozang-append → build-pdfs → build → selftest → commit → deploy`.
