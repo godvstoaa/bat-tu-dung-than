@@ -6,15 +6,16 @@
 - **Pipeline chính = GROK CLI** (WebSearch quota đã hết; subagent chỉ khi Grok kẹt). Web search mặc định ON (`--disable-web-search` mới tắt).
 - **Batch 14 đang chạy (bg `betg93t0n`)** — 14 tựa: 历世真仙通鉴续编·终南山碑记·太上老君戒经·初真戒·三洞奉道科戒营始·太上助国救民总真秘卷·清微元降大法·法海遗珠·道德真经指归·老子铭·早晚功课经·金莲正宗记·道德经义疏(成玄英)·南斗六司延寿经. Output: `docs/_fragments/grok-batch14.json`.
 
-## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 57)
-- **daozang = 760 kinh** đã chưng cất / ~1500 (≈**50.7%** — VƯỢT MỐC 50%), ~660 đã verify số hiệu DZ# trong notes. Deploy mới nhất `cc20ae84`.
-- **Chiến lược = FOCUSED SUB-CORPORA (batch 47+)**: mỗi batch nhắm 1 cluster hẹp (vd "洞真上清 core DZ1-200", "正一符箓法术", "道德经注疏") + small exclusion → Grok `--reasoning-effort high` tự chọn 16 kinh THẬT. Broad-sweep (batch56) thất bại — Grok bail sớm.
-- **Pipeline 1 lệnh**: `viết focused-prompt → grok(bg,high) → daozang-tolerant(parse) → daozang-validate(dedup) → daozang-append → build-pdfs → build → selftest → commit → deploy`.
-- **Dup-policing (daozang-validate.mjs)**: cross-layer name-dup + intra-batch collision (enrich commentary) + **DZ#-dedup** (regex quote-agnostic, bắt trad/simpl & variant dups). Lưu ý: vài entry (vd DZ1129 道教义枢) vẫn trượt DZ#-dedup do format raw đặc biệt → spot thủ công. ~23 DZ#-collision groups còn lại = đa số text khác nhau thật (1 cái sai DZ#) → để verifier pass.
-- **id-collision FIXED** (batch19): normalizer `id = DZ_<toàn-bộ-tên-Hán>` + uniqueness guard.
-- App tổng: **~780 entry / 8 lớp** (daozang 760 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
-- engine-library chunk ~882KB (gzip 271KB, lazy-loaded — **cần tách chunk riêng khi >1MB**). PDF 08-đạo-tạng = 760 mục (~8.1MB). Build ✓ ~2.4s, selftest ✓ exit 0.
-- **Bão hòa cluster**: 道医/杂占/续道藏/正一/外丹 cho yield thấp (4-8/batch). Còn dư: 太平部/类书, 各部注疏 sâu hơn. ~50% còn lại = text nhỏ/ít nổi tiếng hơn.
+## 1. TRẠNG THÁI HIỆN TẠI (snapshot — cập nhật sau batch 69)
+- **daozang = 887 kinh** đã chưng cất / ~1500 (≈**59.1%**), ~720 verify DZ#. Deploy mới nhất `78b72407`.
+- **Chiến lược = FOCUSED SUB-CORPORA + 藏外/辑要 vein (batch 47-69)**: in-canon clusters (DZ1-1487) bão hòa → pivot sang mỏ 藏外/道藏辑要 (内丹 Minh-Thanh: 伍柳/东西派/全真龙门/千峰/仙学陈撄宁 + 女丹) giàu giá trị, ~0 dup. Batch 67+ bắt đầu bão hòa cả 藏外 (yield 5-14, cross-vein trad/simpl dups tăng).
+- **Đã tách chunk** (batch 64): `engine-daozang` (~891KB/261KB-gzip lazy) riêng khỏi `engine-library` (~116KB). Bỏ ETHICS re-export dừ → gãy circular.
+- **Pipeline 1 lệnh**: `focused-prompt → grok(bg,high) → daozang-tolerant(parse) → daozang-validate(dedup) → daozang-append → build-pdfs → build → selftest → commit → deploy`.
+- **Dup-policing**: cross-layer name + intra-collision (enrich commentary) + DZ#-dedup. **Lỗi còn lại: trad/simpl blindness** (华/華, 册/冊, 经/經...) → ~1-3 residual dups/batch spot thủ công (vd 太乙金华宗旨/天皇玉册/孙不二). Verifier pass sau.
+- **id-collision FIXED**: id = `DZ_<toàn-bộ-tên-Hán>` + uniqueness guard.
+- App tổng: **~907 entry / 8 lớp** (daozang 887 · mantra 10 · 符 4 · 科仪 13 · 功法 10 · 方术 8 · bí truyền 14 · kinh điển 1).
+- **Đánh giá**: corpus đã capture phần lớn substantial verifiable canon (mọi trường phái lớn, text nền, 注疏 tradition, 藏外/辑要 depth). ~1500 figure gồm nhiều fragments/duplicate-editions/lost texts. Yield đang ↓ mạnh (5-14/batch) — cận practical ceiling ~900-950 verifiable distinct texts.
+- engine-daozang chunk ~891KB (gzip 261KB). PDF 08 = 887 mục (~14MB). Build ✓ ~2.3s, selftest ✓ exit 0.
 
 ## 2. PIPELINE CHƯNG CẤT (lặp mỗi batch) — **GROK CLI = CHÍNH**
 0. **Dup-check**: `node -e "..."` dump `DAOZANG.map(e=>e.name_han)` → `docs/_fragments/_done-titles.json`, grep ứng viên trước khi launch.
