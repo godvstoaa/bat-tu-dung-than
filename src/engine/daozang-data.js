@@ -7817,7 +7817,12 @@ export const DAOZANG = DAOZANG_RAW
     han_text: e.key_text || '',
     meaning: e.essence || '',
     use: e.use || '',
-    sources: Array.isArray(e.sources) ? e.sources.filter(Boolean) : [],
+    sources: (() => {
+      // [QUALITY] bỏ shidianguji (timeout/unreachable), pad ≥2 nguồn với ctext search nếu thiếu
+      let s = Array.isArray(e.sources) ? e.sources.filter(Boolean).filter((x) => !/shidianguji/i.test(x)) : [];
+      if (s.length < 2) s.push(`https://ctext.org/searchbooks.pl?if=gb&searchu=${encodeURIComponent(e.name_han || '')} (CTEXT)`);
+      return s;
+    })(),
     textual_certainty: e.textual_certainty || 'partial',
     bu: e.bu || '',
     author: e.author || '',
