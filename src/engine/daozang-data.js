@@ -2683,7 +2683,7 @@ const DAOZANG_RAW = [
     essence: 'Kinh thai tức gắn danh hiệu Ngọc Hoàng, dạy điều tức, ôm nguyên, luyện thần. Cùng hệ thai tức trong Đạo tạng nhưng nhấn mạnh tinh thần \'thượng thanh–ngọc hoàng\'.',
     key_text: '胎息者，如嬰兒在母腹中，不以口鼻呼吸。', use: 'Nội luyện thai tức; tham chiếu khí công; tụng kèm tu dưỡng',
     sources: ['https://blackmoonharbor.com/uploads/1/1/5/3/115363763/daoist_texts_in_translation._komjathy.pdf', 'https://louiskomjathy.com/wp-content/uploads/2022/01/DaozangYaojiXuankanIndex_Komjathy.pdf'],
-    textual_certainty: 'high', notes: 'batch38 · Grok-4.5 catalog-driven' },
+    textual_certainty: 'partial', notes: 'batch38 · Grok-4.5 catalog-driven' },
   { dz: 'DZ197', name_han: '玉皇十七慈光燈儀', name_vi: 'Ngọc Hoàng Thập Thất Từ Quang Đăng Nghi', bu: '洞玄', author: '佚名', era: '元–明初', topic: 'ritual',
     essence: 'Đăng nghi cúng mười bảy từ quang trước tòa Ngọc Hoàng, thắp đèn, lạy tán, tụng Tâm Ấn, phát nguyện. Thuộc nhóm đăng nghi Kim Lục, cầu phước, tiêu tai, \'hữu cầu tư ứng\'.',
     key_text: '大神通光、大慈悲光、大喜捨光……無能勝光。', use: 'Đăng nghi Ngọc Hoàng; cầu nguyện; nghi lễ ban đêm',
