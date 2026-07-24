@@ -22,6 +22,8 @@ import { computeWesternChart, westernSummary } from './western-astro.js';
 import { computeWesternForecast, forecastSummary } from './western-predict.js';
 import { synthesisDimensions, synthesisTimeline } from './western-synthesis.js';
 import { SUN_IN_SIGN, MOON_IN_SIGN, ASCENDANT_MEANING, WESTERN_PLANETS, BAZI_WESTERN_MAP } from './western-kb.js';
+// [HUYỀN HỌC] Thư viện 1523 kinh — suggest theo câu hỏi user
+import { suggestDaozangByQuestion } from './daozang-data.js';
 // [NEW SCHOOLS] Tarot / Numerology / Runes / IChing64 / Coffee — grok research
 import { drawTarot, tarotSummary, TAROT_MAJOR, TAROT_SUITS } from './tarot-kb.js';
 import { numerologyReading, lifePathNumber, LIFE_PATH } from './numerology.js';
@@ -1027,7 +1029,18 @@ export function buildTargetedBrief(R, userQuestion) {
   };
 
   const keywords = RELEVANCE[cat];
-  if (!keywords) return fullBrief; // overview = full
+  if (!keywords) {
+    // overview hoặc huyenhoc → full brief + thêm thư viện huyền học nếu question match
+    if (cat === 'huyenhoc' || cat === 'overview') {
+      const dzKinh = suggestDaozangByQuestion(userQuestion, 8);
+      if (dzKinh.length) {
+        let dzSection = '\n--- THƯ VIỆN HUYỀN HỌC — KINH/VĂN HIẾN LIÊN QUAN (tham chiếu, tra cứu) ---\n';
+        dzKinh.forEach((e) => { dzSection += `• ${e.name_han} (${e.name_vi || ''}): ${(e.essence || '').slice(0, 120)}\n`; });
+        return fullBrief + dzSection;
+      }
+    }
+    return fullBrief; // overview = full
+  }
 
   // Always include: NÃO (brain) + CONCEPT INDEX only
   const alwaysInclude = ['NÃO', 'CONCEPT', 'DỰ BÁO'];
@@ -1058,6 +1071,7 @@ function classifyQuestionForBrief(question) {
   if (/(tính cách|bản chất|con người|khí chất)/i.test(q)) return 'personality';
   if (/(diện mạo|ngoại hình|đẹp|mặt|tướng mạo)/i.test(q)) return 'appearance';
   if (/(cổ pháp|nạp âm|兰台|thần đầu lộc|九命)/i.test(q)) return 'gufa';
+  if (/(trừ tà|âm tà|quỷ|vong|phù|bùa|chú|kinh|tụng|cầu an|phong thủy|đại|hướng|tu luyện|tu tiên|nội đan|công pháp|siêu độ|cầu siêu|thần|tiên|đạo|thiền|khí công|bói|số mệnh|giải mệnh|bát tự|cải mệnh|tích đức|chuyển vận|cầu tài|cầu duyên|hòa hợp|bệnh|thuốc|chữa|dược|lễ|cúng|giỗ|hạn|star|tinh tú|sao|bản mệnh|thái tuế|lưu niên|diêm|địa phủ|cõi|luân hồi|nghiệp|nhân quả|thiện|ác|công đức|phước)/i.test(q)) return 'huyenhoc';
   if (/(phụ mẫu|cha mẹ|bố mẹ|tổ tiên)/i.test(q)) return 'parents';
   if (/(anh chị|huynh đệ|anh em)/i.test(q)) return 'siblings';
   return 'overview';
