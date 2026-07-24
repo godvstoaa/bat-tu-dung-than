@@ -7921,3 +7921,59 @@ export function suggestDaozangByQuestion(question, limit = 8) {
   }));
 }
 
+// ── CHART-AWARE: Bát Tự + câu hỏi → kinh + lời khuyên tu luyện CÁ NHÂN HÓA ──
+// Phối hợp Dụng Thần + ngũ hành + thập thần + Âm Tà indicators + câu hỏi
+const _YONG2CULT = {
+  '木': { practice: 'hành Mộc — sinh khí, hướng Đông, giờ Dần/Mão. Tu luyện: dẫn khí sinh phát, thiền hành tẩu, đạo đức nhân từ (仁).', kw: ['导引','养生','青','木','肝','仁','东方'] },
+  '火': { practice: 'hành Hỏa — minh tâm, hướng Nam, giờ Tỵ/Ngọ. Tu luyện: tồn thần, niệm chú, quang minh thiền, lễ độ (礼).', kw: ['神咒','金光','心','礼','南方','火','存神','光明'] },
+  '土': { practice: 'hành Thổ — ổn định, hướng Trung, giờ Thìn/Tuất/Sửu/Mùi. Tu luyện: nội đan trung cung, tĩnh toạ, tín thực (信).', kw: ['黄庭','中','脾','信','土','胎息','中丹'] },
+  '金': { practice: 'hành Kim — thu liễm, hướng Tây, giờ Thân/Dậu. Tu luyện: điều tức thu khí, nội quán, nghĩa khí (义).', kw: ['调息','肺','义','西方','金','收气','内观'] },
+  '水': { practice: 'hành Thủy — tĩnh lặng, hướng Bắc, giờ Tí/Hợi. Tu luyện: tĩnh toạ, thai tức, tàng tinh, trí tuệ (智).', kw: ['胎息','肾','智','北方','水','藏','静坐'] },
+};
+const _PATTERN2CULT = {
+  '正官格': 'Mệnh chính quan — tu luyện cần KHIÊM CẦN, tu đức nghiệp, tránh kiêu ngạo. Phù hợp: niệm kinh, sám hối, tích đức công quá cách.',
+  '七杀格': 'Mệnh thất sát — khí thế mạnh, dễ xung đột. Tu luyện cần CHẾ NGỰ (như thực chế sát): nội đan rèn tâm, thiền chỉ, tránh cường mệnh.',
+  '正印格': 'Mệnh chính ấn — thiên bẩm trí tuệ, duyên tu. Phù hợp: nghiên kinh, nội đan, thanh tu; tránh thế tục.',
+  '偏印格': 'Mệnh thiên ấn — duyên huyền bí, dễ cô tịch. Tu luyện: thanh hư, tồn thần, tránh u uất.',
+  '食神格': 'Mệnh thực thần — phúc đức tự nhiên, an lạc. Tu luyện: đạo đức tự nhiên (vô vi), dưỡng sinh, an nhiên.',
+  '伤官格': 'Mệnh thương quan — tài năng kiêu ngạo. Tu luyện cần GIẢM NGÃ MẠN: sám hối, niệm chú, phục thấp.',
+  '正财格': 'Mệnh chính tài — thực tế, vật chất. Tu luyện: bồi đức nghiệp, bố thí, chuyển vật chất → tinh thần.',
+  '偏财格': 'Mệnh thiên tài — hào phóng nhưng dễ tán. Tu luyện: công quá cách, giữ đức, tiết dục.',
+  '比肩格': 'Mệnh tỷ kiên — tự lực, cứng đầu. Tu luyện: học khuất phục, nhẫn nhục, đề hlao.',
+  '劫财格': 'Mệnh kiếp tài — tranh đấu. Tu luyện: nhẫn nhục, từ bi, tránh cạnh tranh tu luyện.',
+};
+const _AMTA2CULT = {
+  high: 'Cảnh giác Âm Tà cao — nên trì chú 金光神 chú + 存神 bảo vệ, tránh tự tu pháp cao khi chưa có sư truyền.',
+  medium: 'Âm Tà vừa — nên niệm chú護身 (金光/天蓬) trước khi tu, giữ tâm chánh.',
+  low: 'Âm Tà thấp — có thể tu luyện bình thường, duy trì thanh tịnh.',
+};
+
+export function suggestDaozangChartAware(R, question) {
+  const out = { kinh: [], chartAdvice: '', yongAdvice: '', amtaAdvice: '' };
+  // 1. Kinh from question
+  if (question) out.kinh = suggestDaozangByQuestion(question, 6);
+  // 2. Dụng Thần → tu luyện method + extra kinh
+  const yong = R?.yong?.god;
+  if (yong && _YONG2CULT[yong]) {
+    const y = _YONG2CULT[yong];
+    out.yongAdvice = `[BÁT TỰ PHỐI HỢP] Dụng Thần ${yong} → ${y.practice}`;
+    // add kinh matching yong keywords
+    const extraKinh = [];
+    for (const e of DAOZANG) {
+      const text = (e.name_han || '') + (e.meaning || '');
+      if (y.kw.some((w) => text.includes(w)) && !out.kinh.find((k) => k.id === e.id)) {
+        extraKinh.push({ id: e.id, name_han: e.name_han, name_vi: e.name_vi, notes: e.notes, essence: (e.meaning || '').slice(0, 120), hits: 0, fromChart: true });
+      }
+      if (extraKinh.length >= 3) break;
+    }
+    out.kinh = [...out.kinh, ...extraKinh].slice(0, 8);
+  }
+  // 3. Cách cục → temperament advice
+  const pattern = R?.pattern?.name;
+  if (pattern && _PATTERN2CULT[pattern]) out.chartAdvice = `[CÁCH CỤC] ${pattern} → ${_PATTERN2CULT[pattern]}`;
+  // 4. Âm Tà level → protection advice
+  const amtaLevel = R?.amta?.susceptibility?.level;
+  if (amtaLevel && _AMTA2CULT[amtaLevel]) out.amtaAdvice = `[ÂM TÀ] ${_AMTA2CULT[amtaLevel]}`;
+  return out;
+}
+
