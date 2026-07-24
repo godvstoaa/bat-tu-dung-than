@@ -7692,6 +7692,67 @@ const DAOZANG_RAW = [
     key_text: '夫道、德、仁、义、礼，五者一体也。', use: 'Tâm thuật trị thế, đạo đức–quyền biến, tử thư binh–đạo',
     sources: ['https://zh.wikisource.org/wiki/%E9%BB%84%E7%9F%B3%E5%85%AC%E7%B4%A0%E6%9B%B8_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)', 'https://ctext.org/library.pl?if=gb&res=111109', 'https://ctext.org/wiki.pl?if=gb&chapter=399958'],
     textual_certainty: 'high', notes: 'batch120 · Grok-4.5 deep saturation' },
+
+  { dz: 'DZ774', name_han: '猶龍傳', name_vi: 'Do Long Truyện', bu: '洞神', author: '賈善翔', era: '北宋·元祐前後', topic: '仙传',
+    essence: 'Đạo sĩ Bắc Tống Giả Thiện Tường soạn (bản Đạo tạng sáu quyển), lấy lời Khổng Tử \'kỳ do long da\' đặt tên, chuyên chép lịch kiếp ứng hóa và truyền kinh của Thái Thượng Lão Quân. Bổ sung hệ Lão Quân truyện trước Hỗn Nguyên Thánh Kỷ, kết hợp phổ lục thần thánh với niên phổ giáo hóa.',
+    key_text: '孔子適周，將問禮於老子，……去，謂弟子曰：鳥，吾知其能飛；魚，吾知其能游；獸，吾知其能走。……至於龍，吾不能知其乘風雲而上天。吾今日見老子，其猶龍邪！', use: 'Nghiên cứu thần thoại Lão Quân, phổ lục Động thần và nguồn trích dẫn hóa thân lịch kiếp',
+    sources: ['https://zh.daoinfo.org/index.php?title=%E7%8C%B6%E9%BE%8D%E5%82%B3', 'https://ctext.org/wiki.pl?if=gb&res=466275', 'https://zh.wikisource.org/zh-hant/%E7%8C%B6%E9%BE%8D%E5%82%B3'],
+    textual_certainty: 'high', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: 'DZ960', name_han: '御製真武廟碑', name_vi: 'Ngự Chế Chân Vũ Miếu Bi', bu: '洞神', author: '明成祖朱棣', era: '明·永樂', topic: 'classic',
+    essence: 'Ngự chế bi văn của Minh Thành Tổ về miếu Chân Vũ, thu vào Chính thống Đạo tạng cùng hệ Huyền Thiên Thượng Đế. Ghi lý do sùng phụng Chân Vũ, duyên khởi kiến miếu và tuyên ngôn giáo–quốc. Tư liệu kim thạch quan phương cho tín ngưỡng Huyền Đế đời Minh.',
+    key_text: 'null', use: 'Nghiên cứu bi ký Chân Vũ quan phương, chính sách sùng Đạo Minh và quan hệ cung quán–triều đình',
+    sources: ['https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F', 'https://zh.daoinfo.org/index.php?title=%E7%8E%84%E5%A4%A9%E4%B8%8A%E5%B8%9D%E5%95%9F%E8%81%96%E9%8C%84', 'https://baike.baidu.com/item/%E7%8E%84%E5%A4%A9%E4%B8%8A%E5%B8%9D%E5%90%AF%E5%9C%A3%E5%BD%95/7785567'],
+    textual_certainty: 'partial', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: '藏外', name_han: '大唐回元觀鐘樓銘', name_vi: 'Đại Đường Hồi Nguyên Quan Chung Lâu Minh', bu: '藏外', author: '令狐楚撰；柳公權書', era: '唐·開成元年（836）', topic: 'classic',
+    essence: 'Bi minh cung quán Đạo giáo Trường An thời Đường, do Lệnh Hồ Sở soạn văn, Liễu Công Quyền viết chữ, lập năm Khai Thành nguyên niên. Chép duyên cách Hồi Nguyên Quan và việc dựng lầu chuông. Bia khai quật 1986, là tư liệu kim thạch–thư pháp hiếm về đạo quán kinh thành Đường.',
+    key_text: 'null', use: 'Đối chiếu bi ký cung quán Đường, địa danh Trường An và văn bia Đạo giáo thế tục',
+    sources: ['https://baike.baidu.com/item/%E5%A4%A7%E5%94%90%E5%9B%9E%E5%85%83%E8%A7%82%E9%92%9F%E6%A5%BC%E9%93%AD/7141977', 'https://www.beilin-museum.com/index.php?m=home&c=View&a=index&aid=2581', 'https://www.9610.com/lgq/05.htm'],
+    textual_certainty: 'high', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: '藏外', name_han: '重校正地理新書', name_vi: 'Trùng Hiệu Chính Địa Lý Tân Thư', bu: '藏外', author: '王洙等奉敕刪定', era: '北宋仁宗朝', topic: '择',
+    essence: 'Sách quan tu về địa lý–táng trạch đời Bắc Tống, Vương Thù chủ trì hiệu định trên nền cựu bản. Hệ thống hóa long mạch, huyệt pháp, niên tháng lựa táng và kỵ húy quan phương. Là điển phạm trạch cát/táng thư triều Tống, khác các bản dân gian hậu kỳ.',
+    key_text: 'null', use: 'Nghiên cứu thuật trạch cát–táng trạch quan phương Tống và nguồn gốc địa lý thuật số',
+    sources: ['https://baike.baidu.com/item/%E9%87%8D%E6%A0%A1%E6%AD%A3%E5%9C%B0%E7%90%86%E6%96%B0%E4%B9%A6/15595715', 'https://zh.wikipedia.org/wiki/%E5%9C%B0%E7%90%86%E6%96%B0%E4%B9%A6', 'https://ctext.org/wiki.pl?if=gb&res=0'],
+    textual_certainty: 'high', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: '藏外', name_han: '外臺秘要', name_vi: 'Ngoại Đài Bí Yếu', bu: '藏外', author: '王燾', era: '唐·天寶十一載（752）', topic: '医方',
+    essence: 'Y thư tổng hợp bốn mươi quyển của Vương Đảo đời Đường, thu hơn sáu nghìn phương từ vài chục nhà. Mỗi môn tiên luận hậu phương, chú xuất xứ; bảo tồn nhiều phương thư Tiền–Đường đã thất lạc. Giao thoa y đạo–phương thuật, bổ sung cho hệ Thiên Kim/Trửu Hậu trong ngữ cảnh Đạo giáo dưỡng sinh.',
+    key_text: '余幼多疾病，長好醫術。', use: 'Tra cứu phương dược cổ, bệnh chứng Đường và giao điểm y phương–đạo y',
+    sources: ['https://ctext.org/wiki.pl?if=gb&res=798621', 'https://zh.wikisource.org/wiki/%E5%A4%96%E5%8F%B0%E7%A7%98%E8%A6%81%E6%96%B9%E5%BA%8F', 'https://baike.baidu.com/item/%E5%A4%96%E5%8F%B0%E7%A7%98%E8%A6%81/1090038'],
+    textual_certainty: 'high', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: '藏外', name_han: '葬法倒杖', name_vi: 'Táng Pháp Đảo Trượng', bu: '藏外', author: '題楊筠松', era: '唐（託名；四庫地理類著錄）', topic: '择',
+    essence: 'Một quyển thuật táng trạch, đề Dương Quân Tùng (Dương Cứu Bần). Phần táng pháp luận điểm huyệt; phần đảo trượng nêu mười hai pháp lập huyệt–đặt quan và nhị thập tứ sa táng pháp. Văn bản then chốt phái Hình thế, thu Tứ khố và các địa lý tùng thư.',
+    key_text: '穴場金魚水界。圓暈在隱微之間者，為太極。', use: 'Đối chiếu pháp lập huyệt, đảo trượng và thuật táng phái Hình thế',
+    sources: ['https://ctext.org/wiki.pl?if=gb&chapter=103611', 'https://baike.baidu.com/item/%E8%91%AC%E6%B3%95%E5%80%92%E6%9D%96/7672601', 'https://gj.zdic.net/zibu/372/10326.html'],
+    textual_certainty: 'partial', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: '藏外', name_han: '星命總括', name_vi: 'Tinh Mệnh Tổng Quát', bu: '藏外', author: '題遼耶律純', era: '遼統和二年序（984；四庫多疑託名）', topic: '占',
+    essence: 'Ba quyển tinh mệnh thuật số, đề Da Luật Thuần đời Liêu, có tự tự Thống Hòa nhị niên. Luận cung tinh, nhật nguyệt thăng điện, tứ chính quản nhiếp và cách cục. Thu Tứ khố toàn thư tử bộ thuật số, là sách tinh mệnh hệ thống sớm trong truyền thống quan phương.',
+    key_text: '大遼統和二年，翰林學士耶律純，以議地界事奉國書使于高麗。', use: 'Nghiên cứu tinh mệnh–chiêm tinh Trung cổ và đối chiếu hệ quả lão/tử bình',
+    sources: ['https://ctext.org/wiki.pl?if=gb&res=54261', 'https://zh.wikisource.org/zh-hant/%E6%98%9F%E5%91%BD%E7%B8%BD%E6%8B%AC_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)', 'https://baike.baidu.com/item/%E6%98%9F%E5%91%BD%E6%80%BB%E6%8B%AC/358770'],
+    textual_certainty: 'partial', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: '藏外', name_han: '容齋隨筆', name_vi: 'Dung Trai Tùy Bút', bu: '藏外', author: '洪邁', era: '南宋', topic: '笔记',
+    essence: 'Ngũ bút (Tùy bút–Ngũ bút) khoảng bảy mươi tư quyển của Hồng Mại. Ghi chép khảo chứng kinh sử, điển chương, y bốc tinh toán và cố sự Tống. Là đỉnh cao bút ký học thuật Nam Tống; nhiều điều liên quan tượng số–phương thuật và dị văn Đạo giáo.',
+    key_text: 'null', use: 'Tra khảo chứng thuật số, cố sự Tống và dị văn liên quan Đạo–Phật trong bút ký',
+    sources: ['https://zh.wikisource.org/zh-hans/%E5%AE%B9%E9%BD%8B%E9%9A%A8%E7%AD%86', 'https://ctext.org/wiki.pl?if=gb&res=182361', 'https://baike.baidu.com/item/%E5%AE%B9%E6%96%8B%E9%9A%8F%E7%AC%94/154998'],
+    textual_certainty: 'high', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: '藏外', name_han: '夢溪筆談', name_vi: 'Mộng Khê Bút Đàm', bu: '藏外', author: '沈括', era: '北宋晚期', topic: '笔记',
+    essence: 'Bút ký tổng hợp của Thẩm Quát, vốn hai mươi sáu quyển chia mười bảy môn (kể cả Tượng số, Thần kỳ, Dị sự, Dược nghị). Ghi thiên văn, lịch pháp, thuật số và dị truyện đương thời. Nguồn giao thoa khoa kỹ–huyền học Bắc Tống không thể thiếu.',
+    key_text: '事非前定，方其知時，即是今日。', use: 'Đối chiếu tượng số, lịch pháp, dị sự và quan điểm tri thức–mệnh số đời Tống',
+    sources: ['https://zh.wikisource.org/zh-hans/%E5%A4%A2%E6%BA%AA%E7%AD%86%E8%AB%87', 'https://ctext.org/wiki.pl?if=gb&res=13396', 'https://zh.wikipedia.org/wiki/%E5%A4%A2%E6%BA%AA%E7%AC%94%E8%B0%88'],
+    textual_certainty: 'high', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: '藏外', name_han: '類說', name_vi: 'Loại Thuyết', bu: '藏外', author: '曾慥', era: '南宋·紹興六年（1136）', topic: '类书',
+    essence: 'Tổng tập bút ký–tiểu thuyết khoảng sáu mươi quyển do Tằng Tạo biên, trích hơn hai trăm nhà từ Hán đến đầu Nam Tống. Thể loại thư tạp toản, giữ nhiều dị văn tiên đạo, chí quái đã thất lạc. Cùng Đạo Khu của Tằng Tạo tạo cặp loại thư–đạo thư quan trọng.',
+    key_text: '可以資治體，助名教，供笑談，廣見聞。', use: 'Khai thác dị bản tiên truyện, bút ký thất lạc và so sánh với Đạo Khu/Vân Cấp',
+    sources: ['https://zh.wikipedia.org/zh-hans/%E7%B1%BB%E8%AF%B4', 'https://ctext.org/wiki.pl?if=gb&res=160643', 'https://zh.wikisource.org/wiki/%E9%A1%9E%E8%AA%AA'],
+    textual_certainty: 'high', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: 'DZ667', name_han: '無上妙道文始真經', name_vi: 'Vô Thượng Diệu Đạo Văn Thủy Chân Kinh', bu: '洞神', author: '題關令尹喜（今本多出唐宋以後）', era: '漢志著錄《關尹子》；今本道藏本', topic: 'philosophy',
+    essence: 'Tức Quan Doãn Tử, còn gọi Văn Thủy Chân Kinh; Đạo giáo tôn Tứ Tử chân kinh. Chín thiên (Nhất Vũ đến Cửu Dược) luận đạo, khí, tâm và quỷ thần. Bản nay trong Động thần bộ, tư tưởng \'quý thanh\', ảnh hưởng nội tu–huyền học đời sau.',
+    key_text: '一道能作萬物，終無有一物能作道者，能害道者。', use: 'Đọc triết Đạo gia–Đạo giáo, đối chiếu Tứ Tử chân kinh và nguồn huyền học',
+    sources: ['https://zh.daoinfo.org/index.php?title=%E7%84%A1%E4%B8%8A%E5%A6%99%E9%81%93%E6%96%87%E5%A7%8B%E7%9C%9F%E7%B6%93', 'https://zh.wikipedia.org/wiki/%E5%85%B3%E5%B0%B9%E5%AD%90', 'https://ctext.org/wiki.pl?if=gb&chapter=720548'],
+    textual_certainty: 'partial', notes: 'batch121 · Grok-4.5 remaining' },
+  { dz: 'DZ746', name_han: '通玄真經', name_vi: 'Thông Huyền Chân Kinh', bu: '洞神', author: '文子（戰國黃老系；唐玄宗封通玄真人）', era: '先秦–漢成書傳統；唐天寶元年尊經', topic: 'philosophy',
+    essence: 'Tức Văn Tử, một trong Tứ Tử chân kinh Đạo giáo. Nhiều chương dẫn \'Lão Tử viết\' rồi diễn nghĩa đạo nguyên, tinh thành, cửu thủ. Huyền Tông phong Thông Huyền chân nhân; Đạo tạng có chú bản Từ Linh Phủ, Đỗ Đạo Kiên. Cầu nối Hoàng Lão–Đạo giáo triết lý.',
+    key_text: '老子曰：有物混成，先天地生。', use: 'Đối chiếu Hoàng Lão, chú sớ Tứ Tử và nguồn triết–tu dưỡng Đạo giáo',
+    sources: ['https://zh.wikisource.org/wiki/%E9%80%9A%E7%8E%84%E7%9C%9F%E7%B6%93_(%E5%9B%9B%E9%83%A8%E5%8F%A2%E5%88%8A%E6%9C%AC)', 'https://ctext.org/wiki.pl?if=gb&res=240539', 'https://baike.baidu.com/item/%E9%80%9A%E7%8E%84%E7%9C%9F%E7%BB%8F%E6%B3%A8/17618230'],
+    textual_certainty: 'high', notes: 'batch121 · Grok-4.5 remaining' },
 ];
 
 // id base = full Hán of name_han (unique per entry, since dup-filter enforces unique
@@ -7729,3 +7790,39 @@ export function daozangByBu(entries = DAOZANG) {
   for (const e of entries) c[e.bu] = (c[e.bu] || 0) + 1;
   return c;
 }
+
+// ── chart-aware: lá số → gợi ý kinh 道藏 liên quan theo AM-TA indicators ──
+// Biến corpus 1500+ kinh thành «kiến thức DÙNG TRONG app»: khi lá số có
+// indicator âm tà/hư bí, surface kinh trừ tà/救度/护命/玄学 liên quan.
+const _AMTA_DZ_KW = {
+  diaoke: ['北帝', '伏魔', '伏魔', '驱邪', '治邪', '女青', '鬼律', '酆都', '丰都', '考召', '杀鬼', '咒鬼', '治瘟', '辞瘟', '豁落', '火雷', '神虎', '金光', '荡秽'],
+  guiyue: ['救度', '拔罪', '超度', '血湖', '十王', '幽科', '施食', '济炼', '中元', '水陆', '焰口', '盂兰', '度厄', '冥王', '解冤', '灭罪'],
+  huagai: ['内丹', '修真', '悟真', '参同', '黄庭', '清净', '清静', '道德', '坐忘', '化书', '仙学', '灵源', '金丹', '胎息', '导引', '养性', '养生'],
+  guchen: ['和合', '解冤', '姻缘'],
+  sifei: ['禳灾', '消灾', '护命', '解厄', '益算', '延寿'],
+  yinchayangcuo: ['解厄', '和合', '安胎', '安宅', '镇宅'],
+  taiyuan: ['护命', '保胎', '安胎', '六甲'],
+  rizhuo: ['护命', '延寿', '益算', '北斗', '星君', '本命', '延生', '保命'],
+  jiesha: ['护命', '消灾', '解厄', '镇宅', '安宅'],
+  pure_yin: ['北帝', '伏魔', '驱邪', '女青', '鬼律', '纯阳', '金光', '护命', '消魔'],
+  xianling: ['救度', '拔罪', '超度', '血湖', '十王', '幽科', '施食', '济炼', '冥王', '度厄'],
+};
+const _INDICATOR_KEYS = Object.keys(_AMTA_DZ_KW);
+
+export function suggestDaozangByAmTa(amta, limit = 10) {
+  if (!amta || !amta.detected || !amta.detected.length) return [];
+  const hay = amta.detected.map((d) => d.id || '').join(' ');
+  const kws = new Set();
+  for (const k of _INDICATOR_KEYS) if (hay.includes(k.replace('_', '-')) || hay.includes(k)) _AMTA_DZ_KW[k].forEach((w) => kws.add(w));
+  if (!kws.size) return [];
+  const scored = [];
+  for (const e of DAOZANG) {
+    const text = (e.name_han || '') + (e.topic || '') + (e.meaning || '');
+    let hits = 0;
+    for (const w of kws) if (text.includes(w)) hits++;
+    if (hits) scored.push({ e, hits });
+  }
+  scored.sort((a, b) => b.hits - a.hits);
+  return scored.slice(0, limit).map((s) => ({ id: s.e.id, name_han: s.e.name_han, name_vi: s.e.name_vi, notes: s.e.notes, hits: s.hits }));
+}
+

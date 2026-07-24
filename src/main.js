@@ -68,6 +68,7 @@ import { analyzeTang } from './engine/tang-analyze.js'; // [loop 1382] TANG GIA 
 import { analyzeAmTa } from './engine/amta-analyze.js'; // [loop 1383] ÂM TÀ / vong hồn — detect tín hiệu
 import { LIBRARY, LAYERS, countByLayer, ETHICS as LIB_ETHICS } from './engine/library-data.js'; // [library] Thư viện Huyền học
 import { suggestByAmTa } from './engine/talisman-data.js'; // [amta] chart-aware 符咒 suggestion
+import { suggestDaozangByAmTa } from './engine/daozang-data.js'; // [amta] chart-aware kinh 道藏 liên quan (1512 kinh corpus)
 import { SCHOOLS, COMPARE_DIMS, compareMatrix } from './engine/schools-data.js'; // [schools] đối chiếu trường phái
 import { AMTA_TU_LUYEN } from './engine/amta-tuluyen-data.js'; // [amta-tuluyen] module riêng Âm Tà · Tu Luyện
 import { compassReading, bestDirection, shanFromDegree } from './engine/fengshui-compass.js'; // [loop 631] la bàn 24 sơn
@@ -6192,6 +6193,19 @@ function renderAmTa(R) {
       ));
     });
     box.appendChild(_h('details', { open: '' }, _h('summary', {}, `Phù / Chú / Nghi thức tham chiếu (${sug.length}) — do đạo sĩ 受箓 chủ trì`), sg));
+  }
+  // ── chart-aware kinh 道藏 liên quan (từ corpus 1512 kinh, theo indicators lá số) ──
+  const dzSug = suggestDaozangByAmTa(amta, 10);
+  if (dzSug.length) {
+    const dg = _h('div', { class: 'amta-sug' });
+    dzSug.forEach((e) => {
+      dg.appendChild(_h('div', { class: 'amta-sug-item' },
+        _h('span', { class: 'lib-name zh', style: 'font-size:14px' }, e.name_han),
+        e.name_vi ? _h('span', { class: 'hint' }, ' ' + e.name_vi) : null,
+        _h('span', { class: 'hint', style: 'font-size:10px' }, ` · ${e.notes || ''}`),
+      ));
+    });
+    box.appendChild(_h('details', {}, _h('summary', {}, `📖 Kinh / văn hiến liên quan ngữ cảnh (${dzSug.length}) — tra cứuDepth`), dg));
   }
   // ── module «Âm Tà · Tu Luyện»: curated reference sub-sections (static, opt-in) ──
   const sp = AMTA_TU_LUYEN.spiritTypes || [];
