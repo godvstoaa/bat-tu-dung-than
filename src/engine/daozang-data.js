@@ -2038,11 +2038,7 @@ const DAOZANG_RAW = [
     sources: ['https://zh.daoinfo.org/index.php?title=%E6%B8%85%E5%92%8C%E7%9C%9F%E4%BA%BA%E5%8C%97%E9%81%8A%E8%AA%9E%E9%8C%84&variant=zh-hant', 'https://zh.wikisource.org/wiki/%E6%B8%85%E5%92%8C%E7%9C%9F%E4%BA%BA%E5%8C%97%E9%81%8A%E8%AA%9E%E9%8C%84', 'https://fabriziopregadio.com/files/PREGADIO_and_ESPOSITO_Daozang_jiyao_Catalogue.pdf'],
     textual_certainty: 'high', notes: 'batch29 · Grok-4.5 catalog-driven' },
 
-  { dz: 'DZ402', name_han: '黃庭內景玉經註', name_vi: 'Hoàng Đình Nội Cảnh Ngọc Kinh Chú', bu: '洞玄', author: '梁丘子（白履忠）', era: '唐（约8世纪）', topic: 'cultivation',
-    essence: 'Chú giải kinh điển Thượng Thanh về nội cảnh thân thần và tam đơn điền. Lương Khâu Tử giải \'nội giả tâm dã, cảnh giả tượng dã\', chỉ cách tồn tư tạng phủ, luyện hồn phách để trường sinh. Đây là chú bản Hoàng Đình Nội Cảnh độc lập quan trọng nhất trong Chính Thống Đạo Tạng.',
-    key_text: '內者，心也。景者，象也。', use: 'Nền tảng tồn tư tạng thần, luyện khí Hoàng Đình; tham chiếu khi đọc Nội Cảnh Kinh.',
-    sources: ['https://zh.wikisource.org/wiki/%E9%BB%83%E5%BA%AD%E5%85%A7%E6%99%AF%E7%8E%89%E7%B6%93%E8%A8%BB_(%E6%A2%81%E4%B8%98%E5%AD%90)', 'https://zh.daoinfo.org/index.php?title=%E9%BB%83%E5%BA%AD%E5%85%A7%E6%99%AF%E7%8E%89%E7%B6%93%E6%B3%A8%EF%BC%88%E6%A2%81%E4%B8%98%E5%AD%90%EF%BC%89', 'https://ctext.org/library.pl?if=gb&res=84065'],
-    textual_certainty: 'high', notes: 'batch30 · Grok-4.5 catalog-driven' },
+  
   { dz: 'DZ401', name_han: '黃庭內景玉經注', name_vi: 'Hoàng Đình Nội Cảnh Ngọc Kinh Chú (Lưu Trường Sinh)', bu: '洞玄', author: '劉處玄（劉長生）', era: '金（12世纪末）', topic: 'cultivation',
     essence: 'Chú giải Hoàng Đình Nội Cảnh theo hướng Toàn Chân, nhấn mạnh tâm tính và nội đan hơn là thuần tồn thần tạng phủ. Lưu Xử Huyền (Trường Sinh) đọc kinh qua lăng kính \'chân tính\', nối truyền thống Thượng Thanh với tu trì Toàn Chân. Một quyển, thu vào Động Huyền bộ Ngọc quyết loại.',
     key_text: '夫萬物以人為主，人以一心為宗。', use: 'Đối chiếu chú Hoàng Đình thời Đường với cách đọc nội đan Toàn Chân; luyện tâm định.',
@@ -3985,11 +3981,7 @@ const DAOZANG_RAW = [
     key_text: '先天而生生而無形後天而存存而無體', use: 'Tụng tĩnh tâm, tham huyền, nội quán; đọc kèm chú giải nội đan',
     sources: ['https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf', 'https://zh.wikisource.org/zh-hant/%E5%A4%AA%E4%B8%8A%E6%B4%9E%E7%8E%84%E9%9D%88%E5%AF%B6%E5%A4%A9%E5%B0%8A%E8%AA%AA%E5%A4%A7%E9%80%9A%E7%B6%93', 'https://zh.daoinfo.org/index.php?title=%E5%A4%AA%E4%B8%8A%E6%B4%9E%E9%9D%88%E5%AF%B6%E5%A4%A9%E5%B0%8A%E8%AA%AA%E5%A4%A7%E9%80%9A%E7%B6%93&variant=zh-hans', 'http://www.ctcwri.idv.tw/CTCW-HFL/HFL02%E6%B4%9E%E7%8E%84%E9%83%A8/HFL0201%E6%9C%AC%E6%96%87%E9%A1%9E/HFL0201ALL/HFL020111%E5%A4%AA%E4%B8%8A%E6%B4%9E%E7%8E%84%E9%9D%88%E5%AF%B6%E5%A4%A9%E5%B0%8A%E8%AA%AA%E5%A4%A7%E9%80%9A%E7%B6%93/0201-079-3-3%E5%A4%AA%E4%B8%8A%E6%B4%9E%E7%8E%84%E9%9D%88%E5%AF%B6%E5%A4%A9%E5%B0%8A%E8%AA%AA%E5%A4%A7%E9%80%9A%E7%B6%93.pdf'],
     textual_certainty: 'high', notes: 'batch60 · Grok-4.5 focused 经典本文杂' },
-  { dz: 'DZ625', name_han: '太上說東斗主筭護命妙經', name_vi: 'Thái Thượng Thuyết Đông Đẩu Chủ Toán Hộ Mệnh Diệu Kinh', bu: '洞神', author: '佚名（託太上老君授正一天師）', era: '北宋初 / 約10–11 thế kỷ', topic: '经典',
-    essence: 'Lão Quân truyền cho Chính Nhất Thiên Sư về Đông Đẩu Đế Quân “chủ toán diên niên”: giám hình hồn, tước tử thượng sinh, độ tam đồ ngũ khổ bát nạn. Liệt năm chân quân Đông Đẩu (Thương Linh Diên Sinh…), hướng dẫn tụng hướng đông, cúng quả hoa, sám tội cầu thọ. Nằm trong hệ Ngũ Đẩu, ít nổi hơn Bắc Đẩu kinh nhưng là bản chính tạng độc lập.',
-    key_text: '吾今復為汝說玉靈瑤篇，東斗帝君之名，主算延年，使傳下世', use: 'Tụng cúng Đông Đẩu, cầu thọ, tước tử thượng sinh, sám tội diên mệnh',
-    sources: ['https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf', 'https://zh.wikisource.org/zh-hant/%E5%A4%AA%E4%B8%8A%E8%AA%AC%E6%9D%B1%E6%96%97%E4%B8%BB%E7%AE%97%E8%AD%B7%E5%91%BD%E5%A6%99%E7%B6%93', 'https://www.daoist.org/BookSearch(test)/list016.asp', 'https://crta.info/wiki/Daozang_-_DZ'],
-    textual_certainty: 'high', notes: 'batch60 · Grok-4.5 focused 经典本文杂' },
+  
   
 
   { dz: 'DZ1400', name_han: '上清黄庭养神经', name_vi: 'Thượng Thanh Hoàng Đình Dưỡng Thần Kinh', bu: '正一', author: '佚名', era: '唐宋间', topic: 'cultivation|黄庭',
@@ -7819,13 +7811,16 @@ const _DZ_FIX = {
   '太上说西斗记名护身妙经': 'DZ626', '磻溪集（长春子磻溪集）': 'DZ1159',
   '太上紫微玄都雷霆玉经': 'DZ15', '洞玄灵宝定观经注': 'DZ401',
   '谷神篇': 'DZ252', '三洞众戒文': 'DZ178',
-  '仙乐集': 'DZ1151', '黃庭內景玉經注': 'DZ402',
+  '仙乐集': 'DZ1141', '黃庭內景玉經注': 'DZ402',
+  '太上老君说安宅八阳经': 'DZ634', '太上老君内观经': 'DZ641',
 };
 DAOZANG.forEach((e) => {
-  const key = e.name_han.replace(/[（(].*$/, '');
-  if (key in _DZ_FIX) {
-    const fix = _DZ_FIX[key];
-    e.notes = (fix ? `道藏 ${fix}` : '道藏 kinh (DZ contested)') + (e.notes ? ' · ' + e.notes.split(' · ').slice(1).join(' · ') : '');
+  for (const [k, fix] of Object.entries(_DZ_FIX)) {
+    if (e.name_han.includes(k)) {
+      const suffix = (e.notes || '').split(' · ').filter((p) => !/DZ\s*0*\d/i.test(p) && !/^道藏/.test(p)).join(' · ');
+      e.notes = (fix ? `道藏 ${fix}` : '道藏 kinh (DZ contested)') + (suffix ? ' · ' + suffix : '');
+      break;
+    }
   }
 });
 
