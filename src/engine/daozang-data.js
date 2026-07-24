@@ -5127,6 +5127,12 @@ const DAOZANG_RAW = [
     key_text: '固役而不耻者，抑志怪小说之书也', use: 'bút ký Đường, dị văn tiên đạo, pháp thuật trung cổ',
     sources: ['https://zh.wikipedia.org/zh-hans/%E9%85%89%E9%98%B3%E6%9D%82%E4%BF%8E', 'https://ctext.org/wiki.pl?if=gb&res=895322&remap=gb', 'https://baike.baidu.com/item/%E9%85%89%E9%98%B3%E6%9D%82%E4%BF%8E/70374'],
     textual_certainty: 'high', notes: 'batch80 · Grok-4.5 仙传藏外+符咒+笔记类书' },
+
+  { dz: 'null', name_han: '新镌京版工师雕斫正式鲁班经匠家镜（附灵驱解法洞明真言秘书）', name_vi: 'Tân Quyên Kinh Bản Công Sư Điêu Chước Chính Thức Lỗ Ban Kinh Tượng Gia Kính', bu: '续道藏', author: '午榮等彙編（託魯班）', era: '明萬曆—崇禎刻本', topic: '民间科法本',
+    essence: 'Sách thợ mộc–kiến trúc dân gian khắc đời Minh, phụ lục “Linh khu giải pháp động minh chân ngôn bí thư” và “Lỗ ban bí thư”. Gồm phù trấn trạch, chú thượng lương, ngũ lôi địa chi linh phù, giải vật ma, thạch cảm đương v.v. Là pháp bản phù chú thợ thuyền/dân gian có bản khắc rõ, không phải bịa hiện đại.',
+    key_text: '附录载灵驱解法洞明真言秘书与鲁班秘书，介绍符箓咒语与镇物图形。', use: '修造镇宅、上梁禳解、工完解法、民间符咒镇物',
+    sources: ['https://baike.baidu.com/item/%E9%B2%81%E7%8F%AD%E7%BB%8F/57399721', 'http://collection.sina.com.cn/jczs/2015-07-27/doc-ifxfhxmr6452359.shtml', 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Shanghai_%E5%B7%A5%E5%B8%AB%E9%9B%95%E6%96%B2%E6%AD%A3%E5%BC%8F%E9%AD%AF%E7%8F%AD%E6%9C%A8%E5%AE%B6%E9%8F%A1%E4%B8%89%E5%8D%B7_%E9%A6%96%E5%9C%96%E4%B8%80%E5%8D%B7_%E9%9D%88%E9%A9%85%E8%A7%A3%E6%B3%95%E6%B4%9E%E6%98%8E%E7%9C%9F%E8%A8%80%E7%A7%98%E6%9B%B8%E4%B8%80%E5%8D%B7.pdf'],
+    textual_certainty: 'high', notes: 'batch81b · Grok-4.5 符咒秘诀藏外(饱和)' },
 ];
 
 // id base = full Hán of name_han (unique per entry, since dup-filter enforces unique
