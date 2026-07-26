@@ -26,7 +26,7 @@
   <meta name="twitter:description" content="Luận mệnh Bát Tự chính xác — Tứ Trụ, Dụng Thần, Cách Cục, Tử Vi, Phong Thủy + luận giải chi tiết." />
   <meta name="twitter:image" content="/bat-tu-dung-than/icon-512.png" />
   <meta name="robots" content="index, follow" />
-  <meta name="keywords" content="bát tự, tứ trụ, dụng thần, tử bình, tử vi, phong thủy, luận mệnh, đại vận, lưu niên, xem bói, bói toán, xem mệnh,Eight Characters, BaZi, Four Pillars, Zi Wei Dou Shu" />
+  <meta name="keywords" content="bát tự, tứ trụ, dụng thần, tử bình, tử vi, phong thủy, luận mệnh, đại vận, lưu niên, cổ pháp, thư viện huyền học, Eight Characters, BaZi, Four Pillars, Zi Wei Dou Shu" />
   <link rel="canonical" href="https://battu.god8.shop/" />
   <script type="application/ld+json">
   {
@@ -46,7 +46,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script type="module" crossorigin src="/bat-tu-dung-than/assets/index-BQV9u6ud.js"></script>
+  <script type="module" crossorigin src="/bat-tu-dung-than/assets/index-D1WxnPxN.js"></script>
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/vendor-lunar-Chzur7NX.js">
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-tcm-DfTkM1Sd.js">
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-nayin-BS6de1YW.js">
@@ -59,7 +59,7 @@
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-western-D_hNwKjx.js">
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-daozang-BNj0DRuU.js">
   <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-library-GiTbSaKG.js">
-  <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-ai-BkJDyLAO.js">
+  <link rel="modulepreload" crossorigin href="/bat-tu-dung-than/assets/engine-ai-BcwTIAWh.js">
   <link rel="stylesheet" crossorigin href="/bat-tu-dung-than/assets/index-CQazP6A0.css">
 </head>
 <body>
@@ -95,15 +95,16 @@
     <section class="card form-card">
       <h2 class="card-title">Lập lá số tứ trụ</h2>
       <form id="birth-form" class="birth-form">
-        <div class="field">
-          <label for="date">Ngày sinh (dương lịch)</label>
+        <!-- Hàng 1: lõi bắt buộc -->
+        <div class="field field-date">
+          <label for="date">Ngày sinh <span class="hint-inline">(dương lịch)</span></label>
           <input type="date" id="date" required value="" min="1900-01-01" max="2100-12-31" />
         </div>
-        <div class="field">
+        <div class="field field-time">
           <label for="time">Giờ sinh</label>
           <input type="time" id="time" required value="12:00" />
         </div>
-        <div class="field">
+        <div class="field field-gender">
           <label>Giới tính</label>
           <div class="seg">
             <input type="radio" name="gender" id="g-nam" value="nam" checked />
@@ -112,20 +113,13 @@
             <label for="g-nu">Nữ</label>
           </div>
         </div>
-        <div class="field">
-          <label for="partner">Đối tượng quan tâm <span class="hint-inline">(tùy chọn — chỉ đổi diễn giải tình duyên, không đổi lá số)</span></label>
-          <select id="partner">
-            <option value="" selected>— Không chỉ định (mặc định khác giới)</option>
-            <option value="nam">Nam</option>
-            <option value="nu">Nữ</option>
-          </select>
+        <!-- Hàng 2: ngữ cảnh -->
+        <div class="field field-name">
+          <label for="birth-name">Tên <span class="hint-inline">(tùy chọn)</span></label>
+          <input type="text" id="birth-name" maxlength="40" placeholder="VD: Nguyễn Văn A" autocomplete="name" />
         </div>
-        <div class="field">
-          <label for="birth-name">Tên <span class="hint-inline">(tùy chọn — để thầy nhận lại con sau này; bỏ trống nếu ẩn danh)</span></label>
-          <input type="text" id="birth-name" maxlength="40" placeholder="VD: Nguyễn Văn A (để trống nếu ẩn danh)" autocomplete="name" />
-        </div>
-        <div class="field">
-          <label for="tz">Múi giờ nơi sinh <span class="hint-inline">(mặc định VN = GMT+7)</span></label>
+        <div class="field field-tz">
+          <label for="tz">Múi giờ <span class="hint-inline">(mặc định GMT+7)</span></label>
           <select id="tz">
             <option value="7" selected>GMT+7 (Việt Nam, Thái Lan)</option>
             <option value="8">GMT+8 (Trung, Sing, Malaysia, Đài Loan, PH)</option>
@@ -137,8 +131,8 @@
             <option value="1">GMT+1 (Đức, Pháp, Việt hải ngoại Âu)</option>
           </select>
         </div>
-        <div class="field">
-          <label for="city">Nơi sinh <span class="hint-inline">(→ hiệu chỉnh 真太阳时 theo kinh độ)</span></label>
+        <div class="field field-city">
+          <label for="city">Nơi sinh <span class="hint-inline">(真太阳时)</span></label>
           <select id="city">
             <option value="" selected>— Không / giờ nhập dùng nguyên —</option>
             <option value="105.85">Hà Nội (105.85°Đ)</option>
@@ -152,10 +146,20 @@
             <option value="manual">Khác (nhập kinh độ ↓)</option>
           </select>
         </div>
-        <div class="field" id="long-field" style="display:none">
-          <label for="long">Kinh độ nơi sinh (°Đ, vd 116.4 cho Bắc Kinh)</label>
-          <input type="number" id="long" step="0.01" min="-180" max="180" style="width:7em" />
+        <div class="field field-long" id="long-field" style="display:none">
+          <label for="long">Kinh độ nơi sinh (°Đ)</label>
+          <input type="number" id="long" step="0.01" min="-180" max="180" placeholder="vd 116.4 Bắc Kinh" />
         </div>
+        <!-- Hàng 3: tùy chọn full width -->
+        <div class="field field-partner">
+          <label for="partner">Đối tượng quan tâm <span class="hint-inline">(tùy chọn — chỉ đổi diễn giải tình duyên)</span></label>
+          <select id="partner">
+            <option value="" selected>— Không chỉ định (mặc định khác giới)</option>
+            <option value="nam">Nam</option>
+            <option value="nu">Nữ</option>
+          </select>
+        </div>
+        <!-- Hàng 4: CTA -->
         <button type="submit" class="btn-primary">Luận giải</button>
       </form>
       <p class="hint" id="calendar-note"></p>
@@ -1268,7 +1272,7 @@
       </section>
 
 <section class="card">
-        <h3 class="card-title">Nhất Chưởng Kinh <span class="zh">一掌經</span> <span class="hint-inline">(bói tay Phật giáo · 4 cung ngón tay + lục đạo)</span></h3>
+        <h3 class="card-title">Nhất Chưởng Kinh <span class="zh">一掌經</span> <span class="hint-inline">(phân tích tay Phật giáo · 4 cung ngón tay + lục đạo)</span></h3>
         <div id="yizhangjing"></div>
       </section>
 
@@ -1908,5 +1912,9 @@
     });
   }
 </script>
+<footer style="text-align:center;padding:24px 16px 32px;color:#666;font-size:0.85rem;border-top:1px solid #222;margin-top:40px">
+  <p>Bát Tự Dụng Thần · Tham chiếu văn hoá-tôn giáo · Xác suất theo cổ pháp — KHÔNG phải chẩn đoán y tế/tâm thần, KHÔNG đảm bảo kết quả.</p>
+  <p><a href="/privacy.html" style="color:#9b6a2a">Chính sách bảo mật</a> · <a href="/kinh/index.html" style="color:#9b6a2a">Thư viện 1523 kinh</a> · <a href="/sitemap-kinh.xml" style="color:#9b6a2a">Sơ đồ trang</a></p>
+</footer>
 </body>
 </html>
