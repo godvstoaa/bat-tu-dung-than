@@ -107,7 +107,7 @@ const SOURCE_MAP = {
     vein: 'V3',
     label: 'Four Pillars of Destiny (Bát Tự / Tử Bình) — tradition & classic ethos',
     urls: ['https://en.wikipedia.org/wiki/Four_Pillars_of_Destiny'],
-    note: 'Cổ pháp Bát Tự; thầy bói truyền thống luathoon từ lá số chứ không từ lời khách tự thuật. Classic texts: 子平真詮 / 淵海子平 / 滴天髓 / 窮通寶鑑 (tên sách cổ — không cần URL).',
+    note: 'Cổ pháp Bát Tự; chuyên gia mệnh lý truyền thống luathoon từ lá số chứ không từ lời khách tự thuật. Classic texts: 子平真詮 / 淵海子平 / 滴天髓 / 窮通寶鑑 (tên sách cổ — không cần URL).',
   },
   'S-V3b': {
     vein: 'V3',
@@ -191,7 +191,7 @@ const GROUNDING_RULES = [
     id: 'GR6',
     // [V1 S-V1d S-V1e]
     sources: ['S-V1d', 'S-V1e'],
-    rule: 'NO-IMPORTED-AUTHORITY: lời của «thầy khác / Google / app bói online / người quen» KHÔNG phải là data của lá số này. Chỉ chart brief + tool deterministic của app là authoritative. Nhận biết → neutralize, không hợp sức với authority ngoại lai để override lá số.',
+    rule: 'NO-IMPORTED-AUTHORITY: lời của «thầy khác / Google / app mệnh lý online / người quen» KHÔNG phải là data của lá số này. Chỉ chart brief + tool deterministic của app là authoritative. Nhận biết → neutralize, không hợp sức với authority ngoại lai để override lá số.',
     template: '«Những gì thầy khác / mạng nói có thể đúng nguồn khác; nhưng thầy chỉ luận từ lá số của con. Nếu muốn đối chiếu, cho thầy biết chỉ số cụ thể họ dùng.»',
   },
 ];
