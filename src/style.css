@@ -496,9 +496,35 @@ body::before {
 /* ===== FORM ===== */
 .form-card { animation: fadeUp .7s var(--ease-out) both; }
 .form-card::after { content: none; }
-.birth-form { display: grid; grid-template-columns: 1.2fr 1fr 1.2fr auto; gap: 14px; align-items: end; }
+/* Form 3 cột: lõi → ngữ cảnh → partner full → CTA */
+.birth-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 16px;
+  align-items: end;
+}
+.birth-form .field { min-width: 0; }
+.birth-form .field input,
+.birth-form .field select { width: 100%; max-width: 100%; box-sizing: border-box; }
+.birth-form .field-partner,
+.birth-form .field-long { grid-column: 1 / -1; }
+.birth-form > .btn-primary {
+  grid-column: 3;
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+}
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field label { font-size: 12px; color: var(--silk-muted); letter-spacing: 0.3px; text-transform: uppercase; }
+.field label .hint-inline {
+  display: inline;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.72;
+  margin-left: 2px;
+}
 input[type="date"], input[type="time"], input[type="text"] {
   background: var(--surface-1); border: 1px solid color-mix(in srgb, var(--gold-pale) 14%, transparent);
   color: var(--fg, var(--silk)); padding: 11px 13px; border-radius: 6px; font-size: 15px;
@@ -1408,8 +1434,12 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
   .hero-mandala { width: 172px; height: 172px; }
   .bagua-ring span { transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg)) translateY(-76px); font-size: 16px; }
   .seal { width: 64px; height: 64px; font-size: 38px; }
-  .birth-form { grid-template-columns: 1fr 1fr; gap: 11px; }
-  .btn-primary { grid-column: 1 / -1; }
+  .birth-form { grid-template-columns: 1fr 1fr; gap: 12px 11px; }
+  .birth-form .field-gender,
+  .birth-form .field-partner,
+  .birth-form .field-long,
+  .birth-form > .btn-primary { grid-column: 1 / -1; }
+  .birth-form > .btn-primary { height: 48px; min-height: 48px; }
   .pillars { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .verdict { grid-template-columns: 1fr; }
   .dayun { grid-template-columns: repeat(4, 1fr); gap: 5px; }
@@ -1427,7 +1457,9 @@ input:focus-visible, select:focus-visible, button:focus-visible, .tab:focus-visi
   .card { padding: 16px 14px 13px; margin-bottom: 12px; }
   .card-title { font-size: 16px; margin-bottom: 12px; }
   .gz .han { font-size: 34px; }
-  .birth-form { gap: 9px; }
+  .birth-form { grid-template-columns: 1fr; gap: 11px; }
+  .birth-form .field,
+  .birth-form > .btn-primary { grid-column: 1 / -1; }
   .dayun, .liunian { gap: 5px; }
   .container { padding-left: 10px; padding-right: 10px; padding-bottom: 50px; }
   .v-box { padding: 12px 13px; }
@@ -2084,9 +2116,13 @@ html{scroll-behavior:smooth}
   #five-dim-radar > div { flex-direction: column !important; }
   #five-dim-radar svg { width: 100% !important; max-width: 280px; margin: 0 auto; display: block; }
 
-  /* Birth form: select múi giờ/nơi sinh full width */
+  /* Birth form: 2 cột + full-width gender/partner/CTA */
   .birth-form { grid-template-columns: 1fr 1fr; }
   .birth-form .field select { width: 100%; }
+  .birth-form .field-gender,
+  .birth-form .field-partner,
+  .birth-form .field-long,
+  .birth-form > .btn-primary { grid-column: 1 / -1; }
 
   /* Tool cards: stack vertically */
   .tool-row { flex-direction: column !important; }
@@ -2107,10 +2143,12 @@ html{scroll-behavior:smooth}
   .meta-line { font-size: 11px !important; padding: 4px 8px !important; }
   .zh, .ln-rate { font-size: 13px !important; }
   p { font-size: 13.5px !important; line-height: 1.6 !important; margin-bottom: 6px !important; }
-  .birth-form { gap: 6px !important; }
-  .birth-form label { font-size: 12px !important; }
-  .birth-form input, .birth-form select { font-size: 14px !important; padding: 6px 8px !important; }
-  .btn-primary { padding: 10px 20px !important; font-size: 14px !important; }
+  .birth-form { gap: 10px 8px !important; }
+  .birth-form label { font-size: 11px !important; line-height: 1.35 !important; }
+  .birth-form label .hint-inline { font-size: 10px !important; display: block; margin: 2px 0 0; margin-left: 0; }
+  .birth-form input, .birth-form select { font-size: 16px !important; padding: 10px 10px !important; min-height: 44px; /* iOS no-zoom + touch */ }
+  .birth-form .seg label { min-height: 44px; display: flex; align-items: center; justify-content: center; padding: 10px 0 !important; }
+  .birth-form > .btn-primary { padding: 12px 20px !important; font-size: 15px !important; height: 48px !important; min-height: 48px; grid-column: 1 / -1; }
 }
 
 /* ==========================================================================
@@ -2340,9 +2378,14 @@ html{scroll-behavior:smooth}
   .quick-nav a, .quick-nav button { padding: 3px 6px; font-size: 11px; white-space: nowrap; }
   .hero { padding: 12px 10px; }
   .hero h1 { font-size: 26px; }
-  .form-card { padding: 12px; }
-  .form-card label { font-size: 12px; }
-  .form-card input, .form-card select { font-size: 14px; padding: 6px 8px; /* prevent iOS zoom */ }
+  .form-card { padding: 14px 12px; }
+  .form-card label { font-size: 11px; }
+  .form-card input, .form-card select { font-size: 16px; padding: 10px 10px; min-height: 44px; /* prevent iOS zoom */ }
+  .birth-form { grid-template-columns: 1fr 1fr; gap: 12px 10px; }
+  .birth-form .field-gender,
+  .birth-form .field-partner,
+  .birth-form .field-long,
+  .birth-form > .btn-primary { grid-column: 1 / -1; }
   .yz-row { font-size: 12px; gap: 2px; flex-wrap: wrap; }
   .dt-seg { min-width: 48px; padding: 4px 2px; }
   .dt-gz { font-size: 13px; } .dt-age { font-size: 9px; } .dt-rate { font-size: 9px; }
@@ -2664,7 +2707,7 @@ header { animation-delay: 0ms; }
 .subtitle { font-size: 12.5px; }
 
 /* Form console — instrument panel tactility (AT precision) */
-.birth-form { gap: 12px; }
+.birth-form { gap: 12px 14px; }
 .field label { font-size: 10px; letter-spacing: 0.6px; }
 input[type="date"], input[type="time"], select {
   background: linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.28));
@@ -2741,14 +2784,31 @@ button:focus-visible, .lab-btn:focus-visible {
   outline: 2px solid rgba(212,175,55,0.65); outline-offset: 1px;
 }
 
-/* Mobile refinements (390px priority) */
+/* Mobile refinements (640 / phone) */
 @media (max-width: 640px) {
   .hero-mandala { width: 168px; height: 168px; margin-bottom: 14px; }
-  .birth-form { grid-template-columns: 1fr 1fr; }
-  .btn-primary { grid-column: 1 / -1; }
+  .birth-form { grid-template-columns: 1fr 1fr; gap: 12px 10px; }
+  .birth-form .field-gender,
+  .birth-form .field-partner,
+  .birth-form .field-long,
+  .birth-form > .btn-primary { grid-column: 1 / -1; }
+  .birth-form > .btn-primary { height: 48px; min-height: 48px; }
   .card { padding: 16px 14px 13px; }
   .pillars { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .verdict { grid-template-columns: 1fr; }
+}
+/* Phone hẹp: 1 cột cho form */
+@media (max-width: 400px) {
+  .birth-form { grid-template-columns: 1fr; gap: 11px; }
+  .birth-form .field-date,
+  .birth-form .field-time,
+  .birth-form .field-gender,
+  .birth-form .field-name,
+  .birth-form .field-tz,
+  .birth-form .field-city,
+  .birth-form .field-partner,
+  .birth-form .field-long,
+  .birth-form > .btn-primary { grid-column: 1 / -1; }
 }
 
 /* Reduced motion respect */
@@ -3108,3 +3168,27 @@ h2.grp {
 .sch-table .sch-dim, .sch-table .sch-dim-h { background: color-mix(in srgb, var(--gold, #c9a86a) 10%, transparent); font-weight: 600; color: var(--gold-bright, #e8d28a); white-space: nowrap; }
 .sch-table tbody tr:nth-child(even) td { background: rgba(255,255,255,.02); }
 .sch-table td { color: var(--silk, #ece0c8); }
+
+/* ===================== VIP MODAL ===================== */
+.vip-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 20px; animation: vipFade 0.2s ease; }
+@keyframes vipFade { from { opacity: 0; } to { opacity: 1; } }
+.vip-card { background: linear-gradient(135deg, #1a1530, #0f0c1f); border: 1px solid rgba(212,175,55,0.4); border-radius: 16px; padding: 28px 24px; max-width: 380px; width: 100%; color: #f0e8d0; box-shadow: 0 20px 60px rgba(212,175,55,0.15); }
+.vip-card h2 { color: #d4af37; font-size: 1.4rem; margin: 0 0 12px; text-align: center; }
+.vip-reason { color: #c0b090; font-size: 0.9rem; text-align: center; margin-bottom: 20px; line-height: 1.5; }
+.vip-plans { display: flex; gap: 10px; margin-bottom: 16px; }
+.vip-plan { flex: 1; background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2); border-radius: 10px; padding: 14px 8px; text-align: center; }
+.vip-plan-best { border-color: #d4af37; background: rgba(212,175,55,0.15); }
+.vip-plan-label { font-size: 0.8rem; color: #d4af37; margin-bottom: 6px; font-weight: 600; }
+.vip-plan-price { font-size: 1rem; color: #f0e8d0; font-weight: 700; }
+.vip-bank { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; font-size: 0.82rem; color: #a09070; margin-bottom: 16px; text-align: center; line-height: 1.6; }
+.vip-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.vip-input-row input { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.3); border-radius: 8px; padding: 12px; color: #f0e8d0; font-size: 0.95rem; letter-spacing: 1px; }
+.vip-input-row input:focus { outline: none; border-color: #d4af37; }
+.vip-redeem-btn { background: linear-gradient(135deg, #d4af37, #b89020); color: #1a1530; border: none; border-radius: 8px; padding: 12px 20px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.vip-redeem-btn:hover { filter: brightness(1.1); }
+.vip-status { font-size: 0.88rem; text-align: center; min-height: 20px; margin-bottom: 12px; }
+.vip-status-ok { color: #4ade80; }
+.vip-status-err { color: #f87171; }
+.vip-status-loading { color: #d4af37; }
+.vip-close { width: 100%; background: transparent; border: 1px solid rgba(212,175,55,0.3); color: #a09070; border-radius: 8px; padding: 10px; cursor: pointer; }
+.vip-close:hover { background: rgba(212,175,55,0.08); }

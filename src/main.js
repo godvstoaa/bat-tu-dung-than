@@ -4335,6 +4335,16 @@ async function handleAsk() {
   }
   const q = $('question').value.trim();
   if (!q) return;
+  // [VIP GATE] free tier: 3 câu/ngày, VIP không giới hạn
+  try {
+    const { canUseAi, incrementAiQuota, isVip, FREE_AI_DAILY, getAiQuota } = await import('./engine/vip.js');
+    if (!canUseAi() && !isVip()) {
+      const quota = getAiQuota();
+      showVipModal('Bạn đã dùng hết ' + FREE_AI_DAILY + ' câu hỏi AI miễn phí hôm nay. Nâng VIP để hỏi không giới hạn + báo cáo chi tiết.');
+      return;
+    }
+    incrementAiQuota();
+  } catch (_) {}
   _logEvent('ai_question', { q: q }); // [admin loop 1351]
   $('question').value = '';
   _aiBusy = true;
@@ -7922,3 +7932,62 @@ fetch('/api/ai-config').then(function (r) { return r.json(); }).then(function (c
   }
 }).catch(function () {});
 /* bust */
+
+// ============================================================================
+//  [VIP] Modal — user nhập activation code (mua qua chuyển khoản) hoặc IAP
+// ============================================================================
+function showVipModal(reason) {
+  // remove existing
+  const old = $('vip-modal'); if (old) old.remove();
+  const overlay = _h('div', { id: 'vip-modal', class: 'vip-overlay' });
+  const card = _h('div', { class: 'vip-card' });
+  card.appendChild(_h('h2', {}, '⭐ Nâng VIP'));
+  if (reason) card.appendChild(_h('p', { class: 'vip-reason' }, reason));
+  // pricing
+  const plans = _h('div', { class: 'vip-plans' });
+  [
+    { label: '7 ngày', price: '30.000đ', plan: 'W7' },
+    { label: '30 ngày', price: '99.000đ', plan: 'M30', best: true },
+    { label: '365 ngày', price: '499.000đ', plan: 'Y365' },
+  ].forEach(p => {
+    const plan = _h('div', { class: 'vip-plan' + (p.best ? ' vip-plan-best' : '') });
+    plan.appendChild(_h('div', { class: 'vip-plan-label' }, p.label + (p.best ? ' ⭐' : '')));
+    plan.appendChild(_h('div', { class: 'vip-plan-price' }, p.price));
+    plans.appendChild(plan);
+  });
+  card.appendChild(plans);
+  // bank info placeholder (user điền sau)
+  card.appendChild(_h('div', { class: 'vip-bank' },
+    'Chuyển khoản: STK [điền] — [Ngân hàng] — Nội dung: VIP'));
+  // code input
+  const inputRow = _h('div', { class: 'vip-input-row' });
+  const input = _h('input', { type: 'text', placeholder: 'Nhập mã VIP (VD: VIP-XXXX-XXXX)', maxlength: '20' });
+  const btn = _h('button', { class: 'vip-redeem-btn' }, 'Kích hoạt');
+  const status = _h('div', { class: 'vip-status' });
+  btn.onclick = async () => {
+    const code = input.value.trim();
+    if (!code) { status.textContent = 'Vui lòng nhập mã'; status.className = 'vip-status vip-status-err'; return; }
+    status.textContent = 'Đang kiểm tra...'; status.className = 'vip-status vip-status-loading';
+    try {
+      const { redeemCode } = await import('./engine/vip.js');
+      const res = await redeemCode(code);
+      if (res.ok) {
+        status.textContent = '✅ VIP đã kích hoạt! ' + res.days + ' ngày. Hỏi AI không giới hạn ngay.';
+        status.className = 'vip-status vip-status-ok';
+        setTimeout(() => { overlay.remove(); }, 2000);
+      } else {
+        status.textContent = '❌ ' + res.error; status.className = 'vip-status vip-status-err';
+      }
+    } catch (e) { status.textContent = 'Lỗi: ' + e.message; status.className = 'vip-status vip-status-err'; }
+  };
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') btn.click(); });
+  inputRow.appendChild(input); inputRow.appendChild(btn);
+  card.appendChild(inputRow); card.appendChild(status);
+  // close
+  const closeBtn = _h('button', { class: 'vip-close' }, 'Đóng');
+  closeBtn.onclick = () => overlay.remove();
+  card.appendChild(closeBtn);
+  overlay.appendChild(card);
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}

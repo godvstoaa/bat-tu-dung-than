@@ -85,19 +85,17 @@ export async function redeemCode(code) {
   }
 }
 
-// iOS: purchase via StoreKit (Capacitor In-App Purchases)
+// iOS: purchase via StoreKit (Capacitor plugin — runtime, không import tĩnh)
 export async function purchaseIap(productId) {
   if (!isNative()) return { ok: false, error: 'IAP chỉ khả dụng trong app iOS/Android' };
   try {
-    // Dynamic import — chỉ load khi native (không bloat web bundle)
-    const { InAppPurchases } = await import('@capacitor-community/in-app-purchases');
-    // 1. fetch products
-    const { products } = await InAppPurchases.getProducts({ productIds: [productId] });
+    // Access plugin via Capacitor runtime registry (không cần npm install cho web build)
+    const IAP = window.Capacitor?.Plugins?.InAppPurchases || window.Capacitor?.Plugins?.['InAppPurchases'];
+    if (!IAP) return { ok: false, error: 'Plugin IAP chưa cài (cần build native)' };
+    const { products } = await IAP.getProducts({ productIds: [productId] });
     if (!products || !products.length) return { ok: false, error: 'Sản phẩm không khả dụng' };
-    // 2. purchase
-    const result = await InAppPurchases.purchase({ productId });
+    const result = await IAP.purchase({ productId });
     if (result.purchase && result.purchase.state === 'purchased') {
-      // 3. verify receipt + activate
       const plan = VIP_PLANS.find((p) => p.id === productId);
       if (plan) {
         const now = Date.now();
