@@ -1,0 +1,34 @@
+{
+  "text": "{\"entries\":[{\"name_han\":\"...\",\"full_vn\":\"...\"}]}",
+  "stopReason": "EndTurn",
+  "sessionId": "019fb3c5-96c5-7e62-a1fe-7dd536432460",
+  "requestId": "cbefcd0c-1f64-47d0-a5f5-f80cb5a57895",
+  "thought": "The user wants me to translate 20 Daoist/BaZi classical texts into Vietnamese. They want actual translations of key content from these texts, not summaries. Let me research what each of these texts ac...",
+  "usage": {
+    "input_tokens": 57030,
+    "cache_read_input_tokens": 1024,
+    "output_tokens": 403,
+    "reasoning_tokens": 383,
+    "total_tokens": 58457
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.1167852,
+  "total_cost_usd_ticks": 1167852000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 57030,
+      "outputTokens": 403,
+      "cacheReadInputTokens": 1024,
+      "modelCalls": 1,
+      "costUSD": 0.1167852
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "name_han": "...",
+        "full_vn": "..."
+      }
+    ]
+  }
+}
