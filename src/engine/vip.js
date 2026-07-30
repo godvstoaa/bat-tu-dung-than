@@ -85,31 +85,72 @@ export async function redeemCode(code) {
   }
 }
 
-// iOS: purchase via StoreKit (Capacitor plugin — runtime, không import tĩnh)
+// iOS: purchase via RevenueCat (StoreKit abstraction — receipt validation + subscription)
 export async function purchaseIap(productId) {
   if (!isNative()) return { ok: false, error: 'IAP chỉ khả dụng trong app iOS/Android' };
   try {
-    // Access plugin via Capacitor runtime registry (không cần npm install cho web build)
-    const IAP = window.Capacitor?.Plugins?.InAppPurchases || window.Capacitor?.Plugins?.['InAppPurchases'];
-    if (!IAP) return { ok: false, error: 'Plugin IAP chưa cài (cần build native)' };
-    const { products } = await IAP.getProducts({ productIds: [productId] });
-    if (!products || !products.length) return { ok: false, error: 'Sản phẩm không khả dụng' };
-    const result = await IAP.purchase({ productId });
-    if (result.purchase && result.purchase.state === 'purchased') {
-      const plan = VIP_PLANS.find((p) => p.id === productId);
-      if (plan) {
-        const now = Date.now();
-        const current = getVipStatus();
-        const base = current.vip ? current.until : now;
-        const until = base + plan.days * 86400000;
-        localStorage.setItem(VIP_KEY, JSON.stringify({ vip: true, until, plan: productId, source: 'ios' }));
-        return { ok: true, until, days: plan.days };
-      }
+    const { Purchases } = await import('@revenuecat/purchases-capacitor');
+    // 1. Lấy offerings
+    const { offerings } = await Purchases.getOfferings();
+    const pkg = offerings.current?.availablePackages?.find((p) => p.product.identifier === productId);
+    if (!pkg) return { ok: false, error: 'Gói không khả dụng' };
+    // 2. Purchase
+    const { customerInfo } = await Purchases.purchasePackage({ aPackage: pkg });
+    // 3. Check entitlement
+    if (customerInfo.entitlements.active['vip']) {
+      const ent = customerInfo.entitlements.active['vip'];
+      const until = ent.expirationTimeMs || (Date.now() + 30 * 86400000);
+      localStorage.setItem(VIP_KEY, JSON.stringify({ vip: true, until, plan: productId, source: 'ios_iap' }));
+      return { ok: true, until };
     }
-    return { ok: false, error: 'Thanh toán chưa hoàn tất' };
+    return { ok: false, error: 'Chưa kích hoạt' };
   } catch (e) {
-    return { ok: false, error: e.message || 'Lỗi IAP' };
+    if (e.userCancelled) return { ok: false, cancelled: true };
+    return { ok: false, error: (e.message || 'Lỗi IAP').slice(0, 100) };
   }
+}
+
+// Restore purchases — Apple BẮT BUỘC (guideline 3.1.1)
+export async function restorePurchases() {
+  if (!isNative()) return { ok: false, error: 'Chỉ khả dụng trong app' };
+  try {
+    const { Purchases } = await import('@revenuecat/purchases-capacitor');
+    const { customerInfo } = await Purchases.restorePurchases();
+    if (customerInfo.entitlements.active['vip']) {
+      const ent = customerInfo.entitlements.active['vip'];
+      const until = ent.expirationTimeMs || (Date.now() + 30 * 86400000);
+      localStorage.setItem(VIP_KEY, JSON.stringify({ vip: true, until, plan: 'restored', source: 'ios_iap' }));
+      return { ok: true, until };
+    }
+    return { ok: false, error: 'Không tìm thấy gói VIP' };
+  } catch (e) {
+    return { ok: false, error: (e.message || 'Lỗi').slice(0, 80) };
+  }
+}
+
+// Check VIP status on app open (sync with RevenueCat)
+export async function checkIapVipStatus() {
+  if (!isNative()) return;
+  try {
+    const { Purchases } = await import('@revenuecat/purchases-capacitor');
+    const { customerInfo } = await Purchases.getCustomerInfo();
+    if (customerInfo.entitlements.active['vip']) {
+      const ent = customerInfo.entitlements.active['vip'];
+      const until = ent.expirationTimeMs || (Date.now() + 30 * 86400000);
+      localStorage.setItem(VIP_KEY, JSON.stringify({ vip: true, until, plan: 'iap_active', source: 'ios_iap' }));
+    }
+  } catch (_) {}
+}
+
+// Initialize RevenueCat on app start
+export async function initRevenueCat(apiKey) {
+  if (!isNative() || !apiKey) return;
+  try {
+    const { Purchases } = await import('@revenuecat/purchases-capacitor');
+    await Purchases.setLogLevel('WARN');
+    await Purchases.configure({ apiKey });
+    await checkIapVipStatus();
+  } catch (_) {}
 }
 
 // Universal buy — tự chọn web vs iOS
