@@ -47,11 +47,17 @@ npx cap open ios       # mở Xcode
 
 ## 3. METADATA (điền vào App Store Connect)
 
-### Tên app
+### Tên App Store (Name field trong App Store Connect)
 ```
-Bát Tự Dụng Thần — Phân Tích Mệnh Lý
+Lữ Đăng
 ```
-(KHÔNG dùng "Bói Toán" — Apple flag 4.3)
+- **Subtitle** (field riêng, ≤30 ký tự): `Bát Tự · Tử Vi · Mệnh Lý Cổ Pháp`
+- KHÔNG dùng "Bói Toán" — Apple flag 4.3.
+- **Bundle ID `shop.god8.battu` giữ nguyên** (đây là appId kỹ thuật, cố định vĩnh viễn, không liên quan tên Store).
+- **Home-screen icon name**: Apple bắt ≈ App Store name (2.3.10) → khi build, đặt `appName`/CFBundleDisplayName = "Lữ Đăng" luôn (chỉ display name, KHÔNG phải appId).
+
+#### Brand origin (paste vào phần "What's New"/mô tả nếu muốn)
+> *Tên "Lữ Đăng" do tự gieo quẻ Dịch mà ra: quẻ #56 Hỏa Sơn Lữ (lửa sáng trên đỉnh núi = đuốc soi đường cho lữ khách), hào 3 động cảnh báo phải khiêm nhường, biến sang quẻ #35 Hỏa Địa Tấn (mặt trời mọc = tiến tới sáng rộng). Lữ Đăng = ngọn đèn soi đường cho người lữ khách đi trong đêm, hướng ánh bình minh.*
 
 ### Danh mục
 - **Primary**: Lifestyle

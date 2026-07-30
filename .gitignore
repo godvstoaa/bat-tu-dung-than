@@ -40,6 +40,9 @@ public/sitemap-kinh.xml
 ios/
 android/
 
+# App Store submission assets (generated, ~9MB, giữ local)
+appstore-shots/
+
 # Local temp / OCR / audit artifacts (KHÔNG commit)
 _tmp/
 _tmp_*
