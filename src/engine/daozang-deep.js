@@ -2806,17 +2806,28 @@ export const DAOZANG_DEEP = {
 
 };
 
+// trad→simpl normalization for matching
+const _T2S = { '經':'经','書':'书','寶':'宝','論':'论','傳':'传','記':'记','義':'义','註':'注','訣':'诀','祕':'秘','體':'体','圖':'图','錄':'录','紀':'纪','靈':'灵','煉':'炼','師':'师','醫':'医','學':'学','籤':'签','聖':'圣','冊':'册','曆':'历','濟':'济','藥':'药','術':'术','數':'数','運':'运','觀':'观','覺':'觉','語':'语','話':'话','讀':'读','詩':'诗','詞':'词','賦':'赋','頌':'颂','銘':'铭','誥':'诰','緯':'纬','綱':'纲' };
+function _norm(s) { return String(s||'').replace(/[（(].*$/,'').split('').map(c => _T2S[c] || c).join(''); }
+
 // Merge deep content into DAOZANG entries at runtime
 export function enrichWithDeep(entries) {
+  // build normalized key map
+  const normMap = {};
+  for (const [key, deep] of Object.entries(DAOZANG_DEEP)) {
+    normMap[_norm(key)] = deep;
+  }
   for (const e of entries) {
-    const name = e.name_han.replace(/[（(].*$/, '');
-    // match by name substring (handles parenthetical suffixes)
-    for (const [key, deep] of Object.entries(DAOZANG_DEEP)) {
-      if (name.includes(key) || key.includes(name)) {
-        e.deep_essence = deep.deep_essence;
-        e.deep_passages = deep.key_passages;
-        e.deep_application = deep.application;
-        e.deep_related = deep.related;
+    const name = _norm(e.name_han);
+    // exact normalized match
+    if (normMap[name]) {
+      Object.assign(e, { deep_essence: normMap[name].deep_essence, deep_passages: normMap[name].key_passages, deep_application: normMap[name].application, deep_related: normMap[name].related });
+      continue;
+    }
+    // substring match (normalized)
+    for (const [nkey, deep] of Object.entries(normMap)) {
+      if (name.includes(nkey) || nkey.includes(name)) {
+        Object.assign(e, { deep_essence: deep.deep_essence, deep_passages: deep.key_passages, deep_application: deep.application, deep_related: deep.related });
         break;
       }
     }
