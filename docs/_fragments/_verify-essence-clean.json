@@ -1,0 +1,202 @@
+[
+ {
+  "title": "道德经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太清調氣經",
+  "verdict": "accurate",
+  "issues": "DZ numbering: shidianguji/CRTA use DZ820; 道藏提要/daoinfo sometimes list ~814—catalog systems differ, not a content error. Essence and key_text match the Daozang text."
+ },
+ {
+  "title": "老君音誦誡經",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "玉清無極總真文昌大洞仙經注",
+  "verdict": "accurate",
+  "issues": "Claim “lớp chú triết lý sâu nhất” is evaluative. Structurally correct: 10 juan, first 2 theory (incl. Yijing/Hetu-Luoshu diagrams), last 8 commentary; neidan-Yijing reading of Wenchang Dadong, 卫琪/中阳子, 1311."
+ },
+ {
+  "title": "太上慈悲九幽拔罪懺",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "黄帝阴符经注（黄居真）",
+  "verdict": "accurate",
+  "issues": "key_text is the Yin Fu Jing opening that the note annotates, not original Huang prose—standard and acceptable. Song Daozang jade-instruction class; sits with 蹇昌辰 / 任照一 among Song commentaries."
+ },
+ {
+  "title": "崔公入药镜注释（李攀龙）",
+  "verdict": "partial",
+  "issues": "key_text “先天一炁金丹祖，虚无久是先天母” is from 沧溟诗曰 (Li’s appended poem in the 道藏精华录 three-note set), not from Cui’s 246-character root text and not the formal lemma of the commentary. Essence otherwise correct: Li with 王道渊/彭好古; discusses 应潮/应星, 朔望 fire-phasing, xiantian yiqi.",
+  "corrected_essence": "Chú 《入药镜》 của Lý Phan Long (Thương Minh), in cùng chú Vương Đạo Uyên và Bành Hảo Cổ trong 《道藏精华录》. Giải “ứng triều–ứng tinh”, hỏa hầu sóc vọng, tiên thiên nhất khí. Bổ sung góc nhìn văn nhân–đạo sĩ cho cốt tủy 246 chữ của Thôi Hy Phạm. (Câu “先天一炁…” là thơ phụ của Thương Minh, không phải nguyên văn Thôi công.)"
+ },
+ {
+  "title": "销释金刚科仪（宝卷/科仪）",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "历象考成",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "温病条辨",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "通玄真经（文子）",
+  "verdict": "partial",
+  "issues": "Author 辛钘 is traditional (also linked to 计然); scholarly dating spans late Warring States–early Han redaction, not a single secure person. key_text appears in Wenzi (e.g. 微明) in essentially this form. 12 pian and 九守 / practical wuwei politics OK."
+ },
+ {
+  "title": "太上老君内观经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "道德真经义疏（老子道德经开题序诀义疏）",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太上说下元三品解厄水官妙经",
+  "verdict": "accurate",
+  "issues": "Cautious framing is correct: exact independent Zhengtong title is not cleanly isolable; belongs to Sanguan/Xia Yuan Shuiguan functional cluster. key_text is a divine title formula, not a continuous sutra sentence."
+ },
+ {
+  "title": "太上洞玄靈寶往生救苦妙經",
+  "verdict": "partial",
+  "issues": "This exact title exists (DZ ~372, Dongxuan). Content is 天尊 teaching 左玄真人 on hells/sin, long zhai, daochang, five kinds of dana for 往生—not primarily “oai thần Cứu Khổ” (that is closer to 《太上洞玄灵宝救苦妙经》). Era better 南北朝末–隋唐 than “唐宋—宋”.",
+  "corrected_essence": "Kinh Linh Bảo (ĐĐ ~372) về vãng sinh cứu khổ: Thiên Tôn dạy Tả Huyền chân nhân nhân duyên tội phúc, địa ngục tam đồ ngũ khổ; phương giải là trai giới, lập đạo tràng, tụng sám, bố thí (tài/pháp/kinh tượng…) để bạt tội, tùy nguyện vãng sinh. Khác bản ngắn “Cứu Khổ Thiên Tôn”; trọng tâm độ u–vãng sinh hơn là xưng tán Cứu Khổ đơn thuần. Ước Nam Bắc triều mạt–Tùy–Đường."
+ },
+ {
+  "title": "黄庭内景玉经注解（汪旦）",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "许真君受炼形神上清毕道法要节文",
+  "verdict": "partial",
+  "issues": "Text exists in Zhengtong (Dongxuan methods); Jingming/Xu Xun milieu, sometimes linked to 何守澄节录. Very short (<~400 chars), more 符咒/度人经-style 炼形神 than multi-step Shangqing neidan manual. key_text “形神受炼，上清毕道，白日飞升” not verified as continuous verbatim in the piece—reads like title+trope paraphrase.",
+  "corrected_essence": "Tiết văn ngắn (Đạo tạng, Động huyền phương pháp) gắn Tịnh Minh/Hứa Chân Quân: mượn ý Độ nhân / Linh Bảo, bàn luyện hình thần, phù chú hộ trì hướng tất đạo Thượng Thanh. Không phải cẩm nang nhiều bước chi tiết; key_text kiểu tiêu đề–khẩu quyết cần đối nguyên văn trước khi trích."
+ },
+ {
+  "title": "台湾道教仪式之音乐（吕锤宽）",
+  "verdict": "accurate",
+  "issues": "Common published title variants e.g. 《台灣的道教儀式與音樂》(1994); content claim (ritual bands, wen/wu ke, Taiwan field collection) holds."
+ },
+ {
+  "title": "大六壬金口诀",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "灵城精义",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太上老君混元三部符",
+  "verdict": "accurate",
+  "issues": "Era better 唐宋 than bare “Đường”; 3 juan, 740+ fu, functional categories match Daozang/daoinfo."
+ },
+ {
+  "title": "五显灵官大帝",
+  "verdict": "accurate",
+  "issues": "Correctly treated as deity/cult cluster, not a single DZ scripture."
+ },
+ {
+  "title": "太上三五禹步经",
+  "verdict": "partial",
+  "issues": "Negative catalog finding is sound. key_text “而稱禹步者，大禹治水而成厥功，天授此步…” not matched in standard Yubu sources (e.g. 洞神八帝元变经 uses different origin wording: bird-step imitation etc.). Treat key_text as unverified paraphrase."
+ },
+ {
+  "title": "太上老君说上七元真人金轩玉字经",
+  "verdict": "inaccurate",
+  "issues": "Exact title and key_text “七元真宰，金轩玉字” not found in Zhengtong/Schipper-style catalogs or major digital corpora. Positive claims about Qiyuan zhenren / jin xuan yu zi practice are unsubstantiated.",
+  "corrected_essence": "Không xác minh được đúng nhan đề trong Chính thống Đạo tạng / mục lục chuẩn. Có thể nhầm với nhóm kinh thất nguyên / Bắc Đẩu–tinh quân hoặc bản dân gian ngoài tạng. Không gán nội dung hay DZ khi chưa có bản đối chiếu."
+ },
+ {
+  "title": "太上妙始经",
+  "verdict": "partial",
+  "issues": "Scripture exists (Dongshen, ~DZ658 range): cosmic “妙始”, xu wu / qingwei xuanyuan qi—philosophy not fulu. key_text “妙始希夷，道之根也” NOT in the text (hallucinated); actual opening is “道出於無形，無名無聲…”. Era 南北朝–唐宋, not only “唐重玄”.",
+  "corrected_essence": "Kinh một quyển (Động thần) bàn “diệu thủy/thủy khởi” vũ trụ: đạo xuất vô hình, hư vô làm tông, thanh vi huyền nguyên chi khí làm bản; hợp tán thành thiên địa vạn vật. Màu Lão học/trùng huyền, đọc tụng suy ngẫm hơn phù lục. Không dùng câu “妙始希夷，道之根也” (không có trong nguyên văn)."
+ },
+ {
+  "title": "太上说东岳大帝护国保民妙经",
+  "verdict": "accurate",
+  "issues": "Cautious negative + nearest-title mapping (e.g. DZ1441 cluster) is appropriate."
+ },
+ {
+  "title": "太上洞玄灵宝圆明大义经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太清真人授道经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太上说百解消灾妙经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太上玄都太妙经",
+  "verdict": "accurate",
+  "issues": "Nearest-title caution (e.g. 太上玄都妙本清静身心经) is sound."
+ },
+ {
+  "title": "太上说五斗星君本行真经",
+  "verdict": "accurate",
+  "issues": "Exact “本行真经” title not in Zhengtong; nearest 太上老君说五斗金章受生经 (≈DZ648). key_text is from that 受生经 (wording 九天圣众 slightly reordered as 九天众圣)—acceptable if labeled as related-text witness."
+ },
+ {
+  "title": "太清五髓经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太清阴阳五行经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太上灵宝胞胎经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太上说消魔经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太上说西王母益算经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "老子节解",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太清玉炉经",
+  "verdict": "accurate",
+  "issues": ""
+ },
+ {
+  "title": "太上老君说牛王妙经",
+  "verdict": "accurate",
+  "issues": ""
+ }
+]

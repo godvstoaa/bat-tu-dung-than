@@ -1,0 +1,87 @@
+[
+ {
+  "dz": "null",
+  "name_han": "太上感应篇注（惠栋）",
+  "name_vi": "Thái Thượng Cảm Ứng Thiên chú (Huệ Đống)",
+  "bu": "藏外善书",
+  "author": "惠栋",
+  "era": "清·乾隆",
+  "topic": "philosophy",
+  "essence": "Bản chú giải học thuật Nho gia của Thái Thượng Cảm Ứng Thiên do Huệ Đống soạn. Kết hợp khảo chứng kinh sử với đạo đức thiện thư, nhấn mạnh báo ứng thiện ác. Là một trong những bản chú có ảnh hưởng nhất ngoài chính thống đạo tạng.",
+  "key_text": "祸福无门，惟人自召。",
+  "use": "Thiện thư / đạo đức khuyến thiện, tham khảo chú giải học thuật",
+  "sources": [
+   "https://zh.wikisource.org/wiki/%E5%A4%AA%E4%B8%8A%E6%84%9F%E6%87%89%E7%AF%87",
+   "https://ctext.org/wiki.pl?if=gb&res=803497"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "null",
+  "name_han": "玉历宝钞",
+  "name_vi": "Ngọc Lịch Bảo Sao",
+  "bu": "藏外善书",
+  "author": "托名淡痴道人传",
+  "era": "清（前身宋元传说）",
+  "topic": "philosophy",
+  "essence": "Thiện thư mô tả thập điện Diêm Vương và địa ngục báo ứng, kết hợp Phật-Đạo dân gian. Lan truyền mạnh từ thời Thanh, dùng để khuyến thiện, răn ác qua hình ảnh địa phủ.",
+  "key_text": "善恶到头终有报，只争来早与来迟。",
+  "use": "Thiện thư / giáo hóa dân gian về báo ứng",
+  "sources": [
+   "https://zh.wikisource.org/wiki/%E7%8E%89%E6%9B%86%E5%AF%B6%E9%88%94",
+   "https://baike.baidu.com/item/%E7%8E%89%E5%8E%86%E5%AE%9D%E9%92%9E"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "null",
+  "name_han": "吕祖全书",
+  "name_vi": "Lữ Tổ Toàn Thư",
+  "bu": "藏外/全真内丹",
+  "author": "刘体恕等辑",
+  "era": "清·乾隆",
+  "topic": "cultivation",
+  "essence": "Tổng tập lớn các trước tác và giáng bút gán cho Lữ Động Tân: nội đan, thiện thư, thi phú, chú giải. Là nguồn chính ngoài tạng về Lữ Tổ và truyền thừa toàn chân-đan đạo hậu kỳ.",
+  "key_text": "性命双修，形神俱妙。",
+  "use": "Nội đan / Lữ Tổ tín ngưỡng / nghiên cứu toàn chân",
+  "sources": [
+   "https://zh.wikisource.org/wiki/%E5%91%82%E7%A5%96%E5%85%A8%E6%9B%B8",
+   "https://ctext.org/wiki.pl?if=gb&res=142105"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "null",
+  "name_han": "遵生八笺",
+  "name_vi": "Tuân Sinh Bát Tiên",
+  "bu": "藏外道教医学/养生",
+  "author": "高濂",
+  "era": "明·万历",
+  "topic": "养生",
+  "essence": "Bách khoa dưỡng sinh Minh đại: thanh tu diệu luận, tứ thời điều nhiếp, khởi cư an lạc, diên niên khước bệnh, ẩm soạn phục thực, yên nhàn thanh thưởng, linh bí đan dược, trần ngoại hà xa. Hòa Nho-Đạo-y học.",
+  "key_text": "人之生也，皆由养而得之。",
+  "use": "Dưỡng sinh / đạo dẫn / y đạo tàng ngoại",
+  "sources": [
+   "https://zh.wikisource.org/wiki/%E9%81%B5%E7%94%9F%E5%85%AB%E7%AC%8A",
+   "https://ctext.org/wiki.pl?if=gb&res=241530"
+  ],
+  "textual_certainty": "high"
+ },
+ {
+  "dz": "null",
+  "name_han": "寿世保元",
+  "name_vi": "Thọ Thế Bảo Nguyên",
+  "bu": "藏外道教医学/方书",
+  "author": "龚廷贤",
+  "era": "明·万历",
+  "topic": "养生",
+  "essence": "Phương thư y học Minh đại gắn mạnh với dưỡng sinh đạo giáo: nội ngoại phụ nhi, tiên đan diên thọ. Được đạo giáo dân gian và y quán dùng rộng ngoài tạng.",
+  "key_text": "保元者，保其元气也。",
+  "use": "Y đạo / dưỡng sinh / phương thư",
+  "sources": [
+   "https://zh.wikisource.org/wiki/%E5%A3%BD%E4%B8%96%E4%BF%9D%E5%85%83",
+   "https://baike.baidu.com/item/%E5%AF%BF%E4%B8%96%E4%BF%9D%E5%85%83"
+  ],
+  "textual_certainty": "high"
+ }
+]

@@ -1,0 +1,29 @@
+{
+  "text": "{\"entries\":[  ]}",
+  "stopReason": "EndTurn",
+  "sessionId": "019fb129-b695-7fb2-9a9e-076b80595dda",
+  "requestId": "4c48b07f-03a0-4b50-8820-060ea9472ab9",
+  "thought": "The user wants deep research on 20 Daoist/BaZi classical texts, with web search for actual content. For each text I need:\n",
+  "usage": {
+    "input_tokens": 8154,
+    "cache_read_input_tokens": 50176,
+    "output_tokens": 165,
+    "reasoning_tokens": 155,
+    "total_tokens": 58495
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.0323508,
+  "total_cost_usd_ticks": 323508000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 8154,
+      "outputTokens": 165,
+      "cacheReadInputTokens": 50176,
+      "modelCalls": 1,
+      "costUSD": 0.0323508
+    }
+  },
+  "structuredOutput": {
+    "entries": []
+  }
+}

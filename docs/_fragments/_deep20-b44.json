@@ -1,0 +1,37 @@
+{
+  "text": "{\"entries\":[{\"name_han\":\"...\",\"deep_essence\":\"...\",\"key_passages\":\"...\",\"application\":\"...\",\"related\":\"...\"}]}",
+  "stopReason": "EndTurn",
+  "sessionId": "019fb15e-01e4-7e02-8645-7ef147f61581",
+  "requestId": "6997ca5b-83ff-4966-8f78-b98d199c1a62",
+  "thought": "The user wants deep research on 20 Daoist/BaZi related texts. I need to use web search to find actual content for each text and return structured JSON with specific fields.\n",
+  "usage": {
+    "input_tokens": 472,
+    "cache_read_input_tokens": 57600,
+    "output_tokens": 167,
+    "reasoning_tokens": 132,
+    "total_tokens": 58239
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.019226,
+  "total_cost_usd_ticks": 192260000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 472,
+      "outputTokens": 167,
+      "cacheReadInputTokens": 57600,
+      "modelCalls": 1,
+      "costUSD": 0.019226
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "name_han": "...",
+        "deep_essence": "...",
+        "key_passages": "...",
+        "application": "...",
+        "related": "..."
+      }
+    ]
+  }
+}

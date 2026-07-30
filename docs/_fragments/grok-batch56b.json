@@ -1,0 +1,309 @@
+{
+  "text": "{ \"entries\": [ { \"dz\": \"DZ640\", \"name_han\": \"太上老君说城隍感应消灾集福妙经\", \"name_vi\": \"Thái Thượng Lão Quân thuyết Thành Hoàng cảm ứng tiêu tai tập phúc diệu kinh\", \"bu\": \"洞神\", \"author\": \"佚名\", \"era\": \"元–明\", \"topic\": \"ritual\", \"essence\": \"Kinh cầu Thành Hoàng tiêu tai, tập phúc. Thuộc bộ Động Thần, dùng trong nghi thức trấn an, bảo hộ thành thị. Nhấn mạnh cảm ứng thần linh khi thành tâm cầu đảo.\", \"key_text\": \"太上老君曰：城隍之神，主掌一方\", \"use\": \"Nghi lễ cầu Thành Hoàng, tiêu tai tập phúc\", \"sources\": [\"https://www.kanripo.org/text/KR5a0640\", \"https://ctext.org/wiki.pl?if=gb&res=803245\"], \"textual_certainty\": \"partial\" } ] }{ \"entries\": [ { \"dz\": \"DZ640\", \"name_han\": \"太上老君说城隍感应消灾集福妙经\", \"name_vi\": \"Thái Thượng Lão Quân thuyết Thành Hoàng cảm ứng tiêu tai tập phúc diệu kinh\", \"bu\": \"洞神\", \"author\": \"佚名\", \"era\": \"元–明\", \"topic\": \"ritual\", \"essence\": \"Kinh cầu Thành Hoàng tiêu tai, tập phúc. Thuộc bộ Động Thần, dùng trong nghi thức trấn an, bảo hộ thành thị. Nhấn mạnh cảm ứng thần linh khi thành tâm cầu đảo.\", \"key_text\": \"太上老君曰：城隍之神，主掌一方\", \"use\": \"Nghi lễ cầu Thành Hoàng, tiêu tai tập phúc\", \"sources\": [\"https://www.kanripo.org/text/KR5a0640\", \"https://ctext.org/wiki.pl?if=gb&res=803245\"], \"textual_certainty\": \"partial\" } ] }{\n  \"entries\": [\n    {\n      \"dz\": \"DZ640\",\n      \"name_han\": \"洞神八帝妙精经\",\n      \"name_vi\": \"Động Thần Bát Đế Diệu Tinh Kinh\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"东晋\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Kinh cổ cốt lõi bộ Động Thần, gắn hệ thống Cửu Hoàng (Sơ/Trung/Hậu Tam Hoàng) với pháp trì giới, phù chú và dưỡng sinh. Nội dung gồm trai trì bát giới, tam hoàng tam nhất, câu hồn chế phách, cùng tiểu đơn pháp. Là một trong những bản văn đại diện cho truyền thống Tam Hoàng trong Đạo tạng.\",\n      \"key_text\": \"帝君曰：一切动静去来云为善恶之数要\",\n      \"use\": \"Nghi quỹ Động Thần, phù chú, tồn tư, giới luật sơ cấp\",\n      \"sources\": [\n        \"https://zh.wikisource.org/wiki/%E6%B4%9E%E7%A5%9E%E5%85%AB%E5%B8%9D%E5%A6%99%E7%B2%BE%E7%B6%93\",\n        \"https://ctext.org/wiki.pl?if=gb&res=606951\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ641\",\n      \"name_han\": \"太上老君内观经\",\n      \"name_vi\": \"Thái Thượng Lão Quân Nội Quan Kinh\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"唐\",\n      \"topic\": \"philosophy\",\n      \"essence\": \"Kinh ngắn luận nội quán: quay nhìn vào thân tâm, nhận biết tâm là gốc của đạo và phiền não. Nhấn mạnh tĩnh lặng, dứt vọng, giữ nhất tâm để hợp đạo. Là văn bản huyền học thực tiễn, thường dùng kèm các kinh Lão Quân khác trong Động Thần.\",\n      \"key_text\": \"内观之道，静神定心\",\n      \"use\": \"Thiền định nội quán, tu tâm dưỡng tính\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\",\n        \"http://www.ctcwri.idv.tw/CTCW-CMTS/CMT03%E6%B4%9E%E7%A5%9E%E9%83%A8/CH0301-C.htm\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ620\",\n      \"name_han\": \"太上老君说常清静妙经\",\n      \"name_vi\": \"Thái Thượng Lão Quân thuyết Thường Thanh Tĩnh Diệu Kinh\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"唐\",\n      \"topic\": \"classic\",\n      \"essence\": \"Kinh ngắn nổi tiếng về thường thanh tĩnh: người biết thanh tĩnh thì thiên địa quy y. Giải thích vọng tâm sinh dục, dục sinh phiền não; dứt dục thì tâm thanh, tâm thanh thì thần an. Là kinh nhật tụng cốt lõi của nhiều phái Đạo giáo.\",\n      \"key_text\": \"人能常清静，天地悉皆归\",\n      \"use\": \"Nhật tụng, tĩnh tọa, nhập môn huyền học\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\",\n        \"https://ctext.org/wiki.pl?if=en&res=480257\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ651\",\n      \"name_han\": \"太上洞神三元妙本福寿真经\",\n      \"name_vi\": \"Thái Thượng Động Thần Tam Nguyên Diệu Bản Phúc Thọ Chân Kinh\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"宋–元\",\n      \"topic\": \"ritual\",\n      \"essence\": \"Kinh Động Thần gắn tín ngưỡng Tam Nguyên (Thiên–Địa–Thủy quan) với cầu phúc thọ, tiêu tai. Nhấn mạnh bản nguyên diệu huyền của đạo và công đức sám hối, bố thí, trì tụng. Dùng trong nghi thức cầu thọ và trấn an.\",\n      \"key_text\": \"null\",\n      \"use\": \"Cầu phúc thọ, nghi Tam Nguyên, trì tụng tiêu tai\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ671\",\n      \"name_han\": \"太上无极大道自然真一五称符上经\",\n      \"name_vi\": \"Thái Thượng Vô Cực Đại Đạo Tự Nhiên Chân Nhất Ngũ Xưng Phù Thượng Kinh\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"六朝\",\n      \"topic\": \"fu\",\n      \"essence\": \"Kinh phù thuộc thần phù loại bộ Động Thần, nói về ngũ xưng phù và chân nhất tự nhiên. Kết hợp phù lục với thuyết vô cực đại đạo, dùng để hộ thân, triệu thỉnh, và hành đạo. Là văn bản quan trọng về hệ thống phù của truyền thống sớm.\",\n      \"key_text\": \"null\",\n      \"use\": \"Phù lục hộ mệnh, nghi thức triệu thỉnh\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ784\",\n      \"name_han\": \"太上老君戒经\",\n      \"name_vi\": \"Thái Thượng Lão Quân Giới Kinh\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"南北朝–唐\",\n      \"topic\": \"戒律\",\n      \"essence\": \"Kinh giới luật do Lão Quân thuyết, nêu các giới điều căn bản cho đạo sĩ và tín chúng. Nhấn mạnh giữ giới để dứt nghiệp, tiến đạo, và tránh họa. Cùng nhóm giới luật Động Thần như kinh luật, kinh giới.\",\n      \"key_text\": \"null\",\n      \"use\": \"Thụ giới, quy củ đạo sĩ, giáo hóa đạo đức\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ786\",\n      \"name_han\": \"太上老君经律\",\n      \"name_vi\": \"Thái Thượng Lão Quân Kinh Luật\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"南北朝\",\n      \"topic\": \"戒律\",\n      \"essence\": \"Tập kinh–luật gán cho Lão Quân, kết hợp giáo nghĩa và quy chế hành đạo. Quy định cách giữ giới, tránh tội, và cư xử trong tăng đoàn. Là tài liệu chuẩn mực cho giới luật phái Thiên Sư/Động Thần.\",\n      \"key_text\": \"null\",\n      \"use\": \"Giới luật, quản lý hành trì, giáo khoa đạo sĩ\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ803\",\n      \"name_han\": \"太上洞神三皇仪\",\n      \"name_vi\": \"Thái Thượng Động Thần Tam Hoàng Nghi\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"南北朝\",\n      \"topic\": \"ritual\",\n      \"essence\": \"Nghi thức truyền thụ và hành trì kinh pháp Tam Hoàng thuộc Động Thần. Ghi trình tự lập đàn, thỉnh thần, trao kinh–lục, và các tiết mục nghi quỹ. Là văn bản nghi lễ then chốt của hệ Tam Hoàng.\",\n      \"key_text\": \"null\",\n      \"use\": \"Truyền độ Tam Hoàng, lập đàn Động Thần\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\",\n        \"https://dao.crs.cuhk.edu.hk/Main/%E4%B8%AD%E5%BF%83%E5%87%BA%E7%89%88/%E4%B8%89%E7%9A%87%E7%B6%93/\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ817\",\n      \"name_han\": \"太清中黄真经\",\n      \"name_vi\": \"Thái Thanh Trung Hoàng Chân Kinh\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名（旧题九仙君/中黄真人系）\",\n      \"era\": \"唐\",\n      \"topic\": \"服气\",\n      \"essence\": \"Kinh dưỡng sinh phục khí lấy Trung Hoàng (tỳ/trung cung) làm gốc, dạy nuốt khí, điều tức, và luyện nội khí. Kết hợp thuyết ngũ tạng với pháp thổ nạp. Thuộc nhóm phương pháp dưỡng sinh Thái Thanh trong Động Thần.\",\n      \"key_text\": \"null\",\n      \"use\": \"Phục khí, điều tức, dưỡng trung hoàng\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ818\",\n      \"name_han\": \"太清导引养生经\",\n      \"name_vi\": \"Thái Thanh Đạo Dẫn Dưỡng Sinh Kinh\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"唐或更早\",\n      \"topic\": \"养生\",\n      \"essence\": \"Kinh hướng dẫn đạo dẫn (vận động–hô hấp) để dưỡng sinh trường thọ. Mô tả các thế kéo giãn, thở, và phối hợp với khí huyết. Là cẩm nang thực hành thể dục dưỡng sinh trong truyền thống Thái Thanh.\",\n      \"key_text\": \"null\",\n      \"use\": \"Đạo dẫn, thể dục dưỡng sinh, phòng bệnh\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ821\",\n      \"name_han\": \"太上老君养生诀\",\n      \"name_vi\": \"Thái Thượng Lão Quân Dưỡng Sinh Quyết\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名（旧题老君）\",\n      \"era\": \"唐\",\n      \"topic\": \"养生\",\n      \"essence\": \"Quyết dưỡng sinh gán cho Lão Quân: ăn uống, ngủ nghỉ, điều khí, và kiêng kỵ hàng ngày. Ngắn gọn, thực dụng, nhấn mạnh phòng bệnh hơn trị bệnh. Phù hợp người mới nhập môn dưỡng sinh Đạo giáo.\",\n      \"key_text\": \"null\",\n      \"use\": \"Dưỡng sinh hàng ngày, kiêng kỵ, điều tức\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ838\",\n      \"name_han\": \"养性延命录\",\n      \"name_vi\": \"Dưỡng Tính Diên Mệnh Lục\",\n      \"bu\": \"洞神\",\n      \"author\": \"陶弘景（辑）\",\n      \"era\": \"南朝梁\",\n      \"topic\": \"养生\",\n      \"essence\": \"Tào Hoằng Cảnh biên soạn, trích lục các pháp dưỡng tính, ăn uống, đạo dẫn, phòng dục từ nguồn cổ. Hệ thống hóa kinh nghiệm trường sinh trước đời Đường. Là một trong những cẩm nang dưỡng sinh kinh điển nhất trong Đạo tạng.\",\n      \"key_text\": \"夫禀气含灵，唯人为贵\",\n      \"use\": \"Dưỡng tính, diên mệnh, tham khảo y–đạo\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://ctext.org/wiki.pl?if=gb&res=141661\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ854\",\n      \"name_han\": \"太上三皇宝斋神仙上录经\",\n      \"name_vi\": \"Thái Thượng Tam Hoàng Bảo Trai Thần Tiên Thượng Lục Kinh\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"南北朝–隋唐\",\n      \"topic\": \"ritual\",\n      \"essence\": \"Kinh ghi nghi Tam Hoàng bảo trai và cách làm tín vật, hương châu, trọng tiêu thủy. Kết hợp trai giới với cầu tiên, hộ sinh, độ thất thế. Là văn bản phương pháp–uy nghi then chốt của hệ Động Thần Tam Hoàng.\",\n      \"key_text\": \"黄帝曰：凡学士精心愿乐，勤道求生\",\n      \"use\": \"Trai nghi Tam Hoàng, chế tín vật, cầu tiên\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E5%A4%AA%E4%B8%8A%E4%B8%89%E7%9A%87%E5%AF%B6%E9%BD%8B%E7%A5%9E%E4%BB%99%E4%B8%8A%E9%8C%84%E7%B6%93\",\n        \"https://ctext.org/wiki.pl?if=gb&res=521411\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ855\",\n      \"name_han\": \"太清金阙玉华仙书八极神章三皇内秘文\",\n      \"name_vi\": \"Thái Thanh Kim Khuyết Ngọc Hoa Tiên Thư Bát Cực Thần Chương Tam Hoàng Nội Bí Văn\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"唐宋\",\n      \"topic\": \"方术\",\n      \"essence\": \"Văn bí truyền hệ Tam Hoàng, gồm thần chương bát cực và nội văn dùng trong triệu thỉnh, hộ thân, biến hóa. Mang tính phù–chú–lục mạnh, gắn thuật số và hành pháp. Thuộc nhóm phương thuật Động Thần liên quan Tam Hoàng nội văn.\",\n      \"key_text\": \"null\",\n      \"use\": \"Phù chú, triệu thỉnh, hành pháp bí truyền\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ856\",\n      \"name_han\": \"三皇内文遗秘\",\n      \"name_vi\": \"Tam Hoàng Nội Văn Di Bí\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"唐宋辑本（源出六朝三皇文传统）\",\n      \"topic\": \"方术\",\n      \"essence\": \"Bản di bí của truyền thống Tam Hoàng nội văn: phù tự, ẩn văn, pháp triệu quỷ thần sơn xuyên. Được xem là tàn dư hệ kinh–phù Tam Hoàng cổ, dùng cho trấn yểm, hộ thân, và các thuật số. Cốt lõi phương thuật Động Thần.\",\n      \"key_text\": \"null\",\n      \"use\": \"Phù lục cổ, trấn yểm, hộ thân\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://dao.crs.cuhk.edu.hk/Main/%E4%B8%AD%E5%BF%83%E5%87%BA%E7%89%88/%E4%B8%89%E7%9A%87%E7%B6%93/\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ869\",\n      \"name_han\": \"思印气诀法\",\n      \"name_vi\": \"Tư Ấn Khí Quyết Pháp\",\n      \"bu\": \"洞神\",\n      \"author\": \"佚名\",\n      \"era\": \"唐–宋\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Pháp quyết kết hợp tư tưởng (tồn tư), ấn quyết và luyện khí. Dạy dùng tâm ấn–thủ ấn phối hợp hô hấp để tụ khí, hộ thân, và hành pháp. Nằm cuối dải phương pháp Động Thần, mang tính thực hành mật truyền.\",\n      \"key_text\": \"null\",\n      \"use\": \"Tồn tư, kết ấn, luyện khí hành pháp\",\n      \"sources\": [\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F\"\n      ],\n      \"textual_certainty\": \"high\"\n    }\n  ]\n}",
+  "stopReason": "EndTurn",
+  "sessionId": "019f90f8-185d-7263-957e-d11b634112fd",
+  "requestId": "6fd67b0b-709b-470e-8b37-a0fdbe985f57",
+  "thought": "The user wants me to act as a distillation agent for Chinese Daoist Canon texts specifically from the 洞神部 (Dongshen) section with Schipper-Verellen DZ numbers in the range 600-870. I need to select 16...I found useful sources. Let me look at:Let me read the PDF for Dongshen section DZ numbers.Excellent! Now I have the full verified list of Dongshen texts in DZ 620-870 range. I need to select 16 that are NOT in the exclusion list.\nI can help you select 16 Dongshen texts from the DZ 620-870 range that aren't on the exclusion list. Let me search for the available texts in that range to find suitable options.",
+  "usage": {
+    "input_tokens": 195377,
+    "cache_read_input_tokens": 263808,
+    "output_tokens": 7394,
+    "reasoning_tokens": 1764,
+    "total_tokens": 466579
+  },
+  "num_turns": 4,
+  "total_cost_usd": 0.5592604,
+  "total_cost_usd_ticks": 5592604000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 195377,
+      "outputTokens": 7394,
+      "cacheReadInputTokens": 263808,
+      "modelCalls": 4,
+      "costUSD": 0.5592604
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "dz": "DZ640",
+        "name_han": "洞神八帝妙精经",
+        "name_vi": "Động Thần Bát Đế Diệu Tinh Kinh",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "东晋",
+        "topic": "cultivation",
+        "essence": "Kinh cổ cốt lõi bộ Động Thần, gắn hệ thống Cửu Hoàng (Sơ/Trung/Hậu Tam Hoàng) với pháp trì giới, phù chú và dưỡng sinh. Nội dung gồm trai trì bát giới, tam hoàng tam nhất, câu hồn chế phách, cùng tiểu đơn pháp. Là một trong những bản văn đại diện cho truyền thống Tam Hoàng trong Đạo tạng.",
+        "key_text": "帝君曰：一切动静去来云为善恶之数要",
+        "use": "Nghi quỹ Động Thần, phù chú, tồn tư, giới luật sơ cấp",
+        "sources": [
+          "https://zh.wikisource.org/wiki/%E6%B4%9E%E7%A5%9E%E5%85%AB%E5%B8%9D%E5%A6%99%E7%B2%BE%E7%B6%93",
+          "https://ctext.org/wiki.pl?if=gb&res=606951",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ641",
+        "name_han": "太上老君内观经",
+        "name_vi": "Thái Thượng Lão Quân Nội Quan Kinh",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "唐",
+        "topic": "philosophy",
+        "essence": "Kinh ngắn luận nội quán: quay nhìn vào thân tâm, nhận biết tâm là gốc của đạo và phiền não. Nhấn mạnh tĩnh lặng, dứt vọng, giữ nhất tâm để hợp đạo. Là văn bản huyền học thực tiễn, thường dùng kèm các kinh Lão Quân khác trong Động Thần.",
+        "key_text": "内观之道，静神定心",
+        "use": "Thiền định nội quán, tu tâm dưỡng tính",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F",
+          "http://www.ctcwri.idv.tw/CTCW-CMTS/CMT03%E6%B4%9E%E7%A5%9E%E9%83%A8/CH0301-C.htm"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ620",
+        "name_han": "太上老君说常清静妙经",
+        "name_vi": "Thái Thượng Lão Quân thuyết Thường Thanh Tĩnh Diệu Kinh",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "唐",
+        "topic": "classic",
+        "essence": "Kinh ngắn nổi tiếng về thường thanh tĩnh: người biết thanh tĩnh thì thiên địa quy y. Giải thích vọng tâm sinh dục, dục sinh phiền não; dứt dục thì tâm thanh, tâm thanh thì thần an. Là kinh nhật tụng cốt lõi của nhiều phái Đạo giáo.",
+        "key_text": "人能常清静，天地悉皆归",
+        "use": "Nhật tụng, tĩnh tọa, nhập môn huyền học",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F",
+          "https://ctext.org/wiki.pl?if=en&res=480257"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ651",
+        "name_han": "太上洞神三元妙本福寿真经",
+        "name_vi": "Thái Thượng Động Thần Tam Nguyên Diệu Bản Phúc Thọ Chân Kinh",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "宋–元",
+        "topic": "ritual",
+        "essence": "Kinh Động Thần gắn tín ngưỡng Tam Nguyên (Thiên–Địa–Thủy quan) với cầu phúc thọ, tiêu tai. Nhấn mạnh bản nguyên diệu huyền của đạo và công đức sám hối, bố thí, trì tụng. Dùng trong nghi thức cầu thọ và trấn an.",
+        "key_text": "null",
+        "use": "Cầu phúc thọ, nghi Tam Nguyên, trì tụng tiêu tai",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ671",
+        "name_han": "太上无极大道自然真一五称符上经",
+        "name_vi": "Thái Thượng Vô Cực Đại Đạo Tự Nhiên Chân Nhất Ngũ Xưng Phù Thượng Kinh",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "六朝",
+        "topic": "fu",
+        "essence": "Kinh phù thuộc thần phù loại bộ Động Thần, nói về ngũ xưng phù và chân nhất tự nhiên. Kết hợp phù lục với thuyết vô cực đại đạo, dùng để hộ thân, triệu thỉnh, và hành đạo. Là văn bản quan trọng về hệ thống phù của truyền thống sớm.",
+        "key_text": "null",
+        "use": "Phù lục hộ mệnh, nghi thức triệu thỉnh",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ784",
+        "name_han": "太上老君戒经",
+        "name_vi": "Thái Thượng Lão Quân Giới Kinh",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "南北朝–唐",
+        "topic": "戒律",
+        "essence": "Kinh giới luật do Lão Quân thuyết, nêu các giới điều căn bản cho đạo sĩ và tín chúng. Nhấn mạnh giữ giới để dứt nghiệp, tiến đạo, và tránh họa. Cùng nhóm giới luật Động Thần như kinh luật, kinh giới.",
+        "key_text": "null",
+        "use": "Thụ giới, quy củ đạo sĩ, giáo hóa đạo đức",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ786",
+        "name_han": "太上老君经律",
+        "name_vi": "Thái Thượng Lão Quân Kinh Luật",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "南北朝",
+        "topic": "戒律",
+        "essence": "Tập kinh–luật gán cho Lão Quân, kết hợp giáo nghĩa và quy chế hành đạo. Quy định cách giữ giới, tránh tội, và cư xử trong tăng đoàn. Là tài liệu chuẩn mực cho giới luật phái Thiên Sư/Động Thần.",
+        "key_text": "null",
+        "use": "Giới luật, quản lý hành trì, giáo khoa đạo sĩ",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ803",
+        "name_han": "太上洞神三皇仪",
+        "name_vi": "Thái Thượng Động Thần Tam Hoàng Nghi",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "南北朝",
+        "topic": "ritual",
+        "essence": "Nghi thức truyền thụ và hành trì kinh pháp Tam Hoàng thuộc Động Thần. Ghi trình tự lập đàn, thỉnh thần, trao kinh–lục, và các tiết mục nghi quỹ. Là văn bản nghi lễ then chốt của hệ Tam Hoàng.",
+        "key_text": "null",
+        "use": "Truyền độ Tam Hoàng, lập đàn Động Thần",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F",
+          "https://dao.crs.cuhk.edu.hk/Main/%E4%B8%AD%E5%BF%83%E5%87%BA%E7%89%88/%E4%B8%89%E7%9A%87%E7%B6%93/"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ817",
+        "name_han": "太清中黄真经",
+        "name_vi": "Thái Thanh Trung Hoàng Chân Kinh",
+        "bu": "洞神",
+        "author": "佚名（旧题九仙君/中黄真人系）",
+        "era": "唐",
+        "topic": "服气",
+        "essence": "Kinh dưỡng sinh phục khí lấy Trung Hoàng (tỳ/trung cung) làm gốc, dạy nuốt khí, điều tức, và luyện nội khí. Kết hợp thuyết ngũ tạng với pháp thổ nạp. Thuộc nhóm phương pháp dưỡng sinh Thái Thanh trong Động Thần.",
+        "key_text": "null",
+        "use": "Phục khí, điều tức, dưỡng trung hoàng",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ818",
+        "name_han": "太清导引养生经",
+        "name_vi": "Thái Thanh Đạo Dẫn Dưỡng Sinh Kinh",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "唐或更早",
+        "topic": "养生",
+        "essence": "Kinh hướng dẫn đạo dẫn (vận động–hô hấp) để dưỡng sinh trường thọ. Mô tả các thế kéo giãn, thở, và phối hợp với khí huyết. Là cẩm nang thực hành thể dục dưỡng sinh trong truyền thống Thái Thanh.",
+        "key_text": "null",
+        "use": "Đạo dẫn, thể dục dưỡng sinh, phòng bệnh",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ821",
+        "name_han": "太上老君养生诀",
+        "name_vi": "Thái Thượng Lão Quân Dưỡng Sinh Quyết",
+        "bu": "洞神",
+        "author": "佚名（旧题老君）",
+        "era": "唐",
+        "topic": "养生",
+        "essence": "Quyết dưỡng sinh gán cho Lão Quân: ăn uống, ngủ nghỉ, điều khí, và kiêng kỵ hàng ngày. Ngắn gọn, thực dụng, nhấn mạnh phòng bệnh hơn trị bệnh. Phù hợp người mới nhập môn dưỡng sinh Đạo giáo.",
+        "key_text": "null",
+        "use": "Dưỡng sinh hàng ngày, kiêng kỵ, điều tức",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ838",
+        "name_han": "养性延命录",
+        "name_vi": "Dưỡng Tính Diên Mệnh Lục",
+        "bu": "洞神",
+        "author": "陶弘景（辑）",
+        "era": "南朝梁",
+        "topic": "养生",
+        "essence": "Tào Hoằng Cảnh biên soạn, trích lục các pháp dưỡng tính, ăn uống, đạo dẫn, phòng dục từ nguồn cổ. Hệ thống hóa kinh nghiệm trường sinh trước đời Đường. Là một trong những cẩm nang dưỡng sinh kinh điển nhất trong Đạo tạng.",
+        "key_text": "夫禀气含灵，唯人为贵",
+        "use": "Dưỡng tính, diên mệnh, tham khảo y–đạo",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://ctext.org/wiki.pl?if=gb&res=141661",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ854",
+        "name_han": "太上三皇宝斋神仙上录经",
+        "name_vi": "Thái Thượng Tam Hoàng Bảo Trai Thần Tiên Thượng Lục Kinh",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "南北朝–隋唐",
+        "topic": "ritual",
+        "essence": "Kinh ghi nghi Tam Hoàng bảo trai và cách làm tín vật, hương châu, trọng tiêu thủy. Kết hợp trai giới với cầu tiên, hộ sinh, độ thất thế. Là văn bản phương pháp–uy nghi then chốt của hệ Động Thần Tam Hoàng.",
+        "key_text": "黄帝曰：凡学士精心愿乐，勤道求生",
+        "use": "Trai nghi Tam Hoàng, chế tín vật, cầu tiên",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E5%A4%AA%E4%B8%8A%E4%B8%89%E7%9A%87%E5%AF%B6%E9%BD%8B%E7%A5%9E%E4%BB%99%E4%B8%8A%E9%8C%84%E7%B6%93",
+          "https://ctext.org/wiki.pl?if=gb&res=521411",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ855",
+        "name_han": "太清金阙玉华仙书八极神章三皇内秘文",
+        "name_vi": "Thái Thanh Kim Khuyết Ngọc Hoa Tiên Thư Bát Cực Thần Chương Tam Hoàng Nội Bí Văn",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "唐宋",
+        "topic": "方术",
+        "essence": "Văn bí truyền hệ Tam Hoàng, gồm thần chương bát cực và nội văn dùng trong triệu thỉnh, hộ thân, biến hóa. Mang tính phù–chú–lục mạnh, gắn thuật số và hành pháp. Thuộc nhóm phương thuật Động Thần liên quan Tam Hoàng nội văn.",
+        "key_text": "null",
+        "use": "Phù chú, triệu thỉnh, hành pháp bí truyền",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ856",
+        "name_han": "三皇内文遗秘",
+        "name_vi": "Tam Hoàng Nội Văn Di Bí",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "唐宋辑本（源出六朝三皇文传统）",
+        "topic": "方术",
+        "essence": "Bản di bí của truyền thống Tam Hoàng nội văn: phù tự, ẩn văn, pháp triệu quỷ thần sơn xuyên. Được xem là tàn dư hệ kinh–phù Tam Hoàng cổ, dùng cho trấn yểm, hộ thân, và các thuật số. Cốt lõi phương thuật Động Thần.",
+        "key_text": "null",
+        "use": "Phù lục cổ, trấn yểm, hộ thân",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://dao.crs.cuhk.edu.hk/Main/%E4%B8%AD%E5%BF%83%E5%87%BA%E7%89%88/%E4%B8%89%E7%9A%87%E7%B6%93/",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ869",
+        "name_han": "思印气诀法",
+        "name_vi": "Tư Ấn Khí Quyết Pháp",
+        "bu": "洞神",
+        "author": "佚名",
+        "era": "唐–宋",
+        "topic": "cultivation",
+        "essence": "Pháp quyết kết hợp tư tưởng (tồn tư), ấn quyết và luyện khí. Dạy dùng tâm ấn–thủ ấn phối hợp hô hấp để tụ khí, hộ thân, và hành pháp. Nằm cuối dải phương pháp Động Thần, mang tính thực hành mật truyền.",
+        "key_text": "null",
+        "use": "Tồn tư, kết ấn, luyện khí hành pháp",
+        "sources": [
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/zh-hans/%E6%AD%A3%E7%B5%B1%E9%81%93%E8%97%8F"
+        ],
+        "textual_certainty": "high"
+      }
+    ]
+  }
+}

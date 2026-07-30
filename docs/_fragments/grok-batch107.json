@@ -1,0 +1,302 @@
+{
+  "text": "{\n  \"entries\": [\n    {\n      \"dz\": \"笔记\",\n      \"name_han\": \"客窗闲话\",\n      \"name_vi\": \"Khách Song Nhàn Thoại\",\n      \"bu\": \"藏外\",\n      \"author\": \"吴炽昌\",\n      \"era\": \"清 · 嘉庆—道光\",\n      \"topic\": \"志怪\",\n      \"essence\": \"Tập bút ký chí quái đời Thanh, ghi chuyện quỷ thần, nhân quả và dị sự nghe được nơi khách sạn, hành quán. Lối văn giản dị, thiên về giáo huấn đạo đức hơn là huyền ảo thuần túy. Là một trong những bộ truyện chí quái trung kỳ Thanh còn lưu hành rộng.\",\n      \"key_text\": \"客窗闲话，盖纪其客中所闻也。\",\n      \"use\": \"Tham khảo chí quái Thanh trung kỳ, nhân quả và dị sự dân gian\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E5%AE%A2%E7%AA%97%E9%97%B2%E8%AF%9D\",\n        \"https://ctext.org/wiki.pl?if=gb&res=488883\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"笔记\",\n      \"name_han\": \"淞隐漫录\",\n      \"name_vi\": \"Tùng Ẩn Mạn Lục\",\n      \"bu\": \"藏外\",\n      \"author\": \"王韬\",\n      \"era\": \"清 · 同治—光绪\",\n      \"topic\": \"志怪\",\n      \"essence\": \"Tác phẩm chí quái—tiểu thuyết ngắn của Vương Đào thời Thanh mạt, chịu ảnh hưởng Liêu trai. Nhiều truyện gắn bối cảnh Thượng Hải và giao lưu Đông—Tây, pha yếu tố kỳ ảo với xã hội hiện đại. Được coi là cầu nối giữa chí quái truyền thống và tiểu thuyết văn ngôn cận đại.\",\n      \"key_text\": \"海上多美人，亦多异事。\",\n      \"use\": \"Nghiên cứu chí quái Thanh mạt, văn hóa Thượng Hải và ảnh hưởng Liêu trai\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E6%B7%9E%E9%9A%B1%E6%BC%AB%E9%8C%84\",\n        \"https://ctext.org/wiki.pl?if=gb&res=145758\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"笔记\",\n      \"name_han\": \"三异笔谈\",\n      \"name_vi\": \"Tam Dị Bút Đàm\",\n      \"bu\": \"藏外\",\n      \"author\": \"许仲元\",\n      \"era\": \"清 · 嘉庆—道光\",\n      \"topic\": \"志怪\",\n      \"essence\": \"Bút ký chí quái bốn quyển, ghi ba loại dị sự: nhân sự lạ, quỷ thần, và phong thổ dị thường. Tác giả ghi chép theo lối kiến văn, ít tô vẽ, mang tính sử liệu và phong tục học. Bổ sung mảng bút ký dị sự Giang Nam đầu thế kỷ XIX.\",\n      \"key_text\": \"三异者，人事之异、鬼神之异、物产之异也。\",\n      \"use\": \"Đối chiếu dị sự, phong tục và kiến văn Giang Nam đời Thanh\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E4%B8%89%E5%BC%82%E7%AC%94%E8%B0%88\",\n        \"https://baike.baidu.com/item/%E4%B8%89%E5%BC%82%E7%AC%94%E8%B0%88\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"笔记\",\n      \"name_han\": \"咫闻录\",\n      \"name_vi\": \"Chỉ Văn Lục\",\n      \"bu\": \"藏外\",\n      \"author\": \"慵讷居士\",\n      \"era\": \"清 · 道光\",\n      \"topic\": \"志怪\",\n      \"essence\": \"Tập truyện chí quái mười hai quyển, ghi chuyện quỷ hồ, báo ứng và dị nhân. Lối kể gần Liêu trai nhưng giản lược hơn, nhiều mẩu ngắn mang tính răn đời. Là nguồn tham khảo chí quái dân gian vùng Giang—Chiết thời Đạo Quang.\",\n      \"key_text\": \"咫闻者，咫尺之闻也。\",\n      \"use\": \"Sưu tầm truyện hồ ly, báo ứng và dị sự dân gian Thanh\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E5%92%AB%E9%97%BB%E5%BD%95\",\n        \"https://zh.wikisource.org/wiki/%E5%92%AB%E8%81%9E%E9%8C%84\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"笔记\",\n      \"name_han\": \"翼駉稗编\",\n      \"name_vi\": \"Dực Quânn Bại Biên\",\n      \"bu\": \"藏外\",\n      \"author\": \"汤用中\",\n      \"era\": \"清 · 道光—咸丰\",\n      \"topic\": \"志怪\",\n      \"essence\": \"Bút ký tạp soạn chí quái và kiến văn, lấy tên từ điển cố ‘dực quân’ (ngựa có cánh—ý chuyện lạ). Ghi chép quỷ thần, kỳ sự và giai thoại quan trường. Ít được nhắc hơn Liêu trai nhưng phản ánh mạng lưới truyền miệng quan lại—văn nhân trung kỳ Thanh.\",\n      \"key_text\": \"稗编所录，多里巷传闻。\",\n      \"use\": \"Bổ sung corpus chí quái quan viên—văn nhân trung Thanh\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E7%BF%BC%E9%A7%89%E7%A8%BF%E7%BC%96\",\n        \"https://ctext.org/searchbooks.pl?if=gb&searchu=%E7%BF%BC%E9%A7%89%E7%A8%BF%E7%B7%A8\"\n      ],\n      \"textual_certainty\": \"partial\"\n    },\n    {\n      \"dz\": \"笔记\",\n      \"name_han\": \"萤窗异草\",\n      \"name_vi\": \"Huỳnh Song Dị Thảo\",\n      \"bu\": \"藏外\",\n      \"author\": \"长白浩歌子\",\n      \"era\": \"清 · 乾隆前后\",\n      \"topic\": \"志怪\",\n      \"essence\": \"Tập truyện chí quái văn ngôn ba tập, thường được so sánh với Liêu trai chí dị. Nhiều truyện tình yêu người—hồ ly, quỷ nữ, kết cấu hoàn chỉnh hơn bút ký tạp lục. Là một trong những bộ ‘bắt chước Liêu trai’ thành công nhất đời Thanh.\",\n      \"key_text\": \"异草生萤窗之下，亦足以供谈助。\",\n      \"use\": \"Đọc song song Liêu trai; phân tích mô típ hồ ly và chí quái văn ngôn\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E8%9D%A0%E7%AA%97%E5%BC%82%E8%8D%89\",\n        \"https://ctext.org/wiki.pl?if=gb&res=266030\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"笔记\",\n      \"name_han\": \"夜谭随录\",\n      \"name_vi\": \"Dạ Đàm Tùy Lục\",\n      \"bu\": \"藏外\",\n      \"author\": \"和邦额\",\n      \"era\": \"清 · 乾隆\",\n      \"topic\": \"志怪\",\n      \"essence\": \"Tác phẩm chí quái của tác giả Mãn tộc Hòa Bang Ngạch, mười hai quyển. Ghi chuyện quỷ thần, hồ ly và dị sự, mang màu sắc biên cương—quan trường. Được xếp cùng Liêu trai, Tử bất ngữ như ‘tam đại chí quái Càn Long’.\",\n      \"key_text\": \"夜谈所闻，随笔录之。\",\n      \"use\": \"So sánh chí quái Mãn—Hán; nghiên cứu dị sự quan viên Càn Long\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E5%A4%9C%E8%B0%AD%E9%9A%8F%E5%BD%95\",\n        \"https://ctext.org/wiki.pl?if=gb&res=592472\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"笔记\",\n      \"name_han\": \"夜雨秋灯录\",\n      \"name_vi\": \"Dạ Vũ Thu Đăng Lục\",\n      \"bu\": \"藏外\",\n      \"author\": \"宣鼎\",\n      \"era\": \"清 · 同治—光绪\",\n      \"topic\": \"志怪\",\n      \"essence\": \"Tập truyện chí quái—truyện kỳ Thanh mạt, văn phong hoa mỹ, giàu kịch tính. Nhiều truyện dài hơi hơn bút ký ngắn, pha bi kịch tình cảm và dị sự. Ảnh hưởng lớn đến tiểu thuyết văn ngôn cuối Thanh đầu Dân quốc.\",\n      \"key_text\": \"夜雨秋灯，苦中作乐，用以遣愁。\",\n      \"use\": \"Nghiên cứu truyện kỳ Thanh mạt và chuyển tiếp sang tiểu thuyết cận đại\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E5%A4%9C%E9%9B%A8%E7%A7%8B%E7%81%AF%E5%BD%95\",\n        \"https://ctext.org/wiki.pl?if=gb&res=881155\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"笔记\",\n      \"name_han\": \"右台仙馆笔记\",\n      \"name_vi\": \"Hữu Đài Tiên Quán Bút Ký\",\n      \"bu\": \"藏外\",\n      \"author\": \"俞樾\",\n      \"era\": \"清 · 光绪\",\n      \"topic\": \"志怪\",\n      \"essence\": \"Bút ký chí quái của Dũ Việt (Khúc viên), ghi kiến văn quỷ thần, báo ứng và dị sự sau khi ẩn cư. Lối văn học giả, thường bình luận kinh sử xen dị sự. Nối tiếp truyền thống Tử bất ngữ và Nhạc vi thảo đường bút ký trong dòng họ Dũ—các nhà học.\",\n      \"key_text\": \"右台仙馆者，余晚年所居也。\",\n      \"use\": \"Đối chiếu bút ký học giả Thanh mạt với chí quái thuần văn nghệ\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E5%8F%B3%E5%8F%B0%E4%BB%99%E9%A6%86%E7%AC%94%E8%AE%B0\",\n        \"https://ctext.org/wiki.pl?if=gb&res=255308\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"神相全编\",\n      \"name_vi\": \"Thần Tướng Toàn Biên\",\n      \"bu\": \"藏外\",\n      \"author\": \"陈抟（托名）/ 袁忠彻等辑\",\n      \"era\": \"明 · 辑本（托宋陈抟）\",\n      \"topic\": \"方术\",\n      \"essence\": \"Bộ sách tướng thuật (nhân tướng) quy mô lớn đời Minh, thường gán cho Trần Đoàn. Hệ thống hóa xem mặt, xương, tay, hình dáng và vận mệnh. Là cẩm nang chuẩn mực của môn tướng pháp trong văn hóa dân gian và nghề xem tướng Đông Á.\",\n      \"key_text\": \"相者，观其形而知其神。\",\n      \"use\": \"Tham chiếu hệ thống tướng thuật cổ; so sánh với麻衣相法 và柳庄相法\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E7%A5%9E%E7%9B%B8%E5%85%A8%E7%B7%A8\",\n        \"https://ctext.org/wiki.pl?if=gb&res=145050\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"麻衣相法\",\n      \"name_vi\": \"Ma Y Tướng Pháp\",\n      \"bu\": \"藏外\",\n      \"author\": \"托名麻衣道者\",\n      \"era\": \"宋—明 传本\",\n      \"topic\": \"方术\",\n      \"essence\": \"Kinh điển tướng thuật gán cho đạo sĩ Ma Y, truyền từ Tống—Minh. Tập trung xem mặt (ngũ quan), ngũ hành hình tướng và đoán cát hung. Cùng Thần tướng toàn biên tạo thành hai trụ cột của nhân tướng học Hán văn.\",\n      \"key_text\": \"麻衣道者相法，以神为主。\",\n      \"use\": \"Học thuật và thực hành xem tướng; đối chiếu các bản in Minh—Thanh\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E9%BA%BB%E8%A1%A3%E7%9B%B8%E6%B3%95\",\n        \"https://zh.wikisource.org/wiki/%E9%BA%BB%E8%A1%A3%E7%A5%9E%E7%9B%B8\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"柳庄相法\",\n      \"name_vi\": \"Liễu Trang Tướng Pháp\",\n      \"bu\": \"藏外\",\n      \"author\": \"袁珙 / 袁忠彻\",\n      \"era\": \"明 · 洪武—永乐\",\n      \"topic\": \"方术\",\n      \"essence\": \"Tướng pháp triều Minh gắn với Viên Củng và con Viên Trung Triệt, từng phục vụ triều đình. Nhấn mạnh cốt tướng, khí sắc và vận hạn quan lộc. Ảnh hưởng lớn đến nghề tướng sĩ và văn bản tướng thuật dân gian sau này.\",\n      \"key_text\": \"柳庄先生相法，多验于公卿。\",\n      \"use\": \"Nghiên cứu tướng thuật cung đình Minh và truyền thừa Viên thị\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E6%9F%B3%E5%BA%84%E7%9B%B8%E6%B3%95\",\n        \"https://zh.wikipedia.org/wiki/%E8%A2%81%E7%90%AC\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"卜筮正宗\",\n      \"name_vi\": \"Bốc Thệ Chính Tông\",\n      \"bu\": \"藏外\",\n      \"author\": \"王洪绪\",\n      \"era\": \"清 · 康熙—雍正\",\n      \"topic\": \"方术\",\n      \"essence\": \"Kinh điển bốc phệ lục hào đời Thanh, hệ thống hóa Dịch chiêm theo lối ‘Nạp giáp / Lục hào’. Giải thích động hào, thế ứng, lục thân và đoán việc cụ thể (quan lộc, hôn nhân, bệnh tật). Vẫn là giáo trình chuẩn cho người học Kinh Dịch thực dụng.\",\n      \"key_text\": \"学易在明理，占易在决疑。\",\n      \"use\": \"Thực hành lục hào; đối chiếu với增删卜易 và易隐\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E5%8D%9C%E7%AD%9D%E6%AD%A3%E5%AE%97\",\n        \"https://ctext.org/wiki.pl?if=gb&res=966590\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"增删卜易\",\n      \"name_vi\": \"Tăng San Bốc Dịch\",\n      \"bu\": \"藏外\",\n      \"author\": \"野鹤老人 / 李文辉整理\",\n      \"era\": \"清 · 康熙\",\n      \"topic\": \"方术\",\n      \"essence\": \"Sách bốc dịch lục hào thực chiến, ghi lại kinh nghiệm ‘Dã Hạc lão nhân’ với nhiều quẻ án cụ thể. Chỉnh sửa, bổ sung lý luận thế ứng và động biến. Được coi là ‘bí kíp thực dụng’ song song với Bốc thệ chính tông.\",\n      \"key_text\": \"易理无穷，而占法有定。\",\n      \"use\": \"Học bói lục hào qua án lệ; so sánh phương pháp với卜筮正宗\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E5%A2%9E%E5%88%A0%E5%8D%9C%E6%98%93\",\n        \"https://zh.wikisource.org/wiki/%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"协纪辨方书\",\n      \"name_vi\": \"Hiệp Kỷ Biện Phương Thư\",\n      \"bu\": \"藏外\",\n      \"author\": \"允禄等奉敕纂\",\n      \"era\": \"清 · 乾隆\",\n      \"topic\": \"方术\",\n      \"essence\": \"Sách quan phương về chọn ngày (trạch nhật) và lịch kỵ, do triều Càn Long sắc tu. Hệ thống hóa thần sát, phương vị, niên nguyệt nhật thời và nghi thức cát hung. Là chuẩn mực nhà nước cho lịch thư và thuật trạch nhật Thanh—Dân quốc.\",\n      \"key_text\": \"敬天授时，协纪辨方。\",\n      \"use\": \"Tra thần sát, chọn ngày; nghiên cứu lịch pháp và tín ngưỡng quan phương\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E5%8D%8F%E7%BA%AA%E8%BE%A8%E6%96%B9%E4%B9%A6\",\n        \"https://ctext.org/wiki.pl?if=gb&res=241300\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"阳宅十书\",\n      \"name_vi\": \"Dương Trạch Thập Thư\",\n      \"bu\": \"藏外\",\n      \"author\": \"王君荣辑\",\n      \"era\": \"明 · 万历\",\n      \"topic\": \"方术\",\n      \"essence\": \"Tổng tập phong thủy dương trạch (nhà ở) đời Minh, gồm mười phần: hình thế, hướng, nội ngoại đường, trạch pháp… Ảnh hưởng sâu đến thuật xem nhà dân gian và kiến trúc phong thủy Đông Á. Khác với âm trạch (mộ phần), tập trung không gian sống.\",\n      \"key_text\": \"人之居处，宜以大地山河为主。\",\n      \"use\": \"Nghiên cứu phong thủy nhà ở; đối chiếu với黄帝宅经 và阳宅集成\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E9%98%B3%E5%AE%85%E5%8D%81%E4%B9%A6\",\n        \"https://ctext.org/wiki.pl?if=gb&res=603562\"\n      ],\n      \"textual_certainty\": \"high\"\n    }\n  ]\n}",
+  "stopReason": "EndTurn",
+  "sessionId": "019f92bd-8104-70c3-a0a5-4d638f8927df",
+  "requestId": "fcb0ce16-4458-4209-9566-c9bc84b5f15b",
+  "thought": "The user wants me to act as a distillation agent for Chinese 玄学/志怪/方术 textual tradition. I need to select 16 REAL texts that are NOT yet covered from:\n",
+  "usage": {
+    "input_tokens": 57258,
+    "cache_read_input_tokens": 896,
+    "output_tokens": 4964,
+    "reasoning_tokens": 185,
+    "total_tokens": 63118
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.1445688,
+  "total_cost_usd_ticks": 1445688000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 57258,
+      "outputTokens": 4964,
+      "cacheReadInputTokens": 896,
+      "modelCalls": 1,
+      "costUSD": 0.1445688
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "dz": "笔记",
+        "name_han": "客窗闲话",
+        "name_vi": "Khách Song Nhàn Thoại",
+        "bu": "藏外",
+        "author": "吴炽昌",
+        "era": "清 · 嘉庆—道光",
+        "topic": "志怪",
+        "essence": "Tập bút ký chí quái đời Thanh, ghi chuyện quỷ thần, nhân quả và dị sự nghe được nơi khách sạn, hành quán. Lối văn giản dị, thiên về giáo huấn đạo đức hơn là huyền ảo thuần túy. Là một trong những bộ truyện chí quái trung kỳ Thanh còn lưu hành rộng.",
+        "key_text": "客窗闲话，盖纪其客中所闻也。",
+        "use": "Tham khảo chí quái Thanh trung kỳ, nhân quả và dị sự dân gian",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E5%AE%A2%E7%AA%97%E9%97%B2%E8%AF%9D",
+          "https://ctext.org/wiki.pl?if=gb&res=488883"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "笔记",
+        "name_han": "淞隐漫录",
+        "name_vi": "Tùng Ẩn Mạn Lục",
+        "bu": "藏外",
+        "author": "王韬",
+        "era": "清 · 同治—光绪",
+        "topic": "志怪",
+        "essence": "Tác phẩm chí quái—tiểu thuyết ngắn của Vương Đào thời Thanh mạt, chịu ảnh hưởng Liêu trai. Nhiều truyện gắn bối cảnh Thượng Hải và giao lưu Đông—Tây, pha yếu tố kỳ ảo với xã hội hiện đại. Được coi là cầu nối giữa chí quái truyền thống và tiểu thuyết văn ngôn cận đại.",
+        "key_text": "海上多美人，亦多异事。",
+        "use": "Nghiên cứu chí quái Thanh mạt, văn hóa Thượng Hải và ảnh hưởng Liêu trai",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E6%B7%9E%E9%9A%B1%E6%BC%AB%E9%8C%84",
+          "https://ctext.org/wiki.pl?if=gb&res=145758"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "笔记",
+        "name_han": "三异笔谈",
+        "name_vi": "Tam Dị Bút Đàm",
+        "bu": "藏外",
+        "author": "许仲元",
+        "era": "清 · 嘉庆—道光",
+        "topic": "志怪",
+        "essence": "Bút ký chí quái bốn quyển, ghi ba loại dị sự: nhân sự lạ, quỷ thần, và phong thổ dị thường. Tác giả ghi chép theo lối kiến văn, ít tô vẽ, mang tính sử liệu và phong tục học. Bổ sung mảng bút ký dị sự Giang Nam đầu thế kỷ XIX.",
+        "key_text": "三异者，人事之异、鬼神之异、物产之异也。",
+        "use": "Đối chiếu dị sự, phong tục và kiến văn Giang Nam đời Thanh",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E4%B8%89%E5%BC%82%E7%AC%94%E8%B0%88",
+          "https://baike.baidu.com/item/%E4%B8%89%E5%BC%82%E7%AC%94%E8%B0%88"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "笔记",
+        "name_han": "咫闻录",
+        "name_vi": "Chỉ Văn Lục",
+        "bu": "藏外",
+        "author": "慵讷居士",
+        "era": "清 · 道光",
+        "topic": "志怪",
+        "essence": "Tập truyện chí quái mười hai quyển, ghi chuyện quỷ hồ, báo ứng và dị nhân. Lối kể gần Liêu trai nhưng giản lược hơn, nhiều mẩu ngắn mang tính răn đời. Là nguồn tham khảo chí quái dân gian vùng Giang—Chiết thời Đạo Quang.",
+        "key_text": "咫闻者，咫尺之闻也。",
+        "use": "Sưu tầm truyện hồ ly, báo ứng và dị sự dân gian Thanh",
+        "sources": [
+          "https://baike.baidu.com/item/%E5%92%AB%E9%97%BB%E5%BD%95",
+          "https://zh.wikisource.org/wiki/%E5%92%AB%E8%81%9E%E9%8C%84"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "笔记",
+        "name_han": "翼駉稗编",
+        "name_vi": "Dực Quânn Bại Biên",
+        "bu": "藏外",
+        "author": "汤用中",
+        "era": "清 · 道光—咸丰",
+        "topic": "志怪",
+        "essence": "Bút ký tạp soạn chí quái và kiến văn, lấy tên từ điển cố ‘dực quân’ (ngựa có cánh—ý chuyện lạ). Ghi chép quỷ thần, kỳ sự và giai thoại quan trường. Ít được nhắc hơn Liêu trai nhưng phản ánh mạng lưới truyền miệng quan lại—văn nhân trung kỳ Thanh.",
+        "key_text": "稗编所录，多里巷传闻。",
+        "use": "Bổ sung corpus chí quái quan viên—văn nhân trung Thanh",
+        "sources": [
+          "https://baike.baidu.com/item/%E7%BF%BC%E9%A7%89%E7%A8%BF%E7%BC%96",
+          "https://ctext.org/searchbooks.pl?if=gb&searchu=%E7%BF%BC%E9%A7%89%E7%A8%BF%E7%B7%A8"
+        ],
+        "textual_certainty": "partial"
+      },
+      {
+        "dz": "笔记",
+        "name_han": "萤窗异草",
+        "name_vi": "Huỳnh Song Dị Thảo",
+        "bu": "藏外",
+        "author": "长白浩歌子",
+        "era": "清 · 乾隆前后",
+        "topic": "志怪",
+        "essence": "Tập truyện chí quái văn ngôn ba tập, thường được so sánh với Liêu trai chí dị. Nhiều truyện tình yêu người—hồ ly, quỷ nữ, kết cấu hoàn chỉnh hơn bút ký tạp lục. Là một trong những bộ ‘bắt chước Liêu trai’ thành công nhất đời Thanh.",
+        "key_text": "异草生萤窗之下，亦足以供谈助。",
+        "use": "Đọc song song Liêu trai; phân tích mô típ hồ ly và chí quái văn ngôn",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E8%9D%A0%E7%AA%97%E5%BC%82%E8%8D%89",
+          "https://ctext.org/wiki.pl?if=gb&res=266030"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "笔记",
+        "name_han": "夜谭随录",
+        "name_vi": "Dạ Đàm Tùy Lục",
+        "bu": "藏外",
+        "author": "和邦额",
+        "era": "清 · 乾隆",
+        "topic": "志怪",
+        "essence": "Tác phẩm chí quái của tác giả Mãn tộc Hòa Bang Ngạch, mười hai quyển. Ghi chuyện quỷ thần, hồ ly và dị sự, mang màu sắc biên cương—quan trường. Được xếp cùng Liêu trai, Tử bất ngữ như ‘tam đại chí quái Càn Long’.",
+        "key_text": "夜谈所闻，随笔录之。",
+        "use": "So sánh chí quái Mãn—Hán; nghiên cứu dị sự quan viên Càn Long",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E5%A4%9C%E8%B0%AD%E9%9A%8F%E5%BD%95",
+          "https://ctext.org/wiki.pl?if=gb&res=592472"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "笔记",
+        "name_han": "夜雨秋灯录",
+        "name_vi": "Dạ Vũ Thu Đăng Lục",
+        "bu": "藏外",
+        "author": "宣鼎",
+        "era": "清 · 同治—光绪",
+        "topic": "志怪",
+        "essence": "Tập truyện chí quái—truyện kỳ Thanh mạt, văn phong hoa mỹ, giàu kịch tính. Nhiều truyện dài hơi hơn bút ký ngắn, pha bi kịch tình cảm và dị sự. Ảnh hưởng lớn đến tiểu thuyết văn ngôn cuối Thanh đầu Dân quốc.",
+        "key_text": "夜雨秋灯，苦中作乐，用以遣愁。",
+        "use": "Nghiên cứu truyện kỳ Thanh mạt và chuyển tiếp sang tiểu thuyết cận đại",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E5%A4%9C%E9%9B%A8%E7%A7%8B%E7%81%AF%E5%BD%95",
+          "https://ctext.org/wiki.pl?if=gb&res=881155"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "笔记",
+        "name_han": "右台仙馆笔记",
+        "name_vi": "Hữu Đài Tiên Quán Bút Ký",
+        "bu": "藏外",
+        "author": "俞樾",
+        "era": "清 · 光绪",
+        "topic": "志怪",
+        "essence": "Bút ký chí quái của Dũ Việt (Khúc viên), ghi kiến văn quỷ thần, báo ứng và dị sự sau khi ẩn cư. Lối văn học giả, thường bình luận kinh sử xen dị sự. Nối tiếp truyền thống Tử bất ngữ và Nhạc vi thảo đường bút ký trong dòng họ Dũ—các nhà học.",
+        "key_text": "右台仙馆者，余晚年所居也。",
+        "use": "Đối chiếu bút ký học giả Thanh mạt với chí quái thuần văn nghệ",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E5%8F%B3%E5%8F%B0%E4%BB%99%E9%A6%86%E7%AC%94%E8%AE%B0",
+          "https://ctext.org/wiki.pl?if=gb&res=255308"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "神相全编",
+        "name_vi": "Thần Tướng Toàn Biên",
+        "bu": "藏外",
+        "author": "陈抟（托名）/ 袁忠彻等辑",
+        "era": "明 · 辑本（托宋陈抟）",
+        "topic": "方术",
+        "essence": "Bộ sách tướng thuật (nhân tướng) quy mô lớn đời Minh, thường gán cho Trần Đoàn. Hệ thống hóa xem mặt, xương, tay, hình dáng và vận mệnh. Là cẩm nang chuẩn mực của môn tướng pháp trong văn hóa dân gian và nghề xem tướng Đông Á.",
+        "key_text": "相者，观其形而知其神。",
+        "use": "Tham chiếu hệ thống tướng thuật cổ; so sánh với麻衣相法 và柳庄相法",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E7%A5%9E%E7%9B%B8%E5%85%A8%E7%B7%A8",
+          "https://ctext.org/wiki.pl?if=gb&res=145050"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "麻衣相法",
+        "name_vi": "Ma Y Tướng Pháp",
+        "bu": "藏外",
+        "author": "托名麻衣道者",
+        "era": "宋—明 传本",
+        "topic": "方术",
+        "essence": "Kinh điển tướng thuật gán cho đạo sĩ Ma Y, truyền từ Tống—Minh. Tập trung xem mặt (ngũ quan), ngũ hành hình tướng và đoán cát hung. Cùng Thần tướng toàn biên tạo thành hai trụ cột của nhân tướng học Hán văn.",
+        "key_text": "麻衣道者相法，以神为主。",
+        "use": "Học thuật và thực hành xem tướng; đối chiếu các bản in Minh—Thanh",
+        "sources": [
+          "https://baike.baidu.com/item/%E9%BA%BB%E8%A1%A3%E7%9B%B8%E6%B3%95",
+          "https://zh.wikisource.org/wiki/%E9%BA%BB%E8%A1%A3%E7%A5%9E%E7%9B%B8"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "柳庄相法",
+        "name_vi": "Liễu Trang Tướng Pháp",
+        "bu": "藏外",
+        "author": "袁珙 / 袁忠彻",
+        "era": "明 · 洪武—永乐",
+        "topic": "方术",
+        "essence": "Tướng pháp triều Minh gắn với Viên Củng và con Viên Trung Triệt, từng phục vụ triều đình. Nhấn mạnh cốt tướng, khí sắc và vận hạn quan lộc. Ảnh hưởng lớn đến nghề tướng sĩ và văn bản tướng thuật dân gian sau này.",
+        "key_text": "柳庄先生相法，多验于公卿。",
+        "use": "Nghiên cứu tướng thuật cung đình Minh và truyền thừa Viên thị",
+        "sources": [
+          "https://baike.baidu.com/item/%E6%9F%B3%E5%BA%84%E7%9B%B8%E6%B3%95",
+          "https://zh.wikipedia.org/wiki/%E8%A2%81%E7%90%AC"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "卜筮正宗",
+        "name_vi": "Bốc Thệ Chính Tông",
+        "bu": "藏外",
+        "author": "王洪绪",
+        "era": "清 · 康熙—雍正",
+        "topic": "方术",
+        "essence": "Kinh điển bốc phệ lục hào đời Thanh, hệ thống hóa Dịch chiêm theo lối ‘Nạp giáp / Lục hào’. Giải thích động hào, thế ứng, lục thân và đoán việc cụ thể (quan lộc, hôn nhân, bệnh tật). Vẫn là giáo trình chuẩn cho người học Kinh Dịch thực dụng.",
+        "key_text": "学易在明理，占易在决疑。",
+        "use": "Thực hành lục hào; đối chiếu với增删卜易 và易隐",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E5%8D%9C%E7%AD%9D%E6%AD%A3%E5%AE%97",
+          "https://ctext.org/wiki.pl?if=gb&res=966590"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "增删卜易",
+        "name_vi": "Tăng San Bốc Dịch",
+        "bu": "藏外",
+        "author": "野鹤老人 / 李文辉整理",
+        "era": "清 · 康熙",
+        "topic": "方术",
+        "essence": "Sách bốc dịch lục hào thực chiến, ghi lại kinh nghiệm ‘Dã Hạc lão nhân’ với nhiều quẻ án cụ thể. Chỉnh sửa, bổ sung lý luận thế ứng và động biến. Được coi là ‘bí kíp thực dụng’ song song với Bốc thệ chính tông.",
+        "key_text": "易理无穷，而占法有定。",
+        "use": "Học bói lục hào qua án lệ; so sánh phương pháp với卜筮正宗",
+        "sources": [
+          "https://baike.baidu.com/item/%E5%A2%9E%E5%88%A0%E5%8D%9C%E6%98%93",
+          "https://zh.wikisource.org/wiki/%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "协纪辨方书",
+        "name_vi": "Hiệp Kỷ Biện Phương Thư",
+        "bu": "藏外",
+        "author": "允禄等奉敕纂",
+        "era": "清 · 乾隆",
+        "topic": "方术",
+        "essence": "Sách quan phương về chọn ngày (trạch nhật) và lịch kỵ, do triều Càn Long sắc tu. Hệ thống hóa thần sát, phương vị, niên nguyệt nhật thời và nghi thức cát hung. Là chuẩn mực nhà nước cho lịch thư và thuật trạch nhật Thanh—Dân quốc.",
+        "key_text": "敬天授时，协纪辨方。",
+        "use": "Tra thần sát, chọn ngày; nghiên cứu lịch pháp và tín ngưỡng quan phương",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E5%8D%8F%E7%BA%AA%E8%BE%A8%E6%96%B9%E4%B9%A6",
+          "https://ctext.org/wiki.pl?if=gb&res=241300"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "阳宅十书",
+        "name_vi": "Dương Trạch Thập Thư",
+        "bu": "藏外",
+        "author": "王君荣辑",
+        "era": "明 · 万历",
+        "topic": "方术",
+        "essence": "Tổng tập phong thủy dương trạch (nhà ở) đời Minh, gồm mười phần: hình thế, hướng, nội ngoại đường, trạch pháp… Ảnh hưởng sâu đến thuật xem nhà dân gian và kiến trúc phong thủy Đông Á. Khác với âm trạch (mộ phần), tập trung không gian sống.",
+        "key_text": "人之居处，宜以大地山河为主。",
+        "use": "Nghiên cứu phong thủy nhà ở; đối chiếu với黄帝宅经 và阳宅集成",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E9%98%B3%E5%AE%85%E5%8D%81%E4%B9%A6",
+          "https://ctext.org/wiki.pl?if=gb&res=603562"
+        ],
+        "textual_certainty": "high"
+      }
+    ]
+  }
+}

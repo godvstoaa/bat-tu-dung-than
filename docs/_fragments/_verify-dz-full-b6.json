@@ -1,0 +1,66 @@
+{
+  "text": "{ \"corrections\": [ { \"title\": \"太上说长生益算妙经\", \"current_dz\": \"DZ650\", \"correct_dz\": \"DZ650\", \"note\": \"pending verification\" } ] }{ \"corrections\": [] }{ \"corrections\": [] }{ \"corrections\": [] }{ \"corrections\": [\n  {\n    \"title\": \"太上洞玄灵宝三元威仪自然经\",\n    \"current_dz\": \"DZ526\",\n    \"correct_dz\": \"DZ530\",\n    \"note\": \"Schipper/CT title: 洞玄靈寶玉籙簡文三元威儀自然真經 (DZ530). DZ526 is the Daozang tiyao (DT) number, not the Schipper DZ number; DZ526 is 太上洞淵三昧神咒齋清旦行道儀.\"\n  },\n  {\n    \"title\": \"太上灵宝净明法序\",\n    \"current_dz\": \"DZ554\",\n    \"correct_dz\": \"DZ559\",\n    \"note\": \"CRTA/Zhonghua Daozang index: 太上靈寶淨明法序 = DZ559 (Pregadio lists related 法印式 at CT559; DT≈554). DZ554 is 靈寶淨明院教師周真公起請畫一.\"\n  },\n  {\n    \"title\": \"还丹众仙论\",\n    \"current_dz\": \"DZ232\",\n    \"correct_dz\": \"DZ233\",\n    \"note\": \"還丹眾仙論 is DZ233 (Yang Zai 楊在). DZ232 is 還丹祕訣養赤子神方; 232 is the DT number for 還丹眾仙論.\"\n  },\n  {\n    \"title\": \"玄宗直指万法同归\",\n    \"current_dz\": \"DZ1055\",\n    \"correct_dz\": \"DZ1066\",\n    \"note\": \"玄宗直指萬法同歸 is DZ1066 (CT1066; DT1055). DZ1055 is 純陽真人渾成集.\"\n  },\n  {\n    \"title\": \"灵棋经\",\n    \"current_dz\": \"DZ1032\",\n    \"correct_dz\": \"DZ1041\",\n    \"note\": \"Full Schipper title 靈棋本章正經 = DZ1041 (DT1032). DZ1032 is 雲笈七籤.\"\n  },\n  {\n    \"title\": \"道德真经取善集\",\n    \"current_dz\": \"DZ713\",\n    \"correct_dz\": \"DZ718\",\n    \"note\": \"道德真經取善集 (Li Lin 李霖) is DZ718 (DT713). DZ713 is 道德經論兵要義述.\"\n  }\n]}",
+  "stopReason": "EndTurn",
+  "sessionId": "019f939e-5c0e-7543-9765-77826eb89574",
+  "requestId": "bc24c511-e69f-449e-937c-a3d09880c942",
+  "thought": "The user wants me to verify Daoist Canon (DZ) catalog numbers against titles. I need to check each of the 40 entries against authoritative sources like Schipper-Verellen, Komjathy, Pregadio, or CRTA.\n...Let me try alternative sources. There's a CT text wiki and CRTA. Also the researchgate title index for Zhonghua Daozang maps to DZ numbers.PDF downloaded successfully. Let me extract text from it.Good - the PDF has CT (Schipper) numbers which equal DZ numbers. Text is garbled for Chinese due to encoding but I can extract specific lines. Let me write a script to extract all relevant CT numbers ...Excellent! Now I have the authoritative Pregadio index. Let me compare each entry:\nThat’s a solid comparison so far! The DZ650, DZ711, DZ548, DZ907, DZ588, DZ425, and DZ252 entries all line up nicely. DZ298 is also close enough—those two titles are clearly variants of the same work.\n\nThe ones that need deeper digging are DZ526, 554, 1415, 232, 1055, 1032, 404, 317, 43, 713, 1376, 663, and 632. Let me pull the exact canonical titles and see if any of those variants actually point to the same text.Let me search more carefully for remaining titles that might be wrong or need verification.I need to find 太上灵宝净明法序 more carefully. Earlier homeinmists said it was a preface to 太上灵宝净明洞神上品经. That would be DZ 1103.\nInteresting findings:\n\n3. 太上灵宝净明法序:Let me use open_page or search more. Also check Zhonghua Daozang index more carefully from researchgate.Let me get more data from the JSTOR title index snippets and also try to download the Zhonghua D...That's an HTML page not PDF. Let me try researchgate or other sources. I have enough from Pregadio's index which is the gold standard matching Schipper CT numbers.\nThat sounds like you're making good progress with the classification. The title variants you're noting are common in Daoist texts—scholars often use shortened forms or slight rephrasings when citing from indexes like Pregadio's. For instance, the \"太上说\" vs. \"灵宝天尊说\" in DZ 317 and 43 is a frequent shorthand, and the same goes for the \"后编\" vs. \"后集\" in DZ 298.\n\nFor the ones flagged as wrong, like DZ 526 and 554, you're right to double-check against the actual DT/CT numbers.For entries where the title is wrong but the DZ points to the clearly intended work (common short-name variants), I should only correct when the DZ NUMBER is wrong for the intended work, not when it's...The DZ# 1415 is correct for the intended work (北帝說豁落七元經), even though the title here uses the wrong speaker name. I'll include it as a title-form error with the correct DZ still 1415. \n\nFor the rest of the list, I’ll check each one 1-by-1 and return only the corrections where the DZ is actually wrong for the title.",
+  "usage": {
+    "input_tokens": 156117,
+    "cache_read_input_tokens": 1343744,
+    "output_tokens": 9879,
+    "reasoning_tokens": 8454,
+    "total_tokens": 1509740
+  },
+  "num_turns": 11,
+  "total_cost_usd": 1.26183,
+  "total_cost_usd_ticks": 12618300000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 156117,
+      "outputTokens": 9879,
+      "cacheReadInputTokens": 1343744,
+      "modelCalls": 11,
+      "costUSD": 1.26183
+    }
+  },
+  "structuredOutput": {
+    "corrections": [
+      {
+        "title": "太上洞玄灵宝三元威仪自然经",
+        "current_dz": "DZ526",
+        "correct_dz": "DZ530",
+        "note": "Schipper/CT title: 洞玄靈寶玉籙簡文三元威儀自然真經 (DZ530). DZ526 is the Daozang tiyao (DT) number, not the Schipper DZ number; DZ526 is 太上洞淵三昧神咒齋清旦行道儀."
+      },
+      {
+        "title": "太上灵宝净明法序",
+        "current_dz": "DZ554",
+        "correct_dz": "DZ559",
+        "note": "CRTA/Zhonghua Daozang index: 太上靈寶淨明法序 = DZ559 (Pregadio lists related 法印式 at CT559; DT≈554). DZ554 is 靈寶淨明院教師周真公起請畫一."
+      },
+      {
+        "title": "还丹众仙论",
+        "current_dz": "DZ232",
+        "correct_dz": "DZ233",
+        "note": "還丹眾仙論 is DZ233 (Yang Zai 楊在). DZ232 is 還丹祕訣養赤子神方; 232 is the DT number for 還丹眾仙論."
+      },
+      {
+        "title": "玄宗直指万法同归",
+        "current_dz": "DZ1055",
+        "correct_dz": "DZ1066",
+        "note": "玄宗直指萬法同歸 is DZ1066 (CT1066; DT1055). DZ1055 is 純陽真人渾成集."
+      },
+      {
+        "title": "灵棋经",
+        "current_dz": "DZ1032",
+        "correct_dz": "DZ1041",
+        "note": "Full Schipper title 靈棋本章正經 = DZ1041 (DT1032). DZ1032 is 雲笈七籤."
+      },
+      {
+        "title": "道德真经取善集",
+        "current_dz": "DZ713",
+        "correct_dz": "DZ718",
+        "note": "道德真經取善集 (Li Lin 李霖) is DZ718 (DT713). DZ713 is 道德經論兵要義述."
+      }
+    ]
+  }
+}

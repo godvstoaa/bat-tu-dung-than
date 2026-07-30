@@ -1,0 +1,345 @@
+{
+  "text": "{ \"results\": [ { \"title\": \"太上消災祈福醮儀\", \"verdict\": \"partial\", \"issue\": \"Mô tả tổng quát đúng hướng khoa nghi tiêu tai–cầu phúc, nhưng chưa xác minh được chi tiết “bổ sung cho các nghi giải ách–đoạn ôn trong Động thần bộ” từ nguồn chính; niên đại/tác giả “不詳” hợp lý nhưng vai trò cụ thể trong tạng cần đối chiếu mục lục đầy đủ hơn.\" }, { \"title\": \"太上洞神天公消魔護國經\", \"verdict\": \"partial\", \"issue\": \"Tồn tại kinh Động thần liên quan Thiên Công/tiêu ma hộ quốc và được dùng trong nghiên cứu trai giáo, nhưng xác nhận “ba quyển”, yếu tố sấm chú cụ thể và mức độ trích dẫn còn mỏng; phần lớn là tóm tắt hợp lý chưa đủ nguồn độc lập.\" }, { \"title\": \"北斗七元金玄羽章\", \"verdict\": \"partial\", \"issue\": \"Nội dung thất nguyên Bắc Đẩu và “vũ chương” (phù hình) đúng hướng, nhưng việc gán Schipper “định niên đại khoảng đầu Đường” chưa thấy nguồn rõ ràng; nên coi niên đại là không chắc, không khẳng định Schipper.\" }, { \"title\": \"南嶽總勝集\", \"verdict\": \"partial\", \"issue\": \"Tác giả Trần Điền Phu (陳田夫), Nam Tống, sơn chí Nam Nhạc Hành Sơn là đúng hướng; “địa chí–thắng tích, động thiên, cung quán” hợp lý. Không thấy sai lớn, nhưng một số chi tiết biên soạn/truyền bản chưa được đối chiếu đầy đủ → partial nhẹ.\" }, { \"title\": \"太上洞淵辭瘟神咒妙經\", \"verdict\": \"partial\", \"issue\": \"Thuộc hệ Động Uyên/ôn dịch và thần chú là hợp lý; cốt truyện “Nguyên Thủy dạy Động Uyên… ôn dịch do bất kính Tam Bảo… thỉnh hành bệnh thần vương” cần xác minh từng chi tiết — có thể đúng khung Động Uyên nhưng chưa xác nhận đủ từ nguồn mở.\" }, { \"title\": \"純陽帝君神化妙通紀\", \"verdict\": \"partial\", \"issue\": \"Tác giả Miêu Thiện Thời (Toàn Chân), truyện Lã Động Tân, dự định ~120 hóa và còn khoảng 90–100 hóa là khung phổ biến; “nay còn khoảng 95” mang tính ước lượng. Không sai lớn nhưng con số còn lại và phạm vi “điểm hóa nhiều nhân vật Nho–Đạo” nên coi là gần đúng.\" }, { \"title\": \"太上洞玄靈寶護諸童子經\", \"verdict\": \"partial\", \"issue\": \"Kinh Linh Bảo hộ đồng tử tồn tại; mô tả Bắc Đẩu thất tinh đồng tử/ngũ thần/thập phương thiện đồng tử hộ vệ khi ra vào cửa có vẻ khớp truyền thống, nhưng chi tiết cốt truyện chưa được đối chiếu đầy đủ bản kinh.\" }, { \"title\": \"靈寶天尊說祿庫受生經\", \"verdict\": \"partial\", \"issue\": \"Khái niệm lộc khố thụ sinh, vay trả tiền địa phủ, đốt thụ sinh tiền theo cung khố là đúng truyền thống; gán “Linh Bảo Thiên Tôn giảng” và chi tiết thập nhị cung khố cần xác nhận đúng bản này (có nhiều kinh thụ sinh tương cận).\" }, { \"title\": \"太上神咒延壽妙經\", \"verdict\": \"partial\", \"issue\": \"Kinh ngắn hộ mệnh–diên thọ, giả thác Nguyên Thủy là hợp lý; “hơn 200 chữ”, ngũ hư lục hao, lục trai thập trực, Giáp Tý Canh… là chi tiết cụ thể chưa kiểm đủ — có thể đúng nhưng mức tin cậy trung bình.\" }, { \"title\": \"太上召諸神龍安鎮墳墓經\", \"verdict\": \"partial\", \"issue\": \"Tồn tại nhóm kinh an trấn phần mộ/long mạch trong tạng; mô tả công năng đúng hướng. Không thấy sai attribution lớn, nhưng chi tiết “Động Huyền” và phạm vi dùng cần xác nhận mục lục.\" }, { \"title\": \"太上七星神咒經\", \"verdict\": \"partial\", \"issue\": \"Kinh chú thất tinh Bắc Đẩu ngắn trong tạng là hợp lý; “song hành với Hư Hoàng bảo sinh” là nhận định nhóm chức năng, không phải sai fact cứng, nhưng chưa có nguồn độc lập mạnh.\" }, { \"title\": \"太上虛皇保生神咒經\", \"verdict\": \"partial\", \"issue\": \"Thần chú Hư Hoàng bảo sinh tồn tại trong hệ Động Huyền/tinh tú; mô tả hộ mệnh–bảo thai–trừ tà đúng hướng. Chi tiết tác giả/niên đại không rõ là chấp nhận được.\" }, { \"title\": \"太上北斗二十八章經\", \"verdict\": \"partial\", \"issue\": \"Khung giả thác Bắc Đẩu nguyên quân truyền Hán Minh Đế, 28 chương là mô tả kinh Bắc Đẩu phổ biến; chi tiết “Chung Nam Sơn” và cấu trúc “7 chương trị thân trị quốc + các chương sau lễ tụng” cần xác minh bản — có thể đúng một phần.\" }, { \"title\": \"太上老君說救生真經\", \"verdict\": \"partial\", \"issue\": \"Kinh Lão Quân cứu sinh bảo mệnh trong tạng là hợp lý; bối cảnh Tử Vi cung/lưu ly thất bảo điện và lục giáp lục đinh là chi tiết cốt truyện chưa đối chiếu đủ.\" }, { \"title\": \"太上說紫微神兵護國消魔經\", \"verdict\": \"partial\", \"issue\": \"Cốt truyện Hư Nguy hóa Chân Vũ, Phong Đô, Bắc Cực Huyền Thiên là truyền thuyết Chân Vũ quen thuộc; gán đúng bản kinh này và vai trò Lão Quân tại Tử Vi thượng cung cần xác nhận — khung đúng hướng, chi tiết có thể gộp từ nhiều bản.\" }, { \"title\": \"太上洞神五星諸宿日月混常經\", \"verdict\": \"partial\", \"issue\": \"Còn gọi Nhật Nguyệt Hỗn Thường Kinh và nội dung tinh tinh hóa thân (thầy bói, đạo sĩ…) là mô tả được ghi nhận trong nghiên cứu Đạo tạng; mức chi tiết “cầu gì được nấy/quan lộc” mang tính tóm tắt — partial nhẹ.\" }, { \"title\": \"無上三元鎮宅靈籙\", \"verdict\": \"partial\", \"issue\": \"Lục trấn trạch giả thác Kim Minh thất chân trong Động Thần là hướng đúng; chi tiết truyền “Vô thượng tam nguyên an trấn trạch lục” và “tam thiên trấn phòng đại tướng” chưa kiểm đủ từng điểm.\" }, { \"title\": \"易林\", \"verdict\": \"partial\", \"issue\": \"Tiêu Diên Thọ/Tiêu Cán, 4096 quẻ (64×64), thu vào Đạo tạng/Vạn Lịch tục tạng là đúng khung; “Tùy chí 16 quyển, bản tạng 10 quyển” cần đối chiếu mục lục cụ thể — có thể đúng nhưng dễ nhầm bản.\" }, { \"title\": \"太上玄靈斗姆大聖元君本命延生心經\", \"verdict\": \"partial\", \"issue\": \"Kinh Đẩu Mẫu bản mệnh diên sinh tồn tại; mô tả mẹ Bắc Đẩu, dược lực, giải ách, bảo thai đúng tín ngưỡng. Văn bản ngắn và công năng là tóm tắt hợp lý; không thấy sai cứng.\" }, { \"title\": \"玉皇宥罪錫福寶懺\", \"verdict\": \"partial\", \"issue\": \"Bảo sám Ngọc Hoàng xá tội ban phúc thuộc hệ sám; đề “雷霆猛吏都督辛漢臣” là attribution truyền thống cần coi là đề danh, không chắc tác giả lịch sử — verdict partial vì attribution.\" }, { \"title\": \"高上玉皇滿願寶懺\", \"verdict\": \"partial\", \"issue\": \"Thuộc nhóm sám Ngọc Hoàng trong tạng là hợp lý; mô tả viên mãn nguyện cầu/tẩy tội đúng hướng. Không có claim niên đại/tác giả sai lớn.\" }, { \"title\": \"太上洞玄靈寶十號功德因緣妙經\", \"verdict\": \"partial\", \"issue\": \"Kinh giải thích thập hiệu Nguyên Thủy Thiên Tôn trong Linh Bảo là mô tả hợp lý; danh sách hiệu (“Vô thượng đạo, Nguyên thủy, Thái cực…”) mang tính minh họa — có thể không đủ/không khớp thứ tự đầy đủ.\" }, { \"title\": \"太上慈悲九幽拔罪懺\", \"verdict\": \"partial\", \"issue\": \"Sám bạt tội cửu u nhiều quyển trong tạng là đúng hướng; “mười quyển” và khung Nguyên Thủy/thập phương cần xác nhận đúng bản (có nhiều sám từ bi/cửu u tương cận dễ nhầm).\" }, { \"title\": \"高上神霄宗師受經式\", \"verdict\": \"partial\", \"issue\": \"Tư liệu truyền kinh phái Thần Tiêu gắn Tống Huy Tông–Lâm Linh Tố là hướng đúng và quan trọng; chi tiết “liệt kê kinh lục bí tàng phủ Thần Tiêu” hợp lý nhưng mức “then chốt danh mục” mang tính đánh giá.\" }, { \"title\": \"玄和子十二月卦金訣\", \"verdict\": \"partial\", \"issue\": \"Ghép 12 quẻ tiêu tức với 12 tháng cho hỏa hầu kim đan là mô tả chuẩn của loại thư; tác giả “玄和子” và chi tiết nội/ngoại đan đúng hướng. Không thấy sai cứng rõ.\" }, { \"title\": \"石藥爾雅\", \"verdict\": \"partial\", \"issue\": \"Mai Bưu (梅彪), từ điển dược thạch ẩn danh mô phỏng Nhĩ Nhã là đúng; “hơn 150” vị là ước lượng phổ biến — có thể lệch số đếm tùy bản, nên partial nhẹ.\" }, { \"title\": \"丹方鑑源\", \"verdict\": \"partial\", \"issue\": \"Độc Cô Đào / Tử Các Sơn Tẩu, cẩm nang phân loại dược liệu ngoại đan–hoàng bạch là đúng hướng; chi tiết nhóm (kim ngân, hoàng, sa, phàn…) khớp thể loại. Không thấy sai attribution lớn.\" }, { \"title\": \"大丹記\", \"verdict\": \"partial\", \"issue\": \"Đề Ngụy Bá Dương, nghi ngụy thác; bàn chì–thủy ngân/đại đan — khung đúng. “Mục lục Tống đại ghi nhận” hợp lý nhưng cần nguồn cụ thể; không đủ để gọi inaccurate.\" }, { \"title\": \"白雲仙人靈草歌\", \"verdict\": \"partial\", \"issue\": \"Thơ ca linh thảo phục thực trong tạng, đề Bạch Vân tiên nhân — đúng thể loại; mức “thần hiệu chữa bệnh” là tóm tắt chung.\" }, { \"title\": \"金華赤松山志\", \"verdict\": \"partial\", \"issue\": \"Nghê Thủ Ước (倪守約), sơn chí Xích Tùng Kim Hoa, truyền thuyết Hoàng Sơ Bình/Hoàng Đại Tiên là đúng hướng và được dùng rộng; chi tiết “chế cáo” v.v. không sai lớn.\" }, { \"title\": \"大滌洞天記\", \"verdict\": \"partial\", \"issue\": \"Đặng Mục (鄧牧), Đại Địch động thiên (Hàng Châu), 3 quyển — đúng hướng. “Thứ 24 trong 36 động thiên” là claim hệ thống động thiên cần xác nhận số thứ tự chuẩn (có thể đúng theo một bảng phân loại).\" }, { \"title\": \"天壇王屋山聖跡記\", \"verdict\": \"partial\", \"issue\": \"Thánh tích Vương Ốc–Thiên Đàn, động thiên số một, có liên quan Đỗ Quang Đình và các bản tập — đúng hướng; “Đỗ Quang Đình đẳng (tập)” có thể đơn giản hóa quá trình biên tập nhiều đời.\" }, { \"title\": \"南嶽小錄\", \"verdict\": \"partial\", \"issue\": \"Lý Xung Chiêu (李冲昭), sơn lục Nam Nhạc đời Đường còn nguyên vẹn — attribution và giá trị lịch sử được chấp nhận rộng. Không thấy sai cứng.\" }, { \"title\": \"太上玉清謝罪登真寶懺\", \"verdict\": \"partial\", \"issue\": \"Bảo sám Động Chân, tạ tội đăng chân, lễ Ngọc Thanh thiên tôn — đúng thể loại; “năm mươi vị” và “kim cách” là chi tiết cụ thể chưa đối chiếu đủ.\" }, { \"title\": \"太上泰清拔罪昇天寶懺\", \"verdict\": \"partial\", \"issue\": \"Bảo sám bạt tội thăng thiên, khung Động Chân/Nguyên Thủy — hợp lý; bối cảnh “Thủy Thanh thiên” và “Bắc Phong ngục” cần xác nhận đúng bản.\" }, { \"title\": \"九天應元雷聲普化天尊玉樞寶懺\", \"verdict\": \"partial\", \"issue\": \"Sám Lôi Tổ/Ngọc Xu phổ biến là đúng; mô tả quy mệnh tam bảo và Lôi bộ hợp lý. Không có claim niên đại sai.\" }, { \"title\": \"雷霆玉樞宥罪法懺\", \"verdict\": \"partial\", \"issue\": \"Pháp sám đồng hệ với Ngọc Xu Bảo Sám, văn cú khác — nhận định nhóm hợp lý; “đồng quyển” có thể nhầm cách đóng gói tạng (cùng hệ ≠ cùng quyển).\" }, { \"title\": \"太乙火府奏告祈禳儀\", \"verdict\": \"partial\", \"issue\": \"Khoa nghi Thái Ất Hỏa Phủ tấu cáo–kỳ nhương thuộc Lôi pháp là đúng hướng; chi tiết đốt phù, thắp đèn, Bắc Đẩu là mô tả nghi thức tổng quát.\" }, { \"title\": \"太上靈寶上元天官消愆滅罪懺\", \"verdict\": \"partial\", \"issue\": \"Thuộc bộ sám Tam Quan (thượng/trung/hạ nguyên) là khung chuẩn; mô tả Thượng Nguyên Thiên Quan tiêu khiên diệt tội đúng hướng.\" }, { \"title\": \"青玄救苦寶懺\", \"verdict\": \"partial\", \"issue\": \"Sám Thái Ất Cứu Khổ / Thanh Huyền cứu khổ trong hệ siêu độ là đúng hướng; “Thanh Hoa Trường Lạc giới / Đông Cực diệu nghiêm cung” khớp thần thoại cứu khổ phổ biến.\" }, { \"title\": \"東嶽大生寶懺\", \"verdict\": \"partial\", \"issue\": \"Sám Đông Nhạc Đại Sinh / Thái Sơn đế quân gắn âm ty–thọ yểu là đúng tín ngưỡng; mô tả chức năng sám hợp lý.\" }, { \"title\": \"太上慈悲道場消災九幽懺\", \"verdict\": \"partial\", \"issue\": \"10 quyển/43 phẩm, đề Cát Huyền soạn, tựa Lý Hàm Quang — attribution truyền thống; học giới thường coi đề danh, không phải xác thực Cát Huyền. “Khác với Thái Thượng Từ bi cửu u bạt tội sám” là điểm phân biệt quan trọng, có thể đúng nhưng cần cẩn trọng nhầm bản.\" }, { \"title\": \"雲阜山申仙翁傳\", \"verdict\": \"partial\", \"issue\": \"Truyện Thân Tiên Ông (Thân Thái Chi) gắn danh sơn/Clouds阜 là hướng tiên truyện; chi tiết “Kim đan hỏa long đại thành pháp” và đời Đường cần xác nhận — có thể trộn tiểu sử–truyền thuyết.\" }, { \"title\": \"江淮異人錄\", \"verdict\": \"partial\", \"issue\": \"Ngô Thục (吳淑), dị nhân Giang Hoài Đường mạt–Tống sơ là đúng; “khoảng 25” nhân vật là ước lượng phổ biến (số mục có thể lệch nhẹ theo bản).\" }, { \"title\": \"純陽呂真人藥石製\", \"verdict\": \"partial\", \"issue\": \"Thác Lã Động Tân, dược thạch/thảo dược ca quyết ngoại đan — đúng thể loại; “hơn 60 long nha thảo dược” là ước lượng số mục, có thể lệch.\" }, { \"title\": \"太極真人雜丹藥方\", \"verdict\": \"partial\", \"issue\": \"Chúng thuật/ngoại đan phương dược trong tạng; “24 phương” và các pháp hợp lục nhất nê v.v. là chi tiết kỹ thuật cần xác nhận số lượng.\" }, { \"title\": \"元始天尊說藥王救八十一難真經\", \"verdict\": \"partial\", \"issue\": \"Kinh Tục Đạo Tạng Dược Vương/81 nạn gắn Biển Thước là mô tả được ghi nhận trong mục lục tục tạng; khung đạo y–hộ mệnh đúng hướng.\" }, { \"title\": \"碧霞元君護國庇民普濟保生妙經\", \"verdict\": \"partial\", \"issue\": \"Kinh Bích Hà Nguyên Quân trong Tục Đạo Tạng là đúng hướng; chức năng hộ quốc tị dân/thưởng thiện phạt ác khớp tín ngưỡng Thái Sơn nữ thần.\" }, { \"title\": \"无上三天玉堂正宗高奔内景玉书\", \"verdict\": \"partial\", \"issue\": \"Lộ Thời Trung (路时中), pháp Ngọc Đường/Thiên Tâm, tồn tư tam quang và cao bôn nội cảnh — đúng hướng nghiên cứu phái; chi tiết kỹ thuật tóm tắt hợp lý.\" }, { \"title\": \"太上说青玄雷令法行因地妙经\", \"verdict\": \"partial\", \"issue\": \"Kinh Chính Nhất về Ôn Nguyên soái / Thanh Huyền địa lôi là hướng đúng; cốt truyện Bính Đinh, mặt xanh tóc đỏ, đời Hán Dực Linh tướng quân là truyền thuyết Ôn soái phổ biến — có thể đúng nhưng dễ gộp tiểu sử thần.\" }, { \"title\": \"太上中道妙法莲华经\", \"verdict\": \"partial\", \"issue\": \"Kinh đầu Vạn Lịch Tục Đạo tạng, 10 quyển, phỏng Pháp Hoa với Nguyên Thủy Thiên Tôn — đúng hướng; chi tiết “thập cực ngũ vô gian” là tóm tắt giáo nghĩa.\" }, { \"title\": \"道德真經全解（時雍）\", \"verdict\": \"partial\", \"issue\": \"Thời Ung (時雍), bản toàn giải đời Kim trong Đạo tạng — attribution và bối cảnh Lão học phương Bắc Kim là hợp lý; không thấy sai cứng.\" }, { \"title\": \"道德真經章句訓頌（張嗣成）\", \"verdict\": \"partial\", \"issue\": \"Trương Tự Thành, Thiên sư đời 39, huấn tụng vần từng chương — đúng hướng; “song tu tính mệnh” là diễn giải học thuật hợp lý.\" }, { \"title\": \"道德真經注疏（原題顧歡）\", \"verdict\": \"partial\", \"issue\": \"Đề Cố Hoan nhưng thực chất tập chú nhiều đời là đồng thuận học giới; liên hệ có thể với hệ 30 nhà/Trương Quân Tương — đúng hướng, chi tiết quan hệ bản còn tranh luận nên partial.\" }, { \"title\": \"太上正一盟威法籙\", \"verdict\": \"partial\", \"issue\": \"Tập hợp pháp lục sơ kỳ Thiên sư/minh uy — đúng; “khoảng 14 bậc” và danh lục cụ thể (đồng tử, xích quan, 24 trị…) là tóm tắt có thể gần đúng nhưng số bậc/tên có thể lệch theo bản.\" }, { \"title\": \"正一法文十籙召儀\", \"verdict\": \"partial\", \"issue\": \"Tàn quyển triệu thỉnh thuộc mười lục sơ kỳ Chính Nhất — đúng thể loại; chi tiết tên lục cụ thể chưa kiểm từng mục.\" }, { \"title\": \"正一法文傳都功版儀\", \"verdict\": \"partial\", \"issue\": \"Nghi truyền đô công bản, chức vị cao trong 24 trị — đúng kiến thức Thiên sư đạo chuẩn; nhấn mạnh không thụ bản thì không đủ quyền truyền trị là tóm tắt hợp lý.\" }, { \"title\": \"醮三洞真文五法正一盟威籙立成儀（張萬福）\", \"verdict\": \"partial\", \"issue\": \"Trương Vạn Phúc, khoa nghi tế tiếu lục Tam động/Chính Nhất — attribution và thể loại đúng; tiết mục thiết đàn/giải uế/phát lô là mô tả nghi thức tổng quát.\" }, { \"title\": \"太上玄天真武無上將軍籙\", \"verdict\": \"partial\", \"issue\": \"Pháp lục Chân Vũ Chính Nhất thời Minh, Long Hổ sơn — đúng hướng; “Minh sơ” là ước lượng niên đại hợp lý chứ không phải xác chứng tuyệt đối.\" }, { \"title\": \"太上正一延生保命籙\", \"verdict\": \"partial\", \"issue\": \"Lục diên sinh bảo mệnh Chính Nhất, liên hệ bản mệnh Bắc Đẩu — đúng thể loại lục hộ mệnh; “Minh sơ” tương tự là ước lượng.\" }, { \"title\": \"正一法文法籙部儀\", \"verdict\": \"partial\", \"issue\": \"Tàn quyển nghi minh thệ pháp lục — đúng hướng; ví dụ “hoàng tố tam minh đăng đàn” là chi tiết cụ thể cần xác nhận đúng bản này.\" }, { \"title\": \"正一法文太上外籙儀\", \"verdict\": \"partial\", \"issue\": \"Nghi truyền ngoại lục sơ cấp cho đạo sĩ/tín chúng (kể cả khung cổ có phụ nữ/hạ nhân/tứ di) — mô tả học thuật quen thuộc; mức bao quát đối tượng có thể phụ thuộc bản và diễn giải.\" }, { \"title\": \"受籙次第法信儀\", \"verdict\": \"partial\", \"issue\": \"Thứ tự thụ lục và pháp tín theo bậc (Chính Nhất → đạo đức → động thần → linh bảo → thượng thanh) là khung phẩm trật Đạo giáo chuẩn; liệt kê cụ thể mang tính tóm tắt hợp lý.\" } ] }",
+  "stopReason": "EndTurn",
+  "sessionId": "019f9402-74da-7a62-b21a-fb0e91b9be20",
+  "requestId": "278dd68a-6efd-43cf-a669-99e138bbcedb",
+  "thought": "The user wants me to verify each essence/description against web sources and return verdicts for partial/inaccurate entries only. Let me first read the full prompt file since it was truncated.",
+  "usage": {
+    "input_tokens": 62608,
+    "cache_read_input_tokens": 128,
+    "output_tokens": 5084,
+    "reasoning_tokens": 41,
+    "total_tokens": 67820
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.1557584,
+  "total_cost_usd_ticks": 1557584000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 62608,
+      "outputTokens": 5084,
+      "cacheReadInputTokens": 128,
+      "modelCalls": 1,
+      "costUSD": 0.1557584
+    }
+  },
+  "structuredOutput": {
+    "results": [
+      {
+        "title": "太上消災祈福醮儀",
+        "verdict": "partial",
+        "issue": "Mô tả tổng quát đúng hướng khoa nghi tiêu tai–cầu phúc, nhưng chưa xác minh được chi tiết “bổ sung cho các nghi giải ách–đoạn ôn trong Động thần bộ” từ nguồn chính; niên đại/tác giả “不詳” hợp lý nhưng vai trò cụ thể trong tạng cần đối chiếu mục lục đầy đủ hơn."
+      },
+      {
+        "title": "太上洞神天公消魔護國經",
+        "verdict": "partial",
+        "issue": "Tồn tại kinh Động thần liên quan Thiên Công/tiêu ma hộ quốc và được dùng trong nghiên cứu trai giáo, nhưng xác nhận “ba quyển”, yếu tố sấm chú cụ thể và mức độ trích dẫn còn mỏng; phần lớn là tóm tắt hợp lý chưa đủ nguồn độc lập."
+      },
+      {
+        "title": "北斗七元金玄羽章",
+        "verdict": "partial",
+        "issue": "Nội dung thất nguyên Bắc Đẩu và “vũ chương” (phù hình) đúng hướng, nhưng việc gán Schipper “định niên đại khoảng đầu Đường” chưa thấy nguồn rõ ràng; nên coi niên đại là không chắc, không khẳng định Schipper."
+      },
+      {
+        "title": "南嶽總勝集",
+        "verdict": "partial",
+        "issue": "Tác giả Trần Điền Phu (陳田夫), Nam Tống, sơn chí Nam Nhạc Hành Sơn là đúng hướng; “địa chí–thắng tích, động thiên, cung quán” hợp lý. Không thấy sai lớn, nhưng một số chi tiết biên soạn/truyền bản chưa được đối chiếu đầy đủ → partial nhẹ."
+      },
+      {
+        "title": "太上洞淵辭瘟神咒妙經",
+        "verdict": "partial",
+        "issue": "Thuộc hệ Động Uyên/ôn dịch và thần chú là hợp lý; cốt truyện “Nguyên Thủy dạy Động Uyên… ôn dịch do bất kính Tam Bảo… thỉnh hành bệnh thần vương” cần xác minh từng chi tiết — có thể đúng khung Động Uyên nhưng chưa xác nhận đủ từ nguồn mở."
+      },
+      {
+        "title": "純陽帝君神化妙通紀",
+        "verdict": "partial",
+        "issue": "Tác giả Miêu Thiện Thời (Toàn Chân), truyện Lã Động Tân, dự định ~120 hóa và còn khoảng 90–100 hóa là khung phổ biến; “nay còn khoảng 95” mang tính ước lượng. Không sai lớn nhưng con số còn lại và phạm vi “điểm hóa nhiều nhân vật Nho–Đạo” nên coi là gần đúng."
+      },
+      {
+        "title": "太上洞玄靈寶護諸童子經",
+        "verdict": "partial",
+        "issue": "Kinh Linh Bảo hộ đồng tử tồn tại; mô tả Bắc Đẩu thất tinh đồng tử/ngũ thần/thập phương thiện đồng tử hộ vệ khi ra vào cửa có vẻ khớp truyền thống, nhưng chi tiết cốt truyện chưa được đối chiếu đầy đủ bản kinh."
+      },
+      {
+        "title": "靈寶天尊說祿庫受生經",
+        "verdict": "partial",
+        "issue": "Khái niệm lộc khố thụ sinh, vay trả tiền địa phủ, đốt thụ sinh tiền theo cung khố là đúng truyền thống; gán “Linh Bảo Thiên Tôn giảng” và chi tiết thập nhị cung khố cần xác nhận đúng bản này (có nhiều kinh thụ sinh tương cận)."
+      },
+      {
+        "title": "太上神咒延壽妙經",
+        "verdict": "partial",
+        "issue": "Kinh ngắn hộ mệnh–diên thọ, giả thác Nguyên Thủy là hợp lý; “hơn 200 chữ”, ngũ hư lục hao, lục trai thập trực, Giáp Tý Canh… là chi tiết cụ thể chưa kiểm đủ — có thể đúng nhưng mức tin cậy trung bình."
+      },
+      {
+        "title": "太上召諸神龍安鎮墳墓經",
+        "verdict": "partial",
+        "issue": "Tồn tại nhóm kinh an trấn phần mộ/long mạch trong tạng; mô tả công năng đúng hướng. Không thấy sai attribution lớn, nhưng chi tiết “Động Huyền” và phạm vi dùng cần xác nhận mục lục."
+      },
+      {
+        "title": "太上七星神咒經",
+        "verdict": "partial",
+        "issue": "Kinh chú thất tinh Bắc Đẩu ngắn trong tạng là hợp lý; “song hành với Hư Hoàng bảo sinh” là nhận định nhóm chức năng, không phải sai fact cứng, nhưng chưa có nguồn độc lập mạnh."
+      },
+      {
+        "title": "太上虛皇保生神咒經",
+        "verdict": "partial",
+        "issue": "Thần chú Hư Hoàng bảo sinh tồn tại trong hệ Động Huyền/tinh tú; mô tả hộ mệnh–bảo thai–trừ tà đúng hướng. Chi tiết tác giả/niên đại không rõ là chấp nhận được."
+      },
+      {
+        "title": "太上北斗二十八章經",
+        "verdict": "partial",
+        "issue": "Khung giả thác Bắc Đẩu nguyên quân truyền Hán Minh Đế, 28 chương là mô tả kinh Bắc Đẩu phổ biến; chi tiết “Chung Nam Sơn” và cấu trúc “7 chương trị thân trị quốc + các chương sau lễ tụng” cần xác minh bản — có thể đúng một phần."
+      },
+      {
+        "title": "太上老君說救生真經",
+        "verdict": "partial",
+        "issue": "Kinh Lão Quân cứu sinh bảo mệnh trong tạng là hợp lý; bối cảnh Tử Vi cung/lưu ly thất bảo điện và lục giáp lục đinh là chi tiết cốt truyện chưa đối chiếu đủ."
+      },
+      {
+        "title": "太上說紫微神兵護國消魔經",
+        "verdict": "partial",
+        "issue": "Cốt truyện Hư Nguy hóa Chân Vũ, Phong Đô, Bắc Cực Huyền Thiên là truyền thuyết Chân Vũ quen thuộc; gán đúng bản kinh này và vai trò Lão Quân tại Tử Vi thượng cung cần xác nhận — khung đúng hướng, chi tiết có thể gộp từ nhiều bản."
+      },
+      {
+        "title": "太上洞神五星諸宿日月混常經",
+        "verdict": "partial",
+        "issue": "Còn gọi Nhật Nguyệt Hỗn Thường Kinh và nội dung tinh tinh hóa thân (thầy bói, đạo sĩ…) là mô tả được ghi nhận trong nghiên cứu Đạo tạng; mức chi tiết “cầu gì được nấy/quan lộc” mang tính tóm tắt — partial nhẹ."
+      },
+      {
+        "title": "無上三元鎮宅靈籙",
+        "verdict": "partial",
+        "issue": "Lục trấn trạch giả thác Kim Minh thất chân trong Động Thần là hướng đúng; chi tiết truyền “Vô thượng tam nguyên an trấn trạch lục” và “tam thiên trấn phòng đại tướng” chưa kiểm đủ từng điểm."
+      },
+      {
+        "title": "易林",
+        "verdict": "partial",
+        "issue": "Tiêu Diên Thọ/Tiêu Cán, 4096 quẻ (64×64), thu vào Đạo tạng/Vạn Lịch tục tạng là đúng khung; “Tùy chí 16 quyển, bản tạng 10 quyển” cần đối chiếu mục lục cụ thể — có thể đúng nhưng dễ nhầm bản."
+      },
+      {
+        "title": "太上玄靈斗姆大聖元君本命延生心經",
+        "verdict": "partial",
+        "issue": "Kinh Đẩu Mẫu bản mệnh diên sinh tồn tại; mô tả mẹ Bắc Đẩu, dược lực, giải ách, bảo thai đúng tín ngưỡng. Văn bản ngắn và công năng là tóm tắt hợp lý; không thấy sai cứng."
+      },
+      {
+        "title": "玉皇宥罪錫福寶懺",
+        "verdict": "partial",
+        "issue": "Bảo sám Ngọc Hoàng xá tội ban phúc thuộc hệ sám; đề “雷霆猛吏都督辛漢臣” là attribution truyền thống cần coi là đề danh, không chắc tác giả lịch sử — verdict partial vì attribution."
+      },
+      {
+        "title": "高上玉皇滿願寶懺",
+        "verdict": "partial",
+        "issue": "Thuộc nhóm sám Ngọc Hoàng trong tạng là hợp lý; mô tả viên mãn nguyện cầu/tẩy tội đúng hướng. Không có claim niên đại/tác giả sai lớn."
+      },
+      {
+        "title": "太上洞玄靈寶十號功德因緣妙經",
+        "verdict": "partial",
+        "issue": "Kinh giải thích thập hiệu Nguyên Thủy Thiên Tôn trong Linh Bảo là mô tả hợp lý; danh sách hiệu (“Vô thượng đạo, Nguyên thủy, Thái cực…”) mang tính minh họa — có thể không đủ/không khớp thứ tự đầy đủ."
+      },
+      {
+        "title": "太上慈悲九幽拔罪懺",
+        "verdict": "partial",
+        "issue": "Sám bạt tội cửu u nhiều quyển trong tạng là đúng hướng; “mười quyển” và khung Nguyên Thủy/thập phương cần xác nhận đúng bản (có nhiều sám từ bi/cửu u tương cận dễ nhầm)."
+      },
+      {
+        "title": "高上神霄宗師受經式",
+        "verdict": "partial",
+        "issue": "Tư liệu truyền kinh phái Thần Tiêu gắn Tống Huy Tông–Lâm Linh Tố là hướng đúng và quan trọng; chi tiết “liệt kê kinh lục bí tàng phủ Thần Tiêu” hợp lý nhưng mức “then chốt danh mục” mang tính đánh giá."
+      },
+      {
+        "title": "玄和子十二月卦金訣",
+        "verdict": "partial",
+        "issue": "Ghép 12 quẻ tiêu tức với 12 tháng cho hỏa hầu kim đan là mô tả chuẩn của loại thư; tác giả “玄和子” và chi tiết nội/ngoại đan đúng hướng. Không thấy sai cứng rõ."
+      },
+      {
+        "title": "石藥爾雅",
+        "verdict": "partial",
+        "issue": "Mai Bưu (梅彪), từ điển dược thạch ẩn danh mô phỏng Nhĩ Nhã là đúng; “hơn 150” vị là ước lượng phổ biến — có thể lệch số đếm tùy bản, nên partial nhẹ."
+      },
+      {
+        "title": "丹方鑑源",
+        "verdict": "partial",
+        "issue": "Độc Cô Đào / Tử Các Sơn Tẩu, cẩm nang phân loại dược liệu ngoại đan–hoàng bạch là đúng hướng; chi tiết nhóm (kim ngân, hoàng, sa, phàn…) khớp thể loại. Không thấy sai attribution lớn."
+      },
+      {
+        "title": "大丹記",
+        "verdict": "partial",
+        "issue": "Đề Ngụy Bá Dương, nghi ngụy thác; bàn chì–thủy ngân/đại đan — khung đúng. “Mục lục Tống đại ghi nhận” hợp lý nhưng cần nguồn cụ thể; không đủ để gọi inaccurate."
+      },
+      {
+        "title": "白雲仙人靈草歌",
+        "verdict": "partial",
+        "issue": "Thơ ca linh thảo phục thực trong tạng, đề Bạch Vân tiên nhân — đúng thể loại; mức “thần hiệu chữa bệnh” là tóm tắt chung."
+      },
+      {
+        "title": "金華赤松山志",
+        "verdict": "partial",
+        "issue": "Nghê Thủ Ước (倪守約), sơn chí Xích Tùng Kim Hoa, truyền thuyết Hoàng Sơ Bình/Hoàng Đại Tiên là đúng hướng và được dùng rộng; chi tiết “chế cáo” v.v. không sai lớn."
+      },
+      {
+        "title": "大滌洞天記",
+        "verdict": "partial",
+        "issue": "Đặng Mục (鄧牧), Đại Địch động thiên (Hàng Châu), 3 quyển — đúng hướng. “Thứ 24 trong 36 động thiên” là claim hệ thống động thiên cần xác nhận số thứ tự chuẩn (có thể đúng theo một bảng phân loại)."
+      },
+      {
+        "title": "天壇王屋山聖跡記",
+        "verdict": "partial",
+        "issue": "Thánh tích Vương Ốc–Thiên Đàn, động thiên số một, có liên quan Đỗ Quang Đình và các bản tập — đúng hướng; “Đỗ Quang Đình đẳng (tập)” có thể đơn giản hóa quá trình biên tập nhiều đời."
+      },
+      {
+        "title": "南嶽小錄",
+        "verdict": "partial",
+        "issue": "Lý Xung Chiêu (李冲昭), sơn lục Nam Nhạc đời Đường còn nguyên vẹn — attribution và giá trị lịch sử được chấp nhận rộng. Không thấy sai cứng."
+      },
+      {
+        "title": "太上玉清謝罪登真寶懺",
+        "verdict": "partial",
+        "issue": "Bảo sám Động Chân, tạ tội đăng chân, lễ Ngọc Thanh thiên tôn — đúng thể loại; “năm mươi vị” và “kim cách” là chi tiết cụ thể chưa đối chiếu đủ."
+      },
+      {
+        "title": "太上泰清拔罪昇天寶懺",
+        "verdict": "partial",
+        "issue": "Bảo sám bạt tội thăng thiên, khung Động Chân/Nguyên Thủy — hợp lý; bối cảnh “Thủy Thanh thiên” và “Bắc Phong ngục” cần xác nhận đúng bản."
+      },
+      {
+        "title": "九天應元雷聲普化天尊玉樞寶懺",
+        "verdict": "partial",
+        "issue": "Sám Lôi Tổ/Ngọc Xu phổ biến là đúng; mô tả quy mệnh tam bảo và Lôi bộ hợp lý. Không có claim niên đại sai."
+      },
+      {
+        "title": "雷霆玉樞宥罪法懺",
+        "verdict": "partial",
+        "issue": "Pháp sám đồng hệ với Ngọc Xu Bảo Sám, văn cú khác — nhận định nhóm hợp lý; “đồng quyển” có thể nhầm cách đóng gói tạng (cùng hệ ≠ cùng quyển)."
+      },
+      {
+        "title": "太乙火府奏告祈禳儀",
+        "verdict": "partial",
+        "issue": "Khoa nghi Thái Ất Hỏa Phủ tấu cáo–kỳ nhương thuộc Lôi pháp là đúng hướng; chi tiết đốt phù, thắp đèn, Bắc Đẩu là mô tả nghi thức tổng quát."
+      },
+      {
+        "title": "太上靈寶上元天官消愆滅罪懺",
+        "verdict": "partial",
+        "issue": "Thuộc bộ sám Tam Quan (thượng/trung/hạ nguyên) là khung chuẩn; mô tả Thượng Nguyên Thiên Quan tiêu khiên diệt tội đúng hướng."
+      },
+      {
+        "title": "青玄救苦寶懺",
+        "verdict": "partial",
+        "issue": "Sám Thái Ất Cứu Khổ / Thanh Huyền cứu khổ trong hệ siêu độ là đúng hướng; “Thanh Hoa Trường Lạc giới / Đông Cực diệu nghiêm cung” khớp thần thoại cứu khổ phổ biến."
+      },
+      {
+        "title": "東嶽大生寶懺",
+        "verdict": "partial",
+        "issue": "Sám Đông Nhạc Đại Sinh / Thái Sơn đế quân gắn âm ty–thọ yểu là đúng tín ngưỡng; mô tả chức năng sám hợp lý."
+      },
+      {
+        "title": "太上慈悲道場消災九幽懺",
+        "verdict": "partial",
+        "issue": "10 quyển/43 phẩm, đề Cát Huyền soạn, tựa Lý Hàm Quang — attribution truyền thống; học giới thường coi đề danh, không phải xác thực Cát Huyền. “Khác với Thái Thượng Từ bi cửu u bạt tội sám” là điểm phân biệt quan trọng, có thể đúng nhưng cần cẩn trọng nhầm bản."
+      },
+      {
+        "title": "雲阜山申仙翁傳",
+        "verdict": "partial",
+        "issue": "Truyện Thân Tiên Ông (Thân Thái Chi) gắn danh sơn/Clouds阜 là hướng tiên truyện; chi tiết “Kim đan hỏa long đại thành pháp” và đời Đường cần xác nhận — có thể trộn tiểu sử–truyền thuyết."
+      },
+      {
+        "title": "江淮異人錄",
+        "verdict": "partial",
+        "issue": "Ngô Thục (吳淑), dị nhân Giang Hoài Đường mạt–Tống sơ là đúng; “khoảng 25” nhân vật là ước lượng phổ biến (số mục có thể lệch nhẹ theo bản)."
+      },
+      {
+        "title": "純陽呂真人藥石製",
+        "verdict": "partial",
+        "issue": "Thác Lã Động Tân, dược thạch/thảo dược ca quyết ngoại đan — đúng thể loại; “hơn 60 long nha thảo dược” là ước lượng số mục, có thể lệch."
+      },
+      {
+        "title": "太極真人雜丹藥方",
+        "verdict": "partial",
+        "issue": "Chúng thuật/ngoại đan phương dược trong tạng; “24 phương” và các pháp hợp lục nhất nê v.v. là chi tiết kỹ thuật cần xác nhận số lượng."
+      },
+      {
+        "title": "元始天尊說藥王救八十一難真經",
+        "verdict": "partial",
+        "issue": "Kinh Tục Đạo Tạng Dược Vương/81 nạn gắn Biển Thước là mô tả được ghi nhận trong mục lục tục tạng; khung đạo y–hộ mệnh đúng hướng."
+      },
+      {
+        "title": "碧霞元君護國庇民普濟保生妙經",
+        "verdict": "partial",
+        "issue": "Kinh Bích Hà Nguyên Quân trong Tục Đạo Tạng là đúng hướng; chức năng hộ quốc tị dân/thưởng thiện phạt ác khớp tín ngưỡng Thái Sơn nữ thần."
+      },
+      {
+        "title": "无上三天玉堂正宗高奔内景玉书",
+        "verdict": "partial",
+        "issue": "Lộ Thời Trung (路时中), pháp Ngọc Đường/Thiên Tâm, tồn tư tam quang và cao bôn nội cảnh — đúng hướng nghiên cứu phái; chi tiết kỹ thuật tóm tắt hợp lý."
+      },
+      {
+        "title": "太上说青玄雷令法行因地妙经",
+        "verdict": "partial",
+        "issue": "Kinh Chính Nhất về Ôn Nguyên soái / Thanh Huyền địa lôi là hướng đúng; cốt truyện Bính Đinh, mặt xanh tóc đỏ, đời Hán Dực Linh tướng quân là truyền thuyết Ôn soái phổ biến — có thể đúng nhưng dễ gộp tiểu sử thần."
+      },
+      {
+        "title": "太上中道妙法莲华经",
+        "verdict": "partial",
+        "issue": "Kinh đầu Vạn Lịch Tục Đạo tạng, 10 quyển, phỏng Pháp Hoa với Nguyên Thủy Thiên Tôn — đúng hướng; chi tiết “thập cực ngũ vô gian” là tóm tắt giáo nghĩa."
+      },
+      {
+        "title": "道德真經全解（時雍）",
+        "verdict": "partial",
+        "issue": "Thời Ung (時雍), bản toàn giải đời Kim trong Đạo tạng — attribution và bối cảnh Lão học phương Bắc Kim là hợp lý; không thấy sai cứng."
+      },
+      {
+        "title": "道德真經章句訓頌（張嗣成）",
+        "verdict": "partial",
+        "issue": "Trương Tự Thành, Thiên sư đời 39, huấn tụng vần từng chương — đúng hướng; “song tu tính mệnh” là diễn giải học thuật hợp lý."
+      },
+      {
+        "title": "道德真經注疏（原題顧歡）",
+        "verdict": "partial",
+        "issue": "Đề Cố Hoan nhưng thực chất tập chú nhiều đời là đồng thuận học giới; liên hệ có thể với hệ 30 nhà/Trương Quân Tương — đúng hướng, chi tiết quan hệ bản còn tranh luận nên partial."
+      },
+      {
+        "title": "太上正一盟威法籙",
+        "verdict": "partial",
+        "issue": "Tập hợp pháp lục sơ kỳ Thiên sư/minh uy — đúng; “khoảng 14 bậc” và danh lục cụ thể (đồng tử, xích quan, 24 trị…) là tóm tắt có thể gần đúng nhưng số bậc/tên có thể lệch theo bản."
+      },
+      {
+        "title": "正一法文十籙召儀",
+        "verdict": "partial",
+        "issue": "Tàn quyển triệu thỉnh thuộc mười lục sơ kỳ Chính Nhất — đúng thể loại; chi tiết tên lục cụ thể chưa kiểm từng mục."
+      },
+      {
+        "title": "正一法文傳都功版儀",
+        "verdict": "partial",
+        "issue": "Nghi truyền đô công bản, chức vị cao trong 24 trị — đúng kiến thức Thiên sư đạo chuẩn; nhấn mạnh không thụ bản thì không đủ quyền truyền trị là tóm tắt hợp lý."
+      },
+      {
+        "title": "醮三洞真文五法正一盟威籙立成儀（張萬福）",
+        "verdict": "partial",
+        "issue": "Trương Vạn Phúc, khoa nghi tế tiếu lục Tam động/Chính Nhất — attribution và thể loại đúng; tiết mục thiết đàn/giải uế/phát lô là mô tả nghi thức tổng quát."
+      },
+      {
+        "title": "太上玄天真武無上將軍籙",
+        "verdict": "partial",
+        "issue": "Pháp lục Chân Vũ Chính Nhất thời Minh, Long Hổ sơn — đúng hướng; “Minh sơ” là ước lượng niên đại hợp lý chứ không phải xác chứng tuyệt đối."
+      },
+      {
+        "title": "太上正一延生保命籙",
+        "verdict": "partial",
+        "issue": "Lục diên sinh bảo mệnh Chính Nhất, liên hệ bản mệnh Bắc Đẩu — đúng thể loại lục hộ mệnh; “Minh sơ” tương tự là ước lượng."
+      },
+      {
+        "title": "正一法文法籙部儀",
+        "verdict": "partial",
+        "issue": "Tàn quyển nghi minh thệ pháp lục — đúng hướng; ví dụ “hoàng tố tam minh đăng đàn” là chi tiết cụ thể cần xác nhận đúng bản này."
+      },
+      {
+        "title": "正一法文太上外籙儀",
+        "verdict": "partial",
+        "issue": "Nghi truyền ngoại lục sơ cấp cho đạo sĩ/tín chúng (kể cả khung cổ có phụ nữ/hạ nhân/tứ di) — mô tả học thuật quen thuộc; mức bao quát đối tượng có thể phụ thuộc bản và diễn giải."
+      },
+      {
+        "title": "受籙次第法信儀",
+        "verdict": "partial",
+        "issue": "Thứ tự thụ lục và pháp tín theo bậc (Chính Nhất → đạo đức → động thần → linh bảo → thượng thanh) là khung phẩm trật Đạo giáo chuẩn; liệt kê cụ thể mang tính tóm tắt hợp lý."
+      }
+    ]
+  }
+}

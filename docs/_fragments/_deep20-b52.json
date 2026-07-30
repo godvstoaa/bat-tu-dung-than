@@ -1,0 +1,37 @@
+{
+  "text": "{\"entries\":[{\"name_han\":\"…\",\"deep_essence\":\"…\",\"key_passages\":\"…\",\"application\":\"…\",\"related\":\"…\"}]}",
+  "stopReason": "EndTurn",
+  "sessionId": "019fb161-c160-7173-a3a1-be20c3fa95d3",
+  "requestId": "bf79229e-ecee-4ced-bed5-267f39688d42",
+  "thought": "The user wants deep research on 20 Chinese religious/literary texts related to Baojuan (precious scrolls), Daoism, folk religion, and related literature. They want actual content found via web search ...",
+  "usage": {
+    "input_tokens": 57047,
+    "cache_read_input_tokens": 1024,
+    "output_tokens": 130,
+    "reasoning_tokens": 90,
+    "total_tokens": 58201
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.1151812,
+  "total_cost_usd_ticks": 1151812000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 57047,
+      "outputTokens": 130,
+      "cacheReadInputTokens": 1024,
+      "modelCalls": 1,
+      "costUSD": 0.1151812
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "name_han": "…",
+        "deep_essence": "…",
+        "key_passages": "…",
+        "application": "…",
+        "related": "…"
+      }
+    ]
+  }
+}

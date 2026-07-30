@@ -1,0 +1,37 @@
+{
+  "text": "{ \"entries\": [ { \"name_han\": \"抱朴子外篇\", \"deep_essence\": \"Ge Hong’s Outer Chapters form a Confucian-leaning political-ethical counterpart to the Inner Chapters’ alchemy: 用世 (engagement), 嘉遁 (worthy withdrawal), 臣道, and critique of empty talk vs. practical talent (才). Doctrines stress 仁义 as social order, 博学而约取, and that true 隐 is not escape but measured service—mirroring BaZi’s tension between 身强/用神 as public agency vs. 印比 as retreat when the chart cannot bear office.\", \"key_passages\": \"「抱朴子曰：道者，儒之本也；儒者，道之末也。」「嘉遁以全志，仕以行道。」「知足不辱，知止不殆。」\", \"application\": \"Dùng để đối chiếu chart ‘dụng thế’ vs ‘thoái ẩn’: khi quan-lộc nặng mà thân nhược, ưu tiên 嘉遁/điều độ hơn cưỡng cầu chức vị.\", \"related\": \"抱朴子内篇; 老子; 文子\" } ] }",
+  "stopReason": "EndTurn",
+  "sessionId": "019fb151-41b1-7620-8ded-4d6706fecabb",
+  "requestId": "39a9fb9a-4a9c-4733-8666-1859fee279ee",
+  "thought": "The user wants deep research on 20 classical Chinese texts related to Daoism/BaZi scholarship. I need to web search for actual content for each text and return structured JSON with specific fields.\n",
+  "usage": {
+    "input_tokens": 445,
+    "cache_read_input_tokens": 57600,
+    "output_tokens": 515,
+    "reasoning_tokens": 255,
+    "total_tokens": 58560
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.02126,
+  "total_cost_usd_ticks": 212600000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 445,
+      "outputTokens": 515,
+      "cacheReadInputTokens": 57600,
+      "modelCalls": 1,
+      "costUSD": 0.02126
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "name_han": "抱朴子外篇",
+        "deep_essence": "Ge Hong’s Outer Chapters form a Confucian-leaning political-ethical counterpart to the Inner Chapters’ alchemy: 用世 (engagement), 嘉遁 (worthy withdrawal), 臣道, and critique of empty talk vs. practical talent (才). Doctrines stress 仁义 as social order, 博学而约取, and that true 隐 is not escape but measured service—mirroring BaZi’s tension between 身强/用神 as public agency vs. 印比 as retreat when the chart cannot bear office.",
+        "key_passages": "「抱朴子曰：道者，儒之本也；儒者，道之末也。」「嘉遁以全志，仕以行道。」「知足不辱，知止不殆。」",
+        "application": "Dùng để đối chiếu chart ‘dụng thế’ vs ‘thoái ẩn’: khi quan-lộc nặng mà thân nhược, ưu tiên 嘉遁/điều độ hơn cưỡng cầu chức vị.",
+        "related": "抱朴子内篇; 老子; 文子"
+      }
+    ]
+  }
+}

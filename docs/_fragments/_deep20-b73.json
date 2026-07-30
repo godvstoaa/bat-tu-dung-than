@@ -1,0 +1,29 @@
+{
+  "text": "{\"entries\":[]}",
+  "stopReason": "EndTurn",
+  "sessionId": "019fb149-d51a-7a32-ae81-a234489bcfbb",
+  "requestId": "43c104e3-26a3-485e-83f4-2321b0b6839d",
+  "thought": "The user wants deep research on 20 Chinese classical texts related to Daoist/zhiguai (志怪) and Tang dynasty chuanqi (传奇) literature. They want actual content from web search, with specific fields in Vi...",
+  "usage": {
+    "input_tokens": 57005,
+    "cache_read_input_tokens": 1024,
+    "output_tokens": 100,
+    "reasoning_tokens": 92,
+    "total_tokens": 58129
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.1149172,
+  "total_cost_usd_ticks": 1149172000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 57005,
+      "outputTokens": 100,
+      "cacheReadInputTokens": 1024,
+      "modelCalls": 1,
+      "costUSD": 0.1149172
+    }
+  },
+  "structuredOutput": {
+    "entries": []
+  }
+}

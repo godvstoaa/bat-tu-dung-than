@@ -1,0 +1,318 @@
+{
+  "text": "{ \"entries\": [] }{\n  \"entries\": [\n    {\n      \"dz\": \"DZ783\",\n      \"name_han\": \"墉城集仙录\",\n      \"name_vi\": \"Dung Thành Tập Tiên Lục\",\n      \"bu\": \"洞玄\",\n      \"author\": \"杜光庭\",\n      \"era\": \"唐末五代（约10世纪）\",\n      \"topic\": \"仙传\",\n      \"essence\": \"Tập truyện nữ tiên do Đỗ Quang Đình biên soạn, lấy Tây Vương Mẫu ở Kim Dung thành làm trung tâm. Ghi khoảng hơn ba mươi nữ tiên đắc đạo từ thượng cổ đến đương thời. Là nguồn chính để nghiên cứu hệ phổ nữ tiên và truyền thuyết Đạo giáo thời Đường.\",\n      \"key_text\": \"女仙以金母为尊，金母以墉城为治，编纪古今女仙得道事实。\",\n      \"use\": \"Tra cứu nữ tiên, Tây Vương Mẫu, truyền thừa nữ tu\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=513731&remap=gb\",\n        \"https://zh.wikisource.org/wiki/%E5%A2%89%E5%9F%8E%E9%9B%86%E4%BB%99%E9%8C%84\",\n        \"https://zh.daoinfo.org/index.php?title=%E5%A2%89%E5%9F%8E%E9%9B%86%E4%BB%99%E9%8C%84&variant=zh-hans\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ300\",\n      \"name_han\": \"华阳陶隐居内传\",\n      \"name_vi\": \"Hoa Dương Đào Ẩn Cư Nội Truyện\",\n      \"bu\": \"洞真\",\n      \"author\": \"贾嵩\",\n      \"era\": \"唐\",\n      \"topic\": \"仙传\",\n      \"essence\": \"Tiểu sử ba quyển về Đào Hoằng Cảnh (Trinh Bạch tiên sinh), do Giả Tung đời Đường soạn. Bổ sung chỗ sơ lược của Lương thư và Bản khởi lục, thuật gia thế, ẩn cư Mao Sơn, trước tác và huyền hóa. Tài liệu then chốt về Thượng Thanh và Mao Sơn.\",\n      \"key_text\": \"先生讳弘景，字通明，丹阳秣陵人也。\",\n      \"use\": \"Nghiên cứu Đào Hoằng Cảnh, Mao Sơn, Thượng Thanh sử\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/index.php?title=%E8%8F%AF%E9%99%BD%E9%99%B6%E9%9A%B1%E5%B1%85%E5%85%A7%E5%82%B3&variant=zh-hans\",\n        \"https://ctext.org/wiki.pl?if=gb&res=580615&remap=gb\",\n        \"https://zh.wikisource.org/zh-hans/%E8%8F%AF%E9%99%BD%E9%99%B6%E9%9A%B1%E5%B1%85%E5%85%A7%E5%82%B3\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ305\",\n      \"name_han\": \"纯阳帝君神化妙通纪\",\n      \"name_vi\": \"Thuần Dương Đế Quân Thần Hóa Diệu Thông Kỷ\",\n      \"bu\": \"洞真\",\n      \"author\": \"苗善时\",\n      \"era\": \"元\",\n      \"topic\": \"仙传\",\n      \"essence\": \"Miêu Thiện Thời đời Nguyên tập hợp sử truyện và thực tích Lã Động Tân, chép khoảng 120 hóa, chia thành nhiều quyển. Mỗi chương kèm thơ từ, mô tả thần thông cảm ứng và giáo hóa. Kinh điển quan trọng của tín ngưỡng Lã Tổ và Toàn Chân.\",\n      \"key_text\": \"仆不揣井观管量于诸经，集唐宋史传，摭收实迹，削去浮华，绩成一百二十化。\",\n      \"use\": \"Lã Tổ thần hóa, Toàn Chân huyền thoại, cảm ứng truyện\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=261129&remap=gb\",\n        \"https://zh.wikisource.org/zh-hans/%E7%B4%94%E9%99%BD%E5%B8%9D%E5%90%9B%E7%A5%9E%E5%8C%96%E5%A6%99%E9%80%9A%E7%B4%80\",\n        \"https://ctext.org/library.pl?if=gb&res=83968&remap=gb\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ174\",\n      \"name_han\": \"金莲正宗仙源像传\",\n      \"name_vi\": \"Kim Liên Chính Tông Tiên Nguyên Tượng Truyện\",\n      \"bu\": \"洞真\",\n      \"author\": \"刘志玄、谢西蟾等\",\n      \"era\": \"元泰定四年（1327）\",\n      \"topic\": \"仙传\",\n      \"essence\": \"Toàn Chân đạo sĩ đời Nguyên biên soạn, có hình tượng ngũ tổ thất chân kèm truyện và chiếu sắc phong. Ghi chép tông phái Kim Liên và ân sủng triều Nguyên đối với Toàn Chân. Kết hợp phổ lục với tượng truyện.\",\n      \"key_text\": \"世远言存，道无今古。像而传之，若闻若睹。\",\n      \"use\": \"Toàn Chân phổ hệ, ngũ tổ thất chân, tượng truyện\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/index.php?title=%E9%87%91%E8%93%AE%E6%AD%A3%E5%AE%97%E4%BB%99%E6%BA%90%E5%83%8F%E5%82%B3&variant=zh-hans\",\n        \"https://zh.wikisource.org/wiki/%E9%87%91%E8%93%AE%E6%AD%A3%E5%AE%97%E4%BB%99%E6%BA%90%E5%83%8F%E5%82%B3\",\n        \"https://ctext.org/wiki.pl?if=gb&res=435514&remap=gb\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ595\",\n      \"name_han\": \"江淮异人录\",\n      \"name_vi\": \"Giang Hoài Dị Nhân Lục\",\n      \"bu\": \"洞玄\",\n      \"author\": \"吴淑\",\n      \"era\": \"北宋初\",\n      \"topic\": \"仙传\",\n      \"essence\": \"Ngô Thục đời Tống chép khoảng 25 dị nhân, đạo lưu, phương sĩ vùng Giang Hoài cuối Đường–Ngũ Đại. Giọng thực hơn chí quái thuần túy; nhiều điều được Nam Đường thư trích. Vừa bút ký vừa dị nhân truyện.\",\n      \"key_text\": \"是编所纪，多道流侠客术士之事，凡唐代二人，南唐二十三人。\",\n      \"use\": \"Dị nhân phương sĩ Giang Nam, bút ký Đạo giáo\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E6%B1%9F%E6%B7%AE%E7%95%B0%E4%BA%BA%E9%8C%84\",\n        \"https://zh.daoinfo.org/index.php?title=%E6%B1%9F%E6%B7%AE%E7%95%B0%E4%BA%BA%E9%8C%84&variant=zh-hans\",\n        \"https://www.shidianguji.com/book/DZ0595\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ972\",\n      \"name_han\": \"宫观碑志\",\n      \"name_vi\": \"Cung Quán Bi Chí\",\n      \"bu\": \"洞神\",\n      \"author\": \"不详（收陶谷、郑子聃等撰文）\",\n      \"era\": \"约元（收宋金元碑）\",\n      \"topic\": \"ritual\",\n      \"essence\": \"Một quyển trong Chính thống Đạo tạng, tập chín bài bi ký cung quán Đạo giáo. Gồm bia trùng tu Vương Mẫu cung, Trùng Dương thành đạo cung, Thái Thanh cung… Tài liệu kim thạch–sử quan trọng về kiến trúc và triều chiếu.\",\n      \"key_text\": \"泾州回山重修王母宫记\",\n      \"use\": \"Đạo giáo bi ký, cung quán sử, kim thạch văn\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/index.php?title=%E5%AE%AE%E8%A7%80%E7%A2%91%E8%AA%8C&variant=zh-hans\",\n        \"https://zh.wikisource.org/zh-hans/%E5%AE%AE%E8%A7%80%E7%A2%91%E8%AA%8C\",\n        \"https://www.shidianguji.com/book/DZ0972\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ969\",\n      \"name_han\": \"天坛王屋山圣迹记\",\n      \"name_vi\": \"Thiên Đàn Vương Ốc Sơn Thánh Tích Ký\",\n      \"bu\": \"洞神\",\n      \"author\": \"杜光庭（叙；元人续收诗文）\",\n      \"era\": \"唐（叙）/元刊合编\",\n      \"topic\": \"仙传\",\n      \"essence\": \"Ghi thánh tích Vương Ốc sơn—Thanh Hư Tiểu Hữu đệ nhất động thiên. Thuật địa thế, động thiên, hiến tế, truyền thuyết Hoàng Đế và tiên chân. Kết hợp sơn chí với bi–thánh tích Đạo giáo.\",\n      \"key_text\": \"有王屋山者，在洛阳京北百馀里，黄河之北，势雄气壮。\",\n      \"use\": \"Động thiên phúc địa, Vương Ốc sơn chí, thánh tích\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E5%A4%A9%E5%A3%87%E7%8E%8B%E5%B1%8B%E5%B1%B1%E8%81%96%E8%B7%A1%E8%A8%98\",\n        \"https://zh.daoinfo.org/index.php?title=%E5%A4%A9%E5%A3%87%E7%8E%8B%E5%B1%8B%E5%B1%B1%E8%81%96%E8%B7%A1%E8%A8%98&variant=zh-hans\",\n        \"https://ctext.org/wiki.pl?if=gb&chapter=165885\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"李虚中命书\",\n      \"name_vi\": \"Lý Hư Trung Mệnh Thư\",\n      \"bu\": \"太玄\",\n      \"author\": \"旧题鬼谷子撰、唐李虚中注（实多出后人手）\",\n      \"era\": \"唐（题）/宋以后传本；四库子部术数\",\n      \"topic\": \"占\",\n      \"essence\": \"Kinh điển mệnh lý sớm, luận ngũ hành nạp âm, quan lộc khí và cách cục. Bốn khố toàn thư thu vào thuật số; ảnh hưởng sâu tới Tử bình hậu thế dù tác quyền còn tranh luận.\",\n      \"key_text\": \"甲子天官藏，是子旺母衰之金，溺于水下而韬光。\",\n      \"use\": \"Mệnh lý cổ, nạp âm, nguồn Tử bình\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E6%9D%8E%E8%99%9B%E4%B8%AD%E5%91%BD%E6%9B%B8_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)/%E5%85%A8%E8%A6%BD\",\n        \"https://ctext.org/searchbooks.pl?if=gb&author=%E9%AC%BC%E8%B0%B7%E5%AD%90\",\n        \"https://zh.wikisource.org/wiki/%E9%AC%BC%E8%B0%B7%E5%AD%90_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)\"\n      ],\n      \"textual_certainty\": \"partial\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"玉照定真经\",\n      \"name_vi\": \"Ngọc Chiếu Định Chân Kinh\",\n      \"bu\": \"太玄\",\n      \"author\": \"旧题晋郭璞撰、张颙注\",\n      \"era\": \"宋以前传本（四库辑永乐大典）\",\n      \"topic\": \"占\",\n      \"essence\": \"Tác phẩm mệnh lý cổ, còn bản đầy đủ trong Vĩnh Lạc đại điển rồi vào Tứ khố. Luận niên nghi, nguyệt nghi và cát hung ứng nghiệm; được coi là di ý của Lạc Lục tử và Lý Hư Trung mệnh thư.\",\n      \"key_text\": \"犹有珞琭子及李虚中命书遗意，所言吉凶应验切近中理。\",\n      \"use\": \"Mệnh lý cổ, niên nguyệt nghi, tham chiếu Tử bình\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=1009629&remap=gb\",\n        \"https://zh.wikisource.org/zh-hans/%E7%8E%89%E7%85%A7%E5%AE%9A%E7%9C%9F%E7%B6%93_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)\",\n        \"https://baike.baidu.com/item/%E7%8E%89%E7%85%A7%E5%AE%9A%E7%9C%9F%E7%BB%8F/1099324\"\n      ],\n      \"textual_certainty\": \"partial\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"撼龙经\",\n      \"name_vi\": \"Hám Long Kinh\",\n      \"bu\": \"太清\",\n      \"author\": \"旧题唐杨筠松\",\n      \"era\": \"唐（题）/宋以后盛传；四库术数\",\n      \"topic\": \"占\",\n      \"essence\": \"Kinh điển loan đầu hình thế, chuyên bàn long mạch núi non theo cửu tinh (Tham Lang đến Hữu Bật). Thường đi kèm Nghi long kinh và Táng pháp đảo trượng. Nền tảng phái Giang Tây–hình thế.\",\n      \"key_text\": \"寻龙千里去无踪，五岭东西却有踪。\",\n      \"use\": \"Phong thủy loan đầu, long mạch cửu tinh, hình thế\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=739860&remap=gb\",\n        \"https://zh.wikisource.org/zh-hans/%E6%92%BC%E9%BE%8D%E7%B6%93_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)\",\n        \"https://zh.wikisource.org/zh-hant/%E6%92%BC%E9%BE%8D%E7%B6%93\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"梅花易数\",\n      \"name_vi\": \"Mai Hoa Dịch Số\",\n      \"bu\": \"太玄\",\n      \"author\": \"旧题宋邵雍\",\n      \"era\": \"北宋（托名）/后世定型通行\",\n      \"topic\": \"占\",\n      \"essence\": \"Pháp bói tượng số lấy tiên thiên bát quái làm số, lấy sự vật–thời gian–ngoại ứng khởi quẻ. Nổi tiếng với các tắc quan mai, nghe gà, thấy sắc… Ảnh hưởng sâu tới dân gian và chữ số.\",\n      \"key_text\": \"以数起卦，故曰先天；以卦起数，故曰后天。\",\n      \"use\": \"Bói tượng số, ngoại ứng, khởi quẻ thời gian\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=724043\",\n        \"https://zh.wikisource.org/zh-hans/%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8\",\n        \"https://ctext.org/wiki.pl?if=gb&res=724043&remap=gb\"\n      ],\n      \"textual_certainty\": \"partial\"\n    },\n    {\n      \"dz\": \"DZ1032\",\n      \"name_han\": \"云笈七签\",\n      \"name_vi\": \"Vân Cập Thất Thiêm\",\n      \"bu\": \"太玄\",\n      \"author\": \"张君房\",\n      \"era\": \"北宋天禧–天圣间（约1019–1029）\",\n      \"topic\": \"类书\",\n      \"essence\": \"Loại thư Đạo giáo lớn khoảng 122 quyển, trích tinh hoa Đại Tống Thiên Cung bảo tạng. Gồm giáo lý, truyền thừa, phục khí, kim đan, phương dược, phù đồ, tiên truyện. Được gọi là “tiểu Đạo tạng”.\",\n      \"key_text\": \"类例既明，指归略备，纲条科格，无不兼该。\",\n      \"use\": \"Bách khoa Đạo giáo tiền Tống, tra cứu giáo sử và phương thuật\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/zh-hans/%E4%BA%91%E7%AC%88%E4%B8%83%E7%AD%BE\",\n        \"https://zh.wikisource.org/zh-hans/%E9%9B%B2%E7%AC%88%E4%B8%83%E7%B1%A4\",\n        \"https://ctext.org/wiki.pl?if=gb&res=820577&remap=gb\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ1017\",\n      \"name_han\": \"道枢\",\n      \"name_vi\": \"Đạo Xu\",\n      \"bu\": \"太玄\",\n      \"author\": \"曾慥\",\n      \"era\": \"南北宋之际\",\n      \"topic\": \"类书\",\n      \"essence\": \"Tằng Tạo biên 42 quyển, 108 thiên, lấy tên từ Trang tử “đạo xu”. Tập yếu nội đan, phục khí, tồn tư, thai tức… Mỗi thiên có tứ ngôn đề yếu. Kho tư liệu then chốt về luyện dưỡng Tống.\",\n      \"key_text\": \"彼是莫得其偶，谓之道枢。\",\n      \"use\": \"Nội đan phương thuật, luyện dưỡng tổng hợp\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=212023\",\n        \"https://zh.wikisource.org/zh-hans/%E9%81%93%E6%A8%9E\",\n        \"https://baike.baidu.com/item/%E9%81%93%E6%9E%A2/9686978\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ1224\",\n      \"name_han\": \"道门定制\",\n      \"name_vi\": \"Đạo Môn Định Chế\",\n      \"bu\": \"正一\",\n      \"author\": \"吕元素（胡湘龙校）\",\n      \"era\": \"南宋淳熙–嘉泰（1188–1201）\",\n      \"topic\": \"ritual\",\n      \"essence\": \"Mười quyển nghi thức trai giao, biểu chương, văn điệp do Lã Nguyên Tố định chế cho vừa mức giản–tường. Gồm an trạch, an phần, cầu vũ, hoàng lục… Chuẩn mực khoa nghi Tống.\",\n      \"key_text\": \"至简易者道，而至详备者礼。\",\n      \"use\": \"Khoa nghi trai giao, mẫu biểu chương, đàn tràng\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/index.php?title=%E9%81%93%E9%96%80%E5%AE%9A%E5%88%B6&variant=zh-hans\",\n        \"https://www.shidianguji.com/book/DZ1224\",\n        \"https://baike.baidu.com/item/%E9%81%93%E9%97%A8%E5%AE%9A%E5%88%B6/3964534\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"鬼谷子\",\n      \"name_vi\": \"Quỷ Cốc Tử\",\n      \"bu\": \"太清\",\n      \"author\": \"旧题鬼谷子（王诩）\",\n      \"era\": \"战国（传本）；四库子部\",\n      \"topic\": \"philosophy\",\n      \"essence\": \"Tử thư duy nhất còn của phái tung hoành: bài hạp, phản ứng, nội kiền, suy ma… Vừa mưu lược ngôn thuyết vừa dưỡng thần (Bản kinh âm phù). Ảnh hưởng sâu tới thuật số và binh–chính.\",\n      \"key_text\": \"粤若稽古圣人之在天地间也，为众生之先，观阴阳之开阖以命物。\",\n      \"use\": \"Tung hoành mưu lược, dưỡng thần, triết lý quyền biến\",\n      \"sources\": [\n        \"https://zh.wikisource.org/wiki/%E9%AC%BC%E8%B0%B7%E5%AD%90_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)\",\n        \"https://baike.baidu.com/item/%E9%AC%BC%E8%B0%B7%E5%AD%90/130566\",\n        \"https://ctext.org/searchbooks.pl?if=gb&author=%E9%AC%BC%E8%B0%B7%E5%AD%90\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"黄石公素书\",\n      \"name_vi\": \"Hoàng Thạch Công Tố Thư\",\n      \"bu\": \"太清\",\n      \"author\": \"旧题黄石公撰、宋张商英序注\",\n      \"era\": \"秦漢传说/宋定本；四库子部兵家\",\n      \"topic\": \"philosophy\",\n      \"essence\": \"Sáu thiên luận đạo đức, nhân nghĩa, quyền biến, an nguy. Tương truyền Hoàng Thạch Công trao Trương Lương; Trương Thương Anh đời Tống định bản chú. Giao thoa đạo–binh–tâm thuật.\",\n      \"key_text\": \"夫道、德、仁、义、礼，五者一体也。\",\n      \"use\": \"Tâm thuật trị thế, đạo đức–quyền biến, tử thư binh–đạo\",\n      \"sources\": [\n        \"https://zh.wikisource.org/wiki/%E9%BB%84%E7%9F%B3%E5%85%AC%E7%B4%A0%E6%9B%B8_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)\",\n        \"https://ctext.org/library.pl?if=gb&res=111109\",\n        \"https://ctext.org/wiki.pl?if=gb&chapter=399958\"\n      ],\n      \"textual_certainty\": \"high\"\n    }\n  ]\n}",
+  "stopReason": "EndTurn",
+  "sessionId": "019f9346-433e-7d52-a708-8000529a2ef4",
+  "requestId": "d2aad196-14c0-4108-9a72-532e3e6f2a67",
+  "thought": "The user wants me to act as a distillation agent and find 16 REAL historical Chinese books related to 玄学/仙传/方术/笔记 that are NOT yet covered in their corpus (~1496 kinh). They want books from remaining ...Let me look at the corpus to see what's already covered, and search for real historical works in the remaining niches.Let me look at the done titles and recent batches to avoid duplicates, then research real works.I need to find titles not yet in the corpus. Let me get more of the done-titles and also search recent batches for what's been covered. Then I'll research real historical works in the niches requested...The clean json might be empty or different structure. Let me check.Let me extract all name_han from clean batches properly with Python to avoid encoding issues, and also search for works not yet covered.Good - I have 1521 titles. Let me search for remaining niches carefully - works that are NOT in the corpus.Great, I have many missing candidates. Let me verify 16 real ones across the niches with web search. I'll pick:\nI have many missing works. Let me verify 16 carefully with web search across the niches:\n",
+  "usage": {
+    "input_tokens": 141908,
+    "cache_read_input_tokens": 1152384,
+    "output_tokens": 14860,
+    "reasoning_tokens": 8697,
+    "total_tokens": 1309152
+  },
+  "num_turns": 9,
+  "total_cost_usd": 1.2382356,
+  "total_cost_usd_ticks": 12382356000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 141908,
+      "outputTokens": 14860,
+      "cacheReadInputTokens": 1152384,
+      "modelCalls": 9,
+      "costUSD": 1.2382356
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "dz": "DZ783",
+        "name_han": "墉城集仙录",
+        "name_vi": "Dung Thành Tập Tiên Lục",
+        "bu": "洞玄",
+        "author": "杜光庭",
+        "era": "唐末五代（约10世纪）",
+        "topic": "仙传",
+        "essence": "Tập truyện nữ tiên do Đỗ Quang Đình biên soạn, lấy Tây Vương Mẫu ở Kim Dung thành làm trung tâm. Ghi khoảng hơn ba mươi nữ tiên đắc đạo từ thượng cổ đến đương thời. Là nguồn chính để nghiên cứu hệ phổ nữ tiên và truyền thuyết Đạo giáo thời Đường.",
+        "key_text": "女仙以金母为尊，金母以墉城为治，编纪古今女仙得道事实。",
+        "use": "Tra cứu nữ tiên, Tây Vương Mẫu, truyền thừa nữ tu",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=513731&remap=gb",
+          "https://zh.wikisource.org/wiki/%E5%A2%89%E5%9F%8E%E9%9B%86%E4%BB%99%E9%8C%84",
+          "https://zh.daoinfo.org/index.php?title=%E5%A2%89%E5%9F%8E%E9%9B%86%E4%BB%99%E9%8C%84&variant=zh-hans"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ300",
+        "name_han": "华阳陶隐居内传",
+        "name_vi": "Hoa Dương Đào Ẩn Cư Nội Truyện",
+        "bu": "洞真",
+        "author": "贾嵩",
+        "era": "唐",
+        "topic": "仙传",
+        "essence": "Tiểu sử ba quyển về Đào Hoằng Cảnh (Trinh Bạch tiên sinh), do Giả Tung đời Đường soạn. Bổ sung chỗ sơ lược của Lương thư và Bản khởi lục, thuật gia thế, ẩn cư Mao Sơn, trước tác và huyền hóa. Tài liệu then chốt về Thượng Thanh và Mao Sơn.",
+        "key_text": "先生讳弘景，字通明，丹阳秣陵人也。",
+        "use": "Nghiên cứu Đào Hoằng Cảnh, Mao Sơn, Thượng Thanh sử",
+        "sources": [
+          "https://zh.daoinfo.org/index.php?title=%E8%8F%AF%E9%99%BD%E9%99%B6%E9%9A%B1%E5%B1%85%E5%85%A7%E5%82%B3&variant=zh-hans",
+          "https://ctext.org/wiki.pl?if=gb&res=580615&remap=gb",
+          "https://zh.wikisource.org/zh-hans/%E8%8F%AF%E9%99%BD%E9%99%B6%E9%9A%B1%E5%B1%85%E5%85%A7%E5%82%B3"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ305",
+        "name_han": "纯阳帝君神化妙通纪",
+        "name_vi": "Thuần Dương Đế Quân Thần Hóa Diệu Thông Kỷ",
+        "bu": "洞真",
+        "author": "苗善时",
+        "era": "元",
+        "topic": "仙传",
+        "essence": "Miêu Thiện Thời đời Nguyên tập hợp sử truyện và thực tích Lã Động Tân, chép khoảng 120 hóa, chia thành nhiều quyển. Mỗi chương kèm thơ từ, mô tả thần thông cảm ứng và giáo hóa. Kinh điển quan trọng của tín ngưỡng Lã Tổ và Toàn Chân.",
+        "key_text": "仆不揣井观管量于诸经，集唐宋史传，摭收实迹，削去浮华，绩成一百二十化。",
+        "use": "Lã Tổ thần hóa, Toàn Chân huyền thoại, cảm ứng truyện",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=261129&remap=gb",
+          "https://zh.wikisource.org/zh-hans/%E7%B4%94%E9%99%BD%E5%B8%9D%E5%90%9B%E7%A5%9E%E5%8C%96%E5%A6%99%E9%80%9A%E7%B4%80",
+          "https://ctext.org/library.pl?if=gb&res=83968&remap=gb"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ174",
+        "name_han": "金莲正宗仙源像传",
+        "name_vi": "Kim Liên Chính Tông Tiên Nguyên Tượng Truyện",
+        "bu": "洞真",
+        "author": "刘志玄、谢西蟾等",
+        "era": "元泰定四年（1327）",
+        "topic": "仙传",
+        "essence": "Toàn Chân đạo sĩ đời Nguyên biên soạn, có hình tượng ngũ tổ thất chân kèm truyện và chiếu sắc phong. Ghi chép tông phái Kim Liên và ân sủng triều Nguyên đối với Toàn Chân. Kết hợp phổ lục với tượng truyện.",
+        "key_text": "世远言存，道无今古。像而传之，若闻若睹。",
+        "use": "Toàn Chân phổ hệ, ngũ tổ thất chân, tượng truyện",
+        "sources": [
+          "https://zh.daoinfo.org/index.php?title=%E9%87%91%E8%93%AE%E6%AD%A3%E5%AE%97%E4%BB%99%E6%BA%90%E5%83%8F%E5%82%B3&variant=zh-hans",
+          "https://zh.wikisource.org/wiki/%E9%87%91%E8%93%AE%E6%AD%A3%E5%AE%97%E4%BB%99%E6%BA%90%E5%83%8F%E5%82%B3",
+          "https://ctext.org/wiki.pl?if=gb&res=435514&remap=gb"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ595",
+        "name_han": "江淮异人录",
+        "name_vi": "Giang Hoài Dị Nhân Lục",
+        "bu": "洞玄",
+        "author": "吴淑",
+        "era": "北宋初",
+        "topic": "仙传",
+        "essence": "Ngô Thục đời Tống chép khoảng 25 dị nhân, đạo lưu, phương sĩ vùng Giang Hoài cuối Đường–Ngũ Đại. Giọng thực hơn chí quái thuần túy; nhiều điều được Nam Đường thư trích. Vừa bút ký vừa dị nhân truyện.",
+        "key_text": "是编所纪，多道流侠客术士之事，凡唐代二人，南唐二十三人。",
+        "use": "Dị nhân phương sĩ Giang Nam, bút ký Đạo giáo",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E6%B1%9F%E6%B7%AE%E7%95%B0%E4%BA%BA%E9%8C%84",
+          "https://zh.daoinfo.org/index.php?title=%E6%B1%9F%E6%B7%AE%E7%95%B0%E4%BA%BA%E9%8C%84&variant=zh-hans",
+          "https://www.shidianguji.com/book/DZ0595"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ972",
+        "name_han": "宫观碑志",
+        "name_vi": "Cung Quán Bi Chí",
+        "bu": "洞神",
+        "author": "不详（收陶谷、郑子聃等撰文）",
+        "era": "约元（收宋金元碑）",
+        "topic": "ritual",
+        "essence": "Một quyển trong Chính thống Đạo tạng, tập chín bài bi ký cung quán Đạo giáo. Gồm bia trùng tu Vương Mẫu cung, Trùng Dương thành đạo cung, Thái Thanh cung… Tài liệu kim thạch–sử quan trọng về kiến trúc và triều chiếu.",
+        "key_text": "泾州回山重修王母宫记",
+        "use": "Đạo giáo bi ký, cung quán sử, kim thạch văn",
+        "sources": [
+          "https://zh.daoinfo.org/index.php?title=%E5%AE%AE%E8%A7%80%E7%A2%91%E8%AA%8C&variant=zh-hans",
+          "https://zh.wikisource.org/zh-hans/%E5%AE%AE%E8%A7%80%E7%A2%91%E8%AA%8C",
+          "https://www.shidianguji.com/book/DZ0972"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ969",
+        "name_han": "天坛王屋山圣迹记",
+        "name_vi": "Thiên Đàn Vương Ốc Sơn Thánh Tích Ký",
+        "bu": "洞神",
+        "author": "杜光庭（叙；元人续收诗文）",
+        "era": "唐（叙）/元刊合编",
+        "topic": "仙传",
+        "essence": "Ghi thánh tích Vương Ốc sơn—Thanh Hư Tiểu Hữu đệ nhất động thiên. Thuật địa thế, động thiên, hiến tế, truyền thuyết Hoàng Đế và tiên chân. Kết hợp sơn chí với bi–thánh tích Đạo giáo.",
+        "key_text": "有王屋山者，在洛阳京北百馀里，黄河之北，势雄气壮。",
+        "use": "Động thiên phúc địa, Vương Ốc sơn chí, thánh tích",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E5%A4%A9%E5%A3%87%E7%8E%8B%E5%B1%8B%E5%B1%B1%E8%81%96%E8%B7%A1%E8%A8%98",
+          "https://zh.daoinfo.org/index.php?title=%E5%A4%A9%E5%A3%87%E7%8E%8B%E5%B1%8B%E5%B1%B1%E8%81%96%E8%B7%A1%E8%A8%98&variant=zh-hans",
+          "https://ctext.org/wiki.pl?if=gb&chapter=165885"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "李虚中命书",
+        "name_vi": "Lý Hư Trung Mệnh Thư",
+        "bu": "太玄",
+        "author": "旧题鬼谷子撰、唐李虚中注（实多出后人手）",
+        "era": "唐（题）/宋以后传本；四库子部术数",
+        "topic": "占",
+        "essence": "Kinh điển mệnh lý sớm, luận ngũ hành nạp âm, quan lộc khí và cách cục. Bốn khố toàn thư thu vào thuật số; ảnh hưởng sâu tới Tử bình hậu thế dù tác quyền còn tranh luận.",
+        "key_text": "甲子天官藏，是子旺母衰之金，溺于水下而韬光。",
+        "use": "Mệnh lý cổ, nạp âm, nguồn Tử bình",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E6%9D%8E%E8%99%9B%E4%B8%AD%E5%91%BD%E6%9B%B8_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)/%E5%85%A8%E8%A6%BD",
+          "https://ctext.org/searchbooks.pl?if=gb&author=%E9%AC%BC%E8%B0%B7%E5%AD%90",
+          "https://zh.wikisource.org/wiki/%E9%AC%BC%E8%B0%B7%E5%AD%90_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)"
+        ],
+        "textual_certainty": "partial"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "玉照定真经",
+        "name_vi": "Ngọc Chiếu Định Chân Kinh",
+        "bu": "太玄",
+        "author": "旧题晋郭璞撰、张颙注",
+        "era": "宋以前传本（四库辑永乐大典）",
+        "topic": "占",
+        "essence": "Tác phẩm mệnh lý cổ, còn bản đầy đủ trong Vĩnh Lạc đại điển rồi vào Tứ khố. Luận niên nghi, nguyệt nghi và cát hung ứng nghiệm; được coi là di ý của Lạc Lục tử và Lý Hư Trung mệnh thư.",
+        "key_text": "犹有珞琭子及李虚中命书遗意，所言吉凶应验切近中理。",
+        "use": "Mệnh lý cổ, niên nguyệt nghi, tham chiếu Tử bình",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=1009629&remap=gb",
+          "https://zh.wikisource.org/zh-hans/%E7%8E%89%E7%85%A7%E5%AE%9A%E7%9C%9F%E7%B6%93_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)",
+          "https://baike.baidu.com/item/%E7%8E%89%E7%85%A7%E5%AE%9A%E7%9C%9F%E7%BB%8F/1099324"
+        ],
+        "textual_certainty": "partial"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "撼龙经",
+        "name_vi": "Hám Long Kinh",
+        "bu": "太清",
+        "author": "旧题唐杨筠松",
+        "era": "唐（题）/宋以后盛传；四库术数",
+        "topic": "占",
+        "essence": "Kinh điển loan đầu hình thế, chuyên bàn long mạch núi non theo cửu tinh (Tham Lang đến Hữu Bật). Thường đi kèm Nghi long kinh và Táng pháp đảo trượng. Nền tảng phái Giang Tây–hình thế.",
+        "key_text": "寻龙千里去无踪，五岭东西却有踪。",
+        "use": "Phong thủy loan đầu, long mạch cửu tinh, hình thế",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=739860&remap=gb",
+          "https://zh.wikisource.org/zh-hans/%E6%92%BC%E9%BE%8D%E7%B6%93_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)",
+          "https://zh.wikisource.org/zh-hant/%E6%92%BC%E9%BE%8D%E7%B6%93"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "梅花易数",
+        "name_vi": "Mai Hoa Dịch Số",
+        "bu": "太玄",
+        "author": "旧题宋邵雍",
+        "era": "北宋（托名）/后世定型通行",
+        "topic": "占",
+        "essence": "Pháp bói tượng số lấy tiên thiên bát quái làm số, lấy sự vật–thời gian–ngoại ứng khởi quẻ. Nổi tiếng với các tắc quan mai, nghe gà, thấy sắc… Ảnh hưởng sâu tới dân gian và chữ số.",
+        "key_text": "以数起卦，故曰先天；以卦起数，故曰后天。",
+        "use": "Bói tượng số, ngoại ứng, khởi quẻ thời gian",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=724043",
+          "https://zh.wikisource.org/zh-hans/%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8",
+          "https://ctext.org/wiki.pl?if=gb&res=724043&remap=gb"
+        ],
+        "textual_certainty": "partial"
+      },
+      {
+        "dz": "DZ1032",
+        "name_han": "云笈七签",
+        "name_vi": "Vân Cập Thất Thiêm",
+        "bu": "太玄",
+        "author": "张君房",
+        "era": "北宋天禧–天圣间（约1019–1029）",
+        "topic": "类书",
+        "essence": "Loại thư Đạo giáo lớn khoảng 122 quyển, trích tinh hoa Đại Tống Thiên Cung bảo tạng. Gồm giáo lý, truyền thừa, phục khí, kim đan, phương dược, phù đồ, tiên truyện. Được gọi là “tiểu Đạo tạng”.",
+        "key_text": "类例既明，指归略备，纲条科格，无不兼该。",
+        "use": "Bách khoa Đạo giáo tiền Tống, tra cứu giáo sử và phương thuật",
+        "sources": [
+          "https://zh.wikipedia.org/zh-hans/%E4%BA%91%E7%AC%88%E4%B8%83%E7%AD%BE",
+          "https://zh.wikisource.org/zh-hans/%E9%9B%B2%E7%AC%88%E4%B8%83%E7%B1%A4",
+          "https://ctext.org/wiki.pl?if=gb&res=820577&remap=gb"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ1017",
+        "name_han": "道枢",
+        "name_vi": "Đạo Xu",
+        "bu": "太玄",
+        "author": "曾慥",
+        "era": "南北宋之际",
+        "topic": "类书",
+        "essence": "Tằng Tạo biên 42 quyển, 108 thiên, lấy tên từ Trang tử “đạo xu”. Tập yếu nội đan, phục khí, tồn tư, thai tức… Mỗi thiên có tứ ngôn đề yếu. Kho tư liệu then chốt về luyện dưỡng Tống.",
+        "key_text": "彼是莫得其偶，谓之道枢。",
+        "use": "Nội đan phương thuật, luyện dưỡng tổng hợp",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=212023",
+          "https://zh.wikisource.org/zh-hans/%E9%81%93%E6%A8%9E",
+          "https://baike.baidu.com/item/%E9%81%93%E6%9E%A2/9686978"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ1224",
+        "name_han": "道门定制",
+        "name_vi": "Đạo Môn Định Chế",
+        "bu": "正一",
+        "author": "吕元素（胡湘龙校）",
+        "era": "南宋淳熙–嘉泰（1188–1201）",
+        "topic": "ritual",
+        "essence": "Mười quyển nghi thức trai giao, biểu chương, văn điệp do Lã Nguyên Tố định chế cho vừa mức giản–tường. Gồm an trạch, an phần, cầu vũ, hoàng lục… Chuẩn mực khoa nghi Tống.",
+        "key_text": "至简易者道，而至详备者礼。",
+        "use": "Khoa nghi trai giao, mẫu biểu chương, đàn tràng",
+        "sources": [
+          "https://zh.daoinfo.org/index.php?title=%E9%81%93%E9%96%80%E5%AE%9A%E5%88%B6&variant=zh-hans",
+          "https://www.shidianguji.com/book/DZ1224",
+          "https://baike.baidu.com/item/%E9%81%93%E9%97%A8%E5%AE%9A%E5%88%B6/3964534"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "鬼谷子",
+        "name_vi": "Quỷ Cốc Tử",
+        "bu": "太清",
+        "author": "旧题鬼谷子（王诩）",
+        "era": "战国（传本）；四库子部",
+        "topic": "philosophy",
+        "essence": "Tử thư duy nhất còn của phái tung hoành: bài hạp, phản ứng, nội kiền, suy ma… Vừa mưu lược ngôn thuyết vừa dưỡng thần (Bản kinh âm phù). Ảnh hưởng sâu tới thuật số và binh–chính.",
+        "key_text": "粤若稽古圣人之在天地间也，为众生之先，观阴阳之开阖以命物。",
+        "use": "Tung hoành mưu lược, dưỡng thần, triết lý quyền biến",
+        "sources": [
+          "https://zh.wikisource.org/wiki/%E9%AC%BC%E8%B0%B7%E5%AD%90_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)",
+          "https://baike.baidu.com/item/%E9%AC%BC%E8%B0%B7%E5%AD%90/130566",
+          "https://ctext.org/searchbooks.pl?if=gb&author=%E9%AC%BC%E8%B0%B7%E5%AD%90"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "黄石公素书",
+        "name_vi": "Hoàng Thạch Công Tố Thư",
+        "bu": "太清",
+        "author": "旧题黄石公撰、宋张商英序注",
+        "era": "秦漢传说/宋定本；四库子部兵家",
+        "topic": "philosophy",
+        "essence": "Sáu thiên luận đạo đức, nhân nghĩa, quyền biến, an nguy. Tương truyền Hoàng Thạch Công trao Trương Lương; Trương Thương Anh đời Tống định bản chú. Giao thoa đạo–binh–tâm thuật.",
+        "key_text": "夫道、德、仁、义、礼，五者一体也。",
+        "use": "Tâm thuật trị thế, đạo đức–quyền biến, tử thư binh–đạo",
+        "sources": [
+          "https://zh.wikisource.org/wiki/%E9%BB%84%E7%9F%B3%E5%85%AC%E7%B4%A0%E6%9B%B8_(%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC)",
+          "https://ctext.org/library.pl?if=gb&res=111109",
+          "https://ctext.org/wiki.pl?if=gb&chapter=399958"
+        ],
+        "textual_certainty": "high"
+      }
+    ]
+  }
+}

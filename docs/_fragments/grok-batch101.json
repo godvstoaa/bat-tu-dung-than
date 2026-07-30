@@ -1,0 +1,318 @@
+{
+  "text": "{ \"entries\":[] }{\n  \"entries\": [\n    {\n      \"dz\": \"类书\",\n      \"name_han\": \"太平御览·道部\",\n      \"name_vi\": \"Thái Bình Ngự Lãm · Đạo Bộ\",\n      \"bu\": \"类书\",\n      \"author\": \"李昉等奉敕纂\",\n      \"era\": \"北宋·太平兴国（约983–984）\",\n      \"topic\": \"类书\",\n      \"essence\": \"Bộ loại thư quan tu Bắc Tống, phần Đạo bộ (khoảng quyển 659–679) tập hợp trích dẫn tiền Tống về đạo sĩ, chân nhân, tiên thuật và danh sơn. Cùng Thần quỷ bộ, là kho tư liệu then chốt để khảo cứu thần tiên và dị sự trước đời Tống. Nhiều dị văn sách mất chỉ còn nhờ sách này.\",\n      \"key_text\": \"道者，導也，所以導人至於無為者也。\",\n      \"use\": \"Tra cứu dị văn tiên đạo tiền Tống; đối chiếu thuật ngữ đạo giáo với trích dẫn chính sử/tạp thư\",\n      \"sources\": [\n        \"https://ctext.org/taiping-yulan/zh\",\n        \"https://zh.wikipedia.org/zh-hans/%E5%A4%AA%E5%B9%B3%E5%BE%A1%E8%A7%88\",\n        \"https://zh.wikisource.org/wiki/%E5%A4%AA%E5%B9%B3%E5%BE%A1%E8%A6%BD\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"类书\",\n      \"name_han\": \"册府元龟·帝王部·符瑞\",\n      \"name_vi\": \"Sách Phủ Nguyên Quy · Đế Vương Bộ · Phù Thụy\",\n      \"bu\": \"类书\",\n      \"author\": \"王钦若、杨亿等奉敕纂\",\n      \"era\": \"北宋·大中祥符（成书1013）\",\n      \"topic\": \"类书\",\n      \"essence\": \"Loại thư sử chính Bắc Tống nghìn quyển; môn Phù thụy thuộc Đế vương bộ (khoảng quyển 22–25) biên niên các điềm lành, long phụng, kỳ mộc theo triều đại. Nguồn sử liệu phong phú về chính trị–tín ngưỡng phù thụy đời Đường–Ngũ đại, không lấy bút ký tạp sử.\",\n      \"key_text\": \"符瑞者，所以應命而彰德也。\",\n      \"use\": \"Đối chiếu điềm lành chính sử với nghi lễ tế tự và tuyên ngôn chính thống vương triều\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/zh-hans/%E5%86%8A%E5%BA%9C%E5%85%83%E9%BE%9C\",\n        \"https://zh.wikisource.org/wiki/%E5%86%8A%E5%BA%9C%E5%85%83%E9%BE%9C\",\n        \"https://baike.baidu.com/item/%E5%86%8C%E5%BA%9C%E5%85%83%E9%BE%9F/1121947\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"类书\",\n      \"name_han\": \"玉海·郊祀\",\n      \"name_vi\": \"Ngọc Hải · Giao Tự\",\n      \"bu\": \"类书\",\n      \"author\": \"王应麟\",\n      \"era\": \"南宋\",\n      \"topic\": \"类书\",\n      \"essence\": \"Loại thư Nam Tống nhằm ứng thí Bác học hoành từ; môn Giao tự (khoảng quyển 92–94) hệ thống điển cố tế giao, bắc giao, phong thiện và sơn xuyên. Kết hợp trích sử, chế chiếu với bình chú, rất hữu dụng cho nghi lễ quốc gia và tín ngưỡng sơn nhạc.\",\n      \"key_text\": \"天子祭天地，及山川，歲徧焉。\",\n      \"use\": \"Nghiên cứu nghi lễ giao tự, phong thiện, quan hệ vương quyền–thần quyền\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E7%8E%89%E6%B5%B7\",\n        \"https://ctext.org/wiki.pl?if=gb&res=986699\",\n        \"https://baike.baidu.com/item/%E7%8E%89%E6%B5%B7/11044255\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"类书\",\n      \"name_han\": \"天中记\",\n      \"name_vi\": \"Thiên Trung Ký\",\n      \"bu\": \"类书\",\n      \"author\": \"陈耀文\",\n      \"era\": \"明\",\n      \"topic\": \"类书\",\n      \"essence\": \"Loại thư tổng hợp Minh triều 60 quyển, đặt tên theo núi Thiên Trung gần nơi ở tác giả. Thu thập quảng bác từ cửu lưu, sấm vĩ, sách hiếm; có mục thần tiên–thích đạo, bổ sung nhiều dị văn không thấy ở loại thư Tống. Giá trị khảo dị văn và tra cứu huyền học cao.\",\n      \"key_text\": \"其居近天中山，故以名書。\",\n      \"use\": \"Bổ sung trích dẫn thần tiên/đạo thích ngoài Thái Bình Ngự Lãm; tra cứu sấm vĩ và dị sự\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=798023\",\n        \"https://baike.baidu.com/item/%E5%A4%A9%E4%B8%AD%E8%AE%B0/9635898\",\n        \"https://archive.org/details/06057732.cn\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"类书\",\n      \"name_han\": \"艺文类聚·灵异部\",\n      \"name_vi\": \"Nghệ Văn Loại Tụ · Linh Dị Bộ\",\n      \"bu\": \"类书\",\n      \"author\": \"欧阳询等奉敕纂\",\n      \"era\": \"唐·武德（成书约624）\",\n      \"topic\": \"类书\",\n      \"essence\": \"Loại thư quan tu đầu Đường 100 quyển; Linh dị bộ (quyển 78–79) gồm tiên đạo, thần, quỷ, mộng, hồn phách. Thể lệ “sự cư tiền, văn liệt hậu” bảo tồn nhiều đoạn văn, phú về linh dị và tiên đạo trước Đường.\",\n      \"key_text\": \"靈異部上·仙道\",\n      \"use\": \"Đối chiếu trích dẫn tiên đạo–linh dị tiền Đường; nguồn văn tuyển cho điển cố thần quái\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/zh-hans/%E8%89%BA%E6%96%87%E7%B1%BB%E8%81%9A\",\n        \"https://zh.wikisource.org/zh-hans/%E8%97%9D%E6%96%87%E9%A1%9E%E8%81%9A\",\n        \"https://ctext.org/wiki.pl?if=gb&res=952925\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"剪灯新话\",\n      \"name_vi\": \"Tiễn Đăng Tân Thoại\",\n      \"bu\": \"藏外\",\n      \"author\": \"瞿佑\",\n      \"era\": \"明初·洪武–永乐\",\n      \"topic\": \"笔记\",\n      \"essence\": \"Tập truyện truyền kỳ văn ngôn Minh sơ, 4 quyển + phụ lục khoảng 21 thiên (Kim Phụng Thoa Ký, Mẫu Đơn Đăng Ký…). Kế thừa chí quái Lục triều và Đường truyền kỳ, mở đường cho tiểu thuyết văn ngôn Minh–Thanh và ảnh hưởng sang Triều Tiên, Nhật Bản. Từng bị cấm vì “mê hoặc nhân tâm”.\",\n      \"key_text\": \"余友瞿宗吉之為《剪燈新話》，其所志怪有過於馬孺子所言。\",\n      \"use\": \"Đọc truyền kỳ tình–quỷ Minh sơ; nguồn chuyển thể kịch và “nhị phách”\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E5%89%AA%E7%87%88%E6%96%B0%E8%A9%B1\",\n        \"https://zh.wikisource.org/zh-hans/%E5%89%AA%E7%87%88%E6%96%B0%E8%A9%B1\",\n        \"https://baike.baidu.com/item/%E5%89%AA%E7%81%AF%E6%96%B0%E8%AF%9D/7648229\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"耳食录\",\n      \"name_vi\": \"Nhĩ Thực Lục\",\n      \"bu\": \"藏外\",\n      \"author\": \"乐钧\",\n      \"era\": \"清·乾隆（sơ biên 1794）\",\n      \"topic\": \"笔记\",\n      \"essence\": \"Tập truyền kỳ văn ngôn Thanh, sơ biên 12 quyển + nhị biên 8 quyển, gần 200 thiên. Phong cách gần Liêu Trai nhưng thiên về thế tình, hồ quỷ và đạo đức khuyến trừng; là một trong các “phỏng Liêu” quan trọng sau Càn Long.\",\n      \"key_text\": \"惡乎有惡乎不有，惡乎知惡乎不知，僕鄙人也，羈栖之暇，輒敢操觚追記所聞，亦妄言妄聽耳。\",\n      \"use\": \"So sánh truyền kỳ Càn Long với Liêu Trai/Duyệt Vi; nghiên cứu hồ quỷ–nhân tình\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E8%80%B3%E9%A3%9F%E5%BD%95/4341437\",\n        \"https://ctext.org/wiki.pl?if=gb&res=217539\",\n        \"http://www.guoxue123.com/xiaosuo/0001/esl/index.htm\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"谐铎\",\n      \"name_vi\": \"Hài Đạc\",\n      \"bu\": \"藏外\",\n      \"author\": \"沈起凤\",\n      \"era\": \"清·乾隆五十六年（1791）\",\n      \"topic\": \"笔记\",\n      \"essence\": \"Tập chí quái–thế tình 12 quyển 122 thiên; mỗi thiên kết hợp “hài” (kể chuyện châm biếm) và “đạc” (lời bình khuyến giới). Dùng hồ, hổ, gà… làm ngụ ngôn nhân tính, đả kích khoa cử và quan trường, khác hẳn giọng trầm mặc của Duyệt Vi.\",\n      \"key_text\": \"諧以言之，鐸以警之。\",\n      \"use\": \"Đọc ngụ ngôn chí quái Càn Long; phân tích châm biếm xã hội qua quỷ hồ\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E8%B0%90%E9%93%8E/224513\",\n        \"https://www.iwenyan.com/zi/xieduo\",\n        \"https://weread.qq.com/web/bookDetail/26f325e0813ab8869g01665b\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"夜雨秋灯录\",\n      \"name_vi\": \"Dạ Vũ Thu Đăng Lục\",\n      \"bu\": \"藏外\",\n      \"author\": \"宣鼎\",\n      \"era\": \"清·光绪三年（1877，Báo quán Thân Báo）\",\n      \"topic\": \"笔记\",\n      \"essence\": \"Tập chí quái–truyền kỳ cuối Thanh, 8 quyển 115 thiên (còn tục lục). Tác giả viết trong cảnh “vô khả nại hà”, truyện giàu cảm xúc, kỳ nữ, hiệp nghĩa và dị thuật; được xem là đỉnh cao văn ngôn chí quái sau Liêu Trai thời Đồng–Quang.\",\n      \"key_text\": \"以無可奈何之身，當無可奈何之境，未能已已奮筆直書耳。\",\n      \"use\": \"Đọc truyền kỳ cuối Thanh; so sánh giọng cảm thương với phỏng Liêu thời Càn–Gia\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E5%A4%9C%E9%9B%A8%E7%A7%8B%E7%81%AF%E5%BD%95/141384\",\n        \"https://zh.wikisource.org/zh-hans/%E5%A4%9C%E9%9B%A8%E7%A7%8B%E7%87%88%E9%8C%84\",\n        \"https://ctext.org/wiki.pl?if=gb&res=219175\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"右台仙馆笔记\",\n      \"name_vi\": \"Hữu Đài Tiên Quán Bút Ký\",\n      \"bu\": \"藏外\",\n      \"author\": \"俞樾\",\n      \"era\": \"清·晚清（sau 1879）\",\n      \"topic\": \"笔记\",\n      \"essence\": \"Tập bút ký văn ngôn 16 quyển khoảng 667 tắc, viết cuối đời khi táng phu nhân ở Hữu Đài Sơn (Hàng Châu). Thể lệ gần Duyệt Vi Thảo Đường Bút Ký: quỷ thần, nhân quả, dị văn xã hội Thanh mạt, giọng học giả mà bình đạm.\",\n      \"key_text\": \"其年冬，葬夫人於錢唐之右台山，余亦自營生壙於其左。\",\n      \"use\": \"Đọc bút ký quỷ thần học giả cuối Thanh; đối chiếu với Duyệt Vi và Di Kiên\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E5%8F%B3%E8%87%BA%E4%BB%99%E9%A4%A8%E7%AD%86%E8%A8%98\",\n        \"https://ctext.org/wiki.pl?if=gb&res=420788\",\n        \"https://baike.baidu.com/item/%E5%8F%B3%E5%8F%B0%E4%BB%99%E9%A6%86%E7%AC%94%E8%AE%B0/5647238\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"萤窗异草\",\n      \"name_vi\": \"Huỳnh Song Dị Thảo\",\n      \"bu\": \"藏外\",\n      \"author\": \"长白浩歌子（庆兰）\",\n      \"era\": \"清·乾隆（khoảng 1768–1788）\",\n      \"topic\": \"笔记\",\n      \"essence\": \"Tập truyền kỳ văn ngôn 12 quyển (sơ–nhị–tam biên), khoảng 138 thiên, còn gọi Liêu Trai Thặng Cảo. Tác giả Mãn Châu, con Doãn Kế Thiện; truyện hồ tiên–kỳ ngộ, văn phong điển nhã, là phỏng Liêu quan trọng cùng thời với Nhĩ Thực Lục.\",\n      \"key_text\": \"全書大段似仿聊齋，而典而不俗，繁而多致。\",\n      \"use\": \"So sánh phỏng Liêu Mãn–Hán thời Càn Long; đọc hồ tiên và tình duyên kỳ ngộ\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E8%90%A4%E7%AA%97%E5%BC%82%E8%8D%89/2385900\",\n        \"https://ctext.org/wiki.pl?if=gb&res=838337\",\n        \"https://zh.wikisource.org/wiki/%E8%9E%A2%E7%AA%97%E7%95%B0%E8%8D%89\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"金石\",\n      \"name_han\": \"老子铭\",\n      \"name_vi\": \"Lão Tử Minh\",\n      \"bu\": \"金石\",\n      \"author\": \"边韶撰（传蔡邕书）\",\n      \"era\": \"东汉·延熹八年（165）\",\n      \"topic\": \"金石\",\n      \"essence\": \"Bia minh do Hán Hoàn Đế sai Trần tướng Biên Thiều soạn khi mộng Lão Tử và cho tế tự ở miếu Lão Tử (Lại hương, nay Lộc Ấp). Ghi tiểu sử Lão Tử, học thuyết hư tĩnh và xu hướng thần thánh hóa Lão quân đời Hán; là bia đạo quan trọng sớm nhất còn văn bản đầy đủ qua Lệ Thích.\",\n      \"key_text\": \"延熹八年八月甲子，皇上尚德弘道，含閎光大，存神養性，意在凌雲……夢見老子，尊而祀之。\",\n      \"use\": \"Khảo sự thần thánh hóa Lão Tử đời Hán; văn bản gốc cho lịch sử đạo giáo sớm\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E8%80%81%E5%AD%90%E9%8A%98\",\n        \"https://baike.baidu.com/item/%E8%80%81%E5%AD%90%E9%93%AD/3781667\",\n        \"https://zh.wikipedia.org/zh-hans/%E8%BE%B9%E9%9F%B6\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"金石\",\n      \"name_han\": \"西岳华山庙碑\",\n      \"name_vi\": \"Tây Nhạc Hoa Sơn Miếu Bi\",\n      \"bu\": \"金石\",\n      \"author\": \"弘农太守袁逢修庙；郭香察书\",\n      \"era\": \"东汉·延熹八年（165）\",\n      \"topic\": \"金石\",\n      \"essence\": \"Bia lệ thư nổi tiếng, lập ở Tây Nhạc miếu Hoa Âm; ghi điển tế sơn nhạc từ Chu–Hán, cung Tập Linh, điện Tồn Tiên đời Vũ Đế và việc trùng tu miếu. Nguyên bia hủy vì động đất Gia Tĩnh; còn các bản thác Tống (Trường Viên, Hoa Âm, Tứ Minh). Vừa là mẫu lệ thư vừa là tư liệu tế nhac–tiên đạo nhà Hán.\",\n      \"key_text\": \"孝武皇帝修封禪之禮，思登假之道，巡省五嶽……宮曰集靈宮，殿曰存僊殿，門曰望僊門。\",\n      \"use\": \"Nghiên cứu tế nhac và “tập linh/tồn tiên” Hán; đối chiếu thư pháp lệ bi\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E8%8F%AF%E5%B1%B1%E5%BB%9F%E7%A2%91\",\n        \"https://www.dpm.org.cn/collection/impres/232076.html\",\n        \"https://baike.baidu.com/item/%E5%AE%8B%E6%8B%93%E8%A5%BF%E5%B2%B3%E5%8D%8E%E5%B1%B1%E5%BA%99%E7%A2%91%E5%86%8C/19622482\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"金石\",\n      \"name_han\": \"泰山刻石\",\n      \"name_vi\": \"Thái Sơn Khắc Thạch\",\n      \"bu\": \"金石\",\n      \"author\": \"传李斯撰并书\",\n      \"era\": \"秦·始皇二十八年（前219）及二世元年（前209）\",\n      \"topic\": \"金石\",\n      \"essence\": \"Khắc thạch phong thiện Thái Sơn đời Tần, tiểu triện điển phạm, một trong “Tần tứ sơn khắc thạch”. Gồm chiếu thư Thủy Hoàng ca tụng thống nhất và chiếu nhị thế; di thạch hiện ở Đại miếu Thái An. Là chứng tích sớm nhất về nghi lễ sơn nhac–đế vương trên Thái Sơn.\",\n      \"key_text\": \"皇帝曰：金石刻盡始皇帝所為也，今襲號而金石刻辭不稱始皇帝。\",\n      \"use\": \"Khảo phong thiện và chữ tiểu triện Tần; nguồn gốc “Thái Sơn” trong nghi lễ đế vương\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E7%A7%A6%E6%B3%B0%E5%B1%B1%E5%88%BB%E7%9F%B3\",\n        \"https://baike.baidu.com/item/%E6%B3%B0%E5%B1%B1%E5%88%BB%E7%9F%B3/2820330\",\n        \"https://www.dpm.org.cn/collection/impres/234107.html\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"金石\",\n      \"name_han\": \"姚伯多造像记\",\n      \"name_vi\": \"Diêu Bá Đa Tạo Tượng Ký\",\n      \"bu\": \"金石\",\n      \"author\": \"姚伯多等（家族造像记）\",\n      \"era\": \"北魏·太和二十年（496）\",\n      \"topic\": \"金石\",\n      \"essence\": \"Bia tạo tượng đạo giáo sớm nhất còn biết, ở Dược Vương Sơn (Diệu huyện, Thiểm Tây). Bốn mặt tạc tượng và ký văn dài, ghi Diêu Bá Đa–Bá Long… kính tạo “hoàng tiên quân” thạch tượng vì chủ và thất tổ. Tư liệu cực quý về đạo tượng và tín ngưỡng Lão quân Bắc Ngụy trước khi Phật–Đạo hỗn dung phổ biến.\",\n      \"key_text\": \"太和二十年，歲在丙子，姚伯多、伯龍、定龍……上為□主，下為七祖眷屬，敬造皇先君文石像一軀。\",\n      \"use\": \"Khảo tạo tượng đạo giáo sớm; đối chiếu với Lão quân tín ngưỡng và bi ký Phật–Đạo hỗn hợp\",\n      \"sources\": [\n        \"https://www.daoist.org/BookSearch(test)/list009/0286.pdf\",\n        \"https://www.9610.com/weijin/yaoboduo.htm\",\n        \"https://ascdc.digitalarchives.tw/collection_1832994.html\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"金石\",\n      \"name_han\": \"岱岳观造像记碑\",\n      \"name_vi\": \"Đại Nhạc Quan Tạo Tượng Ký Bi\",\n      \"bu\": \"金石\",\n      \"author\": \"道士郭行真奉敕立（后历朝续刻题记）\",\n      \"era\": \"唐·显庆六年（661）起，历高宗–玄宗等续刻\",\n      \"topic\": \"金石\",\n      \"essence\": \"Còn gọi Song Thúc bi / Uyên Ương bi, hai phiến đá ghép, dựng ở Đại Nhạc Quan Thái Sơn theo chiếu Cao Tông–Võ Tắc Thiên. Trên bi liên tục khắc đề ký đạo sĩ phụng chỉ tế Thái Sơn suốt hơn trăm năm Đường; chứng tỏ quan hệ mật thiết triều Đường–đạo giáo và nghi thức sơn tế.\",\n      \"key_text\": \"顯慶六年，道士郭行真奉敕為高宗、武后建醮造像。\",\n      \"use\": \"Nghiên cứu đạo giáo triều Đường và nghi tế Thái Sơn qua bi ký liên tục\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E5%8F%8C%E6%9D%9F%E7%A2%91/3715839\",\n        \"https://www.dpm.org.cn/Uploads/pdf/1510/T00093_00.pdf\",\n        \"http://www.sd-aiguo.com/hdql/index/detail?id=12730736\"\n      ],\n      \"textual_certainty\": \"high\"\n    }\n  ]\n}",
+  "stopReason": "EndTurn",
+  "sessionId": "019f928b-c33b-7fc2-8d47-840c76dd9926",
+  "requestId": "95412264-bc38-4df4-b7c2-8e98b5e8ddd3",
+  "thought": "The user wants me to act as a distillation agent for Chinese 玄学/志怪/类书 textual tradition. I need to select 16 REAL texts from:\nI have enough material to produce the 16 verified entries. Let me compile the final JSON carefully.\nGot it—I've noted the 16 entries with their Sino-Vietnamese readings and the exact sources you provided. Ready to compile the final JSON whenever you are. Just let me know if you want any adjustments to the readings or structure.",
+  "usage": {
+    "input_tokens": 120752,
+    "cache_read_input_tokens": 337664,
+    "output_tokens": 8614,
+    "reasoning_tokens": 2471,
+    "total_tokens": 467030
+  },
+  "num_turns": 2,
+  "total_cost_usd": 0.7975508,
+  "total_cost_usd_ticks": 7975508000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 120752,
+      "outputTokens": 8614,
+      "cacheReadInputTokens": 337664,
+      "modelCalls": 2,
+      "costUSD": 0.7975508
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "dz": "类书",
+        "name_han": "太平御览·道部",
+        "name_vi": "Thái Bình Ngự Lãm · Đạo Bộ",
+        "bu": "类书",
+        "author": "李昉等奉敕纂",
+        "era": "北宋·太平兴国（约983–984）",
+        "topic": "类书",
+        "essence": "Bộ loại thư quan tu Bắc Tống, phần Đạo bộ (khoảng quyển 659–679) tập hợp trích dẫn tiền Tống về đạo sĩ, chân nhân, tiên thuật và danh sơn. Cùng Thần quỷ bộ, là kho tư liệu then chốt để khảo cứu thần tiên và dị sự trước đời Tống. Nhiều dị văn sách mất chỉ còn nhờ sách này.",
+        "key_text": "道者，導也，所以導人至於無為者也。",
+        "use": "Tra cứu dị văn tiên đạo tiền Tống; đối chiếu thuật ngữ đạo giáo với trích dẫn chính sử/tạp thư",
+        "sources": [
+          "https://ctext.org/taiping-yulan/zh",
+          "https://zh.wikipedia.org/zh-hans/%E5%A4%AA%E5%B9%B3%E5%BE%A1%E8%A7%88",
+          "https://zh.wikisource.org/wiki/%E5%A4%AA%E5%B9%B3%E5%BE%A1%E8%A6%BD"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "类书",
+        "name_han": "册府元龟·帝王部·符瑞",
+        "name_vi": "Sách Phủ Nguyên Quy · Đế Vương Bộ · Phù Thụy",
+        "bu": "类书",
+        "author": "王钦若、杨亿等奉敕纂",
+        "era": "北宋·大中祥符（成书1013）",
+        "topic": "类书",
+        "essence": "Loại thư sử chính Bắc Tống nghìn quyển; môn Phù thụy thuộc Đế vương bộ (khoảng quyển 22–25) biên niên các điềm lành, long phụng, kỳ mộc theo triều đại. Nguồn sử liệu phong phú về chính trị–tín ngưỡng phù thụy đời Đường–Ngũ đại, không lấy bút ký tạp sử.",
+        "key_text": "符瑞者，所以應命而彰德也。",
+        "use": "Đối chiếu điềm lành chính sử với nghi lễ tế tự và tuyên ngôn chính thống vương triều",
+        "sources": [
+          "https://zh.wikipedia.org/zh-hans/%E5%86%8A%E5%BA%9C%E5%85%83%E9%BE%9C",
+          "https://zh.wikisource.org/wiki/%E5%86%8A%E5%BA%9C%E5%85%83%E9%BE%9C",
+          "https://baike.baidu.com/item/%E5%86%8C%E5%BA%9C%E5%85%83%E9%BE%9F/1121947"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "类书",
+        "name_han": "玉海·郊祀",
+        "name_vi": "Ngọc Hải · Giao Tự",
+        "bu": "类书",
+        "author": "王应麟",
+        "era": "南宋",
+        "topic": "类书",
+        "essence": "Loại thư Nam Tống nhằm ứng thí Bác học hoành từ; môn Giao tự (khoảng quyển 92–94) hệ thống điển cố tế giao, bắc giao, phong thiện và sơn xuyên. Kết hợp trích sử, chế chiếu với bình chú, rất hữu dụng cho nghi lễ quốc gia và tín ngưỡng sơn nhạc.",
+        "key_text": "天子祭天地，及山川，歲徧焉。",
+        "use": "Nghiên cứu nghi lễ giao tự, phong thiện, quan hệ vương quyền–thần quyền",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E7%8E%89%E6%B5%B7",
+          "https://ctext.org/wiki.pl?if=gb&res=986699",
+          "https://baike.baidu.com/item/%E7%8E%89%E6%B5%B7/11044255"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "类书",
+        "name_han": "天中记",
+        "name_vi": "Thiên Trung Ký",
+        "bu": "类书",
+        "author": "陈耀文",
+        "era": "明",
+        "topic": "类书",
+        "essence": "Loại thư tổng hợp Minh triều 60 quyển, đặt tên theo núi Thiên Trung gần nơi ở tác giả. Thu thập quảng bác từ cửu lưu, sấm vĩ, sách hiếm; có mục thần tiên–thích đạo, bổ sung nhiều dị văn không thấy ở loại thư Tống. Giá trị khảo dị văn và tra cứu huyền học cao.",
+        "key_text": "其居近天中山，故以名書。",
+        "use": "Bổ sung trích dẫn thần tiên/đạo thích ngoài Thái Bình Ngự Lãm; tra cứu sấm vĩ và dị sự",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=798023",
+          "https://baike.baidu.com/item/%E5%A4%A9%E4%B8%AD%E8%AE%B0/9635898",
+          "https://archive.org/details/06057732.cn"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "类书",
+        "name_han": "艺文类聚·灵异部",
+        "name_vi": "Nghệ Văn Loại Tụ · Linh Dị Bộ",
+        "bu": "类书",
+        "author": "欧阳询等奉敕纂",
+        "era": "唐·武德（成书约624）",
+        "topic": "类书",
+        "essence": "Loại thư quan tu đầu Đường 100 quyển; Linh dị bộ (quyển 78–79) gồm tiên đạo, thần, quỷ, mộng, hồn phách. Thể lệ “sự cư tiền, văn liệt hậu” bảo tồn nhiều đoạn văn, phú về linh dị và tiên đạo trước Đường.",
+        "key_text": "靈異部上·仙道",
+        "use": "Đối chiếu trích dẫn tiên đạo–linh dị tiền Đường; nguồn văn tuyển cho điển cố thần quái",
+        "sources": [
+          "https://zh.wikipedia.org/zh-hans/%E8%89%BA%E6%96%87%E7%B1%BB%E8%81%9A",
+          "https://zh.wikisource.org/zh-hans/%E8%97%9D%E6%96%87%E9%A1%9E%E8%81%9A",
+          "https://ctext.org/wiki.pl?if=gb&res=952925"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "剪灯新话",
+        "name_vi": "Tiễn Đăng Tân Thoại",
+        "bu": "藏外",
+        "author": "瞿佑",
+        "era": "明初·洪武–永乐",
+        "topic": "笔记",
+        "essence": "Tập truyện truyền kỳ văn ngôn Minh sơ, 4 quyển + phụ lục khoảng 21 thiên (Kim Phụng Thoa Ký, Mẫu Đơn Đăng Ký…). Kế thừa chí quái Lục triều và Đường truyền kỳ, mở đường cho tiểu thuyết văn ngôn Minh–Thanh và ảnh hưởng sang Triều Tiên, Nhật Bản. Từng bị cấm vì “mê hoặc nhân tâm”.",
+        "key_text": "余友瞿宗吉之為《剪燈新話》，其所志怪有過於馬孺子所言。",
+        "use": "Đọc truyền kỳ tình–quỷ Minh sơ; nguồn chuyển thể kịch và “nhị phách”",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E5%89%AA%E7%87%88%E6%96%B0%E8%A9%B1",
+          "https://zh.wikisource.org/zh-hans/%E5%89%AA%E7%87%88%E6%96%B0%E8%A9%B1",
+          "https://baike.baidu.com/item/%E5%89%AA%E7%81%AF%E6%96%B0%E8%AF%9D/7648229"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "耳食录",
+        "name_vi": "Nhĩ Thực Lục",
+        "bu": "藏外",
+        "author": "乐钧",
+        "era": "清·乾隆（sơ biên 1794）",
+        "topic": "笔记",
+        "essence": "Tập truyền kỳ văn ngôn Thanh, sơ biên 12 quyển + nhị biên 8 quyển, gần 200 thiên. Phong cách gần Liêu Trai nhưng thiên về thế tình, hồ quỷ và đạo đức khuyến trừng; là một trong các “phỏng Liêu” quan trọng sau Càn Long.",
+        "key_text": "惡乎有惡乎不有，惡乎知惡乎不知，僕鄙人也，羈栖之暇，輒敢操觚追記所聞，亦妄言妄聽耳。",
+        "use": "So sánh truyền kỳ Càn Long với Liêu Trai/Duyệt Vi; nghiên cứu hồ quỷ–nhân tình",
+        "sources": [
+          "https://baike.baidu.com/item/%E8%80%B3%E9%A3%9F%E5%BD%95/4341437",
+          "https://ctext.org/wiki.pl?if=gb&res=217539",
+          "http://www.guoxue123.com/xiaosuo/0001/esl/index.htm"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "谐铎",
+        "name_vi": "Hài Đạc",
+        "bu": "藏外",
+        "author": "沈起凤",
+        "era": "清·乾隆五十六年（1791）",
+        "topic": "笔记",
+        "essence": "Tập chí quái–thế tình 12 quyển 122 thiên; mỗi thiên kết hợp “hài” (kể chuyện châm biếm) và “đạc” (lời bình khuyến giới). Dùng hồ, hổ, gà… làm ngụ ngôn nhân tính, đả kích khoa cử và quan trường, khác hẳn giọng trầm mặc của Duyệt Vi.",
+        "key_text": "諧以言之，鐸以警之。",
+        "use": "Đọc ngụ ngôn chí quái Càn Long; phân tích châm biếm xã hội qua quỷ hồ",
+        "sources": [
+          "https://baike.baidu.com/item/%E8%B0%90%E9%93%8E/224513",
+          "https://www.iwenyan.com/zi/xieduo",
+          "https://weread.qq.com/web/bookDetail/26f325e0813ab8869g01665b"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "夜雨秋灯录",
+        "name_vi": "Dạ Vũ Thu Đăng Lục",
+        "bu": "藏外",
+        "author": "宣鼎",
+        "era": "清·光绪三年（1877，Báo quán Thân Báo）",
+        "topic": "笔记",
+        "essence": "Tập chí quái–truyền kỳ cuối Thanh, 8 quyển 115 thiên (còn tục lục). Tác giả viết trong cảnh “vô khả nại hà”, truyện giàu cảm xúc, kỳ nữ, hiệp nghĩa và dị thuật; được xem là đỉnh cao văn ngôn chí quái sau Liêu Trai thời Đồng–Quang.",
+        "key_text": "以無可奈何之身，當無可奈何之境，未能已已奮筆直書耳。",
+        "use": "Đọc truyền kỳ cuối Thanh; so sánh giọng cảm thương với phỏng Liêu thời Càn–Gia",
+        "sources": [
+          "https://baike.baidu.com/item/%E5%A4%9C%E9%9B%A8%E7%A7%8B%E7%81%AF%E5%BD%95/141384",
+          "https://zh.wikisource.org/zh-hans/%E5%A4%9C%E9%9B%A8%E7%A7%8B%E7%87%88%E9%8C%84",
+          "https://ctext.org/wiki.pl?if=gb&res=219175"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "右台仙馆笔记",
+        "name_vi": "Hữu Đài Tiên Quán Bút Ký",
+        "bu": "藏外",
+        "author": "俞樾",
+        "era": "清·晚清（sau 1879）",
+        "topic": "笔记",
+        "essence": "Tập bút ký văn ngôn 16 quyển khoảng 667 tắc, viết cuối đời khi táng phu nhân ở Hữu Đài Sơn (Hàng Châu). Thể lệ gần Duyệt Vi Thảo Đường Bút Ký: quỷ thần, nhân quả, dị văn xã hội Thanh mạt, giọng học giả mà bình đạm.",
+        "key_text": "其年冬，葬夫人於錢唐之右台山，余亦自營生壙於其左。",
+        "use": "Đọc bút ký quỷ thần học giả cuối Thanh; đối chiếu với Duyệt Vi và Di Kiên",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E5%8F%B3%E8%87%BA%E4%BB%99%E9%A4%A8%E7%AD%86%E8%A8%98",
+          "https://ctext.org/wiki.pl?if=gb&res=420788",
+          "https://baike.baidu.com/item/%E5%8F%B3%E5%8F%B0%E4%BB%99%E9%A6%86%E7%AC%94%E8%AE%B0/5647238"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "萤窗异草",
+        "name_vi": "Huỳnh Song Dị Thảo",
+        "bu": "藏外",
+        "author": "长白浩歌子（庆兰）",
+        "era": "清·乾隆（khoảng 1768–1788）",
+        "topic": "笔记",
+        "essence": "Tập truyền kỳ văn ngôn 12 quyển (sơ–nhị–tam biên), khoảng 138 thiên, còn gọi Liêu Trai Thặng Cảo. Tác giả Mãn Châu, con Doãn Kế Thiện; truyện hồ tiên–kỳ ngộ, văn phong điển nhã, là phỏng Liêu quan trọng cùng thời với Nhĩ Thực Lục.",
+        "key_text": "全書大段似仿聊齋，而典而不俗，繁而多致。",
+        "use": "So sánh phỏng Liêu Mãn–Hán thời Càn Long; đọc hồ tiên và tình duyên kỳ ngộ",
+        "sources": [
+          "https://baike.baidu.com/item/%E8%90%A4%E7%AA%97%E5%BC%82%E8%8D%89/2385900",
+          "https://ctext.org/wiki.pl?if=gb&res=838337",
+          "https://zh.wikisource.org/wiki/%E8%9E%A2%E7%AA%97%E7%95%B0%E8%8D%89"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "金石",
+        "name_han": "老子铭",
+        "name_vi": "Lão Tử Minh",
+        "bu": "金石",
+        "author": "边韶撰（传蔡邕书）",
+        "era": "东汉·延熹八年（165）",
+        "topic": "金石",
+        "essence": "Bia minh do Hán Hoàn Đế sai Trần tướng Biên Thiều soạn khi mộng Lão Tử và cho tế tự ở miếu Lão Tử (Lại hương, nay Lộc Ấp). Ghi tiểu sử Lão Tử, học thuyết hư tĩnh và xu hướng thần thánh hóa Lão quân đời Hán; là bia đạo quan trọng sớm nhất còn văn bản đầy đủ qua Lệ Thích.",
+        "key_text": "延熹八年八月甲子，皇上尚德弘道，含閎光大，存神養性，意在凌雲……夢見老子，尊而祀之。",
+        "use": "Khảo sự thần thánh hóa Lão Tử đời Hán; văn bản gốc cho lịch sử đạo giáo sớm",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E8%80%81%E5%AD%90%E9%8A%98",
+          "https://baike.baidu.com/item/%E8%80%81%E5%AD%90%E9%93%AD/3781667",
+          "https://zh.wikipedia.org/zh-hans/%E8%BE%B9%E9%9F%B6"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "金石",
+        "name_han": "西岳华山庙碑",
+        "name_vi": "Tây Nhạc Hoa Sơn Miếu Bi",
+        "bu": "金石",
+        "author": "弘农太守袁逢修庙；郭香察书",
+        "era": "东汉·延熹八年（165）",
+        "topic": "金石",
+        "essence": "Bia lệ thư nổi tiếng, lập ở Tây Nhạc miếu Hoa Âm; ghi điển tế sơn nhạc từ Chu–Hán, cung Tập Linh, điện Tồn Tiên đời Vũ Đế và việc trùng tu miếu. Nguyên bia hủy vì động đất Gia Tĩnh; còn các bản thác Tống (Trường Viên, Hoa Âm, Tứ Minh). Vừa là mẫu lệ thư vừa là tư liệu tế nhac–tiên đạo nhà Hán.",
+        "key_text": "孝武皇帝修封禪之禮，思登假之道，巡省五嶽……宮曰集靈宮，殿曰存僊殿，門曰望僊門。",
+        "use": "Nghiên cứu tế nhac và “tập linh/tồn tiên” Hán; đối chiếu thư pháp lệ bi",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E8%8F%AF%E5%B1%B1%E5%BB%9F%E7%A2%91",
+          "https://www.dpm.org.cn/collection/impres/232076.html",
+          "https://baike.baidu.com/item/%E5%AE%8B%E6%8B%93%E8%A5%BF%E5%B2%B3%E5%8D%8E%E5%B1%B1%E5%BA%99%E7%A2%91%E5%86%8C/19622482"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "金石",
+        "name_han": "泰山刻石",
+        "name_vi": "Thái Sơn Khắc Thạch",
+        "bu": "金石",
+        "author": "传李斯撰并书",
+        "era": "秦·始皇二十八年（前219）及二世元年（前209）",
+        "topic": "金石",
+        "essence": "Khắc thạch phong thiện Thái Sơn đời Tần, tiểu triện điển phạm, một trong “Tần tứ sơn khắc thạch”. Gồm chiếu thư Thủy Hoàng ca tụng thống nhất và chiếu nhị thế; di thạch hiện ở Đại miếu Thái An. Là chứng tích sớm nhất về nghi lễ sơn nhac–đế vương trên Thái Sơn.",
+        "key_text": "皇帝曰：金石刻盡始皇帝所為也，今襲號而金石刻辭不稱始皇帝。",
+        "use": "Khảo phong thiện và chữ tiểu triện Tần; nguồn gốc “Thái Sơn” trong nghi lễ đế vương",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E7%A7%A6%E6%B3%B0%E5%B1%B1%E5%88%BB%E7%9F%B3",
+          "https://baike.baidu.com/item/%E6%B3%B0%E5%B1%B1%E5%88%BB%E7%9F%B3/2820330",
+          "https://www.dpm.org.cn/collection/impres/234107.html"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "金石",
+        "name_han": "姚伯多造像记",
+        "name_vi": "Diêu Bá Đa Tạo Tượng Ký",
+        "bu": "金石",
+        "author": "姚伯多等（家族造像记）",
+        "era": "北魏·太和二十年（496）",
+        "topic": "金石",
+        "essence": "Bia tạo tượng đạo giáo sớm nhất còn biết, ở Dược Vương Sơn (Diệu huyện, Thiểm Tây). Bốn mặt tạc tượng và ký văn dài, ghi Diêu Bá Đa–Bá Long… kính tạo “hoàng tiên quân” thạch tượng vì chủ và thất tổ. Tư liệu cực quý về đạo tượng và tín ngưỡng Lão quân Bắc Ngụy trước khi Phật–Đạo hỗn dung phổ biến.",
+        "key_text": "太和二十年，歲在丙子，姚伯多、伯龍、定龍……上為□主，下為七祖眷屬，敬造皇先君文石像一軀。",
+        "use": "Khảo tạo tượng đạo giáo sớm; đối chiếu với Lão quân tín ngưỡng và bi ký Phật–Đạo hỗn hợp",
+        "sources": [
+          "https://www.daoist.org/BookSearch(test)/list009/0286.pdf",
+          "https://www.9610.com/weijin/yaoboduo.htm",
+          "https://ascdc.digitalarchives.tw/collection_1832994.html"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "金石",
+        "name_han": "岱岳观造像记碑",
+        "name_vi": "Đại Nhạc Quan Tạo Tượng Ký Bi",
+        "bu": "金石",
+        "author": "道士郭行真奉敕立（后历朝续刻题记）",
+        "era": "唐·显庆六年（661）起，历高宗–玄宗等续刻",
+        "topic": "金石",
+        "essence": "Còn gọi Song Thúc bi / Uyên Ương bi, hai phiến đá ghép, dựng ở Đại Nhạc Quan Thái Sơn theo chiếu Cao Tông–Võ Tắc Thiên. Trên bi liên tục khắc đề ký đạo sĩ phụng chỉ tế Thái Sơn suốt hơn trăm năm Đường; chứng tỏ quan hệ mật thiết triều Đường–đạo giáo và nghi thức sơn tế.",
+        "key_text": "顯慶六年，道士郭行真奉敕為高宗、武后建醮造像。",
+        "use": "Nghiên cứu đạo giáo triều Đường và nghi tế Thái Sơn qua bi ký liên tục",
+        "sources": [
+          "https://baike.baidu.com/item/%E5%8F%8C%E6%9D%9F%E7%A2%91/3715839",
+          "https://www.dpm.org.cn/Uploads/pdf/1510/T00093_00.pdf",
+          "http://www.sd-aiguo.com/hdql/index/detail?id=12730736"
+        ],
+        "textual_certainty": "high"
+      }
+    ]
+  }
+}

@@ -1,0 +1,318 @@
+{
+  "text": "{ \"entries\": [ ] }{\n  \"entries\": [\n    {\n      \"dz\": \"辑要\",\n      \"name_han\": \"唱道真言\",\n      \"name_vi\": \"Xướng Đạo Chân Ngôn\",\n      \"bu\": \"太玄\",\n      \"author\": \"鹤臞子（托青华老人）\",\n      \"era\": \"清（约18–19世纪）\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Sách đan đạo thu trong Đạo tạng tập yếu (đấu tập), lấy 'luyện tâm' làm then chốt xuyên suốt tính–mệnh. Nhấn mạnh tĩnh quán, huyền quan nhất khiếu và luyện hư sau xuất thần. Là tác phẩm điển hình kiểu đàn loan hậu kỳ, trọng tâm địa hơn kỹ thuật hình thức.\",\n      \"key_text\": \"炼丹先要炼心。\",\n      \"use\": \"Luyện tâm–tĩnh quán, đối chiếu nội đan hậu kỳ; tra ngữ vựng 'huyền quan', 'luyện hư'.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E5%94%B1%E9%81%93%E7%9C%9F%E8%A8%80\",\n        \"https://ctext.org/wiki.pl?if=gb&res=455928\",\n        \"https://zh.wikipedia.org/wiki/%E5%94%B1%E9%81%93%E7%9C%9F%E8%A8%80\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"吕祖全书（master）\",\n      \"name_vi\": \"Lữ Tổ Toàn Thư\",\n      \"bu\": \"正一\",\n      \"author\": \"刘体恕辑；邵志琳增辑\",\n      \"era\": \"清乾隆（32卷→64卷）\",\n      \"topic\": \"类书\",\n      \"essence\": \"Tùng thư chuyên đề về Lữ Động Tân: hành trạng, truyền thuyết, thi văn và kinh sấm đàn loan. Bản Lưu 32 quyển, bản Thiệu tăng 64 quyển phản ánh tín ngưỡng Lữ Tổ và đàn loan Giang Nam. Thu vào Tàng ngoại đạo thư, là nguồn chính nghiên cứu Lữ Tổ giáo hậu kỳ.\",\n      \"key_text\": \"null\",\n      \"use\": \"Tra Lữ Tổ–đàn loan–cứu kiếp; so sánh các bản in; nghiên cứu tín ngưỡng dân gian–đạo quán.\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E5%90%95%E7%A5%96%E5%85%A8%E4%B9%A6/6477093\",\n        \"https://zh.daoinfo.org/index.php?title=%E5%91%82%E7%A5%96%E5%85%A8%E6%9B%B8\",\n        \"https://old.shuge.org/ebook/lv-zu-quan-shu/\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ1410\",\n      \"name_han\": \"长春真人西游记\",\n      \"name_vi\": \"Trường Xuân Chân Nhân Tây Du Ký\",\n      \"bu\": \"正一\",\n      \"author\": \"李志常\",\n      \"era\": \"元初（约1228）\",\n      \"topic\": \"仙传\",\n      \"essence\": \"Môn nhân Lý Chí Thường ghi hành trình Khâu Xử Cơ ứng chiếu Thành Cát Tư Hãn đi Mông Cổ–Tây Vực–Trung Á. Vừa du ký địa lý phong tục, vừa tư liệu lịch sử Toàn Chân và đối thoại 'bất sát–thanh tĩnh'. Là nguồn sử–địa–đạo giáo song trọng.\",\n      \"key_text\": \"null\",\n      \"use\": \"Lịch sử Toàn Chân, quan hệ đạo–chính quyền Mông Nguyên; đối chiếu với Tây du lục.\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/wiki/%E9%95%BF%E6%98%A5%E7%9C%9F%E4%BA%BA%E8%A5%BF%E6%B8%B8%E8%AE%B0\",\n        \"https://zh.daoinfo.org/index.php?title=%E9%95%B7%E6%98%A5%E7%9C%9F%E4%BA%BA%E8%A5%BF%E9%81%8A%E8%A8%98\",\n        \"https://baike.baidu.com/item/%E9%95%BF%E6%98%A5%E7%9C%9F%E4%BA%BA%E8%A5%BF%E6%B8%B8%E8%AE%B0/1122038\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ973\",\n      \"name_han\": \"甘水仙源录\",\n      \"name_vi\": \"Cam Thủy Tiên Nguyên Lục\",\n      \"bu\": \"洞神\",\n      \"author\": \"李道谦\",\n      \"era\": \"元至元（1288）\",\n      \"topic\": \"仙传\",\n      \"essence\": \"Lý Đạo Khiêm biên bi chí–truyền ký các chân nhân Toàn Chân và danh sơn cung quán. Mười quyển, là 'hồ sơ' hệ thống nguồn–lưu phái sau Trùng Dương–Thất chân. Nguồn cốt lõi viết sử Toàn Chân thời Nguyên.\",\n      \"key_text\": \"null\",\n      \"use\": \"Phả hệ Toàn Chân, bi minh, lịch sử cung quán; tra cứu nhân vật đời Tống–Kim–Nguyên.\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E7%94%98%E6%B0%B4%E4%BB%99%E6%BA%90%E5%BD%95/4742515\",\n        \"https://zh.daoinfo.org/index.php?title=%E7%94%98%E6%B0%B4%E4%BB%99%E6%BA%90%E9%8C%84\",\n        \"https://ctext.org/wiki.pl?if=gb&res=453569\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ173\",\n      \"name_han\": \"金莲正宗记\",\n      \"name_vi\": \"Kim Liên Chính Tông Ký\",\n      \"bu\": \"洞真\",\n      \"author\": \"秦志安\",\n      \"era\": \"元太宗十三年（1241）\",\n      \"topic\": \"仙传\",\n      \"essence\": \"Tiên truyện sơ kỳ Toàn Chân do Tần Chí An soạn, năm quyển. Lập 'kim liên chính tông' từ Đông Hoa–Trùng Dương đến thất chân, định hình tự sự chính thống phái. Văn bản then chốt về huyền thoại lập giáo Toàn Chân.\",\n      \"key_text\": \"null\",\n      \"use\": \"Nghiên cứu chính thống hóa Toàn Chân; so sánh với Thất chân niên phổ, Kim liên chính tông tiên nguyên tượng.\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E9%87%91%E8%8E%B2%E6%AD%A3%E5%AE%97%E8%AE%B0/9682006\",\n        \"https://zh.daoinfo.org/index.php?title=%E9%87%91%E8%93%AE%E6%AD%A3%E5%AE%97%E8%A8%98\",\n        \"https://www.shidianguji.com/zh/book/DZ0173\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ1059\",\n      \"name_han\": \"盘山栖云王真人语录\",\n      \"name_vi\": \"Bàn Sơn Thê Vân Vương Chân Nhân Ngữ Lục\",\n      \"bu\": \"太玄\",\n      \"author\": \"王志谨述；论志焕编\",\n      \"era\": \"金元之际（约13世纪）\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Ngữ lục Toàn Chân của Vương Chí Cẩn (Thê Vân), môn nhân biên. Dạy từ thô vào diệu: lấy hư không–sơn–thủy–phong–vân làm pháp môn, tâm đạo nhân như mây không dính cảnh. Giọng thực tiễn, trọng tín hành hơn huyền thuyết.\",\n      \"key_text\": \"道人之心亦当如此。\",\n      \"use\": \"Tâm pháp Toàn Chân hậu kỳ; đối chiếu ngữ lục Mã–Khâu–Vương; thiền–đạo giao thoa.\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E7%9B%98%E5%B1%B1%E6%A0%96%E4%BA%91%E7%8E%8B%E7%9C%9F%E4%BA%BA%E8%AF%AD%E5%BD%95/18611280\",\n        \"https://zh.wikisource.org/zh-hans/%E7%9B%A4%E5%B1%B1%E6%A3%B2%E9%9B%B2%E7%8E%8B%E7%9C%9E%E4%BA%BA%E8%AA%9E%E9%8C%B2\",\n        \"https://cread.jd.com/read/startRead.action?bookId=30048582&readType=1\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ249\",\n      \"name_han\": \"中和集\",\n      \"name_vi\": \"Trung Hòa Tập\",\n      \"bu\": \"洞真\",\n      \"author\": \"李道纯；门人蔡志颐编\",\n      \"era\": \"元初\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Thi văn–luận thuyết của Lý Đạo Thuần (Thanh Am), sáu quyển. Lấy 'trung hòa' hội Nho–Thích–Đạo, chủ 'thủ trung' làm huyền quan. Cầu nối Nam tông–Toàn Chân, ảnh hưởng mạnh phái trung hậu kỳ.\",\n      \"key_text\": \"null\",\n      \"use\": \"Nội đan trung phái; đối chiếu Thanh Am ngữ lục, Tam thiên dịch tủy; nghiên cứu tam giáo hợp nhất.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/index.php?title=%E4%B8%AD%E5%92%8C%E9%9B%86\",\n        \"https://zh.wikisource.org/wiki/%E4%B8%AD%E5%92%8C%E9%9B%86\",\n        \"https://ctext.org/searchbooks.pl?if=gb&author=%E6%9D%8E%E9%81%93%E7%B4%94\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"摄生消息论\",\n      \"name_vi\": \"Nhiếp Sinh Tiêu Tức Luận\",\n      \"bu\": \"太清\",\n      \"author\": \"丘处机（题）\",\n      \"era\": \"金元（题名）/流传明清\",\n      \"topic\": \"道医\",\n      \"essence\": \"Dưỡng sinh tứ thời theo Xuân–Hạ–Thu–Đông, kết hợp tạng phủ–ngũ hành và ẩm thực khởi cư. Ngắn gọn, thực dụng, mang dấu ấn y đạo Toàn Chân. Lưu truyền rộng ngoài tàng, thường gán cho Khâu Xử Cơ.\",\n      \"key_text\": \"null\",\n      \"use\": \"Dưỡng sinh tứ thời, phòng bệnh theo mùa; đối chiếu Nội kinh–Thiên kim; giáo dục y đạo dân gian.\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E6%91%84%E7%94%9F%E6%B6%88%E6%81%AF%E8%AE%BA/3101847\",\n        \"http://www.taoist.org.cn/showInfoContent.do?id=1416&p=%27p%27\",\n        \"https://cmpaca.org/Html/?4999.html\"\n      ],\n      \"textual_certainty\": \"partial\"\n    },\n    {\n      \"dz\": \"DZ838\",\n      \"name_han\": \"养性延命录\",\n      \"name_vi\": \"Dưỡng Tính Diên Mệnh Lục\",\n      \"bu\": \"洞神\",\n      \"author\": \"陶弘景集\",\n      \"era\": \"南朝梁\",\n      \"topic\": \"道医\",\n      \"essence\": \"Đào Hoằng Cảnh biên tập dưỡng tính: giáo giới, thực giới, phục khí trị bệnh, đạo dẫn án ma, ngự nữ. Tổng hợp tiền Tần–Lục triều, cầu nối y–đạo–dưỡng sinh. Kinh điển 'mệnh tại ngã bất tại thiên' trong thực hành thân thể.\",\n      \"key_text\": \"养性之道，不欲饱食便卧及终日久坐，皆损寿也。\",\n      \"use\": \"Lịch sử dưỡng sinh–đạo dẫn; trích dẫn cổ phương; so sánh với Bảo Phác tử, Chư bệnh nguyên hậu.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E9%A4%8A%E6%80%A7%E5%BB%B6%E5%91%BD%E9%8C%84\",\n        \"https://ctext.org/wiki.pl?if=gb&res=277199\",\n        \"https://baike.baidu.com/item/%E5%85%BB%E6%80%A7%E5%BB%B6%E5%91%BD%E5%BD%95\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"千金翼方\",\n      \"name_vi\": \"Thiên Kim Dực Phương\",\n      \"bu\": \"太清\",\n      \"author\": \"孙思邈\",\n      \"era\": \"唐（约682）\",\n      \"topic\": \"道医\",\n      \"essence\": \"Tiếp Bị cấp thiên kim yếu phương, 30 quyển, bổ dược liệu–thương hàn–trúng phong–sang ung. 'Dực' nghĩa cánh hổ, tóm kết kinh nghiệm cuối đời Tôn Tư Mạc. Y–đạo giao thoa, có thực trị, dưỡng tính, châm cứu.\",\n      \"key_text\": \"null\",\n      \"use\": \"Lâm sàng cổ phương, dược liệu; đối chiếu Thiên kim yếu phương; nghiên cứu y đạo Đường.\",\n      \"sources\": [\n        \"https://zh.wikipedia.org/zh-hans/%E5%8D%83%E9%87%91%E7%BF%BC%E6%96%B9\",\n        \"https://ctext.org/wiki.pl?if=gb&res=358699\",\n        \"https://baike.baidu.com/item/%E5%8D%83%E9%87%91%E7%BF%BC%E6%96%B9/8454861\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"修龄要旨\",\n      \"name_vi\": \"Tu Linh Yếu Chỉ\",\n      \"bu\": \"太清\",\n      \"author\": \"冷谦\",\n      \"era\": \"元末明初\",\n      \"topic\": \"道医\",\n      \"essence\": \"Sách dưỡng sinh–khí công của Lãnh Khiêm (Long Dương tử): tứ thời, khởi cư, lục tự quyết, thập lục đoạn cẩm, bát đoạn cẩm, đạo dẫn ca. Ngắn gọn, thực hành, đại diện dưỡng sinh đạo gia Minh sơ ngoài tàng.\",\n      \"key_text\": \"null\",\n      \"use\": \"Khí công–đạo dẫn thực hành; lục tự–bát đoạn cẩm; đối chiếu Tuân sinh bát tiên.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E4%BF%AE%E9%BD%A1%E8%A6%81%E6%97%A8\",\n        \"https://ctext.org/wiki.pl?if=gb&res=301647\",\n        \"https://baike.baidu.com/item/%E4%BF%AE%E9%BE%84%E8%A6%81%E6%97%A8/6546112\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"遵生八笺\",\n      \"name_vi\": \"Tuân Sinh Bát Tiên\",\n      \"bu\": \"太清\",\n      \"author\": \"高濂\",\n      \"era\": \"明万历十九年（1591）\",\n      \"topic\": \"类书\",\n      \"essence\": \"Bách khoa dưỡng sinh văn nhân: thanh tu, tứ thời, khởi cư, diên niên khước bệnh, ẩm soạn, yến nhàn thanh thưởng, linh bí đan dược, trần ngoại hà cử. Tổng hợp hàng trăm nguồn y–đạo–nhã thú, cầu nối đạo y và đời sống sĩ phu.\",\n      \"key_text\": \"null\",\n      \"use\": \"Dưỡng sinh tổng hợp, ẩm thực–đạo dẫn–đan dược; nghiên cứu văn hóa sinh hoạt Minh; trích phương thực dụng.\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=277199&remap=gb\",\n        \"http://www.chinaknowledge.de/Literature/Diverse/zunshengbajian.html\",\n        \"https://baike.baidu.com/item/%E9%81%B5%E7%94%9F%E5%85%AB%E7%AC%BA\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"藏外\",\n      \"name_han\": \"活人心法\",\n      \"name_vi\": \"Hoạt Nhân Tâm Pháp\",\n      \"bu\": \"太清\",\n      \"author\": \"朱权\",\n      \"era\": \"明\",\n      \"topic\": \"道医\",\n      \"essence\": \"Chu Quyền (Ninh hiến vương) soạn hai quyển: trị tâm, đạo dẫn, lục tự, tứ quý ca, ẩm thực. Chủ 'dục trị kỳ tật tiên trị kỳ tâm', có đồ đạo dẫn sớm. Tiêu biểu y đạo vương thất–đạo giáo Minh.\",\n      \"key_text\": \"欲治其疾，先治其心。\",\n      \"use\": \"Tâm–thân đồng trị; đạo dẫn đồ–ca; lịch sử y đạo Minh.\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E6%B4%BB%E4%BA%BA%E5%BF%83%E6%B3%95/2921060\",\n        \"http://www.taoist.org.cn/showInfoContent.do?id=1267&p=%27p%27\",\n        \"https://xjyx.jxutcm.edu.cn/info/1066/1680.htm\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ1032\",\n      \"name_han\": \"云笈七签\",\n      \"name_vi\": \"Vân Cấp Thất Thiêm\",\n      \"bu\": \"太玄\",\n      \"author\": \"张君房\",\n      \"era\": \"北宋天禧–天圣（约1019–1029）\",\n      \"topic\": \"类书\",\n      \"essence\": \"Trương Quân Phòng trích tinh hoa Đại Tống thiên cung bảo tàng thành ~122 quyển, gọi 'tiểu đạo tàng'. Hệ thống giáo lý, kinh pháp, khí pháp, kim đan, phương dược trước Bắc Tống. Cổng vào nghiên cứu đạo giáo tiền Tống.\",\n      \"key_text\": \"null\",\n      \"use\": \"Tra cứu trích đoạn thất lạc; tổng quan giáo lý–tu luyện tiền Tống; đối chiếu bản tàng.\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E4%BA%91%E7%AC%88%E4%B8%83%E7%AD%BE/9165426\",\n        \"https://ctext.org/wiki.pl?if=gb&res=820577&remap=gb\",\n        \"https://zh.daoinfo.org/index.php?title=%E9%9B%B2%E7%AC%88%E4%B8%83%E7%B1%A4\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ1017\",\n      \"name_han\": \"道枢\",\n      \"name_vi\": \"Đạo Khu\",\n      \"bu\": \"太玄\",\n      \"author\": \"曾慥\",\n      \"era\": \"南宋绍兴（约1151）\",\n      \"topic\": \"类书\",\n      \"essence\": \"Tằng Táo biên 42 quyển, hơn trăm thiên, tóm tinh yếu phương thuật Hán–Bắc Tống: nội đan, phục khí, thai tức, đạo dẫn. Mỗi thiên có tứ ngôn đề yếu; xen 'chí du tử viết'. Bách khoa tu luyện tiền Nam Tống, trọng Chung–Lữ.\",\n      \"key_text\": \"彼是莫得其偶，谓之道枢。\",\n      \"use\": \"Đối chiếu dị bản đan kinh; nghiên cứu Chung–Lữ và nội đan Tống; trích dẫn dật văn.\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=212023&remap=gb\",\n        \"https://zh.wikipedia.org/zh-hans/%E9%81%93%E6%A8%9E\",\n        \"https://zh.daoinfo.org/index.php?title=%E9%81%93%E6%A8%9E\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ1138\",\n      \"name_han\": \"无上秘要\",\n      \"name_vi\": \"Vô Thượng Bí Yếu\",\n      \"bu\": \"太平\",\n      \"author\": \"北周武帝宇文邕敕通道观学士纂\",\n      \"era\": \"北周（约574）\",\n      \"topic\": \"类书\",\n      \"essence\": \"Loại thư đạo giáo sớm nhất còn biết: nguyên 100 quyển, tàng còn tàn ~67 quyển. Hợp nhất tam động tứ phụ để thống nhất giáo lý, phục vụ cải cách đạo–Phật Bắc Chu. Nguồn chính cho vũ trụ quan–giới luật–tu đạo Lục triều.\",\n      \"key_text\": \"null\",\n      \"use\": \"Phục nguyên kinh thất lạc; nghiên cứu kết cấu tam động; lịch sử chính sách tôn giáo Bắc triều.\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/%E6%97%A0%E4%B8%8A%E7%A7%98%E8%A6%81/9686821\",\n        \"https://zh.daoinfo.org/index.php?title=%E7%84%A1%E4%B8%8A%E7%A7%98%E8%A6%81\",\n        \"https://ctext.org/wiki.pl?if=gb&res=820577\"\n      ],\n      \"textual_certainty\": \"high\"\n    }\n  ]\n}",
+  "stopReason": "EndTurn",
+  "sessionId": "019f91a4-d892-7ac1-bd0c-0c0c8e49eed4",
+  "requestId": "769d198f-3968-4d9e-8be2-f3a4d6d6da8b",
+  "thought": "The user wants me to act as a distillation agent for Chinese Daoist textual tradition, specifically selecting 16 REAL texts from:I have enough verified material. Let me compile the final JSON with 16 entries carefully.\nGot it—I've reviewed the selections and adjusted the list to prioritize 藏外 materials while keeping the Quanzhen and 道医 focus intact. Here's the refined 16-entry compilation:\n\n1. 唱道真言 - 辑要, 鹤臞子, Qing  \n2.",
+  "usage": {
+    "input_tokens": 176203,
+    "cache_read_input_tokens": 551040,
+    "output_tokens": 10450,
+    "reasoning_tokens": 4617,
+    "total_tokens": 737693
+  },
+  "num_turns": 2,
+  "total_cost_usd": 1.1390504,
+  "total_cost_usd_ticks": 11390504000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 176203,
+      "outputTokens": 10450,
+      "cacheReadInputTokens": 551040,
+      "modelCalls": 2,
+      "costUSD": 1.1390504
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "dz": "辑要",
+        "name_han": "唱道真言",
+        "name_vi": "Xướng Đạo Chân Ngôn",
+        "bu": "太玄",
+        "author": "鹤臞子（托青华老人）",
+        "era": "清（约18–19世纪）",
+        "topic": "cultivation",
+        "essence": "Sách đan đạo thu trong Đạo tạng tập yếu (đấu tập), lấy 'luyện tâm' làm then chốt xuyên suốt tính–mệnh. Nhấn mạnh tĩnh quán, huyền quan nhất khiếu và luyện hư sau xuất thần. Là tác phẩm điển hình kiểu đàn loan hậu kỳ, trọng tâm địa hơn kỹ thuật hình thức.",
+        "key_text": "炼丹先要炼心。",
+        "use": "Luyện tâm–tĩnh quán, đối chiếu nội đan hậu kỳ; tra ngữ vựng 'huyền quan', 'luyện hư'.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E5%94%B1%E9%81%93%E7%9C%9F%E8%A8%80",
+          "https://ctext.org/wiki.pl?if=gb&res=455928",
+          "https://zh.wikipedia.org/wiki/%E5%94%B1%E9%81%93%E7%9C%9F%E8%A8%80"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "吕祖全书（master）",
+        "name_vi": "Lữ Tổ Toàn Thư",
+        "bu": "正一",
+        "author": "刘体恕辑；邵志琳增辑",
+        "era": "清乾隆（32卷→64卷）",
+        "topic": "类书",
+        "essence": "Tùng thư chuyên đề về Lữ Động Tân: hành trạng, truyền thuyết, thi văn và kinh sấm đàn loan. Bản Lưu 32 quyển, bản Thiệu tăng 64 quyển phản ánh tín ngưỡng Lữ Tổ và đàn loan Giang Nam. Thu vào Tàng ngoại đạo thư, là nguồn chính nghiên cứu Lữ Tổ giáo hậu kỳ.",
+        "key_text": "null",
+        "use": "Tra Lữ Tổ–đàn loan–cứu kiếp; so sánh các bản in; nghiên cứu tín ngưỡng dân gian–đạo quán.",
+        "sources": [
+          "https://baike.baidu.com/item/%E5%90%95%E7%A5%96%E5%85%A8%E4%B9%A6/6477093",
+          "https://zh.daoinfo.org/index.php?title=%E5%91%82%E7%A5%96%E5%85%A8%E6%9B%B8",
+          "https://old.shuge.org/ebook/lv-zu-quan-shu/"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ1410",
+        "name_han": "长春真人西游记",
+        "name_vi": "Trường Xuân Chân Nhân Tây Du Ký",
+        "bu": "正一",
+        "author": "李志常",
+        "era": "元初（约1228）",
+        "topic": "仙传",
+        "essence": "Môn nhân Lý Chí Thường ghi hành trình Khâu Xử Cơ ứng chiếu Thành Cát Tư Hãn đi Mông Cổ–Tây Vực–Trung Á. Vừa du ký địa lý phong tục, vừa tư liệu lịch sử Toàn Chân và đối thoại 'bất sát–thanh tĩnh'. Là nguồn sử–địa–đạo giáo song trọng.",
+        "key_text": "null",
+        "use": "Lịch sử Toàn Chân, quan hệ đạo–chính quyền Mông Nguyên; đối chiếu với Tây du lục.",
+        "sources": [
+          "https://zh.wikipedia.org/wiki/%E9%95%BF%E6%98%A5%E7%9C%9F%E4%BA%BA%E8%A5%BF%E6%B8%B8%E8%AE%B0",
+          "https://zh.daoinfo.org/index.php?title=%E9%95%B7%E6%98%A5%E7%9C%9F%E4%BA%BA%E8%A5%BF%E9%81%8A%E8%A8%98",
+          "https://baike.baidu.com/item/%E9%95%BF%E6%98%A5%E7%9C%9F%E4%BA%BA%E8%A5%BF%E6%B8%B8%E8%AE%B0/1122038"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ973",
+        "name_han": "甘水仙源录",
+        "name_vi": "Cam Thủy Tiên Nguyên Lục",
+        "bu": "洞神",
+        "author": "李道谦",
+        "era": "元至元（1288）",
+        "topic": "仙传",
+        "essence": "Lý Đạo Khiêm biên bi chí–truyền ký các chân nhân Toàn Chân và danh sơn cung quán. Mười quyển, là 'hồ sơ' hệ thống nguồn–lưu phái sau Trùng Dương–Thất chân. Nguồn cốt lõi viết sử Toàn Chân thời Nguyên.",
+        "key_text": "null",
+        "use": "Phả hệ Toàn Chân, bi minh, lịch sử cung quán; tra cứu nhân vật đời Tống–Kim–Nguyên.",
+        "sources": [
+          "https://baike.baidu.com/item/%E7%94%98%E6%B0%B4%E4%BB%99%E6%BA%90%E5%BD%95/4742515",
+          "https://zh.daoinfo.org/index.php?title=%E7%94%98%E6%B0%B4%E4%BB%99%E6%BA%90%E9%8C%84",
+          "https://ctext.org/wiki.pl?if=gb&res=453569"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ173",
+        "name_han": "金莲正宗记",
+        "name_vi": "Kim Liên Chính Tông Ký",
+        "bu": "洞真",
+        "author": "秦志安",
+        "era": "元太宗十三年（1241）",
+        "topic": "仙传",
+        "essence": "Tiên truyện sơ kỳ Toàn Chân do Tần Chí An soạn, năm quyển. Lập 'kim liên chính tông' từ Đông Hoa–Trùng Dương đến thất chân, định hình tự sự chính thống phái. Văn bản then chốt về huyền thoại lập giáo Toàn Chân.",
+        "key_text": "null",
+        "use": "Nghiên cứu chính thống hóa Toàn Chân; so sánh với Thất chân niên phổ, Kim liên chính tông tiên nguyên tượng.",
+        "sources": [
+          "https://baike.baidu.com/item/%E9%87%91%E8%8E%B2%E6%AD%A3%E5%AE%97%E8%AE%B0/9682006",
+          "https://zh.daoinfo.org/index.php?title=%E9%87%91%E8%93%AE%E6%AD%A3%E5%AE%97%E8%A8%98",
+          "https://www.shidianguji.com/zh/book/DZ0173"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ1059",
+        "name_han": "盘山栖云王真人语录",
+        "name_vi": "Bàn Sơn Thê Vân Vương Chân Nhân Ngữ Lục",
+        "bu": "太玄",
+        "author": "王志谨述；论志焕编",
+        "era": "金元之际（约13世纪）",
+        "topic": "cultivation",
+        "essence": "Ngữ lục Toàn Chân của Vương Chí Cẩn (Thê Vân), môn nhân biên. Dạy từ thô vào diệu: lấy hư không–sơn–thủy–phong–vân làm pháp môn, tâm đạo nhân như mây không dính cảnh. Giọng thực tiễn, trọng tín hành hơn huyền thuyết.",
+        "key_text": "道人之心亦当如此。",
+        "use": "Tâm pháp Toàn Chân hậu kỳ; đối chiếu ngữ lục Mã–Khâu–Vương; thiền–đạo giao thoa.",
+        "sources": [
+          "https://baike.baidu.com/item/%E7%9B%98%E5%B1%B1%E6%A0%96%E4%BA%91%E7%8E%8B%E7%9C%9F%E4%BA%BA%E8%AF%AD%E5%BD%95/18611280",
+          "https://zh.wikisource.org/zh-hans/%E7%9B%A4%E5%B1%B1%E6%A3%B2%E9%9B%B2%E7%8E%8B%E7%9C%9E%E4%BA%BA%E8%AA%9E%E9%8C%B2",
+          "https://cread.jd.com/read/startRead.action?bookId=30048582&readType=1"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ249",
+        "name_han": "中和集",
+        "name_vi": "Trung Hòa Tập",
+        "bu": "洞真",
+        "author": "李道纯；门人蔡志颐编",
+        "era": "元初",
+        "topic": "cultivation",
+        "essence": "Thi văn–luận thuyết của Lý Đạo Thuần (Thanh Am), sáu quyển. Lấy 'trung hòa' hội Nho–Thích–Đạo, chủ 'thủ trung' làm huyền quan. Cầu nối Nam tông–Toàn Chân, ảnh hưởng mạnh phái trung hậu kỳ.",
+        "key_text": "null",
+        "use": "Nội đan trung phái; đối chiếu Thanh Am ngữ lục, Tam thiên dịch tủy; nghiên cứu tam giáo hợp nhất.",
+        "sources": [
+          "https://zh.daoinfo.org/index.php?title=%E4%B8%AD%E5%92%8C%E9%9B%86",
+          "https://zh.wikisource.org/wiki/%E4%B8%AD%E5%92%8C%E9%9B%86",
+          "https://ctext.org/searchbooks.pl?if=gb&author=%E6%9D%8E%E9%81%93%E7%B4%94"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "摄生消息论",
+        "name_vi": "Nhiếp Sinh Tiêu Tức Luận",
+        "bu": "太清",
+        "author": "丘处机（题）",
+        "era": "金元（题名）/流传明清",
+        "topic": "道医",
+        "essence": "Dưỡng sinh tứ thời theo Xuân–Hạ–Thu–Đông, kết hợp tạng phủ–ngũ hành và ẩm thực khởi cư. Ngắn gọn, thực dụng, mang dấu ấn y đạo Toàn Chân. Lưu truyền rộng ngoài tàng, thường gán cho Khâu Xử Cơ.",
+        "key_text": "null",
+        "use": "Dưỡng sinh tứ thời, phòng bệnh theo mùa; đối chiếu Nội kinh–Thiên kim; giáo dục y đạo dân gian.",
+        "sources": [
+          "https://baike.baidu.com/item/%E6%91%84%E7%94%9F%E6%B6%88%E6%81%AF%E8%AE%BA/3101847",
+          "http://www.taoist.org.cn/showInfoContent.do?id=1416&p=%27p%27",
+          "https://cmpaca.org/Html/?4999.html"
+        ],
+        "textual_certainty": "partial"
+      },
+      {
+        "dz": "DZ838",
+        "name_han": "养性延命录",
+        "name_vi": "Dưỡng Tính Diên Mệnh Lục",
+        "bu": "洞神",
+        "author": "陶弘景集",
+        "era": "南朝梁",
+        "topic": "道医",
+        "essence": "Đào Hoằng Cảnh biên tập dưỡng tính: giáo giới, thực giới, phục khí trị bệnh, đạo dẫn án ma, ngự nữ. Tổng hợp tiền Tần–Lục triều, cầu nối y–đạo–dưỡng sinh. Kinh điển 'mệnh tại ngã bất tại thiên' trong thực hành thân thể.",
+        "key_text": "养性之道，不欲饱食便卧及终日久坐，皆损寿也。",
+        "use": "Lịch sử dưỡng sinh–đạo dẫn; trích dẫn cổ phương; so sánh với Bảo Phác tử, Chư bệnh nguyên hậu.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E9%A4%8A%E6%80%A7%E5%BB%B6%E5%91%BD%E9%8C%84",
+          "https://ctext.org/wiki.pl?if=gb&res=277199",
+          "https://baike.baidu.com/item/%E5%85%BB%E6%80%A7%E5%BB%B6%E5%91%BD%E5%BD%95"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "千金翼方",
+        "name_vi": "Thiên Kim Dực Phương",
+        "bu": "太清",
+        "author": "孙思邈",
+        "era": "唐（约682）",
+        "topic": "道医",
+        "essence": "Tiếp Bị cấp thiên kim yếu phương, 30 quyển, bổ dược liệu–thương hàn–trúng phong–sang ung. 'Dực' nghĩa cánh hổ, tóm kết kinh nghiệm cuối đời Tôn Tư Mạc. Y–đạo giao thoa, có thực trị, dưỡng tính, châm cứu.",
+        "key_text": "null",
+        "use": "Lâm sàng cổ phương, dược liệu; đối chiếu Thiên kim yếu phương; nghiên cứu y đạo Đường.",
+        "sources": [
+          "https://zh.wikipedia.org/zh-hans/%E5%8D%83%E9%87%91%E7%BF%BC%E6%96%B9",
+          "https://ctext.org/wiki.pl?if=gb&res=358699",
+          "https://baike.baidu.com/item/%E5%8D%83%E9%87%91%E7%BF%BC%E6%96%B9/8454861"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "修龄要旨",
+        "name_vi": "Tu Linh Yếu Chỉ",
+        "bu": "太清",
+        "author": "冷谦",
+        "era": "元末明初",
+        "topic": "道医",
+        "essence": "Sách dưỡng sinh–khí công của Lãnh Khiêm (Long Dương tử): tứ thời, khởi cư, lục tự quyết, thập lục đoạn cẩm, bát đoạn cẩm, đạo dẫn ca. Ngắn gọn, thực hành, đại diện dưỡng sinh đạo gia Minh sơ ngoài tàng.",
+        "key_text": "null",
+        "use": "Khí công–đạo dẫn thực hành; lục tự–bát đoạn cẩm; đối chiếu Tuân sinh bát tiên.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E4%BF%AE%E9%BD%A1%E8%A6%81%E6%97%A8",
+          "https://ctext.org/wiki.pl?if=gb&res=301647",
+          "https://baike.baidu.com/item/%E4%BF%AE%E9%BE%84%E8%A6%81%E6%97%A8/6546112"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "遵生八笺",
+        "name_vi": "Tuân Sinh Bát Tiên",
+        "bu": "太清",
+        "author": "高濂",
+        "era": "明万历十九年（1591）",
+        "topic": "类书",
+        "essence": "Bách khoa dưỡng sinh văn nhân: thanh tu, tứ thời, khởi cư, diên niên khước bệnh, ẩm soạn, yến nhàn thanh thưởng, linh bí đan dược, trần ngoại hà cử. Tổng hợp hàng trăm nguồn y–đạo–nhã thú, cầu nối đạo y và đời sống sĩ phu.",
+        "key_text": "null",
+        "use": "Dưỡng sinh tổng hợp, ẩm thực–đạo dẫn–đan dược; nghiên cứu văn hóa sinh hoạt Minh; trích phương thực dụng.",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=277199&remap=gb",
+          "http://www.chinaknowledge.de/Literature/Diverse/zunshengbajian.html",
+          "https://baike.baidu.com/item/%E9%81%B5%E7%94%9F%E5%85%AB%E7%AC%BA"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "藏外",
+        "name_han": "活人心法",
+        "name_vi": "Hoạt Nhân Tâm Pháp",
+        "bu": "太清",
+        "author": "朱权",
+        "era": "明",
+        "topic": "道医",
+        "essence": "Chu Quyền (Ninh hiến vương) soạn hai quyển: trị tâm, đạo dẫn, lục tự, tứ quý ca, ẩm thực. Chủ 'dục trị kỳ tật tiên trị kỳ tâm', có đồ đạo dẫn sớm. Tiêu biểu y đạo vương thất–đạo giáo Minh.",
+        "key_text": "欲治其疾，先治其心。",
+        "use": "Tâm–thân đồng trị; đạo dẫn đồ–ca; lịch sử y đạo Minh.",
+        "sources": [
+          "https://baike.baidu.com/item/%E6%B4%BB%E4%BA%BA%E5%BF%83%E6%B3%95/2921060",
+          "http://www.taoist.org.cn/showInfoContent.do?id=1267&p=%27p%27",
+          "https://xjyx.jxutcm.edu.cn/info/1066/1680.htm"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ1032",
+        "name_han": "云笈七签",
+        "name_vi": "Vân Cấp Thất Thiêm",
+        "bu": "太玄",
+        "author": "张君房",
+        "era": "北宋天禧–天圣（约1019–1029）",
+        "topic": "类书",
+        "essence": "Trương Quân Phòng trích tinh hoa Đại Tống thiên cung bảo tàng thành ~122 quyển, gọi 'tiểu đạo tàng'. Hệ thống giáo lý, kinh pháp, khí pháp, kim đan, phương dược trước Bắc Tống. Cổng vào nghiên cứu đạo giáo tiền Tống.",
+        "key_text": "null",
+        "use": "Tra cứu trích đoạn thất lạc; tổng quan giáo lý–tu luyện tiền Tống; đối chiếu bản tàng.",
+        "sources": [
+          "https://baike.baidu.com/item/%E4%BA%91%E7%AC%88%E4%B8%83%E7%AD%BE/9165426",
+          "https://ctext.org/wiki.pl?if=gb&res=820577&remap=gb",
+          "https://zh.daoinfo.org/index.php?title=%E9%9B%B2%E7%AC%88%E4%B8%83%E7%B1%A4"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ1017",
+        "name_han": "道枢",
+        "name_vi": "Đạo Khu",
+        "bu": "太玄",
+        "author": "曾慥",
+        "era": "南宋绍兴（约1151）",
+        "topic": "类书",
+        "essence": "Tằng Táo biên 42 quyển, hơn trăm thiên, tóm tinh yếu phương thuật Hán–Bắc Tống: nội đan, phục khí, thai tức, đạo dẫn. Mỗi thiên có tứ ngôn đề yếu; xen 'chí du tử viết'. Bách khoa tu luyện tiền Nam Tống, trọng Chung–Lữ.",
+        "key_text": "彼是莫得其偶，谓之道枢。",
+        "use": "Đối chiếu dị bản đan kinh; nghiên cứu Chung–Lữ và nội đan Tống; trích dẫn dật văn.",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=212023&remap=gb",
+          "https://zh.wikipedia.org/zh-hans/%E9%81%93%E6%A8%9E",
+          "https://zh.daoinfo.org/index.php?title=%E9%81%93%E6%A8%9E"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ1138",
+        "name_han": "无上秘要",
+        "name_vi": "Vô Thượng Bí Yếu",
+        "bu": "太平",
+        "author": "北周武帝宇文邕敕通道观学士纂",
+        "era": "北周（约574）",
+        "topic": "类书",
+        "essence": "Loại thư đạo giáo sớm nhất còn biết: nguyên 100 quyển, tàng còn tàn ~67 quyển. Hợp nhất tam động tứ phụ để thống nhất giáo lý, phục vụ cải cách đạo–Phật Bắc Chu. Nguồn chính cho vũ trụ quan–giới luật–tu đạo Lục triều.",
+        "key_text": "null",
+        "use": "Phục nguyên kinh thất lạc; nghiên cứu kết cấu tam động; lịch sử chính sách tôn giáo Bắc triều.",
+        "sources": [
+          "https://baike.baidu.com/item/%E6%97%A0%E4%B8%8A%E7%A7%98%E8%A6%81/9686821",
+          "https://zh.daoinfo.org/index.php?title=%E7%84%A1%E4%B8%8A%E7%A7%98%E8%A6%81",
+          "https://ctext.org/wiki.pl?if=gb&res=820577"
+        ],
+        "textual_certainty": "high"
+      }
+    ]
+  }
+}

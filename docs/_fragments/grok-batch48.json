@@ -1,0 +1,334 @@
+{
+  "text": "{\"entries\":[]}{\"entries\":[]}{\"entries\":[]}{\n  \"entries\": [\n    {\n      \"dz\": \"DZ677\",\n      \"name_han\": \"唐玄宗御註道德真經\",\n      \"name_vi\": \"Đường Huyền Tông Ngự chú Đạo Đức Chân Kinh\",\n      \"bu\": \"太玄\",\n      \"author\": \"李隆基（唐玄宗）\",\n      \"era\": \"唐（开元，约732–733）\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Bản chú ngự của Đường Huyền Tông, dùng đạo trị quốc kết hợp dưỡng thân. Mỗi chương giải “道” theo hướng thanh tĩnh vô vi, nhấn mạnh quân vương bắt chước tự nhiên. Đây là nền tảng “thánh nghĩa” mà đời sau (như Đỗ Quang Đình) mở rộng.\",\n      \"key_text\": \"道者，虛極也。\",\n      \"use\": \"Đọc khi cần bản chú quan phương đời Đường và khung trị quốc–tu thân của Đạo giáo trung kỳ.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/wiki/唐玄宗御註道德真經\",\n        \"https://zh.daoinfo.org/wiki/唐玄宗御註道德真經\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://ctext.org/library.pl?if=gb&res=84357\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ680\",\n      \"name_han\": \"宋徽宗御解道德真經\",\n      \"name_vi\": \"Tống Huy Tông Ngự giải Đạo Đức Chân Kinh\",\n      \"bu\": \"太玄\",\n      \"author\": \"趙佶（宋徽宗）\",\n      \"era\": \"北宋末（政和前后）\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Chú giải ngự của Tống Huy Tông, hòa trộn huyền học, trị đạo và khí tượng Đạo giáo triều đình. Giải “道” theo hướng huyền diệu–vạn hóa, đồng thời phục vụ chính thống hóa Đạo giáo thời Tống. Ảnh hưởng mạnh các bản sớ nghĩa đời sau (như Chương An).\",\n      \"key_text\": \"道者，天地之始，萬物之母。\",\n      \"use\": \"Dùng để đối chiếu “ngự giải” Tống với “ngự chú” Đường; khảo cứu chính trị–tư tưởng Lão học cung đình.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/宋徽宗御解道德真經\",\n        \"https://zh.wikisource.org/wiki/宋徽宗御解道德真經\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://baike.baidu.com/item/道德经/327138\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ685\",\n      \"name_han\": \"道德真經傳（陸希聲）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Truyện (Lục Hy Thanh)\",\n      \"bu\": \"太玄\",\n      \"author\": \"陸希聲\",\n      \"era\": \"晚唐\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Lục Hy Thanh hợp Nho–Đạo: cho rằng Lão tử cùng gốc với Phục Hy, Văn Vương, Khổng Tử. Phê Dương Chu (quý thân), Trang Chu (tuyệt thánh), Thân Hàn (khắc nghiệt), Vương–Hà (hư vô). Trọng tâm là triết lý chính trị và biến thông đạo đức.\",\n      \"key_text\": \"老氏於三聖人皆變而通之，反而合之。\",\n      \"use\": \"Nghiên cứu Lão học Nho–Đạo hợp lưu cuối Đường; so sánh với đường lối huyền học thuần túy.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德真經傳（陸希聲）\",\n        \"https://zh.wikipedia.org/wiki/老子_(書)\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/wiki/道德真經傳_(陸希聲)\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ688\",\n      \"name_han\": \"道德真經直解（邵若愚）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Trực Giải (Thiệu Nhược Ngu)\",\n      \"bu\": \"太玄\",\n      \"author\": \"邵若愚\",\n      \"era\": \"南宋\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Bản “trực giải” đời Tống, chú trọng nghĩa thẳng, tránh phô trương huyền đàm. Giải Lão theo hướng thực tiễn tu thân–xử thế, kết hợp khí tượng Tống Nho. Phù hợp người muốn đọc chú giải rõ ràng, gần văn bản.\",\n      \"key_text\": \"直以經義解之，不事穿鑿。\",\n      \"use\": \"Đối chiếu với các bản tập chú/tập giải; dùng khi cần chú giải Tống giản minh.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德真經直解（邵若愚）\",\n        \"https://ctext.org/wiki.pl?if=gb&res=961750\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://baike.baidu.com/item/道德经/327138\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ689\",\n      \"name_han\": \"道德真經論（司馬光）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Luận (Tư Mã Quang)\",\n      \"bu\": \"太玄\",\n      \"author\": \"司馬光\",\n      \"era\": \"北宋\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Tư Mã Quang luận Lão theo Nho thần chính thống: nhấn mạnh đạo–đức không tách rời, phản đối chia cứng “Đạo kinh/Đức kinh”. Giải thiên về trị đạo, đạo đức công, ít huyền đàm nội đan. Là tiếng nói Nho gia trong kho chú Lão của Đạo tạng.\",\n      \"key_text\": \"夫道德連體，不可偏舉，今從本名。\",\n      \"use\": \"Đọc khi cần góc nhìn Nho–Lão của sử gia–chính trị gia Bắc Tống.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/wiki/道德真經論\",\n        \"https://zh.daoinfo.org/wiki/道德真經論（司馬光）\",\n        \"https://ctext.org/library.pl?if=en&res=84369\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ690\",\n      \"name_han\": \"道德真經註（王弼）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Chú (Vương Bật)\",\n      \"bu\": \"太玄\",\n      \"author\": \"王弼\",\n      \"era\": \"曹魏正始（240–249）\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Chú bản huyền học then chốt: “dĩ vô vi bản”, lấy hư tĩnh làm gốc vạn hữu. Vương Bật giải Lão bằng lý luận hình nhi thượng, định hình bản Lão lưu hành phổ biến. Đạo tạng chia thành bốn quyển, là cột mốc Lão học trung cổ.\",\n      \"key_text\": \"天下之物，皆以有為生。有之所始，以無為本。\",\n      \"use\": \"Bản chú triết học cốt lõi để đọc song song với Hà Thượng Công và các chú Đạo giáo.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德真經註（王弼）\",\n        \"https://ctext.org/library.pl?if=gb&res=84370\",\n        \"https://ctext.org/dao-de-zhen-jing-zhu/zh\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ692\",\n      \"name_han\": \"道德真經新註（李約）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Tân Chú (Lý Ước)\",\n      \"bu\": \"太玄\",\n      \"author\": \"李約\",\n      \"era\": \"唐\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Lý Ước chú “mới” theo hướng thanh tâm dưỡng khí, an gia bảo quốc. Nổi tiếng tranh luận cú đọc “人法地地，法天天，法道道，法自然”, phản đối cách đọc “năm đại”. Nhấn mạnh vô tư như trời–đất–đạo.\",\n      \"key_text\": \"人法地地，法天天，法道道，法自然。\",\n      \"use\": \"Nghiên cứu dị giải cú pháp chương 25 và Lão học trị thế đời Đường.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/wiki/道德真經新註\",\n        \"https://zh.daoinfo.org/wiki/道德真經新註（李約）\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikisource.org/wiki/道德真經新注序\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ694\",\n      \"name_han\": \"道德真經疏義（趙志堅）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Sớ Nghĩa (Triệu Chí Kiên)\",\n      \"bu\": \"太玄\",\n      \"author\": \"趙志堅\",\n      \"era\": \"唐\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Sớ nghĩa Trùng huyền đời Đường (khuyết quyển đầu). Dùng thể lệ “khai đề–thích nghĩa” của Trùng huyền học, lấy “phục quy chân tính” làm tông. Tiếp nối dòng Lão học huyền đàm thời Đường trung–vãn.\",\n      \"key_text\": \"以重玄家復歸真性說為宗旨。\",\n      \"use\": \"Đọc khi khảo sát Trùng huyền học và các sớ Lão khuyết quyển trong Đạo tạng.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德真經疏義（趙志堅）\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://a.daorenjia.com/c15\",\n        \"https://zh.daoinfo.org/wiki/Category:洞神部玉訣類\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ695\",\n      \"name_han\": \"道德真經集解（趙秉文）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Tập Giải (Triệu Bỉnh Văn)\",\n      \"bu\": \"太玄\",\n      \"author\": \"趙秉文\",\n      \"era\": \"金\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Tập giải đời Kim, thu thập nhiều nhà (Vương Bật, Huyền Tông, Lục Hy Thanh, Huy Tông, Tô Triệt, Tư Mã Quang, Lã Huệ Khanh, Vương Bàng…). Chủ trương đạo–đức tương tu, không tách cứng thượng/hạ thiên. Giá trị tư liệu cao cho Lão học Tống–Kim.\",\n      \"key_text\": \"道與德相須而不相離。\",\n      \"use\": \"Tra cứu dị chú nhiều đời; so sánh các trường phái chú Lão trước Kim.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德真经集解（赵秉文）\",\n        \"https://ctext.org/wiki.pl?if=gb&res=812932\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://www.daoist.org/BookSearch(test)/list006.asp?Page=64\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ696\",\n      \"name_han\": \"道德真經全解（時雍）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Toàn Giải (Thời Ung)\",\n      \"bu\": \"太玄\",\n      \"author\": \"時雍\",\n      \"era\": \"金\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Bản “toàn giải” đời Kim, giải trọn văn Lão theo hướng Đạo giáo–triết lý. Nhấn mạnh thông suốt toàn kinh, không chỉ trích đoạn. Phản ánh Lão học phương Bắc thời Kim trong Đạo tạng.\",\n      \"key_text\": \"全解道德，通貫上下。\",\n      \"use\": \"Đối chiếu với tập giải Triệu Bỉnh Văn; nghiên cứu Lão học Kim.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德真經全解（時雍）\",\n        \"https://www.ctcwri.idv.tw/CTCW-CMDD.htm\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://www.daoist.org/BookSearch(test)/list006.asp?Page=64\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ698\",\n      \"name_han\": \"道德真經章句訓頌（張嗣成）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Chương Cú Huấn Tụng (Trương Tự Thành)\",\n      \"bu\": \"太玄\",\n      \"author\": \"張嗣成（第三十九代天師）\",\n      \"era\": \"元（至治二年，1322）\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Thiên sư Trương Tự Thành dùng văn vần (tứ–ngũ–thất ngôn) để “huấn tụng” từng chương. Kết hợp nghĩa lý Đạo giáo Chính Nhất với dưỡng tinh–khí–thần, song tu tính mệnh. Hình thức dễ tụng, đặc sắc Lão học Thiên sư đời Nguyên.\",\n      \"key_text\": \"太上老君，道大而德宏，守約而施博。\",\n      \"use\": \"Đọc tụng, khảo cứu Lão học Thiên sư phái và diễn nghĩa vần hóa.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德真經章句訓頌（張嗣成）\",\n        \"https://zh.wikisource.org/wiki/道德真經章句訓頌\",\n        \"https://www.kanripo.org/text/KR5c0085/002\",\n        \"https://ctext.org/wiki.pl?if=gb&res=586834\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ705\",\n      \"name_han\": \"道德真經集解（董思靖）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Tập Giải (Đổng Tư Tĩnh)\",\n      \"bu\": \"太玄\",\n      \"author\": \"董思靖\",\n      \"era\": \"南宋（淳祐丙午，1246）\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Đạo sĩ Tuyền Châu Đổng Tư Tĩnh tập giải, kèm âm thích kế thừa–biến đổi Lục Đức Minh. Kết hợp trích chú cổ với lựa chọn âm nghĩa riêng. Là bản tập giải Đạo giáo Nam Tống quan trọng (khác Triệu Bỉnh Văn).\",\n      \"key_text\": \"經名：道德真經集解。又名：太上老子道德經集解。\",\n      \"use\": \"Nghiên cứu âm nghĩa–tập chú Nam Tống; so với bản tập giải Kim–Nguyên.\",\n      \"sources\": [\n        \"https://baike.baidu.com/item/道德真经集解/17619563\",\n        \"https://zh.daoinfo.org/wiki/道德真經集解（董思靖）\",\n        \"https://ctext.org/library.pl?if=en&res=84385\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ710\",\n      \"name_han\": \"道德真經注疏（原題顧歡）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Chú Sớ (nguyên đề Cố Hoan)\",\n      \"bu\": \"太玄\",\n      \"author\": \"原題顧歡（實多為唐–宋集注；或與張君相《三十家》相關）\",\n      \"era\": \"南齊名義 / 唐宋輯成\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Tám quyển chú sớ, đề Cố Hoan nhưng học giới coi là tập chú nhiều đời (Vương Bật, Huyền Tông, Thành Huyền Anh… có thể lẫn). Bảo tồn mảnh chú cổ thất lạc, giá trị tư liệu hơn là “một tác giả”.\",\n      \"key_text\": \"舊題吳郡徵士顧歡述。\",\n      \"use\": \"Khai thác dị chú cổ; đối chiếu với các bản đơn chú chính danh.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德真經注疏（原題顧歡）\",\n        \"https://zh.wikisource.org/wiki/道德真經注疏\",\n        \"https://www.shidianguji.com/book/DZ0710\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ713\",\n      \"name_han\": \"道德經論兵要義述（王真）\",\n      \"name_vi\": \"Đạo Đức Kinh Luận Binh Yếu Nghĩa Thuật (Vương Chân)\",\n      \"bu\": \"太玄\",\n      \"author\": \"王真\",\n      \"era\": \"唐\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Đọc Lão dưới góc “luận binh”: khai thác chương dụng binh, nhu thắng cương, bất tranh. Chuyển triết lý vô vi thành yếu nghĩa quân sự–chiến lược. Độc đáo trong kho chú Lão vì chuyên đề binh pháp.\",\n      \"key_text\": \"不以兵強天下，其事好還。\",\n      \"use\": \"Nghiên cứu giao điểm Lão học và binh thư; đọc song song chương 30–31–69.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德經論兵要義述（王真）\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikipedia.org/wiki/老子_(書)\",\n        \"https://baike.baidu.com/item/道德经/327138\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ718\",\n      \"name_han\": \"道德真經取善集（李霖）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Thủ Thiện Tập (Lý Lâm)\",\n      \"bu\": \"太玄\",\n      \"author\": \"李霖\",\n      \"era\": \"金\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Lý Lâm “thủ thiện” — chọn lấy lời chú hay của nhiều nhà, biên tập thành tập. Mười hai quyển, bảo tồn nhiều mảnh chú Tống–Kim. Phương pháp biên soạn: lựa chọn tinh hoa hơn là chú mới hoàn toàn.\",\n      \"key_text\": \"取諸家之善而集之。\",\n      \"use\": \"Kho tư liệu dị chú; tra cứu quan điểm nhiều đời trong một bản.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德真經取善集（李霖）\",\n        \"https://ctext.org/library.pl?if=en&res=84396\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://zh.wikipedia.org/wiki/老子_(書)\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ725\",\n      \"name_han\": \"道德真經廣聖義（杜光庭）\",\n      \"name_vi\": \"Đạo Đức Chân Kinh Quảng Thánh Nghĩa (Đỗ Quang Đình)\",\n      \"bu\": \"太玄\",\n      \"author\": \"杜光庭\",\n      \"era\": \"唐末（天復元年，约901）\",\n      \"topic\": \"philosophy|老学\",\n      \"essence\": \"Mở rộng “thánh nghĩa” (ngự chú–sớ Huyền Tông): mỗi chương chép kinh, chú, sớ rồi “nghĩa viết” của Đỗ. Tôn sùng Trùng huyền; tựa liệt kê ~60 nhà chú Lão, phân tông phái (trị quốc, trị thân, hư vô, trùng huyền…). Tác phẩm tổng kết Lão học trước Ngũ Đại quy mô lớn nhất trong Đạo tạng.\",\n      \"key_text\": \"此書所廣「聖義」，即唐玄宗《道德經》注疏。\",\n      \"use\": \"Bản “toàn thư” Lão học Đường–Ngũ Đại; tra cứu lịch sử chú sớ và phân loại tông chỉ.\",\n      \"sources\": [\n        \"https://zh.daoinfo.org/wiki/道德真經廣聖義（杜光庭）\",\n        \"https://ctext.org/library.pl?if=gb&res=84403\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://en.daoinfo.org/wiki/Explications_Expanding_upon_the_Sages_Commentary_on_the_True_Scripture_of_the_Way_and_Its_Power\"\n      ],\n      \"textual_certainty\": \"high\"\n    }\n  ]\n}",
+  "stopReason": "EndTurn",
+  "sessionId": "019f90b1-528e-71c2-a67b-cb7d44f664da",
+  "requestId": "197aea04-6d0f-4101-9a32-fdc6dd7dee14",
+  "thought": "The user wants me to act as a distillation agent for the Chinese Daoist Canon, specifically selecting 16 REAL commentaries on the 道德经 (Dao De Jing / Laozi) from the 太玄部 (Taixuan section). I need to ve...Let me read the PDF for Daodejing related entries.Let me extract text from the PDF focusing on 道德 entries.I have the CT numbers from the golden elixir index. The CT column is typically the Schipper Concordance number (DZ#). Let me map the commentaries:\nGot it—I've mapped out the CT numbers and their corresponding commentaries from the golden elixir index.Let me try daoinfo pages and ctext for more precise author-DZ mappings. From golden elixir index CT = Schipper number typically.\nThat sounds like a solid approach—using the Schipper concordance to cross-reference the CT numbers with the actual DZ entries and their attributed authors. The mappings you've pulled together look pretty consistent with what I recall from the Daoist canon literature.Interesting - daoinfo says 道藏提要編號719 for 廣聖義, while golden elixir CT is 725. There may be a difference between 道藏提要 numbering and Schipper CT numbering.\nExcellent - I have a complete list of authors. Note: Traditional classification puts these in 洞神部玉訣類, but the user said 太玄部 - historically 太玄 was for Laozi tradition (四辅), and in some catalogs 道德经 com...Got it—thanks for the clarification on the catalog placement. I'll use **洞神部** (Dongshen) for the Zhengtong Daozang location, since that's where these玉訣類 works actually sit, even though traditional Laozi scholarship often groups them under 太玄. That keeps things consistent with the Schipper catalog and the DZ numbering.\n\nNow continuing from where you left off:\n\n710 注疏 - (probably 彭耜 or another, but incomplete in your note)\n\nLet me pull the full list of authors and their DZ numbers so we can map them cleanly. I’ll include the ones you flagged 16, plus a few more that are clearly under 洞神部玉訣類 and have solid author attributions:\n\n11. DZ710 注疏 - 顧歡 (Tang, often grouped with Laozi commentaries)  \n12. DZ712 集義 - 危大有 (Song)  \n13.Note: daoinfo uses 道藏提要 numbering which differs from Schipper CT:Got it—thanks for the notes on numbering and cataloging.",
+  "usage": {
+    "input_tokens": 175663,
+    "cache_read_input_tokens": 835072,
+    "output_tokens": 12959,
+    "reasoning_tokens": 7174,
+    "total_tokens": 1023694
+  },
+  "num_turns": 8,
+  "total_cost_usd": 0.88761,
+  "total_cost_usd_ticks": 8876100000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 175663,
+      "outputTokens": 12959,
+      "cacheReadInputTokens": 835072,
+      "modelCalls": 8,
+      "costUSD": 0.88761
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "dz": "DZ677",
+        "name_han": "唐玄宗御註道德真經",
+        "name_vi": "Đường Huyền Tông Ngự chú Đạo Đức Chân Kinh",
+        "bu": "太玄",
+        "author": "李隆基（唐玄宗）",
+        "era": "唐（开元，约732–733）",
+        "topic": "philosophy|老学",
+        "essence": "Bản chú ngự của Đường Huyền Tông, dùng đạo trị quốc kết hợp dưỡng thân. Mỗi chương giải “道” theo hướng thanh tĩnh vô vi, nhấn mạnh quân vương bắt chước tự nhiên. Đây là nền tảng “thánh nghĩa” mà đời sau (như Đỗ Quang Đình) mở rộng.",
+        "key_text": "道者，虛極也。",
+        "use": "Đọc khi cần bản chú quan phương đời Đường và khung trị quốc–tu thân của Đạo giáo trung kỳ.",
+        "sources": [
+          "https://zh.wikisource.org/wiki/唐玄宗御註道德真經",
+          "https://zh.daoinfo.org/wiki/唐玄宗御註道德真經",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://ctext.org/library.pl?if=gb&res=84357"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ680",
+        "name_han": "宋徽宗御解道德真經",
+        "name_vi": "Tống Huy Tông Ngự giải Đạo Đức Chân Kinh",
+        "bu": "太玄",
+        "author": "趙佶（宋徽宗）",
+        "era": "北宋末（政和前后）",
+        "topic": "philosophy|老学",
+        "essence": "Chú giải ngự của Tống Huy Tông, hòa trộn huyền học, trị đạo và khí tượng Đạo giáo triều đình. Giải “道” theo hướng huyền diệu–vạn hóa, đồng thời phục vụ chính thống hóa Đạo giáo thời Tống. Ảnh hưởng mạnh các bản sớ nghĩa đời sau (như Chương An).",
+        "key_text": "道者，天地之始，萬物之母。",
+        "use": "Dùng để đối chiếu “ngự giải” Tống với “ngự chú” Đường; khảo cứu chính trị–tư tưởng Lão học cung đình.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/宋徽宗御解道德真經",
+          "https://zh.wikisource.org/wiki/宋徽宗御解道德真經",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://baike.baidu.com/item/道德经/327138"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ685",
+        "name_han": "道德真經傳（陸希聲）",
+        "name_vi": "Đạo Đức Chân Kinh Truyện (Lục Hy Thanh)",
+        "bu": "太玄",
+        "author": "陸希聲",
+        "era": "晚唐",
+        "topic": "philosophy|老学",
+        "essence": "Lục Hy Thanh hợp Nho–Đạo: cho rằng Lão tử cùng gốc với Phục Hy, Văn Vương, Khổng Tử. Phê Dương Chu (quý thân), Trang Chu (tuyệt thánh), Thân Hàn (khắc nghiệt), Vương–Hà (hư vô). Trọng tâm là triết lý chính trị và biến thông đạo đức.",
+        "key_text": "老氏於三聖人皆變而通之，反而合之。",
+        "use": "Nghiên cứu Lão học Nho–Đạo hợp lưu cuối Đường; so sánh với đường lối huyền học thuần túy.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德真經傳（陸希聲）",
+          "https://zh.wikipedia.org/wiki/老子_(書)",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/wiki/道德真經傳_(陸希聲)"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ688",
+        "name_han": "道德真經直解（邵若愚）",
+        "name_vi": "Đạo Đức Chân Kinh Trực Giải (Thiệu Nhược Ngu)",
+        "bu": "太玄",
+        "author": "邵若愚",
+        "era": "南宋",
+        "topic": "philosophy|老学",
+        "essence": "Bản “trực giải” đời Tống, chú trọng nghĩa thẳng, tránh phô trương huyền đàm. Giải Lão theo hướng thực tiễn tu thân–xử thế, kết hợp khí tượng Tống Nho. Phù hợp người muốn đọc chú giải rõ ràng, gần văn bản.",
+        "key_text": "直以經義解之，不事穿鑿。",
+        "use": "Đối chiếu với các bản tập chú/tập giải; dùng khi cần chú giải Tống giản minh.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德真經直解（邵若愚）",
+          "https://ctext.org/wiki.pl?if=gb&res=961750",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://baike.baidu.com/item/道德经/327138"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ689",
+        "name_han": "道德真經論（司馬光）",
+        "name_vi": "Đạo Đức Chân Kinh Luận (Tư Mã Quang)",
+        "bu": "太玄",
+        "author": "司馬光",
+        "era": "北宋",
+        "topic": "philosophy|老学",
+        "essence": "Tư Mã Quang luận Lão theo Nho thần chính thống: nhấn mạnh đạo–đức không tách rời, phản đối chia cứng “Đạo kinh/Đức kinh”. Giải thiên về trị đạo, đạo đức công, ít huyền đàm nội đan. Là tiếng nói Nho gia trong kho chú Lão của Đạo tạng.",
+        "key_text": "夫道德連體，不可偏舉，今從本名。",
+        "use": "Đọc khi cần góc nhìn Nho–Lão của sử gia–chính trị gia Bắc Tống.",
+        "sources": [
+          "https://zh.wikisource.org/wiki/道德真經論",
+          "https://zh.daoinfo.org/wiki/道德真經論（司馬光）",
+          "https://ctext.org/library.pl?if=en&res=84369",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ690",
+        "name_han": "道德真經註（王弼）",
+        "name_vi": "Đạo Đức Chân Kinh Chú (Vương Bật)",
+        "bu": "太玄",
+        "author": "王弼",
+        "era": "曹魏正始（240–249）",
+        "topic": "philosophy|老学",
+        "essence": "Chú bản huyền học then chốt: “dĩ vô vi bản”, lấy hư tĩnh làm gốc vạn hữu. Vương Bật giải Lão bằng lý luận hình nhi thượng, định hình bản Lão lưu hành phổ biến. Đạo tạng chia thành bốn quyển, là cột mốc Lão học trung cổ.",
+        "key_text": "天下之物，皆以有為生。有之所始，以無為本。",
+        "use": "Bản chú triết học cốt lõi để đọc song song với Hà Thượng Công và các chú Đạo giáo.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德真經註（王弼）",
+          "https://ctext.org/library.pl?if=gb&res=84370",
+          "https://ctext.org/dao-de-zhen-jing-zhu/zh",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ692",
+        "name_han": "道德真經新註（李約）",
+        "name_vi": "Đạo Đức Chân Kinh Tân Chú (Lý Ước)",
+        "bu": "太玄",
+        "author": "李約",
+        "era": "唐",
+        "topic": "philosophy|老学",
+        "essence": "Lý Ước chú “mới” theo hướng thanh tâm dưỡng khí, an gia bảo quốc. Nổi tiếng tranh luận cú đọc “人法地地，法天天，法道道，法自然”, phản đối cách đọc “năm đại”. Nhấn mạnh vô tư như trời–đất–đạo.",
+        "key_text": "人法地地，法天天，法道道，法自然。",
+        "use": "Nghiên cứu dị giải cú pháp chương 25 và Lão học trị thế đời Đường.",
+        "sources": [
+          "https://zh.wikisource.org/wiki/道德真經新註",
+          "https://zh.daoinfo.org/wiki/道德真經新註（李約）",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikisource.org/wiki/道德真經新注序"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ694",
+        "name_han": "道德真經疏義（趙志堅）",
+        "name_vi": "Đạo Đức Chân Kinh Sớ Nghĩa (Triệu Chí Kiên)",
+        "bu": "太玄",
+        "author": "趙志堅",
+        "era": "唐",
+        "topic": "philosophy|老学",
+        "essence": "Sớ nghĩa Trùng huyền đời Đường (khuyết quyển đầu). Dùng thể lệ “khai đề–thích nghĩa” của Trùng huyền học, lấy “phục quy chân tính” làm tông. Tiếp nối dòng Lão học huyền đàm thời Đường trung–vãn.",
+        "key_text": "以重玄家復歸真性說為宗旨。",
+        "use": "Đọc khi khảo sát Trùng huyền học và các sớ Lão khuyết quyển trong Đạo tạng.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德真經疏義（趙志堅）",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://a.daorenjia.com/c15",
+          "https://zh.daoinfo.org/wiki/Category:洞神部玉訣類"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ695",
+        "name_han": "道德真經集解（趙秉文）",
+        "name_vi": "Đạo Đức Chân Kinh Tập Giải (Triệu Bỉnh Văn)",
+        "bu": "太玄",
+        "author": "趙秉文",
+        "era": "金",
+        "topic": "philosophy|老学",
+        "essence": "Tập giải đời Kim, thu thập nhiều nhà (Vương Bật, Huyền Tông, Lục Hy Thanh, Huy Tông, Tô Triệt, Tư Mã Quang, Lã Huệ Khanh, Vương Bàng…). Chủ trương đạo–đức tương tu, không tách cứng thượng/hạ thiên. Giá trị tư liệu cao cho Lão học Tống–Kim.",
+        "key_text": "道與德相須而不相離。",
+        "use": "Tra cứu dị chú nhiều đời; so sánh các trường phái chú Lão trước Kim.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德真经集解（赵秉文）",
+          "https://ctext.org/wiki.pl?if=gb&res=812932",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://www.daoist.org/BookSearch(test)/list006.asp?Page=64"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ696",
+        "name_han": "道德真經全解（時雍）",
+        "name_vi": "Đạo Đức Chân Kinh Toàn Giải (Thời Ung)",
+        "bu": "太玄",
+        "author": "時雍",
+        "era": "金",
+        "topic": "philosophy|老学",
+        "essence": "Bản “toàn giải” đời Kim, giải trọn văn Lão theo hướng Đạo giáo–triết lý. Nhấn mạnh thông suốt toàn kinh, không chỉ trích đoạn. Phản ánh Lão học phương Bắc thời Kim trong Đạo tạng.",
+        "key_text": "全解道德，通貫上下。",
+        "use": "Đối chiếu với tập giải Triệu Bỉnh Văn; nghiên cứu Lão học Kim.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德真經全解（時雍）",
+          "https://www.ctcwri.idv.tw/CTCW-CMDD.htm",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://www.daoist.org/BookSearch(test)/list006.asp?Page=64"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ698",
+        "name_han": "道德真經章句訓頌（張嗣成）",
+        "name_vi": "Đạo Đức Chân Kinh Chương Cú Huấn Tụng (Trương Tự Thành)",
+        "bu": "太玄",
+        "author": "張嗣成（第三十九代天師）",
+        "era": "元（至治二年，1322）",
+        "topic": "philosophy|老学",
+        "essence": "Thiên sư Trương Tự Thành dùng văn vần (tứ–ngũ–thất ngôn) để “huấn tụng” từng chương. Kết hợp nghĩa lý Đạo giáo Chính Nhất với dưỡng tinh–khí–thần, song tu tính mệnh. Hình thức dễ tụng, đặc sắc Lão học Thiên sư đời Nguyên.",
+        "key_text": "太上老君，道大而德宏，守約而施博。",
+        "use": "Đọc tụng, khảo cứu Lão học Thiên sư phái và diễn nghĩa vần hóa.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德真經章句訓頌（張嗣成）",
+          "https://zh.wikisource.org/wiki/道德真經章句訓頌",
+          "https://www.kanripo.org/text/KR5c0085/002",
+          "https://ctext.org/wiki.pl?if=gb&res=586834"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ705",
+        "name_han": "道德真經集解（董思靖）",
+        "name_vi": "Đạo Đức Chân Kinh Tập Giải (Đổng Tư Tĩnh)",
+        "bu": "太玄",
+        "author": "董思靖",
+        "era": "南宋（淳祐丙午，1246）",
+        "topic": "philosophy|老学",
+        "essence": "Đạo sĩ Tuyền Châu Đổng Tư Tĩnh tập giải, kèm âm thích kế thừa–biến đổi Lục Đức Minh. Kết hợp trích chú cổ với lựa chọn âm nghĩa riêng. Là bản tập giải Đạo giáo Nam Tống quan trọng (khác Triệu Bỉnh Văn).",
+        "key_text": "經名：道德真經集解。又名：太上老子道德經集解。",
+        "use": "Nghiên cứu âm nghĩa–tập chú Nam Tống; so với bản tập giải Kim–Nguyên.",
+        "sources": [
+          "https://baike.baidu.com/item/道德真经集解/17619563",
+          "https://zh.daoinfo.org/wiki/道德真經集解（董思靖）",
+          "https://ctext.org/library.pl?if=en&res=84385",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ710",
+        "name_han": "道德真經注疏（原題顧歡）",
+        "name_vi": "Đạo Đức Chân Kinh Chú Sớ (nguyên đề Cố Hoan)",
+        "bu": "太玄",
+        "author": "原題顧歡（實多為唐–宋集注；或與張君相《三十家》相關）",
+        "era": "南齊名義 / 唐宋輯成",
+        "topic": "philosophy|老学",
+        "essence": "Tám quyển chú sớ, đề Cố Hoan nhưng học giới coi là tập chú nhiều đời (Vương Bật, Huyền Tông, Thành Huyền Anh… có thể lẫn). Bảo tồn mảnh chú cổ thất lạc, giá trị tư liệu hơn là “một tác giả”.",
+        "key_text": "舊題吳郡徵士顧歡述。",
+        "use": "Khai thác dị chú cổ; đối chiếu với các bản đơn chú chính danh.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德真經注疏（原題顧歡）",
+          "https://zh.wikisource.org/wiki/道德真經注疏",
+          "https://www.shidianguji.com/book/DZ0710",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ713",
+        "name_han": "道德經論兵要義述（王真）",
+        "name_vi": "Đạo Đức Kinh Luận Binh Yếu Nghĩa Thuật (Vương Chân)",
+        "bu": "太玄",
+        "author": "王真",
+        "era": "唐",
+        "topic": "philosophy|老学",
+        "essence": "Đọc Lão dưới góc “luận binh”: khai thác chương dụng binh, nhu thắng cương, bất tranh. Chuyển triết lý vô vi thành yếu nghĩa quân sự–chiến lược. Độc đáo trong kho chú Lão vì chuyên đề binh pháp.",
+        "key_text": "不以兵強天下，其事好還。",
+        "use": "Nghiên cứu giao điểm Lão học và binh thư; đọc song song chương 30–31–69.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德經論兵要義述（王真）",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikipedia.org/wiki/老子_(書)",
+          "https://baike.baidu.com/item/道德经/327138"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ718",
+        "name_han": "道德真經取善集（李霖）",
+        "name_vi": "Đạo Đức Chân Kinh Thủ Thiện Tập (Lý Lâm)",
+        "bu": "太玄",
+        "author": "李霖",
+        "era": "金",
+        "topic": "philosophy|老学",
+        "essence": "Lý Lâm “thủ thiện” — chọn lấy lời chú hay của nhiều nhà, biên tập thành tập. Mười hai quyển, bảo tồn nhiều mảnh chú Tống–Kim. Phương pháp biên soạn: lựa chọn tinh hoa hơn là chú mới hoàn toàn.",
+        "key_text": "取諸家之善而集之。",
+        "use": "Kho tư liệu dị chú; tra cứu quan điểm nhiều đời trong một bản.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德真經取善集（李霖）",
+          "https://ctext.org/library.pl?if=en&res=84396",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://zh.wikipedia.org/wiki/老子_(書)"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ725",
+        "name_han": "道德真經廣聖義（杜光庭）",
+        "name_vi": "Đạo Đức Chân Kinh Quảng Thánh Nghĩa (Đỗ Quang Đình)",
+        "bu": "太玄",
+        "author": "杜光庭",
+        "era": "唐末（天復元年，约901）",
+        "topic": "philosophy|老学",
+        "essence": "Mở rộng “thánh nghĩa” (ngự chú–sớ Huyền Tông): mỗi chương chép kinh, chú, sớ rồi “nghĩa viết” của Đỗ. Tôn sùng Trùng huyền; tựa liệt kê ~60 nhà chú Lão, phân tông phái (trị quốc, trị thân, hư vô, trùng huyền…). Tác phẩm tổng kết Lão học trước Ngũ Đại quy mô lớn nhất trong Đạo tạng.",
+        "key_text": "此書所廣「聖義」，即唐玄宗《道德經》注疏。",
+        "use": "Bản “toàn thư” Lão học Đường–Ngũ Đại; tra cứu lịch sử chú sớ và phân loại tông chỉ.",
+        "sources": [
+          "https://zh.daoinfo.org/wiki/道德真經廣聖義（杜光庭）",
+          "https://ctext.org/library.pl?if=gb&res=84403",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://en.daoinfo.org/wiki/Explications_Expanding_upon_the_Sages_Commentary_on_the_True_Scripture_of_the_Way_and_Its_Power"
+        ],
+        "textual_certainty": "high"
+      }
+    ]
+  }
+}

@@ -1,0 +1,314 @@
+[
+ {
+  "title": "太上老君内日用妙经",
+  "current_dz": "DZ645",
+  "correct_dz": "DZ645",
+  "note": "Schipper/Komjathy: 内日用=DZ645; 外日用=DZ646."
+ },
+ {
+  "title": "太上说长生益算妙经",
+  "current_dz": "DZ645",
+  "correct_dz": "DZ650",
+  "note": "Full title 太上老君说长生益算妙经; Schipper/Komjathy DZ650."
+ },
+ {
+  "title": "太平经",
+  "current_dz": "DZ1101",
+  "correct_dz": "DZ1101",
+  "note": "Schipper assigns Taiping jing as DZ1101."
+ },
+ {
+  "title": "太平经钞",
+  "current_dz": "DZ1101",
+  "correct_dz": "DZ1101",
+  "note": "Schipper collapses 钞 with 经 as one number (DZ1101); not a separate CT#."
+ },
+ {
+  "title": "钟吕传道集（真仙传道集）",
+  "current_dz": "DZ263",
+  "correct_dz": "DZ263",
+  "note": "Only as 修真十书 vols.14–16 (DZ263); no independent CT#."
+ },
+ {
+  "title": "修真十书",
+  "current_dz": "DZ263",
+  "correct_dz": "DZ263",
+  "note": "Anthology DZ263 (道藏提要 often 262; Schipper 263)."
+ },
+ {
+  "title": "关尹子（无上妙道文始真经）",
+  "current_dz": "DZ662",
+  "correct_dz": "DZ667",
+  "note": "无上妙道文始真经=DZ667 (Komjathy)."
+ },
+ {
+  "title": "太上老君说报父母恩重经",
+  "current_dz": "DZ662",
+  "correct_dz": "DZ662",
+  "note": "Komjathy: 太上老君说报父母恩重经=DZ662."
+ },
+ {
+  "title": "九天应元雷声普化天尊玉枢宝经（玉枢经）",
+  "current_dz": "DZ16",
+  "correct_dz": "DZ16",
+  "note": "玉枢宝经=DZ16 (Schipper/Komjathy)."
+ },
+ {
+  "title": "太上紫微玄都雷霆玉经",
+  "current_dz": "DZ16",
+  "correct_dz": "DZ15",
+  "note": "Full 无上九霄…紫微玄都雷霆玉经=DZ15; 道藏提要15."
+ },
+ {
+  "title": "道法会元",
+  "current_dz": "DZ1220",
+  "correct_dz": "DZ1220",
+  "note": "Standard Schipper number for the great leifa compendium."
+ },
+ {
+  "title": "火师汪真君雷霆奥旨",
+  "current_dz": "DZ1220",
+  "correct_dz": "DZ1220",
+  "note": "Section inside 道法会元 (DZ1220); not a separate CT title."
+ },
+ {
+  "title": "元始五老赤书玉篇真文天书经",
+  "current_dz": "DZ22",
+  "correct_dz": "DZ22",
+  "note": "Lingbao chishu yupian; Schipper DZ22."
+ },
+ {
+  "title": "太上赤书玉篇真文",
+  "current_dz": "DZ22",
+  "correct_dz": "DZ22",
+  "note": "Alternate short name of the same DZ22 scripture (赤书真文)."
+ },
+ {
+  "title": "太上老君说百病崇百药经",
+  "current_dz": "DZ188",
+  "correct_dz": "null",
+  "note": "Preserved mainly via 云笈七签; not independent Zhengtong CT entry."
+ },
+ {
+  "title": "玄都律文",
+  "current_dz": "DZ188",
+  "correct_dz": "DZ188",
+  "note": "Komjathy: 玄都律文=DZ188."
+ },
+ {
+  "title": "洞玄灵宝定观经",
+  "current_dz": "DZ400",
+  "correct_dz": "DZ400",
+  "note": "Pregadio/Schipper index: 定观经=DZ400."
+ },
+ {
+  "title": "洞玄灵宝定观经注",
+  "current_dz": "DZ400",
+  "correct_dz": "DZ401",
+  "note": "定观经注=DZ401 (Pregadio index)."
+ },
+ {
+  "title": "太上老君混元三部符",
+  "current_dz": "DZ673",
+  "correct_dz": "DZ673",
+  "note": "Komjathy: 混元三部符=DZ673."
+ },
+ {
+  "title": "无上三元镇宅灵籙",
+  "current_dz": "DZ673",
+  "correct_dz": "DZ674",
+  "note": "Komjathy/shidianguji: 镇宅灵籙=DZ674."
+ },
+ {
+  "title": "磻溪集（长春子磻溪集）",
+  "current_dz": "DZ1146",
+  "correct_dz": "DZ1159",
+  "note": "Qiu Chuji Panxi ji=DZ1159 (Komjathy)."
+ },
+ {
+  "title": "葆光集",
+  "current_dz": "DZ1146",
+  "correct_dz": "DZ1146",
+  "note": "Yin Zhiping Baoguang ji=DZ1146."
+ },
+ {
+  "title": "云光集",
+  "current_dz": "DZ1153",
+  "correct_dz": "DZ1152",
+  "note": "Wang Chuyi Yunguang ji=DZ1152."
+ },
+ {
+  "title": "重陽全真集",
+  "current_dz": "DZ1153",
+  "correct_dz": "DZ1153",
+  "note": "Wang Zhe Chongyang quanzhen ji=DZ1153."
+ },
+ {
+  "title": "道典论",
+  "current_dz": "DZ1132",
+  "correct_dz": "DZ1130",
+  "note": "Komjathy: 道典论=DZ1130."
+ },
+ {
+  "title": "上清道类事相",
+  "current_dz": "DZ1132",
+  "correct_dz": "DZ1132",
+  "note": "Wang Xuanhe Shangqing daolei shixiang=DZ1132."
+ },
+ {
+  "title": "太上九真明科",
+  "current_dz": "DZ1400",
+  "correct_dz": "DZ1409",
+  "note": "Schipper/Komjathy/academic CT: 九真明科=DZ1409."
+ },
+ {
+  "title": "上清黄庭养神经",
+  "current_dz": "DZ1400",
+  "correct_dz": "DZ1400",
+  "note": "Komjathy: 上清黄庭养神经=DZ1400."
+ },
+ {
+  "title": "太上说东斗护命妙经",
+  "current_dz": "DZ629",
+  "correct_dz": "DZ625",
+  "note": "太上说东斗主算护命妙经=DZ625."
+ },
+ {
+  "title": "太上北斗二十八章经",
+  "current_dz": "DZ629",
+  "correct_dz": "DZ629",
+  "note": "Komjathy: 北斗二十八章经=DZ629."
+ },
+ {
+  "title": "太上说西斗记名护身妙经",
+  "current_dz": "DZ630",
+  "correct_dz": "DZ626",
+  "note": "Komjathy/crta: 西斗记名护身妙经=DZ626."
+ },
+ {
+  "title": "太上老君说救生真经",
+  "current_dz": "DZ630",
+  "correct_dz": "DZ630",
+  "note": "Komjathy ZH index: 老君说救生真经=DZ630."
+ },
+ {
+  "title": "太上老君说上七元真人金轩玉字经",
+  "current_dz": "DZ660",
+  "correct_dz": "null",
+  "note": "No verified independent Schipper CT match under this title."
+ },
+ {
+  "title": "混元八景真经",
+  "current_dz": "DZ660",
+  "correct_dz": "DZ660",
+  "note": "shidianguji/orthodox listing: 混元八景真经=DZ660."
+ },
+ {
+  "title": "灵宝自然经诀",
+  "current_dz": "DZ319",
+  "correct_dz": "null",
+  "note": "真一自然经诀 is Dunhuang (DH); not a Zhengtong CT title."
+ },
+ {
+  "title": "洞玄灵宝本相运度劫期经",
+  "current_dz": "DZ319",
+  "correct_dz": "DZ319",
+  "note": "Komjathy/crta: 本相运度劫期经=DZ319."
+ },
+ {
+  "title": "玄天上帝感应经",
+  "current_dz": "DZ754",
+  "correct_dz": "null",
+  "note": "No independent Zhengtong CT; often confused with 感应灵签/启圣录."
+ },
+ {
+  "title": "太上说玄天大圣真武本传神咒妙经",
+  "current_dz": "DZ754",
+  "correct_dz": "DZ754",
+  "note": "With Chen Zhong commentary: Schipper DZ754."
+ },
+ {
+  "title": "太上说三官大帝本行经",
+  "current_dz": "DZ1444",
+  "correct_dz": "null",
+  "note": "Not verified as independent Zhengtong CT under this title."
+ },
+ {
+  "title": "元始天尊说药王救八十一难真经",
+  "current_dz": "DZ1444",
+  "correct_dz": "DZ1444",
+  "note": "Xu Daozang; Schipper DZ1444."
+ },
+ {
+  "title": "灵宝施食科仪",
+  "current_dz": "DZ1454",
+  "correct_dz": "null",
+  "note": "Later ritual name; Zhengtong has 灵宝施食法 as DZ1454."
+ },
+ {
+  "title": "灵宝施食法",
+  "current_dz": "DZ1454",
+  "correct_dz": "DZ1454",
+  "note": "Komjathy/crta: 灵宝施食法=DZ1454."
+ },
+ {
+  "title": "谷神篇",
+  "current_dz": "DZ251",
+  "correct_dz": "DZ252",
+  "note": "Lin Yuan Gushen pian=DZ252 (Komjathy)."
+ },
+ {
+  "title": "全真集玄秘要",
+  "current_dz": "DZ251",
+  "correct_dz": "DZ251",
+  "note": "Li Daochun Quanzhen jixuan biyao=DZ251."
+ },
+ {
+  "title": "三洞众戒文",
+  "current_dz": "DZ177",
+  "correct_dz": "DZ178",
+  "note": "Zhang Wanfu; Schipper DZ178 (after 智慧上品大诫)."
+ },
+ {
+  "title": "太上洞真智慧上品大诫",
+  "current_dz": "DZ177",
+  "correct_dz": "DZ177",
+  "note": "Zhihui shangpin dajie=DZ177."
+ },
+ {
+  "title": "太上说洪恩灵济真君妙经",
+  "current_dz": "DZ316",
+  "correct_dz": "DZ317",
+  "note": "Full 灵宝天尊说洪恩灵济真君妙经=DZ317."
+ },
+ {
+  "title": "太上济度章赦",
+  "current_dz": "DZ316",
+  "correct_dz": "DZ316",
+  "note": "Komjathy: 太上济度章赦=DZ316."
+ },
+ {
+  "title": "太上说三元经",
+  "current_dz": "DZ1429",
+  "correct_dz": "DZ1442",
+  "note": "Likely 太上三元赐福赦罪…妙经=DZ1442 (popular Sanguan jing)."
+ },
+ {
+  "title": "长春真人西游记",
+  "current_dz": "DZ1429",
+  "correct_dz": "DZ1429",
+  "note": "Li Zhichang Changchun zhenren xiyou ji=DZ1429."
+ },
+ {
+  "title": "紫阳真人内传",
+  "current_dz": "DZ303",
+  "correct_dz": "DZ303",
+  "note": "Zhou Yishan hagiography; Schipper DZ303."
+ },
+ {
+  "title": "纯阳帝君神化妙通纪",
+  "current_dz": "DZ303",
+  "correct_dz": "DZ305",
+  "note": "Miao Shanshi; Schipper/Komjathy DZ305."
+ }
+]

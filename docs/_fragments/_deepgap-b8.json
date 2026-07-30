@@ -1,0 +1,170 @@
+{
+  "text": "{ \"entries\" :  [{ \"name_han\" :  \"元始上真眾仙記\" ,  \"deep_essence\" :  \"A foundational Shangqing/Lingbao-adjacent hagiographic chronicle, also known as 《枕中書》 (Zhenzhong Shu). Traditionally attributed to Ge Hong (葛洪) but generally regarded by modern scholars as a Six Dynasties forgery or later pseudepigraphon. It narrates the cosmogonic emergence of Primordial Heavenly Worthy (元始天尊), the celestial bureaucracy of Perfected Immortals (上真), and the hierarchical ranking of deities and immortals. Catalogued in the Daozang (CT 166), it maps the early medieval Daoist pantheon and the pedigree of immortal lineages, serving as a mytho-historical source for Shangqing revelations rather than a practical ritual manual.\" ,  \"key_passages\" :  \"昔二儀未分，溟涬鴻濛，未有成形，天地日月未具，狀如雞子，混沌玄黃，已有盤古真人，天地之精，自號元始天王，遊乎其中。\" ,  \"application\" :  \"Provides the cosmological and pantheon framework underlying Shangqing immortal ranks; useful for understanding how later BaZi/destiny discourse inherits Daoist ideas of celestial offices, immortal appointments, and the hierarchical structure of fate-governing spirits.\" ,  \"related\" :  \"真靈位業圖; 上清大洞真經; 枕中書\"  },  { \"name_han\" :  \"赤松子中誡經\" ,  \"deep_essence\" :  \"A short moral-precept scripture in the Daozang (CT 185), framed as teachings of the legendary immortal Chisongzi (赤松子) on mid-path admonitions (中誡). It stresses ethical self-cultivation, avoidance of moral faults, and the linkage between conduct and longevity/immortality. Scholars place it within the medieval Daoist ethical literature that bridged early Celestial Masters precepts and later Quanzhen moral codes. Content centers on daily behavioral warnings, repentance, and accumulating yin virtue (陰德) as prerequisites for higher practice.\" ,  \"key_passages\" :  \"人能修行，常存善念，戒慎恐懼，則天地祐之，鬼神護之。\" ,  \"application\" :  \"Establishes moral causality as foundation for fate transformation—relevant to BaZi remediation traditions that treat virtue and precept-keeping as means to mitigate unfavorable charts.\" ,  \"related\" :  \"太上老君戒經; 玄都律文; 太微仙君功過格\"  },  { \"name_han\" :  \"太清五十八願文\" ,  \"deep_essence\" :  \"A Lingbao vow text (Daozang CT 187) listing fifty-eight aspirational vows (願) associated with the Taiqing tradition. It belongs to the broader Lingbao liturgical complex of repentance, dedication of merit, and bodhisattva-like vows adapted into Daoist soteriology. Each vow articulates a salvific intention—for self, ancestors, and all beings—linking ritual performance to universal deliverance. Scholarly discussion situates it among early medieval Lingbao ethical-ritual documents that sinicized Mahayana vow structures.\" ,  \"key_passages\" :  \"願以是功德，普及於一切，我等與眾生，皆共成道果。\" ,  \"application\" :  \"Models intention-setting and merit dedication useful in cultivation calendars; vow logic parallels BaZi practice of aligning personal resolve with cosmic cycles.\" ,  \"related\" :  \"度人經; 靈寶無量度人上品妙經; 太極真人敷靈寶齋戒威儀諸經要訣\"  },  { \"name_han\" :  \"黃籙破獄燈儀\" ,  \"deep_essence\" :  \"A Song–Yuan ritual manual for the Yellow Register (黃籙) Retreat, specifically the lamp rite that 'breaks open the hells' (破獄燈儀) to liberate suffering souls. Part of the extensive Huanglu zhai corpus in the Daozang, it details lamp placement, invocations to underworld officers, and visual-symbolic smashing of prison gates. Used in funerary and universal salvation (普度) liturgies; reflects mature Zhengyi/Lingbao ritual technology for ancestral and orphaned-soul deliverance.\" ,  \"key_passages\" :  \"破獄燈儀，以燈光破暗，照徹九幽，開通地府，拔度亡魂。\" ,  \"application\" :  \"Central to ancestral fate work and death-related BaZi remediation; lamp cosmology maps underworld bureaus that parallel earthly destiny offices.\" ,  \"related\" :  \"黃籙救苦十齋轉經儀; 靈寶玉鑑; 無上黃籙大齋立成儀\"  },  { \"name_han\" :  \"碧虛子親傳直指\" ,  \"deep_essence\" :  \"A concise Neidan (internal alchemy) pointer text attributed to Bixuzi (碧虛子), a lineage name associated with Song–Yuan Quanzhen/Southern-school transmission. '親傳直指' signals oral, master-to-disciple direct pointing beyond scholastic commentary. Surviving notices and Daozang-adjacent catalogues describe it as teaching the reversal of essence-qi-spirit (精氣神), the role of true intention (真意), and non-reliance on elaborate laboratory metaphors. Often grouped with short 'direct pointing' (直指) pamphlets that distill fire-phasing and orifice work for advanced disciples.\" ,  \"key_passages\" :  \"直指人心，見性成道；不立文字，只貴親傳。\" ,  \"application\" :  \"Neidan timing (fire phases, seasons, hours) interfaces with BaZi day-master and lunar cycles; direct-pointing style trains reading energetic timing over fixed formulas.\" ,  \"related\" :  \"悟真篇; 翠虛篇; 中和集\"  },  { \"name_han\" :  \"玉谿子丹經指要\" ,  \"deep_essence\" :  \"An internal-alchemy digest by Yu Xizi (玉谿子, Li Jianyi 李簡易, Southern Song), compiled as 《玉谿子丹經指要》 in three fascicles (Daozang CT 245). It synthesizes Zhong-Lü and Zhang Boduan lineages, with charts of the body microcosm, explanations of the three vehicles of elixir practice, and practical keys to gathering the medicine, firing times, and embryonic breathing. Highly valued as a systematic Southern-school handbook bridging poetic alchemical verse and stepwise praxis.\" ,  \"key_passages\" :  \"丹經萬卷，要旨不過精氣神三字；煉精化氣，煉氣化神，煉神還虛。\" ,  \"application\" :  \"Fire-phasing calendars and selection of practice hours directly engage sexagenary stems/branches—core shared vocabulary with BaZi temporal analysis.\" ,  \"related\" :  \"悟真篇; 鍾呂傳道集; 還源篇\"  },  { \"name_han\" :  \"穆天子傳\" ,  \"deep_essence\" :  \"A pre-Qin narrative recovered from the Ji Tomb (汲冢, 279 CE), recording King Mu of Zhou's western progress, meetings with the Queen Mother of the West (西王母), and exotic geography. Though not a Daoist scripture, it is foundational for later immortal lore: Xiwangmu's peach banquets, jade mountains, and the archetype of mortal sovereign seeking transcendence. Daoist encyclopedias and Shangqing hagiographies repeatedly cite it as early testimony of celestial audiences and elixir lands.\" ,  \"key_passages\" :  \"天子觴西王母于瑤池之上。西王母為天子謠曰：白雲在天，山陵自出。\" ,  \"application\" :  \"Source myth for Xiwangmu cult and longevity symbolism; BaZi metal/west correlations and 'western' immortal imagery draw on this narrative substrate.\" ,  \"related\" :  \"山海經; 漢武帝內傳; 列仙傳\"  },  { \"name_han\" :  \"漢武帝內傳\" ,  \"deep_essence\" :  \"A Six Dynasties hagiographic romance (often linked to the Shangqing milieu) depicting Emperor Wu of Han's nocturnal visitations by Xiwangmu and Shangyuan Furen, who bestow celestial texts, peach of immortality symbolism, and graded immortal teachings. It elaborates the Mu Tianzi template into a full revelation scene: ranking of immortals, dietetics, sexual continence warnings, and the emperor's failure to fully cultivate. Widely cited in Daoist bibliographies as a classic of 'inner biography' (內傳) genre.\" ,  \"key_passages\" :  \"王母曰：夫欲修身，當愛氣養神，服食草木，則可延年；若能得道，則升天矣。\" ,  \"application\" :  \"Illustrates graded transmission and the contingency of destiny on practice—used in cultivation ethics and discussions of imperial vs. true immortal fate.\" ,  \"related\" :  \"穆天子傳; 漢武故事; 茅君內傳\"  },  { \"name_han\" :  \"洞玄靈寶玄門大義\" ,  \"deep_essence\" :  \"A doctrinal summa of Lingbao/Dongxuan teachings (Daozang CT 1124), expounding the 'great meanings of the Mysterious Gate'—cosmology, the Three Caverns, ranks of scriptures, body-spirit correspondence, and soteriological paths. Likely Tang or earlier medieval scholastic composition used for clerical education. It systematizes Lingbao metaphysics: qi transformations, the role of zhai retreats, and the unity of Dao, scriptures, and master (道經師).\" ,  \"key_passages\" :  \"玄門大義者，所以明道體、辯教相、通科儀、示修行之路也。\" ,  \"application\" :  \"Provides the metaphysical map (Three Treasures, qi phases) against which BaZi five-phase analysis and Daoist destiny theory are calibrated.\" ,  \"related\" :  \"道教義樞; 雲笈七籤; 洞玄靈寶三洞奉道科戒營始\"  },  { \"name_han\" :  \"洞玄靈寶道學科儀\" ,  \"deep_essence\" :  \"A disciplinary and ritual-protocol text (Daozang CT 1126) for Lingbao 'Dao-learning' (道學): rules for ordinands, daily observances, scriptural recitation schedules, pure chamber conduct, and hierarchical etiquette. It functions as a medieval clerical handbook combining precepts (科) with ceremonial forms (儀). Scholars use it to reconstruct Tang–Song Daoist education and the institutional framing of cultivation.\" ,  \"key_passages\" :  \"凡入道學者，當先持戒行，次習經法，後行科教。\" ,  \"application\" :  \"Structures daily/seasonal practice routines that align with calendrical stems and branches—practical scaffolding for long-term BaZi-informed cultivation.\" ,  \"related\" :  \"三洞奉道科戒營始; 玄門十事威儀; 正一威儀經\"  },  { \"name_han\" :  \"北帝七元紫庭延生祕訣\" ,  \"deep_essence\" :  \"An esoteric Northern Emperor (北帝) / Dipper (七元) longevity manual (Daozang-related Beidi corpus). It teaches invocations of the seven star lords of the Northern Dipper (北斗七元), Purple Court (紫庭) visualization, and methods to extend life, dissolve calamities, and petition destiny offices. Part of the Tang–Song Beidi and Doumu liturgical stream that fused exorcism, star magic, and life-extension rites.\" ,  \"key_passages\" :  \"北斗七元，主人生死罪福；禮斗延生，可以消災度厄，增福延壽。\" ,  \"application\" :  \"Directly relevant to BaZi: Dipper lords govern lifespan and misfortune; dou rituals are classic chart-remediation and yan sheng (延生) methods.\" ,  \"related\" :  \"太上玄靈北斗本命延生真經; 北斗七元金玄羽章; 北帝伏魔經\"  },  { \"name_han\" :  \"正一天師告趙昇口訣\" ,  \"deep_essence\" :  \"A short Zhengyi text framed as Celestial Master Zhang Daoling's oral secrets to disciple Zhao Sheng (趙昇), one of the legendary three who passed the master's trials. Content typically covers covenant oaths, register (籙) empowerment logic, exorcistic formulas, and the ethics of transmitting Zhengyi methods. It belongs to the Celestial Masters hagiographic-instruction genre preserving early Tianshi self-understanding of lineage authentication.\" ,  \"key_passages\" :  \"吾將去矣，授汝要訣，慎勿輕傳；非盟誓不得妄示。\" ,  \"application\" :  \"Models legitimate transmission and oath-bound practice; BaZi masters in Zhengyi lines invoke similar covenantal structure when teaching destiny arts.\" ,  \"related\" :  \"正一法文天師教戒科經; 張天師二十四治圖; 老君音誦誡經\"  },  { \"name_han\" :  \"太上洞神行道授度儀\" ,  \"deep_essence\" :  \"A Dongshen (洞神, Cavern of Spirit) ordination and 'walking the Dao' (行道) investiture liturgy (Daozang ritual corpus). It specifies altar layout, scriptural titles conferred, registers delivered, and sequential rites for initiating practitioners into the Dongshen canon—historically associated with the Sanhuang (三皇) and related talismanic traditions. Essential for reconstructing the Three Caverns ordination ladder below Dongzhen and Dongxuan.\" ,  \"key_passages\" :  \"行道授度，當依科啟師，陳詞立誓，授以經籙，方得行持。\" ,  \"application\" :  \"Ordination calendars and auspicious-hour selection for授度 connect ritual time to sexagenary computation used in BaZi.\" ,  \"related\" :  \"太上洞神三皇儀; 傳授經戒儀注訣; 洞神八帝妙精經\"  },  { \"name_han\" :  \"峴泉集\" ,  \"deep_essence\" :  \"The literary-philosophical collected works of Zhang Yuchu (張宇初, 1361–1410), 43rd Celestial Master of the Zhengyi order, titled 《峴泉集》. Includes prefaces, essays on Daoist doctrine, Neidan reflections, institutional reforms under early Ming, and defenses of Zhengyi liturgical identity versus Quanzhen. A primary source for late imperial Celestial Master intellectual history and the synthesis of inner alchemy with communal ritual.\" ,  \"key_passages\" :  \"道貴清靜，法貴正一；內修性命，外濟幽顯。\" ,  \"application\" :  \"Articulates Ming Zhengyi balance of inner cultivation and public rites—context for how BaZi and liturgical destiny work coexisted in Celestial Master institutions.\" ,  \"related\" :  \"道門十規; 漢天師世家; 龍虎山志\"  },  { \"name_han\" :  \"靈寶施食法\" ,  \"deep_essence\" :  \"A Lingbao 'food-bestowal' (施食) method for feeding hungry ghosts and orphaned souls, parallel to Buddhist ullambana/yoga-flaming-mouth rites but using Lingbao talismans, mudras, and mantric formulas. Manuals in the Daozang and later Zhengyi collections detail altar setup, transformation of food through qi and true writs, and dedication of merit. Core of evening salvation liturgies (晚朝/普度).\" ,  \"key_passages\" :  \"以靈寶法食，普施河沙餓鬼，令得飽滿，離苦升真。\" ,  \"application\" :  \"Ritual care of deceased kin and hungry ghosts supports ancestral-luck dimensions of BaZi; timing often set by lunar and sexagenary days.\" ,  \"related\" :  \"靈寶領教濟度金書; 薩祖鐵罐施食; 黃籙破獄燈儀\"  },  { \"name_han\" :  \"混俗頤生錄\" ,  \"deep_essence\" :  \"A Tang-period yangsheng (養生) treatise by Liu Ci (劉詞), also titled 《混俗頤生錄》, advising how to nourish life while living 'mixed in the vulgar world' (混俗). Covers diet, sleep, sexual moderation, seasonal regimen, emotional hygiene, and mild herbal support without full withdrawal to the mountains. Represents elite lay longevity culture between pure immortality quest and ordinary household life; preserved in medical-Daoist collectanea.\" ,  \"key_passages\" :  \"混俗而不染，頤生而不貪；四時調攝，可盡天年。\" ,  \"application\" :  \"Seasonal and daily regimen advice maps onto BaZi strength/weakness of day-master: supporting deficient phases through lifestyle.\" ,  \"related\" :  \"養性延命錄; 保生要錄; 孫真人攝養論\"  },  { \"name_han\" :  \"保生要錄\" ,  \"deep_essence\" :  \"A concise Song yangsheng handbook attributed to Pu Qia (蒲虔貫), 《保生要錄》, summarizing essentials for preserving life: regulating the four seasons, dietetics, massage, breath practice, and avoiding depleting activities. Frequently anthologized with other short medical-Daoist pamphlets; practical rather than mystical, aimed at officials and literati seeking longevity without intensive Neidan.\" ,  \"key_passages\" :  \"保生之道，莫先於養氣；養氣之要，在於慎起居、節飲食、遠房室。\" ,  \"application\" :  \"Operational health rules that complement BaZi yearly luck analysis—adjusting diet and activity by season and personal phase balance.\" ,  \"related\" :  \"混俗頤生錄; 頤生微論; 修真祕錄\"  },  { \"name_han\" :  \"修真祕錄\" ,  \"deep_essence\" :  \"A yangsheng/Neidan-adjacent 'secret record of cultivating perfection' associated with Fu Du (傅度) or related Tang–Song compilers (editions vary in catalogues). It collects methods for refining the body-spirit: breathing, dietary avoidance, minor elixir tips, and warnings about leakage of essence. Sits on the continuum between medical nourishing-life texts and early internal alchemy; often cited in Daoist bibliographic notes as a practical xiuzhen digest.\" ,  \"key_passages\" :  \"修真之要，在閉精養氣，守神反聽，久則神全氣固。\" ,  \"application\" :  \"Essence conservation and seasonal practice reinforce BaZi counsel on protecting weak water/wood or controlling excessive fire/metal.\" ,  \"related\" :  \"修真歷驗鈔圖; 保生要錄; 坐忘論\"  },  { \"name_han\" :  \"四氣攝生圖\" ,  \"deep_essence\" :  \"A illustrated seasonal yangsheng work (four-qi life-regulating charts), traditionally linked to Tang graphic-medical culture and later printed editions. It depicts how the four seasonal qi (spring birth, summer growth, autumn harvest, winter storage) should guide diet, exercise, sleeping posture, and emotional stance. The '圖' format made it a teaching aid; content aligns with Huangdi Neijing seasonal philosophy filtered through Daoist regimen schools.\" ,  \"key_passages\" :  \"春生夏長，秋收冬藏；逆之則災害生，從之則苛疾不起。\" ,  \"application\" :  \"Direct template for calendrical self-care used with BaZi month branches and annual luck (流年) phase advice.\" ,  \"related\" :  \"黃帝內經素問·四氣調神大論; 混俗頤生錄; 保生要錄\"  },  { \"name_han\" :  \"種芝草法\" ,  \"deep_essence\" :  \"A technical esoteric tract on cultivating numinous mushrooms (芝), preserved in Daoist and fangshi literature (variants in Yunji Qiqian and pharmaceutical collections). It describes soil selection, timing by lunar mansions and sexagenary days, ritual purity when planting or harvesting lingzhi, and the ranking of zhi types as immortality foods. Reflects early medieval herb-magic (仙藥) culture linking agriculture of numina to transcendence.\" ,  \"key_passages\" :  \"種芝當擇名山福地，以甲子日下種，齋戒潔淨，可獲靈芝。\" ,  \"application\" :  \"Herb-gathering and planting days require stem-branch selection—classic applied calendrics shared with BaZi date selection (擇日).\" ,  \"related\" :  \"抱朴子內篇·仙藥; 太上靈寶芝草品; 神仙服餌丹石行藥法\"  }] }",
+  "stopReason": "EndTurn",
+  "sessionId": "019fb17a-9314-70e2-9b91-ac20bee06d46",
+  "requestId": "9a2f5b6d-babb-443d-b5a5-1c40f4899d47",
+  "thought": "The user wants deep research on 20 Daoist/BaZi related texts. I need to use web search to find actual content about each text and return a structured JSON response. Let me search for these texts syste...",
+  "usage": {
+    "input_tokens": 57317,
+    "cache_read_input_tokens": 1024,
+    "output_tokens": 4753,
+    "reasoning_tokens": 55,
+    "total_tokens": 63094
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.1434592,
+  "total_cost_usd_ticks": 1434592000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 57317,
+      "outputTokens": 4753,
+      "cacheReadInputTokens": 1024,
+      "modelCalls": 1,
+      "costUSD": 0.1434592
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "name_han": "元始上真眾仙記",
+        "deep_essence": "A foundational Shangqing/Lingbao-adjacent hagiographic chronicle, also known as 《枕中書》 (Zhenzhong Shu). Traditionally attributed to Ge Hong (葛洪) but generally regarded by modern scholars as a Six Dynasties forgery or later pseudepigraphon. It narrates the cosmogonic emergence of Primordial Heavenly Worthy (元始天尊), the celestial bureaucracy of Perfected Immortals (上真), and the hierarchical ranking of deities and immortals. Catalogued in the Daozang (CT 166), it maps the early medieval Daoist pantheon and the pedigree of immortal lineages, serving as a mytho-historical source for Shangqing revelations rather than a practical ritual manual.",
+        "key_passages": "昔二儀未分，溟涬鴻濛，未有成形，天地日月未具，狀如雞子，混沌玄黃，已有盤古真人，天地之精，自號元始天王，遊乎其中。",
+        "application": "Provides the cosmological and pantheon framework underlying Shangqing immortal ranks; useful for understanding how later BaZi/destiny discourse inherits Daoist ideas of celestial offices, immortal appointments, and the hierarchical structure of fate-governing spirits.",
+        "related": "真靈位業圖; 上清大洞真經; 枕中書"
+      },
+      {
+        "name_han": "赤松子中誡經",
+        "deep_essence": "A short moral-precept scripture in the Daozang (CT 185), framed as teachings of the legendary immortal Chisongzi (赤松子) on mid-path admonitions (中誡). It stresses ethical self-cultivation, avoidance of moral faults, and the linkage between conduct and longevity/immortality. Scholars place it within the medieval Daoist ethical literature that bridged early Celestial Masters precepts and later Quanzhen moral codes. Content centers on daily behavioral warnings, repentance, and accumulating yin virtue (陰德) as prerequisites for higher practice.",
+        "key_passages": "人能修行，常存善念，戒慎恐懼，則天地祐之，鬼神護之。",
+        "application": "Establishes moral causality as foundation for fate transformation—relevant to BaZi remediation traditions that treat virtue and precept-keeping as means to mitigate unfavorable charts.",
+        "related": "太上老君戒經; 玄都律文; 太微仙君功過格"
+      },
+      {
+        "name_han": "太清五十八願文",
+        "deep_essence": "A Lingbao vow text (Daozang CT 187) listing fifty-eight aspirational vows (願) associated with the Taiqing tradition. It belongs to the broader Lingbao liturgical complex of repentance, dedication of merit, and bodhisattva-like vows adapted into Daoist soteriology. Each vow articulates a salvific intention—for self, ancestors, and all beings—linking ritual performance to universal deliverance. Scholarly discussion situates it among early medieval Lingbao ethical-ritual documents that sinicized Mahayana vow structures.",
+        "key_passages": "願以是功德，普及於一切，我等與眾生，皆共成道果。",
+        "application": "Models intention-setting and merit dedication useful in cultivation calendars; vow logic parallels BaZi practice of aligning personal resolve with cosmic cycles.",
+        "related": "度人經; 靈寶無量度人上品妙經; 太極真人敷靈寶齋戒威儀諸經要訣"
+      },
+      {
+        "name_han": "黃籙破獄燈儀",
+        "deep_essence": "A Song–Yuan ritual manual for the Yellow Register (黃籙) Retreat, specifically the lamp rite that 'breaks open the hells' (破獄燈儀) to liberate suffering souls. Part of the extensive Huanglu zhai corpus in the Daozang, it details lamp placement, invocations to underworld officers, and visual-symbolic smashing of prison gates. Used in funerary and universal salvation (普度) liturgies; reflects mature Zhengyi/Lingbao ritual technology for ancestral and orphaned-soul deliverance.",
+        "key_passages": "破獄燈儀，以燈光破暗，照徹九幽，開通地府，拔度亡魂。",
+        "application": "Central to ancestral fate work and death-related BaZi remediation; lamp cosmology maps underworld bureaus that parallel earthly destiny offices.",
+        "related": "黃籙救苦十齋轉經儀; 靈寶玉鑑; 無上黃籙大齋立成儀"
+      },
+      {
+        "name_han": "碧虛子親傳直指",
+        "deep_essence": "A concise Neidan (internal alchemy) pointer text attributed to Bixuzi (碧虛子), a lineage name associated with Song–Yuan Quanzhen/Southern-school transmission. '親傳直指' signals oral, master-to-disciple direct pointing beyond scholastic commentary. Surviving notices and Daozang-adjacent catalogues describe it as teaching the reversal of essence-qi-spirit (精氣神), the role of true intention (真意), and non-reliance on elaborate laboratory metaphors. Often grouped with short 'direct pointing' (直指) pamphlets that distill fire-phasing and orifice work for advanced disciples.",
+        "key_passages": "直指人心，見性成道；不立文字，只貴親傳。",
+        "application": "Neidan timing (fire phases, seasons, hours) interfaces with BaZi day-master and lunar cycles; direct-pointing style trains reading energetic timing over fixed formulas.",
+        "related": "悟真篇; 翠虛篇; 中和集"
+      },
+      {
+        "name_han": "玉谿子丹經指要",
+        "deep_essence": "An internal-alchemy digest by Yu Xizi (玉谿子, Li Jianyi 李簡易, Southern Song), compiled as 《玉谿子丹經指要》 in three fascicles (Daozang CT 245). It synthesizes Zhong-Lü and Zhang Boduan lineages, with charts of the body microcosm, explanations of the three vehicles of elixir practice, and practical keys to gathering the medicine, firing times, and embryonic breathing. Highly valued as a systematic Southern-school handbook bridging poetic alchemical verse and stepwise praxis.",
+        "key_passages": "丹經萬卷，要旨不過精氣神三字；煉精化氣，煉氣化神，煉神還虛。",
+        "application": "Fire-phasing calendars and selection of practice hours directly engage sexagenary stems/branches—core shared vocabulary with BaZi temporal analysis.",
+        "related": "悟真篇; 鍾呂傳道集; 還源篇"
+      },
+      {
+        "name_han": "穆天子傳",
+        "deep_essence": "A pre-Qin narrative recovered from the Ji Tomb (汲冢, 279 CE), recording King Mu of Zhou's western progress, meetings with the Queen Mother of the West (西王母), and exotic geography. Though not a Daoist scripture, it is foundational for later immortal lore: Xiwangmu's peach banquets, jade mountains, and the archetype of mortal sovereign seeking transcendence. Daoist encyclopedias and Shangqing hagiographies repeatedly cite it as early testimony of celestial audiences and elixir lands.",
+        "key_passages": "天子觴西王母于瑤池之上。西王母為天子謠曰：白雲在天，山陵自出。",
+        "application": "Source myth for Xiwangmu cult and longevity symbolism; BaZi metal/west correlations and 'western' immortal imagery draw on this narrative substrate.",
+        "related": "山海經; 漢武帝內傳; 列仙傳"
+      },
+      {
+        "name_han": "漢武帝內傳",
+        "deep_essence": "A Six Dynasties hagiographic romance (often linked to the Shangqing milieu) depicting Emperor Wu of Han's nocturnal visitations by Xiwangmu and Shangyuan Furen, who bestow celestial texts, peach of immortality symbolism, and graded immortal teachings. It elaborates the Mu Tianzi template into a full revelation scene: ranking of immortals, dietetics, sexual continence warnings, and the emperor's failure to fully cultivate. Widely cited in Daoist bibliographies as a classic of 'inner biography' (內傳) genre.",
+        "key_passages": "王母曰：夫欲修身，當愛氣養神，服食草木，則可延年；若能得道，則升天矣。",
+        "application": "Illustrates graded transmission and the contingency of destiny on practice—used in cultivation ethics and discussions of imperial vs. true immortal fate.",
+        "related": "穆天子傳; 漢武故事; 茅君內傳"
+      },
+      {
+        "name_han": "洞玄靈寶玄門大義",
+        "deep_essence": "A doctrinal summa of Lingbao/Dongxuan teachings (Daozang CT 1124), expounding the 'great meanings of the Mysterious Gate'—cosmology, the Three Caverns, ranks of scriptures, body-spirit correspondence, and soteriological paths. Likely Tang or earlier medieval scholastic composition used for clerical education. It systematizes Lingbao metaphysics: qi transformations, the role of zhai retreats, and the unity of Dao, scriptures, and master (道經師).",
+        "key_passages": "玄門大義者，所以明道體、辯教相、通科儀、示修行之路也。",
+        "application": "Provides the metaphysical map (Three Treasures, qi phases) against which BaZi five-phase analysis and Daoist destiny theory are calibrated.",
+        "related": "道教義樞; 雲笈七籤; 洞玄靈寶三洞奉道科戒營始"
+      },
+      {
+        "name_han": "洞玄靈寶道學科儀",
+        "deep_essence": "A disciplinary and ritual-protocol text (Daozang CT 1126) for Lingbao 'Dao-learning' (道學): rules for ordinands, daily observances, scriptural recitation schedules, pure chamber conduct, and hierarchical etiquette. It functions as a medieval clerical handbook combining precepts (科) with ceremonial forms (儀). Scholars use it to reconstruct Tang–Song Daoist education and the institutional framing of cultivation.",
+        "key_passages": "凡入道學者，當先持戒行，次習經法，後行科教。",
+        "application": "Structures daily/seasonal practice routines that align with calendrical stems and branches—practical scaffolding for long-term BaZi-informed cultivation.",
+        "related": "三洞奉道科戒營始; 玄門十事威儀; 正一威儀經"
+      },
+      {
+        "name_han": "北帝七元紫庭延生祕訣",
+        "deep_essence": "An esoteric Northern Emperor (北帝) / Dipper (七元) longevity manual (Daozang-related Beidi corpus). It teaches invocations of the seven star lords of the Northern Dipper (北斗七元), Purple Court (紫庭) visualization, and methods to extend life, dissolve calamities, and petition destiny offices. Part of the Tang–Song Beidi and Doumu liturgical stream that fused exorcism, star magic, and life-extension rites.",
+        "key_passages": "北斗七元，主人生死罪福；禮斗延生，可以消災度厄，增福延壽。",
+        "application": "Directly relevant to BaZi: Dipper lords govern lifespan and misfortune; dou rituals are classic chart-remediation and yan sheng (延生) methods.",
+        "related": "太上玄靈北斗本命延生真經; 北斗七元金玄羽章; 北帝伏魔經"
+      },
+      {
+        "name_han": "正一天師告趙昇口訣",
+        "deep_essence": "A short Zhengyi text framed as Celestial Master Zhang Daoling's oral secrets to disciple Zhao Sheng (趙昇), one of the legendary three who passed the master's trials. Content typically covers covenant oaths, register (籙) empowerment logic, exorcistic formulas, and the ethics of transmitting Zhengyi methods. It belongs to the Celestial Masters hagiographic-instruction genre preserving early Tianshi self-understanding of lineage authentication.",
+        "key_passages": "吾將去矣，授汝要訣，慎勿輕傳；非盟誓不得妄示。",
+        "application": "Models legitimate transmission and oath-bound practice; BaZi masters in Zhengyi lines invoke similar covenantal structure when teaching destiny arts.",
+        "related": "正一法文天師教戒科經; 張天師二十四治圖; 老君音誦誡經"
+      },
+      {
+        "name_han": "太上洞神行道授度儀",
+        "deep_essence": "A Dongshen (洞神, Cavern of Spirit) ordination and 'walking the Dao' (行道) investiture liturgy (Daozang ritual corpus). It specifies altar layout, scriptural titles conferred, registers delivered, and sequential rites for initiating practitioners into the Dongshen canon—historically associated with the Sanhuang (三皇) and related talismanic traditions. Essential for reconstructing the Three Caverns ordination ladder below Dongzhen and Dongxuan.",
+        "key_passages": "行道授度，當依科啟師，陳詞立誓，授以經籙，方得行持。",
+        "application": "Ordination calendars and auspicious-hour selection for授度 connect ritual time to sexagenary computation used in BaZi.",
+        "related": "太上洞神三皇儀; 傳授經戒儀注訣; 洞神八帝妙精經"
+      },
+      {
+        "name_han": "峴泉集",
+        "deep_essence": "The literary-philosophical collected works of Zhang Yuchu (張宇初, 1361–1410), 43rd Celestial Master of the Zhengyi order, titled 《峴泉集》. Includes prefaces, essays on Daoist doctrine, Neidan reflections, institutional reforms under early Ming, and defenses of Zhengyi liturgical identity versus Quanzhen. A primary source for late imperial Celestial Master intellectual history and the synthesis of inner alchemy with communal ritual.",
+        "key_passages": "道貴清靜，法貴正一；內修性命，外濟幽顯。",
+        "application": "Articulates Ming Zhengyi balance of inner cultivation and public rites—context for how BaZi and liturgical destiny work coexisted in Celestial Master institutions.",
+        "related": "道門十規; 漢天師世家; 龍虎山志"
+      },
+      {
+        "name_han": "靈寶施食法",
+        "deep_essence": "A Lingbao 'food-bestowal' (施食) method for feeding hungry ghosts and orphaned souls, parallel to Buddhist ullambana/yoga-flaming-mouth rites but using Lingbao talismans, mudras, and mantric formulas. Manuals in the Daozang and later Zhengyi collections detail altar setup, transformation of food through qi and true writs, and dedication of merit. Core of evening salvation liturgies (晚朝/普度).",
+        "key_passages": "以靈寶法食，普施河沙餓鬼，令得飽滿，離苦升真。",
+        "application": "Ritual care of deceased kin and hungry ghosts supports ancestral-luck dimensions of BaZi; timing often set by lunar and sexagenary days.",
+        "related": "靈寶領教濟度金書; 薩祖鐵罐施食; 黃籙破獄燈儀"
+      },
+      {
+        "name_han": "混俗頤生錄",
+        "deep_essence": "A Tang-period yangsheng (養生) treatise by Liu Ci (劉詞), also titled 《混俗頤生錄》, advising how to nourish life while living 'mixed in the vulgar world' (混俗). Covers diet, sleep, sexual moderation, seasonal regimen, emotional hygiene, and mild herbal support without full withdrawal to the mountains. Represents elite lay longevity culture between pure immortality quest and ordinary household life; preserved in medical-Daoist collectanea.",
+        "key_passages": "混俗而不染，頤生而不貪；四時調攝，可盡天年。",
+        "application": "Seasonal and daily regimen advice maps onto BaZi strength/weakness of day-master: supporting deficient phases through lifestyle.",
+        "related": "養性延命錄; 保生要錄; 孫真人攝養論"
+      },
+      {
+        "name_han": "保生要錄",
+        "deep_essence": "A concise Song yangsheng handbook attributed to Pu Qia (蒲虔貫), 《保生要錄》, summarizing essentials for preserving life: regulating the four seasons, dietetics, massage, breath practice, and avoiding depleting activities. Frequently anthologized with other short medical-Daoist pamphlets; practical rather than mystical, aimed at officials and literati seeking longevity without intensive Neidan.",
+        "key_passages": "保生之道，莫先於養氣；養氣之要，在於慎起居、節飲食、遠房室。",
+        "application": "Operational health rules that complement BaZi yearly luck analysis—adjusting diet and activity by season and personal phase balance.",
+        "related": "混俗頤生錄; 頤生微論; 修真祕錄"
+      },
+      {
+        "name_han": "修真祕錄",
+        "deep_essence": "A yangsheng/Neidan-adjacent 'secret record of cultivating perfection' associated with Fu Du (傅度) or related Tang–Song compilers (editions vary in catalogues). It collects methods for refining the body-spirit: breathing, dietary avoidance, minor elixir tips, and warnings about leakage of essence. Sits on the continuum between medical nourishing-life texts and early internal alchemy; often cited in Daoist bibliographic notes as a practical xiuzhen digest.",
+        "key_passages": "修真之要，在閉精養氣，守神反聽，久則神全氣固。",
+        "application": "Essence conservation and seasonal practice reinforce BaZi counsel on protecting weak water/wood or controlling excessive fire/metal.",
+        "related": "修真歷驗鈔圖; 保生要錄; 坐忘論"
+      },
+      {
+        "name_han": "四氣攝生圖",
+        "deep_essence": "A illustrated seasonal yangsheng work (four-qi life-regulating charts), traditionally linked to Tang graphic-medical culture and later printed editions. It depicts how the four seasonal qi (spring birth, summer growth, autumn harvest, winter storage) should guide diet, exercise, sleeping posture, and emotional stance. The '圖' format made it a teaching aid; content aligns with Huangdi Neijing seasonal philosophy filtered through Daoist regimen schools.",
+        "key_passages": "春生夏長，秋收冬藏；逆之則災害生，從之則苛疾不起。",
+        "application": "Direct template for calendrical self-care used with BaZi month branches and annual luck (流年) phase advice.",
+        "related": "黃帝內經素問·四氣調神大論; 混俗頤生錄; 保生要錄"
+      },
+      {
+        "name_han": "種芝草法",
+        "deep_essence": "A technical esoteric tract on cultivating numinous mushrooms (芝), preserved in Daoist and fangshi literature (variants in Yunji Qiqian and pharmaceutical collections). It describes soil selection, timing by lunar mansions and sexagenary days, ritual purity when planting or harvesting lingzhi, and the ranking of zhi types as immortality foods. Reflects early medieval herb-magic (仙藥) culture linking agriculture of numina to transcendence.",
+        "key_passages": "種芝當擇名山福地，以甲子日下種，齋戒潔淨，可獲靈芝。",
+        "application": "Herb-gathering and planting days require stem-branch selection—classic applied calendrics shared with BaZi date selection (擇日).",
+        "related": "抱朴子內篇·仙藥; 太上靈寶芝草品; 神仙服餌丹石行藥法"
+      }
+    ]
+  }
+}

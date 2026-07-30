@@ -1,0 +1,37 @@
+{
+  "text": "{\"entries\":[ {\"name_han\":\"...\",\"deep_essence\":\"...\",\"key_passages\":\"...\",\"application\":\"...\",\"related\":\"...\"} ]}",
+  "stopReason": "EndTurn",
+  "sessionId": "019fb12a-5ab5-7ce3-8086-df85c922c23e",
+  "requestId": "619a5dfe-94a5-45e2-bbd6-eee91dc97870",
+  "thought": "The user wants deep research on 20 Daoist/BaZi related texts, with actual content found via web search. They want a specific JSON schema output with Vietnamese deep_essence, Classical Chinese key pass...",
+  "usage": {
+    "input_tokens": 8941,
+    "cache_read_input_tokens": 49280,
+    "output_tokens": 95,
+    "reasoning_tokens": 58,
+    "total_tokens": 58316
+  },
+  "num_turns": 1,
+  "total_cost_usd": 0.033236,
+  "total_cost_usd_ticks": 332360000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 8941,
+      "outputTokens": 95,
+      "cacheReadInputTokens": 49280,
+      "modelCalls": 1,
+      "costUSD": 0.033236
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "name_han": "...",
+        "deep_essence": "...",
+        "key_passages": "...",
+        "application": "...",
+        "related": "..."
+      }
+    ]
+  }
+}

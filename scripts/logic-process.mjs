@@ -7,7 +7,7 @@ const DEEP_FILE = 'src/engine/daozang-deep.js';
 
 let deepSrc = readFileSync(DEEP_FILE, 'utf8');
 
-const batchFiles = readdirSync(FRAG).filter(f => /^_logic(?:gap)?-b\d+\.json$/.test(f));
+const batchFiles = readdirSync(FRAG).filter(f => /^_logic(?:gap|split)?-b\d+\.json$/.test(f));
 console.log(`Found ${batchFiles.length} logic batch files`);
 
 let added = 0;

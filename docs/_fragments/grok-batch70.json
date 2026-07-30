@@ -1,0 +1,322 @@
+{
+  "text": "{\"entries\":[]}{\"entries\":[]}{ \"entries\": [] }{\n  \"entries\": [\n    {\n      \"dz\": \"DZ219\",\n      \"name_han\": \"靈寶無量度人上經大法\",\n      \"name_vi\": \"Linh Bảo Vô Lượng Độ Nhân Thượng Kinh Đại Pháp\",\n      \"bu\": \"洞真\",\n      \"author\": \"佚名（宋元符籙道士彙編）\",\n      \"era\": \"宋元（成書約宋–明初）\",\n      \"topic\": \"ritual\",\n      \"essence\": \"Bộ đại pháp 72 quyển lấy Kinh Độ Nhân làm trục, tập hợp phù lục, trai nghi, tồn tư và luyện độ cứu vong của phái Linh Bảo. Phần độ sinh giải kinh từng câu kèm phù đồ; phần độ tử có nghi phá ngục, cứu vong. Đây là tổng tập pháp thuật Linh Bảo lớn nhất trong Đạo tạng, dùng cho nghi thức độ người sống và người chết.\",\n      \"key_text\": \"道言昔於始青天中\",\n      \"use\": \"Nghi thức độ nhân, phù lục, trai khoa Linh Bảo; tham khảo hệ thống pháp thuật cứu độ.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E9%9D%88%E5%AF%B6%E7%84%A1%E9%87%8F%E5%BA%A6%E4%BA%BA%E4%B8%8A%E7%B6%93%E5%A4%A7%E6%B3%95\",\n        \"https://zh.daoinfo.org/index.php?title=%E9%9D%88%E5%AF%B6%E7%84%A1%E9%87%8F%E5%BA%A6%E4%BA%BA%E4%B8%8A%E7%B6%93%E5%A4%A7%E6%B3%95\",\n        \"https://www.shidianguji.com/zh/book/DZ0219\",\n        \"https://taolibrary.com/category95.aspx\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ220\",\n      \"name_han\": \"無上玄元三天玉堂大法\",\n      \"name_vi\": \"Vô Thượng Huyền Nguyên Tam Thiên Ngọc Đường Đại Pháp\",\n      \"bu\": \"洞真\",\n      \"author\": \"路時中\",\n      \"era\": \"南宋\",\n      \"topic\": \"ritual\",\n      \"essence\": \"Ba mươi quyển đại pháp Ngọc Đường do Lộ Thời Trung (Thượng Thanh đại động tam cảnh pháp sư) biên soạn, thuộc hệ Thiên Tâm/Chính Nhất. Nội dung gồm phát minh đại đạo, giới luật, tồn chân tu chứng, cao bôn nội cảnh, thư phù, ấn, bộ cang, trị tà và luyện độ. Nhấn mạnh nội tu kết hợp phù lục, xưng pháp xuất từ Ngọc Kinh sơn.\",\n      \"key_text\": \"道本無名，道亦無形。道之妙，先天而生。\",\n      \"use\": \"Pháp thuật Ngọc Đường: trị bệnh, trấn tà, luyện độ; nghiên cứu Thiên Tâm phái.\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=648420\",\n        \"https://zh.wikisource.org/zh-hans/%E7%84%A1%E4%B8%8A%E7%8E%84%E5%85%83%E4%B8%89%E5%A4%A9%E7%8E%89%E5%A0%82%E5%A4%A7%E6%B3%95\",\n        \"https://zh.daoinfo.org/index.php?title=%E7%84%A1%E4%B8%8A%E7%8E%84%E5%85%83%E4%B8%89%E5%A4%A9%E7%8E%89%E5%A0%82%E5%A4%A7%E6%B3%95\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ222\",\n      \"name_han\": \"清微神烈秘法\",\n      \"name_vi\": \"Thanh Vi Thần Liệt Bí Pháp\",\n      \"bu\": \"洞真\",\n      \"author\": \"佚名（清微派）\",\n      \"era\": \"宋元\",\n      \"topic\": \"ritual\",\n      \"essence\": \"Hai quyển bí pháp phái Thanh Vi, chuyên về thần liệt (lôi pháp) và phù chú. Thuộc hệ Thanh Vi trong Động chân phương pháp loại, bổ trợ cho Thanh Vi nguyên giáng đại pháp. Dùng để triệu thỉnh thần lôi, trị tà, cầu đảo.\",\n      \"key_text\": \"null\",\n      \"use\": \"Lôi pháp Thanh Vi, phù lục cầu đảo trị tà.\",\n      \"sources\": [\n        \"https://taolibrary.com/category95.aspx\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://michaelstanley-baker.com/clarkes-complete-daoist-index/\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ223\",\n      \"name_han\": \"清微元降大法\",\n      \"name_vi\": \"Thanh Vi Nguyên Giáng Đại Pháp\",\n      \"bu\": \"洞真\",\n      \"author\": \"佚名（清微派）\",\n      \"era\": \"宋元\",\n      \"topic\": \"ritual\",\n      \"essence\": \"Hai mươi lăm quyển tổng tập đại pháp phái Thanh Vi, ghi chép nguyên giáng (thần tiên giáng truyền) và hệ thống pháp thuật, thần phổ, nghi thức. Cùng với Thanh Vi tiên phổ và các bí pháp khác tạo thành khối tài liệu cốt lõi của Thanh Vi phái trong Đạo tạng.\",\n      \"key_text\": \"null\",\n      \"use\": \"Nghi thức, thần phổ và pháp thuật phái Thanh Vi.\",\n      \"sources\": [\n        \"https://taolibrary.com/category95.aspx\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\",\n        \"https://michaelstanley-baker.com/clarkes-complete-daoist-index/\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ226\",\n      \"name_han\": \"紫元君授道傳心法\",\n      \"name_vi\": \"Tử Nguyên Quân Thụ Đạo Truyền Tâm Pháp\",\n      \"bu\": \"洞真\",\n      \"author\": \"原題長生陰真人注\",\n      \"era\": \"晚唐–北宋（約）\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Một quyển nội đan tâm pháp, nguyên đề Âm chân nhân chú, luận đạo truyền tâm theo Tử Nguyên quân. Trích Âm Phù kinh, chủ trương nội đan chân chính, phản đối ngoại đan và phục khí hình thức. Nhấn mạnh khẩu quyết tâm truyền hơn văn tự.\",\n      \"key_text\": \"null\",\n      \"use\": \"Nội đan tâm pháp; so sánh với Âm Phù–nội đan truyền thống.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E7%B4%AB%E5%85%83%E5%90%9B%E6%8E%88%E9%81%93%E5%82%B3%E5%BF%83%E6%B3%95\",\n        \"https://zh.daoinfo.org/index.php?title=%E7%B4%AB%E5%85%83%E5%90%9B%E6%8E%88%E9%81%93%E5%82%B3%E5%BF%83%E6%B3%95\",\n        \"https://www.jstor.org/stable/26768560\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ227\",\n      \"name_han\": \"真龍虎九仙經\",\n      \"name_vi\": \"Chân Long Hổ Cửu Tiên Kinh\",\n      \"bu\": \"洞真\",\n      \"author\": \"原題羅公遠、葉靜能注\",\n      \"era\": \"唐（託）/唐宋\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Kinh nội đan về long hổ, cửu tiên, nguyên đề La Công Viễn và Diệp Tĩnh Năng chú. Giảng luyện khí, điều tức, tránh tán loạn và vọng tưởng; dùng số cửu và hô hấp để điều hòa long hổ. Thuộc nhóm đan kinh ngắn trong Động chân phương pháp loại.\",\n      \"key_text\": \"無散亂，無煩怒，無起著，無妄想，無貪愛。\",\n      \"use\": \"Nội đan hô hấp–long hổ; tham khảo chú giải La–Diệp.\",\n      \"sources\": [\n        \"http://www.ctcwri.idv.tw/CTCW-CMTS/CMT01%E6%B4%9E%E7%9C%9F%E9%83%A8/CMT0108%E6%96%B9%E6%B3%95%E9%A1%9E/CMT0108ALL/CH010809%E7%9C%9F%E9%BE%8D%E8%99%8E%E4%B9%9D%E4%BB%99%E7%B6%93.htm\",\n        \"https://ctext.org/wiki.pl?if=gb&chapter=829751\",\n        \"https://taolibrary.com/category95.aspx\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ233\",\n      \"name_han\": \"還丹眾仙論\",\n      \"name_vi\": \"Hoàn Đan Chúng Tiên Luận\",\n      \"bu\": \"洞真\",\n      \"author\": \"楊在（抱腹山人）\",\n      \"era\": \"北宋皇祐四年（1052）\",\n      \"topic\": \"外丹\",\n      \"essence\": \"Một quyển do Dương Tại biên soạn năm Hoàng Hựu 4, tập hợp hơn ba mươi gia thuyết hoàn đan đời Đường–Tống. Bảo tồn nhiều đan quyết cổ đã thất truyền; luận chân chì, chân thủy ngân, hoa trì, hoàng nha, hà xa. Vừa mang dấu ấn ngoại đan vừa chuyển sang ngôn ngữ nội đan.\",\n      \"key_text\": \"粵還丹者，華池為初也。華池之中，能生神水。\",\n      \"use\": \"Nghiên cứu lịch sử hoàn đan; trích dẫn đan quyết thất truyền.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E9%82%84%E4%B8%B9%E7%9C%BE%E4%BB%99%E8%AB%96\",\n        \"https://ctext.org/library.pl?if=gb&res=83885\",\n        \"https://baike.baidu.com/item/%E8%BF%98%E4%B8%B9%E4%BC%97%E4%BB%99%E8%AE%BA/23146231\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ244\",\n      \"name_han\": \"大丹直指\",\n      \"name_vi\": \"Đại Đan Trực Chỉ\",\n      \"bu\": \"洞真\",\n      \"author\": \"丘處機\",\n      \"era\": \"金–元\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Hai quyển nội đan quan trọng của Khâu Xử Cơ (Trường Xuân chân nhân), đệ tử biên hành. Giảng tinh khí thần, luyện tinh hóa khí, luyện khí hóa thần, luyện thần hợp đạo; kèm đồ long hổ, chu thiên hỏa hầu, phi tinh. Nhấn mạnh tính mệnh song tu theo hệ Toàn Chân Long Môn.\",\n      \"key_text\": \"金丹之秘在一性一命而已。性者天也，常潛於頂；命者地也。\",\n      \"use\": \"Nội đan Toàn Chân; thực hành hỏa hầu và đồ thức.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/wiki/%E5%A4%A7%E4%B8%B9%E7%9B%B4%E6%8C%87\",\n        \"https://ctext.org/wiki.pl?if=gb&res=123259\",\n        \"https://zh.daoinfo.org/index.php?title=%E5%A4%A7%E4%B8%B9%E7%9B%B4%E6%8C%87\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ245\",\n      \"name_han\": \"玉谿子丹經指要\",\n      \"name_vi\": \"Ngọc Khê Tử Đan Kinh Chỉ Yếu\",\n      \"bu\": \"洞真\",\n      \"author\": \"李簡易\",\n      \"era\": \"南宋（自序景定五年 1264）\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Ba quyển do Lý Giản Dị (Ngọc Khê tử) soạn, có Hỗn nguyên tiên phái đồ dung hợp Nam–Bắc tông. Gồm Ngộ Chân thiên chỉ yếu, biện hoặc, đan phòng pháp ngữ, giải Khâm Viên xuân. Lấy chân chì (tiên thiên nhất khí) làm cốt, giảng thủ thủ, ôn dưỡng, hỏa hầu, phản đối bàng môn.\",\n      \"key_text\": \"是以金火還返，為內丹之至要，當於一身中求。\",\n      \"use\": \"Nội đan Nam tông; đối chiếu Ngộ Chân thiên và phái đồ.\",\n      \"sources\": [\n        \"https://ctext.org/wiki.pl?if=gb&res=390679\",\n        \"https://zh.daoinfo.org/wiki/%E7%8E%89%E8%B0%BF%E5%AD%90%E4%B8%B9%E7%B6%93%E6%8C%87%E8%A6%81\",\n        \"https://baike.baidu.com/item/%E7%8E%89%E6%BA%AA%E5%AD%90%E4%B8%B9%E7%BB%8F%E6%8C%87%E8%A6%81/9778164\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ246\",\n      \"name_han\": \"西山群仙會真記\",\n      \"name_vi\": \"Tây Sơn Quần Tiên Hội Chân Ký\",\n      \"bu\": \"洞真\",\n      \"author\": \"施肩吾撰，李竦編\",\n      \"era\": \"晚唐–北宋\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Năm quyển hệ Chung–Lữ nội đan, đề Hoa Dương chân nhân Thi Kiên Ngô, đệ tử Lý Tủng biên. Kết cấu nhận thức (thức đạo, thức pháp…) rồi dưỡng hình khí, bổ tinh khí thần, và luyện đan. Chủ trương dưỡng hình trước, bổ ích tinh khí thần làm nền, là trụ cột của phái Chung Lữ.\",\n      \"key_text\": \"性非生知，學道者必資於切問；道難言傳，立教者不尚於多言。\",\n      \"use\": \"Nội đan Chung–Lữ; khung dưỡng sinh–bổ ích–luyện đan.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E8%A5%BF%E5%B1%B1%E7%BE%A4%E4%BB%99%E6%9C%83%E7%9C%9F%E8%A8%98\",\n        \"https://ctext.org/wiki.pl?if=gb&res=964040\",\n        \"https://zh.daoinfo.org/index.php?title=%E8%A5%BF%E5%B1%B1%E7%BE%A4%E4%BB%99%E6%9C%83%E7%9C%9F%E8%A8%98\",\n        \"https://purplecloudinstitute.com/wp-content/uploads/2023/08/Daoist-Texts-in-Western-Languages-%C2%A9-Purple-Cloud-Press-2023.pdf\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ247\",\n      \"name_han\": \"會真集\",\n      \"name_vi\": \"Hội Chân Tập\",\n      \"bu\": \"洞真\",\n      \"author\": \"王吉昌（超然子）\",\n      \"era\": \"金元\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Năm quyển của Siêu Nhiên tử Vương Cát Xương, dùng đồ Thái Cực, ngũ hành, tứ tượng bát quái kết hợp Dịch và kim đan. Có từ khúc đan đạo, dung Phật lý, khuyên đạm bạc danh lợi. Thuộc nội đan Toàn Chân thời Kim–Nguyên.\",\n      \"key_text\": \"夫易廣矣大矣，其無體也。始於一氣，即道也。\",\n      \"use\": \"Nội đan Dịch–đan đồ; từ khúc tu chân.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E6%9C%83%E7%9C%9F%E9%9B%86\",\n        \"https://zh.daoinfo.org/index.php?title=%E6%9C%83%E7%9C%9F%E9%9B%86\",\n        \"https://www.shidianguji.com/book/DZ0247\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ249\",\n      \"name_han\": \"中和集\",\n      \"name_vi\": \"Trung Hòa Tập\",\n      \"bu\": \"洞真\",\n      \"author\": \"李道純撰，蔡志頤編\",\n      \"era\": \"元（大德丙午 1306 biên thành）\",\n      \"topic\": \"philosophy\",\n      \"essence\": \"Sáu quyển chủ lực của Lý Đạo Thuần (Doanh Thiềm tử), đệ tử Thái Chí Di biên. Lấy «Trung Hòa» (Lễ Ký) làm cương lĩnh, dung Nho–Thích–Đạo, Nam–Bắc tông; có Thái Cực đồ, Trung Hòa đồ, tính mệnh luận. Khởi nguồn «trung phái» nội đan với yếu chỉ thủ trung trí hòa.\",\n      \"key_text\": \"所謂中者，非中外之中，亦非四維上下之中。\",\n      \"use\": \"Triết lý nội đan trung phái; tính mệnh song tu, tam giáo hợp nhất.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/wiki/%E4%B8%AD%E5%92%8C%E9%9B%86\",\n        \"https://baike.baidu.com/item/%E4%B8%AD%E5%92%8C%E9%9B%86/5707524\",\n        \"https://www.fabriziopregadio.com/files/PREGADIO_Time_in_Chinese_Alchemy.pdf\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ252\",\n      \"name_han\": \"谷神篇\",\n      \"name_vi\": \"Cốc Thần Thiên\",\n      \"bu\": \"洞真\",\n      \"author\": \"林轅（五福玄巢子）\",\n      \"era\": \"元（大德八年 1304 tự tự）\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Hai quyển của Lâm Viện, tự xưng gặp chí nhân chỉ điểm, tham khảo quần kinh. Lấy «cốc dưỡng nguyên khí» đặt tên, kế thừa Tử Dương Nam tông, độc tôn nguyên khí; có thơ đại dược hoàn đan, đồ thức. Chủ trương đạm bạc danh lợi, tu thân dưỡng tính.\",\n      \"key_text\": \"古聖帝王官天下者，首以神仙之道，默相傳授。\",\n      \"use\": \"Nội đan nguyên khí; thơ–đồ tu luyện Nam tông.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E8%B0%B7%E7%A5%9E%E7%AF%87\",\n        \"https://ctext.org/wiki.pl?if=gb&res=969119\",\n        \"https://zh.daoinfo.org/index.php?title=%E8%B0%B7%E7%A5%9E%E7%AF%87\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ253\",\n      \"name_han\": \"金闕帝君三元真一經\",\n      \"name_vi\": \"Kim Khuyết Đế Quân Tam Nguyên Chân Nhất Kinh\",\n      \"bu\": \"洞真\",\n      \"author\": \"佚名（託涓子授青童君）\",\n      \"era\": \"南北朝（約）\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Kinh Thượng Thanh cổ về tồn thủ tam nguyên chân nhất: thượng nhất thiên đế, trung nhất đan hoàng, hạ nhất nguyên vương trong thân. Liên kết Đại Động chân kinh, Đại Hữu diệu kinh, Thái Thượng tố linh; được Đăng Chân ẩn quyết và Vân Cấp thất thiêm trích dẫn. Phương pháp tồn tư cốt lõi của Thượng Thanh.\",\n      \"key_text\": \"是故上一帝君寶《大洞真經》，中一丹皇寶《大有妙經》，下一元王寶《太上素靈》。\",\n      \"use\": \"Tồn tư tam nhất Thượng Thanh; liên hệ Đại Động–Tố Linh.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E9%87%91%E9%97%95%E5%B8%9D%E5%90%9B%E4%B8%89%E5%85%83%E7%9C%9F%E4%B8%80%E7%B6%93\",\n        \"https://ctext.org/wiki.pl?if=gb&res=133090\",\n        \"https://zh.wikipedia.org/wiki/%E9%87%91%E9%97%95%E5%B8%9D%E5%90%9B%E4%B8%89%E5%85%83%E7%9C%9F%E4%B8%80%E7%B6%93\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ254\",\n      \"name_han\": \"大洞金華玉經\",\n      \"name_vi\": \"Đại Động Kim Hoa Ngọc Kinh\",\n      \"bu\": \"洞真\",\n      \"author\": \"佚名（上清系）\",\n      \"era\": \"六朝–唐（約）\",\n      \"topic\": \"cultivation\",\n      \"essence\": \"Kinh phương pháp Thượng Thanh liên quan Đại Động, giảng kim hoa ẩn thư, đế quân thượng nguyện, huyền mẫu bát gian. Nhấn mạnh trước khi thụ Đại Động chi quyết phải tụng đế quân nguyện và trai giới. Bổ trợ hệ Đại Động chân kinh trong Động chân phương pháp loại.\",\n      \"key_text\": \"夫得受大洞之訣，洞一上道雌一合變，當先誦帝君上願、玄母八間金華隱書。\",\n      \"use\": \"Nghi truyền thụ và tụng nguyện hệ Đại Động.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/wiki/%E5%A4%A7%E6%B4%9E%E9%87%91%E8%8F%AF%E7%8E%89%E7%B6%93\",\n        \"https://taolibrary.com/category/category96/c960120.htm\",\n        \"https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf\"\n      ],\n      \"textual_certainty\": \"high\"\n    },\n    {\n      \"dz\": \"DZ290\",\n      \"name_han\": \"廣黃帝本行記\",\n      \"name_vi\": \"Quảng Hoàng Đế Bản Hành Ký\",\n      \"bu\": \"洞真\",\n      \"author\": \"王瓘\",\n      \"era\": \"唐（廣明二年記事止）\",\n      \"topic\": \"仙传\",\n      \"essence\": \"Tiên truyện về Hoàng Đế cầu đạo thành tiên do Vương Quán soạn; Tân Đường thư chép ba quyển, Đạo tạng chỉ còn hạ quyển. Kể Hoàng Đế trị thiên hạ xong đi tìm ẩn sĩ: thụ Tam Hoàng nội văn, Cửu nhự phương, vấn đạo Quảng Thành tử, luyện đan, thừa long thăng thiên. Tổng hợp Trang tử, Liệt tiên truyện, sử ký và đạo điển.\",\n      \"key_text\": \"黃帝以天下既理，物用具備，乃尋真訪隱，問道求仙，冀獲長生久視。\",\n      \"use\": \"Tiên truyện Hoàng Đế; nghiên cứu tín ngưỡng Hoàng Đế và Đạo giáo.\",\n      \"sources\": [\n        \"https://zh.wikisource.org/zh-hans/%E5%BB%A3%E9%BB%83%E5%B8%9D%E6%9C%AC%E8%A1%8C%E8%A8%98\",\n        \"https://zh.daoinfo.org/index.php?title=%E5%BB%A3%E9%BB%83%E5%B8%9D%E6%9C%AC%E8%A1%8C%E8%A8%98\",\n        \"https://ctext.org/wiki.pl?if=gb&chapter=317526\",\n        \"https://baike.baidu.com/item/%E5%B9%BF%E9%BB%84%E5%B8%9D%E6%9C%AC%E8%A1%8C%E8%AE%B0/23146036\"\n      ],\n      \"textual_certainty\": \"high\"\n    }\n  ]\n}",
+  "stopReason": "EndTurn",
+  "sessionId": "019f9171-49d0-7d11-a420-c88f033e465e",
+  "requestId": "099c8f5d-5932-4df7-beb7-1b49c0be686e",
+  "thought": "The user wants me to act as a distillation agent for Chinese Daoist Canon texts. They want 16 REAL texts from the 洞真部 (Dongzhen section) in the DZ200-DZ300 range, that haven't been covered yet.\nLet me read the PDF index to find DZ 200-300 texts.Excellent! I now have a complete verified list of DZ 200-300 texts from the Zhengtong Daozang catalog. Let me select 16 texts from DZ200-300 that are NOT already covered.\nI see you're working through the DZ 200-300 texts and want to avoid the already-covered ones while focusing on biography, genealogy, cultivation methods, and similar categories.Perfect! Now I have the definitive Schipper Concordance numbering (CT column = Schipper DZ numbers from Concordance du Tao-tsang).\nGot it—thanks for laying out the full mapping. The Schipper DZ numbers line up cleanly with the CT column, and the academic confirmations for DZ 246 and DZ 249 are solid.",
+  "usage": {
+    "input_tokens": 232843,
+    "cache_read_input_tokens": 492544,
+    "output_tokens": 11042,
+    "reasoning_tokens": 4261,
+    "total_tokens": 736429
+  },
+  "num_turns": 4,
+  "total_cost_usd": 1.1789732,
+  "total_cost_usd_ticks": 11789732000,
+  "modelUsage": {
+    "grok-4.5-build": {
+      "inputTokens": 232843,
+      "outputTokens": 11042,
+      "cacheReadInputTokens": 492544,
+      "modelCalls": 4,
+      "costUSD": 1.1789732
+    }
+  },
+  "structuredOutput": {
+    "entries": [
+      {
+        "dz": "DZ219",
+        "name_han": "靈寶無量度人上經大法",
+        "name_vi": "Linh Bảo Vô Lượng Độ Nhân Thượng Kinh Đại Pháp",
+        "bu": "洞真",
+        "author": "佚名（宋元符籙道士彙編）",
+        "era": "宋元（成書約宋–明初）",
+        "topic": "ritual",
+        "essence": "Bộ đại pháp 72 quyển lấy Kinh Độ Nhân làm trục, tập hợp phù lục, trai nghi, tồn tư và luyện độ cứu vong của phái Linh Bảo. Phần độ sinh giải kinh từng câu kèm phù đồ; phần độ tử có nghi phá ngục, cứu vong. Đây là tổng tập pháp thuật Linh Bảo lớn nhất trong Đạo tạng, dùng cho nghi thức độ người sống và người chết.",
+        "key_text": "道言昔於始青天中",
+        "use": "Nghi thức độ nhân, phù lục, trai khoa Linh Bảo; tham khảo hệ thống pháp thuật cứu độ.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E9%9D%88%E5%AF%B6%E7%84%A1%E9%87%8F%E5%BA%A6%E4%BA%BA%E4%B8%8A%E7%B6%93%E5%A4%A7%E6%B3%95",
+          "https://zh.daoinfo.org/index.php?title=%E9%9D%88%E5%AF%B6%E7%84%A1%E9%87%8F%E5%BA%A6%E4%BA%BA%E4%B8%8A%E7%B6%93%E5%A4%A7%E6%B3%95",
+          "https://www.shidianguji.com/zh/book/DZ0219",
+          "https://taolibrary.com/category95.aspx"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ220",
+        "name_han": "無上玄元三天玉堂大法",
+        "name_vi": "Vô Thượng Huyền Nguyên Tam Thiên Ngọc Đường Đại Pháp",
+        "bu": "洞真",
+        "author": "路時中",
+        "era": "南宋",
+        "topic": "ritual",
+        "essence": "Ba mươi quyển đại pháp Ngọc Đường do Lộ Thời Trung (Thượng Thanh đại động tam cảnh pháp sư) biên soạn, thuộc hệ Thiên Tâm/Chính Nhất. Nội dung gồm phát minh đại đạo, giới luật, tồn chân tu chứng, cao bôn nội cảnh, thư phù, ấn, bộ cang, trị tà và luyện độ. Nhấn mạnh nội tu kết hợp phù lục, xưng pháp xuất từ Ngọc Kinh sơn.",
+        "key_text": "道本無名，道亦無形。道之妙，先天而生。",
+        "use": "Pháp thuật Ngọc Đường: trị bệnh, trấn tà, luyện độ; nghiên cứu Thiên Tâm phái.",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=648420",
+          "https://zh.wikisource.org/zh-hans/%E7%84%A1%E4%B8%8A%E7%8E%84%E5%85%83%E4%B8%89%E5%A4%A9%E7%8E%89%E5%A0%82%E5%A4%A7%E6%B3%95",
+          "https://zh.daoinfo.org/index.php?title=%E7%84%A1%E4%B8%8A%E7%8E%84%E5%85%83%E4%B8%89%E5%A4%A9%E7%8E%89%E5%A0%82%E5%A4%A7%E6%B3%95",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ222",
+        "name_han": "清微神烈秘法",
+        "name_vi": "Thanh Vi Thần Liệt Bí Pháp",
+        "bu": "洞真",
+        "author": "佚名（清微派）",
+        "era": "宋元",
+        "topic": "ritual",
+        "essence": "Hai quyển bí pháp phái Thanh Vi, chuyên về thần liệt (lôi pháp) và phù chú. Thuộc hệ Thanh Vi trong Động chân phương pháp loại, bổ trợ cho Thanh Vi nguyên giáng đại pháp. Dùng để triệu thỉnh thần lôi, trị tà, cầu đảo.",
+        "key_text": "null",
+        "use": "Lôi pháp Thanh Vi, phù lục cầu đảo trị tà.",
+        "sources": [
+          "https://taolibrary.com/category95.aspx",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://michaelstanley-baker.com/clarkes-complete-daoist-index/"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ223",
+        "name_han": "清微元降大法",
+        "name_vi": "Thanh Vi Nguyên Giáng Đại Pháp",
+        "bu": "洞真",
+        "author": "佚名（清微派）",
+        "era": "宋元",
+        "topic": "ritual",
+        "essence": "Hai mươi lăm quyển tổng tập đại pháp phái Thanh Vi, ghi chép nguyên giáng (thần tiên giáng truyền) và hệ thống pháp thuật, thần phổ, nghi thức. Cùng với Thanh Vi tiên phổ và các bí pháp khác tạo thành khối tài liệu cốt lõi của Thanh Vi phái trong Đạo tạng.",
+        "key_text": "null",
+        "use": "Nghi thức, thần phổ và pháp thuật phái Thanh Vi.",
+        "sources": [
+          "https://taolibrary.com/category95.aspx",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf",
+          "https://michaelstanley-baker.com/clarkes-complete-daoist-index/"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ226",
+        "name_han": "紫元君授道傳心法",
+        "name_vi": "Tử Nguyên Quân Thụ Đạo Truyền Tâm Pháp",
+        "bu": "洞真",
+        "author": "原題長生陰真人注",
+        "era": "晚唐–北宋（約）",
+        "topic": "cultivation",
+        "essence": "Một quyển nội đan tâm pháp, nguyên đề Âm chân nhân chú, luận đạo truyền tâm theo Tử Nguyên quân. Trích Âm Phù kinh, chủ trương nội đan chân chính, phản đối ngoại đan và phục khí hình thức. Nhấn mạnh khẩu quyết tâm truyền hơn văn tự.",
+        "key_text": "null",
+        "use": "Nội đan tâm pháp; so sánh với Âm Phù–nội đan truyền thống.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E7%B4%AB%E5%85%83%E5%90%9B%E6%8E%88%E9%81%93%E5%82%B3%E5%BF%83%E6%B3%95",
+          "https://zh.daoinfo.org/index.php?title=%E7%B4%AB%E5%85%83%E5%90%9B%E6%8E%88%E9%81%93%E5%82%B3%E5%BF%83%E6%B3%95",
+          "https://www.jstor.org/stable/26768560"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ227",
+        "name_han": "真龍虎九仙經",
+        "name_vi": "Chân Long Hổ Cửu Tiên Kinh",
+        "bu": "洞真",
+        "author": "原題羅公遠、葉靜能注",
+        "era": "唐（託）/唐宋",
+        "topic": "cultivation",
+        "essence": "Kinh nội đan về long hổ, cửu tiên, nguyên đề La Công Viễn và Diệp Tĩnh Năng chú. Giảng luyện khí, điều tức, tránh tán loạn và vọng tưởng; dùng số cửu và hô hấp để điều hòa long hổ. Thuộc nhóm đan kinh ngắn trong Động chân phương pháp loại.",
+        "key_text": "無散亂，無煩怒，無起著，無妄想，無貪愛。",
+        "use": "Nội đan hô hấp–long hổ; tham khảo chú giải La–Diệp.",
+        "sources": [
+          "http://www.ctcwri.idv.tw/CTCW-CMTS/CMT01%E6%B4%9E%E7%9C%9F%E9%83%A8/CMT0108%E6%96%B9%E6%B3%95%E9%A1%9E/CMT0108ALL/CH010809%E7%9C%9F%E9%BE%8D%E8%99%8E%E4%B9%9D%E4%BB%99%E7%B6%93.htm",
+          "https://ctext.org/wiki.pl?if=gb&chapter=829751",
+          "https://taolibrary.com/category95.aspx"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ233",
+        "name_han": "還丹眾仙論",
+        "name_vi": "Hoàn Đan Chúng Tiên Luận",
+        "bu": "洞真",
+        "author": "楊在（抱腹山人）",
+        "era": "北宋皇祐四年（1052）",
+        "topic": "外丹",
+        "essence": "Một quyển do Dương Tại biên soạn năm Hoàng Hựu 4, tập hợp hơn ba mươi gia thuyết hoàn đan đời Đường–Tống. Bảo tồn nhiều đan quyết cổ đã thất truyền; luận chân chì, chân thủy ngân, hoa trì, hoàng nha, hà xa. Vừa mang dấu ấn ngoại đan vừa chuyển sang ngôn ngữ nội đan.",
+        "key_text": "粵還丹者，華池為初也。華池之中，能生神水。",
+        "use": "Nghiên cứu lịch sử hoàn đan; trích dẫn đan quyết thất truyền.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E9%82%84%E4%B8%B9%E7%9C%BE%E4%BB%99%E8%AB%96",
+          "https://ctext.org/library.pl?if=gb&res=83885",
+          "https://baike.baidu.com/item/%E8%BF%98%E4%B8%B9%E4%BC%97%E4%BB%99%E8%AE%BA/23146231"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ244",
+        "name_han": "大丹直指",
+        "name_vi": "Đại Đan Trực Chỉ",
+        "bu": "洞真",
+        "author": "丘處機",
+        "era": "金–元",
+        "topic": "cultivation",
+        "essence": "Hai quyển nội đan quan trọng của Khâu Xử Cơ (Trường Xuân chân nhân), đệ tử biên hành. Giảng tinh khí thần, luyện tinh hóa khí, luyện khí hóa thần, luyện thần hợp đạo; kèm đồ long hổ, chu thiên hỏa hầu, phi tinh. Nhấn mạnh tính mệnh song tu theo hệ Toàn Chân Long Môn.",
+        "key_text": "金丹之秘在一性一命而已。性者天也，常潛於頂；命者地也。",
+        "use": "Nội đan Toàn Chân; thực hành hỏa hầu và đồ thức.",
+        "sources": [
+          "https://zh.wikisource.org/wiki/%E5%A4%A7%E4%B8%B9%E7%9B%B4%E6%8C%87",
+          "https://ctext.org/wiki.pl?if=gb&res=123259",
+          "https://zh.daoinfo.org/index.php?title=%E5%A4%A7%E4%B8%B9%E7%9B%B4%E6%8C%87"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ245",
+        "name_han": "玉谿子丹經指要",
+        "name_vi": "Ngọc Khê Tử Đan Kinh Chỉ Yếu",
+        "bu": "洞真",
+        "author": "李簡易",
+        "era": "南宋（自序景定五年 1264）",
+        "topic": "cultivation",
+        "essence": "Ba quyển do Lý Giản Dị (Ngọc Khê tử) soạn, có Hỗn nguyên tiên phái đồ dung hợp Nam–Bắc tông. Gồm Ngộ Chân thiên chỉ yếu, biện hoặc, đan phòng pháp ngữ, giải Khâm Viên xuân. Lấy chân chì (tiên thiên nhất khí) làm cốt, giảng thủ thủ, ôn dưỡng, hỏa hầu, phản đối bàng môn.",
+        "key_text": "是以金火還返，為內丹之至要，當於一身中求。",
+        "use": "Nội đan Nam tông; đối chiếu Ngộ Chân thiên và phái đồ.",
+        "sources": [
+          "https://ctext.org/wiki.pl?if=gb&res=390679",
+          "https://zh.daoinfo.org/wiki/%E7%8E%89%E8%B0%BF%E5%AD%90%E4%B8%B9%E7%B6%93%E6%8C%87%E8%A6%81",
+          "https://baike.baidu.com/item/%E7%8E%89%E6%BA%AA%E5%AD%90%E4%B8%B9%E7%BB%8F%E6%8C%87%E8%A6%81/9778164"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ246",
+        "name_han": "西山群仙會真記",
+        "name_vi": "Tây Sơn Quần Tiên Hội Chân Ký",
+        "bu": "洞真",
+        "author": "施肩吾撰，李竦編",
+        "era": "晚唐–北宋",
+        "topic": "cultivation",
+        "essence": "Năm quyển hệ Chung–Lữ nội đan, đề Hoa Dương chân nhân Thi Kiên Ngô, đệ tử Lý Tủng biên. Kết cấu nhận thức (thức đạo, thức pháp…) rồi dưỡng hình khí, bổ tinh khí thần, và luyện đan. Chủ trương dưỡng hình trước, bổ ích tinh khí thần làm nền, là trụ cột của phái Chung Lữ.",
+        "key_text": "性非生知，學道者必資於切問；道難言傳，立教者不尚於多言。",
+        "use": "Nội đan Chung–Lữ; khung dưỡng sinh–bổ ích–luyện đan.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E8%A5%BF%E5%B1%B1%E7%BE%A4%E4%BB%99%E6%9C%83%E7%9C%9F%E8%A8%98",
+          "https://ctext.org/wiki.pl?if=gb&res=964040",
+          "https://zh.daoinfo.org/index.php?title=%E8%A5%BF%E5%B1%B1%E7%BE%A4%E4%BB%99%E6%9C%83%E7%9C%9F%E8%A8%98",
+          "https://purplecloudinstitute.com/wp-content/uploads/2023/08/Daoist-Texts-in-Western-Languages-%C2%A9-Purple-Cloud-Press-2023.pdf"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ247",
+        "name_han": "會真集",
+        "name_vi": "Hội Chân Tập",
+        "bu": "洞真",
+        "author": "王吉昌（超然子）",
+        "era": "金元",
+        "topic": "cultivation",
+        "essence": "Năm quyển của Siêu Nhiên tử Vương Cát Xương, dùng đồ Thái Cực, ngũ hành, tứ tượng bát quái kết hợp Dịch và kim đan. Có từ khúc đan đạo, dung Phật lý, khuyên đạm bạc danh lợi. Thuộc nội đan Toàn Chân thời Kim–Nguyên.",
+        "key_text": "夫易廣矣大矣，其無體也。始於一氣，即道也。",
+        "use": "Nội đan Dịch–đan đồ; từ khúc tu chân.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E6%9C%83%E7%9C%9F%E9%9B%86",
+          "https://zh.daoinfo.org/index.php?title=%E6%9C%83%E7%9C%9F%E9%9B%86",
+          "https://www.shidianguji.com/book/DZ0247"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ249",
+        "name_han": "中和集",
+        "name_vi": "Trung Hòa Tập",
+        "bu": "洞真",
+        "author": "李道純撰，蔡志頤編",
+        "era": "元（大德丙午 1306 biên thành）",
+        "topic": "philosophy",
+        "essence": "Sáu quyển chủ lực của Lý Đạo Thuần (Doanh Thiềm tử), đệ tử Thái Chí Di biên. Lấy «Trung Hòa» (Lễ Ký) làm cương lĩnh, dung Nho–Thích–Đạo, Nam–Bắc tông; có Thái Cực đồ, Trung Hòa đồ, tính mệnh luận. Khởi nguồn «trung phái» nội đan với yếu chỉ thủ trung trí hòa.",
+        "key_text": "所謂中者，非中外之中，亦非四維上下之中。",
+        "use": "Triết lý nội đan trung phái; tính mệnh song tu, tam giáo hợp nhất.",
+        "sources": [
+          "https://zh.wikisource.org/wiki/%E4%B8%AD%E5%92%8C%E9%9B%86",
+          "https://baike.baidu.com/item/%E4%B8%AD%E5%92%8C%E9%9B%86/5707524",
+          "https://www.fabriziopregadio.com/files/PREGADIO_Time_in_Chinese_Alchemy.pdf"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ252",
+        "name_han": "谷神篇",
+        "name_vi": "Cốc Thần Thiên",
+        "bu": "洞真",
+        "author": "林轅（五福玄巢子）",
+        "era": "元（大德八年 1304 tự tự）",
+        "topic": "cultivation",
+        "essence": "Hai quyển của Lâm Viện, tự xưng gặp chí nhân chỉ điểm, tham khảo quần kinh. Lấy «cốc dưỡng nguyên khí» đặt tên, kế thừa Tử Dương Nam tông, độc tôn nguyên khí; có thơ đại dược hoàn đan, đồ thức. Chủ trương đạm bạc danh lợi, tu thân dưỡng tính.",
+        "key_text": "古聖帝王官天下者，首以神仙之道，默相傳授。",
+        "use": "Nội đan nguyên khí; thơ–đồ tu luyện Nam tông.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E8%B0%B7%E7%A5%9E%E7%AF%87",
+          "https://ctext.org/wiki.pl?if=gb&res=969119",
+          "https://zh.daoinfo.org/index.php?title=%E8%B0%B7%E7%A5%9E%E7%AF%87"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ253",
+        "name_han": "金闕帝君三元真一經",
+        "name_vi": "Kim Khuyết Đế Quân Tam Nguyên Chân Nhất Kinh",
+        "bu": "洞真",
+        "author": "佚名（託涓子授青童君）",
+        "era": "南北朝（約）",
+        "topic": "cultivation",
+        "essence": "Kinh Thượng Thanh cổ về tồn thủ tam nguyên chân nhất: thượng nhất thiên đế, trung nhất đan hoàng, hạ nhất nguyên vương trong thân. Liên kết Đại Động chân kinh, Đại Hữu diệu kinh, Thái Thượng tố linh; được Đăng Chân ẩn quyết và Vân Cấp thất thiêm trích dẫn. Phương pháp tồn tư cốt lõi của Thượng Thanh.",
+        "key_text": "是故上一帝君寶《大洞真經》，中一丹皇寶《大有妙經》，下一元王寶《太上素靈》。",
+        "use": "Tồn tư tam nhất Thượng Thanh; liên hệ Đại Động–Tố Linh.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E9%87%91%E9%97%95%E5%B8%9D%E5%90%9B%E4%B8%89%E5%85%83%E7%9C%9F%E4%B8%80%E7%B6%93",
+          "https://ctext.org/wiki.pl?if=gb&res=133090",
+          "https://zh.wikipedia.org/wiki/%E9%87%91%E9%97%95%E5%B8%9D%E5%90%9B%E4%B8%89%E5%85%83%E7%9C%9F%E4%B8%80%E7%B6%93"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ254",
+        "name_han": "大洞金華玉經",
+        "name_vi": "Đại Động Kim Hoa Ngọc Kinh",
+        "bu": "洞真",
+        "author": "佚名（上清系）",
+        "era": "六朝–唐（約）",
+        "topic": "cultivation",
+        "essence": "Kinh phương pháp Thượng Thanh liên quan Đại Động, giảng kim hoa ẩn thư, đế quân thượng nguyện, huyền mẫu bát gian. Nhấn mạnh trước khi thụ Đại Động chi quyết phải tụng đế quân nguyện và trai giới. Bổ trợ hệ Đại Động chân kinh trong Động chân phương pháp loại.",
+        "key_text": "夫得受大洞之訣，洞一上道雌一合變，當先誦帝君上願、玄母八間金華隱書。",
+        "use": "Nghi truyền thụ và tụng nguyện hệ Đại Động.",
+        "sources": [
+          "https://zh.wikisource.org/wiki/%E5%A4%A7%E6%B4%9E%E9%87%91%E8%8F%AF%E7%8E%89%E7%B6%93",
+          "https://taolibrary.com/category/category96/c960120.htm",
+          "https://www.goldenelixir.com/files/Index_of_Zhengtong_Daozang.pdf"
+        ],
+        "textual_certainty": "high"
+      },
+      {
+        "dz": "DZ290",
+        "name_han": "廣黃帝本行記",
+        "name_vi": "Quảng Hoàng Đế Bản Hành Ký",
+        "bu": "洞真",
+        "author": "王瓘",
+        "era": "唐（廣明二年記事止）",
+        "topic": "仙传",
+        "essence": "Tiên truyện về Hoàng Đế cầu đạo thành tiên do Vương Quán soạn; Tân Đường thư chép ba quyển, Đạo tạng chỉ còn hạ quyển. Kể Hoàng Đế trị thiên hạ xong đi tìm ẩn sĩ: thụ Tam Hoàng nội văn, Cửu nhự phương, vấn đạo Quảng Thành tử, luyện đan, thừa long thăng thiên. Tổng hợp Trang tử, Liệt tiên truyện, sử ký và đạo điển.",
+        "key_text": "黃帝以天下既理，物用具備，乃尋真訪隱，問道求仙，冀獲長生久視。",
+        "use": "Tiên truyện Hoàng Đế; nghiên cứu tín ngưỡng Hoàng Đế và Đạo giáo.",
+        "sources": [
+          "https://zh.wikisource.org/zh-hans/%E5%BB%A3%E9%BB%83%E5%B8%9D%E6%9C%AC%E8%A1%8C%E8%A8%98",
+          "https://zh.daoinfo.org/index.php?title=%E5%BB%A3%E9%BB%83%E5%B8%9D%E6%9C%AC%E8%A1%8C%E8%A8%98",
+          "https://ctext.org/wiki.pl?if=gb&chapter=317526",
+          "https://baike.baidu.com/item/%E5%B9%BF%E9%BB%84%E5%B8%9D%E6%9C%AC%E8%A1%8C%E8%AE%B0/23146036"
+        ],
+        "textual_certainty": "high"
+      }
+    ]
+  }
+}
