@@ -182,8 +182,6 @@ export const PRESETS = [
     note: 'Endpoint thẳng — trình duyệt sẽ CHẶN CORS. Chỉ dùng nếu app có backend/proxy, hoặc chạy qua server-side.' },
   { id: 'zai-coding', label: 'Z.ai — GLM Coding Plan (glm-5.2) [proxy]', endpoint: '/zai/api/coding/paas/v4', model: 'glm-5.2',
     note: 'Endpoint Coding Plan — đi qua proxy /zai (cùng-origin, tránh CORS). Chạy được cả dev (Vite proxy) LẪN production (Cloudflare /zai). Dùng API key gói Coding Plan. [loop 1186 FIX: trước đây gọi thẳng api.z.ai → CORS chặn web].' },
-  { id: 'cf-glm', label: '★ Cloudflare Workers AI — GLM-5.2 [proxy]', endpoint: '/cf-ai/client/v4/accounts/bc101a2962ca21a084172c5334ad7dad/ai/v1', model: '@cf/zai-org/glm-5.2',
-    note: 'Cloudflare Workers AI chạy GLM-5.2. Đi qua proxy /cf-ai (cùng-origin) — tránh CORS. Dùng Cloudflare API Token làm key.' },
   { id: 'nvidia-glm', label: '★ NVIDIA NIM — GLM-5.2 [proxy, free 5000 credit]', endpoint: '/nvidia/v1', model: 'z-ai/glm-5.2',
     note: 'NVIDIA NIM chạy GLM-5.2 (cùng model, infra NVIDIA nhanh/ổn + tool-use + reasoning). Lấy key FREE ở build.nvidia.com/settings/api-keys (tài khoản NVIDIA free, 5000 credit + 40 RPM). Đi qua proxy /nvidia — tránh CORS.' },
   { id: 'groq', label: '★ Groq — llama-3.3-70b [proxy, FREE + cực nhanh 0.3s]', endpoint: '/groq/openai/v1', model: 'llama-3.3-70b-versatile',
@@ -207,21 +205,27 @@ export function getConfig() {
   if (cfg && typeof cfg.endpoint === 'string' && /^https?:\/\/api\.z\.ai\//.test(cfg.endpoint)) {
     cfg.endpoint = cfg.endpoint.replace(/^https?:\/\/api\.z\.ai\//, '/zai/');
   }
+  // [cloudflare-gỡ] migrate user cũ đang dùng cf-glm (Cloudflare Workers AI / proxy /cf-ai) → zai-proxy.
+  //   Worker không còn route /cf-ai → cfg cũ sẽ 404 → AI fail. Tự chuyển sang Z.ai + persist.
+  if (cfg && (cfg.preset === 'cf-glm' || (typeof cfg.endpoint === 'string' && /\/cf-ai|cloudflare/i.test(cfg.endpoint)))) {
+    const _def = PRESETS.find((p) => p.id === 'zai-proxy') || PRESETS[0];
+    cfg = { enabled: cfg.enabled !== false, endpoint: _def.endpoint, apiKey: '', model: _def.model, preset: 'zai-proxy' };
+    try { if (typeof localStorage !== 'undefined') localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
+  }
   if (cfg) {
-    // [loop 1387 FIX BUG SIÊU NGHIÊM TRỌNG] heal cfg hỏng: enabled nhưng THIẾU endpoint/model
-    //   (do bug main.js PRESETS['cf-glm'] từng set {enabled:true}) → isAIReady FALSE → AI toàn
-    //   local fallback («Giải Mệnh cục bộ») → khách rời. Tự sửa + persist cho user đã stuck.
+    // heal cfg hỏng: enabled nhưng THIẾU endpoint/model → isAIReady FALSE → AI toàn local
+    //   fallback («Giải Mệnh cục bộ») → khách rời. Tự sửa + persist cho user đã stuck.
     if (cfg.enabled && (!cfg.endpoint || !cfg.model)) {
-      const _cf = PRESETS.find((p) => p.id === 'cf-glm') || PRESETS[0];
-      cfg = { enabled: true, endpoint: _cf.endpoint, apiKey: '', model: _cf.model, preset: 'cf-glm' };
+      const _def = PRESETS.find((p) => p.id === 'zai-proxy') || PRESETS[0];
+      cfg = { enabled: true, endpoint: _def.endpoint, apiKey: '', model: _def.model, preset: 'zai-proxy' };
       try { if (typeof localStorage !== 'undefined') localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
     }
     return cfg;
   }
-  // [loop 903] Mặc định: Cloudflare Workers AI GLM-5.2 (proxy /cf-ai — chạy trên worker cùng origin).
-  // [loop 905] enabled: true — key nhúng server-side, user KHÔNG cần nhập gì.
-  const cfPreset = PRESETS.find((p) => p.id === 'cf-glm') || PRESETS[0];
-  return { enabled: true, endpoint: cfPreset.endpoint, apiKey: '', model: cfPreset.model, preset: 'cf-glm' };
+  // Mặc định: Z.ai GLM-5.2 (proxy /zai — worker inject key server-side, user KHÔNG cần nhập gì).
+  // [cloudflare-gỡ] trước đây default cf-glm (Cloudflare Workers AI); đã gỡ → đổi sang Z.ai.
+  const defPreset = PRESETS.find((p) => p.id === 'zai-proxy') || PRESETS[0];
+  return { enabled: true, endpoint: defPreset.endpoint, apiKey: '', model: defPreset.model, preset: 'zai-proxy' };
 }
 export function setConfig(cfg) {
   try { if (typeof localStorage !== 'undefined') localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
@@ -229,9 +233,10 @@ export function setConfig(cfg) {
 }
 export function isAIReady(cfg) {
   cfg = cfg || getConfig();
-  // [loop 905] cf-glm: key nhúng server-side → KHÔNG cần apiKey
-  const isCfNoKey = cfg.preset === 'cf-glm'; // worker inject key
-  return !!(cfg.enabled && cfg.endpoint && cfg.model && (isCfNoKey || cfg.apiKey));
+  // Endpoint đi qua worker proxy (bắt đầu bằng «/») → key nhúng server-side, KHÔNG cần apiKey.
+  //   Gồm zai-proxy (/zai), groq (/groq), nvidia (/nvidia)... worker inject key miễn phí.
+  const isProxyNoKey = typeof cfg.endpoint === 'string' && cfg.endpoint.charAt(0) === '/';
+  return !!(cfg.enabled && cfg.endpoint && cfg.model && (isProxyNoKey || cfg.apiKey));
 }
 
 // ===========================================================================

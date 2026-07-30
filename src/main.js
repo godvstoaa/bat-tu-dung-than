@@ -7914,19 +7914,19 @@ document.addEventListener('click', function (e) {
   }
 }, true);
 _logEvent('visit', { ref: document.referrer || '', path: location.pathname, loadMs: Math.round(performance.now()) });
-// [admin loop 1351] admin AI config — auto-enable cf-glm nếu admin có key (user không cần tự setup)
+// [admin loop 1351] admin AI config — auto-enable Z.ai nếu admin có key (user không cần tự setup)
 // [loop 1357] mode=free → chỉ auto-enable nếu free model đang BẬT (admin có thể tắt free glm-5.2)
 fetch('/api/ai-config').then(function (r) { return r.json(); }).then(function (c) {
   if (c.hasKey && c.mode !== 'off') {
-    var _cfP = PRESETS.find(function (p) { return p.id === 'cf-glm'; }) || PRESETS[0];
+    var _defP = PRESETS.find(function (p) { return p.id === 'zai-proxy'; }) || PRESETS[0];
     if (c.mode === 'free' && c.freeEnabled !== false) {
-      // [loop 1393] admin set FREE → FORCE cf-glm cho MỌI user (override localStorage)
-      //   → /cf-ai path → freeRoute → Groq/cf-glm (ổn định). z.ai rate-limit reset sau.
-      setConfig({ enabled: true, endpoint: _cfP.endpoint, apiKey: '', model: _cfP.model, preset: 'cf-glm' });
+      // admin set FREE → FORCE Z.ai cho MỌI user (override localStorage)
+      //   → /zai path → freeRoute → pool Groq/NVIDIA + z.ai (ổn định).
+      setConfig({ enabled: true, endpoint: _defP.endpoint, apiKey: '', model: _defP.model, preset: 'zai-proxy' });
     } else if (c.mode === 'custom') {
       var cfg = getConfig();
       if (!cfg.enabled) {
-        setConfig({ enabled: true, endpoint: _cfP.endpoint, apiKey: '', model: _cfP.model, preset: 'cf-glm' });
+        setConfig({ enabled: true, endpoint: _defP.endpoint, apiKey: '', model: _defP.model, preset: 'zai-proxy' });
       }
     }
   }

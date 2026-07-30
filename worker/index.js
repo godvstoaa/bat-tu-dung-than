@@ -3,7 +3,6 @@ import { makeProxy } from '../functions/_proxy.js';
 import { handleAdminRoute, isAiEnabled, isFreeAiEnabled, logFreeUsage, logEvent } from './admin.js';
 
 const PROXIES = [
-  ['/cf-ai', 'https://api.cloudflare.com'],
   ['/zai', 'https://api.z.ai'],
   ['/groq', 'https://api.groq.com'],
   ['/nvidia', 'https://integrate.api.nvidia.com'],
@@ -35,33 +34,33 @@ function withSecurityHeaders(res) {
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
 }
 
-// [loop 1376] FREE model pool — multi-backend gateway. Admin thêm free provider keys (NVIDIA,
-//   Groq...) vào ai:config.freePool → app thử pool + cf-glm theo thứ tự, fallback khi 1 provider
+// [loop 1376] FREE model pool — multi-backend gateway. Z.ai Coding Plan (glm-5.2) là PRIMARY,
+//   admin thêm free provider keys (Groq/NVIDIA...) vào ai:config.freePool làm FALLBACK khi z.ai
 //   fail (401/429/500/timeout). Ai cũng dùng được (key server-side, user không cần key).
-const CF_FREE_BASE = 'https://api.cloudflare.com/client/v4/accounts/bc101a2962ca21a084172c5334ad7dad/ai/v1';
 async function freeRoute(request, env, ctx, ip, aiCfg) {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'authorization, content-type' } });
   let bodyObj = {};
   try { bodyObj = await request.json(); } catch (e) { try { bodyObj = JSON.parse(await request.text()); } catch (_) {} }
   const pool = Array.isArray(aiCfg && aiCfg.freePool) ? aiCfg.freePool.filter(function (p) { return p && p.apiKey && p.endpoint && p.model; }) : [];
-  // [loop 1392 FIX] BỎ smart routing — z.ai thinking 30-138s → Worker kill → abort → fallback local.
-  //   Mọi câu → Groq (fast) → cf-glm (GLM-5.2 không thinking, 3-12s, ổn định) → z.ai (LAST resort).
-  //   cf-glm CŨNG là GLM-5.2 (cùng model) nhưng KHÔNG thinking → nhanh hơn z.ai cho mọi câu.
+  // [cloudflare-gỡ] z.ai Coding Plan (glm-5.2) là DEFAULT/PRIMARY — nhanh, ổn, hỗ trợ tool-use.
+  //   Pool (Groq/NVIDIA/...) chỉ là FALLBACK khi z.ai fail. (Trước đây cf-glm default; Groq từng
+  //   đứng đầu pool nhưng key chết 403/413 → mọi request fail ở Groq trước khi tới z.ai.)
   var poolBackends = pool.map(function (p) { return { name: p.name || 'pool', endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey) }; });
-  var cfBackend = [{ name: 'cf-glm', endpoint: CF_FREE_BASE, model: '@cf/zai-org/glm-5.2', apiKey: env.CF_AI_KEY || '' }];
   var zaiBackend = aiCfg.zaiKey ? [{ name: 'z.ai-paid', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2', apiKey: String(aiCfg.zaiKey) }] : [];
-  const backends = [].concat(poolBackends, cfBackend, zaiBackend);
+  const backends = [].concat(zaiBackend, poolBackends); // z.ai TRƯỚC, pool fallback
   for (let i = 0; i < backends.length; i++) {
     const b = backends[i];
     if (!b.apiKey) continue;
     var ac = new AbortController();
-    var timer = setTimeout(function () { ac.abort(); }, 45000); // [loop 1394] 45s — brief 20K tokens cần thời gian process
+    var timer = setTimeout(function () { ac.abort(); }, 45000); // 45s — brief 20K tokens cần thời gian process
     try {
       bodyObj.model = b.model;
-      // [loop 1383] pool backends (Groq) — bỏ tools/tool_choice (payload quá lớn → HTTP 413).
-      //   cf-glm (built-in) giữ tools. Pool backends trả lời từ brief (engine đã tính sẵn).
-      var bodySend = bodyObj;
-      if (b.name !== 'cf-glm') { bodySend = Object.assign({}, bodyObj); delete bodySend.tools; delete bodySend.tool_choice; }
+      // [cloudflare-gỡ] z.ai coding plan làm PRIMARY. Giữ nguyên thinking (frontend gửi
+      //   thinking:{enabled} → z.ai reasoning) — coding plan glm-5.2 thinking ~6s/call, chấp nhận
+      //   được, chất lượng luận giải tốt hơn no-thinking. Chỉ strip tools cho POOL (Groq/NVIDIA)
+      //   vì payload tools lớn → HTTP 413; z.ai-paid giữ tools (tool-use đầy đủ).
+      var bodySend = Object.assign({}, bodyObj);
+      if (b.name !== 'z.ai-paid') { delete bodySend.tools; delete bodySend.tool_choice; }
       const res = await fetch(b.endpoint + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + b.apiKey }, body: JSON.stringify(bodySend), signal: ac.signal });
       clearTimeout(timer);
       if (res.status === 200 && res.body) {
@@ -129,15 +128,15 @@ export default {
         }
         const sub = url.pathname.slice(prefix.length);
         const params = { path: sub.split('/').filter(Boolean) };
-        if (prefix === '/cf-ai') {
-          // [loop 1376] FREE pool: KHÔNG có admin custom key → freeRoute (NVIDIA/Groq/... + cf-glm fallback)
+        if (prefix === '/zai') {
+          // FREE pool gateway: KHÔNG có admin custom key → freeRoute (pool Groq/NVIDIA + z.ai)
           let adminKey = null, aiCfg = {};
           try { aiCfg = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); adminKey = aiCfg.apiKey || null; } catch (e) {}
           if (!adminKey) {
             if (!(await isFreeAiEnabled(env))) return new Response(JSON.stringify({ error: { message: 'Model free đang bị TẮT.', type: 'free_ai_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' } });
             return await freeRoute(request, env, ctx, ip, aiCfg);
           }
-          // admin custom key (single backend, như cũ)
+          // admin custom key (single backend — forward tới z.ai với key admin)
           const headers = new Headers(request.headers);
           if (!headers.get('Authorization') && adminKey) headers.set('Authorization', `Bearer ${adminKey}`);
           request = new Request(request, { headers });
