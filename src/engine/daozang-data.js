@@ -7834,6 +7834,10 @@ DAOZANG.forEach((e) => {
   }
 });
 
+// [DEEP] Merge scholarly deep content (from daozang-deep.js) into entries
+import { enrichWithDeep } from './daozang-deep.js';
+enrichWithDeep(DAOZANG);
+
 export function daozangByBu(entries = DAOZANG) {
   const c = {};
   for (const e of entries) c[e.bu] = (c[e.bu] || 0) + 1;
