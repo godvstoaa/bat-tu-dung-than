@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 const FRAG = 'docs/_fragments';
 const DEEP_FILE = 'src/engine/daozang-deep.js';
 
-const batchFiles = readdirSync(FRAG).filter(f => /^_deep20-b\d+\.json$/.test(f)).sort((a, b) => {
+const batchFiles = readdirSync(FRAG).filter(f => /^_deep(?:20|gap)-b\d+\.json$/.test(f)).sort((a, b) => {
   const na = parseInt(a.match(/\d+/)[0]); const nb = parseInt(b.match(/\d+/)[0]);
   return na - nb;
 });
