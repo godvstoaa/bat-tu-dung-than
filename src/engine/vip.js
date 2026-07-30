@@ -9,13 +9,16 @@ const FREE_AI_KEY = 'battu-ai-quota';
 
 // Gói VIP (giá VN — chuyển khoản; iOS dùng IAP price tier tương đương)
 export const VIP_PLANS = [
-  { id: 'vip-week', label: 'VIP 7 ngày', price: '30.000đ', ios: false, days: 7 },
-  { id: 'vip-month', label: 'VIP 30 ngày', price: '99.000đ', ios: false, days: 30 },
-  { id: 'vip-year', label: 'VIP 365 ngày', price: '499.000đ', ios: false, days: 365 },
-  // iOS IAP (Apple tier): week=$0.99, month=$2.99, year=$14.99
-  { id: 'shop.god8.battu.vip.week', label: 'VIP 7 ngày (iOS)', price: '$0.99', ios: true, days: 7 },
-  { id: 'shop.god8.battu.vip.month', label: 'VIP 30 ngày (iOS)', price: '$2.99', ios: true, days: 30 },
-  { id: 'shop.god8.battu.vip.year', label: 'VIP 365 ngày (iOS)', price: '$14.99', ios: true, days: 365 },
+  // Web (bank transfer — 0% fee)
+  { id: 'vip-week', label: 'VIP 7 ngày', price: '69.000đ', ios: false, days: 7 },
+  { id: 'vip-month', label: 'VIP 30 ngày', price: '189.000đ', ios: false, days: 30, best: true },
+  { id: 'vip-year', label: 'VIP 365 ngày', price: '1.149.000đ', ios: false, days: 365 },
+  { id: 'vip-lifetime', label: 'VIP Trọn đời', price: '2.299.000đ', ios: false, days: 36500 },
+  // iOS IAP (Apple price tiers — 15% Small Business fee)
+  { id: 'vip_week', label: 'VIP 7 ngày (iOS)', price: '$2.99', ios: true, days: 7 },
+  { id: 'vip_month', label: 'VIP 30 ngày (iOS)', price: '$7.99', ios: true, days: 30, best: true },
+  { id: 'vip_year', label: 'VIP 365 ngày (iOS)', price: '$49.99', ios: true, days: 365 },
+  { id: 'vip_lifetime', label: 'VIP Trọn đời (iOS)', price: '$99.99', ios: true, days: 36500 },
 ];
 
 // Phát hiện môi trường Capacitor (native iOS/Android) vs browser
