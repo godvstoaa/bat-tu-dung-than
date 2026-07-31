@@ -72,6 +72,15 @@ for (const e of DAOZANG) {
 ${e.han_text ? `<div class="han-box">${esc(e.han_text)}</div>` : ''}
 <p>${esc(e.meaning || '')}</p>
 ${e.use ? `<p><b>Ứng dụng:</b> ${esc(e.use)}</p>` : ''}
+${e.deep_essence ? `<h2>📖 Phân tích sâu</h2><p>${esc(e.deep_essence)}</p>` : ''}
+${e.deep_passages ? `<h2>墨 Đoạn Hán verbatim</h2><div class="han-box">${esc(e.deep_passages)}</div>` : ''}
+${e.deep_application ? `<p><b>⚡ Ứng dụng chuyên sâu:</b> ${esc(e.deep_application)}</p>` : ''}
+${e.deep_related ? `<p><b>🔗 Liên quan:</b> ${esc(e.deep_related)}</p>` : ''}
+${e.logic_thesis ? `<h2>🎯 Lý luận — Luận điểm</h2><p>${esc(e.logic_thesis)}</p>` : ''}
+${e.logic_chain ? `<h3>🔗 Chuỗi lý luận</h3><p>${esc(e.logic_chain)}</p>` : ''}
+${e.logic_practice ? `<h3>⚡ Thực hành BaZi</h3><p>${esc(e.logic_practice)}</p>` : ''}
+${e.logic_compare ? `<h3>⚖ So sánh</h3><p>${esc(e.logic_compare)}</p>` : ''}
+${e.full_vn ? `<h2>🇻🇳 Bản dịch Việt</h2><p>${esc(e.full_vn)}</p>` : ''}
 ${sources ? `<div class="src"><b>Nguồn tham chiếu:</b><ul>${sources}</ul></div>` : ''}
 <p class="back"><a href="/">← Xem lá số Bát Tự của bạn</a> · <a href="/#thu-vien-huyen-hoc">Thư viện Huyền học</a></p>
 </body></html>`;

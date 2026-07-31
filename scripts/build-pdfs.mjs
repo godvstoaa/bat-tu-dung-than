@@ -51,6 +51,17 @@ function renderEntry(e) {
   if (e.visual) parts.push(`<p><b>Thị giác:</b> ${esc(e.visual)}</p>`);
   if (e.meaning) parts.push(`<p>${esc(e.meaning)}</p>`);
   if (e.use) parts.push(`<p class="muted"><b>Dùng:</b> ${esc(e.use)}</p>`);
+  // [DEEP] phân tích sâu
+  if (e.deep_essence) parts.push(`<h3>📖 Phân tích sâu</h3><p>${esc(e.deep_essence)}</p>`);
+  if (e.deep_passages) parts.push(`<div class="han-box"><span class="zh">${esc(e.deep_passages)}</span></div>`);
+  if (e.deep_application) parts.push(`<p class="muted"><b>⚡ Ứng dụng:</b> ${esc(e.deep_application)}</p>`);
+  // [LOGIC] lý luận
+  if (e.logic_thesis) parts.push(`<h3>🎯 Luận điểm</h3><p>${esc(e.logic_thesis)}</p>`);
+  if (e.logic_chain) parts.push(`<p class="muted"><b>🔗 Lý luận:</b> ${esc(e.logic_chain)}</p>`);
+  if (e.logic_practice) parts.push(`<p class="muted"><b>⚡ Thực hành:</b> ${esc(e.logic_practice)}</p>`);
+  if (e.logic_compare) parts.push(`<p class="muted"><b>⚖ So sánh:</b> ${esc(e.logic_compare)}</p>`);
+  // [FULL VN] dịch Việt
+  if (e.full_vn) parts.push(`<h3>🇻🇳 Bản dịch Việt</h3><p>${esc(e.full_vn)}</p>`);
   if (e.recitation_context) parts.push(`<p class="muted"><b>Context:</b> ${esc(e.recitation_context)}</p>`);
   if (e.notes) parts.push(`<p class="muted"><i>${esc(e.notes)}</i></p>`);
   const srcs = (e.sources || []).map((s) => { const m = s.match(/^(https?:\/\/\S+)\s*\(([^)]*)\)/); return `<li>${m ? `<a href="${m[1]}">${esc(m[2] || m[1])}</a> — <span class="muted">${esc(m[1])}</span>` : esc(s)}</li>`; }).join('');
