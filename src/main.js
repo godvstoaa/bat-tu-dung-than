@@ -6074,6 +6074,28 @@ function _renderLibEntry(e) {
   if (e.use) body.push(_h('div', { class: 'hint' }, _h('b', {}, 'Dùng: '), document.createTextNode(e.use)));
   if (e.recitation_context) body.push(_h('div', { class: 'hint' }, _h('b', {}, 'Context: '), document.createTextNode(e.recitation_context)));
   if (e.notes) body.push(_h('div', { class: 'hint', style: 'opacity:.85' }, _h('i', {}, e.notes)));
+  // [DEEP] phân tích sâu + verbatim passages + ứng dụng + cross-ref
+  if (e.deep_essence || e.deep_passages || e.deep_application || e.deep_related) {
+    const dd = _h('div', { style: 'font-size:13px;line-height:1.8;color:var(--silk)' });
+    if (e.deep_essence) dd.appendChild(_h('div', { style: 'margin-bottom:8px' }, _h('b', { style: 'color:var(--gold-bright)' }, '📖 Phân tích sâu: '), document.createTextNode(e.deep_essence)));
+    if (e.deep_passages) dd.appendChild(_h('div', { style: 'margin-bottom:8px' }, _h('b', { style: 'color:var(--gold-bright)' }, '墨 Đoạn Hán verbatim: '), _h('span', { class: 'zh' }, e.deep_passages)));
+    if (e.deep_application) dd.appendChild(_h('div', { style: 'margin-bottom:8px' }, _h('b', { style: 'color:var(--gold-bright)' }, '⚡ Ứng dụng: '), document.createTextNode(e.deep_application)));
+    if (e.deep_related) dd.appendChild(_h('div', {}, _h('b', { style: 'color:var(--gold-bright)' }, '🔗 Liên quan: '), document.createTextNode(e.deep_related)));
+    body.push(_h('details', { class: 'lib-deep', style: 'margin-top:8px' }, _h('summary', { style: 'color:var(--gold);cursor:pointer;font-size:13px' }, '📖 Phân tích sâu (chương/đoạn/ứng dụng)'), dd));
+  }
+  // [LOGIC] luận điểm + chuỗi suy luận + thực hành + so sánh
+  if (e.logic_thesis || e.logic_chain || e.logic_practice || e.logic_compare) {
+    const ld = _h('div', { style: 'font-size:13px;line-height:1.8;color:var(--silk)' });
+    if (e.logic_thesis) ld.appendChild(_h('div', { style: 'margin-bottom:8px' }, _h('b', { style: 'color:var(--gold-bright)' }, '🎯 Luận điểm: '), document.createTextNode(e.logic_thesis)));
+    if (e.logic_chain) ld.appendChild(_h('div', { style: 'margin-bottom:8px' }, _h('b', { style: 'color:var(--gold-bright)' }, '🔗 Chuỗi lý luận: '), document.createTextNode(e.logic_chain)));
+    if (e.logic_practice) ld.appendChild(_h('div', { style: 'margin-bottom:8px' }, _h('b', { style: 'color:var(--gold-bright)' }, '⚡ Thực hành BaZi: '), document.createTextNode(e.logic_practice)));
+    if (e.logic_compare) ld.appendChild(_h('div', {}, _h('b', { style: 'color:var(--gold-bright)' }, '⚖ So sánh: '), document.createTextNode(e.logic_compare)));
+    body.push(_h('details', { class: 'lib-logic', style: 'margin-top:4px' }, _h('summary', { style: 'color:var(--gold);cursor:pointer;font-size:13px' }, '🎯 Lý luận & Logic (tại sao + làm gì + so sánh)'), ld));
+  }
+  // [FULL VN] bản dịch thuần Việt
+  if (e.full_vn) {
+    body.push(_h('details', { class: 'lib-vn', style: 'margin-top:4px' }, _h('summary', { style: 'color:var(--gold);cursor:pointer;font-size:13px' }, '🇻🇳 Bản dịch Việt (đầy đủ)'), _h('div', { style: 'font-size:13px;line-height:1.9;color:var(--silk);margin-top:6px' }, document.createTextNode(e.full_vn))));
+  }
   const sul = _h('ul', { style: 'font-size:11px;line-height:1.6' });
   (e.sources || []).forEach((s) => sul.appendChild(_libSourceLi(s)));
   body.push(_h('details', { class: 'lib-src' }, _h('summary', {}, `Nguồn (${(e.sources || []).length} — ≥2 độc lập)`), sul));
