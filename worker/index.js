@@ -115,10 +115,6 @@ export default {
       return handleAdminRoute(request, env, url);
     }
 
-    // 1b) VIP activation code system (bank transfer monetization)
-    if (url.pathname === '/api/redeem' && request.method === 'POST') {
-      return handleRedeemCode(request, env, ip);
-    }
 
     // 2) proxy LLM API
     for (const [prefix, host] of PROXIES) {
@@ -173,65 +169,5 @@ export default {
   },
 };
 
-// ============================================================================
-//  VIP Activation Code System — bank transfer monetization
-//  Admin tạo mã (POST /admin/api/vip-gen) → user mua → nhập mã (POST /api/redeem)
-//  Mã lưu trong ADMIN_KV: key=code → { days, plan, used:boolean, created, usedAt }
-// ============================================================================
-const PLANS = { 'W7': 7, 'M30': 30, 'Y365': 365 };
-
-async function handleRedeemCode(request, env, ip) {
-  const cors = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' };
-  try {
-    const { code } = await request.json();
-    if (!code || typeof code !== 'string' || code.trim().length < 6) {
-      return new Response(JSON.stringify({ ok: false, error: 'Mã không hợp lệ' }), { status: 400, headers: cors });
-    }
-    const key = 'vip:' + code.trim().toUpperCase();
-    if (!env.ADMIN_KV) return new Response(JSON.stringify({ ok: false, error: 'Hệ thống chưa sẵn sàng' }), { status: 503, headers: cors });
-    const raw = await env.ADMIN_KV.get(key);
-    if (!raw) return new Response(JSON.stringify({ ok: false, error: 'Mã không tồn tại' }), { status: 404, headers: cors });
-    const data = JSON.parse(raw);
-    if (data.used) return new Response(JSON.stringify({ ok: false, error: 'Mã đã được sử dụng' }), { status: 410, headers: cors });
-    // activate
-    data.used = true;
-    data.usedAt = new Date().toISOString();
-    data.usedByIp = ip;
-    await env.ADMIN_KV.put(key, JSON.stringify(data));
-    // log
-    if (env.ADMIN_KV) env.ADMIN_KV.put('viplog:' + Date.now(), JSON.stringify({ code: data.code, plan: data.plan, ip })).catch(() => {});
-    return new Response(JSON.stringify({ ok: true, days: data.days, plan: data.plan }), { status: 200, headers: cors });
-  } catch (e) {
-    return new Response(JSON.stringify({ ok: false, error: 'Lỗi server' }), { status: 500, headers: cors });
-  }
-}
-
-// Admin: generate VIP codes (gọi từ admin dashboard với adminKey)
-// POST /admin/api/vip-gen { plan: 'W7'|'M30'|'Y365', count: N, adminKey: '...' }
-export async function handleVipGen(request, env) {
-  const cors = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
-  try {
-    const { plan, count, adminKey } = await request.json();
-    // simple auth — adminKey từ KV 'ai:config' apiKey
-    const aiCfg = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}');
-    if (!aiCfg.apiKey || adminKey !== aiCfg.apiKey) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: cors });
-    }
-    const days = PLANS[plan];
-    if (!days) return new Response(JSON.stringify({ error: 'Plan không hợp lệ (W7/M30/Y365)' }), { status: 400, headers: cors });
-    const n = Math.min(Math.max(parseInt(count) || 1, 1), 100);
-    const codes = [];
-    for (let i = 0; i < n; i++) {
-      // generate readable code: VIP-XXXX-XXXX (8 alphanumeric, avoid ambiguous 0/O/1/I)
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let code = 'VIP-';
-      for (let j = 0; j < 8; j++) { code += chars[Math.floor(Math.random() * chars.length)]; if (j === 3) code += '-'; }
-      await env.ADMIN_KV.put('vip:' + code, JSON.stringify({ code, days, plan, used: false, created: new Date().toISOString() }));
-      codes.push(code);
-    }
-    return new Response(JSON.stringify({ ok: true, codes, days, plan }), { status: 200, headers: cors });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
-  }
-}
+// [REMOVED] VIP redeem/vip-gen + PLANS — gỡ hệ thống payment cho App Store (app free).
 
