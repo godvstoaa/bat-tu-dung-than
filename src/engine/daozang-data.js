@@ -7922,6 +7922,8 @@ export function suggestDaozangByQuestion(question, limit = 8) {
   return scored.slice(0, limit).map((s) => ({
     id: s.e.id, name_han: s.e.name_han, name_vi: s.e.name_vi,
     notes: s.e.notes, essence: (s.e.meaning || '').slice(0, 150), hits: s.hits,
+    logic_thesis: (s.e.logic_thesis || '').slice(0, 150),
+    full_vn: (s.e.full_vn || '').slice(0, 200),
   }));
 }
 

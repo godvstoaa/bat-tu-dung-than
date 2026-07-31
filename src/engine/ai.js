@@ -1066,7 +1066,12 @@ export function buildTargetedBrief(R, userQuestion) {
         if (dzAware.amtaAdvice) dzSection += dzAware.amtaAdvice + '\n';
         if (dzAware.kinh.length) {
           dzSection += 'KINH/VĂN HIẾN LIÊN QUAN:\n';
-          dzAware.kinh.forEach((e) => { dzSection += `• ${e.name_han} (${e.name_vi || ''}): ${(e.essence || '').slice(0, 120)}${e.fromChart ? ' ← từ Dụng Thần' : ''}\n`; });
+          dzAware.kinh.forEach((e) => {
+            dzSection += `• ${e.name_han} (${e.name_vi || ''}): ${(e.essence || '').slice(0, 100)}${e.fromChart ? ' ← Dụng Thần' : ''}`;
+            if (e.logic_thesis) dzSection += ` | LOGIC: ${e.logic_thesis.slice(0, 100)}`;
+            if (e.full_vn) dzSection += ` | VN: ${e.full_vn.slice(0, 100)}`;
+            dzSection += '\n';
+          });
         }
         return fullBrief + dzSection;
       }
