@@ -1231,8 +1231,8 @@ function adminDashboard() {
     to:document.getElementById('vf-to').value?new Date(document.getElementById('vf-to').value).getTime()+86400000:null,
   }; }
   function _bestScore(v){ var sc=(v.charts||[]).map(function(c){return c.score;}).filter(function(s){return s!=null;}); return sc.length?Math.max.apply(null,sc):null; }
-  function _vHay(v){ var refEv=(v.timeline||[]).find(function(t){return t.type==='visit'&&t.data&&t.data.ref;}); var ref=refEv?(' '+refEv.data.ref):'';
-    return [v.name,v.ip,v.country,v.city,v.device,v.note,(v.tags||[]).join(' '),(v.charts||[]).map(function(c){return (c.dob||'')+' '+(c.time||'')+' '+(c.gender||'')+' '+(c.name||'')+' '+(c.score!=null?c.score:'')+' '+(c.grade||'')+' '+(c.patternQ||'')+' '+(c.yong||'');}).join(' '),(v.questions||[]).join(' '),(v.chats||[]).map(function(c){return (c.q||'')+' '+(c.response||'');}).join(' '),ref].join(' ').toLowerCase(); }
+  function _vHay(v){ if(v._hay)return v._hay; var refEv=(v.timeline||[]).find(function(t){return t.type==='visit'&&t.data&&t.data.ref;}); var ref=refEv?(' '+refEv.data.ref):'';
+    v._hay=[v.name,v.ip,v.country,v.city,v.device,v.note,(v.tags||[]).join(' '),(v.charts||[]).map(function(c){return (c.dob||'')+' '+(c.time||'')+' '+(c.gender||'')+' '+(c.name||'')+' '+(c.score!=null?c.score:'')+' '+(c.grade||'')+' '+(c.patternQ||'')+' '+(c.yong||'');}).join(' '),(v.questions||[]).join(' '),(v.chats||[]).map(function(c){return (c.q||'')+' '+(c.response||'').slice(0,300);}).join(' '),ref].join(' ').toLowerCase(); return v._hay; }
   function _vHit(v,f){ if(!f.q)return true; var hay=_vHay(v); return f.q.split(/\\s+/).every(function(t){return t&&hay.indexOf(t)>=0;}); }
   function _vMatch(v,f){
     if(!_vHit(v,f))return false;
@@ -1307,7 +1307,9 @@ function adminDashboard() {
     var bip=document.getElementById('byip'); if(bip){bip.textContent='';
       var vc=document.getElementById('vcount'); if(vc) vc.textContent=matched.length+' / '+arr.length+' visitor';
       if(!matched.length) bip.appendChild(el('div','tiny','(không khớp — bớt filter hoặc bấm «✕ lọc»)'));
-      matched.slice(0,200).forEach(function(v){ bip.appendChild(_vCard(v)); });
+      var LIMIT=50; // [PERF] giảm 200→50 — 200 cards × 20 DOM = 4000 elements gây freeze
+      matched.slice(0,LIMIT).forEach(function(v){ bip.appendChild(_vCard(v)); });
+      if(matched.length>LIMIT) bip.appendChild(el('div','tiny','… còn '+(matched.length-LIMIT)+' visitor — bớt filter để thấy thêm'));
     }
     var tc=document.getElementById('vtagcloud'); if(tc){tc.textContent='';
       (d.tagCloud||[]).slice(0,20).forEach(function(t){ var chip=el('span','badge','🏷 '+t.tag+' '+t.count); chip.style.cssText='background:rgba(100,180,255,.12);color:#64b4ff;cursor:pointer;margin:2px'; chip.title='Lọc theo tag «'+t.tag+'»'; chip.onclick=function(){document.getElementById('vq').value=t.tag;vRender();}; tc.appendChild(chip); });
