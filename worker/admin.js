@@ -903,7 +903,7 @@ function adminDashboard() {
         <div class="card">
           <h3>🔎 Tìm visitor <span class="card-actions tiny">tìm + lọc + sắp xếp · gõ bất kỳ đặc điểm nào admin nhớ</span></h3>
           <div class="toolbar">
-            <input class="filter" id="vq" placeholder="🔍 tên / ngày sinh / IP / câu hỏi / trả lời AI / ghi chú / tag…" oninput="vRender()" style="flex:1;min-width:220px">
+            <input class="filter" id="vq" placeholder="🔍 tên / ngày sinh / IP / câu hỏi / trả lời AI / ghi chú / tag…" oninput="_vDebounced()" style="flex:1;min-width:220px">
             <select class="filter" id="vf-gender" onchange="vRender()"><option value="">Mọi giới</option><option value="nam">Nam</option><option value="nữ">Nữ</option></select>
             <select class="filter" id="vf-country" onchange="vRender()"></select>
             <select class="filter" id="vf-sort" onchange="vRender()">
@@ -921,13 +921,13 @@ function adminDashboard() {
             <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-name" onchange="vRender()"> có tên</label>
             <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-ret" onchange="vRender()"> quay lại</label>
             <span style="margin-left:6px">điểm</span>
-            <input class="filter" id="vf-smin" type="number" min="0" max="100" placeholder="từ" oninput="vRender()" style="width:50px">
+            <input class="filter" id="vf-smin" type="number" min="0" max="100" placeholder="từ" oninput="_vDebounced()" style="width:50px">
             <span>–</span>
-            <input class="filter" id="vf-smax" type="number" min="0" max="100" placeholder="đến" oninput="vRender()" style="width:50px">
+            <input class="filter" id="vf-smax" type="number" min="0" max="100" placeholder="đến" oninput="_vDebounced()" style="width:50px">
             <span style="margin-left:4px">thăm</span>
-            <input class="filter" id="vf-from" type="date" oninput="vRender()" style="width:128px">
+            <input class="filter" id="vf-from" type="date" oninput="_vDebounced()" style="width:128px">
             <span>→</span>
-            <input class="filter" id="vf-to" type="date" oninput="vRender()" style="width:128px">
+            <input class="filter" id="vf-to" type="date" oninput="_vDebounced()" style="width:128px">
           </div>
           <div id="vtagcloud" class="tiny" style="margin-top:6px;line-height:2"></div>
           <div id="byip"></div>
@@ -940,7 +940,7 @@ function adminDashboard() {
         <div class="card"><h3>Sự kiện gần đây <span class="card-actions tiny">click dòng ai_chat → xem full Q+A</span></h3>
           <div class="toolbar">
             <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option><option value="ai_chat">ai_chat (Q+A)</option><option value="error">error</option><option value="click">click</option></select>
-            <input class="filter" id="sq" placeholder="🔍 tìm trong sự kiện" oninput="var q=this.value.toLowerCase();document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'})">
+            <input class="filter" id="sq" placeholder="🔍 tìm trong sự kiện" oninput="_sqDebounced(this)">
           </div>
           <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
         </div>
@@ -1282,6 +1282,12 @@ function adminDashboard() {
     bk.onclick=(function(ip){return function(e){e.stopPropagation();if(confirm('Block IP '+ip+'?'))blockIp(ip,1);};})(v.ip); card.appendChild(bk);
     return card;
   }
+  // [PERF FIX] debounce vRender — tránh lag khi gõ search (mỗi phím gõ trước đây re-render 200+ DOM)
+  var _vTimer;
+  function _vDebounced(){ clearTimeout(_vTimer); _vTimer = setTimeout(vRender, 300); }
+  // [PERF FIX] debounce events search — querySelectorAll ALL rows mỗi keystroke = freeze
+  var _sqTimer;
+  function _sqDebounced(inp){ var val=inp.value; clearTimeout(_sqTimer); _sqTimer=setTimeout(function(){ var q=val.toLowerCase(); document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'}); }, 300); }
   function vRender(){
     var d=_lastD; if(!d)return; var f=_vf();
     var arr=(d.byIp||[]).slice();
