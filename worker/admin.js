@@ -1253,8 +1253,8 @@ function adminDashboard() {
     return true;
   }
   function _vCard(v){
-    var card=el('div'); card.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin:6px 0;cursor:pointer;transition:border-color .15s,transform .1s;position:relative';
-    card.onmouseenter=function(){card.style.borderColor='var(--border2)';card.style.transform='translateX(2px)';}; card.onmouseleave=function(){card.style.borderColor='var(--border)';card.style.transform='none';};
+    var card=el('div'); card.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin:6px 0;cursor:pointer;position:relative';
+    card.onmouseenter=function(){card.style.borderColor='var(--border2)';}; card.onmouseleave=function(){card.style.borderColor='var(--border)';};
     card.onclick=function(){showVisitor(v.ip);};
     var r1=el('div'); r1.style.cssText='display:flex;align-items:center;gap:8px;flex-wrap:wrap';
     if(v.name){var nm=el('span',null,v.name); nm.style.cssText='color:var(--gold);font-weight:700'; r1.appendChild(nm);}
