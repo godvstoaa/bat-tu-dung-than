@@ -1816,7 +1816,7 @@ export function execTool(name, args, R) {
         } catch (e) { return { error: 'lỗi analyze_remedy_fate: ' + e.message }; }
       }
       case 'log_error': { // [R46] AI tự log lỗi khi bị user sửa — structured error report + POST to server KV
-        try { fetch('/api/log-error', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).catch(() => {}); } catch (_) {}
+        try { fetch(_resolveNativeUrl('/api/log-error'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) }).catch(() => {}); } catch (_) {}
         return {
           logged: true,
           timestamp: new Date().toISOString(),
@@ -2416,7 +2416,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   ];
 
   const endpoint = cfg.endpoint.replace(/\/$/, '');
-  const url = endpoint.endsWith('/chat/completions') ? endpoint : endpoint + '/chat/completions';
+  const url = _resolveNativeUrl(endpoint.endsWith('/chat/completions') ? endpoint : endpoint + '/chat/completions');
   const headers = { 'Content-Type': 'application/json', ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}) };
   // [loop 1186 FIX] thinking là param BẢN ĐỊA Z.ai/BigModel — KHÔNG gửi cho Cloudflare Workers AI.
   //   api.cloudflare.com không hiểu thinking → 400. Model @cf/zai-org/glm-5.2 chứa chữ «glm» nhưng
@@ -2507,12 +2507,18 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   }
 }
 
+// [CAPACITOR] iOS/Android native: relative URLs → absolute (production server)
+function _resolveNativeUrl(url) {
+  try { if (typeof window !== 'undefined' && window.Capacitor && window.Capacitor.isNativeAvailable() && typeof url === 'string' && url.startsWith('/')) return 'https://battu.god8.shop' + url; } catch (_) {}
+  return url;
+}
+
 // ---- Test kết nối (cho nút "Test" trong ⚙) — báo chính xác CORS/auth/HTTP ----
 export async function testAIConnection(cfg) {
   cfg = cfg || getConfig();
   if (!cfg.endpoint || !cfg.model) return { ok: false, detail: '❌ Thiếu endpoint/model.' };
   const endpoint = cfg.endpoint.replace(/\/$/, '');
-  const url = endpoint.endsWith('/chat/completions') ? endpoint : endpoint + '/chat/completions';
+  const url = _resolveNativeUrl(endpoint.endsWith('/chat/completions') ? endpoint : endpoint + '/chat/completions');
   try {
     const res = await fetch(url, {
       method: 'POST',

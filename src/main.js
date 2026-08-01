@@ -4280,7 +4280,7 @@ function addMsgActions(body, text) {
       _fbBad.textContent = rating === 'bad' ? '✓' : '👎';
       try {
         const _ch = currentResult ? ((currentResult.chart && currentResult.chart.input ? currentResult.chart.input.year + '-' + currentResult.chart.input.month + '-' + currentResult.chart.input.day + '-' + currentResult.chart.input.hour + '-' + currentResult.chart.input.gender : '') || '') : '';
-        fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rating, q: (text || '').slice(0, 200), chartHash: _ch, source: 'ai' }) }).catch(() => {});
+        fetch(_apiUrl('/api/feedback'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rating, q: (text || '').slice(0, 200), chartHash: _ch, source: 'ai' }) }).catch(() => {});
       } catch (_) {}
     };
     _fbGood.addEventListener('click', () => _sendFb('good'));
@@ -7892,13 +7892,22 @@ function init3DTilt() {
 // [admin loop 1351] visitor analytics — log tới worker (fire-and-forget, không block UI)
 // [loop 1380] session ID — admin target user để inject message (can thiệp chat)
 const _sid = (function () { try { var s = localStorage.getItem('bazi-sid'); if (!s) { s = 'sid-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); localStorage.setItem('bazi-sid', s); } return s; } catch (e) { return 'sid-anon'; } })();
+// [CAPACITOR] iOS/Android native app chạy từ capacitor://localhost → relative URLs KHÔNG hoạt động
+//   Detect native → dùng absolute URL (production server)
+const _API_BASE = (function () {
+  try {
+    if (window.Capacitor && window.Capacitor.isNativeAvailable()) return 'https://battu.god8.shop';
+  } catch (e) {}
+  return ''; // web: relative URL (empty string prefix)
+})();
+function _apiUrl(path) { return _API_BASE + path; }
 function _logEvent(type, data) {
   if (window._nolog) return;
-  try { var d = Object.assign({ sid: _sid }, data || {}); fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: type, data: d }) }).catch(function () {}); } catch (e) {}
+  try { var d = Object.assign({ sid: _sid }, data || {}); fetch(_apiUrl('/api/event'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: type, data: d }) }).catch(function () {}); } catch (e) {}
 }
 // [loop 1380] poll admin inbox — nhận tin nhắn admin inject (can thiệp chat real-time)
 setInterval(function () {
-  fetch('/api/inbox?sid=' + encodeURIComponent(_sid)).then(function (r) { return r.json(); }).then(function (r) {
+  fetch(_apiUrl('/api/inbox?sid=' + encodeURIComponent(_sid))).then(function (r) { return r.json(); }).then(function (r) {
     if (!r || !r.message || !r.message.text) return;
     var _pop = $('ai-popup'); if (_pop && _pop.classList.contains('hidden')) { _pop.classList.remove('hidden'); }
     var _cl = $('chat-log'); if (!_cl) return;
@@ -7929,7 +7938,7 @@ document.addEventListener('click', function (e) {
 _logEvent('visit', { ref: document.referrer || '', path: location.pathname, loadMs: Math.round(performance.now()) });
 // [admin loop 1351] admin AI config — auto-enable Z.ai nếu admin có key (user không cần tự setup)
 // [loop 1357] mode=free → chỉ auto-enable nếu free model đang BẬT (admin có thể tắt free glm-5.2)
-fetch('/api/ai-config').then(function (r) { return r.json(); }).then(function (c) {
+fetch(_apiUrl('/api/ai-config')).then(function (r) { return r.json(); }).then(function (c) {
   if (c.hasKey && c.mode !== 'off') {
     var _defP = PRESETS.find(function (p) { return p.id === 'zai-proxy'; }) || PRESETS[0];
     if (c.mode === 'free' && c.freeEnabled !== false) {
