@@ -1,6 +1,6 @@
 // Cloudflare Worker — serve static app + proxy LLM + admin + anti-scraping + anti-abuse.
 import { makeProxy } from '../functions/_proxy.js';
-import { handleAdminRoute, isAiEnabled, isFreeAiEnabled, logFreeUsage, logEvent } from './admin.js';
+import { handleAdminRoute, isAiEnabled, isFreeAiEnabled, logFreeUsage, logEvent, adminPath } from './admin.js';
 
 const PROXIES = [
   ['/zai', 'https://api.z.ai'],
@@ -108,7 +108,8 @@ export default {
     }
 
     // 0b) Block scraper UAs — CHỈ cho main site (KHÔNG cho /api/ /admin/ — admin dùng curl/CLI OK)
-    const isAdminOrApi = url.pathname.startsWith('/api/') || url.pathname.startsWith('/admin');
+    const ap = adminPath(env);
+    const isAdminOrApi = url.pathname.startsWith('/api/') || url.pathname === '/' + ap || url.pathname.startsWith('/' + ap + '/') || url.pathname.startsWith('/admin');
     if (!isAdminOrApi && SCRAPER_RE.test(ua) && !GOOD_BOT_RE.test(ua)) {
       return new Response('Forbidden', { status: 403 });
     }
@@ -126,7 +127,12 @@ export default {
     // 1) Admin + logging routes
     // [AUDIT FIX] route MỌI /api/* về handleAdminRoute (trước đây chỉ các path đã biết →
     //   /api/unknown rơi xuống SPA fallback trả HTML 200; giờ 405 JSON từ admin.js)
-    if (url.pathname.startsWith('/api/') || url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+    // [AUDIT FIX ẨN PANEL] khi ADMIN_PATH được cấu hình → /admin cũ trả 404 (scanner không tìm thấy),
+    //   panel chỉ ở /<ADMIN_PATH> (vd /panel-7xK2mQ9p)
+    if (env.ADMIN_PATH && (url.pathname === '/admin' || url.pathname.startsWith('/admin/'))) {
+      return new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' } });
+    }
+    if (url.pathname.startsWith('/api/') || url.pathname === '/' + ap || url.pathname.startsWith('/' + ap + '/')) {
       return handleAdminRoute(request, env, url);
     }
 

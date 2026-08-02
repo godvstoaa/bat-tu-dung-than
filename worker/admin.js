@@ -372,31 +372,35 @@ export async function handleAdminRoute(request, env, url) {
   //   che giấu lỗi client + sai status code)
   if (path.startsWith('/api/')) return json({ ok: false, err: 'method not allowed' }, 405);
 
-  if (path === '/admin' || path.startsWith('/admin/')) {
-    // POST /admin/setup {token, key} — bootstrap 1 lần. [AUDIT FIX] trước đây AI-anonymous claim race:
+  // [AUDIT FIX] admin panel ẨN — env.ADMIN_PATH (wrangler secret) → /<path> thay vì /admin công khai
+  //   (scanner không biết panel ở đâu; token vẫn là lớp bảo vệ chính). Mặc định 'admin' khi chưa đặt.
+  const ap = adminPath(env);
+  const apDash = '/' + ap + '/';
+  if (path === '/' + ap || path.startsWith(apDash)) {
+    // POST /<path>/setup {token, key} — bootstrap 1 lần. [AUDIT FIX] trước đây AI-anonymous claim race:
     //   deploy mới chưa ai setup → kẻ đầu tiên hit /admin/setup chiếm panel (đọc PII, tắt AI, chèn chat).
     //   Nay BẮT BUỘC khớp secret ADMIN_SETUP_KEY (wrangler secret put ADMIN_SETUP_KEY <key>); chưa đặt → đóng.
-    if (path === '/admin/setup' && method === 'POST') {
-      if (!env.ADMIN_SETUP_KEY) return json({ ok: false, err: 'Admin chưa kích hoạt: chạy `wrangler secret put ADMIN_SETUP_KEY <key>` rồi POST /admin/setup {key, token}.' }, 403);
+    if (path === apDash + 'setup' && method === 'POST') {
+      if (!env.ADMIN_SETUP_KEY) return json({ ok: false, err: 'Admin chưa kích hoạt: chạy `wrangler secret put ADMIN_SETUP_KEY <key>` rồi POST /' + ap + '/setup {key, token}.' }, 403);
       const _sip = clientIP(request);
       const _sk = 'setup:' + _sip + ':' + Math.floor(Date.now() / 300000);
       const _sc = parseInt((env.ADMIN_KV && await env.ADMIN_KV.get(_sk)) || '0', 10);
       if (_sc >= 5) return json({ ok: false, err: 'Quá nhiều lần thử — chờ 5 phút.' }, 429);
       if (env.ADMIN_KV) await env.ADMIN_KV.put(_sk, String(_sc + 1), { expirationTtl: 300 });
       const existing = env.ADMIN_TOKEN || (env.ADMIN_KV && await env.ADMIN_KV.get('admin:token'));
-      if (existing) return json({ ok: false, err: 'Token đã đặt rồi — dùng /admin?token=<token>' }, 403);
+      if (existing) return json({ ok: false, err: 'Token đã đặt rồi — dùng /' + ap + '?token=<token>' }, 403);
       const body = await request.json().catch(() => ({}));
       if (String(body && body.key) !== env.ADMIN_SETUP_KEY) return json({ ok: false, err: 'Setup key sai.' }, 403);
       const t = body && body.token && String(body.token).length >= 8 ? String(body.token) : null;
       if (!t) return json({ ok: false, err: 'Cần body {token: "..."} độ dài ≥ 8 ký tự' }, 400);
       if (env.ADMIN_KV) await env.ADMIN_KV.put('admin:token', t);
       await auditLog(env, request, 'admin_token_bootstrap', { from: _sip });
-      return json({ ok: true, msg: 'Đã đặt. Mở /admin?token=<token>' });
+      return json({ ok: true, msg: 'Đã đặt. Mở /' + ap + '?token=<token>' });
     }
     const ck = (request.headers.get('Cookie') || '').match(/btu_admin=([^;]+)/);
     const token = request.headers.get('X-Admin-Token') || url.searchParams.get('token') || (ck ? decodeURIComponent(ck[1]) : '') || '';
     const expected = env.ADMIN_TOKEN || (env.ADMIN_KV && await env.ADMIN_KV.get('admin:token')) || '';
-    if (!expected) return json({ ok: false, err: 'Chưa đặt token admin. Cấu hình ADMIN_SETUP_KEY rồi POST /admin/setup {key, token} lần đầu.', needSetup: true }, 401);
+    if (!expected) return json({ ok: false, err: 'Chưa đặt token admin. Cấu hình ADMIN_SETUP_KEY rồi POST /' + ap + '/setup {key, token} lần đầu.', needSetup: true }, 401);
     if (!(await safeEqual(token, expected))) {
       // [loop 1351] rate-limit failed auth (chống brute-force token): 10 fail / 5ph / IP
       const fk = 'fail:' + clientIP(request);
@@ -408,16 +412,16 @@ export async function handleAdminRoute(request, env, url) {
     // [loop 1364] auth thành công → clear fail counter IP này (user hợp lệ không bị lock cumulate)
     if (env.ADMIN_KV) env.ADMIN_KV.delete('fail:' + clientIP(request)).catch(function () {});
     // [loop 1364] session cookie — auth lần đầu (URL/header token) → set cookie HttpOnly+Secure.
-    //   Reload /admin (URL đã strip token khỏi history) vẫn work qua cookie. URL sạch + reload OK.
-    if (path === '/admin' || path === '/admin/') {
-      const _d = adminDashboard();
+    //   Reload /<path> (URL đã strip token khỏi history) vẫn work qua cookie. URL sạch + reload OK.
+    if (path === '/' + ap || path === apDash.slice(0, -1)) {
+      const _d = adminDashboard(env);
       const _h = new Headers(_d.headers);
-      _h.append('Set-Cookie', 'btu_admin=' + encodeURIComponent(expected) + '; Path=/admin; HttpOnly; Secure; SameSite=Strict; Max-Age=86400');
+      _h.append('Set-Cookie', 'btu_admin=' + encodeURIComponent(expected) + '; Path=/' + ap + '; HttpOnly; Secure; SameSite=Strict; Max-Age=86400');
       return new Response(_d.body, { status: _d.status, headers: _h });
     }
-    if (path === '/admin/api/stats') { try { return await adminStats(env, url); } catch (e) { return json({ error: e.message }, 500); } }
+    if (path === apDash + 'api/stats') { try { return await adminStats(env, url); } catch (e) { return json({ error: e.message }, 500); } }
     // [R46] admin xem error log (AI tự log khi luận sai)
-    if (path === '/admin/api/error-log' && method === 'GET') {
+    if (path === apDash + 'api/error-log' && method === 'GET') {
       try {
         const list = env.ADMIN_KV ? await env.ADMIN_KV.list({ prefix: 'err:', limit: 100 }) : { keys: [] };
         const errors = [];
@@ -425,12 +429,12 @@ export async function handleAdminRoute(request, env, url) {
         return json({ count: errors.length, errors: errors.sort((a, b) => (b.ts || '').localeCompare(a.ts || '')) });
       } catch (e) { return json({ error: e.message }, 500); }
     }
-    if (path === '/admin/api/ai' && method === 'POST') return adminToggleAi(env, request);
-    if (path === '/admin/api/ai-free' && method === 'POST') return adminToggleFreeAi(env, request);
-    if (path === '/admin/api/free-test' && method === 'POST') { try { return await adminFreeTest(env, request); } catch (e) { return json({ ok: false, err: e.message }, 500); } }
-    if (path === '/admin/api/token' && method === 'POST') return adminChangeToken(env, request);
-    if (path === '/admin/api/export' && method === 'GET') return adminExport(env);
-    if (path === '/admin/api/events' && method === 'GET') {
+    if (path === apDash + 'api/ai' && method === 'POST') return adminToggleAi(env, request);
+    if (path === apDash + 'api/ai-free' && method === 'POST') return adminToggleFreeAi(env, request);
+    if (path === apDash + 'api/free-test' && method === 'POST') { try { return await adminFreeTest(env, request); } catch (e) { return json({ ok: false, err: e.message }, 500); } }
+    if (path === apDash + 'api/token' && method === 'POST') return adminChangeToken(env, request);
+    if (path === apDash + 'api/export' && method === 'GET') return adminExport(env);
+    if (path === apDash + 'api/events' && method === 'GET') {
       const type = url.searchParams.get('type');
       const limit = Math.min(parseInt(url.searchParams.get('limit') || '200', 10), 200);
       const logRaw = env.ADMIN_KV ? await env.ADMIN_KV.get('events:log') : null;
@@ -439,7 +443,7 @@ export async function handleAdminRoute(request, env, url) {
       return json({ events: filtered.slice(0, limit), total: filtered.length });
     }
     // [loop 1365] visitor detail — click IP → load HẾT data 1 visitor (timeline/charts/chats/device, không cap)
-    if (path === '/admin/api/visitor' && method === 'GET') {
+    if (path === apDash + 'api/visitor' && method === 'GET') {
       const ip = url.searchParams.get('ip');
       if (!ip) return json({ ok: false, err: 'Cần ?ip=' }, 400);
       const logRaw = env.ADMIN_KV ? await env.ADMIN_KV.get('events:log') : null;
@@ -457,11 +461,11 @@ export async function handleAdminRoute(request, env, url) {
       var sidEv = ipEvents.filter(function (e) { return e.data && e.data.sid; }).slice(-1)[0];
       return json({ ok: true, ip: ip, sid: (sidEv && sidEv.data && sidEv.data.sid) || '', country: last.country || '', city: last.city || '', ua: last.ua || '', device: parseUA(last.ua), firstTs: ipEvents[0].ts, lastTs: last.ts, count: ipEvents.length, visits: visits, referrer: (refEv && refEv.data && refEv.data.ref) || '', charts: charts, questions: questions, chats: chats, clicks: clicks, timeline: ipEvents.map(function (e) { return { ts: e.ts, type: e.type, data: e.data || {} }; }) });
     }
-    if (path === '/admin/api/notify' && method === 'POST') return adminNotifyConfig(env, request);
-    if (path === '/admin/api/ai-config' && method === 'POST') return adminAiConfigSet(env, request);
-    if (path === '/admin/api/free-pool' && method === 'POST') return adminFreePoolSet(env, request);
+    if (path === apDash + 'api/notify' && method === 'POST') return adminNotifyConfig(env, request);
+    if (path === apDash + 'api/ai-config' && method === 'POST') return adminAiConfigSet(env, request);
+    if (path === apDash + 'api/free-pool' && method === 'POST') return adminFreePoolSet(env, request);
     // [loop 1380] admin inject message vào chat user (can thiệp real-time)
-    if (path === '/admin/api/inject' && method === 'POST') {
+    if (path === apDash + 'api/inject' && method === 'POST') {
       const body = await request.json().catch(() => ({}));
       if (!body.sid || !body.text) return json({ ok: false, err: 'Cần {sid, text}' }, 400);
       if (!env.ADMIN_KV) return json({ ok: false, err: 'no store' }, 500);
@@ -470,8 +474,8 @@ export async function handleAdminRoute(request, env, url) {
       await auditLog(env, request, 'inject_msg', { sid: String(body.sid).slice(0, 16), len: msg.text.length });
       return json({ ok: true, msg: 'Đã gửi — user sẽ thấy trong chat (poll 8s)' });
     }
-    if (path === '/admin/api/ai-config' && method === 'GET') { try { return await adminAiConfigGet(env); } catch (e) { return json({ error: e.message }, 500); } }
-    if (path === '/admin/api/clear' && method === 'POST') {
+    if (path === apDash + 'api/ai-config' && method === 'GET') { try { return await adminAiConfigGet(env); } catch (e) { return json({ error: e.message }, 500); } }
+    if (path === apDash + 'api/clear' && method === 'POST') {
       if (env.ADMIN_KV) {
         await env.ADMIN_KV.delete('events:log');
         await env.ADMIN_KV.delete('cache:stats');
@@ -492,7 +496,7 @@ export async function handleAdminRoute(request, env, url) {
       return json({ ok: true, msg: 'Events + counters + dayagg cleared' });
     }
     // [loop 1369] xóa events của 1 IP (dọn test pollution / spammer data hỏng)
-    if (path === '/admin/api/events-delete' && method === 'POST') {
+    if (path === apDash + 'api/events-delete' && method === 'POST') {
       const body = await request.json().catch(() => ({}));
       if (!body.ip) return json({ ok: false, err: 'Cần {ip}' }, 400);
       if (!env.ADMIN_KV) return json({ ok: false, err: 'no store' }, 500);
@@ -508,7 +512,7 @@ export async function handleAdminRoute(request, env, url) {
       return json({ ok: true, removed, msg: 'Đã xóa ' + removed + ' events của ' + body.ip });
     }
     // [visitor-finder] note + tag per visitor — bộ nhớ dài hạn admin «ai là ai». Lưu/xóa vnote:<ip>.
-    if (path === '/admin/api/note' && method === 'POST') {
+    if (path === apDash + 'api/note' && method === 'POST') {
       const body = await request.json().catch(() => ({}));
       const ip = String((body && body.ip) || '').slice(0, 64);
       if (!ip) return json({ ok: false, err: 'Cần {ip}' }, 400);
@@ -521,14 +525,14 @@ export async function handleAdminRoute(request, env, url) {
       await auditLog(env, request, 'visitor_note', { ip: ip, hasNote: !!note, tagCount: tags.length });
       return json({ ok: true });
     }
-    if (path === '/admin/api/block' && method === 'POST') {
+    if (path === apDash + 'api/block' && method === 'POST') {
       const body = await request.json().catch(() => ({}));
       if (body.ip && body.block) { await env.ADMIN_KV.put('block:' + body.ip, '1'); await auditLog(env, request, 'ip_block', { ip: body.ip, block: true }); return json({ ok: true, msg: 'Blocked ' + body.ip }); }
       if (body.ip && !body.block) { await env.ADMIN_KV.delete('block:' + body.ip); await auditLog(env, request, 'ip_block', { ip: body.ip, block: false }); return json({ ok: true, msg: 'Unblocked ' + body.ip }); }
       if (body.list) { const ks = await env.ADMIN_KV.list({ prefix: 'block:' }); return json({ blocked: ks.keys.map((k) => k.name.slice(6)) }); }
       return json({ ok: false, err: 'Cần {ip, block:true/false} hoặc {list:true}' }, 400);
     }
-    if (path === '/admin/api/audit' && method === 'GET') {
+    if (path === apDash + 'api/audit' && method === 'GET') {
       let log = []; try { log = JSON.parse((await env.ADMIN_KV.get('audit:log')) || '[]'); } catch (e) {}
       return json({ audit: log });
     }
@@ -843,7 +847,7 @@ async function adminChangeToken(env, request) {
   if (env.ADMIN_TOKEN) return json({ ok: false, err: 'Token đang lấy từ secret ADMIN_TOKEN (ưu tiên hơn KV) — muốn đổi: `wrangler secret put ADMIN_TOKEN <new>`.' }, 400);
   if (env.ADMIN_KV) await env.ADMIN_KV.put('admin:token', t);
   await auditLog(env, request, 'token_change', {}); // KHÔNG log giá trị token mới
-  return json({ ok: true, msg: 'Token đã đổi. Dùng /admin?token=<new>' });
+  return json({ ok: true, msg: 'Token đã đổi. Dùng /' + adminPath(env) + '?token=<new>' });
 }
 
 async function adminExport(env) {
@@ -864,9 +868,19 @@ async function adminExport(env) {
   return new Response(rows.join('\n'), { headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="batu-events.csv"' } });
 }
 
-function adminDashboard() {
+// [AUDIT FIX] admin panel ẨN — env.ADMIN_PATH (wrangler secret) quyết định đường dẫn panel
+//   (vd ADMIN_PATH=panel-7xK2mQ9p → https://domain/panel-7xK2mQ9p). Mặc định 'admin' khi chưa đặt.
+//   Sanitize: chỉ [a-zA-Z0-9_-], ≤40 ký tự, không slash.
+export function adminPath(env) {
+  const p = String((env && env.ADMIN_PATH) || '').replace(/[^a-zA-Z0-9_-]/g, '');
+  return p ? p.slice(0, 40) : 'admin';
+}
+
+function adminDashboard(env) {
+  const ap = adminPath(env);
   // Dashboard JS dùng DOM createElement + textContent (KHÔNG innerHTML → XSS-safe,
   //   user data — IP/AI-question — được escape tự động bởi textContent).
+  // [AUDIT FIX] thay MỌI '/admin' trong template bằng '/<path ẩn>' (dashboard JS fetch theo prefix)
   return new Response(`<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin — Bát Tự</title><style>
   :root{--bg:#0a0913;--surface:#15131f;--surface2:#1c1928;--border:rgba(212,175,55,.14);--border2:rgba(212,175,55,.28);--text:#e8d9b0;--muted:#9a8a6a;--gold:#d4af37;--green:#7fbf7f;--red:#e0533d;--blue:#64b4ff;--purple:#b478c8;--r:12px;--rs:8px}
   *{box-sizing:border-box}
@@ -1621,7 +1635,7 @@ function adminDashboard() {
   <div id="chat-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
   <div id="visitor-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
   <div id="note-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:10000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
-  </body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer',
+  </body></html>`.replace(/\/admin/g, '/' + ap), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer',
     // [loop 1355] security headers — CSP cho admin dashboard (inline script/style cần 'unsafe-inline';
     //   connect chỉ same-origin, chặn framing/external). HSTS + nosniff cho mọi response.
     'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
