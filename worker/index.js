@@ -20,6 +20,13 @@ function clientIP(request) {
   return request.headers.get('CF-Connecting-IP') || (request.headers.get('X-Forwarded-For') || '').split(',')[0].trim() || 'unknown';
 }
 
+// [AUDIT FIX C3] Restrict CORS — trước đây * → bất kỳ site nào cũng drain AI quota
+const ALLOWED_ORIGINS = /^(https:\/\/battu\.god8\.shop|https:\/\/battu\.maz-elements0\.workers\.dev|capacitor:\/\/localhost|ionic:\/\/localhost|http:\/\/localhost:\d+)$/;
+function corsOrigin(request) {
+  const o = request.headers.get('Origin') || '';
+  return ALLOWED_ORIGINS.test(o) ? o : 'https://battu.god8.shop';
+}
+
 // [loop 1355] security headers cho main app HTML (HSTS/nosniff/Referrer/X-Frame — zero breakage risk).
 //   KHÔNG thêm CSP strict ở đây vì app có inline script → CSP có thể gây trắng trang (bug từng gặp).
 //   CSP strict chỉ áp dụng cho admin dashboard (nơi chứa token + user data).
@@ -38,7 +45,7 @@ function withSecurityHeaders(res) {
 //   admin thêm free provider keys (Groq/NVIDIA...) vào ai:config.freePool làm FALLBACK khi z.ai
 //   fail (401/429/500/timeout). Ai cũng dùng được (key server-side, user không cần key).
 async function freeRoute(request, env, ctx, ip, aiCfg) {
-  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'authorization, content-type' } });
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': corsOrigin(request), 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'authorization, content-type' } });
   let bodyObj = {};
   try { bodyObj = await request.json(); } catch (e) { try { bodyObj = JSON.parse(await request.text()); } catch (_) {} }
   const pool = Array.isArray(aiCfg && aiCfg.freePool) ? aiCfg.freePool.filter(function (p) { return p && p.apiKey && p.endpoint && p.model; }) : [];
@@ -67,7 +74,7 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
         if (env.ADMIN_KV) logFreeUsage(env, ip, 200, b.name).catch(function () {});
         // [loop 1395] BỎ tee/server-side capture — gây backpressure → BodyStreamBuffer aborted.
         //   Frontend đã log full response (loop 1387). Trả response TRỰC TIẾP → không tee.
-        return new Response(res.body, { status: 200, headers: { 'Content-Type': res.headers.get('Content-Type') || 'text/event-stream', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store', 'X-Free-Backend': b.name } });
+        return new Response(res.body, { status: 200, headers: { 'Content-Type': res.headers.get('Content-Type') || 'text/event-stream', 'Access-Control-Allow-Origin': corsOrigin(request), 'Cache-Control': 'no-store', 'X-Free-Backend': b.name } });
       }
       if (env.ADMIN_KV) logFreeUsage(env, ip, res.status, b.name).catch(function () {});
     } catch (e) {
@@ -75,7 +82,7 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
       if (env.ADMIN_KV) logFreeUsage(env, ip, 0, b.name).catch(function () {});
     }
   }
-  return new Response(JSON.stringify({ error: { message: 'Tất cả free backend đều thất bại — thử lại, hoặc admin thêm key ở «AI Config».', type: 'free_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' } });
+  return new Response(JSON.stringify({ error: { message: 'Tất cả free backend đều thất bại — thử lại, hoặc admin thêm key ở «AI Config».', type: 'free_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin(request), 'Cache-Control': 'no-store' } });
 }
 
 export default {
@@ -120,7 +127,7 @@ export default {
     for (const [prefix, host] of PROXIES) {
       if (url.pathname === prefix || url.pathname.startsWith(prefix + '/')) {
         if (!(await isAiEnabled(env))) {
-          return new Response(JSON.stringify({ error: { message: 'AI đang bị TẮT bởi quản trị viên.', type: 'ai_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' } });
+          return new Response(JSON.stringify({ error: { message: 'AI đang bị TẮT bởi quản trị viên.', type: 'ai_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin(request), 'Cache-Control': 'no-store' } });
         }
         const sub = url.pathname.slice(prefix.length);
         const params = { path: sub.split('/').filter(Boolean) };
@@ -129,7 +136,7 @@ export default {
           let adminKey = null, aiCfg = {};
           try { aiCfg = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); adminKey = aiCfg.apiKey || null; } catch (e) {}
           if (!adminKey) {
-            if (!(await isFreeAiEnabled(env))) return new Response(JSON.stringify({ error: { message: 'Model free đang bị TẮT.', type: 'free_ai_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' } });
+            if (!(await isFreeAiEnabled(env))) return new Response(JSON.stringify({ error: { message: 'Model free đang bị TẮT.', type: 'free_ai_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin(request), 'Cache-Control': 'no-store' } });
             return await freeRoute(request, env, ctx, ip, aiCfg);
           }
           // admin custom key (single backend — forward tới z.ai với key admin)
