@@ -124,7 +124,9 @@ export default {
     }
 
     // 1) Admin + logging routes
-    if (url.pathname === '/api/event' || url.pathname === '/api/feedback' || url.pathname === '/api/inbox' || url.pathname === '/api/ai-config' || url.pathname === '/api/log-error' || url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+    // [AUDIT FIX] route MỌI /api/* về handleAdminRoute (trước đây chỉ các path đã biết →
+    //   /api/unknown rơi xuống SPA fallback trả HTML 200; giờ 405 JSON từ admin.js)
+    if (url.pathname.startsWith('/api/') || url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
       return handleAdminRoute(request, env, url);
     }
 
