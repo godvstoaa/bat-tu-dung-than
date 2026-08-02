@@ -78,7 +78,7 @@ function relativeActual(R) {
 // =====================================================================
 export function deduceFromFamily(subject, members) {
   const S = subject;
-  const isMale = S.chart.input.gender === 'nam';
+  const isMale = (S.chart.input.genderNorm || S.chart.input.gender) === 'nam';
   const results = [];
   for (const m of members) {
     if (!m || !m.R || !m.role) continue;

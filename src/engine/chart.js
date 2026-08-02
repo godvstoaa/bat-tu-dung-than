@@ -9,7 +9,7 @@ import {
   GAN, ZHI, HIDDEN, HIDDEN_WEIGHT, WUXING, SHENG, KE, KE_BY, SHENG_BY,
   TIAOHOU, CLIMATE, WX_VI, TEN_GOD_VI,
 } from './constants.js';
-import { tenGod, changSheng, parseGender } from './core.js';
+import { tenGod, changSheng, parseGender, normalizeGender } from './core.js';
 import { detectInteractions } from './interactions.js';
 import { computeShensha } from './shensha.js';
 import { computePattern } from './pattern.js';
@@ -59,6 +59,11 @@ export function buildChart(year, month, day, hour, minute, gender) {
   const solar = Solar.fromYmdHms(cy, cm, cd, ch, cmin, 0);
   const lunar = solar.getLunar();
   const ec = lunar.getEightChar();
+  // [AUDIT FIX] 子时 (23:00+) hiển thị SAI ngày/giờ sinh: pillars phải tính theo ngày roll,
+  //   nhưng solar/lunar display phải là THỜI ĐIỂM SINH THẬT của user (không phải 00:xx hôm sau).
+  //   inputSolar/inputLunar = datetime gốc; giữ solar/lunar (rolled) cho tương thích tính toán.
+  const inputSolar = Solar.fromYmdHms(year, month, day, hour, minute, 0);
+  const inputLunar = inputSolar.getLunar();
 
   const pillars = {
     year:  { gan: ec.getYearGan(),  zhi: ec.getYearZhi(),  nayin: ec.getYearNaYin()  },
@@ -80,13 +85,21 @@ export function buildChart(year, month, day, hour, minute, gender) {
   }
 
   return {
-    input: { year, month, day, hour, minute, gender },
+    input: { year, month, day, hour, minute, gender, genderNorm: normalizeGender(gender) },
     solar: solar.toYmdHms(),
+    // [AUDIT FIX] ngày giờ sinh THẬT (không roll 子时) — dùng cho hiển thị + AI brief
+    solarInput: inputSolar.toYmdHms(),
     lunar: {
       text: lunar.toString(),
       year: lunar.getYearInChinese(),
       month: lunar.getMonthInChinese(),
       day: lunar.getDayInChinese(),
+    },
+    lunarInput: {
+      text: inputLunar.toString(),
+      year: inputLunar.getYearInChinese(),
+      month: inputLunar.getMonthInChinese(),
+      day: inputLunar.getDayInChinese(),
     },
     jieqi: {
       prev: { name: lunar.getPrevJieQi().getName(), time: lunar.getPrevJieQi().getSolar().toYmdHms() },
@@ -573,12 +586,17 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
   // Tìm đại vận đang hành (startAge <= tuổi hiện tại)
   const age = cur - year;
   let active = null;
+  let lastFit = null;
   for (let i = 1; i < dayunList.length; i++) {
     const dy = dayunList[i];
     if (!dy.getGanZhi()) continue;
     if (dy.getStartAge() <= age + 1 && age + 1 < dy.getStartAge() + 10) { active = dy; break; } // [AUDIT FIX HIGH] +1 xusui age (startAge là mũ tuổi) — trước đây chọn dayun cũ 1 năm trong transition year (4/5 chart sai)
-    if (!active && i <= 8) active = dy; // dự phòng
+    // [AUDIT FIX] fallback: nhớ đại vận GẦN NHẤT đã bắt đầu (không lấy index 1 = tuổi thơ).
+    if (dy.getStartAge() <= age + 1) lastFit = dy;
   }
+  // [AUDIT FIX] tuổi già vượt hết đại vận liệt kê → lấy đại vận cuối đã bắt đầu
+  //   (trước đây rơi vào `i <= 8` → active = đại vận TUỔI THƠ → lưu niên hiển thị sai thập niên)
+  if (!active) active = lastFit;
   if (!active) return [];
 
   const lnList = active.getLiuNian();

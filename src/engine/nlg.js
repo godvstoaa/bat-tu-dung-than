@@ -4,7 +4,7 @@
 //  TOÀN BỘ lá số (cách cục, hội hợp, thần sa, dụng thần, đại vận, lưu niên)
 //  + Cơ sở tri thức kb.js. Cùng lá số + cùng câu hỏi ⇒ cùng câu trả lời.
 // ============================================================================
-import { WX_VI, GAN, ZHI, SHENG, KE, KE_BY, TEN_GOD_VI } from './constants.js';
+import { WX_VI, GAN, ZHI, SHENG, KE, KE_BY, TEN_GOD_VI, ZHI_ORDER } from './constants.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { scanMarriageTiming } from './marriage-timing.js';
 import { scanWealthCareerYingqi } from './yingqi-wealth.js';
@@ -25,7 +25,15 @@ import { castByTime, solarToMhNums } from './meihua.js';
 import { predictEvents } from './event-predict.js';
 import { guiguziFortune } from './guiguzi.js';
 import { analyze } from './chart.js';
-import { guiguziFDG } from './guiguzi-fdg.js';
+import { yearFlyingStar } from './xuankong.js';
+
+// [AUDIT FIX] Tam Sát theo chi năm (三煞: 申子辰→Nam, 寅午戌→Bắc, 亥卯未→Tây, 巳酉丑→Đông)
+const SANSHA_BRANCH = {
+  申: 'Chính Nam', 子: 'Chính Nam', 辰: 'Chính Nam',
+  寅: 'Chính Bắc', 午: 'Chính Bắc', 戌: 'Chính Bắc',
+  亥: 'Chính Tây', 卯: 'Chính Tây', 未: 'Chính Tây',
+  巳: 'Chính Đông', 酉: 'Chính Đông', 丑: 'Chính Đông',
+};import { guiguziFDG } from './guiguzi-fdg.js';
 import { hexagramSynthesis } from './hexagram-synthesis.js';
 import { computeLiuDao } from './liudao.js';
 import { dayNayinPersonality } from './nayin-personality.js';
@@ -632,7 +640,7 @@ function pDaily(R, intent) {
     else if (/\bhom kia\b/.test(_q)) _offset = -2;
   }
   let y, mo, d;
-  try { const _n = new Date(); _n.setDate(_n.getDate() + _offset); y = _n.getFullYear(); mo = _n.getMonth() + 1; d = _n.getDate(); } catch (e) { y = 2026; mo = 6; d = 29; }
+  try { const _n = new Date(); _n.setDate(_n.getDate() + _offset); y = _n.getFullYear(); mo = _n.getMonth() + 1; d = _n.getDate(); } catch (e) { const _n2 = new Date(); y = _n2.getFullYear(); mo = _n2.getMonth() + 1; d = _n2.getDate(); }
   let db;
   try { db = dailyBriefing(R, y, mo, d, R.patternQuality); } catch (e) { db = null; }
   const _dayLabel = _offset === 0 ? 'hôm nay' : _offset === 1 ? 'ngày mai' : _offset === -1 ? 'hôm qua' : _offset === 2 ? 'ngày kia' : _offset === -2 ? 'hôm kia' : `ngày ${y}-${mo}-${d}`;
@@ -675,7 +683,7 @@ function pBestDays(R, intent) {
   const dm = R.chart.dayMaster;
   const userZhi = R.chart.pillars.year.zhi;
   let y, mo;
-  try { const _n = new Date(); y = _n.getFullYear(); mo = _n.getMonth() + 1; } catch (e) { y = 2026; mo = 6; }
+  try { const _n = new Date(); y = _n.getFullYear(); mo = _n.getMonth() + 1; } catch (e) { const _n2 = new Date(); y = _n2.getFullYear(); mo = _n2.getMonth() + 1; }
   // [loop 885] detect activity
   const _q = (intent?.raw || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
   let _actId = 'marry', _actLabel = 'Cưới hỏi';
@@ -1214,13 +1222,22 @@ export function composeAnswer(question, R) {
     const WX_DIR = { 木: 'Đông/Mộc (xanh)', 火: 'Nam/Hỏa (đỏ)', 土: 'Tây Nam/Trung/Thổ (vàng)', 金: 'Tây/Kim (trắng)', 水: 'Bắc/Thủy (đen)' };
     const WX_ITEM = { 木: 'cây cối, gỗ', 火: 'ánh sáng, nến, điện', 土: 'gốm đá, pha lê', 金: 'vật kim loại, đồng', 水: 'bể nước, phong linh, màu đen' };
     const dung = R.yong?.primary, hy = R.yong?.xi;
+    // [AUDIT FIX] Ngũ Hoàng/Tam Sát tính theo NĂM HIỆN TẠI (trước đây hardcode 2026 → sai advice sau 2026)
+    let _fsWarn = '';
+    try {
+      const _fsY = new Date().getFullYear();
+      const _wu = yearFlyingStar(_fsY).pan.find((p) => p.star === 5);
+      const _br = ZHI_ORDER[((_fsY - 4) % 12 + 12) % 12];
+      const _sanshaDir = SANSHA_BRANCH[_br];
+      _fsWarn = `⚠ Năm ${_fsY} cần tránh động thổ hướng ${_wu ? _wu.palace : '?'} (Ngũ Hoàng)${_sanshaDir ? ` + hướng Tam Sát (${_sanshaDir})` : ''}. Chi tiết mở tab «Định Vị Phong Thủy» hoặc hỏi AI khi online.`;
+    } catch (e) { _fsWarn = '⚠ Chi tiết Ngũ Hoàng/Tam Sát xem tab «Định Vị Phong Thủy».'; }
     return {
       title: 'Phong thủy & định vị',
       lead: `Bạn hỏi về hướng/phong thủy. Theo Dụng Thần ${WX_VI[dung] || dung} của bạn:`,
       paragraphs: [
         `Mệnh bạn Dụng ${WX_VI[dung] || dung}${hy ? ', Hỷ ' + (WX_VI[hy] || hy) : ''}. Hướng CÁT: ${WX_DIR[dung] || '?'}${hy ? ' + ' + (WX_DIR[hy] || '?') : ''}. Hướng KỴ: hành khắc Dụng.`,
         `Bố trí: đồ nội thất dùng chất liệu ${WX_ITEM[dung] || '?'} (bổ Dụng). Cửa chính/giường ưu tiên hướng ${WX_DIR[dung] || '?'}.`,
-        `⚠ Năm 2026 cần tránh động thổ hướng Nam (Ngũ Hoàng) + hướng Tam Sát (Bắc 亥子丑). Chi tiết mở tab «Định Vị Phong Thủy» hoặc hỏi AI khi online.`,
+        _fsWarn,
       ],
       intent,
     };

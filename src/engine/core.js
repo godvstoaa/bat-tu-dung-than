@@ -20,6 +20,22 @@ export function parseGender(g) {
   throw new Error(`Giới tính không hợp lệ («${g}») — nhập «nam» hoặc «nữ».`);
 }
 
+// [AUDIT FIX] normalizeGender — trả chuẩn 'nam'/'nữ' (STR, không phải 1/0 như parseGender).
+//   Downstream (hehun/zhai/family-deduction/ideal-match) so `=== 'nam'` trên chart.input.gender;
+//   trước đây gender raw ('male'/'MALE'/'female') lọt qua → 合婚/命卦 SAI thầm lặng.
+export function normalizeGender(g) {
+  return parseGender(g) === 1 ? 'nam' : 'nữ';
+}
+
+// [AUDIT FIX] isMaleGender — kiểm tra giới-tính-nam KHÔNG throw (benign helpers như computeZhai),
+//   normalize nhiều variant, garbage → null (caller tự quyết định).
+export function isMaleGender(g) {
+  const s = String(g == null ? '' : g).trim().toLowerCase();
+  if (['nam', 'male', 'm', 'man', 'boy', '男'].includes(s)) return true;
+  if (['nữ', 'nu', 'female', 'f', 'woman', 'girl', '女'].includes(s)) return false;
+  return null;
+}
+
 // --- Thập Thần của một Can so với Nhật Chủ ---
 export function tenGod(dayGan, otherGan) {
   const dm = GAN[dayGan];

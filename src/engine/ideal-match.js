@@ -51,7 +51,7 @@ export function findIdealPartners(R, opts = {}) {
       const d = 15;
       for (const h of times) {
         try {
-          const pR = analyze(y, m, d, h, 0, gender, 2026);
+          const pR = analyze(y, m, d, h, 0, gender, new Date().getFullYear());
           // 1. Partner 日主 should be user's Dụng/Hỷ (ideally)
           const pDm = pR.chart.dayMaster.wx;
           const dmIsGood = goodForUser.includes(pDm);
@@ -151,7 +151,7 @@ function _scoreChild(p, R) {
   const userYearZhi = R.chart.pillars.year.zhi;
   const userDayZhi = R.chart.dayZhi;
   const dmGan = p.dayGan, dmWx = GAN[dmGan].wx;
-  const isMale = (R.chart.input && R.chart.input.gender) === 'nam';
+  const isMale = (R.chart.input && (R.chart.input.genderNorm || R.chart.input.gender)) === 'nam';
   const childWx = isMale ? KE_BY[R.chart.dayMaster.wx] : SHENG[R.chart.dayMaster.wx]; // sao con của PHỤ HUYNH
 
   // Phân bố ngũ hành 8 chữ (khí chính; tàng can bỏ qua cho tốc độ)
@@ -237,7 +237,7 @@ function _scoreChildRich(cR, R) {
   parentFit = Math.max(0, Math.min(25, parentFit));
 
   // sao con [0..5]
-  const isMale = (R.chart.input && R.chart.input.gender) === 'nam';
+  const isMale = (R.chart.input && (R.chart.input.genderNorm || R.chart.input.gender)) === 'nam';
   const childWx = isMale ? KE_BY[R.chart.dayMaster.wx] : SHENG[R.chart.dayMaster.wx];
   const childStar = (ws[childWx] || 0) > 0 ? 5 : 0;
 
@@ -268,7 +268,9 @@ function _fullChildScan(R) {
   const key = _childKey(R);
   if (_childCache && _childCache.key === key) return _childCache.scan;
   const byYear = new Map();
-  for (let yr = 2025; yr <= 2040; yr++) {
+  // [AUDIT FIX] cửa sổ năm động (trước đây 2025-2040 cố định → thành lịch sử sau 2040)
+  const _curY = new Date().getFullYear();
+  for (let yr = _curY - 1; yr <= _curY + 14; yr++) {
     // (1) stage thô — lightweight, toàn 31 ngày × 12 giờ
     const coarse = [];
     for (let m = 1; m <= 12; m++) {

@@ -4,7 +4,7 @@
 //  (4) 用神互不损伤. Trả điểm + chốt hợp/không. Nguồn: 渊海子平, 八字合婚.
 // ============================================================================
 import { ZHI, GAN } from './constants.js';
-import { tenGod } from './core.js';
+import { tenGod, normalizeGender } from './core.js';
 import { XING_PAIRS, HAI_PAIRS } from './zodiac-deep.js';
 import { computeZhai } from './zhai.js';
 import { ganZhiNayin } from './nayin.js'; // [loop 530] 納音配婚
@@ -123,8 +123,8 @@ export function computeHehun(R1, R2) {
   //   làm chồng. Nếu Nhật Chủ A nhìn B đúng sao phối ngẫu (và B nhìn A) → tín hiệu mạnh.
   //   [SAME-SEX] chỉ cho cặp KHÁC giới. Cặp cùng giới → bỏ (gendered rule không khớp);
   //   tương hợp luận qua ngũ hành (4a) + ngày chi + dụng thần — đã gender-neutral.
-  const aMale = (a.input && a.input.gender) === 'nam';
-  const bMale = (b.input && b.input.gender) === 'nam';
+  const aMale = (a.input && (a.input.genderNorm || normalizeGender(a.input.gender))) === 'nam';
+  const bMale = (b.input && (b.input.genderNorm || normalizeGender(b.input.gender))) === 'nam';
   if (aMale !== bMale) {
     const wifeGods = ['正財', '偏財']; // nam → vợ = Tài
     const husbGods = ['正官', '七殺']; // nữ → chồng = Quan Sát

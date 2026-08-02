@@ -12,13 +12,46 @@ const TTL_EVENT = 60 * 60 * 24 * 90; // 90 ngày
 function json(data, status = 200, extra = {}) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type,X-Admin-Token', ...extra },
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type,X-Admin-Token', ...extra },
   });
 }
 function clientIP(request) {
-  return request.headers.get('CF-Connecting-IP')
-    || (request.headers.get('X-Forwarded-For') || '').split(',')[0].trim()
-    || 'unknown';
+  // [AUDIT FIX] bỏ fallback X-Forwarded-For — nếu worker lộ ra ngoài Cloudflare, attacker tự đặt XFF
+  //   → bypass IP block + rate-limit (spoof). Chỉ tin CF-Connecting-IP.
+  return request.headers.get('CF-Connecting-IP') || 'unknown';
+}
+
+// [AUDIT FIX] so sánh token constant-time (SHA-256 → XOR) — trước đây `!==` leak timing qua network
+async function safeEqual(a, b) {
+  try {
+    const enc = new TextEncoder();
+    const [da, db] = await Promise.all([
+      crypto.subtle.digest('SHA-256', enc.encode(String(a))),
+      crypto.subtle.digest('SHA-256', enc.encode(String(b))),
+    ]);
+    const ba = new Uint8Array(da), bb = new Uint8Array(db);
+    let diff = 0;
+    for (let i = 0; i < ba.length; i++) diff |= ba[i] ^ bb[i];
+    return diff === 0;
+  } catch (e) { return String(a) === String(b); }
+}
+
+// [AUDIT FIX] cắt chuỗi động trước khi ghi KV — chống events:log vượt 25MB (KV value limit)
+const _S = (v, n) => String(v == null ? '' : v).slice(0, n);
+// [AUDIT FIX] cap tổng kích thước 1 event (data JSON) — đặc biệt ai_chat response AI dài
+function _capEventData(data) {
+  const d = data || {};
+  const out = {};
+  for (const k of Object.keys(d)) {
+    const v = d[k];
+    if (typeof v === 'string') {
+      if (k === 'response' || k === 'q' || k === 'text' || k === 'question') out[k] = _S(v, 4000);
+      else out[k] = _S(v, 300);
+    } else if (v && typeof v === 'object') {
+      try { out[k] = _S(JSON.stringify(v), 500); } catch (e) { out[k] = '[unserializable]'; }
+    } else out[k] = v;
+  }
+  return out;
 }
 
 // [loop 1365] parseUA — rút device label từ User-Agent (OS/browser/type/brand Android).
@@ -136,15 +169,24 @@ export async function logEvent(env, request, type, data) {
   const country = (request.cf && request.cf.country) || '';
   const city = (request.cf && request.cf.city) || '';
   const ts = Date.now();
-  // [loop 1352] events:log cap 1500 (KV value limit 25MB → 1500 events ≈ 700KB, thừa sức).
-  //   Cap cũ 200 → lịch sử chat/lá số bị xóa vĩnh viễn sau vài giờ, phá «thống kê chi tiết».
+  // [AUDIT FIX] cap 1500 events NHƯNG phải tính theo KÍCH THƯỚC: 1500 × chat-response 50-150KB
+  //   vượt 25MB KV value limit → /api/event 500 cho mọi visitor, analytics chết (đã xảy ra thực tế).
+  //   - data đã được cắt (response/q → 4000 chars)
+  //   - tổng serialized vượt ~1.5MB → tự cắt bớt events cũ ngay (self-heal, không cần admin clear)
+  const capped = _capEventData(data);
   const logRaw = await env.ADMIN_KV.get('events:log');
   let log = [];
-  try { log = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
+  try { log = logRaw ? JSON.parse(logRaw) : []; } catch (e) { log = []; } // corrupt → reset (self-heal)
   const isNewIp = type === 'visit' && !log.some((e) => e.ip === ip);
-  log.unshift({ ts, type, ip, ua, country, city, data: data || {} });
-  if (log.length > 1500) log.length = 1500;
-  await env.ADMIN_KV.put('events:log', JSON.stringify(log));
+  log.unshift({ ts, type, ip, ua, country, city, data: capped });
+  const MAX_EST = 1_500_000; // ~1.5MB ước lượng (an toàn dưới 25MB kể cả JSON overhead × lịch sử)
+  while (log.length > 1500 || (log.length > 100 && JSON.stringify(log).length > MAX_EST)) log.pop();
+  try {
+    await env.ADMIN_KV.put('events:log', JSON.stringify(log));
+  } catch (e) {
+    // [AUDIT FIX] self-heal: vẫn vượt → giữ 300 events mới nhất, thử lại 1 lần
+    try { while (log.length > 300) log.pop(); await env.ADMIN_KV.put('events:log', JSON.stringify(log)); } catch (e2) {}
+  }
   // [visitor-finder] profile bền vững — chart identity (dob|time|gender) sống qua events:log rollover + đổi IP.
   //   Chỉ upsert khi chart có name → admin tìm theo tên dài hạn. Không TTL (persistent).
   if (type === 'chart' && data && data.name) {
@@ -181,6 +223,8 @@ export async function logEvent(env, request, type, data) {
 }
 
 // [loop 1351] Telegram notification — admin nhận alert ngay khi user lập lá số / hỏi AI
+// [AUDIT FIX PRIVACY] giảm PII trên kênh bên thứ ba: bỏ IP + DOB đầy đủ, chỉ giữ quốc gia + đoạn
+//   ngắn (full content vẫn ở KV nội bộ). Không bỏ vì admin cần alert nhanh; đủ ẩn danh hóa.
 async function notifyTelegram(env, event) {
   if (!env.ADMIN_KV) return;
   const token = await env.ADMIN_KV.get('notify:tg_token');
@@ -188,18 +232,18 @@ async function notifyTelegram(env, event) {
   if (!token || !chatId) return;
   var msg = '🔔 <b>' + event.type + '</b>\n';
   msg += '🌍 ' + (event.country || '?') + (event.city ? ' / ' + event.city : '') + '\n';
-  msg += '🌐 ' + event.ip + '\n';
-  if (event.type === 'chart' && event.data) msg += '📊 Lá số: ' + (event.data.dob || '?') + ' ' + (event.data.gender || '') + '\n';
-  if (event.type === 'ai_question' && event.data) msg += '💬 Hỏi: ' + String(event.data.q || '').slice(0, 200) + '\n';
-  if (event.type === 'error' && event.data) msg += '⚠ Lỗi: ' + String(event.data.msg || '').slice(0, 200) + '\n';
+  if (event.type === 'chart' && event.data) msg += '📊 Lá số (năm/g.tính): ' + String(event.data.year || event.data.dob || '?').slice(0, 30) + ' / ' + String(event.data.gender || '?') + '\n';
+  if (event.type === 'ai_question' && event.data) msg += '💬 Hỏi: ' + String(event.data.q || '').slice(0, 150) + '\n';
+  if (event.type === 'error' && event.data) msg += '⚠ Lỗi: ' + String(event.data.msg || '').slice(0, 150) + '\n';
   if (event.type === 'new_visitor') msg = '🆕 <b>Visitor mới!</b>\n';
   msg += '⏰ ' + new Date(event.ts).toLocaleString('vi-VN');
   try {
-    await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+    const r = await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'HTML' }),
     });
-  } catch (e) {}
+    if (!r.ok) { try { await env.ADMIN_KV.put('notify:tg_fail', String(await r.text()).slice(0, 300)); } catch (e) {} }
+  } catch (e) { try { await env.ADMIN_KV.put('notify:tg_fail', String(e && e.message || 'fetch fail').slice(0, 300)); } catch (e2) {} }
 }
 
 async function adminNotifyConfig(env, request) {
@@ -268,7 +312,10 @@ export async function handleAdminRoute(request, env, url) {
 
   if (path === '/api/event' && method === 'POST') {
     try {
-      const body = await request.json();
+      // [AUDIT FIX] cap body size — chống attacker POST payload khổng lồ (KV bloat / memory)
+      const raw = await request.text();
+      if (raw.length > 64 * 1024) return json({ ok: false, err: 'payload quá lớn (>64KB)' }, 413);
+      const body = JSON.parse(raw || '{}');
       const type = ['visit', 'chart', 'ai_question', 'ai_chat', 'error', 'click'].includes(body && body.type) ? body.type : 'other';
       const ok = await logEvent(env, request, type, body && body.data);
       return json(ok ? { ok: true } : { ok: false, err: 'rate_limited (max 30/phút/IP)' }, ok ? 200 : 429);
@@ -276,15 +323,27 @@ export async function handleAdminRoute(request, env, url) {
   }
   // [loop 1378 MOAT] /api/feedback — public, log 👍/👎 (data flywheel)
   if (path === '/api/feedback' && method === 'POST') {
-    try { const body = await request.json(); await logFeedback(env, clientIP(request), body); return json({ ok: true }); }
+    // [AUDIT FIX] throttle 30/phút/IP như logEvent (trước đây không giới hạn → KV write-quota abuse)
+    const _rlk = 'rl:' + clientIP(request) + ':' + Math.floor(Date.now() / 60000);
+    const _rlc = parseInt((env.ADMIN_KV && await env.ADMIN_KV.get(_rlk)) || '0', 10);
+    if (_rlc >= 30) return json({ ok: false, err: 'rate_limited' }, 429);
+    if (env.ADMIN_KV) await env.ADMIN_KV.put(_rlk, String(_rlc + 1), { expirationTtl: 120 });
+    try { const raw = await request.text(); if (raw.length > 16 * 1024) return json({ ok: false }, 413); const body = JSON.parse(raw || '{}'); await logFeedback(env, clientIP(request), body); return json({ ok: true }); }
     catch (e) { return json({ ok: false }, 400); }
   }
   // [R46] /api/log-error — AI tự log lỗi khi luận SAI (public POST → lưu KV 30 ngày)
   if (path === '/api/log-error' && method === 'POST') {
+    // [AUDIT FIX] throttle như logEvent — trước đây tạo key KV MỚI mỗi request không giới hạn
+    const _elrk = 'rl:' + clientIP(request) + ':' + Math.floor(Date.now() / 60000);
+    const _elc = parseInt((env.ADMIN_KV && await env.ADMIN_KV.get(_elrk)) || '0', 10);
+    if (_elc >= 30) return json({ ok: false, err: 'rate_limited' }, 429);
+    if (env.ADMIN_KV) await env.ADMIN_KV.put(_elrk, String(_elc + 1), { expirationTtl: 120 });
     try {
-      const body = await request.json();
+      const raw = await request.text();
+      if (raw.length > 16 * 1024) return json({ ok: false, err: 'payload quá lớn' }, 413);
+      const body = JSON.parse(raw || '{}');
       const id = 'err:' + Date.now() + ':' + Math.random().toString(36).slice(2, 8);
-      const entry = JSON.stringify({ ...body, ts: new Date().toISOString(), ip: clientIP(request) });
+      const entry = JSON.stringify({ ..._capEventData(body), ts: new Date().toISOString(), ip: clientIP(request) });
       if (env.ADMIN_KV) await env.ADMIN_KV.put(id, entry, { expirationTtl: 86400 * 30 });
       return json({ ok: true, id });
     } catch (e) { return json({ ok: false, error: e.message }, 500); }
@@ -309,23 +368,36 @@ export async function handleAdminRoute(request, env, url) {
     return json({ mode: config.mode || 'free', endpoint: config.endpoint || '', hasKey: !!(config.apiKey || config.zaiKey || (Array.isArray(config.freePool) && config.freePool.length)), model: config.model || '', freeEnabled: await isFreeAiEnabled(env) });
   }
 
+  // [AUDIT FIX] /api/* không khớp route → 405 JSON (trước đây rơi xuống SPA fallback trả HTML 200,
+  //   che giấu lỗi client + sai status code)
+  if (path.startsWith('/api/')) return json({ ok: false, err: 'method not allowed' }, 405);
+
   if (path === '/admin' || path.startsWith('/admin/')) {
-    // POST /admin/setup {token} — one-time self-service (chỉ khi chưa đặt token). Ưu tiên wrangler
-    //   secret env.ADMIN_TOKEN nếu có; KHÔNG thì KV admin:token. Tránh cần wrangler secret put.
+    // POST /admin/setup {token, key} — bootstrap 1 lần. [AUDIT FIX] trước đây AI-anonymous claim race:
+    //   deploy mới chưa ai setup → kẻ đầu tiên hit /admin/setup chiếm panel (đọc PII, tắt AI, chèn chat).
+    //   Nay BẮT BUỘC khớp secret ADMIN_SETUP_KEY (wrangler secret put ADMIN_SETUP_KEY <key>); chưa đặt → đóng.
     if (path === '/admin/setup' && method === 'POST') {
+      if (!env.ADMIN_SETUP_KEY) return json({ ok: false, err: 'Admin chưa kích hoạt: chạy `wrangler secret put ADMIN_SETUP_KEY <key>` rồi POST /admin/setup {key, token}.' }, 403);
+      const _sip = clientIP(request);
+      const _sk = 'setup:' + _sip + ':' + Math.floor(Date.now() / 300000);
+      const _sc = parseInt((env.ADMIN_KV && await env.ADMIN_KV.get(_sk)) || '0', 10);
+      if (_sc >= 5) return json({ ok: false, err: 'Quá nhiều lần thử — chờ 5 phút.' }, 429);
+      if (env.ADMIN_KV) await env.ADMIN_KV.put(_sk, String(_sc + 1), { expirationTtl: 300 });
       const existing = env.ADMIN_TOKEN || (env.ADMIN_KV && await env.ADMIN_KV.get('admin:token'));
       if (existing) return json({ ok: false, err: 'Token đã đặt rồi — dùng /admin?token=<token>' }, 403);
       const body = await request.json().catch(() => ({}));
+      if (String(body && body.key) !== env.ADMIN_SETUP_KEY) return json({ ok: false, err: 'Setup key sai.' }, 403);
       const t = body && body.token && String(body.token).length >= 8 ? String(body.token) : null;
       if (!t) return json({ ok: false, err: 'Cần body {token: "..."} độ dài ≥ 8 ký tự' }, 400);
       if (env.ADMIN_KV) await env.ADMIN_KV.put('admin:token', t);
+      await auditLog(env, request, 'admin_token_bootstrap', { from: _sip });
       return json({ ok: true, msg: 'Đã đặt. Mở /admin?token=<token>' });
     }
     const ck = (request.headers.get('Cookie') || '').match(/btu_admin=([^;]+)/);
-    const token = url.searchParams.get('token') || request.headers.get('X-Admin-Token') || (ck ? decodeURIComponent(ck[1]) : '') || '';
+    const token = request.headers.get('X-Admin-Token') || url.searchParams.get('token') || (ck ? decodeURIComponent(ck[1]) : '') || '';
     const expected = env.ADMIN_TOKEN || (env.ADMIN_KV && await env.ADMIN_KV.get('admin:token')) || '';
-    if (!expected) return json({ ok: false, err: 'Chưa đặt token admin. POST /admin/setup {token:"<chọn-≥8-ký-tự>"} để tạo (chỉ lần đầu).', needSetup: true }, 401);
-    if (token !== expected) {
+    if (!expected) return json({ ok: false, err: 'Chưa đặt token admin. Cấu hình ADMIN_SETUP_KEY rồi POST /admin/setup {key, token} lần đầu.', needSetup: true }, 401);
+    if (!(await safeEqual(token, expected))) {
       // [loop 1351] rate-limit failed auth (chống brute-force token): 10 fail / 5ph / IP
       const fk = 'fail:' + clientIP(request);
       const fc = parseInt((env.ADMIN_KV && await env.ADMIN_KV.get(fk)) || '0', 10);
@@ -766,6 +838,9 @@ async function adminChangeToken(env, request) {
   const body = await request.json().catch(() => ({}));
   const t = body && body.new && String(body.new).length >= 8 ? String(body.new) : null;
   if (!t) return json({ ok: false, err: 'Cần body {new: "..."} độ dài ≥ 8 ký tự' }, 400);
+  // [AUDIT FIX] khi env.ADMIN_TOKEN (secret) tồn tại, KV admin:token bị BỎ QUA khi đọc (secret ưu tiên)
+  //   → đổi token KV = no-op gây nhầm tưởng. Báo rõ thay vì im lặng.
+  if (env.ADMIN_TOKEN) return json({ ok: false, err: 'Token đang lấy từ secret ADMIN_TOKEN (ưu tiên hơn KV) — muốn đổi: `wrangler secret put ADMIN_TOKEN <new>`.' }, 400);
   if (env.ADMIN_KV) await env.ADMIN_KV.put('admin:token', t);
   await auditLog(env, request, 'token_change', {}); // KHÔNG log giá trị token mới
   return json({ ok: true, msg: 'Token đã đổi. Dùng /admin?token=<new>' });
@@ -776,7 +851,12 @@ async function adminExport(env) {
   const logRaw = await env.ADMIN_KV.get('events:log');
   let events = [];
   try { events = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
-  const esc = (s) => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
+  // [AUDIT FIX] chống CSV formula injection — cell bắt đầu = + - @ (hoặc tab/CR) → prefix '
+  const esc = (s) => {
+    let v = String(s == null ? '' : s);
+    if (/^[=+\-@\t\r]/.test(v)) v = "'" + v;
+    return '"' + v.replace(/"/g, '""') + '"';
+  };
   const rows = [['timestamp', 'type', 'ip', 'country', 'city', 'ua', 'data'].join(',')];
   for (const e of events) {
     rows.push([new Date(e.ts).toISOString(), e.type, e.ip, e.country || '', e.city || '', e.ua || '', JSON.stringify(e.data || {})].map(esc).join(','));

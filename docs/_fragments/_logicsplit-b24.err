@@ -1,4 +1,0 @@
-Error: Internal error: {
-  "message": "response truncated by max_tokens",
-  "error_kind": "max_tokens_truncation"
-}

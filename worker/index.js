@@ -17,7 +17,8 @@ const SCRAPER_RE = /scrapy|python-requests|python\/|wget|httpclient|java\/|go-ht
 const GOOD_BOT_RE = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|facebookexternalhit/i;
 
 function clientIP(request) {
-  return request.headers.get('CF-Connecting-IP') || (request.headers.get('X-Forwarded-For') || '').split(',')[0].trim() || 'unknown';
+  // [AUDIT FIX] bỏ fallback X-Forwarded-For (spoof nếu worker lộ ra ngoài CF)
+  return request.headers.get('CF-Connecting-IP') || 'unknown';
 }
 
 // [AUDIT FIX C3] Restrict CORS — trước đây * → bất kỳ site nào cũng drain AI quota
@@ -46,14 +47,16 @@ function withSecurityHeaders(res) {
 //   fail (401/429/500/timeout). Ai cũng dùng được (key server-side, user không cần key).
 async function freeRoute(request, env, ctx, ip, aiCfg) {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': corsOrigin(request), 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'authorization, content-type' } });
+  // [AUDIT FIX] chỉ nhận POST (trước đây GET cũng POST /chat/completions → 503 rác)
+  if (request.method !== 'POST') return new Response(JSON.stringify({ error: { message: 'method not allowed' } }), { status: 405, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin(request) } });
   let bodyObj = {};
   try { bodyObj = await request.json(); } catch (e) { try { bodyObj = JSON.parse(await request.text()); } catch (_) {} }
   const pool = Array.isArray(aiCfg && aiCfg.freePool) ? aiCfg.freePool.filter(function (p) { return p && p.apiKey && p.endpoint && p.model; }) : [];
   // [cloudflare-gỡ] z.ai Coding Plan (glm-5.2) là DEFAULT/PRIMARY — nhanh, ổn, hỗ trợ tool-use.
   //   Pool (Groq/NVIDIA/...) chỉ là FALLBACK khi z.ai fail. (Trước đây cf-glm default; Groq từng
   //   đứng đầu pool nhưng key chết 403/413 → mọi request fail ở Groq trước khi tới z.ai.)
-  var poolBackends = pool.map(function (p) { return { name: p.name || 'pool', endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey) }; });
-  var zaiBackend = aiCfg.zaiKey ? [{ name: 'z.ai-paid', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2', apiKey: String(aiCfg.zaiKey) }] : [];
+  var poolBackends = pool.map(function (p) { return { name: p.name || 'pool', endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey), stripTools: true }; });
+  var zaiBackend = aiCfg.zaiKey ? [{ name: 'z.ai-paid', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2', apiKey: String(aiCfg.zaiKey), stripTools: false }] : [];
   const backends = [].concat(zaiBackend, poolBackends); // z.ai TRƯỚC, pool fallback
   for (let i = 0; i < backends.length; i++) {
     const b = backends[i];
@@ -66,15 +69,18 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
       //   thinking:{enabled} → z.ai reasoning) — coding plan glm-5.2 thinking ~6s/call, chấp nhận
       //   được, chất lượng luận giải tốt hơn no-thinking. Chỉ strip tools cho POOL (Groq/NVIDIA)
       //   vì payload tools lớn → HTTP 413; z.ai-paid giữ tools (tool-use đầy đủ).
+      // [AUDIT FIX] dùng cờ nội bộ stripTools (trước đây so tên 'z.ai-paid' → admin đặt pool entry
+      //   trùng tên là vô hiệu hóa strip → 413).
       var bodySend = Object.assign({}, bodyObj);
-      if (b.name !== 'z.ai-paid') { delete bodySend.tools; delete bodySend.tool_choice; }
+      if (b.stripTools) { delete bodySend.tools; delete bodySend.tool_choice; }
       const res = await fetch(b.endpoint + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + b.apiKey }, body: JSON.stringify(bodySend), signal: ac.signal });
       clearTimeout(timer);
       if (res.status === 200 && res.body) {
         if (env.ADMIN_KV) logFreeUsage(env, ip, 200, b.name).catch(function () {});
         // [loop 1395] BỎ tee/server-side capture — gây backpressure → BodyStreamBuffer aborted.
         //   Frontend đã log full response (loop 1387). Trả response TRỰC TIẾP → không tee.
-        return new Response(res.body, { status: 200, headers: { 'Content-Type': res.headers.get('Content-Type') || 'text/event-stream', 'Access-Control-Allow-Origin': corsOrigin(request), 'Cache-Control': 'no-store', 'X-Free-Backend': b.name } });
+        // [AUDIT FIX] bỏ header X-Free-Backend (lộ backend name cho client)
+        return new Response(res.body, { status: 200, headers: { 'Content-Type': res.headers.get('Content-Type') || 'text/event-stream', 'Access-Control-Allow-Origin': corsOrigin(request), 'Cache-Control': 'no-store' } });
       }
       if (env.ADMIN_KV) logFreeUsage(env, ip, res.status, b.name).catch(function () {});
     } catch (e) {
@@ -126,6 +132,14 @@ export default {
     // 2) proxy LLM API
     for (const [prefix, host] of PROXIES) {
       if (url.pathname === prefix || url.pathname.startsWith(prefix + '/')) {
+        // [AUDIT FIX] per-IP AI budget riêng (30/phút/IP) — mỗi call đốt quota trả phí admin;
+        //   global 120/min quá lỏng để chống drain từ server-side (không cần Origin).
+        if (env.ADMIN_KV) {
+          const ark = 'airl:' + ip + ':' + Math.floor(Date.now() / 60000);
+          const arc = parseInt((await env.ADMIN_KV.get(ark)) || '0', 10);
+          if (arc >= 30) return new Response(JSON.stringify({ error: { message: 'AI quota giới hạn 30 call/phút/IP — thử lại sau.' } }), { status: 429, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin(request), 'Retry-After': '60', 'Cache-Control': 'no-store' } });
+          await env.ADMIN_KV.put(ark, String(arc + 1), { expirationTtl: 120 });
+        }
         if (!(await isAiEnabled(env))) {
           return new Response(JSON.stringify({ error: { message: 'AI đang bị TẮT bởi quản trị viên.', type: 'ai_disabled' } }), { status: 503, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin(request), 'Cache-Control': 'no-store' } });
         }

@@ -35,6 +35,9 @@ export default defineConfig({
       '/bigmodel': { target: 'https://open.bigmodel.cn', changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/bigmodel/, '') },
       '/deepseek': { target: 'https://api.deepseek.com', changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/deepseek/, '') },
       '/openai':   { target: 'https://api.openai.com',   changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/openai/, '') },
+      // [AUDIT FIX] thiếu 2 proxy này → preset nvidia-glm/groq fail CORS khi dev (production OK qua worker)
+      '/nvidia':   { target: 'https://integrate.api.nvidia.com', changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/nvidia/, '') },
+      '/groq':     { target: 'https://api.groq.com',     changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/groq/, '') },
     },
   },
   build: {
@@ -48,7 +51,7 @@ export default defineConfig({
           // === VENDOR (cache vĩnh viễn — file hash không đổi khi update code) ===
           if (id.includes('node_modules/lunar-javascript')) return 'vendor-lunar';
           if (id.includes('node_modules/astronomy-engine')) return 'vendor-astronomy';
-          if (id.includes('node_modules/three')) return 'vendor-three';
+          // [AUDIT FIX] three@0.134 không được import ở đâu — manualChunk vendor-three chết
 
           // === ENGINE-AI (lazy — chỉ load khi user mở chat AI) ===
           // kb.js (263KB data!) + ai.js (222KB) = ~485KB → TÁCH khỏi main bundle

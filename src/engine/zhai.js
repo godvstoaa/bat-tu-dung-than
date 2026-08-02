@@ -5,6 +5,7 @@
 //  hướng cửa chính / chủ phòng ngủ / bếp. Nguồn: 八宅明镜.
 // ============================================================================
 import { Solar } from 'lunar-javascript';
+import { isMaleGender } from './core.js';
 
 // 8 quái ↔ số & nhóm Đông/Tây Tứ
 const GUA = {
@@ -41,7 +42,11 @@ function digitRoot(n) { n = Math.abs(n); while (n >= 10) { let s = 0; while (n) 
  * @returns {{ gua, guaName, grp, grpVi, auspicious, inauspicious, advice }}
  */
 export function computeZhai(birthYear, gender) {
-  const isMale = gender === 'nam';
+  // [AUDIT FIX] normalize gender — trước đây `=== 'nam'` → 'male'/'MALE' sinh ra 命卦 SAI nhóm
+  //   (vd 1990 'male' = 艮/Tây thay vì 坎/Đông). Garbage → throw rõ ràng, không silent female.
+  const m = isMaleGender(gender);
+  if (m === null) throw new Error(`Giới tính không hợp lệ («${gender}») — nhập «nam» hoặc «nữ».`);
+  const isMale = m;
   // Mệnh quái theo năm sinh (dương lịch, sau lập xuân mới tính năm sau — giản lược dùng năm dương lịch)
   const s = digitRoot(birthYear);
   const lt = ((birthYear % 100) + 100) % 100; // 2 chữ số cuối của năm (lastTwoDigits)
@@ -80,7 +85,7 @@ export function computeZhai(birthYear, gender) {
   const advice = [
     `① Cửa chính (大门): mở về hướng cát — tốt nhất ${ausp['Sinh Khí']} (Sinh Khí) hoặc ${ausp['Diên Niên']} (Diên Niên) để thu vượng khí.`,
     `② Phòng ngủ chủ (主卧): đặt ở hướng cát ${ausp['Thiên Y']} (Thiên Y — tốt sức khoẻ) hoặc ${ausp['Phục Vị']} (Phục Vị — yên ngủ); đầu giường hướng cát.`,
-    `③ Bếp (厨房): bếp nên "tọa hung hướng cát" — đặt ở hướng HUNG ${inausp['Tuyệt Mệnh'] || inKeys[0]} để ép tà, nhưng bếp lò/cửa bếp quay về hướng CÁT ${ausp['Sinh Khí']}.`,
+    `③ Bếp (厨房): bếp nên "tọa hung hướng cát" — đặt ở hướng HUNG ${inausp['Tuyệt Mệnh'] || 'Tây Nam'} để ép tà, nhưng bếp lò/cửa bếp quay về hướng CÁT ${ausp['Sinh Khí']}.`,
     `④ Học/bàn làm việc: ngồi nhìn về hướng ${ausp['Sinh Khí']} hoặc ${ausp['Thiên Y']}.`,
     `${g.grp === 'east' ? 'Bạn thuộc Đông Tứ Mệnh → hợp nhà Đông Tứ Trạch (tọa Bắc/Nam/Đông/Đông Nam).' : 'Bạn thuộc Tây Tứ Mệnh → hợp nhà Tây Tứ Trạch (tọa Tây/Tây Bắc/Tây Nam/Đông Bắc).'}`,
   ];

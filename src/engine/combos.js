@@ -3,21 +3,23 @@
 //  Nguồn: 子平真詮, 滴天髓 — các tổ hợp quyết định lớn đến đẳng cấp & cát hung.
 //  Mỗi tổ hợp: điều kiện (sự hiện diện của các Thập Thần) + nghĩa + cát/hung.
 // ============================================================================
-import { TEN_GOD_VI } from './constants.js';
+import { TEN_GOD_VI, HIDDEN_WEIGHT } from './constants.js';
 
 // Đếm điểm Thập Thần. [cycle 55] can năm/tháng/giờ = 1; TÀNG CAN (cả 本/中/余 khí của 4 trụ) =
 //   [0.5, 0.3, 0.1]. Trước đây chỉ đếm 本气 (hidden[0]) → bỏ sót 十神 chỉ có ở 中气/余气 →
 //   tổ hợp (vd 食神制杀) KHÔNG phát hiện dù đủ điều kiện. Cổ pháp 十神组合 tính cả tàng can.
+// [AUDIT FIX] trọng số nhập từ constants.HIDDEN_WEIGHT (trước đây hardcode [0.5,0.3,0.1]
+//   trong khi scoring dùng 0.6/0.3/0.1 → cùng bản khí đóng góp khác nhau giữa 2 tầng).
 function godCount(chart) {
   const c = {};
   for (const key of ['year', 'month', 'time']) {
     const g = chart.pillars[key].ganGod;
     if (g && g !== '日主') c[g] = (c[g] || 0) + 1;
   }
-  const W = [0.5, 0.3, 0.1]; // 本/中/余 khí trọng số
   for (const key of ['year', 'month', 'day', 'time']) {
     const p = chart.pillars[key];
     if (!p.hidden) continue;
+    const W = HIDDEN_WEIGHT[p.hidden.length] || [0.6, 0.3, 0.1];
     p.hidden.forEach((h, i) => { if (h && h.god && h.god !== '日主') c[h.god] = (c[h.god] || 0) + (W[i] || 0.1); });
   }
   delete c['日主'];

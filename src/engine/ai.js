@@ -360,7 +360,7 @@ ${(() => { try { const b = dailyBriefing(R, _now.getFullYear(), _now.getMonth() 
 - «Lĩnh vực cuộc sống» (LIFE_AREA_INDEX — quy tắc chủ mỗi lĩnh vực): ${Object.entries(LIFE_AREA_INDEX).map(([k, e]) => `${e.title}→${e.focus}`).join('; ')}
 - «Cách cục hướng dẫn» (PATTERN_GUIDE — định hướng sự nghiệp/đời sống cho cách cục này): ${R.pattern && PATTERN_GUIDE[R.pattern.name] ? PATTERN_GUIDE[R.pattern.name] : '(cách không có guide)'}
 - «Tương tác can chi» (INTERACTION_MEANING — ý nghĩa hợp/xung/hình/hại): ${Object.entries(INTERACTION_MEANING).map(([k, e]) => `${k}→${String(e).split('.')[0]}`).join('; ')}
-- Giới tính: ${c.input.gender} | Dương lịch: ${c.solar}
+- Giới tính: ${c.input.genderNorm || c.input.gender} | Dương lịch: ${c.solarInput || c.solar}
 - Tiết khí gần nhất: ${c.jieqi.prev.name}
 
 TỨ TRỤ:
@@ -977,10 +977,14 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
 
   // ---- [round 43] 彭祖百忌 (CẤM KỴ dân gian — kiêng kỵ mỗi ngày) ----
   try {
-    const dayGan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'][(_now.getFullYear() - 4) % 10];
-    const dayZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][(_now.getFullYear() - 4) % 12];
+    // [AUDIT FIX] 彭祖百忌 là cấm kỵ theo CAN-CHI NGÀY — trước đây dùng `(year-4)%10/12`
+    //   = can-chi NĂM → brief đưa sai quy luật (vd 2026-08-03: ngày thật 己酉, code cũ đưa 丙午).
+    const _dz = Solar.fromYmdHms(_now.getFullYear(), _now.getMonth() + 1, _now.getDate(), 12, 0, 0);
+    const _dzE = _dz.getLunar().getEightChar();
+    const dayGan = _dzE.getDayGan();
+    const dayZhi = _dzE.getDayZhi();
     const bj = PENGZU_BAIJI.getDaily(dayGan, dayZhi);
-    brief += `\n--- 彭祖百忌 (cấm kị dân gian, round 43) ---\nNăm ${_now.getFullYear()} (${dayGan}${dayZhi}) kiêng: ${bj.combined}`;
+    brief += `\n--- 彭祖百忌 (cấm kị dân gian, round 43) ---\nHôm nay ${_now.getFullYear()}-${_now.getMonth() + 1}-${_now.getDate()} (${dayGan}${dayZhi}) kiêng: ${bj.combined}`;
   } catch (e) { brief += "\n--- ROUND 43: [lỗi load] ---"; }
 
   // CẤM KỴ CONCEPT INDEX — 1 dòng định nghĩa mỗi hệ (AI dùng khi user hỏi «X là gì»)
@@ -1138,6 +1142,9 @@ Dung thuat ngu BaTu NHUNG luon giai thich nhanh trong ngoac don ngay sau: «Than
 Su dung day du thuat ngu chuyen ngan BaTu (Thap Than, Cach cuc, Dung Than, Sat An tuong sinh, Thien Duc, Cuu Suu, Thien Nhan...). Phan tich sau ky thuat, danh nguoi da hieu co phap. KHONG can giai thich nguyen ban thuat ngu.`
 };
 
+// [AUDIT FIX] năm module-scope cho SYSTEM_PROMPT (không hardcode 2026 — example «NAM NAY» tự cập nhật)
+const _PROMPT_NOW = new Date();
+const _PY = _PROMPT_NOW.getFullYear();
 export const SYSTEM_PROMPT = `Ban la mot ONG THAY PHONG THUY thuc chien - giau kinh nghiem, noi THANG, DON GIAN, DUNG TRONG TAM. KHONG han lam, KHONG long vong, KHONG liet ke du lieu - ma TONG HOP + PHAN TICH + DUC KET thanh cau tra loi ma nguoi KHONG RANH phong thuy cung hieu va LAM THEO duoc.
 
 [SUC MANH TOAN DIEN - DUNG HET KHA NANG]
@@ -1155,7 +1162,7 @@ NGUYEN TAC:
 5. HANH DONG LAM DUOC NGAY + LAY NGAY THAT TU TOOL: moi loi khuyen phai la viec CO THE LAM DUOC ngay (co NGAY cu the, co cach lam, co dieu kien). Khi khuyen "nen lam X vao luc nao" -> BAT BUOC GOI TOOL (best_days_in_year / find_good_days / analyze_day) de lay NGAY THẬT chinh xac roi dua vao, KHONG tuong tuong "thang 10". GHI RÒ ngày + can-chi + điem. KHONG phat feng-thuy chung chung (mau sac, huong, chau cay) kieu an khap tat ca - chi noi khi no that su giai quyet van de cua ho va kem LY DO tu menh. Uu tien: (a) ngay KY trong khoang ngan han (tranh lam viec lon ngay nao), (b) ngay CAT gan nhat de tien thu.
 6. NOI THAT: neu hung -> noi hung thang ("nam nay con den, thu cho chac"); neu cat -> noi cat nhung giu chung muc.
 7. PHONG CACH: am ap nhu ong thay day hoc tro - "con a, menh con la... nen..." - KHONG lanh nhu robot.
-8. NAM/THANG HIEN TAI - CUC KY QUAN TRONG: doc muc "THOI GIAN HIEN TAI" dau chart brief. Do la nam/thang DANG DIEN RA. Khi user hoi "nam nay"/"thang nay"/"thang nay black"/"nam roi" -> PHAI dung DUNG nam + thang ghi o brief (vi du neu brief ghi "NAM NAY = 2026" thi "nam nay" = 2026, KHONG PHAI 2024). TUYET DOI KHONG mac dinh nam 2024 hay nam cu. KHONG noi "sang nam 2026 se..." neu 2026 da la nam nay.
+8. NAM/THANG HIEN TAI - CUC KY QUAN TRONG: doc muc "THOI GIAN HIEN TAI" dau chart brief. Do la nam/thang DANG DIEN RA. Khi user hoi "nam nay"/"thang nay"/"thang nay black"/"nam roi" -> PHAI dung DUNG nam + thang ghi o brief (vi du neu brief ghi "NAM NAY = ${_PY}" thi "nam nay" = ${_PY}, KHONG PHAI ${_PY - 2}). TUYET DOI KHONG mac dinh nam ${_PY - 2} hay nam cu. KHONG noi "sang nam ${_PY + 1} se..." neu ${_PY + 1} da la nam nay.
 9. NGON NGU: chi viet TIENG VIET. KHONG xai chu Han-Trung trong cau (vd "一棵", "恰恰" - CAM). Chi duoc giu ten HAN-VIET cua sao/cach cuc (Chinh Quan, That Sat...). Noi "cay bi ngap nuoc" chu KHONG noi "一棵树".
 10. CHINH TA TIENG VIET - BAT BUOC: viet DUNG chinh ta, co dau day du, ro nghia. KHONG duoc viet tu sai/garble/khong ton tai (VD CAM: "tránhinten", "kwệt", "kwet", "khuyet" - phai la "hao/khaying/khuyet" dung nghia). Neu khong chac mot tu -> dung tu don gian khac cho chac. TRUOC KHI gui: DOC LAI toan bo cau tra loi va SUA HET loi chinh ta. Moi tu phai la tieng Viet hop le, de doc.
 11. KHONG BA PHẢI - CA NHAN HOA: moi cau luan PHAI dua vao MENH RIENG cua ho (Dung Than cua ho, dai van dang hanh, luu nguyet/luu nien hien tai cua ho). Kiem tra: neu bo loi khuyen nay sang 10 nguoi khac cung giong het -> no la "ba phai", PHAI bo hoac ca nhan hoa them bang du lieu rieng cua ho. Tra loi nhu dang noi chuyen 1-1 voi nguoi cua the, khong phai doc bai cho dông.
@@ -2350,7 +2357,7 @@ export function suggestFollowups(question, R) {
   // [loop 1165] cải vận branch — discover clothing/direction/crystal/number
   if (has(/cai van|cai yun|bot xui|may man|cải vận|xui xeo|han lam|gi cai van|lam sao bot xui/)) return [_dung ? `Màu + hướng may mắn (Dụng ${_dung})?` : 'Màu + hướng may mắn?', 'Số điện thoại hợp mệnh?', 'Đá phong thủy hợp mệnh?', 'Đại vận nào thuận để hành sự?'];
   if (has(/tong|quy dao|doi toi|cuoc doi|overview|synthesis|chot/)) return ['Đỉnh cao đời tôi lúc nào?', 'Cẩn thận năm nào nhất?', 'Lời khuyên hành động cho tôi?'];
-  if (has(/luu nien|nam nay|2026|2027|2028/)) return ['Tháng nào trong năm tốt nhất?', 'Năm này cẩn thận điều gì?', 'Đại vận đang hành có thuận không?'];
+  if (has(/luu nien|nam nay|nam sau|nam toi|20\d{2}/)) return ['Tháng nào trong năm tốt nhất?', 'Năm này cẩn thận điều gì?', 'Đại vận đang hành có thuận không?'];
   // [loop 1116] hôm nay/day followups → discover health_today + best_hour + 3-pillar interaction
   if (has(/hom nay|today|gio nao|truc|ngay nao/)) return ['Hôm nay tạng nào yếu, nên dưỡng gì?', 'Giờ nào tốt nhất hôm nay, hướng nào kỵ?', 'Hôm nay xung/hợp trụ nào (日/月/年)?'];
   // [loop 1139] số lý followups — discover evaluate_number (loop 1137)

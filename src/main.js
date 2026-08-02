@@ -327,10 +327,10 @@ function renderVerdict(R) {
   const dm = chart.dayMaster;
   const pill = (w, extra) => `<span class="elem-pill ${wxClass(w)}">${w} ${WX_VI[w]}${extra || ''}</span>`;
   const favHtml = [...new Set([yong.primary, yong.xi].filter(Boolean))].map((w) => pill(w)).join('');
-  const reasons = yong.reasons.map((r) => `<li>${r}</li>`).join('');
+  const reasons = yong.reasons.map((r) => `<li>${esc(r)}</li>`).join('');
   const tiaohou = yong.tiaohou.note
     ? `<div class="tiaohou-note"><b>調候 Điều Hậu:</b> ${esc(yong.tiaohou.note)}</div>` : '';
-  const methodBadges = yong.method.map((m) => `<span class="badge-method">${m}</span>`).join('');
+  const methodBadges = yong.method.map((m) => `<span class="badge-method">${esc(m)}</span>`).join('');
 
   $('verdict').innerHTML = `
     <div class="v-box">
@@ -1523,7 +1523,6 @@ function renderWaterActivation() {
   try {
     const year = new Date().getFullYear();
     const r = waterActivation(year);
-    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const row = (label, x, tone, mark) => {
       if (!x || !x.dir) {
         return `<div class="ln" title="${esc(x && x.note)}">
@@ -3600,7 +3599,6 @@ function renderCaiMenh(R) {
   try {
     const rec = getRemedyForChart(R);
     const yk = getYeguoForChart(R);
-    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const rootDiag = (yk.length ? yk : []).map(y => `<div class="rm-row"><b>${esc(y.why || y.karma)}</b><br><span class="hint-inline">→ dấu ${esc(y.karma)}: ${esc(y.result)}</span><br><span class="wi-text">💊 ${esc(y.cure)}</span></div>`).join('');
     const threeLayer = rec.relevant.map(h => `<div class="rm-row"><b>${esc(h.when)}</b><br><span class="hint-inline">形 (ngoại cảnh):</span> <span class="wi-text">${esc(h.xing)}</span><br><span class="hint-inline">心 (tâm):</span> <span class="wi-text">${esc(h.xin)}</span><br><span class="hint-inline">业 (nghiệp gốc):</span> <span class="wi-text">${esc(h.ye)}</span></div>`).join('');
     const jingzhou = JING_ZHOU.map(j => `<div class="rm-mini"><b>${esc(j.problem)}</b> → <span class="zh">${esc(j.cure)}</span><br><span class="hint-inline">${esc(j.method)}</span></div>`).join('');
@@ -4662,6 +4660,9 @@ async function run() {
 
   renderTuzu3D(c);
   renderPillars(c);
+  // [AUDIT FIX] bọc block render chính — engine exception không được bỏ dở run() giữa chừng
+  //   (trước đây 1 lỗi ở giữa chuỗi → UI nửa render, tab sau không chạy)
+  try {
   renderVerdict(currentResult);
   renderVerdict3D(currentResult);
   renderSynthesis(currentResult);
@@ -4700,6 +4701,7 @@ async function run() {
   renderLiuNian(currentResult.liunian);
   try { renderDailyBriefing(currentResult); } catch (e) { console.warn('dailyBriefing', e.message); }
   try { renderTodayHero(); } catch (e) { console.warn('todayHero', e.message); } // [user feedback] chỉ hiện khi có lá số (gated trong #result)
+  } catch (e) { console.warn('render chain:', e.message); } // [AUDIT FIX] kết thúc block render chính
   // [UI P1] countUp — animate numeric scores/% ("số mệnh hiện ra"). Vanilla, reduced-motion aware.
   (function countUpAll() {
     const root = $('result'); if (!root || !window.requestAnimationFrame) return;
@@ -4869,12 +4871,18 @@ async function run() {
     });
     // scroll-spy: highlight group đang xem (trước đây .active KHÔNG được áp — user lạc trong trang dài)
     if (grpLinks.length) {
+      // [AUDIT FIX] rAF-throttle — trước đây getBoundingClientRect chạy MỌI scroll event (per-frame work)
+      let _spyRaf = 0;
       const spy = () => {
-        // [loop 936] dùng getBoundingClientRect (viewport-relative) — offsetTop lệch theo offsetParent
-        let activeIdx = 0;
-        const line = window.innerHeight / 3;
-        grpLinks.forEach(({ grp }, idx) => { if (grp.getBoundingClientRect().top <= line) activeIdx = idx; });
-        grpLinks.forEach(({ a }, idx) => a.classList.toggle('active', idx === activeIdx));
+        if (_spyRaf) return;
+        _spyRaf = requestAnimationFrame(() => {
+          _spyRaf = 0;
+          // [loop 936] dùng getBoundingClientRect (viewport-relative) — offsetTop lệch theo offsetParent
+          let activeIdx = 0;
+          const line = window.innerHeight / 3;
+          grpLinks.forEach(({ grp }, idx) => { if (grp.getBoundingClientRect().top <= line) activeIdx = idx; });
+          grpLinks.forEach(({ a }, idx) => a.classList.toggle('active', idx === activeIdx));
+        });
       };
       if (window._qnavSpy) window.removeEventListener('scroll', window._qnavSpy, { passive: true });
       window._qnavSpy = spy;
@@ -4908,30 +4916,44 @@ async function run() {
   init3DTilt();
 
   // [loop 156] CARD SEARCH/FILTER — lọc card theo từ khoá. [loop 311] ẩn grp header mồ côi.
+  // [AUDIT FIX] listener gắn MỘT LẦN (guard dataset) — trước đây gắn lại mỗi lần run()
+  //   → ~165 listener input + N keydown global tích lũy theo số lần "Luận giải" (freeze dần).
   const cardSearch = $('card-search');
   if (cardSearch) {
     cardSearch.classList.remove('hidden');
-    cardSearch.addEventListener('input', () => {
-      const q = cardSearch.value.trim().toLowerCase();
-      const cards = document.querySelectorAll('#result > .card');
-      // [loop 937] dùng data-filtered + updateCardVisibility (single source: collapse AND search)
-      cards.forEach((el) => {
-        if (!q) { el.dataset.filtered = '0'; return; }
-        const title = el.querySelector('.card-title') || el;
-        const text = (title.textContent + ' ' + el.textContent.slice(0, 500)).toLowerCase();
-        el.dataset.filtered = text.includes(q) ? '0' : '1';
+    if (!cardSearch.dataset.searchBound) {
+      cardSearch.dataset.searchBound = '1';
+      // [AUDIT FIX] debounce 200ms (trước đây mỗi keystroke: đọc textContent 165+ card + full DOM walk)
+      let _csTimer = 0;
+      cardSearch.addEventListener('input', () => {
+        clearTimeout(_csTimer);
+        _csTimer = setTimeout(() => {
+          const q = cardSearch.value.trim().toLowerCase();
+          const cards = document.querySelectorAll('#result > .card');
+          // [loop 937] dùng data-filtered + updateCardVisibility (single source: collapse AND search)
+          cards.forEach((el) => {
+            if (!q) { el.dataset.filtered = '0'; return; }
+            const title = el.querySelector('.card-title') || el;
+            const text = (title.textContent + ' ' + el.textContent.slice(0, 500)).toLowerCase();
+            el.dataset.filtered = text.includes(q) ? '0' : '1';
+          });
+          updateCardVisibility();
+        }, 200);
       });
-      updateCardVisibility();
-    });
+    }
   }
   // [loop 422] keyboard shortcut: "/" → focus card search (skip if typing in input/textarea)
-  document.addEventListener('keydown', (e) => {
-    if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement?.tagName)) {
-      e.preventDefault();
-      const cs = $('card-search');
-      if (cs) { cs.focus(); cs.select(); }
-    }
-  });
+  // [AUDIT FIX] gắn 1 lần ở module scope thay vì mỗi run() — trước đây N keydown handlers chồng nhau
+  if (!window._slashSearchBound) {
+    window._slashSearchBound = true;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement?.tagName)) {
+        e.preventDefault();
+        const cs = $('card-search');
+        if (cs) { cs.focus(); cs.select(); }
+      }
+    });
+  }
   if ($('bh-date')) { $('bh-date').value = todayStr; try { renderBestHour(todayStr); } catch (e) { console.warn('best-hour init', e.message); } }
   $('ts-year').value = curYear;
   renderTaisui(curYear);
@@ -4942,8 +4964,9 @@ async function run() {
   currentTopic = 'general';
   renderTabs();
   renderTopic();
-  $('chat-log').replaceChildren();
-  if (!_skipChatReset) { chatHistory = []; try { localStorage.removeItem('bazi-chat'); } catch (_) {} }
+  // [AUDIT FIX] chỉ clear DOM chat khi history thật sự reset — trước đây replaceChildren vô điều kiện
+  //   → wipe message vừa restore (race: restore +200ms vs run() nặng vài giây) → user thấy chat trống
+  if (!_skipChatReset) { chatHistory = []; try { localStorage.removeItem('bazi-chat'); } catch (_) {} $('chat-log').replaceChildren(); }
   updateAIStatus();
   try{renderDaily();}catch(e){console.warn('daily',e.message);}
   try{renderSpaceFs();}catch(e){console.warn('spaceFs',e.message);}
@@ -4964,7 +4987,9 @@ async function run() {
   lazyRender('five-dim-radar', () => { try { renderFiveDimRadar(); } catch (e) { console.warn('5dim', e.message); } });
   lazyRender('week-preview',  () => { try { renderWeekPreview(); } catch (e) { console.warn('week', e.message); } });
   lazyRender('month-calendar',() => { try { renderMonthCalendar(); } catch (e) { console.warn('cal', e.message); } });
-  renderQuickSummary(); // [loop 39] tóm tắt nhanh — render ngay (không lazy, ở đầu trang)
+  // [AUDIT FIX] renderQuickSummary nặng (10+ module đồng bộ) → đẩy sau paint để UI hiện trước,
+  //   không block toàn bộ run() vài giây
+  try { setTimeout(() => { try { renderQuickSummary(); } catch (e) { console.warn('quickSummary', e.message); } }, 0); } catch (_) {}
   lazyRender('decade-curve',  () => { try { renderDecadeCurve(); } catch (e) { console.warn('decade-curve', e.message); } });
   lazyRender('ziwei-stars-out',() => { try { renderZiweiFull(); } catch (e) { console.warn('ziweiFull', e.message); } });
   lazyRender('life-summary',   () => { try { renderLifeTrajectory(currentResult); } catch (e) { console.warn('life', e.message); } });
@@ -5694,8 +5719,12 @@ function runHehun() {
   const [by, bm, bdy] = bd.split('-').map(Number);
   const [ah, ami] = ($('hh-a-time').value || '12:00').split(':').map(Number);
   const [bh, bmi] = ($('hh-b-time').value || '12:00').split(':').map(Number);
-  const ag = document.querySelector('input[name="hh-a-g"]:checked').value;
-  const bg = document.querySelector('input[name="hh-b-g"]:checked').value;
+  const agEl = document.querySelector('input[name="hh-a-g"]:checked');
+  const bgEl = document.querySelector('input[name="hh-b-g"]:checked');
+  // [AUDIT FIX] guard radio missing (trước đây `.value` throw → cả tab Hợp Tuổi chết)
+  if (!agEl || !bgEl) { $('hh-out').innerHTML = '<p class="hint">Chưa chọn giới tính cho cả hai người.</p>'; return; }
+  const ag = agEl.value;
+  const bg = bgEl.value;
   const R1 = analyze(ay, am, ady, ah, ami, ag);
   const R2 = analyze(by, bm, bdy, bh, bmi, bg);
   const h = computeHehun(R1, R2);
@@ -5706,8 +5735,8 @@ function runHehun() {
     <div class="hh3d"><div class="hh3d-orb" style="--c:${hhCA}"><div class="hh3d-sphere"></div><div class="hh3d-han" style="color:${hhCA}">${R1.chart.dayMaster.wx}</div><div class="hh3d-label">A · ${R1.chart.dayMaster.vi}</div></div><div class="hh3d-bond"><div class="hh3d-score">${h.score}</div><div class="hh3d-bar"><div class="hh3d-marker" style="left:calc(${h.score}% - 5px)"></div></div><div class="hh3d-rating ln-rate ${cls}">${h.rating}</div></div><div class="hh3d-orb" style="--c:${hhCB}"><div class="hh3d-sphere"></div><div class="hh3d-han" style="color:${hhCB}">${R2.chart.dayMaster.wx}</div><div class="hh3d-label">B · ${R2.chart.dayMaster.vi}</div></div></div>
     <div class="hh-head">A ${R1.chart.dayMaster.vi} (${R1.chart.pillars.year.gan}${R1.chart.pillars.year.zhi}) × B ${R2.chart.dayMaster.vi} (${R2.chart.pillars.year.gan}${R2.chart.pillars.year.zhi})
     → <span class="ln-rate ${cls}">${h.rating} (${h.score}/100)</span></div>
-    <ul class="zr-reasons">${h.factors.map((f) => `<li>${f}</li>`).join('')}</ul>
-    <p class="zr-advice">${h.verdict}</p>`;
+    <ul class="zr-reasons">${h.factors.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>
+    <p class="zr-advice">${esc(h.verdict)}</p>`;
   // [plan #8] share/copy button (DOM-built, no innerHTML) → virality lever. Reuses clipboard + _fallbackCopy.
   const _share = document.createElement('button');
   _share.type = 'button'; _share.className = 'btn-ghost hh-share-btn';
@@ -5783,7 +5812,10 @@ function runZodiacPair() {
 }
 function runZhai() {
   const yr = parseInt($('zh-year').value, 10);
-  const g = document.querySelector('input[name="zh-g"]:checked').value;
+  const gEl = document.querySelector('input[name="zh-g"]:checked');
+  // [AUDIT FIX] guard radio missing (trước đây `.value` throw → tab Bát Trạch chết)
+  if (!gEl) { $('zh-out').innerHTML = '<p class="hint">Chưa chọn giới tính.</p>'; return; }
+  const g = gEl.value;
   const z = computeZhai(yr, g);
   $('zh-out').innerHTML = `
     <div class="zh-head">Mệnh quái: <b>${z.guaName}</b> · <span class="ln-rate rate-mid">${z.grpVi}</span></div>
@@ -5791,7 +5823,7 @@ function runZhai() {
       <div class="zh-col cat"><b>4 hướng CÁT (应 đặt cửa/giường/bàn)</b>${Object.entries(z.auspicious).map(([k, v]) => `<div><span class="zh-dir">${v}</span> — ${k}</div>`).join('')}</div>
       <div class="zh-col hung"><b>4 hướng HUNG (应 đặt bếp/toilet)</b>${Object.entries(z.inauspicious).map(([k, v]) => `<div><span class="zh-dir">${v}</span> — ${k}</div>`).join('')}</div>
     </div>
-    <ul class="zr-reasons">${z.advice.map((a) => `<li>${a}</li>`).join('')}</ul>`;
+    <ul class="zr-reasons">${z.advice.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>`;
 }
 
 // ---- wiring ----
@@ -7117,10 +7149,10 @@ function runLiuren() {
   if (dv) { const [d1, t1] = dv.split('T'); [y, mo, d] = d1.split('-').map(Number); if (t1) h = parseInt(t1.slice(0, 2), 10) || 12; }
   else { const n = new Date(); y = n.getFullYear(); mo = n.getMonth() + 1; d = n.getDate(); h = n.getHours(); }
   const r = liurenPan(y, mo, d, h);
-  const k4 = r.ke4.map((k) => `<div class="lr-ke"><div class="zh lr-up">${k.up}</div><div class="zh lr-down">${k.down}</div><div class="lr-kn">${k.n} <span class="hint-inline">${k.rel}</span></div></div>`).join('');
-  const sc = r.sanchuan.map((s2) => `<div class="lr-ke"><div class="zh lr-up">${s2.zhi}</div><div class="lr-kn">${s2.n}</div></div>`).join('');
-  const tj = Object.entries(r.tjAt).map(([z, t]) => `<span class="lr-tj ${['贵人','六合','青龙','太常','太阴','天后'].includes(t) ? 'cat' : (['螣蛇','朱雀','勾陈','白虎','玄武'].includes(t) ? 'hung' : '')}">${z}${t}</span>`).join(' ');
-  const html = '<div class="lr-head">日 <b>' + r.dayGanZhi + '</b> · 时 ' + r.hourZhi + ' (' + (r.isDay ? '昼' : '夜') + ') · 月将 <b>' + r.yuejiang + '</b>(' + r.yuejiangVi + ') · 贵人 ' + r.gui + ' (' + r.zongMen + ')</div><div class="lr-row"><span class="lr-sec">四课</span><div class="lr-kes">' + k4 + '</div></div><div class="lr-row"><span class="lr-sec">三传</span><div class="lr-kes">' + sc + '</div></div><div class="lr-row"><span class="lr-sec">初传 ' + r.sanchuan[0].zhi + ' 天将</span><b class="zh">' + r.chuan1TianJiang + '</b></div><div class="lr-row"><span class="lr-sec">十二天将</span><div class="lr-tjs">' + tj + '</div></div><div class="zr-advice">' + r.verdict + '</div><p class="hint">' + r.note + '</p>';
+  const k4 = r.ke4.map((k) => `<div class="lr-ke"><div class="zh lr-up">${esc(k.up)}</div><div class="zh lr-down">${esc(k.down)}</div><div class="lr-kn">${esc(k.n)} <span class="hint-inline">${esc(k.rel)}</span></div></div>`).join('');
+  const sc = r.sanchuan.map((s2) => `<div class="lr-ke"><div class="zh lr-up">${esc(s2.zhi)}</div><div class="lr-kn">${esc(s2.n)}</div></div>`).join('');
+  const tj = Object.entries(r.tjAt).map(([z, t]) => `<span class="lr-tj ${['贵人','六合','青龙','太常','太阴','天后'].includes(t) ? 'cat' : (['螣蛇','朱雀','勾陈','白虎','玄武'].includes(t) ? 'hung' : '')}">${esc(z)}${esc(t)}</span>`).join(' ');
+  const html = '<div class="lr-head">日 <b>' + esc(r.dayGanZhi) + '</b> · 时 ' + esc(r.hourZhi) + ' (' + (r.isDay ? '昼' : '夜') + ') · 月将 <b>' + esc(r.yuejiang) + '</b>(' + esc(r.yuejiangVi) + ') · 贵人 ' + esc(r.gui) + ' (' + esc(r.zongMen) + ')</div><div class="lr-row"><span class="lr-sec">四课</span><div class="lr-kes">' + k4 + '</div></div><div class="lr-row"><span class="lr-sec">三传</span><div class="lr-kes">' + sc + '</div></div><div class="lr-row"><span class="lr-sec">初传 ' + esc(r.sanchuan[0].zhi) + ' 天将</span><b class="zh">' + esc(r.chuan1TianJiang) + '</b></div><div class="lr-row"><span class="lr-sec">十二天将</span><div class="lr-tjs">' + tj + '</div></div><div class="zr-advice">' + esc(r.verdict) + '</div><p class="hint">' + esc(r.note) + '</p>';
   $('liuren').innerHTML = html;
 }
 
@@ -7183,14 +7215,14 @@ function runTaiyi() {
   const suanTag = (s) => s >= 10 ? (s % 10 === 0 ? '杜塞' : '长数') : '短数';
   const suanCls = (s) => s >= 10 ? (s % 10 === 0 ? 'rate-hung' : 'rate-cat') : 'rate-mid';
   const html =
-    '<div class="lr-head">Năm <b>' + r.year + '</b>' + (r.month ? ' · tháng ' + r.month : '') + ' · 积年 <b>' + r.jiyuan.toLocaleString('en-US') + '</b> · ' + r.wuYuan + '/' + r.jiName + ' · 入纪 ' + r.ruji + '/360 · 入局 <b>' + r.ruju + '/72</b>' + (r.rujuYue !== null ? ' (月局 ' + (r.rujuYue + 1) + ')' : '') + '</div>'
-    + '<div class="lr-row"><span class="lr-sec">太乙 行宫</span><b class="zh">' + r.taiyiGongName + '</b> (' + g.gua + ' · ' + g.wx + ' · ' + g.dir + ' · ' + g.nature + ') — năm thứ ' + (r.taiyiYearsIn + 1) + '/3</div>'
-    + '<div class="lr-row"><span class="lr-sec">天目/文昌</span><b class="zh">' + r.tianmuPos + '</b> <span class="hint-inline">@cung ' + r.tianmuGong + ' (' + r.tianmu + ' — ' + r.tianmuVi + ')</span></div>'
-    + '<div class="lr-row"><span class="lr-sec">计神/始击</span><b class="zh">' + r.jishenPos + '</b> → <b class="zh">' + r.shijiPos + '</b> <span class="hint-inline">@cung ' + r.shijiGong + ' (客目)</span></div>'
+    '<div class="lr-head">Năm <b>' + r.year + '</b>' + (r.month ? ' · tháng ' + r.month : '') + ' · 积年 <b>' + r.jiyuan.toLocaleString('en-US') + '</b> · ' + esc(r.wuYuan) + '/' + esc(r.jiName) + ' · 入纪 ' + r.ruji + '/360 · 入局 <b>' + r.ruju + '/72</b>' + (r.rujuYue !== null ? ' (月局 ' + (r.rujuYue + 1) + ')' : '') + '</div>'
+    + '<div class="lr-row"><span class="lr-sec">太乙 行宫</span><b class="zh">' + esc(r.taiyiGongName) + '</b> (' + esc(g.gua) + ' · ' + esc(g.wx) + ' · ' + esc(g.dir) + ' · ' + esc(g.nature) + ') — năm thứ ' + (r.taiyiYearsIn + 1) + '/3</div>'
+    + '<div class="lr-row"><span class="lr-sec">天目/文昌</span><b class="zh">' + esc(r.tianmuPos) + '</b> <span class="hint-inline">@cung ' + esc(r.tianmuGong) + ' (' + esc(r.tianmu) + ' — ' + esc(r.tianmuVi) + ')</span></div>'
+    + '<div class="lr-row"><span class="lr-sec">计神/始击</span><b class="zh">' + esc(r.jishenPos) + '</b> → <b class="zh">' + esc(r.shijiPos) + '</b> <span class="hint-inline">@cung ' + esc(r.shijiGong) + ' (客目)</span></div>'
     + '<div class="lr-row"><span class="lr-sec">主算/客算</span><span class="ln-rate ' + suanCls(r.zhuSuan) + '">主算 ' + r.zhuSuan + ' <small>' + suanTag(r.zhuSuan) + '</small></span> <span class="ln-rate ' + suanCls(r.keSuan) + '">客算 ' + r.keSuan + ' <small>' + suanTag(r.keSuan) + '</small></span></div>'
-    + '<div class="lr-row"><span class="lr-sec">Chủ / Khách</span><span class="ln-rate ' + favorCls + '">' + r.favor + '</span> <span class="ln-rate ' + luckCls + '">' + r.luck + '</span>' + ((r.buHeZhu || r.buHeKe) ? ' <span class="ln-rate rate-hung">不和数</span>' : '') + '</div>'
-    + '<div class="zr-advice">' + r.advice + '</div>'
-    + '<p class="hint">' + r.note + '</p>';
+    + '<div class="lr-row"><span class="lr-sec">Chủ / Khách</span><span class="ln-rate ' + favorCls + '">' + esc(r.favor) + '</span> <span class="ln-rate ' + luckCls + '">' + esc(r.luck) + '</span>' + ((r.buHeZhu || r.buHeKe) ? ' <span class="ln-rate rate-hung">不和数</span>' : '') + '</div>'
+    + '<div class="zr-advice">' + esc(r.advice) + '</div>'
+    + '<p class="hint">' + esc(r.note) + '</p>';
   $('taiyi').innerHTML = html;
 }
 
@@ -7201,12 +7233,12 @@ function renderDaily() {
   if (!currentResult) { el.textContent = 'Nhập ngày sinh rồi luận giải để xem hôm nay.'; return; }
   const r = dailyGuidance(currentResult);
   const cls = r.score >= 65 ? 'rate-cat' : r.score >= 45 ? 'rate-mid' : 'rate-hung';
-  const yiHtml = r.yi.map((y) => '<span class="lm-rate rate-cat">' + y + '</span>').join(' ');
-  const jiHtml = r.ji.map((j) => '<span class="lm-rate rate-hung">' + j + '</span>').join(' ');
-  const reasonsHtml = r.reasons.map((rs) => '<li>' + rs + '</li>').join('');
+  const yiHtml = r.yi.map((y) => '<span class="lm-rate rate-cat">' + esc(y) + '</span>').join(' ');
+  const jiHtml = r.ji.map((j) => '<span class="lm-rate rate-hung">' + esc(j) + '</span>').join(' ');
+  const reasonsHtml = r.reasons.map((rs) => '<li>' + esc(rs) + '</li>').join('');
   el.innerHTML =
-    '<div class="dy-head"><b>' + r.date + '</b> (ÂL ' + r.lunar + ') <span class="zh">' + r.dayGanZhi + '</span> [' + r.dayGanVsDm + '] <span class="ln-rate ' + cls + '">' + r.score + '/100</span></div>'
-    + '<div class="dy-verdict">' + r.verdict + '</div>'
+    '<div class="dy-head"><b>' + esc(r.date) + '</b> (ÂL ' + esc(r.lunar) + ') <span class="zh">' + esc(r.dayGanZhi) + '</span> [' + esc(r.dayGanVsDm) + '] <span class="ln-rate ' + cls + '">' + esc(r.score) + '/100</span></div>'
+    + '<div class="dy-verdict">' + esc(r.verdict) + '</div>'
     + '<div class="dy-yj"><b>宜 (nên):</b> ' + yiHtml + '</div>'
     + '<div class="dy-yj"><b>忌 (tránh):</b> ' + jiHtml + '</div>'
     + '<details><summary>Lý do chi tiết</summary><ul class="zr-reasons">' + reasonsHtml + '</ul></details>';
@@ -7219,10 +7251,10 @@ function renderSpaceFs() {
   const sf = spaceFs(i.year, i.gender, currentResult.yong, new Date().getFullYear());
   const cells = sf.result.map((r) => {
     const cls = r.verdict === 'CAT' ? 'cat' : r.verdict === 'HUNG' ? 'xiong' : 'mid';
-    return '<div class="sf-cell ' + cls + '"><div class="sf-dir">' + r.dir + '</div><div class="sf-votes">' + (r.votes >= 0 ? '+' : '') + r.votes + '</div><div class="sf-notes">' + r.notes.join(' ') + '</div></div>';
+    return '<div class="sf-cell ' + cls + '"><div class="sf-dir">' + esc(r.dir) + '</div><div class="sf-votes">' + (r.votes >= 0 ? '+' : '') + r.votes + '</div><div class="sf-notes">' + r.notes.map(esc).join(' ') + '</div></div>';
   }).join('');
   const el = document.getElementById('space-out');
-  if (el) el.innerHTML = '<div class="sf-head">' + sf.zhai + ' · Dụng ' + sf.yong + ' · Năm ' + sf.year + '</div><div class="sf-grid">' + cells + '</div><div class="zr-advice">' + sf.advice + '</div>' + (sf.warn ? '<div class="zr-advice" style="color:#ff9b89">' + sf.warn + '</div>' : '');
+  if (el) el.innerHTML = '<div class="sf-head">' + esc(sf.zhai) + ' · Dụng ' + esc(sf.yong) + ' · Năm ' + esc(sf.year) + '</div><div class="sf-grid">' + cells + '</div><div class="zr-advice">' + esc(sf.advice) + '</div>' + (sf.warn ? '<div class="zr-advice" style="color:#ff9b89">' + esc(sf.warn) + '</div>' : '');
 }
 
 // ---------------------------------------------------------------- ÂM PHẦN 24 SƠN (yinzhai)
@@ -7231,14 +7263,14 @@ function renderYinzhai() {
   if (!el) return;
   const ov = yinzhaiOverview();
   // build <select>
-  const opts = MOUNTAINS_24.map((m) => '<option value="' + m.zhi + '">' + m.vi + ' (' + m.zhi + ') — ' + m.palaceVi + ' ' + m.dir + '</option>').join('');
+  const opts = MOUNTAINS_24.map((m) => '<option value="' + esc(m.zhi) + '">' + esc(m.vi) + ' (' + esc(m.zhi) + ') — ' + esc(m.palaceVi) + ' ' + esc(m.dir) + '</option>').join('');
   const rulesHtml =
-    '<details><summary>' + ov.ruleSummary.shaRule.title + '</summary><ul>' + ov.ruleSummary.shaRule.points.map((p) => '<li>' + p + '</li>').join('') + '</ul></details>' +
-    '<details><summary>' + ov.ruleSummary.waterRule.title + '</summary><ul>' + ov.ruleSummary.waterRule.points.map((p) => '<li>' + p + '</li>').join('') + '</ul></details>' +
-    '<details><summary>' + ov.ruleSummary.anShanRule.title + '</summary><ul>' + ov.ruleSummary.anShanRule.points.map((p) => '<li>' + p + '</li>').join('') + '</ul></details>';
+    '<details><summary>' + esc(ov.ruleSummary.shaRule.title) + '</summary><ul>' + ov.ruleSummary.shaRule.points.map((p) => '<li>' + esc(p) + '</li>').join('') + '</ul></details>' +
+    '<details><summary>' + esc(ov.ruleSummary.waterRule.title) + '</summary><ul>' + ov.ruleSummary.waterRule.points.map((p) => '<li>' + esc(p) + '</li>').join('') + '</ul></details>' +
+    '<details><summary>' + esc(ov.ruleSummary.anShanRule.title) + '</summary><ul>' + ov.ruleSummary.anShanRule.points.map((p) => '<li>' + esc(p) + '</li>').join('') + '</ul></details>';
   el.innerHTML =
-    '<div class="yz-head">' + ov.title + '</div>' +
-    '<p class="hint">' + ov.note + ' <em>Nguồn: ' + ov.source + '</em></p>' +
+    '<div class="yz-head">' + esc(ov.title) + '</div>' +
+    '<p class="hint">' + esc(ov.note) + ' <em>Nguồn: ' + esc(ov.source) + '</em></p>' +
     '<div class="yz-select"><label>Chọn sơn TỌA (坐): </label><select id="yz-mountain" aria-label="Sơn toạ (择日)">' + opts + '</select></div>' +
     '<div id="yz-result"></div>' +
     '<div class="yz-rules">' + rulesHtml + '</div>';
@@ -7248,17 +7280,17 @@ function renderYinzhai() {
     const sa = sittingDirectionAnalysis(zhi);
     if (!sa) { out.innerHTML = '<p class="hint">(chọn sơn hợp lệ)</p>'; return; }
     const cls = sa.score >= 70 ? 'cat' : sa.score >= 50 ? 'mid' : 'xiong';
-    const goodHtml = sa.good.map((g) => '<span class="lm-rate rate-cat">' + g.vi + ' (' + g.zhi + ')</span>').join(' ');
-    const badHtml = sa.bad.map((b) => '<span class="lm-rate rate-hung">' + b.vi + ' (' + b.zhi + ')</span>').join(' ');
+    const goodHtml = sa.good.map((g) => '<span class="lm-rate rate-cat">' + esc(g.vi) + ' (' + esc(g.zhi) + ')</span>').join(' ');
+    const badHtml = sa.bad.map((b) => '<span class="lm-rate rate-hung">' + esc(b.vi) + ' (' + esc(b.zhi) + ')</span>').join(' ');
     out.innerHTML =
-      '<div class="yz-row"><b>Tọa:</b> ' + sa.sitting.vi + ' (' + sa.sitting.zhi + ') @ ' + sa.sitting.dir + ' · ' + sa.sitting.palaceVi + '</div>' +
-      '<div class="yz-row"><b>Hướng (đối cung):</b> ' + (sa.facing.primary ? sa.facing.primary.vi + ' (' + sa.facing.primary.zhi + ') @ ' + sa.facing.primary.dir : '?') + '</div>' +
+      '<div class="yz-row"><b>Tọa:</b> ' + esc(sa.sitting.vi) + ' (' + esc(sa.sitting.zhi) + ') @ ' + esc(sa.sitting.dir) + ' · ' + esc(sa.sitting.palaceVi) + '</div>' +
+      '<div class="yz-row"><b>Hướng (đối cung):</b> ' + (sa.facing.primary ? esc(sa.facing.primary.vi) + ' (' + esc(sa.facing.primary.zhi) + ') @ ' + esc(sa.facing.primary.dir) : '?') + '</div>' +
       '<div class="yz-row"><b>Hướng cát:</b> ' + (goodHtml || '—') + '</div>' +
       '<div class="yz-row"><b>Hướng kỵ:</b> ' + (badHtml || '—') + '</div>' +
-      (sa.sanhe ? '<div class="yz-row"><b>Tam hợp cục:</b> ' + sa.sanhe.wx + ' (' + sa.sanhe.members.join('-') + ')</div>' : '') +
-      (sa.chong ? '<div class="yz-row"><b>Lục xung:</b> ' + sa.chong + '</div>' : '') +
-      '<div class="ln-rate ' + ('rate-' + cls) + '">' + sa.score + '/100 · ' + sa.verdict + '</div>' +
-      '<div class="zr-advice">' + sa.note + '</div>';
+      (sa.sanhe ? '<div class="yz-row"><b>Tam hợp cục:</b> ' + esc(sa.sanhe.wx) + ' (' + sa.sanhe.members.map(esc).join('-') + ')</div>' : '') +
+      (sa.chong ? '<div class="yz-row"><b>Lục xung:</b> ' + esc(sa.chong) + '</div>' : '') +
+      '<div class="ln-rate ' + ('rate-' + cls) + '">' + sa.score + '/100 · ' + esc(sa.verdict) + '</div>' +
+      '<div class="zr-advice">' + esc(sa.note) + '</div>';
   }
   const sel = document.getElementById('yz-mountain');
   if (sel) {
@@ -7320,10 +7352,10 @@ function renderKongwang() {
   const typeCls = (t) => t.startsWith('出空') ? 'geju-xi' : 'geju-ji';
   const timelineHtml = rows.length
     ? '<div class="kw-timeline"><div class="kw-tl-head">📅 Lịch kích hoạt (khi cung «treo» thành «thực»):</div><ul class="kw-tl">' + rows.map((r) =>
-        '<li><span class="kw-chi zh">' + r.chi + '</span> <span class="' + typeCls(r.type) + '">' + r.type + '</span> <b>' + r.scope + '</b> <span class="zh">' + r.gz + '</span> <span class="ln-rate ' + rateClass(r.rating) + '">' + (r.rating || '—') + '</span>' + (r.tag ? ' <span class="hint">' + r.tag + '</span>' : '') + '</li>'
+        '<li><span class="kw-chi zh">' + esc(r.chi) + '</span> <span class="' + typeCls(r.type) + '">' + esc(r.type) + '</span> <b>' + esc(r.scope) + '</b> <span class="zh">' + esc(r.gz) + '</span> <span class="ln-rate ' + rateClass(r.rating) + '">' + esc(r.rating || '—') + '</span>' + (r.tag ? ' <span class="hint">' + esc(r.tag) + '</span>' : '') + '</li>'
       ).join('') + '</ul></div>'
     : '<p class="hint">Trong cửa sổ 10 năm tới không có lưu niên/đại vận mang chi «' + kw.kong.join('/') + '» (hoặc 冲 chi đó) — cung «treo» vẫn chưa tới lúc «xuất không».</p>';
-  el.innerHTML = '<div class="kw-note"><b>空亡 (' + kw.kong.join(', ') + ')</b> — ' + kw.note + '</div><ul class="zr-reasons">' + kw.affected.map((a) => '<li><b>' + a.palace + '</b>: ' + a.note + '</li>').join('') + '</ul>' + timelineHtml + (kw.tips.length ? '<p class="hint">' + kw.tips.join(' ') + '</p>' : '');
+  el.innerHTML = '<div class="kw-note"><b>空亡 (' + kw.kong.map(esc).join(', ') + ')</b> — ' + esc(kw.note) + '</div><ul class="zr-reasons">' + kw.affected.map((a) => '<li><b>' + esc(a.palace) + '</b>: ' + esc(a.note) + '</li>').join('') + '</ul>' + timelineHtml + (kw.tips.length ? '<p class="hint">' + kw.tips.map(esc).join(' ') + '</p>' : '');
 }
 
 // ---------------------------------------------------------------- TUẾ VẬN TỊNH LÂM 岁运并临 (lưu niên × đại vận)
@@ -7377,8 +7409,8 @@ function renderChangshengDeep() {
   if (!el) return;
   const luckCls = (l) => l === 'cát' ? 'rate-cat' : l === 'hung' || l === 'hung nhẹ' ? 'rate-hung' : 'rate-mid';
   el.innerHTML = '<div class="cs-grid">' + cs.stages.map((s) => {
-    return '<div class="cs-cell ' + luckCls(s.luck) + '"><div class="cs-stage">' + s.stageVi + '</div><div class="cs-label">' + s.label + '</div><div class="cs-meaning">' + s.meaning.slice(0, 80) + '...</div></div>';
-  }).join('') + '</div><div class="tiaohou-note">' + cs.monthNote + '</div>';
+    return '<div class="cs-cell ' + luckCls(s.luck) + '"><div class="cs-stage">' + esc(s.stageVi) + '</div><div class="cs-label">' + esc(s.label) + '</div><div class="cs-meaning">' + esc(s.meaning.slice(0, 80)) + '...</div></div>';
+  }).join('') + '</div><div class="tiaohou-note">' + esc(cs.monthNote) + '</div>';
 }
 
 // ---------------------------------------------------------------- PHỐI NGỖU LÝ TƯỞNG (BẢNG + CHI TIẾT)
@@ -7676,31 +7708,31 @@ function renderIdealMatch() {
     var detailId = 'im-det-' + p.rank;
     return '<tr class="im-row" onclick="var d=document.getElementById(\'' + detailId + '\'); d.style.display=d.style.display===\'none\'?\'\':\'none\';">' +
       '<td><b>#' + p.rank + '</b></td>' +
-      '<td>' + p.date + '<br><b>' + hourStr + '</b><br><span class="im-age">' + ageStr + '</span></td>' +
-      '<td class="zh">' + p.ganZhi4 + '</td>' +
-      '<td>' + p.dayMaster + dung + '</td>' +
+      '<td>' + esc(p.date) + '<br><b>' + esc(hourStr) + '</b><br><span class="im-age">' + esc(ageStr) + '</span></td>' +
+      '<td class="zh">' + esc(p.ganZhi4) + '</td>' +
+      '<td>' + esc(p.dayMaster) + dung + '</td>' +
       '<td><b>' + p.combinedScore + '</b></td>' +
-      '<td>' + p.hehunRating + '</td>' +
-      '<td>' + p.yearRel + (p.dayRel ? '<br>' + p.dayRel : '') + '</td>' +
-      '<td>' + (p.nameHint && p.nameHint.chars ? p.nameHint.chars.split('(').slice(0,4).join('(').replace(/\)/g,') ').trim() : '?') + '</td>' +
+      '<td>' + esc(p.hehunRating) + '</td>' +
+      '<td>' + esc(p.yearRel) + (p.dayRel ? '<br>' + esc(p.dayRel) : '') + '</td>' +
+      '<td>' + esc(p.nameHint && p.nameHint.chars ? p.nameHint.chars.split('(').slice(0,4).join('(').replace(/\)/g,') ').trim() : '?') + '</td>' +
       '</tr>' +
       '<tr id="' + detailId + '" style="display:none"><td colspan="8"><div class="im-detail">' +
-      prof.paragraphs.map(function(pa) { return '<p>' + pa + '</p>'; }).join('') +
+      prof.paragraphs.map(function(pa) { return '<p>' + esc(pa) + '</p>'; }).join('') +
       '</div></td></tr>';
   }).join('');
 
   // CON CÁI — bảng với ngày cụ thể
   var childRows = ct.filter(function(c) { return c.isBest; }).map(function(c) {
     var dates = '';
-    try { var cd = idealChildDates(currentResult, c.year); dates = cd.slice(0,3).map(function(d) { return d.date + ' ' + d.ganZhi + ' (' + d.score + ')'; }).join('<br>'); } catch(e) {}
+    try { var cd = idealChildDates(currentResult, c.year); dates = cd.slice(0,3).map(function(d) { return esc(d.date) + ' ' + esc(d.ganZhi) + ' (' + d.score + ')'; }).join('<br>'); } catch(e) {}
     return '<tr>' +
       '<td><b>' + c.year + '</b></td>' +
-      '<td class="zh">' + c.ganZhi + '</td>' +
-      '<td>' + c.ganWx + '/' + c.zhiWx + '</td>' +
+      '<td class="zh">' + esc(c.ganZhi) + '</td>' +
+      '<td>' + esc(c.ganWx) + '/' + esc(c.zhiWx) + '</td>' +
       '<td><b>' + c.score + '</b></td>' +
-      '<td>' + c.notes.join('; ') + '</td>' +
+      '<td>' + c.notes.map(esc).join('; ') + '</td>' +
       '<td>' + dates + '</td>' +
-      '<td>' + (c.nameHint && c.nameHint.chars ? c.nameHint.chars.split('(').slice(0,4).join('(').replace(/\)/g,') ').trim() : '?') + '</td>' +
+      '<td>' + esc(c.nameHint && c.nameHint.chars ? c.nameHint.chars.split('(').slice(0,4).join('(').replace(/\)/g,') ').trim() : '?') + '</td>' +
       '</tr>';
   }).join('');
 
@@ -7795,7 +7827,7 @@ try {
   if (Array.isArray(savedChat) && savedChat.length) {
     chatHistory = savedChat;
     // re-append messages to chat-log (visible when user opens popup)
-    setTimeout(() => { savedChat.forEach((m) => { try { const r = appendMsg(m.role, m.content); if (m.role === 'assistant' && r) addMsgActions(r.body, m.content); } catch (_) {} }); }, 200);
+    setTimeout(() => { savedChat.forEach((m) => { try { const r = appendMsg(m.role, m.content); if (m.role === 'assistant' && r) addMsgActions(r.body, m.content); } catch (_) {} }); try { _updateExportBtn(); } catch (_) {} }, 200);
   }
 } catch (_) {}
 // [loop 23] city change → hiện/ẩn ô kinh độ thủ công
@@ -7821,6 +7853,10 @@ function init3DTilt() {
   const isTouch = matchMedia('(hover: none)').matches;
 
   cards.forEach((card) => {
+    // [AUDIT FIX] guard double-bind — trước đây re-attach 3+ listener/card mỗi lần run()
+    //   → ~165 card × 3 × N lần "Luận giải" = hàng nghìn listener chồng (freeze Chrome dần)
+    if (card.dataset.tiltBound) return;
+    card.dataset.tiltBound = '1';
     let glare = card.querySelector('.tilt-glare');
     if (!glare) {
       glare = document.createElement('div');

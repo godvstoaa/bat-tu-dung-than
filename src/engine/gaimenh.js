@@ -17,7 +17,7 @@ export function gaimenhPlan(R, opts) {
   const yong = R.yong;
   const syn = R.synthesis || {};
   const mangpai = analyzeMangpai(R);
-  const xk = xuankongPan(opts && opts.year ? opts.year : (R.liunian && R.liunian[0] ? R.liunian[0].year : 2026));
+  const xk = xuankongPan(opts && opts.year ? opts.year : (R.liunian && R.liunian[0] ? R.liunian[0].year : new Date().getFullYear()));
 
   // ---- 1. CHẨN ĐOÁN: gom "bệnh" ưu tiên ----
   const problems = [];

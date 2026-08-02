@@ -1933,7 +1933,8 @@ html{scroll-behavior:smooth}
   .card-title { color: #333 !important; font-size: 13px !important; border-bottom: 1px solid #999 !important; }
   .hint, .hint-inline { color: #555 !important; }
   .ln, .sp-item { background: #f5f5f5 !important; color: #333 !important; border: 1px solid #ddd !important; }
-  details { open: true; }
+  /* [AUDIT FIX] bỏ `details { open: true }` (CSS không hợp lệ — dead); beforeprint JS mở details thật.
+     Card lazy-reveal (card-hidden) vẫn phải hiện khi in: opacity/transform override thay vì `.hidden`. */
   details > div, details summary + * { display: block !important; }
   details summary::after { content: ''; }
   .gold, [style*="color"] { color: #333 !important; }
@@ -1941,7 +1942,9 @@ html{scroll-behavior:smooth}
   .rate-hung, .bh-worst { background: rgba(200,50,40,0.15) !important; }
   .rate-cat, .bh-best { background: rgba(40,140,80,0.15) !important; }
   a { color: #333 !important; text-decoration: none !important; }
-  .hidden { display: block !important; }
+  /* [AUDIT FIX] KHÔNG ép .hidden hiện (trước đây in trước khi "Luận giải" → container rỗng hiện ra;
+     các chip state-.hidden cũng lọt vào bản in). Card ẩn theo lazy-reveal thì in đầy đủ. */
+  .card-hidden { opacity: 1 !important; transform: none !important; }
 }
 .chat-suggest { display: flex; flex-wrap: nowrap; gap: 4px; margin-bottom: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .suggest-chip { 
@@ -3169,26 +3172,3 @@ h2.grp {
 .sch-table tbody tr:nth-child(even) td { background: rgba(255,255,255,.02); }
 .sch-table td { color: var(--silk, #ece0c8); }
 
-/* ===================== VIP MODAL ===================== */
-.vip-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 20px; animation: vipFade 0.2s ease; }
-@keyframes vipFade { from { opacity: 0; } to { opacity: 1; } }
-.vip-card { background: linear-gradient(135deg, #1a1530, #0f0c1f); border: 1px solid rgba(212,175,55,0.4); border-radius: 16px; padding: 28px 24px; max-width: 380px; width: 100%; color: #f0e8d0; box-shadow: 0 20px 60px rgba(212,175,55,0.15); }
-.vip-card h2 { color: #d4af37; font-size: 1.4rem; margin: 0 0 12px; text-align: center; }
-.vip-reason { color: #c0b090; font-size: 0.9rem; text-align: center; margin-bottom: 20px; line-height: 1.5; }
-.vip-plans { display: flex; gap: 10px; margin-bottom: 16px; }
-.vip-plan { flex: 1; background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2); border-radius: 10px; padding: 14px 8px; text-align: center; }
-.vip-plan-best { border-color: #d4af37; background: rgba(212,175,55,0.15); }
-.vip-plan-label { font-size: 0.8rem; color: #d4af37; margin-bottom: 6px; font-weight: 600; }
-.vip-plan-price { font-size: 1rem; color: #f0e8d0; font-weight: 700; }
-.vip-bank { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; font-size: 0.82rem; color: #a09070; margin-bottom: 16px; text-align: center; line-height: 1.6; }
-.vip-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
-.vip-input-row input { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.3); border-radius: 8px; padding: 12px; color: #f0e8d0; font-size: 0.95rem; letter-spacing: 1px; }
-.vip-input-row input:focus { outline: none; border-color: #d4af37; }
-.vip-redeem-btn { background: linear-gradient(135deg, #d4af37, #b89020); color: #1a1530; border: none; border-radius: 8px; padding: 12px 20px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-.vip-redeem-btn:hover { filter: brightness(1.1); }
-.vip-status { font-size: 0.88rem; text-align: center; min-height: 20px; margin-bottom: 12px; }
-.vip-status-ok { color: #4ade80; }
-.vip-status-err { color: #f87171; }
-.vip-status-loading { color: #d4af37; }
-.vip-close { width: 100%; background: transparent; border: 1px solid rgba(212,175,55,0.3); color: #a09070; border-radius: 8px; padding: 10px; cursor: pointer; }
-.vip-close:hover { background: rgba(212,175,55,0.08); }

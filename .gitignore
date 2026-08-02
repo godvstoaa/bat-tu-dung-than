@@ -23,6 +23,7 @@ _pdf_*/
 
 # Temp verify/test scripts
 _verify.txt
+_test-brain.mjs
 fuzz-*.mjs
 regression-*.mjs
 perf-*.mjs
@@ -48,4 +49,4 @@ _tmp/
 _tmp_*
 daozang_index*
 .grok-prompt.tmp.md
-docs/_fragments/_
+docs/_fragments/

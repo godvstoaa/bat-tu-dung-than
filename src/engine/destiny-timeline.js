@@ -27,9 +27,10 @@ export function lifeTimeline(R) {
   const dgMap = {};
   for (const d of dg.items) dgMap[d.ganZhi] = d;
   // [loop 1002] 应期 dayun activation theo thập kỷ — «cửa mở 10 năm» cho sao ẩn (989-1000)
+  // [AUDIT FIX] năm scan = năm hiện tại (trước đây hardcode 2026 → dần cũ, thập kỷ lệch sau 2026)
   const yqMap = {};
   try {
-    const yqActs = scanBranchYingqi(R, 2026, 1).dayunActivations || [];
+    const yqActs = scanBranchYingqi(R, new Date().getFullYear(), 1).dayunActivations || [];
     for (const a of yqActs) {
       if (!yqMap[a.ganZhi]) yqMap[a.ganZhi] = [];
       yqMap[a.ganZhi].push(a);

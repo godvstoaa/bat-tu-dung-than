@@ -83,6 +83,9 @@ export function yearFlyingStar(year) {
   });
   const cat = pan.filter((p) => p.base === 'cát' || p.base === 'đại cát');
   const xiong = pan.filter((p) => p.base === 'hung' || p.base === 'đại hung');
+  // [AUDIT FIX] 5黄/2黑 theo ĐÚNG vị trí năm tính (trước đây hardcode "5黄(Nam 2026)" → sai mọi năm khác)
+  const _wu = pan.find((p) => p.star === 5);
+  const _eh = pan.find((p) => p.star === 2);
   return { year, center, centerStar: STAR[center], pan, cat, xiong,
-    advice: `${year} 年飞星: 中宫 = ${STAR[center].han} (${STAR[center].name}). 激活 cát: ${cat.map(p=>p.palace+'('+p.name+')').join(', ')}. 避免 hung: ${xiong.map(p=>p.palace+'('+p.name+')').join(', ')} — đặc biệt 5黄(Nam 2026) kỵ động thổ, 2黑(西北) kỵ nghỉ ngủ ở đây.` };
+    advice: `${year} 年飞星: 中宫 = ${STAR[center].han} (${STAR[center].name}). 激活 cát: ${cat.map(p=>p.palace+'('+p.name+')').join(', ')}. 避免 hung: ${xiong.map(p=>p.palace+'('+p.name+')').join(', ')} — đặc biệt 5黄(${_wu ? _wu.palace : '?'} ${year}) kỵ động thổ, 2黑(${_eh ? _eh.palace : '?'}) kỵ nghỉ ngủ ở đây.` };
 }
