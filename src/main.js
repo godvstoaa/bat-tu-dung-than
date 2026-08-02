@@ -391,7 +391,7 @@ $('copy-summary-btn') && document.addEventListener('click', (e) => {
     const c = currentResult.chart, y = currentResult.yong, s = currentResult.strength;
     const p = c.pillars;
     const txt = [
-      `Lá số Bát Tự — ${c.solar}`,
+      `Lá số Bát Tự — ${c.solarInput || c.solar}`,
       `Tứ trụ: ${p.year.gan}${p.year.zhi} ${p.month.gan}${p.month.zhi} ${p.day.gan}${p.day.zhi} ${p.time.gan}${p.time.zhi}`,
       `Nhật chủ: ${c.dayMaster.gan} (${WX_VI[c.dayMaster.wx]})`,
       `Thân: ${s.level} (${s.strong ? 'vượng' : 'nhược'}, ${s.deLenh ? 'đắc lệnh' : 'thất lệnh'}${s.qiPhase ? ' ' + s.qiPhase : ''})`,
@@ -4366,7 +4366,7 @@ async function handleAsk() {
     body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? chatBrand().short + ' (trực tuyến)' : chatBrand().short + ' (cục bộ)';
-    _logEvent('ai_chat', { q: q, response: text, source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed, detail: meta && meta.detail, toolsOn0: meta && meta.toolsOn0, error: meta && meta.error }); // [loop 1387] LUÔN log frontend (server capture ko reliable response dài)
+    _logEvent('ai_chat', { q: q.slice(0,500), response: String(text).slice(0,2000), source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed, detail: meta && meta.detail, toolsOn0: meta && meta.toolsOn0, error: meta && meta.error }); // [loop 1387] LUÔN log frontend (server capture ko reliable response dài)
     // [loop 947] message actions (refactored → addMsgActions helper, dùng cả cho restore)
     addMsgActions(body, text);
     // [loop 928] gợi ý câu hỏi kế tiếp theo ngữ cảnh (cảm giác ông thầy tư vấn)
@@ -4657,7 +4657,7 @@ async function run() {
 
   const ty = taiYuan(c.pillars.month.gan, c.pillars.month.zhi);
   $('meta-line').textContent =
-    `Dương lịch: ${c.solar} · Âm lịch: ${c.lunar.year}/${c.lunar.month}/${c.lunar.day} · ` +
+    `Dương lịch: ${c.solarInput || c.solar} · Âm lịch: ${c.lunarInput ? c.lunarInput.year + '/' + c.lunarInput.month + '/' + c.lunarInput.day : c.lunar.year + '/' + c.lunar.month + '/' + c.lunar.day} · ` +
     `Tiết khí: ${c.jieqi.prev.name} · Thai nguyên: ${ty.ganZhi} (${ty.ganVi} ${ty.zhiVi} — ${ty.wx})`;
 
   renderTuzu3D(c);
@@ -7011,7 +7011,7 @@ window.addEventListener('afterprint', () => {
 
 $('ev-btn')?.addEventListener('click', () => {
   if (!currentResult) { $('event-verify').innerHTML = '<p class="hint">Nhập ngày sinh rồi luận giải trước.</p>'; return; }
-  const yr = parseInt($('ev-year').value, 10) || 2026;
+  const yr = parseInt($('ev-year').value, 10) || new Date().getFullYear();
   const type = $('ev-type').value;
   try {
     const r = verifyPastEvent(currentResult, yr, type);

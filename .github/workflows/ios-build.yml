@@ -33,13 +33,13 @@ jobs:
 
       - name: Setup Capacitor iOS
         run: |
-          npx cap add ios || true
+          npx cap add ios 
           npx cap copy ios
 
       - name: Copy app icons
         run: |
           mkdir -p ios/App/App/Assets.xcassets/AppIcon.appiconset
-          cp resources/ios-icons/*.png ios/App/App/Assets.xcassets/AppIcon.appiconset/ 2>/dev/null || true
+          cp resources/ios-icons/*.png ios/App/App/Assets.xcassets/AppIcon.appiconset/ 2>/dev/null 
 
       - name: Set up Ruby for fastlane
         uses: ruby/setup-ruby@v1
@@ -60,7 +60,7 @@ jobs:
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
         run: |
-          fastlane pilot build --scheme App --project ios/App/App.xcodeproj || true
+          fastlane pilot build --scheme App --project ios/App/App.xcodeproj 
           # Hoặc dùng xcodebuild trực tiếp:
           xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -archivePath build/App.xcarchive archive -allowProvisioningUpdates CODE_SIGN_STYLE=Automatic || echo "Build needs Xcode signing setup — xem APP-STORE-SUBMISSION.md"
 
