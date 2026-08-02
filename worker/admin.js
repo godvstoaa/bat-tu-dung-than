@@ -1099,8 +1099,15 @@ function adminDashboard(env) {
   const H = { 'X-Admin-Token': TOKEN };
   function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
   function statBlock(val, label, accent){ const s=el('span','stat'); const b=el('b'); b.textContent=val; if(accent) b.style.color=accent; s.appendChild(b); s.appendChild(el('span',null,label)); return s; }
-  async function load(){
-    const r = await fetch('/admin/api/stats?nocache=1', { headers: H });
+  // [AUDIT FIX PERF] load(full) — trước đây setInterval(load,3000) + ?nocache=1:
+  //   mỗi 3s fetch lại TOÀN BỘ events:log (multi-MB, bỏ qua cache KV) + re-render 200 dòng
+  //   events + 50 visitor cards + profiles → CPU/RAM tăng vô hạn → Chrome đông cứng cả máy
+  //   (đúng bug user gặp khi gõ ô Điểm trong tìm kiếm — mỗi gõ chồng thêm vRender lên vòng poll).
+  //   Nay: poll nhẹ 15s (dùng cache KV, chỉ cập nhật KPI + _lastD), render nặng chỉ khi full
+  //   (mở đầu / thao tác thủ công / đổi filter).
+  async function load(full){
+    if (full === undefined) full = true;
+    const r = await fetch('/admin/api/stats' + (full ? '?nocache=1' : ''), { headers: H });
     if (!r.ok) { document.getElementById('status').textContent='Lỗi '+r.status; return; }
     const d = await r.json();
     // [loop 1351] sound notification + flash khi event mới
@@ -1149,6 +1156,9 @@ function adminDashboard(env) {
       if (d.aiLatency) { aik.appendChild(statBlock(fmtMs(d.aiLatency.avgMs), 'AI ⏱ avg', d.aiLatency.avgMs>30000?'#c0392b':'#7fbf7f')); aik.appendChild(statBlock(fmtMs(d.aiLatency.p95Ms), 'AI ⏱ p95', d.aiLatency.p95Ms>60000?'#c0392b':'#d4af37')); aik.appendChild(statBlock(fmtMs(d.aiLatency.maxMs), 'AI ⏱ max', '#9a8a6a')); if (d.aiLatency.bailCount>0) aik.appendChild(statBlock(d.aiLatency.bailCount, '⏱ cắt 60s', '#e0533d')); }
       if (d.freeUsage) { aik.appendChild(statBlock(d.freeUsage.calls, '🆓 free calls', '#64b4ff')); if (d.freeUsage.today) aik.appendChild(statBlock(d.freeUsage.today, '🆓 free hôm nay', '#64b4ff')); if (d.freeUsage.err) aik.appendChild(statBlock(d.freeUsage.err, '🆓 free lỗi', d.freeUsage.err>0?'#e0533d':'#9a8a6a')); aik.appendChild(statBlock(d.freeUsage.enabled?'BẬT':'TẮT', '🆓 free mode', d.freeUsage.enabled?'#7fbf7f':'#c0392b')); }
     }
+    // [AUDIT FIX PERF] poll nhẹ: cập nhật _lastD (data mới cho vRender khi user tương tác),
+    //   KHÔNG đụng bảng events/visitor/profiles (chỉ render khi full = thao tác thủ công)
+    if (!full) { _lastD = d; return; }
     const c=document.getElementById('controls'); c.textContent='';
     // [loop 1351] conversion funnel
     const fn=document.getElementById('funnel'); if (fn && d.funnel) { fn.textContent='';
@@ -1454,7 +1464,7 @@ function adminDashboard(env) {
     if(rEl){ rEl.textContent = r.ok ? ('✅ HTTP '+r.status+' · '+r.durationMs+'ms'+(r.tokens?' · '+r.tokens+' tokens':'')+(r.preview?' · «'+String(r.preview).slice(0,40)+'»':'')) : ('❌ '+(r.err||('HTTP '+r.status))+' · '+(r.durationMs||'?')+'ms'); rEl.style.color=r.ok?'#7fbf7f':'#e0533d'; }
   }
   var _lastCount = 0; var _soundOn = false;
-  load(); setInterval(load, 3000);
+  load(true); setInterval(function(){ if (!document.hidden) load(false); }, 15000);
   async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
   async function tgOff(){ await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable:true})}); alert('Telegram alert đã tắt'); }
   async function aiLoad(){ var r=await fetch('/admin/api/ai-config?token='+TOKEN).then(function(r){return r.json()}); var c=r.config||{}; document.getElementById('ai-mode').value=c.mode||'free'; document.getElementById('ai-endpoint').value=c.endpoint||'https://api.z.ai/api/coding/paas/v4'; document.getElementById('ai-apikey').value=''; document.getElementById('ai-apikey').placeholder=c.apiKey?'Đã đặt ('+c.apiKey+')':'API Key (dán từ z.ai/model-api)'; document.getElementById('ai-model').value=c.model||'glm-5.2'; document.getElementById('ai-status').textContent='Mode: '+(c.mode||'free')+(c.apiKey?' | Key: '+c.apiKey:' | No key'); aiModeChange(); }
