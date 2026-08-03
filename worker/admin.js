@@ -188,11 +188,12 @@ export async function logEvent(env, request, type, data) {
     try { while (log.length > 300) log.pop(); await env.ADMIN_KV.put('events:log', JSON.stringify(log)); } catch (e2) {}
   }
   // [visitor-finder] profile bền vững — chart identity (dob|time|gender) sống qua events:log rollover + đổi IP.
-  //   Chỉ upsert khi chart có name → admin tìm theo tên dài hạn. Không TTL (persistent).
+  //   Chỉ upsert khi chart có name → admin tìm theo tên dài hạn.
+  //   [AUDIT FIX PRIVACY] thêm TTL 90 ngày (trước đây vĩnh viễn — khớp policy "lưu tối đa 90 ngày").
   if (type === 'chart' && data && data.name) {
     try {
       const pk = 'vprof:' + String(data.dob || '?') + '|' + String(data.time || 'na') + '|' + String(data.gender || '?');
-      await env.ADMIN_KV.put(pk, JSON.stringify({ name: String(data.name).slice(0, 40), dob: data.dob || '', time: data.time || '', gender: data.gender || '', ip: ip, score: data.score != null ? data.score : null, grade: data.grade || '', patternQ: data.patternQ || '', yong: data.yong || '', lastTs: ts }));
+      await env.ADMIN_KV.put(pk, JSON.stringify({ name: String(data.name).slice(0, 40), dob: data.dob || '', time: data.time || '', gender: data.gender || '', ip: ip, score: data.score != null ? data.score : null, grade: data.grade || '', patternQ: data.patternQ || '', yong: data.yong || '', lastTs: ts }), { expirationTtl: TTL_EVENT });
     } catch (e) {}
   }
   // [loop 1361] test events (data.test/audit/xss) — log vào events:log (cho raw endpoint check)
@@ -519,7 +520,8 @@ export async function handleAdminRoute(request, env, url) {
       const note = String((body && body.note) || '').slice(0, 500);
       const tags = Array.isArray(body && body.tags) ? body.tags.filter((t) => typeof t === 'string' && t.trim()).map((t) => t.trim().slice(0, 20)).slice(0, 10) : [];
       if (!note && !tags.length) await env.ADMIN_KV.delete('vnote:' + ip);
-      else await env.ADMIN_KV.put('vnote:' + ip, JSON.stringify({ note: note, tags: tags, ts: Date.now() }));
+      // [AUDIT FIX PRIVACY] TTL 90 ngày cho ghi chú (khớp policy) — trước đây vĩnh viễn
+      else await env.ADMIN_KV.put('vnote:' + ip, JSON.stringify({ note: note, tags: tags, ts: Date.now() }), { expirationTtl: TTL_EVENT });
       await env.ADMIN_KV.delete('cache:stats'); // note mới phải phản ánh ngay (bypass cache 60s)
       await env.ADMIN_KV.delete('cache:vdata'); // [PERF] rebuild vdata cache để note/tag mới hiện ngay
       await auditLog(env, request, 'visitor_note', { ip: ip, hasNote: !!note, tagCount: tags.length });
