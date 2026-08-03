@@ -1098,6 +1098,8 @@ function adminDashboard(env) {
   </div>
   <script>
   const TOKEN = new URLSearchParams(location.search).get('token') || '';
+  // [AUDIT FIX] dynamic admin path — khi ADMIN_PATH set, /admin/* bị 404, phải dùng /${ap}/*
+  const AP = location.pathname.replace(/\/[^/]+$/, '') || '/admin'; // strip /dashboard.html → /panel-xyz
   const H = { 'X-Admin-Token': TOKEN };
   function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
   function statBlock(val, label, accent){ const s=el('span','stat'); const b=el('b'); b.textContent=val; if(accent) b.style.color=accent; s.appendChild(b); s.appendChild(el('span',null,label)); return s; }
@@ -1109,7 +1111,7 @@ function adminDashboard(env) {
   //   (mở đầu / thao tác thủ công / đổi filter).
   async function load(full){
     if (full === undefined) full = true;
-    const r = await fetch('/admin/api/stats' + (full ? '?nocache=1' : ''), { headers: H });
+    const r = await fetch(AP+'/api/stats' + (full ? '?nocache=1' : ''), { headers: H });
     if (!r.ok) { document.getElementById('status').textContent='Lỗi '+r.status; return; }
     const d = await r.json();
     // [loop 1351] sound notification + flash khi event mới
@@ -1176,8 +1178,8 @@ function adminDashboard(env) {
     }
     const btn=el('button', d.aiEnabled?'btn off':'btn', d.aiEnabled?'⏸ Tắt AI toàn cục':'▶ Bật AI'); btn.onclick=()=>toggle(!d.aiEnabled); c.appendChild(btn);
     if (d.freeUsage) { const fb=el('button', d.freeUsage.enabled?'btn off':'btn', d.freeUsage.enabled?'🆫 Tắt free glm-5.2':'🆫 Bật free glm-5.2'); fb.style.marginLeft='8px'; fb.onclick=()=>toggleFree(!d.freeUsage.enabled); c.appendChild(fb); }
-    const exp=el('a','btn','📥 Export CSV'); exp.href='/admin/api/export?token='+encodeURIComponent(TOKEN); exp.style.cssText='margin-left:8px;text-decoration:none;padding:9px 14px;display:inline-block'; c.appendChild(exp);
-    const chg=el('button','btn','🔑 Đổi token'); chg.style.marginLeft='8px'; chg.onclick=function(){ var n=prompt('Token mới (≥8 ký tự):'); if(!n||n.length<8){if(n!==null)alert('Cần ≥8 ký tự');return;} fetch('/admin/api/token?token='+encodeURIComponent(TOKEN),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({new:n})}).then(function(r){return r.json()}).then(function(j){ if(j.ok){alert('Đã đổi! Đang chuyển sang token mới…'); location.href='/admin?token='+encodeURIComponent(n);} else alert('Lỗi: '+(j.err||'?')); }); }; c.appendChild(chg);
+    const exp=el('a','btn','📥 Export CSV'); exp.href=AP+'/api/export?token='+encodeURIComponent(TOKEN); exp.style.cssText='margin-left:8px;text-decoration:none;padding:9px 14px;display:inline-block'; c.appendChild(exp);
+    const chg=el('button','btn','🔑 Đổi token'); chg.style.marginLeft='8px'; chg.onclick=function(){ var n=prompt('Token mới (≥8 ký tự):'); if(!n||n.length<8){if(n!==null)alert('Cần ≥8 ký tự');return;} fetch(AP+'/api/token?token='+encodeURIComponent(TOKEN),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({new:n})}).then(function(r){return r.json()}).then(function(j){ if(j.ok){alert('Đã đổi! Đang chuyển sang token mới…'); location.href=AP+'?token='+encodeURIComponent(n);} else alert('Lỗi: '+(j.err||'?')); }); }; c.appendChild(chg);
     const ft=document.getElementById('ftype').value;
     const evs = ft ? d.events.filter(e=>e.type===ft) : d.events;
     const tb=document.getElementById('events'); tb.textContent='';
@@ -1455,33 +1457,33 @@ function adminDashboard(env) {
     var sv=el('button','btn','💾 Lưu'); sv.style.cssText='padding:6px 16px;font-size:13px'; sv.onclick=function(){ _saveNote(ip, ta.value.trim(), tags); };
     act.appendChild(dl); act.appendChild(sv); box.appendChild(act);
     m.appendChild(box); m.style.display='flex';
-    function _saveNote(ip2,note2,tags2){ sv.textContent='⏳...'; sv.disabled=true; fetch('/admin/api/note?token='+TOKEN,{method:'POST',headers:Object.assign({},H,{'Content-Type':'application/json'}),body:JSON.stringify({ip:ip2,note:note2,tags:tags2})}).then(function(r){return r.json();}).then(function(j){ sv.textContent='💾 Lưu'; sv.disabled=false; if(j.ok){m.style.display='none';load();loadAudit();} else alert('❌ '+(j.err||'lỗi')); }).catch(function(){sv.textContent='💾 Lưu';sv.disabled=false;alert('❌ lỗi mạng');}); }
+    function _saveNote(ip2,note2,tags2){ sv.textContent='⏳...'; sv.disabled=true; fetch(AP+'/api/note?token='+TOKEN,{method:'POST',headers:Object.assign({},H,{'Content-Type':'application/json'}),body:JSON.stringify({ip:ip2,note:note2,tags:tags2})}).then(function(r){return r.json();}).then(function(j){ sv.textContent='💾 Lưu'; sv.disabled=false; if(j.ok){m.style.display='none';load();loadAudit();} else alert('❌ '+(j.err||'lỗi')); }).catch(function(){sv.textContent='💾 Lưu';sv.disabled=false;alert('❌ lỗi mạng');}); }
   }
-  async function toggle(en){ await fetch('/admin/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
-  async function toggleFree(en){ await fetch('/admin/api/ai-free?token='+TOKEN, { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
+  async function toggle(en){ await fetch(AP+'/api/ai', { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
+  async function toggleFree(en){ await fetch(AP+'/api/ai-free?token='+TOKEN, { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify({enabled:en}) }); load(); loadAudit(); }
   // [loop 1360] test free glm-5.2 trực tiếp — admin thấy model sống/chết + tốc độ
   async function freeTest(){
     var rEl=document.getElementById('free-test-result'); if(rEl){rEl.textContent='⏳ đang test...';rEl.style.color='#d4af37';}
-    var r=await fetch('/admin/api/free-test?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json();}).catch(function(e){return {ok:false,err:e.message};});
+    var r=await fetch(AP+'/api/free-test?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json();}).catch(function(e){return {ok:false,err:e.message};});
     if(rEl){ rEl.textContent = r.ok ? ('✅ HTTP '+r.status+' · '+r.durationMs+'ms'+(r.tokens?' · '+r.tokens+' tokens':'')+(r.preview?' · «'+String(r.preview).slice(0,40)+'»':'')) : ('❌ '+(r.err||('HTTP '+r.status))+' · '+(r.durationMs||'?')+'ms'); rEl.style.color=r.ok?'#7fbf7f':'#e0533d'; }
   }
   var _lastCount = 0; var _soundOn = false;
   load(true); setInterval(function(){ if (!document.hidden) load(false); }, 15000);
-  async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
-  async function tgOff(){ await fetch('/admin/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable:true})}); alert('Telegram alert đã tắt'); }
-  async function aiLoad(){ var r=await fetch('/admin/api/ai-config?token='+TOKEN).then(function(r){return r.json()}); var c=r.config||{}; document.getElementById('ai-mode').value=c.mode||'free'; document.getElementById('ai-endpoint').value=c.endpoint||'https://api.z.ai/api/coding/paas/v4'; document.getElementById('ai-apikey').value=''; document.getElementById('ai-apikey').placeholder=c.apiKey?'Đã đặt ('+c.apiKey+')':'API Key (dán từ z.ai/model-api)'; document.getElementById('ai-model').value=c.model||'glm-5.2'; document.getElementById('ai-status').textContent='Mode: '+(c.mode||'free')+(c.apiKey?' | Key: '+c.apiKey:' | No key'); aiModeChange(); }
+  async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch(AP+'/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
+  async function tgOff(){ await fetch(AP+'/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable:true})}); alert('Telegram alert đã tắt'); }
+  async function aiLoad(){ var r=await fetch(AP+'/api/ai-config?token='+TOKEN).then(function(r){return r.json()}); var c=r.config||{}; document.getElementById('ai-mode').value=c.mode||'free'; document.getElementById('ai-endpoint').value=c.endpoint||'https://api.z.ai/api/coding/paas/v4'; document.getElementById('ai-apikey').value=''; document.getElementById('ai-apikey').placeholder=c.apiKey?'Đã đặt ('+c.apiKey+')':'API Key (dán từ z.ai/model-api)'; document.getElementById('ai-model').value=c.model||'glm-5.2'; document.getElementById('ai-status').textContent='Mode: '+(c.mode||'free')+(c.apiKey?' | Key: '+c.apiKey:' | No key'); aiModeChange(); }
   function aiModeChange(){ var m=document.getElementById('ai-mode').value; var dis=m==='off'; ['ai-endpoint','ai-apikey','ai-model'].forEach(function(id){document.getElementById(id).disabled=dis;}); }
-  async function aiSave(){ var body={mode:document.getElementById('ai-mode').value}; if(document.getElementById('ai-endpoint').value)body.endpoint=document.getElementById('ai-endpoint').value; if(document.getElementById('ai-apikey').value)body.apiKey=document.getElementById('ai-apikey').value; if(document.getElementById('ai-model').value)body.model=document.getElementById('ai-model').value; var r=await fetch('/admin/api/ai-config?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}); alert(r.ok?'✅ AI config đã lưu!':'❌ Lỗi'); aiLoad(); load(); }
+  async function aiSave(){ var body={mode:document.getElementById('ai-mode').value}; if(document.getElementById('ai-endpoint').value)body.endpoint=document.getElementById('ai-endpoint').value; if(document.getElementById('ai-apikey').value)body.apiKey=document.getElementById('ai-apikey').value; if(document.getElementById('ai-model').value)body.model=document.getElementById('ai-model').value; var r=await fetch(AP+'/api/ai-config?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}); alert(r.ok?'✅ AI config đã lưu!':'❌ Lỗi'); aiLoad(); load(); }
   // [loop 1376] free model pool — load + render + add + save
   var _freePool = [];
-  async function fpLoad(){ var r=await fetch('/admin/api/ai-config?token='+TOKEN).then(function(r){return r.json()}).catch(function(){return {config:{}}}); var c=r.config||{}; _freePool=Array.isArray(c.freePool)?c.freePool:[]; fpRender(); }
+  async function fpLoad(){ var r=await fetch(AP+'/api/ai-config?token='+TOKEN).then(function(r){return r.json()}).catch(function(){return {config:{}}}); var c=r.config||{}; _freePool=Array.isArray(c.freePool)?c.freePool:[]; fpRender(); }
   function fpRender(){ var lst=document.getElementById('free-pool-list'); if(!lst)return; lst.textContent=''; if(!_freePool.length){lst.appendChild(el('div','tiny','(chưa có backend free nào — thêm NVIDIA/Groq bên dưới. z.ai luôn là fallback cuối.)'));return;} _freePool.forEach(function(p,i){ var row=el('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(212,175,55,.08);flex-wrap:wrap'; var info=el('span','tiny',(p.name||'?')+' · '+p.endpoint+' · '+p.model+(p.apiKey?' · '+p.apiKey:'')); row.appendChild(info); var rm=el('button','btn off'); rm.textContent='✕'; rm.style.cssText='padding:2px 7px;font-size:10px'; rm.onclick=(function(idx){return function(){_freePool.splice(idx,1);fpRender();};})(i); row.appendChild(rm); lst.appendChild(row); }); }
   function fpAdd(){ var name=document.getElementById('fp-name').value.trim(), endpoint=document.getElementById('fp-endpoint').value.trim(), model=document.getElementById('fp-model').value.trim(), key=document.getElementById('fp-key').value.trim(); if(!endpoint||!model||!key){alert('Cần endpoint + model + key');return;} _freePool.push({name:name||'backend-'+(_freePool.length+1),endpoint:endpoint,model:model,apiKey:key}); document.getElementById('fp-name').value='';document.getElementById('fp-endpoint').value='';document.getElementById('fp-model').value='';document.getElementById('fp-key').value=''; fpRender(); }
-  async function fpSave(){ var st=document.getElementById('fp-status'); if(st){st.textContent='⏳ đang lưu...';st.style.color='#d4af37';} var r=await fetch('/admin/api/free-pool?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({pool:_freePool})}).then(function(r){return r.json()}).catch(function(e){return {ok:false,err:e.message};}); if(r.ok&&st){_freePool=r.pool||_freePool;fpRender();st.textContent='✅ Đã lưu '+(_freePool.length)+' backend. App tự dùng pool + z.ai.';st.style.color='#7fbf7f';} else if(st){st.textContent='❌ '+(r.err||'lỗi');st.style.color='#e0533d';} }
+  async function fpSave(){ var st=document.getElementById('fp-status'); if(st){st.textContent='⏳ đang lưu...';st.style.color='#d4af37';} var r=await fetch(AP+'/api/free-pool?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({pool:_freePool})}).then(function(r){return r.json()}).catch(function(e){return {ok:false,err:e.message};}); if(r.ok&&st){_freePool=r.pool||_freePool;fpRender();st.textContent='✅ Đã lưu '+(_freePool.length)+' backend. App tự dùng pool + z.ai.';st.style.color='#7fbf7f';} else if(st){st.textContent='❌ '+(r.err||'lỗi');st.style.color='#e0533d';} }
   aiLoad(); fpLoad();
-  async function clearData(){ var r=await fetch('/admin/api/clear?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json()}); alert(r.ok?'✅ Data cleared':'❌ '+r.err); load(); loadAudit(); }
-  async function blockList(){ var r=await fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({list:true})}).then(function(r){return r.json()}); alert('Blocked IPs: '+((r.blocked||[]).join(', ')||'(không có)')); }
-  function blockIp(ip,block){ fetch('/admin/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip,block:block})}).then(function(){load();loadAudit();}); }
+  async function clearData(){ var r=await fetch(AP+'/api/clear?token='+TOKEN,{method:'POST',headers:H}).then(function(r){return r.json()}); alert(r.ok?'✅ Data cleared':'❌ '+r.err); load(); loadAudit(); }
+  async function blockList(){ var r=await fetch(AP+'/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({list:true})}).then(function(r){return r.json()}); alert('Blocked IPs: '+((r.blocked||[]).join(', ')||'(không có)')); }
+  function blockIp(ip,block){ fetch(AP+'/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip,block:block})}).then(function(){load();loadAudit();}); }
   // [loop 1352] full-chat modal — admin xem TOÀN BỘ Q+A (không bị truncate 200 chars).
   function fmtMs(ms){ if(ms==null)return ''; if(ms<1000)return ms+'ms'; var s=ms/1000; return s<60?(s.toFixed(1)+'s'):(Math.round(s/60)+'m'+String(Math.round(s%60)).padStart(2,'0')+'s'); }
   function showChat(q, resp, src, dur, ts, ip, rounds, bailed, detail){
@@ -1513,7 +1515,7 @@ function adminDashboard(env) {
     box.appendChild(el('div','tiny','⏳ Đang load toàn bộ dữ liệu «'+ip+'»…'));
     m.appendChild(box); m.style.display='flex';
     var r;
-    try { r = await fetch('/admin/api/visitor?token='+TOKEN+'&ip='+encodeURIComponent(ip), {headers:H}).then(function(x){return x.json();}); }
+    try { r = await fetch(AP+'/api/visitor?token='+TOKEN+'&ip='+encodeURIComponent(ip), {headers:H}).then(function(x){return x.json();}); }
     catch(e){ r = {ok:false, err:e.message}; }
     box.textContent='';
     if (!r.ok) { box.appendChild(el('div',null,'❌ '+(r.err||'Lỗi load'))); var ce=el('button','btn','✕ Đóng'); ce.onclick=function(){m.style.display='none';}; box.appendChild(ce); return; }
@@ -1523,7 +1525,7 @@ function adminDashboard(env) {
     hl.appendChild(el('div','tiny',(r.country||'?')+(r.city?' / '+r.city:'')+' · '+(r.device&&r.device.label||'?')));
     head.appendChild(hl);
     var close=el('button','btn','✕ Đóng'); close.style.cssText='padding:4px 12px;font-size:12px'; close.onclick=function(){m.style.display='none';}; head.appendChild(close);
-    var del=el('button','btn off','🗑 Xóa data IP'); del.style.cssText='padding:4px 10px;font-size:11px;margin-right:6px'; del.onclick=(function(ip){return function(){if(confirm('Xóa HẾT events của «'+ip+'» khỏi log? (không hoàn tác — dùng dọn test/spam/hỏng)')){fetch('/admin/api/events-delete?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip})}).then(function(r){return r.json();}).then(function(j){alert(j.ok?'✅ Đã xóa '+j.removed+' events của '+ip:'❌ '+(j.err||'lỗi'));m.style.display='none';load();loadAudit();});}};})(ip); head.appendChild(del);
+    var del=el('button','btn off','🗑 Xóa data IP'); del.style.cssText='padding:4px 10px;font-size:11px;margin-right:6px'; del.onclick=(function(ip){return function(){if(confirm('Xóa HẾT events của «'+ip+'» khỏi log? (không hoàn tác — dùng dọn test/spam/hỏng)')){fetch(AP+'/api/events-delete?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip})}).then(function(r){return r.json();}).then(function(j){alert(j.ok?'✅ Đã xóa '+j.removed+' events của '+ip:'❌ '+(j.err||'lỗi'));m.style.display='none';load();loadAudit();});}};})(ip); head.appendChild(del);
     box.appendChild(head);
     box.appendChild(el('div','tiny','⏱ '+new Date(r.firstTs).toLocaleString('vi-VN')+' → '+new Date(r.lastTs).toLocaleString('vi-VN')));
     var st=el('div'); st.style.cssText='display:flex;gap:14px;flex-wrap:wrap;margin:8px 0;font-size:12px';
@@ -1593,7 +1595,7 @@ function adminDashboard(env) {
       send.onclick = (function (sid) { return function () {
         if (!ta.value.trim()) return;
         send.textContent = '⏳...'; send.disabled = true;
-        fetch('/admin/api/inject?token=' + TOKEN, { method: 'POST', headers: { ...H, 'Content-Type': 'application/json' }, body: JSON.stringify({ sid: sid, text: ta.value.trim() }) }).then(function (r) { return r.json(); }).then(function (j) {
+        fetch(AP+'/api/inject?token=' + TOKEN, { method: 'POST', headers: { ...H, 'Content-Type': 'application/json' }, body: JSON.stringify({ sid: sid, text: ta.value.trim() }) }).then(function (r) { return r.json(); }).then(function (j) {
           send.textContent = '📨 Gửi'; send.disabled = false;
           if (j.ok) { ta.value = ''; alert('✅ Đã gửi! Visitor sẽ thấy trong chat (~8 giây).'); }
           else alert('❌ ' + (j.err || 'lỗi'));
@@ -1605,7 +1607,7 @@ function adminDashboard(env) {
   }
   // [loop 1355] audit log loader — truy vết admin actions
   async function loadAudit(){
-    var r = await fetch('/admin/api/audit?token='+TOKEN, { headers: H }).then(function(r){return r.json();}).catch(function(){return {audit:[]};});
+    var r = await fetch(AP+'/api/audit?token='+TOKEN, { headers: H }).then(function(r){return r.json();}).catch(function(){return {audit:[]};});
     var al = document.getElementById('audit'); if (!al) return; al.textContent='';
     var rows = r.audit || [];
     if (!rows.length) { al.appendChild(el('div','tiny','(chưa có action nào được log)')); return; }
