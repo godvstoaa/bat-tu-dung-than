@@ -116,7 +116,9 @@ footer{border-top:1px solid var(--border);margin-top:56px;padding:18px 0;font-si
   <a href="#trilingual">5. Trilingual Content</a>
   <a href="#privacy">6. Free &amp; Privacy</a>
   <a href="#verify">7. Verification Guide</a>
-  <a href="#appendix">8. Appendix</a>
+  <a href="#themes">8. Adaptive Themes</a>
+  <a href="#ai">9. Chart-Aware AI</a>
+  <a href="#appendix">10. Appendix</a>
 </nav>
 
 <main>
@@ -251,17 +253,55 @@ Prepared as documentation in support of the App Review appeal for Guideline 4.3(
 </div>
 </section>
 
-<!-- ==================== 8. APPENDIX ==================== -->
+<!-- ==================== 8. THEMES ==================== -->
+<section id="themes">
+<h2>8. Adaptive Design — Dụng Thần Themes <span class="zh">用神主題</span> <span class="vi">Giao diện đổi màu theo Dụng Thần</span></h2>
+<p>Lữ Đăng retunes its entire visual system — accent colors, surfaces, typography and background glow — to the <b>Dụng Thần</b> (governing element) of each computed chart, using five classical palettes inspired by traditional pigments:</p>
+<table>
+<tr><th>Element</th><th>Palette</th><th>Base accent</th></tr>
+<tr><td>木 Wood</td><td>黛綠 Dai green</td><td class="ok">Forest green #5a8f6a</td></tr>
+<tr><td>火 Fire</td><td>朱砂 Cinnabar</td><td class="ok">Vermilion #c45c48</td></tr>
+<tr><td>土 Earth</td><td>泥金 Clay gold</td><td class="ok">Gold #c9a84c</td></tr>
+<tr><td>金 Metal</td><td>銀白 Silver white</td><td class="ok">Pale silver #b8b0a0</td></tr>
+<tr><td>水 Water</td><td>花青 Hua blue</td><td class="ok">Azure #4a6e8a</td></tr>
+</table>
+<p>The theme is applied automatically when a chart is computed — the same app, two different charts, two entirely different moods:</p>
+<div class="shots">
+  <div class="shot"><img src="/review-shots/04-theme-water.png" alt="Water (水) Dụng Thần theme — azure palette"/><div class="cap">Fig. 4 — Chart with Dụng Thần 水 (Water): the app re-themes to the azure 花青 palette.</div></div>
+  <div class="shot"><img src="/review-shots/05-theme-wood.png" alt="Wood (木) Dụng Thần theme — forest green palette"/><div class="cap">Fig. 5 — Chart with Dụng Thần 木 (Wood): the same app re-themes to the forest-green 黛綠 palette.</div></div>
+</div>
+<p class="small">This is a functional demonstration of per-chart personalization: every reading is not only computed individually, but <i>presented</i> individually — the interface adapts to the chart's governing element.</p>
+</section>
+
+<!-- ==================== 9. CHART-AWARE AI ==================== -->
+<section id="ai">
+<h2>9. Chart-Aware AI Assistant <span class="zh">智能分析</span> <span class="vi">Luận giải bằng AI</span></h2>
+<p>The built-in assistant answers open questions about the user's chart with <b>deep-reasoning AI grounded in the computed analysis</b>. Each answer is based on:</p>
+<ul class="tight">
+<li>The full computed chart (40+ sections, ~85 KB of structured data — not a prompt about a star sign).</li>
+<li>40+ analysis tools the assistant can invoke (year forecast, marriage timing, career stars, day selection, feng shui directions…).</li>
+<li>Contextual citation from the 1,523-text library — the assistant can surface the relevant classical text for the user's specific situation.</li>
+</ul>
+<p>The assistant answers in the user's language and works without an account. A real answer, captured from the live build:</p>
+<div class="samples"><span class="lbl">Real AI response — Vietnamese</span>
+<div style="margin-top:6px">«Con a, mệnh con hợp nhất với ngành có tính KỶ LUẬT + QUYỀN LỰC + KỸ THUẬT CHUYÊN SÂU — kiểu con người dũng cảm, chịu áp lực giỏi, nhưng phải làm đúng…»</div>
+<div class="small" style="margin-top:4px">Full conversation UI: <a href="/review-shots/06-ai-answer.png" target="_blank">see screenshot</a></div></div>
+<div class="shots">
+  <div class="shot"><img src="/review-shots/06-ai-answer.png" alt="Real AI answer about career compatibility"/><div class="cap">Fig. 6 — The assistant answering a career question for the prefilled chart (live build).</div></div>
+</div>
+</section>
+
+<!-- ==================== 10. APPENDIX ==================== -->
 <section id="appendix">
-<h2>8. Appendix <span class="vi">Phụ lục</span></h2>
-<h3>8.1 Sources &amp; verification references</h3>
+<h2>10. Appendix <span class="vi">Phụ lục</span></h2>
+<h3>10.1 Sources &amp; verification references</h3>
 <ul class="tight">
 <li>Schipper, K. &amp; Verellen, F. — <i>The Taoist Canon: A Historical Companion</i> (University of Chicago Press).</li>
 <li>Komjathy, L. — <i>The Daoist Tradition: An Introduction</i>; Daoist canon catalog work.</li>
 <li>Pregadio, F. — <i>The Encyclopedia of Taoism</i>.</li>
 <li>ctext.org and kanripo.org — digital critical editions used for cross-verification.</li>
 </ul>
-<h3>8.2 Submission metadata</h3>
+<h3>10.2 Submission metadata</h3>
 <div class="code">App name: Lữ Đăng (旅燈) · Bát Tự Dụng Thần
 Bundle ID: shop.god8.battu
 Category: Education / Reference
