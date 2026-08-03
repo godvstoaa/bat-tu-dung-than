@@ -1102,7 +1102,7 @@ function adminDashboard(env) {
   <script>
   const TOKEN = new URLSearchParams(location.search).get('token') || '';
   // [AUDIT FIX] dynamic admin path — khi ADMIN_PATH set, /admin/* bị 404, phải dùng path hiện tại
-  const AP = location.pathname.replace(/\/+$/, ''); // /panel-xyz hoặc /admin (strip trailing slash)
+  const AP = location.pathname.replace(/\\/+$/, ''); // /panel-xyz hoặc /admin (strip trailing slash)
   const H = { 'X-Admin-Token': TOKEN };
   function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
   function statBlock(val, label, accent){ const s=el('span','stat'); const b=el('b'); b.textContent=val; if(accent) b.style.color=accent; s.appendChild(b); s.appendChild(el('span',null,label)); return s; }
