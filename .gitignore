@@ -50,3 +50,5 @@ _tmp_*
 daozang_index*
 .grok-prompt.tmp.md
 docs/_fragments/
+
+docs/_grok-*

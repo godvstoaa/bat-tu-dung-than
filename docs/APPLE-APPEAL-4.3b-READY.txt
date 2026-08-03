@@ -1,0 +1,33 @@
+Dear App Review Team,
+
+Thank you for reviewing our submission. We respectfully appeal the Guideline 4.3(b) decision for **Lữ Đăng**.
+
+**Lữ Đăng is not a horoscope, palm reading, or generic fortune-telling app.** It is a cultural-educational reference tool for studying traditional Vietnamese-Chinese metaphysics (Bazi / Four Pillars, TCM, Feng Shui, classical divination), with Vietnamese-first interface, trilingual content (Vietnamese · Chinese · English), and every result computed on-device from classical algorithms — not from a static database of readings. We believe the app was categorized based on surface appearance; the unique substance is documented in our evidence page:
+
+👉 **https://battu.god8.shop/review/evidence.html**
+
+Key differentiators:
+
+1. **The largest Daoist text library in any mobile app we are aware of — 1,523 texts, 3.14 million characters.** No comparable collection exists on the App Store. Each text carries 4 layers of scholarly work: summary, deep chapter analysis, logical reasoning chains, and full Vietnamese translation. All 765 catalog numbers were verified against the Schipper–Verellen Concordance, Komjathy, Pregadio, and ctext.org.
+
+2. **Not a single-feature horoscope app — 10 feature groups:**
+- BaZi core engine producing a **40+ section, ~85 KB personalized analysis per chart** (Yong Shen determination, ten-god combinations, 60-year cycles, day-level forecasting)
+- Traditional Chinese Medicine (五运六气, meridian clock, element-based diet)
+- Feng Shui (太岁 / 三煞 / 五黄 direction analysis per chart)
+- **12 on-device divination systems** (梅花 / 六壬 / 奇门 / 太乙 / 紫微 / 河洛 ...)
+- Deep classical reference: **120/120 穷通宝鉴 rules** + hundreds of rules transcribed from 子平真诠, 三命通会, 渊海子平
+- 12 Daoist schools comparison matrix (正一 / 全真 / 茅山 × 9 dimensions)
+- Marriage compatibility, destiny-improvement framework, lifestyle recommendations
+- Chart-aware AI assistant that cites the 1,523-text library based on the user's specific birth chart
+- Adaptive interface that re-themes to the chart's governing element (Dụng Thần) — five classical palettes
+
+3. **Completely free, no monetization.** No ads, no in-app purchases, no subscription, no account, no third-party advertising or tracking SDKs. This is a genuine educational tool.
+
+We would welcome the opportunity to provide a short video walkthrough, or to discuss with the App Review Board — a 5-minute demonstration would make clear this app belongs in Education/Reference rather than the saturated entertainment-fortune category.
+
+Thank you for your time and consideration.
+
+Best regards,
+Apple Developer Program Member
+Bundle ID: shop.god8.battu
+App: Lữ Đăng (旅燈 · Bát Tự Dụng Thần)
