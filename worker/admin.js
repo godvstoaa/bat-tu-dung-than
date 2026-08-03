@@ -307,7 +307,7 @@ async function adminFreePoolSet(env, request) {
 }
 
 export async function handleAdminRoute(request, env, url) {
-  const path = url.pathname;
+  let path = url.pathname;
   const method = request.method;
   if (method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type,X-Admin-Token' } });
 
@@ -376,8 +376,11 @@ export async function handleAdminRoute(request, env, url) {
   // [AUDIT FIX] admin panel ẨN — env.ADMIN_PATH (wrangler secret) → /<path> thay vì /admin công khai
   //   (scanner không biết panel ở đâu; token vẫn là lớp bảo vệ chính). Mặc định 'admin' khi chưa đặt.
   const ap = adminPath(env);
+  // [FIX] normalize trailing slash — run_worker_first:false + html_handling:auto-trailing-slash
+  //   redirect /panel → /panel/ → path mismatch → dashboard không render
+  if (path.endsWith('/') && path.length > 1) path = path.replace(/\/+$/, '');
   const apDash = '/' + ap + '/';
-  if (path === '/' + ap || path.startsWith(apDash)) {
+  if (path === '/' + ap || path === apDash.slice(0, -1) || path.startsWith(apDash)) {
     // POST /<path>/setup {token, key} — bootstrap 1 lần. [AUDIT FIX] trước đây AI-anonymous claim race:
     //   deploy mới chưa ai setup → kẻ đầu tiên hit /admin/setup chiếm panel (đọc PII, tắt AI, chèn chat).
     //   Nay BẮT BUỘC khớp secret ADMIN_SETUP_KEY (wrangler secret put ADMIN_SETUP_KEY <key>); chưa đặt → đóng.
