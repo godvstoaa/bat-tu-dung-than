@@ -1,61 +1,65 @@
 <!doctype html>
 <html lang="vi"><head><meta charset="utf-8"/>
-<title>Chính sách bảo mật — Bát Tự Dụng Thần</title>
+<title>Chính sách bảo mật - Bát Tự Dụng Thần</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="description" content="Chính sách bảo mật dữ liệu — app Bát Tự Dụng Thần"/>
+<meta name="description" content="Chính sách bảo mật dữ liệu - app Bát Tự Dụng Thần"/>
 <style>body{font-family:system-ui,sans-serif;max-width:720px;margin:0 auto;padding:24px;line-height:1.7;color:#1a1a1a}h1{font-size:1.4rem;color:#9b6a2a}h2{font-size:1.1rem;margin-top:24px}.upd{color:#666;font-size:0.9rem}</style>
 </head><body>
 <h1>Chính sách bảo mật</h1>
-<p class="upd">Cập nhật: 2026-07-26 · App: Bát Tự Dụng Thần (battu.god8.shop)</p>
+<p class="upd">Cập nhật: 2026-08-03 · App: Bát Tự Dụng Thần (battu.god8.shop)</p>
 
 <h2>1. Dữ liệu chúng tôi thu thập</h2>
 <p>App tính lá số Bát Tự dựa trên thông tin bạn nhập:</p>
 <ul>
-<li><b>Ngày/tháng/năm sinh, giờ sinh, giới tính</b> — cần thiết để tính tứ trụ (Bát Tự). Đây là dữ liệu bạn tự nhập, KHÔNG thu thập tự động.</li>
-<li><b>Tên (tuỳ chọn)</b> — chỉ để hiển thị, bạn có thể nhập tên giả.</li>
-<li><b>Nơi sinh / múi giờ (tuỳ chọn)</b> — để tính chính xác hơn.</li>
-<li><b>Câu hỏi bạn chat với AI</b> — gửi đến dịch vụ AI để trả lời.</li>
+<li><b>Ngày/tháng/năm sinh, giờ sinh, giới tính</b> - cần thiết để tính tứ trụ (Bát Tự). Đây là dữ liệu bạn tự nhập.</li>
+<li><b>Tên (tùy chọn)</b> - chỉ để hiển thị, bạn có thể nhập tên giả.</li>
+<li><b>Nơi sinh / múi giờ (tùy chọn)</b> - để tính chính xác hơn.</li>
+<li><b>Câu hỏi và câu trả lời trong chat AI</b> - được gửi đến máy chủ và nhà cung cấp AI để tạo câu trả lời.</li>
+<li><b>Thông tin kỹ thuật</b>: địa chỉ IP, quốc gia/thành phố ước tính từ IP, loại thiết bị và trình duyệt, thời điểm truy cập - dùng để chống lạm dụng (giới hạn tốc độ, chặn spam) và thống kê sử dụng.</li>
 </ul>
 
-<h2>2. Dữ liệu KHÔNG thu thập</h2>
+<h2>2. Cách dữ liệu được sử dụng</h2>
 <ul>
-<li>❌ KHÔNG yêu cầu tài khoản / đăng nhập / email / số điện thoại</li>
-<li>❌ KHÔNG theo dõi vị trí GPS</li>
-<li>❌ KHÔNG đọc danh bạ, ảnh, tin nhắn</li>
-<li>❌ KHÔNG bán hoặc chia sẻ dữ liệu với bên thứ ba để quảng cáo</li>
+<li><b>Lá số của bạn</b> được tính ngay trên máy bạn (localStorage) - không gửi lên server để tính toán.</li>
+<li><b>Khi bạn chat với AI</b>: câu hỏi (có thể kèm thông tin lá số và dữ liệu người thân bạn đã nhập trong tính năng Gia tộc) được gửi qua máy chủ của chúng tôi tới nhà cung cấp AI bên thứ ba (Z.ai, Groq, NVIDIA, OpenAI, DeepSeek, BigModel - tùy cấu hình) để tạo câu trả lời. Nhà cung cấp xử lý theo chính sách riêng của họ.</li>
+<li><b>Sự kiện thống kê</b> (lập lá số, chat, lỗi) được gửi lên máy chủ để phục vụ thống kê và cải thiện chất lượng; được lưu tạm thời, tối đa khoảng 90 ngày, sau đó tự xóa hoặc bị đẩy ra khỏi bộ lưu trữ. Bạn có thể yêu cầu xóa sớm hơn (mục 6).</li>
+<li>Chúng tôi KHÔNG bán, không chia sẻ dữ liệu cho bên thứ ba vì mục đích quảng cáo.</li>
 </ul>
 
-<h2>3. Cách dữ liệu được lưu</h2>
+<h2>3. Dữ liệu KHÔNG thu thập</h2>
 <ul>
-<li><b>Lá số & lịch sử chat</b>: lưu trong <code>localStorage</code> của trình duyệt bạn — chỉ bạn thấy, xoá khi clear browser. KHÔNG gửi lên server lưu trữ dài hạn.</li>
-<li><b>Địa chỉ IP</b>: dùng tạm thời để chống lạm dụng (rate-limit 120 req/phút) + chặn spam. Lưu trong Cloudflare KV tối đa 2 phút, sau đó tự xoá.</li>
-<li><b>Câu hỏi AI</b>: gửi qua proxy đến nhà cung cấp AI (Z.ai / BigModel). Nhà cung cấp xử lý theo chính sách riêng của họ. Chúng tôi KHÔNG lưu nội dung chat sau khi trả lời.</li>
+<li>✓ KHÔNG yêu cầu tài khoản / đăng nhập / email / số điện thoại</li>
+<li>✓ KHÔNG theo dõi vị trí GPS (vị trí chỉ là tùy chọn nhập tay để tính giờ địa phương)</li>
+<li>✓ KHÔNG đọc danh bạ, ảnh, tin nhắn</li>
+<li>✓ KHÔNG cài đặt theo dõi (analytics tracker) của bên thứ ba trong app</li>
 </ul>
 
-<h2>4. Cookie & trình theo dõi</h2>
-<p>App KHÔNG sử dụng cookie thương mại, KHÔNG cài bộ theo dõi (analytics tracker) của bên thứ ba. Service Worker chỉ dùng để lưu cache offline (PWA), không theo dõi bạn.</p>
-
-<h2>5. Dữ liệu trẻ em</h2>
-<p>App không dành cho người dưới 13 tuổi. Không thu thập cố ý dữ liệu trẻ em.</p>
-
-<h2>6. Quyền của bạn</p>
+<h2>4. Lưu trữ &amp; bảo mật</h2>
 <ul>
-<li><b>Xoá dữ liệu</b>: clear browser data / localStorage — mọi dữ liệu biến mất ngay.</li>
+<li><b>Lá số &amp; lịch sử chat trên máy bạn</b>: lưu trong <code>localStorage</code> của thiết bị - chỉ bạn thấy, xóa khi clear browser/app data.</li>
+<li><b>Dữ liệu trên máy chủ</b>: truyền qua HTTPS, lưu trong Cloudflare KV, tự xóa sau tối đa khoảng 90 ngày.</li>
+<li><b>API key AI</b> lưu phía server (không nằm trong code client).</li>
+<li>Không có phương thức truyền tải internet nào 100% an toàn - bạn cân nhắc trước khi nhập thông tin nhạy cảm.</li>
+</ul>
+
+<h2>5. Trẻ em</h2>
+<p>App không dành cho người dưới 13 tuổi. Chúng tôi không cố ý thu thập dữ liệu trẻ em.</p>
+
+<h2>6. Quyền của bạn</h2>
+<ul>
+<li><b>Xóa dữ liệu trên máy</b>: clear browser/app data - lá số và lịch sử chat biến mất ngay.</li>
+<li><b>Xóa dữ liệu trên server</b>: liên hệ theo mục 9, chúng tôi xóa dữ liệu thống kê của bạn trong vòng 30 ngày.</li>
 <li><b>Không nhập thông tin thật</b>: bạn có thể dùng thông tin giả để trải nghiệm app.</li>
-<li><b>Quyền truy cập/sửa</b>: dữ liệu nằm trong browser bạn — bạn toàn quyền.</li>
 </ul>
 
-<h2>7. Bảo mật</h2>
-<p>App triển khai trên Cloudflare Workers (HTTPS/TLS). API key AI lưu ở server-side (KHÔNG lộ trong code client). Tuy nhiên không có phương pháp truyền tải internet nào 100% an toàn — bạn cân nhắc trước khi nhập thông tin nhạy cảm.</p>
+<h2>7. Cookie &amp; trình theo dõi</h2>
+<p>App KHÔNG dùng cookie quảng cáo, KHÔNG có tracker bên thứ ba. Service Worker chỉ dùng để cache offline (PWA), không theo dõi bạn.</p>
 
 <h2>8. Miễn trừ trách nhiệm</h2>
-<p>Nội dung phân tích (Bát Tự, Tử Vi, phong thủy, Kinh Dịch...) là <b>tham chiếu văn hoá-tôn giáo / xác suất theo cổ pháp</b>, KHÔNG phải chẩn đoán y tế/tâm thần, KHÔNG phải lời khuyên tài chính/pháp lý, KHÔNG đảm bảo kết quả. Mọi quyết định dựa trên nội dung app là trách nhiệm của bạn. Nếu gặp vấn đề sức khoẻ/tâm lý → liên hệ chuyên gia y tế.</p>
+<p>Nội dung phân tích (Bát Tự, Tử Vi, phong thủy, Kinh Dịch...) là <b>tham khảo văn hóa - tín ngưỡng / xác suất theo cổ pháp</b>, KHÔNG phải chẩn đoán y tế/tâm thần, KHÔNG phải lời khuyên tài chính/pháp lý, KHÔNG đảm bảo kết quả. Mọi quyết định dựa trên nội dung app là trách nhiệm của bạn. Nếu gặp vấn đề sức khỏe/tâm lý - liên hệ chuyên gia y tế.</p>
 
-<h2>9. Thay đổi chính sách</h2>
-<p>Chúng tôi có thể cập nhật chính sách. Phiên bản mới nhất luôn tại trang này.</p>
-
-<h2>10. Liên hệ</h2>
-<p>Câu hỏi về bảo mật: liên hệ qua fanpage / email đính kèm trên trang chủ.</p>
+<h2>9. Liên hệ</h2>
+<p>Câu hỏi về bảo mật hoặc yêu cầu xóa dữ liệu: liên hệ qua fanpage / email dán kèm trên trang chủ.</p>
 
 <p style="margin-top:32px"><a href="/">← Về trang chủ</a></p>
 </body></html>
