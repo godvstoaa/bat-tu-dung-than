@@ -10,7 +10,9 @@ Key differentiators:
 
 1. **The largest Daoist text library in any mobile app we are aware of — 1,523 texts, 3.14 million characters.** No comparable collection exists on the App Store. Each text carries 4 layers of scholarly work: summary, deep chapter analysis, logical reasoning chains, and full Vietnamese translation. All 765 catalog numbers were verified against the Schipper–Verellen Concordance, Komjathy, Pregadio, and ctext.org.
 
-2. **Not a single-feature horoscope app — 10 feature groups:**
+2. **A genuine OCR-to-reasoning pipeline — every interpretation is an argument, not a reading.** The corpus was digitized from classical Chinese source documents (OCR + manual verification passes), then distilled into an explicit reasoning system: each text and each chart analysis carries a visible logic chain (premises from classical sources → reasoning steps → conclusion). Nothing is asserted without its classical basis. The app's analysis engine and AI assistant are governed by strict anti-flattery principles enforced in the system prompt itself — the assistant is required to state unpleasant truths plainly ("if the year is bad, say it is bad"), forbidden from generic comfort ("don't worry", "it will pass"), required to verify the user's own claims against the computed chart before agreeing (anti-sycophancy), and instructed to delete any advice that would apply identically to ten other people (anti-blind-faith, anti-generic-reading rule).
+
+3. **Not a single-feature horoscope app — 10 feature groups:**
 - BaZi core engine producing a **40+ section, ~85 KB personalized analysis per chart** (Yong Shen determination, ten-god combinations, 60-year cycles, day-level forecasting)
 - Traditional Chinese Medicine (五运六气, meridian clock, element-based diet)
 - Feng Shui (太岁 / 三煞 / 五黄 direction analysis per chart)
@@ -21,7 +23,7 @@ Key differentiators:
 - Chart-aware AI assistant that cites the 1,523-text library based on the user's specific birth chart
 - Adaptive interface that re-themes to the chart's governing element (Dụng Thần) — five classical palettes
 
-3. **Completely free, no monetization.** No ads, no in-app purchases, no subscription, no account, no third-party advertising or tracking SDKs. This is a genuine educational tool.
+4. **Completely free, no monetization.** No ads, no in-app purchases, no subscription, no account, no third-party advertising or tracking SDKs. This is a genuine educational tool.
 
 We would welcome the opportunity to provide a short video walkthrough, or to discuss with the App Review Board — a 5-minute demonstration would make clear this app belongs in Education/Reference rather than the saturated entertainment-fortune category.
 

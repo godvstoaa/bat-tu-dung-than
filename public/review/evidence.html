@@ -118,7 +118,8 @@ footer{border-top:1px solid var(--border);margin-top:56px;padding:18px 0;font-si
   <a href="#verify">7. Verification Guide</a>
   <a href="#themes">8. Adaptive Themes</a>
   <a href="#ai">9. Chart-Aware AI</a>
-  <a href="#appendix">10. Appendix</a>
+  <a href="#principles">10. Reasoning Principles</a>
+  <a href="#appendix">11. Appendix</a>
 </nav>
 
 <main>
@@ -182,7 +183,10 @@ Prepared as documentation in support of the App Review appeal for Guideline 4.3(
 <h3>3.2 Scholarly verification</h3>
 <p>All <b>765 catalog identifiers</b> (DZ#) were cross-checked against the standard academic references for the Daoist canon: Schipper–Verellen <i>Concordance of the Daoist Canon</i>, Komjathy, Pregadio, ctext.org and kanripo.org. Corrections from the verification pass were applied programmatically and re-verified.</p>
 
-<h3>3.3 Sample entries</h3>
+<h3>3.3 Content pipeline — OCR &amp; scholarly distillation</h3>
+<p>The corpus was not scraped from the web: it was <b>digitized from classical Chinese source documents via OCR, then distilled through manual verification passes</b> into the four analysis layers. The pipeline was: (1) OCR of the original printed catalogs and texts; (2) extraction and normalization of titles and catalog numbers; (3) programmatic verification of every catalog identifier (765 DZ#) against the standard academic references, with a documented correction pass; (4) distillation of each text into essence → deep analysis → <b>explicit logic chain</b> → Vietnamese translation. The reasoning layer (Layer 3) is the product of this distillation: every interpretation in the app is an <b>argument with premises and steps</b>, not a canned sentence.</p>
+
+<h3>3.4 Sample entries</h3>
 <div class="samples"><span class="lbl">Layer 1 · Verbatim Classical Chinese — 道德经</span>
 <div class="zh-text" style="margin-top:6px">道可道，非常道。名可名，非常名。</div>
 <div class="small" style="margin-top:4px">Dao De Jing — full text with 4-layer analysis at <a href="https://battu.god8.shop/kinh/dao-duc-kinh.html" target="_blank">battu.god8.shop/kinh/dao-duc-kinh.html</a></div></div>
@@ -291,17 +295,34 @@ Prepared as documentation in support of the App Review appeal for Guideline 4.3(
 </div>
 </section>
 
-<!-- ==================== 10. APPENDIX ==================== -->
+<!-- ==================== 10. REASONING PRINCIPLES ==================== -->
+<section id="principles">
+<h2>10. Reasoning, Not Fortune-Telling — Principles <span class="zh">論理</span> <span class="vi">Nguyên tắc luận giải</span></h2>
+<p>Lữ Đăng differs from fortune-telling apps not only in content volume but in <b>epistemic stance</b>. The analysis engine and the AI assistant are governed by explicit, enforced rules against empty talk, flattery, and blind faith. These rules are part of the application's system prompt and are visible in behaviour:</p>
+
+<table>
+<tr><th>Principle</th><th>What the app is required to do</th><th>What it is forbidden from doing</th></tr>
+<tr><td><b>State the truth plainly</b> <span class="small">說真話</span></td><td>If the chart indicates a difficult year, say so directly with the reasoning ("năm nay con đến, thử cho chắc").</td><td class="no">Empty comfort ("don't worry", "it will pass", "nothing serious").</td></tr>
+<tr><td><b>Individual reasoning, no generic readings</b> <span class="small">因人論理</span></td><td>Every answer must be grounded in the user's own computed chart (governing element, current decade, current year/month).</td><td class="no">Any advice that would apply identically to ten other people — flagged as "ba phải" and deleted.</td></tr>
+<tr><td><b>Verify before agreeing</b> <span class="small">先驗證後認同</span></td><td>When the user claims "this year is terrible for me", the assistant must re-run the year/month analysis and confirm or correct the claim with evidence.</td><td class="no">Sycophancy — agreeing with the user's own assessment without checking the chart.</td></tr>
+<tr><td><b>Every conclusion cites its logic chain</b> <span class="small">邏輯鏈</span></td><td>Layer 3 of each text and each chart analysis exposes the premises (classical sources) → steps → conclusion.</td><td class="no">Assertions without a classical basis ("because I say so").</td></tr>
+<tr><td><b>No fatalism, no fear-mongering</b> <span class="small">不宿命</span></td><td>Treats the chart as a tendency to be understood and acted upon (the destiny-improvement framework, 了凡四训), with concrete actionable advice and dates.</td><td class="no">"Your fate is sealed" narratives; vague doomsaying.</td></tr>
+</table>
+
+<div class="callout"><b>The result:</b> asking the assistant "is this year bad for me?" returns a verification against the actual computed year, not reassurance. This is the behaviour of a reference instrument, not of a fortune-teller — and it is enforced in code, not just promised.</div>
+</section>
+
+<!-- ==================== 11. APPENDIX ==================== -->
 <section id="appendix">
-<h2>10. Appendix <span class="vi">Phụ lục</span></h2>
-<h3>10.1 Sources &amp; verification references</h3>
+<h2>11. Appendix <span class="vi">Phụ lục</span></h2>
+<h3>11.1 Sources &amp; verification references</h3>
 <ul class="tight">
 <li>Schipper, K. &amp; Verellen, F. — <i>The Taoist Canon: A Historical Companion</i> (University of Chicago Press).</li>
 <li>Komjathy, L. — <i>The Daoist Tradition: An Introduction</i>; Daoist canon catalog work.</li>
 <li>Pregadio, F. — <i>The Encyclopedia of Taoism</i>.</li>
 <li>ctext.org and kanripo.org — digital critical editions used for cross-verification.</li>
 </ul>
-<h3>10.2 Submission metadata</h3>
+<h3>11.2 Submission metadata</h3>
 <div class="code">App name: Lữ Đăng (旅燈) · Bát Tự Dụng Thần
 Bundle ID: shop.god8.battu
 Category: Education / Reference
