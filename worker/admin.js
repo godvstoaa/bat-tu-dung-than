@@ -39,6 +39,8 @@ async function safeEqual(a, b) {
 // [AUDIT FIX] cắt chuỗi động trước khi ghi KV — chống events:log vượt 25MB (KV value limit)
 const _S = (v, n) => String(v == null ? '' : v).slice(0, n);
 // [AUDIT FIX] cap tổng kích thước 1 event (data JSON) — đặc biệt ai_chat response AI dài
+// [FIX 2] GIỮ NGUYÊN array (không stringify) — trước đây detail (array) thành JSON string
+//   → admin showChat gọi detail.join() crash → click log AI không hiện modal
 function _capEventData(data) {
   const d = data || {};
   const out = {};
@@ -47,6 +49,8 @@ function _capEventData(data) {
     if (typeof v === 'string') {
       if (k === 'response' || k === 'q' || k === 'text' || k === 'question') out[k] = _S(v, 4000);
       else out[k] = _S(v, 300);
+    } else if (Array.isArray(v)) {
+      out[k] = v.slice(0, 20).map((x) => (typeof x === 'string' ? _S(x, 300) : x));
     } else if (v && typeof v === 'object') {
       try { out[k] = _S(JSON.stringify(v), 500); } catch (e) { out[k] = '[unserializable]'; }
     } else out[k] = v;
@@ -1489,6 +1493,12 @@ function adminDashboard(env) {
   function blockIp(ip,block){ fetch(AP+'/api/block?token='+TOKEN,{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({ip:ip,block:block})}).then(function(){load();loadAudit();}); }
   // [loop 1352] full-chat modal — admin xem TOÀN BỘ Q+A (không bị truncate 200 chars).
   function fmtMs(ms){ if(ms==null)return ''; if(ms<1000)return ms+'ms'; var s=ms/1000; return s<60?(s.toFixed(1)+'s'):(Math.round(s/60)+'m'+String(Math.round(s%60)).padStart(2,'0')+'s'); }
+  // [FIX 2] detail cũ có thể là JSON string (trước cap) hoặc array (sau cap) → parse an toàn
+  function _detailArr(detail){
+    if (Array.isArray(detail)) return detail;
+    if (typeof detail === 'string') { try { var p = JSON.parse(detail); if (Array.isArray(p)) return p; } catch (_) {} }
+    return null;
+  }
   function showChat(q, resp, src, dur, ts, ip, rounds, bailed, detail){
     var m=document.getElementById('chat-modal'); m.textContent='';
     var box=el('div'); box.style.cssText='background:#15131f;border:1px solid '+(bailed?'#c0392b':'#d4af37')+';border-radius:10px;padding:18px 22px;max-width:780px;width:calc(100% - 40px);max-height:85vh;overflow:auto';
@@ -1497,7 +1507,8 @@ function adminDashboard(env) {
     left.appendChild(el('span',null, (src==='ai'?'🤖 AI trả lời':'📦 Local (offline)') + (ip?'  ·  ':'')));
     if(ip){var ipE=el('span','ip',ip); ipE.style.fontSize='12px'; left.appendChild(ipE);}
     left.appendChild(el('div','tiny', (ts?new Date(ts).toLocaleString('vi-VN'):'') + (dur!=null?'  ·  ⏱ '+fmtMs(dur):'') + (rounds?'  ·  🔄 '+rounds+' vòng':'') + (bailed?'  ·  ⚠ BỊ CẮT: '+bailed:'')));
-    if (detail && detail.length) left.appendChild(el('div','tiny','🔀 mỗi round: ' + detail.join(' → ')));
+    var _dl = _detailArr(detail);
+    if (_dl && _dl.length) left.appendChild(el('div','tiny','🔀 mỗi round: ' + _dl.join(' → ')));
     meta.appendChild(left);
     var close=el('button','btn','✕ Đóng'); close.style.cssText='padding:4px 12px;font-size:12px'; close.onclick=function(){m.style.display='none';}; meta.appendChild(close);
     box.appendChild(meta);
