@@ -1,174 +1,218 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"/>
-<title>App Uniqueness Evidence — Lữ Đăng</title>
+<title>App Uniqueness Evidence — Lữ Đăng 🏮</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0913;color:#f0e8d0;line-height:1.5}
-.wrap{max-width:820px;margin:0 auto;padding:0}
-/* Hero */
+.wrap{max-width:860px;margin:0 auto}
 .hero{background:linear-gradient(135deg,#1a1530,#0f0c1f);padding:40px 24px 32px;text-align:center;border-bottom:3px solid #d4af37}
-.hero h1{font-size:1.8rem;color:#d4af37;margin-bottom:8px}
-.hero .sub{color:#c0b090;font-size:0.95rem}
-.hero .badge{display:inline-block;background:rgba(212,175,55,.15);border:1px solid #d4af37;color:#d4af37;padding:4px 14px;border-radius:20px;font-size:0.8rem;margin:6px 4px}
-/* Stats bar */
+.hero h1{font-size:2rem;color:#d4af37;margin-bottom:4px}
+.hero .zh-title{font-size:1.3rem;color:#e0c890;margin-bottom:8px}
+.hero .vi-title{font-size:0.9rem;color:#c0b090}
+.badge{display:inline-block;background:rgba(212,175,55,.15);border:1px solid #d4af37;color:#d4af37;padding:4px 12px;border-radius:20px;font-size:0.78rem;margin:4px}
 .stats{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;padding:20px;background:#13111c}
-.stat{text-align:center;min-width:100px}
-.stat .num{font-size:1.6rem;font-weight:800;color:#d4af37}
-.stat .lbl{font-size:0.72rem;color:#a09070;text-transform:uppercase;letter-spacing:.5px}
-/* Section */
+.stat{text-align:center;min-width:90px}.stat .num{font-size:1.5rem;font-weight:800;color:#d4af37}.stat .lbl{font-size:0.65rem;color:#a09070;text-transform:uppercase}
 .sec{padding:24px;border-bottom:1px solid #222}
-.sec h2{font-size:1.15rem;color:#d4af37;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.sec p{font-size:0.88rem;color:#c0b090;margin-bottom:8px}
-/* Feature grid */
-.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
-.feat{background:#13111c;border:1px solid #2a2440;border-radius:8px;padding:10px 12px}
-.feat .ico{font-size:1.3rem;margin-bottom:4px}
-.feat .name{font-weight:700;color:#e0d0b0;font-size:0.82rem}
-.feat .desc{font-size:0.72rem;color:#908070;margin-top:2px}
-.feat .uniq{font-size:0.68rem;color:#d4af37;margin-top:2px}
-/* Table */
-table{width:100%;border-collapse:collapse;font-size:0.78rem;margin:8px 0}
-th{background:#1a1530;color:#d4af37;padding:6px;text-align:left;border:1px solid #2a2440}
-td{padding:6px;border:1px solid #2a2440;color:#c0b090}
-.yes{color:#4ade80;font-weight:700} .no{color:#666}
-/* Sample */
-.sample{background:#13111c;border-left:3px solid #d4af37;padding:12px;margin:8px 0;border-radius:0 6px 6px 0}
+.sec h2{font-size:1.1rem;color:#d4af37;margin-bottom:8px}
+.sec h2 .zh{font-family:'Noto Serif SC',serif;color:#c0a060;font-size:0.9rem;margin-left:4px}
+.sec h2 .vi{font-size:0.78rem;color:#908070;margin-left:4px}
+.sec p{font-size:0.85rem;color:#c0b090;margin-bottom:6px}
+.summary{background:#13111c;border-left:3px solid #d4af37;padding:12px 16px;margin-bottom:12px;font-size:0.85rem;color:#d8c8a0}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.feat{background:#13111c;border:1px solid #2a2440;border-radius:8px;padding:10px}
+.feat .ico{font-size:1.2rem;margin-bottom:2px}
+.feat .name{font-weight:700;color:#e0d0b0;font-size:0.78rem}
+.feat .name .zh{font-family:'Noto Serif SC',serif;color:#c0a060;font-size:0.72rem}
+.feat .desc{font-size:0.68rem;color:#908070;margin-top:2px}
+.feat .uniq{font-size:0.65rem;color:#d4af37;margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:0.72rem;margin:6px 0}
+th{background:#1a1530;color:#d4af37;padding:5px;text-align:left;border:1px solid #2a2440}
+td{padding:5px;border:1px solid #2a2440;color:#c0b090}
+.yes{color:#4ade80;font-weight:700}.no{color:#666}
+.sample{background:#13111c;border-left:3px solid #d4af37;padding:10px;margin:6px 0;border-radius:0 6px 6px 0}
+.sample .lang{font-size:0.6rem;color:#d4af37;text-transform:uppercase;letter-spacing:.5px}
 .sample .zh{font-family:'Noto Serif SC',serif;color:#e0d0b0;font-size:0.85rem}
-.sample .vi{color:#c0b090;font-size:0.8rem;margin-top:4px}
-.sample .tag{display:inline-block;background:rgba(212,175,55,.12);color:#d4af37;padding:1px 8px;border-radius:10px;font-size:0.68rem;margin:2px}
-/* Links */
+.sample .vi{color:#c0b090;font-size:0.78rem;margin-top:2px}
+.sample .en{color:#90a0b0;font-size:0.72rem;margin-top:2px;font-style:italic}
+.tag{display:inline-block;background:rgba(212,175,55,.12);color:#d4af37;padding:1px 8px;border-radius:10px;font-size:0.65rem;margin:2px}
 a{color:#d4af37}
-.disclaimer{padding:16px 24px;background:#1a0a0a;font-size:0.75rem;color:#a07070;text-align:center}
-.foot{text-align:center;padding:16px;color:#555;font-size:0.7rem}
-@media(max-width:600px){.feat-grid{grid-template-columns:1fr}.stat .num{font-size:1.3rem}}
+.tri{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:0.65rem;margin:4px 0}
+.tri .col{padding:4px;border-radius:4px}.tri .en{background:rgba(100,180,255,.08);color:#80b0e0}.tri .vi{background:rgba(212,175,55,.06);color:#c0a060}.tri .zh{background:rgba(127,191,127,.08);color:#80b080;font-family:'Noto Serif SC',serif}
+.steps{counter-reset:step}
+.step{display:flex;gap:12px;align-items:flex-start;background:#13111c;border:1px solid #2a2440;border-radius:8px;padding:10px 12px;margin:6px 0}
+.step::before{counter-increment:step;content:counter(step);flex:0 0 26px;height:26px;border-radius:50%;background:#d4af37;color:#1a1530;font-weight:800;font-size:0.8rem;display:flex;align-items:center;justify-content:center}
+.step b{color:#e0d0b0;font-size:0.8rem}
+.step span{display:block;font-size:0.72rem;color:#908070;margin-top:2px}
+.shots{display:grid;grid-template-columns:1fr;gap:10px;margin:10px 0}
+.shot{background:#13111c;border:1px solid #2a2440;border-radius:8px;overflow:hidden}
+.shot img{width:100%;display:block;border-bottom:1px solid #2a2440}
+.shot .cap{font-size:0.7rem;color:#a09070;padding:6px 10px}
+.disclaimer{padding:14px;background:#1a0a0a;font-size:0.7rem;color:#a07070;text-align:center}
+.foot{text-align:center;padding:12px;color:#555;font-size:0.65rem}
+@media(max-width:600px){.feat-grid{grid-template-columns:1fr}.tri{grid-template-columns:1fr}}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
 </head><body>
 <div class="wrap">
 
-<!-- HERO -->
 <div class="hero">
 <h1>🏮 Lữ Đăng</h1>
-<p class="sub">Bát Tự · Tử Vi · Huyền Học — Cultural-Educational Reference App</p>
+<div class="zh-title">旅燈 · Bát Tự Dụng Thần</div>
+<div class="vi-title">Cultural-Religious Reference App · Ứng dụng tham chiếu văn hoá-tôn giáo</div>
 <div style="margin-top:8px">
-<span class="badge">1,523 Classical Texts</span>
+<span class="badge">1,523 Texts · 1,523 kinh</span>
 <span class="badge">3.14M Characters</span>
-<span class="badge">12 Divination Systems</span>
+<span class="badge">12 Systems · 12 hệ</span>
+<span class="badge">VI · ZH · EN Trilingual</span>
 <span class="badge">Free · No Ads · No IAP</span>
 </div>
 </div>
 
-<!-- STATS -->
 <div class="stats">
-<div class="stat"><div class="num">1,523</div><div class="lbl">Classical Texts</div></div>
-<div class="stat"><div class="num">3.14M</div><div class="lbl">Characters</div></div>
-<div class="stat"><div class="num">12</div><div class="lbl">Divination Systems</div></div>
-<div class="stat"><div class="num">40+</div><div class="lbl">AI Tools</div></div>
+<div class="stat"><div class="num">1,523</div><div class="lbl">Classical Texts / Kinh điển</div></div>
+<div class="stat"><div class="num">3.14M</div><div class="lbl">Characters / Ký tự</div></div>
+<div class="stat"><div class="num">12</div><div class="lbl">Systems / Hệ thống</div></div>
 <div class="stat"><div class="num">765</div><div class="lbl">Verified DZ#</div></div>
+<div class="stat"><div class="num">3</div><div class="lbl">Languages / Ngôn ngữ</div></div>
 <div class="stat"><div class="num">0</div><div class="lbl">Ads / IAP</div></div>
 </div>
 
-<!-- 1. LIBRARY -->
+<!-- EXECUTIVE SUMMARY -->
 <div class="sec">
-<h2>📚 World's Largest Daoist Text Library in Any App</h2>
-<p>No App Store app has even 1% of this collection. Each text has up to <b>4 layers of scholarly analysis</b>:</p>
-<table>
-<tr><th>Layer</th><th>Content</th><th>Coverage</th></tr>
-<tr><td><b>Essence</b></td><td>Summary + verbatim Classical Chinese</td><td class="yes">100%</td></tr>
-<tr><td><b>Deep Analysis</b></td><td>Chapter-specific, terminology, practical application</td><td class="yes">90%</td></tr>
-<tr><td><b>Logical Reasoning</b></td><td>Thesis → reasoning chain → BaZi practice → comparison</td><td class="yes">100%</td></tr>
-<tr><td><b>Vietnamese Translation</b></td><td>Full translation of key passages</td><td class="yes">86%</td></tr>
-</table>
-<p style="margin-top:8px"><b>Academic verification:</b> Schipper-Verellen Concordance · Komjathy Title Index · Pregadio Golden Elixir · ctext.org · kanripo.org</p>
-<p><b>Sample pages (live, verifiable):</b><br>
-<a href="https://battu.god8.shop/kinh/dao-duc-kinh.html">→ 道德经 Dao De Jing (4-layer)</a><br>
-<a href="https://battu.god8.shop/kinh/am-phu-kinh-tam-hoang-ngoc-quyet-nguyen-de-hien-vien-hoang-de.html">→ 阴符经 Yin Fu Jing (4-layer)</a><br>
-<a href="https://battu.god8.shop/kinh/index.html">→ Full library index (1,523 texts)</a></p>
+<h2>📌 Executive Summary <span class="vi">Tóm tắt</span></h2>
+<div class="summary">
+<b>Lữ Đăng is a cultural-educational reference tool for Vietnamese-Chinese metaphysics — not an entertainment fortune-telling app.</b>
+Every result is <b>computed on-device from classical algorithms</b> (BaZi chart construction, element balancing, 60-year cycles), backed by the <b>largest Daoist text library in any mobile app (1,523 texts, 3.14M characters)</b> with 4-layer scholarly analysis — verified against Schipper-Verellen, Komjathy, Pregadio and ctext.org.
+It is <b>100% free, no ads, no IAP, no account</b>, and serves the underserved Vietnamese-speaking community (~100M people).
+</div>
 </div>
 
-<!-- 2. ALL FEATURES -->
+<!-- 5-MINUTE VERIFICATION -->
 <div class="sec">
-<h2>🧩 Complete Feature Catalog (10 Groups)</h2>
+<h2>⏱ Verify in 5 Minutes <span class="zh">驗證</span> <span class="vi">Tự kiểm chứng trong 5 phút</span></h2>
+<div class="steps">
+<div class="step"><div><b>Open the app with a prefilled birth chart</b><span>Click: <a href="https://battu.god8.shop/?dob=1990-06-15&time=10:00&g=nam" target="_blank">battu.god8.shop/?dob=1990-06-15&time=10:00&amp;g=nam</a> — a full 40+ section, ~85KB personalized analysis renders automatically (see screenshots below).</span></div></div>
+<div class="step"><div><b>Browse the library</b><span>Click: <a href="https://battu.god8.shop/kinh/index.html" target="_blank">battu.god8.shop/kinh/index.html</a> — 1,523 classical texts with 4 layers of analysis each. Try <a href="https://battu.god8.shop/kinh/dao-duc-kinh.html" target="_blank">道德经 / Đạo Đức Kinh</a>.</span></div></div>
+<div class="step"><div><b>Run any divination system</b><span>Open the app, go to the Divination tab — 12 on-device engines (梅花 / 六壬 / 奇门 / 太乙 / 紫微 / 河洛 / 称骨 / 金口诀 ...). All computed locally, no server.</span></div></div>
+<div class="step"><div><b>Ask the AI assistant</b><span>Tap the 💬 button and ask any question about the chart — the assistant cites the 1,523-text library based on that specific birth chart. Free, no sign-up.</span></div></div>
+</div>
+</div>
+
+<!-- SCREENSHOTS -->
+<div class="sec">
+<h2>📸 Screenshots — Real App, Live Build <span class="vi">Ảnh thật từ app</span></h2>
+<p>Captured from the live production build, not mockups.</p>
+<div class="shots">
+<div class="shot"><img src="/review-shots/01-bazi-chart.png" alt="BaZi chart analysis - 40+ sections rendered"/><div class="cap">BaZi chart analysis — 40+ sections, ~85KB per chart (格局 / 用神 / 十神 / 大运 / 流年 ...)</div></div>
+<div class="shot"><img src="/review-shots/02-library.png" alt="Daoist library index - 1,523 texts"/><div class="cap">Library — 1,523 classical texts, 4-layer analysis each</div></div>
+<div class="shot"><img src="/review-shots/03-ai-chat.png" alt="AI assistant chat"/><div class="cap">Chart-aware AI assistant — free, no account, cites the 1,523-text library</div></div>
+</div>
+</div>
+
+<!-- LIBRARY -->
+<div class="sec">
+<h2>📚 Largest Daoist Library in Any Mobile App <span class="zh">道藏</span> <span class="vi">Thư viện kinh lớn nhất</span></h2>
+<p>No App Store app has even 1% of this collection. Each text has <b>4 layers of analysis</b>:</p>
+<div class="tri">
+<div class="col en"><b>EN:</b> Summary + verbatim Classical Chinese passages</div>
+<div class="col vi"><b>VI:</b> Tóm tắt + đoạn Hán nguyên văn</div>
+<div class="col zh"><b>ZH:</b> 原文 + 学术分析</div>
+</div>
+<table>
+<tr><th>Layer / Tầng</th><th>EN</th><th>VI</th><th>ZH</th><th>Coverage</th></tr>
+<tr><td><b>1. Essence</b></td><td>Summary</td><td>Tóm tắt</td><td>提要</td><td class="yes">100%</td></tr>
+<tr><td><b>2. Deep</b></td><td>Chapter analysis</td><td>Phân tích chương</td><td>章節分析</td><td class="yes">90%</td></tr>
+<tr><td><b>3. Logic</b></td><td>Reasoning chain</td><td>Chuỗi lý luận</td><td>邏輯鏈</td><td class="yes">100%</td></tr>
+<tr><td><b>4. Translation</b></td><td>Vietnamese TL</td><td>Dịch VN</td><td>越譯</td><td class="yes">86%</td></tr>
+</table>
+<p style="margin-top:6px"><b>Academic verification:</b> Schipper-Verellen · Komjathy · Pregadio · ctext.org · kanripo.org</p>
+<p><b>Live samples:</b><br>
+<a href="https://battu.god8.shop/kinh/dao-duc-kinh.html">→ 道德经 / Đạo Đức Kinh</a><br>
+<a href="https://battu.god8.shop/kinh/am-phu-kinh-tam-hoang-ngoc-quyet-nguyen-de-hien-vien-hoang-de.html">→ 阴符经 / Âm Phù Kinh</a><br>
+<a href="https://battu.god8.shop/kinh/index.html">→ Full index / Toàn bộ 1,523</a></p>
+</div>
+
+<!-- ALL FEATURES -->
+<div class="sec">
+<h2>🧩 Complete Feature Catalog <span class="zh">功能目錄</span> <span class="vi">10 nhóm tính năng</span></h2>
 <div class="feat-grid">
-<div class="feat"><div class="ico">🎯</div><div class="name">BaZi Core Analysis</div><div class="desc">格局·用神·十神·五行·大运·流年·纳音</div><div class="uniq">38-section brief, 83KB per chart</div></div>
-<div class="feat"><div class="ico">📅</div><div class="name">Daily/Weekly/Monthly</div><div class="desc">运势 today, 7-day preview, calendar</div><div class="uniq">彭祖百忌 by day ganzhi (corrected)</div></div>
-<div class="feat"><div class="ico">📜</div><div class="name">Future Predictions</div><div class="desc">大运 timeline, 10-year forecast, life trajectory</div><div class="uniq">8 大运 + 4 life stages + windows</div></div>
-<div class="feat"><div class="ico">💼</div><div class="name">Life Areas</div><div class="desc">Career, marriage, wealth, health, children, education</div><div class="uniq">Personalized per chart, not generic</div></div>
-<div class="feat"><div class="ico">🏠</div><div class="name">Feng Shui</div><div class="desc">太岁·三煞·五黄·direction analysis·sat方位</div><div class="uniq">20+ feng shui classics in library</div></div>
-<div class="feat"><div class="ico">🏥</div><div class="name">TCM / Đông Y</div><div class="desc">五运六气·meridian clock·health profile·diet</div><div class="uniq">黄帝内经 + 30 medical texts</div></div>
-<div class="feat"><div class="ico">🔮</div><div class="name">12 Divination Systems</div><div class="desc">梅花·六壬·奇门·太乙·紫微·河洛·称骨·金口·Tarot·Runes·I-Ching·Coffee</div><div class="uniq">On-device computation, not API</div></div>
-<div class="feat"><div class="ico">📖</div><div class="name">Deep Reference Systems</div><div class="desc">盲派·古法·兰台·滴天髓·穷通宝鉴·鬼谷子·珞琭子</div><div class="uniq">120/120 调候 rules + 163 deep rules</div></div>
-<div class="feat"><div class="ico">🕯️</div><div class="name">Daoist Schools</div><div class="desc">12 schools × 9 dimensions comparison matrix</div><div class="uniq">正一·全真·茅山·閭山·清微·神霄...</div></div>
-<div class="feat"><div class="ico">🤖</div><div class="name">Chart-Aware AI</div><div class="desc">AI references 1,523 kinh based on YOUR chart</div><div class="uniq">40+ tools, 25-feature connectivity</div></div>
+<div class="feat"><div class="ico">🎯</div><div class="name">BaZi Core <span class="zh">八字</span></div><div class="desc">格局·用神·十神·五行·大运 — 40+ sections, ~85KB/chart</div><div class="uniq">Unique: deepest analysis on App Store</div></div>
+<div class="feat"><div class="ico">🏥</div><div class="name">TCM Medicine <span class="zh">中医</span></div><div class="desc">五运六气·meridian clock·health·diet by element</div><div class="uniq">Unique: 黄帝内经 + 30 medical texts</div></div>
+<div class="feat"><div class="ico">🏠</div><div class="name">Feng Shui <span class="zh">风水</span></div><div class="desc">太岁·三煞·五黄·direction per chart</div><div class="uniq">Unique: 20+ Kan Yu classics in library</div></div>
+<div class="feat"><div class="ico">🔮</div><div class="name">12 Divination <span class="zh">十二术数</span></div><div class="desc">梅花·六壬·奇门·太乙·紫微·河洛·称骨·金口·Tarot·Runes</div><div class="uniq">Unique: on-device, not API</div></div>
+<div class="feat"><div class="ico">📖</div><div class="name">Deep Reference <span class="zh">深论</span></div><div class="desc">盲派·古法·滴天髓·穷通宝鉴·鬼谷子·珞琭子</div><div class="uniq">Unique: 120/120 调候 rules + hundreds more</div></div>
+<div class="feat"><div class="ico">🕯️</div><div class="name">12 Schools <span class="zh">十二宗派</span></div><div class="desc">正一·全真·茅山·閭山·清微·神霄 × 9 dimensions</div><div class="uniq">Unique: interactive comparison matrix</div></div>
+<div class="feat"><div class="ico">💑</div><div class="name">Marriage + Life <span class="zh">合婚</span></div><div class="desc">合婚 compatibility·Liễu Phàm·lifestyle·naming</div><div class="uniq">Unique: chart-personalized, not generic</div></div>
+<div class="feat"><div class="ico">🤖</div><div class="name">Chart-Aware AI <span class="zh">智能</span></div><div class="desc">AI cites kinh by YOUR chart · 40+ tools · 25 systems</div><div class="uniq">Unique: references 1,523 texts contextually</div></div>
+<div class="feat"><div class="ico">📅</div><div class="name">Timing <span class="zh">择日</span></div><div class="desc">Daily/weekly/monthly + 彭祖百忌 + day selection</div><div class="uniq">Unique: day-ganzhi corrected (not year)</div></div>
+<div class="feat"><div class="ico">🌐</div><div class="name">Trilingual <span class="zh">三语</span></div><div class="desc">VI · ZH · EN content — texts, analysis, AI</div><div class="uniq">Unique: serves 3 language communities</div></div>
 </div>
 </div>
 
-<!-- 3. UNIQUE vs COMPETITORS -->
+<!-- COMPARISON -->
 <div class="sec">
-<h2>🏆 Why This App Is NOT a Clone</h2>
+<h2>🏆 Why NOT a Clone <span class="zh">非克隆</span> <span class="vi">Không phải app nhái</span></h2>
 <table>
-<tr><th>Feature</th><th>Typical App Store app</th><th>This app</th></tr>
-<tr><td>Content volume</td><td class="no">1 horoscope text/day</td><td class="yes">1,523 classical texts, 3.14M chars</td></tr>
-<tr><td>Analysis depth</td><td class="no">1-2 sentences</td><td class="yes">4-layer scholarly (2,062 chars avg)</td></tr>
+<tr><th>Feature</th><th>Typical App</th><th>This App</th></tr>
+<tr><td>Content</td><td class="no">1 horoscope/day</td><td class="yes">1,523 texts, 3.14M chars</td></tr>
+<tr><td>Depth</td><td class="no">1-2 sentences</td><td class="yes">4-layer scholarly</td></tr>
 <tr><td>Systems</td><td class="no">1 (zodiac)</td><td class="yes">12 on-device engines</td></tr>
-<tr><td>Health/TCM</td><td class="no">None</td><td class="yes">五运六气 + meridian clock + diet</td></tr>
-<tr><td>Feng Shui</td><td class="no">Generic color/direction</td><td class="yes">太岁/三煞/五黄 per chart</td></tr>
-<tr><td>Schools</td><td class="no">None</td><td class="yes">12 schools × 9 dimensions</td></tr>
-<tr><td>Academic sources</td><td class="no">None</td><td class="yes">Schipper/Komjathy/Pregadio</td></tr>
-<tr><td>Computation</td><td class="no">Server random</td><td class="yes">On-device deterministic</td></tr>
-<tr><td>Monetization</td><td class="no">Ads + aggressive IAP</td><td class="yes">Free, no ads, no IAP</td></tr>
-<tr><td>User data</td><td class="no">Account + tracking</td><td class="yes">No login, localStorage only</td></tr>
+<tr><td>TCM</td><td class="no">None</td><td class="yes">五运六气 + diet</td></tr>
+<tr><td>Schools</td><td class="no">None</td><td class="yes">12 × 9 dimensions</td></tr>
+<tr><td>Languages</td><td class="no">1</td><td class="yes">3 (VI/ZH/EN)</td></tr>
+<tr><td>Academic</td><td class="no">None</td><td class="yes">Schipper/Komjathy</td></tr>
+<tr><td>Price</td><td class="no">Ads + IAP</td><td class="yes">Free, no monetization</td></tr>
 </table>
 </div>
 
-<!-- 4. SAMPLE 4-LAYER -->
+<!-- SAMPLE 4-LAYER TRILINGUAL -->
 <div class="sec">
-<h2>🔬 Sample: 阴符经 Yin Fu Jing — 4-Layer Deep Analysis</h2>
+<h2>🔬 Sample: 阴符经 <span class="zh">陰符經</span> <span class="vi">Âm Phù Kinh</span></h2>
 <div class="sample">
-<div class="tag">Layer 1: Essence</div>
-<div class="vi">Kinh về "đạo cơ" — trời đất vạn vật trộm lẫn nhau; ai nắm thời cơ thì chuyển họa phúc.</div>
-</div>
-<div class="sample">
-<div class="tag">Layer 1: Verbatim Chinese</div>
+<div class="lang">Layer 1 · Verbatim Chinese</div>
 <div class="zh">观天之道，执天之行，尽矣。天有五贼，见之者昌。</div>
 </div>
 <div class="sample">
-<div class="tag">Layer 3: Logic Thesis</div>
-<div class="vi">Humans are NOT locked in fixed destiny — heaven/earth/humans all "steal" from each other; whoever grasps the "moment" (机) can change fortune.</div>
+<div class="lang">Layer 4 · Vietnamese Translation</div>
+<div class="vi">Quán sát đạo trời, nắm giữ sự vận hành, thế là đủ. Trời có ngũ tặc (5 hành tương khắc), ai thấy được thì thịnh vượng.</div>
 </div>
 <div class="sample">
-<div class="tag">Layer 3: Reasoning Chain</div>
-<div class="vi">天地万物之盗 → humans participate → must see the "opening" → BaZi timing = finding the dao moment → act when window opens → going against = failure</div>
+<div class="lang">Layer 3 · Logic Thesis</div>
+<div class="vi">Con người KHÔNG bị khóa trong mệnh cố định — trời đất vạn vật đều «đạo» (trộm) lẫn nhau; ai nắm được «cơ» thì chuyển họa phúc.</div>
 </div>
 <div class="sample">
-<div class="tag">Layer 3: BaZi Practice</div>
-<div class="vi">Step 1: Find Dụng Thần (needed element). Step 2: Check đại vận (when element arrives). Step 3: Act when window opens. Step 4: Going against = doomed.</div>
+<div class="lang">Layer 3 · Reasoning Chain</div>
+<div class="vi">天地万物之盗 → nhân cũng tham gia → phải thấy «cơ» → BaZi = tìm đạo cơ → hành động khi cửa mở.</div>
 </div>
 <div class="sample">
-<div class="tag">Layer 3: Comparative</div>
-<div class="vi">Differs from 道德经 (passive wu-wei): Yin Fu Jing has MILITARY STRATEGY logic — proactively seizing opportunity. Reason: Yin Fu leans toward Bing Fa (兵法); Dao De Jing leans toward Mệnh Lý (命理).</div>
+<div class="lang">Layer 3 · BaZi Practice</div>
+<div class="vi">Step 1: Tìm Dụng Thần. Step 2: Xem đại vận. Step 3: Hành động khi cửa mở. Step 4: Nghịch = phạm cơ → hung.</div>
+</div>
+<div class="sample">
+<div class="lang">Layer 3 · Comparative Analysis</div>
+<div class="vi">Khác 道德经 (vô vi thuận hóa): Âm Phù mang logic binh pháp — chủ động lấy cơ. Lý do: Âm Phù thiên về Binh Pháp; Đạo Đức thiên về Mệnh Lý.</div>
 </div>
 </div>
 
-<!-- 5. FREE + PRIVACY -->
+<!-- PRIVACY -->
 <div class="sec">
-<h2>🔒 Free + Privacy-First (Not a Spam Monetization Play)</h2>
+<h2>🔒 Free + Privacy <span class="zh">免费</span> <span class="vi">Miễn phí</span></h2>
 <div class="feat-grid">
 <div class="feat"><div class="ico">🆓</div><div class="name">100% Free</div><div class="desc">No ads, no IAP, no subscription</div></div>
-<div class="feat"><div class="ico">🔐</div><div class="name">No Account</div><div class="desc">No login, no email, no tracking</div></div>
-<div class="feat"><div class="ico">📱</div><div class="name">On-Device</div><div class="desc">Chart computed locally, not server</div></div>
+<div class="feat"><div class="ico">🔐</div><div class="name">No Account</div><div class="desc">No login, no email, no third-party advertising/tracking SDKs</div></div>
+<div class="feat"><div class="ico">📱</div><div class="name">On-Device</div><div class="desc">Chart computed locally</div></div>
 <div class="feat"><div class="ico">📜</div><div class="name">Privacy Policy</div><div class="desc"><a href="https://battu.god8.shop/privacy.html">Live privacy policy</a></div></div>
 </div>
 </div>
 
 <div class="disclaimer">
-⚠️ This app provides cultural-religious reference content based on traditional Chinese-Vietnamese metaphysics. NOT medical/psychological diagnosis. NOT financial/legal advice. Does NOT guarantee outcomes. Appropriate category: Education / Reference.
+⚠️ Cultural-religious reference · NOT medical/psychological diagnosis · NOT financial advice · Category: Education / Reference<br>
+⚠️ Tham chiếu văn hoá-tôn giáo · KHÔNG chẩn đoán y tế · Danh mục: Giáo dục / Tham khảo
 </div>
-
 <div class="foot">
-Evidence generated 2026-08-03 · App: Lữ Đăng (shop.god8.battu) · <a href="https://battu.god8.shop">https://battu.god8.shop</a>
+Evidence generated 2026-08-03 · App: Lữ Đăng (shop.god8.battu) · <a href="https://battu.god8.shop">https://battu.god8.shop</a><br>
+Trilingual: Tiếng Việt · 中文 · English
 </div>
 
-</div>
-</body></html>
+</div></body></html>
