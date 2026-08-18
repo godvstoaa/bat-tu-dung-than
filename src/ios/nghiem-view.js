@@ -294,7 +294,7 @@ export async function mountNghiem(host, ctx = {}) {
       an.jiaocai ? el('span', { class: 'ios-chip', text: '教材' }) : null,
       an.jiaocai ? el('span', { class: 'ios-chip', text: '印本' }) : null,
     ].filter(Boolean)),
-    el('p', { class: 'ios-muted', text: 'Đối chiếu bản in với engine trên cùng một án — không phải bài diễn giải mệnh.' }),
+    el('p', { class: 'ios-muted', text: 'Đối chiếu bản in với sổ cái engine trên cùng một án.' }),
     hint ? el('p', { class: 'ios-muted tiny', id: 'ios-jieqi-hint', text: `工具: ${hint}` }) : null,
   );
 
