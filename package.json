@@ -14,6 +14,7 @@
     "build:corpus": "node scripts/build-corpus.mjs",
     "build:ios": "node scripts/build-corpus.mjs && vite build --mode ios && node scripts/ios-postbuild.mjs",
     "verify:ios": "node scripts/verify-ios-build.mjs",
+    "verify:ios-path": "node scripts/verify-ios-review-path.mjs",
     "cap:ios": "npm run build:ios && npx cap sync ios",
     "preview:ios": "vite preview --outDir dist-ios --host 127.0.0.1 --port 5174"
   },

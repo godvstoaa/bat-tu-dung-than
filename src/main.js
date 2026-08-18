@@ -4660,48 +4660,47 @@ async function run() {
 
   renderTuzu3D(c);
   renderPillars(c);
-  // [AUDIT FIX] bọc block render chính — engine exception không được bỏ dở run() giữa chừng
-  //   (trước đây 1 lỗi ở giữa chuỗi → UI nửa render, tab sau không chạy)
-  try {
-  renderVerdict(currentResult);
-  renderVerdict3D(currentResult);
-  renderSynthesis(currentResult);
-  applyChatBrand(); // [user] popup chat → «Nghịch Thiên Cải Mệnh» khi điểm thấp, «Giải Mệnh» khi cao
-  renderPersonalityNarrative(currentResult); // [loop 488] natal «bạn là ai»
-  renderPhaseNarrative(currentResult); // [loop 472] narrative ngay sau tổng luận
-  renderDayunTimeline(currentResult); // [loop 475] timeline trực quan thập kỷ
-  renderGuiguzi(currentResult); // [loop 522] Quỷ Cốc Tử thần toán
-  renderNayinPersonality(currentResult); // [loop 526] 日柱納音 personality
-  renderQianli(currentResult);
-  renderMangpai(currentResult);
-  renderMangpaiView(currentResult);
-  renderGaimenh(currentResult);
+  // [AUDIT v3 — ISOLATION] mỗi render module bọc riêng: 1 module lỗi CHỈ chết module đó,
+  //   không giết 25 module phía sau như try/catch khối cũ (agent-audit finding: chain-catch
+  //   nuốt toàn bộ phần đuôi → user thấy nửa trang mà không biết lỗi gì).
+  const _rs = (name, fn) => { try { fn(); } catch (e) { console.warn('render ' + name + ':', e && e.message); } };
+  _rs('verdict', () => renderVerdict(currentResult));
+  _rs('verdict3D', () => renderVerdict3D(currentResult));
+  _rs('synthesis', () => renderSynthesis(currentResult));
+  _rs('chatBrand', () => applyChatBrand()); // [user] popup chat → «Nghịch Thiên Cải Mệnh» khi điểm thấp, «Giải Mệnh» khi cao
+  _rs('personality', () => renderPersonalityNarrative(currentResult)); // [loop 488] natal «bạn là ai»
+  _rs('phase', () => renderPhaseNarrative(currentResult)); // [loop 472] narrative ngay sau tổng luận
+  _rs('dayunTimeline', () => renderDayunTimeline(currentResult)); // [loop 475] timeline trực quan thập kỷ
+  _rs('guiguzi', () => renderGuiguzi(currentResult)); // [loop 522] Quỷ Cốc Tử thần toán
+  _rs('nayinPersonality', () => renderNayinPersonality(currentResult)); // [loop 526] 日柱納音 personality
+  _rs('qianli', () => renderQianli(currentResult));
+  _rs('mangpai', () => renderMangpai(currentResult));
+  _rs('mangpaiView', () => renderMangpaiView(currentResult));
+  _rs('gaimenh', () => renderGaimenh(currentResult));
   const xkYear = new Date().getFullYear();
-  $('xk-year').value = xkYear;
-  renderXuankong(xkYear);
-  initDaguaSelects(); renderDagua();
-  renderClassic(currentResult);
-  renderZiwei();
-  try { renderLnSihua(currentResult); } catch (e) { console.warn('lnSihua', e.message); }
-  renderLiuqin(currentResult);
-  renderRemedy(currentResult);
-  try { renderAmTa(currentResult); } catch (e) { console.warn('amta', e.message); }
+  _rs('xk-year', () => { $('xk-year').value = xkYear; });
+  _rs('xuankong', () => renderXuankong(xkYear));
+  _rs('dagua', () => { initDaguaSelects(); renderDagua(); });
+  _rs('classic', () => renderClassic(currentResult));
+  _rs('ziwei', () => renderZiwei());
+  _rs('lnSihua', () => renderLnSihua(currentResult));
+  _rs('liuqin', () => renderLiuqin(currentResult));
+  _rs('remedy', () => renderRemedy(currentResult));
+  _rs('amta', () => renderAmTa(currentResult));
   window._currentResult = currentResult; // [loop 140] cho renderWuXing truy cập monthMainWx
-  renderWuXing(currentResult.wx, currentResult.yong);
-  renderWx3D(currentResult.wx, currentResult.yong);
-  
-  renderInteractions(currentResult);
-  renderShensha(currentResult);
-  renderShenshaExtra(currentResult);
-  try { renderNobleStars(currentResult); } catch (e) { console.warn('nobleStars', e.message); }
-  try { renderExtraShensha(); } catch (e) { console.warn('extraShensha', e.message); }
-  try { renderMarriageDeep(); } catch (e) { console.warn('marriageDeep', e.message); }
-  renderDaYun(currentResult.dayun);
-  renderDayunInteract(currentResult);
-  renderLiuNian(currentResult.liunian);
-  try { renderDailyBriefing(currentResult); } catch (e) { console.warn('dailyBriefing', e.message); }
-  try { renderTodayHero(); } catch (e) { console.warn('todayHero', e.message); } // [user feedback] chỉ hiện khi có lá số (gated trong #result)
-  } catch (e) { console.warn('render chain:', e.message); } // [AUDIT FIX] kết thúc block render chính
+  _rs('wuxing', () => renderWuXing(currentResult.wx, currentResult.yong));
+  _rs('wx3d', () => renderWx3D(currentResult.wx, currentResult.yong));
+  _rs('interactions', () => renderInteractions(currentResult));
+  _rs('shensha', () => renderShensha(currentResult));
+  _rs('shenshaExtra', () => renderShenshaExtra(currentResult));
+  _rs('nobleStars', () => renderNobleStars(currentResult));
+  _rs('extraShensha', () => renderExtraShensha());
+  _rs('marriageDeep', () => renderMarriageDeep());
+  _rs('dayun', () => renderDaYun(currentResult.dayun));
+  _rs('dayunInteract', () => renderDayunInteract(currentResult));
+  _rs('liunian', () => renderLiuNian(currentResult.liunian));
+  _rs('dailyBriefing', () => renderDailyBriefing(currentResult));
+  _rs('todayHero', () => renderTodayHero()); // [user feedback] chỉ hiện khi có lá số (gated trong #result)
   // [UI P1] countUp — animate numeric scores/% ("số mệnh hiện ra"). Vanilla, reduced-motion aware.
   (function countUpAll() {
     const root = $('result'); if (!root || !window.requestAnimationFrame) return;
@@ -4893,24 +4892,24 @@ async function run() {
   }
   // [loop 937] collapsible groups (mobile default-collapse secondary) — sau quick-nav (grp.id đã set)
   initCollapsibleGroups();
-  // reveal print button (lab bar)
+  // reveal print button
   const pbtn = $('print-btn');
   if (pbtn) pbtn.classList.remove('hidden');
-  const pbtnLab = $('print-btn-lab');
-  if (pbtnLab) pbtnLab.classList.remove('hidden');
   const curYear = new Date().getFullYear();
-  $('ly-year').value = curYear;
-  renderLyear(curYear);
-  try { if ($('ly-ev')) renderLyearEvents(curYear); } catch (e) { console.warn('ly-ev', e.message); }
-  try { $('yd-year').value = curYear; renderYearDaily(currentResult, curYear); } catch (e) { console.warn('yd', e.message); }
-  $('lm-year').value = curYear;
-  renderLiuyue(curYear);
+  // [AUDIT v3 — ISOLATION] đuôi run() bọc riêng từng module (agent-audit: trước đây 1 throw
+  //   ở đây giết cả init3DTilt + card-search vì async rejection không ai catch).
+  _rs('ly-year', () => { $('ly-year').value = curYear; });
+  _rs('lyear', () => renderLyear(curYear));
+  _rs('ly-ev', () => { if ($('ly-ev')) renderLyearEvents(curYear); });
+  _rs('yd', () => { $('yd-year').value = curYear; renderYearDaily(currentResult, curYear); });
+  _rs('lm-year', () => { $('lm-year').value = curYear; });
+  _rs('liuyue', () => renderLiuyue(curYear));
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  $('lr-date').value = todayStr;
-  renderLiuRi(todayStr);
-  if ($('zlr-date')) { $('zlr-date').value = todayStr; try { renderZiweiLiuri(todayStr); } catch (e) { console.warn('zlr init', e.message); } }
-  try { renderXiaoxian(); } catch (e) { console.warn('xiaoxian init', e.message); }
+  _rs('lr-date', () => { $('lr-date').value = todayStr; });
+  _rs('liuri', () => renderLiuRi(todayStr));
+  _rs('zlr-init', () => { if ($('zlr-date')) { $('zlr-date').value = todayStr; renderZiweiLiuri(todayStr); } });
+  _rs('xiaoxian', () => renderXiaoxian());
 
   // [loop 148] 3D TILT INTERACTIVE — ALL cards get mouse-tracking 3D tilt + glare
   init3DTilt();
@@ -6294,7 +6293,7 @@ function renderAmTa(R) {
   root.appendChild(box);
 }
 
-$('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run(); });
+$('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run().catch((err) => console.warn('run submit:', err && err.message)); });
 $('ask-btn').addEventListener('click', handleAsk);
 $('question').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAsk(); });
 // [loop 1372] AI style selector — Gần gũi / Cân bằng / Chuyên gia (per-user, localStorage)
@@ -6343,7 +6342,6 @@ function getAIStyle() {
   });
 })();
 $('ai-settings-btn')?.addEventListener('click', openModal);
-$('settings-btn')?.addEventListener('click', openModal);
 // [loop 935] back-to-top floating button — hiện khi cuộn xuống, click về đầu trang (mobile scroll-fatigue)
 (function initToTop() {
   const btn = $('to-top');
@@ -7029,7 +7027,6 @@ $('yd-btn').addEventListener('click', () => {
 });
 
 $('print-btn')?.addEventListener('click', () => window.print());
-$('print-btn-lab')?.addEventListener('click', () => window.print());
 // [loop 278] force-open all <details> for print — CSS display:block !important
 //   doesn't override browser's built-in details hiding. Without this, all
 //   collapsible sections (factors/tonggen roots/sanyuan/jiaoyun/etc.) are
@@ -7820,7 +7817,7 @@ try {
   } // close else
 } catch (e) {}
 // [loop 1367] auto-run chart nếu mở từ URL (admin «Mở lá số» / share link) — không cần click submit
-if (window._autoRunChart && typeof run === 'function') { try { setTimeout(function () { if ($('date') && $('date').value) run(); }, 150); } catch (e) {} }
+if (window._autoRunChart && typeof run === 'function') { try { setTimeout(function () { if ($('date') && $('date').value) run().catch((e) => console.warn('run auto:', e && e.message)); }, 150); } catch (e) {} }
 // [loop 388] restore AI chat history from previous session (same chart)
 try {
   const savedChat = JSON.parse(localStorage.getItem('bazi-chat') || 'null');
@@ -7841,7 +7838,9 @@ if ($('city')) { $('city').addEventListener('change', syncLongField); syncLongFi
 _skipChatReset = true; // [loop 389] don't clear chat on initial render (same chart)
 // [loop 857] render welcome FIRST — for empty form new users (before run() returns early)
 try { renderQuickSummary(); } catch (_) {}
-try { run(); } catch (e) { console.warn('auto-render:', e.message); }
+if (import.meta.env.MODE !== 'ios') {
+  run().catch((e) => console.warn('auto-render:', e && e.message));
+}
 _skipChatReset = false;
 
 // ============================================================================
@@ -7942,7 +7941,7 @@ function _logEvent(type, data) {
   try { var d = Object.assign({ sid: _sid }, data || {}); fetch(_apiUrl('/api/event'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: type, data: d }) }).catch(function () {}); } catch (e) {}
 }
 // [loop 1380] poll admin inbox — nhận tin nhắn admin inject (can thiệp chat real-time)
-setInterval(function () {
+if (import.meta.env.MODE !== 'ios') setInterval(function () {
   fetch(_apiUrl('/api/inbox?sid=' + encodeURIComponent(_sid))).then(function (r) { return r.json(); }).then(function (r) {
     if (!r || !r.message || !r.message.text) return;
     var _pop = $('ai-popup'); if (_pop && _pop.classList.contains('hidden')) { _pop.classList.remove('hidden'); }
@@ -7992,3 +7991,10 @@ fetch(_apiUrl('/api/ai-config')).then(function (r) { return r.json(); }).then(fu
 /* bust */
 
 // [REMOVED] showVipModal + payment/redeem/IAP — gỡ cho App Store (app free, AI unlimited)
+
+// iOS research shell — chỉ khi vite --mode ios
+if (import.meta.env.MODE === 'ios') {
+  import('./ios/shell.js')
+    .then((m) => m.initIosShell())
+    .catch((e) => console.error('[ios-shell]', e));
+}

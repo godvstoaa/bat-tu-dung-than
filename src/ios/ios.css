@@ -1,0 +1,218 @@
+/* iOS research shell — system fonts, safe-area, 44px targets */
+.ios-root {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: none;
+  flex-direction: column;
+  background: #0a0913;
+  color: #eef1f8;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Songti SC", "Helvetica Neue", sans-serif;
+}
+body.ios-shell-active #ios-root { display: flex !important; }
+body.ios-shell-active > header.hero,
+body.ios-shell-active > .container,
+body.ios-shell-active > #chat-fab,
+body.ios-shell-active > #chat-panel,
+body.ios-shell-active > .bg-glow,
+body.ios-shell-active > .bg-clouds,
+body.ios-shell-active > .bg-grain,
+body.ios-shell-active > #mote-field,
+body.ios-shell-active > footer,
+body.ios-shell-active > #ai-fab,
+body.ios-shell-active > #ai-popup {
+  display: none !important;
+}
+body.ios-legacy-visible #ios-root { display: none !important; }
+
+.ios-panels {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(88px + env(safe-area-inset-bottom, 0px));
+}
+.ios-panel[hidden] { display: none !important; }
+
+.ios-tabbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 60;
+  display: flex;
+  gap: 2px;
+  padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+  background: rgba(10, 9, 19, 0.94);
+  border-top: 1px solid rgba(212, 175, 55, 0.22);
+  backdrop-filter: blur(10px);
+}
+.ios-tab {
+  flex: 1;
+  min-height: 44px;
+  min-width: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #9aa3bf;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.ios-tab.active {
+  color: #1a1408;
+  background: linear-gradient(145deg, #e8d28a, #d4af37);
+  font-weight: 600;
+}
+.ios-tab-icon { font-size: 16px; line-height: 1; }
+
+.ios-lib-head h1 { margin: 0; font-size: 26px; color: #e8d28a; }
+.ios-muted { color: #9aa3bf; font-size: 14px; margin: 6px 0; }
+.ios-muted.tiny { font-size: 12px; }
+.ios-section-label {
+  margin: 14px 0 8px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #9aa3bf;
+  font-weight: 600;
+}
+.ios-search-row { display: flex; gap: 8px; margin-top: 12px; }
+.ios-search {
+  flex: 1;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.28);
+  color: #eef1f8;
+  padding: 0 12px;
+  font-size: 16px;
+  font-family: inherit;
+}
+.ios-btn-ghost, .ios-btn-copy, .ios-btn-primary, .ios-back, .ios-filter-chip, .ios-list-item, .ios-subtab {
+  min-height: 44px;
+  min-width: 44px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.ios-btn-ghost {
+  border-radius: 12px;
+  border: 1px solid rgba(212,175,55,0.35);
+  background: transparent;
+  color: #e8d28a;
+  padding: 0 14px;
+}
+.ios-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid #d4af37;
+  background: linear-gradient(145deg, #e8d28a, #d4af37);
+  color: #1a1408;
+  font-weight: 600;
+}
+.ios-chip-row { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.ios-filter-chip, .ios-chip {
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: #c9d0e6;
+  padding: 0 12px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.ios-filter-chip.active { border-color: #d4af37; color: #e8d28a; }
+.ios-day-card {
+  margin-top: 8px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(212,175,55,0.28);
+  background: rgba(212,175,55,0.08);
+}
+.ios-day-card .zh { font-size: 22px; margin: 4px 0; }
+.ios-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.ios-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.ios-list-item {
+  text-align: left;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.22);
+  color: inherit;
+  padding: 12px;
+}
+.ios-list-item .zh { font-size: 18px; }
+.ios-count { font-size: 13px; color: #9aa3bf; }
+
+.ios-reader-head { margin-bottom: 8px; }
+.ios-reader-title { margin: 8px 0 4px; font-size: 22px; }
+.ios-back {
+  border: 0;
+  background: transparent;
+  color: #e8d28a;
+  padding: 0 4px;
+  font-size: 15px;
+}
+.ios-subtabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.ios-subtab {
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: #9aa3bf;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.ios-subtab.active { background: #d4af37; color: #1a1408; border-color: transparent; font-weight: 600; }
+.ios-block { margin: 0 0 14px; }
+.ios-block h4 { margin: 0 0 6px; color: #e8d28a; font-size: 14px; }
+.ios-prose { margin: 0; line-height: 1.65; white-space: pre-wrap; font-size: 15px; }
+.ios-warn {
+  padding: 10px 12px;
+  border-left: 3px solid #caa14a;
+  background: rgba(202,161,74,0.1);
+  border-radius: 0 10px 10px 0;
+  color: #e8d28a;
+  font-size: 13px;
+}
+.ios-source-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+.ios-source-text {
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 12px;
+  color: #c9d0e6;
+}
+.ios-btn-copy {
+  border-radius: 10px;
+  border: 1px solid rgba(212,175,55,0.35);
+  background: transparent;
+  color: #e8d28a;
+  padding: 0 10px;
+  font-size: 12px;
+}
+.ios-meta-list { padding-left: 18px; color: #c9d0e6; font-size: 14px; }
+.ios-placeholder { padding: 24px 8px; }
+.ios-placeholder h2 { color: #e8d28a; }
+.ios-legacy-return {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: 10px;
+  z-index: 80;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #d4af37;
+  background: rgba(10,9,19,0.92);
+  color: #e8d28a;
+  font-family: inherit;
+  font-weight: 600;
+}
+.hidden { display: none !important; }
+.zh { font-family: "PingFang SC", "Songti SC", "Noto Serif SC", serif; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
