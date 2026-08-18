@@ -4,6 +4,11 @@
 import { IOS_BUILD } from './flags.js';
 import { el, clear } from './ui.js';
 import { mountLibrary } from './library-view.js';
+import { mountNotes } from './notes-view.js';
+import { mountLearn } from './learn-view.js';
+import { mountCompare } from './compare-view.js';
+import { buildSampleResult } from './sample-case.js';
+import { upsertCitation } from './notes.js';
 import './ios.css';
 
 const TABS = [
@@ -15,14 +20,6 @@ const TABS = [
 ];
 
 let _state = { tab: 'library' };
-
-function placeholder(title, blurb) {
-  return el('div', { class: 'ios-placeholder' }, [
-    el('h2', { text: title }),
-    el('p', { class: 'ios-muted', text: blurb }),
-    el('p', { class: 'ios-muted tiny', text: 'Đang hoàn thiện trong sprint tiếp theo — không có tính năng giả.' }),
-  ]);
-}
 
 export async function initIosShell() {
   if (!IOS_BUILD) return;
@@ -69,7 +66,6 @@ export async function initIosShell() {
     tablist.appendChild(btn);
   }
 
-  // Keyboard arrows on tablist
   tablist.addEventListener('keydown', (ev) => {
     if (ev.key !== 'ArrowRight' && ev.key !== 'ArrowLeft') return;
     const ids = TABS.map((t) => t.id);
@@ -92,65 +88,80 @@ export async function initIosShell() {
       }
       panelNodes[t.id].hidden = !on;
     }
-    try {
-      if (window.Capacitor?.Plugins?.Haptics?.selectionChanged) {
-        await window.Capacitor.Plugins.Haptics.selectionChanged();
-      }
-    } catch { /* ignore */ }
     await ensurePanel(id);
+  }
+
+  function mountLab(p) {
+    clear(p);
+    const { pillars, sample } = buildSampleResult();
+    p.appendChild(el('div', { class: 'ios-placeholder' }, [
+      el('h2', { text: 'Chart Lab' }),
+      el('p', { class: 'ios-muted', text: 'Case study Bát Tự — không phải màn hình mở app. Không cần nhập ngày sinh để xem mẫu.' }),
+      el('div', { class: 'ios-day-card' }, [
+        el('p', { class: 'ios-section-label', text: 'CASE MẪU' }),
+        el('p', { text: sample.label }),
+        el('p', { class: 'zh', text: pillars }),
+        el('p', { class: 'ios-muted tiny', text: 'Tứ trụ dựng bằng engine chart.js (xác định).' }),
+      ]),
+      el('button', {
+        type: 'button',
+        class: 'ios-btn-primary',
+        text: 'Mở Chart Lab đầy đủ với case mẫu',
+        onClick: () => {
+          const date = document.getElementById('date');
+          const time = document.getElementById('time');
+          const gNam = document.getElementById('g-nam');
+          if (date) date.value = '1990-06-15';
+          if (time) time.value = '10:00';
+          if (gNam) gNam.checked = true;
+          document.body.classList.remove('ios-shell-active');
+          document.body.classList.add('ios-legacy-visible');
+          const form = document.getElementById('birth-form');
+          if (form && typeof form.requestSubmit === 'function') form.requestSubmit();
+          else form?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+          let back = document.getElementById('ios-legacy-return');
+          if (!back) {
+            back = el('button', {
+              id: 'ios-legacy-return',
+              type: 'button',
+              class: 'ios-legacy-return',
+              text: '← Vỏ nghiên cứu',
+              onClick: () => {
+                document.body.classList.add('ios-shell-active');
+                document.body.classList.remove('ios-legacy-visible');
+                selectTab('library');
+              },
+            });
+            document.body.appendChild(back);
+          }
+        },
+      }),
+    ]));
   }
 
   async function ensurePanel(id) {
     const p = panelNodes[id];
-    if (p.dataset.ready === '1' && id !== 'library') return;
-    if (id === 'library') {
-      if (p.dataset.ready === '1') return;
-      await mountLibrary(p, {});
+    if (id === 'notes') {
+      await mountNotes(p);
       p.dataset.ready = '1';
       return;
     }
-    clear(p);
-    if (id === 'study') p.appendChild(placeholder('Học', 'Lộ trình học theo cổ bản sẽ mở ở sprint S2.'));
-    else if (id === 'compare') p.appendChild(placeholder('Đối chiếu', 'So sánh hai nguồn / trường phái sẽ mở ở sprint S2.'));
-    else if (id === 'notes') p.appendChild(placeholder('Ghi chú', 'Trích dẫn đã lưu sẽ quản lý đầy đủ ở sprint S2. Nút «Lưu trích dẫn» trong Thư viện đã ghi localStorage.'));
-    else if (id === 'lab') {
-      p.appendChild(el('div', { class: 'ios-placeholder' }, [
-        el('h2', { text: 'Chart Lab' }),
-        el('p', { class: 'ios-muted', text: 'Bàn dựng lá số Bát Tự dùng làm case study — không phải màn hình mở app.' }),
-        el('p', { class: 'ios-muted tiny', text: 'Case mẫu + mở app luận mệnh sẽ nối ở sprint S2. Hiện có thể hiện app cũ thủ công.' }),
-        el('button', {
-          type: 'button',
-          class: 'ios-btn-primary',
-          text: 'Hiện Chart Lab (app Bát Tự)',
-          onClick: () => {
-            document.body.classList.remove('ios-shell-active');
-            document.body.classList.add('ios-legacy-visible');
-            let back = document.getElementById('ios-legacy-return');
-            if (!back) {
-              back = el('button', {
-                id: 'ios-legacy-return',
-                type: 'button',
-                class: 'ios-legacy-return',
-                text: '← Vỏ nghiên cứu',
-                onClick: () => {
-                  document.body.classList.add('ios-shell-active');
-                  document.body.classList.remove('ios-legacy-visible');
-                  selectTab('library');
-                },
-              });
-              document.body.appendChild(back);
-            }
-          },
-        }),
-      ]));
-    }
+    if (p.dataset.ready === '1') return;
+    if (id === 'library') {
+      await mountLibrary(p, {
+        onSaveCitation: (entry) => {
+          upsertCitation(entry);
+          const btns = p.querySelectorAll('.ios-btn-primary');
+          btns.forEach((btn) => {
+            if (/Lưu trích dẫn|Đã lưu/.test(btn.textContent || '')) btn.textContent = 'Đã lưu trích dẫn';
+          });
+        },
+      });
+    } else if (id === 'study') await mountLearn(p);
+    else if (id === 'compare') await mountCompare(p);
+    else if (id === 'lab') mountLab(p);
     p.dataset.ready = '1';
   }
 
   await ensurePanel('library');
-}
-
-export function revealLegacyApp() {
-  document.body.classList.remove('ios-shell-active');
-  document.body.classList.add('ios-legacy-visible');
 }

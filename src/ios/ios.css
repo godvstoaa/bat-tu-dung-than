@@ -211,6 +211,14 @@ body.ios-legacy-visible #ios-root { display: none !important; }
   font-weight: 600;
 }
 .hidden { display: none !important; }
+.ios-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 520px) {
+  .ios-compare-grid { grid-template-columns: 1fr; }
+}
 .zh { font-family: "PingFang SC", "Songti SC", "Noto Serif SC", serif; }
 
 @media (prefers-reduced-motion: reduce) {
