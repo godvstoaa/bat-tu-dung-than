@@ -3,6 +3,9 @@ node_modules/
 
 # Build output
 dist/
+dist-ios/
+public/corpus/
+test-results/
 
 # Test screenshots
 verify-shots/
@@ -37,9 +40,10 @@ public/kinh/
 public/sitemap-kinh.xml
 
 # Capacitor native projects (regenerated on each machine via `npx cap add ios|android`)
-# KHÔNG commit ios/ — signing/machine-specific. Mac sẽ `npx cap add ios` lại.
-ios/
-android/
+# Anchor `/` — KHÔNG nuốt src/ios/ hay resources/ios/
+# KHÔNG commit /ios/ — signing/machine-specific. Mac sẽ `npx cap add ios` lại.
+/ios/
+/android/
 
 # App Store submission assets (generated, ~9MB, giữ local)
 appstore-shots/

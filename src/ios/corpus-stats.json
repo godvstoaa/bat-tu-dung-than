@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "source": "src/engine/daozang-data.js",
+  "generatedBy": "scripts/build-corpus.mjs",
+  "note": "Sinh tự động — KHÔNG sửa tay. Mọi số liệu công bố (app/App Store) phải lấy từ file này.",
+  "total": 1523,
+  "buCount": 125,
+  "layers": [
+    "daozang"
+  ],
+  "withDzNumber": 758,
+  "withSources": 1523,
+  "certainty": {
+    "high": 1349,
+    "partial": 155,
+    "low": 19
+  },
+  "thresholds": {
+    "han_text": 20,
+    "deep_essence": 100,
+    "logic_chain": 40,
+    "full_vn": 200
+  },
+  "nonEmpty": {
+    "han_text": 1487,
+    "meaning": 1523,
+    "use": 1523,
+    "deep_essence": 1367,
+    "deep_passages": 1367,
+    "deep_application": 1367,
+    "deep_related": 1367,
+    "logic_thesis": 1516,
+    "logic_chain": 1516,
+    "logic_practice": 1516,
+    "logic_compare": 1516,
+    "full_vn": 1314,
+    "sources": 1523,
+    "notes": 1523
+  },
+  "substantive": {
+    "han_text": 497,
+    "deep_essence": 1357,
+    "logic_chain": 1516,
+    "full_vn": 1313
+  },
+  "contentHash": "eed2b25b028b971c"
+}

@@ -1,7 +1,7 @@
 {
-  "appId": "shop.god8.battu",
+  "appId": "shop.god8.lvdang",
   "appName": "Lữ Đăng",
-  "webDir": "dist",
+  "webDir": "dist-ios",
   "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https"
@@ -9,18 +9,26 @@
   "ios": {
     "contentInset": "always",
     "backgroundColor": "#0a0913",
-    "scrollEnabled": true
+    "scrollEnabled": true,
+    "preferredContentMode": "mobile"
   },
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 1000,
+      "launchShowDuration": 900,
       "backgroundColor": "#0a0913",
-      "showSpinner": false
+      "showSpinner": false,
+      "fadeInDuration": 150,
+      "fadeOutDuration": 300
     },
     "Keyboard": {
       "resize": "body",
       "style": "DARK",
       "resizeOnFullScreen": true
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0a0913",
+      "overlaysWebView": false
     }
   }
 }

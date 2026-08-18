@@ -10,7 +10,12 @@
     "preview": "vite preview",
     "test": "node selftest.mjs",
     "deploy": "rm -rf dist && node scripts/build-seo-pages.mjs && vite build && npx wrangler deploy",
-    "deploy:worker": "npx wrangler deploy"
+    "deploy:worker": "npx wrangler deploy",
+    "build:corpus": "node scripts/build-corpus.mjs",
+    "build:ios": "node scripts/build-corpus.mjs && vite build --mode ios && node scripts/ios-postbuild.mjs",
+    "verify:ios": "node scripts/verify-ios-build.mjs",
+    "cap:ios": "npm run build:ios && npx cap sync ios",
+    "preview:ios": "vite preview --outDir dist-ios --host 127.0.0.1 --port 5174"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.1",
