@@ -64,6 +64,26 @@ async function main() {
   ok(await page.locator('#ios-tab-library').getAttribute('aria-selected') === 'true', 'Thư viện mặc định');
   ok(!(await page.locator('header.hero').isVisible()), 'hero web ẩn khi shell active');
 
+  // Audit: chip filter không được chồng bounding box
+  const overlap = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll('.ios-chip-row')];
+    const bad = [];
+    for (const row of rows) {
+      const chips = [...row.querySelectorAll('.ios-filter-chip')];
+      for (let i = 0; i < chips.length; i++) {
+        const a = chips[i].getBoundingClientRect();
+        if (a.width < 8 || a.height < 8) bad.push('chip quá nhỏ');
+        for (let j = i + 1; j < chips.length; j++) {
+          const b = chips[j].getBoundingClientRect();
+          const hit = !(a.right <= b.left + 0.5 || b.right <= a.left + 0.5 || a.bottom <= b.top + 0.5 || b.bottom <= a.top + 0.5);
+          if (hit) bad.push(`${chips[i].textContent.trim()} ∩ ${chips[j].textContent.trim()}`);
+        }
+      }
+    }
+    return bad;
+  });
+  ok(overlap.length === 0, overlap.length ? `chip chồng: ${overlap.slice(0, 3).join(' | ')}` : 'chip filter không chồng nhau');
+
   await page.screenshot({ path: path.join(SHOTS, 'ios-01-library.png') });
 
   await page.fill('#ios-lib-q', '穷通宝鉴');

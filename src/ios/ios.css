@@ -90,7 +90,7 @@ body.ios-legacy-visible #ios-root { display: none !important; }
   font-size: 16px;
   font-family: inherit;
 }
-.ios-btn-ghost, .ios-btn-copy, .ios-btn-primary, .ios-back, .ios-filter-chip, .ios-list-item, .ios-subtab {
+.ios-btn-ghost, .ios-btn-copy, .ios-btn-primary, .ios-back, .ios-list-item, .ios-subtab {
   min-height: 44px;
   min-width: 44px;
   font-family: inherit;
@@ -115,17 +115,65 @@ body.ios-legacy-visible #ios-root { display: none !important; }
   color: #1a1408;
   font-weight: 600;
 }
-.ios-chip-row { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-.ios-filter-chip, .ios-chip {
+/* Chip hàng ngang: KHÔNG shrink → tránh chữ chồng như ảnh audit */
+.ios-chip-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 2px 10px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.45) transparent;
+}
+.ios-chip-row::-webkit-scrollbar { height: 4px; }
+.ios-chip-row::-webkit-scrollbar-track { background: transparent; }
+.ios-chip-row::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.4);
+  border-radius: 4px;
+}
+.ios-filter-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: none;
+  min-width: 44px;
+  min-height: 40px;
+  margin: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.08);
+  color: #c9d0e6;
+  padding: 0 14px;
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1.2;
+  white-space: nowrap;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.ios-chip {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(255,255,255,0.06);
   color: #c9d0e6;
-  padding: 0 12px;
-  font-size: 13px;
+  padding: 4px 10px;
+  font-size: 12px;
   white-space: nowrap;
+  line-height: 1.2;
 }
-.ios-filter-chip.active { border-color: #d4af37; color: #e8d28a; }
+.ios-filter-chip.active { border-color: #d4af37; color: #e8d28a; background: rgba(212,175,55,0.14); }
 .ios-day-card {
   margin-top: 8px;
   padding: 14px;

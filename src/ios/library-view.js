@@ -45,6 +45,14 @@ export async function mountLibrary(host, ctx = {}) {
   let debounce = null;
 
   const chips = collectChips(items);
+  const TOPIC_VI = {
+    cultivation: 'Tu luyện', ritual: 'Khoa nghi', classic: 'Kinh điển',
+    biography: 'Tiên truyện', alchemy: 'Đan đạo', ethics: 'Giới luật',
+    liturgy: 'Khoa nghi', scripture: 'Kinh điển', history: 'Sử chí',
+    medicine: 'Y đạo', talisman: 'Phù lục', cosmology: 'Vũ trụ luận',
+  };
+  const labelOf = (name) => TOPIC_VI[name] || name;
+
   const paintChips = (row, pairs, kind) => {
     clear(row);
     for (const [name, n] of pairs) {
@@ -53,7 +61,8 @@ export async function mountLibrary(host, ctx = {}) {
         class: 'ios-filter-chip',
         role: 'checkbox',
         'aria-checked': 'false',
-        text: `${name} ${n}`,
+        text: `${labelOf(name)} ${n}`,
+        title: name,
         onClick: () => {
           if (kind === 'bu') filterBu = filterBu === name ? '' : name;
           else filterTopic = filterTopic === name ? '' : name;
@@ -123,14 +132,14 @@ export async function mountLibrary(host, ctx = {}) {
   }
 
   function sync() {
-    // update chip aria
+    // update chip aria — khớp theo title (id gốc), không theo nhãn đã dịch
     [...chipsBu.children].forEach((b) => {
-      const name = b.textContent.replace(/\s+\d+$/, '');
+      const name = b.getAttribute('title') || b.textContent.replace(/\s+\d+$/, '');
       b.setAttribute('aria-checked', filterBu === name ? 'true' : 'false');
       b.classList.toggle('active', filterBu === name);
     });
     [...chipsTopic.children].forEach((b) => {
-      const name = b.textContent.replace(/\s+\d+$/, '');
+      const name = b.getAttribute('title') || b.textContent.replace(/\s+\d+$/, '');
       b.setAttribute('aria-checked', filterTopic === name ? 'true' : 'false');
       b.classList.toggle('active', filterTopic === name);
     });
