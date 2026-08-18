@@ -1,22 +1,22 @@
 // ============================================================================
-//  shell.js — bàn thầy: Hồ sơ (mặc định) · Bàn · So sánh · Thư viện
+//  shell.js — Án (mặc định) · Nghiệm · Thư viện
 // ============================================================================
 import { el, clear } from './ui.js';
 import { mountLibrary } from './library-view.js';
-import { mountCases } from './cases-view.js';
-import { mountCase } from './case-view.js';
-import { mountCompareCases } from './compare-cases-view.js';
+import { mountAn } from './an-view.js';
+import { mountNghiem } from './nghiem-view.js';
 import { upsertCitation } from './notes.js';
+import { SAMPLE_AN_ID } from './family-cases.js';
 import './ios.css';
 
 const TABS = [
-  { id: 'cases', label: 'Hồ sơ', icon: '🗂' },
-  { id: 'desk', label: 'Bàn', icon: '🧮' },
-  { id: 'compare', label: 'So sánh', icon: '⚖' },
-  { id: 'library', label: 'Thư viện', icon: '📚' },
+  { id: 'an', label: 'Án', icon: '家系' },
+  { id: 'nghiem', label: 'Nghiệm', icon: '校正' },
+  { id: 'library', label: 'Thư viện', icon: '出典' },
 ];
 
-let _state = { tab: 'cases', caseId: 'sample-1990' };
+let _state = { tab: 'an', anId: SAMPLE_AN_ID };
+let _libApi = null;
 
 export async function initIosShell() {
   document.body.classList.add('ios-shell-active');
@@ -42,7 +42,7 @@ export async function initIosShell() {
       class: 'ios-panel',
       role: 'tabpanel',
       'aria-labelledby': `ios-tab-${t.id}`,
-      hidden: t.id !== 'cases',
+      hidden: t.id !== 'an',
     });
     panelNodes[t.id] = p;
     panels.appendChild(p);
@@ -50,9 +50,9 @@ export async function initIosShell() {
     const btn = el('button', {
       id: `ios-tab-${t.id}`,
       type: 'button',
-      class: 'ios-tab' + (t.id === 'cases' ? ' active' : ''),
+      class: 'ios-tab' + (t.id === 'an' ? ' active' : ''),
       role: 'tab',
-      'aria-selected': t.id === 'cases' ? 'true' : 'false',
+      'aria-selected': t.id === 'an' ? 'true' : 'false',
       'aria-controls': `ios-panel-${t.id}`,
       onClick: () => selectTab(t.id),
     }, [
@@ -73,13 +73,11 @@ export async function initIosShell() {
 
   root.append(panels, tablist);
 
-  function openClassic(q) {
-    selectTab('library').then(() => {
-      const input = document.getElementById('ios-lib-q');
-      if (!input) return;
-      input.value = q;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-    });
+  async function openCite(row) {
+    await selectTab('library');
+    if (_libApi && row?.sid) {
+      await _libApi.showReader(row.sid, { highlight: row.quote, panel: row.panel });
+    }
   }
 
   async function selectTab(id) {
@@ -98,30 +96,24 @@ export async function initIosShell() {
 
   async function ensurePanel(id, force) {
     const p = panelNodes[id];
-    if (!force && p.dataset.ready === '1' && id !== 'desk' && id !== 'compare' && id !== 'cases') return;
+    if (!force && p.dataset.ready === '1' && id !== 'nghiem' && id !== 'an') return;
 
-    if (id === 'cases') {
-      mountCases(p, {
-        onOpenCase: (caseId) => {
-          _state.caseId = caseId;
-          selectTab('desk');
+    if (id === 'an') {
+      mountAn(p, {
+        onOpenAn: (anId) => {
+          _state.anId = anId;
+          selectTab('nghiem');
         },
       });
-    } else if (id === 'desk') {
-      await mountCase(p, {
-        caseId: _state.caseId,
-        onBackList: () => selectTab('cases'),
-        onOpenClassic: openClassic,
-      });
-    } else if (id === 'compare') {
-      await mountCompareCases(p, {
-        caseA: 'sample-1990',
-        caseB: 'sample-1985',
-        onOpenClassic: openClassic,
+    } else if (id === 'nghiem') {
+      await mountNghiem(p, {
+        anId: _state.anId,
+        onBackList: () => selectTab('an'),
+        onOpenCite: openCite,
       });
     } else if (id === 'library') {
-      if (p.dataset.ready === '1') return;
-      await mountLibrary(p, {
+      if (p.dataset.ready === '1' && _libApi) return;
+      _libApi = await mountLibrary(p, {
         onSaveCitation: (entry) => {
           upsertCitation(entry);
           const btns = p.querySelectorAll('.ios-btn-primary');
@@ -134,5 +126,5 @@ export async function initIosShell() {
     p.dataset.ready = '1';
   }
 
-  await ensurePanel('cases', true);
+  await ensurePanel('an', true);
 }

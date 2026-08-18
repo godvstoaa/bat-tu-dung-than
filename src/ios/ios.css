@@ -335,6 +335,49 @@
   .ios-compare-grid { grid-template-columns: 1fr; }
 }
 .zh { font-family: "PingFang SC", "Songti SC", "Noto Serif SC", serif; }
+.ios-an-people { margin-top: 8px; }
+.ios-check-row { flex-direction: row !important; align-items: center; gap: 10px; }
+.ios-check-row input { width: 20px; height: 20px; }
+.ios-radial {
+  margin: 12px 0;
+  padding: 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(212,175,55,0.22);
+  background: radial-gradient(circle at 50% 45%, rgba(232,210,138,0.08), rgba(10,9,19,0.4));
+}
+.ios-evidence { margin: 10px 0 4px; }
+.ios-evidence-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.ios-pillar-line { font-size: 16px; color: #e8d28a; }
+.ios-quote {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-left: 3px solid #d4af37;
+  background: rgba(212,175,55,0.08);
+  color: #e8d28a;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.ios-best-hour td { color: #e8d28a; font-weight: 600; }
+.ios-radar-wrap { margin-top: 12px; }
+.ios-cite-hit {
+  background: rgba(232,210,138,0.35);
+  color: #fff6d2;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+details.ios-lab-block summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: #e8d28a;
+  cursor: pointer;
+}
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }

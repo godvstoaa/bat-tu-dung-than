@@ -21,9 +21,9 @@ if (!fs.existsSync(indexHtml)) {
 }
 
 fs.writeFileSync(path.join(OUT, 'manifest.webmanifest'), JSON.stringify({
-  name: 'Lữ Đăng — Bàn thầy cổ pháp',
+  name: 'Lữ Đăng — Hiệu chỉnh giờ',
   short_name: 'Lữ Đăng',
-  description: 'Sổ hồ sơ mệnh lý Tử Bình: mở case, bảng Tứ Trụ / thập thần / dụng thần / đại vận, đối chiếu hai lá, trích dẫn Đạo Tạng. Tính trên thiết bị.',
+  description: 'Nghiệm chứng gia tộc · 校正时辰: mở án, xếp 12 giờ theo nhất quán cụm, mỗi dòng sổ cái nhảy tới đoạn kinh trên máy.',
   lang: 'vi',
   dir: 'ltr',
   start_url: '/?source=pwa',

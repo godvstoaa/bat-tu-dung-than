@@ -12,7 +12,7 @@ export async function mountLibrary(host, ctx = {}) {
 
   const header = el('header', { class: 'ios-lib-head' }, [
     el('h1', { text: 'Lữ Đăng' }),
-    el('p', { class: 'ios-muted', text: 'Kho trích dẫn 1523 kinh — mở từ bàn tính, không phải màn hình mở app' }),
+    el('p', { class: 'ios-muted', text: 'Tòa trích dẫn — mở đoạn kinh từ sổ cái nghiệm, không phải màn hình mở app' }),
   ]);
   const qInput = el('input', {
     id: 'ios-lib-q',
@@ -96,10 +96,12 @@ export async function mountLibrary(host, ctx = {}) {
     );
   }
 
-  async function showReader(sid) {
+  async function showReader(sid, extra = {}) {
     root.querySelectorAll('.ios-lib > :not(.ios-reader-host)').forEach((n) => n.classList.add('hidden'));
     readerHost.classList.remove('hidden');
     await openReader(readerHost, sid, {
+      highlight: extra.highlight || '',
+      panel: extra.panel || 'summary',
       onBack: () => {
         clear(readerHost);
         readerHost.classList.add('hidden');

@@ -47,8 +47,9 @@ if (fs.existsSync(indexPath)) {
 const html = fs.readFileSync(path.join(OUT, 'index.html'), 'utf8');
 check(!/fonts\.googleapis\.com/.test(html), 'không còn request Google Fonts');
 check(!/id="birth-form"|id="ai-fab"|class="hero"/.test(html), 'HTML không còn hero / form / FAB web');
-check(/Bàn thầy|hồ sơ|cổ pháp/i.test(html), 'title/description bàn thầy');
+check(/Hiệu chỉnh giờ|校正时辰|án gia tộc/i.test(html), 'title/description hiệu chỉnh giờ');
 check(!/luận mệnh/i.test(html), 'HTML không còn «luận mệnh»');
+check(!/sổ hồ sơ mệnh lý|Lập lá số|Giải Mệnh/i.test(html), 'HTML không còn chrome diễn giải mệnh');
 check(!/data-ios-hide/.test(html), 'không dùng data-ios-hide (xoá, không ẩn)');
 
 const manPath = path.join(OUT, 'manifest.webmanifest');
@@ -56,7 +57,7 @@ check(fs.existsSync(manPath), 'manifest.webmanifest có mặt');
 if (fs.existsSync(manPath)) {
   const man = fs.readFileSync(manPath, 'utf8');
   check(!/luận mệnh/i.test(man), 'manifest không còn «luận mệnh»');
-  check(/hồ sơ|bàn thầy|cổ pháp/i.test(man), 'manifest nói bàn thầy / hồ sơ');
+  check(/Hiệu chỉnh giờ|校正时辰|gia tộc/i.test(man), 'manifest nói hiệu chỉnh giờ / gia tộc');
 }
 
 let js = '';
