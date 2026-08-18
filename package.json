@@ -12,7 +12,7 @@
     "deploy": "rm -rf dist && node scripts/build-seo-pages.mjs && vite build && npx wrangler deploy",
     "deploy:worker": "npx wrangler deploy",
     "build:corpus": "node scripts/build-corpus.mjs",
-    "build:ios": "node scripts/build-corpus.mjs && vite build --mode ios && node scripts/ios-postbuild.mjs",
+    "build:ios": "node scripts/build-corpus.mjs && node scripts/ios-clean-outdir.mjs && vite build --mode ios && node scripts/ios-postbuild.mjs",
     "verify:ios": "node scripts/verify-ios-build.mjs",
     "verify:ios-path": "node scripts/verify-ios-review-path.mjs",
     "cap:ios": "npm run build:ios && npx cap sync ios",

@@ -11,6 +11,7 @@ import { DITIANSUI, DITIANSUI_HEZHI, DITIANSUI_TONGLUN, YONGSHEN_METHOD, ZIPING_
 import { SHENSHA_INFO } from './shensha.js';
 import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
+import { RESEARCH_SYSTEM_PROMPT } from '../ios/research-prompt.js';
 import { assessGufa, mangpaiKoujue, hetuReading } from './gufa-engine.js'; // [round 31] CO PHAP + [R39] 盲派金口诀 + [R40] 河图洛书
 import { assessHuangji } from './huangji-engine.js'; // [round 34] 皇极经世 值年卦 (prophetic/cam ky)
 import { assessTaiyi } from './taiyi-engine.js'; // [round 36] 太乙神数 (quoc van, tam thuc cam ky)
@@ -1568,7 +1569,10 @@ export function execTool(name, args, R) {
         return { input: ev.input, lastDigit: ev.lastDigit, lastWxVi: ev.lastWxVi, sum81: ev.sum81, luckVi: ev.luckVi, dungMatch: ev.dungMatch, kyMatch: ev.kyMatch, dungCount: ev.dungCount, kyCount: ev.kyCount, score: ev.score, rating: ev.rating, advice: _s(ev.advice, 320), favNums: rec.favNums, avoidNums: rec.avoidNums, goodCombos: rec.goodCombos };
       }
       case 'analyze_day': {
-        const d = analyzeLiuRi(R, a.year, a.month, a.day, R.patternQuality);
+        // [AUDIT v3] validate year giống analyze_year — chống năm vô lý (vd 99999) lọt vào engine
+        const _dy = Number(a.year);
+        if (!Number.isFinite(_dy) || _dy < 1000 || _dy > 3000) return { error: 'Năm không hợp lệ («' + (a.year ?? '') + '» — phải 1000-3000) cho tool analyze_day.' };
+        const d = analyzeLiuRi(R, _dy, a.month, a.day, R.patternQuality);
         // [loop 1102] thêm phương vị财神/喜神/福神 (từ dailyGuide) — AI trả lời «hướng tài/hỷ hôm nay»
         let _dirs = null;
         try { const g = dailyGuide(R, a.year, a.month, a.day); _dirs = { cai: g.caishen, xi: g.xishen, fu: g.fushen, best: g.bestDir }; } catch (_) {}
@@ -2184,7 +2188,7 @@ export function execTool(name, args, R) {
 }
 
 function toolLabel(name) {
-  // [loop 558 FIX BUG8] đầy đủ 14 tool — trước đây chỉ 7, tool còn lại hiện tên kỹ thuật.
+  // [AUDIT v3] đủ 38/38 tool — status stream hiện nhãn Việt cho mọi tool (trước đây 22/38 hiện tên kỹ thuật).
   return ({
     get_current_time: 'Lấy thời gian', analyze_day: 'Luận lưu ngày', analyze_year: 'Luận lưu năm',
     best_days_in_year: 'Tìm ngày tốt cả năm', life_trajectory: 'Quỹ tích đời', analyze_month: 'Luận lưu tháng',
@@ -2192,6 +2196,13 @@ function toolLabel(name) {
     inverse_bazi: 'Tìm bát tự ngược', analyze_char: '测字 (châm tự)', analyze_meihua: 'Gieo quẻ梅花',
     analyze_liuren: 'Đại lục nhâm', analyze_qimen: 'Kỳ môn độn giáp', analyze_guiguzi: 'Quỷ cốc tử',
     analyze_relative: 'Phân tích người thân', fengshui_direction: 'La bàn phong thủy',
+    health_q: 'Đông y — hỏi bệnh', health_hour: 'Kinh mạch giờ', health_profile: 'Profile tạng phủ',
+    health_today: 'Đông y hôm nay', evaluate_number: 'Xét số lý', analyze_gufa: 'Cổ pháp珞琭子',
+    analyze_huangji: 'Hoàng cực kinh thế', analyze_taiyi: 'Thái ất thần số', analyze_chenggu: 'Xưng cốt',
+    analyze_wuyun: 'Ngũ vận lục khí', analyze_appearance: 'Diện mạo bát tự', analyze_western: 'Tây phương chiêm',
+    analyze_synthesis: 'Tổng hợp sơ đồ', analyze_tarot: 'Tarot', analyze_numerology: 'Số học Pythagoras',
+    analyze_rune: 'Runes', analyze_iching: 'Kinh Dịch 64 quẻ', analyze_coffee: 'Xem cặn cà phê',
+    analyze_name: 'Luận tên ngũ cách', analyze_remedy_fate: 'Cải mệnh 3 tầng', log_error: 'Ghi nhận lỗi',
   })[name] || name;
 }
 
@@ -2415,7 +2426,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
     : '== HƯỚNG DẪN TRẢ LỜI ==\nQUAN TRỌNG: Thông tin lá số ĐÃ CÓ ĐỦ trong context trên. Khi user hỏi về Nhật Chủ, Dụng Thần, Cách Cục, Đại Vận, Lưu Niên, Thập Thần, Ngũ Hành, Tương Tác, Thần Sát, Nạp Âm, Mệnh Cung, Tài Khố... → TRẢ LỜI TRỰC TIẾP từ context, KHÔNG gọi tool. CHỈ gọi tool khi: (1) hỏi NGÀY CỤ THỂ tốt/xấu → find_good_days/best_days_in_year; (2) hỏi VỀ 1 NĂM cụ thể → analyze_year; (3) xem quẻ (梅花/六壬/奇门) → tool tương ứng; (4) hỏi người thân → analyze_relative; (5) hướng/phong thủy → fengshui_direction; (6) giờ tốt hôm nay → analyze_best_hour.';
 
   const messages = [
-    { role: 'system', content: SYSTEM_PROMPT },
+    { role: 'system', content: (import.meta.env?.MODE === 'ios' ? RESEARCH_SYSTEM_PROMPT : SYSTEM_PROMPT) },
     { role: 'system', content: brief + '\n\n' + _guide + '\n\n' + _ANTI_MANIP_GUIDE },
     { role: 'system', content: (STYLE_DIRECTIVES[style] || STYLE_DIRECTIVES['gan-guoi']) + '\n\n⚠ REMEMBER THIS STYLE WHEN ANSWERING — áp dụng cho Câu trả lời này.' },
     ...((history || []).slice(-8)),
@@ -2458,7 +2469,10 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   };
   try {
     for (let step = 0; step < 6 && totalAttempts < 9; step++, totalAttempts++) {
-      if (Date.now() - _tStart > 180000) return _bail('⏱ Luận giải trực tuyến trả lời quá lâu (>3 phút)');
+      // [FIX NO-CUT — user yêu cầu KHÔNG BAO GIỜ cắt câu trả lời] Đã XÓA total-duration bail 180s
+      //   (trước đây cắt oan câu dài đang stream đều → «⏱ quá lâu» + BỊ CẤT trong log).
+      //   Van an toàn giờ là: idle timeout mỗi round (chỉ bắn khi stream CHẾT thật — không chunk)
+      //   + nút ⏹ Dừng của user. Câu đang chảy → chờ tới hết, không giới hạn tổng thời gian.
       let round;
       try {
         round = await streamRound(url, headers, buildBody(messages, toolsOn, thinkOn), onToken, onStatus, signal);
@@ -2557,15 +2571,25 @@ function _reasonStageLabel(reasonLen) {
 // ---- 1 vòng streaming SSE: gom content (→ onToken) + tool_calls + bỏ qua reasoning_content ----
 // Theo docs Z.ai (interleaved thinking + stream tool call).
 async function streamRound(url, headers, body, onToken, onStatus, signal) {
-  // [loop 1370] TTFT(25s) + idle(30s) timeout — flat 12s cũ cắt prompt nặng + answer dài giữa dòng.
-  //   25s chờ token ĐẦU (brief BaZi nặng cần thời gian xử lý). Chunk đầu → idle 30s/giữa chunk
-  //   → answer dài stream hết, stall thì abort → fallback. Fix «signal timed out» câu thật.
+  // [loop 1370 + NO-CUT] TTFT 75s + idle adaptive (45s/90s) — chỉ bắn khi stream CHẾT thật (không chunk nào).
+  //   Câu đang stream đều → KHÔNG BAO GIỜ bị cắt bởi thời gian (user yêu cầu no-cut).
+  //   Van an toàn: idle = kết nối chết; nút ⏹ Dừng = user chủ động.
   const _ac = new AbortController();
-  var _timer = setTimeout(function () { _ac.abort(); }, 45000); // [loop 1394] 45s TTFT — brief 20K tokens
-  function _resetIdle() { clearTimeout(_timer); _timer = setTimeout(function () { _ac.abort(); }, 30000); }
+  var _timer = setTimeout(function () { _ac.abort(); }, 75000); // [loop 1394 + NO-CUT] 75s TTFT — brief 20K tokens cần process, không cắt sớm
+  function _resetIdle() { clearTimeout(_timer); _timer = setTimeout(function () { _ac.abort(); }, (typeof full === 'string' && full.length > 200) ? 90000 : 45000); }
   const _sig = signal ? AbortSignal.any([signal, _ac.signal]) : _ac.signal;
   try {
-  const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal: _sig });
+  // [FIX LOG-ERRORS] retry 1 lần khi MẠNG giật (Load failed / Failed to fetch / NetworkError)
+  //   TRƯỚC khi stream bắt đầu — trước đây 1 cú mất mạng là dump về local (error «Load failed» trong log).
+  var res;
+  for (var _att = 0; _att < 2; _att++) {
+    try { res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal: _sig }); break; }
+    catch (_fe) {
+      var _net = /Failed to fetch|NetworkError|Load failed/i.test(_fe && _fe.message || '');
+      if (_net && _att === 0 && !(signal && signal.aborted)) { try { onStatus && onStatus('Mạng giật — đang thử lại…'); } catch (_) {} await new Promise(function (r) { setTimeout(r, 800); }); continue; }
+      throw _fe;
+    }
+  }
   if (res.status === 503) { // [admin loop 1351] AI bị admin tắt → fallback local NGAY (không retry)
     const err = new Error('Luận giải trực tuyến bị tắt bởi quản trị viên');
     err.aiDisabled = true;

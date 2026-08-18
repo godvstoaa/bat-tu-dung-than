@@ -51,10 +51,20 @@ if (fs.existsSync(statsPath)) {
   check(st.total === indexTotal, `corpus-stats.json khớp index (${st.total})`);
 }
 
-const html = fs.readFileSync(path.join(OUT, 'index.html'), 'utf8');
-check(!/fonts\.googleapis\.com/.test(html), 'không còn request Google Fonts');
-check(!/application\/ld\+json/.test(html), 'không còn JSON-LD structured data');
-check(/Lữ Đăng|Cổ Pháp|Chart Lab|tra cứu/i.test(html), 'title/description research-oriented');
+  const html = fs.readFileSync(path.join(OUT, 'index.html'), 'utf8');
+  check(!/fonts\.googleapis\.com/.test(html), 'không còn request Google Fonts');
+  check(!/application\/ld\+json/.test(html), 'không còn JSON-LD structured data');
+  check(/Lữ Đăng|Cổ Pháp|Chart Lab|tra cứu/i.test(html), 'title/description research-oriented');
+  check(/data-ios-hide/.test(html), 'HTML có data-ios-hide cho module bói');
+
+  let js = '';
+  const assets = path.join(OUT, 'assets');
+  for (const f of fs.readdirSync(assets).filter((x) => x.endsWith('.js'))) {
+    js += fs.readFileSync(path.join(assets, f), 'utf8') + '\n';
+  }
+  check(!js.includes('/api/inbox'), 'không chunk nào còn URL /api/inbox');
+  check(js.includes('RESEARCH') || js.includes('TRỢ LÝ NGHIÊN CỨU') || js.includes('trợ lý nghiên cứu'), 'có prompt/persona nghiên cứu');
+  check(js.includes('hasChart'), 'payload chart dùng cờ hasChart');
 
 const mb = dirSizeMB(OUT);
 console.log(`  INFO  dist-ios: ${mb} MB`);

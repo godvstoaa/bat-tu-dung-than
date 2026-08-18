@@ -4638,7 +4638,11 @@ async function run() {
   //   R.synthesis.score = điểm mệnh cách 0-100 (đã tính sẵn cho mỗi lá số).
   try {
     const _s = currentResult.synthesis || {};
-    _logEvent('chart', { dob: dateVal, time: timeVal, gender: gender, score: (_s.score != null ? _s.score : null), grade: _s.gradeVi || null, fortune: _s.fortuneVi || null, percentile: (_s.percentile != null ? _s.percentile : null), patternQ: (currentResult.patternQuality && currentResult.patternQuality.quality) || null, strong: !!(currentResult.strength && currentResult.strength.strong), yong: (currentResult.yong && currentResult.yong.primary) || null, ...(nameVal ? { name: nameVal } : {}) });
+    if (import.meta.env.MODE === 'ios') {
+      _logEvent('chart', { hasChart: true, hasName: !!nameVal, score: (_s.score != null ? _s.score : null), grade: _s.gradeVi || null, percentile: (_s.percentile != null ? _s.percentile : null), patternQ: (currentResult.patternQuality && currentResult.patternQuality.quality) || null, strong: !!(currentResult.strength && currentResult.strength.strong), yong: (currentResult.yong && currentResult.yong.primary) || null });
+    } else {
+      _logEvent('chart', { dob: dateVal, time: timeVal, gender: gender, score: (_s.score != null ? _s.score : null), grade: _s.gradeVi || null, fortune: _s.fortuneVi || null, percentile: (_s.percentile != null ? _s.percentile : null), patternQ: (currentResult.patternQuality && currentResult.patternQuality.quality) || null, strong: !!(currentResult.strength && currentResult.strength.strong), yong: (currentResult.yong && currentResult.yong.primary) || null, ...(nameVal ? { name: nameVal } : {}) });
+    }
   } catch (e) {}
   const c = currentResult.chart;
   // [loop 915] DỤNG THẦN THEME — đổi accent màu app theo Dụng Thần (may mắn)
@@ -6418,6 +6422,12 @@ $('cfg-test').addEventListener('click', async () => {
 //   «Nghịch Thiên Cải Mệnh» (empowerment: «mệnh do ta tạo», KHÔNG kết cục) thay vì chỉ «luận giải».
 //   Đồng bộ ngưỡng với callout tổng luận (< 46). Đọc currentResult — chưa có lá số → mặc định «Giải Mệnh».
 function chatBrand() {
+  if (import.meta.env.MODE === 'ios') {
+    return {
+      vi: 'Trợ lý Nghiên cứu', zh: '研究助手', short: 'Nghiên cứu',
+      greet: '📜 Xin chào. Tôi là trợ lý nghiên cứu cổ pháp — ưu tiên trích dẫn nguồn, nêu tiền đề và giới hạn dữ liệu. Hỏi về kinh điển, chuỗi lập luận, hoặc case Chart Lab.',
+    };
+  }
   const _s = (currentResult && currentResult.synthesis) || {};
   const low = typeof _s.score === 'number' && _s.score < 46;
   if (low) return {
