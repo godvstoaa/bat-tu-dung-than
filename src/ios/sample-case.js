@@ -1,7 +1,7 @@
 // ============================================================================
-//  sample-case.js — case Chart Lab mẫu xác định
+//  sample-case.js — case studio mẫu (không gọi analyze() đầy đủ)
 // ============================================================================
-import { analyze } from '../engine/chart.js';
+import { analyzeStudio } from './studio-analyze.js';
 
 export const SAMPLE = {
   year: 1990, month: 6, day: 15, hour: 10, minute: 0, gender: 'nam',
@@ -9,8 +9,6 @@ export const SAMPLE = {
 };
 
 export function buildSampleResult() {
-  const R = analyze(SAMPLE.year, SAMPLE.month, SAMPLE.day, SAMPLE.hour, SAMPLE.minute, SAMPLE.gender);
-  const p = R.chart.pillars;
-  const pillars = `${p.year.gan}${p.year.zhi} ${p.month.gan}${p.month.zhi} ${p.day.gan}${p.day.zhi} ${p.time.gan}${p.time.zhi}`;
-  return { R, pillars, sample: SAMPLE };
+  const R = analyzeStudio(SAMPLE);
+  return { R, pillars: R.pillars, sample: SAMPLE };
 }

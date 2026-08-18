@@ -3,28 +3,13 @@
   position: fixed;
   inset: 0;
   z-index: 50;
-  display: none;
+  display: flex;
   flex-direction: column;
   background: #0a0913;
   color: #eef1f8;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Songti SC", "Helvetica Neue", sans-serif;
 }
-body.ios-shell-active #ios-root,
 #ios-root { display: flex !important; }
-body:not(.ios-legacy-visible) > header.hero,
-body:not(.ios-legacy-visible) > .container,
-body:not(.ios-legacy-visible) > #chat-fab,
-body:not(.ios-legacy-visible) > #chat-panel,
-body:not(.ios-legacy-visible) > .bg-glow,
-body:not(.ios-legacy-visible) > .bg-clouds,
-body:not(.ios-legacy-visible) > .bg-grain,
-body:not(.ios-legacy-visible) > #mote-field,
-body:not(.ios-legacy-visible) > footer,
-body:not(.ios-legacy-visible) > #ai-fab,
-body:not(.ios-legacy-visible) > #ai-popup {
-  display: none !important;
-}
-body.ios-legacy-visible #ios-root { display: none !important; }
 
 .ios-panels {
   flex: 1;
@@ -279,6 +264,24 @@ body.ios-legacy-visible #ios-root { display: none !important; }
 .ios-meta-list { padding-left: 18px; color: #c9d0e6; font-size: 14px; }
 .ios-placeholder { padding: 24px 8px; }
 .ios-placeholder h2 { color: #e8d28a; }
+.ios-case-row { display: flex; gap: 8px; align-items: stretch; }
+.ios-case-row .ios-list-item { flex: 1; }
+.ios-case-name { font-weight: 600; }
+.ios-cite { margin: 0 0 12px; }
+.ios-cite-ref {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 6px 10px;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(212,175,55,0.35);
+  background: transparent;
+  color: #e8d28a;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.ios-cases h1 { margin: 0; font-size: 26px; color: #e8d28a; }
 .ios-lab h2 { color: #e8d28a; margin: 0 0 8px; }
 .ios-lab-form {
   display: grid;

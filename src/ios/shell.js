@@ -1,28 +1,24 @@
 // ============================================================================
-//  shell.js — tab bar research-first (chỉ mount khi --mode ios)
+//  shell.js — bàn thầy: Hồ sơ (mặc định) · Bàn · So sánh · Thư viện
 // ============================================================================
-import { IOS_BUILD } from './flags.js';
 import { el, clear } from './ui.js';
 import { mountLibrary } from './library-view.js';
-import { mountNotes } from './notes-view.js';
-import { mountLearn } from './learn-view.js';
-import { mountCompare } from './compare-view.js';
-import { mountLab } from './lab-view.js';
+import { mountCases } from './cases-view.js';
+import { mountCase } from './case-view.js';
+import { mountCompareCases } from './compare-cases-view.js';
 import { upsertCitation } from './notes.js';
 import './ios.css';
 
 const TABS = [
+  { id: 'cases', label: 'Hồ sơ', icon: '🗂' },
+  { id: 'desk', label: 'Bàn', icon: '🧮' },
+  { id: 'compare', label: 'So sánh', icon: '⚖' },
   { id: 'library', label: 'Thư viện', icon: '📚' },
-  { id: 'study', label: 'Học', icon: '🎓' },
-  { id: 'compare', label: 'Đối chiếu', icon: '⚖' },
-  { id: 'notes', label: 'Ghi chú', icon: '🔖' },
-  { id: 'lab', label: 'Chart Lab', icon: '🧪' },
 ];
 
-let _state = { tab: 'library' };
+let _state = { tab: 'cases', caseId: 'sample-1990' };
 
 export async function initIosShell() {
-  if (!IOS_BUILD) return;
   document.body.classList.add('ios-shell-active');
 
   let root = document.getElementById('ios-root');
@@ -46,7 +42,7 @@ export async function initIosShell() {
       class: 'ios-panel',
       role: 'tabpanel',
       'aria-labelledby': `ios-tab-${t.id}`,
-      hidden: t.id !== 'library',
+      hidden: t.id !== 'cases',
     });
     panelNodes[t.id] = p;
     panels.appendChild(p);
@@ -54,9 +50,9 @@ export async function initIosShell() {
     const btn = el('button', {
       id: `ios-tab-${t.id}`,
       type: 'button',
-      class: 'ios-tab' + (t.id === 'library' ? ' active' : ''),
+      class: 'ios-tab' + (t.id === 'cases' ? ' active' : ''),
       role: 'tab',
-      'aria-selected': t.id === 'library' ? 'true' : 'false',
+      'aria-selected': t.id === 'cases' ? 'true' : 'false',
       'aria-controls': `ios-panel-${t.id}`,
       onClick: () => selectTab(t.id),
     }, [
@@ -77,6 +73,15 @@ export async function initIosShell() {
 
   root.append(panels, tablist);
 
+  function openClassic(q) {
+    selectTab('library').then(() => {
+      const input = document.getElementById('ios-lib-q');
+      if (!input) return;
+      input.value = q;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  }
+
   async function selectTab(id) {
     _state.tab = id;
     for (const t of TABS) {
@@ -88,18 +93,34 @@ export async function initIosShell() {
       }
       panelNodes[t.id].hidden = !on;
     }
-    await ensurePanel(id);
+    await ensurePanel(id, true);
   }
 
-  async function ensurePanel(id) {
+  async function ensurePanel(id, force) {
     const p = panelNodes[id];
-    if (id === 'notes') {
-      await mountNotes(p);
-      p.dataset.ready = '1';
-      return;
-    }
-    if (p.dataset.ready === '1') return;
-    if (id === 'library') {
+    if (!force && p.dataset.ready === '1' && id !== 'desk' && id !== 'compare' && id !== 'cases') return;
+
+    if (id === 'cases') {
+      mountCases(p, {
+        onOpenCase: (caseId) => {
+          _state.caseId = caseId;
+          selectTab('desk');
+        },
+      });
+    } else if (id === 'desk') {
+      await mountCase(p, {
+        caseId: _state.caseId,
+        onBackList: () => selectTab('cases'),
+        onOpenClassic: openClassic,
+      });
+    } else if (id === 'compare') {
+      await mountCompareCases(p, {
+        caseA: 'sample-1990',
+        caseB: 'sample-1985',
+        onOpenClassic: openClassic,
+      });
+    } else if (id === 'library') {
+      if (p.dataset.ready === '1') return;
       await mountLibrary(p, {
         onSaveCitation: (entry) => {
           upsertCitation(entry);
@@ -109,22 +130,9 @@ export async function initIosShell() {
           });
         },
       });
-    } else if (id === 'study') await mountLearn(p);
-    else if (id === 'compare') await mountCompare(p);
-    else if (id === 'lab') {
-      mountLab(p, {
-        onOpenClassic: (q) => {
-          selectTab('library').then(() => {
-            const input = document.getElementById('ios-lib-q');
-            if (!input) return;
-            input.value = q;
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-          });
-        },
-      });
     }
     p.dataset.ready = '1';
   }
 
-  await ensurePanel('library');
+  await ensurePanel('cases', true);
 }

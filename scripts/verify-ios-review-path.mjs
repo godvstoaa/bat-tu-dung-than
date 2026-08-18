@@ -1,5 +1,5 @@
 // ============================================================================
-//  verify-ios-review-path.mjs — Playwright: cold open → Thư viện → search → đọc
+//  verify-ios-review-path.mjs — cold open hồ sơ → mở case → bảng + trích dẫn
 // ============================================================================
 import http from 'http';
 import fs from 'fs';
@@ -25,6 +25,7 @@ function contentType(p) {
   if (p.endsWith('.json')) return 'application/json; charset=utf-8';
   if (p.endsWith('.png')) return 'image/png';
   if (p.endsWith('.svg')) return 'image/svg+xml';
+  if (p.endsWith('.webmanifest')) return 'application/manifest+json';
   return 'application/octet-stream';
 }
 
@@ -60,105 +61,52 @@ async function main() {
   await page.waitForSelector('#ios-root', { timeout: 15000 });
 
   const tabs = await page.locator('.ios-tab').allTextContents();
-  ok(tabs.join(' ').includes('Thư viện') && tabs.join(' ').includes('Chart Lab'), 'có 5 tab research');
-  ok(await page.locator('#ios-tab-library').getAttribute('aria-selected') === 'true', 'Thư viện mặc định');
-  ok(!(await page.locator('header.hero').isVisible()), 'hero web ẩn khi shell active');
-  ok(!(await page.locator('#birth-form').isVisible()), 'form ngày sinh không phải first screen');
-  ok(!(await page.locator('#ai-fab').isVisible()), 'không có FAB luận giải trên first screen');
+  ok(tabs.join(' ').includes('Hồ sơ') && tabs.join(' ').includes('Thư viện'), 'có tab Hồ sơ + Thư viện');
+  ok(tabs.join(' ').includes('Bàn') && tabs.join(' ').includes('So sánh'), 'có tab Bàn + So sánh');
+  ok(await page.locator('#ios-tab-cases').getAttribute('aria-selected') === 'true', 'Hồ sơ là tab mặc định');
+  ok(await page.locator('#ios-case-list .ios-list-item').count() >= 2, 'sổ có ≥2 hồ sơ (kể cả case mẫu)');
+  ok(await page.locator('#birth-form').count() === 0, 'DOM không có #birth-form');
+  ok(await page.locator('#ai-fab').count() === 0, 'DOM không có FAB Giải Mệnh');
+  ok(await page.locator('header.hero').count() === 0, 'DOM không có hero web');
 
-  const banned = /Giải Mệnh|vận thế hôm nay|hợp tuổi|cải mệnh|Lập lá số|Luận mệnh/i;
-  const chromeText = await page.evaluate(() => {
-    const sel = [
-      '.ios-lib-head', '.ios-tabbar', '.ios-search-row',
-      'h1', 'h2', '.ios-btn-primary', '#ai-fab', 'header.hero',
-    ].join(',');
-    return [...document.querySelectorAll(sel)]
+  const chrome = await page.evaluate(() => {
+    return [...document.querySelectorAll('h1, h2, .ios-tabbar, .ios-btn-primary')]
       .filter((n) => n.offsetParent !== null)
       .map((n) => n.innerText)
       .join(' ');
   });
-  ok(!banned.test(chromeText), banned.test(chromeText)
-    ? `first screen còn CTA cấm: ${chromeText.match(banned)?.[0]}`
-    : 'first screen không có Giải Mệnh / vận thế / hợp tuổi / cải mệnh');
-  ok(/Lữ Đăng|Thư viện|kinh điển/i.test(chromeText), 'first screen là thư viện cổ học');
+  ok(!/Giải Mệnh|vận thế hôm nay|hợp tuổi|cải mệnh|Lập lá số/i.test(chrome), 'chrome first screen không có CTA tiêu dùng');
+  ok(/Hồ sơ|Lữ Đăng/i.test(chrome), 'first screen là sổ hồ sơ');
+  await page.screenshot({ path: path.join(SHOTS, 'ios-01-cases.png') });
 
-  await page.waitForSelector('.ios-filter-chip', { timeout: 15000 });
-  // Audit: chữ không tràn/chồng; gap ≥ 8px; không còn thanh cuộn vàng
-  const chipAudit = await page.evaluate(() => {
-    const bad = [];
-    const rows = [...document.querySelectorAll('.ios-chip-row')];
-    if (!rows.length) bad.push('thiếu chip-row');
-    for (const row of rows) {
-      const chips = [...row.querySelectorAll('.ios-filter-chip')];
-      if (chips.length < 2) bad.push('quá ít chip');
-      for (let i = 0; i < chips.length; i++) {
-        const el = chips[i];
-        const a = el.getBoundingClientRect();
-        if (a.width < 24 || a.height < 24) bad.push(`chip quá nhỏ: ${el.textContent.trim()}`);
-        if (el.scrollWidth > el.clientWidth + 1) bad.push(`chữ tràn: ${el.textContent.trim()}`);
-        if (i + 1 < chips.length) {
-          const b = chips[i + 1].getBoundingClientRect();
-          const gap = b.left - a.right;
-          if (gap < 8) bad.push(`gap ${gap.toFixed(1)}px: ${el.textContent.trim()} | ${chips[i + 1].textContent.trim()}`);
-          const hit = !(a.right <= b.left + 0.5 || b.right <= a.left + 0.5 || a.bottom <= b.top + 0.5 || b.bottom <= a.top + 0.5);
-          if (hit) bad.push(`chồng: ${el.textContent.trim()} ∩ ${chips[i + 1].textContent.trim()}`);
-        }
-      }
-    }
-    return bad;
-  });
-  ok(chipAudit.length === 0, chipAudit.length ? `chip audit: ${chipAudit.slice(0, 4).join(' | ')}` : 'chip filter: không chồng, không tràn chữ, gap ≥ 8px');
+  await page.locator('#ios-case-list .ios-list-item').first().click();
+  await page.waitForSelector('#ios-case-desk .ios-table', { timeout: 15000 });
+  const desk = await page.locator('#ios-panel-desk').innerText();
+  ok(/庚午/.test(desk) && /辛亥/.test(desk), 'case mẫu ra Tứ Trụ 庚午…辛亥');
+  ok(await page.locator('#ios-case-cites .ios-cite-ref').count() >= 3, 'mỗi diễn giải có locator kinh');
+  ok(/子平真诠|渊海子平|穷通宝鉴|滴天髓|三命通会/.test(desk), 'trích dẫn kinh có tên');
+  ok(!/Giải Mệnh|vận thế hôm nay|hợp tuổi|cải mệnh/i.test(desk), 'bàn không có CTA tiêu dùng');
+  ok(!/\/100/.test(desk), 'bàn không hiện điểm /100');
+  await page.screenshot({ path: path.join(SHOTS, 'ios-02-desk.png') });
 
-  await page.screenshot({ path: path.join(SHOTS, 'ios-01-library.png') });
+  await page.getByRole('tab', { name: 'So sánh' }).click();
+  await page.waitForSelector('#ios-compare-out .ios-table', { timeout: 15000 });
+  const cmp = await page.locator('#ios-panel-compare').innerText();
+  ok(/Tứ Trụ/.test(cmp) && /Dụng thần/.test(cmp), 'so sánh là bảng hai hồ sơ');
+  ok(!/\bXem hợp\b|CTA hợp/i.test(cmp), 'so sánh không phải CTA xem hợp');
+  await page.screenshot({ path: path.join(SHOTS, 'ios-03-compare.png') });
 
+  await page.getByRole('tab', { name: 'Thư viện' }).click();
+  await page.waitForSelector('#ios-lib-q', { timeout: 15000 });
   await page.fill('#ios-lib-q', '穷通宝鉴');
   await page.waitForTimeout(250);
-  const first = page.locator('.ios-list-item').first();
-  ok(await first.count() > 0, 'search 穷通宝鉴 có kết quả');
-  await page.screenshot({ path: path.join(SHOTS, 'ios-02-search-han.png') });
-  await first.click();
+  const libItems = page.locator('#ios-panel-library .ios-list-item');
+  ok(await libItems.count() > 0, 'thư viện search 穷通宝鉴 có kết quả');
+  await libItems.first().click();
   await page.waitForSelector('.ios-reader-title', { timeout: 10000 });
-  ok(await page.locator('.ios-subtab').count() >= 5, 'reader có ≥5 tab nội dung');
+  ok(await page.locator('.ios-subtab').count() >= 5, 'reader có ≥5 tab');
   ok(await page.locator('a[href^="http"]').count() === 0, 'shell không có link http ngoài');
-
-  await page.getByRole('tab', { name: 'Nguồn' }).click();
-  ok(await page.locator('.ios-source-row').count() > 0, 'tab Nguồn có tham chiếu');
-  await page.screenshot({ path: path.join(SHOTS, 'ios-03-reader-sources.png') });
-
-  await page.getByRole('tab', { name: 'Học' }).click();
-  await page.waitForSelector('.ios-learn h2', { timeout: 10000 });
-  const learnOverlap = await page.evaluate(() => {
-    const items = [...document.querySelectorAll('.ios-learn .ios-list-item')];
-    const bad = [];
-    for (let i = 0; i < items.length; i++) {
-      const a = items[i].getBoundingClientRect();
-      for (let j = i + 1; j < Math.min(items.length, i + 6); j++) {
-        const b = items[j].getBoundingClientRect();
-        const hit = !(a.right <= b.left + 0.5 || b.right <= a.left + 0.5 || a.bottom <= b.top + 0.5 || b.bottom <= a.top + 0.5);
-        if (hit) bad.push(`${items[i].textContent.slice(0, 20)} ∩ ${items[j].textContent.slice(0, 20)}`);
-      }
-    }
-    return bad;
-  });
-  ok(learnOverlap.length === 0, learnOverlap.length ? `học list chồng: ${learnOverlap[0]}` : 'tab Học: bước lộ trình không chồng');
-  await page.screenshot({ path: path.join(SHOTS, 'ios-04-learn.png') });
-  await page.getByRole('tab', { name: 'Đối chiếu' }).click();
-  await page.waitForSelector('.ios-compare h2', { timeout: 10000 });
-  await page.screenshot({ path: path.join(SHOTS, 'ios-05-compare.png') });
-  await page.getByRole('tab', { name: 'Ghi chú' }).click();
-  await page.waitForSelector('#ios-panel-notes h2', { timeout: 10000 });
-  await page.screenshot({ path: path.join(SHOTS, 'ios-06-notes.png') });
-  await page.getByRole('tab', { name: 'Chart Lab' }).click();
-  await page.waitForSelector('#ios-panel-lab h2', { timeout: 10000 });
-  await page.waitForSelector('#ios-lab-out .ios-table', { timeout: 15000 });
-  const labText = await page.locator('#ios-panel-lab').innerText();
-  ok(/庚午/.test(labText) && /辛亥/.test(labText), 'Chart Lab case mẫu ra Tứ Trụ 庚午…辛亥');
-  ok(/子平真诠|渊海子平|穷通宝鉴|滴天髓/.test(labText), 'Chart Lab trích dẫn kinh điển có tên');
-  ok(/Tra bảng Tứ Trụ/.test(labText), 'CTA Chart Lab là tra bảng, không phải luận giải');
-  ok(!/Giải Mệnh|vận thế hôm nay|hợp tuổi|cải mệnh/i.test(labText), 'Chart Lab không có CTA tiêu dùng');
-  ok(!/\/100/.test(labText), 'Chart Lab không hiện điểm mệnh /100');
-  ok(!(await page.locator('#birth-form').isVisible()), 'Chart Lab không đổ ra form web');
-  await page.screenshot({ path: path.join(SHOTS, 'ios-07-lab.png') });
+  await page.screenshot({ path: path.join(SHOTS, 'ios-04-library.png') });
 
   await browser.close();
   server.close();

@@ -12,8 +12,8 @@ npm run cap:ios       # Mac: sync Xcode
 ## Output
 `dist-ios/` ~18–20 MB, corpus 1523 entries, đã prune `review/`, `kinh/`, `downloads/`.
 
-## Preview trên Windows
-Browser xem shell research-first. Notch/font Apple thật cần TestFlight/simulator.
+## Preview
+Browser: cold open = sổ hồ sơ (không form luận giải, không thư viện giả). Notch/font Apple thật cần TestFlight/simulator.
 
 ## Xcode
 - Bundle: `shop.god8.battu` (cùng listing App Store — không đổi bundle / không app thứ hai)

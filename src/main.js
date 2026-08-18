@@ -8004,9 +8004,4 @@ fetch(_apiUrl('/api/ai-config')).then(function (r) { return r.json(); }).then(fu
 
 // [REMOVED] showVipModal + payment/redeem/IAP — gỡ cho App Store (app free, AI unlimited)
 
-// iOS research shell — chỉ khi vite --mode ios
-if (import.meta.env.MODE === 'ios') {
-  import('./ios/shell.js')
-    .then((m) => m.initIosShell())
-    .catch((e) => console.error('[ios-shell]', e));
-}
+// iOS studio entry is src/ios/app.js (ios-app.html) — không nhúng shell vào bundle web.
