@@ -26,6 +26,7 @@ export async function mountLearn(host) {
         el('h3', { text: p.title }),
         el('p', { class: 'ios-muted', text: `${p.okCount}/${p.steps.length} bước tra được` + (p.broken ? ` · ${p.broken} thiếu` : '') }),
       ]);
+      const steps = el('div', { class: 'ios-list' });
       p.steps.forEach((st, i) => {
         const btn = el('button', {
           type: 'button',
@@ -52,8 +53,9 @@ export async function mountLearn(host) {
             });
           },
         });
-        card.appendChild(btn);
+        steps.appendChild(btn);
       });
+      card.appendChild(steps);
       listHost.appendChild(card);
     }
   };

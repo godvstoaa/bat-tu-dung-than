@@ -64,25 +64,32 @@ async function main() {
   ok(await page.locator('#ios-tab-library').getAttribute('aria-selected') === 'true', 'Thư viện mặc định');
   ok(!(await page.locator('header.hero').isVisible()), 'hero web ẩn khi shell active');
 
-  // Audit: chip filter không được chồng bounding box
-  const overlap = await page.evaluate(() => {
-    const rows = [...document.querySelectorAll('.ios-chip-row')];
+  await page.waitForSelector('.ios-filter-chip', { timeout: 15000 });
+  // Audit: chữ không tràn/chồng; gap ≥ 8px; không còn thanh cuộn vàng
+  const chipAudit = await page.evaluate(() => {
     const bad = [];
+    const rows = [...document.querySelectorAll('.ios-chip-row')];
+    if (!rows.length) bad.push('thiếu chip-row');
     for (const row of rows) {
       const chips = [...row.querySelectorAll('.ios-filter-chip')];
+      if (chips.length < 2) bad.push('quá ít chip');
       for (let i = 0; i < chips.length; i++) {
-        const a = chips[i].getBoundingClientRect();
-        if (a.width < 8 || a.height < 8) bad.push('chip quá nhỏ');
-        for (let j = i + 1; j < chips.length; j++) {
-          const b = chips[j].getBoundingClientRect();
+        const el = chips[i];
+        const a = el.getBoundingClientRect();
+        if (a.width < 24 || a.height < 24) bad.push(`chip quá nhỏ: ${el.textContent.trim()}`);
+        if (el.scrollWidth > el.clientWidth + 1) bad.push(`chữ tràn: ${el.textContent.trim()}`);
+        if (i + 1 < chips.length) {
+          const b = chips[i + 1].getBoundingClientRect();
+          const gap = b.left - a.right;
+          if (gap < 8) bad.push(`gap ${gap.toFixed(1)}px: ${el.textContent.trim()} | ${chips[i + 1].textContent.trim()}`);
           const hit = !(a.right <= b.left + 0.5 || b.right <= a.left + 0.5 || a.bottom <= b.top + 0.5 || b.bottom <= a.top + 0.5);
-          if (hit) bad.push(`${chips[i].textContent.trim()} ∩ ${chips[j].textContent.trim()}`);
+          if (hit) bad.push(`chồng: ${el.textContent.trim()} ∩ ${chips[i + 1].textContent.trim()}`);
         }
       }
     }
     return bad;
   });
-  ok(overlap.length === 0, overlap.length ? `chip chồng: ${overlap.slice(0, 3).join(' | ')}` : 'chip filter không chồng nhau');
+  ok(chipAudit.length === 0, chipAudit.length ? `chip audit: ${chipAudit.slice(0, 4).join(' | ')}` : 'chip filter: không chồng, không tràn chữ, gap ≥ 8px');
 
   await page.screenshot({ path: path.join(SHOTS, 'ios-01-library.png') });
 
@@ -99,6 +106,33 @@ async function main() {
   await page.getByRole('tab', { name: 'Nguồn' }).click();
   ok(await page.locator('.ios-source-row').count() > 0, 'tab Nguồn có tham chiếu');
   await page.screenshot({ path: path.join(SHOTS, 'ios-03-reader-sources.png') });
+
+  await page.getByRole('tab', { name: 'Học' }).click();
+  await page.waitForSelector('.ios-learn h2', { timeout: 10000 });
+  const learnOverlap = await page.evaluate(() => {
+    const items = [...document.querySelectorAll('.ios-learn .ios-list-item')];
+    const bad = [];
+    for (let i = 0; i < items.length; i++) {
+      const a = items[i].getBoundingClientRect();
+      for (let j = i + 1; j < Math.min(items.length, i + 6); j++) {
+        const b = items[j].getBoundingClientRect();
+        const hit = !(a.right <= b.left + 0.5 || b.right <= a.left + 0.5 || a.bottom <= b.top + 0.5 || b.bottom <= a.top + 0.5);
+        if (hit) bad.push(`${items[i].textContent.slice(0, 20)} ∩ ${items[j].textContent.slice(0, 20)}`);
+      }
+    }
+    return bad;
+  });
+  ok(learnOverlap.length === 0, learnOverlap.length ? `học list chồng: ${learnOverlap[0]}` : 'tab Học: bước lộ trình không chồng');
+  await page.screenshot({ path: path.join(SHOTS, 'ios-04-learn.png') });
+  await page.getByRole('tab', { name: 'Đối chiếu' }).click();
+  await page.waitForSelector('.ios-compare h2', { timeout: 10000 });
+  await page.screenshot({ path: path.join(SHOTS, 'ios-05-compare.png') });
+  await page.getByRole('tab', { name: 'Ghi chú' }).click();
+  await page.waitForSelector('#ios-panel-notes h2', { timeout: 10000 });
+  await page.screenshot({ path: path.join(SHOTS, 'ios-06-notes.png') });
+  await page.getByRole('tab', { name: 'Chart Lab' }).click();
+  await page.waitForSelector('#ios-panel-lab h2', { timeout: 10000 });
+  await page.screenshot({ path: path.join(SHOTS, 'ios-07-lab.png') });
 
   await browser.close();
   server.close();

@@ -72,12 +72,13 @@ body.ios-legacy-visible #ios-root { display: none !important; }
 .ios-muted { color: #9aa3bf; font-size: 14px; margin: 6px 0; }
 .ios-muted.tiny { font-size: 12px; }
 .ios-section-label {
-  margin: 14px 0 8px;
+  margin: 20px 0 10px;
   font-size: 11px;
   letter-spacing: 0.08em;
   color: #9aa3bf;
   font-weight: 600;
 }
+.ios-search-row + .ios-section-label { margin-top: 18px; }
 .ios-search-row { display: flex; gap: 8px; margin-top: 12px; }
 .ios-search {
   flex: 1;
@@ -115,36 +116,43 @@ body.ios-legacy-visible #ios-root { display: none !important; }
   color: #1a1408;
   font-weight: 600;
 }
-/* Chip hàng ngang: KHÔNG shrink → tránh chữ chồng như ảnh audit */
-.ios-chip-row {
+/* Chip hàng ngang: không shrink; chặn scrollbar vàng global (`* { scrollbar-color }`) */
+#ios-root,
+#ios-root * {
+  scrollbar-width: none !important;
+  scrollbar-color: transparent transparent !important;
+}
+#ios-root *::-webkit-scrollbar,
+#ios-root *::-webkit-scrollbar-thumb,
+#ios-root *::-webkit-scrollbar-track {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+#ios-root .ios-chip-row {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 4px 2px 10px;
+  padding: 2px 0 8px;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(212, 175, 55, 0.45) transparent;
 }
-.ios-chip-row::-webkit-scrollbar { height: 4px; }
-.ios-chip-row::-webkit-scrollbar-track { background: transparent; }
-.ios-chip-row::-webkit-scrollbar-thumb {
-  background: rgba(212, 175, 55, 0.4);
-  border-radius: 4px;
-}
-.ios-filter-chip {
+#ios-root .ios-filter-chip {
+  all: unset;
+  box-sizing: border-box;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
   width: max-content;
   max-width: none;
   min-width: 44px;
   min-height: 40px;
   margin: 0;
+  overflow: hidden;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(255,255,255,0.08);
@@ -157,8 +165,7 @@ body.ios-legacy-visible #ios-root { display: none !important; }
   position: relative;
   z-index: 1;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .ios-chip {
   display: inline-flex;
@@ -173,7 +180,11 @@ body.ios-legacy-visible #ios-root { display: none !important; }
   white-space: nowrap;
   line-height: 1.2;
 }
-.ios-filter-chip.active { border-color: #d4af37; color: #e8d28a; background: rgba(212,175,55,0.14); }
+#ios-root .ios-filter-chip.active {
+  border-color: #d4af37;
+  color: #e8d28a;
+  background: rgba(212,175,55,0.14);
+}
 .ios-day-card {
   margin-top: 8px;
   padding: 14px;
@@ -184,8 +195,13 @@ body.ios-legacy-visible #ios-root { display: none !important; }
 .ios-day-card .zh { font-size: 22px; margin: 4px 0; }
 .ios-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
 .ios-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-.ios-list-item {
+#ios-root .ios-list-item {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   text-align: left;
+  white-space: normal;
+  overflow: hidden;
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(0,0,0,0.22);
@@ -204,8 +220,21 @@ body.ios-legacy-visible #ios-root { display: none !important; }
   padding: 0 4px;
   font-size: 15px;
 }
-.ios-subtabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
-.ios-subtab {
+.ios-subtabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin: 10px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0 6px;
+  -webkit-overflow-scrolling: touch;
+}
+#ios-root .ios-subtab {
+  flex: 0 0 auto;
+  width: max-content;
+  white-space: nowrap;
+  overflow: hidden;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.05);
@@ -213,7 +242,12 @@ body.ios-legacy-visible #ios-root { display: none !important; }
   padding: 0 12px;
   font-size: 13px;
 }
-.ios-subtab.active { background: #d4af37; color: #1a1408; border-color: transparent; font-weight: 600; }
+#ios-root .ios-subtab.active {
+  background: #d4af37;
+  color: #1a1408;
+  border-color: transparent;
+  font-weight: 600;
+}
 .ios-block { margin: 0 0 14px; }
 .ios-block h4 { margin: 0 0 6px; color: #e8d28a; font-size: 14px; }
 .ios-prose { margin: 0; line-height: 1.65; white-space: pre-wrap; font-size: 15px; }

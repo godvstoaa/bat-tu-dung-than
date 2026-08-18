@@ -3,6 +3,7 @@
 // ============================================================================
 export function el(tag, attrs = {}, children = []) {
   const n = document.createElement(tag);
+  if (tag === 'button' || tag === 'textarea') n.setAttribute('spellcheck', 'false');
   for (const [k, v] of Object.entries(attrs)) {
     if (k === 'class') n.className = v;
     else if (k === 'text') n.textContent = v;
