@@ -1,6 +1,6 @@
 // ============================================================================
-//  cite.js — chỉ hiện câu khi tìm được đoạn THẬT trong 5 kinh ưu tiên
-//  Không dán câu soạn sẵn lên bìa sách.
+//  cite.js — mỗi trục engine ↔ một đoạn kinh đã kiểm trên máy
+//  Không chấm điểm từ khóa. Không citeLine.
 // ============================================================================
 import { loadIndex, loadEntry } from './corpus.js';
 
@@ -18,31 +18,31 @@ const FIELD_PANEL = {
   full_vn: 'translation',
   meaning: 'summary',
   deep_essence: 'summary',
-  deep_application: 'summary',
-  use: 'summary',
   logic_thesis: 'reasoning',
   logic_chain: 'reasoning',
   logic_practice: 'reasoning',
-  logic_compare: 'reasoning',
 };
 
-const TEXT_FIELDS = [
-  'deep_passages', 'han_text', 'deep_essence', 'full_vn', 'meaning',
-  'logic_thesis', 'logic_chain', 'logic_practice', 'logic_compare',
-  'deep_application', 'use',
-];
-
-const THEME_NEEDLES = {
-  reciprocity: ['十神', '日干', '日主', '财官', '印食', 'Nhật', 'thập thần', 'Tài', 'Quan', 'Ấn', '日干为主'],
-  palace: ['月令', '四柱', '提纲', 'nguyệt lệnh', 'tứ trụ', '专用日干'],
-  stem: ['冲', '合', '地支', '天干', '六合', '三合', 'xung', 'hợp'],
-  nayin: ['纳音', 'nạp âm', '六十甲子'],
-  balance: ['五行', '五气', 'ngũ hành', '中和'],
-  timing: ['大运', 'Đại Vận', 'lưu niên', '起运'],
-  hour: ['时', '四柱', 'giờ', 'ngày', '三元', '专用日干'],
+/** Một đoạn đã mở file corpus và xác nhận substring tồn tại. */
+const AXIS_PASSAGE = {
+  reciprocity: { sid: 'DZ_渊海子平', field: 'deep_passages', quote: '专用日干为主本；三元要成格局，四柱喜见财官。' },
+  palace: { sid: 'DZ_渊海子平', field: 'deep_passages', quote: '欲知贵贱，先观月令乃提纲' },
+  stem: { sid: 'DZ_渊海子平', field: 'deep_essence', quote: '天干合、地支六合三合冲刑穿' },
+  nayin: { sid: 'DZ_三命通会', field: 'deep_passages', quote: '总论纳音，论纳音取象，释六十甲子性质吉凶。' },
+  balance: { sid: 'DZ_渊海子平', field: 'deep_passages', quote: '人禀天地，命属阴阳，生居覆载之内，尽在五行之中。' },
+  timing: { sid: 'DZ_滴天髓', field: 'full_vn', quote: 'Đại Vận là dòng khí lớn mười năm' },
+  hour: { sid: 'DZ_三命通会', field: 'full_vn', quote: 'năm–tháng–ngày (và giờ) hợp thành cục' },
 };
 
-let _books = null;
+const PAIR_AXIS = {
+  reciprocity: 'reciprocity',
+  palaceForward: 'palace',
+  stemBranch: 'stem',
+  nayin: 'nayin',
+};
+
+let _ready = null;
+let _hits = null;
 
 function locator(it) {
   if (!it) return '';
@@ -51,121 +51,75 @@ function locator(it) {
   return it.sid || it.id || '';
 }
 
-function splitPassages(text) {
-  return String(text || '')
-    .split(/[｜|\n]/)
-    .flatMap((p) => p.split(/(?<=[。．.!?])\s*/))
-    .map((s) => s.trim())
-    .filter((s) => s.length >= 16 && s.toLowerCase() !== 'null');
-}
-
-function harvest(entry, meta) {
-  const rows = [];
-  for (const field of TEXT_FIELDS) {
-    const raw = String(entry[field] || '').trim();
-    if (raw.length < 16) continue;
-    const parts = field === 'deep_passages' || field === 'han_text'
-      ? splitPassages(raw)
-      : splitPassages(raw);
-    for (const passage of parts) {
-      rows.push({
-        sid: meta.sid,
-        title: meta.name_han,
-        titleVi: meta.name_vi || '',
-        locator: locator(meta),
-        field,
-        panel: FIELD_PANEL[field] || 'summary',
-        passage,
-      });
-    }
-  }
-  return rows;
-}
-
 export async function readyCite() {
-  if (_books) return _books;
+  if (_ready) return _hits;
   const idx = await loadIndex();
   const items = idx.items || [];
-  const books = [];
-  for (const sid of PREFERRED_SIDS) {
-    const meta = items.find((it) => it.sid === sid || it.id === sid);
+  const hits = {};
+  for (const [axis, spec] of Object.entries(AXIS_PASSAGE)) {
+    const meta = items.find((it) => it.sid === spec.sid || it.id === spec.sid);
     if (!meta) continue;
-    const entry = await loadEntry(sid);
-    books.push({ meta, entry, passages: harvest(entry, meta) });
+    const entry = await loadEntry(spec.sid);
+    const raw = String(entry[spec.field] || '');
+    if (!raw.includes(spec.quote)) continue;
+    hits[axis] = {
+      sid: spec.sid,
+      title: meta.name_han,
+      titleVi: meta.name_vi || '',
+      locator: locator(meta),
+      field: spec.field,
+      panel: FIELD_PANEL[spec.field] || 'summary',
+      quote: spec.quote,
+    };
   }
-  _books = books;
-  return _books;
+  _hits = hits;
+  _ready = true;
+  return _hits;
 }
 
-export function themeOf(msg) {
-  const s = String(msg || '');
-  if (/Nạp âm|nạp âm|纳音/i.test(s)) return 'nayin';
-  if (/đại vận|Đại Vận|大运/i.test(s)) return 'timing';
-  if (/Chi năm|Nhật Chi|ngũ hợp|Xung|Lục Hợp|Tam Hợp/i.test(s)) return 'stem';
-  if (/Cung |Trụ Năm|Trụ Tháng|Trụ Ngày|Trụ Giờ|宫/i.test(s)) return 'palace';
-  if (/Ngũ Hành|gia tộc|Dụng chủ thể/i.test(s)) return 'balance';
-  if (/giờ|时辰|时柱/i.test(s)) return 'hour';
-  if (/Nhật Chủ|vai trò|hành /i.test(s)) return 'reciprocity';
-  return 'reciprocity';
+export function citeTheme(axis, text) {
+  const hit = _hits && _hits[axis];
+  if (!hit || !text) return null;
+  return {
+    text,
+    quote: hit.quote,
+    title: hit.title,
+    titleVi: hit.titleVi,
+    locator: hit.locator,
+    sid: hit.sid,
+    field: hit.field,
+    panel: hit.panel,
+    axis,
+  };
 }
 
-function scorePassage(passage, needles) {
-  const hay = passage.passage;
-  let n = 0;
-  for (const k of needles) {
-    if (hay.includes(k)) n += k.length >= 4 ? 4 : 2;
-  }
-  if (passage.field === 'deep_passages' || passage.field === 'han_text') n += 3;
-  if (passage.field === 'deep_essence') n += 2;
-  return n;
+export function citeLedger(msg, axis) {
+  return citeTheme(axis, msg);
 }
 
-export function locatePassage(theme) {
-  if (!_books) return null;
-  const needles = THEME_NEEDLES[theme] || THEME_NEEDLES.reciprocity;
-  let best = null;
-  let bestN = 0;
-  for (const book of _books) {
-    for (const p of book.passages) {
-      const n = scorePassage(p, needles);
-      if (n > bestN) {
-        bestN = n;
-        best = p;
+/** Sổ cái family.js: gắn trục từ cặp / cụm, bỏ câu không có đoạn đã kiểm. */
+export function citeFamilyLedger(family) {
+  const rows = [];
+  for (const p of family.pairs || []) {
+    const axes = p.pair?.axes || {};
+    for (const [engKey, axis] of Object.entries(PAIR_AXIS)) {
+      const reasons = axes[engKey]?.reasons || [];
+      for (const msg of reasons) {
+        if (!/^[✓⚠✗]/.test(msg)) continue;
+        const row = citeTheme(axis, msg);
+        if (row) rows.push(row);
       }
     }
   }
-  if (!best || bestN < 2) return null;
-  return best;
-}
-
-export function citeLedger(msg) {
-  const hit = locatePassage(themeOf(msg));
-  if (!hit) return null;
-  return {
-    text: msg,
-    quote: hit.passage,
-    title: hit.title,
-    titleVi: hit.titleVi,
-    locator: hit.locator,
-    sid: hit.sid,
-    field: hit.field,
-    panel: hit.panel,
-  };
-}
-
-export function citeTheme(theme, fallbackText) {
-  const hit = locatePassage(theme);
-  if (!hit) return null;
-  return {
-    text: fallbackText || hit.passage,
-    quote: hit.passage,
-    title: hit.title,
-    titleVi: hit.titleVi,
-    locator: hit.locator,
-    sid: hit.sid,
-    field: hit.field,
-    panel: hit.panel,
-  };
+  for (const msg of family.familyBalance?.reasons || []) {
+    const row = citeTheme('balance', msg);
+    if (row) rows.push(row);
+  }
+  for (const msg of family.timing?.reasons || []) {
+    const row = citeTheme('timing', msg);
+    if (row) rows.push(row);
+  }
+  return rows;
 }
 
 export function citedOnly(rows) {

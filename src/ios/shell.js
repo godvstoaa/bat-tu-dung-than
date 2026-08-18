@@ -110,6 +110,7 @@ export async function initIosShell() {
         anId: _state.anId,
         onBackList: () => selectTab('an'),
         onOpenCite: openCite,
+        onTreeChanged: () => selectTab('nghiem'),
       });
     } else if (id === 'library') {
       if (p.dataset.ready === '1' && _libApi) return;

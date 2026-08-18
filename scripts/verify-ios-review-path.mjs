@@ -70,6 +70,9 @@ async function main() {
   const listText = await page.locator('#ios-an-list').innerText();
   ok(/giờ chưa rõ/.test(listText), 'án mẫu có thành viên giờ chưa rõ');
   ok(/Cha|Mẹ|Con|Chủ thể/.test(listText), 'án mẫu là cụm gia tộc');
+  ok(await page.locator('#ios-an-root input[type=date]').count() === 0, 'cold open Án không có input ngày');
+  ok(await page.locator('#ios-an-root input[type=time]').count() === 0, 'cold open Án không có input giờ');
+  ok(await page.locator('#ios-an-root input[type=radio]').count() === 0, 'cold open Án không có radio giới');
   ok(await page.locator('#birth-form').count() === 0, 'DOM không có #birth-form');
   ok(await page.locator('#ai-fab').count() === 0, 'DOM không có FAB Giải Mệnh');
   ok(await page.locator('header.hero').count() === 0, 'DOM không có hero web');

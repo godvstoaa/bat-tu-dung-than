@@ -2,9 +2,9 @@
 //  nghiem-view.js — chòm sao gia tộc + xếp 12 giờ + sổ cái có đoạn kinh thật
 // ============================================================================
 import { el, clear } from './ui.js';
-import { getAn, roleVi, memberDateLine } from './family-cases.js';
+import { getAn, addMember, ROLE_OPTS, roleVi, memberDateLine } from './family-cases.js';
 import { runCluster, runRectify } from './family-run.js';
-import { readyCite, citeLedger, citeTheme, citedOnly } from './cite.js';
+import { readyCite, citeTheme, citeFamilyLedger } from './cite.js';
 
 function svgEl(tag, attrs, children = []) {
   const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -118,6 +118,78 @@ function citeBlock(row, onOpen) {
   ]);
 }
 
+function attachNodeForm(an, ctx) {
+  const wrap = el('div', { class: 'ios-attach', id: 'ios-attach-node' });
+  const toggle = el('button', {
+    type: 'button',
+    class: 'ios-btn-ghost',
+    id: 'ios-attach-toggle',
+    text: '+ Người thân vào cây',
+  });
+  const fields = el('div', { class: 'ios-attach-fields hidden' });
+
+  const roleSel = el('select', { class: 'ios-search', 'aria-label': 'Vai trò trên cây' });
+  for (const r of ROLE_OPTS) roleSel.appendChild(el('option', { value: r.id, text: r.vi }));
+  roleSel.value = an.members?.some((m) => m.role === 'center') ? 'child' : 'center';
+  const nameIn = el('input', { type: 'text', class: 'ios-search', maxlength: '40', placeholder: 'Nhãn nút (tuỳ chọn)', 'aria-label': 'Nhãn nút' });
+  const dateIn = el('input', { type: 'date', class: 'ios-search', min: '1900-01-01', max: '2100-12-31', 'aria-label': 'Ngày (tuỳ chọn)' });
+  const timeIn = el('input', { type: 'time', class: 'ios-search', 'aria-label': 'Giờ nếu đã rõ' });
+  const unknown = el('input', { type: 'checkbox', id: 'ios-tree-hour-unknown', checked: true });
+  unknown.checked = true;
+  timeIn.disabled = true;
+  unknown.addEventListener('change', () => { timeIn.disabled = unknown.checked; });
+  const gNam = el('input', { type: 'radio', name: 'ios-tree-g', id: 'ios-tree-g-nam', value: 'nam' });
+  const gNu = el('input', { type: 'radio', name: 'ios-tree-g', id: 'ios-tree-g-nu', value: 'nu', checked: true });
+
+  fields.append(
+    el('p', { class: 'ios-muted tiny', text: 'Gắn một nút vào chòm sao. Giờ mặc định chưa rõ — sẽ vào bảng 12 时辰.' }),
+    el('div', { class: 'ios-lab-form' }, [
+      el('label', { class: 'ios-lab-field' }, [el('span', { text: 'Vai trò trên cây' }), roleSel]),
+      el('label', { class: 'ios-lab-field' }, [el('span', { text: 'Nhãn' }), nameIn]),
+      el('label', { class: 'ios-lab-field' }, [el('span', { text: 'Ngày (nếu có)' }), dateIn]),
+      el('label', { class: 'ios-lab-field' }, [el('span', { text: 'Giờ (nếu rõ)' }), timeIn]),
+      el('div', { class: 'ios-lab-field' }, [
+        el('span', { text: 'Giới' }),
+        el('div', { class: 'ios-lab-seg' }, [
+          gNam, el('label', { for: 'ios-tree-g-nam', text: 'Nam' }),
+          gNu, el('label', { for: 'ios-tree-g-nu', text: 'Nữ' }),
+        ]),
+      ]),
+      el('label', { class: 'ios-lab-field ios-check-row', style: 'grid-column:1/-1' }, [
+        unknown,
+        el('span', { text: 'Giờ chưa rõ' }),
+      ]),
+    ]),
+    el('button', {
+      type: 'button',
+      class: 'ios-btn-primary',
+      text: 'Gắn vào cây',
+      onClick: () => {
+        const [y, m, d] = String(dateIn.value || '').split('-').map(Number);
+        if (!y || !m || !d) return;
+        const [hh, mi] = String(timeIn.value || '12:00').split(':').map(Number);
+        addMember(an.id, {
+          role: roleSel.value,
+          label: nameIn.value.trim() || roleVi(roleSel.value),
+          year: y, month: m, day: d,
+          hour: unknown.checked ? null : (hh ?? 12),
+          minute: unknown.checked ? 0 : (mi || 0),
+          gender: gNu.checked ? 'nu' : 'nam',
+          hourUnknown: unknown.checked,
+        });
+        if (ctx.onTreeChanged) ctx.onTreeChanged();
+      },
+    }),
+  );
+
+  toggle.addEventListener('click', () => {
+    fields.classList.toggle('hidden');
+  });
+
+  wrap.append(toggle, fields);
+  return wrap;
+}
+
 function consistencyCopy(family) {
   const score = family.score;
   const band = score >= 67 ? 'khớp cao' : score >= 57 ? 'khớp vừa' : score >= 51 ? 'lệch nhẹ' : 'lệch nhiều';
@@ -150,11 +222,6 @@ export async function mountNghiem(host, ctx = {}) {
     root.append(el('h2', { text: an.title }), el('p', { class: 'ios-warn', text: err.message || String(err) }));
     return;
   }
-  if (!cluster) {
-    root.append(el('h2', { text: an.title }), el('p', { class: 'ios-muted', text: 'Án chưa có chủ thể — thêm người thân vai trò Chủ thể.' }));
-    return;
-  }
-
   const resultHost = el('div', { id: 'ios-nghiem-result' });
   const runBtn = el('button', {
     type: 'button',
@@ -163,23 +230,40 @@ export async function mountNghiem(host, ctx = {}) {
     text: 'Chạy nghiệm · Xếp 12 giờ',
   });
 
-  const evidence = el('div', { class: 'ios-evidence' });
-  for (const p of cluster.evidence) {
-    evidence.appendChild(el('div', { class: 'ios-evidence-row' }, [
-      el('span', { class: 'ios-muted', text: `${roleVi(p.role)} · ${p.label}${p.hourUnknown ? ' · giờ chưa rõ' : ''}` }),
-      el('span', { class: 'zh ios-pillar-line', text: p.pillars }),
-    ]));
-  }
-
   root.append(
     el('h2', { text: an.title }),
     el('p', { class: 'ios-muted', text: 'Chòm sao gia tộc — mỗi nút là nhật can. Trụ can-chi chỉ là bằng chứng, không phải bài diễn giải.' }),
-    radialSvg(cluster.radial),
-    evidence,
-    el('p', { class: 'ios-muted tiny', text: (an.members || []).map((m) => `${roleVi(m.role)} ${memberDateLine(m)}`).join(' · ') }),
-    el('div', { class: 'ios-lab-actions' }, [runBtn]),
-    resultHost,
   );
+
+  if (!cluster) {
+    root.append(el('p', { class: 'ios-muted', text: 'Án chưa có nút trên cây — gắn chủ thể hoặc người thân bên dưới.' }));
+  } else {
+    const evidence = el('div', { class: 'ios-evidence' });
+    for (const p of cluster.evidence) {
+      evidence.appendChild(el('div', { class: 'ios-evidence-row' }, [
+        el('span', { class: 'ios-muted', text: `${roleVi(p.role)} · ${p.label}${p.hourUnknown ? ' · giờ chưa rõ' : ''}` }),
+        el('span', { class: 'zh ios-pillar-line', text: p.pillars }),
+      ]));
+    }
+    root.append(
+      radialSvg(cluster.radial),
+      evidence,
+      el('p', { class: 'ios-muted tiny', text: (an.members || []).map((m) => `${roleVi(m.role)} ${memberDateLine(m)}`).join(' · ') }),
+    );
+  }
+
+  if (!an.sample) {
+    root.appendChild(attachNodeForm(an, ctx));
+  } else {
+    root.appendChild(el('p', {
+      class: 'ios-muted tiny',
+      text: 'Án mẫu chỉ đọc. Tạo án trống trên tab Án rồi gắn nút trên cây này.',
+    }));
+  }
+
+  if (cluster) {
+    root.append(el('div', { class: 'ios-lab-actions' }, [runBtn]), resultHost);
+  }
 
   runBtn.addEventListener('click', () => {
     clear(resultHost);
@@ -201,7 +285,7 @@ export async function mountNghiem(host, ctx = {}) {
 
     const summaryCite = citeTheme('balance', consistencyCopy(fam));
     const hourCite = citeTheme('hour', pack.scans[0]?.verdict || 'Xếp 12 giờ theo độ nhất quán cụm.');
-    const ledgerCites = citedOnly((fam.ledger || []).map((l) => citeLedger(l.msg)));
+    const ledgerCites = citeFamilyLedger(fam);
 
     resultHost.append(
       el('section', { class: 'ios-lab-block', id: 'ios-cluster-summary' }, [
@@ -218,7 +302,7 @@ export async function mountNghiem(host, ctx = {}) {
         el('td', { class: 'zh', text: `${c.zhi} ${c.zhiVi}` }),
         el('td', { text: `${c.hour}h` }),
         el('td', { text: String(c.score) }),
-        el('td', { text: c.delta === 0 ? 'tốt nhất' : String(c.delta) }),
+        el('td', { text: c.delta === 0 ? 'đứng đầu' : String(c.delta) }),
       ]));
       resultHost.append(
         el('section', { class: 'ios-lab-block' }, [
