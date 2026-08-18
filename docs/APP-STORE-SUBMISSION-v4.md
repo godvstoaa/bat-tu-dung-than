@@ -18,7 +18,7 @@ Sau Guideline 4.3(b) 9/6/2026 (fortune telling nêu đích danh): app mở như 
 2. Tìm `穷通宝鉴` → Nguồn (không link ngoài)  
 3. Lưu trích dẫn → Ghi chú  
 4. Học / Đối chiếu  
-5. Chart Lab case mẫu `1990-06-15 10:00` → `庚午 壬午 辛亥 癸巳`  
+5. Chart Lab case mẫu `1990-06-15 10:00` → bảng Tứ Trụ `庚午 壬午 辛亥 癸巳` + trích 子平真诠 / 穷通宝鉴 (không lá số tiêu dùng, không điểm /100)  
 6. Airplane Mode: thư viện + case mẫu vẫn chạy  
 
 ## Review Notes (English, paste)

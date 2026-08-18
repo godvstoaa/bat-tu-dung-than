@@ -7,7 +7,7 @@ import { mountLibrary } from './library-view.js';
 import { mountNotes } from './notes-view.js';
 import { mountLearn } from './learn-view.js';
 import { mountCompare } from './compare-view.js';
-import { buildSampleResult } from './sample-case.js';
+import { mountLab } from './lab-view.js';
 import { upsertCitation } from './notes.js';
 import './ios.css';
 
@@ -91,54 +91,6 @@ export async function initIosShell() {
     await ensurePanel(id);
   }
 
-  function mountLab(p) {
-    clear(p);
-    const { pillars, sample } = buildSampleResult();
-    p.appendChild(el('div', { class: 'ios-placeholder' }, [
-      el('h2', { text: 'Chart Lab' }),
-      el('p', { class: 'ios-muted', text: 'Case study Bát Tự — không phải màn hình mở app. Không cần nhập ngày sinh để xem mẫu.' }),
-      el('div', { class: 'ios-day-card' }, [
-        el('p', { class: 'ios-section-label', text: 'CASE MẪU' }),
-        el('p', { text: sample.label }),
-        el('p', { class: 'zh', text: pillars }),
-        el('p', { class: 'ios-muted tiny', text: 'Tứ trụ dựng bằng engine chart.js (xác định).' }),
-      ]),
-      el('button', {
-        type: 'button',
-        class: 'ios-btn-primary',
-        text: 'Mở Chart Lab đầy đủ với case mẫu',
-        onClick: () => {
-          const date = document.getElementById('date');
-          const time = document.getElementById('time');
-          const gNam = document.getElementById('g-nam');
-          if (date) date.value = '1990-06-15';
-          if (time) time.value = '10:00';
-          if (gNam) gNam.checked = true;
-          document.body.classList.remove('ios-shell-active');
-          document.body.classList.add('ios-legacy-visible');
-          const form = document.getElementById('birth-form');
-          if (form && typeof form.requestSubmit === 'function') form.requestSubmit();
-          else form?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-          let back = document.getElementById('ios-legacy-return');
-          if (!back) {
-            back = el('button', {
-              id: 'ios-legacy-return',
-              type: 'button',
-              class: 'ios-legacy-return',
-              text: '← Vỏ nghiên cứu',
-              onClick: () => {
-                document.body.classList.add('ios-shell-active');
-                document.body.classList.remove('ios-legacy-visible');
-                selectTab('library');
-              },
-            });
-            document.body.appendChild(back);
-          }
-        },
-      }),
-    ]));
-  }
-
   async function ensurePanel(id) {
     const p = panelNodes[id];
     if (id === 'notes') {
@@ -159,7 +111,18 @@ export async function initIosShell() {
       });
     } else if (id === 'study') await mountLearn(p);
     else if (id === 'compare') await mountCompare(p);
-    else if (id === 'lab') mountLab(p);
+    else if (id === 'lab') {
+      mountLab(p, {
+        onOpenClassic: (q) => {
+          selectTab('library').then(() => {
+            const input = document.getElementById('ios-lib-q');
+            if (!input) return;
+            input.value = q;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+          });
+        },
+      });
+    }
     p.dataset.ready = '1';
   }
 

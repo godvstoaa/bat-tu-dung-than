@@ -2,7 +2,7 @@
   "name": "bat-tu-dung-than",
   "private": true,
   "version": "3.1.0",
-  "description": "App luận Bát Tự - Dụng Thần theo Tử Bình / Phong thủy huyền học Hồng Kông",
+  "description": "Lữ Đăng — thư viện cổ học Đạo Tạng và tra cứu Tứ Trụ / Dụng Thần theo cổ pháp",
   "type": "module",
   "scripts": {
     "dev": "vite --host ::",

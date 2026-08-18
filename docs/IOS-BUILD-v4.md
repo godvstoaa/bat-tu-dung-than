@@ -16,7 +16,7 @@ npm run cap:ios       # Mac: sync Xcode
 Browser xem shell research-first. Notch/font Apple thật cần TestFlight/simulator.
 
 ## Xcode
-- Bundle: `shop.god8.lvdang`
+- Bundle: `shop.god8.battu` (cùng listing App Store — không đổi bundle / không app thứ hai)
 - Display Name: `Lữ Đăng`
 - Kéo `resources/ios/PrivacyInfo.xcprivacy`
 - `ITSAppUsesNonExemptEncryption = NO`

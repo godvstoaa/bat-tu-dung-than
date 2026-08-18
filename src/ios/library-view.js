@@ -12,7 +12,7 @@ export async function mountLibrary(host, ctx = {}) {
 
   const header = el('header', { class: 'ios-lib-head' }, [
     el('h1', { text: 'Lữ Đăng' }),
-    el('p', { class: 'ios-muted', text: 'Tra cứu & đối chiếu cổ pháp — dữ liệu offline' }),
+    el('p', { class: 'ios-muted', text: 'Thư viện 1523 kinh điển · tìm kiếm · chú giải nhiều tầng — offline' }),
   ]);
   const qInput = el('input', {
     id: 'ios-lib-q',

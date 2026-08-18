@@ -29,13 +29,14 @@ function iosModePlugins(mode) {
       name: 'ios-html',
       transformIndexHtml(html) {
         let out = html;
-        out = out.replace(/<title>[^<]*<\/title>/i, '<title>Lữ Đăng — Cổ Pháp &amp; Chart Lab</title>');
+        out = out.replace(/<title>[^<]*<\/title>/i, '<title>Lữ Đăng — Thư viện cổ học &amp; tra cứu</title>');
         out = out.replace(
           /<meta\s+name="description"[^>]*>/i,
-          '<meta name="description" content="Công cụ nghiên cứu cổ pháp offline: tra cứu kinh điển, đối chiếu nguồn, chuỗi lập luận có trích dẫn. Chart Lab Bát Tự kèm kiểm chứng dữ liệu." />'
+          '<meta name="description" content="Thư viện 1523 kinh điển Đạo Tạng + tra cứu Tứ Trụ theo cổ pháp: tìm kiếm, đối chiếu nguồn, chú giải nhiều tầng. Tính toán trên thiết bị." />'
         );
         out = out.replace(/<meta\s+name="keywords"[^>]*>\s*/gi, '');
         out = out.replace(/<meta\s+property="og:[^"]+"[^>]*>\s*/gi, '');
+        out = out.replace(/<meta\s+name="twitter:[^"]+"[^>]*>\s*/gi, '');
         out = out.replace(/<link\s+rel="canonical"[^>]*>\s*/gi, '');
         out = out.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/gi, '');
         out = out.replace(/<link[^>]+fonts\.googleapis\.com[^>]*>\s*/gi, '');
@@ -44,11 +45,29 @@ function iosModePlugins(mode) {
           /<meta\s+name="apple-mobile-web-app-title"[^>]*>/i,
           '<meta name="apple-mobile-web-app-title" content="Lữ Đăng" />'
         );
+        // Ẩn form luận mệnh NGAY first paint — không chờ JS gắn ios-shell-active
+        // (bundle chính rất nặng; reviewer 30 giây sẽ thấy splash thư viện).
+        const splash = `<div id="ios-root" class="ios-root"><div class="ios-panels"><div class="ios-lib ios-splash"><header class="ios-lib-head"><h1>Lữ Đăng</h1><p class="ios-muted">Thư viện cổ học · 1523 kinh điển · tra cứu</p></header><p class="ios-muted">Đang tải thư viện…</p></div></div></div>`;
+        if (!out.includes('id="ios-root"')) {
+          out = out.replace('<body>', `<body class="ios-shell-active">\n${splash}\n`);
+        }
         const crit = `<style id="ios-critical">
-html,body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Songti SC","Noto Sans SC","Helvetica Neue",sans-serif!important}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Songti SC","Noto Sans SC","Helvetica Neue",sans-serif!important;background:#0a0913;color:#eef1f8}
 [data-ios-hide]{display:none!important}
-#ios-root{display:flex!important;flex-direction:column;min-height:100dvh}
-body.ios-shell-active>header.hero,body.ios-shell-active>.container,body.ios-shell-active>#chat-fab,body.ios-shell-active>#chat-panel{display:none!important}
+#ios-root{display:flex!important;flex-direction:column;min-height:100dvh;position:fixed;inset:0;z-index:50;background:#0a0913}
+body:not(.ios-legacy-visible)>header.hero,
+body:not(.ios-legacy-visible)>.container,
+body:not(.ios-legacy-visible)>#chat-fab,
+body:not(.ios-legacy-visible)>#chat-panel,
+body:not(.ios-legacy-visible)>.bg-glow,
+body:not(.ios-legacy-visible)>.bg-clouds,
+body:not(.ios-legacy-visible)>.bg-grain,
+body:not(.ios-legacy-visible)>#mote-field,
+body:not(.ios-legacy-visible)>footer,
+body:not(.ios-legacy-visible)>#ai-fab,
+body:not(.ios-legacy-visible)>#ai-popup{display:none!important}
+.ios-splash{padding:calc(24px + env(safe-area-inset-top,0px)) 20px}
+.ios-splash h1{margin:0;font-size:26px;color:#e8d28a}
 </style>`;
         if (!out.includes('id="ios-critical"')) {
           out = out.replace('</head>', `${crit}\n</head>`);

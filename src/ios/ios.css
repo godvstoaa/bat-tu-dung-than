@@ -9,18 +9,19 @@
   color: #eef1f8;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Songti SC", "Helvetica Neue", sans-serif;
 }
-body.ios-shell-active #ios-root { display: flex !important; }
-body.ios-shell-active > header.hero,
-body.ios-shell-active > .container,
-body.ios-shell-active > #chat-fab,
-body.ios-shell-active > #chat-panel,
-body.ios-shell-active > .bg-glow,
-body.ios-shell-active > .bg-clouds,
-body.ios-shell-active > .bg-grain,
-body.ios-shell-active > #mote-field,
-body.ios-shell-active > footer,
-body.ios-shell-active > #ai-fab,
-body.ios-shell-active > #ai-popup {
+body.ios-shell-active #ios-root,
+#ios-root { display: flex !important; }
+body:not(.ios-legacy-visible) > header.hero,
+body:not(.ios-legacy-visible) > .container,
+body:not(.ios-legacy-visible) > #chat-fab,
+body:not(.ios-legacy-visible) > #chat-panel,
+body:not(.ios-legacy-visible) > .bg-glow,
+body:not(.ios-legacy-visible) > .bg-clouds,
+body:not(.ios-legacy-visible) > .bg-grain,
+body:not(.ios-legacy-visible) > #mote-field,
+body:not(.ios-legacy-visible) > footer,
+body:not(.ios-legacy-visible) > #ai-fab,
+body:not(.ios-legacy-visible) > #ai-popup {
   display: none !important;
 }
 body.ios-legacy-visible #ios-root { display: none !important; }
@@ -278,6 +279,35 @@ body.ios-legacy-visible #ios-root { display: none !important; }
 .ios-meta-list { padding-left: 18px; color: #c9d0e6; font-size: 14px; }
 .ios-placeholder { padding: 24px 8px; }
 .ios-placeholder h2 { color: #e8d28a; }
+.ios-lab h2 { color: #e8d28a; margin: 0 0 8px; }
+.ios-lab-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+.ios-lab-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #9aa3bf; }
+.ios-lab-field .ios-search { width: 100%; box-sizing: border-box; }
+.ios-lab-seg { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.ios-lab-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ios-lab-pillars { font-size: 22px; margin: 16px 0 4px; color: #e8d28a; }
+.ios-lab-block { margin: 22px 0; }
+.ios-lab-h { margin: 0 0 8px; font-size: 16px; color: #e8d28a; }
+.ios-lab-ol { margin: 0; padding-left: 20px; line-height: 1.65; font-size: 14px; color: #c9d0e6; }
+.ios-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ios-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.ios-table th, .ios-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.ios-table th { color: #9aa3bf; font-weight: 600; font-size: 11px; letter-spacing: 0.04em; }
+.ios-table td { color: #eef1f8; }
 .ios-legacy-return {
   position: fixed;
   top: calc(10px + env(safe-area-inset-top, 0px));

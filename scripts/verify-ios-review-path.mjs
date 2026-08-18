@@ -63,6 +63,24 @@ async function main() {
   ok(tabs.join(' ').includes('Thư viện') && tabs.join(' ').includes('Chart Lab'), 'có 5 tab research');
   ok(await page.locator('#ios-tab-library').getAttribute('aria-selected') === 'true', 'Thư viện mặc định');
   ok(!(await page.locator('header.hero').isVisible()), 'hero web ẩn khi shell active');
+  ok(!(await page.locator('#birth-form').isVisible()), 'form ngày sinh không phải first screen');
+  ok(!(await page.locator('#ai-fab').isVisible()), 'không có FAB luận giải trên first screen');
+
+  const banned = /Giải Mệnh|vận thế hôm nay|hợp tuổi|cải mệnh|Lập lá số|Luận mệnh/i;
+  const chromeText = await page.evaluate(() => {
+    const sel = [
+      '.ios-lib-head', '.ios-tabbar', '.ios-search-row',
+      'h1', 'h2', '.ios-btn-primary', '#ai-fab', 'header.hero',
+    ].join(',');
+    return [...document.querySelectorAll(sel)]
+      .filter((n) => n.offsetParent !== null)
+      .map((n) => n.innerText)
+      .join(' ');
+  });
+  ok(!banned.test(chromeText), banned.test(chromeText)
+    ? `first screen còn CTA cấm: ${chromeText.match(banned)?.[0]}`
+    : 'first screen không có Giải Mệnh / vận thế / hợp tuổi / cải mệnh');
+  ok(/Lữ Đăng|Thư viện|kinh điển/i.test(chromeText), 'first screen là thư viện cổ học');
 
   await page.waitForSelector('.ios-filter-chip', { timeout: 15000 });
   // Audit: chữ không tràn/chồng; gap ≥ 8px; không còn thanh cuộn vàng
@@ -132,6 +150,14 @@ async function main() {
   await page.screenshot({ path: path.join(SHOTS, 'ios-06-notes.png') });
   await page.getByRole('tab', { name: 'Chart Lab' }).click();
   await page.waitForSelector('#ios-panel-lab h2', { timeout: 10000 });
+  await page.waitForSelector('#ios-lab-out .ios-table', { timeout: 15000 });
+  const labText = await page.locator('#ios-panel-lab').innerText();
+  ok(/庚午/.test(labText) && /辛亥/.test(labText), 'Chart Lab case mẫu ra Tứ Trụ 庚午…辛亥');
+  ok(/子平真诠|渊海子平|穷通宝鉴|滴天髓/.test(labText), 'Chart Lab trích dẫn kinh điển có tên');
+  ok(/Tra bảng Tứ Trụ/.test(labText), 'CTA Chart Lab là tra bảng, không phải luận giải');
+  ok(!/Giải Mệnh|vận thế hôm nay|hợp tuổi|cải mệnh/i.test(labText), 'Chart Lab không có CTA tiêu dùng');
+  ok(!/\/100/.test(labText), 'Chart Lab không hiện điểm mệnh /100');
+  ok(!(await page.locator('#birth-form').isVisible()), 'Chart Lab không đổ ra form web');
   await page.screenshot({ path: path.join(SHOTS, 'ios-07-lab.png') });
 
   await browser.close();

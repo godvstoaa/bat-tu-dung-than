@@ -56,6 +56,15 @@ if (fs.existsSync(statsPath)) {
   check(!/application\/ld\+json/.test(html), 'không còn JSON-LD structured data');
   check(/Lữ Đăng|Cổ Pháp|Chart Lab|tra cứu/i.test(html), 'title/description research-oriented');
   check(/data-ios-hide/.test(html), 'HTML có data-ios-hide cho module bói');
+  const head = (html.match(/<head[\s\S]*?<\/head>/i) || [''])[0];
+  check(!/luận mệnh/i.test(head), 'head iOS không còn «luận mệnh»');
+  check(/Thư viện cổ học|tra cứu/i.test(head), 'metadata nói thư viện / tra cứu');
+  const manPath = path.join(OUT, 'manifest.webmanifest');
+  if (fs.existsSync(manPath)) {
+    const man = fs.readFileSync(manPath, 'utf8');
+    check(!/luận mệnh/i.test(man), 'manifest không còn «luận mệnh»');
+    check(/thư viện|tra cứu/i.test(man), 'manifest nói thư viện / tra cứu');
+  }
 
   let js = '';
   const assets = path.join(OUT, 'assets');
