@@ -239,6 +239,7 @@ export async function mountNghiem(host, ctx = {}) {
       resultHost.append(el('p', { class: 'ios-muted', text: 'Không có người giờ chưa rõ trong án này — sổ cái vẫn chấm nhất quán cụm.' }));
     }
 
+    resultHost.scrollIntoView({ block: 'start', behavior: 'smooth' });
     resultHost.append(
       el('section', { class: 'ios-lab-block', id: 'ios-ledger' }, [
         el('h3', { class: 'ios-lab-h', text: 'Sổ cái khớp / lệch' }),

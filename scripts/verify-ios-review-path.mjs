@@ -95,6 +95,8 @@ async function main() {
 
   await page.locator('#ios-run-btn').click();
   await page.waitForSelector('#ios-hour-table', { timeout: 30000 });
+  await page.locator('#ios-hour-table').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(200);
   const hourRows = await page.locator('#ios-hour-table tbody tr').count();
   ok(hourRows >= 12, `bảng 12 giờ có ${hourRows} hàng`);
   const result = await page.locator('#ios-nghiem-result').innerText();
