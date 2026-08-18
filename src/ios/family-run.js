@@ -99,7 +99,7 @@ export function rectifyHourStudio(center, member, otherMembers = []) {
   const clear = gap >= 4;
   const verdict = clear
     ? `Giờ ${best.zhiVi} (${best.hour}h) cho điểm nhất quán cụm cao nhất (${best.score}), hơn giờ nhì ${gap} điểm.`
-    : `Nhiều giờ cho điểm gần nhau (top ${best.score}, nhì ${second ? second.score : '?'}). Cần thêm người thân hoặc sự kiện để tách.`);
+    : `Nhiều giờ cho điểm gần nhau (top ${best.score}, nhì ${second ? second.score : '?'}). Cần thêm người thân hoặc sự kiện để tách.`;
   return { candidates, best, verdict, clear };
 }
 
