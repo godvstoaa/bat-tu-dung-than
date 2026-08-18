@@ -35,6 +35,19 @@ export function buildPersonR(m, hourOverride) {
   return toFamilyR(memberInput(m, hourOverride));
 }
 
+/** 四柱 for list/plate. Hour-unknown 时柱 is 未记 — never a noon placeholder. */
+export function memberStemBranchLine(m) {
+  if (!m?.year || !m?.month || !m?.day) return '未记';
+  try {
+    const R = buildPersonR(m);
+    const p = R.chart.pillars;
+    const time = (m.hourUnknown || m.hour == null) ? '未记' : `${p.time.gan}${p.time.zhi}`;
+    return `${p.year.gan}${p.year.zhi} ${p.month.gan}${p.month.zhi} ${p.day.gan}${p.day.zhi} ${time}`;
+  } catch {
+    return '未记';
+  }
+}
+
 function toEngineMember(m, R) {
   return { role: m.role === 'center' ? 'sibling' : m.role, label: m.label, R, hourUnknown: !!m.hourUnknown };
 }

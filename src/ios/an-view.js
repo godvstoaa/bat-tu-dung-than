@@ -1,11 +1,12 @@
 // ============================================================================
-//  an-view.js — danh sách án cổ / 教材 (cold open: không form ngày/giờ)
+//  an-view.js — một bản in 四柱 教材 (cold open: không dương lịch)
 // ============================================================================
 import { el, clear } from './ui.js';
 import {
   loadAns, upsertAn, removeAn, isPrintedCase,
-  roleVi, memberDateLine, anSummary, SAMPLE_AN_ID,
+  roleVi, anSummary, plateChips, SAMPLE_AN_ID,
 } from './family-cases.js';
+import { memberStemBranchLine } from './family-run.js';
 
 export function mountAn(host, ctx = {}) {
   clear(host);
@@ -18,17 +19,23 @@ export function mountAn(host, ctx = {}) {
     root.append(
       el('header', { class: 'ios-lib-head' }, [
         el('h1', { text: 'Lữ Đăng' }),
-        el('p', { class: 'ios-muted', text: 'Án cổ · 校正' }),
-        el('p', { class: 'ios-muted tiny', text: 'Mở bản in 教材 — hiệu khảo, thi khóa giờ, đối 应期.' }),
+        el('p', { class: 'ios-muted', text: '四柱 教材 · 校正' }),
+        el('p', { class: 'ios-muted tiny', text: 'Bản in 四柱 — thi khóa 时辰, hiệu khảo đoạn kinh, đối 应期.' }),
       ]),
-      el('p', { class: 'ios-count', id: 'ios-an-count', text: `${list.length} án cổ / 教材` }),
+      el('p', { class: 'ios-count', id: 'ios-an-count', text: `${list.filter((a) => a.jiaocai).length} bản in 教材` }),
     );
 
     const ul = el('div', { class: 'ios-list', id: 'ios-an-list' });
     for (const an of list) {
       const people = el('div', { class: 'ios-an-people' });
       for (const m of an.members || []) {
-        people.appendChild(el('div', { class: 'ios-muted tiny', text: `${roleVi(m.role)} · ${m.label} · ${memberDateLine(m)}` }));
+        people.appendChild(el('div', {
+          class: 'ios-an-pillar zh',
+          text: `${roleVi(m.role)} · ${memberStemBranchLine(m)}`,
+        }));
+      }
+      if (!(an.members || []).length) {
+        people.appendChild(el('div', { class: 'ios-muted tiny', text: 'Chưa gắn trụ' }));
       }
       ul.appendChild(el('div', { class: 'ios-case-row' }, [
         el('button', {
@@ -40,14 +47,7 @@ export function mountAn(host, ctx = {}) {
           el('div', { class: 'ios-case-name', text: an.title }),
           el('div', { class: 'ios-muted', text: anSummary(an) }),
           people,
-          el('div', { class: 'ios-badges' }, [
-            an.jiaocai ? el('span', { class: 'ios-chip', text: 'Án cổ' }) : null,
-            an.jiaocai ? el('span', { class: 'ios-chip', text: '教材' }) : null,
-            an.jiaocai ? el('span', { class: 'ios-chip', text: '印本' }) : null,
-            (an.members || []).some((m) => m.hourUnknown)
-              ? el('span', { class: 'ios-chip', text: 'giờ chưa rõ' })
-              : null,
-          ].filter(Boolean)),
+          el('div', { class: 'ios-badges' }, plateChips(an).map((t) => el('span', { class: 'ios-chip', text: t }))),
         ]),
         isPrintedCase(an) ? null : el('button', {
           type: 'button',
@@ -81,7 +81,7 @@ export function mountAn(host, ctx = {}) {
           paint();
         },
       }),
-      el('p', { class: 'ios-muted tiny', text: 'Gắn người thân trên cây (tab Đối) — không nhập ngày sinh ở đây.' }),
+      el('p', { class: 'ios-muted tiny', text: 'Gắn trụ trên tab Đối — không nhập dương lịch ở đây.' }),
     );
   };
 

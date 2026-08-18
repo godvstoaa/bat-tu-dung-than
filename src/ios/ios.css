@@ -354,6 +354,21 @@
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .ios-pillar-line { font-size: 16px; color: #e8d28a; }
+.ios-evidence-compact .ios-evidence-row { padding: 3px 0; }
+.ios-evidence-compact .ios-pillar-line { font-size: 13px; }
+.ios-an-pillar {
+  font-size: 14px;
+  color: #e8d28a;
+  line-height: 1.45;
+  margin: 2px 0;
+}
+.ios-shi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(44px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+.ios-shi-grid .ios-shi-btn { width: 100%; font-size: 18px; }
 .ios-quote {
   margin: 8px 0;
   padding: 10px 12px;

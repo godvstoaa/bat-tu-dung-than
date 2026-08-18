@@ -67,12 +67,17 @@ async function main() {
   ok(!/Nghiệm/.test(tabText), 'nhãn tab không còn Nghiệm');
   ok(!/Hồ sơ|Bàn|So sánh/.test(tabText), 'không còn tab Hồ sơ / Bàn / So sánh');
   ok(await page.locator('#ios-tab-an').getAttribute('aria-selected') === 'true', 'Án là tab mặc định');
-  ok(await page.locator('#ios-an-list .ios-list-item').count() >= 2, 'sổ có ≥2 án cổ / 教材');
+  ok(await page.locator('#ios-an-list .ios-list-item').count() >= 1, 'sổ có ≥1 bản in 教材');
+  ok(await page.locator('#ios-an-list .ios-list-item').count() <= 2, 'không liệt kê 3 permutation plate');
   const listText = await page.locator('#ios-an-list').innerText();
-  ok(/教材/.test(listText) && /印本|Án cổ/.test(listText), 'chip 教材 / Án cổ / 印本 hiện trên danh sách');
-  ok(/giờ chưa rõ/.test(listText), 'án cổ có thành viên giờ chưa rõ');
+  const anRoot = await page.locator('#ios-an-root').innerText();
+  ok(/教材/.test(listText) && /印本/.test(listText), 'chip 教材 / 印本 hiện trên danh sách');
+  ok(/四柱|未记/.test(listText), 'list có 四柱 / 未记');
+  ok(/[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]/.test(listText), 'list hiện 干支');
   ok(/Cha|Mẹ|Con|Chủ thể/.test(listText), 'án cổ là cụm trụ');
   ok(!/hồ sơ khách|Án mẫu/.test(listText), 'không gắn nhãn hồ sơ khách / Án mẫu');
+  ok(!/\d{4}-\d{2}-\d{2}/.test(anRoot), 'cold open không có dương lịch YYYY-MM-DD');
+  ok(!/1995-08-12|09:30|giờ sinh/.test(anRoot), 'cold open không hiện ngày/giờ sinh');
   ok(await page.locator('#ios-an-root input[type=date]').count() === 0, 'cold open Án không có input ngày');
   ok(await page.locator('#ios-an-root input[type=time]').count() === 0, 'cold open Án không có input giờ');
   ok(await page.locator('#ios-an-root input[type=radio]').count() === 0, 'cold open Án không có radio giới');
@@ -87,11 +92,15 @@ async function main() {
       .join(' ');
   });
   ok(!/luận mệnh|Giải Mệnh|vận thế hôm nay|hợp tuổi|cải mệnh|Lập lá số|sổ hồ sơ/i.test(chrome), 'chrome first screen không có CTA tiêu dùng');
-  ok(/Án cổ|教材|校正|Lữ Đăng/i.test(chrome), 'first screen là Án cổ / 校正');
+  ok(/四柱|教材|校正|Lữ Đăng/i.test(chrome), 'first screen là 四柱 教材 / 校正');
   ok(!/\/100/.test(chrome), 'first screen không có điểm /100');
   await page.screenshot({ path: path.join(SHOTS, 'ios-01-cases.png') });
 
   await page.locator('#ios-an-list .ios-list-item').first().click();
+  await page.waitForSelector('#ios-thi', { timeout: 20000 });
+  await page.waitForSelector('#ios-hour-table', { timeout: 20000 });
+  const hourBtns = await page.locator('#ios-hour-table .ios-shi-btn').count();
+  ok(hourBtns >= 12, `Thi có ${hourBtns} 地支`);
   await page.waitForSelector('#ios-hieu-khao', { timeout: 20000 });
   await page.waitForSelector('#ios-family-tree', { timeout: 20000 });
   ok(await page.locator('#ios-family-tree svg').count() >= 1, 'Đối hiện bản in cụm trụ');
@@ -99,11 +108,10 @@ async function main() {
   const doi = await page.locator('#ios-nghiem').innerText();
   ok(/Hiệu khảo|合|歧/.test(doi), 'hiệu khảo có 合 / 歧');
   ok(!/Giải Mệnh|cải mệnh|luận mệnh|diễn giải mệnh/i.test(doi), 'Đối không có CTA tiêu dùng');
+  await page.locator('#ios-family-tree').scrollIntoViewIfNeeded();
   await page.screenshot({ path: path.join(SHOTS, 'ios-02-tree.png') });
 
   await page.locator('#ios-hour-table').scrollIntoViewIfNeeded();
-  const hourRows = await page.locator('#ios-hour-table tbody tr').count();
-  ok(hourRows >= 12, `Thi có ${hourRows} 时辰`);
   await page.locator('#ios-hour-table .ios-shi-btn').first().click();
   await page.waitForSelector('#ios-thi-grade-line', { timeout: 30000 });
   const grade = await page.locator('#ios-nghiem-result').innerText();

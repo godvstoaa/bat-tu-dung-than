@@ -16,10 +16,10 @@ export const SAMPLE_AN_ID = 'sample-an-1995';
 
 const SEED_1995 = {
   id: SAMPLE_AN_ID,
-  title: 'Án cổ · bản in 1995 — giờ con tranh',
+  title: '教材 · 时辰未记',
   sample: true,
   jiaocai: true,
-  plateNote: '印本教材: cụm bốn trụ. Giờ con tranh (未记时). Hai 应期 đã ghi trên bản in: kỳ khảo 2013, sinh 2020.',
+  plateNote: '印本教材: cụm 四柱. 时柱 con 未记. Hai 应期 đã ghi trên bản in: kỳ khảo, sinh nở.',
   members: [
     { id: 'm-center', role: 'center', label: 'Chủ thể', year: 1995, month: 8, day: 12, hour: 9, minute: 30, gender: 'nu', hourUnknown: false },
     { id: 'm-father', role: 'father', label: 'Cha', year: 1968, month: 5, day: 2, hour: 7, minute: 0, gender: 'nam', hourUnknown: false },
@@ -27,49 +27,16 @@ const SEED_1995 = {
     { id: 'm-child', role: 'child', label: 'Con', year: 2020, month: 7, day: 7, hour: null, minute: 0, gender: 'nu', hourUnknown: true },
   ],
   events: [
-    { id: 'ev-2013', memberId: 'm-center', year: 2013, type: 'study_success', label: 'Kỳ khảo 2013 ghi trên bản in' },
-    { id: 'ev-2020', memberId: 'm-center', year: 2020, type: 'birth_child', label: 'Sinh 2020 ghi trên bản in' },
+    { id: 'ev-2013', memberId: 'm-center', year: 2013, type: 'study_success', label: 'Kỳ khảo ghi trên bản in' },
+    { id: 'ev-2020', memberId: 'm-center', year: 2020, type: 'birth_child', label: 'Sinh nở ghi trên bản in' },
   ],
 };
 
-const SEED_1968 = {
-  id: 'jiaocai-1968',
-  title: 'Án cổ · bản in 1968 — giờ con tranh',
-  sample: true,
-  jiaocai: true,
-  plateNote: '印本教材: tâm 1968, phối 1971, con 1995 giờ chưa ghi. 应期 trên bản in: hôn sự 1993, sinh 1995.',
-  members: [
-    { id: 'm-center', role: 'center', label: 'Chủ thể', year: 1968, month: 5, day: 2, hour: 7, minute: 0, gender: 'nam', hourUnknown: false },
-    { id: 'm-spouse', role: 'spouse', label: 'Phối ngẫu', year: 1971, month: 11, day: 9, hour: 5, minute: 30, gender: 'nu', hourUnknown: false },
-    { id: 'm-child', role: 'child', label: 'Con', year: 1995, month: 8, day: 12, hour: null, minute: 0, gender: 'nu', hourUnknown: true },
-  ],
-  events: [
-    { id: 'ev-1993', memberId: 'm-center', year: 1993, type: 'marriage', label: 'Hôn sự 1993 ghi trên bản in' },
-    { id: 'ev-1995', memberId: 'm-center', year: 1995, type: 'birth_child', label: 'Sinh 1995 ghi trên bản in' },
-  ],
-};
-
-const SEED_1971 = {
-  id: 'jiaocai-1971',
-  title: 'Án cổ · bản in 1971 — giờ con tranh',
-  sample: true,
-  jiaocai: true,
-  plateNote: '印本教材: tâm 1971, phối 1968, con 2020 giờ chưa ghi. 应期 trên bản in: bệnh án 2018, sinh 2020.',
-  members: [
-    { id: 'm-center', role: 'center', label: 'Chủ thể', year: 1971, month: 11, day: 9, hour: 5, minute: 30, gender: 'nu', hourUnknown: false },
-    { id: 'm-spouse', role: 'spouse', label: 'Phối ngẫu', year: 1968, month: 5, day: 2, hour: 7, minute: 0, gender: 'nam', hourUnknown: false },
-    { id: 'm-child', role: 'child', label: 'Con', year: 2020, month: 7, day: 7, hour: null, minute: 0, gender: 'nu', hourUnknown: true },
-  ],
-  events: [
-    { id: 'ev-2018', memberId: 'm-center', year: 2018, type: 'illness', label: 'Bệnh án 2018 ghi trên bản in' },
-    { id: 'ev-2020b', memberId: 'm-center', year: 2020, type: 'birth_child', label: 'Sinh 2020 ghi trên bản in' },
-  ],
-};
-
-export const SEED_ANS = [SEED_1995, SEED_1968, SEED_1971];
+export const SEED_ANS = [SEED_1995];
 export const SEED_AN = SEED_1995;
 
 const SEED_IDS = new Set(SEED_ANS.map((a) => a.id));
+const RETIRED_IDS = new Set(['jiaocai-1968', 'jiaocai-1971']);
 
 function uid(prefix) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -94,14 +61,24 @@ export function memberDateLine(m) {
 }
 
 export function anSummary(an) {
-  const n = (an.members || []).length;
   const unknown = (an.members || []).filter((m) => m.hourUnknown).length;
-  const bits = [];
-  if (an.jiaocai) bits.push('教材');
-  bits.push(`${n} trụ`);
-  if (unknown) bits.push(`${unknown} giờ tranh`);
-  if ((an.events || []).length) bits.push(`${an.events.length} 应期`);
+  const ev = (an.events || []).length;
+  const bits = ['四柱'];
+  if (unknown) bits.push(`${unknown} khóa giờ`);
+  if (ev) bits.push(`${ev} 应期`);
   return bits.join(' · ');
+}
+
+export function plateChips(an) {
+  const unknown = (an.members || []).filter((m) => m.hourUnknown).length;
+  const ev = (an.events || []).length;
+  const chips = [];
+  if (an.jiaocai) {
+    chips.push('教材', '印本');
+  }
+  if (unknown) chips.push(`${unknown} khóa giờ`);
+  if (ev) chips.push(`${ev} 应期`);
+  return chips;
 }
 
 export function isPrintedCase(an) {
@@ -162,7 +139,7 @@ export function loadAns() {
     stored = [];
   }
   const seeds = SEED_ANS.map(normalizeAn).filter(Boolean);
-  const user = stored.map(normalizeAn).filter((a) => a && !SEED_IDS.has(a.id) && !a.jiaocai);
+  const user = stored.map(normalizeAn).filter((a) => a && !SEED_IDS.has(a.id) && !RETIRED_IDS.has(a.id) && !a.jiaocai);
   return [...seeds, ...user].sort((a, b) => {
     if (a.id === SAMPLE_AN_ID) return -1;
     if (b.id === SAMPLE_AN_ID) return 1;

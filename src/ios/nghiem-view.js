@@ -175,6 +175,15 @@ function jieqiHint(an) {
   return lines[0] || '';
 }
 
+function solarSourceDetails(an) {
+  const box = el('details', { class: 'ios-lab-block', id: 'ios-solar-source' });
+  box.appendChild(el('summary', { text: 'Nguồn dương lịch (để dựng trụ)' }));
+  for (const m of an.members || []) {
+    box.appendChild(el('p', { class: 'ios-muted tiny', text: `${roleVi(m.role)} · ${memberDateLine(m)}` }));
+  }
+  return box;
+}
+
 function hieuKhaoSection(an, cluster, onOpen) {
   const fam = cluster.family;
   const rows = hieuKhaoRows(fam);
@@ -183,17 +192,16 @@ function hieuKhaoSection(an, cluster, onOpen) {
     el('p', { class: 'ios-muted tiny', text: an.plateNote || '印本: đoạn kinh đã kiểm đối chiếu sổ cái engine.' }),
     radialSvg(cluster.radial),
   ]);
-  const evidence = el('div', { class: 'ios-evidence' });
+  const evidence = el('div', { class: 'ios-evidence ios-evidence-compact' });
   for (const p of cluster.evidence) {
+    const line = p.hourUnknown
+      ? String(p.pillars || '').replace(/\S+$/, '未记')
+      : p.pillars;
     evidence.appendChild(el('div', { class: 'ios-evidence-row' }, [
-      el('span', { class: 'ios-muted', text: `${roleVi(p.role)} · ${p.label}${p.hourUnknown ? ' · giờ tranh' : ''}` }),
-      el('span', { class: 'zh ios-pillar-line', text: p.hourUnknown ? '时柱未记' : p.pillars }),
+      el('span', { class: 'zh ios-pillar-line', text: `${roleVi(p.role)} · ${line}` }),
     ]));
   }
-  sec.append(
-    evidence,
-    el('p', { class: 'ios-muted tiny', text: (an.members || []).map((m) => `${roleVi(m.role)} ${memberDateLine(m)}`).join(' · ') }),
-  );
+  sec.appendChild(evidence);
   if (!rows.length) {
     sec.appendChild(el('p', { class: 'ios-muted', text: 'Chưa có trục nào gắn được đoạn kinh đã kiểm.' }));
     return sec;
@@ -290,53 +298,37 @@ export async function mountNghiem(host, ctx = {}) {
   root.append(
     el('h2', { text: an.title }),
     el('div', { class: 'ios-badges' }, [
-      an.jiaocai ? el('span', { class: 'ios-chip', text: 'Án cổ' }) : null,
       an.jiaocai ? el('span', { class: 'ios-chip', text: '教材' }) : null,
       an.jiaocai ? el('span', { class: 'ios-chip', text: '印本' }) : null,
     ].filter(Boolean)),
-    el('p', { class: 'ios-muted', text: 'Đối chiếu bản in với sổ cái engine trên cùng một án.' }),
+    el('p', { class: 'ios-muted tiny', text: 'Thi khóa 时辰 trước — hiệu khảo và 应期 cùng bản in.' }),
     hint ? el('p', { class: 'ios-muted tiny', id: 'ios-jieqi-hint', text: `工具: ${hint}` }) : null,
   );
-
-  if (!cluster) {
-    root.append(el('p', { class: 'ios-muted', text: 'Án chưa có nút trên cây — gắn chủ thể hoặc người thân bên dưới.' }));
-  } else {
-    root.appendChild(hieuKhaoSection(an, cluster, ctx.onOpenCite));
-  }
-
-  if (!isPrintedCase(an)) {
-    root.appendChild(attachNodeForm(an, ctx));
-  }
 
   const disputed = (an.members || []).filter((m) => m.hourUnknown);
   const thi = el('section', { class: 'ios-lab-block', id: 'ios-thi' }, [
     el('h3', { class: 'ios-lab-h', text: 'Thi' }),
     el('p', { class: 'ios-muted tiny', text: disputed.length
-      ? `Giờ ${roleVi(disputed[0].role)} · ${disputed[0].label} đang khoá. Chọn 1 trong 12 时辰 — chấm khóa / lập luận.`
-      : 'Không có trụ giờ tranh trên án này.' }),
+      ? `时柱 ${roleVi(disputed[0].role)} đang khoá. Chọn 1 trong 12 地支 — chấm khóa / lập luận.`
+      : 'Không có trụ 时辰未记 trên án này.' }),
   ]);
   const gradeHost = el('div', { id: 'ios-nghiem-result' });
   if (disputed.length) {
     const cells = shiChenList();
-    const table = el('table', { class: 'ios-table', id: 'ios-hour-table' });
-    table.appendChild(el('thead', {}, [el('tr', {}, ['时辰', 'Giờ'].map((h) => el('th', { text: h })))]));
-    const tbody = el('tbody');
+    const grid = el('div', { class: 'ios-shi-grid', id: 'ios-hour-table' });
     const btns = [];
     for (const cell of cells) {
       const btn = el('button', {
         type: 'button',
         class: 'ios-shi-btn',
         'data-hour': String(cell.hour),
-        text: `${cell.zhi} ${cell.zhiVi}`,
+        text: cell.zhi,
+        'aria-label': `${cell.zhi} ${cell.zhiVi}`,
       });
       btns.push(btn);
-      tbody.appendChild(el('tr', {}, [
-        el('td', {}, [btn]),
-        el('td', { text: `${cell.hour}h` }),
-      ]));
+      grid.appendChild(btn);
     }
-    table.appendChild(tbody);
-    const hoursWrap = el('div', { class: 'ios-table-wrap', id: 'ios-thi-hours' }, [table]);
+    const hoursWrap = el('div', { id: 'ios-thi-hours' }, [grid]);
     thi.append(hoursWrap, gradeHost);
 
     let pack = null;
@@ -367,5 +359,16 @@ export async function mountNghiem(host, ctx = {}) {
   }
   root.appendChild(thi);
 
+  if (!cluster) {
+    root.append(el('p', { class: 'ios-muted', text: 'Án chưa có nút trên cây — gắn chủ thể hoặc người thân bên dưới.' }));
+  } else {
+    root.appendChild(hieuKhaoSection(an, cluster, ctx.onOpenCite));
+  }
+
+  if (!isPrintedCase(an)) {
+    root.appendChild(attachNodeForm(an, ctx));
+  }
+
   if (cluster) root.appendChild(yingqiSection(an));
+  if ((an.members || []).length) root.appendChild(solarSourceDetails(an));
 }
