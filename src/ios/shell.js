@@ -1,5 +1,5 @@
 // ============================================================================
-//  shell.js — Án (mặc định) · Nghiệm · Thư viện
+//  shell.js — Án (mặc định) · Đối · Thư viện
 // ============================================================================
 import { el, clear } from './ui.js';
 import { mountLibrary } from './library-view.js';
@@ -11,7 +11,7 @@ import './ios.css';
 
 const TABS = [
   { id: 'an', label: 'Án', icon: '家系' },
-  { id: 'nghiem', label: 'Nghiệm', icon: '校正' },
+  { id: 'nghiem', label: 'Đối', icon: '校正' },
   { id: 'library', label: 'Thư viện', icon: '出典' },
 ];
 

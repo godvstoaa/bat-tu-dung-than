@@ -1,5 +1,5 @@
 // ============================================================================
-//  verify-ios-review-path.mjs — Án → cây → xếp 12 giờ → đoạn kinh thật
+//  verify-ios-review-path.mjs — Án cổ → hiệu khảo → thi → 应期 → cite
 // ============================================================================
 import http from 'http';
 import fs from 'fs';
@@ -63,13 +63,16 @@ async function main() {
   const tabs = await page.locator('.ios-tab').allTextContents();
   const tabText = tabs.join(' ');
   ok(tabText.includes('Án') && tabText.includes('Thư viện'), 'có tab Án + Thư viện');
-  ok(tabText.includes('Nghiệm'), 'có tab Nghiệm');
+  ok(tabText.includes('Đối'), 'có tab Đối');
+  ok(!/Nghiệm/.test(tabText), 'nhãn tab không còn Nghiệm');
   ok(!/Hồ sơ|Bàn|So sánh/.test(tabText), 'không còn tab Hồ sơ / Bàn / So sánh');
   ok(await page.locator('#ios-tab-an').getAttribute('aria-selected') === 'true', 'Án là tab mặc định');
-  ok(await page.locator('#ios-an-list .ios-list-item').count() >= 1, 'sổ có ≥1 án gia tộc');
+  ok(await page.locator('#ios-an-list .ios-list-item').count() >= 2, 'sổ có ≥2 án cổ / 教材');
   const listText = await page.locator('#ios-an-list').innerText();
-  ok(/giờ chưa rõ/.test(listText), 'án mẫu có thành viên giờ chưa rõ');
-  ok(/Cha|Mẹ|Con|Chủ thể/.test(listText), 'án mẫu là cụm gia tộc');
+  ok(/教材/.test(listText) && /印本|Án cổ/.test(listText), 'chip 教材 / Án cổ / 印本 hiện trên danh sách');
+  ok(/giờ chưa rõ/.test(listText), 'án cổ có thành viên giờ chưa rõ');
+  ok(/Cha|Mẹ|Con|Chủ thể/.test(listText), 'án cổ là cụm trụ');
+  ok(!/hồ sơ khách|Án mẫu/.test(listText), 'không gắn nhãn hồ sơ khách / Án mẫu');
   ok(await page.locator('#ios-an-root input[type=date]').count() === 0, 'cold open Án không có input ngày');
   ok(await page.locator('#ios-an-root input[type=time]').count() === 0, 'cold open Án không có input giờ');
   ok(await page.locator('#ios-an-root input[type=radio]').count() === 0, 'cold open Án không có radio giới');
@@ -83,31 +86,40 @@ async function main() {
       .map((n) => n.innerText)
       .join(' ');
   });
-  ok(!/luận mệnh|Giải Mệnh|vận thế hôm nay|hợp tuổi|cải mệnh|Lập lá số|sổ hồ sơ mệnh lý/i.test(chrome), 'chrome first screen không có CTA tiêu dùng');
-  ok(/Án|Lữ Đăng|Hiệu chỉnh giờ|校正/i.test(chrome), 'first screen là sổ án / hiệu chỉnh giờ');
+  ok(!/luận mệnh|Giải Mệnh|vận thế hôm nay|hợp tuổi|cải mệnh|Lập lá số|sổ hồ sơ/i.test(chrome), 'chrome first screen không có CTA tiêu dùng');
+  ok(/Án cổ|教材|校正|Lữ Đăng/i.test(chrome), 'first screen là Án cổ / 校正');
   ok(!/\/100/.test(chrome), 'first screen không có điểm /100');
   await page.screenshot({ path: path.join(SHOTS, 'ios-01-cases.png') });
 
   await page.locator('#ios-an-list .ios-list-item').first().click();
+  await page.waitForSelector('#ios-hieu-khao', { timeout: 20000 });
   await page.waitForSelector('#ios-family-tree', { timeout: 20000 });
-  ok(await page.locator('#ios-family-tree svg').count() >= 1, 'mở án hiện chòm sao gia tộc');
-  ok(await page.locator('#ios-run-btn').count() === 1, 'có CTA Chạy nghiệm / Xếp 12 giờ');
-  const tree = await page.locator('#ios-nghiem').innerText();
-  ok(!/Giải Mệnh|cải mệnh|luận mệnh|diễn giải mệnh/i.test(tree), 'nghiệm không có CTA tiêu dùng');
+  ok(await page.locator('#ios-family-tree svg').count() >= 1, 'Đối hiện bản in cụm trụ');
+  ok(await page.locator('#ios-hieu-khao').count() === 1, 'có mục Hiệu khảo');
+  const doi = await page.locator('#ios-nghiem').innerText();
+  ok(/Hiệu khảo|合|歧/.test(doi), 'hiệu khảo có 合 / 歧');
+  ok(!/Giải Mệnh|cải mệnh|luận mệnh|diễn giải mệnh/i.test(doi), 'Đối không có CTA tiêu dùng');
   await page.screenshot({ path: path.join(SHOTS, 'ios-02-tree.png') });
 
-  await page.locator('#ios-run-btn').click();
-  await page.waitForSelector('#ios-hour-table', { timeout: 30000 });
   await page.locator('#ios-hour-table').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(200);
   const hourRows = await page.locator('#ios-hour-table tbody tr').count();
-  ok(hourRows >= 12, `bảng 12 giờ có ${hourRows} hàng`);
-  const result = await page.locator('#ios-nghiem-result').innerText();
-  ok(/时辰|Tý|Sửu|Dần/.test(result), 'bảng giờ có địa chi');
-  ok(!/\/100/.test(result), 'kết quả không hiện điểm /100');
-  const cites = page.locator('#ios-nghiem-result .ios-cite-ref');
+  ok(hourRows >= 12, `Thi có ${hourRows} 时辰`);
+  await page.locator('#ios-hour-table .ios-shi-btn').first().click();
+  await page.waitForSelector('#ios-thi-grade-line', { timeout: 30000 });
+  const grade = await page.locator('#ios-nghiem-result').innerText();
+  ok(/khớp khóa 教材|lệch khóa/.test(grade), 'Thi chấm khóa / lập luận');
+  ok(/时辰|Tý|Sửu|Dần/.test(await page.locator('#ios-thi').innerText()), 'Thi có địa chi');
+  ok(!/\/100/.test(grade), 'Thi không hiện điểm /100');
+  ok(!/tốt nhất|giải mệnh|vận thế/i.test(grade), 'Thi không nói phẩm chất mệnh');
+  const cites = page.locator('#ios-nghiem .ios-cite-ref');
   ok(await cites.count() >= 1, 'có ≥1 cite-ref mở được reader');
-  ok(/子平真诠|渊海子平|穷通宝鉴|滴天髓|三命通会/.test(result), 'trích dẫn là kinh ưu tiên');
+  ok(/子平真诠|渊海子平|穷通宝鉴|滴天髓|三命通会/.test(doi + grade), 'trích dẫn là kinh ưu tiên');
+
+  await page.locator('#ios-yingqi').scrollIntoViewIfNeeded();
+  const ying = await page.locator('#ios-yingqi').innerText();
+  ok(await page.locator('#ios-yingqi .ios-yingqi-row').count() >= 1, 'có ≥1 hàng 应期');
+  ok(/giữ|không giữ/.test(ying), '应期 là luật giữ / không giữ');
+  ok(!/năm này tốt|运势|vận thế/i.test(ying), '应期 không nói vận hạn');
   await page.screenshot({ path: path.join(SHOTS, 'ios-03-hours.png') });
 
   await cites.first().click();

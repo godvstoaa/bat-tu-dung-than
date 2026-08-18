@@ -98,6 +98,10 @@ export function citeLedger(msg, axis) {
 }
 
 /** Sổ cái family.js: gắn trục từ cặp / cụm, bỏ câu không có đoạn đã kiểm. */
+function pickReason(reasons) {
+  return (reasons || []).find((m) => /[✓⚠✗]/.test(m)) || (reasons || [])[0] || '';
+}
+
 export function citeFamilyLedger(family) {
   const rows = [];
   for (const p of family.pairs || []) {
@@ -119,6 +123,32 @@ export function citeFamilyLedger(family) {
     const row = citeTheme('timing', msg);
     if (row) rows.push(row);
   }
+  return rows;
+}
+
+/** Một hàng / trục — chỉ khi đoạn kinh đã kiểm còn trên máy. */
+export function hieuKhaoRows(family) {
+  const seen = new Set();
+  const rows = [];
+  const push = (axis, msg) => {
+    if (!msg || seen.has(axis)) return;
+    const cite = citeTheme(axis, msg);
+    if (!cite) return;
+    seen.add(axis);
+    rows.push({
+      ...cite,
+      agree: /✓/.test(msg) && !/⚠|✗/.test(msg),
+      engine: msg,
+    });
+  };
+  for (const p of family.pairs || []) {
+    const axes = p.pair?.axes || {};
+    for (const [engKey, axis] of Object.entries(PAIR_AXIS)) {
+      push(axis, pickReason(axes[engKey]?.reasons));
+    }
+  }
+  push('balance', pickReason(family.familyBalance?.reasons));
+  push('timing', pickReason(family.timing?.reasons));
   return rows;
 }
 

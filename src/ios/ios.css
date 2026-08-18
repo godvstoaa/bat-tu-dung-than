@@ -386,6 +386,55 @@ details.ios-lab-block summary {
   color: #e8d28a;
   cursor: pointer;
 }
+.ios-hk-row { margin: 0 0 16px; }
+.ios-hk-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.ios-mark-he, .ios-mark-qi {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.ios-mark-he { background: rgba(111,191,138,0.18); color: #6fbf8a; }
+.ios-mark-qi { background: rgba(208,122,106,0.18); color: #d07a6a; }
+.ios-shi-btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: #eef1f8;
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.ios-shi-btn.active {
+  border-color: #d4af37;
+  background: rgba(212,175,55,0.18);
+  color: #e8d28a;
+}
+.ios-thi-grade-line { font-size: 16px; color: #e8d28a; margin: 12px 0 6px; }
+.ios-yingqi-event {
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.22);
+}
+.ios-yingqi-title { margin: 0 0 8px; color: #e8d28a; }
+.ios-yingqi-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 13px;
+  color: #c9d0e6;
+}
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }

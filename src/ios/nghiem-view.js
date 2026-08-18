@@ -1,10 +1,11 @@
 // ============================================================================
-//  nghiem-view.js — chòm sao gia tộc + xếp 12 giờ + sổ cái có đoạn kinh thật
+//  nghiem-view.js — Đối: hiệu khảo + Thi + 应期 trên cùng một án cổ
 // ============================================================================
 import { el, clear } from './ui.js';
-import { getAn, addMember, ROLE_OPTS, roleVi, memberDateLine } from './family-cases.js';
-import { runCluster, runRectify } from './family-run.js';
-import { readyCite, citeTheme, citeFamilyLedger } from './cite.js';
+import { getAn, addMember, ROLE_OPTS, roleVi, memberDateLine, isPrintedCase } from './family-cases.js';
+import { runCluster, runRectify, shiChenList, buildPersonR } from './family-run.js';
+import { readyCite, citeTheme, hieuKhaoRows } from './cite.js';
+import { verifyAnYingqi } from './yingqi.js';
 
 function svgEl(tag, attrs, children = []) {
   const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -15,7 +16,7 @@ function svgEl(tag, attrs, children = []) {
 
 function radialSvg(radial) {
   const wrap = el('div', { class: 'ios-radial', id: 'ios-family-tree' });
-  const svg = svgEl('svg', { viewBox: '0 0 300 300', width: '100%', height: '300', role: 'img', 'aria-label': 'Chòm sao gia tộc' });
+  const svg = svgEl('svg', { viewBox: '0 0 300 300', width: '100%', height: '300', role: 'img', 'aria-label': 'Bản in cụm trụ' });
   const tone = { good: '#6fbf8a', mid: '#d4af37', bad: '#d07a6a' };
   for (const e of radial.edges || []) {
     const a = radial.nodes.find((n) => n.id === e.from);
@@ -50,56 +51,6 @@ function radialSvg(radial) {
     }, [document.createTextNode(n.label || '')]));
   }
   wrap.appendChild(svg);
-  return wrap;
-}
-
-function radarSvg(radar) {
-  const cx = 120, cy = 120, r = 78;
-  const svg = svgEl('svg', { viewBox: '0 0 240 240', width: '100%', height: '220', class: 'ios-radar' });
-  const n = radar.length || 6;
-  for (const ring of [0.33, 0.66, 1]) {
-    const pts = radar.map((_, i) => {
-      const ang = -Math.PI / 2 + (i / n) * 2 * Math.PI;
-      return `${cx + r * ring * Math.cos(ang)},${cy + r * ring * Math.sin(ang)}`;
-    }).join(' ');
-    svg.appendChild(svgEl('polygon', { points: pts, fill: 'none', stroke: 'rgba(255,255,255,0.12)' }));
-  }
-  const val = radar.map((d, i) => {
-    const ang = -Math.PI / 2 + (i / n) * 2 * Math.PI;
-    const t = Math.max(0, Math.min(1, (d.value || 0) / 10));
-    return `${cx + r * t * Math.cos(ang)},${cy + r * t * Math.sin(ang)}`;
-  }).join(' ');
-  svg.appendChild(svgEl('polygon', { points: val, fill: 'rgba(212,175,55,0.28)', stroke: '#d4af37' }));
-  radar.forEach((d, i) => {
-    const ang = -Math.PI / 2 + (i / n) * 2 * Math.PI;
-    svg.appendChild(svgEl('text', {
-      x: cx + (r + 18) * Math.cos(ang),
-      y: cy + (r + 18) * Math.sin(ang) + 4,
-      fill: '#9aa3bf', 'font-size': 10, 'text-anchor': 'middle',
-    }, [document.createTextNode(d.axis)]));
-  });
-  return el('div', { class: 'ios-radar-wrap' }, [svg]);
-}
-
-function matrixTable(matrix) {
-  const labels = matrix.labels || [];
-  const wrap = el('div', { class: 'ios-table-wrap' });
-  const table = el('table', { class: 'ios-table', id: 'ios-matrix' });
-  table.appendChild(el('thead', {}, [el('tr', {}, [
-    el('th', { text: '' }),
-    ...labels.map((l) => el('th', { text: l })),
-  ])]));
-  const body = el('tbody');
-  labels.forEach((rowLabel, i) => {
-    const tr = el('tr', {}, [el('th', { text: rowLabel })]);
-    labels.forEach((_, j) => {
-      const cell = (matrix.cells || []).find((c) => c.i === i && c.j === j);
-      tr.appendChild(el('td', { text: cell && cell.score != null ? String(cell.score) : '—' }));
-    });
-    body.appendChild(tr);
-  });
-  table.appendChild(body);
-  wrap.appendChild(table);
   return wrap;
 }
 
@@ -142,7 +93,7 @@ function attachNodeForm(an, ctx) {
   const gNu = el('input', { type: 'radio', name: 'ios-tree-g', id: 'ios-tree-g-nu', value: 'nu', checked: true });
 
   fields.append(
-    el('p', { class: 'ios-muted tiny', text: 'Gắn một nút vào chòm sao. Giờ mặc định chưa rõ — sẽ vào bảng 12 时辰.' }),
+    el('p', { class: 'ios-muted tiny', text: 'Gắn một nút vào cụm. Giờ mặc định chưa rõ — vào Thi 12 时辰.' }),
     el('div', { class: 'ios-lab-form' }, [
       el('label', { class: 'ios-lab-field' }, [el('span', { text: 'Vai trò trên cây' }), roleSel]),
       el('label', { class: 'ios-lab-field' }, [el('span', { text: 'Nhãn' }), nameIn]),
@@ -190,10 +141,122 @@ function attachNodeForm(an, ctx) {
   return wrap;
 }
 
-function consistencyCopy(family) {
-  const score = family.score;
-  const band = score >= 67 ? 'khớp cao' : score >= 57 ? 'khớp vừa' : score >= 51 ? 'lệch nhẹ' : 'lệch nhiều';
-  return `Độ nhất quán dữ liệu của cụm: ${score} (${band}). ${family.confirms} tín hiệu khớp · ${family.conflicts} tín hiệu lệch — đây là đồng nhất giữa các trụ, không phải phẩm chất mệnh.`;
+function parseJqTime(s) {
+  const [d, tt] = String(s || '').split(' ');
+  const [y, mo, da] = (d || '').split('-').map(Number);
+  const [h, mi] = (tt || '0:0:0').split(':').map(Number);
+  if (!y || !mo || !da) return null;
+  return new Date(y, mo - 1, da, h || 0, mi || 0).getTime();
+}
+
+function jieqiHint(an) {
+  const lines = [];
+  for (const m of an.members || []) {
+    if (!m.year || !m.month || !m.day) continue;
+    let R;
+    try { R = buildPersonR(m); } catch { continue; }
+    const hour = m.hourUnknown ? null : Number(m.hour);
+    if (hour === 23 || hour === 0) {
+      lines.push(`${roleVi(m.role)}: sát 子时 — ranh giới giờ.`);
+    }
+    const jq = R.chart?.jieqi;
+    if (!jq?.prev?.time && !jq?.next?.time) continue;
+    const birth = new Date(m.year, m.month - 1, m.day, hour ?? 12, m.minute ?? 0).getTime();
+    const windowMs = 36 * 3600 * 1000;
+    const prev = parseJqTime(jq.prev?.time);
+    const next = parseJqTime(jq.next?.time);
+    if (prev != null && Math.abs(birth - prev) < windowMs) {
+      lines.push(`${roleVi(m.role)}: sát节气 ${jq.prev.name}.`);
+    }
+    if (next != null && Math.abs(birth - next) < windowMs) {
+      lines.push(`${roleVi(m.role)}: sát节气 ${jq.next.name}.`);
+    }
+  }
+  return lines[0] || '';
+}
+
+function hieuKhaoSection(an, cluster, onOpen) {
+  const fam = cluster.family;
+  const rows = hieuKhaoRows(fam);
+  const sec = el('section', { class: 'ios-lab-block', id: 'ios-hieu-khao' }, [
+    el('h3', { class: 'ios-lab-h', text: 'Hiệu khảo' }),
+    el('p', { class: 'ios-muted tiny', text: an.plateNote || '印本: đoạn kinh đã kiểm đối chiếu sổ cái engine.' }),
+    radialSvg(cluster.radial),
+  ]);
+  const evidence = el('div', { class: 'ios-evidence' });
+  for (const p of cluster.evidence) {
+    evidence.appendChild(el('div', { class: 'ios-evidence-row' }, [
+      el('span', { class: 'ios-muted', text: `${roleVi(p.role)} · ${p.label}${p.hourUnknown ? ' · giờ tranh' : ''}` }),
+      el('span', { class: 'zh ios-pillar-line', text: p.hourUnknown ? '时柱未记' : p.pillars }),
+    ]));
+  }
+  sec.append(
+    evidence,
+    el('p', { class: 'ios-muted tiny', text: (an.members || []).map((m) => `${roleVi(m.role)} ${memberDateLine(m)}`).join(' · ') }),
+  );
+  if (!rows.length) {
+    sec.appendChild(el('p', { class: 'ios-muted', text: 'Chưa có trục nào gắn được đoạn kinh đã kiểm.' }));
+    return sec;
+  }
+  const ol = el('ol', { class: 'ios-lab-ol', id: 'ios-hieu-khao-list' });
+  for (const row of rows) {
+    ol.appendChild(el('li', { class: 'ios-hk-row' }, [
+      el('div', { class: 'ios-hk-head' }, [
+        el('span', { class: row.agree ? 'ios-mark-he' : 'ios-mark-qi', text: row.agree ? '合' : '歧' }),
+        el('span', { class: 'ios-muted tiny', text: row.agree ? '印本 khớp sổ cái' : '印本 lệch sổ cái' }),
+      ]),
+      el('p', { class: 'ios-muted tiny', text: `Engine: ${row.engine}` }),
+      citeBlock(row, onOpen),
+    ]));
+  }
+  sec.appendChild(ol);
+  return sec;
+}
+
+function yingqiSection(an) {
+  const sec = el('section', { class: 'ios-lab-block', id: 'ios-yingqi' }, [
+    el('h3', { class: 'ios-lab-h', text: '应期' }),
+    el('p', { class: 'ios-muted tiny', text: 'Sự kiện đã ghi trên bản in. Mỗi hàng là luật giữ / không giữ — không phải vận hạn.' }),
+  ]);
+  const packs = verifyAnYingqi(an);
+  if (!packs.length) {
+    sec.appendChild(el('p', { class: 'ios-muted', text: 'Bản in này chưa ghi 应期.' }));
+    return sec;
+  }
+  for (const pack of packs) {
+    const box = el('div', { class: 'ios-yingqi-event' }, [
+      el('p', { class: 'ios-yingqi-title', text: `${pack.event.label || pack.event.type} · ${pack.event.year} ${pack.yearGZ}` }),
+    ]);
+    for (const rule of pack.rules) {
+      box.appendChild(el('div', { class: 'ios-yingqi-row', 'data-hold': rule.hold ? '1' : '0' }, [
+        el('span', { class: rule.hold ? 'ios-mark-he' : 'ios-mark-qi', text: rule.hold ? 'giữ' : 'không giữ' }),
+        el('span', { text: rule.copy }),
+      ]));
+    }
+    sec.appendChild(box);
+  }
+  return sec;
+}
+
+function paintThiGrade(host, scan, pick, onOpen) {
+  clear(host);
+  const best = scan.best;
+  const match = pick.hour === best.hour;
+  const line = match
+    ? 'khớp khóa 教材'
+    : `lệch khóa; đứng đầu engine là ${best.zhiVi} (${best.hour}h) (điểm nhất quán cụm ${best.score})`;
+  host.append(
+    el('p', { class: 'ios-thi-grade-line', id: 'ios-thi-grade-line', text: line }),
+    el('p', { class: 'ios-muted tiny', text: 'Điểm này là khóa / lập luận — không phải phẩm chất mệnh.' }),
+  );
+  const hourCite = citeTheme('hour', line);
+  if (hourCite) host.appendChild(citeBlock(hourCite, onOpen));
+  const axes = hieuKhaoRows(scan.family || { pairs: [] });
+  const axisRows = axes.length ? axes : [];
+  if (axisRows.length) {
+    host.appendChild(el('p', { class: 'ios-muted tiny', text: 'Trục sổ cái có đoạn kinh đã kiểm:' }));
+    host.appendChild(el('ol', { class: 'ios-lab-ol' }, axisRows.map((n) => citeBlock(n, onOpen))));
+  }
 }
 
 export async function mountNghiem(host, ctx = {}) {
@@ -204,10 +267,10 @@ export async function mountNghiem(host, ctx = {}) {
   const an = ctx.anId ? getAn(ctx.anId) : null;
   if (!an) {
     root.append(
-      el('h2', { text: 'Nghiệm chứng' }),
-      el('p', { class: 'ios-muted', text: 'Chưa mở án. Vào tab Án và chọn một án gia tộc.' }),
+      el('h2', { text: 'Đối' }),
+      el('p', { class: 'ios-muted', text: 'Chưa mở án. Vào tab Án và chọn một án cổ / 教材.' }),
       el('button', {
-        type: 'button', class: 'ios-btn-primary', text: 'Về sổ án',
+        type: 'button', class: 'ios-btn-primary', text: 'Về Án cổ',
         onClick: () => ctx.onBackList && ctx.onBackList(),
       }),
     );
@@ -222,120 +285,87 @@ export async function mountNghiem(host, ctx = {}) {
     root.append(el('h2', { text: an.title }), el('p', { class: 'ios-warn', text: err.message || String(err) }));
     return;
   }
-  const resultHost = el('div', { id: 'ios-nghiem-result' });
-  const runBtn = el('button', {
-    type: 'button',
-    class: 'ios-btn-primary',
-    id: 'ios-run-btn',
-    text: 'Chạy nghiệm · Xếp 12 giờ',
-  });
 
+  const hint = jieqiHint(an);
   root.append(
     el('h2', { text: an.title }),
-    el('p', { class: 'ios-muted', text: 'Chòm sao gia tộc — mỗi nút là nhật can. Trụ can-chi chỉ là bằng chứng, không phải bài diễn giải.' }),
+    el('div', { class: 'ios-badges' }, [
+      an.jiaocai ? el('span', { class: 'ios-chip', text: 'Án cổ' }) : null,
+      an.jiaocai ? el('span', { class: 'ios-chip', text: '教材' }) : null,
+      an.jiaocai ? el('span', { class: 'ios-chip', text: '印本' }) : null,
+    ].filter(Boolean)),
+    el('p', { class: 'ios-muted', text: 'Đối chiếu bản in với engine trên cùng một án — không phải bài diễn giải mệnh.' }),
+    hint ? el('p', { class: 'ios-muted tiny', id: 'ios-jieqi-hint', text: `工具: ${hint}` }) : null,
   );
 
   if (!cluster) {
     root.append(el('p', { class: 'ios-muted', text: 'Án chưa có nút trên cây — gắn chủ thể hoặc người thân bên dưới.' }));
   } else {
-    const evidence = el('div', { class: 'ios-evidence' });
-    for (const p of cluster.evidence) {
-      evidence.appendChild(el('div', { class: 'ios-evidence-row' }, [
-        el('span', { class: 'ios-muted', text: `${roleVi(p.role)} · ${p.label}${p.hourUnknown ? ' · giờ chưa rõ' : ''}` }),
-        el('span', { class: 'zh ios-pillar-line', text: p.pillars }),
-      ]));
-    }
-    root.append(
-      radialSvg(cluster.radial),
-      evidence,
-      el('p', { class: 'ios-muted tiny', text: (an.members || []).map((m) => `${roleVi(m.role)} ${memberDateLine(m)}`).join(' · ') }),
-    );
+    root.appendChild(hieuKhaoSection(an, cluster, ctx.onOpenCite));
   }
 
-  if (!an.sample) {
+  if (!isPrintedCase(an)) {
     root.appendChild(attachNodeForm(an, ctx));
-  } else {
-    root.appendChild(el('p', {
-      class: 'ios-muted tiny',
-      text: 'Án mẫu chỉ đọc. Tạo án trống trên tab Án rồi gắn nút trên cây này.',
-    }));
   }
 
-  if (cluster) {
-    root.append(el('div', { class: 'ios-lab-actions' }, [runBtn]), resultHost);
-  }
-
-  runBtn.addEventListener('click', () => {
-    clear(resultHost);
-    resultHost.appendChild(el('p', { class: 'ios-muted', text: 'Đang quét 12 时辰…' }));
-    let pack;
-    try {
-      pack = runRectify(an);
-    } catch (err) {
-      clear(resultHost);
-      resultHost.appendChild(el('p', { class: 'ios-warn', text: err.message || String(err) }));
-      return;
-    }
-    clear(resultHost);
-    const fam = pack.cluster?.family;
-    if (!fam) {
-      resultHost.appendChild(el('p', { class: 'ios-muted', text: 'Không đủ dữ liệu để nghiệm.' }));
-      return;
-    }
-
-    const summaryCite = citeTheme('balance', consistencyCopy(fam));
-    const hourCite = citeTheme('hour', pack.scans[0]?.verdict || 'Xếp 12 giờ theo độ nhất quán cụm.');
-    const ledgerCites = citeFamilyLedger(fam);
-
-    resultHost.append(
-      el('section', { class: 'ios-lab-block', id: 'ios-cluster-summary' }, [
-        el('h3', { class: 'ios-lab-h', text: 'Nhất quán dữ liệu' }),
-        el('p', { text: consistencyCopy(fam) }),
-        summaryCite ? citeBlock(summaryCite, ctx.onOpenCite) : null,
-      ]),
-    );
-
-    for (const scan of pack.scans) {
-      const who = `${roleVi(scan.member.role)} · ${scan.member.label}`;
-      const rows = scan.candidates.map((c, i) => el('tr', { class: i === 0 ? 'ios-best-hour' : '' }, [
-        el('td', { text: String(i + 1) }),
-        el('td', { class: 'zh', text: `${c.zhi} ${c.zhiVi}` }),
-        el('td', { text: `${c.hour}h` }),
-        el('td', { text: String(c.score) }),
-        el('td', { text: c.delta === 0 ? 'đứng đầu' : String(c.delta) }),
+  const disputed = (an.members || []).filter((m) => m.hourUnknown);
+  const thi = el('section', { class: 'ios-lab-block', id: 'ios-thi' }, [
+    el('h3', { class: 'ios-lab-h', text: 'Thi' }),
+    el('p', { class: 'ios-muted tiny', text: disputed.length
+      ? `Giờ ${roleVi(disputed[0].role)} · ${disputed[0].label} đang khoá. Chọn 1 trong 12 时辰 — chấm khóa / lập luận.`
+      : 'Không có trụ giờ tranh trên án này.' }),
+  ]);
+  const gradeHost = el('div', { id: 'ios-nghiem-result' });
+  if (disputed.length) {
+    const cells = shiChenList();
+    const table = el('table', { class: 'ios-table', id: 'ios-hour-table' });
+    table.appendChild(el('thead', {}, [el('tr', {}, ['时辰', 'Giờ'].map((h) => el('th', { text: h })))]));
+    const tbody = el('tbody');
+    const btns = [];
+    for (const cell of cells) {
+      const btn = el('button', {
+        type: 'button',
+        class: 'ios-shi-btn',
+        'data-hour': String(cell.hour),
+        text: `${cell.zhi} ${cell.zhiVi}`,
+      });
+      btns.push(btn);
+      tbody.appendChild(el('tr', {}, [
+        el('td', {}, [btn]),
+        el('td', { text: `${cell.hour}h` }),
       ]));
-      resultHost.append(
-        el('section', { class: 'ios-lab-block' }, [
-          el('h3', { class: 'ios-lab-h', text: `Xếp 12 giờ — ${who}` }),
-          el('p', { class: 'ios-muted tiny', text: `Giờ đứng đầu: ${scan.best.zhiVi} (${scan.best.hour}h), điểm nhất quán ${scan.best.score}.` }),
-          el('p', { text: scan.verdict }),
-          hourCite ? citeBlock(hourCite, ctx.onOpenCite) : null,
-          el('div', { class: 'ios-table-wrap' }, [
-            el('table', { class: 'ios-table', id: 'ios-hour-table' }, [
-              el('thead', {}, [el('tr', {}, ['#', '时辰', 'Giờ', 'Nhất quán', 'Δ'].map((h) => el('th', { text: h })))]),
-              el('tbody', {}, rows),
-            ]),
-          ]),
-        ]),
-      );
     }
-    if (!pack.scans.length) {
-      resultHost.append(el('p', { class: 'ios-muted', text: 'Không có người giờ chưa rõ trong án này — sổ cái vẫn chấm nhất quán cụm.' }));
-    }
+    table.appendChild(tbody);
+    const hoursWrap = el('div', { class: 'ios-table-wrap', id: 'ios-thi-hours' }, [table]);
+    thi.append(hoursWrap, gradeHost);
 
-    resultHost.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    resultHost.append(
-      el('section', { class: 'ios-lab-block', id: 'ios-ledger' }, [
-        el('h3', { class: 'ios-lab-h', text: 'Sổ cái khớp / lệch' }),
-        ledgerCites.length
-          ? el('ol', { class: 'ios-lab-ol', id: 'ios-ledger-cites' }, ledgerCites.map((n) => citeBlock(n, ctx.onOpenCite)))
-          : el('p', { class: 'ios-muted', text: 'Không tìm được đoạn kinh khớp cho các dòng sổ cái — không hiện câu diễn giải.' }),
-      ]),
-      el('details', { class: 'ios-lab-block' }, [
-        el('summary', { text: 'Ma trận cặp + radar 6 trục' }),
-        matrixTable(pack.cluster.matrix),
-        radarSvg(pack.cluster.radar),
-      ]),
-    );
-  });
+    let pack = null;
+    const sit = (cell) => {
+      if (!pack) {
+        try { pack = runRectify(an); } catch (err) {
+          clear(gradeHost);
+          gradeHost.appendChild(el('p', { class: 'ios-warn', text: err.message || String(err) }));
+          return;
+        }
+      }
+      const scan = pack.scans[0];
+      if (!scan) {
+        clear(gradeHost);
+        gradeHost.appendChild(el('p', { class: 'ios-muted', text: 'Không quét được khóa.' }));
+        return;
+      }
+      scan.family = pack.cluster?.family;
+      btns.forEach((b) => b.classList.toggle('active', Number(b.dataset.hour) === cell.hour));
+      paintThiGrade(gradeHost, scan, cell, ctx.onOpenCite);
+      gradeHost.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    };
+    btns.forEach((btn, i) => {
+      btn.addEventListener('click', () => sit(cells[i]));
+    });
+  } else {
+    thi.appendChild(gradeHost);
+  }
+  root.appendChild(thi);
+
+  if (cluster) root.appendChild(yingqiSection(an));
 }

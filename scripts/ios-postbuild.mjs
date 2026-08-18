@@ -21,9 +21,9 @@ if (!fs.existsSync(indexHtml)) {
 }
 
 fs.writeFileSync(path.join(OUT, 'manifest.webmanifest'), JSON.stringify({
-  name: 'Lữ Đăng — Hiệu chỉnh giờ',
+  name: 'Lữ Đăng — Án cổ · 校正',
   short_name: 'Lữ Đăng',
-  description: 'Nghiệm chứng gia tộc · 校正时辰: mở án, xếp 12 giờ theo nhất quán cụm, mỗi dòng sổ cái nhảy tới đoạn kinh trên máy.',
+  description: 'Án cổ · 校正: hiệu khảo bản in 教材, thi khóa 时辰, đối 应期 với đoạn kinh trên máy.',
   lang: 'vi',
   dir: 'ltr',
   start_url: '/?source=pwa',

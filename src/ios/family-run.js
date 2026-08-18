@@ -7,8 +7,16 @@ import { radialData, matrixData, radarData } from '../engine/family-diagram.js';
 import { ZHI } from '../engine/constants.js';
 import { toFamilyR, pillarLine } from './studio-analyze.js';
 
-const ZHI_BY_HOUR = { 0: '子', 2: '丑', 4: '寅', 6: '卯', 8: '辰', 10: '巳', 12: '午', 14: '未', 16: '申', 18: '酉', 20: '戌', 22: '亥' };
-const HOURS = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22];
+export const ZHI_BY_HOUR = { 0: '子', 2: '丑', 4: '寅', 6: '卯', 8: '辰', 10: '巳', 12: '午', 14: '未', 16: '申', 18: '酉', 20: '戌', 22: '亥' };
+export const HOURS = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22];
+
+export function shiChenList() {
+  return HOURS.map((hour) => ({
+    hour,
+    zhi: ZHI_BY_HOUR[hour],
+    zhiVi: ZHI[ZHI_BY_HOUR[hour]].vi,
+  }));
+}
 
 function memberInput(m, hourOverride) {
   const hourUnknown = !!m.hourUnknown || m.hour == null;
