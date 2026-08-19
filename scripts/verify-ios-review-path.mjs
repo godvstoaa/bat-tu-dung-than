@@ -76,11 +76,14 @@ async function main() {
   ok(/[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]/.test(listText), 'list hiện 干支');
   ok(/Cha|Mẹ|Con|Chủ thể/.test(listText), 'án cổ là cụm trụ');
   ok(!/hồ sơ khách|Án mẫu/.test(listText), 'không gắn nhãn hồ sơ khách / Án mẫu');
+  ok(!/Tạo án trống|ÁN TRỐNG/.test(anRoot), 'first paint không hiện Tạo án trống');
+  ok(!/ngày sinh|thêm ngày sinh|giờ sinh/i.test(anRoot), 'first paint không nói thêm ngày sinh');
   ok(!/\d{4}-\d{2}-\d{2}/.test(anRoot), 'cold open không có dương lịch YYYY-MM-DD');
-  ok(!/1995-08-12|09:30|giờ sinh/.test(anRoot), 'cold open không hiện ngày/giờ sinh');
+  ok(!/1995-08-12|09:30/.test(anRoot), 'cold open không hiện ngày/giờ sinh');
   ok(await page.locator('#ios-an-root input[type=date]').count() === 0, 'cold open Án không có input ngày');
   ok(await page.locator('#ios-an-root input[type=time]').count() === 0, 'cold open Án không có input giờ');
   ok(await page.locator('#ios-an-root input[type=radio]').count() === 0, 'cold open Án không có radio giới');
+  ok(await page.locator('#ios-an-overflow-panel.hidden').count() === 1, 'panel Tạo án trống đang ẩn');
   ok(await page.locator('#birth-form').count() === 0, 'DOM không có #birth-form');
   ok(await page.locator('#ai-fab').count() === 0, 'DOM không có FAB Giải Mệnh');
   ok(await page.locator('header.hero').count() === 0, 'DOM không có hero web');
@@ -101,6 +104,18 @@ async function main() {
   await page.waitForSelector('#ios-hour-table', { timeout: 20000 });
   const hourBtns = await page.locator('#ios-hour-table .ios-shi-btn').count();
   ok(hourBtns >= 12, `Thi có ${hourBtns} 地支`);
+  ok(await page.locator('#ios-nghiem input[type=date]').count() === 0, 'Đối không có input ngày');
+  ok(await page.locator('#ios-nghiem input[type=time]').count() === 0, 'Đối không có input giờ');
+  const doiFold = await page.evaluate(() => {
+    const root = document.getElementById('ios-nghiem');
+    if (!root) return '';
+    const clone = root.cloneNode(true);
+    clone.querySelectorAll('details').forEach((d) => d.remove());
+    return clone.innerText;
+  });
+  ok(!/\d{4}-\d{2}-\d{2}/.test(doiFold), 'Đối (chưa mở details) không có YYYY-MM-DD');
+  ok(await page.locator('#ios-solar-source').count() === 1, 'có #ios-solar-source');
+  ok(!(await page.locator('#ios-solar-source').getAttribute('open')), 'solar source đang đóng');
   await page.waitForSelector('#ios-hieu-khao', { timeout: 20000 });
   await page.waitForSelector('#ios-family-tree', { timeout: 20000 });
   ok(await page.locator('#ios-family-tree svg').count() >= 1, 'Đối hiện bản in cụm trụ');
@@ -108,7 +123,7 @@ async function main() {
   const doi = await page.locator('#ios-nghiem').innerText();
   ok(/Hiệu khảo|合|歧/.test(doi), 'hiệu khảo có 合 / 歧');
   ok(!/Giải Mệnh|cải mệnh|luận mệnh|diễn giải mệnh/i.test(doi), 'Đối không có CTA tiêu dùng');
-  await page.locator('#ios-family-tree').scrollIntoViewIfNeeded();
+  await page.locator('#ios-thi').scrollIntoViewIfNeeded();
   await page.screenshot({ path: path.join(SHOTS, 'ios-02-tree.png') });
 
   await page.locator('#ios-hour-table').scrollIntoViewIfNeeded();
@@ -136,6 +151,12 @@ async function main() {
   ok(await page.locator('#ios-cite-hit, .ios-cite-hit, .ios-reader-title').count() >= 1, 'reader mở đoạn kinh');
   ok(await page.locator('a[href^="http"]').count() === 0, 'shell không có link http ngoài');
   await page.screenshot({ path: path.join(SHOTS, 'ios-04-cite.png') });
+
+  const reviewDir = path.join(ROOT, 'public', 'review');
+  fs.mkdirSync(reviewDir, { recursive: true });
+  for (const name of ['ios-01-cases.png', 'ios-02-tree.png', 'ios-03-hours.png', 'ios-04-cite.png']) {
+    fs.copyFileSync(path.join(SHOTS, name), path.join(reviewDir, name));
+  }
 
   await browser.close();
   server.close();

@@ -369,6 +369,18 @@
   margin: 12px 0;
 }
 .ios-shi-grid .ios-shi-btn { width: 100%; font-size: 18px; }
+.ios-overflow {
+  display: block;
+  margin: 28px auto 8px;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: #6b7288;
+  font-size: 22px;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
 .ios-quote {
   margin: 8px 0;
   padding: 10px 12px;
