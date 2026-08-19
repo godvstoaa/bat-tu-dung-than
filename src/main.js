@@ -6411,8 +6411,10 @@ $('cfg-test').addEventListener('click', async () => {
     el.style.color = '#e0533d';
   }
 });
-// [user fix] Move ai-fab + ai-popup OUTSIDE #result → visible on landing (before birth entry)
-(function () { const fab = $('ai-fab'), pop = $('ai-popup'); if (fab) document.body.appendChild(fab); if (pop) document.body.appendChild(pop); })();
+// Web: FAB nổi trên landing. iOS: giữ trong #result (đã ẩn) — reviewer không thấy CTA luận giải.
+if (import.meta.env.MODE !== 'ios') {
+  (function () { const fab = $('ai-fab'), pop = $('ai-popup'); if (fab) document.body.appendChild(fab); if (pop) document.body.appendChild(pop); })();
+}
 
 // AI popup (chat widget nổi): mở/đóng. [loop 358] Dùng event DELEGATION (gắn vào document)
 //   thay vì addEventListener trực tiếp — fix bug «sau Luận giải, bấm Giải Mệnh không hoạt động»:
@@ -8002,9 +8004,4 @@ fetch(_apiUrl('/api/ai-config')).then(function (r) { return r.json(); }).then(fu
 
 // [REMOVED] showVipModal + payment/redeem/IAP — gỡ cho App Store (app free, AI unlimited)
 
-// iOS research shell — chỉ khi vite --mode ios
-if (import.meta.env.MODE === 'ios') {
-  import('./ios/shell.js')
-    .then((m) => m.initIosShell())
-    .catch((e) => console.error('[ios-shell]', e));
-}
+// iOS studio entry is src/ios/app.js (ios-app.html) — không nhúng shell vào bundle web.

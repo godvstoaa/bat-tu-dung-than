@@ -1,7 +1,7 @@
 // ============================================================================
 //  corpus.js — loader + search offline cho public/corpus/
 // ============================================================================
-import { CORPUS_BASE } from './flags.js';
+const CORPUS_BASE = 'corpus';
 
 let _index = null;
 const _cache = new Map();

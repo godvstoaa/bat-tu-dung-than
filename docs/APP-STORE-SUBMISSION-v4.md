@@ -1,46 +1,54 @@
-# Lữ Đăng — App Store Strategy v4 (research-first)
+# Lữ Đăng — App Store Strategy (án cổ / 校正)
+
+> **Do not submit until** new IPA + screenshots 01–04 + Connect copy + Marketing URL = `https://battu.god8.shop/review/ios.html`.  
+> A third 4.3(b) on the same listing is worse than waiting.  
+> Paste pack: `docs/CONNECT-PASTE-v5.md`.
 
 > Binary iOS: `npm run build:ios` → `dist-ios/` (`webDir` Capacitor).  
-> Runbook: `docs/IOS-BUILD-v4.md`.
+> Bundle: `shop.god8.battu` · Display: `Lữ Đăng`.  
+> Runbook: `docs/IOS-BUILD-v4.md`.  
+> Web homepage stays a fortune product — do not disguise it; do not use it as Marketing URL.
 
 ## Mục tiêu
-Sau Guideline 4.3(b) 9/6/2026 (fortune telling nêu đích danh): app mở như **công cụ nghiên cứu cổ pháp offline**. Chart Lab là case-study phụ.
+Guideline 4.3(b): không giả thư viện để giấu xem số, không `display:none` engine (2.3.1).  
+Binary iOS **là** xưởng hiệu khảo án cổ (印本教材). Bát Tự là máy tính, không phải sản phẩm diễn giải mệnh. Thi và 应期 là hai cách làm **cùng một án**.
 
 ## Metadata
-- Name: `Lữ Đăng — Cổ Pháp & Chart Lab`
-- Subtitle: `Tra cứu cổ bản · Chart Lab`
-- Category: Education (+ Reference nếu được)
-- Số liệu (`src/ios/corpus-stats.json`): 1523 mục · ~125 bộ · 758 DZ# · 1516 chuỗi lập luận · 1313 bản dịch Việt đáng kể · 497 nguyên văn Hán đáng kể
-- Cấm: largest / only app / độc quyền / 4 tầng mọi văn bản / đổi vận / mở đầu bằng «Bói»
+- Name: `Lữ Đăng — Án cổ · 校正`
+- Subtitle: `Hiệu khảo 教材 · 校正时辰`
+- Category: Education
+- Marketing URL: `https://battu.god8.shop/review/ios.html`
+- Cấm: luận mệnh · horoscope · giải mệnh · vận hôm nay · hợp tuổi · cải mệnh · lập lá số · /100 · sổ hồ sơ mệnh lý một người
 
-## Reviewer path
-1. Mở app → Thư viện  
-2. Tìm `穷通宝鉴` → Nguồn (không link ngoài)  
-3. Lưu trích dẫn → Ghi chú  
-4. Học / Đối chiếu  
-5. Chart Lab case mẫu `1990-06-15 10:00` → `庚午 壬午 辛亥 癸巳`  
-6. Airplane Mode: thư viện + case mẫu vẫn chạy  
+## Reviewer path (≈90s, no login)
+1. Launch → **một** bản in **四柱 教材** (干支 trên thẻ; **không** ngày dương lịch; **không** “Tạo án trống” trên first paint)
+2. Mở plate → tab **Đối**: **Thi** 12 地支 ngay phía trên (chưa mở `#ios-solar-source`)
+3. Chọn 1 时辰 → khóa / lập luận (khớp khóa 教材 hoặc lệch khóa)
+4. **Hiệu khảo** (合 / 歧) + **应期** (luật giữ / không giữ) cùng scroll
+5. Chạm một cite → reader mở đúng đoạn kinh
+6. Airplane Mode: toán cụm + plate + corpus vẫn chạy
+
+## Screenshot order
+1. `ios-01-cases` — 四柱 教材 plate  
+2. `ios-02-tree` — Thi 12 地支  
+3. `ios-03-hours` — 应期 giữ / không giữ  
+4. `ios-04-cite` — citation reader  
 
 ## Review Notes (English, paste)
 
 ```
 PRIMARY PURPOSE
-Lữ Đăng is an offline research tool for Vietnamese-Chinese classical metaphysics. Primary navigation is library search, source comparison, citation-based explanations, and saved notes. BaZi Chart Lab is secondary.
+Lữ Đăng opens one printed 四柱 classroom plate (教材 / 印本) whose hour pillar is blank (时辰未记). The first screen shows stem-branch lines, not Gregorian birth dates. Opening the plate puts a 12-地支 exam (Thi) above collation (Hiệu khảo: engine vs a real classical passage) and recorded-event 应期 pass/fail. Scoring is khóa / lập luận, not destiny. BaZi is the calculator. The library is the citation court.
+
+REMOVED FROM THIS BINARY (not hidden): Tarot/Runes/qian lots, almanac daily luck, destiny score, “change fate” CTAs, consumer “Giải Mệnh” chat FAB.
 
 REVIEW STEPS — no login
-1. Launch → Library.
-2. Search 穷通宝鉴 or a DZ number.
-3. Open a text → Sources tab (copy only, no outbound web links).
-4. Save citation → Notes.
-5. Chart Lab → preloaded sample, no birth form required first.
+1. Launch → one 四柱 教材 plate (干支 / 未记, no YYYY-MM-DD). No empty-case intake on first paint.
+2. Open the plate → Đối leads with Thi (12 地支).
+3. Tap one 时辰 → khóa / lập luận result.
+4. Read ≥1 应期 row (rule holds / does not hold).
+5. Tap a citation → library reader at the matching passage.
 
-Library and core chart math work offline. Network is for optional AI and declared analytics. UI is Vietnamese.
+Marketing URL: https://battu.god8.shop/review/ios.html
+Core math, printed plate, and the 1,523-text library work offline.
 ```
-
-## Resolution Center (if 4.3b)
-
-```
-Thank you for the review. This binary’s primary experience is a classical-text research tool (offline corpus, citations, compare, learning paths). BaZi is a secondary Chart Lab. Analytics on iOS does not send birth dates. We welcome an appeal/appointment if needed.
-```
-
-Do not ask “which apps duplicate our features?”.

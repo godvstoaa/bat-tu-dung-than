@@ -1,5 +1,5 @@
 // ============================================================================
-//  verify-ios-build.mjs — assert artifact dist-ios trước khi cap sync.
+//  verify-ios-build.mjs — artifact dist-ios: studio bundle, không module tiêu dùng
 // ============================================================================
 import fs from 'fs';
 import path from 'path';
@@ -11,8 +11,8 @@ const OUT = path.join(ROOT, 'dist-ios');
 let pass = 0;
 let fail = 0;
 
-function check( Cond, msg) {
-  if (Cond) {
+function check(cond, msg) {
+  if (cond) {
     console.log(`  PASS  ${msg}`);
     pass++;
   } else {
@@ -40,31 +40,52 @@ let indexTotal = 0;
 if (fs.existsSync(indexPath)) {
   const idx = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
   indexTotal = idx.total || idx.items?.length || 0;
-  const nFiles = fs.readdirSync(entriesDir).filter((f) => f.endsWith('.json')).length;
+  const nFiles = fs.readdirSync(entriesDir).filter((x) => x.endsWith('.json')).length;
   check(indexTotal === nFiles, `index.json (${indexTotal}) khớp số file entries (${nFiles})`);
 }
 
-const statsPath = path.join(ROOT, 'src', 'ios', 'corpus-stats.json');
-check(fs.existsSync(statsPath), 'src/ios/corpus-stats.json tồn tại');
-if (fs.existsSync(statsPath)) {
-  const st = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
-  check(st.total === indexTotal, `corpus-stats.json khớp index (${st.total})`);
+const html = fs.readFileSync(path.join(OUT, 'index.html'), 'utf8');
+check(!/fonts\.googleapis\.com/.test(html), 'không còn request Google Fonts');
+check(!/id="birth-form"|id="ai-fab"|class="hero"/.test(html), 'HTML không còn hero / form / FAB web');
+check(/Hiệu chỉnh giờ|校正时辰|Án cổ|校正/i.test(html), 'title/description Án cổ · 校正');
+check(!/luận mệnh/i.test(html), 'HTML không còn «luận mệnh»');
+check(!/sổ hồ sơ mệnh lý|Lập lá số|Giải Mệnh/i.test(html), 'HTML không còn chrome diễn giải mệnh');
+check(!/data-ios-hide/.test(html), 'không dùng data-ios-hide (xoá, không ẩn)');
+
+const manPath = path.join(OUT, 'manifest.webmanifest');
+check(fs.existsSync(manPath), 'manifest.webmanifest có mặt');
+if (fs.existsSync(manPath)) {
+  const man = fs.readFileSync(manPath, 'utf8');
+  check(!/luận mệnh/i.test(man), 'manifest không còn «luận mệnh»');
+  check(/Hiệu chỉnh giờ|校正时辰|Án cổ|校正/i.test(man), 'manifest nói Án cổ / 校正');
 }
 
-  const html = fs.readFileSync(path.join(OUT, 'index.html'), 'utf8');
-  check(!/fonts\.googleapis\.com/.test(html), 'không còn request Google Fonts');
-  check(!/application\/ld\+json/.test(html), 'không còn JSON-LD structured data');
-  check(/Lữ Đăng|Cổ Pháp|Chart Lab|tra cứu/i.test(html), 'title/description research-oriented');
-  check(/data-ios-hide/.test(html), 'HTML có data-ios-hide cho module bói');
+let js = '';
+let appJs = '';
+const assets = path.join(OUT, 'assets');
+for (const f of fs.readdirSync(assets).filter((x) => x.endsWith('.js'))) {
+  const body = fs.readFileSync(path.join(assets, f), 'utf8') + '\n';
+  js += body;
+  if (!f.includes('vendor-lunar') && !f.includes('vendor-astronomy')) appJs += body;
+}
 
-  let js = '';
-  const assets = path.join(OUT, 'assets');
-  for (const f of fs.readdirSync(assets).filter((x) => x.endsWith('.js'))) {
-    js += fs.readFileSync(path.join(assets, f), 'utf8') + '\n';
-  }
-  check(!js.includes('/api/inbox'), 'không chunk nào còn URL /api/inbox');
-  check(js.includes('RESEARCH') || js.includes('TRỢ LÝ NGHIÊN CỨU') || js.includes('trợ lý nghiên cứu'), 'có prompt/persona nghiên cứu');
-  check(js.includes('hasChart'), 'payload chart dùng cờ hasChart');
+check(!js.includes('/api/inbox'), 'không chunk nào còn URL /api/inbox');
+check(!/src\/main\.js|from['"]\.\/main/.test(js), 'không phải bundle web main.js');
+
+const banned = [
+  [/tarot/i, 'tarot'],
+  [/runes-kb|drawRune|TAROT_MAJOR/i, 'runes/tarot kb'],
+  [/cầu thẻ|求签|摇签|qiuqian/i, 'cầu thẻ'],
+  [/Hoàng Lịch|黄历/i, 'hoàng lịch'],
+  [/Nghịch Thiên|cải mệnh/i, 'cải mệnh CTA'],
+  [/Giải Mệnh/, 'Giải Mệnh'],
+  [/vận thế hôm nay/i, 'vận thế hôm nay'],
+  [/\/100/, 'điểm /100'],
+];
+for (const [re, label] of banned) {
+  const hay = label === 'điểm /100' ? appJs : js;
+  check(!re.test(hay) && !re.test(html), `bundle không có ${label}`);
+}
 
 const mb = dirSizeMB(OUT);
 console.log(`  INFO  dist-ios: ${mb} MB`);

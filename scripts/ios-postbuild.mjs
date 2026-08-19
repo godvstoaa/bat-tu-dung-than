@@ -10,10 +10,36 @@ import { pruneIosArtifacts, assertNoPruned, dirSizeMB } from './ios-artifacts.mj
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'dist-ios');
 
-if (!fs.existsSync(path.join(OUT, 'index.html'))) {
+const indexHtml = path.join(OUT, 'index.html');
+const altHtml = path.join(OUT, 'ios-app.html');
+if (fs.existsSync(altHtml)) {
+  fs.renameSync(altHtml, indexHtml);
+}
+if (!fs.existsSync(indexHtml)) {
   console.error('[ios-postbuild] thiếu dist-ios/index.html — chạy vite build --mode ios trước');
   process.exit(1);
 }
+
+fs.writeFileSync(path.join(OUT, 'manifest.webmanifest'), JSON.stringify({
+  name: 'Lữ Đăng — Án cổ · 校正',
+  short_name: 'Lữ Đăng',
+  description: 'Án cổ · 校正: hiệu khảo bản in 教材, thi khóa 时辰, đối 应期 với đoạn kinh trên máy.',
+  lang: 'vi',
+  dir: 'ltr',
+  start_url: '/?source=pwa',
+  scope: '/',
+  display: 'standalone',
+  display_override: ['standalone', 'fullscreen'],
+  orientation: 'any',
+  background_color: '#0a0913',
+  theme_color: '#0a0913',
+  categories: ['education', 'productivity'],
+  icons: [
+    { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+    { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+    { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+  ],
+}, null, 2));
 
 const removed = pruneIosArtifacts(OUT);
 assertNoPruned(OUT);
