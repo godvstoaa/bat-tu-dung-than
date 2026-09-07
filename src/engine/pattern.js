@@ -8,8 +8,9 @@
 //    4) Cách ĐẶC BIỆT (ngoại cách): Chuyên Vượng (曲直/炎上/稼穑/从革/润下),
 //       Tòng cách (tòng tài/sát/ nhi/ vượng/ cường), Hóa khí.
 // ============================================================================
-import { GAN, ZHI, HIDDEN, SHENG, KE, KE_BY, SHENG_BY } from './constants.js';
+import { GAN, ZHI, HIDDEN, SHENG, KE, KE_BY, SHENG_BY, SANHE_HUAQI, SANHUI_HUAQI } from './constants.js';
 import { tenGod, godGroup } from './core.js';
+import { computeSiling } from './chart.js'; // [假从 band] cycle ESM an toàn — chỉ dùng runtime trong detectSpecial
 
 // ---- Tên Hán-Việt cho 8 chính cách + biến thể ----
 export const PATTERN_VI = {
@@ -136,50 +137,72 @@ function detectSpecial(chart, wx, strength, interactions) {
   const monthZhi = chart.monthZhi;
   const total = wx.total || 1;
 
-  // -- TỒNG cách (Nhật Chủ cực nhược, theo một hành khác) --
-  if (strength.ratio < 0.25) {
-    // Đếm nhóm ngoài (Tài/Quan/Thực) xem ai áp đảo
+  const CHONG_MAP = { 子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳' };
+  // -- TỒNG cách (Nhật Chủ theo thế) — [chuẩn 滴天髓 从象 + corpus 2026-08] --
+  //   Tiêu chí CỐT LÕI = HIỆU LỰC GỐC (root effectiveness), không phải % thô:
+  //   gốc VÔ HIỆU nếu: (a) chỉ 余气 (pos ≥ 2 — quá mỏng), (b) chi gốc bị XUNG bởi trụ khác
+  //   (gốc bị thương), (c) chi gốc bị kéo vào tam hợp hóa hành KHÁC (gốc bị hóa mất).
+  //   Vô gốc hiệu lực + nhóm ngoài áp đảo (≥45%) → 从. Còn trợ nhẹ (Ấn/比 hidden/rò rỉ)
+  //   → 假从 (theo thế CÓ ĐIỀU KIỆN — vận gặp trợ = biến động). 印/比当令 hoặc 透干 → KHÔNG từ.
+  {
     const groups = { cai: 0, guan: 0, shi: 0 };
     for (const [w, s] of Object.entries(wx.score)) {
       const rel = relGroup(dmWx, w);
       if (groups[rel] !== undefined) groups[rel] += s;
     }
     const dom = Object.entries(groups).sort((a, b) => b[1] - a[1])[0];
-    if (dom[1] / total > 0.45) {
-      // phải ít/không có Ấn-Tỷ trợ thân
-      const help = (wx.score[dmWx] + wx.score[SHENG_BY[dmWx]]) / total;
-      if (help < 0.22) {
-        const map = { cai: '從財格', guan: '從殺格', shi: '從兒格' };
-        // [子平真诠/滴天髓 FIX — audit 2026-08] 真从 requires 日主 VÔ GỐC (bản khí/trung khí
-        //   không còn Nhật Chủ ở bất kỳ chi nào). Còn gốc → 假从 (theo thế CÓ ĐIỀU KIỆN):
-        //   vận gặp gốc = biến động lớn. Tag congGia để brief/AI luận đúng, tránh cứng nhắc.
-        let dmRoot = false;
-        for (const zk of ['year', 'month', 'day', 'time']) {
-          const hid = HIDDEN[chart.pillars[zk].zhi] || [];
-          for (let hi = 0; hi < Math.min(hid.length, 2); hi++) {
-            const hx = GAN[hid[hi]] ? GAN[hid[hi]].wx : null; // [FIX] HIDDEN là mảng chuỗi — hid[hi] đã là can
-            if (hx === dmWx) { dmRoot = true; break; }
-          }
-          if (dmRoot) break;
-        }
-        const res = { kind: 'cong', name: map[dom[0]], geShen: { wx: dominantWx(dmWx, dom[0]) } };
-        if (dmRoot) {
-          res.congGia = true;
-          res.note = 'Nhật Chủ còn gốc (bản khí/trung khí) → 假从 — theo thế CÓ ĐIỀU KIỆN: vận gặp gốc là biến động lớn, luận linh hoạt hơn 真从.';
-        }
-        return res;
+    const help = (wx.score[dmWx] + wx.score[SHENG_BY[dmWx]]) / total;
+    const domRatio = dom[1] / total;
+
+    // 1. HIỆU LỰC GỐC Nhật Chủ: duyệt 4 chi — gốc 本气/trung khí CHƯA bị vô hiệu mới tính
+    let dmEffectiveRoot = false;
+    const pillars = chart.pillars;
+    const branchKeys = ['year', 'month', 'day', 'time'];
+    for (const zk of branchKeys) {
+      const zhi = pillars[zk].zhi;
+      const hid = HIDDEN[zhi] || [];
+      const pos = hid.indexOf(chart.dayGan) >= 0 ? hid.indexOf(chart.dayGan) : -1;
+      if (pos < 0 || pos > 1) continue; // 余气 (pos 2) → không đủ làm gốc
+      // gốc bị XUNG?
+      const clashed = branchKeys.some((ok) => ok !== zk && CHONG_MAP[zhi] === pillars[ok].zhi);
+      // gốc bị TAM HÓA (chi thuộc tam hợp, 化神 ≠ dmWx)?
+      const inSanhe = Object.entries(SANHE_HUAQI || {}).find(([keys, hua]) => keys.split('').includes(zhi) && hua !== dmWx);
+      if (!clashed && !inSanhe) { dmEffectiveRoot = true; break; }
+    }
+
+    // 2. Ấn/比當令 hoặc 透干 → tháng/trời nuôi thân → KHÔNG từ (trừ 真从 band vô trợ)
+    let helperTou = false;
+    for (const zk of ['year', 'month', 'time']) {
+      const gwx = GAN[pillars[zk].gan] ? GAN[pillars[zk].gan].wx : null;
+      if (gwx === dmWx || gwx === SHENG_BY[dmWx]) { helperTou = true; break; }
+    }
+    let silBlocked = false;
+    try {
+      const sil = computeSiling(chart);
+      if (sil && (sil.wx === dmWx || sil.wx === SHENG_BY[dmWx])) silBlocked = true;
+    } catch (_) {}
+
+    // 3. Nhóm ngoài áp đảo + vô gốc hiệu lực → 从 (theo thế)
+    if (domRatio > 0.45 && help <= 0.40 && !dmEffectiveRoot && !helperTou && !silBlocked) { // [cap] help > 40% = 母多子病 (Ấn chủ đạo) — không phải 从
+      const congGia = help > 0.12 || strength.ratio >= 0.25; // còn dấu vết trợ → 假从
+      const map = { cai: '從財格', guan: '從殺格', shi: '從兒格' };
+      const res = { kind: 'cong', name: map[dom[0]], geShen: { wx: dominantWx(dmWx, dom[0]) } };
+      if (congGia) {
+        res.congGia = true;
+        res.note = 'Nhật Chủ vô gốc hiệu lực (gốc 余气/bị xung/bị hóa) nhưng còn dấu vết trợ → 假从 — vận gặp trợ = biến động lớn.';
       }
+      return res;
     }
   }
 
   // -- CHUYÊN VƯỢNG / TÒNG VƯỢNG (Nhật Chủ cực vượng, một hành áp đảo) --
-  if (strength.ratio > 0.70) {
+  if (strength.ratio > 0.58) { // [cập nhật] 0.70→0.58: 从旺 cổ pháp chấp nhận dm áp đảo không cần 三合 (vd 丙午×3 炎上)
     const dmScore = wx.score[dmWx] / total;
     // Chuyên vượng: cần tam hợp/tam hội行 Nhật Chủ + không có quan sát khắc
     const sanHui = (interactions.sanHui || []).some((s) => s.wx === dmWx);
     const sanHe = (interactions.sanHe || []).some((s) => s.wx === dmWx);
     const hasOfficer = hasOfficerStem(chart, dmWx);
-    if ((sanHui || sanHe) && !hasOfficer && dmScore > 0.40) {
+    if ((sanHui || sanHe || dmScore > 0.55) && !hasOfficer) { // [cập nhật] đ Chi phá cách khi dm áp đảo trần trụi (≈55%) — không bắt buộc 三合
       const zwMap = { 木: '曲直格', 火: '炎上格', 土: '稼穡格', 金: '從革格', 水: '潤下格' };
       return { kind: 'zhuanwang', name: zwMap[dmWx], geShen: { wx: dmWx } };
     }

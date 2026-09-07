@@ -874,6 +874,7 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   //   Chỉ khi: (a) quality='有救', (b) KHÔNG 调候 override (调候 đã xử lý cực đoán), (c) thuốc ≠ primary.
   try {
     if (patternQualityResult && patternQualityResult.quality === '有救'
+        && !(pattern && pattern.type === 'special') // [FIX corpus 2026-08] cách TỪ: Dụng = hướng theo thế, thuốc cứu không đè
         && !(yong.tiaohou?.override) && patternQualityResult.rescues?.length) {
       const dmWx = chart.dayMaster.wx;
       const GROUP_WX = { ti: dmWx, yin: SHENG_BY[dmWx], shi: SHENG[dmWx], cai: KE[dmWx], guan: KE_BY[dmWx] };

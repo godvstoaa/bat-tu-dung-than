@@ -9,6 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node selftest.mjs",
+    "accuracy": "node scripts/classical-accuracy.mjs",
     "deploy": "rm -rf dist && node scripts/build-seo-pages.mjs && vite build && npx wrangler deploy",
     "deploy:worker": "npx wrangler deploy",
     "build:corpus": "node scripts/build-corpus.mjs",

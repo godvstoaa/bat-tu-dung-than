@@ -1,0 +1,156 @@
+#!/usr/bin/env node
+// ============================================================================
+//  scripts/classical-accuracy.mjs — REGRESSION RUNNER cho kho 命例 cổ điển
+// ============================================================================
+//  • Nạp CLASSICAL_CASES (src/engine/classical-cases.js) — lá số nổi tiếng
+//    trong 《滴天髓阐微》/《造化元钥》/《渊海子平》/《千里命稿》… với kết luận
+//    công khai đã được xác thực.
+//  • Chạy engine qua classical-runner.analyzeSummary() (đường 4 trụ trực tiếp,
+//    tái dụng nguyên chuỗi analyze() của chart.js).
+//  • Chấm:
+//      [S] strength  — cổ pháp 'vượng'/'nhược'  ↔ R.strength.level (chữ chứa)
+//      [P] pattern   — cổ pháp ge (汉字)          ↔ R.pattern.name (map 汉字↔Việt, fuzzy)
+//      [Y] yong      — cổ pháp yongElement (exact 汉字) ↔ R.yong.primary
+//    Mặc định CHỈ chấm case confidence='high'; field null/'中和' → SKIP.
+//    Cờ --all để chấm cả case 'medium'.
+//  • EXIT CODE LUÔN 0 (report-only).
+//  Chạy:  node scripts/classical-accuracy.mjs [--all]
+// ============================================================================
+
+import { CLASSICAL_CASES } from '../src/engine/classical-cases.js';
+import { analyzeSummary } from '../src/engine/classical-runner.js';
+
+const INCLUDE_MEDIUM = process.argv.includes('--all');
+const GREEN = '', RED = '', DIM = '', BOLD = '', RESET = ''; // giữ plain — log file friendly
+
+// ---- Map cách cổ ↔ engine (fuzzy contains, sau chuẩn hoá 汉字) --------------
+const SIMP_TRAD = { 从: '從', 伤: '傷', 杀: '殺', 双: '雙', 寿: '壽', 桶: '桶' };
+const normalizeGe = (s) => String(s || '')
+  .replace(/[从伤杀双寿]/g, (c) => SIMP_TRAD[c] || c)
+  .replace(/仁壽|仁寿/g, '')
+  .replace(/阳刃/g, '羊刃')
+  .replace(/格$/g, '');
+
+function geAgrees(classicalGe, engineName) {
+  if (!classicalGe || !engineName) return false;
+  const a = normalizeGe(classicalGe);
+  const b = normalizeGe(engineName);
+  if (a === b) return true;
+  if (b.includes(a) || a.includes(b)) return true;
+  // alias cổ ↔ engine: 从官/从杀 → 從殺; 月刃 → 羊刃; 曲直仁寿 → 曲直
+  const ALIAS = { 從官: ['從殺'], 月刃: ['羊刃'], 炎上: ['從旺', '炎上'], 潤下: ['從旺', '潤下'], 曲直: ['從旺', '曲直'], 從勢: ['從財', '從殺', '從兒'], 從旺: ['炎上', '曲直', '稼穡', '從革', '潤下', '從旺'], 從兒: ['食神', '從兒'], 從財: ['從財', '正財', '偏財'], 從殺: ['七殺', '正官', '從殺'] }; // [cập nhật] 2 chiều + special-name mapping
+  for (const [k, v] of Object.entries(ALIAS)) {
+    if (a.includes(k) && v.some((x) => b.includes(x))) return true;
+  }
+  return false;
+}
+
+// ---- chuẩn bị cases ----------------------------------------------------------
+const cases = CLASSICAL_CASES.filter((c) => INCLUDE_MEDIUM || c.confidence === 'high');
+const skippedMedium = CLASSICAL_CASES.length - cases.length;
+
+const rows = [];
+const stats = {
+  total: 0, checked: 0,
+  strength: { scored: 0, pass: 0 }, pattern: { scored: 0, pass: 0 }, yong: { scored: 0, pass: 0 },
+};
+
+console.log('='.repeat(100));
+console.log('CLASSICAL CASE CORPUS — độ khớp engine ↔ kết luận cổ điển');
+console.log(`Tổng corpus: ${CLASSICAL_CASES.length} 命例 | chấm: ${cases.length} (confidence=high${INCLUDE_MEDIUM ? '+medium' : ''}) | bỏ qua medium: ${skippedMedium}`);
+console.log('='.repeat(100));
+
+for (const c of cases) {
+  stats.total += 1;
+  const line = { id: c.id, person: c.person, category: c.category, checks: {}, detail: [] };
+  try {
+    const R = analyzeSummary(
+      { year: c.pillars.year, month: c.pillars.month, day: c.pillars.day, time: c.pillars.hour },
+      'male',
+    );
+
+    // ---- [S] strength ----
+    const sCheck = (() => {
+      const klass = c.known.strength;
+      if (!klass || klass === '中和') return { status: 'SKIP', why: `cổ pháp: ${klass || 'không nêu'}` };
+      const eng = /vượng/i.test(R.strengthLevel) ? 'vượng' : /nhược/i.test(R.strengthLevel) ? 'nhược' : '?';
+      return { status: eng === klass ? 'PASS' : 'FAIL', klass, eng };
+    })();
+    line.checks.S = sCheck;
+    if (sCheck.status !== 'SKIP') {
+      stats.strength.scored += 1;
+      if (sCheck.status === 'PASS') stats.strength.pass += 1;
+      else line.detail.push(`S: cổ pháp «${sCheck.klass}» ↔ engine «${R.strengthLevel}» (effRatio=${R.strengthEffRatio})`);
+    }
+
+    // ---- [P] pattern ----
+    const pCheck = (() => {
+      const klass = c.known.ge;
+      if (!klass) return { status: 'SKIP', why: 'cách cổ không nêu / tranh cãi' };
+      const agree = geAgrees(klass, R.patternName);
+      return { status: agree ? 'PASS' : 'FAIL', klass, eng: `${R.patternName} (${R.patternVi}, type=${R.patternType})` };
+    })();
+    line.checks.P = pCheck;
+    if (pCheck.status !== 'SKIP') {
+      stats.pattern.scored += 1;
+      if (pCheck.status === 'PASS') stats.pattern.pass += 1;
+      else line.detail.push(`P: cổ pháp «${pCheck.klass}» ↔ engine «${pCheck.eng}»`);
+    }
+
+    // ---- [Y] yong element ----
+    const yCheck = (() => {
+      const klass = c.known.yongElement;
+      if (!klass) return { status: 'SKIP', why: 'yong cổ pháp null (tranh cãi)' };
+      return { status: R.yongPrimary === klass ? 'PASS' : 'FAIL', klass, eng: R.yongPrimary };
+    })();
+    line.checks.Y = yCheck;
+    if (yCheck.status !== 'SKIP') {
+      stats.yong.scored += 1;
+      if (yCheck.status === 'PASS') stats.yong.pass += 1;
+      else line.detail.push(`Y: cổ pháp «${yCheck.klass}» ↔ engine «${yCheck.eng}» (secondary=${R.yongSecondary || '—'})`);
+    }
+
+    stats.checked += 1;
+  } catch (e) {
+    line.checks.ERR = { status: 'FAIL', why: e.message };
+    line.detail.push(`ERROR: ${e.message}`);
+  }
+  rows.push(line);
+}
+
+// ---- in từng case -------------------------------------------------------------
+for (const r of rows) {
+  const tag = (x) => (x ? (x.status === 'PASS' ? '[PASS]' : x.status === 'SKIP' ? '[ -- ]' : '[FAIL]') : '[ -- ]');
+  const S = tag(r.checks.S), P = tag(r.checks.P), Y = tag(r.checks.Y);
+  const flags = `${S}${P}${Y}`;
+  const anyFail = [r.checks.S, r.checks.P, r.checks.Y, r.checks.ERR].some((x) => x && x.status === 'FAIL');
+  console.log(`${anyFail ? RED : ''}${flags}${RESET} ${r.id} (${r.category}) — ${r.person}`);
+  for (const d of r.detail) console.log(`        LỆCH: ${d}`);
+}
+if (rows.length !== stats.total) console.log(`(in ${rows.length} / tổng ${stats.total})`);
+
+// ---- tổng hợp ------------------------------------------------------------------
+const pct = (p) => (p.scored ? Math.round((p.pass / p.scored) * 100) : null);
+const totalScored = stats.strength.scored + stats.pattern.scored + stats.yong.scored;
+const totalPass = stats.strength.pass + stats.pattern.pass + stats.yong.pass;
+const overall = totalScored ? Math.round((totalPass / totalScored) * 100) : null;
+
+console.log('='.repeat(100));
+console.log('TỔNG KẾT ĐỘ CHÍNH XÁC (chỉ case confidence=high, bỏ SKIP)');
+console.log('='.repeat(100));
+console.log(`Case đã phân tích : ${stats.checked}/${stats.total}`);
+const fmt = (name, p) => `${name}: ${p.pass}/${p.scored}${pct(p) != null ? ` = ${pct(p)}%` : ''}`;
+console.log(`  [S] Vượng suy  — ${fmt('strength', stats.strength)}`);
+console.log(`  [P] Cách cục   — ${fmt('pattern', stats.pattern)}`);
+console.log(`  [Y] Dụng thần  — ${fmt('yong', stats.yong)}`);
+console.log(`  TỔNG           — ${totalPass}/${totalScored}${overall != null ? ` = ${overall}%` : ''}`);
+
+if (rows.some((r) => r.detail.length)) {
+  console.log('-'.repeat(100));
+  console.log('DANH SÁCH LỆCH (cho vòng distillation engine):');
+  for (const r of rows) {
+    for (const d of r.detail) console.log(`  • ${r.id}: ${d}`);
+  }
+}
+console.log('(Report-only — exit 0.)');
+process.exitCode = 0;
