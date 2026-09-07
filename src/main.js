@@ -95,7 +95,18 @@ import { checkDayunInteractions } from './engine/dayun-check.js';
 import { rankDayun } from './engine/dayun-rank.js'; // [loop 1078] rich totalScore (Dụng+十神+冲合) cho charts
 import { computeMarriageShensha, computeExtraShensha } from './engine/shensha-marriage.js';
 import { viToHan } from './engine/vi2han.js';
-import { askAI, getConfig, setConfig, isAIReady, PRESETS, testAIConnection, suggestFollowups } from './engine/ai.js';
+import { askAI, getConfig, setConfig, isAIReady, PRESETS, testAIConnection, suggestFollowups, buildChartBrief } from './engine/ai.js';
+import { checkNeo } from './engine/neo-checker.js'; // [RESTORE] bị mất khi process song song prune — neo accuracy checker
+// [NATIVE iOS] Capacitor plugins — native feel (haptics + status bar) để không bị coi là «repackaged website» (4.2).
+//   Web: plugin tự no-op (web implementation) — không crash trình duyệt.
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { StatusBar, Style } from '@capacitor/status-bar';
+// [FIX SMOKE] chỉ gọi plugin khi chạy NATIVE thật — trên web Capacitor StatusBar ném
+//   console.error «not implemented on web» (khác haptics no-op) →噪声 console + smoke fail.
+const _isNativeShell = typeof window !== 'undefined' && !!window.Capacitor && !!(window.Capacitor.isNativeAvailable && window.Capacitor.isNativeAvailable());
+const _haptic = (fn) => { if (_isNativeShell) { try { fn(); } catch (_) {} } };
+const hapticImpact = (s) => _haptic(() => Haptics.impact({ style: s || ImpactStyle.Medium }));
+const hapticNotify = (t) => _haptic(() => Haptics.notification({ type: t || 'SUCCESS' }));
 import { decadeForecast } from './engine/decade-forecast.js';
 import { starPower } from './engine/star-power.js';
 import { annualTabooOverview } from './engine/annual-taboo.js';
@@ -593,14 +604,20 @@ function renderSynthesis(R) {
       const extras = ps.slice(Math.max(adviceIdx + 1, 4)).filter(Boolean);
       return `<p class="syn-advice">${esc(advice)}</p>${extras.map((p) => `<p class="hint" style="margin-top:4px">${esc(p)}</p>`).join('')}`;
     })()}`;
-  // [user request] nút callout Nghịch Thiên Cải Mệnh → cuộn tới #remedy-fate + flash highlight
+  // [user request · FIX] nút callout Nghịch Thiên Cải Mệnh → MỞ chat AI + hỏi SẴN về cải mệnh.
+  //   Cũ: chỉ cuộn tới #remedy-fate — card này render LAZY, lúc bấm còn rỗng → «không có gì hết».
+  //   Nay: mở popup AI + prefill câu hỏi cá nhân hoá (nghiệp gốc + 3 tầng 形心业) + auto-ask.
   const _ntcmGoto = document.getElementById('ntcm-goto');
   if (_ntcmGoto) _ntcmGoto.addEventListener('click', () => {
-    const t = document.getElementById('remedy-fate');
-    if (!t) return;
-    t.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    t.classList.add('ntcm-flash');
-    setTimeout(() => t.classList.remove('ntcm-flash'), 1600);
+    hapticImpact(ImpactStyle.Medium); // [NATIVE]
+    const pop = $('ai-popup');
+    if (pop) pop.classList.remove('hidden');
+    const _ntcmQ = 'Luận giúp con NGHỊCH THIÊN CẢI MỆNH cho lá số này: (1) nghiệp gốc nào cần giải trước và dấu nhận biết, (2) hóa giải 3 tầng 形/心/业 cụ thể ra sao, (3) bắt đầu từ bước nào NGAY tuần này? Nói thẳng, đừng an ui.';
+    const qEl = $('question');
+    if (qEl) qEl.value = _ntcmQ;
+    if (!_aiBusy) handleAsk(); // đang bận → chỉ mở popup + prefill, user bấm Hỏi khi xong
+    const _cl = $('chat-log');
+    if (_cl) setTimeout(() => _cl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 120);
   });
 }
 
@@ -4364,12 +4381,38 @@ async function handleAsk() {
     body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? chatBrand().short + ' (trực tuyến)' : chatBrand().short + ' (cục bộ)';
-    _logEvent('ai_chat', { q: q.slice(0,500), response: String(text).slice(0,2000), source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed, detail: meta && meta.detail, toolsOn0: meta && meta.toolsOn0, error: meta && meta.error }); // [loop 1387] LUÔN log frontend (server capture ko reliable response dài)
+    // [NEO-CHECKER] đo accuracy neo-data của response vs brief → log score + conflicts cho admin theo dõi
+    let _neo = null;
+    try { if (source === 'ai' && currentResult) { const _brief = buildChartBrief(currentResult); _neo = checkNeo(String(text).slice(0, 8000), _brief); } } catch (_) {}
+    _logEvent('ai_chat', { q: q.slice(0,2000), response: String(text).slice(0,16000), source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed, detail: meta && meta.detail, toolsOn0: meta && meta.toolsOn0, error: meta && meta.error, neoScore: _neo && _neo.score, neoConflicts: _neo && _neo.conflicts, neoHasRedFlag: _neo && _neo.hasRedFlag, neoChecked: _neo && _neo.totalChecked }); // [loop 1387] LUÔN log frontend — [FIX] cap 16000 để log ĐỦ câu trả lời + [NEO] score/conflicts
     // [loop 947] message actions (refactored → addMsgActions helper, dùng cả cho restore)
     addMsgActions(body, text);
-    // [loop 928] gợi ý câu hỏi kế tiếp theo ngữ cảnh (cảm giác ông thầy tư vấn)
+    // [NEO BADGE — user-facing] app bói TỰ CHẤM ĐIỂM mỗi câu trả lời vs lá số đã tính (độc quyền App Store).
     try {
-      const _fups = suggestFollowups(q, currentResult);
+      if (_neo && _neo.hasRedFlag) hapticNotify('WARNING'); else hapticNotify('SUCCESS'); // [NATIVE] rung báo kết quả kiểm chứng
+      if (_neo && _neo.score != null) {
+        const wrap = body.parentElement;
+        if (wrap) {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.style.cssText = 'display:inline-flex;align-items:center;gap:5px;margin:6px 14px 2px;padding:4px 10px;font-size:11px;font-family:inherit;cursor:pointer;border-radius:12px;border:1px solid ' + (_neo.hasRedFlag ? 'rgba(224,83,61,.5)' : 'rgba(212,175,55,.35)') + ';color:' + (_neo.hasRedFlag ? '#e0533d' : 'var(--gold,#d4af37)') + ';background:rgba(212,175,55,.06)';
+          chip.innerHTML = (_neo.hasRedFlag ? '⚠' : '🎯') + ' Neo ' + _neo.score + '% · ' + _neo.totalChecked + ' mốc dữ liệu' + (_neo.conflicts.length ? ' · ' + _neo.conflicts.length + ' mâu thuẫn' : ' · khớp lá số');
+          const det = document.createElement('div');
+          det.style.cssText = 'display:none;margin:2px 14px 8px;padding:8px 10px;font-size:11px;line-height:1.5;background:rgba(0,0,0,.25);border-radius:8px;border:1px solid rgba(212,175,55,.15)';
+          det.innerHTML = '<b>Kiểm chứng tự động:</b> so từng dữ liệu thầy nêu (ngũ hành %, vượng suy, can-chi, năm, hướng…) với lá số đã tính bằng thuật toán.' +
+            (_neo.conflicts.length
+              ? '<br><b style="color:#e0533d">Mâu thuẫn phát hiện:</b><br>' + _neo.conflicts.map((c) => '• <b>[' + esc(String(c.type || '?')) + ']</b> thầy nói «' + esc(String(c.said || '?')) + '» — lá số ghi «' + esc(String(c.brief || '?')) + '»').join('<br>')
+              : '<br>✅ Mọi mốc dữ liệu khớp lá số đã tính.') +
+            '<br><span style="opacity:.55">Neo đo độ khớp dữ liệu nền tảng — bấm «⚠» trong admin xem phân tích.</span>';
+          chip.onclick = () => { det.style.display = det.style.display === 'none' ? 'block' : 'none'; };
+          wrap.insertBefore(chip, body.nextSibling);
+          wrap.insertBefore(det, chip.nextSibling);
+        }
+      }
+    } catch (_) {}
+    // [loop 928 → SMART v2] gợi ý câu hỏi kế tiếp — engine thông minh: đọc câu hỏi + câu trả lời AI + lịch sử chat
+    try {
+      const _fups = suggestFollowups(q, currentResult, text, chatHistory);
       if (_fups && _fups.length) {
         const fc = document.createElement('div');
         fc.className = 'msg-followups';
@@ -4568,6 +4611,7 @@ async function run() {
   const dateVal = $('date').value;
   const timeVal = $('time').value || '12:00';
   if (!dateVal) return;
+  hapticImpact(ImpactStyle.Medium); // [NATIVE] phản hồi xúc giác khi bấm Luận giải
   // [loop 447] loading state — visual feedback during compute+render
   const _btn = document.querySelector('#birth-form button[type="submit"]');
   if (_btn) { const _orig = _btn.innerHTML; _btn.innerHTML = '⏳ Đang luận giải…'; _btn.disabled = true; _btn.classList.add('btn-loading'); setTimeout(() => { _btn.innerHTML = _orig; _btn.disabled = false; _btn.classList.remove('btn-loading'); }, 6000); }
@@ -4668,6 +4712,7 @@ async function run() {
   //   không giết 25 module phía sau như try/catch khối cũ (agent-audit finding: chain-catch
   //   nuốt toàn bộ phần đuôi → user thấy nửa trang mà không biết lỗi gì).
   const _rs = (name, fn) => { try { fn(); } catch (e) { console.warn('render ' + name + ':', e && e.message); } };
+  _rs('reasoningHero', () => renderReasoningChains(currentResult)); // [RESTORE] HERO — chuỗi lập luận cổ pháp lên đầu kết quả
   _rs('verdict', () => renderVerdict(currentResult));
   _rs('verdict3D', () => renderVerdict3D(currentResult));
   _rs('synthesis', () => renderSynthesis(currentResult));
@@ -4896,9 +4941,11 @@ async function run() {
   }
   // [loop 937] collapsible groups (mobile default-collapse secondary) — sau quick-nav (grp.id đã set)
   initCollapsibleGroups();
-  // reveal print button
+  // reveal print + share buttons
   const pbtn = $('print-btn');
   if (pbtn) pbtn.classList.remove('hidden');
+  const sbtn = $('share-btn');
+  if (sbtn) sbtn.classList.remove('hidden');
   const curYear = new Date().getFullYear();
   // [AUDIT v3 — ISOLATION] đuôi run() bọc riêng từng module (agent-audit: trước đây 1 throw
   //   ở đây giết cả init3DTilt + card-search vì async rejection không ai catch).
@@ -6297,11 +6344,179 @@ function renderAmTa(R) {
   root.appendChild(box);
 }
 
+// ═══════════════ [RESTORE — APP-STORE EDU v2] HERO: CHUỖI LẬP LUẬN CỔ PHÁP + EDUCATION MODE ═══════════════
+//   Bị mất khi process song song (Cursor S0-S2) commit từ snapshot cũ. Viết lại nguyên bản.
+//   4.3(b) fix: khác biệt nhìn thấy = mỗi kết luận hiện TRÍCH DẪN → TIỀN ĐỀ → SUY LUẬN → PHẢN BIỆN.
+const EDU = import.meta.env.MODE === 'edu';
+const _RC_WXVI = { '木': 'Mộc', '火': 'Hỏa', '土': 'Thổ', '金': 'Kim', '水': 'Thủy' };
+
+function _rcSourceFor(yong) {
+  const m = ((yong && yong.method) || []).join(' ');
+  const src = [];
+  if (/调候|điều hậu/i.test(m)) src.push('穷通宝鉴《Tiểu Thông Bảo Giám》— điều hậu theo ngày chủ × tháng sinh');
+  if (/从|tòng/i.test(m)) src.push('子平真诠《Tử Bình Chân Thuyên》— chương cách cục (tòng cách)');
+  if (/扶抑|phù ức|bệnh dược|病药/i.test(m)) src.push('渊海子平《Uyên Hải Tử Bình》+ 命理约言 (phù ức / bệnh dược)');
+  if (yong && yong.tiaohou && yong.tiaohou.note) src.push('Ghi chú điều hậu: ' + String(yong.tiaohou.note).slice(0, 100));
+  return src.length ? src.join(' · ') : '子平真诠 · 三命通会 (cổ pháp Tử Bình)';
+}
+
+function _rcCard(head, rows) {
+  return `<div style="background:rgba(0,0,0,.22);border:1px solid rgba(212,175,55,.22);border-left:3px solid var(--gold,#d4af37);border-radius:8px;padding:12px 14px;margin:8px 0">
+    <div style="font-weight:700;color:var(--gold,#d4af37);font-size:13px;margin-bottom:6px">🏷 KẾT LUẬN: ${head}</div>
+    ${rows.map((r) => `<div style="font-size:12px;line-height:1.55;margin:3px 0;color:var(--text,#e8e0cc)"><b style="opacity:.85">${r[0]}</b> ${r[1]}</div>`).join('')}
+  </div>`;
+}
+
+function renderReasoningChains(R) {
+  const host = $('result'); if (!host || !R) return;
+  let el = document.getElementById('reasoning-hero'); if (el) el.remove();
+  el = document.createElement('section'); el.className = 'card'; el.id = 'reasoning-hero';
+  el.style.borderColor = 'rgba(212,175,55,0.45)';
+  const y = R.yong || {}, st = R.strength || {}, pat = R.pattern || {}, syn = R.synthesis || {}, c = R.chart || {};
+  const wxSorted = Object.entries(R.wx?.pct || {}).sort((a, b) => b[1] - a[1]);
+  const cards = [];
+  try {
+    const premises = [
+      `(1) Thân ${esc(st.level || '?')} — tỉ lệ phù trợ ${((st.ratio || 0) * 100).toFixed(1)}%${st.deLenh ? ', đắc lệnh' : ', thất lệnh'}${st.deDia ? ' + đắc địa (thông căn)' : ''}`,
+      `(2) Ngũ hành: ${wxSorted.slice(0, 2).map(([w, p]) => `${_RC_WXVI[w] || w} ${Math.round(p)}%`).join(' + ')} dẫn đoạt; yếu nhất ${_RC_WXVI[wxSorted[wxSorted.length - 1]?.[0]] || '?'} ${Math.round(wxSorted[wxSorted.length - 1]?.[1] || 0)}%`,
+      `(3) Sinh mùa ${esc((c.jieqi && c.jieqi.prev && c.jieqi.prev.name) || (c.lunar && c.lunar.month) || '?')} — ngữ cảnh tiết khí`,
+    ];
+    const counter = (y.tiaohou && (y.tiaohou.override || /LÀM CHỦ/i.test(y.tiaohou.note || '')))
+      ? 'Phù ức (thân nhược cần Ấn) ĐÃ được xét — nhưng cực hàn/nhiệt thì cổ pháp lấy điều hậu làm gấp («调候为急»), override kết luận cân bằng.'
+      : 'Trường hợp không cực đoan → phương pháp phù ức (cân bằng vượng suy) giữ nguyên như lập luận chính.';
+    cards.push(_rcCard(`Dụng Thần = ${_RC_WXVI[y.primary] || y.primary || '?'} · Hỷ ${_RC_WXVI[y.xi] || '?'} · Kỵ ${_RC_WXVI[y.ji] || '?'}`, [
+      ['📖 TRÍCH DẪN:', esc(_rcSourceFor(y))],
+      ['⚖️ TIỀN ĐỀ:', esc(premises.join(' · '))],
+      ['🔗 SUY LUẬN:', esc(((y.reasons || []).join(' ') || '(xem chi tiết mục Dụng Thần)'))],
+      ['⚠️ PHẢN BIỆN ĐÃ XÉT:', esc(counter)],
+    ]));
+  } catch (_) {}
+  try {
+    cards.push(_rcCard(`Thân ${esc(st.level || '?')} (${((st.ratio || 0) * 100).toFixed(1)}% phù trợ)`, [
+      ['📖 TRÍCH DẪN:', '子平真诠 «THÁNG LỆNH LÀ CỐI» (月令为纲) + 渊海子平 — 3 pháp 得令/得地/得势'],
+      ['⚖️ TIỀN ĐỀ:', esc(`đắc lệnh: ${st.deLenh ? '✓' : '✗'} · đắc địa (thông căn): ${st.deDia ? '✓' : '✗'} · thời vận: ${st.qiPhase || '?'}${st.sanFaBonus ? ` · hoa giáng +${st.sanFaBonus} (cổ pháp «đắc lệnh giả vượng»)` : ''}`)],
+      ['🔗 SUY LUẬN:', 'So sánh lực phù trợ (Ấn + Tỷ) với lực khắc tiết (Tài + Quan + Thực) trên cả 4 trụ, có cộng hoa giáng theo tháng lệnh.'],
+      ['⚠️ PHẢN BIỆN ĐÃ XÉT:', 'Tàng can trong địa chi đã đếm đủ (không chỉ thiên can lộ) — tránh kết luận «mạnh/yếu» chỉ từ bề mặt.'],
+    ]));
+  } catch (_) {}
+  try {
+    cards.push(_rcCard(`${esc(pat.vi || '?')} (${esc(pat.name || '')})`, [
+      ['📖 TRÍCH DẪN:', '子平真诠 chương 8 «Luận cách cục» — lấy nguyệt lệnh làm cách'],
+      ['⚖️ TIỀN ĐỀ:', esc(`Nguyệt lệnh ${c.pillars && c.pillars.month ? c.pillars.month.zhi : '?'} → ${pat.geShen ? 'thần cách ' + (pat.geShen.gan || '') + ' (' + (pat.geShen.god || '?') + ')' : '(can tòng/vương)'}`)],
+      ['🔗 SUY LUẬN:', esc((pat.note || '').slice(0, 200) || 'Cách cục thành + cứu ứng được xét trong mục Cách Cục Thành Bại.')],
+      ['⚠️ PHẢN BIỆN ĐÃ XÉT:', esc(R.patternQuality && R.patternQuality.quality ? ('Chất lượng cách: ' + R.patternQuality.quality + (R.patternQuality.rescues && R.patternQuality.rescues.length ? ' — có cứu ứng («bại trung hữu thành»)' : '')) : 'Thành/bại + cứu ứng: xem mục Cách Cục Thành Bại.')],
+    ]));
+  } catch (_) {}
+  try {
+    const combos = (syn.combos || []).map((cb) => `${cb.vi}[${cb.tone === 'cat' ? 'cát' : 'hung'}]`).join(' · ');
+    cards.push(_rcCard(combos || 'Không có tổ hợp thập thần nổi bật', [
+      ['📖 TRÍCH DẪN:', '三命通会 + 子平真诠 — các cấu hình thập thần kinh điển (伤官配印 / 杀印相生 / 食制杀…)'],
+      ['⚖️ TIỀN ĐỀ:', 'Đếm thập thần trên 4 trụ gồm TÀNG CAN (mỗi chi có 1–3 can ẩn).'],
+      ['🔗 SUY LUẬN:', 'Tổ hợp có mặt mới đổi tính chất kết luận đơn lẻ — vd «Thương Quan khắc Quan» chuyển thành «học vấn cao» khi có Ấn chế.'],
+    ]));
+  } catch (_) {}
+  try {
+    const _head5 = esc(syn.gradeVi || '?') + ' · ' + esc(syn.fortuneVi || '') + ' (' + (syn.score != null ? syn.score : '?') + '/100)';
+    const _fac = (syn.factors || []).slice(0, 4).join(' | ') || '(các nhân tố xem mục Tổng Luận)';
+    const _pct = syn.percentile != null ? syn.percentile : '?';
+    cards.push(_rcCard(_head5, [
+      ['📖 TRÍCH DẪN:', 'Tổng hợp đa trụ trọng số (cách cục 30% + dụng thần 25% + tổ hợp 20% + đại vận khởi đầu 15% + tương tác 10%)'],
+      ['⚖️ TIỀN ĐỀ:', esc(_fac)],
+      ['🔗 SUY LUẬN:', 'Điểm là thước đo tương đối giữa các lá số (phân vị ' + _pct + '%), không phải phán định tuyệt đối.'],
+    ]));
+  } catch (_) {}
+  el.innerHTML = `<h3 class="card-title">🏛 Chuỗi Lập Luận Cổ Pháp <span class="zh">论证链</span> <span class="hint-inline">(mỗi kết luận → trích dẫn cổ bản → tiền đề → suy luận → phản biện)</span></h3>
+    <p class="hint" style="margin-bottom:6px">Không có nhận định nào không kèm xuất xứ. Cuộn xuống để thấy toàn bộ hệ lập luận của lá số này.</p>
+    ${cards.join('')}`;
+  host.insertBefore(el, host.firstChild);
+}
+
+// [NATIVE iOS] StatusBar tối theo theme app — CHỈ trên native shell (web bỏ qua)
+(function initNativeChrome() {
+  if (!_isNativeShell) return;
+  try { StatusBar.setStyle({ style: Style.Dark }); } catch (_) {}
+  try { StatusBar.setBackgroundColor({ color: '#0a0913' }); } catch (_) {}
+})();
+
+// ═══ [UX P1 · RESTORE] SAVED CHARTS — danh sách lá số đã lưu, chuyển nhanh giữa các thành viên ═══
+//   Trước đây chỉ có 1 slot bazi-birth → xem lá số người thân phải nhập lại tay mỗi lần.
+const _SAVED_KEY = 'bazi-saved-charts';
+function _savedList() { try { const a = JSON.parse(localStorage.getItem(_SAVED_KEY) || '[]'); return Array.isArray(a) ? a.slice(0, 20) : []; } catch (_) { return []; } }
+function _savedStore(list) { try { localStorage.setItem(_SAVED_KEY, JSON.stringify(list.slice(0, 20))); } catch (_) {} }
+(function initSavedCharts() {
+  const formCard = document.querySelector('.form-card');
+  if (!formCard || document.getElementById('saved-charts-card')) return;
+  const card = document.createElement('section');
+  card.className = 'card'; card.id = 'saved-charts-card';
+  formCard.parentNode.insertBefore(card, formCard);
+
+  function render() {
+    const list = _savedList();
+    card.innerHTML = `
+      <h3 class="card-title">👤 Lá số của tôi <span class="hint-inline">(lưu &amp; chuyển nhanh giữa các thành viên — tối đa 20)</span></h3>
+      <div id="saved-list"></div>
+      <div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="btn sm" id="saved-add">💾 Lưu lá số đang nhập</button></div>`;
+    const listBox = card.querySelector('#saved-list');
+    if (!list.length) {
+      listBox.innerHTML = '<p class="hint">Chưa có lá số nào — nhập ngày sinh ở form dưới rồi bấm «💾 Lưu».</p>';
+    } else {
+      list.forEach((f, i) => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(212,175,55,.08);flex-wrap:wrap';
+        const info = document.createElement('span');
+        info.style.cssText = 'flex:1;min-width:180px;font-size:13px';
+        info.innerHTML = '👤 <b>' + esc(f.name || 'Không tên') + '</b> · ' + esc(f.date) + ' ' + esc(f.time || '') + ' (' + esc(f.gender === 'nu' ? 'Nữ' : 'Nam') + ')';
+        const view = document.createElement('button');
+        view.type = 'button'; view.className = 'btn sm'; view.textContent = '▶ Xem';
+        view.onclick = () => {
+          const d = $('date'), t = $('time');
+          if (d) d.value = f.date;
+          if (t) t.value = f.time || '12:00';
+          const g = document.getElementById(f.gender === 'nu' ? 'g-nu' : 'g-nam');
+          if (g) g.checked = true;
+          const nm = $('birth-name'); if (nm) nm.value = f.name || '';
+          hapticImpact(ImpactStyle.Medium);
+          run().catch((err) => console.warn('saved view:', err && err.message));
+          setTimeout(() => { const r = $('result'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 150);
+        };
+        const del = document.createElement('button');
+        del.type = 'button'; del.className = 'btn sm';
+        del.style.borderColor = 'rgba(192,57,43,.5)'; del.style.color = '#e0533d'; del.textContent = '🗑';
+        del.title = 'Xoá';
+        del.onclick = () => {
+          if (!confirm('Xoá «' + (f.name || f.date) + '» khỏi danh sách?')) return;
+          const l = _savedList(); l.splice(i, 1); _savedStore(l); render();
+        };
+        row.appendChild(info); row.appendChild(view); row.appendChild(del);
+        listBox.appendChild(row);
+      });
+    }
+    card.querySelector('#saved-add').onclick = () => {
+      const dateEl = $('date');
+      const date = dateEl ? dateEl.value : '';
+      if (!date) { alert('Nhập ngày sinh ở form dưới trước rồi mới lưu.'); return; }
+      const gender = (document.querySelector('input[name="gender"]:checked') || {}).value || 'nam';
+      const item = { name: (($('birth-name') || {}).value || '').trim(), date, time: ($('time') || {}).value || '12:00', gender };
+      let l = _savedList();
+      const key = item.date + '|' + item.time + '|' + item.gender;
+      l = l.filter((x) => (x.date + '|' + x.time + '|' + x.gender) !== key); // dedupe — lưu đè bản cũ cùng người
+      l.unshift(item);
+      _savedStore(l);
+      render();
+      const add = card.querySelector('#saved-add');
+      if (add) { add.textContent = '✓ Đã lưu'; setTimeout(() => { add.textContent = '💾 Lưu lá số đang nhập'; }, 1200); }
+    };
+  }
+  render();
+})();
+
 $('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run().catch((err) => console.warn('run submit:', err && err.message)); });
 $('ask-btn').addEventListener('click', handleAsk);
 $('question').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAsk(); });
 // [loop 1372] AI style selector — Gần gũi / Cân bằng / Chuyên gia (per-user, localStorage)
 function getAIStyle() {
+  if (EDU) return 'nghien-cuu'; // [EDU v2] education variant luôn dùng giọng trợ lý nghiên cứu
+  if (import.meta.env.MODE === 'ios') return 'nghien-cuu'; // [S1 ios] giữ tuỳ chọn của process song song
   try { return localStorage.getItem('bazi-ai-style') || 'gan-guoi'; } catch (e) { return 'gan-guoi'; }
 }
 (function initAIStyle() {
@@ -6422,6 +6637,10 @@ $('cfg-test').addEventListener('click', async () => {
 //   «Nghịch Thiên Cải Mệnh» (empowerment: «mệnh do ta tạo», KHÔNG kết cục) thay vì chỉ «luận giải».
 //   Đồng bộ ngưỡng với callout tổng luận (< 46). Đọc currentResult — chưa có lá số → mặc định «Giải Mệnh».
 function chatBrand() {
+  if (EDU) return {
+    vi: 'Trợ lý Nghiên cứu', zh: '研究助手', short: 'Trợ lý',
+    greet: '📖 Xin chào — tôi là Trợ lý Nghiên cứu Cổ Pháp. Hỏi tôi về kinh điển, thuật toán Tử Bình, hoặc ý nghĩa một đoạn trích trong 1523 văn bản thư viện. Mỗi trả lời kèm dẫn chứng nguồn.',
+  };
   if (import.meta.env.MODE === 'ios') {
     return {
       vi: 'Trợ lý Nghiên cứu', zh: '研究助手', short: 'Nghiên cứu',
@@ -7037,6 +7256,19 @@ $('yd-btn').addEventListener('click', () => {
 });
 
 $('print-btn')?.addEventListener('click', () => window.print());
+// [UX P1] native share — share sheet (mobile web + desktop Chrome/Edge/Safari); fallback copy link
+(function initShareBtn() {
+  const sb = $('share-btn'); if (!sb) return;
+  sb.addEventListener('click', async () => {
+    const data = { title: 'Bát Tự Dụng Thần — Lá số của tôi', text: 'Xem lá số Bát Tự luận giải chi tiết (Dụng Thần · Chuỗi Lập Luận · AI):', url: location.href };
+    try {
+      if (navigator.share) { await navigator.share(data); return; }
+      await navigator.clipboard.writeText(location.href);
+      const old = sb.textContent; sb.textContent = '✓ Đã copy link';
+      setTimeout(() => { sb.textContent = old; }, 1500);
+    } catch (e) { /* user hủy share — bỏ qua */ }
+  });
+})();
 // [loop 278] force-open all <details> for print — CSS display:block !important
 //   doesn't override browser's built-in details hiding. Without this, all
 //   collapsible sections (factors/tonggen roots/sanyuan/jiaoyun/etc.) are

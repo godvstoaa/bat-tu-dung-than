@@ -50,7 +50,7 @@ export function rankDayun(R) {
     else if (CHONG[d.zhi] === dayZhi) {
       // [loop 59 sửa] 天克 = GAN_CHONG (4 cặp thất sát), KHÔNG phải tenGod ∈ {七殺,正官,正財,偏財}.
       //   Cùng bug fuyin.js L19 + dayun-check.js: tenGod-based 克 → 384 false positive.
-      const GANCHONG = { 甲:'庚', 庚:'甲', 乙:'辛', 辛:'乙', 丙:'壬', 壬:'丙', 丁:'癸', 癸:'丁' };
+      const GANCHONG = { 甲:'庚', 庚:'甲', 乙:'辛', 辛:'乙', 丙:'壬', 壬:'丙', 丁:'癸', 癸:'丁', 戊:'甲', 己:'乙', 壬:'戊', 癸:'己' }; // [UNIFY — audit 2026-08] đủ 10 can (khớp chart.js _GC)
       if (GANCHONG[dayGan] === d.gan) { interaction = '⚡天克地冲(反吟)'; intScore -= 15; }
       else { interaction = '⚡地冲'; intScore -= 8; }
     }

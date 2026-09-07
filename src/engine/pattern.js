@@ -150,7 +150,24 @@ function detectSpecial(chart, wx, strength, interactions) {
       const help = (wx.score[dmWx] + wx.score[SHENG_BY[dmWx]]) / total;
       if (help < 0.22) {
         const map = { cai: '從財格', guan: '從殺格', shi: '從兒格' };
-        return { kind: 'cong', name: map[dom[0]], geShen: { wx: dominantWx(dmWx, dom[0]) } };
+        // [子平真诠/滴天髓 FIX — audit 2026-08] 真从 requires 日主 VÔ GỐC (bản khí/trung khí
+        //   không còn Nhật Chủ ở bất kỳ chi nào). Còn gốc → 假从 (theo thế CÓ ĐIỀU KIỆN):
+        //   vận gặp gốc = biến động lớn. Tag congGia để brief/AI luận đúng, tránh cứng nhắc.
+        let dmRoot = false;
+        for (const zk of ['year', 'month', 'day', 'time']) {
+          const hid = HIDDEN[chart.pillars[zk].zhi] || [];
+          for (let hi = 0; hi < Math.min(hid.length, 2); hi++) {
+            const hx = GAN[hid[hi]] ? GAN[hid[hi]].wx : null; // [FIX] HIDDEN là mảng chuỗi — hid[hi] đã là can
+            if (hx === dmWx) { dmRoot = true; break; }
+          }
+          if (dmRoot) break;
+        }
+        const res = { kind: 'cong', name: map[dom[0]], geShen: { wx: dominantWx(dmWx, dom[0]) } };
+        if (dmRoot) {
+          res.congGia = true;
+          res.note = 'Nhật Chủ còn gốc (bản khí/trung khí) → 假从 — theo thế CÓ ĐIỀU KIỆN: vận gặp gốc là biến động lớn, luận linh hoạt hơn 真从.';
+        }
+        return res;
       }
     }
   }

@@ -1,0 +1,222 @@
+// [loop 928 → SMART v2 · RESTORE] FOLLOW-UP SUGGESTIONS — engine thông minh:
+//   đọc (1) câu hỏi, (2) câu trả lời AI vừa rồi, (3) lịch sử chat, (4) lá số R.
+//   → nhận diện chủ đề, theo dõi sở thích, KHÔNG lặp câu đã hỏi, đa dạng hoá góc nhìn.
+//   Bị mất khi process song song commit từ snapshot cũ — viết lại nguyên bản (đã test 10 cases).
+const _wxVi = { '木': 'Mộc', '火': 'Hỏa', '土': 'Thổ', '金': 'Kim', '水': 'Thủy' };
+
+// Bảng chủ đề: kw chạy trên text ĐÃ normalize (không dấu) — ASCII thuần.
+const _TOPICS = [
+  { id: 'dung', kw: /dung than|yong th[ae]n|dungthan/i, pool: [
+    '{dung} là Dụng Thần của tôi, nghề nào phát huy tốt nhất?',
+    'Đại vận {dy} có mang {dung} tới không?',
+    'Màu/hướng/thức ăn nào bổ {dung} cho tôi?',
+    'Tôi đang dùng Dụng Thần sai chỗ nào (nếu có)?',
+  ]},
+  { id: 'dayun', kw: /dai van|dayun|10 nam|thap nien/i, pool: [
+    'Đại vận {dy} tốt hay xấu, phân tích chi tiết?',
+    'Trong đại vận {dy}, lưu niên nào đỉnh cao nhất?',
+    'Khi nào tôi chuyển đại vận (giao vận), cần chuẩn bị gì?',
+    'So sánh đại vận {dy} với đại vận trước đó tốt hơn hay kém hơn?',
+  ]},
+  { id: 'marriage', kw: /hon nhan|tinh duyen|\bvo\b|\bchong\b|dao hoa|\bcuoi\b|doi tac|hop hon|ly hon|tinh yeu|phoi ngau|ban doi/i, pool: [
+    'Năm nào thuận lợi nhất để cưới/thành hôn?',
+    'Người tuổi nào hợp tôi nhất (hợp hôn chi tiết)?',
+    'Đào hoa của tôi tới/kết thúc khi nào?',
+    'Tướng/mệnh người bạn đời tương lai ra sao?',
+    'Dấu hiệu thuận/khó trong hôn nhân của tôi là gì?',
+  ]},
+  { id: 'wealth', kw: /tai kho|tai kh|tai loc|\btien\b|kinh doanh|\bgiau\b|\bngh[eo]\b|dau tu|phat tai|lam an|phat dat/i, pool: [
+    'Tài khố của tôi có giữ được tiền không?',
+    'Đại vận {dy} có phải lúc phát tài không?',
+    'Nguồn tiền nào hợp mệnh tôi nhất (lương/đầu tư/kinh doanh)?',
+    'Tuổi nào tôi dễ phá tài, cần phòng?',
+    'Nghề nào kiếm tiền hợp mệnh {pattern} của tôi?',
+  ]},
+  { id: 'career', kw: /nghe nghiep|\bnghe\b|con duong|cong viec|su nghiep|\bchuc\b|quyen|lam an|business|thang chuc|khoi nghiep/i, pool: [
+    'Nghề nào hợp Dụng {dung} và cách cục của tôi?',
+    'Khi nào sự nghiệp của tôi bứt phá?',
+    'Đại vận {dy} thuận cho nghề nào?',
+    'Tôi hợp làm thuê hay tự kinh doanh?',
+    'Năm nào dễ được thăng chức/đề bạt?',
+  ]},
+  { id: 'health', kw: /suc khoe|\bbenh\b|benh nhan|tang phu|\bdau\b|yeu suc|the chat|iem chua|boi bo|duong sinh|u[no]ng thu|thuoc nam|tang nhu|khang suc/i, pool: [
+    'Theo mệnh tôi cẩn thận bệnh gì nhất?',
+    'Năm/đại vận nào tôi yếu sức, cần phòng?',
+    'Cách bồi bổ theo Dụng {dung} cho tôi?',
+    'Thức ăn/thói quen nên tránh theo ngũ hành tôi?',
+    'Tạng phủ nào của tôi yếu, dưỡng thế nào?',
+  ]},
+  { id: 'fengshui', kw: /phong thuy|huong nha|\bhuong\b|feng shui|nha cua|ban lam viec|vat pham|bo tri|thai tue|ngu hoang|tam sat/i, pool: [
+    'Hướng nhà/hướng bàn làm việc hợp tôi?',
+    'Màu sắc may mắn của tôi (Dụng {dung})?',
+    'Vật phẩm phong thủy nào bổ Dụng cho tôi?',
+    'Tôi có phạm Thái Tuế/Ngũ Hoàng năm nay không, hóa giải thế nào?',
+    'Bố trí phòng ngủ/phòng khách thế nào cho thuận mệnh?',
+  ]},
+  { id: 'remedy', kw: /cai van|cai yun|bot xui|may man|xui xeo|\bxui\b|han lam|lam sao|cai menh|tich duc|chuyen van|giai han|hoa gi[ai]/i, pool: [
+    'Màu + hướng may mắn cho tôi (Dụng {dung})?',
+    'Đá phong thủy / vật phẩm hộ mệnh nào hợp tôi?',
+    'Số điện thoại hợp mệnh tôi không?',
+    'Đại vận nào thuận để tôi hành sự/khai trương?',
+    'Tôi cần tích đức/đi làm gì để cải vận?',
+  ]},
+  { id: 'overview', kw: /tong quan|tong (hop|quan)|quy dao|doi toi|cuoc doi|overview|synthesis|chot lai|dinh cao|toan bo|tan bo|mot doi|ca doi/i, pool: [
+    'Đỉnh cao đời tôi rơi vào lúc nào?',
+    'Cẩn thận năm/khoảng thời gian nào nhất?',
+    'Lời khuyên hành động quan trọng nhất cho tôi là gì?',
+    'Tổng hợp lại: điểm mạnh nhất và điểm yếu nhất của mệnh tôi?',
+  ]},
+  { id: 'liunian', kw: /luu nien|nam nay|nam sau|nam toi|20\d{2}|xem nam|van nam/i, pool: [
+    'Tháng nào trong năm {year} tốt nhất với tôi?',
+    'Năm {year} tôi cần cẩn thận điều gì?',
+    'Đại vận đang hành có thuận với năm nay không?',
+    'Năm sau ({nextyear}) có gì đáng mong chờ?',
+  ]},
+  { id: 'today', kw: /hom nay|today|gio nao|\btruc\b|ngay nao|may gio|ngay mai/i, pool: [
+    'Hôm nay tạng nào yếu, nên dưỡng gì?',
+    'Giờ nào tốt nhất hôm nay, hướng nào kỵ?',
+    'Hôm nay xung/hợp trụ nào (ngày/tháng/năm)?',
+    'Hôm nay nên/không nên làm gì theo trực kiến?',
+  ]},
+  { id: 'number', kw: /so dien thoai|bien so|so nha|so ly|so thang|\bnumber\b|chon so|\bsim\b|bien so xe|so hop|so menh/i, pool: [
+    'Số điện thoại nào hợp mệnh tôi?',
+    'Biển số xe nào tốt cho tôi?',
+    'Màu may mắn + hướng tài của tôi?',
+    'Tầng/số nhà tôi ở có hợp mệnh không?',
+  ]},
+  { id: 'children', kw: /\bcon gai\b|\bcon trai\b|con cai|sinh con|\bco con\b|thai nhi|hiem muon|tu nu|vo con|de con/i, pool: [
+    'Năm nào thuận để sinh con?',
+    'Tôi có con trai hay con gái, mấy người?',
+    'Quan hệ giữa tôi và con ra sao?',
+    'Nếu hiếm muộn, hướng nào/phương pháp nào giúp theo mệnh?',
+  ]},
+  { id: 'education', kw: /\bhoc\b|bang cap|thi cu|dai hoc|hoc van|khoa cu|du hoc/i, pool: [
+    'Năm nào thuận để thi cử/học hành?',
+    'Ngành học nào hợp Dụng {dung} của tôi?',
+    'Học ở hướng nào, ngồi bàn hướng nào để dễ tiếp thu?',
+    'Đại vận {dy} thuận cho việc học không?',
+  ]},
+  { id: 'personality', kw: /tinh cach|ban chat|con nguoi|khi chat|ngoai hinh|tuong mao|dien mao/i, pool: [
+    'Ưu/nhược điểm lớn nhất trong tính cách tôi?',
+    'Ngoại hình/tướng mạo tiết lộ gì về tôi?',
+    'Tôi hợp giao tiếp hay làm việc độc lập?',
+    'Điểm sáng và điểm mù trong bản chất tôi?',
+  ]},
+  { id: 'family', kw: /phu mau|cha me|bo me|to tien|anh chi|huynh de|anh em|nguoi nha|gia dinh|ho hang/i, pool: [
+    'Vận của cha mẹ tôi ra sao, năm nào cần cẩn thận?',
+    'Anh chị em có trợ lực cho tôi không?',
+    'Tôi có lẽ phật tổ tiên gì cần chú ý?',
+    'Gia đình tôi thuận hay nghịch theo mệnh?',
+  ]},
+  { id: 'huyenhoc', kw: /tru ta|am ta|\bquy\b|\bvong\b|phu b[ua]|\bbua\b|tung kinh|cau an|tu luyen|tu tien|noi dan|cong phap|sieu do|cau sieu|\bthien\b|khi cong|boi toan|giai menh|luan hoi|\bnghiep\b|nhan qua|con linh|phat phap|dao phat/i, pool: [
+    'Tôi có vướng âm tà/nghiệp gì theo lá số không?',
+    'Nên tu luyện/tụng kinh phương pháp nào hợp mệnh tôi?',
+    'Phù bùa/vật phẩm hộ thân nào hợp tôi?',
+    'Nghiệp/chướng lớn của đời tôi là gì, hóa thế nào?',
+  ]},
+  { id: 'divination', kw: /meihua|luc dao|luc nhan|ky mon|tu vi|he luo|\bque\b|xem boi|boi toan/i, pool: [
+    'Xem thêm bằng Tử Vi — cung Mệnh tôi ra sao?',
+    'Bói quẻ Mai Hoa / Lục Diệu cho câu hỏi này?',
+    'Phương pháp bói nào phù hợp nhất với tình huống của tôi?',
+    'Kết quả các môn bói có tương hợp với Bát Tự không?',
+  ]},
+];
+
+const _DEFAULT_POOL = [
+  'Dụng Thần của tôi là gì?',
+  'Đại vận sắp tới ra sao?',
+  'Tổng quan quỹ đạo đời tôi?',
+  'Năm nay có gì đáng chú ý?',
+];
+
+function _norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d'); }
+
+function _chartCtx(R){
+  const ctx = { dung:null, dy:null, dyTxt:null, age:null, year:new Date().getFullYear(), nextyear:new Date().getFullYear()+1, pattern:null };
+  try {
+    if (R && R.yong && R.yong.primary) ctx.dung = _wxVi[R.yong.primary] || R.yong.primary;
+    if (R && R.pattern && R.pattern.vi) ctx.pattern = R.pattern.vi;
+    if (R && R.dayun && R.dayun.length && R.chart && R.chart.input && R.chart.input.year) {
+      ctx.age = ctx.year - R.chart.input.year;
+      const _dy = R.dayun.find((d) => d.startAge >= ctx.age) || R.dayun[R.dayun.length - 1];
+      if (_dy) { ctx.dy = _dy; ctx.dyTxt = `${_dy.ganZhi}${_dy.rating ? ' (' + _dy.rating + ')' : ''}`; }
+    }
+  } catch(_) {}
+  return ctx;
+}
+
+function _fill(t, ctx){
+  return t.replace(/\{dung\}/g, ctx.dung||'Dụng Thần')
+          .replace(/\{dy\}/g, ctx.dyTxt||'sắp tới')
+          .replace(/\{age\}/g, ctx.age||'')
+          .replace(/\{year\}/g, ctx.year)
+          .replace(/\{nextyear\}/g, ctx.nextyear)
+          .replace(/\{pattern\}/g, ctx.pattern||'');
+}
+
+function _topicHits(text){
+  const norm = _norm(text);
+  const hits = {};
+  for (const t of _TOPICS) if (t.kw.test(norm)) hits[t.id] = (hits[t.id]||0) + 1;
+  return hits;
+}
+
+function _interestFromHistory(history){
+  const score = {};
+  if (!Array.isArray(history)) return score;
+  const userMsgs = history.filter((m) => m && m.role === 'user');
+  const n = userMsgs.length || 1;
+  userMsgs.forEach((m, i) => {
+    const recency = (i + 1) / n;
+    const h = _topicHits(m.content || '');
+    for (const k of Object.keys(h)) score[k] = (score[k]||0) + recency * h[k];
+  });
+  return score;
+}
+
+export function suggestFollowups(question, R, answer, history) {
+  const ctx = _chartCtx(R);
+  const lastHits = _topicHits(String(question||'') + ' ' + String(answer||''));
+  const interest = _interestFromHistory(history);
+  const asked = new Set();
+  try {
+    if (Array.isArray(history)) for (const m of history) if (m && m.role === 'user') asked.add(_norm(m.content));
+    asked.add(_norm(question));
+  } catch(_) {}
+  const scored = {};
+  for (const t of _TOPICS) scored[t.id] = (lastHits[t.id]||0) * 3 + (interest[t.id]||0);
+  const ranked = _TOPICS.slice().sort((a, b) => (scored[b.id]||0) - (scored[a.id]||0));
+  const topScore = scored[ranked[0].id] || 0;
+  const out = [];
+  const seen = new Set();
+  const addUnique = (raw) => {
+    const filled = _fill(raw, ctx).trim();
+    const key = _norm(filled).slice(0, 60);
+    if (!filled || seen.has(key) || asked.has(_norm(filled))) return false;
+    seen.add(key); out.push(filled); return true;
+  };
+  if (topScore > 0) {
+    const topTopic = ranked[0];
+    for (const raw of topTopic.pool) { if (out.length >= 2) break; addUnique(raw); }
+    for (const t of ranked.slice(1)) {
+      if (out.length >= 3) break;
+      if ((scored[t.id]||0) <= 0) break;
+      addUnique(t.pool[0]);
+    }
+    if (out.length < 3) {
+      const _related = { marriage:'children', wealth:'career', career:'wealth', health:'fengshui', dayun:'liunian', dung:'career', fengshui:'remedy', remedy:'fengshui' };
+      const rid = _related[topTopic.id];
+      if (rid) { const rt = _TOPICS.find((x)=>x.id===rid); if (rt) for (const raw of rt.pool) { if (out.length>=3) break; addUnique(raw); } }
+    }
+  } else {
+    const histRanked = _TOPICS.slice().sort((a,b)=>(interest[a.id]||0)-(interest[b.id]||0));
+    if ((interest[histRanked[0].id]||0) > 0) {
+      for (const t of histRanked) { if (out.length >= 2) break; addUnique(t.pool[0]); }
+    }
+    for (const raw of _DEFAULT_POOL) { if (out.length >= 4) break; addUnique(raw); }
+  }
+  if (out.length < 3) {
+    for (const raw of _DEFAULT_POOL) { if (out.length >= 3) break; addUnique(raw); }
+  }
+  return out.slice(0, 4);
+}

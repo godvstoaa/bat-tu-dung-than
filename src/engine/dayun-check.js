@@ -31,7 +31,7 @@ export function checkDayunInteractions(chart, dayun) {
 
   // [loop 59 sửa] 天克 = GAN_CHONG (4 cặp thất sát 甲庚/乙辛/丙壬/丁癸), KHÔNG phải 'bất kỳ ngũ hành khắc'.
   //   Trước đây dùng tenGod ∈ {七殺,正官,正財,偏財} → 384 false positive (cùng bug fuyin.js L19 đã sửa).
-  const GAN_CHONG = { 甲:'庚', 庚:'甲', 乙:'辛', 辛:'乙', 丙:'壬', 壬:'丙', 丁:'癸', 癸:'丁' };
+  const GAN_CHONG = { 甲:'庚', 庚:'甲', 乙:'辛', 辛:'乙', 丙:'壬', 壬:'丙', 丁:'癸', 癸:'丁', 戊:'甲', 己:'乙', 壬:'戊', 癸:'己' }; // [UNIFY — audit 2026-08] đủ 10 can 七杀克 (khớp chart.js _GC) — trước thiếu 戊己壬癸 → 戊/己/壬/癸 day master không flag 天克地冲 trong khi chart.js có
   for (const d of (dayun || [])) {
     if (!d || !d.gan || !d.zhi) continue;
     const dgGan = d.gan, dgZhi = d.zhi;

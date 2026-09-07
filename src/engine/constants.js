@@ -233,6 +233,55 @@ export const HIDDEN_WEIGHT = {
   3: [0.6, 0.3, 0.1],
 };
 
+// ---- 人元司令分野 / 月令用事 (IMPROV 1 — 渊海子平·三命通会 chuẩn bảng) ----
+// Mỗi nguyệt chi KHÔNG do bản khí cai quản nguyên tháng: tháng chia 30 ngày 用事,
+// dư khí → trung khí → bản khí lần lượt «司令» (thống lệnh) theo số ngày.
+// Chuẩn bảng 渊海子平 «论人元司令分野» — mỗi tháng CỘNG ĐỦ 30 ngày (đã verify):
+//   寅: 戊7+丙7+甲16=30 | 卯: 甲10+乙20=30 | 辰: 乙9+癸3+戊18=30
+//   巳: 戊5+庚9+丙16=30 | 午: 丙10+己9+丁11=30 | 未: 丁9+乙3+己18=30
+//   申: 戊7+壬3+庚20=30 (chuẩn «戊己七日» giản lược thành 戊) | 酉: 庚10+辛20=30
+//   戌: 辛9+丁3+戊18=30 | 亥: 戊7+甲5+壬18=30 | 子: 壬10+癸20=30 | 丑: 癸9+辛3+己18=30
+// [note] tháng 巳 bảng chuẩn là 戊「5」日 (5+9+16=30); biến thể 戊7 (7+9+16=32) LỆCH tổng
+//   30 ngày → không dùng. Thứ tự mảng = thứ tự thời gian trong tháng (dư khí trước).
+export const SILING = {
+  寅: [ { gan: '戊', days: 7 }, { gan: '丙', days: 7 }, { gan: '甲', days: 16 } ],
+  卯: [ { gan: '甲', days: 10 }, { gan: '乙', days: 20 } ],
+  辰: [ { gan: '乙', days: 9 }, { gan: '癸', days: 3 }, { gan: '戊', days: 18 } ],
+  巳: [ { gan: '戊', days: 5 }, { gan: '庚', days: 9 }, { gan: '丙', days: 16 } ],
+  午: [ { gan: '丙', days: 10 }, { gan: '己', days: 9 }, { gan: '丁', days: 11 } ],
+  未: [ { gan: '丁', days: 9 }, { gan: '乙', days: 3 }, { gan: '己', days: 18 } ],
+  申: [ { gan: '戊', days: 7 }, { gan: '壬', days: 3 }, { gan: '庚', days: 20 } ],
+  酉: [ { gan: '庚', days: 10 }, { gan: '辛', days: 20 } ],
+  戌: [ { gan: '辛', days: 9 }, { gan: '丁', days: 3 }, { gan: '戊', days: 18 } ],
+  亥: [ { gan: '戊', days: 7 }, { gan: '甲', days: 5 }, { gan: '壬', days: 18 } ],
+  子: [ { gan: '壬', days: 10 }, { gan: '癸', days: 20 } ],
+  丑: [ { gan: '癸', days: 9 }, { gan: '辛', days: 3 }, { gan: '己', days: 18 } ],
+};
+
+// 12 节 (tiết KHAI nguyệt — KHÔNG phải 24 khí) → nguyệt chi tương ứng.
+// Dùng để đối chiếu jieqi prev/next với monthZhi trước khi tính ngày-into-tháng (guard 子时-roll).
+export const JIE_BRANCH = {
+  立春: '寅', 惊蛰: '卯', 清明: '辰', 立夏: '巳', 芒种: '午', 小暑: '未',
+  立秋: '申', 白露: '酉', 寒露: '戌', 立冬: '亥', 大雪: '子', 小寒: '丑',
+};
+
+// Tra can 司令 cho ngày thứ `dayInMonth` (có thể lẻ, 0-based từ giờ 节) của nguyệt chi.
+// Vượt quá nominal 30 ngày (tháng dài) → bản khí (phần tử cuối) tiếp tục thống lệnh.
+export function silingAt(monthZhi, dayInMonth) {
+  const windows = SILING[monthZhi];
+  if (!windows || !(dayInMonth >= 0) || dayInMonth > 31) return null;
+  let acc = 0;
+  for (const w of windows) {
+    acc += w.days;
+    if (dayInMonth < acc) return w.gan;
+  }
+  return windows[windows.length - 1].gan;
+}
+
+// ---- 地支三会方 (địa chi tam hội phương — 三命通会) [IMPROV 2] ----
+// Cùng thể thức với SANHE_HUAQI (trên): hội ĐỦ 3 chi phương mới hóa; 化神 phải đắc lệnh.
+export const SANHUI_HUAQI = { '寅卯辰': '木', '巳午未': '火', '申酉戌': '金', '亥子丑': '水' };
+
 // ---- THẬP THẦN (十神) ----
 // Quan hệ giữa một Can với Nhật Chủ (日主).
 export const TEN_GOD_VI = {

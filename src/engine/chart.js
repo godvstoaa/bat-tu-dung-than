@@ -8,6 +8,7 @@ import { Solar } from 'lunar-javascript';
 import {
   GAN, ZHI, HIDDEN, HIDDEN_WEIGHT, WUXING, SHENG, KE, KE_BY, SHENG_BY,
   TIAOHOU, CLIMATE, WX_VI, TEN_GOD_VI,
+  SILING, JIE_BRANCH, SANHE_HUAQI, SANHUI_HUAQI, silingAt,
 } from './constants.js';
 import { tenGod, changSheng, parseGender, normalizeGender } from './core.js';
 import { detectInteractions } from './interactions.js';
@@ -71,6 +72,17 @@ export function buildChart(year, month, day, hour, minute, gender) {
     day:   { gan: ec.getDayGan(),   zhi: ec.getDayZhi(),   nayin: ec.getDayNaYin()   },
     time:  { gan: ec.getTimeGan(),  zhi: ec.getTimeZhi(),  nayin: ec.getTimeNaYin()  },
   };
+  // [CRITICAL FIX — 节 vs 子时-roll] 子时换日 chỉ đổi NGÀY (theo trường phái app đã chọn).
+  //   NĂM/THÁNG phải evaluate tại THỜI ĐIỂM SINH THẬT: nếu một 节 rơi trong cửa sổ
+  //   (23:xx ngày D → 00:xx ngày D+1) thì roll +1h làm TRƯỢT sang tháng/năm mới oan.
+  //   VD thật: sinh 2006-05-05 23:10 (立夏 23:30:39) — roll cũ cho 癸巳月 (sai, nhảy cả tháng),
+  //   đúng = 壬辰月 vì sinh TRƯỚC tiết 20 phút. Fix: lấy year/month từ EightChar gốc.
+  if (hour >= 23) {
+    const trueLunar = Solar.fromYmdHms(year, month, day, hour, minute, 0).getLunar();
+    const trueEc = trueLunar.getEightChar();
+    pillars.year  = { gan: trueEc.getYearGan(),  zhi: trueEc.getYearZhi(),  nayin: trueEc.getYearNaYin()  };
+    pillars.month = { gan: trueEc.getMonthGan(), zhi: trueEc.getMonthZhi(), nayin: trueEc.getMonthNaYin() };
+  }
   const dayGan = pillars.day.gan;
 
   for (const key of ['year', 'month', 'day', 'time']) {
@@ -105,6 +117,19 @@ export function buildChart(year, month, day, hour, minute, gender) {
       prev: { name: lunar.getPrevJieQi().getName(), time: lunar.getPrevJieQi().getSolar().toYmdHms() },
       next: { name: lunar.getNextJieQi().getName(), time: lunar.getNextJieQi().getSolar().toYmdHms() },
     },
+    // [IMPROV 1 — 人元司令分野] 12 节 (tiết KHAI nguyệt, không phải 24 khí) — dùng tính
+    //   «ngày-into-tháng» = (giờ sinh − giờ 节) để tra SILING can thống lệnh. getPrevJieQi
+    //   trả về cả 中气 (vd 春分) nên KHÔNG dùng được cho mục đích này — phải dùng getPrevJie.
+    //   Tính từ lunar đã roll 子时 (lệch ≤1h, analyzeStrength còn guard JIE_BRANCH match).
+    jie: (() => {
+      try {
+        if (typeof lunar.getPrevJie !== 'function') return null;
+        return {
+          prev: { name: lunar.getPrevJie().getName(), time: lunar.getPrevJie().getSolar().toYmdHms() },
+          next: { name: lunar.getNextJie().getName(), time: lunar.getNextJie().getSolar().toYmdHms() },
+        };
+      } catch (e) { return null; }
+    })(),
     pillars,
     dayGan,
     dayZhi: pillars.day.zhi,
@@ -121,11 +146,43 @@ export function buildChart(year, month, day, hour, minute, gender) {
 // ===========================================================================
 //  2. CHO ĐIỂM NGŨ HÀNH (nguyệt lệnh nhân trọng số cao)
 // ===========================================================================
+// [IMPROV 1 — 人元司令分野] Can TỐNG LỆNH tại GIỜ SINH (không phải bản khí nguyên tháng).
+//   Cổ pháp (渊海子平): tháng chia 30 ngày 用事 — dư khí/trung khí/bản khí lần lượt thống lệnh
+//   (vd 寅月: 戊7 ngày → 丙7 → 甲16; 辰月: 乙9 → 癸3 → 戊18). Trả về {gan, wx, dayInMonth}
+//   hoặc null khi không đủ dữ liệu (thiếu chart.jie, 节 không khớp monthZhi — guard 子时-roll,
+//   hoặc giờ sinh ngoài cửa sổ [0, 31] ngày). Null → caller fallback về check bản khí cũ.
+export function computeSiling(chart) {
+  try {
+    const mz = chart.monthZhi;
+    const windows = SILING[mz];
+    const jie = chart.jie && chart.jie.prev;
+    if (!windows || !jie || !jie.time || !jie.name) return null;
+    // 节 phải là tiết KHAI ĐÚNG nguyệt chi đang xét (đối chiếu JIE_BRANCH) — nếu lệch
+    // (edge 子时-roll hoặc bảng tiết lệch năm) → trả null, fallback bản khí (an toàn).
+    if (JIE_BRANCH[jie.name] !== mz) return null;
+    const inp = chart.input || {};
+    const birthMs = new Date(inp.year, (inp.month || 1) - 1, inp.day || 1, inp.hour || 0, inp.minute || 0).getTime();
+    if (!Number.isFinite(birthMs)) return null;
+    const _pt = (s) => { const [d, tt] = String(s).split(' '); const [y, mo, da] = (d || '').split('-').map(Number); const [h, mi] = (tt || '0:0:0').split(':').map(Number); return new Date(y, (mo || 1) - 1, da || 1, h || 0, mi || 0).getTime(); };
+    const dayInMonth = (birthMs - _pt(jie.time)) / 86400000; // ngày lẻ từ giờ 节
+    const gan = silingAt(mz, dayInMonth);
+    if (!gan) return null;
+    return { gan, wx: GAN[gan].wx, dayInMonth: +dayInMonth.toFixed(2), jie: jie.name, monthZhi: mz };
+  } catch (e) { return null; }
+}
+
+// [IMPROV 1b] trọng số tàng can «司令» ở nguyệt chi = 0.75 (75% bản khí) — thay trọng số
+//   vị trí khi trọng số vị trí THẤP HƠN (modest boost, không hạ can nào).
+const SILING_BOOST_WEIGHT = 0.75;
+// [IMPROV 2] 三合局/三会方 bonus = +8% tổng điểm khi hóa thần ĐẮC LỆNH, +4% (bán lực) khi không.
+const GROUP_BONUS_RATIO = 0.08;
+
 export function scoreWuXing(chart) {
   const score = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
   const detail = [];
   const posWeightStem = { year: 1.0, month: 1.0, day: 1.0, time: 1.0 };
   const posWeightBranch = { year: 1.0, month: 1.8, day: 1.1, time: 1.0 };
+  const siling = computeSiling(chart); // [IMPROV 1b]
 
   for (const key of ['year', 'month', 'day', 'time']) {
     const p = chart.pillars[key];
@@ -134,15 +191,45 @@ export function scoreWuXing(chart) {
     detail.push({ src: `Can ${key}`, gan: p.gan, wx: gwx, pts: posWeightStem[key] });
     for (const h of p.hidden) {
       const hwx = GAN[h.gan].wx;
-      const hpts = +(posWeightBranch[key] * h.weight).toFixed(3);
+      // [IMPROV 1b] 司令 boost: tàng can trùng can THỐNG LỆNH ở nguyệt chi nâng lên 0.75
+      //   (75% trọng số bản khí) thay vì trọng số vị trí (0.3/0.1) — «司令者旺», cổ pháp
+      //   月令用事. Chỉ NÂNG (khi trọng số vị trí < 0.75), không HẠ can bản khí đang 司令.
+      //   Note: can 司令 không nằm trong tàng can nguyệt chi (vd 丙 thống lệnh 10 ngày đầu
+      //   午月 dù 午 tàng [丁,己]) thì không có gì để nâng — bỏ qua, deLenh vẫn xét phía dưới.
+      const isSiling = key === 'month' && siling && h.gan === siling.gan;
+      const hw = isSiling ? Math.max(h.weight, SILING_BOOST_WEIGHT) : h.weight;
+      const hpts = +(posWeightBranch[key] * hw).toFixed(3);
       score[hwx] += hpts;
-      detail.push({ src: `Tàng ${key}`, gan: h.gan, wx: hwx, pts: hpts });
+      detail.push({ src: `Tàng ${key}`, gan: h.gan, wx: hwx, pts: hpts, ...(isSiling && hw > h.weight ? { siling: true } : {}) });
     }
+  }
+  // [IMPROV 2 — 三合局/三会方] ĐỦ 3 chi của một tổ 三合 (申子辰→水, 亥卯未→木, 寅午戌→火,
+  //   巳酉丑→金) hoặc 三会 (寅卯辰→木, 巳午未→火, 申酉戌→金, 亥子丑→水) trong tứ trụ →
+  //   hóa thần GẮN KẾT khí đó. Cổ法 «合局化气须得令» — chỉ cộng thưởng ĐẦY (+8% tổng) khi
+  //   hóa thần ĐẮC LỆNH (= bản khí nguyệt chi HOẶC can 司令); không đắc lệnh → bán lực +4%
+  //   (cục thành mà khí không thịnh thời). Bảng lấy từ constants (SANHE_HUAQI/SANHUI_HUAQI),
+  //   tránh circular-dep với interactions.js.
+  const branches = [chart.yearZhi, chart.monthZhi, chart.dayZhi, chart.hourZhi].filter(Boolean);
+  const zset = new Set(branches);
+  const _h0 = chart.monthZhi && HIDDEN[chart.monthZhi] ? HIDDEN[chart.monthZhi][0] : null;
+  const monthMainWx = _h0 && GAN[_h0] ? GAN[_h0].wx : null;
+  const cmdWx = siling ? siling.wx : monthMainWx;
+  const baseTotal = Object.values(score).reduce((a, b) => a + b, 0);
+  for (const [key, huaWx, kind] of [
+    ...Object.entries(SANHE_HUAQI).map(([k, w]) => [k, w, '三合局']),
+    ...Object.entries(SANHUI_HUAQI).map(([k, w]) => [k, w, '三会方']),
+  ]) {
+    const members = key.split('');
+    if (!members.every((b) => zset.has(b))) continue;
+    const deLen = huaWx === monthMainWx || huaWx === cmdWx;
+    const bonus = +(baseTotal * (deLen ? GROUP_BONUS_RATIO : GROUP_BONUS_RATIO / 2)).toFixed(3);
+    score[huaWx] += bonus;
+    detail.push({ src: `${kind} ${key} ${deLen ? 'đắc lệnh' : 'bán lực (bất đắc lệnh)'}`, gan: '', wx: huaWx, pts: bonus, group: key, groupKind: kind });
   }
   const total = Object.values(score).reduce((a, b) => a + b, 0);
   const pct = {};
   for (const w of WUXING) pct[w] = +((score[w] / total) * 100).toFixed(1);
-  return { score, pct, total: +total.toFixed(3), detail };
+  return { score, pct, total: +total.toFixed(3), detail, siling };
 }
 
 // ===========================================================================
@@ -158,7 +245,14 @@ export function analyzeStrength(chart, wx) {
   // [loop 551 FIX] guard monthZhi null/undefined — trước đây GAN[HIDDEN[undefined][0]] → TypeError crash.
   const _mz0 = chart.monthZhi && HIDDEN[chart.monthZhi] ? HIDDEN[chart.monthZhi][0] : null;
   const monthMainWx = _mz0 && GAN[_mz0] ? GAN[_mz0].wx : null;
-  const deLenh = monthMainWx != null && (monthMainWx === dmWx || monthMainWx === resourceWx);
+  // [IMPROV 1a — 人元司令分野] deLenh theo can THỐNG LỆNH tại ngày sinh (月令用事), không còn
+  //   nhị phân trên bản khí nguyên tháng. Vd 甲 sinh 辰月 ngày thứ ≤9 → 乙木司令 (甲 gets 印-adjacent
+  //   ruling via 木 khí) — theo bản khí (戊) thì失令, theo 司令 thì đúng khí thời. Khi không đủ
+  //   dữ liệu jie (computeSiling null) → fallback BẢN KHÍ cũ (main-qi check) như trước đây.
+  const siling = computeSiling(chart);
+  const cmdWx = siling ? siling.wx : monthMainWx;
+  const deLenhMainQi = monthMainWx != null && (monthMainWx === dmWx || monthMainWx === resourceWx);
+  const deLenh = cmdWx != null && (cmdWx === dmWx || cmdWx === resourceWx);
   // [loop 484] 进气/旺气/退气 — vị trí ngày sinh trong khoảng节气 (滴天髓 进气退气).
   //   Refinement 得令: mới vào节气 (初气) = 进气 «lệnh đang VÀO mạnh dần»; sắp转 (末气)
   //   = 退气 «lệnh RA suy»; giữa = 旺气 «đương lệnh đầy đủ». Cổ法 «进气 Ungасpending, 退气 waning».
@@ -192,14 +286,25 @@ export function analyzeStrength(chart, wx) {
   if (deDia) sanFaBonus += 0.03;                    // 得地 có căn (~30%)
   const effRatio = ratio + sanFaBonus;
 
+  // [IMPROV 4 — 中和 band] dải 0.47–0.53 = THÂN TRUNG HÒA (cân bằng): cổ法 «中和者贵» —
+  //   thân không vượng không nhược → Dụng THEO CÁCH CỤC (thế cục quyết, không ép phù ức).
+  //   Downstream (computeFuYi/findYongShen) vẫn chạy nhánh Phù Ức thường qua `strong` —
+  //   `strong` giữ NGUYÊN ranh giới cũ (≥0.50 = vượng-side) để không đảo Dụng/Ngụng: chỉ
+  //   NHÃN level đổi (0.50–0.53 cũ «Thân vượng» nay «Trung hòa», 0.47–0.50 cũ «Thân nhược»
+  //   nay «Trung hòa») — không crash, 扶抑 vẫn cho primary hợp lý.
   let level, strong;
   if (effRatio >= 0.62) { level = 'Thân quá vượng'; strong = true; }
-  else if (effRatio >= 0.50) { level = 'Thân vượng'; strong = true; }
+  else if (effRatio >= 0.53) { level = 'Thân vượng'; strong = true; }
+  else if (effRatio > 0.47) {
+    level = 'Thân trung hòa (cân bằng — Dụng theo cách cục)';
+    strong = effRatio >= 0.50; // giữ hướng Phù Ức theo ranh giới cũ — an toàn downstream
+  }
   else if (effRatio >= 0.38) { level = 'Thân nhược'; strong = false; }
   else { level = 'Thân quá nhược'; strong = false; }
 
   return { dmWx, resourceWx, support: +support.toFixed(3), oppose: +oppose.toFixed(3),
-    ratio: +ratio.toFixed(3), effRatio: +effRatio.toFixed(3), deLenh, deDia, root: +root.toFixed(2),
+    ratio: +ratio.toFixed(3), effRatio: +effRatio.toFixed(3), deLenh, deLenhMainQi,
+    siling, monthCommandWx: cmdWx, deDia, root: +root.toFixed(2),
     sanFaBonus: +sanFaBonus.toFixed(2), qiPhase, monthMainWx, level, strong };
 }
 
@@ -375,7 +480,27 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
   //   chart sinh mùa hàn/nóng (vd 甲木 tháng 子 cần 丁火 noãn, code cũ lấy Mộc/Thủy + cấm Hỏa).
   const EXTREME_COLD = ['亥', '子', '丑']; // đông hàn → cần Hỏa noãn
   const EXTREME_HOT = ['巳', '午', '未'];  // hạ nhiệt → cần Thủy nhuận
-  const isExtreme = EXTREME_COLD.includes(chart.monthZhi) || EXTREME_HOT.includes(chart.monthZhi);
+  // [IMPROV 3 — 调候 mở rộng] ngoài 6 tháng cực đoan, KHÍ HẬU THIÊN LỆCH theo TỈ LỆ ngũ hành
+  //   trong tháng chuyển tiếp cũng đủ «寒甚/燥甚» để 调候 làm chủ (窮通寶鑑 «燥甚者润之»):
+  //   • TÁO (dry-hot skew): 火 ≥40% toàn cục trong tháng thổ 辰/戌/丑/未 (thổ vốn táo/vượng)
+  //     → cần Thủy nhuận như tháng hạ.
+  //   • HÀN THẤP (cold-wet skew): 水 ≥40% toàn cục trong tháng 申/酉 (thu lương) hoặc 寅/卯
+  //     (xuân sơ, mộc hút thuỷ) → cần Hỏa noãn như tháng đông.
+  //   Guard cũ _tiaoHarmful (thân vượng + 调候 Tỷ/Ấn, thân cực nhược + 调候 Quan Sát) ÁP DỤNG
+  //   cho cả trigger mới (cùng đường isExtreme bên dưới — không có bypass riêng).
+  let climateSkew = null;
+  const _pct = wx && wx.pct ? wx.pct : null;
+  if (_pct && Number.isFinite(_pct['火'])) {
+    if (['辰', '戌', '丑', '未'].includes(chart.monthZhi) && _pct['火'] >= 40) {
+      climateSkew = `tháng thổ ${chart.monthZhi} mà 火 chiếm ${_pct['火']}% (≥40%) → TÁO NHIỆT thiên lệch`;
+    } else if (['申', '酉', '寅', '卯'].includes(chart.monthZhi) && _pct['水'] >= 40) {
+      climateSkew = `tháng ${chart.monthZhi} mà 水 chiếm ${_pct['水']}% (≥40%) → HÀN THẤP thiên lệch`;
+    }
+  }
+  const isExtreme = EXTREME_COLD.includes(chart.monthZhi) || EXTREME_HOT.includes(chart.monthZhi) || !!climateSkew;
+  if (climateSkew) {
+    reasons.push(`🌡️ [Điều hậu mở rộng] ${climateSkew} — ngoài 6 tháng cực đoan, thiên lệch khí hậu theo tỉ lệ ngũ hành cũng đủ điều kiện 调候 làm chủ (vẫn tuân guard phù-ức bên dưới).`);
+  }
   // [loop 116 fix BUG CAO] 调候 override KHÔNG fire cho CÁCH ĐẶC BIỆT (从格/专旺).
   //   Từ cách «tòng/tracking thế» — đã theo thế cục thì 调候 không đè (cổ法: «从格
   //   不论调候»). Trước đây 调候 override CHẾT 从財格 用神 (火→Thủy) → Dụng SAI.
@@ -830,7 +955,10 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   //   nhận object THIẾU 2 field này → 源流 factor (loop 457) VÀ 空亡 penalty (loop 150) là
   //   DEAD CODE trong production (R.yuanliu/R.kongwang undefined → if(yl)/if(kw) skip).
   //   Tổng luận bỏ qua dòng khí + trụ void-pillar suốt! Nay fix → 2 factor activate.
-  const full = { chart, wx, strength, interactions, shensha, pattern, yong, dayun, liunian, synthesis, patternQuality: patternQualityResult, kongwang, pillarQuality: pillarQualResult };
+  // [IMPROV 1c] expose R.siling = {gan, wx, dayInMonth, jie, monthZhi} — can 人元司令 tại giờ
+  //   sinh (null khi thiếu jie/giờ). Cũng có tại R.wx.siling và R.strength.siling (bản sao).
+  const full = { chart, wx, strength, interactions, shensha, pattern, yong, dayun, liunian, synthesis, patternQuality: patternQualityResult, kongwang, pillarQuality: pillarQualResult,
+    siling: (strength && strength.siling) || wx.siling || null };
   try { full.liuqin = analyzeLiuqin(full); } catch (e) { full.liuqin = []; }
   try { full.remedy = buildRemedy(full); } catch (e) { full.remedy = { twelveLaws: [] }; }
   // [loop 452] 源流 dòng khí ngũ hành — đọc độc lập từ wx (không cascade/đổi score).

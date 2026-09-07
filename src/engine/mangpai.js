@@ -34,8 +34,10 @@ export function analyzeMangpai(R) {
   const list = ganGodList(c);
   const notes = [];
 
-  // Tài/Quan ở 主 (ngày/giờ) hay 宾 (năm/tháng)?
-  const isZhu = (pos) => pos === 'day' || pos === 'time';
+  // Tài/Quan ở 主 (ngày) hay 宾 (năm/tháng/giờ)?
+  // [UNIFY — audit 2026-08] 日为主 (khẩu quyết chuẩn 盲派, khớp mangpai-view) — trước đây
+  //   gộp Ngày+Giờ làm 主 → mâu thuẫn 宾主 với mangpai-view (cùng câu hỏi 2 đáp án ngược).
+  const isZhu = (pos) => pos === 'day';
   // [loop 553 FIX] 盲派 «财官» gồm cả TÀNG CAN (庫中財官), không chỉ thiên can lộ.
   //   Trước đây chỉ đếm lộ can → khi Tài/Quan chỉ ở địa chi tàng, mệnh bị luận
   //   «ít Tài Quan»/«cân bằng» SAI (flip verdict) trong khi thực có Tài tọa chủ.

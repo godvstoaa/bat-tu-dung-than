@@ -19,7 +19,8 @@ Sau Guideline 4.3(b) 9/6/2026 (fortune telling nêu đích danh): app mở như 
 3. Lưu trích dẫn → Ghi chú  
 4. Học / Đối chiếu  
 5. Chart Lab case mẫu `1990-06-15 10:00` → `庚午 壬午 辛亥 癸巳`  
-6. Airplane Mode: thư viện + case mẫu vẫn chạy  
+6. **Chart Lab → «Mở Chart Lab đầy đủ»** → cuộn tới card «🏛 Chuỗi Lập Luận Cổ Pháp» (trích dẫn cổ bản → tiền đề → suy luận → phản biện cho từng kết luận) → hỏi AI → bấm badge «🎯 Neo X%» xem kiểm chứng từng mốc dữ liệu  
+7. Airplane Mode: thư viện + case mẫu vẫn chạy  
 
 ## Review Notes (English, paste)
 
@@ -27,12 +28,17 @@ Sau Guideline 4.3(b) 9/6/2026 (fortune telling nêu đích danh): app mở như 
 PRIMARY PURPOSE
 Lữ Đăng is an offline research tool for Vietnamese-Chinese classical metaphysics. Primary navigation is library search, source comparison, citation-based explanations, and saved notes. BaZi Chart Lab is secondary.
 
+TWO DIFFERENTIATING FEATURES (not found in comparable apps)
+1) REASONING-CHAIN UI — every analytical conclusion in the full chart view renders its classical source citation (穷通宝鉴 / 子平真诠 / 渊海子平), its premises, reasoning steps, and counter-arguments considered. Claims are auditable on screen.
+2) NEO SCORE (self-audit) — after each AI answer, the app cross-checks every data point mentioned against the algorithmically computed chart and shows a badge "Neo X% · matches chart"; tapping it lists matched/conflicting data points.
+
 REVIEW STEPS — no login
 1. Launch → Library.
 2. Search 穷通宝鉴 or a DZ number.
 3. Open a text → Sources tab (copy only, no outbound web links).
 4. Save citation → Notes.
 5. Chart Lab → preloaded sample, no birth form required first.
+6. Optional: "Open full Chart Lab" → scroll to the reasoning-chain cards → ask the AI one question → tap the Neo badge under its answer.
 
 Library and core chart math work offline. Network is for optional AI and declared analytics. UI is Vietnamese.
 ```

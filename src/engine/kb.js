@@ -583,7 +583,7 @@ export { WX_VI, TEN_GOD_VI };
 // ---- 穷通宝鉴: 調候 (seasonal priority) cho từng Nhật Chủ × tháng ----
 export const QIONGTONG_TIAOHOU = {
   // 木 Day Master
-  '甲寅月': 'Mộc vượng mùa xuân → cần KIM cắt gọt hoặc HỎA tiết. Ưu tiên: Canh (庚) + Hỏa (丙).',
+  '甲寅月': 'Mộc vượng mùa xuân, đắc lệnh → cần HỎA tiết tiết chế + THỦY nhuận. Ưu tiên: 丙-Hỏa chủ + 癸-Thủy佐 (bảng chuẩn 穷通宝鉴).',
   '甲卯月': 'Dương Mộc rực rỡ → Geng-Kim cắt tỉa thành tài. Không kim → cần Hỏa tiết khí.',
   '甲巳月': 'Mộc mùa hè khô → gấp NƯỚC (癸) tưới. Không Thủy → Mộc héo, tài lộc hao.',
   '甲午月': 'Mộc bị Hỏa thiêu → cần 癸-Thủy +壬-Thủy ướt. Ưu tiên chính: Thủy dưỡng Mộc.',
@@ -601,7 +601,7 @@ export const QIONGTONG_TIAOHOU = {
   '丁寅月': 'Âm Hỏa mùa xuân → 甲-Mộc là sinh mẫu. "丁火甲木,嫡母也" — cần Mộc.',
   '丁午月': 'Âm Hỏa mùa hạ cực thịnh → 壬-Thủy phối. "丁壬合" → vừa chế vừa hợp = đẹp.',
   '丁酉月': 'Tài vượng mùa thu → cần 甲-Mộc + 丙-Hỏa. "甲丙两全" cho Đinh thu.',
-  '丁子月': 'Đinh gặp Tý mùa đông → "丁火逢冬,大忌水多" → cần 甲-Mộc + 戊-Thổ.',
+  '丁子月': 'Đinh gặp Tý mùa đông → "丁火逢冬,大忌水多" → cần 甲-Mộc (Ấn sinh thân) + 庚-Kim (phá giáp dẫn 丁). Ưu tiên: 甲 chủ, 庚佐.',
   // 土 Day Master
   '戊寅月': 'Dương Thổ mùa xuân Mộc khắc → cần 丙-Hỏa sinh Thổ + 甲-Giáp tiết Mộc.',
   '戊巳月': 'Thổ mùa hạ → "戊土夏月,先看壬癸" → Thủy tưới Thổ mới sinh vạn vật.',
@@ -612,7 +612,7 @@ export const QIONGTONG_TIAOHOU = {
   '己酉月': 'Thổ mùa thu Kim thực → 丙-Hỏa ưu tiên. Kim quá → Thổ kiệt.',
   '己子月': 'Thổ mùa đông → 丙-Hỏa + 戊-Thổ trợ. "己土冬月,丙火为先".',
   // 金 Day Master
-  '庚寅月': 'Dương Kim mùa xuân → cần 丁-Hỏa luyện + 甲-Mộc + 丙-Hỏa phối. "庚金劈甲引丁".',
+  '庚寅月': 'Dương Kim tuyệt tại Dần mùa xuân → cần 戊-Thổ sinh thân, 甲-Mộc, 壬-Thủy rửa trừ hỏa, 丙-Hỏa ấm (bảng chuẩn: 戊甲壬丙).',
   '庚巳月': 'Kim mùa hạ → 壬-Thủy + 癸-Thủy ưu tiên. Kim bị Hỏa khắc, cần Thủy chế Hỏa.',
   '庚申月': 'Kim mùa thu cực vượng → cần 丁-Hỏa luyện thành khí cụ + 甲-Mộc để Kim có việc.',
   '庚亥月': 'Kim mùa đông → "金寒水冷" → cần 丙-Hỏa + 丁-Hỏa sưởi ấm. Ưu tiên Hỏa.',
@@ -2233,7 +2233,7 @@ export const SHENTOU_LU_NAYIN = {
   source: "李虚中命書 卷中. Grok-4 Heavy OCR. Day la bang nhaps am 'than dau loc' — moi cap nhaps am co 1 doc tinh rieng (BI TRUYEN cua co phap).",
   principle: "「神頭祿」= moi nhaps am (vd Hai Trung Kim, Phong Hoa) deu co 1 'loc than' + tinh cach rieng, xem de doan cuoc doi. Khac 'nhaps am chi la ten goi' cua kim phap.",
   examples: {
-    "甲寅": "Giap-Than = nhaps am 'Đai Khe Thuy' → 「潤深處靜之水」— nuoc chim sau yen tinh. Gia Moc vuong + Tho suy → ky dac qui di.",
+    "甲寅": "Giap-Dan (Giáp Dần) = nhaps am 'Đai Khe Thuy' → 「潤深處靜之水」— nuoc chim sau yen tinh. Gia Moc vuong + Tho suy → ky dac qui di.",
     "癸丑": "Quy-Suu = 'Tang Dot Moc' → 「剛柔相濟之木，水土承於旺方則生育利物」— mem cung tuong ung, thuy-tho sung vuong → sinh vat loi.",
     "乙卯": "At-Mao = 'Dai Khac Thuy' → 「死中受氣之水，雖敗無妨」— nuoc chet ma van co khi, bai nhung khong ngai.",
     "丙辰": "Binh-Then = 'Sa Trung Tho' → 「發施養生之土」— dat sinh tuong, thich Hoa tro, 'khong quan tu du'.",

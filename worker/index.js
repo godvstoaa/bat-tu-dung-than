@@ -56,13 +56,13 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
   //   Pool (Groq/NVIDIA/...) chỉ là FALLBACK khi z.ai fail. (Trước đây cf-glm default; Groq từng
   //   đứng đầu pool nhưng key chết 403/413 → mọi request fail ở Groq trước khi tới z.ai.)
   var poolBackends = pool.map(function (p) { return { name: p.name || 'pool', endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey), stripTools: true }; });
-  var zaiBackend = aiCfg.zaiKey ? [{ name: 'z.ai-paid', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.2', apiKey: String(aiCfg.zaiKey), stripTools: false }] : [];
+  var zaiBackend = aiCfg.zaiKey ? [{ name: 'z.ai-paid', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.3', apiKey: String(aiCfg.zaiKey), stripTools: false }] : []; // [SPEED] glm-5.2→glm-5.3-flash (thinking giữ — client gửi thinking:{type:enabled}, flash match isZaiNative)
   const backends = [].concat(zaiBackend, poolBackends); // z.ai TRƯỚC, pool fallback
   for (let i = 0; i < backends.length; i++) {
     const b = backends[i];
     if (!b.apiKey) continue;
     var ac = new AbortController();
-    var timer = setTimeout(function () { ac.abort(); }, 45000); // 45s — brief 20K tokens cần thời gian process
+    var timer = setTimeout(function () { ac.abort(); }, 90000); // [NO-CUT] 90s tới headers — brief 20K tokens cần process; stream body SAU headers không bị timer này (fetch đã resolve)
     try {
       bodyObj.model = b.model;
       // [cloudflare-gỡ] z.ai coding plan làm PRIMARY. Giữ nguyên thinking (frontend gửi

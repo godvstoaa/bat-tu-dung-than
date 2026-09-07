@@ -121,6 +121,53 @@ export const SAN_QI = {
   人三奇: ['辛', '壬', '癸'],   // nhân kỳ
 };
 
+// ============================================================================
+//  [AUDIT WIRE] SAO THIẾU THƯỜNG DÙNG — bổ sung theo audit (nguồn: 三命通會, 渊海子平)
+// ============================================================================
+
+// ---- 太极贵人 (《三命通會·論太極貴人》口诀: «甲乙生人子午中, 丙丁鸡兔定亨通, 戊己两干临四季,
+//   庚辛寅亥禄丰隆, 壬癸巳申偏喜美») — năm/ngày can → chi. Chủ thông minh hiếu học,
+//   duyên với huyền học/tôn giáo/thuật số (太极 = cực lí).
+export const TAI_JI = {
+  甲: ['子', '午'], 乙: ['子', '午'], 丙: ['卯', '酉'], 丁: ['卯', '酉'],
+  戊: ['辰', '戌', '丑', '未'], 己: ['辰', '戌', '丑', '未'],
+  庚: ['寅', '亥'], 辛: ['寅', '亥'], 壬: ['巳', '申'], 癸: ['巳', '申'],
+};
+// ---- 天厨贵人 = 食神之禄位 (甲食丙→禄巳, 乙食丁→禄午…; 渊海子平) — năm/ngày can → chi.
+//   Chủ phú quý ấm no, «天厨» lương thực trời cho, hưởng phúc ăn uống.
+export const TIAN_CHU = {
+  甲: '巳', 乙: '午', 丙: '巳', 丁: '午', 戊: '申', 己: '酉',
+  庚: '亥', 辛: '子', 壬: '寅', 癸: '卯',
+};
+// ---- 流霞 (口诀 «甲鸡乙犬丙羊加, 丁猴戊巳己午查, 庚龙辛兔壬猪位, 癸人见虎定不差»)
+//   — ngày can → chi. Huyết quang phụ: nữ chủ sản khoa, nam chủ tiểu thương tích.
+export const LIU_XIA = {
+  甲: '酉', 乙: '戌', 丙: '未', 丁: '申', 戊: '巳', 己: '午',
+  庚: '辰', 辛: '卯', 壬: '亥', 癸: '寅',
+};
+// ---- 血刃 — NGUYỆT CHI → chi, bản thông dụng nhất (thống nhất các bảng 神煞 tổng hợp,
+//   khẩu quyết «正丑二未三寅四申，五卯六酉七辰八戌，九巳十亥子午丑申»).
+//   [note] Có dị bản ít dùng (vd 寅月→巳) — chọn bản phổ biến như trên; sao phụ nhỏ, mang tính tham khảo.
+export const XUE_REN = {
+  寅: '丑', 卯: '未', 辰: '寅', 巳: '申', 午: '卯', 未: '酉',
+  申: '辰', 酉: '戌', 戌: '巳', 亥: '亥', 子: '午', 丑: '申',
+};
+// ---- 灾煞 (又名 白虎煞) = 劫煞前一位 / giữa tam hợp đối xung — tra theo nhóm tam hợp NĂM CHI:
+//   申子辰(A)见午, 寅午戌(B)见子, 巳酉丑(C)见卯, 亥卯未(D)见酉. 《三命通會·論災煞》.
+//   Chủ tai hoạ/bệnh tật bất ngờ; có 天德/月德/quý nhân đồng hành thì giảm («灾煞忌克, 德能解之»).
+export const ZAI_SHA = { A: '午', B: '子', C: '卯', D: '酉' };
+// ---- 十灵日 (渊海子平) — 10 nhật trụ mang linh khí: thông minh linh lợi, nhạy bén huyền học.
+export const SHI_LING = ['甲辰', '乙亥', '丙辰', '丁酉', '戊午', '庚戌', '庚寅', '辛亥', '壬寅', '癸未'];
+// ---- 天赦日 («春戊寅, 夏甲午, 秋戊申, 冬甲子» — 三命通會) — mùa = nhóm 月支.
+//   Đại cát: sinh ngày trời xá tội →逢凶化吉, ít tai ương lớn, tội lỗi dễ được tha thứ.
+export const TIAN_SHE = { 春: '戊寅', 夏: '甲午', 秋: '戊申', 冬: '甲子' };
+// ---- 四废日 (《五行精纪》/三命通會引: «春庚申辛酉, 夏壬子癸亥, 秋甲寅乙卯, 冬丙午丁巳»)
+//   — can chi «tuyệt» của mùa, ngày vô dụng. Chủ sự khó thành, thể yếu; cần Dụng Thần chế phục.
+export const SI_FEI = { 春: ['庚申', '辛酉'], 夏: ['壬子', '癸亥'], 秋: ['甲寅', '乙卯'], 冬: ['丙午', '丁巳'] };
+// ---- 金神 («金神貴乎時» — 渊海子平) — CHỈ tra GIỜ trụ: 乙丑/己巳/癸酉.
+//   Khí kim oai liệt; chế phục mà vào Hoả hương («金神入火乡») thì chủ đại quý, quyền uy.
+export const JIN_SHEN = ['乙丑', '己巳', '癸酉'];
+
 // ---- 神煞 KHẨU QUYẾT (口诀 — nguồn cổ) ----
 // [loop 1194] Lưu nguồn công thức cho từng nhóm sao; đã đối chiếu khớp bảng trên.
 // Nguồn: 三命通會 (识典古籍/古文岛 «論天月德»), 渊海子平, 知乎/搜狐 — ≥2 nguồn độc lập.
@@ -135,6 +182,15 @@ export const SHENSHA_KOUJUE = {
   天德: '正丁二坤(申)，三壬四辛，五乾(亥)六甲，七癸八艮(寅)，九丙十乙，子巽(巳)丑庚。注: 天德不臨戊己土。',
   月德: '寅午戌月丙，申子辰月壬，巳酉丑月庚，亥卯未月甲 (月支三合 → 天干).',
   金舆: '甲龙乙蛇丙戊羊，丁己猴庚犬，辛猪壬牛癸骑虎。',
+  // [AUDIT WIRE] khẩu quyết các sao bổ sung
+  德秀: '寅午戌月丙德戊秀，申子辰月壬德甲秀，巳酉丑月庚德癸秀，亥卯未月甲德丁秀 (bảng DEXIU đơn giản hoá; cổ văn 秀 có dị bản 戊癸/戊己/乙庚/丁壬).',
+  天赦: '春戊寅，夏甲午，秋戊申，冬甲子 (mùa theo 月支, tra nhật trụ).',
+  四废: '春庚申辛酉，夏壬子癸亥，秋甲寅乙卯，冬丙午丁巳 (can chi tuyệt của mùa).',
+  金神: '金神贵乎时：乙丑、己巳、癸酉三时 (入火乡制伏则贵).',
+  太极贵人: '甲乙生人子午中，丙丁鸡兔定亨通，戊己两干临四季，庚辛寅亥禄丰隆，壬癸巳申偏喜美。',
+  天厨: '甲丙见巳，乙丁见午，戊见申，己见酉，庚见亥，辛见子，壬见寅，癸见卯 (食神禄位).',
+  流霞: '甲鸡乙犬丙羊加，丁猴戊巳己午查，庚龙辛兔壬猪位，癸人见虎定不差。',
+  血刃: '正丑二未三寅四申，五卯六酉七辰八戌，九巳十亥子午丑申 (tra theo 月支).',
 };
 
 // ---- Ý nghĩa rút gọn của từng sao (dùng cho luận giải NLG) ----
@@ -155,6 +211,20 @@ export const SHENSHA_INFO = {
   kuiGang: { zh: '魁罡', vi: 'Quù Cương', desc: 'cương nghị, thông minh, quyết đoán, cứng rắn; kỵ hình xung, nữ mạng bất lợi hôn nhân', tone: 'volatile' },
   sanQi: { zh: '三奇贵人', vi: 'Tam Kỳ Quý Nhân', desc: 'tài năng kỳ xuất, bác học đa năng,胸怀 xuất chúng (cần quý nhân phù trợ mới phát)', tone: 'cat' },
   tianYiMed: { zh: '天医', vi: 'Thiên Y', desc: 'sao chủ y tế/sức khoẻ — duyên y/dược, thể chất, đức từ bi thương xót; «天医拱照, 可作良医»', tone: 'cat' },
+  // ---- [AUDIT WIRE] 4 bảng chết được nối + 9 sao bổ sung ----
+  dexiu: { zh: '德秀贵人', vi: 'Đức Tú Quý Nhân', desc: 'đức tinh + tú khí cùng hội (theo nguyệt chi) — tính thuần hoà, văn chương tuấn tú, gặp dữ hoá lành', tone: 'cat' },
+  yueDeHe: { zh: '月德合', vi: 'Nguyệt Đức Hợp', desc: 'can hợp của Nguyệt Đức — phúc đức êm thấm, trừ tai giải ách như Nguyệt Đức', tone: 'cat' },
+  tianDeHe: { zh: '天德合', vi: 'Thiên Đức Hợp', desc: 'hợp của Thiên Đức (can hợp/chi lục hợp) — trời che chở, hoá giải hung hiểm, phúc hậu', tone: 'cat' },
+  ciGuan: { zh: '词馆', vi: 'Từ Quán', desc: '«hàn lâm chi vị» (临官, đối song Học Đường) — học nghiệp tinh chuyên, văn chương khoa cử công danh', tone: 'cat' },
+  taiJi: { zh: '太极贵人', vi: 'Thái Cực Quý Nhân', desc: 'quý nhân huyền học — thông minh hiếu học, duyên với thuật số/tôn giáo/huyền bí, «太极 » cực lí phò trợ', tone: 'cat' },
+  tianChu: { zh: '天厨贵人', vi: 'Thiên Xư Quý Nhân', desc: 'lương thực trời cho (食神禄位) — phú quý ấm no, hưởng phúc ăn uống', tone: 'cat' },
+  shiLing: { zh: '十灵日', vi: 'Thập Linh', desc: 'sinh ngày mang linh khí — thông minh linh lợi, nhạy huyền học, gặp việc hay có chỗ xoay chuyển', tone: 'cat' },
+  tianShe: { zh: '天赦日', vi: 'Thiên Xá', desc: 'sinh ngày trời xá tội — đại cát, 逢凶化吉, tội lỗi dễ được tha, ít tai ương lớn', tone: 'cat' },
+  siFei: { zh: '四废日', vi: 'Tứ Phế', desc: 'sinh ngày «vô dụng» của mùa (can chi tuyệt) — sự khó thành, thể yếu; Dụng Thần chế phục thì giảm', tone: 'hung' },
+  jinShen: { zh: '金神', vi: 'Kim Thần', desc: 'khí kim oai liệt ở giờ trụ — chế phục mà vào Hoả hương (金神入火乡) thì đại quý, quyền uy', tone: 'volatile' },
+  zaiSha: { zh: '灾煞', vi: 'Tai Sát', desc: 'sát tinh Bạch Hổ (giữa tam hợp đối xung) — chủ tai hoạ/bệnh tật bất ngờ; có Đức/quý nhân thì giải', tone: 'hung' },
+  xueRen: { zh: '血刃', vi: 'Huyết Nhận', desc: 'sát huyết quang (theo nguyệt chi) — cẩn thận thương tích/phẫu thuật; sao phụ nhỏ, tham khảo', tone: 'hung' },
+  liuXia: { zh: '流霞', vi: 'Lưu Hà', desc: 'huyết quang phụ (theo nhật can) — nữ chú ý sản khoa, nam chủ tiểu thương tích', tone: 'hung' },
 };
 
 /**
@@ -232,6 +302,36 @@ export function computeShensha(chart) {
     const ydHit = allGan.filter((g) => g === ydStem);
     if (ydHit.length) result.yueDe = { at: ydHit };
   }
+  // [AUDIT WIRE — bảng chết → hoạt hoá]
+  // 月德合 — can hợp của 月德, tra như 月德 theo NGUYỆT CHI (三命通會). Bảng YUE_DE_HE trước đây định nghĩa nhưng KHÔNG dùng.
+  const ydhStem = YUE_DE_HE[BRANCH_GROUP[chart.monthZhi]];
+  if (ydhStem) {
+    const ydhHit = allGan.filter((g) => g === ydhStem);
+    if (ydhHit.length) result.yueDeHe = { at: ydhHit };
+  }
+  // 天德合 — 合 của 天德 (là can → can hợp; là chi → lục hợp), tra theo NGUYỆT CHI. Bảng TIAN_DE_HE idem.
+  const tdhMark = TIAN_DE_HE[chart.monthZhi];
+  if (tdhMark) {
+    const tdhHit = allZhi.concat(allGan).filter((x) => x === tdhMark);
+    if (tdhHit.length) result.tianDeHe = { at: tdhHit };
+  }
+  // 德秀贵人 — 《三命通會·論德秀》: tra tam hợp NGUYỆT CHI → 德 can + 秀 can;
+  //   đủ CẢ 德 và 秀 mới lập 德秀 («命得此二神»). Bảng DEXIU trước đây định nghĩa nhưng KHÔNG dùng.
+  //   [variant] cổ văn 秀 có dị bản (寅午戌 戊癸, 申子辰 戊己/丙辛甲己…) — dùng bảng đơn giản hoá đã có.
+  const dxKey = Object.keys(DEXIU).find((k) => k.includes(chart.monthZhi));
+  if (dxKey) {
+    const dx = DEXIU[dxKey];
+    const deHit = allGan.filter((g) => g === dx.de);
+    const xiuHit = allGan.filter((g) => g === dx.xiu);
+    if (deHit.length && xiuHit.length) result.dexiu = { at: [...deHit, ...xiuHit], name: `德${dx.de}+秀${dx.xiu}` };
+  }
+  // 词馆 — 《三命通會·論學堂詞館》: NĂM can → ngũ hành 临官 vị (= LU_SHEN[yearGan]).
+  //   (bản 日 can là biến thể hiện đại; chính thống tra theo năm can). Bảng CIGUAN_INFO idem.
+  const cgTarget = LU_SHEN[chart.pillars.year.gan];
+  if (cgTarget) {
+    const cgHit = find(cgTarget);
+    if (cgHit.length) result.ciGuan = { at: cgHit };
+  }
   // Kim Dư — chi theo nhật can
   const jyHit = find(JIN_YU[dg]);
   if (jyHit.length) result.jinYu = { at: jyHit };
@@ -241,6 +341,45 @@ export function computeShensha(chart) {
   // Quù Cương — đặc thù ngày
   const dayGZ = chart.pillars.day.gan + chart.pillars.day.zhi;
   if (KUI_GANG.includes(dayGZ)) result.kuiGang = { at: [dayGZ] };
+
+  // ---- [AUDIT WIRE] 9 SAO BỔ SUNG ----
+  // 太极贵人 — năm can + ngày can → chi (cả hai mệnh cách đều lập)
+  const tjTargets = [...new Set([...(TAI_JI[dg] || []), ...(TAI_JI[chart.pillars.year.gan] || [])])];
+  if (tjTargets.length) {
+    const tjHit = findAny(tjTargets);
+    if (tjHit.length) result.taiJi = { at: tjHit };
+  }
+  // 天厨贵人 — năm can + ngày can → chi (食神禄位)
+  const tcTargets = [...new Set([TIAN_CHU[dg], TIAN_CHU[chart.pillars.year.gan]].filter(Boolean))];
+  if (tcTargets.length) {
+    const tcHit = findAny(tcTargets);
+    if (tcHit.length) result.tianChu = { at: tcHit };
+  }
+  // 流霞 — ngày can → chi
+  const lxHit = find(LIU_XIA[dg]);
+  if (lxHit.length) result.liuXia = { at: lxHit };
+  // 血刃 — nguyệt chi → chi
+  const xrTarget = XUE_REN[chart.monthZhi];
+  if (xrTarget) {
+    const xrHit = find(xrTarget);
+    if (xrHit.length) result.xueRen = { at: xrHit };
+  }
+  // 灾煞 — nhóm tam hợp NĂM chi → chi giữa tam hợp đối xung (劫煞前一位)
+  const zsHit = find(ZAI_SHA[group]);
+  if (zsHit.length) result.zaiSha = { at: zsHit };
+  // 十灵日 — 10 nhật trụ linh khí
+  if (SHI_LING.includes(dayGZ)) result.shiLing = { at: [dayGZ] };
+  // 天赦日 — mùa (theo nguyệt chi) → nhật trụ: 春戊寅 夏甲午 秋戊申 冬甲子
+  const season = ['寅', '卯', '辰'].includes(chart.monthZhi) ? '春'
+    : (['巳', '午', '未'].includes(chart.monthZhi) ? '夏'
+      : (['申', '酉', '戌'].includes(chart.monthZhi) ? '秋' : '冬'));
+  if (TIAN_SHE[season] === dayGZ) result.tianShe = { at: [dayGZ] };
+  // 四废日 — mùa → nhật trụ tuyệt của mùa
+  if ((SI_FEI[season] || []).includes(dayGZ)) result.siFei = { at: [dayGZ] };
+  // 金神 — CHỈ GIỜ trụ: 乙丑/己巳/癸酉 (金神贵乎时)
+  const timeGZ = chart.pillars.time.gan + chart.pillars.time.zhi;
+  if (JIN_SHEN.includes(timeGZ)) result.jinShen = { at: [timeGZ] };
+
   // Tam Kỳ — 4 thiên can chứa đủ 1 bộ tam kỳ
   const ganSet = new Set(allGan);
   for (const [name, trio] of Object.entries(SAN_QI)) {

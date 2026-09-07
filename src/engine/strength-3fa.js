@@ -16,15 +16,21 @@ import { tongGen } from './tonggen.js';
 const SHENG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' }; // a sinh b
 
 /**
- * @returns {{ deLenh, deDia, deShi, count, dmWx, monthMainWx, root, verdict, driver, summary }}
+ * @returns {{ deLenh, deDia, deShi, count, dmWx, monthMainWx, monthCommandWx, silingWx, root, verdict, driver, summary }}
  */
 export function strength3Fa(R) {
   const dmWx = R.chart.dayMaster.wx;
   const monthMainWx = R.strength?.monthMainWx;
   const pillars = R.chart.pillars;
 
-  // 1) 得令: 日主 hành = lệnh hoặc lệnh sinh 日主 (Ấn)
-  const deLenh = monthMainWx === dmWx || SHENG[monthMainWx] === dmWx;
+  // 1) 得令: can THỐNG LỆNH (人元司令分野 月令用事) = 日主 hành hoặc lệnh sinh 日主 (Ấn).
+  //   [IMPROV 1 sync với chart.js analyzeStrength] trước đây dùng NHỊ PHÂN bản khí nguyệt chi
+  //   (monthMainWx) — sai với sinh nửa đầu tháng khi dư khí thống lệnh (vd 甲 sinh 辰月 ngày ≤9:
+  //   乙木司令, bản khí 戊 → nhận thất lệnh oan). Nay ưu tiên R.strength.siling / R.siling
+  //   (can 司令 theo ngày-into-tháng, chart.js computeSiling) → fallback bản khí khi null.
+  const silingWx = (R.strength && R.strength.siling && R.strength.siling.wx) || (R.siling && R.siling.wx) || null;
+  const cmdWx = silingWx || monthMainWx || null;
+  const deLenh = cmdWx != null && (cmdWx === dmWx || SHENG[cmdWx] === dmWx);
 
   // 2) 得地: thông căn (tổng căn of 日主 hành)
   const root = tongGen(R.chart, dmWx);
@@ -61,7 +67,8 @@ export function strength3Fa(R) {
 
   const summary = `Nhật Chủ ${WX_VI[dmWx]}: ${verdict}. ${driver}${note} (得令=${deLenh ? '✓' : '✗'}, 得地=${deDia ? '✓' + ` (căn ${root.total})` : '✗'}, 得势=${deShi ? '✓' + ` (tỷ ${biCount})` : '✗'}).`;
 
-  return { deLenh, deDia, deShi, count, dmWx, monthMainWx, root: root.total, biCount, yinWx, yinRoot, verdict, driver, note, summary };
+  return { deLenh, deDia, deShi, count, dmWx, monthMainWx, monthCommandWx: cmdWx, silingWx,
+    root: root.total, biCount, yinWx, yinRoot, verdict, driver, note, summary };
 }
 
 export { SHENG };

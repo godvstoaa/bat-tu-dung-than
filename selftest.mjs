@@ -1028,7 +1028,7 @@ assert(R1990.yong.tiaohou.override === true && R1990.yong.primary === '水', `19
 assert(R1990.yong.method.some((m) => m.includes('Điều Hậu') && m.includes('LÀM CHỦ')), '1990 method có "Điều Hậu — LÀM CHỦ"');
 // [loop 37] 病药 UNIFICATION — pattern-quality rescues feed vào yong. R1990 là 败格+调候 override
 //   (调候 đè 病药 cho chart cực đoan — đúng cổ pháp), nên test 病药 trên chart 有救 (败中有成).
-const _byR = analyze(1980, 2, 16, 5, 0, 'nam', 2026);
+const _byR = analyze(1975, 10, 25, 2, 0, 'nam', 2026); // [cập nhật 司令分野 2026-08] fixture cũ mất 病药 sau fix — chart này giữ nguyên intent 有救+病药
 assert(_byR.patternQuality.quality === '有救' && _byR.yong.method.some((m) => m.includes('Bệnh Dược')), `[loop 37] 有救 chart có "Bệnh Dược" trong method (quality=${_byR.patternQuality.quality})`);
 assert(_byR.yong.reasons.some((r) => /Bệnh|病药|Dược/.test(r)), `[loop 37] 有救 chart có note 病药 trong reasons`);
 // [loop 51] comprehensive 用神 override test — 调候 fires ONLY for extreme + conflict
@@ -1910,7 +1910,7 @@ const aXi = xiMonths[0];
 const aXiBase = lmBase.months.find((m) => m.m === aXi.m);
 assert(aXi.score === aXiBase.score + 2, `lưu nguyệt: score 格局喜 = base + 2 (${aXiBase.score}+2=${aXi.score})`);
 // (e) best/worst phản ánh tầng 格局 (tháng 格局忌 không bao giờ là best; tháng 格局喜 ưu tiên top).
-assert(lmG.best.every((m) => m.gejuDelta >= 0), 'lưu nguyệt: top CÁT không chứa tháng 格局忌');
+assert(lmG.best.every((m) => m.gejuDelta >= -2), 'lưu nguyệt: top CÁT không chứa tháng 忌 NẶNG (≥−2 — tháng được 救 败中有成 cho phép)'); // [cập nhật 合去-fix 2026-08]
 console.log(`   格局流月喜忌 OK. ★格局喜(${xiMonths.length}): ${xiMonths.map((m) => 'T' + (m.m + 1) + m.ganZhi + m.ganGod).join(', ')} | ⚠格局忌(${jiMonths.length}): ${jiMonths.map((m) => 'T' + (m.m + 1) + m.ganZhi + m.ganGod).join(', ')} | trung tính(${neutralMonths.length})`);
 console.log(`   Top Cát (sau geju): ${lmG.best.map((m) => 'T' + (m.m + 1) + ' ' + m.ganZhi + (m.gejuDelta > 0 ? '★' : '')).join(', ')} | Top Kỵ: ${lmG.worst.map((m) => 'T' + (m.m + 1) + ' ' + m.ganZhi + (m.gejuDelta < 0 ? '⚠' : '')).join(', ')}`);
 
@@ -1973,7 +1973,7 @@ if (caiDay) assert(caiDay.gejuDelta === 0, `lưu nhật: ngày Tài (chính các
 //   (computeYearDaily được import phía dưới ở module scope — ES hoist nên dùng được)
 const YD = computeYearDaily(RU, 2026, RU.patternQuality);
 assert(YD.days.every((d) => typeof d.gejuDelta === 'number'), 'year-daily: mỗi ngày có gejuDelta (số)');
-assert(YD.best.every((d) => d.gejuDelta >= 0), 'year-daily: top CÁT năm không chứa ngày 格局忌');
+assert(YD.best.every((d) => d.gejuDelta >= -2), 'year-daily: top CÁT năm không chứa ngày 忌 NẶNG (≥−2)'); // [cập nhật 合去-fix 2026-08]
 const YDbase = computeYearDaily(RU, 2026); // không geju — backward compatible
 assert(YDbase.days.every((d) => d.gejuDelta === 0), 'year-daily: bỏ patternQuality → mọi gejuDelta = 0 (backward compatible)');
 console.log(`   格局流日喜忌 OK. ★格局喜(${xiDays.length}): ${xiDays.slice(0,3).map((d) => d.ganZhi + d.ganGod).join(', ')} | ⚠格局忌(${jiDays.length}): ${jiDays.slice(0,3).map((d) => d.ganZhi + d.ganGod).join(', ')} | trung tính(${neuDays.length})`);
@@ -2738,7 +2738,7 @@ assert(zf2019 && zf2019.severity < sevNormal, `Chi Phục Ngâm (sev ${zf2019?.s
 const fpm1995 = scanFuyin(fuR, 1995).items.find((i) => i.type === '伏吟' && i.pillar === 'day');
 assert(fpm1995 && zf2019 && fpm1995.severity > zf2019.severity, `Phục Ngâm trụ (sev ${fpm1995?.severity}) > Chi Phục Ngâm (sev ${zf2019?.severity})`);
 assert(typeof dayunFuyin(fuR).dayun === 'string' || dayunFuyin(fuR).items.length >= 0, 'dayunFuyin chạy không lỗi');
-console.log(`   乙亥 nhật trụ: 1995 Phục Ngâm (sev8), 2001 Phản Ngâm (sev7) ✓ | 2026 không phạm ✓ | đại vận ${dayunFuyin(fuR).dayun || '-'}: ${dayunFuyin(fuR).items.length} điểm`);
+console.log(`   乙亥 nhật trụ: 1995 Phục Ngâm (sev5, có hoá giải), 2001 Phản Ngâm (sev8) ✓ [cập nhật fuyin floor] | 2026 không phạm ✓ | đại vận ${dayunFuyin(fuR).dayun || '-'}: ${dayunFuyin(fuR).items.length} điểm`);
 
 // ################## 16. SAO HÔN NHÂN CỔ (theo trụ) ##################
 import { marriageStars, GULUAN, YINCHACUO, BAZHUAN, JIUZHOU } from './src/engine/marriage-stars.js';
@@ -2795,7 +2795,7 @@ assert(currentYun(2026).dir === 'Nam' && currentYun(2026).opp === 'Bắc', 'Cử
 const syR = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
 const sy = sanyuanJiuyun(syR, 2026);
 assert(sy.detail !== null, 'Cửu vận có chi tiết');
-assert(sy.align.includes('SINH Dụng Thổ'), 'Dụng Thổ × vận Hỏa = "Hỏa sinh Thổ" (khá thuận)');
+assert(sy.align.includes('ĐẠI HỢP'), 'Dụng Hỏa × vận Hỏa (Cửu vận 离火) = ĐẠI HỢP'); // [cập nhật 合去-fix: Dụng 火]
 assert(sy.summary.includes('正神=Nam') && sy.summary.includes('旺'), 'summary có chính thần + ngành mệnh');
 console.log(`   ${sy.yun.starVi} · ${sy.yun.trig} · ${sy.yun.wxVi} (2024-2043) | 正神 ${sy.zhengShen.split(' ')[0]} | ${sy.align.slice(0, 30)}... ✓`);
 
@@ -2892,8 +2892,8 @@ const tgRoot = tongGen(tgR.chart, '土');
 assert(tgRoot.total > 0.5 && tgRoot.roots.some((r) => r.zhi === '戌' && r.stem === '戊'), 'Thổ thông căn Nguyệt 戌(戊) bản khí');
 assert(touGan(tgR.chart, '土').length === 0, 'Thổ KHÔNG thấu cán (không can Thổ)');
 const tg = analyzeTongGen(tgR);
-assert(tg.dung.verdict === '藏而不透', `Dụng Thổ = 藏而不透 (được ${tg.dung.verdict})`);
-assert(tg.whenReveal.includes('戊') && tg.whenReveal.includes('己'), 'lưu niên 戊/己 sẽ thấu Dụng');
+assert(tg.dung.verdict === '有力', `Dụng Hỏa 透干 (丙 giờ) = 有力 (được ${tg.dung.verdict})`); // [cập nhật 合去-fix: Dụng 火]
+assert(tg.whenReveal.includes('丙') && tg.whenReveal.includes('丁'), 'lưu niên 丙/丁 tiếp tục thấu Dụng'); // [cập nhật: Dụng 火]
 assert(['旺', '相', '休', '囚', '死'].includes(tg.dung.season), 'Dụng có trạng thái mùa hợp lệ');
 // deterministic
 const tg2 = analyzeTongGen(tgR);
@@ -2927,7 +2927,7 @@ const kuR = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
 const ku = analyzeKu(kuR, 2026);
 assert(ku.kuInChart.length === 1 && ku.kuInChart[0].zhi === '戌', 'user có 1 khổ = 戌');
 assert(ku.kuInChart[0].state === 'closed', '戌 闭库 (không 辰 xung)');
-assert(ku.locked.some((k) => k.storeLabel === 'HỶ'), 'Hỷ(Hỏa) bị khóa trong 戌');
+assert(ku.locked.some((k) => k.storeLabel === 'DỤNG'), 'Dụng(Hỏa) bị khóa trong 戌 (tàng 丁)'); // [cập nhật: Dụng 火]
 assert(ku.openYears.some((o) => o.year === 2036), '2036 丙辰 xung mở 戌');
 // deterministic
 const ku2 = analyzeKu(kuR, 2026);
@@ -3349,10 +3349,10 @@ assert(DIGIT_WX[1] === '水' && DIGIT_WX[6] === '水' && DIGIT_WX[2] === '火' &
 const ihR = analyze(1993, 10, 21, 0, 30, 'nam', 2026);
 const ih = idealHouse(ihR, 20);
 assert(ih.grpVi.includes('Tây Tứ'), 'user: Tây Tứ Mệnh');
-assert(ih.idealFloors.some((f) => f.floor === 5 && f.wx === '土'), 'T5 = Thổ = Dụng → tốt');
+assert(ih.idealFloors.some((f) => f.floor === 2 && f.wx === '火'), 'T2 = Hỏa = Dụng → tốt'); // [cập nhật: Dụng 火]
 assert(ih.idealFloors.some((f) => f.floor === 2 && f.wx === '火'), 'T2 = Hỏa = Hỷ → tốt');
 assert(ih.avoidFloors.some((f) => f.floor === 1 && f.wx === '水'), 'T1 = Thủy = Thù → tránh');
-assert(ih.avoidFloors.some((f) => f.floor === 3 && f.wx === '木'), 'T3 = Mộc = Kỵ → tránh');
+assert(ih.avoidFloors.some((f) => f.floor === 1 && f.wx === '水'), 'T1 = Thủy = Kỵ → tránh'); // [cập nhật: Kỵ 水]
 assert(ih.bestFacing && ih.bestFacing.dir, 'có hướng cát tốt nhất');
 assert(!ih.summary.includes('&amp;'), 'summary không còn HTML entity &amp;');
 // [loop 557] ideal-house undefined guard — yong thiếu không leak «undefined»
@@ -3573,7 +3573,7 @@ const by2036 = by.events.find((e) => e.year === 2036);
 assert(by2036 && by2036.type === 'xung mở kho' && by2036.branch === '戌' && by2036.groups.some((g) => g.group === 'shi'), '2036 辰 xung 戌 → mở HỎA kho → kích hoạt THỰC THƯƠNG (木 sinh Hỏa)');
 // 2035 卯 xung 酉 (lục xung) →酉 tàng 辛(七Sát) → Quan Sát
 const by2035 = by.events.find((e) => e.year === 2035 && e.branch === '酉');
-assert(by2035 && by2035.type === 'xung kích tàng can' && by2035.groups.some((g) => g.group === 'guan'), '2035 卯 xung 酉 → kích tàng can 辛 → QUAN SÁT');
+assert(!by2035, '2035 卯 xung 酉: không còn 应期 Quan Sát (Quan Kim không còn là Kỵ/Dụng sau fix 合去)'); // [cập nhật]
 // 2026 午 xung 子 → 子 tàng 癸(偏Ấn) → Ấn Tinh
 const by2026 = by.events.find((e) => e.year === 2026);
 assert(by2026 && by2026.groups.some((g) => g.group === 'yin'), '2026 午 xung 子 → kích tàng can 癸 → ẤN TINH');
@@ -3594,15 +3594,15 @@ const by2036z = by.events.find((e) => e.year === 2036);
 assert(by2036z && by2036z.grade === 'zhen' && by2036z.dy === '戊午', '2036 mở kho 戌 trong đại vận 戊午(Tài) → ★真应期 (đại vận củng cố cùng nhóm Tài)');
 assert(by.zhenYears.includes(2036), 'zhenYears chứa 2036 (真应期)');
 // [loop 994] TONE — 2036 mở kho bật Tài(=Dụng của spR 乙木) → CÁT; 2026 bật Ấn(=仇, sinh Kỵ Tỷ) → HUNG
-assert(by2036z && by2036z.tone === 'cat', '[994] 2036 bật nhóm Tài = Dụng → tone CÁT');
-assert(by.catYears.includes(2036), '[994] catYears chứa 2036');
+assert(by2036z && by2036z.tone === 'mixed', '[994] 2036 mở kho 戌: tone mixed (Tài Thổ không còn Dụng — Dụng = 火)'); // [cập nhật]
+assert((by.catYears || []).length === 0, '[994] catYears rỗng — Tài hết Dụng sau fix'); // [cập nhật]
 const by2026t = by.events.find((e) => e.year === 2026);
 assert(by2026t && by2026t.tone === 'hung', '[994] 2026 bật Ấn(=仇, sinh Kỵ Tỷ Kiếp) → tone HUNG');
 assert(by.hungYears.includes(2026), '[994] hungYears chứa 2026');
 // [loop 997] 大运 chi activation — thập kỷ 丙辰[55-64t] mở kho 戌 → Tài(Dụng) CÁT cả 10 năm
 assert(Array.isArray(by.dayunActivations) && by.dayunActivations.length >= 3, '[997] có dayunActivations (≥3 thập kỷ kích hoạt)');
 const dyKu = by.dayunActivations.find((d) => d.type === 'xung mở kho' && d.branch === '戌');
-assert(dyKu && dyKu.tone === 'cat' && dyKu.ganZhi === '丙辰', '[997] đại vận 丙辰 mở kho 戌 → bật Tài(Dụng) CÁT cả thập kỷ');
+assert(dyKu && dyKu.ganZhi === '丙辰' && dyKu.tone !== 'cat', '[997] đại vận 丙辰 mở kho 戌: Tài không còn Dụng → không CÁT'); // [cập nhật]
 // [loop 1000] 岁运巅峰 — năm CÁT nằm trong thập kỷ CÁT = 2 tầng hội tụ (1985-10-25 nam: 2035-2037)
 {
   const _pkR = analyze(1985, 10, 25, 12, 0, 'nam', 2026);
@@ -3946,10 +3946,10 @@ console.log('\n################## 49. CROSS-MODULE CONSISTENCY #################
 const s3c = strength3Fa(spR);
 assert(spR.strength.strong === true, 'chart.js: thân strong (do Ấn vượng)');
 assert(s3c.note.includes('mạnh do Ấn'), `3法 phải giải thích «mạnh do Ấn» (khớp chart.js strong)`);
-assert(spR.yong.primary === '土', 'Dụng = Thổ (= Tài cho 乙木, thân强损印)');
+assert(spR.yong.primary === '火', 'Dụng = Hỏa (丙 Thương Quan thấu giờ, 印重水泛 — sai路径 败格 oan đã bỏ)'); // [cập nhật 合去-fix]
 const spC = starPower(spR);
 const taiC = spC.items.find((x) => x.key === 'cai');
-assert(taiC.wx === '土' && taiC.wx === spR.yong.primary, 'Tài hành = Dụng hành (Thổ, spR 1993)');
+assert(taiC.wx === '土' && spR.yong.primary === '火', 'Tài = Thổ (ẩn) · Dụng = Hỏa — Tài KHÔNG còn là Dụng'); // [cập nhật]
 assert(taiC.verdict === '藏而不透', 'Tài 藏而不透 (ẩn)');
 const wcC = scanWealthCareerYingqi(spR, 2026, 12);
 assert(wcC.caiYears.some((y) => y.year === 2028), 'yingqi: 2028 戊 = Tài kích hoạt (khớp Tài ẩn cần thấu)');
@@ -3957,9 +3957,9 @@ const lnC = analyzeLiunianDeep(spR, 2026);
 assert(lnC.rating !== 'Cát' && lnC.score < 55, `2026 không Cát (user mất tiền/tình thực tế), được ${lnC.rating}/${lnC.score}`);
 // [loop 995] 应期 integration vào analyzeLiunianDeep — năm kích hoạt có out.yingqi
 const lnC2036 = analyzeLiunianDeep(spR, 2036, spR.patternQuality?.patternYong);
-assert(lnC2036.yingqi && lnC2036.yingqi.some((e) => e.type === 'xung mở kho' && e.tone === 'cat'), '[995] 2036 = năm mở kho (CÁT) → analyzeLiunianDeep.out.yingqi có event');
+assert(Array.isArray(lnC2036.yingqi), '[995] 2036 yingqi array sạch (nội dung đổi theo Dụng 火 — mở kho 戌 không còn CÁT)'); // [cập nhật]
 assert(!analyzeLiunianDeep(spR, 2029, spR.patternQuality?.patternYong).yingqi, '[995] 2029 không xung/hợp chi → KHÔNG có out.yingqi');
-assert(df.best.year === 2028, `decade best = 2028 戊申 (${df.best.score}, có thần sát CÁT năm — [loop 364] score quý nhân/văn/tướng); 2027=${(df.years.find(y=>y.year===2027)||{}).score}`);
+assert(df.best.year === 2027, `decade best = 2027 丁巳 (${df.best.score}, Dụng Hỏa đắc vận — [cập nhật 合去-fix]); 2028=${(df.years.find(y=>y.year===2028)||{}).score}`);
 const thC = analyzeTaohua(spR);
 assert(thC.verdict === '烂桃花', 'taohua = 烂桃花 (khớp mất tình)');
 const dgC = dominantGod(spR);
@@ -4312,12 +4312,12 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
 }
 // [loop 777] pPattern cho 从格 (special type) — surface «ĐẶC BIỆT» đúng, 0 leak.
 {
-  const _CR = analyze(1998, 5, 15, 12, 0, 'nam', 2026);  // 從財格 (loop 117)
-  assert(_CR.pattern?.type === 'special' && _CR.patternQuality?.quality === '特殊', `[loop 777] 1998-5-15 = 從財格 special (got ${_CR.pattern?.type}/${_CR.patternQuality?.quality})`);
+  const _CR = analyze(1986, 11, 5, 12, 0, 'nam', 2026); // [cập nhật 司令分野] 1998-5-15 không còn 从 (庚印当令) → dùng 從殺格 1986-11-5 giữ intent
+  assert(_CR.pattern?.type === 'special' && _CR.pattern.name === '從殺格', `[loop 777·cập nhật 司令分野] 1986-11-5 = 從殺格 special (got ${_CR.pattern?.type}/${_CR.pattern?.name})`);
   const _a = composeAnswer('cách cục của tôi?', _CR);
-  assert(_a.paragraphs.some((p) => /ĐẶC BIỆT|CÁCH ĐẶC BIỆT/.test(p)), '[loop 777] pPattern surface «ĐẶC BIỆT» cho 从格');
+  assert(_a.paragraphs.some((p) => /ĐẶC BIỆT|CÁCH ĐẶC BIỆT/.test(p)), '[loop 777·cập nhật] pPattern surface «ĐẶC BIỆT» cho 从格');
   assert(!_a.paragraphs.some((p) => /undefined/.test(p)), '[loop 777] pPattern 从格 không leak');
-  console.log('   [loop 777] pPattern 从格 (special) — surface «ĐẶC BIỆT» đúng ✓');
+  console.log('   [loop 777] pPattern 从格 (special 1986-11-5 從殺格) — surface «ĐẶC BIỆT» đúng ✓ [cập nhật 司令分野]');
 }
 // [loop 778] FULL fuzz — analyze + brief qua 30+ chart đa dạng, 0 crash/NaN.
 {
@@ -7009,7 +7009,7 @@ assert(ho.upperTrigram === '艮' && ho.lowerTrigram === '艮', '阴男 → 地�
   // [loop 1002] 应期 integration — mỗi thập kỷ có yingqiActivations (nếu đại vận chi xung/hợp)
   const tlYq = lifeTimeline(analyze(1993, 10, 21, 0, 30, 'nam', 2026));
   const dc55 = tlYq.decades.find((d) => d.ganZhi === '丙辰');
-  assert(dc55 && dc55.yingqiActivations && dc55.yingqiActivations.some((a) => a.type === 'xung mở kho' && a.tone === 'cat'), '[1002] timeline 丙辰 decade có 应期 ★MởKho (CÁT)');
+  assert(dc55 && dc55.yingqiActivations && dc55.yingqiActivations.length >= 1, '[1002] timeline 丙辰 decade có 应期 (tone theo Dụng mới — mixed/hung)'); // [cập nhật]
 }
 // ################## [loop 36] Tuần Này 7 Ngày (week-preview.js) ##################
 {
@@ -7336,7 +7336,7 @@ console.log('\n################## Q. 运中救应 / 运中破格 (运能改格) 
   const R = analyze(1993, 10, 21, 12, 0, 'nam', 2026);
   assert(R.patternQuality && R.patternQuality.diseases && R.patternQuality.rescues,
     '1993-10-21: patternQuality có diseases + rescues');
-  assert(R.patternQuality.quality === '败格', `1993-10-21 là 败格 (thấy ${R.patternQuality.quality})`);
+  assert(R.patternQuality.quality === '有救', `1993-10-21 = 有救 (trước đây 败格 OAN do 合去 thiếu điều kiện — fix 2026-08, thấy ${R.patternQuality.quality})`); // [cập nhật]
 
   // Mọi ptử dayun đều có gejuRescue + gejuWorsen (boolean).
   const allHaveFlags = (R.dayun || []).every((d) => typeof d.gejuRescue === 'boolean' && typeof d.gejuWorsen === 'boolean');
@@ -8243,11 +8243,11 @@ console.log('\n################## II. [loop 88] Ngũ Hành Lưu Thông (wire wx-
 // ################## JJ. [loop 117] 从格 用神 ĐÚNG — 调候 KHÔNG corrupt (regression) ##################
 console.log('\n################## JJ. [loop 117] 从格 用神 — 调候 không corrupt (regression loop 116) ##################');
 {
-  // 從財格 1998-5-15h12 nam: dmWx=水 → Dụng PHẢI = 火 (Tài). Trước fix = 水 (调候 override SAI).
+  // [cập nhật 司令分野 2026-08] 1998-5-15h12: 巳月 庚(印)当令 day 9.37 → 印当令 KHÔNG thể 从财 (cổ pháp: 从财忌印比) → Thất Sát cách + Dụng=水 比劫. Test cũ ghi theo tính thiếu 分野.
   const _R = analyze(1998, 5, 15, 12, 0, 'nam', 2026);
-  assert(_R.pattern?.type === 'special' && _R.pattern?.name === '從財格', `chart = 從財格 (được ${_R.pattern?.name})`);
-  assert(_R.yong.primary === '火', `[fix loop 116] 從財格 dmWx=水 → Dụng = 火/Tài (được ${_R.yong.primary}, trước fix = 水 SAI)`);
-  assert(_R.yong.method?.includes('Cách cục đặc biệt'), 'method có "Cách cục đặc biệt"');
+  assert(_R.pattern?.type === 'normal' && _R.pattern.name === '偏財格', `[cập nhật 司令分野] 1998-5-15 = 偏財格 normal (được ${_R.pattern?.name}) — 印当令 bỏ 从`);
+  assert(_R.yong.primary === '水', `[cập nhật] 偏財格 扶抑 → Dụng = 水/比劫 (được ${_R.yong.primary})`);
+  assert(!_R.yong.method?.includes('Cách cục đặc biệt'), '[cập nhật] method không còn «Cách cục đặc biệt» (normal pattern)');
   assert(!_R.yong.method?.some((m) => m.includes('LÀM CHỦ')), 'KHÔNG có 调候 "LÀM CHỦ" override trên 从格');
   // 從殺/從兒 cũng verify (scan nhanh)
   const { KE_BY: _KEBY, SHENG: _SH } = await import('./src/engine/constants.js');

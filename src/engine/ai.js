@@ -177,11 +177,11 @@ const CFG_KEY = 'bazi_ai_config_v1';
 // LƯU Ý CORS: gọi THẲNG (https://api.z.ai...) từ trình duyệt sẽ bị CORS chặn → fallback.
 // Khi `npm run dev`, dùng preset "proxy dev" (/zai/...) đi qua Vite proxy → chạy được.
 export const PRESETS = [
-  { id: 'zai-proxy', label: '★ Z.ai — PROXY (glm-5.2) [khuyên dùng — web + dev]', endpoint: '/zai/api/paas/v4', model: 'glm-5.2',
+  { id: 'zai-proxy', label: '★ Z.ai — PROXY (glm-5.3 🧠 chất lượng cao) [khuyên dùng]', endpoint: '/zai/api/paas/v4', model: 'glm-5.3',
     note: 'Đi qua proxy cùng-origin → KHÔNG bị CORS. Chạy được cả npm run dev (Vite proxy) LẪN trên web production (Cloudflare Pages Function /zai). Nên dùng.' },
-  { id: 'zai-general', label: 'Z.ai — API chung (glm-5.2) [CORS: chỉ chạy qua backend]', endpoint: 'https://api.z.ai/api/paas/v4', model: 'glm-5.2',
+  { id: 'zai-general', label: 'Z.ai — API chung (glm-5.3) [CORS: chỉ chạy qua backend]', endpoint: 'https://api.z.ai/api/paas/v4', model: 'glm-5.3',
     note: 'Endpoint thẳng — trình duyệt sẽ CHẶN CORS. Chỉ dùng nếu app có backend/proxy, hoặc chạy qua server-side.' },
-  { id: 'zai-coding', label: 'Z.ai — GLM Coding Plan (glm-5.2) [proxy]', endpoint: '/zai/api/coding/paas/v4', model: 'glm-5.2',
+  { id: 'zai-coding', label: 'Z.ai — GLM Coding Plan (glm-5.3 ⚡flash nhanh) [proxy]', endpoint: '/zai/api/coding/paas/v4', model: 'glm-5.3-flash',
     note: 'Endpoint Coding Plan — đi qua proxy /zai (cùng-origin, tránh CORS). Chạy được cả dev (Vite proxy) LẪN production (Cloudflare /zai). Dùng API key gói Coding Plan. [loop 1186 FIX: trước đây gọi thẳng api.z.ai → CORS chặn web].' },
   { id: 'nvidia-glm', label: '★ NVIDIA NIM — GLM-5.2 [proxy, free 5000 credit]', endpoint: '/nvidia/v1', model: 'z-ai/glm-5.2',
     note: 'NVIDIA NIM chạy GLM-5.2 (cùng model, infra NVIDIA nhanh/ổn + tool-use + reasoning). Lấy key FREE ở build.nvidia.com/settings/api-keys (tài khoản NVIDIA free, 5000 credit + 40 RPM). Đi qua proxy /nvidia — tránh CORS.' },
@@ -214,6 +214,12 @@ export function getConfig() {
     try { if (typeof localStorage !== 'undefined') localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
   }
   if (cfg) {
+    // [SPEED MIGRATE] user cũ kẹt glm-5.2 trên preset Z.ai proxy → nâng glm-5.3-flash (nhanh hơn,
+    //   thinking + tool-use đã verify). KHONG đụng cfg custom (apiKey/model khác do user tự đặt).
+    if ((cfg.model === 'glm-5.2' || cfg.model === 'glm-5.3-flash') && cfg.preset !== 'zai-coding' && typeof cfg.endpoint === 'string' && cfg.endpoint.startsWith('/zai')) {
+      cfg.model = 'glm-5.3';
+      try { if (typeof localStorage !== 'undefined') localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
+    }
     // heal cfg hỏng: enabled nhưng THIẾU endpoint/model → isAIReady FALSE → AI toàn local
     //   fallback («Giải Mệnh cục bộ») → khách rời. Tự sửa + persist cho user đã stuck.
     if (cfg.enabled && (!cfg.endpoint || !cfg.model)) {
@@ -318,14 +324,24 @@ export function buildChartBrief(R) {
     return `${l.year}(${hanviet(l.ganZhi)}:${l.rating}${l.isNow ? '★nay' : ''}${gtag ? '|' + gtag : ''})`;
   }).join(' ');
 
-  let brief = `== ⏰ THỜI GIAN HIỆN TẠI (CHUẨN MỌI PHÂN TÍCH — ĐỌC KỄ, RẤT QUAN TRỌNG) ==
+  let brief = `== 🚨 DATA SOURCES (ĐỌC TRƯỚC — CHỐNG HALLUCINATION) ==
+⚠ Brief này CHỈ chứa: BaZi (Tứ Trụ 四柱) + thập thần + đại vận + lưu niên + thần sát + nạp âm + Dụng Thần + tổ hợp kinh điển + ứng kỳ + sát phương năm + Đông Y + phong thủy hướng.
+❌ KHÔNG CHỨA: Tử Vi palace/cung/sao Tử Vi (Cự Môn/Thái Âm/Vũ Khúc/Văn Khúc @ cung nào...), chỉ tay, tướng số khuôn mặt (trừ brief thập can thể tượng).
+⛔ AI TUYỆT ĐỐI KHÔNG ĐƯỢC: (1) trích dẫn Tử Vi palace/cung — đó là BỊA; (2) tự thêm chi tiết đời user (đã lập gia đình/li dời/con cái/nghề nghiệp cụ thể) — chỉ từ câu hỏi user + brief; (3) bịa năm/tháng sự kiện không có trong mục ỨNG KỲ. MỌI kết luận phải neo indicator CÓ TÊN trong brief — nếu không có → nói «theo lá số chỉ thấy X», không bịa thêm.
+
+== 🧭 SAT PHƯƠNG ${curYear} (KHI KHUYÊN HƯỚNG — BAT BUỘC CHECK TRƯỚC, KHÔNG BA PHẢI) ==
+- TAM SÁT ${curYear} (phương tối kỵ động thổ/dời nhà): ${(() => { try { return sanshaDirection(curYear).summary; } catch (e) { return '(không tính được)'; } })()}
+- SAT PHƯƠNG ${curYear} TỔNG HỢP (TháiTuế/TuếPhá/TamSát/Ngũ Hoàng/Nhị Hắc — check trước khi khuyên hướng): ${(() => { try { return annualTabooOverview(curYear).summary; } catch (e) { return '(không tính được)'; } })()}
+⚡ LỆNH: Khi khuyên hướng cửa/giường/bàn/bếp/động thổ → PHẢI check hướng đó có trùng Thái Tuế/Tam Sát/Ngũ Hoàng năm ${curYear} KHÔNG. Nếu trùng → KHÔNG khuyên (dù hợp Dụng Thần) — ưu tiên hướng CÁT KHÔNG phạm sát phương. Dụng Thần áp dụng cho hướng BÀN LÀM VIỆC, KHÔNG tự động cho ĐẦU GIƯỜNG (đầu giường ưu tiên Bát Trạch + sát phương năm).
+
+== ⏰ THỜI GIAN HIỆN TẠI (CHUẨN MỌI PHÂN TÍCH — ĐỌC KỄ, RẤT QUAN TRỌNG) ==
 - Hôm nay (dương lịch): ${nowSolar.toYmd()}
 - Âm lịch: ${nowLunar.toString()}
 - NĂM NAY = ${curYear} = ${curYearGZ} (${hanviet(curYearGZ)}). ĐÂY LÀ NĂM ĐANG DIỄN RA, KHÔNG PHẢI TƯƠNG LAI. Từ "năm nay" / "năm này" LUÔN là ${curYear} — KHÔNG được mặc định 2024 hay bất kỳ năm nào khác.
 - THÁNG NAY (lưu nguyệt) = ${curMonthGZ} (${hanviet(curMonthGZ)}) — rating ${curMonthRating}${curMonthNote}
 - ⚠ LƯU NGUYỆT = tháng TIẾT KHÍ (vd ${curMonthGZ} = tháng «${({子:'Tý',丑:'Sửu',寅:'Dần',卯:'Mão',辰:'Thìn',巳:'Tỵ',午:'Ngọ',未:'Mùi',申:'Thân',酉:'Dậu',戌:'Tuất',亥:'Hợi'})[curMonthGZ[1]]}»), GẦN tháng DƯƠNG lịch, KHÔNG PHẢI tháng ÂM lịch (tháng âm lệch 1-2 tháng vs tiết-khí). Khi nói «tháng», PHẢI dùng TÊN CHI-THÁNG (tháng Ngọ/Mùi/Tý...) hoặc «tháng X dương» — KHÔNG BAO GIỜ ghi «tháng X âm» cho lưu nguyệt (sai hệ).
 - Khi user hỏi "tháng này / năm nay" → PHẢI dùng ${curYear} và lưu nguyệt ${curMonthGZ} ở trên.
-- ĐỐI TƯỢNG QUAN TÂM: ${(() => { const p = R.chart?.input?.partner; const g = R.chart?.input?.gender; if (!p) return 'không chỉ định (mặc định khác giới — luận Tài/Quan gendered bình thường)'; const same = (g === 'nam' && p === 'nam') || (g !== 'nam' && p !== 'nam'); return same ? 'CÙNG GIỚI → luận tình duyên qua NGÀY CHI (Phu Thê cung, universal) + ngũ hành, KHÔNG gendered Tài/Quan (xem rule 15b + caveat chống hại)' : 'khác giới — luận Tài/Quan gendered bình thường'; })()}
+- ĐỐI TƯỢNG QUAN TÂM: ${(() => { const p = R.chart?.input?.partner; const g = R.chart?.input?.gender; if (!p) return 'không chỉ định (mặc định khác giới — luận Tài/Quan gendered bình thường)'; const same = (g === 'nam' && p === 'nam') || (g !== 'nam' && p !== 'nam'); return same ? 'CÙNG GIỚI → luận tình duyên qua NGÀY CHI (Phu Thê cung, universal) + ngũ hành, KHÔNG gendered Tài/Quan (xem rule 18b + caveat chống hại)' : 'khác giới — luận Tài/Quan gendered bình thường'; })()}
 - TRỊ NIÊN THÁI TUẾ ${curYear}: ${(() => { try { const o = taiSuiOverview(R, curYear); return `${o.current.ganZhi} = ${o.current.name} (vị ${o.current.index}/60). ${o.current.note} Bản mệnh TS (năm sinh) = ${o.natal.name}.`; } catch (e) { return '(không tính được)'; } })()}
 
 == 📅 HÔM NAY TỔNG KHÁI (DAILY BRIEFING — QUAN TRỌNG NHẤT, ĐỌC TRƯỚC) ==
@@ -374,6 +390,7 @@ WHY VƯỢNG SUY 得令/得地/得势 3 pháp (mạnh nhờ lệnh/địa/thế 
 NGŨ HÀNH: ${wx}
 - «源流» (R.yuanliu — nguồn + dòng ngũ hành của lá số): ${R.yuanliu ? `nguồn=${wxVi(R.yuanliu.source)} | dòng ${(R.yuanliu.chain || []).map((c) => wxVi(c.wx) + ' ' + Math.round((c.pct || 0) * 100) + '%').join('→')} | khuyết(gap)=${R.yuanliu.gap ? wxVi(R.yuanliu.gap) : '(đủ 5 hành — lưu thông)'} | 归宿=${wxVi(R.yuanliu.endpoint)} | ảnh hưởng ${R.yuanliu.aspectKey}${R.yuanliu.verdict ? ' · ' + R.yuanliu.verdict : ''}` : '(không tính)'}
 
+- NGOẠI HÌNH/TÍNH CÁCH THEO NGŨ HÀNH (L2 FIX — KHÔNG CHỈ NHÌN HÀNH DOMINANT, xét TẤT CẢ hành ≥12%): ${(() => { const APPEAR = { '木':'cao/thon/mộc mạc, ngay thẳng', '火':'sáng mắt/tươi/rực rỡ, nhiệt huyết', '土':'chắc đậm/ổn, vuông mặt, tín', '金':'thanh tú/sắc nét/da trắng, dứt khoát', '水':'uyển chuyển/tròn/mềm, thông minh' }; const NATURE = { '木':'phát triển/kiên cường/bảo vệ', '火':'lan tỏa/bốc đồng/hào phóng', '土':'bao dung/chậm chắc/thu nhận', '金':'cương quyết/kỷ luật/cứng rắn', '水':'linh hoạt/sâu kín/tự do' }; const ord = Object.entries(R.wx?.pct || {}).filter(([,p]) => p >= 12).sort(([,a],[,b]) => b - a); if (!ord.length) return '(không tính được)'; return ord.map(([wx,p], i) => { const tag = i === 0 ? ' ★DOMINANT' : (p >= 25 ? ' ← ảnh hưởng MẠNH' : ' ← cũng có mặt'); return wxVi(wx)+'('+Math.round(p)+'%)=ngoại hình:'+(APPEAR[wx]||'?')+' | tính:'+(NATURE[wx]||'?')+tag; }).join(' || '); })()}
 CÁCH CỤC (格局): ${R.pattern.vi} — ${R.pattern.name}
 HÓA KHÍ (化气格 — can hợp có hóa không; nếu thành → Dụng đổi hẳn): ${(() => { try { const h = analyzeHuaQi(R); return h.huaQiGe ? `⚠ ${h.summary}` : h.summary; } catch (e) { return '(không tính được)'; } })()}
   ${R.pattern.note}
@@ -394,6 +411,7 @@ DỤNG – HỶ – KỴ – THÙ (用喜忌仇):
   - Phép lấy Dụng Thần: ${R.yong.method.join(' + ')}
   - Lập luận: ${R.yong.reasons.join(' ')}
   - Điều Hậu (调候): ${R.yong.tiaohou.note || '(không)'}
+  - ⚡ OVERRIDE PRIORITY (L6 FIX — AI PHẢI LUẬN THEO ĐÚNG ƯU TIÊN NÀY, KHÔNG ĐƯỢC NHẦM): ${(() => { const isCong = /从|從|tòng cách|tong cach/i.test(R.pattern?.vi || '') || /从格|從格/.test(R.pattern?.name || ''); const hasTiao = !!(R.yong?.tiaohou && R.yong.tiaohou.override); const methods = (R.yong?.method || []).join(' '); const isFuY = /扶抑|phù Ức|phu uc|bù (thân|nhược)|khắc (thân|vượng)/i.test(methods); if (isCong) return '🥇 从格 (TÒNG CÁCH) → Dụng = hành THEO thế (bỏ 扶抑/调候) — Nhật chủ quá yếu, theo thế mới sống. AI KHÔNG được nói «thân nhược cần Ấn» nếu đây là tòng cách!'; if (hasTiao) return '🥈 调候 (ĐIỀU HẬU) → Dụng = hành ĐIỀU HÒA nhiệt độ (Hỏa cho mùa đông hàn / Thủy cho mùa hè nhiệt) — override 扶抑 khi khắc nghiệt. AI KHÔNG nói «cần Ấn/Tỷ» nếu tháng quá lạnh/nóng!'; if (isFuY) return '🥉 扶抑 (PHÙ ỨC / BỆNH DƯỢC) → Dụng = hành BÙ (Ấn/Tỷ cho nhược) hoặc KHẮC (Tài/Quan/Thực cho vượng) — trường hợp bình thường.'; return '(không xác định rõ override — luận theo method + reasons phía trên)'; })()}
   - SỨC MẠNH DỤNG (通根透干 + 旺相休囚死): ${(() => { try { const t = analyzeTongGen(R); return `${t.dung.verdict} (${t.dung.seasonVi}) — căn ${t.dung.root.total}, lộ ${t.dung.reveal.length}. ${t.dung.verdict === '藏而不透' ? 'Đợi lưu niên can ' + t.whenReveal.join('/') + ' thấu mới phát.' : t.dung.verdict === '虚浮' || t.dung.verdict === '虚' ? 'Dụng YẾU — cần bù mạnh.' : 'Dụng thật, có lực.'}`; } catch (e) { return '(không tính được)'; } })()}
 
 TỔNG LUẬN MỆNH: ${R.synthesis.gradeVi} · ${R.synthesis.fortuneVi} (điểm ${R.synthesis.score}/100)
@@ -449,6 +467,8 @@ NGHỊCH THIÊN CẢI MỆNH (cải vận):
   - THỦY PHÁP 水法 (kích hoạt tài/tình — đặt nước hướng nào): ${(() => { try { const wa = waterActivation(curYear); const pw = wa.primaryWealth; const rm = wa.romanceWater; const av = (wa.avoidWater || []).map((x) => x.dir).join('/') || '—'; return `primary wealth → ${pw && pw.dir ? pw.dir + ' (' + (pw.starName || pw.star) + ')' : '—'}, romance → ${rm && rm.dir ? rm.dir + ' (' + (rm.starName || rm.star) + ')' : '—'}, AVOID → ${av} [运${wa.yun} 零神=${wa.yunInfo.ling}]. ${wa.summary}`; } catch (e) { return '(không tính được)'; } })()}
   - 12 pháp cải vận + 了凡四训 (tích âm đức là pháp cốt lõi nghịch thiên) đã có sẵn trong dữ liệu.
   - Thời điểm vàng (chỉ lưu niên CÁT/ĐẠI CÁT): ${(R.remedy?.timing || []).filter((t) => t.rating === 'Cát' || t.rating === 'Đại cát').map((t) => `${t.year}(${t.gz})`).join(', ') || '(chưa có năm Cát trong khung 10 năm)'}
+
+⏰ TIMING HIERARCHY (L7 FIX — AI LUẬN VẬN THEO ĐÚNG THỨ TỰ, KHÔNG NHẦM TẦNG): ${(() => { try { const _age = _now.getFullYear() - (R.chart?.input?.year || _now.getFullYear()); const _curDy = (R.dayun||[]).find(d => d.startAge != null && _age >= d.startAge) || (R.dayun||[])[(R.dayun||[]).length-1]; const _dyRating = _curDy?.rating || '?'; const _dyGanZhi = _curDy?.ganZhi || '?'; return `🥇 ĐẠI VẬN ${_dyGanZhi} (${_dyRating}) = BỐI CẢNH 10 NĂM (quyết định xu hướng LỚN) → AI phải nói ĐẠI VẬN trước, rồi mới xuống 🥈 LƯU NIÊN ${curYear} (kích hoạt cụ thể trong bối cảnh đại vận) → cuối cùng 🥉 LƯU NGUYỆT (chi tiết tháng, chỉ cụ thể hoá). QUY TẮC KẾT HỢP: đại vận TỐT + lưu niên TỐT = cực tốt | đại vận XẤU + lưu niên TỐT = tạm ổn trong giai đoạn khó | đại vận XẤU + lưu niên XẤU = năm nguy hiểm. KHÔNG BAO GIỜ nói «năm nay tốt» mà không check đại vận đang hành có KỴ không!`; } catch(e) { return '(không tính được)'; } })()}
 
 ĐẠI VẬN: ${dayunStr}${gejuDayunBrief ? '\n★ 格局喜忌 (子平真詮 ch.10-11): Vận không chỉ xem ngũ hành sinh khắc Nhật Chủ, mà còn xem THẬP THẦN vận có sinh trợ Dụng/相 (★格局喜) hay khắc phá 格 (⚠格局忌).' + gejuDayunBrief : ''}
 
@@ -629,7 +649,7 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const monthZhi = c.pillars.month.zhi || '';
     const tiaohouKey = dmGan + monthZhi + '月';
     // [AUDIT FIX] fallback dùng tiaohou.note computed (R.yong.tiaohou — full coverage cho mọi
-    //   chart) thay vì generic «không có cổ quyết cụ thể». QIONGTONG_TIAOHOU chỉ cover 42/120 combo
+    //   chart) thay vì generic «không có cổ quyết cụ thể». QIONGTONG_TIAOHOU đã cover đủ 120/120 combo (42 coarse + 78 refined — audit 2026-08)
     //   → 78 combo (vd 戊子/壬子) rơi fallback. Note computed chính xác per-chart (theo TIAOHOU table).
     const tiaohou = QIONGTONG_TIAOHOU[tiaohouKey] || R.yong?.tiaohou?.note || '(không có cổ quyết cụ thể)';
     const weakestWx = Object.entries(R.wx?.pct || {}).sort(([,a],[,b]) => a - b)[0];
@@ -680,6 +700,7 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const decadeTheme = DECADE_LIFE_THEMES[ageRange] || '';
     brief += "\n--- HÔN NHÂN + TÀI VẬN + QUÝ NHÂN (round 2 crawl) ---\n" +
       "PHỐI NGẪU (日支=" + dayZhi + "): " + (spouseReading ? spouseReading.traits + " | Hôn nhân: " + spouseReading.marriage : "(không có dữ liệu)") + "\n" +
+      "⚠ TÀNG CAN PHỐI NGÃU — HIỂU ĐÚNG (L5 FIX): khi phối ngẫu tinh (Quan/Sát/Tài) NẰM TÀNG CAN (ẩn trong địa chi, không lộ thiên can) → nghĩa là ĐỐI TƯỢNG ẩn / quan hệ bắt đầu phi tình cảm (đồng nghiệp/bạn → mới phát triển tình) / người đó KHÔNG LỘ ngay là «đối tượng». KHÔNG PHẢI là «con giấu tình cảm / đơn phương im lặng». Sự thể hiện tình cảm của CON phụ thuộc THƯƠNG QUAN (biểu đạt) hay ẤN (kín đáo) — KHÔNG phụ thuộc tàng can. AI KHÔNG được dịch «Sát tàng can = con giấu tình» — ĐÓ LÀ SAI.\n" +
       "KẾT HÔN TIMING: " + MARRIAGE_TIMING_SIGNALS.slice(0, 4).join(" • ") + "\n" +
       "TÀI VẬN CẤP: xem thân cường/nhược + Tài vượng/suy + Tài khố (辰戌丑未) + đại vận Tài → phân cấp giàu/nghèo. " + WEALTH_TIERS.map(t => t.tier + "(" + t.level + ")").join(" / ") + "\n" +
       "TÀI KHỐ: " + (['辰','戌','丑','未'].includes(dayZhi) ? "Nhật Chi = " + dayZhi + " → " + (WEALTH_KU[dayZhi] ? WEALTH_KU[dayZhi].note : '') : "Nhật Chi không phải辰戌丑未") + "\n" +
@@ -1008,6 +1029,16 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
     const brainOut = brainThink('', c, R, c?.input?.gender);
     if (brainOut) brief += `\n--- NÃO (BRAIN GRAPH — kết luận determinist) ---\n${brainOut}`;
   } catch (_) { /* brain crash = skip, don't break brief */ }
+  brief += `
+--- CHUẨN ĐO THỐNG NHẤT (grading scale + engine chuẩn 2026-08) ---`;
+  brief += `
+• Thang chuẩn 6 cấp: Đại cát / Cát / Bình hòa / Hơi nghịch / Hung / Đại hung. Quy đổi: quẻ «trung»≈Bình hòa · tổ hợp «hung»≈Hung · tiers «CẦN HÓA GIẢI»≈Hơi nghịch · số 81 «trung»≈Bình hòa. KHÔNG trộn thang khi luận.`;
+  brief += `
+• 合去/合绊: summary cách cục đã tính — 合去 chỉ khi 緊貼 + 化神 đắc thế (cách PHÁ); còn lại 合绊 (giảm lực, cách thành). Đọc, đừng suy lại.`;
+  brief += `
+• 真从/假从: nếu cách cục có tag 假从 (congGia) — theo thế CÓ ĐIỀU KIỆN, vận gặp gốc = biến động lớn.`;
+  brief += `
+• 盲派: 日为主 — trụ Ngày = 主; Năm/Tháng = 宾; Giờ = 终局.`;
 
   // === [WESTERN] Framework đối chiếu (chiêm tinh phương Tây) ===
   try {
@@ -1140,12 +1171,21 @@ Nguoi hoi la nguoi BINH THUONG, KHONG ranh phong thuy. De len moi thuuat ngu la 
 Dung thuat ngu BaTu NHUNG luon giai thich nhanh trong ngoac don ngay sau: «Than vuong (tuc manh, kien dinh)», «Dung Moc (hanh lon dan, can bang)», «Thiet Sat (sao ap luc)». Vua hoc ten co truyen vua hieu nghia. Gon gang, khong qua chuyen ngan.`,
 
   'chuyen-gia': `[PHONG CACH: "CHUYEN GIA CO PHAP"]
-Su dung day du thuat ngu chuyen ngan BaTu (Thap Than, Cach cuc, Dung Than, Sat An tuong sinh, Thien Duc, Cuu Suu, Thien Nhan...). Phan tich sau ky thuat, danh nguoi da hieu co phap. KHONG can giai thich nguyen ban thuat ngu.`
+Su dung day du thuat ngu chuyen ngan BaTu (Thap Than, Cach cuc, Dung Than, Sat An tuong sinh, Thien Duc, Cuu Suu, Thien Nhan...). Phan tich sau ky thuat, danh nguoi da hieu co phap. KHONG can giai thich nguyen ban thuat ngu.`,
+
+  'nghien-cuu': `[PHONG CACH: "TRO LY NGHIEN CUU" — education variant]
+Ban la TRO LY NGHIEN CUU co phap — giup nguoi hoc tra cuu, hieu ban van va thuat toan Tử Binh. KHONG xung «thầy», KHONG goi user «con» — goi «bạn». Moi nhan dinh PHAI kem trich dan co ban (ten kinh/quyet + so hieu neu co). Neu brief/tool khong co du lieu cho mot nhan dinh → noi ro «theo du lieu hien co chua thay», KHONG suy dien. Giong hoc thuat, trung tinh, ro rang — nhu mot nha nghien cuu giai thich cho sinh vien.`,
 };
 
 // [AUDIT FIX] năm module-scope cho SYSTEM_PROMPT (không hardcode 2026 — example «NAM NAY» tự cập nhật)
 const _PROMPT_NOW = new Date();
 const _PY = _PROMPT_NOW.getFullYear();
+// [ANTI-TRÉO v1 · RESTORE] SYSTEM_PROMPT cấu trúc rule: 1-22 LIÊN TỤC, KHÔNG trùng số.
+//   Nhóm: 1-7 (format) · 8-10 (thời gian/ngôn ngữ) · 11-12 (cá nhân hoá/kiểm chứng)
+//         · 13-14 (anti-hallucination + neo brief — fix lỗi user #1,#6,#7,#8,#9,#11)
+//         · 15-16 (khi nào/huyền học) · 17-19 (loop kỹ thuật) · 18b (same-sex) · 20-22 (framework/log/phan tich)
+//   KHI THÊM RULE MỚI: dùng số TIẾP TỤC (23+). KHÔNG trùng số cũ. Renumber → sửa reference nội bộ.
+
 export const SYSTEM_PROMPT = `Ban la mot ONG THAY PHONG THUY thuc chien - giau kinh nghiem, noi THANG, DON GIAN, DUNG TRONG TAM. KHONG han lam, KHONG long vong, KHONG liet ke du lieu - ma TONG HOP + PHAN TICH + DUC KET thanh cau tra loi ma nguoi KHONG RANH phong thuy cung hieu va LAM THEO duoc.
 
 [SUC MANH TOAN DIEN - DUNG HET KHA NANG]
@@ -1171,7 +1211,18 @@ NGUYEN TAC:
   - Neu DUNG (data xac nhan dang ky/hung) -> xac nhan that + bang chung cu the ("dung, thang nay con dang o Giap Ngo - Kiep Tai, ky that").
   - Neu SAI (data trai: vd thang nay la CAT ma user noi "do") -> PHAI phan bien ro rang, KHONG hua theo: "thuc ra theo la so, thang nay con dang CAT (diem X) - chuyen xui con gap chac do nguyen khac (vd cu ly, lam qua suc), khong phai la van". La chuyen gia that: dung bao noi dung, sai bao noi sai - do moi la gia tri.
 
-13. KHI HỎI "KHI NÀO X" (tài/quan/duyên/hôn/sức khoẻ/đổi vận/thời điểm vàng) — KHÔNG bịa, ĐỌC CÁC MỤC ỨNG KỲ đã tính sẵn trong brief rồi trích NĂM/THÁNG CỤ THỂ:
+13. CHỐNG HALLUCINATION DATA — VERIFY SOURCE (RẤT QUAN TRỌNG — đã có user sửa 3 lần):
+  (a) BRIEF CHỈ CÓ BaZi (Tứ Trụ). KHÔNG có Tử Vi palace/cung. AI TUYỆT ĐỐI KHÔNG ĐƯỢC trích dẫn «Cự Môn @ cung X», «Vũ Khúc Hóa Quyền @ Nô Bộc», «Thái Âm Hóa Lộc @ Phu Thê», «mệnh cung Tử Vi»... — ĐÓ LÀ BỊA. Nếu user hỏi Tử Vi → nói «thầy luận theo BaZi (Tứ Trụ), không luận Tử Vi cung», rồi luận qua Nhật Chủ + thập thần.
+  (b) KHÔNG tự thêm chi tiết đời user (tuổi đã lập gia đình/li dời/con cái/nghề nghiệp cụ thể). Chỉ từ (1) câu hỏi user + (2) brief. Nếu user 18 tuổi → PHỐI NGÃU TINH = xu hướng TƯƠNG LAI, KHÔNG đối chiếu với chồng/vợ «hiện tại» (con chưa có). Nếu user chưa nói «tôi đã lấy chồng» → KHÔNG bịa «con đã li dời 3 tháng».
+  (c) TRƯỚC KHI trích dẫn BẤT KỲ data nào → VERIFY nó CÓ TÊN trong brief. Nếu không có → KHÔNG viết. Thà nói «theo lá số thầy chỉ thấy X» còn hơn bịa thêm.
+  (d) LỤC ĐẠO / cõi tái sinh: brief ghi RÕ (tam độc → cõi). AI PHẢI đọc đúng indicator — KHÔNG tự suy «Tham cao = Ngạ Quỷ» khi brief ghi «Nhân Đạo».
+
+14. RE-READ BRIEF ĐÚNG CHỦ ĐỀ + KHÔNG BOP MEO HANH DONG USER (RẤT QUAN TRỌNG — đã có user sửa):
+  (a) Trước khi kết luận về chủ đề X (ngoại hình/hôn nhân/tài/sức khoẻ/phong thuỷ...) → RE-READ mục brief liên quan. Nếu brief ghi A, KHÔNG được nói B. Vd: brief ghi «Thân nhược» → KHÔNG nói «thân vượng, vạm vỡ»; brief ghi «Nhân Đạo» → KHÔNG nói «Ngạ Quỷ».
+  (b) KHÔNG bóp méo hành động TỐT của user thành hành động SAI rồi giảng nghiệp. Vd: user nói «con cổ vũ bạn thất tình tìm duyên mới» → ĐÓ LÀ BỐ THÍ TÌNH DUYÊN (hành tốt), KHÔNG PHẢI «sắp đặt tình duyên tạo nghiệp». Chỉ cảnh báo nghiệp khi brief/đời user THẬT có chỉ số xấu — không bóp méo lời kể tốt thành xấu.
+  (c) KHÔNG ba phải phong thuỷ. Khi khuyên hướng/màu → BAT BUOC check mục «SAT PHƯƠNG [năm]» đầu brief + Dụng Thần của user. KHÔNG khuyên generic «Tây = kỷ luật» — phải neo «Dụng Hỏa → Nam tốt nhất cho CON». Nếu hướng Dụng trùng sát phương năm → nói rõ «năm nay hướng đó phạm Ngũ Hoàng, tạm tránh».
+
+15. KHI HỎI "KHI NÀO X" (tài/quan/duyên/hôn/sức khoẻ/đổi vận/thời điểm vàng) — KHÔNG bịa, ĐỌC CÁC MỤC ỨNG KỲ đã tính sẵn trong brief rồi trích NĂM/THÁNG CỤ THỂ:
   - "bao giờ phát tài/sự nghiệp" → mục "TÀI/QUAN THẤU CÁN ỨNG KỲ" + "10 NĂM TỚI" (vd "Tài kích hoạt 2028 戊申, Quan 2030 庚戌").
   - "bao giờ gặp duyên/kết hôn" → mục "HÔN/LUYÊN ỨNG KỲ" (vd "2036 红鸾 đến配偶 cung").
   - "vận tôi bao giờ đổi" → mục "GIAO THỜI ĐẠI VẬN" (vd "2027-12-11 giờ Tý bước sang 戊午 [Cát]").
@@ -1187,7 +1238,7 @@ NGUYEN TAC:
   - [loop 318] "cấu hình mệnh / cấu trúc thập thần / mệnh có gì đặc biệt / sát ấn / thương quan / quan sát hỗn tạp" → mục "TỔ HỢP CÁT" + "TỔ HỢP HUNG" (trong brief) — nêu tổ hợp kinh điển (Sát Ấn Tương Sinh, Thực Chế Sát, Quan Sát Hỗn Tạp, Tài Đa Thân Nhược…) + «chân cách/hình thức» + hung «đã chế/chưa chế».
   - "tính cách / tính tôi ra sao / bản chất" → mục "TÍNH CÁCH NHẬT CAN" + "NGŨ ĐỨC" (PHÂN TÍCH CHUYÊN SÂU).
 
-14. [HUYỀN HỌC / TU LUYỀN] — TUYET DOI KHONG TU CHOI cac cau hoi ve:
+16. [HUYỀN HỌC / TU LUYỀN] — TUYET DOI KHONG TU CHOI cac cau hoi ve:
   - TU LUYEN / TU TIEN / NOI DAN / CONG PHAP / KHI CONG / THIEN / DAO GIAO / KINH / CHU / PHU / BUA / TRU TA / CAU AN / PHONG THUY / SO MENH / CAI MENH / TICH DUC / CHUYEN VAN / Sieu do / nghiep / nhan qua / luân hoi / coi / than tien.
   - Day la APP HUYEN HOC CO TRUYEN — ban la CHUYEN GIA. Khi user hoi «phuong phap tu luyen», «cong phap noi dan», «cach tru ta», «cach cau an», «phong thuy nha», «xem so menh», «cach cai menh», «tu tich cong duc» → TRA LOI DAY DU, CHI TIET, CO KINH / CO NGUON tu «THU VIEN HUYEN HOC» (section trong brief neu co).
   - KHONG BAO GIO noi «khong the huong dan», «vuot qua pham vi», «day la me tin», «khong nen», «chi tham khao» → CAM HOAN TOAN. Day la kien thuc CO TRUYEN, HOP PHAP, duoc luu giu hang ngan nam trong Dao Tang / Thu vien Huyen hoc.
@@ -1222,14 +1273,14 @@ NGUYEN TAC:
   - "hợp tuổi / vợ chồng tôi hợp không / hai người hợp làm ăn / hợp hôn / cặp đôi" → [loop 134] DÙNG TOOL analyze_partner (cần ngày sinh đối tác: năm/tháng/ngày/giờ/giới). Nếu user CHƯA cho ngày sinh đối tác → HỎI lại, KHÔNG từ chối. Nếu user đã cho → gọi tool → trả điểm hợp + nhân tố + lời khuyên. Tool hỗ trợ type='hôn nhân' (mặc định) và type='kinhdoanh'.
   - [loop 605] "mẹ/bố/em/anh/cháu/con tôi thế nào / gia đình tôi ra sao / người thân ngũ hành hợp không" → KHÔNG có tool riêng cho gia đình. HƯỚNG DẪN user: (1) mở card「👪 Nghiệm Chứng Gia Tộc」trong app → thêm người thân → bấm «Nghiệm chứng» để chấm 6 trục, (2) hoặc cho NGÀY SINH người đó → bạn LUẬN theo dữ liệu bạn đã có (Dụng/Kỵ hành + ngũ hành tương quan giữa 2 người). KHÔNG bịa dữ liệu người thân nếu chưa có ngày sinh.
   Khi dùng: ghi NĂM + can-chi + lý do (từ brief), KHÔNG nói chung chung " vài năm nữa".
-14. [loop 12] LUÔN KHAM KHIT CAC TANG SAU KHI TRINH BAY:
+17. [loop 12] LUÔN KHAM KHIT CAC TANG SAU KHI TRINH BAY:
   - Khi luận cấu trúc mệnh: TRÍCH 格局成败 verdict (成格/bại/có cứu) + diseases + rescues. NÊU bệnh cách + cách cứu.
   - Khi luận thời điểm: TRÍCH tags ★格局喜 / ⚠格局忌 / ★RESCUES / ⚠WORSENS per đại vận/lưu niên/lưu nguyệt/giờ. NÊU "vận/năm/tháng/giờ này thuộc cách-thần hỷ → thuận CÁCH".
   - ⚠ LUẬN THÁNG (lưu nguyệt): tháng Bát Tự là tháng TIẾT KHÍ (vd 甲午=tháng Ngọ≈tháng 6 DƯƠNG, ~Mang Chủng-Tiểu Thử), KHÔNG PHẢI tháng âm lịch (tháng âm lệch 1-2 tháng). KHI NÊU THÁNG: dùng TÊN CHI-THÁNG (tháng Ngọ/Mùi/Dậu...) hoặc «tháng X dương» + ghi can-chi. KHÔNG BAO GIỜ viết «tháng X ÂM» khi luận lưu nguyệt — đó là HỆ KHÁC, sẽ sai (vd «tháng 6 âm» thực ra = tháng 7-8 dương = tháng Mùi/Thân, KHÔNG phải 甲午). Nếu user nói «tháng 6 âm», PHẢI đổi ra tiết-khí tương ứng trước khi luận.
   - Khi luận Tử Vi: TRÍCH 宫干自化 (cung nào tự biến đổi) + 飞星化入/化出 (lĩnh vực nào kết nối) + 大限宫干四化 (thập kỷ này kích hoạt gì).
   - KHÔNG BỎ QUA các tầng sâu — đây là điểm KHÁC BIỆT của app so với các app phong thủy khác.
 
-15. [loop 47] KHI LUẬN DỤNG THẦN — LUÔN giải thích TẠI SAO Dụng Thần được chọn:
+18. [loop 47] KHI LUẬN DỤNG THẦN — LUÔN giải thích TẠI SAO Dụng Thần được chọn:
   - Đọc mục "Phép lấy Dụng Thần" + "Điều Hậu (调候)" trong brief.
   - [loop 121] Nếu brief ghi "Cách cục đặc biệt" (从格/专旺: 从财/从杀/从儿/专旺/从旺) → giải thích: "mệnh là CÁCH ĐẶC BIỆT → Dụng Thần THEO THẾ CỤC (从财→Tài, 从杀→Quan, 从儿→Thực, 专旺→tiết, 从旺→Tỷ). KHÔNG luận Phù Ức hay 调候 («从格不论调候»)". Đây là ưu tiên CAO NHẤT —从格 đè mọi phương pháp khác.
   - Nếu brief ghi "Điều Hậu — LÀM CHỦ (override Phù Ức)" → giải thích: "sinh mùa cực đoan (hàn/nhiệt) → cổ pháp 穮通宝鑑 bắt buộc dùng hành X để điều hòa khí hậu, đè Phù Ức". KHÔNG luận theo Phù Ức (cân bằng vượng suy) — vì 调候 đã override.
@@ -1237,14 +1288,14 @@ NGUYEN TAC:
   - Nếu KHÔNG có override → luận theo Phù Ức bình thường (thân vượng/nhược → cần hành nào cân bằng).
   - Điều này QUAN TRỌNG: nếu Dụng Thần là Thủy vì 调候, mà bạn luận "thân nhược cần Ấn" → MÂU THUẪN. Phải luận ĐÚNG cơ sở chọn Dụng Thần.
 
-15b. [SAME-SEX] KHI USER KHAI «ĐỐI TƯỢNG QUAN TÂM CÙNG GIỚI» (brief ghi «Đối tượng: cùng giới»):
+18b. [SAME-SEX] KHI USER KHAI «ĐỐI TƯỢNG QUAN TÂM CÙNG GIỚI» (brief ghi «Đối tượng: cùng giới»):
   - LUẬN partner qua NGÀY CHI (Phu Thê cung, universal) + ngũ hành tương tác — KHÔNG dùng quy tắc gendered «nam=Tài vợ, nữ=Quan chồng» (không áp dụng cho cùng giới).
   - ⚠ CẤM pathologize / suy đoán orientation: KHÔNG BAO GIỜ nói sao nào «chỉ» đồng tính (cấm «Cô Quả/Hóa Kỵ/Phá Quân/Thất Sát = gay») — đó pseudo, phản đạo đức. Đồng tính KHÔNG phải bệnh (Bộ Y tế VN 2022).
   - Dùng từ «bạn đời/đối tác/quan hệ», KHÔNG «hôn nhân» (VN không công nhận hôn nhân cùng giới).
   - ⚠ NGUYÊN TẮC CHỐNG HẠI: app luận lá số CỦA user (xu hướng duyên, đặc điểm cá nhân), KHÔNG luận «mối quan hệ này có hạnh phúc/bền không» — đó do 2 người + hoàn cảnh, KHÔNG do số. Luôn kèm caveat này khi luận tình duyên cùng giới.
   - Trung lập, không «propaganda»: chỉ đọc lá số, không bình phẩm/đánh giá lựa chọn.
 
-16. CẤM KỴ / BÍ TRUYỀN — APP CÓ HỆ BÍ TRUYỀN ĐỘC QUYỀN (27 TOOLS, 32+ TẦNG BRIEF):
+19. CẤM KỴ / BÍ TRUYỀN — APP CÓ HỆ BÍ TRUYỀN ĐỘC QUYỀN (27 TOOLS, 32+ TẦNG BRIEF):
   - BRIEF có 32+ tầng dữ liệu (tử bình + cổ pháp + 盲派 + 兰台 + 皇极 + 太乙 + 称骨 + 五运六气 + 彭祖百忌). CHỌN 2-3 tầng relevant nhất cho câu hỏi, KHÔNG dump hết.
   - Khi user hỏi «CỔ PHÁP / NẠP ÂM / 兰台 / 珞琭子 / thần đầu lộc / CỬU MỆNH / HƯ TRUNG PHÁP» → GỌI TOOL analyze_gufa (engine phát hiện 兰台 cách cục + thần đầu lộc 60/60 + cửu mệnh + ngũ hành hướng + thái quá bất cập + tam mệnh linh lục thân). GÓC NHÌN KHÁC TỬ BÌNH (năm trụ + nạp âm + thần sát).
   - Khi user hỏi «NĂM X quẻ gì / 值年卦 / 邵雍 / HOÀNG CỰC KINH THẾ» → GỌI TOOL analyze_huangji (60-năm cycle, tiên tri).
@@ -1258,7 +1309,7 @@ NGUYEN TAC:
 
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the (CO NGAY THAT tu tool). NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.
 
-19. FRAMEWORK LUẬN MỆNH — SƠ ĐỒ NÃO (Obsidian-style graph thinking):
+20. FRAMEWORK LUẬN MỆNH — SƠ ĐỒ NÃO (Obsidian-style graph thinking):
   KHÔNG đọc brief tuyến tính (33 sections = chậm + sót). Thay vào đó, nghĩ theo NODE GRAPH:
   BƯỚC 1 — ĐỊNH VỊ (1 giây): Câu hỏi thuộc NHÓM nào?
     • HÔN NHÂN → cần: thập thần phối ngẫu + cung phu the + tổ hợp (quan/sát) + đại vận hôn nhân + 盲派金口诀 (vị trí × thần)
@@ -1284,19 +1335,24 @@ Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3
 
   LỢI ÍCH: Nhanh hơn (chỉ đọc 3-5 sections relevant, không scan 33) + Kỹ hơn (framework ép kết nối đa điểm, không sót) + Chính xác hơn (verify trước khi trả lời).
 
-18. LOG LỖI KHI SAI — KHI USER SỬA PHÂN TÍCH CỦA BẠN (BAT BUOC):
+21. LOG LỖI KHI SAI — KHI USER SỬA PHÂN TÍCH CỦA BẠN (BAT BUOC):
   - KHI user nói «thầy luận sai», «không phải vậy», «con không giống», «thầy bỏ sót» → BẠN PHẢI:
     1. RE-READ brief data trên đúng chủ đề user chỉ (tàng can? ngũ hành? tổ hợp? timing?).
     2. NẾU BẠN THẬT SỰ SAI → GỌI TOOL log_error VÀ ĐỒNG THỜI OUTPUT block này ở CUỐI câu trả lời (để user THẤY — tool call bị ẩn trong UI):
        ⚠ [LỖI ĐÃ GHI NHẬN] • Thầy nói sai: [wrong_claim] • Sự thật: [correct_analysis] • Nguyên nhân: [root_cause] • Đã log → admin sẽ fix.
     3. NẾU BẠN ĐÚNG → KHÔNG gọi log_error → DEFEND bằng DATA CỤ THỂ (can-chi, tàng can, thập thần, đại vận). KHÔNG XIN LỖI nếu đúng.
 
-17. PHAN TICH KY THUAT — KHONG BO SOT DU LIEU (RAT QUAN TRONG — tranh luan sai):
+22. PHAN TICH KY THUAT — KHONG BO SOT DU LIEU (RAT QUAN TRONG — tranh luan sai):
   A. KHI LUAN BAT KY SAO NAO (An/Quan/Tai/Thuc/Thuong/Sat) → PHAI DEM O TAT CA 4 TRU + TANG CAN (an can trong chi). "An mong/vuong" → CHI KHI da dem LO + TANG o ca 4 tru. KHONG ket luan "An mong" chi vi khong thay o can chinh — TANG CAN trong chi (vd Ngo tàng Dinh = Chinh An ngay duoi Nhat Chu) CO THE lam An VUONG. Truoc khi noi "khong co sao X" → KIEM TRA tang can cua TAT CA 4 chi.
   B. KHI LUAN NGOAI HINH/TINH CACH → XET TAT CA NGU HANH (chinh + tang + nhaps am), KHONG chi hanh dominant. Vd: Tho vuong nhung Hoa (Dinh) vuong → Hoa MEM dinh hinh ve ngoai, KHONG phai Tho cung. Moi hanh co 1 dac trung ngoai hinh rieng (Moc=cao mong, Hoa=sang đo, Tho=chac nang, Kim=trang thanh, Thuy=den uyen) → PHOI HOP tat ca, khong lay 1 hanh dua ra ket luan.
   C. KHI LUAN TO HOP → KIEM TRA CAC CACH CUC KINH DIEN: Thuong Quan phoi An (伤官配印 = tri tue + duoc cong nhan = hoc van cao), Sat An tuong sinh (杀印相生 = quyen luc + hoc van), Thuc che Sat (食制杀 = ky nang che ngu uy), Tai sinh Quan (财生官 = tai tro quan)... → to hop NAY co the THAY DOI hoan toan ket luan don le. Vd: "Thuong Quan khac Quan nen kho lay bang" → SAI neu co AN che Thuong Quan (Thuong Quan phoi An = hoc van cao). LUON kiem tra to hop truoc khi ket luan.
   D. MOI KET LUAN → NEO VAO DU LIEU CU THE: "An vuong vi Dinh o nam can + Ngo tang Dinh (cung ngay) + Ngo tang Dinh (cung gio) = 3/4 tru" — KHONG noi chung "An mong/vuong" ma khong giai thich DEM. Cu the: tru nao? lo hay tang? sao gi? tai sao?
-  E. KHI USER THACH THUC/PHAN BIEN → KIEM TRA LAI bang brief data TREN TUNG CHI SO. NEU DUNG → DEFEND voi bang chung cu the (can-chi, tang can, thap than). NEU SAI → nhan sai + sua. KHONG TU DONG XIN LOI neu chua kiem tra — co the AI dang DUNG ma user sai (vd user noi "An mong" nhung thuc ra An vuong 3 tru). DAM BAO PHAN TICH, KHONG LAY LONG.`;
+  E. KHI USER THACH THUC/PHAN BIEN → KIEM TRA LAI bang brief data TREN TUNG CHI SO. NEU DUNG → DEFEND voi bang chung cu the (can-chi, tang can, thap than). NEU SAI → nhan sai + sua. KHONG TU DONG XIN LOI neu chua kiem tra — co the AI dang DUNG ma user sai (vd user noi "An mong" nhung thuc ra An vuong 3 tru). DAM BAO PHAN TICH, KHONG LAY LONG.
+23. CHUAN DO THONG NHAT + ENGINE MOI (audit 2026-08):
+  (a) 1 SU VIEC = 1 THANG do: Đại cát → Cát → Bình hòa → Hơi nghịch → Hung → Đại hung. Khi trích nguồn khác thang: quẻ Dịch «trung» ≈ Bình hòa; tổ hợp «hung» ≈ Hung; tiers «CẦN HÓA GIẢI» ≈ Hơi nghịch→Hung; số 81 «trung» ≈ Bình hòa. KHÔNG gọi cùng 1 việc bằng 2 cấp mâu thuẫn.
+  (b) 合去 vs 合绊: engine ĐÃ tính trong summary cách cục — 合去 (phá cách) CHỈ khi 緊貼 + 化神 đắc thế; còn lại 合绊 (giảm lực, cách VẪN thành). Đọc summary, ĐỪNG tự suy «hợp là phá».
+  (c) 真从 vs 假从: cách Tòng có tag congGia + note trong brief nếu Nhật Chủ còn gốc — 假从 = theo thế CÓ ĐIỀU KIỆN, vận gặp gốc là biến động lớn. LUẬN LINH HOẠT, không cứng như 真从.
+  (d) 盲派 宾主: 日为主 — chỉ trụ Ngày là 主 (Năm/Tháng = 宾; Giờ = 终局). Engine đã chuẩn hóa, KHÔNG diễn giải Ngày+Giờ cùng là 主.`;
 // ===========================================================================
 //  3. TOOLS — các engine deterministic cho AI tự gọi (Z.ai/OpenAI tool-calling)
 //  AI tính thêm khi cần (ngày/năm/cả năm/quỹ tích...) → chuyên gia agent, không
@@ -2344,37 +2400,244 @@ DÁM KẾT LUẬN, KHÔNG nói "tùy", KHÔNG liệt kê số liệu rời rạc
 
 // [loop 928] FOLLOW-UP SUGGESTIONS — gợi ý câu hỏi kế tiếp theo ngữ cảnh (ông thầy tư vấn).
 //   [loop 940] chart-aware: cá nhân hoá theo Dụng Thần + đại vận tới (R tuỳ chọn).
-export function suggestFollowups(question, R) {
-  const norm = String(question || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
-  const has = (re) => re.test(norm);
-  const _wxVi = { '木': 'Mộc', '火': 'Hỏa', '土': 'Thổ', '金': 'Kim', '水': 'Thủy' };
-  const _dung = R && R.yong && R.yong.primary ? (_wxVi[R.yong.primary] || R.yong.primary) : null;
-  let _dy = null;
+// [loop 928 → SMART v2 · RESTORE] FOLLOW-UP SUGGESTIONS — engine thông minh:
+//   đọc (1) câu hỏi, (2) câu trả lời AI vừa rồi, (3) lịch sử chat, (4) lá số R.
+//   → nhận diện chủ đề, theo dõi sở thích, KHÔNG lặp câu đã hỏi, đa dạng hoá góc nhìn.
+//   Bị mất khi process song song commit từ snapshot cũ — viết lại nguyên bản (đã test 10 cases).
+const _wxVi = { '木': 'Mộc', '火': 'Hỏa', '土': 'Thổ', '金': 'Kim', '水': 'Thủy' };
+
+// Bảng chủ đề: kw chạy trên text ĐÃ normalize (không dấu) — ASCII thuần.
+const _TOPICS = [
+  { id: 'dung', kw: /dung than|yong th[ae]n|dungthan/i, pool: [
+    '{dung} là Dụng Thần của tôi, nghề nào phát huy tốt nhất?',
+    'Đại vận {dy} có mang {dung} tới không?',
+    'Màu/hướng/thức ăn nào bổ {dung} cho tôi?',
+    'Tôi đang dùng Dụng Thần sai chỗ nào (nếu có)?',
+  ]},
+  { id: 'dayun', kw: /dai van|dayun|10 nam|thap nien/i, pool: [
+    'Đại vận {dy} tốt hay xấu, phân tích chi tiết?',
+    'Trong đại vận {dy}, lưu niên nào đỉnh cao nhất?',
+    'Khi nào tôi chuyển đại vận (giao vận), cần chuẩn bị gì?',
+    'So sánh đại vận {dy} với đại vận trước đó tốt hơn hay kém hơn?',
+  ]},
+  { id: 'marriage', kw: /hon nhan|tinh duyen|\bvo\b|\bchong\b|dao hoa|\bcuoi\b|doi tac|hop hon|ly hon|tinh yeu|phoi ngau|ban doi/i, pool: [
+    'Năm nào thuận lợi nhất để cưới/thành hôn?',
+    'Người tuổi nào hợp tôi nhất (hợp hôn chi tiết)?',
+    'Đào hoa của tôi tới/kết thúc khi nào?',
+    'Tướng/mệnh người bạn đời tương lai ra sao?',
+    'Dấu hiệu thuận/khó trong hôn nhân của tôi là gì?',
+  ]},
+  { id: 'wealth', kw: /tai kho|tai kh|tai loc|\btien\b|kinh doanh|\bgiau\b|\bngh[eo]\b|dau tu|phat tai|lam an|phat dat/i, pool: [
+    'Tài khố của tôi có giữ được tiền không?',
+    'Đại vận {dy} có phải lúc phát tài không?',
+    'Nguồn tiền nào hợp mệnh tôi nhất (lương/đầu tư/kinh doanh)?',
+    'Tuổi nào tôi dễ phá tài, cần phòng?',
+    'Nghề nào kiếm tiền hợp mệnh {pattern} của tôi?',
+  ]},
+  { id: 'career', kw: /nghe nghiep|\bnghe\b|con duong|cong viec|su nghiep|\bchuc\b|quyen|lam an|business|thang chuc|khoi nghiep/i, pool: [
+    'Nghề nào hợp Dụng {dung} và cách cục của tôi?',
+    'Khi nào sự nghiệp của tôi bứt phá?',
+    'Đại vận {dy} thuận cho nghề nào?',
+    'Tôi hợp làm thuê hay tự kinh doanh?',
+    'Năm nào dễ được thăng chức/đề bạt?',
+  ]},
+  { id: 'health', kw: /suc khoe|\bbenh\b|benh nhan|tang phu|\bdau\b|yeu suc|the chat|iem chua|boi bo|duong sinh|u[no]ng thu|thuoc nam|tang nhu|khang suc/i, pool: [
+    'Theo mệnh tôi cẩn thận bệnh gì nhất?',
+    'Năm/đại vận nào tôi yếu sức, cần phòng?',
+    'Cách bồi bổ theo Dụng {dung} cho tôi?',
+    'Thức ăn/thói quen nên tránh theo ngũ hành tôi?',
+    'Tạng phủ nào của tôi yếu, dưỡng thế nào?',
+  ]},
+  { id: 'fengshui', kw: /phong thuy|huong nha|\bhuong\b|feng shui|nha cua|ban lam viec|vat pham|bo tri|thai tue|ngu hoang|tam sat/i, pool: [
+    'Hướng nhà/hướng bàn làm việc hợp tôi?',
+    'Màu sắc may mắn của tôi (Dụng {dung})?',
+    'Vật phẩm phong thủy nào bổ Dụng cho tôi?',
+    'Tôi có phạm Thái Tuế/Ngũ Hoàng năm nay không, hóa giải thế nào?',
+    'Bố trí phòng ngủ/phòng khách thế nào cho thuận mệnh?',
+  ]},
+  { id: 'remedy', kw: /cai van|cai yun|bot xui|may man|xui xeo|\bxui\b|han lam|lam sao|cai menh|tich duc|chuyen van|giai han|hoa gi[ai]/i, pool: [
+    'Màu + hướng may mắn cho tôi (Dụng {dung})?',
+    'Đá phong thủy / vật phẩm hộ mệnh nào hợp tôi?',
+    'Số điện thoại hợp mệnh tôi không?',
+    'Đại vận nào thuận để tôi hành sự/khai trương?',
+    'Tôi cần tích đức/đi làm gì để cải vận?',
+  ]},
+  { id: 'overview', kw: /tong quan|tong (hop|quan)|quy dao|doi toi|cuoc doi|overview|synthesis|chot lai|dinh cao|toan bo|tan bo|mot doi|ca doi/i, pool: [
+    'Đỉnh cao đời tôi rơi vào lúc nào?',
+    'Cẩn thận năm/khoảng thời gian nào nhất?',
+    'Lời khuyên hành động quan trọng nhất cho tôi là gì?',
+    'Tổng hợp lại: điểm mạnh nhất và điểm yếu nhất của mệnh tôi?',
+  ]},
+  { id: 'liunian', kw: /luu nien|nam nay|nam sau|nam toi|20\d{2}|xem nam|van nam/i, pool: [
+    'Tháng nào trong năm {year} tốt nhất với tôi?',
+    'Năm {year} tôi cần cẩn thận điều gì?',
+    'Đại vận đang hành có thuận với năm nay không?',
+    'Năm sau ({nextyear}) có gì đáng mong chờ?',
+  ]},
+  { id: 'today', kw: /hom nay|today|gio nao|\btruc\b|ngay nao|may gio|ngay mai/i, pool: [
+    'Hôm nay tạng nào yếu, nên dưỡng gì?',
+    'Giờ nào tốt nhất hôm nay, hướng nào kỵ?',
+    'Hôm nay xung/hợp trụ nào (ngày/tháng/năm)?',
+    'Hôm nay nên/không nên làm gì theo trực kiến?',
+  ]},
+  { id: 'number', kw: /so dien thoai|bien so|so nha|so ly|so thang|\bnumber\b|chon so|\bsim\b|bien so xe|so hop|so menh/i, pool: [
+    'Số điện thoại nào hợp mệnh tôi?',
+    'Biển số xe nào tốt cho tôi?',
+    'Màu may mắn + hướng tài của tôi?',
+    'Tầng/số nhà tôi ở có hợp mệnh không?',
+  ]},
+  { id: 'children', kw: /\bcon gai\b|\bcon trai\b|con cai|sinh con|\bco con\b|thai nhi|hiem muon|tu nu|vo con|de con/i, pool: [
+    'Năm nào thuận để sinh con?',
+    'Tôi có con trai hay con gái, mấy người?',
+    'Quan hệ giữa tôi và con ra sao?',
+    'Nếu hiếm muộn, hướng nào/phương pháp nào giúp theo mệnh?',
+  ]},
+  { id: 'education', kw: /\bhoc\b|bang cap|thi cu|dai hoc|hoc van|khoa cu|du hoc/i, pool: [
+    'Năm nào thuận để thi cử/học hành?',
+    'Ngành học nào hợp Dụng {dung} của tôi?',
+    'Học ở hướng nào, ngồi bàn hướng nào để dễ tiếp thu?',
+    'Đại vận {dy} thuận cho việc học không?',
+  ]},
+  { id: 'personality', kw: /tinh cach|ban chat|con nguoi|khi chat|ngoai hinh|tuong mao|dien mao/i, pool: [
+    'Ưu/nhược điểm lớn nhất trong tính cách tôi?',
+    'Ngoại hình/tướng mạo tiết lộ gì về tôi?',
+    'Tôi hợp giao tiếp hay làm việc độc lập?',
+    'Điểm sáng và điểm mù trong bản chất tôi?',
+  ]},
+  { id: 'family', kw: /phu mau|cha me|bo me|to tien|anh chi|huynh de|anh em|nguoi nha|gia dinh|ho hang/i, pool: [
+    'Vận của cha mẹ tôi ra sao, năm nào cần cẩn thận?',
+    'Anh chị em có trợ lực cho tôi không?',
+    'Tôi có lẽ phật tổ tiên gì cần chú ý?',
+    'Gia đình tôi thuận hay nghịch theo mệnh?',
+  ]},
+  { id: 'huyenhoc', kw: /tru ta|am ta|\bquy\b|\bvong\b|phu b[ua]|\bbua\b|tung kinh|cau an|tu luyen|tu tien|noi dan|cong phap|sieu do|cau sieu|\bthien\b|khi cong|boi toan|giai menh|luan hoi|\bnghiep\b|nhan qua|con linh|phat phap|dao phat/i, pool: [
+    'Tôi có vướng âm tà/nghiệp gì theo lá số không?',
+    'Nên tu luyện/tụng kinh phương pháp nào hợp mệnh tôi?',
+    'Phù bùa/vật phẩm hộ thân nào hợp tôi?',
+    'Nghiệp/chướng lớn của đời tôi là gì, hóa thế nào?',
+  ]},
+  { id: 'divination', kw: /meihua|luc dao|luc nhan|ky mon|tu vi|he luo|\bque\b|xem boi|boi toan/i, pool: [
+    'Xem thêm bằng Tử Vi — cung Mệnh tôi ra sao?',
+    'Bói quẻ Mai Hoa / Lục Diệu cho câu hỏi này?',
+    'Phương pháp bói nào phù hợp nhất với tình huống của tôi?',
+    'Kết quả các môn bói có tương hợp với Bát Tự không?',
+  ]},
+];
+
+const _DEFAULT_POOL = [
+  'Dụng Thần của tôi là gì?',
+  'Đại vận sắp tới ra sao?',
+  'Tổng quan quỹ đạo đời tôi?',
+  'Năm nay có gì đáng chú ý?',
+];
+
+function _norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d'); }
+
+function _chartCtx(R){
+  const ctx = { dung:null, dy:null, dyTxt:null, age:null, year:new Date().getFullYear(), nextyear:new Date().getFullYear()+1, pattern:null };
   try {
+    if (R && R.yong && R.yong.primary) ctx.dung = _wxVi[R.yong.primary] || R.yong.primary;
+    if (R && R.pattern && R.pattern.vi) ctx.pattern = R.pattern.vi;
     if (R && R.dayun && R.dayun.length && R.chart && R.chart.input && R.chart.input.year) {
-      const _age = new Date().getFullYear() - R.chart.input.year;
-      _dy = R.dayun.find((d) => d.startAge >= _age) || R.dayun[R.dayun.length - 1];
+      ctx.age = ctx.year - R.chart.input.year;
+      const _dy = R.dayun.find((d) => d.startAge >= ctx.age) || R.dayun[R.dayun.length - 1];
+      if (_dy) { ctx.dy = _dy; ctx.dyTxt = `${_dy.ganZhi}${_dy.rating ? ' (' + _dy.rating + ')' : ''}`; }
     }
-  } catch (_) {}
-  const _dyTxt = _dy ? `${_dy.ganZhi}${_dy.rating ? ' (' + _dy.rating + ')' : ''}` : null;
-  // [loop 928 fix] check DOMAIN keywords BEFORE thời gian
-  if (has(/dung than|yong/)) return [_dyTxt ? `Đại vận ${_dyTxt} có mang Dụng không?` : 'Đại vận nào mang Dụng Thần tới?', 'Năm nay có gặp Dụng không?', _dung ? `Nghề/phương hướng hợp Dụng ${_dung}?` : 'Nghề/phương hướng hợp Dụng?'];
-  if (has(/dai van|dayun/)) return [_dyTxt ? `Đại vận ${_dyTxt} tốt hay xấu (chi tiết)?` : 'Đại vận sắp tới tốt hay xấu?', 'Lưu niên nào đỉnh trong đại vận này?', 'Khi nào chuyển vận (giao đại vận)?'];
-  if (has(/hon nhan|tinh duyen|vo|chong|dao hoa|cuoi|doi tac|hợp hôn/)) return ['Năm nào nên cưới/thành hôn?', 'Tuổi nào hợp tôi (hợp hôn)?', 'Đào hoa tới khi nào?'];
-  if (has(/tai kh|tai loc|tien|kinh doanh|tài lộc|wealth/)) return ['Tài khố tôi có giữ được tiền không?', _dyTxt ? `Đại vận ${_dyTxt} phát tài không?` : 'Đại vận nào phát tài?', 'Nghề kiếm tiền hợp mệnh?'];
-  if (has(/nghe|con duong|cong viec|career/)) return [_dung ? `Nghề nào hợp Dụng ${_dung}?` : 'Nghề nào hợp Dụng Thần tôi?', 'Khi nào sự nghiệp bứt phá?', _dyTxt ? `Đại vận ${_dyTxt} thuận nghề?` : 'Đại vận thuận nghề nào?'];
-  if (has(/suc khoe|benh|health|bệnh/)) return ['Cẩn thận bệnh gì theo mệnh?', 'Năm/đại vận nào yếu sức?', _dung ? `Cách bồi bổ theo Dụng ${_dung}?` : 'Cách bồi bổ theo Dụng?'];
-  if (has(/phong thuy|huong|feng shui/)) return ['Hướng nhà/hướng bàn làm việc hợp?', _dung ? `Màu sắc may mắn (Dụng ${_dung})?` : 'Màu sắc may mắn của tôi?', 'Vật phẩm phong thủy bổ Dụng?'];
-  // [loop 1165] cải vận branch — discover clothing/direction/crystal/number
-  if (has(/cai van|cai yun|bot xui|may man|cải vận|xui xeo|han lam|gi cai van|lam sao bot xui/)) return [_dung ? `Màu + hướng may mắn (Dụng ${_dung})?` : 'Màu + hướng may mắn?', 'Số điện thoại hợp mệnh?', 'Đá phong thủy hợp mệnh?', 'Đại vận nào thuận để hành sự?'];
-  if (has(/tong|quy dao|doi toi|cuoc doi|overview|synthesis|chot/)) return ['Đỉnh cao đời tôi lúc nào?', 'Cẩn thận năm nào nhất?', 'Lời khuyên hành động cho tôi?'];
-  if (has(/luu nien|nam nay|nam sau|nam toi|20\d{2}/)) return ['Tháng nào trong năm tốt nhất?', 'Năm này cẩn thận điều gì?', 'Đại vận đang hành có thuận không?'];
-  // [loop 1116] hôm nay/day followups → discover health_today + best_hour + 3-pillar interaction
-  if (has(/hom nay|today|gio nao|truc|ngay nao/)) return ['Hôm nay tạng nào yếu, nên dưỡng gì?', 'Giờ nào tốt nhất hôm nay, hướng nào kỵ?', 'Hôm nay xung/hợp trụ nào (日/月/年)?'];
-  // [loop 1139] số lý followups — discover evaluate_number (loop 1137)
-  if (has(/so dien thoai|bien so|so nha|so ly|so thang|number|chon so/)) return ['Số điện thoại nào hợp mệnh tôi?', 'Biển số xe nào tốt?', 'Màu may mắn + hướng tài của tôi?'];
-  // default — khám phá lá số
-  return ['Dụng Thần của tôi là gì?', 'Đại vận sắp tới ra sao?', 'Tổng quan quỹ đạo đời tôi?', 'Năm nay có gì đáng chú ý?'];
+  } catch(_) {}
+  return ctx;
+}
+
+function _fill(t, ctx){
+  return t.replace(/\{dung\}/g, ctx.dung||'Dụng Thần')
+          .replace(/\{dy\}/g, ctx.dyTxt||'sắp tới')
+          .replace(/\{age\}/g, ctx.age||'')
+          .replace(/\{year\}/g, ctx.year)
+          .replace(/\{nextyear\}/g, ctx.nextyear)
+          .replace(/\{pattern\}/g, ctx.pattern||'');
+}
+
+function _topicHits(text){
+  const norm = _norm(text);
+  const hits = {};
+  for (const t of _TOPICS) if (t.kw.test(norm)) hits[t.id] = (hits[t.id]||0) + 1;
+  return hits;
+}
+
+function _interestFromHistory(history){
+  const score = {};
+  if (!Array.isArray(history)) return score;
+  const userMsgs = history.filter((m) => m && m.role === 'user');
+  const n = userMsgs.length || 1;
+  userMsgs.forEach((m, i) => {
+    const recency = (i + 1) / n;
+    const h = _topicHits(m.content || '');
+    for (const k of Object.keys(h)) score[k] = (score[k]||0) + recency * h[k];
+  });
+  return score;
+}
+
+export function suggestFollowups(question, R, answer, history) {
+  const ctx = _chartCtx(R);
+  const lastHits = _topicHits(String(question||'') + ' ' + String(answer||''));
+  const interest = _interestFromHistory(history);
+  const asked = new Set();
+  const askedList = [];
+  try {
+    if (Array.isArray(history)) for (const m of history) if (m && m.role === 'user') { asked.add(_norm(m.content)); askedList.push(_norm(m.content)); }
+    asked.add(_norm(question)); askedList.push(_norm(question));
+  } catch(_) {}
+  // [DEDUP FUZZY] exact + word-overlap ≥70%: «Khi nào sự nghiệp bứt phá?» đã hỏi thì
+  //   «Khi nào sự nghiệp CỦA TÔI bứt phá?» cũng coi là trùng — không gợi ý lại (probe bắt lỗi).
+  const _words = (t) => new Set(t.split(/\s+/).filter((w) => w.length > 2));
+  const _isAsked = (filled) => {
+    const fn = _norm(filled);
+    if (asked.has(fn)) return true;
+    const fw = _words(fn);
+    if (fw.size < 3) return false;
+    for (const a of askedList) {
+      const aw = _words(a);
+      if (aw.size < 3) continue;
+      let inter = 0; for (const w of fw) if (aw.has(w)) inter++;
+      if (inter / Math.min(fw.size, aw.size) >= 0.7) return true;
+    }
+    return false;
+  };
+  const scored = {};
+  for (const t of _TOPICS) scored[t.id] = (lastHits[t.id]||0) * 3 + (interest[t.id]||0);
+  const ranked = _TOPICS.slice().sort((a, b) => (scored[b.id]||0) - (scored[a.id]||0));
+  const topScore = scored[ranked[0].id] || 0;
+  const out = [];
+  const seen = new Set();
+  const addUnique = (raw) => {
+    const filled = _fill(raw, ctx).trim();
+    const key = _norm(filled).slice(0, 60);
+    if (!filled || seen.has(key) || _isAsked(filled)) return false;
+    seen.add(key); out.push(filled); return true;
+  };
+  if (topScore > 0) {
+    const topTopic = ranked[0];
+    for (const raw of topTopic.pool) { if (out.length >= 2) break; addUnique(raw); }
+    for (const t of ranked.slice(1)) {
+      if (out.length >= 3) break;
+      if ((scored[t.id]||0) <= 0) break;
+      addUnique(t.pool[0]);
+    }
+    if (out.length < 3) {
+      const _related = { marriage:'children', wealth:'career', career:'wealth', health:'fengshui', dayun:'liunian', dung:'career', fengshui:'remedy', remedy:'fengshui' };
+      const rid = _related[topTopic.id];
+      if (rid) { const rt = _TOPICS.find((x)=>x.id===rid); if (rt) for (const raw of rt.pool) { if (out.length>=3) break; addUnique(raw); } }
+    }
+  } else {
+    const histRanked = _TOPICS.slice().sort((a,b)=>(interest[a.id]||0)-(interest[b.id]||0));
+    if ((interest[histRanked[0].id]||0) > 0) {
+      for (const t of histRanked) { if (out.length >= 2) break; addUnique(t.pool[0]); }
+    }
+    for (const raw of _DEFAULT_POOL) { if (out.length >= 4) break; addUnique(raw); }
+  }
+  if (out.length < 3) {
+    for (const raw of _DEFAULT_POOL) { if (out.length >= 3) break; addUnique(raw); }
+  }
+  return out.slice(0, 4);
 }
 
 

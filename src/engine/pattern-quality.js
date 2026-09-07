@@ -266,13 +266,29 @@ function geStarCombined(chart, pattern) {
   const ge = pattern.geShen;
   if (!ge || !ge.gan) return null;
   const geGan = ge.gan;
+  // [子平真诠 ch.8 FIX — audit 2026-08] 合去 requires ĐỦ 2 điều kiện:
+  //   (1) 緊貼 — partner LIỀN KỀ trụ đang 透 格 thần (năm↔tháng; tháng↔ngày=日主; thời↔ngày=日主).
+  //       Năm↔thời là 隔合 (cách 2 trụ) → KHÔNG tính 合去.
+  //   (2) 化神 ĐẮC THẾ — 化神 = bản khí tháng lệnh HOẶC 透干 ở trụ khác. Không đủ → chỉ 合绊
+  //       (giảm lực, KHÔNG phá cách). Trước đây: ngũ hợp bất kỳ vị trí → 败格 oan ~25-30% lá số,
+  //       và không luật cứu ứng nào cứu được via 'he'.
+  const posOf = [];
+  for (const k of ['year', 'month', 'time']) if (chart.pillars[k].gan === geGan) posOf.push(k);
+  const ADJ = { year: ['month'], month: ['year'], time: [] }; // 日主 (day) là 合我 — không phải 合去
   for (const k of ['year', 'month', 'time']) {
     const other = chart.pillars[k].gan;
     if (other === geGan) continue;
     const hua = HE_MAP[geGan + other];
-    if (hua) {
-      return { geGan, partner: other, hua, note: `格 thần ${geGan} bị ${other} ngũ hợp hóa hành ${hua} → cách bị khuyết (dụng thần bị hợp đi).` };
+    if (!hua) continue;
+    const adjacent = posOf.some((p) => ADJ[p].includes(k));
+    if (!adjacent) continue;
+    const hid0 = (HIDDEN[chart.pillars.month.zhi] || [])[0];
+    const huaDeLenh = hid0 && GAN[hid0] && GAN[hid0].wx === hua; // [FIX] HIDDEN là mảng chuỗi
+    const huaTou = ['year', 'month', 'time'].some((pk) => GAN[chart.pillars[pk].gan] && GAN[chart.pillars[pk].gan].wx === hua);
+    if (huaDeLenh || huaTou) {
+      return { broken: true, geGan, partner: other, hua, note: `格 thần ${geGan} bị ${other} 緊貼 ngũ hợp, 化神 ${hua} đắc thế → 合去, cách bị khuyết (dụng thần bị hợp đi).` };
     }
+    return { tied: true, geGan, partner: other, hua, note: `格 thần ${geGan}合 ${other} — 化神 ${hua} KHÔNG đắc lệnh/透干 → chỉ 合绊 (lực cách giảm), KHÔNG phải 合去.` };
   }
   return null;
 }
@@ -341,6 +357,10 @@ function evalJiu(jiu, disease, groups, chart, pattern) {
 //  Trả về:
 //    { quality:'成格'|'有救'|'败格'|'特殊', keyStar, transparent, rooted, broken,
 //      rescued, diseases:[], rescues:[], patternYong:{xi:[],ji:[]}, summary }
+//  [audit 2026-09] pattern.type === 'special' (从格/专旺/化气) KHÔNG còn trả cứng
+//  '特殊' — specialVerdict() giờ chấm 3 trạng thái 成格/有救/败格 + diseases/rescues
+//  đầy đủ (trừ kind chưa nhận diện), để adjustDayunByGeju/adjustLiunianByGeju và
+//  brief AI chạy cùng một kênh như 8 chính cách.
 // ===========================================================================
 export function patternQuality(R) {
   const { chart, pattern, strength, interactions } = R;
@@ -364,6 +384,7 @@ export function patternQuality(R) {
   // ----- Lớp 1: THÀNH (cơ bản) -----
   //  (a) geGan thấu can + thông căn + không bị hợp mất + không rơi không vong
   let broken = false;
+  let heTiedNote = null; // [FIX] 合绊 note — không phá cách, chỉ gắn vào summary
   const diseases = [];
   if (ge.exists) {
     if (!ge.transparent) {
@@ -378,8 +399,11 @@ export function patternQuality(R) {
       diseases.push({ via: 'kong', killers: [], note: `Tàng cung của 格 thần rơi Không Vong (${ge.kw.kong.join(',')}) — cách bị treo, đợi vận thực.` });
     }
     if (combinedAway) {
-      broken = true;
-      diseases.push({ via: 'he', killers: [], note: combinedAway.note });
+      if (combinedAway.tied) heTiedNote = combinedAway.note; // [FIX] 合绊 — ghi chú, KHÔNG phá cách
+      else {
+        broken = true;
+        diseases.push({ via: 'he', killers: [], note: combinedAway.note });
+      }
     }
   }
 
@@ -439,7 +463,8 @@ export function patternQuality(R) {
     inKong: ge.geInKong,
   } : null;
 
-  const summary = buildSummary(quality, pattern, keyStar, diseases, rescues, patternYong);
+  const summary = buildSummary(quality, pattern, keyStar, diseases, rescues, patternYong)
+    + (heTiedNote ? ' · ' + heTiedNote : '');
 
   return {
     quality,
@@ -476,18 +501,349 @@ function buildSummary(quality, pattern, keyStar, diseases, rescues, py) {
   return parts.join(' ');
 }
 
+// ===========================================================================
+//  CÁCH ĐẶC BIỆT — THÀNH / BẠI / CỨU (从格 · 专旺 成败) — [audit 2026-09]
+//
+//  HỔNG CŨ (audit): specialVerdict() trả cứng '特殊', KHÔNG BAO GIỜ xét 成败/破格
+//  → mọi 从格/专旺格 được coi "thành" vĩnh viễn dù vận/cục trợ thân hay khắc phá.
+//
+//  Cơ sở cổ pháp:
+//   - 滴天髓 · 顺局: «从得真者只论从，从神又有吉和凶» — tòng phải THUẬN thế tuyệt
+//     đối; «从气从势» — theo KHÍ/Theo THẾ chứ không theo thân.
+//   - 滴天髓: «真从之象有几人，假从亦可发其身» — gốc tàng chưa lộ = 假从, vẫn dụng
+//     được («假从遇根 — 运过即复»: bệnh có nhưng cứu THEO ĐỊNH NGHĨA 假从).
+//   - 从格破: Nhật Chủ ĐẮC GỐC (tàng can cùng hành ở bản khí/trung khí) hoặc đắc
+//     Tỷ Kiếp/Ấn THẤU CAN trợ lực → «日主得根，不肯从» — thế tòng vỡ (破格).
+//     Càng đắc gốc sâu (bản khí > trung khí, 透干 > tàng) bệnh càng nặng.
+//   - 专旺破 (曲直/炎上/稼穑/从革/润下): «旺之极者不可损» — Quan Sát khắc thân
+//     phạm vượng là PHÁ CÁCH; cứu duy nhất: Quan bị ngũ hợp 绊/去 (合杀).
+//   - 從旺格: thuận the cực vượng — kỵ Quan/Tài/Thực (khắc-tiết phá thế vượng).
+//
+//  Kênh 运 (ĐẠI VẬN phá/cứu cách đặc biệt): diseases[].killers / rescues[].drug
+//  cùng shape với nhánh chính cách → adjustDayunByGeju 运中破格 (−1 khi vận mang
+//  nhóm bệnh: 从格 gặp 运 Tỷ/Ấn, 专旺 gặp 运 Quan Sát) và 运中救应 (+1 khi vận
+//  mang nhóm thuốc: 从格 gặp 运 Tài/Quan/Thực giữ nguyên thế tòng) hoạt động cho
+//  cách đặc biệt y hệt 8 chính cách. Lá số sạch vẫn đăng ký MỘT bệnh tiềm ẩn
+//  (latent:true) để kênh 运中破格 biết phải canh nhóm nào — chất lượng vẫn 成格.
+// ===========================================================================
+
+// --- Tàng can hành `wxWanted` ở VỊ TRÍ BẢN KHÍ (pos 0) / TRUNG KHÍ (pos 1) ---
+//  (dư khí pos 2 bỏ qua — quá mỏng, không đủ làm gốc theo cổ pháp)
+function scanHiddenWxAt(chart, wxWanted, maxPos = 2) {
+  const out = [];
+  for (const k of ['year', 'month', 'day', 'time']) {
+    const hid = HIDDEN[chart.pillars[k].zhi] || [];
+    for (let i = 0; i < Math.min(hid.length, maxPos); i++) {
+      const h = hid[i];
+      const hGan = typeof h === 'string' ? h : (h && h.gan); // phòng HIDDEN dạng object
+      if (hGan && GAN[hGan] && GAN[hGan].wx === wxWanted) {
+        out.push({ pillar: k, zhi: chart.pillars[k].zhi, pos: i, posVi: i === 0 ? 'bản khí' : 'trung khí' });
+      }
+    }
+  }
+  return out;
+}
+
+// --- Can `gan` có bị ngũ hợp LIỀN KỀ (合绊/合去) không — trả {partner, hua, withDm} ---
+//  緊貼: năm↔tháng; tháng↔năm/ngày; giờ↔ngày. Năm↔giờ là 隔合 — không tính (đồng luật
+//  geStarCombined ở trên). Partner là Nhật Chủ (day) = Nhật Chủ tự hợp 绊 nó (贪合忘克)
+//  → vẫn tính là bị khống chế (vd dm 辛 hợp Quan 丙 — 丙辛合).
+function findCombinedForGan(chart, gan) {
+  const ADJS = { year: ['month'], month: ['year', 'day'], time: ['day'] };
+  const pos = ['year', 'month', 'time'].filter((k) => chart.pillars[k].gan === gan);
+  for (const k of pos) {
+    for (const p of ADJS[k]) {
+      const pg = p === 'day' ? chart.dayGan : chart.pillars[p].gan;
+      const hua = HE_MAP[gan + pg];
+      if (hua) return { partner: pg, partnerPillar: p, hua, withDm: p === 'day' };
+    }
+  }
+  return null;
+}
+
+// --- Tóm tắt lời văn cho cách đặc biệt (mirror buildSummary của nhánh chính cách) ---
+function buildSpecialSummary(quality, pattern, classical, extra, diseases, rescues, py) {
+  const qVi = { 成格: 'Thành cách (thuận thế nguyên vẹn)', 有救: 'Có cứu ứng (假从/合杀 — bại trung hữu thành)', 败格: 'Bại cách (cách đặc biệt bị phá — 破格)' }[quality] || quality;
+  const parts = [];
+  parts.push(`【格局成败】 ${pattern.vi} → ${qVi}.`);
+  if (classical) parts.push(classical);
+  if (diseases.length) parts.push('Bệnh: ' + diseases.map((d) => d.note).join('; '));
+  if (rescues.length) parts.push('Cứu: ' + rescues.map((r) => r.note).join('; '));
+  if (extra) parts.push(extra);
+  if (py.note) {
+    const xi = py.xi.map((x) => x.vi).join('/');
+    const ji = py.ji.map((x) => x.vi).join('/');
+    parts.push(`Cách ${pattern.vi} ưa ${xi || '(—)'}, kỵ ${ji || '(—)'}.`);
+  }
+  return parts.join(' ');
+}
+
 function specialVerdict(pattern, chart) {
+  const sp = pattern.special || {};
+  const kind = sp.kind;
+
+  // Loại đặc biệt chưa nhận diện (phòng pattern.js mở rộng sau) → giữ behavior cũ.
+  if (kind !== 'cong' && kind !== 'zhuanwang' && kind !== 'huaqi') {
+    return {
+      quality: '特殊',
+      keyStar: null,
+      transparent: null,
+      rooted: null,
+      broken: false,
+      rescued: false,
+      diseases: [],
+      rescues: [],
+      patternYong: { xi: [], ji: [], yong: [], note: pattern.note || '' },
+      summary: `【格局成败】 ${pattern.vi} — Cách đặc biệt (thuận thế), không luận thành/bại theo 8 chính cách; xét vỡ khi bị vận khắc phá thế cục.`,
+    };
+  }
+
+  const dg = chart.dayGan;
+  const dmWx = GAN[dg].wx;
+  const G = GROUP_WX(dmWx);
+  const groups = scanGroups(chart);
+  const pref = pattern.pref || {};
+  // patternYong ĐỒNG BỘ nhánh chính cách → adjustDayunByGeju/adjustLiunianByGeju
+  // tầng 喜忌 (+2/−2/+3/−3) giờ có hiệu lực cho cách đặc biệt (trước đây rỗng).
+  const patternYong = {
+    xi: (pref.xi || []).map((g) => ({ group: g, wx: G[g], vi: GROUP_VI[g] })),
+    ji: (pref.ji || []).map((g) => ({ group: g, wx: G[g], vi: GROUP_VI[g] })),
+    yong: (pref.yong || []).map((g) => ({ group: g, wx: G[g], vi: GROUP_VI[g] })),
+    note: pref.note || pattern.note || '',
+  };
+
+  const diseases = [];
+  const rescues = [];
+  let broken = false;
+  let classical = '';
+  let extra = '';
+  let quality = '成格';
+
+  // ---------------------------------------------------------------------
+  //  TỒNG VƯỢNG 格 (kind 'cong' + name 從旺格): nhật chủ CỰC VƯỢNG theo thế MÌNH
+  //  — bệnh = Quan Sát khắc thân / Tài bị quần Kiếp tranh / Thực Thương tiết thế.
+  //  (KHÔNG dùng luật trợ-thân của 从 nhược — vì Tỷ/Ấn chính là bản thể của cách.)
+  // ---------------------------------------------------------------------
+  if (kind === 'cong' && pattern.name === '從旺格') {
+    classical = 'Cổ pháp: 從旺 — thuận the cực vượng («旺之极者不可损»), lấy Tỷ Kiếp/Ấn trợ thế; kỵ Quan Sát khắc thân phạm vượng, Tài gặp quần Kiếp tranh, Thực Thương tiết khí tán thế.';
+    const OFFS = [
+      { grp: 'guan', vi: 'Quan Sát', harm: 'khắc thân phạm vượng' },
+      { grp: 'cai', vi: 'Tài', harm: 'quần Kiếp tranh tài' },
+      { grp: 'shi', vi: 'Thực Thương', harm: 'tiết khí tán thế' },
+    ];
+    const offWxOf = { guan: G.guan, cai: G.cai, shi: G.shi };
+    let anyTou = false;
+    for (const o of OFFS) {
+      const stems = groups[o.grp].reveal;
+      if (stems.length) {
+        anyTou = true;
+        const combs = stems.map((s) => ({ s, c: findCombinedForGan(chart, s) }));
+        const unrescued = combs.filter((x) => !x.c);
+        diseases.push({
+          via: o.grp + '-tougan', killers: [o.grp],
+          note: `從旺破 — ${o.vi} THẤU CAN (${stems.join(', ')}) ${o.harm} phá thế vượng${unrescued.length ? '' : ' (nhưng bị ngũ hợp 绊/去 toàn bộ)'}.`,
+        });
+        if (!unrescued.length) {
+          const c0 = combs[0].c;
+          rescues.push({
+            diseaseVia: o.grp + '-tougan', drug: ['ti', 'yin'],
+            note: `${o.vi} ${stems[0]} bị ngũ hợp ${c0.partner} (hóa ${c0.hua}${c0.withDm ? ' — Nhật Chủ tự hợp 绊' : ''}) → 合去 bất phạm thế → cách được cứu.`,
+          });
+        }
+      } else {
+        const hidMain = scanHiddenWxAt(chart, offWxOf[o.grp], 1);
+        if (hidMain.length) {
+          diseases.push({
+            via: o.grp + '-tang', killers: [o.grp],
+            note: `${o.vi} tàng BẢN KHÍ chi ${hidMain.map((r) => r.zhi).join(', ')} — thế vượng bất thuần («giả» tòng vượng): sa tàng chưa lộ.`,
+          });
+          rescues.push({
+            diseaseVia: o.grp + '-tang', drug: ['ti', 'yin'],
+            note: 'Vật khắc tàng một nơi, thế vượng áp đảo toàn cục — cứu theo định nghĩa tòng-vượng-giả; vận/luân niên lộ đúng thần khắc thì mới phá thật («假从遇根 — 运过即复»).',
+          });
+        }
+      }
+    }
+    if (!diseases.length) {
+      diseases.push({
+        via: 'latent-ke-tiet', killers: ['guan', 'cai', 'shi'], latent: true,
+        note: 'Bệnh tiềm ẩn (chỉ phát khi gặp vận): tòng vượng kỵ Quan/Tài/Thực — vận khắc-tiết thân thì phạm vượng phá cách («旺之极者不可损»).',
+      });
+      extra = 'Không thấy Quan/Tài/Thực lộ hoặc tàng bản khí → thuần vượng, cách thành.';
+    } else {
+      const allRescued = diseases.every((d) => rescues.some((r) => r.diseaseVia === d.via));
+      if (allRescued) quality = '有救';
+      else { quality = '败格'; broken = true; }
+    }
+    return {
+      quality, keyStar: null, transparent: null, rooted: null, broken,
+      rescued: rescues.length > 0, diseases, rescues, patternYong,
+      summary: buildSpecialSummary(quality, pattern, classical, extra, diseases, rescues, patternYong),
+    };
+  }
+
+  // ---------------------------------------------------------------------
+  //  TỒNG cách (kind 'cong', 從財/從殺/從兒): nhật chủ CỰC NHƯỢC bỏ thân theo thế
+  //  — 滴天髓 «从得真者只论从» — BỆNH = trợ thân (Tỷ Kiếp cùng hành + Ấn 生 thân).
+  //  Càng đắc gốc sâu bệnh càng nặng: bản khí > trung khí > 透干 vô gốc.
+  // ---------------------------------------------------------------------
+  if (kind === 'cong') {
+    classical = 'Cổ pháp (滴天髓·顺局): «从得真者只论从，从神又有吉和凶» / «从气从势» — tòng phải thuận thế tuyệt đối; «真从之象有几人，假从亦可发其身» — trợ thân tàng một chỗ là 假从, trợ thân lộ/đắc gốc thì «日主得根，不肯从» → 破格.';
+    const helpers = [
+      ...groups.ti.reveal.map((g) => ({ gan: g, grp: 'ti', god: tenGod(dg, g) })),
+      ...groups.yin.reveal.map((g) => ({ gan: g, grp: 'yin', god: tenGod(dg, g) })),
+    ];
+    const roots = scanHiddenWxAt(chart, dmWx, 2); // gốc Nhật Chủ ở bản khí/trung khí
+    if (helpers.length) {
+      //  Bệnh nặng: Tỷ Kiếp/Ấn THẤU CAN (lộ rõ, not 藏) —救援 duy nhất: bị ngũ hợp 绊/去.
+      const byGrp = { ti: [], yin: [] };
+      for (const h of helpers) byGrp[h.grp].push(h);
+      let anyUnrescued = false;
+      for (const grp of ['ti', 'yin']) {
+        if (!byGrp[grp].length) continue;
+        const ganList = byGrp[grp].map((h) => h.gan);
+        const combs = ganList.map((s) => ({ s, c: findCombinedForGan(chart, s) }));
+        const unrescued = combs.filter((x) => !x.c);
+        const vi = GROUP_VI[grp];
+        diseases.push({
+          via: grp + '-tougan', killers: ['ti', 'yin'],
+          note: `从格破 — ${vi} THẤU CAN trợ thân (${byGrp[grp].map((h) => h.gan + ' [' + h.god + ']').join(', ')})${roots.length ? ' + Nhật Chủ đắc gốc tàng ' + roots.map((r) => r.zhi + ' (' + r.posVi + ')').join(', ') : ''} → «日主得根/得助，不肯从» — thế tòng vỡ${unrescued.length ? ' thật (破格)' : ' nhưng đã bị hợp khống'}.`,
+        });
+        if (unrescued.length) anyUnrescued = true;
+        else {
+          const c0 = combs[0].c;
+          rescues.push({
+            diseaseVia: grp + '-tougan', drug: (pref.yong || []).slice(0, 2),
+            note: `${vi} ${ganList[0]} bị ngũ hợp ${c0.partner} (hóa ${c0.hua}${c0.withDm ? ' — Nhật Chủ tự hợp' : ''}) → 合去 trợ thần, thế tòng khôi phục → cứu.`,
+          });
+        }
+      }
+      if (anyUnrescued) { quality = '败格'; broken = true; }
+      else quality = '有救';
+    } else if (roots.length) {
+      //  Bệnh có nhưng YẾU/藏 (gốc tàng chưa 透) → 假从 — cứu THEO ĐỊNH NGHĨA.
+      quality = '有救';
+      diseases.push({
+        via: 'support-root', killers: ['ti', 'yin'],
+        note: `Nhật Chủ đắc gốc tàng ${roots.map((r) => r.zhi + ' (' + r.posVi + ')').join(', ')} — tòng bất thuần (假从): gốc 藏 chưa lộ, thế tòng còn giữ.`,
+      });
+      rescues.push({
+        diseaseVia: 'support-root', drug: (pref.yong || []).slice(0, 2),
+        note: '假从遇根 — 运过即复: gốc tàng KHÔNG 透 nên tòng không vỡ (cứu theo định nghĩa 假从 — 滴天髓 «假从亦可发其身»); chỉ khi vận/luân niên 透 Tỷ-Ấn trợ thân thì thế tòng mới động.',
+      });
+    } else {
+      //  Thuần tòng — vẫn đăng ký bệnh tiềm ẩn để kênh 运中破格 canh vận Tỷ/Ấn.
+      diseases.push({
+        via: 'latent-support', killers: ['ti', 'yin'], latent: true,
+        note: 'Bệnh tiềm ẩn (chỉ phát khi gặp vận): tòng kỵ Tỷ Kiếp/Ấn trợ thân — vận trợ thân thì «日主得根，不肯从», thế tòng vỡ (从格破).',
+      });
+      extra = 'Nhật Chủ vô gốc, không thấy Tỷ Kiếp/Ấn lộ → thuần tòng (真从), cách thành.';
+    }
+    return {
+      quality, keyStar: null, transparent: null, rooted: null, broken,
+      rescued: rescues.length > 0, diseases, rescues, patternYong,
+      summary: buildSpecialSummary(quality, pattern, classical, extra, diseases, rescues, patternYong),
+    };
+  }
+
+  // ---------------------------------------------------------------------
+  //  CHUYÊN VƯỢNG (kind 'zhuanwang': 曲直/炎上/稼穑/从革/润下)
+  //  — «旺之极者不可损»: BỆNH = Quan Sát (khắc Nhật Chủ) thấu can hoặc tàng
+  //  bản khí; CỨU duy nhất theo đề bài: Quan can bị ngũ hợp LIỀN KỀ 绊/去.
+  // ---------------------------------------------------------------------
+  if (kind === 'zhuanwang') {
+    classical = 'Cổ pháp (滴天髓): «旺之极者不可损» — Chuyên Vượng nhất thuận khí thế, lấy Thực Thương tiết tú; QUAN SÁT khắc thân phạm vượng là phá cách, trừ khi Quan bị ngũ hợp 绊/去 (合杀).';
+    const offWx = G.guan; // KE_BY[dmWx]
+    const offTou = ['year', 'month', 'time']
+      .filter((k) => GAN[chart.pillars[k].gan].wx === offWx)
+      .map((k) => ({ gan: chart.pillars[k].gan, pillar: k }));
+    const offRootMain = scanHiddenWxAt(chart, offWx, 1);
+    if (offTou.length) {
+      const combs = offTou.map((o) => ({ s: o.gan, c: findCombinedForGan(chart, o.gan) }));
+      const unrescued = combs.filter((x) => !x.c);
+      diseases.push({
+        via: 'guan', killers: ['guan'],
+        note: `专旺破 — Quan Sát (hành ${offWx}) THẤU CAN (${combs.map((x) => x.s).join(', ')}) khắc thân phạm vượng («旺之极者不可损»)${unrescued.length ? ' → 破格' : ' nhưng bị ngũ hợp khống chế toàn bộ'}.`,
+      });
+      if (unrescued.length) {
+        quality = '败格'; broken = true;
+      } else {
+        quality = '有救';
+        const c0 = combs[0].c;
+        rescues.push({
+          diseaseVia: 'guan', drug: ['shi', 'ti'],
+          note: `Quan Sát ${combs[0].s} bị ngũ hợp ${c0.partner} (hóa ${c0.hua}${c0.withDm ? ' — Nhật Chủ tự hợp 绊, 贪合忘克' : ''}) → 合杀 bất khắc → cách được cứu.`,
+        });
+      }
+    } else if (offRootMain.length) {
+      //  Phòng thủ (pattern.js hiện chặn sẵn sát bản khí khi định cách) — vẫn xử đúng nếu ngưỡng đổi.
+      quality = '有救';
+      diseases.push({
+        via: 'guan', killers: ['guan'],
+        note: `Quan Sát tàng BẢN KHÍ chi ${offRootMain.map((r) => r.zhi).join(', ')} — chuyên vượng mang sát, thế thuần bị lệch (giả chuyên vượng).`,
+      });
+      rescues.push({
+        diseaseVia: 'guan', drug: ['shi', 'ti'],
+        note: 'Sát tàng chưa thấu, thế hội/hợp vượng áp đảo — cứu theo định nghĩa giả chuyên vượng («假从遇根 — 运过即复»); vận lộ Quan Sát thì phá thật.',
+      });
+    } else {
+      diseases.push({
+        via: 'latent-guan', killers: ['guan'], latent: true,
+        note: 'Bệnh tiềm ẩn (chỉ phát khi gặp vận): chuyên vượng kỵ Quan Sát — vận khắc thân phạm vượng thì phá cách («旺之极者不可损»).',
+      });
+      const offMid = scanHiddenWxAt(chart, offWx, 2).filter((r) => r.pos === 1);
+      extra = 'Không thấy Quan Sát thấu can hay tàng bản khí → một khí thuận thế, cách thành.'
+        + (offMid.length ? ` (Lưu ý: còn tàng sa ${offMid.map((r) => r.zhi).join(', ')} ở TRUNG KHÍ — thuần khiết chưa tuyệt đối, giả chuyên vượng nhẹ.)` : '');
+    }
+    return {
+      quality, keyStar: null, transparent: null, rooted: null, broken,
+      rescued: rescues.length > 0, diseases, rescues, patternYong,
+      summary: buildSpecialSummary(quality, pattern, classical, extra, diseases, rescues, patternYong),
+    };
+  }
+
+  // ---------------------------------------------------------------------
+  //  HÓA KHÍ (kind 'huaqi' — pattern.js hiện chưa sinh loại này, phòng lộ trình)
+  //  — BỆNH = can khắc 化神 thấu can; CỨU = can ấy bị ngũ hợp 绊/去.
+  // ---------------------------------------------------------------------
+  const huaWx = (pattern.geShen && pattern.geShen.wx) || (sp.geShen && sp.geShen.wx) || null;
+  if (!huaWx) {
+    return {
+      quality: '特殊', keyStar: null, transparent: null, rooted: null, broken: false,
+      rescued: false, diseases: [], rescues: [], patternYong,
+      summary: `【格局成败】 ${pattern.vi} — Hóa khí thiếu 化神, không luận thành/bại.`,
+    };
+  }
+  classical = `Cổ pháp: Hóa khí — ngũ hợp hóa thành thì thuận theo 化神 ${huaWx}; kỵ can khắc hóa thần (克化神) phá hóa.`;
+  const clashWx = KE_BY[huaWx];
+  const clashTou = ['year', 'month', 'time'].filter((k) => GAN[chart.pillars[k].gan].wx === clashWx).map((k) => chart.pillars[k].gan);
+  const clashGrp = dmWx === clashWx ? 'ti' : G.yin === clashWx ? 'yin' : G.shi === clashWx ? 'shi' : G.cai === clashWx ? 'cai' : 'guan';
+  if (clashTou.length) {
+    const combs = clashTou.map((s) => ({ s, c: findCombinedForGan(chart, s) }));
+    diseases.push({
+      via: 'clash-hua', killers: [clashGrp],
+      note: `克化神 — can ${clashTou.join(', ')} (hành ${clashWx}) khắc 化神 ${huaWx} thấu can → hóa khí bị phá.`,
+    });
+    if (combs.every((x) => x.c)) {
+      quality = '有救';
+      rescues.push({
+        diseaseVia: 'clash-hua', drug: [],
+        note: `克 thần ${combs[0].s} bị ngũ hợp ${combs[0].c.partner} (hóa ${combs[0].c.hua}) → 合去, hóa thần được bảo vệ → cứu.`,
+      });
+    } else {
+      quality = '败格'; broken = true;
+    }
+  } else {
+    diseases.push({
+      via: 'latent-clash', killers: [clashGrp], latent: true,
+      note: 'Bệnh tiềm ẩn (chỉ phát khi gặp vận): hóa khí kỵ can khắc 化神 — vận khắc hóa thần thì phá hóa.',
+    });
+    extra = `Không thấy can hành ${clashWx} khắc 化神 ${huaWx} → hóa thuận, cách thành.`;
+  }
   return {
-    quality: '特殊',
-    keyStar: null,
-    transparent: null,
-    rooted: null,
-    broken: false,
-    rescued: false,
-    diseases: [],
-    rescues: [],
-    patternYong: { xi: [], ji: [], yong: [], note: pattern.note || '' },
-    summary: `【格局成败】 ${pattern.vi} — Cách đặc biệt (thuận thế), không luận thành/bại theo 8 chính cách; xét vỡ khi bị vận khắc phá thế cục.`,
+    quality, keyStar: null, transparent: null, rooted: null, broken,
+    rescued: rescues.length > 0, diseases, rescues, patternYong,
+    summary: buildSpecialSummary(quality, pattern, classical, extra, diseases, rescues, patternYong),
   };
 }
 

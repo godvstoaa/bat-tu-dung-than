@@ -47,10 +47,11 @@ function _capEventData(data) {
   for (const k of Object.keys(d)) {
     const v = d[k];
     if (typeof v === 'string') {
-      if (k === 'response' || k === 'q' || k === 'text' || k === 'question') out[k] = _S(v, 4000);
+      if (k === 'response' || k === 'q' || k === 'text' || k === 'question') out[k] = _S(v, 16000); // [FIX] log ĐỦ câu trả lời AI dài
       else out[k] = _S(v, 300);
     } else if (Array.isArray(v)) {
-      out[k] = v.slice(0, 20).map((x) => (typeof x === 'string' ? _S(x, 300) : x));
+      if (k === 'neoConflicts') out[k] = v.slice(0, 10).map((x) => { try { return _S(JSON.stringify(x), 200); } catch (e) { return '{}'; } }); // [NEO] conflict objects stringify gọn
+      else out[k] = v.slice(0, 20).map((x) => (typeof x === 'string' ? _S(x, 300) : x));
     } else if (v && typeof v === 'object') {
       try { out[k] = _S(JSON.stringify(v), 500); } catch (e) { out[k] = '[unserializable]'; }
     } else out[k] = v;
@@ -437,6 +438,26 @@ export async function handleAdminRoute(request, env, url) {
         return json({ count: errors.length, errors: errors.sort((a, b) => (b.ts || '').localeCompare(a.ts || '')) });
       } catch (e) { return json({ error: e.message }, 500); }
     }
+    // [NEO-CHECKER] admin xem neo accuracy stats — aggregate từ events:log (+ baseline KV)
+    if (path === apDash + 'api/neo-stats' && method === 'GET') {
+      try {
+        const logRaw = env.ADMIN_KV ? await env.ADMIN_KV.get('events:log') : null;
+        let baseline = null;
+        try { const bRaw = env.ADMIN_KV ? await env.ADMIN_KV.get('neo:baseline') : null; if (bRaw) baseline = JSON.parse(bRaw); } catch (e) {}
+        let events = []; try { events = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
+        const chats = events.filter((e) => e.type === 'ai_chat' && e.data && e.data.source === 'ai' && e.data.neoScore != null);
+        const scored = chats.map((e) => ({ ts: e.ts, ip: e.ip, score: e.data.neoScore, redFlag: e.data.neoHasRedFlag, q: (e.data.q || '').slice(0, 100), conflicts: e.data.neoConflicts || [], checked: e.data.neoChecked || 0 }));
+        const scores = scored.map((x) => x.score).filter((x) => x != null);
+        const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+        const dist = { ge90: scores.filter((x) => x >= 90).length, '70_89': scores.filter((x) => x >= 70 && x < 90).length, lt70: scores.filter((x) => x < 70).length };
+        const redFlags = scored.filter((x) => x.redFlag);
+        const now = Date.now(); const trend = [];
+        for (let i = 6; i >= 0; i--) { const dStart = now - i * 86400000; const dEnd = dStart - 86400000; const dayScores = scored.filter((x) => x.ts <= dStart && x.ts > dEnd).map((x) => x.score); trend.push({ day: new Date(dStart).toISOString().slice(0, 10), avg: dayScores.length ? Math.round(dayScores.reduce((a, b) => a + b, 0) / dayScores.length) : null, count: dayScores.length }); }
+        const confTypes = {};
+        for (const x of scored) for (const c of x.conflicts) { try { const co = typeof c === 'string' ? JSON.parse(c) : c; if (co && co.type) confTypes[co.type] = (confTypes[co.type] || 0) + 1; } catch (e) {} }
+        return json({ totalScored: scored.length, avgScore: avg, distribution: dist, redFlagCount: redFlags.length, trend, conflictTypes: confTypes, recentConflicts: scored.filter((x) => x.conflicts.length).slice(0, 20), baseline: baseline });
+      } catch (e) { return json({ error: e.message }, 500); }
+    }
     if (path === apDash + 'api/ai' && method === 'POST') return adminToggleAi(env, request);
     if (path === apDash + 'api/ai-free' && method === 'POST') return adminToggleFreeAi(env, request);
     if (path === apDash + 'api/free-test' && method === 'POST') { try { return await adminFreeTest(env, request); } catch (e) { return json({ ok: false, err: e.message }, 500); } }
@@ -553,15 +574,23 @@ export async function handleAdminRoute(request, env, url) {
 async function adminStats(env, url) {
   const nocache = url && url.searchParams.get('nocache');
   if (!nocache && env.ADMIN_KV) { const cached = await env.ADMIN_KV.get('cache:stats'); if (cached) { try { return json(JSON.parse(cached)); } catch (e) {} } }
-  const ai = await isAiEnabled(env);
-  const logRaw = env.ADMIN_KV ? await env.ADMIN_KV.get('events:log') : null;
+  // [PERF FIX] đọc song song isAiEnabled + events:log
+  const [ai, logRaw] = await Promise.all([
+    isAiEnabled(env),
+    env.ADMIN_KV ? env.ADMIN_KV.get('events:log') : Promise.resolve(null),
+  ]);
   let events = [];
   try { events = logRaw ? JSON.parse(logRaw) : []; } catch (e) {}
   // [loop 1361] lọc test events (data.test/audit/xss + q chứa 'audit test') ra khỏi stats
   //   — production sạch. (Raw /admin/api/events vẫn trả tất cả, cho audit self-check.)
   events = events.filter((e) => !(e.data && (e.data.test || e.data.audit || e.data.xss || (typeof e.data.q === 'string' && e.data.q.indexOf('audit test') >= 0))));
-  const get = async (k) => parseInt((await env.ADMIN_KV.get(k)) || '0', 10);
-  const totals = { visit: await get('cnt:visit'), chart: await get('cnt:chart'), ai_question: await get('cnt:ai_question'), ai_chat: await get('cnt:ai_chat'), error: await get('cnt:error'), all: await get('cnt:all') };
+  // [PERF FIX] đọc 6 counters song song + get helper cho free/feedback (500 fix)
+  const _cnt = env.ADMIN_KV ? await Promise.all([
+    env.ADMIN_KV.get('cnt:visit'), env.ADMIN_KV.get('cnt:chart'), env.ADMIN_KV.get('cnt:ai_question'),
+    env.ADMIN_KV.get('cnt:ai_chat'), env.ADMIN_KV.get('cnt:error'), env.ADMIN_KV.get('cnt:all'),
+  ]) : [null,null,null,null,null,null];
+  const totals = { visit: parseInt(_cnt[0]||'0',10), chart: parseInt(_cnt[1]||'0',10), ai_question: parseInt(_cnt[2]||'0',10), ai_chat: parseInt(_cnt[3]||'0',10), error: parseInt(_cnt[4]||'0',10), all: parseInt(_cnt[5]||'0',10) };
+  const get = async (k) => parseInt((env.ADMIN_KV ? await env.ADMIN_KV.get(k) : null) || '0', 10);
   const ips = new Set(events.map((e) => e.ip));
   // [loop 1351] byIp — group events theo visitor (đúng nhu cầu «người nào xem gì hỏi gì»)
   const byIp = {};
@@ -778,7 +807,10 @@ async function adminStats(env, url) {
   const BOT_RE = /bot|crawl|spider|facebookexternalhit|googleweblight|preview|semrush|ahrefs|dataforseo|pingdom|uptime/i;
   let botCount = 0; const realIps = new Set();
   for (const e of events) { if (BOT_RE.test(e.ua || '')) botCount++; else if (e.ip) realIps.add(e.ip); }
-  const eventsLite = events.map(function (e) { var c = { ts: e.ts, type: e.type, ip: e.ip, country: e.country, city: e.city, data: e.data }; return c; });
+  // [PERF FIX] chỉ gửi 200 sự kiện gần nhất — giữ NGUYÊN response đầy đủ trong mỗi ai_chat.
+  const eventsLite = events.slice(0, 200).map(function (e) {
+    return { ts: e.ts, type: e.type, ip: e.ip, country: e.country, city: e.city, data: e.data || {} };
+  });
   // [loop 1378 MOAT] feedback flywheel — data độc quyền chart↔outcome
   const fbTotal = await get('cnt:feedback');
   const fbGood = await get('cnt:feedback_good');
@@ -953,6 +985,19 @@ function adminDashboard(env) {
   .btn.sm{padding:4px 10px;font-size:11px}
   .filter{padding:7px 10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--rs);font-size:13px;font-family:inherit}
   .filter:focus{outline:none;border-color:var(--gold)}
+  /* === FILTER PANEL (redesign v2) — phân nhóm khoa học, chỉ tìm khi bấm nút === */
+  .fpanel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
+  .fgroup{display:flex;flex-direction:column;gap:6px;padding:0 14px;border-left:2px solid rgba(212,175,55,.18)}
+  .fgroup:first-of-type{padding-left:0;border-left:none}
+  .flabel{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+  .frow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .fchecks{display:flex;flex-wrap:wrap;gap:6px}
+  .fcheck{display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;padding:4px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;color:var(--text);user-select:none;transition:all .12s}
+  .fcheck:hover{border-color:var(--gold)}
+  .fcheck input{margin:0;cursor:pointer}
+  .fcheck.on{background:rgba(212,175,55,.14);border-color:var(--gold);color:var(--gold)}
+  .fbtns{display:flex;gap:8px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid rgba(212,175,55,.1)}
+  .fresult{font-size:12px;color:var(--muted);margin-left:auto;white-space:nowrap}
   .toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
   .badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
   .b-visit{background:rgba(127,191,127,.2);color:#7fbf7f}.b-chart{background:rgba(212,175,55,.2);color:#d4af37}.b-ai_question{background:rgba(180,120,200,.2);color:#b478c8}.b-other{background:rgba(150,150,150,.2);color:#aaa}.b-error{background:rgba(192,57,43,.25);color:#e0533d}.b-ai_chat{background:rgba(100,180,255,.2);color:#64b4ff}.b-click{background:rgba(100,200,150,.2);color:#64c896}
@@ -991,6 +1036,11 @@ function adminDashboard(env) {
           <div class="card"><h3>🜂 Funnel <span class="card-actions tiny">visitor → lá số → AI</span></h3><div id="funnel"></div></div>
         </div>
         <div class="card"><h3>📊 Engagement <span class="card-actions tiny">chất lượng & sâu traffic</span></h3><div id="engagement" class="kpi-grid"></div></div>
+        <div class="card"><h3>🎯 Neo Accuracy <span class="card-actions tiny">AI có neo đúng data không — auto-verify vs brief</span></h3>
+          <div id="neo-kpis" class="kpi-grid"></div>
+          <div style="margin-top:10px"><div class="tiny" style="margin-bottom:4px">📈 Trend 7 ngày (avg neo score)</div><div id="neo-trend" style="display:flex;align-items:flex-end;gap:3px;height:40px"></div></div>
+          <div style="margin-top:10px"><div class="tiny" style="margin-bottom:4px">🔴 Conflicts gần đây</div><div id="neo-conflicts" style="max-height:240px;overflow:auto"></div></div>
+        </div>
         <div class="card"><h3>📈 Hoạt động 7 ngày <span class="card-actions tiny">số liệu gần đây</span></h3><div id="daily"></div></div>
         <div class="card"><h3>📉 Xu hướng 30 ngày <span class="card-actions tiny">dayagg TTL 90d · retention dài</span></h3><div id="trend30"></div></div>
         <div class="card"><h3>⏰ Giờ hoạt động (VN, UTC+7)</h3><div id="hourly" style="display:flex;align-items:flex-end;gap:1px;height:44px;margin-top:4px"></div></div>
@@ -1000,53 +1050,97 @@ function adminDashboard(env) {
       </section>
       <!-- ===== VISITORS ===== -->
       <section class="tab" id="tab-visitors">
-        <div class="pagehead"><h2>👥 Visitors</h2><span class="pill">Tìm lại bất kỳ ai · tên / ngày sinh / câu hỏi / ghi chú / tag</span></div>
+        <div class="pagehead"><h2>👥 Visitors</h2><span class="pill">Log sự kiện hiện sẵn · tìm IP/tên khi cần</span></div>
 
-        <!-- 🔎 VISITOR FINDER -->
-        <div class="card">
-          <h3>🔎 Tìm visitor <span class="card-actions tiny">tìm + lọc + sắp xếp · gõ bất kỳ đặc điểm nào admin nhớ</span></h3>
-          <div class="toolbar">
-            <input class="filter" id="vq" placeholder="🔍 tên / ngày sinh / IP / câu hỏi / trả lời AI / ghi chú / tag…" oninput="_vDebounced()" style="flex:1;min-width:220px">
-            <select class="filter" id="vf-gender" onchange="vRender()"><option value="">Mọi giới</option><option value="nam">Nam</option><option value="nữ">Nữ</option></select>
-            <select class="filter" id="vf-country" onchange="vRender()"></select>
-            <select class="filter" id="vf-sort" onchange="vRender()">
-              <option value="recent">Gần nhất</option><option value="old">Cũ nhất</option><option value="scorehi">Điểm cao</option><option value="scorelo">Điểm thấp</option><option value="charts">Nhiều lá số</option><option value="qs">Nhiều câu hỏi</option><option value="named">Có tên</option><option value="note">Có ghi chú</option>
-            </select>
-            <span class="tiny" id="vcount" style="margin-left:auto;white-space:nowrap"></span>
-            <button class="btn sm" onclick="vReset()">✕ lọc</button>
-          </div>
-          <div class="toolbar" style="font-size:11px;gap:10px;align-items:center">
-            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-chart" onchange="vRender()"> lá số</label>
-            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-chat" onchange="vRender()"> chat</label>
-            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-q" onchange="vRender()"> câu hỏi</label>
-            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-note" onchange="vRender()"> ghi chú</label>
-            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-tag" onchange="vRender()"> tag</label>
-            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-name" onchange="vRender()"> có tên</label>
-            <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" id="vf-ret" onchange="vRender()"> quay lại</label>
-            <span style="margin-left:6px">điểm</span>
-            <input class="filter" id="vf-smin" type="number" min="0" max="100" placeholder="từ" oninput="_vDebounced()" style="width:50px">
-            <span>–</span>
-            <input class="filter" id="vf-smax" type="number" min="0" max="100" placeholder="đến" oninput="_vDebounced()" style="width:50px">
-            <span style="margin-left:4px">thăm</span>
-            <input class="filter" id="vf-from" type="date" oninput="_vDebounced()" style="width:128px">
-            <span>→</span>
-            <input class="filter" id="vf-to" type="date" oninput="_vDebounced()" style="width:128px">
-          </div>
-          <div id="vtagcloud" class="tiny" style="margin-top:6px;line-height:2"></div>
-          <div id="byip"></div>
-        </div>
-
-        <!-- 📒 DANH BẠ TÊN (profiles bền vững — sống qua rollover log) -->
-        <div class="card"><h3>📒 Danh bạ tên <span class="card-actions tiny">bền vững · tìm theo tên dù đã lâu (sống qua rollover log 1500 events)</span></h3><div id="profiles"></div></div>
-
-        <!-- SỰ KIỆN (chi tiết) -->
-        <div class="card"><h3>Sự kiện gần đây <span class="card-actions tiny">click dòng ai_chat → xem full Q+A</span></h3>
-          <div class="toolbar">
-            <select class="filter" id="ftype" onchange="load()"><option value="">Tất cả</option><option value="visit">visit</option><option value="chart">chart</option><option value="ai_question">ai_question</option><option value="ai_chat">ai_chat (Q+A)</option><option value="error">error</option><option value="click">click</option></select>
-            <input class="filter" id="sq" placeholder="🔍 tìm trong sự kiện" oninput="_sqDebounced(this)">
+        <!-- SỰ KIỆN (log chính — ĐẶT TRÊN CÙNG, luôn hiện) -->
+        <div class="card"><h3>📜 Sự kiện gần đây <span class="card-actions tiny">click dòng ai_chat → xem full Q+A · click IP → xem chi tiết visitor</span></h3>
+          <div class="fpanel">
+            <div class="toolbar" style="margin-bottom:0;align-items:stretch">
+              <div class="fgroup" style="flex:1;min-width:200px">
+                <div class="flabel">📂 Loại sự kiện</div>
+                <select class="filter" id="ftype" onchange="_evApply()"><option value="">Tất cả loại</option><option value="visit">🚪 visit (truy cập)</option><option value="chart">📊 chart (lập lá số)</option><option value="ai_question">❓ ai_question</option><option value="ai_chat">💬 ai_chat (Q+A đầy đủ)</option><option value="error">⚠ error (lỗi JS)</option><option value="click">🖱 click</option></select>
+              </div>
+              <div class="fgroup" style="flex:1;min-width:200px">
+                <div class="flabel">🔍 Từ khoá trong sự kiện</div>
+                <input class="filter" id="sq" placeholder="tìm trong nội dung sự kiện…" onkeydown="if(event.key==='Enter')_sqSearch()" style="width:100%">
+              </div>
+            </div>
+            <div class="fbtns">
+              <button class="btn" onclick="_sqSearch()">🔍 Tìm trong kết quả</button>
+              <button class="btn sm" onclick="_sqClear()">✕ Xoá</button>
+              <span class="fresult" id="sqresult"></span>
+            </div>
           </div>
           <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
         </div>
+
+        <!-- 🔎 VISITOR FINDER (chỉ hiển thị danh sách khi bấm «🔍 Tìm») -->
+        <div class="card">
+          <h3>🔎 Tìm theo IP / tên <span class="card-actions tiny">đặt điều kiện rồi bấm «🔍 Tìm» — danh sách chỉ hiện khi cần</span></h3>
+          <div class="fpanel">
+            <div class="toolbar" style="margin-bottom:0;align-items:stretch">
+              <div class="fgroup" style="flex:1;min-width:220px">
+                <div class="flabel">🔍 Từ khoá</div>
+                <input class="filter" id="vq" placeholder="tên / ngày sinh / IP / câu hỏi / trả lời AI / ghi chú / tag…" onkeydown="if(event.key==='Enter')vSearch()" style="width:100%">
+              </div>
+              <div class="fgroup">
+                <div class="flabel">Phân loại</div>
+                <div class="frow">
+                  <select class="filter" id="vf-gender"><option value="">Mọi giới</option><option value="nam">Nam</option><option value="nữ">Nữ</option></select>
+                  <select class="filter" id="vf-country"></select>
+                </div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel">Sắp xếp</div>
+                <select class="filter" id="vf-sort">
+                  <option value="recent">Gần nhất</option><option value="old">Cũ nhất</option><option value="scorehi">Điểm cao</option><option value="scorelo">Điểm thấp</option><option value="charts">Nhiều lá số</option><option value="qs">Nhiều câu hỏi</option><option value="named">Có tên</option><option value="note">Có ghi chú</option>
+                </select>
+              </div>
+            </div>
+            <div class="toolbar" style="margin-top:12px;margin-bottom:0;align-items:stretch">
+              <div class="fgroup">
+                <div class="flabel">Chỉ hiện có</div>
+                <div class="fchecks">
+                  <label class="fcheck" id="fc-chart"><input type="checkbox" id="vf-chart"> 📊 lá số</label>
+                  <label class="fcheck" id="fc-chat"><input type="checkbox" id="vf-chat"> 💬 chat</label>
+                  <label class="fcheck" id="fc-q"><input type="checkbox" id="vf-q"> ❓ câu hỏi</label>
+                  <label class="fcheck" id="fc-note"><input type="checkbox" id="vf-note"> 📝 ghi chú</label>
+                  <label class="fcheck" id="fc-tag"><input type="checkbox" id="vf-tag"> 🏷 tag</label>
+                  <label class="fcheck" id="fc-name"><input type="checkbox" id="vf-name"> 👤 có tên</label>
+                  <label class="fcheck" id="fc-ret"><input type="checkbox" id="vf-ret"> 🔄 quay lại</label>
+                </div>
+              </div>
+            </div>
+            <div class="toolbar" style="margin-top:12px;margin-bottom:0;align-items:stretch">
+              <div class="fgroup">
+                <div class="flabel">🔢 Điểm lá số (0–100)</div>
+                <div class="frow">
+                  <input class="filter" id="vf-smin" type="number" min="0" max="100" placeholder="từ" style="width:60px">
+                  <span class="tiny">→</span>
+                  <input class="filter" id="vf-smax" type="number" min="0" max="100" placeholder="đến" style="width:60px">
+                </div>
+              </div>
+              <div class="fgroup">
+                <div class="flabel">📅 Thăm trong khoảng</div>
+                <div class="frow">
+                  <input class="filter" id="vf-from" type="date" style="width:138px">
+                  <span class="tiny">→</span>
+                  <input class="filter" id="vf-to" type="date" style="width:138px">
+                </div>
+              </div>
+            </div>
+            <div class="fbtns">
+              <button class="btn" onclick="vSearch()">🔍 Tìm</button>
+              <button class="btn sm" onclick="vReset()">✕ Xoá lọc</button>
+              <span class="fresult" id="vcount"></span>
+            </div>
+          </div>
+          <div id="vtagcloud" class="tiny" style="margin:6px 0;line-height:2"></div>
+          <div id="byip"></div>
+        </div>
+
+        <!-- 📒 DANH BẠ TÊN (chỉ hiện khi đã bấm Tìm) -->
+        <div class="card"><h3>📒 Danh bạ tên <span class="card-actions tiny">bền vững · chỉ hiện khi bấm «🔍 Tìm» phía trên</span></h3><div id="profiles"></div></div>
       </section>
       <!-- ===== AI ===== -->
       <section class="tab" id="tab-ai">
@@ -1400,6 +1494,13 @@ function adminDashboard(env) {
   // [PERF FIX] debounce vRender — tránh lag khi gõ search (mỗi phím gõ trước đây re-render 200+ DOM)
   var _vTimer;
   function _vDebounced(){ clearTimeout(_vTimer); _vTimer = setTimeout(vRender, 300); }
+  // [redesign v3] danh sách IP/tên chỉ hiện khi user chủ động bấm «🔍 Tìm» — tránh che log sự kiện
+  var _vSearched = false;
+  function vSearch(){ _vSearched = true; vRender(); }
+  function _sqSearch(){ var inp=document.getElementById('sq'); var q=(inp.value||'').toLowerCase().trim(); var shown=0,total=0; document.querySelectorAll('#events tr').forEach(function(tr){total++;var ok=!q||tr.textContent.toLowerCase().indexOf(q)>=0;tr.style.display=ok?'':'none';if(ok)shown++;}); var r=document.getElementById('sqresult'); if(r) r.textContent=q?shown+' / '+total+' dòng khớp':(total+' dòng'); }
+  function _sqClear(){ var inp=document.getElementById('sq'); if(inp) inp.value=''; _sqSearch(); }
+  function _evApply(){ var ft=document.getElementById('ftype'); if(ft) load(); _sqSearch(); }
+  (function(){ document.addEventListener('change',function(e){ var lb=e.target.closest('.fcheck'); if(lb){ lb.classList.toggle('on',e.target.checked); } }); })();
   // [PERF FIX] debounce events search — querySelectorAll ALL rows mỗi keystroke = freeze
   var _sqTimer;
   function _sqDebounced(inp){ var val=inp.value; clearTimeout(_sqTimer); _sqTimer=setTimeout(function(){ var q=val.toLowerCase(); document.querySelectorAll('#events tr').forEach(function(tr){tr.style.display=!q||tr.textContent.toLowerCase().indexOf(q)>=0?'':'none'}); }, 300); }
@@ -1419,9 +1520,16 @@ function adminDashboard(env) {
       }
     });
     var matched=arr.filter(function(v){return _vMatch(v,f);});
+    // [redesign v3] luôn cập nhật số lượng — nhưng KHÔNG render danh sách cho đến khi bấm «🔍 Tìm»
+    var vc=document.getElementById('vcount'); if(vc) vc.textContent=_vSearched ? (matched.length+' / '+arr.length+' visitor') : (arr.length+' visitor — bấm «🔍 Tìm» để xem');
+    var csel=document.getElementById('vf-country'); if(csel && !csel.options.length){ var ph=document.createElement('option'); ph.value=''; ph.textContent='Mọi quốc gia'; csel.appendChild(ph); var cs={}; (d.byIp||[]).forEach(function(v){if(v.country)cs[v.country]=1;}); Object.keys(cs).sort().forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;csel.appendChild(o);}); }
+    if (!_vSearched) {
+      var bip0=document.getElementById('byip'); if(bip0){bip0.textContent=''; var hint=el('div','tiny','💡 Chưa hiển thị — đặt điều kiện rồi bấm «🔍 Tìm» (hoặc Enter) để mở danh sách visitor.'); hint.style.cssText='padding:14px;text-align:center;opacity:.7'; bip0.appendChild(hint);}
+      var pr0=document.getElementById('profiles'); if(pr0){pr0.textContent=''; var ph0=el('div','tiny','💡 Bấm «🔍 Tìm» phía trên để hiện danh bạ tên.'); ph0.style.cssText='padding:10px;text-align:center;opacity:.7'; pr0.appendChild(ph0);}
+      return;
+    }
     var bip=document.getElementById('byip'); if(bip){bip.textContent='';
-      var vc=document.getElementById('vcount'); if(vc) vc.textContent=matched.length+' / '+arr.length+' visitor';
-      if(!matched.length) bip.appendChild(el('div','tiny','(không khớp — bớt filter hoặc bấm «✕ lọc»)'));
+      if(!matched.length) bip.appendChild(el('div','tiny','(không khớp — bớt filter hoặc bấm «✕ lọc)»'));
       var LIMIT=50; // [PERF] giảm 200→50 — 200 cards × 20 DOM = 4000 elements gây freeze
       matched.slice(0,LIMIT).forEach(function(v){ bip.appendChild(_vCard(v)); });
       if(matched.length>LIMIT) bip.appendChild(el('div','tiny','… còn '+(matched.length-LIMIT)+' visitor — bớt filter để thấy thêm'));
@@ -1430,7 +1538,6 @@ function adminDashboard(env) {
       (d.tagCloud||[]).slice(0,20).forEach(function(t){ var chip=el('span','badge','🏷 '+t.tag+' '+t.count); chip.style.cssText='background:rgba(100,180,255,.12);color:#64b4ff;cursor:pointer;margin:2px'; chip.title='Lọc theo tag «'+t.tag+'»'; chip.onclick=function(){document.getElementById('vq').value=t.tag;vRender();}; tc.appendChild(chip); });
       if(!(d.tagCloud||[]).length) tc.appendChild(el('span','tiny','(chưa có tag — thêm ở nút ✏️ mỗi visitor)'));
     }
-    var csel=document.getElementById('vf-country'); if(csel && !csel.options.length){ var ph=document.createElement('option'); ph.value=''; ph.textContent='Mọi quốc gia'; csel.appendChild(ph); var cs={}; (d.byIp||[]).forEach(function(v){if(v.country)cs[v.country]=1;}); Object.keys(cs).sort().forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;csel.appendChild(o);}); }
     var pr=document.getElementById('profiles'); if(pr){pr.textContent='';
       var profs=(d.profiles||[]);
       var pf=profs.filter(function(p){if(!f.q)return true;var hay=((p.name||'')+' '+(p.dob||'')+' '+(p.gender||'')+' '+(p.grade||'')+' '+(p.score!=null?p.score:'')).toLowerCase();return f.q.split(/\\s+/).every(function(t){return t&&hay.indexOf(t)>=0;});});
@@ -1442,7 +1549,7 @@ function adminDashboard(env) {
       }
     }
   }
-  function vReset(){ ['vq','vf-smin','vf-smax','vf-from','vf-to'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';}); ['vf-gender','vf-country','vf-sort'].forEach(function(id){var e=document.getElementById(id);if(e)e.selectedIndex=0;}); ['vf-chart','vf-chat','vf-q','vf-note','vf-tag','vf-name','vf-ret'].forEach(function(id){var e=document.getElementById(id);if(e)e.checked=false;}); vRender(); }
+  function vReset(){ ['vq','vf-smin','vf-smax','vf-from','vf-to'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';}); ['vf-gender','vf-country','vf-sort'].forEach(function(id){var e=document.getElementById(id);if(e)e.selectedIndex=0;}); ['vf-chart','vf-chat','vf-q','vf-note','vf-tag','vf-name','vf-ret'].forEach(function(id){var e=document.getElementById(id);if(e)e.checked=false;}); document.querySelectorAll('.fcheck').forEach(function(lb){lb.classList.remove('on');}); _vSearched=false; vRender(); }
   function editNote(ip){
     var d=_lastD||{}; var n=(d.notes&&d.notes[ip])||{}; var note=n.note||''; var tags=((n.tags)||[]).slice();
     var m=document.getElementById('note-modal'); if(!m)return; m.textContent='';
@@ -1475,7 +1582,9 @@ function adminDashboard(env) {
     if(rEl){ rEl.textContent = r.ok ? ('✅ HTTP '+r.status+' · '+r.durationMs+'ms'+(r.tokens?' · '+r.tokens+' tokens':'')+(r.preview?' · «'+String(r.preview).slice(0,40)+'»':'')) : ('❌ '+(r.err||('HTTP '+r.status))+' · '+(r.durationMs||'?')+'ms'); rEl.style.color=r.ok?'#7fbf7f':'#e0533d'; }
   }
   var _lastCount = 0; var _soundOn = false;
-  load(true); setInterval(function(){ if (!document.hidden) load(false); }, 15000);
+  load(false); setTimeout(function(){ load(true); }, 60); // [PERF] cached NGAY → fresh nền sau
+  setInterval(function(){ if (!document.hidden) load(false); }, 15000);
+  loadNeo(); setInterval(function(){ if (!document.hidden) loadNeo(); }, 60000); // [NEO] refresh 60s
   async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch(AP+'/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
   async function tgOff(){ await fetch(AP+'/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable:true})}); alert('Telegram alert đã tắt'); }
   async function aiLoad(){ var r=await fetch(AP+'/api/ai-config?token='+TOKEN).then(function(r){return r.json()}); var c=r.config||{}; document.getElementById('ai-mode').value=c.mode||'free'; document.getElementById('ai-endpoint').value=c.endpoint||'https://api.z.ai/api/coding/paas/v4'; document.getElementById('ai-apikey').value=''; document.getElementById('ai-apikey').placeholder=c.apiKey?'Đã đặt ('+c.apiKey+')':'API Key (dán từ z.ai/model-api)'; document.getElementById('ai-model').value=c.model||'glm-5.2'; document.getElementById('ai-status').textContent='Mode: '+(c.mode||'free')+(c.apiKey?' | Key: '+c.apiKey:' | No key'); aiModeChange(); }
@@ -1620,6 +1729,46 @@ function adminDashboard(env) {
     }
   }
   // [loop 1355] audit log loader — truy vết admin actions
+  // [NEO-CHECKER] load + render neo accuracy (đo AI neo đúng data không) + so sánh baseline
+  async function loadNeo(){
+    try {
+      var r = await fetch(AP+'/api/neo-stats?token='+TOKEN, { headers: H }).then(function(x){return x.json();}).catch(function(){return null;});
+      if (!r) return;
+      var nk=document.getElementById('neo-kpis'); if(nk){nk.textContent='';
+        if (r.avgScore == null) { nk.appendChild(statBlock('—','chưa có data')); nk.appendChild(statBlock('—','hỏi AI để đo')); if (r.baseline) nk.appendChild(statBlock(r.baseline.avgScore+'%','📊 BASELINE (cũ)','#9a8a6a')); return; }
+        var scoreColor = r.avgScore>=85?'#7fbf7f':r.avgScore>=70?'#d4af37':'#c0392b';
+        nk.appendChild(statBlock(r.avgScore+'%','🎯 avg neo', scoreColor));
+        if (r.baseline && r.baseline.avgScore != null) {
+          var delta = r.avgScore - r.baseline.avgScore;
+          var deltaColor = delta > 0 ? '#7fbf7f' : delta < 0 ? '#c0392b' : '#9a8a6a';
+          nk.appendChild(statBlock((delta>0?'▲+':delta<0?'▼':'±')+Math.abs(delta)+'%','vs baseline ('+r.baseline.avgScore+'%)', deltaColor));
+          nk.appendChild(statBlock(r.baseline.avgScore+'%','📊 baseline','#9a8a6a'));
+        }
+        nk.appendChild(statBlock(r.totalScored,'câu đã chấm'));
+        nk.appendChild(statBlock(Math.round((r.distribution.ge90/(r.totalScored||1))*100)+'%','≥90% ✅','#7fbf7f'));
+        nk.appendChild(statBlock(Math.round((r.distribution.lt70/(r.totalScored||1))*100)+'%','<70% ⚠','#e0533d'));
+        nk.appendChild(statBlock(r.redFlagCount,'🔴 red flag', r.redFlagCount>0?'#c0392b':'#7fbf7f'));
+      }
+      var nt=document.getElementById('neo-trend'); if(nt && r.trend){nt.textContent='';
+        r.trend.forEach(function(dd){ var bar=el('div'); bar.style.cssText='flex:1;min-width:14px;background:'+(dd.avg==null?'rgba(212,175,55,.1)':(dd.avg>=85?'#7fbf7f':dd.avg>=70?'#d4af37':'#c0392b'))+';height:'+Math.max(2,dd.avg==null?2:Math.round(dd.avg))+'px'; bar.title=dd.day+': '+(dd.avg==null?'không data':dd.avg+'% ('+dd.count+' câu)'); nt.appendChild(bar); });
+      }
+      var nc=document.getElementById('neo-conflicts'); if(nc){nc.textContent='';
+        var confs=r.recentConflicts||[];
+        if(!confs.length){ nc.appendChild(el('div','tiny','✅ chưa phát hiện conflict — AI đang neo đúng data')); }
+        else { confs.forEach(function(x){
+            var row=el('div'); row.style.cssText='padding:6px 8px;border-bottom:1px solid rgba(212,175,55,.08);font-size:11px;cursor:pointer';
+            row.onmouseenter=function(){row.style.background='rgba(192,57,43,.06)';};
+            row.onmouseleave=function(){row.style.background='';};
+            var sev=x.redFlag?'🔴':'🟠';
+            var confList=(x.conflicts||[]).map(function(c){ try{ var co=typeof c==='string'?JSON.parse(c):c; return '['+co.type+'] «'+(co.said||'?')+'» brief:«'+(co.brief||'?')+'»'; }catch(e){ return '?'; } }).join(' | ');
+            row.appendChild(el('div',null, sev+' '+new Date(x.ts).toLocaleString('vi-VN')+' · score '+x.score+'% · «'+(x.q||'').slice(0,50)+'…»'));
+            row.appendChild(el('div','tiny', confList.slice(0,250)));
+            nc.appendChild(row);
+          });
+        }
+      }
+    } catch(e) {}
+  }
   async function loadAudit(){
     var r = await fetch(AP+'/api/audit?token='+TOKEN, { headers: H }).then(function(r){return r.json();}).catch(function(){return {audit:[]};});
     var al = document.getElementById('audit'); if (!al) return; al.textContent='';

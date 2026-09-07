@@ -48,11 +48,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 let count = 0;
 const sitemapUrls = [];
 const indexEntries = [];
+// [AUDIT v3 — SLUG COLLISION] 5 cặp kinh trùng slug (tên Việt trùng/ngoặc bị slugify strip)
+//   → bản sau ĐÈ bản trước: 5 kinh unreachable + index trỏ nhầm văn bản. Fix: track used slug,
+//   trùng thì appended DZ# (vd do-long-truyen-dz774.html) để MỖI kinh có trang riêng.
+const usedSlugs = new Set();
+let _anonDup = 0;
 
 for (const e of DAOZANG) {
-  const slug = slugify(e.name_vi || e.name_han);
-  if (!slug) continue;
   const dz = (e.notes || '').match(/DZ0*\d+/i)?.[0] || '';
+  let slug = slugify(e.name_vi || e.name_han);
+  if (!slug) continue;
+  if (usedSlugs.has(slug)) {
+    slug = slug + '-' + (dz ? dz.toLowerCase() : 'b' + (++_anonDup));
+    if (usedSlugs.has(slug)) slug = slug + '-b' + (++_anonDup);
+  }
+  usedSlugs.add(slug);
   const title = `${e.name_vi || e.name_han} (${e.name_han})${dz ? ' — ' + dz : ''} | Thư viện Huyền học`;
   const desc = (e.meaning || '').slice(0, 155).replace(/\n/g, ' ');
   const url = `${SITE}/kinh/${slug}.html`;
@@ -189,7 +199,7 @@ h1{font-size:1.55rem;margin:0 0 6px;color:#d4af37}.zh{font-family:'Noto Serif SC
 <div id="hit">Hiển thị tất cả ${count} kinh · gõ để lọc</div>
 ${groupHtml}
 <div class="foot"><p>Lữ Đăng · Tham chiếu văn hoá-tôn giáo · không thay thế tư vấn chuyên môn.</p><p><a href="/">Bát Tự Dụng Thần</a> · <a href="/sitemap-kinh.xml">Sitemap</a></p></div>
-<script>(function(){var q=document.getElementById('q'),hit=document.getElementById('hit'),items=[].slice.call(document.querySelectorAll('.kinh-item')),groups=[].slice.call(document.querySelectorAll('.bu-group')),total=${count};function run(){var s=(q.value||'').trim().toLowerCase(),n=0;items.forEach(function(li){var ok=!s||(li.getAttribute('data-q')||'').indexOf(s)!==-1;li.classList.toggle('hidden',!ok);if(ok)n++;});groups.forEach(function(g){g.classList.toggle('hidden',!g.querySelector('.kinh-item:not(.hidden)'));});hit.textContent=s?('Tìm thấy '+n+' / '+total+' kinh'):('Hiển thị tất cả '+total+' kinh');}q.addEventListener('input',run);})();</script>
+<script>(function(){var q=document.getElementById('q'),hit=document.getElementById('hit'),items=[].slice.call(document.querySelectorAll('.kinh-item')),groups=[].slice.call(document.querySelectorAll('.bu-group')),total=${count};function run(){var s=(q.value||'').trim().toLowerCase(),n=0;items.forEach(function(li){var ok=!s||(li.getAttribute('data-q')||'').indexOf(s)!==-1;li.classList.toggle('hidden',!ok);if(ok)n++;});groups.forEach(function(g){g.classList.toggle('hidden',!g.querySelector('.kinh-item:not(.hidden)'));});hit.textContent=s?('Tìm thấy '+n+' / '+total+' kinh'):('Hiển thị tất cả '+total+' kinh');}q.addEventListener('input',run);try{var uq=new URLSearchParams(location.search).get('q');if(uq){q.value=uq;run();q.focus();}}catch(e){}})();</script>
 </body></html>`;
 writeFileSync(resolve(OUT_DIR, 'index.html'), indexHtml, 'utf8');
 console.log(`[seo] Generated ${count} kinh pages + sitemap + index (${buGroups.length} 部)`);

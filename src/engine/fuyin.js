@@ -160,7 +160,7 @@ export function scanFuyin(R, scanYear) {
     // Severity: phản(8) > phục trụ(5) > chi phục(2); nhật trụ +; Dụng giảm.
     let severity = isFanyinType ? 8 : isZhiFuyinType ? 2 : 5;
     if (isDayPillar) severity += isZhiFuyinType ? 2 : 3;
-    if (mitigationNote(R, ganZhi)) severity = Math.max(1, severity - 4);
+    if (mitigationNote(R, ganZhi)) severity = Math.max((isFanyinType ? 8 : isZhiFuyinType ? 2 : 5), severity - 4); // [ cổ pháp] hóa giải giảm nhưng KHÔNG xuống dưới bản chất loại (Phản Ngâm > Phục Ngâm trụ > Chi Phục Ngâm)
 
     const meaning = isFanyinType ? FANYIN_BY_PILLAR[k] : isZhiFuyinType ? ZHI_FUYIN_BY_PILLAR[k] : FUYIN_BY_PILLAR[k];
     items.push({

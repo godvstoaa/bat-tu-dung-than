@@ -20,12 +20,12 @@ catch (e) { console.log('⚠ Playwright/chromium chưa cài — bỏ qua smoke-b
 
 let exit = 0;
 try {
-  const page = await browser.newPage();
+  const page = await browser.newPage({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1' }); // [AUDIT v3] UA iPhone thật — worker anti-bot chặn UA 'headless' (Playwright mặc định) → smoke bị 403 oan
   page.on('pageerror', (e) => pageErrors.push(String(e)));
   page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
 
   console.log(`▶ Loading ${URL} ...`);
-  await page.goto(URL, { waitUntil: 'networkidle', timeout: 30000 });
+  await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 }); // [AUDIT v3] networkidle không tới được (app poll liên tục) — domcontentloaded + đợi form
 
   // 1. App shell + birth form
   const hasForm = !!(await page.$('input[type="date"]'));
