@@ -171,6 +171,18 @@ function detectSpecial(chart, wx, strength, interactions) {
     }
 
     // 2. Ấn/比當令 hoặc 透干 → tháng/trời nuôi thân → KHÔNG từ (trừ 真从 band vô trợ)
+    // [FIX — corpus/cháu case] Ấn CÓ GỐC hiệu lực (bản khí/trung khí tại chi chưa xung/hóa)
+    //   → 印 có lực sinh thân → KHÔNG từ (vd cháu 辛金: 印 己 bản khí tại 月支丑 → 从儿 SAI)
+    let yinEffectiveRoot = false;
+    for (const zk of branchKeys) {
+      const zhiY = pillars[zk].zhi;
+      const hidY = HIDDEN[zhiY] || [];
+      let posY = -1; for (let pi = 0; pi < Math.min(hidY.length, 2); pi++) { const wY = GAN[hidY[pi]] ? GAN[hidY[pi]].wx : null; if (wY === SHENG_BY[dmWx]) { posY = pi; break; } }
+      if (posY < 0 || posY > 1) continue;
+      const clashedY = branchKeys.some((ok) => ok !== zk && CHONG_MAP[zhiY] === pillars[ok].zhi);
+      const inSanheY = Object.entries(SANHE_HUAQI || {}).find(([keys, hua]) => keys.split('').includes(zhiY) && hua !== SHENG_BY[dmWx]);
+      if (!clashedY && !inSanheY) { yinEffectiveRoot = true; break; }
+    }
     let helperTou = false;
     for (const zk of ['year', 'month', 'time']) {
       const gwx = GAN[pillars[zk].gan] ? GAN[pillars[zk].gan].wx : null;
@@ -183,7 +195,7 @@ function detectSpecial(chart, wx, strength, interactions) {
     } catch (_) {}
 
     // 3. Nhóm ngoài áp đảo + vô gốc hiệu lực → 从 (theo thế)
-    if (domRatio > 0.45 && help <= 0.40 && !dmEffectiveRoot && !helperTou && !silBlocked) { // [cap] help > 40% = 母多子病 (Ấn chủ đạo) — không phải 从
+    if (domRatio > 0.45 && help <= 0.40 && !dmEffectiveRoot && !yinEffectiveRoot && !helperTou && !silBlocked) { // [cap] help > 40% = 母多子病 (Ấn chủ đạo) — không phải 从
       const congGia = help > 0.12 || strength.ratio >= 0.25; // còn dấu vết trợ → 假从
       const map = { cai: '從財格', guan: '從殺格', shi: '從兒格' };
       const res = { kind: 'cong', name: map[dom[0]], geShen: { wx: dominantWx(dmWx, dom[0]) } };

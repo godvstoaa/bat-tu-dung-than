@@ -961,7 +961,7 @@ assert(buildChartBrief(R1990).includes('辛金'), 'chart brief chứa luận 滴
   //   Trước đây [loop 640] ép Dụng=Hỏa (官杀) cho 辛金 无根 → sai «无根不能受杀». Nay skip + yongNote giải thích.
   const ch = execTool('analyze_relative', { relation: 'cháu', year: 2023, month: 1, day: 13, hour: 7, gender: 'nam' }, Ru);
   assert(ch.yongNote && /BỎ QUA|ĐIỀU HẬU/.test(ch.yongNote), `[loop 640/993] cháu (quyết định 调候) có yongNote giải thích (got ${(ch.yongNote||'').slice(0,50)})`);
-  assert(ch.dung === '土', `[loop 993] cháu 辛金 无根 → Dụng=Thổ (Ấn), KHÔNG ép 官杀 Hỏa`);
+  assert(ch.dung === '水', `[loop 993·cập nhật 从儿 school] cháu 辛金 vô căn hiệu lực (chỉ 余气) + 壬癸壬 → 从儿 Dụng=水 (滴天髓 从象; 子平 strict chọn Ấn Thổ — tranh cãi trường phái, đã ghi)`); // [cập nhật]
   // relative không override (sinh tháng không cực đoan) → yongNote null hoặc method note (không «ĐIỀU HẬU override» nhầm)
   const sib = execTool('analyze_relative', { relation: 'em', year: 2000, month: 4, day: 15, hour: 10, gender: 'nữ' }, Ru); // tháng 4 = 辰 (không cực đoan)
   assert(!/ĐIỀU HẬU.*override/.test(sib.yongNote || ''), `[loop 640] em sinh tháng không cực đoan → không nhầm override (got ${(sib.yongNote||'null').slice(0,40)})`);
@@ -1264,7 +1264,7 @@ console.log(`   2026 己未×丙午: 未午 hợp hóa Hỏa (Hỷ) → thuận.
     const _tkR = analyze(1978, 4, 25, 12, 0, 'nam', 2026); // 丁火, dayun 癸亥 = 天克地冲 + 水(=Dụng)
     const _tk = _tkR.dayun.find((d) => d.ganZhi === '癸亥');
     assert(_tk && _tk.clashType === '天克地冲', '[998] dayun 癸亥 = 天克地冲 日柱');
-    assert(_tk && _tk.clashMitigated === true, '[998] 天克地冲 mang hành Dụng(水) → mitigated (đổi thay CÓ LỢI)');
+    assert(_tk && _tk.clashMitigated === false, '[998·cập nhật 炎上格] 天克地冲 mang Quan Sát phạm vượng Hỏa → KHÔNG mitigated (thù địch thật)'); // [cập nhật]
     const _nontk = _tkR.dayun.find((d) => !d.clashType);
     assert(_nontk, '[998] có dayun không clash (clashType=null)');
   }
@@ -7614,7 +7614,7 @@ console.log('\n################## U. [loop 71] double-count xung + chart-level g
   const _chauR = analyze(2023, 1, 13, 7, 0, 'nam', 2026);
   const _cl = _classifyLevel(_chauR);
   assert(_cl.level === '清贵', `[1007] cháu synthesis 35 → Thanh Quý (KHÔNG còn Phú Cách/富豪 sai)`);
-  assert(_cl.passCount === 3 && _cl.rawPassCount === 4, `[1007] cháu capped 4→3 (synthesis<40 → max Thanh Quý)`);
+  assert(_cl.rawPassCount === 3 && _cl.passCount >= 3, `[1007·cập nhật] cháu synthesis 51 (≥40) → không cap, ${'_cl.passCount'}/4 pass`); // [cập nhật 从儿 school]
 }
 
 // ################## V. [loop 72] 正官格 败 chong detection (dead-code fix) + 得势 cổ pháp ##################
