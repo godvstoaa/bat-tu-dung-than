@@ -35,6 +35,12 @@ export const PATTERN_VI = {
   從殺格: 'Tòng Sát cách',
   從兒格: 'Tòng Nhi cách (Tòng Thực Thương)',
   從旺格: 'Tòng Vượng cách',
+  // hóa khí cách (Thiên Can Ngũ Hợp HÓA)
+  化土格: 'Hóa Thổ cách (Giáp Kỷ hợp hóa)',
+  化金格: 'Hóa Kim cách (Ất Canh hợp hóa)',
+  化水格: 'Hóa Thủy cách (Bính Tân hợp hóa)',
+  化木格: 'Hóa Mộc cách (Đinh Nhâm hợp hóa)',
+  化火格: 'Hóa Hỏa cách (Mậu Quý hợp hóa)',
 };
 
 // ---- Ưu tiên Dụng/Thích/Kỵ của từng cách (theo nhóm Thập Thần) ----
@@ -63,6 +69,33 @@ export const PATTERN_PREF = {
   從旺格: { special: 'cong', yong: ['ti', 'yin'], xi: ['ti', 'yin'], ji: ['guan', 'cai', 'shi'], note: 'Tòng Vượng — Nhật Chủ cực vượng, theo vượng thế — lấy Tỷ Kiếp / Ấn; kỵ Quan – Tài – Thực Thương phá thế.' },
 };
 
+// ---- 化氣格 (Thiên Can Ngũ Hợp HÓA KHÍ) — pref tính ĐỘNG theo quan hệ Nhật Chủ ↔ Hóa Thần ----
+//   Nhóm thập thần (ti/yin/shi/cai/guan) luôn TỎNG ĐỐI với NHẬT CHỦ, mà CÙNG tên cách
+//   «化土格» sinh được từ CẢ HAI can của cặp hợp (甲 hoặc 己) — cùng một chữ nhóm ↔ hành
+//   KHÁC nhau theo can ngày. Nên pref CHỐT ĐỒNG phải dựng Runtime theo dmWx thật
+//   (buildHuaqiPref — gọi trong detectSpecial); bản ghi tĩnh dưới đây chỉ là fallback.
+//     yong = nhóm CỦA HÓA THẦN + nhóm HÀNH SINH hóa thần (nuôi hóa — 化神得生);
+//     ji   = nhóm HÀNH KHẮC hóa thần (克化神 → phá hóa) + Tỷ Kiếp (trợ thân → nhật chủ
+//            hồi hoàn, «化见本气比劫则不化») — TRỪ khi Hóa Thần chính là bản hành nhật chủ
+//            (己 hợp 甲 / 庚 hợp 乙): 比劫 = chính hóa thần, trợ nó là THUẬN hóa.
+const HUA_QI_HE = { 甲: '土', 己: '土', 乙: '金', 庚: '金', 丙: '水', 辛: '水', 丁: '木', 壬: '木', 戊: '火', 癸: '火' };
+const HUA_WX_VI = { 土: 'Thổ', 金: 'Kim', 木: 'Mộc', 水: 'Thủy', 火: 'Hỏa' };
+function buildHuaqiPref(dmWx, huaWx) {
+  const grpHua = relGroup(dmWx, huaWx);           // nhóm của Hóa Thần
+  const grpGen = relGroup(dmWx, SHENG_BY[huaWx]); // nhóm hành sinh Hóa Thần
+  const grpKe = relGroup(dmWx, KE_BY[huaWx]);     // nhóm hành khắc Hóa Thần
+  const yong = [grpHua, grpGen];
+  const ji = (grpHua === 'ti' || grpKe === 'ti') ? [grpKe] : [grpKe, 'ti'];
+  return {
+    special: 'huaqi', wx: huaWx,
+    yong, xi: [...yong], ji,
+    note: `Hóa ${HUA_WX_VI[huaWx]} — Nhật Chủ ngũ hợp HÓA thành ${huaWx}, bỏ bản chất cũ theo hóa thần: lấy nhóm ${yong.join('/')} (hóa thần + hành sinh hóa); kỵ nhóm ${ji.join('/')} (khắc hóa thần phá hóa / Tỷ Kiếp giúp thân hồi hoàn).`,
+  };
+}
+for (const [dg, huaWx] of Object.entries(HUA_QI_HE)) {
+  PATTERN_PREF[`化${huaWx}格`] = buildHuaqiPref(GAN[dg].wx, huaWx);
+}
+
 // Lộc & Nhận của Nhật Can (để nhận diện Kiến Lộc / Nguyệt Nhận)
 import { LU_SHEN, YANG_REN } from './shensha.js';
 
@@ -80,13 +113,15 @@ export function computePattern(chart, wx, strength, interactions) {
   // === Bước 0: kiểm cách đặc biệt trước (ưu tiên cao khi đạt ngưỡng) ===
   const special = detectSpecial(chart, wx, strength, interactions);
   if (special) {
-    const pref = PATTERN_PREF[special.name];
+    // [化气] special.pref đã dựng đúng hướng theo can ngày thật — ưu tiên hơn bản tĩnh
+    const pref = special.pref || PATTERN_PREF[special.name];
     return {
       type: 'special',
       name: special.name,
       vi: PATTERN_VI[special.name] || special.name,
       geShen: special.geShen || null,
-      shunNi: 'thuận thế',
+      shunNi: special.shunNi || 'thuận thế',
+      ...(special.congGia !== undefined ? { congGia: special.congGia } : {}),
       pref, note: pref.note, special,
     };
   }
@@ -138,6 +173,78 @@ function detectSpecial(chart, wx, strength, interactions) {
   const total = wx.total || 1;
 
   const CHONG_MAP = { 子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳' };
+
+  // -- HÓA KHÍ cách (天干五合化气) — [三命通会 化气十段锦 / 滴天髓 化象] --
+  //   Điều kiện NGHIÊM NGẶT (sai 1 → KHÔNG hóa, trở về chính cách/tòng cách):
+  //   (1) NHẬT CAN + can KỀ CẠNH (Tháng hoặc Giờ — KHÔNG tính Năm, xa quá không hợp) lập ngũ hợp;
+  //   (2) HÓA THẦN có lực: đắc nguyệt lệnh (bản khí nguyệt chi, hoặc 司令 nếu có ngày thật)
+  //       HOẶC thấu can (can khác ngoài 2 can hợp) + CÓ GỐC (bản/trung khí tại chi nào);
+  //   (3) KHÔNG PHÁ HÓA: không can khác khắc Hóa Thần thấu can (克化神 → hóa tan);
+  //   (4) NHẬT CHỦ gần như vô gốc: còn BẢN KHÍ gốc (bất luận chi nào) → 「有根不化」;
+  //       chỉ còn trung/dư khí → HÓA ĐƯỢC nhưng 假化 (congGia — hóa chưa thuần).
+  {
+    const HUA_GE = { 土: '化土格', 金: '化金格', 木: '化木格', 水: '化水格', 火: '化火格' };
+    const branches = ['year', 'month', 'day', 'time'];
+    const dmWxEff = dmWx || (GAN[chart.dayGan] && GAN[chart.dayGan].wx); // _ff (selftest) chỉ có dayMaster.gan
+    // (4) góc nhật chủ — quét MỘT LẦN (điều kiện này độc lập cặp hợp)
+    let dmRootPos = -1; // -1 = vô gốc hiệu lực
+    for (const zk of branches) {
+      const hid2 = HIDDEN[chart.pillars[zk].zhi] || [];
+      const idx = hid2.findIndex((hg) => GAN[hg] && GAN[hg].wx === dmWxEff);
+      if (idx >= 0 && (dmRootPos < 0 || idx < dmRootPos)) dmRootPos = idx;
+    }
+    if (dmRootPos !== 0) { // còn bản khí gốc → 「日主有根不化」— bỏ qua toàn bộ 化气
+      for (const k of ['month', 'time']) {
+        const pK = chart.pillars[k];
+        if (!pK || !pK.gan || pK.gan === chart.dayGan) continue;
+        // HUA_QI_HE khóa theo TỪNG can (mỗi can chỉ hợp duy nhất 1 đối tác, cùng hóa):
+        // can kề có hóa + nhật can có hóa + hai can KHÁC nhau ⟺ hai can là đối tác ngũ hợp
+        const huaWx = HUA_QI_HE[pK.gan];
+        if (!huaWx || huaWx !== HUA_QI_HE[chart.dayGan]) continue;
+        // 争合 / 妒合 BẤT HÓA (三命通会): nhật can bị ≥2 đối tác cùng cặp hợp tranh giành
+        //   (vd 癸 nhật gặp 戊 tháng VÀ 戌 giờ) — thế hợp bị chia, tất không hóa.
+        const partnerCount = branches.filter((pk) => pk !== 'day').filter((pk) => {
+          const g = chart.pillars[pk].gan;
+          return g !== chart.dayGan && HUA_QI_HE[g] === huaWx;
+        }).length;
+        if (partnerCount > 1) continue;
+        const inHe = new Set([chart.dayGan, pK.gan]);
+        // (3) phá hóa — can khác khắc hóa thần
+        const poHua = branches.some((pk) => {
+          const g = chart.pillars[pk].gan;
+          return !inHe.has(g) && GAN[g].wx && KE[GAN[g].wx] === huaWx;
+        });
+        if (poHua) continue;
+        // (2a) đắc lệnh: bản khí nguyệt chi (fallback 司令 khi có ngày sinh thật)
+        let cmdWx = HIDDEN[monthZhi] && GAN[HIDDEN[monthZhi][0]] ? GAN[HIDDEN[monthZhi][0]].wx : null;
+        try {
+          const sil = computeSiling(chart);
+          if (sil && sil.wx) cmdWx = sil.wx;
+        } catch (_) {}
+        // (2b) hoặc thấu can (ngoài 2 can hợp) + có gốc bản/trung khí — đường này KÉM
+        //   chắc bằng đắc lệnh nên đòi nhật chủ VÔ GỐC TUYỆT ĐỐI (cả dư khí cũng không)
+        const touGan = branches.some((pk) => {
+          if (pk === 'day') return false;
+          const g = chart.pillars[pk].gan;
+          return !inHe.has(g) && GAN[g].wx === huaWx;
+        });
+        const huaRoot = branches.some((zk) => {
+          const hid2 = HIDDEN[chart.pillars[zk].zhi] || [];
+          return hid2.slice(0, 2).some((hg) => GAN[hg] && GAN[hg].wx === huaWx);
+        });
+        if (!(cmdWx === huaWx || (touGan && huaRoot && dmRootPos === -1))) continue;
+        // Đủ điều kiện → thành Hóa khí cách (ưu tiên trên Tòng: hóa là chuyển chất, sâu hơn theo thế)
+        const res = { kind: 'huaqi', name: HUA_GE[huaWx], geShen: { wx: huaWx }, shunNi: 'thuận dụng' };
+        res.pref = buildHuaqiPref(dmWxEff, huaWx); // pref ĐÚNG HƯỚNG theo can ngày thật (xem chú thích trên buildHuaqiPref)
+        res.congGia = dmRootPos >= 1; // còn trung/dư khí căn → 假化
+        if (res.congGia) {
+          res.note = 'Nhật chủ chỉ còn trung/dư khí căn → 假化 (hóa chưa thuần) — vận gặp bản khí gốc hoặc khắc hóa thần = hồi hoàn, biến động lớn.';
+        }
+        return res;
+      }
+    }
+  }
+
   // -- TỒNG cách (Nhật Chủ theo thế) — [chuẩn 滴天髓 从象 + corpus 2026-08] --
   //   Tiêu chí CỐT LÕI = HIỆU LỰC GỐC (root effectiveness), không phải % thô:
   //   gốc VÔ HIỆU nếu: (a) chỉ 余气 (pos ≥ 2 — quá mỏng), (b) chi gốc bị XUNG bởi trụ khác

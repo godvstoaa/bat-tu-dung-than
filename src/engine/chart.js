@@ -286,16 +286,21 @@ export function analyzeStrength(chart, wx) {
   if (deDia) sanFaBonus += 0.03;                    // 得地 có căn (~30%)
   const effRatio = ratio + sanFaBonus;
 
-  // [IMPROV 4 — 中和 band] dải 0.47–0.53 = THÂN TRUNG HÒA (cân bằng): cổ法 «中和者贵» —
+  // [IMPROV 4 — 中和 band] dải = THÂN TRUNG HÒA (cân bằng): cổ法 «中和者贵» —
   //   thân không vượng không nhược → Dụng THEO CÁCH CỤC (thế cục quyết, không ép phù ức).
   //   Downstream (computeFuYi/findYongShen) vẫn chạy nhánh Phù Ức thường qua `strong` —
   //   `strong` giữ NGUYÊN ranh giới cũ (≥0.50 = vượng-side) để không đảo Dụng/Ngụng: chỉ
-  //   NHÃN level đổi (0.50–0.53 cũ «Thân vượng» nay «Trung hòa», 0.47–0.50 cũ «Thân nhược»
-  //   nay «Trung hòa») — không crash, 扶抑 vẫn cho primary hợp lý.
+  //   NHÃN level đổi (0.50–0.51 «Trung hòa», 0.49–0.50 «Trung hòa») — không crash, 扶抑 vẫn
+  //   cho primary hợp lý.
+  //   [cập nhật 中和 narrow — corpus 滴天髓] dải 0.47–0.53 quá RỘNG: 任铁樵 (effRatio 0.512) và
+  //   奋郁·清厚 (0.523) cổ pháp đọc VƯỢNG («日主坐当令之禄», 羊刃当令) mà engine né vào «trung hòa»;
+  //   丙申从杀 (0.489) cổ pháp đọc NHƯỢC. Thu hẹp còn (0.49, 0.51) — chỉ cân bằng THẬT SỰ mới
+  //   trung hòa; 0.512/0.523 → vượng, 0.489 → nhược. `strong` KHÔNG đổi (vẫn ranh giới 0.50)
+  //   → 扶抑/Dụng downstream bất biến, chỉ nhãn vượng-suy chính xác hơn theo cổ pháp.
   let level, strong;
   if (effRatio >= 0.62) { level = 'Thân quá vượng'; strong = true; }
-  else if (effRatio >= 0.53) { level = 'Thân vượng'; strong = true; }
-  else if (effRatio > 0.47) {
+  else if (effRatio >= 0.51) { level = 'Thân vượng'; strong = true; }
+  else if (effRatio > 0.49) {
     level = 'Thân trung hòa (cân bằng — Dụng theo cách cục)';
     strong = effRatio >= 0.50; // giữ hướng Phù Ức theo ranh giới cũ — an toàn downstream
   }
@@ -421,6 +426,48 @@ export function findYongShen(chart, wx, strength, pattern, interactions) {
   reasons.push(...fuYi.reasons);
   method.push('Phù Ức (扶抑)');
 
+  // --- [泄旺 — 滴天髓 «旺之极者不可损»] hành THÁI QUÁ → tiết (泄) thay vì khắc (克) ---
+  //   Cổ pháp: một hành chiếm ÁP ĐẢO toàn cục («旺之极» — 昆仑之水可顺不可逆, 汪洋之势,
+  //   重重厚土, 烈火其势猛烈) thì KHÔNG THỂ khắc chế («不可损») — dùng khắc chỉ gia tăng
+  //   kích điện («激») mà phải dùng hành nó SINH RA để tiết hơi («泄其泛滥», «发泄菁华»,
+  //   «泄火吐秀»). Phù Ức thân-vượng lấy Tài/Quan = 克 hành thái quá → SAI hướng đúng
+  //   滴天髓 cho các lá vượng-cực (corpus: kunlun/houtu/huoyan).
+  //   Trigger (chọn lọc để không đụng chart thường): strength.strong (hướng vượng) +
+  //   hành mạnh nhất toàn cục THÁI QUÁ (≥48% gần áp đảo, HOẶC ≥42% mà gấp 1.8× hành nhì —
+  //   «một mình một cõi») + primary Phù Ức đang 克 nó (primary===KE[e*] hay KE[primary]===e*
+  //   — cả Tài-bị-克-lại lẫn Quan-đi-克 đều là «损»).
+  const _wxSorted = WUXING.slice().sort((a, b) => (wx.pct[b] || 0) - (wx.pct[a] || 0));
+  const _eWx = _wxSorted[0];                                   // hành thái quá nhất toàn cục (kể cả khí Nhật Chủ — «昆仑之水» chính là khí 壬)
+  const _pctE = wx.pct[_eWx] || 0;
+  const _secondPct = wx.pct[_wxSorted[1]] || 0;
+  const _taiQua = _pctE >= 48 || (_pctE >= 42 && _pctE >= 1.8 * _secondPct);
+  if (_taiQua && strength.strong && (primary === KE[_eWx] || KE[primary] === _eWx)) {
+    let drain = SHENG[_eWx];                                   // 泄: hành e* sinh ra (旺者宜泄)
+    //   «会局归库»: nếu tứ trụ có tam hợp/tam hội ĐỦ mà hoá thần = hành drain vừa SINH RA
+    //   (khí e* tiết một cấp rồi «hội» thành thể mới —vd 烈火逢湿土: 土泄火 mà 巳酉丑会金
+    //   归库 → cổ pháp lấy 金 làm Dụng, «酉金…又能泄火吐秀») → 泄 tgt = hoá thần đó.
+    //   Guard: frame phải chứa chi bản-khí là e* hoặc drain (khí thật trong cục), và hoá
+    //   thần ≠ primary cũ (nếu trùng thì chẳng đổi gì — bỏ).
+    const _zset = new Set([chart.yearZhi, chart.monthZhi, chart.dayZhi, chart.hourZhi].filter(Boolean));
+    const _mainQi = (b) => (HIDDEN[b] && HIDDEN[b][0] && GAN[HIDDEN[b][0]] ? GAN[HIDDEN[b][0]].wx : null);
+    for (const [gKey, huaWx] of [...Object.entries(SANHE_HUAQI), ...Object.entries(SANHUI_HUAQI)]) {
+      const members = gKey.split('');
+      if (!members.every((b) => _zset.has(b))) continue;
+      if (huaWx !== SHENG[drain] || huaWx === primary) continue;
+      if (members.some((b) => _mainQi(b) === _eWx || _mainQi(b) === drain)) { drain = huaWx; break; }
+    }
+    const _oldPrimary = primary;
+    primary = drain;
+    secondary = _oldPrimary;   // element 克 cũ giáng phụ (oldPrimary luôn ≠ drain: 克-e* ≠ SHENG-e*)
+    reasons.push(`⚡ 泄旺 (滴天髓 «旺之极者不可损»): hành ${_eWx} (${WX_VI[_eWx] || _eWx}) thái quá (~${_pctE}% toàn cục) — khắc chỉ «激» vượng thêm; dùng ${WX_VI[drain] || drain} (${drain}) tiết thay vì khắc («${_eWx}旺极, 宜泄不宜克, 顺其势而泄之»).`);
+    method.push('泄秀 (泄旺势)');
+    // Gỡ reason «Kỵ:» CŨ còn liệt kê primary/Hỷ MỚI (phù-ức avoid cũ mâu thuẫn Dụng 泄 mới)
+    const _newXi0 = SHENG_BY[drain];
+    for (let i = reasons.length - 1; i >= 0; i--) {
+      if (/^Kỵ:/.test(reasons[i]) && (reasons[i].includes(`(${drain})`) || reasons[i].includes(`(${_newXi0})`))) reasons.splice(i, 1);
+    }
+  }
+
   // --- Bổ sung: Bệnh Dược ---
   const bingYao = computeBingYao(chart, wx, strength);
   if (bingYao) {
@@ -505,6 +552,10 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
   //   Từ cách «tòng/tracking thế» — đã theo thế cục thì 调候 không đè (cổ法: «从格
   //   不论调候»). Trước đây 调候 override CHẾT 从財格 用神 (火→Thủy) → Dụng SAI.
   const isSpecial = method.includes('Cách cục đặc biệt');
+  // [泄旺] Dụng đã theo hướng 泄旺势 (滴天髓 «旺之极者不可损») — thuận SÁCH LỰC thế cục.
+  //   Cổ法 cho vượng-cực: «顺泄» đứng TRÊN 调候 (任铁樵注 壬水仲冬仍取甲木泄, không lấy 火暖)
+  //   → 调候 chỉ ghi chú phối hợp, KHÔNG override primary 泄.
+  const _xieWang = method.includes('泄秀 (泄旺势)');
   let tiaoOverride = false;
   // [loop 993 FIX] 调候 override KHÔNG ép 官杀 (khắc thân) làm Dụng khi Nhật Chủ 极弱无根.
   //   Cổ法 «寒金喜火炼» chỉ đúng khi thân CÓ căn; còn «无根身弱不能受杀» — ép 官杀 (+喜 Tài
@@ -536,7 +587,7 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     reasons.push(`🌡️ Điều Hậu (调候) tháng ${chart.monthZhi} cần ${tiaoStemsVi(tiaoRaw)} ${clim ? clim.need : ''}, NHƯNG ${_why} → KHÔNG ép làm Dụng CHÍNH (Phù Ức ưu tiên). Giữ Phù Ức (${primary}) làm chủ; ${tiaoPrimaryWx} xuống secondary — chỉ phối khi ĐÃ đủ Dụng chính (vd 官印相生), không thì khắc/hao thân.`);
     if (tiaoPrimaryWx !== primary && tiaoPrimaryWx !== secondary) secondary = tiaoPrimaryWx;
   }
-  if (isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary && !isSpecial && !_skipForGuan) {
+  if (isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary && !isSpecial && !_skipForGuan && !_xieWang) {
     tiaoOverride = true;
     const fuyiPrimary = primary;
     primary = tiaoPrimaryWx;                                  // 调候 lên làm chủ
@@ -558,6 +609,11 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     for (let i = reasons.length - 1; i >= 0; i--) {
       if (/^Kỵ:/.test(reasons[i]) && (reasons[i].includes(`(${primary})`) || reasons[i].includes(`(${_newXi})`))) reasons.splice(i, 1);
     }
+  }
+
+  // [泄旺] 调候 bị HẠM khi Dụng đã theo 泄旺势 — ghi chú phối hợp, không đảo Dụng.
+  if (_xieWang && isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary && tiaoPrimaryWx !== secondary) {
+    reasons.push(`🌡️ Điều Hậu (调候) tháng ${chart.monthZhi} cần ${tiaoStemsVi(tiaoRaw)} ${clim ? clim.need : ''} — NHƯNG hành thái quá phải thuận thế mà tiết («旺之极者不可损») → giữ 泄旺 Dụng ${primary} làm chủ, ${tiaoPrimaryWx} chỉ phối khi vận/năm mang tới.`);
   }
 
   // --- BỘ 用喜忌仇 (Dụng – Hỷ – Kỵ – Thù) — tính từ primary SAU override ---
