@@ -96,7 +96,8 @@ import { rankDayun } from './engine/dayun-rank.js'; // [loop 1078] rich totalSco
 import { computeMarriageShensha, computeExtraShensha } from './engine/shensha-marriage.js';
 import { viToHan } from './engine/vi2han.js';
 import { askAI, getConfig, setConfig, isAIReady, PRESETS, testAIConnection, suggestFollowups, buildChartBrief } from './engine/ai.js';
-import { checkNeo } from './engine/neo-checker.js'; // [RESTORE] bị mất khi process song song prune — neo accuracy checker
+import { checkNeo } from './engine/neo-checker.js';
+import { initLanding } from './landing.js'; // [LANDING v1] màn đầu sống động — hôm nay + quote + sample // [RESTORE] bị mất khi process song song prune — neo accuracy checker
 // [NATIVE iOS] Capacitor plugins — native feel (haptics + status bar) để không bị coi là «repackaged website» (4.2).
 //   Web: plugin tự no-op (web implementation) — không crash trình duyệt.
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -6509,6 +6510,9 @@ function _savedStore(list) { try { localStorage.setItem(_SAVED_KEY, JSON.stringi
   }
   render();
 })();
+
+// [LANDING v1] khởi tạo màn đầu — sample 1-chạm chạy lá số trình diễn
+if (import.meta.env.MODE !== 'ios') initLanding({ onSample: () => { const f = document.getElementById('birth-form'); if (f) { f.requestSubmit ? f.requestSubmit() : f.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); const r = document.getElementById('result'); if (r) setTimeout(() => r.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200); } } });
 
 $('birth-form').addEventListener('submit', (e) => { e.preventDefault(); run().catch((err) => console.warn('run submit:', err && err.message)); });
 $('ask-btn').addEventListener('click', handleAsk);
