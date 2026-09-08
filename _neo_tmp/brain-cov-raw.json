@@ -1,0 +1,1672 @@
+{
+  "done": 196,
+  "covs": [
+    {
+      "ts": 1788845006373,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "thầy ơi kiếp trước con có phải là atula ko, kiếp trước con l"
+    },
+    {
+      "ts": 1788446702330,
+      "coverage": 50,
+      "nodesTotal": 6,
+      "q": "nghe cứ sai sai sao á, trường con không có CLB nào như thế c"
+    },
+    {
+      "ts": 1788443021462,
+      "coverage": 33,
+      "nodesTotal": 6,
+      "q": "CHứ thầy không xem được là bạn thân mới con là đứa nào hả. T"
+    },
+    {
+      "ts": 1788438852156,
+      "coverage": 50,
+      "nodesTotal": 6,
+      "q": "bạn mới sắp tới của con là người thế nào vậy thầy, con hướng"
+    },
+    {
+      "ts": 1788438343357,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "Chuyện bạn bè thì sao thầy, giờ chưa đi học mà con cô đơn qu"
+    },
+    {
+      "ts": 1788431895428,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "Con học đại học thầy có lời khuyên gì khi nhìn vào bát tự kh"
+    },
+    {
+      "ts": 1788431268999,
+      "coverage": 100,
+      "nodesTotal": 5,
+      "q": "con học đại học ngành Thương Mại Điện Tử tại đại học luật th"
+    },
+    {
+      "ts": 1788428864421,
+      "coverage": 100,
+      "nodesTotal": 5,
+      "q": "Ba năm cấp ba, con đi học trong môi trường khá độc hại vì nơ"
+    },
+    {
+      "ts": 1788414102687,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "Nhà con gần đây cãi nhau, và con cảm thấy không an lòng khi "
+    },
+    {
+      "ts": 1788413892855,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "hôm nay con nên từ quê vào sg lại k, mệt qá"
+    },
+    {
+      "ts": 1788413790339,
+      "coverage": 25,
+      "nodesTotal": 4,
+      "q": "con mệt mỏi quá thầy ơi, nhà con vừa có 3 cái tang, giờ ngườ"
+    },
+    {
+      "ts": 1787972252574,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "con với người sinh ngày 9 thg 12, 2002 có hợp k"
+    },
+    {
+      "ts": 1787774898962,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "còn cái tang nào nữa k"
+    },
+    {
+      "ts": 1787774732592,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "ông nội chứ k phải ông ngoại"
+    },
+    {
+      "ts": 1787774621893,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "thầy coi thử câc tang đó có trùng vs lá số k, con nhớ thầy c"
+    },
+    {
+      "ts": 1787774296219,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "thầy ơi phía ngoại anh họ con mất ngày 11/4/2026 âm, bà ngoạ"
+    },
+    {
+      "ts": 1787683211819,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "nếu v ngươiif sinh 09/04/2008 mà con gặp vào 2026 là k phải "
+    },
+    {
+      "ts": 1787682991725,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "nhưng co. vẫn thấy con k sai, là do hết duyên đko hay người "
+    },
+    {
+      "ts": 1787682156300,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "tháng 10-12/2024, con disconnect vơie 1 nhóm khác nữa, có th"
+    },
+    {
+      "ts": 1787682034496,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "đầu 2024 dương con có disconnect với 1 nhóm khá thân vì hiểu"
+    },
+    {
+      "ts": 1787681403789,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "năm 2022 con bắt đầu gặp người sinh 22/9/1987 và connect làm"
+    },
+    {
+      "ts": 1787680599496,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "nỗi lo lớn nhất của con bây giờ là tiền bạc, con sợ ba mẹ bệ"
+    },
+    {
+      "ts": 1787679705118,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "con k từng nghĩ tới ng ngoài nên cứ trách gia đình, nhưng nế"
+    },
+    {
+      "ts": 1787679274150,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "v người đánh trách là người ngoài đko, họ đã làm gia đình bấ"
+    },
+    {
+      "ts": 1787679087853,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "năm 2008-2009 là lúc con bắt đầu gánh vát thêm trách nhiệm đ"
+    },
+    {
+      "ts": 1787620936619,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "3 ngày nữa là chung cửu bà con tức thứ 6 tuần này ngày 28/8/"
+    },
+    {
+      "ts": 1787620413021,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "bà con mới mất ngày 23/4/2026 âm lịch, k phải mất lâu"
+    },
+    {
+      "ts": 1787620155493,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "với trong mơ dường như làm sắc v là để đầu bà k bị cong ra s"
+    },
+    {
+      "ts": 1787620083673,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "ý con là nó sụp lâu r á trước khi con mơ hôm nay r"
+    },
+    {
+      "ts": 1787619811677,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "có phải là bà về k, và con nhớ đúng là mộ có sụp nhưng mẹ nó"
+    },
+    {
+      "ts": 1787619204196,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "con vừa mơ thấy cảnh bà ngoại mất lúc cỡ 7h35 sáng cỡ đó, co"
+    },
+    {
+      "ts": 1787595915568,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "con nhớ lá số hắn bổ con con hay gì"
+    },
+    {
+      "ts": 1787595706239,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "hắn nhỏ v có thực sự là người chồng giúp ích k? lá số hắnvoo"
+    },
+    {
+      "ts": 1787595305881,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "Về chuyện \"có đáng lấy không\", lá số đôi nói vậy: sao chồng "
+    },
+    {
+      "ts": 1787595102988,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "tương lai hắn sẽ gánh được gì phụ con, có xứng đáng để chọn "
+    },
+    {
+      "ts": 1787594734602,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "người đó chần chừ ngỏ lời vì có vẻ tự ti, nghĩ nhiều, có phả"
+    },
+    {
+      "ts": 1787594656392,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "giới tính nam, k biết giờ sinh"
+    },
+    {
+      "ts": 1787594361940,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "người sinh 09/04/2008 có trưởng thành cảm xúc hơn con k?, vì"
+    },
+    {
+      "ts": 1787594280966,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "người sinh 09/04/2008 có trưởng thành cảm xúc hơn con k?"
+    },
+    {
+      "ts": 1787589412217,
+      "coverage": 50,
+      "nodesTotal": 6,
+      "q": "Tôi đang muốn tai nghe màu hồng nhưng mà màu không hợp  mệnh"
+    },
+    {
+      "ts": 1787565678750,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "Người kia đang là một núi như thế — con cứ giữ thước 90 ngày"
+    },
+    {
+      "ts": 1787559978110,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "nếu nói mậu thì có phải người chồng con đều sẽ có mậu trong "
+    },
+    {
+      "ts": 1787308273407,
+      "coverage": 50,
+      "nodesTotal": 4,
+      "q": "Anh chị em ⚠ Kỵ 27/100 — nhược · Tỷ Kiếp (cung 酉 xung) ⚠ Sao"
+    },
+    {
+      "ts": 1787280848807,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "nay có nên bắt chuyện/tỏ tình với người sinh 09/04/2008 ko"
+    },
+    {
+      "ts": 1787209356301,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "người đó đang ghen nghĩ con vs ng khác, nãy go  thiếu"
+    },
+    {
+      "ts": 1787209181794,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "ng đó đang hen, 2 con chưa nc lâgn nào"
+    },
+    {
+      "ts": 1787209003244,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "nói gì"
+    },
+    {
+      "ts": 1787208932114,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "giờ nào tốt nhất"
+    },
+    {
+      "ts": 1787208633804,
+      "coverage": 50,
+      "nodesTotal": 4,
+      "q": "Vận hôm nay. Vận hôm nay có phù hợp để tỏ tình với người sin"
+    },
+    {
+      "ts": 1787111667755,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "người mà con hỏi thầy 09/04/2008 tính tình họ sao, s con ngh"
+    },
+    {
+      "ts": 1787078019095,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "con với người sinh 09/04/2008 có thể có con như lá số nói k"
+    },
+    {
+      "ts": 1787077772312,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "Tôi có con trai hay con gái, mấy người?"
+    },
+    {
+      "ts": 1787077559092,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "cách người đó yêu thương con? người đó có từng làm gì cho co"
+    },
+    {
+      "ts": 1787077294985,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "con 26 tuổi r, đợi 5 năm v có đáng k, và b ấy tính tình ra s"
+    },
+    {
+      "ts": 1787076927506,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "con đang mập mờ với người sinh 09/04/2008, 2 bên đều thích n"
+    },
+    {
+      "ts": 1787064557507,
+      "coverage": 100,
+      "nodesTotal": 4,
+      "q": "Vậy có chắc chắn hai đứa đi cùng nhau đến thành vợ chồng khô"
+    },
+    {
+      "ts": 1787064350169,
+      "coverage": 67,
+      "nodesTotal": 6,
+      "q": "Hiện tại hai đứa đã chấp nhận chia tay vì gia đình ngăn cản."
+    },
+    {
+      "ts": 1787064132522,
+      "coverage": 50,
+      "nodesTotal": 4,
+      "q": "Xem giúp t ngày sinh của anh này có hợp lhoong. Có duyên lâu"
+    },
+    {
+      "ts": 1787063860659,
+      "coverage": 50,
+      "nodesTotal": 4,
+      "q": "Tình duyên"
+    },
+    {
+      "ts": 1787063392378,
+      "coverage": 75,
+      "nodesTotal": 4,
+      "q": "Tình duyên"
+    },
+    {
+      "ts": 1786956314021,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "2029 thế nào"
+    },
+    {
+      "ts": 1786955839620,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "năm nay thế nào?"
+    },
+    {
+      "ts": 1786952561563,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "Tôi có vướng âm tà/nghiệp gì theo lá số không?"
+    },
+    {
+      "ts": 1786794056279,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "mô tả chi tiết thằng chồng"
+    },
+    {
+      "ts": 1786793694824,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "chồng tương lai của tôi thế nào"
+    },
+    {
+      "ts": 1786729343310,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "Thầy tử vi từng nói con là người có tiền rồi cũng sẽ đi làm "
+    },
+    {
+      "ts": 1786727362552,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "bạn thân của con, thầy kêu là sắp tới lúc bơ vơ nhập học là "
+    },
+    {
+      "ts": 1786727151062,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "sức khỏe tinh thần con ổn không thầy ha, cỡ đó"
+    },
+    {
+      "ts": 1786726732014,
+      "coverage": 100,
+      "nodesTotal": 5,
+      "q": "Thầy cho con biết bốn năm đại học tới của con thế nào không "
+    },
+    {
+      "ts": 1786725783648,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "con đã nói dì ruột con. Là em gái của mẹ con, dì ấy nói sẽ c"
+    },
+    {
+      "ts": 1786725506818,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "con chuẩn bị vào đại học, là một trường có tiếng. Con khá lo"
+    },
+    {
+      "ts": 1786718201034,
+      "coverage": 33,
+      "nodesTotal": 6,
+      "q": "Con mới nhắn tin vay dì ruột con lúc 8h tối nay, vay em gái "
+    },
+    {
+      "ts": 1786717944089,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "Trời ạ, con đã đỗ đại học danh tiếng rồi, mà đang sợ không l"
+    },
+    {
+      "ts": 1786717693661,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "Kiểu con có khả năng lo học đại học mà không lo lắng về tiền"
+    },
+    {
+      "ts": 1786717456226,
+      "coverage": 100,
+      "nodesTotal": 5,
+      "q": "con muốn xem là con có khả năng lấy được bằng đại học không "
+    },
+    {
+      "ts": 1786683116799,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "ok"
+    },
+    {
+      "ts": 1786683073655,
+      "coverage": 0,
+      "nodesTotal": 3,
+      "q": "hôm nay có nên bắt lầu liên hệ người trong giới diễn xuất để"
+    },
+    {
+      "ts": 1786646879221,
+      "coverage": 33,
+      "nodesTotal": 6,
+      "q": "không lẽ thầy không coi được bạn thân con là ai"
+    },
+    {
+      "ts": 1786646682202,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "con chuẩn bị vào đại học vào tháng 9 ạ, mong thầy con coi đư"
+    },
+    {
+      "ts": 1786603796317,
+      "coverage": 83,
+      "nodesTotal": 6,
+      "q": "Thầy luận nhà ở của con năm 2034 như nào dc kh ạ"
+    },
+    {
+      "ts": 1786603615007,
+      "coverage": 100,
+      "nodesTotal": 6,
+      "q": "2034 con được cái gì thầy, kiểu cuộc sống sẽ tốt đến mức nào"
+    },
+    {
+      "ts": 1786603448302,
+      "coverage": 83,
+      "nodesTotal": 6,
+      "q": "cố năm 2032 lên hương đk thầy"
+    },
+    {
+      "ts": 1786603188785,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "thầy dựa vô dữ liệu bát tự để xem coi con có thuận lợi học h"
+    },
+    {
+      "ts": 1786602590516,
+      "coverage": 33,
+      "nodesTotal": 6,
+      "q": "sao thầy"
+    },
+    {
+      "ts": 1786602452963,
+      "coverage": 0,
+      "nodesTotal": 6,
+      "q": "con định chủ nhật tuần này nhắn"
+    },
+    {
+      "ts": 1786602256981,
+      "coverage": 33,
+      "nodesTotal": 6,
+      "q": "con định vay dì ruột con, là em gái của mẹ con ạ"
+    },
+    {
+      "ts": 1786598907484,
+      "coverage": 80,
+      "nodesTotal": 5,
+      "q": "con đỗ đại học danh tiếng nhưng hiện tại khá lo lắng về học "
+    },
+    {
+      "ts": 1786453546060,
+      "coverage": 100,
+      "nodesTotal": 5,
+      "q": "con học đại học luật tp hcm ạ, ngành thương mại điện tử, thầ"
+    },
+    {
+      "ts": 1786453111448,
+      "coverage": 100,
+      "nodesTotal": 6,
+      "q": "cái người thầy đang nói là người 2034 trở đi mà, con đang hỏ"
+    },
+    {
+      "ts": 1786452920803,
+      "coverage": 100,
+      "nodesTotal": 6,
+      "q": "anh 2027 á, thầy nói chi tiết đi"
+    },
+    {
+      "ts": 1786452743278,
+      "coverage": 50,
+      "nodesTotal": 6,
+      "q": "ủa, tưởng hai người đó là hai người khác, thầy nói lực đực l"
+    },
+    {
+      "ts": 1786452458048,
+      "coverage": 75,
+      "nodesTotal": 4,
+      "q": "năm 2027 con có người yêu đúng hong thầy, anh người yêu 2027"
+    },
+    {
+      "ts": 1786452183001,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "mệt thế, phải giữ nữa á. Không phải chữ \" giữ\" trong hôn nhâ"
+    },
+    {
+      "ts": 1786451848719,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "chán thế, lấy thằng chồng gì mà có như không, chả sướng, như"
+    },
+    {
+      "ts": 1786451609419,
+      "coverage": 50,
+      "nodesTotal": 6,
+      "q": "cự môn vượng ở đâu á thầy"
+    },
+    {
+      "ts": 1786451417279,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "vậy người ngoài nhìn những cái gì mà ngưỡng mộ cuộc hôn nhân"
+    },
+    {
+      "ts": 1786451097551,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "Thầy cho con biết là, lỡ thôi nha, trong lá số thì con sẽ đa"
+    },
+    {
+      "ts": 1786450954119,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "con cũng không vội kết hôn sớm, con tính 28-30 mới cưới"
+    },
+    {
+      "ts": 1786450697714,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "sao bữa ông thầy tử vi kêu là con lấy được thằng chồng tuyệt"
+    },
+    {
+      "ts": 1786450541155,
+      "coverage": 100,
+      "nodesTotal": 5,
+      "q": "cho con hỏi là con chỉ 44 điểm trung đẳng thuận, bại cách, v"
+    },
+    {
+      "ts": 1786448230351,
+      "coverage": 83,
+      "nodesTotal": 6,
+      "q": "Con cảm ơn thầy, mai mốt con định kiếm cái chứng chỉ ielts n"
+    },
+    {
+      "ts": 1786447958668,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "con học ngành thương mại điện tử ạ. Với, con lo là người nhà"
+    },
+    {
+      "ts": 1786447735339,
+      "coverage": 80,
+      "nodesTotal": 5,
+      "q": "Con đã trúng tuyển vào đại học Luật Tp. HCM, nhưng con khá l"
+    },
+    {
+      "ts": 1786368667901,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "nếu v đầu hướng đông được k thầy"
+    },
+    {
+      "ts": 1786368513154,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "v còn giường ngủ? và gương?"
+    },
+    {
+      "ts": 1786368302112,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "nếu v nên chọn hướng bàn làm việc theo bát trạch hay dụng th"
+    },
+    {
+      "ts": 1786367617863,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "Hướng nhà/hướng bàn làm việc hợp?"
+    },
+    {
+      "ts": 1786367408214,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "v thì hướng đầu khi ngủ và gương thì s"
+    },
+    {
+      "ts": 1786367193314,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "s trưa thầy nói là tây, v là có nhầm lẫn?"
+    },
+    {
+      "ts": 1786367118288,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "bàn làm việc hướng nam hay tây tốt, hướng hiện tại là đông"
+    },
+    {
+      "ts": 1786366095511,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "nếu v bàn làm việc quay vào giường á, có s k thầy,s trưa thầ"
+    },
+    {
+      "ts": 1786365810458,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "nếu bàn quay về hướng bắc được k thầy, lưng thì sát hướng na"
+    },
+    {
+      "ts": 1786352204811,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "còn tủ và cái gương thì s thầy"
+    },
+    {
+      "ts": 1786352078019,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "ý là kê bàn làm việc trong phòng ngủ như nào á thầy"
+    },
+    {
+      "ts": 1786351810222,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "ý là hỏi bố trí phòng ngủ"
+    },
+    {
+      "ts": 1786350618743,
+      "coverage": 75,
+      "nodesTotal": 4,
+      "q": "còn hướng nào ok nữa k thầy, cho tốt ngành diễn và công việc"
+    },
+    {
+      "ts": 1786350371873,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "v chốt lại là sao thầy list lại đi, đọc rối quá"
+    },
+    {
+      "ts": 1786350297765,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "giường kê sát góc đông nam được k"
+    },
+    {
+      "ts": 1786350132950,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "Kê bàn sát tường Đông (cùng bên cửa sổ) Ngồi xuống → mặt nhì"
+    },
+    {
+      "ts": 1786350015636,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "con hỏi cái bàn làm việc á, với cái gương, cái tủ để dâu"
+    },
+    {
+      "ts": 1786349894425,
+      "coverage": 0,
+      "nodesTotal": 3,
+      "q": "nếu v gương chiếu vào giường có s k, là cái lưng con quay vô"
+    },
+    {
+      "ts": 1786349618606,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "cái gương riêng, cái tủ tiếng á thầy, và con chưa hiểu kê mặ"
+    },
+    {
+      "ts": 1786349414244,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "hướng ngủ và bàn làm việc và đặt tủ gương trong phòng như nà"
+    },
+    {
+      "ts": 1786348527688,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "con có số đi hay làm việc ở nước ngoài ko, diễn xuất của con"
+    },
+    {
+      "ts": 1786347234875,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "số con có bấu víu vào người chồng để đỡ khổ hơn k, con đang "
+    },
+    {
+      "ts": 1786346845080,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "con chịu khổ được hiện tại với con vầy là ổn con chỉ sợ nếu "
+    },
+    {
+      "ts": 1786346211461,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "v là số con chỉ bình bình đko, có vào được có vào đc tầng lớ"
+    },
+    {
+      "ts": 1786345519151,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "tương lai sau này con có giàu có k hay bình bình đủ sống, co"
+    },
+    {
+      "ts": 1786345125536,
+      "coverage": 75,
+      "nodesTotal": 4,
+      "q": "theo diễn k thành công con sợ khổ sợ k thể nuôi được mình lạ"
+    },
+    {
+      "ts": 1786344545229,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "con đang trầm cảm đko"
+    },
+    {
+      "ts": 1786344033777,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "con đang trầm cảm đúng k thầy"
+    },
+    {
+      "ts": 1786342993981,
+      "coverage": 50,
+      "nodesTotal": 4,
+      "q": "chi tiết công việc operation của con trong 6 tháng tới, nó l"
+    },
+    {
+      "ts": 1786342406126,
+      "coverage": 100,
+      "nodesTotal": 4,
+      "q": "công việc sắp tới của con"
+    },
+    {
+      "ts": 1786332948922,
+      "coverage": 100,
+      "nodesTotal": 4,
+      "q": "hôm nay là ngày cát mà tâm trạng con bất ổn lo lắng quá, tuầ"
+    },
+    {
+      "ts": 1786299733796,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "con từng nghe thầy nói con tạo nghiệp ở kiếp trước nhiều nên"
+    },
+    {
+      "ts": 1786298072084,
+      "coverage": 100,
+      "nodesTotal": 4,
+      "q": "sự nghiệp của con sẽ ra sao, chi tiết ngành nghề và thời gia"
+    },
+    {
+      "ts": 1786288604801,
+      "coverage": 100,
+      "nodesTotal": 4,
+      "q": "theo số mệnh định sẵn thì sự nghiệp con sẽ chi tiết như nào,"
+    },
+    {
+      "ts": 1786288296740,
+      "coverage": 50,
+      "nodesTotal": 4,
+      "q": "con đã bỏ ngành luật mà con theo từ 2018-9/2025, để muốn đổi"
+    },
+    {
+      "ts": 1786287868100,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "ok thầy"
+    },
+    {
+      "ts": 1786287799600,
+      "coverage": 25,
+      "nodesTotal": 4,
+      "q": "công việc của con trong thời gian tới có bớt khó khăn k"
+    },
+    {
+      "ts": 1786287460706,
+      "coverage": 83,
+      "nodesTotal": 6,
+      "q": "Đại vận sắp tới ra sao?"
+    },
+    {
+      "ts": 1786287408954,
+      "coverage": 29,
+      "nodesTotal": 7,
+      "q": "Hi"
+    },
+    {
+      "ts": 1786281033825,
+      "coverage": 25,
+      "nodesTotal": 4,
+      "q": "9/2025 con bắt đầu bỏ ngành luật mà con theo từ 2018, con đị"
+    },
+    {
+      "ts": 1786280747688,
+      "coverage": 50,
+      "nodesTotal": 4,
+      "q": "Lưu niên nào đỉnh trong đại vận này?"
+    },
+    {
+      "ts": 1786279906980,
+      "coverage": 75,
+      "nodesTotal": 4,
+      "q": "con có trở thành diễn viên nổi tiếng k, con có kiếm được tiê"
+    },
+    {
+      "ts": 1786278597166,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "nếu kiếp trước con nghiệp nhiều quá thì đời này con có phúc "
+    },
+    {
+      "ts": 1786207463207,
+      "coverage": 100,
+      "nodesTotal": 2,
+      "q": "Chồng tương lai con có tốt không vậy thầy"
+    },
+    {
+      "ts": 1786207403197,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "Tổng quan quỹ đạo đời tôi?"
+    },
+    {
+      "ts": 1786207325633,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "Năm nay có gì đáng chú ý?"
+    },
+    {
+      "ts": 1786207234654,
+      "coverage": 80,
+      "nodesTotal": 5,
+      "q": "Kiếp trước con có nghiệp gì vậy thầy"
+    },
+    {
+      "ts": 1786207160900,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "Nghề kiếm tiền hợp mệnh?"
+    },
+    {
+      "ts": 1786207059050,
+      "coverage": 50,
+      "nodesTotal": 4,
+      "q": "Vậy trong tiền kiếp của con, con có được lên trời không"
+    },
+    {
+      "ts": 1786206848115,
+      "coverage": 100,
+      "nodesTotal": 2,
+      "q": "Vậy a tu la có phải là con người không thầy"
+    },
+    {
+      "ts": 1786206720662,
+      "coverage": 100,
+      "nodesTotal": 5,
+      "q": "Tháng nào trong năm tốt nhất?"
+    },
+    {
+      "ts": 1786206552506,
+      "coverage": 80,
+      "nodesTotal": 5,
+      "q": "Dạ cho con hỏi là kiếp trước con có phải là công chúa không"
+    },
+    {
+      "ts": 1786206393672,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "Năm nay có gì đáng chú ý?"
+    },
+    {
+      "ts": 1786205842484,
+      "coverage": 100,
+      "nodesTotal": 2,
+      "q": "Chồng chính và chồng ngoại là gì vậy thầy"
+    },
+    {
+      "ts": 1786205684150,
+      "coverage": 50,
+      "nodesTotal": 2,
+      "q": "Vậy con gặp chồng tương lai năm con mấy tuổi vậy thầy"
+    },
+    {
+      "ts": 1786205619882,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "Mang nghiệp gì, kiếp trước làm gì"
+    },
+    {
+      "ts": 1786204373926,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "con mang nghiệp gì và vì sao kiếp trước các kiếp đó con đã l"
+    },
+    {
+      "ts": 1786203705942,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "con đang mang nghiệp gì và vì sao con mang nó do kiếp nào và"
+    },
+    {
+      "ts": 1786203430119,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "Con đang mang nghiệp gì vậy thầy, và kiếp trước con làm gì m"
+    },
+    {
+      "ts": 1786203195581,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "Khi nào tôi phát tài?"
+    },
+    {
+      "ts": 1786203105506,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "Thân nhược là gì"
+    },
+    {
+      "ts": 1786131198015,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "Con thờ Thầy 1 mắt mà, đức chí tôn thầy nói là ai, và chỉ co"
+    },
+    {
+      "ts": 1786130951752,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "Con ở trọ k có bàn thờ"
+    },
+    {
+      "ts": 1786130725907,
+      "coverage": 40,
+      "nodesTotal": 5,
+      "q": "Xin thầy chỉ hết 1 lần, và con đạo cao đài"
+    },
+    {
+      "ts": 1786130505787,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "Dạ"
+    },
+    {
+      "ts": 1786130018503,
+      "coverage": 80,
+      "nodesTotal": 5,
+      "q": "Các nghiệp con link tới các đời kiếp trước như nào con xin đ"
+    },
+    {
+      "ts": 1786129703917,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "Mệnh con có cách cục vỡ (bại cách) + nghiệp chướng nặng → cầ"
+    },
+    {
+      "ts": 1786129520706,
+      "coverage": 75,
+      "nodesTotal": 4,
+      "q": "Cải vận đc đko, nếu con vẫn muốn ng đó, do mình quyết đko th"
+    },
+    {
+      "ts": 1786129363698,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "Con gặp người sinh 09/04/2008 lần đầu ngày 14/2/2026, nó có "
+    },
+    {
+      "ts": 1786129208719,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "Gặp ngày 14/2/2026 dương?"
+    },
+    {
+      "ts": 1786129089371,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "Ý con là năm âm hay dương và tháng duong."
+    },
+    {
+      "ts": 1786128990130,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "2019 2023 2025"
+    },
+    {
+      "ts": 1786128819513,
+      "coverage": 0,
+      "nodesTotal": 5,
+      "q": "Năm thầy nói là năm âm hay dương"
+    },
+    {
+      "ts": 1786128548878,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "Các năm tình duyên từ 10t đến giờ"
+    },
+    {
+      "ts": 1785994091975,
+      "coverage": 83,
+      "nodesTotal": 6,
+      "q": "ác nghiệp cần hóa giải là gì"
+    },
+    {
+      "ts": 1785684912072,
+      "coverage": 20,
+      "nodesTotal": 5,
+      "q": "anh rể của con ấy, có hòa hợp với gia đình không ạ, chị dâu "
+    },
+    {
+      "ts": 1785684723745,
+      "coverage": 50,
+      "nodesTotal": 2,
+      "q": "Vậy trong nhà con, chị con là số tốt nhất rồi. Con là người "
+    },
+    {
+      "ts": 1785684541883,
+      "coverage": 100,
+      "nodesTotal": 2,
+      "q": "hôn nhân của anh giữa thì sao thầy"
+    },
+    {
+      "ts": 1785684401853,
+      "coverage": 100,
+      "nodesTotal": 2,
+      "q": "Hôn nhân của bả tốt không thầy, con sợ cái nết này kh ai chị"
+    },
+    {
+      "ts": 1785684186930,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "chị cả con mai mốt lên được cở nào thầy, kiểu chạm tới tầng "
+    },
+    {
+      "ts": 1785683957865,
+      "coverage": 75,
+      "nodesTotal": 4,
+      "q": "chị cả chuẩn bị đi đại học; anh giữa hình như sinh lúc 10h r"
+    },
+    {
+      "ts": 1785683794000,
+      "coverage": 60,
+      "nodesTotal": 5,
+      "q": "chị cả 20.11.2007 lúc 12:09 ; anh giữa 9/8/2009 không rõ giờ"
+    },
+    {
+      "ts": 1785683638763,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "nhà con có 3 anh chị em ruột, thầy coi hộ con ai là người th"
+    },
+    {
+      "ts": 1785683504983,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "vậy con được nhờ anh chị em ruột không ạ, thầy dựa vào lá số"
+    },
+    {
+      "ts": 1785683353760,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "con đúng là có một người em họ cùng tuổi nhưng rất thân thiế"
+    },
+    {
+      "ts": 1785683184637,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "anh chị em ruột thì sao  thầy, thầy cho con biết ai là quý  "
+    },
+    {
+      "ts": 1785683011833,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "thầy ơi, thầy cho con hỏi là số con có được nhờ người nhà kh"
+    },
+    {
+      "ts": 1785674373039,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "huhu sao mà khổ quá. Đã là người xăm soi cỡ đó mà vẫn vớ phả"
+    },
+    {
+      "ts": 1785673844035,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "rồi ruốc cuộc cái người chồng thật mà con sẽ kết hôn và đi đ"
+    },
+    {
+      "ts": 1785673554254,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "THẦY ƠI CÁI NÀY CŨNG THẦY NÓI HÔM QUA NÈ: Đây là phần con cầ"
+    },
+    {
+      "ts": 1785673273876,
+      "coverage": 100,
+      "nodesTotal": 3,
+      "q": "Người chồng bên con đến cuối cùng với thằng súc sinh 2034-20"
+    },
+    {
+      "ts": 1785671565724,
+      "coverage": 67,
+      "nodesTotal": 3,
+      "q": "Vãi, cái thằng đó là cái thằng gặp năm 2034, 2035 thật hả th"
+    },
+    {
+      "ts": 1785671015982,
+      "coverage": 33,
+      "nodesTotal": 3,
+      "q": "Hồi thầy tử vi con đi đi coi có nói là. Mốt con sẽ gặp một t"
+    }
+  ],
+  "missedAll": {
+    "ky_than": 78,
+    "phat_tai": 88,
+    "van_hy_than_toi": 20,
+    "nam_vang_sap_toi": 124,
+    "thuan_dung": 12,
+    "quyen_luc_hoc_van": 20,
+    "tai_tro_su_nghiep": 65,
+    "quy_nhan_tro_giup": 13,
+    "cach_cuc_vo_co_cuu": 26,
+    "cuoc_doi_tot": 3,
+    "ky_nang_che_ngu": 5,
+    "cach_cuc_thuan": 1,
+    "hoc_van_cao": 6
+  },
+  "lowCoverage": [
+    {
+      "ts": 1788443021462,
+      "cov": 33,
+      "total": 6,
+      "q": "CHứ thầy không xem được là bạn thân mới con là đứa nào hả. Thầy liệt k"
+    },
+    {
+      "ts": 1788414102687,
+      "cov": 20,
+      "total": 5,
+      "q": "Nhà con gần đây cãi nhau, và con cảm thấy không an lòng khi ở nhà.  Li"
+    },
+    {
+      "ts": 1788413892855,
+      "cov": 20,
+      "total": 5,
+      "q": "hôm nay con nên từ quê vào sg lại k, mệt qá"
+    },
+    {
+      "ts": 1788413790339,
+      "cov": 25,
+      "total": 4,
+      "q": "con mệt mỏi quá thầy ơi, nhà con vừa có 3 cái tang, giờ người con nặng"
+    },
+    {
+      "ts": 1787972252574,
+      "cov": 20,
+      "total": 5,
+      "q": "con với người sinh ngày 9 thg 12, 2002 có hợp k"
+    },
+    {
+      "ts": 1787774898962,
+      "cov": 20,
+      "total": 5,
+      "q": "còn cái tang nào nữa k"
+    },
+    {
+      "ts": 1787774732592,
+      "cov": 0,
+      "total": 5,
+      "q": "ông nội chứ k phải ông ngoại"
+    },
+    {
+      "ts": 1787774621893,
+      "cov": 20,
+      "total": 5,
+      "q": "thầy coi thử câc tang đó có trùng vs lá số k, con nhớ thầy có thừng dự"
+    },
+    {
+      "ts": 1787682156300,
+      "cov": 33,
+      "total": 3,
+      "q": "tháng 10-12/2024, con disconnect vơie 1 nhóm khác nữa, có thầy tiebegs"
+    },
+    {
+      "ts": 1787681403789,
+      "cov": 20,
+      "total": 5,
+      "q": "năm 2022 con bắt đầu gặp người sinh 22/9/1987 và connect làm việc chun"
+    },
+    {
+      "ts": 1787679274150,
+      "cov": 20,
+      "total": 5,
+      "q": "v người đánh trách là người ngoài đko, họ đã làm gia đình bất hoà và c"
+    },
+    {
+      "ts": 1787679087853,
+      "cov": 20,
+      "total": 5,
+      "q": "năm 2008-2009 là lúc con bắt đầu gánh vát thêm trách nhiệm đko, con nh"
+    },
+    {
+      "ts": 1787620936619,
+      "cov": 20,
+      "total": 5,
+      "q": "3 ngày nữa là chung cửu bà con tức thứ 6 tuần này ngày 28/8/2026 dương"
+    },
+    {
+      "ts": 1787620413021,
+      "cov": 0,
+      "total": 5,
+      "q": "bà con mới mất ngày 23/4/2026 âm lịch, k phải mất lâu"
+    },
+    {
+      "ts": 1787620155493,
+      "cov": 20,
+      "total": 5,
+      "q": "với trong mơ dường như làm sắc v là để đầu bà k bị cong ra sau á, theo"
+    },
+    {
+      "ts": 1787620083673,
+      "cov": 20,
+      "total": 5,
+      "q": "ý con là nó sụp lâu r á trước khi con mơ hôm nay r"
+    },
+    {
+      "ts": 1787619811677,
+      "cov": 20,
+      "total": 5,
+      "q": "có phải là bà về k, và con nhớ đúng là mộ có sụp nhưng mẹ nói k phải c"
+    },
+    {
+      "ts": 1787595915568,
+      "cov": 20,
+      "total": 5,
+      "q": "con nhớ lá số hắn bổ con con hay gì"
+    },
+    {
+      "ts": 1787594734602,
+      "cov": 20,
+      "total": 5,
+      "q": "người đó chần chừ ngỏ lời vì có vẻ tự ti, nghĩ nhiều, có phải vì k có "
+    },
+    {
+      "ts": 1787594656392,
+      "cov": 20,
+      "total": 5,
+      "q": "giới tính nam, k biết giờ sinh"
+    },
+    {
+      "ts": 1787594361940,
+      "cov": 20,
+      "total": 5,
+      "q": "người sinh 09/04/2008 có trưởng thành cảm xúc hơn con k?, vì con có tr"
+    },
+    {
+      "ts": 1787594280966,
+      "cov": 20,
+      "total": 5,
+      "q": "người sinh 09/04/2008 có trưởng thành cảm xúc hơn con k?"
+    },
+    {
+      "ts": 1787565678750,
+      "cov": 20,
+      "total": 5,
+      "q": "Người kia đang là một núi như thế — con cứ giữ thước 90 ngày mà đo, đừ"
+    },
+    {
+      "ts": 1787280848807,
+      "cov": 20,
+      "total": 5,
+      "q": "nay có nên bắt chuyện/tỏ tình với người sinh 09/04/2008 ko"
+    },
+    {
+      "ts": 1787209356301,
+      "cov": 0,
+      "total": 5,
+      "q": "người đó đang ghen nghĩ con vs ng khác, nãy go  thiếu"
+    },
+    {
+      "ts": 1787209003244,
+      "cov": 20,
+      "total": 5,
+      "q": "nói gì"
+    },
+    {
+      "ts": 1787208932114,
+      "cov": 20,
+      "total": 5,
+      "q": "giờ nào tốt nhất"
+    },
+    {
+      "ts": 1787111667755,
+      "cov": 20,
+      "total": 5,
+      "q": "người mà con hỏi thầy 09/04/2008 tính tình họ sao, s con nghe kể là ha"
+    },
+    {
+      "ts": 1787078019095,
+      "cov": 20,
+      "total": 5,
+      "q": "con với người sinh 09/04/2008 có thể có con như lá số nói k"
+    },
+    {
+      "ts": 1787077772312,
+      "cov": 20,
+      "total": 5,
+      "q": "Tôi có con trai hay con gái, mấy người?"
+    },
+    {
+      "ts": 1787077559092,
+      "cov": 20,
+      "total": 5,
+      "q": "cách người đó yêu thương con? người đó có từng làm gì cho con mà con k"
+    },
+    {
+      "ts": 1787076927506,
+      "cov": 20,
+      "total": 5,
+      "q": "con đang mập mờ với người sinh 09/04/2008, 2 bên đều thích nhau nhưng "
+    },
+    {
+      "ts": 1786955839620,
+      "cov": 0,
+      "total": 5,
+      "q": "năm nay thế nào?"
+    },
+    {
+      "ts": 1786727151062,
+      "cov": 33,
+      "total": 3,
+      "q": "sức khỏe tinh thần con ổn không thầy ha, cỡ đó"
+    },
+    {
+      "ts": 1786718201034,
+      "cov": 33,
+      "total": 6,
+      "q": "Con mới nhắn tin vay dì ruột con lúc 8h tối nay, vay em gái của mẹ con"
+    },
+    {
+      "ts": 1786683116799,
+      "cov": 0,
+      "total": 5,
+      "q": "ok"
+    },
+    {
+      "ts": 1786683073655,
+      "cov": 0,
+      "total": 3,
+      "q": "hôm nay có nên bắt lầu liên hệ người trong giới diễn xuất để bái sư xi"
+    },
+    {
+      "ts": 1786646879221,
+      "cov": 33,
+      "total": 6,
+      "q": "không lẽ thầy không coi được bạn thân con là ai"
+    },
+    {
+      "ts": 1786646682202,
+      "cov": 33,
+      "total": 3,
+      "q": "con chuẩn bị vào đại học vào tháng 9 ạ, mong thầy con coi đường bạn bè"
+    },
+    {
+      "ts": 1786602590516,
+      "cov": 33,
+      "total": 6,
+      "q": "sao thầy"
+    },
+    {
+      "ts": 1786602452963,
+      "cov": 0,
+      "total": 6,
+      "q": "con định chủ nhật tuần này nhắn"
+    },
+    {
+      "ts": 1786602256981,
+      "cov": 33,
+      "total": 6,
+      "q": "con định vay dì ruột con, là em gái của mẹ con ạ"
+    },
+    {
+      "ts": 1786451417279,
+      "cov": 33,
+      "total": 3,
+      "q": "vậy người ngoài nhìn những cái gì mà ngưỡng mộ cuộc hôn nhân đó, con l"
+    },
+    {
+      "ts": 1786450954119,
+      "cov": 33,
+      "total": 3,
+      "q": "con cũng không vội kết hôn sớm, con tính 28-30 mới cưới"
+    },
+    {
+      "ts": 1786368667901,
+      "cov": 0,
+      "total": 5,
+      "q": "nếu v đầu hướng đông được k thầy"
+    },
+    {
+      "ts": 1786368513154,
+      "cov": 20,
+      "total": 5,
+      "q": "v còn giường ngủ? và gương?"
+    },
+    {
+      "ts": 1786368302112,
+      "cov": 20,
+      "total": 5,
+      "q": "nếu v nên chọn hướng bàn làm việc theo bát trạch hay dụng thần"
+    },
+    {
+      "ts": 1786367617863,
+      "cov": 20,
+      "total": 5,
+      "q": "Hướng nhà/hướng bàn làm việc hợp?"
+    },
+    {
+      "ts": 1786367408214,
+      "cov": 0,
+      "total": 5,
+      "q": "v thì hướng đầu khi ngủ và gương thì s"
+    },
+    {
+      "ts": 1786367193314,
+      "cov": 0,
+      "total": 5,
+      "q": "s trưa thầy nói là tây, v là có nhầm lẫn?"
+    },
+    {
+      "ts": 1786366095511,
+      "cov": 0,
+      "total": 5,
+      "q": "nếu v bàn làm việc quay vào giường á, có s k thầy,s trưa thầy nóiquay "
+    },
+    {
+      "ts": 1786365810458,
+      "cov": 0,
+      "total": 5,
+      "q": "nếu bàn quay về hướng bắc được k thầy, lưng thì sát hướng nam"
+    },
+    {
+      "ts": 1786352204811,
+      "cov": 0,
+      "total": 5,
+      "q": "còn tủ và cái gương thì s thầy"
+    },
+    {
+      "ts": 1786350371873,
+      "cov": 0,
+      "total": 5,
+      "q": "v chốt lại là sao thầy list lại đi, đọc rối quá"
+    },
+    {
+      "ts": 1786350297765,
+      "cov": 0,
+      "total": 5,
+      "q": "giường kê sát góc đông nam được k"
+    },
+    {
+      "ts": 1786350132950,
+      "cov": 33,
+      "total": 3,
+      "q": "Kê bàn sát tường Đông (cùng bên cửa sổ) Ngồi xuống → mặt nhìn hướng Tâ"
+    },
+    {
+      "ts": 1786350015636,
+      "cov": 20,
+      "total": 5,
+      "q": "con hỏi cái bàn làm việc á, với cái gương, cái tủ để dâu"
+    },
+    {
+      "ts": 1786349894425,
+      "cov": 0,
+      "total": 3,
+      "q": "nếu v gương chiếu vào giường có s k, là cái lưng con quay vô hướng tườ"
+    },
+    {
+      "ts": 1786349618606,
+      "cov": 33,
+      "total": 3,
+      "q": "cái gương riêng, cái tủ tiếng á thầy, và con chưa hiểu kê mặt rồi cái "
+    },
+    {
+      "ts": 1786349414244,
+      "cov": 20,
+      "total": 5,
+      "q": "hướng ngủ và bàn làm việc và đặt tủ gương trong phòng như nào, con làm"
+    },
+    {
+      "ts": 1786344545229,
+      "cov": 20,
+      "total": 5,
+      "q": "con đang trầm cảm đko"
+    },
+    {
+      "ts": 1786344033777,
+      "cov": 20,
+      "total": 5,
+      "q": "con đang trầm cảm đúng k thầy"
+    },
+    {
+      "ts": 1786287868100,
+      "cov": 0,
+      "total": 5,
+      "q": "ok thầy"
+    },
+    {
+      "ts": 1786287799600,
+      "cov": 25,
+      "total": 4,
+      "q": "công việc của con trong thời gian tới có bớt khó khăn k"
+    },
+    {
+      "ts": 1786287408954,
+      "cov": 29,
+      "total": 7,
+      "q": "Hi"
+    },
+    {
+      "ts": 1786281033825,
+      "cov": 25,
+      "total": 4,
+      "q": "9/2025 con bắt đầu bỏ ngành luật mà con theo từ 2018, con định hươbsh "
+    },
+    {
+      "ts": 1786207325633,
+      "cov": 20,
+      "total": 5,
+      "q": "Năm nay có gì đáng chú ý?"
+    },
+    {
+      "ts": 1786203105506,
+      "cov": 20,
+      "total": 5,
+      "q": "Thân nhược là gì"
+    },
+    {
+      "ts": 1786130951752,
+      "cov": 0,
+      "total": 5,
+      "q": "Con ở trọ k có bàn thờ"
+    },
+    {
+      "ts": 1786129363698,
+      "cov": 20,
+      "total": 5,
+      "q": "Con gặp người sinh 09/04/2008 lần đầu ngày 14/2/2026, nó có đc tính là"
+    },
+    {
+      "ts": 1786129208719,
+      "cov": 20,
+      "total": 5,
+      "q": "Gặp ngày 14/2/2026 dương?"
+    },
+    {
+      "ts": 1786129089371,
+      "cov": 0,
+      "total": 5,
+      "q": "Ý con là năm âm hay dương và tháng duong."
+    },
+    {
+      "ts": 1786128990130,
+      "cov": 20,
+      "total": 5,
+      "q": "2019 2023 2025"
+    },
+    {
+      "ts": 1786128819513,
+      "cov": 0,
+      "total": 5,
+      "q": "Năm thầy nói là năm âm hay dương"
+    },
+    {
+      "ts": 1785684912072,
+      "cov": 20,
+      "total": 5,
+      "q": "anh rể của con ấy, có hòa hợp với gia đình không ạ, chị dâu của anh gi"
+    },
+    {
+      "ts": 1785683504983,
+      "cov": 33,
+      "total": 3,
+      "q": "vậy con được nhờ anh chị em ruột không ạ, thầy dựa vào lá số bát tự để"
+    },
+    {
+      "ts": 1785683011833,
+      "cov": 33,
+      "total": 3,
+      "q": "thầy ơi, thầy cho con hỏi là số con có được nhờ người nhà không ạ. Kiể"
+    },
+    {
+      "ts": 1785674373039,
+      "cov": 33,
+      "total": 3,
+      "q": "huhu sao mà khổ quá. Đã là người xăm soi cỡ đó mà vẫn vớ phải quả chồn"
+    },
+    {
+      "ts": 1785671015982,
+      "cov": 33,
+      "total": 3,
+      "q": "Hồi thầy tử vi con đi đi coi có nói là. Mốt con sẽ gặp một thằng đẹp t"
+    }
+  ]
+}
