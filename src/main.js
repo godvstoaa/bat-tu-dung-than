@@ -6449,7 +6449,7 @@ function _savedStore(list) { try { localStorage.setItem(_SAVED_KEY, JSON.stringi
   if (!formCard || document.getElementById('saved-charts-card')) return;
   const card = document.createElement('section');
   card.className = 'card'; card.id = 'saved-charts-card';
-  formCard.parentNode.insertBefore(card, formCard);
+  formCard.insertAdjacentElement('afterend', card);
 
   function render() {
     const list = _savedList();
