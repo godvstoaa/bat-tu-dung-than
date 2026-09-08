@@ -416,6 +416,10 @@ export function findYongShen(chart, wx, strength, pattern, interactions) {
     avoid = jiWx;
     method.push('Cách cục đặc biệt');
     reasons.push(`📐 Cách cục đặc biệt — ${pattern.vi}. ${p.note}`);
+    // [school-option] 假从 — pattern.congGia do detectSpecial đặt (còn trợ/gốc yếu bị bỏ theo势)
+    if (pattern.congGia) {
+      reasons.push('⚠️ 假从 — theo thế có điều kiện, vận gặp trợ = biến động (đại vận/lưu niên mang Tỷ Kiếp – Ấn trợ thân sẽ phá thế theo → biến động lớn).');
+    }
     reasons.push(`Theo thế cục, Dụng Thần lấy nhóm ${p.yong.map((g) => GROUP_VI[g]).join('/')} → hành ${[primary, secondary].filter(Boolean).join(', ')}; kỵ nhóm ${p.ji.map((g) => GROUP_VI[g]).join('/')} → hành ${avoid.join(', ')}.`);
     return finalizeYong(primary, secondary, avoid, reasons, method, chart, G, interactions, strength, wx);
   }
@@ -587,7 +591,13 @@ function finalizeYong(primary, secondary, avoid, reasons, method, chart, G, inte
     reasons.push(`🌡️ Điều Hậu (调候) tháng ${chart.monthZhi} cần ${tiaoStemsVi(tiaoRaw)} ${clim ? clim.need : ''}, NHƯNG ${_why} → KHÔNG ép làm Dụng CHÍNH (Phù Ức ưu tiên). Giữ Phù Ức (${primary}) làm chủ; ${tiaoPrimaryWx} xuống secondary — chỉ phối khi ĐÃ đủ Dụng chính (vd 官印相生), không thì khắc/hao thân.`);
     if (tiaoPrimaryWx !== primary && tiaoPrimaryWx !== secondary) secondary = tiaoPrimaryWx;
   }
-  if (isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary && !isSpecial && !_skipForGuan && !_xieWang) {
+    // [FIX — corpus zuozongtang 2026-08] 调候需求 đã thỏa bởi Phù Ức: tháng lạnh cần Hỏa mà
+  //   bảng 调候 KHÔNG chứa Hỏa-can + Phù Ức primary ĐÃ là Hỏa → mục tiêu sưởi đạt, không override
+  //   (vd 左宗棠 丙火亥月: bảng [甲戊庚壬] không Hỏa, Phù Ức=Hỏa → giữ Hỏa làm chủ; 甲 chỉ là xe chở lửa).
+  const _climElem = ({ 亥: '火', 子: '火', 丑: '火', 巳: '水', 午: '水', 未: '水' })[chart.monthZhi];
+  const _climInTiao = _climElem && tiaoRaw.some((sg) => GAN[sg] && GAN[sg].wx === _climElem);
+  const _climSatisfied = _climElem && !_climInTiao && primary === _climElem;
+  if (isExtreme && tiaoPrimaryWx && tiaoPrimaryWx !== primary && !isSpecial && !_skipForGuan && !_xieWang && !_climSatisfied) {
     tiaoOverride = true;
     const fuyiPrimary = primary;
     primary = tiaoPrimaryWx;                                  // 调候 lên làm chủ
@@ -832,7 +842,7 @@ export function computeLiuNian(year, month, day, hour, minute, gender, yong, ref
 // ===========================================================================
 //  7. HÀM TỔNG: TRẢ VỀ TOÀN BỘ KẾT QUẢ LUẬN MỆNH
 // ===========================================================================
-export function analyze(year, month, day, hour, minute, gender, refYear) {
+export function analyze(year, month, day, hour, minute, gender, refYear, opts = {}) {
   // [loop 662] validate input VN — lunar-javascript throws English «wrong month 13»;
   //   validate trước để error tiếng Việt sạch (AI tool / form đều hưởng).
   const _n = (v) => Number.isFinite(Number(v));
@@ -885,7 +895,9 @@ export function analyze(year, month, day, hour, minute, gender, refYear) {
   const strength = analyzeStrength(chart, wx);
   const interactions = detectInteractions(chart.pillars);
   const shensha = computeShensha(chart);
-  const pattern = computePattern(chart, wx, strength, interactions);
+  // [school-option] opts = { school: 'ditian' | 'ziping' } — trường phái nhận định cách
+  //   đặc biệt (Tòng), mặc định DEFAULT_SCHOOL 'ditian' (xem pattern.js setSchool).
+  const pattern = computePattern(chart, wx, strength, interactions, opts);
   const yong = findYongShen(chart, wx, strength, pattern, interactions);
   let patternQualityResult = null;
   try { patternQualityResult = patternQuality({ chart, pattern, strength, interactions }); } catch (e) { patternQualityResult = null; }

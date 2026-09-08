@@ -1609,14 +1609,16 @@ assert(NAYIN_MEANING['金箔金'].vi === 'Kim Bạc Kim', `纳音 金箔金 vi =
 }
 // [loop 751] 从格/专旺 detection RATE — meta-invariant bảo vệ threshold calibration.
 //   Cổ pháp: ~3-7% charts. Engine conservative 1.5% (false 从格 flip 用神 thảm họa → thà miss).
-//   Guard: rate phải trong 0.5%-12% — bắt regress nếu threshold quá lỏng (rate nổ) hoặc quá chặt (rate tắt).
+//   Guard: rate phải trong khoảng — bắt regress nếu threshold quá lỏng (rate nổ) hoặc quá chặt (rate tắt).
+//   [cập nhật school-option] DEFAULT_SCHOOL = 'ditian' (滴天髓 khoan: band vô-gốc ≥30% + 假从
+//   còn-gốc) → rate tự nhiên cao hơn band 子平真詮 nghiêm cũ → nới trần 12% → 15%.
 {
   let _total = 0, _special = 0;
   for (let _y = 1985; _y <= 2005; _y++) for (const _m of [2, 5, 8, 11]) for (const _d of [5, 15, 25]) for (const _h of [0, 6, 12, 18]) {
     try { const _R = analyze(_y, _m, _d, _h, 0, 'nam', 2026); _total++; if (_R.pattern?.type === 'special') _special++; } catch (e) {}
   }
   const _rate = _special / _total;
-  assert(_rate >= 0.005 && _rate <= 0.12, `[loop 751] 从格/专旺 rate trong khoảng 0.5%-12% (got ${(_rate * 100).toFixed(1)}% = ${_special}/${_total}) — threshold calibration ổn định`);
+  assert(_rate >= 0.005 && _rate <= 0.15, `[loop 751] 从格/专旺 rate trong khoảng 0.5%-15% (got ${(_rate * 100).toFixed(1)}% = ${_special}/${_total}) — threshold calibration ổn định [cập nhật school-option]`);
   assert(_special > 0, '[loop 751] phát hiện ÍT NHẤT 1 从格/专旺 trong sample (detectSpecial hoạt động)');
   console.log(`   [loop 751] 从格/专旺 rate ${(_rate * 100).toFixed(1)}% (${_special}/${_total}) — trong khoảng an toàn ✓`);
 }
@@ -4752,9 +4754,12 @@ console.log('   [loop 735] «giải hạn năm nay» route remedy ✓ (isRemedyS
   console.log(`   [loop 814] garbage input (${_garbage.length} type: empty/punct/emoji/null) — 0 crash/leak ✓`);
 }
 // [loop 815] pRemedy member-specific — Dụng khác → màu advice khác.
+//   [cập nhật school-option] DEFAULT_SCHOOL = 'ditian' → lá 1964-04-04 12:00 (壬 ngày, gốc 子
+//   bị 午 xung) nay được nhận 從兒格 假从 theo thế (Dụng 木) thay vì 食神 thường (Dụng 金) —
+//   đổi kỳ vọng 金→木 (4 thành viên vẫn 4 Dụng/4 màu khác nhau — mục đích test giữ nguyên).
 {
   const _COLOR = { 木: 'xanh lá', 火: 'đỏ', 土: 'vàng', 金: 'trắng', 水: 'đen' };
-  const _F = [[1993, 10, 21, 1, 15, 'nam', '土'], [1996, 12, 4, 10, 15, 'nữ', '火'], [1970, 6, 27, 7, 15, 'nữ', '水'], [1964, 4, 4, 12, 0, 'nam', '金']];
+  const _F = [[1993, 10, 21, 1, 15, 'nam', '土'], [1996, 12, 4, 10, 15, 'nữ', '火'], [1970, 6, 27, 7, 15, 'nữ', '水'], [1964, 4, 4, 12, 0, 'nam', '木']];
   for (const [y, m, d, h, mi, g, dung] of _F) {
     const _a = composeAnswer('làm sao cải vận?', analyze(y, m, d, h, mi, g, 2026));
     const _cl = _a.paragraphs.find((p) => /màu|Màu/.test(p)) || '';

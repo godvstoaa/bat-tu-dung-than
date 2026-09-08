@@ -80,10 +80,11 @@ export function buildChartFromPillars(pillars, gender = 'male') {
  * Phân tích tứ trụ trực tiếp — CHUỖI GIỐNG analyze() của chart.js
  * (scoreWuXing → kongwang weaken → strength → interactions → shensha →
  *  pattern → yong → patternQuality → 病药 rescue/promotion).
+ * [school-option] opts = { school: 'ditian' | 'ziping' } — thread vào computePattern.
  * Trả về R rút gọn: { chart, wx, strength, interactions, shensha, pattern,
  *                      yong, kongwang, patternQuality }
  */
-export function analyzePillars(pillars, gender = 'male') {
+export function analyzePillars(pillars, gender = 'male', opts = {}) {
   parseGender(gender);
   const chart = buildChartFromPillars(pillars, gender);
   const wx = scoreWuXing(chart);
@@ -114,7 +115,7 @@ export function analyzePillars(pillars, gender = 'male') {
   const strength = analyzeStrength(chart, wx);
   const interactions = detectInteractions(chart.pillars);
   const shensha = computeShensha(chart);
-  const pattern = computePattern(chart, wx, strength, interactions);
+  const pattern = computePattern(chart, wx, strength, interactions, opts);
   const yong = findYongShen(chart, wx, strength, pattern, interactions);
   let patternQualityResult = null;
   try { patternQualityResult = patternQuality({ chart, pattern, strength, interactions }); } catch (e) { patternQualityResult = null; }
@@ -173,9 +174,10 @@ export function analyzePillars(pillars, gender = 'male') {
   return { chart, wx, strength, interactions, shensha, pattern, yong, kongwang, patternQuality: patternQualityResult };
 }
 
-/** Bản tóm tắt phẳng tiện cho runner/regression: xuất các field chấm điểm. */
-export function analyzeSummary(pillars, gender = 'male') {
-  const R = analyzePillars(pillars, gender);
+/** Bản tóm tắt phẳng tiện cho runner/regression: xuất các field chấm điểm.
+ *  [school-option] opts = { school } — thread xuống analyzePillars → computePattern. */
+export function analyzeSummary(pillars, gender = 'male', opts = {}) {
+  const R = analyzePillars(pillars, gender, opts);
   return {
     strengthLevel: R.strength.level,           // 'Thân vượng' / 'Thân nhược' / ...
     strengthStrong: R.strength.strong,         // true/false

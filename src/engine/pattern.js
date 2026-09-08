@@ -99,11 +99,24 @@ for (const [dg, huaWx] of Object.entries(HUA_QI_HE)) {
 // Lộc & Nhận của Nhật Can (để nhận diện Kiến Lộc / Nguyệt Nhận)
 import { LU_SHEN, YANG_REN } from './shensha.js';
 
+// ---- [school-option] Trường phái mặc định cho nhận định cách đặc biệt (从格) ----
+//   'ditian' (滴天髓 — phái KHOAN, DEFAULT): «从气从势» — khi thế áp đảo tuyệt đối thì
+//     gốc yếu bị «bỏ» theo势 (假从); trợ 透干 vô gốc (floating) không cản thế.
+//   'ziping' (子平真詮 — phái NGHIÊM): còn gốc hiệu lực / trợ 透干 → KHÔNG 从.
+//   Đổi runtime bằng setSchool() hoặc truyền opts = { school } qua computePattern/analyze.
+export let DEFAULT_SCHOOL = 'ditian';
+export function setSchool(s) {
+  if (s !== 'ditian' && s !== 'ziping') throw new Error(`Trường phái không hợp lệ («${s}» — chỉ 'ditian' | 'ziping').`);
+  DEFAULT_SCHOOL = s;
+  return DEFAULT_SCHOOL;
+}
+
 /**
  * Quyết định cách cục. Trả về:
  *   { type, name, vi, geShen, shunNi, pref, note, special }
+ * opts.school: 'ditian' | 'ziping' — mặc định DEFAULT_SCHOOL ('ditian').
  */
-export function computePattern(chart, wx, strength, interactions) {
+export function computePattern(chart, wx, strength, interactions, opts = {}) {
   const dg = chart.dayGan;
   const dmWx = chart.dayMaster.wx;
   const monthZhi = chart.monthZhi;
@@ -111,7 +124,7 @@ export function computePattern(chart, wx, strength, interactions) {
   const stemsGan = ['year', 'month', 'time'].map((k) => chart.pillars[k].gan); // can Năm/Tháng/Giờ (không tính ngày)
 
   // === Bước 0: kiểm cách đặc biệt trước (ưu tiên cao khi đạt ngưỡng) ===
-  const special = detectSpecial(chart, wx, strength, interactions);
+  const special = detectSpecial(chart, wx, strength, interactions, opts.school || DEFAULT_SCHOOL);
   if (special) {
     // [化气] special.pref đã dựng đúng hướng theo can ngày thật — ưu tiên hơn bản tĩnh
     const pref = special.pref || PATTERN_PREF[special.name];
@@ -132,9 +145,38 @@ export function computePattern(chart, wx, strength, interactions) {
   for (let i = 0; i < hidden.length; i++) {
     if (stemsGan.includes(hidden[i])) { geGan = hidden[i]; geSource = i === 0 ? 'bản khí' : (i === 1 ? 'trung khí' : 'dư khí'); break; }
   }
-  const geGod = tenGod(dg, geGan);
-  const geGroup = godGroup(geGod);
+  let geGod = tenGod(dg, geGan);
+  let geGroup = godGroup(geGod);
+  // [G2-audit FIX 2026-08] 透出的藏神 là Tỷ Kiếp (ti) nhưng 月令本气 KHÔNG phải ti → rớt về 本气
+  //   (vd 阴寒湿滞 癸丑月: 癸比肩 透 năm+giờ nhưng 本气 己=七杀 → 七殺格, không phải 月劫格)
+  if (geGroup === 'ti' && hidden[0] !== geGan && godGroup(tenGod(dg, hidden[0])) !== 'ti') {
+    geGan = hidden[0]; geSource = 'bản khí (ti-fallback)'; geGod = tenGod(dg, geGan); geGroup = godGroup(geGod);
+  }
 
+  // === Bước 1b: 杀刃 rule [G2-audit 2026-08] — 禄/刃月 «无格可取» NHƯNG tháng can 透 官杀
+  //   CÓ gốc (bản khí/trung khí tại chi khác) → đặt tên cách theo 官杀 (杀刃相生 — 任铁樵 用神定格;
+  //   vd 小儿章 丙午月 壬杀透得亥禄 → 七殺格). Chỉ tháng can (năm không — 隔太远), guard gốc.
+  if (geGroup === 'ti' && (monthZhi === LU_SHEN[dg] || monthZhi === YANG_REN[dg])) {
+    const mg = chart.pillars.month.gan;
+    const mgod = tenGod(dg, mg);
+    if (godGroup(mgod) === 'guan' && mg !== dg) {
+      let mgRoot = false;
+      for (const zk of ['year', 'month', 'day', 'time']) {
+        const hid = HIDDEN[chart.pillars[zk].zhi] || [];
+        if (hid.slice(0, 2).includes(mg)) { mgRoot = true; break; }
+      }
+      if (mgRoot) {
+        const name2 = mgod === '七殺' ? '七殺格' : '正官格';
+        const pref2 = PATTERN_PREF[name2] || PATTERN_PREF['七殺格'];
+        return {
+          type: 'normal', name: name2, vi: PATTERN_VI[name2] || name2,
+          geShen: { gan: mg, god: mgod, wx: GAN[mg].wx, source: 'tháng can sát xuyên (杀刃)' },
+          shunNi: pref2.shun ? 'thuận dụng' : 'nghịch dụng',
+          pref: pref2, note: pref2.note, special: null,
+        };
+      }
+    }
+  }
   // === Bước 2: Nếu nguyệt lệnh là Tỷ Kiếp → Kiến Lộc / Nguyệt Kiếp / Nhận ===
   if (geGroup === 'ti') {
     let name;
@@ -167,7 +209,7 @@ export function computePattern(chart, wx, strength, interactions) {
 }
 
 // ---- Phát hiện cách đặc biệt (Chuyên Vượng / Tòng cách) ----
-function detectSpecial(chart, wx, strength, interactions) {
+function detectSpecial(chart, wx, strength, interactions, school = 'ditian') {
   const dmWx = chart.dayMaster.wx;
   const monthZhi = chart.monthZhi;
   const total = wx.total || 1;
@@ -249,9 +291,18 @@ function detectSpecial(chart, wx, strength, interactions) {
   //   Tiêu chí CỐT LÕI = HIỆU LỰC GỐC (root effectiveness), không phải % thô:
   //   gốc VÔ HIỆU nếu: (a) chỉ 余气 (pos ≥ 2 — quá mỏng), (b) chi gốc bị XUNG bởi trụ khác
   //   (gốc bị thương), (c) chi gốc bị kéo vào tam hợp hóa hành KHÁC (gốc bị hóa mất).
-  //   Vô gốc hiệu lực + nhóm ngoài áp đảo (≥45%) → 从. Còn trợ nhẹ (Ấn/比 hidden/rò rỉ)
+  //   Vô gốc hiệu lực + nhóm ngoài áp đảo → 从. Còn trợ nhẹ (Ấn/比 hidden/rò rỉ)
   //   → 假从 (theo thế CÓ ĐIỀU KIỆN — vận gặp trợ = biến động). 印/比当令 hoặc 透干 → KHÔNG từ.
+  //   [school-option] Hai phái:
+  //     • 'ziping' (子平真詮 — NGHIÊM): như trên — còn gốc hiệu lực (本气/trung khí) hay còn
+  //       trợ 透干 (Ấn/比 can chi nào) → NHẤT QUYẾT không 从.
+  //     • 'ditian' (滴天髓 — KHOAN, «从气从势»): (b1) vô gốc + nhóm ngoài ≥30% (trợ ≤35%) → 从;
+  //       (b2) CÒN GỐC hiệu lực nhưng thế áp đảo TUYỆT ĐỐI (≥50%, trợ ≤30%) → gốc yếu bị
+  //       «bỏ» theo势 — 假从; TRỪ khi gốc là 本气 NGUYỆT CHI (được nguyệt lệnh duy trì thật);
+  //       trợ 透干 chỉ cản khi can trợ CÓ gốc hiệu lực (floating vô gốc = không đỡ được thế).
+  //     'ditian' là DEFAULT — corpus 命例 nguồn 滴天髓阐微.
   {
+    const liberal = school !== 'ziping'; // [school-option] phái khoan = mặc định
     const groups = { cai: 0, guan: 0, shi: 0 };
     for (const [w, s] of Object.entries(wx.score)) {
       const rel = relGroup(dmWx, w);
@@ -263,6 +314,7 @@ function detectSpecial(chart, wx, strength, interactions) {
 
     // 1. HIỆU LỰC GỐC Nhật Chủ: duyệt 4 chi — gốc 本气/trung khí CHƯA bị vô hiệu mới tính
     let dmEffectiveRoot = false;
+    let dmMonthBenQiRoot = false; // [school-option] gốc 本气 NGUYỆT CHI = duy trì thật → cả phái khoan cũng từ chối
     const pillars = chart.pillars;
     const branchKeys = ['year', 'month', 'day', 'time'];
     for (const zk of branchKeys) {
@@ -274,7 +326,7 @@ function detectSpecial(chart, wx, strength, interactions) {
       const clashed = branchKeys.some((ok) => ok !== zk && CHONG_MAP[zhi] === pillars[ok].zhi);
       // gốc bị TAM HÓA (chi thuộc tam hợp, 化神 ≠ dmWx)?
       const inSanhe = Object.entries(SANHE_HUAQI || {}).find(([keys, hua]) => keys.split('').includes(zhi) && hua !== dmWx);
-      if (!clashed && !inSanhe) { dmEffectiveRoot = true; break; }
+      if (!clashed && !inSanhe) { dmEffectiveRoot = true; if (zk === 'month' && pos === 0) dmMonthBenQiRoot = true; }
     }
 
     // 2. Ấn/比當令 hoặc 透干 → tháng/trời nuôi thân → KHÔNG từ (trừ 真从 band vô trợ)
@@ -291,9 +343,21 @@ function detectSpecial(chart, wx, strength, interactions) {
       if (!clashedY && !inSanheY) { yinEffectiveRoot = true; break; }
     }
     let helperTou = false;
+    let helperTouRooted = false; // [school-option] can trợ 透干 CÓ gốc hiệu lực → trợ thật (phái khoan cũng cản)
     for (const zk of ['year', 'month', 'time']) {
       const gwx = GAN[pillars[zk].gan] ? GAN[pillars[zk].gan].wx : null;
-      if (gwx === dmWx || gwx === SHENG_BY[dmWx]) { helperTou = true; break; }
+      if (gwx === dmWx || gwx === SHENG_BY[dmWx]) {
+        helperTou = true;
+        // gốc hiệu lực của can trợ: 本气/trung khí tại chi chưa xung/chưa bị tam-hóa
+        for (const rk of branchKeys) {
+          const hidR = HIDDEN[pillars[rk].zhi] || [];
+          const posR = hidR.indexOf(pillars[zk].gan);
+          if (posR < 0 || posR > 1) continue;
+          const clashedR = branchKeys.some((ok) => ok !== rk && CHONG_MAP[pillars[rk].zhi] === pillars[ok].zhi);
+          const inSanheR = Object.entries(SANHE_HUAQI || {}).find(([keys, hua]) => keys.split('').includes(pillars[rk].zhi) && hua !== gwx);
+          if (!clashedR && !inSanheR) { helperTouRooted = true; break; }
+        }
+      }
     }
     let silBlocked = false;
     try {
@@ -301,14 +365,40 @@ function detectSpecial(chart, wx, strength, interactions) {
       if (sil && (sil.wx === dmWx || sil.wx === SHENG_BY[dmWx])) silBlocked = true;
     } catch (_) {}
 
-    // 3. Nhóm ngoài áp đảo + vô gốc hiệu lực → 从 (theo thế)
-    if (domRatio > 0.45 && help <= 0.40 && !dmEffectiveRoot && !yinEffectiveRoot && !helperTou && !silBlocked) { // [cap] help > 40% = 母多子病 (Ấn chủ đạo) — không phải 从
-      const congGia = help > 0.12 || strength.ratio >= 0.25; // còn dấu vết trợ → 假从
+    // 3. Nhóm ngoài áp đảo + điều kiện gốc/trợ THEO TRƯỜNG PHÁI → 从 (theo thế)
+    const silOk = !silBlocked;        // 印/比当令 → KHÔNG 从 (cả hai phái — 印当令 = không từ)
+    const yinOk = !yinEffectiveRoot;  // Ấn có gốc hiệu lực → sinh thân thật → KHÔNG 从 (cả hai phái)
+    const helperOk = liberal ? (helperTou ? !helperTouRooted : true) : !helperTou; // [school-option] phái khoan chỉ cản trợ 透干 CÓ gốc (floating vô gốc bỏ qua)
+    let congFired = false, congGia = false, congGiaNote = null;
+    if (silOk && yinOk && helperOk) {
+      if (!dmEffectiveRoot) {
+        // (a) Nhật Chủ VÔ GỐC hiệu lực:
+        //     band cứng (cả hai phái): nhóm ngoài > 45% + trợ ≤ 40% // [cap] help > 40% = 母多子病 (Ấn chủ đạo) — không phải 从
+        //     [school-option] band KHOAN (chỉ 'ditian'): thế áp đảo mà gốc đã mất — nhóm ≥ 30% + trợ ≤ 35%
+        const gateStrict = domRatio > 0.45 && help <= 0.40;
+        const gateLiberal = domRatio >= 0.30 && help <= 0.35;
+        if (gateStrict || (liberal && gateLiberal)) {
+          congFired = true;
+          congGia = help > 0.12 || strength.ratio >= 0.25; // còn dấu vết trợ → 假从
+        }
+      } else if (liberal && !dmMonthBenQiRoot) {
+        // (b) [滴天髓 从气从势 — school-option] Nhật Chủ CÒN GỐC hiệu lực nhưng thế áp đảo
+        //     TUYỆT ĐỐI (nhóm ngoài ≥ 50%, trợ ≤ 30%) → gốc yếu bị «bỏ» theo势 — 假从
+        //     (còn gốc thật nên không bao giờ là 真从). Gốc 本气 NGUYỆT CHI = nguyệt lệnh
+        //     duy trì thật → KHÔNG 从 kể cả phái khoan.
+        if (domRatio >= 0.50 && help <= 0.30) {
+          congFired = true;
+          congGia = true;
+          congGiaNote = '滴天髓 从势: gốc bị thế áp đảo bỏ theo势 — 假从';
+        }
+      }
+    }
+    if (congFired) { // [cap] help > 40% = 母多子病 (Ấn chủ đạo) — đã chặn ở gate trên
       const map = { cai: '從財格', guan: '從殺格', shi: '從兒格' };
       const res = { kind: 'cong', name: map[dom[0]], geShen: { wx: dominantWx(dmWx, dom[0]) } };
       if (congGia) {
         res.congGia = true;
-        res.note = 'Nhật Chủ vô gốc hiệu lực (gốc 余气/bị xung/bị hóa) nhưng còn dấu vết trợ → 假从 — vận gặp trợ = biến động lớn.';
+        res.note = congGiaNote || 'Nhật Chủ vô gốc hiệu lực (gốc 余气/bị xung/bị hóa) nhưng còn dấu vết trợ → 假从 — vận gặp trợ = biến động lớn.';
       }
       return res;
     }

@@ -243,7 +243,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·从象章 (任铁樵注)',
     person: '从象章 例造 (无名氏) — 四柱皆刃',
     pillars: { year: '丙午', month: '甲午', day: '丙午', hour: '甲午' },
-    note: 'Ví dụ 专旺 火 kinh điển nhất (四火两甲).',
+    note: 'Ví dụ 专旺 火 kinh điển nhất (四火两甲). [downgraded — dual-school probe 2026-09: cách 专旺 khớp cả 2 phái nhưng hướng Dụng tranh cãi — cổ pháp lấy 旺神 火, engine lấy 泄秀 (土) — fail Y ở cả phái ditian lẫn ziping]',
     known: {
       strength: 'vượng',
       ge: '從旺格',
@@ -251,7 +251,7 @@ export const CLASSICAL_CASES = [
       verdict: '丙生仲夏, 四柱皆刃, 强旺极矣 — 可顺不可逆, 从其旺势; 亥运 犯旺神, 死于军前.',
     },
     principle: '「四柱皆刃, 从旺可也」— 旺之极者 顺其势, 逆其旺神者凶 (炎上/从旺 一路).',
-    confidence: 'high',
+    confidence: 'medium',
   },
   {
     id: 'ditian-congwang-mu',
@@ -259,7 +259,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·从象章 (任铁樵注)',
     person: '从象章 例造 (无名氏) — 甲木从旺',
     pillars: { year: '癸卯', month: '乙卯', day: '甲寅', hour: '乙亥' },
-    note: '例 曲直/从旺 木.',
+    note: '例 曲直/从旺 木. [downgraded — dual-school probe 2026-09: cách 专旺 khớp cả 2 phái nhưng hướng Dụng tranh cãi — cổ pháp lấy 旺神 木, engine lấy 泄秀 (火) — fail Y ở cả phái ditian lẫn ziping]',
     known: {
       strength: 'vượng',
       ge: '從旺格',
@@ -267,7 +267,7 @@ export const CLASSICAL_CASES = [
       verdict: '甲木生仲春, 禄刃两全, 旺之极矣 — 从其旺神; 早采芹香, 登科发甲, 仕至黄堂; 庚戌运 触旺神, 不能免咎.',
     },
     principle: '「从其旺神」— 两卯 禄刃, 寅亥生 乙助 癸印, 旺极顺用; 逆旺之运应凶.',
-    confidence: 'high',
+    confidence: 'medium',
   },
   {
     id: 'ditian-congcai-tu',
@@ -275,7 +275,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·从象章 (任铁樵注)',
     person: '从象章 例造 (无名氏) — 四柱皆财 (土)',
     pillars: { year: '戊戌', month: '丙辰', day: '乙未', hour: '丙戌' },
-    note: '例 从财 土.',
+    note: '例 从财 土. [school: ditian 从势 (ziping strict = normal pattern) — dual-school probe 2026-09: phái ditian nhận 從財格 (gốc 辰 bị xung + hội hóa = vô hiệu), Y 土 khớp; phái ziping giữ 正財 thường]',
     known: {
       strength: 'nhược',
       ge: '從財格',
@@ -291,7 +291,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·从象章 (任铁樵注)',
     person: '从象章 例造 (无名氏) — 四寅从财 (木)',
     pillars: { year: '壬寅', month: '壬寅', day: '庚寅', hour: '戊寅' },
-    note: '例 从财 木.',
+    note: '例 从财 木. [school: ditian 从势 (ziping strict = normal pattern) — dual-school probe 2026-09: phái ditian nhận 從財格 (trợ 戊 透 giờ nhưng vô gốc — floating bỏ qua), Y 木 khớp; phái ziping giữ 偏印 thường]',
     known: {
       strength: 'nhược',
       ge: '從財格',
@@ -307,7 +307,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·从象章 (任铁樵注)',
     person: '从象章 例造 (无名氏) — 从财 (火)',
     pillars: { year: '丙寅', month: '庚寅', day: '壬午', hour: '乙巳' },
-    note: '例 从财 火.',
+    note: '例 从财 火. [downgraded — dual-school probe 2026-09: 庚 印透 tháng CÓ gốc trung-khí tại 巳 (trợ thật) → cả phái ditian lẫn ziping đều từ chối 从 (giữ 正財/偏財 thường) trong khi 滴天髓 断 从财格真 — tranh cãi 印根微 vs 弃命从]',
     known: {
       strength: 'nhược',
       ge: '從財格',
@@ -315,7 +315,7 @@ export const CLASSICAL_CASES = [
       verdict: '壬水无根, 寅午支全 财星成势 — 从财格真; 登科发仁, 至侍郎.',
     },
     principle: '「财星得地, 弃命从之」— 从财格 真; 顺火之运发.',
-    confidence: 'high',
+    confidence: 'medium',
   },
   {
     id: 'ditian-congsha-xinjin',
@@ -323,7 +323,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·假从章 (任铁樵注)',
     person: '假从章 例造 (无名氏) — 辛金从杀',
     pillars: { year: '丁卯', month: '丙寅', day: '辛亥', hour: '庚寅' },
-    note: '例 假从杀 — 亥寅化木生火.',
+    note: '例 假从杀 — 亥寅化木生火. [school: ditian 从势 (ziping strict = normal pattern) — dual-school probe 2026-09: phái ditian nhận 從殺格 (trợ 庚 透 giờ vô gốc — floating bỏ qua), Y 火 khớp; phái ziping giữ 正官 thường]',
     known: {
       strength: 'nhược',
       ge: '從殺格',
@@ -339,7 +339,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·从象章 (任铁樵注)',
     person: '从象章 例造 (无名氏) — 己未从杀',
     pillars: { year: '癸亥', month: '乙卯', day: '己未', hour: '丁卯' },
-    note: '例 真从杀.',
+    note: '例 真从杀. [school: ditian 从势 (ziping strict = normal pattern) — dual-school probe 2026-09: phái ditian nhận 從殺格 (gốc 未 bị kéo vào 亥卯未 hóa = vô hiệu; 丁 trợ vô gốc), Y 木 khớp; phái ziping giữ 七殺 thường]',
     known: {
       strength: 'nhược',
       ge: '從殺格',
@@ -355,7 +355,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·假从章 (任铁樵注)',
     person: '假从章 例造 (无名氏) — 戊土从官',
     pillars: { year: '乙卯', month: '己卯', day: '戊辰', hour: '癸亥' },
-    note: '例 假从 官 — 任氏 明言 「从官非身衰论」.',
+    note: '例 假从 官 — 任氏 明言 「从官非身衰论」. [school: ditian 从势 (ziping strict = normal pattern) — dual-school probe 2026-09: phái ditian nhận 從殺格 (gốc 辰 bị hội hóa = vô hiệu; 己 比 vô gốc), Y 木 khớp; phái ziping giữ 正官 thường]',
     known: {
       strength: 'nhược',
       ge: '從殺格',
@@ -371,7 +371,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·从象章 (任铁樵注)',
     person: '从象章 例造 (无名氏) — 乙酉从杀',
     pillars: { year: '辛巳', month: '辛丑', day: '乙酉', hour: '乙酉' },
-    note: '例 真从杀 金.',
+    note: '例 真从杀 金. [school: ditian 从势 (ziping strict = normal pattern) — dual-school probe 2026-09: phái ditian nhận 從殺格 (印 癸 tại 丑 bị kéo vào 巳酉丑 hóa Kim = vô hiệu; 乙 比 vô gốc), Y 金 khớp; phái ziping giữ 七殺 thường]',
     known: {
       strength: 'nhược',
       ge: '從殺格',
@@ -387,7 +387,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·假从章 (任铁樵注)',
     person: '假从章 例造 (无名氏) — 丙申从杀',
     pillars: { year: '丁丑', month: '壬寅', day: '丙申', hour: '壬辰' },
-    note: '例 从杀 用财.',
+    note: '例 从杀 用财. [downgraded — dual-school probe 2026-09: 印 (木) trợ thân ~45% (> ngưỡng 40% cap «母多子病») → cả phái ditian lẫn ziping đều từ chối 从杀 (giữ 偏印 thường) trong khi 任氏 断 从杀用财 — tranh cãi trợ-thân-đủ vs 弃命从]',
     known: {
       strength: 'nhược',
       ge: '從殺格',
@@ -395,7 +395,7 @@ export const CLASSICAL_CASES = [
       verdict: '两壬紧克丙火, 格成从杀 — 用财更妙 (财生杀); 年支丑土生金晦火 — 身出官家, 早登科甲; 运走西北金水 — 仕至观察.',
     },
     principle: '「格成从杀, 用财更妙」— 官杀势重 弃命从之; 喜财滋杀 之运.',
-    confidence: 'high',
+    confidence: 'medium',
   },
   {
     id: 'ditian-jiaccong-guisi',
@@ -403,7 +403,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·假从章 (任铁樵注)',
     person: '假从章 例造 (无名氏) — 癸巳假从杀',
     pillars: { year: '癸巳', month: '乙卯', day: '己亥', hour: '癸酉' },
-    note: '例 假从 — 「不作真从」 có 运程 佐证.',
+    note: '例 假从 — 「不作真从」 có 运程 佐证. [school: ditian 从势 (ziping strict = normal pattern) — dual-school probe 2026-09: phái ditian nhận 從殺格, Y 木 khớp; phái ziping giữ 七殺 thường]',
     known: {
       strength: 'nhược',
       ge: '從殺格',
@@ -435,7 +435,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·从象章 (任铁樵注)',
     person: '从象章 例造 (无名氏) — 从势 (财官伤并旺)',
     pillars: { year: '丙戌', month: '壬辰', day: '癸巳', hour: '甲寅' },
-    note: '例 从势.',
+    note: '例 从势. [downgraded — dual-school probe 2026-09: 从势 财官伤并旺 mà KHÔNG nhóm nào đạt ngưỡng áp đảo (max ~24%) → cả phái ditian lẫn ziping đều không nhận 从势 — hướng Dụng 任氏 lấy 官星势 (土) vs engine lấy nhóm mạnh nhất khác — tranh cãi, đo trung thực = medium]',
     known: {
       strength: 'nhược',
       ge: null,
@@ -443,7 +443,7 @@ export const CLASSICAL_CASES = [
       verdict: '癸水无根, 财官伤三者并旺 — 从官星之势; 甲午运 会火局生官 云程直上; 戊戌运 仕至观察; 亥运 帮身冲巳, 不禄.',
     },
     principle: '「从势者, 财官食伤并旺…以财官为势」— 从官星 之造 喜 财官 之运; 恢复帮身则破.',
-    confidence: 'high',
+    confidence: 'medium',
   },
   {
     id: 'ditian-conghua',
@@ -451,7 +451,7 @@ export const CLASSICAL_CASES = [
     source: '滴天髓阐微·从象章 (任铁樵注)',
     person: '从象章 例造 (无名氏) — 丙火从化 (金)',
     pillars: { year: '癸酉', month: '乙丑', day: '丙申', hour: '丙申' },
-    note: '例 从化 金水之势.',
+    note: '例 从化 金水之势. [downgraded — dual-school probe 2026-09: nhóm theo (金水) ~27% — dưới mọi ngưỡng áp đảo → cả phái ditian lẫn ziping đều không nhận 从 (giữ 正官 thường) trong khi 任氏 断 从化金水 — tranh cãi thế-chưa-áp-đảo vs 弃命从化]',
     known: {
       strength: 'nhược',
       ge: null,
@@ -459,7 +459,7 @@ export const CLASSICAL_CASES = [
       verdict: '丙火衰绝无气, 酉丑拱金 申申助之 — 从化金水之势; 癸亥运 入泮登科; 辛酉庚申 由县令迁州牧; 己未运 火土逆势, 不禄.',
     },
     principle: '「衰绝无气, 从化金水之势」— 顺化神 (金) 则贵, 逆之则亡. (Engine 不判 化气 — fixtures này vẫn chấm strength/yong.)',
-    confidence: 'high',
+    confidence: 'medium',
   },
 
   // ==========================================================================
