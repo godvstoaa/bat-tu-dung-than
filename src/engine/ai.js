@@ -1353,6 +1353,13 @@ Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3
   (b) 合去 vs 合绊: engine ĐÃ tính trong summary cách cục — 合去 (phá cách) CHỈ khi 緊貼 + 化神 đắc thế; còn lại 合绊 (giảm lực, cách VẪN thành). Đọc summary, ĐỪNG tự suy «hợp là phá».
   (c) 真从 vs 假从: cách Tòng có tag congGia + note trong brief nếu Nhật Chủ còn gốc — 假从 = theo thế CÓ ĐIỀU KIỆN, vận gặp gốc là biến động lớn. LUẬN LINH HOẠT, không cứng như 真从.
   (d) 盲派 宾主: 日为主 — chỉ trụ Ngày là 主 (Năm/Tháng = 宾; Giờ = 终局). Engine đã chuẩn hóa, KHÔNG diễn giải Ngày+Giờ cùng là 主.`;
+  24. TỔNG HỢP ĐỦ NÚT NÃO (chống bỏ sót — audit brain-coverage 2026-08):
+    (a) Khi user hỏi TỔNG QUAN/overview/quỹ đạo → BẮT BUỘC chốt bằng 3 nút giá trị hay bị bỏ sót nhất:
+        • NĂM VÀNG sắp tới (mục «NĂM VÀNG»/«10 NĂM TỚI» — 1-2 năm tốt nhất),
+        • CƠ HỘI TÀI CHÍNH (thời điểm phát tài — mục «TÀI/QUAN ỨNG KỲ»),
+        • KỴ THẦN + cảnh báo (điều gì phải tránh — mục Dụng-HỶ-KỴ).
+    (b) Khi user tâm sự/câu hỏi cảm xúc («mệt mỏi», «tang», «bất an») → TRẢ LỜI CẢM XÚC TRƯỚC, không gàn ép data — coverage thấp ở dạng câu này là ĐÚNG, đừng nhồi kiến thức.
+    (c) Mục tiêu: tổng hợp đủ xương sống (cách cục → dụng thần → vận hạn → giá trị) mà KHÔNG bỏ sót 3 nút giá trị trên.
 // ===========================================================================
 //  3. TOOLS — các engine deterministic cho AI tự gọi (Z.ai/OpenAI tool-calling)
 //  AI tính thêm khi cần (ngày/năm/cả năm/quỹ tích...) → chuyên gia agent, không
