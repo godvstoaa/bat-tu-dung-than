@@ -109,7 +109,8 @@ export function checkNeo(response, brief) {
     if (resp.includes(star)) {
       const idx = resp.indexOf(star);
       const ctx = resp.slice(Math.max(0, idx - 20), idx + 60);
-      if (/cung|mệnh cung|Phu Thê|Tài Bạch|Quan Lộc|Nô Bộc|Điền Trạch|Phụ Mẫu|Huynh Đệ|Tử Nữ|Phúc Đức|命宫|夫妻|财帛/.test(ctx)) {
+      const denyTuvi = /không (luận|xem|có)|theo BaZi|chỉ luận theo|dữ liệu tử vi/i.test(resp.slice(Math.max(0, idx - 120), idx + 120));
+      if (/cung|mệnh cung|Phu Thê|Tài Bạch|Quan Lộc|Nô Bộc|Điền Trạch|Phụ Mẫu|Huynh Đệ|Tử Nữ|Phúc Đức|命宫|夫妻|财帛/.test(ctx) && !denyTuvi) {
         if (!hasTuViData) {
           conflicts.push({ type: 'tuviHallucinate', said: star + ' + cung', brief: '(không có Tử Vi palace)', severity: 'critical', note: 'Bịa Tử Vi palace (lỗi #6/#11 type)' });
           break;
@@ -133,15 +134,20 @@ export function checkNeo(response, brief) {
     }
   }
 
+    // [FP-FIX] AI tự nhận lỗi = cơ chế tự sửa hoạt động — không flag self-correct
+  const isSelfCorrection = /tính nhầm|thầy nhầm|nhận lỗi|thầy nói sai|thầy luận sai|đính chính/i.test(resp);
+
   // 6. NĂM HIỆN TẠI — neo vs brief
   const briefYearMatch = bf.match(/NĂM NAY\s*=\s*(\d{4})/);
   if (briefYearMatch) {
     const briefYear = briefYearMatch[1];
-    const respYearRefs = resp.match(/năm nay[^.]{0,30}?(\d{4})/gi);
+    // [FIX FP 2026-08] chỉ flag KHI KHẮNG ĐỊNH («năm nay = 2027»). Bỏ qua so sánh
+    // («năm nay quen người, năm 2027 khớp») và self-correction («thầy tính nhầm...»)
+    const respYearRefs = resp.match(/năm nay\s*(?:(?:=|là|:)|\()\s*(\d{4})/gi);
     if (respYearRefs) {
       for (const ref of respYearRefs) {
         const yr = (ref.match(/\d{4}/) || [])[0];
-        if (yr && yr !== briefYear) conflicts.push({ type: 'yearWrong', said: 'năm nay = ' + yr, brief: 'năm nay = ' + briefYear, severity: 'high' });
+        if (yr && yr !== briefYear && !isSelfCorrection) conflicts.push({ type: 'yearWrong', said: 'năm nay = ' + yr, brief: 'năm nay = ' + briefYear, severity: 'high' });
         else if (yr === briefYear) matches.push({ type: 'year', token: yr });
       }
     }
@@ -168,6 +174,7 @@ export function checkNeo(response, brief) {
     }
   }
 
+    // [FP-FIX] AI tự nhận lỗi = cơ chế tự sửa hoạt động — không flag self-correct
   const total = matches.length + conflicts.length;
   const score = total > 0 ? Math.round((matches.length / total) * 100) : null;
   const hasRedFlag = conflicts.some((c) => c.severity === 'critical');
