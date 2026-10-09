@@ -1283,6 +1283,13 @@ function adminDashboard(env) {
     const chg=el('button','btn','🔑 Đổi token'); chg.style.marginLeft='8px'; chg.onclick=function(){ var n=prompt('Token mới (≥8 ký tự):'); if(!n||n.length<8){if(n!==null)alert('Cần ≥8 ký tự');return;} fetch(AP+'/api/token?token='+encodeURIComponent(TOKEN),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({new:n})}).then(function(r){return r.json()}).then(function(j){ if(j.ok){alert('Đã đổi! Đang chuyển sang token mới…'); location.href=AP+'?token='+encodeURIComponent(n);} else alert('Lỗi: '+(j.err||'?')); }); }; c.appendChild(chg);
     const ft=document.getElementById('ftype').value;
     const evs = ft ? d.events.filter(e=>e.type===ft) : d.events;
+    // [UX] sắp xếp theo cột header bấm (toggle ↑↓) — dữ liệu client-side có sẵn
+    if (_evSort.col) {
+      const dir = _evSort.dir;
+      const key = (e) => _evSort.col === 'ts' ? (e.ts||0) : _evSort.col === 'type' ? (e.type||'') : _evSort.col === 'ip' ? (e.ip||'') : _evSort.col === 'geo' ? ((e.country||'')+(e.city||'')) : (e.data ? JSON.stringify(e.data).length : 0);
+      evs = evs.slice().sort((a, b) => { const ka = key(a), kb = key(b); return (ka > kb ? 1 : ka < kb ? -1 : 0) * dir; });
+    }
+    ('ts type ip geo data').split(' ').forEach((c) => { const ar = document.getElementById('ev-arrow-' + c); if (ar) ar.textContent = (_evSort.col === c) ? (_evSort.dir === 1 ? ' ▼' : ' ▲') : ''; });
     const tb=document.getElementById('events'); tb.textContent='';
     evs.forEach(function(e){
       const tr=el('tr');
