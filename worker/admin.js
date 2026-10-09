@@ -1071,7 +1071,7 @@ function adminDashboard(env) {
               <span class="fresult" id="sqresult"></span>
             </div>
           </div>
-          <table><thead><tr><th>Thời gian</th><th>Loại</th><th>IP</th><th>Địa lý</th><th>Dữ liệu</th></tr></thead><tbody id="events"></tbody></table>
+          <table><thead><tr><th style="cursor:pointer;user-select:none" onclick="_evSortBy('ts')">Thời gian <span id="ev-arrow-ts"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('type')">Loại <span id="ev-arrow-type"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('ip')">IP <span id="ev-arrow-ip"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('geo')">Địa lý <span id="ev-arrow-geo"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('data')" title="Sắp theo độ dài dữ liệu">Dữ liệu <span id="ev-arrow-data"></span></th></tr></thead><tbody id="events"></tbody></table>
         </div>
 
         <!-- 🔎 VISITOR FINDER (chỉ hiển thị danh sách khi bấm «🔍 Tìm») -->
@@ -1287,9 +1287,9 @@ function adminDashboard(env) {
     evs.forEach(function(e){
       const tr=el('tr');
       const td1=el('td','tiny',new Date(e.ts).toLocaleString('vi-VN')); tr.appendChild(td1);
-      const td2=el('td'); const badge=el('span','badge b-'+(e.type||'other'), e.type); td2.appendChild(badge); tr.appendChild(td2);
+      const td2=el('td'); const badge=el('span','badge b-'+(e.type||'other'), e.type); badge.style.cursor='pointer'; badge.title='🔍 Lọc theo loại «'+e.type+'»'; badge.onclick=function(ev){ ev.stopPropagation(); const sel=document.getElementById('ftype'); if (sel) { sel.value = e.type; } _evApply(); }; td2.appendChild(badge); tr.appendChild(td2);
       var tdIp=el('td','ip', e.ip||'?'); if(e.ip){tdIp.style.cursor='pointer';tdIp.title='Click xem chi tiết visitor';tdIp.onclick=function(){showVisitor(e.ip);};tdIp.onmouseenter=function(){tdIp.style.textDecoration='underline';};tdIp.onmouseleave=function(){tdIp.style.textDecoration='none';};} tr.appendChild(tdIp);
-      tr.appendChild(el('td','tiny', (e.country||'?')+(e.city?' / '+e.city:'')));
+      const tdGeo=el('td','tiny', (e.country||'?')+(e.city?' / '+e.city:'')); tdGeo.style.cursor='pointer'; tdGeo.title='🔍 Lọc theo địa lý «'+(e.country||'')+'»'; tdGeo.onclick=function(ev){ ev.stopPropagation(); const inp=document.getElementById('sq'); if (inp) { inp.value = (e.country||'') + (e.city ? ' ' + e.city : ''); } _sqSearch(); }; tr.appendChild(tdGeo);
       tr.appendChild(el('td','tiny', (function(){ if(!e.data) return ''; if(e.type==='ai_chat') return (e.data.source==='local'?'⚠ ':'')+'«'+String(e.data.q||'').slice(0,46)+'» → '+(e.data.source==='ai'?'🤖':'📦LOCAL')+(e.data.durationMs!=null?' '+fmtMs(e.data.durationMs):'')+(e.data.rounds?' · '+e.data.rounds+'v':'')+(e.data.bailed?' · BỊ CẮT':'')+(e.data.error?' · ERR: '+String(e.data.error).slice(0,80):'')+' — «click»'; if(e.type==='ai_question') return 'Q: '+String(e.data.q||'').slice(0,200); if(e.type==='chart') return '📊 '+String(e.data.dob||'')+' '+String(e.data.time||'')+' '+String(e.data.gender||'')+(e.data.score!=null?' · 🔢 '+e.data.score+'/100'+(e.data.grade?' ('+e.data.grade+')':''):''); if(e.type==='error') return '⚠ '+String(e.data.msg||'').slice(0,200); if(e.type==='click') return '🖱 '+String(e.data.id||'')+' ('+String(e.data.txt||'').slice(0,30)+')'; if(e.type==='visit'&&e.data.ref) return '← '+String(e.data.ref).slice(0,80); return JSON.stringify(e.data).slice(0,200); })()));
       // [loop 1352] ai_chat row click → modal full Q+A (không truncate)
       if (e.type==='ai_chat' && e.data) { tr.style.cursor='pointer'; tr.onmouseenter=function(){tr.style.background='rgba(212,175,55,.08)';}; tr.onmouseleave=function(){tr.style.background='';}; tr.onclick=function(){showChat(e.data.q, e.data.response, e.data.source, e.data.durationMs, e.ts, e.ip, e.data.rounds, e.data.bailed, e.data.detail);}; }
@@ -1497,6 +1497,9 @@ function adminDashboard(env) {
   // [redesign v3] danh sách IP/tên chỉ hiện khi user chủ động bấm «🔍 Tìm» — tránh che log sự kiện
   var _vSearched = false;
   function vSearch(){ _vSearched = true; vRender(); }
+  // [UX] sort state cho bảng sự kiện — header bấm toggle ↑↓
+  var _evSort = { col: null, dir: 1 };
+  function _evSortBy(col){ if (_evSort.col === col) { _evSort.dir = -_evSort.dir; } else { _evSort.col = col; _evSort.dir = 1; } load(); }
   function _sqSearch(){ var inp=document.getElementById('sq'); var q=(inp.value||'').toLowerCase().trim(); var shown=0,total=0; document.querySelectorAll('#events tr').forEach(function(tr){total++;var ok=!q||tr.textContent.toLowerCase().indexOf(q)>=0;tr.style.display=ok?'':'none';if(ok)shown++;}); var r=document.getElementById('sqresult'); if(r) r.textContent=q?shown+' / '+total+' dòng khớp':(total+' dòng'); }
   function _sqClear(){ var inp=document.getElementById('sq'); if(inp) inp.value=''; _sqSearch(); }
   function _evApply(){ var ft=document.getElementById('ftype'); if(ft) load(); _sqSearch(); }
