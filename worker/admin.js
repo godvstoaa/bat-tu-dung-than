@@ -1822,7 +1822,7 @@ function adminDashboard(env) {
   <div id="chat-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
   <div id="visitor-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
   <div id="note-modal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:10000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)"></div>
-  </body></html>`.replace(/\/admin/g, '/' + ap), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer',
+  <div style="position:fixed;bottom:4px;right:10px;font-size:9px;opacity:.4;z-index:99;pointer-events:none">admin build 2026-09-08-sort</div></body></html>`.replace(/\/admin/g, '/' + ap), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer',
     // [loop 1355] security headers — CSP cho admin dashboard (inline script/style cần 'unsafe-inline';
     //   connect chỉ same-origin, chặn framing/external). HSTS + nosniff cho mọi response.
     'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
