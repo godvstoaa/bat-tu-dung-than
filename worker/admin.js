@@ -1053,7 +1053,7 @@ function adminDashboard(env) {
         <div class="pagehead"><h2>👥 Visitors</h2><span class="pill">Log sự kiện hiện sẵn · tìm IP/tên khi cần</span></div>
 
         <!-- SỰ KIỆN (log chính — ĐẶT TRÊN CÙNG, luôn hiện) -->
-        <div class="card"><h3>📜 Sự kiện gần đây <span class="card-actions tiny">click dòng ai_chat → xem full Q+A · click IP → xem chi tiết visitor</span></h3>
+        <div class="card"><h3>📜 Sự kiện gần đây <span class="card-actions tiny">click dòng ai_chat → xem full Q+A · click IP → xem chi tiết visitor · <b>bấm header ⇅ sắp xếp · bấm Loại/Địa lý lọc</b></span></h3>
           <div class="fpanel">
             <div class="toolbar" style="margin-bottom:0;align-items:stretch">
               <div class="fgroup" style="flex:1;min-width:200px">
@@ -1071,7 +1071,7 @@ function adminDashboard(env) {
               <span class="fresult" id="sqresult"></span>
             </div>
           </div>
-          <table><thead><tr><th style="cursor:pointer;user-select:none" onclick="_evSortBy('ts')">Thời gian <span id="ev-arrow-ts"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('type')">Loại <span id="ev-arrow-type"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('ip')">IP <span id="ev-arrow-ip"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('geo')">Địa lý <span id="ev-arrow-geo"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('data')" title="Sắp theo độ dài dữ liệu">Dữ liệu <span id="ev-arrow-data"></span></th></tr></thead><tbody id="events"></tbody></table>
+          <table><thead><tr><th style="cursor:pointer;user-select:none" onclick="_evSortBy('ts')">Thời gian ⇅<span id="ev-arrow-ts"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('type')">Loại ⇅<span id="ev-arrow-type"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('ip')">IP ⇅<span id="ev-arrow-ip"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('geo')">Địa lý ⇅<span id="ev-arrow-geo"></span></th><th style="cursor:pointer;user-select:none" onclick="_evSortBy('data')" title="Sắp theo độ dài dữ liệu">Dữ liệu ⇅<span id="ev-arrow-data"></span></th></tr></thead><tbody id="events"></tbody></table>
         </div>
 
         <!-- 🔎 VISITOR FINDER (chỉ hiển thị danh sách khi bấm «🔍 Tìm») -->
@@ -1282,7 +1282,7 @@ function adminDashboard(env) {
     const exp=el('a','btn','📥 Export CSV'); exp.href=AP+'/api/export?token='+encodeURIComponent(TOKEN); exp.style.cssText='margin-left:8px;text-decoration:none;padding:9px 14px;display:inline-block'; c.appendChild(exp);
     const chg=el('button','btn','🔑 Đổi token'); chg.style.marginLeft='8px'; chg.onclick=function(){ var n=prompt('Token mới (≥8 ký tự):'); if(!n||n.length<8){if(n!==null)alert('Cần ≥8 ký tự');return;} fetch(AP+'/api/token?token='+encodeURIComponent(TOKEN),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({new:n})}).then(function(r){return r.json()}).then(function(j){ if(j.ok){alert('Đã đổi! Đang chuyển sang token mới…'); location.href=AP+'?token='+encodeURIComponent(n);} else alert('Lỗi: '+(j.err||'?')); }); }; c.appendChild(chg);
     const ft=document.getElementById('ftype').value;
-    const evs = ft ? d.events.filter(e=>e.type===ft) : d.events;
+    let evs = ft ? d.events.filter(e=>e.type===ft) : d.events;
     // [UX] sắp xếp theo cột header bấm (toggle ↑↓) — dữ liệu client-side có sẵn
     if (_evSort.col) {
       const dir = _evSort.dir;
