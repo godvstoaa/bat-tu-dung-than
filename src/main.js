@@ -4627,20 +4627,23 @@ async function run() {
   // [loop 23] Múi giờ + 真太阳时 (giờ Mặt Trời thật theo kinh độ nơi sinh).
   //   Bát Tự dùng 真太阳时 — đồng hồ múi giờ chỉ là xấp xỉ. Sinh gần ranh 时辰 thì sai vài
   //   phút có đổi 时柱. Có city/longitude → hiệu chỉnh; không thì dùng giờ nhập y nguyên.
-  const tz = parseFloat($('tz').value) || 7;
+  // [tz-full] Number.isFinite thay cho `|| 7` — trước đây GMT+0 (value "0") falsy → nuốt thành GMT+7
+  let tz = parseFloat($('tz').value);
+  if (!Number.isFinite(tz)) tz = 7;
+  const dst = ($('dst') && $('dst').checked) ? 1 : 0; // [tz-full] giờ mùa hè +1h (Âu/Mỹ/Úc hè)
   const cityVal = $('city').value;
   const nameVal = (($('birth-name') || {}).value || '').trim().slice(0, 40); // [visitor-finder] tên tùy chọn (admin tìm lại)
   let longitude = null;
   if (cityVal === 'manual') { const lv = parseFloat($('long').value); longitude = Number.isFinite(lv) && lv >= -180 && lv <= 180 ? lv : null; }
   else if (cityVal && !Number.isNaN(parseFloat(cityVal))) longitude = parseFloat(cityVal);
-  const tt = trueSolarTime({ year: y0, month: m0, day: d0, hour: hh0, minute: mm0, tzOffset: tz, longitude });
+  const tt = trueSolarTime({ year: y0, month: m0, day: d0, hour: hh0, minute: mm0, tzOffset: tz + dst, longitude });
   const y = tt.solar.year, m = tt.solar.month, d = tt.solar.day, hh = tt.solar.hour, mm = tt.solar.minute;
   // [loop 851 PRIVACY] persist birth data — nhưng KHÔNG overwrite nếu đến từ URL share
   //   (user B mở link user A → KHÔNG đè localStorage user B)
   // [loop 852 FIX] clear _fromUrlShare SAU lần save đầu — user B tự nhập data riêng
   //   lần sau → save ĐÚNG (không bị skip vì flag cũ).
   if (!window._fromUrlShare) {
-    try { localStorage.setItem('bazi-birth', JSON.stringify({ date: dateVal, time: timeVal, gender, tz, city: cityVal, long: $('long') ? $('long').value : '', name: nameVal })); } catch (e) {}
+    try { localStorage.setItem('bazi-birth', JSON.stringify({ date: dateVal, time: timeVal, gender, tz, dst, city: cityVal, long: $('long') ? $('long').value : '', name: nameVal })); } catch (e) {}
   }
   window._fromUrlShare = false; // clear — lần submit kế (user tự nhập) → save bình thường
   // [loop 391] update URL with birth params for shareable link
@@ -4664,7 +4667,7 @@ async function run() {
     // [loop 421] validate: lunar-javascript silently returns undefined cho năm ngoài ~1900-2100
     //   → tất cả trụ = undefined → user thấy lá số rác mà không có error. Verify explicitly.
     if (!currentResult.chart.pillars.day.gan || !currentResult.chart.pillars.year.gan) {
-      throw new Error('Ngày sinh ngoài khoảng hỗ trợ (≈1900–2100). Vui lòng nhập ngày trong khoảng này.');
+      throw new Error('Ngày sinh ngoài khoảng hỗ trợ (≈1800–2100). Vui lòng nhập ngày trong khoảng này.');
     }
     // [loop 1382] TANG GIA 丧家 — attach R.tang cho UI/consumer (AI brief tính riêng trong extendBrief).
     //   Defensive: tang là tầng opt-in bonus, KHÔNG được làm crash parse lá số.
@@ -7749,10 +7752,15 @@ function renderQuickSummary() {
   let curDyTxt = '(đang tính)';
   try {
     const age = new Date().getFullYear() - c.chart.input.year;
-    const dy = (c.dayun || []).find((d) => age >= d.startAge && age < d.startAge + 10);
+    // [bugfix-dayun-elder] tuổi vượt thập kỷ cuối (thọ cao) → kẹp về thập kỷ CUỐI, không «(không rõ)»
+    const _dyList = c.dayun || [];
+    const _dyLast = _dyList[_dyList.length - 1] || null;
+    const dy = _dyList.find((d) => age >= d.startAge && age < d.startAge + 10)
+      || (_dyLast && age >= _dyLast.startAge + 10 ? _dyLast : null);
     const ln = (c.liunian || []).find((l) => l.isNow);
     const dyNy = dy ? ganZhiNayin(dy.ganZhi) : null; // [loop 361] nạp âm đại vận
     curDyTxt = dy ? `Đại vận <b>${hanviet(dy.ganZhi)}</b> (${dy.startAge}–${dy.startAge + 9}t, ${dy.zhiGod ? TEN_GOD_VI[dy.zhiGod] + ' vận, ' : ''}${dyNy ? dyNy + ', ' : ''}${dy.rating})${ln ? ` · Lưu niên ${hanviet(ln.ganZhi)} (${ln.gan ? TEN_GOD_VI[tenGod(c.chart.dayGan, ln.gan)] + ' năm, ' : ''}${ln.rating})` : ''}` : '(không rõ)';
+    if (dy && age >= dy.startAge + 10) curDyTxt += ' <span class="hint-inline">(thọ vượt bảng đại vận — quy chiếu thập kỷ cuối)</span>'; // [bugfix-dayun-elder]
     // [loop 645→663] ĐỈNH VẬN emphasis — ten-god specific strategy (Tài/Quan/Ấn/Thực/Tỷ)
     if (dy && dy.rating === 'Đại cát') {
       // [loop 663] strategy theo thập thần vận — Tài=đầu tư, Quan=sự nghiệp, Ấn=học vấn, Thực=sáng tạo, Tỷ=hợp tác
@@ -8056,7 +8064,8 @@ try {
   if (subj.time) $('time').value = subj.time;
   const gRadio = document.querySelector(`input[name="gender"][value="${subj.gender}"]`);
   if (gRadio) gRadio.checked = true;
-  if (subj.tz && $('tz')) $('tz').value = String(subj.tz);
+  if (subj.tz != null && subj.tz !== '' && $('tz')) $('tz').value = String(subj.tz); // [tz-full] subj.tz=0 (GMT+0) cũng phải restore
+  if (subj.dst != null && $('dst')) $('dst').checked = !!subj.dst; // [tz-full]
   if (subj.city && $('city')) $('city').value = subj.city;
   if (subj.long && $('long')) $('long').value = subj.long;
   if (subj.name && $('birth-name')) $('birth-name').value = subj.name; // [visitor-finder] prefill tên
@@ -8079,7 +8088,16 @@ function syncLongField() {
   if (!lf || !c) return;
   lf.style.display = (c.value === 'manual') ? '' : 'none';
 }
-if ($('city')) { $('city').addEventListener('change', syncLongField); syncLongField(); }
+if ($('city')) {
+  $('city').addEventListener('change', () => {
+    syncLongField();
+    // [tz-full] chọn thành phố thế giới → tự set múi giờ theo data-tz của option
+    const _opt = $('city').selectedOptions && $('city').selectedOptions[0];
+    const _ctz = _opt ? _opt.getAttribute('data-tz') : null;
+    if (_ctz != null && _ctz !== '' && $('tz')) $('tz').value = _ctz;
+  });
+  syncLongField();
+}
 // auto-render on page load — user sees results immediately (saved data or defaults)
 _skipChatReset = true; // [loop 389] don't clear chat on initial render (same chart)
 // [loop 857] render welcome FIRST — for empty form new users (before run() returns early)

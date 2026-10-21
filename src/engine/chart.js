@@ -712,7 +712,7 @@ export function computeDaYun(year, month, day, hour, minute, gender, yong) {
   //   thầm lặng → ĐẢO dayun direction + SAI 起运 age. Nay accept variant, throw cho garbage.
   const g = parseGender(gender);
   const yun = ec.getYun(g);
-  const list = yun.getDaYun();
+  const list = yun.getDaYun(13); // [bugfix-dayun-elder] 13 mục (0=trước khởi vận + 12 thập kỷ) — trước đây default 10 → chỉ 8 thập kỷ (~tới 87t), người >87t rơi khỏi bảng → «(không rõ)»
   // [cycle 47 sửa C7] chuẩn hoá khung Dụng sang 用/喜/忌/仇 (giống scoreLiunianYear) → 大运 & 流年
   //   nhất quán về "hành có lợi". Trước đây dùng secondary/avoid (khung khác) → dayun & liunian
   //   chênh nhau cho lá số secondary≠xi.
@@ -720,7 +720,7 @@ export function computeDaYun(year, month, day, hour, minute, gender, yong) {
   const avoidSet = new Set([yong.ji, yong.chou].filter(Boolean));
   const dGan = ec.getDayGan();
   const out = [];
-  for (let i = 1; i < list.length && i <= 8; i++) {
+  for (let i = 1; i < list.length && i <= 12; i++) { // [bugfix-dayun-elder] 12 thập kỷ — phủ tới thọ trên trăm tuổi
     const dy = list[i];
     const gz = dy.getGanZhi();
     if (!gz) continue;

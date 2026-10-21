@@ -22,7 +22,10 @@ export function classifyChartLevel(R) {
   const catCombos = (synthesis?.combos || []).filter((c) => c.tone === 'cat');
   const xiongCombos = (synthesis?.combos || []).filter((c) => c.tone === 'xiong');
   const catShensha = shensha ? ['tianYi','tianDe','yueDe','wenChang','jiangXing','jinYu','sanQi','luShen'].filter((k) => shensha[k]).length : 0;
-  const dayunCat = (dayun || []).filter((d) => d.score >= 2).length;
+  // [bugfix-dayun-elder] chấm tier chỉ trên 8 thập kỷ ĐẦU (cuộc đời chủ động) — bảng 12 thập kỷ
+  //   (mở rộng tới thọ >100) chỉ phục vụ hiển thị; nếu không, 2 thập kỷ ~90t+ làm lệch ngưỡng
+  //   dayunCat → sai bậc (vd cháu 2023 được «Phú Cách» vì vận già cát).
+  const dayunCat = (dayun || []).slice(0, 8).filter((d) => d.score >= 2).length;
 
   // 6 tiêu chí cổ pháp
   const criteria = [];

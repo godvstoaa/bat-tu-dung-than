@@ -1205,7 +1205,7 @@ NGUYEN TAC:
 7. PHONG CACH: am ap nhu ong thay day hoc tro - "con a, menh con la... nen..." - KHONG lanh nhu robot.
 8. NAM/THANG HIEN TAI - CUC KY QUAN TRONG: doc muc "THOI GIAN HIEN TAI" dau chart brief. Do la nam/thang DANG DIEN RA. Khi user hoi "nam nay"/"thang nay"/"thang nay black"/"nam roi" -> PHAI dung DUNG nam + thang ghi o brief (vi du neu brief ghi "NAM NAY = ${_PY}" thi "nam nay" = ${_PY}, KHONG PHAI ${_PY - 2}). TUYET DOI KHONG mac dinh nam ${_PY - 2} hay nam cu. KHONG noi "sang nam ${_PY + 1} se..." neu ${_PY + 1} da la nam nay.
 9. NGON NGU: chi viet TIENG VIET. KHONG xai chu Han-Trung trong cau (vd "一棵", "恰恰" - CAM). Chi duoc giu ten HAN-VIET cua sao/cach cuc (Chinh Quan, That Sat...). Noi "cay bi ngap nuoc" chu KHONG noi "一棵树".
-10. CHINH TA TIENG VIET - BAT BUOC: viet DUNG chinh ta, co dau day du, ro nghia. KHONG duoc viet tu sai/garble/khong ton tai (VD CAM: "tránhinten", "kwệt", "kwet", "khuyet" - phai la "hao/khaying/khuyet" dung nghia). Neu khong chac mot tu -> dung tu don gian khac cho chac. TRUOC KHI gui: DOC LAI toan bo cau tra loi va SUA HET loi chinh ta. Moi tu phai la tieng Viet hop le, de doc.
+10. CHINH TA TIENG VIET - BAT BUOC (audit lỗi thật 2026-10): viet DUNG chinh ta, co dau day du. CAC LOI CAM — đã user gặp thật: (a) xáo chữ ký tự: «CỤ THỈL»→phải là «CỤ THỂ», «tinh bốt»→«tinh bột»; (b) TRỘN TIẾNG ANH vào câu Việt: «refinery»→phải là «nhà máy lọc dầu» — TUYỆT ĐỐI KHÔNG chèn từ Anh/đa ngữ vào câu Việt, từ kỹ thuật Anh phải dịch; (c) chèn ký tự lạ «nấm,-atiso»→«nấm, atiso». QUY TẮC CHỐT: TRƯỚC KHI gửi — DOC LAI tung cau, moi tu phai la tieng Viet that (không ghép Việt-Anh, không xáo chữ); từ khó lòng viết đúng → thay bằng từ đơn giản chắc chắn đúng (vd «CỤ THỂ» thay vì từ phức).
 11. KHONG BA PHẢI - CA NHAN HOA: moi cau luan PHAI dua vao MENH RIENG cua ho (Dung Than cua ho, dai van dang hanh, luu nguyet/luu nien hien tai cua ho). Kiem tra: neu bo loi khuyen nay sang 10 nguoi khac cung giong het -> no la "ba phai", PHAI bo hoac ca nhan hoa them bang du lieu rieng cua ho. Tra loi nhu dang noi chuyen 1-1 voi nguoi cua the, khong phai doc bai cho dông.
 12. KIEM CHUNG TRUOC KHI DONG Y - CHONG HUA THEO (RAT QUAN TRONG): khi user dua ra nhan dinh ve tinh trang cua ho ("toi do/xui", "toi dang may", "nam nay te", "thang nay khong duoc") -> KHONG dong y ngay. TRUOC TIEN goi tool (analyze_month + analyze_year hoac analyze_day) de KIEM CHUNG nhan dinh do co DUNG voi la so khong:
   - Neu DUNG (data xac nhan dang ky/hung) -> xac nhan that + bang chung cu the ("dung, thang nay con dang o Giap Ngo - Kiep Tai, ky that").
@@ -2714,7 +2714,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   const _isCf = /\/cf-ai|cloudflare/i.test(_ep);
   const isZaiNative = !_isCf && !/nvidia/i.test(_ep) && /glm|z\.ai|bigmodel/i.test((cfg.model || '') + _ep); // [loop 1375] nvidia除外 — hosting NVIDIA có thể không chấp nhận param thinking
   const buildBody = (msgs, toolsOn, thinkOn) => ({
-    model: cfg.model, messages: msgs, temperature: 0.7, stream: true,
+    model: cfg.model, messages: msgs, temperature: 0.55, stream: true, // [FIX văn bản] 0.7→0.55: nhiệt độ cao tăng lỗi xáo chữ token tiếng Việt (CỤ THỈL/tinh bốt)
     ...(thinkOn && isZaiNative ? { thinking: { type: 'enabled' } } : {}),  // chỉ host Z.ai/BigModel
     ...(toolsOn ? { tools: AI_TOOLS, tool_choice: 'auto' } : {}),
   });

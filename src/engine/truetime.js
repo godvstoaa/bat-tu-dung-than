@@ -79,7 +79,9 @@ export function trueSolarTime({ year, month, day, hour, minute, tzOffset = 7, lo
   let note;
   if (usedTrueSolar) {
     const sign = shiftMin >= 0 ? '+' : '';
-    note = `真太阳时 (giờ Mặt Trời thật tại kinh độ ${longitude}°Đ): đồng hồ ${pad(hour)}:${pad(minute)} → 真太阳时 ${pad(solar.hour)}:${pad(solar.minute)} (hiệu ${sign}${Math.round(shiftMin)} phút = kinh độ ${sign}${Math.round(longMin)}′ + EOT ${eotMin >= 0 ? '+' : ''}${eotMin.toFixed(1)}′).`;
+    const edge = shichenEdgeDist(totalMin);
+    const edgeWarn = edge < 15 ? ` ⚠ Sinh cách ranh 时辰 chỉ ~${edge} phút — Trụ Giờ RẤT nhạy cảm: giờ khai sinh sai nhỏ là lá số đổi.` : '';
+    note = `真太阳时 (giờ Mặt Trời thật tại kinh độ ${longitude}°Đ): đồng hồ ${pad(hour)}:${pad(minute)} → 真太阳时 ${pad(solar.hour)}:${pad(solar.minute)} (hiệu ${sign}${Math.round(shiftMin)} phút = kinh độ ${sign}${Math.round(longMin)}′ + EOT ${eotMin >= 0 ? '+' : ''}${eotMin.toFixed(1)}′).${edgeWarn}`;
   } else {
     note = `Giờ nhập được dùng nguyên làm giờ sinh địa-phương (GMT${tzOffset >= 0 ? '+' : ''}${tzOffset}). Chọn nơi sinh / kinh độ để hiệu chỉnh 真太阳时 (chính xác hơn, quan trọng khi sinh gần ranh 时辰).`;
   }
@@ -87,6 +89,17 @@ export function trueSolarTime({ year, month, day, hour, minute, tzOffset = 7, lo
 }
 
 const pad = (n) => String(Math.abs(n)).padStart(2, '0');
+
+// [tz-full] khoảng cách (phút) từ giờ hiện tại tới ranh 时辰 gần nhất — ranh tại giờ lẻ (23,1,3…21h)
+function shichenEdgeDist(totalMin) {
+  let best = 1e9;
+  for (let h = -1; h <= 21; h += 2) {
+    const b = ((h * 60) % 1440 + 1440) % 1440;
+    const d = Math.min(Math.abs(totalMin - b), 1440 - Math.abs(totalMin - b));
+    if (d < best) best = d;
+  }
+  return best;
+}
 
 // Helper: 时辰 (chi giờ) từ giờ 真太阳时 — cho UI hiển thị.
 const SHICHEN = [

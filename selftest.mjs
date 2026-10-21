@@ -2668,7 +2668,7 @@ console.log('\n################## 12. QUỸ TÍCH CUỘC ĐỜI ################
 const lt1 = buildLifeTrajectory(analyze(1995, 8, 12, 9, 30, 'nu'));
 const lt2 = buildLifeTrajectory(analyze(1995, 8, 12, 9, 30, 'nu'));
 assert(JSON.stringify(lt1) === JSON.stringify(lt2), 'buildLifeTrajectory deterministic');
-assert(lt1.decades.length === 8 && lt1.stages.length === 4, '8 đại vận + 4 giai đoạn đời');
+assert(lt1.decades.length === 12 && lt1.stages.length === 4, '12 đại vận + 4 giai đoạn đời'); // [bugfix-dayun-elder] 12 thập kỷ (trước đây 8 — người >87t rơi khỏi bảng)
 assert(['marriage', 'children', 'career', 'wealth', 'health'].every((k) => Array.isArray(lt1.keyWindows[k])), 'đủ 5 cửa sổ cuộc đời');
 assert(typeof lt1.summary === 'string' && lt1.summary.length > 30, 'có tóm tắt cung đường');
 const ltM = buildLifeTrajectory(analyze(1985, 3, 20, 8, 0, 'nam')); // [loop 34] chart mùa xuân (không 调候 override) cho test theme Vợ
