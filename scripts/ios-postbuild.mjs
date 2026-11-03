@@ -16,6 +16,9 @@ if (!fs.existsSync(path.join(OUT, 'index.html'))) {
 }
 
 const removed = pruneIosArtifacts(OUT);
+// điện thoại không dùng bản kiến trúc texture 2048 (<id>.hd.glb) — chỉ máy để bàn mức «high»
+const modelsDir = path.join(OUT, 'models');
+if (fs.existsSync(modelsDir)) for (const f of fs.readdirSync(modelsDir)) if (f.endsWith('.hd.glb')) fs.rmSync(path.join(modelsDir, f));
 assertNoPruned(OUT);
 
 const corpusIndex = path.join(OUT, 'corpus', 'index.json');

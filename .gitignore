@@ -56,3 +56,11 @@ daozang_index*
 docs/_fragments/
 
 docs/_grok-*
+
+# Khoá API cục bộ (Meshy.ai) — không commit
+.env.meshy
+.env.local
+
+# Meshy: GLB thô (lớn) — chỉ commit bản đã nén trong public/models
+assets-meshy/raw/
+assets-meshy/library/

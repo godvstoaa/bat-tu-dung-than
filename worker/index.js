@@ -1,6 +1,10 @@
 // Cloudflare Worker — serve static app + proxy LLM + admin + anti-scraping + anti-abuse.
 import { makeProxy } from '../functions/_proxy.js';
 import { handleAdminRoute, isAiEnabled, isFreeAiEnabled, logFreeUsage, logEvent, adminPath } from './admin.js';
+import { MAX_ROOMS } from '../src/game/protocol.js';
+
+// Durable Object phòng Huyền Quán MMO (binding QUAN trong wrangler.jsonc)
+export { TownShard } from './quan-room.js';
 
 const PROXIES = [
   ['/zai', 'https://api.z.ai'],
@@ -22,7 +26,7 @@ function clientIP(request) {
 }
 
 // [AUDIT FIX C3] Restrict CORS — trước đây * → bất kỳ site nào cũng drain AI quota
-const ALLOWED_ORIGINS = /^(https:\/\/battu\.god8\.shop|https:\/\/battu\.maz-elements0\.workers\.dev|capacitor:\/\/localhost|ionic:\/\/localhost|http:\/\/localhost:\d+)$/;
+const ALLOWED_ORIGINS = /^(https:\/\/battu\.god8\.shop|https:\/\/battu\.maz-elements0\.workers\.dev|capacitor:\/\/localhost|ionic:\/\/localhost|http:\/\/(?:localhost|127\.0\.0\.1):\d+)$/;
 function corsOrigin(request) {
   const o = request.headers.get('Origin') || '';
   return ALLOWED_ORIGINS.test(o) ? o : 'https://battu.god8.shop';
@@ -105,6 +109,16 @@ export default {
       if (blocked === '1') {
         return new Response('Access denied.', { status: 403, headers: { 'Content-Type': 'text/plain' } });
       }
+    }
+
+    // 0a') Huyền Quán MMO — WebSocket /ws/quan?room=N → Durable Object TownShard «town-N»
+    if (url.pathname === '/ws/quan') {
+      if (request.headers.get('Upgrade') !== 'websocket') return new Response('Expected websocket', { status: 426 });
+      const origin = request.headers.get('Origin');
+      if (origin && !ALLOWED_ORIGINS.test(origin)) return new Response('Forbidden origin', { status: 403 });
+      if (!env.QUAN) return new Response('MMO chưa bật', { status: 503 });
+      const room = Math.max(0, Math.min(MAX_ROOMS - 1, parseInt(url.searchParams.get('room') || '0', 10) || 0));
+      return env.QUAN.get(env.QUAN.idFromName('town-' + room)).fetch(request);
     }
 
     // 0b) Block scraper UAs — CHỈ cho main site (KHÔNG cho /api/ /admin/ — admin dùng curl/CLI OK)

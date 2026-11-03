@@ -306,3 +306,7 @@ body.ios-legacy-visible #ios-root { display: none !important; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* Học Quán overlay — game toàn màn hình dọc (src/game) */
+.hq-overlay { position: fixed; inset: 0; z-index: 1000; background: #14111c; }
+body.hq-overlay-open { overflow: hidden; overscroll-behavior: none; }

@@ -17,6 +17,7 @@ const TABS = [
   { id: 'compare', label: 'Đối chiếu', icon: '⚖' },
   { id: 'notes', label: 'Ghi chú', icon: '🔖' },
   { id: 'lab', label: 'Chart Lab', icon: '🧪' },
+  { id: 'quan', label: 'Học Quán', icon: '🏮' },
 ];
 
 let _state = { tab: 'library' };
@@ -139,6 +140,40 @@ export async function initIosShell() {
     ]));
   }
 
+  // Học Quán: game 3D học cổ pháp (docs/GAME-MMO-PROMPT-PLAN.md). Mở dạng overlay toàn màn
+  //   hình (game cần màn dọc trọn vẹn, che tab bar); nút ← trong game quay lại tab này.
+  function mountQuan(p) {
+    clear(p);
+    p.appendChild(el('div', { class: 'ios-placeholder' }, [
+      el('h2', { text: 'Học Quán' }),
+      el('p', { class: 'ios-muted', text: 'Sân học cổ pháp 3D: ngồi bàn thầy dựng tứ trụ, xoay la bàn bát trạch, xem lịch tiết khí, đốt trầm và ngồi trà. Chơi màn hình dọc, chạy offline.' }),
+      el('div', { class: 'ios-day-card' }, [
+        el('p', { class: 'ios-section-label', text: 'TRONG QUÁN' }),
+        el('p', { text: 'Bàn Thầy Tử Bình · La Bàn Đài · Bảng Lịch Ngày · Trà Thất · Lò Trầm' }),
+        el('p', { class: 'ios-muted tiny', text: 'Mọi kết quả tính bằng engine cổ pháp của app, để tham khảo và học tập.' }),
+      ]),
+      el('button', { type: 'button', class: 'ios-btn-primary', text: 'Vào Học Quán', onClick: openQuan }),
+    ]));
+  }
+
+  async function openQuan() {
+    let ov = document.getElementById('hq-overlay');
+    if (!ov) {
+      ov = el('div', { id: 'hq-overlay', class: 'hq-overlay' });
+      document.body.appendChild(ov);
+    }
+    ov.hidden = false;
+    document.body.classList.add('hq-overlay-open');
+    const { mountGame } = await import('../game/mount.js');
+    mountGame(ov, {
+      onExit: () => {
+        ov.hidden = true;
+        document.body.classList.remove('hq-overlay-open');
+        document.getElementById('ios-tab-quan')?.focus();
+      },
+    });
+  }
+
   async function ensurePanel(id) {
     const p = panelNodes[id];
     if (id === 'notes') {
@@ -160,6 +195,7 @@ export async function initIosShell() {
     } else if (id === 'study') await mountLearn(p);
     else if (id === 'compare') await mountCompare(p);
     else if (id === 'lab') mountLab(p);
+    else if (id === 'quan') mountQuan(p);
     p.dataset.ready = '1';
   }
 

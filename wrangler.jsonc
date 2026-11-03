@@ -11,5 +11,8 @@
     "html_handling": "none"
   },
   "kv_namespaces": [{ "binding": "ADMIN_KV", "id": "fa5ff6c7198f48999bcfeeeba6f8d264" }],
+  // Huyền Quán MMO — mỗi phòng (town-N) là một Durable Object, lưu trạng thái bằng SQLite backend
+  "durable_objects": { "bindings": [{ "name": "QUAN", "class_name": "TownShard" }] },
+  "migrations": [{ "tag": "quan-v1", "new_sqlite_classes": ["TownShard"] }],
   "observability": { "enabled": true }
 }

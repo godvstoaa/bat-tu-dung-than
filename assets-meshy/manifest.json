@@ -1,0 +1,253 @@
+{
+  "style": "Stylized East Asian xianxia fantasy, Vietnamese lacquer-art palette: cinnabar red, black lacquer, gold-leaf trim, eggshell white, jade teal accents. Hand-painted PBR textures, clean readable silhouette, game-ready asset, no text, no logos, no religious statues or symbols.",
+  "assets": [
+    {
+      "id": "hero_m",
+      "kind": "character",
+      "poly": 15000,
+      "prompt": "A young male scholar-cultivator, slim build, long black hair in a topknot with a jade hairpin, flowing layered robe with wide sleeves, cinnabar outer robe over cream inner robe, gold embroidered cloud trims, cloth belt with a jade pendant, soft boots, calm expression, full body",
+      "anims": [
+        0,
+        30,
+        14,
+        33,
+        41,
+        290
+      ],
+      "height": 1.75
+    },
+    {
+      "id": "hero_f",
+      "kind": "character",
+      "poly": 15000,
+      "prompt": "A young female scholar-cultivator, long black hair half-up with a gold phoenix hairpin, flowing layered robe with wide sleeves, jade-teal outer robe over white inner robe, gold cloud embroidery, sash belt, soft shoes, gentle expression, full body",
+      "anims": [
+        0,
+        1,
+        14,
+        32,
+        41,
+        290
+      ],
+      "height": 1.65
+    },
+    {
+      "id": "master",
+      "kind": "character",
+      "poly": 15000,
+      "prompt": "An elderly scholar master, long white beard and eyebrows, black scholar hat, deep indigo robe with gold trim, holding a calligraphy brush, wise and kind, full body",
+      "anims": [
+        0,
+        33,
+        41
+      ],
+      "height": 1.7
+    },
+    {
+      "id": "npc_villager",
+      "kind": "character",
+      "poly": 10000,
+      "prompt": "A middle-aged traditional townsperson in an ancient-style brown cross-collar tunic with cloth sash and loose cream trousers, conical straw hat worn on the head, woven cloth shoulder bag, cloth shoes, friendly, full body, historical costume",
+      "anims": [
+        0,
+        290,
+        30
+      ],
+      "height": 1.7
+    },
+    {
+      "id": "npc_merchant",
+      "kind": "character",
+      "poly": 10000,
+      "prompt": "A plump cheerful merchant in mustard-yellow silk robe with red trims, small round hat, holding an abacus, full body",
+      "anims": [
+        0,
+        41,
+        30
+      ],
+      "height": 1.68
+    },
+    {
+      "id": "hall_main",
+      "kind": "static",
+      "poly": 30000,
+      "prompt": "A grand two-tier hall of a mountain academy on a stone platform with front stairs, sweeping curved roofs with upturned eaves, dark ceramic roof tiles, cinnabar pillars, black lacquer wooden panels with gold cloud carvings, gold roof ridge ornaments, lanterns hanging at the eaves"
+    },
+    {
+      "id": "gate_sect",
+      "kind": "static",
+      "poly": 20000,
+      "prompt": "A three-bay mountain sect gateway archway (paifang) of grey stone and lacquered wood, tiered curved roofs, cinnabar beams, gold trims, plain stone base, standing alone"
+    },
+    {
+      "id": "library_tower",
+      "kind": "static",
+      "poly": 30000,
+      "prompt": "A five-storey octagonal library tower, each storey with curved eaves and a balcony, cinnabar pillars, black lacquer walls with lattice windows, gold finial on top"
+    },
+    {
+      "id": "tea_pavilion",
+      "kind": "static",
+      "poly": 15000,
+      "prompt": "An open waterside tea pavilion on wooden stilts, square plan, four cinnabar pillars, double curved roof, low wooden railing, wooden deck"
+    },
+    {
+      "id": "house_town",
+      "kind": "static",
+      "poly": 12000,
+      "prompt": "A traditional two-room town house with curved tile roof, wooden walls, a round moon window, small porch with a hanging lantern"
+    },
+    {
+      "id": "bridge_arch",
+      "kind": "static",
+      "poly": 10000,
+      "prompt": "A single-span arched stone bridge with carved stone railings and small lantern posts at both ends"
+    },
+    {
+      "id": "observatory",
+      "kind": "static",
+      "poly": 20000,
+      "prompt": "A circular stone observatory terrace with stone stairs and a large bronze armillary sphere instrument in the center"
+    },
+    {
+      "id": "luopan_stand",
+      "kind": "static",
+      "poly": 8000,
+      "prompt": "A large ornate geomancy compass disk with concentric engraved rings mounted on a carved wooden pedestal, gold and black lacquer"
+    },
+    {
+      "id": "cauldron",
+      "kind": "static",
+      "poly": 8000,
+      "prompt": "An ancient bronze tripod cauldron with two upright handles and cloud relief patterns, green patina, on a square stone base"
+    },
+    {
+      "id": "scholar_desk",
+      "kind": "static",
+      "poly": 6000,
+      "prompt": "A low black lacquer scholar desk with rolled scrolls, an ink stone, a brush holder with brushes and a small celadon vase"
+    },
+    {
+      "id": "flying_sword",
+      "kind": "static",
+      "poly": 4000,
+      "prompt": "An elegant straight jian sword, slim blade with a faint jade glow, gold guard shaped like clouds, red tassel on the pommel, lying horizontally"
+    },
+    {
+      "id": "boat",
+      "kind": "static",
+      "poly": 6000,
+      "prompt": "A small wooden river boat with a curved woven bamboo canopy and a long wooden oar"
+    },
+    {
+      "id": "tree_pine",
+      "kind": "static",
+      "poly": 10000,
+      "prompt": "An ancient twisted pine tree with layered flat foliage clouds and a gnarled trunk growing out of a mossy rock"
+    },
+    {
+      "id": "tree_peach",
+      "kind": "static",
+      "poly": 10000,
+      "prompt": "A single blossoming peach tree with dense clusters of pink flowers on gracefully curved branches, twisted dark trunk rooted in grass, nothing above the canopy"
+    },
+    {
+      "id": "rock_island",
+      "kind": "static",
+      "poly": 20000,
+      "prompt": "A floating rock island chunk with a grassy top, a small waterfall pouring off one edge, hanging roots and vines underneath"
+    },
+    {
+      "id": "palace_grand",
+      "kind": "static",
+      "hd": true,
+      "poly": 150000,
+      "prompt": "A colossal palace hall complex on a three-tier carved white stone terrace with grand central staircases and balustrades, double-eaved hip roof with sweeping upturned eaves, rows of cinnabar columns, intricate bracket sets under the eaves, golden roof ridge ornaments, carved lattice doors, bronze lanterns along the terrace, extremely detailed architecture"
+    },
+    {
+      "id": "tower_nine",
+      "kind": "static",
+      "hd": true,
+      "poly": 150000,
+      "prompt": "A towering nine-storey octagonal observation tower with a balcony and carved railing on every level, layered upturned eaves with small hanging bells, cinnabar pillars, intricate bracket sets, golden spire finial, on a wide stone base with stairs, extremely detailed architecture"
+    },
+    {
+      "id": "sect_gate_grand",
+      "kind": "static",
+      "hd": true,
+      "poly": 150000,
+      "prompt": "A monumental mountain sect entrance: a five-bay stone and lacquered wood archway with tiered curved roofs, flanked by two tall square watch towers and fortified stone walls, wide stone stairs leading up through the gate, cinnabar beams, gold trims, extremely detailed architecture"
+    },
+    {
+      "id": "cliff_palace",
+      "kind": "static",
+      "hd": true,
+      "poly": 150000,
+      "prompt": "A grand cliffside palace complex built on a rocky mountain peak, multiple connected halls and pavilions with covered walkways and terraces stepping down the cliff, small waterfalls, curved dark tile roofs, cinnabar pillars, extremely detailed fantasy architecture"
+    },
+    {
+      "id": "city_gate",
+      "kind": "static",
+      "hd": true,
+      "poly": 120000,
+      "prompt": "A massive fortified city gate: thick stone wall with a central arched tunnel gate and crenellated battlements, a two-storey wooden gate tower on top with double curved eaves, cinnabar pillars, gold trims, banners on poles, extremely detailed architecture"
+    },
+    {
+      "id": "sky_palace",
+      "kind": "static",
+      "hd": true,
+      "poly": 150000,
+      "prompt": "A floating sky palace on a levitating mountain island, several golden-roofed halls connected by stone bridges, waterfalls pouring off the edges into clouds below, hanging roots under the island, extremely detailed fantasy architecture"
+    },
+    {
+      "id": "deity_yuanshi",
+      "kind": "static",
+      "model": "meshy-6-lite",
+      "style": false,
+      "poly": 100000,
+      "prompt": "Statue of Yuanshi Tianzun, the Primordial Lord of the Taoist Three Pure Ones: elderly sage with long white beard, seated upright on an ornate dragon throne, holding a glowing pearl in the right hand, imperial crown with hanging bead strings, red and gold robe. Traditional Taoist temple statue, carved wood with cinnabar red lacquer and gold leaf, dignified serene face, flowing layered robes with embroidered cloud patterns, highly detailed sculpture, full body, no text, no letters"
+    },
+    {
+      "id": "deity_lingbao",
+      "kind": "static",
+      "model": "meshy-6-lite",
+      "style": false,
+      "poly": 100000,
+      "prompt": "Statue of Lingbao Tianzun of the Taoist Three Pure Ones: elderly sage with long black beard, seated upright on an ornate throne, holding a jade ruyi scepter with both hands, imperial crown with hanging bead strings, deep blue and gold robe. Traditional Taoist temple statue, carved wood with cinnabar red lacquer and gold leaf, dignified serene face, flowing layered robes with embroidered cloud patterns, highly detailed sculpture, full body, no text, no letters"
+    },
+    {
+      "id": "deity_daode",
+      "kind": "static",
+      "model": "meshy-6-lite",
+      "style": false,
+      "poly": 100000,
+      "prompt": "Statue of Daode Tianzun, Laozi the Supreme Old Lord of the Taoist Three Pure Ones: kind elderly sage with long white beard and long eyebrows, seated upright on an ornate throne, holding a crane feather fan, Taoist crown, ochre yellow and gold robe. Traditional Taoist temple statue, carved wood with cinnabar red lacquer and gold leaf, dignified serene face, flowing layered robes with embroidered cloud patterns, highly detailed sculpture, full body, no text, no letters"
+    },
+    {
+      "id": "deity_wenchang",
+      "kind": "static",
+      "model": "meshy-6-lite",
+      "style": false,
+      "poly": 100000,
+      "prompt": "Statue of Wenchang Dijun, Taoist god of literature and examinations: noble scholar official with black beard, seated upright on a throne, holding a writing brush and a scroll, scholar official hat, green and gold court robe. Traditional Taoist temple statue, carved wood with cinnabar red lacquer and gold leaf, dignified serene face, flowing layered robes with embroidered cloud patterns, highly detailed sculpture, full body, no text, no letters"
+    },
+    {
+      "id": "deity_doumu",
+      "kind": "static",
+      "model": "meshy-6-lite",
+      "style": false,
+      "poly": 100000,
+      "prompt": "Statue of Doumu, Taoist Mother of the Big Dipper goddess: serene goddess with three faces and eight arms holding the sun, the moon, a bow, a halberd and a seal, seated cross-legged on a lotus throne, golden phoenix crown, purple and gold robe. Traditional Taoist temple statue, carved wood with cinnabar red lacquer and gold leaf, dignified serene face, flowing layered robes with embroidered cloud patterns, highly detailed sculpture, full body, no text, no letters"
+    }
+  ],
+  "animNames": {
+    "0": "idle",
+    "1": "walk",
+    "14": "run",
+    "30": "walk",
+    "32": "sit",
+    "33": "sit",
+    "41": "bow",
+    "290": "wave"
+  }
+}

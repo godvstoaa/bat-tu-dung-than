@@ -9,6 +9,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node selftest.mjs",
+    "test:game": "node scripts/test-game-state.mjs && node scripts/test-game-zheri.mjs && node scripts/test-game-dz.mjs && node scripts/test-game-halls.mjs && node scripts/test-game-progress.mjs",
+    "test:mmo": "node scripts/test-quan-protocol.mjs && node scripts/test-quan-mmo.mjs",
+    "dev:mmo": "node scripts/dev-mmo.mjs",
     "accuracy": "node scripts/classical-accuracy.mjs",
     "deploy": "rm -rf dist && node scripts/build-seo-pages.mjs && vite build && npx wrangler deploy",
     "deploy:worker": "npx wrangler deploy",
@@ -26,12 +29,15 @@
     "@capacitor/haptics": "^8.0.2",
     "@capacitor/ios": "^8.4.2",
     "@capacitor/keyboard": "^8.0.5",
+    "@capacitor/screen-orientation": "^8.0.2",
     "@capacitor/status-bar": "^8.0.3",
     "astronomy-engine": "^2.1.19",
-    "lunar-javascript": "^1.7.3"
+    "lunar-javascript": "^1.7.3",
+    "three": "^0.170.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.4.2",
+    "@gltf-transform/cli": "^4.5.1",
     "playwright": "^1.61.0",
     "sharp": "^0.35.3",
     "vite": "^7.0.0",

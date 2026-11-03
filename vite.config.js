@@ -68,6 +68,8 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: '::',
     proxy: {
+      // Huyền Quán MMO: WebSocket tới worker cục bộ (`npm run dev:mmo`, cổng 8788)
+      '/ws': { target: 'http://127.0.0.1:8788', ws: true, changeOrigin: false },
       '/zai':      { target: 'https://api.z.ai',         changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/zai/, '') },
       '/bigmodel': { target: 'https://open.bigmodel.cn', changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/bigmodel/, '') },
       '/deepseek': { target: 'https://api.deepseek.com', changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/deepseek/, '') },
@@ -81,6 +83,8 @@ export default defineConfig(({ mode }) => ({
     emptyOutDir: true,
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
+      // Huyền Quán (game.html) chỉ có ở bản web — bản iOS không đưa vào (docs/GAME-HUYEN-QUAN-SPEC.md §10).
+      input: mode === 'ios' ? undefined : { main: 'index.html', game: 'game.html' },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/lunar-javascript')) return 'vendor-lunar';

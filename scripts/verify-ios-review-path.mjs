@@ -107,7 +107,7 @@ async function main() {
   ok(await page.locator('.ios-source-row').count() > 0, 'tab Nguồn có tham chiếu');
   await page.screenshot({ path: path.join(SHOTS, 'ios-03-reader-sources.png') });
 
-  await page.getByRole('tab', { name: 'Học' }).click();
+  await page.getByRole('tab', { name: 'Học', exact: true }).click();
   await page.waitForSelector('.ios-learn h2', { timeout: 10000 });
   const learnOverlap = await page.evaluate(() => {
     const items = [...document.querySelectorAll('.ios-learn .ios-list-item')];
@@ -133,6 +133,44 @@ async function main() {
   await page.getByRole('tab', { name: 'Chart Lab' }).click();
   await page.waitForSelector('#ios-panel-lab h2', { timeout: 10000 });
   await page.screenshot({ path: path.join(SHOTS, 'ios-07-lab.png') });
+
+  // Học Quán (game 3D dọc) — không phải tab mặc định, mở overlay, thoát về vỏ.
+  await page.getByRole('tab', { name: 'Học Quán' }).click();
+  await page.waitForSelector('#ios-panel-quan h2', { timeout: 10000 });
+  await page.getByRole('button', { name: 'Vào Học Quán' }).click();
+  await page.waitForSelector('#hq-gate:not([hidden])', { timeout: 20000 });
+  const quanBrand = await page.textContent('#hq-gate-title');
+  ok(quanBrand === 'Học Quán', `Học Quán: cổng mang tên «${quanBrand}»`);
+  // cổng v2: nhập bát tự → lễ lật trụ (Dụng/Hỷ/Kỵ) → mặc phẩm phục
+  await page.fill('#hq-gate-form [name=date]', '1995-06-15');
+  await page.fill('#hq-gate-form [name=time]', '08:30');
+  await page.click('#hq-gate-form button[type=submit]');
+  await page.waitForSelector('#hq-wear', { timeout: 20000 });
+  await page.click('#hq-wear');
+  await page.waitForSelector('#hq-game:not([hidden])', { timeout: 20000 });
+  await page.waitForFunction(() => window.__hq && window.__hq.renderer, null, { timeout: 30000 });
+  await page.waitForTimeout(1500);
+  const quan = await page.evaluate(() => ({
+    mode: window.__hq.renderer.mode,
+    stations: window.__hq.STATIONS.map((s) => s.id),
+    links: document.querySelectorAll('#hq-overlay a[href^="http"]').length,
+    banned: /xin xăm|bói|giải hạn|đổi vận/i.test(document.getElementById('hq-overlay').innerText),
+  }));
+  ok(!quan.stations.includes('xam') && !quan.stations.includes('sen'), `Học Quán: không có gian bói (${quan.stations.join(',')})`);
+  ok(quan.links === 0, 'Học Quán: không có link http ngoài');
+  ok(!quan.banned, 'Học Quán: không có từ cấm (bói / xin xăm / giải hạn / đổi vận)');
+  console.log(`  INFO  Học Quán renderer: ${quan.mode}`);
+  // Giải án (P2): mở án khách đầu tiên — phải dựng được 6 bước, offline
+  await page.evaluate(() => window.__hq.openStation('an0'));
+  await page.waitForSelector('.hq-case [data-role=title]', { timeout: 20000 });
+  const caseTitle = await page.textContent('.hq-case [data-role=title]');
+  ok(/Bước 1\/6/.test(caseTitle), `Học Quán: mở án khách (${caseTitle})`);
+  await page.screenshot({ path: path.join(SHOTS, 'ios-09-case.png') });
+  await page.click('#hq-panel-close');
+  await page.screenshot({ path: path.join(SHOTS, 'ios-08-quan.png') });
+  await page.click('#hq-exit');
+  await page.waitForSelector('#hq-overlay', { state: 'hidden', timeout: 10000 });
+  ok(await page.isVisible('#ios-panel-quan'), 'Học Quán: thoát quay về vỏ nghiên cứu');
 
   await browser.close();
   server.close();
