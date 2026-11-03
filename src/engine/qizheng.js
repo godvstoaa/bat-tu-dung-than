@@ -90,7 +90,7 @@ const PALACES_12 = [
   { key: 'ji',    zh: '疾厄', vi: 'Tật Ách',  domain: 'bệnh tật, tai nạn, hiểm nguy' },
   { key: 'qian',  zh: '迁移', vi: 'Thiên Di', domain: 'di chuyển, du học, xuất ngoại' },
   { key: 'guan',  zh: '官禄', vi: 'Quan Lộc', domain: 'sự nghiệp, quan chức, danh vọng' },
-  { key: 'fu',    zh: '福德', vi: 'Phúc Đức', domain: 'phúc đức, tâm tính, giàu nghổ' },
+  { key: 'fu',    zh: '福德', vi: 'Phúc Đức', domain: 'phúc đức, tâm tính, giàu nghèo' },
   { key: 'xiang', zh: '相貌', vi: 'Tướng Mạo',domain: 'ngoại hình, nhân duyên, cuối đời' },
 ];
 

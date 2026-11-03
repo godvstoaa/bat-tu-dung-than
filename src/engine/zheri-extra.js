@@ -23,7 +23,7 @@ const TIAN_YUAN = { 寅: '乙亥', 卯: '甲戌', 辰: '乙酉', 巳: '丙申', 
 const INFO = {
   tianYi: { vi: 'Thiên Y', note: 'Thiên Y nhật — «thiên y đáo, vạn bệnh trừ». Cầu y/trị bệnh/phục thuốc/châm cứu/khởi đầu liệu trình sức khoẻ đều CÁT.' },
   yueEn: { vi: 'Nguyệt Ân', note: 'Nguyệt Ân nhật — «dương kiến sở sinh». Việc chung (dinh dựng/hôn nhân/dời nhà/tế tự/nhận chức/nạp tài) đều CÁT.' },
-  tianYuan: { vi: 'Thiên Nguyện', note: 'Thiên Nguyện nhật — «nghi nhất thiết» (宜祭祀/祈福/ cầu tự/ hưng tạo động thổ/ khai thị lập quyềnen giao dịch). CÁT tổng hợp, bổ 天赦.' },
+  tianYuan: { vi: 'Thiên Nguyện', note: 'Thiên Nguyện nhật — «nghi nhất thiết» (宜祭祀/祈福/ cầu tự/ hưng tạo động thổ/ khai thị lập quyển giao dịch). CÁT tổng hợp, bổ 天赦.' },
 };
 
 function dayInfo(year, month, day) {

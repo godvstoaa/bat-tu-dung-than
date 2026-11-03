@@ -2,6 +2,7 @@
 // + than đau loc + cuu menh trên LA SO THUC. Day la LOGIC TINH TOAN, khong chi tra cuu.
 // Nguon: 珞琭子赋注 / 李虚中命书 / 兰台妙选 (Round 27-31 kb.js).
 import { LANTAI_PATTERNS, SHENTOU_LU_NAYIN, GUFA_MODEL, JIUMING_SYSTEM, MANGPAI_KOUJUE, HELU_LUOSHU } from './kb.js';
+import { scanCuophapExtra } from './cuophap-extra.js'; // [round 2 quét sâu 22/10/2026] 136 luật mới — additive, không đụng luật cũ
 
 // trad → simp cho cac chu nhaps am (xu ly 2 dang chart)
 const T2S = { '劍':'剑','鋒':'锋','燈':'灯','楊':'杨','頭':'头','蠟':'蜡','釵':'钗','釧':'钏','霹':'霹','靂':'雳','澗':'涧','長':'长','寶':'宝','馬':'马','龍':'龙','駒':'驹','鳳':'凤','闕':'阙','靈':'灵','淵':'渊','躍':'跃','門':'门','鑛':'矿','鑛':'矿','釱':'','鍾':'钟','鎮':'镇' };
@@ -139,6 +140,8 @@ export function assessGufa(R) {
   const zunBei = zunXiongBeiJi(R);
   const upDown = wuxingUpDown(chart);
   const imb = wuxingImbalance(chart);
+  let extra = { patterns: [], checks: [], verdict: '', sources: {} }; // [round 2] defensive default
+  try { extra = scanCuophapExtra(chart, R); } catch (e) { try { console.warn('cuophap-extra scan:', e && e.message); } catch (_) {} }
   const cat = lantai.filter(p => p.cat === 'cat');
   const hung = lantai.filter(p => p.cat === 'hung');
   let verdict = 'CO PHAP (古法 nhaps am): ';
@@ -154,7 +157,9 @@ export function assessGufa(R) {
   if (zunBei) verdict += zunBei + ' ';
   if (upDown.doc) verdict += 'NGU HANH HUONG: ' + upDown.doc + ' ';
   if (imb.notes.length && imb.notes[0] && !imb.notes[0].includes('can bang')) verdict += 'THAI QUA/BAT CAP: ' + imb.notes.join(' ') + ' ';
-  return { lantai: { cat, hung }, shenTouLu: stl, jiuming, nayinRelations: nayinRel, zunBei, wuxingUpDown: upDown, wuxingImbalance: imb, verdict, model: GUFA_MODEL.note };
+  // [round 2 quét sâu] verdict mở rộng — additive: chỉ thêm text, không đụng field cũ
+  try { if (extra && extra.verdict) verdict += extra.verdict + ' '; } catch (_) {}
+  return { lantai: { cat, hung }, shenTouLu: stl, jiuming, nayinRelations: nayinRel, zunBei, wuxingUpDown: upDown, wuxingImbalance: imb, verdict, extra, model: GUFA_MODEL.note };
 }
 
 // === nhaps am sinhk giua cac tru (CO PHAP doc nien-menh nhaps am vs cac tru) ===
@@ -223,7 +228,7 @@ export function wuxingUpDown(chart) {
     if (kind) res.pairs.push(`${order[i]}(${up})→${order[i+1]}(${lo}):${kind}`);
   }
   let doc = '';
-  if (res.zhuqi > res.daoqi + res.weishi) doc = 'Duoi SINH tren nhieu (助气) → "nhat huong huong phuc, đeu duoc giup". ';
+  if (res.zhuqi > res.daoqi + res.weishi) doc = 'Duoi SINH tren nhieu (助气) → "nhat huong huong phuc, được người giúp". ';
   if (res.daoqi >= 2) doc += 'Tren SINH duoi nhieu (盗气) → "lam cho nguoi khac, phu on nguoi". ';
   if (res.chenzhi >= 2) doc += 'Duoi KHAC tren nhieu → "tram tri kho phat". ';
   if (res.weishi >= 2) doc += 'Tren KHAC duoi nhieu (威势) → "uy quyen nhung bat loi vo/con". ';

@@ -79,7 +79,7 @@ const STARS = [
   // 申
   { zhi: '申', starZh: '天孤', starVi: 'Thiên Cô', tone: 'hung', grade: 'Hạ phẩm',
     meaning: 'Chủ cô độc, lục thân duyên bạc. Khó dựa người thân, phải tự lập, cần nuôi quan hệ.',
-    destiny: 'Mệnh cung Thiên Cô → tiền thế cô lập/khérác người thân, đời này duyên bạc, nên chủ động xây tình cảm.' },
+    destiny: 'Mệnh cung Thiên Cô → tiền thế cô lập/khó khăn với người thân, đời này duyên bạc, nên chủ động xây tình cảm.' },
   // 酉
   { zhi: '酉', starZh: '天刃', starVi: 'Thiên Nhận', tone: 'mid', grade: 'Trung phẩm',
     meaning: 'Chủ cương cường háo đấu, dễ hình thương. Tính cương, dễ tổn thương, cần học nhẫn.',

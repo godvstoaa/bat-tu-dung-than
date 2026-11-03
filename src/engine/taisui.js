@@ -90,7 +90,7 @@ export const TAISUI_REMEDY = [
   '① 拜太岁 / 安太岁 — sau Lập Xuân (≈4/2 dương), đến đền/chùa đăng ký an thái tuế.',
   '② 佩 tam hợp sinh tiếu — 戴 hình con giáp tam hợp với tuổi mình (xem gợi ý) để mượn sức đồng minh.',
   '③ Trị "huyết quang" — hiến máu / cạo máu / trích nha (đánh răng rút máu) chủ động ứng huyết quang, hoá tai nạn.',
-  '④ Đỗ xuân (躲春) — đúng giờ Lập Xuân ở yên trong nhà, trấn tĩnh, tránhdynamic.',
+  '④ Đỗ xuân (躲春) — đúng giờ Lập Xuân ở yên trong nhà, trấn tĩnh, tránh di chuyển.',
   '⑤ Thái tuế phù — mang theo/贴 太岁符; cuối năm hoá (đốt/trả đền).',
   '⑥ Hành thiện tích đức — quyên góp, phóng sinh, làm việc tốt (thái tuế tinh quân tra xét thiện ác).',
   '⑦ Giữ 提供 — cẩn trọng, khiêm nhường, tránh khẩu thiệt; không động thổ phương thái tuế.',

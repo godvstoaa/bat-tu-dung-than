@@ -231,7 +231,7 @@ export function remedySummary(R) {
 // ---------------------------------------------------------------------------
 export const TEN_THIEN = [
   { han: '与人为善', vi: 'Cùng người làm thiện', practice: 'Làm gương lành,khuyến khích người khác thiện' },
-  { han: '爱敬存心', vi: 'Yêu kính giữ lòng', practice: 'Giữ tâm yêu+khíất trọng mọi người' },
+  { han: '爱敬存心', vi: 'Yêu kính giữ lòng', practice: 'Giữ tâm yêu + kính trọng mọi người' },
   { han: '成人之美', vi: 'Thành cái đẹp cho người', practice: 'Giúp người hoàn thành việc tốt (không đố kỵ)' },
   { han: '劝人为善', vi: 'Khuyên người làm thiện', practice: 'Dẫn dắt người khác hướng thiện' },
   { han: '救人危急', vi: 'Cứu người nguy cấp', practice: 'Giúp lúc khó khăn nhất (tiền/sức/tâm)' },

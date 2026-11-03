@@ -628,7 +628,8 @@ export const QIONGTONG_TIAOHOU = {
   '癸寅月': 'Âm Thủy mùa xuân → 庚-Kim + 丙-Hỏa + 甲-Mộc. "癸水寅月,辛金为源".',
   '癸巳月': 'Âm Thủy mùa hạ → 庚-Kim sinh + 壬-Thủy trợ + 丙-Hỏa.',
   '癸酉月': 'Thủy mùa thu Kim sinh → "金白水清" → cần 丙-Hỏa + 甲-Mộc phối.',
-  '癸子月': 'Thủy mùa đông → "癸水冬月,丙火解冻" → Hỏa sưởi là ưu tiên số 1.','甲子月': 'Đông hàn cực, Giáp Mộc đông phục — cần Đinh Hỏa noãn gốc trước, Canh Kim đẽo thành khí, Bính Hỏa phụ. Ưu tiên: Đinh → Canh → Bính. — 甲木子月，丁火为尊，庚金次之',
+  '癸子月': 'Thủy mùa đông → "癸水冬月,丙火解冻" → Hỏa sưởi là ưu tiên số 1.',
+'甲子月': 'Đông hàn cực, Giáp Mộc đông phục — cần Đinh Hỏa noãn gốc trước, Canh Kim đẽo thành khí, Bính Hỏa phụ. Ưu tiên: Đinh → Canh → Bính. — 甲木子月，丁火为尊，庚金次之',
   '甲丑月': 'Quý đông hàn thấp, thổ băng — Mộc cần Đinh Hỏa giải hàn trước, Canh Kim trác cụ, Bính Hỏa phụ noãn. Ưu tiên: Đinh → Canh → Bính. — 甲木丑月，丁火为先，庚金次之',
   '甲辰月': 'Quý xuân thấp thổ, mộc khí lão — cần Canh Kim phạt mộc thành tài, Đinh Hỏa ôn nhuận, Nhâm Thủy tưới. Ưu tiên: Canh → Đinh → Nhâm. — 甲木辰月，庚金为主，丁壬为佐',
   '甲未月': 'Quý hạ táo nhiệt, mộc bị thiêu — gấp Quý Thủy nhuận, Đinh Hỏa tiết tú vừa, Canh Kim phụ. Ưu tiên: Quý → Đinh → Canh. — 甲木未月，癸水为先，丁火次之',
@@ -1145,7 +1146,7 @@ export const STAR_PALACE_RULES = [
   'CUNG hung + TINH cát → môi trường xấu nhưng người tốt → ví dụ: Nhật Chi bị xung nhưng Tài tinh vượng → vợ tính tốt nhưng hoàn cảnh khó.',
   '「星宫同参」— lúc nào cũng xem CẢ cung lẫn tinh, không chỉ xem 1 thứ. Cung = hoàn cảnh; Tinh = con người.',
   'Tinh không xuất hiện trong tứ trụ → người đó "không hiển" (có thể mất sớm, hoặc xa cách, hoặc không nổi bật).',
-  'Tinh bị xung/khếtn trong cung đối ứng → người đó dễ có biến cố/sức khỏe vấn đề.',
+  'Tinh bị xung/khét trong cung đối ứng → người đó dễ có biến cố/sức khỏe vấn đề.',
 ];
 
 // ---- 六亲 biến thông: khi sao không có trong tứ trụ ----
@@ -2446,7 +2447,7 @@ export const LANTAI_PATTERNS = [
   { id: "linfeng", name: "麟逢鳳沼", vi: "Lân phượng phượng chiểu", cat: "cat", detect: { branchesAll: ["辰", "酉"] }, judgment: "Then(long/lan) + Dau(phung) → 'lan phung phung chieu', quy. (Tru 乙酉-庚辰 la 'tu am đai sat' → ngoai le).", source: "lan dai" },
   { id: "shuirao", name: "水繞花堤", vi: "Thủy nhiễu hoa đê", cat: "cat", detect: { and: [ { nayinAny: ["大林木", "桑柘木", "楊柳木", "松柏木", "石榴木", "平地木"] }, { nayinAny: ["天河水", "大海水", "大溪水", "长流水", "井泉水", "涧下水"] } ] }, judgment: "2 Moc (noi) + 2 Thuy (ngoai) → 'thuy nhieu hoa đe', phu quy, nhân-tri tuong tu.", source: "lan dai" },
   { id: "jinma", name: "金馬嘶風", vi: "Kim mã ti phong", cat: "cat", detect: { and: [ { ganzhiAny: ["庚午", "甲午"] }, { branch: "巳" } ] }, judgment: "Canh-Ngo/Giap-Ngo (kim ma) + Ty (ton phong) → 'choi sieu quan'. Tan-Ty tot nhat.", source: "lan dai" },
-  { id: "yunlong", name: "雲龍風虎", vi: "Vân long phong hổ", cat: "cat", detect: { branchesAll: ["寅", "卯", "辰", "巳"] }, judgment: "Dan(ho)+Mao(loi)+Then(long)+Ty(phong) đeu co (thuan) → 'com đac đac khoa'. Dao luan → luc nhe.", source: "lan dai" },
+  { id: "yunlong", name: "雲龍風虎", vi: "Vân long phong hổ", cat: "cat", detect: { branchesAll: ["寅", "卯", "辰", "巳"] }, judgment: "Dan(ho)+Mao(loi)+Then(long)+Ty(phong) đều co (thuan) → 'com đac đac khoa'. Dao luan → luc nhe.", source: "lan dai" },
   { id: "sangliu", name: "桑柳成林", vi: "Tang dương thành lâm", cat: "cat", detect: { and: [ { nayin: "桑柘木" }, { nayin: "楊柳木" } ] }, judgment: "Tang Dot Moc (Nham-Tu/Quy-Suu) + Duong Lieu Moc (Nham-Ngo/Quy-Vi) → 'hoai nhan trong chi tai'.", source: "lan dai" },
   { id: "cangsong", name: "蒼松冬秀", vi: "Thương tùng đông tú", cat: "cat", detect: { and: [ { nayin: "松柏木" }, { month: "winter" } ] }, judgment: "Tung Bach Moc (Canh-Dan/Tan-Mao) + sinh đong (Hai/Tu/Suu) → 'tiet cao cung cuc', ky nhan.", source: "lan dai" },
   { id: "huoming", name: "火明木秀", vi: "Hỏa minh mộc tú", cat: "cat", detect: { and: [ { nayinAny: ["炉中火", "爐中火", "天上火", "霹靂火", "覆燈火", "山下火", "山頭火", "桑柘木", "大林木", "松柏木", "楊柳木", "石榴木", "平地木"] }, { month: "spring" }, { hasHuo: true }, { hasMoc: true } ] }, judgment: "Hoa + Moc + xuan (Dan/Mao/Then) → 'hoa minh moc tu', van hoa, quy.", source: "lan dai" },
@@ -2459,8 +2460,8 @@ export const LANTAI_PATTERNS = [
   { id: "baihuxianshi", name: "白虎銜屍", vi: "Bạch hổ hàm thi", cat: "hung", detect: { and: [ { ganAny: ["甲", "乙"] }, { ganAny: ["庚", "辛"] }, { branchesAll: ["寅", "卯", "辰"] } ] }, judgment: "Giap/At (Moc than) + Canh/Tan (Kim = bach ho) + Dan-Mao-Then → 'bach ho ham thi', cuc hung nguy.", source: "lan dai" },
   { id: "fengdongdeng", name: "風動燈滅", vi: "Phong động đăng diệt", cat: "hung", detect: { and: [ { nayin: "覆燈火" }, { nayinAny: ["大林木", "桑柘木", "松柏木", "楊柳木", "石榴木", "平地木"] } ] }, judgment: "Phuc Đang Hoa (Giap-Then/At-Ty) + Moc nhieu (moc chieu phong) → 'phong dang dang yet', moc nat, tien binh.", source: "lan dai" },
   { id: "taiyangsunming", name: "太陽損明", vi: "Thái dương tổn minh", cat: "hung", detect: { and: [ { ganzhi: "戊午" }, { nayinWaterCount: 2 } ] }, judgment: "Mau-Ngo (thai duong hoa) + 2+ Thuy → 'thai duong ton minh', quang bi giam, hung.", source: "lan dai" },
-  { id: "gui toumu", name: "鬼投母腹", vi: "Quỷ đầu mẫu phúc", cat: "hung", detect: { nayinWaterCount: 4 }, judgment: "4 tru đeu Thuy + thai vo Tho → 'quy đau mau phuc', thoi nho mo coi som.", source: "lan dai" },
-  { id: "sanqi", name: "三奇拱貴", vi: "Tam kỳ củng quý", cat: "cat", detect: { ganSetAny: [["乙","丙","丁"],["甲","戊","庚"],["壬","癸","辛"]] }, judgment: "Thien can đeu 1 bo tam ky (乙丙丁 thien / 甲戊庚 đia / 壬癸辛 nhan) → 'tam ky cung quy', cuc quy, đon đac.", source: "lan dai" },
+  { id: "gui toumu", name: "鬼投母腹", vi: "Quỷ đầu mẫu phúc", cat: "hung", detect: { nayinWaterCount: 4 }, judgment: "4 tru đều Thuy + thai vo Tho → 'quy đau mau phuc', thoi nho mo coi som.", source: "lan dai" },
+  { id: "sanqi", name: "三奇拱貴", vi: "Tam kỳ củng quý", cat: "cat", detect: { ganSetAny: [["乙","丙","丁"],["甲","戊","庚"],["壬","癸","辛"]] }, judgment: "Thien can đều 1 bo tam ky (乙丙丁 thien / 甲戊庚 đia / 壬癸辛 nhan) → 'tam ky cung quy', cuc quy, đon đac.", source: "lan dai" },
   { id: "shiliu", name: "石榴噴火", vi: "Thạch lựu phun hỏa", cat: "cat", detect: { and: [ { nayin: "石榴木" }, { month: "summer" }, { hasHuo: true } ] }, judgment: "Thach Luu Moc (Canh-Than/Tan-Dau) + ha + Hoa → 'thach luu phun hoa', quy (dang ky van hoa).", source: "lan dai" },
   { id: "hangu", name: "寒谷回春", vi: "Hàn cốc hồi xuân", cat: "cat", detect: { and: [ { hasMoc: true }, { month: "winter" }, { branchesAll: ["寅", "卯", "辰"] } ] }, judgment: "Moc + sinh đong (bang cuc) + gap Dan/Mao/Then (xuan) → 'han coc hoi xuan', phat đe nhat.", source: "lan dai" },
   { id: "zhenwu", name: "真武當權", vi: "Chân vũ đương quyền", cat: "cat", detect: { and: [ { ganAny: ["壬", "癸"] }, { branchesAll: ["子", "巳", "丑"] } ] }, judgment: "Nham/Quy (bach thu/huyen vu) + Tu+Ty+Suu (qui/xa/ruc) → 'chan vu đuong quyen', quy (dang lanh đao/quan).", source: "lan dai" },
@@ -2618,7 +2619,7 @@ export const MAQIANKE_SHAOBINGE = {
     keyVerses: "'Thành tây thùy cúc nhất chi hoa' = ám chi 李自成 (đã ứng). Nhiều câu ám chi sự kiện Thanh/Dân Quốc (tranh cai).",
     honestyFlag: "⚠ Cùng tinh chất 推背图/马前课 — tiên tri CẤM, giải đoán tranh cai. App chi tham chieu.",
   },
-  note: "Bộ 3 tiên tri cấm: 推背图 (Đường·Lý Thuần Phong) + 马前课 (Tam Quốc·Gia Cát Lượng) + 烧饼歌 (Minh·Lưu Bá Ôn). Tat ca đeu INTERPRETIVE (không compute chính xác) → app tham chieu trung thực, không 'nhét bừa'.",
+  note: "Bộ 3 tiên tri cấm: 推背图 (Đường·Lý Thuần Phong) + 马前课 (Tam Quốc·Gia Cát Lượng) + 烧饼歌 (Minh·Lưu Bá Ôn). Tat ca đều INTERPRETIVE (không compute chính xác) → app tham chieu trung thực, không 'nhét bừa'.",
 };
 
 // ROUND 43: 彭祖百忌 (CẤM KỴ dân gian) — mỗi can/chi → 1 điều kiêng kỵ. Dùng cho trạch nhật.
@@ -2680,7 +2681,7 @@ export const YANGGONG_JIRI = {
     const key = lunarMonth + '/' + lunarDay;
     return this.days.find(d => d.lunar === key) || null;
   },
-  note: "13 ngày na y đeu la 'bách sự kỵ' — kiêng MỌI việc lon: cuoi hoi, khai truong, đong nha, di chuyen, ky ket hop đong. Dung KEM hoang đao/hac đao + 彭祖百忌.",
+  note: "13 ngày na y đều la 'bách sự kỵ' — kiêng MỌI việc lon: cuoi hoi, khai truong, đong nha, di chuyen, ky ket hop đong. Dung KEM hoang đao/hac đao + 彭祖百忌.",
 };
 
 // ROUND 45: 葬经 (Quách Phác, Tấn) — PHONG THỦY nền tảng CẤM KỴ (tang táng ảnh hưởng con cháu)

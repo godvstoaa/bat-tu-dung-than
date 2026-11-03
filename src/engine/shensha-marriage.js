@@ -110,7 +110,7 @@ export function computeExtraShensha(chart) {
 
   // 丧门
   const sm = FWD2[yz];
-  if (allZhi.includes(sm)) out.push({ star:'丧门', vi:'Tang Môn', desc:'chủ tang sự, bệnh nặng, thương tâm — gặp lưu niên mang chi này cần chú ý sức khoảogia đình', at: allZhi.filter(z=>z===sm).join(','), tone:'volatile' });
+  if (allZhi.includes(sm)) out.push({ star:'丧门', vi:'Tang Môn', desc:'chủ tang sự, bệnh nặng, thương tâm — gặp lưu niên mang chi này cần chú ý sức khỏe gia đình', at: allZhi.filter(z=>z===sm).join(','), tone:'volatile' });
   // 吊客
   const dk = FWD6[yz];
   if (allZhi.includes(dk)) out.push({ star:'吊客', vi:'Điếu Khách', desc:'chủ có tang, wearing mourning — năm gặp chi này cẩn thận người lớn tuổi', at: allZhi.filter(z=>z===dk).join(','), tone:'volatile' });

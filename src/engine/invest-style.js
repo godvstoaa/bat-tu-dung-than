@@ -52,7 +52,7 @@ const GOD_INVEST = {
   食神: { style: 'từ từ, sinh lời tự nhiên', risk: 2, desc: 'tài hoa sinh tiền, kinh doanh nhỏ, F&B — vui vẻ' },
   傷官: { style: 'sáng tạo, phá cách, biến động', risk: 4, desc: 'startup, tech, đầu tư phi truyền thống — giỏi nhưng hao' },
   比肩: { style: 'hợp tác, bình đẳng', risk: 3, desc: 'đầu tư cùng bạn bè/đối tác — nên rõ ràng hợp đồng' },
-  劫財: { style: '⚠ RỦI RO CAO — hao tiền', risk: 5, desc: 'DẶC BIỆT CẢNH BÁO: dễ hao tiền qua đầu cơ/cho vay — TRÁNH day trading' },
+  劫財: { style: '⚠ RỦI RO CAO — hao tiền', risk: 5, desc: 'ĐẶC BIỆT CẢNH BÁO: dễ hao tiền qua đầu cơ/cho vay — TRÁNH day trading' },
 };
 
 /**

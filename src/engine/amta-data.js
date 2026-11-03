@@ -175,7 +175,7 @@ export const indicators = [
   {
     id: 'jiesha-wangshen',
     indicator: '劫煞 / 亡神 (Kiếp Sát · Vong Thần)',
-    condition: 'Kiếp sát = ngũ hành tuyệt處 (Dần-Thân-Tỵ-Hợi); Vong thần = ngũ hành lộccommands (臨官). Tra theo năm chi / ngày chi.',
+    condition: 'Kiếp sát = ngũ hành tuyệt處 (Dần-Thân-Tỵ-Hợi); Vong thần = ngũ hành Lâm Quan (臨官). Tra theo năm chi / ngày chi.',
     meaning: 'Theo《三命通會》卷十二: «劫煞為災不可當…» / «亡神吉則峻歷有威…». Dân giao gắn «vong thần» với «dễ感应 vong linh»; cổ pháp gốc là luận đoán tai hoạ / tâm tính. strength cao vì có trích nguyên văn.',
     strength: 5,
     sources: [
@@ -417,7 +417,7 @@ export const ritualsTaiwanShoujing = [
       '4)Đôi khi phát收驚符 / chỉ dẫn cúng gia.',
     ],
     practitioner: '收驚婆 (đạo bà — đặc trưng 行天宮), 道長 (đạo sĩ), 法師. Có cả chùa / miếu (行天宮, 保安宮) và thực hành tại gia.',
-    variants: ['Chùa / miếu (đomány lớn, miến phí — 行天宮)', 'Tại gia (cá nhân / 收驚婆)', 'Biến thể閭山 / 正一 theo dòng đạo'],
+    variants: ['Chùa / miếu (đình miếu lớn, miễn phí — 行天宮)', 'Tại gia (cá nhân / 收驚婆)', 'Biến thể閭山 / 正一 theo dòng đạo'],
     meaning: '«安魂» — đưa hồn phách về trạng thái ổn định sau khi «著驚» (bị惊). KHÔNG phải chẩn đoán / thay thế tâm lý y tế.',
     sources: [
       'https://religion.moi.gov.tw/Knowledge/Content?ci=2&cid=6 (全國宗教資訊網 內政部 GOV)',

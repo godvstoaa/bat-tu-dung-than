@@ -70,7 +70,7 @@ const NEED_MAP = {
 };
 
 const REMEDY = {
-  '火': 'đôngnoãn: hướng Nam, màu đỏ/tím, hoạt động trưa, thức ấm (gừng, quế, thịt đỏ vừa phải)',
+  '火': 'đông noãn: hướng Nam, màu đỏ/tím, hoạt động trưa, thức ấm (gừng, quế, thịt đỏ vừa phải)',
   '水': 'mát nhuận: hướng Bắc, màu xanh đen, gần sông/biển, thức nhuận (rau xanh, trái thanh mát)',
   '木': 'thông tiết: hướng Đông, màu xanh lục, trồng cây, vận động ngoài trời',
 };

@@ -19,7 +19,7 @@ export const WX_REMEDY = {
   火: {
     direction: 'Nam', house: 'tọa Nam hướng Bắc',
     color: 'đỏ, hồng, tím, cam', career: 'năng lượng – điện, điện tử, ẩm thực, quảng cáo – truyền thông, giải trí, mỹ phẩm, ánh sáng, in ấn',
-    food: 'vị đắng, ớt, cà chua, thịtle đỏ, trà đỏ, cà phê', material: 'đèn, nến, điện tử, nhựa, lụa đỏ',
+    food: 'vị đắng, ớt, cà chua, atiso đỏ, trà đỏ, cà phê', material: 'đèn, nến, điện tử, nhựa, lụa đỏ',
     number: '2, 7', organ: 'tim – ruột non – huyết',
     animal: 'ngựa, rắn (Ngọ/Tỵ)', season: 'hạ',
   },

@@ -469,8 +469,8 @@ function pTiming(R, intent) {
   const badDy = [];
   for (const d of _badAll.slice(0, 2)) badDy.push(d);
   for (const d of _badAll) if (d.clashMitigated && !badDy.includes(d)) badDy.push(d);
-  if (goodDy.length) lines.push(`Đại vận CÁT: ${goodDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}–${d.startAge + 9}t]${d.gejuRescue ? ' ★RESCUES' : d.gejuDelta > 0 ? ' ★CÁCH THUẬN' : ''}${d.clashType === '天克地冲' ? (d.clashMitigated ? ' ⚡đổithayCÓLỢI' : ' ⚡biếnloạn') : d.clashType === '地冲' ? ' ⚡biếnđộng' : d.clashType === '伏吟' ? ' ⚡trùphúc' : ''}`).join('; ')} — tiến thủ.`);
-  if (badDy.length) lines.push(`Đại vận cần THẬN TRỌNG: ${badDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}–${d.startAge + 9}t]${d.gejuWorsen ? ' ⚠WORSENS' : d.gejuDelta < 0 ? ' ⚠CÁCH NGHỊCH' : ''}${d.clashType === '天克地冲' ? (d.clashMitigated ? ' ⚡nhưngMangDụng→đổithayCÓLỢI(chủđộngnắm)' : ' ⚡天克地冲đạiLoạn') : d.clashType === '地冲' ? ' ⚡地冲biếnđộng' : d.clashType === '伏吟' ? ' ⚡伏吟trùphúc' : ''}`).join('; ')} — giữ ổn định.`);
+  if (goodDy.length) lines.push(`Đại vận CÁT: ${goodDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}–${d.startAge + 9}t]${d.gejuRescue ? ' ★RESCUES' : d.gejuDelta > 0 ? ' ★CÁCH THUẬN' : ''}${d.clashType === '天克地冲' ? (d.clashMitigated ? ' ⚡đổithayCÓLỢI' : ' ⚡biếnloạn') : d.clashType === '地冲' ? ' ⚡biến động' : d.clashType === '伏吟' ? ' ⚡trù phúc' : ''}`).join('; ')} — tiến thủ.`);
+  if (badDy.length) lines.push(`Đại vận cần THẬN TRỌNG: ${badDy.map((d) => `${hanviet(d.ganZhi)} [${d.startAge}–${d.startAge + 9}t]${d.gejuWorsen ? ' ⚠WORSENS' : d.gejuDelta < 0 ? ' ⚠CÁCH NGHỊCH' : ''}${d.clashType === '天克地冲' ? (d.clashMitigated ? ' ⚡nhưngMangDụng→đổithayCÓLỢI(chủđộngnắm)' : ' ⚡天克地冲đạiLoạn') : d.clashType === '地冲' ? ' ⚡地冲biến động' : d.clashType === '伏吟' ? ' ⚡伏吟trù phúc' : ''}`).join('; ')} — giữ ổn định.`);
   // Session module supplements (khi không có AI, NLG vẫn có dữ liệu timing đầy đủ)
   try { const jy = jiaoYunAnalysis(R); if (jy.next) lines.push(`🔄 Giao thời đại vận kế: ${jy.next.ganZhi} [${jy.next.age}t, ${jy.next.rating}] — còn ${jy.daysUntil} ngày.`); } catch (e) {}
   try { const wc = scanWealthCareerYingqi(R, new Date().getFullYear(), 8); if (wc.caiYears.length) lines.push(`💰 Tài kích hoạt: ${wc.caiYears.map((y) => y.year).join(', ')}${wc.guanYears.length ? ' | 🎯 Quan: ' + wc.guanYears.map((y) => y.year).join(', ') : ''}.`); } catch (e) {}
@@ -953,7 +953,7 @@ function pShensha(R) {
   return {
     title: 'Thần 煞 (sao mệnh)',
     lead: `Mệnh ${dayGz} mang ${keys.length} sao thần煞 (${catCount} cát):`,
-    paragraphs: lines.concat([`💡 Sao thần煞 phụ trợ — cát sao tăng lực khi trùng Dụng/Hỷ; cường sao (羊刃/魁罡) cần «chế» (quan sát/đapsulation) mới tốt. Mở AI để luân giải sao theo lưu niên/đại vận.`]),
+    paragraphs: lines.concat([`💡 Sao thần煞 phụ trợ — cát sao tăng lực khi trùng Dụng/Hỷ; cường sao (羊刃/魁罡) cần «chế» (quan sát/đắc chế) mới tốt. Mở AI để luân giải sao theo lưu niên/đại vận.`]),
   };
 }
 function pInteractions(R) {

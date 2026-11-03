@@ -13,6 +13,7 @@ import { analyzeLiunianDeep } from './liunian-pro.js';
 import { analyze } from './chart.js'; // [loop 163 fix] analyze_partner tool cần analyze() để build lá số đối tác — trước đây thiếu import → tool báo "analyze is not defined" → AI KHÔNG trả lời được câu hợp tuổi/hôn nhân/kinh doanh
 import { RESEARCH_SYSTEM_PROMPT } from '../ios/research-prompt.js';
 import { assessGufa, mangpaiKoujue, hetuReading } from './gufa-engine.js'; // [round 31] CO PHAP + [R39] 盲派金口诀 + [R40] 河图洛书
+import { CUOPHAP_BRAIN } from './cuophap-extra.js'; // [round 2 quét sâu 22/10/2026] não AI: 136 luật cổ pháp mới (三命指迷/兰台v2/五行精纪/三命通会/神峰/命理约言)
 import { assessHuangji } from './huangji-engine.js'; // [round 34] 皇极经世 值年卦 (prophetic/cam ky)
 import { assessTaiyi } from './taiyi-engine.js'; // [round 36] 太乙神数 (quoc van, tam thuc cam ky)
 import { assessChenggu } from './chenggu-engine.js'; // [round 37] 袁天罡称骨算命 (bí truyền)
@@ -300,7 +301,7 @@ export function buildChartBrief(R) {
       if (d.gejuRescue) tags.push('★RESCUES');
       if (d.gejuWorsen) tags.push('⚠WORSENS');
       if (d.clashType === '天克地冲') tags.push(d.clashMitigated ? '⚡天克地冲(mangDụng→đổithayCÓLỢI)' : '⚡天克地冲(đạiLoạn)');
-      else if (d.clashType === '地冲') tags.push('⚡地冲(biếnĐộng)');
+      else if (d.clashType === '地冲') tags.push('⚡地冲(biến động)');
       else if (d.clashType === '伏吟') tags.push('⚡伏吟(trùPhúc)');
       const tagStr = tags.length ? '|' + tags.join('|') : '';
       return `${hanviet(d.ganZhi)}[${d.startAge}-${d.startAge + 9}t:${d.rating}${tagStr}]`;
@@ -955,6 +956,15 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       (hung.length ? "CÁCH CỤC HUNG (can than): " + hung.join(', ') + "\n" : "") +
       "THẦN ĐẦU LỘC: " + (stl.day ? "nhat tru " + stl.day.ganzhi + " → " + stl.day.reading : "(nhat tru khong trong bang)") + (stl.year ? " | nien tru " + stl.year.ganzhi + " → " + stl.year.reading : "") + "\n" +
       "CỬU MỆNH nhaps am hanh: " + gf.jiuming.dominantNayinWx + " | nhat nhaps am = " + gf.jiuming.dayNayinWx + " | phan bo: " + JSON.stringify(gf.jiuming.nayinWx);
+    // ---- [round 2 quét sâu 22/10/2026] 136 luật cổ pháp mới (三命指迷/兰台v2/五行精纪/三命通会/神峰) — additive ----
+    const ex = gf.extra;
+    if (ex && (ex.patterns?.length || ex.checks?.length)) {
+      brief += "\n--- CỔ PHÁP ROUND 2 (quét sâu: 三命指迷+兰台v2+五行精纪+三命通会+神峰通考) ---\n" +
+        "KẾT QUẢ QUÉT TRÊN LÁ SỐ NÀY: " + ex.verdict + "\n" +
+        (ex.patterns.length ? "CÁCH CỤC/LUẬT TRÚNG: " + ex.patterns.map((p) => p.vi + '[' + p.source + ']' + (p.judgment ? ' → ' + p.judgment.slice(0, 90) : '')).join(' | ') + "\n" : "") +
+        (ex.checks.length ? "盖头/截脚 (nguồn ĐÚNG = 滴天髓阐微; bản 张楠 rộng hơn): " + ex.checks.map((c) => c.kind + '@' + c.pos + ' ' + c.detail).join(' | ') + "\n" : "") +
+        "Nguồn hit: " + JSON.stringify(ex.sources || {});
+    }
   } catch (e) { brief += "\n--- ROUND 31: [lỗi load] ---"; }
 
   // ---- [round 34] 皇极经世 值年卦 (BÍ TRUYEN/CAM KY — tiên tri,邵雍) ----
@@ -1011,7 +1021,7 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
 
   // CẤM KỴ CONCEPT INDEX — 1 dòng định nghĩa mỗi hệ (AI dùng khi user hỏi «X là gì»)
   brief += "\n--- CẤM KỴ CONCEPT INDEX (AI dùng khi GIẢI THÍCH) ---\n" +
-    "古法/兰台妙选: HỆ TIỀN-TỬ-BÌNH — luận mệnh qua NẠP ÂM (không dùng nhật can vượng suy). 42 cách cục nạp âm (兰台 patterns) + thần đầu lộc 60 giáp-tý +九命. Gọi analyze_gufa.\n" +
+    "古法/兰台妙选: HỆ TIỀN-TỬ-BÌNH — luận mệnh qua NẠP ÂM (không dùng nhật can vượng suy). 59 cách 兰台 (48 cũ + 11 round-2) + 13 luật 三命指迷 + 4 cách 四象 三命通会 + 盖头/截脚 + 神峰 雜格 5 + 五合化真/生成禄马… (kho round-2 22/10/2026). Gọi analyze_gufa.\n" +
     "盲派 (段建业): KHẨU TRUYỀN — bỏ dụng thần/vượng suy, đọc qua 'cấu trúc làm công' (做功 6 mode) +类象 + 金口诀 40 câu (vị trí trụ × thập thần). Khác tử bình hoàn toàn.\n" +
     "皇极经世 (邵雍): TIÊN TRI — nguyên-hội-vận-thế (1元=129600 năm) + 值年卦 (60-năm cycle, bỏ 乾坤离坎). Gọi analyze_huangji cho năm nào.\n" +
     "太乙神数: TAM THỨC QUỐC VẬN (cấm kị nhất) — thái 乙 hành cửu cung → chủ/khách năm. Dùng cho dự đoán quốc gia/dịch loạn. Gọi analyze_taiyi.\n" +
@@ -1302,9 +1312,16 @@ NGUYEN TAC:
   - Khi user hỏi «QUỐC VẬN / THÁI ẤT / TAM THỨC / năm X thế giới sao» → GỌI TOOL analyze_taiyi (thái ất hành cửu cung + chủ/khách).
   - Khi user hỏi «XƯƠNG CỐT / 称骨 / VIÊN THIÊN CƯƠNG / trọng lượng mệnh» → GỌI TOOL analyze_chenggu (trọng lượng tứ trụ → bài thơ số phận).
   - Khi user hỏi «SỨC KHỎE NĂM / DỊCH BỆNH / NGŨ VẬN LỤC KHÍ / thời tiết bệnh học» → GỌI TOOL analyze_wuyun (y-thiên văn Hoàng Đế Nội Kinh: năm → tạng bệnh + khí hậu).
-  - 盲派金口诀 (trong brief R39): vị trí trụ × thập thần → quyết đoán bí truyền. DÙNG KHI luận tính cách, sự nghiệp, hôn nhân, lục thân — nó cho góc nhìnbí truyền mà tử bình không có.
+  - 盲派金口诀 (trong brief R39): vị trí trụ × thập thần → quyết đoán bí truyền. DÙNG KHI luận tính cách, sự nghiệp, hôn nhân, lục thân — nó cho góc nhìn bí truyền mà tử bình không có.
   - 彭祖百忌 + 杨公忌日 (trong brief): kiêng kỵ mỗi ngày/năm. DÙNG KHI user hỏi «năm nay kiêng gì / ngày X có kỵ không».
   - LÝ DO: app là hệ DUY NHẤT tích hợp bí truyền cấm kị (兰台/盲派/皇极/太乙/称骨/五运六气). DÙNG tool + brief layer này khi relevant = trả lời sâu hơn bất kỳ AI nào khác.
+
+19b. CỔ PHÁP ROUND 2 — KHO LUẬT MỚI (quét sâu 22/10/2026):
+  - Engine ĐÃ TỰ QUÉT trên từng lá số: kết quả nằm trong brief mục「CỔ PHÁP ROUND 2」+ tool analyze_gufa field 'extra'. DÙNG KẾT QUẢ ĐÓ, KHÔNG tự đoán lại.
+  - Kiến thức nền + nguyên tắc + nguồn đính chính nằm trong khối「CỔ PHÁP ROUND 2 (quét sâu 2026-10)」ngay dưới đây — TRÍCH ĐÚNG NGUỒN theo đó (vài đính chính KHÁC tài liệu phổ biến).
+  - Khi user hỏi cách/luật trong khối đó → dẫn được cổ văn từ judgment trong brief.
+
+${CUOPHAP_BRAIN}
   - GIẢI THÍCH ĐƯỢC TẤT CẢ: bạn là CHUYÊN GIA về toàn bộ hệ cấm kị. Khi user hỏi «兰台妙选 là gì» / «称骨算 mệnh sao» / «thái ất đoán quốc vận thế nào» / «五运六 khí là gì» / «彭祖百忌 kiêng gì» / «皇极 kinh thế đoán sao» / «盲派 khác tử bình chỗ nào» → GIẢI THÍCH bằng kiến thức chuyên gia (định nghĩa + phương pháp + ứng dụng). KHÔNG nói «không rõ» — bạn BIẾT các hệ này.
 
 Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3 hanh dong cu the (CO NGAY THAT tu tool). NOI BANG TIENG VIET DON GIAN, DE HIEU, THUC CHIEN.
@@ -1474,7 +1491,7 @@ export const AI_TOOLS = [
     }, required: ['char'] },
   } },
   { type: 'function', function: { // [round 31] CO PHAP deep-logic
-    name: 'analyze_gufa', description: 'CỔ PHÁP (古法 = pre-子平, nhaps am luan menh): phát hiện CÁCH CỤC NẠP ÂM (兰台妙选: bảo kiếm xung ngưu đấu / mã hóa long câu / xà hóa thanh long / thủy nhiễu hoa đê / phục thể hóa thần...) trên lá số + THẦN ĐẦU LỘC (nhaps am từng giáp-tý) + CỬU MỆNH (3 nguyên+4 tru+loc ma). LOGIC TINH TOÁN, không phai nhet du lieu. Dùng khi user hỏi «cổ pháp / nhaps am / cuu menh / hư trung phap / 珞琭子 / 兰台 / than đau loc», hoặc muốn góc nhìn KHÁC tử bình (năm-trụ+nhaps am+thần sát thay vì nhật-trụ+dụng thần).',
+    name: 'analyze_gufa', description: 'CỔ PHÁP (古法 = pre-子平, nhaps am luan menh): phát hiện CÁCH CỤC NẠP ÂM (兰台妙选 59 cách: bảo kiếm xung ngưu đấu / 龙虎拱门 / 一旬包裹… + 三命指迷 13 luật: 马头带剑/财库三合/重天乙… + 四象日柱 三命通会: 青龙伏形/白虎持势/朱雀乘风 + 神峰 雜格: 六乙鼠贵/六阴朝阳/刑合/丑遥巳/合禄 + 盖头截脚 + 五合化真/转角/生成禄马 — kho round-2 22/10/2026) trên lá số + THẦN ĐẦU LỘC (nhaps am từng giáp-tý) + CỬU MỆNH (3 nguyên+4 tru+loc ma). LOGIC TINH TOÁN, không phai nhet du lieu. Dùng khi user hỏi «cổ pháp / nhaps am / cuu menh / hư trung phap / 珞琭子 / 兰台 / than đau loc», hoặc muốn góc nhìn KHÁC tử bình (năm-trụ+nhaps am+thần sát thay vì nhật-trụ+dụng thần).',
     parameters: { type: 'object', properties: {} },
   } },
   { type: 'function', function: { // [round 34] 皇极经世 值年卦 (prophetic/cam ky)
@@ -1743,6 +1760,13 @@ export function execTool(name, args, R) {
           hungPatterns: gf.lantai.hung.map(p => ({ vi: p.vi, judgment: p.judgment })),
           shenTouLu: gf.shenTouLu,
           jiuming: { dominantNayinWx: gf.jiuming.dominantNayinWx, dayNayinWx: gf.jiuming.dayNayinWx, nayinWx: gf.jiuming.nayinWx },
+          // [round 2 quét sâu 22/10/2026] 136 luật mới — additive field
+          extra: gf.extra ? {
+            verdict: gf.extra.verdict,
+            patterns: (gf.extra.patterns || []).map(p => ({ id: p.id, name: p.name, vi: p.vi, cat: p.cat, source: p.source, judgment: p.judgment })),
+            checks: gf.extra.checks || [],
+            sources: gf.extra.sources || {},
+          } : null,
           model: gf.model,
         };
       }

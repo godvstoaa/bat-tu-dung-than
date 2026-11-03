@@ -141,7 +141,7 @@ const GOD_EVENT_RULES = {
   },
   // 傷官 — biến động, khẩu thiệp, sáng tạo bùng nổ; nữ khắc phu; kỵ "thương quan kiến quan"
   傷官: {
-    area: 'Biến động · Khẩu thịphi · Sáng tạo',
+    area: 'Biến động · Khẩu thị phi · Sáng tạo',
     events: ['变动 (thay đổi / chuyển việc)', '口舌 (khẩu thị phi)', 'sáng tạo bùng nổ'],
     baseConf: 0.52,
     modStrong: { events: ['创业 (khởi nghiệp)', 'sáng tạo bùng nổ', 'thay đổi lớn'], note: 'Thân vượng + Thương Quan năm → tiết tú → sáng tạo / khởi nghiệp / biến động tích cực.', dConf: 0.04 },

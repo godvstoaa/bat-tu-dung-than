@@ -65,7 +65,7 @@ function ganGodToRelative(god, isFemale) {
     if (god === '正印') return 'mẹ';
     if (god === '偏印') return 'người mẹ thứ / dưỡng mẫu';
     if (god === '七杀' || god === '正官') return 'con cái';
-    if (god === '食神' || god === '伤官') return 'con cái (nữ mạng đupe)'; // nam: do vợ sinh
+    if (god === '食神' || god === '伤官') return 'con cái (nữ mạng tự sinh)'; // nam: do vợ sinh
     if (god === '比肩' || god === '劫财') return 'anh chị em';
   }
   return null;

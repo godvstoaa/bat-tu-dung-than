@@ -6084,7 +6084,7 @@ function _h(tag, attrs, ...kids) {
     if (v == null) continue;
     if (k === 'class') n.className = v;
     else if (k === 'text') { n.textContent = v; continue; }
-    else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
+    else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2).toLowerCase(), v); // [bugfix-onclick-case] 'onClick'.slice(2)='Click' ≠ 'click' — event type case-sensitive → mọi nút _h(onClick) chết im lặng (Âm Tà/Library gate...)
     else n.setAttribute(k, v);
   }
   for (const kid of kids) {
@@ -6314,7 +6314,7 @@ function renderAmTa(R) {
         _h('span', { class: 'hint', style: 'font-size:10px' }, ` · ${e.notes || ''}`),
       ));
     });
-    box.appendChild(_h('details', {}, _h('summary', {}, `📖 Kinh / văn hiến liên quan ngữ cảnh (${dzSug.length}) — tra cứuDepth`), dg));
+    box.appendChild(_h('details', {}, _h('summary', {}, `📖 Kinh / văn hiến liên quan ngữ cảnh (${dzSug.length}) — tra cứu chuyên sâu`), dg));
   }
   // ── module «Âm Tà · Tu Luyện»: curated reference sub-sections (static, opt-in) ──
   const sp = AMTA_TU_LUYEN.spiritTypes || [];

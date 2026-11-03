@@ -63,7 +63,7 @@ export const BITRUYEN = [
       'docs/ocr-gufa2-grok.md (app OCR 神頭祿 60甲子 + 天乙贵人 — scan PD)',
       'https://baike.baidu.com/item/%E6%9D%8E%E8%99%9A%E4%B8%AD%E5%91%BD%E4%B9%A6 (百度百科 李虚中命书 — 永乐大典 tái dựng)',
     ],
-    textual_certainty: 'partial', notes: 'Tác giảKyilian hư trung xác; «鬼谷子撰» đề attributed. Bản hiện = 永乐大典 tái dựng.',
+    textual_certainty: 'partial', notes: 'Tác giả Kyilian hư trung xác; «鬼谷子撰» đề attributed. Bản hiện = 永乐大典 tái dựng.',
   },
   {
     id: 'LOST_GUIGUZI_LINEAGE', layer: 'bitruyen',
@@ -185,7 +185,7 @@ export const BITRUYEN = [
     school: '符咒秘本 — 万法归宗 (16册 5卷, ẩn danh)',
     name_han: '萬法歸宗', name_vi: 'Vạn Pháp Quy Tông',
     han_text: '（符咒大汇编 — 16册5卷; ẩn danh, khắc ấn niên đại bất詳）',
-    lost_reason: 'BÍ BẢN — «vạn pháp quy tông» (mọi phép về một gốc) = đại biên soạn符咒, tác giảẩn danh, khắc ấn niên đại bất詳. Dân gian lưu truyền sao chép tay, bản dị nhiều.',
+    lost_reason: 'BÍ BẢN — «vạn pháp quy tông» (mọi phép về một gốc) = đại biên soạn符咒, tác giả ẩn danh, khắc ấn niên đại bất詳. Dân gian lưu truyền sao chép tay, bản dị nhiều.',
     survives: '16册5卷 符咒 (各类符+咒+诀). shuge.org có bản điện tử (chỉ «học nghiên cứu, không làm theo»).',
     meaning: 'Tổng tập符咒 bí truyền — «vạn pháp quy tông». Cốt: mọi thuật符咒 đều dẫn về một «đạo» gốc. Đại biểu cho符咒 dân gian-tôn giáo.',
     use: 'Tham chiếu符咒 tổng tập (KHÔNG thực hành).',
@@ -201,7 +201,7 @@ export const BITRUYEN = [
     name_han: '魯班經', name_vi: 'Lỗ Ban Kinh',
     han_text: '（木匠法 + 符 + 厌胜 — Minh 流行; «鲁班» tổ匠 attributed）',
     lost_reason: 'BÍ BẢN — thư「匠作秘法»(thuật người thợ mộc: 符/厌胜/择日), «鲁班» tổ匠 attributed. Dân gian lưu hành, nhiều bản dị + cấm (vì «厌胜» hại người).',
-    survives: '《鲁班经》 (Minh万历刻本流传) —匠师诀+符+厌胜术 (truyền «thợgomộc»). Cấm vì厌胜 («đ submerged vật» hại chủ).',
+    survives: '《鲁班经》 (Minh万历刻本流传) —匠师诀+符+厌胜术 (truyền «thợ gốm mộc»). Cấm vì厌胜 («đ submerged vật» hại chủ).',
     meaning: 'Thư匠作 bí truyền — tổ匠鲁班 attributed. Bao符/厌胜/择日. «厌胜» = thuật «áp» (có thể hại) → cấm.',
     use: 'Tham chiếu匠作 dân gian (cấm thực hành厌胜).',
     sources: [

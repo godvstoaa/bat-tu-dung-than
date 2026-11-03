@@ -72,7 +72,7 @@ const COMBO_DEFS = [
     desc: 'Kiếp Tài nhiều tranh giành Tài («群劫争财») — hao tiền, hôn nhân biến, đầu tư thất bại; cần Quan Sát chế Kiếp.' },
   { id: 'yinHuy', name: '印綬護身', vi: 'Ấn Thụ Hộ Thân', tone: 'cat',
     test: (g, s) => s && !s.strong && ((g['正印'] || 0) + (g['偏印'] || 0)) >= 2,
-    desc: 'Thân nhược được Ấn (nhiều) sinh phù bảo vệ («印绶护身») — quý nhân giúp, học vấn, ấm no, phúc (dù thân nhược vẫn được ấpủ).' },
+    desc: 'Thân nhược được Ấn (nhiều) sinh phù bảo vệ («印绶护身») — quý nhân giúp, học vấn, ấm no, phúc (dù thân nhược vẫn được ấp ủ).' },
   { id: 'shiXie', name: '食神洩秀', vi: 'Thực Tiết Tú', tone: 'cat',
     test: (g, s) => s && s.strong && (g['食神'] || 0) >= 1,
     desc: 'Thân vượng được Thực Thần tiết tú («身旺食泄秀») — thông minh, nghệ thuật/tài hoa bộc lộ, phúc lộc.' },
