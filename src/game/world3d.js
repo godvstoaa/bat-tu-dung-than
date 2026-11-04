@@ -9,6 +9,7 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import * as T from './terrain.js';
 import { rng, cloudTex } from './textures.js';
 import { platformTop } from './obstacles.js';
+import { inCourt } from './court.js';
 
 const CHUNK = 128;
 const N = T.WORLD / CHUNK; // 16 × 16 chunk
@@ -18,8 +19,7 @@ export const QUALITY = {
   high: { near: 2, mid: 4, segNear: 64, segMid: 32, segFar: 8, treesNear: 320, bloom: true, shadow: 2048 },
 };
 
-// Sân quán cũ (±16 × ±11.5 m) nằm đúng y = 0 → hạ địa hình 8 cm để không chập với mặt sân lát đá.
-const inCourt = (x, z) => Math.abs(x) < 16.4 && Math.abs(z) < 11.8;
+// Sân Sơn Môn (court.js) lát đá ở y = 0 → hạ địa hình 8 cm để không chập với mặt sân.
 
 const C = {
   grass: new THREE.Color('#5f9a3c'), grass2: new THREE.Color('#8db24a'), dry: new THREE.Color('#b8a862'),
@@ -293,7 +293,7 @@ export function createWorld(scene, renderer, { quality = 'mid' } = {}) {
   }
 
   // Mặt đất dưới chân (sân quán ở y = 0, ngoài sân theo địa hình)
-  const groundY = (x, z) => { if (inCourt(x, z)) return 0; const p = platformTop(x, z); return Math.max(T.heightAt(x, z), T.WATER - 1.2, p ?? -1e9); };
+  const groundY = (x, z) => { const p = platformTop(x, z); if (inCourt(x, z)) return p ?? 0; return Math.max(T.heightAt(x, z), T.WATER - 1.2, p ?? -1e9); };
 
   // Cây chắn giữa camera và người chơi: thu nhỏ về 0 (xét cây gần, rẻ: ≤ vài trăm cây)
   const nearList = { pine: [], leaf: [] };

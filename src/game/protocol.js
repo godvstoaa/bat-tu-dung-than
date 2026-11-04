@@ -32,7 +32,8 @@ export const CLOSE_SPAM = 4002;
 export const CLOSE_BAD = 4003;
 
 // Bồ đoàn ở Trà Thất (toạ độ ô) — mỗi chỗ một người, máy chủ giữ khoá.
-export const SEATS = [{ x: 2.25, y: 3.45 }, { x: 3.75, y: 3.45 }, { x: 5.25, y: 3.45 }];
+// chỗ ngồi bồ đoàn Trà Thất (toạ độ ô) — theo bố cục Sơn Môn
+export const SEATS = [{ x: -16.5, y: 22.71875 }, { x: -15, y: 22.71875 }, { x: -13.5, y: 22.71875 }]; // = court.js › TEA_SEATS (test-game-state kiểm)
 
 export const EMOTES = {
   bow: { icon: '🙇', text: 'cúi chào' },

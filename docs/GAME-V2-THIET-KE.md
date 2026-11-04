@@ -119,3 +119,14 @@ iOS (4.3b): S6 (giải quẻ, xin xăm) và Thầy AI **tắt** như app chính;
 - 2026-11-04: **V2-3** Thầy Giải Quẻ (`que-ui.js`) trong Chính Điện: Mai Hoa (giờ/số), Lục Hào (gieo xu), Tiểu Lục Nhâm, Kim Khẩu Quyết, xin xăm + keo; nút «Nhờ Thầy luận thêm» (Thầy AI). Đã chơi thử cả 5 phép.
 - 2026-11-04: **V2-4** 4 điện vào được: Chính Điện Tam Thanh, Văn Xương Các, Đẩu Mẫu Điện, Lão Quân Điện. 5 tượng tạo bằng Meshy (meshy-6-lite, 100k tam giác). Đã thử vào/ra cả 4 điện. **Còn thiếu** 4 điện vùng (Thái Tuế, Huyền Nữ, Quỷ Cốc, Thủy Quan): hết credit Meshy (còn 7, cần ~20).
 - 2026-11-04: **V2-5** cấp / gia trì nguyên tố / ngự kiếm / VIP (§3.1). VIP chưa có thanh toán thật.
+- 2026-11-04: **Huyền Quán Sơn Môn** thay sân quán cũ (32 × 22 m). Bố cục trong `court.js` (một nguồn cho vị trí gian, nền bậc, vật cản), phần dựng trong `sect.js`.
+  - Khuôn viên: 120 × 132 m, tường son mái ngói, Sơn Môn và Hậu Môn (`gate_sect`).
+  - Sân trước: thần đạo đèn đá, Đại Đỉnh, hồ sen đôi; cánh Tây có Trà Thất, Ống Xăm, Bàn Hợp Hôn; cánh Đông có La Bàn Đài, Bảng Lịch.
+  - Hai tầng nền đá (cao 2 m và 4 m) có lan can, bậc ngự đạo, cờ ngũ hành.
+  - Trên cùng là Bàn Thầy có mái trước Chính Đường (`palace_grand`). Hai bên có điện phụ, lầu chuông / lầu trống; bốn góc có bảo tháp.
+  - Hậu Sơn (`cliff_palace`) lùi về z −116; cửa Chính Điện Tam Thanh ở (0, −84).
+- 2026-11-04: **Va chạm theo hình khối** (`collide.js`): cắt lát model ở tầm thân người (0,4–2 m trên chân), raster vào lưới 0,5 m (`obstacles.js`).
+  - Áp cho mọi công trình Meshy, cây, nhà nhân bản; cổng thì khoét lối giữa vòm.
+  - Tìm đường: A* lưới 0,8 m + rút gọn theo tầm nhìn thẳng (`world.js`). Khi vướng, nhân vật trượt dọc vật cản, không được thì tính lại đường.
+  - Test: `test-game-state.mjs` › Sơn Môn.
+- 2026-11-04: hiệu năng sơn môn: gộp khối thủ công theo vật liệu, công trình phụ dùng bản thường (không HD). Trong khung xem trước: 1.116 → 186 lượt vẽ, 3 → 45 khung/giây.

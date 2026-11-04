@@ -69,7 +69,7 @@ export class TownShard extends DurableObject {
 
     if (m.t === 'hello') {
       if (a.ready) return;
-      Object.assign(a, { ready: true, name: m.name, robe: m.robe, acc: m.acc, look: m.look, title: m.title, pid: m.pid, u: await stableId(m.pid, a.id), x: 12.2, y: 9.2, h: 0, s: 0 });
+      Object.assign(a, { ready: true, name: m.name, robe: m.robe, acc: m.acc, look: m.look, title: m.title, pid: m.pid, u: await stableId(m.pid, a.id), x: 11.875, y: 33.875, h: 0, s: 0 }); // = world.js › START (giữa sân Sơn Môn)
       ws.serializeAttachment(a);
       this.send(ws, {
         t: 'welcome', v: P.VERSION, you: a.id, room: a.room, renamed: m.badName ? a.name : undefined,

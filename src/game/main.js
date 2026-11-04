@@ -172,7 +172,7 @@ export function startGame({ onExit = null } = {}) {
   // -------------------------------------------------------------------------
   // API cho các gian
   // -------------------------------------------------------------------------
-  const TEA_SEAT = { x: 3.75, y: 3.45 };
+  const TEA_SEAT = SEATS[1];
   let preSit = null;
 
   const api = {
@@ -231,6 +231,7 @@ export function startGame({ onExit = null } = {}) {
   function walkTo(pt, stationId = null) {
     if (player.sitting) return;
     player.path = findPath(player, pt);
+    player.replanned = false;
     player.pending = stationId;
     target = player.path.length ? player.path[player.path.length - 1] : null;
     if (!player.path.length && stationId && nearestStation(player)?.id === stationId) openStation(stationId);
@@ -424,7 +425,16 @@ export function startGame({ onExit = null } = {}) {
         }
       } else {
         const nx = player.x + (ddx / dist) * mv, ny = player.y + (ddy / dist) * mv;
-        if (blockedAt(nx, ny, player)) { player.path = []; target = null; player.moving = false; return; } // dốc / nước: dừng lại
+        if (blockedAt(nx, ny, player)) {
+          // vướng: trượt dọc mặt vật cản; không trượt được thì tính lại đường một lần; vẫn kẹt thì dừng
+          if (!blockedAt(nx, player.y, player)) player.x = nx;
+          else if (!blockedAt(player.x, ny, player)) player.y = ny;
+          else if (!player.replanned && target) { player.replanned = true; player.path = findPath(player, target); if (!player.path.length) target = null; return; }
+          else { player.path = []; target = null; player.moving = false; return; }
+          player.moving = true;
+          return;
+        }
+        player.replanned = false;
         player.x = nx; player.y = ny;
         player.h = Math.atan2(ddx, ddy);
         player.face = Math.abs(ddx) > Math.abs(ddy) ? (ddx < 0 ? 'left' : 'right') : (ddy < 0 ? 'up' : 'down');
@@ -748,7 +758,7 @@ export function startGame({ onExit = null } = {}) {
   lockPortrait(true);
 
   // Cho kiểm thử tự động (Playwright) — không dùng trong game.
-  window.__hq = { state, player, stick, altCtl, net, openStation, walkTo, STATIONS, get renderer() { return renderer; } };
+  window.__hq = { state, player, stick, altCtl, net, openStation, walkTo, STATIONS, blockedAt, findPath, get renderer() { return renderer; } };
 
   return { pause, resume, exit };
 }

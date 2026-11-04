@@ -1,30 +1,41 @@
 // ============================================================================
-//  HUYỀN QUÁN — bản đồ lưới 20×14, vật cản, vị trí các gian, tìm đường BFS.
-//  Toạ độ theo ô (float); ô (c, r) phủ [c, c+1) × [r, r+1).
+//  HUYỀN QUÁN — vị trí các gian, vật cản, tìm đường.
+//  Toạ độ người chơi theo ô 1,6 m (float): ô (x, y) ↔ mét (X, Z) = ((x − 10)·1,6, (y − 7)·1,6).
+//  Bố cục sân quán: court.js (Sơn Môn). Va chạm: obstacles.js (lưới 0,5 m — cắt lát model + khối tay).
+//  Tìm đường: đi thẳng nếu không vướng; không thì A* trên lưới nửa ô (0,8 m), rút gọn theo tầm nhìn thẳng.
 // ============================================================================
 
 import { hasStation, TEXT } from './features.js';
 import { walkable } from './terrain.js';
 import { blockedByBuilding, platformTop } from './obstacles.js';
+import { COURT_STATIONS, START_M, toTile } from './court.js';
 
+// Bản 2D dự phòng (render.js) vẫn vẽ sân cũ 20×14 ô
 export const COLS = 20;
 export const ROWS = 14;
 export const TILE = 32;
+export const PROPS = [];
 
-// block: các hình chữ nhật chặn đường {c, r, w, h}. spot: chỗ khách đứng để vào gian.
-const ALL_STATIONS = [
-  { id: 'thay', name: 'Bàn Thầy Tử Bình', verb: 'Ngồi trước bàn thầy', block: [{ c: 7, r: 1, w: 6, h: 3 }, { c: 9, r: 4, w: 2, h: 1 }], spot: { x: 10, y: 5.5 }, label: { x: 10, y: 0.75 } },
-  { id: 'tra', name: 'Trà Thất', verb: 'Ngồi bồ đoàn uống trà', block: [{ c: 1, r: 1, w: 5, h: 2 }], spot: { x: 3.5, y: 3.6 }, label: { x: 3.5, y: 0.75 } },
-  { id: 'compass', name: 'La Bàn Đài', verb: 'Xem la bàn hướng nhà', block: [{ c: 15, r: 1, w: 3, h: 2 }], spot: { x: 16.5, y: 3.6 }, label: { x: 16.5, y: 0.75 } },
-  { id: 'xam', name: 'Ống Xăm', verb: 'Xin một quẻ xăm', block: [{ c: 2, r: 6, w: 2, h: 2 }], spot: { x: 4.6, y: 7 }, label: { x: 3, y: 5.6 } },
-  { id: 'huong', name: 'Lư Hương', verb: 'Thắp một tuần nhang', block: [{ c: 9, r: 7, w: 2, h: 1 }], spot: { x: 10, y: 8.7 }, label: { x: 10, y: 6.2 } },
-  { id: 'lich', name: 'Bảng Lịch Ngày', verb: 'Xem lịch hôm nay', block: [{ c: 16, r: 6, w: 2, h: 2 }], spot: { x: 15.4, y: 7 }, label: { x: 17, y: 5.6 } },
-  { id: 'sen', name: 'Hồ Sen', verb: 'Thả đèn hoa đăng', block: [{ c: 6, r: 10, w: 8, h: 2 }], spot: { x: 14.6, y: 10.9 }, label: { x: 10, y: 9.7 } },
-  // Khách hỏi việc (Giải Án, P2) — 3 khách NPC đứng chờ, đổi mỗi ngày
-  { id: 'an0', kind: 'case', slot: 0, name: 'Khách hỏi việc', verb: 'Giải án cho khách', block: [{ c: 5, r: 8, w: 1, h: 1 }], spot: { x: 5.5, y: 9.4 }, label: { x: 5.5, y: 7.6 } },
-  { id: 'an1', kind: 'case', slot: 1, name: 'Khách hỏi việc', verb: 'Giải án cho khách', block: [{ c: 14, r: 8, w: 1, h: 1 }], spot: { x: 14.5, y: 9.4 }, label: { x: 14.5, y: 7.6 } },
-  { id: 'an2', kind: 'case', slot: 2, name: 'Khách hỏi việc', verb: 'Giải án cho khách', block: [{ c: 14, r: 4, w: 1, h: 1 }], spot: { x: 14.5, y: 5.4 }, label: { x: 14.5, y: 3.6 } },
-];
+const NAMES = {
+  thay: ['Bàn Thầy Tử Bình', 'Ngồi trước bàn thầy'],
+  tra: ['Trà Thất', 'Ngồi bồ đoàn uống trà'],
+  compass: ['La Bàn Đài', 'Xem la bàn hướng nhà'],
+  xam: ['Ống Xăm', 'Xin một quẻ xăm'],
+  huong: ['Lư Hương', 'Thắp một tuần nhang'],
+  lich: ['Bảng Lịch Ngày', 'Xem lịch hôm nay'],
+  sen: ['Hồ Sen', 'Thả đèn hoa đăng'],
+  an0: ['Khách hỏi việc', 'Giải án cho khách'],
+  an1: ['Khách hỏi việc', 'Giải án cho khách'],
+  an2: ['Khách hỏi việc', 'Giải án cho khách'],
+};
+// block: chữ nhật theo ô {c, r, w, h} (bấm vào công trình → gian). spot: chỗ khách đứng. court: dữ liệu dựng 3D (mét)
+const ALL_STATIONS = Object.keys(NAMES).map((id) => {
+  const c = COURT_STATIONS.find((s) => s.id === id);
+  const a = toTile(c.block[0], c.block[1]), b = toTile(c.block[2], c.block[3]);
+  const st = { id, name: NAMES[id][0], verb: NAMES[id][1], block: [{ c: a.x, r: a.y, w: b.x - a.x, h: b.y - a.y }], spot: toTile(...c.spot), label: toTile(...c.label), court: c };
+  if (id.startsWith('an')) Object.assign(st, { kind: 'case', slot: Number(id[2]) });
+  return st;
+});
 
 // Sảnh nghề ngoài thế giới (docs/GAME-NOI-DUNG-THEO-APP.md) — world: toạ độ mét (khớp terrain.js › CLEARINGS)
 export const HALLS = [
@@ -32,14 +43,14 @@ export const HALLS = [
   { id: 'duongtrach', region: 'phongthuy', name: 'Sảnh Dương Trạch', verb: 'Xem nhà cho khách', world: { x: -806, z: 62 } },
   { id: 'dieuhau', region: 'cungthong', name: 'Sảnh Điều Hậu', verb: 'Xem khí hậu lá số', world: { x: 480, z: 420 } },
   { id: 'thuvien', region: 'thulau', name: 'Thư Lâu', verb: 'Đọc tầng thư hôm nay', world: { x: 0, z: -630 } },
-  { id: 'hophon', region: 'thanh', name: 'Bàn Hợp Hôn', verb: 'Xem hợp hôn (án chung)', world: { x: -40, z: 40 } },
+  { id: 'hophon', region: 'thanh', name: 'Bàn Hợp Hôn', verb: 'Xem hợp hôn (án chung)', world: { x: -48, z: 8 } },
   { id: 'tuvi', region: 'trichthien', name: 'Sảnh Tử Vi', verb: 'An sao Tử Vi', world: { x: -567, z: 503 } },
   { id: 'tuongphap', region: 'manh', name: 'Sảnh Tượng Pháp', verb: 'Đọc tượng Manh phái', world: { x: 654, z: -441 } },
   { id: 'cachcuc', region: 'tubinh', name: 'Sảnh Cách Cục', verb: 'Định cách cục', world: { x: -521, z: -538 } },
 ];
 for (const h of HALLS) {
-  const tx = h.world.x / 1.6 + 10, ty = h.world.z / 1.6 + 7;
-  ALL_STATIONS.push({ ...h, kind: 'desk', block: [], spot: { x: tx, y: ty + 1.6 }, label: { x: tx, y: ty } });
+  const t = toTile(h.world.x, h.world.z);
+  ALL_STATIONS.push({ ...h, kind: 'desk', block: [], spot: { x: t.x, y: t.y + 1.6 }, label: t });
 }
 
 // ---------------------------------------------------------------------------
@@ -48,14 +59,13 @@ for (const h of HALLS) {
 // Toạ độ mét; tâm điện = origin, lối vào ở phía +z, bàn thờ phía −z.
 // ---------------------------------------------------------------------------
 export const ROOMS = [
-  { id: 'chinhdien', name: 'Chính Điện Tam Thanh', region: 'thanh', door: { x: 0, z: -58 }, origin: { x: 1500, z: 0 }, w: 34, d: 28, h: 14,
+  { id: 'chinhdien', name: 'Chính Điện Tam Thanh', region: 'thanh', door: { x: 0, z: -84 }, origin: { x: 1500, z: 0 }, w: 34, d: 28, h: 14,
     deities: [['deity_lingbao', -6.5], ['deity_yuanshi', 0], ['deity_daode', 6.5]], npc: 'que' },
   { id: 'vanxuong', name: 'Văn Xương Các', region: 'thulau', door: { x: 0, z: -652 }, origin: { x: 1600, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_wenchang', 0]] },
   { id: 'daumau', name: 'Đẩu Mẫu Điện', region: 'trichthien', door: { x: -566, z: 566 }, origin: { x: 1700, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_doumu', 0]] },
   { id: 'laoquan', name: 'Lão Quân Điện', region: 'tubinh', door: { x: -564, z: -510 }, origin: { x: 1800, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_daode', 0]] },
 ];
 export const roomAt = (x, z) => ROOMS.find((r) => Math.abs(x - r.origin.x) <= r.w / 2 + 1 && Math.abs(z - r.origin.z) <= r.d / 2 + 1) || null;
-const toTile = (x, z) => ({ x: x / 1.6 + 10, y: z / 1.6 + 7 });
 for (const r of ROOMS) {
   const inside = toTile(r.origin.x, r.origin.z + r.d / 2 - 3.2);
   const exitW = { x: r.origin.x, z: r.origin.z + r.d / 2 - 1.2 };
@@ -70,58 +80,19 @@ export const STATIONS = ALL_STATIONS
   .filter((s) => hasStation(s.id))
   .map((s) => (s.id === 'huong' ? { ...s, name: TEXT.huong, verb: TEXT.huongVerb } : s));
 
-// Cây và trang trí cũng chặn đường.
-export const PROPS = [
-  { type: 'peach', c: 1, r: 10 },
-  { type: 'pine', c: 18, r: 10 },
-  { type: 'peach', c: 6, r: 5 },
-  { type: 'pine', c: 13, r: 5 },
-];
-
-export const START = { x: 12.2, y: 9.2 }; // trong sân, lệch khỏi lối giữa (không vướng gian nào)
+export const START = toTile(START_M.x, START_M.z);
 
 export function stationById(id) {
   return STATIONS.find((s) => s.id === id) || null;
 }
 
-// Lưới vật cản: true = chặn.
-function buildGrid() {
-  const g = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const isGate = r === ROWS - 1 && (c === 9 || c === 10);
-      if (r === 0 || c === 0 || c === COLS - 1 || (r === ROWS - 1 && !isGate)) g[r][c] = true;
-    }
-  }
-  // Cổng tam quan mở ra thế giới Huyền Giới (hàng 13, cột 9–10 để trống).
-  for (const st of ALL_STATIONS) for (const b of st.block) {
-    for (let r = b.r; r < b.r + b.h; r++) for (let c = b.c; c < b.c + b.w; c++) g[r][c] = true;
-  }
-  for (const p of PROPS) g[p.r][p.c] = true;
-  return g;
-}
-
-export const GRID = buildGrid();
-
-// Ô trong sân quán dùng lưới; ngoài sân là thế giới mở (luôn «trống» ở mức ô — địa hình xét riêng).
-export const inCourtTile = (c, r) => c >= 0 && r >= 0 && c < COLS && r < ROWS;
-export function blockedTile(c, r) {
-  if (!inCourtTile(c, r)) return false;
-  return GRID[r][c];
-}
-
-// Toạ độ ô ↔ mét thế giới (khớp models.js: 1 ô = 1.6 m, tâm sân = (10, 7))
+// Toạ độ ô ↔ mét thế giới
 const U = 1.6;
 export const tileToWorld = (x, y) => ({ x: (x - 10) * U, z: (y - 7) * U });
 export const worldToTile = (X, Z) => ({ x: X / U + 10, y: Z / U + 7 });
 
-const R = 0.28; // bán kính va chạm của khách (theo ô)
-
 // from (tuỳ chọn, toạ độ ô) để xét độ dốc khi đi trên địa hình.
 export function blockedAt(x, y, from = null) {
-  if (blockedTile(Math.floor(x - R), Math.floor(y - R)) || blockedTile(Math.floor(x + R), Math.floor(y - R))
-    || blockedTile(Math.floor(x - R), Math.floor(y + R)) || blockedTile(Math.floor(x + R), Math.floor(y + R))) return true;
-  if (inCourtTile(Math.floor(x), Math.floor(y))) return false;
   const w = tileToWorld(x, y);
   if (blockedByBuilding(w.x, w.z)) return true;
   if (platformTop(w.x, w.z) != null) return false; // trên nền bậc cấp: đi thoải mái
@@ -129,51 +100,95 @@ export function blockedAt(x, y, from = null) {
   return !walkable(w.x, w.z, f?.x, f?.z);
 }
 
-// Ô trống gần nhất với (x, y) — dùng khi click vào công trình.
-function nearestFree(x, y) {
-  const c0 = Math.floor(x), r0 = Math.floor(y);
-  if (!blockedTile(c0, r0)) return { c: c0, r: r0 };
-  let best = null, bd = Infinity;
-  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
-    if (GRID[r][c]) continue;
-    const d = (c + 0.5 - x) ** 2 + (r + 0.5 - y) ** 2;
-    if (d < bd) { bd = d; best = { c, r }; }
+// đi thẳng được từ a tới b? (lấy mẫu mỗi 0,2 ô)
+function clearLine(a, b) {
+  const d = Math.hypot(b.x - a.x, b.y - a.y), n = Math.max(1, Math.ceil(d / 0.2));
+  let prev = a;
+  for (let k = 1; k <= n; k++) {
+    const p = { x: a.x + (b.x - a.x) * (k / n), y: a.y + (b.y - a.y) * (k / n) };
+    if (blockedAt(p.x, p.y, prev)) return false;
+    prev = p;
   }
-  return best;
+  return true;
 }
 
-// BFS 8 hướng (không cắt góc) từ vị trí hiện tại tới điểm đích → danh sách điểm cần đi.
+// điểm trống gần nhất quanh (x, y) — bấm vào công trình thì đi tới chân nó
+function nearestFreePoint(x, y) {
+  if (!blockedAt(x, y)) return { x, y };
+  for (let r = 0.5; r <= 10; r += 0.5) for (let k = 0; k < 24; k++) {
+    const a = (k / 24) * Math.PI * 2, p = { x: x + Math.cos(a) * r, y: y + Math.sin(a) * r };
+    if (!blockedAt(p.x, p.y)) return p;
+  }
+  return null;
+}
+
+const STEP = 0.5;      // ô A* = nửa ô (0,8 m)
+const MAX_NODES = 60000;
+
+/**
+ * Đường đi từ from tới to (toạ độ ô) → danh sách điểm. Rỗng = không tới được.
+ * A* 8 hướng (không cắt góc) trong khung bao hai điểm + lề 40 ô.
+ */
 export function findPath(from, to) {
-  // ngoài sân: đi thẳng tới đích (địa hình chặn dốc/nước trong lúc đi)
-  if (!inCourtTile(Math.floor(from.x), Math.floor(from.y)) || !inCourtTile(Math.floor(to.x), Math.floor(to.y))) return [{ x: to.x, y: to.y }];
-  const start = { c: Math.floor(from.x), r: Math.floor(from.y) };
-  const goal = nearestFree(to.x, to.y);
+  const goal = nearestFreePoint(to.x, to.y);
   if (!goal) return [];
-  const exactOk = !blockedAt(to.x, to.y);
-  const key = (c, r) => r * COLS + c;
-  const prev = new Map([[key(start.c, start.r), null]]);
-  const q = [start];
-  const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
-  while (q.length) {
-    const cur = q.shift();
-    if (cur.c === goal.c && cur.r === goal.r) break;
-    for (const [dc, dr] of dirs) {
-      const c = cur.c + dc, r = cur.r + dr;
-      if (blockedTile(c, r) || prev.has(key(c, r))) continue;
-      if (dc && dr && (blockedTile(cur.c + dc, cur.r) || blockedTile(cur.c, cur.r + dr))) continue;
-      prev.set(key(c, r), cur);
-      q.push({ c, r });
+  if (clearLine(from, goal)) return [{ x: goal.x, y: goal.y }];
+  // đích rất xa (sảnh nghề ngoài thế giới): đi thẳng, gặp núi / nước thì dừng — đi xa dùng trạm đi nhanh
+  if (Math.hypot(goal.x - from.x, goal.y - from.y) > 150) return [{ x: goal.x, y: goal.y }];
+  const pad = 40;
+  const x0 = Math.min(from.x, goal.x) - pad, y0 = Math.min(from.y, goal.y) - pad;
+  const W = Math.ceil((Math.abs(goal.x - from.x) + 2 * pad) / STEP) + 1, H = Math.ceil((Math.abs(goal.y - from.y) + 2 * pad) / STEP) + 1;
+  const px = (i) => x0 + i * STEP, py = (j) => y0 + j * STEP;
+  const si = Math.round((from.x - x0) / STEP), sj = Math.round((from.y - y0) / STEP);
+  const gi = Math.round((goal.x - x0) / STEP), gj = Math.round((goal.y - y0) / STEP);
+  const N = W * H, g = new Float32Array(N).fill(Infinity), f = new Float32Array(N), came = new Int32Array(N).fill(-1);
+  const state = new Uint8Array(N); // 0 chưa xét · 1 trống · 2 chặn · 3 đã đóng
+  const free = (i, j) => {
+    if (i < 0 || j < 0 || i >= W || j >= H) return false;
+    const k = j * W + i;
+    if (!state[k]) state[k] = blockedAt(px(i), py(j)) ? 2 : 1;
+    return state[k] !== 2;
+  };
+  const heap = [];
+  const push = (k) => { heap.push(k); let i = heap.length - 1; while (i) { const p = (i - 1) >> 1; if (f[heap[p]] <= f[heap[i]]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
+  const pop = () => {
+    const top = heap[0], last = heap.pop();
+    if (heap.length) {
+      heap[0] = last; let i = 0;
+      for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && f[heap[l]] < f[heap[m]]) m = l; if (r < heap.length && f[heap[r]] < f[heap[m]]) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; }
+    }
+    return top;
+  };
+  const hOf = (i, j) => { const dx = Math.abs(i - gi), dy = Math.abs(j - gj); return Math.max(dx, dy) + 0.414 * Math.min(dx, dy); };
+  const s0 = sj * W + si; g[s0] = 0; f[s0] = hOf(si, sj); push(s0);
+  const dirs = [[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1], [1, 1, 1.414], [1, -1, 1.414], [-1, 1, 1.414], [-1, -1, 1.414]];
+  let found = -1, seen = 0;
+  while (heap.length && seen < MAX_NODES) {
+    const k = pop(); if (state[k] === 3) continue;
+    state[k] = 3; seen++;
+    const i = k % W, j = (k - i) / W;
+    if (Math.abs(i - gi) <= 1 && Math.abs(j - gj) <= 1) { found = k; break; }
+    for (const [di, dj, c] of dirs) {
+      const ni = i + di, nj = j + dj;
+      if (!free(ni, nj)) continue;
+      if (di && dj && (!free(i + di, j) || !free(i, j + dj))) continue;
+      const nk = nj * W + ni; if (state[nk] === 3) continue;
+      const ng = g[k] + c;
+      if (ng < g[nk]) { g[nk] = ng; came[nk] = k; f[nk] = ng + hOf(ni, nj); push(nk); }
     }
   }
-  if (!prev.has(key(goal.c, goal.r))) return [];
-  const tiles = [];
-  for (let n = goal; n; n = prev.get(key(n.c, n.r))) tiles.unshift(n);
-  const pts = tiles.slice(1).map((t) => ({ x: t.c + 0.5, y: t.r + 0.5 }));
-  if (exactOk) {
-    if (pts.length) pts[pts.length - 1] = { x: to.x, y: to.y };
-    else pts.push({ x: to.x, y: to.y });
+  if (found < 0) return [];
+  const pts = [];
+  for (let k = found; k >= 0 && k !== s0; k = came[k]) { const i = k % W; pts.unshift({ x: px(i), y: py((k - i) / W) }); }
+  pts.push({ x: goal.x, y: goal.y });
+  // rút gọn: từ mỗi điểm nhảy tới điểm xa nhất còn nhìn thẳng thấy
+  const out = []; let cur = from, idx = 0;
+  while (idx < pts.length) {
+    let best = idx;
+    for (let k = pts.length - 1; k > idx; k--) if (clearLine(cur, pts[k])) { best = k; break; }
+    out.push(pts[best]); cur = pts[best]; idx = best + 1;
   }
-  return pts;
+  return out;
 }
 
 // Gian nằm tại điểm click (theo vùng chặn hoặc chỗ đứng).

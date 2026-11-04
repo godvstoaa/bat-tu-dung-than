@@ -48,8 +48,8 @@ function sizeOf(obj) {
  * @param fit { height | width | depth | max } — kích thước đích (m) theo một trục
  * @param at  { x, y, z, ry } — y là độ cao mặt đất (đáy mô hình đặt tại đây)
  */
-export async function placeModel(parent, id, { fit = { max: 4 }, at = { x: 0, y: 0, z: 0, ry: 0 }, skinned = false } = {}) {
-  if (hasLod(id) && !skinned) return placeLod(parent, id, { fit, at });
+export async function placeModel(parent, id, { fit = { max: 4 }, at = { x: 0, y: 0, z: 0, ry: 0 }, skinned = false, hd = true } = {}) {
+  if (hasLod(id) && !skinned) return placeLod(parent, id, { fit, at, hd });
   const g = await loadModel(id);
   if (!g) return null;
   const obj = skinned ? cloneSkinned(g.scene) : g.scene.clone(true);
@@ -68,8 +68,8 @@ export async function placeModel(parent, id, { fit = { max: 4 }, at = { x: 0, y:
 
 // Công trình trùm: THREE.LOD — gần dùng bản chi tiết (hd nếu máy mạnh), xa dùng bản giản lược.
 // Biến đổi tính theo bản gần rồi áp chung cho cả hai (cùng khung bao gốc).
-async function placeLod(parent, id, { fit, at }) {
-  const near = (modelQuality === 'high' && (await loadModel(`${id}.hd`))) || (await loadModel(id));
+async function placeLod(parent, id, { fit, at, hd = true }) {
+  const near = (hd && modelQuality === 'high' && (await loadModel(`${id}.hd`))) || (await loadModel(id));
   if (!near) return null;
   const far = await loadModel(`${id}.lod`);
   const nearObj = near.scene.clone(true);

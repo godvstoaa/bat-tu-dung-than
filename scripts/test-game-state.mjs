@@ -2,7 +2,11 @@
 // Chạy: node scripts/test-game-state.mjs
 import assert from 'node:assert/strict';
 import * as S from '../src/game/state.js';
-import { findPath, blockedAt, STATIONS, START, nearestStation, ROOMS, roomAt } from '../src/game/world.js';
+import { findPath, blockedAt, STATIONS, START, nearestStation, ROOMS, roomAt, worldToTile, stationById } from '../src/game/world.js';
+import { platformTop } from '../src/game/obstacles.js';
+import { TEA_SEATS } from '../src/game/court.js';
+import { SEATS } from '../src/game/protocol.js';
+import { readFileSync } from 'node:fs';
 import { analyze } from '../src/engine/chart.js';
 
 let passed = 0;
@@ -141,6 +145,29 @@ test('Điện thờ: cửa ↔ trong điện khớp nhau, trạm trong điện n
     const w = fromTile(st.spot);
     assert.equal(roomAt(w.x, w.z)?.id, st.room, `${st.id} không nằm trong điện ${st.room}`);
   }
+});
+
+test('Sơn Môn: tường chặn, cổng thông, vách nền chặn, bậc lên dần, Chính Đường không đi xuyên', () => {
+  const B = (x, z) => { const t = worldToTile(x, z); return blockedAt(t.x, t.y); };
+  for (const [x, z] of [[-60.6, 0], [60.6, 20], [20, 66.6], [-20, -66.6], [-36.2, -20], [36.2, 0], [27.8, -30], [0, -30], [10, -40]]) assert.equal(B(x, z), true, `(${x}, ${z}) phải chặn`);
+  for (const [x, z] of [[0, 66.6], [0, -66.6], [0, 10.5], [0, -3.5], [0, -58.5], [0, -8.1]]) assert.equal(B(x, z), false, `(${x}, ${z}) phải đi được`);
+  // bậc chính: độ cao tăng dần từ sân (0) lên tầng 1 (2) rồi tầng 2 (4)
+  let prev = -1;
+  for (let z = 14; z >= -9; z -= 0.5) { const h = platformTop(0, z) ?? 0; assert.ok(h >= prev - 1e-9, `bậc tụt ở z ${z}`); assert.ok(h - prev <= 0.41 || prev < 0, `bậc cao quá ở z ${z}`); prev = h; }
+  assert.equal(platformTop(0, -8.1), 4.25, 'bệ thầy cao 4,25 m');
+  // đi bộ từ cổng lên bệ thầy phải vòng qua Đại Đỉnh / lư hương, không cắt qua khối chặn
+  const path = findPath(START, stationById('thay').spot);
+  let cur = START;
+  for (const p of path) { const n = Math.ceil(Math.hypot(p.x - cur.x, p.y - cur.y) / 0.1); for (let k = 1; k <= n; k++) assert.equal(blockedAt(cur.x + (p.x - cur.x) * k / n, cur.y + (p.y - cur.y) * k / n), false, 'đường đi cắt qua vật cản'); cur = p; }
+});
+
+test('Trà Thất: chỗ ngồi bồ đoàn theo Trà Thất mới, không dính vật cản; máy chủ xuất phát đúng START', () => {
+  assert.equal(SEATS.length, TEA_SEATS.length);
+  SEATS.forEach((s, i) => { assert.ok(Math.abs(s.x - TEA_SEATS[i].x) < 1e-6 && Math.abs(s.y - TEA_SEATS[i].y) < 1e-6, `ghế ${i} lệch court.js`); assert.equal(blockedAt(s.x, s.y), false, `ghế ${i} dính vật cản`); });
+  const tra = stationById('tra');
+  for (const s of SEATS) assert.ok(Math.hypot(s.x - tra.spot.x, s.y - tra.spot.y) < 2, 'ghế phải ngay cạnh chỗ đứng Trà Thất');
+  const room = readFileSync(new URL('../worker/quan-room.js', import.meta.url), 'utf8');
+  assert.ok(room.includes(`x: ${START.x}, y: ${START.y}`), 'worker/quan-room.js phải xuất phát tại START');
 });
 
 test('A4: lá số mẫu khớp engine app chính', () => {

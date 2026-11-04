@@ -19,6 +19,9 @@ import { createWorld, QUALITY } from './world3d.js';
 import { createLandmarks } from './landmarks.js';
 import { setModelQuality } from './assets.js';
 import { createCharacter } from './characters.js';
+import { buildSect } from './sect.js';
+import { addFootprint } from './collide.js';
+import { COURT_STATIONS, DAIS, PONDS } from './court.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
@@ -31,12 +34,20 @@ function pickQuality(coarse) {
 }
 
 const WX_COLOR = { 木: '#5fd27a', 火: '#ff5a3c', 土: '#f0b54a', 金: '#f4efe0', 水: '#4f9bff' };
-const LABEL_ANCHOR = {
-  thay: [0, 7.0, -6.2], tra: [-10.4, 3.7, -8.0], compass: [10.4, 1.9, -8.0], xam: [-11.2, 2.3, 0],
-  huong: [0, 2.15, 0.8], lich: [11.2, 3.0, 0], sen: [0, 1.2, 6.4],
-  an0: [-7.2, 2.9, 2.4], an1: [7.2, 2.9, 2.4], an2: [7.2, 2.9, -4.0],
+// nhãn gian trong sân: độ cao theo mô hình cũ, dời theo bố cục Sơn Môn (court.js)
+const OLD_ANCHOR = {
+  tra: [-10.4, 3.7, -8.0], compass: [10.4, 1.9, -8.0], xam: [-11.2, 2.3, 0],
+  huong: [0, 2.15, 0.8], lich: [11.2, 3.0, 0], an0: [-7.2, 2.9, 2.4], an1: [7.2, 2.9, 2.4], an2: [7.2, 2.9, -4.0],
 };
-const STATION_CENTER = { thay: [0, -4.0], tra: [-10.0, -6.85], compass: [10.4, -8.0], xam: [-11.2, 0], huong: [0, 0.8], lich: [11.2, 0], sen: [0, 6.4], an0: [-7.2, 2.4], an1: [7.2, 2.4], an2: [7.2, -4.0] };
+const LABEL_ANCHOR = { thay: [DAIS.x, DAIS.y + 9.6, DAIS.z + 2.6], sen: [PONDS[0].cx, 1.4, PONDS[0].cz] };
+const STATION_CENTER = {};
+const COURT_OF = {};
+for (const c of COURT_STATIONS) {
+  COURT_OF[c.id] = c; STATION_CENTER[c.id] = c.center;
+  const a = OLD_ANCHOR[c.id]; if (a) LABEL_ANCHOR[c.id] = [a[0] + c.offset[0], a[1] + c.y, a[2] + c.offset[1]];
+}
+// mô hình thủ công dựng sẵn ở toạ độ cũ → dời tới chỗ mới
+const shift = (id, g) => { const c = COURT_OF[id]; g.position.set(c.offset[0], c.y, c.offset[1]); return g; };
 
 // Khung màu theo giờ (spec 9.5): nội suy tuyến tính giữa các mốc.
 const KEYS = [
@@ -135,8 +146,6 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     return g;
   };
 
-  const isl = MD.island(undefined, { courtOnly: true }); MD.mergeStatic(isl); scene.add(isl);
-  isl.traverse((o) => { if (o.isMesh) pickables.push(o); });
   // --- THẾ GIỚI MỞ Huyền Giới: địa hình 2048², trời tán xạ, nước, rừng (docs/DAI-THE-GIOI-DESIGN.md)
   const quality = pickQuality(coarse);
   const world = createWorld(scene, renderer, { quality });
@@ -174,28 +183,36 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     composer.addPass(new UnrealBloomPass(new THREE.Vector2(512, 512), 0.28, 0.5, 0.96));
     composer.addPass(new OutputPass());
   }
-  const wallG = MD.walls(); MD.mergeStatic(wallG); scene.add(wallG);
-  const gateG = MD.gate(undefined, TEXT.han); MD.ownMaterials(gateG); MD.mergeStatic(gateG); scene.add(gateG);
-  gateG.userData.box = new THREE.Box3().setFromObject(gateG); fadeGroups.push(gateG);
+  // Huyền Quán Sơn Môn (sect.js theo court.js): sân, tường, cổng, nền đá, Chính Đường, điện phụ, tháp, cây
+  const ripple = TX.rippleTex();
+  const sect = buildSect(scene, {
+    ripple,
+    onBig: (obj) => { MD.ownMaterials(obj); obj.userData.box = new THREE.Box3().setFromObject(obj); fadeGroups.push(obj); },
+  });
+  pickables.push(...sect.pickables);
 
-  const hallG = station('thay', MD.hall(undefined, TEXT.han), { fade: true });
-  const masterG = MD.master(); masterG.position.set(0, 0.5, -5.15); scene.add(masterG);
+  // Bàn Thầy Tử Bình: bệ có mái trên tầng 2, trước Chính Đường
+  const daisG = MD.masterDais(undefined, TEXT.han); daisG.position.set(DAIS.x, DAIS.y, DAIS.z);
+  const hallG = station('thay', daisG, { fade: true });
+  addFootprint(daisG, { base: DAIS.y });
+  const seatY = DAIS.y + MD.DAIS_FLOOR;
+  const masterG = MD.master(); masterG.position.set(DAIS.x, seatY, DAIS.z); scene.add(masterG);
   let masterChar = null;
   createCharacter('master', { height: 1.85 }).then((m) => {
     if (!m) return;
-    masterChar = m; m.obj.position.set(0, 0.42, -5.35); m.setBase('sit'); scene.add(m.obj);
+    masterChar = m; m.obj.position.set(DAIS.x, seatY - 0.08, DAIS.z - 0.2); m.setBase('sit'); scene.add(m.obj);
     masterG.visible = false;
   });
-  const teaG = station('tra', MD.teaPavilion(), { fade: true });
-  const compG = station('compass', MD.compassTerrace());
+  const teaG = station('tra', shift('tra', MD.teaPavilion()), { fade: true });
+  const compG = station('compass', shift('compass', MD.compassTerrace()));
   // bản iOS: không có án xăm — đặt giá sách cổ (không tương tác) vào chỗ đó
-  const xamG = hasStation('xam') ? station('xam', MD.xamAltar()) : null;
-  if (!xamG) { const rack = MD.scrollRack(); MD.mergeStatic(rack); scene.add(rack); }
-  const incG = station('huong', MD.incenseBurner());
+  const xamG = hasStation('xam') ? station('xam', shift('xam', MD.xamAltar())) : null;
+  if (!xamG) { const rack = shift('xam', MD.scrollRack()); MD.mergeStatic(rack); scene.add(rack); }
+  const incG = station('huong', shift('huong', MD.incenseBurner()));
   const cal = TX.calendarCanvas();
-  const calG = station('lich', MD.calendarBoard(cal.texture));
-  const ripple = TX.rippleTex();
-  const pondG = hasStation('sen') ? station('sen', MD.pond(ripple)) : (() => { const p = MD.pond(ripple); scene.add(p); return p; })();
+  const calG = station('lich', shift('lich', MD.calendarBoard(cal.texture)));
+  const P0 = PONDS[0];
+  const pondG = (() => { const p = MD.pond(ripple, undefined, { cz: 0, W: P0.W, D: P0.D }); p.position.set(P0.cx, 0, P0.cz); if (hasStation('sen')) return station('sen', p); scene.add(p); return p; })();
 
   // Sảnh nghề ngoài thế giới: dấu vàng xoay + vòng sáng trên mặt đất
   const deskMarks = STATIONS.filter((st) => st.world).map((st) => {
@@ -222,14 +239,14 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   // cây (vị trí theo PROPS của world.js) + trúc ngoài tường
   const trees = [];
-  for (const [kind, x, z, seed] of [['peach', -13.6, 5.6, 1], ['pine', 13.6, 5.6, 2], ['peach', -5.6, -2.4, 3], ['pine', 5.6, -2.4, 4]]) {
+  for (const [kind, x, z, seed] of [['peach', -31, 34, 1], ['pine', 31, 34, 2], ['peach', -31, 15, 3], ['pine', 31, 15, 4], ['peach', -12, 60, 5], ['peach', 12, 60, 6]]) {
     const t = kind === 'peach' ? MD.peachTree(seed) : MD.pineTree(seed);
     t.position.set(x, 0, z); t.rotation.y = seed;
     if (kind === 'peach') trees.push(t);
-    MD.mergeStatic(t); scene.add(t);
+    MD.mergeStatic(t); scene.add(t); addFootprint(t, { hi: 1.3 });
   }
-  for (const [x, z, s] of [[-17.5, -6, 1], [-17.8, 2, 2], [-17.2, 8, 3], [17.5, -5, 4], [17.8, 3, 5], [17.3, 9, 6], [-9, -12.4, 7], [8, -12.6, 8], [-13, 12.6, 9], [13, 12.4, 10]]) {
-    const b = MD.bambooClump(s); b.position.set(x, 0, z); MD.mergeStatic(b); scene.add(b);
+  for (const [x, z, s] of [[-46, 36, 1], [-46, 44, 2], [-34, 45, 3], [46, 36, 4], [46, 44, 5], [34, 45, 6], [-46, 20, 7], [-34, 19, 8], [46, 18, 9], [56, 2, 10], [-56, 2, 11]]) {
+    const b = MD.bambooClump(s); b.position.set(x, 0, z); MD.mergeStatic(b); scene.add(b); addFootprint(b, { hi: 1.5 });
   }
   const rocks = MD.floatingRocks(); scene.add(rocks);
   // đá trôi thành đảo nổi lơ lửng trên Huyền Thành (cao 140–260 m)
@@ -237,18 +254,18 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   // đèn lồng có ánh sáng: 2 ở chính đường, 2 ở cổng
   const lanternLights = [];
-  for (const [x, y, z] of [[-4.55, 3.1, -4.85], [4.55, 3.1, -4.85], [-2.4, 2.35, 10.85], [2.4, 2.35, 10.85]]) {
+  for (const [x, y, z] of [[DAIS.x - 4.6, seatY + 3.3, DAIS.z + 3.25], [DAIS.x + 4.6, seatY + 3.3, DAIS.z + 3.25], [-3.8, 4.2, 64.2], [3.8, 4.2, 64.2]]) {
     const l = MD.lantern(1.1, { light: true }); l.position.set(x, y, z); scene.add(l);
     l.traverse((o) => { if (o.isPointLight) lanternLights.push(o); });
   }
   // dây đèn mở khoá (Môn Sinh)
   const extraLanterns = new THREE.Group();
-  for (let i = 0; i < 7; i++) { const l = MD.lantern(0.7); l.position.set(-3.6 + i * 1.2, 3.2 + Math.sin(i * 0.9) * 0.05, -4.75); extraLanterns.add(l); }
+  for (let i = 0; i < 7; i++) { const l = MD.lantern(0.7); l.position.set(DAIS.x - 3.6 + i * 1.2, seatY + 3.55 + Math.sin(i * 0.9) * 0.05, DAIS.z + 3.25); extraLanterns.add(l); }
   extraLanterns.visible = false; scene.add(extraLanterns);
-  const craneG = MD.crane(); craneG.position.set(2.0, 6.62, -7.25); craneG.rotation.y = -0.6; craneG.visible = false; scene.add(craneG);
+  const craneG = MD.crane(); craneG.position.set(DAIS.x + 2.4, seatY + 8.0, DAIS.z); craneG.rotation.y = -0.6; craneG.visible = false; scene.add(craneG);
 
   // Thiên Bàn
-  const tb = MD.thienBan(); tb.position.set(0, 16, -40); tb.rotation.x = -0.18; tb.scale.setScalar(1.25); scene.add(tb);
+  const tb = MD.thienBan(); tb.position.set(0, 78, -80); tb.rotation.x = -0.32; tb.scale.setScalar(2.6); scene.add(tb);
   let celebrate = 0; const celebColor = new THREE.Color(); const baseRing = new THREE.Color('#ffd27a');
 
   // đèn trời (instanced)
@@ -282,8 +299,8 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     const pts = new THREE.Points(g, m); pts.userData.seed = Array.from({ length: n }, () => r() * 10);
     scene.add(pts); return pts;
   }
-  const dust = points(160, '#ffd98a', 0.09, [30, [0.3, 6], 21], { seed: 3, opacity: 0.55 });
-  const flies = points(60, '#d6ff7a', 0.16, [30, [0.3, 3], 21], { seed: 4, opacity: 0, additive: true });
+  const dust = points(420, '#ffd98a', 0.09, [110, [0.3, 7], 120], { seed: 3, opacity: 0.55 });
+  const flies = points(220, '#d6ff7a', 0.16, [110, [0.3, 3], 120], { seed: 4, opacity: 0, additive: true });
   const petals = points(90, '#f6a8be', 0.11, [6, [0.2, 4], 6], { seed: 6, opacity: 0.9 });
 
   // khói nhang
@@ -605,7 +622,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     mr.arm.rotation.x = Math.sin(t * 2.2) * 0.08; mr.arm.rotation.y = Math.sin(t * 1.1) * 0.1;
     const look = S.near?.id === 'thay' ? 1 : 0;
     mr.head.rotation.x = look ? -0.05 : 0.22 + Math.sin(t * 0.7) * 0.03;
-    mr.head.rotation.y = look ? Math.atan2(w.x - 0, w.z + 5.15) * 0.6 : Math.sin(t * 0.3) * 0.2;
+    mr.head.rotation.y = look ? Math.atan2(w.x - DAIS.x, w.z - DAIS.z) * 0.6 : Math.sin(t * 0.3) * 0.2;
 
     // la bàn: kim run nhẹ
     if (!reduced) compG.userData.needle.rotation.y = Math.sin(t * 0.9) * 0.12 + Math.sin(t * 3.1) * 0.02;
@@ -629,7 +646,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
         const sm = smoke.find((x) => !x.s.visible);
         if (sm) {
           const st = I.sticks[Math.floor(Math.random() * 3)];
-          sm.s.position.set(st.g.position.x + I.top.x - len * Math.sin(st.g.rotation.z), I.top.y + len, I.top.z);
+          sm.s.position.set(incG.position.x + st.g.position.x + I.top.x - len * Math.sin(st.g.rotation.z), incG.position.y + I.top.y + len, incG.position.z + I.top.z);
           sm.life = 0; sm.vx = (Math.random() - 0.5) * 0.15; sm.vz = (Math.random() - 0.5) * 0.15; sm.s.visible = true;
         }
       }
@@ -762,7 +779,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     for (const id of [...remotes.keys()]) if (!seen.has(id)) dropRemote(id);
 
     // vòng đích
-    if (S.target && !p.sitting) { const tw = MD.toWorld(S.target.x, S.target.y); targetRing.position.set(tw.x, 0.03, tw.z); targetRing.visible = true; targetRing.scale.setScalar(1 + Math.sin(t * 6) * 0.1); }
+    if (S.target && !p.sitting) { const tw = MD.toWorld(S.target.x, S.target.y); targetRing.position.set(tw.x, world.groundY(tw.x, tw.z) + 0.03, tw.z); targetRing.visible = true; targetRing.scale.setScalar(1 + Math.sin(t * 6) * 0.1); }
     else targetRing.visible = false;
 
     if (composer && !lowQuality) composer.render(); else renderer.render(scene, camera);

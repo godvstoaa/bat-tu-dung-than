@@ -183,7 +183,7 @@ export function roof(W, D, H, { upturn = 0.55, mats } = {}) {
 }
 
 // Cột sơn son: chân đá tảng, đai vàng.
-function column(h, r = 0.16, m = materials()) {
+export function column(h, r = 0.16, m = materials()) {
   const g = new THREE.Group();
   g.add(cyl(r * 1.7, r * 1.9, 0.18, m.stone, { y: 0.09 }, 12));
   g.add(cyl(r, r * 1.08, h, m.son, { y: 0.18 + h / 2 }, 14));
@@ -346,6 +346,56 @@ export function hall(m = materials(), han = '玄 館') {
   g.add(box(0.5, 0.06, 0.06, m.lacquer, { x: 0.55, y: 0.85, z: -4.3 }));
   for (let i = 0; i < 3; i++) g.add(cyl(0.008, 0.012, 0.32, m.wood, { x: 0.4 + i * 0.13, y: 1.0, z: -4.3 }, 4));
   g.add(cyl(0.12, 0.1, 0.12, m.celadon, { x: -0.75, y: 0.88, z: -4.15 }, 12));
+  return g;
+}
+
+/**
+ * Bàn Thầy Tử Bình trên nền tầng 2 (court.js › DAIS): bệ gỗ, 6 cột son, mái hai tầng, biển 玄館,
+ * bình phong la bàn sau lưng thầy, kệ sách cuộn, án thư. Gốc toạ độ = chỗ thầy ngồi; khách đứng phía +z.
+ * Mặt sàn bệ ở y = DAIS_FLOOR.
+ */
+export const DAIS_FLOOR = 0.25;
+export function masterDais(m = materials(), han = '玄 館') {
+  const g = new THREE.Group();
+  const F = DAIS_FLOOR;
+  g.add(box(10.4, F, 6.8, m.wood, { y: F / 2 }));
+  g.add(box(10.6, 0.05, 7.0, m.gold, { y: F + 0.005, shadow: false }));
+  // cột: 2 trước (chừa lối nhìn), 4 sau
+  const H = 4.2;
+  for (const [x, z] of [[-4.6, 2.9], [4.6, 2.9], [-4.6, -2.9], [-1.7, -2.9], [1.7, -2.9], [4.6, -2.9]]) { const c = column(H, 0.22); c.position.set(x, F, z); g.add(c); }
+  // xà + biển
+  for (const z of [2.9, -2.9]) { g.add(box(9.8, 0.3, 0.3, m.son, { y: F + H + 0.1, z })); g.add(box(9.8, 0.1, 0.32, m.gold, { y: F + H - 0.08, z })); }
+  for (const x of [-4.6, 4.6]) g.add(box(0.3, 0.3, 6.1, m.son, { x, y: F + H + 0.1 }));
+  const sign = mesh(new THREE.PlaneGeometry(2.8, 1.0), std({ map: TX.signTex(han), roughness: 0.35, metalness: 0.1 }), { y: F + H - 0.7, z: 3.07, shadow: false });
+  g.add(sign);
+  g.add(box(3.0, 1.16, 0.06, m.gold, { y: F + H - 0.7, z: 3.03, shadow: false }));
+  // mái hai tầng
+  const r1 = roof(12.6, 8.6, 1.7, { upturn: 0.7 }); r1.position.set(0, F + H + 0.25, 0); g.add(r1);
+  const pTex = m.panel.map.clone(); pTex.repeat.set(3, 1); pTex.needsUpdate = true;
+  g.add(box(7.0, 1.2, 4.2, std({ map: pTex, roughness: 0.45 }), { y: F + H + 1.6 }));
+  const r2 = roof(8.8, 5.4, 1.7, { upturn: 0.6 }); r2.position.set(0, F + H + 2.15, 0); g.add(r2);
+  // bình phong sau lưng thầy + la bàn lớn
+  const scr = std({ map: TX.panelTex(9), roughness: 0.45 });
+  g.add(box(6.2, 3.0, 0.2, scr, { y: F + 1.5, z: -2.2 }));
+  g.add(box(6.4, 0.16, 0.26, m.gold, { y: F + 3.05, z: -2.2 }));
+  g.add(mesh(new THREE.CircleGeometry(1.15, 56), std({ map: TX.luopanTex(), roughness: 0.3, metalness: 0.25 }), { y: F + 1.75, z: -2.08 }));
+  g.add(mesh(new THREE.TorusGeometry(1.17, 0.07, 8, 56), m.gold, { y: F + 1.75, z: -2.07 }));
+  // kệ sách cuộn hai bên
+  for (const sx of [-1, 1]) {
+    g.add(box(1.6, 2.0, 0.5, m.wood, { x: sx * 3.6, y: F + 1.0, z: -1.6 }));
+    for (let i = 0; i < 9; i++) g.add(cyl(0.05, 0.05, 0.4, i % 2 ? m.paper : m.straw, { x: sx * 3.6 - 0.55 + (i % 3) * 0.55, y: F + 0.55 + Math.floor(i / 3) * 0.6, z: -1.38, rz: Math.PI / 2 }, 8));
+  }
+  // án thư + giấy + nghiên + bút
+  const dz = 1.4, dy = F;
+  g.add(box(2.2, 0.08, 1.0, m.lacquer, { y: dy + 0.78, z: dz }));
+  g.add(box(2.26, 0.03, 1.05, m.gold, { y: dy + 0.73, z: dz, shadow: false }));
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) g.add(box(0.1, 0.72, 0.1, m.lacquer, { x: sx * 1.0, y: dy + 0.37, z: dz + sz * 0.4 }));
+  g.add(box(0.8, 0.01, 0.5, m.paper, { x: -0.2, y: dy + 0.83, z: dz + 0.05, shadow: false }));
+  g.add(box(0.28, 0.05, 0.2, m.ink, { x: 0.6, y: dy + 0.845, z: dz - 0.05 }));
+  for (let i = 0; i < 3; i++) g.add(cyl(0.008, 0.012, 0.32, m.wood, { x: 0.4 + i * 0.13, y: dy + 1.0, z: dz - 0.3 }, 4));
+  g.add(cyl(0.12, 0.1, 0.12, m.celadon, { x: -0.8, y: dy + 0.88, z: dz - 0.15 }, 12));
+  // bồ đoàn cho khách trước án
+  g.add(cyl(0.38, 0.4, 0.12, m.cushion, { y: F + 0.06, z: dz + 1.1 }, 18));
   return g;
 }
 
@@ -517,9 +567,9 @@ export function calendarBoard(calTex, m = materials()) {
   return g;
 }
 
-export function pond(rippleMap, m = materials()) {
+export function pond(rippleMap, m = materials(), { cz = 6.4, W = 12.4, D = 3.0 } = {}) {
   const g = new THREE.Group();
-  const cz = 6.4, W = 12.4, D = 3.0;
+  const pads = Math.round(14 * (W * D) / 37), flowers = Math.round(6 * (W * D) / 37);
   for (const [x, z, w, d] of [[0, cz - D / 2 - 0.2, W + 0.8, 0.4], [0, cz + D / 2 + 0.2, W + 0.8, 0.4], [-W / 2 - 0.2, cz, 0.4, D], [W / 2 + 0.2, cz, 0.4, D]]) {
     g.add(box(w, 0.32, d, m.stone, { x, y: 0.16, z }));
     g.add(box(w, 0.04, d, m.stoneDark, { x, y: 0.34, z, shadow: false }));
@@ -529,12 +579,12 @@ export function pond(rippleMap, m = materials()) {
   water.userData.dynamic = true; g.add(water);
   const r = TX.rng(23);
   const padGeo = new THREE.CircleGeometry(0.32, 16, 0.3, Math.PI * 1.85);
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < pads; i++) {
     const p = mesh(padGeo, m.lotusLeaf, { x: (r() - 0.5) * (W - 1), y: 0.14, z: cz + (r() - 0.5) * (D - 0.6), rx: -Math.PI / 2, rz: r() * 6, shadow: false });
     p.scale.setScalar(0.7 + r() * 0.6); g.add(p);
   }
   // hoa sen: hai tầng cánh
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < flowers; i++) {
     const f = new THREE.Group(); f.position.set((r() - 0.5) * (W - 2), 0.16, cz + (r() - 0.5) * (D - 0.8));
     for (let k = 0; k < 8; k++) {
       const pet = mesh(new THREE.SphereGeometry(0.09, 8, 6, 0, Math.PI), m.lotus, { y: 0.08, ry: (k / 8) * Math.PI * 2, rx: -0.5, shadow: false });
