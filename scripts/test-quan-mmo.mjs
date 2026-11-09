@@ -57,6 +57,35 @@ try {
     assert.ok(!a.inbox.some((m) => m.t === 'mv'));
   });
 
+  await step('đổi phòng: tp cập nhật toạ độ cũ — mv sau cú nhảy không bị kẹp về chỗ cũ', async () => {
+    send(b, { t: 'mv', x: 12, y: 34 }); // đi vài bước quanh sân — tiêu gói mvFirst sau hello
+    await sleep(150);
+    a.inbox.length = 0;
+    send(b, { t: 'tp', x: 1125, y: 25 });                  // «vào điện»: nhảy > 25 ô (đúng probe: 20,30 → 1125,25)
+    await sleep(150);
+    send(b, { t: 'mv', x: 1125.5, y: 25.5, h: 0, s: 0 });  // bước đầu trong điện
+    const mv = await wait(a, (m) => m.t === 'mv');
+    assert.deepEqual([mv.x, mv.y], [1125.5, 25.5], 'mv sau tp phải đi qua, không bị sanityMv kẹp về 12,34');
+    send(b, { t: 'mv', x: 1125.6, y: 25.6 });              // đi tiếp trong điện vẫn bình thường
+    const mv2 = await wait(a, (m) => m.t === 'mv');
+    assert.deepEqual([mv2.x, mv2.y], [1125.6, 25.6]);
+    // đối chứng: nhảy thẳng KHÔNG qua tp (> 25 ô) → guard còn nguyên, bị kẹp về toạ độ cũ
+    send(b, { t: 'mv', x: 1160, y: 25.6 }); // 34,4 ô > ngưỡng 25 ô
+    const clamped = await wait(a, (m) => m.t === 'mv');
+    assert.deepEqual([clamped.x, clamped.y], [1125.6, 25.6], 'nhảy không báo tp vẫn bị sanityMv kẹp');
+    a.inbox.length = 0;
+  });
+
+  await step('Tàng Y Các: đổi trang bị phát cho người khác, món lạ bị lọc; người vào sau thấy trang bị', async () => {
+    send(a, { t: 'cos', c: 'r:y_hoa,h:kim_quan,b:hack,m:hac' });
+    const c = await wait(b, (m) => m.t === 'cos');
+    assert.equal(c.id, wa.you); assert.equal(c.c, 'r:y_hoa,h:kim_quan,m:hac');
+    const d = await client(R0, 'Sen'); const wd = await hello(d);
+    assert.equal(wd.players.find((p) => p.id === wa.you)?.cos, 'r:y_hoa,h:kim_quan,m:hac');
+    d.ws.close(); await wait(a, (m) => m.t === 'leave'); await wait(b, (m) => m.t === 'leave');
+    a.inbox.length = 0; b.inbox.length = 0;
+  });
+
   await step('cử chỉ + cụm từ soạn sẵn tới mọi người; chat tự do bị bỏ', async () => {
     send(b, { t: 'emo', e: 'bow', to: wa.you });
     const e = await wait(a, (m) => m.t === 'emo');

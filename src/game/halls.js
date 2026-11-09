@@ -3,6 +3,8 @@
 //    Điều Hậu (han-nuan + Cùng Thông Bảo Giám) · Thư Viện (Trích Thiên Tủy, Ngũ Ngôn Độc Bộ, Tích Thiện Thiên)
 //    Hợp Hôn (hehun) · Tử Vi (ziwei) · Tượng Pháp (Manh phái) · Cách Cục (pattern).
 //  Án = { id, npc, R, intro, steps:[{ key, title, prompt, kind, options:[[v, nhãn]], answer, order?, explain, ref? }], ask }
+//  4 sảnh có khách (Điều Hậu · Tử Vi · Tượng Pháp · Cách Cục) thêm bước cuối «Năm nay»
+//  — npcDeep(R, year) từ npc-deep.js, lưu niên thật theo hạt giống (P0-2). Thư Viện + Hợp Hôn không thêm.
 //  kind: 'one' (chọn 1) · 'many' (chọn nhiều, chấm Jaccard) · 'grid9' (la bàn 9 cung).
 //  order: thang thứ tự cho 'one' → chọn kề đáp án được 40%.
 //  Thuần logic (không DOM) — test: scripts/test-game-halls.mjs. UI chung: case-ui.js › hallCaseBody.
@@ -16,6 +18,7 @@ import { GAN, ZHI, WX_VI } from '../engine/constants.js';
 import { DITIANSUI, DITIANSUI_TONGLUN, WUYAN_DUBU, JISHAN_PIAN, DITIANSUI_MAXIMS, QIONGTONG_TIAOHOU } from '../engine/kb.js';
 import { hashSeed, rng, makeNpc } from './npc.js';
 import { tiaohouQuote } from './cases.js';
+import { npcDeep } from './npc-deep.js';
 
 const WX = ['木', '火', '土', '金', '水'];
 const SEASON_OF = { 寅: 0, 卯: 0, 辰: 0, 巳: 1, 午: 1, 未: 1, 申: 2, 酉: 2, 戌: 2, 亥: 3, 子: 3, 丑: 3 };
@@ -77,6 +80,8 @@ export function buildDieuHau(key, today = new Date()) {
     steps.push({ key: 'sach', title: 'Tra Cùng Thông Bảo Giám', kind: 'one', prompt: `Nhật chủ ${dm} (${GAN[dm].vi}) sinh tháng ${q.month}${q.season ? ' (cùng mùa)' : ''}: sách dạy câu nào?`,
       options: opts.map((t, i) => [String(i), t]), answer: String(opts.indexOf(q.text)), explain: `Cùng Thông Bảo Giám, ${dm}${q.month}月: ${q.text}` });
   }
+  // Bước cuối «Năm nay» — lưu niên thật của khách theo năm hiện tại (P0-2, npc-deep.js)
+  steps.push(npcDeep(R, year));
   return {
     id: 'dieuhau', npc, R, pillars: pillarsOf(R), steps,
     intro: `${npc.call} hay nghe nói «lá số lạnh cần lửa, nóng cần nước» và nhờ xem lá số mình thuộc khí hậu nào.`,
@@ -177,12 +182,13 @@ export const ZW_MAIN = { 紫微: 'Tử Vi', 天机: 'Thiên Cơ', 太阳: 'Thái
 export function buildTuVi(key, today = new Date()) {
   const year = today.getFullYear();
   const npc = makeNpc(`zw:${key}`, year);
+  const R = npcR(npc, year);
   const Z = computeZiwei(npc.year, npc.month, npc.day, npc.hour, npc.minute, npc.gender);
   const ming = Z.palaces.find((p) => p.isMing);
   const stars = (ming.stars || []).filter((s) => ZW_MAIN[s]);
   const b = Z.birth;
   return {
-    id: 'tuvi', npc, R: npcR(npc, year), Z,
+    id: 'tuvi', npc, R, Z,
     intro: `Âm lịch: tháng ${b.lunarMonth}, ngày ${b.lunarDay}, giờ ${b.timeZhi} (${ZHI[b.timeZhi].vi}), năm can ${b.yearGan} (${GAN[b.yearGan].vi}).`,
     steps: [
       { key: 'menh', title: 'An Mệnh cung', kind: 'one', prompt: 'Từ cung Dần khởi tháng Giêng đếm thuận tới tháng sinh, rồi khởi giờ Tý đếm nghịch tới giờ sinh: Mệnh ở cung nào?',
@@ -192,6 +198,7 @@ export function buildTuVi(key, today = new Date()) {
       { key: 'tinh', title: 'Chính tinh thủ Mệnh', kind: 'many', prompt: 'Chính tinh nào đóng cung Mệnh? (không chọn gì nếu Mệnh vô chính diệu)',
         options: Object.entries(ZW_MAIN), answer: stars,
         explain: stars.length ? `Mệnh có ${stars.map((s) => `${s} ${ZW_MAIN[s]}`).join(', ')}.` : 'Mệnh vô chính diệu — mượn sao cung Thiên Di đối diện.' },
+      npcDeep(R, year), // bước cuối «Năm nay» (P0-2, npc-deep.js)
     ],
     ask: 'Thầy xem lá số Tử Vi của tôi: Mệnh, Thân, chính tinh thủ Mệnh nói gì về tính cách và đường công danh?',
   };
@@ -219,6 +226,7 @@ export function buildTuongPhap(key, today = new Date()) {
         options: [['phu', 'Phú — tài chủ đạo'], ['can', 'Cân bằng'], ['quy', 'Quý — quan chủ đạo']], order: ['phu', 'can', 'quy'], answer: fg, explain: M.fuguui },
       { key: 'tang', title: 'Tầng thứ (làm công)', kind: 'one', prompt: 'Mệnh làm được «công» tới đâu?',
         options: LV.map((x) => [x, x]), order: LV, answer: lv, explain: `${M.level} (${M.score} điểm). ${M.notes.slice(0, 2).join(' ')}` },
+      npcDeep(R, year), // bước cuối «Năm nay» (P0-2, npc-deep.js)
     ],
     ask: 'Theo Manh phái, tài và quan của tôi nằm ở đâu, tôi hợp làm công hay tự kinh doanh?',
   };
@@ -250,6 +258,7 @@ export function buildCachCuc(key, today = new Date()) {
         options: Object.entries(GROUP_VI), answer: P.pref.yong, explain: `Dụng: ${P.pref.yong.map((g) => GROUP_VI[g]).join(', ')} · hỷ: ${(P.pref.xi || []).map((g) => GROUP_VI[g]).join(', ') || '—'}.` },
       { key: 'ky', title: 'Kỵ thần phá cách', kind: 'one', prompt: 'Nhóm thần nào phá cách này nhất?',
         options: Object.entries(GROUP_VI), answer: P.pref.ji[0], explain: `Kỵ: ${P.pref.ji.map((g) => GROUP_VI[g]).join(', ')}.` },
+      npcDeep(R, year), // bước cuối «Năm nay» (P0-2, npc-deep.js)
     ],
     ask: `Lá số tôi là ${P.vi}. Thầy xem cách này thành hay bại, có cứu ứng không, nên đi đường nào?`,
   };

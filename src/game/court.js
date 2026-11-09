@@ -55,6 +55,8 @@ export const PLACE = {
 
 // Bàn Thầy Tử Bình: trên tầng 2, ngay trên đầu bậc, trước Chính Đường
 export const DAIS = { x: 0, z: -11, y: 4 };
+// Quầy Tàng Y Các (cánh Tây, giữa Ống Xăm và hồ sen Tây)
+export const TANGY = { x: -22, z: 37 };
 // Chính Đường (palace_grand) — tâm, bề ngang
 export const MAIN_HALL = { x: 0, z: -31, w: 44 };
 
@@ -72,6 +74,8 @@ export const COURT_STATIONS = (() => {
   }
   // Bàn thầy: án thư + chỗ thầy ngồi; khách đứng phía trước (gần đầu bậc)
   out.push({ id: 'thay', y: DAIS.y, offset: [0, 0], center: [DAIS.x, DAIS.z], block: [-1.6, -13.8, 1.6, -9.2], spot: [0, -8.1], label: [0, -11.5] });
+  // Tàng Y Các: quầy Thợ May Tiên Y (sect.js dựng quầy + giá áo; render3d đặt người bán)
+  out.push({ id: 'tangy', y: 0, offset: [0, 0], center: [TANGY.x, TANGY.z], block: [TANGY.x - 2.8, TANGY.z - 1.6, TANGY.x + 2.8, TANGY.z + 0.9], spot: [TANGY.x, TANGY.z + 2.3], label: [TANGY.x, TANGY.z] });
   // Hồ sen (gian thả đèn): khách đứng mép Nam
   const p = PONDS[0];
   out.push({ id: 'sen', y: 0, offset: [0, 0], center: [p.cx, p.cz], block: [p.cx - p.W / 2 - 0.4, p.cz - p.D / 2 - 0.4, p.cx + p.W / 2 + 0.4, p.cz + p.D / 2 + 0.4], spot: [p.cx - 6, p.cz + p.D / 2 + 1.4], label: [p.cx, p.cz] });

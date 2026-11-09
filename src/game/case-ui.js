@@ -156,9 +156,11 @@ export function npcCaseBody(api, slot, npc, onDone) {
         hints += 1;
         for (let i2 = 0; i2 < 2; i2++) {
           const want = K.pillars[p][i2];
-          if (slots[p][i2]) { const old = box.querySelector(`.hq-tile[data-used-at="${p}${i2}"]`); if (old) { used.delete(+old.dataset.t); old.removeAttribute('data-used-at'); } }
+          if (slots[p][i2] === want) continue; // ô đã đúng, giữ nguyên
           const t = [...box.querySelectorAll('.hq-tile')].find((x) => cs.tiles[+x.dataset.t] === want && !used.has(+x.dataset.t));
-          if (t) { used.add(+t.dataset.t); t.dataset.usedAt = `${p}${i2}`; }
+          if (!t) continue; // hết thẻ trống khớp chữ → bỏ ô này, không phá bookkeeping thẻ đã dùng
+          if (slots[p][i2]) { const old = box.querySelector(`.hq-tile[data-used-at="${p}${i2}"]`); if (old) { used.delete(+old.dataset.t); old.removeAttribute('data-used-at'); } }
+          used.add(+t.dataset.t); t.dataset.usedAt = `${p}${i2}`;
           slots[p][i2] = want;
         }
         api.toast(`Gợi ý: trụ ${COL.find(([x]) => x === p)[1]} là ${K.pillars[p]} (${C.gzVi(K.pillars[p])})`);
@@ -507,7 +509,7 @@ export async function hallCaseBody(api, hallId, key, onDone) {
       <div class="hq-actions">${FEATURES.ai && cs.ask ? '<button class="hq-btn hq-primary" data-role="master">🎙 Hỏi Thầy về án này</button>' : ''}<button class="hq-btn${FEATURES.ai && cs.ask ? '' : ' hq-primary'}" data-role="close">Xong</button></div></div>`;
     root.querySelector('[data-role=close]').onclick = () => { api.panel.close(); onDone?.(); };
     const mb = root.querySelector('[data-role=master]');
-    if (mb) mb.onclick = () => openMaster(api, { R: cs.R, who: cs.npc.call, first: cs.ask });
+    if (mb) mb.onclick = () => openMaster(api, { R: cs.R, who: cs.npc?.call, first: cs.ask });
   }, titles);
   return root;
 }

@@ -329,10 +329,10 @@ select.hq-input { width: auto; max-width: 100%; }
 .hq-altpad button { width: 58px; height: 58px; border-radius: 50%; font-size: 22px; color: #fff8ea; background: rgba(40,30,45,.78); border: 1px solid var(--hq-gold); touch-action: none; }
 .hq-altpad button:active { background: rgba(180,50,40,.85); }
 
-/* Thầy giải quẻ */
-.hq-tabs { display: flex; gap: 6px; overflow-x: auto; margin: 8px 0; }
-.hq-tab { font: inherit; padding: 7px 12px; border-radius: 99px; background: #2b2430; color: var(--hq-paper); border: 1px solid var(--hq-line); white-space: nowrap; cursor: pointer; }
-.hq-tab.on { background: var(--hq-son); border-color: #d2463c; color: #fff8ea; }
+/* Thầy giải quẻ: nhóm tab pill RIÊNG — không đè .hq-tab gạch chân vàng của Sổ Mệnh (block «Sổ mệnh» ở trên) */
+.hq-que-tabs { display: flex; gap: 6px; overflow-x: auto; margin: 8px 0; }
+.hq-que-tab { font: inherit; padding: 7px 12px; border-radius: 99px; background: #2b2430; color: var(--hq-paper); border: 1px solid var(--hq-line); white-space: nowrap; cursor: pointer; }
+.hq-que-tab.on { background: var(--hq-son); border-color: #d2463c; color: #fff8ea; }
 .hq-que-res { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #1b161f; border: 1px solid rgba(212,175,55,.35); }
 .hq-que-hex .hq-han { font-size: 26px; color: var(--hq-gold); }
 .hq-han { font-family: "Noto Serif SC", "Noto Serif", serif; }
@@ -358,3 +358,71 @@ select.hq-input { width: auto; max-width: 100%; }
 .hq-xlr { display: grid; gap: 2px; text-align: center; padding: 6px; border-radius: 10px; background: #2b2430; border: 1px solid var(--hq-line); }
 .hq-xlr b { font-size: 22px; } .hq-xlr.good { border-color: var(--wx-moc); } .hq-xlr.bad { border-color: #8a3a32; }
 .hq-jk { overflow-x: auto; font-size: 13px; }
+
+/* Vận Mệnh Các · Thái Tuế Điện */
+.hq-van-head { text-align: center; margin: 4px 0 10px; }
+.hq-van-head .hq-han { font-size: 34px; color: var(--hq-gold); letter-spacing: 4px; }
+.hq-van-list { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 6px; }
+.hq-van-list li { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 8px; border: 1px solid var(--hq-line); border-radius: 8px; }
+.hq-van-list li.on { border-color: var(--hq-gold); background: rgba(212,175,55,.12); }
+.hq-van-list li.past { opacity: .55; }
+.hq-van-list .hq-han { font-size: 18px; color: var(--hq-gold); }
+.hq-tt-me { padding: 8px 10px; border-radius: 8px; font-weight: 600; }
+.hq-tt-me.bad { background: rgba(224,83,63,.16); color: #ffb3a6; } .hq-tt-me.good { background: rgba(79,164,99,.16); color: #9fe5b0; }
+.hq-tt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0; }
+.hq-tt-grid span { display: flex; flex-direction: column; align-items: center; padding: 6px 2px; border: 1px solid var(--hq-line); border-radius: 8px; font-size: 13px; }
+.hq-tt-grid span small { opacity: .75; }
+.hq-tt-grid span.heavy { border-color: #e0533f; } .hq-tt-grid span.light { border-color: #d4a03a; }
+.hq-tt-grid span.me { background: rgba(212,175,55,.16); outline: 2px solid var(--hq-gold); }
+
+/* Tàng Y Các */
+.hq-dbtn.dot { position: relative; }
+.hq-dbtn.dot::after { content: ''; position: absolute; top: 6px; right: 22%; width: 9px; height: 9px; border-radius: 50%; background: #ff4a3a; box-shadow: 0 0 0 2px #1a1418; }
+.hq-yc-bal { display: flex; flex-wrap: wrap; gap: 8px; font-weight: 700; }
+.hq-yc-bal span { padding: 4px 10px; border-radius: 99px; background: #2b2430; border: 1px solid var(--hq-line); }
+.hq-yc-checkin { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 10px 0 4px; }
+.hq-yc-checkin span { display: flex; flex-direction: column; align-items: center; padding: 4px 0; font-size: 11px; border: 1px solid var(--hq-line); border-radius: 8px; opacity: .7; }
+.hq-yc-checkin span b { font-size: 11px; }
+.hq-yc-checkin span.got { opacity: 1; background: rgba(212,175,55,.18); border-color: var(--hq-gold); }
+.hq-yc-checkin span.next { opacity: 1; outline: 2px dashed var(--hq-gold); }
+.hq-yc-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+/* tab pill của Tàng Y Các (wardrobe-ui.js giữ markup .hq-tab): style pill scope riêng,
+   trước đây ăn nhờ block .hq-tab pill toàn cục đã gỡ */
+.hq-yc-tabs .hq-tab { font: inherit; padding: 7px 12px; border-radius: 99px; background: #2b2430; color: var(--hq-paper); border: 1px solid var(--hq-line); white-space: nowrap; cursor: pointer; }
+.hq-yc-tabs .hq-tab.on { background: var(--hq-son); border-color: #d2463c; color: #fff8ea; }
+.hq-yc-grid, .hq-yc-sets { display: grid; gap: 8px; }
+.hq-yc-card, .hq-yc-setcard { display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: start; padding: 10px; border-radius: 12px; border: 1px solid var(--rc, var(--hq-line)); background: linear-gradient(135deg, rgba(255,255,255,.03), transparent); }
+.hq-yc-card.on { box-shadow: 0 0 0 2px var(--rc) inset; }
+.hq-yc-card.r5 { background: linear-gradient(135deg, rgba(255,196,74,.14), transparent 60%); }
+.hq-yc-card.r4 { background: linear-gradient(135deg, rgba(197,139,255,.12), transparent 60%); }
+.hq-yc-card p, .hq-yc-setcard p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+.hq-yc-act { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.hq-yc-sw { display: block; width: 48px; height: 48px; border-radius: 10px; border: 1px solid rgba(255,255,255,.25); }
+.hq-yc-ic { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 10px; background: #241d26; font-size: 26px; font-style: normal; }
+.hq-yc-r { color: var(--rc); font-weight: 700; }
+.hq-yc-set { opacity: .7; }
+.hq-yc-lock { color: #ffcf7a; }
+.hq-yc-why { opacity: .7; font-size: 12px; }
+.hq-yc-on { color: var(--hq-gold); font-weight: 700; }
+.hq-yc-setcard { grid-template-columns: 1fr; border-color: var(--hq-line); }
+.hq-yc-setcard.match { border-color: var(--hq-gold); background: rgba(212,175,55,.08); }
+.hq-yc-setic { display: flex; gap: 6px; }
+.hq-yc-setic .hq-yc-sw, .hq-yc-setic .hq-yc-ic { width: 40px; height: 40px; font-size: 20px; }
+.hq-yc-match { color: var(--hq-gold); font-weight: 700; }
+.hq-yc-packs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+
+/* Khung tên (Tàng Y Các) */
+.hq-name.hq-frame-khung_may { border: 1px solid #e8f0ff; background: linear-gradient(90deg, rgba(120,150,210,.55), rgba(40,50,80,.7)); box-shadow: 0 0 8px rgba(200,220,255,.6); }
+.hq-name.hq-frame-khung_sen { border: 1px solid #ffb6cb; background: linear-gradient(90deg, rgba(240,120,160,.55), rgba(80,30,50,.75)); box-shadow: 0 0 8px rgba(255,160,190,.6); }
+.hq-name.hq-frame-khung_ngoc { border: 1px solid #8ff0d0; background: linear-gradient(90deg, rgba(40,150,120,.6), rgba(10,50,45,.75)); box-shadow: 0 0 8px rgba(120,240,200,.6); }
+.hq-name.hq-frame-khung_long { border: 1px solid #ffd76a; color: #fff3c4; background: linear-gradient(90deg, #7a4a0a, #c99124 50%, #7a4a0a); box-shadow: 0 0 12px rgba(255,200,80,.9); text-shadow: 0 0 6px #ffcf5a; }
+.hq-name.hq-frame-khung_long::before { content: '🐉 '; }
+
+/* [G2 NPC-AI] Bong bóng bark NPC trong panel (vanmenh-ui.js / thaitue.js —
+   mục 05 §05.3, khuôn hiển thị mục 04 §4.4). Màu theo bảng spec mục 9
+   (gold #d6a84a / son --hq-son), font ≥ 12px, nằm trong dòng chảy panel —
+   không absolute, không đè nội dung. Block mới thêm, không sửa block có sẵn. */
+.hq-bark { margin: 0 0 10px; padding: 8px 12px; border: 1px solid rgba(214,168,74,.45); border-left: 3px solid var(--hq-son); border-radius: 10px; background: rgba(214,168,74,.08); color: var(--hq-paper); font-size: 13.5px; line-height: 1.5; }
+.hq-bark::before { content: '❝ '; color: var(--hq-gold); font-weight: 700; }
+@media (prefers-reduced-motion: no-preference) { .hq-bark { animation: hq-bark-in .25s ease-out; } }
+@keyframes hq-bark-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }

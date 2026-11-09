@@ -24,6 +24,7 @@ const NAMES = {
   huong: ['Lư Hương', 'Thắp một tuần nhang'],
   lich: ['Bảng Lịch Ngày', 'Xem lịch hôm nay'],
   sen: ['Hồ Sen', 'Thả đèn hoa đăng'],
+  tangy: ['Tàng Y Các', 'Xem trang phục, phụ kiện'],
   an0: ['Khách hỏi việc', 'Giải án cho khách'],
   an1: ['Khách hỏi việc', 'Giải án cho khách'],
   an2: ['Khách hỏi việc', 'Giải án cho khách'],
@@ -54,6 +55,18 @@ for (const h of HALLS) {
 }
 
 // ---------------------------------------------------------------------------
+// Nhãn địa danh thế giới mở — cùng khuôn với HALLS: name + world (toạ độ mét).
+// landmarks.js đặt mô hình + biển tên đúng theo toạ độ này (một nguồn duy nhất,
+// không lệch nhau). Thuần nhãn, KHÔNG đẩy vào ALL_STATIONS: trạm bấm-được phải
+// liệt kê trong features.js › ALL (hasStation) — đẩy trạm lạ vào chỉ tạo trạm
+// ảo mở bảng lỗi. Người chơi biết chỗ qua biển tên 3D tại điểm này.
+// ---------------------------------------------------------------------------
+export const PLACES = [
+  { id: 'amvancoc', name: 'Am Vân Cốc', world: { x: -56, z: -163 } }, // sườn Hậu Sơn, cạnh quần thể điện (0,-116)
+  { id: 'laotung', name: 'Lão Tùng', world: { x: 6, z: 72 } }, // gác cổng Sơn Môn (0, z1+1.2 › court.js › COURT) — trong tầm bark 16 m của render3d › GATE_SM
+];
+
+// ---------------------------------------------------------------------------
 // ĐIỆN VÀO ĐƯỢC (docs/GAME-V2-THIET-KE.md §S4–S5): không gian trong điện đặt ở rìa Đông ngoài bản đồ
 // (trên biển mây — ra khỏi sàn là chạm nước). Cửa ngoài thế giới «door», lối ra trong điện «exit».
 // Toạ độ mét; tâm điện = origin, lối vào ở phía +z, bàn thờ phía −z.
@@ -64,7 +77,16 @@ export const ROOMS = [
   { id: 'vanxuong', name: 'Văn Xương Các', region: 'thulau', door: { x: 0, z: -652 }, origin: { x: 1600, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_wenchang', 0]] },
   { id: 'daumau', name: 'Đẩu Mẫu Điện', region: 'trichthien', door: { x: -566, z: 566 }, origin: { x: 1700, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_doumu', 0]] },
   { id: 'laoquan', name: 'Lão Quân Điện', region: 'tubinh', door: { x: -564, z: -510 }, origin: { x: 1800, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_daode', 0]] },
+  // Sơn Môn: cửa trước mặt hai điện phụ (sect.js) — Tây: hành lang đại vận; Đông: Thái Tuế (web, iOS tắt)
+  { id: 'vanmenh', name: 'Vận Mệnh Các', region: 'thanh', door: { x: -38.6, z: -40 }, origin: { x: 1900, z: 0 }, w: 20, d: 72, h: 11, deities: [], kind: 'vanmenh' },
+  // x=1850 nằm trong biên server (maxX 1210 ô = 1920 m — protocol.js bỏ gói mv vượt biên;
+  // x=2000 cũ = 1260 ô, đi trong điện gửi mv bị vứt). Cách Lão Quân Điện (1800, mép 1812)
+  // và Vận Mệnh Các (1900, mép 1890) để các điện không chồng hình lên nhau.
+  { id: 'thaitue', name: 'Thái Tuế Điện', region: 'thanh', door: { x: 38.6, z: -40 }, origin: { x: 1850, z: 0 }, w: 28, d: 24, h: 13, deities: [], kind: 'thaitue' },
 ];
+// Vận Mệnh Các: bia tổng quan ở lối vào + 9 cổng đại vận dọc lối giữa (vanmenh.js › VAN_GATES)
+export const VAN_GATE_Z = (i) => 25 - i * 6; // toạ độ z cổng i so với tâm điện (cổng 9 ở −23, trước bàn lễ)
+export const VAN_STELE = { x: -5.5, z: 29.5 };
 export const roomAt = (x, z) => ROOMS.find((r) => Math.abs(x - r.origin.x) <= r.w / 2 + 1 && Math.abs(z - r.origin.z) <= r.d / 2 + 1) || null;
 for (const r of ROOMS) {
   const inside = toTile(r.origin.x, r.origin.z + r.d / 2 - 3.2);
@@ -73,6 +95,18 @@ for (const r of ROOMS) {
   ALL_STATIONS.push({ id: `door_${r.id}`, kind: 'door', room: r.id, name: r.name, verb: `Vào ${r.name}`, block: [], world: r.door, spot: { x: doorT.x, y: doorT.y + 1.2 }, label: doorT, to: inside });
   ALL_STATIONS.push({ id: `exit_${r.id}`, kind: 'exit', room: r.id, name: 'Cửa điện', verb: 'Ra khỏi điện', block: [], world: exitW, spot: toTile(exitW.x, exitW.z), label: toTile(exitW.x, exitW.z), to: { x: doorT.x, y: doorT.y + 2.2 } });
   if (r.npc === 'que') { const q = { x: r.origin.x - r.w / 2 + 8.5, z: r.origin.z + 1 }; ALL_STATIONS.push({ id: 'que', kind: 'desk', room: r.id, name: 'Thầy Giải Quẻ', verb: 'Xin thầy gieo quẻ', block: [], world: q, spot: toTile(q.x + 1.4, q.z), label: toTile(q.x, q.z) }); }
+  if (r.kind === 'vanmenh') {
+    const b = { x: r.origin.x + VAN_STELE.x, z: r.origin.z + VAN_STELE.z };
+    ALL_STATIONS.push({ id: 'vanbia', kind: 'van', room: r.id, name: 'Bia Vận Mệnh', verb: 'Đọc bia quỹ tích đời', block: [], world: b, spot: toTile(b.x + 1.6, b.z + 0.4), label: toTile(b.x, b.z) });
+    for (let i = 0; i < 9; i++) {
+      const gz = { x: r.origin.x, z: r.origin.z + VAN_GATE_Z(i) };
+      ALL_STATIONS.push({ id: `van${i}`, kind: 'van', slot: i, room: r.id, name: `Cổng Đại Vận ${i + 1}`, verb: 'Bước vào thập kỷ này', block: [], world: gz, spot: toTile(gz.x, gz.z + 1.5), label: toTile(gz.x, gz.z) });
+    }
+  }
+  if (r.kind === 'thaitue') {
+    const q = { x: r.origin.x, z: r.origin.z - 2.2 };
+    ALL_STATIONS.push({ id: 'thaitue', kind: 'van', room: r.id, name: 'Bàn Lễ Thái Tuế', verb: 'Xem Thái Tuế năm nay', block: [], world: q, spot: toTile(q.x, q.z), label: toTile(q.x, q.z - 4) });
+  }
 }
 
 // Gian bật theo bản build (iOS tắt gian bói). Vật cản vẫn tính đủ mọi công trình.
@@ -85,6 +119,14 @@ export const START = toTile(START_M.x, START_M.z);
 export function stationById(id) {
   return STATIONS.find((s) => s.id === id) || null;
 }
+
+// ---------------------------------------------------------------------------
+// NPC-AI G2 · BARK TRẠM — KHÔNG còn map trạm→pool ở đây (audit F1 dọn helper
+// chết: barkPoolOfStation/STATION_BARK_POOL từng trỏ 8/9 id pool không tồn tại
+// và không có consumer nào gọi). Một đường duy nhất: pool bark nằm trong
+// bark-pool.js, consumer (stations.js, render3d.js) gọi pickBark(poolId,
+// dayKey) trực tiếp theo id pool — trạm câm khi pool thiếu (§05.3).
+// ---------------------------------------------------------------------------
 
 // Toạ độ ô ↔ mét thế giới
 const U = 1.6;

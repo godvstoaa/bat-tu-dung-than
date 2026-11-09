@@ -20,8 +20,12 @@ import { createLandmarks } from './landmarks.js';
 import { setModelQuality } from './assets.js';
 import { createCharacter } from './characters.js';
 import { buildSect } from './sect.js';
+import { createOutfit } from './accessories.js';
+import { ITEM, decodeCos } from './cosmetics.js';
 import { addFootprint } from './collide.js';
-import { COURT_STATIONS, DAIS, PONDS } from './court.js';
+import { COURT, COURT_STATIONS, DAIS, PONDS, TANGY } from './court.js';
+import { pickBark } from './bark-pool.js'; // NPC-AI G0 bark pool — thuần, không DOM (docs/npc-ai/15 §15.5b)
+import { hashSeed, rng } from './npc.js';  // rng theo hạt giống — không Math.random trần
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
@@ -39,7 +43,7 @@ const OLD_ANCHOR = {
   tra: [-10.4, 3.7, -8.0], compass: [10.4, 1.9, -8.0], xam: [-11.2, 2.3, 0],
   huong: [0, 2.15, 0.8], lich: [11.2, 3.0, 0], an0: [-7.2, 2.9, 2.4], an1: [7.2, 2.9, 2.4], an2: [7.2, 2.9, -4.0],
 };
-const LABEL_ANCHOR = { thay: [DAIS.x, DAIS.y + 9.6, DAIS.z + 2.6], sen: [PONDS[0].cx, 1.4, PONDS[0].cz] };
+const LABEL_ANCHOR = { thay: [DAIS.x, DAIS.y + 9.6, DAIS.z + 2.6], sen: [PONDS[0].cx, 1.4, PONDS[0].cz], tangy: [TANGY.x, 3.6, TANGY.z] };
 const STATION_CENTER = {};
 const COURT_OF = {};
 for (const c of COURT_STATIONS) {
@@ -63,6 +67,9 @@ const KEYS = [
 ];
 const tmpA = new THREE.Color(), tmpB = new THREE.Color();
 function lerpHex(a, b, t, out) { return out.copy(tmpA.set(a)).lerp(tmpB.set(b), t); }
+// scratch dùng lại qua các khung hình — không cấp phát Matrix4/Quaternion/Vector3/Color mới mỗi khung
+const MT4 = new THREE.Matrix4(), QT4 = new THREE.Quaternion(), VS1 = new THREE.Vector3(), VS2 = new THREE.Vector3();
+const WHITE = new THREE.Color('#ffffff');
 
 function timeLook(hour) {
   let i = 0;
@@ -182,6 +189,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(new UnrealBloomPass(new THREE.Vector2(512, 512), 0.28, 0.5, 0.96));
     composer.addPass(new OutputPass());
+    composer.setPixelRatio(renderer.getPixelRatio()); // render target của bloom cùng tỉ lệ pixel với canvas
   }
   // Huyền Quán Sơn Môn (sect.js theo court.js): sân, tường, cổng, nền đá, Chính Đường, điện phụ, tháp, cây
   const ripple = TX.rippleTex();
@@ -200,7 +208,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   let masterChar = null;
   createCharacter('master', { height: 1.85 }).then((m) => {
     if (!m) return;
-    masterChar = m; m.obj.position.set(DAIS.x, seatY - 0.08, DAIS.z - 0.2); m.setBase('sit'); scene.add(m.obj);
+    masterChar = m; m.obj.position.set(DAIS.x, seatY, DAIS.z + 0.15); m.setBase('idle'); scene.add(m.obj);
     masterG.visible = false;
   });
   const teaG = station('tra', shift('tra', MD.teaPavilion()), { fade: true });
@@ -225,6 +233,59 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     return { marker, g };
   });
 
+  // người bán ở quầy Tàng Y Các — cúi chào khi khách lại gần
+  let tailor = null;
+  createCharacter('npc_merchant', { height: 1.8 }).then((ch) => { if (!ch) return; tailor = ch; ch.obj.position.set(TANGY.x + 1.2, 0, TANGY.z - 1.2); scene.add(ch.obj); });
+
+  // --- NPC-AI G2 · bark cục bộ (docs/npc-ai/05 §05.2; luật không-lộ-chuyện mục 13:
+  //     bark chỉ gán DOM tại máy này, KHÔNG thêm field nào vào payload mạng, không
+  //     import net.js/protocol.js; người chơi khác không bao giờ thấy bark của máy này) ---
+  // Nhịp bark theo hạt giống ngày+lượt (hashSeed/rng npc.js — không Math.random trần):
+  // cùng ngày + cùng lượt → cùng bark, mai tự đổi; pool rỗng/lạ → im lặng như hôm nay
+  // (mục 05 §05.3), KHÔNG bịa giọng, KHÔNG đổi hành vi render sẵn có.
+  const makeBark = () => ({ round: 0, nextAt: 0, bark: null });
+  function tickBark(bk, active, nowMs, seedBase, poolId) {
+    if (!active) { bk.bark = null; return; }
+    if (!bk.bark && nowMs >= bk.nextAt) {
+      const seed = `${seedBase}|${bk.round++}`;
+      const r = rng(hashSeed(seed));
+      const text = pickBark(poolId, seed);
+      if (text) bk.bark = { text, until: nowMs + 4200 + Math.floor(r() * 1800) }; // hiện 4,2–6 giây
+      bk.nextAt = nowMs + (bk.bark ? bk.bark.until - nowMs + 5000 : 2500) + Math.floor(r() * 4000); // nghỉ 5–9 giây
+    } else if (bk.bark && nowMs >= bk.bark.until) bk.bark = null;
+  }
+  // bark Bà Tư (hồ sơ 34 — pool `tho_may` bark-pool.js): hiện khi khách lại gần quầy
+  // Tàng Y Các (cùng điều kiện S.near 'tangy' của cúi chào), mỗi lượt một câu theo
+  // seed ngày + số lượt trong phiên (G2b stations dùng cùng múi `${dayKey}:tangy`)
+  const tangyBark = makeBark();
+  // [F3 audit] Pool bark khách ❓ chọn theo CHỦ ĐỀ án của CHÍNH khách đó (npc.topic
+  // — npc.js QUESTIONS: career/wealth/love/study/move) vì chuyện án của khách sinh
+  // theo topic (story-gen.js TOPIC_FILES); bong bóng nói chuyện sảnh khác án
+  // (điều hậu/cách cục như kiểu khe chẵn/lẻ cũ) là tự mâu thuẫn. Mapping topic→pool:
+  // hai pool khach_* hiện có đều là câu RIÊNG của sảnh — khach_dieuhau: khí hậu/
+  // điều hậu lá số; khach_cachcuc: cách thành/bại — không topic sân nào khớp hương
+  // vị nào, và không pool có câu TRUNG TÍNH chung → trả null: khách im lặng, KHÔNG
+  // bịa câu ngoài pool (mục 05 §05.3). G2b khi viết pool khách theo chủ đề (vd
+  // 'khach_career'), bổ sung ánh xạ vào bảng dưới — mọi chỗ khác giữ nguyên.
+  const KHACH_TOPIC_POOL = {
+    // career: 'khach_career', wealth: 'khach_wealth', … — chưa có pool khớp
+  };
+  const khachPoolOf = (topic) => KHACH_TOPIC_POOL[topic] || null;
+  // Tutorial Lão Tùng gác cổng (hồ sơ 33 §33.5.2 nhánh B — TẤT ĐỊNH, không AI, không
+  // hạt giống): 3 câu dẫn nhập nguyên văn (06-11:52 / :53 / :119), mỗi câu 7 giây.
+  // Chỉ hiện MỘT lần cho người chơi mới lần đầu tới Sơn Môn — flag localStorage
+  // 'huyenquan:gaccong' (không đụng state game; máy chưa có save → flag chưa có → nói).
+  // Câu quyền riêng tư (S3) KHÔNG nằm ở đây — thuộc tutorial đầy đủ của G2b, chỉ nói 1 lần (T3).
+  const LT_TUT = Object.freeze([
+    'Khách tới Sơn Môn à. Hề hề. Ngày giờ sinh của khách là gì?',
+    'Lão không biết đọc lá số. Lão chỉ hỏi ngày sinh. Đọc là việc của thầy.',
+    'Ở Huyền Giới, lá số là nhân vật của khách. Không khai thì lão không biết khách là ai. Khai sai thì nhân vật sai, không ai phạt.',
+  ]);
+  let ltSeen = false;
+  try { ltSeen = !!localStorage.getItem('huyenquan:gaccong'); } catch (e) { /* kho bị khoá — coi như lần đầu trong phiên */ }
+  const lt = { i: -1, until: 0, bark: null };
+  const GATE_SM = { x: 0, z: COURT.z1 + 1.2 }; // Sơn Môn — sect.js đặt gate_sect đúng tại đây
+
   // Khách hỏi việc (Giải Án): 3 nhân vật đứng chờ + dấu ❓ vàng xoay khi chưa giải
   const caseNpcs = ['an0', 'an1', 'an2'].map((id) => {
     const [x, z] = STATION_CENTER[id];
@@ -234,7 +295,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     const ring = new THREE.Mesh(new THREE.RingGeometry(0.42, 0.55, 32), new THREE.MeshBasicMaterial({ color: '#ffd27a', transparent: true, opacity: 0.55, depthWrite: false }));
     ring.rotation.x = -Math.PI / 2; ring.position.y = 0.03; g.add(ring);
     scene.add(g); pickables.push(g);
-    return { id, g, marker, ring, av: null, robe: null };
+    return { id, g, marker, ring, av: null, robe: null, bark: makeBark(), bub: null };
   });
 
   // cây (vị trí theo PROPS của world.js) + trúc ngoài tường
@@ -309,25 +370,41 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   for (let i = 0; i < 36; i++) { const s = new THREE.Sprite(smokeMat.clone()); s.visible = false; scene.add(s); smoke.push({ s, life: 0, vx: 0, vz: 0 }); }
   let smokeT = 0;
 
+  // chén trà trên tay khi ngồi Trà Thất + hơi nóng bốc lên
+  const teaCup = new THREE.Group(); teaCup.visible = false; scene.add(teaCup);
+  {
+    const cel = new THREE.MeshStandardMaterial({ color: '#9fbfae', roughness: 0.25 });
+    const cup = new THREE.Mesh(new THREE.LatheGeometry([[0.001, 0], [0.032, 0.004], [0.045, 0.05], [0.042, 0.052], [0.001, 0.018]].map(([r, y]) => new THREE.Vector2(r, y)), 14), cel);
+    const tea = new THREE.Mesh(new THREE.CircleGeometry(0.039, 14), new THREE.MeshStandardMaterial({ color: '#b89a4a', roughness: 0.15 }));
+    tea.rotation.x = -Math.PI / 2; tea.position.y = 0.042;
+    teaCup.add(cup, tea);
+  }
+  const steamMat = new THREE.SpriteMaterial({ map: TX.softTex('rgba(245,245,250,0.85)', 'rgba(245,245,250,0)'), transparent: true, depthWrite: false });
+  const steam = Array.from({ length: 7 }, (_, i) => { const s = new THREE.Sprite(steamMat.clone()); s.visible = false; scene.add(s); return { s, life: i * 0.4 }; });
+  const handV = new THREE.Vector3(), fwdV = new THREE.Vector3();
+
   // khách
   let av = null, avRobe = null;
   const avState = { heading: Math.PI, phase: 0, walk: 0, lastX: null, lastZ: null };
   // Nhân vật Meshy cho người chơi (dáng hero_m / hero_f); procedural chỉ hiện khi chưa nạp xong
   let hero = null, heroLook = null, heroLoading = false;
   // phẩm phục: tô áo theo Dụng thần (robe), đai theo Hỷ thần (accent) — đổi màu thì dựng lại nhân vật
-  function ensureHero(look, robe, accent) {
-    const key = `${look}|${robe}|${accent || ''}`;
+  // phẩm phục Tàng Y Các: món có look → HSV riêng; không thì theo Dụng / Hỷ thần
+  const robeTint = (robe, accent, item) => (ITEM[item]?.look ? { primary: ITEM[item].look.pri, accent: ITEM[item].look.acc } : { primary: robe, accent });
+  function ensureHero(look, robe, accent, robeItem = null) {
+    const key = `${look}|${robe}|${accent || ''}|${robeItem || ''}`;
     if (heroLook === key || heroLoading) return;
     heroLoading = true;
-    createCharacter(look, { height: 1.9, tint: { primary: robe, accent } }).then((h) => {
+    createCharacter(look, { height: 1.9, tint: robeTint(robe, accent, robeItem) }).then((h) => {
       heroLoading = false;
       if (!h) { heroLook = key; return; }
-      if (hero) scene.remove(hero.obj);
+      if (hero) { hero.dispose(); scene.remove(hero.obj); } // hủy mixer + material clone của bản cũ
       hero = h; heroLook = key; scene.add(h.obj);
     });
   }
   let lastEmote = null;
   let giatri = null, giatriWx = null; const giatriPos = new THREE.Vector3();
+  const outfit = createOutfit(scene); // phụ kiện 3D của người chơi (accessories.js)
 
   function ensureAvatar(robe) {
     if (av && avRobe === robe) return;
@@ -355,7 +432,8 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const remoteGroups = [];
   function remoteEntry(o) {
     let r = remotes.get(o.id);
-    if (r && (r.robe !== o.robe || r.acc !== (o.acc || ''))) { dropRemote(o.id); r = null; }
+    const oc = decodeCos(o.cos || '');
+    if (r && (r.robe !== o.robe || r.acc !== (o.acc || '') || r.robeItem !== (oc.robe || ''))) { dropRemote(o.id); r = null; }
     if (!r) {
       const grp = new THREE.Group(); grp.userData.remoteId = o.id;
       const walk = remoteTemplate(o.robe, false).clone(), sit = remoteTemplate(o.robe, true).clone();
@@ -363,22 +441,33 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       const label = document.createElement('div'); label.className = 'hq-label hq-name hq-other';
       const bub = document.createElement('div'); bub.className = 'hq-bubble'; bub.hidden = true;
       layer.append(label, bub);
-      r = { grp, walk, sit, robe: o.robe, acc: o.acc || '', label, bub, heading: o.h || 0, ch: null };
+      r = { grp, walk, sit, robe: o.robe, acc: o.acc || '', robeItem: oc.robe || '', label, bub, heading: o.h || 0, ch: null, outfit: createOutfit(scene, { remoteLight: true }), fx: null, fxKey: '', fxNear: false };
       remotes.set(o.id, r);
       const rr = r;
-      createCharacter(o.look === 'hero_f' ? 'hero_f' : 'hero_m', { height: 1.9, tint: { primary: o.robe, accent: o.acc } }).then((ch) => { if (!ch || !remotes.has(o.id)) return; rr.ch = ch; grp.add(ch.obj); rr.walk.visible = rr.sit.visible = false; });
+      createCharacter(o.look === 'hero_f' ? 'hero_f' : 'hero_m', { height: 1.9, tint: robeTint(o.robe, o.acc, oc.robe) }).then((ch) => {
+        if (!ch) return;
+        if (!remotes.has(o.id)) { ch.dispose(); return; } // người đã rời phòng trước khi nạp xong — dọn bản vừa dựng
+        rr.ch = ch; grp.add(ch.obj); rr.walk.visible = rr.sit.visible = false;
+      });
     }
     return r;
   }
   function dropRemote(id) {
     const r = remotes.get(id); if (!r) return;
     scene.remove(r.grp); r.label.remove(); r.bub.remove();
+    r.outfit.dispose(); // hủy geometry/material/texture của phụ kiện
+    r.ch?.dispose();    // hủy mixer + material clone của nhân vật
+    if (r.fx) { scene.remove(r.fx.obj); scene.remove(r.fx.trail); r.fx.dispose(); }
     remoteGroups.splice(remoteGroups.indexOf(r.grp), 1);
     remotes.delete(id);
   }
   const selfBub = document.createElement('div'); selfBub.className = 'hq-bubble'; selfBub.hidden = true;
   // bong bóng của Thầy (đang luận bằng AI)
   const masterBub = document.createElement('div'); masterBub.className = 'hq-bubble master'; masterBub.hidden = true;
+  // bong bóng bark NPC (G2 — mục 05/13): Bà T tư quầy Tàng Y + Lão Tùng cổng Sơn Môn;
+  // tái dùng đúng cơ chế showBubble/place của bong bóng Thầy — không dựng cơ chế mới
+  const tailorBub = document.createElement('div'); tailorBub.className = 'hq-bubble'; tailorBub.hidden = true;
+  const gateBub = document.createElement('div'); gateBub.className = 'hq-bubble'; gateBub.hidden = true;
 
   // nhãn HTML
   const layer = document.createElement('div');
@@ -392,6 +481,49 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const nameTag = document.createElement('div'); nameTag.className = 'hq-label hq-name'; layer.appendChild(nameTag);
   layer.appendChild(selfBub);
   layer.appendChild(masterBub);
+  layer.appendChild(tailorBub);
+  layer.appendChild(gateBub);
+  for (const cn of caseNpcs) { const b = document.createElement('div'); b.className = 'hq-bubble'; b.hidden = true; layer.appendChild(b); cn.bub = b; } // bark khách ❓ từng khe
+
+  // --- NPC-AI G3 · Vân Cốc & Khổng Tiên Sinh (hồ sơ 17/18) — 2 NPC canon đứng TĨNH
+  //     cạnh Am Vân Cốc — Hậu Sơn. KHÔNG tạo caseNpc mới (hệ đó chỉ cho khách án):
+  //     gắn thẳng scene root từ đầu ở toạ độ tĩnh (2 mesh, chi phí thấp), dựng đúng
+  //     khuôn Thầy/người bán (createCharacter + tint) và bark đúng khuôn tickBark/
+  //     showBubble sẵn có — pool persona tương ứng trong bark-pool.js (PERSONA_POOLS,
+  //     id trùng persona), seed ngày + tên, hiện khi người chơi tới gần 8 m, nhịp
+  //     nghỉ 5–9 s theo khung tickBark hiện hành. landmarks.js › SPOTS 'amvancoc'
+  //     đã đặt am tại world (-56,-163) quay ry≈0,57 về bậc Hậu Sơn, bàn scholar_desk
+  //     ≈ (-49,8;-153,3), chiếu lệch tiếp 2,2 m — toạ độ dưới khớp cụm đó.
+  const HSV_OF = (hex) => { // hex → [h,s,v] 0–1 — tintMaterial (characters.js) nhận mảng HSV, không nhận hex
+    const c = new THREE.Color(hex), r = c.r, g = c.g, b = c.b;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+    let h = 0;
+    if (d > 0) h = mx === r ? ((g - b) / d + (g < b ? 6 : 0)) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return [h / 6, mx === 0 ? 0 : d / mx, mx];
+  };
+  const hermits = [
+    { id: 'van_coc', name: 'Vân Cốc', look: 'master', height: 1.72, x: -52, z: -158,
+      ry: Math.atan2(0 - -52, -76 - -158), // quay ra lối vào — cùng hướng am nhìn về bậc điện Hậu Sơn
+      tint: { primary: HSV_OF('#d97b29') }, // tăng bào vàng cam đất — «lão tăng am tranh» (hồ sơ 17.1)
+      hold: false, ch: null, bark: makeBark(), gy: 0, bub: null },
+    { id: 'khong_tiensinh', name: 'Khổng Tiên Sinh', look: 'npc_villager', height: 1.78, x: -49.8, z: -151.5,
+      ry: Math.atan2(-49.78 - -49.8, -153.33 - -151.5), // cúi mặt xuống bàn thoại như đang ngồi đọc thẻ tre
+      tint: { primary: HSV_OF('#9fb6bf'), accent: HSV_OF('#e8e2d4') }, // áo đạo sĩ xanh xám nhạt, đai trắng ngà (hồ sơ 18.1: thẻ tre, bàn tính)
+      hold: true, ch: null, bark: makeBark(), gy: 0, bub: null }, // hold: tay phải trước ngực — quạt giấy gấp của tiên sinh
+  ];
+  for (const hn of hermits) {
+    hn.gy = T.heightAt(hn.x, hn.z); // cao độ đất tại chỗ đứng — landmarks dùng cùng hàm H
+    hn.bub = document.createElement('div'); hn.bub.className = 'hq-bubble'; hn.bub.hidden = true; layer.appendChild(hn.bub);
+    const el = document.createElement('div'); el.className = 'hq-label'; el.textContent = hn.name; layer.appendChild(el);
+    labels.push({ id: hn.id, el, pos: new THREE.Vector3(hn.x, hn.gy + 3.3, hn.z) }); // đi chung vòng nhãn: ẩn ngoài tầm nhìn + mờ theo khoảng cách
+    createCharacter(hn.look, { height: hn.height, tint: hn.tint }).then((ch) => {
+      if (!ch) return; // thiếu GLB → không dựng (khuôn createCharacter trả null như Thầy/người bán)
+      hn.ch = ch;
+      ch.obj.position.set(hn.x, hn.gy, hn.z);
+      ch.obj.rotation.y = hn.ry;
+      scene.add(ch.obj);
+    });
+  }
   const targetRing = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.4, 32), new THREE.MeshBasicMaterial({ color: '#ffd27a', transparent: true, opacity: 0.8, depthWrite: false }));
   targetRing.rotation.x = -Math.PI / 2; targetRing.visible = false; scene.add(targetRing);
 
@@ -462,6 +594,9 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   // --- vòng cập nhật
   let calKey = '';
+  // [F6 audit] seed ngày bark dựng MỘT LẦN mỗi ngày (so ba số ngày trước khi
+  // lắp chuỗi + padStart) — không cấp phát chuỗi mỗi khung hình
+  let barkDay = { y: -1, m: -1, d: -1 }, barkDayKey = '';
   let fpsAcc = 0, fpsN = 0, fpsT = 0, lowQuality = false;
   const tmpV = new THREE.Vector3();
   const tmpV2 = new THREE.Vector3();
@@ -471,6 +606,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     const w = canvas.clientWidth || 640, h = canvas.clientHeight || 448;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2));
     renderer.setSize(w, h, false);
+    composer?.setPixelRatio(renderer.getPixelRatio()); // bloom theo đúng tỉ lệ pixel của renderer
     composer?.setSize(w, h);
     camera.aspect = w / h;
     // màn dọc (điện thoại): mở rộng góc nhìn để thấy đủ sân
@@ -488,9 +624,9 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     const nightSky = L.night >= 0.6; sky.visible = nightSky; if (world.sky) world.sky.visible = !nightSky;
     fog.color.copy(L.fog);
     mtnMat.color.copy(L.fog).lerp(L.top, 0.25).multiplyScalar(0.82);
-    cloudMat.color.copy(L.mid).lerp(new THREE.Color('#ffffff'), 0.35 * (1 - L.night));
+    cloudMat.color.copy(L.mid).lerp(WHITE, 0.35 * (1 - L.night));
     // môi trường PMREM (bầu trời) đã chiếu sáng vật liệu PBR → đèn bán cầu chỉ còn phần bổ sung
-    hemi.intensity = L.hemi * (0.35 + 0.3 * L.night); hemi.color.copy(L.top).lerp(new THREE.Color('#ffffff'), 0.5);
+    hemi.intensity = L.hemi * (0.35 + 0.3 * L.night); hemi.color.copy(L.top).lerp(WHITE, 0.5);
     scene.environmentIntensity = 0.55 - L.night * 0.25;
     sun.color.copy(L.sunColor); sun.intensity = L.sun;
     // mặt trời ban ngày đi Đông → Tây; ban đêm dùng ánh trăng cố định
@@ -515,6 +651,13 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   function frame(S, dt) {
     const t = S.time / 1000;
     const now = S.now;
+    // seed ngày cho bark (đúng khuôn todayStr — state.js) để cùng ngày ra cùng bark;
+    // [F6] chỉ dựng lại khi số năm/tháng/ngày đổi (qua 0h) — giữa ngày dùng bản cache
+    if (now.getFullYear() !== barkDay.y || now.getMonth() !== barkDay.m || now.getDate() !== barkDay.d) {
+      barkDay = { y: now.getFullYear(), m: now.getMonth(), d: now.getDate() };
+      barkDayKey = `${barkDay.y}-${String(barkDay.m + 1).padStart(2, '0')}-${String(barkDay.d).padStart(2, '0')}`;
+    }
+    const dayKey = barkDayKey;
     const L = applyTime(now);
     const p = S.player;
     ensureAvatar(p.robe);
@@ -536,24 +679,51 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     avState.alt = (avState.alt || 0) + (((p.flying ? p.alt || 0 : 0)) - (avState.alt || 0)) * Math.min(1, dt * 3);
     const gy = world.groundY(w.x, w.z) + avState.alt;
     av.position.set(w.x, gy, w.z);
-    ensureHero(p.look || 'hero_m', p.robe, p.accent);
+    const cos = S.cos || {};
+    ensureHero(p.look || 'hero_m', p.robe, p.accent, cos.robe);
     if (hero) {
       av.visible = false;
       hero.obj.position.set(w.x, gy, w.z);
       hero.obj.rotation.y = avState.heading;
-      hero.setBase(p.sitting ? 'sit' : p.flying ? 'idle' : avState.walk > 0.4 ? 'run' : 'idle');
+      // ngồi bồ đoàn: nền idle (thân trên thở) + tư thế xếp bằng dựng bằng xương (characters.js › seat)
+      hero.setBase(p.flying ? 'idle' : !p.sitting && avState.walk > 0.4 ? 'run' : 'idle');
       if (S.selfEmote && S.selfEmote !== lastEmote) { lastEmote = S.selfEmote; hero.play(S.selfEmote.e === 'wave' ? 'wave' : 'bow'); }
       hero.update(dt);
+      if (p.sitting) hero.seat('tea', t); else hero.unseat();
+      // cầm đồ Tàng Y Các khi đứng yên: đưa tay lên trước ngực
+      if (!p.sitting && cos.hand && avState.walk < 0.3 && !p.flying) hero.hold(t);
     }
+    // chén trà bám tay phải; hơi nóng bốc từ miệng chén
+    const hand = p.sitting && hero ? hero.hand(true) : null;
+    teaCup.visible = !!hand;
+    if (hand) {
+      hand.getWorldPosition(handV);
+      fwdV.set(Math.sin(avState.heading), 0, Math.cos(avState.heading));
+      teaCup.position.copy(handV).addScaledVector(fwdV, 0.05); teaCup.position.y -= 0.03;
+      if (S.teaColor) teaCup.children[1].material.color.set(S.teaColor);
+      for (const st of steam) {
+        st.life += dt;
+        if (st.life > 2.8) { st.life = 0; st.ox = (Math.random() - 0.5) * 0.03; st.oz = (Math.random() - 0.5) * 0.03; }
+        const k = st.life / 2.8;
+        st.s.visible = !reduced;
+        st.s.position.set(teaCup.position.x + (st.ox || 0) + Math.sin(t * 1.3 + st.life * 3) * 0.02 * k, teaCup.position.y + 0.07 + k * 0.45, teaCup.position.z + (st.oz || 0));
+        st.s.scale.setScalar(0.04 + k * 0.16);
+        st.s.material.opacity = 0.35 * Math.sin(Math.PI * k);
+      }
+    } else for (const st of steam) st.s.visible = false;
     // gia trì nguyên tố theo hành Dụng thần (progress.js) — dựng lại khi đổi hành
-    if (!giatri || giatriWx !== p.robe) {
-      if (giatri) { scene.remove(giatri.obj); scene.remove(giatri.trail); }
-      giatri = createGiatri(p.robe); giatriWx = p.robe; scene.add(giatri.obj); scene.add(giatri.trail);
+    const gKey = `${p.robe}|${cos.aura || ''}|${cos.trail || ''}|${cos.mount || ''}`;
+    if (!giatri || giatriWx !== gKey) {
+      if (giatri) { scene.remove(giatri.obj); scene.remove(giatri.trail); giatri.dispose(); } // hủy material/texture bản cũ
+      giatri = createGiatri(p.robe, { aura: cos.aura, trail: cos.trail, mount: cos.mount }); giatriWx = gKey; scene.add(giatri.obj); scene.add(giatri.trail);
     }
     giatri.set(S.giatri || []);
     giatri.obj.position.set(w.x, gy, w.z); giatri.obj.rotation.y = avState.heading;
     giatriPos.set(w.x, gy, w.z);
     giatri.update(dt, t, { moving: avState.walk > 0.4, flying: !!p.flying, world: giatriPos });
+    // phụ kiện bám xương (mũ, lưng, tay) — cầm chén trà thì cất đồ cầm tay
+    outfit.set({ head: cos.head, back: cos.back, hand: p.sitting ? null : cos.hand });
+    outfit.update(hero, avState.heading, t, { night: L.night, visible: !!hero && av.visible === false });
     // bóng đổ + mặt trời bám theo người chơi
     sun.target.position.set(w.x, gy, w.z);
     sun.position.copy(sun.target.position).addScaledVector(lightDir, 160);
@@ -616,7 +786,33 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       for (const m of g.userData.fadeMats) { m.opacity += (goalO - m.opacity) * Math.min(1, dt * 8); m.depthWrite = m.opacity > 0.95; }
     }
 
-    if (masterChar) { masterChar.update(dt); if (S.near?.id === 'thay' && !masterChar.greeted) { masterChar.greeted = true; masterChar.play('bow'); } if (S.near?.id !== 'thay') masterChar.greeted = false; }
+    sect.update?.(t);
+    if (tailor) { tailor.update(dt); const nearT = S.near?.id === 'tangy'; if (nearT && !tailor.greeted) { tailor.greeted = true; tailor.play('bow'); } if (!nearT) tailor.greeted = false; }
+    // bark Bà T tư: chỉ khi khách đứng gần quầy (cùng cơ chế S.near của cúi chào/nhãn trạm)
+    const barkMs = performance.now();
+    tickBark(tangyBark, S.near?.id === 'tangy', barkMs, `${dayKey}:tangy`, 'tho_may');
+    // bark Vân Cốc & Khổng (G3): hiện khi người chơi tới gần 8 m — pool persona
+    // tương ứng (id trùng persona trong bark-pool.js), seed ngày + tên cùng múi
+    // `${dayKey}:…` với hệ bark sẵn có; mixer vẫn chạy để tư thế đứng thở idle
+    for (const hn of hermits) {
+      if (hn.ch) { hn.ch.update(dt); if (hn.hold) hn.ch.hold(t); }
+      tickBark(hn.bark, Math.hypot(w.x - hn.x, w.z - hn.z) < 8, barkMs, `${dayKey}:${hn.id}`, hn.id);
+    }
+    // tutorial Lão Tùng: người chơi mới (chưa từng nghe) tới gần Sơn Môn lần đầu → 3 câu
+    // dẫn nhập tất định, mỗi câu 7 giây; hết trình tự đánh dấu localStorage để không nói lại
+    if (lt.i >= 0 && lt.i < LT_TUT.length) {
+      if (barkMs >= lt.until) {
+        lt.i++; lt.until = barkMs + 7000;
+        if (lt.i >= LT_TUT.length) { ltSeen = true; try { localStorage.setItem('huyenquan:gaccong', '1'); } catch (e) { /* kho bị khoá: lần tới sẽ nghe lại — chấp nhận */ } }
+      }
+    } else if (!ltSeen && Math.hypot(w.x - GATE_SM.x, w.z - GATE_SM.z) < 16) { lt.i = 0; lt.until = barkMs + 7000; }
+    // [F6 audit] tutorial 3 câu × 7 giây ≈ 21 giây: chỉ tạo object bark MỚI khi
+    // câu ĐỔI — `until` gắn cứng cùng lúc đổi câu nên giữa hai lần đổi không có
+    // gì để cập nhật; hết trình tự thì trả về null đúng như trước.
+    const ltText = lt.i >= 0 && lt.i < LT_TUT.length ? LT_TUT[lt.i] : null;
+    if (ltText == null) lt.bark = null;
+    else if (!lt.bark || lt.bark.text !== ltText) lt.bark = { text: ltText, until: lt.until };
+    if (masterChar) { masterChar.update(dt); masterChar.seat('write', t); if (S.near?.id === 'thay' && !masterChar.greeted) { masterChar.greeted = true; masterChar.play('bow'); } if (S.near?.id !== 'thay') masterChar.greeted = false; }
     // thầy: viết, thỉnh thoảng ngẩng nhìn khách khi khách lại gần
     const mr = masterG.userData.rig;
     mr.arm.rotation.x = Math.sin(t * 2.2) * 0.08; mr.arm.rotation.y = Math.sin(t * 1.1) * 0.1;
@@ -694,13 +890,12 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       tb.userData.rim.emissiveIntensity = 0.6 + 2 * k;
     }
 
-    // đèn trời, đá trôi, mây
-    const mt = new THREE.Matrix4(); const q = new THREE.Quaternion(); const sc = new THREE.Vector3(); const ps = new THREE.Vector3();
+    // đèn trời, đá trôi, mây (dùng scratch module-level, không cấp phát mới mỗi khung)
     for (let i = 0; i < SLN; i++) {
       const d = slData[i];
       if (!reduced) { d.y += d.v * dt; d.a += d.w * dt; if (d.y > 34) d.y = -14; }
-      ps.set(Math.cos(d.a) * d.r, d.y, Math.sin(d.a) * d.r); sc.setScalar(d.s);
-      mt.compose(ps, q, sc); skyLanterns.setMatrixAt(i, mt);
+      VS1.set(Math.cos(d.a) * d.r, d.y, Math.sin(d.a) * d.r); VS2.setScalar(d.s);
+      MT4.compose(VS1, QT4, VS2); skyLanterns.setMatrixAt(i, MT4);
     }
     skyLanterns.instanceMatrix.needsUpdate = true;
     if (!reduced) {
@@ -733,7 +928,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
         cn.g.add(cn.av); cn.robe = info.npc.robe + info.npc.gender;
         // thay bằng nhân vật Meshy (khe chẵn: thương nhân, khe lẻ: dân làng)
         const look = caseNpcs.indexOf(cn) % 2 ? 'npc_villager' : 'npc_merchant';
-        if (cn.ch) { cn.g.remove(cn.ch.obj); cn.ch = null; }
+        if (cn.ch) { cn.g.remove(cn.ch.obj); cn.ch.dispose(); cn.ch = null; }
         createCharacter(look, { height: 1.8 }).then((ch) => { if (!ch) return; cn.ch = ch; cn.g.add(ch.obj); cn.av.visible = false; });
       }
       MD.poseAvatar(cn.av, { walk: 0, phase: 0, sitting: false, idle: t + cn.g.position.x });
@@ -747,6 +942,14 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       const lookGoal = Math.hypot(dxp, dzp) < 6 ? Math.atan2(dxp, dzp) : 0;
       cn.av.rotation.y += (((lookGoal - cn.av.rotation.y + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI) * Math.min(1, dt * 4);
       if (cn.ch) cn.ch.obj.rotation.y = cn.av.rotation.y;
+      // bark khách ❓ (chưa giải — nhóm khách AI-light mục 14): hiện khi người chơi lại gần
+      // (bán kính 6 m, cùng cơ chế wave/bow phía trên). [F3] Pool theo npc.topic của chính
+      // khách (xem khachPoolOf phía trên) — không còn khe chẵn/lẻ; topic không khớp pool
+      // nào → khách im lặng thay vì nói điều trái án mình. Seed = chính hạt giống
+      // ngày·khe·pid của main.js (info.npc.key) → cùng khách hôm nay ra cùng câu trên máy
+      // chủ nhân của nó; bark KHÔNG rời máy này (mục 13 Quyết 3).
+      const khachPool = khachPoolOf(info.npc.topic);
+      tickBark(cn.bark, !!khachPool && !info.done && Math.hypot(w.x - cn.g.position.x, w.z - cn.g.position.z) < 6, barkMs, info.npc.key, khachPool);
       cn.marker.visible = !info.done; cn.ring.visible = !info.done;
       if (!info.done && !reduced) { cn.marker.rotation.y = t * 1.6; cn.marker.position.y = 2.75 + Math.sin(t * 2 + cn.g.position.x) * 0.08; }
       const lb = labels.find((l) => l.id === cn.id);
@@ -765,9 +968,34 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       if (r.ch) {
         const close = camera.position.distanceTo(r.grp.position) < 60;
         r.ch.obj.visible = true;
-        r.ch.setBase(sitting ? 'sit' : o.moving ? 'run' : 'idle');
+        r.ch.setBase(!sitting && o.moving ? 'run' : 'idle');
         if (o.bubble && o.bubble !== r.lastBub) { r.lastBub = o.bubble; if (o.bubble.text === '🙇' || o.bubble.text === '🙏') r.ch.play('bow'); else if (o.bubble.text === '👋') r.ch.play('wave'); }
-        if (close) r.ch.update(dt);
+        if (close) { r.ch.update(dt); if (sitting) r.ch.seat('calm', t); else r.ch.unseat(); }
+        const oc = decodeCos(o.cos || ''); // decode MỘT lần cho cả đồ cầm tay + trang bị + hào quang
+        if (close && oc.hand && !sitting && !o.moving) r.ch.hold(t);
+        // trang bị người khác (Tàng Y Các): phụ kiện + hào quang skin + ngự vật khi bay — chỉ khi ở gần
+        r.outfit.set({ head: oc.head, back: oc.back, hand: sitting ? null : oc.hand });
+        r.outfit.update(r.ch, r.heading, t, { night: L.night, visible: close });
+        // hào quang / vệt / ngự vật người khác: dựng MỘT LẦN mỗi người (chỉ dựng lại khi đổi skin),
+        // bật/tắt theo khoảng cách với hysteresis 60/75 m — hết churn dựng/hủy quanh ngưỡng 60 m
+        const hasFx = !!(oc.aura || oc.trail || (o.a || 0) > 0.5);
+        const fk = `${o.robe}|${oc.aura || ''}|${oc.trail || ''}|${oc.mount || ''}`;
+        if (hasFx && fk !== r.fxKey) {
+          if (r.fx) { scene.remove(r.fx.obj); scene.remove(r.fx.trail); r.fx.dispose(); r.fx = null; }
+          r.fx = createGiatri(o.robe, { aura: oc.aura, trail: oc.trail, mount: oc.mount });
+          r.fx.set([]); r.fx.obj.visible = r.fx.trail.visible = false;
+          scene.add(r.fx.obj); scene.add(r.fx.trail);
+          r.fxKey = fk;
+        }
+        if (r.fx) {
+          const dc = camera.position.distanceTo(r.grp.position);
+          if (dc < 60) r.fxNear = true; else if (dc > 75) r.fxNear = false; // vùng 60–75 m giữ nguyên trạng thái
+          const show = hasFx && r.fxNear;
+          r.fx.obj.visible = r.fx.trail.visible = show;
+          if (show) { r.fx.obj.position.copy(r.grp.position); r.fx.obj.rotation.y = r.heading; r.fx.update(dt, t, { moving: !!o.moving, flying: (o.a || 0) > 0.5, world: r.grp.position }); }
+        }
+        const fc = `hq-label hq-name hq-other${oc.frame ? ` hq-frame-${oc.frame}` : ''}`;
+        if (r.label.className !== fc) r.label.className = fc;
       }
       r.grp.position.set(ow.x, world.groundY(ow.x, ow.z) + (o.a || 0) + (sitting ? 0 : (o.moving && !reduced ? Math.abs(Math.sin(t * 9.5 + ow.x)) * 0.07 : 0)), ow.z);
       const goalH = sitting ? Math.PI : (o.h || 0);
@@ -799,6 +1027,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     }
     proj.set(w.x, gy + (p.sitting ? 1.75 : 2.45), w.z).project(camera);
     nameTag.textContent = p.name || '';
+    if (nameTag.dataset.frame !== (cos.frame || '')) { nameTag.dataset.frame = cos.frame || ''; nameTag.className = `hq-label hq-name${cos.frame ? ` hq-frame-${cos.frame}` : ''}`; }
     nameTag.classList.toggle('gold', !!p.gold);
     nameTag.style.transform = `translate(-50%,-100%) translate(${(proj.x * 0.5 + 0.5) * rw}px,${(-proj.y * 0.5 + 0.5) * rh}px)`;
     const place = (el, x, y, z, dy = 0) => {
@@ -815,7 +1044,12 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       if (on) { if (el.textContent !== b.text) el.textContent = b.text; place(el, x, y, z, -22); }
     };
     showBubble(selfBub, S.selfBubble, w.x, gy + (p.sitting ? 1.75 : 2.45), w.z);
-    showBubble(masterBub, S.masterBubble, 0, 2.6, -5.35);
+    showBubble(masterBub, S.masterBubble, DAIS.x, DAIS.y + 2.6, DAIS.z);
+    // bark NPC cục bộ (không qua /ws — mục 13): Bà T tư tại quầy, Lão Tùng tại cổng, khách ❓ từng khe
+    showBubble(tailorBub, tangyBark.bark, TANGY.x + 1.2, 2.8, TANGY.z - 1.2);
+    showBubble(gateBub, lt.bark, GATE_SM.x, 5.6, GATE_SM.z - 0.8);
+    for (const cn of caseNpcs) showBubble(cn.bub, cn.g.visible ? cn.bark.bark : null, cn.g.position.x, 3.3, cn.g.position.z); // trên nhãn ❓ (y≈2.9)
+    for (const hn of hermits) showBubble(hn.bub, hn.bark.bark, hn.x, hn.gy + 2.9, hn.z); // dưới nhãn tên (y≈3,3) — đúng khuôn bark NPC cục bộ
     for (const r of remotes.values()) {
       const o = r.data; if (!o) continue;
       const ow = MD.toWorld(o.x, o.y);
@@ -830,7 +1064,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     fpsAcc += dt; fpsN++; fpsT += dt;
     if (fpsT > 3) {
       const fps = fpsN / fpsAcc;
-      if (fps < 35 && !lowQuality) { lowQuality = true; renderer.shadowMap.enabled = false; renderer.setPixelRatio(1); mats.roof.needsUpdate = true; scene.traverse((o) => { if (o.material) o.material.needsUpdate = true; }); }
+      if (fps < 35 && !lowQuality) { lowQuality = true; renderer.shadowMap.enabled = false; renderer.setPixelRatio(1); composer?.setPixelRatio(1); mats.roof.needsUpdate = true; scene.traverse((o) => { if (o.material) o.material.needsUpdate = true; }); }
       fpsAcc = 0; fpsN = 0; fpsT = 0;
     }
   }
@@ -851,6 +1085,15 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // Kiểm thử ánh sáng theo giờ: ghi đè giờ hiển thị (null = giờ thật).
     setDebugHour(h) { debugHour = h; },
     // gỡ lỗi: camera tự do { pos:[x,y,z], look:[x,y,z] } — null để trả về bám khách
+    // dữ liệu cá nhân cho điện (interior.js) + nhãn cổng đại vận theo can chi của người chơi
+    setRoomData(d) {
+      interiors.setData(d);
+      for (const lb of labels) {
+        const m = /^van(\d)$/.exec(lb.id); if (!m) continue;
+        const g = d?.van?.gates?.[Number(m[1])];
+        if (g) lb.el.textContent = `${g.ganZhi} · ${g.ages.replace('t', ' tuổi')}${d.van.current === Number(m[1]) ? ' ★' : ''}`;
+      }
+    },
     setDebugCam(v) { debugCam = v; },
     // Kiểm thử / ảnh chụp: đặt góc nhìn camera
     setView({ yaw, pitch, dist } = {}) { if (yaw != null) { cam.yaw = cam.yawGoal = yaw; } if (pitch != null) cam.pitch = pitch; if (dist != null) cam.dist = dist; },

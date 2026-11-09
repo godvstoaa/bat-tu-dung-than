@@ -13,7 +13,13 @@ import { TEXT } from './features.js';
 import { buzz, lockPortrait } from './haptics.js';
 import { createNet } from './net.js';
 import { makeNpc } from './npc.js';
-import { unlocked, unlockedList, newlyUnlocked, levelInfo, WX_GIATRI } from './progress.js';
+// [G2 — NPC-AI] chuyện riêng của khách hỏi việc (docs/npc-ai/08) — thuần theo
+// hạt giống, không AI, không mạng; story chỉ hiện trong panel của chủ mở án
+// (mục 13 Quyết 3), không bao giờ vào payload mạng (mv/cos giữ nguyên).
+import { makeStory } from './story-gen.js';
+import { unlocked, unlockedList, newlyUnlocked, levelInfo, WX_GIATRI, vipActive } from './progress.js';
+import * as C from './cosmetics.js';
+import { wardrobeBody } from './wardrobe-ui.js';
 import { REGIONS } from './terrain.js';
 const REGION_NAME = Object.fromEntries(REGIONS.map((r) => [r.id, r.name]));
 import { EMOTES, PHRASES, SEATS, REPORT_REASONS } from './protocol.js';
@@ -21,7 +27,7 @@ import { EMOTES, PHRASES, SEATS, REPORT_REASONS } from './protocol.js';
 const SPEED = 3.5; // ô/giây
 const WX_NAMES = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
 const WX_CLS = { 木: 'moc', 火: 'hoa', 土: 'tho', 金: 'kim', 水: 'thuy' };
-const ICON = { thay: '📜', compass: '🧭', xam: '🎋', huong: '🕯', lich: '📅', tra: '🍵', sen: '🪷', an0: '❓', an1: '❓', an2: '❓', trach: '🗓', duongtrach: '🧭', dieuhau: '🌡', thuvien: '📚', hophon: '💞', tuvi: '✨', tuongphap: '👁', cachcuc: '🏯' };
+const ICON = { thay: '📜', compass: '🧭', xam: '🎋', huong: '🕯', lich: '📅', tra: '🍵', sen: '🪷', an0: '❓', an1: '❓', an2: '❓', trach: '🗓', duongtrach: '🧭', dieuhau: '🌡', thuvien: '📚', hophon: '💞', tuvi: '✨', tuongphap: '👁', cachcuc: '🏯', vanbia: '🪨', thaitue: '🪔', tangy: '👘', ...Object.fromEntries(Array.from({ length: 9 }, (_, i) => [`van${i}`, '⛩'])) };
 
 export function startGame({ onExit = null } = {}) {
   const storage = window.localStorage;
@@ -51,7 +57,21 @@ export function startGame({ onExit = null } = {}) {
     if (d !== npcDay) {
       let pid = 'local';
       try { pid = localStorage.getItem('huyenquan:pid') || 'local'; } catch (e) { /* ignore */ }
-      npcs = [0, 1, 2].map((i) => makeNpc(`${d}:${i}:${pid}`));
+      // [G2 — NPC-AI] chuyện riêng từng khách (mục 08 §8.4): gọi makeStory với
+      // ĐÚNG hạt hôm nay `${d}:${i}:${pid}` — same-seed (§8.6.2): cùng ngày +
+      // cùng pid + cùng khe ⇒ nguyên văn cùng chuyện, kể cả khi AI tắt/mất
+      // mạng. R = lá số khách dựng bằng chartOf (cache theo năm sẵn có);
+      // story đính kèm npc — consumer chỉ là panel án (stations.js
+      // openCaseSlot), không field nào rời máy (mục 13 Quyết 3).
+      npcs = [0, 1, 2].map((i) => {
+        const seed = `${d}:${i}:${pid}`;
+        const npc = makeNpc(seed);
+        try {
+          const R = chartOf({ year: npc.year, month: npc.month, day: npc.day, hour: npc.hour, minute: npc.minute, gender: npc.gender });
+          npc.story = makeStory(seed, R, `an${i}`, pid, npc, new Date().getFullYear());
+        } catch (e) { /* lá số không dựng được → khách vẫn đứng chờ như cũ, không có chuyện riêng */ }
+        return npc;
+      });
       npcDay = d;
     }
     return npcs[slot];
@@ -61,7 +81,7 @@ export function startGame({ onExit = null } = {}) {
   // Mạng (MMO) — offline-first: mất mạng vẫn chơi đơn bình thường
   // -------------------------------------------------------------------------
   const net = createNet({
-    profile: () => ({ name: state.player?.name || 'Khách', robe: state.player?.robe || '土', accent: state.player?.accent || '', look: state.player?.look || 'hero_m', title: S.titleFor(state.phucKhi).name }),
+    profile: () => ({ name: state.player?.name || 'Khách', robe: state.player?.robe || '土', accent: state.player?.accent || '', cos: C.encodeCos(C.wardrobe(state).equipped), look: state.player?.look || 'hero_m', title: S.titleFor(state.phucKhi).name }),
     onEvent(ev) {
       if (ev.t === 'status' || ev.t === 'count') updateOnline();
       else if (ev.t === 'emo' && ev.toMe && !ev.self) { toast(`${ev.name || 'Một khách'} ${EMOTES[ev.e].text} bạn ${EMOTES[ev.e].icon}`); buzz('light'); }
@@ -132,6 +152,13 @@ export function startGame({ onExit = null } = {}) {
   }
 
   function save() { S.saveState(state, storage); }
+  // trang bị đang hiển thị = đồ đang mặc + món đang thử (20 giây)
+  let cosPreview = null;
+  function cosNow() {
+    const eq = { ...C.wardrobe(state).equipped };
+    if (cosPreview) { if (performance.now() < cosPreview.until) eq[cosPreview.slot] = cosPreview.id; else cosPreview = null; }
+    return eq;
+  }
 
   function updateHud() {
     const t = S.titleFor(state.phucKhi);
@@ -146,6 +173,13 @@ export function startGame({ onExit = null } = {}) {
     $('hq-fly').hidden = !canFly;
     if (!canFly && player.flying) setFlying(false);
     $('hq-phuc').textContent = `✦ ${state.phucKhi}`;
+    // Tàng Y Các: Ngọc, quà lên cấp, Ngọc VIP mỗi ngày, chấm đỏ khi chưa điểm danh
+    const W = C.wardrobe(state);
+    const gift = C.levelGifts(state, levelInfo(state).level); if (gift) toast(`🎁 Quà lên cấp · +${gift} Ngọc`);
+    const vd = C.vipDaily(state, vipActive(state)); if (vd) toast(`👑 Chân Nhân · +${vd} Ngọc hôm nay`);
+    W.bonus = C.setBonus(state, state.player?.yong?.primary).bonus;
+    $('hq-ngoc').textContent = `💎 ${W.ngoc}`;
+    $('hq-wardrobe').classList.toggle('dot', !C.checkedIn(state));
     $('hq-streak').textContent = `🔥 ${S.currentStreak(state)}`;
     const done = S.tasks(state).filter((x) => x.done).length;
     $('hq-tasks-btn').innerHTML = `<b aria-hidden="true">📋</b><span>${done}/3 việc</span>`;
@@ -174,6 +208,7 @@ export function startGame({ onExit = null } = {}) {
   // -------------------------------------------------------------------------
   const TEA_SEAT = SEATS[1];
   let preSit = null;
+  let pendingSeat = false; // chống re-entry: một lời xin chỗ đang chờ máy chủ
 
   const api = {
     state,
@@ -188,21 +223,39 @@ export function startGame({ onExit = null } = {}) {
     goTo(id) { panel.close(); walkToStation(stationById(id)); },
     // Ngồi bồ đoàn: online thì máy chủ cấp chỗ (mỗi chỗ một người). Trả false nếu kín chỗ.
     async setSitting(on) {
+      if (on && pendingSeat) return false; // chưa xong lời xin trước → bỏ qua lần gọi chồng
       if (on && !player.sitting) {
-        const i = await net.requestSeat();
-        if (i < 0) return false;
-        const seat = SEATS[i] || TEA_SEAT;
-        preSit = { x: player.x, y: player.y }; player.x = seat.x; player.y = seat.y; player.path = [];
+        pendingSeat = true; // đặt TRƯỚC await — cả khi await ném lỗi vẫn được clear ở finally
+        try {
+          const i = await net.requestSeat();
+          if (i < 0) { toast('Hết chỗ ngồi'); return false; } // kín chỗ → không dời người vào ghế
+          const seat = SEATS[i] || TEA_SEAT;
+          preSit = { x: player.x, y: player.y }; player.x = seat.x; player.y = seat.y; player.path = [];
+        } finally {
+          pendingSeat = false;
+        }
       }
       if (!on && player.sitting) { net.stand(); if (preSit) { player.x = preSit.x; player.y = preSit.y; } }
       player.sitting = on;
       return true;
     },
     setTeaColor(c) { teaColor = c; },
+    vip: () => vipActive(state),
+    level: () => levelInfo(state).level,
+    yong: () => state.player?.yong?.primary || null,
+    previewCos(slot, id) { cosPreview = { slot, id, until: performance.now() + 20000 }; },
+    cosChanged() { cosPreview = null; net.setCos(C.encodeCos(C.wardrobe(state).equipped)); save(); updateHud(); },
+    refreshRooms: () => syncRooms(),
     celebrate(wx) { renderer?.celebrate?.(wx); },
     todayNpc,
     wipe() { try { storage.removeItem(S.KEY); } catch (e) { /* ignore */ } location.reload(); },
   };
+
+  // Vận Mệnh Các / Thái Tuế Điện: khắc biển cổng, bia, bài vị theo lá số + đèn dầu (web)
+  function syncRooms() {
+    if (import.meta.env.MODE === 'ios' || !renderer?.setRoomData) return;
+    import('./vanmenh-ui.js').then((m) => renderer.setRoomData(m.roomData(state))).catch((e) => console.warn('[rooms]', e));
+  }
 
   function openStation(id) {
     const st = stationById(id);
@@ -246,7 +299,7 @@ export function startGame({ onExit = null } = {}) {
     ov.innerHTML = `<div><b>${st.kind === 'door' ? '⛩ Bước vào' : '⛩ Ra khỏi'} ${esc(st.name)}</b><span>${st.kind === 'door' ? 'Khói trầm thoang thoảng, nến lung linh…' : 'Trở lại ngoài trời'}</span></div>`;
     ($('hq-canvas')?.closest('.hq-root') || document.body).appendChild(ov);
     requestAnimationFrame(() => ov.classList.add('on'));
-    setTimeout(() => { player.x = st.to.x; player.y = st.to.y; player.path = []; target = null; player.face = 'up'; }, 500);
+    setTimeout(() => { player.x = st.to.x; player.y = st.to.y; player.path = []; target = null; player.face = 'up'; net.tp(st.to.x, st.to.y); }, 500);
     setTimeout(() => ov.classList.remove('on'), 1000);
     setTimeout(() => ov.remove(), 1600);
     buzz('light');
@@ -255,7 +308,7 @@ export function startGame({ onExit = null } = {}) {
   function teleportTo(st) {
     if (player.sitting) return;
     if (player.flying && st.room) setFlying(false);
-    const go = () => { player.x = st.spot.x; player.y = st.spot.y; player.path = []; target = null; player.face = 'up'; };
+    const go = () => { player.x = st.spot.x; player.y = st.spot.y; player.path = []; target = null; player.face = 'up'; net.tp(st.spot.x, st.spot.y); };
     // sảnh nghề ngoài thế giới: đi trạm (xe ngựa / đò) — màn chuyển ngắn rồi mới mở án
     if (st.world && !reduced) {
       const ov = document.createElement('div');
@@ -318,7 +371,13 @@ export function startGame({ onExit = null } = {}) {
   const onKeyUp = (e) => { if (e.code === 'Space') altCtl.up = false; if (e.code === 'KeyC') altCtl.down = false; if (KEYMAP[e.code]) keys.delete(KEYMAP[e.code]); };
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
-  window.addEventListener('blur', () => keys.clear());
+  // mất focus → thả mọi phím đang giữ (kể cả độ cao khi bay) và cent joystick về 0, không trôi người
+  window.addEventListener('blur', () => {
+    keys.clear();
+    altCtl.up = altCtl.down = false;
+    stick.x = stick.y = 0;
+    knob.style.transform = '';
+  });
 
   // Joystick ảo (chỉ hiện trên màn cảm ứng — CSS). Kéo trong bán kính 46px.
   const stickEl = $('hq-stick');
@@ -497,6 +556,7 @@ export function startGame({ onExit = null } = {}) {
       masterBubble,
       selfEmote,
       giatri: unlockedList(state),
+      cos: cosNow(),
       cases: [0, 1, 2].map((i) => ({ id: `an${i}`, npc: todayNpc(i), done: S.caseDone(state, i) })),
     }, dt);
     raf = requestAnimationFrame(loop);
@@ -541,6 +601,7 @@ export function startGame({ onExit = null } = {}) {
   };
 
   $('hq-book').onclick = () => panel.open({ title: TEXT.book, body: openBook(api) });
+  $('hq-wardrobe').onclick = () => panel.open({ title: 'Tàng Y Các', body: wardrobeBody(api) });
 
   // Giao lưu: cử chỉ + cụm từ soạn sẵn (không có chat tự do)
   function showSelf(text, e = null) { selfBubble = { text, until: performance.now() + 3800 }; if (e) selfEmote = { e, at: performance.now() }; }
@@ -635,6 +696,7 @@ export function startGame({ onExit = null } = {}) {
     if (!renderer) {
       $('hq-loading').hidden = false;
       renderer = await createScene();
+      syncRooms();
       $('hq-loading').hidden = true;
       $('hq-game').classList.toggle('is3d', renderer.mode === '3d');
     }
@@ -747,7 +809,7 @@ export function startGame({ onExit = null } = {}) {
         if (!state.profiles.some(same)) S.addProfile(state, { label: 'Bản thân', year: birth.y, month: birth.m, day: birth.d, hour: nohour ? null : birth.h, minute: nohour ? null : birth.mi, gender });
         save();
         updateHud();
-        enter();
+        enter().then(() => syncRooms()); // lá số mới → khắc lại biển 9 cổng + bia + đèn 3D (lần đầu enter() đã tự sync)
         toast(`Phẩm phục ${WX_NAMES[y.primary]} đã mặc. Thầy đang ngồi ở Chính Đường.`);
       };
     };
@@ -757,8 +819,10 @@ export function startGame({ onExit = null } = {}) {
   showGate();
   lockPortrait(true);
 
-  // Cho kiểm thử tự động (Playwright) — không dùng trong game.
-  window.__hq = { state, player, stick, altCtl, net, openStation, walkTo, STATIONS, blockedAt, findPath, get renderer() { return renderer; } };
+  // Cho kiểm thử tự động (Playwright) — chỉ bản dev; bản đóng gói không phơi đối tượng này.
+  if (import.meta.env && import.meta.env.DEV) {
+    window.__hq = { state, player, stick, altCtl, net, openStation, walkTo, STATIONS, blockedAt, findPath, get renderer() { return renderer; } };
+  }
 
   return { pause, resume, exit };
 }

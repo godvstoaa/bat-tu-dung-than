@@ -1,8 +1,12 @@
 // ============================================================================
-//  THẦY GIẢI QUẺ (docs/GAME-V2-THIET-KE.md §S6) — 5 phép của trang chính, cùng engine:
+//  THẦY GIẢI QUẺ (docs/GAME-V2-THIET-KE.md §S6 + docs/GAME-THIET-KE-CHOT.md P0-1)
+//  — 5 phép của trang chính, cùng engine:
 //    Mai Hoa Dịch Số (theo giờ / theo 2 số) · Lục Hào (gieo 3 xu × 6) · Tiểu Lục Nhâm ·
 //    Kim Khẩu Quyết · Xin xăm (kèm xin keo âm dương).
-//  Chỉ bản web (FEATURES.divination) — iOS tắt như app chính. Tải lười từ stations.js.
+//  «Đường Thầy» — 3 tab nội dung mới (FILE NÀY CHỈ RENDER, logic ở 3 module thuần):
+//    Án cổ (gu-gongan.js) · Năm hạn của bạn (namhan.js, cần lá số R) · Chọn kinh (kinh-tu.js).
+//  Chỉ bản web (FEATURES.divination) — iOS tắt như app chính (features.js IOS_OFF gồm 'que').
+//  Tải lười từ stations.js.
 // ============================================================================
 import { Solar } from 'lunar-javascript';
 import { castByTime, castByNumbers, solarToMhNums, TRIGRAMS } from '../engine/meihua.js';
@@ -78,16 +82,103 @@ function xamHtml(f) {
     <p class="hq-que-verdict">→ ${esc(f.summary)}</p></div>`;
 }
 
+// ---------------------------------------------------------------------------
+// Đường Thầy — 3 tab mới (P0-1). CHỈ RENDER: chọn án/chấm điểm/map ngôn ngữ đều
+// nằm trong gu-gongan.js · namhan.js · kinh-tu.js; các hàm dưới chỉ dựng chuỗi DOM.
+// ---------------------------------------------------------------------------
+const todayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const CMP_MARK = (m) => (m === true ? '✓ khớp' : m === false ? '✗ khác' : '—');
+
+function gonganPanelHtml(g) {
+  return `<div class="hq-que-res">
+    <p class="hq-que-hex"><span class="hq-han">古案 · ${esc(g.person)}</span></p>
+    <p>Tứ trụ: <span class="hq-han">${esc(g.pillarsText)}</span></p>
+    <p class="hq-sub">Nguồn: ${esc(g.source)}</p>
+    ${g.note ? `<p class="hq-sub">${esc(g.note)}</p>` : ''}
+    <p class="hq-sub">Đoán trước khi đọc phán — ${g.total} bước, mỗi bước 1 điểm.</p>
+    <div data-role="quiz"></div></div>`;
+}
+
+function compareHtml(g) {
+  const c = g.compare;
+  const axis = (name, classic, engine, m) =>
+    `<li>• ${name}: cổ pháp «${esc(classic)}» · engine «${esc(engine)}» → <b>${CMP_MARK(m)}</b></li>`;
+  const yongRow = c.axes.yong.match === null
+    ? `<li>• Hành dụng: cổ pháp tranh cãi, không chốt · engine «${esc(c.engine.yong)}» → —</li>`
+    : axis('Hành dụng', c.classic.yong, c.engine.yong, c.axes.yong.match);
+  const geRow = c.axes.ge.match === null
+    ? `<li>• Cách cục: cổ pháp không chốt · engine «${esc(c.engine.ge)}» → —</li>`
+    : axis('Cách cục', c.classic.ge, c.engine.ge, c.axes.ge.match);
+  return `<div data-role="cmp"><p><b>Đối chiếu hai phán</b></p>
+    <p class="hq-han sm hq-quote">${esc(c.classic.verdict)}</p>
+    <p class="hq-sub">Nguyên lý cổ: ${esc(c.classic.principle)}</p>
+    <p class="hq-sub">Người trong án: ${esc(c.classic.person)} · nguồn: ${esc(c.classic.source)}</p>
+    <ul class="hq-plain">${axis('Thân vượng/nhược', c.classic.strength, c.engine.strength, c.axes.strength.match)}${yongRow}${geRow}</ul>
+    <p class="hq-note">${esc(c.note)}</p></div>`;
+}
+
+function wireGonganQuiz(out, g, mod) {
+  const quiz = out.querySelector('[data-role=quiz]');
+  const answers = {};
+  let i = 0;
+  const finish = () => {
+    const gr = mod.gradeGongan(g, answers); // luật chấm nằm trong gu-gongan.js — UI chỉ render X/n
+    quiz.innerHTML = `<p class="hq-que-verdict">Đoán của bạn: <b>${gr.score}/${gr.total}</b> — chấm ngay trong panel, không ghi ra sổ điểm.</p>
+      ${compareHtml(g)}
+      <div class="hq-actions"><button class="hq-btn" data-a="ghep" type="button">Bước 4 — bắt phán ghép (bài tập vạch mặt)</button></div>`;
+    quiz.querySelector('[data-a=ghep]').onclick = () => {
+      quiz.insertAdjacentHTML('beforeend', `<p><b>Thầy đọc lại «phán» cho án trên:</b></p><p class="hq-quote hq-han sm">${esc(g.fake.verdict)}</p>
+        <p><b>Vạch mặt:</b> ${esc(g.fake.reveal)}</p><p class="hq-note">${esc(g.fake.lesson)}</p>`);
+      buzz('medium');
+    };
+  };
+  const next = () => {
+    if (i >= g.steps.length) { finish(); return; }
+    const st = g.steps[i];
+    quiz.innerHTML = `<p><b>Bước ${i + 1}/${g.total}:</b> ${esc(st.prompt)}</p>
+      <div class="hq-actions">${st.options.map((o) => `<button class="hq-btn" data-o="${esc(o)}" type="button">${esc(o)}</button>`).join('')}</div>`;
+    quiz.querySelectorAll('button[data-o]').forEach((b) => {
+      b.onclick = () => { answers[st.key] = b.dataset.o; i += 1; buzz('light'); next(); };
+    });
+  };
+  next();
+}
+
+function namhanHtml(nh) {
+  const dy = nh.dayun
+    ? `<p><b>Đại vận đang đi:</b> ${esc(nh.dayun.vi)}</p>
+       ${nh.godDecade ? `<p class="hq-sub">Chủ đề thập niên — <b>${esc(nh.godDecade.godVi)}</b>: ${esc(nh.godDecade.theme)}. ${esc(nh.godDecade.detail)}</p>` : ''}`
+    : '<p class="hq-sub">Chưa vào đại vận đầu — giai đoạn nền tảng tuổi nhỏ, chưa luận năm hạn.</p>';
+  const toneCls = (t) => (t === 'thuan' ? 'good' : t === 'thu' ? 'bad' : 'mid');
+  const yrs = nh.years.map((y) => `<li>• Năm ${y.year} <span class="hq-han">${esc(y.ganZhi)}</span> — <span class="hq-luck ${toneCls(y.soft.tone)}">${esc(y.soft.text)}</span>
+    <details><summary>tra cứu kỹ thuật</summary><p class="hq-sub">Chấm ${y.score}/100 (${esc(y.rating)}) · can năm ${esc(y.ganGod || '?')}</p><p>${esc(y.deep)}</p></details></li>`).join('');
+  return `<div class="hq-que-res"><p class="hq-que-hex">Năm hạn của bạn</p>${dy}
+    <ul class="hq-plain">${yrs}</ul>
+    <p class="hq-quote">${esc(nh.advice)}</p>
+    <p class="hq-note">Ngày sinh của bạn chỉ nằm trên máy, không rời khỏi thiết bị.</p></div>`;
+}
+
+function kinhHtml(kt) {
+  const list = kt.kinh.map((k) => `<li>• <b>${esc(k.name_vi)}</b>${k.han ? ` <span class="hq-han sm">${esc(k.han)}</span>` : ''}<br><span class="hq-sub">${esc(k.notes)}</span><br>${esc(k.essence)}</li>`).join('');
+  return `<div class="hq-que-res"><p class="hq-que-hex">Chọn kinh tu</p>
+    ${kt.kinh.length ? `<ul class="hq-plain">${list}</ul>` : '<p class="hq-sub">Chưa gợi được kinh — thử thêm việc đang hỏi.</p>'}
+    ${kt.yongAdvice ? `<p>${esc(kt.yongAdvice)}</p>` : ''}
+    ${kt.chartAdvice ? `<p>${esc(kt.chartAdvice)}</p>` : ''}
+    ${kt.amtaAdvice ? `<p>${esc(kt.amtaAdvice)}</p>` : ''}
+    <p class="hq-note">Kinh để tham khảo, chiêm nghiệm — đọc chậm, đừng vội.</p></div>`;
+}
+
 /**
  * Bàn Thầy Giải Quẻ.
  * @param api  game api (panel, toast, state…)
  * @param opts.R  lá số người hỏi (để Thầy AI luận thêm)
  */
 export function queBody(api, { R = null, who = 'Bạn' } = {}) {
-  const TABS = [['meihua', 'Mai Hoa'], ['liuyao', 'Lục Hào'], ['xlr', 'Lục Nhâm'], ['jk', 'Kim Khẩu'], ['xam', 'Xin xăm']];
+  const TABS = [['meihua', 'Mai Hoa'], ['liuyao', 'Lục Hào'], ['xlr', 'Lục Nhâm'], ['jk', 'Kim Khẩu'], ['xam', 'Xin xăm'], ['gongan', 'Án cổ'], ['kinh', 'Chọn kinh']];
+  if (R) TABS.push(['namhan', 'Năm hạn của bạn']); // chỉ hiện khi đã lập lá số (stations.js truyền sẵn R)
   const root = el(`<div class="hq-que">
     <p class="hq-sub">Thầy vuốt râu: «Tâm thành thì quẻ linh. Hỏi việc gì, cứ nói.»</p>
-    <div class="hq-tabs" role="tablist">${TABS.map(([k, l], i) => `<button type="button" role="tab" class="hq-tab${i ? '' : ' on'}" data-k="${k}">${l}</button>`).join('')}</div>
+    <div class="hq-que-tabs" role="tablist">${TABS.map(([k, l], i) => `<button type="button" role="tab" class="hq-que-tab${i ? '' : ' on'}" data-k="${k}">${l}</button>`).join('')}</div>
     <label>Việc muốn hỏi <input class="hq-input" name="q" maxlength="120" placeholder="vd: tháng này đổi việc có nên không?"></label>
     <div data-role="form"></div>
     <div data-role="out"></div>
@@ -106,7 +197,7 @@ export function queBody(api, { R = null, who = 'Bạn' } = {}) {
   };
 
   function renderForm() {
-    root.querySelectorAll('.hq-tab').forEach((b) => b.classList.toggle('on', b.dataset.k === tab));
+    root.querySelectorAll('.hq-que-tab').forEach((b) => b.classList.toggle('on', b.dataset.k === tab));
     $('out').innerHTML = '';
     const f = $('form');
     if (tab === 'meihua') {
@@ -158,6 +249,36 @@ export function queBody(api, { R = null, who = 'Bạn' } = {}) {
           show(`<div class="hq-que-res hq-jk">${renderJinkoujueCard(r)}</div>`, `Kim Khẩu Quyết lập khóa giờ ${l.getTimeZhi()}.`);
         } catch (e) { api.toast(e.message || 'Chưa lập được khóa.'); }
       };
+    } else if (tab === 'gongan') {
+      const today = todayKey();
+      f.innerHTML = `<p class="hq-sub">Mỗi ngày một án cổ nguyên văn: tự đoán 2–3 bước, rồi đối chiếu phán cổ với engine tự tiêu.</p>
+        <div class="hq-actions"><button class="hq-btn hq-primary" data-a="go" type="button">Mở án cổ hôm nay</button></div>`;
+      f.querySelector('[data-a=go]').onclick = () => {
+        import('./gu-gongan.js').then((m) => {
+          const g = m.buildGongan(`${who}|${today}`, today);
+          show(gonganPanelHtml(g), `Án cổ ${g.person} — tứ trụ ${g.pillarsText}; tự đoán ${g.total} bước rồi đối chiếu hai phán.`);
+          wireGonganQuiz($('out'), g, m);
+        });
+      };
+    } else if (tab === 'namhan') {
+      f.innerHTML = `<p class="hq-sub">Năm hạn theo lá số của chính bạn — đại vận đang đi và 5 năm tới. Dữ liệu chỉ nằm trên máy.</p>
+        <div class="hq-actions"><button class="hq-btn hq-primary" data-a="go" type="button">Xem đại vận &amp; 5 năm tới</button></div>`;
+      f.querySelector('[data-a=go]').onclick = () => {
+        import('./namhan.js').then((m) => {
+          const nh = m.buildNamHan(R, new Date().getFullYear());
+          const nThuan = nh.years.filter((y) => y.soft.tone === 'thuan').length;
+          show(namhanHtml(nh), `Năm hạn của bạn: ${nh.dayun ? nh.dayun.vi + '.' : 'chưa vào đại vận.'} 5 năm tới có ${nThuan} năm thuận.`);
+        });
+      };
+    } else if (tab === 'kinh') {
+      f.innerHTML = `<p class="hq-sub">Đạo Tạng gợi kinh theo Dụng thần của bạn (nếu đã lập số) và việc đang hỏi.</p>
+        <div class="hq-actions"><button class="hq-btn hq-primary" data-a="go" type="button">Gợi kinh tu</button></div>`;
+      f.querySelector('[data-a=go]').onclick = () => {
+        import('./kinh-tu.js').then((m) => {
+          const kt = m.kinhTu(R, root.querySelector('[name=q]').value);
+          show(kinhHtml(kt), `Chọn kinh: ${kt.kinh.length} kinh gợi ý${kt.yongAdvice ? ' theo Dụng thần' : ''}${kt.chartAdvice ? ' và theo cách cục' : ''}.`);
+        });
+      };
     } else {
       f.innerHTML = `<p class="hq-sub">Quỳ trước điện, lắc ống xăm cho tới khi một thẻ rơi ra.</p><div class="hq-actions"><button class="hq-btn hq-primary" data-a="go" type="button">Lắc ống xăm</button></div>`;
       f.querySelector('[data-a=go]').onclick = () => {
@@ -170,7 +291,7 @@ export function queBody(api, { R = null, who = 'Bạn' } = {}) {
       };
     }
   }
-  root.querySelector('.hq-tabs').addEventListener('click', (e) => { const b = e.target.closest('.hq-tab'); if (b) { tab = b.dataset.k; renderForm(); } });
+  root.querySelector('.hq-que-tabs').addEventListener('click', (e) => { const b = e.target.closest('.hq-que-tab'); if (b) { tab = b.dataset.k; renderForm(); } });
   renderForm();
   return root;
 }

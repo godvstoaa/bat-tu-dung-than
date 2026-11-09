@@ -59,7 +59,7 @@ export function prevDay(dateStr) {
 }
 
 function freshDaily(date) {
-  return { date, got: {}, teaMin: 0, sticks: 0, chartIds: [] };
+  return { date, got: {}, teaMin: 0, sticks: 0, stickTries: 0, caseGain: 0, chartIds: [] };
 }
 
 export function createState(now = new Date()) {
@@ -86,6 +86,8 @@ export function createState(now = new Date()) {
     deskLog: {},
     xp: 0,          // Phúc Khí tích lũy cả đời (cấp)
     vip: null,      // { until, source } — quyền lợi VIP
+    thaitue: null,  // { year, day, days } — đèn an Thái Tuế (lightLamp)
+    wardrobe: null, // Tàng Y Các: { owned, equipped, ngoc, checkin, bonus } — cosmetics.js
   };
 }
 
@@ -156,17 +158,29 @@ export function grantDaily(s, key, now = new Date()) {
   return addPhuc(s, REWARD[key] || 0);
 }
 
-// Lập lá số: +10 cho mỗi hồ sơ, chỉ lần đầu (đời hồ sơ), không theo ngày.
+// Khóa sinh hồ sơ «năm-tháng-ngày-giờ-phút-giới tính» — thưởng lá số gắn với bát tự,
+// không với id hồ sơ: xoá rồi tạo lại cùng người không được +10 lần hai.
+export function chartBirthKey(p) {
+  return `${p.year}-${p.month}-${p.day}-${p.hour}-${p.minute}-${p.gender}`;
+}
+
+// Lập lá số: +10 cho mỗi hồ sơ, chỉ lần đầu (đời hồ sơ theo khóa sinh), không theo ngày.
+// Bản cũ lưu id hồ sơ trong flags.chartRewarded — id đã có trong danh sách thì vẫn tôn trọng.
 export function grantChart(s, profileId) {
   s.flags.chartRewarded = s.flags.chartRewarded || [];
-  if (s.flags.chartRewarded.includes(profileId)) return 0;
-  s.flags.chartRewarded.push(profileId);
+  if (s.flags.chartRewarded.includes(profileId)) return 0; // id bản cũ đã thưởng
+  const p = s.profiles.find((x) => x.id === profileId);
+  const k = p ? chartBirthKey(p) : profileId; // không tìm thấy hồ sơ → dùng chính id làm khóa
+  if (s.flags.chartRewarded.includes(k)) return 0;
+  s.flags.chartRewarded.push(k);
   return addPhuc(s, REWARD.chart);
 }
 
 export function sticksLeft(s, now = new Date()) {
   rollDay(s, now);
-  return Math.max(0, CAPS.sticksPerDay - s.daily.sticks);
+  // keo bị thần từ chối cũng lấy một lượt: đếm cả stickTries, không chỉ thẻ đã nhận
+  const used = Math.max(s.daily.sticks, s.daily.stickTries || 0);
+  return Math.max(0, CAPS.sticksPerDay - used);
 }
 
 export function recordStick(s, entry, now = new Date()) {
@@ -174,6 +188,7 @@ export function recordStick(s, entry, now = new Date()) {
   const at = now.getTime();
   s.sticks.unshift({ ...entry, at });
   s.sticks.length = Math.min(s.sticks.length, CAPS.keepSticks);
+  s.daily.stickTries = (s.daily.stickTries || 0) + 1; // mỗi lần xin keo tốn một lượt
   if (!entry.accepted) return 0;
   if (s.daily.sticks >= CAPS.sticksPerDay) return 0;
   s.daily.sticks += 1;
@@ -186,7 +201,7 @@ export function addTeaMinutes(s, minutes, now = new Date()) {
   if (!m) return 0;
   s.tea.totalMin += m;
   const room = Math.max(0, CAPS.teaPerDay - s.daily.teaMin);
-  s.daily.teaMin += m;
+  s.daily.teaMin = Math.min(CAPS.teaPerDay, s.daily.teaMin + m); // kẹp ở trần, không cộng tràn
   return addPhuc(s, Math.min(room, m));
 }
 
@@ -283,6 +298,23 @@ export function removeProfile(s, id) {
 // ---------------------------------------------------------------------------
 export const CASES_PER_DAY = 3;
 export const CASE_REWARD = { npcMax: 15, classical: 25 };
+// Trần thưởng án mỗi ngày (npc + cổ + nghề gộp chung): điểm do phía khách tự tính,
+// chặn cứng ở state để không farm được — cap ~60.
+export const CASE_GAIN_CAP = 60;
+
+// Thái Tuế Điện: mỗi năm (can chi) một ngọn đèn an Thái Tuế — thắp lần đầu +10, mỗi ngày thêm dầu +3.
+export const LAMP_REWARD = { first: 10, daily: 3 };
+export function lampState(s, year, now = new Date()) {
+  const L = s.thaitue || {};
+  const lit = L.year === year;
+  return { lit, days: lit ? L.days || 0 : 0, today: lit && L.day === todayStr(now) };
+}
+export function lightLamp(s, year, now = new Date()) {
+  const st = lampState(s, year, now);
+  if (st.today) return 0;
+  s.thaitue = { year, day: todayStr(now), days: st.days + 1 };
+  return addPhuc(s, st.lit ? LAMP_REWARD.daily : LAMP_REWARD.first);
+}
 
 // Sảnh nghề (Trạch Nhật, …): 1 khách/sảnh/ngày; thông thạo = 30 án gần nhất mỗi nghề
 export const DESK_REWARD = 15;
@@ -325,7 +357,14 @@ export function recordCase(s, { kind, slot, id, name, total, mastery }, now = ne
     if (prev < 0.6 && total >= 0.6) gained = CASE_REWARD.classical;
     s.classical[id] = Math.max(prev, total);
   }
-  s.phucKhi += gained;
-  s.xp = (s.xp || 0) + gained;
-  return gained;
+  // «Hợp mệnh»: mặc đủ bộ ngũ hành trùng Dụng thần → +10% (cosmetics.js › setBonus)
+  if (gained > 0 && s.wardrobe?.bonus) gained = Math.round(gained * (1 + s.wardrobe.bonus));
+  // trần thưởng án mỗi ngày: vượt cap thì chỉ nhận phần còn thừa (reset theo daily)
+  if (gained > 0) {
+    s.daily.caseGain = s.daily.caseGain || 0;
+    const room = Math.max(0, CASE_GAIN_CAP - s.daily.caseGain);
+    gained = Math.min(gained, room);
+    s.daily.caseGain += gained;
+  }
+  return addPhuc(s, gained);
 }

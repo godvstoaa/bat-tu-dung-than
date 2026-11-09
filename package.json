@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node selftest.mjs",
-    "test:game": "node scripts/test-game-state.mjs && node scripts/test-game-zheri.mjs && node scripts/test-game-dz.mjs && node scripts/test-game-halls.mjs && node scripts/test-game-progress.mjs",
+    "test:game": "node scripts/test-game-state.mjs && node scripts/test-game-zheri.mjs && node scripts/test-game-dz.mjs && node scripts/test-game-halls.mjs && node scripts/test-game-progress.mjs && node scripts/test-game-vanmenh.mjs && node scripts/test-game-cosmetics.mjs",
     "test:mmo": "node scripts/test-quan-protocol.mjs && node scripts/test-quan-mmo.mjs",
     "dev:mmo": "node scripts/dev-mmo.mjs",
     "accuracy": "node scripts/classical-accuracy.mjs",

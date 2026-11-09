@@ -1,0 +1,183 @@
+{
+  "id": "attached-levine-heller",
+  "title": "Attached: The New Science of Adult Attachment and How It Can Help You Find—and Keep—Love",
+  "author": "Amir Levine & Rachel Heller",
+  "why": "Sách chuyển lý thuyết gắn bó của Bowlby–Ainsworth thành nền tảng khoa học về gắn bó người trưởng thành: ba kiểu an toàn/lo âu/né tránh với cơ chế sinh học rõ (hệ thống gắn bó, điểm tựa an toàn, chiến lược kích hoạt/tắt), phủ từ chẩn đoán kiểu, bẫy lo âu–né tránh, đến giao tiếp, xung đột và chia tay. Với app bói toán, corpus này giúp AI luận mệnh bằng cơ chế hành vi kiểm chứng được thay vì câu Barnum, và biến lời khuyên duyên/sự nghiệp thành điều kiện cụ thể 'nếu thấy X thì làm Y'. Nguồn web phủ đủ 12 chương cộng mở đầu (SuperSummary, ReadingGraphics, Summarize, review Kim Tasso, nghiên cứu gốc được dẫn trong sách); riêng chương 9 và phần phụ lục ít được tóm tắt chi tiết nên các điểm từ đó là tổng hợp nhiều nguồn chắc chắn; sách không phủ kiểu disorganized/fearful-avoidant nên AI không nên gán nhãn kiểu này khi dùng corpus.",
+  "points": [
+    {
+      "title": "Hệ thống gắn bó là cơ chế sinh học, không phải sở thích",
+      "source": "Mở đầu & Chương 1 — Có khoa học cho sự thân mật không?",
+      "principle": "Levine và Heller lập luận nhu cầu gần gũi trong tình yêu là một hệ thống sinh học do tiến hoá dựng lên, giống nhu cầu ăn uống: khi cảm thấy nguy hiểm hay thiếu liên kết, hệ thống gắn bó tự động kích hoạt để tìm sự gần gũi. Cách hệ thống này phản ứng với thân mật — tìm gần hay né xa — chính là thứ quyết định kiểu gắn bó của mỗi người.",
+      "appHook": "Khi luận tính cách qua thập thần hay lục thân, AI nên nói về nhu cầu gần gũi như nhu cầu cố hữu có cơ chế, tránh kiểu câu 'bạn cần được yêu thương' áp đặt chung chung. Mỗi câu luận phải chốt được chuỗi cơ chế: nguy hiểm cảm nhận → hệ thống kích hoạt → hành vi tìm gần hay né xa.",
+      "tag": "personality"
+    },
+    {
+      "title": "Nghịch lý phụ thuộc: dựa dẫm đúng cách làm người ta độc lập hơn",
+      "source": "Chương 2 — Phụ thuộc không phải từ ngữ xấu",
+      "principle": "Từ các nghiên cứu trẻ em thiếu người chăm sóc vẫn phát triển bất thường dù đủ ăn đủ uống, sách kết luận phụ thuộc là thực tế của con người chứ không phải lựa chọn. Khi nhu cầu gắn bó được đáp ứng chu đáo và ổn định, người ta lại tự tin, chủ động hơn trong thế giới bên ngoài; tưởng tự lập tuyệt đối thường chỉ là chiến lược né tránh ngụy trang.",
+      "appHook": "Khi luận mệnh ra mẫu 'độc lập quá mức, không cần ai' (ví dụ đọc cung tài hay móc mệnh mang tính tự xoay xở), AI phải cảnh báo đó có thể là né tránh chứ không phải sức mạnh; lời khuyên vận trình nên hướng khách xây một đến hai điểm tựa ổn định thay vì cứ cổ vũ tự chịu đựng một mình.",
+      "tag": "social"
+    },
+    {
+      "title": "Đối tác là điểm tựa an toàn để khám phá thế giới",
+      "source": "Chương 2 & Chương 7 — Điểm tựa và kiểu an toàn",
+      "principle": "Thí nghiệm Tình huống lạ của Ainsworth cho thấy trẻ chỉ dám khám phá khi người mẹ có mặt; người lớn cũng vậy — có một chỗ neo tin cậy thì mới dám thử thách ngoài kia, khái niệm Bowlby gọi là điểm tựa an toàn. Sách dùng điều này để giải thích vì sao quan hệ bền giúp cả hai thi đấu tốt hơn ở công việc, sức khỏe và hiệu năng chung.",
+      "appHook": "Trong luận sự nghiệp: nếu khách ở giai đoạn muốn bứt phá nhưng quan hệ tình cảm đang rối loạn, AI nên chỉ ra mối quan hệ bất ổn sẽ hút phần năng lượng khám phá; lời khuyên vận trình năm đó là củng cố điểm tựa trước khi mở rộng, chứ không phải cứ phóng đi.",
+      "tag": "social"
+    },
+    {
+      "title": "Quan hệ chất lượng điều hoà sinh lý: huyết áp, tim mạch, hoóc môn",
+      "source": "Chương 2 — Phụ thuộc không phải từ ngữ xấu",
+      "principle": "Sách dẫn bằng chứng người thân thiết thực sự điều chỉnh sinh lý cho nhau: huyết áp, nhịp tim và hoóc môn giảm áp lực đều đo được khi có người gắn bó tốt bên cạnh. Ngược lại, quan hệ chất lượng kém làm các chỉ số này xấu đi, nên chất lượng tình cảm là biến số sức khỏe thật chứ không phải chuyện mềm.",
+      "appHook": "Khi luận sức khỏe theo cung tử vi hay ngày xấu của can chi, AI nên gắn phần sức khỏe tinh thần với chất lượng quan hệ gắn bó cụ thể (có người điều hoà hay đang cô lập) thay vì chỉ khuyên 'giữ bình tâm' kiểu chung chung không đo được.",
+      "tag": "stress"
+    },
+    {
+      "title": "Ba kiểu gắn bó đo bằng hai trục: lo âu và né tránh",
+      "source": "Chương 3 — Kiểu gắn bó của tôi là gì?",
+      "principle": "Nghiên cứu hiện đại đo gắn bó bằng hai chiều độc lập: mức lo âu (sợ bị bỏ rơi, ám ảnh về quan hệ) và mức né tránh (ngại thân mật, ngại dựa dẫm). Phối hợp hai trục cho ba kiểu chính: an toàn (cả hai thấp), lo âu (lo âu cao – né tránh thấp), né tránh (lo âu thấp – né tránh cao); đo kiểu bằng bảng hỏi chuẩn cho kết quả nhất quán hơn nhiều so với tự chẩn đoán theo cảm tính.",
+      "appHook": "AI luận tính cách nên tổ chức nhận diện khách theo hai trục này — hỏi hành vi cụ thể (phản ứng khi bị im lặng, khi xa nhau) thay vì dán nhãn theo cung hay lục thân một chiều. Đây là khuôn khổ giúp câu luận có cấu trúc cơ chế, thoát khỏi câu Barnum ai đọc cũng thấy hợp.",
+      "tag": "personality"
+    },
+    {
+      "title": "Phân bố dân số và độ bền của kiểu gắn bó",
+      "source": "Chương 3 — Kiểu gắn bó của tôi là gì?",
+      "principle": "Khoảng một nửa người trưởng thành thuộc kiểu an toàn, khoảng 20% kiểu lo âu và 25% kiểu né tránh; khoảng 70–75% giữ nguyên kiểu qua thời gian, nghĩa là khoảng một phần tư có thể đổi kiểu nhờ trải nghiệm và đối tác mới. Sách nhấn mạnh kiểu gắn bó tương đối ổn định nhưng không phải án tử cố định.",
+      "appHook": "Khi khách hỏi 'số mình có đổi được không' về tình duyên, AI có thể dẫn con số này để trấn an: rủi ro kiểu lo âu hay né tránh là xu hướng mạnh chứ không phải số mệnh đóng đinh; lời khuyên nên kèm mốc thời gian và điều kiện cụ thể để thay đổi.",
+      "tag": "personality"
+    },
+    {
+      "title": "Năm quy tắc vàng để đọc kiểu người khác",
+      "source": "Chương 4 — Giải mã kiểu của đối tác",
+      "principle": "Để đoán kiểu của người khác, sách đưa năm bước: xem người đó có tìm kiếm thân mật hay không; xem có ám ảnh về quan hệ và nhạy với bị từ chối hay không; không dựa vào một dấu hiệu đơn lẻ mà cần nhiều chứng cứ; xem họ phản ứng thế nào khi được nói nhu cầu thẳng; và chú ý cả những gì họ không nói, không làm.",
+      "appHook": "AI luận hợp duyên hay hợp tuổi nên từ chối suy đoán kiểu đối phương khi khách chỉ đưa thông tin mờ; dùng chính bộ quy tắc này để hỏi ngược vài chi tiết quan sát được trước khi kết luận 'hai người không hợp' — tránh đọc vận tình duyên dựa trên một cú giận duy nhất.",
+      "tag": "decision"
+    },
+    {
+      "title": "Cảm giác hoá học cuồn cuộn có thể là hệ thống lo âu bị kích hoạt",
+      "source": "Chương 1 & Chương 8 — Bẫy lo âu–né tránh",
+      "principle": "Sách chỉ ra người ta dễ nhầm cảm giác nôn nao không ổn định với tình yêu đúng người: chính sự chập chờn của đối tác kích hoạt hệ thống gắn bó và tạo cảm giác đam mê mãnh liệt. Người lo âu đặc biệt dễ bị hút vào người né tránh vì nhịp xa–gần đó trông như hoá học, trong khi kiểu an toàn bị đánh giá nhạt dù là lựa chọn bền nhất.",
+      "appHook": "Khi khách kể 'yêu như điện giật, gần gũi kiểu chập chờn khó hiểu', AI nên đưa giả thuyết nhầm hoá học này thay vì phù phép thành duyên kiếp gặp lại; lời khuyên là thử bài đo bằng thời gian với người làm mình ổn định trước khi tuyên duyên tốt hay xấu.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Radar sáu giác quan cho nguy hiểm của kiểu lo âu",
+      "source": "Chương 5 — Sống với giác quan thứ sáu cho nguy hiểm",
+      "principle": "Người lo âu có hệ thống cảnh báo siêu nhạy: đọc từng cử chỉ nhỏ của đối tác và phóng đại tín hiệu vô hại thành mối đe doạ bị bỏ lại. Cơ chế này không phải yếu đuối mà là hệ thống kích hoạt quá mức do lịch sử gắn bó, và nó khiến họ đòi sự trấn an liên tục dù chưa có mối đe doạ thật.",
+      "appHook": "Luận tính cách khách có dấu ám ảnh quan hệ (đọc lại tin nhắn nhiều lần, nghi ngờ vô căn cứ): AI nên giải thích bằng cơ chế radar nhạy chứ không phải chê 'đa nghi' hay hù hoạ hôn nhân; cách dùng là dạy khách phân biệt tín hiệu thật và tiếng ồn của hệ thống.",
+      "tag": "personality"
+    },
+    {
+      "title": "Hành vi phản kháng: gây cháy để giành lại sự gần gũi",
+      "source": "Chương 5 — Kiểu lo âu",
+      "principle": "Khi cảm thấy đối tác xa đi, người lo âu chạy các hành vi phản kháng định sẵn: nhắn gọi dồn dập, lảng tránh để trả đũa, ghi sổ so đo, dọa chia tay, tạo ghen. Đây là các mánh cố giành lại gần gũi nhưng thực tế đẩy đối tác xa hơn, tạo vòng xoáy tăng dần mà cả hai đều đốt kiệt sức.",
+      "appHook": "Lời khuyên tình duyên của AI cần gọi tên cụ thể từng hành vi phản kháng khi khách mô tả (nhắn dồn dập, dọa bỏ đi để xem phản ứng) thay vì khuyên chung 'bình tĩnh lại'; mỗi lần phát hiện một hành vi, kèm ngay kỹ thuật thay thế như chờ mười phút rồi nói nhu cầu bằng lời.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Tư duy khan hiếm giữ người lo âu ở lại quan hệ bất ổn",
+      "source": "Chương 5 — Kiểu lo âu",
+      "principle": "Sách giải thích người lo âu thường ở lại rất lâu trong quan hệ bất ổn vì tin rằng cơ hội gặp người tốt hiếm như trúng số, không ai khác sẽ xuất hiện. Niềm tin khan hiếm này khiến họ chịu đựng nhịp lo lắng mãn tính và nhầm sự có mặt của người kia với tình yêu đủ chất.",
+      "appHook": "Khi luận duyên thấy khách 'lâu rồi vẫn lẹt đẹt', AI nên soi niềm tin khan hiếm trước khi kết luận duyên xấu; lời khuyên vận trình nên kèm dữ kiện có nhiều cách gặp người mới để nới lỏng bẫy tư duy, không khuyến khích chấp nhận quan hệ làm lo lắng thêm.",
+      "tag": "decision"
+    },
+    {
+      "title": "Chiến lược tắt của kiểu né tránh",
+      "source": "Chương 6 — Giữ tình yêu trong tầm tay",
+      "principle": "Người né tránh tắt dần hệ thống gắn bó bằng các chiến lược quen thuộc: đổ lỗi điểm xấu của đối tác, nhắc người yêu cũ lý tưởng, tự nhủ bản thân chưa sẵn sàng cam kết, giữ khoảng cách vật lý, mãi hoá tự do độc lập. Cơ chế này làm họ trông tự chủ mà thực ra đang nén nhu cầu gần gũi của chính mình.",
+      "appHook": "Luận tính cách khách có dấu kiêng cam kết (mãi chưa kết hôn dù ổn, than bị giới hạn tự do): AI nên gọi tên từng chiến lược tắt cụ thể khách đang dùng và phân biệt với 'chưa gặp đúng người' — đây là chỗ câu luận về cung Phu Thê tránh sáo rỗng nhất.",
+      "tag": "personality"
+    },
+    {
+      "title": "Người yêu ma và ảo ảnh tri kỷ của người né tránh",
+      "source": "Chương 6 — Kiểu né tránh",
+      "principle": "Người né tránh thường trìu mến hơn với người yêu trong quá khứ (người yêu ma) hơn là người hiện tại, vì khoảng cách an toàn cho phép tưởng tượng; họ cũng ôm ảo ảnh tri kỷ — chờ người hoàn hảo để khi đó sự khó chịu với thân mật tự biến mất. Cả hai đều là mánh né tránh, không phải dữ kiện tình cảm thật.",
+      "appHook": "Khi khách than 'người yêu cũ vẫn trong tim' hoặc 'đợi đúng người tri kỷ', AI nên diễn giải đây có thể là cơ chế né tránh hơn là duyên nợ; khuyên khách kiểm chứng bằng cách xem người hiện tại có bị đánh giá xấu vô cớ so với một hình ảnh lý tưởng không.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Tình yêu là được làm nên, không phải được tìm thấy",
+      "source": "Chương 6 — Kiểu né tránh",
+      "principle": "Trái với bẫy ảo tri kỷ, sách khẳng định quan hệ tốt là sản phẩm được vun đắp hằng ngày chứ không phải món tìm thấy đã hoàn chỉnh. Người né tránh cần tự nhận trách nhiệm về chiến lược tắt của mình; người lo âu cần chấp nhận rằng quan hệ ổn định cảm giác nhạt ngay đầu là bình thường, không phải dấu hiệu duyên sai.",
+      "appHook": "Đây là nền cho lời khuyên vận trình tình duyên: thay vì nói 'năm nay có hay không có Duyên', AI nên chuyển khách từ tư duy tìm đúng người sang tư duy làm đúng quan hệ, kèm hai hành vi cụ thể theo kiểu gắn bó của khách.",
+      "tag": "advice"
+    },
+    {
+      "title": "Kiểu an toàn là dự báo tốt nhất cho hạnh phúc quan hệ",
+      "source": "Chương 7 — Sống gần gũi thoải mái",
+      "principle": "Trong các nghiên cứu về quan hệ, kiểu an toàn cho kết quả tích cực nhất: ít xung đột dữ dội, thông điệp rõ ràng, ít ghen và ít cô đơn trong lòng. Sách gọi đây là kiểu duy nhất giúp cả hai đều thoải mái, và là chỉ báo dự báo tốt hơn nhiều tiêu chí thường dùng để chọn người.",
+      "appHook": "Khi luận hợp duyên theo tuổi hay cung, AI nên nhấn mạnh tiêu chí cần đo là mức độ an toàn–gắn bó của cả hai người hơn là tương sinh tương khắc; một đối tác kiểu an toàn là điều kiện tốt hơn nhiều con số đẹp trên giấy.",
+      "tag": "personality"
+    },
+    {
+      "title": "Hiệu ứng đệm an toàn: một đối tác an toàn nâng cả hai",
+      "source": "Chương 7 — Kiểu an toàn",
+      "principle": "Sách dẫn bằng chứng rằng kết đôi với người an toàn làm cả hai an toàn hơn theo thời gian, và chỉ một người an toàn trong cặp cũng đủ kéo chất lượng quan hệ lên cao. Kèm cảnh báo: người an toàn vẫn có thể mắc kẹt trong quan hệ một chiều khi cứ cố gắng cứu người né tránh mãi mà không thấy đổi.",
+      "appHook": "Lời khuyên vận trình duyên nên xem việc chọn điểm tựa an toàn là quyết định chiến lược chứ không phải duyên may; với khách kiểu an toàn đang kiệt sức trong quan hệ một chiều, AI cần trao quyền rút ra thay vì tiếp tục cố gắng vô hạn.",
+      "tag": "social"
+    },
+    {
+      "title": "Bẫy lo âu–né tránh: ổn định trong không ổn định",
+      "source": "Chương 8 — Bẫy lo âu–né tránh",
+      "principle": "Cặp lo âu–né tránh tạo vòng xoáy tự củng cố: người lo âu đòi gần hơn, người né tránh rút xa hơn, mỗi bên đều xác nhận niềm tin tiêu cực của bên kia, tạo cơn lốc cảm xúc lặp lại mà sách gọi là ổn định trong không ổn định. Quan hệ này bám chặt và khó thoát vì mỗi nhịp sóng đều được đọc lại thành chứng cử cho niềm tin cũ.",
+      "appHook": "Khi luận duyên thấy vòng lặp cãi nhau–hoà lại–cãi nhau theo chu kỳ, AI nên nêu giả thuyết bẫy lo âu–né tránh thay vì đổ cho duyên xấu; yêu cầu khách xác định bên nào đòi gần, bên nào rút xa, và mỗi bên làm gì khi sóng lên để soi vòng xoáy cụ thể.",
+      "tag": "social"
+    },
+    {
+      "title": "Thoát bẫy: điều chỉnh cộng sinh thay vì biến đổi hoàn toàn",
+      "source": "Chương 9 — Thoát khỏi bẫy lo âu–né tránh",
+      "principle": "Sách không đòi người né tránh biến thành người lo âu hay ngược lại; giải pháp là điều chỉnh nhỏ song song: bên né tránh tạo khoảng cách một cách chủ động và có báo trước, bên lo âu học đòi nhu cầu bằng lời thay vì bằng hành vi phản kháng. Vòng xoáy chỉ thoát khi một bên đổi bước trước và bên kia ăn theo.",
+      "appHook": "Lời khuyên tình duyên nên có dạng bài tập hai chiều: khách làm X, đối tác làm Y, trong hai đến bốn tuần, rồi đánh giá lại. Câu 'vận tình duyên năm sau tốt hơn' chỉ đáng nói khi kèm điều kiện thay đổi hành vi này.",
+      "tag": "advice"
+    },
+    {
+      "title": "Lộ trình thay đổi cho người né tránh: nhận diện chiến lược trước",
+      "source": "Chương 9 — Thoát khỏi bẫy lo âu–né tránh",
+      "principle": "Bước đầu tiên của người né tránh muốn thay đổi là nhận diện được chính các chiến lược tắt của mình khi chúng chạy: gọi tên thời điểm muốn rút, cảm giác ngột ngạt, và lý do 'chưa sẵn sàng' tự nói với lòng. Sách nhấn mạnh sự tự quan sát này là điều kiện để bắt đầu hành vi khác, không phải để tự phạt bản thân vì có nhu cầu.",
+      "appHook": "Với khách có mẫu né tránh, AI nên giao nhiệm vụ quan sát bản thân (ghi lại mỗi lần muốn rút và lý do tự nói) thay vì chỉ khuyên 'mở lòng hơn'; đây là cách đưa lời khuyên mệnh về hành vi đo được, thoát câu cổ vũ Barnum.",
+      "tag": "habits"
+    },
+    {
+      "title": "Đau chia tay là sinh học, không phải yếu đuối ý chí",
+      "source": "Chương 10 — Hướng dẫn chia tay theo góc độ gắn bó",
+      "principle": "Hệ thống gắn bó đọc chia tay như mối đe doạ tồn tại; nghiên cứu não cho thấy đau khi mất người yêu dùng vùng tương tự vùng đau thể chất. Ký ức về khoảnh khắc tốt tràn về lấn át, khiến người chia tay tự trách là yếu đuối — sách xác nhận đây là phản ứng sinh học bình thường và cần kiên nhẫn cho cơ thể hạ nhiệt.",
+      "appHook": "Khi khách hỏi về bóng ma người cũ hay khó buông sau chia tay, AI nên giải thích bằng cơ chế sinh học để giảm tự trách; lời khuyên là đừng quyết định lớn về vận trình trong giai đoạn hệ thống còn kích hoạt mạnh, hẹn xem lại sau một đến ba tháng.",
+      "tag": "stress"
+    },
+    {
+      "title": "Người né tránh hồi phục nhanh — thường là nén, không phải lành",
+      "source": "Chương 10 — Hướng dẫn chia tay theo góc độ gắn bó",
+      "principle": "Sách mô tả hai mẫu phản ứng chia tay: người lo âu khủng hoảng lộ liễu rồi hồi phục dần; người né tránh trông bình tĩnh và nhanh chuyển sang người mới, nhưng đó là chiến lược tắt nén cảm xúc, không phải đã qua cơn đau. Vẻ ngoài bình thản vì vậy không phải bằng chứng đã vượt qua.",
+      "appHook": "Luận vận tình duyên sau chia tay cần phân biệt hai mẫu này: với khách bình thản lạ thường, AI nên nêu khả năng cảm xúc còn bị nén thay vì chúc 'đã qua cơn'; với khách khủng hoảng rõ, an ủi bằng cơ chế hồi phục của hệ thống gắn bó.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Chín chiến lược vượt qua chia tay theo nền tảng gắn bó",
+      "source": "Chương 10 — Hướng dẫn chia tay theo góc độ gắn bó",
+      "principle": "Sách đưa bộ công cụ vượt chia tay: dựng mạng lưới hỗ trợ, viết ra lý do rời đi để chống lại ký ức tốt tràn về, giữ nhịp sinh hoạt, cắt liên lạc trong giai đoạn đầu, cho phép mình khóc và đau. Mục tiêu là chống lại các tín hiệu kích hoạt tự động của hệ thống gắn bó sau mất mát.",
+      "appHook": "Lời khuyên vượt chia tay phải là danh sách hành vi cụ thể theo mô hình này, không phải câu 'cứ để thời gian chữa lành'; AI nên kèm điều kiện như viết lý do ra giấy ngay lần nhớ nhung đầu tiên và giao cho mạng hỗ trợ một vai trò rõ ràng.",
+      "tag": "habits"
+    },
+    {
+      "title": "Giao tiếp hiệu quả: nói nhu cầu thẳng, cụ thể",
+      "source": "Chương 11 — Giao tiếp hiệu quả",
+      "principle": "Nguyên tắc của chương: thông điệp mơ hồ cho nhiều cách hiểu còn thông điệp rõ chỉ có một nghĩa; người lo âu đặc biệt cần nói nhu cầu trực tiếp thay vì để hành vi phản kháng thay lời. Công thức gồm nói thật lòng, tập trung vào nhu cầu, nói cụ thể, không đổ lỗi, kiên quyết và không xin lỗi vì có nhu cầu.",
+      "appHook": "Lời khuyên tình duyên nên chuyển thành câu khách nói được ngay: 'khi X xảy ra, mình cần Y trong Z ngày', thay vì khuyên chung 'hiểu nhau hơn'; AI có thể viết thẳng mẫu câu này cho khách theo đúng tình huống khách kể.",
+      "tag": "advice"
+    },
+    {
+      "title": "Đo người qua phản ứng với lời nói thẳng",
+      "source": "Chương 11 — Giao tiếp hiệu quả",
+      "principle": "Cách người kia phản ứng khi bạn nói nhu cầu rõ ràng là tín hiệu đo năng lực thân mật của họ: người an toàn lắng nghe và điều chỉnh, người né tránh né tránh câu chuyện, người lo âu dễ cảm thấy bị chỉ trích. Lời nói thẳng vì vậy vừa là giải pháp vừa là công cụ thử nghiệm quan hệ.",
+      "appHook": "Khi khách hỏi 'có nên tiếp tục với người này', AI nên chuyển thành bài thử: nói một nhu cầu cụ thể rồi đọc kiểu người từ phản ứng, và so với bản luận mệnh ban đầu — biến câu luận duyên từ phán đoán sang kiểm chứng.",
+      "tag": "decision"
+    },
+    {
+      "title": "Năm nguyên tắc an toàn để xử lý xung đột",
+      "source": "Chương 12 — Năm nguyên tắc an toàn cho xung đột",
+      "principle": "Xung đột không phải bằng chứng quan hệ xấu — cách xử lý xung đột mới là điều quyết định. Năm nguyên tắc của người an toàn: lo cho sự ổn của đối phương trong tranh cãi, giữ vấn đề hiện tại không lan sang vét cũ, tránh khái quát hoá kiểu 'cậu luôn', bám vào vấn đề thật, và chủ động trao đổi nhu cầu ngay cả khi đang đau.",
+      "appHook": "Khi khách kể cuộc cãi vã, AI nên chấm theo năm nguyên tắc này (đánh dấu nguyên tắc nào bị phá) rồi chỉ điều chỉnh tương ứng; đây là khuôn đánh giá cụ thể thay vì kết luận chung 'hai người hay cãi nhau nên duyên bất ổn'.",
+      "tag": "advice"
+    }
+  ]
+}

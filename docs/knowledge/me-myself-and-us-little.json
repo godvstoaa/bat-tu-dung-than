@@ -1,0 +1,183 @@
+{
+  "id": "me-myself-and-us-little",
+  "title": "Me, Myself, and Us: The Science of Personality and the Art of Well-Being",
+  "author": "Brian R. Little",
+  "why": "Sách tổng hợp khoa học tính cách của Little (Cambridge, tác giả bài nói TED nổi tiếng): tính cách có ba tầng — bản chất sinh học, bản chất xã hội, và bản chất do dự án cá nhân tự chọn; con người vừa mang thiên hướng ổn định vừa có thể 'diễn khác mình' vì điều mình coi trọng, với chi phí phải bù đắp. Đắt giá cho app bói toán vì nó cho cơ chế cụ thể để luận tính cách theo ngày-giờ-tuổi mà không dán nhãn cứng, và chuyển luận mệnh sang khối lượng công việc thiết thực: lời khuyên sự nghiệp (khớp môi trường, đối tác thực thi), tình duyên (tính dễ chịu/trách nhiệm/trầm cảm tính trong cặp đôi), sức khỏe (cắn hại thật là hiềm khích chứ không phải bận rộn), và chống sáo rỗng Barnum bằng cách nêu 'giống tất cả / giống một số / không giống ai' kèm cơ chế. Nguồn trích: tóm tắt toàn sách (SuperSummary), ghi chú đọc chi tiết (Versatile Being), review Words Like Silver, Kirkus, và các kết quả tìm kiếm xác nhận từng chương; mục lục nguyên văn không lấy được từ thư viện (bị chặn) nên nhãn 'source' ghi theo chủ đề chương thay vì số chương cứng, trừ chương mở đầu có tên đã xác nhận. Không chương nào bị bỏ sót về nội dung, nhưng các chi tiết phụ (ví dụ cốt truyện nhỏ trong chương) ngoài 25 điểm chọn lọc không được trích.",
+  "points": [
+    {
+      "title": "Ba tầng bản chất: sinh học, xã hội, tự chọn",
+      "source": "Tổng quan đầu sách (khung xuyên suốt các chương)",
+      "principle": "Mọi hành vi của ta được nuôi từ ba nguồn năng lượng khác nhau: bản chất sinh học (di truyền, não bộ), bản chất xã hội (văn hóa, chuẩn mực được xã hội hóa từ nhỏ), và bản chất tự chọn (các dự án, khát vọng cá nhân). Ba tầng này có thể hòa hợp hoặc xung đột với nhau, và cách người ta biên đạo ba tầng trong đời quyết định sức khỏe lẫn an lạc. Không tầng nào là 'bản chất thật duy nhất' — cả ba đều tự nhiên theo cách riêng.",
+      "appHook": "Khi luận tính cách từ bát tự/tử vi, hãy trình bày ngày-giờ-tuổi là 'tầng thiên hướng' (gần tầng sinh học-xã hội) chứ không phải toàn bộ mệnh người, rồi luôn hỏi về mục tiêu đang theo đuổi để đọc tầng thứ ba. Cách này cho phép AI giải thích mâu thuẫn giữa lá số và lời kể người xem thay vì đánh đòn 'lá số sai'.",
+      "tag": "personality"
+    },
+    {
+      "title": "Giống tất cả, giống một số, không giống ai",
+      "source": "Chương mở đầu — To Be or Not to Be: The Mysterious Architecture of Personality",
+      "principle": "Mỗi người ở một số phương diện giống mọi người khác, ở một số phương diện giống một số người, và ở một số phương diện không giống bất kỳ ai. Một bản mô tả tính cách chỉ chạm tầng 'giống mọi người' thì đúng với ai cũng được — đó chính là bản chất của văn sáo rỗng kiểu Barnum. Giá trị nằm ở tầng thứ ba: điểm riêng không trùng ai.",
+      "appHook": "Đây là bộ lọc chống Barnum cốt lõi cho AI luận mệnh: mọi khối luận tính cách phải có ít nhất một câu gắn vào chi tiết riêng (ngày-giờ cụ thể, tổ hợp can-chi hiếm, dự án người xem vừa khai báo), không dừng ở kiểu mẫu chung. Nếu không đủ dữ kiện cho tầng 'không giống ai', nói rõ đó là thiên hướng chung của nhóm chứ không ngụy trang thành chân dung cá nhân.",
+      "tag": "personality"
+    },
+    {
+      "title": "Khung cá nhân: khung soi và chuồng nhốt",
+      "source": "Chương mở đầu — khung cá nhân theo George Kelly",
+      "principle": "Mỗi người đọc thế giới qua các cặp cực đối (tin-không tin, thông minh-không thông minh) tự dựng thành hệ khung; khung vừa giúp nhìn rõ vừa có thể trở thành chuồng giam. Khung càng ít và càng neo chặt vào khung trung tâm, một sự phủ nhận đơn lẻ càng gây sốc toàn hệ thống. Người có nhiều khung luân phiên sẽ ít lo âu hơn vì luôn còn lối diễn giải khác cho cùng một sự kiện.",
+      "appHook": "Khi một luận đoán xui (ví dụ vận hạn thất bại thi cử) chạm trúng khung tự hào của người xem, AI phải chủ động mở khung thay thế ('đây là bài kiểm tra cho khung chăm chỉ, không phải khung tài năng') để tránh gây chấn thương niềm tin. Đồng thời AI tự kiểm tra: đừng luận người khác bằng một cặp cực duy nhất.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Đừng đóng đinh tính cách vào tuổi ba mươi",
+      "source": "Chương mở đầu và chương về bản chất ổn định",
+      "principle": "Quan điểm cũ rằng tính cách kết tinh như thạch nhựa sau ba mươi tuổi đã bị khoa học hiện đại sửa lại: mức biểu hiện trung bình vẫn đổi theo tuổi và hoàn cảnh, và hành vi có thể lệch khỏi thiên hướng ổn định vì mục tiêu đang theo đuổi. Câu hỏi đúng không phải 'ta có đổi được không' mà là 'ta đang đổi vì ai, vì điều gì'.",
+      "appHook": "Luận mệnh phải giữ giọng mở: nói 'đây là thiên hướng cao/mặt bằng của tổ hợp can-chi này', tuyệt đối không khẳng định 'mày sinh ra đã vậy đổi được đâu'. Điểm này giúp app vừa uy tín vừa không bất lực hóa người xem trước lời khuyên vận trình.",
+      "tag": "personality"
+    },
+    {
+      "title": "Ổn định thứ hạng, không ổn định mức",
+      "source": "Chương về bản chất ổn định và biểu hiện theo hoàn cảnh",
+      "principle": "Đến một bữa tiệc, ai cũng hướng ngoại hơn một chút so với ngày thường, nhưng thứ hạng tương đối giữa những người trong nhóm vẫn giữ nguyên: đứa lớp trưởng hài hước năm xưa, ba mươi năm sau vẫn là người bông đùa nhất lớp dù mức đã dịu xuống. Nói cách khác, mức tuyệt đối của hành vi đổi theo tình huống và tuổi, còn vị trí của ta so với mặt bằng chung bền bỉ đáng kinh ngạc.",
+      "appHook": "Luận vận trình theo chu kỳ (đại vận, lưu niên) nên diễn đạt bằng so sánh tương đối: 'vận này bạn hướng ngoại hơn chính mình ở vận trước' thay vì 'vận này bạn trở thành người hướng ngoại'. Đặt mốc so sánh là chính người xem qua các thời kỳ là cách vừa đúng khoa học vừa dễ cảm nhận.",
+      "tag": "personality"
+    },
+    {
+      "title": "Hướng nội-hướng ngoại là bài toán kích hoạt não",
+      "source": "Chương về hai thái độ hướng nội-hướng ngoại (bản chất sinh học)",
+      "principle": "Người hướng ngoại có mức kích hoạt nền vỏ não thấp hơn nên chủ động đi tìm kích thích để lên đúng ngưỡng sung; người hướng nội có nền cao nên né môi trường quá náo nhiệt — không phải vì không thích, mà vì hiểu ngầm rằng hiệu năng của mình sụt trong môi trường đó. Vấn đề là thiết lập mức kích thích tối ưu, không phải 'loại tính cách nào tốt hơn'.",
+      "appHook": "Luận 'tính hướng ngoại' từ mệnh không nên dừng ở dán nhãn mà nêu cơ chế và điều kiện phát huy: môi trường làm việc ồn ào/rộng rãi cho nhóm nền thấp, nhịp sâu-yên tĩnh cho nhóm nền cao. Khi tư vấn sự nghiệp, gợi ý chọn khối lượng giao tiếp phù hợp ngưỡng kích hoạt thay vì bắt đổi tính.",
+      "tag": "personality"
+    },
+    {
+      "title": "Điểm giữa hướng nội-hướng ngoại thắng ở vai trò bán hàng",
+      "source": "Chương về hai thái độ — dẫn nghiên cứu Adam Grant",
+      "principle": "Nhóm ambivert, tức người nằm giữa thang hướng ngoại, cho hiệu suất bán hàng cao nhất trong các nghiên cứu vì vừa đủ chủ động tiếp cận vừa đủ lắng nghe để đọc nhu cầu khách. Cả hai cực đều có vai riêng nhưng vai 'giao dịch với người lạ qua lại nhiều' thưởng cho điểm giữa. Đây là ví dụ điển hình: giá trị của một thiên hướng phụ thuộc vai trò đang đảm nhận.",
+      "appHook": "Khi tư vấn ngành nghề theo mệnh, tránh quy tắc 'mệnh Dương thì làm bán hàng'; hãy cân nhắc loại vai trò — vai cần thâm niên quan hệ hay vai cần đọc người — rồi nói nhóm thiên hướng nào hưởng lợi. Điều này biến luận sự nghiệp từ ghim nhãn thành bài toán khớp vai-tính.",
+      "tag": "advice"
+    },
+    {
+      "title": "Trầm cảm tính: viên lính canh trung thành",
+      "source": "Chương về trầm cảm tính (nhạy tín hiệu tiêu cực)",
+      "principle": "Lõi của trầm cảm tính là độ nhạy với tín hiệu đe dọa trong môi trường, liên quan vùng não phát hiện nguy cơ hoạt động quá mức. Cái giá là dễ lo âu, dễ tổn thương cảm xúc; cái được là hệ báo động nhạy — phát hiện rủi ro sớm mà người bình thản bỏ qua. Nó là 'lính canh trung thành': phục vụ chủ nhà bằng sự cảnh giác, nhưng nếu không quản được thì lính canh báo động cả ngày lẫn đêm.",
+      "appHook": "Với mệnh có thiên hướng trầm cảm tính cao, AI không được khen chê nhị nguyên mà khuyên quản lính canh: đặt ranh giới thời gian lo lắng, dùng sự nhạy này cho công việc cần phát hiện lỗi và rủi ro. Khi luận sức khỏe, nhắc rằng stress kéo dài của nhóm này chiếm phần chi phí lớn nhất, nên giảm tải mục tiêu quan trọng hơn phủ nhận tính nhạy.",
+      "tag": "stress"
+    },
+    {
+      "title": "Tự trọng qua cơn sốt; kỷ luật thắng tự trọng",
+      "source": "Chương về tự trọng và chủ nghĩa tự đại",
+      "principle": "Làn sóng nâng cao tự trọng những năm trước đã tạo hiệu quả ngược: điểm tự đại ở sinh viên tăng qua các thế hệ trong khi thấu cảm giảm, và bản thân tự trọng cao được chứng minh là dự báo kém hơn nhiều so với tự kỷ luật và tự điều chỉnh cho thành đạt lẫn sức khỏe. Cảm giác tốt về bản thân không tự sinh ra hành vi tốt; hành vi tốt mới nuôi cảm giác tốt bền vững.",
+      "appHook": "Từ chối lời khuyên kiểu 'hãy yêu bản thân nhiều hơn' trong luận an lạc — đó là Barnum thuần túy. Thay vào đó, khi luận vận trình gắn lời khuyên vào thói quen cụ thể (chuẩn bị trước, hoàn tất việc nhỏ đúng hẹn) vì tự điều chỉnh mới là biến số mang sức nặng.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Sáng tạo cần ngưỡng thông minh, không cần thiên tài",
+      "source": "Chương về sáng tạo và nghiên cứu IPAR (Berkeley)",
+      "principle": "Ở nhóm kiến trúc sư sáng tạo được nghiên cứu lâu dài, trí thông minh vượt ngưỡng khoảng một trăm hai mươi trở lên không còn phân biệt ai sáng tạo hơn ai; nhiều người trong số đó chỉ là học sinh khá loạt B. Điều tách nhóm sáng tạo ra là tổ hợp tính cách: bướng bỉnh tự tin, chạm ngưỡng xung đột với quy ước, không quan trọng hòa đồng xã giao. Sáng tạo là cấu hình tính cách chứ không phải chỉ số IQ thêm nữa.",
+      "appHook": "Luận 'mệnh sáng tạo' (thiên hướng cởi mở cao) nên nêu cơ chế: cởi mở nuôi ý tưởng mới nhưng cũng kèm nhạy cảm cảm xúc dễ chùng xuống; kèm lời khuyên cụ thể về cấu hình — giữ tự tin và bất tuân ở chỗ đúng, không cần ép bản thân xã giao rộng. Chỉ sáng kiến nào vượt ngưỡng năng lực nền mới nói 'đủ trí tuệ', tránh phô trương 'trí tuệ bẩm sinh'.",
+      "tag": "personality"
+    },
+    {
+      "title": "Huyền thoại anh hùng đơn độc",
+      "source": "Chương về sáng tạo — trường hợp Darwin và vợ Emma",
+      "principle": "Đề tài độc lập bền bỉ của các thiên tài sáng tạo phần lớn là huyền thoại: Darwin bị bệnh mạn tính và phụ thuộc gần như hoàn toàn vào người vợ Emma duyệt, sắp và chịu đựng nhịp sống cho ông mỗi ngày. Thành tựu sáng tạo thật sự đứng trên vai những đồng đội đáng tin, kỷ tánh và ân cần ở phía hậu cần. Ai làm phần 'nghĩ ra ý tưởng' không đồng nghĩa với người hoàn tất nó.",
+      "appHook": "Khi luận sự nghiệp cho mệnh thiên hướng cởi mở-sáng tạo, khuyên tìm hoặc giữ vai đồng đội thực thi (người duyệt, người theo tiến độ) như một phần của kế hoạch thành công, không chỉ khuyên 'cố lên'. Đây là lời khuyên có cơ chế, chống kiểu sáo 'phát huy nội lực'.",
+      "tag": "social"
+    },
+    {
+      "title": "Hiệu năng tự tin và căng thẳng: hai dự báo mạnh nhất của an lạc",
+      "source": "Chương về phân tích dự án cá nhân",
+      "principle": "Trong hàng nghìn hồ sơ phân tích dự án cá nhân, niềm tin vào khả năng hoàn thành chính dự án đang chạy là dự báo tích cực mạnh nhất cho an lạc, còn mức căng thẳng của chính những dự án đó là dự báo tiêu cực mạnh nhất — độ lớn tương đương và vượt cả giới tính, dân tộc, tầng lớp xã hội. Người trầm cảm thường đang ôm những dự án căng thẳng mà thiếu niềm tin làm được.",
+      "appHook": "Luận vận trình nên chuyển sang khảo sát mục tiêu đang chạy của người xem: với mỗi mục tiêu lớn, AI chấm hai điều — bạn tin làm được tới đâu, và nó đang ngốn bao nhiêu năng lượng. Đó là cách định lượng lời khuyên 'năm nay nên tập trung gì' thay vì câu đại trà 'giữ vững niềm tin'.",
+      "tag": "decision"
+    },
+    {
+      "title": "Đánh đổi ý nghĩa — quản lý được; dự án lõi phải nuôi được",
+      "source": "Chương về dự án cá nhân và dự án lõi",
+      "principle": "Dự án giàu ý nghĩa nhất thường khó quản lý nhất, nên an lạc không đến từ chọn dự án càng lớn càng tốt mà từ sự theo đuổi bền vững các dự án lõi — những cam kết xác định con người ta. Bền vững nghĩa là dự án vừa có ý nghĩa vừa ở tầm tay, và khi cả hai tính chất hội tụ trong cùng một dự án thì lợi ích an lạc đạt đỉnh.",
+      "appHook": "Khi tư vấn mục tiêu năm-tháng theo vận, AI nên phản hồi theo khung này: nếu người xem chọn mục tiêu hoành tráng, đừng chê mà giúp tách thành đợt con khả thi; nếu mục tiêu quá dễ, hỏi nó gắn với điều gì lõi để tăng ý nghĩa. Ngược lại với văn mẫu 'hãy đặt mục tiêu thật to', đây là quy tắc hai chiều có điều kiện.",
+      "tag": "advice"
+    },
+    {
+      "title": "Ba cách nuôi dự án lõi: tái khung, tự thay đổi, soi môi trường",
+      "source": "Chương về nuôi dự án lõi bền vững",
+      "principle": "Có ba đòn bẩy để giữ dự án lõi sống: tái khung hóa nghĩa là nhìn lại dự án qua kính khác để thấy ý nghĩa mới (nghiên cứu nổi tiếng: cô nhân khách sạn được kể rằng công việc lau dọn là hình thức vận động thể chất thì các chỉ số sức khỏe cải thiện rõ rệt dù việc không đổi); tự thay đổi nghĩa là đặt thay đổi bản thân như một dự án do tự thân khởi phát — dự án tự chọn bền hơn dự án bị áp đặt; và soi môi trường nghĩa là quét lại bối cảnh xã hội để sớm phát hiện khi dự án đã mất điều kiện sống.",
+      "appHook": "Đây là kho lời khuyên vận trình dựng sẵn: khi người xem than việc hay mục tiêu chán hoặc đuối, AI chọn một trong ba đòn (đổi cách nhìn việc, tự đặt mục tiêu thay vì bị giao, rà lại điều kiện môi trường) thay vì khuyên chung chung 'kiên trì'. Điểm của khung là mỗi đòn đều có ví dụ cơ chế cụ thể để AI kể lại.",
+      "tag": "habits"
+    },
+    {
+      "title": "Tính cách tự do: diễn khác mình vì điều mình coi trọng",
+      "source": "Chương về tính cách tự do và diễn vượt tính",
+      "principle": "Con người có thể hành xử ngược thiên hướng sinh học-xã hội — một người hướng nội diễn hướng ngoại, một người khó chịu diễn dịu dàng trong bữa cơm gia đình — không phải vì hai mặt mà vì đang phục vụ dự án lõi: sự chuyên nghiệp hoặc tình thương. Phân biệt quan trọng: hành vi lệch thiên hướng vì mục tiêu tự chọn là cách diễn đạt bản chất sâu nhất, không phải giả tạo. Ít nhất là trong cửa sổ ngắn, diễn khác mình tự nhiên và có giá trị.",
+      "appHook": "Khi luận vận hạn đòi vai khác tính (ví dụ mệnh hướng nội bước vào năm cần nhiều ngoại giao), AI nói rõ đây là 'diễn theo dự án' có thể làm được và đáng làm, kèm điều kiện bù đắp — tránh hai thái cực: 'đổi tính ngay' (phi thực tế) và 'đừng cố' (bất lực). Cách này tôn trọng cả lá số lẫn năng lực con người.",
+      "tag": "habits"
+    },
+    {
+      "title": "Chi phí diễn dài ngày: kiềm nén đốt cơ thể",
+      "source": "Chương về tính cách tự do — chi phí sinh lý",
+      "principle": "Diễn khác thiên hướng trong thời gian dài không miễn phí: kiềm nén phần bản chất bị gạt sang một bên làm hệ thần kinh tự chủ rơi vào trạng thái kích hoạt kéo dài, và nghiên cứu cho thấy người kiềm nén lâu dài mang chi phí sức khỏe — tim nhanh hơn, căng cơ, giật mình mạnh hơn; dòng nghiên cứu khác chỉ ra cố không nghĩ đến điều gì lại khiến nó đeo bám hơn. Diễn ngắn ngày để vượt sự kiện là rẻ, diễn thường trực là đắt.",
+      "appHook": "Luận sức khỏe cho giai đoạn 'vận đòi diễn vai khác tính' phải kèm cảnh báo cơ chế này: AI nhắc người xem phân bổ vai diễn thành phiên ngắn có ranh giới, không để trở thành mặt nạ thường trực, vì không chỉ mệt mà tổn thương sức khỏe thực sự qua hệ kích hoạt thần kinh.",
+      "tag": "stress"
+    },
+    {
+      "title": "Ngách phục hồi: chỗ giấu chân cho bản chất đầu tiên",
+      "source": "Chương về tính cách tự do — chiến lược giảm chi phí",
+      "principle": "Kỹ thuật chính để trả giá rẻ hơn khi diễn khác mình là tạo 'ngách phục hồi' — một không gian hoặc quãng thời gian định kỳ nơi người ta được thả mình về thiên hướng gốc: người hướng nội diễn hướng ngoại cả ngày cần quãng yên tĩnh riêng buổi tối để hồi. Có thể thương lượng trước 'hiệp ước tính cách tự do' — quy định rõ ai cần không gian gì, khi nào — trong gia đình và đội nhóm.",
+      "appHook": "Luận cho người đang ở vận phải liên tục diễn vai ngược tính (bán hàng, chủ trì, xã giao), AI nên tự động đề xuất lịch ngách phục hồi cụ thể (quãng im lặng, góc riêng, hoạt động độc lập) như một phần đơn thuốc, không phải gợi ý phụ. Đây cũng là gợi ý hòa hợp cho cặp đôi khi luận tình duyên.",
+      "tag": "stress"
+    },
+    {
+      "title": "Tự giám sát cao, thấp, và linh hoạt",
+      "source": "Chương về tự giám sát và vai diễn xã hội",
+      "principle": "Người tự giám sát cao đọc tín hiệu bối cảnh rồi chỉnh biểu hiện cho khớp, thường thắng ở thang sự nghiệp nhưng dễ thiếu cam kết dài hạn trong quan hệ; người tự giám sát thấp đi theo giá trị nội tại bất chấp bối cảnh, quan hệ bền nhưng hay bị coi là cứng. Cực đoan của hai đầu đều có giá, và tư thế tối ưu là tự giám sát linh hoạt: biết khi nào đọc bối cảnh, khi nào bám giá trị.",
+      "appHook": "Luận sự nghiệp-tình duyên có thể dùng khung này để nói người xem 'bạn thuộc kiểu đọc phòng' hay 'kiểu bám giá trị' kèm cảnh báo mỗi kiểu một cái giá (thăng tiến nhạt tình cảm hay cứng đầu bỏ lỡ cơ hội). Lời khuyên: luyện mặt còn thiếu theo ngữ cảnh cụ thể trong vận hiện tại thay vì bắt đổi kiểu.",
+      "tag": "social"
+    },
+    {
+      "title": "Vị trí kiểm soát nội: công cụ mạnh và giới hạn thật",
+      "source": "Chương về kiểm soát, ý chí và vận may — Coleman, Asch, kẹo dẻo, viện dưỡng lão",
+      "principle": "Người tin mình nắm bánh lái (vị trí kiểm soát nội) kháng áp lực đám đông tốt hơn, ít mạo hiểm sức khỏe hơn, lên kế hoạch rõ hơn và trì hoãn phần thưởng gần để đổi phần thưởng xa tốt hơn; trong nghiên cứu giáo dục lớn nhất nước Mỹ, vị trí kiểm soát nội còn dự báo thành tích học tập vượt cả trí thông minh và hoàn cảnh gia đình. Nhưng nghiên cứu viện dưỡng lão cho mặt trái: khi cảm giác kiểm soát được trao rồi bị rút lại, sức khỏe nhóm được trao còn sụp xuống. Kiểm soát chỉ có lợi khi bám đúng mức kiểm soát thật trong môi trường.",
+      "appHook": "Luận vận trình nên nuôi tư thế 'ta là người quyết' nhưng luôn kèm bản đồ ràng buộc thật (tiền, thời gian, người khác) để tránh khuyến khích ảo tưởng kiểm soát — đây là ranh giới giữa tự tin và tự lừa. Khi luận sức khỏe tuổi già hoặc vận thu hẹp quyền tự quyết, nhấn giữ cho người xem ít nhất một vùng quyết định nhỏ thật sự.",
+      "tag": "decision"
+    },
+    {
+      "title": "Cứng cỏi ba chữ C, và kẻ thù thật là hiềm khích",
+      "source": "Chương về tính cách và sức khỏe — cứng cỏi so với tính cách A",
+      "principle": "Nghiên cứu dài hạn sau sa thải hàng loạt cho thấy người sống sót tốt nhất mang ba phẩm chất: dính vào việc có nghĩa, tin mình có ảnh hưởng, và nhìn biến cố là cơ hội. Tính cách A mang ba phẩm chất tương tự nhưng kèm một chất độc khác nhau: hiềm khích — tức bám víu xác nhận rằng mình bị hạ thấp. Vội vàng, ồn ào không phải mầm bệnh; hiềm khích mới làm tim hư. Người cứng cỏi dùng ba chữ C một cách linh hoạt, thậm chí coi thử thách như trò chơi đầy hứng thú.",
+      "appHook": "Luận sức khỏe cho mệnh kiểu 'tính cách A' (vội, tham công) phải nhắm đúng mục tiêu: không khuyên giảm tốc độ chung chung mà can thiệp vào hiềm khích — nhận ra lúc đang giữ trận, buông đánh giá về người khác. Kèm cách chơi lại: chuyển nhiệm vụ thành trò có cược vui để giữ hứng mà hạ căng.",
+      "tag": "stress"
+    },
+    {
+      "title": "Nhất quán: thế giới dễ hiểu, dễ quản, có ý nghĩa",
+      "source": "Chương về sức khỏe và nguồn gốc của sức khỏe tốt",
+      "principle": "Nghiên cứu về nguồn gốc của sức khỏe tốt chỉ ra cảm giác nhất quán — niềm tin bền rằng cuộc sống có thể hiểu, có thể quản, và đáng công sức — là chất keo bảo vệ sức khỏe khi va đập. Nó không đòi biết hết tương lai, chỉ cần tin mọi việc sẽ suôi ổn trong giới hạn hợp lý. Cảm giác này cập nhật liên tục qua trải nghiệm, không phải đức tin mù.",
+      "appHook": "Trong luận an lạc-sức khỏe, AI có thể chủ động xây cảm giác nhất quán cho người xem bằng cách sắp diễn giải vận hạn thành câu chuyện có mạch: đây là điều gì đang xảy ra, bạn điều khiển được phần nào, phần đó ý nghĩa ra sao. Chính cấu trúc ba lớp này làm một bài luận mệnh đọc lên an ủi thật chứ không phải an ủi sáo.",
+      "tag": "stress"
+    },
+    {
+      "title": "Thời điểm chuyển vận làm tính cách lộ rõ",
+      "source": "Chương về biểu hiện tính cách theo thời kỳ",
+      "principle": "Trong giai đoạn chuyển tiếp cuộc đời (nhập học, thăng chức, ly hôn, mất việc), biểu hiện tính cách không phẳng lặng mà càng đậm nét: người hướng ngoại còn hướng ngoại hơn, người có kỷ luật còn kỹ hơn, người khó chịu còn khó ở hơn — vì mọi người phải dựng lại vai và cả hệ quy chiếu trong môi trường mới. Biến động là thời điểm tính cách phô bản chất nhất.",
+      "appHook": "Đây là cơ chế trực tiếp cho luận đại vận-lưu niên: AI cảnh báo rằng ở các cột mốc chuyển vận trong lá số, thiên hướng mệnh của người xem sẽ phóng đại — điểm mạnh nhân đôi nhưng điểm yếu cũng vậy. Lời khuyên vận chuyển do đó phải gắn vào thiên hướng cụ thể (người khó chịu vào vận chuyển cần sẵn kế hoạch giữ mối quan hệ, người kỷ luật cần chừa chỗ linh hoạt).",
+      "tag": "decision"
+    },
+    {
+      "title": "Khớp người-môi trường: cùng một thành phố, hai số phận",
+      "source": "Chương về môi trường của bản ngã — nhà quy hoạch và nhà tâm lý học",
+      "principle": "Hai nhà tư tưởng nhìn một thành phố bằng hai con mắt: một bên than thành phố giết sự thân quen gần gũi, một bên nói thành phố quá tải thông tin cho não người; thực tế cả hai đều đúng một nửa vì quên khác biệt cá nhân — thành phố nhộn nhịp nuôi người hướng ngoại nhưng là máy ép cho người hướng nội. Môi trường phù hợp thiên hướng nuôi dưỡng, môi trường lệch thiên hướng lấy máu từng ngày.",
+      "appHook": "Luận phong thủy nơi ở-nghề nghiệp có thể dịch thành bài toán khớp môi trường: cùng một phường ồn ào, người mệnh nền kích hoạt thấp nên tạo ngách yên, người nền cao thì hưởng và cần thêm mục tiêu để không nhàm. Khi tư vấn đổi việc-đổi chỗ theo vận, AI xét khớp thiên hướng trước rồi mới nói đến may rủi.",
+      "tag": "social"
+    },
+    {
+      "title": "Tình duyên: ba tính cách quyết hơi ấm của cặp đôi",
+      "source": "Chương về tính cách trong quan hệ và hôn nhân",
+      "principle": "Trong quan hệ tình duyên, ba tính cách mang sức nặng khác nhau: tính dễ chịu dự báo hài lòng hôn nhân, với hiệu ứng rõ ở người chồng; tính kỷ luật làm bạn đời đáng tin, ổn định tài chính-việc nhà; còn trầm cảm tính cao thì kéo giảm hài lòng qua sóng cảm xúc thất thường. Khác biệt tính cách không tự động phá cặp đôi — điều nguy hiểm là cách xử lý khi khác biệt chạm nhau, và đôi lứa có thể thương lượng 'hiệp ước tính cách' để mỗi bên có không gian về thiên hướng gốc.",
+      "appHook": "Luận hợp-khắc trong tình duyên nên đi từ ba biến số này (độ dịu, độ đáng tin, độ sóng cảm xúc) thay vì chỉ ghép can-chi của hai người; AI nói rõ cơ chế mỗi biến ảnh hưởng đời sống chung gì. Khi hai mệnh lệch thiên hướng, đề xuất hiệp ước cụ thể (ai cần quãng riêng khi nào) thay vì phán 'khắc mệnh' chốt hạ.",
+      "tag": "social"
+    },
+    {
+      "title": "Điệu nhảy cuối đời giữa Tôi và bản ngã tôi xây",
+      "source": "Chương kết — các bản ngã tương lai và triển vọng nhân học cá nhân",
+      "principle": "Cái tôi quan sát và cái bản ngã đã được xây dựng suốt đời có thể hòa giải như một điệu nhảy đôi: nhìn lại các bản ngã mình từng là, thấy được các bản ngã còn có thể là, rồi chọn hướng đi tiếp theo một cách chủ động. Hy vọng trong khung này không phải ảo tưởng cũng không phải xiềng — nó vừa thích nghi vừa có điều kiện: chỉ phát huy sau khi ta nhìn thẳng năng lực thật và môi trường thật. Cuối cùng, đời có ý nghĩa nhờ vừa trọn vẹn theo đuổi điều lõi, vừa chừa một nhịp nhẹ nhõm chơi đùa để cả đoàn dự án không gãy.",
+      "appHook": "Phần kết luận vận trình của AI nên dùng khung này: sau các luận chi tiết, đóng bằng câu hỏi tiến về tương lai ('bạn muốn trở thành bản ngã nào trong vận tới?') kèm điều kiện thực tế, thay vì câu chúc rỗng. Giữ một chút nhẹ nhàng, hài hước trong bài luận dài để người xem không bị đè bởi các cảnh báo sức khỏe-công việc.",
+      "tag": "advice"
+    }
+  ]
+}

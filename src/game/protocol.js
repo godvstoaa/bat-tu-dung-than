@@ -1,12 +1,14 @@
 // ============================================================================
 //  HUYỀN QUÁN MMO — giao thức dùng chung client (src/game/net.js) và máy chủ
-//  (worker/quan-room.js). Thuần JS, không DOM, không phụ thuộc → test bằng node.
+//  (worker/quan-room.js). Thuần JS, không DOM → test bằng node. Chỉ dựa vào cosmetics.js (danh mục thuần).
 //  docs/GAME-MMO-PROMPT-PLAN.md §P1.
 //
 //  Client → server                         Server → client
-//   hello {name, robe, acc, title, pid}          welcome {you, room, players[], seats}
+//   hello {name, robe, acc, cos, title, pid}     welcome {you, room, players[], seats}
+//   cos   {c}  (đổi trang bị)                  cos {id, c}
 //   mv    {x, y, h, s}                      join {p} · leave {id} · count {n}
-//   emo   {e, to?}                          mv {id, x, y, h, s}
+//   tp    {x, y}  (nhảy đổi phòng/xe ngựa)     mv {id, x, y, h, s}
+//   emo   {e, to?}
 //   say   {k}                               emo {id, e, to?} · say {id, k}
 //   sit   {}  /  stand {}                   seat {i|-1} · seats {taken[]}
 //   report {id, why}                        full {} (đóng 4001) · err {m}
@@ -17,6 +19,8 @@
 //   coop_start {} · coop_leave {}           coop {id, host, members[], started, key?}
 //   coop_ans {step, ans, hints}             coop_step {step, by, ans, result} · coop_done {total, points} · coop_end {why}
 // ============================================================================
+
+import { cleanCos } from './cosmetics.js';
 
 export const VERSION = 1;
 export const ROOM_CAP = 60;                 // người / shard
@@ -74,7 +78,21 @@ export function cleanName(raw) {
   return s;
 }
 
+// Danh hiệu: qua đúng bộ lọc của cleanName (ký tự điều khiển/zero-width, HTML, thô tục).
+// Xấu/lỗi thì bỏ hẳn («») chứ không giữ nguyên — không chỉ slice.
+export function cleanTitle(raw) {
+  return cleanName(raw) || '';
+}
+
 const num = (v) => typeof v === 'number' && Number.isFinite(v);
+
+// Chặn bước nhảy phi lý khi relay mv: quãng đi > ~40 m/gói (25 ô, 1 ô = 1,6 m) không thể
+// là chuyển động hợp lệ (client tối đa ~4,7 ô/s, gửi ≤ 8 Hz) → kẹp về toạ độ cũ.
+export const MV_JUMP_TILES = 25;
+export function sanityMv(a, x, y) {
+  const nx = Number.isFinite(x) ? x : a.x, ny = Number.isFinite(y) ? y : a.y;
+  return Math.hypot(nx - a.x, ny - a.y) > MV_JUMP_TILES ? { x: a.x, y: a.y } : { x: nx, y: ny };
+}
 
 // Kiểm/chuẩn hoá một gói client gửi lên. Trả gói sạch hoặc null (bỏ qua).
 export function parseClient(text) {
@@ -88,10 +106,11 @@ export function parseClient(text) {
       return {
         t: 'hello', name: name || 'Khách',
         robe: ROBES.includes(m.robe) ? m.robe : '土',
-        title: typeof m.title === 'string' ? m.title.slice(0, 24) : '',
+        title: typeof m.title === 'string' ? cleanTitle(m.title) : '',
         phai: PHAI[m.phai] ? m.phai : '',
         look: m.look === 'hero_f' ? 'hero_f' : 'hero_m',
         acc: ROBES.includes(m.acc) ? m.acc : '', // màu đai = Hỷ thần (chỉ gửi màu, không gửi ngày sinh)
+        cos: cleanCos(m.cos), // trang bị Tàng Y Các — chỉ món có trong danh mục, đúng ô
         pid: typeof m.pid === 'string' && /^[a-z0-9-]{8,40}$/i.test(m.pid) ? m.pid : null,
         badName: !name,
       };
@@ -99,11 +118,17 @@ export function parseClient(text) {
     case 'mv':
       if (!num(m.x) || !num(m.y) || m.x < WORLD_TILES.minX || m.y < WORLD_TILES.minY || m.x > WORLD_TILES.maxX || m.y > WORLD_TILES.maxY) return null;
       return { t: 'mv', x: round2(m.x), y: round2(m.y), h: num(m.h) ? round2(m.h) : 0, s: m.s ? 1 : 0, a: num(m.a) ? Math.max(0, Math.min(420, Math.round(m.a))) : 0 };
+    case 'tp':
+      // Nhảy xa hợp lệ do client chủ động (đổi phòng qua cửa điện, lên xe ngựa/đò sang
+      // sảnh nghề): chỉ kiểm biên thế giới như mv — không kiểm bước nhảy vì cú nhảy là chủ đích.
+      if (!num(m.x) || !num(m.y) || m.x < WORLD_TILES.minX || m.y < WORLD_TILES.minY || m.x > WORLD_TILES.maxX || m.y > WORLD_TILES.maxY) return null;
+      return { t: 'tp', x: round2(m.x), y: round2(m.y) };
     case 'emo':
       if (!EMOTES[m.e]) return null;
       return { t: 'emo', e: m.e, to: typeof m.to === 'string' ? m.to.slice(0, 16) : undefined };
     case 'say':
       return PHRASES[m.k] ? { t: 'say', k: m.k } : null;
+    case 'cos': return typeof m.c === 'string' ? { t: 'cos', c: cleanCos(m.c) } : null;
     case 'sit': return { t: 'sit' };
     case 'stand': return { t: 'stand' };
     case 'report':

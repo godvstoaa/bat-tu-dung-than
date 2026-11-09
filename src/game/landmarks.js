@@ -9,8 +9,9 @@ import * as T from './terrain.js';
 import { placeModel, instanceModel, instanceModelLod, loadModel, hasLod } from './assets.js';
 import { rng } from './npc.js';
 import { stoneTex } from './textures.js';
-import { addBlock, addPlatform } from './obstacles.js';
-import { HALLS } from './world.js';
+import { addBlock, addPlatform, cityWallBlocks, markTerraceEdges } from './obstacles.js';
+import { HALLS, PLACES } from './world.js';
+import { COURT } from './court.js';
 import { addLight, glowAll } from './lights.js';
 import { addFootprint } from './collide.js';
 
@@ -97,6 +98,9 @@ function terrace(g, { x, z, ry = 0, w, d, levels = 3, rise = 3, stepD = 1.6 }) {
   }
   g.add(grp);
   addPlatform(x, z, w * 0.98, d * 0.98, ry, top);
+  // viền vách quanh mép nền (như court.js › EDGE) — không trèo lên nóc từ hông;
+  // cửa bậc phía trước (rộng w·0,22, nửa w·0,11) vẫn mở để leo lên
+  markTerraceEdges(x, z, ry, w * 0.98, d * 0.98, { stairW: w * 0.11 });
   return top;
 }
 const rockMat = new THREE.MeshStandardMaterial({ map: stoneTex({ seed: 77, tiles: 2, repeat: [3, 6], base: '#6f665a' }), roughness: 0.95, flatShading: true });
@@ -128,13 +132,16 @@ const CITY_R = 158;
 function wallRing(g) {
   const mat = stoneMat(4); const capM = new THREE.MeshStandardMaterial({ color: '#3a2a26', roughness: 0.7 });
   const N = 64;
+  // chặn kín vành tường: 3 khối/đoạn (giữa + 2 điểm lệch 1/6 vào hai đầu) — bước ~5,2 m
+  // nhỏ hơn đường kính khối ~6,8 m nên khít, hết lỗ hở ~8 m ở mối nối của bản cũ;
+  // cùng quy tắc cổng Nam với vòng mesh bên dưới (obstacles.js › cityWallBlocks)
+  for (const b of cityWallBlocks(CITY_R, N)) addBlock(b.x, b.z, b.r);
   for (let i = 0; i < N; i++) {
     const a0 = (i / N) * Math.PI * 2, a1 = ((i + 1) / N) * Math.PI * 2, am = (a0 + a1) / 2;
     if (Math.abs(Math.sin(am)) > 0.985 && Math.sin(am) > 0) continue; // chừa cổng Nam (+Z)
     const x0 = Math.cos(a0) * CITY_R, z0 = Math.sin(a0) * CITY_R, x1 = Math.cos(a1) * CITY_R, z1 = Math.sin(a1) * CITY_R;
     const len = Math.hypot(x1 - x0, z1 - z0) + 0.6;
     const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, y = H(cx, cz);
-    addBlock(cx, cz, 3.4);
     const seg = new THREE.Mesh(new THREE.BoxGeometry(len, 14, 5), mat);
     seg.position.set(cx, y + 6, cz); seg.rotation.y = -am + Math.PI / 2; seg.castShadow = true; seg.receiveShadow = true; g.add(seg);
     const cap = new THREE.Mesh(new THREE.BoxGeometry(len, 1.4, 6.4), capM); cap.position.set(cx, y + 13.7, cz); cap.rotation.y = seg.rotation.y; g.add(cap);
@@ -293,6 +300,62 @@ SPOTS.push({ at: [-600, 600], place: async (g) => {
 } });
 SPOTS.push({ at: [-420, -380], place: async (g) => {
   const x = -430, z = -330; await place(g, 'lib_mtn_house', { fit: { width: 34 }, at: { x, y: H(x, z), z, ry: faceTo(x, z, 0, 0) } });
+} });
+
+// ---------------------------------------------------------------------------
+// Địa danh mới (world.js › PLACES — toạ độ là nguồn duy nhất, trùng chỗ mô hình).
+//  · Lão Tùng gác cổng Sơn Môn: cổng tại (0, z1+1.2) (sect.js › gate_sect, trùng
+//    render3d › GATE_SM — bark tutorial kích trong bán kính 16 m) → ông đứng bên
+//    phải lối vào, lệch trục 6 m, lùi 4,8 m (ngoài hành lang cổng |x| ≤ 3,4 và
+//    tường son z ≤ z1+1,4; cách hàng đèn z=74 > 1,5 m), người thật cao ~1,9 m,
+//    solid chỉ thân nhỏ để khách lại gần đọc bark.
+//  · Am Vân Cốc: nhà núi sau Hậu Sơn, cạnh quần thể cliff_palace (0,-116) —
+//    mép nhà cách nền điện ~5 m, không đè nền bậc (x ≤ -45,5 · z ≤ -152,5);
+//    bàn thoại Khổng Tiên Sinh (scholar_desk) 5 m trước mặt am + chiếu cói
+//    ngồi đàm đạo (không solid, đi đè được) + biển tên địa danh.
+// ---------------------------------------------------------------------------
+const boardMat = new THREE.MeshStandardMaterial({ color: '#4a2c20', roughness: 0.8 });
+function nameBoard(text, ry = 0) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 160;
+  const t2 = c.getContext('2d');
+  t2.fillStyle = '#33210f'; t2.fillRect(0, 0, 512, 160);
+  t2.strokeStyle = '#d9a441'; t2.lineWidth = 10; t2.strokeRect(8, 8, 496, 144);
+  t2.fillStyle = '#f3df9a'; t2.textAlign = 'center'; t2.textBaseline = 'middle';
+  t2.font = `bold ${Math.min(88, Math.floor(3800 / Math.max(1, text.length)))}px serif`;
+  t2.fillText(text, 256, 84);
+  const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4;
+  const grp = new THREE.Group();
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 2.1, 8), boardMat); post.position.y = 1.05; post.castShadow = true;
+  const card = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.75), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.6 })); card.position.y = 2.15; card.castShadow = true;
+  grp.add(post, card); grp.rotation.y = ry;
+  return grp;
+}
+// Lão Tùng tại cổng Sơn Môn
+const laotung = PLACES.find((q) => q.id === 'laotung');
+SPOTS.push({ at: [laotung.world.x, laotung.world.z], place: async (g) => {
+  const gz = COURT.z1 + 1.2, { x, z } = laotung.world;
+  const ry = faceTo(x, z, 0, gz + 12); // quay mặt ra đường, nhìn dọc lối vào phía Nam
+  await place(g, 'lib_ong_lao', { fit: { width: 1.2 }, at: { x, y: H(x, z), z, ry } });
+  const bx = x + 1.9, bz = z - 1.6; // biển tên sau vai, tránh lối đi
+  const board = nameBoard(laotung.name, ry); board.position.set(bx, H(bx, bz), bz); g.add(board);
+  addFootprint(board, { hi: 1.6 });
+} });
+// Am Vân Cốc + bàn thoại Khổng Tiên Sinh
+const amvancoc = PLACES.find((q) => q.id === 'amvancoc');
+SPOTS.push({ at: [amvancoc.world.x, amvancoc.world.z], place: async (g) => {
+  const { x, z } = amvancoc.world;
+  const ry = faceTo(x, z, 0, -76); // quay nhà về phía bậc điện Hậu Sơn (lối tiếp khách)
+  await place(g, 'lib_mtn_house', { fit: { width: 21 }, at: { x, y: H(x, z), z, ry } });
+  const fx = x + Math.sin(ry) * 11.5, fz = z + Math.cos(ry) * 11.5; // ~5 m tính từ mép nhà
+  await place(g, 'scholar_desk', { fit: { width: 3.2 }, at: { x: fx, y: H(fx, fz), z: fz, ry } });
+  // chiếu cói ngay cạnh bàn: mặt phẳng màu rơm sát đất (+0,02 chống z-fighting), không solid
+  const mx = fx + Math.sin(ry) * 2.2, mz = fz + Math.cos(ry) * 2.2;
+  const co = new THREE.PlaneGeometry(2.2, 3.2); co.rotateX(-Math.PI / 2);
+  const chieu = new THREE.Mesh(co, new THREE.MeshStandardMaterial({ color: '#c9a86a', roughness: 0.95 }));
+  chieu.position.set(mx, H(mx, mz) + 0.02, mz); chieu.rotation.y = ry; chieu.receiveShadow = true; g.add(chieu);
+  const px = fx + Math.cos(ry) * 2.8, pz = fz - Math.sin(ry) * 2.8; // biển tên bên phải bàn
+  const board = nameBoard(amvancoc.name, ry); board.position.set(px, H(px, pz), pz); g.add(board);
+  addFootprint(board, { hi: 1.6 });
 } });
 
 // ---------------------------------------------------------------------------

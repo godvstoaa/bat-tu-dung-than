@@ -11,7 +11,9 @@ import * as TX from './textures.js';
 import { placeModel, instanceModel } from './assets.js';
 import { addFootprint } from './collide.js';
 import { addLight, addGlow } from './lights.js';
-import { COURT, TERRACES, STAIRS, PONDS, MAIN_HALL } from './court.js';
+import { addSolidRect as addSolidRectLocal } from './obstacles.js';
+import { COURT, TERRACES, STAIRS, PONDS, MAIN_HALL, TANGY } from './court.js';
+import { SETS, ITEM } from './cosmetics.js';
 
 const mk = (geo, mat, x, y, z, g, { ry = 0, rx = 0, shadow = true } = {}) => {
   const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); o.rotation.set(rx, ry, 0);
@@ -168,6 +170,39 @@ export function buildSect(scene, { ripple, onBig = null }) {
     balustrade(deco, m, x0, z0, x1, z0, 0.32); balustrade(deco, m, x0, z0, x0, z1, 0.32); balustrade(deco, m, x1, z0, x1, z1, 0.32);
   }
 
+  // --- Tàng Y Các: hai giá treo phẩm phục ngũ hành bên quầy Thợ May (quầy là model, nạp bất đồng bộ)
+  const robes = [];
+  for (const sx of [-1, 1]) {
+    const R = new THREE.Group(); R.position.set(TANGY.x + sx * 4.2, 0, TANGY.z - 0.2); R.rotation.y = sx * 0.35; deco.add(R);
+    for (const dx of [-1.1, 1.1]) box(0.1, 2.4, 0.1, m.dark, dx, 1.2, 0, R);
+    box(2.4, 0.08, 0.08, m.gold, 0, 2.35, 0, R);
+    SETS.slice(sx < 0 ? 0 : 3, sx < 0 ? 3 : 5).forEach((st, i, arr) => {
+      const it = ITEM[st.pieces[0]], c = new THREE.Color().setHSL(it.look.pri[0], it.look.pri[1] * 0.9, it.look.pri[2] * 0.55);
+      const robe = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 1.5, 1, 4), new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, side: THREE.DoubleSide }));
+      robe.position.set((i - (arr.length - 1) / 2) * 0.72, 1.55, 0.02); robe.castShadow = true; R.add(robe); robes.push(robe);
+      const sash = new THREE.Mesh(new THREE.PlaneGeometry(0.64, 0.1), new THREE.MeshStandardMaterial({ color: new THREE.Color().setHSL(it.look.acc[0], it.look.acc[1], it.look.acc[2] * 0.6), side: THREE.DoubleSide }));
+      sash.position.set(robe.position.x, 1.45, 0.03); R.add(sash);
+    });
+    addFootprint(R, { base: 0 });
+  }
+  for (const sx of [-1, 1]) stoneLantern(deco, m, TANGY.x + sx * 2.6, TANGY.z + 1.6, 0, 0.75);
+  // ma-nơ-canh mặc phẩm phục bộ ngũ hành trước đình (xoay chậm khoe áo — nhóm động, không gộp)
+  const manq = new THREE.Group(); root.add(manq);
+  const wood = new THREE.MeshStandardMaterial({ color: '#b98a5a', roughness: 0.6 });
+  ['y_moc', 'y_hoa', 'y_thuy'].forEach((id, i) => {
+    const it = ITEM[id], g = new THREE.Group(); g.position.set(TANGY.x + (i - 1) * 1.5, 0, TANGY.z + 0.2); manq.add(g);
+    const c = new THREE.Color().setHSL(it.look.pri[0], Math.min(1, it.look.pri[1]), it.look.pri[2] * 0.5);
+    const a2 = new THREE.Color().setHSL(it.look.acc[0], it.look.acc[1], it.look.acc[2] * 0.55);
+    box(0.5, 0.08, 0.5, m.dark, 0, 0.04, 0, g);
+    mk(new THREE.CylinderGeometry(0.03, 0.03, 0.5, 6), m.dark, 0, 0.3, 0, g);
+    mk(new THREE.LatheGeometry([[0.001, 0], [0.34, 0.02], [0.3, 0.45], [0.2, 0.9], [0.24, 1.05], [0.14, 1.12], [0.001, 1.14]].map(([r, y]) => new THREE.Vector2(r, y)), 18), new THREE.MeshStandardMaterial({ color: c, roughness: 0.7 }), 0, 0.5, 0, g);
+    mk(new THREE.CylinderGeometry(0.205, 0.215, 0.1, 18), new THREE.MeshStandardMaterial({ color: a2, roughness: 0.6 }), 0, 1.15, 0, g);
+    mk(new THREE.SphereGeometry(0.12, 12, 10), wood, 0, 1.78, 0, g);
+    g.userData.spin = i;
+  });
+  manq.userData.update = (t) => manq.children.forEach((g) => { g.rotation.y = Math.sin(t * 0.4 + g.userData.spin * 2) * 0.6; });
+  root.userData.manq = manq;
+  addSolidRectLocal(TANGY.x - 2.4, TANGY.z - 0.2, TANGY.x + 2.4, TANGY.z + 0.6);
   addGlow(m.lampGlow, { base: 0.4, night: 2.6, color: '#ffb050' });
   MD.mergeStatic(deco);
 
@@ -185,6 +220,8 @@ export function buildSect(scene, { ripple, onBig = null }) {
       addFootprint(hall.obj, { base: 4 });
       big(hall);
     }
+    // quầy Thợ May Tiên Y (Tàng Y Các)
+    await solid(await placeModel(root, 'lib_wood_pavilion', { hd: false, fit: { width: 6.2 }, at: { x: TANGY.x, y: 0, z: TANGY.z - 1.4, ry: 0 } }));
     // Đại Đỉnh giữa sân
     await solid(await placeModel(root, 'cauldron', { fit: { height: 5.5 }, at: { x: 0, y: 0, z: 27.5, ry: 0 } }));
     // điện phụ Đông / Tây, lầu chuông / lầu trống (quay vào trục)
@@ -206,5 +243,5 @@ export function buildSect(scene, { ripple, onBig = null }) {
     if (bl) addFootprint(bl, { hi: 1.3, ground: () => 0 });
   })().catch((e) => console.warn('[sect]', e));
 
-  return { root, pickables: pick };
+  return { root, pickables: pick, update: (t) => root.userData.manq?.userData.update(t) };
 }

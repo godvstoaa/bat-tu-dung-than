@@ -7,8 +7,10 @@
 
 export const IOS = (import.meta.env && import.meta.env.MODE) === 'ios';
 
-const ALL = ['thay', 'compass', 'xam', 'huong', 'lich', 'tra', 'sen', 'an0', 'an1', 'an2', 'trach', 'duongtrach', 'dieuhau', 'thuvien', 'hophon', 'tuvi', 'tuongphap', 'cachcuc', 'que'];
-const IOS_OFF = ['xam', 'sen', 'que']; // gieo quẻ / xin xăm: tắt trên iOS (4.3b)
+const VAN = ['vanbia', ...Array.from({ length: 9 }, (_, i) => `van${i}`), 'thaitue'];
+const ALL = ['thay', 'compass', 'xam', 'huong', 'lich', 'tra', 'sen', 'an0', 'an1', 'an2', 'trach', 'duongtrach', 'dieuhau', 'thuvien', 'hophon', 'tuvi', 'tuongphap', 'cachcuc', 'que', 'tangy', ...VAN];
+// gieo quẻ / xin xăm / vận hạn bản thân (đại vận, Thái Tuế): tắt trên iOS (4.3b) — cả cửa vào hai điện đó
+const IOS_OFF = ['xam', 'sen', 'que', ...VAN, 'door_vanmenh', 'exit_vanmenh', 'door_thaitue', 'exit_thaitue'];
 
 export const FEATURES = {
   stations: IOS ? ALL.filter((id) => !IOS_OFF.includes(id)) : ALL,
@@ -16,6 +18,12 @@ export const FEATURES = {
   wishes: !IOS,
   // Thầy luận bằng AI của app (askAI) — iOS tắt như app chính
   ai: !IOS,
+  // [G1 — NPC-AI] persona giọng Thầy qua system message trong engine/ai.js
+  //   (docs/npc-ai/15-lo-trinh-tich-hop.md §15.6a — flag «NPC_PERSONA_ENABLED»).
+  //   TẮT MẶC ĐỊNH: chỉ bật sau gate eval M-ROLE ≥ 98% + P0 100% (bộ đỏ 200 câu);
+  //   flag tắt → hành vi Thầy hôm nay KHÔNG ĐỔI. iOS đã tắt hẳn AI qua `ai` ở
+  //   trên nên nhánh persona không bao giờ chạy trên iOS.
+  personaAi: false,
 };
 
 export const TEXT = IOS
@@ -31,4 +39,4 @@ export const TEXT = IOS
   };
 
 // cửa điện / lối ra luôn có (điện thờ là không gian, không phải gian bói)
-export const hasStation = (id) => id.startsWith('door_') || id.startsWith('exit_') || FEATURES.stations.includes(id);
+export const hasStation = (id) => !(IOS && IOS_OFF.includes(id)) && (id.startsWith('door_') || id.startsWith('exit_') || FEATURES.stations.includes(id));

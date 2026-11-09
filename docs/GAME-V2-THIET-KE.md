@@ -76,6 +76,35 @@ iOS (4.3b): S6 (giải quẻ, xin xăm) và Thầy AI **tắt** như app chính;
 - **Bay:** nút 🗡️ (hiện khi đã mở), cần ▲▼ đổi độ cao; phím F / Space / C. MMO gửi độ cao `a` (0–420) để người khác thấy bay.
 - **VIP:** `state.vip = { until }`; `vipActive()` kiểm hạn. **Chưa có cổng thanh toán** (Apple IAP cho iOS; VNPay/Stripe cho web) — cần chủ app đăng ký merchant trước khi bật bán.
 
+### 3.2 Tàng Y Các — trang phục, phụ kiện, hiệu ứng (S13)
+
+Mã: `cosmetics.js` (danh mục + logic, dùng chung client / máy chủ / test), `accessories.js` (phụ kiện 3D thủ công + ngự vật), `effects.js` (skin hào quang / vệt bước / ngự vật), `wardrobe-ui.js` (bảng). Test: `test-game-cosmetics.mjs`, `test-quan-mmo.mjs`.
+
+- **8 ô trang bị, 51 món:**
+  - phẩm phục (tô màu HSV riêng, shader cũ);
+  - mũ/trâm, sau lưng, cầm tay (dựng thủ công, bám xương Head / Spine02 / RightHand theo vị trí thế giới);
+  - hào quang, vệt bước, ngự vật (skin của gia trì);
+  - khung tên (CSS).
+- **5 bậc hiếm:** Phàm / Linh / Huyền / Tiên / Thần.
+- **Hai loại tiền:**
+  - Phúc Khí (cày được, tiêu không giảm cấp);
+  - Ngọc (điểm danh 7 ngày 10→80, VIP +30/ngày, +20 mỗi cấp).
+- **Nạp Ngọc:** bảng gói để sẵn nhưng **chưa có thanh toán thật** (iOS ẩn hẳn mục này).
+- **Món giới hạn:** độc quyền VIP (Tử Y Chân Nhân, Mũ Sen Vàng — VIP + cấp 10, Bát Quái Hộ Thân Phù, Tiên Hạc ngự vật), theo cấp (Bộ Bộ Sinh Liên cấp 8), theo chuỗi điểm danh 7 ngày (khung tên Kim Long). Tên món khớp danh mục `cosmetics.js` (đồng bộ 2026-11-05 — bản cũ ghi «Liên Hoa Quan, Pháp Luân» lệch với code).
+- **5 bộ ngũ hành** (phẩm phục + mũ + sau lưng + hào quang):
+  - mặc đủ bộ có hiệu ứng bộ;
+  - bộ trùng Dụng thần của người chơi được **Hợp mệnh**: +10% Phúc Khí khi giải án / sảnh nghề.
+- **Hiện ngoài cảnh:**
+  - skin hào quang / vệt bước đã mua hiện kể cả chưa đủ cấp gia trì;
+  - bay vẫn theo cấp 8 / VIP, ngự vật chỉ đổi hình;
+  - cầm đồ khi đứng yên thì tay phải đưa lên trước ngực (`characters.js › hold`); ngồi trà thì cất đồ cầm tay.
+- **Thử đồ:** «Thử 20s» mặc tạm món chưa mua để xem ngoài cảnh.
+- **Trong sân:** quầy **Tàng Y Các** (cánh Tây, −22/37) gồm đình gỗ, 3 ma-nơ-canh mặc áo bộ ngũ hành, người bán cúi chào; mở cùng bảng với nút «Y Các».
+- **MMO:**
+  - hello mang `cos` (chuỗi gọn `ô:món`), tin `cos` khi đổi đồ;
+  - máy chủ lọc qua danh mục (`cleanCos`) rồi phát lại;
+  - người khác ở gần thấy áo, phụ kiện, hào quang, ngự vật, khung tên.
+
 ## 4. Điện thờ và vị thần
 
 | Điện | Vị trí | Thần chủ | Gắn với |
@@ -92,6 +121,8 @@ iOS (4.3b): S6 (giải quẻ, xin xăm) và Thầy AI **tắt** như app chính;
 **Nguồn tượng:**
 1. Thư viện cộng đồng Meshy (CC0), ưu tiên model nhiều chi tiết, remesh 80k/300k.
 2. Thiếu thì tạo bằng Meshy text-to-3D, theo phong cách: tượng gỗ sơn son thếp vàng, ngồi trên đài sen đá, không chữ.
+
+**Tài nguyên kho hiện tại:** đã rà chốt — 94 file GLB / 48 id, không thiếu file, credit chỉ còn 7 → **chỉ tải về (GET/CC0), không tạo mới tốn credit**; nguyên tắc và lệnh kiểm xem `docs/GAME-MESHY-ASSET-PLAN.md`. Điện còn thiếu tượng (Huyền Nữ, Quỷ Cốc, Thủy Phủ) và kế hoạch dựng lại khi có tài nguyên: `docs/GAME-THIET-KE-CHOT.md` §4.
 
 ## 5. Kỹ thuật
 
@@ -110,6 +141,8 @@ iOS (4.3b): S6 (giải quẻ, xin xăm) và Thầy AI **tắt** như app chính;
 | V2-3 | Thầy giải quẻ trong điện (5 phép) | test engine, chơi thử |
 | V2-4 | Nội thất điện + tượng thần (Chính Điện trước, rồi 7 điện vùng) | vào/ra, va chạm, ảnh |
 | V2-5 | Tiến trình: danh hiệu theo thông thạo, mở phẩm phục · tổng kiểm iOS | test, verify:ios |
+
+> **Lộ trình thực thi hiện tại** nằm ở `docs/GAME-THIET-KE-CHOT.md` (thiết kế chốt 2026-11-05, P0 code-only không đụng file khóa): P0-1 «Đường Thầy» (3 tab Thầy Giải Quẻ) + P0-2 bước «Năm nay» 4 sảnh — đã làm xong 2026-11-05 (nhật ký §7).
 
 ## 7. Nhật ký
 
@@ -130,3 +163,28 @@ iOS (4.3b): S6 (giải quẻ, xin xăm) và Thầy AI **tắt** như app chính;
   - Tìm đường: A* lưới 0,8 m + rút gọn theo tầm nhìn thẳng (`world.js`). Khi vướng, nhân vật trượt dọc vật cản, không được thì tính lại đường.
   - Test: `test-game-state.mjs` › Sơn Môn.
 - 2026-11-04: hiệu năng sơn môn: gộp khối thủ công theo vật liệu, công trình phụ dùng bản thường (không HD). Trong khung xem trước: 1.116 → 186 lượt vẽ, 3 → 45 khung/giây.
+- 2026-11-04: ngồi bồ đoàn dựng tư thế xếp bằng bằng xương (`characters.js › seat`): uống trà (cầm chén, nhấp mỗi 7,5 s, hơi nóng), thầy viết chữ sau án thấp, người khác tĩnh tọa.
+- 2026-11-04: thêm **Vận Mệnh Các** và **Thái Tuế Điện** (xem `GAME-NOI-DUNG-THEO-APP.md`, nhật ký 2026-11-04).
+- 2026-11-04: **Tàng Y Các** (§3.2): 51 món / 8 ô, 5 bộ ngũ hành + Hợp mệnh, Ngọc + điểm danh + VIP + quà cấp, phụ kiện 3D, skin hiệu ứng, ngự vật (mây, hồ lô, đài sen, hạc), khung tên, quầy trong sân, đồng bộ MMO. Sửa kèm: `net.js` không chép `acc` của người khác (đai luôn mặc định); bong bóng thoại của Thầy trỏ về vị trí bàn cũ.
+- 2026-11-05: **đợt vá bug + nội dung P0** (thi công theo `GAME-THIET-KE-CHOT.md`, tài sản theo `GAME-MESHY-ASSET-PLAN.md`):
+  - **Ghế phantom Trà Thất:** cũ — máy chủ không trả lời xin ghế thì client tự nhồi người vào bồ đoàn giữa (SEATS[1]) dù có thể hết chỗ → hai người đè một ghế. Giờ `net.js › setSitting`: đường thất bại trả −1 (không số ảo) → `main.js` toast «Hết chỗ ngồi», không dời người; chỉ ngoại tuyến (offline-first) mới cấp ghế cục bộ; gọi chồng dùng lại cùng promise (`seatPending`), máy chủ trả `seat` thì clear. `worker/quan-room.js`: ROOM_CAP đếm cả socket chưa hello (`occupied()`), `sweepIdle()` đóng socket nối mà không chào sau 30 s. `stations.js › openTra` bỏ toast kép.
+  - **Tường thành hở:** cũ chỉ 1 khối chặn giữa mỗi đoạn cung → mối nối hở ~8 m xuyên được thành. `obstacles.js › cityWallBlocks`: 3 khối/đoạn (bước ~5,2 m < đường kính khối ~6,8 m → kín vòng), `landmarks.js › wallRing` dùng nó, cổng Nam vẫn mở. Kèm `markTerraceEdges` (obstacles + landmarks › terrace): viền vách mép nền bậc — không trèo lên nóc từ hông, cửa bậc chính diện vẫn mở.
+  - **Biên Thái Tuế:** origin điện 2000 → 1850 (`world.js › ROOMS`) — x=2000 là ô 1260, vượt biên server (maxX 1210 ô = 1920 m) nên `mv` đứng trong điện bị giao thức bỏ gói; dời cửa tránh chồng hình với Lão Quân Điện (1800) và Vận Mệnh Các (1900).
+  - **Farm Phúc Khí:** `state.js` — thưởng lá số khóa theo **khóa sinh** (`chartBirthKey`: xoá hồ sơ rồi tạo lại cùng người không +10 lần hai); keo bị thần từ chối cũng tốn lượt (`daily.stickTries` + `sticksLeft`); phút trà kẹp trần ngày không cộng tràn (`addTeaMinutes`); chữ hết lượt ở xin xăm nói đúng chuyện keo chối (`stations.js › openXam`).
+  - **Chấm án clamp:** trần thưởng án/ngày `CASE_GAIN_CAP = 60` gộp mọi loại án, vượt chỉ nhận phần còn (`state.js › recordCase` — chống farm điểm client tự tính); chấm án cổ: tòng/chuyên vượng là bản chất cách cục, ưu tiên hơn vượng/nhược (`cases.js › buildClassical`); gợi ý án Tứ Trụ không phá bookkeeping thẻ đã dùng (`case-ui.js`).
+  - **Dispose GPU:** `render3d.js` hủy geometry/material bản cũ khi đổi trang bị (hero, outfit, ngự vật, hào quang) và khi người rời phòng trước khi nạp xong; `characters.js › createCharacter` theo dõi material clone riêng từng instance (texture chung cache không hủy); `master-ui.js`: promise lib AI hỏng không bị cache (thử lại được), stream token gộp theo rAF.
+  - **Tên món VIP:** danh mục dùng tên thật «Tử Y Chân Nhân · Mũ Sen Vàng (VIP + cấp 10) · Bát Quái Hộ Thân Phù · Tiên Hạc» — đã sửa §3.2 khớp `cosmetics.js` (bản cũ ghi «Liên Hoa Quan, Pháp Luân»).
+  - **Vận Mệnh Các / Thái Tuế Điện wire-up:** trạm bia + 9 cổng đại vận + bàn lễ Thái Tuế (`world.js` VAN_GATE_Z/VAN_STELE, `stations.js › openVan` nạp lười), nội thất thủ tục (`interior.js › buildVanMenh / buildThaiTue`; vách 60 bài vị atlas clamp theo cao độ phòng), đèn an Thái Tuế `state.js › lightLamp` (+10 lần đầu, +3/ngày, 1 lần/ngày). iOS tắt cả hai điện: `features.js` — `hasStation` giờ lọc cả trạm `door_/exit_` theo IOS_OFF (bản cũ cửa hai điện vẫn hiện trên iOS).
+  - Khác: `protocol.js › cleanTitle` (danh hiệu qua bộ lọc tên), `net.js › tp` (nhảy đổi phòng/xe ngựa không bị sanityMv kẹp về chỗ cũ), `main.js` mất focus thả phím + cent joystick, `stations.js › chartOf` cache key kèm năm phân tích (qua giao thừa không trả chart năm cũ), `models.js` hạ án thư thấp hơn.
+  - Test chạy đạt trong đợt này: `test-game-state.mjs` (19), `test-quan-protocol.mjs` (14), `test-game-collide.mjs` (131), `test-game-cosmetics.mjs` (8), `test-game-vanmenh.mjs` (9), `test-game-thay-mo-rong.mjs` (13 — Đường Thầy), `test-game-npc-deep.mjs` (7), `test-game-halls.mjs` (8 — baseline giữ nguyên).
+- 2026-11-09: **NPC-AI G0–G2** (thi công theo `docs/GAME-NPC-AI-THIET-KE-DAY-DU.md` — 217.852 từ, 36 mục; sách đã vá 8 finding medium/low + đồng bộ 3 lỗi cao):
+  - **G0 module thuần:** `persona-data.js` (PERSONA-CHUNG 10 luật + 20 persona đủ 7 trường, `lama_dakiet` fail-closed `runtime:false`), `npc-personas.js` (getPersona / personaSystemPrompt — bảng biến đóng 15 khe / personaBark), `bark-pool.js` (pickBark một nguồn: 20 persona dẫn chiếu persona-data + pool trạm xam/que/huong/tra/sen/la_ban/lich + nhóm khách `khach_dieuhau`/`khach_cachcuc`), `story-gen.js` (`makeStory(seed, R, slot, pid…)` — same-seed deterministic, tách pid, chuyện gắn cách cục), `map-rating.js` (6 mức liunian → nhãn mềm «Thuận/Bình thường/Nên thủ», rating gốc chỉ nằm trong `<details>`).
+  - **G1 inject:** `ai.js` — system message persona chèn đúng khung mục 04 §4.4.2 (giữa khối brief+anti-manip và STYLE), persona vào cache key `_briefCacheKey` (không persona → key byte-giống cũ), dynamic import sau guard nên **flag tắt dist không chứa 1 byte persona nào** (build kiểm chứng 2 chiều). Flag `FEATURES.personaAi = false` mặc định — chờ gate eval M-ROLE/P0 trước khi bật.
+  - **G2 wire:** khách hỏi việc có **«Chuyện khách»** riêng sinh từ seed hôm nay + lá số (main.js › todayNpc → makeStory; stations.js › storyCaseBody), nhớ khách qua ngày bằng localStorage `khach:<pid>:<ngày>` (tự dọn key quá 30 ngày); bark trạm (Bàn Thầy/La Bàn/Ống Xăm/Lư Hương/Bảng Lịch/Trà/Sen/Thầy Giải Quẻ/sảnh nghề) qua pickBark theo dayKey; Bà Tư Tàng Y Các bark bong bóng khi lại gần; tutorial 3 câu Lão Tùng lần đầu qua Sơn Môn (flag localStorage); bark bia Vận Mệnh + cổng đại vận + tuyên vị Thái Tuế (vị thứ 43/60 + phương kiêng dân gian); nhãn mức qua mapRating.
+  - **Audit đối kháng sau G2** (10 mũi): 7 sạch (không lộ chuyện qua payload MMO, seed nhất quán 3 màn, flag fail-closed, cache key cũ nguyên vẹn, Lập Xuân đúng giờ thật, không chữ «Đại hung/Hạn» lộ ngoài details, esc đầy đủ) + 6 finding đã vá: một nguồn bark (xoá bản copy kép + helper chết world.js, `dieu_am` lệch chính tả 1 chữ giữa 2 bản — thắng bản đúng), một công thức hash (personaBark = pickBark), khách sân im lặng khi topic không khớp pool (hết mâu thuẫn bong bóng vs án), prune localStorage, «Ba lần keo» đúng số liệu, dayKey/tutorial bark hết cấp phát mỗi frame.
+  - Gate: **19/19 suite node đạt** (thêm mới: persona-schema 14, bark-pool 8, story-gen 8, map-rating 6, ai-persona 10), `test-quan-mmo` 12/12 trên server thật, `vite build` sạch, smoke trình duyệt bản production: vào quán → thế giới → bark Ống Xăm («Keo chối là thần nói thật…») + «Chuyện khách» Cô Hà hiện thật. Chưa làm: G3 (3D canon — chờ tài nguyên Meshy tải về), G4 (runtime tôn giáo — chờ biên bản tham vấn), gate eval 200 câu trước khi bật `personaAi`.
+- 2026-11-09: **G3-lite — model canon đầu tiên + 3 điểm G3 vào world** (tự tải từ thư viện Meshy bằng URL ký sẵn của viewer, KHÔNG đốt credit — balance còn 7/7):
+  - `lib_ong_lao` («Taoist Monk in Traditional Attire», CC0, task 019941bf — 696.251 mặt, có rig; `scripts/strip-anim.mjs` cắt 1 animation thành prop tĩnh rồi `meshy-pack-library.mjs` pack 3 mức: hd 2,55 MB / base 0,99 MB / lod 0,18 MB). Provenance ghi `library/links.json` + `LICENSES.md`.
+  - **Lão Tùng** đứng cổng Sơn Môn (6, 72 — cách tâm bark tutorial 7,7 m) + biển tên 3D; **Am Vân Cốc** = `lib_mtn_house` tại (−56, −163) sườn Tây Hậu Sơn (không đè nền cliff_palace); **bàn thoại Khổng** = `scholar_desk` + chiếu cói procedural (plane rơm #c9a86a) cạnh am. `world.js` thêm registry `PLACES` (một nguồn toạ độ, landmarks đọc lại); biển tên 3D qua helper `nameBoard()`.
+  - Mồi tìm model: trang post community chỉ rót GLB ký sẵn qua performance entry khi model CÓ RIG (viewer load `Animation_*_withSkin.glb`); model static stream `model.json` không lộ GLB —model static cần download tay (nút Download nằm trong viewer WebGL không chạy được trong trình duyệt nhúng).
+  - Còn thiếu cho G3-full: model riêng Vân Cốc (nhà sư áo cam) + Khổng (đế truyền văn) — các trang post static đã chọn sẵn trong sách hồ sơ 17/18 (The Hermit, The Smiling Sage — CC0) chờ download tay hoặc tìm bản rigged tương đương.

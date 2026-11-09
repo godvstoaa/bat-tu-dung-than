@@ -387,13 +387,13 @@ export function masterDais(m = materials(), han = '玄 館') {
   }
   // án thư + giấy + nghiên + bút
   const dz = 1.4, dy = F;
-  g.add(box(2.2, 0.08, 1.0, m.lacquer, { y: dy + 0.78, z: dz }));
-  g.add(box(2.26, 0.03, 1.05, m.gold, { y: dy + 0.73, z: dz, shadow: false }));
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) g.add(box(0.1, 0.72, 0.1, m.lacquer, { x: sx * 1.0, y: dy + 0.37, z: dz + sz * 0.4 }));
-  g.add(box(0.8, 0.01, 0.5, m.paper, { x: -0.2, y: dy + 0.83, z: dz + 0.05, shadow: false }));
-  g.add(box(0.28, 0.05, 0.2, m.ink, { x: 0.6, y: dy + 0.845, z: dz - 0.05 }));
-  for (let i = 0; i < 3; i++) g.add(cyl(0.008, 0.012, 0.32, m.wood, { x: 0.4 + i * 0.13, y: dy + 1.0, z: dz - 0.3 }, 4));
-  g.add(cyl(0.12, 0.1, 0.12, m.celadon, { x: -0.8, y: dy + 0.88, z: dz - 0.15 }, 12));
+  g.add(box(2.2, 0.08, 1.0, m.lacquer, { y: dy + 0.42, z: dz }));
+  g.add(box(2.26, 0.03, 1.05, m.gold, { y: dy + 0.37, z: dz, shadow: false }));
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) g.add(box(0.1, 0.36, 0.1, m.lacquer, { x: sx * 1.0, y: dy + 0.19, z: dz + sz * 0.4 }));
+  g.add(box(0.8, 0.01, 0.5, m.paper, { x: -0.2, y: dy + 0.47, z: dz - 0.05, shadow: false }));
+  g.add(box(0.28, 0.05, 0.2, m.ink, { x: 0.6, y: dy + 0.485, z: dz - 0.15 }));
+  for (let i = 0; i < 3; i++) g.add(cyl(0.008, 0.012, 0.32, m.wood, { x: 0.4 + i * 0.13, y: dy + 0.64, z: dz - 0.38 }, 4));
+  g.add(cyl(0.12, 0.1, 0.12, m.celadon, { x: -0.8, y: dy + 0.52, z: dz - 0.25 }, 12));
   // bồ đoàn cho khách trước án
   g.add(cyl(0.38, 0.4, 0.12, m.cushion, { y: F + 0.06, z: dz + 1.1 }, 18));
   return g;

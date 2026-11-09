@@ -43,9 +43,12 @@ export function masterChatBody(api, { R, who, first, starters = [] }) {
   const form = root.querySelector('[data-role=form]');
   const sugg = root.querySelector('[data-role=sugg]');
   const history = [];
-  let busy = false, abort = null;
+  let busy = false, abort = null, rafPaint = 0, rafText = '';
   let lib = null;
-  const load = async () => (lib ||= Promise.all([import('../engine/ai.js'), import('../engine/neo-checker.js')]).then(([ai, neo]) => ({ ...ai, checkNeo: neo.checkNeo })));
+  const load = async () => {
+    lib ||= Promise.all([import('../engine/ai.js'), import('../engine/neo-checker.js')]).then(([ai, neo]) => ({ ...ai, checkNeo: neo.checkNeo }));
+    try { return await lib; } catch (e) { lib = null; throw e; } // hỏng lần này vẫn được thử lại — không cache promise rejected
+  };
 
   async function ask(q, asker) {
     if (busy || !q) return;
@@ -62,8 +65,13 @@ export function masterChatBody(api, { R, who, first, starters = [] }) {
       const { source, text } = await L.askAI(q, R, L.getConfig(), {
         history, signal: abort.signal,
         onStatus: (s) => { body.innerHTML = `<p class="hq-sub">${esc(s)} …</p>`; },
-        onToken: (_d, full) => { body.innerHTML = md(clean(full)); },
+        // gộp token trong cùng khung hình: mỗi rAF chỉ vẽ một lần (token dồn cuối khung)
+        onToken: (_d, full) => {
+          rafText = full;
+          if (!rafPaint) rafPaint = requestAnimationFrame(() => { rafPaint = 0; body.innerHTML = md(clean(rafText)); });
+        },
       });
+      if (rafPaint) { cancelAnimationFrame(rafPaint); rafPaint = 0; }
       body.innerHTML = md(text);
       a.classList.remove('streaming');
       history.push({ role: 'user', content: q }, { role: 'assistant', content: clean(text) });
@@ -93,9 +101,9 @@ export function masterChatBody(api, { R, who, first, starters = [] }) {
 
   form.onsubmit = (e) => { e.preventDefault(); const q = form.q.value.trim(); form.q.value = ''; ask(q, 'Bạn'); };
   sugg.addEventListener('click', (e) => { const b = e.target.closest('.hq-choice'); if (b) ask(b.textContent, 'Bạn'); });
-  // panel đóng → huỷ luồng
+  // panel đóng → huỷ luồng (chỉ dõi trong subtree panel — panel đóng là replaceChildren bên trong nó)
   const mo = new MutationObserver(() => { if (!root.isConnected) { abort?.abort(); mo.disconnect(); } });
-  requestAnimationFrame(() => { if (root.parentNode) mo.observe(document.body, { childList: true, subtree: true }); });
+  requestAnimationFrame(() => { if (root.parentNode) mo.observe(root.closest('.hq-panel') || document.body, { childList: true, subtree: true }); });
   if (first) requestAnimationFrame(() => ask(first, who));
   else sugg.innerHTML = starters.map((x) => `<button type="button" class="hq-choice">${esc(x)}</button>`).join('');
   return root;

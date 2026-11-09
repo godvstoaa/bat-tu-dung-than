@@ -1,0 +1,302 @@
+{
+  "id": "behave-sapolsky",
+  "title": "Behave: The Biology of Humans at Our Best and Worst",
+  "author": "Robert M. Sapolsky",
+  "why": "Cuốn tổng hợp đỉnh cao về sinh học hành vi: Sapolsky giải một hành vi bằng chuỗi nguyên nhân chồng lớp từ vài phần nghìn giây trước (não) đến vài triệu năm trước (tiến hóa). Đắt giá cho app bói toán vì nó cung cấp cơ chế cụ thể để luận tính cách, động lực, stress, quan hệ nhóm — thay cho câu sáo Barnum; đồng thời huấn luyện AI biết nói điều kiện và giới hạn của mọi phán đoán. Nguồn trích: tóm tắt chương từ SuperSummary, bài review học thuật, blog chương-tương-chương và chỉ mục sách (sackett.net); không tải bản sách gốc, phần chắc chắn nhất tập trung ở chương 1–12; chương 14–17 trích từ các nguồn tóm tắt có nhất quán đủ tin.",
+  "points": [
+    {
+      "title": "Hành vi không bao giờ chỉ có một nguyên nhân",
+      "source": "Mở đầu + Chương 1 «The Behavior»",
+      "principle": "Sapolsky phân tích một hành vi bằng cách đi ngược theo các tầng thời gian: vài giây trước (mạch não), vài giờ trước (hormon), vài năm trước (tuổi thơ), vài triệu năm trước (tiến hóa). Mỗi tầng chỉ giải thích một phần và các tầng tương tác với nhau. Câu hỏi «tại sao người ta làm vậy» không có câu trả lời duy nhất, chỉ có chuỗi nguyên nhân chồng lớp.",
+      "appHook": "Khi luận mệnh, AI không gán cả tính cách cho một chi hay một cung duy nhất; mỗi dấu hiệu chỉ là một tầng, phải ghép nhiều tầng (tứ trụ, đại vận, hoàn cảnh sống) rồi nói rõ mức tin cậy từng tầng.",
+      "tag": "personality"
+    },
+    {
+      "title": "Cùng một hành vi, ngữ cảnh đổi thì nghĩa đổi",
+      "source": "Chương 1 «The Behavior»",
+      "principle": "«Hung hăng» và «thấu cảm» là nhãn con người gán lên hành vi chứ không phải chất liệu tự nhiên của hành vi. Bảo vệ gia đình bằng bạo lực có thể là hành động yêu thương, còn việc nhân đạo cũng có thể xuất phát từ sự lạnh lùng tính toán. Không thể đánh giá hành vi tách khỏi bối cảnh của nó.",
+      "appHook": "Khi luận chi hay cung mang sắc mạnh mẽ (như Thất Sát, Kiếp Tài), AI đặt vào bối cảnh sự nghiệp hay gia đình trước khi gọi là «hung»; cùng một dấu hiệu, ở cương vị bảo vệ là điểm mạnh, trong ngoại giao là rủi ro.",
+      "tag": "personality"
+    },
+    {
+      "title": "Vỏ não trước trán là phanh, và phanh chín muộn nhất",
+      "source": "Chương 2 «One Second Before» + Chương 6 «Adolescence»",
+      "principle": "Vỏ não trước trán (prefrontal cortex) chịu trách nhiệm dìm xung động và dự tính hậu quả xa; tổn thương vùng này làm mất khả năng kiềm chế dù mọi thứ khác bình thường. Hệ cảm xúc limbic chín sớm hơn nên tuổi trẻ dễ hành động trước khi nghĩ. Chỉ khoảng giữa tuổi 20 hệ phanh này mới hoàn thiện.",
+      "appHook": "Với mệnh có xu hướng bốc đồng, lời khuyên không phải câu sáo «hãy biết kiềm chế» mà là thiết kế cơ chế bên ngoài: quy tắc chờ 24 giờ trước quyết định lớn, người giám sát định sẵn — vì phanh sinh lý cần thời gian rèn.",
+      "tag": "decision"
+    },
+    {
+      "title": "Amygdala phản ứng trước, não nghĩ sau",
+      "source": "Chương 2 «One Second Before»",
+      "principle": "Hạt hạnh nhân (amygdala) là mạch phát hiện đe dọa và gắn cảm xúc, hoạt động cực nhanh và chịu ảnh hưởng của những gì đã học từ trước. Kích thích amygdala làm tăng phản ứng sợ hãi–hung hăng, tổn thương nó làm giảm. Nó còn hoạt động trên cả tín hiệu mơ hồ nên dễ báo động nhầm.",
+      "appHook": "Khi giải thích vì sao người này nóng nảy hay hay hoảng loạn, AI diễn giải như mạch não được rèn bởi kinh nghiệm chứ không phải số phận bất biến, kèm cách luyện lại phản ứng (hít thở, chờ vài giây) để hạ nhạy mạch báo động.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Dopamin là niềm vui của sự chờ đợi, không phải của phần thưởng",
+      "source": "Chương 2 «One Second Before»",
+      "principle": "Dopamin dâng lên khi con người mong đợi phần thưởng và mạnh nhất khi kết quả còn bất định — cái «có thể được» gây hứng thú hơn cả cái chắc chắn. Hệ dopamin chiếu lên vỏ não trước trán để thúc đẩy chọn con đường khó hơn nhưng đền bù cao hơn. Nó giải thích vì sao mục tiêu lấp lửng vừa đủ lại duy trì động lực tốt.",
+      "appHook": "Khi tư vấn sự nghiệp theo vận trình, AI cắt mục tiêu lớn thành các mốc thử thách có thể thắng để nung dopamin, thay vì hứa hẹn chắc chắn trơn; động lực sống ở chỗ «sắp tới đây» chứ không ở chỗ đã có.",
+      "tag": "habits"
+    },
+    {
+      "title": "Serotonin ít không làm người hung dữ, mà làm mất phanh khi bị khiêu khích",
+      "source": "Chương 2 «One Second Before»",
+      "principle": "Serotonin liên quan đến việc đè nén hành vi gây hại: nồng độ thấp làm sinh vật khó dừng phản ứng hung hăng trong tình huống đã đủ lý do để bực, chứ không tạo ra cơn giận từ không. Vai trò của nó là kiểm soát nhịp dừng, không phải chất «hung hăng».",
+      "appHook": "Khi luận kiểu tính dễ bùng nổ khi bị xúc phạm, AI nói đúng cơ chế: không phải người này «đen» mà là ngưỡng dừng thấp; lời khuyên là giảm nguồn khiêu khích và rèn khoảng nghỉ giữa kích thích và phản ứng.",
+      "tag": "decision"
+    },
+    {
+      "title": "Nóng, ồn và đau hạ ngưỡng hành vi xấu",
+      "source": "Chương 3 «Seconds to Minutes Before»",
+      "principle": "Những kích thích môi trường vài phút trước hành vi làm thay đổi ngưỡng của não: nhiệt độ cao, tiếng ồn, đau đớn đều tăng khả năng phản ứng hung hăng. Não không xử lý hành vi trong chân không mà trong một thân thể đang chịu đựng cảm giác cụ thể.",
+      "appHook": "Luận «tháng xung khắc dễ tranh chấp» nên chuyển thành khuyên thực dụng: không quyết định quan trọng khi nóng bức, mệt hay trong môi trường ồn; đây là cách biến chữ số mệnh thành lời khuyên môi trường đo được.",
+      "tag": "stress"
+    },
+    {
+      "title": "Cùng một tín hiệu, trạng thái sinh lý khác nhau thì ý nghĩa khác nhau",
+      "source": "Chương 3 «Seconds to Minutes Before»",
+      "principle": "Không có kích thích nào mang ý nghĩa cố định: cùng một câu nói, một mùi hay âm thanh, cơ thể đói mệt hay no đủ sẽ giải mã khác nhau. Não trích rút ý nghĩa từ trạng thái bên trong kết hợp tín hiệu bên ngoài. Hành vi vì thế không thể đoán chỉ bằng đầu vào.",
+      "appHook": "Khi giải mã biểu tượng (mơ, quẻ, điềm), AI hỏi trạng thái hiện tại của người hỏi trước khi cố định nghĩa; tránh kiểu đọc quẻ máy móc một biểu tượng một nghĩa cho mọi người.",
+      "tag": "decision"
+    },
+    {
+      "title": "Testosteron là hormone kiếm địa vị, không phải hormone hung hăng",
+      "source": "Chương 4 «Hours to Days Before»",
+      "principle": "Bằng chứng chéo nhiều loài cho thấy testosteron không tự tạo ra hung hăng; nó khuếch đại phản ứng với các kích thích đã sẵn sàng và làm tăng hành vi cạnh tranh vị thế — kể cả hành vi hợp tác khi thế đua nằm ở đó. Hung hăng chỉ là một trong nhiều kênh thể hiện.",
+      "appHook": "Khi luận mệnh loại khí vượng dễ bị gán là xấu tính, AI diễn giải thành nhu cầu cạnh tranh địa vị cao và khuyên kênh hóa vào thi đua lành mạnh (thăng tiến, thể thao) thay vì xung đột thân tình.",
+      "tag": "personality"
+    },
+    {
+      "title": "Oxytocin gắn kết nhóm trong và nhóm ngoài dễ thành kẻ thù",
+      "source": "Chương 4 «Hours to Days Before»",
+      "principle": "Oxytocin tăng lòng tin, gắn bó và sẵn sàng hy sinh — nhưng chủ yếu với người được coi là «của mình». Song song, nó có thể làm tăng thái độ phòng thủ với người ngoài nhóm. Hormone «yêu thương» này có mặt hai mặt.",
+      "appHook": "Trong luận tình duyên và gia đạo, khi nói về sự gắn bó chặt (cung phu thê hợp đắc), AI kèm cảnh báo: trung thành nhóm nội mạnh đi thì dễ khép và đề phòng người ngoài; cần giữ vòng xã hội mở.",
+      "tag": "social"
+    },
+    {
+      "title": "Stress mạn tính ăn mòn hải mã và bộ nhớ",
+      "source": "Chương 4 «Hours to Days Before»",
+      "principle": "Glucocorticoid (cortisol) hữu ích trong ngắn hạn nhưng ở mức kéo dài nhiều ngày đến nhiều tháng sẽ làm teo nhánh thần kinh ở hải mã (hippocampus), bộ phận ghi nhớ và dập tắt phản ứng stress. Kết quả là vòng xoáy: stress lâu làm hỏng chính cơ chế tự dừng stress.",
+      "appHook": "Khi luận sức khỏe theo vận trình, AI nhắc người ở giai đoạn áp lực kéo dài rằng trí nhớ và khả năng tự điều tiết đang chịu chi phí sinh học thật; ưu tiên giảm nguồn stress trước khi nói đến tự kỷ luật.",
+      "tag": "stress"
+    },
+    {
+      "title": "Trải nghiệm lặp lại được in vào mạch thần kinh",
+      "source": "Chương 4–5 «Hours to Days / Days to Months Before»",
+      "principle": "Mỗi lần một mạch thần kinh được kích hoạt, kết nối giữa các tế bào được củng cố, khiến lần sau dễ kích hoạt hơn — kỹ năng và thói quen thực chất là những con đường thần kinh được đi nhiều lần. Tác động của trải nghiệm lên não là vật lý, không phải ẩn dụ.",
+      "appHook": "Khi khuyên đổi vận, AI không dừng ở «hãy kiên trì» mà nói rõ cơ chế: thói quen nhỏ lặp lại mỗi ngày là cách ghi chương mới cho não; tuần đầu đặt mục tiêu rất dễ để mạch mới có dịp được đi nhiều lần.",
+      "tag": "habits"
+    },
+    {
+      "title": "Chăm sóc sớm viết lại biểu hiện gene",
+      "source": "Chương 5 «Days to Months Before»",
+      "principle": "Nghiên cứu kinh điển của Meaney trên chuột: chuột con được mẹ liếm–chăm nhiều lớn lên bình tĩnh hơn, cơ chế là dấu methyl hóa trên promoter gene thụ thể glucocorticoid ở hải mã làm giảm phản ứng stress. Nuôi dưỡng đã đổi cách gene bật–tắt mà không đổi trình tự DNA. Nuôi chéo chứng minh đây là tác động môi trường, không di truyền.",
+      "appHook": "Khi luận «bẩm sinh hay lo âu», AI tách hai điều: xu hướng sinh ra và cách nuôi dạy đã biến nó thành gì; câu hỏi về tuổi thơ (cha mẹ, nghèo đói, xung đột) đứng trước kết luận về tính cách cố hữu.",
+      "tag": "stress"
+    },
+    {
+      "title": "Ấn dấu thời thơ không phải bản án vĩnh viễn",
+      "source": "Chương 5 «Days to Months Before»",
+      "principle": "Các thay đổi epigenetic do môi trường in ra đều có thể đảo chiều: trong thí nghiệm, ức chế enzyme histone deacetylase khôi phục gene bị tắt, và chuyển chuột con sang mẹ chăm tốt xóa được hồ sơ stress. Môi trường sớm có quyền lực lớn nhưng không khóa cứng kết cục.",
+      "appHook": "Thông điệp hy vọng có cơ sở sinh học: khi AI luận về vận hạn nặng từ thuở nhỏ, luôn kèm phần khả tác động — trị liệu, thay đổi môi trường — thay vì bó tay trước chữ «số».",
+      "tag": "advice"
+    },
+    {
+      "title": "Não thiếu niên là bộ máy săn phần thưởng chưa có phanh",
+      "source": "Chương 6 «Adolescence»",
+      "principle": "Ở tuổi thiếu niên, hệ thưởng limbic chín trước và hệ kiểm soát vỏ não trước trán chín sau; khi quyết định mạo hiểm, thiếu niên có hoạt động vỏ não trước trán thấp hơn và kém nhạy với tín hiệu trừng phạt. Rủi ro tăng mạnh nhất khi có bạn bè nhìn; đồng thời đây cũng là giai đoạn vỏ não được môi trường định hình mạnh nhất.",
+      "appHook": "Luận vận trình tuổi trẻ: AI cảnh báo «sai lầm kiểu tuổi này» có gốc sinh học và nhắc gia đình rằng giám sát xã hội (bạn bè tốt) hiệu quả hơn giảng đạo lý; đồng thời nhấn mạnh đây là cửa sổ rèn thói quen thu hoạch cao nhất.",
+      "tag": "decision"
+    },
+    {
+      "title": "Trong bụng mẹ đã viết phần đầu của cuốn sổ sức khỏe",
+      "source": "Chương 7 «Back to the Womb»",
+      "principle": "Môi trường thai kỳ — dinh dưỡng, hormon stress của mẹ vượt nhau thai, các chất độc — «lập trình» cấu trúc cơ quan và đường cong sức khỏe, tâm trạng của đứa trẻ nhiều năm sau. Bào thai không chỉ lớn lên mà còn được điều chỉnh theo dự báo về thế giới nào nó sắp sinh ra.",
+      "appHook": "Khi luận sức khỏe bẩm sinh theo tứ trụ, AI nói điều kiện sinh ra (thời thế, cha mẹ stress, dinh dưỡng) như một biến số thật, và dừng quát hóa kiểu «sinh năm này thể chất tốt hay xấu» — phần này phụ thuộc bối cảnh hơn năm sinh.",
+      "tag": "stress"
+    },
+    {
+      "title": "Chất độc thời thai nhi để lại dấu vết hành vi",
+      "source": "Chương 7 «Back to the Womb»",
+      "principle": "Các teratogen như rượu (gây hội chứng rượu thai), khói thuốc, chất gây rối loạn nội tiết làm thay đổi phát triển não bào thai và tăng xác suất lo âu, bốc đồng, khó học ở tuổi sau. Đây là rủi ro hành vi có nguồn hoàn toàn phòng ngừa được.",
+      "appHook": "Trong tư vấn về con cái: phần vận sức khỏe của con có gốc là quyết định môi trường của cha mẹ; AI khuyên phòng ngừa cụ thể (thai kỳ sạch rượu, thuốc lá) thay vì chỉ cầu vía theo ngày giờ tốt.",
+      "tag": "advice"
+    },
+    {
+      "title": "Không có gene cho hành vi, chỉ có gene bật tắt theo môi trường",
+      "source": "Chương 8 «Back to When You Were Just a Few Cells»",
+      "principle": "Gene không phải công tắc bật–tắt cố định; biểu hiện của chúng phụ thuộc nhân tố phiên dịch và môi trường, nghĩa là gene nhiều khi chỉ là người theo sau những gì trải nghiệm bật lên. Hành vi là tính trạng đa gene — không một biến thể đơn lẻ nào giải thích được tính cách.",
+      "appHook": "Đây là chống Barnum cứng: AI không được nói «mệnh này bẩm sinh thế»; mọi mô tả tính cách từ bát tự phải kèm dòng phản biện rằng sinh học chỉ cho xu hướng, còn môi trường hiện tại đang giữ phần lớn quyền biểu hiện.",
+      "tag": "personality"
+    },
+    {
+      "title": "Gene chiến binh MAO-A chỉ hiện khi gặp lạm dụng thời thơ",
+      "source": "Chương 8 «Back to When You Were Just a Few Cells»",
+      "principle": "Nghiên cứu Caspi–Moffitt: biến thể enzyme MAO-A giảm hoạt động chỉ liên hệ với hành vi bạo lực ở nhóm từng bị lạm dụng nghiêm trọng khi nhỏ; người mang biến thể này mà lớn lên bình thường thì không khác gì người khác. Tương tác gene–môi trường là khuôn mẫu đúng thay vì «gene quyết định».",
+      "appHook": "Khi luận dấu hiệu mệnh hung hay chi phạm, AI gắn điều kiện môi trường phát triển vào trước khi cảnh báo rủi ro; cùng một cấu hình, hai tuổi thơ khác nhau cho hai đường đời khác nhau.",
+      "tag": "personality"
+    },
+    {
+      "title": "Chọn lọc tối ưu sinh sản, không tối ưu hạnh phúc",
+      "source": "Chương 9–10 «Back to the Beginning / The Evolution of Behavior»",
+      "principle": "Tiến hóa chọn đặc tính giúp sinh sản thành công nhiều hơn, chứ không chọn trạng thái thoải mái hay đúng đắn; vì thế nhiều thiết kế não — như lo âu báo động thái quá — là hệ quả trái ý muốn của một cơ chế từng có lợi. Mọi đặc tính chỉ «đủ tốt» trong môi trường tổ tiên, không tối ưu cho hiện tại.",
+      "appHook": "Khi giải thích lo lắng thái quá hay thèm ăn quá mức, AI diễn giải như di sản của bộ máy sinh sản hơn là lỗi tính cách — giúp người dùng trân trọng cơ chế thay vì tự trách mình.",
+      "tag": "personality"
+    },
+    {
+      "title": "Hợp tác loài người xây từ chọn họ hàng và tương hỗ có theo dõi uy tín",
+      "source": "Chương 10 «The Evolution of Behavior»",
+      "principle": "Chọn lọc nhóm kiểu «vì lợi ích loài người» chủ yếu bị bác bỏ; hợp tác giữa người không huyết thống tiến hóa qua tương hỗ: giúp nhau nhiều lần, ghi nhớ người không giữ lời, và quan tâm danh tiếng. Con người mở rộng cơ chế này xa hơn các loài khác, kể cả trả ơn gián tiếp qua người khác.",
+      "appHook": "Trong luận tình duyên và quan hệ đối tác, lời khuyên đặt nền trên cơ chế này: lòng tin xây bằng cam kết nhỏ giữ đều đặn và minh bạch; sự phản bội lặp lại là dữ kiện chứ không phải vận hạn.",
+      "tag": "social"
+    },
+    {
+      "title": "Con người không bẩm sinh hiền cũng không bẩm sinh ác",
+      "source": "Chương 10 «The Evolution of Behavior»",
+      "principle": "Sapolsky từ chối cả hai cực Rousseau (con người tự nhiên hiền lành) và Hobbes (con người tự nhiên hung dữ): dữ kiện các xã hội săn bắt cho thấy cả hợp tác lẫn bạo lực đều hiện diện sẵn trong sinh học và văn hóa loài người. Hướng biểu hiện do bối cảnh quyết định.",
+      "appHook": "AI giữ trung lập khi luận tính cách: không phán mệnh tốt hay mệnh xấu tuyệt đối; cùng một cấu hình, một môi trường thu hút ra thi đua, một môi trường nuôi ghen ghét — nên lời khuyên thường là đổi môi trường trước, đổi người sau.",
+      "tag": "personality"
+    },
+    {
+      "title": "Họ hàng có thể được dựng bằng văn hóa, không chỉ huyết thống",
+      "source": "Chương 10 «The Evolution of Behavior»",
+      "principle": "Cơ chế chọn họ hàng không chỉ phản ứng với DNA mà với các dấu hiệu được xã hội gán; con người dựng họ hàng tương tượng — cha mẹ đỡ đầu, anh em kết nghĩa, nhóm tôn giáo gọi nhau là anh em — để mở rộng vùng hợp tác. Danh xưng thân thuộc làm thay đổi hành vi nuôi dưỡng.",
+      "appHook": "Khi luận gia đạo và vòng quan hệ, AI chỉ ra chữ «người nhà» là dựng được: biến người đồng hành tốt thành người nhà bằng nghi lễ và vai trò rõ ràng giúp quan hệ bền hơn nhiều so với chờ duyên số tự nhiên.",
+      "tag": "social"
+    },
+    {
+      "title": "Đồng xu chia nhóm cũng đủ sinh thành kiến",
+      "source": "Chương 11 «Us Versus Them»",
+      "principle": "Thí nghiệm nhóm tối thiểu của Tajfel: chỉ cần chia người theo đồng xu, màu mắt hay sở thích tranh — điều vô nghĩa hoàn toàn — đã nảy sinh thiên vị nhóm trong và hạ thấp nhóm ngoài. Việc gán nhãn nhóm tự nó sinh thành kiến, không cần lý do thực.",
+      "appHook": "Khi giải thích tương khắc chi hay cung hay tuổi, AI nhận thức rằng chính khung «mệnh này khắc mệnh kia» là một dạng gán nhóm có nguy cơ đẻ thành kiến thật; dùng khung tương hợp để gợi cách phối hợp công việc chứ không tạo chia rẽ giữa các tuổi.",
+      "tag": "social"
+    },
+    {
+      "title": "Não phân loại nhóm trong vài phần nghìn giây, kể cả dưới ngưỡng ý thức",
+      "source": "Chương 11 «Us Versus Them»",
+      "principle": "Bộ não phân biệt người trong và ngoài nhóm tự động, nhanh hơn cả nhận thức chủ quan; các vùng như amygdala và vỏ nhận diện khuôn mặt phản ứng khác nhau tùy người đối diện thuộc nhóm nào. Vì là quá trình tự động, muốn tránh thiên vị phải chủ động can thiệp chứ không thể trông vào lòng tốt.",
+      "appHook": "Khi người dùng nói cứ thấy khó thiện cảm với người khác tuổi hay cung, AI giải thích bằng quá trình tự động của não — không phải bàn tay số phận hay lỗi tính cách — và khuyên tiếp xúc cá nhân hóa để làm mềm phân loại.",
+      "tag": "social"
+    },
+    {
+      "title": "Thấu cảm giảm khi người ngoài nhóm đau, có khi đảo thành khoái cảm",
+      "source": "Chương 11 «Us Versus Them» + Chương 14 (Empathy)",
+      "principle": "Hệ thấu cảm não không trung lập: khi người chịu đau thuộc nhóm ngoài, phản ứng của các vùng liên quan cảm nhận đau giảm hẳn, thậm chí có khi chuyển sang tín hiệu khoái cảm. Thấu cảm là tài nguyên ưu tiên cho nhóm trong; muốn chia sẻ cho người khác nhóm thì phải dùng ý chí điều tiết.",
+      "appHook": "Trong tư vấn hòa giải mâu thuẫn (gia đình, đối tác), AI chuẩn bị bước đưa người kia vào nhóm trong — kể câu chuyện cá nhân của họ trước khi bàn điều kiện — vì không làm vậy thì mọi lý lẽ gặp thấu cảm đã tắt trước.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Tiếp xúc hạ thành kiến chỉ khi điều kiện đúng",
+      "source": "Chương 11 «Us Versus Them»",
+      "principle": "Giả thuyết tiếp xúc không đúng vô điều kiện: giao lưu giữa hai nhóm chỉ giảm thù địch khi địa vị ngang, có mục tiêu chung và hợp tác, có ủng hộ từ thể chế xung quanh. Tiếp xúc đơn thuần trong bất bình đẳng đôi khi còn tăng giận. Thiết kế điều kiện mới là chìa khóa.",
+      "appHook": "Khi khuyên hòa giải quanh xung khắc tuổi (gia đình lo tuổi khắc tuổi), AI khuyên tạo hoạt động hợp tác có mục tiêu chung ngang vai — chứ không chỉ khuyên gặp nhau nhiều hơn, vốn có thể phản tác dụng.",
+      "tag": "advice"
+    },
+    {
+      "title": "Người thường làm hại người khác khi được lệnh, tỉ lệ phụ thuộc tình huống",
+      "source": "Chương 12 «Hierarchy, Obedience, and Resistance»",
+      "principle": "Thí nghiệm Milgram: đa số người bình thường tuân lệnh đẩy mức điện giật tối đa, nhưng các biến thể cho thấy khoảng cách với nạn nhân, sự hiện diện của đồng minh phản đối, hay uy tín của người ra lệnh quyết định tỉ lệ tuân thủ. Tội ác thường phát sinh trong thiết kế tình huống, không cần quái vật.",
+      "appHook": "Khi luận về vị thế quyền lực làm sai lệch con người, AI dùng khung này để khuyên thiết kế đồng minh phản đối và cơ chế cảnh báo sớm trong công việc — chống áp lực quyền lực bằng cấu trúc hiệu quả hơn bằng ý chí cá nhân.",
+      "tag": "social"
+    },
+    {
+      "title": "Vai trò và bối cảnh có thể nuốt tính cách, nhưng bằng chứng có giới hạn",
+      "source": "Chương 12 «Hierarchy, Obedience, and Resistance»",
+      "principle": "Thí nghiệm tù Stanford cho thấy vai trò cảnh sát và tù nhân thiết lập hành vi nhanh hơn tính cách cá nhân; nhưng nghiên cứu này bị phê bình nặng về phương pháp (gợi ý trước, tuyển chọn thiên lệch). Quyền của tình huống là thật, nhưng đừng bẻ cong bằng chứng để kết tội tính cách quá tay.",
+      "appHook": "Khi luận người trong tổ chức, AI diễn giải «bị vai trò thay đổi» như mô tả trung lập có cơ chế, không gán cho bản tính; đồng thời minh bạch với người dùng về mức tin cậy của các bằng chứng hành vi — cách nói này tăng uy tín chống Barnum.",
+      "tag": "social"
+    },
+    {
+      "title": "Mỗi bậc xuống trong địa vị xã hội, sức khỏe xấu thêm một bậc",
+      "source": "Chương 12 «Hierarchy, Obedience, and Resistance»",
+      "principle": "Nghiên cứu Whitehall trên công chức Anh cho thấy tỷ lệ bệnh và tử vong tăng đều theo từng bậc thấp hơn trong cơ cấu, ngay cả khi trừ đi hút thuốc và thu nhập cơ bản. Không phải ranh giới nghèo–giàu mà là gradient liên tục theo vị trí xã hội.",
+      "appHook": "Khi luận sức khỏe theo vận trình, AI đánh giá vị trí xã hội của người dùng trong môi trường làm việc (địa vị, quyền kiểm soát) như một biến số sức khỏe thật — cụ thể hơn nhiều so với chỉ nói tháng này nên giữ sức.",
+      "tag": "stress"
+    },
+    {
+      "title": "Điểm độc của địa vị thấp nằm ở thiếu kiểm soát, thiếu dự đoán, thiếu lối xả",
+      "source": "Chương 12 «Hierarchy, Obedience, and Resistance»",
+      "principle": "Trong cả dữ liệu khỉ đầu chén lẫn người, tác hại của stress không đến từ thiếu tiền thuần túy mà từ thiếu cảm giác kiểm soát, thiếu khả năng dự đoán điều gì tới, và không có lối xả căng thẳng (chăm sóc xã hội, liên minh, hoạt động xả). Thêm một trong ba yếu tố này là giảm đáng kể mức hại sinh học.",
+      "appHook": "Khi khuyên sức khỏe và sự nghiệp cho người ở vị trí bị động, AI ưu tiên tăng dự đoán được (kế hoạch rõ, thông tin sớm) và tạo lối xả — đôi khi hiệu quả hơn tăng thu nhập trên cùng một mệnh.",
+      "tag": "stress"
+    },
+    {
+      "title": "Phán quyết đạo đức chạy trước lý giải",
+      "source": "Chương 13 «Morality and Doing the Right Thing»",
+      "principle": "Phán xét đạo đức nảy sinh như trực giác nhanh, rồi lý do mới được dựng lên để biện minh — không phải ngược lại. Vấn đề xe điện cho thấy cùng số mạng cứu, kéo cần được chấp nhận còn đẩy người thì không: khung hình ảnh và khoảng cách quyết định đạo đức, không chỉ số học.",
+      "appHook": "Khi AI khuyên về quyết định đạo đức (chia tài sản, buông bỏ mối quan hệ), nhớ rằng cảm giác đúng đầu tiên của người dùng là trực giác còn lý do đến sau; khuyên chờ kiểm tra lý do thật sau cơn cảm xúc rồi mới chốt.",
+      "tag": "decision"
+    },
+    {
+      "title": "Ghê tởm vật lý lây sang phán xét đạo đức",
+      "source": "Chương 13 «Morality and Doing the Right Thing»",
+      "principle": "Cảm giác ghê tởm của cơ thể (mùi xấu, chỗ bẩn, vị đắng) làm phán xét đạo đức nặng hơn; cùng một hành động được đánh giá tàn nhẫn hơn khi người đánh giá đang ở trạng thái ghê tởm. Đạo đức không phát ra từ một lý trí trong sạch mà từ một thân thể đang cảm.",
+      "appHook": "Khi khuyên người dùng không quyết định lúc đói, mệt hay bực bội, AI nói rõ cơ chế: trạng thái cơ thể đang nghiêng cán cân đạo đức; hẹn phán xét tình huống nhạy cảm cho lúc thân–tâm ổn định.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Mỗi người mang một nền tảng đạo đức khác nhau",
+      "source": "Chương 13 «Morality and Doing the Right Thing»",
+      "principle": "Lý thuyết nền tảng đạo đức cho thấy con người nhấn mạnh khác nhau giữa quan tâm–làm hại, công bằng, trung thành, tôn trọng quyền lực và thanh sạch. Mâu thuẫn giữa người với người thường không phải ai vô đạo đức, mà là hai nền tảng ưu tiên khác nhau đang va nhau.",
+      "appHook": "Khi luận gia đạo và xung khắc quanh hiếu thảo đối lập công bằng, AI xác định trước ưu tiên đạo đức của từng bên trong mâu thuẫn; giải pháp không phải đổi người mà là dựng thỏa hiệp nhận diện được ưu tiên mỗi bên.",
+      "tag": "social"
+    },
+    {
+      "title": "Thấu cảm có hai đầu: cảm nhận và hiểu, và chúng tách rời",
+      "source": "Chương 14 «Feeling Someone's Pain, Understanding Someone's Pain, Empathy»",
+      "principle": "Thấu cảm gồm thành phần cảm xúc (cảm nhận đau cùng, liên quan vỏ não đảo và vỏ não đai trước) và thành phần nhận thức (hiểu góc nhìn); hai bên có thể có mà không có nhau. Thấu cảm còn nhanh cạn khi nạn nhân là người xa lạ ẩn danh, còn một nhân vật cụ thể có mặt làm cảm xúc mạnh hơn hẳn.",
+      "appHook": "Trong luận tình duyên, khi đối tác được gán kiểu lạnh, AI phân biệt hai dạng: thiếu cảm nhận hay thiếu hiểu — lời khuyên khác nhau; và khuyên bày tỏ nhu cầu bằng tình huống cụ thể một người thay vì yêu cầu chung chung hãy thấu cảm với tôi.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Làm điều tốt không cần động cơ ấm",
+      "source": "Chương 14 «Empathy» + Chương 1 «The Behavior»",
+      "principle": "Hành động nhân đạo không phải lúc nào cũng bề mặt cảm xúc ấm; nó có thể phát sinh từ quyết định lạnh và tính toán, trong khi hành động hung như bảo vệ người thân lại xuất phát từ tình yêu. Đánh giá hành động nên dựa trên kết quả và bối cảnh hơn cảm xúc của người làm.",
+      "appHook": "Khi luận kiểu người vô tình nhưng có nghĩa hay nóng miệng mà lòng tốt, AI khuyên xem chất lượng hành động lặp lại thay vì cảm xúc bề mặt — cách đánh giá con người có cơ chế, không gắn nhãn mệnh theo ấn tượng.",
+      "tag": "advice"
+    },
+    {
+      "title": "Cơ thể ấm thì thế giới ấm, tay sạch thì phán nhẹ",
+      "source": "Chương 15 «Metaphors We Kill By»",
+      "principle": "Tư duy thể hiện (embodied cognition): trải nghiệm vật lý như giữ ly nước nóng làm đánh giá tính cách người khác ấm áp hơn, còn làm tay sạch làm phán xét đạo đức nhẹ hơn. Não xử lý ấm–lạnh, sạch–bẩn theo cùng mạch cảm xúc xã hội, nên ngôn từ dựa trên thân thể có sức chỉnh hướng nhận thức thật.",
+      "appHook": "Khi soạn lời luận mệnh, AI dùng ngôn từ ấm (bậc thang, lối đi, mùa) thay vì ngôn từ đen (tai ương kinh hoàng); và biết rằng trạng thái thể chất người đọc cũng nghiêng cách họ tiếp nhận thông điệp.",
+      "tag": "decision"
+    },
+    {
+      "title": "Gợi mở qua ký hiệu có hiệu lực nhưng nhỏ, đừng thần kỳ hóa",
+      "source": "Chương 15 «Metaphors We Kill By»",
+      "principle": "Tiếp xúc với từ và ký hiệu trong môi trường có thể điều chỉnh hành vi ta không hay biết, và các nghi lễ vật chất (bàn thờ, tên gọi, biểu tượng) mang sức nặng cảm xúc thật. Tuy nhiên các hiệu ứng gợi mở qua ký hiệu thường nhỏ và bị tranh cãi mạnh về khả năng tái lập — chúng là điều chỉnh nhỏ, không phải phép dịch chuyển số phận.",
+      "appHook": "Khi tư vấn phong thủy, AI nói đúng tỷ trọng: chỉnh môi trường và ký hiệu là can thiệp tâm lý hỗ trợ có giá trị, nhưng tuyệt đối không hứa đặt vật này thì vận đổi; nói thẳng hiệu lực nhỏ giúp app giữ uy tín khoa học.",
+      "tag": "decision"
+    },
+    {
+      "title": "Biểu tượng thiêng bị xâm phạm có thể gây phản ứng mãnh liệt",
+      "source": "Chương 15 «Metaphors We Kill By»",
+      "principle": "Ký hiệu được gán giá trị thiêng (quốc kỳ, đấng tôn giáo, nơi thờ) kích hoạt hệ cảm xúc như một sự đe dọa thể chất; xâm phạm có thể sinh phản ứng cực đoan, kể cả bạo lực. Đây không phải lập luận mà là cảm giác tổn thương thể hiện bằng cảm xúc và sinh lý.",
+      "appHook": "Khi luận về mâu thuẫn gia đình quanh bàn thờ, tên gọi, phong tục cưới hỏi, AI nhận diện đây là xung đột về biểu tượng thiêng; khuyên xử lý bằng tôn trọng nghi thức trước, không đi bằng lý lẽ hợp lý trước.",
+      "tag": "social"
+    },
+    {
+      "title": "Sinh lý có thể sản xuất hành vi ngoài ý muốn, vụ khối u não",
+      "source": "Chương 16 «Biology, the Criminal Justice System, and Free Will»",
+      "principle": "Vụ Charles Whitman: trước vụ xả súng, anh ta để lại thư yêu cầu khám và kết quả là khối u ép vào vùng amygdala; các trường hợp sa sút trí tuệ phía trán cũng cho thấy hành vi lệch chuẩn xuất hiện đột ngột khi tổn thương não thay đổi. Bộ máy sinh lý có thể sản xuất hành vi mà người mang nó không chọn được.",
+      "appHook": "Khi thấy dấu hiệu tính cách đổi đột ngột sau tuổi trưởng thành (giận dữ mới, hành vi mới), AI khuyến nghị kiểm tra y khoa (não, hormon) trước khi gán cho vận hạn hay tính cách; kết luận sinh lý có thể cứu được một đời.",
+      "tag": "personality"
+    },
+    {
+      "title": "Tự do ý chí theo nghĩa thần thoại không tồn tại, trách nhiệm cần thiết kế lại",
+      "source": "Chương 16 «Biology, the Criminal Justice System, and Free Will»",
+      "principle": "Kết luận xuyên suốt của sách: mỗi hành vi được sinh ra bởi chuỗi nguyên nhân — não, hormon, gene, môi trường, tiến hóa — mà không tầng nào người ta tự chọn được. Sapolsky cho rằng trừng phạt dựa trên cái đáng bị là mô hình sai; hướng đúng là phòng ngừa, cách ly nhân đạo và trị liệu người nguy hiểm. Không có tự do ý chí không đồng nghĩa mọi cố gắng vô nghĩa.",
+      "appHook": "Triết lý vận trình của app: thay vì phán mệnh xấu đáng chịu, AI luôn ánh xạ về nguyên nhân có thể can thiệp; lời khuyên theo khung điều kiện — cơ chế — hành động thay vì kiếp số — kết cục, kể cả với vận hạn nặng.",
+      "tag": "advice"
+    },
+    {
+      "title": "Không câu trả lời một tầng nào đủ, bài học tổng của cả sách",
+      "source": "Chương 17 «Why Do We Do the Things We Do?»",
+      "principle": "Chương cuối kết nối mọi tầng: hành vi phải được giải bằng chuỗi từ vài phần nghìn giây trước đến vài triệu năm trước, và bỏ một tầng nào ra là kết luận sẽ lệch. Một câu chuyện duyên dáng, đẹp, dễ nhớ thường là dấu hiệu cần đề phòng nhiều hơn là bằng chứng cho đúng.",
+      "appHook": "Đây là quy tắc chống Barnum của app: mọi luận mệnh của AI phải có cơ chế cụ thể, chỉ rõ tầng nào nó đứng trên (sinh học, hoàn cảnh, thói quen), và tự phủ định khi thiếu dữ kiện; tránh câu chắc chắn tuyệt đối kiểu áp dụng đúng cho mọi người.",
+      "tag": "decision"
+    }
+  ]
+}

@@ -164,7 +164,9 @@ export function buildClassical(id) {
   if (!c) return null;
   const k = c.known;
   const special = ['从格', '专旺'].includes(c.category);
-  const verdict = k.strength === 'vượng' ? 'vuong' : k.strength === 'nhược' ? 'nhuoc' : k.strength === '中和' ? 'trung' : special ? 'tong' : null;
+  // tòng / chuyên vượng là BẢN CHẤT cách cục — ưu tiên hơn vượng/nhược thường: ai trả lời đúng
+  // «Cách đặc biệt» (chip tong) phải được điểm, dù sách cổ ghi thêm thân vượng/nhược kèm theo.
+  const verdict = special ? 'tong' : k.strength === 'vượng' ? 'vuong' : k.strength === 'nhược' ? 'nhuoc' : k.strength === '中和' ? 'trung' : null;
   const r = rng(hashSeed(id));
   const geOpts = k.ge ? shuffle(r, [k.ge, ...shuffle(r, Object.keys(GE_VI).filter((g) => g !== k.ge)).slice(0, 3)]) : null;
   const steps = [verdict && 'strength', geOpts && 'ge', WX.includes(k.yongElement) && 'yong'].filter(Boolean);

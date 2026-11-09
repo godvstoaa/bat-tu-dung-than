@@ -32,6 +32,7 @@ import { numerologyReading, lifePathNumber, LIFE_PATH } from './numerology.js';
 import { drawRune, RUNES } from './runes-kb.js';
 import { ichingRandom, ICHING_64 } from './iching64-kb.js';
 import { coffeeRead, COFFEE_SYMBOLS } from './coffee-kb.js';
+import { BEHAVIOR_KB, pickBehaviorPoints } from './behavior-kb.js'; // [2026-11] corpus hành vi học 6 sách tâm lý — neo nhận định + chống sáo Barnum (docs/KNOWLEDGE-BEHAVIORAL.md)
 import { analyzeName } from './naming.js';
 import { getRemedyForChart, getYeguoForChart, meritLedger, remedySummary, LIAOFAN_STORY, REMEDY_QUOTES, YEGUO, BAZI_HUAJIE, CHAN_HUI, CHANHUI_PRINCIPLE, ZHUNTI, JING_ZHOU, GAI_XIN, GAI_LEVELS, GAI_PRINCIPLE, DAO_JIA } from './remedy-fate.js';
 import { think as brainThink } from '../brain/brain.js';
@@ -138,6 +139,7 @@ import { matchBusinessPartners } from './partner-match.js';
 import { analyzeHealth, answerHealth, meridianClock, bodyConstitution, stageHealth, decadeHealthArc } from './tcm.js';
 import { evaluateNumber, recommendNumbers } from './number-fs.js'; // [loop 1137/1141] số lý phong thủy
 import { ANTI_MANIPULATION_DATA as _AM } from './anti-manipulation-data.js'; // [loop 1386] META anti-manipulate steering
+import { FEATURES } from '../game/features.js'; // [G1 — NPC-AI] flag FEATURES.personaAi, TẮT mặc định (docs/npc-ai/15 §15.6a)
 
 // [loop 1386] META-steering injection: neo AI vào LÁ SỐ (data), chống false-premise / narrative
 //   manipulation / sycophancy. Build 1 lần (static), inject vào system message #2 cùng brief.
@@ -167,6 +169,19 @@ const _ANTI_MANIP_GUIDE = (() => {
 
 // brief cache — tránh rebuild 16k brief mỗi chat message (212ms → 0ms sau lần đầu)
 let _briefCache = null;
+
+// [G1 — NPC-AI] cache key brief — tách hàm (export nội bộ `_`, chỉ để test
+//   scripts/test-game-ai-persona.mjs đọc; không thuộc API công khai) theo
+//   docs/npc-ai/15-lo-trinh-tich-hop.md §15.6b: persona vào khóa cache để KHÔNG
+//   trộn brief giữa các persona (đổi persona → key đổi → không dính brief cache
+//   của giọng cũ). personaId null (flag tắt / không có persona) → chuỗi key
+//   GIỮNG NGUYÊN khuôn cũ — đường đi code khi flag tắt y hệt như trước G1.
+export function _briefCacheKey(R, personaId) {
+  const _td = new Date();
+  const _famKey = (R._family || []).map((f) => `${f.role || ''}:${f.date || ''}:${f.time || ''}`).join(',');
+  const base = `${R.chart.input.year}-${R.chart.input.month}-${R.chart.input.day}-${R.chart.input.hour}-${R.chart.input.minute}-${R.chart.input.gender}-${_td.getFullYear()}-${_td.getMonth()}-${_td.getDate()}-${_famKey}`;
+  return personaId ? `${base}|persona:${personaId}` : base;
+}
 
 const hanviet = (gz) => gz.split('').map((c) => (GAN[c]?.vi || ZHI[c]?.vi || c)).join(' ');
 const wxVi = (w) => WX_VI[w];
@@ -686,6 +701,21 @@ ${(() => { try { const cz = cezi('福'); return `[kiểm tra dữ liệu] 测字
       "  → ĐẶT TÊN: chữ Hán có hành " + (R.yong?.primary || '?') + " + tránh hành " + (R.yong?.ji || '?') + " (tool analyze_name)\n" +
       "  → PHONG THỦY: hướng " + ({'木':'Đông','火':'Nam','土':'Trung','金':'Tây','水':'Bắc'}[R.yong?.primary] || '?') + " tốt, hướng kỵ theo " + (R.yong?.ji || '?') + " (tool fengshui_direction)";
   } catch (e) { brief += "\n--- KIẾN THỨC CỔ PHÁP: [lỗi load] ---"; }
+
+  // ---- [2026-11] HÀNH VI HỌC — corpus 6 sách tâm lý (behavior-kb.js) — neo nhận định tính cách/hành vi + chống sáo Barnum ----
+  // Tối đa 8 điểm/lượt (token budget): lọc theo chủ đề từ tín hiệu lá số (cách cục→tính cách, chi ngày→tình duyên,
+  // thập thần chủ đạo→sự nghiệp, ngũ hành lệch→sức khỏe, đa thập thần→quan hệ); luôn có habits/advice (lời khuyên cải vận).
+  try {
+    const _dmGan = c.dayMaster.gan || '';
+    const _weakestWx = Object.entries(R.wx?.pct || {}).sort(([,a],[,b]) => a - b)[0];
+    const _topGod = ((typeof dominantGod === 'function') ? (dominantGod(R).ranked || [])[0]?.god : null) || null;
+    const _godSet = new Set();
+    for (const pos of ['year','month','day','time']) { const pl = c.pillars[pos]; if (pl.ganGod) _godSet.add(pl.ganGod); (pl.hidden||[]).forEach(h => { if (h.god) _godSet.add(h.god); }); }
+    const _bh = pickBehaviorPoints({ dayGan: _dmGan, dayZhi: c.pillars.day.zhi || '', yearZhi: c.pillars.year.zhi || '', weakestWx: _weakestWx ? _weakestWx[0] : null, topGod: _topGod, patternName: R.pattern?.name || null, godCount: _godSet.size }, 8);
+    brief += "\nNGUYÊN LÝ HÀNH VI HỌC (Sapolsky/Kahneman/Clear/Little/Levine-Heller/Aronson — trích ý tưởng, chống sáo Barnum):\n" +
+      _bh.map(p => "• [" + p.tag + "] " + p.title + " (" + p.book + "): " + p.principle.slice(0, 110) + " → Áp: " + p.appHook.slice(0, 100)).join("\n") + "\n" +
+      "(Neo nhận định tính cách/hành vi vào nguyên lý trên khi khớp chủ đề — KHÔNG dùng thay dữ liệu lá số.)\n";
+  } catch (e) { brief += "\nNGUYÊN LÝ HÀNH VI HỌC: [lỗi load]\n"; }
 
   // ---- [round 2 crawl] HÔN NHÂN + TÀI VẬN + QUÝ NHÂN ----
   try {
@@ -1377,6 +1407,10 @@ Dinh dang: 3-5 doan ngan. Mo = chot luan. Giua = giai thich don gian. Cuoi = 2-3
         • KỴ THẦN + cảnh báo (điều gì phải tránh — mục Dụng-HỶ-KỴ).
     (b) Khi user tâm sự/câu hỏi cảm xúc («mệt mỏi», «tang», «bất an») → TRẢ LỜI CẢM XÚC TRƯỚC, không gàn ép data — coverage thấp ở dạng câu này là ĐÚNG, đừng nhồi kiến thức.
     (c) Mục tiêu: tổng hợp đủ xương sống (cách cục → dụng thần → vận hạn → giá trị) mà KHÔNG bỏ sót 3 nút giá trị trên.
+  25. HÀNH VI HỌC — NEO NHẬN ĐỊNH + CHỐNG SÁO BARNUM (corpus hành vi 2026-11):
+    (a) Khi luận TÍNH CÁCH/HÀNH VI từ lá số → nếu mục «NGUYÊN LÝ HÀNH VI HỌC» trong brief có điểm khớp chủ đề → NEO nhận định vào nguyên lý đó: nói rõ CƠ CHẾ (dấu hiệu nào trong lá số → vì sao hay dẫn tới hành vi đó) thay vì dán nhãn trống.
+    (b) CẤM câu sáo Barnum: câu đúng với bất kỳ ai («bạn bề ngoài mạnh mẽ nhưng bên trong nhạy cảm») mà KHÔNG neo được vào trụ/sao cụ thể + nguyên lý cụ thể. Mỗi nhận định tính cách phải đủ 3 mảnh: dấu hiệu lá số (trụ nào, sao nào) + cơ chế (nguyên lý hành vi học ngắn) + điều kiện («nếu đi kèm X thì Y»).
+    (c) Khuyên cải vận → dùng cơ chế hành vi có đế (sửa môi trường, thói quen nhỏ lặp lại, quản áp lực) thay kiểu «suy nghĩ tích cực». Mọi nhận định nói rõ ĐIỀU KIỆN + GIỚI HẠN: mệnh là khuynh hướng, hoàn cảnh và lựa chọn vẫn đổi được kết cục.
 `;
 // ===========================================================================
 //  3. TOOLS — các engine deterministic cho AI tự gọi (Z.ai/OpenAI tool-calling)
@@ -2333,6 +2367,10 @@ export function _selectRelevantSections(sections, question) {
     { kw: /tu vi|tử vi|ziwei|紫微/, titles: [/TỬ VI|紫微/] },
     { kw: /phong thuy|phong thủy|feng shui|hướng/, titles: [/PHONG THỦY|HƯỚNG/] },
     { kw: /khí hậu|dieu hau|điều hậu|调候/, titles: [/ĐIỀU HẬU|调候/] },
+    { kw: /tinh cach|tinh khi|tinh thanh|tinh cong|hinh nguoi|doc nguoi/, titles: [/HÀNH VI HỌC/] },
+    { kw: /loi khuyen|thoi quen|cai thien|cai van|ky luat|tu quan|hanh dong|thay doi ban than/, titles: [/HÀNH VI HỌC/] },
+    { kw: /stress|ap luc|cam xuc|met moi|lo au|bat an|thu gian/, titles: [/HÀNH VI HỌC/] },
+    { kw: /moi quan he|quan he|dong nghiep|hop tac|nhom|ban be|ung xu/, titles: [/HÀNH VI HỌC/] },
   ];
   // Always-include sections (core)
   const ALWAYS = [/TÓM TẮT|⭐/, /TỨ TRỤ|四柱/, /VƯỢNG SUY/];
@@ -2674,11 +2712,42 @@ export function suggestFollowups(question, R, answer, history) {
 
 
 // ===========================================================================
+//  [G1 — NPC-AI] PERSONA — nạp giọng nhân vật vào chuỗi AI của Thầy
+//  (điểm cắm docs/npc-ai/15-lo-trinh-tich-hop.md §15.6a; kiến trúc vị trí chèn
+//   docs/npc-ai/04-kien-truc-persona-object.md §4.4.2 + docs/npc-ai/02 §5.1).
+//  Dynamic import npc-personas.js CHỈ chạy trong nhánh flag bật: persona-data.js
+//  (~1121 dòng) KHÔNG bị kéo tĩnh vào chunk engine-ai của mọi người dùng — sách
+//  §15.5e dự chunk riêng engine-npc / tải lười cho 4 module G0, nhưng G0 chưa gán
+//  chunk đó trong vite.config.js (file ngoài phạm vi được sửa của G1) nên dynamic
+//  import là cách an toàn cho bundle. Fail-closed ở MỌI nhánh lỗi: flag tắt /
+//  id lạ / runtime:false / lỗi nạp module → trả null → chuỗi messages NGUYÊN
+//  TRẠNG như trước G1 (Thầy vẫn trả lời bình thường).
+// ===========================================================================
+let _npcPersonasPromise = null;
+async function _resolvePersonaMessage(personaInput, ctx) {
+  if (!FEATURES.personaAi || !personaInput) return null; // flag TẮT (mặc định) → nguyên trạng 100%
+  try {
+    if (!_npcPersonasPromise) _npcPersonasPromise = import('../game/npc-personas.js');
+    const { getPersona, personaSystemPrompt } = await _npcPersonasPromise;
+    // Kênh 02 §5.1: option `persona` là object đã resolve; kênh 15 §15.6a: id string
+    // → getPersona tự fail-closed (id lạ → null; lama_dakiet runtime:false → null).
+    const p = typeof personaInput === 'string' ? getPersona(personaInput) : personaInput;
+    // runtime:false chặn cả đường truyền thẳng object — không nạp tới khi flag tôn giáo bật.
+    if (!p || p.runtime === false) return null;
+    return { id: p.id, message: { role: 'system', content: personaSystemPrompt(p, ctx) } };
+  } catch (_) { _npcPersonasPromise = null; return null; } // lỗi nạp → lượt này không persona, lượt sau thử lại được
+}
+
+// ===========================================================================
 //  4. AGENTIC ASK — streaming + tools + thinking + memory (Z.ai spec)
 //  - history: [{role:'user'|'assistant', content}] bộ nhớ hội thoại
 //  - onToken(delta, full): stream nội dung; onStatus(text): báo tiến trình tool
+//  - persona (G1 — NPC-AI): id persona ('thay_tubinh') hoặc object từ getPersona()
+//    (docs/npc-ai/02 §5.1); không truyền → đọc R.npcPersona (docs/npc-ai/15 §15.6a).
+//    CHỈ có hiệu lực khi FEATURES.personaAi BẬT — flag tắt (mặc định) thì bỏ qua
+//    hoàn toàn → tương thích ngược, hành vi Thầy như cũ.
 // ===========================================================================
-export async function askAI(question, R, cfg, { onToken, onStatus, history, signal, style } = {}) {
+export async function askAI(question, R, cfg, { onToken, onStatus, history, signal, style, persona } = {}) {
   cfg = cfg || getConfig();
   // [loop 1354] telemetry — track rounds + total elapsed để log vào admin ai_chat event
   //   (admin thấy: query này mất mấy round? có bị guard cắt ở 60s không?)
@@ -2694,9 +2763,10 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
     return localFallback('Đang dùng bộ luân giải cục bộ. Mở ⚙ Cài đặt để nhận phân tích chuyên sâu hơn.');
   }
 
-  const _td = new Date();
-  const _famKey = (R._family || []).map((f) => `${f.role || ''}:${f.date || ''}:${f.time || ''}`).join(',');
-  const _ck = `${R.chart.input.year}-${R.chart.input.month}-${R.chart.input.day}-${R.chart.input.hour}-${R.chart.input.minute}-${R.chart.input.gender}-${_td.getFullYear()}-${_td.getMonth()}-${_td.getDate()}-${_famKey}`;
+  // [G1 — NPC-AI] giải persona MỘT LẦN, trước cache key + messages. Flag TẮT (mặc định)
+  //   hoặc persona null → trả null ngay → hai dòng dưới y hệt như trước G1 (key + brief giữ nguyên).
+  const _persona = await _resolvePersonaMessage(persona || R?.npcPersona, R);
+  const _ck = _briefCacheKey(R, _persona?.id); // [G1 — NPC-AI] persona vào khóa cache (§15.6b)
   const _fullBrief = (_briefCache && _briefCache.key === _ck) ? _briefCache.brief : (_briefCache = { key: _ck, brief: buildChartBrief(R) }).brief;
 
   // [loop 919] SECTION RAG — chia brief thành sections, gửi chỉ phần liên quan
@@ -2723,6 +2793,11 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
   const messages = [
     { role: 'system', content: (import.meta.env?.MODE === 'ios' ? RESEARCH_SYSTEM_PROMPT : SYSTEM_PROMPT) },
     { role: 'system', content: brief + '\n\n' + _guide + '\n\n' + _ANTI_MANIP_GUIDE },
+    // [G1 — NPC-AI] system message persona — chèn GIỮA ② (brief+guide+anti-manip) và
+    //   ③ (style): chốt vị trí DUY NHẤT docs/npc-ai/04 §4.4.2 + 02 §5.1/§5.3 — thứ tự
+    //   mảng tự thực thi ưu tiên an toàn > persona > style, KHÔNG cần cơ chế nào khác.
+    //   Flag tắt / persona null → spread rỗng → mảng NGUYÊN TRẠNG (hành vi không đổi).
+    ...(_persona ? [_persona.message] : []),
     { role: 'system', content: (STYLE_DIRECTIVES[style] || STYLE_DIRECTIVES['gan-guoi']) + '\n\n⚠ REMEMBER THIS STYLE WHEN ANSWERING — áp dụng cho Câu trả lời này.' },
     ...((history || []).slice(-8)),
     { role: 'user', content: question },

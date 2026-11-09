@@ -1,0 +1,183 @@
+{
+  "id": "atomic-habits-clear",
+  "title": "Atomic Habits",
+  "author": "James Clear",
+  "why": "Atomic Habits (2018) hệ thống hóa cơ chế hình thành và phá bỏ thói quen từ tâm lý học hành vi và thần kinh học: lãi kép của thay đổi nhỏ, tầng bản dạng, vòng lặp gợi ý–khao khát–hành động–thưởng và bốn định luật can thiệp. Corpus này cho phép AI luận mệnh xây lời khuyên cải vận bằng cơ chế cụ thể (thiết kế môi trường, ma sát, thưởng tức thì, chọn sân phù hợp năng khiếu) thay vì câu sáo Barnum. Nguồn web đáng tin đã phủ đủ 20 chương của 6 phần; phần mở đầu và kết luận được suy từ chủ đề lãi kép trùng với chương 1 vì các bản tóm tắt theo chương chỉ phủ chương 1–20.",
+  "points": [
+    {
+      "title": "Lãi kép 1%: thói quen là lãi kép của tự hoàn thiện",
+      "source": "Chương 1 — The Surprising Power of Atomic Habits (Phần 1: The Fundamentals)",
+      "principle": "Cải thiện 1% mỗi ngày sau một năm cho kết quả gấp khoảng 37,78 lần; ngược lại, xấu đi 1% mỗi ngày kéo kết quả tiến về gần 0. Thói quen là khoản đầu tư nhỏ lặp lại, lợi nhuận dồn tích theo thời gian giống lãi kép. Chiến lược hợp nhất các lợi ích cận biên — cải từng khâu nhỏ hơn 1% ở nhiều mặt — cho khác biệt lớn khi cộng dồn, như phép biến đổi của đội xe đạp Anh.",
+      "appHook": "Khi luận vận trình dài hạn, AI khuyến khích cải vận bằng hành vi vi mô lặp mỗi ngày (ngủ, học, giao tiếp) thay vì chờ thời điểm chuyển vận lớn. Nêu cơ chế cộng dồn cụ thể để lời khuyên có đế, không sáo.",
+      "tag": "habits"
+    },
+    {
+      "title": "Cao nguyên tiềm năng và thung lũng thất vọng",
+      "source": "Chương 1 — The Surprising Power of Atomic Habits",
+      "principle": "Tiến bộ theo thói quen không tuyến tính: kết quả thường trễ hơn nỗ lực, tạo giai đoạn cảm giác làm mà chẳng thấy gì đổi thay. Đường tiến bộ thực tế vượt lên đột ngột sau ngưỡng tới hạn, trong khi kỳ vọng của con người chạy theo đường thẳng — khoảng hở giữa hai đường đó chính là thung lũng thất vọng. Phần lớn người bỏ cuộc đúng lúc hệ thống sắp phá ngưỡng.",
+      "appHook": "Khi khách đang nỗ lực mà chưa thấy quả (học hành, kinh doanh, tình duyên), AI diễn giải đây là độ trễ tự nhiên của tích lũy và chỉ dấu hiệu đang sát ngưỡng, thay vì kết luận vận xui chặn đường.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Hệ thống thắng mục tiêu",
+      "source": "Chương 1 — The Surprising Power of Atomic Habits",
+      "principle": "Người thắng và người thua thường có mục tiêu như nhau, nên mục tiêu không phải nhân tố phân biệt; chất lượng hệ thống — tập thói quen chạy hằng ngày — mới quyết định kết quả. Con người không dừng đúng tầm mục tiêu mà trượt xuống đúng tầm hệ thống đang vận hành. Mục tiêu chỉ định hướng, hệ thống mới tạo tiến bộ.",
+      "appHook": "Trong luận sự nghiệp và sức khỏe, AI chuyển mục tiêu mơ hồ (muốn thành công, bớt áp lực) thành hệ thống cụ thể: lịch, quy trình, thói quen đo được gắn với nhịp vận của khách. Đây là mẫu chống Barnum vì lời khuyên có cấu trúc chứ không phải lời chúc.",
+      "tag": "advice"
+    },
+    {
+      "title": "Ba tầng thay đổi: kết quả – quá trình – bản dạng",
+      "source": "Chương 2 — How Your Habits Shape Your Identity (Phần 1: The Fundamentals)",
+      "principle": "Thay đổi hành vi có ba tầng: đổi kết quả, đổi quá trình, đổi bản dạng (quan niệm về bản thân). Đa số bắt đầu từ kết quả nên bền vững kém; thay đổi bền nhất xuất phát từ bản dạng vì hành vi nhất quán với hình ảnh tự thân được duy trì gần như tự nhiên. Thói quen và bản dạng nuôi ngược nhau theo hai chiều.",
+      "appHook": "AI luận tính cách theo bát tự nên đóng khung các chỉ số bản mệnh là xu hướng bản dạng đang được nuôi, không phải bản án cố định — và chỉ đường đổi bản dạng qua hành vi. Cách này gắn tính cách với cơ chế thay đổi được, chống sáo rỗng.",
+      "tag": "personality"
+    },
+    {
+      "title": "Mỗi hành vi là một lá phiếu cho bản dạng muốn có",
+      "source": "Chương 2 — How Your Habits Shape Your Identity",
+      "principle": "Mỗi lần thực hiện một hành vi là một lá phiếu bầu cho loại người bạn muốn trở thành; không cần đa số tuyệt đối, chỉ cần chuỗi lá phiếu chiếm ưu thế để nghiêng cán cân bản dạng. Quy trình hai bước: quyết định loại người muốn làm, rồi chứng minh cho chính mình bằng các chiến thắng nhỏ lặp lại. Bản dạng là tổng các bằng chứng tích lũy theo thời gian.",
+      "appHook": "Khi khách muốn đổi diện mạo bản thân (từ rụt rè sang tự tin, từ trì hoãn sang kỷ luật), AI đề xuất những lá phiếu bầu nhỏ hợp bản mệnh để làm ngay trong ngày — cụ thể, đo được, thay vì khuyên chung chung hãy tự tin.",
+      "tag": "personality"
+    },
+    {
+      "title": "Vòng lặp thói quen bốn bước và bốn định luật",
+      "source": "Chương 3 — How to Build Better Habits in 4 Simple Steps (Phần 1: The Fundamentals)",
+      "principle": "Mọi thói quen chạy theo vòng lặp: tín hiệu gợi ý, khao khát, phản hồi hành động, phần thưởng. Từ đó sinh bốn định luật: làm cho rõ ràng, làm cho hấp dẫn, làm cho dễ, làm cho thỏa mãn — và đảo ngược cả bốn để bỏ thói quen xấu. Đây là khung chẩn đoán sửa được cho bất kỳ hành vi nào.",
+      "appHook": "AI dùng khung bốn định luật để chẩn đoán thói quen hư khách khai khi luận sức khỏe và công việc, rồi đưa lời khuyên bám đúng khâu vòng lặp đang gãy — mỗi khuyến nghị có chỗ đứng cơ chế rõ.",
+      "tag": "habits"
+    },
+    {
+      "title": "Thói quen chạy vô thức và bảng kiểm điểm thói quen",
+      "source": "Chương 4 — The Man Who Didn't Look Right (Phần 2: 1st Law — Make It Obvious)",
+      "principle": "Khi thói quen tự động hóa đủ sâu, não thực hiện mà không có ý thức — không thể sửa cái mình không nhận ra. Công cụ huấn luyện nhận biết: quét thói quen hằng ngày và chấm dấu cộng (tốt), trừ (xấu), bằng (trung tính) để biến hành vi vô thức thành đối tượng quan sát. Kỹ thuật gọi tên hành động và chỉ tay vào nó cũng kéo hành vi về vùng ý thức.",
+      "appHook": "Trước khi khuyên, AI mời khách tự lập bảng kiểm điểm thói quen theo giai đoạn vận hiện tại; kết quả giúp phần luận sức khỏe đối chiếu hành vi thật thay vì đoán chung.",
+      "tag": "habits"
+    },
+    {
+      "title": "Ý định triển khai: chốt trước thời gian và địa điểm",
+      "source": "Chương 5 — The Best Way to Start a New Habit (Phần 2: 1st Law — Make It Obvious)",
+      "principle": "Nghiên cứu cho thấy người lập kế hoạch dạng tôi sẽ làm X lúc giờ T tại nơi P thực hiện hành vi mới với tỷ lệ cao hơn hẳn nhóm chỉ hình dung chung chung. Ý định triển khai loại bỏ chi phí quyết định và phân vân khỏi mỗi lần thực hiện: thời điểm và bối cảnh đã chốt, chỉ còn phần hành động. Người thực hiện cảm giác rõ ràng hơn, tỷ lệ bỏ giữa chừng giảm.",
+      "appHook": "Mọi lời khuyên của AI đi kèm mốc thực thi gắn nhịp sống của khách (trước giờ đi làm, tối sau cơm) thay vì dừng ở nên làm — biến khuyến nghị mệnh lý thành cam kết có vị trí thời gian.",
+      "tag": "decision"
+    },
+    {
+      "title": "Xếp chồng thói quen: gắn hành vi mới vào thói quen cũ",
+      "source": "Chương 5 — The Best Way to Start a New Habit",
+      "principle": "Thay vì săn động lực mới, gắn hành vi muốn hình thành ngay sau một thói quen đã vững theo mẫu sau khi tôi làm X, tôi sẽ làm Y. Thói quen cũ đóng vai trò tín hiệu sẵn có, tiết kiệm phần khó nhất của vòng lặp là nhận đúng tín hiệu. Chuỗi càng neo vào thói quen chạy mỗi ngày thì tỷ lệ chạy càng cao.",
+      "appHook": "AI xếp lời khuyên thành chuỗi neo nhịp sống thật (sau khi pha cà phê thì viết ba dòng nhật ký; sau khi tắt đèn bàn làm việc thì cất điện thoại) — mỗi khuyến nghị có điểm neo cụ thể thay vì lời răn chung.",
+      "tag": "habits"
+    },
+    {
+      "title": "Môi trường thiết kế hành vi, động lực bị đặt quá cao",
+      "source": "Chương 6 — Motivation Is Overrated; Environment Often Matters More (Phần 2: 1st Law)",
+      "principle": "Hành vi là hàm của con người và môi trường; tín hiệu thị giác trong môi trường kích hoạt thói quen mạnh hơn động lực mong muốn. Nghiên cứu sắp xếp lại căng tin cho thấy chỉ đổi vị trí đặt món là đổi hành vi ăn uống hàng loạt mà không cần ai dạy. Thiết kế môi trường rẻ hơn và bền hơn việc cậy ý chí.",
+      "appHook": "AI chéo lời khuyên phong thủy với cơ chế này: sắp không gian làm việc và ngủ sao cho tín hiệu tốt nổi bật, tín hiệu xấu khuất — biến tư vấn phong thủy thành thao tác môi trường cụ thể, không mê tín.",
+      "tag": "habits"
+    },
+    {
+      "title": "Tự chủ là chiến lược ngắn hạn, loại trừ tín hiệu mới là dài hạn",
+      "source": "Chương 7 — The Secret to Self-Control (Phần 2: 1st Law, đảo: Make It Invisible)",
+      "principle": "Nghiên cứu cựu chiến binh nghiện heroin sau khi rời môi trường chứa tín hiệu cho thấy tỷ lệ tái nghiện giảm mạnh — hành vi lệ thuộc bối cảnh nhiều hơn ý chí. Người được xem là kỷ luật cao thực ra dành ít thời gian chống cám dỗ vì họ dựng đời để cám dỗ ít xuất hiện. Ý chí cạn kiệt theo thời gian; loại trừ tín hiệu bền hơn.",
+      "appHook": "Khi khách tự trách ý chí kém, AI chuyển trách nhiệm sang cấu trúc môi trường: cắt nguồn cám dỗ thay vì tăng kỷ luật — khử chữ oán bản thân trong luận giải và phòng cảm giác bất lực.",
+      "tag": "stress"
+    },
+    {
+      "title": "Dopamine phun trước phần thưởng: ham muốn đến từ kỳ vọng",
+      "source": "Chương 8 — How to Make a Habit Irresistible (Phần 3: 2nd Law — Make It Attractive)",
+      "principle": "Não phun dopamine mạnh nhất ở giai đoạn chờ đợi phần thưởng, không phải lúc nhận phần thưởng — khao khát bản chất là kỳ vọng phần thưởng, và chênh lệch giữa kỳ vọng và thực tế định hình cảm xúc. Tín hiệu dự đoán phần thưởng lớn khiến hành vi dẫn tới nó gần như không thể kháng cự. Muốn tạo ham muốn thì thổi phồng kỳ vọng; muốn dập ham muốn thì hạ kỳ vọng.",
+      "appHook": "AI giải thích cơ chế thần kinh này khi khách than mất kiểm soát vì chờ tin, nghiện mua sắm hay cứ phải xem thêm một lần bói nữa — biến cảm giác lỗi của mình thành mô tả cơ chế và đưa cách hạ kỳ vọng cụ thể.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Gói cám dỗ: gắn việc nên làm với việc muốn làm",
+      "source": "Chương 8 — How to Make a Habit Irresistible",
+      "principle": "Theo nguyên lý Premack, hành vi có xác suất xảy ra cao được dùng làm phần thưởng để củng cố hành vi có xác suất thấp. Thực hành là gói cám dỗ — ghép hành động cần làm với ham muốn sẵn có theo mẫu sau khi tôi muốn X, tôi sẽ làm Y. Cách này vừa tăng độ hấp dẫn vừa không tốn thêm ý chí.",
+      "appHook": "AI đóng gói lời khuyên sức khỏe và học hành dạng ghép đãi kèm việc (xem series chỉ khi tập thể dục, nghe nhạc khi dọn bàn làm việc) để khách ở vận kém động lực vẫn chạy được hành vi tốt.",
+      "tag": "habits"
+    },
+    {
+      "title": "Ba vòng bắt chước: người gần, đám đông, người quyền năng",
+      "source": "Chương 9 — The Role of Family and Friends in Shaping Your Habits (Phần 3: 2nd Law)",
+      "principle": "Con người bắt chước ba lớp môi trường xã hội: những người gần gũi (gia đình, bạn thân), số đông (chuẩn mực của nhóm), và người quyền năng (nhóm có thành tựu, địa vị). Sức hút của hòa nhập thường lấn át mục tiêu riêng. Muốn đổi hành vi, hãy gia nhập hoặc dựng quanh mình môi trường nơi hành vi mong muốn là điều bình thường.",
+      "appHook": "Trong luận tình duyên và mối quan hệ, AI chỉ ra chuẩn mực vòng tròn thân thiết đang kéo khách theo hướng nào và khuyên chọn cộng đồng nơi thói quen tốt là chuẩn — biến câu tình duyên phụ người thành cơ chế xã hội học rõ.",
+      "tag": "social"
+    },
+    {
+      "title": "Tái khung ham muốn: từ phải làm sang được làm",
+      "source": "Chương 10 — How to Find and Fix the Causes of Your Bad Habits (Phần 3: 2nd Law, đảo: Make It Unattractive)",
+      "principle": "Mỗi khao khát đều dẫn về một động cơ nền: tìm cảm giác an toàn, được chấp nhận, đạt thành tựu; thói quen chỉ là cách não chọn để chạm động cơ đó. Hai người gặp cùng sự kiện nhưng khác phản ứng chỉ vì khác khung diễn giải — đổi khung từ nghĩa vụ sang cơ hội làm thay đổi cảm xúc trước hành vi. Thói quen xấu thường là đáp án sai cho một động cơ đúng.",
+      "appHook": "Khi khách kể áp lực công việc hay tình duyên bằng ngôn ngữ nghĩa vụ, AI tái khung thành lựa chọn có động cơ nền rõ (được chứng minh năng lực, được giữ kết nối) — giải áp cảm xúc bằng cơ chế diễn giải, không phải lời an ủi sáo.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Chuyển động không bằng hành động: tần suất lặp tạo tự động hóa",
+      "source": "Chương 11 — Walk Slowly, but Never Backward (Phần 4: 3rd Law — Make It Easy)",
+      "principle": "Cần phân biệt chuyển động (chuẩn bị, lên kế hoạch, tìm hiểu) với hành động (thực thi thật); chuyển động cho cảm giác tiến bộ nhưng không sinh kết quả. Thói quen hình thành theo tần suất lặp chứ không theo thời gian trôi trên lịch — càng lặp nhiều, nối não càng tự động hóa. Tiến chậm đều vẫn tốt hơn giật lùi.",
+      "appHook": "AI nhận diện kiểu khách lên kế hoạch mãi (đọc nhiều, xem nhiều quẻ, chưa hành động) và nhắc nguyên lý tần suất: mỗi lần thực thi nhỏ đáng giá hơn một kế hoạch đẹp — đôn hành động bằng cơ chế, không phải trách móc.",
+      "tag": "habits"
+    },
+    {
+      "title": "Định luật ít nỗ lực: giảm ma sát cho việc tốt, thêm ma sát cho việc xấu",
+      "source": "Chương 12 — The Law of Least Effort (Phần 4: 3rd Law)",
+      "principle": "Đứng trước lựa chọn, người ta lấy phương án ít nỗ lực hơn; mức ma sát của hành động quyết định tần suất nó xảy ra. Sửa môi trường để bước đầu của thói quen tốt còn lại một cú chạm, và chồng thêm các lớp cản cho thói quen xấu. Chuẩn bị môi trường trước là hành động tiền triển khai quan trọng hơn quyết tâm.",
+      "appHook": "AI gợi các chốt giảm ma sát nhỏ hợp nhịp sống khách (để giày tập cạnh cửa, tắt thông báo ứng dụng xấu trước giờ ngủ) trong phần lời khuyên sức khỏe — mỗi khuyến nghị là thao tác môi trường, không phải bài giảng đạo lý.",
+      "tag": "habits"
+    },
+    {
+      "title": "Quy tắc hai phút: chuẩn hóa trước khi tối ưu",
+      "source": "Chương 13 — How to Stop Procrastinating by Using the Two-Minute Rule (Phần 4: 3rd Law)",
+      "principle": "Bất kỳ thói quen mới nào cũng nên bắt đầu bằng phiên bản làm xong trong hai phút — thói quen cổng vào dẫn dắt hành vi lớn hơn phía sau. Mục tiêu giai đoạn đầu không phải kết quả mà là đều đặn xuất hiện; chuẩn hóa trước, tối ưu hóa sau. Thu nhỏ hành động xuống mức không thể từ chối giúp phá hàng rào khởi động.",
+      "appHook": "Mọi lời khuyên AI phát ra kèm phiên bản hai phút (đọc một trang, đi bộ hai phút, viết một câu nhật ký) kèm lý do: ở giai đoạn chuyển vận, đều đặn quan trọng hơn cường độ.",
+      "tag": "habits"
+    },
+    {
+      "title": "Thiết bị cam kết và tự động hóa: khóa hành vi tương lai",
+      "source": "Chương 14 — How to Make Good Habits Inevitable (Phần 4: 3rd Law, đảo: Make It Difficult)",
+      "principle": "Thiết bị cam kết là lựa chọn thực hiện ngay nhằm khóa chặt hành vi tương lai: ký trước, đặt tiền cược, hẹn lịch cố định. Tự động hóa và quyết định một lần (chuyển tiền tự động, gỡ ứng dụng, mua món đồ đổi môi trường) triệt tiêu những điểm quyết định mà ý chí có thể thua. Làm hành vi tốt khó bỏ qua và hành vi xấu khó thực hiện.",
+      "appHook": "Khi luận vận hành động, AI đề xuất thiết bị cam kết hợp hoàn cảnh khách (hẹn lịch cứng, đặt cọc, dọn nguồn cám dỗ một lần cho cả giai đoạn) — biến quyết tâm thành cấu trúc tự chạy.",
+      "tag": "decision"
+    },
+    {
+      "title": "Luật tối yếu: phần thưởng tức thì quyết định lặp lại",
+      "source": "Chương 15 — The Cardinal Rule of Behavior Change (Phần 5: 4th Law — Make It Satisfying)",
+      "principle": "Hậu quả tức thì định hướng hành vi mạnh hơn hậu quả trễ, kể cả khi hậu quả trễ có giá trị lớn hơn nhiều. Thói quen xấu hấp dẫn vì thưởng đến ngay và giá đến muộn; thói quen tốt đúng chiều ngược lại. Luật cốt lõi của thay đổi hành vi: cái được thưởng ngay sẽ được lặp lại — nên phải tự thêm thưởng tức thì cho việc tốt và thêm chi phí tức thì cho việc xấu.",
+      "appHook": "AI gắn lời khuyên với cơ chế thưởng tức thì nhỏ tự trả (ghi nhận khoảnh khắc hoàn thành, phần thưởng nhỏ ngay sau việc) khi khách than làm việc tốt mà không thấy động lực — nêu cơ chế trễ thưởng thay vì buộc tội ý chí.",
+      "tag": "habits"
+    },
+    {
+      "title": "Bảng theo dõi thói quen và quy tắc không lỡ hai lần",
+      "source": "Chương 16 — How to Stick with Good Habits Every Day (Phần 5: 4th Law)",
+      "principle": "Theo dõi trực quan (dấu tuần tự trên lịch) cung cấp tín hiệu tiến bộ rõ ràng, phần thưởng tức thì tự nhiên và động lực không phá chuỗi. Việc đo đạc có thể méo mó nếu tối ưu số liệu thay vì chất lượng, nên cần chọn chỉ tiêu phản ánh đúng việc cần nuôi. Quy tắc sống còn: được phép lỡ một lần nhưng không bao giờ lỡ hai lần liền — một ngày hỏng là tai nạn, hai ngày là khởi đầu một thói quen xấu mới.",
+      "appHook": "AI khuyến khách chọn một chỉ số đơn giản theo dõi hằng ngày trong giai đoạn chuyển vận, kèm quy tắc không lỡ hai lần — giúp tái khởi động sau ngày trượt mà không rơi vào tự oán.",
+      "tag": "habits"
+    },
+    {
+      "title": "Đối tác trách nhiệm và hợp đồng thói quen",
+      "source": "Chương 17 — How an Accountability Partner Can Change Everything (Phần 5: 4th Law, đảo: Make It Unsatisfying)",
+      "principle": "Con người muốn được nhìn là người tử tế trong mắt người khác, nên sự chứng kiến của xã hội là chi phí tức thì cho hành vi xấu và thưởng tức thì cho hành vi tốt. Hợp đồng thói quen văn bản hóa cam kết, người giám sát và hình phạt cụ thể, biến lời hứa nội tâm thành ràng buộc bên ngoài có giá trị. Hình phạt phải tức thì, chắc chắn và đủ đau mới có sức ràng buộc.",
+      "appHook": "Với khách hay hủy hẹn với chính mình, AI khuyên chỉ định một người giám sát và viết hợp đồng nhỏ có hình phạt cụ thể — chuyển cam kết khỏi đầu và thêm cơ chế xã hội thật.",
+      "tag": "social"
+    },
+    {
+      "title": "Chọn sân phù hợp năng khiếu: gen định ra vùng cơ hội",
+      "source": "Chương 18 — The Truth About Talent (Phần 6: Advanced Tactics)",
+      "principle": "Gen ảnh hưởng tính cách, tính cách làm cho một số thói quen dễ hơn thói quen khác; gen không quyết định kết quả cuối nhưng định ra vùng việc nào nỗ lực sinh lời cao nhất. Chiến lược đúng là chọn cuộc chơi có lợi cho điểm mạnh, không chèo ngược thiên nhiên; ở vùng yếu thì dựng giới hạn để không bị kéo xuống. Quá trình tìm trường hợp ứng là thử rộng rồi thu hẹp và đào sâu.",
+      "appHook": "Luận sự nghiệp theo bát tự và tử vi được neo vào nguyên lý này: thiên hướng bản mệnh là vùng cơ hội cần khai thác, không phải bản án — và AI khuyên chọn môi trường việc làm hợp thiên hướng thay vì sửa tính cách. Cách neo với khoa học tính cách Big Five giúp luận mệnh tránh sáo Barnum.",
+      "tag": "advice"
+    },
+    {
+      "title": "Quy tắc Goldilocks: đỉnh động lực ở độ khó vừa sát khả năng",
+      "source": "Chương 19 — The Goldilocks Rule (Phần 6: Advanced Tactics)",
+      "principle": "Con người đạt đỉnh động lực khi làm việc ở vùng khó vừa đủ — ngay sát mép khả năng hiện tại: quá dễ thì nhàm, quá khó thì mất hy vọng. Người giỏi rời cuộc chơi thường không vì thất bại mà vì chán khi thử thách không còn tăng. Duy trì động lực cần tiếp tục neo nhiệm vụ sát mép khả năng và học cách yêu lấy cả phần việc lặp đều.",
+      "appHook": "AI điều chỉnh cường độ lời khuyên theo giai đoạn vận của khách: vận thuận thì đưa thử thách sát mép khả năng, vận khó thì hạ độ khó để giữ chuỗi — và cảnh báo rằng nhàm chán, hơn cả thất bại, mới là kẻ đánh mất người giỏi.",
+      "tag": "advice"
+    },
+    {
+      "title": "Thói quen khóa kỹ năng: ghép luyện tập có chủ đích và tự kiểm định kỳ",
+      "source": "Chương 20 — The Downside of Creating Good Habits (Phần 6: Advanced Tactics)",
+      "principle": "Thói quen tạo nền tự động hóa, nhưng tự động hóa lâu ngày có thể đóng băng hiệu năng. Thành thạo đòi hỏi thói quen cộng với luyện tập có chủ đích — vùng tập trung vào điểm yếu vừa sát khả năng và có phản hồi. Bộ đôi giữ đỉnh cao là thói quen tự động hóa phần nền, luyện tập có chủ đích tiếp tục leo; đánh giá định kỳ (kiểm điểm hàng năm) giữ hệ thống khỏi tự mãn. Chu kỳ vận hành: làm, đo, nhận xét, điều chỉnh.",
+      "appHook": "Với khách ở giai đoạn ổn định dài (đại vận thuận), AI nhắc rủi ro đóng băng và gắn nhịp tự đánh giá, leo thử thách theo chu kỳ thời tiết tháng tiết khí — giữ lời khuyên vận trình có cấu trúc thời gian cụ thể.",
+      "tag": "advice"
+    }
+  ]
+}

@@ -37,6 +37,16 @@ test('Trà tối đa 15 Phúc Khí/ngày, tổng phút vẫn cộng đủ', () =
   assert.equal(S.addTeaMinutes(s, 4, day('2026-11-04')), 4);
 });
 
+test('Trà: daily.teaMin không vượt trần CAPS.teaPerDay', () => {
+  const s = S.createState(day('2026-11-03'));
+  const now = day('2026-11-03');
+  S.addTeaMinutes(s, 10, now);
+  S.addTeaMinutes(s, 10, now); // thưởng dừng ở room=5 nhưng đồng hồ phút phải kẹp ở trần
+  assert.equal(s.daily.teaMin, S.CAPS.teaPerDay, `teaMin phải kẹp ở ${S.CAPS.teaPerDay}`);
+  assert.ok(s.daily.teaMin <= S.CAPS.teaPerDay);
+  assert.equal(s.daily.teaMin, 15);
+});
+
 test('Xăm: tối đa 3 thẻ nhận/ngày, thẻ không nhận không cộng', () => {
   const s = S.createState(day('2026-11-03'));
   const now = day('2026-11-03');
@@ -47,11 +57,43 @@ test('Xăm: tối đa 3 thẻ nhận/ngày, thẻ không nhận không cộng', 
   assert.equal(S.sticksLeft(s, day('2026-11-04')), 3);
 });
 
+test('Xăm: keo bị từ chối cũng tốn lượt — sticksLeft trừ cả stickTries', () => {
+  const s = S.createState(day('2026-11-03'));
+  const now = day('2026-11-03');
+  S.recordStick(s, { num: 1, tone: '中平', accepted: false }, now);
+  assert.equal(S.sticksLeft(s, now), 2, '1 keo bị chối → còn 2 lượt');
+  assert.equal(S.recordStick(s, { num: 2, tone: '中平', accepted: true }, now), 3);
+  S.recordStick(s, { num: 3, tone: '中平', accepted: false }, now);
+  S.recordStick(s, { num: 4, tone: '中平', accepted: false }, now);
+  assert.equal(S.sticksLeft(s, now), 0, '2 nhận + 2 keo chối = hết lượt hôm nay');
+  assert.equal(S.sticksLeft(s, day('2026-11-04')), 3, 'sang ngày mở lại đủ lượt');
+});
+
 test('Lá số: +10 chỉ lần đầu mỗi hồ sơ', () => {
   const s = S.createState();
   assert.equal(S.grantChart(s, 'a'), 10);
   assert.equal(S.grantChart(s, 'a'), 0);
   assert.equal(S.grantChart(s, 'b'), 10);
+});
+
+test('Lá số: thưởng khóa theo KHÓA SINH — xoá rồi tạo lại cùng người không +10 lần 2', () => {
+  const s = S.createState();
+  const prof = { label: 'Mây', year: 1990, month: 5, day: 20, hour: 8, minute: 30, gender: 'nam' };
+  const p1 = S.addProfile(s, prof);
+  assert.equal(S.grantChart(s, p1.id), 10);
+  S.removeProfile(s, p1.id);
+  const p2 = S.addProfile(s, { ...prof }); // id mới, cùng khóa sinh
+  assert.ok(p2.id !== p1.id);
+  assert.equal(S.grantChart(s, p2.id), 0, 'cùng khóa sinh → không thưởng lần hai');
+  assert.deepEqual(s.flags.chartRewarded, [S.chartBirthKey(prof)]);
+  const p3 = S.addProfile(s, { ...prof, year: 1991 }); // khóa sinh khác
+  assert.equal(S.grantChart(s, p3.id), 10, 'khóa sinh khác → vẫn thưởng lần đầu');
+  // bản cũ lưu id hồ sơ trong flags — id đã có thì tôn trọng
+  const s2 = S.createState();
+  s2.flags.chartRewarded = ['id-cũ'];
+  const pOld = S.addProfile(s2, prof);
+  pOld.id = 'id-cũ';
+  assert.equal(S.grantChart(s2, 'id-cũ'), 0, 'id bản cũ đã thưởng → không thưởng lại');
 });
 
 test('Nhang cháy 3 phút thời gian thực, không thắp chồng', () => {
@@ -177,6 +219,22 @@ test('A4: lá số mẫu khớp engine app chính', () => {
   assert.equal(P.month.gan + P.month.zhi, '壬午');
   assert.equal(R.yong.primary, '水');
   assert.throws(() => analyze(2025, 2, 29, 8, 0, 'nam'), /không tồn tại/);
+});
+
+test('Giải án: tổng thưởng án mỗi ngày bị kẹp ở CASE_GAIN_CAP (chống farm client-authoritative)', () => {
+  const s = S.createState(day('2026-11-03'));
+  const now = day('2026-11-03');
+  const g1 = S.recordCase(s, { kind: 'npc', slot: 0, total: 1 }, now);         // 15
+  const g2 = S.recordCase(s, { kind: 'npc', slot: 1, total: 1 }, now);         // 15
+  const g3 = S.recordCase(s, { kind: 'npc', slot: 2, total: 1 }, now);         // 15
+  const g4 = S.recordCase(s, { kind: 'classical', id: 'k1', total: 1 }, now);  // 25 nhưng chỉ còn room 15
+  assert.equal(g4, S.CASE_GAIN_CAP - (g1 + g2 + g3), 'án vượt trần chỉ nhận phần còn thừa');
+  const g5 = S.recordCase(s, { kind: 'desk', id: 'trach', total: 1 }, now);
+  assert.equal(g5, 0, 'đủ trần → không cộng thêm');
+  assert.equal(s.phucKhi, S.CASE_GAIN_CAP);
+  assert.equal(s.daily.caseGain, S.CASE_GAIN_CAP);
+  const g6 = S.recordCase(s, { kind: 'npc', slot: 0, total: 1 }, day('2026-11-04'));
+  assert.equal(g6, 15, 'sang ngày trần mở lại');
 });
 
 console.log(`\n${passed} test đạt${process.exitCode ? ' — CÓ LỖI' : ''}`);

@@ -1,0 +1,183 @@
+{
+  "id": "thinking-fast-and-slow-kahneman",
+  "title": "Thinking, Fast and Slow",
+  "author": "Daniel Kahneman",
+  "why": "Sách chia tâm trí thành Hệ 1 nhanh – tự động – lắp câu chuyện mạch lạc từ ít dữ kiện, và Hệ 2 chậm – chăm chỉ nhưng lười; rồi bằng hàng loạt thí nghiệm chứng minh phán đoán trong bất định trượt theo mẫu hệ thống (thả neo, tính sẵn có, mẫu đại diện, quá tin câu chuyện, nghiền thiệt, tròng khung) và cuộc đời được chấm điểm sai lệch bởi 'cái tôi đang nhớ'. Đắt giá cho app bói toán vì nó đưa cho AI quy trình luận mệnh có cơ chế: hiệu chỉnh mọi báo đoán về tần suất gốc của nhóm tham chiếu, chấm bằng chứng thay vì mô tả kiểu mẫu, dùng góc nhìn ngoài và thi sát trước khi khuyên sự nghiệp, tách cảm xúc khỏi dữ kiện khi khuyên tình duyên – sức khỏe, đồng thời giải thích cho người dùng vì sao lời đọc mạch lạc 'nghe trúng' mang tính Barnum. Corpus phủ cả 5 phần/38 chương (từ Chương 1–3 hai hệ thống đến Chương 38 ảo giác hội tụ chú ý); số chương lấy theo mục lục bản tiếng Anh, hai điểm tính sẵn có dùng khoảng chương 11–12 vì các nguồn web lệch nhau về tên đúng của chương 11, chương 33 (Reversals) được nén vào điểm tròng khung, và riêng các nghiên cứu kích hoạt ngầm của Chương 4 được nén vào điểm máy kết hợp vì Kahneman bản thân đã thừa nhận một số nghiên cứu đó yếu khi kiểm định lại.",
+  "points": [
+    {
+      "title": "Hai chế độ tư duy: Hệ 1 nhanh tự động, Hệ 2 chậm chăm chỉ nhưng lười",
+      "source": "Phần I – Two Systems, Chương 1–3 (The Characters of the Story; Attention and Effort; The Lazy Controller)",
+      "principle": "Tâm trí vận hành hai chế độ. Hệ 1 sinh cảm giác, ấn tượng và phán đoán tức thì gần như không tốn công; Hệ 2 lo suy luận có chủ đích, giữ chú ý và kiểm soát, nhưng đắt công nên tìm đường ngắn nhất: phần lớn thời gian chỉ gật gù theo đề xuất của Hệ 1 thay vì kiểm tra. Vì thế con người tin vào phán đoán nhanh và chỉ huy động suy nghĩ sâu khi bị dồn ép.",
+      "appHook": "Khi luận tính cách từ lá số, AI tách rõ cho người dùng: phần 'cảm giác ngay' về bản thân là Hệ 1, còn kết luận cần bằng chứng hành vi cụ thể — hỏi vài chi tiết thật (cách xử xung đột, lịch làm việc) để kéo Hệ 2 vào trước khi chốt nét. Với quyết định lớn (đổi việc, kết hôn), gợi ý quy tắc chờ qua đêm và rà lại bằng danh sách tiêu chí thay vì trông vào linh cảm.",
+      "tag": "decision"
+    },
+    {
+      "title": "Trôi chảy nhận thức: điều quen thuộc, rõ ràng, có vần điệu tự động cảm thấy đúng",
+      "source": "Phần I – Chương 5 (Cognitive Ease)",
+      "principle": "Cảm giác nhẹ nhàng khi xử lý thông tin (chữ rõ, câu trơn, nội dung quen, nghe đi nghe lại) được Hệ 1 đọc nhầm thành tín hiệu của sự thật và an toàn; cái khó đọc, khó hiểu bị nghi ngờ nhiều hơn. Nhắc lại đơn thuần đã tăng độ tin và thiện cảm mà không cần thêm bằng chứng. Đây là cơ chế gốc khiến câu văn lái láng nghe đúng: trôi chảy là bà đỡ của hiệu ứng Barnum.",
+      "appHook": "Văn án luận mệnh của AI phải tự rà soát: đừng tạo cảm giác đúng chỉ nhờ câu chữ mượt và lặp lại; sau mỗi đoạn kết luận, ghi rõ mức chắc chắn và cơ sở để người dùng không nhầm 'nghe hay' với 'đúng'. Điểm này cũng là tài liệu giải thích cho người dùng vì sao truyện tử vi tổng quát nghe rất trúng.",
+      "tag": "decision"
+    },
+    {
+      "title": "Máy kết hợp và 'cái thấy là tất cả': dựng câu chuyện mạch lạc từ dữ kiện ít ỏi rồi tin chắc",
+      "source": "Phần I – Chương 4 và 7 (The Associative Machine; A Machine for Jumping to Conclusions)",
+      "principle": "Các ý tưởng kích hoạt lẫn nhau thành mạng hội, nên Hệ 1 ưu tiên lắp 'câu chuyện mạch lạc nhất từ những gì đang có' và không bao giờ tự hỏi còn thiếu gì. Chỉ vài dữ kiện là đủ chốt một bức tranh nhất quán, và độ tự tin tăng theo độ mạch lạc của câu chuyện chứ không theo độ đầy đủ của dữ liệu. Kết quả là nhảy tới kết luận với tự tin cao khi thông tin còn rất ít.",
+      "appHook": "AI luận mệnh chỉ có giờ sinh và vài dòng kể chuyện, rất dễ mắc đúng lỗi này nếu tô màu bản chân dung đầy tự tin; quy tắc ứng xử: với mỗi kết luận tính cách, nêu rõ dữ liệu đang dùng và câu hỏi còn bỏ ngỏ, chủ động hỏi thêm thay vì đoán. Dùng chính nguyên lý này giải thích cho người dùng vì sao mô tả mờ ảo vẫn thấy 'trúng': não tự gắn chi tiết đời mình vào chỗ trống.",
+      "tag": "decision"
+    },
+    {
+      "title": "Hiệu ứng hào quang: một nét nổi đánh bóng cả bức chân dung",
+      "source": "Phần I – Chương 8 (How Judgments Happen)",
+      "principle": "Khi đánh giá người theo nhiều chiều, Hệ 1 khuynh hướng chấm mọi chiều theo một ấn tượng tổng đã có: ưa người này thì tự động chấm tốt cả tính cách, năng lực, ý định của họ. Từng khía cạnh không được đánh giá độc lập rồi tổng hợp, mà bị rửa thành một màu. Đánh giá về người vì thế bị một chi tiết tốt hoặc xấu kéo lệch toàn phần.",
+      "appHook": "Trong luận tình duyên và hợp mệnh đối tác, AI nhắc người dùng tách đánh giá từng nét riêng của người kia (tính cách, thói quen chi tiêu, cách xử mâu thuẫn) thay vì để một ấn tượng đầu — hoặc một nét trong lá số — tô hết bức tranh. Đây là bộ câu hỏi lọc thực dụng khi người dùng khẳng định 'người ấy mọi điều đều tốt'.",
+      "tag": "social"
+    },
+    {
+      "title": "Thay thế câu hỏi: trả lời câu hỏi dễ thay câu hỏi khó mà không hay biết",
+      "source": "Phần I – Chương 9 (Answering an Easier Question)",
+      "principle": "Gặp câu hỏi mục tiêu khó (rủi ro này bao nhiêu, người này có thành công không), Hệ 1 lặng lẽ thay bằng câu hỏi phụ trợ dễ hơn (mình thấy nguy hiểm thế nào, mình thích người này không) và trả lời câu thay thế trong khi tin rằng đang trả lời câu gốc. Trường hợp điển hình là đổi chác cảm xúc: yêu thích một lựa chọn thì thấy rủi ro nhỏ, lợi ích lớn; sợ thì thấy ngược lại. Người trả lời hoàn toàn không ý thức được đã đổi câu hỏi.",
+      "appHook": "Khi người dùng hỏi 'tôi có thành công hay hạnh phúc không', AI nhận diện nguy cơ cả hai bên đang trả lời câu dễ 'bạn có cảm thấy hy vọng không'; cách xử lý: đổi câu hỏi mơ hồ thành nhóm câu hỏi có dữ kiện (việc làm, thu nhập, quan hệ hiện tại) rồi mới luận theo lá số. Kết luận cuối phải quay về câu hỏi gốc, không phải cảm giác tạm thời.",
+      "tag": "decision"
+    },
+    {
+      "title": "Thả neo: con số đầu tiên kéo mọi ước lượng về phía nó",
+      "source": "Phần II – Heuristics and Biases, Chương 10 (Anchors)",
+      "principle": "Con số đầu tiên gặp, kể cả ngẫu nhiên hoặc rõ ràng vô nghĩa, kéo ước lượng về phía nó: số neo lớn làm ước lượng nở ra, số neo nhỏ làm thít lại. Ngay cả người có kinh nghiệm cũng không thoát hoàn toàn; cơ chế gồm điều chỉnh không đủ và việc kích hoạt sẵn những ý nghĩ quanh con số neo.",
+      "appHook": "Mốc thời gian trong luận mệnh (phát tài tuổi 35, ba năm hôn nhân ấm) dễ thành neo cho kỳ vọng người dùng, nên chỉ đưa dưới dạng khoảng rộng có điều kiện kèm ghi chú đây là ước lượng mô hình, không phải lịch hẹn. Ngược lại, khi người dùng tự neo vào con số bi quan cũ (khoản nợ năm nào, thất bại tuổi nào), AI dùng dữ kiện hiện tại để mở neo.",
+      "tag": "decision"
+    },
+    {
+      "title": "Tính sẵn có: cái dễ nhớ, dễ hình dung cảm thấy dễ xảy ra",
+      "source": "Phần II – Chương 11–12 (The Science of Availability)",
+      "principle": "Ước lượng tần suất bị thay bằng câu hỏi dễ hơn: nhớ được bao nhiêu trường hợp, nhớ nhanh thế nào. Sự kiện sống động, gần đây, được truyền thông miêu tả nhiều thì phình lên thành thường gặp dù thống kê nói ngược lại. Sự dễ nhớ (cảm giác thoải mái khi gọi ra) còn được dùng thay cho phép đếm, nên trải nghiệm cá nhân thường thắng dữ liệu.",
+      "appHook": "Khi người dùng hoảng vì 'năm xấu sẽ gặp tai họa' sau khi đọc một câu chuyện chia sẻ sống động, AI đối chiếu với tần suất thực tế của nhóm cùng tuổi và hoàn cảnh, chỉ ra cơ chế nhớ chọn lọc: một câu chuyện kể hay nổi hơn nghìn trường hợp êm đềm. Nguyên tắc chung cho lời khuyên sức khỏe và tài chính: đừng định giá rủi ro theo mức dễ hình dung.",
+      "tag": "stress"
+    },
+    {
+      "title": "Cảm xúc đoán rủi ro: sợ thì thấy lợi ích nhỏ, yêu thì thấy rủi ro nhỏ",
+      "source": "Phần II – Chương 13 (Availability, Emotion, and Risk)",
+      "principle": "Trong lĩnh vực rủi ro, cảm xúc hiện tại được dùng làm phép tính thay thế: mức sợ quyết định rủi ro cảm nhận, mức yêu thích quyết định lợi ích cảm nhận, hai mặt đổi chác ngược chiều. Việc chỉ nhắc tới một nguy cơ cũng làm nó thấy nguy hơn dù thông tin không đổi. Cảm xúc là tham số của phán đoán, không phải kết quả của phân tích.",
+      "appHook": "Trong lời khuyên tình duyên hoặc đầu tư theo vận trình, AI tách 'bạn đang sợ hay yêu điều này thế nào' khỏi 'dữ kiện tình hình là gì' bằng cách yêu cầu nêu trước (thời gian đã ở cùng nhau, cách xử xung đột, dòng tiền). Khi luận năm có biến động, nhắc rằng sợ hãi sau một tin xấu là phản ứng hệ thống của Hệ 1, không phải dấu hiệu mệnh đổi.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Mẫu hệ thống đại diện: đoán theo kiểu mẫu và quên tần suất gốc",
+      "source": "Phần II – Chương 14 (Tom W's Specialty)",
+      "principle": "Con người đánh giá người bằng mức giống mẫu hệ thống (nét tính cách, nghề điển hình) thay vì bằng xác suất cơ bản của nhóm trong dân số: mô tả nghe rất giống dân kỹ thuật thì chấm xác suất cao dù nhóm đó chiếm phần rất nhỏ. Mức đại diện còn gợi sự đồng bộ giả: thấy một nét hiếm ở người này thì đinh ninh các nét khác cũng lệch theo. Quy tắc đúng: bằng chứng cá nhân yếu thì dựa vào xác suất cơ bản; bằng chứng mạnh thì cũng chỉ hiệu chỉnh một phần về phía nó.",
+      "appHook": "Đây là cạm bẫy Barnum số một của luận tính cách theo can chi: mô tả 'mệnh Thủy giữ cảm xúc, đa nghi' áp cho gần ai cũng đúng một phần, nên AI phải kèm tần suất của nét đó trong dân số ('phần lớn mọi lá số đều có nét này một mức nào đó') và yêu cầu dẫn chứng hành vi thật trước khi chốt nét. Chỉ nêu nét có bằng chứng, mức tin khiêm tốn.",
+      "tag": "personality"
+    },
+    {
+      "title": "Nghịch lý Linda: thêm chi tiết làm xác suất giảm nhưng câu chuyện thuyết phục hơn",
+      "source": "Phần II – Chương 15 (Linda: Less Is More)",
+      "principle": "Với một nhân vật có nét nổi bật, người ta chấm xác suất mô tả chi tiết (kết hợp hai đặc tính) cao hơn mô tả bao trùm (một đặc tính), vi phạm luật xác suất cơ bản. Lý do là câu chuyện chi tiết đại diện tốt hơn nên cảm thấy đúng hơn, dù logic bắt nó khó xảy ra hơn. Mô tả càng cụ thể càng thuyết phục và càng ít khả năng đúng.",
+      "appHook": "Cảnh báo trực tiếp cho văn án luận mệnh: mỗi chi tiết cụ thể thêm vào ('năm 32 tuổi gặp người nước ngoài và đổi ngành') làm câu báo đoán nghe trúng hơn nhưng xác suất thấp hơn, nên AI giữ trần câu chuyện cụ thể, ưu tiên mô tả vùng khả năng cao và ghi rõ tính suy đoán. Quy tắc viết chống Barnum: mức chi tiết do bằng chứng người dùng cung cấp quyết định, không do nhu cầu kể hay.",
+      "tag": "decision"
+    },
+    {
+      "title": "Nguyên nhân thắng thống kê: tâm trí đòi một lý do cho từng trường hợp",
+      "source": "Phần II – Chương 16 (Causes Trump Statistics), kế thừa Chương 6 (Norms, Surprises, and Causes)",
+      "principle": "Thống kê khô khan khó thắng một ca đơn lẻ được gắn câu chuyện nhân quả: lý do cho ca riêng lẻ (hoàn cảnh, tính cách, sự cố) đè bẹp tần suất cả nhóm. Hệ 1 luôn tìm nguyên nhân cho biến cố và coi điều lệch khỏi kỳ vọng là có thủ phạm. Vì thế bài học từ số liệu khó thắng ấn tượng từ một câu chuyện kể hay.",
+      "appHook": "Khi luận vận trình, AI tránh gắn nguyên nhân mệnh số cho từng biến cố nhỏ ('trượt phỏng vấn vì sao mệnh này'), mà nêu hai lớp: phân bố thống kê của người cùng hoàn cảnh và cơ chế có bằng chứng (kỹ năng, thị trường, may rủi). Nhắc người dùng rằng một ca kể hay trên mạng không phải bằng chứng về lá số của họ.",
+      "tag": "personality"
+    },
+    {
+      "title": "Hồi quy về trung bình: chuỗi cực đoan rồi trở về mức thường, nhưng bị gán cho nguyên nhân",
+      "source": "Phần II – Chương 17 (Regression to the Mean)",
+      "principle": "Mọi chuỗi cực đoan (thành tích đỉnh, trượt dồn dập) có xu hướng theo sau bằng mức trung bình hơn, thuần túy vì ngẫu nhiên và cấu trúc số học, không cần nguyên nhân nào cả. Nhưng tâm trí cứ gán sự trở về cho một lý do (khen thì bì, đổi phong thủy thì khá) và vì thế đúc kết quy luật sai. Hiểu hồi quy là liều vắc-xin cho niềm tin sai về vận may và lời nguyền.",
+      "appHook": "Điểm cốt lõi nhất cho luận vận trình: sau năm rất tốt thì năm sau thường bớt sáng, sau chuỗi trượt thì mức thường quay lại — AI phải nói trước điều này để người dùng không quy cho 'mệnh đổi' hay 'phong thủy thất hiệu'. Lời khuyên tài chính và sự nghiệp: đừng tăng cược ngay sau chuỗi thắng, đừng đổ toàn bộ chiến lược ngay sau chuỗi thua.",
+      "tag": "advice"
+    },
+    {
+      "title": "Thuần hóa dự đoán trực giác: lấy tần suất gốc làm mốc, hiệu chỉnh một phần theo bằng chứng",
+      "source": "Phần II – Chương 18 (Taming Intuitive Predictions)",
+      "principle": "Dự đoán tự nhiên của con người là so khớp mức bằng chứng với thang điểm của kết quả, dẫn tới dự đoán quá cực đoan và bỏ quên xác suất cơ bản. Quy trình hiệu chỉnh gồm: bắt đầu từ kết quả trung bình của nhóm tham chiếu; chấm bằng chứng riêng trên thang có quy ước; dịch dự đoán một phần về phía bằng chứng nhưng không vượt khỏi khoảng hợp lý; bằng chứng yếu thì dịch rất ít. Kết quả là dự đoán kém ấn tượng hơn nhưng ít sai hơn — gần như mọi dự đoán đều nên nén lại một chút.",
+      "appHook": "Đây là máy móc nội tại cho chính AI luận mệnh: trước khi chốt 'năm nay bạn thành công lớn', lấy mức thông thường của nhóm hoàn cảnh tương tự, cộng hiệu chỉnh theo bằng chứng cụ thể người dùng nêu, phát biểu trong khoảng bằng chứng cho phép. Văn án kết luận dùng từ lượng hóa khiêm tốn ('khả năng cao hơn mặt bằng', 'nên chuẩn bị phương án') thay vì tuyên bố tuyệt đối.",
+      "tag": "advice"
+    },
+    {
+      "title": "Ảo giác hiểu biết và giá trị: mạch lạc khiến tự tin ngộ nhận; nhìn lại tưởng 'lúc đó đã biết'",
+      "source": "Phần III – Overconfidence, Chương 19–20 (The Illusion of Understanding; The Illusion of Validity)",
+      "principle": "Sau sự kiện, ký ức được điều chỉnh để 'lúc đó mình đã thấy trước', khiến người ta quá tin khả năng hiểu và dự đoán — đó là thiên lệch nhìn lại. Độ mạch lạc của câu chuyện giải thích quá khứ không chứng minh cơ chế thật của thế giới, và độ chính xác dự báo dài hạn của chuyên gia trong môi trường nhiễu thường không hơn chọn ngẫu nhiên. Tự tin của người dự đoán phản ánh chất lượng câu chuyện nội tâm, không phản ánh chất lượng dự báo.",
+      "appHook": "Sau biến cố lớn, người dùng thường quay lại khẳng định 'quả đúng như lá số'; AI nên giải thích thiên lệch nhìn lại và đề xuất ghi lại dự đoán gốc trước khi biết kết quả để đối chiếu trung thực. Khi AI tự viết bài luận dài mạch lạc, nó phải tự kiểm: độ mạch lạc của văn án không phải bằng chứng cho độ chính xác của báo đoán.",
+      "tag": "decision"
+    },
+    {
+      "title": "Công thức thắng trực giác khi đánh giá người; trực giác chuyên gia chỉ đáng tin trong môi trường có quy luật và phản hồi nhanh",
+      "source": "Phần III – Chương 21–22 (Intuitions vs. Formulas; Expert Intuition: When Can We Trust It?)",
+      "principle": "Hàng loạt nghiên cứu tuyển chọn (nhân sự, ứng viên, bệnh nhân) cho thấy công thức chấm điểm vài biến có cấu trúc thường đúng hơn phỏng vấn tổng hợp cảm tính, vì con người đổi trọng số theo cảm xúc nhất thời và bỏ quên biến quan trọng. Trực giác chuyên gia chỉ đáng tin khi hai điều kiện cùng có: môi trường đủ đều đặn có quy luật và cơ hội luyện tập dài hạn với phản hồi nhanh, rõ. Ngoài hai điều kiện đó, tự tin chuyên gia là cảm giác đã quen, không phải bằng chứng đúng.",
+      "appHook": "AI luận mệnh nên tự làm theo tinh thần này: dùng khung chấm điểm có cấu trúc từ hệ thống bát tự/tử vi làm khung chính, văn án chỉ là lớp giao tiếp, và nói rõ với người dùng rằng luận tính cách thuộc môi trường không có phản hồi chuẩn nên dùng như khung suy nghĩ, không phải công cụ dự báo chuyên môn. Khi khuyên đánh giá ứng viên hoặc đối tác, đề xuất chấm điểm theo tiêu chí định sẵn thay vì ấn tượng buổi gặp.",
+      "tag": "decision"
+    },
+    {
+      "title": "Góc nhìn ngoài: so với nhóm tham chiếu thay vì dựng kịch bản từ trong đầu",
+      "source": "Phần III – Chương 23 (The Outside View)",
+      "principle": "Hoạch định dựa trên chi tiết riêng của kế hoạch cho ước lượng lạc quan sai lệch — thiên lệch hoạch định — vì nó bỏ quên thống kê của những kế hoạch tương tự đã trễ hạn hoặc thất bại. Cách hiệu chỉnh là góc nhìn ngoài: xác định nhóm tham chiếu, lấy phân bố thời gian và kết quả của nhóm, rồi mới hiệu chỉnh theo đặc điểm riêng của dự án và con người.",
+      "appHook": "Trong lời khuyên sự nghiệp và khởi nghiệp theo vận trình, AI bắt buộc dùng góc nhìn ngoài: hỏi trước có bao nhiêu người cùng hoàn cảnh làm được trong bao lâu, nêu phân bố thực tế (phần lớn dự án nhỏ gập sớm), rồi mới hiệu chỉnh theo năng lực và điều kiện của người dùng. Đây là cách chuyển câu 'mệnh nói năm nay khởi nghiệp tốt' thành lời khuyên có cơ chế.",
+      "tag": "advice"
+    },
+    {
+      "title": "Lạc quan thái quá là năng lượng cũng là lỗi; chống lại bằng thi sát trước",
+      "source": "Phần III – Chương 24 (The Engine of Capitalism)",
+      "principle": "Thiên hướng lạc quan thái quá — tin mình ít rủi ro hơn người khác — vừa là động lực làm việc, vừa là nguồn gốc phớt lờ rủi ro và hụt kế hoạch. Biện pháp tổ chức là thi sát trước: giả định dự án đã thất bại, mỗi người viết ra nguyên nhân thất bại nhiều khả năng nhất, để lộ những rủi ro bị lạc quan che khuất trước khi quyết. Cá nhân nên tự đặt cùng câu hỏi này khi đang cảm thấy chắc chắn quá mức.",
+      "appHook": "Khi lá số chỉ ra 'vận kiện thích hợp thử thách mới', AI vẫn làm thi sát trước cùng người dùng: giả sử 12 tháng sau thất bại, nguyên nhân nhiều khả năng là gì và cần chuẩn bị gì ngay bây giờ. Lời khuyên tài chính trong vận tốt nên kèm giới hạn tổn thất tối đa chấp nhận được trước khi tăng cược.",
+      "tag": "advice"
+    },
+    {
+      "title": "Thuyết triển vọng: mọi thứ được cảm nhận theo điểm tham chiếu và cảm nhận thay đổi nhỏ dần theo quy mô",
+      "source": "Phần IV – Choices, Chương 25–26 (Bernoulli's Errors; Prospect Theory)",
+      "principle": "Con người không đánh giá kết quả như của cải tuyệt đối mà như lãi hay lỗ so với một điểm tham chiếu (mức đang có, mức kỳ vọng): cùng một mức thu nhập cảm thấy giàu hay nghèo tùy mốc so. Cảm nhận thay đổi nhỏ dần theo quy mô — bước từ 0 lên 10 cảm nhận mạnh hơn bước từ 90 lên 100. Thuyết triển vọng thay mô hình lợi ích cổ điển bằng ba trụ: tham chiếu, giảm nhạy cảm, và bất đối xứng mất–được.",
+      "appHook": "Trong luận tài lộc và hạnh phúc, AI hỏi rõ điểm tham chiếu của người dùng (mức đang có, kỳ vọng, mức người xung quanh) vì 'vận tốt xấu' phần lớn là khoảng cách tới mốc đó, không phải sự kiện tuyệt đối. Lời khuyên hạnh phúc tài chính nên gồm cả việc ổn định mốc tham chiếu: giảm so sánh, đặt kỳ vọng thực tế.",
+      "tag": "decision"
+    },
+    {
+      "title": "Nghiền thiệt: mất đánh gấp rưỡi đến gấp đôi được, nên người ta bỏ cơ hội và ôm giữ rủi ro",
+      "source": "Phần IV – Chương 28 (Bad Events)",
+      "principle": "Cảm nhận mất mát mạnh hơn cảm nhận được lợi cùng quy mô khoảng 1,5–2,5 lần, nên người ta trả giá đắt để tránh rủi ro nhỏ và từ chối đánh đổi có kỳ vọng tốt. Ngược lại, khi đang lỗ, người ta sẵn sàng đánh cược lớn để mong gỡ — hành vi gỡ gạc điển hình của người thua. Nghiền thiệt giải thích vì sao từ bỏ điều ổn định để thử điều mới cảm nhận khó gấp đôi phần thưởng nó hứa hẹn.",
+      "appHook": "Trong lời khuyên tình duyên và sự nghiệp, AI chỉ ra khi nào quyết định của người dùng bị nghiền thiệt dẫn đường: bám người không hợp vì tiếc những năm đã đầu tư, giữ công việc bào mòn vì sợ mất lương. Cách nói thay: quy đổi mất và được về cùng thang cảm nhận, khuyến nghị thử nghiệm có thời hạn và lối thoát rõ thay vì quyết dồn dập hoặc tất tay.",
+      "tag": "decision"
+    },
+    {
+      "title": "Mô hình bốn góc: vừa mua bảo hiểm vừa mua vé số, và phóng đại hoặc bỏ quên sự kiện hiếm",
+      "source": "Phần IV – Chương 29–30 (The Fourfold Pattern; Rare Events)",
+      "principle": "Tùy tổ hợp lợi–thiệt và xác suất, người ta vừa sẵn sàng trả tiền để loại bỏ rủi ro nhỏ (mua bảo hiểm) vừa trả tiền để mua cơ hội hiếm (vé số), vì xác suất rất nhỏ được phóng đại hoặc đưa về không tùy bối cảnh. Chỉ nhắc tới một sự kiện hiếm cũng làm nó cảm thấy quan trọng hơn dù xác suất không đổi. Đây là bộ máy tâm lý chung của người đánh bạc và người mua bảo hiểm.",
+      "appHook": "Khi luận 'năm có vận may lớn' hoặc cảnh báo tai họa, AI phải nói rõ xác suất là rất thấp và không khơi dậy niềm tin đánh cược vào cơ hội hiếm ('mua đất tháng này sẽ đổi đời'); khi cảnh báo rủi ro có thật, nêu bằng con số và so sánh để người dùng không phóng đại quá mức. Điểm này giữ cho tư vấn sức khỏe và tài chính trong vận trình không đe dọa quá tay cũng không nói cho vui.",
+      "tag": "decision"
+    },
+    {
+      "title": "Chi phí chìm, hiệu ứng sở hữu và thiên vị hiện trạng: giữ gìn cái đã bỏ ra và cái đang có",
+      "source": "Phần IV – Chương 27 và 32 (The Endowment Effect; Keeping Score)",
+      "principle": "Cái đang sở hữu được định giá cao hơn cái chưa sở hữu, nên người ta ngại đổi trạng thái kể cả khi đổi có lợi — đó là thiên vị hiện trạng. Cái đã bỏ ra (tiền, thời gian, tình cảm) không phải lý do hợp lý để tiếp tục đầu tư, nhưng tâm trí ghi nó vào sổ riêng và tiếp tục bơm vào dự án đang hỏng để khỏi thú nhận mất mát. Quy tắc đúng: chỉ nhìn chi phí và lợi ích tính từ bây giờ.",
+      "appHook": "AI dùng khung này khi người dùng hỏi quyết định giữa chừng: đổi ngành sau nhiều năm học, rời quan hệ sau nhiều năm, đóng cửa dự án đã đầu tư — liệt kê 'cái đã bỏ ra' thành chi phí chìm và chấm quyết định chỉ theo lợi ích chi phí từ nay. Cũng giải thích vì sao cảm giác 'mình có nó rồi' khiến người ta chịu thiệt vẫn giữ.",
+      "tag": "habits"
+    },
+    {
+      "title": "Tròng khung: cùng thông tin, đổi cách nói là đổi quyết định; và khuyên nhìn khung rộng thay vì soi từng ván",
+      "source": "Phần IV – Chương 31 và 34 (Risk Policies; Frames and Reality)",
+      "principle": "Diễn đạt cùng một thực tế theo khung được hay mất ('90% sống sót' đối '10% tử vong') làm đảo chiều quyết định của người nghe, dù logic không đổi — khung là hiện thực trong tâm trí, không phải lớp áo ngoài thông tin. Biện pháp cho cá nhân là khung rộng: gom các quyết định nhỏ thành một danh mục dài hạn thay vì chấm từng ván riêng lẻ; tách lẻ từng quyết định khiến người ta chấp nhận rủi ro tùy hứng nhiều hơn khi nhìn tổng thể.",
+      "appHook": "AI luận mệnh phải có ý thức tròng khung: khi cảnh báo năm xấu, kèm khung hành động ('nếu chuẩn bị X thì rủi ro giảm'), tránh khung bi quan toàn phần gây tê liệt; khi khuyến khích thay đổi, nêu cả hai khung được và mất để người dùng tự chọn. Lời khuyên đầu tư và sức khỏe nên chấm theo cả năm hoặc cả danh mục, không soi từng biến cố tháng.",
+      "tag": "advice"
+    },
+    {
+      "title": "Hai cái tôi: cái đang trải nghiệm và cái đang nhớ; ký ức chấm điểm theo cao điểm và kết thúc, bỏ quên thời lượng",
+      "source": "Phần V – Two Selves, Chương 35–36 (Two Selves; Life as a Story)",
+      "principle": "Trong mỗi người có hai chủ thể: cái tôi đang trải nghiệm sống từng phút, và cái tôi đang nhớ chấm điểm cả giai đoạn — cái đang nhớ có tiếng nói quyết định. Quy tắc chấm của ký ức là cao điểm cộng kết thúc, bỏ quên thời lượng: giai đoạn dài êm kèm một biến cố đau cuối được nhớ như khủng khiếp, sự kiện ngắn đỉnh cao kết thúc tốt được nhớ như tuyệt vời. Vì thế con người chấm lại cuộc đời bằng ký ức sai lệch so với thực tế đã sống.",
+      "appHook": "Khi người dùng tự kết 'năm đó là năm đen' hay 'mối tình ấy hoàn toàn tốt đẹp', AI hỏi tách trải nghiệm từng giai đoạn (mấy tháng thế nào, cao điểm gì, kết thế nào) thay vì tin câu chấm điểm chung của ký ức, và giải thích quy tắc cao điểm–kết thúc để họ hiểu vì sao nhớ sai. Với quyết định sẽ được kể lại (cưới hỏi, chuyển chỗ ở), nhắc chấm cả hạnh phúc hàng ngày chứ không chỉ câu chuyện đỉnh cao.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Hạnh phúc trải nghiệm có trần theo thu nhập; danh giá cuộc đời là câu chuyện nên vẫn tăng theo tiền",
+      "source": "Phần V – Chương 37 (Experienced Well-Being)",
+      "principle": "Hạnh phúc hàng ngày của người thu nhập thấp tăng rõ theo thu nhập, nhưng tới một ngưỡng thì dừng — tiền mua được thoải mái khỏi nỗi đau thường nhật chứ không mua thêm niềm vui phút giây vô hạn. Trái lại, mức tự chấm điểm cuộc đời nói chung vẫn tăng theo thu nhập, vì câu hỏi đó mời gọi một câu chuyện về thành tựu và tiêu chuẩn so sánh. Sau ngưỡng, các yếu tố thời gian như cô đơn, đau mạn tính, ngủ kém ảnh hưởng mạnh hơn tới trải nghiệm hàng ngày.",
+      "appHook": "Khi luận tài lộc và hạnh phúc, AI phân biệt hai câu hỏi 'bạn đánh giá cả đời thế nào' (bị thu nhập và câu chuyện xã hội kéo) và 'ngày của bạn sống thế nào' (bị thời gian, sức khỏe, quan hệ kéo). Lời khuyên vận trình sau ngưỡng đủ dùng nên hướng sang cải thiện ngày thường (ngủ, quan hệ, giảm đi lại mệt) thay vì đuổi theo mốc thu nhập để ký ức tự chấm điểm cao hơn.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Ảo giác hội tụ chú ý: không gì quan trọng như bạn nghĩ khi đang nghĩ về nó",
+      "source": "Phần V – Chương 38 (Thinking About Life)",
+      "principle": "Khi chú ý đổ dồn vào một khía cạnh cuộc đời (tiền, tình duyên, sức khỏe, nơi ở), khía cạnh đó bị phóng đại tầm quan trọng trong đánh giá tổng thể — nhắc tới điều gì thì điều đó được chấm nặng, dù trong đời thường nó chỉ chiếm một lát nhỏ trải nghiệm. Đây là lý do kỳ vọng 'đổi chỗ ở sẽ hạnh phúc hơn nhiều' thường vỡ sau vài tháng, khi chú ý rời chủ đề và đời trở về hỗn hợp cũ.",
+      "appHook": "Khi người dùng quy mọi bất ổn vào một trục mệnh số (sao hạn này, hướng nhà này), AI mở khóa bằng câu hỏi: nó chiếm bao nhiêu phần trong ngày của bạn thực sự, còn lại đang tốt gì? Sau biến cố tình duyên hoặc tài chính, nhắc rằng tầm quan trọng đang cảm nhận là hiệu ứng chú ý tạm thời và sẽ quy về mức thực khi chú ý chuyển đi.",
+      "tag": "emotion"
+    }
+  ]
+}

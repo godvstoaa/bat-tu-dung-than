@@ -84,7 +84,8 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       // Huyền Quán (game.html) chỉ có ở bản web — bản iOS không đưa vào (docs/GAME-HUYEN-QUAN-SPEC.md §10).
-      input: mode === 'ios' ? undefined : { main: 'index.html', game: 'game.html' },
+      // Key entry PHẢI là 'index' → chunk entry tên index-*.js (selftest [loop 790/813/840] glob /^index-.*\.js$/)
+      input: mode === 'ios' ? undefined : { index: 'index.html', game: 'game.html' },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/lunar-javascript')) return 'vendor-lunar';

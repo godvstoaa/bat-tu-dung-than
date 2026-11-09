@@ -41,7 +41,8 @@ export function createNet({ profile, onEvent = () => {} }) {
   let ws = null, me = null, room = 0, status = 'off', count = 0, seats = [];
   let retry = 0, retryTimer = 0, stopped = true;
   let lastSent = { x: -1, y: -1, s: -1, h: 0, at: 0 };
-  let seatWaiter = null;
+  let seatWaiter = null;   // hàm resolve đang chờ máy chủ trả seat
+  let seatPending = null;  // promise của lượt xin ghế đang chạy (để gọi chồng dùng lại)
 
   const set = (s) => { if (status !== s) { status = s; onEvent({ t: 'status', status: s, room }); } };
 
@@ -55,7 +56,7 @@ export function createNet({ profile, onEvent = () => {} }) {
     sock.onopen = () => {
       retry = 0;
       const p = profile();
-      sock.send(JSON.stringify({ t: 'hello', name: p.name, robe: p.robe, acc: p.accent, look: p.look, title: p.title, pid: pid() }));
+      sock.send(JSON.stringify({ t: 'hello', name: p.name, robe: p.robe, acc: p.accent, cos: p.cos || '', look: p.look, title: p.title, pid: pid() }));
     };
     sock.onmessage = (e) => { let m; try { m = JSON.parse(e.data); } catch (_) { return; } handle(m); };
     sock.onclose = (e) => {
@@ -78,7 +79,7 @@ export function createNet({ profile, onEvent = () => {} }) {
   function upsert(p) {
     if (blocked.has(p.u)) return;
     const o = others.get(p.id) || { id: p.id, bubble: null };
-    Object.assign(o, { u: p.u, look: p.look, name: p.name, robe: p.robe, title: p.title, tx: p.x, ty: p.y, th: p.h, s: p.s });
+    Object.assign(o, { u: p.u, look: p.look, name: p.name, robe: p.robe, acc: p.acc || '', cos: p.cos || '', title: p.title, tx: p.x, ty: p.y, th: p.h, s: p.s });
     if (o.x == null) { o.x = p.x; o.y = p.y; o.h = p.h; }
     others.set(p.id, o);
   }
@@ -102,6 +103,7 @@ export function createNet({ profile, onEvent = () => {} }) {
         break;
       case 'join': upsert(m.p); onEvent({ t: 'join', name: m.p.name }); break;
       case 'leave': others.delete(m.id); break;
+      case 'cos': { const o = others.get(m.id); if (o) o.cos = m.c || ''; break; }
       case 'count': count = m.n; onEvent({ t: 'count', n: m.n }); break;
       case 'mv': {
         const o = others.get(m.id);
@@ -124,9 +126,10 @@ export function createNet({ profile, onEvent = () => {} }) {
         onEvent({ t: 'say', id: m.id, self: m.id === me, text, name: others.get(m.id)?.name });
         break;
       }
-      case 'seat': seatWaiter?.(m.i); seatWaiter = null; break;
+      case 'seat': seatWaiter?.(m.i); seatWaiter = null; seatPending = null; break;
       case 'seats': seats = m.taken || []; break;
       case 'reported': onEvent({ t: 'reported', id: m.id }); break;
+      case 'err': onEvent({ t: 'err', m: m.m }); break;
       default:
     }
   }
@@ -142,15 +145,16 @@ export function createNet({ profile, onEvent = () => {} }) {
     others,
     start() { if (!stopped) return; stopped = false; connect(); },
     stop() { stopped = true; clearTimeout(retryTimer); if (ws) { const s = ws; ws = null; s.close(1000); } others.clear(); set('off'); },
-    // Gọi mỗi khung hình: gửi vị trí (≤ 8 Hz, chỉ khi đổi) + nội suy người khác.
+    // Gọi mỗi khung hình: gửi vị trí (≤ 8 Hz, chỉ khi đổi — kể cả đổi hướng h) + nội suy người khác.
     tick(dt, self) {
       const now = performance.now();
       if (me && now - lastSent.at > 1000 / P.MOVE_HZ) {
         const s = self.sitting ? 1 : 0;
         const a = Math.round(self.alt || 0);
-        if (Math.abs(self.x - lastSent.x) > 0.02 || Math.abs(self.y - lastSent.y) > 0.02 || s !== lastSent.s || a !== lastSent.a) {
-          send({ t: 'mv', x: self.x, y: self.y, h: self.h || 0, s, a });
-          lastSent = { x: self.x, y: self.y, s, a, at: now };
+        const h = self.h || 0;
+        if (Math.abs(self.x - lastSent.x) > 0.02 || Math.abs(self.y - lastSent.y) > 0.02 || Math.abs(h - lastSent.h) > 0.02 || s !== lastSent.s || a !== lastSent.a) {
+          send({ t: 'mv', x: self.x, y: self.y, h, s, a });
+          lastSent = { x: self.x, y: self.y, s, a, h, at: now };
         }
       }
       const step = 3.5 * 1.35 * dt; // nhanh hơn tốc độ đi chút để đuổi kịp
@@ -163,16 +167,27 @@ export function createNet({ profile, onEvent = () => {} }) {
     },
     emote(e, to) { send({ t: 'emo', e, to }); },
     say(k) { send({ t: 'say', k }); },
-    // Xin một bồ đoàn ở Trà Thất. Offline → chỗ giữa; online → máy chủ cấp (-1 = kín chỗ).
+    // Nhảy xa hợp lệ do client chủ động (đổi phòng qua cửa điện, lên xe ngựa/đò): báo máy
+    // chủ cập nhật toạ độ cũ để các gói mv sau cú nhảy không bị sanityMv kẹp về chỗ cũ.
+    // Ngoại tuyến → send tự bỏ qua.
+    teleport(x, y) { send({ t: 'tp', x, y }); },
+    // Xin một bồ đoàn ở Trà Thất. Máy chủ không trả lời / hết chỗ → -1 (không có ghế —
+    // các đường THẤT BẠI không bao giờ trả số ảo, vì 1 là chỉ số ghế hợp lệ). Ngoại tuyến
+    // thì khác: offline-first (mất mạng vẫn chơi đơn) → cấp ghế cục bộ để ngồi trà vẫn
+    // chạy — không có người thật nên không cần máy chủ khoá chỗ. Gọi chồng khi waiter
+    // chưa xong thì dùng lại cùng promise, không gửi thêm gói sit.
     requestSeat() {
-      if (!me) return Promise.resolve(1);
-      return new Promise((resolve) => {
+      if (!me) return Promise.resolve(1); // ngoại tuyến: ghế cục bộ (SEATS[1] = bồ đoàn giữa)
+      if (seatWaiter) return seatPending;
+      return (seatPending = new Promise((resolve) => {
         seatWaiter = resolve;
         send({ t: 'sit' });
-        setTimeout(() => { if (seatWaiter === resolve) { seatWaiter = null; resolve(1); } }, 1500);
-      });
+        setTimeout(() => { if (seatWaiter === resolve) { seatWaiter = null; seatPending = null; resolve(-1); } }, 1500);
+      }));
     },
     stand() { send({ t: 'stand' }); },
+    // đổi trang bị (Tàng Y Các) → người khác thấy ngay
+    setCos(c) { send({ t: 'cos', c }); },
     report(id, why) { send({ t: 'report', id, why }); },
     // ẩn theo mã ổn định u (bền qua kết nối lại), xoá khỏi cảnh ngay
     block(id) { const o = others.get(id); if (!o) return; blocked.add(o.u); others.delete(id); try { localStorage.setItem(BLOCK_KEY, JSON.stringify([...blocked].slice(-200))); } catch (e) { /* ignore */ } },

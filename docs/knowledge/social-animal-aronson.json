@@ -1,0 +1,183 @@
+{
+  "id": "social-animal-aronson",
+  "title": "The Social Animal",
+  "author": "Elliot Aronson (tái bản 12 cùng Joshua Aronson)",
+  "why": "The Social Animal (1972, tái bản đến 2018) là giáo trình xã hội học tâm lý nền tảng: mâu thuẫn nhận thức, tuân thủ nhóm và thẩm quyền, hai tuyến thuyết phục, heuristic nhận thức, định kiến tự thi hành tiên ngôn, quy luật tình cảm. Đây là corpus đắt nhất cho app bói toán ở trục chống sáo rỗng Barnum (thiên vị xác nhận, kiên trì niềm tin, gán nhầm nguồn kích thích, tương quan không phải nhân quả) và trục cơ chế cụ thể cho lời khuyên tình duyên (tương đồng, hiệu ứng tăng-giảm) và xã hội (hiệu ứng Ben Franklin, hợp tác phụ thuộc lẫn nhau). Nguồn web phủ đủ 9 chương theo mục lục tái bản 12: tài liệu giảng dạy đại học, flashcard học phần theo chương, bài review và tham chiếu tóm tắt — nhiều nguồn độc lập xác nhận trùng khớp từng khái niệm; không dùng bản văn gốc có bản quyền và không chép nguyên văn chuỗi quá 20 từ. Chi tiết tiểu mục nhỏ của chương 1 và chương phương pháp (chương 9) nguồn web mỏng hơn, nên chỉ trích những điểm chắc chắn được nhiều nguồn xác nhận.",
+  "points": [
+    {
+      "title": "Quy luật số một của Aronson: làm việc điên rồ không hẳn là người điên rồ",
+      "source": "Chương 1 — What Is Social Psychology?",
+      "principle": "Aronson mở sách bằng quy luật: những người làm việc điên rồ không nhất thiết là người điên rồ. Trong phần lớn trường hợp, chính tình huống — áp lực nhóm, thẩm quyền, hoàn cảnh đặc biệt — đủ sức khiến người bình thường hành xử trái với tính cách bẩm sinh của họ. Muốn hiểu hành vi phải bắt đầu từ bối cảnh, không phải vội chẩn đoán bản chất.",
+      "appHook": "Khi luận lá số, AI phải luôn nhắc biến số tình huống: cùng một Can Chi, cùng một tính cách, hoàn cảnh khác nhau cho hành trình khác nhau — mệnh là khuynh hướng chứ không phải bản án cố định. Đây là trụ chống quy lỗi đặc điểm cá nhân cho toàn bộ phần luận tính cách.",
+      "tag": "personality"
+    },
+    {
+      "title": "Quy lỗi cá nhân hay quy lỗi tình huống",
+      "source": "Chương 1 — What Is Social Psychology? (và chương Social Cognition)",
+      "principle": "Con người có xu hướng hệ thống giải thích hành vi người khác bằng tính cách mà lơ là vai trò hoàn cảnh — lỗi quy lỗi cơ bản. Người quan sát thường bảo \"anh ấy ích kỷ\", trong khi chính người trong cuộc thấy mình bị hoàn cảnh thúc ép. Sự lệch này là quy luật nhận thức chung của mọi người, không phải cá biệt của ai.",
+      "appHook": "Khi đọc số nói về \"đời anh tự chuốc lấy\", AI nên vẽ cân hai bên: nhân cách khuynh hướng từ lá số và các biến hoàn cảnh (nghề, vị trí, thời vận đang đứng). Luận cân bằng kiểu này giúp câu trả lời không thành án tử cho tính cách người dùng.",
+      "tag": "personality"
+    },
+    {
+      "title": "Sức mạnh của đa số: tuân theo đám ngay cả khi thấy rõ sai",
+      "source": "Chương 2 — Conformity",
+      "principle": "Trong thí nghiệm Asch, người tham gia đối mặt với đáp án sai rõ ràng trước mắt, nhưng khi cả nhóm đồng loạt đưa câu sai, họ uốn theo đa số ở khoảng một phần ba số lần trả lời — mà không cần một lời đe dọa nào. Chỉ cần một tiếng nói đồng tình duy nhất đã đủ làm tỷ lệ tuân thủ sụp đổ. Nhận thức đúng đắn không tự bảo vệ được con người khỏi áp lực xã hội.",
+      "appHook": "Dùng khi luận quan hệ bạn bè hay môi trường làm việc: AI nên khuyên người dùng chủ động chọn nhóm đồng hành, vì nhóm nào quanh mình thì lâu ngày người đó uốn theo nhóm đó, chẳng cần mệnh nào phán. Câu trả lời tránh kiểu Barnum bằng cách chỉ ra cơ chế cụ thể: một đồng minh cùng chí hướng là phao cứu khỏi lệch chuẩn.",
+      "tag": "social"
+    },
+    {
+      "title": "Hai cái cù yêu cầu ta theo đám",
+      "source": "Chương 2 — Conformity",
+      "principle": "Con người tuân theo nhóm vì hai lý do khác nhau: một là coi nhóm là nguồn thông tin đáng tin về thực tại (khi tình huống mơ hồ, khủng hoảng), hai là sợ bị chê cười, bị đẩy ra ngoài. Sự mơ hồ làm tăng dòng thứ nhất; lòng tự trọng thấp làm tăng dòng thứ hai. Phân biệt hai dòng này mới biết theo đám ở đâu là hợp lý, ở đâu là hèn kém.",
+      "appHook": "Khi người dùng hỏi có nên nghe mách bảo của gia đình, bạn bè về hôn nhân hay chuyển nghề không, AI phân biệt: nếu người mách là người có kinh nghiệm thật trong chuyện đó thì nghe theo là lấy thông tin hợp lý; nếu chỉ sợ mất lòng mà theo thì là nạn nhân của áp lực chuẩn mực — và nên cân lại bằng thế đứng riêng của lá số.",
+      "tag": "decision"
+    },
+    {
+      "title": "Quyền lực của thẩm quyền: người thường cũng thành tay sai",
+      "source": "Chương 2 — Conformity",
+      "principle": "Trong thí nghiệm Milgram, khoảng hai phần ba người thường đồng ý phóng điện ở mức tối đa vào người lạ chỉ vì một người mang áo blouse bảo họ làm — dù trước đó không ai tin mình sẽ làm thế. Mức tuân thủ đó không đến từ tính ác của con người mà đến từ các điều kiện tình huống: gần gũi thẩm quyền, bối cảnh chính thức, không nhìn thấy người chịu đau. Khi cấu trúc tình huống sai, ai cũng có thể trở thành tay sai.",
+      "appHook": "Dùng khi lời khuyên sự nghiệp vướng chuyện \"sếp sai vẫn nghe theo\" hay cảnh báo năm dễ bị kéo theo người có quyền. AI nên khuyên dựng sẵn cơ chế phòng hộ: chuẩn bị câu trả lời từ chối và có người giám sát bên ngoài, vì theo thí nghiệm này ý chí cá nhân yếu hơn cấu trúc tình huống.",
+      "tag": "social"
+    },
+    {
+      "title": "Hai đường vào lòng người: tuyến trung tâm và tuyến ngoại vi",
+      "source": "Chương 3 — Mass Communication, Propaganda, and Persuasion",
+      "principle": "Thuyết phục đi theo hai tuyến: tuyến trung tâm đòi người nghe suy xét kỹ lập luận thì hiệu ứng bền; tuyến ngoại vi dụ dăng bằng tín hiệu bề mặt — độ nổi tiếng, vẻ đẹp, số lượng người nói — hiệu ứng dễ tàn. Người mệt hay bận rộn trượt xuống tuyến ngoại vi nhiều hơn. Tín hiệu ngoại vi không bao giờ chứng minh được nội dung đúng.",
+      "appHook": "Đây là bài tự vệ cho người dùng bói toán: AI nên chỉ rõ — thầy nổi tiếng, quảng cáo hoành tráng, nhiều lời khen là tín hiệu ngoại vi, không bằng lập luận cụ thể gắn với lá số thật của chính mình. Khi AI tự luận, hãy nói cơ chế và dẫn cứ cụ thể theo Can Chi, nhà, đại vận chứ không vờn chữ hoa mỹ.",
+      "tag": "decision"
+    },
+    {
+      "title": "Uy tín nguồn và hiệu ứng nướng chậm",
+      "source": "Chương 3 — Mass Communication, Propaganda, and Persuasion",
+      "principle": "Người nói có chuyên môn và được xem là vô tư dễ đổi ý người nghe hơn, nhất là khi người nghe vốn không đồng ý. Nhưng hiệu ứng ngủ đông cho thấy lời của nguồn ít uy tín, khi ta đã quên mất ai nói, có thể nổi dậy và thuyết phục mình dần dần — ta nhớ nội dung mà quên nguồn. Lời từ nguồn đuối vẫn ám ảnh lâu dài nếu không ghi rõ mốc thời gian để kiểm chứng.",
+      "appHook": "Khi người dùng trích \"thầy nào đó bảo năm nay xấu\", AI nên hỏi lại nguồn và thời điểm nói — nhiều khi người ta nhớ mệnh lý sai mà quên bẵng ai nói. Ngược lại, khi AI cảnh báo điều gì, hãy nêu rõ mốc thời gian cụ thể để người dùng có thể kiểm chứng, không để lời cảnh báo trôi thành nỗi ám ảnh vô chủ.",
+      "tag": "decision"
+    },
+    {
+      "title": "Dọa mà phải kèm chỉ đường",
+      "source": "Chương 3 — Mass Communication, Propaganda, and Persuasion",
+      "principle": "Thông điệp khơi sợ hãi chỉ hiệu quả ở mức vừa phải; mức sợ quá cao thường khiến người nghe né tránh, phủ nhận hoặc trượt ra ngoài. Sợ hãi sinh hành động khi kèm hướng dẫn cụ thể, khả thi — nói rõ bước đầu tiên phải làm là gì. Dọa mà không cho đường ra chỉ sinh lo lắng vô ích.",
+      "appHook": "Quy tắc bắt buộc khi AI luận vận hạn xấu: mỗi cảnh báo về năm phá tài, tai nạn hay tình duyên trục trặc phải gắn một hoặc hai việc cụ thể khả thi (khám sức khỏe định kỳ, hoãn ký hợp đồng lớn, nói chuyện thẳng thắn với người thương). Cấm kiểu \"năm này rất xấu\" mà không kèm lối thoát — đúng như tài liệu, đó là sinh lo lắng vô ích.",
+      "tag": "advice"
+    },
+    {
+      "title": "Hai cỗ máy đoán nhanh: tính sẵn có và tính đại diện",
+      "source": "Chương 4 — Social Cognition",
+      "principle": "Để tiết kiệm công sức suy nghĩ, người ta dùng hai heuristic: tính sẵn có — chuyện dễ nhớ ra được đánh giá là hay xảy ra hơn, dù thực tế ngược lại; tính đại diện — phán xét ai thuộc nhóm nào dựa trên khung dáng điển hình của nhóm, thay vì xác suất thật. Hai cỗ máy này nhanh mà hay lệch, nhất là khi dấu hiệu bề mặt trông giống điển hình.",
+      "appHook": "Đây là cơ chế đằng sau việc người dùng nhớ mãi một lần bói trúng mà quên hàng trăm lần không trúng, và đằng sau suy luận \"ra Can nào là dáng người đó\". AI nên chủ động nêu hai lăng kính này khi luận: cảm giác \"nhớ ra ví dụ\" không phải bằng chứng thống kê, và bản tính theo Can Chi chỉ là xác suất khuynh hướng.",
+      "tag": "decision"
+    },
+    {
+      "title": "Khung đặt câu đổi cả câu trả lời",
+      "source": "Chương 4 — Social Cognition",
+      "principle": "Cùng một thực tại, khi đóng khung theo \"tiết kiệm bao nhiêu\" hay \"mất bao nhiêu\", theo \"cơ hội\" hay \"nguy cơ\", người ta quyết khác hẳn nhau. Nghiên cứu của Kahneman và Tversky cho thấy con người nhạy cảm với mất mát hơn là với điều tương đương là khoản thu. Khung đặt câu không phải màu mè — nó đổi cả lựa chọn.",
+      "appHook": "Khi đưa lời khuyên về vận hạn, AI nên chọn khung tích cực có cơ sở: nói \"năm này tốt để củng cố nền tảng, làm ba việc sau\" thay vì chỉ liệt kê cấm kỵ — khung cấm kích hoạt tâm lý né tránh và dễ làm người dùng nản. Đồng thời nhắc người dùng: nghe lại lời luận của mình, ý nghĩa còn phụ thuộc khung nào đang treo.",
+      "tag": "decision"
+    },
+    {
+      "title": "Thiên vị xác nhận: gốc rễ của hiệu ứng Barnum",
+      "source": "Chương 4 — Social Cognition",
+      "principle": "Người ta có xu hướng tìm và tin những bằng chứng khớp với điều mình đã tin mà bỏ sót bằng chứng ngược. Đó là lý do bản mô tả chung chung kiểu \"bạn mạnh mẽ bên ngoài nhưng có lúc mỏng manh bên trong\" dường như lúc nào cũng đúng với ai — hiệu ứng Barnum. Câu chung chung hợp với gần như mọi người nên khó phản bác, nhưng cũng chẳng nói lên điều gì riêng.",
+      "appHook": "Trụ cột chống sáo rỗng: AI tuyệt đối tránh chuỗi câu mô tả Barnum không gắn với yếu tố cụ thể trong lá số. Mỗi tính cách nêu ra phải truy hồi được về một Can Chi, một nhà, một tổ hợp nhất định, kèm cả mặt bù trừ khi hợp lệ; và khi người dùng khẳng định \"mình đúng như bản bói\", AI chủ động gợi thử một trường hợp ngược để mở mắt.",
+      "tag": "decision"
+    },
+    {
+      "title": "Niềm tin khó diệt: kiên trì cả khi bằng chứng gốc sập",
+      "source": "Chương 4 — Social Cognition",
+      "principle": "Khi người ta đã hình thành một niềm tin, cho dù bằng chứng dẫn ra niềm tin đó sau này bị chứng minh là giả, niềm tin vẫn sống dai dẳng. Con người tự xây mạng giải thích quanh niềm tin, rồi mạng giải thích tự đứng vững mà không cần bằng chứng gốc nữa. Muốn phá phải chủ động cài đặt trước một giải thích thay thế.",
+      "appHook": "Khi AI phải sửa một nhận định sai của người dùng về mệnh mình (ví dụ tin mình \"vận xấu triền miên\" vì một lần bói cũ không chuẩn), đừng chỉ phủ nhận: hãy chỉ ra giả thuyết sai đó hình thành thế nào và cài sẵn hai ba cách diễn giải thay thế gắn với lá số thật, để niềm tin sai không sống dai qua mạng giải thích tự lập.",
+      "tag": "decision"
+    },
+    {
+      "title": "Tư duy \"nếu mà\": hối tiếc đo bằng khoảng cách với thành công",
+      "source": "Chương 4 — Social Cognition",
+      "principle": "Người ta hay nghĩ về những sự việc có thể đã xảy ra nhưng không xảy ra; và thương nhất ở chỗ suýt đạt — người giành hạng nhì thường khổ hơn người giành hạng ba, vì hạng ba so với tưởng tượng \"suýt không vào huy chương\". Nghịch lý này điều khiển cảm giác hối tiếc: việc suýt trượt đau hơn việc trượt xa. Nghĩ tới \"nếu mà\" cũng có mặt tốt: giúp rút bài học nếu dùng đúng hướng.",
+      "appHook": "Khi người dùng dồn nén hối tiếc \"nếu hồi đó chọn hướng khác thì...\", AI nên giải thích mức đau hối tiếc phụ thuộc khoảng cách với thành công gần chạm, không bằng giá trị thực của kết quả. Dùng đúng chiều: hướng người dùng nhìn lại để rút quy tắc hành động chứ không đày mình vào tưởng tượng vô ích.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Mâu thuẫn nhận thức: ba đường tự an ủi",
+      "source": "Chương 5 — Self-Justification",
+      "principle": "Khi cùng lúc giữ hai ý bất tương hợp — hành động đã làm và niềm tin đã có — con người thấy căng thẳng khó chịu và giảm nó theo ba đường: đổi hành vi, đổi niềm tin, hoặc thêm niềm tin giải thích. Người ta thường chọn đường rẻ nhất, nghĩa là bẻ cong ý niệm nhiều hơn là bẻ cong hành vi. Đây là động cơ ngầm của hàng loạt hành vi tự biện hộ.",
+      "appHook": "Khi người dùng biết nên làm gì mà vừa đưa ra lời tự biện hộ (ví dụ \"năm nay mệnh xấu nên thôi không tìm việc\"), AI nhận diện và gọi tên cơ chế mâu thuẫn nhận thức: đó không phải mệnh bắt vậy, mà là cách tâm lý tự giảm căng thẳng. Giải pháp phải là hành vi nhỏ đi trước, để niềm tin theo sau hành vi chứ không ngược lại.",
+      "tag": "decision"
+    },
+    {
+      "title": "Sự giá trị sinh ra từ cố sức",
+      "source": "Chương 5 — Self-Justification",
+      "principle": "Aronson và Mills cho thấy con người đánh giá cao thứ mình phải trả giá đắt để có được, ngay cả khi thứ đó chẳng đáng bao nhiêu; nghi lễ gia nhập khắt khe khiến người ta yêu quý tổ chức hơn. Lý do không phải sản phẩm tốt hơn, mà là việc trả giá lớn cho mục tiêu nhỏ tạo mâu thuẫn — tâm lý giải bằng cách nâng giá trị mục tiêu lên. Hiểu được quy luật này, người ta tránh được việc trả giá đắt để rồi bị trói vào mục tiêu sai.",
+      "appHook": "Khi luận về người dùng theo một trường phái bói toán hay một nghề đòi khổ luyện, AI nên hiểu đam mê của họ có phần do chính nỗi khó chịu đầu vào. Dùng điều này đúng chiều: đặt bài tập nhỏ đáng trả giá để người dùng tự sinh giá trị cho mục tiêu mới trong năm tốt; và nhắc họ kiểm tra xem có đang trói mình vào mục tiêu sai chỉ vì đã trả giá đắt hay không.",
+      "tag": "habits"
+    },
+    {
+      "title": "Hiệu ứng Ben Franklin: cho đi để thương thêm",
+      "source": "Chương 5 — Self-Justification",
+      "principle": "Nghịch lý Franklin: giúp một người một việc khiến ta yêu quý người đó hơn, chứ không phải ngược lại. Vì hành vi tốt tạo mâu thuẫn nếu ta vẫn coi người đó đáng ghét, tâm lý giải bằng cách nâng thiện cảm lên. Người mà ta bỏ công sức giúp trở thành người ta thương.",
+      "appHook": "Dùng khi khuyên về tình duyên hay quan hệ gia đình: thay vì bảo \"thể hiện tốt hơn để người ta thương\", AI nên khuyên hành động cụ thể — chủ động giúp một việc nhỏ của người mình muốn gần (người thân khó tính, người yêu đang lạnh nhạt) — vì theo hiệu ứng này, hành động cho đi tự sinh thiện cảm ở chính người cho.",
+      "tag": "social"
+    },
+    {
+      "title": "Khen thưởng quá tay phá động cơ nội tại",
+      "source": "Chương 5 — Self-Justification",
+      "principle": "Khi con người làm việc vì lý do ngoài đủ lớn (tiền nhiều, đe dọa nặng), họ không cần tự thuyết phục mình là thích việc đó — nên niềm yêu thích nội tại không sinh ra. Ngược lại, lý do ngoài nhỏ bé (thưởng nhẹ, cảnh báo nhẹ) buộc tâm lý tự bổ sung lý do bên trong: \"chắc mình thích việc này\". Hệ quả là khen thưởng quá tay có thể phá hoại đam mê sẵn có.",
+      "appHook": "Khi AI khuyên người dùng xây thói quen (tập thiền, học kỹ năng, rèn phong thủy), nên khuyến khích tự thưởng nhỏ và tự lý giải nội tại, tránh ràng buộc bởi phần thưởng lớn bên ngoài hay nỗi sợ lớn — vì theo nguyên lý biện minh không đầy đủ, phần thưởng quá tay biến việc yêu thích thành công việc có trả công, chết dần khi thưởng vắng.",
+      "tag": "habits"
+    },
+    {
+      "title": "Thất bại tương đối: đau vì chênh lệch, không phải vì nghèo",
+      "source": "Chương 6 — Human Aggression",
+      "principle": "Nỗi bất mãn không sinh ra từ mức sống thấp tuyệt đối, mà từ chênh lệch giữa thứ mình có và thứ mình thấy người xung quanh có. Con người đo hạnh phúc bằng chuẩn so sánh, và chuẩn đó bò lên theo tiến bộ của mình hoặc của người khác. Thế giới càng trưng bày nhiều thành công ngoài kia, thất bại tương đối càng dễ bùng.",
+      "appHook": "Dùng khi người dùng thấy mình tụt so với bạn bè, đồng nghiệp hay mạng xã hội trong giai đoạn luận vận: AI gọi tên chính nó là thất bại tương đối — nỗi đau đến từ chuẩn so sánh bò lên, không phải mệnh sụp. Lời khuyên cụ thể: chọn chuẩn so sánh theo quá khứ của chính mình (so mình hôm nay với mình năm ngoái) thay vì với bảng thành công của người khác.",
+      "tag": "stress"
+    },
+    {
+      "title": "Giấc mơ xả giận là ngụy biện",
+      "source": "Chương 6 — Human Aggression",
+      "principle": "Ý niệm \"giận thì phải xả ra cho nhẹ lòng\" không qua được kiểm chứng: các nghiên cứu cho thấy hành động xả giận (đấm gối, la hét, chơi nội dung bạo lực) thường củng cố cơn giận và làm hành vi hung hăng sau đó tăng lên chứ không giảm. Việc diễn tập cơn giận chính là lớp học cho cơn giận. Con đường giảm giận hiệu quả là can thiệp trước khi bùng hoặc đổi tình huống sinh giận.",
+      "appHook": "Khi luận về tháng, ngày dễ sinh cơn bốc đồng, AI không nên khuyên kiểu \"giận thì xả hết ra\" — hãy khuyên công cụ thật: rời khỏi tình huống vài phút, thở chậm, viết ra trước khi nói, đi bộ. Đây là chỗ phân biệt lời khuyên có cơ chế với lời ru ngủ kiểu Barnum.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Nhãn mệnh tự thành thật: tiên ngôn tự thi hành",
+      "source": "Chương 7 — Prejudice",
+      "principle": "Định kiến không chỉ chờ đối tượng phản ánh nó — nó tự biến đối tượng thành như định kiến: người ta hành xử với một con người theo niềm tin sẵn có, và cách hành xử ấy kéo phản ứng xác nhận niềm tin quay về. Trong lớp học, giáo viên kỳ vọng cao về đứa nào thì đứa đó tiến bộ hơn, vì kỳ vọng tự chuyển thành cách dạy và cách phản hồi. Nhãn là một loại chất xúc tác hành vi.",
+      "appHook": "Nguyên lý sống còn cho app bói toán: một bản mệnh đọc sai có thể tự thành sự thật — nói \"mệnh anh khó kết duyên\" quá đà có thể khiến người dùng né tránh yêu đương và thực sự khó kết duyên. Mọi luận về tính cách phải kèm lời giải trần: đây là khuynh hướng thống kê, không phải lệnh cấm; AI chủ động cảnh báo người dùng đừng dùng lá số làm cái hộp nhốt mình.",
+      "tag": "personality"
+    },
+    {
+      "title": "Ta và Họ, và bài thuốc hợp tác phụ thuộc lẫn nhau",
+      "source": "Chương 7 — Prejudice",
+      "principle": "Con người chia đội Ta và Họ gần như tức thì, kể cả với nhóm vô nghĩa xếp ngẫu nhiên; thiên vị nhóm mình là sản phẩm phụ của nhu cầu tự tôn qua danh tính tập thể. Thuốc giảm đã qua kiểm chứng là hợp tác phụ thuộc lẫn nhau: khi thành công của mỗi người phụ thuộc vào mảnh thông tin riêng của mỗi người — như lớp học ghép hình (jigsaw) của Aronson — thiên vị giảm và thiện cảm tăng. Giao tiếp thẳng hay kêu gọi chung chung không đủ; phải đổi cấu trúc tình huống.",
+      "appHook": "Khi khuyên về quan hệ (hai họ không hợp, xung đột trong nhóm bạn hay đội nhóm), AI nên khuyên thiết kế hoạt động có phụ thuộc lẫn nhau: cùng làm một việc mà mỗi người giữ một phần không thể thiếu, thay vì chỉ rủ \"nói chuyện cho hiểu nhau\". Khi luận tính cách hướng nội, hướng ngoại, cũng tránh áp nhãn ta-họ lên chính bản thân người dùng.",
+      "tag": "social"
+    },
+    {
+      "title": "Tương đồng thắng bổ khuyết trong tình yêu",
+      "source": "Chương 8 — Liking, Loving, and Interpersonal Sensitivity",
+      "principle": "Nghiên cứu xuyên suốt cho thấy người ta yêu quý người giống mình về giá trị, thái độ và nền tảng sống; giả thuyết \"tính cách trái ngược thì bổ khuyết cho nhau\" hầu như không qua kiểm chứng cho quan hệ lâu dài. Tương đồng làm cuộc đối thoại suôn sẻ, xác nhận quan điểm của nhau và là tín hiệu người ấy cũng sẽ thương mình. Bắt đầu từ khác biệt lớn thì con đường dài hơn nhiều.",
+      "appHook": "Khi luận tình duyên bằng hợp mệnh, tương khắc, AI nên dịch sang ngôn ngữ hành vi: điểm hợp thực sự truy về sự tương đồng trong giá trị và cách sống (quan điểm về tiền, gia đình, nhịp sống), chứ không phải công thức \"trai mệnh này cần gái mệnh kia để bù trừ\". Lời khuyên hẹn hò: tìm chỗ giống nhau trước, còn khác biệt để thương lượng.",
+      "tag": "advice"
+    },
+    {
+      "title": "Hiệu ứng tăng-giảm: đổi lòng mới quyết định tình",
+      "source": "Chương 8 — Liking, Loving, and Interpersonal Sensitivity",
+      "principle": "Aronson và Linder cho thấy thiện cảm của ta chịu tác động mạnh nhất không phải từ mức độ thương đều đặn, mà từ hướng thay đổi: người từ chối mình mà dần mở lòng khiến mình yêu quý gấp bội người thương đều đặn từ đầu; người đầu tiên tâng bốc rồi nguội dần làm tổn thương sâu hơn người chỉ thẳng thắn suốt. Ưu ái tăng dần có sức mạnh hơn ưu ái đều; khinh dần cũng thế.",
+      "appHook": "Khi luận tình duyên giai đoạn đầu, AI nên giải thích cảm giác \"người ấy gần đây ấm hơn\" có sức nặng quyết định hơn cả bản phân tích ổn định — người dùng dễ nhầm hiệu ứng tăng-giảm với mệnh duyên. Lời khuyên: duy trì thiện cảm tăng nhỏ đều hiệu quả hơn nóng lạnh xoay tròn; và khi tự thấy ngất ngây vì người vừa đổi thái độ, nên kiểm tra xem đó có phải chỉ là hiệu ứng tăng.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Gán nhầm nguồn rung động",
+      "source": "Chương 8 — Liking, Loving, and Interpersonal Sensitivity",
+      "principle": "Cảm xúc sinh lý từ nguồn nào đó — đứng trên cầu treo cao, tập thể dục, xem phim kinh dị — có thể bị gán nhầm thành rung động yêu đương với người đang ở cạnh. Dutton và Aron cho thấy người đàn ông gặp cô gái trên cầu cao gọi lại cho cô nhiều hơn khi gặp trên cầu thấp. Tim đập không tự chỉ rõ nguyên nhân; bộ não tự kể câu chuyện hợp lý nhất.",
+      "appHook": "Dùng khi luận duyên theo tháng, ngày \"dễ rung động\": AI nhắc người dùng phân biệt rung động thật với rung động mượn (gặp nhau trong môi trường hồi hộp — du lịch mạo hiểm, sự kiện căng thẳng, sát hạn áp lực công việc). Lời khuyên hành động: sau buổi hẹn khiến tim đập, hãy gặp lại trong bối cảnh yên tĩnh để kiểm tra cảm xúc có còn không, trước khi quyết lớn.",
+      "tag": "emotion"
+    },
+    {
+      "title": "Tương quan không phải nhân quả",
+      "source": "Chương 9 — Social Psychology as a Science",
+      "principle": "Hai thứ đi cùng nhau trong dữ liệu quan sát chưa chắc một thứ sinh ra thứ kia — có thể có biến thứ ba ẩn, hoặc chiều nhân quả ngược. Chỉ thí nghiệm có phân nhóm ngẫu nhiên và can thiệp chủ động mới chứng minh được quan hệ nhân quả. Sách khép lại bằng cách dạy người đọc đặt câu hỏi thận trọng với mọi tuyên bố \"đã được chứng minh\".",
+      "appHook": "Chuẩn chưng cất cuối cùng cho AI: khi dẫn nghiên cứu hành vi để luận mệnh (ví dụ \"người hướng nội thường thành công hơn trong nghề X\"), dùng ngôn ngữ xác suất và khuynh hướng, không khẳng định nhân quả tuyệt đối. Khi người dùng tin một mối liên hệ (bói trúng bằng mệnh thật), AI nên gợi rõ các giải thích thay thế: trùng hợp, tiên ngôn tự thi hành, chọn lọc ký ức.",
+      "tag": "decision"
+    }
+  ]
+}

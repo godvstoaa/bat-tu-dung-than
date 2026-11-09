@@ -23,6 +23,7 @@ export function gameMarkup() {
         <span class="hq-chips">
           <span id="hq-phuc" class="hq-chip" title="${TEXT.point}"></span>
           <span id="hq-streak" class="hq-chip" title="Chuỗi ngày"></span>
+          <span id="hq-ngoc" class="hq-chip" title="Ngọc"></span>
           <button id="hq-online" class="hq-chip hq-online off" type="button" title="Người đang trong quán">Ngoại tuyến</button>
         </span>
       </div>
@@ -40,6 +41,7 @@ export function gameMarkup() {
       <button id="hq-tasks-btn" class="hq-dbtn" type="button" aria-label="Nhiệm vụ hôm nay"></button>
       <button id="hq-social" class="hq-dbtn" type="button" aria-label="Giao lưu: cử chỉ và câu chào"><b aria-hidden="true">💬</b><span>Giao lưu</span></button>
       <button id="hq-menu" class="hq-dbtn" type="button" aria-label="Danh sách các gian"><b aria-hidden="true">☰</b><span>Các gian</span></button>
+      <button id="hq-wardrobe" class="hq-dbtn" type="button" aria-label="Tàng Y Các: trang phục, phụ kiện, hiệu ứng"><b aria-hidden="true">👘</b><span>Y Các</span></button>
       <button id="hq-book" class="hq-dbtn" type="button" aria-label="${TEXT.book}"><b aria-hidden="true">📜</b><span>${TEXT.book}</span></button>
     </nav>
     <p class="hq-help">WASD / mũi tên để đi · click để đi tới · kéo để xoay, lăn chuột để gần/xa · <kbd>Q</kbd>/<kbd>R</kbd> xoay 45° · <kbd>E</kbd> vào gian · <kbd>Esc</kbd> đóng</p>

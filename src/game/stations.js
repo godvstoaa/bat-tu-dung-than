@@ -12,6 +12,8 @@ import { GAN, ZHI, WX_VI } from '../engine/constants.js';
 import { YI_VI, JI_VI } from '../engine/daily-guide.js';
 import * as S from './state.js';
 import { CALM_LINES, randomName } from './names.js';
+// [G2 — NPC-AI] (docs/npc-ai/15 §15.11 — thứ tự import: dữ liệu → chuyện → bark → consumer)
+import { pickBark } from './bark-pool.js'; // MỘT NGUỒN pool bark (persona + khach_* + trạm — audit F1/F2)
 import { bell, knock, rattle } from './audio.js';
 import { ROBE } from './render.js';
 import { TEXT, FEATURES } from './features.js';
@@ -52,8 +54,10 @@ export function softRating(r = '') {
 
 const chartCache = new Map();
 export function chartOf(p) {
-  const k = `${p.year}-${p.month}-${p.day}-${p.hour}-${p.minute}-${p.gender}`;
-  if (!chartCache.has(k)) chartCache.set(k, analyze(p.year, p.month, p.day, p.hour, p.minute, p.gender, new Date().getFullYear()));
+  const year = new Date().getFullYear();
+  // key kèm năm phân tích (mẫu vanmenh-ui.js › vanOf) — qua giao thừa không trả chart năm cũ
+  const k = `${p.year}-${p.month}-${p.day}-${p.hour}-${p.minute}-${p.gender}-${year}`;
+  if (!chartCache.has(k)) chartCache.set(k, analyze(p.year, p.month, p.day, p.hour, p.minute, p.gender, year));
   return chartCache.get(k);
 }
 
@@ -69,6 +73,39 @@ function needProfile(api, what) {
     <div class="hq-actions"><button class="hq-btn hq-primary" data-go="thay">Tới bàn thầy</button></div></div>`);
   body.querySelector('[data-go]').onclick = () => api.goTo('thay');
   return body;
+}
+
+// ---------------------------------------------------------------------------
+// [G2 — NPC-AI] BARK TRẠM (docs/npc-ai/05-npc-da-co-trong-code.md; mở khóa
+// stations.js theo mục 15 §15.7). Bark ≤ 90 ký tự, không doạ, không chê lá số
+// người chơi (mục 06 §7). Chọn THUẦN THEO HẠT — cùng ngày + cùng trạm → cùng
+// câu, mai tự đổi (mục 05 §05.3); không Math.random. Hiện qua cơ chế sẵn có:
+// api.toast lúc mở trạm, hoặc dòng thoại trong panel trạm đó — KHÔNG dựng UI
+// mới, KHÔNG bong bóng 3D (phần render3d của thợ khác).
+//
+// MỘT NGUỒN (audit F1 — docs/npc-ai/05 §05.3 + 04): TOÀN BỘ pool bark (persona
+// thay_tubinh, khách khach_*, trạm xam/que/huong/tra/sen/la_ban/lich) nằm ở
+// bark-pool.js — chỗ này KHÔNG còn pool cục bộ; barkOf gọi thẳng pickBark,
+// pool không có → null → trạm câm (§05.3), KHÔNG bịa giọng. Map trạm→pool
+// barkPoolOfStation ở world.js đã dọn (đường chết không consumer).
+// ---------------------------------------------------------------------------
+const pidLocal = () => {
+  try { return localStorage.getItem('huyenquan:pid') || 'local'; } catch (e) { return 'local'; }
+};
+// Múi chọn bark = dayKey khuôn (ngày : pid) — chỉ làm chỉ số chọn câu, không
+// ghi state, không rời máy người chơi.
+const dayKeyOf = () => `${S.todayStr(new Date())}:${pidLocal()}`;
+
+/** Chọn bark trạm theo hạt — delegate pickBark của bark-pool.js: một nguồn dữ
+ *  liệu + một công thức chọn, chung với persona (audit F1/F2). Không có pool →
+ * null — trạm câm như hôm nay, KHÔNG bịa giọng. */
+function barkOf(poolId, seed = dayKeyOf()) {
+  return pickBark(poolId, seed);
+}
+/** Phát bark trạm qua toast sẵn có — lúc MỞ trạm (mục 05: mỗi trạm ghi rõ khi nào). */
+function stationBark(api, poolId, seed = dayKeyOf()) {
+  const text = barkOf(poolId, seed);
+  if (text) api.toast(text);
 }
 
 // ---------------------------------------------------------------------------
@@ -127,10 +164,13 @@ function chartResult(api, prof, R, ritual) {
     starters: ['Thầy luận tổng quan lá số giúp tôi.', `Năm ${new Date().getFullYear()} công việc và tiền bạc thế nào?`, 'Tình duyên, gia đạo của tôi ra sao?', 'Sức khỏe tôi cần lưu ý gì?'],
   }));
   if (ritual && !api.reduced) {
+    const timers = [];
     const cards = body.querySelectorAll('.hq-pillar');
-    cards.forEach((c, i) => setTimeout(() => { c.classList.add('flip'); knock(700, 0.2); }, 900 + i * 600));
-    const tm = setTimeout(() => { finish(); bell(330, 0.12); }, 900 + cards.length * 600 + 500);
-    body.querySelector('[data-role=skip]').onclick = () => { clearTimeout(tm); body.querySelectorAll('.hq-pillar').forEach((c) => c.classList.add('flip')); finish(); };
+    cards.forEach((c, i) => timers.push(setTimeout(() => { c.classList.add('flip'); knock(700, 0.2); }, 900 + i * 600)));
+    timers.push(setTimeout(() => { finish(); bell(330, 0.12); }, 900 + cards.length * 600 + 500));
+    body.querySelector('[data-role=skip]').onclick = () => { for (const t of timers) clearTimeout(t); body.querySelectorAll('.hq-pillar').forEach((c) => c.classList.add('flip')); finish(); };
+    // đóng panel giữa nghi lễ → dọn sạch tiếng gõ/chuông (mẫu openXam › api.onClose)
+    api.onClose(body, () => { for (const t of timers) clearTimeout(t); });
   } else {
     body.querySelectorAll('.hq-pillar').forEach((c) => c.classList.add('flip'));
     finish();
@@ -140,6 +180,10 @@ function chartResult(api, prof, R, ritual) {
 
 function openThay(api) {
   const { state } = api;
+  // [G2 — NPC-AI] bark chào của Thầy Tử Bình (mục 05 §05.4 — pool BARK-thay
+  // hồ sơ 19 = `thay_tubinh` đã có trong bark-pool.js); bark NGOÀI GIỜ (khách
+  // đi ngang) là phần render3d của thợ khác. Nút 🎙 hỏi Thầy AI giữ nguyên vai.
+  stationBark(api, 'thay_tubinh');
   const first = state.profiles.length === 0;
   const body = el(`<div>
     <p class="hq-sub">Thầy đặt bút xuống, ngẩng lên: «Khách muốn xem cho ai?»</p>
@@ -265,6 +309,9 @@ function compassView(api, prof) {
 }
 
 function openCompass(api) {
+  // [G2 — NPC-AI] bark La Bàn Đài (mục 05 §05.14): 1–2 câu tĩnh, chỉ đọc
+  // hướng — không nói «hướng xấu cả đời», không AI.
+  stationBark(api, 'la_ban');
   if (!api.state.profiles.length) return needProfile(api, 'La bàn hướng nhà');
   api.state.flags.sawCompass = true;
   api.after(S.grantDaily(api.state, 'compass'), 'xem la bàn');
@@ -289,9 +336,21 @@ function stickResult(f, topic) {
 
 function openXam(api) {
   const { state } = api;
+  // [G2 — NPC-AI] bark chào của thần (mục 05 §05.6 — «cắm bark vào đầu
+  // openXam»), cao cao tại tại, không doạ, khớp luật keo 3 lần sẵn có.
+  stationBark(api, 'xam');
   if (S.sticksLeft(state) === 0) {
     const last = state.sticks.find((x) => x.accepted);
-    return el(`<div><p>Hôm nay khách đã nhận đủ ${S.CAPS.sticksPerDay} thẻ. Mai hãy quay lại — quẻ hỏi nhiều thì lòng càng rối.</p>
+    // [F5 audit] «Ba lần keo…» chỉ đúng số liệu khi tổng keo hôm nay (stickTries
+    // — state.js recordStick: mỗi lần chốt thẻ/ba-keo-chối tính 1 lượt) đã đạt
+    // trần CAPS.sticksPerDay MÀ vẫn chưa nhận đủ thẻ (có keo bị chối). Hết lượt
+    // mà nhận đủ thẻ → nói chuyện thẻ; điều kiện cũ `tries > sticks` là phép đo
+    // gián tiếp, sai ngữ cảnh ngay khi trần đổi/số liệu cũ.
+    const tries = state.daily.stickTries || 0;
+    const triedOut = tries >= S.CAPS.sticksPerDay && state.daily.sticks < S.CAPS.sticksPerDay;
+    return el(`<div><p>${triedOut
+      ? 'Ba lần keo chưa thuận thì mai quay lại — hôm nay hết lượt xin thẻ rồi.'
+      : `Hôm nay khách đã nhận đủ ${S.CAPS.sticksPerDay} thẻ. Mai hãy quay lại — quẻ hỏi nhiều thì lòng càng rối.`}</p>
       ${last ? `<p class="hq-sub">Thẻ gần nhất: số ${last.num} · ${esc(last.toneVi || last.tone)}</p>` : ''}</div>`);
   }
   const body = el(`<div class="hq-xam">
@@ -389,6 +448,10 @@ function openXam(api) {
 // ---------------------------------------------------------------------------
 function openHuong(api) {
   const { state } = api;
+  // [G2 — NPC-AI] bark theo ngày, giọng Vân Cốc chủ trạm (mục 05 §05.8);
+  // pool CALM_LINES của names.js GIỮ NGUYÊN làm nền — câu tĩnh tâm khi nhang
+  // cháy vẫn bốc như cũ ở dưới (không thay bằng bark pool).
+  stationBark(api, 'huong');
   const body = el(`<div class="hq-huong">
     <div class="hq-incense-vis"><span></span><span></span><span></span></div>
     <p class="hq-calm" data-role="calm"></p>
@@ -461,6 +524,9 @@ function lichPersonal(api, prof) {
 
 function openLich(api) {
   const { state } = api;
+  // [G2 — NPC-AI] bark Bảng Lịch Ngày (mục 05 §05.14): chỉ nói hôm nay, không
+  // chọn thay khách, không trích can chi rối.
+  stationBark(api, 'lich');
   const now = new Date();
   const T = todayInfo(now);
   const body = el(`<div class="hq-lich">
@@ -492,9 +558,14 @@ function openLich(api) {
 function openTra(api) {
   const { state } = api;
   const teas = S.TEAS.map((t) => ({ ...t, open: state.phucKhi >= t.min }));
+  // [G2 — NPC-AI] bark người rót vô hình (mục 05 §05.9): nói ngay lúc khách
+  // ngồi xuống — giới thiệu đúng 4 loại trà thật của S.TEAS, không nhắc khoá
+  // 🔒/Phúc Khí bằng lời NPC (người rót không đếm tiền — PERSONA-CHUNG).
+  const pourBark = barkOf('tra');
   const body = el(`<div class="hq-tra">
     <div data-role="setup">
       <p class="hq-sub">Khách ngồi xuống bồ đoàn. Ấm nước vừa sôi.</p>
+      ${pourBark ? `<p class="hq-quote">“${esc(pourBark)}”</p>` : ''}
       <div class="hq-radio">${teas.map((t, i) => `<label class="${t.open ? '' : 'locked'}"><input type="radio" name="tea" value="${t.id}"${i === 0 ? ' checked' : ''}${t.open ? '' : ' disabled'}> ${t.name}${t.open ? '' : ` (🔒 ${t.min} ${TEXT.point})`}</label>`).join('')}</div>
       <div class="hq-radio">${[1, 3, 5, 10].map((m) => `<label><input type="radio" name="dur" value="${m}"${m === 3 ? ' checked' : ''}> ${m} phút</label>`).join('')}</div>
       <div class="hq-actions"><button class="hq-btn hq-primary" data-role="start">🍵 Rót trà, ngồi tĩnh</button></div>
@@ -524,7 +595,8 @@ function openTra(api) {
   }
   $('start').onclick = async () => {
     const tea = S.TEAS.find((t) => t.id === body.querySelector('[name=tea]:checked').value);
-    if (!(await api.setSitting(true))) { api.toast('Ba bồ đoàn đều có khách ngồi — đợi chút nhé.'); return; }
+    // setSitting tự toast khi hết chỗ — không nhắc nữa cho khỏi báo đôi
+    if (!(await api.setSitting(true))) return;
     durMs = Number(body.querySelector('[name=dur]:checked').value) * 60000;
     start = Date.now();
     api.setTeaColor(tea.color);
@@ -557,8 +629,12 @@ function openSen(api) {
   if (state.daily.got.lantern) {
     return el(`<div><p>Đèn hoa đăng của khách hôm nay đang trôi trên hồ.</p>${mine.map((l) => `<p class="hq-poem">“${esc(l.wish)}”</p>`).join('')}<p class="hq-sub">Mỗi ngày một ngọn đèn. Mai lại thả nhé.</p></div>`);
   }
+  // [G2 — NPC-AI] bark Hồ Sen (mục 05 §05.9): giữ luật riêng tư — không hứa
+  // «đèn chung MMO» chưa có; lời hồ đi cùng form thả đèn lúc mở trạm.
+  const senBark = barkOf('sen');
   const body = el(`<form class="hq-form">
     <label>Điều ước gửi theo đèn <textarea class="hq-input" name="wish" maxlength="80" rows="2" placeholder="vd: mong mẹ khoẻ"></textarea></label>
+    ${senBark ? `<p class="hq-quote">“${esc(senBark)}”</p>` : ''}
     <p class="hq-sub">Điều ước chỉ lưu trên máy của bạn, không gửi đi đâu.</p>
     <div class="hq-actions"><button class="hq-btn hq-primary" type="submit">🪷 Thả đèn</button></div>
   </form>`);
@@ -642,16 +718,124 @@ function lazyBody(load) {
   return box;
 }
 
+// ---------------------------------------------------------------------------
+// [G2 — NPC-AI] CHUYỆN KHÁCH (docs/npc-ai/08 §8.4 consumer + §8.5 bộ nhớ liên
+// ngày; mở khóa stations.js theo mục 15 §15.7). Story do main.js › todayNpc
+// tính sẵn từ hạt `${ngày}:${khe}:${pid}` (makeStory same-seed — nguyên văn
+// cùng chuyện trong ngày) và đính kèm npc; phần này chỉ HIỆN trong panel án
+// của chủ mở — không bark chung, không field payload mạng (mục 13 Quyết 3).
+// ---------------------------------------------------------------------------
+// Sách §8.5 muốn cờ FEATURES.storyMemory tắt mặc định — features.js không
+// thuộc phạm vi được sửa đợt này nên cờ để địa phương: web bật, iOS giữ tắt
+// cho gọn (cùng lý do sách ghi). Story (phần chữ hiển thị) vẫn chạy đủ nền tảng.
+const STORY_MEMORY = (import.meta.env?.MODE || 'web') !== 'ios';
+let storyRecallDay = ''; // phiên này đã nhắc chuyện hôm qua chưa (1 lần/ngày/phiên)
+
+// Kho §8.5: khóa 'khach:<pid>:<ngày>' → { ten, storyId, tag } — CHỈ trên máy
+// người chơi (khuôn 'huyenquan:pid' — net.js:8), không lưu ngày sinh/lá số
+// (tính lại được từ hạt); đọc/ghi bọc try/catch — kho đầy thì mất câu nhắc,
+// không lỗi app. tag = nhãn tệp hoàn cảnh (mục 08 §8.4.1) để mai kể đúng 1 câu.
+function storyMemoRead(day) {
+  if (!STORY_MEMORY) return null;
+  try { return JSON.parse(localStorage.getItem(`khach:${pidLocal()}:${day}`) || 'null'); } catch (e) { return null; }
+}
+function storyMemoWrite(day, npc) {
+  if (!STORY_MEMORY || !npc?.story) return;
+  try {
+    localStorage.setItem(`khach:${pidLocal()}:${day}`, JSON.stringify({ ten: npc.call, storyId: npc.story.storyId, tag: npc.story.tags?.[0] || '' }));
+    storyMemoPrune(day); // [F4] dọn key cũ ngay lúc ghi — kho không tích vô hạn
+  } catch (e) { /* kho đầy/quota → bỏ câu nhắc, không lỗi app (§8.5) */ }
+}
+
+// [F4 audit] Dọn kho §8.5: quét key prefix `khach:<pid>:` cùng pid — xoá key có
+// ngày cũ hơn 30 ngày và giữ tối đa ~30 key/pid (mỗi ngày 1 key nên ~= 1 tháng
+// nhắc chuyện). Ngày trong key là 'YYYY-MM-DD' (todayStr) nên so chuỗi = so
+// lịch; quét gom key ra mảng TRƯỚC khi removeItem (đổi length giữa lúc lặp).
+// Chạy trong try/catch của storyMemoWrite — kho bị khoá thì chỉ bỏ dọn.
+function storyMemoPrune(today) {
+  const prefix = `khach:${pidLocal()}:`;
+  const mine = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(prefix) && k.length > prefix.length) mine.push(k);
+  }
+  const [y, m, d] = today.split('-').map(Number);
+  const cutoff = S.todayStr(new Date(y, m - 1, d - 30)); // 30 ngày trước — cùng khuôn 'YYYY-MM-DD'
+  mine.sort(); // ngày đứng cuối key → sort chuỗi = cũ nhất trước, mới nhất (hôm nay) cuối
+  for (let i = 0; i < mine.length; i++) {
+    const k = mine[i];
+    const conLai = mine.length - i;                  // số key chưa xét (gồm cả key này)
+    const quaCu = k.slice(prefix.length) < cutoff;   // quá 30 ngày → xoá
+    const du30 = conLai > 30;                        // còn hơn 30 key → bỏ key cũ nhất này
+    if (quaCu || du30) localStorage.removeItem(k);
+  }
+}
+
+// Nhãn tệp hoàn cảnh → chuyện cộc (kể lại đúng 1 câu — §8.5; chỉ tên + chủ đề)
+const STORY_TAG_VI = {
+  'CD-doi-viec': 'đổi việc', 'CD-be-tac': 'việc đang bế tắc', 'CD-mo-rong': 'mở rộng việc buôn bán',
+  'CD-mua-nha': 'mua nhà', 'CD-cuoi': 'chuyện cưới hỏi', 'CD-thi': 'thi cử', 'CD-don-nha': 'dọn nhà',
+  'CD-chung': 'một chuyện thường ngày',
+  'DH-han-khat-nuoc': 'điều hậu lá số', 'DH-noan-can-lua': 'điều hậu lá số', 'DH-thap-can-kho': 'điều hậu lá số', 'DH-can-bang': 'điều hậu lá số',
+  'CC-cach-thuong': 'cách cục lá số', 'CC-bai-cach-co-hau': 'cách cục lá số',
+  'HH-hop': 'hợp hôn', 'HH-khac': 'hợp hôn', 'HH-trung': 'hợp hôn',
+  'TR-viec-lon': 'chọn ngày cho việc lớn', 'DT-mua-cho-ai': 'hướng cửa nhà', 'DT-ai-mat-ngu': 'hướng cửa nhà',
+};
+// Đọc kho hôm qua đúng 1 lần/ngày — nhồi 1 câu đầu án «đầu tiên» mở trong ngày.
+function storyRecallLine() {
+  const today = S.todayStr();
+  if (storyRecallDay === today) return '';
+  storyRecallDay = today;
+  const m = storyMemoRead(S.prevDay(today));
+  if (!m || !m.ten) return '';
+  const vi = STORY_TAG_VI[m.tag];
+  return vi ? `Hôm qua ${m.ten} cũng ghé quán hỏi chuyện ${vi}.` : '';
+}
+
+/** Đoạn «Chuyện khách» — theo mẫu panel sẵn có (hq-sub + hq-quote, không CSS
+ *  mới): câu dẫn mở án (intro) thay cho việc khách chỉ có câu hỏi in sẵn.
+ *  ask/thanks thay câu hỏi + cảm ơn chung nằm trong case-ui.js (không thuộc
+ *  đợt này) — ở đây thêm chuyện, không đổi cấu trúc án (§8.6.4). */
+function storyBlockHtml(npc) {
+  const st = npc?.story;
+  if (!st) return '';
+  const recall = storyRecallLine();
+  return `<p class="hq-sub"><b>Chuyện khách</b></p>
+    <p class="hq-quote">“${esc(st.intro)}”</p>${recall ? `
+    <p class="hq-sub">${esc(recall)}</p>` : ''}`;
+}
+
+/** Bọc loader án sân: án hiện xong thì đặt «Chuyện khách» ngay trên câu hỏi
+ *  của khách (không đụng DOM case-ui khác) + ghi kho liên ngày §8.5. Sách ghi
+ *  «sau khi giải án» (S.recordCase — case-ui.js:232, không thuộc đợt này) —
+ *  ghi tại lúc mở án: cùng nội dung {ten, storyId}, vẫn chỉ local. */
+function storyCaseBody(api, slot, loader) {
+  return lazyBody(async () => {
+    const node = await loader();
+    try {
+      const npc = api.todayNpc(slot);
+      const html = storyBlockHtml(npc);
+      if (html) {
+        const q = node.querySelector?.('.hq-quote');
+        if (q) q.insertAdjacentHTML('beforebegin', html);
+        else node.insertAdjacentHTML?.('afterbegin', html);
+        storyMemoWrite(S.todayStr(), npc);
+      }
+    } catch (e) { /* chuyện chỉ là lời — án vẫn phải mở nguyên vẹn */ }
+    return node;
+  });
+}
+
 function openCaseSlot(slot) {
   return (api) => {
     const npc = api.todayNpc(slot);
     if (S.caseDone(api.state, slot)) {
       const b = el(`<div><p>${esc(npc.call)} đã được giải án hôm nay. Mai sẽ có khách mới.</p>
         <div class="hq-actions"><button class="hq-btn hq-primary" data-role="redo">Giải lại để luyện (không tính điểm)</button></div></div>`);
-      b.querySelector('[data-role=redo]').onclick = () => api.panel.open({ title: npc.call, body: lazyBody(async () => (await import('./case-ui.js')).npcCaseBody(api, slot, npc)) });
+      b.querySelector('[data-role=redo]').onclick = () => api.panel.open({ title: npc.call, body: storyCaseBody(api, slot, async () => (await import('./case-ui.js')).npcCaseBody(api, slot, npc)) });
       return b;
     }
-    return lazyBody(async () => (await import('./case-ui.js')).npcCaseBody(api, slot, npc));
+    return storyCaseBody(api, slot, async () => (await import('./case-ui.js')).npcCaseBody(api, slot, npc));
   };
 }
 
@@ -675,12 +859,19 @@ function openDesk(id, title, bodyName, doneText) {
 const openTrach = openDesk('trach', 'Sảnh Trạch Nhật', 'zheriCaseBody', 'Hôm nay khách ở Sảnh Trạch Nhật đã chốt được ngày.');
 const openDuongTrach = openDesk('duongtrach', 'Sảnh Dương Trạch', 'dzCaseBody', 'Hôm nay khách ở Sảnh Dương Trạch đã xem xong nhà.');
 // 6 sảnh khai báo (halls.js). Hợp Hôn = án chung: khoá theo ngày (cả quán cùng một cặp).
+// [G2 — NPC-AI] bark khách chờ sảnh nghề (mục 05 §05.2 — nhóm khách procedural
+// AI-light, pool `khach_*` sẵn có của bark-pool.js): khách nói một câu lúc mở
+// sảnh, chỉ khi án hôm nay CHƯA giải; same-seed (key sảnh theo ngày + pid) →
+// cùng ngày cùng câu. Chuyện riêng (makeStory) của nhóm sảnh này thuộc consumer
+// halls/case-ui — đợt sau; bark chung chỉ là câu chờ không đụng lá số (mục 13).
+const HALL_BARK = { dieuhau: 'khach_dieuhau', cachcuc: 'khach_cachcuc' };
 function openHall(id, doneText, shared = false) {
   return (api) => {
     let pid = 'local';
     try { pid = localStorage.getItem('huyenquan:pid') || 'local'; } catch (e) { /* ignore */ }
     const day = S.todayStr(new Date());
     const key = shared ? day : `${day}:${pid}`;
+    if (HALL_BARK[id] && !S.deskDone(api.state, id)) stationBark(api, HALL_BARK[id], key);
     const run = () => lazyBody(async () => (await import('./case-ui.js')).hallCaseBody(api, id, key));
     if (S.deskDone(api.state, id)) {
       const b = el(`<div><p>${doneText} Mai sẽ có án mới.</p><p class="hq-sub">Thông thạo: ${S.deskMastery(api.state, id)}%</p>
@@ -711,8 +902,25 @@ function openQue(api) {
   try { if (b) R = chartOf({ year: b.y, month: b.m, day: b.d, hour: b.h, minute: b.mi, gender: b.gender }); } catch (e) { /* bỏ qua */ }
   // iOS (4.3b): không đóng gói que-ui — điều kiện viết thẳng để Vite thay tĩnh và bỏ chunk
   if (import.meta.env.MODE === 'ios') return null;
+  // [G2 — NPC-AI] bark Thầy Giải Quẻ dẫn vào 5 phép (mục 05 §05.5 — mở rộng
+  // từ câu thoại sẵn có que-ui.js:180, KHÔNG dựng từ số 0). Bark theo TỪNG
+  // phép khi đổi tab nằm ở que-ui.js (không thuộc đợt này) — ở đây bark lúc
+  // mở trạm; nút «🎙 Nhờ Thầy luận thêm» giữ nguyên vai AI của Thầy AI.
+  stationBark(api, 'que');
   return lazyBody(async () => (await import('./que-ui.js')).queBody(api, { R, who: api.state.player?.name || 'Bạn' }));
 }
 
-export const STATION_OPEN = { thay: openThay, compass: openCompass, xam: openXam, huong: openHuong, lich: openLich, tra: openTra, sen: openSen, an0: openCaseSlot(0), an1: openCaseSlot(1), an2: openCaseSlot(2), trach: openTrach, duongtrach: openDuongTrach, que: openQue, ...HALL_OPEN };
+// Vận Mệnh Các + Thái Tuế Điện (web) — bảng nạp lười; iOS loại hẳn khỏi gói
+function openVan(name, ...args) {
+  return (api) => {
+    if (import.meta.env.MODE === 'ios') return null;
+    return lazyBody(async () => (await import('./vanmenh-ui.js'))[name](api, ...args));
+  };
+}
+const VAN_OPEN = { vanbia: openVan('vanBiaBody'), thaitue: openVan('thaiTueBody') };
+// Tàng Y Các (quầy Thợ May trong sân) — cùng bảng với nút «Y Các»
+VAN_OPEN.tangy = (api) => lazyBody(async () => (await import('./wardrobe-ui.js')).wardrobeBody(api));
+for (let i = 0; i < 9; i++) VAN_OPEN[`van${i}`] = openVan('vanGateBody', i);
+
+export const STATION_OPEN = { thay: openThay, compass: openCompass, xam: openXam, huong: openHuong, lich: openLich, tra: openTra, sen: openSen, an0: openCaseSlot(0), an1: openCaseSlot(1), an2: openCaseSlot(2), trach: openTrach, duongtrach: openDuongTrach, que: openQue, ...HALL_OPEN, ...VAN_OPEN };
 export { ROBE };
