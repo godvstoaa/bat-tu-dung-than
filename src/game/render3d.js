@@ -4,6 +4,7 @@
 //  { resize, frame(scene, dt), yaw, rotate(step), celebrate(wx), mode: '3d' }.
 // ============================================================================
 import * as THREE from 'three';
+import { span, record } from './perf.js';
 import * as MD from './models.js';
 import * as TX from './textures.js';
 import * as T from './terrain.js';
@@ -17,19 +18,21 @@ import { ROBE } from './render.js';
 import { hasStation, TEXT } from './features.js';
 import { createWorld, QUALITY } from './world3d.js';
 import { createLandmarks } from './landmarks.js';
-import { setModelQuality } from './assets.js';
+import { setModelQuality, setWarmup } from './assets.js';
 import { createCharacter } from './characters.js';
 import { buildSect } from './sect.js';
 import { createOutfit } from './accessories.js';
 import { ITEM, decodeCos } from './cosmetics.js';
-import { addFootprint } from './collide.js';
-import { COURT, COURT_STATIONS, DAIS, PONDS, TANGY } from './court.js';
+import { addFootprint, footprintIdle } from './collide.js';
+import { stoneReady } from './ground-tex.js';
+import { COURT, COURT_STATIONS, DAIS, PONDS, TANGY, inCourt } from './court.js';
 import { pickBark } from './bark-pool.js'; // NPC-AI G0 bark pool — thuần, không DOM (docs/npc-ai/15 §15.5b)
 import { hashSeed, rng } from './npc.js';  // rng theo hạt giống — không Math.random trần
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { setActors, blockedByBuilding } from './obstacles.js';
 
 // Mức chất lượng: ghi đè bằng localStorage «huyenquan:quality» = low | mid | high
 function pickQuality(coarse) {
@@ -155,14 +158,17 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   // --- THẾ GIỚI MỞ Huyền Giới: địa hình 2048², trời tán xạ, nước, rừng (docs/DAI-THE-GIOI-DESIGN.md)
   const quality = pickQuality(coarse);
-  const world = createWorld(scene, renderer, { quality });
+  let qualityForced = false; try { qualityForced = !!QUALITY[localStorage.getItem('huyenquan:quality')]; } catch (e) { /* ignore */ }
+  const world = span('init:world', () => createWorld(scene, renderer, { quality }));
   setModelQuality(quality);
-  const landmarks = createLandmarks(scene);
-  const interiors = createInteriors(scene); // điện thờ vào được (world.js › ROOMS) // tài sản Meshy theo vùng (nạp khi tới gần)
+  const landmarks = span('init:landmarks', () => createLandmarks(scene));
+  const interiors = span('init:interiors', () => createInteriors(scene)); // điện thờ vào được (world.js › ROOMS) // tài sản Meshy theo vùng (nạp khi tới gần)
   sun.shadow.mapSize.set(QUALITY[quality].shadow, QUALITY[quality].shadow);
   // nhóm đèn điểm động (lights.js): gán cho các đèn lồng / nến gần người chơi nhất
   const POOL_N = quality === 'high' ? 16 : quality === 'mid' ? 10 : 6;
-  const lightPool = Array.from({ length: POOL_N }, () => { const l = new THREE.PointLight('#ffa04a', 0, 26, 1.6); l.visible = false; scene.add(l); return l; });
+  const lightPool = Array.from({ length: POOL_N }, () => { const l = new THREE.PointLight('#ffa04a', 0, 26, 1.6); l.position.set(0, -500, 0); scene.add(l); return l; });
+  // SỐ đèn trong cảnh phải cố định: bật/tắt `visible` làm đổi số đèn → three.js biên dịch lại shader
+  // của MỌI vật liệu (khựng 250–400 ms mỗi lần đi qua vùng có đèn). Đèn rỗi: cường độ 0, cất dưới đất.
   let lightNight = 0, lightTick = 0, lightRoom = null, anchorTick = 0;
   function updateLightPool(px, py, pz, dt) {
     lightTick -= dt; if (lightTick > 0) return; lightTick = 0.3;
@@ -175,19 +181,18 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     near.sort((a, b) => a[0] - b[0]);
     lightPool.forEach((pl, i) => {
       const e = near[i];
-      pl.visible = !!e;
-      if (!e) return;
+      if (!e) { pl.intensity = 0; pl.position.set(0, -500, 0); return; }
       const L = e[1];
       pl.position.set(L.x, L.y, L.z); pl.color.set(L.color);
       // trong điện luôn thắp nến; ngoài trời đèn mạnh dần theo đêm
       pl.intensity = L.power * (lightRoom ? 14 : 1.2 + 16 * lightNight);
     });
   }
-  let composer = null;
+  let composer = null, bloomPass = null;
   if (QUALITY[quality].bloom) {
     composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-    composer.addPass(new UnrealBloomPass(new THREE.Vector2(512, 512), 0.28, 0.5, 0.96));
+    composer.addPass(bloomPass = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.28, 0.5, 0.96));
     composer.addPass(new OutputPass());
     composer.setPixelRatio(renderer.getPixelRatio()); // render target của bloom cùng tỉ lệ pixel với canvas
   }
@@ -597,7 +602,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // [F6 audit] seed ngày bark dựng MỘT LẦN mỗi ngày (so ba số ngày trước khi
   // lắp chuỗi + padStart) — không cấp phát chuỗi mỗi khung hình
   let barkDay = { y: -1, m: -1, d: -1 }, barkDayKey = '';
-  let fpsAcc = 0, fpsN = 0, fpsT = 0, lowQuality = false;
+  let fpsAcc = 0, fpsN = 0, fpsT = 0, lowQuality = false, degrade = 0, firstT = null;
   const tmpV = new THREE.Vector3();
   const tmpV2 = new THREE.Vector3();
   const headV = new THREE.Vector3();
@@ -648,7 +653,13 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     return L;
   }
 
+  let shadowTick = 0;
   function frame(S, dt) {
+    if (degrade >= 2 && ++shadowTick % 6 === 0) renderer.shadowMap.needsUpdate = true;
+    const tF = performance.now(); frame0(S, dt); record('frame:js', performance.now() - tF - lastRenderMs);
+  }
+  let lastRenderMs = 0;
+  function frame0(S, dt) {
     const t = S.time / 1000;
     const now = S.now;
     // seed ngày cho bark (đúng khuôn todayStr — state.js) để cùng ngày ra cùng bark;
@@ -727,7 +738,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // bóng đổ + mặt trời bám theo người chơi
     sun.target.position.set(w.x, gy, w.z);
     sun.position.copy(sun.target.position).addScaledVector(lightDir, 160);
-    world.update(w.x, w.z, dt, t);
+    span('f:world', () => world.update(w.x, w.z, dt, t));
     lightRoom = roomAt(w.x, w.z)?.id || null; // trong điện: chỉ thắp nến / đèn của điện đó
     updateLightPool(w.x, gy + 2, w.z, dt);
     interiors.update(dt);
@@ -738,7 +749,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       for (const lb of labels) { const st = stationById(lb.id); if (st?.world) lb.pos.y = world.groundY(st.world.x, st.world.z) + 3.4; }
       for (const d of deskMarks) d.g.position.y = world.groundY(d.g.position.x, d.g.position.z);
     }
-    landmarks.update(w.x, w.z);
+    span('f:landmarks', () => landmarks.update(w.x, w.z));
     av.rotation.y = avState.heading;
     MD.poseAvatar(av, { walk: avState.walk, phase: avState.phase, sitting: p.sitting, idle: t });
 
@@ -772,7 +783,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     tmpV2.copy(cam.target); tmpV2.y += lookUp;
     camera.lookAt(tmpV2);
     if (debugCam) { camera.position.fromArray(debugCam.pos); camera.lookAt(...debugCam.look); }
-    world.occlusion(w.x, w.z, camera.position.x, camera.position.z);
+    span('f:occl', () => world.occlusion(w.x, w.z, camera.position.x, camera.position.z));
     sky.position.copy(camera.position); stars.position.copy(camera.position);
 
     // làm mờ công trình che khuất khách
@@ -958,6 +969,15 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     if (!reduced) for (const d of deskMarks) { d.marker.rotation.y = t * 1.6; d.marker.position.y = 2.9 + Math.sin(t * 2) * 0.1; }
 
     // người chơi khác
+    // NPC đứng yên → vòng chặn cho người chơi (không đi xuyên / đứng chồng lên NPC)
+    const actors = [];
+    for (const hn of hermits) actors.push({ x: hn.x, z: hn.z, r: 0.35 });
+    if (tailor) actors.push({ x: tailor.obj.position.x, z: tailor.obj.position.z, r: 0.35 });
+    for (const cn of caseNpcs) if (cn.g.visible) actors.push({ x: cn.g.position.x, z: cn.g.position.z, r: 0.35 });
+    setActors(actors);
+    // người chơi khác: tách nhẹ khi đứng sát nhau / sát mình / sát NPC (chỉ phần hiển thị — vị trí mạng giữ nguyên)
+    // → hết cảnh nhiều nhân vật đứng chồng một chỗ ở cùng một trạm
+    const occupied = [{ x: w.x, z: w.z }, ...actors];
     const seen = new Set();
     for (const o of S.others || []) {
       seen.add(o.id);
@@ -997,7 +1017,22 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
         const fc = `hq-label hq-name hq-other${oc.frame ? ` hq-frame-${oc.frame}` : ''}`;
         if (r.label.className !== fc) r.label.className = fc;
       }
-      r.grp.position.set(ow.x, world.groundY(ow.x, ow.z) + (o.a || 0) + (sitting ? 0 : (o.moving && !reduced ? Math.abs(Math.sin(t * 9.5 + ow.x)) * 0.07 : 0)), ow.z);
+      if (!r.sep) r.sep = { x: 0, z: 0 };
+      let px = 0, pz = 0;
+      if (!sitting && !(o.a > 0.5)) {
+        for (const q of occupied) {
+          const ddx = ow.x + r.sep.x - q.x, ddz = ow.z + r.sep.z - q.z, d = Math.hypot(ddx, ddz), need = 0.85;
+          if (d < need) { const k = (need - d) / need, a = d > 1e-3 ? 1 / d : 0; const ang = String(o.id).length * 2.39 + String(o.id).charCodeAt(0); px += (a ? ddx * a : Math.cos(ang)) * k; pz += (a ? ddz * a : Math.sin(ang)) * k; }
+        }
+      }
+      const gx = r.sep.x + px * 0.6, gz = r.sep.z + pz * 0.6, lim = Math.hypot(gx, gz);
+      const cap = lim > 1.2 ? 1.2 / lim : 1;
+      const tx = gx * cap, tz = gz * cap;
+      if (!blockedByBuilding(ow.x + tx, ow.z + tz)) { r.sep.x += (tx - r.sep.x) * Math.min(1, dt * 6); r.sep.z += (tz - r.sep.z) * Math.min(1, dt * 6); }
+      if (o.moving && !px && !pz) { r.sep.x *= 1 - Math.min(1, dt * 2); r.sep.z *= 1 - Math.min(1, dt * 2); } // đang đi thì nhả dần về đúng vị trí
+      const sx = ow.x + r.sep.x, sz = ow.z + r.sep.z;
+      occupied.push({ x: sx, z: sz });
+      r.grp.position.set(sx, world.groundY(sx, sz) + (o.a || 0) + (sitting ? 0 : (o.moving && !reduced ? Math.abs(Math.sin(t * 9.5 + ow.x)) * 0.07 : 0)), sz);
       const goalH = sitting ? Math.PI : (o.h || 0);
       const dh2 = ((goalH - r.heading + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
       r.heading += dh2 * Math.min(1, dt * 8);
@@ -1010,13 +1045,23 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     if (S.target && !p.sitting) { const tw = MD.toWorld(S.target.x, S.target.y); targetRing.position.set(tw.x, world.groundY(tw.x, tw.z) + 0.03, tw.z); targetRing.visible = true; targetRing.scale.setScalar(1 + Math.sin(t * 6) * 0.1); }
     else targetRing.visible = false;
 
-    if (composer && !lowQuality) composer.render(); else renderer.render(scene, camera);
+    {
+      const p0 = renderer.info.programs.length, t0 = renderer.info.memory.textures, a = performance.now();
+      if (composer) composer.render(); else renderer.render(scene, camera); // KHÔNG đổi giữa composer ↔ vẽ thẳng lúc chơi: đổi đường vẽ = biên dịch lại mọi shader
+      const d = performance.now() - a, dp = renderer.info.programs.length - p0, dt2 = renderer.info.memory.textures - t0;
+      lastRenderMs = d;
+      record(dp ? `render:+${dp} shader ${renderer.info.programs.slice(-dp).map((q) => `${q.name}:${q.cacheKey.split(',').slice(-4, -2).join('/')}`).join(' ')}` : dt2 > 0 ? `render:+${dt2} tex` : 'render', d); // __perf.top(): khung chậm do biên dịch shader / đẩy texture
+    }
 
     // nhãn HTML
     const rw = canvas.clientWidth, rh = canvas.clientHeight;
+    // nhãn gian: chỉ trong tầm ~70 m, và không «xuyên tường» — đứng ngoài sân Sơn Môn thì không
+    // thấy nhãn các gian bên trong (và ngược lại) trừ khi đã sát (≤ 28 m)
+    const meIn = inCourt(w.x, w.z);
     for (const lb of labels) {
       proj.copy(lb.pos).project(camera);
-      const vis = proj.z < 1 && Math.abs(proj.x) < 1.15 && Math.abs(proj.y) < 1.15 && camera.position.distanceTo(lb.pos) < 220;
+      const dl = Math.hypot(lb.pos.x - w.x, lb.pos.z - w.z);
+      const vis = proj.z < 1 && Math.abs(proj.x) < 1.15 && Math.abs(proj.y) < 1.15 && dl < 70 && (dl < 28 || inCourt(lb.pos.x, lb.pos.z) === meIn);
       lb.el.style.display = vis ? '' : 'none';
       if (!vis) continue;
       const near = S.near?.id === lb.id;
@@ -1061,16 +1106,93 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     }
 
     // tự hạ chất lượng nếu chậm
-    fpsAcc += dt; fpsN++; fpsT += dt;
+    // bỏ qua giai đoạn nạp (khung giật do dựng kết cấu / nạp mô hình) và các khung giật đơn lẻ
+    // người chơi đã tự chọn mức chất lượng (localStorage «huyenquan:quality») → không tự hạ
+    if (firstT == null) firstT = t;
+    if (t - firstT > 8 && dt < 0.25 && !qualityForced) { fpsAcc += dt; fpsN++; fpsT += dt; }
     if (fpsT > 3) {
       const fps = fpsN / fpsAcc;
-      if (fps < 35 && !lowQuality) { lowQuality = true; renderer.shadowMap.enabled = false; renderer.setPixelRatio(1); composer?.setPixelRatio(1); mats.roof.needsUpdate = true; scene.traverse((o) => { if (o.material) o.material.needsUpdate = true; }); }
+      // hạ theo bậc — bóng đổ giữ tới cùng (tắt bóng làm cả cảnh phẳng, «giả» hẳn):
+      // bậc 1: độ phân giải 1×, tắt bloom/hạt bụi, cỏ còn ½, bóng 1024 · bậc 2: tắt bóng
+      if (fps < 35 && degrade === 0) {
+        degrade = 1; lowQuality = true; renderer.setPixelRatio(1); composer?.setPixelRatio(1); if (bloomPass) bloomPass.enabled = false;
+        world.grass?.setDensity(0.5);
+        if (sun.shadow.mapSize.x > 1024) { sun.shadow.mapSize.set(1024, 1024); sun.shadow.map?.dispose(); sun.shadow.map = null; }
+      } else if (fps < 24 && degrade === 1) {
+        // KHÔNG tắt shadowMap (tắt = biên dịch lại mọi shader, đứng hình 1–2 s): giữ bóng nhưng chỉ vẽ lại bản đồ bóng thưa
+        degrade = 2; renderer.shadowMap.autoUpdate = false;
+      }
       fpsAcc = 0; fpsN = 0; fpsT = 0;
     }
   }
 
+  // --- hâm nóng: shader biên dịch song song (KHR_parallel_shader_compile), texture đẩy lên GPU
+  // từng cái một mỗi khung — mô hình nạp giữa lúc chơi không làm khựng khung hình
+  const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
+  const TEX_KEYS = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap', 'alphaMap'];
+  const uploaded = new WeakSet();
+  async function uploadTextures(root, budgetMs = 6) {
+    const list = [];
+    root.traverse((o) => { if (!o.material) return; for (const m of [].concat(o.material)) for (const k of TEX_KEYS) { const t = m[k]; if (t && !uploaded.has(t)) { uploaded.add(t); list.push(t); } } });
+    let t0 = performance.now();
+    for (const t of list) {
+      renderer.initTexture(t);
+      if (performance.now() - t0 > budgetMs) { await nextFrame(); t0 = performance.now(); }
+    }
+  }
+  setWarmup(async (obj) => {
+    await renderer.compileAsync(obj, camera, scene);
+    await uploadTextures(obj);
+  });
+
+  /**
+   * Màn nạp: chờ mọi thứ nặng xong TRƯỚC khi mở màn — sinh địa hình/kết cấu (Worker), dựng sơn môn
+   * và vùng gần, cắt lát va chạm, biên dịch toàn bộ shader, đẩy texture lên GPU, vẽ nháp vài khung.
+   * Nhờ vậy vào game là mượt ngay, không «khựng dần» trong nửa phút đầu.
+   */
+  async function ready(px, pz, onStep = () => {}) {
+    const cap = (p, ms) => Promise.race([p, new Promise((r) => setTimeout(r, ms))]);
+    await world.prepare(px, pz, onStep);
+    onStep('Đang dựng Sơn Môn…');
+    await cap(Promise.all([sect.loaded, stoneReady(), landmarks.prepare(px, pz, 900)]), 25000);
+    onStep('Đang đặt va chạm công trình…');
+    await cap(footprintIdle(), 8000);
+    onStep('Đang chuẩn bị ánh sáng…');
+    // trời / môi trường PMREM / sương / mặt trời phải có TRƯỚC khi biên dịch — thiếu environment lúc
+    // biên dịch thì khung đầu tiên sau màn nạp sẽ biên dịch lại toàn bộ vật liệu (khựng ~250 ms)
+    applyTime(new Date());
+    await renderer.compileAsync(scene, camera);
+    // vật liệu dùng chung chỉ được gán về sau (hoa đào nở theo mùa, đèn, mái…) — biên dịch luôn bây giờ
+    const spare = new THREE.Group(), boxG = new THREE.BoxGeometry();
+    for (const m of Object.values(mats)) if (m?.isMaterial) { const o = new THREE.Mesh(boxG, m); o.castShadow = o.receiveShadow = true; spare.add(o); }
+    await renderer.compileAsync(spare, camera, scene);
+    boxG.dispose();
+    await uploadTextures(scene, 10);
+    // vẽ nháp: bản đồ bóng, PMREM, bộ đệm hậu kỳ khởi tạo xong khi màn còn che
+    // khung bóng phủ cả thế giới trong lúc vẽ nháp → shader bóng (depth) của MỌI vật thể đổ bóng
+    // (cây instanced, nhân vật skinned, mô hình có alpha…) biên dịch luôn, không đợi tới lúc chúng
+    // lọt vào vùng bóng quanh người chơi giữa lúc chơi
+    const sc = sun.shadow.camera, keep = { l: sc.left, r: sc.right, t: sc.top, b: sc.bottom, f: sc.far };
+    Object.assign(sc, { left: -1100, right: 1100, top: 1100, bottom: -1100, far: 3000 }); sc.updateProjectionMatrix();
+    const sp = sun.position.clone(); sun.position.copy(sun.target.position).addScaledVector(lightDir.lengthSq() ? lightDir : new THREE.Vector3(0.4, 0.8, 0.3), 1400);
+    // vật thể chưa từng vào vùng bóng (cây instanced đang 0 bản sao, chunk núi chưa đổ bóng…) vẫn
+    // phải có mặt trong lượt nháp này thì shader bóng của chúng mới được biên dịch sẵn
+    const restore = [];
+    scene.traverse((o) => {
+      if (o.isInstancedMesh && o.count === 0) { restore.push([o, 'count', 0]); o.count = 1; }
+      if (o.isMesh && o.userData.terrain && !o.castShadow) { restore.push([o, 'castShadow', false]); o.castShadow = true; }
+    });
+    if (composer) composer.render(); else renderer.render(scene, camera);
+    restore.forEach(([o, k, v]) => { o[k] = v; });
+    await nextFrame();
+    Object.assign(sc, { left: keep.l, right: keep.r, top: keep.t, bottom: keep.b, far: keep.f }); sc.updateProjectionMatrix(); sun.position.copy(sp);
+    for (let i = 0; i < 3; i++) { if (composer) composer.render(); else renderer.render(scene, camera); await nextFrame(); }
+  }
+
   return {
     mode: '3d',
+    ready,
+    warmScene: () => renderer.compileAsync(scene, camera),
     scene, // kiểm thử / gỡ lỗi
     resize,
     frame,
@@ -1079,6 +1201,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     rotate(step) { cam.yawGoal += step; },
     celebrate(wx) { celebColor.set(WX_COLOR[wx] || '#ffd27a'); celebrate = 6; },
     get lowQuality() { return lowQuality; },
+    get degrade() { return degrade; },
     info: () => ({ ...renderer.info.render, quality, trees: world.treeCount, pending: world.pending, cam: camera.position.toArray().map((v) => Math.round(v)), target: cam.target.toArray().map((v) => Math.round(v)) }),
     // Ảnh chụp canvas (kiểm thử / chia sẻ): vẽ lại rồi đọc ngay trong cùng tác vụ.
     snapshot(type = 'image/jpeg') { renderer.render(scene, camera); return canvas.toDataURL(type, 0.85); },

@@ -4,13 +4,15 @@
 // Dùng: node scripts/meshy-lod.mjs <in.glb> <out.glb> [ratio=0.1 | t:<số tam giác đích>]
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
-import { MeshoptSimplifier } from 'meshoptimizer';
+import { MeshoptSimplifier, MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 
 const [src, dst, ratioArg, mode] = process.argv.slice(2);
 // mode «keepuv»: không gộp qua đường nối UV (texture không bị kéo sọc) — dừng ở mức sàn của mesh nếu không đạt đích
 // mode «auto»: như keepuv; không đạt đích thì gộp qua đường nối có tính sai số UV
 await MeshoptSimplifier.ready;
-const io = new NodeIO().registerExtensions(ALL_EXTENSIONS);
+await MeshoptDecoder.ready; await MeshoptEncoder.ready;
+// đọc được cả GLB đã nén meshopt (bản đóng gói trong public/models)
+const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
 const doc = await io.read(src);
 let ratio = Number(ratioArg) || 0.1;
 if (String(ratioArg || '').startsWith('t:')) {

@@ -5,170 +5,37 @@
 //  có gợn; rừng 2 tầng (cây 3D gần, billboard xa); biển mây quanh rìa.
 // ============================================================================
 import * as THREE from 'three';
+import { span } from './perf.js';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import * as T from './terrain.js';
 import { rng, cloudTex } from './textures.js';
-import { platformTop } from './obstacles.js';
+import { platformTop, blockedByBuilding, solidCount } from './obstacles.js';
 import { inCourt } from './court.js';
+import { layersTexture, placeholderArray, waterNormalTexture } from './ground-tex.js';
+import { gen } from './gen.js';
+import { CHUNK, CHUNKS as N, groundAt } from './terrain-mesh.js';
+import { roadField, makeRoadSampler, FIELD_RANGE } from './roads.js';
+import { createGrass } from './grass.js';
+import { createForest } from './forest.js';
 
-const CHUNK = 128;
-const N = T.WORLD / CHUNK; // 16 × 16 chunk
 export const QUALITY = {
   low: { near: 1, mid: 2, segNear: 32, segMid: 16, segFar: 6, treesNear: 160, bloom: false, shadow: 1024 },
   mid: { near: 1, mid: 3, segNear: 48, segMid: 24, segFar: 8, treesNear: 240, bloom: true, shadow: 1536 },
   high: { near: 2, mid: 4, segNear: 64, segMid: 32, segFar: 8, treesNear: 320, bloom: true, shadow: 2048 },
 };
 
-// Sân Sơn Môn (court.js) lát đá ở y = 0 → hạ địa hình 8 cm để không chập với mặt sân.
+const sst = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 
-const C = {
-  grass: new THREE.Color('#5f9a3c'), grass2: new THREE.Color('#8db24a'), dry: new THREE.Color('#b8a862'),
-  rock: new THREE.Color('#857a6e'), rock2: new THREE.Color('#5e5650'), snow: new THREE.Color('#f2f6fa'),
-  sand: new THREE.Color('#cdb987'), bed: new THREE.Color('#3b5550'), stone: new THREE.Color('#9a8f80'),
-};
-const tmp = new THREE.Color();
-const mixC = new THREE.Color(); // trộn riêng — KHÔNG dùng chung với `out` (lỗi cũ: đè hết thành màu đá)
-
-function colorAt(x, z, h, s, out) {
-  if (h < T.WATER - 0.5) return out.copy(C.bed);
-  if (h < T.WATER + 1.4) return out.copy(C.sand);
-  const v = 0.5 + 0.5 * Math.sin(x * 0.07 + Math.cos(z * 0.05) * 3);
-  out.copy(C.grass).lerp(C.grass2, v * 0.6).lerp(C.dry, Math.max(0, Math.min(1, (h - 120) / 140)));
-  const rockK = Math.max(0, Math.min(1, (s - 0.55) / 0.4));
-  out.lerp(mixC.copy(C.rock).lerp(C.rock2, v), rockK);
-  if (h > 290) out.lerp(C.snow, Math.max(0, Math.min(1, (h - 290) / 60)) * (1 - rockK * 0.6));
-  // phố Huyền Thành: lát đá quanh quảng trường
-  const rr = Math.hypot(x, z);
-  if (rr < 150 && h < 2) out.lerp(C.stone, Math.max(0, 1 - Math.max(0, rr - 30) / 120) * 0.55);
-  return out;
-}
-
-function buildChunkGeometry(cx, cz, seg) {
-  const x0 = -T.HALF + cx * CHUNK, z0 = -T.HALF + cz * CHUNK, step = CHUNK / seg;
-  const vs = seg + 1;
-  const ring = seg * 4; // đỉnh skirt
-  const total = vs * vs + ring;
-  const pos = new Float32Array(total * 3), col = new Float32Array(total * 3), nor = new Float32Array(total * 3);
-  const idx = [];
-  // lấy mẫu thêm 1 vòng viền ngoài chunk → pháp tuyến ở mép tính giống hệt chunk bên cạnh (hết đường kẻ)
-  const W = vs + 2;
-  const H = new Float32Array(W * W);
-  for (let j = 0; j < W; j++) for (let i = 0; i < W; i++) {
-    const x = x0 + (i - 1) * step, z = z0 + (j - 1) * step;
-    let h = T.heightAt(x, z);
-    if (inCourt(x, z)) h -= 0.08;
-    H[j * W + i] = h;
-  }
-  const hAt = (i, j) => H[(j + 1) * W + (i + 1)];
-  for (let j = 0; j < vs; j++) for (let i = 0; i < vs; i++) {
-    const k = (j * vs + i) * 3;
-    const h = hAt(i, j);
-    pos[k] = x0 + i * step; pos[k + 1] = h; pos[k + 2] = z0 + j * step;
-    const dx = (hAt(i + 1, j) - hAt(i - 1, j)) / (2 * step), dz = (hAt(i, j + 1) - hAt(i, j - 1)) / (2 * step);
-    const n = Math.hypot(dx, 1, dz);
-    nor[k] = -dx / n; nor[k + 1] = 1 / n; nor[k + 2] = -dz / n;
-    colorAt(pos[k], pos[k + 2], h, Math.hypot(dx, dz), tmp);
-    col[k] = tmp.r; col[k + 1] = tmp.g; col[k + 2] = tmp.b;
-  }
-  for (let j = 0; j < seg; j++) for (let i = 0; i < seg; i++) {
-    const a = j * vs + i, b = a + 1, c = a + vs, d = c + 1;
-    idx.push(a, c, b, b, c, d);
-  }
-  // skirt: viền thả xuống 10 m che kẽ hở giữa chunk khác LOD
-  const border = [];
-  for (let i = 0; i < seg; i++) border.push(i);
-  for (let j = 0; j < seg; j++) border.push(j * vs + seg);
-  for (let i = seg; i > 0; i--) border.push(seg * vs + i);
-  for (let j = seg; j > 0; j--) border.push(j * vs);
-  const base = vs * vs;
-  border.forEach((v, n) => {
-    const k = (base + n) * 3;
-    for (let c = 0; c < 3; c++) { pos[k + c] = pos[v * 3 + c]; col[k + c] = col[v * 3 + c]; nor[k + c] = nor[v * 3 + c]; }
-    pos[k + 1] -= 10;
-  });
-  for (let n = 0; n < border.length; n++) {
-    const a = border[n], b = border[(n + 1) % border.length], a2 = base + n, b2 = base + ((n + 1) % border.length);
-    idx.push(a, b, a2, b, b2, a2);
-  }
+// Lưới chunk do Worker tính (terrain-mesh.js › chunkData) → BufferGeometry (rẻ, chỉ gói mảng)
+function geomFrom(d) {
   const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
-  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  g.setIndex(idx);
+  g.setAttribute('position', new THREE.BufferAttribute(d.pos, 3));
+  g.setAttribute('normal', new THREE.BufferAttribute(d.nor, 3));
+  g.setAttribute('color', new THREE.BufferAttribute(d.col, 3));
+  g.setAttribute('aSplat', new THREE.BufferAttribute(d.spl, 4));
+  g.setIndex(new THREE.BufferAttribute(d.idx, 1));
   g.computeBoundingSphere();
-  return g;
-}
-
-// Texture chi tiết (hạt đất / cỏ) — nhân với màu đỉnh
-function detailTex() {
-  const c = document.createElement('canvas'); c.width = c.height = 256;
-  const g = c.getContext('2d'); const r = rng(5);
-  g.fillStyle = '#d8d8d8'; g.fillRect(0, 0, 256, 256);
-  for (let i = 0; i < 9000; i++) { const v = 150 + r() * 105 | 0; g.fillStyle = `rgb(${v},${v},${v})`; g.fillRect(r() * 256, r() * 256, 1 + r() * 2, 1 + r() * 2); }
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
-  return t;
-}
-
-// Gợn nước: normal map sinh bằng canvas
-function waterNormals() {
-  const S = 256; const c = document.createElement('canvas'); c.width = c.height = S;
-  const g = c.getContext('2d'); const img = g.createImageData(S, S); const r = rng(9);
-  const waves = Array.from({ length: 10 }, () => ({ kx: (r() - 0.5) * 0.4, kz: (r() - 0.5) * 0.4, p: r() * 6 }));
-  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
-    let dx = 0, dz = 0;
-    for (const w of waves) { const ph = (x * w.kx + y * w.kz) * Math.PI * 2 / 6.4 * 4 + w.p; dx += Math.cos(ph) * w.kx; dz += Math.cos(ph) * w.kz; }
-    const k = (y * S + x) * 4;
-    img.data[k] = 128 + dx * 160; img.data[k + 1] = 128 + dz * 160; img.data[k + 2] = 255; img.data[k + 3] = 255;
-  }
-  g.putImageData(img, 0, 0);
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  return t;
-}
-
-// Billboard cây (2 mặt phẳng chéo) — canvas có alpha
-function treeCard(kind) {
-  const c = document.createElement('canvas'); c.width = 128; c.height = 256;
-  const g = c.getContext('2d');
-  g.fillStyle = '#4a3020'; g.fillRect(58, 170, 12, 86);
-  if (kind === 'pine') {
-    g.fillStyle = '#25462f';
-    for (let k = 0; k < 4; k++) { const y = 30 + k * 42, w = 26 + k * 14; g.beginPath(); g.moveTo(64, y - 30); g.lineTo(64 - w, y + 34); g.lineTo(64 + w, y + 34); g.closePath(); g.fill(); }
-  } else {
-    for (const [x, y, rr, col] of [[64, 110, 52, '#3f6b33'], [40, 130, 34, '#4c7a3a'], [88, 128, 36, '#36602e'], [64, 70, 38, '#4f7f3c']]) { g.fillStyle = col; g.beginPath(); g.arc(x, y, rr, 0, Math.PI * 2); g.fill(); }
-  }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
-function crossGeo(w, h) {
-  const a = new THREE.PlaneGeometry(w, h); a.translate(0, h / 2, 0);
-  const b = a.clone(); b.rotateY(Math.PI / 2);
-  const g = new THREE.BufferGeometry();
-  const merge = (geos) => { const pos = [], uv = [], nor = [], idx = []; let off = 0; for (const x of geos) { pos.push(...x.attributes.position.array); uv.push(...x.attributes.uv.array); nor.push(...x.attributes.normal.array); for (const i of x.index.array) idx.push(i + off); off += x.attributes.position.count; } g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); g.setIndex(idx); };
-  merge([a, b]);
-  return g;
-}
-function pineGeo() {
-  const parts = [new THREE.CylinderGeometry(0.35, 0.6, 6, 6).translate(0, 3, 0)];
-  [[5.5, 5, 5], [4.4, 4.4, 8], [3.2, 3.8, 10.6], [1.9, 3.2, 12.8]].forEach(([r, h, y]) => parts.push(new THREE.ConeGeometry(r, h, 7).translate(0, y, 0)));
-  return mergeSimple(parts);
-}
-function leafGeo() {
-  const parts = [new THREE.CylinderGeometry(0.3, 0.5, 5, 6).translate(0, 2.5, 0)];
-  [[0, 7, 0, 3.6], [2.2, 6, 0.8, 2.6], [-2, 6.2, -0.6, 2.7], [0.4, 8.6, -0.4, 2.4]].forEach(([x, y, z, r]) => parts.push(new THREE.IcosahedronGeometry(r, 0).translate(x, y, z)));
-  return mergeSimple(parts);
-}
-function mergeSimple(geos) {
-  const pos = [], nor = []; const col = [];
-  geos.forEach((g0, n) => {
-    const g = g0.index ? g0.toNonIndexed() : g0; g.computeVertexNormals();
-    pos.push(...g.attributes.position.array); nor.push(...g.attributes.normal.array);
-    const cc = n === 0 ? [0.29, 0.19, 0.12] : [1, 1, 1];
-    for (let i = 0; i < g.attributes.position.count; i++) col.push(...cc);
-  });
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
-  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.userData.relief = d.relief;
   return g;
 }
 
@@ -193,12 +60,103 @@ export function createWorld(scene, renderer, { quality = 'mid' } = {}) {
   }
 
   // --- địa hình
-  const terrainMat = new THREE.MeshStandardMaterial({ vertexColors: true, map: detailTex(), roughness: 0.96, metalness: 0 });
-  terrainMat.map.repeat.set(CHUNK / 6, CHUNK / 6);
-  // UV theo toạ độ thế giới cho texture chi tiết
-  terrainMat.onBeforeCompile = (sh) => {
-    sh.vertexShader = sh.vertexShader.replace('#include <uv_vertex>', '#include <uv_vertex>\n#ifdef USE_MAP\n vMapUv = (mapTransform * vec3(position.xz / 128.0, 1.0)).xy;\n#endif');
+  // kết cấu mặt đất: bản tạm 4×4 (cùng kiểu → không biên dịch lại shader), Worker sinh bản thật
+  const TU = {
+    uAlb: { value: placeholderArray(4, [[78, 98, 46], [118, 96, 70], [130, 124, 114], [140, 132, 118]], true) },
+    uNrm: { value: placeholderArray(4, [[128, 128, 255]], false) },
   };
+  const groundP = gen('ground', quality === 'low' ? 256 : 512).then((d) => {
+    const old = [TU.uAlb.value, TU.uNrm.value];
+    TU.uAlb.value = layersTexture(d.alb, d.S, d.n, true); TU.uNrm.value = layersTexture(d.nrm, d.S, d.n, false);
+    old.forEach((t) => t.dispose());
+  });
+  const RF = roadField(1024);
+  const roadTex = new THREE.DataTexture(RF.data, RF.res, RF.res, THREE.RedFormat, THREE.UnsignedByteType);
+  roadTex.magFilter = THREE.LinearFilter; roadTex.minFilter = THREE.LinearFilter; roadTex.needsUpdate = true;
+  const roadAt = makeRoadSampler(RF);
+  const terrainMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0 });
+  terrainMat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, TU, { uRoad: { value: roadTex }, uWorld: { value: T.WORLD } });
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nattribute vec4 aSplat;\nvarying vec4 vSplat;\nvarying vec3 vWP;\nvarying vec3 vWN;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvSplat = aSplat;\nvWP = (modelMatrix * vec4(position, 1.0)).xyz;\nvWN = normalize(mat3(modelMatrix) * normal);');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+uniform highp sampler2DArray uAlb; uniform highp sampler2DArray uNrm; uniform sampler2D uRoad; uniform float uWorld;
+varying vec4 vSplat; varying vec3 vWP; varying vec3 vWN;
+vec3 gTN = vec3(0.0, 0.0, 1.0);`)
+      .replace('#include <map_fragment>', `
+{
+  vec2 wp = vWP.xz;
+  vec2 uA = wp / 3.2;
+  vec2 uB = vec2(wp.x * 0.7071 - wp.y * 0.7071, wp.x * 0.7071 + wp.y * 0.7071) / 13.0;
+  vec2 dAx = dFdx(uA), dAy = dFdy(uA), dBx = dFdx(uB), dBy = dFdy(uB);
+  float far = smoothstep(55.0, 150.0, length(vWP - cameraPosition));
+  vec2 uM = wp / 61.0;
+  float macro = textureGrad(uAlb, vec3(uM, 1.0), dFdx(uM), dFdy(uM)).a;
+  float s = (0.5 - texture(uRoad, (wp + 0.5 * uWorld) / uWorld).r) * ${FIELD_RANGE.toFixed(1)} + (macro - 0.5) * 1.8;
+  float wRoad = smoothstep(0.35, -0.35, s);
+  float wVerge = smoothstep(2.4, 0.1, s) * (1.0 - wRoad);
+  float w[4];
+  float wBank = 1.0 - smoothstep(${(T.WATER + 1.2).toFixed(2)}, ${(T.WATER + 3.8).toFixed(2)}, vWP.y + (macro - 0.5) * 1.2);
+  w[0] = vSplat.x * (1.0 - wRoad) * (1.0 - wVerge * 0.8) * (1.0 - wBank); w[1] = vSplat.y + wVerge * 1.3 + wBank * 1.6; w[2] = vSplat.z * (1.0 - wBank * 0.7); w[3] = wRoad * 2.0;
+  vec4 c[4]; vec3 n[4]; float hmax = -9.0;
+  for (int i = 0; i < 4; i++) {
+    c[i] = vec4(0.0); n[i] = vec3(0.0, 0.0, 1.0);
+    if (w[i] > 0.003 && i == 2) {
+      vec3 bw = pow(abs(normalize(vWN)), vec3(4.0)); bw /= (bw.x + bw.y + bw.z);
+      vec2 pzy = vWP.zy / 4.5, pxy = vWP.xy / 4.5, pxz = wp / 4.5;
+      vec2 qzy = vec2(vWP.z * 0.8 + vWP.y * 0.6, vWP.y * 0.8 - vWP.z * 0.6) / 17.0, qxy = vec2(vWP.x * 0.8 + vWP.y * 0.6, vWP.y * 0.8 - vWP.x * 0.6) / 17.0, qxz = uB * 0.76;
+      vec4 tx = mix(textureGrad(uAlb, vec3(pzy, 2.0), dFdx(pzy), dFdy(pzy)), textureGrad(uAlb, vec3(qzy, 2.0), dFdx(qzy), dFdy(qzy)), 0.4);
+      vec4 ty = mix(textureGrad(uAlb, vec3(pxz, 2.0), dFdx(pxz), dFdy(pxz)), textureGrad(uAlb, vec3(qxz, 2.0), dFdx(qxz), dFdy(qxz)), 0.45);
+      vec4 tz = mix(textureGrad(uAlb, vec3(pxy, 2.0), dFdx(pxy), dFdy(pxy)), textureGrad(uAlb, vec3(qxy, 2.0), dFdx(qxy), dFdy(qxy)), 0.4);
+      c[i] = tx * bw.x + ty * bw.y + tz * bw.z;
+      n[i] = vec3(0.0, 0.0, 1.0);
+      hmax = max(hmax, c[i].a + w[i]);
+    } else if (w[i] > 0.003) {
+      vec4 a = textureGrad(uAlb, vec3(uA, float(i)), dAx, dAy), b = textureGrad(uAlb, vec3(uB, float(i)), dBx, dBy);
+      c[i] = vec4(mix(mix(a.rgb, b.rgb, 0.35), b.rgb, far), mix(max(a.a, b.a * 0.9), b.a, far));
+      n[i] = textureGrad(uNrm, vec3(uA, float(i)), dAx, dAy).xyz * 2.0 - 1.0;
+      hmax = max(hmax, c[i].a + w[i]);
+    }
+  }
+  vec3 alb = vec3(0.0), tn = vec3(0.0); float bs = 0.0;
+  for (int i = 0; i < 4; i++) {
+    float b = w[i] > 0.003 ? max(c[i].a + w[i] - (hmax - 0.28), 0.0) : 0.0;
+    alb += c[i].rgb * b; tn += n[i] * b; bs += b;
+  }
+  alb /= max(bs, 1e-4); tn = normalize(tn / max(bs, 1e-4));
+  float snow = vSplat.w;
+  alb = mix(alb, vec3(0.92, 0.94, 0.97) * (0.86 + 0.14 * c[2].a), snow);
+  tn.xy *= mix(1.0, 0.35, snow) * (1.0 - far * 0.6);
+  gTN = normalize(tn);
+  diffuseColor.rgb *= alb;
+}`)
+      .replace('#include <normal_fragment_maps>', `
+{
+  vec3 Tv = normalize((viewMatrix * vec4(1.0, 0.0, 0.0, 0.0)).xyz);
+  vec3 Bv = normalize((viewMatrix * vec4(0.0, 0.0, 1.0, 0.0)).xyz);
+  Tv = normalize(Tv - normal * dot(normal, Tv));
+  Bv = normalize(Bv - normal * dot(normal, Bv) - Tv * dot(Tv, Bv));
+  normal = normalize(Tv * gTN.x + Bv * gTN.y + normal * gTN.z);
+}`);
+  };
+  terrainMat.customProgramCacheKey = () => 'terrain-splat-v4';
+
+  // Cỏ thật: mật độ suy từ cùng trọng số lớp như shader (cỏ chỉ mọc nơi lớp cỏ thắng thế)
+  const GB = new Float32Array(7);
+  const grassSample = (x, z) => {
+    let h = T.heightAt(x, z);
+    if (inCourt(x, z) || h < T.WATER + 0.6 || Math.hypot(x, z) > T.EDGE) return [h, 0, 0];
+    const e = 1.2, sl = Math.hypot(T.heightAt(x + e, z) - T.heightAt(x - e, z), T.heightAt(x, z + e) - T.heightAt(x, z - e)) / (2 * e);
+    groundAt(x, z, h, sl, GB);
+    let d = Math.max(0, Math.min(1, GB[0] * 1.15 - GB[1] * 0.9 - GB[2] * 1.6 - GB[3] * 3));
+    if (d > 0) d *= sst(0.6, 2.8, roadAt(x, z));
+    if (d > 0 && (platformTop(x, z) != null || blockedByBuilding(x, z))) d = 0;
+    const dry = Math.max(0, Math.min(1, (h - 110) / 150 + T.fbm(x / 70 + 3, z / 70 - 5, 3) * 0.35 + T.fbm(x / 9, z / 9, 2) * 0.25));
+    return [h, d, dry];
+  };
+  const grass = createGrass(scene, { quality, sample: grassSample, version: solidCount });
   const chunks = new Map(); // key → { mesh, seg }
   const queue = [];
   const keyOf = (cx, cz) => cx * 100 + cz;
@@ -222,27 +180,74 @@ export function createWorld(scene, renderer, { quality = 'mid' } = {}) {
       queue.push(...all);
     }
   }
-  function buildSome(budgetMs = 6) {
-    const t0 = performance.now();
-    while (queue.length && performance.now() - t0 < budgetMs) {
-      const { i, j, seg } = queue.shift();
-      const geo = buildChunkGeometry(i, j, seg);
-      const k = keyOf(i, j);
-      const old = chunks.get(k);
-      if (old) { old.mesh.geometry.dispose(); old.mesh.geometry = geo; old.seg = seg; old.mesh.castShadow = seg >= Q.segMid; }
-      else {
-        const m = new THREE.Mesh(geo, terrainMat); m.receiveShadow = true; m.castShadow = seg >= Q.segMid; m.userData.terrain = true;
-        group.add(m); chunks.set(k, { mesh: m, seg });
-      }
+  // dựng chunk trong Worker (tối đa 3 việc song song); kết quả về thì thay hình học — luồng chính
+  // chỉ gói mảng số (< 1 ms), không còn khung giật 15–30 ms mỗi lần qua ranh chunk
+  let inFlight = 0;
+  function place(d) {
+    const geo = geomFrom(d), k = keyOf(d.cx, d.cz), old = chunks.get(k);
+    const cast = d.seg >= Q.segMid && d.relief > 3;
+    if (old) { old.mesh.geometry.dispose(); old.mesh.geometry = geo; old.seg = d.seg; old.mesh.castShadow = cast; }
+    else {
+      const m = new THREE.Mesh(geo, terrainMat); m.receiveShadow = true; m.castShadow = cast; m.userData.terrain = true;
+      group.add(m); chunks.set(k, { mesh: m, seg: d.seg });
     }
   }
-  // khởi tạo: toàn bộ ở mức xa (nhanh), rồi nâng dần quanh người chơi
-  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const m = new THREE.Mesh(buildChunkGeometry(i, j, Q.segFar), terrainMat); m.receiveShadow = true; m.userData.terrain = true; group.add(m); chunks.set(keyOf(i, j), { mesh: m, seg: Q.segFar }); }
+  function buildSome() {
+    while (queue.length && inFlight < 3) {
+      const { i, j, seg } = queue.shift();
+      inFlight++;
+      gen('chunk', i, j, seg).then((d) => { inFlight--; place(d); }); // Worker trả theo thứ tự gửi → bản mới luôn tới sau
+    }
+  }
+  // khởi tạo: toàn bộ ở mức xa (dựng trong Worker), rồi nâng dần quanh người chơi
+  const farP = Promise.all(Array.from({ length: N * N }, (_, n) => gen('chunk', n % N, Math.floor(n / N), Q.segFar).then((d) => { if (!chunks.has(keyOf(d.cx, d.cz))) place(d); })));
 
-  // --- nước (hồ, sông) — một mặt phẳng lớn ở mực nước
-  const wn = waterNormals(); wn.repeat.set(160, 160);
-  const water = new THREE.Mesh(new THREE.PlaneGeometry(T.WORLD * 1.1, T.WORLD * 1.1), new THREE.MeshStandardMaterial({ color: '#1f5a66', roughness: 0.06, metalness: 0.15, normalMap: wn, normalScale: new THREE.Vector2(0.35, 0.35), transparent: true, opacity: 0.86 }));
-  water.rotation.x = -Math.PI / 2; water.position.y = T.WATER; water.receiveShadow = true; group.add(water);
+  // --- nước (hồ, sông): màu theo độ sâu (nông trong, sâu thẫm), bọt mảnh ven bờ, gợn hai lớp
+  // trôi khác hướng (không lộ ô lặp), phản chiếu trời qua môi trường PMREM.
+  // Độ sâu đọc từ bản đồ độ cao thô của cả thế giới, nướng cuốn chiếu sau khi vào game.
+  const halfTex = (data, n) => { const t = new THREE.DataTexture(data, n, n, THREE.RedFormat, THREE.HalfFloatType); t.magFilter = t.minFilter = THREE.LinearFilter; t.needsUpdate = true; return t; };
+  const WU = {
+    uDepth: { value: halfTex(new Uint16Array(4).fill(THREE.DataUtils.toHalfFloat(-50)), 2) }, // tạm: «sâu» khắp nơi
+    uWN: { value: waterNormalTexture({ nrm: new Uint8Array(16 * 4).fill(128).map((v, i) => (i % 4 === 2 || i % 4 === 3 ? 255 : v)), S: 4 }) },
+    uWorld: { value: T.WORLD }, uT: { value: 0 },
+  };
+  const depthP = gen('depth', 512).then((d) => { WU.uDepth.value.dispose(); WU.uDepth.value = halfTex(d.data, d.DEP); });
+  const waterP = gen('water', 256).then((d) => { WU.uWN.value.dispose(); WU.uWN.value = waterNormalTexture(d); });
+  const waterMat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.12, metalness: 0, transparent: true, depthWrite: false, envMapIntensity: 0.75 });
+  waterMat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, WU);
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWWP;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWWP = (modelMatrix * vec4(position, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+uniform sampler2D uDepth; uniform sampler2D uWN; uniform float uWorld; uniform float uT;
+varying vec3 vWWP;
+vec3 gWN = vec3(0.0, 0.0, 1.0);`)
+      .replace('#include <map_fragment>', `
+{
+  vec2 wp = vWWP.xz;
+  float d = max(0.0, -texture2D(uDepth, (wp + 0.5 * uWorld) / uWorld).r);
+  vec2 u1 = wp / 9.0 + vec2(uT * 0.021, uT * 0.013), u2 = vec2(wp.x * 0.8 - wp.y * 0.6, wp.x * 0.6 + wp.y * 0.8) / 23.0 - vec2(uT * 0.009, -uT * 0.016);
+  vec3 n1 = texture2D(uWN, u1).xyz * 2.0 - 1.0, n2 = texture2D(uWN, u2).xyz * 2.0 - 1.0;
+  float distK = smoothstep(40.0, 260.0, length(vWWP - cameraPosition));
+  gWN = normalize(vec3((n1.xy + n2.xy) * mix(0.26, 0.08, distK), 1.0));
+  vec3 shallow = vec3(0.10, 0.17, 0.13), deep = vec3(0.010, 0.040, 0.055);
+  vec3 col = mix(shallow, deep, smoothstep(0.3, 6.0, d));
+  float foam = (1.0 - smoothstep(0.05, 0.55, d)) * smoothstep(0.35, 0.75, texture2D(uWN, wp / 2.7 + uT * 0.03).r);
+  col = mix(col, vec3(0.62, 0.66, 0.64), foam * 0.6);
+  diffuseColor.rgb = col;
+  diffuseColor.a = clamp(mix(0.35, 0.93, smoothstep(0.1, 3.5, d)) + foam * 0.4, 0.0, 1.0);
+}`)
+      .replace('#include <normal_fragment_maps>', `
+{
+  vec3 Tv = normalize((viewMatrix * vec4(1.0, 0.0, 0.0, 0.0)).xyz), Bv = normalize((viewMatrix * vec4(0.0, 0.0, 1.0, 0.0)).xyz);
+  normal = normalize(Tv * gWN.x + Bv * gWN.y + normal * gWN.z);
+}`);
+  };
+  waterMat.customProgramCacheKey = () => 'water-v1';
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(T.WORLD * 1.1, T.WORLD * 1.1), waterMat);
+  water.rotation.x = -Math.PI / 2; water.position.y = T.WATER; water.receiveShadow = true; water.renderOrder = 2; group.add(water);
 
   // --- biển mây quanh rìa
   const clouds = new THREE.Group(); group.add(clouds);
@@ -255,68 +260,33 @@ export function createWorld(scene, renderer, { quality = 'mid' } = {}) {
     c.scale.setScalar(260 + cr() * 260); c.userData.v = 2 + cr() * 3; clouds.add(c);
   }
 
-  // --- rừng: vị trí từ treeDensity, 2 loài
-  const trees = { pine: [], leaf: [] };
-  const tr = rng(17);
-  for (let x = -T.EDGE; x < T.EDGE; x += 11) for (let z = -T.EDGE; z < T.EDGE; z += 11) {
-    const px = x + (tr() - 0.5) * 9, pz = z + (tr() - 0.5) * 9;
-    const dn = T.treeDensity(px, pz);
-    if (tr() > dn * 0.75) continue;
-    const h = T.heightAt(px, pz);
-    (h > 140 || tr() < 0.35 ? trees.pine : trees.leaf).push({ x: px, y: h - 0.3, z: pz, s: 0.75 + tr() * 0.7, r: tr() * 6.28 });
-  }
-  const mk = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), ps = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
-  const far = {}, near = {};
-  for (const kind of ['pine', 'leaf']) {
-    const list = trees[kind];
-    const fm = new THREE.InstancedMesh(crossGeo(kind === 'pine' ? 11 : 12, kind === 'pine' ? 16 : 11), new THREE.MeshLambertMaterial({ map: treeCard(kind), alphaTest: 0.5, side: THREE.DoubleSide }), list.length);
-    list.forEach((t, i) => { q.setFromAxisAngle(up, t.r); sc.setScalar(t.s); ps.set(t.x, t.y, t.z); mk.compose(ps, q, sc); fm.setMatrixAt(i, mk); });
-    fm.instanceMatrix.needsUpdate = true; fm.frustumCulled = false; group.add(fm); far[kind] = fm;
-    const nm = new THREE.InstancedMesh(kind === 'pine' ? pineGeo() : leafGeo(), new THREE.MeshStandardMaterial({ vertexColors: true, color: kind === 'pine' ? '#2c5a3a' : '#4d7d3a', roughness: 0.85, flatShading: true }), Q.treesNear);
-    nm.castShadow = true; nm.receiveShadow = true; nm.count = 0; nm.frustumCulled = false; group.add(nm); near[kind] = nm;
-  }
-  let lastTreeAt = new THREE.Vector3(1e9, 0, 0);
-  const hidden = new THREE.Matrix4().makeScale(0, 0, 0);
-  function updateTrees(px, pz) {
-    if (Math.hypot(px - lastTreeAt.x, pz - lastTreeAt.z) < 30) return;
-    lastTreeAt.set(px, 0, pz);
-    const R = 170;
-    for (const kind of ['pine', 'leaf']) {
-      const list = trees[kind]; let n = 0;
-      list.forEach((t, i) => {
-        const close = Math.hypot(t.x - px, t.z - pz) < R && n < Q.treesNear;
-        q.setFromAxisAngle(up, t.r); sc.setScalar(t.s); ps.set(t.x, t.y, t.z); mk.compose(ps, q, sc);
-        if (close) { nearList[kind][n] = t; t.hid = false; near[kind].setMatrixAt(n++, mk); far[kind].setMatrixAt(i, hidden); } else far[kind].setMatrixAt(i, mk);
-      });
-      nearList[kind].length = n; near[kind].count = n; near[kind].instanceMatrix.needsUpdate = true; far[kind].instanceMatrix.needsUpdate = true;
-    }
-  }
+  // --- rừng: vị trí tính trong Worker; cây dựng khi có kết quả
+  let forest = null;
+  const treesP = gen('trees').then((lists) => { forest = span('init:forest', () => createForest(group, renderer, lists, quality)); });
 
   // Mặt đất dưới chân (sân quán ở y = 0, ngoài sân theo địa hình)
   const groundY = (x, z) => { const p = platformTop(x, z); if (inCourt(x, z)) return p ?? 0; return Math.max(T.heightAt(x, z), T.WATER - 1.2, p ?? -1e9); };
 
-  // Cây chắn giữa camera và người chơi: thu nhỏ về 0 (xét cây gần, rẻ: ≤ vài trăm cây)
-  const nearList = { pine: [], leaf: [] };
-  const segDist = (px, pz, ax, az, bx, bz) => { const vx = bx - ax, vz = bz - az; const t = Math.max(0, Math.min(1, ((px - ax) * vx + (pz - az) * vz) / (vx * vx + vz * vz || 1))); return Math.hypot(px - ax - vx * t, pz - az - vz * t); };
-  function occlusion(px, pz, cx, cz) {
-    for (const kind of ['pine', 'leaf']) {
-      const nm = near[kind]; let changed = false;
-      nearList[kind].forEach((tt, i) => {
-        const block = segDist(tt.x, tt.z, px, pz, cx, cz) < 5.5 * tt.s && Math.hypot(tt.x - px, tt.z - pz) > 1.5;
-        if (block !== !!tt.hid) { tt.hid = block; q.setFromAxisAngle(up, tt.r); sc.setScalar(block ? 0 : tt.s); ps.set(tt.x, tt.y, tt.z); mk.compose(ps, q, sc); nm.setMatrixAt(i, mk); changed = true; }
-      });
-      if (changed) nm.instanceMatrix.needsUpdate = true;
-    }
-  }
-
   return {
-    sky, water, group, clouds, groundY, setSun, occlusion, treeCount: trees.pine.length + trees.leaf.length,
+    sky, water, group, clouds, groundY, setSun, grass,
+    occlusion: (...a) => forest?.occlusion(...a),
+    get treeCount() { return forest?.count || 0; },
+    /** Màn nạp chờ: kết cấu, toàn bộ địa hình mức xa, rừng, bản đồ độ sâu, rồi các chunk chi tiết quanh (px, pz). */
+    async prepare(px, pz, onStep = () => {}) {
+      onStep('Đang đắp núi sông…'); await Promise.all([groundP, farP, waterP]);
+      onStep('Đang trồng rừng…'); await Promise.all([treesP, depthP]);
+      onStep('Đang dựng địa hình quanh bạn…');
+      updateChunks(px, pz);
+      while (queue.length || inFlight) { buildSome(); await new Promise((r) => setTimeout(r, 16)); }
+      forest?.update(px, pz, 0);
+    },
     terrainMeshes: () => [...chunks.values()].map((c) => c.mesh),
     update(px, pz, dt, t) {
-      updateChunks(px, pz); buildSome(); updateTrees(px, pz);
-      wn.offset.x = (t * 0.004) % 1; wn.offset.y = (t * 0.0027) % 1;
+      span('w:chunks', () => { updateChunks(px, pz); buildSome(); }); if (forest) span('forest:update', () => forest.update(px, pz, t));
+      span('grass:update', () => grass.update(px, groundY(px, pz), pz, t));
+      WU.uT.value = t;
       for (const c of clouds.children) { c.position.x += c.userData.v * dt; if (c.position.x > 1900) c.position.x = -1900; }
     },
-    get pending() { return queue.length; },
+    get pending() { return queue.length + inFlight; },
   };
 }

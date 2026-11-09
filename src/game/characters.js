@@ -5,7 +5,7 @@
 // ============================================================================
 import * as THREE from 'three';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
-import { loadModel } from './assets.js';
+import { loadModel, warmObject } from './assets.js';
 
 // tên động tác theo thứ tự action_ids đã gửi Meshy
 export const CHAR_ANIMS = {
@@ -77,6 +77,7 @@ vec3 hq_recolor(vec3 hsv, vec3 t){ return hq_hsv2rgb(vec3(t.x, t.y * smoothstep(
   return m;
 }
 
+const FIT = new Map();
 export async function createCharacter(id, { height = 1.9, tint = null } = {}) {
   const g = await loadModel(id);
   if (!g) return null;
@@ -89,13 +90,19 @@ export async function createCharacter(id, { height = 1.9, tint = null } = {}) {
     if (tint?.primary) o.material = Array.isArray(o.material) ? o.material.map(tinted) : tinted(o.material);
   });
   // Meshy rig dùng cm + khung xương thu 0.01 → khung bao thường sai ×100; đo chính xác theo da (skinning)
+  // đo theo da (skinning, chính xác) rất tốn với rig nặng (hàng trăm nghìn đỉnh) → đo MỘT lần mỗi mô hình,
+  // các bản sao sau dùng lại tỉ lệ (khách hỏi việc / người chơi khác xuất hiện không còn khựng)
+  let fit = FIT.get(id);
+  if (!fit) {
+    obj.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(obj, true);
+    fit = { h: box.getSize(new THREE.Vector3()).y || 1, minY: box.min.y };
+    FIT.set(id, fit);
+  }
+  const k = height / fit.h;
+  obj.scale.multiplyScalar(k);
+  obj.position.y -= fit.minY * k; // chân chạm đất
   obj.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(obj, true);
-  const size = box.getSize(new THREE.Vector3());
-  obj.scale.multiplyScalar(height / (size.y || 1));
-  obj.updateMatrixWorld(true);
-  const b2 = new THREE.Box3().setFromObject(obj, true);
-  obj.position.y -= b2.min.y; // chân chạm đất
   const root = new THREE.Group(); root.add(obj);
   const mixer = new THREE.AnimationMixer(obj);
   const names = CHAR_ANIMS[id] || [];
@@ -181,6 +188,7 @@ export async function createCharacter(id, { height = 1.9, tint = null } = {}) {
     aim(bone.RightArm, bone.RightForeArm, _v.set(sR * 0.22, -0.82, 0.42), _rq);
     aim(bone.RightForeArm, bone.RightHand, _v.set(-sR * (0.3 + sway), 0.5, 0.8), _rq);
   }
+  await warmObject(root); // shader + texture sẵn trước khi nhân vật hiện ra
   return {
     seat, unseat, hold,
     hand: (right = true) => bone[right ? 'RightHand' : 'LeftHand'] || null,

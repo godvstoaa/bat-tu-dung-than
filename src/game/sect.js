@@ -6,6 +6,7 @@
 //  Mọi model Meshy vào lưới va chạm theo hình khối (collide.js) — không đi xuyên.
 // ============================================================================
 import * as THREE from 'three';
+import { span } from './perf.js';
 import * as MD from './models.js';
 import * as TX from './textures.js';
 import { placeModel, instanceModel } from './assets.js';
@@ -14,6 +15,7 @@ import { addLight, addGlow } from './lights.js';
 import { addSolidRect as addSolidRectLocal } from './obstacles.js';
 import { COURT, TERRACES, STAIRS, PONDS, MAIN_HALL, TANGY } from './court.js';
 import { SETS, ITEM } from './cosmetics.js';
+import { stoneMaterial } from './ground-tex.js';
 
 const mk = (geo, mat, x, y, z, g, { ry = 0, rx = 0, shadow = true } = {}) => {
   const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); o.rotation.set(rx, ry, 0);
@@ -24,16 +26,16 @@ const box = (w, h, d, mat, x, y, z, g, o) => mk(new THREE.BoxGeometry(w, h, d), 
 function mats() {
   const W = COURT.x1 - COURT.x0, D = COURT.z1 - COURT.z0;
   return {
-    pave: new THREE.MeshStandardMaterial({ map: TX.stoneTex({ seed: 29, tiles: 4, repeat: [W / 6.4, D / 6.4], base: '#8f877a' }), roughness: 0.92 }),
-    path: new THREE.MeshStandardMaterial({ map: TX.stoneTex({ seed: 31, tiles: 2, repeat: [2, 14], base: '#a39a8a' }), roughness: 0.88 }),
-    terrace: new THREE.MeshStandardMaterial({ map: TX.stoneTex({ seed: 44, tiles: 3, repeat: [10, 1], base: '#958e82' }), roughness: 0.88 }),
-    top: new THREE.MeshStandardMaterial({ map: TX.stoneTex({ seed: 45, tiles: 4, repeat: [12, 10], base: '#8c8478' }), roughness: 0.92 }),
-    marble: new THREE.MeshStandardMaterial({ color: '#cbc3b2', roughness: 0.7 }),
+    pave: stoneMaterial({ seed: 29, rows: 8, repeat: [W / 6.4, D / 6.4], base: '#a59d8e', roughness: 0.92 }),
+    path: stoneMaterial({ seed: 31, rows: 3, repeat: [2, 14], base: '#b5ad9c', roughness: 0.85 }),
+    terrace: stoneMaterial({ seed: 44, rows: 3, repeat: [10, 1], base: '#a8a092', roughness: 0.88 }),
+    top: stoneMaterial({ seed: 45, rows: 8, repeat: [12, 10], base: '#a09888', roughness: 0.92 }),
+    marble: stoneMaterial({ seed: 93, rows: 1, base: '#cbc4b5', S: 256, roughness: 0.62, normalScale: 0.5 }),
     plaster: new THREE.MeshStandardMaterial({ map: TX.lacquerTex('#9b2a1f', { seed: 21, gold: 0.05, repeat: [24, 1], streak: 0.05 }), roughness: 0.8 }),
-    base: new THREE.MeshStandardMaterial({ color: '#4d4740', roughness: 0.95 }),
+    base: stoneMaterial({ seed: 95, rows: 1, base: '#6a645b', S: 256, roughness: 0.95 }),
     gold: new THREE.MeshStandardMaterial({ color: '#d4a63c', roughness: 0.32, metalness: 0.85 }),
     dark: new THREE.MeshStandardMaterial({ color: '#2b2622', roughness: 0.9 }),
-    lampGlow: new THREE.MeshStandardMaterial({ color: '#ffd9a0', emissive: '#ffb050', emissiveIntensity: 1, roughness: 0.6 }),
+    lampGlow: new THREE.MeshStandardMaterial({ color: '#c9b48a', emissive: '#ffb050', emissiveIntensity: 1, roughness: 0.75 }),
   };
 }
 
@@ -53,17 +55,24 @@ function balustrade(g, m, x0, z0, x1, z1, y, gaps = []) {
   }
 }
 
-// đèn đá (thạch đăng): đế, thân, hộp đèn sáng, mái nhỏ — đăng ký đèn điểm
+// đèn đá (thạch đăng) tạc nguyên khối đá: bệ bát giác, thân tròn thuôn, đài đỡ, khám đèn
+// lục giác có 6 trụ (ánh đèn lọt qua khe), mái đá lục giác, búp đỉnh — đăng ký đèn điểm.
+// (Bản cũ: hộp vuông trắng + mái chóp đen sơn → trông như đèn nhựa.)
 function stoneLantern(g, m, x, z, y = 0, s = 1) {
   const L = new THREE.Group(); L.position.set(x, y, z); L.scale.setScalar(s); g.add(L);
-  box(0.9, 0.3, 0.9, m.base, 0, 0.15, 0, L);
-  box(0.36, 1.3, 0.36, m.marble, 0, 0.95, 0, L);
-  box(0.8, 0.14, 0.8, m.marble, 0, 1.66, 0, L);
-  box(0.56, 0.56, 0.56, m.lampGlow, 0, 2.0, 0, L, { shadow: false });
-  for (const [dx, dz] of [[-0.3, -0.3], [0.3, -0.3], [-0.3, 0.3], [0.3, 0.3]]) box(0.08, 0.6, 0.08, m.dark, dx, 2.0, dz, L);
-  mk(new THREE.ConeGeometry(0.72, 0.5, 4), m.dark, 0, 2.55, 0, L, { ry: Math.PI / 4 });
-  mk(new THREE.SphereGeometry(0.1, 8, 6), m.gold, 0, 2.85, 0, L);
-  addLight(x, y + 2.0 * s, z, { color: '#ffb35c', power: 1.1 });
+  const cyl = (rt, rb, h, seg, mat, yy, o) => mk(new THREE.CylinderGeometry(rt, rb, h, seg), mat, 0, yy, 0, L, o);
+  cyl(0.5, 0.58, 0.2, 8, m.base, 0.1);
+  cyl(0.34, 0.44, 0.24, 8, m.marble, 0.32);
+  cyl(0.15, 0.2, 1.1, 10, m.marble, 0.99);
+  cyl(0.2, 0.15, 0.08, 10, m.marble, 1.28);
+  cyl(0.44, 0.3, 0.16, 6, m.marble, 1.62);
+  cyl(0.22, 0.22, 0.42, 6, m.lampGlow, 1.91, { shadow: false });
+  for (let k = 0; k < 6; k++) { const a = (k / 6) * Math.PI * 2 + Math.PI / 6; box(0.07, 0.46, 0.07, m.marble, Math.cos(a) * 0.29, 1.91, Math.sin(a) * 0.29, L, { ry: -a }); }
+  cyl(0.36, 0.36, 0.05, 6, m.marble, 2.16);
+  mk(new THREE.ConeGeometry(0.66, 0.42, 6), m.marble, 0, 2.39, 0, L);
+  mk(new THREE.SphereGeometry(0.1, 10, 8), m.marble, 0, 2.66, 0, L);
+  mk(new THREE.ConeGeometry(0.06, 0.2, 6), m.marble, 0, 2.82, 0, L);
+  addLight(x, y + 1.95 * s, z, { color: '#ffb35c', power: 1.1 });
   addFootprint(L, { base: y });
 }
 
@@ -204,10 +213,10 @@ export function buildSect(scene, { ripple, onBig = null }) {
   root.userData.manq = manq;
   addSolidRectLocal(TANGY.x - 2.4, TANGY.z - 0.2, TANGY.x + 2.4, TANGY.z + 0.6);
   addGlow(m.lampGlow, { base: 0.4, night: 2.6, color: '#ffb050' });
-  MD.mergeStatic(deco);
+  span('sect:merge', () => MD.mergeStatic(deco));
 
   // --- model Meshy (bất đồng bộ) — tất cả vào lưới va chạm theo hình khối
-  (async () => {
+  const loaded = (async () => {
     // Sơn Môn + Hậu Môn: khoét lối giữa vòm cổng
     const big = (r) => { if (r?.obj && bigHook) bigHook(r.obj); return r; };
     big(await solid(await placeModel(root, 'gate_sect', { fit: { width: 30 }, at: { x: 0, y: 0, z: COURT.z1 + 1.2, ry: 0 } }), { keep: (x) => Math.abs(x) > 3.4 }));
@@ -243,5 +252,6 @@ export function buildSect(scene, { ripple, onBig = null }) {
     if (bl) addFootprint(bl, { hi: 1.3, ground: () => 0 });
   })().catch((e) => console.warn('[sect]', e));
 
-  return { root, pickables: pick, update: (t) => root.userData.manq?.userData.update(t) };
+  // `loaded`: mọi mô hình Meshy của sơn môn đã đặt xong (màn nạp chờ, có giới hạn thời gian)
+  return { root, pickables: pick, loaded, update: (t) => root.userData.manq?.userData.update(t) };
 }

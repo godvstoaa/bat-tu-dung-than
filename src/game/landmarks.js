@@ -6,14 +6,17 @@
 // ============================================================================
 import * as THREE from 'three';
 import * as T from './terrain.js';
-import { placeModel, instanceModel, instanceModelLod, loadModel, hasLod } from './assets.js';
+import { placeModel, instanceModel, instanceModelLod, loadModel, hasLod, warmObject } from './assets.js';
 import { rng } from './npc.js';
 import { stoneTex } from './textures.js';
+import { stoneMaterial } from './ground-tex.js';
 import { addBlock, addPlatform, cityWallBlocks, markTerraceEdges } from './obstacles.js';
 import { HALLS, PLACES } from './world.js';
 import { COURT } from './court.js';
 import { addLight, glowAll } from './lights.js';
 import { addFootprint } from './collide.js';
+import { CITY_R } from './roads.js';
+export { roadPath } from './roads.js';
 
 const H = (x, z) => T.heightAt(x, z);
 const R = (g) => T.REGIONS.find((r) => r.id === g);
@@ -38,7 +41,7 @@ const solidHouses = (grp) => grp && addFootprint(grp, { ground: H });
 const stoneMats = new Map();
 function stoneMat(rep) {
   const k = Math.round(rep);
-  if (!stoneMats.has(k)) { const t = stoneTex({ seed: 51, tiles: 4, repeat: [k, k], base: '#8d867b' }); stoneMats.set(k, new THREE.MeshStandardMaterial({ map: t, roughness: 0.9 })); }
+  if (!stoneMats.has(k)) stoneMats.set(k, stoneMaterial({ seed: 51, rows: 6, repeat: [k, k], base: '#8d867b' }));
   return stoneMats.get(k);
 }
 const trimMat = new THREE.MeshStandardMaterial({ color: '#d9a441', metalness: 0.7, roughness: 0.35 });
@@ -128,9 +131,9 @@ async function palaceComplex(g, { x, z, ry, scale = 1, main = ['palace_grand', '
 }
 
 // --- Huyền Thành: tường thành, thành môn, đại lộ có nhà hai bên, học cung phía Bắc
-const CITY_R = 158;
 function wallRing(g) {
-  const mat = stoneMat(4); const capM = new THREE.MeshStandardMaterial({ color: '#3a2a26', roughness: 0.7 });
+  const mat = stoneMaterial({ seed: 61, rows: 10, repeat: [3, 3], base: '#7e776c', grout: '#3e3933', roughness: 0.93 });
+  const capM = new THREE.MeshStandardMaterial({ color: '#3a2a26', roughness: 0.7 });
   const N = 64;
   // chặn kín vành tường: 3 khối/đoạn (giữa + 2 điểm lệch 1/6 vào hai đầu) — bước ~5,2 m
   // nhỏ hơn đường kính khối ~6,8 m nên khít, hết lỗ hở ~8 m ở mối nối của bản cũ;
@@ -178,7 +181,7 @@ const SPOTS = [
     for (const sx of [-1, 1]) { const t = local(p.x, p.z, ry, sx * 88, 40); await place(g, ['tower_nine', 'library_tower'], { fit: { height: 80 }, at: { x: t.x, y: top, z: t.z, ry } }); }
     solidTrees(await instanceModel(g, 'tree_pine', pinesNear(p.x, p.z, 300, 40, 11)));
   } },
-  { at: [640, -520], place: async (g) => { const p = R('manh'); await palaceComplex(g, { x: p.x, z: p.z, ry: faceTo(p.x, p.z, 0, 0), scale: 0.75 }); await placeModel(g, 'cauldron', { fit: { height: 22 }, at: { x: p.x + 70, y: H(p.x + 70, p.z + 60), z: p.z + 60, ry: 0 } }); solidTrees(await instanceModel(g, 'tree_pine', pinesNear(p.x, p.z, 320, 30, 12))); } },
+  { at: [640, -520], place: async (g) => { const p = R('manh'); await palaceComplex(g, { x: p.x, z: p.z, ry: faceTo(p.x, p.z, 0, 0), scale: 0.75 }); await place(g, 'cauldron', { fit: { height: 22 }, at: { x: p.x + 70, y: H(p.x + 70, p.z + 60), z: p.z + 60, ry: 0 } }); solidTrees(await instanceModel(g, 'tree_pine', pinesNear(p.x, p.z, 320, 30, 12))); } },
   { at: [-600, 600], place: async (g) => {
     const p = R('trichthien'); const ry = faceTo(p.x, p.z, 0, 0);
     const top = terrace(g, { x: p.x, z: p.z, ry, w: 120, d: 120, levels: 3, rise: 4 });
@@ -188,7 +191,7 @@ const SPOTS = [
   } },
   { at: [620, 620], place: async (g) => {
     const p = R('cungthong');
-    for (const [dx, dz] of [[-1, -1], [-1, 0.2], [0.2, -1]]) { const s = shore(p.x, p.z, dx, dz); await placeModel(g, 'tea_pavilion', { fit: { width: 34 }, at: { x: s.x, y: H(s.x, s.z), z: s.z, ry: faceTo(s.x, s.z, p.x, p.z) } }); }
+    for (const [dx, dz] of [[-1, -1], [-1, 0.2], [0.2, -1]]) { const s = shore(p.x, p.z, dx, dz); await place(g, 'tea_pavilion', { fit: { width: 34 }, at: { x: s.x, y: H(s.x, s.z), z: s.z, ry: faceTo(s.x, s.z, p.x, p.z) } }); }
     await instanceModel(g, 'boat', [[0, 0], [60, -40], [-50, 50], [90, 70], [-80, -60]].map(([dx, dz], i) => ({ x: p.x + dx, y: T.WATER - 0.6, z: p.z + dz, ry: i * 1.7, s: 12 })), { fitKey: 'max' });
   } },
   { at: [0, -700], place: async (g) => {
@@ -197,7 +200,7 @@ const SPOTS = [
     await place(g, ['tower_nine', 'library_tower'], { fit: { height: 112 }, at: { x: p.x, y: top, z: p.z, ry } });
     for (const sx of [-1, 1]) { const s = local(p.x, p.z, ry, sx * 42, 30); await place(g, 'library_tower', { fit: { height: 48 }, at: { x: s.x, y: top, z: s.z, ry } }); }
   } },
-  { at: [-820, 0], place: async (g) => { const p = R('phongthuy'); await palaceComplex(g, { x: p.x, z: p.z - 40, ry: faceTo(p.x, p.z, 0, 0), scale: 0.6 }); await placeModel(g, 'luopan_stand', { fit: { height: 18 }, at: { x: p.x, y: H(p.x, p.z + 50), z: p.z + 50, ry: faceTo(p.x, p.z + 50, 0, 0) } }); } },
+  { at: [-820, 0], place: async (g) => { const p = R('phongthuy'); await palaceComplex(g, { x: p.x, z: p.z - 40, ry: faceTo(p.x, p.z, 0, 0), scale: 0.6 }); await place(g, 'luopan_stand', { fit: { height: 18 }, at: { x: p.x, y: H(p.x, p.z + 50), z: p.z + 50, ry: faceTo(p.x, p.z + 50, 0, 0) } }); } },
   { at: [820, 0], place: async (g) => { const p = R('lichduong'); await palaceComplex(g, { x: p.x, z: p.z - 40, ry: faceTo(p.x, p.z, 0, 0), scale: 0.6 }); } },
   { at: [T.SKY_ISLAND.x, T.SKY_ISLAND.z], place: async (g) => {
     const s = T.SKY_ISLAND;
@@ -358,72 +361,35 @@ SPOTS.push({ at: [amvancoc.world.x, amvancoc.world.z], place: async (g) => {
   addFootprint(board, { hi: 1.6 });
 } });
 
-// ---------------------------------------------------------------------------
-// Đường đá: từ cửa nam Huyền Thành vòng quanh tường thành rồi toả tới từng sảnh nghề;
-// gặp dốc quá (> ~38°) thì dừng ở chân núi — lên đỉnh bằng trạm đi nhanh («Các gian»).
-// ---------------------------------------------------------------------------
-export function roadPath(tx, tz) {
-  const pts = [];
-  const R0 = 205, a0 = Math.PI / 2, a1 = Math.atan2(tz, tx);
-  pts.push([0, CITY_R + 8]);
-  let da = a1 - a0; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
-  const nArc = Math.max(1, Math.ceil(Math.abs(da) * R0 / 10));
-  for (let i = 0; i <= nArc; i++) { const a = a0 + da * i / nArc; pts.push([Math.cos(a) * R0, Math.sin(a) * R0]); }
-  const [sx, sz] = pts[pts.length - 1];
-  const L = Math.hypot(tx - sx, tz - sz), n = Math.ceil(L / 8);
-  const nx = -(tz - sz) / L, nz = (tx - sx) / L; // pháp tuyến ngang: uốn nhẹ cho tự nhiên
-  for (let i = 1; i <= n; i++) {
-    const t = i / n, bend = Math.sin(t * Math.PI) * 26 * T.fbm(tx / 300 + i * 0.02, tz / 300, 2);
-    const x = sx + (tx - sx) * t + nx * bend, z = sz + (tz - sz) * t + nz * bend;
-    if (Math.hypot(tx - x, tz - z) < 14) break; // chừa sân trước bàn
-    if (T.slopeAt(x, z) > 0.78) break;
-    pts.push([x, z]);
-  }
-  return pts;
-}
-const roadMat = new THREE.MeshStandardMaterial({ map: stoneTex({ seed: 23, tiles: 3, repeat: [1, 1], base: '#9a9184' }), roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
-roadMat.map.wrapS = roadMat.map.wrapT = THREE.RepeatWrapping;
-function roadMesh(pts, width = 5) {
-  const pos = [], uv = [], idx = [];
-  let dist = 0;
-  for (let i = 0; i < pts.length; i++) {
-    const [x, z] = pts[i];
-    const [ax, az] = pts[Math.max(0, i - 1)], [bx, bz] = pts[Math.min(pts.length - 1, i + 1)];
-    const tl = Math.hypot(bx - ax, bz - az) || 1, px = -(bz - az) / tl, pz = (bx - ax) / tl;
-    if (i) dist += Math.hypot(x - pts[i - 1][0], z - pts[i - 1][1]);
-    for (const side of [-1, 1]) {
-      const vx = x + px * side * width / 2, vz = z + pz * side * width / 2;
-      pos.push(vx, Math.max(H(vx, vz), T.WATER + 0.5) + 0.3, vz);
-      uv.push(side < 0 ? 0 : 1, dist / width);
-    }
-    if (i) { const k = i * 2; idx.push(k - 2, k - 1, k, k - 1, k + 1, k); }
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-  geo.setIndex(idx); geo.computeVertexNormals();
-  const m = new THREE.Mesh(geo, roadMat); m.receiveShadow = true; m.name = 'road';
-  return m;
-}
+// Đường đá: roads.js — vẽ thẳng vào địa hình (world3d.js), không còn dải mesh nổi.
 
 const LOD_UPDATERS = [];
 
 export function createLandmarks(scene) {
   const root = new THREE.Group(); root.name = 'landmarks'; scene.add(root);
-  for (const h of HALLS) if (h.region !== 'thanh') root.add(roadMesh(roadPath(h.world.x, h.world.z)));
   const done = new Set();
   let last = 0;
+  // khởi động nạp các vùng trong tầm; trả lời hứa của những vùng vừa khởi động
+  const start = (px, pz, R) => {
+    const ps = [];
+    SPOTS.forEach((s, i) => {
+      if (done.has(i) || Math.hypot(px - s.at[0], pz - s.at[1]) > R) return;
+      done.add(i);
+      // dựng xong + hâm nóng (biên dịch shader, đẩy texture) rồi MỚI đưa vào cảnh → vùng mới hiện ra
+      // không làm khựng khung hình (root ở gốc toạ độ nên ma trận thế giới không đổi khi gắn sau)
+      const g = new THREE.Group();
+      ps.push(s.place(g).then(() => warmObject(g)).then(() => root.add(g)).catch((e) => { console.warn('[landmarks]', e); root.add(g); }));
+    });
+    return ps;
+  };
   return {
     root,
+    /** Màn nạp: dựng trước các vùng gần (≤ R m) — vùng xa tiếp tục nạp nền khi đã vào game. */
+    prepare(px, pz, R = 320) { return Promise.all(start(px, pz, R)); },
     update(px, pz, now = performance.now()) {
       if (now - last < 1500) return; last = now;
       for (const u of LOD_UPDATERS) u(px, pz);
-      SPOTS.forEach((s, i) => {
-        if (done.has(i) || Math.hypot(px - s.at[0], pz - s.at[1]) > 900) return;
-        done.add(i);
-        const g = new THREE.Group(); root.add(g);
-        s.place(g).catch((e) => console.warn('[landmarks]', e));
-      });
+      start(px, pz, 900);
     },
   };
 }

@@ -6,6 +6,7 @@
 //  Đèn: addLight(..., { room }) → render3d gán đèn điểm khi người chơi ở trong điện.
 // ============================================================================
 import * as THREE from 'three';
+import { stoneMaterial } from './ground-tex.js';
 import * as TX from './textures.js';
 import { ROOMS, VAN_GATE_Z, VAN_STELE } from './world.js';
 import { roof } from './models.js';
@@ -19,7 +20,7 @@ import { createCharacter } from './characters.js';
 const M = {};
 function mats() {
   if (M.ready) return M;
-  M.floor = new THREE.MeshStandardMaterial({ map: TX.stoneTex({ seed: 41, tiles: 6, repeat: [6, 6], base: '#6d665c' }), roughness: 0.85 });
+  M.floor = stoneMaterial({ seed: 41, rows: 8, repeat: [6, 6], base: '#6d665c', roughness: 0.85 });
   M.wall = new THREE.MeshStandardMaterial({ map: TX.lacquerTex('#7a1c14', { seed: 9, gold: 0.25, repeat: [3, 1] }), roughness: 0.6 });
   M.dado = new THREE.MeshStandardMaterial({ color: '#2b1410', roughness: 0.7 });
   M.col = new THREE.MeshStandardMaterial({ map: TX.lacquerTex('#9c2318', { seed: 4, gold: 0.15 }), roughness: 0.45, metalness: 0.05 });
@@ -136,7 +137,7 @@ const TONE_COL = { cat: '#ffcf5a', thuan: '#ffb35c', binh: '#e8b070', nghich: '#
 function buildVanMenh(g, r, m, L) {
   const hd = r.d / 2;
   // lối đá giữa
-  const slab = new THREE.MeshStandardMaterial({ map: TX.stoneTex({ seed: 52, tiles: 2, repeat: [1, 18], base: '#8a8170' }), roughness: 0.85 });
+  const slab = stoneMaterial({ seed: 52, rows: 3, repeat: [1, 18], base: '#8a8170', roughness: 0.85 });
   box(4.2, 0.06, r.d - 8, slab, 0, 0.03, 1, g);
   const gates = [];
   for (let i = 0; i < 9; i++) {

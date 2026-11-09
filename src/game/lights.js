@@ -5,6 +5,8 @@
 //  Vật liệu phát sáng (đèn lồng GLB, nến) đăng ký để chỉnh độ sáng theo ngày/đêm.
 // ============================================================================
 
+import { warmObject } from './assets.js';
+
 export const LIGHTS = [];     // { x, y, z, color, power, room }
 export const GLOW_MATS = new Set();
 
@@ -29,4 +31,6 @@ export function addGlow(mat, { base = 0.35, night = 1.6, color = '#ffb070' } = {
 
 export function glowAll(obj, opts) {
   obj.traverse((o) => { if (o.isMesh) for (const m of [].concat(o.material)) addGlow(m, opts); });
+  // gắn emissiveMap đổi biến thể shader → biên dịch song song ngay, đừng đợi khung hình vẽ tới
+  warmObject(obj);
 }

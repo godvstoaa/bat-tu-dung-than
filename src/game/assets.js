@@ -5,11 +5,14 @@
 //  - instanceModel(...): mô hình lặp nhiều chỗ (nhà, cây) → InstancedMesh theo từng mesh con.
 // ============================================================================
 import * as THREE from 'three';
+import { span } from './perf.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 
 const loader = new GLTFLoader();
+// (không dùng MeshoptDecoder.useWorkers: worker của nó dựng từ Function.toString → bản build đã nén
+// tên hàm thì vỡ «workerProcess is not defined», giải nén treo vô hạn)
 loader.setMeshoptDecoder(MeshoptDecoder);
 const cache = new Map();
 
@@ -20,11 +23,19 @@ export const hasLod = (id) => HD_IDS.has(id) || id.startsWith('lib_');
 let modelQuality = 'mid';
 export function setModelQuality(q) { modelQuality = q; }
 
+// «Hâm nóng» trước khi đưa vào cảnh: biên dịch shader song song + đẩy texture lên GPU dần từng
+// khung (render3d.js gán) → mô hình nạp giữa lúc chơi không làm khựng khung hình.
+let warmHook = null;
+export function setWarmup(fn) { warmHook = fn; }
+async function warm(obj) { if (warmHook) { try { await warmHook(obj); } catch (e) { /* vẫn hiển thị */ } } }
+export const warmObject = warm;
+
 export function modelUrl(id) { return new URL(`models/${id}.glb`, document.baseURI).href; }
 
 export function loadModel(id) {
   if (!cache.has(id)) {
-    cache.set(id, loader.loadAsync(modelUrl(id)).then((g) => {
+    cache.set(id, fetch(modelUrl(id)).then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+      .then((buf) => new Promise((res, rej) => span('glb:' + id, () => loader.parse(buf, '', res, rej)))).then((g) => {
       g.scene.traverse((o) => {
         if (!o.isMesh) return;
         o.castShadow = true; o.receiveShadow = true;
@@ -62,6 +73,7 @@ export async function placeModel(parent, id, { fit = { max: 4 }, at = { x: 0, y:
   obj.updateMatrixWorld(true);
   const b = new THREE.Box3().setFromObject(obj);
   obj.position.set(at.x - (b.min.x + b.max.x) / 2, at.y - b.min.y, at.z - (b.min.z + b.max.z) / 2);
+  await warm(obj);
   parent.add(obj);
   return { obj, animations: g.animations };
 }
@@ -84,6 +96,7 @@ async function placeLod(parent, id, { fit, at, hd = true }) {
   lod.updateMatrixWorld(true);
   const b = new THREE.Box3().setFromObject(nearObj);
   lod.position.set(at.x - (b.min.x + b.max.x) / 2, at.y - b.min.y, at.z - (b.min.z + b.max.z) / 2);
+  await warm(lod);
   parent.add(lod);
   return { obj: lod, animations: [] };
 }
@@ -118,6 +131,7 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
     im.computeBoundingSphere();
     group.add(im);
   });
+  await warm(group);
   parent.add(group);
   return group;
 }
@@ -147,6 +161,7 @@ export async function instanceModelLod(parent, id, items, { fitKey = 'height', n
   const group = new THREE.Group();
   for (const m of N.meshes) group.add(m.im);
   if (F) for (const m of F.meshes) group.add(m.im);
+  await warm(group);
   parent.add(group);
   const M = new THREE.Matrix4(), base = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), one = new THREE.Vector3(1, 1, 1), P = new THREE.Vector3();
   const write = (set, list) => {
@@ -161,7 +176,9 @@ export async function instanceModelLod(parent, id, items, { fitKey = 'height', n
       im.count = list.length; im.instanceMatrix.needsUpdate = true; im.computeBoundingSphere();
     }
   };
-  let lastKey = '';
+  // null (không phải ''): lần đầu danh sách «gần» rỗng có khoá '' — so với '' sẽ bỏ qua lần ghi đầu,
+  // mọi bản sao ở lại count 0 → cắt lát va chạm thấy 0 nhà (cả dãy phố đi xuyên được)
+  let lastKey = null;
   const update = (px, pz) => {
     const nearL = [], farL = [];
     for (const it of items) (Math.hypot(it.x - px, it.z - pz) < near || !F ? nearL : farL).push(it);

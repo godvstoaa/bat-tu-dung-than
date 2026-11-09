@@ -76,9 +76,18 @@ export function markTerraceEdges(x, z, ry, w, d, { band = 0.5, stairW = 0 } = {}
 
 // Thân khách: tâm + 4 điểm lệch 0,3 m (đủ chặn tường mỏng một ô)
 const BODY = [[0, 0], [0.3, 0], [-0.3, 0], [0, 0.3], [0, -0.3]];
+// Nhân vật đứng yên (NPC, khách hỏi việc…): vòng chặn động, render3d cập nhật mỗi khung —
+// người chơi không còn đi xuyên / đứng chồng lên NPC
+let actors = [];
+export function setActors(list) { actors = list; }
+export function actorAt(x, z, pad = 0) {
+  for (const a of actors) { const r = a.r + pad; if ((x - a.x) ** 2 + (z - a.z) ** 2 < r * r) return a; }
+  return null;
+}
 export function blockedByBuilding(x, z) {
   for (const [dx, dz] of BODY) if (solidAt(x + dx, z + dz)) return true;
   for (const c of circles) if ((x - c.x) ** 2 + (z - c.z) ** 2 < c.r * c.r) return true;
+  if (actors.length && actorAt(x, z, 0.3)) return true;
   return false;
 }
 

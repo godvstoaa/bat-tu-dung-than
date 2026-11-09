@@ -3,6 +3,7 @@
 //  HUD, bảng. Gọi qua mount.js sau khi markup đã chèn vào DOM.
 //  Spec: docs/GAME-HUYEN-QUAN-SPEC.md · Kế hoạch: docs/GAME-MMO-PROMPT-PLAN.md
 // ============================================================================
+import { record } from './perf.js';
 import * as S from './state.js';
 import { STATIONS, START, findPath, stationAt, nearestStation, blockedAt, stationById } from './world.js';
 import { createRenderer, clientToTile, nightLevel as nightLevelOf, ROBE } from './render.js';
@@ -534,6 +535,7 @@ export function startGame({ onExit = null } = {}) {
 
   function loop(ts) {
     if (!renderer || paused) return;
+    const tLoop = performance.now();
     const dt = Math.min(0.05, lastTs ? (ts - lastTs) / 1000 : 0);
     lastTs = ts;
     step(dt);
@@ -559,6 +561,7 @@ export function startGame({ onExit = null } = {}) {
       cos: cosNow(),
       cases: [0, 1, 2].map((i) => ({ id: `an${i}`, npc: todayNpc(i), done: S.caseDone(state, i) })),
     }, dt);
+    record('loop', performance.now() - tLoop);
     raf = requestAnimationFrame(loop);
   }
 
@@ -694,16 +697,34 @@ export function startGame({ onExit = null } = {}) {
     $('hq-gate').hidden = true;
     $('hq-game').hidden = false;
     if (!renderer) {
-      $('hq-loading').hidden = false;
+      const ld = $('hq-loading');
+      ld.hidden = false;
       renderer = await createScene();
       syncRooms();
-      $('hq-loading').hidden = true;
+      // màn nạp thật: mọi việc nặng (sinh địa hình, nạp công trình gần, biên dịch shader, đẩy
+      // texture) xong rồi mới mở — vào game là mượt, không khựng dần trong nửa phút đầu
+      if (renderer.ready) {
+        const t0 = performance.now();
+        try { await renderer.ready((player.x - 10) * 1.6, (player.y - 7) * 1.6, (msg) => { ld.textContent = msg; }); } catch (e) { console.warn('[huyenquan] nạp trước lỗi, vào luôn:', e); }
+        console.info(`[huyenquan] nạp ${Math.round(performance.now() - t0)} ms`);
+      }
       $('hq-game').classList.toggle('is3d', renderer.mode === '3d');
     }
     paused = false;
     renderer.resize();
     refreshDay();
     startLoop();
+    // chạy vài khung sau màn nạp: những thứ dựng lười ở khung đầu (nhân vật, gia trì, phụ kiện…) biên dịch
+    // shader lúc màn còn che, rồi hâm nóng lại cả cảnh một lượt — mở màn là mượt ngay
+    const ld = $('hq-loading');
+    if (!ld.hidden && renderer.warmScene) {
+      ld.textContent = 'Sắp xong…';
+      const frames = (n) => new Promise((r) => { const f = () => (--n <= 0 ? r() : requestAnimationFrame(f)); requestAnimationFrame(f); });
+      await frames(10);
+      await renderer.warmScene();
+      await frames(3);
+    }
+    ld.hidden = true;
     net.start();
     updateOnline();
     canvas.focus({ preventScroll: true });
