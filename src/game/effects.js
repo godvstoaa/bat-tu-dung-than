@@ -132,7 +132,7 @@ export function createGiatri(wx, skins = {}) {
   // ngự vật: skin Tàng Y Các hoặc kiếm bay mặc định + mây
   const fly = add(new THREE.Group());
   const mount = skins.mount && skins.mount !== 'kiem' ? buildMount(skins.mount) : null;
-  if (mount) fly.add(mount);
+  if (mount) { fly.add(mount); mount.userData.setColor?.({ 木: '#7dffa8', 火: '#ff8a5c', 土: '#ffd36a', 金: '#f4f7ff', 水: '#7fc8ff' }[wx] || '#8fe3ff'); } // Ngũ Hành Dực: cánh theo hành
   else {
     loadModel('flying_sword').then((g) => {
       if (!g) return;

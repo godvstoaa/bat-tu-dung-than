@@ -5,7 +5,7 @@
 // ============================================================================
 import { DataUtils } from 'three';
 import { groundLayersData, paveData, waterNormalData } from './ground-tex.js';
-import { chunkData, treeList, depthData } from './terrain-mesh.js';
+import { chunkData, treeList, depthData, flowData } from './terrain-mesh.js';
 
 const OPS = {
   ground: ([S]) => groundLayersData(S),
@@ -14,6 +14,7 @@ const OPS = {
   chunk: ([cx, cz, seg]) => chunkData(cx, cz, seg),
   trees: () => treeList(),
   depth: ([DEP]) => ({ data: depthData(DEP, DataUtils.toHalfFloat), DEP }),
+  flow: ([N]) => ({ data: flowData(N), N }),
 };
 
 function buffers(res, out = []) {

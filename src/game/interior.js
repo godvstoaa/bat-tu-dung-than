@@ -116,7 +116,7 @@ async function buildRoom(root, r, updaters) {
     const q = { x: -hw + 8.5, z: 1 };
     placeModel(g.parent, 'scholar_desk', { fit: { width: 2.6 }, at: { ...L(q.x + 0.2, q.z), y: 0, ry: Math.PI / 2 } });
     { const w2 = L(q.x, q.z); addBlock(w2.x, w2.z, 1.1); }
-    createCharacter('master', { height: 1.85 }).then((ch) => {
+    createCharacter('master', {}).then((ch) => {
       if (!ch) return;
       const w2 = L(q.x - 1.1, q.z); ch.obj.position.set(w2.x, 0.05, w2.z); ch.obj.rotation.y = Math.PI / 2; ch.setBase('sit');
       root.add(ch.obj); updaters.push((dt) => ch.update(dt));
@@ -272,11 +272,17 @@ function buildThaiTue(g, r, m, L, az, top, aw, tz) {
   };
 }
 
-/** Dựng mọi điện (một lần). Trả { root, update(dt), setData({ van, thaitue }) }. */
+/** Dựng mọi điện — LƯỜI: lần đầu người chơi vào dải phòng phía Đông (ensure) mới dựng và nạp tượng thần
+ *  (2026-11-10: trước đây dựng ngay khi mở game → ~6 MB GLB tượng / điện trên màn nạp dù chưa vào điện nào).
+ *  Trả { root, ensure(), update(dt), setData({ van, thaitue }) }. */
 export function createInteriors(scene) {
   const root = new THREE.Group(); root.name = 'interiors'; scene.add(root);
   const updaters = [];
-  for (const r of ROOMS) if (hasStation(`door_${r.id}`)) buildRoom(root, r, updaters).catch((e) => console.warn('[interior]', r.id, e));
+  let built = false;
+  const ensure = () => {
+    if (built) return; built = true;
+    for (const r of ROOMS) if (hasStation(`door_${r.id}`)) buildRoom(root, r, updaters).catch((e) => console.warn('[interior]', r.id, e));
+  };
   let pending = null;
   const apply = () => {
     if (!pending) return;
@@ -285,6 +291,7 @@ export function createInteriors(scene) {
   };
   return {
     root,
+    ensure,
     update(dt) { for (const u of updaters) u(dt); apply(); },
     // dữ liệu cá nhân (lá số người chơi, Thái Tuế năm nay) → vẽ biển cổng, bia, bài vị, đèn
     setData(d) { pending = { ...(pending || {}), ...d }; apply(); },

@@ -13,7 +13,7 @@ import { rng } from './textures.js';
 export const GRASS_Q = {
   low: { n: 7000, blades: 4, r: 22, res: 72 },
   mid: { n: 16000, blades: 5, r: 30, res: 96 },
-  high: { n: 28000, blades: 6, r: 38, res: 120 },
+  high: { n: 18000, blades: 5, r: 34, res: 120 }, // 28000×6 ≈ 840k tam giác mỗi khung — quá nặng
 };
 const SEG = 3;          // đốt mỗi ngọn
 const MARGIN = 14;      // trường nướng rộng hơn bán kính cỏ để kịp nướng lại khi đi

@@ -28,6 +28,8 @@ if (/[^\x00-\x7f]/.test(ROOT)) {
   }
 }
 cfg.main = fwd(path.join(base, cfg.main));
+// máy dev: mã OTP trả thẳng trong phản hồi (không gửi email / SMS thật) — worker/auth.js
+cfg.vars = { ...(cfg.vars || {}), AUTH_DEV: '1' };
 if (cfg.assets) cfg.assets.directory = fwd(path.join(base, cfg.assets.directory));
 if (!fs.existsSync(cfg.assets?.directory || '')) console.warn('[dev-mmo] chưa có dist/ — chạy `npm run build` trước nếu cần phục vụ trang.');
 fs.writeFileSync(path.join(dir, 'wrangler.jsonc'), JSON.stringify(cfg, null, 2));

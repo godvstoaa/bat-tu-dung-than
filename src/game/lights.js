@@ -17,6 +17,9 @@ export function addLight(x, y, z, { color = '#ffb35c', power = 1, room = null } 
   return l;
 }
 
+/** Bỏ mọi đèn của một phòng (phòng nội thất dựng lười — rooms.js / interior-build.js giải phóng) */
+export function removeRoomLights(room) { for (let i = LIGHTS.length - 1; i >= 0; i--) if (LIGHTS[i].room === room) LIGHTS.splice(i, 1); }
+
 /** Vật liệu tự phát sáng: lấy màu (map) làm vùng phát sáng; độ mạnh theo đêm. */
 export function addGlow(mat, { base = 0.35, night = 1.6, color = '#ffb070' } = {}) {
   if (!mat || GLOW_MATS.has(mat)) return;

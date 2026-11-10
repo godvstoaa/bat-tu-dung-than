@@ -7,7 +7,10 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const LIB = path.join(ROOT, 'assets-meshy', 'library');
+// --set bq: model thành Bát Quái (assets-meshy/library/bq/<tên>.glb → public/models/bq_<tên>*.glb)
+const SET = process.argv.includes('--set') ? process.argv[process.argv.indexOf('--set') + 1] : '';
+const LIB = path.join(ROOT, 'assets-meshy', 'library', SET);
+const PREFIX = SET ? `${SET}_` : 'lib_';
 const OUT = path.join(ROOT, 'public', 'models');
 const TMP = path.join(LIB, '.tmp'); fs.mkdirSync(TMP, { recursive: true });
 const cli = path.join(ROOT, 'node_modules', '@gltf-transform', 'cli', 'bin', 'cli.js');
@@ -17,9 +20,9 @@ const run = (args) => execFileSync(NODE[0], [NODE[1], ...args], { stdio: 'pipe',
 const mb = (f) => (fs.statSync(f).size / 1048576).toFixed(2);
 // hd + thường giữ đường nối UV (texture sạch); lod gộp mạnh — chỉ thấy khi rất xa
 const LEVELS = [['.hd', 300000, 2048, 'auto'], ['', 80000, 1024, 'auto'], ['.lod', 12000, 512, '']];
-const ids = process.argv.slice(2);
+const ids = process.argv.slice(2).filter((a, i, all) => a !== '--set' && all[i - 1] !== '--set');
 for (const f of fs.readdirSync(LIB).filter((x) => x.endsWith('.glb') && (!ids.length || ids.includes(x.replace('.glb', ''))))) {
-  const id = 'lib_' + f.replace('.glb', '');
+  const id = PREFIX + f.replace('.glb', '');
   const src = path.join(LIB, f);
   const out = [];
   for (const [suf, tris, tex, mode] of LEVELS) {

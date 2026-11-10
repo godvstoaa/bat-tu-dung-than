@@ -4,7 +4,7 @@
 // ============================================================================
 import { DataUtils } from 'three';
 import { groundLayersData, paveData, waterNormalData, setGenerator } from './ground-tex.js';
-import { chunkData, treeList, depthData } from './terrain-mesh.js';
+import { chunkData, treeList, depthData, flowData } from './terrain-mesh.js';
 
 const LOCAL = {
   ground: ([S]) => groundLayersData(S),
@@ -13,6 +13,7 @@ const LOCAL = {
   chunk: ([cx, cz, seg]) => chunkData(cx, cz, seg),
   trees: () => treeList(),
   depth: ([DEP]) => ({ data: depthData(DEP, DataUtils.toHalfFloat), DEP }),
+  flow: ([N]) => ({ data: flowData(N), N }),
 };
 
 let worker = null, broken = typeof Worker === 'undefined';

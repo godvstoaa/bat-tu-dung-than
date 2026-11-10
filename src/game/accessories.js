@@ -287,6 +287,21 @@ const MOUNT = {
     return g;
   },
 };
+// Ngũ Hành Dực (P15): đôi cánh năng lượng sau lưng, đập nhịp, bụi sao — màu theo hành (đặt qua userData.setColor)
+MOUNT.duc = () => {
+  const g = new THREE.Group(), W = [];
+  const mat = new THREE.MeshBasicMaterial({ color: '#8fe3ff', transparent: true, opacity: 0.55, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending });
+  mat.userData.hqOwn = true;
+  for (const sx of [-1, 1]) {
+    const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.bezierCurveTo(sx * 0.6, 0.5, sx * 1.4, 0.7, sx * 1.6, 0.2); shape.bezierCurveTo(sx * 1.2, -0.1, sx * 0.9, -0.6, sx * 0.4, -0.8); shape.lineTo(0, 0);
+    const w = new THREE.Mesh(new THREE.ShapeGeometry(shape, 12), mat); const pv = new THREE.Group(); pv.position.set(sx * 0.12, 1.3, -0.18); pv.add(w); pv.userData.sx = sx; g.add(pv); W.push(pv);
+  }
+  const dust = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(Array.from({ length: 90 }, (_, i) => [(Math.sin(i * 12.9) * 1.4), 0.6 + Math.cos(i * 7.3) * 0.8, -0.3 - Math.abs(Math.sin(i * 3.1)) * 1.2]).flat(), 3)), new THREE.PointsMaterial({ color: '#fff6c8', size: 0.05, transparent: true, opacity: 0.8, depthWrite: false }));
+  dust.material.userData.hqOwn = true; g.add(dust);
+  g.userData.setColor = (c) => mat.color.set(c);
+  g.userData.animate = (t) => { const f = Math.sin(t * 3.2); W.forEach((w) => { w.rotation.y = -w.userData.sx * (0.25 + f * 0.35); w.rotation.z = w.userData.sx * f * 0.08; }); dust.rotation.y = t * 0.3; };
+  return g;
+};
 export const buildMount = (id) => (MOUNT[id] ? (mats(), MOUNT[id]()) : null);
 
 // ---------------------------------------------------------------------------

@@ -88,6 +88,10 @@ export function createState(now = new Date()) {
     vip: null,      // { until, source } — quyền lợi VIP
     thaitue: null,  // { year, day, days } — đèn an Thái Tuế (lightLamp)
     wardrobe: null, // Tàng Y Các: { owned, equipped, ngoc, checkin, bonus } — cosmetics.js
+    life: null,     // sinh tồn + Văn: { full, wake, hp, van, bed, … } — life.js › lifeState
+    cloud: null,    // tài khoản: { uid, rev, at } bản lưu đám mây đã đồng bộ — account.js (chỉ trên máy)
+    law: null,      // Huyền Thành Luật: { record, sentence } — law.js › lawState
+    home: null,     // Thành Bát Quái: { inv, own, buffs, plants, spawn } — items.js › homeState
   };
 }
 
@@ -157,6 +161,19 @@ export function grantDaily(s, key, now = new Date()) {
   s.daily.got[key] = true;
   return addPhuc(s, REWARD[key] || 0);
 }
+
+// Thưởng ở nhà / trong thành (thắp hương bàn thờ, pha trà, đọc sách, tưới cây…): mỗi khoá một lần
+// mỗi ngày, số Phúc Khí do bên gọi tính (homefs.warmReward…) — kẹp 0..20 / lần.
+export const HOME_DAILY_CAP = 40;
+export function grantHome(s, key, amount, now = new Date()) {
+  rollDay(s, now);
+  const k = `home:${key}`;
+  if (s.daily.got[k]) return 0;
+  const used = s.daily.homeGain || 0, n = Math.max(0, Math.min(20, Math.round(amount), HOME_DAILY_CAP - used));
+  s.daily.got[k] = true; s.daily.homeGain = used + n;
+  return addPhuc(s, n);
+}
+export const homeGot = (s, key) => !!s.daily.got[`home:${key}`];
 
 // Khóa sinh hồ sơ «năm-tháng-ngày-giờ-phút-giới tính» — thưởng lá số gắn với bát tự,
 // không với id hồ sơ: xoá rồi tạo lại cùng người không được +10 lần hai.
@@ -359,6 +376,8 @@ export function recordCase(s, { kind, slot, id, name, total, mastery }, now = ne
   }
   // «Hợp mệnh»: mặc đủ bộ ngũ hành trùng Dụng thần → +10% (cosmetics.js › setBonus)
   if (gained > 0 && s.wardrobe?.bonus) gained = Math.round(gained * (1 + s.wardrobe.bonus));
+  // Thanh Tâm Đan (items.js › useBuff 'buff_case'): +25% trong ngày đã uống
+  if (gained > 0 && s.home?.buffs?.case?.date === s.daily.date) gained = Math.round(gained * 1.25);
   // trần thưởng án mỗi ngày: vượt cap thì chỉ nhận phần còn thừa (reset theo daily)
   if (gained > 0) {
     s.daily.caseGain = s.daily.caseGain || 0;

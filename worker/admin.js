@@ -429,6 +429,13 @@ export async function handleAdminRoute(request, env, url) {
       return new Response(_d.body, { status: _d.status, headers: _h });
     }
     if (path === apDash + 'api/stats') { try { return await adminStats(env, url); } catch (e) { return json({ error: e.message }, 500); } }
+    // Kinh tế Phần II (§20.3): dòng tiền bơm / hút, giá tham chiếu, quán; hàng đợi duyệt lời luận thầy mệnh lý (§14.4 lớp 2)
+    if (path === apDash + 'api/econ' && env.ECONOMY) {
+      const ec = env.ECONOMY.get(env.ECONOMY.idFromName('economy'));
+      if (method === 'POST') { const b = await request.json().catch(() => ({})); return json(await ec.call('dv_review', '_admin', { id: String(b.id || ''), fraud: !!b.fraud }, { admin: true })); }
+      const [stats, queue] = await Promise.all([ec.call('stats', '_admin', {}, { admin: true }), ec.call('dv_review', '_admin', {}, { admin: true })]);
+      return json({ ok: true, stats, queue: queue.queue || [] });
+    }
     // [R46] admin xem error log (AI tự log khi luận sai)
     if (path === apDash + 'api/error-log' && method === 'GET') {
       try {

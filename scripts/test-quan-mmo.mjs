@@ -2,6 +2,8 @@
 // Cần `npm run dev:mmo` đang chạy (cổng 8788). Chạy: node scripts/test-quan-mmo.mjs [ws://127.0.0.1:8788]
 import assert from 'node:assert/strict';
 import { ROOM_CAP, CLOSE_SPAM, CLOSE_FULL } from '../src/game/protocol.js';
+import { encodeLayout, LISTING_COUNT } from '../src/game/estate-core.js';
+import { workplaces, CMINE } from '../src/game/guild-core.js';
 
 const BASE = process.argv[2] || 'ws://127.0.0.1:8788';
 // mỗi lần chạy dùng dải phòng riêng để không đụng dữ liệu lần trước
@@ -111,6 +113,35 @@ try {
     send(b, { t: 'stand' });
   });
 
+  await step('lư hương chung: thắp phát cho cả phòng, lư lớn trước, mỗi người một tuần nhang; người vào sau thấy nhang đang cháy', async () => {
+    send(a, { t: 'inc' });
+    const ia = await wait(b, (m) => m.t === 'inc');
+    assert.equal(ia.k, 0); assert.equal(ia.ago, 0);
+    await wait(a, (m) => m.t === 'inc');
+    a.inbox = a.inbox.filter((m) => m.t !== 'inc'); b.inbox = b.inbox.filter((m) => m.t !== 'inc');
+    send(a, { t: 'inc' }); // đang cháy → bỏ qua
+    await sleep(300);
+    assert.ok(!b.inbox.some((m) => m.t === 'inc'), 'một người không thắp chồng');
+    const c = await client(R0, 'Khách Hương');
+    const w = await hello(c);
+    assert.ok(Array.isArray(w.inc) && w.inc.some(([k, ago]) => k === 0 && ago >= 0 && ago < 60000));
+    c.ws.close();
+    await wait(a, (m) => m.t === 'leave' && m.id === w.you);
+    a.inbox = a.inbox.filter((m) => m.t !== 'join' && m.t !== 'leave' && m.t !== 'count'); // không để gói của khách thử lẫn sang bước sau
+  });
+
+  await step('kinh tế (Economy DO): khách gửi tiền có trần, chống gửi trùng, mua → nấu → ăn; mã gói q không bị trường kết quả đè; khách không ký gửi được', async () => {
+    const ask = async (op, x = {}) => { const q = 900 + Math.floor(Math.random() * 1e5); send(a, { t: 'ec', op, a: x, q }); return wait(a, (m) => m.t === 'ec_res' && m.q === q, 6000); };
+    assert.match((await ask('deposit', { xu: 40000, k: 'big' })).err, /300 đồng/);
+    assert.ok((await ask('deposit', { xu: 20000, k: 'd1' })).ok);
+    assert.ok((await ask('deposit', { xu: 20000, k: 'd1' })).dup);
+    assert.ok((await ask('th_buy', { id: 'gao', n: 1, k: 'b1' })).ok);
+    const ck = await ask('th_buy', { id: 'rau', n: 1, k: 'b2' }); assert.ok(ck.ok);
+    const c2 = await ask('cook', { id: 'chao_rau', score: 0.8 }); assert.ok(c2.ok && c2.n === 3 && c2.qual > 0 && c2.qual <= 1, JSON.stringify(c2).slice(0, 200));
+    const e = await ask('eat', { i: c2.inv.findIndex((s) => s.id === 'chao_rau') }); assert.ok(e.ok && e.full > 0);
+    assert.match((await ask('mk_post', { i: 0, n: 1, price: 300 })).err, /đăng nhập/);
+  });
+
   await step('tên thô tục bị đổi thành «Khách»', async () => {
     const c = await client(R0, 'đéo ai');
     const w = await hello(c);
@@ -142,6 +173,80 @@ try {
     for (let i = 0; i < 60 && s.closed == null; i++) await sleep(50);
     assert.equal(s.closed, CLOSE_SPAM);
   });
+
+  // --- Nhà riêng Thành Bát Quái (Estate DO dùng chung mọi shard)
+  {
+    const ea = await client(R0 + 4, 'Chủ'); await hello(ea);
+    const eb = await client(R0 + 4, 'Khách'); await hello(eb);
+    let q = 100;
+    const ask = async (c, o) => { const id = ++q; send(c, { ...o, q: id }); return wait(c, (m) => m.t === 'est_res' && m.q === id); };
+    const lst = await ask(ea, { t: 'est_list' });
+    const free = [...Array(LISTING_COUNT).keys()].filter((h) => !lst.list.some(([x]) => x === h));
+    assert.ok(free.length >= 2, 'cần ≥ 2 căn trống (xoá .wrangler state nếu đầy)');
+    const [h1, h2] = free;
+    await step('nhà: mua căn trống được; người thứ hai mua cùng căn → taken; mỗi người một căn → limit', async () => {
+      const r = await ask(ea, { t: 'est_claim', h: h1 }); assert.equal(r.ok, true);
+      const up = await wait(eb, (m) => m.t === 'est_up' && m.h === h1); assert.equal(up.name, 'Chủ');
+      assert.equal((await ask(eb, { t: 'est_claim', h: h1 })).err, 'taken');
+      assert.equal((await ask(ea, { t: 'est_claim', h: h2 })).err, 'limit');
+      const l2 = await ask(ea, { t: 'est_list' }); assert.equal(l2.mine, h1); assert.ok(l2.list.some(([x, n]) => x === h1 && n === 'Chủ'));
+    });
+    const it = encodeLayout([{ u: 1, i: 'ban_tho', x: 0, z: -3, r: 0 }, { u: 2, i: 'ban_tra', x: 2.5, z: -0.5, r: 0 }]);
+    await step('nhà: người không phải chủ không lưu được; chủ lưu bố cục → khách est_get thấy đúng', async () => {
+      assert.equal((await ask(eb, { t: 'est_save', h: h1, it, c: 2 })).err, 'notowner');
+      assert.equal((await ask(ea, { t: 'est_save', h: h1, it, c: 2 })).ok, true);
+      const g = await ask(eb, { t: 'est_get', h: h1 }); assert.equal(g.it, it); assert.equal(g.c, 2); assert.equal(g.name, 'Chủ');
+    });
+    await step('nhà: bố cục sai (đè nhau / ra ngoài phòng) bị máy chủ bỏ, không trả lời', async () => {
+      const bad = encodeLayout([{ u: 1, i: 'ban_tho', x: 0, z: -3, r: 0 }, { u: 2, i: 'ban_tho', x: 0.5, z: -3, r: 0 }]);
+      send(ea, { t: 'est_save', h: h1, it: bad, c: 0, q: 9999 });
+      await sleep(400); assert.ok(!ea.inbox.some((m) => m.q === 9999));
+      const g = await ask(eb, { t: 'est_get', h: h1 }); assert.equal(g.it, it);
+    });
+    await step('nhà: khen mỗi người một lần, chủ không tự khen; bán lại → căn trống', async () => {
+      const k1 = await ask(eb, { t: 'est_like', h: h1 }); assert.equal(k1.ok, true); assert.equal(k1.likes, 1);
+      assert.equal((await ask(eb, { t: 'est_like', h: h1 })).err, 'dup');
+      assert.equal((await ask(ea, { t: 'est_like', h: h1 })).err, 'self');
+      assert.equal((await ask(eb, { t: 'est_release', h: h1 })).err, 'notowner');
+      assert.equal((await ask(ea, { t: 'est_release', h: h1 })).ok, true);
+      assert.equal((await ask(eb, { t: 'est_get', h: h1 })).err, 'empty');
+      const l3 = await ask(ea, { t: 'est_list' }); assert.equal(l3.mine, null);
+    });
+    ea.ws.close(); eb.ws.close();
+  }
+
+  // --- Việc làm (Guild DO, P2): máy chủ giữ chỗ, kiểm vị trí theo toạ độ nó biết, chặn làm vội
+  {
+    const wa = await client(R0 + 5, 'Thợ'); await hello(wa);
+    let q = 500;
+    const ask = async (o) => { const id = ++q; send(wa, { ...o, q: id }); return wait(wa, (m) => m.t === 'job_res' && m.q === id); };
+    const tile = (p) => ({ x: p.x / 1.6 + 10, y: p.z / 1.6 + 7 });
+    const taverns = [...workplaces().values()].filter((w) => w.type === 'tuu');
+    await step('việc làm: job_me có hồ sơ nghề mới (uy tín 50); bảng Chiêu công tửu lâu 3·3·1·1 chỗ', async () => {
+      const me = await ask({ t: 'job_me' }); assert.equal(me.ok, true); assert.equal(me.career.rep, 50); assert.equal(me.shift, null);
+      const b = await ask({ t: 'job_board', k: taverns[0].k }); assert.equal(b.ok, true); assert.deepEqual(b.layout, [3, 3, 1, 1]);
+    });
+    let k = null;
+    await step('việc làm: xin chỗ Học việc; đứng ngoài tiệm thì không vào ca được (far); vào tiệm thì vào ca, làm vội bị chặn', async () => {
+      for (const w of taverns) { const r = await ask({ t: 'job_apply', k: w.k, r: 0, y: { primary: '火', accent: '木', ji: '水' } }); if (r.ok) { k = w.k; break; } assert.equal(r.err, 'full'); }
+      assert.ok(k != null, 'mọi tửu lâu hết chỗ Học việc (xoá .wrangler state)');
+      assert.equal((await ask({ t: 'job_start', job: 'bep', k })).err, 'far');
+      const room = workplaces().get(k).room, t = tile(room);
+      send(wa, { t: 'tp', x: t.x, y: t.y });
+      const s = await ask({ t: 'job_start', job: 'bep', k }); assert.equal(s.ok, true, s.err); assert.equal(s.shift.rel, 'dung'); assert.ok(s.shift.task.seed > 0);
+      const f = await ask({ t: 'job_task', seed: s.shift.task.seed, sc: 0.7 }); assert.equal(f.err, 'fast');
+      const e = await ask({ t: 'job_end' }); assert.equal(e.ok, true); assert.equal(e.quit, true); assert.equal(e.paid, 0);
+      const qq = await ask({ t: 'job_quit' }); assert.equal(qq.ok, true);
+    });
+    await step('việc làm: thợ mỏ không cần chỗ, phải đứng trong mỏ dân sự; mạch quặng có sổ', async () => {
+      const t = tile({ x: CMINE.x, z: CMINE.z }); send(wa, { t: 'tp', x: t.x, y: t.y });
+      const s = await ask({ t: 'job_start', job: 'mo' }); assert.equal(s.ok, true, s.err);
+      const o = await ask({ t: 'job_ores' }); assert.equal(o.ok, true); assert.equal(Object.keys(o.ores).length, 10);
+      const e = await ask({ t: 'job_end' }); assert.equal(e.ok, true);
+      assert.equal((await ask({ t: 'job_start', job: 'xx' }).catch(() => ({ err: 'dropped' }))).err, 'dropped');
+    });
+    wa.ws.close();
+  }
 
   await step(`phòng đầy ${ROOM_CAP} người → người tiếp theo nhận full (4001)`, async () => {
     const room = R0 + 2;

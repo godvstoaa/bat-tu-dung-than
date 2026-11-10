@@ -478,12 +478,14 @@ function openHuong(api) {
   }
   $('light').onclick = () => {
     const r = S.lightIncense(state);
+    if (r.ok) api.lightIncense?.();
     if (r.ok) { bell(392, 0.15); api.after(r.gained, 'thắp nhang'); }
     update();
   };
   update();
   const iv = setInterval(update, 1000);
   api.onClose(body, () => clearInterval(iv));
+  api.meritBody && body.append(api.meritBody('huong'));
   return body;
 }
 
@@ -646,6 +648,7 @@ function openSen(api) {
     if (r.ok) { bell(587, 0.1); api.after(r.gained, 'thả đèn'); }
     api.panel.open({ title: 'Hồ Sen', body: el(`<div><p>Ngọn đèn chạm mặt nước, chầm chậm trôi ra giữa hồ.</p><p class="hq-poem">“${esc(wish)}”</p></div>`) });
   };
+  api.meritBody && body.append(api.meritBody('sen'));
   return body;
 }
 

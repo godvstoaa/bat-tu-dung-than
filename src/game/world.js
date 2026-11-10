@@ -6,9 +6,12 @@
 // ============================================================================
 
 import { hasStation, TEXT } from './features.js';
-import { walkable } from './terrain.js';
-import { blockedByBuilding, platformTop } from './obstacles.js';
+import { walkable, SCALE, ROOM_X0 } from './terrain.js';
+import { inCanal, extNear, EXT_HW } from './canals.js';
+import { blockedByBuilding, platformTop, reserveClear } from './obstacles.js';
 import { COURT_STATIONS, START_M, toTile } from './court.js';
+import { enterables, doorNear, houseAt, doorOfRoom } from './homes.js';
+import { roomByKey, roomAtDyn, insideOf, exitOf, spotNear, roomSpots, openSpotNear } from './rooms.js';
 
 // Bản 2D dự phòng (render.js) vẫn vẽ sân cũ 20×14 ô
 export const COLS = 20;
@@ -39,15 +42,16 @@ const ALL_STATIONS = Object.keys(NAMES).map((id) => {
 });
 
 // Sảnh nghề ngoài thế giới (docs/GAME-NOI-DUNG-THEO-APP.md) — world: toạ độ mét (khớp terrain.js › CLEARINGS)
+const TS = SCALE; // thế giới v3 phóng ×1,6 (terrain.js) — toạ độ cũ × TS, khớp terrain.CLEARINGS
 export const HALLS = [
-  { id: 'trach', region: 'lichduong', name: 'Sảnh Trạch Nhật', verb: 'Chọn ngày cho khách', world: { x: 735, z: -36 } },
-  { id: 'duongtrach', region: 'phongthuy', name: 'Sảnh Dương Trạch', verb: 'Xem nhà cho khách', world: { x: -806, z: 62 } },
-  { id: 'dieuhau', region: 'cungthong', name: 'Sảnh Điều Hậu', verb: 'Xem khí hậu lá số', world: { x: 480, z: 420 } },
-  { id: 'thuvien', region: 'thulau', name: 'Thư Lâu', verb: 'Đọc tầng thư hôm nay', world: { x: 0, z: -630 } },
+  { id: 'trach', region: 'lichduong', name: 'Sảnh Trạch Nhật', verb: 'Chọn ngày cho khách', world: { x: 735 * TS, z: -36 * TS } },
+  { id: 'duongtrach', region: 'phongthuy', name: 'Sảnh Dương Trạch', verb: 'Xem nhà cho khách', world: { x: -806 * TS, z: 62 * TS } },
+  { id: 'dieuhau', region: 'cungthong', name: 'Sảnh Điều Hậu', verb: 'Xem khí hậu lá số', world: { x: 480 * TS, z: 420 * TS } },
+  { id: 'thuvien', region: 'thulau', name: 'Thư Lâu', verb: 'Đọc tầng thư hôm nay', world: { x: 0 * TS, z: -630 * TS } },
   { id: 'hophon', region: 'thanh', name: 'Bàn Hợp Hôn', verb: 'Xem hợp hôn (án chung)', world: { x: -48, z: 8 } },
-  { id: 'tuvi', region: 'trichthien', name: 'Sảnh Tử Vi', verb: 'An sao Tử Vi', world: { x: -567, z: 503 } },
-  { id: 'tuongphap', region: 'manh', name: 'Sảnh Tượng Pháp', verb: 'Đọc tượng Manh phái', world: { x: 654, z: -441 } },
-  { id: 'cachcuc', region: 'tubinh', name: 'Sảnh Cách Cục', verb: 'Định cách cục', world: { x: -521, z: -538 } },
+  { id: 'tuvi', region: 'trichthien', name: 'Sảnh Tử Vi', verb: 'An sao Tử Vi', world: { x: -567 * TS, z: 503 * TS } },
+  { id: 'tuongphap', region: 'manh', name: 'Sảnh Tượng Pháp', verb: 'Đọc tượng Manh phái', world: { x: 654 * TS, z: -441 * TS } },
+  { id: 'cachcuc', region: 'tubinh', name: 'Sảnh Cách Cục', verb: 'Định cách cục', world: { x: -521 * TS, z: -538 * TS } },
 ];
 for (const h of HALLS) {
   const t = toTile(h.world.x, h.world.z);
@@ -71,23 +75,23 @@ export const PLACES = [
 // (trên biển mây — ra khỏi sàn là chạm nước). Cửa ngoài thế giới «door», lối ra trong điện «exit».
 // Toạ độ mét; tâm điện = origin, lối vào ở phía +z, bàn thờ phía −z.
 // ---------------------------------------------------------------------------
+const RX = ROOM_X0; // dải phòng (terrain.js) — điện thờ ở hàng z = 0, phòng lưới rooms.js ở z ≤ −230
 export const ROOMS = [
-  { id: 'chinhdien', name: 'Chính Điện Tam Thanh', region: 'thanh', door: { x: 0, z: -84 }, origin: { x: 1500, z: 0 }, w: 34, d: 28, h: 14,
+  { id: 'chinhdien', name: 'Chính Điện Tam Thanh', region: 'thanh', door: { x: 0, z: -84 }, origin: { x: RX + 245, z: 0 }, w: 34, d: 28, h: 14,
     deities: [['deity_lingbao', -6.5], ['deity_yuanshi', 0], ['deity_daode', 6.5]], npc: 'que' },
-  { id: 'vanxuong', name: 'Văn Xương Các', region: 'thulau', door: { x: 0, z: -652 }, origin: { x: 1600, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_wenchang', 0]] },
-  { id: 'daumau', name: 'Đẩu Mẫu Điện', region: 'trichthien', door: { x: -566, z: 566 }, origin: { x: 1700, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_doumu', 0]] },
-  { id: 'laoquan', name: 'Lão Quân Điện', region: 'tubinh', door: { x: -564, z: -510 }, origin: { x: 1800, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_daode', 0]] },
+  { id: 'vanxuong', name: 'Văn Xương Các', region: 'thulau', door: { x: 0 * TS, z: -652 * TS }, origin: { x: RX + 345, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_wenchang', 0]] },
+  { id: 'daumau', name: 'Đẩu Mẫu Điện', region: 'trichthien', door: { x: -566 * TS, z: 566 * TS }, origin: { x: RX + 445, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_doumu', 0]] },
+  { id: 'laoquan', name: 'Lão Quân Điện', region: 'tubinh', door: { x: -564 * TS, z: -510 * TS }, origin: { x: RX + 545, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_daode', 0]] },
   // Sơn Môn: cửa trước mặt hai điện phụ (sect.js) — Tây: hành lang đại vận; Đông: Thái Tuế (web, iOS tắt)
-  { id: 'vanmenh', name: 'Vận Mệnh Các', region: 'thanh', door: { x: -38.6, z: -40 }, origin: { x: 1900, z: 0 }, w: 20, d: 72, h: 11, deities: [], kind: 'vanmenh' },
-  // x=1850 nằm trong biên server (maxX 1210 ô = 1920 m — protocol.js bỏ gói mv vượt biên;
-  // x=2000 cũ = 1260 ô, đi trong điện gửi mv bị vứt). Cách Lão Quân Điện (1800, mép 1812)
-  // và Vận Mệnh Các (1900, mép 1890) để các điện không chồng hình lên nhau.
-  { id: 'thaitue', name: 'Thái Tuế Điện', region: 'thanh', door: { x: 38.6, z: -40 }, origin: { x: 1850, z: 0 }, w: 28, d: 24, h: 13, deities: [], kind: 'thaitue' },
+  { id: 'vanmenh', name: 'Vận Mệnh Các', region: 'thanh', door: { x: -38.6, z: -40 }, origin: { x: RX + 645, z: 0 }, w: 20, d: 72, h: 11, deities: [], kind: 'vanmenh' },
+  // phải nằm trong biên server (protocol.WORLD_TILES theo ROOM_X1); cách Lão Quân Điện và Vận Mệnh Các
+  // để các điện không chồng hình lên nhau.
+  { id: 'thaitue', name: 'Thái Tuế Điện', region: 'thanh', door: { x: 38.6, z: -40 }, origin: { x: RX + 595, z: 0 }, w: 28, d: 24, h: 13, deities: [], kind: 'thaitue' },
 ];
 // Vận Mệnh Các: bia tổng quan ở lối vào + 9 cổng đại vận dọc lối giữa (vanmenh.js › VAN_GATES)
 export const VAN_GATE_Z = (i) => 25 - i * 6; // toạ độ z cổng i so với tâm điện (cổng 9 ở −23, trước bàn lễ)
 export const VAN_STELE = { x: -5.5, z: 29.5 };
-export const roomAt = (x, z) => ROOMS.find((r) => Math.abs(x - r.origin.x) <= r.w / 2 + 1 && Math.abs(z - r.origin.z) <= r.d / 2 + 1) || null;
+export const roomAt = (x, z) => ROOMS.find((r) => Math.abs(x - r.origin.x) <= r.w / 2 + 1 && Math.abs(z - r.origin.z) <= r.d / 2 + 1) || roomAtDyn(x, z);
 for (const r of ROOMS) {
   const inside = toTile(r.origin.x, r.origin.z + r.d / 2 - 3.2);
   const exitW = { x: r.origin.x, z: r.origin.z + r.d / 2 - 1.2 };
@@ -109,14 +113,71 @@ for (const r of ROOMS) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// CỬA TRONG THÀNH (homes.js) + PHÒNG LƯỚI (rooms.js): trạm ẢO (không nằm trong STATIONS — hơn 2.000
+// cửa): nearestStation / stationAt / stationById tra theo homes.js / rooms.js.
+//   door:<i>   cửa vào phòng (cửa hàng, nhà rao bán / nhà riêng, điện)    → kind 'door'
+//   knock:<i>  nhà dân đóng cửa — gõ cửa                                   → kind 'knock'
+//   exit:<key> lối ra phòng, về đúng cửa ngoài phố                         → kind 'exit'
+//   spot:<key>|<id>  điểm tương tác trong phòng (hàng, chủ tiệm, đồ nhà)  → kind 'spot'
+// ---------------------------------------------------------------------------
+const VIRT = new Map();
+let doorVerbHook = null;
+/** main.js đặt: nhãn cửa nhà riêng theo trạng thái máy chủ (rao bán / của bạn / nhà người khác) */
+export function setDoorVerbHook(fn) { doorVerbHook = fn; }
+function doorStation(e) {
+  const id = e.kind === 'knock' ? `knock:${e.i}` : `door:${e.i}`;
+  if (!VIRT.has(id)) {
+    const t = toTile(e.door.x, e.door.z), base = { id, name: e.name, block: [], world: e.door, spot: t, label: t, enter: e };
+    if (e.kind === 'knock') VIRT.set(id, { ...base, kind: 'knock', verb: `Gõ cửa ${e.name}` });
+    else {
+      const r = roomByKey(e.key), inn = insideOf(r);
+      VIRT.set(id, { ...base, kind: 'door', room: e.key, home: e.kind !== 'temple', to: toTile(inn.x, inn.z),
+        get verb() { return (e.kind === 'est' && doorVerbHook?.(e)) || (e.kind === 'est' ? `Xem nhà rao bán · ${e.name}` : `Vào ${e.name}`); } });
+    }
+  }
+  return VIRT.get(id);
+}
+function exitStation(key) {
+  const id = `exit:${key}`;
+  if (!VIRT.has(id)) {
+    const r = roomByKey(key); if (!r) return null;
+    const e = doorOfRoom(key), w = exitOf(r), t = toTile(w.x, w.z);
+    const out = e ? toTile(e.back.x, e.back.z) : START;
+    VIRT.set(id, { id, kind: 'exit', room: key, name: r.title, verb: r.kind === 'temple' ? `Ra khỏi ${r.title}` : 'Ra phố', block: [], world: w, spot: t, label: t, to: out, home: r.kind !== 'temple' });
+  }
+  return VIRT.get(id);
+}
+const SPOT_ST = new WeakMap();
+function spotStation(key, s) {
+  if (!SPOT_ST.has(s)) { const t = toTile(s.x, s.z); SPOT_ST.set(s, { id: `spot:${key}|${s.id}`, kind: 'spot', room: key, data: s, name: s.name, verb: s.verb, block: [], world: { x: s.x, z: s.z }, spot: t, label: t }); }
+  return SPOT_ST.get(s);
+}
+/** Trạm ảo trong phòng lưới tại (x, z) mét: điểm tương tác gần nhất hoặc lối ra */
+function roomStationNear(x, z, exitR = 1.4) {
+  const r = roomAtDyn(x, z); if (!r) return undefined;
+  const s = spotNear(x, z);
+  const ex = exitOf(r), de = Math.hypot(ex.x - x, ex.z - z);
+  if (s && Math.hypot(s.x - x, s.z - z) <= de) return spotStation(r.key, s);
+  if (de <= exitR) return exitStation(r.key);
+  return s ? spotStation(r.key, s) : null;
+}
+const U_TILE = 1.6;
+const tileW = (p) => ({ x: (p.x - 10) * U_TILE, z: (p.y - 7) * U_TILE });
+
 // Gian bật theo bản build (iOS tắt gian bói). Vật cản vẫn tính đủ mọi công trình.
 export const STATIONS = ALL_STATIONS
   .filter((s) => hasStation(s.id))
   .map((s) => (s.id === 'huong' ? { ...s, name: TEXT.huong, verb: TEXT.huongVerb } : s));
 
 export const START = toTile(START_M.x, START_M.z);
+// chỗ đứng của mọi trạm / cửa: phần lấp đặc công trình lớn chừa trống bán kính 3,5 m (vẫn tới được — cửa điện phụ nằm trong hốc hiên sâu ~3 m)
+for (const s of ALL_STATIONS) if (s.spot) reserveClear((s.spot.x - 10) * 1.6, (s.spot.y - 7) * 1.6, 3.5);
 
 export function stationById(id) {
+  if (id.startsWith('door:') || id.startsWith('knock:')) { const e = enterables()[Number(id.slice(id.indexOf(':') + 1))]; return e ? doorStation(e) : null; }
+  if (id.startsWith('exit:')) return exitStation(id.slice(5));
+  if (id.startsWith('spot:')) { const [key, sid] = id.slice(5).split('|'); const s = roomSpots(key).find((q) => q.id === sid); return s ? spotStation(key, s) : null; }
   return STATIONS.find((s) => s.id === id) || null;
 }
 
@@ -138,6 +199,7 @@ export function blockedAt(x, y, from = null) {
   const w = tileToWorld(x, y);
   if (blockedByBuilding(w.x, w.z)) return true;
   if (platformTop(w.x, w.z) != null) return false; // trên nền bậc cấp: đi thoải mái
+  if (inCanal(w.x, w.z) || (extNear(w.x, w.z)?.d ?? 99) < EXT_HW) return true; // tìm đường tránh nước (bơi chỉ khi tự điều khiển)
   const f = from ? tileToWorld(from.x, from.y) : null;
   return !walkable(w.x, w.z, f?.x, f?.z);
 }
@@ -239,7 +301,13 @@ export function stationAt(x, y) {
     for (const b of st.block) if (x >= b.c && x < b.c + b.w && y >= b.r - 0.6 && y < b.r + b.h) return st;
     if (Math.hypot(x - st.spot.x, y - st.spot.y) < 0.6) return st;
   }
-  return null;
+  const w = tileW({ x, y });
+  // trong phòng lưới: bấm sát một món / quầy → đi tới điểm tương tác đó
+  if (roomAtDyn(w.x, w.z)) { const s = spotNear(w.x, w.z, 1.0); const r = roomAtDyn(w.x, w.z); return s ? spotStation(r.key, s) : null; }
+  { const os = openSpotNear(w.x, w.z, 1.0); if (os) return spotStation(os.key, os.s); }
+  // bấm vào một ngôi nhà (hoặc ngay cửa) → đi tới cửa nhà đó
+  const e = houseAt(w.x, w.z) || doorNear(w.x, w.z, 1.2);
+  return e ? doorStation(e) : null;
 }
 
 export function nearestStation(pos, maxDist = 1.5) {
@@ -248,5 +316,14 @@ export function nearestStation(pos, maxDist = 1.5) {
     const d = Math.hypot(pos.x - st.spot.x, pos.y - st.spot.y);
     if (d <= bd) { bd = d; best = st; }
   }
-  return best;
+  if (best) return best;
+  const w = tileW(pos);
+  const inRoom = roomStationNear(w.x, w.z);
+  if (inRoom !== undefined) return inRoom;
+  // biệt phủ: cổng phủ, đồ đạc trong gian / sân vườn (ngoài trời)
+  const os = openSpotNear(w.x, w.z);
+  if (os) return spotStation(os.key, os.s);
+  // cửa nhà gần nhất (≤ 2,1 m)
+  const e = doorNear(w.x, w.z, 2.1);
+  return e ? doorStation(e) : null;
 }

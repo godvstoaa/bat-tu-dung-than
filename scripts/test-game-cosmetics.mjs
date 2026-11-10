@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import * as C from '../src/game/cosmetics.js';
 import * as S from '../src/game/state.js';
 import { parseClient } from '../src/game/protocol.js';
+import * as LIFE from '../src/game/life.js';
+import * as COIN from '../src/game/coins.js';
 
 let n = 0;
 const t = (name, fn) => { fn(); n += 1; console.log('✓', name); };
@@ -15,7 +17,7 @@ t('Danh mục: id duy nhất, đúng ô, mỗi bộ 4 món khác ô, món trả 
   for (const it of C.ITEMS) {
     assert.ok(slots.has(it.slot), it.id);
     assert.ok(it.rarity >= 1 && it.rarity <= 5);
-    if (!it.free) assert.ok(it.price && (it.price.phuc > 0 || it.price.ngoc > 0), `${it.id} thiếu giá`);
+    if (!it.free) assert.ok(it.price && (it.price.xu > 0 || it.price.ngoc > 0) && !it.price.phuc, `${it.id} thiếu giá`);
   }
   for (const st of C.SETS) {
     assert.equal(st.pieces.length, 4);
@@ -31,11 +33,11 @@ t('Tủ đồ mặc định: đồ miễn phí có sẵn, đang mặc đồ mặ
   assert.equal(w.ngoc, 0);
 });
 
-t('Mua: trừ đúng tiền, thiếu tiền / đã có / VIP / cấp / chuỗi điểm danh bị chặn', () => {
-  const s = fresh(); s.phucKhi = 300;
-  assert.equal(C.buy(s, 'y_bach').ok, true); assert.equal(s.phucKhi, 60);
+t('Mua: trừ đúng tiền (xu), thiếu tiền / đã có / VIP / cấp / chuỗi điểm danh bị chặn; Phúc Khí không còn là tiền', () => {
+  const s = fresh(); s.phucKhi = 99999; LIFE.lifeState(s).xu = C.ITEM.y_bach.price.xu + 50 * COIN.DONG;
+  assert.equal(C.buy(s, 'y_bach').ok, true); assert.equal(LIFE.walletXu(s), 50 * COIN.DONG); assert.equal(s.phucKhi, 99999);
   assert.match(C.buy(s, 'y_bach').reason, /Đã có/);
-  assert.match(C.buy(s, 'phat_tran').reason, /Thiếu Phúc Khí/);
+  assert.match(C.buy(s, 'phat_tran').reason, /Không đủ tiền/);
   C.wardrobe(s).ngoc = 2000;
   assert.match(C.buy(s, 'y_tu').reason, /VIP/);
   assert.equal(C.buy(s, 'y_tu', { vip: true }).ok, true);
@@ -65,7 +67,8 @@ t('Điểm danh: mỗi ngày một lần, chuỗi 7 ngày vòng lại, đứt ch
   assert.equal(C.checkin(s, new Date(2026, 10, 12)).day, 1, 'nghỉ ngày → về ngày 1');
 });
 
-t('VIP nhận Ngọc mỗi ngày; quà lên cấp nhận dồn một lần', () => {
+t('Quyết định 13: không còn Ngọc miễn phí (điểm danh, VIP, lên cấp)', () => {
+  assert.equal(C.CHECKIN.reduce((a, b) => a + b, 0), 0); assert.equal(C.VIP_DAILY, 0); assert.equal(C.LEVEL_GIFT, 0);
   const s = fresh();
   assert.equal(C.vipDaily(s, true, new Date(2026, 10, 4)), C.VIP_DAILY);
   assert.equal(C.vipDaily(s, true, new Date(2026, 10, 4, 23)), 0);
@@ -86,7 +89,7 @@ t('MMO: mã hoá trang bị gọn, máy chủ lọc món lạ / sai ô', () => {
 });
 
 t('Lưu / đọc lại giữ tủ đồ', () => {
-  const s = fresh(); C.wardrobe(s).ngoc = 999; s.phucKhi = 500; C.buy(s, 'y_bach'); C.equip(s, 'y_bach');
+  const s = fresh(); C.wardrobe(s).ngoc = 999; LIFE.lifeState(s).xu = 4 * COIN.BAC; C.buy(s, 'y_bach'); C.equip(s, 'y_bach');
   const mem = new Map(); const st = { getItem: (k) => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, v) };
   S.saveState(s, st);
   const b = S.loadState(st, new Date(2026, 10, 4));

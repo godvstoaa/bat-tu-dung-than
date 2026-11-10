@@ -247,9 +247,9 @@ export function buildSect(scene, { ripple, onBig = null }) {
     const pines = [];
     for (let z = -48; z <= 48; z += 12) for (const sx of [-1, 1]) if (z < -50 || z > -22) pines.push({ x: sx * 57, y: 0, z, ry: z * 0.37, s: 11 });
     for (const x of [-44, -30, 30, 44]) pines.push({ x, y: 0, z: -61, ry: x, s: 10 });
-    const pg = await instanceModel(root, 'tree_pine', pines); if (pg) addFootprint(pg, { hi: 1.3, ground: () => 0 });
+    const pg = await instanceModel(root, 'tree_pine', pines); if (pg) addFootprint(pg, { hi: 1.3, ground: () => 0, fill: false });
     const bl = await instanceModel(root, 'tree_peach', [[-52, 30], [52, 30], [-24, 14], [24, 14], [-52, 46], [52, 46]].map(([x, z], i) => ({ x, y: 0, z, ry: i * 1.3, s: 7 })));
-    if (bl) addFootprint(bl, { hi: 1.3, ground: () => 0 });
+    if (bl) addFootprint(bl, { hi: 1.3, ground: () => 0, fill: false });
   })().catch((e) => console.warn('[sect]', e));
 
   // `loaded`: mọi mô hình Meshy của sơn môn đã đặt xong (màn nạp chờ, có giới hạn thời gian)

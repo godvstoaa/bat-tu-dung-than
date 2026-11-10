@@ -8,23 +8,25 @@ test('Huyền Thành phẳng ở y = 0 quanh quán (bán kính 150)', () => {
   for (let i = 0; i < 200; i++) { const a = i * 0.7, d = (i % 10) * 15; assert.ok(Math.abs(T.heightAt(Math.cos(a) * d, Math.sin(a) * d)) < 0.5, `lệch tại ${d}`); }
 });
 test('Đỉnh tông môn cao > 300, hồ thấp hơn mực nước, rìa là biển mây', () => {
-  assert.ok(T.heightAt(-620, -560) > 300, 'Tử Bình');
-  assert.ok(T.heightAt(-600, 600) > 280, 'Trích Thiên');
-  assert.ok(T.heightAt(620, 620) < T.WATER, 'hồ');
-  assert.ok(T.heightAt(1010, 0) < -40, 'rìa');
+  const R = (id) => T.REGIONS.find((r) => r.id === id);
+  assert.ok(T.heightAt(R('tubinh').x, R('tubinh').z) > 300, 'Tử Bình');
+  assert.ok(T.heightAt(R('trichthien').x, R('trichthien').z) > 280, 'Trích Thiên');
+  assert.ok(T.heightAt(R('cungthong').x, R('cungthong').z) < T.WATER, 'hồ');
+  assert.ok(T.heightAt(T.HALF - 20, 0) < -40, 'rìa');
 });
 test('Sông thấp hơn mực nước dọc lòng sông', () => {
   for (const [x, z] of T.RIVER.slice(1, -1)) assert.ok(T.heightAt(x, z) < T.WATER, `${x},${z}`);
 });
 test('Hàm tất định (cùng toạ độ → cùng độ cao)', () => { assert.equal(T.heightAt(123.4, -567.8), T.heightAt(123.4, -567.8)); });
 test('Đi bộ: chặn nước sâu + vách dốc, cho đi trên cao nguyên', () => {
-  assert.equal(T.walkable(620, 620), false);
+  const L = T.REGIONS.find((r) => r.id === 'cungthong'), P = T.REGIONS.find((r) => r.id === 'tubinh');
+  assert.equal(T.walkable(L.x, L.z), false);
   assert.equal(T.walkable(10, 10, 9, 10), true);
-  let blocked = 0; for (let i = 0; i < 400; i++) { const x = -620 + i, z = -560; if (!T.walkable(x + 1, z, x, z)) blocked++; } assert.ok(blocked > 0, 'phải có chỗ dốc không leo được');
+  let blocked = 0; for (let i = 0; i < 700; i++) { const x = P.x - 350 + i, z = P.z; if (!T.walkable(x + 1, z, x, z)) blocked++; } assert.ok(blocked > 0, 'phải có chỗ dốc không leo được');
 });
 test('Rừng: không cây trong thành, có cây ngoài thành', () => {
   assert.equal(T.treeDensity(50, 50), 0);
-  let n = 0; for (let x = -900; x < 900; x += 40) for (let z = -900; z < 900; z += 40) if (T.treeDensity(x, z) > 0.4) n++;
+  let n = 0; for (let x = -1400; x < 1400; x += 60) for (let z = -1400; z < 1400; z += 60) if (T.treeDensity(x, z) > 0.4) n++;
   assert.ok(n > 200, `chỉ ${n} điểm có rừng`);
 });
 test('Hiệu năng heightAt: 50k lần < 400ms', () => {

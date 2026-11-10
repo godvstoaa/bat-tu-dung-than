@@ -25,11 +25,13 @@ test('hello: tên xấu → «Khách», áo sai → Thổ, pid sai → null', ()
 });
 
 test('mv: chặn toạ độ ngoài bản đồ / NaN, làm tròn', () => {
-  assert.equal(P.parseClient(J({ t: 'mv', x: -700, y: 3 })), null);
-  assert.equal(P.parseClient(J({ t: 'mv', x: 5, y: 999 })), null);
+  assert.equal(P.parseClient(J({ t: 'mv', x: -1100, y: 3 })), null);
+  assert.equal(P.parseClient(J({ t: 'mv', x: 5, y: 1200 })), null);
   assert.ok(P.parseClient(J({ t: 'mv', x: -300, y: 400 })), 'thế giới mở: toạ độ xa tâm vẫn hợp lệ');
   assert.equal(P.parseClient(J({ t: 'mv', x: 'a', y: 3 })), null);
-  assert.deepEqual(P.parseClient(J({ t: 'mv', x: 3.14159, y: 2, h: 1.23456, s: true })), { t: 'mv', x: 3.14, y: 2, h: 1.23, s: 1, a: 0 });
+  assert.deepEqual(P.parseClient(J({ t: 'mv', x: 3.14159, y: 2, h: 1.23456, s: true })), { t: 'mv', x: 3.14, y: 2, h: 1.23, s: 1, a: 0, w: 0, b: 0, fs: 0 });
+  // trạng thái nước: 2 = bơi; 3 = trên thuyền, b = loại thuyền; giá trị lạ → 0
+  assert.deepEqual([P.parseClient(J({ t: 'mv', x: 1, y: 1, w: 2 })).w, P.parseClient(J({ t: 'mv', x: 1, y: 1, w: 3, b: 2 })).b, P.parseClient(J({ t: 'mv', x: 1, y: 1, w: 9, b: 2 })).w, P.parseClient(J({ t: 'mv', x: 1, y: 1, w: 2, b: 2 })).b], [2, 2, 0, 0]);
   // độ cao ngự kiếm: kẹp 0–420, làm tròn
   assert.equal(P.parseClient(J({ t: 'mv', x: 1, y: 1, a: 999 })).a, 420);
   assert.equal(P.parseClient(J({ t: 'mv', x: 1, y: 1, a: 25.6 })).a, 26);
@@ -38,8 +40,8 @@ test('mv: chặn toạ độ ngoài bản đồ / NaN, làm tròn', () => {
 // ── tp: nhảy đổi phòng do client chủ động — cùng biên thế giới như mv, làm tròn; ──
 test('tp: đúng biên thế giới như mv, làm tròn; ngoài bản đồ / NaN bị bỏ', () => {
   assert.deepEqual(P.parseClient(J({ t: 'tp', x: 1125.256, y: 25 })), { t: 'tp', x: 1125.26, y: 25 }); // vào điện xa > 25 ô vẫn hợp lệ
-  assert.equal(P.parseClient(J({ t: 'tp', x: -700, y: 3 })), null);
-  assert.equal(P.parseClient(J({ t: 'tp', x: 5, y: 999 })), null);
+  assert.equal(P.parseClient(J({ t: 'tp', x: -1100, y: 3 })), null);
+  assert.equal(P.parseClient(J({ t: 'tp', x: 5, y: 1200 })), null);
   assert.equal(P.parseClient(J({ t: 'tp', x: 'a', y: 3 })), null);
 });
 
@@ -166,6 +168,18 @@ testA('mv: đổi heading phải gửi mv (kể cả đứng yên) và ghi lastS
   sock.sent = [];
   net.tick(0.02, { x: 5, y: 5, h: 1.2, sitting: false, alt: 0 }); // không đổi gì
   assert.equal(sock.sent.length, 0, 'không đổi gì thì không gửi gói nào');
+});
+
+test('lư hương chung: lư lớn nhận 15 người, đầy thì sang lư nhỏ vắng nhất; nén tàn thì nhả chỗ; 9 lư kín thì −1', () => {
+  const now = 1e12, L = [];
+  assert.equal(P.parseClient(J({ t: 'inc', k: 5 })).t, 'inc');
+  for (let i = 0; i < 15; i++) { assert.equal(P.pickBurner(L, now), 0); L.push({ k: 0, at: now }); }
+  const k1 = P.pickBurner(L, now); assert.ok(k1 >= 1 && k1 <= 8); L.push({ k: k1, at: now });
+  const k2 = P.pickBurner(L, now); assert.notEqual(k2, k1, 'lư nhỏ vắng nhất');
+  assert.equal(P.pickBurner(L, now + P.INCENSE_MS + 1), 0, 'nén tàn → lư lớn trống lại');
+  const full = []; P.BURNER_CAP.forEach((c, k) => { for (let i = 0; i < c; i++) full.push({ k, at: now }); });
+  assert.equal(P.pickBurner(full, now), -1);
+  assert.ok(P.BURNER_CAP.reduce((a, b) => a + b, 0) >= P.ROOM_CAP, 'đủ lư cho cả phòng');
 });
 
 await Promise.all(pending);

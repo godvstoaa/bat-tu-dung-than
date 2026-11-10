@@ -4,8 +4,11 @@
 //  Bậc hiếm: Phàm · Linh · Huyền · Tiên · Thần. Tiền: Phúc Khí (cày) và Ngọc (điểm danh, VIP, lên cấp).
 //  5 bộ ngũ hành (4 món): mặc đủ bộ → hiệu ứng bộ; bộ hợp Dụng thần người chơi → «Hợp mệnh» +10% Phúc Khí
 //  khi giải án / sảnh nghề (state.js › recordCase đọc s.wardrobe.bonus).
-//  Thuần dữ liệu + logic, không DOM, không phụ thuộc → client, máy chủ MMO (protocol.js) và test dùng chung.
+//  Thuần dữ liệu + logic, không DOM → client, máy chủ MMO (protocol.js) và test dùng chung.
+//  P18: giá Phúc Khí cũ → tiền kim loại (xu); Ngọc chỉ từ nạp (bỏ điểm danh / VIP / quà cấp tặng Ngọc).
 // ============================================================================
+import { normPrice, fmt as fmtCoin } from './coins.js';
+import { walletXu, spendXu } from './life.js';
 
 export const SLOTS = [
   { id: 'robe', name: 'Phẩm phục', icon: '👘' },
@@ -73,6 +76,9 @@ export const ITEMS = [
   { id: 'aura_sen', slot: 'aura', name: 'Bộ Bộ Sinh Liên', rarity: 5, price: { ngoc: 640 }, unlock: { level: 8 }, desc: 'Sen vàng nở dưới chân — cấp 8.' },
   // --- vệt bước
   { id: 'trail_menh', slot: 'trail', name: 'Bộ Pháp Bản Mệnh', rarity: 1, free: true, desc: 'Vệt sáng theo hành (mở ở cấp 6).' },
+  // đạp nước (P14 — movement.js): bị động, không tốn thể lực; bán bằng Ngọc (ẩn trên iOS như mọi món Ngọc)
+  { id: 'hai_ho_than', slot: 'trail', name: 'Hài Hộ Thân', rarity: 3, price: { ngoc: 300 }, waterWalk: true, desc: 'Hài thêu phù thủy văn — bước trên mặt nước như trên đất, bọt nước bắn nhẹ theo chân.' },
+  { id: 'dinh_thuy_chau', slot: 'trail', name: 'Định Thủy Châu', rarity: 4, price: { ngoc: 600 }, waterWalk: true, desc: 'Ngọc trấn thủy — mỗi bước trên nước nở một đài sen (Bộ Bộ Sinh Liên).' },
   { id: 'trail_may', slot: 'trail', name: 'Đằng Vân Bộ', rarity: 2, price: { phuc: 300 }, desc: 'Mây trắng cuộn theo bước chân.' },
   { id: 'trail_sen', slot: 'trail', name: 'Liên Hoa Bộ', rarity: 3, price: { ngoc: 120 }, desc: 'Cánh sen hồng rơi theo bước.' },
   { id: 'trail_lua', slot: 'trail', name: 'Hỏa Vân Bộ', rarity: 3, price: { ngoc: 120 }, desc: 'Đốm lửa bám gót.' },
@@ -83,6 +89,7 @@ export const ITEMS = [
   { id: 'may', slot: 'mount', name: 'Cân Đẩu Vân', rarity: 3, price: { ngoc: 200 }, desc: 'Cưỡi mây cân đẩu.' },
   { id: 'ho_lo_bay', slot: 'mount', name: 'Hồ Lô Phi Hành', rarity: 3, price: { ngoc: 200 }, desc: 'Cưỡi hồ lô tím vàng.' },
   { id: 'dai_sen', slot: 'mount', name: 'Liên Hoa Đài', rarity: 4, price: { ngoc: 360 }, desc: 'Đứng trên đài sen vàng.' },
+  { id: 'duc', slot: 'mount', name: 'Ngũ Hành Dực', rarity: 4, price: { ngoc: 420 }, desc: 'Đôi cánh năng lượng theo hành Dụng thần — lơ lửng tự do, bụi sao lấp lánh.' },
   { id: 'hac', slot: 'mount', name: 'Tiên Hạc', rarity: 5, price: { ngoc: 780 }, unlock: { vip: true }, desc: 'Cưỡi hạc trắng sải cánh — VIP.' },
   // --- khung tên
   { id: 'khung_tron', slot: 'frame', name: 'Khung Mộc', rarity: 1, free: true, desc: 'Khung tên mặc định.' },
@@ -91,6 +98,8 @@ export const ITEMS = [
   { id: 'khung_ngoc', slot: 'frame', name: 'Bích Ngọc', rarity: 3, price: { ngoc: 90 }, desc: 'Viền ngọc bích.' },
   { id: 'khung_long', slot: 'frame', name: 'Kim Long', rarity: 5, price: { ngoc: 480 }, unlock: { streak: 7 }, desc: 'Viền rồng vàng — điểm danh 7 ngày liền.' },
 ];
+// P18: giá Phúc Khí cũ → tiền kim loại (× 15 đồng — coins.PHUC_RATE.cosmetic); Ngọc giữ (bản web; ẩn nạp trên iOS)
+for (const it of ITEMS) if (it.price) it.price = normPrice(it.price, 'cosmetic');
 export const ITEM = Object.fromEntries(ITEMS.map((it) => [it.id, it]));
 const FREE = ITEMS.filter((it) => it.free).map((it) => it.id);
 export const DEFAULT_EQUIP = { robe: 'y_menh', aura: 'aura_menh', trail: 'trail_menh', mount: 'kiem', frame: 'khung_tron' };
@@ -104,10 +113,11 @@ export const SETS = [
 ];
 export const SET_BONUS = 0.1; // Hợp mệnh: +10% Phúc Khí giải án / sảnh nghề
 
-// Điểm danh 7 ngày (vòng lặp) · VIP mỗi ngày · quà lên cấp
-export const CHECKIN = [10, 15, 20, 25, 30, 40, 80];
-export const VIP_DAILY = 30;
-export const LEVEL_GIFT = 20;
+// P18 (quyết định 13): BỎ MỌI NGỌC MIỄN PHÍ — điểm danh chỉ giữ chuỗi ngày (mở vài món theo chuỗi; P17 thay bằng quẻ đầu
+// ngày + Âm Đức), VIP không còn Ngọc hằng ngày, lên cấp không còn quà Ngọc. Ngọc chỉ còn từ nạp.
+export const CHECKIN = [0, 0, 0, 0, 0, 0, 0];
+export const VIP_DAILY = 0;
+export const LEVEL_GIFT = 0;
 
 // ---------------------------------------------------------------------------
 const dayStr = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -141,17 +151,17 @@ export function canBuy(s, id, ctx = {}) {
   if (u.vip && !ctx.vip) return { ok: false, reason: 'Chỉ dành cho VIP.' };
   if (u.level && (ctx.level || 1) < u.level) return { ok: false, reason: `Cần cấp ${u.level}.` };
   if (u.streak && (w.checkin.bestStreak || 0) < u.streak) return { ok: false, reason: `Cần điểm danh ${u.streak} ngày liền.` };
-  if (it.price.phuc && (s.phucKhi || 0) < it.price.phuc) return { ok: false, reason: `Thiếu Phúc Khí (cần ${it.price.phuc}).` };
+  if (it.price.xu && walletXu(s) < it.price.xu) return { ok: false, reason: `Không đủ tiền (cần ${fmtCoin(it.price.xu)}).` };
   if (it.price.ngoc && w.ngoc < it.price.ngoc) return { ok: false, reason: `Thiếu Ngọc (cần ${it.price.ngoc}).` };
   return { ok: true };
 }
 
-/** Mua → trừ tiền, cho vào tủ. Phúc Khí tiêu không làm giảm cấp (xp giữ nguyên). */
+/** Mua → trừ tiền (xu) hoặc Ngọc, cho vào tủ. */
 export function buy(s, id, ctx = {}) {
   const c = canBuy(s, id, ctx);
   if (!c.ok) return c;
   const it = ITEM[id], w = wardrobe(s);
-  if (it.price.phuc) s.phucKhi -= it.price.phuc;
+  if (it.price.xu) spendXu(s, it.price.xu);
   if (it.price.ngoc) w.ngoc -= it.price.ngoc;
   w.owned.push(id);
   return { ok: true };

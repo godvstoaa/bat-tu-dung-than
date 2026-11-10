@@ -5,6 +5,12 @@ import { MAX_ROOMS } from '../src/game/protocol.js';
 
 // Durable Object phòng Huyền Quán MMO (binding QUAN trong wrangler.jsonc)
 export { TownShard } from './quan-room.js';
+export { Estate } from './estate.js';
+export { Accounts } from './accounts.js';
+export { Guild } from './guild.js';
+export { Economy } from './economy.js';
+import { handleAuth } from './auth.js';
+import { handleNpcChat } from './npc-chat.js';
 
 const PROXIES = [
   ['/zai', 'https://api.z.ai'],
@@ -145,6 +151,13 @@ export default {
     //   panel chỉ ở /<ADMIN_PATH> (vd /panel-7xK2mQ9p)
     if (env.ADMIN_PATH && (url.pathname === '/admin' || url.pathname.startsWith('/admin/'))) {
       return new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' } });
+    }
+    // tài khoản người chơi (đăng nhập không mật khẩu) + bản lưu đám mây — worker/auth.js
+    if (url.pathname.startsWith('/api/auth/') || url.pathname === '/api/save') return handleAuth(request, env, url);
+    // NPC hội thoại bằng LLM (P6) — cần đăng nhập, hạn mức / ngày, giới hạn 30 lượt / phút / IP như các route AI khác
+    if (url.pathname === '/api/npc/chat') {
+      if (env.ADMIN_KV) { const k = 'npcrl:' + ip + ':' + Math.floor(Date.now() / 60000), n = parseInt((await env.ADMIN_KV.get(k)) || '0', 10); if (n >= 30) return new Response(JSON.stringify({ ok: false, err: 'rate' }), { status: 429, headers: { 'Content-Type': 'application/json' } }); await env.ADMIN_KV.put(k, String(n + 1), { expirationTtl: 120 }); }
+      return handleNpcChat(request, env);
     }
     if (url.pathname.startsWith('/api/') || url.pathname === '/' + ap || url.pathname.startsWith('/' + ap + '/')) {
       return handleAdminRoute(request, env, url);

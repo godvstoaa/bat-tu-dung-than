@@ -1,11 +1,29 @@
 import { defineConfig } from 'vite';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 // ============================================================================
 //  Vite config — proxy LLM API để TRÁNH CORS khi gọi từ trình duyệt.
 //  Mode `ios` → outDir dist-ios + transform head research-first + prune artifact.
 // ============================================================================
+
+// Danh sách model GLB có thật trong public/models (import 'virtual:model-files') — assets.js không gửi yêu cầu
+// thăm dò bậc chi tiết không tồn tại (trên web, file thiếu trả về index.html 200 → tải phí, parse lỗi)
+function modelFiles() {
+  const ID = 'virtual:model-files', RID = '\0model-files';
+  return {
+    name: 'model-files',
+    resolveId(id) { return id === ID ? RID : null; },
+    load(id) {
+      if (id !== RID) return null;
+      const dir = path.resolve(__dirname_cfg, 'public/models');
+      const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.endsWith('.glb')).map((f) => f.slice(0, -4)).sort() : [];
+      return `export default ${JSON.stringify(files)};`;
+    },
+  };
+}
+const __dirname_cfg = path.dirname(fileURLToPath(import.meta.url));
 
 function swAutoVersion() {
   return {
@@ -60,7 +78,7 @@ body.ios-shell-active>header.hero,body.ios-shell-active>.container,body.ios-shel
 }
 
 export default defineConfig(({ mode }) => ({
-  plugins: [swAutoVersion(), ...iosModePlugins(mode)],
+  plugins: [swAutoVersion(), modelFiles(), ...iosModePlugins(mode)],
   base: process.env.GH_PAGES ? '/bat-tu-dung-than/' : '/',
   define: {
     __IOS__: mode === 'ios',
@@ -70,6 +88,10 @@ export default defineConfig(({ mode }) => ({
     proxy: {
       // Huyền Quán MMO: WebSocket tới worker cục bộ (`npm run dev:mmo`, cổng 8788)
       '/ws': { target: 'http://127.0.0.1:8788', ws: true, changeOrigin: false },
+      // tài khoản + bản lưu đám mây (worker/auth.js) — cần `npm run dev:mmo`
+      '/api/auth': { target: 'http://127.0.0.1:8788', changeOrigin: false },
+      '/api/save': { target: 'http://127.0.0.1:8788', changeOrigin: false },
+      '/api/npc': { target: 'http://127.0.0.1:8788', changeOrigin: false }, // NPC hội thoại (P6)
       '/zai':      { target: 'https://api.z.ai',         changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/zai/, '') },
       '/bigmodel': { target: 'https://open.bigmodel.cn', changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/bigmodel/, '') },
       '/deepseek': { target: 'https://api.deepseek.com', changeOrigin: true, secure: true, rewrite: (p) => p.replace(/^\/deepseek/, '') },
@@ -88,12 +110,13 @@ export default defineConfig(({ mode }) => ({
       input: mode === 'ios' ? undefined : { index: 'index.html', game: 'game.html' },
       output: {
         manualChunks(id) {
+          // hàm nạp trước của vite (mọi import() động đều gọi): để riêng, không rơi vào chunk nặng nào
+          if (id.includes('vite/preload-helper') || id.includes('vite/modulepreload-polyfill')) return 'vendor-vite';
           if (id.includes('node_modules/lunar-javascript')) return 'vendor-lunar';
           if (id.includes('node_modules/astronomy-engine')) return 'vendor-astronomy';
           if (id.includes('/src/engine/kb.js')) return 'engine-kb';
-          if (id.includes('/src/engine/ai.js')) return 'engine-ai';
-          if (id.includes('/src/engine/brief-extender.js')) return 'engine-ai';
-          if (id.includes('/src/engine/nlg.js')) return 'engine-ai';
+          // (bỏ chunk engine-ai, 2026-11-10: ép ai.js vào chunk riêng kéo theo mọi engine nó dùng — game.html cần các
+          //  engine đó nên phải tải engine-ai, mà engine-ai nạp tĩnh Đạo Tạng 4,4 MB → game tải thừa ~5 MB JS)
           if (id.match(/\/src\/engine\/(gufa-engine|huangji-engine|taiyi-engine|chenggu-engine|wuyun-liuqi|appearance-engine)/)) return 'engine-camky';
           if (id.includes('/src/engine/flying-sihua.js')) return 'engine-camky';
           if (id.includes('/src/engine/ziwei-liunian')) return 'engine-camky';

@@ -1,17 +1,16 @@
 // ============================================================================
 //  TEST VA CHẠM (thuần Node — chỉ obstacles.js, không three.js/DOM):
-//   1) Tường Huyền Thành: đi đường ngang qua TỪNG đoạn tường + từng mối nối → phải bị chặn
-//      (bản cũ chỉ chặn 1 khối giữa đoạn → lỗ hở ~8 m ở mối nối, đi xuyên được).
-//   2) Cổng Nam (+Z): 2 đoạn bỏ qua → đường ngang phải thông (không bị chặn nhầm).
+//   1) Tường bát giác Bát Quái Thành: đi ngang qua mọi cạnh (ngoài ô cổng) và mọi đỉnh → bị chặn;
+//      hành lang giữa 8 cổng (Bát Môn) phải thông.
 //   3) Viền vách nền bậc cấp (landmarks › terrace): đi từ hông phải bị chặn ở MẶT vách
 //      (không trèo lên nóc), cửa bậc chính diện phải còn mở.
 //  Mô phỏng đúng bước kiểm của game: blockedByBuilding = tâm người + 4 điểm lệch 0,3 m
 //  (obstacles.js), người đi dừng ở mẫu bị chặn đầu tiên — xuyên = đến đích không gặp chặn nào.
 // ============================================================================
 import assert from 'node:assert/strict';
-import { addBlock, cityWallBlocks, markTerraceEdges, blockedByBuilding } from '../src/game/obstacles.js';
+import { addBlock, markTerraceEdges, blockedByBuilding } from '../src/game/obstacles.js';
+import { octWallBlocks, wallSegments, octVertices, GUA, OCT_A, TAN8, gateHalf, toWorld } from '../src/game/batquai.js';
 
-const CITY_R = 158, N = 64;
 let pass = 0;
 const fails = [];
 const check = (name, fn) => {
@@ -30,38 +29,27 @@ function march(x0, z0, x1, z1, step = 0.05) {
 }
 
 // ---------------------------------------------------------------------------
-// 1) Tường Huyền Thành — đường ngang qua từng đoạn + mối nối
+// 1) Tường bát giác Bát Quái Thành — đường cắt ngang qua từng cạnh (ngoài ô cổng) + từng đỉnh
 // ---------------------------------------------------------------------------
-const segMid = (i) => { const a = ((i + 0.5) / N) * Math.PI * 2; return { a, x: Math.cos(a) * CITY_R, z: Math.sin(a) * CITY_R }; };
-const isGate = (i) => { const am = ((i + 0.5) / N) * Math.PI * 2; return Math.abs(Math.sin(am)) > 0.985 && Math.sin(am) > 0; };
+for (const b of octWallBlocks()) addBlock(b.x, b.z, b.r); // đăng ký đúng như batquai3d.js › octWall
+for (const p of octVertices()) addBlock(p.x, p.z, 6.8);     // tháp góc
 
-for (const b of cityWallBlocks(CITY_R, N)) addBlock(b.x, b.z, b.r); // đăng ký đúng như landmarks.js › wallRing
-
-// Điều kiện bỏ cổng của wallRing (sin điểm giữa > 0,985, dương) thực tế bỏ 4 đoạn i = 14–17
-// (điểm giữa 14.5 và 17.5 cũng > 0,985) — cityWallBlocks dùng ĐÚNG điều kiện đó để khối chặn
-// chỉ nằm chỗ có mesh tường; quảng rộng giữa cổng do footprint model city_gate (GLB) chặn.
-check('tường: đúng 3 khối/đoạn × 60 đoạn tường (4 đoạn cổng bỏ) = 180 khối', () => {
-  assert.equal(cityWallBlocks(CITY_R, N).length, 180);
-});
-
-check('cổng Nam: hành lang giữ (|x| < 5) qua tường thành còn thông', () => {
-  assert.equal(march(-4.5, CITY_R, 4.5, CITY_R), null, 'hành lang cổng bị chặn nhầm');
-});
-
-for (let i = 0; i < N; i++) {
-  if (isGate(i)) continue; // đoạn cổng (không mesh): chặn bởi footprint city_gate GLB — ngoài tầm test thuần
-  const m = segMid(i);
-  const hit = march(m.x - 14, m.z, m.x + 14, m.z);
-  check(`tường · đoạn ${i}/64: đường ngang bị chặn (${m.x.toFixed(0)}, ${m.z.toFixed(0)})`, () => assert.ok(hit, `XUYÊN tường tại đoạn ${i}`));
+check('tường: 16 đoạn (8 cạnh × 2 bên cổng)', () => assert.equal(wallSegments().length, 16));
+for (const g of GUA) {
+  const L = OCT_A * TAN8, h = gateHalf(g);
+  check(`cổng ${g.gate}: hành lang giữa (|v| < 5) qua tường còn thông`, () => {
+    const a = toWorld(g, OCT_A - 9, 0), b = toWorld(g, OCT_A + 9, 0);
+    assert.equal(march(a.x, a.z, b.x, b.z), null, 'hành lang cổng bị chặn nhầm');
+  });
+  for (let v = -L + 1; v <= L - 1; v += 3.1) {
+    if (Math.abs(v) < h + 1) continue; // ô cổng: model cổng chặn (ngoài tầm test thuần)
+    const a = toWorld(g, OCT_A - 14, v), b = toWorld(g, OCT_A + 14, v);
+    check(`tường cung ${g.name} · v=${v.toFixed(1)}: đường ngang bị chặn`, () => assert.ok(march(a.x, a.z, b.x, b.z), `XUYÊN tường (${a.x.toFixed(0)}, ${a.z.toFixed(0)})`));
+  }
 }
-
-// mối nối giữa hai đoạn tường — đúng chỗ hở ~8 m của bản cũ; nối nằm trọn trong quảng cổng (cả hai đoạn là cổng) thì bỏ
-for (let i = 0; i < N; i++) {
-  const j = (i + 1) % N;
-  if (isGate(i) && isGate(j)) continue;
-  const a = ((i + 1) / N) * Math.PI * 2, x = Math.cos(a) * CITY_R, z = Math.sin(a) * CITY_R;
-  const hit = march(x - 14, z, x + 14, z);
-  check(`mối nối đoạn ${i}–${j}: đường ngang bị chặn`, () => assert.ok(hit, `XUYÊN tường ở mối nối (${x.toFixed(1)}, ${z.toFixed(1)})`));
+for (const p of octVertices()) {
+  const n = Math.hypot(p.x, p.z);
+  check(`đỉnh tường (${p.x.toFixed(0)}, ${p.z.toFixed(0)}): đi chéo qua bị chặn`, () => assert.ok(march(p.x * (1 - 14 / n), p.z * (1 - 14 / n), p.x * (1 + 14 / n), p.z * (1 + 14 / n))));
 }
 
 // ---------------------------------------------------------------------------
@@ -116,6 +104,36 @@ for (let i = 0; i < N; i++) {
   const [ex, ez] = w(STAIR + 4, HD + 22), [fx, fz] = w(STAIR + 4, HD - 22);
   check('nền xoay: mặt trước ngoài cửa bậc → bị chặn', () => {
     assert.ok(march(ex, ez, fx, fz), 'trèo lên nóc từ mép trước ngoài cửa bậc (nền xoay)');
+  });
+}
+
+// ---------------------------------------------------------------------------
+// 4) Đặc hoá công trình lớn (collide.js › solidifyCells): viền tường có khe → lòng điện phải đặc,
+//    đường hầm thông hai đầu (cổng thành) phải còn thông.
+// ---------------------------------------------------------------------------
+{
+  const { solidifyCells } = await import('../src/game/collide.js');
+  const key = (i, j) => (i + 32768) * 65536 + (j + 32768);
+  const has = (out, i, j) => out.some(([a, b]) => a === i && b === j);
+  // viền chữ nhật 40×20 ô, mặt trước hở 3 khe rộng 2, 3, 6 ô
+  const ring = new Set();
+  for (let i = 0; i <= 40; i++) for (const j of [0, 20]) { const gap = j === 20 && ((i >= 5 && i <= 6) || (i >= 15 && i <= 17) || (i >= 28 && i <= 33)); if (!gap) ring.add(key(i, j)); }
+  for (let j = 0; j <= 20; j++) { ring.add(key(0, j)); ring.add(key(40, j)); }
+  check('đặc hoá r=4: khe ≤ 8 ô được đóng, lòng điện đặc', () => {
+    const out = solidifyCells(ring, 4);
+    assert.ok(has(out, 20, 10), 'lòng điện vẫn rỗng');
+    assert.ok(has(out, 16, 20) && has(out, 30, 20), 'khe trên viền chưa được đóng');
+  });
+  check('đặc hoá r=1: khe rộng hơn 2 ô → lòng thông ra ngoài, không lấp', () => {
+    const out = solidifyCells(ring, 1);
+    assert.ok(!has(out, 20, 10), 'lấp nhầm lòng có cửa rộng');
+  });
+  // đường hầm: hai tường song song dài 30 ô, cách nhau 16 ô (8 m) — hai đầu mở
+  const tun = new Set();
+  for (let i = 0; i <= 30; i++) { tun.add(key(i, 0)); tun.add(key(i, 16)); }
+  check('đặc hoá: đường hầm thông hai đầu không bị lấp', () => {
+    const out = solidifyCells(tun, 4);
+    assert.ok(!has(out, 15, 8), 'đường hầm cổng thành bị lấp');
   });
 }
 

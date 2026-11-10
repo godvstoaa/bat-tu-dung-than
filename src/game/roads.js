@@ -6,19 +6,18 @@
 import * as T from './terrain.js';
 import { HALLS } from './world.js';
 import { COURT } from './court.js';
+import { ringRoad, diagonalAvenues, RING_W, GUA } from './batquai.js';
+import { cityRoads, outerGate } from './cityblocks.js';
 
 export const CITY_R = 158;
 
-// Từ cửa Nam Huyền Thành vòng quanh tường thành rồi toả tới từng sảnh nghề;
+// Từ cổng Ngoại Thành cùng hướng (8 cổng ngoài hướng đúng 8 vùng — cityblocks.js) thẳng tới sảnh nghề;
 // gặp dốc quá (> ~38°) thì dừng ở chân núi — lên đỉnh bằng trạm đi nhanh («Các gian»).
 export function roadPath(tx, tz) {
-  const pts = [];
-  const R0 = 205, a0 = Math.PI / 2, a1 = Math.atan2(tz, tx);
-  pts.push([0, CITY_R + 8]);
-  let da = a1 - a0; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
-  const nArc = Math.max(1, Math.ceil(Math.abs(da) * R0 / 10));
-  for (let i = 0; i <= nArc; i++) { const a = a0 + da * i / nArc; pts.push([Math.cos(a) * R0, Math.sin(a) * R0]); }
-  const [sx, sz] = pts[pts.length - 1];
+  const g = GUA.reduce((b, q) => (q.dir[0] * tx + q.dir[1] * tz > b.dir[0] * tx + b.dir[1] * tz ? q : b), GUA[0]);
+  const s0 = outerGate(g, 4);
+  const pts = [[s0.x, s0.z]];
+  const sx = s0.x, sz = s0.z;
   const L = Math.hypot(tx - sx, tz - sz), n = Math.ceil(L / 8);
   const nx = -(tz - sz) / L, nz = (tx - sx) / L; // pháp tuyến ngang: uốn nhẹ cho tự nhiên
   for (let i = 1; i <= n; i++) {
@@ -39,6 +38,12 @@ export function roadLines() {
   // trong thành: đại lộ Nam (thành môn → cổng Sơn Môn) và trục Đông – Tây giữa hai dãy phố
   LINES.push({ pts: [[0, CITY_R + 12], [0, COURT.z1 + 1]], w: 9 });
   for (const sx of [-1, 1]) LINES.push({ pts: [[sx * (COURT.x1 + 1), 0], [sx * (CITY_R - 4), 0]], w: 8 });
+  // Bát Quái Thành: đường vành bát giác nối 8 khu + đại lộ 4 khu chéo ra cổng
+  LINES.push({ pts: ringRoad(), w: RING_W }, ...diagonalAvenues());
+  // Ngoại Thành: 8 đại lộ, 9 vành phố bát giác, ngõ dọc, phố ranh giữa các cung
+  for (const r of cityRoads()) LINES.push({ pts: r.pts, w: r.w });
+  // Nam Môn: từ cổng Cảnh Môn thẳng Nam qua Nam Môn Đại Kiều (bridges.riverBridges) tới bến sông bờ Nam
+  { const g = GUA.find((q) => q.id === 'li'), s0 = outerGate(g, 4); LINES.push({ pts: [[s0.x, s0.z], [0, 1190]], w: 8 }); }
   return LINES;
 }
 

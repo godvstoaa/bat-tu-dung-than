@@ -3,6 +3,8 @@
 //  api (main.js): state, after, toast, vip(), level(), yong(), previewCos(slot, id), cosChanged()
 // ============================================================================
 import * as C from './cosmetics.js';
+import { fmt as fmtCoin } from './coins.js';
+import { walletXu } from './life.js';
 import { WX_VI } from '../engine/constants.js';
 import { IOS } from './features.js';
 
@@ -15,10 +17,10 @@ const ICON = {
   hand: { quat_giay: '🪭', phat_tran: '🪶', den_long_tay: '🏮', la_ban_tay: '🧭', quat_long: '🪽' },
   aura: { aura_menh: '✨', aura_dao: '🌸', aura_lua: '🔥', aura_batquai: '☯️', aura_set: '⚡', aura_tuyet: '❄️', aura_sen: '🪷' },
   trail: { trail_menh: '✨', trail_may: '☁️', trail_sen: '🌸', trail_lua: '🔥', trail_bang: '🧊', trail_sao: '🌌' },
-  mount: { kiem: '🗡️', may: '☁️', ho_lo_bay: '🏺', dai_sen: '🪷', hac: '🕊️' },
+  mount: { kiem: '🗡️', may: '☁️', ho_lo_bay: '🏺', dai_sen: '🪷', hac: '🕊️', duc: '🪽' },
   frame: { khung_tron: '▭', khung_may: '☁️', khung_sen: '🪷', khung_ngoc: '💠', khung_long: '🐉' },
 };
-const priceTxt = (p) => (p?.ngoc ? `💎 ${p.ngoc}` : p?.phuc ? `✦ ${p.phuc}` : '');
+const priceTxt = (p) => (p?.ngoc ? `💎 ${p.ngoc}` : p?.xu ? `💰 ${fmtCoin(p.xu)}` : '');
 
 export function wardrobeBody(api) {
   const s = api.state; C.wardrobe(s);
@@ -38,12 +40,13 @@ export function wardrobeBody(api) {
   function head() {
     const w = C.wardrobe(s), today = C.checkedIn(s), st = w.checkin.streak || 0;
     const day = today ? ((st - 1) % 7) + 1 : (st % 7) + 1;
-    $('head').innerHTML = `<div class="hq-yc-bal"><span>✦ ${s.phucKhi} Phúc Khí</span><span>💎 ${w.ngoc} Ngọc</span><span>${api.vip() ? '👑 Chân Nhân' : 'Chưa VIP'}</span></div>
-      <div class="hq-yc-checkin">${C.CHECKIN.map((n, i) => `<span class="${i < (today ? day : day - 1) ? 'got' : ''}${i === day - 1 && !today ? ' next' : ''}">N${i + 1}<b>💎${n}</b></span>`).join('')}</div>
-      <div class="hq-actions"><button class="hq-btn hq-primary" data-a="ci" type="button" ${today ? 'disabled' : ''}>${today ? `Đã điểm danh ✓ · chuỗi ${st} ngày` : `📅 Điểm danh +${C.CHECKIN[day - 1]} Ngọc`}</button>
+    $('head').innerHTML = `<div class="hq-yc-bal"><span>💰 ${fmtCoin(walletXu(s))}</span><span>💎 ${w.ngoc} Ngọc</span><span>${api.vip() ? '👑 Chân Nhân' : 'Chưa VIP'}</span></div>
+      <div class="hq-yc-checkin">${C.CHECKIN.map((n, i) => `<span class="${i < (today ? day : day - 1) ? 'got' : ''}${i === day - 1 && !today ? ' next' : ''}">N${i + 1}</span>`).join('')}</div>
+      <p class="hq-note">Điểm danh giữ chuỗi ngày (mở vài món theo chuỗi) — không còn tặng Ngọc. Ngọc chỉ có khi nạp.</p>
+      <div class="hq-actions"><button class="hq-btn hq-primary" data-a="ci" type="button" ${today ? 'disabled' : ''}>${today ? `Đã điểm danh ✓ · chuỗi ${st} ngày` : '📅 Điểm danh giữ chuỗi'}</button>
       ${IOS ? '' : '<button class="hq-btn" data-a="nap" type="button">💎 Nạp Ngọc</button>'}</div>`;
     const ci = $('head').querySelector('[data-a=ci]');
-    if (ci && !today) ci.onclick = () => { const r = C.checkin(s); if (r.ok) { api.toast(`Điểm danh ngày ${r.day}/7 · +${r.ngoc} Ngọc`); api.after(0); } head(); body(); };
+    if (ci && !today) ci.onclick = () => { const r = C.checkin(s); if (r.ok) { api.toast(`Điểm danh ngày ${r.day}/7 · chuỗi ${r.streak} ngày`); api.after(0); } head(); body(); };
     const nap = $('head').querySelector('[data-a=nap]');
     if (nap) nap.onclick = () => { tab = 'vip'; tabs(); body(); };
   }
@@ -103,7 +106,6 @@ export function wardrobeBody(api) {
     const n = el(`<div class="hq-yc-vip">
       <h4>👑 Chân Nhân (VIP)</h4>
       <ul class="hq-plain">
-        <li>💎 +${C.VIP_DAILY} Ngọc mỗi ngày</li>
         <li>🗡️ Ngự kiếm phi hành ngay, không chờ cấp 8</li>
         <li>✨ Mở sớm hào quang, linh khí, vệt bước</li>
         <li>👘 Đồ độc quyền: Tử Y Chân Nhân, Liên Hoa Quan, Bát Quái Pháp Luân, Tiên Hạc</li>

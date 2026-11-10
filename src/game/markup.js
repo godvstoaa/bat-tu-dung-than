@@ -28,6 +28,7 @@ export function gameMarkup() {
         </span>
       </div>
       <button id="hq-fly" class="hq-hbtn icon" type="button" hidden aria-label="Ngự kiếm phi hành">🗡️</button>
+      <button id="hq-ride" class="hq-hbtn icon" type="button" hidden aria-label="Cưỡi / xuống ngựa (H)">🐎</button>
       <button id="hq-sound" class="hq-hbtn icon" type="button"></button>
     </header>
     <div class="hq-stage">
@@ -41,6 +42,7 @@ export function gameMarkup() {
       <button id="hq-tasks-btn" class="hq-dbtn" type="button" aria-label="Nhiệm vụ hôm nay"></button>
       <button id="hq-social" class="hq-dbtn" type="button" aria-label="Giao lưu: cử chỉ và câu chào"><b aria-hidden="true">💬</b><span>Giao lưu</span></button>
       <button id="hq-menu" class="hq-dbtn" type="button" aria-label="Danh sách các gian"><b aria-hidden="true">☰</b><span>Các gian</span></button>
+      <button id="hq-econ" class="hq-dbtn" type="button" aria-label="Kho đồ, ruộng, bếp, chợ, tiệm (phím I)"><b aria-hidden="true">🎒</b><span>Kho đồ</span></button>
       <button id="hq-wardrobe" class="hq-dbtn" type="button" aria-label="Tàng Y Các: trang phục, phụ kiện, hiệu ứng"><b aria-hidden="true">👘</b><span>Y Các</span></button>
       <button id="hq-book" class="hq-dbtn" type="button" aria-label="${TEXT.book}"><b aria-hidden="true">📜</b><span>${TEXT.book}</span></button>
     </nav>

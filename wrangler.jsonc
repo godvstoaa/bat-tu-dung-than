@@ -12,7 +12,10 @@
   },
   "kv_namespaces": [{ "binding": "ADMIN_KV", "id": "fa5ff6c7198f48999bcfeeeba6f8d264" }],
   // Huyền Quán MMO — mỗi phòng (town-N) là một Durable Object, lưu trạng thái bằng SQLite backend
-  "durable_objects": { "bindings": [{ "name": "QUAN", "class_name": "TownShard" }] },
-  "migrations": [{ "tag": "quan-v1", "new_sqlite_classes": ["TownShard"] }],
+  "durable_objects": { "bindings": [{ "name": "QUAN", "class_name": "TownShard" }, { "name": "ESTATE", "class_name": "Estate" }, { "name": "ACCOUNTS", "class_name": "Accounts" }, { "name": "GUILD", "class_name": "Guild" }, { "name": "ECONOMY", "class_name": "Economy" }] },
+  // accounts-v1: tài khoản người chơi (worker/accounts.js) — một bản toàn cục; secrets: GOOGLE_CLIENT_ID/SECRET, RESEND_API_KEY, MAIL_FROM
+  // guild-v1: sổ việc làm — chỗ làm, ca, tay nghề, tiền công (worker/guild.js) — một bản toàn cục
+  // estate-v1: sổ nhà riêng Thành Bát Quái (worker/estate.js) — một bản toàn cục
+  "migrations": [{ "tag": "quan-v1", "new_sqlite_classes": ["TownShard"] }, { "tag": "estate-v1", "new_sqlite_classes": ["Estate"] }, { "tag": "accounts-v1", "new_sqlite_classes": ["Accounts"] }, { "tag": "guild-v1", "new_sqlite_classes": ["Guild"] }, { "tag": "economy-v1", "new_sqlite_classes": ["Economy"] }],
   "observability": { "enabled": true }
 }

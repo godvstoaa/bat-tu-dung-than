@@ -77,3 +77,25 @@ export function knock(freq = 900, vol = 0.25) {
 export function rattle() {
   for (let i = 0; i < 3; i++) setTimeout(() => knock(1400 + Math.random() * 900, 0.12), i * 45 + Math.random() * 30);
 }
+
+// Tóe nước (rơi / nhảy xuống nước): tiếng ồn trắng qua bandpass trượt xuống, tắt nhanh.
+export function splash(vol = 0.22) {
+  if (!enabled) return;
+  const a = ctx(); if (!a) return;
+  const now = a.currentTime;
+  const src = a.createBufferSource(); src.buffer = noiseBuffer(a, 0.6);
+  const f = a.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.2;
+  f.frequency.setValueAtTime(2400, now); f.frequency.exponentialRampToValueAtTime(380, now + 0.5);
+  const g = a.createGain(); g.gain.setValueAtTime(vol, now); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+  src.connect(f).connect(g).connect(a.destination); src.start(now);
+}
+// Tiếng nước vỗ khi bơi / lội / chèo thuyền (gọi mỗi nhịp tay / nhịp chèo): ngắn, trầm.
+export function paddle(vol = 0.07) {
+  if (!enabled) return;
+  const a = ctx(); if (!a) return;
+  const now = a.currentTime;
+  const src = a.createBufferSource(); src.buffer = noiseBuffer(a, 0.25, true);
+  const f = a.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 900;
+  const g = a.createGain(); g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(vol, now + 0.04); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+  src.connect(f).connect(g).connect(a.destination); src.start(now);
+}

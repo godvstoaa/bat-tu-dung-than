@@ -7,19 +7,41 @@ import * as THREE from 'three';
 import { span, record } from './perf.js';
 import * as MD from './models.js';
 import * as TX from './textures.js';
+import * as MG from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import * as T from './terrain.js';
-import { LIGHTS, GLOW_MATS } from './lights.js';
+import { LIGHTS, GLOW_MATS, addLight } from './lights.js';
 import { createGiatri } from './effects.js';
 import { createInteriors } from './interior.js';
 import { roomAt } from './world.js';
 import { STATIONS, stationById } from './world.js';
 import { incenseState } from './state.js';
+import { createIncense } from './incense3d.js';
+import { updateLotus } from './lotus.js';
 import { ROBE } from './render.js';
 import { hasStation, TEXT } from './features.js';
 import { createWorld, QUALITY } from './world3d.js';
 import { createLandmarks } from './landmarks.js';
-import { setModelQuality, setWarmup } from './assets.js';
-import { createCharacter } from './characters.js';
+import { setModelQuality, setWarmup, settleLods, loadModel as loadGlb } from './assets.js';
+import { createCharacter, setViewer } from './characters.js';
+import { poseOf } from './flight-poses.js';
+import { createCitizens } from './citizens.js';
+import { generateCity } from './cityblocks.js';
+import { createRoomBuilder } from './interior-build.js';
+import { createMansions } from './mansion3d.js';
+import { createRiver } from './river3d.js';
+import * as MO from './motion.js';
+import { createFleet, makeBoat, makeBoatByIdx, floatBoat } from './boats3d.js';
+import { docks as boatDocks } from './boats.js';
+import { splash as playSplash, paddle as playPaddle } from './audio.js';
+import { createPrison } from './prison3d.js';
+import { registerPrison } from './prison.js';
+import { createLifePlaces, makeYoke } from './lifeplaces3d.js';
+import { registerLifePlaces } from './lifeplaces.js';
+import { createJobPlaces, makeParcel } from './jobplaces3d.js';
+import { registerJobPlaces } from './jobplaces.js';
+import * as RZ from './raze.js';
+import { homeInfoOf } from './rooms.js';
+import { setEstateOwner, setEstateLookup } from './cityident3d.js';
 import { buildSect } from './sect.js';
 import { createOutfit } from './accessories.js';
 import { ITEM, decodeCos } from './cosmetics.js';
@@ -32,12 +54,20 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
-import { setActors, blockedByBuilding } from './obstacles.js';
+import { setActors, blockedByBuilding, platformTop } from './obstacles.js';
+import { zones as jobZones } from './jobzones.js';
 
 // Mức chất lượng: ghi đè bằng localStorage «huyenquan:quality» = low | mid | high
-function pickQuality(coarse) {
+function pickQuality(coarse, renderer) {
   try { const q = localStorage.getItem('huyenquan:quality'); if (QUALITY[q]) return q; } catch (e) { /* ignore */ }
-  return coarse ? 'mid' : 'high';
+  if (coarse) return 'mid';
+  // card đồ hoạ tích hợp (Intel UHD / Iris, AMD APU…): mặc định «mid» — đo trên Intel UHD: high 17 fps
+  try {
+    const gl = renderer.getContext(), ext = gl.getExtension('WEBGL_debug_renderer_info');
+    const name = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    if (/Intel|UHD|Iris|Mali|Adreno|PowerVR|Apple GPU|Radeon\(TM\) Graphics|Vega \d+ Graphics|SwiftShader|llvmpipe/i.test(name)) return 'mid';
+  } catch (e) { /* ignore */ }
+  return 'high';
 }
 
 const WX_COLOR = { 木: '#5fd27a', 火: '#ff5a3c', 土: '#f0b54a', 金: '#f4efe0', 水: '#4f9bff' };
@@ -99,7 +129,8 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.3, 9000);
   let debugCam = null;
-  const fog = new THREE.Fog('#d8cbb0', 260, 1900);
+  // sương gần hơn: các ngưỡng đổi bậc chi tiết / nạp vùng xa nằm trong mù (không thấy nhà «bật» ra ở xa)
+  const fog = new THREE.Fog('#d8cbb0', 190, 1700);
   scene.fog = fog;
 
   // --- bầu trời: vòm gradient bám camera
@@ -128,7 +159,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const mr = TX.rng(91);
   const mtnMat = new THREE.MeshBasicMaterial({ color: '#7b7a8a', fog: true });
   for (let i = 0; i < 22; i++) {
-    const a = (i / 22) * Math.PI * 2 + mr() * 0.3, d = 2600 + mr() * 700, h = 260 + mr() * 420;
+    const a = (i / 22) * Math.PI * 2 + mr() * 0.3, d = 3400 + mr() * 900, h = 320 + mr() * 520;
     const m = new THREE.Mesh(new THREE.ConeGeometry(h * 0.8 + mr() * 260, h, 5 + Math.floor(mr() * 3)), mtnMat);
     m.position.set(Math.cos(a) * d, -20 + h / 2, Math.sin(a) * d); m.rotation.y = mr() * 3;
     mountains.add(m);
@@ -157,7 +188,8 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   };
 
   // --- THẾ GIỚI MỞ Huyền Giới: địa hình 2048², trời tán xạ, nước, rừng (docs/DAI-THE-GIOI-DESIGN.md)
-  const quality = pickQuality(coarse);
+  const quality = pickQuality(coarse, renderer);
+  if (quality !== 'high') renderer.shadowMap.type = THREE.PCFShadowMap; // bóng mềm PCFSoft: đắt trên máy yếu
   let qualityForced = false; try { qualityForced = !!QUALITY[localStorage.getItem('huyenquan:quality')]; } catch (e) { /* ignore */ }
   const world = span('init:world', () => createWorld(scene, renderer, { quality }));
   setModelQuality(quality);
@@ -165,11 +197,11 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const interiors = span('init:interiors', () => createInteriors(scene)); // điện thờ vào được (world.js › ROOMS) // tài sản Meshy theo vùng (nạp khi tới gần)
   sun.shadow.mapSize.set(QUALITY[quality].shadow, QUALITY[quality].shadow);
   // nhóm đèn điểm động (lights.js): gán cho các đèn lồng / nến gần người chơi nhất
-  const POOL_N = quality === 'high' ? 16 : quality === 'mid' ? 10 : 6;
+  const POOL_N = quality === 'high' ? 6 : quality === 'mid' ? 4 : 3; // mỗi đèn điểm = thêm chi phí cho MỌI điểm ảnh lit
   const lightPool = Array.from({ length: POOL_N }, () => { const l = new THREE.PointLight('#ffa04a', 0, 26, 1.6); l.position.set(0, -500, 0); scene.add(l); return l; });
   // SỐ đèn trong cảnh phải cố định: bật/tắt `visible` làm đổi số đèn → three.js biên dịch lại shader
   // của MỌI vật liệu (khựng 250–400 ms mỗi lần đi qua vùng có đèn). Đèn rỗi: cường độ 0, cất dưới đất.
-  let lightNight = 0, lightTick = 0, lightRoom = null, anchorTick = 0;
+  let lightNight = 0, lightTick = 0, lightRoom = null, anchorTick = 0, absorbT = 5;
   function updateLightPool(px, py, pz, dt) {
     lightTick -= dt; if (lightTick > 0) return; lightTick = 0.3;
     const near = [];
@@ -211,7 +243,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const seatY = DAIS.y + MD.DAIS_FLOOR;
   const masterG = MD.master(); masterG.position.set(DAIS.x, seatY, DAIS.z); scene.add(masterG);
   let masterChar = null;
-  createCharacter('master', { height: 1.85 }).then((m) => {
+  createCharacter('master', {}).then((m) => {
     if (!m) return;
     masterChar = m; m.obj.position.set(DAIS.x, seatY, DAIS.z + 0.15); m.setBase('idle'); scene.add(m.obj);
     masterG.visible = false;
@@ -222,6 +254,8 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const xamG = hasStation('xam') ? station('xam', shift('xam', MD.xamAltar())) : null;
   if (!xamG) { const rack = shift('xam', MD.scrollRack()); MD.mergeStatic(rack); scene.add(rack); }
   const incG = station('huong', shift('huong', MD.incenseBurner()));
+  // lư hương chung: nhang của cả phòng (lư lớn + 8 lư nhỏ quanh Đại Đỉnh — incense3d.js)
+  const incense = (() => { const I = incG.userData.incense; I.group.visible = false; const top = I.top.clone().add(incG.position); const r = createIncense(scene, mats, { mainTop: top, merge: MD.mergeStatic }); for (const g of r.root.children) if (g.userData.station) pickables.push(g); return r; })();
   const cal = TX.calendarCanvas();
   const calG = station('lich', shift('lich', MD.calendarBoard(cal.texture)));
   const P0 = PONDS[0];
@@ -240,7 +274,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   // người bán ở quầy Tàng Y Các — cúi chào khi khách lại gần
   let tailor = null;
-  createCharacter('npc_merchant', { height: 1.8 }).then((ch) => { if (!ch) return; tailor = ch; ch.obj.position.set(TANGY.x + 1.2, 0, TANGY.z - 1.2); scene.add(ch.obj); });
+  createCharacter('npc_merchant', {}).then((ch) => { if (!ch) return; tailor = ch; ch.obj.position.set(TANGY.x + 1.2, 0, TANGY.z - 1.2); scene.add(ch.obj); });
 
   // --- NPC-AI G2 · bark cục bộ (docs/npc-ai/05 §05.2; luật không-lộ-chuyện mục 13:
   //     bark chỉ gán DOM tại máy này, KHÔNG thêm field nào vào payload mạng, không
@@ -309,10 +343,10 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     const t = kind === 'peach' ? MD.peachTree(seed) : MD.pineTree(seed);
     t.position.set(x, 0, z); t.rotation.y = seed;
     if (kind === 'peach') trees.push(t);
-    MD.mergeStatic(t); scene.add(t); addFootprint(t, { hi: 1.3 });
+    MD.mergeStatic(t); scene.add(t); addFootprint(t, { hi: 1.3, fill: false });
   }
   for (const [x, z, s] of [[-46, 36, 1], [-46, 44, 2], [-34, 45, 3], [46, 36, 4], [46, 44, 5], [34, 45, 6], [-46, 20, 7], [-34, 19, 8], [46, 18, 9], [56, 2, 10], [-56, 2, 11]]) {
-    const b = MD.bambooClump(s); b.position.set(x, 0, z); MD.mergeStatic(b); scene.add(b); addFootprint(b, { hi: 1.5 });
+    const b = MD.bambooClump(s); b.position.set(x, 0, z); MD.mergeStatic(b); scene.add(b); addFootprint(b, { hi: 1.5, fill: false });
   }
   const rocks = MD.floatingRocks(); scene.add(rocks);
   // đá trôi thành đảo nổi lơ lửng trên Huyền Thành (cao 140–260 m)
@@ -372,7 +406,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // khói nhang
   const smokeMat = new THREE.SpriteMaterial({ map: TX.softTex('rgba(235,235,240,0.9)', 'rgba(235,235,240,0)'), transparent: true, depthWrite: false });
   const smoke = [];
-  for (let i = 0; i < 36; i++) { const s = new THREE.Sprite(smokeMat.clone()); s.visible = false; scene.add(s); smoke.push({ s, life: 0, vx: 0, vz: 0 }); }
+  for (let i = 0; i < 90; i++) { const s = new THREE.Sprite(smokeMat.clone()); s.visible = false; scene.add(s); smoke.push({ s, life: 0, vx: 0, vz: 0 }); }
   let smokeT = 0;
 
   // chén trà trên tay khi ngồi Trà Thất + hơi nóng bốc lên
@@ -393,6 +427,70 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const avState = { heading: Math.PI, phase: 0, walk: 0, lastX: null, lastZ: null };
   // Nhân vật Meshy cho người chơi (dáng hero_m / hero_f); procedural chỉ hiện khi chưa nạp xong
   let hero = null, heroLook = null, heroLoading = false;
+  // phương tiện đi đất (P4, vehicles.js): ngựa (lib_horse), lừa (ngựa thu nhỏ, sẫm màu), xe ngựa (ngựa + lib_cart)
+  const MOUNT = { lua: { h: 1.3, saddle: 0.95, tint: '#7a6a5a' }, ngua: { h: 1.75, saddle: 1.22 }, xengua: { h: 1.75, saddle: 1.05, cart: true } };
+  const mountTpl = new Map();
+  async function mountTemplate(id) {
+    const M = MOUNT[id]; if (!M) return null;
+    if (!mountTpl.has(id)) mountTpl.set(id, (async () => {
+      const hg = (await loadGlb('lib_horse.mid')) || (await loadGlb('lib_horse.far')) || (await loadGlb('lib_horse'));
+      if (!hg) return null;
+      const g = new THREE.Group(), horse = hg.scene.clone(true);
+      let b = new THREE.Box3().setFromObject(horse), sz = b.getSize(new THREE.Vector3());
+      const k = M.h / (sz.y || 1); horse.scale.setScalar(k); b = new THREE.Box3().setFromObject(horse);
+      const c = b.getCenter(new THREE.Vector3()); horse.position.set(-c.x, -b.min.y, -c.z);
+      const len = b.getSize(new THREE.Vector3()); if (len.x > len.z) horse.rotation.y = Math.PI / 2; // mô hình dọc trục x → quay theo hướng đi (+z)
+      if (M.tint) horse.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.color.multiply(new THREE.Color(M.tint)); } });
+      horse.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+      g.add(horse);
+      if (M.cart) { const cg = (await loadGlb('lib_cart.mid')) || (await loadGlb('lib_cart.far')); if (cg) { const cart = cg.scene.clone(true); let cb = new THREE.Box3().setFromObject(cart); const ck = 2.2 / (cb.getSize(new THREE.Vector3()).y || 1); cart.scale.setScalar(ck); cb = new THREE.Box3().setFromObject(cart); const cc = cb.getCenter(new THREE.Vector3()); cart.position.set(-cc.x, -cb.min.y, -cc.z - 2.6); g.add(cart); } }
+      return g;
+    })());
+    const tpl = await mountTpl.get(id); return tpl ? tpl.clone(true) : null;
+  }
+  let myMount = null, myMountId = null, myMountBusy = false;
+  // dấu chân đạp nước (P14): tiên đạo → đài sen phát sáng (Bộ Bộ Sinh Liên, ≤ 24) · khí công → sương / bọt (sprite, ≤ 24)
+  const stepFx = (() => {
+    const petal = new THREE.ConeGeometry(0.12, 0.28, 5); petal.rotateX(Math.PI / 2.6); petal.translate(0, 0.05, 0.1);
+    const parts = []; for (let k = 0; k < 8; k++) { const g = petal.clone(); g.rotateY((k / 8) * Math.PI * 2); parts.push(g); }
+    const lotusGeo = MG.mergeGeometries(parts); const lotusMat = new THREE.MeshBasicMaterial({ color: '#ffb7d0', transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending });
+    const lotus = Array.from({ length: 24 }, () => { const m = new THREE.Mesh(lotusGeo, lotusMat.clone()); m.visible = false; m.userData.life = 9; scene.add(m); return m; });
+    const mistMat = new THREE.SpriteMaterial({ map: TX.softTex('rgba(240,248,255,0.9)', 'rgba(240,248,255,0)'), transparent: true, depthWrite: false });
+    const mist = Array.from({ length: 24 }, () => { const m = new THREE.Sprite(mistMat.clone()); m.visible = false; m.userData.life = 9; scene.add(m); return m; });
+    let t0 = 0;
+    return {
+      step(fx, x, y, z, heading, dt, moving) {
+        if ((t0 -= dt) > 0 || !moving) return; t0 = 0.36;
+        if (fx === 'lotus' && !lowQuality && !reduced) { const m = lotus.find((q) => q.userData.life > 1.5) || lotus[0]; m.position.set(x, y + 0.02, z); m.rotation.y = heading; m.userData.life = 0; m.visible = true; }
+        else if (fx === 'qi' && !lowQuality && !reduced) for (const sd of [-1, 1]) { const m = mist.find((q) => q.userData.life > 1) || mist[0]; m.position.set(x + Math.cos(heading) * 0.35 * sd, y + 0.15, z - Math.sin(heading) * 0.35 * sd); m.userData.life = 0; m.userData.sd = sd; m.visible = true; }
+      },
+      tick(dt) {
+        for (const m of lotus) { if (!m.visible) continue; m.userData.life += dt; const k = m.userData.life / 1.5; if (k >= 1) { m.visible = false; continue; } m.scale.setScalar(0.6 + k * 0.6); m.material.opacity = 0.85 * (1 - k); }
+        for (const m of mist) { if (!m.visible) continue; m.userData.life += dt; const k = m.userData.life; if (k >= 1) { m.visible = false; continue; } m.scale.setScalar(0.3 + k * 0.9); m.position.y += dt * 0.25; m.material.opacity = 0.55 * (1 - k); }
+      },
+    };
+  })();
+  // cột sáng nhiệm vụ mệnh (P5) — chỉ dựng trên máy người đúng mệnh
+  const fateG = (() => {
+    const g = new THREE.Group(); g.visible = false;
+    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.9, 26, 20, 1, true), new THREE.MeshBasicMaterial({ color: '#ffe08a', transparent: true, opacity: 0.22, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
+    col.position.y = 13; g.add(col);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(1.6, 2.1, 40), new THREE.MeshBasicMaterial({ color: '#ffd36a', transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.06; g.add(ring);
+    g.userData = { col, ring }; scene.add(g); return g;
+  })();
+  // biển «Chiêu công» ở khu làm của nghề ngoài tiệm (P7 — jobzones.js): cột gỗ + bảng giấy đỏ + đèn lồng nhỏ
+  const jobSigns = (() => {
+    const g = new THREE.Group(); scene.add(g);
+    const postG = new THREE.BoxGeometry(0.16, 2.6, 0.16), boardG = new THREE.BoxGeometry(1.4, 0.85, 0.08), lampG = new THREE.SphereGeometry(0.18, 10, 8);
+    const wood = new THREE.MeshStandardMaterial({ color: '#5a3a22', roughness: 0.9 }), paper = new THREE.MeshStandardMaterial({ color: '#b3261e', emissive: '#3a0805', roughness: 0.8 }), lamp = new THREE.MeshBasicMaterial({ color: '#ffb347' });
+    const list = [];
+    for (const z of Object.values(jobZones())) for (const s of z.spots) {
+      const m = new THREE.Group(), p1 = new THREE.Mesh(postG, wood), b = new THREE.Mesh(boardG, paper), l = new THREE.Mesh(lampG, lamp);
+      p1.position.y = 1.3; b.position.set(0, 2.25, 0.1); l.position.set(0.62, 2.85, 0.1); m.add(p1, b, l); m.position.set(s.x, 0, s.z); m.visible = false; g.add(m); list.push(m);
+    }
+    return list;
+  })();
   // phẩm phục: tô áo theo Dụng thần (robe), đai theo Hỷ thần (accent) — đổi màu thì dựng lại nhân vật
   // phẩm phục Tàng Y Các: món có look → HSV riêng; không thì theo Dụng / Hỷ thần
   const robeTint = (robe, accent, item) => (ITEM[item]?.look ? { primary: ITEM[item].look.pri, accent: ITEM[item].look.acc } : { primary: robe, accent });
@@ -400,7 +498,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     const key = `${look}|${robe}|${accent || ''}|${robeItem || ''}`;
     if (heroLook === key || heroLoading) return;
     heroLoading = true;
-    createCharacter(look, { height: 1.9, tint: robeTint(robe, accent, robeItem) }).then((h) => {
+    createCharacter(look, { tint: robeTint(robe, accent, robeItem) }).then((h) => {
       heroLoading = false;
       if (!h) { heroLook = key; return; }
       if (hero) { hero.dispose(); scene.remove(hero.obj); } // hủy mixer + material clone của bản cũ
@@ -449,7 +547,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       r = { grp, walk, sit, robe: o.robe, acc: o.acc || '', robeItem: oc.robe || '', label, bub, heading: o.h || 0, ch: null, outfit: createOutfit(scene, { remoteLight: true }), fx: null, fxKey: '', fxNear: false };
       remotes.set(o.id, r);
       const rr = r;
-      createCharacter(o.look === 'hero_f' ? 'hero_f' : 'hero_m', { height: 1.9, tint: robeTint(o.robe, o.acc, oc.robe) }).then((ch) => {
+      createCharacter(o.look === 'hero_f' ? 'hero_f' : 'hero_m', { tint: robeTint(o.robe, o.acc, oc.robe) }).then((ch) => {
         if (!ch) return;
         if (!remotes.has(o.id)) { ch.dispose(); return; } // người đã rời phòng trước khi nạp xong — dọn bản vừa dựng
         rr.ch = ch; grp.add(ch.obj); rr.walk.visible = rr.sit.visible = false;
@@ -459,6 +557,8 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   }
   function dropRemote(id) {
     const r = remotes.get(id); if (!r) return;
+    if (r.boat) scene.remove(r.boat);
+    if (r.mount) scene.remove(r.mount);
     scene.remove(r.grp); r.label.remove(); r.bub.remove();
     r.outfit.dispose(); // hủy geometry/material/texture của phụ kiện
     r.ch?.dispose();    // hủy mixer + material clone của nhân vật
@@ -529,15 +629,54 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       scene.add(ch.obj);
     });
   }
+  // dân thành Bát Quái (citizens.js): ~33 NPC theo 8 khu — dựng khi tới gần
+  const citizens = createCitizens({ scene, layer, groundY: (x, z) => platformTop(x, z) ?? T.heightAt(x, z), extra: [...generateCity().walkers, ...boatDocks().map((d, i) => ({ id: `chudo_${d.id}`, name: ['Lão Lái', 'Cô Đò', 'Chú Chèo', 'Bà Bến'][i % 4] + ' ' + ['Hà', 'Giang', 'Thủy', 'Lâm', 'Nguyệt', 'Tuyền', 'Phong', 'Sương'][i % 8], role: 'Chủ đò', look: i % 2 ? 'hero_f' : 'npc_villager', gua: 'kan', wx: '水', lines: ['Khách đi thuyền không? Đò, thuyền hoa, thuyền buồm có cả!', 'Ngược dòng giữa lạch thì chèo mỏi tay đấy, men theo bờ cho nhẹ.', 'Thuyền buồm cột cao, không qua được thủy môn đâu khách ạ.'], x: d.x + 1.5, z: d.z + 1.5, path: null }))] }); // + ~70 dân phố Ngoại Thành + chủ đò các bến
+  // phòng lưới (rooms.js): cửa hàng / nhà riêng / điện — dựng lười khi bước vào, chủ tiệm thêm vào citizens
+  const roomsB = createRoomBuilder({ scene, citizens });
+  // 16 biệt phủ đi bộ thật ở vành phủ Ngoại Thành (mansion3d.js): va chạm ngay, hình chi tiết dựng lười
+  const phuG = new THREE.Group(); phuG.name = 'mansions'; scene.add(phuG);
+  registerPrison(); const prison = createPrison(scene); // Thiên Lao + Khoáng Sơn (luật pháp — law.js)
+  RZ.initRaze(scene); // công trình ngoài thành phá được (raze.js)
+  registerLifePlaces(); createLifePlaces(scene); // quầy cơm, liêu xá, giếng quanh Sơn Môn (sinh tồn — life.js)
+  const yoke = makeYoke(); yoke.visible = false; scene.add(yoke); // đòn gánh nước trên vai khi đang gánh
+  // gợn nước: vòng tròn loang quanh người bơi / lội / mũi thuyền, tóe nước khi rơi xuống (pool 24 vòng, 1 vật liệu mỗi vòng)
+  const ripples = [];
+  { const geo = new THREE.RingGeometry(0.42, 0.55, 28); geo.rotateX(-Math.PI / 2);
+    for (let i = 0; i < 24; i++) { const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: '#e8f1ef', transparent: true, opacity: 0, depthWrite: false })); m.visible = false; m.renderOrder = 3; scene.add(m); ripples.push({ m, age: 9, life: 1.6, s: 1 }); } }
+  let rippleNext = 0, rippleT = 0, splashSeen = 0, wakeT = 0, myBoat = null;
+  const fleet = createFleet(scene); // thuyền NPC trên hào, kênh, sông, hồ
+  const spawnRipple = (x, y, z, s = 1, life = 1.6) => { const r = ripples[rippleNext]; rippleNext = (rippleNext + 1) % ripples.length; r.age = 0; r.life = life; r.s = s; r.m.position.set(x, y + 0.03, z); r.m.visible = true; };
+  const tickRipples = (dt) => { for (const r of ripples) { if (!r.m.visible) continue; r.age += dt; const k = r.age / r.life; if (k >= 1) { r.m.visible = false; continue; } r.m.scale.setScalar(r.s * (0.6 + k * 4.2)); r.m.material.opacity = 0.55 * (1 - k) * Math.min(1, k * 6); } };
+  registerJobPlaces(); const jobPlaces = createJobPlaces(scene); // mỏ dân sự Khoáng Sơn (việc làm P2 — guild-core.js)
+  const parcel = makeParcel(); parcel.visible = false; scene.add(parcel); // kiện hàng sau lưng phu dịch trạm
+  const river = span('init:river', () => createRiver(scene)); // thủy đạo Bát Môn: hào Nội Thành + kênh Khảm / Tốn, thuyền hoa
+  const mansionsB = span('init:mansions', () => createMansions(phuG, { provider: (key) => homeInfoOf(key), citizens }));
   const targetRing = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.4, 32), new THREE.MeshBasicMaterial({ color: '#ffd27a', transparent: true, opacity: 0.8, depthWrite: false }));
   targetRing.rotation.x = -Math.PI / 2; targetRing.visible = false; scene.add(targetRing);
 
   // --- camera thứ ba
-  const cam = { yaw: 0, pitch: 0.4, dist: 15, target: new THREE.Vector3(3.5, 1.2, 3.5), yawGoal: 0 };
+  const cam = { yaw: 0, pitch: 0.4, dist: 11, target: new THREE.Vector3(3.5, 1.2, 3.5), yawGoal: 0 };
   const proj = new THREE.Vector3();
 
   // điều khiển con trỏ: kéo = xoay, chạm/click ngắn = đi tới
   const ptrs = new Map(); let down = null; let pinch = 0;
+  // cần điều khiển động (P16): chạm ở góc dưới (trái — hoặc phải khi bật tay trái) thì cần hiện dưới ngón tay;
+  // chạm nhanh không kéo (< 150 ms, < 10 px) vẫn là chạm để đi
+  let stickHook = null; const stickPtrs = new Map();
+  canvas.addEventListener('pointerdown', (e) => {
+    if (stickHook && e.pointerType === 'touch' && !ptrs.size && stickHook.zone(e)) { try { canvas.setPointerCapture(e.pointerId); } catch (_) { /* bỏ */ } stickPtrs.set(e.pointerId, { x: e.clientX, y: e.clientY, t: performance.now(), moved: false }); stickHook.start(e); e.stopImmediatePropagation(); }
+  }, true);
+  canvas.addEventListener('pointermove', (e) => {
+    const sp = stickPtrs.get(e.pointerId); if (!sp) return;
+    if (!sp.moved && Math.hypot(e.clientX - sp.x, e.clientY - sp.y) > 10) sp.moved = true;
+    stickHook.move(e); e.stopImmediatePropagation();
+  }, true);
+  const stickUp = (e) => {
+    const sp = stickPtrs.get(e.pointerId); if (!sp) return;
+    stickPtrs.delete(e.pointerId); stickHook.end(e); e.stopImmediatePropagation();
+    if (e.type === 'pointerup' && !sp.moved && performance.now() - sp.t < 150) { const hit = pick(e.clientX, e.clientY); if (hit && onTap) onTap(hit); }
+  };
+  canvas.addEventListener('pointerup', stickUp, true); canvas.addEventListener('pointercancel', stickUp, true);
   canvas.addEventListener('pointerdown', (e) => {
     try { canvas.setPointerCapture(e.pointerId); } catch (_) { /* con trỏ không còn hoạt động */ }
     ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -549,7 +688,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (ptrs.size === 2) {
       const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y);
-      if (pinch) cam.dist = Math.min(48, Math.max(6, cam.dist * (pinch / d)));
+      if (pinch) cam.dist = Math.min(48, Math.max(2.4, cam.dist * (pinch / d)));
       pinch = d; return;
     }
     if (!down) return;
@@ -572,7 +711,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   };
   canvas.addEventListener('pointerup', up);
   canvas.addEventListener('pointercancel', (e) => { ptrs.delete(e.pointerId); down = null; pinch = 0; });
-  canvas.addEventListener('wheel', (e) => { e.preventDefault(); cam.dist = Math.min(48, Math.max(6, cam.dist * (1 + e.deltaY * 0.0012))); }, { passive: false });
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); cam.dist = Math.min(48, Math.max(2.4, cam.dist * (1 + e.deltaY * 0.0012))); }, { passive: false });
 
   const ray = new THREE.Raycaster();
   const ndc = new THREE.Vector2();
@@ -609,7 +748,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   function resize() {
     const w = canvas.clientWidth || 640, h = canvas.clientHeight || 448;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2));
+    renderer.setPixelRatio(lowQuality ? 1 : Math.min(window.devicePixelRatio || 1, quality === 'high' ? 1.5 : 1.25)); // 2× = gấp 1,8 lần điểm ảnh, gần như không thấy khác
     renderer.setSize(w, h, false);
     composer?.setPixelRatio(renderer.getPixelRatio()); // bloom theo đúng tỉ lệ pixel của renderer
     composer?.setSize(w, h);
@@ -687,20 +826,44 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     avState.walk += ((speed > 0.3 && !p.sitting ? 1 : 0) - avState.walk) * Math.min(1, dt * 8);
     avState.phase += dt * 9.5 * avState.walk;
     // bay lượn: độ cao trên mặt đất mượt dần (ngự kiếm cất cánh / hạ xuống)
-    avState.alt = (avState.alt || 0) + (((p.flying ? p.alt || 0 : 0)) - (avState.alt || 0)) * Math.min(1, dt * 3);
-    const gy = world.groundY(w.x, w.z) + avState.alt;
+    // ngự kiếm: độ cao mượt dần · đi bộ / nhảy / leo / bơi: cao độ thật từ motion.js (tức thời)
+    avState.alt = p.flying ? (avState.alt || 0) + ((p.alt || 0) - (avState.alt || 0)) * Math.min(1, dt * 3) : (p.alt || 0);
+    // trên mặt đất / dưới nước: cao độ thật p.y3 của motion.js (groundY kẹp đáy nước ở −7,2 → người bơi trên sông sâu
+    // bị vẽ cao vài mét); ngự kiếm / trong phòng nội thất: mặt đất + độ cao như cũ
+    const realY = !p.flying && p.y3 != null && w.x <= T.ROOM_X0 - 40;
+    // bơi: người nằm sấp trên mặt nước khi bơi, đứng thẳng đạp nước khi nổi yên
+    avState.swimK = (avState.swimK || 0) + ((p.swim ? (avState.walk > 0.25 ? 1 : 0.25) : 0) - (avState.swimK || 0)) * Math.min(1, dt * 4);
+    // trên thuyền: thuyền nổi theo mặt sóng, người đứng / ngồi trên sàn thuyền
+    if (p.boat) { const id = p.boat.b?.id || 'do'; if (!myBoat || myBoat.userData.type !== id) { if (myBoat) scene.remove(myBoat); myBoat = makeBoat(id); scene.add(myBoat); } myBoat.visible = true; avState.heading = p.boat.h; }
+    else if (myBoat) myBoat.visible = false;
+    const boatY = p.boat ? floatBoat(myBoat, w.x, w.z, p.boat.h) + (myBoat.userData.type === 'buom' ? 1.1 : myBoat.userData.type === 'hoa' ? 0.5 : 0.3) : null;
+    let gy = boatY ?? ((realY ? p.y3 : world.groundY(w.x, w.z) + avState.alt) + avState.swimK * 0.72);
+    // đang cưỡi: dựng phương tiện dưới chân, người ngồi trên yên, nhấp nhô theo nước kiệu
+    const rideId = !p.flying && !p.boat ? p.ride : null;
+    if (rideId !== myMountId && !myMountBusy) {
+      if (myMount) { scene.remove(myMount); myMount = null; }
+      myMountId = rideId;
+      if (rideId) { myMountBusy = true; mountTemplate(rideId).then((m) => { myMountBusy = false; if (m && myMountId === rideId) { myMount = m; scene.add(m); } }); }
+    }
+    if (myMount && rideId) {
+      const bob = avState.walk > 0.3 && !reduced ? Math.abs(Math.sin(t * 11)) * 0.06 : 0;
+      myMount.position.set(w.x, gy + bob * 0.4, w.z); myMount.rotation.y = avState.heading; myMount.visible = true;
+      gy += (MOUNT[rideId].saddle || 1) + bob;
+    }
     av.position.set(w.x, gy, w.z);
     const cos = S.cos || {};
     ensureHero(p.look || 'hero_m', p.robe, p.accent, cos.robe);
     if (hero) {
       av.visible = false;
       hero.obj.position.set(w.x, gy, w.z);
-      hero.obj.rotation.y = avState.heading;
+      hero.obj.rotation.order = 'YXZ'; hero.obj.rotation.y = avState.heading; hero.obj.rotation.x = avState.swimK * 1.25;
       // ngồi bồ đoàn: nền idle (thân trên thở) + tư thế xếp bằng dựng bằng xương (characters.js › seat)
-      hero.setBase(p.flying ? 'idle' : !p.sitting && avState.walk > 0.4 ? 'run' : 'idle');
+      const flyPose = (p.flying || p.fs === 5) && p.fs ? poseOf(cos.mount || 'kiem', p.fs) : null; // tư thế bay độc bản (P15)
+      hero.setBase(flyPose ? (hero.has(flyPose.base) ? flyPose.base : 'idle') : myMount && rideId ? (hero.has('sit') ? 'sit' : 'idle') : p.flying || (p.air && !p.climb) ? 'idle' : p.climb ? 'run' : p.swim ? (avState.walk > 0.2 ? 'walk' : 'idle') : !p.sitting && avState.walk > 0.4 ? 'run' : 'idle');
       if (S.selfEmote && S.selfEmote !== lastEmote) { lastEmote = S.selfEmote; hero.play(S.selfEmote.e === 'wave' ? 'wave' : 'bow'); }
       hero.update(dt);
-      if (p.sitting) hero.seat('tea', t); else hero.unseat();
+      if (flyPose) hero.pose(flyPose, t);
+      else if (p.sitting || (p.boat && myBoat?.userData.type === 'do')) hero.seat('tea', t); else hero.unseat(); // ngồi đò
       // cầm đồ Tàng Y Các khi đứng yên: đưa tay lên trước ngực
       if (!p.sitting && cos.hand && avState.walk < 0.3 && !p.flying) hero.hold(t);
     }
@@ -723,6 +886,9 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       }
     } else for (const st of steam) st.s.visible = false;
     // gia trì nguyên tố theo hành Dụng thần (progress.js) — dựng lại khi đổi hành
+    if (S.fate) { fateG.visible = true; fateG.position.set(S.fate.x, world.groundY(S.fate.x, S.fate.z), S.fate.z); fateG.userData.col.material.opacity = 0.16 + Math.sin(t * 2.2) * 0.06; fateG.userData.ring.rotation.z = t * 0.6; fateG.userData.ring.scale.setScalar(1 + Math.sin(t * 2.2) * 0.08); }
+    else fateG.visible = false;
+    for (const m of jobSigns) { const near = Math.hypot(m.position.x - w.x, m.position.z - w.z) < 260; m.visible = near; if (near) m.position.y = Math.max(world.groundY(m.position.x, m.position.z), -5.6); }
     const gKey = `${p.robe}|${cos.aura || ''}|${cos.trail || ''}|${cos.mount || ''}`;
     if (!giatri || giatriWx !== gKey) {
       if (giatri) { scene.remove(giatri.obj); scene.remove(giatri.trail); giatri.dispose(); } // hủy material/texture bản cũ
@@ -735,13 +901,35 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // phụ kiện bám xương (mũ, lưng, tay) — cầm chén trà thì cất đồ cầm tay
     outfit.set({ head: cos.head, back: cos.back, hand: p.sitting ? null : cos.hand });
     outfit.update(hero, avState.heading, t, { night: L.night, visible: !!hero && av.visible === false });
+    // gợn nước quanh người chơi trong nước; tóe nước + tiếng khi rơi xuống
+    tickRipples(dt);
+    // đội thuyền NPC (tránh người chơi + người khác) · vệt sóng sau thuyền mình
+    fleet.update(dt, w.x, w.z, [...remotes.values()].map((q) => q.grp.position));
+    if (p.boat && myBoat && (wakeT -= dt) < 0) { const b = p.boat.b; const v = b ? Math.hypot(b.vx, b.vz) : 0; wakeT = v > 0.5 ? 0.35 : 1.5; if (v > 0.3) { const L2 = (b.type.len / 2) * 0.9; spawnRipple(w.x - Math.sin(p.boat.h) * L2, myBoat.position.y - 0.1, w.z - Math.cos(p.boat.h) * L2, b.type.beam * 0.5, 2.4); playPaddle(0.05); } }
+    stepFx.tick(dt);
+    if (p.waterWalk && p.waterY != null) stepFx.step(p.waterWalk.fx, w.x, p.waterY, w.z, avState.heading, dt, avState.walk > 0.3);
+    if (p.waterY != null && !p.flying && !p.boat) {
+      if ((p.splash || 0) > splashSeen) { splashSeen = p.splash; for (let k = 0; k < 3; k++) spawnRipple(w.x, p.waterY, w.z, 0.8 + k * 0.5, 1.4 + k * 0.4); playSplash(); }
+      if ((rippleT -= dt) < 0) { rippleT = avState.walk > 0.3 ? 0.42 : 1.1; spawnRipple(w.x + Math.sin(avState.heading) * 0.4, p.waterY, w.z + Math.cos(avState.heading) * 0.4, p.swim ? 1 : 0.7); if (avState.walk > 0.3) playPaddle(); }
+    } else splashSeen = p.splash || 0;
+    yoke.visible = !!S.carry && !p.flying; if (yoke.visible) { yoke.position.set(w.x, gy + 1.5, w.z); yoke.rotation.y = avState.heading; }
+    parcel.visible = !!S.parcel && !p.flying; if (parcel.visible) { parcel.position.set(w.x - Math.sin(avState.heading) * 0.32, gy + 1.25, w.z - Math.cos(avState.heading) * 0.32); parcel.rotation.y = avState.heading; }
     // bóng đổ + mặt trời bám theo người chơi
     sun.target.position.set(w.x, gy, w.z);
     sun.position.copy(sun.target.position).addScaledVector(lightDir, 160);
     span('f:world', () => world.update(w.x, w.z, dt, t));
     lightRoom = roomAt(w.x, w.z)?.id || null; // trong điện: chỉ thắp nến / đèn của điện đó
     updateLightPool(w.x, gy + 2, w.z, dt);
+    if ((absorbT -= dt) < 0) { absorbT = 5; absorbLights(); } // đèn điểm của vùng mới nạp
+    interiors.root.visible = w.x > T.ROOM_X0 - 40; // điện thờ ở dải phòng phía Đông: ngoài đó thì không vẽ (hàng trăm mesh)
+    if (interiors.root.visible) interiors.ensure(); // dựng lười lần đầu tới dải phòng
     interiors.update(dt);
+    roomsB.update(w.x, w.z, dt);
+    span('f:mansions', () => mansionsB.update(w.x, w.z, dt));
+    river.update(dt, t);
+    prison.setVisible(w.x > T.ROOM_X0 - 40); prison.update(dt);
+    jobPlaces.setVisible(w.x > T.ROOM_X0 - 40); jobPlaces.update(dt);
+    RZ.tickRaze(dt, w.x, w.z);
     // nhãn + dấu vàng của trạm có toạ độ thế giới: bám mặt sàn thật (nền bậc, sàn điện) — cập nhật thưa
     anchorTick -= dt;
     if (anchorTick <= 0) {
@@ -757,11 +945,12 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     cam.yaw += (cam.yawGoal - cam.yaw) * Math.min(1, dt * 8);
     // màn dọc: nhìn vượt lên trước khách → khách nằm 1/3 dưới, khung dành cho quán
     const portrait = camera.aspect < 0.8;
-    const ahead = p.sitting ? 0.6 : (portrait ? 3.4 : 1.0);
-    tmpV.set(w.x - Math.sin(cam.yaw) * ahead, gy + (p.sitting ? 0.9 : 1.3), w.z - Math.cos(cam.yaw) * ahead);
+    const close = Math.min(1, Math.max(0, (6.5 - cam.dist) / 4)); // camera sát (≤ 6,5 m): nhìn ngang mặt nhân vật, không vượt lên trước
+    const ahead = (p.sitting ? 0.6 : (portrait ? 3.4 : 1.0)) * (1 - close);
+    tmpV.set(w.x - Math.sin(cam.yaw) * ahead, gy + (p.sitting ? 0.9 : 1.3) + close * 0.28, w.z - Math.cos(cam.yaw) * ahead);
     // dịch chuyển xa (truyền tống / hồi sinh): camera nhảy thẳng, không trượt qua nửa bản đồ
     if (cam.target.distanceTo(tmpV) > 40) cam.target.copy(tmpV); else cam.target.lerp(tmpV, Math.min(1, dt * 5));
-    const cd = cam.dist * (p.sitting ? 0.75 : 1) * (portrait ? 0.9 : 1);
+    const cd = cam.dist * (p.sitting ? 0.75 : 1) * (portrait ? 0.9 : 1) * (p.boat ? ({ do: 1.25, hoa: 1.7, buom: 2.5 }[myBoat?.userData.type] || 1) : 1); // trên thuyền: lùi camera theo cỡ thuyền
     // ngước nhìn trời: camera hạ sát đất (không chui xuống đất), điểm nhìn nâng dần lên theo độ ngước
     const elev = Math.max(cam.pitch, 0.06);
     const lookUp = cam.pitch < 0.15 ? (0.15 - cam.pitch) * cd * 2.4 : 0;
@@ -774,6 +963,15 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     if (camera.position.y < floorY) camera.position.y = floorY;
     // trong điện: camera không xuyên tường / trần
     const inRoom = roomAt(cam.target.x, cam.target.z);
+    // trong gian biệt phủ: camera kẹp trong lòng gian (vỏ gian đã mờ — mansion3d.update), không cao quá mái hiên
+    const inHall = !inRoom && mansionsB.hallAt(cam.target.x, cam.target.z);
+    if (inHall) {
+      const c = Math.cos(inHall.ry), s = Math.sin(inHall.ry), dx = camera.position.x - inHall.cx, dz = camera.position.z - inHall.cz;
+      let lx = c * dx - s * dz, lz = s * dx + c * dz;
+      lx = Math.max(-inHall.hw + 0.6, Math.min(inHall.hw - 0.6, lx)); lz = Math.max(-inHall.hd + 0.6, Math.min(inHall.hd - 0.6, lz));
+      camera.position.x = inHall.cx + c * lx + s * lz; camera.position.z = inHall.cz - s * lx + c * lz;
+      camera.position.y = Math.min(inHall.top + 1.5, camera.position.y);
+    }
     if (inRoom) {
       const ox = inRoom.origin.x, oz = inRoom.origin.z, mx = inRoom.w / 2 - 0.9, mz = inRoom.d / 2 - 0.9;
       camera.position.x = Math.min(ox + mx, Math.max(ox - mx, camera.position.x));
@@ -782,6 +980,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     }
     tmpV2.copy(cam.target); tmpV2.y += lookUp;
     camera.lookAt(tmpV2);
+    setViewer(camera.position);
     if (debugCam) { camera.position.fromArray(debugCam.pos); camera.lookAt(...debugCam.look); }
     span('f:occl', () => world.occlusion(w.x, w.z, camera.position.x, camera.position.z));
     sky.position.copy(camera.position); stars.position.copy(camera.position);
@@ -839,25 +1038,23 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       xamG.userData.candleLight.intensity = 1.8 + Math.sin(t * 11) * 0.3 + L.night * 2;
     }
 
-    // nhang
+    // nhang: hương chung của phòng (S.incense) + nén của mình khi chưa có máy chủ
     const I = incG.userData.incense;
     const inc = incenseState(S.state, now.getTime());
-    I.group.visible = inc.burning;
-    if (inc.burning) {
-      const len = 0.18 + 0.62 * (1 - inc.progress);
-      for (const s of I.sticks) { s.body.scale.y = len; s.body.position.y = len / 2; s.tip.position.y = len; }
-      I.light.intensity = 0.8 + Math.sin(t * 7) * 0.2;
+    I.group.visible = false;
+    const incList = (S.incense || []).slice();
+    if (inc.burning && !incList.some((e) => e.mine)) incList.push({ k: 0, at: S.state.incense.litAt, mine: true });
+    const nearInc = Math.hypot(w.x - incG.position.x, w.z - incG.position.z) < 150;
+    const nSticks = incense.update(incList, now.getTime(), t, nearInc);
+    I.light.intensity = 0;
+    if (nSticks) {
       smokeT -= dt;
       if (smokeT <= 0 && !reduced && !lowQuality) {
-        smokeT = 0.09;
-        const sm = smoke.find((x) => !x.s.visible);
-        if (sm) {
-          const st = I.sticks[Math.floor(Math.random() * 3)];
-          sm.s.position.set(incG.position.x + st.g.position.x + I.top.x - len * Math.sin(st.g.rotation.z), incG.position.y + I.top.y + len, incG.position.z + I.top.z);
-          sm.life = 0; sm.vx = (Math.random() - 0.5) * 0.15; sm.vz = (Math.random() - 0.5) * 0.15; sm.s.visible = true;
-        }
+        smokeT = 0.09 / Math.min(4, 1 + Math.sqrt(nSticks / 3) * 0.6);
+        const sm = smoke.find((x) => !x.s.visible), tip = incense.randomTip();
+        if (sm && tip) { sm.s.position.copy(tip); sm.life = 0; sm.vx = (Math.random() - 0.5) * 0.15; sm.vz = (Math.random() - 0.5) * 0.15; sm.s.visible = true; }
       }
-    } else I.light.intensity = 0;
+    }
     for (const sm of smoke) {
       if (!sm.s.visible) continue;
       sm.life += dt;
@@ -869,7 +1066,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     }
 
     // hồ: gợn nước + đèn hoa đăng của khách
-    ripple.offset.x = (t * 0.015) % 1; ripple.offset.y = Math.sin(t * 0.2) * 0.02;
+    if (!reduced) updateLotus(w.x, w.z, t, dt); // hồ sen trong tầm: lá dập dềnh, hoa đung đưa, cá bơi
     const B = pondG.userData.bounds;
     pondG.userData.lanterns.forEach((Lt, i) => {
       Lt.visible = i < Math.min(6, S.todayLanterns.length);
@@ -940,7 +1137,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
         // thay bằng nhân vật Meshy (khe chẵn: thương nhân, khe lẻ: dân làng)
         const look = caseNpcs.indexOf(cn) % 2 ? 'npc_villager' : 'npc_merchant';
         if (cn.ch) { cn.g.remove(cn.ch.obj); cn.ch.dispose(); cn.ch = null; }
-        createCharacter(look, { height: 1.8 }).then((ch) => { if (!ch) return; cn.ch = ch; cn.g.add(ch.obj); cn.av.visible = false; });
+        createCharacter(look, {}).then((ch) => { if (!ch) return; cn.ch = ch; cn.g.add(ch.obj); cn.av.visible = false; });
       }
       MD.poseAvatar(cn.av, { walk: 0, phase: 0, sitting: false, idle: t + cn.g.position.x });
       if (cn.ch) {
@@ -974,6 +1171,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     for (const hn of hermits) actors.push({ x: hn.x, z: hn.z, r: 0.35 });
     if (tailor) actors.push({ x: tailor.obj.position.x, z: tailor.obj.position.z, r: 0.35 });
     for (const cn of caseNpcs) if (cn.g.visible) actors.push({ x: cn.g.position.x, z: cn.g.position.z, r: 0.35 });
+    for (const a of citizens.update(dt, t, w, barkMs, dayKey)) actors.push(a);
     setActors(actors);
     // người chơi khác: tách nhẹ khi đứng sát nhau / sát mình / sát NPC (chỉ phần hiển thị — vị trí mạng giữ nguyên)
     // → hết cảnh nhiều nhân vật đứng chồng một chỗ ở cùng một trạm
@@ -984,11 +1182,16 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       const r = remoteEntry(o);
       const ow = MD.toWorld(o.x, o.y);
       const sitting = !!o.s;
-      r.walk.visible = !sitting && !r.ch; r.sit.visible = sitting && !r.ch;
-      if (r.ch) {
-        const close = camera.position.distanceTo(r.grp.position) < 60;
-        r.ch.obj.visible = true;
-        r.ch.setBase(!sitting && o.moving ? 'run' : 'idle');
+      // xa (> 90 m, trễ tới 80 m): thay nhân vật có xương bằng hình rút gọn (một mesh tĩnh) — phòng 60 người không phải
+      // chạy da / xương cho người chỉ cao vài điểm ảnh
+      const dcam = camera.position.distanceTo(r.grp.position);
+      if (dcam > 90) r.lite = true; else if (dcam < 80) r.lite = false;
+      const useCh = r.ch && !r.lite;
+      r.walk.visible = !sitting && !useCh; r.sit.visible = sitting && !useCh;
+      if (r.ch) r.ch.obj.visible = useCh;
+      if (useCh) {
+        const close = dcam < 60;
+        r.ch.setBase(o.w === 4 && r.ch.has('sit') ? 'sit' : !sitting && o.moving ? 'run' : 'idle');
         if (o.bubble && o.bubble !== r.lastBub) { r.lastBub = o.bubble; if (o.bubble.text === '🙇' || o.bubble.text === '🙏') r.ch.play('bow'); else if (o.bubble.text === '👋') r.ch.play('wave'); }
         if (close) { r.ch.update(dt); if (sitting) r.ch.seat('calm', t); else r.ch.unseat(); }
         const oc = decodeCos(o.cos || ''); // decode MỘT lần cho cả đồ cầm tay + trang bị + hào quang
@@ -1032,11 +1235,23 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       if (o.moving && !px && !pz) { r.sep.x *= 1 - Math.min(1, dt * 2); r.sep.z *= 1 - Math.min(1, dt * 2); } // đang đi thì nhả dần về đúng vị trí
       const sx = ow.x + r.sep.x, sz = ow.z + r.sep.z;
       occupied.push({ x: sx, z: sz });
-      r.grp.position.set(sx, world.groundY(sx, sz) + (o.a || 0) + (sitting ? 0 : (o.moving && !reduced ? Math.abs(Math.sin(t * 9.5 + ow.x)) * 0.07 : 0)), sz);
+      // người khác đang bơi: nổi theo mặt sóng ở máy mình (cùng hàm water.js) — gói mv không mang cao độ âm
+      // người khác trên thuyền: dựng thuyền đúng loại dưới chân, nổi theo sóng
+      if (o.w === 4) { const rid = ['lua', 'ngua', 'xengua'][o.b || 0] || 'ngua'; if (r.mountId !== rid && !r.mountBusy) { if (r.mount) scene.remove(r.mount); r.mount = null; r.mountId = rid; r.mountBusy = true; mountTemplate(rid).then((m) => { r.mountBusy = false; if (m && r.mountId === rid && remotes.has(o.id)) { r.mount = m; scene.add(m); } }); } }
+      else if (r.mount) { scene.remove(r.mount); r.mount = null; r.mountId = null; }
+      if (o.w === 3) { const want = String(o.b || 0); if (!r.boat || r.boat.userData.idx !== want) { if (r.boat) scene.remove(r.boat); r.boat = makeBoatByIdx(o.b || 0); r.boat.userData.idx = want; scene.add(r.boat); } r.boat.visible = true; }
+      else if (r.boat) r.boat.visible = false;
+      const by = o.w === 3 && r.boat ? floatBoat(r.boat, sx, sz, o.h || 0) + (r.boat.userData.type === 'buom' ? 1.1 : r.boat.userData.type === 'hoa' ? 0.5 : 0.3) : null;
+      const wy = o.w === 2 ? MO.waterLevelAt(sx, sz) : null;
+      const wwY = o.w === 5 ? MO.waterLevelAt(sx, sz) : null; // người khác đạp nước: đứng trên mặt sóng (P14)
+      r.swimK = (r.swimK || 0) + ((o.w === 2 ? (o.moving ? 1 : 0.25) : 0) - (r.swimK || 0)) * Math.min(1, dt * 4);
+      r.grp.position.set(sx, by ?? (wwY != null ? wwY + 0.02 : wy != null ? wy - MO.FLOAT + r.swimK * 0.72 : world.groundY(sx, sz) + (o.a || 0)) + (sitting || o.w ? 0 : (o.moving && !reduced ? Math.abs(Math.sin(t * 9.5 + ow.x)) * 0.07 : 0)), sz);
+      r.grp.rotation.order = 'YXZ'; r.grp.rotation.x = r.swimK * 1.25;
       const goalH = sitting ? Math.PI : (o.h || 0);
       const dh2 = ((goalH - r.heading + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
       r.heading += dh2 * Math.min(1, dt * 8);
       r.grp.rotation.y = r.heading;
+      if (r.mount) { r.mount.position.set(sx, r.grp.position.y, sz); r.mount.rotation.y = r.heading; r.grp.position.y += MOUNT[r.mountId]?.saddle || 1; }
       r.data = o;
     }
     for (const id of [...remotes.keys()]) if (!seen.has(id)) dropRemote(id);
@@ -1095,6 +1310,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     showBubble(gateBub, lt.bark, GATE_SM.x, 5.6, GATE_SM.z - 0.8);
     for (const cn of caseNpcs) showBubble(cn.bub, cn.g.visible ? cn.bark.bark : null, cn.g.position.x, 3.3, cn.g.position.z); // trên nhãn ❓ (y≈2.9)
     for (const hn of hermits) showBubble(hn.bub, hn.bark.bark, hn.x, hn.gy + 2.9, hn.z); // dưới nhãn tên (y≈3,3) — đúng khuôn bark NPC cục bộ
+    citizens.ui(w, place, showBubble);
     for (const r of remotes.values()) {
       const o = r.data; if (!o) continue;
       const ow = MD.toWorld(o.x, o.y);
@@ -1150,11 +1366,22 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
    * và vùng gần, cắt lát va chạm, biên dịch toàn bộ shader, đẩy texture lên GPU, vẽ nháp vài khung.
    * Nhờ vậy vào game là mượt ngay, không «khựng dần» trong nửa phút đầu.
    */
+  // Đèn điểm gắn sẵn trong mô hình (đèn lồng Sơn Môn, nến bàn xăm, đốm hương…): mỗi đèn điểm có mặt trong
+  // cảnh là thêm chi phí cho MỌI điểm ảnh được chiếu sáng (Intel UHD: 14 đèn ≈ −20% khung hình). Chuyển hết
+  // sang danh sách LIGHTS — nhóm đèn (lightPool) gán cho vài nguồn gần người chơi nhất.
+  const absorbLights = () => {
+    const pool = new Set(lightPool), stray = [];
+    scene.traverse((o) => { if (o.isPointLight && !pool.has(o)) stray.push(o); });
+    const P = new THREE.Vector3();
+    for (const l of stray) { l.getWorldPosition(P); addLight(P.x, P.y, P.z, { color: '#' + l.color.getHexString(), power: Math.max(0.4, Math.min(1.2, l.intensity || 0.6)) }); l.parent.remove(l); }
+  };
   async function ready(px, pz, onStep = () => {}) {
+    absorbLights();
     const cap = (p, ms) => Promise.race([p, new Promise((r) => setTimeout(r, ms))]);
     await world.prepare(px, pz, onStep);
     onStep('Đang dựng Sơn Môn…');
-    await cap(Promise.all([sect.loaded, stoneReady(), landmarks.prepare(px, pz, 900)]), 25000);
+    await cap(Promise.all([sect.loaded, stoneReady(), landmarks.prepare(px, pz, 350)]), 25000);
+    await cap(settleLods(px, pz), 6000); // công trình gần lên bản chi tiết trước khi mở màn (không nhảy bậc trước mắt); vùng xa nạp nền sau khi vào game
     onStep('Đang đặt va chạm công trình…');
     await cap(footprintIdle(), 8000);
     onStep('Đang chuẩn bị ánh sáng…');
@@ -1173,7 +1400,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // (cây instanced, nhân vật skinned, mô hình có alpha…) biên dịch luôn, không đợi tới lúc chúng
     // lọt vào vùng bóng quanh người chơi giữa lúc chơi
     const sc = sun.shadow.camera, keep = { l: sc.left, r: sc.right, t: sc.top, b: sc.bottom, f: sc.far };
-    Object.assign(sc, { left: -1100, right: 1100, top: 1100, bottom: -1100, far: 3000 }); sc.updateProjectionMatrix();
+    Object.assign(sc, { left: -T.HALF, right: T.HALF, top: T.HALF, bottom: -T.HALF, far: T.WORLD * 1.5 }); sc.updateProjectionMatrix();
     const sp = sun.position.clone(); sun.position.copy(sun.target.position).addScaledVector(lightDir.lengthSq() ? lightDir : new THREE.Vector3(0.4, 0.8, 0.3), 1400);
     // vật thể chưa từng vào vùng bóng (cây instanced đang 0 bản sao, chunk núi chưa đổ bóng…) vẫn
     // phải có mặt trong lượt nháp này thì shader bóng của chúng mới được biên dịch sẵn
@@ -1190,18 +1417,30 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   }
 
   return {
+    setStickHook(h) { stickHook = h; },
+    morphStats: () => world.morphStats(),
     mode: '3d',
     ready,
-    warmScene: () => renderer.compileAsync(scene, camera),
+    citizens, // gỡ lỗi: dân thành Bát Quái
+    prepareRoom: (key) => roomsB.prepare(key),
+    rebuildRoom: (key) => { roomsB.rebuild(key); const m = /^est:(\d+)$/.exec(key || ''); if (m) mansionsB.refurnish(Number(m[1])); },
+    mansions: mansionsB, // gỡ lỗi
+    raze: RZ, // phá hủy công trình ngoài thành (main.js)
+    rooms: roomsB, // gỡ lỗi
+    setEstateOwner, setEstateLookup, // biển nhà rao bán / tên chủ nhà ngoài phố
+    warmScene: () => { absorbLights(); return renderer.compileAsync(scene, camera); },
     scene, // kiểm thử / gỡ lỗi
     resize,
     frame,
     pick,
     get yaw() { return cam.yaw; },
+    get cam() { return cam; }, // gỡ lỗi / chụp ảnh kiểm (scripts)
     rotate(step) { cam.yawGoal += step; },
     celebrate(wx) { celebColor.set(WX_COLOR[wx] || '#ffd27a'); celebrate = 6; },
     get lowQuality() { return lowQuality; },
     get degrade() { return degrade; },
+    // gỡ lỗi hiệu năng: tổng lệnh vẽ / tam giác của CẢ một khung (bóng + cảnh + hậu kỳ)
+    frameStats() { const inf = renderer.info; inf.autoReset = false; inf.reset(); if (composer) composer.render(); else renderer.render(scene, camera); const r = { calls: inf.render.calls, tris: inf.render.triangles, geo: inf.memory.geometries, tex: inf.memory.textures, progs: inf.programs.length }; inf.autoReset = true; return r; },
     info: () => ({ ...renderer.info.render, quality, trees: world.treeCount, pending: world.pending, cam: camera.position.toArray().map((v) => Math.round(v)), target: cam.target.toArray().map((v) => Math.round(v)) }),
     // Ảnh chụp canvas (kiểm thử / chia sẻ): vẽ lại rồi đọc ngay trong cùng tác vụ.
     snapshot(type = 'image/jpeg') { renderer.render(scene, camera); return canvas.toDataURL(type, 0.85); },

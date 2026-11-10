@@ -4,12 +4,16 @@
 //  bản đồ độ sâu nước. Luồng chính chỉ còn gói mảng số vào BufferGeometry / texture.
 // ============================================================================
 import * as T from './terrain.js';
+import { waterAt } from './water.js';
 import { inCourt } from './court.js';
-import { CITY_R, roadField, makeRoadSampler } from './roads.js';
+import { roadField, makeRoadSampler } from './roads.js';
+import { GUA, OCT_A } from './batquai.js';
+const octDist = (x, z) => { let m = -Infinity; for (const g of GUA) m = Math.max(m, x * g.dir[0] + z * g.dir[1]); return m - OCT_A; };
 import { rng } from './textures.js';
 
-export const CHUNK = 128;
-export const CHUNKS = T.WORLD / CHUNK; // 16 × 16
+export const ROAD_RES = 1536; // ~2,2 m / điểm ảnh trên 3328 m
+export const CHUNK = 256; // thế giới v3 3328 m → 13 × 13 chunk (giữ ~170 lưới / lệnh vẽ như bản 2048 × 128)
+export const CHUNKS = T.WORLD / CHUNK;
 
 // Mặt đất = trộn 4 lớp kết cấu (ground-tex.js) theo trọng số từng đỉnh; màu đỉnh chỉ còn là
 // «tông» nhân thêm (khô/ướt, cát, đáy hồ, sáng tối vĩ mô) — hết cảnh thảm xanh đổ màu phẳng.
@@ -24,9 +28,10 @@ export function groundAt(x, z, h, s, out = new Float32Array(7)) {
   const k = 0.88 + 0.22 * (0.5 + 0.5 * Math.sin(x * 0.07 + Math.cos(z * 0.05) * 3));
   const tint = [0, 1, 2].map((c) => TINT.lush[c] + (TINT.dry[c] - TINT.lush[c]) * dryK);
   let dirt = 0.85 * sst(0.16, 0.4, T.fbm(x / 34 + 11, z / 34 - 7, 3)); // mảng đất trống
-  if (Math.hypot(x, z) < CITY_R + 6) dirt = Math.max(dirt, 0.4 + 0.3 * sst(0.0, 0.3, T.fbm(x / 12, z / 12, 2))); // đất nện trong thành
+  const ow = octDist(x, z), oo = T.cityOctDist(x, z); // khoảng cách có dấu tới tường Nội / Ngoại Thành (âm = trong)
+  if (oo < 6) dirt = Math.max(dirt, 0.4 + 0.3 * sst(0.0, 0.3, T.fbm(x / 12, z / 12, 2))); // đất nện trong thành
   const rock = Math.max(0, Math.min(1, (s - 0.72 - 0.15 * v) / 0.38)); // đá lộ ở dốc > ~36°
-  const rw = Math.abs(Math.hypot(x, z) - CITY_R); // chân tường thành: dải đất nện ẩm
+  const rw = Math.min(Math.abs(ow), Math.abs(oo)); // chân tường thành (cả hai lớp): dải đất nện ẩm
   if (rw < 5) dirt = Math.max(dirt, 1 - sst(2, 5, rw));
   const snow = h > 290 ? Math.max(0, Math.min(1, (h - 290) / 60)) * (1 - rock * 0.6) : 0;
   return set((1 - rock) * (1 - dirt * 0.6), dirt * (1 - rock), rock, snow, tint, k);
@@ -89,14 +94,14 @@ export function chunkData(cx, cz, seg) {
 }
 
 let ROAD = null;
-const roadAt = (x, z) => { if (!ROAD) ROAD = makeRoadSampler(roadField(1024)); return ROAD(x, z); };
+const roadAt = (x, z) => { if (!ROAD) ROAD = makeRoadSampler(roadField(ROAD_RES)); return ROAD(x, z); };
 
 // Vị trí rừng: mật độ từ treeDensity, 2 loài; không mọc giữa đường
 export function treeList() {
   const pine = [], leaf = [];
   const tr = rng(17);
-  for (let x = -T.EDGE; x < T.EDGE; x += 11) for (let z = -T.EDGE; z < T.EDGE; z += 11) {
-    const px = x + (tr() - 0.5) * 9, pz = z + (tr() - 0.5) * 9;
+  for (let x = -T.EDGE; x < T.EDGE; x += 15) for (let z = -T.EDGE; z < T.EDGE; z += 15) { // lưới 15 m (thế giới ×1,6: giữ số cây ~ như cũ)
+    const px = x + (tr() - 0.5) * 12, pz = z + (tr() - 0.5) * 12;
     const dn = T.treeDensity(px, pz);
     if (tr() > dn * 0.75) continue;
     if (roadAt(px, pz) < 2.5) continue;
@@ -112,6 +117,21 @@ export function depthData(DEP, toHalf) {
   for (let j = 0; j < DEP; j++) {
     const z = -T.HALF + (j + 0.5) * st;
     for (let i = 0; i < DEP; i++) out[j * DEP + i] = toHalf(T.heightAt(-T.HALF + (i + 0.5) * st, z) - T.WATER);
+  }
+  return out;
+}
+
+// Dòng chảy mặt nước (m/s) trên lưới N × N phủ cả thế giới — RG 8 bit: 128 + v × 60 (±2,1 m/s); shader world3d
+// trôi pháp tuyến theo dòng (sông chảy thấy được)
+export function flowData(N) {
+  const out = new Uint8Array(N * N * 2), st = T.WORLD / N;
+  for (let j = 0; j < N; j++) {
+    const z = -T.HALF + (j + 0.5) * st;
+    for (let i = 0; i < N; i++) {
+      const w = waterAt(-T.HALF + (i + 0.5) * st, z), o = (j * N + i) * 2;
+      out[o] = Math.max(0, Math.min(255, Math.round(128 + (w ? w.flow.x : 0) * 60)));
+      out[o + 1] = Math.max(0, Math.min(255, Math.round(128 + (w ? w.flow.z : 0) * 60)));
+    }
   }
   return out;
 }

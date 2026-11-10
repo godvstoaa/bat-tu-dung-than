@@ -4,10 +4,13 @@
 //  Gia trì theo hành Dụng thần của người chơi, mở dần theo cấp; VIP mở sớm bay + gia trì.
 //  Thuần logic — test: scripts/test-game-progress.mjs
 // ============================================================================
+import { effectiveLevel } from './realm.js';
 
 // xp cần để đạt cấp L: 20·(L−1)²  → L2: 20 · L3: 80 · L4: 180 · L6: 500 · L8: 980 · L10: 1620
 export const xpFor = (L) => 20 * (L - 1) ** 2;
 export const levelOf = (xp = 0) => Math.max(1, Math.floor(Math.sqrt(Math.max(0, xp) / 20)) + 1);
+/** cấp hiệu lực: kẹp ở trần cảnh giới đã đột phá (P20 — realm.js); s không phải state đầy đủ thì dùng cấp thô */
+export const effLevel = (s) => { const raw = levelOf(s?.xp || 0); return s && typeof s === 'object' ? effectiveLevel(s, raw) : raw; };
 
 export const GIATRI = [
   { id: 'aura', lv: 2, vip: true, name: 'Hào quang hộ thể', desc: 'vòng sáng dưới chân theo màu hành' },
@@ -34,7 +37,7 @@ export function vipActive(s, now = Date.now()) {
 export function unlocked(s, id, now = Date.now()) {
   const g = GIATRI.find((x) => x.id === id);
   if (!g) return false;
-  return levelOf(s?.xp || 0) >= g.lv || (g.vip && vipActive(s, now));
+  return effLevel(s) >= g.lv || (g.vip && vipActive(s, now));
 }
 
 export function unlockedList(s, now = Date.now()) {
@@ -43,9 +46,9 @@ export function unlockedList(s, now = Date.now()) {
 
 /** Tiến độ tới cấp sau: { level, xp, from, to, pct } */
 export function levelInfo(s) {
-  const xp = s?.xp || 0, level = levelOf(xp);
+  const xp = s?.xp || 0, raw = levelOf(xp), level = effLevel(s);
   const from = xpFor(level), to = xpFor(level + 1);
-  return { level, xp, from, to, pct: Math.round(((xp - from) / (to - from)) * 100) };
+  return { level, raw, capped: level < raw, xp, from, to, pct: Math.round(((xp - from) / (to - from)) * 100) };
 }
 
 /** Gia trì vừa mở khi xp tăng từ a → b (để báo cho người chơi). */

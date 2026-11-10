@@ -3,6 +3,7 @@
 //  Toạ độ: ô lưới (x, y) → thế giới X = (x − 10)·U, Z = (y − 7)·U, Y hướng lên.
 // ============================================================================
 import * as THREE from 'three';
+import { lotusLife, waterSurface } from './lotus.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import * as TX from './textures.js';
 
@@ -569,31 +570,14 @@ export function calendarBoard(calTex, m = materials()) {
 
 export function pond(rippleMap, m = materials(), { cz = 6.4, W = 12.4, D = 3.0 } = {}) {
   const g = new THREE.Group();
-  const pads = Math.round(14 * (W * D) / 37), flowers = Math.round(6 * (W * D) / 37);
   for (const [x, z, w, d] of [[0, cz - D / 2 - 0.2, W + 0.8, 0.4], [0, cz + D / 2 + 0.2, W + 0.8, 0.4], [-W / 2 - 0.2, cz, 0.4, D], [W / 2 + 0.2, cz, 0.4, D]]) {
     g.add(box(w, 0.32, d, m.stone, { x, y: 0.16, z }));
     g.add(box(w, 0.04, d, m.stoneDark, { x, y: 0.34, z, shadow: false }));
   }
   g.add(box(W, 0.1, D, std({ color: '#0d2228', roughness: 1 }), { y: -0.3, z: cz, shadow: false }));
-  const water = mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ map: rippleMap, color: '#5fa3ad', roughness: 0.08, metalness: 0.35, transparent: true, opacity: 0.88 }), { y: 0.12, z: cz, rx: -Math.PI / 2, shadow: false });
-  water.userData.dynamic = true; g.add(water);
-  const r = TX.rng(23);
-  const padGeo = new THREE.CircleGeometry(0.32, 16, 0.3, Math.PI * 1.85);
-  for (let i = 0; i < pads; i++) {
-    const p = mesh(padGeo, m.lotusLeaf, { x: (r() - 0.5) * (W - 1), y: 0.14, z: cz + (r() - 0.5) * (D - 0.6), rx: -Math.PI / 2, rz: r() * 6, shadow: false });
-    p.scale.setScalar(0.7 + r() * 0.6); g.add(p);
-  }
-  // hoa sen: hai tầng cánh
-  for (let i = 0; i < flowers; i++) {
-    const f = new THREE.Group(); f.position.set((r() - 0.5) * (W - 2), 0.16, cz + (r() - 0.5) * (D - 0.8));
-    for (let k = 0; k < 8; k++) {
-      const pet = mesh(new THREE.SphereGeometry(0.09, 8, 6, 0, Math.PI), m.lotus, { y: 0.08, ry: (k / 8) * Math.PI * 2, rx: -0.5, shadow: false });
-      pet.scale.set(1, 1.6, 0.6); pet.position.x = Math.sin((k / 8) * Math.PI * 2) * 0.05; pet.position.z = Math.cos((k / 8) * Math.PI * 2) * 0.05;
-      f.add(pet);
-    }
-    f.add(mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.05, 10), m.gold, { y: 0.1, shadow: false }));
-    g.add(f);
-  }
+  // mặt nước sóng lăn tăn + sen dập dềnh, hoa trên cuống, cá chép (lotus.js — cập nhật khi người chơi ở gần)
+  const water = waterSurface(W, D); water.position.set(0, 0.12, cz); g.add(water);
+  lotusLife(g, { x0: -W / 2, x1: W / 2, z0: cz - D / 2, z1: cz + D / 2, y: 0.12, seed: Math.round(W * 13 + D * 7) });
   // đèn hoa đăng của khách (ẩn cho tới khi thả)
   const lanterns = [];
   for (let i = 0; i < 6; i++) {

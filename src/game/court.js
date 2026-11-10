@@ -88,6 +88,13 @@ export const TEA_SEATS = [-12.4, -10, -7.6].map((x) => {
   return toTile(x + dx, -5.7 + dz);
 });
 
+// Lư Hương chung (protocol.js › BURNER_CAP): lư lớn = gian «huong» trước Đại Đỉnh (0, 27.5); 8 lư nhỏ vòng quanh đỉnh
+// (bán kính 7,2 m, tránh đèn đá ±5,6 và chỗ khách đứng thắp ở lư lớn)
+export const DINH = { x: 0, z: 27.5 };
+export const BURNERS = [{ x: 0, z: 34, main: true }, ...[25, 70, 110, 155, 222, 258, 282, 318].map((d) => {
+  const a = (d * Math.PI) / 180;
+  return { x: Math.round((DINH.x + Math.cos(a) * 7.2) * 100) / 100, z: Math.round((DINH.z + Math.sin(a) * 7.2) * 100) / 100, ry: -a - Math.PI / 2 };
+})];
 export const START_M = { x: 3, z: 43 }; // giữa sân trước, nhìn thẳng lên Chính Đường
 
 // ---------------------------------------------------------------------------
@@ -101,6 +108,9 @@ addSolidRect(COURT.x0 - T, COURT.z1, -COURT.gateS, COURT.z1 + T);
 addSolidRect(COURT.gateS, COURT.z1, COURT.x1 + T, COURT.z1 + T);
 addSolidRect(COURT.x0 - T, COURT.z0 - T, -COURT.gateN, COURT.z0);
 addSolidRect(COURT.gateN, COURT.z0 - T, COURT.x1 + T, COURT.z0);
+
+// 8 lư hương nhỏ (đặc 1 × 1 m)
+for (const b of BURNERS) if (!b.main) addSolidRect(b.x - 0.5, b.z - 0.5, b.x + 0.5, b.z + 0.5);
 
 // nền đá: mặt trên đi được, mép là vách (dải 0,5 m) — chừa chỗ bậc
 for (const t of TERRACES) addPlatform((t.x0 + t.x1) / 2, (t.z0 + t.z1) / 2, t.x1 - t.x0, t.z1 - t.z0, 0, t.top);

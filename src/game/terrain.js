@@ -6,11 +6,21 @@
 //  Bắc = −Z. Huyền Thành là cao nguyên phẳng ở độ cao 0 (quán cũ đặt nguyên tại y = 0).
 // ============================================================================
 
-export const WORLD = 2048;
+// THẾ GIỚI v3 (2026-11-10): toàn bộ địa hình bản cũ 2048 m PHÓNG ĐỀU ×1,6 — heightAt(x, z) = địa hình cũ
+// tại (x/1,6, z/1,6). Mọi vùng, sông, sảnh nghề, bình đài giữ nguyên hình dạng tương đối (dốc thoải hơn),
+// Ngoại Thành bát giác 420 → 672 (thêm vành biệt phủ). Hằng xuất ra (REGIONS, RIVER, CLEARINGS…) ở toạ độ MỚI.
+import { inCanal, CANAL_BED, extCarve } from './canals.js';
+import { riverCarve, RIVER_CTRL, WATER_LEVEL } from './waterways.js';
+export const SCALE = 1.6;
+const S0 = { HALF: 1024, EDGE: 960, CITY_OCT: 420, PEAK_PAD: 125 }; // hằng bản cũ (dùng bên trong heightOld)
+export const WORLD = 3328;        // 13 chunk × 256 m (terrain-mesh.CHUNK)
 export const HALF = WORLD / 2;
-export const WATER = -6;          // mực nước hồ / sông
+export const WATER = WATER_LEVEL;  // mực nước hồ / sông (-6, waterways.js)
 export const CLOUD_SEA = -70;     // biển mây quanh rìa thế giới
-export const EDGE = 960;          // bán kính bắt đầu đổ xuống biển mây
+export const EDGE = S0.EDGE * SCALE; // 1536 — bán kính bắt đầu đổ xuống biển mây
+// dải không gian nội thất (phòng tiệm / nhà / điện thờ) ở rìa Đông, ngoài biển mây — rooms.js, world.js › ROOMS, protocol.WORLD_TILES
+export const ROOM_X0 = HALF + 250; // 1914
+export const ROOM_X1 = ROOM_X0 + 700; // mép Đông cùng của dải phòng
 
 // --- simplex noise 2D (Gustavson), hoán vị theo hạt giống
 function makeNoise(seed = 1) {
@@ -43,37 +53,43 @@ const ridged = (x, z, oct = 5) => { let a = 0, f = 1, amp = 1, norm = 0; for (le
 const smooth = (e0, e1, x) => { const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
 
 // --- các vùng (C1). kind: city (cao nguyên phẳng) · peak (núi tông môn) · valley · lake · plateau
-export const REGIONS = [
-  { id: 'thanh', name: 'Huyền Thành', x: 0, z: 0, r: 180, kind: 'city', h: 0 },
+const REGIONS0 = [
+  { id: 'thanh', name: 'Huyền Thành', x: 0, z: 0, r: 450, kind: 'city', h: 0 }, // Bát Quái Thành: Ngoại Thành bát giác trung đoạn 420 (cityblocks.js)
   { id: 'tubinh', name: 'Tử Bình Phong', x: -620, z: -560, r: 230, kind: 'peak', h: 420 },
   { id: 'manh', name: 'Manh Phái Cốc', x: 640, z: -520, r: 230, kind: 'valley', h: 300 },
   { id: 'trichthien', name: 'Trích Thiên Đỉnh', x: -600, z: 600, r: 210, kind: 'peak', h: 380 },
-  { id: 'cungthong', name: 'Cùng Thông Hồ', x: 620, z: 620, r: 250, kind: 'lake', h: -24 },
+  // hồ dời vào trong (2026-11-10): tâm (930, 900) r 250 m mới — bờ Đông / Nam trước đây tràn ra quá rìa thế giới (không có bờ)
+  { id: 'cungthong', name: 'Cùng Thông Hồ', x: 581.25, z: 562.5, r: 156.25, kind: 'lake', h: -24 },
   { id: 'thulau', name: 'Thư Lâu Lâm', x: 0, z: -700, r: 160, kind: 'plateau', h: 110 },
   { id: 'phongthuy', name: 'Phong Thủy Viên', x: -820, z: 0, r: 150, kind: 'plateau', h: 55 },
   { id: 'lichduong', name: 'Lịch Đường', x: 820, z: 0, r: 150, kind: 'plateau', h: 55 },
 ];
-export const SKY_ISLAND = { id: 'thienban', name: 'Thiên Bàn Đảo', x: 0, z: 300, r: 120, y: 520 };
+export const REGIONS = REGIONS0.map((g) => ({ ...g, x: g.x * SCALE, z: g.z * SCALE, r: g.r * SCALE }));
+export const SKY_ISLAND = { id: 'thienban', name: 'Thiên Bàn Đảo', x: 0, z: 300 * SCALE, r: 120 * SCALE, y: 520 };
 
-// Sông Huyền Hà: Trích Thiên Đỉnh → vòng qua phía Tây Huyền Thành → Cùng Thông Hồ
-export const RIVER = [[-520, 470], [-380, 360], [-260, 230], [-230, 60], [-160, 220], [40, 300], [260, 420], [430, 560], [560, 600]];
+// Sông Huyền Hà (waterways.js): sông lớn ~150 m từ rìa Tây → chân Trích Thiên → vòng Nam Ngoại Thành → hồ Cùng Thông.
+// RIVER = điểm điều khiển tim sông (toạ độ mới) — giữ tên cũ cho nơi dùng.
+export const RIVER = RIVER_CTRL;
 
-function distToRiver(x, z) {
-  let best = Infinity;
-  for (let i = 0; i < RIVER.length - 1; i++) {
-    const [ax, az] = RIVER[i], [bx, bz] = RIVER[i + 1];
-    const vx = bx - ax, vz = bz - az; const t = Math.max(0, Math.min(1, ((x - ax) * vx + (z - az) * vz) / (vx * vx + vz * vz)));
-    const dx = x - (ax + vx * t), dz = z - (az + vz * t);
-    best = Math.min(best, Math.hypot(dx, dz));
-  }
-  return best;
-}
+// khoảng cách có dấu tới tường bát giác Ngoại Thành (trung đoạn CITY_OCT, âm = trong thành)
+export const CITY_OCT = S0.CITY_OCT * SCALE; // 672 = cityblocks.OUTER_A (test-game-city kiểm khớp)
+const OCT_DIRS = Array.from({ length: 8 }, (_, k) => [Math.cos(Math.PI / 2 + k * Math.PI / 4), Math.sin(Math.PI / 2 + k * Math.PI / 4)]);
+const octMax = (x, z) => { let m = -Infinity; for (const [dx, dz] of OCT_DIRS) m = Math.max(m, x * dx + z * dz); return m; };
+export function cityOctDist(x, z) { return octMax(x, z) - CITY_OCT; }
+const cityOctDist0 = (x, z) => octMax(x, z) - S0.CITY_OCT;
 
 // bán kính + độ cao bình đài trên đỉnh núi (landmarks.js đặt quần thể lên đây)
-export const PEAK_PAD = 125;
+export const PEAK_PAD = S0.PEAK_PAD * SCALE;
 export function peakPadH(g) { return g.h * 0.86 + 40; }
 
+// sông Huyền Hà khắc theo mặt cắt thật (waterways.riverCarve, toạ độ mới) · thủy đạo Bát Môn trong thành (canals.js):
+// lòng kênh / hào phẳng đáy −4,3 (mặt nước −0,8) · kênh dẫn ra sông + suối nạp (canals.extCarve)
 export function heightAt(x, z) {
+  const h = riverCarve(x, z, heightOld(x / SCALE, z / SCALE));
+  return inCanal(x, z) ? Math.min(h, CANAL_BED) : extCarve(x, z, h);
+}
+function heightOld(x, z) {
+  const REGIONS = REGIONS0, PEAK_PAD = S0.PEAK_PAD, cityOctDist = cityOctDist0, EDGE = S0.EDGE, HALF = S0.HALF;
   const r = Math.hypot(x, z);
   // nền: đồi thoai thoải + núi gợn khắp nơi
   let h = 28 + 34 * fbm(x / 420, z / 420) + 70 * Math.pow(ridged(x / 520 + 9, z / 520 - 3), 2.2);
@@ -92,9 +108,6 @@ export function heightAt(x, z) {
       h = h * (1 - k) + (g.h + 6 * n3(x / 60, z / 60)) * k;
     }
   }
-  // sông khắc lòng (rộng ~22, sâu tới dưới mực nước)
-  const dr = distToRiver(x, z);
-  if (dr < 60) { const k = 1 - smooth(10, 60, dr); h = h * (1 - k) + (WATER - 5 + 4 * (dr / 60)) * k; }
   // bình đài đỉnh núi tông môn: san phẳng chóp (đặt cung điện), quanh mép thành vách dựng
   for (const g of REGIONS) {
     if (g.kind !== 'peak') continue;
@@ -105,8 +118,8 @@ export function heightAt(x, z) {
   // cao nguyên phẳng (thành, thư lâu, phong thủy viên, lịch đường) — làm phẳng cuối cùng
   for (const g of REGIONS) {
     if (g.kind !== 'city' && g.kind !== 'plateau') continue;
-    const d = Math.hypot(x - g.x, z - g.z);
-    const k = 1 - smooth(g.r * 0.85, g.r * 1.45, d);
+    // thành: phẳng tới ngoài tường 15 m theo đúng hình bát giác, chuyển dốc trong ~100 m (không đè mạch núi tông môn)
+    const k = g.kind === 'city' ? 1 - smooth(15, 120, cityOctDist(x, z)) : 1 - smooth(g.r * 0.85, g.r * 1.45, Math.hypot(x - g.x, z - g.z));
     h = h * (1 - k) + g.h * k;
   }
   // rìa thế giới đổ xuống biển mây
@@ -143,12 +156,12 @@ export function walkable(x, z, fromX, fromZ) {
 
 // Rừng: mật độ cây theo noise + luật vùng (không trồng trên nước, đá dốc, quảng trường, tuyết cao)
 // Sân trống quanh sảnh nghề (toạ độ khớp world.js › station.world) + quần thể cung điện
-export const CLEARINGS = [[735, -36], [-806, 62], [480, 420], [0, -630], [-567, 503], [654, -441], [-521, -538]].map(([x, z]) => ({ x, z, r: 45 }));
+export const CLEARINGS = [[735, -36], [-806, 62], [480, 420], [0, -630], [-567, 503], [654, -441], [-521, -538]].map(([x, z]) => ({ x: x * SCALE, z: z * SCALE, r: 45 * SCALE }));
 export function treeDensity(x, z) {
   for (const c of CLEARINGS) if (Math.hypot(x - c.x, z - c.z) < c.r) return 0;
   const h = heightAt(x, z);
   if (h < WATER + 1.5 || h > 330) return 0;
-  if (Math.hypot(x, z) < 200) return 0; // Huyền Thành: cây đặt tay
+  if (cityOctDist(x, z) < 30) return 0; // Bát Quái Thành: cây đặt tay
   const s = slopeAt(x, z);
   if (s > 0.9) return 0;
   return Math.max(0, 0.55 + 0.6 * fbm(x / 160 + 40, z / 160 - 11, 3)) * (1 - smooth(0.5, 0.9, s));
