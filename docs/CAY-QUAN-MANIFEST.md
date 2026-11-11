@@ -199,3 +199,12 @@ Máy dev lúc đo đang chạy thêm Chrome và ZCode của người dùng, nên
 - Đồ phố 440k tam giác, trong đó cây 280k.
 - Cỏ 200k tam giác.
 - Sơn Môn ở tâm thành 310k tam giác: mốc nhìn thấy từ đại lộ, trong tầm sương 1.700 m.
+
+**Độ phân giải động** (`render3d`, sau bậc hạ 1, hoặc khi người chơi chọn mức thấp):
+- Cách làm:
+  - Mỗi 3 s đo fps một lần.
+  - fps < 27: bớt 15% tỉ lệ điểm ảnh, tối thiểu 0,6.
+  - fps > 48: nâng lại, tối đa 1.
+- Vì sao chọn cách này: máy nghẽn đáng kể ở khâu tô điểm ảnh. Cùng điểm đại lộ, 1280 × 720 đạt 21 fps; 640 × 360 đạt 28 fps (+33%) dù có nhiều tam giác hơn.
+- Kết quả cùng điểm (mức mặc định): 21–22 → **27 fps** khi tỉ lệ về 0,6. Hình mềm hơn chút; chữ giao diện là HTML nên vẫn sắc.
+- Người chơi chọn mức trung hoặc cao: không tự hạ bậc, không đổi độ phân giải (tôn trọng lựa chọn).

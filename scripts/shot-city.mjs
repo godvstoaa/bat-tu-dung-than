@@ -10,7 +10,7 @@ const URL_ = process.argv.find((a) => a.startsWith('http')) || 'http://localhost
 const OUT = process.argv.slice(2).find((a) => !a.startsWith('http')) || 'shots';
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({ headless: true, args: ['--use-angle=d3d11', '--ignore-gpu-blocklist', '--enable-gpu-rasterization'] });
-const page = await (await browser.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
+const page = await (await browser.newContext({ viewport: { width: Number(process.env.VW || 1280), height: Number(process.env.VH || 720) } })).newPage();
 if (process.env.QUALITY) await page.addInitScript((q) => { try { localStorage.setItem('huyenquan:quality', q); } catch (e) { /* ignore */ } }, process.env.QUALITY); // QUALITY=low|mid|high: chụp ở mức đồ hoạ đó
 const errs = [], tiers = [];
 page.on('response', (r) => { const u = r.url(); if (/\.(lod1|mid)\.glb/.test(u)) tiers.push(u.split('/').pop()); });

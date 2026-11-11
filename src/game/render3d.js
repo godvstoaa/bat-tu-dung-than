@@ -760,13 +760,14 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // lắp chuỗi + padStart) — không cấp phát chuỗi mỗi khung hình
   let barkDay = { y: -1, m: -1, d: -1 }, barkDayKey = '';
   let fpsAcc = 0, fpsN = 0, fpsT = 0, lowQuality = false, degrade = 0, firstT = null, lastReal = 0;
+  let dynPR = 1; // độ phân giải động (sau bậc hạ 1): 0,6–1 × — máy nghẽn ở khâu tô điểm ảnh (đo 2026-11-12: ¼ điểm ảnh → +33 % fps)
   const tmpV = new THREE.Vector3();
   const tmpV2 = new THREE.Vector3();
   const headV = new THREE.Vector3();
 
   function resize() {
     const w = canvas.clientWidth || 640, h = canvas.clientHeight || 448;
-    renderer.setPixelRatio(softGl ? 0.5 : lowQuality ? 1 : Math.min(window.devicePixelRatio || 1, quality === 'high' ? 1.5 : 1.25)); // 2× = gấp 1,8 lần điểm ảnh, gần như không thấy khác
+    renderer.setPixelRatio(softGl ? 0.5 : lowQuality ? dynPR : Math.min(window.devicePixelRatio || 1, quality === 'high' ? 1.5 : 1.25)); // 2× = gấp 1,8 lần điểm ảnh, gần như không thấy khác
     renderer.setSize(w, h, false);
     composer?.setPixelRatio(renderer.getPixelRatio()); // bloom theo đúng tỉ lệ pixel của renderer
     composer?.setSize(w, h);
@@ -1346,12 +1347,13 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     /* bỏ khung giật đơn lẻ (> 1 s) — KHÔNG bỏ khung chậm thường xuyên: máy rất yếu (2–4 fps) trước đây không bao giờ được hạ */
     /* đo bằng đồng hồ THẬT: dt từ vòng lặp đã bị kẹp ≤ 0,05 s (vật lý) nên máy 3 fps vẫn «đo» ra 20 fps, không bao giờ được hạ */
     const realNow = performance.now(), rdt = lastReal ? (realNow - lastReal) / 1000 : 0; lastReal = realNow;
-    if (t - firstT > 8 && rdt > 0 && rdt < 1 && !qualityForced) { fpsAcc += rdt; fpsN++; fpsT += rdt; }
+    if (t - firstT > 8 && rdt > 0 && rdt < 1) { fpsAcc += rdt; fpsN++; fpsT += rdt; }
     if (fpsT > 3) {
       const fps = fpsN / fpsAcc;
       // hạ theo bậc — bóng đổ giữ tới cùng (tắt bóng làm cả cảnh phẳng, «giả» hẳn):
       // bậc 1: độ phân giải 1×, tắt bloom/hạt bụi, cỏ còn ½, bóng 1024 · bậc 2: tắt bóng
-      if (fps < 35 && degrade === 0) {
+      if (qualityForced) { /* người chơi chọn mức đồ hoạ: không tự hạ bậc (chỉ độ phân giải động ở mức thấp, dưới đây) */ }
+      else if (fps < 35 && degrade === 0) {
         degrade = 1; lowQuality = true; renderer.setPixelRatio(softGl ? 0.5 : 1); composer?.setPixelRatio(renderer.getPixelRatio()); if (bloomPass) bloomPass.enabled = false;
         world.grass?.setDensity(0.5);
         if (sun.shadow.mapSize.x > 1024) { sun.shadow.mapSize.set(1024, 1024); sun.shadow.map?.dispose(); sun.shadow.map = null; }
@@ -1361,6 +1363,15 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       } else if (fps < 12 && degrade === 2 && quality !== 'low') {
         // vẫn quá chậm: tải lại ở mức THẤP (ít nhà chi tiết, tầm nhìn ngắn) — một lần, người chơi được báo khi vào lại
         degrade = 3; try { localStorage.setItem('huyenquan:quality', 'low'); localStorage.setItem('huyenquan:autoLow', '1'); setTimeout(() => location.reload(), 300); } catch (err) { /* ignore */ }
+      }
+      // ĐỘ PHÂN GIẢI ĐỘNG (sau bậc 1): fps < 27 → bớt 15 % tỉ lệ điểm ảnh (tối thiểu 0,6); fps > 48 → nâng lại (tối đa 1).
+      // Mỗi cửa sổ đo 3 s một bước — không nhấp nháy; hình mờ hơn chút nhưng mượt hơn rõ trên máy đồ hoạ tích hợp.
+      if ((degrade >= 1 || quality === 'low') && !softGl) {
+        lowQuality = true;
+        const prev = dynPR;
+        if (fps < 27 && dynPR > 0.6) dynPR = Math.max(0.6, Math.round(dynPR * 0.85 * 100) / 100);
+        else if (fps > 48 && dynPR < 1) dynPR = Math.min(1, Math.round((dynPR / 0.85) * 100) / 100);
+        if (dynPR !== prev) { renderer.setPixelRatio(dynPR); composer?.setPixelRatio(dynPR); }
       }
       fpsAcc = 0; fpsN = 0; fpsT = 0;
     }
@@ -1466,7 +1477,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     get degrade() { return degrade; },
     // gỡ lỗi hiệu năng: tổng lệnh vẽ / tam giác của CẢ một khung (bóng + cảnh + hậu kỳ)
     frameStats() { const inf = renderer.info; inf.autoReset = false; inf.reset(); if (composer) composer.render(); else renderer.render(scene, camera); const r = { calls: inf.render.calls, tris: inf.render.triangles, geo: inf.memory.geometries, tex: inf.memory.textures, progs: inf.programs.length }; inf.autoReset = true; return r; },
-    info: () => ({ ...renderer.info.render, quality, trees: world.treeCount, pending: world.pending, cam: camera.position.toArray().map((v) => Math.round(v)), target: cam.target.toArray().map((v) => Math.round(v)) }),
+    info: () => ({ ...renderer.info.render, quality, dynPR, degrade, trees: world.treeCount, pending: world.pending, cam: camera.position.toArray().map((v) => Math.round(v)), target: cam.target.toArray().map((v) => Math.round(v)) }),
     // Ảnh chụp canvas (kiểm thử / chia sẻ): vẽ lại rồi đọc ngay trong cùng tác vụ.
     snapshot(type = 'image/jpeg') { renderer.render(scene, camera); return canvas.toDataURL(type, 0.85); },
     // Kiểm thử ánh sáng theo giờ: ghi đè giờ hiển thị (null = giờ thật).
