@@ -24,7 +24,7 @@ import { createLandmarks } from './landmarks.js';
 import { setModelQuality, setWarmup, settleLods, loadModel as loadGlb, placeModel, instanceModel } from './assets.js';
 import { createCharacter, setViewer } from './characters.js';
 import { poseOf } from './flight-poses.js';
-import { createCitizens } from './citizens.js';
+import { createCitizens, setCitizenCap } from './citizens.js';
 import { walkers4 } from './city4.js';
 import { createRoomBuilder } from './interior-build.js';
 import { createMansions } from './mansion3d.js';
@@ -647,6 +647,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     });
   }
   // dân thành Bát Quái (citizens.js): ~33 NPC theo 8 khu — dựng khi tới gần
+  if (quality === 'low') setCitizenCap(16); // máy yếu: ít nhân vật có xương cùng lúc
   const citizens = safeInit('citizens', () => createCitizens({ scene, layer, groundY: (x, z) => platformTop(x, z) ?? T.heightAt(x, z), extra: [...walkers4(), ...boatDocks().map((d, i) => ({ id: `chudo_${d.id}`, name: ['Lão Lái', 'Cô Đò', 'Chú Chèo', 'Bà Bến'][i % 4] + ' ' + ['Hà', 'Giang', 'Thủy', 'Lâm', 'Nguyệt', 'Tuyền', 'Phong', 'Sương'][i % 8], role: 'Chủ đò', look: i % 2 ? 'hero_f' : 'npc_villager', gua: 'kan', wx: '水', lines: ['Khách đi thuyền không? Đò, thuyền hoa, thuyền buồm có cả!', 'Ngược dòng giữa lạch thì chèo mỏi tay đấy, men theo bờ cho nhẹ.', 'Thuyền buồm cột cao, không qua được thủy môn đâu khách ạ.'], x: d.x + 1.5, z: d.z + 1.5, path: null }))] }), { update: () => [], ui: () => {}, add: () => {}, remove: () => {} }); // + dân phố + chủ đò các bến
   // phòng lưới (rooms.js): cửa hàng / nhà riêng / điện — dựng lười khi bước vào, chủ tiệm thêm vào citizens
   const roomsB = createRoomBuilder({ scene, citizens });

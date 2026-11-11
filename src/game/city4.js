@@ -120,7 +120,7 @@ const RES_POOL = {
 const GARDEN_POOL = ['lib_courtyard', 'bq_farmhouse', 'bq_house_stone', 'bq_house_2f', 'lib_mtn_house'];
 const ANGLE_HOME = ['bq_tower_house', 'bq_house_2f', 'bq_granary'];
 // chiều cao mái đích theo cấp đường (§3.5) — góc phố +2 m
-const HT = { avenue: [8, 12], plaza: [8, 12], ring: [7, 11], street: [5.5, 9.5], lane: [5.5, 9.5], boundary: [5.5, 9.5], alley: [5, 7], boi: [4.5, 7.5] };
+const HT = { avenue: [10, 14], plaza: [9, 13], ring: [9, 12.5], street: [6.5, 10.5], lane: [6.5, 10.5], boundary: [6.5, 10.5], alley: [5, 7], boi: [5, 8] }; // v5.1: phố kín hơn (D/H đại lộ ≈ 2,7, phố nhánh ≈ 1,4)
 export const HT_DISTORT = [0.85, 1.25]; // giới hạn kéo dọc so với phóng đều (không méo quá)
 const u01 = (s) => (hash(s) % 10007) / 10007;
 function poolOf(h) {
@@ -235,5 +235,23 @@ export function walkers4() {
     const g = GUA.reduce((best, q) => (q.dir[0] * a.x + q.dir[1] * a.z > best.dir[0] * a.x + best.dir[1] * a.z ? q : best), GUA[0]).id;
     WALK.push({ id: `pho4_${i}`, name: WALK_NAMES[hash(`${i}`) % WALK_NAMES.length], role: 'Người đi đường', look: WALK_LOOKS[i % WALK_LOOKS.length], gua: g, wx: WX[g], lines: WALK_LINES[g], path: [a, b], x: a.x, z: a.z });
   });
+  // v5 (THANH-MANIFEST §3.9): người đi đường TRƯỚC DÃY TIỆM — mỗi ~60 m vỉa hè một người, đi qua lại đoạn ≤ 40 m (luôn ở gần
+  // phố có người chơi; trước đây một người cho cả đoạn đại lộ hàng trăm mét nên phố vắng)
+  const runs = new Map();
+  for (const h of allHouses()) { if (h.angle || isRemoved(h.id) || (h.use !== 'shop' && h.use !== 'fortune')) continue; const k = `${h.block}#${h.edge}`; let l = runs.get(k); if (!l) runs.set(k, (l = [])); l.push(h); }
+  let k = 0;
+  for (const [key, list] of [...runs].sort((p, q) => (p[0] < q[0] ? -1 : 1))) {
+    if (list.length < 3) continue;
+    list.sort((a, b) => a.bi - b.bi);
+    const A = list[0].door, Bp = list[list.length - 1].door, len = Math.hypot(Bp.x - A.x, Bp.z - A.z); if (len < 20) continue;
+    const tx = (Bp.x - A.x) / len, tz = (Bp.z - A.z) / len, ox = list[0].nx * 1.2, oz = list[0].nz * 1.2; // ra vỉa hè 1,2 m trước cửa
+    for (let s0 = (hash(key) % 30); s0 + 20 < len; s0 += 60) {
+      const s1 = Math.min(len, s0 + 40), a = { x: A.x + tx * s0 + ox, z: A.z + tz * s0 + oz }, b = { x: A.x + tx * s1 + ox, z: A.z + tz * s1 + oz };
+      if (inPhuPlot(a.x, a.z)) continue;
+      const g = String(list[0].district).split('-').pop(), gg = WX[g] ? g : 'li';
+      WALK.push({ id: `pho5_${k}`, name: WALK_NAMES[hash(`w${k}`) % WALK_NAMES.length], role: list[0].use === 'fortune' ? 'Khách xem bói' : 'Khách đi chợ', look: WALK_LOOKS[hash(`l${k}`) % WALK_LOOKS.length], gua: gg, wx: WX[gg], lines: WALK_LINES[gg], path: [a, b], x: a.x, z: a.z });
+      k++;
+    }
+  }
   return WALK;
 }

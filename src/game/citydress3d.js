@@ -51,14 +51,19 @@ const G = (() => {
   const wall = mergeGeometries([paint(strip(wallB.clone()), '#e6e0d2'), paint(strip(wallC.clone()), '#39404a')]);
   const well = mergeGeometries([paint(strip(wellR.clone()), '#8f8a80'), paint(strip(wellF.clone()), '#6a4a30')]);
   const shedAll = mergeGeometries([paint(strip(shed.clone()), '#e2dccd'), paint(strip(shedRoof.clone()), '#3d4048')]);
-  return { plane, trunk, crown, wall, well, shedAll, slant, postPair, goods, sign, lamp, post, lantern };
+  const cone = new THREE.ConeGeometry(1, 1, 7); cone.translate(0, 0.5, 0); // tầng tùng (đáy ở 0)
+  const stalk = new THREE.CylinderGeometry(0.05, 0.07, 1, 5); stalk.translate(0, 0.5, 0); // thân tre
+  const droop = new THREE.DodecahedronGeometry(1, 0); droop.scale(1, 1.25, 1); droop.translate(0, -0.35, 0); // tán liễu rủ
+  const rope = new THREE.BoxGeometry(1, 0.035, 0.035);
+  const lanternS = new THREE.SphereGeometry(0.2, 6, 4); lanternS.scale(1, 1.3, 1);
+  return { plane, trunk, crown, cone, stalk, droop, wall, well, shedAll, slant, postPair, goods, sign, lamp, post, lantern, rope, lanternS };
 })();
 const M = (() => {
   const std = (o) => new THREE.MeshStandardMaterial({ roughness: 0.9, ...o });
   const lan = std({ color: '#c8341f', emissive: '#ff6a2a', emissiveIntensity: 0.6, roughness: 0.6 });
   return {
     pave: std({ color: '#ffffff', roughness: 0.95 }), court: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.97 }), vc: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.88 }),
-    trunk: std({ color: '#5a4030' }), leaf: std({ color: '#ffffff', flatShading: true, roughness: 0.85 }),
+    trunk: std({ color: '#5a4030' }), bamboo: std({ color: '#ffffff', roughness: 0.7 }), leaf: std({ color: '#ffffff', flatShading: true, roughness: 0.85 }),
     wall: std({ color: '#e6e0d2', roughness: 0.92 }), cap: std({ color: '#39404a', roughness: 0.7 }),
     stone: std({ color: '#8f8a80' }), wood: std({ color: '#6a4a30', roughness: 0.8 }), roofTile: std({ color: '#3d4048', roughness: 0.75 }),
     cloth: std({ color: '#ffffff', roughness: 0.8, side: THREE.DoubleSide }), goods: std({ color: '#ffffff', roughness: 0.85 }), sign: std({ color: '#ffffff', roughness: 0.6 }),
@@ -66,6 +71,23 @@ const M = (() => {
   };
 })();
 glowAll(new THREE.Mesh(G.lantern, M.lantern), { base: 0.5, night: 2.4, color: '#ff8a3c' });
+// GIÓ (shader, không tốn CPU): tán lá đung đưa theo độ cao đỉnh trong khuôn, lệch pha theo vị trí từng cây
+const WIND = { value: 0 };
+function tickWind() { WIND.value = performance.now() / 1000; }
+M.leaf.onBeforeCompile = (sh) => {
+  sh.uniforms.uWind = WIND;
+  sh.vertexShader = 'uniform float uWind;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+    #ifdef USE_INSTANCING
+      vec2 wp = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
+    #else
+      vec2 wp = vec2(0.0);
+    #endif
+    float ph = dot(wp, vec2(0.131, 0.173));
+    float wk = clamp(position.y * 0.5 + 0.55, 0.0, 1.4);
+    transformed.x += (sin(uWind * 1.6 + ph) * 0.06 + sin(uWind * 3.7 + ph * 1.7) * 0.02) * wk;
+    transformed.z += (cos(uWind * 1.25 + ph * 0.8) * 0.045 + sin(uWind * 4.3 + ph) * 0.015) * wk;`);
+};
+M.leaf.customProgramCacheKey = () => 'leaf-wind';
 
 /** gom thể hiện theo khuôn rồi tạo InstancedMesh (một lệnh vẽ / khuôn / ô) */
 function batch() {
@@ -74,12 +96,13 @@ function batch() {
   const build = (grp, { shadow = false } = {}) => {
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), P = new THREE.Vector3(), S = new THREE.Vector3(), c = new THREE.Color();
     const near = new THREE.Group(); near.name = 'near'; grp.add(near); grp.userData.near = near; // đồ nhỏ: ẩn khi ô xa hơn R_NEAR
-    const SMALL = new Set([G.trunk, G.crown, G.slant, G.postPair, G.goods, G.sign, G.shedAll, G.lamp]);
+    const SMALL = new Set([G.trunk, G.crown, G.cone, G.stalk, G.droop, G.slant, G.postPair, G.goods, G.sign, G.shedAll, G.lamp, G.rope, G.lanternS]);
     for (const { geo, mat, list } of by.values()) {
       const im = new THREE.InstancedMesh(geo, mat, list.length);
       list.forEach(([x, y, z, ry, sx, sy, sz, color], i) => { im.setMatrixAt(i, m4.compose(P.set(x, y, z), q.setFromAxisAngle(up, ry), S.set(sx, sy, sz))); if (color) im.setColorAt(i, c.set(color)); });
       if (im.instanceColor) im.instanceColor.needsUpdate = true;
-      im.castShadow = shadow && (geo === G.trunk || geo === G.crown); /* chỉ cây đổ bóng — nền / biển / sạp thì không (lượt bóng nhân đôi lệnh vẽ) */ im.receiveShadow = true; im.computeBoundingSphere(); (SMALL.has(geo) ? near : grp).add(im);
+      if (mat === M.leaf) im.onBeforeRender = tickWind; // gió: cập nhật thời gian một lần / khung
+      im.castShadow = shadow && (geo === G.trunk || geo === G.crown || geo === G.cone || geo === G.droop); /* chỉ cây đổ bóng — nền / biển / sạp thì không (lượt bóng nhân đôi lệnh vẽ) */ im.receiveShadow = true; im.computeBoundingSphere(); (SMALL.has(geo) ? near : grp).add(im);
     }
   };
   return { add, build };
@@ -92,13 +115,36 @@ const housesOfCell = (id) => {
   return BYCELL.get(id) || [];
 };
 
-function tree(B, x, z, seed, big = 1) {
-  const y = H(x, z), r = rnd01(seed), s = (0.8 + 0.5 * r) * big, ht = (3.2 + 2.6 * r) * big;
-  const leaf = LEAF[hash(seed) % LEAF.length];
-  B.add(G.trunk, M.trunk, x, y, z, 0, s, ht * 0.55, s);
-  B.add(G.crown, M.leaf, x, y + ht * 0.72, z, r * 6, 1.9 * s, 1.5 * s, 1.9 * s, leaf);
-  B.add(G.crown, M.leaf, x + 0.7 * s, y + ht * 0.95, z - 0.4 * s, r * 3, 1.3 * s, 1.1 * s, 1.3 * s, leaf);
-  addSolidCircle(x, z, 0.35 * big);
+// 6 loài cây (cao thấp, dáng, màu khác nhau rõ) — chọn theo hạt giống; `kind` ép loài (vd cây đa ở quảng trường phường)
+const SPECIES = [['broad', 0.3], ['pine', 0.18], ['blossom', 0.14], ['maple', 0.12], ['willow', 0.12], ['bamboo', 0.14]];
+const GREENS = ['#4f7a3a', '#5e8a40', '#3e6a34', '#6a8a3a', '#4a7a52', '#56803e'];
+function speciesOf(seed) { let r = rnd01(seed + 'sp'), a = 0; for (const [k, p] of SPECIES) { a += p; if (r <= a) return k; } return 'broad'; }
+function tree(B, x, z, seed, big = 1, kind = null) {
+  const y = H(x, z), r = rnd01(seed), r2 = rnd01(seed + 'b'), sp = kind || speciesOf(seed), rot = r * 6.28;
+  const g = GREENS[hash(seed) % GREENS.length];
+  if (sp === 'pine') { // tùng: thân cao, 3–4 tầng nón nhỏ dần — 7–13 m
+    const ht = (7 + 6 * r) * big, s = (1.4 + 0.6 * r2) * big, n = 3 + (r2 > 0.5 ? 1 : 0);
+    B.add(G.trunk, M.trunk, x, y, z, 0, 0.8 * big, ht * 0.45, 0.8 * big);
+    for (let i = 0; i < n; i++) { const t = i / n, w = s * (1.25 - 0.85 * t); B.add(G.cone, M.leaf, x, y + ht * (0.28 + 0.62 * t), z, rot + i, w, ht * 0.36, w, i ? g : '#2f5a30'); }
+  } else if (sp === 'bamboo') { // khóm tre: 7–11 thân mảnh 6–10 m, lá chụm ở ngọn
+    const n = 7 + (hash(seed) % 5);
+    for (let i = 0; i < n; i++) { const a = i * 2.39 + r * 6, d = 0.25 + 0.55 * rnd01(seed + i), h = (6 + 4 * rnd01(seed + 'h' + i)) * big, sx = x + Math.cos(a) * d, sz = z + Math.sin(a) * d;
+      B.add(G.stalk, M.bamboo, sx, y, sz, 0, 1, h, 1, ['#7a9a4a', '#8aa852', '#6a8a3a'][i % 3]); B.add(G.crown, M.leaf, sx, y + h * 0.9, sz, a, 0.55, 0.9, 0.55, '#6a9a3e'); }
+  } else if (sp === 'willow') { // liễu: thân nghiêng, tán rủ thuôn dài — 6–9 m
+    const ht = (6 + 3 * r) * big, s = (1.5 + 0.5 * r2) * big;
+    B.add(G.trunk, M.trunk, x, y, z, 0, 0.9 * s, ht * 0.62, 0.9 * s);
+    B.add(G.droop, M.leaf, x, y + ht * 0.78, z, rot, 2.1 * s, 2.0 * s, 2.1 * s, '#7a9a4a');
+    B.add(G.droop, M.leaf, x + 0.8 * s, y + ht * 0.7, z + 0.4 * s, rot + 2, 1.4 * s, 1.6 * s, 1.4 * s, '#8aa852');
+  } else { // tán tròn: thường (2–3 chòm, 5–9 m) · đào / anh đào (hồng, thấp 3,5–6 m) · phong (đỏ cam, 4–7 m)
+    const blossom = sp === 'blossom', maple = sp === 'maple';
+    const ht = (blossom ? 3.5 + 2.5 * r : maple ? 4 + 3 * r : 5 + 4 * r) * big, s = (blossom ? 0.85 + 0.4 * r2 : 1 + 0.6 * r2) * big;
+    const col = blossom ? ['#e8a4bc', '#f2c4d4', '#d98aa6', '#f5e6ea'][hash(seed) % 4] : maple ? ['#c86a3a', '#b8452c', '#d8862e', '#a83a2a'][hash(seed) % 4] : g;
+    B.add(G.trunk, M.trunk, x, y, z, 0, s, ht * 0.55, s);
+    B.add(G.crown, M.leaf, x, y + ht * 0.72, z, rot, 1.9 * s, 1.45 * s, 1.9 * s, col);
+    B.add(G.crown, M.leaf, x + 0.8 * s * Math.cos(rot), y + ht * 0.92, z + 0.8 * s * Math.sin(rot), rot + 1, 1.3 * s, 1.1 * s, 1.3 * s, col);
+    if (r2 > 0.45 || big > 1.5) B.add(G.crown, M.leaf, x - 0.9 * s * Math.sin(rot), y + ht * 0.8, z + 0.9 * s * Math.cos(rot), rot + 2, 1.2 * s, 1.0 * s, 1.2 * s, col);
+  }
+  addSolidCircle(x, z, sp === 'bamboo' ? 0.8 * big : 0.35 * big);
 }
 const insideQuad = (P, x, z) => { let sgn = 0; for (let i = 0; i < P.length; i++) { const a = P[i], b = P[(i + 1) % P.length], cr = (b.x - a.x) * (z - a.z) - (b.z - a.z) * (x - a.x); if (Math.abs(cr) < 1e-9) continue; if (!sgn) sgn = Math.sign(cr); else if (Math.sign(cr) !== sgn) return false; } return true; };
 
@@ -202,7 +248,7 @@ function buildCell(id, low) {
       B.add(G.plane, M.pave, cx, H(cx, cz) + 0.05, cz, face, 2 * SQ, 1, 2 * SQ, '#a39a88');
       ring(B, sq, cx, cz, 9, `sq${ct.block}`, 1.05);
       garden(B, P, ct, cx, cz, low, 22);
-      tree(B, cx + 14 * Math.cos(face + 1.2), cz + 14 * Math.sin(face + 1.2), `banyan${ct.ward}`, 2.3);
+      tree(B, cx + 14 * Math.cos(face + 1.2), cz + 14 * Math.sin(face + 1.2), `banyan${ct.ward}`, 2.3, 'broad');
       const wx = cx + 12 * Math.cos(face - 1.9), wz = cz + 12 * Math.sin(face - 1.9);
       B.add(G.well, M.vc, wx, H(wx, wz), wz); addSolidCircle(wx, wz, 1.1);
       for (const ps of ct.passes) { const gx = ps.x - ps.nx * (L.CITY.COURT_INSET + 1), gz = ps.z - ps.nz * (L.CITY.COURT_INSET + 1); models.push(['paifang', 'lib_paifang', { width: 8 }, gx, gz, Math.atan2(ps.nx, ps.nz)]); }
@@ -233,13 +279,29 @@ function buildCell(id, low) {
         const x = px + nx * off * sv, z = pz + nz * off * sv;
         if (nearCross(C, x, z, r)) continue;
         if (inPhuPlot(x, z)) continue;
-        if (r.kind === 'avenue' && !low) tree(B, x, z, `${r.id}|${k}|${sv}`, 0.95);
+        if (r.kind === 'avenue' && !low) tree(B, x, z, `${r.id}|${k}|${sv}`, 0.95, ['broad', 'maple', 'blossom', 'willow'][hash(`${r.id}|${sv}`) % 4]); // mỗi bên đại lộ một hàng cùng loài (cao thấp vẫn khác)
         if ((r.kind === 'avenue' && k % 2 === 0) || r.kind === 'ring') {
           const lx = x - tx * 3, lz = z - tz * 3, ry = Math.atan2(-nx * sv, -nz * sv) - Math.PI / 2;
           B.add(G.post, M.wood, lx, H(lx, lz), lz, ry); B.add(G.lantern, M.lantern, lx, H(lx, lz), lz, ry); addSolidCircle(lx, lz, 0.3);
           if (k % 4 === 0) addLight(lx, H(lx, lz) + 3, lz, { color: '#ffa04a', power: 1 });
         }
+        // hàng quán vỉa hè đại lộ (Biện Kinh: «xâm nhai» — sạp lấn mép đường), xen giữa hai gốc cây
+        if (r.kind === 'avenue' && !low && k % 3 === (sv > 0 ? 1 : 2)) { const sx = px + tx * step / 2 + nx * (off - 1.6) * sv, sz = pz + tz * step / 2 + nz * (off - 1.6) * sv; if (!nearCross(C, sx, sz, r)) stall(B, sx, sz, Math.atan2(-nx * sv, -nz * sv), `av${r.id}${k}${sv}`); }
       }
+    }
+  }
+  // 5b) dây đèn lồng giăng ngang phố nhánh Nội / Trung Thành (mỗi ~22 m, 5 đèn / dây, cao 5,4 m)
+  if (!low) for (const r of C.roads) {
+    if (r.bridge || (r.kind !== 'street' && r.kind !== 'lane')) continue;
+    const Lr = Math.hypot(r.b.x - r.a.x, r.b.z - r.a.z); if (Lr < 30) continue;
+    const tx = (r.b.x - r.a.x) / Lr, tz = (r.b.z - r.a.z) / Lr, ry = Math.atan2(tx, tz) + Math.PI / 2;
+    for (let s = 14; s < Lr - 10; s += 22) {
+      const x = r.a.x + tx * s, z = r.a.z + tz * s;
+      if (x < C.x0 || x >= C.x1 || z < C.z0 || z >= C.z1 || nearCross(C, x, z, r) || inPhuPlot(x, z)) continue;
+      const ring0 = L.districtOf(x, z).ring; if (ring0 !== 'noi' && ring0 !== 'trung') continue;
+      const y = H(x, z) + 5.4, wd = r.w + 2;
+      B.add(G.rope, M.wood, x, y, z, ry, wd, 1, 1);
+      for (let q = -2; q <= 2; q++) { const o = q * wd / 6, lx = x - tz * o, lz = z + tx * o; B.add(G.lanternS, M.lantern, lx, y - 0.35 - 0.25 * (1 - (q / 2.5) ** 2), lz, 0, 1, 1, 1); }
     }
   }
   // 6a) mọi quảng trường (chợ, sảnh, trung tâm): lát đá + hàng cây quanh mép

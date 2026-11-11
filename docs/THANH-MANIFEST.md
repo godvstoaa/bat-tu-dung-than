@@ -121,3 +121,26 @@ Nguồn:
   5. quảng trường phường
   6. đầu cầu
 - **Nhìn ảnh, không được có:** dải ≥ 4 nhà giống hệt; góc ô vuông trơ; lõi ô trống không cây; phố không biển hiệu, không đèn.
+
+## 6. Bổ sung v5.1 (phản hồi người chơi: «phố chưa ra phố phường», quán và cây giống nhau)
+
+- **Phố kín hơn:**
+  - Chiều cao mái đích: đại lộ 10–14 m, quảng trường 9–13 m, vành 9–12,5 m, phố nhánh 6,5–10,5 m. D/H đại lộ khoảng 2,7, phố nhánh khoảng 1,4.
+  - Mặt tiền lớn đi thành dãy tiệm liền 4–8 nhà, khe 1,2–2 m.
+- **Người trên phố:** mỗi khoảng 60 m vỉa hè trước dãy tiệm có một người đi lại trong đoạn ≤ 40 m, nên quanh người chơi luôn có người. Tối đa 24 nhân vật cùng lúc (máy yếu 16). Người đi đường không đổ bóng.
+- **Đời sống phố:**
+  - Dây đèn lồng giăng ngang phố nhánh Nội và Trung Thành, mỗi khoảng 22 m.
+  - Hàng quán trên vỉa hè đại lộ.
+- **Cây:**
+  - 6 loài: tán rộng, tùng nhiều tầng 7–13 m, anh đào 3,5–6 m, phong đỏ, liễu rủ, khóm tre 6–10 m.
+  - Cao thấp chênh rõ. Mỗi bên đại lộ một loài, chiều cao vẫn khác nhau.
+  - **Gió:** tán lá đung đưa trong shader, lệch pha theo vị trí từng cây.
+- **Nội thất quán:** mỗi tiệm một biến thể riêng theo khoá phòng:
+  - màu tường, sàn, màu cột;
+  - quầy (rộng, màu mặt);
+  - kệ sau (liền khối, hai kệ có tranh giữa, ba tủ đứng);
+  - đồ treo vách;
+  - thứ tự và bên bắt đầu bày đồ;
+  - thảm, chậu cây, chum, thùng, ghế đẩu, khóm tre ở góc;
+  - 2–4 đèn khác vị trí và màu;
+  - tửu lâu: bàn vuông, bàn tròn hoặc phản dài; trà lâu: số bàn và vị trí bàn khác nhau.

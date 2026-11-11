@@ -9,7 +9,9 @@ import { citizenList, toWorld, guaById } from './batquai.js';
 import { createCharacter, WX_HSV } from './characters.js';
 import { rng, hashSeed } from './npc.js';
 
-const NEAR = 70, NEAR_PHO = 55, TALK = 4.5, GREET = 4.5, LABEL = 24, MAX_ACTIVE = 24;
+const NEAR = 70, NEAR_PHO = 55, TALK = 4.5, GREET = 4.5, LABEL = 24;
+let MAX_ACTIVE = 24; // tối đa nhân vật có xương cùng lúc (máy yếu: 16 — setCitizenCap); v5.1: người đi đường rải dày quanh phố có tiệm
+export function setCitizenCap(n) { MAX_ACTIVE = n; }
 const hsvOf = (hex) => { const c = new THREE.Color(hex), r = c.r, g = c.g, b = c.b, mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let h = 0; if (d > 0) h = mx === r ? ((g - b) / d + (g < b ? 6 : 0)) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return [h / 6, mx ? d / mx : 0, mx]; };
 const angDiff = (a, b) => (((b - a + Math.PI) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
 
@@ -50,6 +52,7 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
       if (!ch) return;
       if (n.removed) { ch.dispose?.(); return; }
       n.ch = ch;
+      if (String(n.id).startsWith('pho')) ch.obj.traverse((o) => { if (o.isMesh) o.castShadow = false; }); // người đi đường: không đổ bóng (đông người → lượt bóng nhân đôi lệnh vẽ)
       ch.obj.position.set(n.x, groundY(n.x, n.z), n.z); ch.obj.rotation.y = n.ry;
       if (n.active) scene.add(ch.obj);
     });

@@ -423,7 +423,8 @@ function genBlock(B) {
     let cur = ch;
     while (cur < end - 5) {
       // một NHÓM 3–6 nhà liền tường: cùng lùi, cùng sâu; hết nhóm → khe 2–4 m (tường rào / cổng / cây)
-      const k = boi ? 999 : 3 + Math.floor(rnd() * 4), sb = boi ? 0 : front ? rnd() * 0.8 : rnd() * 1.5;
+      // mặt tiền lớn: dãy tiệm liền 4–8 nhà (phố chợ kín mặt tiền); phố nhánh: nhóm 3–6
+      const k = boi ? 999 : front ? 4 + Math.floor(rnd() * 5) : 3 + Math.floor(rnd() * 4), sb = boi ? 0 : front ? rnd() * 0.6 : rnd() * 1.5;
       let placed = 0, tries = 0, gD = null;
       while (placed < k && cur < end - 5 && tries < 40) {
         tries++;
@@ -451,7 +452,7 @@ function genBlock(B) {
         out.push(o); cur += f + 0.1; placed++;
       }
       if (cur < end - 5) { // khe giữa hai nhóm
-        const g = 2 + rnd() * 2, along = cur + g / 2;
+        const g = front ? 1.2 + rnd() * 0.8 : 2 + rnd() * 2, along = cur + g / 2; // khe: mặt tiền lớn 1,2–2 m (ngõ hẻm), phố nhánh 2–4 m
         if (!holes.some(([h0, h1]) => along > h0 - 1 && along < h1 + 1)) gaps.push({ x: r1(e.P.x + e.tx * along + e.nx * 3), z: r1(e.P.z + e.tz * along + e.nz * 3), tx: e.tx, tz: e.tz, nx: -e.nx, nz: -e.nz, w: r1(g), edge: e.i });
         cur += g;
       }

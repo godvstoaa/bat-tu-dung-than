@@ -37,6 +37,9 @@ function canvasTex(w, h, draw, repeat = [1, 1]) {
 const sharedTex = (key, w, h, draw) => { if (!TEX.has(key)) TEX.set(key, canvasTex(w, h, draw)); return TEX.get(key); };
 const COLOR_MAT = new Map();
 const colorMat = (hex, extra = {}) => { const k = hex + JSON.stringify(extra); if (!COLOR_MAT.has(k)) COLOR_MAT.set(k, new THREE.MeshStandardMaterial({ color: hex, roughness: 0.7, ...extra })); return COLOR_MAT.get(k); };
+// v5.1: mỗi tiệm một biến thể nội thất RIÊNG theo khoá phòng (không còn mọi tiệm cùng loại giống hệt nhau)
+const seeded = (key) => { let h = 2166136261; for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619); } let a = h >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
+const pickOf = (rnd, arr) => arr[Math.floor(rnd() * arr.length) % arr.length];
 function mats() {
   if (M) return M;
   const planks = (c) => canvasTex(256, 256, (g) => { g.fillStyle = c; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 8; i++) { g.fillStyle = `rgba(0,0,0,${0.06 + (i % 3) * 0.04})`; g.fillRect(0, i * 32, 256, 2); g.fillStyle = `rgba(255,255,255,${0.03 + (i % 2) * 0.03})`; g.fillRect(0, i * 32 + 6, 256, 10); } }, [3, 3]);
@@ -225,15 +228,26 @@ const OWNER_LINES = {
 
 function buildShop(ctx, r) {
   const s = r.shop, T = SHOP_TYPES[r.type] || SHOP_TYPES.moc, mt = mats(), { W, hw, hd } = ctx;
-  shell(ctx, { wall: T.wall, floor: T.floor, plaque: s.name.toUpperCase() });
+  const rnd = seeded(`int|${r.key}`);
+  // vỏ: màu tường lệch sắc / sáng theo tiệm, sàn: 60 % đúng loại, còn lại gỗ / gỗ sẫm / đá
+  const wc = new THREE.Color(T.wall); wc.offsetHSL((rnd() - 0.5) * 0.08, (rnd() - 0.5) * 0.2, (rnd() - 0.5) * 0.4);
+  shell(ctx, { wall: `#${wc.getHexString()}`, floor: rnd() < 0.5 ? T.floor : pickOf(rnd, ['wood', 'dark', 'stone']), plaque: s.name.toUpperCase(), column: pickOf(rnd, [null, mt.lacquer, mt.dark]) });
+  // đồ treo vách sau (trên kệ): tranh / thư pháp / không — mỗi tiệm một kiểu
+  const hang = Math.floor(rnd() * 3), wallArt = Object.keys(ITEM).filter((k) => ITEM[k].place === 'wall' && ['painting', 'calli', 'plaque'].includes(ITEM[k].proc));
+  if (hang && wallArt.length) for (const sx of hang === 2 ? [-1, 1] : [0]) buildItem(ctx, { i: pickOf(rnd, wallArt), x: sx * (W / 4), z: 0, r: 0 });
   const items = itemsOfShop(r.type);
   const uses = items.filter((it) => it.kind === 'use');
   const decor = items.filter((it) => it.kind === 'decor');
-  // quầy + kệ sau + chủ tiệm
-  const cw = Math.min(uses.length ? 6.2 : 4.6, W - 5), cz = -hd + 2.7;
-  ctx.box(cw, 1.0, 0.8, mt.wood, 0, 0.5, cz, true); ctx.box(cw + 0.2, 0.08, 1.0, mt.dark, 0, 1.04, cz);
+  for (let i = decor.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [decor[i], decor[j]] = [decor[j], decor[i]]; } // thứ tự bày khác nhau
+  // quầy: rộng / màu khác nhau; kệ sau: liền một khối · hai kệ + tranh giữa · ba tủ đứng
+  const cw = Math.min((uses.length ? 6.2 : 4.6) * (0.85 + 0.3 * rnd()), W - 5), cz = -hd + 2.5 + rnd() * 0.5;
+  const ctop = pickOf(rnd, [mt.dark, mt.lacquer, mt.wood]);
+  ctx.box(cw, 1.0, 0.8, pickOf(rnd, [mt.wood, mt.dark]), 0, 0.5, cz, true); ctx.box(cw + 0.2, 0.08, 1.0, ctop, 0, 1.04, cz);
   const goodsMat = ['gom', 'tratrang', 'huong'].includes(r.type) ? mt.goodsGom : ['hoavien', 'duoc'].includes(r.type) ? mt.goodsGreen : mt.goodsWarm;
-  ctx.box(W - 4.4, 2.6, 0.55, goodsMat, 0, 1.3, -hd + 0.6, true);
+  const shelf = Math.floor(rnd() * 3), sh = 2.2 + rnd() * 0.8;
+  if (shelf === 0) ctx.box(W - 4.4, sh, 0.55, goodsMat, 0, sh / 2, -hd + 0.6, true);
+  else if (shelf === 1) { const w2 = (W - 6.6) / 2; for (const sx of [-1, 1]) ctx.box(w2, sh, 0.55, goodsMat, sx * (w2 / 2 + 1.1), sh / 2, -hd + 0.6, true); buildItem(ctx, { i: pickOf(rnd, Object.keys(ITEM).filter((k) => ITEM[k].proc === 'painting')) || null, x: 0, z: 0, r: 0 }); }
+  else { const n = 3, w3 = Math.min(1.6, (W - 6) / 3); for (let k = 0; k < n; k++) ctx.box(w3, sh + 0.3, 0.6, goodsMat, (k - 1) * (w3 + 1.2), (sh + 0.3) / 2, -hd + 0.62, true); }
   const ownerLines = OWNER_LINES[r.type] || OWNER_LINES.moc;
   ctx.npcs.push({ id: `own_${r.key}`, name: s.owner, role: s.name, look: T.look, gua: s.g, wx: guaById(s.g).wx, lines: ownerLines, x: r.origin.x, z: r.origin.z + cz - 1.0, path: null, face: 0 });
   const svc = T.svc || [];
@@ -251,11 +265,12 @@ function buildShop(ctx, r) {
   });
   // đồ bài trí: bày dọc vách trái rồi vách phải (quay mặt vào giữa phòng); đồ nhỏ đặt trên bục
   const hiring = !!JOB_OF_SHOP[r.type] || r.type === MINE_SHOP; // bảng Chiêu công / xe goòng sát cửa bên trái → chừa chỗ
-  const cur = { L: -hd + 3.9, R: -hd + 3.9 }, zMax = ctx.hd - (hiring ? 4.6 : 3.0);
+  const cur = { L: -hd + 3.7 + rnd() * 0.6, R: -hd + 3.7 + rnd() * 0.6 }, zMax = ctx.hd - (hiring ? 4.6 : 3.0);
+  if (rnd() < 0.5) cur.L += 0.01; else cur.R += 0.01; // bên bắt đầu bày khác nhau
   let island = 0;
   for (const it of decor) {
     const [fw, fd] = it.foot, wallItem = it.place === 'wall';
-    const along = fw + 0.7;
+    const along = fw + 0.55 + rnd() * 0.5;
     let side = cur.L <= cur.R ? 'L' : 'R';
     if (cur[side] + along > zMax) side = side === 'L' ? 'R' : 'L';
     if (cur[side] + along > zMax) {
@@ -286,7 +301,24 @@ function buildShop(ctx, r) {
   const zj = { tuu: 'hamruou', dichtram: 'thungan', namon: 'nhadich' }[r.type];
   if (zj) { const mt = mats(), { hw, hd } = ctx, z = hd - 2.9; ctx.box(0.12, 1.5, 2.1, mt.dark, hw - 0.3, 1.75, z); for (let k = 0; k < 3; k++) ctx.box(0.02, 0.5, 0.42, mt.redpaper, hw - 0.38, 2.1, z - 0.62 + k * 0.62); ctx.spot({ id: `zj:${zj}`, kind: 'job', zoneJob: zj, name: WORK[zj].name, verb: `Nhận việc · ${WORK[zj].name}`, x: hw - 1.6, z, r: 1.2 }); }
   svc.forEach((id, n) => { if (!ctx.spots.some((q) => q.svc === id)) ctx.spot({ id: `s:${id}`, kind: 'svc', svc: id, name: svcInfo(id).name, verb: svcInfo(id).verb, x: n % 2 ? 2.4 : -2.4, z: cz + 1.0 - Math.floor(n / 2) * 1.8, r: 1.1 }); }); // nhiều dịch vụ: xen hai bên quầy
-  for (const x of [-W / 4, W / 4]) ctx.lamp(x, ctx.H - 1.4, 0, 1, T.wall === '#8a2a1c' ? '#e2a531' : '#c8341f');
+  // đèn: 2–4 ngọn, vị trí / cao / màu khác nhau
+  const nl = 2 + Math.floor(rnd() * 3), lc = pickOf(rnd, ['#c8341f', '#e2a531', '#b8452c', '#d8862e']);
+  for (let k = 0; k < nl; k++) ctx.lamp(-W / 2 + (W * (k + 0.5)) / nl + (rnd() - 0.5), ctx.H - 1.2 - rnd() * 0.6, (rnd() - 0.5) * (ctx.D * 0.4), 1, k % 2 && rnd() < 0.5 ? '#e2a531' : lc);
+  shopExtras(ctx, rnd, hiring);
+}
+/** đồ thêm riêng từng tiệm (thảm, chậu cây, chum, thùng gỗ, ghế đẩu, rèm) ở các góc trống cạnh cửa + giữa sàn */
+function shopExtras(ctx, rnd, hiring) {
+  const mt = mats(), { hw, hd } = ctx;
+  if (rnd() < 0.7) { const rc = pickOf(rnd, ['#7a2a20', '#3e5a6a', '#6a5a2a', '#5a2a4a', '#2e4a3a']); const rug = ctx.plane(2.2 + rnd() * 1.6, 1.6 + rnd() * 1.4, colorMat(rc, { roughness: 1 }), (rnd() - 0.5) * 1.2, 0.012, 0.8 + (rnd() - 0.5) * 1.5); rug.rotation.x = -Math.PI / 2; }
+  const corners = [[hw - 1.2, hd - 1.3], ...(hiring ? [] : [[-hw + 1.2, hd - 1.3]])];
+  for (const [x, z] of corners) {
+    const k = Math.floor(rnd() * 5);
+    if (k === 0) { ctx.cyl(0.32, 0.26, 0.5, mt.jar2, x, 0.25, z, true); const c = ctx.mesh(new THREE.DodecahedronGeometry(0.55, 0), mt.leaf, x, 1.0 + rnd() * 0.3, z); c.scale.set(1, 1.2 + rnd() * 0.5, 1); }
+    else if (k === 1) for (let q = 0; q < 2 + Math.floor(rnd() * 2); q++) ctx.cyl(0.26 + rnd() * 0.1, 0.22, 0.6 + rnd() * 0.3, mt.jar, x + (q % 2 ? 0.45 : -0.2), 0.35, z - Math.floor(q / 2) * 0.55, true, 12);
+    else if (k === 2) { for (let q = 0; q < 2 + Math.floor(rnd() * 2); q++) ctx.box(0.7, 0.55, 0.6, mt.wood, x + (rnd() - 0.5) * 0.3, 0.28 + q * 0.56, z, q === 0, rnd() * 0.4); }
+    else if (k === 3) { ctx.box(0.5, 0.45, 0.5, mt.dark, x, 0.23, z, true); ctx.box(0.5, 0.45, 0.5, mt.dark, x - 0.7, 0.23, z - 0.2, true); }
+    else { ctx.cyl(0.18, 0.15, 0.35, mt.jar2, x, 0.18, z, true); for (let q = 0; q < 5; q++) { const st = ctx.cyl(0.025, 0.03, 1.2 + rnd() * 0.6, mt.bamboo, x + Math.cos(q * 1.3) * 0.07, 0.95, z + Math.sin(q * 1.3) * 0.07, false, 6); st.rotation.z = (rnd() - 0.5) * 0.15; } }
+  }
 }
 // việc làm (P2 — work.js): bảng «Chiêu công» bằng gỗ dán giấy đỏ trên vách trái sát cửa; Lò Rèn có xe goòng xuống mỏ dân sự
 function jobCorner(ctx, r) {
@@ -309,12 +341,17 @@ function jobCorner(ctx, r) {
 const SHOP_EXTRA = {
   tuu(ctx) {
     const mt = mats(), { hw, hd } = ctx;
-    for (let i = 0; i < 6; i++) ctx.cyl(0.35, 0.28, 0.8, mt.jar, -hw + 1.6 + i * 1.0, 0.4, -hd + 1.5, true, 12);
-    const tables = [[-hw + 3.5, 0.5], [hw - 3.5, 0.5], [-hw + 3.5, 4], [hw - 3.5, 4]];
-    tables.forEach(([tx, tz], k) => {
-      ctx.box(1.3, 0.8, 1.3, mt.wood, tx, 0.4, tz, true);
-      for (const [ax, az] of [[1, 0], [-1, 0], [0, -1]]) ctx.box(0.45, 0.45, 0.45, mt.dark, tx + ax * 1.05, 0.22, tz + az * 1.05, true);
-      ctx.cyl(0.08, 0.07, 0.22, mt.jar2, tx, 0.92, tz);
+    const rnd = seeded(`tuu|${ctx.r.key}`), nj = 3 + Math.floor(rnd() * 5);
+    for (let i = 0; i < nj; i++) ctx.cyl(0.3 + rnd() * 0.12, 0.26, 0.6 + rnd() * 0.35, mt.jar, -hw + 1.6 + i * 1.0, 0.4, -hd + 1.5, true, 12);
+    // bàn: vuông 4 · tròn 6 · phản dài 3 — mỗi tửu lâu một kiểu, lệch nhẹ
+    const style = Math.floor(rnd() * 3);
+    const tables = style === 1 ? [[-hw + 3.2, 0], [0, 1.2], [hw - 3.2, 0], [-hw + 3.2, 3.6], [0, 4.6], [hw - 3.2, 3.6]] : style === 2 ? [[-hw + 3.4, 0.6], [hw - 3.4, 0.6], [-hw + 3.4, 4]] : [[-hw + 3.5, 0.5], [hw - 3.5, 0.5], [-hw + 3.5, 4], [hw - 3.5, 4]];
+    tables.forEach(([tx0, tz0], k) => {
+      const tx = tx0 + (rnd() - 0.5) * 0.5, tz = tz0 + (rnd() - 0.5) * 0.5;
+      if (style === 1) { ctx.cyl(0.65, 0.65, 0.08, mt.wood, tx, 0.78, tz, true, 18); ctx.cyl(0.08, 0.12, 0.74, mt.dark, tx, 0.37, tz, false, 8); for (let q = 0; q < 4; q++) ctx.cyl(0.2, 0.2, 0.45, mt.dark, tx + Math.cos(q * 1.57 + 0.4) * 1.0, 0.22, tz + Math.sin(q * 1.57 + 0.4) * 1.0, true, 10); }
+      else if (style === 2) { ctx.box(2.6, 0.45, 1.2, mt.dark, tx, 0.22, tz, true, rnd() * 0.2); ctx.box(1.2, 0.3, 0.7, mt.wood, tx, 0.6, tz); for (const ax of [-1, 1]) ctx.cyl(0.36, 0.4, 0.12, mt.cushion, tx + ax * 0.7, 0.5, tz + 0.3, false, 14); }
+      else { ctx.box(1.3, 0.8, 1.3, mt.wood, tx, 0.4, tz, true); for (const [ax, az] of [[1, 0], [-1, 0], [0, -1]]) ctx.box(0.45, 0.45, 0.45, mt.dark, tx + ax * 1.05, 0.22, tz + az * 1.05, true); }
+      ctx.cyl(0.08, 0.07, 0.22, mt.jar2, tx, style === 2 ? 0.86 : 0.92, tz);
       if (k === 0) ctx.spot({ id: 's:tindon', kind: 'svc', svc: 'tindon', name: SVC.tindon.name, verb: SVC.tindon.verb, x: tx, z: tz + 1.4 });
     });
     ctx.npcs.push({ id: `tn_${ctx.r.key}`, name: 'Tiểu Nhị', role: 'Tiểu nhị', look: 'npc_villager', gua: ctx.r.shop.g, wx: '水', lines: ['Có ngay, có ngay!', 'Lầu trên còn bàn sát cửa sổ.', 'Khách quan muốn nghe chuyện thì hỏi chưởng quầy.'], x: ctx.r.origin.x + hw - 2, z: ctx.r.origin.z + 2.2, path: null, face: -Q });
@@ -324,8 +361,10 @@ const SHOP_EXTRA = {
     ctx.box(4, 0.4, 2, mt.wood, hw - 3.2, 0.2, -hd + 1.6, true); ctx.box(3.6, 2.2, 0.12, mt.screen, hw - 3.2, 1.5, -hd + 0.75);
     ctx.npcs.push({ id: `tt_${ctx.r.key}`, name: 'Tiên Sinh Kể Chuyện', role: 'Thuyết thư', look: 'master', gua: ctx.r.shop.g, wx: '木', lines: ['Lại nói chuyện năm ấy…', 'Muốn biết hậu sự thế nào, xin nghe hồi sau phân giải.'], x: ctx.r.origin.x + hw - 3.2, z: ctx.r.origin.z - hd + 1.6, path: null, face: 0 });
     ctx.spot({ id: 's:thuyetthu', kind: 'svc', svc: 'thuyetthu', name: SVC.thuyetthu.name, verb: SVC.thuyetthu.verb, x: hw - 3.2, z: -hd + 3.4 });
-    [[-hw + 3, 0], [-hw + 3, 3.5], [hw - 3.2, 2.5]].forEach(([tx, tz], k) => {
-      ctx.box(1.4, 0.4, 1, mt.wood, tx, 0.2, tz, true);
+    const rnd = seeded(`tra|${ctx.r.key}`), cand = [[-hw + 3, 0], [-hw + 3, 3.5], [hw - 3.2, 2.5], [0, 4.6], [-hw + 3, 6.2], [hw - 3.2, 5.6]].filter(([, z]) => z < hd - 2.5);
+    cand.slice(0, 3 + Math.floor(rnd() * Math.max(1, cand.length - 2))).forEach(([tx0, tz0], k) => {
+      const tx = tx0 + (rnd() - 0.5) * 0.6, tz = tz0 + (rnd() - 0.5) * 0.6;
+      ctx.box(1.2 + rnd() * 0.5, 0.4, 0.9 + rnd() * 0.3, rnd() < 0.5 ? mt.wood : mt.dark, tx, 0.2, tz, true);
       for (const ax of [-1, 1]) ctx.cyl(0.38, 0.42, 0.14, mt.cushion, tx + ax * 1.15, 0.07, tz, false, 16);
       ctx.cyl(0.07, 0.06, 0.12, mt.jar2, tx, 0.46, tz);
       if (k === 0) ctx.spot({ id: 's:uongtra', kind: 'svc', svc: 'uongtra', name: SVC.uongtra.name, verb: SVC.uongtra.verb, x: tx + 1.6, z: tz });
