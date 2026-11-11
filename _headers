@@ -11,6 +11,11 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# model 3D (tên không có hash): cache 1 ngày, quá hạn vẫn dùng bản cũ thêm 7 ngày trong lúc kiểm lại ngầm
+# (trước đây max-age=0 → mỗi lần vào game ~100 lượt hỏi lại máy chủ cho từng file GLB)
+/models/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
 # trang evidence review — không bao giờ cache (đổi nội dung thường xuyên, tránh stale như cũ)
 /review/*
   Cache-Control: no-store
