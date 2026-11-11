@@ -691,65 +691,47 @@ export function startGame({ onExit = null } = {}) {
       dock.addEventListener('click', (e) => { if (e.target.closest('.hq-dbtn')) dock.classList.remove('open'); });
       document.addEventListener('pointerdown', (e) => { if (dock.classList.contains('open') && !dock.contains(e.target) && e.target !== tg) dock.classList.remove('open'); });
     } }
-  // v4 BẢN ĐỒ THÀNH (G3): bản đồ nhỏ 120 × 120 quanh người chơi (±700 m); bấm → bản đồ cả thành 4,25 km với 41 trạm xe
-  // ngựa nội thành (citylayout.stations) — bấm trạm là ngồi xe tới (5 đồng; tân thủ dưới cấp 5 miễn phí).
-  const CITY_MAP = { R: 2300 }; // nửa bề rộng bản đồ thành (m)
-  let cityBase = null; // ảnh nền thành vẽ một lần (1024 px)
-  function drawCity(L, W) {
-    const N = 1024, c = document.createElement('canvas'); c.width = c.height = N;
-    const g = c.getContext('2d'), k = N / (2 * CITY_MAP.R), P = (x, z) => [N / 2 + x * k, N / 2 + z * k];
-    const oct = (a) => { g.beginPath(); for (let i = 0; i <= 8; i++) { const ang = (i / 8) * Math.PI * 2 + Math.PI / 8, r = a / Math.cos(Math.PI / 8); const [x, y] = P(Math.cos(ang) * r, Math.sin(ang) * r); if (i) g.lineTo(x, y); else g.moveTo(x, y); } };
-    g.fillStyle = '#2d3a2a'; g.fillRect(0, 0, N, N);
-    g.fillStyle = '#5a5444'; oct(L.CITY.A); g.fill();
-    g.strokeStyle = '#8a7f66'; for (const r of L.roads()) { g.lineWidth = Math.max(0.6, r.w * k); g.beginPath(); g.moveTo(...P(r.a.x, r.a.z)); g.lineTo(...P(r.b.x, r.b.z)); g.stroke(); }
-    g.fillStyle = '#3f6fa0'; g.strokeStyle = '#3f6fa0';
-    for (const ch of L.water().channels) { g.beginPath(); ch.pts.forEach((q, i) => { const [x, y] = P(q.x, q.z); if (i) g.lineTo(x, y); else g.moveTo(x, y); }); g.lineWidth = Math.max(2, ch.wIn * 2 * k); g.stroke(); }
-    { const lk = L.water().lake; g.beginPath(); g.arc(...P(lk.x, lk.z), lk.r * k, 0, 7); g.fill(); }
-    g.strokeStyle = '#c9b48e'; g.lineWidth = 3; oct(L.CITY.A); g.stroke();
-    g.font = 'bold 15px serif'; g.textAlign = 'center'; g.fillStyle = '#f3df9a';
-    for (const l of L.landmarks()) if (l.kind === 'hall' || l.kind === 'port' || l.id === 'sonmon') { const [x, y] = P(l.x, l.z); g.fillText(l.name.replace('Sảnh ', ''), x, y - 8); }
-    return c;
-  }
+  // v4 BẢN ĐỒ (map-ui.js) — kiểu game nhập vai lớn: bản đồ nhỏ chi tiết quanh người chơi (nhà từng căn, icon, ghim đường
+  // đi + mũi tên chỉ hướng); bấm bản đồ nhỏ / phím M → bản đồ toàn màn hình kéo / phóng / tìm / lọc / đặt dấu / đi xe.
+  const CART_XU = 500; // 5 đồng / chuyến xe ngựa nội thành
+  let MAP = null; // module map-ui (nạp lười)
+  const meWorld = () => { const w = tileToWorld(player.x, player.y); return { x: w.x, z: w.z, h: player.h || 0 }; };
+  const othersWorld = () => (net.status === 'online' ? [...net.others.values()].map((o) => tileToWorld(o.x, o.y)) : []);
+  const mapCtx = () => ({
+    player: meWorld, others: othersWorld, toast,
+    pin: () => state.mapPin || null,
+    setPin: (p) => { state.mapPin = p; save(); },
+    free: levelInfo(state).level < 5,
+    travel: (st) => {
+      if (levelInfo(state).level >= 5 && !LIFE.spendXu(state, CART_XU)) { toast('Không đủ 5 đồng đi xe.'); return false; }
+      save(); panel.close(); api.travel(st.x, st.z, `🐎 Xe ngựa tới ${st.name}`); return true;
+    },
+    walk: (x, z) => { const t = worldToTile(x, z); walkTo({ x: t.x, y: t.y }); },
+  });
   const minimap = (() => {
-    const N = 120, c = document.createElement('canvas'); c.width = c.height = N; c.className = 'hq-minimap'; c.title = 'Bản đồ thành — bấm để mở, chọn trạm xe ngựa';
-    let L = null;
-    Promise.all([import('./citylayout.js'), import('./waterways.js')]).then(([Lm, W]) => { L = Lm; cityBase = drawCity(Lm, W); }).catch(() => {});
+    const N = 132, wrap = document.createElement('div'); wrap.className = 'hq-minimap-wrap';
+    const c = document.createElement('canvas'); c.width = c.height = N; c.className = 'hq-minimap'; c.title = 'Bản đồ (M) — bấm để mở';
+    const pinTxt = document.createElement('div'); pinTxt.className = 'hq-pin-txt'; pinTxt.hidden = true;
+    wrap.append(c, pinTxt);
+    import('./map-ui.js').then((m) => { MAP = m; }).catch(() => {});
     c.onclick = () => openCityMap();
     let at = 0;
-    return { el: c, update(now) {
-      if (now - at < 400 || !cityBase) return; at = now;
-      const g = c.getContext('2d'), w = tileToWorld(player.x, player.y), span = 1400, k = cityBase.width / (2 * CITY_MAP.R);
-      g.fillStyle = '#2d3a2a'; g.fillRect(0, 0, N, N);
-      g.drawImage(cityBase, cityBase.width / 2 + (w.x - span / 2) * k, cityBase.height / 2 + (w.z - span / 2) * k, span * k, span * k, 0, 0, N, N);
-      const x = N / 2, y = N / 2, h = player.h || 0;
-      g.fillStyle = '#ffd36a'; g.strokeStyle = '#1a1310'; g.lineWidth = 1; g.beginPath(); g.moveTo(x + Math.sin(h) * 6, y + Math.cos(h) * 6); g.lineTo(x + Math.sin(h + 2.5) * 4, y + Math.cos(h + 2.5) * 4); g.lineTo(x + Math.sin(h - 2.5) * 4, y + Math.cos(h - 2.5) * 4); g.closePath(); g.fill(); g.stroke();
-      void L;
+    return { el: wrap, update(now) {
+      if (now - at < 300 || !MAP) return; at = now;
+      const g = c.getContext('2d'), me = meWorld();
+      if (me.x > ROOM_X0 - 40) { g.fillStyle = '#2b2118'; g.fillRect(0, 0, N, N); return; } // trong phòng: không vẽ thành
+      MAP.drawMap(g, { cx: me.x, cz: me.z, s: 0.55, w: N, h: N }, { player: me, others: othersWorld(), pin: state.mapPin, mini: true });
+      const p = state.mapPin;
+      if (p) { const d = Math.hypot(p.x - me.x, p.z - me.z); if (d < 8) { state.mapPin = null; save(); toast(`📍 Đã tới ${p.name}`); } pinTxt.hidden = !state.mapPin; pinTxt.textContent = `📍 ${p.name} · ${d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`}`; } else pinTxt.hidden = true;
     } };
   })();
-  const CART_XU = 500; // 5 đồng / chuyến xe ngựa nội thành
   async function openCityMap() {
-    const L = await import('./citylayout.js');
-    if (!cityBase) cityBase = drawCity(L);
-    const box = document.createElement('div'); box.className = 'hq-bigmap';
-    const size = Math.min(560, innerWidth - 40), bc = document.createElement('canvas'); bc.width = bc.height = size; bc.style.cursor = 'pointer'; box.append(bc);
-    const free = levelInfo(state).level < 5, note = document.createElement('p'); note.className = 'hq-sub';
-    note.textContent = `Bấm một trạm xe ngựa (chấm đỏ) để ngồi xe tới — ${free ? 'tân thủ dưới cấp 5 đi miễn phí' : '5 đồng một chuyến'}. Chấm vàng là bạn.`;
-    box.append(note);
-    const g = bc.getContext('2d'), k = size / (2 * CITY_MAP.R), P = (x, z) => [size / 2 + x * k, size / 2 + z * k];
-    g.drawImage(cityBase, 0, 0, size, size);
-    const ST = L.stations();
-    for (const st of ST) { const [x, y] = P(st.x, st.z); g.fillStyle = '#c8341f'; g.strokeStyle = '#fff3c4'; g.lineWidth = 1.5; g.beginPath(); g.arc(x, y, 5, 0, 7); g.fill(); g.stroke(); }
-    const w = tileToWorld(player.x, player.y); { const [x, y] = P(w.x, w.z); g.fillStyle = '#ffd36a'; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); }
-    bc.onclick = (e) => {
-      const r = bc.getBoundingClientRect(), mx = (e.clientX - r.left) * (size / r.width), my = (e.clientY - r.top) * (size / r.height);
-      let best = null, bd = 14; for (const st of ST) { const [x, y] = P(st.x, st.z), d = Math.hypot(x - mx, y - my); if (d < bd) { bd = d; best = st; } }
-      if (!best) return;
-      if (!free && !LIFE.spendXu(state, CART_XU)) { toast('Không đủ 5 đồng đi xe.'); return; }
-      save(); panel.close(); api.travel(best.x, best.z, `🐎 Xe ngựa tới ${best.name}`);
-    };
-    panel.open({ title: '🗺 Bản đồ Huyền Thành · trạm xe ngựa', body: box });
+    MAP ||= await import('./map-ui.js');
+    if (document.querySelector('.hq-mapfull')) return;
+    MAP.openMapScreen($('hq-game') || document.body, mapCtx());
   }
   api.openCityMap = openCityMap;
+  addEventListener('keydown', (e) => { if ((e.key === 'm' || e.key === 'M') && !e.target.closest?.('input, textarea') && !$('hq-game').hidden && !document.querySelector('.hq-mapfull')) openCityMap(); });
   $('hq-canvas')?.parentElement?.appendChild(minimap.el);
   // vuốt nút Nhảy lên để cất cánh (P16)
   setTimeout(() => { const jb = $('hq-jump'); if (!jb) return; let y0 = null; jb.addEventListener('pointerdown', (e) => { y0 = e.clientY; }); jb.addEventListener('pointermove', (e) => { if (y0 != null && y0 - e.clientY > 36 && !player.flying) { y0 = null; setFlying(true); buzz('medium'); } }); jb.addEventListener('pointerup', () => { y0 = null; }); }, 0);

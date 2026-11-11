@@ -94,6 +94,7 @@ export function createState(now = new Date()) {
     home: null,     // Thành Bát Quái: { inv, own, buffs, plants, spawn } — items.js › homeState
     lastPos: null,  // v4: chỗ đứng lần trước { x, z, at } — spawn.js (nơi xuất hiện)
     tutorial: null, // v4: hướng dẫn tân thủ { step, done, skipped, got } — tutorial.js
+    mapPin: null,   // v4: dấu đường đi trên bản đồ { x, z, name } — map-ui.js
   };
 }
 
