@@ -129,6 +129,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
+  /* giữ 9000 m: phông núi xa (mtnMat) nằm ngoài vòng sương — cắt còn 1800 m thì đỉnh núi bị chặt (đã thử, ảnh shots/far1800) */
   const camera = new THREE.PerspectiveCamera(45, 1, 0.3, 9000);
   let debugCam = null;
   // sương gần hơn: các ngưỡng đổi bậc chi tiết / nạp vùng xa nằm trong mù (không thấy nhà «bật» ra ở xa)
@@ -192,6 +193,9 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // --- THẾ GIỚI MỞ Huyền Giới: địa hình 2048², trời tán xạ, nước, rừng (docs/DAI-THE-GIOI-DESIGN.md)
   const quality = pickQuality(coarse, renderer);
   document.documentElement.dataset.hqQuality = quality; /* để kiểm / hỗ trợ: xem mức đồ hoạ đang dùng */
+  /* dựng hình bằng CPU: chi phí tỉ lệ số điểm ảnh → ½ độ phân giải (¼ điểm ảnh) + không bóng đổ (đỡ một lượt vẽ cả cảnh) */
+  const softGl = !!document.documentElement.dataset.hqSoftGl;
+  if (softGl) renderer.shadowMap.enabled = false;
   // v4: máy hết bộ nhớ đồ họa (WebGL mất ngữ cảnh — trình duyệt hay báo «xảy ra sự cố») → tự tải lại ở mức THẤP thay vì treo / sập
   canvas.addEventListener('webglcontextlost', (e) => {
     e.preventDefault();
@@ -761,7 +765,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   function resize() {
     const w = canvas.clientWidth || 640, h = canvas.clientHeight || 448;
-    renderer.setPixelRatio(lowQuality ? 1 : Math.min(window.devicePixelRatio || 1, quality === 'high' ? 1.5 : 1.25)); // 2× = gấp 1,8 lần điểm ảnh, gần như không thấy khác
+    renderer.setPixelRatio(softGl ? 0.5 : lowQuality ? 1 : Math.min(window.devicePixelRatio || 1, quality === 'high' ? 1.5 : 1.25)); // 2× = gấp 1,8 lần điểm ảnh, gần như không thấy khác
     renderer.setSize(w, h, false);
     composer?.setPixelRatio(renderer.getPixelRatio()); // bloom theo đúng tỉ lệ pixel của renderer
     composer?.setSize(w, h);
@@ -1347,7 +1351,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       // hạ theo bậc — bóng đổ giữ tới cùng (tắt bóng làm cả cảnh phẳng, «giả» hẳn):
       // bậc 1: độ phân giải 1×, tắt bloom/hạt bụi, cỏ còn ½, bóng 1024 · bậc 2: tắt bóng
       if (fps < 35 && degrade === 0) {
-        degrade = 1; lowQuality = true; renderer.setPixelRatio(1); composer?.setPixelRatio(1); if (bloomPass) bloomPass.enabled = false;
+        degrade = 1; lowQuality = true; renderer.setPixelRatio(softGl ? 0.5 : 1); composer?.setPixelRatio(renderer.getPixelRatio()); if (bloomPass) bloomPass.enabled = false;
         world.grass?.setDensity(0.5);
         if (sun.shadow.mapSize.x > 1024) { sun.shadow.mapSize.set(1024, 1024); sun.shadow.map?.dispose(); sun.shadow.map = null; }
       } else if (fps < 24 && degrade === 1) {

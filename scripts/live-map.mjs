@@ -25,6 +25,7 @@ await page.waitForTimeout(3000);
 const mode = await page.evaluate(() => (document.querySelector('canvas')?.getContext ? 'canvas' : '?') + ' · 3dfail=' + !!document.querySelector('.hq-3dfail'));
 console.log('chế độ:', mode, LOW ? '· máy yếu giả lập' : '', '· chất lượng:', await page.evaluate(() => document.documentElement.dataset.hqQuality), '· heap MB:', await page.evaluate(() => Math.round((performance.memory?.usedJSHeapSize || 0) / 1048576)));
 console.log('fps đo 5 s:', await page.evaluate(() => new Promise((r) => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 5000) requestAnimationFrame(f); else r((n / 5).toFixed(1)); }; requestAnimationFrame(f); })));
+if (process.env.FPSONLY) { console.log('cảnh:', JSON.stringify(await page.evaluate(() => window.__hq?.renderer?.frameStats?.() || null)), JSON.stringify(await page.evaluate(() => window.__hq?.renderer?.info?.() || null))); console.log(errs.length ? 'lỗi trang: ' + errs.join(' | ') : 'không lỗi trang'); await browser.close(); process.exit(0); }
 await page.screenshot({ path: 'shots/live-map-0-game.png', timeout: LOW ? 180000 : 30000 });
 await page.keyboard.press('m');
 await page.waitForSelector('.hq-mapfull', { timeout: 15000 });
