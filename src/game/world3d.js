@@ -5,6 +5,7 @@
 //  có gợn; rừng 2 tầng (cây 3D gần, billboard xa); biển mây quanh rìa.
 // ============================================================================
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { span } from './perf.js';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import * as T from './terrain.js';
@@ -224,9 +225,30 @@ vec3 gTN = vec3(0.0, 0.0, 1.0);`)
     }
     const ms = performance.now() - t0; MSTAT.ms += ms; MSTAT.frames++; MSTAT.maxMs = Math.max(MSTAT.maxMs, ms);
   }
+  // GỘP Ô XA: mỗi cụm 4 × 4 chunk đều ở mức xa (và hết geomorph ≥ 1,5 s) → một lưới, một lệnh vẽ (đo phố 2026-11-12:
+  // ~1.000 chunk xa 72 tam giác mà mỗi chunk một lệnh vẽ = ~350 lệnh / khung). Chunk nào đổi mức → bỏ gộp cả cụm.
+  // Chunk gốc vẫn giữ (ẩn) cho raycast / terrainMeshes.
+  const SUP = 4, supers = new Map();
+  const supOf = (i, j) => { const k = Math.floor(i / SUP) * 1000 + Math.floor(j / SUP); let s = supers.get(k); if (!s) supers.set(k, (s = { i0: Math.floor(i / SUP) * SUP, j0: Math.floor(j / SUP) * SUP, mesh: null, at: 0 })); return s; };
+  const supChunks = (s) => { const l = []; for (let j = s.j0; j < s.j0 + SUP && j < N; j++) for (let i = s.i0; i < s.i0 + SUP && i < N; i++) l.push(chunks.get(keyOf(i, j))); return l; };
+  function unmerge(s) { if (!s.mesh) return; group.remove(s.mesh); s.mesh.geometry.dispose(); s.mesh = null; for (const c of supChunks(s)) if (c) c.mesh.visible = true; }
+  let supAt = 0;
+  function mergeSupers() {
+    const now = performance.now(); if (now - supAt < 500) return; supAt = now;
+    for (const s of supers.values()) {
+      if (s.mesh || now - s.at < 1500) continue;
+      const l = supChunks(s);
+      if (l.some((c) => !c || c.seg !== Q.segFar || MORPH.has(c.mesh.geometry))) continue;
+      const geo = mergeGeometries(l.map((c) => c.mesh.geometry)); if (!geo) continue;
+      geo.computeBoundingSphere();
+      const m = new THREE.Mesh(geo, terrainMat); m.receiveShadow = true; m.castShadow = false; m.name = 'terrain-far';
+      group.add(m); s.mesh = m; for (const c of l) c.mesh.visible = false;
+    }
+  }
   let inFlight = 0;
   function place(d) {
     const geo = geomFrom(d), k = keyOf(d.cx, d.cz), old = chunks.get(k);
+    { const s = supOf(d.cx, d.cz); s.at = performance.now(); unmerge(s); }
     const cast = d.seg >= Q.segMid && d.relief > 3;
     if (old) {
       // geomorph theo thời gian: đỉnh lưới mới bắt đầu ở độ cao của lưới cũ (nội suy) rồi trượt về độ cao thật trong ~0,6 s
@@ -371,7 +393,7 @@ vec3 gWN = vec3(0.0, 0.0, 1.0);`)
     },
     terrainMeshes: () => [...chunks.values()].map((c) => c.mesh),
     update(px, pz, dt, t) {
-      span('w:chunks', () => { updateChunks(px, pz); buildSome(); tickMorph(dt); }); if (forest) span('forest:update', () => forest.update(px, pz, t));
+      span('w:chunks', () => { updateChunks(px, pz); buildSome(); tickMorph(dt); mergeSupers(); }); if (forest) span('forest:update', () => forest.update(px, pz, t));
       span('grass:update', () => grass.update(px, groundY(px, pz), pz, t));
       waterTick(t); movePatch(px, pz); // đồng hồ nước chung (sóng shader = water.js) · ô sóng bám người chơi
       for (const c of clouds.children) { c.position.x += c.userData.v * dt; if (c.position.x > T.HALF * 1.8) c.position.x = -T.HALF * 1.8; }

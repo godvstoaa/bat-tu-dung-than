@@ -210,16 +210,16 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
   parent.add(group);
   // nhân bản rải rộng (hàng cây, cổng phường, đèn…): chỉ vẽ các bản trong tầm — bản sao ngoài tầm vẫn tốn
   // cả lượt vẽ lẫn lượt bóng vì khung bao của InstancedMesh phủ hết. Va chạm đã cắt lát lúc dựng (không phụ thuộc).
-  const E = { items, sets, cut: Math.max(Math.max(...items.map((it) => it.s)) * 24, 260), lx: Infinity, lz: Infinity, cull: items.length > 3 };
+  const E = { items, sets, lo: sets, hi: null, group, cut: Math.max(Math.max(...items.map((it) => it.s)) * 24, 260), lx: Infinity, lz: Infinity, cull: items.length > 3 };
   if (hasLod(id) && items.length <= 4) {
     const near = Math.max(Math.max(...items.map((it) => it.s)) * 4, 70);
     E.upgrade = { near, busy: false, done: false, run: async () => {
       const gm = (await loadModel(id)) || (await loadModel(`${id}.mid`)); if (!gm) return; // tới gần: bản gốc (bản .mid nhìn gần vỡ mảnh)
       const tmp = new THREE.Group(); const ns = buildInstanced(gm, items, fitKey, tmp);
       await warm(tmp);
-      for (const { im } of sets) group.remove(im);
+      for (const { im } of E.sets) group.remove(im);
       for (const { im } of ns) group.add(im);
-      sets = E.sets = ns; E.lx = Infinity;
+      sets = E.sets = E.hi = ns; E.lx = Infinity;
     } };
   }
   if (E.cull || E.upgrade) INST.push(E);
@@ -258,6 +258,12 @@ function tickInstances(px, pz) {
   for (const E of INST) {
     const U = E.upgrade;
     if (U && !U.busy && !U.done && E.items.some((it) => Math.hypot(it.x - px, it.z - pz) < U.near)) { U.busy = true; U.run().catch(() => {}).finally(() => { U.busy = false; U.done = true; }); }
+    // bản gốc chỉ khi còn ở gần; đi xa (> 1,5 × tầm nâng) trả về bản nhẹ — trước đây nâng rồi giữ mãi: 2 đèn lồng 80k
+    // tam giác vẫn vẽ (cả bóng) khi người chơi ở cách 640 m (đo 2026-11-12: 160k tam giác / khung)
+    if (U && U.done && E.hi) {
+      const want = E.items.some((it) => Math.hypot(it.x - px, it.z - pz) < U.near * 1.5) ? E.hi : E.lo;
+      if (E.sets !== want) { for (const { im } of E.sets) E.group.remove(im); for (const { im } of want) E.group.add(im); E.sets = want; E.lx = Infinity; }
+    }
     if (!E.cull || Math.hypot(px - E.lx, pz - E.lz) < 20) continue;
     E.lx = px; E.lz = pz;
     const keep = [];

@@ -169,3 +169,33 @@ Kèm đợt này (hiệu năng, không thuộc cây và quán):
 - Đo đối chứng trong cùng phòng `tuu#5` (máy dev đang bận): có khách 34 fps, bỏ khách 36 fps, tức khách tốn khoảng 2 fps. Cùng phòng lúc máy rảnh đạt 60 fps.
 - Ảnh: `shots/khach`.
 - Tiểu nhị tửu lâu đi lại lối giữa, từ cửa tới quầy. Bước lấp bàn luôn chừa lối |x| < 2,6 m, nên không đâm vào bàn ghế ở cả ba kiểu bố cục. Khách đứng chắn trước mặt thì tiểu nhị dừng.
+
+## 6. Tối ưu lệnh vẽ (2026-11-12, sau khi đo tách nguồn ở đại lộ)
+
+Cách đo: tắt từng nhóm cảnh, xem `frameStats` (lệnh vẽ và tam giác) giảm bao nhiêu.
+
+**Sửa:**
+- **Địa hình xa:** gộp mỗi cụm 4 × 4 chunk ở mức xa thành một lưới (`world3d.mergeSupers`), sau khi hết geomorph 1,5 s.
+  - Trước: khoảng 1.000 chunk, mỗi chunk một lệnh vẽ.
+- **Tường bát quái Nội Thành** (`batquai3d.octWall`): 320 mesh rời gộp thành 3 lưới.
+- **Đèn lồng nhân bản ≤ 4 bản:** trước đây nâng lên model gốc 80k tam giác rồi giữ mãi. Giờ đi xa thì trả về bản nhẹ (`assets.tickInstances`).
+
+**Đo cùng điểm đại lộ (3, 640), mức thường, cũ / mới xen kẽ 2 lượt:**
+
+| | Cũ | Mới |
+|---|---|---|
+| Lệnh vẽ | 1.147 | 781 (−32%) |
+| Tam giác | 2,93 M | 2,80 M |
+| fps | 18–20 | 20–21 |
+
+**Mức thấp:**
+- Đại lộ: 742 lệnh vẽ, trước là 1.108.
+- Trong quán có khách: 60 fps, 59–66 lệnh vẽ.
+
+Máy dev lúc đo đang chạy thêm Chrome và ZCode của người dùng, nên fps tuyệt đối dao động giữa các lần đo. Vì vậy chỉ so cũ / mới xen kẽ trong cùng một lần.
+
+**Còn lại** (không cắt, vì là thứ người chơi nhìn thấy):
+- Nhà phố khoảng 600k tam giác.
+- Đồ phố 440k tam giác, trong đó cây 280k.
+- Cỏ 200k tam giác.
+- Sơn Môn ở tâm thành 310k tam giác: mốc nhìn thấy từ đại lộ, trong tầm sương 1.700 m.

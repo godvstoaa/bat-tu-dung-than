@@ -4,6 +4,7 @@
 //  giếng), đèn lồng, nhà vườn, cây. landmarks.js gọi: octWall, cityGates, buildDistrict.
 // ============================================================================
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { lotusLife, waterSurface } from './lotus.js';
 import * as T from './terrain.js';
 import * as BQ from './batquai.js';
@@ -122,19 +123,23 @@ export const mats = () => wallMats || (wallMats = {
 export function octWall(g) {
   const M = mats();
   for (const b of BQ.octWallBlocks()) addBlock(b.x, b.z, b.r);
+  // gộp thành 3 lưới (thân / mũ / lỗ châu mai) — trước đây ~320 mesh rời = ~110 lệnh vẽ ở phố Nội Thành (đo 2026-11-12)
+  const segGeo = [], capGeo = [], merGeo = [];
+  const box = (w, hh, d, x, y, z, ry, list) => { const b = new THREE.BoxGeometry(w, hh, d); b.rotateY(ry); b.translate(x, y, z); list.push(b); };
   for (const s of BQ.wallSegments()) {
     const ex = s.b.x - s.a.x, ez = s.b.z - s.a.z, L = Math.hypot(ex, ez), n = Math.max(1, Math.ceil(L / 10));
     const ry = Math.atan2(-ez, ex), len = L / n + 0.5;
     for (let i = 0; i < n; i++) {
       const t = (i + 0.5) / n, cx = s.a.x + ex * t, cz = s.a.z + ez * t, y = H(cx, cz);
-      const seg = new THREE.Mesh(new THREE.BoxGeometry(len, BQ.WALL_H, BQ.WALL_T), M.wall);
-      seg.position.set(cx, y + BQ.WALL_H / 2 - 1, cz); seg.rotation.y = ry; seg.castShadow = true; seg.receiveShadow = true; g.add(seg);
-      const cap = new THREE.Mesh(new THREE.BoxGeometry(len, 1.4, BQ.WALL_T + 1.4), M.cap); cap.position.set(cx, y + BQ.WALL_H - 0.3, cz); cap.rotation.y = ry; g.add(cap);
-      for (const k of [-0.3, 0.3]) { // lỗ châu mai
-        const m2 = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.1), M.wall);
-        m2.position.set(cx + Math.cos(ry) * k * len, y + BQ.WALL_H + 1, cz - Math.sin(ry) * k * len); m2.rotation.y = ry; g.add(m2);
-      }
+      box(len, BQ.WALL_H, BQ.WALL_T, cx, y + BQ.WALL_H / 2 - 1, cz, ry, segGeo);
+      box(len, 1.4, BQ.WALL_T + 1.4, cx, y + BQ.WALL_H - 0.3, cz, ry, capGeo);
+      for (const k of [-0.3, 0.3]) box(1.6, 1.6, 1.1, cx + Math.cos(ry) * k * len, y + BQ.WALL_H + 1, cz - Math.sin(ry) * k * len, ry, merGeo); // lỗ châu mai
     }
+  }
+  for (const [list, mat, shadow] of [[segGeo, M.wall, true], [capGeo, M.cap, false], [merGeo, M.wall, false]]) {
+    if (!list.length) continue;
+    const geo = mergeGeometries(list, false); list.forEach((q) => q.dispose());
+    const o = new THREE.Mesh(geo, mat); o.castShadow = shadow; o.receiveShadow = true; g.add(o);
   }
   // tháp góc bát giác ở 8 đỉnh: thân đá, lầu gỗ đỏ, mái ngói
   for (const p of BQ.octVertices()) {
