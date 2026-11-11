@@ -95,7 +95,9 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
         n.ch.setBase(n.moving ? 'walk' : 'idle');
         if (d < GREET && !n.greeted) { n.greeted = true; n.ch.play(n.ch.has('wave') ? 'wave' : 'bow'); }
         if (d > GREET + 2) n.greeted = false;
-        n.ch.update(dt);
+        // xa > 30 m: tính hoạt ảnh 1 / 3 khung (gộp thời gian — nhịp đi vẫn đúng), đỡ CPU khi phố đông người
+        n.animAcc = (n.animAcc || 0) + dt;
+        if (d <= 30 || ((n.animTick = (n.animTick || 0) + 1) % 3 === 0)) { n.ch.update(n.animAcc); n.animAcc = 0; }
         if (n.pose === 'hold' && !n.moving) n.ch.hold(t);
         n.ch.obj.position.set(n.x, groundY(n.x, n.z), n.z);
         n.ch.obj.rotation.y = n.ry;
