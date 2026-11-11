@@ -38,8 +38,16 @@ for (const [i, s] of SPOTS.entries()) {
   if (s.inst) await page.evaluate(async ([id, x, z]) => { const A = await import('/src/game/assets.js'), C = await import('/src/game/cityblocks3d.js'); const sc = window.__hq.renderer.scene; const ids = id.split(','); let k = 0; for (const mid of ids) { const g = await A.loadModel(mid); const set = C.instancedSet(g, [{ x: x - 24 + k * 16, y: 0, z: z - 18, ry: k % 2 ? 1.57 : 0, f: 12.9, lotF: 12.9, d: 16, id: mid.split('.')[0], ys: 1, tint: [1, 0.86, 0.82] }], { shadow: k < 2, flat: k >= 2 }); for (const m of set.meshes) sc.add(m.im); set.write([0]); k++; } }, [s.inst, s.x, s.z]), await page.waitForTimeout(3000);
   if (s.zoom) { await page.mouse.move(640, 360); for (let k = 0; k < s.zoom; k++) { await page.mouse.wheel(0, 400); await page.waitForTimeout(80); } await page.waitForTimeout(2500); }
   await page.evaluate(() => document.querySelectorAll('.hq-tut, .hq-digest, .hq-toast, .hq-panel').forEach((e) => { if (e.classList.contains('hq-panel')) e.hidden = true; else e.remove(); }));
+  if (s.profile) {
+    const cdp = await page.context().newCDPSession(page); await cdp.send('Profiler.enable'); await cdp.send('Profiler.setSamplingInterval', { interval: 200 }); await cdp.send('Profiler.start');
+    await page.waitForTimeout(5000); const { profile } = await cdp.send('Profiler.stop');
+    const self = new Map(), dt = new Map(); const ids = new Map(profile.nodes.map((n) => [n.id, n]));
+    for (let i = 0; i < profile.samples.length; i++) { const n = ids.get(profile.samples[i]); const k = `${n.callFrame.functionName || '(anon)'} ${n.callFrame.url.split('/').pop().split('?')[0]}:${n.callFrame.lineNumber}`; self.set(k, (self.get(k) || 0) + (profile.timeDeltas[i] || 0)); }
+    const tot = [...self.values()].reduce((a, b) => a + b, 0);
+    console.log(s.name, 'PROFILE top:'); for (const [k, v] of [...self].sort((a, b) => b[1] - a[1]).slice(0, 18)) console.log(`  ${(v / tot * 100).toFixed(1)}%  ${k}`);
+  }
   if (s.stats) { const fps = await page.evaluate(() => new Promise((r) => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 3000) requestAnimationFrame(f); else r(Math.round(n / 3)); }; requestAnimationFrame(f); })); console.log(s.name, 'fps', fps, JSON.stringify(await page.evaluate(() => window.__hq?.renderer?.frameStats?.() || null))); }
-  if (s.eval) { await page.evaluate(s.eval); await page.waitForTimeout(2500); }
+  if (s.eval) { const r = await page.evaluate(s.eval); if (r != null) console.log(s.name, 'eval:', r); await page.waitForTimeout(500); }
   if (s.debug) console.log(await page.evaluate(async ([hx, hz]) => { const THREE = await import('/node_modules/.vite/deps/three.js'); const out = []; const v = new THREE.Vector3(), m = new THREE.Matrix4(); window.__hq.renderer.scene.traverse((o) => { if (!o.isInstancedMesh || !o.visible || !o.count) return; o.geometry.computeBoundingBox(); const c = o.geometry.boundingBox.getCenter(new THREE.Vector3()); for (let k = 0; k < o.count; k++) { m.fromArray(o.instanceMatrix.array, k * 16); v.copy(c).applyMatrix4(m); if (Math.hypot(v.x - hx, v.z - hz) < 6) out.push(`${o.name || o.geometry.uuid.slice(0, 6)} k${k}/${o.count} @${v.x.toFixed(1)},${v.z.toFixed(1)} sh=${o.castShadow}`); } }); return out.join(' | '); }, [s.hx, s.hz]));
   await page.screenshot({ path: `${OUT}/${String(i + 1).padStart(2, '0')}-${s.name || 'spot'}.png`, ...(s.clip ? { clip: s.clip } : {}) });
 }

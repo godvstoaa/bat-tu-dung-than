@@ -59,9 +59,18 @@ try {
     assert.ok(!a.inbox.some((m) => m.t === 'mv'));
   });
 
+  await step('v4 phát theo vùng: người ở xa (> 600 m) chỉ nhận gói thưa (≤ 1 gói / 2 giây)', async () => {
+    send(b, { t: 'mv', x: 1200, y: 34 }); await sleep(2200); a.inbox.length = 0; // B ra xa A (đang ở sân)
+    for (let i = 0; i < 6; i++) { send(b, { t: 'mv', x: 1200 + i * 0.2, y: 34 }); await sleep(60); }
+    await sleep(300);
+    assert.ok(a.inbox.filter((m) => m.t === 'mv').length <= 1, 'xa thì thưa');
+    send(b, { t: 'tp', x: 12, y: 34 }); await sleep(150);
+  });
+
   await step('đổi phòng: tp cập nhật toạ độ cũ — mv sau cú nhảy không bị kẹp về chỗ cũ', async () => {
     send(b, { t: 'mv', x: 12, y: 34 }); // đi vài bước quanh sân — tiêu gói mvFirst sau hello
     await sleep(150);
+    send(a, { t: 'tp', x: 1120, y: 25 }); await sleep(100); // v4 phát theo vùng: A đứng cùng khu với B (trong ~600 m) mới nhận mọi gói
     a.inbox.length = 0;
     send(b, { t: 'tp', x: 1125, y: 25 });                  // «vào điện»: nhảy > 25 ô (đúng probe: 20,30 → 1125,25)
     await sleep(150);
