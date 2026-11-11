@@ -25,11 +25,9 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
     const l = { u: c.x * g.dir[0] + c.z * g.dir[1] };
     const look = c.world ? { x: 0, z: -71 } : toWorld(g, l.u, 0);
     const rest = c.face ?? (Math.hypot(look.x - c.x, look.z - c.z) > 0.5 ? Math.atan2(look.x - c.x, look.z - c.z) : 0);
-    const label = document.createElement('div'); label.className = 'hq-label'; label.style.display = 'none';
-    label.textContent = c.name; label.title = c.role; layer.appendChild(label);
-    const bub = document.createElement('div'); bub.className = 'hq-bubble'; bub.hidden = true; layer.appendChild(bub);
+    // nhãn + bong bóng DOM dựng lười (lần đầu hiện) — ~800 người đi đường không còn ~1.600 nút DOM thường trực
     return {
-      ...c, ry: rest, rest, ch: null, loading: false, active: false, label, bub,
+      ...c, ry: rest, rest, ch: null, loading: false, active: false, label: null, bub: null,
       tint: { primary: WX_HSV[c.wx] || WX_HSV.土, accent: hsvOf(g.color) },
       seg: 0, dirn: 1, t: 0, wait: 2 + (hashSeed(c.id) % 40) / 10, moving: false,
       greeted: false, bark: null, round: 0, nextAt: 0,
@@ -37,11 +35,26 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
     };
   };
   const list = [...citizenList(), ...extra].map(makeNpc);
+  function dom(n) {
+    if (n.label) return;
+    const label = document.createElement('div'); label.className = 'hq-label'; label.style.display = 'none';
+    label.textContent = n.name; label.title = n.role; layer.appendChild(label);
+    const bub = document.createElement('div'); bub.className = 'hq-bubble'; bub.hidden = true; layer.appendChild(bub);
+    n.label = label; n.bub = bub;
+  }
+  const hideDom = (n) => { if (n.label) { n.label.style.display = 'none'; n.bub.hidden = true; } };
+  // ứng viên: chỉ NPC có thể vào tầm (d < near + 40) hoặc đang hiện — quét lại cả danh sách khi người chơi đi > 20 m
+  // hoặc mỗi 0,5 s (NPC chưa hiện thì đứng yên, nên biên 40 m > 20 m đi được là đủ an toàn)
+  let cand = [], scanAt = -1, sx = 1e9, sz = 1e9, dirty = true;
+  function rescan(w, t) {
+    cand = []; for (const n of list) if (n.active || Math.hypot(w.x - n.x, w.z - n.z) < n.near + 40) cand.push(n);
+    scanAt = t; sx = w.x; sz = w.z; dirty = false;
+  }
   /** NPC trong phòng dựng lười (chủ tiệm…): thêm / bỏ khi phòng dựng / giải phóng */
-  function add(c) { if (list.some((n) => n.id === c.id)) return; list.push(makeNpc({ ...c, indoor: true, world: true })); }
+  function add(c) { if (list.some((n) => n.id === c.id)) return; list.push(makeNpc({ ...c, indoor: true, world: true })); dirty = true; }
   function remove(id) {
     const i = list.findIndex((n) => n.id === id); if (i < 0) return;
-    const n = list[i]; n.removed = true; n.active = false; if (n.ch) { scene.remove(n.ch.obj); n.ch.dispose?.(); } n.label.remove(); n.bub.remove(); list.splice(i, 1);
+    const n = list[i]; n.removed = true; n.active = false; if (n.ch) { scene.remove(n.ch.obj); n.ch.dispose?.(); } n.label?.remove(); n.bub?.remove(); list.splice(i, 1); dirty = true;
   }
 
   function spawn(n) {
@@ -62,12 +75,14 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
   /** Mỗi khung: w = vị trí người chơi (mét). Trả danh sách vòng chặn (actors) của NPC đang hiện. */
   function update(dt, t, w, nowMs, dayKey = '') {
     actors.length = 0;
+    if (dirty || t - scanAt > 0.5 || t < scanAt || Math.hypot(w.x - sx, w.z - sz) > 20) rescan(w, t);
     let act = 0;
-    for (const n of list) if (n.active) act++;
-    for (const n of list) {
+    for (const n of cand) if (n.active) act++;
+    for (const n of cand) {
+      if (n.removed) continue;
       const d = Math.hypot(w.x - n.x, w.z - n.z);
-      if (!n.active && d < n.near && act < MAX_ACTIVE) { n.active = true; act++; spawn(n); if (n.ch) scene.add(n.ch.obj); }
-      else if (n.active && d > n.near + 15) { n.active = false; act--; if (n.ch) scene.remove(n.ch.obj); n.bark = null; }
+      if (!n.active && d < n.near && act < MAX_ACTIVE) { n.active = true; act++; dom(n); spawn(n); if (n.ch) scene.add(n.ch.obj); }
+      else if (n.active && d > n.near + 15) { n.active = false; act--; if (n.ch) scene.remove(n.ch.obj); n.bark = null; hideDom(n); }
       if (!n.active) continue;
       // đi lại: qua lại giữa các điểm lộ trình, nghỉ 3–6 s ở đầu mút; khách đứng chắn trước mặt thì dừng
       let goal = n.rest;
@@ -118,11 +133,13 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
 
   /** Nhãn tên + bong bóng (place/showBubble của render3d — cùng khuôn với NPC khác) */
   function ui(w, place, showBubble) {
-    for (const n of list) {
+    for (const n of cand) {
+      if (!n.label || n.removed) continue; // chưa từng hiện → không có nút DOM
+      if (!n.active || !n.ch) { if (n.label.style.display !== 'none') hideDom(n); continue; }
       const d = Math.hypot(w.x - n.x, w.z - n.z);
       const gy = groundY(n.x, n.z), hh = (n.height || 1.72) + 0.55;
-      if (n.active && n.ch && d < LABEL) place(n.label, n.x, gy + hh, n.z); else n.label.style.display = 'none';
-      showBubble(n.bub, n.active && n.ch ? n.bark : null, n.x, gy + hh - 0.15, n.z);
+      if (d < LABEL) place(n.label, n.x, gy + hh, n.z); else if (n.label.style.display !== 'none') n.label.style.display = 'none';
+      if (n.bark || !n.bub.hidden) showBubble(n.bub, n.bark, n.x, gy + hh - 0.15, n.z);
     }
   }
 

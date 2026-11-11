@@ -17,7 +17,8 @@ import { SHOP_TYPES, ITEM, itemsOfShop, COUPLETS, WX_NAME } from './items.js';
 import { TIERS, footOf } from './estate.js';
 import { setRoomSolids, clearRoomSolids } from './obstacles.js';
 import { addLight, removeRoomLights, addGlow } from './lights.js';
-import { placeModel } from './assets.js';
+import { placeModel, loadModel } from './assets.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { stoneMaterial } from './ground-tex.js';
 import { guaById } from './batquai.js';
 import { SVC, svcInfo, USE_VERB } from './shop-data.js';
@@ -123,6 +124,25 @@ function makeCtx(scene, r) {
   ctx.spot = (s) => ctx.spots.push({ r: 1.3, ...s, x: r.origin.x + s.x, z: r.origin.z + s.z });
   ctx.light = (x, y, z, power = 1, color = '#ffa04a') => { if (ctx.lights >= 8) return; ctx.lights++; addLight(r.origin.x + x, y, r.origin.z + z, { color, power, room: r.key }); };
   ctx.model = (id, fit, x, z, ry = 0, y = 0) => placeModel(g, id, { fit, at: { x, y, z, ry }, hd: false }).catch(() => null);
+  /** nhiều bản một model (bàn ghế, bình…): một InstancedMesh / lưới model; items {x,y,z,ry,s}, s = kích thước đích theo `fitKey` */
+  ctx.inst = (id, items, fitKey = 'height') => loadModel(id).then((gm) => {
+    if (!gm || !items.length) return;
+    const root = gm.scene; root.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(root), size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
+    const ref = (fitKey === 'width' ? size.x : fitKey === 'depth' ? size.z : size.y) || 1;
+    const M4 = new THREE.Matrix4(), base = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), one = new THREE.Vector3(1, 1, 1), P = new THREE.Vector3();
+    root.traverse((o) => {
+      if (!o.isMesh) return;
+      const im = new THREE.InstancedMesh(o.geometry, o.material, items.length); im.castShadow = true; im.receiveShadow = true;
+      items.forEach((it, i) => {
+        const k = it.s / ref;
+        base.makeTranslation(-center.x, -box.min.y, -center.z).premultiply(new THREE.Matrix4().makeScale(k, k, k));
+        M4.compose(P.set(it.x, it.y || 0, it.z), q.setFromAxisAngle(up, it.ry || 0), one).multiply(base).multiply(o.matrixWorld);
+        im.setMatrixAt(i, M4);
+      });
+      im.instanceMatrix.needsUpdate = true; im.computeBoundingSphere(); g.add(im); ctx.own.push(im);
+    });
+  }).catch(() => null);
   ctx.lamp = (x, y, z, power = 1, hex = '#c8341f') => {
     const m = mats();
     ctx.cyl(0.03, 0.03, ctx.H - y - 0.5, m.dark, x, (ctx.H + y + 0.5) / 2, z);
@@ -303,13 +323,16 @@ function buildShop(ctx, r) {
   svc.forEach((id, n) => { if (!ctx.spots.some((q) => q.svc === id)) ctx.spot({ id: `s:${id}`, kind: 'svc', svc: id, name: svcInfo(id).name, verb: svcInfo(id).verb, x: n % 2 ? 2.4 : -2.4, z: cz + 1.0 - Math.floor(n / 2) * 1.8, r: 1.1 }); }); // nhiều dịch vụ: xen hai bên quầy
   // đèn: 2–4 ngọn, vị trí / cao / màu khác nhau
   const nl = 2 + Math.floor(rnd() * 3), lc = pickOf(rnd, ['#c8341f', '#e2a531', '#b8452c', '#d8862e']);
-  for (let k = 0; k < nl; k++) ctx.lamp(-W / 2 + (W * (k + 0.5)) / nl + (rnd() - 0.5), ctx.H - 1.2 - rnd() * 0.6, (rnd() - 0.5) * (ctx.D * 0.4), 1, k % 2 && rnd() < 0.5 ? '#e2a531' : lc);
-  shopExtras(ctx, rnd, hiring);
+  const nl2 = (r.type === 'tuu' || r.type === 'tralau') ? 4 + Math.floor(rnd() * 2) : nl; // quán ăn uống: đèn dày (§3.6)
+  for (let k = 0; k < nl2; k++) ctx.lamp(-W / 2 + (W * (k + 0.5)) / nl2 + (rnd() - 0.5), ctx.H - 1.2 - rnd() * 0.6, (rnd() - 0.5) * (ctx.D * 0.4), 1, k % 2 && rnd() < 0.5 ? '#e2a531' : lc);
+  const dine = r.type === 'tuu' || r.type === 'tralau';
+  if (!dine) { const F = furn(ctx); shopDress(ctx, F, rnd, island, hiring); F.flush(); }
+  shopExtras(ctx, rnd, hiring, dine);
 }
 /** đồ thêm riêng từng tiệm (thảm, chậu cây, chum, thùng gỗ, ghế đẩu, rèm) ở các góc trống cạnh cửa + giữa sàn */
-function shopExtras(ctx, rnd, hiring) {
+function shopExtras(ctx, rnd, hiring, dine = false) {
   const mt = mats(), { hw, hd } = ctx;
-  if (rnd() < 0.7) { const rc = pickOf(rnd, ['#7a2a20', '#3e5a6a', '#6a5a2a', '#5a2a4a', '#2e4a3a']); const rug = ctx.plane(2.2 + rnd() * 1.6, 1.6 + rnd() * 1.4, colorMat(rc, { roughness: 1 }), (rnd() - 0.5) * 1.2, 0.012, 0.8 + (rnd() - 0.5) * 1.5); rug.rotation.x = -Math.PI / 2; }
+  if (rnd() < 0.7 && !dine) { const rc = pickOf(rnd, ['#7a2a20', '#3e5a6a', '#6a5a2a', '#5a2a4a', '#2e4a3a']); const rug = ctx.plane(2.2 + rnd() * 1.6, 1.6 + rnd() * 1.4, colorMat(rc, { roughness: 1 }), (rnd() - 0.5) * 1.2, 0.012, 0.8 + (rnd() - 0.5) * 1.5); rug.rotation.x = -Math.PI / 2; }
   const corners = [[hw - 1.2, hd - 1.3], ...(hiring ? [] : [[-hw + 1.2, hd - 1.3]])];
   for (const [x, z] of corners) {
     const k = Math.floor(rnd() * 5);
@@ -338,37 +361,216 @@ function jobCorner(ctx, r) {
     ctx.spot({ id: 'cart', kind: 'job', mine: true, name: 'Xe goòng Khoáng Sơn', verb: 'Xuống mỏ dân sự làm thợ mỏ', x: -hw + 2.9 + sx, z: z - 0.6, r: 1.2 });
   }
 }
+// ============================================================================
+//  QUÁN RA QUÁN (docs/CAY-QUAN-MANIFEST.md §3) — bàn ghế là MODEL THẬT (gỗ kiểu Minh, Meshy), không còn hộp:
+//    bàn vuông bát tiên / bàn tròn + ghế tựa quay vào bàn + bộ trà / vò rượu trên mặt bàn (Tống ngồi ghế, không ngồi đệm)
+//    thuỷ bài (bảng tên món) treo trên quầy · giá hoa có bình cắm hoa bốn mùa · tùng cảnh trên án (Mộng Lương Lục:
+//    «插四時花，掛名人畫» · «列花架，安頓奇杉異檜») · tranh / thư pháp hai vách và vách cửa · bình phong ngăn gian tửu lâu
+//  Mỗi model một InstancedMesh / phòng (ctx.inst) — vài chục lệnh vẽ cho cả phòng.
+// ============================================================================
+/** gom đồ model theo id rồi dựng InstancedMesh một lần / model / phòng */
+function furn(ctx) {
+  const F = new Map();
+  return {
+    add(id, s, x, z, ry = 0, y = 0, fit = 'height') { const k = `${id}|${fit}`; if (!F.has(k)) F.set(k, { id, fit, items: [] }); F.get(k).items.push({ x, y, z, ry, s }); },
+    flush() { for (const { id, fit, items } of F.values()) ctx.inst(id, items, fit); },
+  };
+}
+// tỉ lệ rộng / cao của model (đo khung bao): mặt bàn cao = rộng / k
+const TABLE = { sq: { id: 'pr_table_long', w: 1.15, k: 1.53 }, round: { id: 'pr_table_round', w: 2.0, k: 3.25 } };
+const CHAIRS = [['pr_chair', 1.0], ['pr_chair_red', 1.08]];
+/** một bộ bàn: bàn + 2–6 ghế quay vào bàn + đồ trên bàn (bộ trà / vò rượu + chén) */
+function tableSet(ctx, F, rnd, x, z, { round = false, seats = 4, top = 'tea', rot = 0, chair = null } = {}) {
+  const T = round ? TABLE.round : TABLE.sq, th = T.w / T.k, [cid, ch] = chair || pickOf(rnd, CHAIRS), mt = mats();
+  F.add(T.id, T.w, x, z, rot, 0, 'width');
+  ctx.solid(x, z, T.w / 2 - 0.08, T.w / 2 - 0.08, rot);
+  const pos = [];
+  if (round) for (let k = 0; k < seats; k++) { const a = rot + (k / seats) * Math.PI * 2 + 0.35; pos.push([x + Math.sin(a) * (T.w / 2 + 0.4), z + Math.cos(a) * (T.w / 2 + 0.4)]); }
+  else {
+    const sides = [[0, 1], [0, -1], [1, 0], [-1, 0]].slice(0, Math.max(2, Math.min(4, seats))), c = Math.cos(rot), s = Math.sin(rot);
+    for (const [ax, az] of sides) pos.push([x + (ax * c + az * s) * (T.w / 2 + 0.36), z + (-ax * s + az * c) * (T.w / 2 + 0.36)]);
+  }
+  for (const [cx, cz] of pos) { F.add(cid, ch, cx, cz, Math.atan2(x - cx, z - cz) + (rnd() - 0.5) * 0.3); ctx.solid(cx, cz, 0.25, 0.25); }
+  if (top === 'tea') F.add('pr_teaset', round ? 0.62 : 0.5, x, z, rnd() * 6.28, th, 'width');
+  else if (top === 'wine') {
+    F.add('pr_jar_porcelain', 0.3, x + 0.15, z - 0.12, rnd() * 6, th);
+    for (let k = 0; k < 3; k++) { const a = k * 2.1 + rnd(); ctx.cyl(0.045, 0.035, 0.07, mt.jar2, x + Math.cos(a) * 0.34, th + 0.035, z + Math.sin(a) * 0.34, false, 10); }
+    ctx.box(0.34, 0.05, 0.24, mt.jar2, x - 0.2, th + 0.025, z + 0.16); ctx.box(0.26, 0.06, 0.16, colorMat('#c8a050'), x - 0.2, th + 0.08, z + 0.16); // đĩa thức nhắm
+  }
+  return { x, z, th };
+}
+// hoa bốn mùa (tứ thời hoa): đào / mai hồng · lan trắng tím · cúc vàng · mai trắng điểm đỏ — cành mảnh, hoa nhỏ dọc ngọn
+const SEASON_FLOWER = [['#f2c4d4', '#e07a9a'], ['#f5f0e8', '#b58ad8'], ['#f2c440', '#e88a20'], ['#f4f0ea', '#c8304a']];
+const FLOWER_MAT = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+function flowers(ctx, rnd, x, y, z) {
+  const parts = [], col = pickOf(rnd, SEASON_FLOWER), stem = new THREE.Color('#3a2a1a'), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
+  const paint = (g, hex) => { const c = new THREE.Color(hex), n = g.attributes.position.count, a = new Float32Array(n * 3); for (let i = 0; i < n; i++) c.toArray(a, i * 3); g.setAttribute('color', new THREE.BufferAttribute(a, 3)); for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'color'].includes(k)) g.deleteAttribute(k); return g.index ? g.toNonIndexed() : g; };
+  const n = 4 + Math.floor(rnd() * 3);
+  for (let s = 0; s < n; s++) {
+    const a = rnd() * 6.283, lean = 0.15 + rnd() * 0.45, len = 0.45 + rnd() * 0.45, d = new THREE.Vector3(Math.sin(a) * Math.sin(lean), Math.cos(lean), Math.cos(a) * Math.sin(lean));
+    const g = new THREE.CylinderGeometry(0.007, 0.011, len, 4); g.translate(0, len / 2, 0); q.setFromUnitVectors(up, d); g.applyMatrix4(m4.compose(new THREE.Vector3(x, y, z), q, new THREE.Vector3(1, 1, 1))); parts.push(paint(g, `#${stem.getHexString()}`));
+    for (let j = 0; j < 5; j++) {
+      const t = 0.5 + 0.5 * rnd(), r = 0.025 + rnd() * 0.022, b = new THREE.IcosahedronGeometry(r, 0);
+      b.translate(x + d.x * len * t + (rnd() - 0.5) * 0.06, y + d.y * len * t + (rnd() - 0.5) * 0.04, z + d.z * len * t + (rnd() - 0.5) * 0.06); parts.push(paint(b, j % 3 ? col[0] : col[1]));
+    }
+  }
+  const geo = mergeGeometries(parts); ctx.own.push(geo);
+  const m = new THREE.Mesh(geo, FLOWER_MAT); m.castShadow = true; ctx.g.add(m);
+}
+/** giá hoa: án gỗ dựa vách + bình sứ cắm hoa / chậu tùng cảnh (+ chum sứ cạnh chân án) */
+function flowerStand(ctx, F, rnd, x, z, ry, kind = 'vase') {
+  const w = 1.1 + rnd() * 0.25, th = w / 1.44;
+  F.add('pr_table_ming', w, x, z, ry, 0, 'width'); ctx.solid(x, z, w / 2, 0.26, ry);
+  const s = Math.sin(ry), c = Math.cos(ry);
+  if (kind === 'bonsai') F.add('lib_bonsai.vch', 0.7, x, z, ry + rnd(), th);
+  else {
+    const [vid, vh] = pickOf(rnd, [['pr_vase_ming', 0.42], ['pr_vase_celadon', 0.45]]), ox = (rnd() - 0.5) * w * 0.4;
+    F.add(vid, vh, x + c * ox, z - s * ox, rnd() * 6, th); flowers(ctx, rnd, x + c * ox, th + vh * 0.85, z - s * ox);
+    if (rnd() < 0.6) F.add('pr_teaset', 0.32, x - c * ox * 1.6, z + s * ox * 1.6, rnd() * 6, th, 'width');
+  }
+  if (rnd() < 0.5) F.add('pr_jar_porcelain', 0.5, x + c * (w / 2 + 0.35) + s * 0.1, z - s * (w / 2 + 0.35) + c * 0.1, rnd() * 6);
+}
+// thuỷ bài: bảng tên món treo trên thanh gỗ phía trên quầy (chữ dọc, đỏ / đen xen nhau)
+const MENU = {
+  tralau: ['龍 井', '碧 螺 春', '普 洱', '鐵 觀 音', '茉 莉', '白 毫', '桂 花 糕', '點 心'],
+  tuu: ['女 兒 紅', '竹 葉 青', '杏 花 村', '花 雕', '燒 鵝', '醉 蟹', '牛 肉', '湯 麵'],
+};
+function menuBoards(ctx, rnd, list, cz, span) {
+  const mt = mats(), n = Math.min(list.length, 5 + Math.floor(rnd() * 3)), y = ctx.H - 2.4, start = Math.floor(rnd() * list.length);
+  ctx.box(span + 0.4, 0.07, 0.07, mt.dark, 0, y + 0.64, cz);
+  for (const sx of [-1, 1]) ctx.cyl(0.015, 0.015, ctx.H - y - 0.6, mt.dark, sx * (span / 2 + 0.1), (ctx.H + y + 0.64) / 2, cz, false, 4);
+  for (let k = 0; k < n; k++) {
+    const t = list[(start + k) % list.length], red = (k + start) % 2 === 0;
+    const tex = textTex(`mn:${t}:${red}`, t, { w: 96, h: 320, bg: red ? '#8a2a1c' : '#2e1b12', fg: red ? '#f3e7c8' : '#e8c25a', border: red ? '#e8c25a' : null, vertical: true, size: 56 });
+    const p = ctx.plane(0.34, 1.12, colorMat('#ffffff', { map: tex, roughness: 0.7, side: THREE.DoubleSide }), -span / 2 + span * (k + 0.5) / n, y, cz);
+    p.rotation.z = (rnd() - 0.5) * 0.04;
+  }
+}
+/** lò phong lô đun nước (than hồng + ấm đồng) cạnh quầy trà + chum nước */
+function teaStove(ctx, F, x, z) {
+  const mt = mats();
+  ctx.cyl(0.3, 0.36, 0.72, mt.jar, x, 0.36, z, true, 12);
+  ctx.cyl(0.24, 0.24, 0.04, colorMat('#ff6a2a', { emissive: '#ff5a1a', emissiveIntensity: 1.4 }), x, 0.73, z, false, 12);
+  const k = ctx.mesh(new THREE.SphereGeometry(0.19, 12, 8), mt.brass, x, 0.92, z); k.scale.y = 0.82;
+  const sp = ctx.cyl(0.028, 0.018, 0.24, mt.brass, x + 0.2, 0.98, z, false, 6); sp.rotation.z = -0.95;
+  ctx.cyl(0.05, 0.05, 0.05, mt.dark, x, 1.1, z, false, 8);
+  ctx.light(x, 1.0, z, 0.45, '#ff8a3c');
+  F.add('pr_jar_porcelain', 0.75, x - 0.85, z, 0.4); ctx.solid(x - 0.85, z, 0.3, 0.3);
+}
+/** tranh cuộn / thư pháp trên vách cửa (mặt quay vào trong) — hai bên cửa, ngoài câu đối */
+function frontArt(ctx, rnd) {
+  const mt = mats(), pics = Object.keys(ITEM).filter((k) => ITEM[k].proc === 'painting');
+  for (const sx of [-1, 1]) {
+    if (!pics.length || rnd() < 0.15) continue;
+    const it = ITEM[pickOf(rnd, pics)], x = sx * (ctx.hw / 2 + 0.6 + rnd() * 0.8), z = ctx.hd - 0.3;
+    const w = 1.0 + rnd() * 0.4, h = w * (1.3 + rnd() * 0.3);
+    ctx.box(w + 0.1, h + 0.14, 0.04, mt.dark, x, 2.6, z + 0.01);
+    ctx.plane(w, h, colorMat('#ffffff', { map: artTex(it.art), roughness: 0.85 }), x, 2.6, z - 0.02, Math.PI);
+  }
+}
+/** tranh / thư pháp hai vách bên (quán không bày hàng dọc vách: trà lâu, tửu lâu) */
+function sideArt(ctx, rnd, zs) {
+  const wallArt = Object.keys(ITEM).filter((k) => ITEM[k].place === 'wall' && ['painting', 'calli'].includes(ITEM[k].proc));
+  if (!wallArt.length) return;
+  for (const r of [1, 3]) for (const z of zs) if (rnd() < 0.85) buildItem(ctx, { i: pickOf(rnd, wallArt), x: 0, z: z + (rnd() - 0.5) * 0.8, r });
+}
+/** bàn tiếp khách + giá hoa cho tiệm bán (tiệm không bàn khách trước đây chỉ có quầy + hàng) */
+function shopDress(ctx, F, rnd, island, hiring) {
+  const { hw, hd } = ctx;
+  // hai góc vách sau (cạnh kệ hàng): giá hoa · tùng cảnh
+  const kinds = rnd() < 0.5 ? ['vase', 'bonsai'] : ['bonsai', 'vase'];
+  [-1, 1].forEach((sx, k) => flowerStand(ctx, F, rnd, sx * (hw - 1.15), -hd + 0.55, 0, kinds[k]));
+  // bàn tiếp khách (chủ tiệm mời trà): giữa phòng phía cửa, lệch một bên lối giữa — chỉ khi chưa có hàng bày giữa phòng
+  if (!island) { const side = rnd() < 0.5 ? -1 : 1; tableSet(ctx, F, rnd, side * Math.min(3.3, hw - 3.2), Math.min(1.2, hd - (hiring ? 5.6 : 4)), { seats: 2, rot: 0, top: 'tea' }); }
+  frontArt(ctx, rnd);
+}
+/** lấp khoảng trống lớn (§3.5: không để sàn trống > 4 × 4 m): tìm điểm xa mọi vật cản / điểm tương tác nhất (bỏ lối giữa
+ *  cửa → quầy), còn hở bán kính ≥ 2,3 m thì đặt thêm một bộ bàn — lặp tối đa 4 lần */
+function fillEmpty(ctx, F, rnd, opt, zMin, zMax) {
+  const { hw } = ctx, ox = ctx.r.origin.x, oz = ctx.r.origin.z;
+  for (let n = 0; n < 4; n++) {
+    const S = [...ctx.solids.map((q) => ({ x: q.x - ox, z: q.z - oz, r: Math.max(q.hw, q.hd) })), ...ctx.spots.map((q) => ({ x: q.x - ox, z: q.z - oz, r: 0.9 }))];
+    let best = null, bd = 0;
+    for (let x = -hw + 1.5; x <= hw - 1.5; x += 0.5) for (let z = zMin; z <= zMax; z += 0.5) {
+      if (Math.abs(x) < 2.6) continue;
+      let d = hw - Math.abs(x); for (const q of S) d = Math.min(d, Math.hypot(x - q.x, z - q.z) - q.r);
+      if (d > bd) { bd = d; best = [x, z]; }
+    }
+    if (!best || bd < 2.3) break;
+    tableSet(ctx, F, rnd, best[0], best[1], { seats: 2 + Math.floor(rnd() * 2), ...opt });
+  }
+}
+// chum rượu đất nung: dáng phình bụng, miệng nhỏ (tiện xoay một lần / phòng)
+function wineJar(ctx, geo, x, z, r, h, y = 0) {
+  const mt = mats(), m = new THREE.Mesh(geo, mt.jar); m.position.set(x, y, z); m.scale.set(r, h, r); m.castShadow = m.receiveShadow = true; ctx.g.add(m);
+  ctx.cyl(r * 0.5, r * 0.56, 0.07, mt.redpaper, x, y + h + 0.02, z, false, 12); // nắp giấy đỏ
+  ctx.cyl(r * 0.47, r * 0.47, 0.03, mt.dark, x, y + h - 0.04, z, false, 12); // dây buộc
+}
+const jarProfile = () => new THREE.LatheGeometry([[0, 0], [0.62, 0], [0.86, 0.1], [1, 0.42], [0.94, 0.7], [0.66, 0.88], [0.46, 0.95], [0.48, 1]].map(([a, b]) => new THREE.Vector2(a, b)), 18);
 const SHOP_EXTRA = {
   tuu(ctx) {
-    const mt = mats(), { hw, hd } = ctx;
-    const rnd = seeded(`tuu|${ctx.r.key}`), nj = 3 + Math.floor(rnd() * 5);
-    for (let i = 0; i < nj; i++) ctx.cyl(0.3 + rnd() * 0.12, 0.26, 0.6 + rnd() * 0.35, mt.jar, -hw + 1.6 + i * 1.0, 0.4, -hd + 1.5, true, 12);
-    // bàn: vuông 4 · tròn 6 · phản dài 3 — mỗi tửu lâu một kiểu, lệch nhẹ
-    const style = Math.floor(rnd() * 3);
-    const tables = style === 1 ? [[-hw + 3.2, 0], [0, 1.2], [hw - 3.2, 0], [-hw + 3.2, 3.6], [0, 4.6], [hw - 3.2, 3.6]] : style === 2 ? [[-hw + 3.4, 0.6], [hw - 3.4, 0.6], [-hw + 3.4, 4]] : [[-hw + 3.5, 0.5], [hw - 3.5, 0.5], [-hw + 3.5, 4], [hw - 3.5, 4]];
-    tables.forEach(([tx0, tz0], k) => {
-      const tx = tx0 + (rnd() - 0.5) * 0.5, tz = tz0 + (rnd() - 0.5) * 0.5;
-      if (style === 1) { ctx.cyl(0.65, 0.65, 0.08, mt.wood, tx, 0.78, tz, true, 18); ctx.cyl(0.08, 0.12, 0.74, mt.dark, tx, 0.37, tz, false, 8); for (let q = 0; q < 4; q++) ctx.cyl(0.2, 0.2, 0.45, mt.dark, tx + Math.cos(q * 1.57 + 0.4) * 1.0, 0.22, tz + Math.sin(q * 1.57 + 0.4) * 1.0, true, 10); }
-      else if (style === 2) { ctx.box(2.6, 0.45, 1.2, mt.dark, tx, 0.22, tz, true, rnd() * 0.2); ctx.box(1.2, 0.3, 0.7, mt.wood, tx, 0.6, tz); for (const ax of [-1, 1]) ctx.cyl(0.36, 0.4, 0.12, mt.cushion, tx + ax * 0.7, 0.5, tz + 0.3, false, 14); }
-      else { ctx.box(1.3, 0.8, 1.3, mt.wood, tx, 0.4, tz, true); for (const [ax, az] of [[1, 0], [-1, 0], [0, -1]]) ctx.box(0.45, 0.45, 0.45, mt.dark, tx + ax * 1.05, 0.22, tz + az * 1.05, true); }
-      ctx.cyl(0.08, 0.07, 0.22, mt.jar2, tx, style === 2 ? 0.86 : 0.92, tz);
-      if (k === 0) ctx.spot({ id: 's:tindon', kind: 'svc', svc: 'tindon', name: SVC.tindon.name, verb: SVC.tindon.verb, x: tx, z: tz + 1.4 });
-    });
-    ctx.npcs.push({ id: `tn_${ctx.r.key}`, name: 'Tiểu Nhị', role: 'Tiểu nhị', look: 'npc_villager', gua: ctx.r.shop.g, wx: '水', lines: ['Có ngay, có ngay!', 'Lầu trên còn bàn sát cửa sổ.', 'Khách quan muốn nghe chuyện thì hỏi chưởng quầy.'], x: ctx.r.origin.x + hw - 2, z: ctx.r.origin.z + 2.2, path: null, face: -Q });
+    const mt = mats(), { hw, hd } = ctx, F = furn(ctx);
+    const rnd = seeded(`tuu|${ctx.r.key}`);
+    // chum rượu đất nung xếp tầng sau quầy bên trái (nắp giấy đỏ buộc dây) + vò sứ bên phải
+    const nj = 4 + Math.floor(rnd() * 3), jg = jarProfile(); ctx.own.push(jg);
+    for (let i = 0; i < nj; i++) { const x = -hw + 1.0 + i * 0.78, r = 0.34 + rnd() * 0.05, h = 0.7 + rnd() * 0.18; wineJar(ctx, jg, x, -hd + 1.25, r, h); ctx.solid(x, -hd + 1.25, r, r); }
+    for (let i = 0; i < nj - 2; i++) { const x = -hw + 1.39 + i * 0.78; ctx.box(0.7, 0.05, 0.5, mt.wood, x, 0.92, -hd + 1.25); wineJar(ctx, jg, x, -hd + 1.25, 0.28, 0.58, 0.95); } // tầng trên kê ván
+    for (let i = 0; i < 3; i++) F.add('pr_jar_porcelain', 0.7 + rnd() * 0.2, hw - 1.0 - i * 0.85, -hd + 1.2, rnd() * 6);
+    const cz = -hd + 2.75; menuBoards(ctx, rnd, MENU.tuu, cz - 0.15, 4.2);
+    // ba kiểu: (0) gian ngăn vách trái + bàn tròn bên phải · (1) gian ngăn + bàn vuông lưới · (2) bình phong chia giữa, bàn tròn hai bên
+    const style = Math.floor(rnd() * 3), chair = pickOf(rnd, CHAIRS), sets = [];
+    if (style < 2) {
+      // gian ngăn (閣子 — Đông Kinh Mộng Hoa Lục): bình phong vuông góc vách trái, mỗi gian một bàn vuông hai ghế
+      const zs = [-2.6, 0.9, 4.4].filter((z) => z < hd - 2.4), scr = pickOf(rnd, ['pr_screen_antique', 'pr_screen_blossom']);
+      for (const z of [...zs.map((z) => z - 1.75), zs[zs.length - 1] + 1.75]) { F.add(scr, 1.9, -hw + 1.25, z, Math.PI / 2); ctx.solid(-hw + 1.25, z, 0.95, 0.12); }
+      for (const z of zs) sets.push(tableSet(ctx, F, rnd, -hw + 1.3, z, { seats: 2, top: rnd() < 0.6 ? 'wine' : 'tea', chair }));
+      if (style === 0) for (const [x, z] of [[hw - 3.4, -1.6], [hw - 3.4, 3.0], [-3.6, 1.2]]) sets.push(tableSet(ctx, F, rnd, x + (rnd() - 0.5) * 0.4, z + (rnd() - 0.5) * 0.4, { round: x > 0, seats: x > 0 ? 4 + Math.floor(rnd() * 2) : 3, top: 'wine', chair }));
+      else for (const [x, z] of [[hw - 2.8, -1.8], [hw - 2.8, 1.6], [hw - 2.8, 5.0], [-3.4, -0.2], [-3.4, 3.4]].filter(([, z]) => z < hd - 2.6)) sets.push(tableSet(ctx, F, rnd, x, z, { seats: 4, top: rnd() < 0.7 ? 'wine' : 'tea', chair }));
+    } else {
+      for (const sx of [-1, 1]) { F.add('pr_screen_blossom', 2.0, sx * (hw - 3.6), 0.6, 0); ctx.solid(sx * (hw - 3.6), 0.6, 1.0, 0.15); } // bình phong ngăn đôi mỗi dãy bàn tròn
+      for (const [x, z] of [[-hw + 3.6, -2.0], [-hw + 3.6, 3.2], [hw - 3.6, -2.0], [hw - 3.6, 3.2]]) sets.push(tableSet(ctx, F, rnd, x, z + (rnd() - 0.5) * 0.3, { round: true, seats: 4 + Math.floor(rnd() * 2), top: 'wine', chair }));
+    }
+    const t0 = sets[0];
+    ctx.spot({ id: 's:tindon', kind: 'svc', svc: 'tindon', name: SVC.tindon.name, verb: SVC.tindon.verb, x: t0.x + 1.9, z: t0.z, r: 1.4 });
+    flowerStand(ctx, F, rnd, hw - 0.55, hd - 5.2, -Q, 'vase');
+    sideArt(ctx, rnd, [-2, 2.5]);
+    frontArt(ctx, rnd);
+    fillEmpty(ctx, F, rnd, { top: 'wine', chair }, -hd + 4.2, hd - 3.4);
+    F.flush();
+    ctx.npcs.push({ id: `tn_${ctx.r.key}`, name: 'Tiểu Nhị', role: 'Tiểu nhị', look: 'npc_villager', gua: ctx.r.shop.g, wx: '水', lines: ['Có ngay, có ngay!', 'Lầu trên còn bàn sát cửa sổ.', 'Khách quan muốn nghe chuyện thì hỏi chưởng quầy.'], x: ctx.r.origin.x + 1.5, z: ctx.r.origin.z + 1.2, path: null, face: -Q });
   },
   tralau(ctx) {
-    const mt = mats(), { hw, hd } = ctx;
-    ctx.box(4, 0.4, 2, mt.wood, hw - 3.2, 0.2, -hd + 1.6, true); ctx.box(3.6, 2.2, 0.12, mt.screen, hw - 3.2, 1.5, -hd + 0.75);
+    const mt = mats(), { hw, hd } = ctx, F = furn(ctx);
+    const rnd = seeded(`tra|${ctx.r.key}`);
+    // sân khấu thuyết thư góc phải: bục + bình phong model + ghế bành trống + án nhỏ (thước gõ)
+    ctx.box(4, 0.4, 2.2, mt.wood, hw - 3.2, 0.2, -hd + 1.5, true);
+    F.add(pickOf(rnd, ['pr_screen_antique', 'pr_screen_blossom']), 2.2, hw - 3.2, -hd + 0.75, 0, 0.4);
+    F.add('pr_chair_red', 1.08, hw - 4.5, -hd + 1.4, 0, 0.4); F.add('pr_table_ming', 0.9, hw - 2.0, -hd + 1.9, 0, 0.4, 'width');
+    ctx.box(0.22, 0.05, 0.06, mt.dark, hw - 2.0, 0.4 + 0.9 / 1.44 + 0.03, -hd + 1.9);
     ctx.npcs.push({ id: `tt_${ctx.r.key}`, name: 'Tiên Sinh Kể Chuyện', role: 'Thuyết thư', look: 'master', gua: ctx.r.shop.g, wx: '木', lines: ['Lại nói chuyện năm ấy…', 'Muốn biết hậu sự thế nào, xin nghe hồi sau phân giải.'], x: ctx.r.origin.x + hw - 3.2, z: ctx.r.origin.z - hd + 1.6, path: null, face: 0 });
     ctx.spot({ id: 's:thuyetthu', kind: 'svc', svc: 'thuyetthu', name: SVC.thuyetthu.name, verb: SVC.thuyetthu.verb, x: hw - 3.2, z: -hd + 3.4 });
-    const rnd = seeded(`tra|${ctx.r.key}`), cand = [[-hw + 3, 0], [-hw + 3, 3.5], [hw - 3.2, 2.5], [0, 4.6], [-hw + 3, 6.2], [hw - 3.2, 5.6]].filter(([, z]) => z < hd - 2.5);
-    cand.slice(0, 3 + Math.floor(rnd() * Math.max(1, cand.length - 2))).forEach(([tx0, tz0], k) => {
-      const tx = tx0 + (rnd() - 0.5) * 0.6, tz = tz0 + (rnd() - 0.5) * 0.6;
-      ctx.box(1.2 + rnd() * 0.5, 0.4, 0.9 + rnd() * 0.3, rnd() < 0.5 ? mt.wood : mt.dark, tx, 0.2, tz, true);
-      for (const ax of [-1, 1]) ctx.cyl(0.38, 0.42, 0.14, mt.cushion, tx + ax * 1.15, 0.07, tz, false, 16);
-      ctx.cyl(0.07, 0.06, 0.12, mt.jar2, tx, 0.46, tz);
-      if (k === 0) ctx.spot({ id: 's:uongtra', kind: 'svc', svc: 'uongtra', name: SVC.uongtra.name, verb: SVC.uongtra.verb, x: tx + 1.6, z: tz });
-    });
+    // quầy trà: lò phong lô + chum nước bên trái quầy, thuỷ bài treo trên quầy
+    teaStove(ctx, F, -3.9, -hd + 2.4);
+    menuBoards(ctx, rnd, MENU.tralau, -hd + 2.6, 3.8);
+    // ba kiểu bàn: (0) hai dãy bàn vuông · (1) bàn tròn · (2) bàn tròn trái + bàn vuông phải — lối giữa ≥ 1,4 m
+    const style = Math.floor(rnd() * 3), chair = pickOf(rnd, CHAIRS), sets = [];
+    const rows = [-0.8, 2.5, 5.6].filter((z) => z < hd - 2.4);
+    for (const sx of [-1, 1]) for (const [i, z] of rows.entries()) {
+      const round = style === 1 || (style === 2 && sx < 0);
+      if (round && i === 2) continue; // bàn tròn chiếm chỗ hơn: hai hàng
+      if (rnd() < 0.12 && sets.length > 2) continue; // để trống một chỗ cho thoáng
+      const z2 = round ? -0.4 + i * 3.8 : z;
+      sets.push(tableSet(ctx, F, rnd, sx * (round ? 4.6 : 4.4) + (rnd() - 0.5) * 0.5, z2 + (rnd() - 0.5) * 0.4, { round, seats: round ? 4 + Math.floor(rnd() * 2) : 2 + Math.floor(rnd() * 3), top: 'tea', chair }));
+    }
+    const t0 = sets[0];
+    ctx.spot({ id: 's:uongtra', kind: 'svc', svc: 'uongtra', name: SVC.uongtra.name, verb: SVC.uongtra.verb, x: t0.x + (t0.x < 0 ? 2.0 : -2.0), z: t0.z });
+    // giá hoa + tùng cảnh dựa vách (Mộng Lương Lục: cắm hoa bốn mùa, bày tùng bách lạ)
+    flowerStand(ctx, F, rnd, -hw + 0.55, -hd + 3.3, Q, 'vase');
+    flowerStand(ctx, F, rnd, hw - 0.55, hd - 3.2, -Q, 'bonsai');
+    sideArt(ctx, rnd, [-1.5, 2.5]);
+    fillEmpty(ctx, F, rnd, { top: 'tea', chair }, -hd + 4.2, hd - 3.4);
+    frontArt(ctx, rnd);
+    F.flush();
   },
   dichtram(ctx) {
     const mt = mats(), { hw, hd } = ctx;

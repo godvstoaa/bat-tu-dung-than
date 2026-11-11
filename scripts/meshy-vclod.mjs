@@ -99,7 +99,7 @@ for (const id of ids) {
   let idx = new Uint32Array(I.length); for (let i = 0; i < I.length; i++) idx[i] = remap[I[i]];
   const pos32 = new Float32Array(WP), col32 = new Float32Array(WC);
   // giản lược có tính màu (sai số màu cũng tính vào), không khoá biên → đạt đích
-  const [out, err] = MeshoptSimplifier.simplifyWithAttributes(idx, pos32, 3, col32, 3, [0.6, 0.6, 0.6], null, Math.floor(target) * 3, Number(process.env.ERR || 0.05), []); // ERR: sai số cho phép (bản rất xa cần lớn hơn để đạt đích)
+  const [out, err] = MeshoptSimplifier.simplifyWithAttributes(idx, pos32, 3, col32, 3, [0.6, 0.6, 0.6], null, Math.floor(Math.min(target, idx.length / 3)) * 3, Number(process.env.ERR || 0.05), []); // ERR: sai số cho phép (bản rất xa cần lớn hơn để đạt đích)
   idx = out;
   // mesh nhiều mảnh rời / mép hở (vd trống lầu): giản lược thường kẹt xa đích → «sloppy» (gộp theo lưới không gian)
   if (idx.length / 3 > target * 1.5) { const [o2] = MeshoptSimplifier.simplifySloppy(idx, pos32, 3, null, Math.floor(target) * 3, 0.5); if (o2.length >= 300) idx = o2; }

@@ -33,10 +33,13 @@ await page.screenshot({ path: `${OUT}/00-start.png` });
 // điểm chụp: (x, z) mét thế giới — dịch chuyển bằng api.travel (màn chuyển cảnh) rồi chờ dựng
 const SPOTS = JSON.parse(process.env.SPOTS || '[]');
 for (const [i, s] of SPOTS.entries()) {
+  // {room: 'tuu#2'}: vào tiệm thứ n của loại đó (đứng sau cửa, nhìn vào quầy)
+  if (s.room) Object.assign(s, await page.evaluate(async (spec) => { const R = await import('/src/game/rooms.js'); const [type, n] = spec.split('#'); const list = R.roomSpecs().filter((r) => r.kind === 'shop' && r.type === type); const r = list[Number(n || 0) % list.length]; const p = R.insideOf(r); return { x: p.x, z: p.z, title: r.title }; }, s.room)), console.log(s.name, '→', s.title);
   await page.evaluate(([x, z]) => window.__hq?.api?.travel?.(x, z, 'chụp ảnh'), [s.x, s.z]);
   await page.waitForTimeout(s.wait || 9000);
   if (s.place) await page.evaluate(async ([id, x, z]) => { const A = await import('/src/game/assets.js'); const sc = window.__hq.renderer.scene; for (const [k, v] of [['', -8], ['.lod1', 8], ['.lod2', 24]]) await A.placeModel(sc, id + k, { fit: { width: 12 }, at: { x: x + v, y: 0, z: z - 18, ry: 0 } }); }, [s.place, s.x, s.z]), await page.waitForTimeout(4000);
   if (s.inst) await page.evaluate(async ([id, x, z]) => { const A = await import('/src/game/assets.js'), C = await import('/src/game/cityblocks3d.js'); const sc = window.__hq.renderer.scene; const ids = id.split(','); let k = 0; for (const mid of ids) { const g = await A.loadModel(mid); const set = C.instancedSet(g, [{ x: x - 24 + k * 16, y: 0, z: z - 18, ry: k % 2 ? 1.57 : 0, f: 12.9, lotF: 12.9, d: 16, id: mid.split('.')[0], ys: 1, tint: [1, 0.86, 0.82] }], { shadow: k < 2, flat: k >= 2 }); for (const m of set.meshes) sc.add(m.im); set.write([0]); k++; } }, [s.inst, s.x, s.z]), await page.waitForTimeout(3000);
+  if (s.tilt) { await page.mouse.move(640, 300); await page.mouse.down(); for (let k = 1; k <= 10; k++) await page.mouse.move(640 + (s.turn || 0) * k / 10, 300 + s.tilt * k / 10); await page.mouse.up(); await page.waitForTimeout(1200); } // kéo chuột: nghiêng / xoay camera
   if (s.zoom) { await page.mouse.move(640, 360); for (let k = 0; k < s.zoom; k++) { await page.mouse.wheel(0, 400); await page.waitForTimeout(80); } await page.waitForTimeout(2500); }
   await page.evaluate(() => document.querySelectorAll('.hq-tut, .hq-digest, .hq-toast, .hq-panel').forEach((e) => { if (e.classList.contains('hq-panel')) e.hidden = true; else e.remove(); }));
   if (s.profile) {
