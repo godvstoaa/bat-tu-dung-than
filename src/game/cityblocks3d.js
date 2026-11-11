@@ -138,6 +138,8 @@ export const houseHeight = (h, sp) => {
   if (h.ht) return Math.min(nat * 1.25, Math.max(nat * 0.85, h.ht));
   return Math.min(nat * (1 + Math.min(0.12, Math.max(-0.04, ((h.ys || 1) - 1) * 0.2))), HCAP[h.id] || 10.5);
 };
+// chỉ đổ bóng: không ghi màu / độ sâu ở lượt vẽ chính (lượt bóng dùng vật liệu độ sâu riêng của three)
+const SHADOW_ONLY = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });
 export function instancedSet(gltf, houses, { shadow, flat = false }) {
   const root = gltf.scene; root.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(root), size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
@@ -264,7 +266,7 @@ export async function cityHouses(grp) {
     for (const m of mid.meshes) grp.add(m.im);
     const far2 = base2[n] ? instancedSet(base2[n], list, { shadow: false, flat: true }) : null;
     if (far2) for (const m of far2.meshes) grp.add(m.im);
-    models.push({ id, mine, list, local: new Map(mine.map((hi, j) => [hi, j])), close: null, near: null, mid, far2, want: new Set(), busy: new Set() });
+    models.push({ id, mine, list, local: new Map(mine.map((hi, j) => [hi, j])), close: null, near: null, nearSh: null, gMid: g, mid, far2, want: new Set(), busy: new Set() });
   });
   await warmObject(grp);
   let dirty = false, lastPx = 0, lastPz = 0;
@@ -277,7 +279,11 @@ export async function cityHouses(grp) {
       /* 2026-11-11: nhà gần dùng BẢN GỐC (~80k) — .lod1 / .mid nhìn gần vỡ mảnh, texture kéo sọc (ảnh người chơi); bản rút gọn chỉ còn ở bậc vừa (≥ 36 m) */
       const g = (await loadModel(m.id)) || (await loadModel(`${m.id}.vc`)) || (await loadModel(`${m.id}.lod1`));
       if (!g) return;
-      const set = instancedSet(g, m.list, { shadow: true });
+      // bóng nhà gần: đổ bằng bản .vc (~9k) VÔ HÌNH thay bản gốc 80k — bóng ở độ phân giải bản đồ bóng không khác,
+      // mà lượt bóng bớt ~70k tam giác / nhà (đo 2026-11-12: 9 nhà gần = ~720k tam giác chỉ để vẽ bóng)
+      const proxy = tier === 'near' && m.gMid && m.gMid !== g;
+      const set = instancedSet(g, m.list, { shadow: !proxy });
+      if (proxy) { m.nearSh = instancedSet(m.gMid, m.list, { shadow: true, flat: true }); for (const x of m.nearSh.meshes) { x.im.material = SHADOW_ONLY; x.im.receiveShadow = false; grp.add(x.im); } }
       const tmp = new THREE.Group(); for (const x of set.meshes) tmp.add(x.im);
       await warmObject(tmp);
       for (const x of set.meshes) grp.add(x.im);
@@ -307,6 +313,7 @@ export async function cityHouses(grp) {
       // bậc chưa có → dồn sang bậc thấp hơn đã có (cùng một bộ nhân bản thì gộp danh sách)
       const out = new Map([[m.mid, []]]); if (m.near) out.set(m.near, []); if (m.close) out.set(m.close, []);
       out.get(m.close || m.near || m.mid).push(...c); out.get(m.near || m.mid).push(...n); out.get(m.mid).push(...v);
+      if (m.nearSh) m.nearSh.write(m.near ? n : []);
       if (m.far2) m.far2.write(f2); else out.get(m.mid).push(...f2); // không có .vc2 → bậc vừa
       for (const [set, l] of out) set.write(l);
     }

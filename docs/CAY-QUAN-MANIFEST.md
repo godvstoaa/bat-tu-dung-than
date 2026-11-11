@@ -213,3 +213,15 @@ Máy dev lúc đo đang chạy thêm Chrome và ZCode của người dùng, nên
 - Sửa: field cỏ nướng xong mà độ phủ < 0,3% thì không vẽ lưới cỏ.
 - Đã kiểm ngoài đồng (3000, 0) và (−3000, 500): cỏ vẫn hiện đủ.
 - Tam giác: đại lộ 2,81 → 2,61 M; sân trong 3,01 → 2,81 M.
+
+**Bóng nhà gần** (`cityblocks3d`):
+- Vấn đề: nhà trong 36 m dùng bản gốc khoảng 80k tam giác, và bản này được vẽ cả trong lượt bóng. Phố có 9 nhà gần thì khoảng 720k tam giác chỉ để tạo bóng.
+- Sửa: bóng đổ bằng bản `.vc` khoảng 9k tam giác, vô hình ở lượt vẽ chính (`SHADOW_ONLY`: không ghi màu, không ghi độ sâu). Hình nhà vẫn là bản gốc.
+- Đo xen kẽ cũ / mới ở phố (1400, 200):
+
+  | | Tam giác | fps |
+  |---|---|---|
+  | Cũ | 3,54 M | 16 |
+  | Mới | 2,93 M | **23 (+44%)** |
+
+- Ảnh `shots/bong-cu` và `shots/bong-moi`: bóng giống nhau.
