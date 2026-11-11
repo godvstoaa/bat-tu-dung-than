@@ -151,9 +151,9 @@ Kèm đợt này (hiệu năng, không thuộc cây và quán):
 - Mỗi loài có uniform màu tán, độ pha và tỉ lệ lá rụng; không thêm tam giác. Tán đổi màu nhờ mặt nạ đỉnh `leafm`; lá rụng bằng `discard` theo ô 0,4 m.
 - Đào và mai giữ hoa suốt đông tới Tết. Đông Việt Nam không trụi: rụng ≤ 40%.
 - Ảnh cùng một góc sân trong ở 4 mùa: `shots/mua`, `shots/mua2`. Thử mùa khác: `localStorage['huyenquan:season']`.
-- **Chưa làm:** bình hoa trong quán đổi theo tứ thời hoa (hiện chọn ngẫu nhiên theo phòng).
+- Bình hoa trong quán theo tứ thời hoa (`season.js` dùng chung): xuân lan / đào, hạ sen, thu cúc, đông mai.
 
-**G-5.4 «Quán có khách» (goal kế, chờ duyệt):**
+**G-5.4 «Quán có khách»:**
 - Trà lâu và tửu lâu có khách ngồi ghế uống trà, nhắm rượu: ≥ 40% bàn có 1–3 khách.
 - Có tiếng trò chuyện cục bộ. Tiểu nhị đi giữa các bàn.
 - **Tiêu chí:** ảnh 3 quán có khách ngồi đúng ghế, không xuyên bàn; tổng nhân vật có xương vẫn ≤ `MAX_ACTIVE` (24, máy yếu 16); fps trong quán ≥ 50.
@@ -161,3 +161,11 @@ Kèm đợt này (hiệu năng, không thuộc cây và quán):
   - tư thế ngồi (`characters.js` đã có `sit` cho người chơi);
   - `tableSet` trả vị trí ghế;
   - NPC khách dựng lười theo phòng như chủ tiệm.
+
+**Kết quả G-5.4 (2026-11-12): đạt phần khách ngồi.**
+- `interior-build.seatGuests`: khoảng 45% bàn có 1–3 khách, tối đa 6 khách mỗi quán.
+- Khách ngồi đúng ghế, quay vào bàn (động tác `sit` của Meshy là ngồi ghế). Mỗi khách nói câu theo loại quán; không hiện nhãn tên.
+- Khách không đổ bóng; hoạt ảnh ngồi tính một trên ba khung.
+- Đo đối chứng trong cùng phòng `tuu#5` (máy dev đang bận): có khách 34 fps, bỏ khách 36 fps, tức khách tốn khoảng 2 fps. Cùng phòng lúc máy rảnh đạt 60 fps.
+- Ảnh: `shots/khach`.
+- Tiểu nhị tửu lâu đi lại lối giữa, từ cửa tới quầy. Bước lấp bàn luôn chừa lối |x| < 2,6 m, nên không đâm vào bàn ghế ở cả ba kiểu bố cục. Khách đứng chắn trước mặt thì tiểu nhị dừng.

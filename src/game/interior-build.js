@@ -18,6 +18,7 @@ import { TIERS, footOf } from './estate.js';
 import { setRoomSolids, clearRoomSolids } from './obstacles.js';
 import { addLight, removeRoomLights, addGlow } from './lights.js';
 import { placeModel, loadModel } from './assets.js';
+import { seasonOf } from './season.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { stoneMaterial } from './ground-tex.js';
 import { guaById } from './batquai.js';
@@ -390,20 +391,22 @@ function tableSet(ctx, F, rnd, x, z, { round = false, seats = 4, top = 'tea', ro
     const sides = [[0, 1], [0, -1], [1, 0], [-1, 0]].slice(0, Math.max(2, Math.min(4, seats))), c = Math.cos(rot), s = Math.sin(rot);
     for (const [ax, az] of sides) pos.push([x + (ax * c + az * s) * (T.w / 2 + 0.36), z + (-ax * s + az * c) * (T.w / 2 + 0.36)]);
   }
-  for (const [cx, cz] of pos) { F.add(cid, ch, cx, cz, Math.atan2(x - cx, z - cz) + (rnd() - 0.5) * 0.3); ctx.solid(cx, cz, 0.25, 0.25); }
+  const seatPos = [];
+  for (const [cx, cz] of pos) { const ry = Math.atan2(x - cx, z - cz) + (rnd() - 0.5) * 0.3; F.add(cid, ch, cx, cz, ry); ctx.solid(cx, cz, 0.25, 0.25); seatPos.push({ x: cx, z: cz, ry }); }
   if (top === 'tea') F.add('pr_teaset', round ? 0.62 : 0.5, x, z, rnd() * 6.28, th, 'width');
   else if (top === 'wine') {
     F.add('pr_jar_porcelain', 0.3, x + 0.15, z - 0.12, rnd() * 6, th);
     for (let k = 0; k < 3; k++) { const a = k * 2.1 + rnd(); ctx.cyl(0.045, 0.035, 0.07, mt.jar2, x + Math.cos(a) * 0.34, th + 0.035, z + Math.sin(a) * 0.34, false, 10); }
     ctx.box(0.34, 0.05, 0.24, mt.jar2, x - 0.2, th + 0.025, z + 0.16); ctx.box(0.26, 0.06, 0.16, colorMat('#c8a050'), x - 0.2, th + 0.08, z + 0.16); // đĩa thức nhắm
   }
-  return { x, z, th };
+  return { x, z, th, seats: seatPos };
 }
 // hoa bốn mùa (tứ thời hoa): đào / mai hồng · lan trắng tím · cúc vàng · mai trắng điểm đỏ — cành mảnh, hoa nhỏ dọc ngọn
-const SEASON_FLOWER = [['#f2c4d4', '#e07a9a'], ['#f5f0e8', '#b58ad8'], ['#f2c440', '#e88a20'], ['#f4f0ea', '#c8304a']];
+// tứ thời hoa theo mùa (season.js): xuân lan · hạ sen · thu cúc · đông mai (trắng điểm đỏ) / đào Tết
+const SEASON_FLOWER = { xuan: [['#f5f0e8', '#b58ad8'], ['#f2c4d4', '#e07a9a']], ha: [['#f6c8d6', '#f8eef0'], ['#f2a8c0', '#ffffff']], thu: [['#f2c440', '#e88a20'], ['#f6e070', '#d8a020']], dong: [['#f4f0ea', '#c8304a'], ['#f2c4d4', '#e07a9a']] };
 const FLOWER_MAT = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
 function flowers(ctx, rnd, x, y, z) {
-  const parts = [], col = pickOf(rnd, SEASON_FLOWER), stem = new THREE.Color('#3a2a1a'), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
+  const parts = [], col = pickOf(rnd, SEASON_FLOWER[seasonOf()]), stem = new THREE.Color('#3a2a1a'), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
   const paint = (g, hex) => { const c = new THREE.Color(hex), n = g.attributes.position.count, a = new Float32Array(n * 3); for (let i = 0; i < n; i++) c.toArray(a, i * 3); g.setAttribute('color', new THREE.BufferAttribute(a, 3)); for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'color'].includes(k)) g.deleteAttribute(k); return g.index ? g.toNonIndexed() : g; };
   const n = 4 + Math.floor(rnd() * 3);
   for (let s = 0; s < n; s++) {
@@ -484,9 +487,35 @@ function shopDress(ctx, F, rnd, island, hiring) {
   if (!island) { const side = rnd() < 0.5 ? -1 : 1; tableSet(ctx, F, rnd, side * Math.min(3.3, hw - 3.2), Math.min(1.2, hd - (hiring ? 5.6 : 4)), { seats: 2, rot: 0, top: 'tea' }); }
   frontArt(ctx, rnd);
 }
+// ============================================================================
+//  KHÁCH TRONG QUÁN (goal G-5.4): ~45 % bàn có 1–3 khách ngồi ghế (động tác «sit» của Meshy là ngồi ghế), quay vào bàn,
+//  thỉnh thoảng nói chuyện cục bộ (bark). Tối đa 6 khách / quán — trong giới hạn nhân vật có xương (citizens MAX_ACTIVE).
+// ============================================================================
+const GUEST_NAMES = ['Lý', 'Trương', 'Vương', 'Triệu', 'Tôn', 'Chu', 'Ngô', 'Trịnh', 'Hàn', 'Lục', 'Tạ', 'Thẩm', 'Tần', 'Hứa', 'Hà', 'Lữ'];
+const GUEST_ROLE = ['công tử', 'cô nương', 'lão bá', 'thư sinh', 'khách thương', 'đại tẩu'];
+const GUEST_LINES = {
+  tralau: ['Trà Long Tỉnh năm nay ngọt hậu lắm.', 'Nghe nói tiên sinh hôm nay kể hồi mới.', 'Chén nữa thôi rồi về kẻo tối.', 'Huynh đài cũng hay tới đây sao?', 'Bánh quế hoa chỗ này là nhất thành.'],
+  tuu: ['Cạn chén! Cạn chén!', 'Tiểu nhị, thêm một vò Nữ Nhi Hồng!', 'Chuyến hàng này mà trót lọt thì phát tài.', 'Rượu ngon, nhưng đừng say quá nhé.', 'Ngỗng quay ở đây thơm nức cả phố.'],
+};
+function seatGuests(ctx, rnd, sets, kind) {
+  const looks = [['hero_m', '火'], ['hero_f', '水'], ['master', '土'], ['hero_m', '木'], ['hero_f', '金']];
+  let n = 0;
+  for (const s of sets) {
+    if (!s?.seats?.length || n >= 6 || rnd() > 0.45) continue;
+    const k = Math.min(s.seats.length, 1 + Math.floor(rnd() * 3), 6 - n);
+    const pick = [...s.seats].sort(() => rnd() - 0.5).slice(0, k);
+    for (const st of pick) {
+      const [look, wx] = pickOf(rnd, looks), name = `${pickOf(rnd, GUEST_NAMES)} ${pickOf(rnd, GUEST_ROLE)}`;
+      // ngồi lùi vào lòng ghế (gốc nhân vật ở gót chân: chân thò về phía bàn)
+      const bx = st.x - Math.sin(st.ry) * 0.06, bz = st.z - Math.cos(st.ry) * 0.06;
+      ctx.npcs.push({ id: `kh_${ctx.r.key}_${n}`, name, role: 'Khách', look, gua: ctx.r.shop.g, wx, lines: GUEST_LINES[kind], x: ctx.r.origin.x + bx, z: ctx.r.origin.z + bz, path: null, face: st.ry, pose: 'sit', noLabel: true, height: look === 'master' ? 1.7 : undefined });
+      n++;
+    }
+  }
+}
 /** lấp khoảng trống lớn (§3.5: không để sàn trống > 4 × 4 m): tìm điểm xa mọi vật cản / điểm tương tác nhất (bỏ lối giữa
  *  cửa → quầy), còn hở bán kính ≥ 2,3 m thì đặt thêm một bộ bàn — lặp tối đa 4 lần */
-function fillEmpty(ctx, F, rnd, opt, zMin, zMax) {
+function fillEmpty(ctx, F, rnd, opt, zMin, zMax, out = null) {
   const { hw } = ctx, ox = ctx.r.origin.x, oz = ctx.r.origin.z;
   for (let n = 0; n < 4; n++) {
     const S = [...ctx.solids.map((q) => ({ x: q.x - ox, z: q.z - oz, r: Math.max(q.hw, q.hd) })), ...ctx.spots.map((q) => ({ x: q.x - ox, z: q.z - oz, r: 0.9 }))];
@@ -497,7 +526,7 @@ function fillEmpty(ctx, F, rnd, opt, zMin, zMax) {
       if (d > bd) { bd = d; best = [x, z]; }
     }
     if (!best || bd < 2.3) break;
-    tableSet(ctx, F, rnd, best[0], best[1], { seats: 2 + Math.floor(rnd() * 2), ...opt });
+    const t = tableSet(ctx, F, rnd, best[0], best[1], { seats: 2 + Math.floor(rnd() * 2), ...opt }); out?.push(t);
   }
 }
 // chum rượu đất nung: dáng phình bụng, miệng nhỏ (tiện xoay một lần / phòng)
@@ -535,9 +564,10 @@ const SHOP_EXTRA = {
     flowerStand(ctx, F, rnd, hw - 0.55, hd - 5.2, -Q, 'vase');
     sideArt(ctx, rnd, [-2, 2.5]);
     frontArt(ctx, rnd);
-    fillEmpty(ctx, F, rnd, { top: 'wine', chair }, -hd + 4.2, hd - 3.4);
+    fillEmpty(ctx, F, rnd, { top: 'wine', chair }, -hd + 4.2, hd - 3.4, sets);
+    seatGuests(ctx, seeded(`kh|${ctx.r.key}`), sets, 'tuu');
     F.flush();
-    ctx.npcs.push({ id: `tn_${ctx.r.key}`, name: 'Tiểu Nhị', role: 'Tiểu nhị', look: 'npc_villager', gua: ctx.r.shop.g, wx: '水', lines: ['Có ngay, có ngay!', 'Lầu trên còn bàn sát cửa sổ.', 'Khách quan muốn nghe chuyện thì hỏi chưởng quầy.'], x: ctx.r.origin.x + 1.5, z: ctx.r.origin.z + 1.2, path: null, face: -Q });
+    ctx.npcs.push({ id: `tn_${ctx.r.key}`, name: 'Tiểu Nhị', role: 'Tiểu nhị', look: 'npc_villager', gua: ctx.r.shop.g, wx: '水', lines: ['Có ngay, có ngay!', 'Lầu trên còn bàn sát cửa sổ.', 'Khách quan muốn nghe chuyện thì hỏi chưởng quầy.'], x: ctx.r.origin.x + 1.5, z: ctx.r.origin.z + 1.2, path: [{ x: ctx.r.origin.x + 1.6, z: ctx.r.origin.z + hd - 3.6 }, { x: ctx.r.origin.x + 1.4, z: ctx.r.origin.z + 1.2 }, { x: ctx.r.origin.x + 1.6, z: ctx.r.origin.z - hd + 4.4 }], face: -Q }); // tiểu nhị đi lại lối giữa (fillEmpty chừa |x| < 2,6 m)
   },
   tralau(ctx) {
     const mt = mats(), { hw, hd } = ctx, F = furn(ctx);
@@ -568,7 +598,8 @@ const SHOP_EXTRA = {
     flowerStand(ctx, F, rnd, -hw + 0.55, -hd + 3.3, Q, 'vase');
     flowerStand(ctx, F, rnd, hw - 0.55, hd - 3.2, -Q, 'bonsai');
     sideArt(ctx, rnd, [-1.5, 2.5]);
-    fillEmpty(ctx, F, rnd, { top: 'tea', chair }, -hd + 4.2, hd - 3.4);
+    fillEmpty(ctx, F, rnd, { top: 'tea', chair }, -hd + 4.2, hd - 3.4, sets);
+    seatGuests(ctx, seeded(`kh|${ctx.r.key}`), sets, 'tralau');
     frontArt(ctx, rnd);
     F.flush();
   },

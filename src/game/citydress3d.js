@@ -16,6 +16,7 @@ import { addSolidCircle, addSolidOBB } from './obstacles.js';
 import { addLight, glowAll } from './lights.js';
 import { placeModel, getModelQuality, loadModel } from './assets.js';
 import { GUA, toWorld } from './batquai.js';
+import { seasonOf } from './season.js';
 
 const R_BUILD = 300, R_SHOW = 320, R_NEAR = 150; // ô dựng / hiện quanh người chơi · cây, sạp, biển hiệu chỉ hiện trong 150 m (§3.11)
 const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
@@ -205,11 +206,7 @@ export function treeGeo(sp, tier) {
 // MÙA (goal G-5.3, CAY-QUAN-MANIFEST §5): theo tiết khí giờ Việt Nam — Lập xuân 4/2 · Lập hạ 5/5 · Lập thu 7/8 · Lập đông 7/11.
 // Chỉ đổi uniform màu tán + tỉ lệ lá rụng (không thêm tam giác). Đào / mai giữ hoa suốt đông → Tết (đào Tết, mai Tết);
 // đông Việt Nam không trụi hẳn: rụng ≤ 30 %. Thử mùa khác: localStorage 'huyenquan:season' = xuan | ha | thu | dong.
-export function seasonOf(now = Date.now()) {
-  try { const o = globalThis.localStorage?.getItem('huyenquan:season'); if (['xuan', 'ha', 'thu', 'dong'].includes(o)) return o; } catch (e) { /* không có localStorage */ }
-  const d = new Date(now + 7 * 3600e3), md = (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
-  return md >= 204 && md < 505 ? 'xuan' : md >= 505 && md < 807 ? 'ha' : md >= 807 && md < 1107 ? 'thu' : 'dong';
-}
+export { seasonOf };
 const SEASON_LOOK = { // loài → mùa → [màu tán sRGB | null = màu model, độ pha, tỉ lệ lá rụng]
   dao: { xuan: [null, 0, 0], ha: ['#5e8a3a', 0.85, 0], thu: ['#9a9a40', 0.55, 0.1], dong: [null, 0, 0] },
   anhdao: { xuan: [null, 0, 0], ha: ['#5a8a40', 0.85, 0], thu: ['#c8783a', 0.6, 0.1], dong: [null, 0, 0] },

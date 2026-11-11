@@ -65,7 +65,8 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
       if (!ch) return;
       if (n.removed) { ch.dispose?.(); return; }
       n.ch = ch;
-      if (String(n.id).startsWith('pho')) ch.obj.traverse((o) => { if (o.isMesh) o.castShadow = false; }); // người đi đường: không đổ bóng (đông người → lượt bóng nhân đôi lệnh vẽ)
+      if (String(n.id).startsWith('pho') || n.pose === 'sit') ch.obj.traverse((o) => { if (o.isMesh) o.castShadow = false; }); // người đi đường / khách ngồi: không đổ bóng
+      if (n.pose === 'sit' && ch.has('sit')) ch.setBase('sit'); // khách ngồi ghế trong quán (G-5.4) // người đi đường: không đổ bóng (đông người → lượt bóng nhân đôi lệnh vẽ)
       ch.obj.position.set(n.x, groundY(n.x, n.z), n.z); ch.obj.rotation.y = n.ry;
       if (n.active) scene.add(ch.obj);
     });
@@ -104,15 +105,16 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
         }
         if (!n.moving && d < GREET + 1) goal = Math.atan2(w.x - n.x, w.z - n.z);
         else if (!n.moving) goal = n.ry;
-      } else if (d < GREET + 1.5) goal = Math.atan2(w.x - n.x, w.z - n.z); // quay nhìn khách
+      } else if (n.pose === 'sit') goal = n.rest; // khách đang ngồi: giữ hướng vào bàn
+      else if (d < GREET + 1.5) goal = Math.atan2(w.x - n.x, w.z - n.z); // quay nhìn khách
       n.ry += angDiff(n.ry, goal) * Math.min(1, dt * (n.moving ? 8 : 3));
       if (n.ch) {
-        n.ch.setBase(n.moving ? 'walk' : 'idle');
-        if (d < GREET && !n.greeted) { n.greeted = true; n.ch.play(n.ch.has('wave') ? 'wave' : 'bow'); }
+        n.ch.setBase(n.pose === 'sit' && n.ch.has('sit') ? 'sit' : n.moving ? 'walk' : 'idle');
+        if (d < GREET && !n.greeted && n.pose !== 'sit') { n.greeted = true; n.ch.play(n.ch.has('wave') ? 'wave' : 'bow'); }
         if (d > GREET + 2) n.greeted = false;
         // xa > 30 m: tính hoạt ảnh 1 / 3 khung (gộp thời gian — nhịp đi vẫn đúng), đỡ CPU khi phố đông người
         n.animAcc = (n.animAcc || 0) + dt;
-        if (d <= 30 || ((n.animTick = (n.animTick || 0) + 1) % 3 === 0)) { n.ch.update(n.animAcc); n.animAcc = 0; }
+        if ((d <= 30 && n.pose !== 'sit') || ((n.animTick = (n.animTick || 0) + 1) % 3 === 0)) { n.ch.update(n.animAcc); n.animAcc = 0; } // khách ngồi: tư thế gần như tĩnh
         if (n.pose === 'hold' && !n.moving) n.ch.hold(t);
         n.ch.obj.position.set(n.x, groundY(n.x, n.z), n.z);
         n.ch.obj.rotation.y = n.ry;
@@ -138,8 +140,8 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
       if (!n.active || !n.ch) { if (n.label.style.display !== 'none') hideDom(n); continue; }
       const d = Math.hypot(w.x - n.x, w.z - n.z);
       const gy = groundY(n.x, n.z), hh = (n.height || 1.72) + 0.55;
-      if (d < LABEL) place(n.label, n.x, gy + hh, n.z); else if (n.label.style.display !== 'none') n.label.style.display = 'none';
-      if (n.bark || !n.bub.hidden) showBubble(n.bub, n.bark, n.x, gy + hh - 0.15, n.z);
+      if (d < LABEL && !n.noLabel) place(n.label, n.x, gy + hh, n.z); else if (n.label.style.display !== 'none') n.label.style.display = 'none';
+      if (n.bark || !n.bub.hidden) showBubble(n.bub, n.bark, n.x, gy + hh - (n.pose === 'sit' ? 0.7 : 0.15), n.z);
     }
   }
 
