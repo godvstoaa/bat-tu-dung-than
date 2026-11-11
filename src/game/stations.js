@@ -17,6 +17,7 @@ import { pickBark } from './bark-pool.js'; // MỘT NGUỒN pool bark (persona +
 import { bell, knock, rattle } from './audio.js';
 import { ROBE } from './render.js';
 import { TEXT, FEATURES } from './features.js';
+import { MASTER_OF_STATION } from './fortune-npc.js';
 import { buzz } from './haptics.js';
 
 const NOTE = 'Để tham khảo và chiêm nghiệm, không thay quyết định của bạn.';
@@ -102,11 +103,8 @@ const dayKeyOf = () => `${S.todayStr(new Date())}:${pidLocal()}`;
 function barkOf(poolId, seed = dayKeyOf()) {
   return pickBark(poolId, seed);
 }
-/** Phát bark trạm qua toast sẵn có — lúc MỞ trạm (mục 05: mỗi trạm ghi rõ khi nào). */
-function stationBark(api, poolId, seed = dayKeyOf()) {
-  const text = barkOf(poolId, seed);
-  if (text) api.toast(text);
-}
+// v4: bỏ toast lời rao khi mở trạm (thông báo thừa) — lời chào của thầy nằm ngay đầu khung chat (fortune-npc.js).
+export { barkOf };
 
 // ---------------------------------------------------------------------------
 // 7.1 Bàn Thầy Tử Bình
@@ -178,12 +176,11 @@ function chartResult(api, prof, R, ritual) {
   return body;
 }
 
-function openThay(api) {
+function thayBook(api) {
   const { state } = api;
   // [G2 — NPC-AI] bark chào của Thầy Tử Bình (mục 05 §05.4 — pool BARK-thay
   // hồ sơ 19 = `thay_tubinh` đã có trong bark-pool.js); bark NGOÀI GIỜ (khách
   // đi ngang) là phần render3d của thợ khác. Nút 🎙 hỏi Thầy AI giữ nguyên vai.
-  stationBark(api, 'thay_tubinh');
   const first = state.profiles.length === 0;
   const body = el(`<div>
     <p class="hq-sub">Thầy đặt bút xuống, ngẩng lên: «Khách muốn xem cho ai?»</p>
@@ -311,7 +308,6 @@ function compassView(api, prof) {
 function openCompass(api) {
   // [G2 — NPC-AI] bark La Bàn Đài (mục 05 §05.14): 1–2 câu tĩnh, chỉ đọc
   // hướng — không nói «hướng xấu cả đời», không AI.
-  stationBark(api, 'la_ban');
   if (!api.state.profiles.length) return needProfile(api, 'La bàn hướng nhà');
   api.state.flags.sawCompass = true;
   api.after(S.grantDaily(api.state, 'compass'), 'xem la bàn');
@@ -338,7 +334,6 @@ function openXam(api) {
   const { state } = api;
   // [G2 — NPC-AI] bark chào của thần (mục 05 §05.6 — «cắm bark vào đầu
   // openXam»), cao cao tại tại, không doạ, khớp luật keo 3 lần sẵn có.
-  stationBark(api, 'xam');
   if (S.sticksLeft(state) === 0) {
     const last = state.sticks.find((x) => x.accepted);
     // [F5 audit] «Ba lần keo…» chỉ đúng số liệu khi tổng keo hôm nay (stickTries
@@ -451,7 +446,6 @@ function openHuong(api) {
   // [G2 — NPC-AI] bark theo ngày, giọng Vân Cốc chủ trạm (mục 05 §05.8);
   // pool CALM_LINES của names.js GIỮ NGUYÊN làm nền — câu tĩnh tâm khi nhang
   // cháy vẫn bốc như cũ ở dưới (không thay bằng bark pool).
-  stationBark(api, 'huong');
   const body = el(`<div class="hq-huong">
     <div class="hq-incense-vis"><span></span><span></span><span></span></div>
     <p class="hq-calm" data-role="calm"></p>
@@ -528,7 +522,6 @@ function openLich(api) {
   const { state } = api;
   // [G2 — NPC-AI] bark Bảng Lịch Ngày (mục 05 §05.14): chỉ nói hôm nay, không
   // chọn thay khách, không trích can chi rối.
-  stationBark(api, 'lich');
   const now = new Date();
   const T = todayInfo(now);
   const body = el(`<div class="hq-lich">
@@ -867,14 +860,12 @@ const openDuongTrach = openDesk('duongtrach', 'Sảnh Dương Trạch', 'dzCaseB
 // sảnh, chỉ khi án hôm nay CHƯA giải; same-seed (key sảnh theo ngày + pid) →
 // cùng ngày cùng câu. Chuyện riêng (makeStory) của nhóm sảnh này thuộc consumer
 // halls/case-ui — đợt sau; bark chung chỉ là câu chờ không đụng lá số (mục 13).
-const HALL_BARK = { dieuhau: 'khach_dieuhau', cachcuc: 'khach_cachcuc' };
 function openHall(id, doneText, shared = false) {
   return (api) => {
     let pid = 'local';
     try { pid = localStorage.getItem('huyenquan:pid') || 'local'; } catch (e) { /* ignore */ }
     const day = S.todayStr(new Date());
     const key = shared ? day : `${day}:${pid}`;
-    if (HALL_BARK[id] && !S.deskDone(api.state, id)) stationBark(api, HALL_BARK[id], key);
     const run = () => lazyBody(async () => (await import('./case-ui.js')).hallCaseBody(api, id, key));
     if (S.deskDone(api.state, id)) {
       const b = el(`<div><p>${doneText} Mai sẽ có án mới.</p><p class="hq-sub">Thông thạo: ${S.deskMastery(api.state, id)}%</p>
@@ -909,7 +900,6 @@ function openQue(api) {
   // từ câu thoại sẵn có que-ui.js:180, KHÔNG dựng từ số 0). Bark theo TỪNG
   // phép khi đổi tab nằm ở que-ui.js (không thuộc đợt này) — ở đây bark lúc
   // mở trạm; nút «🎙 Nhờ Thầy luận thêm» giữ nguyên vai AI của Thầy AI.
-  stationBark(api, 'que');
   return lazyBody(async () => (await import('./que-ui.js')).queBody(api, { R, who: api.state.player?.name || 'Bạn' }));
 }
 
@@ -925,5 +915,40 @@ const VAN_OPEN = { vanbia: openVan('vanBiaBody'), thaitue: openVan('thaiTueBody'
 VAN_OPEN.tangy = (api) => lazyBody(async () => (await import('./wardrobe-ui.js')).wardrobeBody(api));
 for (let i = 0; i < 9; i++) VAN_OPEN[`van${i}`] = openVan('vanGateBody', i);
 
-export const STATION_OPEN = { thay: openThay, compass: openCompass, xam: openXam, huong: openHuong, lich: openLich, tra: openTra, sen: openSen, an0: openCaseSlot(0), an1: openCaseSlot(1), an2: openCaseSlot(2), trach: openTrach, duongtrach: openDuongTrach, que: openQue, ...HALL_OPEN, ...VAN_OPEN };
+// v4 — gặp thầy là mở thẳng khung chat hỏi về lá số của mình (fortune-ui.js); công cụ cũ (án luyện nghề, tự gieo quẻ,
+// sổ mệnh) thành nút phụ phía trên. iOS / không có AI → giữ nguyên bảng cũ.
+function withMaster(id, old, label, title) {
+  return (api) => {
+    if (import.meta.env.MODE === 'ios' || !FEATURES.ai || !MASTER_OF_STATION[id]) return old(api);
+    return lazyBody(async () => (await import('./fortune-ui.js')).fortuneBody(api, MASTER_OF_STATION[id], { extras: [{ label, onClick: () => { const b = old(api); if (b) api.panel.open({ title, body: b }); } }] }));
+  };
+}
+function openThay(api) {
+  if (import.meta.env.MODE === 'ios' || !FEATURES.ai) return thayBook(api);
+  return lazyBody(async () => (await import('./fortune-ui.js')).fortuneBody(api, 'tubinh', { extras: [
+    { label: '📜 Sổ Mệnh · lập lá số người thân', onClick: () => api.panel.open({ title: 'Bàn Thầy Tử Bình', body: thayBook(api) }) },
+    { label: '📚 Án Cổ', onClick: () => api.panel.open({ title: 'Án Cổ', body: openClassicalList(api) }) },
+  ] }));
+}
+const MASTER_WRAP = {
+  tuvi: withMaster('tuvi', HALL_OPEN.tuvi, '📋 Án luyện nghề hôm nay', 'Sảnh Tử Vi'),
+  hophon: withMaster('hophon', HALL_OPEN.hophon, '📋 Án hợp hôn hôm nay', 'Sảnh Hợp Hôn'),
+  cachcuc: withMaster('cachcuc', HALL_OPEN.cachcuc, '📋 Án định cách hôm nay', 'Sảnh Cách Cục'),
+  dieuhau: withMaster('dieuhau', HALL_OPEN.dieuhau, '📋 Án điều hậu hôm nay', 'Sảnh Điều Hậu'),
+  tuongphap: withMaster('tuongphap', HALL_OPEN.tuongphap, '📋 Án tượng pháp hôm nay', 'Sảnh Tượng Pháp'),
+  trach: withMaster('trach', openTrach, '📋 Án chọn ngày hôm nay', 'Sảnh Trạch Nhật'),
+  duongtrach: withMaster('duongtrach', openDuongTrach, '📋 Án xem nhà hôm nay', 'Sảnh Dương Trạch'),
+  que: withMaster('que', openQue, '☯ Tự gieo quẻ (5 phép)', 'Gieo quẻ'),
+};
+// ba điện Sơn Môn (world.js ROOMS.master): thầy ngồi bàn — chat theo lá số + công cụ riêng của điện
+const hallMaster = (mid, extra) => (api) => {
+  if (import.meta.env.MODE === 'ios' || !FEATURES.ai) return extra.open(api);
+  return lazyBody(async () => (await import('./fortune-ui.js')).fortuneBody(api, mid, { extras: [{ label: extra.label, onClick: () => { const b = extra.open(api); if (b) api.panel.open({ title: extra.title, body: b }); } }] }));
+};
+MASTER_WRAP.m_vanxuong = hallMaster('vanxuong', { label: '📚 Học Án Cổ (lá số kinh điển)', title: 'Án Cổ', open: (api) => openClassicalList(api) });
+MASTER_WRAP.m_daumau = hallMaster('tuvi', { label: '📋 Án tử vi luyện nghề', title: 'Đẩu Mẫu Điện', open: (api) => HALL_OPEN.tuvi(api) });
+MASTER_WRAP.m_laoquan = hallMaster('duocvuong', { label: '🍵 Trà dưỡng sinh', title: 'Trà', open: (api) => openTra(api) });
+/** bảng trạm gốc (công cụ, án luyện nghề) — miếu thờ dùng làm nghi thức riêng (temples.js) */
+export const STATION_BASE = { thay: thayBook, compass: openCompass, xam: openXam, huong: openHuong, lich: openLich, tra: openTra, sen: openSen, an0: openCaseSlot(0), an1: openCaseSlot(1), an2: openCaseSlot(2), trach: openTrach, duongtrach: openDuongTrach, que: openQue, ...HALL_OPEN, ...VAN_OPEN };
+export const STATION_OPEN = { ...STATION_BASE, thay: openThay, ...MASTER_WRAP };
 export { ROBE };

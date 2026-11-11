@@ -15,6 +15,8 @@ import { cityBridges, deckTop, bridgePlatforms } from './bridges.js';
 import { addPlatform } from './obstacles.js';
 import { addLight } from './lights.js';
 import { waterMaterial } from './water3d.js';
+import * as T from './terrain.js';
+import * as LAYOUT from './citylayout.js';
 
 const W = (g, u, v) => ({ x: g.dir[0] * u - g.dir[1] * v, z: g.dir[1] * u + g.dir[0] * v });
 const axisRy = (g) => Math.atan2(-g.dir[1], g.dir[0]); // x cục bộ dọc trục u
@@ -130,103 +132,38 @@ function mergeList(list) {
 }
 
 export function createRiver(scene) {
+  // v4 (thành ×10): hào / kênh Bát Môn cũ đã bỏ. Sông Huyền Hà + Nam Khê chảy xuyên phía Nam thành giữa BỜ KÈ ĐÁ ĐỨNG
+  // (mặt phố y 0 → mặt nước −6); mặt nước là mặt nước thế giới (world3d), ở đây dựng tường kè + mũ kè + bậc bến mỗi ~150 m.
   const grp = new THREE.Group(); grp.name = 'river'; scene.add(grp);
-  const k = AK.kit();
-  const water = waterMaterial({ level: CANAL_WATER, kind: 'canal' });
-  const stone = k.pave, coping = k.stone;
-  const outEdge = MOAT.a + MOAT.w / 2;
-  // --- mặt nước: hào bát giác (vành giữa hai bát giác) + kênh hai đại lộ (Tốn dài tới thủy môn Ngoại Thành)
-  const oct = (a) => { const R = a / Math.cos(Math.PI / 8), pts = []; for (let i = 0; i < 8; i++) { const ang = Math.PI / 2 + Math.PI / 8 + i * Math.PI / 4; pts.push(new THREE.Vector2(Math.cos(ang) * R, Math.sin(ang) * R)); } return pts; };
-  const shape = new THREE.Shape(oct(outEdge)); shape.holes.push(new THREE.Path(oct(MOAT.a - MOAT.w / 2)));
-  const moatGeo = new THREE.ShapeGeometry(shape, 24); moatGeo.rotateX(-Math.PI / 2);
-  { const p = moatGeo.attributes.position, uv = moatGeo.attributes.uv; for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / 8, p.getZ(i) / 8); }
-  const moat = new THREE.Mesh(moatGeo, waterMaterial({ kind: 'moat' })); moat.position.y = CANAL_WATER; moat.receiveShadow = true; grp.add(moat);
-  const canalW = AVE_CANAL.v1 - AVE_CANAL.v0;
-  const u1Of = (id) => (id === OUTLET.gua ? OUTLET.u1 : AVE_CANAL.u1);
-  for (const id of AVE_CANAL.gua) {
-    const g = GUA.find((q) => q.id === id), len = u1Of(id) - outEdge + 1, c = W(g, outEdge - 0.5 + len / 2, 0);
-    const geo = new THREE.PlaneGeometry(len, canalW, Math.ceil(len / 4), 6); geo.rotateX(-Math.PI / 2);
-    { const uv = geo.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * len / 8, uv.getY(i) * canalW / 8); }
-    const sgn = id === 'kan' ? -1 : 1; // Khảm chảy vào hào, Tốn chảy ra (water.js › canalFlow)
-    const m = new THREE.Mesh(geo, waterMaterial({ kind: 'canal', flow: [g.dir[0] * sgn * 0.3, g.dir[1] * sgn * 0.3] })); m.position.set(c.x, CANAL_WATER, c.z); m.rotation.y = axisRy(g); m.receiveShadow = true; grp.add(m);
-  }
-
-  // --- bờ kè đá (từ đáy kênh lên mặt bờ) + mũ kè; bậc bến xuống nước mỗi ~60 m dọc kênh
+  const k = AK.kit(), stone = k.pave, coping = k.stone;
   const walls = new THREE.Group(); grp.add(walls);
-  const wallH = QUAY - CANAL_BED;
-  const wallBox = (len, x, z, ry) => {
-    const b = new THREE.Mesh(new THREE.BoxGeometry(len, wallH, 0.8), stone); b.position.set(x, CANAL_BED + wallH / 2, z); b.rotation.y = ry; b.receiveShadow = true; walls.add(b);
-    const c = new THREE.Mesh(new THREE.BoxGeometry(len, 0.2, 1.0), coping); c.position.set(x, QUAY + 0.1, z); c.rotation.y = ry; walls.add(c);
-  };
-  for (const g of GUA) for (const a of [MOAT.a - MOAT.w / 2, outEdge]) { const L = a * TAN8 * 2, p = W(g, a, 0); wallBox(L + 0.8, p.x, p.z, axisRy(g) + Math.PI / 2); }
-  // bậc đá ép sát bờ xuống tới dưới mặt nước (bến đò / người bơi lên bờ): 8 bậc 0,3 m — nền đi được (motion STEP_UP 0,65)
-  const stepRun = (g, u, vEdge, dir) => { // vEdge: mép kè (v), dir: hướng ra giữa nước (±1, theo v)
-    for (let i = 0; i < 8; i++) {
-      const y = QUAY - 0.3 * (i + 1), p = W(g, u, vEdge + dir * (0.25 + i * 0.45));
-      const st = new THREE.Mesh(new THREE.BoxGeometry(4, QUAY - CANAL_BED - 0.3 * (i + 1), 0.45), coping); st.position.set(p.x, (y + CANAL_BED) / 2, p.z); st.rotation.y = axisRy(g); walls.add(st);
-      addPlatform(p.x, p.z, 4, 0.46, axisRy(g), y);
+  const TOP = 0.35, BED = -7.5;
+  for (const ch of LAYOUT.water().channels) {
+    const P = ch.pts;
+    for (const side of [-1, 1]) {
+      let lastStep = -1e9;
+      for (let i = 0; i + 6 < P.length; i += 6) {
+        const a = P[i], b = P[i + 6];
+        const off = (p) => ({ x: p.x - p.tz * side * (p.w + 0.4), z: p.z + p.tx * side * (p.w + 0.4) });
+        const A = off(a), B = off(b), mx = (A.x + B.x) / 2, mz = (A.z + B.z) / 2;
+        if (T.cityOctDist(mx, mz) > -4) continue; // chỉ trong thành (ngoài thành bờ tự nhiên)
+        if (Math.hypot(mx - LAYOUT.water().lake.x, mz - LAYOUT.water().lake.z) < LAYOUT.water().lake.r + 20) continue;
+        const len = Math.hypot(B.x - A.x, B.z - A.z) + 0.6, ry = Math.atan2(-(B.z - A.z), B.x - A.x);
+        const w = new THREE.Mesh(new THREE.BoxGeometry(len, TOP - BED, 1.0), stone); w.position.set(mx, (TOP + BED) / 2, mz); w.rotation.y = ry; w.receiveShadow = true; walls.add(w);
+        const c = new THREE.Mesh(new THREE.BoxGeometry(len, 0.25, 1.4), coping); c.position.set(mx, TOP + 0.12, mz); c.rotation.y = ry; walls.add(c);
+        // bậc bến xuống nước (người bơi lên bờ / chủ đò): 9 bậc 0,7 m — nền đi được
+        if (a.s - lastStep > 150) {
+          lastStep = a.s;
+          const nx = a.tz * side, nz = -a.tx * side; // hướng ra giữa dòng
+          for (let j = 0; j < 9; j++) {
+            const y = TOP - 0.7 * (j + 1), px = A.x + nx * (0.6 + j * 0.55), pz = A.z + nz * (0.6 + j * 0.55);
+            const st = new THREE.Mesh(new THREE.BoxGeometry(4, y - BED, 0.55), coping); st.position.set(px, (y + BED) / 2, pz); st.rotation.y = ry; walls.add(st);
+            addPlatform(px, pz, 4, 0.56, ry, y);
+          }
+        }
+      }
     }
-  };
-  const steps = (g, u, sv) => stepRun(g, u, sv * AVE_CANAL.v1, -sv);
-  for (const id of AVE_CANAL.gua) {
-    const g = GUA.find((q) => q.id === id), u1 = u1Of(id), len = u1 - outEdge;
-    for (const v of [AVE_CANAL.v0, AVE_CANAL.v1]) { const p = W(g, outEdge + len / 2, v + Math.sign(v) * 0.4); wallBox(len, p.x, p.z, axisRy(g)); }
-    if (id !== OUTLET.gua) { const e = W(g, u1 + 0.4, 0); wallBox(canalW + 1.6, e.x, e.z, axisRy(g) + Math.PI / 2); } // Khảm: đầu kênh khép (suối vào qua cống)
-    for (let u = outEdge + 30; u < u1 - 20; u += 60) for (const sv of [-1, 1]) steps(g, u + (sv > 0 ? 0 : 30), sv);
-  }
-  // hào: mỗi cạnh hai bến bậc ở bờ ngoài (lệch ±30 m khỏi đại lộ) — trục u của cung ⟂ bờ: bậc chạy theo u
-  for (const g of GUA) for (const sv of [-30, 30]) for (let i = 0; i < 8; i++) {
-    const y = QUAY - 0.3 * (i + 1), p = W(g, outEdge - 0.25 - i * 0.45, sv);
-    const st = new THREE.Mesh(new THREE.BoxGeometry(0.45, QUAY - CANAL_BED - 0.3 * (i + 1), 4), coping); st.position.set(p.x, (y + CANAL_BED) / 2, p.z); st.rotation.y = axisRy(g); walls.add(st);
-    addPlatform(p.x, p.z, 0.46, 4, axisRy(g), y);
   }
   MD.mergeStatic(walls);
-
-  // --- cầu đá lưng gù (bridges.js): thân đùn khoét vòm + lan can; mặt cầu là nền đi được theo dốc
-  const bridges = new THREE.Group(); grp.add(bridges);
-  for (const b of cityBridges()) {
-    bridges.add(bridgeBody(b, { stone, coping }));
-    for (const p of bridgePlatforms(b)) addPlatform(p.x, p.z, p.w, p.d, p.ry, p.top, p.top - b.thick - 0.2);
-  }
-  MD.mergeStatic(bridges);
-
-  // --- Thủy Các: thủy tạ bát giác 2 tầng trên 4 góc BỜ NGOÀI hào (nhô nửa ra nước trên cột) — không còn đảo giữa dòng
-  for (let i = 0; i < 8; i += 2) {
-    const ang = Math.PI / 2 + Math.PI / 8 + i * Math.PI / 4, R = (outEdge + 3) / Math.cos(Math.PI / 8);
-    const x = Math.cos(ang) * R, z = Math.sin(ang) * R;
-    const deck = new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.4, 0.35, 8), coping); deck.position.set(x, QUAY + 0.05, z); deck.rotation.y = Math.PI / 8; grp.add(deck);
-    for (let c = 0; c < 8; c++) { const a = c * Math.PI / 4 + Math.PI / 8, col = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.26, wallH, 6), stone); col.position.set(x + Math.cos(a) * 3.9, CANAL_BED + wallH / 2, z + Math.sin(a) * 3.9); grp.add(col); }
-    const { base, shell } = AK.hall({ w: 5.6, d: 5.6, h: 3.2, plinth: 0.2, open: true, octa: true, storeys: 2, roof: 'green' });
-    for (const o of [base, shell]) { o.position.set(x, QUAY + 0.1, z); grp.add(o); }
-    addPlatform(x, z, 8, 8, Math.PI / 8, QUAY + 0.22);
-    addLight(x, 3.4, z, { color: '#ffb35c', power: 1 });
-  }
-
-  // --- suối nạp + kênh dẫn ra sông (canals.EXT_PATHS): dải nước bám mực từng đoạn
-  for (const E of EXT_PATHS) {
-    const P = E.P, pos = [], uvs = [], idx = []; let acc = 0;
-    const pts = [];
-    for (let i = 0; i + 1 < P.length; i++) { const [ax, az, la] = P[i], [bx, bz, lb] = P[i + 1], n = Math.max(1, Math.ceil(Math.hypot(bx - ax, bz - az) / 3)); for (let j = 0; j < n; j++) { const t = j / n; pts.push([ax + (bx - ax) * t, az + (bz - az) * t, la + (lb - la) * t]); } }
-    pts.push(P[P.length - 1]);
-    pts.forEach((p, i) => {
-      const q = pts[Math.min(pts.length - 1, i + 1)], o = pts[Math.max(0, i - 1)], dx = q[0] - o[0], dz = q[1] - o[1], l = Math.hypot(dx, dz) || 1, nx = -dz / l, nz = dx / l;
-      if (i) acc += Math.hypot(p[0] - pts[i - 1][0], p[1] - pts[i - 1][1]);
-      const hw = E.hw + 0.6;
-      pos.push(p[0] + nx * hw, p[2], p[1] + nz * hw, p[0] - nx * hw, p[2], p[1] - nz * hw); uvs.push(0, acc / 8, hw * 2 / 8, acc / 8);
-      if (i) { const a = (i - 1) * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
-    });
-    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2)); geo.setIndex(idx); geo.computeVertexNormals();
-    const m = new THREE.Mesh(geo, E.id === 'link' ? waterMaterial({ kind: 'link' }) : water); m.receiveShadow = true; grp.add(m);
-    if (E.id === 'in') for (let i = 0; i < P.length; i += 2) for (const sd of [-1, 1]) { // đá ven suối
-      const [x, z, lv] = P[i], q = P[Math.min(P.length - 1, i + 1)], dx = q[0] - x, dz = q[1] - z, l = Math.hypot(dx, dz) || 1;
-      const r = new THREE.Mesh(new THREE.DodecahedronGeometry(1 + (i % 3) * 0.4, 0), k.rockG); r.position.set(x - (dz / l) * sd * (E.hw + 1.2), lv + 0.2, z + (dx / l) * sd * (E.hw + 1.2)); r.scale.y = 0.6; r.castShadow = true; grp.add(r);
-    }
-  }
-  // cống nạp: vòm đá + song sắt ở chân tường Ngoại Thành chỗ suối vào cung Khảm (kênh Tốn ra bằng thủy môn — cityblocks3d)
-  const grate = new THREE.MeshStandardMaterial({ color: '#202428', roughness: 0.5, metalness: 0.7 });
-  { const g = GUA.find((q) => q.id === 'kan'), p = W(g, OUTER_A + 3.6, 0), ry = axisRy(g) + Math.PI / 2;
-    const arch = new THREE.Mesh(new THREE.TorusGeometry(4.6, 0.7, 8, 20, Math.PI), k.pave); arch.position.set(p.x, CANAL_WATER, p.z); arch.rotation.y = ry; grp.add(arch);
-    const gr = new THREE.Mesh(new THREE.CircleGeometry(4.2, 20, 0, Math.PI), grate); gr.position.set(p.x, CANAL_WATER, p.z); gr.rotation.y = ry; grp.add(gr); }
-
   return { group: grp, update() {} };
 }

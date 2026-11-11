@@ -8,12 +8,14 @@
 //  Thuần JS (không three.js / DOM) — world.js biến thành trạm cửa ảo.
 // ============================================================================
 import * as BQ from './batquai.js';
-import { generateCity } from './cityblocks.js';
-import { innerHouses } from './innerfill.js';
+import * as LAYOUT from './citylayout.js';
+import { allHouses, isRemoved } from './city4.js';
 import { cityShops } from './shops.js';
 import { listings } from './estate.js';
 import { TEMPLE_NB } from './rooms.js';
 
+/** quầy thầy bói Phố Thầy Bói (citylayout use 'fortune') — mỗi quầy một thầy (fortune-npc.js MASTERS), luân phiên */
+export const FORTUNE_ROTA = ['tubinh', 'tuvi', 'phongthuy', 'trachnhat', 'nguyetlao', 'gieoque'];
 const SURNAME = ['Lý', 'Trần', 'Vương', 'Triệu', 'Tô', 'Hà', 'Lưu', 'Mạnh', 'Tiêu', 'Đường', 'Diệp', 'Hàn', 'Lâm', 'Bạch', 'Từ', 'Ôn', 'Chu', 'Ngô', 'Tạ', 'Phan'];
 
 let LIST = null, GRID = null, BY_KEY = null;
@@ -25,26 +27,30 @@ export function enterables() {
   const push = (kind, key, name, door, frontX, frontZ, obb = null, g = null, extra = {}) => {
     out.push({ i: out.length, kind, key, name, door, back: { x: door.x + frontX * 1.4, z: door.z + frontZ * 1.4 }, obb, g, ...extra });
   };
-  const C = generateCity();
+  const gOf = (h) => String(h.district || '').split('-').pop() || 'li';
+  const obbOf = (h) => ({ x: h.x, z: h.z, hw: h.w / 2, hd: h.d / 2, ry: h.ry });
+  // v4 (city4.js / citylayout.js): tiệm mặt phố (~8.000), nhà rao bán, miếu khu, quầy thầy bói, nhà dân
   const shopByHi = new Map(), shopByInner = new Map();
   for (const s of cityShops()) { if (s.hi != null) shopByHi.set(s.hi, s); if (s.inner) shopByInner.set(s.inner, s); }
-  const estByHi = new Map(), estByObj = new Map();
-  for (const l of listings()) { if (l.hi != null) estByHi.set(l.hi, l); else estByObj.set(l.house, l); }
-  const houses = [...C.houses.map((h, i) => ({ h, i })), ...innerHouses().map((h) => ({ h, i: null }))];
-  for (const { h, i } of houses) {
+  const estByHi = new Map();
+  for (const l of listings()) if (l.hi != null) estByHi.set(l.hi, l);
+  let lm = 0, fb = 0;
+  for (const h of allHouses()) {
     if (!h.door) continue;
-    const fx = Math.sin(h.ry), fz = Math.cos(h.ry);
-    const shop = i != null ? shopByHi.get(i) : null, est = i != null ? estByHi.get(i) : estByObj.get(h);
-    if (shop) push('shop', `shop:${shop.k}`, shop.name, h.door, fx, fz, h, h.g, { shop });
-    else if (est) push('est', `est:${est.h}`, est.name, h.door, fx, fz, h, h.g, { est });
-    else push('knock', null, `nhà họ ${SURNAME[(out.length * 7 + 3) % SURNAME.length]}`, h.door, fx, fz, h, h.g);
+    const shop = shopByHi.get(h.id), est = estByHi.get(h.id);
+    if (shop) push('shop', `shop:${shop.k}`, shop.name, h.door, h.nx, h.nz, obbOf(h), shop.g, { shop });
+    else if (est) push('est', `est:${est.h}`, est.name, h.door, h.nx, h.nz, obbOf(h), est.g, { est });
+    else if (isRemoved(h.id)) continue;
+    else if (h.use === 'temple') push('temple', `lm:${lm++}`, h.name || 'Miếu', h.door, h.nx, h.nz, obbOf(h), gOf(h));
+    else if (h.use === 'fortune') push('fortune', null, h.name || 'Quầy thầy bói', h.door, h.nx, h.nz, obbOf(h), gOf(h), { master: FORTUNE_ROTA[fb++ % FORTUNE_ROTA.length] });
+    else if (h.use === 'home') push('knock', null, `nhà họ ${SURNAME[(out.length * 7 + 3) % SURNAME.length]}`, h.door, h.nx, h.nz, obbOf(h), gOf(h));
   }
-  C.landmarks.forEach((lm, n) => {
-    const g = BQ.guaById(lm.g), sv = Math.sign(lm.v) || 1;
-    const d = BQ.toWorld(g, lm.u, lm.v - sv * (lm.d / 2 + 0.6)); // mép lô phía đại lộ (ngoài nền công trình)
-    const [dx, dz] = g.dir;
-    push('temple', `lm:${n}`, lm.name, d, dz * sv, -dx * sv, null, lm.g);
-  });
+  // đền lớn Nội Thành (citylayout.landmarks kind temple)
+  for (const t of LAYOUT.landmarks()) if (t.kind === 'temple' && t.door && !['vanxuong', 'daumau', 'laoquan'].includes(t.id)) { // ba điện kia vào phòng riêng (world.js ROOMS)
+    const fx = t.door.x - t.x, fz = t.door.z - t.z, n = Math.hypot(fx, fz) || 1;
+    push('temple', `lm:${lm++}`, t.name, t.door, fx / n, fz / n, null, String(t.district).split('-').pop() === 'noi' ? 'li' : String(t.district).split('-').pop());
+  }
+  // công trình có tên trong Sơn Môn (giữ từ bản cũ): tiệm + 4 điện
   for (const g of BQ.GUA) for (const b of BQ.DISTRICTS[g.id].buildings) {
     const shop = shopByInner.get(b.name), ti = TEMPLE_NB.indexOf(b.name);
     if (!shop && ti < 0) continue;

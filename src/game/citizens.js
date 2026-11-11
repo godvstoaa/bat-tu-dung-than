@@ -9,7 +9,7 @@ import { citizenList, toWorld, guaById } from './batquai.js';
 import { createCharacter, WX_HSV } from './characters.js';
 import { rng, hashSeed } from './npc.js';
 
-const NEAR = 70, NEAR_PHO = 55, TALK = 7, GREET = 4.5, LABEL = 24, MAX_ACTIVE = 24;
+const NEAR = 70, NEAR_PHO = 55, TALK = 4.5, GREET = 4.5, LABEL = 24, MAX_ACTIVE = 24;
 const hsvOf = (hex) => { const c = new THREE.Color(hex), r = c.r, g = c.g, b = c.b, mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let h = 0; if (d > 0) h = mx === r ? ((g - b) / d + (g < b ? 6 : 0)) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return [h / 6, mx ? d / mx : 0, mx]; };
 const angDiff = (a, b) => (((b - a + Math.PI) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
 
@@ -97,13 +97,13 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
         n.ch.obj.position.set(n.x, groundY(n.x, n.z), n.z);
         n.ch.obj.rotation.y = n.ry;
       }
-      // câu nói: khách trong 7 m → mỗi 5–9 s một câu (theo ngày + lượt, không Math.random trần)
+      // câu nói: khách trong TALK m → thưa (v4: 30–45 s một câu) (theo ngày + lượt, không Math.random trần)
       if (d < TALK) {
         if (!n.bark && nowMs >= n.nextAt) {
           const seed = `${dayKey}|${n.id}|${n.round++}`, r = rng(hashSeed(seed));
-          const hintTxt = HINT && r() < 0.35 ? HINT(n) : null;
+          const hintTxt = null; // v4: bỏ chen gợi ý nhiệm vụ vào lời NPC (thông báo thừa) — HINT giữ cho nơi khác
           n.bark = { text: hintTxt || n.lines[hashSeed(seed) % n.lines.length], until: nowMs + 4200 + Math.floor(r() * 1800) };
-          n.nextAt = n.bark.until + 5000 + Math.floor(r() * 4000);
+          n.nextAt = n.bark.until + 30000 + Math.floor(r() * 15000); // v4: mỗi NPC ≤ 1 câu / 30–45 giây
         } else if (n.bark && nowMs >= n.bark.until) n.bark = null;
       } else n.bark = null;
       actors.push({ x: n.x, z: n.z, r: 0.35 });

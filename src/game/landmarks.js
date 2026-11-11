@@ -13,9 +13,10 @@ import { stoneMaterial } from './ground-tex.js';
 import { addPlatform, markTerraceEdges } from './obstacles.js';
 import * as BQ from './batquai.js';
 import { octWall, cityGates, buildDistrict } from './batquai3d.js';
-import { outerWall, outerGates, cityHouses, avenueLanterns, courtyardTrees, wardFeatures, blockWalls } from './cityblocks3d.js';
-import { cityIdentity } from './cityident3d.js';
+import { outerWall, outerGates, cityHouses } from './cityblocks3d.js';
+import { estateSigns } from './cityident3d.js';
 import * as CB from './cityblocks.js';
+import * as LAYOUT from './citylayout.js';
 import { HALLS, PLACES } from './world.js';
 import { COURT } from './court.js';
 import { addLight, glowAll } from './lights.js';
@@ -268,20 +269,34 @@ SPOTS.push({ at: [0, 60], place: async (g) => {
 } });
 // Ngoại Thành (cityblocks.js / cityblocks3d.js): tường bát giác 420 m + 8 cổng lớn, ~1.800 nhà phố 3 tầng chi tiết,
 // đèn lồng 8 đại lộ, cây sân trong; mỗi cung một công trình mốc + lô chủ đề (vùng nạp riêng)
+// v4 (thành ×10 — citylayout.js / city4.js): tường bát giác trung đoạn 2.125 m cao 34 m + 8 cổng lớn (+ thủy môn chỗ sông
+// xuyên tường), ~22.900 nhà phố dựng theo ô, mặt tiền đúng loại tiệm; công trình trọng điểm ở tâm 8 khu Ngoại Thành
 SPOTS.push({ at: [0, 0], place: async (g) => {
-  outerWall(g, CB.TRUNG_A, 24); // tường Trung Thành (tường ngoài cũ) — cao 24 m
-  outerWall(g, CB.OUTER_A, 34); // tường Ngoại Thành quanh vành phủ — hùng thành 34 m
-  blockWalls(g);
-  await outerGates(g, CB.TRUNG_A, 24);
-  await outerGates(g, CB.OUTER_A, 34);
+  outerWall(g, LAYOUT.CITY.A, 34);
+  await outerGates(g, LAYOUT.CITY.A, 34);
   const hs = await cityHouses(g);
   LOD_UPDATERS.push(hs.update);
-  await hs.settle(3, 42); // nhà quanh sân Sơn Môn (chỗ xuất phát) có bậc chi tiết trước khi mở màn
-  await cityIdentity(g); // nền lát theo cung, biển tiệm, biển nhà rao bán, đồ bày phố, kênh Khảm, 16 cổng phường
-  await avenueLanterns(g);
-  await courtyardTrees(g);
+  await hs.settle(3, 42);
+  estateSigns(g); // biển BÁN / tên chủ trước 27 nhà phố rao bán (biệt phủ: biển trên cổng phủ)
 } });
-for (const gg of BQ.GUA) { const c = BQ.toWorld(gg, 528, 0); SPOTS.push({ at: [c.x, c.z], place: (g) => wardFeatures(g, gg) }); }
+// công trình trọng điểm: sảnh nghề 8 khu, cảng Nam Môn, 4 đền Phố Thầy Bói (model sảnh lớn trên nền đá)
+for (const l of LAYOUT.landmarks()) {
+  if (!l.w || l.kind === 'sonmon') continue;
+  SPOTS.push({ at: [l.x, l.z], place: async (gg) => {
+    const ry = l.door ? Math.atan2(l.door.x - l.x, l.door.z - l.z) : (l.ry || 0);
+    const top = terrace(gg, { x: l.x, z: l.z, ry, w: l.w, d: l.d, levels: 2, rise: 0.9, stepD: 1.2 });
+    const model = l.kind === 'temple' ? ['hall_main', 'bq_array_hall'] : l.kind === 'port' ? ['bq_inn', 'hall_main'] : ['bq_library_pagoda', 'hall_main'];
+    await place(gg, model, { fit: { width: l.w * 0.8 }, at: { x: l.x, y: top, z: l.z, ry } });
+    if (l.door) await lanternPosts(gg, [-1, 1].map((s) => { const p = local(l.door.x, l.door.z, ry, s * 4, 1.5); return { x: p.x, y: H(p.x, p.z), z: p.z, ry }; }));
+  } });
+}
+// trạm xe ngựa nội thành (citylayout.stations): xe + ngựa + cột đèn — đi nhanh giữa các khu (G3)
+for (const st of LAYOUT.stations()) SPOTS.push({ at: [st.x, st.z], place: async (gg) => {
+  const at = (dx, dz) => { const p = local(st.x, st.z, st.ry || 0, dx, dz); return { x: p.x, y: H(p.x, p.z), z: p.z, ry: (st.ry || 0) + Math.PI / 2 }; };
+  await place(gg, 'lib_cart', { fit: { width: 4.2 }, at: at(-3, 0) });
+  await place(gg, 'lib_horse', { fit: { height: 2.2 }, at: at(-3, 4.5) });
+  await lanternPosts(gg, [at(2.5, -2), at(2.5, 2)]);
+} });
 for (const gg of BQ.GUA) {
   const c = gg.id === 'kan' ? { x: 0, z: -74 } : BQ.toWorld(gg, 118, 0);
   SPOTS.push({ at: [c.x, c.z], place: async (g) => {
@@ -289,21 +304,10 @@ for (const gg of BQ.GUA) {
     if (g.userData.lod) LOD_UPDATERS.push(g.userData.lod);
   } });
 }
-// Cùng Thông Hồ: đình vườn bên Sảnh Điều Hậu, liễu + đào ven hồ
-SPOTS.push({ at: [560 * T.SCALE, 560 * T.SCALE], place: async (g) => {
-  { const x = 462 * T.SCALE, z = 402 * T.SCALE, c = R('cungthong'); await place(g, 'lib_garden_pav', { fit: { width: 16 }, at: { x, y: H(x, z), z, ry: faceTo(x, z, c.x, c.z) } }); }
-  const p = R('cungthong');
-  const ring = []; for (let i = 0; i < 14; i++) { const a = (i / 14) * Math.PI * 2; const s = shore(p.x, p.z, Math.cos(a), Math.sin(a)); ring.push({ x: s.x, y: H(s.x, s.z), z: s.z, ry: a, s: i % 3 === 0 ? 10 : 13 }); }
-  solidTrees(await instanceModel(g, 'lib_willow', ring.filter((_, i) => i % 3 !== 0)));
-  solidTrees(await instanceModel(g, 'lib_blossom', ring.filter((_, i) => i % 3 === 0)));
-} });
 // Trích Thiên: tháp năm tầng bên đài quan tinh · chân Tử Bình: nhà trên núi cạnh đường đá
 SPOTS.push({ at: RA('trichthien'), place: async (g) => {
   const p = R('trichthien'); const ry = faceTo(p.x, p.z, 0, 0); const t = local(p.x, p.z, ry, 75, 20);
   await place(g, 'lib_pagoda5', { fit: { height: 52 }, at: { x: t.x, y: H(t.x, t.z), z: t.z, ry } });
-} });
-SPOTS.push({ at: [-420 * T.SCALE, -380 * T.SCALE], place: async (g) => {
-  const x = -430 * T.SCALE, z = -330 * T.SCALE; await place(g, 'lib_mtn_house', { fit: { width: 34 }, at: { x, y: H(x, z), z, ry: faceTo(x, z, 0, 0) } });
 } });
 
 // ---------------------------------------------------------------------------

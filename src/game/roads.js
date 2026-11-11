@@ -4,10 +4,11 @@
 //  → mặt đường bám đất tuyệt đối, mép có lề đất, cỏ không mọc trên mặt đường.
 // ============================================================================
 import * as T from './terrain.js';
-import { HALLS } from './world.js';
+import { REGIONS } from './terrain.js';
 import { COURT } from './court.js';
 import { ringRoad, diagonalAvenues, RING_W, GUA } from './batquai.js';
-import { cityRoads, outerGate } from './cityblocks.js';
+import { roads4 } from './city4.js';
+import { gates as layoutGates } from './citylayout.js';
 
 export const CITY_R = 158;
 
@@ -15,7 +16,7 @@ export const CITY_R = 158;
 // gặp dốc quá (> ~38°) thì dừng ở chân núi — lên đỉnh bằng trạm đi nhanh («Các gian»).
 export function roadPath(tx, tz) {
   const g = GUA.reduce((b, q) => (q.dir[0] * tx + q.dir[1] * tz > b.dir[0] * tx + b.dir[1] * tz ? q : b), GUA[0]);
-  const s0 = outerGate(g, 4);
+  const G4 = layoutGates().find((q) => q.gua === g.id), s0 = { x: G4.x + G4.ax * 6, z: G4.z + G4.az * 6 };
   const pts = [[s0.x, s0.z]];
   const sx = s0.x, sz = s0.z;
   const L = Math.hypot(tx - sx, tz - sz), n = Math.ceil(L / 8);
@@ -34,19 +35,17 @@ let LINES = null;
 // Mọi tuyến đường: { pts: [[x, z]…], w: bề rộng mặt đường (m) }
 export function roadLines() {
   if (LINES) return LINES;
-  LINES = HALLS.filter((h) => h.region !== 'thanh').map((h) => ({ pts: roadPath(h.world.x, h.world.z), w: 5 }));
-  // trong thành: đại lộ Nam (thành môn → cổng Sơn Môn) và trục Đông – Tây giữa hai dãy phố
+  LINES = [];
+  // Sơn Môn (lõi cũ giữ nguyên): đại lộ Nam (thành môn → cổng Sơn Môn), trục Đông – Tây, vành bát giác + đại lộ chéo
   LINES.push({ pts: [[0, CITY_R + 12], [0, COURT.z1 + 1]], w: 9 });
   for (const sx of [-1, 1]) LINES.push({ pts: [[sx * (COURT.x1 + 1), 0], [sx * (CITY_R - 4), 0]], w: 8 });
-  // Bát Quái Thành: đường vành bát giác nối 8 khu + đại lộ 4 khu chéo ra cổng
   LINES.push({ pts: ringRoad(), w: RING_W }, ...diagonalAvenues());
-  // Ngoại Thành: 8 đại lộ, 9 vành phố bát giác, ngõ dọc, phố ranh giữa các cung
-  for (const r of cityRoads()) LINES.push({ pts: r.pts, w: r.w });
-  // Nam Môn: từ cổng Cảnh Môn thẳng Nam qua Nam Môn Đại Kiều (bridges.riverBridges) tới bến sông bờ Nam
-  { const g = GUA.find((q) => q.id === 'li'), s0 = outerGate(g, 4); LINES.push({ pts: [[s0.x, s0.z], [0, 1190]], w: 8 }); }
+  // v4 (citylayout / city4): 8 đại lộ 32 m, 5 vành 24 m, phố nhánh 12 m, ngõ 6 m (bỏ đoạn trong khuôn viên biệt phủ)
+  for (const r of roads4()) LINES.push({ pts: [[r.a.x, r.a.z], [r.b.x, r.b.z]], w: r.w });
+  // đường núi ra các vùng tông môn ngoài tường (cảnh nền): từ cổng thành tới chân vùng
+  for (const g of REGIONS.filter((q) => q.kind !== 'city' && q.kind !== 'lake')) LINES.push({ pts: roadPath(g.x * 0.8, g.z * 0.8), w: 6 });
   return LINES;
 }
-
 // Trường khoảng cách tới MÉP đường, mã hoá 8 bit: v = 0,5 − s/8 (s = khoảng cách tới mép, âm là
 // trong mặt đường) → nội suy song tuyến của trường khoảng cách cho mép mịn dù 2 m/điểm ảnh.
 export const FIELD_RANGE = 8;

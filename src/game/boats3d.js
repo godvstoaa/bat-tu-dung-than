@@ -9,7 +9,6 @@ import * as MD from './models.js';
 import * as AK from './archkit.js';
 import { BOAT_TYPES, TYPE_BY_IDX } from './boats.js';
 import { waterAt, waveHeight, waveSlope, waterTime } from './water.js';
-import { moatLoop, flowPath } from './canals.js';
 import { riverPoints } from './waterways.js';
 import * as T from './terrain.js';
 import { addGlow } from './lights.js';
@@ -109,16 +108,14 @@ export function createFleet(scene) {
       ships.push({ obj, type, R, s: (i / n) * R.L, speed: speed * (0.9 + (i % 3) * 0.08), dir, cur: speed, pos: null });
     }
   };
-  add('hoa', route(moatLoop(), true), 5, 1.1);
-  // kênh: thuyền hoa xuôi Hưu Môn → hào → Đỗ Môn rồi quay lại (con thoi)
-  add('hoa', route(flowPath(), false), 3, 1.0);
-  add('do', route(flowPath(), false), 3, 1.2);
-  // sông: thuyền buồm buôn hai chiều giữa lạch (lệch hai bên tim sông theo chiều đi)
+  // v4: hào / kênh cũ đã bỏ. Sông Huyền Hà: đoạn TRONG THÀNH (qua 5 cầu tĩnh không 9 m) chỉ thuyền hoa / đò; thuyền buồm
+  // cột 12 m chạy đoạn NGOÀI THÀNH phía Tây (thủy môn chặn buồm)
   const P = riverPoints();
   for (const side of [-1, 1]) {
-    const pts = P.filter((_, i) => i % 6 === 0).map((p) => ({ x: p.x - p.tz * side * 10, z: p.z + p.tx * side * 10 })); // lệch 10 m: lọt nhịp giữa 40 m của Nam Môn Đại Kiều
-    const R = route(side > 0 ? pts : pts.reverse(), false);
-    add('buom', R, 3, 3.2);
+    const lane = P.filter((_, i) => i % 6 === 0).map((p) => ({ x: p.x - p.tz * side * 10, z: p.z + p.tx * side * 10 }));
+    const inCity = lane.filter((p) => T.cityOctDist(p.x, p.z) < -30), west = lane.filter((p) => T.cityOctDist(p.x, p.z) > 60 && p.x < 0);
+    if (inCity.length > 4) { add('hoa', route(side > 0 ? inCity : inCity.reverse(), false), 3, 1.1); add('do', route(side > 0 ? inCity.slice().reverse() : inCity, false), 2, 1.2); }
+    if (west.length > 4) add('buom', route(side > 0 ? west : west.reverse(), false), 2, 3.2);
   }
   // hồ: đò dạo vòng
   { const L = T.REGIONS.find((r) => r.id === 'cungthong'); const pts = []; for (let i = 0; i < 48; i++) { const a = (i / 48) * Math.PI * 2; pts.push({ x: L.x + Math.cos(a) * 110, z: L.z + Math.sin(a) * 110 }); } add('do', route(pts, true), 3, 1.0); add('buom', route(pts.map((p) => ({ x: L.x + (p.x - L.x) * 1.35, z: L.z + (p.z - L.z) * 1.35 })), true), 1, 2.6); }

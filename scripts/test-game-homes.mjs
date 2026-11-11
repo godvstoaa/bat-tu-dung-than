@@ -9,6 +9,8 @@
 import assert from 'node:assert/strict';
 import * as HM from '../src/game/homes.js';
 import * as CB from '../src/game/cityblocks.js';
+import { allHouses } from '../src/game/city4.js';
+import * as LAYOUT from '../src/game/citylayout.js';
 import * as RM from '../src/game/rooms.js';
 import { ROOMS, stationById, nearestStation, stationAt, blockedAt, roomAt } from '../src/game/world.js';
 import { WORLD_TILES } from '../src/game/protocol.js';
@@ -23,20 +25,22 @@ const E = HM.enterables(), C = CB.generateCity(), SPECS = RM.roomSpecs();
 const T = (x, z) => ({ x: x / 1.6 + 10, y: z / 1.6 + 7 });
 const W = (t) => ({ x: (t.x - 10) * 1.6, z: (t.y - 7) * 1.6 });
 
-check(`≥ 2.200 cửa (hiện ${E.length}); đủ 4 loại; mọi phòng lưới có đúng một cửa ngoài phố`, () => {
-  assert.ok(E.length >= 2200);
+check(`v4: ≥ 20.000 cửa (hiện ${E.length}); đủ 5 loại; mọi phòng lưới có đúng một cửa ngoài phố`, () => {
+  assert.ok(E.length >= 20000);
   const n = {}; for (const e of E) n[e.kind] = (n[e.kind] || 0) + 1;
-  assert.ok(n.shop >= 40 && n.est >= 25 && n.temple >= 8 && n.knock > 2000, JSON.stringify(n));
-  for (const r of SPECS) assert.equal(E.filter((e) => e.key === r.key).length, 1, r.key);
-  for (const e of E) if (e.kind === 'knock') assert.equal(e.key, null); else assert.ok(RM.roomByKey(e.key), e.key);
+  assert.ok(n.shop >= 8000 && n.est === 27 && n.temple >= 20 && n.knock > 14000 && n.fortune >= 250, JSON.stringify(n));
+  const byKey = new Map(); for (const e of E) if (e.key) byKey.set(e.key, (byKey.get(e.key) || 0) + 1);
+  for (const r of SPECS) assert.equal(byKey.get(r.key), 1, r.key);
+  for (const e of E) if (e.kind === 'knock' || e.kind === 'fortune') assert.equal(e.key, null); else assert.ok(RM.roomByKey(e.key), e.key);
 });
-check('công trình mốc 8 phường + công trình có tên Nội Thành đều có cửa', () => {
-  for (const l of C.landmarks) assert.ok(E.some((e) => e.name === l.name && e.kind === 'temple'), l.name);
+check('miếu 16 khu + đền Nội Thành + công trình có tên Sơn Môn đều có cửa', () => {
+  for (const h of allHouses().filter((q) => q.use === 'temple')) assert.ok(E.some((e) => e.kind === 'temple' && Math.hypot(e.door.x - h.door.x, e.door.z - h.door.z) < 0.01), h.name);
+  assert.ok(E.some((e) => e.name === 'Huyền Thiên Chính Điện' && e.kind === 'temple'));
   for (const n of ['Đan Dược Các', 'Hỏa Vân Tửu Lâu', 'Lôi Âm Điện', 'Tàng Phong Lâu', 'Đoài Duyệt Trà Lâu']) assert.ok(E.some((e) => e.name === n), n);
 });
 const inBox = (b, x, z, pad = 0) => { const c = Math.cos(b.ry), s = Math.sin(b.ry), px = x - b.x, pz = z - b.z; return Math.abs(px * c - pz * s) < b.hw + pad && Math.abs(px * s + pz * c) < b.hd + pad; };
 check('cửa không nằm trong nhà / tường rào nào (lưới băm)', () => {
-  const boxes = [...C.houses, ...C.walls.map((w) => ({ ...w, hw: w.len / 2, hd: CB.WALL_T / 2 }))];
+  const boxes = allHouses().map((h) => ({ x: h.x, z: h.z, ry: h.ry, hw: h.w / 2, hd: h.d / 2 }));
   const grid = new Map(), K = (x, z) => `${Math.floor(x / 20)},${Math.floor(z / 20)}`;
   for (const b of boxes) { const k = K(b.x, b.z); (grid.get(k) || grid.set(k, []).get(k)).push(b); }
   let bad = 0, ex = '';
@@ -50,9 +54,10 @@ check('doorNear tìm đúng cửa; houseAt bấm giữa nhà ra đúng nhà', ()
   }
 });
 check(`${SPECS.length} phòng lưới không chồng nhau, không chồng điện thờ cũ, trong biên máy chủ`, () => {
-  const all = [...ROOMS, ...SPECS];
-  for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) {
-    const a = all[i], b = all[j];
+  const all = [...ROOMS, ...SPECS], G = new Map(), K = (x, z) => `${Math.floor(x / 60)},${Math.floor(z / 60)}`; // lưới băm 60 m (8.000+ phòng)
+  for (const r of all) { const k = K(r.origin.x, r.origin.z); (G.get(k) || G.set(k, []).get(k)).push(r); }
+  for (const a of all) for (let p = -1; p <= 1; p++) for (let q = -1; q <= 1; q++) for (const b of G.get(`${Math.floor(a.origin.x / 60) + p},${Math.floor(a.origin.z / 60) + q}`) || []) {
+    if (a === b) continue;
     assert.ok(Math.abs(a.origin.x - b.origin.x) > (a.w + b.w) / 2 + 2 || Math.abs(a.origin.z - b.origin.z) > (a.d + b.d) / 2 + 2, `${a.id} ↔ ${b.id}`);
   }
   for (const r of SPECS) for (const [dx, dz] of [[-1, -1], [1, 1]]) { const t = T(r.origin.x + dx * r.w / 2, r.origin.z + dz * r.d / 2); assert.ok(t.x > WORLD_TILES.minX && t.x < WORLD_TILES.maxX && t.y > WORLD_TILES.minY && t.y < WORLD_TILES.maxY, r.key); }

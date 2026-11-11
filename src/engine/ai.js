@@ -2724,8 +2724,8 @@ export function suggestFollowups(question, R, answer, history) {
 //  TRẠNG như trước G1 (Thầy vẫn trả lời bình thường).
 // ===========================================================================
 let _npcPersonasPromise = null;
-async function _resolvePersonaMessage(personaInput, ctx) {
-  if (!FEATURES.personaAi || !personaInput) return null; // flag TẮT (mặc định) → nguyên trạng 100%
+async function _resolvePersonaMessage(personaInput, ctx, force = false) {
+  if ((!FEATURES.personaAi && !force) || !personaInput) return null; // flag TẮT (mặc định) → nguyên trạng 100%
   try {
     if (!_npcPersonasPromise) _npcPersonasPromise = import('../game/npc-personas.js');
     const { getPersona, personaSystemPrompt } = await _npcPersonasPromise;
@@ -2747,7 +2747,7 @@ async function _resolvePersonaMessage(personaInput, ctx) {
 //    CHỈ có hiệu lực khi FEATURES.personaAi BẬT — flag tắt (mặc định) thì bỏ qua
 //    hoàn toàn → tương thích ngược, hành vi Thầy như cũ.
 // ===========================================================================
-export async function askAI(question, R, cfg, { onToken, onStatus, history, signal, style, persona } = {}) {
+export async function askAI(question, R, cfg, { onToken, onStatus, history, signal, style, persona, personaForce = false } = {}) {
   cfg = cfg || getConfig();
   // [loop 1354] telemetry — track rounds + total elapsed để log vào admin ai_chat event
   //   (admin thấy: query này mất mấy round? có bị guard cắt ở 60s không?)
@@ -2765,7 +2765,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
 
   // [G1 — NPC-AI] giải persona MỘT LẦN, trước cache key + messages. Flag TẮT (mặc định)
   //   hoặc persona null → trả null ngay → hai dòng dưới y hệt như trước G1 (key + brief giữ nguyên).
-  const _persona = await _resolvePersonaMessage(persona || R?.npcPersona, R);
+  const _persona = await _resolvePersonaMessage(persona || R?.npcPersona, R, personaForce);
   const _ck = _briefCacheKey(R, _persona?.id); // [G1 — NPC-AI] persona vào khóa cache (§15.6b)
   const _fullBrief = (_briefCache && _briefCache.key === _ck) ? _briefCache.brief : (_briefCache = { key: _ck, brief: buildChartBrief(R) }).brief;
 

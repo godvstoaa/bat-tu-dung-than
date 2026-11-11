@@ -5,9 +5,7 @@
 //  Pháo hoa chỉ có ca vào đêm rằm (tuổi trăng 13,3–16,3 ngày, 18–23 giờ Việt Nam).
 // ============================================================================
 import { guaById, toWorld } from './batquai.js';
-import { TRUNG_A, OUTER_A, OUTER_GATE_D } from './cityblocks.js';
-const outerGateU = OUTER_A + OUTER_GATE_D / 2;
-const CANAL_AVE = ['kan', 'xun']; // đại lộ có kênh giữa (waterways / cityblocks)
+import { gates as layoutGates, CITY } from './citylayout.js';
 import { docks } from './boats.js';
 import { cityShops } from './shops.js';
 import { slotOrigin, shopSize } from './roomgrid.js';
@@ -19,23 +17,24 @@ let Z = null;
 export function zones() {
   if (Z) return Z;
   // bến hồ Cùng Thông: tâm bến là nhà thủy tạ (có va chạm) → đứng ở bậc đá phía Tây Nam (đo trong game: 34/35 điểm đứng được ngay)
-  const STAND = { lake: { x: 786.1, z: 772.1 } };
+  const STAND = {};
   const D = docks(), dock = (kinds) => D.filter((d) => kinds.includes(d.kind)).map((d) => pt(STAND[d.id] || d, 14, d.name));
-  const ring = (u, r, name) => ['li', 'kun', 'dui', 'qian', 'kan', 'gen', 'zhen', 'xun'].map((g) => pt(G(g, u, CANAL_AVE.includes(g) ? 16 : 0), r, `${name} ${guaById(g).gate}`)); // đại lộ Khảm / Tốn có kênh giữa → đứng lề v 16
+  // v4: công trường ở giao lộ đại lộ × vành 1.050 (cổng Trung Thành cũ đã bỏ), đứng lề đại lộ
+  const ring = (u, r, name) => ['li', 'kun', 'dui', 'qian', 'kan', 'gen', 'zhen', 'xun'].map((g) => pt(G(g, u, CITY.AVE_W / 2 + 4), r, `${name} ${guaById(g).gate}`));
   Z = {
     kephat: { spots: [pt(G('dui', 104, 25), 12, 'Ca Đài · Đoài Trạch Lâu')] },
     lodan: { spots: [pt(G('li', 136, 8), 9, 'Cửu Chuyển Đan Lô'), pt(G('li', 120, 15), 10, 'Đan Dược Các')] },
     phaohoa: { spots: [pt(G('li', 150, 0), 16, 'Phố chợ Cảnh Môn')] },
-    laido: { spots: dock(['moat', 'canal']) },
+    laido: { spots: dock(['river']) }, // v4: hào / kênh cũ đã bỏ — đò sông Huyền Hà trong thành
     nguphu: { spots: dock(['river', 'lake']) },
     buonmuoi: { spots: [pt(G('dui', 200, 0), 14, 'Diêm Thị · đại lộ Đoài')] },
     hamruou: { spots: [], rooms: ['tuu'] },
-    tieuphu: { spots: [pt({ x: 0, z: 1040 }, 30, 'Rừng Nam Hoang'), pt({ x: 788, z: 455 }, 30, 'Rừng Đông Lĩnh')] },
+    tieuphu: { spots: [pt({ x: 0, z: 2400 }, 34, 'Rừng Nam Hoang (ngoài Cảnh Môn)'), pt({ x: 2400, z: 0 }, 34, 'Rừng Đông Lĩnh (ngoài Thương Môn)')] }, // v4: rừng ngoài tường thành
     kimhoan: { spots: [pt(G('qian', 120, 0), 14, 'Kim Hoàn Phố · Càn Kiếm Các')] },
     thungan: { spots: [], rooms: ['dichtram', 'namon'] },
-    baotieu: { spots: ['li', 'kun', 'dui', 'qian', 'kan', 'gen', 'zhen', 'xun'].map((g) => pt(G(g, outerGateU + 12, CANAL_AVE.includes(g) ? 18 : 0), 22, `Cổng Ngoại Thành ${guaById(g).gate}`)) },
+    baotieu: { spots: layoutGates().map((q) => pt({ x: q.x + q.ax * 30, z: q.z + q.az * 30 }, 22, `Cổng thành ${q.name}`)) },
     nhadich: { spots: [], rooms: ['namon'] },
-    thoxay: { spots: ring(TRUNG_A - 8, 18, 'Công trường cổng Trung Thành') },
+    thoxay: { spots: ring(1062, 18, 'Công trường vành Trung Thành') },
     nongphu: { spots: [pt(G('kun', 104, -27), 12, 'Khôn Nguyên Thương'), pt(G('kun', 93, 0), 16, 'Linh điền Nông Gia')] },
     thoda: { spots: [pt(G('gen', 128, 0), 18, 'Trấn Sơn Bảo Tháp')] },
   };

@@ -11,27 +11,26 @@ import { generateCity } from './cityblocks.js';
 import { SHOP_TYPES } from './items.js';
 import { setDynFloor } from './obstacles.js';
 import * as BQ from './batquai.js';
-import { COLS, STEP, X0, Z0, slotOrigin, shopSize } from './roomgrid.js';
+import { COLS, STEP, X0, Z0, slotOrigin, shopSize, SLOT_EST, SLOT_TEMPLE } from './roomgrid.js';
+import { enterables } from './homes.js';
 
 export const TEMPLE_NB = ['Càn Nguyên Kiếm Các', 'Trấn Sơn Bảo Tháp', 'Bát Môn Trận Đường', 'Lôi Âm Điện'];
-let SPECS = null, BY_KEY = null;
+let SPECS = null, BY_KEY = null, BY_SLOT = null;
 /** Mọi phòng: [{ key, kind, slot, origin, w, d, h, ... }] */
 export function roomSpecs() {
   if (SPECS) return SPECS;
   const out = [];
-  for (const s of cityShops()) {
-    const [w, d, h] = shopSize(s.type);
-    out.push({ key: `shop:${s.k}`, kind: 'shop', shop: s, type: s.type, title: s.name, w, d, h });
-  }
-  while (out.length < 60) out.push(null); // chừa chỗ thêm cửa hàng sau này mà không dời phòng nhà
-  for (const l of listings()) { const T = TIERS[l.tier]; if (T.mansion) continue; out.push({ key: `est:${l.h}`, kind: 'home', listing: l, title: l.name, w: l.room?.w || T.w, d: l.room?.d || T.d, h: T.h }); }
-  while (out.length < 100) out.push(null);
-  generateCity().landmarks.forEach((lm, n) => out.push({ key: `lm:${n}`, kind: 'temple', lm, title: lm.name, w: 24, d: 22, h: 11 }));
-  // công trình có tên Nội Thành không làm cửa hàng: điện / các / tháp vào thắp hương được
-  for (const g of BQ.GUA) for (const b of BQ.DISTRICTS[g.id].buildings) if (TEMPLE_NB.includes(b.name)) out.push({ key: `nb:${TEMPLE_NB.indexOf(b.name)}`, kind: 'temple', nb: b, g: g.id, title: b.name, w: 24, d: 22, h: 11 });
-  out.forEach((r, k) => { if (r) { r.slot = k; r.origin = slotOrigin(k); r.id = r.key; } });
-  SPECS = out.filter(Boolean);
+  // v4: chỉ số ô cố định theo dải (roomgrid SLOT_*) — tiệm theo k, nhà rao bán theo h, miếu theo thứ tự cửa
+  const put = (k, r) => { r.slot = k; out.push(r); };
+  for (const s of cityShops()) { const [w, d, h] = shopSize(s.type); put(s.k, { key: `shop:${s.k}`, kind: 'shop', shop: s, type: s.type, title: s.name, w, d, h }); }
+  let e = 0;
+  for (const l of listings()) { const T = TIERS[l.tier]; if (T.mansion) continue; put(SLOT_EST + e++, { key: `est:${l.h}`, kind: 'home', listing: l, title: l.name, w: l.room?.w || T.w, d: l.room?.d || T.d, h: T.h }); }
+  let t = 0;
+  for (const d of enterables()) if (d.kind === 'temple') put(SLOT_TEMPLE + t++, { key: d.key, kind: 'temple', g: d.g, lm: d.key.startsWith('lm:') ? { g: d.g } : undefined, title: d.name, w: 24, d: 22, h: 11 });
+  out.forEach((r) => { r.origin = slotOrigin(r.slot); r.id = r.key; });
+  SPECS = out;
   BY_KEY = new Map(SPECS.map((r) => [r.key, r]));
+  BY_SLOT = new Map(SPECS.map((r) => [r.slot, r]));
   return SPECS;
 }
 export const roomByKey = (key) => { roomSpecs(); return BY_KEY.get(key) || null; };
@@ -41,7 +40,7 @@ export function roomAtDyn(x, z) {
   const col = Math.round((x - X0) / STEP), row = Math.round((Z0 - z) / STEP);
   if (col < 0 || col >= COLS || row < 0) return null;
   roomSpecs();
-  const r = SPECS.find((q) => q.slot === row * COLS + col);
+  const r = BY_SLOT.get(row * COLS + col);
   if (!r || Math.abs(x - r.origin.x) > r.w / 2 + 1 || Math.abs(z - r.origin.z) > r.d / 2 + 1) return null;
   return r;
 }

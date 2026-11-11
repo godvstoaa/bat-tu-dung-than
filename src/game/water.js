@@ -78,15 +78,7 @@ function canalFlow(x, z) {
  * Chưa tính cầu / nền (motion.js lo phần đó).
  */
 export function waterAt(x, z) {
-  if (inCanal(x, z)) {
-    const ground = T.heightAt(x, z), f = canalFlow(x, z);
-    return { level: CANAL_WATER, ground, depth: CANAL_WATER - ground, kind: f.kind, flow: { x: f.x, z: f.z }, amp: AMP[f.kind] };
-  }
-  const e = extNear(x, z);
-  if (e && e.d < e.hw) {
-    const ground = T.heightAt(x, z), dir = e.id === 'in' ? -1 : 1, k = Math.max(0.25, 1 - (e.d / e.hw) ** 2); // suối nạp: điểm liệt kê ngược dòng
-    return { level: e.level, ground, depth: e.level - ground, kind: e.id === 'link' ? 'link' : 'stream', flow: { x: e.tx * dir * e.flow * k, z: e.tz * dir * e.flow * k }, amp: e.id === 'link' ? AMP.link : AMP.stream };
-  }
+  // v4: hào / kênh / suối cũ (canals.js) đã bỏ khỏi địa hình — chỉ còn nước thế giới (sông, hồ) ở mực T.WATER
   const ground = T.heightAt(x, z);
   if (ground >= T.WATER - 0.02) return null;
   const rf = riverFlow(x, z), depth = T.WATER - ground;

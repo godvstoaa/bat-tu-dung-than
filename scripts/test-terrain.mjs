@@ -26,8 +26,10 @@ test('Đi bộ: chặn nước sâu + vách dốc, cho đi trên cao nguyên', (
 });
 test('Rừng: không cây trong thành, có cây ngoài thành', () => {
   assert.equal(T.treeDensity(50, 50), 0);
-  let n = 0; for (let x = -1400; x < 1400; x += 60) for (let z = -1400; z < 1400; z += 60) if (T.treeDensity(x, z) > 0.4) n++;
-  assert.ok(n > 200, `chỉ ${n} điểm có rừng`);
+  for (let x = -2000; x < 2000; x += 97) for (let z = -2000; z < 2000; z += 89) if (T.cityOctDist(x, z) < 0) assert.equal(T.treeDensity(x, z), 0, `cây trong thành tại ${x},${z}`);
+  // v4: thành phẳng tới bán kính ~2.300 → rừng ở vành ngoài tường (2.300–3.800)
+  let n = 0; for (let x = -3600; x < 3600; x += 60) for (let z = -3600; z < 3600; z += 60) if (T.cityOctDist(x, z) > 200 && T.treeDensity(x, z) > 0.4) n++;
+  assert.ok(n > 1000, `chỉ ${n} điểm có rừng`);
 });
 test('Hiệu năng heightAt: 50k lần < 400ms', () => {
   const t0 = performance.now(); let s = 0; for (let i = 0; i < 50000; i++) s += T.heightAt((i * 37) % 2000 - 1000, (i * 91) % 2000 - 1000); const ms = performance.now() - t0;

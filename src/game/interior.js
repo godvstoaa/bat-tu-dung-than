@@ -112,8 +112,8 @@ async function buildRoom(root, r, updaters) {
   if (r.kind === 'thaitue') buildThaiTue(g, r, m, L, az, top, aw, tz);
 
   // NPC trong điện: Thầy Giải Quẻ ngồi bên bàn nhỏ
-  if (r.npc === 'que') {
-    const q = { x: -hw + 8.5, z: 1 };
+  if (r.npc === 'que' || r.master) {
+    const q = { x: -hw + (r.master ? 6.5 : 8.5), z: 1 };
     placeModel(g.parent, 'scholar_desk', { fit: { width: 2.6 }, at: { ...L(q.x + 0.2, q.z), y: 0, ry: Math.PI / 2 } });
     { const w2 = L(q.x, q.z); addBlock(w2.x, w2.z, 1.1); }
     createCharacter('master', {}).then((ch) => {

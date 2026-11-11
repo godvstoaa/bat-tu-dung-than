@@ -71,9 +71,20 @@ const sameYong = (a, b) => !!a && !!b && a.primary === b.primary && a.accent ===
 export const YONG_LOCK_MS = 30 * 86400000; // đổi Dụng thần khai báo tối đa 1 lần / 30 ngày (§1.3)
 const rid = (rand) => Math.floor(rand() * 1e9).toString(36).padStart(6, '0');
 
+export const LAYOUT_VER = 4;
 export class GuildEngine {
   /** store: { get, put, delete, list } — ctx.storage của DO hoặc MemStore */
   constructor(store) { this.s = store; }
+  /**
+   * v4 (thành ×10): chỉ số tiệm k đổi (8.100 tiệm mới) → bỏ mọi chỗ giữ / hợp đồng theo k cũ một lần (tay nghề, uy tín, Dụng
+   * thần GIỮ NGUYÊN). Người đang giữ chỗ chỉ cần nhận lại chỗ ở tiệm mới. Gọi một lần lúc DO khởi động (worker/guild.js).
+   */
+  async migrate() {
+    if ((await this.s.get('layoutVer')) === LAYOUT_VER) return false;
+    for (const pre of ['k:', 'own:']) { const m = await this.s.list({ prefix: pre }); const keys = [...m.keys()]; for (let i = 0; i < keys.length; i += 128) await this.s.delete(keys.slice(i, i + 128)); }
+    await this.s.put('layoutVer', LAYOUT_VER);
+    return true;
+  }
 
   // ---------- hồ sơ nghề ----------
   async career(u) {

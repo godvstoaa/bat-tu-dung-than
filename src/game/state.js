@@ -92,6 +92,8 @@ export function createState(now = new Date()) {
     cloud: null,    // tài khoản: { uid, rev, at } bản lưu đám mây đã đồng bộ — account.js (chỉ trên máy)
     law: null,      // Huyền Thành Luật: { record, sentence } — law.js › lawState
     home: null,     // Thành Bát Quái: { inv, own, buffs, plants, spawn } — items.js › homeState
+    lastPos: null,  // v4: chỗ đứng lần trước { x, z, at } — spawn.js (nơi xuất hiện)
+    tutorial: null, // v4: hướng dẫn tân thủ { step, done, skipped, got } — tutorial.js
   };
 }
 
@@ -174,6 +176,8 @@ export function grantHome(s, key, amount, now = new Date()) {
   return addPhuc(s, n);
 }
 export const homeGot = (s, key) => !!s.daily.got[`home:${key}`];
+// v4: thưởng từng bước hướng dẫn tân thủ (tutorial.js tự giữ mỗi bước chỉ một lần), kẹp 0..20
+export function grantTutorial(s, n) { return addPhuc(s, Math.max(0, Math.min(20, Math.round(n) || 0))); }
 
 // Khóa sinh hồ sơ «năm-tháng-ngày-giờ-phút-giới tính» — thưởng lá số gắn với bát tự,
 // không với id hồ sơ: xoá rồi tạo lại cùng người không được +10 lần hai.

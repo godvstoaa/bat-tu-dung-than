@@ -45,6 +45,15 @@ export async function modelAvailable(id) {
 }
 export function modelUrl(id) { return new URL(`models/${id}.glb`, document.baseURI).href; }
 
+/** Bản RIÊNG (không chung bộ đệm loadModel): hình học / vật liệu không bị nơi khác sửa — nhà phố nhân bản (cityblocks3d)
+ *  từng hiện hình nát vì dùng chung lưới với mô hình đặt trong Sơn Môn. Tệp vẫn lấy từ bộ đệm HTTP của trình duyệt. */
+const priv = new Map();
+export function loadModelPrivate(id) {
+  if (MODEL_FILES.size && !MODEL_FILES.has(id)) return Promise.resolve(null);
+  if (!priv.has(id)) priv.set(id, fetch(modelUrl(id)).then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+    .then((buf) => new Promise((res, rej) => loader.parse(buf, '', res, rej))).catch(() => null));
+  return priv.get(id);
+}
 export function loadModel(id) {
   if (!cache.has(id) && MODEL_FILES.size && !MODEL_FILES.has(id)) cache.set(id, Promise.resolve(null)); // không có file → khỏi gửi yêu cầu
   if (!cache.has(id)) {

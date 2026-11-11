@@ -109,7 +109,7 @@ export function createNet({ profile, onEvent = () => {}, token = null }) {
     sock.onopen = () => {
       retry = 0;
       const p = profile();
-      sock.send(JSON.stringify({ t: 'hello', name: p.name, robe: p.robe, acc: p.accent, cos: p.cos || '', look: p.look, title: p.title, pid: pid(), tok: tok || undefined }));
+      sock.send(JSON.stringify({ t: 'hello', name: p.name, robe: p.robe, acc: p.accent, cos: p.cos || '', look: p.look, title: p.title, pid: pid(), tok: tok || undefined, x: p.x, y: p.y }));
     };
     sock.onmessage = (e) => { let m; try { m = JSON.parse(e.data); } catch (_) { return; } handle(m); };
     sock.onclose = (e) => {

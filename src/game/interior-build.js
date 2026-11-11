@@ -9,6 +9,8 @@
 //  Mọi điểm tương tác ghi vào rooms.setRoomSpots (world.js biến thành trạm ảo); va chạm đồ đạc qua
 //  obstacles.setRoomSolids; đèn theo khoá phòng (lights.removeRoomLights khi giải phóng).
 // ============================================================================
+import { GODS, godOfTemple } from './temples.js';
+import { MASTERS } from './fortune-npc.js';
 import * as THREE from 'three';
 import { roomByKey, roomAtDyn, setRoomSpots, clearRoomSpots, homeInfoOf, TEMPLE_NB } from './rooms.js';
 import { SHOP_TYPES, ITEM, itemsOfShop, COUPLETS, WX_NAME } from './items.js';
@@ -235,7 +237,9 @@ function buildShop(ctx, r) {
   const ownerLines = OWNER_LINES[r.type] || OWNER_LINES.moc;
   ctx.npcs.push({ id: `own_${r.key}`, name: s.owner, role: s.name, look: T.look, gua: s.g, wx: guaById(s.g).wx, lines: ownerLines, x: r.origin.x, z: r.origin.z + cz - 1.0, path: null, face: 0 });
   const svc = T.svc || [];
-  ctx.spot({ id: 'owner', kind: svc.length && !items.length ? 'svc' : 'owner', svc: svc.length && !items.length ? svc[0] : undefined, name: s.owner, verb: svc.length && !items.length ? svcInfo(svc[0]).verb : `Hỏi ${s.owner.split(' ')[0].toLowerCase()} mua hàng`, x: 0, z: cz + 1.0, r: 1.1 });
+  // v4: chủ tiệm LUÔN mở bảng tiệm (gọi món, trò chuyện, mua bán) — dịch vụ là các điểm riêng hai bên quầy (trước đây tiệm
+  // không hàng bị dịch vụ đầu chiếm chỗ chủ tiệm → không gọi món / không chat được, và dịch vụ hiện hai lần)
+  ctx.spot({ id: 'owner', kind: 'owner', name: s.owner, verb: items.length ? `Hỏi ${s.owner.split(' ')[0].toLowerCase()} mua hàng` : `Gặp ${s.owner.split(' ')[0].toLowerCase()}`, x: 0, z: cz + 1.0, r: 1.1 });
   // hàng tiêu dùng bày trên quầy (hộp trà, bó hương, lọ thuốc)
   const slots = []; for (let k = 0; k < uses.length; k++) { const side = k % 2 ? 1 : -1, n = Math.floor(k / 2); slots.push(side * (1.0 + n * 0.9)); }
   uses.forEach((it, k) => {
@@ -281,7 +285,7 @@ function buildShop(ctx, r) {
   if (hiring) jobCorner(ctx, r);
   const zj = { tuu: 'hamruou', dichtram: 'thungan', namon: 'nhadich' }[r.type];
   if (zj) { const mt = mats(), { hw, hd } = ctx, z = hd - 2.9; ctx.box(0.12, 1.5, 2.1, mt.dark, hw - 0.3, 1.75, z); for (let k = 0; k < 3; k++) ctx.box(0.02, 0.5, 0.42, mt.redpaper, hw - 0.38, 2.1, z - 0.62 + k * 0.62); ctx.spot({ id: `zj:${zj}`, kind: 'job', zoneJob: zj, name: WORK[zj].name, verb: `Nhận việc · ${WORK[zj].name}`, x: hw - 1.6, z, r: 1.2 }); }
-  svc.slice(items.length ? 0 : 1).forEach((id, n) => { if (!ctx.spots.some((q) => q.svc === id)) ctx.spot({ id: `s:${id}`, kind: 'svc', svc: id, name: svcInfo(id).name, verb: svcInfo(id).verb, x: n % 2 ? 2.4 : -2.4, z: cz + 1.0 - Math.floor(n / 2) * 1.8, r: 1.1 }); }); // nhiều dịch vụ: xen hai bên quầy
+  svc.forEach((id, n) => { if (!ctx.spots.some((q) => q.svc === id)) ctx.spot({ id: `s:${id}`, kind: 'svc', svc: id, name: svcInfo(id).name, verb: svcInfo(id).verb, x: n % 2 ? 2.4 : -2.4, z: cz + 1.0 - Math.floor(n / 2) * 1.8, r: 1.1 }); }); // nhiều dịch vụ: xen hai bên quầy
   for (const x of [-W / 4, W / 4]) ctx.lamp(x, ctx.H - 1.4, 0, 1, T.wall === '#8a2a1c' ? '#e2a531' : '#c8341f');
 }
 // việc làm (P2 — work.js): bảng «Chiêu công» bằng gỗ dán giấy đỏ trên vách trái sát cửa; Lò Rèn có xe goòng xuống mỏ dân sự
@@ -382,8 +386,9 @@ function buildTemple(ctx, r) {
   for (const sx of [-1, 1]) ctx.plane(0.9, 4.2, mt.cloth, sx * 5.2, H - 3, -5, sx > 0 ? -Q : Q);
   for (const sx of [-1, 1]) { ctx.light(sx * 2.4, 1.8, -hd + 2.8, 1.3, '#ffb35c'); ctx.cyl(0.1, 0.1, 0.6, lanternMat('#ff5a1e'), sx * 2.4, 1.5, -hd + 2.8); }
   ctx.lamp(-4, H - 3, 3, 1.2); ctx.lamp(4, H - 3, 3, 1.2);
-  ctx.spot({ id: 'pray', kind: 'pray', name: 'Lư hương', verb: 'Thắp hương cầu an', x: 0, z: -2.0, r: 1.6 });
-  ctx.npcs.push({ id: `tu_${r.key}`, name: 'Thủ Từ', role: 'Người giữ điện', look: 'master', gua: r.lm?.g || r.g || 'li', wx: '土', lines: ['Thắp nén hương, cầu bình an cho cả nhà.', 'Điện này dựng từ thuở lập thành Bát Quái.', 'Mùng một, ngày rằm người đến đông lắm.'], x: r.origin.x - 4, z: r.origin.z - 4, path: null, face: 0.6 });
+  const god = GODS[godOfTemple(r.key, r.lm?.g || r.g)];
+  ctx.spot({ id: 'pray', kind: 'pray', name: `Ban thờ ${god.name}`, verb: `Thắp hương · hỏi ${MASTERS[god.master].name}`, x: 0, z: -2.0, r: 1.6 });
+  ctx.npcs.push({ id: `tu_${r.key}`, name: MASTERS[god.master].name, role: `Giữ ${god.hall}`, look: 'master', gua: r.lm?.g || r.g || 'li', wx: '土', lines: god.lines, x: r.origin.x - 4, z: r.origin.z - 4, path: null, face: 0.6 });
 }
 
 // ============================================================================

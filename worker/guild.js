@@ -9,7 +9,7 @@ import { DurableObject } from 'cloudflare:workers';
 import { GuildEngine } from '../src/game/guild-core.js';
 
 export class Guild extends DurableObject {
-  constructor(ctx, env) { super(ctx, env); this.g = new GuildEngine(ctx.storage); }
+  constructor(ctx, env) { super(ctx, env); this.g = new GuildEngine(ctx.storage); ctx.blockConcurrencyWhile(() => this.g.migrate()); } // v4: chỗ giữ theo chỉ số tiệm cũ bỏ một lần
   me(u) { return this.g.me(u, Date.now()); }
   board(k, u) { return this.g.board(k, u, Date.now()); }
   apply(u, name, k, r, y) { return this.g.apply(u, name, k, r, y, Date.now()); }

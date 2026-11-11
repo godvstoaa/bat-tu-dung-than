@@ -5,9 +5,10 @@
 //  Tìm đường: đi thẳng nếu không vướng; không thì A* trên lưới nửa ô (0,8 m), rút gọn theo tầm nhìn thẳng.
 // ============================================================================
 
+import { MASTERS } from './fortune-npc.js';
+import * as LAYOUT from './citylayout.js';
 import { hasStation, TEXT } from './features.js';
 import { walkable, SCALE, ROOM_X0 } from './terrain.js';
-import { inCanal, extNear, EXT_HW } from './canals.js';
 import { blockedByBuilding, platformTop, reserveClear } from './obstacles.js';
 import { COURT_STATIONS, START_M, toTile } from './court.js';
 import { enterables, doorNear, houseAt, doorOfRoom } from './homes.js';
@@ -53,6 +54,8 @@ export const HALLS = [
   { id: 'tuongphap', region: 'manh', name: 'Sảnh Tượng Pháp', verb: 'Đọc tượng Manh phái', world: { x: 654 * TS, z: -441 * TS } },
   { id: 'cachcuc', region: 'tubinh', name: 'Sảnh Cách Cục', verb: 'Định cách cục', world: { x: -521 * TS, z: -538 * TS } },
 ];
+// v4 (thành ×10): sảnh nghề dời VÀO THÀNH — tâm 8 khu Ngoại Thành (citylayout.landmarks kind 'hall'); bàn đặt trước cửa sảnh
+{ const LM = new Map(LAYOUT.landmarks().map((l) => [l.id, l])); for (const h of HALLS) { const l = LM.get(h.id); if (l?.door) { const fx = l.door.x - l.x, fz = l.door.z - l.z, n = Math.hypot(fx, fz) || 1; h.world = { x: l.door.x + (fx / n) * 4, z: l.door.z + (fz / n) * 4 }; h.region = 'thanh'; h.hall = l; } } }
 for (const h of HALLS) {
   const t = toTile(h.world.x, h.world.z);
   ALL_STATIONS.push({ ...h, kind: 'desk', block: [], spot: { x: t.x, y: t.y + 1.6 }, label: t });
@@ -79,9 +82,9 @@ const RX = ROOM_X0; // dải phòng (terrain.js) — điện thờ ở hàng z =
 export const ROOMS = [
   { id: 'chinhdien', name: 'Chính Điện Tam Thanh', region: 'thanh', door: { x: 0, z: -84 }, origin: { x: RX + 245, z: 0 }, w: 34, d: 28, h: 14,
     deities: [['deity_lingbao', -6.5], ['deity_yuanshi', 0], ['deity_daode', 6.5]], npc: 'que' },
-  { id: 'vanxuong', name: 'Văn Xương Các', region: 'thulau', door: { x: 0 * TS, z: -652 * TS }, origin: { x: RX + 345, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_wenchang', 0]] },
-  { id: 'daumau', name: 'Đẩu Mẫu Điện', region: 'trichthien', door: { x: -566 * TS, z: 566 * TS }, origin: { x: RX + 445, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_doumu', 0]] },
-  { id: 'laoquan', name: 'Lão Quân Điện', region: 'tubinh', door: { x: -564 * TS, z: -510 * TS }, origin: { x: RX + 545, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_daode', 0]] },
+  { id: 'vanxuong', name: 'Văn Xương Các', region: 'thulau', door: { x: 0 * TS, z: -652 * TS }, origin: { x: RX + 345, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_wenchang', 0]], master: 'vanxuong' },
+  { id: 'daumau', name: 'Đẩu Mẫu Điện', region: 'trichthien', door: { x: -566 * TS, z: 566 * TS }, origin: { x: RX + 445, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_doumu', 0]], master: 'tuvi' },
+  { id: 'laoquan', name: 'Lão Quân Điện', region: 'tubinh', door: { x: -564 * TS, z: -510 * TS }, origin: { x: RX + 545, z: 0 }, w: 24, d: 20, h: 12, deities: [['deity_daode', 0]], master: 'duocvuong' },
   // Sơn Môn: cửa trước mặt hai điện phụ (sect.js) — Tây: hành lang đại vận; Đông: Thái Tuế (web, iOS tắt)
   { id: 'vanmenh', name: 'Vận Mệnh Các', region: 'thanh', door: { x: -38.6, z: -40 }, origin: { x: RX + 645, z: 0 }, w: 20, d: 72, h: 11, deities: [], kind: 'vanmenh' },
   // phải nằm trong biên server (protocol.WORLD_TILES theo ROOM_X1); cách Lão Quân Điện và Vận Mệnh Các
@@ -91,6 +94,8 @@ export const ROOMS = [
 // Vận Mệnh Các: bia tổng quan ở lối vào + 9 cổng đại vận dọc lối giữa (vanmenh.js › VAN_GATES)
 export const VAN_GATE_Z = (i) => 25 - i * 6; // toạ độ z cổng i so với tâm điện (cổng 9 ở −23, trước bàn lễ)
 export const VAN_STELE = { x: -5.5, z: 29.5 };
+// v4: cửa ba điện Văn Xương / Đẩu Mẫu / Lão Quân = cửa đền tương ứng ở Phố Thầy Bói Nội Thành (citylayout.landmarks)
+{ const LM = new Map(LAYOUT.landmarks().map((l) => [l.id, l])); for (const r of ROOMS) { const l = LM.get(r.id); if (l?.door) { r.door = { x: l.door.x, z: l.door.z }; r.region = 'thanh'; } } }
 export const roomAt = (x, z) => ROOMS.find((r) => Math.abs(x - r.origin.x) <= r.w / 2 + 1 && Math.abs(z - r.origin.z) <= r.d / 2 + 1) || roomAtDyn(x, z);
 for (const r of ROOMS) {
   const inside = toTile(r.origin.x, r.origin.z + r.d / 2 - 3.2);
@@ -99,6 +104,8 @@ for (const r of ROOMS) {
   ALL_STATIONS.push({ id: `door_${r.id}`, kind: 'door', room: r.id, name: r.name, verb: `Vào ${r.name}`, block: [], world: r.door, spot: { x: doorT.x, y: doorT.y + 1.2 }, label: doorT, to: inside });
   ALL_STATIONS.push({ id: `exit_${r.id}`, kind: 'exit', room: r.id, name: 'Cửa điện', verb: 'Ra khỏi điện', block: [], world: exitW, spot: toTile(exitW.x, exitW.z), label: toTile(exitW.x, exitW.z), to: { x: doorT.x, y: doorT.y + 2.2 } });
   if (r.npc === 'que') { const q = { x: r.origin.x - r.w / 2 + 8.5, z: r.origin.z + 1 }; ALL_STATIONS.push({ id: 'que', kind: 'desk', room: r.id, name: 'Thầy Giải Quẻ', verb: 'Xin thầy gieo quẻ', block: [], world: q, spot: toTile(q.x + 1.4, q.z), label: toTile(q.x, q.z) }); }
+  // v4 (G4): ba điện trước chỉ có tượng → thêm thầy ngồi bàn, chat AI theo lá số (fortune-npc.js MASTERS[r.master])
+  if (r.master) { const q = { x: r.origin.x - r.w / 2 + 6.5, z: r.origin.z + 1 }; ALL_STATIONS.push({ id: `m_${r.id}`, kind: 'desk', room: r.id, name: MASTERS[r.master].name, verb: `Hỏi ${MASTERS[r.master].name}`, block: [], world: q, spot: toTile(q.x + 1.4, q.z), label: toTile(q.x, q.z) }); }
   if (r.kind === 'vanmenh') {
     const b = { x: r.origin.x + VAN_STELE.x, z: r.origin.z + VAN_STELE.z };
     ALL_STATIONS.push({ id: 'vanbia', kind: 'van', room: r.id, name: 'Bia Vận Mệnh', verb: 'Đọc bia quỹ tích đời', block: [], world: b, spot: toTile(b.x + 1.6, b.z + 0.4), label: toTile(b.x, b.z) });
@@ -130,6 +137,7 @@ function doorStation(e) {
   if (!VIRT.has(id)) {
     const t = toTile(e.door.x, e.door.z), base = { id, name: e.name, block: [], world: e.door, spot: t, label: t, enter: e };
     if (e.kind === 'knock') VIRT.set(id, { ...base, kind: 'knock', verb: `Gõ cửa ${e.name}` });
+    else if (e.kind === 'fortune') VIRT.set(id, { ...base, kind: 'fortune', master: e.master, verb: `Xem bói · ${MASTERS[e.master]?.name || e.name}` }); // v4: quầy Phố Thầy Bói — mở thẳng khung chat
     else {
       const r = roomByKey(e.key), inn = insideOf(r);
       VIRT.set(id, { ...base, kind: 'door', room: e.key, home: e.kind !== 'temple', to: toTile(inn.x, inn.z),
@@ -199,7 +207,6 @@ export function blockedAt(x, y, from = null) {
   const w = tileToWorld(x, y);
   if (blockedByBuilding(w.x, w.z)) return true;
   if (platformTop(w.x, w.z) != null) return false; // trên nền bậc cấp: đi thoải mái
-  if (inCanal(w.x, w.z) || (extNear(w.x, w.z)?.d ?? 99) < EXT_HW) return true; // tìm đường tránh nước (bơi chỉ khi tự điều khiển)
   const f = from ? tileToWorld(from.x, from.y) : null;
   return !walkable(w.x, w.z, f?.x, f?.z);
 }

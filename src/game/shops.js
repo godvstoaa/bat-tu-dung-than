@@ -4,13 +4,15 @@
 //  Nội Thành và 8 Dịch Trạm sát 8 cổng ngoài, 1 Nha Môn Địa Ốc (cung Ly, sát cổng Nội Thành).
 // ============================================================================
 import * as BQ from './batquai.js';
-import { generateCity, HOUSE_SPECS } from './cityblocks.js';
+const guaById = (id) => BQ.GUA.find((g) => g.id === id);
+import { HOUSE_SPECS } from './cityblocks.js';
+import { allHouses, isRemoved } from './city4.js';
 import { SHOP_TYPES } from './items.js';
-import { AVE_CANAL } from './canals.js';
 
 // tỉ lệ rộng/sâu của model mặt tiền (đo từ GLB đã đóng gói) — để mặt tiền nằm gọn trong khung nhà cũ
 // (đo bản .lod: scripts/meshy-pack-library.mjs in tỉ lệ khung bao) — lấy từ HOUSE_SPECS cho khỏi lệch hai nơi
 export const FACADE_WD = Object.fromEntries(Object.entries(HOUSE_SPECS).map(([id, sp]) => [id, sp.wd]));
+SHOP_TYPES.tientrang = { name: 'Tiền Trang', facade: 'bq_yamen', owner: 'Chưởng Quỹ', look: 'master', wall: '#8a6a3a', floor: 'stone', sells: [], svc: ['tientrang', 'cho'] }; // v4: mỗi khu một Tiền Trang (citylayout use 'service')
 SHOP_TYPES.may = { name: 'Tiệm May Tàng Y', facade: 'bq_shop_lantern', owner: 'Thợ May', look: 'hero_f', wall: '#e3dccb', floor: 'wood', sells: [], svc: ['may'] };
 
 const WARD_SHOPS = {
@@ -28,44 +30,32 @@ const PREFIX = { li: ['Chu Tước', 'Hồng Vân', 'Đan Hà', 'Liệt Hỏa', 
 const SURNAME = { li: 'Hồng', kun: 'Điền', dui: 'Liễu', qian: 'Lăng', kan: 'Thủy', gen: 'Thạch', zhen: 'Lôi', xun: 'Diệp' };
 const GIVEN = ['Bá', 'Trọng', 'Thúc', 'Quý', 'Nương', 'Cô', 'Lão', 'Tiểu'];
 
-const front = (h) => [Math.sin(h.ry), Math.cos(h.ry)];
-// căn ở góc đại lộ (|v| < 24 — đầu dãy nhà quay ra vành phố, sát đại lộ): khách đi đại lộ thấy ngay
-// đại lộ có kênh giữa (Khảm / Tốn) rộng 19 m mỗi bên → dãy nhà mặt đại lộ lùi ra xa hơn
-function onAvenue(g, h) { void front; return Math.abs(h.v) < (AVE_CANAL.gua.includes(g.id) ? 36 : 24); }
 
 let CACHE = null;
-/** [{ k, type, name, owner, g, house, hi (chỉ số trong city.houses) | null, inner?:name, facade, fit }] */
+const hashS = (t) => { let h = 2166136261; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+/**
+ * v4 (thành ×10, city4.js / citylayout.js): MỌI lô mặt đại lộ / vành / quảng trường là tiệm thật (~8.400 tiệm) + 6 công trình
+ * có tên trong Sơn Môn. [{ k, type, name, owner, g, house, hi (id nhà v4 «ô:i») | null, inner?, facade, fit }]
+ * k = thứ tự ổn định (id nhà v4 sắp xếp) — khoá phòng `shop:k`, chỗ làm, giá ngày.
+ */
 export function cityShops() {
   if (CACHE) return CACHE;
-  const C = generateCity(), out = [], used = new Set();
+  const out = [];
   const INNER = { 'Đan Dược Các': 'duoc', 'Hỏa Vân Tửu Lâu': 'tuu', 'Đoài Duyệt Trà Lâu': 'tralau', 'Tàng Phong Lâu': 'thuhoa', 'Khôn Nguyên Thương': 'gom', 'Nông Gia Đình': 'hoavien' };
-  const taken = new Set(Object.keys(INNER));
-  const add = (type, g, hi, name, extra = {}) => {
-    const T = SHOP_TYPES[type], h = hi != null ? C.houses[hi] : null;
-    const k = out.length, gv = GIVEN[(k * 5 + 3) % GIVEN.length];
-    out.push({ k, type, name, owner: `${T.owner} ${SURNAME[g.id] || 'Lý'} ${gv}`, g: g.id, hi, house: h, facade: T.facade, ...extra });
-    if (hi != null) used.add(hi);
+  const add = (type, g, house, name, extra = {}) => {
+    const T = SHOP_TYPES[type]; if (!T) return;
+    const k = out.length, gv = GIVEN[hashS(`${k}`) % GIVEN.length];
+    out.push({ k, type, name, owner: `${T.owner} ${SURNAME[g] || 'Lý'} ${gv}`, g, hi: house ? house.id : null, house, facade: T.facade, ...extra });
   };
-  for (const g of BQ.GUA) {
-    const cands = C.houses.map((h, i) => ({ h, i })).filter(({ h, i }) => h.g === g.id && h.door && !h.inner && h.f >= 8 && onAvenue(g, h) && !used.has(i));
-    const pick = (u0) => { let best = null; for (const c of cands) { if (used.has(c.i)) continue; const d = Math.abs(c.h.u - u0); if (!best || d < best.d) best = { ...c, d }; } return best; };
-    const list = WARD_SHOPS[g.id];
-    list.forEach((type, j) => {
-      const u0 = type === 'namon' ? 178 : 196 + (j * 168) / Math.max(1, list.length);
-      const c = pick(u0); if (!c) return;
-      // tên hiệu không trùng tiệm khác hay công trình có tên Nội Thành (vd «Đoài Duyệt Trà Lâu»)
-      let name = type === 'namon' ? 'Nha Môn Địa Ốc' : type === 'may' ? 'Tiệm May Tàng Y' : '';
-      for (let k = 0; !name || taken.has(name); k++) name = `${PREFIX[g.id][(j + k) % PREFIX[g.id].length]} ${SHOP_TYPES[type].name}`;
-      taken.add(name);
-      add(type, g, c.i, name);
-    });
-    const dt = pick(392);
-    if (dt) add('dichtram', g, dt.i, `Dịch Trạm ${g.gate.replace('Môn', 'Ngoại')}`);
+  const list = allHouses().filter((h) => (h.use === 'shop' || h.use === 'service') && !isRemoved(h.id)).sort((a, b) => (a.id < b.id ? -1 : 1));
+  for (const h of list) {
+    const g = String(h.district).split('-').pop(), pre = PREFIX[g] || PREFIX.li;
+    const type = h.use === 'service' ? 'tientrang' : h.type, T = SHOP_TYPES[type]; if (!T) continue;
+    const name = type === 'tientrang' ? `Tiền Trang ${guaById(g)?.name || ''}`.trim() : h.type === 'namon' ? `Nha Môn ${guaById(g)?.name || ''}`.trim() : h.type === 'dichtram' ? `Dịch Trạm ${guaById(g)?.name || ''}`.trim() : `${pre[hashS(h.id) % pre.length]} ${T.name}`;
+    add(type, g, { ...h, f: h.w }, name);
   }
-  // công trình có tên ở Nội Thành làm cửa hàng (cửa ở homes.js › enterables, mặt tiền giữ nguyên)
-  for (const g of BQ.GUA) for (const b of BQ.DISTRICTS[g.id].buildings) if (INNER[b.name]) add(INNER[b.name], g, null, b.name, { inner: b.name, facade: null });
-  // khung mặt tiền: rộng = min(mặt tiền nhà, sâu nhà · tỉ lệ model) → nằm gọn trong khung va chạm cũ
-  for (const s of out) if (s.house && s.facade) s.fit = Math.min(s.house.f, s.house.d * (FACADE_WD[s.facade] || 1)) * 0.98;
+  for (const g of BQ.GUA) for (const b of BQ.DISTRICTS[g.id].buildings) if (INNER[b.name]) add(INNER[b.name], g.id, null, b.name, { inner: b.name, facade: null });
+  for (const s of out) if (s.house) s.fit = s.house.w * 0.98;
   CACHE = out;
   return out;
 }

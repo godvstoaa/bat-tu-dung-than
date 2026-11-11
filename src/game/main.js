@@ -39,7 +39,9 @@ import { RAZE_OUTSIDE } from './protocol.js';
 import * as I from './items.js';
 import * as E from './estate.js';
 import { roomByKey, insideOf, setHomeProvider, roomSpots, roomAtDyn } from './rooms.js';
-import { knockReply, nearbyHint } from './homes.js';
+import { knockReply, nearbyHint, enterables } from './homes.js';
+import { spawnOptions, savablePos, WARD_OF_WX } from './spawn.js';
+import * as TUT from './tutorial.js';
 import { scoreHome, warmReward } from './homefs.js';
 import { createRenderer, clientToTile, nightLevel as nightLevelOf, ROBE } from './render.js';
 import { STATION_OPEN, openBook, todayInfo, esc, chartOf } from './stations.js';
@@ -49,6 +51,7 @@ import { TEXT } from './features.js';
 import { buzz, lockPortrait } from './haptics.js';
 import { createNet } from './net.js';
 import { createAccount } from './account.js';
+import { chartSource } from './fortune-npc.js';
 import { makeNpc } from './npc.js';
 // [G2 — NPC-AI] chuyện riêng của khách hỏi việc (docs/npc-ai/08) — thuần theo
 // hạt giống, không AI, không mạng; story chỉ hiện trong panel của chủ mở án
@@ -124,7 +127,7 @@ export function startGame({ onExit = null } = {}) {
   let netCung = null; // cúng cô hồn (P21) — gắn sau khi có life state
   const net = createNet({
     token: () => account.wsToken(),
-    profile: () => ({ name: state.player?.name || 'Khách', robe: state.player?.robe || '土', accent: state.player?.accent || '', cos: C.encodeCos(C.wardrobe(state).equipped), look: state.player?.look || 'hero_m', title: S.titleFor(state.xp || 0).name }),
+    profile: () => ({ name: state.player?.name || 'Khách', robe: state.player?.robe || '土', accent: state.player?.accent || '', cos: C.encodeCos(C.wardrobe(state).equipped), look: state.player?.look || 'hero_m', title: S.titleFor(state.xp || 0).name, x: player.x, y: player.y }), // v4: vị trí xuất hiện thật (spawn.js) — máy chủ kiểm biên
     onEvent(ev) {
       if (ev.t === 'status' || ev.t === 'count') { updateOnline(); if (ev.t === 'status') work?.onStatus(ev.status); }
       else if (ev.t === 'emo' && ev.toMe && !ev.self) { toast(`${ev.name || 'Một khách'} ${EMOTES[ev.e].text} bạn ${EMOTES[ev.e].icon}`); buzz('light'); }
@@ -210,15 +213,45 @@ export function startGame({ onExit = null } = {}) {
   // -------------------------------------------------------------------------
   // Toast + HUD
   // -------------------------------------------------------------------------
-  function toast(text) {
+  // v4: thông báo có HÀNG ĐỢI (1 cái / 1,5 giây, gộp trùng) — không còn vứt bỏ âm thầm. Dồn dập (≥ 3 chờ) hoặc lúc vào ngày
+  // mới → gom thành MỘT thẻ «Sáng nay» (digest) thay cho loạt toast liên tiếp.
+  const toastQ = [];
+  let toastBusy = false, digest = { items: [], title: '🌅 Sáng nay' }; // lúc khởi động: gom mọi thông báo đầu phiên
+  setTimeout(() => digestFlush(), 8000);
+  function digestStart(ms, title) { if (digest) return; digest = { items: [], title }; setTimeout(digestFlush, ms); }
+  function digestFlush() {
+    const d = digest; digest = null;
+    if (!d || !d.items.length) return;
+    if (d.items.length === 1) { toast(d.items[0]); return; }
+    const box = $('hq-toasts'), c = document.createElement('div');
+    c.className = 'hq-digest';
+    c.innerHTML = `<b>${d.title}</b><ul>${d.items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul><button type="button" class="hq-btn">Đã xem</button>`;
+    const bye = () => { c.classList.add('out'); setTimeout(() => c.remove(), 400); };
+    c.querySelector('button').onclick = bye;
+    setTimeout(bye, 6000 + d.items.length * 2500);
+    box.prepend(c);
+  }
+  function showToast(text) {
     const t = document.createElement('div');
     t.className = 'hq-toast';
     t.textContent = text;
     const box = $('hq-toasts');
-    while (box.children.length >= 2) box.firstElementChild.remove(); // tối đa 2 thông báo cùng lúc
+    while (box.querySelectorAll('.hq-toast').length >= 2) box.querySelector('.hq-toast').remove();
     box.appendChild(t);
     setTimeout(() => t.classList.add('out'), 2700);
     setTimeout(() => t.remove(), 3200);
+  }
+  function pumpToast() {
+    if (toastBusy || !toastQ.length) return;
+    toastBusy = true; showToast(toastQ.shift());
+    setTimeout(() => { toastBusy = false; pumpToast(); }, 1500);
+  }
+  function toast(text) {
+    text = String(text ?? '').trim(); if (!text) return;
+    if (digest) { if (!digest.items.includes(text)) digest.items.push(text); return; }
+    if (toastQ.includes(text) || [...$('hq-toasts').querySelectorAll('.hq-toast')].some((t) => t.textContent === text)) return;
+    if (toastQ.length >= 3) { digestStart(2500, '📜 Thông báo'); digest.items.push(...toastQ.splice(0), text); return; }
+    toastQ.push(text); pumpToast();
   }
 
   function save() { S.saveState(state, storage); account.touch(); }
@@ -260,7 +293,7 @@ export function startGame({ onExit = null } = {}) {
   // Sau mọi hành động: thưởng, nhiệm vụ, thành tựu, danh xưng, lưu.
   let lastXp = null;
   function after(gained = 0, why = '') {
-    if (gained > 0) toast(`+${gained} ${TEXT.point} · ${why}`);
+    if (gained > 0 && why) toast(`+${gained} ${TEXT.point} · ${why}`); // không lý do = nơi gọi đã tự báo (tránh toast đôi)
     // lên cấp → báo gia trì nguyên tố vừa mở (progress.js)
     if (lastXp != null) for (const g of newlyUnlocked(lastXp, state.xp || 0)) { toast(`✨ Cấp ${levelInfo(state).level} · mở ${g.name} (${WX_GIATRI[state.player?.robe]?.name || ''})`); buzz('heavy'); }
     lastXp = state.xp || 0;
@@ -342,6 +375,7 @@ export function startGame({ onExit = null } = {}) {
     nearWater: () => { const w = tileToWorld(player.x, player.y); for (const [dx, dz] of [[0, 0], [3, 0], [-3, 0], [0, 3], [0, -3]]) { const i = waterInfo(w.x + dx, w.z + dz); if (i && i.depth > 0.4) return true; } return false; },
     nearbyPlayers: () => { if (net.status !== 'online') return []; const w = tileToWorld(player.x, player.y); return [...net.others.values()].filter((o) => { const q = tileToWorld(o.x, o.y); return Math.hypot(q.x - w.x, q.z - w.z) < 8; }).map((o) => ({ u: o.u, name: o.name })); },
     chartProfile: () => econProfile(),
+    loggedIn: () => account.loggedIn(),
     dayGZ: () => dayGanZhi,
     questHint: () => { const wx = state.player?.yong?.primary; if (!wx || FQ.fateState(LIFE.lifeState(state)).done === S.todayStr()) return null; const q = FQ.questFor(S.todayStr(), wx, fatePid); return q ? { id: q.id, hint: FQ.hint(q) } : null; },
     wipe() { try { storage.removeItem(S.KEY); } catch (e) { /* ignore */ } location.reload(); },
@@ -354,6 +388,7 @@ export function startGame({ onExit = null } = {}) {
   }
 
   function travelTo(to, label) {
+    api.tut?.('travel');
     if (player.flying) setFlying(false);
     const ov = document.createElement('div');
     ov.className = 'hq-travel';
@@ -406,6 +441,7 @@ export function startGame({ onExit = null } = {}) {
     // cửa điện / lối ra: chuyển cảnh vào – ra (không mở bảng)
     if (st.kind === 'door' || st.kind === 'exit') { enterRoom(st); return; }
     if (st.kind === 'knock') { knock(st); return; }
+    if (st.kind === 'fortune') { import('./fortune-ui.js').then((m) => m.openFortune(api, st.master)); buzz('light'); return; } // quầy thầy bói Phố Thầy Bói
     if (st.kind === 'spot' && st.room?.startsWith('law:')) { lawSpot(st); return; }
     if (st.kind === 'spot' && st.room === LP.KEY) { lifeSpot(st); return; }
     if (st.kind === 'spot' && work && (st.room === 'job:mine' || st.data?.kind === 'job')) { work.spot(st); return; }
@@ -425,6 +461,7 @@ export function startGame({ onExit = null } = {}) {
     S.rollDay(state);
     S.visitStation(state, id);
     let body;
+    if (id === 'lich') api.tut?.('que');
     try {
       body = STATION_OPEN[id](api);
     } catch (e) {
@@ -493,6 +530,7 @@ export function startGame({ onExit = null } = {}) {
   }, 4000);
 
   function teleportTo(st) {
+    api.tut?.('travel');
     if (player.sitting) return;
     if (player.flying && st.room) setFlying(false);
     const go = () => { player.x = st.spot.x; player.y = st.spot.y; player.path = []; target = null; player.face = 'up'; net.teleport(st.spot.x, st.spot.y); };
@@ -653,26 +691,65 @@ export function startGame({ onExit = null } = {}) {
       dock.addEventListener('click', (e) => { if (e.target.closest('.hq-dbtn')) dock.classList.remove('open'); });
       document.addEventListener('pointerdown', (e) => { if (dock.classList.contains('open') && !dock.contains(e.target) && e.target !== tg) dock.classList.remove('open'); });
     } }
-  // bản đồ nhỏ 120 × 120: thành, hào, sông vẽ sẵn; chấm người chơi + hướng nhìn; bấm để mở bản đồ lớn
+  // v4 BẢN ĐỒ THÀNH (G3): bản đồ nhỏ 120 × 120 quanh người chơi (±700 m); bấm → bản đồ cả thành 4,25 km với 41 trạm xe
+  // ngựa nội thành (citylayout.stations) — bấm trạm là ngồi xe tới (5 đồng; tân thủ dưới cấp 5 miễn phí).
+  const CITY_MAP = { R: 2300 }; // nửa bề rộng bản đồ thành (m)
+  let cityBase = null; // ảnh nền thành vẽ một lần (1024 px)
+  function drawCity(L, W) {
+    const N = 1024, c = document.createElement('canvas'); c.width = c.height = N;
+    const g = c.getContext('2d'), k = N / (2 * CITY_MAP.R), P = (x, z) => [N / 2 + x * k, N / 2 + z * k];
+    const oct = (a) => { g.beginPath(); for (let i = 0; i <= 8; i++) { const ang = (i / 8) * Math.PI * 2 + Math.PI / 8, r = a / Math.cos(Math.PI / 8); const [x, y] = P(Math.cos(ang) * r, Math.sin(ang) * r); if (i) g.lineTo(x, y); else g.moveTo(x, y); } };
+    g.fillStyle = '#2d3a2a'; g.fillRect(0, 0, N, N);
+    g.fillStyle = '#5a5444'; oct(L.CITY.A); g.fill();
+    g.strokeStyle = '#8a7f66'; for (const r of L.roads()) { g.lineWidth = Math.max(0.6, r.w * k); g.beginPath(); g.moveTo(...P(r.a.x, r.a.z)); g.lineTo(...P(r.b.x, r.b.z)); g.stroke(); }
+    g.fillStyle = '#3f6fa0'; g.strokeStyle = '#3f6fa0';
+    for (const ch of L.water().channels) { g.beginPath(); ch.pts.forEach((q, i) => { const [x, y] = P(q.x, q.z); if (i) g.lineTo(x, y); else g.moveTo(x, y); }); g.lineWidth = Math.max(2, ch.wIn * 2 * k); g.stroke(); }
+    { const lk = L.water().lake; g.beginPath(); g.arc(...P(lk.x, lk.z), lk.r * k, 0, 7); g.fill(); }
+    g.strokeStyle = '#c9b48e'; g.lineWidth = 3; oct(L.CITY.A); g.stroke();
+    g.font = 'bold 15px serif'; g.textAlign = 'center'; g.fillStyle = '#f3df9a';
+    for (const l of L.landmarks()) if (l.kind === 'hall' || l.kind === 'port' || l.id === 'sonmon') { const [x, y] = P(l.x, l.z); g.fillText(l.name.replace('Sảnh ', ''), x, y - 8); }
+    return c;
+  }
   const minimap = (() => {
-    const N = 120, S2 = 3600 / N, c = document.createElement('canvas'); c.width = c.height = N; c.className = 'hq-minimap'; c.title = 'Bản đồ — bấm để mở lớn';
-    const base = document.createElement('canvas'); base.width = base.height = N;
-    Promise.all([import('./waterways.js'), import('./cityblocks.js')]).then(([W, CBm]) => {
-      const g = base.getContext('2d'); g.fillStyle = '#2d3a2a'; g.fillRect(0, 0, N, N);
-      const P = (x, z) => [N / 2 + x / S2, N / 2 + z / S2];
-      const octPath = (a) => { g.beginPath(); for (let k = 0; k <= 8; k++) { const ang = (k / 8) * Math.PI * 2 + Math.PI / 8, r = a / Math.cos(Math.PI / 8); const [x, y] = P(Math.cos(ang) * r, Math.sin(ang) * r); if (k) g.lineTo(x, y); else g.moveTo(x, y); } };
-      g.fillStyle = '#4a5a3e'; octPath(CBm.OUTER_A); g.fill();
-      g.strokeStyle = '#4f8fb8'; g.lineWidth = 3; g.beginPath(); W.riverPoints().forEach((q, i) => { const [x, y] = P(q.x, q.z); if (i) g.lineTo(x, y); else g.moveTo(x, y); }); g.stroke();
-      for (const [a, col, wd] of [[CBm.OUTER_A, '#c9b48e', 1.5], [CBm.TRUNG_A, '#b39a6e', 1], [175, '#4f8fb8', 1.5]]) { g.strokeStyle = col; g.lineWidth = wd; octPath(a); g.stroke(); }
-    }).catch(() => {});
-    c.onclick = () => { const big = document.createElement('div'); big.className = 'hq-bigmap'; const bc = document.createElement('canvas'); bc.width = bc.height = 480; big.append(bc); const g = bc.getContext('2d'); g.drawImage(base, 0, 0, 480, 480); const w = tileToWorld(player.x, player.y); g.fillStyle = '#ffd36a'; g.beginPath(); g.arc(240 + w.x / (3600 / 480), 240 + w.z / (3600 / 480), 6, 0, 7); g.fill(); panel.open({ title: '🗺 Huyền Giới', body: big }); };
+    const N = 120, c = document.createElement('canvas'); c.width = c.height = N; c.className = 'hq-minimap'; c.title = 'Bản đồ thành — bấm để mở, chọn trạm xe ngựa';
+    let L = null;
+    Promise.all([import('./citylayout.js'), import('./waterways.js')]).then(([Lm, W]) => { L = Lm; cityBase = drawCity(Lm, W); }).catch(() => {});
+    c.onclick = () => openCityMap();
     let at = 0;
     return { el: c, update(now) {
-      if (now - at < 400) return; at = now;
-      const g = c.getContext('2d'); g.drawImage(base, 0, 0); const w = tileToWorld(player.x, player.y), x = N / 2 + w.x / S2, y = N / 2 + w.z / S2, h = player.h || 0;
+      if (now - at < 400 || !cityBase) return; at = now;
+      const g = c.getContext('2d'), w = tileToWorld(player.x, player.y), span = 1400, k = cityBase.width / (2 * CITY_MAP.R);
+      g.fillStyle = '#2d3a2a'; g.fillRect(0, 0, N, N);
+      g.drawImage(cityBase, cityBase.width / 2 + (w.x - span / 2) * k, cityBase.height / 2 + (w.z - span / 2) * k, span * k, span * k, 0, 0, N, N);
+      const x = N / 2, y = N / 2, h = player.h || 0;
       g.fillStyle = '#ffd36a'; g.strokeStyle = '#1a1310'; g.lineWidth = 1; g.beginPath(); g.moveTo(x + Math.sin(h) * 6, y + Math.cos(h) * 6); g.lineTo(x + Math.sin(h + 2.5) * 4, y + Math.cos(h + 2.5) * 4); g.lineTo(x + Math.sin(h - 2.5) * 4, y + Math.cos(h - 2.5) * 4); g.closePath(); g.fill(); g.stroke();
+      void L;
     } };
   })();
+  const CART_XU = 500; // 5 đồng / chuyến xe ngựa nội thành
+  async function openCityMap() {
+    const L = await import('./citylayout.js');
+    if (!cityBase) cityBase = drawCity(L);
+    const box = document.createElement('div'); box.className = 'hq-bigmap';
+    const size = Math.min(560, innerWidth - 40), bc = document.createElement('canvas'); bc.width = bc.height = size; bc.style.cursor = 'pointer'; box.append(bc);
+    const free = levelInfo(state).level < 5, note = document.createElement('p'); note.className = 'hq-sub';
+    note.textContent = `Bấm một trạm xe ngựa (chấm đỏ) để ngồi xe tới — ${free ? 'tân thủ dưới cấp 5 đi miễn phí' : '5 đồng một chuyến'}. Chấm vàng là bạn.`;
+    box.append(note);
+    const g = bc.getContext('2d'), k = size / (2 * CITY_MAP.R), P = (x, z) => [size / 2 + x * k, size / 2 + z * k];
+    g.drawImage(cityBase, 0, 0, size, size);
+    const ST = L.stations();
+    for (const st of ST) { const [x, y] = P(st.x, st.z); g.fillStyle = '#c8341f'; g.strokeStyle = '#fff3c4'; g.lineWidth = 1.5; g.beginPath(); g.arc(x, y, 5, 0, 7); g.fill(); g.stroke(); }
+    const w = tileToWorld(player.x, player.y); { const [x, y] = P(w.x, w.z); g.fillStyle = '#ffd36a'; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); }
+    bc.onclick = (e) => {
+      const r = bc.getBoundingClientRect(), mx = (e.clientX - r.left) * (size / r.width), my = (e.clientY - r.top) * (size / r.height);
+      let best = null, bd = 14; for (const st of ST) { const [x, y] = P(st.x, st.z), d = Math.hypot(x - mx, y - my); if (d < bd) { bd = d; best = st; } }
+      if (!best) return;
+      if (!free && !LIFE.spendXu(state, CART_XU)) { toast('Không đủ 5 đồng đi xe.'); return; }
+      save(); panel.close(); api.travel(best.x, best.z, `🐎 Xe ngựa tới ${best.name}`);
+    };
+    panel.open({ title: '🗺 Bản đồ Huyền Thành · trạm xe ngựa', body: box });
+  }
+  api.openCityMap = openCityMap;
   $('hq-canvas')?.parentElement?.appendChild(minimap.el);
   // vuốt nút Nhảy lên để cất cánh (P16)
   setTimeout(() => { const jb = $('hq-jump'); if (!jb) return; let y0 = null; jb.addEventListener('pointerdown', (e) => { y0 = e.clientY; }); jb.addEventListener('pointermove', (e) => { if (y0 != null && y0 - e.clientY > 36 && !player.flying) { y0 = null; setFlying(true); buzz('medium'); } }); jb.addEventListener('pointerup', () => { y0 = null; }); }, 0);
@@ -741,7 +818,7 @@ export function startGame({ onExit = null } = {}) {
   }
   function judge(rec) {
     let birthChi = '';
-    try { if (state.player) birthChi = chartOf(state.player).chart.pillars.year.zhi; } catch (e) { /* chưa lập lá số */ }
+    try { const src = chartSource(state); if (src) birthChi = chartOf(src).chart.pillars.year.zhi; } catch (e) { /* chưa lập lá số */ }
     const L = LAW.lawState(state);
     const crime = LAW.assess({ x: rec.x, z: rec.z, size: rec.hpMax, wx: LAW.guaAt(rec.x, rec.z).wx, yong: state.player?.yong, dayGZ: dayGanZhi, birthChi, priors: L.record.length });
     const sen = LAW.convict(state, crime);
@@ -830,12 +907,13 @@ export function startGame({ onExit = null } = {}) {
   // NHIỆM VỤ MỆNH (P5 — fatequest.js): chỉ dựng điểm trên máy người đúng Dụng thần, đúng canh giờ, đứng đúng vùng
   const fatePid = (() => { try { return localStorage.getItem('huyenquan:pid') || 'local'; } catch (e) { return 'local'; } })();
   let fateVis = null, fateAt = 0, fateBusy = false;
+  let fateToldId = '';
   function fateTick() {
     const now = Date.now(); if (now - fateAt < 1500) return; fateAt = now;
     const w = tileToWorld(player.x, player.y);
     const v = FQ.visibleFor({ L, wx: state.player?.yong?.primary, pid: fatePid, dateStr: S.todayStr(), hour: new Date().getHours(), x: w.x, z: w.z, blocked: blockedByBuilding });
     if (!!v !== !!fateVis || (v && fateVis && v.q.id !== fateVis.q.id)) {
-      if (v) { setOpenSpots('fate', [{ id: v.q.id, kind: 'fate', name: v.q.name, verb: `✨ ${v.q.task}`, x: v.spot.x, z: v.spot.z, r: 2.6 }]); toast(`✨ Mệnh khí dẫn lối: «${v.q.name}» — chỉ người hợp mệnh như bạn mới thấy. Tới cột sáng.`); }
+      if (v) { setOpenSpots('fate', [{ id: v.q.id, kind: 'fate', name: v.q.name, verb: `✨ ${v.q.task}`, x: v.spot.x, z: v.spot.z, r: 2.6 }]); if (fateToldId !== `${S.todayStr()}:${v.q.id}`) { fateToldId = `${S.todayStr()}:${v.q.id}`; toast(`✨ Mệnh khí dẫn lối: «${v.q.name}» — chỉ người hợp mệnh như bạn mới thấy. Tới cột sáng.`); } } // v4: mỗi việc mệnh báo một lần / ngày
       else clearOpenSpots('fate');
     }
     fateVis = v;
@@ -869,7 +947,7 @@ export function startGame({ onExit = null } = {}) {
   function hhDay(today) {
     let clash = 0, thaiTue = false;
     try {
-      const bz = chartOf(state.player).chart.pillars.year.zhi, ti = todayInfo();
+      const bz = chartOf(chartSource(state)).chart.pillars.year.zhi, ti = todayInfo();
       if (LAW.clash(ti.dayGZ, bz)) clash = -1;
       thaiTue = LAW.clash(ti.yearGZ, bz) || String(ti.yearGZ).slice(-1) === String(bz).slice(-1);
     } catch (e) { /* chưa lập lá số */ }
@@ -923,7 +1001,8 @@ export function startGame({ onExit = null } = {}) {
       state.player = { ...(state.player || {}), yong: { primary: y.primary, accent, ji: y.ji || (y.avoid || [])[0] || '' }, robe: y.primary, accent, incarnation: chart };
     } catch (e) { /* engine lỗi → giữ hồ sơ cũ */ }
     LH.reborn(state, chart); state.lifeXpStart = state.xp || 0;
-    const t = START; player.x = t.x; player.y = t.y; player.path = []; if (player.phys) player.phys.y3 = null; net.teleport(t.x, t.y);
+    const tp = templeOf(WARD_OF_WX[state.player?.yong?.primary]), t = tp ? worldToTile(tp.x, tp.z) : START; // v4: đầu thai ở miếu ứng Dụng thần mới
+    player.x = t.x; player.y = t.y; player.path = []; if (player.phys) player.phys.y3 = null; net.teleport(t.x, t.y);
     save(); updateHud(); updateVitals();
     toast(`👶 Đầu thai — lá số mới ${chart.day}/${chart.month}/${chart.year} (Âm phủ cấp, không phải ngày sinh thật của bạn). Dụng thần mới: ${state.player.yong?.primary || '?'}.`);
   }
@@ -967,7 +1046,8 @@ export function startGame({ onExit = null } = {}) {
       if (LH.interludeDone(L)) { rootEl().classList.remove('hq-ghost'); if (LAW.lawState(state).sentence?.label?.startsWith('Thập Điện')) LAW.lawState(state).sentence = null; toast('🌸 Đã mãn kiếp ngắn — đầu thai Nhân đạo.'); chooseChart(pendingCharts || LH.fictionalCharts(`${Date.now()}`, 1)); pendingCharts = null; }
       return;
     }
-    if (LH.dying(L) && Date.now() - dyingWarnAt > 45000) { dyingWarnAt = Date.now(); toast(L.full < 5 ? '⚠ Đói lả — Khí huyết sắp cạn! Tới quầy cơm gần nhất ăn ngay kẻo chết đói.' : '⚠ Bệnh nặng chưa chữa — Khí huyết sắp cạn! Tới Y Quán (gian sau Dược Phòng) ngay.'); buzz('heavy'); }
+    if (!LH.dying(L)) dyingWarnAt = 0;
+    else if (!dyingWarnAt) { dyingWarnAt = Date.now(); /* v4: báo một lần mỗi lần rơi vào cảnh nguy (không lặp 45 giây) */ toast(L.full < 5 ? '⚠ Đói lả — Khí huyết sắp cạn! Tới quầy cơm gần nhất ăn ngay kẻo chết đói.' : '⚠ Bệnh nặng chưa chữa — Khí huyết sắp cạn! Tới Y Quán (gian sau Dược Phòng) ngay.'); buzz('heavy'); }
     rootEl().classList.toggle('hq-dying', LH.dying(L));
   }
   if (L.afterlife?.path === 'ngaquy') rootEl().classList.add('hq-ghost');
@@ -1018,7 +1098,7 @@ export function startGame({ onExit = null } = {}) {
   // ÂM ĐỨC (P17): vào ngày → chốt ngày cũ, gieo quẻ vận khí đầu ngày theo lá số
   function adEnterDay(today) {
     let que = null;
-    try { if (state.player) { const D = dailyGuidance(chartOf(state.player)); que = { score: D.score, label: D.score >= 70 ? 'Ngày thuận' : D.score >= 50 ? 'Ngày bình' : 'Ngày nên thủ' }; } } catch (e) { /* chưa lập lá số */ }
+    try { const src = chartSource(state); if (src) { const D = dailyGuidance(chartOf(src)); que = { score: D.score, label: D.score >= 70 ? 'Ngày thuận' : D.score >= 50 ? 'Ngày bình' : 'Ngày nên thủ' }; } } catch (e) { /* chưa lập lá số */ }
     if (L.ill && !L.ill.cureAt && Date.now() - L.ill.at > 86400000 && AD.adState(L).day?.date !== today) AD.penalize(L, 'neglect'); // bỏ mặc bệnh quá 24 giờ
     const r = AD.enterDay(L, today, que);
     if (!r.newDay) return;
@@ -1030,6 +1110,7 @@ export function startGame({ onExit = null } = {}) {
   }
   function lifeTax() {
     const today = S.todayStr(); if (today === lifeDay) return; lifeDay = today;
+    digestStart(6000, '🌅 Ngày mới');
     adEnterDay(today);
     const t = LIFE.dailyTax(L, LIFE.wealthDong(L), today);
     if (t.due) toast(t.paid ? `🏛 Thuế thân hôm nay: ${t.due} đồng.` : `🏛 Không đủ tiền nộp thuế thân (${t.due} đồng) — ghi nợ.`);
@@ -1049,6 +1130,7 @@ export function startGame({ onExit = null } = {}) {
     }
   }
   function lifeStep(dt) {
+    rememberPos();
     lifeAcc += dt; if (lifeAcc < 1) return;
     const secs = lifeAcc; lifeAcc = 0;
     const moving = player.moving && !player.sitting;
@@ -1085,6 +1167,7 @@ export function startGame({ onExit = null } = {}) {
   const lifeMods = () => LIFE.mods(L);
   // VIỆC LÀM (P2 — work.js): bảng Chiêu công trong tiệm, ca làm, mini-game, phu áp hàng, mỏ dân sự. Máy chủ chấm lương.
   work = createWork({
+    onShift: () => api.tut?.('shift'),
     api, net, L, player, tileToWorld, toast, buzz, panel, save, updateVitals, anchor: vitEl,
     root: () => $('hq-canvas')?.closest('.hq-root') || document.body,
     place: (p, label) => placeAt(p || tileToWorld(START.x, START.y), label, 'Bánh xe goòng lạch cạch trên ray…'),
@@ -1130,7 +1213,7 @@ export function startGame({ onExit = null } = {}) {
 
   // --- di chuyển tự do (motion.js): toạ độ mét cho lõi vật lý, đổi lại ô sau mỗi bước
   const moveIn = { sprint: false, jump: false, hold: false };
-  let climbNagAt = 0;
+  let climbNagAt = 0; const nagSeen = {};
   function freeStep(dxW, dzW, mag, dt) {
     const w = tileToWorld(player.x, player.y);
     const P = player.phys || (player.phys = { x: w.x, z: w.z });
@@ -1146,8 +1229,9 @@ export function startGame({ onExit = null } = {}) {
     player.alt = P.alt; player.air = P.air; player.swim = P.swim; player.wade = P.wade; player.y3 = P.y3; player.waterY = P.waterY; player.climb = !!P.climb; player.gliding = P.gliding; player.stamina = P.stamina; player.waterWalk = P.waterWalk ? ww : null;
     if (P.wwLost && !wwLostSeen) { wwLostSeen = true; toast('💦 Kiệt sức — mất phép đạp nước, rơi xuống nước. Lên bờ nghỉ cho hồi sức.'); } else if (!P.wwLost) wwLostSeen = false;
     if (P.splash) { player.splash = (player.splash || 0) + P.splash; P.splash = 0; }
-    if (r.blockedMsg === 'bank' && performance.now() - climbNagAt > 8000) { climbNagAt = performance.now(); toast('Bờ kè cao quá — hồi sức rồi đu lên, hoặc bơi tới bậc bến đá.'); }
-    if (r.blockedMsg === 'climb' && !canClimb && performance.now() - climbNagAt > 20000) { climbNagAt = performance.now(); toast('👑 Leo trèo, đu bám công trình dành cho Chân Nhân (VIP).'); }
+    // v4: mỗi lời nhắc chỉ một lần mỗi phiên (trước đây lặp 8 / 20 giây)
+    if (r.blockedMsg === 'bank' && !nagSeen.bank) { nagSeen.bank = 1; toast('Bờ kè cao quá — hồi sức rồi đu lên, hoặc bơi tới bậc bến đá.'); }
+    if (r.blockedMsg === 'climb' && !canClimb && !nagSeen.climb) { nagSeen.climb = 1; toast('👑 Leo trèo, đu bám công trình dành cho Chân Nhân (VIP).'); }
     updateStamina();
     return r;
   }
@@ -1359,7 +1443,7 @@ export function startGame({ onExit = null } = {}) {
   const GAN_VN = { 甲: 'Giáp', 乙: 'Ất', 丙: 'Bính', 丁: 'Đinh', 戊: 'Mậu', 己: 'Kỷ', 庚: 'Canh', 辛: 'Tân', 壬: 'Nhâm', 癸: 'Quý' };
   const ZHI_VN = { 子: 'Tý', 丑: 'Sửu', 寅: 'Dần', 卯: 'Mão', 辰: 'Thìn', 巳: 'Tỵ', 午: 'Ngọ', 未: 'Mùi', 申: 'Thân', 酉: 'Dậu', 戌: 'Tuất', 亥: 'Hợi' };
   const WXN = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
-  function econChart() { try { const src = state.player?.incarnation?.chart || state.player; return src && src.year ? chartOf(src) : null; } catch (e) { return null; } }
+  function econChart() { try { const src = chartSource(state); return src ? chartOf(src) : null; } catch (e) { return null; } }
   function econProfile() {
     const R = econChart(); if (!R) return null;
     const P = R.chart.pillars, y = state.player?.yong || {}, gz = (p) => `${GAN_VN[p.gan] || p.gan} ${ZHI_VN[p.zhi] || p.zhi}`;
@@ -1446,7 +1530,52 @@ export function startGame({ onExit = null } = {}) {
   // -------------------------------------------------------------------------
   // Cổng vào
   // -------------------------------------------------------------------------
-  async function enter() {
+  // --- hướng dẫn tân thủ (tutorial.js) ---------------------------------------------------------------------
+  const tutEl = (() => { const d = document.createElement('div'); d.className = 'hq-tut'; d.hidden = true; ($('hq-game') || document.body).appendChild(d); return d; })();
+  function tutUi() {
+    const st = TUT.current(state);
+    if (!st) { tutEl.hidden = true; return; }
+    const i = TUT.tutState(state).step;
+    tutEl.innerHTML = `<b role="button" tabindex="0" title="Thu gọn / mở">🧭 Tân thủ ${i + 1}/${TUT.STEPS.length} · ${esc(st.title)}</b><p>${esc(st.hint)}</p><div class="hq-actions">${st.station ? '<button class="hq-btn hq-primary" type="button" data-a="go">Dẫn đường</button>' : ''}<button class="hq-btn" type="button" data-a="skip">Bỏ qua hướng dẫn</button></div>`;
+    tutEl.querySelector('[data-a=go]')?.addEventListener('click', () => api.goTo(st.station));
+    tutEl.querySelector('[data-a=skip]').onclick = () => { TUT.skip(state); save(); tutUi(); };
+    tutEl.querySelector('b').onclick = () => tutEl.classList.toggle('mini');
+    // màn hẹp: hiện đầy đủ 6 giây rồi thu gọn còn một dòng (chạm để mở lại) — không che cảnh
+    tutEl.classList.remove('mini'); clearTimeout(tutUi.t); if (innerWidth < 760) tutUi.t = setTimeout(() => tutEl.classList.add('mini'), 6000);
+    tutEl.hidden = false;
+  }
+  api.tut = (ev) => {
+    const r = TUT.advance(state, ev); if (!r) return;
+    const got = S.grantTutorial(state, r.reward);
+    after(got, r.finished ? 'hoàn thành hướng dẫn tân thủ' : `tân thủ: ${TUT.STEPS[r.step - 1].title}`);
+    tutUi();
+  };
+
+  // --- nơi xuất hiện (spawn.js) ----------------------------------------------------------------------------
+  function homeSpawnPos() {
+    const H = I.homeState(state); if (!H.own) return null;
+    try {
+      if (E.isPhuH(H.own.h)) { const m = estateByH(H.own.h), mb = m.layout.buildings[0], p = m.toWorld(mb.x, mb.z + 1); return { x: p.x, z: p.z, name: m.name || 'biệt phủ' }; }
+      const r = roomByKey(`est:${H.own.h}`); if (r) { const q = insideOf(r); return { x: q.x, z: q.z - 1.5, name: r.title || 'nhà riêng' }; }
+    } catch (e) { /* nhà không còn trong bố cục */ }
+    return null;
+  }
+  function templeOf(ward) { const e = enterables().find((x) => x.kind === 'temple' && x.g === ward && String(x.key).startsWith('lm:')); return e ? { x: e.back.x, z: e.back.z, name: e.name } : null; }
+  function spawnList() {
+    const T = TUT.tutState(state), firstTime = !state.lastPos && !T.done && !T.skipped && !TUT.isVeteran(state);
+    const plaza = tileToWorld(START.x, START.y);
+    return spawnOptions({ lastPos: state.lastPos, home: homeSpawnPos(), templeOf, plaza, yong: state.player?.yong?.primary, firstTime });
+  }
+  let lastPosAt = 0;
+  function rememberPos() {
+    const now = performance.now(); if (now - lastPosAt < 10000) return; lastPosAt = now;
+    const w = tileToWorld(player.x, player.y);
+    if (!player.flying && savablePos(w.x, w.z, ROOM_X0)) { state.lastPos = { x: Math.round(w.x * 10) / 10, z: Math.round(w.z * 10) / 10, at: Date.now() }; S.saveState(state, storage); } // lưu máy (đám mây theo nhịp save thường)
+  }
+  addEventListener('pagehide', () => { lastPosAt = 0; rememberPos(); save(); });
+
+  async function enter(spawnChoice = null) {
+    if (spawnChoice && !Number.isFinite(spawnChoice.x)) spawnChoice = null; // gọi từ onclick: tham số là sự kiện chuột
     $('hq-gate').hidden = true;
     $('hq-game').hidden = false;
     if (!renderer) {
@@ -1456,11 +1585,8 @@ export function startGame({ onExit = null } = {}) {
       if (coarse) renderer.setStickHook?.(dynStick); // cần điều khiển động (P16)
       syncRooms();
       refreshEstateSigns();
-      // «Nghỉ tại đây» (giường trong nhà riêng): vào game thức dậy trong nhà
-      { const H = I.homeState(state); if (H.spawn === 'home' && H.own) {
-        if (E.isPhuH(H.own.h)) { const m = estateByH(H.own.h), mb = m.layout.buildings[0], p = m.toWorld(mb.x, mb.z + 1); const t = worldToTile(p.x, p.z); player.x = t.x; player.y = t.y; }
-        else { const r = roomByKey(`est:${H.own.h}`); if (r) { const t = worldToTile(insideOf(r).x, insideOf(r).z - 1.5); player.x = t.x; player.y = t.y; } }
-      } }
+      // v4 (G3): xuất hiện theo lựa chọn ở cổng (chỗ lần trước / nhà / miếu hợp mệnh / sân Sơn Môn; lần đầu = Tân Thủ)
+      { const o = spawnChoice || spawnList()[0]; if (o) { const t = worldToTile(o.x, o.z); player.x = t.x; player.y = t.y; } }
       // màn nạp thật: mọi việc nặng (sinh địa hình, nạp công trình gần, biên dịch shader, đẩy
       // texture) xong rồi mới mở — vào game là mượt, không khựng dần trong nửa phút đầu
       if (renderer.ready) {
@@ -1486,6 +1612,9 @@ export function startGame({ onExit = null } = {}) {
     }
     setTimeout(enableHd, 1500); // ảnh mặt / áo 2048 của nhân vật nạp sau khi đã vào
     ld.classList.add('hq-fadeout'); setTimeout(() => { ld.hidden = true; ld.classList.remove('hq-fadeout'); }, 700); // mở màn mờ dần, không tắt phụt
+    if (TUT.isVeteran(state) && !TUT.tutState(state).step && !state.lastPos) TUT.skip(state); // người chơi cũ: không bắt làm tân thủ
+    if (state.player?.birth) api.tut('chart');
+    tutUi();
     lifeStart();
     net.start();
     updateOnline();
@@ -1606,9 +1735,10 @@ export function startGame({ onExit = null } = {}) {
       body.innerHTML = `<p class="hq-welcome">Chào ${esc(state.player.name)} quay lại quán.</p>
         <p class="hq-sub">${esc(S.titleFor(state.xp || 0).name)} · ✦ ${state.phucKhi} ${TEXT.point} · chuỗi ${S.currentStreak(state)} ngày</p>
         <p>${swatch(y.primary)} Phẩm phục ${WX_NAMES[y.primary] || ''}${y.accent ? ` · đai ${WX_NAMES[y.accent]}` : ''}</p>
+        <div class="hq-spawn" role="radiogroup" aria-label="Xuất hiện ở đâu">${spawnList().map((o, i) => `<label class="hq-check"><input type="radio" name="hq-spawn" value="${i}"${o.def ? ' checked' : ''}> ${esc(o.label)}</label>`).join('')}</div>
         <button class="hq-btn hq-primary hq-big" id="hq-enter" type="button">Bước qua cổng</button>
         <button class="hq-btn" id="hq-rebirth" type="button">Sửa bát tự</button>`;
-      $('hq-enter').onclick = enter;
+      $('hq-enter').onclick = () => { const L = spawnList(), i = Number(body.querySelector('input[name=hq-spawn]:checked')?.value || 0); enter(L[i] || L[0]); };
       $('hq-rebirth').onclick = showBirth;
       return;
     }

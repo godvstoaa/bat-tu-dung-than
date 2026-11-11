@@ -9,6 +9,8 @@
 import assert from 'node:assert/strict';
 import * as MS from '../src/game/mansions.js';
 import * as CB from '../src/game/cityblocks.js';
+import * as LAYOUT from '../src/game/citylayout.js';
+import { roads4, renderHouses } from '../src/game/city4.js';
 import * as BQ from '../src/game/batquai.js';
 import * as EL from '../src/game/estate-layout.js';
 import * as T from '../src/game/terrain.js';
@@ -40,29 +42,28 @@ check('16 biệt phủ 4.000–10.000 m², 16 phong cách; 240 biệt thự 300�
   assert.equal(new Set(V.map((m) => m.style)).size, 8);
   assert.equal(new Set(E.map((m) => m.name)).size, E.length, 'trùng tên');
   E.forEach((m, i) => assert.equal(m.h, i, 'h phải khớp thứ tự rao bán'));
-  assert.equal(T.CITY_OCT, CB.OUTER_A);
+  assert.equal(T.CITY_OCT, LAYOUT.CITY.A); // v4: tường Ngoại Thành 2.125
 });
-check('nằm gọn trong vành phủ (giữa tường Trung Thành và Ngoại Thành), không đè nhau', () => {
-  for (const m of E) for (const c of corners(m)) { const o = octMax(c.x, c.z); assert.ok(o > CB.TRUNG_A + 10 && o < CB.OUTER_A - 4, `${m.name} góc o=${o.toFixed(1)}`); }
+check('v4: nằm trong Ngoại Thành (vành 1.500 → tường 2.125), không đè nhau', () => {
+  for (const m of E) for (const c of corners(m)) { const o = octMax(c.x, c.z); assert.ok(o > 1500 && o < LAYOUT.CITY.A - 4, `${m.name} góc o=${o.toFixed(1)}`); }
   const C = E.map((m) => corners(m, 0.3));
   for (let i = 0; i < E.length; i++) for (let j = i + 1; j < E.length; j++) {
     if (Math.hypot(E[i].x - E[j].x, E[i].z - E[j].z) > 160) continue;
     assert.ok(!sat(C[i], C[j]), `${E[i].name} đè ${E[j].name}`);
   }
 });
-check('không đè đường (vành, ngõ, phố nội khu), quảng trường VIP, nhà phố', () => {
-  const roads = CB.cityRoads();
+check('v4: không đè đường (đại lộ, vành, phố, ngõ — trừ đoạn nhường cho khuôn viên phủ), không đè nhà phố còn lại', () => {
+  const roads = roads4();
   for (const m of E) {
     const poly = corners(m, -0.2);
-    for (const r of roads) for (let i = 0; i + 1 < r.pts.length; i++) {
-      const [ax, az] = r.pts[i], [bx, bz] = r.pts[i + 1], L = Math.hypot(bx - ax, bz - az) || 1, ux = (bx - ax) / L, uz = (bz - az) / L, nx = -uz, nz = ux, hw = r.w / 2;
+    for (const r of roads) {
+      const ax = r.a.x, az = r.a.z, bx = r.b.x, bz = r.b.z, L = Math.hypot(bx - ax, bz - az) || 1, ux = (bx - ax) / L, uz = (bz - az) / L, nx = -uz, nz = ux, hw = r.w / 2;
+      if (Math.hypot((ax + bx) / 2 - m.x, (az + bz) / 2 - m.z) > L / 2 + 150) continue;
       const road = [{ x: ax + nx * hw, z: az + nz * hw }, { x: bx + nx * hw, z: bz + nz * hw }, { x: bx - nx * hw, z: bz - nz * hw }, { x: ax - nx * hw, z: az - nz * hw }];
-      assert.ok(!sat(poly, road), `${m.name} đè đường ${r.kind}`);
+      assert.ok(!sat(poly, road), `${m.name} đè đường ${r.kind} ${r.id}`);
     }
   }
-  const city = CB.generateCity();
-  for (const h of city.houses) assert.equal(MS.mansionAt(h.x, h.z, 1), null, `nhà phố ${h.id} trong khuôn viên`);
-  for (const l of [...city.landmarks, ...city.themes]) { const g = BQ.guaById(l.g), w = BQ.toWorld(g, l.u, l.v); assert.equal(MS.mansionAt(w.x, w.z, 1), null, l.name); }
+  for (const h of renderHouses()) assert.equal(MS.mansionAt(h.x, h.z, 1), null, `nhà phố ${h.key} trong khuôn viên`);
 });
 check('phong thủy: gò sau nhà chính, mặt nước trước nhà, nhà phụ bên Thanh Long (+x); hướng cửa ghi được', () => {
   for (const m of E) {

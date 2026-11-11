@@ -209,7 +209,7 @@ test('Trà Thất: chỗ ngồi bồ đoàn theo Trà Thất mới, không dính
   const tra = stationById('tra');
   for (const s of SEATS) assert.ok(Math.hypot(s.x - tra.spot.x, s.y - tra.spot.y) < 2, 'ghế phải ngay cạnh chỗ đứng Trà Thất');
   const room = readFileSync(new URL('../worker/quan-room.js', import.meta.url), 'utf8');
-  assert.ok(room.includes(`x: ${START.x}, y: ${START.y}`), 'worker/quan-room.js phải xuất phát tại START');
+  assert.ok(room.includes(`x: m.x ?? ${START.x}, y: m.y ?? ${START.y}`), 'worker/quan-room.js: nơi khách chọn (spawn.js), mặc định START');
 });
 
 test('A4: lá số mẫu khớp engine app chính', () => {

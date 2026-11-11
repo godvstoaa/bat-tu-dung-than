@@ -6,7 +6,8 @@
 //  Xuất cả hình học va chạm (tường rào có khe cổng, vách nhà có khe cửa, nền, mặt nước, gò sau) và người trong phủ.
 // ============================================================================
 import * as BQ from './batquai.js';
-import { mansionPlots, villaLots, BELT } from './cityblocks.js';
+import { BELT } from './cityblocks.js';
+import { phuPlots as mansionPlots, villaPlots as villaLots } from './city4.js'; // v4: biệt phủ / biệt thự dời sang thành mới, giữ h
 import { estateLayout, STYLES, VILLA_DISTRICT_NAME, compassOf } from './estate-layout.js';
 import { PHU_COUNT } from './estate-core.js';
 

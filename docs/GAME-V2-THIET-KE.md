@@ -595,3 +595,35 @@ Người dùng chê nhân vật xấu (mặt, da, dáng), nhà nhỏ sai cỡ, h
 - **Chưa làm được (cần người dùng)**: gọi `/api/npc/chat` và trọng tài trong Economy DO trên bản thật bằng tài khoản thật (cần đăng nhập — phần máy chủ đã kiểm bằng máy dev + LLM giả, phần mô hình đã kiểm trên backend thật ở trên).
 - **Dọn**: xoá `ai:config` giả khỏi KV máy dev; tắt máy chủ cục bộ và LLM giả. Khoá Meshy (40 ký tự): không có trong bất kỳ commit nào ở mọi nhánh, không có trong `dist/` hay trang bản thật — chỉ nằm trong `.env.meshy` (gitignore).
 
+
+---
+
+## V4 (2026-11-11) — Bói toán làm trục chính · Thành Bát Quái gấp 10 · quy hoạch lại 100%
+
+**Vì sao:** người chơi đến chủ yếu để xem bói / giải bát tự / phong thủy nhưng việc đó bị giấu sau nút bấm và lời rao; thông báo thừa
+khắp nơi; thành nhỏ, nhà mặt đường chính trông như tiệm mà chỉ «gõ cửa» được (47 tiệm / 2.300 cửa); cầu Huyền Hà là khối tường
+đúc; mọi người xuất hiện một chỗ; sảnh trọng điểm xa 1–1,3 km ngoài thành; nhiều điện vào được mà không có gì làm.
+
+**Đã làm:**
+- **Thầy bói AI** (`fortune-npc.js`, `fortune-ui.js`): gặp thầy là mở thẳng ô chat, AI (askAI + 38 tool tra cứu) trả lời theo lá số
+  của chính người chơi (kiếp luân hồi dùng lá số hư cấu — `chartSource`). 13 thầy có giọng persona riêng (`askAI personaForce`, chỉ
+  trong game). Khách chưa đăng nhập 10 câu / ngày. Sửa lỗi `econChart` / `chartOf(state.player)` đọc sai khoá (luôn null).
+- **Miếu** (`temples.js`): mỗi miếu một vị thần + thầy giữ miếu + nghi thức riêng (xin xăm Quan Âm, Thái Tuế, hợp hôn, la bàn, xem
+  ngày…). Ba điện Văn Xương / Đẩu Mẫu / Lão Quân có thầy ngồi bàn. Phố Thầy Bói Nội Thành: 269 quầy, bấm là chat.
+- **Thông báo**: hàng đợi 1 cái / 1,5 s + gộp trùng; dồn dập / đầu ngày → MỘT thẻ «Sáng nay»; bỏ toast từng việc, toast đôi, lời
+  rao mở trạm, nhắc lặp 8 / 20 / 45 s; NPC nói thưa (30–45 s, bỏ chen gợi ý).
+- **Thành v4** (`citylayout.js` dữ liệu, `city4.js` lớp ghép): thế giới 8.192 m, tường Ngoại Thành trung đoạn 2.125 m (diện tích
+  ×10), ~22.900 nhà, **8.100 tiệm** (mọi lô mặt đại lộ / vành / quảng trường), 16 khu (8 Trung Thành quanh chợ, 8 Ngoại Thành quanh
+  sảnh trọng điểm cũ — đã dời vào thành), sông Huyền Hà xuyên phía Nam giữa kè đá đứng, 5 cầu (dốc ≤ 8 %, tĩnh không 9 m),
+  3 thủy môn. Nhà dựng theo ô, bậc vừa dùng `.lod1` (`.lod2` giản lược quá tay — nhà nát vụn), va chạm ô 0,5 m lưu bitset theo mảnh
+  (23 triệu ô vượt trần Set của JS).
+- **Nhà riêng giữ nguyên h**: 16 biệt phủ (2 khối đầu dải g3 mỗi cung, gộp hai hàng), 240 biệt thự (lô nhà vườn g2 / g3), 27 nhà
+  phố — cùng hạng, cùng vùng bài trí / phòng trong → người đã mua giữ nhà, chỉ dời chỗ, không cần hoàn tiền.
+- **Chỗ làm (Guild DO)**: chỉ số tiệm k đổi → `GuildEngine.migrate()` bỏ chỗ giữ / hợp đồng cũ một lần (tay nghề, uy tín giữ nguyên).
+- **Xuất hiện + tân thủ** (`spawn.js`, `tutorial.js`): lần đầu Tân Thủ (sân Sơn Môn, cạnh Thầy Tử Bình); sau đó chọn chỗ lần
+  trước / nhà riêng / miếu ứng Dụng thần / Sơn Môn; máy chủ nhận nơi xuất hiện trong biên. Hướng dẫn 8 bước có nút dẫn đường.
+- **Xe ngựa nội thành**: bấm bản đồ nhỏ → bản đồ cả thành với 41 trạm, bấm trạm là đi (5 đồng; dưới cấp 5 miễn phí).
+- **Máy chủ phát vị trí theo vùng** (~600 m; người xa nhận gói thưa ≤ 1 / 2 s).
+
+**Kiểm:** `test-game-fortune`, `test-game-spawn`, `test-game-city-v4` mới; viết lại `test-game-homes / items / mansion / water /
+motion / jobs` cho thành v4; ảnh chụp kiểm bằng `scripts/shot-city.mjs` (Playwright).

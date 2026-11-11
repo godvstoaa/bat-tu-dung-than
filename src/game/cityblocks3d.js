@@ -14,7 +14,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import * as T from './terrain.js';
 import * as BQ from './batquai.js';
 import * as CB from './cityblocks.js';
-import { loadModel, instanceModel, warmObject } from './assets.js';
+import { loadModel, loadModelPrivate, instanceModel, warmObject } from './assets.js';
 import { addSolidOBB, addSolidCircle, addSolidSegment, addTall } from './obstacles.js';
 import { addLight, glowAll } from './lights.js';
 import { place, pond, field, yard, arena, nameBoard, mats } from './batquai3d.js';
@@ -22,10 +22,10 @@ import * as CN from './canals.js';
 import * as AK from './archkit.js';
 import { innerHouses } from './innerfill.js';
 import { stoneMaterial } from './ground-tex.js';
-import { houseLooks } from './citylook.js';
+import { renderHouses } from './city4.js';
 
 const H = (x, z) => T.heightAt(x, z);
-const CELL = 96, CLOSE = 14, NEAR = 40, MID = 110; // CLOSE / NEAR: theo từng nhà · MID: theo ô (khối xa gộp theo ô)
+const CELL = 128, CLOSE = 0, NEAR = 40, MID = 80, FAR_MAX = 1300; // v4: ô khối xa 128 m (ngoài 1,3 km ẩn — sương che). Nhà < 40 m: .lod1 có bóng; ô < 80 m: .lod1 không bóng; xa hơn: khối thủ tục gộp theo ô. Bậc sát .mid tắt (bản .mid nhà phố bóng kim loại, nát)
 const range = (a, b, s) => { const o = []; for (let x = a; x <= b; x += s) o.push(x); return o; };
 const axisRy = (g) => Math.atan2(-g.dir[1], g.dir[0]); // x cục bộ dọc trục u của cung
 
@@ -44,8 +44,10 @@ export function outerWall(grp, A = CB.OUTER_A, WH = 17) {
       { const L2 = Math.hypot(b.x - a.x, b.z - a.z); addTall((a.x + b.x) / 2, (a.z + b.z) / 2, L2 / 2, WT / 2 + 0.4, Math.atan2(-(b.z - a.z), b.x - a.x), H((a.x + b.x) / 2, (a.z + b.z) / 2) + WH - 1.5); } // mặt thành đi được
       const ex = b.x - a.x, ez = b.z - a.z, len = Math.hypot(ex, ez), n = Math.max(1, Math.ceil(len / 12)), ry = Math.atan2(-ez, ex);
       for (let i = 0; i < n; i++) {
-        const t = (i + 0.5) / n, cx = a.x + ex * t, cz = a.z + ez * t, y = H(cx, cz), l = len / n + 0.5;
-        box(l, WH, WT, cx, y + WH / 2 - 1.5, cz, ry, segGeo);
+        const t = (i + 0.5) / n, cx = a.x + ex * t, cz = a.z + ez * t, l = len / n + 0.5;
+        const wet = H(cx, cz) < -1.5, y = wet ? 0 : H(cx, cz); // v4: sông xuyên tường → thủy môn (tường treo trên vòm, chừa 7 m trên mặt nước −6)
+        if (wet) box(l, WH - 1.5 - 1, WT, cx, (WH - 1.5 + 1) / 2, cz, ry, segGeo);
+        else box(l, WH, WT, cx, y + WH / 2 - 1.5, cz, ry, segGeo);
         box(l, 1.4, WT + 1.4, cx, y + WH - 0.8, cz, ry, capGeo);
         for (const k of [-0.32, 0, 0.32]) box(1.6, 1.6, 1.1, cx + Math.cos(ry) * k * l, y + WH + 0.6, cz - Math.sin(ry) * k * l, ry, merGeo);
       }
@@ -130,7 +132,7 @@ export const houseScale = (h, size) => {
   return { kx, ky, kz };
 };
 export const houseHeight = (h, sp) => Math.min((h.lotF || h.f) * 1.015 * sp.hd * (1 + Math.min(0.12, Math.max(-0.04, ((h.ys || 1) - 1) * 0.2))), HCAP[h.id] || 10.5);
-function instancedSet(gltf, houses, { shadow, flat = false }) {
+export function instancedSet(gltf, houses, { shadow, flat = false }) {
   const root = gltf.scene; root.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(root), size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
   const meshes = [];
@@ -206,11 +208,9 @@ function farGeometry(list) {
 const farMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.92, flatShading: true });
 
 export async function cityHouses(grp) {
-  const C = CB.generateCity();
-  const looks = houseLooks();
-  const houses = [...C.houses, ...innerHouses()].map((h, i) => ({ ...h, y: H(h.x, h.z) })); // Ngoại Thành + nhà chen Nội Thành
-  for (const h of houses) addSolidOBB(h.x, h.z, h.hw - 0.04, h.hd - 0.25, h.ry); // va chạm theo khung nhà gốc — hai bên sát vách (nhà liền vách, không lọt khe)
-  houses.forEach((h, i) => { h.lotF = h.f; const L = looks[i]; if (L) { h.id = L.id; h.f = L.f; h.ys = L.ys; h.tint = L.tint; } });
+  // v4 (thành ×10): ~22.900 nhà từ citylayout qua city4.renderHouses (mặt tiền đúng loại tiệm, nhà theo cung) + nhà chen Sơn Môn
+  const houses = [...renderHouses(), ...innerHouses().map((h) => ({ ...h, lotF: h.f }))].map((h) => ({ ...h, y: H(h.x, h.z) }));
+  for (const h of houses) addSolidOBB(h.x, h.z, h.hw - 0.04, h.hd - 0.25, h.ry); // va chạm theo khung lô — nhà liền vách, không lọt khe
   houses.forEach((h) => { const sp = CB.HOUSE_SPECS[h.id]; if (sp) addTall(h.x, h.z, h.hw - 0.04, h.hd - 0.25, h.ry, h.y + houseHeight(h, sp) * 0.62); }); // mái (leo trèo) // lớp hình: mẫu đặc trưng, mặt tiền tiệm, màu cung
   // ô không gian
   const cells = new Map();
@@ -228,7 +228,8 @@ export async function cityHouses(grp) {
   // trên màn nạp). Chưa nạp xong thì nhà gần tạm dùng bậc thấp hơn đã có.
   const models = [];
   const ids = Object.keys(CB.HOUSE_SPECS).filter((id) => houses.some((h) => h.id === id));
-  const base = await Promise.all(ids.map(async (id) => (await loadModel(`${id}.lod2`)) || (await loadModel(`${id}.lod1`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`))));
+  // v4: bậc vừa dùng .lod1 (sạch) — .lod2 giản lược quá tay, hình nhà nát vụn (kiểm 2026-11-11: dựng nhân bản riêng .lod2 vs .lod1)
+  const base = await Promise.all(ids.map(async (id) => (await loadModelPrivate(`${id}.lod1`)) || (await loadModelPrivate(`${id}.lod2`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`))));
   ids.forEach((id, n) => {
     const g = base[n]; if (!g) return;
     const mine = houses.map((h, i) => (h.id === id ? i : -1)).filter((i) => i >= 0);
@@ -245,7 +246,7 @@ export async function cityHouses(grp) {
     if (m[tier] || m.busy.has(tier)) return;
     m.busy.add(tier);
     const p = (async () => {
-      const g = tier === 'near' ? (await loadModel(`${m.id}.lod1`)) || (await loadModel(`${m.id}.mid`)) : (await loadModel(`${m.id}.mid`)) || (await loadModel(`${m.id}.lod1`));
+      const g = tier === 'near' ? (await loadModelPrivate(`${m.id}.lod1`)) || (await loadModelPrivate(`${m.id}.mid`)) : (await loadModelPrivate(`${m.id}.mid`)) || (await loadModelPrivate(`${m.id}.lod1`));
       if (!g) return;
       const set = instancedSet(g, m.list, { shadow: true });
       const tmp = new THREE.Group(); for (const x of set.meshes) tmp.add(x.im);
@@ -272,7 +273,8 @@ export async function cityHouses(grp) {
     for (const c of cells.values()) {
       const dx = Math.max(c.x0 - px, 0, px - (c.x0 + CELL)), dz = Math.max(c.z0 - pz, 0, pz - (c.z0 + CELL));
       const d = Math.hypot(dx, dz), tier = d < MID ? 1 : 2;
-      if (tier !== c.tier) { c.tier = tier; c.far.visible = tier === 2; changed = true; }
+      if (tier !== c.tier) { c.tier = tier; changed = true; }
+      c.far.visible = tier === 2 && d < FAR_MAX;
     }
     if (!changed) return;
     const tierOf = new Int8Array(houses.length);

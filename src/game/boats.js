@@ -12,7 +12,6 @@ import * as T from './terrain.js';
 import { waterAt, wind } from './water.js';
 import { clearanceAt, piers } from './bridges.js';
 import { GUA } from './batquai.js';
-import { MOAT, MOAT_LANE, AVE_CANAL } from './canals.js';
 import { riverPoints } from './waterways.js';
 
 // idx = mã trong gói mạng (mv.b); price = văn mỗi 30 phút thuê
@@ -122,16 +121,7 @@ let DOCK_CACHE = null;
 export function docks() {
   if (DOCK_CACHE) return DOCK_CACHE;
   const out = [];
-  const outEdge = MOAT.a + MOAT.w / 2;
-  for (const [id, gid, v] of [['moat_li', 'li', 52], ['moat_kan', 'kan', -52]]) { // xa cổng / tháp góc Nội Thành
-    const g = GUA.find((q) => q.id === gid), stand = Wg(g, outEdge + 2, v), sp = Wg(g, MOAT_LANE, v);
-    // dọc hào: hướng tiếp tuyến (vuông góc trục u)
-    out.push({ id, name: gid === 'li' ? 'Bến Hào Cảnh Môn' : 'Bến Hào Hưu Môn', kind: 'moat', x: stand.x, z: stand.z, spawn: { x: sp.x, z: sp.z, h: axisH(g) + Math.PI / 2 }, types: ['do', 'hoa'] });
-  }
-  for (const gid of AVE_CANAL.gua) {
-    const g = GUA.find((q) => q.id === gid), u = outEdge + 30 + 60 * 2, stand = Wg(g, u, AVE_CANAL.v1 + 2), sp = Wg(g, u, 0);
-    out.push({ id: `canal_${gid}`, name: gid === 'kan' ? 'Bến Kênh Khảm Thủy' : 'Bến Kênh Tốn Phong', kind: 'canal', x: stand.x, z: stand.z, spawn: { x: sp.x, z: sp.z, h: axisH(g) }, types: ['do', 'hoa'] });
-  }
+  // v4: hào / kênh Bát Môn cũ đã bỏ — bến chỉ còn trên sông Huyền Hà (trong thành, bờ kè có bậc) và hồ Cùng Thông
   // sông: dưới Nam Môn Đại Kiều (bờ Bắc), gần Trích Thiên, cửa sông vào hồ
   const P = riverPoints();
   const fracAt = (x) => { let bi = 0, bd = Infinity; P.forEach((p, i) => { const d = Math.abs(p.x - x); if (d < bd) { bd = d; bi = i; } }); return bi / (P.length - 1); };

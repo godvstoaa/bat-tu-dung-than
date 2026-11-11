@@ -38,8 +38,10 @@ await check('31 nghề = 30 nghề đặc tả §4.2 (6 mỗi hành) + cân trà
   for (const [t, j] of Object.entries(J.JOB_OF_SHOP)) { assert.equal(J.WORK[j].shop, t); assert.ok(J.SEATS[t]?.length === 4, t); assert.ok(['fire', 'herbs', 'wheel', 'ore', 'deliver'].includes(J.WORK[j].game)); }
   for (const w of Object.values(J.WORK)) if (w.theme?.items && w.game === 'herbs') assert.ok(w.theme.items.length >= 12, w.id);
   const n = (t) => [...W.values()].filter((w) => w.type === t).length;
-  assert.equal(n('tuu'), 4); assert.equal(n('dichtram'), 8); assert.equal(n('duoc'), 4); assert.equal(n('gom'), 3); assert.equal(n('loren'), 3);
-  assert.equal(postRing().length, 8);
+  // v4 (thành ×10): mỗi lô mặt phố lớn là tiệm — hàng trăm chỗ làm mỗi loại, 16 dịch trạm (mỗi khu Trung / Ngoại một trạm)
+  for (const t of ['tuu', 'duoc', 'gom', 'loren']) assert.ok(n(t) >= 100, `${t}: ${n(t)}`);
+  assert.equal(n('dichtram'), 16);
+  assert.equal(postRing().length, 16);
 });
 await check('nghề ngoài tiệm: chỉ vào ca / làm việc trong khu làm (bến, rừng, cổng, phòng tiệm); pháo hoa chỉ đêm rằm 18–23 giờ', async () => {
   const g = new GuildEngine(new MemStore()), now = Date.parse('2026-06-10T03:00:00Z');

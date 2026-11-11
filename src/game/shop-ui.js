@@ -9,6 +9,7 @@
 //    home   giấy tờ nhà cạnh cửa: mua căn đang rao / bài trí nhà mình / khen nhà người khác
 //  api (main.js): state, toast, after, panel, setTeaColor, todayNpc, goTo, travel, estate, rebuildRoom
 // ============================================================================
+import { GODS, godOfTemple } from './temples.js';
 import * as I from './items.js';
 import * as E from './estate.js';
 import { scoreHome, warmReward } from './homefs.js';
@@ -60,7 +61,7 @@ function itemCard(api, it, { deal = null, shopName = '', refresh = () => {} } = 
   act.querySelector('[data-a=buy]').onclick = () => {
     const r = deal ? I.buyDeal(s, deal) : I.buyItem(s, it.id);
     if (!r.ok) { api.toast(r.reason); return; }
-    api.toast(`Đã mua «${it.name}»${shopName ? ` ở ${shopName}` : ''}${it.kind === 'decor' ? ' · cất vào túi, về nhà bài trí' : ''}`); api.after(0); refresh();
+    api.toast(`Đã mua «${it.name}»${shopName ? ` ở ${shopName}` : ''}${it.kind === 'decor' ? ' · cất vào túi, về nhà bài trí' : ''}`); api.tut?.('buy'); api.after(0); refresh();
   };
   act.querySelector('[data-a=use]')?.addEventListener('click', () => { const r = I.useBuff(s, it.id, Date.now(), todayStr()); api.toast(r.ok ? r.msg : r.reason); api.after(0); refresh(); });
   act.querySelector('[data-a=sell]')?.addEventListener('click', () => { const r = I.sellItem(s, it.id); if (r.ok) api.toast(`Đã bán «${it.name}»`); api.after(0); refresh(); });
@@ -94,7 +95,7 @@ function shopBody(api, room) {
       root.append(el(`<p class="hq-sub">${esc(shop.owner)}: «${esc(rare ? `Hôm nay tiệm có ${rare.name} — hàng quý, ít khi về.` : 'Hàng tốt giá phải chăng, khách cứ xem.')}»</p>`));
       const list = I.itemsOfShop(room.type).filter((it) => !it.rare || it === rare);
       for (const it of list) grid.append(itemCard(api, it, { deal: deal?.id === it.id ? deal : null, shopName: shop.name, refresh: render }));
-      if (!list.length) grid.append(el('<p class="hq-note">Tiệm này không bán hàng — chỉ có dịch vụ.</p>'));
+      if (!list.length) grid.append(el(`<p class="hq-note">Tiệm này không bán hàng — dịch vụ ở hai bên quầy: ${esc((I.SHOP_TYPES.find((t) => t.id === room.type)?.svc || []).map((id) => svcInfo(id)?.name || id).join(', ') || '—')}.</p>`));
     } else {
       const inv = I.homeState(s).inv, ids = Object.keys(inv);
       if (!ids.length) grid.append(el('<p class="hq-note">Túi đồ trống. Đồ mua ở các tiệm cất ở đây; về nhà riêng để bài trí.</p>'));
@@ -342,6 +343,7 @@ function useItem(api, room, d) {
 // --- giấy tờ nhà cạnh cửa
 function deedBody(api, room, d) {
   const s = api.state, l = room.listing, h = I.homeState(s), info = api.estate?.info?.(l.h);
+  if (h.own?.h !== l.h) api.tut?.('estate');
   const root = el('<div class="hq-yc"></div>');
   const T = E.TIERS[l.tier], st = E.fitStars(l.wx, yongOf(s));
   root.append(el(`<div><b>${esc(l.name)}</b> <small>${esc(T.name)} · ${l.W ? `${l.W}×${l.D} m (${l.W * l.D} m²) · ${esc(l.style)}` : `${E.roomOf(l).w}×${E.roomOf(l).d} m`} · phường ${esc(BQ.guaById(l.g).name)} (${esc(I.WX_NAME[l.wx])})</small>${l.facing ? `<p class="hq-sub">🧭 ${esc(l.facing.text)} · ${esc(l.facing.trach)} · sau lưng có gò (tọa sơn), trước nhà có mặt nước (minh đường)</p>` : ''}<p>${'★'.repeat(st)}${'☆'.repeat(5 - st)} ${esc(E.FIT_TEXT[st])}</p></div>`));
@@ -376,9 +378,25 @@ function prayBody(api, room) {
     if (homeGot(s, key)) { api.toast('Hôm nay đã thắp hương ở điện này.'); return; }
     if (inc) I.consume(s, inc.id);
     const got = grantHome(s, key, inc ? 2 + (inc.tier || 1) : 1);
+    api.tut?.('pray');
     api.toast(`Khói hương nghi ngút${got ? ` · +${got} Phúc Khí` : ''}`); api.after(got); api.panel.close();
   };
   return root;
+}
+
+// v4 (G4): miếu = chat với thầy giữ miếu theo lá số + nghi thức riêng của vị thần + thắp hương (temples.js)
+function templeBody(api, room) {
+  const god = GODS[godOfTemple(room.key, room.lm?.g || room.g)];
+  const box = el('<div class="hq-loadbox"><p class="hq-sub">Đang vào điện…</p></div>');
+  Promise.all([import('./fortune-ui.js'), import('./stations.js')]).then(([F, ST]) => {
+    const open = (title, body) => body && api.panel.open({ title, body });
+    const extras = [
+      { label: '🪔 Thắp hương', onClick: () => open(room.title, prayBody(api, room)) },
+      { label: god.ritualLabel, onClick: () => open(god.ritualLabel.replace(/^\S+\s/, ''), god.ritual === 'ancổ' ? ST.openClassicalList(api) : ST.STATION_BASE[god.ritual]?.(api)) },
+    ];
+    if (box.isConnected) box.replaceWith(F.fortuneBody(api, god.master, { extras }));
+  }).catch(() => { box.replaceWith(prayBody(api, room)); });
+  return box;
 }
 
 /** Mở điểm tương tác: trả { title, body } để main.js mở bảng, hoặc null (đã xử lý bằng thông báo) */
@@ -393,7 +411,7 @@ export function openSpot(api, st) {
     case 'owner': return { title: room.shop.name, body: shopBody(api, room) };
     case 'ware': { const it = I.ITEM[d.item]; const box = el('<div class="hq-yc"></div>'); box.append(balance(api)); const today = todayStr(); const deal = I.dailyDeal(room.type, room.shop.k, today); const rf = () => { box.replaceWith(openSpot(api, st).body); }; box.append(itemCard(api, it, { deal: deal?.id === it.id ? deal : null, shopName: room.shop.name, refresh: rf })); const all = el('<div class="hq-actions"><button class="hq-btn" type="button">Xem cả tiệm</button></div>'); all.querySelector('button').onclick = () => api.panel.open({ title: room.shop.name, body: shopBody(api, room) }); box.append(all); return { title: it.name, body: box }; }
     case 'svc': return { title: svcInfo(d.svc).name, body: svcBody(api, room, d.svc) };
-    case 'pray': return { title: room.title, body: prayBody(api, room) };
+    case 'pray': return { title: room.title, body: templeBody(api, room) };
     case 'use': { const r = useItem(api, room, d); return r || null; }
     case 'home': return { title: 'Giấy tờ nhà', body: deedBody(api, room, d) };
     default: return null;

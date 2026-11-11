@@ -15,7 +15,7 @@ import { cityShops } from '../src/game/shops.js';
 import { listings } from '../src/game/estate.js';
 import { createState, recordCase } from '../src/game/state.js';
 import * as BQ from '../src/game/batquai.js';
-import { houseLooks, WARDS } from '../src/game/citylook.js';
+import { renderHouses, modelOf } from '../src/game/city4.js';
 import { generateCity, HOUSE_SPECS } from '../src/game/cityblocks.js';
 import { innerHouses } from '../src/game/innerfill.js';
 
@@ -82,12 +82,11 @@ check('hàng hiếm + giảm giá tất định theo ngày, đúng loại tiệm
   assert.ok(days.size >= 3, 'giảm giá không xoay vòng');
 });
 const S = cityShops();
-check(`${S.length} cửa hàng: cung nào cũng ≥ 4 tiệm, mọi loại tiệm có chi nhánh, có 8 dịch trạm + 1 nha môn`, () => {
-  for (const g of BQ.GUA) assert.ok(S.filter((s) => s.g === g.id).length >= 4, g.id);
-  for (const t of Object.keys(I.SHOP_TYPES)) assert.ok(S.some((s) => s.type === t), `thiếu ${t}`);
-  assert.equal(S.filter((s) => s.type === 'dichtram').length, 8);
-  assert.equal(S.filter((s) => s.type === 'namon').length, 1);
-  const names = new Set(S.map((s) => s.name)); assert.equal(names.size, S.length, 'trùng tên tiệm');
+check(`v4: ${S.length} cửa hàng: cung nào cũng ≥ 500 tiệm, mọi loại tiệm có chi nhánh, 16 dịch trạm + 16 nha môn + 16 tiền trang`, () => {
+  for (const g of BQ.GUA) assert.ok(S.filter((s) => s.g === g.id).length >= 500, g.id);
+  for (const t of Object.keys(I.SHOP_TYPES)) if (t !== 'may') assert.ok(S.some((s) => s.type === t), `thiếu ${t}`); // Tiệm May: quầy Thợ May trong sân Sơn Môn
+  for (const t of ['dichtram', 'namon', 'tientrang']) assert.equal(S.filter((s) => s.type === t).length, 16, t);
+  assert.equal(new Set(S.map((s) => s.k)).size, S.length, 'trùng k');
 });
 check('cửa hàng không trùng căn rao bán; mặt tiền gọn trong khung nhà cũ', () => {
   const est = new Set(listings().filter((l) => l.hi != null).map((l) => l.hi));
@@ -97,16 +96,13 @@ check('cửa hàng không trùng căn rao bán; mặt tiền gọn trong khung n
   }
 });
 
-check('bản sắc phố: ≥ 20 mẫu nhà, không hai căn cùng mẫu liền nhau, mẫu mới gọn trong khung, tiệm đúng mặt tiền, 16 phường', () => {
-  const L = houseLooks(), all = [...generateCity().houses, ...innerHouses()];
-  assert.equal(L.length, all.length);
-  assert.ok(new Set(L.map((l) => l.id)).size >= 20);
-  for (let i = 1; i < all.length; i++) if (L[i].id === L[i - 1].id) assert.ok(Math.hypot(all[i].x - all[i - 1].x, all[i].z - all[i - 1].z) >= (L[i].f + L[i - 1].f) / 2 + 2, `căn ${i} trùng mẫu căn trước`);
-  L.forEach((l, i) => { assert.ok(HOUSE_SPECS[l.id], l.id); assert.ok(l.f <= all[i].f + 1e-6, `căn ${i} tràn khung`); assert.ok(l.tint.every((v) => v > 0.6 && v < 1.1)); });
-  for (const s of S) if (s.hi != null) assert.equal(L[s.hi].id, s.facade, s.name);
-  assert.equal(new Set(Object.values(WARDS).flat()).size, 16);
-  // cung Khảm có nhà ven kênh, Khôn có kho lương
-  const by = (g, id) => all.some((h, i) => h.g === g && L[i].id === id);
+check('v4 bản sắc phố: ≥ 20 mẫu nhà, tiệm đúng mặt tiền theo loại, nhà theo cung (Khảm nhà ven sông, Khôn kho lương)', () => {
+  const R = renderHouses();
+  assert.ok(new Set(R.map((h) => h.id)).size >= 20);
+  for (const h of R) { assert.ok(HOUSE_SPECS[h.id], h.id); assert.ok(h.lotF <= h.f + 1e-6, `${h.key} tràn lô`); }
+  const byKey = new Map(R.map((h) => [h.key, h]));
+  for (const s of S) if (s.hi != null && s.type !== 'tientrang') assert.equal(byKey.get(s.hi).id, modelOf({ use: 'shop', type: s.type }), s.name);
+  const by = (g, id) => R.some((h) => h.g === g && h.id === id);
   assert.ok(by('kan', 'bq_canal_house') && by('kun', 'bq_granary'));
 });
 

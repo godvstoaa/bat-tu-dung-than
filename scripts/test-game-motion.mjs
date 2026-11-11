@@ -61,21 +61,20 @@ check('leo trèo: không VIP bị chặn (nhắc mở khoá); VIP đu bám leo l
   run(v, { dx: 1, dz: 0, canClimb: true }, 3);
   assert.ok(v.x > BX + 3 && Math.abs(v.y3) < 0.05, `rơi về đất: x=${v.x.toFixed(1)} y=${v.y3.toFixed(2)}`);
 });
-check('bơi: xuống hào thì nổi nhấp nhô quanh «mặt nước − 1 m», bơi chậm; đu người trèo lên kè 2,2 m (tốn thể lực)', () => {
-  const p = { x: 60, z: -(MOAT.a + MOAT.w / 2 + 1.5) }; run(p, idle, 0.3); // bờ ngoài hào phía Bắc, lệch khỏi đại lộ Khảm
-  assert.ok(Math.abs(p.y3 - 0) < 0.05, `đứng bờ y=${p.y3}`);
-  run(p, { dx: 0, dz: 1 }, 1.5); // bước xuống hào
-  let lo = 9, hi = -9; for (let i = 0; i < 180; i++) { MO.moveFree(p, idle, dt, BASE); if (i > 60) { lo = Math.min(lo, p.y3); hi = Math.max(hi, p.y3); } }
+check('v4 bơi: từ kè sông trong thành bước xuống thì nổi nhấp nhô quanh «mặt nước − 1 m», bơi chậm', () => {
+  const Q = riverPoints().find((q) => T.cityOctDist(q.x, q.z) < -300); // đoạn sông giữa thành, kè đứng
+  const nx = -Q.tz, nz = Q.tx, s0 = Q.w + 3;
+  const p = { x: Q.x + nx * s0, z: Q.z + nz * s0 }; run(p, idle, 0.3);
+  assert.ok(Math.abs(p.y3 - 0) < 0.6, `đứng bờ kè y=${p.y3}`);
+  run(p, { dx: -nx, dz: -nz }, 2.5); // bước ra mép kè, rơi xuống sông
+  let lo = 9, hi = -9; for (let i = 0; i < 240; i++) { MO.moveFree(p, idle, dt, BASE); if (i > 120) { lo = Math.min(lo, p.y3); hi = Math.max(hi, p.y3); } }
   assert.ok(p.swim, 'phải đang bơi');
-  assert.ok(lo > CANAL_WATER - MO.FLOAT - 0.4 && hi < CANAL_WATER - MO.FLOAT + 0.4, `nổi ${lo.toFixed(2)}…${hi.toFixed(2)}`);
-  const z0 = p.z; run(p, { dx: 0, dz: 1 }, 2); const v = (p.z - z0) / 2;
-  assert.ok(v > 0.8 && v < 2, `bơi ${v.toFixed(2)} m/s`);
-  const st = p.stamina; run(p, { dx: 0, dz: -1 }, 6); // bơi ngược ra bờ, trèo kè
-  assert.ok(!p.swim && Math.abs(p.y3 - 0.35) < 0.6 && p.z < -(MOAT.a + MOAT.w / 2), `đã lên bờ: swim=${p.swim} y=${p.y3.toFixed(2)}`);
-  assert.ok(p.stamina < st, 'trèo kè tốn thể lực');
+  assert.ok(lo > T.WATER - MO.FLOAT - 0.6 && hi < T.WATER - MO.FLOAT + 0.6, `nổi ${lo.toFixed(2)}…${hi.toFixed(2)}`);
+  const x0 = p.x, z0 = p.z; run(p, { dx: -nx, dz: -nz }, 2); const v = Math.hypot(p.x - x0, p.z - z0) / 2;
+  assert.ok(v > 0.3 && v < 3, `bơi ${v.toFixed(2)} m/s`);
 });
 // điểm giữa sông Huyền Hà (đoạn thẳng phía Nam thành) và hướng xuôi dòng
-const RP = riverPoints().find((q) => q.x > -250 && q.x < -150);
+const RP = riverPoints().find((q) => q.x > -3300 && q.x < -2600 && T.cityOctDist(q.x, q.z) > 150); // v4: đoạn sông ngoài thành (bờ tự nhiên có bãi nông)
 check('sông: bơi thường ngược dòng giữa lạch gần như đứng yên (≤ 0,25 m/s), xuôi dòng nhanh hơn hẳn; gắng sức thì tiến được', () => {
   const up = { x: RP.x, z: RP.z, y3: T.WATER - 1, stamina: 100 }, dn = { x: RP.x, z: RP.z, y3: T.WATER - 1, stamina: 100 };
   run(up, idle, 0.5); run(dn, idle, 0.5);

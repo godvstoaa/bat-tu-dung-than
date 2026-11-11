@@ -96,7 +96,7 @@ export class TownShard extends DurableObject {
       let acct = null;
       if (m.tok && this.env.ACCOUNTS) { try { acct = await this.env.ACCOUNTS.get(this.env.ACCOUNTS.idFromName('accounts')).consumeWsToken(m.tok); } catch (e) { acct = null; } }
       const uid = acct?.uid || null;
-      Object.assign(a, { uid, ready: true, name: m.name, robe: m.robe, acc: m.acc, cos: m.cos, look: m.look, title: m.title, pid: m.pid, u: await stableId(uid ? accountPid(uid) : m.pid, a.id), x: 11.875, y: 33.875, h: 0, s: 0, helloAt: 0, mvFirst: true }); // = world.js › START (giữa sân Sơn Môn)
+      Object.assign(a, { uid, ready: true, name: m.name, robe: m.robe, acc: m.acc, cos: m.cos, look: m.look, title: m.title, pid: m.pid, u: await stableId(uid ? accountPid(uid) : m.pid, a.id), x: m.x ?? 11.875, y: m.y ?? 33.875, h: 0, s: 0, helloAt: 0, mvFirst: true }); // nơi khách chọn (đã kiểm biên ở parseClient), mặc định world.js › START
       ws.serializeAttachment(a);
       this.send(ws, {
         t: 'welcome', v: P.VERSION, you: a.id, room: a.room, renamed: m.badName ? a.name : undefined,
@@ -120,7 +120,11 @@ export class TownShard extends DurableObject {
         else { const c = P.sanityMv(a, m.x, m.y); m.x = c.x; m.y = c.y; }
         a.x = m.x; a.y = m.y; a.h = m.h; a.s = m.s; a.a = m.a || 0; a.w = m.w || 0; a.b = m.b || 0; a.fs = m.fs || 0;
         ws.serializeAttachment(a);
-        this.broadcast({ t: 'mv', id: a.id, x: m.x, y: m.y, h: m.h, s: m.s, a: a.a, w: a.w, b: a.b, fs: a.fs }, ws);
+        { // phát theo vùng (protocol.inAoi): gần → mọi gói; xa → thưa (≤ 1 gói / AOI_FAR_MS) cho bản đồ nhỏ
+          const now = Date.now(), far = now - (a.farAt || 0) >= P.AOI_FAR_MS, text = JSON.stringify({ t: 'mv', id: a.id, x: m.x, y: m.y, h: m.h, s: m.s, a: a.a, w: a.w, b: a.b, fs: a.fs });
+          if (far) { a.farAt = now; ws.serializeAttachment(a); }
+          for (const [w, b] of this.ready(ws)) if (far || P.inAoi(a, b)) { try { w.send(text); } catch (e) { /* bỏ qua */ } }
+        }
         break;
       }
       case 'tp': {

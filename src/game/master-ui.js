@@ -29,15 +29,15 @@ const clean = (s) => String(s || '').replace(/<think>[\s\S]*?(<\/think>|$)/g, ''
  * @param who   tên gọi người được luận (vd «Chị Lan»)
  * @param first câu hỏi mở đầu (khách hỏi) — tự gửi ngay
  */
-export function masterChatBody(api, { R, who, first, starters = [] }) {
+export function masterChatBody(api, { R, who, first, starters = [], persona = null, personaForce = false, masterName = 'Thầy', greet = '', frame = null, gate = null, placeholder = '' }) {
   const root = el(`<div class="hq-master">
     <div class="hq-master-log" data-role="log"></div>
     <div class="hq-chips-row" data-role="sugg"></div>
     <form class="hq-master-ask" data-role="form">
-      <input class="hq-input" name="q" maxlength="300" placeholder="Hỏi thầy thêm về lá số của ${esc(who)}…" autocomplete="off">
+      <input class="hq-input" name="q" maxlength="300" placeholder="${esc(placeholder || `Hỏi thầy thêm về lá số của ${who}…`)}" autocomplete="off">
       <button class="hq-btn hq-primary" type="submit">Hỏi</button>
     </form>
-    <p class="hq-note">Thầy luận bằng AI trên lá số đã tính sẵn; «Neo» = tỉ lệ câu trả lời khớp dữ liệu lá số. Để tham khảo và học, không thay quyết định của bạn.</p>
+    <p class="hq-note">AI luận trên lá số tính sẵn — để tham khảo, không thay quyết định của bạn.</p>
   </div>`);
   const log = root.querySelector('[data-role=log]');
   const form = root.querySelector('[data-role=form]');
@@ -52,9 +52,11 @@ export function masterChatBody(api, { R, who, first, starters = [] }) {
 
   async function ask(q, asker) {
     if (busy || !q) return;
+    const g = gate ? gate() : { ok: true };
+    if (!g.ok) { log.append(el(`<div class="hq-msg a"><span>${esc(masterName)}</span><div class="hq-msg-body"><p>${esc(g.msg || 'Hôm nay hỏi vậy đủ rồi.')}</p></div></div>`)); return; }
     busy = true; form.q.disabled = true; sugg.innerHTML = '';
     log.append(el(`<div class="hq-msg q"><span>${esc(asker)}</span><p>${esc(q)}</p></div>`));
-    const a = el(`<div class="hq-msg a streaming"><span>Thầy</span><div class="hq-msg-body"><p class="hq-sub">Thầy đang xem lá số…</p></div></div>`);
+    const a = el(`<div class="hq-msg a streaming"><span>${esc(masterName)}</span><div class="hq-msg-body"><p class="hq-sub">${esc(masterName)} đang xem lá số…</p></div></div>`);
     log.append(a);
     const body = a.querySelector('.hq-msg-body');
     a.scrollIntoView({ block: 'nearest' });
@@ -62,8 +64,8 @@ export function masterChatBody(api, { R, who, first, starters = [] }) {
     try {
       const L = await load();
       abort = new AbortController();
-      const { source, text } = await L.askAI(q, R, L.getConfig(), {
-        history, signal: abort.signal,
+      const { source, text } = await L.askAI(frame ? frame(q) : q, R, L.getConfig(), {
+        history, signal: abort.signal, persona, personaForce,
         onStatus: (s) => { body.innerHTML = `<p class="hq-sub">${esc(s)} …</p>`; },
         // gộp token trong cùng khung hình: mỗi rAF chỉ vẽ một lần (token dồn cuối khung)
         onToken: (_d, full) => {
@@ -104,7 +106,8 @@ export function masterChatBody(api, { R, who, first, starters = [] }) {
   // panel đóng → huỷ luồng (chỉ dõi trong subtree panel — panel đóng là replaceChildren bên trong nó)
   const mo = new MutationObserver(() => { if (!root.isConnected) { abort?.abort(); mo.disconnect(); } });
   requestAnimationFrame(() => { if (root.parentNode) mo.observe(root.closest('.hq-panel') || document.body, { childList: true, subtree: true }); });
+  if (greet) log.append(el(`<div class="hq-msg a"><span>${esc(masterName)}</span><div class="hq-msg-body"><p>${esc(greet)}</p></div></div>`));
   if (first) requestAnimationFrame(() => ask(first, who));
-  else sugg.innerHTML = starters.map((x) => `<button type="button" class="hq-choice">${esc(x)}</button>`).join('');
+  else { sugg.innerHTML = starters.map((x) => `<button type="button" class="hq-choice">${esc(x)}</button>`).join(''); if (greet) requestAnimationFrame(() => form.q.focus({ preventScroll: true })); }
   return root;
 }

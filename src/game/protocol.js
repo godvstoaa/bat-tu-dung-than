@@ -150,6 +150,9 @@ export function parseClient(text) {
         pid: typeof m.pid === 'string' && /^[a-z0-9-]{8,40}$/i.test(m.pid) ? m.pid : null,
         tok: typeof m.tok === 'string' && /^[A-Za-z0-9_-]{20,64}$/.test(m.tok) ? m.tok : null, // vé tài khoản một lần (/api/auth/ws-token)
         badName: !name,
+        // v4: nơi xuất hiện do khách chọn (spawn.js) — trong biên thế giới mới nhận, không thì máy chủ dùng START
+        x: num(m.x) && num(m.y) && m.x >= WORLD_TILES.minX && m.y >= WORLD_TILES.minY && m.x <= WORLD_TILES.maxX && m.y <= WORLD_TILES.maxY ? m.x : null,
+        y: num(m.x) && num(m.y) && m.x >= WORLD_TILES.minX && m.y >= WORLD_TILES.minY && m.x <= WORLD_TILES.maxX && m.y <= WORLD_TILES.maxY ? m.y : null,
       };
     }
     case 'mv':
@@ -253,3 +256,8 @@ export function approach(cur, goal, maxStep) {
   if (d > 4 || d <= maxStep) return { x: goal.x, y: goal.y };
   return { x: cur.x + (dx / d) * maxStep, y: cur.y + (dy / d) * maxStep };
 }
+
+// v4 (thành ×10): phát vị trí THEO VÙNG — người trong AOI_TILES (~600 m) nhận mọi gói mv; người xa chỉ nhận gói thưa
+// (≤ 1 gói / AOI_FAR_MS) đủ cho bản đồ nhỏ — phòng 24 người khắp thành không còn dội gói cho tất cả.
+export const AOI_TILES = Math.round(600 / 1.6), AOI_FAR_MS = 2000;
+export const inAoi = (a, b) => Math.hypot((a.x || 0) - (b.x || 0), (a.y || 0) - (b.y || 0)) <= AOI_TILES;

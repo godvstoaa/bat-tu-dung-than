@@ -8,7 +8,7 @@
 export const IOS = (import.meta.env && import.meta.env.MODE) === 'ios';
 
 const VAN = ['vanbia', ...Array.from({ length: 9 }, (_, i) => `van${i}`), 'thaitue'];
-const ALL = ['thay', 'compass', 'xam', 'huong', 'lich', 'tra', 'sen', 'an0', 'an1', 'an2', 'trach', 'duongtrach', 'dieuhau', 'thuvien', 'hophon', 'tuvi', 'tuongphap', 'cachcuc', 'que', 'tangy', ...VAN];
+const ALL = ['thay', 'compass', 'xam', 'huong', 'lich', 'tra', 'sen', 'an0', 'an1', 'an2', 'trach', 'duongtrach', 'dieuhau', 'thuvien', 'hophon', 'tuvi', 'tuongphap', 'cachcuc', 'que', 'tangy', 'm_vanxuong', 'm_daumau', 'm_laoquan', ...VAN];
 // gieo quẻ / xin xăm / vận hạn bản thân (đại vận, Thái Tuế): tắt trên iOS (4.3b) — cả cửa vào hai điện đó
 const IOS_OFF = ['xam', 'sen', 'que', ...VAN, 'door_vanmenh', 'exit_vanmenh', 'door_thaitue', 'exit_thaitue'];
 
@@ -24,6 +24,9 @@ export const FEATURES = {
   //   flag tắt → hành vi Thầy hôm nay KHÔNG ĐỔI. iOS đã tắt hẳn AI qua `ai` ở
   //   trên nên nhánh persona không bao giờ chạy trên iOS.
   personaAi: false,
+  // v4: thầy bói NPC trong game (fortune-npc.js) mang giọng persona riêng — chỉ áp cho khung chat thầy trong game
+  //   (askAI personaForce), không đổi hành vi Thầy trang chính. iOS: AI tắt hẳn nên không chạy.
+  gamePersona: !IOS,
 };
 
 export const TEXT = IOS

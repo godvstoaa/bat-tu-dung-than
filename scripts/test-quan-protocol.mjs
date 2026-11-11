@@ -25,8 +25,8 @@ test('hello: tên xấu → «Khách», áo sai → Thổ, pid sai → null', ()
 });
 
 test('mv: chặn toạ độ ngoài bản đồ / NaN, làm tròn', () => {
-  assert.equal(P.parseClient(J({ t: 'mv', x: -1100, y: 3 })), null);
-  assert.equal(P.parseClient(J({ t: 'mv', x: 5, y: 1200 })), null);
+  assert.equal(P.parseClient(J({ t: 'mv', x: -2700, y: 3 })), null); // thế giới v4 8.192 m: biên ±2.560 ô
+  assert.equal(P.parseClient(J({ t: 'mv', x: 5, y: 2700 })), null);
   assert.ok(P.parseClient(J({ t: 'mv', x: -300, y: 400 })), 'thế giới mở: toạ độ xa tâm vẫn hợp lệ');
   assert.equal(P.parseClient(J({ t: 'mv', x: 'a', y: 3 })), null);
   assert.deepEqual(P.parseClient(J({ t: 'mv', x: 3.14159, y: 2, h: 1.23456, s: true })), { t: 'mv', x: 3.14, y: 2, h: 1.23, s: 1, a: 0, w: 0, b: 0, fs: 0 });
@@ -40,8 +40,8 @@ test('mv: chặn toạ độ ngoài bản đồ / NaN, làm tròn', () => {
 // ── tp: nhảy đổi phòng do client chủ động — cùng biên thế giới như mv, làm tròn; ──
 test('tp: đúng biên thế giới như mv, làm tròn; ngoài bản đồ / NaN bị bỏ', () => {
   assert.deepEqual(P.parseClient(J({ t: 'tp', x: 1125.256, y: 25 })), { t: 'tp', x: 1125.26, y: 25 }); // vào điện xa > 25 ô vẫn hợp lệ
-  assert.equal(P.parseClient(J({ t: 'tp', x: -1100, y: 3 })), null);
-  assert.equal(P.parseClient(J({ t: 'tp', x: 5, y: 1200 })), null);
+  assert.equal(P.parseClient(J({ t: 'tp', x: -2700, y: 3 })), null);
+  assert.equal(P.parseClient(J({ t: 'tp', x: 5, y: 2700 })), null);
   assert.equal(P.parseClient(J({ t: 'tp', x: 'a', y: 3 })), null);
 });
 

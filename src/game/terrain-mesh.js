@@ -11,7 +11,7 @@ import { GUA, OCT_A } from './batquai.js';
 const octDist = (x, z) => { let m = -Infinity; for (const g of GUA) m = Math.max(m, x * g.dir[0] + z * g.dir[1]); return m - OCT_A; };
 import { rng } from './textures.js';
 
-export const ROAD_RES = 1536; // ~2,2 m / điểm ảnh trên 3328 m
+export const ROAD_RES = 3584; // ~2,3 m / điểm ảnh trên 8192 m (v4: ngõ 6 m vẫn rõ mép)
 export const CHUNK = 256; // thế giới v3 3328 m → 13 × 13 chunk (giữ ~170 lưới / lệnh vẽ như bản 2048 × 128)
 export const CHUNKS = T.WORLD / CHUNK;
 

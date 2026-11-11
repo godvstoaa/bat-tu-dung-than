@@ -10,6 +10,7 @@ import { GUA, OCT_A, toWorld, gateWidth } from './batquai.js';
 import { MOAT, AVE_CANAL, OUTLET, CANAL_WATER, CANAL_CLEAR } from './canals.js';
 import { RINGS, BELT, TRUNG_A, OUTER_A } from './cityblocks.js';
 import * as T from './terrain.js';
+import { bridges as layoutBridges, deckTop as layoutDeckTop, waterGates as layoutWaterGates } from './citylayout.js';
 
 export const DECK_T = 0.6;                                  // dày mặt cầu (đáy cầu = mặt − 0,6)
 const HUMP_H = CANAL_WATER + CANAL_CLEAR + DECK_T;          // đỉnh mặt cầu thành: 5,3 m
@@ -19,6 +20,7 @@ export const ARCH_W = 7.5;                                  // nửa bề rộng
 
 /** cao độ mặt cầu tại toạ độ t dọc hướng băng qua (−L…L) */
 export function deckTop(b, t) {
+  if (b.r0 != null) return layoutDeckTop(b, t); // v4: cầu citylayout (dốc ramp cos, ≤ 8%)
   if (b.r0 != null) { // dốc riêng từng đầu: r0 / r1 = chiều dài dốc lên từ đầu −L / xuống tới đầu +L (0 = phẳng tới đầu)
     const e = (k) => (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, k)))) / 2;
     if (b.r0 > 0 && t < -b.L + b.r0) return b.y0 + (b.H - b.y0) * e((t + b.L) / b.r0);
@@ -37,6 +39,9 @@ export const localOf = (b, x, z) => ({ t: (x - b.x) * b.ax + (z - b.z) * b.az, n
 let CITY = null;
 /** cầu trong thành: 8 cầu qua hào (8 đại lộ) + cầu qua kênh Khảm / Tốn ở mọi vành phố / vành phủ */
 export function cityBridges() {
+  return []; // v4: kênh / hào cũ đã bỏ (địa hình không khắc nữa) — cầu thành v4 là citylayout.bridges (riverBridges)
+}
+export function cityBridgesOld() {
   if (CITY) return CITY;
   const out = [];
   const outEdge = MOAT.a + MOAT.w / 2;
@@ -77,32 +82,19 @@ export const allBridges = () => [...cityBridges(), ...riverBridges(), ...EXTRA];
 // CẦU LỚN HUYỀN HÀ (Nam Môn Đại Kiều): thẳng Nam từ cổng Cảnh Môn (Ly), băng sông chỗ cắt vuông góc. Hai bờ cao
 // 16–22 m nên mặt cầu gần như bằng (đỉnh = bờ cao + 1,5 m), tĩnh không giữa dòng ~28 m — thuyền buồm cột 12 m qua thoải
 // mái. Nhịp giữa 40 m trên lạch, các nhịp 30 m; trụ đá có va chạm cho thuyền / người bơi.
-export const RIVER_BRIDGE = { x: 0, z0: 805, z1: 1015, W: 12, thick: 1.4, mid: 40, span: 30, pierW: 4.4 };
+// v4: 5 cầu qua Huyền Hà trong thành (citylayout.bridges — 3 cầu đại lộ 30 m, 2 cầu bộ 6 m; mặt cầu cao 4 m trên mặt phố,
+// dốc ≤ 8 %, tĩnh không 9 m); thêm toạ độ t / bề dày trụ cho river3d.riverBridgeBody
 let RB = null;
 export function riverBridges() {
   if (RB) return RB;
-  const R = RIVER_BRIDGE, L = (R.z1 - R.z0) / 2, z = (R.z0 + R.z1) / 2;
-  const y0 = T.heightAt(R.x, R.z0), y1 = T.heightAt(R.x, R.z1);
-  const b = { id: 'river_nammon', kind: 'river', name: 'Nam Môn Đại Kiều', x: R.x, z, ax: 0, az: 1, L, f: 34, H: Math.max(y0, y1, T.WATER + 15 + R.thick) + 1.5, y0, y1, W: R.W, water: T.WATER, thick: R.thick, piers: [], spans: [] };
-  // trụ: ±mid/2, rồi cách span ra hai phía — chỉ trụ đứng dưới nước / chân bờ (đáy dưới mặt nước)
-  for (const sg of [-1, 1]) for (let t = R.mid / 2; t < L - 6; t += R.span) {
-    const pz = z + sg * t;
-    if (T.heightAt(R.x, pz) > T.WATER + 2) continue; // trên bờ khô: ramp tựa đất, khỏi trụ
-    b.piers.push({ x: R.x, z: pz, r: R.pierW / 2 + 0.6, t: sg * t, hw: R.W / 2 + 0.8, hd: R.pierW / 2 });
-  }
-  RB = [b];
+  RB = layoutBridges().map((b) => ({ ...b, piers: b.piers.map((p) => ({ ...p, t: (p.x - b.x) * b.ax + (p.z - b.z) * b.az, hw: b.W / 2 + 0.8, hd: p.r })) }));
   return RB;
 }
 /** thủy môn trên đường kênh (tĩnh không cố định, trụ hai bên) — để thuyền buồm cột cao bị chặn */
 export function waterGates() {
-  const out = [];
-  for (const id of AVE_CANAL.gua) {
-    const g = GUA.find((q) => q.id === id);
-    for (const A of [TRUNG_A, ...(id === OUTLET.gua ? [OUTER_A] : [])]) { const c = toWorld(g, A, 0); out.push({ id: `wg_${id}_${A}`, x: c.x, z: c.z, ax: g.dir[0], az: g.dir[1], halfLen: 6, halfW: 11, clear: 7, water: CANAL_WATER }); }
-  }
-  return out;
+  // v4: 3 thủy môn ở tường thành (citylayout.waterGates) — vòm cao 7 m: thuyền buồm cột 12 m không qua
+  return layoutWaterGates().map((w) => ({ id: w.id, x: w.x, z: w.z, ax: w.tx, az: w.tz, halfLen: 6, halfW: w.w / 2, clear: 7, water: -6 }));
 }
-
 /**
  * Tĩnh không tại (x, z): khoảng từ mặt nước tới đáy công trình phía trên (m), Infinity nếu không có gì che.
  * Dùng cho thuyền: thuyền cao hơn tĩnh không thì không qua được.

@@ -3,7 +3,18 @@
 //  - vòng tròn chặn (công trình thủ công cũ: tường thành, cột điện)
 //  - nền bậc cấp đi lên được (mặt trên ở độ cao top)
 export const CELL = 0.5;
-const solid = new Set();
+// v4 (thành ×10, ~23.000 nhà ≈ 18 triệu ô): Set<number> vượt trần ~16,7 triệu phần tử của JS → lưới ô 0,5 m lưu dạng
+// BITSET theo mảnh 64 × 64 ô (32 m): Map<mảnh, Uint8Array(512)>. Cùng giao diện add / delete / has / size với Set cũ.
+const solid = (() => {
+  const T = new Map(); let n = 0;
+  const loc = (k) => { const i = Math.floor(k / SPAN) - OFF, j = (k % SPAN) - OFF; return [((i >> 6) * 4096) + (j >> 6), ((i & 63) << 6) | (j & 63)]; };
+  return {
+    add(k) { const [t, b] = loc(k); let a = T.get(t); if (!a) { a = new Uint8Array(512); T.set(t, a); } const m = 1 << (b & 7); if (!(a[b >> 3] & m)) { a[b >> 3] |= m; n++; } },
+    delete(k) { const [t, b] = loc(k), a = T.get(t); if (!a) return; const m = 1 << (b & 7); if (a[b >> 3] & m) { a[b >> 3] &= ~m; n--; } },
+    has(k) { const [t, b] = loc(k), a = T.get(t); return !!a && !!(a[b >> 3] & (1 << (b & 7))); },
+    get size() { return n; },
+  };
+})();
 const OFF = 40000, SPAN = 80000;
 const ck = (i, j) => (i + OFF) * SPAN + (j + OFF);
 const circles = [];

@@ -68,6 +68,7 @@ export function createWork(o) {
 
   // ---------- đồng bộ với máy chủ (nối mạng xong / mở game) ----------
   function setShift(s) {
+    if (s && !shift) o.onShift?.(); // v4: báo hướng dẫn tân thủ (vào ca)
     // mốc nhận việc chỉ đổi khi máy chủ giao việc mới (mở lại bảng không được đặt lại thời gian tối thiểu)
     if (!s || s.task?.seed !== shift?.task?.seed) taskAt = Date.now();
     shift = s ? { ...s } : null;
@@ -120,7 +121,7 @@ export function createWork(o) {
     if (r.mishap === 'nga') toast('💥 Sơ ý bị thương (Khí huyết −6) — việc này không được công.');
     else if (r.mishap === 'hong') toast(`💢 Làm hỏng hàng — bồi ${Math.abs(r.pay)} đồng trừ vào tiền ca.`);
     else if (r.mishap === 'phat') toast('😠 Khách phàn nàn, chủ không trả công việc này (uy tín −1).');
-    else toast(`${job.icon} +${r.pay} đồng vào tiền ca · hiệu suất ${Math.round(r.perf * 100)}% · ${r.n}/${r.max} việc`);
+    else { badge.classList.remove('pop'); void badge.offsetWidth; badge.classList.add('pop'); } // v4: tiến độ hiện trên huy hiệu ca, không toast từng việc
     shift.n = r.n; shift.purse = r.purse;
     if (r.task) { shift.task = r.task; taskAt = Date.now(); }
     if (shift.job === 'phu') setParcel(null);

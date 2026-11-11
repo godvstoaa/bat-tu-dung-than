@@ -9,7 +9,8 @@ import * as T from '../src/game/terrain.js';
 import * as CN from '../src/game/canals.js';
 import * as W from '../src/game/waterways.js';
 import { waterAt, wind } from '../src/game/water.js';
-import { generateCity } from '../src/game/cityblocks.js';
+import { renderHouses } from '../src/game/city4.js';
+import * as LAYOUT from '../src/game/citylayout.js';
 import { innerHouses } from '../src/game/innerfill.js';
 import * as BQ from '../src/game/batquai.js';
 import { estates } from '../src/game/mansions.js';
@@ -24,69 +25,58 @@ const check = (name, fn) => {
 };
 const wet = (x, z) => CN.inCanal(x, z) || T.heightAt(x, z) < T.WATER - 0.4 || ((n) => !!n && n.d < n.hw)(CN.extNear(x, z));
 
-check('sông Huyền Hà: mặt nước 140–215 m mọi mặt cắt, lạch sâu ≥ 6 m rộng ≥ 90 m, sâu nhất 8–11 m', () => {
+const wetW = (x, z) => T.heightAt(x, z) < T.WATER - 0.4;
+check('v4 sông Huyền Hà: mặt nước 100–240 m mọi mặt cắt (trong thành ~120 m giữa kè đứng), lạch sâu ≥ 6 m', () => {
   const P = W.riverPoints();
   for (let i = 30; i < P.length - 60; i += 20) {
     const p = P[i], nx = -p.tz, nz = p.tx;
-    let w = 0, lane = 0, deep = 0;
-    for (let t = -140; t <= 140; t += 1) { const d = T.WATER - T.heightAt(p.x + nx * t, p.z + nz * t); if (d > 0) w++; if (d >= 6) lane++; deep = Math.max(deep, d); }
-    assert.ok(w >= 140 && w <= 215, `s ${Math.round(p.s)}: rộng ${w} m`);
-    assert.ok(lane >= 90, `s ${Math.round(p.s)}: lạch ${lane} m`);
-    assert.ok(deep >= 8 && deep <= 11.5, `s ${Math.round(p.s)}: sâu ${deep.toFixed(1)} m`);
+    if (Math.hypot(p.x, p.z) > T.EDGE - 80) continue;
+    { const L = LAYOUT.water().lake; if (Math.hypot(p.x - L.x, p.z - L.z) < L.r + 160) continue; } // cửa sông loe vào hồ
+    let w = 0, lane = 0;
+    for (let t = -140; t <= 140; t += 1) { const d = T.WATER - T.heightAt(p.x + nx * t, p.z + nz * t); if (d > 0) w++; if (d >= 6) lane++; }
+    assert.ok(w >= 100 && w <= 240, `s ${Math.round(p.s)}: rộng ${w} m`);
+    assert.ok(lane >= 60, `s ${Math.round(p.s)}: lạch ${lane} m`);
   }
 });
-check('sông cách tường Ngoại Thành ≥ 90 m; đổ vào hồ Cùng Thông; hồ có bờ khép kín (không tràn ra biển mây)', () => {
-  for (const p of W.riverPoints()) if (Math.hypot(p.x, p.z) < T.EDGE - 50) assert.ok(T.cityOctDist(p.x, p.z) - p.w > 90, `mép sông sát tường tại (${Math.round(p.x)}, ${Math.round(p.z)})`);
-  const L = T.REGIONS.find((r) => r.id === 'cungthong'), end = W.riverPoints().at(-1);
-  assert.ok(Math.hypot(end.x - L.x, end.z - L.z) < L.r * 0.8, 'cửa sông trong lòng hồ');
+check('v4 sông xuyên phía Nam thành (qua tường ở thủy môn), đổ vào hồ Cùng Thông trong thành; hồ có bờ khép kín', () => {
+  const P = W.riverPoints(), inside = P.filter((p) => T.cityOctDist(p.x, p.z) < -50);
+  assert.ok(inside.length > 50, 'sông phải chảy qua thành');
+  for (const p of inside) assert.ok(p.z > 600, `sông trong thành chỉ ở nửa Nam (${Math.round(p.x)}, ${Math.round(p.z)})`);
+  const L = LAYOUT.water().lake;
   for (let a = 0; a < 16; a++) {
     const ang = (a / 16) * Math.PI * 2; let shore = false;
-    for (let r = 0; r < 700 && !shore; r += 4) { const x = L.x + Math.cos(ang) * r, z = L.z + Math.sin(ang) * r; if (Math.hypot(x, z) > T.EDGE - 20) break; if (T.heightAt(x, z) > T.WATER && !W.riverNear(x, z)) shore = true; }
+    for (let r = 0; r < 700 && !shore; r += 4) { const x = L.x + Math.cos(ang) * r, z = L.z + Math.sin(ang) * r; if (T.heightAt(x, z) > T.WATER && !W.riverNear(x, z)) shore = true; }
     assert.ok(shore || W.riverNear(L.x + Math.cos(ang) * 200, L.z + Math.sin(ang) * 200), `hồ không có bờ hướng ${a}`);
   }
 });
-check('hào ≥ 24 m, kênh giữa đại lộ ≥ 20 m, sâu ≥ 3 m; kênh dẫn Tốn → sông liền mặt nước, đổ đúng mực sông', () => {
-  assert.ok(CN.MOAT.w >= 24 && CN.AVE_CANAL.v1 - CN.AVE_CANAL.v0 >= 20 && CN.CANAL_WATER - CN.CANAL_BED >= 3);
-  const end = CN.LINK.at(-1);
-  assert.ok(Math.abs(end[2] - T.WATER) < 0.01 && W.riverNear(end[0], end[1]), 'kênh dẫn tới sông');
-  for (let i = 0; i + 1 < CN.LINK.length; i++) for (let t = 0; t < 1; t += 0.1) {
-    const [ax, az] = CN.LINK[i], [bx, bz] = CN.LINK[i + 1], x = ax + (bx - ax) * t, z = az + (bz - az) * t, w = waterAt(x, z);
-    assert.ok(w && w.depth >= 3, `kênh dẫn cạn tại (${Math.round(x)}, ${Math.round(z)})`);
-  }
+check('v4 không còn hào / kênh Bát Môn cũ: đại lộ, quảng trường khô ráo (nước trong thành chỉ là sông / hồ)', () => {
+  for (const g of BQ.GUA) for (let u = 200; u < 2100; u += 25) { const p = BQ.toWorld(g, u, 0); if (W.riverNear(p.x, p.z) || Math.hypot(p.x - LAYOUT.water().lake.x, p.z - LAYOUT.water().lake.z) < LAYOUT.water().lake.r + 30) continue; assert.equal(waterAt(p.x, p.z), null, `${g.id} u ${u} ngập`); }
 });
-check('không công trình nào đè lên mặt nước (nhà phố, nhà chen Nội Thành, công trình mốc, khu Nội Thành, biệt phủ / biệt thự)', () => {
+check('v4 không công trình nào đè lên mặt nước (nhà phố, nhà chen Sơn Môn, công trình trọng điểm, biệt phủ / biệt thự)', () => {
   const hits = [];
   const obb = (x, z, hw, hd, ry, name) => {
     const c = Math.cos(ry), s = Math.sin(ry);
-    for (let a = -1; a <= 1; a += 0.25) for (let b = -1; b <= 1; b += 0.25) { const lx = a * hw, lz = b * hd; if (wet(x + lx * c + lz * s, z - lx * s + lz * c)) { hits.push(name); return; } }
+    for (let a = -1; a <= 1; a += 0.25) for (let b = -1; b <= 1; b += 0.25) { const lx = a * hw, lz = b * hd; if (wetW(x + lx * c + lz * s, z - lx * s + lz * c)) { hits.push(name); return; } }
   };
-  const C = generateCity();
-  C.houses.forEach((h, i) => obb(h.x, h.z, h.hw, h.hd, h.ry, `nhà #${i}`));
-  innerHouses().forEach((h, i) => obb(h.x, h.z, h.hw, h.hd, h.ry, `nhà Nội Thành #${i}`));
-  (C.landmarks || []).forEach((l) => obb(l.x, l.z, (l.w || 20) / 2, (l.d || 20) / 2, l.ry || 0, l.name));
-  for (const g of BQ.GUA) for (const b of BQ.DISTRICTS[g.id].buildings) { const w = BQ.toWorld(g, b.u, b.v); obb(w.x, w.z, (b.fit?.width || 12) / 2, (b.fit?.width || 12) / 2, 0, b.name || 'công trình'); }
+  renderHouses().forEach((h) => obb(h.x, h.z, h.hw, h.hd, h.ry, `nhà ${h.key}`));
+  innerHouses().forEach((h, i) => obb(h.x, h.z, h.hw, h.hd, h.ry, `nhà Sơn Môn #${i}`));
+  LAYOUT.landmarks().filter((l) => l.w).forEach((l) => obb(l.x, l.z, l.w / 2, l.d / 2, l.ry || 0, l.name));
   for (const m of estates()) obb(m.x, m.z, (m.W || 100) / 2, (m.D || 100) / 2, m.ry || 0, `phủ ${m.h}`);
   assert.equal(hits.length, 0, hits.slice(0, 5).join(', '));
 });
-check('cầu thành: tĩnh không ≥ 5,5 m giữa lòng vòm; thuyền hoa (4,2 m) qua được, thuyền buồm (12 m) bị thủy môn chặn', () => {
-  for (const b of BR.cityBridges()) {
-    const c = { x: b.x + b.ax * (b.archT || 0), z: b.z + b.az * (b.archT || 0) };
-    assert.ok(BR.clearanceAt(c.x, c.z) >= 5.49, `${b.id} tĩnh không ${BR.clearanceAt(c.x, c.z).toFixed(2)}`);
-  }
+check('v4 5 cầu qua sông: tĩnh không ≥ 8 m giữa lòng; thuyền hoa (4,2 m) qua được; thuyền buồm (12 m) bị cầu / thủy môn chặn', () => {
+  const R = BR.riverBridges(); assert.equal(R.length, 5);
+  for (const b of R) { const cl = BR.clearanceAt(b.x, b.z); assert.ok(cl >= 8 && cl < B.BOAT_TYPES.buom.height, `${b.id} tĩnh không ${cl.toFixed(1)}`); assert.ok(cl >= B.BOAT_TYPES.hoa.height); }
   for (const g of BR.waterGates()) { const cl = BR.clearanceAt(g.x, g.z); assert.ok(cl >= B.BOAT_TYPES.hoa.height && cl < B.BOAT_TYPES.buom.height, `${g.id} ${cl}`); }
-  const rb = BR.riverBridges()[0]; assert.ok(BR.clearanceAt(rb.x, rb.z) >= 14, 'Nam Môn Đại Kiều tĩnh không ≥ 14 m');
 });
-check('tuyến thuyền hoa liền mạch: bến hào → hào (Đông) → kênh Tốn → thủy môn → kênh dẫn → sông, không mắc cạn / vướng cầu', () => {
-  const pts = [...CN.flowPath().slice(Math.floor(CN.flowPath().length * 0.35)), ...CN.LINK.map(([x, z]) => ({ x, z }))];
-  const dense = [];
-  for (let i = 0; i + 1 < pts.length; i++) { const a = pts[i], b = pts[i + 1], n = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 2); for (let k = 0; k < n; k++) dense.push({ x: a.x + (b.x - a.x) * k / n, z: a.z + (b.z - a.z) * k / n, h: Math.atan2(b.x - a.x, b.z - a.z) }); }
-  const boat = B.createBoat('hoa', 0, 0, 0);
-  for (const p of dense) assert.equal(B.hullBlock(boat, p.x, p.z, p.h), null, `vướng tại (${Math.round(p.x)}, ${Math.round(p.z)}): ${B.hullBlock(boat, p.x, p.z, p.h)}`);
-  const sail = B.createBoat('buom', 0, 0, 0), gate = BR.waterGates().find((g) => g.id.includes('672'));
-  assert.equal(B.hullBlock(sail, gate.x, gate.z, Math.atan2(gate.ax, gate.az)), 'low', 'thuyền buồm không qua thủy môn');
+check('v4 tuyến thuyền hoa dọc sông trong thành: lọt qua cả 5 cầu, không mắc cạn / vướng trụ', () => {
+  const P = W.riverPoints().filter((p) => T.cityOctDist(p.x, p.z) < -40);
+  const boat = B.createBoat('hoa', 0, 0, 0); let bad = 0, ex = '';
+  for (let i = 0; i + 1 < P.length; i++) { const a = P[i], b = P[i + 1]; for (const off of [-10, 10]) { const x = a.x - a.tz * off, z = a.z + a.tx * off; const r = B.hullBlock(boat, x, z, Math.atan2(b.x - a.x, b.z - a.z)); if (r) { bad++; ex ||= `(${Math.round(x)}, ${Math.round(z)}) ${r}`; } } }
+  assert.equal(bad, 0, `${bad} chỗ vướng, vd ${ex}`);
 });
-check('bến thuyền: 8 bến, chỗ đứng khô, chỗ thả đủ rộng cho thuyền lớn nhất được thuê', () => {
-  const D = B.docks(); assert.equal(D.length, 8);
+check('v4 bến thuyền: 4 bến (3 bến sông trong thành + hồ), chỗ đứng khô, chỗ thả đủ rộng', () => {
+  const D = B.docks(); assert.equal(D.length, 4);
   for (const d of D) {
     assert.ok(!waterAt(d.x, d.z), `${d.id}: chỗ đứng ngập nước`);
     const big = B.createBoat(d.types.at(-1), d.spawn.x, d.spawn.z, d.spawn.h);
