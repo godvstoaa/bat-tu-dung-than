@@ -8,7 +8,8 @@ import { mkdirSync } from 'node:fs';
 
 const URL_ = process.argv.find((a) => a.startsWith('http')) || 'https://battu.god8.shop/game.html';
 mkdirSync('shots', { recursive: true });
-const browser = await chromium.launch({ headless: true, args: ['--use-angle=d3d11', '--ignore-gpu-blocklist'] });
+const LOW = process.env.LOWEND === '1'; /* giả máy yếu: dựng hình phần mềm (SwiftShader), không GPU */
+const browser = await chromium.launch({ headless: true, args: LOW ? ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--js-flags=--max-old-space-size=1024'] : ['--use-angle=d3d11', '--ignore-gpu-blocklist'] });
 const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 }, userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36' })).newPage();
 const errs = [];
 page.on('pageerror', (e) => errs.push(e.message.slice(0, 200)));
@@ -22,28 +23,29 @@ await go.first().click();
 await page.waitForFunction(() => document.getElementById('hq-loading')?.hidden, null, { timeout: 120000 });
 await page.waitForTimeout(3000);
 const mode = await page.evaluate(() => (document.querySelector('canvas')?.getContext ? 'canvas' : '?') + ' · 3dfail=' + !!document.querySelector('.hq-3dfail'));
-console.log('chế độ:', mode);
-await page.screenshot({ path: 'shots/live-map-0-game.png' });
+console.log('chế độ:', mode, LOW ? '· máy yếu giả lập' : '', '· chất lượng:', await page.evaluate(() => document.documentElement.dataset.hqQuality), '· heap MB:', await page.evaluate(() => Math.round((performance.memory?.usedJSHeapSize || 0) / 1048576)));
+console.log('fps đo 5 s:', await page.evaluate(() => new Promise((r) => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 5000) requestAnimationFrame(f); else r((n / 5).toFixed(1)); }; requestAnimationFrame(f); })));
+await page.screenshot({ path: 'shots/live-map-0-game.png', timeout: LOW ? 180000 : 30000 });
 await page.keyboard.press('m');
 await page.waitForSelector('.hq-mapfull', { timeout: 15000 });
 await page.waitForTimeout(800);
-await page.screenshot({ path: 'shots/live-map-1-open.png' });
+await page.screenshot({ path: 'shots/live-map-1-open.png', timeout: LOW ? 180000 : 30000 });
 const box = await page.locator('.hq-mapfull canvas').first().boundingBox();
 const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
 await page.mouse.move(cx, cy);
 for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, -300); await page.waitForTimeout(150); }
 await page.waitForTimeout(500);
-await page.screenshot({ path: 'shots/live-map-2-zoom.png' });
+await page.screenshot({ path: 'shots/live-map-2-zoom.png', timeout: LOW ? 180000 : 30000 });
 for (let i = 0; i < 9; i++) { await page.mouse.wheel(0, 300); await page.waitForTimeout(120); }
 await page.waitForTimeout(500);
-await page.screenshot({ path: 'shots/live-map-3-whole.png' });
+await page.screenshot({ path: 'shots/live-map-3-whole.png', timeout: LOW ? 180000 : 30000 });
 const search = page.locator('.hq-mapfull input').first();
 await search.fill('thuốc');
 await page.waitForTimeout(600);
 const results = await page.locator('.hq-mapfull .hq-row-btn').allInnerTexts().catch(() => []);
 console.log('tìm «thuốc»:', results.slice(0, 5).join(' | '));
 if (results.length) { await page.locator('.hq-mapfull .hq-row-btn').first().click(); await page.waitForTimeout(700); }
-await page.screenshot({ path: 'shots/live-map-4-card.png' });
+await page.screenshot({ path: 'shots/live-map-4-card.png', timeout: LOW ? 180000 : 30000 });
 const card = await page.locator('.hq-mapfull').innerText().catch(() => '');
 console.log('thẻ:', card.split('\n').filter((l) => /Đặt dấu|Xe|Đi bộ|m$|km/.test(l)).slice(0, 6).join(' | '));
 const pinBtn = page.locator('.hq-mapfull button', { hasText: /Đặt dấu/ });
@@ -52,6 +54,6 @@ await page.keyboard.press('Escape');
 await page.waitForTimeout(800);
 const pinTxt = await page.locator('.hq-pin-txt').innerText().catch(() => '(không thấy)');
 console.log('dấu trên bản đồ nhỏ:', pinTxt);
-await page.screenshot({ path: 'shots/live-map-5-mini.png' });
+await page.screenshot({ path: 'shots/live-map-5-mini.png', timeout: LOW ? 180000 : 30000 });
 console.log(errs.length ? 'lỗi trang: ' + errs.join(' | ') : 'không lỗi trang');
 await browser.close();

@@ -65,7 +65,9 @@ function pickQuality(coarse, renderer) {
   try {
     const gl = renderer.getContext(), ext = gl.getExtension('WEBGL_debug_renderer_info');
     const name = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
-    if (/Intel|UHD|Iris|Mali|Adreno|PowerVR|Apple GPU|Radeon\(TM\) Graphics|Vega \d+ Graphics|SwiftShader|llvmpipe/i.test(name)) return 'mid';
+    // không có GPU thật (dựng hình bằng CPU: máy cũ / driver bị chặn / máy ảo) → THẤP ngay, «vừa» vẫn đứng hình
+    if (/SwiftShader|llvmpipe|softpipe|Basic Render|Software/i.test(name)) { document.documentElement.dataset.hqSoftGl = '1'; return 'low'; }
+    if (/Intel|UHD|Iris|Mali|Adreno|PowerVR|Apple GPU|Radeon\(TM\) Graphics|Vega \d+ Graphics/i.test(name)) return 'mid';
   } catch (e) { /* ignore */ }
   return 'high';
 }
@@ -189,6 +191,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   // --- THẾ GIỚI MỞ Huyền Giới: địa hình 2048², trời tán xạ, nước, rừng (docs/DAI-THE-GIOI-DESIGN.md)
   const quality = pickQuality(coarse, renderer);
+  document.documentElement.dataset.hqQuality = quality; /* để kiểm / hỗ trợ: xem mức đồ hoạ đang dùng */
   // v4: máy hết bộ nhớ đồ họa (WebGL mất ngữ cảnh — trình duyệt hay báo «xảy ra sự cố») → tự tải lại ở mức THẤP thay vì treo / sập
   canvas.addEventListener('webglcontextlost', (e) => {
     e.preventDefault();
@@ -751,7 +754,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // [F6 audit] seed ngày bark dựng MỘT LẦN mỗi ngày (so ba số ngày trước khi
   // lắp chuỗi + padStart) — không cấp phát chuỗi mỗi khung hình
   let barkDay = { y: -1, m: -1, d: -1 }, barkDayKey = '';
-  let fpsAcc = 0, fpsN = 0, fpsT = 0, lowQuality = false, degrade = 0, firstT = null;
+  let fpsAcc = 0, fpsN = 0, fpsT = 0, lowQuality = false, degrade = 0, firstT = null, lastReal = 0;
   const tmpV = new THREE.Vector3();
   const tmpV2 = new THREE.Vector3();
   const headV = new THREE.Vector3();
@@ -1335,7 +1338,10 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // bỏ qua giai đoạn nạp (khung giật do dựng kết cấu / nạp mô hình) và các khung giật đơn lẻ
     // người chơi đã tự chọn mức chất lượng (localStorage «huyenquan:quality») → không tự hạ
     if (firstT == null) firstT = t;
-    if (t - firstT > 8 && dt < 0.25 && !qualityForced) { fpsAcc += dt; fpsN++; fpsT += dt; }
+    /* bỏ khung giật đơn lẻ (> 1 s) — KHÔNG bỏ khung chậm thường xuyên: máy rất yếu (2–4 fps) trước đây không bao giờ được hạ */
+    /* đo bằng đồng hồ THẬT: dt từ vòng lặp đã bị kẹp ≤ 0,05 s (vật lý) nên máy 3 fps vẫn «đo» ra 20 fps, không bao giờ được hạ */
+    const realNow = performance.now(), rdt = lastReal ? (realNow - lastReal) / 1000 : 0; lastReal = realNow;
+    if (t - firstT > 8 && rdt > 0 && rdt < 1 && !qualityForced) { fpsAcc += rdt; fpsN++; fpsT += rdt; }
     if (fpsT > 3) {
       const fps = fpsN / fpsAcc;
       // hạ theo bậc — bóng đổ giữ tới cùng (tắt bóng làm cả cảnh phẳng, «giả» hẳn):
@@ -1347,6 +1353,9 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       } else if (fps < 24 && degrade === 1) {
         // KHÔNG tắt shadowMap (tắt = biên dịch lại mọi shader, đứng hình 1–2 s): giữ bóng nhưng chỉ vẽ lại bản đồ bóng thưa
         degrade = 2; renderer.shadowMap.autoUpdate = false;
+      } else if (fps < 12 && degrade === 2 && quality !== 'low') {
+        // vẫn quá chậm: tải lại ở mức THẤP (ít nhà chi tiết, tầm nhìn ngắn) — một lần, người chơi được báo khi vào lại
+        degrade = 3; try { localStorage.setItem('huyenquan:quality', 'low'); localStorage.setItem('huyenquan:autoLow', '1'); setTimeout(() => location.reload(), 300); } catch (err) { /* ignore */ }
       }
       fpsAcc = 0; fpsN = 0; fpsT = 0;
     }

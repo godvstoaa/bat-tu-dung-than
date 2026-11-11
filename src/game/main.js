@@ -712,6 +712,9 @@ export function startGame({ onExit = null } = {}) {
     const N = 132, wrap = document.createElement('div'); wrap.className = 'hq-minimap-wrap';
     const c = document.createElement('canvas'); c.width = c.height = N; c.className = 'hq-minimap'; c.title = 'Bản đồ (M) — bấm để mở';
     const pinTxt = document.createElement('div'); pinTxt.className = 'hq-pin-txt'; pinTxt.hidden = true;
+    /* trình duyệt đang dựng hình bằng CPU (tắt tăng tốc phần cứng / driver bị chặn) → 3D rất chậm ở mọi mức: chỉ cách bật lại */
+    if (document.documentElement.dataset.hqSoftGl) setTimeout(() => toast('⚠ Trình duyệt đang tắt tăng tốc đồ hoạ nên game rất chậm. Bật lại: Cài đặt trình duyệt → Hệ thống → «Sử dụng tính năng tăng tốc đồ hoạ khi khả dụng», rồi khởi động lại trình duyệt.'), 4000);
+    try { if (localStorage.getItem('huyenquan:autoLow')) { localStorage.removeItem('huyenquan:autoLow'); setTimeout(() => toast('⚙ Máy hơi yếu nên game đã chuyển sang đồ hoạ nhẹ để chạy mượt, không bị sập.'), 2500); } } catch (e) { /* ignore */ }
     wrap.append(c, pinTxt);
     import('./map-ui.js').then((m) => { MAP = m; }).catch(() => {});
     c.onclick = () => openCityMap();
