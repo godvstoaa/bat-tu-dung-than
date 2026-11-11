@@ -197,7 +197,6 @@ Máy dev lúc đo đang chạy thêm Chrome và ZCode của người dùng, nên
 **Còn lại** (không cắt, vì là thứ người chơi nhìn thấy):
 - Nhà phố khoảng 600k tam giác.
 - Đồ phố 440k tam giác, trong đó cây 280k.
-- Cỏ 200k tam giác.
 - Sơn Môn ở tâm thành 310k tam giác: mốc nhìn thấy từ đại lộ, trong tầm sương 1.700 m.
 
 **Độ phân giải động** (`render3d`, sau bậc hạ 1, hoặc khi người chơi chọn mức thấp):
@@ -208,3 +207,9 @@ Máy dev lúc đo đang chạy thêm Chrome và ZCode của người dùng, nên
 - Vì sao chọn cách này: máy nghẽn đáng kể ở khâu tô điểm ảnh. Cùng điểm đại lộ, 1280 × 720 đạt 21 fps; 640 × 360 đạt 28 fps (+33%) dù có nhiều tam giác hơn.
 - Kết quả cùng điểm (mức mặc định): 21–22 → **27 fps** khi tỉ lệ về 0,6. Hình mềm hơn chút; chữ giao diện là HTML nên vẫn sắc.
 - Người chơi chọn mức trung hoặc cao: không tự hạ bậc, không đổi độ phân giải (tôn trọng lựa chọn).
+
+**Cỏ trong phố** (`grass.js`):
+- Vấn đề: ở phố, lưới cỏ vẫn tốn 200k tam giác mỗi khung dù không thấy một ngọn nào (ảnh bật và tắt cỏ giống hệt nhau).
+- Sửa: field cỏ nướng xong mà độ phủ < 0,3% thì không vẽ lưới cỏ.
+- Đã kiểm ngoài đồng (3000, 0) và (−3000, 500): cỏ vẫn hiện đủ.
+- Tam giác: đại lộ 2,81 → 2,61 M; sân trong 3,01 → 2,81 M.

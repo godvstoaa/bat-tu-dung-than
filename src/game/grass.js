@@ -131,7 +131,7 @@ vGY = y;`)
   scene.add(mesh);
 
   // --- nướng trường (cuốn chiếu để không giật khung hình)
-  let bake = null, bakedAt = null, bakedVer = -1;
+  let bake = null, bakedAt = null, bakedVer = -1, empty = false;
   const buf = new Float32Array(RES * RES * 4);
   function start(cx, cz) {
     bake = { ox: cx - SIZE / 2, oz: cz - SIZE / 2, row: 0, ver: version() };
@@ -149,13 +149,17 @@ vGY = y;`)
       field.image.data.set(buf); field.needsUpdate = true;
       U.uFieldOrigin.value.set(bake.ox, bake.oz); U.uReady.value = 1;
       bakedAt = { x: bake.ox + SIZE / 2, z: bake.oz + SIZE / 2 }; bakedVer = bake.ver; bake = null;
+      // vùng gần như không có cỏ (trong thành: đá lát, sân, nhà) → không vẽ lưới cỏ (đo 2026-11-12: 200k tam giác / khung
+      // ở phố mà không thấy một ngọn cỏ nào — mọi khóm co về 0 trong shader nhưng đỉnh vẫn tốn)
+      let cov = 0; for (let k = 1; k < buf.length; k += 4) if (buf[k] > 0.02) cov++; empty = cov / (RES * RES) < 0.003;
     }
   }
   let lastVerCheck = 0;
   return {
     mesh,
+    get empty() { return empty; },
     update(px, py, pz, t, { visible = true } = {}) {
-      mesh.visible = visible;
+      mesh.visible = visible && !empty;
       U.uTime.value = t; U.uCenter.value.set(px, 0, pz); U.uPlayer.value.set(px, py, pz);
       const now = performance.now();
       const far = !bakedAt || Math.hypot(px - bakedAt.x, pz - bakedAt.z) > MARGIN * 0.6;
