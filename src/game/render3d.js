@@ -195,7 +195,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   document.documentElement.dataset.hqQuality = quality; /* để kiểm / hỗ trợ: xem mức đồ hoạ đang dùng */
   /* dựng hình bằng CPU: chi phí tỉ lệ số điểm ảnh → ½ độ phân giải (¼ điểm ảnh) + không bóng đổ (đỡ một lượt vẽ cả cảnh) */
   const softGl = !!document.documentElement.dataset.hqSoftGl;
-  if (softGl) renderer.shadowMap.enabled = false;
+  if (softGl || quality === 'low') renderer.shadowMap.enabled = false; /* mức thấp: không bóng đổ ngay từ đầu (lượt bóng vẽ lại cả cảnh gần ~ +40% tam giác); tắt lúc đầu không phải biên dịch lại shader */
   // v4: máy hết bộ nhớ đồ họa (WebGL mất ngữ cảnh — trình duyệt hay báo «xảy ra sự cố») → tự tải lại ở mức THẤP thay vì treo / sập
   canvas.addEventListener('webglcontextlost', (e) => {
     e.preventDefault();
