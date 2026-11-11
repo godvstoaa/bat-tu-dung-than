@@ -163,6 +163,7 @@ export function treeGeo(sp, tier) {
       for (let i = 0; i < c.count; i++) { col.setRGB(c.getX(i), c.getY(i), c.getZ(i)); col.getHSL(hsl, THREE.SRGBColorSpace); if (hsl.l > 0.45) { const q = Math.min(1, (hsl.l - 0.45) / 0.5); col.setHSL(t[0] + (q - 0.5) * 0.04, t[1], t[2] + (t[3] - t[2]) * q, THREE.SRGBColorSpace); c.setXYZ(i, col.r, col.g, col.b); } }
     }
     geo.computeVertexNormals();
+    geo.setAttribute('leafm', new THREE.BufferAttribute(Float32Array.from(LEAF), 1)); // mặt nạ tán (đổi màu theo mùa — G-5.3)
     // pháp tuyến cầu cho tán (kỹ thuật cây stylized — CAY-QUAN-MANIFEST §1): lá hướng ra từ tâm tán → tán sáng như một khối
     // mềm, không còn từng mặt tam giác gãy sáng tối khi đứng gần. Thân giữ pháp tuyến thật.
     {
@@ -201,10 +202,55 @@ export function treeGeo(sp, tier) {
   TGEO.set(k, pr); return pr;
 }
 // vật liệu cây: màu đỉnh + gió (uniform thời gian chung, cập nhật một lần / khung khi có cây được vẽ)
-function windMat(amp, extra = {}, flat = false) {
+// MÙA (goal G-5.3, CAY-QUAN-MANIFEST §5): theo tiết khí giờ Việt Nam — Lập xuân 4/2 · Lập hạ 5/5 · Lập thu 7/8 · Lập đông 7/11.
+// Chỉ đổi uniform màu tán + tỉ lệ lá rụng (không thêm tam giác). Đào / mai giữ hoa suốt đông → Tết (đào Tết, mai Tết);
+// đông Việt Nam không trụi hẳn: rụng ≤ 30 %. Thử mùa khác: localStorage 'huyenquan:season' = xuan | ha | thu | dong.
+export function seasonOf(now = Date.now()) {
+  try { const o = globalThis.localStorage?.getItem('huyenquan:season'); if (['xuan', 'ha', 'thu', 'dong'].includes(o)) return o; } catch (e) { /* không có localStorage */ }
+  const d = new Date(now + 7 * 3600e3), md = (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
+  return md >= 204 && md < 505 ? 'xuan' : md >= 505 && md < 807 ? 'ha' : md >= 807 && md < 1107 ? 'thu' : 'dong';
+}
+const SEASON_LOOK = { // loài → mùa → [màu tán sRGB | null = màu model, độ pha, tỉ lệ lá rụng]
+  dao: { xuan: [null, 0, 0], ha: ['#5e8a3a', 0.85, 0], thu: ['#9a9a40', 0.55, 0.1], dong: [null, 0, 0] },
+  anhdao: { xuan: [null, 0, 0], ha: ['#5a8a40', 0.85, 0], thu: ['#c8783a', 0.6, 0.1], dong: [null, 0, 0] },
+  phong: { xuan: ['#7aa04a', 0.75, 0], ha: ['#4e7a34', 0.85, 0], thu: [null, 0, 0], dong: ['#5e2a1c', 0.7, 0.4] },
+  hoe: { xuan: ['#8ab04e', 0.45, 0], ha: [null, 0, 0], thu: ['#b0a040', 0.5, 0.05], dong: ['#9a9050', 0.35, 0.15] },
+  du: { xuan: ['#6a9a48', 0.4, 0], ha: [null, 0, 0], thu: ['#c8a032', 0.6, 0.08], dong: ['#8a8048', 0.4, 0.2] },
+  lieu: { xuan: ['#a8c060', 0.5, 0], ha: [null, 0, 0], thu: ['#b8a040', 0.5, 0.1], dong: ['#a09a58', 0.45, 0.25] },
+  tung: { xuan: [null, 0, 0], ha: [null, 0, 0], thu: [null, 0, 0], dong: [null, 0, 0] },
+};
+const SEASON_U = new Map(); // loài → uniform dùng chung cho thân + thẻ lá
+let SEASON_NOW = null;
+function seasonU(sp) {
+  if (!SEASON_U.has(sp)) SEASON_U.set(sp, { uSeasonTint: { value: new THREE.Color(1, 1, 1) }, uSeasonMix: { value: 0 }, uSparse: { value: 0 } });
+  return SEASON_U.get(sp);
+}
+/** áp mùa hiện tại vào uniform (gọi lúc dựng và mỗi lần chia bậc cây — đổi mùa giữa phiên tự cập nhật) */
+export function applySeason(now = Date.now()) {
+  const se = seasonOf(now); if (se === SEASON_NOW) return se; SEASON_NOW = se;
+  for (const sp of Object.keys(SEASON_LOOK)) { const [hex, mix, sparse] = SEASON_LOOK[sp][se], u = seasonU(sp); if (hex) u.uSeasonTint.value.set(hex); u.uSeasonMix.value = hex ? mix : 0; u.uSparse.value = sparse; }
+  return se;
+}
+function windMat(amp, extra = {}, flat = false, sp = null) {
   const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.92, side: THREE.DoubleSide, ...extra });
   m.onBeforeCompile = (sh) => {
     sh.uniforms.uWind = WIND;
+    if (sp) {
+      Object.assign(sh.uniforms, seasonU(sp));
+      sh.vertexShader = (flat ? '' : 'attribute float leafm;\n') + 'varying float vLeaf;\nvarying vec3 vWP;\n' + sh.vertexShader.replace('#include <project_vertex>', `#include <project_vertex>
+        vLeaf = ${flat ? '1.0' : 'leafm'};
+        #ifdef USE_INSTANCING
+          vWP = (modelMatrix * instanceMatrix * vec4(${flat ? 'vec3(0.0)' : 'transformed'}, 1.0)).xyz;
+        #else
+          vWP = (modelMatrix * vec4(transformed, 1.0)).xyz;
+        #endif`);
+      sh.fragmentShader = 'uniform vec3 uSeasonTint;\nuniform float uSeasonMix;\nuniform float uSparse;\nvarying float vLeaf;\nvarying vec3 vWP;\n' + sh.fragmentShader.replace('#include <color_fragment>', `#include <color_fragment>
+        if (vLeaf > 0.5) {
+          float lum = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
+          diffuseColor.rgb = mix(diffuseColor.rgb, uSeasonTint * (0.45 + lum * 1.6), uSeasonMix);
+          if (uSparse > 0.0 && fract(sin(dot(floor(vWP * 2.5), vec3(12.9898, 78.233, 37.719))) * 43758.5453) < uSparse) discard;
+        }`);
+    }
     sh.vertexShader = 'uniform float uWind;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
       #ifdef USE_INSTANCING
         vec2 wp = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
@@ -218,10 +264,13 @@ function windMat(amp, extra = {}, flat = false) {
     // hai mặt nhưng KHÔNG lật pháp tuyến mặt sau: pháp tuyến cầu của tán phải giữ hướng ra ngoài ở cả hai phía lá
     sh.fragmentShader = sh.fragmentShader.replace('float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;', 'float faceDirection = 1.0;');
   };
-  m.customProgramCacheKey = () => `tree-wind-${amp}-${extra.map ? 'map' : 'vc'}-${flat}`;
+  m.customProgramCacheKey = () => `tree-wind-${amp}-${extra.map ? 'map' : 'vc'}-${flat}-${sp || ''}`;
   return m;
 }
-const TREE_MAT = { base: windMat(1), lieu: windMat(1.6) };
+const TREE_MAT = { base: windMat(1) }; // tre (thân không đổi mùa)
+const SP_MAT = new Map(); // loài → { body, card }
+const spMat = (sp) => { if (!SP_MAT.has(sp)) SP_MAT.set(sp, { body: windMat(sp === 'lieu' ? 1.6 : 1, {}, false, sp), card: windMat(4, { map: CARD.tex, alphaTest: 0.45 }, true, sp) }); return SP_MAT.get(sp); };
+applySeason();
 // THẺ LÁ: chùm 3 tấm chéo nhau, texture lá bầu dục (trắng xám → nhuộm theo màu tán từng chùm), alpha cắt, pháp tuyến cầu
 const CARD = (() => {
   const cv = document.createElement('canvas'); cv.width = cv.height = 128; const q = cv.getContext('2d');
@@ -237,7 +286,7 @@ const CARD = (() => {
   const geo = mergeGeometries(quads); const P = geo.attributes.position, N = geo.attributes.normal;
   for (let i = 0; i < N.count; i++) { const x = P.getX(i), y = P.getY(i) + 0.35, z = P.getZ(i), l = Math.hypot(x, y, z) || 1; N.setXYZ(i, x / l, y / l, z / l); }
   geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(P.count * 3).fill(1), 3));
-  return { geo, mat: windMat(4, { map: tex, alphaTest: 0.45 }, true) };
+  return { geo, tex };
 })();
 const CARD_SP = new Set(['hoe', 'du', 'dao', 'anhdao', 'phong']); // liễu, tùng: tán sẵn mảnh (cành rủ / đám lá kim) — không cần thẻ
 /** ghi một cây vào lô của ô (InstancedMesh dựng sau khi khuôn tải xong — xem TreeSet trong cityDress) */
@@ -295,7 +344,7 @@ function treeSet(list, near, shadow) {
     const S0 = { l, mats, cols, ims: null, card: null, cards: null, tones: l.map((t) => t.tone) };
     sets.push(S0);
     Promise.all(TREE_TIERS.map(([, suf]) => treeGeo(sp, suf))).then((geos) => {
-      const mat = sp === 'lieu' ? TREE_MAT.lieu : TREE_MAT.base, ims = [];
+      const mat = spMat(sp).body, ims = [];
       TREE_TIERS.forEach(([tier], j) => {
         const geo = geos[j] || geos[1] || geos[2]; if (!geo) return ims.push(null);
         const im = new THREE.InstancedMesh(geo, mat, l.length); im.count = 0; im.frustumCulled = false; im.visible = false;
@@ -306,7 +355,7 @@ function treeSet(list, near, shadow) {
       const cd = geos[0]?.userData.cards;
       if (CARD_SP.has(sp) && cd && cd.pos.length) {
         const n = Math.min(l.length, 40) * (cd.pos.length / 3); // tối đa 40 cây gần / ô có thẻ lá
-        const im = new THREE.InstancedMesh(CARD.geo, CARD.mat, n); im.count = 0; im.frustumCulled = false; im.visible = false;
+        const im = new THREE.InstancedMesh(CARD.geo, spMat(sp).card, n); im.count = 0; im.frustumCulled = false; im.visible = false;
         im.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3); im.receiveShadow = true; im.onBeforeRender = tickWind; im.name = `tree:${sp}:card`;
         near.add(im); S0.card = im; S0.cards = cd;
       }
@@ -315,7 +364,7 @@ function treeSet(list, near, shadow) {
   }
   /** chia lại bậc theo khoảng cách (gần: chi tiết cao; xa hơn bậc cuối: không vẽ) — ≤ 3 lần / giây, khi đi > 6 m */
   E.assign = (px, pz, k = 1) => {
-    E.px = px; E.pz = pz; E.k = k;
+    E.px = px; E.pz = pz; E.k = k; applySeason();
     const now = performance.now();
     if (Math.hypot(px - E.lx, pz - E.lz) < 6 || now - E.at < 330) return;
     E.lx = px; E.lz = pz; E.at = now;

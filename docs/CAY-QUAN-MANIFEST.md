@@ -145,3 +145,19 @@ Kèm đợt này (hiệu năng, không thuộc cây và quán):
 - Bình hoa trong quán đổi đúng «tứ thời hoa»: mai, lan, cúc, sen.
 - **Tiêu chí:** 4 ảnh cùng một góc phố khác mùa rõ rệt; không thêm tam giác (chỉ đổi màu đỉnh bằng uniform).
 - **Bước kế:** nối uniform mùa từ `calendar` vào shader cây.
+
+**Kết quả G-5.3 (2026-11-12): đạt phần cây.**
+- `citydress3d.seasonOf / applySeason`: mùa theo tiết khí giờ Việt Nam (Lập xuân 4/2, Lập hạ 5/5, Lập thu 7/8, Lập đông 7/11).
+- Mỗi loài có uniform màu tán, độ pha và tỉ lệ lá rụng; không thêm tam giác. Tán đổi màu nhờ mặt nạ đỉnh `leafm`; lá rụng bằng `discard` theo ô 0,4 m.
+- Đào và mai giữ hoa suốt đông tới Tết. Đông Việt Nam không trụi: rụng ≤ 40%.
+- Ảnh cùng một góc sân trong ở 4 mùa: `shots/mua`, `shots/mua2`. Thử mùa khác: `localStorage['huyenquan:season']`.
+- **Chưa làm:** bình hoa trong quán đổi theo tứ thời hoa (hiện chọn ngẫu nhiên theo phòng).
+
+**G-5.4 «Quán có khách» (goal kế, chờ duyệt):**
+- Trà lâu và tửu lâu có khách ngồi ghế uống trà, nhắm rượu: ≥ 40% bàn có 1–3 khách.
+- Có tiếng trò chuyện cục bộ. Tiểu nhị đi giữa các bàn.
+- **Tiêu chí:** ảnh 3 quán có khách ngồi đúng ghế, không xuyên bàn; tổng nhân vật có xương vẫn ≤ `MAX_ACTIVE` (24, máy yếu 16); fps trong quán ≥ 50.
+- **Bước kế:**
+  - tư thế ngồi (`characters.js` đã có `sit` cho người chơi);
+  - `tableSet` trả vị trí ghế;
+  - NPC khách dựng lười theo phòng như chủ tiệm.
