@@ -248,7 +248,7 @@ const armGeo = new THREE.BoxGeometry(0.9, 0.08, 0.08); armGeo.translate(0.4, 3.3
 async function lanternPosts(g, pts) {
   for (const p of pts) { const a = new THREE.Mesh(postGeo, postMat); a.position.set(p.x, p.y, p.z); a.castShadow = true; g.add(a); const b = new THREE.Mesh(armGeo, postMat); b.position.copy(a.position); b.rotation.y = p.ry || 0; g.add(b); addFootprint(a, { hi: 1.6 }); }
   const items = pts.map((p) => ({ x: p.x + Math.cos(p.ry || 0) * 0.75, y: p.y + 2.25, z: p.z - Math.sin(p.ry || 0) * 0.75, ry: p.ry || 0, s: 0.95 }));
-  const lan = await instanceModel(g, 'lib_lantern.lod', items);
+  const lan = await instanceModel(g, 'lib_lantern', items);
   if (lan) glowAll(lan, { base: 0.5, night: 2.4, color: '#ff8a3c' });
   // mỗi đèn lồng là một nguồn sáng (render3d gán đèn điểm cho các đèn gần người chơi)
   for (const it of items) addLight(it.x, it.y + 0.4, it.z, { color: '#ffa04a', power: 1 });

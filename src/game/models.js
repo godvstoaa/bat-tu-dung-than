@@ -522,24 +522,20 @@ export function scrollRack(m = materials()) {
   return g;
 }
 
+// Lư Hương lớn: bệ đá + lư đồng ba chân (model Meshy «cauldron», do render3d.js nạp — CAULDRON_FIT); hàm này chỉ dựng bệ,
+// mặt cát và nhang. Trước đây lư ghép từ hộp / trụ / vòng xuyến trông như cái bát lật cạnh cái hộp.
+export const CAULDRON_FIT = { base: 0.65, height: 1.5, sand: 0.72, sandR: 0.42 }; // mặt cát = 72% chiều cao model (đo: vành 78%, đáy lòng 43%)
 export function incenseBurner(m = materials()) {
   const g = new THREE.Group();
   const cz = 0.8;
   g.add(box(1.6, 0.18, 1.2, m.stone, { y: 0.09, z: cz }));
   g.add(box(1.25, 0.42, 0.9, m.stoneDark, { y: 0.39, z: cz }));
   g.add(box(1.35, 0.06, 1.0, m.gold, { y: 0.62, z: cz, shadow: false }));
-  const by = 0.65;
-  for (let i = 0; i < 3; i++) {
-    const a = (i / 3) * Math.PI * 2 + Math.PI / 6;
-    g.add(cyl(0.05, 0.035, 0.3, m.bronze, { x: Math.cos(a) * 0.32, y: by + 0.14, z: cz + Math.sin(a) * 0.32, rz: Math.cos(a) * -0.25, rx: Math.sin(a) * 0.25 }, 8));
-  }
-  g.add(lathe([[0.001, 0.22], [0.36, 0.24], [0.5, 0.34], [0.55, 0.48], [0.5, 0.62], [0.52, 0.66], [0.46, 0.67], [0.42, 0.6], [0.001, 0.6]], m.bronze, { y: by }, 28));
-  for (const sx of [-1, 1]) g.add(mesh(new THREE.TorusGeometry(0.13, 0.03, 8, 16, Math.PI * 1.2), m.bronze, { x: sx * 0.54, y: by + 0.72, z: cz, rz: sx > 0 ? -0.3 : Math.PI + 0.3, ry: Math.PI / 2 }));
-  g.add(mesh(new THREE.TorusGeometry(0.5, 0.03, 6, 28), m.gold, { y: by + 0.48, z: cz, rx: Math.PI / 2 }));
+  const sy = CAULDRON_FIT.base + CAULDRON_FIT.height * CAULDRON_FIT.sand;
   // cát trong lư
-  g.add(cyl(0.44, 0.44, 0.02, std({ color: '#8d8174', roughness: 1 }), { y: by + 0.6, z: cz }, 24));
+  g.add(cyl(CAULDRON_FIT.sandR, CAULDRON_FIT.sandR, 0.02, std({ color: '#8d8174', roughness: 1 }), { y: sy, z: cz }, 24));
   // nhang (động)
-  const inc = new THREE.Group(); inc.position.set(0, by + 0.6, cz); inc.userData.dynamic = true;
+  const inc = new THREE.Group(); inc.position.set(0, sy, cz); inc.userData.dynamic = true;
   const sticks = [];
   for (const dx of [-0.1, 0, 0.1]) {
     const s = new THREE.Group(); s.position.x = dx; s.rotation.z = dx * -0.6;
@@ -548,8 +544,9 @@ export function incenseBurner(m = materials()) {
     s.add(body, tip); inc.add(s); sticks.push({ g: s, body, tip });
   }
   g.add(inc);
-  const ember = new THREE.PointLight('#ff7a2f', 0, 3, 2); ember.position.set(0, by + 1.1, cz); g.add(ember);
-  g.userData.incense = { group: inc, sticks, light: ember, top: new THREE.Vector3(0, by + 0.6, cz) };
+  const ember = new THREE.PointLight('#ff7a2f', 0, 3, 2); ember.position.set(0, sy + 0.5, cz); g.add(ember);
+  g.userData.incense = { group: inc, sticks, light: ember, top: new THREE.Vector3(0, sy, cz) };
+  g.userData.cauldronAt = { x: 0, y: CAULDRON_FIT.base, z: cz };
   return g;
 }
 

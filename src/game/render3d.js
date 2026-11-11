@@ -21,7 +21,7 @@ import { ROBE } from './render.js';
 import { hasStation, TEXT } from './features.js';
 import { createWorld, QUALITY } from './world3d.js';
 import { createLandmarks } from './landmarks.js';
-import { setModelQuality, setWarmup, settleLods, loadModel as loadGlb } from './assets.js';
+import { setModelQuality, setWarmup, settleLods, loadModel as loadGlb, placeModel, instanceModel } from './assets.js';
 import { createCharacter, setViewer } from './characters.js';
 import { poseOf } from './flight-poses.js';
 import { createCitizens } from './citizens.js';
@@ -272,7 +272,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   if (!xamG) { const rack = shift('xam', MD.scrollRack()); MD.mergeStatic(rack); scene.add(rack); }
   const incG = station('huong', shift('huong', MD.incenseBurner()));
   // lư hương chung: nhang của cả phòng (lư lớn + 8 lư nhỏ quanh Đại Đỉnh — incense3d.js)
-  const incense = (() => { const I = incG.userData.incense; I.group.visible = false; const top = I.top.clone().add(incG.position); const r = createIncense(scene, mats, { mainTop: top, merge: MD.mergeStatic }); for (const g of r.root.children) if (g.userData.station) pickables.push(g); return r; })();
+  const incense = (() => { const I = incG.userData.incense; I.group.visible = false; const top = I.top.clone().add(incG.position); const r = createIncense(scene, mats, { mainTop: top, merge: MD.mergeStatic, instanceModel }); const ca = incG.userData.cauldronAt; placeModel(incG, 'cauldron', { fit: { height: MD.CAULDRON_FIT.height }, at: { ...ca, ry: Math.PI / 2 } }).catch(() => {}); for (const g of r.root.children) if (g.userData.station) pickables.push(g); return r; })();
   const cal = TX.calendarCanvas();
   const calG = station('lich', shift('lich', MD.calendarBoard(cal.texture)));
   const P0 = PONDS[0];

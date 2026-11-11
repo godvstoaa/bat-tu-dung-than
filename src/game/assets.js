@@ -40,7 +40,7 @@ export const warmObject = warm;
 
 /** Có model này không (tra danh sách file lúc build, không tải) — công trình có bậc thì đủ khi có .far / .lod / bản gốc */
 export async function modelAvailable(id) {
-  if (MODEL_FILES.size) return MODEL_FILES.has(id) || (hasLod(id) && (MODEL_FILES.has(`${id}.far`) || MODEL_FILES.has(`${id}.lod`)));
+  if (MODEL_FILES.size) return MODEL_FILES.has(id) || (hasLod(id) && (MODEL_FILES.has(`${id}.vc`) || MODEL_FILES.has(`${id}.far`) || MODEL_FILES.has(`${id}.lod`)));
   return !!(await loadModel(hasLod(id) ? `${id}.lod` : id));
 }
 export function modelUrl(id) { return new URL(`models/${id}.glb`, document.baseURI).href; }
@@ -112,8 +112,10 @@ const nearDist = (v) => Math.max(v * 1.0, 8);   // bản thường 80k: chỉ kh
 const farDist = (v) => Math.max(v * 3.5, 40);   // bản giữa 20k tới đây, xa hơn là .lod 12k
 const cullDist = (v) => (v >= 40 ? Infinity : Math.max(v * 22, 320)); // vật nhỏ ở rất xa: ẩn hẳn (sương đã che gần hết)
 async function placeLod(parent, id, { fit, at, hd = true }) {
-  // bậc xa: .far (6k, giữ đường nối UV) — thiếu thì .lod cũ (giản lược Permissive, texture kéo sọc)
-  const first = (await loadModel(`${id}.far`)) ? `${id}.far` : (await loadModel(`${id}.lod`)) ? `${id}.lod` : null;
+  // bậc xa: .vc (~9k, màu nướng vào đỉnh — scripts/meshy-vclod.mjs; không đường nối UV nên không vỡ mảnh) — thiếu thì
+  // .far / .lod cũ (giản lược gộp qua đường nối UV: nhìn gần vỡ mảnh, texture kéo sọc — ảnh người chơi 2026-11-11)
+  const first = (await loadModel(`${id}.vc`)) ? `${id}.vc` : (await loadModel(`${id}.far`)) ? `${id}.far` : (await loadModel(`${id}.lod`)) ? `${id}.lod` : null;
+  const vc = first === `${id}.vc`;
   const g0 = first ? await loadModel(first) : await loadModel(id);
   if (!g0) return null;
   const obj0 = g0.scene.clone(true);
@@ -122,7 +124,8 @@ async function placeLod(parent, id, { fit, at, hd = true }) {
   const ref = k === 'height' ? size.y : k === 'width' ? size.x : k === 'depth' ? size.z : Math.max(size.x, size.y, size.z);
   const lod = new THREE.LOD();
   const L = { id, lod, v, x: at.x, z: at.z, has: new Set(), busy: false, hd };
-  if (first) { obj0.traverse((o) => { if (o.isMesh) o.castShadow = false; }); lod.addLevel(obj0, farDist(v), 0.08); L.has.add('far'); L.farObj = obj0; }
+  // .vc dùng cho cả bậc giữa lẫn xa (bỏ .mid 20k — cũng vỡ mảnh khi nhìn gần): ngoài nearD là .vc, trong nearD là bản gốc
+  if (first) { obj0.traverse((o) => { if (o.isMesh) o.castShadow = false; }); lod.addLevel(obj0, vc ? nearDist(v) : farDist(v), 0.08); L.has.add('far'); if (vc) L.has.add('mid'); L.farObj = obj0; }
   if (Number.isFinite(cullDist(v))) lod.addLevel(new THREE.Object3D(), cullDist(v));
   else { lod.addLevel(obj0, 0); L.has.add('near'); L.has.add('mid'); }
   lod.scale.setScalar(v / (ref || 1));
@@ -168,7 +171,7 @@ export function tickLazyLods(px, pz) {
     const d = Math.hypot(L.x - px, L.z - pz);
     let tier = null;
     if (!L.has.has('mid') && d < farDist(L.v) * 1.3) tier = 'mid';
-    else if (!L.has.has('near') && L.has.has('mid') && modelQuality !== 'low' && d < nearDist(L.v) * 1.5) tier = 'near';
+    else if (!L.has.has('near') && L.has.has('mid') && d < nearDist(L.v) * (modelQuality === 'low' ? 1.1 : 1.5)) tier = 'near'; // máy yếu cũng nạp bản gốc khi đứng sát (bản rút gọn nhìn gần vỡ mảnh)
     if (!tier) continue;
     lazyBusy++;
     addLazyLevel(L, tier).finally(() => { lazyBusy--; });
@@ -198,7 +201,7 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
   // model thư viện (80k+) nhân bản → bản xa nhẹ (.far / .lod) lúc dựng. Ít bản (≤ 4: đình, tháp, vài cây cảnh)
   // thì khi người chơi tới gần mới nạp thêm bản giữa .mid (20k) và thay vào (2026-11-10: trước đây nạp .mid ngay
   // trên màn nạp — ~5 MB cho các công trình chưa chắc đã nhìn thấy gần).
-  const tiers = [`${id}.far`, `${id}.lod`, `${id}.mid`, id];
+  const tiers = [`${id}.vc`, `${id}.far`, `${id}.lod`, `${id}.mid`, id];
   let g = null; if (hasLod(id)) { for (const t of tiers) if ((g = await loadModel(t))) break; } else g = await loadModel(id);
   if (!g || !items.length) return null;
   const group = new THREE.Group();
@@ -211,7 +214,7 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
   if (hasLod(id) && items.length <= 4) {
     const near = Math.max(Math.max(...items.map((it) => it.s)) * 4, 70);
     E.upgrade = { near, busy: false, done: false, run: async () => {
-      const gm = await loadModel(`${id}.mid`); if (!gm) return;
+      const gm = (await loadModel(id)) || (await loadModel(`${id}.mid`)); if (!gm) return; // tới gần: bản gốc (bản .mid nhìn gần vỡ mảnh)
       const tmp = new THREE.Group(); const ns = buildInstanced(gm, items, fitKey, tmp);
       await warm(tmp);
       for (const { im } of sets) group.remove(im);
@@ -272,8 +275,8 @@ function tickInstances(px, pz) {
  * Trả { group, update(px, pz) } — gọi update định kỳ (landmarks.update) để chia lại gần/xa.
  */
 export async function instanceModelLod(parent, id, items, { fitKey = 'height', near = 45 } = {}) {
-  const [gM, gF] = await Promise.all([hasLod(id) ? loadModel(`${id}.mid`) : null, loadModel(`${id}.lod`)]);
-  const gN = gM || (await loadModel(id));
+  const [gM, gF] = await Promise.all([loadModel(id), (await loadModel(`${id}.vc`)) || loadModel(`${id}.lod`)]); // gần: bản gốc · xa: .vc (không vỡ mảnh)
+  const gN = gM || (hasLod(id) ? await loadModel(`${id}.mid`) : null);
   if (!gN || !items.length) return null;
   const build = (g) => {
     const root = g.scene; root.updateMatrixWorld(true);

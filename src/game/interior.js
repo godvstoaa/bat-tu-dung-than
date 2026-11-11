@@ -101,7 +101,7 @@ async function buildRoom(root, r, updaters) {
   for (const dx of [-2, 0, 2]) cyl(0.45, 0.5, 0.18, m.cushion, dx, 0.09, tz + 1.8, g, 20);
   // đèn lồng treo trên lối giữa
   const lan = []; for (let z = -hd + 6; z <= hd - 4; z += 5.5) for (const sx of [-1, 1]) { const w2 = L(sx * (colX - 1.6), z); lan.push({ x: w2.x, y: H - 4.2, z: w2.z, ry: 0, s: 1.1 }); addLight(w2.x, H - 3.8, w2.z, { color: '#ff9a4a', power: 1, room: r.id }); }
-  const lanG = await instanceModel(root, 'lib_lantern.lod', lan);
+  const lanG = await instanceModel(root, 'lib_lantern', lan);
   if (lanG) glowAll(lanG, { base: 1.2, night: 0.6, color: '#ff8a3c' });
   // ánh sáng nền trong điện (chiếu nhẹ tượng từ phía cửa)
   { const w2 = L(0, hd - 4); addLight(w2.x, H - 2, w2.z, { color: '#ffe0b0', power: 1.4, room: r.id }); }

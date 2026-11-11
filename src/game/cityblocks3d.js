@@ -25,7 +25,7 @@ import { stoneMaterial } from './ground-tex.js';
 import { renderHouses } from './city4.js';
 
 const H = (x, z) => T.heightAt(x, z);
-const CLOSE = 0, NEAR = 36, MID = 68, FAR_MAX = 1200; // v4: bậc theo TỪNG NHÀ — < 36 m .lod1 có bóng · < 68 m .lod1 · < 1,2 km khối xa nhân bản (2 lệnh vẽ) · xa hơn ẩn (sương). Bậc sát .mid tắt (nát)
+const CLOSE = 0, NEAR = 36, MID = 68, FAR_VC = 220, FAR_MAX = 1200; // FAR_VC: tới đây là .vc2 (~2,5k, màu đỉnh) thay khối hộp — // v4: bậc theo TỪNG NHÀ — < 36 m BẢN GỐC có bóng (.lod1 nhìn gần vỡ mảnh) · < 68 m .lod1 · < 1,2 km khối xa nhân bản (2 lệnh vẽ) · xa hơn ẩn (sương). Bậc sát .mid tắt (nát)
 const range = (a, b, s) => { const o = []; for (let x = a; x <= b; x += s) o.push(x); return o; };
 const axisRy = (g) => Math.atan2(-g.dir[1], g.dir[0]); // x cục bộ dọc trục u của cung
 
@@ -248,14 +248,17 @@ export async function cityHouses(grp) {
   const models = [];
   const ids = Object.keys(CB.HOUSE_SPECS).filter((id) => houses.some((h) => h.id === id));
   // v4: bậc vừa dùng .lod1 (sạch) — .lod2 giản lược quá tay, hình nhà nát vụn (kiểm 2026-11-11: dựng nhân bản riêng .lod2 vs .lod1)
-  const base = await Promise.all(ids.map(async (id) => (await loadModel(`${id}.lod1`)) || (await loadModel(`${id}.lod2`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`))));
+  const base = await Promise.all(ids.map(async (id) => (await loadModel(`${id}.vc`)) || (await loadModel(`${id}.lod1`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`)))); // bậc vừa: .vc (màu nướng vào đỉnh, không vỡ mảnh — scripts/meshy-vclod.mjs)
+  const base2 = await Promise.all(ids.map((id) => loadModel(`${id}.vc2`))); // bậc xa (~2,5k tam giác, ~70 KB/mẫu) — thay khối hộp tới FAR_VC
   ids.forEach((id, n) => {
     const g = base[n]; if (!g) return;
     const mine = houses.map((h, i) => (h.id === id ? i : -1)).filter((i) => i >= 0);
     const list = mine.map((i) => houses[i]);
     const mid = instancedSet(g, list, { shadow: false, flat: true });
     for (const m of mid.meshes) grp.add(m.im);
-    models.push({ id, mine, list, local: new Map(mine.map((hi, j) => [hi, j])), close: null, near: null, mid, want: new Set(), busy: new Set() });
+    const far2 = base2[n] ? instancedSet(base2[n], list, { shadow: false, flat: true }) : null;
+    if (far2) for (const m of far2.meshes) grp.add(m.im);
+    models.push({ id, mine, list, local: new Map(mine.map((hi, j) => [hi, j])), close: null, near: null, mid, far2, want: new Set(), busy: new Set() });
   });
   await warmObject(grp);
   let dirty = false, lastPx = 0, lastPz = 0;
@@ -265,7 +268,8 @@ export async function cityHouses(grp) {
     if (m[tier] || m.busy.has(tier)) return;
     m.busy.add(tier);
     const p = (async () => {
-      const g = tier === 'near' ? (await loadModel(`${m.id}.lod1`)) || (await loadModel(`${m.id}.mid`)) : (await loadModel(`${m.id}.mid`)) || (await loadModel(`${m.id}.lod1`));
+      /* 2026-11-11: nhà gần dùng BẢN GỐC (~80k) — .lod1 / .mid nhìn gần vỡ mảnh, texture kéo sọc (ảnh người chơi); bản rút gọn chỉ còn ở bậc vừa (≥ 36 m) */
+      const g = (await loadModel(m.id)) || (await loadModel(`${m.id}.vc`)) || (await loadModel(`${m.id}.lod1`));
       if (!g) return;
       const set = instancedSet(g, m.list, { shadow: true });
       const tmp = new THREE.Group(); for (const x of set.meshes) tmp.add(x.im);
@@ -282,21 +286,22 @@ export async function cityHouses(grp) {
     lastX = px; lastZ = pz;
     let changed = dirty; dirty = false;
     // bậc từng nhà: 0 gần (.lod1, bóng) · 1 vừa (.lod1) · 2 khối xa · 3 ẩn (ngoài FAR_MAX — sương che)
-    const low = getModelQuality() === 'low', nr = low ? 0 : NEAR, md = low ? 40 : MID, fm = low ? 800 : FAR_MAX; // máy yếu: không bóng nhà, ít nhà chi tiết, khối xa gần hơn
+    const low = getModelQuality() === 'low', nr = low ? 24 : NEAR, md = low ? 45 : MID, vd = low ? 140 : FAR_VC, fm = low ? 800 : FAR_MAX; // máy yếu: vòng bản gốc hẹp hơn (24 m) nhưng VẪN có — trước đây 0 m nên đứng sát nhà vẫn thấy bản rút gọn vỡ mảnh
     const tierNow = new Int8Array(houses.length);
-    for (let i = 0; i < houses.length; i++) { const d = Math.hypot(houses[i].x - px, houses[i].z - pz); tierNow[i] = d < nr ? 0 : d < md ? 1 : d < fm ? 2 : 3; }
+    for (let i = 0; i < houses.length; i++) { const d = Math.hypot(houses[i].x - px, houses[i].z - pz); tierNow[i] = d < nr ? 0 : d < md ? 1 : d < vd ? 4 : d < fm ? 2 : 3; }
     if (!lastTier || tierNow.some((t, i) => t !== lastTier[i])) changed = true;
     lastTier = tierNow;
     if (!changed) return;
     const tierOf = lastTier;
     far.write(tierOf);
     for (const m of models) {
-      const c = [], n = [], v = [];
-      for (const hi of m.mine) { const t = tierOf[hi], j = m.local.get(hi); if (t === -1) c.push(j); else if (t === 0) n.push(j); else if (t === 1) v.push(j); }
+      const c = [], n = [], v = [], f2 = [];
+      for (const hi of m.mine) { const t = tierOf[hi], j = m.local.get(hi); if (t === -1) c.push(j); else if (t === 0) n.push(j); else if (t === 1) v.push(j); else if (t === 4) f2.push(j); }
       if (c.length) { want(m, 'close'); want(m, 'near'); } else if (n.length) want(m, 'near');
       // bậc chưa có → dồn sang bậc thấp hơn đã có (cùng một bộ nhân bản thì gộp danh sách)
       const out = new Map([[m.mid, []]]); if (m.near) out.set(m.near, []); if (m.close) out.set(m.close, []);
       out.get(m.close || m.near || m.mid).push(...c); out.get(m.near || m.mid).push(...n); out.get(m.mid).push(...v);
+      if (m.far2) m.far2.write(f2); else out.get(m.mid).push(...f2); // không có .vc2 → bậc vừa
       for (const [set, l] of out) set.write(l);
     }
   };
@@ -415,7 +420,7 @@ export async function wardFeatures(grp, g) {
         const w = BQ.toWorld(g, u, v); items.push({ x: w.x, y: H(w.x, w.z), z: w.z, ry: axisRy(g) + (b % 2 ? Math.PI : 0), s: 5 });
         addSolidOBB(w.x, w.z, 2.4, 2.0, axisRy(g));
       }
-      await instanceModel(grp, 'lib_stall_timber.lod', items, { fitKey: 'width' });
+      await instanceModel(grp, 'lib_stall_timber', items, { fitKey: 'width' }); // bậc .vc (hasLod) — bản .lod vỡ mảnh
       break;
     }
     case 'fields': field(grp, g, half(0)); field(grp, g, half(1)); break;
