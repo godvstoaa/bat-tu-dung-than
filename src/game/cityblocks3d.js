@@ -25,7 +25,7 @@ import { stoneMaterial } from './ground-tex.js';
 import { renderHouses } from './city4.js';
 
 const H = (x, z) => T.heightAt(x, z);
-const CLOSE = 0, NEAR = 36, MID = 52, FAR_MAX = 1200; // v4: bậc theo TỪNG NHÀ — < 36 m .lod1 có bóng · < 52 m .lod1 · < 1,2 km khối xa nhân bản (2 lệnh vẽ) · xa hơn ẩn (sương). Bậc sát .mid tắt (nát)
+const CLOSE = 0, NEAR = 36, MID = 68, FAR_MAX = 1200; // v4: bậc theo TỪNG NHÀ — < 36 m .lod1 có bóng · < 68 m .lod1 · < 1,2 km khối xa nhân bản (2 lệnh vẽ) · xa hơn ẩn (sương). Bậc sát .mid tắt (nát)
 const range = (a, b, s) => { const o = []; for (let x = a; x <= b; x += s) o.push(x); return o; };
 const axisRy = (g) => Math.atan2(-g.dir[1], g.dir[0]); // x cục bộ dọc trục u của cung
 
