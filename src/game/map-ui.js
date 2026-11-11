@@ -54,6 +54,7 @@ export function mapData() {
   for (const e of E) { const st = e.shop?.house?.street; if (!st) continue; const a = acc.get(st) || { x: 0, z: 0, n: 0 }; a.x += e.obb.x; a.z += e.obb.z; a.n++; acc.set(st, a); }
   const streetLabels = [];
   for (const [k, t] of L.streets()) { const a = acc.get(k); if (a && a.n >= 3) streetLabels.push({ name: t.name, x: a.x / a.n, z: a.z / a.n }); }
+  pois.sort((a, b) => (b.big ? 1 : 0) - (a.big ? 1 : 0)); /* công trình lớn vẽ trước, không bị icon nhỏ chiếm chỗ */
   DATA = {
     houses: E, grid: G, GS,
     roads: roads4(), blocks: L.blocks(), water: L.water(), A: L.CITY.A,
@@ -134,12 +135,19 @@ export function drawMap(g, view, opt = {}) {
   }
   // icon
   const icon = (p, sz) => { const px = X(p.x), py = Y(p.z); g.beginPath(); g.arc(px, py, sz * 0.62, 0, 7); g.fillStyle = 'rgba(24,18,12,0.85)'; g.fill(); g.lineWidth = 1.5; g.strokeStyle = '#e8c56a'; g.stroke(); g.font = `${sz}px sans-serif`; g.fillStyle = '#fff'; g.fillText(LAYERS.find((l) => l.id === p.layer)?.icon || '•', px, py + 1); };
+  const drawn = [], named = [];
   for (const p of D.pois) {
     if (!layers.has(p.layer) || !inView(p.x, p.z, 20)) continue;
     if (p.layer === 'fortune' && s < 0.9 && !opt.mini) continue; // 269 quầy: chỉ hiện khi phóng gần
     if ((p.layer === 'est' || p.layer === 'station' || p.layer === 'temple') && s < 0.25 && !opt.mini) continue; // toàn cảnh: chỉ công trình lớn, cổng, bến
-    const sz = opt.mini ? 10 : p.big ? 18 : 15; icon(p, sz);
-    if (!opt.mini && !p.big && s >= 1.4) label(p.name.replace(/^Sảnh /, ''), X(p.x), Y(p.z) - sz, 11);
+    const sz = opt.mini ? 10 : p.big ? 18 : 15, px = X(p.x), py = Y(p.z);
+    /* thưa icon theo màn hình: dãy quầy liền nhau không chồng thành cột (giữ một icon mỗi ~1,4 cỡ icon) */
+    if (!p.big && drawn.some((q) => Math.abs(q.x - px) < sz * 1.4 && Math.abs(q.y - py) < sz * 1.4)) continue;
+    drawn.push({ x: px, y: py }); icon(p, sz);
+    if (!opt.mini && !p.big && s >= 1.4) { /* tên trùng (dãy «Quán Thầy Bói») chỉ ghi một lần trong ~220 px */
+      const t = p.name.replace(/^Sảnh /, '');
+      if (!named.some((q) => q.t === t && Math.hypot(q.x - px, q.y - py) < 220) && label(t, px, py - sz, 11)) named.push({ t, x: px, y: py });
+    }
   }
   // người khác, ghim, người chơi
   for (const o of opt.others || []) { if (!inView(o.x, o.z)) continue; g.beginPath(); g.arc(X(o.x), Y(o.z), 4, 0, 7); g.fillStyle = '#7ad0ff'; g.fill(); }
@@ -168,7 +176,9 @@ export function searchMap(q, x, z, max = 8) {
   for (const e of D.houses) if (e.kind === 'shop' && (types.includes(e.shop?.type) || norm(e.name).includes(n))) out.push({ name: e.name, x: e.door.x, z: e.door.z, kind: 'shop', house: e });
   for (const t of D.streetLabels) if (norm(t.name).includes(n)) out.push({ name: t.name, x: t.x, z: t.z, kind: 'street' });
   for (const d of D.districts) if (norm(d.name).includes(n)) out.push({ name: d.name, x: d.centre.x, z: d.centre.z, kind: 'district' });
-  return out.map((r) => ({ ...r, d: Math.hypot(r.x - x, r.z - z) })).sort((a, b) => a.d - b.d).slice(0, max);
+  const seen = new Set(); /* nhãn phố / khu lặp nhiều đoạn → chỉ giữ đoạn gần nhất */
+  return out.map((r) => ({ ...r, d: Math.hypot(r.x - x, r.z - z) })).sort((a, b) => a.d - b.d)
+    .filter((r) => { if (r.kind !== 'street' && r.kind !== 'district') return true; const k = r.kind + r.name; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, max);
 }
 /** chạm vào bản đồ: icon trong bán kính px, rồi nhà chứa điểm (khi phóng gần) */
 export function hitMap(view, px, py, layers) {
