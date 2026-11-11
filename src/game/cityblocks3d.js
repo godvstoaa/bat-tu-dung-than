@@ -14,7 +14,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import * as T from './terrain.js';
 import * as BQ from './batquai.js';
 import * as CB from './cityblocks.js';
-import { loadModel, loadModelPrivate, instanceModel, warmObject } from './assets.js';
+import { loadModel, instanceModel, warmObject, getModelQuality } from './assets.js';
 import { addSolidOBB, addSolidCircle, addSolidSegment, addTall } from './obstacles.js';
 import { addLight, glowAll } from './lights.js';
 import { place, pond, field, yard, arena, nameBoard, mats } from './batquai3d.js';
@@ -248,7 +248,7 @@ export async function cityHouses(grp) {
   const models = [];
   const ids = Object.keys(CB.HOUSE_SPECS).filter((id) => houses.some((h) => h.id === id));
   // v4: bậc vừa dùng .lod1 (sạch) — .lod2 giản lược quá tay, hình nhà nát vụn (kiểm 2026-11-11: dựng nhân bản riêng .lod2 vs .lod1)
-  const base = await Promise.all(ids.map(async (id) => (await loadModelPrivate(`${id}.lod1`)) || (await loadModelPrivate(`${id}.lod2`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`))));
+  const base = await Promise.all(ids.map(async (id) => (await loadModel(`${id}.lod1`)) || (await loadModel(`${id}.lod2`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`))));
   ids.forEach((id, n) => {
     const g = base[n]; if (!g) return;
     const mine = houses.map((h, i) => (h.id === id ? i : -1)).filter((i) => i >= 0);
@@ -265,7 +265,7 @@ export async function cityHouses(grp) {
     if (m[tier] || m.busy.has(tier)) return;
     m.busy.add(tier);
     const p = (async () => {
-      const g = tier === 'near' ? (await loadModelPrivate(`${m.id}.lod1`)) || (await loadModelPrivate(`${m.id}.mid`)) : (await loadModelPrivate(`${m.id}.mid`)) || (await loadModelPrivate(`${m.id}.lod1`));
+      const g = tier === 'near' ? (await loadModel(`${m.id}.lod1`)) || (await loadModel(`${m.id}.mid`)) : (await loadModel(`${m.id}.mid`)) || (await loadModel(`${m.id}.lod1`));
       if (!g) return;
       const set = instancedSet(g, m.list, { shadow: true });
       const tmp = new THREE.Group(); for (const x of set.meshes) tmp.add(x.im);
@@ -282,8 +282,9 @@ export async function cityHouses(grp) {
     lastX = px; lastZ = pz;
     let changed = dirty; dirty = false;
     // bậc từng nhà: 0 gần (.lod1, bóng) · 1 vừa (.lod1) · 2 khối xa · 3 ẩn (ngoài FAR_MAX — sương che)
+    const low = getModelQuality() === 'low', nr = low ? 0 : NEAR, md = low ? 40 : MID, fm = low ? 800 : FAR_MAX; // máy yếu: không bóng nhà, ít nhà chi tiết, khối xa gần hơn
     const tierNow = new Int8Array(houses.length);
-    for (let i = 0; i < houses.length; i++) { const d = Math.hypot(houses[i].x - px, houses[i].z - pz); tierNow[i] = d < NEAR ? 0 : d < MID ? 1 : d < FAR_MAX ? 2 : 3; }
+    for (let i = 0; i < houses.length; i++) { const d = Math.hypot(houses[i].x - px, houses[i].z - pz); tierNow[i] = d < nr ? 0 : d < md ? 1 : d < fm ? 2 : 3; }
     if (!lastTier || tierNow.some((t, i) => t !== lastTier[i])) changed = true;
     lastTier = tierNow;
     if (!changed) return;

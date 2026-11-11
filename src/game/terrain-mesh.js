@@ -11,7 +11,7 @@ import { GUA, OCT_A } from './batquai.js';
 const octDist = (x, z) => { let m = -Infinity; for (const g of GUA) m = Math.max(m, x * g.dir[0] + z * g.dir[1]); return m - OCT_A; };
 import { rng } from './textures.js';
 
-export const ROAD_RES = 3584; // ~2,3 m / điểm ảnh trên 8192 m (v4: ngõ 6 m vẫn rõ mép)
+export const ROAD_RES = 2560; // ~3,2 m / điểm ảnh trên 8192 m (6,5 MB; trường khoảng cách nội suy nên mép ngõ 6 m vẫn mịn)
 export const CHUNK = 256; // thế giới v3 3328 m → 13 × 13 chunk (giữ ~170 lưới / lệnh vẽ như bản 2048 × 128)
 export const CHUNKS = T.WORLD / CHUNK;
 
@@ -97,11 +97,13 @@ let ROAD = null;
 const roadAt = (x, z) => { if (!ROAD) ROAD = makeRoadSampler(roadField(ROAD_RES)); return ROAD(x, z); };
 
 // Vị trí rừng: mật độ từ treeDensity, 2 loài; không mọc giữa đường
+export const TREE_STEP = 41;
 export function treeList() {
   const pine = [], leaf = [];
   const tr = rng(17);
-  for (let x = -T.EDGE; x < T.EDGE; x += 15) for (let z = -T.EDGE; z < T.EDGE; z += 15) { // lưới 15 m (thế giới ×1,6: giữ số cây ~ như cũ)
-    const px = x + (tr() - 0.5) * 12, pz = z + (tr() - 0.5) * 12;
+  // v4 (thế giới 8.192 m, diện tích ×6): lưới 41 m giữ tổng số cây ~6.500 như bản cũ — lưới 15 m cũ ra 47.700 cây, máy yếu sập tab
+  for (let x = -T.EDGE; x < T.EDGE; x += TREE_STEP) for (let z = -T.EDGE; z < T.EDGE; z += TREE_STEP) {
+    const px = x + (tr() - 0.5) * TREE_STEP * 0.8, pz = z + (tr() - 0.5) * TREE_STEP * 0.8;
     const dn = T.treeDensity(px, pz);
     if (tr() > dn * 0.75) continue;
     if (roadAt(px, pz) < 2.5) continue;

@@ -189,8 +189,18 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   // --- THẾ GIỚI MỞ Huyền Giới: địa hình 2048², trời tán xạ, nước, rừng (docs/DAI-THE-GIOI-DESIGN.md)
   const quality = pickQuality(coarse, renderer);
+  // v4: máy hết bộ nhớ đồ họa (WebGL mất ngữ cảnh — trình duyệt hay báo «xảy ra sự cố») → tự tải lại ở mức THẤP thay vì treo / sập
+  canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    try { if (localStorage.getItem('huyenquan:quality') !== 'low') { localStorage.setItem('huyenquan:quality', 'low'); localStorage.setItem('huyenquan:autoLow', '1'); setTimeout(() => location.reload(), 300); return; } } catch (err) { /* ignore */ }
+    const d = document.createElement('div'); d.className = 'hq-loading'; d.style.zIndex = 99; d.textContent = 'Máy hết bộ nhớ đồ họa — đóng bớt tab / ứng dụng khác rồi tải lại trang.'; document.body.appendChild(d);
+  }, false);
   if (quality !== 'high') renderer.shadowMap.type = THREE.PCFShadowMap; // bóng mềm PCFSoft: đắt trên máy yếu
   let qualityForced = false; try { qualityForced = !!QUALITY[localStorage.getItem('huyenquan:quality')]; } catch (e) { /* ignore */ }
+  // v4: một phần cảnh hỏng (dân phố, thuyền, kè sông, biệt phủ…) chỉ bỏ phần đó — KHÔNG kéo cả game rơi về 2D
+  const initErrors = [];
+  const noop = new Proxy({}, { get: () => () => undefined });
+  const safeInit = (name, fn, stub = noop) => { try { return fn(); } catch (e) { console.error(`[huyenquan] 3D: bỏ phần «${name}» vì lỗi`, e); initErrors.push(`${name}: ${e?.message || e}`); return stub; } };
   const world = span('init:world', () => createWorld(scene, renderer, { quality }));
   setModelQuality(quality);
   const landmarks = span('init:landmarks', () => createLandmarks(scene));
@@ -630,7 +640,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     });
   }
   // dân thành Bát Quái (citizens.js): ~33 NPC theo 8 khu — dựng khi tới gần
-  const citizens = createCitizens({ scene, layer, groundY: (x, z) => platformTop(x, z) ?? T.heightAt(x, z), extra: [...walkers4(), ...boatDocks().map((d, i) => ({ id: `chudo_${d.id}`, name: ['Lão Lái', 'Cô Đò', 'Chú Chèo', 'Bà Bến'][i % 4] + ' ' + ['Hà', 'Giang', 'Thủy', 'Lâm', 'Nguyệt', 'Tuyền', 'Phong', 'Sương'][i % 8], role: 'Chủ đò', look: i % 2 ? 'hero_f' : 'npc_villager', gua: 'kan', wx: '水', lines: ['Khách đi thuyền không? Đò, thuyền hoa, thuyền buồm có cả!', 'Ngược dòng giữa lạch thì chèo mỏi tay đấy, men theo bờ cho nhẹ.', 'Thuyền buồm cột cao, không qua được thủy môn đâu khách ạ.'], x: d.x + 1.5, z: d.z + 1.5, path: null }))] }); // + ~70 dân phố Ngoại Thành + chủ đò các bến
+  const citizens = safeInit('citizens', () => createCitizens({ scene, layer, groundY: (x, z) => platformTop(x, z) ?? T.heightAt(x, z), extra: [...walkers4(), ...boatDocks().map((d, i) => ({ id: `chudo_${d.id}`, name: ['Lão Lái', 'Cô Đò', 'Chú Chèo', 'Bà Bến'][i % 4] + ' ' + ['Hà', 'Giang', 'Thủy', 'Lâm', 'Nguyệt', 'Tuyền', 'Phong', 'Sương'][i % 8], role: 'Chủ đò', look: i % 2 ? 'hero_f' : 'npc_villager', gua: 'kan', wx: '水', lines: ['Khách đi thuyền không? Đò, thuyền hoa, thuyền buồm có cả!', 'Ngược dòng giữa lạch thì chèo mỏi tay đấy, men theo bờ cho nhẹ.', 'Thuyền buồm cột cao, không qua được thủy môn đâu khách ạ.'], x: d.x + 1.5, z: d.z + 1.5, path: null }))] }), { update: () => [], ui: () => {}, add: () => {}, remove: () => {} }); // + dân phố + chủ đò các bến
   // phòng lưới (rooms.js): cửa hàng / nhà riêng / điện — dựng lười khi bước vào, chủ tiệm thêm vào citizens
   const roomsB = createRoomBuilder({ scene, citizens });
   // 16 biệt phủ đi bộ thật ở vành phủ Ngoại Thành (mansion3d.js): va chạm ngay, hình chi tiết dựng lười
@@ -644,13 +654,13 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   { const geo = new THREE.RingGeometry(0.42, 0.55, 28); geo.rotateX(-Math.PI / 2);
     for (let i = 0; i < 24; i++) { const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: '#e8f1ef', transparent: true, opacity: 0, depthWrite: false })); m.visible = false; m.renderOrder = 3; scene.add(m); ripples.push({ m, age: 9, life: 1.6, s: 1 }); } }
   let rippleNext = 0, rippleT = 0, splashSeen = 0, wakeT = 0, myBoat = null;
-  const fleet = createFleet(scene); // thuyền NPC trên hào, kênh, sông, hồ
+  const fleet = safeInit('fleet', () => createFleet(scene)); // thuyền NPC trên sông, hồ
   const spawnRipple = (x, y, z, s = 1, life = 1.6) => { const r = ripples[rippleNext]; rippleNext = (rippleNext + 1) % ripples.length; r.age = 0; r.life = life; r.s = s; r.m.position.set(x, y + 0.03, z); r.m.visible = true; };
   const tickRipples = (dt) => { for (const r of ripples) { if (!r.m.visible) continue; r.age += dt; const k = r.age / r.life; if (k >= 1) { r.m.visible = false; continue; } r.m.scale.setScalar(r.s * (0.6 + k * 4.2)); r.m.material.opacity = 0.55 * (1 - k) * Math.min(1, k * 6); } };
   registerJobPlaces(); const jobPlaces = createJobPlaces(scene); // mỏ dân sự Khoáng Sơn (việc làm P2 — guild-core.js)
   const parcel = makeParcel(); parcel.visible = false; scene.add(parcel); // kiện hàng sau lưng phu dịch trạm
-  const river = span('init:river', () => createRiver(scene)); // thủy đạo Bát Môn: hào Nội Thành + kênh Khảm / Tốn, thuyền hoa
-  const mansionsB = span('init:mansions', () => createMansions(phuG, { provider: (key) => homeInfoOf(key), citizens }));
+  const river = safeInit('river', () => span('init:river', () => createRiver(scene))); // thủy đạo Bát Môn: hào Nội Thành + kênh Khảm / Tốn, thuyền hoa
+  const mansionsB = safeInit('mansions', () => span('init:mansions', () => createMansions(phuG, { provider: (key) => homeInfoOf(key), citizens })));
   const targetRing = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.4, 32), new THREE.MeshBasicMaterial({ color: '#ffd27a', transparent: true, opacity: 0.8, depthWrite: false }));
   targetRing.rotation.x = -Math.PI / 2; targetRing.visible = false; scene.add(targetRing);
 
@@ -1430,6 +1440,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     setEstateOwner, setEstateLookup, // biển nhà rao bán / tên chủ nhà ngoài phố
     warmScene: () => { absorbLights(); return renderer.compileAsync(scene, camera); },
     scene, // kiểm thử / gỡ lỗi
+    initErrors, // phần cảnh bị bỏ vì lỗi (v4)
     resize,
     frame,
     pick,

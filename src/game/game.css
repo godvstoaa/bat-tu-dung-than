@@ -605,3 +605,5 @@ select.hq-input { width: auto; max-width: 100%; }
 .hq-tut.mini { padding: 5px 9px; }
 .hq-tut.mini .hq-actions { margin-top: 4px; }
 .hq-tut b { cursor: pointer; }
+.hq-3dfail { max-width: 420px; margin: 0 auto; padding: 16px; text-align: center; line-height: 1.45; }
+.hq-3dfail b { color: var(--hq-gold); display: block; margin-bottom: 6px; }

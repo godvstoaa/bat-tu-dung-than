@@ -49,7 +49,12 @@ export function roadLines() {
 // Trường khoảng cách tới MÉP đường, mã hoá 8 bit: v = 0,5 − s/8 (s = khoảng cách tới mép, âm là
 // trong mặt đường) → nội suy song tuyến của trường khoảng cách cho mép mịn dù 2 m/điểm ảnh.
 export const FIELD_RANGE = 8;
+const FIELD = new Map(); // dùng chung một bản cho mỗi độ phân giải (world3d + terrain-mesh trước đây tính hai lần)
 export function roadField(res = 1024) {
+  if (FIELD.has(res)) return FIELD.get(res);
+  const out = roadFieldRaw(res); FIELD.set(res, out); return out;
+}
+function roadFieldRaw(res) {
   const W = T.WORLD, k = res / W, data = new Uint8Array(res * res);
   for (const { pts, w } of roadLines()) {
     for (let i = 0; i < pts.length - 1; i++) {

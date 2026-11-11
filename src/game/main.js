@@ -779,7 +779,16 @@ export function startGame({ onExit = null } = {}) {
         const { create3D } = await import('./render3d.js');
         return create3D(canvas, { onTap, reduced });
       } catch (e) {
-        console.warn('[huyenquan] 3D không khởi tạo được, chuyển sang 2D:', e);
+        console.error('[huyenquan] 3D không khởi tạo được:', e);
+        // v4: KHÔNG tự lặng lẽ rơi về 2D (người chơi tưởng game đổi sang 2D) — báo lỗi thật, mời thử lại 3D; 2D chỉ khi tự chọn
+        const choice = await new Promise((res) => {
+          const ld = $('hq-loading'); ld.hidden = false;
+          ld.innerHTML = `<div class="hq-3dfail"><b>Chưa dựng được cảnh 3D trên máy này</b><p class="hq-sub">${esc(String(e?.message || e).slice(0, 220))}</p><p class="hq-sub">Thử tải lại (đóng bớt tab nặng). Nếu vẫn lỗi, gửi dòng chữ trên cho quản trị.</p><div class="hq-actions"><button class="hq-btn hq-primary" type="button" data-a="retry">Tải lại 3D</button><button class="hq-btn" type="button" data-a="2d">Chơi bản 2D tạm</button></div></div>`;
+          ld.querySelector('[data-a=retry]').onclick = () => res('retry');
+          ld.querySelector('[data-a=2d]').onclick = () => res('2d');
+        });
+        if (choice === 'retry') { location.reload(); await new Promise(() => {}); }
+        $('hq-loading').textContent = 'Đang mở bản 2D…';
         // canvas có thể đã gắn context WebGL → thay bằng canvas mới cho 2D
         const fresh = canvas.cloneNode(false);
         canvas.replaceWith(fresh);
