@@ -25,7 +25,7 @@ import { stoneMaterial } from './ground-tex.js';
 import { renderHouses } from './city4.js';
 
 const H = (x, z) => T.heightAt(x, z);
-const CELL = 96, CLOSE = 0, NEAR = 36, MID = 56, FAR_MAX = 1200; // v4: ô khối xa 128 m (ngoài 1,3 km ẩn — sương che). Nhà < 40 m: .lod1 có bóng; ô < 80 m: .lod1 không bóng; xa hơn: khối thủ tục gộp theo ô. Bậc sát .mid tắt (bản .mid nhà phố bóng kim loại, nát)
+const CLOSE = 0, NEAR = 36, MID = 52, FAR_MAX = 1200; // v4: bậc theo TỪNG NHÀ — < 36 m .lod1 có bóng · < 52 m .lod1 · < 1,2 km khối xa nhân bản (2 lệnh vẽ) · xa hơn ẩn (sương). Bậc sát .mid tắt (nát)
 const range = (a, b, s) => { const o = []; for (let x = a; x <= b; x += s) o.push(x); return o; };
 const axisRy = (g) => Math.atan2(-g.dir[1], g.dir[0]); // x cục bộ dọc trục u của cung
 
@@ -206,6 +206,32 @@ function farGeometry(list) {
   return out;
 }
 const farMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.92, flatShading: true });
+const farMatI = new THREE.MeshStandardMaterial({ roughness: 0.92, flatShading: true });
+/** khối xa nhân bản: khối đơn vị (rộng 1, cao 1, sâu 1) co giãn (F, Ht, d) — cùng tỉ lệ farGeometry (tường 0,55 · mái 0,45) */
+function farInstances(houses) {
+  const n = houses.length;
+  const wallG = new THREE.BoxGeometry(1, 0.55, 0.94); wallG.translate(0, 0.275, 0);
+  const roofG = hipRoof(1.06, 1.18, 0.45, 0.55);
+  const mk = (g) => { const im = new THREE.InstancedMesh(g, farMatI, n); im.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3); im.count = 0; im.frustumCulled = false; im.receiveShadow = true; return im; };
+  const wall = mk(wallG), roof = mk(roofG);
+  const M = new Float32Array(n * 16), CW = new Float32Array(n * 3), CR = new Float32Array(n * 3);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), P = new THREE.Vector3(), S = new THREE.Vector3(), col = new THREE.Color(), tmp = new THREE.Color();
+  houses.forEach((h, i) => {
+    const sp = CB.HOUSE_SPECS[h.id] || CB.HOUSE_SPECS.bq_house_tiled, Ht = houseHeight(h, sp), F = (h.lotF || h.f);
+    const tint = 0.9 + ((h.x * 7.31 + h.z * 3.17) % 1 + 1) % 1 * 0.2;
+    m4.compose(P.set(h.x, h.y, h.z), q.setFromAxisAngle(up, h.ry), S.set(F, Ht, h.d)).toArray(M, i * 16);
+    for (const [c, arr] of [[sp.wall, CW], [sp.roof, CR]]) { col.set(c).multiplyScalar(tint); if (h.tint) col.multiply(tmp.setRGB(h.tint[0], h.tint[1], h.tint[2])); arr.set([col.r, col.g, col.b], i * 3); }
+  });
+  return {
+    wall, roof,
+    write(tierOf) {
+      let k = 0;
+      const wm = wall.instanceMatrix.array, rm = roof.instanceMatrix.array, wc = wall.instanceColor.array, rc = roof.instanceColor.array;
+      for (let i = 0; i < n; i++) if (tierOf[i] === 2) { wm.set(M.subarray(i * 16, i * 16 + 16), k * 16); rm.set(M.subarray(i * 16, i * 16 + 16), k * 16); wc.set(CW.subarray(i * 3, i * 3 + 3), k * 3); rc.set(CR.subarray(i * 3, i * 3 + 3), k * 3); k++; }
+      for (const im of [wall, roof]) { im.count = k; im.instanceMatrix.needsUpdate = true; im.instanceColor.needsUpdate = true; }
+    },
+  };
+}
 
 export async function cityHouses(grp) {
   // v4 (thành ×10): ~22.900 nhà từ citylayout qua city4.renderHouses (mặt tiền đúng loại tiệm, nhà theo cung) + nhà chen Sơn Môn
@@ -213,16 +239,9 @@ export async function cityHouses(grp) {
   for (const h of houses) addSolidOBB(h.x, h.z, h.hw - 0.04, h.hd - 0.25, h.ry); // va chạm theo khung lô — nhà liền vách, không lọt khe
   houses.forEach((h) => { const sp = CB.HOUSE_SPECS[h.id]; if (sp) addTall(h.x, h.z, h.hw - 0.04, h.hd - 0.25, h.ry, h.y + houseHeight(h, sp) * 0.62); }); // mái (leo trèo) // lớp hình: mẫu đặc trưng, mặt tiền tiệm, màu cung
   // ô không gian
-  const cells = new Map();
-  houses.forEach((h, i) => {
-    const k = `${Math.floor(h.x / CELL)},${Math.floor(h.z / CELL)}`;
-    if (!cells.has(k)) { const [cx, cz] = k.split(',').map(Number); cells.set(k, { x0: cx * CELL, z0: cz * CELL, idx: [], tier: -1, far: null }); }
-    cells.get(k).idx.push(i);
-  });
-  for (const c of cells.values()) {
-    c.far = new THREE.Mesh(farGeometry(c.idx.map((i) => houses[i])), farMat);
-    c.far.receiveShadow = true; c.far.visible = false; grp.add(c.far);
-  }
+  // v4: khối xa NHÂN BẢN THEO TỪNG NHÀ (tường + mái 4 dốc, khối đơn vị co giãn theo nhà, màu theo mẫu) — 2 lệnh vẽ cho cả
+  // thành, và mỗi nhà đổi bậc theo khoảng cách CỦA NÓ (trước: gộp theo ô → cả ô 96 m lên .lod1 khi người chơi tới gần mép ô)
+  const far = farInstances(houses); grp.add(far.wall, far.roof);
   // mỗi model 3 bộ nhân bản: vừa (.lod2, ~3k, texture 256 — NẠP SẴN, nhẹ), gần (.lod1, ~10k) và sát (.mid, ~20k)
   // NẠP LƯỜI: chỉ khi có nhà của mẫu đó lọt vào tầm (2026-11-10: trước đây nạp sẵn cả 3 bậc × 26 mẫu ≈ 32 MB
   // trên màn nạp). Chưa nạp xong thì nhà gần tạm dùng bậc thấp hơn đã có.
@@ -256,30 +275,20 @@ export async function cityHouses(grp) {
     })().catch((e) => console.warn('[city]', m.id, tier, e)).finally(() => { m.busy.delete(tier); pend.delete(p); });
     pend.add(p);
   };
-  let lastX = Infinity, lastZ = Infinity, lastNear = '';
+  let lastX = Infinity, lastZ = Infinity, lastTier = null;
   const update = (px, pz) => {
     lastPx = px; lastPz = pz;
     if (!dirty && Math.hypot(px - lastX, pz - lastZ) < 6) return;
     lastX = px; lastZ = pz;
     let changed = dirty; dirty = false;
-    // nhà gần (theo từng nhà, không theo ô): chỉ vài chục nhà quanh người chơi dùng bản chi tiết + đổ bóng
-    const nearNow = new Map(); // chỉ số nhà → −1 (sát) | 0 (gần)
-    for (const c of cells.values()) {
-      const dx = Math.max(c.x0 - px, 0, px - (c.x0 + CELL)), dz = Math.max(c.z0 - pz, 0, pz - (c.z0 + CELL));
-      if (Math.hypot(dx, dz) < NEAR) for (const i of c.idx) { const d = Math.hypot(houses[i].x - px, houses[i].z - pz); if (d < NEAR) nearNow.set(i, d < CLOSE ? -1 : 0); }
-    }
-    const nk = [...nearNow].map(([i, t]) => i * 2 + t).sort((a, b) => a - b).join(',');
-    if (nk !== lastNear) { lastNear = nk; changed = true; }
-    for (const c of cells.values()) {
-      const dx = Math.max(c.x0 - px, 0, px - (c.x0 + CELL)), dz = Math.max(c.z0 - pz, 0, pz - (c.z0 + CELL));
-      const d = Math.hypot(dx, dz), tier = d < MID ? 1 : 2;
-      if (tier !== c.tier) { c.tier = tier; changed = true; }
-      c.far.visible = tier === 2 && d < FAR_MAX;
-    }
+    // bậc từng nhà: 0 gần (.lod1, bóng) · 1 vừa (.lod1) · 2 khối xa · 3 ẩn (ngoài FAR_MAX — sương che)
+    const tierNow = new Int8Array(houses.length);
+    for (let i = 0; i < houses.length; i++) { const d = Math.hypot(houses[i].x - px, houses[i].z - pz); tierNow[i] = d < NEAR ? 0 : d < MID ? 1 : d < FAR_MAX ? 2 : 3; }
+    if (!lastTier || tierNow.some((t, i) => t !== lastTier[i])) changed = true;
+    lastTier = tierNow;
     if (!changed) return;
-    const tierOf = new Int8Array(houses.length);
-    for (const c of cells.values()) for (const i of c.idx) tierOf[i] = c.tier;
-    for (const [i, t] of nearNow) tierOf[i] = t;
+    const tierOf = lastTier;
+    far.write(tierOf);
     for (const m of models) {
       const c = [], n = [], v = [];
       for (const hi of m.mine) { const t = tierOf[hi], j = m.local.get(hi); if (t === -1) c.push(j); else if (t === 0) n.push(j); else if (t === 1) v.push(j); }
