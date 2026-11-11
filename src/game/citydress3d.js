@@ -17,7 +17,7 @@ import { addLight, glowAll } from './lights.js';
 import { placeModel, getModelQuality } from './assets.js';
 import { GUA, toWorld } from './batquai.js';
 
-const R_BUILD = 300, R_SHOW = 320; // ô dựng / hiện quanh người chơi (§3.11: lệnh vẽ)
+const R_BUILD = 300, R_SHOW = 320, R_NEAR = 150; // ô dựng / hiện quanh người chơi · cây, sạp, biển hiệu chỉ hiện trong 150 m (§3.11)
 const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
 const rnd01 = (s) => (hash(s) % 10007) / 10007;
 const H = (x, z) => heightAt(x, z);
@@ -73,11 +73,13 @@ function batch() {
   const add = (geo, mat, x, y, z, ry = 0, sx = 1, sy = 1, sz = 1, color = null) => { const k = `${geo.uuid}|${mat.uuid}`; let b = by.get(k); if (!b) by.set(k, (b = { geo, mat, list: [] })); b.list.push([x, y, z, ry, sx, sy, sz, color]); };
   const build = (grp, { shadow = false } = {}) => {
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), P = new THREE.Vector3(), S = new THREE.Vector3(), c = new THREE.Color();
+    const near = new THREE.Group(); near.name = 'near'; grp.add(near); grp.userData.near = near; // đồ nhỏ: ẩn khi ô xa hơn R_NEAR
+    const SMALL = new Set([G.trunk, G.crown, G.slant, G.postPair, G.goods, G.sign, G.shedAll, G.lamp]);
     for (const { geo, mat, list } of by.values()) {
       const im = new THREE.InstancedMesh(geo, mat, list.length);
       list.forEach(([x, y, z, ry, sx, sy, sz, color], i) => { im.setMatrixAt(i, m4.compose(P.set(x, y, z), q.setFromAxisAngle(up, ry), S.set(sx, sy, sz))); if (color) im.setColorAt(i, c.set(color)); });
       if (im.instanceColor) im.instanceColor.needsUpdate = true;
-      im.castShadow = shadow && (geo === G.trunk || geo === G.crown); /* chỉ cây đổ bóng — nền / biển / sạp thì không (lượt bóng nhân đôi lệnh vẽ) */ im.receiveShadow = true; im.computeBoundingSphere(); grp.add(im);
+      im.castShadow = shadow && (geo === G.trunk || geo === G.crown); /* chỉ cây đổ bóng — nền / biển / sạp thì không (lượt bóng nhân đôi lệnh vẽ) */ im.receiveShadow = true; im.computeBoundingSphere(); (SMALL.has(geo) ? near : grp).add(im);
     }
   };
   return { add, build };
@@ -291,17 +293,20 @@ export function cityDress(parent) {
   const root = new THREE.Group(); root.name = 'citydress'; parent.add(root);
   const built = new Map(); let lx = Infinity, lz = Infinity, queue = [];
   const low = () => getModelQuality() === 'low';
+  // ô hiện trong R_SHOW; đồ nhỏ (cây, sạp, biển hiệu) chỉ trong R_NEAR (khoảng cách từ người chơi tới hộp ô)
+  const vis = (id, g, px, pz) => { if (!g) return; const [i, j] = id.split('_').map(Number), cx = -4096 + (i + 0.5) * 256, cz = -4096 + (j + 0.5) * 256, d = Math.max(Math.abs(cx - px), Math.abs(cz - pz)) - 128; g.visible = d < R_SHOW; if (g.userData.near) g.userData.near.visible = d < R_NEAR; };
+  const make = (id, px, pz) => { const g = buildCell(id, low()); built.set(id, g); if (g) { root.add(g); vis(id, g, px, pz); } };
   function update(px, pz) {
     if (Math.hypot(px - lx, pz - lz) > 24) {
       lx = px; lz = pz;
       queue = L.cellsInRange(px, pz, R_BUILD).filter((id) => !built.has(id))
         .sort((a, b) => { const c = (id) => { const [i, j] = id.split('_').map(Number); return Math.hypot(-4096 + (i + 0.5) * 256 - px, -4096 + (j + 0.5) * 256 - pz); }; return c(a) - c(b); });
-      for (const [id, g] of built) { if (!g) continue; const [i, j] = id.split('_').map(Number), cx = -4096 + (i + 0.5) * 256, cz = -4096 + (j + 0.5) * 256; g.visible = Math.max(Math.abs(cx - px), Math.abs(cz - pz)) - 128 < R_SHOW; }
+      for (const [id, g] of built) vis(id, g, px, pz);
     }
     // dựng trong ngân sách ~18 ms mỗi lần gọi (landmarks gọi 0,4–1,5 s / lần)
     const t0 = performance.now();
-    while (queue.length && performance.now() - t0 < 18) { const id = queue.shift(); const g = buildCell(id, low()); built.set(id, g); if (g) root.add(g); }
+    while (queue.length && performance.now() - t0 < 18) make(queue.shift(), px, pz);
   }
-  return { update, root, settle: (px, pz, n = 12) => { lx = Infinity; update(px, pz); for (let k = 0; k < n && queue.length; k++) { const id = queue.shift(); const g = buildCell(id, low()); built.set(id, g); if (g) root.add(g); } } };
+  return { update, root, settle: (px, pz, n = 12) => { lx = Infinity; update(px, pz); for (let k = 0; k < n && queue.length; k++) make(queue.shift(), px, pz); } };
 }
 export const _test = { buildCell };
