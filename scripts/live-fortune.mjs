@@ -8,6 +8,7 @@ import { chromium } from 'playwright';
 const URL_ = process.argv.find((a) => a.startsWith('http')) || 'https://battu.god8.shop/game.html';
 const browser = await chromium.launch({ headless: true, args: ['--use-angle=d3d11', '--ignore-gpu-blocklist'] });
 const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 }, userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36' })).newPage(); // UA thường: worker chặn «HeadlessChrome» (chống cào)
+await page.addInitScript(() => { try { localStorage.setItem('huyenquan:quality', 'low'); } catch (e) { /* ignore */ } }); // kiểm AI, không kiểm đồ hoạ: cố định mức thấp → bộ tự hạ chất lượng không tải lại trang giữa chừng
 const errs = [];
 page.on('pageerror', (e) => errs.push(e.message.slice(0, 200)));
 const ai = [];
