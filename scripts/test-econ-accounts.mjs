@@ -21,8 +21,8 @@ function connect(acc, room) {
   });
 }
 const wait = async (c, p, ms = 8000) => { const t = Date.now(); while (Date.now() - t < ms) { const i = c.inbox.findIndex(p); if (i >= 0) return c.inbox.splice(i, 1)[0]; await new Promise((r) => setTimeout(r, 40)); } return { ok: false, err: 'timeout' }; };
-let q = 100;
-const ask = async (c, op, a = {}) => { const id = ++q; c.ws.send(JSON.stringify({ t: 'ec', op, a, q: id })); await new Promise((r) => setTimeout(r, 120)); return wait(c, (m) => m.t === 'ec_res' && m.q === id); };
+let q = 100, DT = 0; // DT: tua đồng hồ của Economy DO (chỉ máy dev AUTH_DEV) — kiểm tuổi tài khoản, két 24 giờ
+const ask = async (c, op, a = {}) => { const id = ++q; c.ws.send(JSON.stringify({ t: 'ec', op, a: DT ? { ...a, _dt: DT } : a, q: id })); await new Promise((r) => setTimeout(r, 120)); return wait(c, (m) => m.t === 'ec_res' && m.q === id); };
 const ok = (cond, msg) => { console.log(`${cond ? '✓' : '✗'} ${msg}`); if (!cond) process.exitCode = 1; };
 
 const room = 20 + Math.floor(Math.random() * 10), tag = Date.now().toString(36);
@@ -46,8 +46,10 @@ const buy = await ask(b, 'mk_buy', { id: post.id, n: 5, k: `m${tag}` });
 ok(buy.ok && !buy.hold && buy.inv.some((s) => s.id === 'gao' && s.n === 5), 'B mua được, hàng về túi B, không vào két (trong biên độ)');
 const meA = await ask(a, 'me');
 ok(meA.purse === 400000 - 10 * thPrice + Math.round(2000 - 60 - 100), `A nhận tiền trừ phí 3% + phí kho (ví A ${meA.purse})`);
-// hôn nhân
+// hôn nhân — tài khoản vừa tạo: máy chủ chặn (< 7 ngày, ngày tạo lấy ở Accounts DO); tua 15 ngày rồi làm tiếp
 const uOfB = uB;
+ok(/7 ngày/.test((await ask(a, 'cv_propose', { to: uOfB, tier: 'hanvi', phrase: 0 })).err || ''), 'tài khoản mới tạo không cầu hôn được (máy chủ kiểm tuổi tài khoản)');
+DT = 15 * 86400000;
 const prop = await ask(a, 'cv_propose', { to: uOfB, tier: 'hanvi', phrase: 0 });
 ok(prop.ok, 'A cầu hôn B (u từ gói join)');
 const props = (await ask(b, 'cv_view')).props || [];
@@ -60,6 +62,7 @@ const W = { 金: 'Kim', 木: 'Mộc', 火: 'Hỏa' };
 const essays = EXAM.map((e) => `Lá số có tứ trụ ${e.pillars}. Nhật chủ ${e.dm}, ${e.strong}. ${e.note} Vì thế Dụng thần là ${W[e.yong]}, lấy hành ấy làm trọng để cân bằng ngũ hành. Xét tương sinh tương khắc trong cục, Hỷ thần đi kèm giúp sức, còn Kỵ thần cần tránh khi chọn hướng nhà và màu áo. Đại vận mười năm tới thuận cho việc học nghề hợp hành ${W[e.yong]} trong thành: nên tìm tiệm thuộc cung cùng hành để làm công, giữ sức, tích Phúc Khí đều đặn.`);
 const ex = await ask(a, 'dv_exam', { texts: essays });
 ok(ex.ok && ex.pass, `A qua sát hạch (trung bình ${ex.avg})`);
+{ const d0 = DT; DT = 0; ok(/14 ngày/.test((await ask(a, 'dv_register', { fee: 100, level: 99, k: `r0${tag}` })).err || ''), 'thầy: tài khoản mới (< 14 ngày) bị chặn dù client khai cấp 99'); DT = d0; }
 ok((await ask(a, 'dv_register', { fee: 100, level: 12, k: `r${tag}` })).ok, 'A ký quỹ 2 lượng, treo biển 100 đồng / quẻ');
 const list = await ask(b, 'dv_list');
 const thay = (list.list || []).find((d) => d.name === nameA);
@@ -74,7 +77,16 @@ const text = `Nhật chủ Mậu Thổ thân vượng, Thổ dày được Hỏa
 const dl = await ask(a, 'dv_deliver', { id: job?.id, text });
 ok(dl.ok && dl.l0?.pass, `lời luận qua kiểm tất định (${dl.l0?.score}/10)`);
 ok(dl.l1 && dl.l1.logic === 8 && dl.l1.decision === 'APPROVE_PAYOUT', `trọng tài LLM được gọi và đọc đúng schema (logic ${dl.l1?.logic})`);
-ok((await ask(b, 'dv_rate', { id: job?.id, happy: true })).ok, 'B đánh giá hài lòng (giải ngân sau khi tiền nằm két đủ 24 giờ)');
+ok((await ask(b, 'dv_rate', { id: job?.id, happy: true })).ok, 'B đánh giá hài lòng');
+const before = (await ask(a, 'me')).purse;
+const early = (await ask(b, 'dv_mine')).asC?.find((x) => x.id === job?.id);
+ok(early?.status === 'done', `chưa đủ 24 giờ: lượt xem còn trong két (trạng thái ${early?.status})`);
+ok((await ask(a, 'me')).purse === before, 'chưa đủ 24 giờ: thầy chưa nhận tiền');
+DT += 25 * 3600000; // tua 25 giờ
+const after = (await ask(a, 'me')).purse;
+ok(after - before === Math.round(10000 * 0.8), `két giải ngân sau 24 giờ: thầy nhận 100 đồng − 20% thuế (${(after - before) / 100} đồng)`);
+const cB = (await ask(b, 'dv_mine')).asC?.find((x) => x.id === job?.id);
+ok(cB?.status === 'settled' && /Giải ngân/.test(cB.verdict || ''), `khách thấy kết quả: ${cB?.verdict}`);
 a.ws.close(); b.ws.close();
 const log = await (await fetch('http://127.0.0.1:8899/log')).json();
 ok(log.length > 0 && !log.some((l) => l.hasBirth), 'không lời gọi mô hình nào chứa ngày sinh');

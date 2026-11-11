@@ -261,7 +261,7 @@ export function econBody(api, ec, opt = {}) {
   // ---------------- HỘ TỊCH ----------------
   function hotich() {
     const box = el('<div></div>'), here = at === 'hotich', m = me?.marriage;
-    box.append(el(`<h4>💍 Hộ tịch</h4><p class="hq-note">Một vợ một chồng, chỉ tài khoản đăng nhập. Không mừng tiền cưới. Quỹ chung ghi tên người góp — ly hôn chia theo tỉ lệ góp. Ly hôn xong chờ 30 ngày mới cưới lại; tối đa 3 lần / năm.</p>${need('Nha Môn Địa Ốc (quầy «Hộ tịch»)', here)}`));
+    box.append(el(`<h4>💍 Hộ tịch</h4><p class="hq-note">Một vợ một chồng, chỉ tài khoản đăng nhập ít nhất 7 ngày tuổi. Không mừng tiền cưới. Quỹ chung ghi tên người góp — ly hôn chia theo tỉ lệ góp. Ly hôn xong chờ 30 ngày mới cưới lại; tối đa 3 lần / năm.</p>${need('Nha Môn Địa Ốc (quầy «Hộ tịch»)', here)}`));
     if (m) {
       const T = CV.TIERS[m.tier];
       box.append(el(`<div class="hq-yc-card"><span class="hq-food-t"><b>${m.title ? '💞 Phu thê' : '💑 Đã kết hôn'} với ${esc(m.otherName || 'người ấy')}</b><small>Lễ ${esc(T.name)} · từ ${new Date(m.since).toLocaleDateString('vi-VN')}${m.buffUntil > Date.now() ? ' · 🌸 Hỷ khí còn hiệu lực' : ''} · ${m.status === 'DIVORCING' ? `⚖ đang ly hôn (${m.div?.mutual ? 'thuận tình' : 'đơn phương'}) — xong lúc ${new Date(m.div.until).toLocaleString('vi-VN')}` : 'hôn thú hiệu lực'}</small>${T.fund ? `<small>Quỹ chung ${fmtCoin(m.fund)} · phần bạn góp ${fmtCoin(m.mine)}</small>` : ''}</span></div>`));
@@ -320,10 +320,10 @@ export function econBody(api, ec, opt = {}) {
       }
       // thầy
       const prof = mine?.prof;
-      const tg = el(`<div><h4>Hành nghề thầy mệnh lý</h4><p class="hq-note">Cần cấp 10 (hoặc Trúc Cơ), qua sát hạch 3 lá số mẫu, ký quỹ 2 lượng. Giá 50–300 đồng (Sơ cấp), tới 1.000 (Trung cấp, uy tín ≥ 60), 3.000 (Cao cấp, ≥ 85). Tối đa 10 lượt / ngày.</p>${prof ? `<p class="hq-life-van">${esc(prof.rank)} · uy tín ${prof.rep} · ${prof.active ? 'đang nhận khách' : 'nghỉ'} · giá ${prof.fee || 0} đồng${prof.ban > Date.now() ? ' · ⛔ bị treo nghề' : ''}</p>` : ''}<div class="hq-actions"></div></div>`);
+      const tg = el(`<div><h4>Hành nghề thầy mệnh lý</h4><p class="hq-note">Cần tài khoản đăng nhập ít nhất 14 ngày tuổi, qua sát hạch 3 lá số mẫu, ký quỹ 2 lượng. Giá 50–300 đồng (Sơ cấp), tới 1.000 (Trung cấp, uy tín ≥ 60), 3.000 (Cao cấp, ≥ 85). Tối đa 10 lượt / ngày.</p>${prof ? `<p class="hq-life-van">${esc(prof.rank)} · uy tín ${prof.rep} · ${prof.active ? 'đang nhận khách' : 'nghỉ'} · giá ${prof.fee || 0} đồng${prof.ban > Date.now() ? ' · ⛔ bị treo nghề' : ''}</p>` : ''}<div class="hq-actions"></div></div>`);
       const ta = tg.querySelector('.hq-actions');
       if (!prof?.exam) { const e = el('<button class="hq-btn hq-primary" type="button">📝 Làm bài sát hạch</button>'); e.onclick = () => examForm(area); ta.append(e); }
-      else { const r = el('<button class="hq-btn hq-primary" type="button">Đặt giá & nhận khách</button>'); r.onclick = async () => { const fee = Math.floor(Number(prompt('Giá mỗi quẻ (đồng)?', String(prof.fee || 100))) || 0); if (fee > 0) { await run('dv_register', { fee, level: api.level?.() || 1, realm: api.state.realm?.idx | 0 }, (x) => `🔮 Đã treo biển: ${x.rank} · ${x.fee} đồng / quẻ.`); draw(); } }; ta.append(r); }
+      else { const r = el('<button class="hq-btn hq-primary" type="button">Đặt giá & nhận khách</button>'); r.onclick = async () => { const fee = Math.floor(Number(prompt('Giá mỗi quẻ (đồng)?', String(prof.fee || 100))) || 0); if (fee > 0) { await run('dv_register', { fee }, (x) => `🔮 Đã treo biển: ${x.rank} · ${x.fee} đồng / quẻ.`); draw(); } }; ta.append(r); }
       area.append(tg);
       for (const b of mine?.asT || []) {
         const c = el(`<div class="hq-yc-card"><span class="hq-food-t"><b>Khách đặt quẻ · ${b.fee / 100} đồng · hạn ${new Date(b.due).toLocaleString('vi-VN')}</b><small>Hỏi: ${esc(b.q)}</small>${b.profile ? `<small>Nhật chủ ${esc(b.profile.dm)} · ${esc(b.profile.strong)} · Dụng ${esc(b.profile.yong?.primary || '?')} · tứ trụ ${esc(b.profile.pillars.join(' · '))} · ngũ hành ${Object.entries(b.profile.pct).map(([k, v]) => `${k}${v}%`).join(' ')}</small>` : ''}<small>${esc(b.status)}</small></span></div>`);

@@ -1,6 +1,6 @@
 // ============================================================================
 //  THẦY MỆNH LÝ & TRỌNG TÀI (P13 — thuần). Đặc tả §14.
-//  · Hành nghề: tài khoản đăng nhập, cấp ≥ 10 (hoặc cảnh giới Trúc Cơ), ký quỹ 2 lượng, qua SÁT HẠCH (luận 3 lá số mẫu
+//  · Hành nghề: tài khoản đăng nhập ≥ 14 ngày tuổi (máy chủ kiểm ngày tạo ở Accounts DO), ký quỹ 2 lượng, qua SÁT HẠCH (luận 3 lá số mẫu
 //    — lớp 0 chấm: đủ dài, nói đúng Dụng thần của từng mẫu). Giá tự đặt 50–3.000 đồng, trần theo bậc uy tín.
 //  · Lượt xem: khách đăng nhập + đồng ý chia sẻ hồ sơ rút gọn + tứ trụ (KHÔNG ngày giờ sinh dạng lịch), tiền vào KÉT.
 //    1 khách – 1 thầy – 1 lượt / 7 ngày; thầy tối đa 10 lượt / ngày; quá 24 giờ không luận → hoàn tiền, thầy −5 uy tín.

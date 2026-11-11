@@ -24,12 +24,23 @@ import * as DV from './divination.js';
 export const vnDay = (now = Date.now()) => new Date(now + 7 * 3600000).toISOString().slice(0, 10);
 const DEP_CAP = { guest: 300, acct: 5000 }; // đồng / ngày chuyển từ ví máy lên ví máy chủ (cầu nối tới khi ví lên hẳn máy chủ)
 const LOCK_TC = 30 * 86400000;
+/** tuổi tài khoản tối thiểu (máy chủ giữ — ngày tạo ở Accounts DO): thầy mệnh lý 14 ngày (§14.1), kết hôn 7 ngày (§12.1) */
+export const AGE = { thay: 14 * 86400000, cuoi: 7 * 86400000 };
 const okN = (n, max = 999) => Number.isInteger(n) && n > 0 && n <= max;
 const err = (e) => ({ ok: false, err: e });
 
 export class EconEngine {
-  /** store: { get, put, delete, list }; opts.judge(messages) → Promise<string> (trọng tài LLM, tuỳ chọn) */
-  constructor(store, opts = {}) { this.s = store; this.judge = opts.judge || null; }
+  /** store: { get, put, delete, list }; opts.judge(messages) → Promise<string> (trọng tài LLM, tuỳ chọn);
+   *  opts.accountCreated(uid) → Promise<mốc tạo tài khoản | null> (Accounts DO) */
+  constructor(store, opts = {}) { this.s = store; this.judge = opts.judge || null; this.accountCreated = opts.accountCreated || null; }
+  /** ghi mốc tạo tài khoản vào hồ sơ (một lần) — để kiểm tuổi cả người KHÁC (người được cầu hôn) */
+  async stampBorn(u, uid) {
+    if (!uid || !this.accountCreated) return;
+    const p = await this.P(u); if (p.born && p.uid === uid) return;
+    const c = await this.accountCreated(uid); if (!c) return;
+    p.born = c; p.uid = uid; await this.save(u, p);
+  }
+  ageOk(p, need, now, local) { return local || (!!p.born && now - p.born >= need); }
 
   async id() { const n = ((await this.s.get('seq')) || 0) + 1; await this.s.put('seq', n); return n.toString(36); }
   async P(u) {
@@ -52,7 +63,7 @@ export class EconEngine {
     if (typeof f !== 'function') return err('bad');
     const trade = ['mk_post', 'mk_buy', 'vn_rent', 'vn_buy', 'cv_propose', 'cv_answer', 'dv_register', 'dv_book', 'dv_exam'];
     if (trade.includes(op) && !ctx.uid && !ctx.local) return err('Cần đăng nhập tài khoản (khách không giao dịch với người khác).');
-    try { await this.sweepDiv(now); await this.settleVenues(now); return await f.call(this, u, a, { ...ctx, now }); } catch (e) { return err('Lỗi máy chủ kinh tế.'); }
+    try { await this.stampBorn(u, ctx.uid); await this.sweepDiv(now); await this.settleVenues(now); return await f.call(this, u, a, { ...ctx, now }); } catch (e) { return err('Lỗi máy chủ kinh tế.'); }
   }
 
   // ---------- hồ sơ & ví ----------
@@ -343,6 +354,8 @@ export class EconEngine {
     const to = String(a.to || ''); if (!to || to === u) return err('Hãy chọn một người chơi khác.');
     const me = await this.P(u), b1 = CV.blocker(me, ctx.now); if (b1) return err(`Bạn ${b1}.`);
     const tp = await this.P(to), b2 = CV.blocker(tp, ctx.now); if (b2) return err(`Người ấy ${b2}.`);
+    if (!this.ageOk(me, AGE.cuoi, ctx.now, ctx.local)) return err('Tài khoản của bạn cần ít nhất 7 ngày tuổi mới đăng ký hôn thú được.');
+    if (!this.ageOk(tp, AGE.cuoi, ctx.now, ctx.local)) return err('Người ấy cần là tài khoản đăng nhập, ít nhất 7 ngày tuổi.');
     const list = ((await this.s.get(`prop:${to}`)) || []).filter((x) => ctx.now - x.at < CV.PROPOSAL_MS && x.from !== u);
     list.push({ from: u, name: String(ctx.name || '').slice(0, 24), phrase: CV.PHRASES[(a.phrase | 0) % CV.PHRASES.length], tier: CV.TIERS[a.tier] ? a.tier : 'hanvi', at: ctx.now });
     await this.s.put(`prop:${to}`, list.slice(-5));
@@ -355,6 +368,7 @@ export class EconEngine {
     if (!a.yes) return { ok: true, declined: true };
     const A = await this.P(pr.from), B = await this.P(u);
     const b = CV.blocker(A, ctx.now) || CV.blocker(B, ctx.now); if (b) return err(`Không thể kết hôn: ${b}.`);
+    if (!this.ageOk(A, AGE.cuoi, ctx.now, ctx.local) || !this.ageOk(B, AGE.cuoi, ctx.now, ctx.local)) return err('Cả hai cần là tài khoản đăng nhập, ít nhất 7 ngày tuổi.');
     const assets = ((A.purse || 0) + (B.purse || 0)) / 100, fee = CV.cost(pr.tier, assets);
     // người cầu hôn trả lễ; không đủ thì người nhận lời trả phần còn lại
     const fromA = Math.min(A.purse, fee * 100), fromB = fee * 100 - fromA;
@@ -412,7 +426,7 @@ export class EconEngine {
   }
   async op_dv_register(u, a, ctx) {
     const prof = await this.s.get(`dv:${u}`); if (!prof?.exam) return err('Chưa qua bài sát hạch (luận 3 lá số mẫu).');
-    if ((a.level | 0) < 10 && (a.realm | 0) < 2) return err('Cần cấp 10 hoặc cảnh giới Trúc Cơ.');
+    if (!this.ageOk(await this.P(u), AGE.thay, ctx.now, ctx.local)) return err('Hành nghề thầy mệnh lý cần tài khoản đăng nhập ít nhất 14 ngày tuổi.');
     if (prof.ban && prof.ban > ctx.now) return err('Đang bị treo nghề.');
     const R = DV.rankOf(prof.rep), fee = Math.round(Number(a.fee) || 0);
     if (fee < DV.MIN_FEE || fee > R.max) return err(`Giá mỗi quẻ ${DV.MIN_FEE}–${R.max} đồng (bậc ${R.name}).`);

@@ -278,8 +278,19 @@ await check('mặt bằng: số chỗ có hạn, mỗi người một mặt bằ
   const m = await e.call('me', 'A', {}, { uid: 'a', now: now + 5 * D }); // không hàng, không vốn → âm → niêm phong
   assert.ok(m.debt > 0, 'phần âm thành nợ'); assert.equal(m.venue, null);
 });
+await check('tuổi tài khoản do MÁY CHỦ giữ (Accounts DO): tài khoản mới tạo không cầu hôn (< 7 ngày), không hành nghề thầy (< 14 ngày)', async () => {
+  const born = { a: T0 - D, b: T0 - 30 * D, t: T0 - 10 * D };
+  const e = new EconEngine(new MemStore(), { accountCreated: async (uid) => born[uid] || null }), now = T0;
+  await e.call('me', 'A', {}, { uid: 'a', now }); await e.call('me', 'B', {}, { uid: 'b', now });
+  assert.match((await e.call('cv_propose', 'A', { to: 'B' }, { uid: 'a', now })).err, /7 ngày/);
+  assert.match((await e.call('cv_propose', 'B', { to: 'A' }, { uid: 'b', now })).err, /7 ngày/, 'người được cầu hôn cũng phải đủ tuổi');
+  assert.match((await e.call('cv_propose', 'B', { to: 'X' }, { uid: 'b', now })).err, /tài khoản đăng nhập/, 'khách (không có mốc tài khoản) không kết hôn');
+  await e.call('dv_exam', 'T', { texts: essays() }, { uid: 't', now });
+  assert.match((await e.call('dv_register', 'T', { fee: 100, level: 99, realm: 6, k: 'r' }, { uid: 't', now })).err, /14 ngày/, 'khai cấp 99 cũng không qua');
+  assert.match((await e.call('dv_register', 'T', { fee: 100, k: 'r2' }, { uid: 't', now: now + 5 * D })).err, /ký quỹ/, '15 ngày tuổi → qua cổng tuổi, tới bước ký quỹ');
+});
 await check('hộ tịch qua máy chủ: cầu hôn → nhận lời (người cầu hôn trả lễ) → góp quỹ → ly hôn thuận tình chia đúng tỉ lệ', async () => {
-  const e = new EconEngine(new MemStore()), now = T0, A = { uid: 'a', name: 'An', now }, B = { uid: 'b', name: 'Bình', now };
+  const e = new EconEngine(new MemStore(), { accountCreated: async () => T0 - 60 * D }), now = T0, A = { uid: 'a', name: 'An', now }, B = { uid: 'b', name: 'Bình', now };
   await e.call('deposit', 'A', { xu: 400000, k: '1' }, A); await e.call('deposit', 'B', { xu: 100000, k: '2' }, B);
   assert.ok((await e.call('cv_propose', 'A', { to: 'B', tier: 'trungluu' }, A)).ok);
   const ans = await e.call('cv_answer', 'B', { from: 'A', yes: true }, B); assert.ok(ans.ok, ans.err);
@@ -293,7 +304,7 @@ await check('hộ tịch qua máy chủ: cầu hôn → nhận lời (người c
 });
 await check('thầy mệnh lý qua máy chủ: sát hạch → ký quỹ → khách đặt (két) → luận → hài lòng → giải ngân sau 24 giờ trừ thuế 20%; 1 lượt / tuần / cặp; trọng tài LLM được gọi', async () => {
   let judged = 0;
-  const e = new EconEngine(new MemStore(), { judge: async () => { judged++; return '{"logic":8,"relevance":8,"feasible_in_game":true,"spam":false,"manipulation":false,"real_world_advice":false,"decision":"APPROVE_PAYOUT","reason":"ok"}'; } });
+  const e = new EconEngine(new MemStore(), { accountCreated: async () => T0 - 60 * D, judge: async () => { judged++; return '{"logic":8,"relevance":8,"feasible_in_game":true,"spam":false,"manipulation":false,"real_world_advice":false,"decision":"APPROVE_PAYOUT","reason":"ok"}'; } });
   const now = T0, T = { uid: 't', name: 'Thầy', now }, K = { uid: 'k', name: 'Khách', now };
   await e.call('deposit', 'T', { xu: 400000, k: '1' }, T); await e.call('deposit', 'K', { xu: 50000, k: '2' }, K);
   const good = essays();

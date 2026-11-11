@@ -13,9 +13,16 @@ import { llmChat } from './llm.js';
 export class Economy extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
-    this.e = new EconEngine(ctx.storage, { judge: async (messages) => { const r = await llmChat(env, messages, { maxTokens: 300, json: true }); return r.ok ? r.text : ''; } });
+    this.e = new EconEngine(ctx.storage, {
+      judge: async (messages) => { const r = await llmChat(env, messages, { maxTokens: 300, json: true }); return r.ok ? r.text : ''; },
+      accountCreated: async (uid) => { if (!env.ACCOUNTS) return null; try { return (await env.ACCOUNTS.get(env.ACCOUNTS.idFromName('accounts')).me(uid))?.created || null; } catch (e) { return null; } },
+    });
   }
-  call(op, u, args, ctx = {}) { return this.e.call(op, u, args || {}, { uid: ctx.uid || null, name: ctx.name || '', admin: !!ctx.admin }); }
+  call(op, u, args, ctx = {}) {
+    // CHỈ máy dev (AUTH_DEV = 1, npm run dev:mmo): tham số _dt tua đồng hồ để kiểm két 24 giờ, tuổi tài khoản… trên DO thật. Bản thật bỏ qua.
+    const dt = this.env.AUTH_DEV === '1' ? Math.max(0, Math.min(400 * 86400000, Number(args?._dt) || 0)) : 0;
+    return this.e.call(op, u, args || {}, { uid: ctx.uid || null, name: ctx.name || '', admin: !!ctx.admin, now: Date.now() + dt });
+  }
   // --- trí nhớ NPC (§8.3): { aff (−100..100), ev: [≤ 5 câu ≤ 120 ký tự], last } ---
   async memGet(u, npc) { return (await this.ctx.storage.get(`mem:${u}:${npc}`)) || { aff: 0, ev: [], last: 0 }; }
   async memPut(u, npc, mem) {
