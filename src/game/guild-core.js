@@ -71,7 +71,7 @@ const sameYong = (a, b) => !!a && !!b && a.primary === b.primary && a.accent ===
 export const YONG_LOCK_MS = 30 * 86400000; // đổi Dụng thần khai báo tối đa 1 lần / 30 ngày (§1.3)
 const rid = (rand) => Math.floor(rand() * 1e9).toString(36).padStart(6, '0');
 
-export const LAYOUT_VER = 4;
+export const LAYOUT_VER = 5; // v5 (THANH-MANIFEST): lô chia lại theo ô chu vi + sân trong → chỉ số tiệm k đổi lần nữa
 export class GuildEngine {
   /** store: { get, put, delete, list } — ctx.storage của DO hoặc MemStore */
   constructor(store) { this.s = store; }

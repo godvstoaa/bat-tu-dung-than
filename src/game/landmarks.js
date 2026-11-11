@@ -14,6 +14,7 @@ import { addPlatform, markTerraceEdges } from './obstacles.js';
 import * as BQ from './batquai.js';
 import { octWall, cityGates, buildDistrict } from './batquai3d.js';
 import { outerWall, outerGates, cityHouses } from './cityblocks3d.js';
+import { cityDress } from './citydress3d.js';
 import { estateSigns } from './cityident3d.js';
 import * as CB from './cityblocks.js';
 import * as LAYOUT from './citylayout.js';
@@ -277,6 +278,7 @@ SPOTS.push({ at: [0, 0], place: async (g) => {
   const hs = await cityHouses(g);
   LOD_UPDATERS.push(hs.update);
   await hs.settle(3, 42);
+  const dress = cityDress(g); LOD_UPDATERS.push(dress.update); dress.settle(3, 42); // v5: đồ phố, sân trong, phường (THANH-MANIFEST)
   estateSigns(g); // biển BÁN / tên chủ trước 27 nhà phố rao bán (biệt phủ: biển trên cổng phủ)
 } });
 // công trình trọng điểm: sảnh nghề 8 khu, cảng Nam Môn, 4 đền Phố Thầy Bói (model sảnh lớn trên nền đá)

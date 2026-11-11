@@ -15,7 +15,7 @@ import { cityShops } from '../src/game/shops.js';
 import { listings } from '../src/game/estate.js';
 import { createState, recordCase } from '../src/game/state.js';
 import * as BQ from '../src/game/batquai.js';
-import { renderHouses, modelOf } from '../src/game/city4.js';
+import { renderHouses, shopModels } from '../src/game/city4.js';
 import { generateCity, HOUSE_SPECS } from '../src/game/cityblocks.js';
 import { innerHouses } from '../src/game/innerfill.js';
 
@@ -96,12 +96,13 @@ check('cửa hàng không trùng căn rao bán; mặt tiền gọn trong khung n
   }
 });
 
-check('v4 bản sắc phố: ≥ 20 mẫu nhà, tiệm đúng mặt tiền theo loại, nhà theo cung (Khảm nhà ven sông, Khôn kho lương)', () => {
+check('v5 bản sắc phố: ≥ 20 mẫu nhà, tiệm thuộc nhóm mặt tiền của loại, nhà theo cung (Khảm nhà ven sông, Khôn kho lương)', () => {
   const R = renderHouses();
   assert.ok(new Set(R.map((h) => h.id)).size >= 20);
   for (const h of R) { assert.ok(HOUSE_SPECS[h.id], h.id); assert.ok(h.lotF <= h.f + 1e-6, `${h.key} tràn lô`); }
   const byKey = new Map(R.map((h) => [h.key, h]));
-  for (const s of S) if (s.hi != null && s.type !== 'tientrang') assert.equal(byKey.get(s.hi).id, modelOf({ use: 'shop', type: s.type }), s.name);
+  // v5: mỗi loại tiệm một NHÓM model (THANH-MANIFEST §3.4) — model dựng phải thuộc nhóm của loại, và đúng modelOf của chính nhà đó
+  for (const s of S) if (s.hi != null && s.type !== 'tientrang') { const m = byKey.get(s.hi).id; assert.ok(shopModels(s.type).includes(m), `${s.name}: ${m}`); }
   const by = (g, id) => R.some((h) => h.g === g && h.id === id);
   assert.ok(by('kan', 'bq_canal_house') && by('kun', 'bq_granary'));
 });

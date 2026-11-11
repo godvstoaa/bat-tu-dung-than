@@ -13,7 +13,7 @@
 import * as L from './citylayout.js';
 import { GUA, toWorld, toLocal } from './batquai.js';
 import { PHU_PLAN, VILLA_STYLES, VILLAS_PER_DISTRICT, VILLA_W, VILLA_D } from './estate-layout.js';
-import { LISTING_TIERS, PHU_COUNT, VILLA_COUNT } from './estate-core.js';
+import { LISTING_TIERS, LISTING_ROOMS, PHU_COUNT, VILLA_COUNT } from './estate-core.js';
 import { HOUSE_SPECS } from './cityblocks.js';
 
 const band = (h) => String(h.block).split('|')[1];
@@ -66,7 +66,8 @@ function plots() {
   const used = {};
   tiers.forEach((t, j) => {
     const g = GUA[j % GUA.length], key = `${g.id}:${t}`, nth = (used[key] = (used[key] || 0) + 1);
-    const cand = allHouses().filter((h) => h.use === 'home' && h.district.endsWith(`-${g.id}`) && band(h) === BAND[t] && !removed.has(h.id))
+    const room = LISTING_ROOMS[j] || [0, 0]; // v5: lô hẹp dần (nhà ống) → chỉ chọn lô đủ chỗ cho phòng trong cố định của hạng
+    const cand = allHouses().filter((h) => h.use === 'home' && !h.angle && h.district.endsWith(`-${g.id}`) && band(h) === BAND[t] && !removed.has(h.id) && h.w * 1.015 >= room[0] + 0.3 && h.d >= room[1] + 0.3)
       .sort((a, b) => (t === 'tuhop' ? b.w * b.d - a.w * a.d : a.w * a.d - b.w * b.d) || (a.id < b.id ? -1 : 1));
     const h = cand[nth * 4 - 1] || cand[0]; if (!h) return;
     removed.add(h.id);
@@ -93,17 +94,87 @@ const RES_BY_GUA = {
   zhen: ['bq_house_2f', 'bq_house_tiled', 'bq_tower_house'], xun: ['lib_courtyard', 'bq_house_2f', 'bq_canal_house'],
 };
 const GARDEN = ['lib_courtyard', 'bq_farmhouse', 'bq_house_stone'];
-const FACADE_GAP = { bq_teahouse: 0.8, bq_tavern: 0.82, bq_lantern_shop: 0.86, bq_apothecary: 0.86, bq_moongate: 0.86, bq_pottery: 0.88, bq_carpentry: 0.88, bq_incense: 0.88, bq_bookstore: 0.88, bq_forge: 0.88, bq_inn: 0.86, bq_yamen: 0.86, bq_drum_tower: 0.8, bq_shop_lantern: 0.9, bq_teashop: 0.9 };
+const FACADE_GAP = { bq_teahouse: 0.92, bq_tavern: 0.92, bq_lantern_shop: 0.94, bq_apothecary: 0.94, bq_moongate: 0.94, bq_pottery: 0.96, bq_carpentry: 0.96, bq_incense: 0.96, bq_bookstore: 0.96, bq_forge: 0.96, bq_inn: 0.94, bq_yamen: 0.94, bq_drum_tower: 0.92, bq_shop_lantern: 0.9, bq_teashop: 0.9 };  // v5: khe mái tiệm thu nhỏ (≥ 92 %) — phố liền mặt tiền như phố cổ
 const WX_TINT = { 火: [1, 0.86, 0.82], 水: [0.86, 0.92, 1], 木: [0.88, 1, 0.86], 金: [1, 1, 1], 土: [1, 0.94, 0.82] };
 const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
-export function modelOf(h) {
-  if (h.use === 'shop') return FACADE[h.type] || 'bq_shop_lantern';
-  if (h.use === 'fortune') return 'bq_incense';
-  if (h.use === 'temple') return 'bq_drum_tower';
-  if (h.use === 'service') return 'bq_yamen'; // Tiền Trang
+// v5 (THANH-MANIFEST §3.4–3.6): NHÓM MODEL mỗi loại tiệm (biển hiệu nói lên nghề, không phải một model) + nhà ở 6 model / cung;
+// chọn theo từng cạnh ô, KHÔNG trùng 2 nhà liền trước; chiều cao đích theo cấp đường; màu riêng từng nhà.
+const SHOP_POOL = {
+  moc: ['bq_carpentry', 'bq_forge', 'bq_house_tiled', 'bq_tower_house'], gom: ['bq_pottery', 'bq_house_stone', 'bq_shop_lantern', 'bq_granary'],
+  den: ['bq_lantern_shop', 'bq_shop_lantern', 'bq_teashop', 'bq_house_2f'], thuhoa: ['bq_bookstore', 'bq_house_2f', 'bq_teashop', 'bq_tower_house'],
+  hoavien: ['bq_moongate', 'bq_house_2f', 'bq_teashop', 'bq_shop_lantern'], phongthuy: ['bq_shop_lantern', 'bq_bookstore', 'bq_tower_house', 'bq_house_2f'],
+  huong: ['bq_incense', 'bq_shop_lantern', 'bq_teashop', 'bq_house_tiled'], tratrang: ['bq_teashop', 'bq_teahouse', 'bq_shop_lantern', 'bq_house_2f'],
+  duoc: ['bq_apothecary', 'bq_house_tiled', 'bq_teashop', 'bq_tower_house'], loren: ['bq_forge', 'bq_house_stone', 'bq_carpentry', 'bq_granary'],
+  tuu: ['bq_tavern', 'bq_inn', 'bq_tower_house'], tralau: ['bq_teahouse', 'bq_teashop', 'bq_tavern'], dichtram: ['bq_inn'], namon: ['bq_yamen'],
+};
+const RES_POOL = {
+  li: ['bq_house_2f', 'bq_house_tiled', 'lib_courtyard', 'bq_tower_house', 'bq_rural_house', 'lib_mtn_house'],
+  kun: ['bq_farmhouse', 'bq_house_stone', 'bq_granary', 'bq_rural_house', 'bq_house_tiled', 'bq_tower_house'],
+  dui: ['bq_house_2f', 'lib_courtyard', 'bq_house_tiled', 'bq_rural_house', 'bq_tower_house', 'lib_mtn_house'],
+  qian: ['bq_house_stone', 'lib_courtyard', 'bq_tower_house', 'bq_house_2f', 'bq_house_tiled', 'bq_granary'],
+  kan: ['bq_canal_house', 'bq_house_tiled', 'lib_courtyard', 'bq_stilt', 'bq_house_2f', 'bq_tower_house'],
+  gen: ['bq_house_stone', 'lib_mtn_house', 'bq_rural_house', 'bq_granary', 'bq_farmhouse', 'bq_house_2f'],
+  zhen: ['bq_house_2f', 'bq_house_tiled', 'bq_tower_house', 'lib_mtn_house', 'bq_rural_house', 'lib_courtyard'],
+  xun: ['lib_courtyard', 'bq_house_2f', 'bq_canal_house', 'bq_house_tiled', 'bq_tower_house', 'bq_stilt'],
+};
+const GARDEN_POOL = ['lib_courtyard', 'bq_farmhouse', 'bq_house_stone', 'bq_house_2f', 'lib_mtn_house'];
+const ANGLE_HOME = ['bq_tower_house', 'bq_house_2f', 'bq_granary'];
+// chiều cao mái đích theo cấp đường (§3.5) — góc phố +2 m
+const HT = { avenue: [8, 12], plaza: [8, 12], ring: [7, 11], street: [5.5, 9.5], lane: [5.5, 9.5], boundary: [5.5, 9.5], alley: [5, 7], boi: [4.5, 7.5] };
+export const HT_DISTORT = [0.85, 1.25]; // giới hạn kéo dọc so với phóng đều (không méo quá)
+const u01 = (s) => (hash(s) % 10007) / 10007;
+function poolOf(h) {
+  if (h.use === 'shop') return SHOP_POOL[h.type] || ['bq_shop_lantern', 'bq_house_2f', 'bq_teashop'];
+  if (h.use === 'fortune') return ['bq_incense', 'bq_shop_lantern', 'bq_teashop', 'bq_tower_house']; // quầy thầy bói: 3 mẫu (biển hiệu quầy bói ở lớp đồ phố)
+  if (h.use === 'temple') return ['bq_drum_tower'];
+  if (h.use === 'service') return ['bq_yamen'];
+  if (h.angle) return ANGLE_HOME;
   const g = String(h.district).split('-').pop(), b = band(h);
-  const list = b === 'g2' || b === 'g3' ? GARDEN : RES_BY_GUA[g] || RES_BY_GUA.li;
-  return list[hash(h.id) % list.length];
+  return b === 'g2' || b === 'g3' ? GARDEN_POOL : RES_POOL[g] || RES_POOL.li;
+}
+function pick(h, p1, p2, alt = 0) {
+  const pool = poolOf(h), [lo, hi] = h.villa ? [5.5, 9] : HT[h.front] || [5.5, 9.5], up = h.angle ? 2 : 0;
+  // nhịp cao thấp xen kẽ dọc dãy (§3.4–3.5): nhà lẻ ở nửa trên, nhà chẵn ở nửa dưới khoảng đích
+  const r = u01(`${h.id}|ht`), q = alt === 0 ? r : alt > 0 ? 0.62 + 0.38 * r : 0.38 * r; // hai nửa tách rõ (khe 24 %)
+  const ht = lo + up + (hi - lo) * q, F = h.w;
+  let best = null, bs = Infinity;
+  pool.forEach((id, k) => {
+    if (pool.length >= 3 && (id === p1 || id === p2)) return; // không trùng 2 nhà liền trước
+    if (pool.length === 2 && id === p1) return;
+    const sp = HOUSE_SPECS[id]; if (!sp) return;
+    const nat = F * (FACADE_GAP[id] || 1) * sp.hd; // chiều cao khi phóng đều theo mặt tiền
+    const sc = Math.abs(Math.log(ht / nat)) + ((hash(`${h.id}|${k}`) % 97) / 97) * 0.15; // gần chiều cao đích nhất (+ ngẫu nhiên nhẹ)
+    if (sc < bs) { bs = sc; best = id; }
+  });
+  best ||= pool[hash(h.id) % pool.length];
+  const nat = F * (FACADE_GAP[best] || 1) * HOUSE_SPECS[best].hd;
+  return { id: best, ht: Math.round(Math.min(nat * HT_DISTORT[1], Math.max(nat * HT_DISTORT[0], ht)) * 100) / 100 };
+}
+let MODELS = null;
+function models() {
+  if (MODELS) return MODELS;
+  MODELS = new Map();
+  const runs = new Map(); // mỗi cạnh ô một dãy (bi tăng = dọc theo cạnh); nhà góc tự một dãy
+  for (const h of allHouses()) { const k = h.angle ? `${h.id}` : `${h.block}#${h.edge}`; let l = runs.get(k); if (!l) runs.set(k, (l = [])); l.push(h); }
+  for (const list of runs.values()) {
+    list.sort((a, b) => a.bi - b.bi);
+    let p1 = null, p2 = null;
+    list.forEach((h, i) => { const r = pick(h, p1, p2, list.length > 1 ? (i % 2 ? -1 : 1) : 0); MODELS.set(h.id, r); p2 = p1; p1 = r.id; });
+  }
+  return MODELS;
+}
+/** nhóm model mặt tiền của một loại tiệm (§3.4) */
+export const shopModels = (type) => SHOP_POOL[type] || ['bq_shop_lantern', 'bq_house_2f', 'bq_teashop'];
+export function modelOf(h) {
+  const m = h && h.id && models().get(h.id);
+  if (m) return m.id;
+  if (h.use === 'shop') return (SHOP_POOL[h.type] || ['bq_shop_lantern'])[0];
+  return poolOf(h)[0];
+}
+/** màu riêng từng nhà (§3.6): màu cung × độ sáng ±10% × lệch ấm / lạnh ±6% */
+function tintOf(h, G) {
+  const base = WX_TINT[G?.wx] || [1, 1, 1], b = 0.9 + 0.2 * u01(`${h.id}|b`), w = (u01(`${h.id}|w`) - 0.5) * 0.12;
+  return [base[0] * b * (1 + w), base[1] * b, base[2] * b * (1 - w)].map((v) => Math.round(v * 1000) / 1000);
 }
 let RENDER = null;
 /** nhà để dựng: { id, x, z, ry, hw, hd, f, lotF, d, id model, g, tint, y } (khuôn mẫu cũ của cityblocks3d.cityHouses) */
@@ -112,8 +183,8 @@ export function renderHouses() {
   const { removed } = plots();
   RENDER = allHouses().filter((h) => !removed.has(h.id)).map((h) => {
     const g = String(h.district).split('-').pop(), G = GUA.find((q) => q.id === g);
-    const model = modelOf(h), sp = HOUSE_SPECS[model];
-    return { key: h.id, use: h.use, type: h.type, x: h.x, z: h.z, ry: h.ry, hw: h.w / 2, hd: h.d / 2, f: h.w, lotF: h.w * (FACADE_GAP[model] || 1), d: h.d, /* mặt tiền tiệm mái cong chừa khe (mái hiên không đâm vào nhau) */ id: model, g, ys: 1 + ((hash(h.id) % 9) - 3) * 0.02, tint: G ? WX_TINT[G.wx] : null, spec: sp };
+    const model = modelOf(h), sp = HOUSE_SPECS[model], ht = models().get(h.id)?.ht;
+    return { key: h.id, use: h.use, type: h.type, x: h.x, z: h.z, ry: h.ry, hw: h.w / 2, hd: h.d / 2, f: h.w, lotF: h.w * (FACADE_GAP[model] || 1), d: h.d, /* mặt tiền tiệm mái cong chừa khe (mái hiên không đâm vào nhau) */ id: model, g, ht, ys: 1, tint: tintOf(h, G), spec: sp, angle: !!h.angle, setback: h.setback || 0 }; // ht: chiều cao mái đích (§3.5)
   });
   return RENDER;
 }

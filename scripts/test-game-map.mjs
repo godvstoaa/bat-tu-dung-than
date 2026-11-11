@@ -5,7 +5,7 @@ import * as M from '../src/game/map-ui.js';
 let n = 0; const test = (name, fn) => { fn(); n++; console.log('✓', name); };
 const D = M.mapData();
 test('dữ liệu: > 20.000 nhà vẽ được, đủ lớp icon (thầy bói, miếu, sảnh, trạm, bến, nhà bán, cổng), có tên phố', () => {
-  assert.ok(D.houses.length > 20000);
+  assert.ok(D.houses.length > 16000); // v5: sân trong + quảng trường phường (THANH-MANIFEST §3.3)
   for (const l of M.LAYERS) assert.ok(D.pois.some((p) => p.layer === l.id), l.id);
   assert.ok(D.pois.filter((p) => p.layer === 'station').length === 41);
   assert.ok(D.streetLabels.length > 100);

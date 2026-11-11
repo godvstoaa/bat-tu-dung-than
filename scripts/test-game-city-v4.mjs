@@ -56,8 +56,8 @@ check('vùng: núi tông môn ngoài tường 2.600–3.300 m (cảnh nền), h�
   assert.ok(T.heightAt(L.x, L.z) < T.WATER - 5);
 });
 
-check(`≥ 18.000 nhà; id ổn định "ô:i" duy nhất, nằm đúng ô; houseAt / shopAt tra lại được`, () => {
-  assert.ok(HOUSES.length >= 18000, `chỉ ${HOUSES.length}`);
+check(`≥ 17.000 nhà (v5: lõi ô là sân trong ≥ 30 % — THANH-MANIFEST §3.3); id ổn định "ô:i" duy nhất, nằm đúng ô; houseAt / shopAt tra lại được`, () => {
+  assert.ok(HOUSES.length >= 17000, `chỉ ${HOUSES.length}`);
   const ids = new Set();
   for (const h of HOUSES) {
     assert.ok(/^\d+_\d+:\d+$/.test(h.id), h.id); assert.ok(!ids.has(h.id), `trùng ${h.id}`); ids.add(h.id);
@@ -340,6 +340,13 @@ check('cellsInRange / cell: ô ngoài thành rỗng, tra theo bán kính đúng'
   const far = C.cell(C.cellIdAt(3500, -3500)); assert.equal(far.houses.length, 0);
   assert.equal(C.cell('40_2'), null);
   const c = C.cell(C.cellIdAt(500, 500)); assert.ok(c.houses.length > 50 && c.roads.length > 10, `ô (500, 500): ${c.houses.length} nhà`);
+});
+
+check('v5 quy chuẩn (docs/THANH-MANIFEST.md): scripts/city-metrics.mjs — mọi chỉ số V đạt', () => {
+  let out = '';
+  try { out = execFileSync(process.execPath, [fileURLToPath(new URL('./city-metrics.mjs', import.meta.url))], { encoding: 'utf8' }); }
+  catch (e) { assert.fail(String(e.stdout || e.message).split('\n').filter((l) => l.startsWith('✗')).join(' · ')); }
+  assert.ok(/mọi chỉ số đạt/.test(out), out);
 });
 
 console.log(`\n${pass} đạt, ${fails.length} hỏng`);

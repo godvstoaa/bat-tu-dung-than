@@ -46,6 +46,8 @@ export function mapData() {
     else if (e.kind === 'est') pois.push({ layer: 'est', name: e.name, x: e.door.x, z: e.door.z, ref: e });
   }
   for (const l of L.landmarks()) if (l.kind === 'hall' || l.kind === 'port' || l.kind === 'sonmon' || (l.kind === 'temple' && l.id !== 'denchinh')) pois.push({ layer: 'hall', name: l.name, x: l.door?.x ?? l.x, z: l.door?.z ?? l.z, big: true });
+  // v5: đình phường ở tâm quảng trường phường (THANH-MANIFEST §3.8) — lớp «Miếu»; tên phường hiện ở mức phóng vừa
+  for (const w of L.wards()) if (w.square) pois.push({ layer: 'temple', name: `Đình ${w.name}`, x: w.centre.x, z: w.centre.z, ward: w });
   for (const s of L.stations()) pois.push({ layer: 'station', name: s.name, x: s.x, z: s.z, station: s });
   for (const d of docks()) pois.push({ layer: 'dock', name: d.name, x: d.x, z: d.z });
   for (const g of L.gates()) pois.push({ layer: 'gate', name: `Cổng ${g.name}`, x: g.x, z: g.z });

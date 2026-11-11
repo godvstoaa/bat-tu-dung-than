@@ -29,6 +29,7 @@ export const CITY = {
   A: CITY_WALL_A, WALL_T: 8, CELL: 256, SEED: 'huyen-thanh-v4',
   NOI_A: 380, TRUNG_A: 1050, SONMON_A: 190, RINGS: [380, 700, 1050, 1500, 1850],
   AVE_W: 32, RING_W: 24, STREET_W: 12, ALLEY_W: 6, COL: 120, ROW: 80, SETBACK: 1,
+  CHAMFER: 20, COURT_INSET: 22, // v5 (docs/THANH-MANIFEST.md): lô dọc cạnh cách đỉnh góc ≥ 20 m (góc vát, nhà góc 45°) · sân trong = ô lùi 22 m
   GATE_W: 40, RIVER_U: RIVER_ARC_U, QUAY_W,
 };
 const SB = CITY.SETBACK, SW = CITY.STREET_W, AH = CITY.AVE_W / 2, C0 = AH + SB; // lô bắt đầu cách tim đại lộ 17 m
@@ -250,25 +251,15 @@ for (const b of RAW_LIST) {
   }
 }
 
-// --- Bước 3: chia ô có ngõ (ngõ 6 m theo u ở giữa ô đủ sâu) → ô lô cuối cùng
+// --- Bước 3 (v5 · THANH-MANIFEST §3.1): KHÔNG chẻ ô bằng ngõ — mỗi ô thô là một ô lô; nhà bao chu vi, lõi là sân trong
 const BLOCKS = [];
-const MIN_SPLIT = 2 * 14 + CITY.ALLEY_W + 4;
 for (const b of RAW_LIST) {
   if (b.kind !== 'lots') continue;
-  const [[ua, va], [ub, vb], [, vc], [, vd]] = b.loc, depth = ub - ua;
+  const [[ua, va], [ub, vb], [, vc], [, vd]] = b.loc;
   const vAt = (u) => (b.last ? vmax(u) : vd + (vc - vd) * ((u - ua) / (ub - ua)));
-  const mk = (u0, u1, eIn, eOut, sub) => {
-    const loc = [[u0, va], [u1, vb], [u1, vAt(u1)], [u0, vAt(u0)]];
-    const poly = loc.map(([u, v]) => locW(b, u, v));
-    BLOCKS.push({ id: `${b.key}|${sub}`, idx: BLOCKS.length, raw: b.key, g: b.g.id, band: b.band.id, s: b.s, row: b.row, col: b.col, district: b.district, loc, poly, edges: [b.edges[0], eOut, b.edges[2], eIn] });
-  };
-  if (depth >= MIN_SPLIT && !VILLA_BANDS.has(b.band.id)) {
-    const um = (ua + ub) / 2, h = CITY.ALLEY_W / 2;
-    const al = { kind: 'alley', key: `al:${b.key}` };
-    mk(ua, um - h, b.edges[3], al, 0); mk(um + h, ub, al, b.edges[1], 1);
-    const a = locW(b, um, va - SB - 2), z = locW(b, um, vAt(um) + SB + 2);
-    addRoad('alley', `al:${b.key}`, CITY.ALLEY_W, a, z);
-  } else mk(ua, ub, b.edges[3], b.edges[1], 'x');
+  const loc = [[ua, va], [ub, vb], [ub, vAt(ub)], [ua, vAt(ua)]];
+  const poly = loc.map(([u, v]) => locW(b, u, v));
+  BLOCKS.push({ id: `${b.key}|x`, idx: BLOCKS.length, raw: b.key, g: b.g.id, band: b.band.id, s: b.s, row: b.row, col: b.col, district: b.district, loc, poly, edges: [b.edges[0], b.edges[1], b.edges[2], b.edges[3]] });
 }
 // pháp tuyến hướng vào trong ô cho từng cạnh (đa giác lồi)
 for (const B of BLOCKS) {
@@ -278,6 +269,64 @@ for (const B of BLOCKS) {
     let nx = -tz, nz = tx; if ((c.x - P.x) * nx + (c.z - P.z) * nz < 0) { nx = -nx; nz = -nz; }
     return { ...e, i, P, Q, L, tx, tz, nx, nz };
   });
+}
+
+// --- Bước 3b (v5): sân trong (đa giác lõi ô lùi COURT_INSET), PHƯỜNG (siêu khối ~3×3 ô) + ô quảng trường phường,
+// NGÕ XUYÊN 6 m từ phố nhánh vào sân trong (1 / ô, 2 / ô quảng trường phường)
+function insetPoly(P, d) { // tứ giác lồi: dời mỗi cạnh vào trong d rồi giao các cạnh kề
+  const c = centroid(P), L = P.length, lines = [];
+  for (let i = 0; i < L; i++) {
+    const a = P[i], b = P[(i + 1) % L], len = Math.hypot(b.x - a.x, b.z - a.z) || 1, tx = (b.x - a.x) / len, tz = (b.z - a.z) / len;
+    let nx = -tz, nz = tx; if ((c.x - a.x) * nx + (c.z - a.z) * nz < 0) { nx = -nx; nz = -nz; }
+    lines.push({ x: a.x + nx * d, z: a.z + nz * d, tx, tz, nx, nz });
+  }
+  const out = [];
+  for (let i = 0; i < L; i++) {
+    const p = lines[(i + L - 1) % L], q = lines[i], den = p.tx * q.tz - p.tz * q.tx;
+    if (Math.abs(den) < 1e-6) return null;
+    const t = ((q.x - p.x) * q.tz - (q.z - p.z) * q.tx) / den;
+    out.push({ x: r1(p.x + p.tx * t), z: r1(p.z + p.tz * t) });
+  }
+  for (const o of out) for (const l of lines) if ((o.x - l.x) * l.nx + (o.z - l.z) * l.nz < -0.5) return null; // còn nằm trong
+  const e = (i) => Math.hypot(out[(i + 1) % L].x - out[i].x, out[(i + 1) % L].z - out[i].z);
+  return out.every((_, i) => e(i) >= 12) ? out : null; // đủ lớn (≥ 12 m mỗi cạnh) mới là sân
+}
+const WARD_NAMES = ['An Lạc', 'Bình Khang', 'Phúc Thọ', 'Thái Hòa', 'Vĩnh Xuân', 'Thanh Bình', 'Hưng Thịnh', 'Minh Đức', 'Gia Hội', 'Đông Hoa', 'Tây Uyển', 'Nam Huân', 'Bắc Thần', 'Thọ Xương', 'Quảng Đức', 'Hòa Mục', 'Nhân Hậu', 'Tường Vân', 'Kim Ngân', 'Ngọc Hà', 'Liễu Giai', 'Hoa Lâu', 'Trúc Lâm', 'Mai Viên', 'Tùng Hạc', 'Bảo An', 'Cát Tường', 'Đức Hinh', 'Hồng Phúc', 'Vạn Bảo', 'Thiên Lộc', 'Hiền Lương'];
+const WARDS = [];
+{
+  const by = new Map();
+  for (const B of BLOCKS) {
+    B.court = insetPoly(B.poly, VILLA_BANDS.has(B.band) ? CITY.COURT_INSET + 3 : CITY.COURT_INSET); // nhà vườn sâu 22 m + lùi
+    const k = `${B.g}|${B.band}|${B.s}|${Math.floor(B.row / 3)}|${Math.floor(B.col / 3)}`;
+    let l = by.get(k); if (!l) by.set(k, (l = [])); l.push(B); B.ward = k;
+  }
+  for (const [k, list] of [...by].sort((p, q) => (p[0] < q[0] ? -1 : 1))) {
+    const c = centroid(list.map((B) => centroid(B.poly)));
+    const ok = list.filter((B) => B.court && polyDry(B.court, QUAY_W) && !(B.band === 'g3' && B.col === 0 && B.row <= 1)); // ô ven sông: chỉ cần SÂN khô
+    const sq = ok.sort((p, q) => { const a = centroid(p.poly), b = centroid(q.poly); return Math.hypot(a.x - c.x, a.z - c.z) - Math.hypot(b.x - c.x, b.z - c.z) || p.idx - q.idx; })[0] || null;
+    if (sq) sq.square = true;
+    const centre = sq ? centroid(sq.court) : c;
+    WARDS.push({ id: k, name: `Phường ${WARD_NAMES[hash(k) % WARD_NAMES.length]}`, district: list[0].district, blocks: list.map((B) => B.id), square: sq ? sq.id : null, centre: { x: r1(centre.x), z: r1(centre.z) }, court: sq ? sq.court : null });
+  }
+}
+for (const B of BLOCKS) {
+  B.passes = [];
+  if (!B.court) continue;
+  const rnd = mulberry(hash(`${CITY.SEED}|pass|${B.id}`));
+  const long = (e) => e.kind !== 'boi' && e.L >= 2 * CITY.CHAMFER + 30;
+  const cand = B.edges.filter((e) => SIDE_KINDS.has(e.kind) && long(e)).sort((p, q) => q.L - p.L || p.i - q.i);
+  const pool = cand.length ? cand : B.edges.filter(long).sort((p, q) => q.L - p.L || p.i - q.i);
+  const picks = pool.slice(0, 1);
+  if (B.square && picks.length) { const opp = B.edges[(picks[0].i + 2) % 4]; if (long(opp)) picks.push(opp); else if (pool[1]) picks.push(pool[1]); }
+  const cc = centroid(B.court);
+  for (const e of picks) {
+    const lo = CITY.CHAMFER + 10, hi = e.L - CITY.CHAMFER - 10, pos = lo + (hi - lo) * (0.3 + 0.4 * rnd());
+    const px = e.P.x + e.tx * pos, pz = e.P.z + e.tz * pos;
+    if (isWater(px, pz, QUAY_W) || isWater(cc.x, cc.z, QUAY_W)) continue;
+    B.passes.push({ i: e.i, pos, w: CITY.ALLEY_W + 1 });
+    const din = (VILLA_BANDS.has(B.band) ? CITY.COURT_INSET + 3 : CITY.COURT_INSET) + 3; // vuông góc mép phố, chạy vào hẳn trong sân
+    addRoad('alley', `al:${B.id}:${e.i}`, CITY.ALLEY_W, { x: px - e.nx * 2, z: pz - e.nz * 2 }, { x: px + e.nx * din, z: pz + e.nz * din });
+  }
 }
 
 // --- Bước 4: chủ đề phố + lô đặc biệt mỗi khu
@@ -337,11 +386,15 @@ for (const g of GUA) {
 // ============================================================================
 //  LÔ (sinh lười theo ô phố, tất định) — OBB: tâm (x, z), trục mặt tiền (tx, tz), pháp tuyến ra phố (nx, nz)
 // ============================================================================
+// v5 (THANH-MANIFEST §3.3): mặt tiền theo phân bố nhịp phố cổ (nhà ống hẹp xen nhà rộng), sâu lô theo NHÓM
 const LOT = {
-  front: { f: [11, 15], d: 16 }, sideShop: { f: [10, 13], d: 14 }, home: { f: [14, 18], d: 14 },
-  alley: { f: [13, 17], d: 13 }, boi: { f: [6, 8], d: 10 }, special: { f: [22, 22], d: 22 },
-  villa: { f: [20, 26], d: 22 }, // nhà vườn Ngoại Thành ngoài vành 1.500 (không chia ngõ)
+  front: { f: [[5, 7, 0.35], [8, 11, 0.40], [12, 15, 0.20], [16, 19, 0.05]], d: [16, 20] },
+  sideShop: { f: [[5, 7, 0.35], [8, 11, 0.45], [12, 15, 0.20]], d: [14, 16] },
+  home: { f: [[7, 10, 0.40], [10, 14, 0.45], [14, 18, 0.15]], d: [14, 17] },
+  boi: { f: [[6, 8, 1]], d: [10, 10] }, special: { f: [[22, 22, 1]], d: [22, 22] },
+  villa: { f: [[20, 26, 1]], d: [22, 22] }, // nhà vườn Ngoại Thành ngoài vành 1.500
 };
+const pickF = (spec, rnd) => { const r = rnd(); let acc = 0; for (const [a, b, p] of spec.f) { acc += p; if (r <= acc) return a + (b - a) * rnd(); } const [a, b] = spec.f[spec.f.length - 1]; return a + (b - a) * rnd(); };
 const SIDE_SHOP_P = 0.15, THEME_P = 0.65;
 function overlap(a, b) {
   for (const [ax, az] of [[a.tx, a.tz], [a.nx, a.nz], [b.tx, b.tz], [b.nx, b.nz]]) {
@@ -354,47 +407,77 @@ function overlap(a, b) {
 export const lotCorners = (o) => [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(([i, j]) => ({ x: o.x + o.tx * o.hw * i + o.nx * o.hd * j, z: o.z + o.tz * o.hw * i + o.nz * o.hd * j }));
 const insidePoly = (B, p) => B.edges.every((e) => (p.x - e.P.x) * e.nx + (p.z - e.P.z) * e.nz >= -0.05);
 const LOTS_OF = new Map(); // block idx → lô
+const DRESS_OF = new Map(); // block idx → { gaps, gardens } (khe giữa nhóm nhà, sân góc) — citydress3d dựng tường rào / cây
 function genBlock(B) {
   let got = LOTS_OF.get(B.idx); if (got) return got;
-  const rnd = mulberry(hash(`${CITY.SEED}|${B.id}`)), out = [];
+  const rnd = mulberry(hash(`${CITY.SEED}|${B.id}`)), out = [], gaps = [], gardens = [];
   const pr = (e) => { const sp = SPECIAL.has(`${B.id}#${e.i}`), fr = FRONT_KINDS.has(e.kind); return fr ? (sp ? 0 : 1) : sp ? 2 : e.kind === 'boi' ? 3 : SIDE_KINDS.has(e.kind) ? 4 : 5; };
   const order = [...B.edges].sort((a, b) => pr(a) - pr(b) || a.i - b.i);
+  const villa = VILLA_BANDS.has(B.band);
+  const tryPut = (o) => { const C = lotCorners(o); return C.every((p) => insidePoly(B, p)) && !out.some((q) => overlap(o, q)) && ![...C, o].some((p) => isWater(p.x, p.z, QUAY_W)); };
   for (const e of order) {
     const front = FRONT_KINDS.has(e.kind), theme = THEME.get(e.key);
-    let special = SPECIAL.get(`${B.id}#${e.i}`) || null, nShop = 0, cur = 0;
-    const prevK = B.edges[(e.i + 3) % 4].kind, nextK = B.edges[(e.i + 1) % 4].kind;
-    while (cur < e.L - 5) {
-      // chọn loại lô trước (quyết định kích thước)
-      let cls, use, type = null;
-      if (special) cls = 'special';
-      else if (front) cls = 'front';
-      else if (e.kind === 'boi') cls = 'boi';
-      else if (e.kind === 'alley') cls = 'alley';
-      else cls = rnd() < SIDE_SHOP_P ? 'sideShop' : VILLA_BANDS.has(B.band) ? 'villa' : 'home';
-      const spec = LOT[cls], f = spec.f[0] + (spec.f[1] - spec.f[0]) * rnd(), D = spec.d;
-      if (cur + f > e.L + 0.01) break;
-      const along = cur + f / 2;
-      const o = { x: e.P.x + e.tx * along + e.nx * D / 2, z: e.P.z + e.tz * along + e.nz * D / 2, tx: e.tx, tz: e.tz, nx: -e.nx, nz: -e.nz, hw: f / 2, hd: D / 2 };
-      const C = lotCorners(o);
-      if (!C.every((p) => insidePoly(B, p)) || out.some((q) => overlap(o, q)) || [...C, o].some((p) => isWater(p.x, p.z, QUAY_W))) { cur += 1.5; continue; }
-      // góc giao lộ (mặt tiền lớn, kề phố không phải ngõ) → tửu lâu / trà lâu
-      const corner = front && ((cur < 18 && prevK !== 'alley') || (cur + f > e.L - 18 && nextK !== 'alley'));
-      if (special) { const sp = special; special = null; if (sp === 'dichtram' || sp === 'namon') { use = 'shop'; type = sp; } else if (sp === 'tientrang') use = 'service'; else use = 'temple'; o.special = sp; }
-      else if (front || cls === 'sideShop') {
-        use = 'shop';
-        if (corner) type = CORNER_TYPES[hash(`${B.id}|${e.i}|${Math.round(cur)}`) & 1];
-        else if (front) { // mặt tiền lớn: 3 / 4 tiệm theo chủ đề phố (tiệm đầu luôn đúng chủ đề), còn lại loại khác
-          type = nShop++ % 4 !== 3 ? theme : STREET_TYPES[Math.floor(rnd() * STREET_TYPES.length)];
-        } else type = theme && rnd() < THEME_P ? theme : STREET_TYPES[Math.floor(rnd() * STREET_TYPES.length)];
-      } else use = cls === 'boi' ? 'fortune' : 'home';
-      if (cls === 'villa') o.villa = true;
-      o.use = use; if (type) o.type = type; o.front = e.kind; o.street = e.key; o.corner = corner; o.edge = e.i;
-      out.push(o); cur += f + 0.1;
+    let special = SPECIAL.get(`${B.id}#${e.i}`) || null, nShop = 0;
+    const boi = e.kind === 'boi', ch = boi ? 6 : CITY.CHAMFER; // Phố Thầy Bói: dãy quầy liền, không vát góc / chia nhóm
+    const end = e.L - ch, holes = B.passes.filter((p) => p.i === e.i).map((p) => [p.pos - p.w / 2, p.pos + p.w / 2]);
+    let cur = ch;
+    while (cur < end - 5) {
+      // một NHÓM 3–6 nhà liền tường: cùng lùi, cùng sâu; hết nhóm → khe 2–4 m (tường rào / cổng / cây)
+      const k = boi ? 999 : 3 + Math.floor(rnd() * 4), sb = boi ? 0 : front ? rnd() * 0.8 : rnd() * 1.5;
+      let placed = 0, tries = 0, gD = null;
+      while (placed < k && cur < end - 5 && tries < 40) {
+        tries++;
+        let cls, use, type = null;
+        if (special) cls = 'special';
+        else if (front) cls = 'front';
+        else if (e.kind === 'boi') cls = 'boi';
+        else cls = rnd() < SIDE_SHOP_P ? 'sideShop' : villa ? 'villa' : 'home';
+        const spec = LOT[cls], f = pickF(spec, rnd);
+        const D = cls === 'special' || cls === 'villa' || cls === 'boi' ? spec.d[0] : (gD ??= spec.d[0] + (spec.d[1] - spec.d[0]) * rnd());
+        if (cur + f > end + 0.01) break;
+        const hole = holes.find(([h0, h1]) => cur < h1 && cur + f > h0);
+        if (hole) { cur = hole[1] + 0.1; break; } // ngõ xuyên cắt nhóm
+        const along = cur + f / 2, off = (cls === 'special' ? 0 : sb) + D / 2;
+        const o = { x: e.P.x + e.tx * along + e.nx * off, z: e.P.z + e.tz * along + e.nz * off, tx: e.tx, tz: e.tz, nx: -e.nx, nz: -e.nz, hw: f / 2, hd: D / 2 };
+        if (!tryPut(o)) { cur += 1.5; continue; }
+        if (special) { const sp = special; special = null; if (sp === 'dichtram' || sp === 'namon') { use = 'shop'; type = sp; } else if (sp === 'tientrang') use = 'service'; else use = 'temple'; o.special = sp; }
+        else if (front || cls === 'sideShop') {
+          use = 'shop';
+          if (front) type = nShop++ % 4 !== 3 ? theme : STREET_TYPES[Math.floor(rnd() * STREET_TYPES.length)]; // 3 / 4 theo chủ đề phố
+          else type = theme && rnd() < THEME_P ? theme : STREET_TYPES[Math.floor(rnd() * STREET_TYPES.length)];
+        } else use = cls === 'boi' ? 'fortune' : 'home';
+        if (cls === 'villa') o.villa = true;
+        o.use = use; if (type) o.type = type; o.front = e.kind; o.street = e.key; o.corner = false; o.edge = e.i; o.setback = sb;
+        out.push(o); cur += f + 0.1; placed++;
+      }
+      if (cur < end - 5) { // khe giữa hai nhóm
+        const g = 2 + rnd() * 2, along = cur + g / 2;
+        if (!holes.some(([h0, h1]) => along > h0 - 1 && along < h1 + 1)) gaps.push({ x: r1(e.P.x + e.tx * along + e.nx * 3), z: r1(e.P.z + e.tz * along + e.nz * 3), tx: e.tx, tz: e.tz, nx: -e.nx, nz: -e.nz, w: r1(g), edge: e.i });
+        cur += g;
+      }
     }
+  }
+  // GÓC VÁT (§3.2): nhà góc xoay 45° nhìn ra giao lộ (góc giáp mặt tiền lớn → tửu / trà lâu) hoặc sân góc
+  for (let i = 0; i < 4; i++) {
+    const eA = B.edges[(i + 3) % 4], eB = B.edges[i], V = eB.P;
+    let bx = eA.nx + eB.nx, bz = eA.nz + eB.nz; const bl = Math.hypot(bx, bz) || 1; bx /= bl; bz /= bl;
+    const frontC = FRONT_KINDS.has(eA.kind) || FRONT_KINDS.has(eB.kind), fe = FRONT_KINDS.has(eB.kind) ? eB : FRONT_KINDS.has(eA.kind) ? eA : SIDE_KINDS.has(eB.kind) ? eB : eA;
+    const build = frontC || hash(`${B.id}|c${i}`) % 10 < 5;
+    let done = false;
+    if (build) for (const [w, d] of [[13, 10], [11, 9], [9, 8]]) {
+      const s0 = 5.5, o = { x: V.x + bx * (s0 + d / 2), z: V.z + bz * (s0 + d / 2), tx: -bz, tz: bx, nx: -bx, nz: -bz, hw: w / 2, hd: d / 2 };
+      if (!tryPut(o)) continue;
+      o.use = frontC ? 'shop' : 'home'; if (frontC) o.type = CORNER_TYPES[hash(`${B.id}|${i}`) & 1];
+      o.front = fe.kind; o.street = fe.key; o.corner = frontC; o.angle = true; o.edge = fe.i; if (villa && !frontC) o.villa = true;
+      out.push(o); done = true; break;
+    }
+    if (!done) gardens.push({ x: r1(V.x + bx * 9), z: r1(V.z + bz * 9), nx: -bx, nz: -bz });
   }
   got = out.map((o, i) => {
     const door = { x: r1(o.x + o.nx * (o.hd + 1.5)), z: r1(o.z + o.nz * (o.hd + 1.5)) };
-    const rec = { block: B.id, bi: i, x: r1(o.x), z: r1(o.z), w: r1(o.hw * 2), d: r1(o.hd * 2), tx: o.tx, tz: o.tz, nx: o.nx, nz: o.nz, ry: faceDir(o.nx, o.nz), door, use: o.use, front: o.front, street: o.street, corner: o.corner, district: B.district };
+    const rec = { block: B.id, bi: i, x: r1(o.x), z: r1(o.z), w: r1(o.hw * 2), d: r1(o.hd * 2), tx: o.tx, tz: o.tz, nx: o.nx, nz: o.nz, ry: faceDir(o.nx, o.nz), door, use: o.use, front: o.front, street: o.street, corner: o.corner, district: B.district, ward: B.ward, edge: o.edge };
+    if (o.angle) rec.angle = true;
+    if (o.setback) rec.setback = r1(o.setback);
     if (o.type) { rec.type = o.type; rec.name = SHOP_TYPES[o.type].name; }
     if (o.use === 'service') { rec.svc = 'tientrang'; rec.name = 'Tiền Trang'; }
     if (o.use === 'temple') rec.name = `Miếu ${districtName(B.district)}`;
@@ -403,7 +486,7 @@ function genBlock(B) {
     if (o.villa) rec.villa = true;
     return rec;
   });
-  LOTS_OF.set(B.idx, got);
+  LOTS_OF.set(B.idx, got); DRESS_OF.set(B.idx, { gaps, gardens });
   return got;
 }
 
@@ -435,8 +518,16 @@ export function cell(id) {
   const houses = [];
   for (const bi of [...b.blocks].sort((p, q) => p - q)) for (const L of genBlock(BLOCKS[bi])) if (L.x >= x0 && L.x < x1 && L.z >= z0 && L.z < z1) houses.push(L);
   const hs = houses.map((L, i) => ({ id: `${id}:${i}`, cell: id, ...L }));
+  // đồ phố (v5): khe giữa nhóm nhà, sân góc, sân trong (+ ngõ xuyên) có tâm trong ô này
+  const inC = (p) => p.x >= x0 && p.x < x1 && p.z >= z0 && p.z < z1;
+  const gaps = [], gardens = [], courts = [];
+  for (const bi of b.blocks) {
+    const D = DRESS_OF.get(bi) || (genBlock(BLOCKS[bi]), DRESS_OF.get(bi)), B = BLOCKS[bi];
+    gaps.push(...D.gaps.filter(inC)); gardens.push(...D.gardens.filter(inC));
+    if (B.court && inC(centroid(B.court))) courts.push({ block: B.id, poly: B.court, square: !!B.square, ward: B.ward, villa: VILLA_BANDS.has(B.band), passes: B.passes.map((p) => { const e = B.edges[p.i]; return { x: r1(e.P.x + e.tx * p.pos), z: r1(e.P.z + e.tz * p.pos), nx: -e.nx, nz: -e.nz, tx: e.tx, tz: e.tz }; }) });
+  }
   c = {
-    id, ix, iz, x0, z0, x1, z1, houses: hs, shops: hs.filter((h) => h.use === 'shop'),
+    id, ix, iz, x0, z0, x1, z1, houses: hs, shops: hs.filter((h) => h.use === 'shop'), gaps, gardens, courts,
     roads: b.roads.map((i) => ROADS[i]), landmarks: b.marks.map((i) => LANDMARKS[i]),
     bridges: BRIDGES.filter((br) => Math.abs(br.x - (x0 + x1) / 2) <= CITY.CELL / 2 + br.L && Math.abs(br.z - (z0 + z1) / 2) <= CITY.CELL / 2 + br.L),
   };
@@ -481,7 +572,9 @@ export function districtOf(x, z) {
 export const plazas = () => PLAZAS;
 export const landmarks = () => LANDMARKS;
 export const roads = () => ROADS;
-export const blocks = () => BLOCKS.map(({ id, idx, g, band, s, row, col, district, poly, edges }) => ({ id, idx, g, band, s, row, col, district, poly, edges: edges.map(({ kind, key, plaza }) => ({ kind, key, plaza })) }));
+export const blocks = () => BLOCKS.map(({ id, idx, g, band, s, row, col, district, poly, edges, court, square, ward }) => ({ id, idx, g, band, s, row, col, district, poly, court, square: !!square, ward, edges: edges.map(({ kind, key, plaza }) => ({ kind, key, plaza })) }));
+/** phường (v5 · THANH-MANIFEST §3.1, §3.8): { id, name, district, blocks, square (id ô quảng trường phường), centre, court } */
+export const wards = () => WARDS;
 export const bridges = () => BRIDGES;
 /** tên + chủ đề mỗi phố có chủ đề: key → { theme, name } */
 export const streets = () => new Map([...THEME].map(([k, t]) => [k, { theme: t, name: STREET_NAME[t] || `Phố ${SHOP_TYPES[t].name}` }]));

@@ -126,12 +126,18 @@ const diel = (m) => { if (!DIEL.has(m)) { const c = m.clone(); c.metalness = 0; 
 const HCAP = { bq_drum_tower: 16, bq_tower_house: 11, bq_granary: 10, bq_yamen: 12 };
 export const houseScale = (h, size) => {
   const kx = ((h.lotF || h.f) * 1.015) / (size.x || 1);
-  const kz = h.d ? Math.min(kx, h.d / (size.z || 1)) : kx;
+  const kz = h.d ? (h.ht ? Math.min(kx * 1.5, h.d / (size.z || 1)) : Math.min(kx, h.d / (size.z || 1))) : kx; // v5: nhà ống — kéo sâu tới 1,5× cho kín lô
+  // v5 (THANH-MANIFEST §3.5): chiều cao mái đích theo cấp đường (city4 đã chọn model gần đích; kéo dọc ≤ 0,85–1,25 lần)
+  if (h.ht) return { kx, ky: Math.min(kx * 1.25, Math.max(kx * 0.85, h.ht / (size.y || 1))), kz };
   const vary = 1 + Math.min(0.12, Math.max(-0.04, ((h.ys || 1) - 1) * 0.2)); // nhịp cao thấp nhẹ (≤ 12%)
   const ky = Math.min(kx * vary, (HCAP[h.id] || 10.5) / (size.y || 1));
   return { kx, ky, kz };
 };
-export const houseHeight = (h, sp) => Math.min((h.lotF || h.f) * 1.015 * sp.hd * (1 + Math.min(0.12, Math.max(-0.04, ((h.ys || 1) - 1) * 0.2))), HCAP[h.id] || 10.5);
+export const houseHeight = (h, sp) => {
+  const nat = (h.lotF || h.f) * 1.015 * sp.hd;
+  if (h.ht) return Math.min(nat * 1.25, Math.max(nat * 0.85, h.ht));
+  return Math.min(nat * (1 + Math.min(0.12, Math.max(-0.04, ((h.ys || 1) - 1) * 0.2))), HCAP[h.id] || 10.5);
+};
 export function instancedSet(gltf, houses, { shadow, flat = false }) {
   const root = gltf.scene; root.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(root), size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());

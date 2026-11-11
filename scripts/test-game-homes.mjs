@@ -25,10 +25,10 @@ const E = HM.enterables(), C = CB.generateCity(), SPECS = RM.roomSpecs();
 const T = (x, z) => ({ x: x / 1.6 + 10, y: z / 1.6 + 7 });
 const W = (t) => ({ x: (t.x - 10) * 1.6, z: (t.y - 7) * 1.6 });
 
-check(`v4: ≥ 20.000 cửa (hiện ${E.length}); đủ 5 loại; mọi phòng lưới có đúng một cửa ngoài phố`, () => {
-  assert.ok(E.length >= 20000);
+check(`v5: ≥ 16.000 cửa (hiện ${E.length}); đủ 5 loại; mọi phòng lưới có đúng một cửa ngoài phố`, () => {
+  assert.ok(E.length >= 16000); // v5: lõi ô là sân trong (THANH-MANIFEST §3.3) — ít nhà gõ cửa hơn
   const n = {}; for (const e of E) n[e.kind] = (n[e.kind] || 0) + 1;
-  assert.ok(n.shop >= 8000 && n.est === 27 && n.temple >= 20 && n.knock > 14000 && n.fortune >= 250, JSON.stringify(n));
+  assert.ok(n.shop >= 8000 && n.est === 27 && n.temple >= 20 && n.knock > 7500 && n.fortune >= 250, JSON.stringify(n));
   const byKey = new Map(); for (const e of E) if (e.key) byKey.set(e.key, (byKey.get(e.key) || 0) + 1);
   for (const r of SPECS) assert.equal(byKey.get(r.key), 1, r.key);
   for (const e of E) if (e.kind === 'knock' || e.kind === 'fortune') assert.equal(e.key, null); else assert.ok(RM.roomByKey(e.key), e.key);
