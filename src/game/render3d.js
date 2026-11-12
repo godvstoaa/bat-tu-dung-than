@@ -98,7 +98,10 @@ const KEYS = [
   { h: 6.5, sky: ['#4b5d9a', '#f0a36b', '#a9768a'], fog: '#c08f86', sun: ['#ffb27a', 1.3], hemi: 0.7, night: 0.35 },
   { h: 8, sky: ['#6e9cc9', '#efdcb4', '#cdbda2'], fog: '#d8cbb0', sun: ['#fff0d2', 2.6], hemi: 1.0, night: 0 },
   { h: 16, sky: ['#6e9cc9', '#efdcb4', '#cdbda2'], fog: '#d8cbb0', sun: ['#fff0d2', 2.6], hemi: 1.0, night: 0 },
-  { h: 18, sky: ['#3b3a72', '#f08a4b', '#8e5a6c'], fog: '#b4766c', sun: ['#ff9a5a', 1.4], hemi: 0.65, night: 0.4 },
+  // chiều tà / giờ xanh (docs/DOHOA-MANIFEST.md G-8.2): sương bớt hồng nâu (lệch với trời tán xạ còn xanh lúc 18 h), thêm mốc tím hoa cà
+  // 18,9 h — trước đây vòm trời pha cam #f08a4b với xanh đêm thành đỏ máu lúc 18 h 45 (ảnh shots/gfx/dusk-old.png)
+  { h: 18, sky: ['#3b4a82', '#f0955a', '#8e6a7c'], fog: '#b8a09c', sun: ['#ff9a5a', 1.4], hemi: 0.65, night: 0.4 },
+  { h: 18.9, sky: ['#1c2550', '#8a6582', '#3a3456'], fog: '#4a4766', sun: ['#c8b0ff', 1.2], hemi: 0.85, night: 0.8 },
   { h: 19.5, sky: ['#121a3a', '#33386a', '#1c1f3c'], fog: '#262c4e', sun: ['#a9bcff', 1.15], hemi: 1.0, night: 1 },
   { h: 24, sky: ['#0d1430', '#26305e', '#171b38'], fog: '#202848', sun: ['#a9bcff', 1.15], hemi: 1.0, night: 1 },
 ];
@@ -143,7 +146,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const sky = new THREE.Mesh(new THREE.SphereGeometry(400, 32, 16), new THREE.ShaderMaterial({
     uniforms: skyUni, side: THREE.BackSide, depthWrite: false, fog: false,
     vertexShader: 'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-    fragmentShader: 'uniform vec3 top; uniform vec3 mid; uniform vec3 bottom; varying vec3 vP; void main(){ float h = normalize(vP).y; vec3 c = h > 0.0 ? mix(mid, top, pow(clamp(h,0.0,1.0), 0.55)) : mix(mid, bottom, pow(clamp(-h,0.0,1.0), 0.4)); gl_FragColor = vec4(c, 1.0); }',
+    fragmentShader: 'uniform vec3 top; uniform vec3 mid; uniform vec3 bottom; varying vec3 vP; void main(){ float h = normalize(vP).y; vec3 c = h > 0.0 ? mix(mid, top, pow(clamp(h,0.0,1.0), 0.32)) : mix(mid, bottom, pow(clamp(-h,0.0,1.0), 0.4)); gl_FragColor = vec4(c, 1.0); }',
   }));
   sky.renderOrder = -10;
   sky.visible = false; // thế giới mở dùng Sky tán xạ của world3d.js
@@ -164,6 +167,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // Thay 22 hình chóp ConeGeometry (trông như kim tự tháp — ảnh shots/gfx/before-mid/03-rung.png).
   const mountains = new THREE.Group(); scene.add(mountains);
   const mr = TX.rng(91);
+  const MTN_SLATE = new THREE.Color('#58637a');
   const mtnUni = { uFog: { value: new THREE.Color() }, uInk: { value: new THREE.Color() } };
   const MTN_LAYERS = [{ d: 4600, base: 380, amp: 620, k: 0.32 }, { d: 3800, base: 260, amp: 520, k: 0.52 }, { d: 3000, base: 150, amp: 420, k: 0.74 }];
   for (const L of MTN_LAYERS) {
@@ -826,7 +830,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // đêm: trời tán xạ vật lý chỉ ra xám → dùng vòm chuyển màu xanh thẫm của game (có trăng sao)
     const nightSky = L.night >= 0.6; sky.visible = nightSky; if (world.sky) world.sky.visible = !nightSky;
     fog.color.copy(L.fog);
-    mtnUni.uFog.value.copy(L.fog); mtnUni.uInk.value.copy(L.fog).lerp(L.top, 0.35).multiplyScalar(0.62); // mực núi: sương pha sắc trời, đậm hơn
+    mtnUni.uFog.value.copy(L.fog); mtnUni.uInk.value.copy(L.fog).lerp(L.top, 0.35).lerp(MTN_SLATE, 0.45).multiplyScalar(0.7); // mực núi: sương pha sắc trời + xám lam (không đỏ lệch trời)
     cloudMat.color.copy(L.mid).lerp(WHITE, 0.35 * (1 - L.night));
     // môi trường PMREM (bầu trời) đã chiếu sáng vật liệu PBR → đèn bán cầu chỉ còn phần bổ sung
     hemi.intensity = L.hemi * (0.35 + 0.3 * L.night); hemi.color.copy(L.top).lerp(WHITE, 0.5);

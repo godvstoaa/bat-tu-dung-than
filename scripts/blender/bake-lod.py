@@ -14,7 +14,8 @@ SRC, OUT, TARGET = argv[0], argv[1], int(argv[2])
 TEX = int(argv[3]) if len(argv) > 3 else 1024
 AO_K = float(argv[4]) if len(argv) > 4 else 0.55
 VOX = float(argv[5]) if len(argv) > 5 else 0.0035  # cỡ voxel / cỡ model
-FORCE_VOX = len(argv) > 6 and argv[6] == 'voxel'  # bỏ qua nhánh collapse (lưới bị xé thành mảnh vụn — bq_apothecary, bq_yamen)
+MODE = argv[6] if len(argv) > 6 else 'auto'  # auto | voxel | collapse
+FORCE_VOX = MODE == 'voxel'  # bỏ qua nhánh collapse (lưới bị xé thành mảnh vụn — bq_apothecary, bq_yamen)
 t0 = time.time()
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -49,8 +50,9 @@ except Exception: pass
 for a in [a.name for a in lo.data.color_attributes]: lo.data.color_attributes.remove(lo.data.color_attributes[a])
 if tri_m > TARGET:
     # bước 1: gộp mặt phẳng (tường / sàn phẳng không cần nhiều tam giác), bước 2: collapse tới đích
-    m = lo.modifiers.new('pl', 'DECIMATE'); m.decimate_type = 'DISSOLVE'; m.angle_limit = math.radians(2.5)
-    bpy.ops.object.modifier_apply(modifier='pl')
+    if MODE != 'collapse':  # collapse: bỏ gộp mặt phẳng (xé lưới bq_apothecary / bq_yamen thành mảnh)
+        m = lo.modifiers.new('pl', 'DECIMATE'); m.decimate_type = 'DISSOLVE'; m.angle_limit = math.radians(2.5)
+        bpy.ops.object.modifier_apply(modifier='pl')
     bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT'); bpy.ops.mesh.quads_convert_to_tris(); bpy.ops.object.mode_set(mode='OBJECT')
     t1 = len(lo.data.polygons); print('STEP after dissolve+tri', tri_m, '->', t1)
     if t1 > TARGET:
@@ -59,7 +61,7 @@ if tri_m > TARGET:
             if n <= TARGET * 1.05: break
             m = lo.modifiers.new('dc', 'DECIMATE'); m.ratio = TARGET / n; m.use_collapse_triangulate = True
             bpy.ops.object.modifier_apply(modifier='dc'); print('STEP collapse', it, n, '->', len(lo.data.polygons))
-if FORCE_VOX or len(lo.data.polygons) > TARGET * 1.3:
+if FORCE_VOX or (MODE != 'collapse' and len(lo.data.polygons) > TARGET * 1.3):
     # lưới AI nhiều cạnh lỗi đa tạp (mặt gập chồng) → collapse kẹt. Dựng lại lưới kín bằng voxel rồi giảm;
     # chi tiết bề mặt lấy lại nhờ nướng màu + pháp tuyến từ bản gốc.
     print('STEP voxel fallback', len(lo.data.polygons))
@@ -80,6 +82,14 @@ bpy.ops.uv.pack_islands(margin=0.003, rotate=True)
 bpy.ops.object.mode_set(mode='OBJECT')
 bpy.ops.object.shade_smooth()  # pháp tuyến chi tiết nằm ở normal map nướng
 
+# kim loại: lượt nướng DIFFUSE coi kim loại là đen (chóp đồng đèn lồng thành đen) → tắt kim loại trên bản gốc trước khi nướng
+for ms in hi.data.materials:
+    if not ms or not ms.use_nodes: continue
+    for n in ms.node_tree.nodes:
+        if n.type == 'BSDF_PRINCIPLED':
+            inp = n.inputs['Metallic']
+            for l in list(inp.links): ms.node_tree.links.remove(l)
+            inp.default_value = 0.0
 # --- vật liệu nướng
 def img(name, color, noncolor=False):
     im = bpy.data.images.new(name, TEX, TEX, alpha=False, float_buffer=False)

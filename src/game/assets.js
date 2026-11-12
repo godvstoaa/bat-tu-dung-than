@@ -110,7 +110,7 @@ export async function placeModel(parent, id, { fit = { max: 4 }, at = { x: 0, y:
 const LAZY = [];
 // bản gốc khi camera trong khoảng này. Công trình ≥ 6 m: 2,2 × cỡ, tối thiểu 25 m — trước đây = cỡ (cổng phường 8 m → phải
 // đứng trong 8 m; tháp 26 m đứng sát chân camera vẫn ngoài 26 m) nên đứng gần vẫn thấy bản .vc màu loang (ảnh 2026-11-12)
-const nearDist = (v) => (v >= 6 ? Math.min(150, Math.max(v * 3, 30)) : Math.max(v * 1.5, 8)); // ≥ 6 m: 3 × cỡ, 30–150 m
+const nearDist = (v) => (v >= 6 ? Math.min(90, Math.max(v * 2, 30)) : Math.max(v * 1.5, 8)); // ≥ 6 m: 2 × cỡ, 30–90 m (2026-11-12 G-8.1: 3 × cỡ / 150 m → sân Sơn Môn nạp quá nhiều bản gốc)
 const farDist = (v) => Math.max(v * 3.5, 40);   // bản giữa 20k tới đây, xa hơn là .lod 12k
 const vc2Dist = (v) => Math.max(v * 6, 110);    // từ đây trở ra: bản .vc2 (~2,5k)
 const cullDist = (v) => (v >= 40 ? Infinity : Math.max(v * 22, 320)); // vật nhỏ ở rất xa: ẩn hẳn (sương đã che gần hết)
@@ -126,7 +126,7 @@ async function placeLod(parent, id, { fit, at, hd = true }) {
   const { size } = sizeOf(obj0);
   const [k, v] = Object.entries(fit)[0];
   const ref = k === 'height' ? size.y : k === 'width' ? size.x : k === 'depth' ? size.z : Math.max(size.x, size.y, size.z);
-  const lod = new THREE.LOD();
+  const lod = new THREE.LOD(); lod.name = id; // tên model: đo / gỡ lỗi (bảng tam giác theo model)
   const L = { id, lod, v, x: at.x, z: at.z, has: new Set(), busy: false, hd };
   // .vc dùng cho cả bậc giữa lẫn xa (bỏ .mid 20k — cũng vỡ mảnh khi nhìn gần): ngoài nearD là .vc, trong nearD là bản gốc
   if (first) { obj0.traverse((o) => { if (o.isMesh) o.castShadow = false; }); lod.addLevel(obj0, vc ? nearDist(v) : farDist(v), 0.08); L.has.add('far'); if (vc) L.has.add('mid'); L.farObj = obj0; }
@@ -159,7 +159,8 @@ async function addLazyLevel(L, tier) {
   try {
     let g = null;
     if (tier === 'mid') g = (await loadModel(`${L.id}.mid`)) || (await loadModel(`${L.id}.lod1`));
-    else g = (modelQuality === 'ultra' && L.hd && (await loadModel(`${L.id}.hd`))) || (await loadModel(L.id));
+    // bậc gần: .bk (Blender 12k, nướng từ bản gốc — scripts/blender-bake.mjs; cùng hệ toạ độ, lệch khung bao < 0,4 %) trước bản gốc
+    else g = (modelQuality === 'ultra' && L.hd && (await loadModel(`${L.id}.hd`))) || (await loadModel(`${L.id}.bk`)) || (await loadModel(L.id));
     L.has.add(tier);
     if (!g) return;
     const o = g.scene.clone(true);
@@ -256,7 +257,7 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
   if (hasLod(id) && items.length <= 4) {
     const near = Math.max(Math.max(...items.map((it) => it.s)) * 4, 70);
     E.upgrade = { near, busy: false, done: false, run: async () => {
-      const gm = (await loadModel(id)) || (await loadModel(`${id}.mid`)); if (!gm) return; // tới gần: bản gốc (bản .mid nhìn gần vỡ mảnh)
+      const gm = (await loadModel(`${id}.bk`)) || (await loadModel(id)) || (await loadModel(`${id}.mid`)); if (!gm) return; // tới gần: .bk (Blender 12k) / bản gốc (bản .mid nhìn gần vỡ mảnh) — đèn lồng 80k × 2 = 160k ở sân Sơn Môn
       const tmp = new THREE.Group(); const ns = buildInstanced(gm, items, fitKey, tmp, `${id}:hi`); if (proxied) for (const { im } of ns) im.castShadow = false;
       await warm(tmp);
       for (const { im } of E.sets) group.remove(im);
