@@ -102,7 +102,8 @@ Kết luận: phần nhà đã có, chỉ **không lộ ra**. Cửu Trọng Thi�
   - Cảnh trời 13 lệnh vẽ, 106k tam giác (cộng cổng Nam Thiên Môn là 16 lệnh vẽ, 254k).
   - fps trên máy dev, cùng đợt chạy: Cửu Trọng Thiên 29–39, khung 1,27–1,72 triệu tam giác. Sơn Môn 19–21, khung 3,75 triệu.
 - [x] Build web xanh.
-- [ ] Deploy CI và kiểm trên bản live.
+- [x] Deploy CI xanh (8033a15f, 7438dbdd). Kiểm trên bản live: menu 🧭 Địa điểm → Nhà đất → Thăng thiên tới đúng quảng trường trước Quân Thiên Phủ.
+  - Lỗi đã sửa: lần đầu điểm đến sát cổng nên camera lọt vào thân cổng. Cổng đã dời ra thềm riêng.
 
 ## 5. Goal phát triển (tự đặt)
 
