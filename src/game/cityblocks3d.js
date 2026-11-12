@@ -400,6 +400,34 @@ export async function cityHouses(grp) {
     pend.add(p);
   };
   let lastX = Infinity, lastZ = Infinity, lastTier = null;
+  // CẮT THEO HƯỚNG NHÌN (docs/DOHOA-MANIFEST.md §3.2): nhà ngoài hình nón nhìn (nửa góc ngang + 18° dư) và xa hơn 45 m không
+  // ghi vào bộ nhân bản — đo sân Sơn Môn: 1,74 triệu tam giác nhân bản nằm SAU LƯNG / hai bên camera vẫn được vẽ.
+  // Trong 45 m luôn giữ (bóng đổ, nhà sát người). view() gọi mỗi khung từ render3d; chỉ tính lại khi camera xoay > 8° / đi > 6 m.
+  const V = { on: false, cx: 0, cz: 0, fx: 0, fz: 1, cosLim: -1, ax: 0, az: 1, inside: -1 };
+  // nhà chứa camera (đứng sát tường, camera xoay về phía nhà → camera lọt mái hiên — G-8.3): ẩn riêng căn đó; nới 3 m (mái hiên nhô 1–2,5 m)
+  const HB = 32, hgrid = new Map();
+  houses.forEach((h, i) => { const k = Math.floor(h.x / HB) * 100000 + Math.floor(h.z / HB); let b = hgrid.get(k); if (!b) hgrid.set(k, (b = [])); b.push(i); });
+  const houseAt = (x, y, z) => {
+    const gi = Math.floor(x / HB), gj = Math.floor(z / HB);
+    for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (const i of hgrid.get((gi + a) * 100000 + gj + b) || []) {
+      const h = houses[i], dx = x - h.x, dz = z - h.z, c = Math.cos(h.ry), s = Math.sin(h.ry), lx = c * dx - s * dz, lz = s * dx + c * dz;
+      if (Math.abs(lx) < h.hw + 3 && Math.abs(lz) < h.hd + 3 && y < h.y + (CB.HOUSE_SPECS[h.id] ? houseHeight(h, CB.HOUSE_SPECS[h.id]) : 12) + 1.5) return i;
+    }
+    return -1;
+  };
+  const view = (cx, cz, fx, fz, halfH, cy = 0) => {
+    const ins = houseAt(cx, cy, cz); if (ins !== V.inside) { V.inside = ins; dirty = true; update(lastPx, lastPz); }
+    const l = Math.hypot(fx, fz); if (l < 1e-3) { if (V.on) { V.on = false; dirty = true; update(lastPx, lastPz); } return; } // nhìn thẳng xuống: không cắt
+    fx /= l; fz /= l;
+    V.cx = cx; V.cz = cz; V.fx = fx; V.fz = fz; V.cosLim = Math.cos(Math.min(Math.PI * 0.95, halfH + 0.314));
+    if (!V.on || fx * V.ax + fz * V.az < 0.99) { V.on = true; V.ax = fx; V.az = fz; dirty = true; update(lastPx, lastPz); } // 0,99 ≈ 8°
+  };
+  const inView = (h, i) => {
+    if (i === V.inside) return false;
+    if (!V.on) return true;
+    const dx = h.x - V.cx, dz = h.z - V.cz, d = Math.hypot(dx, dz);
+    return d < 45 || (dx * V.ax + dz * V.az) / d > V.cosLim;
+  };
   const update = (px, pz) => {
     lastPx = px; lastPz = pz;
     if (!dirty && Math.hypot(px - lastX, pz - lastZ) < 6) return;
@@ -408,7 +436,7 @@ export async function cityHouses(grp) {
     // bậc từng nhà: 0 gần (.lod1, bóng) · 1 vừa (.lod1) · 2 khối xa · 3 ẩn (ngoài FAR_MAX — sương che)
     const low = getModelQuality() === 'low', nr = low ? 24 : NEAR, md = low ? 45 : MID, vd = low ? 140 : FAR_VC, fm = low ? 800 : FAR_MAX; // máy yếu: vòng bản gốc hẹp hơn (24 m) nhưng VẪN có — trước đây 0 m nên đứng sát nhà vẫn thấy bản rút gọn vỡ mảnh
     const tierNow = new Int8Array(houses.length);
-    for (let i = 0; i < houses.length; i++) { const d = Math.hypot(houses[i].x - px, houses[i].z - pz); tierNow[i] = d < nr ? 0 : d < md ? 1 : d < vd ? 4 : d < fm ? 2 : 3; }
+    for (let i = 0; i < houses.length; i++) { const d = Math.hypot(houses[i].x - px, houses[i].z - pz); tierNow[i] = !inView(houses[i], i) ? 3 : d < nr ? 0 : d < md ? 1 : d < vd ? 4 : d < fm ? 2 : 3; }
     if (!lastTier || tierNow.some((t, i) => t !== lastTier[i])) changed = true;
     lastTier = tierNow;
     if (!changed) return;
@@ -429,7 +457,7 @@ export async function cityHouses(grp) {
   update(0, 0);
   // màn nạp chờ bậc chi tiết của các nhà ngay quanh chỗ xuất phát (tối đa 6 giây), còn lại nạp sau
   const settle = (px, pz) => { update(px, pz); return Promise.race([Promise.all([...pend]), new Promise((r) => setTimeout(r, 6000))]); };
-  return { update, settle, count: houses.length };
+  return { update, settle, view, count: houses.length };
 }
 
 

@@ -164,9 +164,24 @@ Manifest này đi theo hướng đó, đo bằng số, không hứa suông.
 - **G-8.2 AO màn hình (`GTAOPass`): ĐO RỒI BỎ.** Mức cao, bật / tắt cùng phiên: sân Sơn Môn 19–20 → 12 fps, phố 25–26 → 16 fps (−37 %). Bóng khe đã nướng sẵn vào 30 model `.bk` (AO 0,55), không tốn lúc chạy.
 - 35/35 `test-game-*` xanh, build xanh.
 
+### Đợt 4 (2026-11-12): đạt ngân sách §3.4, không đổi hình
+
+- **Đo phần vẽ thừa ở sân Sơn Môn** (chế độ tự chỉnh): 0,27 triệu tam giác sau lớp sương (> 1.750 m); **2,19 triệu ngoài khung nhìn**, trong đó `landmarks` 1,74 triệu. Bộ nhân bản nhà phố đặt `frustumCulled = false` nên nhà sau lưng vẫn được vẽ.
+- **Cắt theo hướng nhìn (§3.2), `cityHouses.view`:**
+  - Mỗi khung `render3d` gọi `landmarks.view` với hướng camera.
+  - Nhà ngoài hình nón (nửa góc nhìn ngang + 18°) và xa hơn 45 m chuyển sang bậc ẩn. Trong 45 m luôn giữ, để bóng đổ không mất.
+  - Chỉ tính lại khi camera xoay > 8° hoặc đi > 6 m.
+  - Ảnh bật / tắt cùng góc sau khi xoay mạnh giống hệt nhau, kể cả hai mép khung (`shots/gfx/cmp-view-*.png`).
+- **Ẩn căn nhà chứa camera** (khung nhà nới 3 m vì mái hiên nhô ra): sửa ca sót của G-8.3. Đứng sát tường, xoay camera về phía nhà, trước đây mái che kín màn hình; giờ thấy nhân vật và phố (`shots/gfx/view-on3/02-pho-turn.png`).
+- **Kết quả, chế độ tự chỉnh:**
+  - Sân Sơn Môn **2,08 triệu tam giác (≤ 2,2 triệu, ĐẠT §3.4 gốc)**, 409 lệnh vẽ.
+  - Phố 1,62 triệu.
+  - Mục «sửa §3.4» của đợt 3 không còn cần: ngân sách gốc đã đạt.
+- 35/35 `test-game-*` xanh, build xanh.
+
 ## 5. Goal tiếp (sau khi đạt mục 4)
 
-- **G-8.1** (đợt 2: 2,62 triệu tam giác, 38 fps khi tự chỉnh — tam giác chưa tới 2,2 triệu, nhưng fps đã qua đích ≥ 24): sân Sơn Môn ≤ 2,2 triệu tam giác. Còn lại: phần lớn là `.vc` 9k của công trình trong 110 m và bản gốc trong `nearDist` (tối đa 150 m). Bước kế: thu `nearDist` về 2 × cỡ (tối đa 90 m), nướng `.bk` cho công trình dùng gần (hall_main, gate_sect, palace_grand…), đo lại.
+- ~~**G-8.1**~~ — đạt đợt 4 (2,08 triệu). Ghi chép cũ: (đợt 2: 2,62 triệu tam giác, 38 fps khi tự chỉnh — tam giác chưa tới 2,2 triệu, nhưng fps đã qua đích ≥ 24): sân Sơn Môn ≤ 2,2 triệu tam giác. Còn lại: phần lớn là `.vc` 9k của công trình trong 110 m và bản gốc trong `nearDist` (tối đa 150 m). Bước kế: thu `nearDist` về 2 × cỡ (tối đa 90 m), nướng `.bk` cho công trình dùng gần (hall_main, gate_sect, palace_grand…), đo lại.
 - ~~**G-8.4:** 4 model loại trừ~~ — xong đợt 3 (`MODE=collapse`, 25k).
 - ~~**G-8.2:** chỉnh màu trời chiều tà~~ — xong đợt 3; AO màn hình đo −37 % fps nên bỏ (dùng AO nướng).
 - ~~**G-8.3:** camera không chui vào mái~~ — xong đợt 2.

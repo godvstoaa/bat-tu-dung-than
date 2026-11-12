@@ -821,6 +821,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     camera.updateProjectionMatrix();
   }
 
+  const camDir = new THREE.Vector3();
   let debugHour = null, camHit = 1; // camHit: phần đường camera còn trống (1 = không bị nhà chắn)
   const sunDir = new THREE.Vector3(), lightDir = new THREE.Vector3(), moonDir = new THREE.Vector3(-0.5, 0.75, -0.4).normalize();
   function applyTime(now) {
@@ -1061,6 +1062,9 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     tmpV2.copy(cam.target); tmpV2.y += lookUp;
     camera.lookAt(tmpV2);
     setViewer(camera.position);
+    // cắt nhà ngoài khung nhìn: hướng nhìn ngang + nửa góc nhìn ngang (dọc 45° → ngang theo tỉ lệ khung)
+    camera.getWorldDirection(camDir);
+    landmarks.view?.(camera.position.x, camera.position.z, camDir.x, camDir.z, Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect), camera.position.y);
     if (debugCam) { camera.position.fromArray(debugCam.pos); camera.lookAt(...debugCam.look); }
     span('f:occl', () => world.occlusion(w.x, w.z, camera.position.x, camera.position.z));
     sky.position.copy(camera.position); stars.position.copy(camera.position); mountains.position.set(camera.position.x, 0, camera.position.z);
@@ -1544,7 +1548,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     get lowQuality() { return lowQuality; },
     get degrade() { return degrade; },
     // gỡ lỗi hiệu năng: tổng lệnh vẽ / tam giác của CẢ một khung (bóng + cảnh + hậu kỳ)
-    webgl: renderer, // đo / gỡ lỗi (scripts/shot-city.mjs)
+    webgl: renderer, camera, // đo / gỡ lỗi (scripts/shot-city.mjs)
     frameStats() { const inf = renderer.info; inf.autoReset = false; inf.reset(); if (composer) composer.render(); else renderer.render(scene, camera); const r = { calls: inf.render.calls, tris: inf.render.triangles, geo: inf.memory.geometries, tex: inf.memory.textures, progs: inf.programs.length }; inf.autoReset = true; return r; },
     info: () => ({ ...renderer.info.render, quality, dynPR, degrade, trees: world.treeCount, pending: world.pending, cam: camera.position.toArray().map((v) => Math.round(v)), target: cam.target.toArray().map((v) => Math.round(v)) }),
     // Ảnh chụp canvas (kiểm thử / chia sẻ): vẽ lại rồi đọc ngay trong cùng tác vụ.

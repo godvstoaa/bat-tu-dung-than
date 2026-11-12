@@ -277,7 +277,7 @@ SPOTS.push({ at: [0, 0], noMerge: true, place: async (g) => {
   outerWall(g, LAYOUT.CITY.A, 34);
   await outerGates(g, LAYOUT.CITY.A, 34);
   const hs = await cityHouses(g);
-  LOD_UPDATERS.push(hs.update);
+  LOD_UPDATERS.push(hs.update); VIEW_UPDATERS.push(hs.view);
   await hs.settle(3, 42);
   const dress = cityDress(g); LOD_UPDATERS.push(dress.update); dress.settle(3, 42); // v5: đồ phố, sân trong, phường (THANH-MANIFEST)
   estateSigns(g); // biển BÁN / tên chủ trước 27 nhà phố rao bán (biệt phủ: biển trên cổng phủ)
@@ -372,6 +372,7 @@ SPOTS.push({ at: [amvancoc.world.x, amvancoc.world.z], place: async (g) => {
 // Đường đá: roads.js — vẽ thẳng vào địa hình (world3d.js), không còn dải mesh nổi.
 
 const LOD_UPDATERS = [];
+const VIEW_UPDATERS = []; // gọi MỖI KHUNG với hướng camera (cắt nhà ngoài khung nhìn — cityblocks3d.cityHouses.view)
 // tầm nạp vùng khi đang chơi (vùng xa chỉ có bản .lod nhẹ, chi tiết nạp lười — assets.tickLazyLods)
 const LOAD_R = 1500; // thế giới v3 (×1,6): vùng tông môn cách tâm ~1.000–1.300 m
 
@@ -398,6 +399,7 @@ export function createLandmarks(scene) {
     root,
     /** Màn nạp: dựng trước các vùng gần (≤ R m) — vùng xa tiếp tục nạp nền khi đã vào game. */
     prepare(px, pz, R = 320) { return Promise.all(start(px, pz, R)); },
+    view(cx, cz, fx, fz, halfH, cy) { for (const v of VIEW_UPDATERS) v(cx, cz, fx, fz, halfH, cy); },
     update(px, pz, now = performance.now()) {
       if (now - last < (now - born < 20000 ? 400 : 1500)) return; last = now; // 20 giây đầu: nạp bậc chi tiết dồn dập
       for (const u of LOD_UPDATERS) u(px, pz);
