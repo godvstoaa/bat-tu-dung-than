@@ -47,7 +47,10 @@ export function heavenLayout() {
       bridges.push({ i, x: (a.x + b.x) / 2, z: (a.z + b.z) / 2, len: r1 - r0, w: bridgeW, ry, a, b });
     }
   });
-  const gate = { x: cx, z: cz + PLAZA_HALF }, arrive = { x: cx, z: cz + PLAZA_HALF - 9 };
+  // Nam Thiên Môn đứng trên THỀM riêng (44 × 22 m) ngoài mép Nam quảng trường: điểm đến cách cổng ≥ 20 m — camera sau lưng
+  // người chơi không lọt vào thân cổng (bản live 2026-11-12: điểm đến sát cổng → màn hình toàn cột đỏ)
+  islands.push({ i: -1, x: cx, z: cz + PLAZA_HALF + 11, hw: 22, hd: 11, ry: 0, apron: true });
+  const gate = { x: cx, z: cz + PLAZA_HALF + 13 }, arrive = { x: cx, z: cz + PLAZA_HALF - 10 };
   CACHE = { plots, islands, bridges, gate, arrive, plazaHalf: PLAZA_HALF };
   return CACHE;
 }

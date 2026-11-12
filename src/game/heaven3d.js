@@ -85,7 +85,8 @@ export function createHeaven(scene) {
     // --- lan can ngọc: trụ mỗi 3 m + tay vịn, dọc mép đảo và hai bên cầu, chừa miệng cầu
     const posts = [], rails = [];
     const gapAt = (x, z) => L.bridges.some((b) => { const ux = (b.b.x - b.a.x) / b.len, uz = (b.b.z - b.a.z) / b.len, dx = x - b.a.x, dz = z - b.a.z, along = dx * ux + dz * uz, side = Math.abs(dx * uz - dz * ux); return side < b.w / 2 + 0.4 && along > -4 && along < b.len + 4; })
-      || Math.hypot(x - L.gate.x, z - L.gate.z) < 4.5;
+      || Math.hypot(x - L.gate.x, z - L.gate.z) < 4.5
+      || L.islands.filter((s) => { const c = Math.cos(s.ry), n = Math.sin(s.ry), dx = x - s.x, dz = z - s.z; return Math.abs(c * dx - n * dz) < s.hw + 1 && Math.abs(n * dx + c * dz) < s.hd + 1; }).length >= 2; // mép giáp đảo khác (thềm cổng ↔ quảng trường): không lan can
     const edge = (ax, az, bx, bz) => {
       const len = Math.hypot(bx - ax, bz - az), n = Math.max(1, Math.round(len / 3)), ry = Math.atan2(bx - ax, bz - az);
       for (let i = 0; i <= n; i++) { const x = ax + (bx - ax) * (i / n), z = az + (bz - az) * (i / n); if (!gapAt(x, z)) posts.push([x, z]); }

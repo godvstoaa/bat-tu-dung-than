@@ -35,10 +35,13 @@ check('vị trí: trong biên máy chủ, cách Thiên Lao / mỏ / lưới phò
   assert.ok(Math.max(...xs) < (WORLD_TILES.maxX - 10) * 1.6, 'trong biên máy chủ');
   for (const P of [JAIL, MINE, CMINE]) assert.ok(Math.min(...zs) - (P.z + P.d / 2) >= 550, `cách ${P.name} ${(Math.min(...zs) - P.z - P.d / 2).toFixed(0)} m`);
   assert.ok(Math.min(...zs) > 0, 'không đụng lưới phòng (z ≤ −230)');
-  for (let i = 0; i < L.islands.length; i++) for (let j = i + 1; j < L.islands.length; j++) { const a = L.islands[i], b = L.islands[j]; assert.ok(Math.hypot(a.x - b.x, a.z - b.z) > Math.hypot(a.hw, a.hd) * 0 + Math.max(a.hw, a.hd) + Math.max(b.hw, b.hd) - 10, `đảo ${i} chồng ${j}`); }
+  const IS = L.islands.filter((q) => !q.apron); // thềm Nam Thiên Môn cố ý liền quảng trường giữa
+  for (let i = 0; i < IS.length; i++) for (let j = i + 1; j < IS.length; j++) { const a = IS[i], b = IS[j]; assert.ok(Math.hypot(a.x - b.x, a.z - b.z) > Math.hypot(a.hw, a.hd) * 0 + Math.max(a.hw, a.hd) + Math.max(b.hw, b.hd) - 10, `đảo ${i} chồng ${j}`); }
 });
 check('đi được: từ Nam Thiên Môn qua cầu tới cổng mọi tiên phủ (mỗi bước 1 m đều có nền)', () => {
   assert.equal(platformTop(L.arrive.x, L.arrive.z), 0);
+  assert.ok(Math.hypot(L.gate.x - L.arrive.x, L.gate.z - L.arrive.z) >= 20, 'điểm đến cách cổng ≥ 20 m (camera không lọt thân cổng)');
+  assert.equal(platformTop(L.gate.x, L.gate.z), 0, 'cổng đứng trên thềm');
   for (const b of L.bridges) {
     const m = T.find((q) => q.k === b.i), C = HV.HEAVEN, sx = Math.abs(b.a.x - C.cx) < 1 ? 1 : Math.sign(b.a.x - C.cx);
     // quảng trường giữa: đi vòng lối ngoài tường phủ Quân Thiên (cách tâm 65 m — tường ở 50 m, mép đảo 80 m)
