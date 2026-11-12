@@ -9,7 +9,7 @@ import { lotusLife, waterSurface } from './lotus.js';
 import * as T from './terrain.js';
 import * as BQ from './batquai.js';
 import { stoneMaterial } from './ground-tex.js';
-import { addBlock, addSolidOBB } from './obstacles.js';
+import { addBlock, addSolidOBB, addTall } from './obstacles.js';
 import { addFootprint } from './collide.js';
 import { instanceModel, instanceModelLod, loadModel, placeModel, hasLod, modelAvailable } from './assets.js';
 
@@ -132,6 +132,7 @@ export function octWall(g) {
     for (let i = 0; i < n; i++) {
       const t = (i + 0.5) / n, cx = s.a.x + ex * t, cz = s.a.z + ez * t, y = H(cx, cz);
       box(len, BQ.WALL_H, BQ.WALL_T, cx, y + BQ.WALL_H / 2 - 1, cz, ry, segGeo);
+      addTall(cx, cz, len / 2, BQ.WALL_T / 2 + 0.3, ry, y + BQ.WALL_H - 1); // độ cao tường cho va chạm (không khai → nhảy xuyên)
       box(len, 1.4, BQ.WALL_T + 1.4, cx, y + BQ.WALL_H - 0.3, cz, ry, capGeo);
       for (const k of [-0.3, 0.3]) box(1.6, 1.6, 1.1, cx + Math.cos(ry) * k * len, y + BQ.WALL_H + 1, cz - Math.sin(ry) * k * len, ry, merGeo); // lỗ châu mai
     }

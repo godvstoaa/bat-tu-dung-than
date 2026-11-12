@@ -175,7 +175,7 @@ export function buildSect(scene, { ripple, onBig = null }) {
   const pw = PONDS[1]; const westPond = MD.pond(ripple, undefined, { cz: 0, W: pw.W, D: pw.D }); westPond.position.set(pw.cx, 0, pw.cz); deco.add(westPond);
   for (const p of PONDS) {
     const x0 = p.cx - p.W / 2 - 0.4, x1 = p.cx + p.W / 2 + 0.4, z0 = p.cz - p.D / 2 - 0.4, z1 = p.cz + p.D / 2 + 0.4;
-    balustrade(deco, m, x0, z1, x1, z1, 0.32, p.id === 'sen' ? [[p.cx - 9, z1 - 1, p.cx - 3, z1 + 1]] : []);
+    balustrade(deco, m, x0, z1, x1, z1, 0.32, [[p.cx + p.gap[0], z1 - 1, p.cx + p.gap[1], z1 + 1]]); // lối xuống hồ (court.PONDS gap)
     balustrade(deco, m, x0, z0, x1, z0, 0.32); balustrade(deco, m, x0, z0, x0, z1, 0.32); balustrade(deco, m, x1, z0, x1, z1, 0.32);
   }
 

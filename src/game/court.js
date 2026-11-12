@@ -9,7 +9,7 @@
 //    nền đá tầng 1 (cao 2 m) với lầu chuông / lầu trống, điện phụ hai bên ·
 //    nền đá tầng 2 (cao 4 m): Bàn Thầy Tử Bình trước Chính Đường · Hậu Môn (z −66) lên Hậu Sơn.
 // ============================================================================
-import { addPlatform, addSolidRect, clearSolidRect } from './obstacles.js';
+import { addPlatform, addSolidRect, clearSolidRect, addTall } from './obstacles.js';
 
 export const U = 1.6; // 1 ô lưới = 1,6 m (toạ độ ô của người chơi, MMO)
 export const toTile = (x, z) => ({ x: x / U + 10, y: z / U + 7 });
@@ -30,11 +30,22 @@ export const STAIRS = [
 ];
 const STEP = 0.4;
 
-// Hồ sen đôi hai bên lối giữa
+// Hồ sen đôi hai bên lối giữa — NƯỚC THẬT (2026-11-12, người chơi: «hồ sen cũng là nước mà»): trước đây là khối chặn
+// đặc «không lội được» (va chạm coi cao 1,2 m → nhảy lên là đứng trên mặt hồ). Giờ lòng hồ dốc dần từ mép xuống sâu
+// ~1,2 m ở giữa (lội — motion.WADE), lan can chặn quanh hồ, mỗi hồ một lối xuống ở mép Nam (gap).
 export const PONDS = [
-  { id: 'sen', cx: 21, cz: 50, W: 24, D: 8 },
-  { id: 'sen-w', cx: -21, cz: 50, W: 24, D: 8 },
+  { id: 'sen', cx: 21, cz: 50, W: 24, D: 8, gap: [-9, -3] },
+  { id: 'sen-w', cx: -21, cz: 50, W: 24, D: 8, gap: [3, 9] },
 ];
+export const POND_LEVEL = 0.12, POND_DEPTH = 1.1, POND_RAMP = 2.4;
+/** nước hồ sen tại (x, z): { pond, level, floor } trong lòng hồ, null ngoài hồ */
+export function pondAt(x, z) {
+  for (const p of PONDS) {
+    const ex = p.W / 2 - Math.abs(x - p.cx), ez = p.D / 2 - Math.abs(z - p.cz);
+    if (ex > 0 && ez > 0) { const t = Math.min(1, Math.min(ex, ez) / POND_RAMP); return { pond: p, level: POND_LEVEL, floor: -POND_DEPTH * t * t * (3 - 2 * t) }; }
+  }
+  return null;
+}
 
 // Gian trong sân: mỗi gian là mô hình thủ công cũ (models.js, toạ độ dựng sẵn quanh `base`) dời tới `at`.
 // block / spot / label: theo khung cũ (mét), cộng độ dời. y: độ cao nền dưới gian.
@@ -108,6 +119,11 @@ addSolidRect(COURT.x0 - T, COURT.z1, -COURT.gateS, COURT.z1 + T);
 addSolidRect(COURT.gateS, COURT.z1, COURT.x1 + T, COURT.z1 + T);
 addSolidRect(COURT.x0 - T, COURT.z0 - T, -COURT.gateN, COURT.z0);
 addSolidRect(COURT.gateN, COURT.z0 - T, COURT.x1 + T, COURT.z0);
+// độ cao tường (6,5 m): không khai thì va chạm coi tường là vật thấp → nhảy lên là đi xuyên (ảnh người chơi 2026-11-12)
+{ const wr = (x0, z0, x1, z1) => addTall((x0 + x1) / 2, (z0 + z1) / 2, Math.abs(x1 - x0) / 2, Math.abs(z1 - z0) / 2, 0, COURT.wallH);
+  wr(COURT.x0 - T, COURT.z0 - T, COURT.x0, COURT.z1 + T); wr(COURT.x1, COURT.z0 - T, COURT.x1 + T, COURT.z1 + T);
+  wr(COURT.x0 - T, COURT.z1, -COURT.gateS, COURT.z1 + T); wr(COURT.gateS, COURT.z1, COURT.x1 + T, COURT.z1 + T);
+  wr(COURT.x0 - T, COURT.z0 - T, -COURT.gateN, COURT.z0); wr(COURT.gateN, COURT.z0 - T, COURT.x1 + T, COURT.z0); }
 
 // 8 lư hương nhỏ (đặc 1 × 1 m)
 for (const b of BURNERS) if (!b.main) addSolidRect(b.x - 0.5, b.z - 0.5, b.x + 0.5, b.z + 0.5);
@@ -134,8 +150,12 @@ for (const s of STAIRS) {
   const tz = s.zHigh, wz = dir < 0 ? [tz - EDGE - 0.1, tz + 0.1] : [tz - 0.1, tz + EDGE + 0.1];
   clearSolidRect(s.x0, wz[0], s.x1, wz[1]);
 }
-// hồ sen: mặt nước không lội được
-for (const p of PONDS) addSolidRect(p.cx - p.W / 2 - 0.4, p.cz - p.D / 2 - 0.4, p.cx + p.W / 2 + 0.4, p.cz + p.D / 2 + 0.4);
+// hồ sen: lan can đá chặn bốn mép (dày 0,4 m), chừa lối xuống ở mép Nam — lòng hồ là nước lội được (pondAt)
+for (const p of PONDS) {
+  const x0 = p.cx - p.W / 2 - 0.4, x1 = p.cx + p.W / 2 + 0.4, z0 = p.cz - p.D / 2 - 0.4, z1 = p.cz + p.D / 2 + 0.4, g0 = p.cx + p.gap[0], g1 = p.cx + p.gap[1];
+  addSolidRect(x0, z0, x1, z0 + 0.4); addSolidRect(x0, z0, x0 + 0.4, z1); addSolidRect(x1 - 0.4, z0, x1, z1);
+  addSolidRect(x0, z1 - 0.4, g0, z1); addSolidRect(g1, z1 - 0.4, x1, z1);
+}
 // gian: khối mô hình
 for (const s of COURT_STATIONS) if (s.id !== 'sen') addSolidRect(...s.block);
 // Bàn thầy: bệ gỗ cao 0,25 m (models.js › masterDais)

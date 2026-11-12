@@ -7,6 +7,7 @@ import * as T from './terrain.js';
 import { inCanal, CANAL_WATER, MOAT, AVE_CANAL, OUTLET, extNear } from './canals.js';
 import { riverNear, riverFlow } from './waterways.js';
 import { GUA } from './batquai.js';
+import { pondAt } from './court.js';
 
 const G = 9.81;
 // đồng hồ nước dùng chung (giây): water3d.tick đặt mỗi khung (cùng uT của shader) → người bơi / thuyền nổi khớp sóng nhìn thấy
@@ -78,6 +79,9 @@ function canalFlow(x, z) {
  * Chưa tính cầu / nền (motion.js lo phần đó).
  */
 export function waterAt(x, z) {
+  // hồ sen sân Sơn Môn: nước tĩnh, gợn rất nhẹ (court.pondAt — lội được)
+  const pd = pondAt(x, z);
+  if (pd) return { level: pd.level, ground: pd.floor, depth: pd.level - pd.floor, kind: 'pond', flow: { x: 0, z: 0 }, amp: 0.02 };
   // v4: hào / kênh / suối cũ (canals.js) đã bỏ khỏi địa hình — chỉ còn nước thế giới (sông, hồ) ở mực T.WATER
   const ground = T.heightAt(x, z);
   if (ground >= T.WATER - 0.02) return null;

@@ -571,7 +571,9 @@ export function pond(rippleMap, m = materials(), { cz = 6.4, W = 12.4, D = 3.0 }
     g.add(box(w, 0.32, d, m.stone, { x, y: 0.16, z }));
     g.add(box(w, 0.04, d, m.stoneDark, { x, y: 0.34, z, shadow: false }));
   }
-  g.add(box(W, 0.1, D, std({ color: '#0d2228', roughness: 1 }), { y: -0.3, z: cz, shadow: false }));
+  // lòng hồ sâu ~1,2 m (court.POND_DEPTH — người chơi lội xuống): đáy + bốn vách đá trong
+  g.add(box(W, 0.1, D, std({ color: '#0d2228', roughness: 1 }), { y: -1.2, z: cz, shadow: false }));
+  for (const [x, z, w, d] of [[0, cz - D / 2 + 0.05, W, 0.1], [0, cz + D / 2 - 0.05, W, 0.1], [-W / 2 + 0.05, cz, 0.1, D], [W / 2 - 0.05, cz, 0.1, D]]) g.add(box(w, 1.2, d, m.stoneDark, { x, y: -0.6, z, shadow: false }));
   // mặt nước sóng lăn tăn + sen dập dềnh, hoa trên cuống, cá chép (lotus.js — cập nhật khi người chơi ở gần)
   const water = waterSurface(W, D); water.position.set(0, 0.12, cz); g.add(water);
   lotusLife(g, { x0: -W / 2, x1: W / 2, z0: cz - D / 2, z1: cz + D / 2, y: 0.12, seed: Math.round(W * 13 + D * 7) });

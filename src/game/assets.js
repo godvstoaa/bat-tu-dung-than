@@ -108,7 +108,9 @@ export async function placeModel(parent, id, { fit = { max: 4 }, at = { x: 0, y:
 //   · bản .hd (300k, texture 2048) CHỈ khi người chơi tự chọn chất lượng «ultra».
 // Biến đổi tính theo khung bao của bản đầu tiên nạp được rồi áp chung cho mọi bậc (cùng khung bao gốc).
 const LAZY = [];
-const nearDist = (v) => Math.max(v * 1.0, 8);   // bản thường 80k: chỉ khi sát (tượng 1,2 m → 8 m; điện 30 m → 30 m)
+// bản gốc khi camera trong khoảng này. Công trình ≥ 6 m: 2,2 × cỡ, tối thiểu 25 m — trước đây = cỡ (cổng phường 8 m → phải
+// đứng trong 8 m; tháp 26 m đứng sát chân camera vẫn ngoài 26 m) nên đứng gần vẫn thấy bản .vc màu loang (ảnh 2026-11-12)
+const nearDist = (v) => (v >= 6 ? Math.min(150, Math.max(v * 3, 30)) : Math.max(v * 1.5, 8)); // ≥ 6 m: 3 × cỡ, 30–150 m
 const farDist = (v) => Math.max(v * 3.5, 40);   // bản giữa 20k tới đây, xa hơn là .lod 12k
 const cullDist = (v) => (v >= 40 ? Infinity : Math.max(v * 22, 320)); // vật nhỏ ở rất xa: ẩn hẳn (sương đã che gần hết)
 async function placeLod(parent, id, { fit, at, hd = true }) {

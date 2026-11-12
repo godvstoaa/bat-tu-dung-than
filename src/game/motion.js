@@ -13,7 +13,7 @@
 // ============================================================================
 import * as T from './terrain.js';
 import { platformTop, blockedByBuilding, tallTopAt } from './obstacles.js';
-import { inCourt } from './court.js';
+import { inCourt, pondAt } from './court.js';
 import { waterAt, waveHeight, waterTime } from './water.js';
 import { clearanceAt } from './bridges.js';
 
@@ -27,7 +27,7 @@ export const SWIM = SWIM_V / 5.6;                          // (tương thích: t
 /** mặt đất (địa hình / nền / sân) tại (x, z) — y: cao độ người (bỏ qua mặt cầu cao hơn đầu khi ở dưới gầm) */
 export function groundHeight(x, z, y = null) {
   const p = platformTop(x, z, y);
-  if (inCourt(x, z)) return p ?? 0;
+  if (inCourt(x, z)) { const pd = pondAt(x, z); if (pd && (p == null || p < pd.floor)) return pd.floor; return p ?? 0; } // lòng hồ sen dốc xuống
   return Math.max(T.heightAt(x, z), p ?? -1e9);
 }
 /** nước tại (x, z) với người ở cao độ y: null nếu khô hoặc đang đứng trên nền (cầu, bậc) cao hơn mặt nước;
@@ -46,7 +46,9 @@ export function waterLevelAt(x, z, y = null) { return waterHere(x, z, y)?.level 
 export function surfaceAt(x, z, y) {
   const g = groundHeight(x, z, y), solid = blockedByBuilding(x, z);
   let top = solid ? tallTopAt(x, z) : null;
-  if (solid && top == null) top = g + 1.2; // vật cản nhỏ chưa biết độ cao (đèn đá, đồ đạc): coi như cao 1,2 m
+  // vật cản chưa khai độ cao (addSolidRect / addBlock không kèm addTall): coi như CAO HƠN tầm nhảy đôi (~3 m).
+  // Trước đây 1,2 m < một cú nhảy (1,3 m) → nhảy là đứng lên «đỉnh» rồi đi xuyên tường Sơn Môn 6,5 m, lan can hồ… (2026-11-12)
+  if (solid && top == null) top = g + 3.5;
   const wh = waterHere(x, z, y);
   // đứng trên công trình khi đã ở cao hơn đỉnh của nó (mái, mặt thành)
   const onTop = solid && top <= y + STEP_UP;
