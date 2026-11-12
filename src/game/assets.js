@@ -218,6 +218,17 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
   if (!g || !items.length) return null;
   const group = new THREE.Group();
   let sets = buildInstanced(g, items, fitKey, group);
+  // bóng bằng bản nhẹ vô hình (.vc2 / .vc) khi mẫu nặng: cây sân Sơn Môn 9,7k × 16 cây vẽ lại trong lượt bóng = ~157k
+  // tam giác (đo 2026-11-12). Hình nhìn thấy giữ nguyên; bóng ở độ phân giải bản đồ bóng không khác.
+  const triOf = (gg) => { let t = 0; gg.scene.traverse((o) => { if (o.isMesh) t += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3; }); return t; };
+  let proxied = false;
+  if (triOf(g) > 4000) {
+    const lite = (MODEL_FILES.size ? (MODEL_FILES.has(`${id}.vc2`) ? await loadModel(`${id}.vc2`) : null) : null) || (MODEL_FILES.has(`${id}.vc`) && !g.scene.name?.includes('.vc') ? await loadModel(`${id}.vc`) : null);
+    if (lite && lite !== g && triOf(lite) < triOf(g) * 0.5) {
+      for (const { im } of sets) im.castShadow = false; proxied = true;
+      for (const { im } of buildInstanced(lite, items, fitKey, group)) { im.material = SHADOW_ONLY; im.castShadow = true; im.receiveShadow = false; }
+    }
+  }
   await warm(group);
   parent.add(group);
   // nhân bản rải rộng (hàng cây, cổng phường, đèn…): chỉ vẽ các bản trong tầm — bản sao ngoài tầm vẫn tốn
@@ -227,7 +238,7 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
     const near = Math.max(Math.max(...items.map((it) => it.s)) * 4, 70);
     E.upgrade = { near, busy: false, done: false, run: async () => {
       const gm = (await loadModel(id)) || (await loadModel(`${id}.mid`)); if (!gm) return; // tới gần: bản gốc (bản .mid nhìn gần vỡ mảnh)
-      const tmp = new THREE.Group(); const ns = buildInstanced(gm, items, fitKey, tmp);
+      const tmp = new THREE.Group(); const ns = buildInstanced(gm, items, fitKey, tmp); if (proxied) for (const { im } of ns) im.castShadow = false;
       await warm(tmp);
       for (const { im } of E.sets) group.remove(im);
       for (const { im } of ns) group.add(im);
