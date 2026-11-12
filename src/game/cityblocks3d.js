@@ -383,8 +383,9 @@ export async function cityHouses(grp) {
     if (m[tier] || m.busy.has(tier)) return;
     m.busy.add(tier);
     const p = (async () => {
-      /* 2026-11-11: nhà gần dùng BẢN GỐC (~80k) — .lod1 / .mid nhìn gần vỡ mảnh, texture kéo sọc (ảnh người chơi); bản rút gọn chỉ còn ở bậc vừa (≥ 36 m) */
-      const g = (await loadModel(m.id)) || (await loadModel(`${m.id}.vc`)) || (await loadModel(`${m.id}.lod1`));
+      /* 2026-11-12: nhà gần dùng bản .bk (Blender: 12k tam giác, màu + pháp tuyến + AO nướng từ bản gốc ~80k — scripts/blender-bake.mjs,
+         docs/DOHOA-MANIFEST.md §3.1). Thiếu .bk thì bản gốc (.lod1 / .mid cũ vỡ mảnh, không dùng ở gần) */
+      const g = (await loadModel(`${m.id}.bk`)) || (await loadModel(m.id)) || (await loadModel(`${m.id}.vc`)) || (await loadModel(`${m.id}.lod1`));
       if (!g) return;
       // bóng nhà gần: đổ bằng bản .vc (~9k) VÔ HÌNH thay bản gốc 80k — bóng ở độ phân giải bản đồ bóng không khác,
       // mà lượt bóng bớt ~70k tam giác / nhà (đo 2026-11-12: 9 nhà gần = ~720k tam giác chỉ để vẽ bóng)

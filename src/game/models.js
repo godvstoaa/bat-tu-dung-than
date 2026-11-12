@@ -70,15 +70,15 @@ const cyl = (rt, rb, h, mat, o, seg = 16) => mesh(new THREE.CylinderGeometry(rt,
 const lathe = (pts, mat, o, seg = 24) => mesh(new THREE.LatheGeometry(pts.map(([r, y]) => new THREE.Vector2(r, y)), seg), mat, o);
 
 // Gộp hình học tĩnh theo vật liệu → ít draw call. Giữ userData của group.
-export function mergeStatic(group) {
+export function mergeStatic(group, { keepFootprints = false } = {}) { // keepFootprints: không gộp vật có va chạm (raze.js ẩn qua tham chiếu)
   group.updateMatrixWorld(true);
   const inv = new THREE.Matrix4().copy(group.matrixWorld).invert();
   const buckets = new Map();
   const keep = [];
   group.traverse((o) => {
-    if (!o.isMesh || o.userData.dynamic || o.isInstancedMesh) return;
+    if (!o.isMesh || o.userData.dynamic || (keepFootprints && o.userData.footprint) || o.isInstancedMesh || o.isSkinnedMesh || Array.isArray(o.material)) return;
     let p = o.parent; let dyn = false;
-    while (p && p !== group) { if (p.userData.dynamic) dyn = true; p = p.parent; }
+    while (p && p !== group) { if (p.userData.dynamic || (keepFootprints && p.userData.footprint) || p.isLOD) dyn = true; p = p.parent; } // con của THREE.LOD: gộp ra ngoài là phá bậc chi tiết
     if (dyn) return;
     const g = o.geometry.index ? o.geometry : null;
     if (!g || !g.attributes.uv || !g.attributes.normal) { keep.push(o); return; }

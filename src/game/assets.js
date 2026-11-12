@@ -112,6 +112,7 @@ const LAZY = [];
 // đứng trong 8 m; tháp 26 m đứng sát chân camera vẫn ngoài 26 m) nên đứng gần vẫn thấy bản .vc màu loang (ảnh 2026-11-12)
 const nearDist = (v) => (v >= 6 ? Math.min(150, Math.max(v * 3, 30)) : Math.max(v * 1.5, 8)); // ≥ 6 m: 3 × cỡ, 30–150 m
 const farDist = (v) => Math.max(v * 3.5, 40);   // bản giữa 20k tới đây, xa hơn là .lod 12k
+const vc2Dist = (v) => Math.max(v * 6, 110);    // từ đây trở ra: bản .vc2 (~2,5k)
 const cullDist = (v) => (v >= 40 ? Infinity : Math.max(v * 22, 320)); // vật nhỏ ở rất xa: ẩn hẳn (sương đã che gần hết)
 const SHADOW_ONLY = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }); // chỉ đổ bóng
 async function placeLod(parent, id, { fit, at, hd = true }) {
@@ -132,6 +133,12 @@ async function placeLod(parent, id, { fit, at, hd = true }) {
   // bóng bậc gần: bản .vc vô hình đi CHUNG nhóm với bản gốc (chỉ có khi bậc gần đang hiện) — bóng như nhau, lượt bóng bớt
   // ~70k tam giác / công trình gần (cùng cách nhà phố — cityblocks3d). Bậc xa vẫn không đổ bóng như trước.
   if (vc) L.shadowSrc = obj0;
+  // bậc rất xa .vc2 (~2,5k, cùng hệ toạ độ với .vc — cùng scripts/meshy-vclod.mjs): ngoài max(6 × cỡ, 110 m). Trước đây .vc 9k hiện tới
+  // 320 m / vô hạn → sân Sơn Môn vẽ 4,3 triệu tam giác, phần lớn là công trình xa (docs/DOHOA-MANIFEST.md §3.2)
+  if (vc && (await loadModel(`${id}.vc2`))) {
+    const o2 = (await loadModel(`${id}.vc2`)).scene.clone(true); o2.traverse((o) => { if (o.isMesh) o.castShadow = false; }); o2.userData.vc2 = true; // collide.js bỏ qua (va chạm vẫn theo .vc)
+    lod.addLevel(o2, Math.max(vc2Dist(v), nearDist(v) + 10), 0.08);
+  }
   if (Number.isFinite(cullDist(v))) lod.addLevel(new THREE.Object3D(), cullDist(v));
   // không có bản rút gọn: obj0 chính là bản gốc → bậc 0. (Lỗi 2026-11-11 → 11-12: nhánh này từng gắn vào «cullDist vô hạn»
   // → mọi công trình rộng ≥ 40 m bị thêm CHÍNH bản xa lần hai ở bậc 0: LOD bật rồi tắt cùng một vật → đứng trong ~150 m là

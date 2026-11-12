@@ -22,6 +22,7 @@ import { HALLS, PLACES } from './world.js';
 import { COURT } from './court.js';
 import { addLight, glowAll } from './lights.js';
 import { addFootprint } from './collide.js';
+import { mergeStatic } from './models.js';
 import * as AK from './archkit.js';
 import { riverBridges, bridgePlatforms, deckTop } from './bridges.js';
 import { riverBridgeBody } from './river3d.js';
@@ -272,7 +273,7 @@ SPOTS.push({ at: [0, 60], place: async (g) => {
 // đèn lồng 8 đại lộ, cây sân trong; mỗi cung một công trình mốc + lô chủ đề (vùng nạp riêng)
 // v4 (thành ×10 — citylayout.js / city4.js): tường bát giác trung đoạn 2.125 m cao 34 m + 8 cổng lớn (+ thủy môn chỗ sông
 // xuyên tường), ~22.900 nhà phố dựng theo ô, mặt tiền đúng loại tiệm; công trình trọng điểm ở tâm 8 khu Ngoại Thành
-SPOTS.push({ at: [0, 0], place: async (g) => {
+SPOTS.push({ at: [0, 0], noMerge: true, place: async (g) => {
   outerWall(g, LAYOUT.CITY.A, 34);
   await outerGates(g, LAYOUT.CITY.A, 34);
   const hs = await cityHouses(g);
@@ -387,7 +388,9 @@ export function createLandmarks(scene) {
       // dựng xong + hâm nóng (biên dịch shader, đẩy texture) rồi MỚI đưa vào cảnh → vùng mới hiện ra
       // không làm khựng khung hình (root ở gốc toạ độ nên ma trận thế giới không đổi khi gắn sau)
       const g = new THREE.Group();
-      ps.push(s.place(g).then(() => warmObject(g)).then(() => root.add(g)).catch((e) => { console.warn('[landmarks]', e); root.add(g); }));
+      // gộp khối tĩnh dựng bằng mã theo vật liệu (luống ruộng, ao, bia, đĩa quẻ…): nhìn ngang qua thành từng là ~3.200 lệnh vẽ lẻ
+      // (docs/DOHOA-MANIFEST.md §3.2). Bỏ qua: con của LOD, vật có va chạm (raze.js ẩn qua tham chiếu), vùng thành chính (biển nhà đổi chủ)
+      ps.push(s.place(g).then(() => { if (!s.noMerge) mergeStatic(g, { keepFootprints: true }); }).then(() => warmObject(g)).then(() => root.add(g)).catch((e) => { console.warn('[landmarks]', e); root.add(g); }));
     });
     return ps;
   };

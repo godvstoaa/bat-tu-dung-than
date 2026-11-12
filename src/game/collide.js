@@ -164,10 +164,11 @@ const FILL_MIN = 10;
 const BB = new THREE.Box3();
 export function addFootprint(obj, { lo = 0.4, hi = 2.0, base = null, ground = null, keep = null, fill = 'auto' } = {}) {
   if (!obj) return;
+  obj.userData.footprint = true; // raze.js ẩn / hiện qua tham chiếu này → models.mergeStatic không gộp nhánh này đi
   obj.updateWorldMatrix(true, true); // cả chuỗi cha (vật nằm trong nhóm con chưa cập nhật ma trận vẫn đúng chỗ)
   // LOD: bậc xa nhất CÓ hình (bậc cuối có thể là Object3D rỗng «ẩn khi rất xa» — assets.placeLod)
   const hasMesh = (o) => { let m = false; o.traverse((c) => { if (c.isMesh) m = true; }); return m; };
-  const root = obj.isLOD && obj.levels.length ? [...obj.levels].reverse().find((l) => hasMesh(l.object))?.object || obj : obj;
+  const root = obj.isLOD && obj.levels.length ? [...obj.levels].reverse().find((l) => hasMesh(l.object) && !l.object.userData.vc2)?.object || obj : obj;
   root.updateMatrixWorld(true);
   const bb = new THREE.Box3().setFromObject(root);
   const rec = { name: obj.name || root.children[0]?.name || obj.type, x: (bb.min.x + bb.max.x) / 2, z: (bb.min.z + bb.max.z) / 2, w: bb.max.x - bb.min.x, d: bb.max.z - bb.min.z, h: bb.max.y - bb.min.y, base: base ?? bb.min.y, cells: 0, filled: false };

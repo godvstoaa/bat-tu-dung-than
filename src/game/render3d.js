@@ -131,7 +131,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
-  /* giữ 9000 m: phông núi xa (mtnMat) nằm ngoài vòng sương — cắt còn 1800 m thì đỉnh núi bị chặt (đã thử, ảnh shots/far1800) */
+  /* giữ 9000 m: phông núi xa (3 lớp dãy núi 3–4,6 km) nằm ngoài vòng sương — cắt còn 1800 m thì đỉnh núi bị chặt (đã thử, ảnh shots/far1800) */
   const camera = new THREE.PerspectiveCamera(45, 1, 0.3, 9000);
   let debugCam = null;
   // sương gần hơn: các ngưỡng đổi bậc chi tiết / nạp vùng xa nằm trong mù (không thấy nhà «bật» ra ở xa)
@@ -159,15 +159,33 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const moon = new THREE.Sprite(new THREE.SpriteMaterial({ map: TX.softTex('rgba(255,250,235,1)', 'rgba(255,250,235,0)'), transparent: true, opacity: 0, fog: false, depthWrite: false }));
   moon.scale.setScalar(36); moon.position.set(-120, 140, -260); scene.add(moon);
 
-  // núi xa kiểu tranh thuỷ mặc
+  // núi xa kiểu tranh thuỷ mặc (docs/DOHOA-MANIFEST.md §3.3): 3 lớp dãy núi vòng quanh camera, đỉnh nhọn có gờ
+  // (nhiễu «ridged» tuần hoàn theo góc → không có đường nối), lớp gần đậm, lớp xa nhạt dần vào sương; chân núi tan vào mù.
+  // Thay 22 hình chóp ConeGeometry (trông như kim tự tháp — ảnh shots/gfx/before-mid/03-rung.png).
   const mountains = new THREE.Group(); scene.add(mountains);
   const mr = TX.rng(91);
-  const mtnMat = new THREE.MeshBasicMaterial({ color: '#7b7a8a', fog: true });
-  for (let i = 0; i < 22; i++) {
-    const a = (i / 22) * Math.PI * 2 + mr() * 0.3, d = 3400 + mr() * 900, h = 320 + mr() * 520;
-    const m = new THREE.Mesh(new THREE.ConeGeometry(h * 0.8 + mr() * 260, h, 5 + Math.floor(mr() * 3)), mtnMat);
-    m.position.set(Math.cos(a) * d, -20 + h / 2, Math.sin(a) * d); m.rotation.y = mr() * 3;
-    mountains.add(m);
+  const mtnUni = { uFog: { value: new THREE.Color() }, uInk: { value: new THREE.Color() } };
+  const MTN_LAYERS = [{ d: 4600, base: 380, amp: 620, k: 0.32 }, { d: 3800, base: 260, amp: 520, k: 0.52 }, { d: 3000, base: 150, amp: 420, k: 0.74 }];
+  for (const L of MTN_LAYERS) {
+    const N = 720, waves = Array.from({ length: 6 }, (_, i) => ({ f: [3, 5, 9, 14, 23, 37][i] + Math.floor(mr() * 3), p: mr() * 6.283, w: [1, 0.6, 0.38, 0.22, 0.12, 0.07][i] }));
+    const wsum = waves.reduce((a, w) => a + w.w, 0);
+    const pos = new Float32Array((N + 1) * 2 * 3), hh = new Float32Array((N + 1) * 2), idx = [];
+    for (let i = 0; i <= N; i++) {
+      const a = (i / N) * Math.PI * 2;
+      let r = 0; for (const w of waves) { const v = 1 - Math.abs(Math.sin(w.f * a * 0.5 + w.p)); r += w.w * v * v; }
+      const h = L.base + L.amp * Math.pow(r / wsum, 1.35) * 1.6;
+      const x = Math.cos(a) * L.d, z = Math.sin(a) * L.d;
+      pos.set([x, -120, z, x, h, z], i * 6); hh.set([0, 1], i * 2);
+      if (i < N) { const b = i * 2; idx.push(b, b + 1, b + 2, b + 1, b + 3, b + 2); }
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aH', new THREE.BufferAttribute(hh, 1)); g.setIndex(idx);
+    const m = new THREE.Mesh(g, new THREE.ShaderMaterial({
+      uniforms: { ...mtnUni, uK: { value: L.k } }, side: THREE.DoubleSide, fog: false, // ghi độ sâu: trời tán xạ (vẽ sau) không đè lên núi
+      vertexShader: 'attribute float aH; varying float vH; void main(){ vH = aH; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+      fragmentShader: 'uniform vec3 uFog; uniform vec3 uInk; uniform float uK; varying float vH; void main(){ float t = uK * smoothstep(0.0, 1.0, vH * 1.15); gl_FragColor = vec4(mix(uFog, uInk, t), 1.0); }',
+    }));
+    m.frustumCulled = false; m.renderOrder = -9; mountains.add(m); // sau trời (−10), trước mọi thứ khác
   }
 
   // --- ánh sáng
@@ -808,7 +826,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // đêm: trời tán xạ vật lý chỉ ra xám → dùng vòm chuyển màu xanh thẫm của game (có trăng sao)
     const nightSky = L.night >= 0.6; sky.visible = nightSky; if (world.sky) world.sky.visible = !nightSky;
     fog.color.copy(L.fog);
-    mtnMat.color.copy(L.fog).lerp(L.top, 0.25).multiplyScalar(0.82);
+    mtnUni.uFog.value.copy(L.fog); mtnUni.uInk.value.copy(L.fog).lerp(L.top, 0.35).multiplyScalar(0.62); // mực núi: sương pha sắc trời, đậm hơn
     cloudMat.color.copy(L.mid).lerp(WHITE, 0.35 * (1 - L.night));
     // môi trường PMREM (bầu trời) đã chiếu sáng vật liệu PBR → đèn bán cầu chỉ còn phần bổ sung
     hemi.intensity = L.hemi * (0.35 + 0.3 * L.night); hemi.color.copy(L.top).lerp(WHITE, 0.5);
@@ -1025,7 +1043,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     setViewer(camera.position);
     if (debugCam) { camera.position.fromArray(debugCam.pos); camera.lookAt(...debugCam.look); }
     span('f:occl', () => world.occlusion(w.x, w.z, camera.position.x, camera.position.z));
-    sky.position.copy(camera.position); stars.position.copy(camera.position);
+    sky.position.copy(camera.position); stars.position.copy(camera.position); mountains.position.set(camera.position.x, 0, camera.position.z);
 
     // làm mờ công trình che khuất khách
     headV.set(w.x, gy + 1.2, w.z);
