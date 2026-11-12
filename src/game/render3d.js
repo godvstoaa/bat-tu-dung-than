@@ -656,7 +656,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // 16 biệt phủ đi bộ thật ở vành phủ Ngoại Thành (mansion3d.js): va chạm ngay, hình chi tiết dựng lười
   const phuG = new THREE.Group(); phuG.name = 'mansions'; scene.add(phuG);
   registerPrison(); const prison = createPrison(scene); // Thiên Lao + Khoáng Sơn (luật pháp — law.js)
-  registerHeaven(); const heaven = safeInit('heaven', () => createHeaven(scene)); // Cửu Trọng Thiên: 9 đảo trời, tiên phủ (heaven.js — NHA-DIADIEM-MANIFEST §2)
+  registerHeaven(); const heaven = safeInit('heaven', () => createHeaven(scene, { citizens })); // Cửu Trọng Thiên: 9 đảo trời, tiên phủ (heaven.js — NHA-DIADIEM-MANIFEST §2)
   RZ.initRaze(scene); // công trình ngoài thành phá được (raze.js)
   registerLifePlaces(); createLifePlaces(scene); // quầy cơm, liêu xá, giếng quanh Sơn Môn (sinh tồn — life.js)
   const yoke = makeYoke(); yoke.visible = false; scene.add(yoke); // đòn gánh nước trên vai khi đang gánh

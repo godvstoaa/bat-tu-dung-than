@@ -447,7 +447,10 @@ export function startGame({ onExit = null } = {}) {
     if (st.kind === 'spot' && work && (st.room === 'job:mine' || st.data?.kind === 'job')) { work.spot(st); return; }
     if (st.kind === 'spot' && st.room === DOCK_KEY) { boat?.spot(st); return; }
     if (st.kind === 'spot' && st.room === 'fate') { fateSpot(); return; }
-    if (st.kind === 'spot' && st.room === 'heaven') { placeAt(tileToWorld(START.x, START.y), '☁ Hạ phàm', 'Cưỡi mây trở về Sơn Môn…'); return; } // Nam Thiên Môn (heaven.js)
+    if (st.kind === 'spot' && st.room === 'heaven') { // Nam Thiên Môn «Hạ phàm» · Thiên Thê ở Hậu Sơn «Thăng thiên» (heaven.js)
+      if (st.data?.id === 'up') { import('./heaven.js').then((H) => { const a = H.heavenLayout().arrive; rideTo(a.x, a.z, '☁ Thăng thiên — Cửu Trọng Thiên', { free: true, sub: 'Bậc mây nối bậc mây, Nam Thiên Môn hiện dần…' }); }); return; }
+      placeAt(tileToWorld(START.x, START.y), '☁ Hạ phàm', 'Cưỡi mây trở về Sơn Môn…'); return;
+    }
     if (st.kind === 'spot') {
       S.rollDay(state);
       import('./shop-ui.js').then((m) => {

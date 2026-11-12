@@ -9,6 +9,7 @@
 //    home   giấy tờ nhà cạnh cửa: mua căn đang rao / bài trí nhà mình / khen nhà người khác
 //  api (main.js): state, toast, after, panel, setTeaColor, todayNpc, goTo, travel, estate, rebuildRoom
 // ============================================================================
+import { VILLA_DISTRICT_NAME } from './estate-layout.js';
 import { GODS, godOfTemple } from './temples.js';
 import * as I from './items.js';
 import * as E from './estate.js';
@@ -246,7 +247,30 @@ export function listingsView(api, canBuy) {
   const doors = new Map(enterables().filter((e) => e.kind === 'est').map((e) => [e.key, e]));
   const L = E.listings().map((l) => ({ l, st: E.fitStars(l.wx, y), info: api.estate?.info?.(l.h) || null }));
   L.sort((a, b) => (!!a.info - !!b.info) || b.st - a.st || a.l.h - b.l.h);
-  for (const { l, st, info } of L) {
+  // G-6.3 (NHA-DIADIEM-MANIFEST §5): lọc theo hạng / khu / còn trống / hợp mệnh — trước là một danh sách 292 căn
+  const F = { tier: 'all', free: true, fit: false, district: -1, limit: 30 };
+  const TIER_CHIPS = [['all', 'Tất cả'], ['tienphu', '☁ Tiên phủ'], ['bietphu', '🏯 Biệt phủ'], ['bietthu', '🏡 Biệt thự'], ['street', '🏠 Nhà phố']];
+  const bar = el(`<div class="hq-est-filter"><div class="hq-est-chips">${TIER_CHIPS.map(([k, n]) => `<button type="button" class="hq-chip" data-tier="${k}">${n}</button>`).join('')}</div>
+    <div class="hq-est-chips"><label><input type="checkbox" data-f="free" checked> Chỉ căn còn trống</label><label><input type="checkbox" data-f="fit"> Hợp mệnh (≥ 4★)</label>
+    <select class="hq-input" data-f="district" hidden><option value="-1">Mọi khu biệt thự</option>${VILLA_DISTRICT_NAME.map((n, i) => `<option value="${i}">${esc(n)}</option>`).join('')}</select></div><p class="hq-sub" data-f="count"></p></div>`);
+  box.append(bar);
+  const list = el('<div class="hq-yc-grid"></div>'); box.append(list);
+  const pass = ({ l, st, info }) => (F.tier === 'all' || (F.tier === 'street' ? !E.isPhu(l) : l.tier === F.tier)) && (!F.free || !info || mine?.h === l.h) && (!F.fit || st >= 4)
+    && (F.district < 0 || F.tier !== 'bietthu' || l.unit?.district === F.district);
+  const render = () => {
+    bar.querySelectorAll('[data-tier]').forEach((b) => b.classList.toggle('on', b.dataset.tier === F.tier));
+    bar.querySelector('[data-f=district]').hidden = F.tier !== 'bietthu';
+    const rows = L.filter(pass);
+    bar.querySelector('[data-f=count]').textContent = `${rows.length} căn khớp${rows.length > F.limit ? ` — hiện ${F.limit} căn hợp mệnh nhất` : ''}.`;
+    list.innerHTML = '';
+    for (const r of rows.slice(0, F.limit)) list.append(card(r));
+    if (rows.length > F.limit) { const more = el('<button type="button" class="hq-btn">Xem thêm 30 căn</button>'); more.onclick = () => { F.limit += 30; render(); }; list.append(more); }
+  };
+  bar.querySelectorAll('[data-tier]').forEach((b) => { b.onclick = () => { F.tier = b.dataset.tier; F.limit = 30; render(); }; });
+  bar.querySelector('[data-f=free]').onchange = (e) => { F.free = e.target.checked; render(); };
+  bar.querySelector('[data-f=fit]').onchange = (e) => { F.fit = e.target.checked; render(); };
+  bar.querySelector('[data-f=district]').onchange = (e) => { F.district = Number(e.target.value); render(); };
+  function card({ l, st, info }) {
     const T = E.TIERS[l.tier], p = E.priceOf(l), alt = E.altPriceOf(l), isMine = mine?.h === l.h;
     const n = el(`<div class="hq-yc-card${st >= 5 ? ' r4' : ''}"><i class="hq-yc-ic">🏠</i>
       <div><b>${esc(l.name)}</b> <small>${esc(T.name)} · ${l.W ? `${l.W}×${l.D} m (${l.W * l.D} m²) · ${esc(l.style)} · ${esc(l.facing.text)} · ${esc(l.facing.trach)}` : `${E.roomOf(l).w}×${E.roomOf(l).d} m`} · phường ${esc(BQ.guaById(l.g).name)} (${esc(I.WX_NAME[l.wx])})</small>
@@ -255,11 +279,12 @@ export function listingsView(api, canBuy) {
       <div class="hq-yc-act"></div></div>`);
     const act = n.querySelector('.hq-yc-act');
     const go = el('<button class="hq-btn" type="button">🧭 Chỉ đường</button>');
-    go.onclick = () => { if (E.isPhu(l)) { api.goTo(`spot:est:${l.h}|gate`); return; } const e = doors.get(`est:${l.h}`); if (e) api.goTo(`door:${e.i}`); };
+    go.onclick = () => { if (l.tier === 'tienphu') { api.rideTo?.(l.house.door.x, l.house.door.z, `☁ ${l.name}`, { free: true, sub: 'Cưỡi mây tới cổng phủ…' }); return; } if (E.isPhu(l)) { api.goTo(`spot:est:${l.h}|gate`); return; } const e = doors.get(`est:${l.h}`); if (e) api.goTo(`door:${e.i}`); };
     act.append(go);
     if (canBuy && !info && !isMine) { const b = el('<button class="hq-btn hq-primary" type="button">Mua căn này</button>'); b.onclick = () => buyFlow(api, l); act.append(b); }
-    box.append(n);
+    return n;
   }
+  render();
   return box;
 }
 

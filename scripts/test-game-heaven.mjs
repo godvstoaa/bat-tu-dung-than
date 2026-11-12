@@ -49,6 +49,7 @@ check('đi được: từ Nam Thiên Môn qua cầu tới cổng mọi tiên ph�
     for (let k = 0; k + 1 < pts.length; k++) { const p = pts[k], q = pts[k + 1], n = Math.ceil(Math.hypot(q.x - p.x, q.z - p.z)); for (let t = 0; t <= n; t++) { const x = p.x + (q.x - p.x) * t / Math.max(1, n), z = p.z + (q.z - p.z) * t / Math.max(1, n); assert.ok(platformTop(x, z) != null, `${m.name}: hụt nền ở (${x.toFixed(1)}, ${z.toFixed(1)})`); } }
   }
   assert.ok(HV.inHeaven(L.arrive.x, L.arrive.z) && !HV.inHeaven(0, 0));
+  assert.ok(Math.hypot(HV.THIEN_THE.x, HV.THIEN_THE.z) < 150 && !HV.inHeaven(HV.THIEN_THE.x, HV.THIEN_THE.z), 'Thiên Thê ở Sơn Môn');
 });
 check('menu Địa điểm: 8 thẻ đều có dòng, dòng đi được có toạ độ, có ăn / ngủ / làm / nhà đất / Cửu Trọng Thiên', () => {
   const ctx = { me: () => ({ x: 0, z: 60 }), own: null, homeSpot: () => null, estateInfo: () => null, contract: null, stations: [], icon: {}, deskDone: () => false, level: 1 };

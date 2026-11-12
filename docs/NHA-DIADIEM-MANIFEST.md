@@ -105,8 +105,21 @@ Kết luận: phần nhà đã có, chỉ **không lộ ra**. Cửu Trọng Thi�
 - [x] Deploy CI xanh (8033a15f, 7438dbdd). Kiểm trên bản live: menu 🧭 Địa điểm → Nhà đất → Thăng thiên tới đúng quảng trường trước Quân Thiên Phủ.
   - Lỗi đã sửa: lần đầu điểm đến sát cổng nên camera lọt vào thân cổng. Cổng đã dời ra thềm riêng.
 
-## 5. Goal phát triển (tự đặt)
+## 5. Goal phát triển (tự đặt) — kết quả
 
-- **G-6.1 Thiên Thê:** lối lên trời trong thế giới (cầu thang mây ở Hậu Sơn Sơn Môn) thay cho chỉ dùng menu. Đo được: đi bộ từ Sơn Môn lên Nam Thiên Môn không qua menu.
-- **G-6.2 Tiên đồng, tiên nữ:** NPC đi trên quảng trường Quân Thiên (≥ 8 người, có bark). Hạc bay quanh đảo (≥ 6 con, nhân bản).
-- **G-6.3 Sổ nhà rõ ràng:** Nha Môn dùng cùng bộ lọc với thẻ Nhà đất (theo hạng, khu, còn trống), không còn danh sách 292 dòng.
+- [x] **G-6.1 Thiên Thê:** thang mây ngoài tường Đông Sơn Môn ở (78, −50).
+  - Chỗ được chọn bằng cách dò lưới va chạm tìm khoảng trống 16 × 24 m. Chỗ dự tính đầu (56, −163) kẹt giữa tường và nhà dân.
+  - Gồm cổng đá, 18 bậc ngọc xoắn lên, cột sáng. Bấm «Bước lên thang mây» là lên Nam Thiên Môn.
+  - Ảnh: `shots/heaven/g/01-thienthe2.png`, `02-thienthe3.png`.
+- [x] **G-6.2 Tiên đồng, tiên nữ:**
+  - 8 người trên lối quảng trường Quân Thiên, có lời chỉ đường và gợi ý phủ hợp mệnh. Chỉ thêm vào khi người chơi ở trên trời.
+  - 6 hạc trắng bay vòng, gộp 1 lệnh vẽ.
+  - Ảnh: `shots/heaven/g/04-tien.png`.
+- [x] **G-6.3 Sổ nhà rõ ràng:**
+  - Nha Môn lọc theo hạng (tiên phủ, biệt phủ, biệt thự, nhà phố), theo khu biệt thự, chỉ căn còn trống, hợp mệnh ≥ 4★.
+  - Mỗi lần hiện 30 căn, có nút «Xem thêm».
+  - Ảnh: `shots/heaven/g/03-nhamon.png`.
+
+### Goal kế tiếp
+
+- **G-6.4 Đo trên máy người chơi.** fps ở Cửu Trọng Thiên phải ≥ fps ở Sơn Môn trên cùng máy. Cần người dùng thử và gửi số.

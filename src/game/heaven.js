@@ -16,6 +16,9 @@ export const HEAVEN = { key: 'heaven', name: 'Cửu Trọng Thiên', cx: ROOM_X0
 const PLAZA_HALF = 50 + HEAVEN.plaza; // nửa cạnh nền đảo giữa (phủ 100 m + quảng trường)
 
 /** đang ở vùng trời (dựng cảnh, ẩn Thiên Lao / mỏ, bỏ minimap thành) */
+// THIÊN THÊ (goal G-6.1): thang mây ngoài tường Đông Sơn Môn (khoảng trống 16 × 24 m dò bằng lưới va chạm — ra cổng Bắc sân
+// rồi rẽ Đông là tới). Chỗ cũ (56, −163) kẹt giữa tường gạch và nhà dân.
+export const THIEN_THE = { x: 78, z: -50 };
 export const inHeaven = (x, z) => Math.abs(x - HEAVEN.cx) < HEAVEN.half && Math.abs(z - HEAVEN.cz) < HEAVEN.half;
 
 const toW = (m, lx, lz) => { const c = Math.cos(m.ry), s = Math.sin(m.ry); return { x: m.x + c * lx + s * lz, z: m.z - s * lx + c * lz }; };
@@ -63,5 +66,8 @@ export function registerHeaven() {
   const L = heavenLayout();
   for (const s of L.islands) addPlatform(s.x, s.z, s.hw * 2, s.hd * 2, s.ry, 0);
   for (const b of L.bridges) addPlatform(b.x, b.z, b.w, b.len, b.ry, 0);
-  setOpenSpots(HEAVEN.key, [{ id: 'down', kind: 'heaven', name: 'Nam Thiên Môn', verb: 'Hạ phàm · về Sơn Môn', x: L.arrive.x + 3.5, z: L.arrive.z + 2, r: 2.6 }]);
+  setOpenSpots(HEAVEN.key, [
+    { id: 'down', kind: 'heaven', name: 'Nam Thiên Môn', verb: 'Hạ phàm · về Sơn Môn', x: L.arrive.x + 3.5, z: L.arrive.z + 2, r: 2.6 },
+    { id: 'up', kind: 'heaven', name: 'Thiên Thê', verb: 'Bước lên thang mây · Cửu Trọng Thiên', x: THIEN_THE.x, z: THIEN_THE.z + 3, r: 3 },
+  ]);
 }

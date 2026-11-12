@@ -645,3 +645,8 @@ select.hq-input { width: auto; max-width: 100%; }
 .hq-place-tx small { color: var(--hq-dim); font-size: 12px; line-height: 1.35; white-space: normal; }
 .hq-place-go { flex: none; font-size: 12px; color: var(--hq-gold); white-space: nowrap; }
 .hq-place:disabled { opacity: 0.75; cursor: default; }
+/* sổ nhà Nha Môn: lọc (G-6.3) */
+.hq-est-filter { display: grid; gap: 6px; margin: 6px 0; }
+.hq-est-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.hq-est-chips label { display: inline-flex; gap: 4px; align-items: center; font-size: 13px; }
+.hq-est-chips .hq-chip.on { border-color: var(--hq-gold); color: var(--hq-gold); }

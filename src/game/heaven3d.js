@@ -7,7 +7,7 @@
 // ============================================================================
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { HEAVEN, heavenLayout, inHeaven } from './heaven.js';
+import { HEAVEN, heavenLayout, inHeaven, THIEN_THE } from './heaven.js';
 import { cloudTex, rng } from './textures.js';
 import { placeModel, instanceModel } from './assets.js';
 
@@ -46,13 +46,50 @@ function rockUnder(hw, hd, depth, seed) {
   return geo;
 }
 
-export function createHeaven(scene) {
+export function createHeaven(scene, { citizens = null } = {}) {
   const grp = new THREE.Group(); grp.name = 'heaven'; grp.visible = false; scene.add(grp);
   let built = false, clouds = null, puffs = null, rocks = [], seaA = null, seaB = null;
   const L = heavenLayout();
+  // --- THIÊN THÊ ở Hậu Sơn (G-6.1): cổng đá + 18 bậc ngọc lơ lửng xoắn lên trời + cột sáng. ≈ 4 lệnh vẽ, < 3k tam giác (+ cổng)
+  const stair = new THREE.Group(); stair.name = 'thienthe'; stair.position.set(THIEN_THE.x, 0, THIEN_THE.z); scene.add(stair);
+  {
+    const steps = [];
+    for (let k = 0; k < 18; k++) { const a = k * 0.42, r = 3.2 + k * 0.12, g = new THREE.CylinderGeometry(1.25, 1.05, 0.28, 10); steps.push(place(g, Math.sin(a) * r, 0.35 + k * 1.55, -2.5 - Math.cos(a) * r)); }
+    const stepMesh = new THREE.Mesh(mergeGeometries(steps, false), new THREE.MeshStandardMaterial({ color: '#f3efe4', emissive: '#c8d8ff', emissiveIntensity: 0.35, roughness: 0.4, transparent: true, opacity: 0.92 }));
+    steps.forEach((g) => g.dispose());
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 3.4, 60, 16, 1, true), new THREE.MeshBasicMaterial({ color: '#fff3c8', transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));
+    beam.position.set(0, 30, -2.5);
+    const halo = new THREE.Mesh(new THREE.RingGeometry(2.6, 4.2, 32), new THREE.MeshBasicMaterial({ color: '#fff0b0', transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide }));
+    halo.rotation.x = -Math.PI / 2; halo.position.set(0, 0.06, -2.5);
+    stair.add(stepMesh, beam, halo, plaque('天梯 · Thiên Thê', 0, 6.4, 1.2));
+    placeModel(stair, 'lib_paifang', { fit: { width: 8 }, at: { x: 0, y: 0, z: 1, ry: 0 } }).catch(() => {});
+    stair.userData = { stepMesh, beam, halo };
+  }
 
+  // --- TIÊN ĐỒNG, TIÊN NỮ (G-6.2): 8 người dạo lối quảng trường giữa (vòng 65 m quanh tường Quân Thiên Phủ) + thềm Nam Thiên Môn
+  const TIEN_LINES = [
+    ['Khách từ hạ giới lên? Chín cõi trời này mỗi cõi một tiên phủ, phủ nào chưa chủ thì mua được.', 'Quân Thiên ở giữa là phủ của bậc chí tôn — giá cũng gấp đôi đấy.'],
+    ['Đi theo cầu ngọc là tới cổng từng phủ, đừng ngó xuống biển mây kẻo chóng mặt.', 'Muốn về hạ giới thì tới Nam Thiên Môn mà «Hạ phàm».'],
+    ['Thương Thiên phía Đông mái xanh như ngọc bích, hợp người mệnh Mộc lắm.', 'Viêm Thiên phía Nam mái đỏ, khí Hỏa vượng.'],
+    ['Huyền Thiên phía Bắc thâm trầm, người mệnh Thủy ở đó yên giấc lắm.', 'Hạo Thiên phía Tây mái bạc, khí Kim thanh sạch.'],
+  ];
+  const tienNpcs = () => {
+    const { cx, cz } = HEAVEN, R = 65, out = [], names = ['Thanh Y Đồng Tử', 'Kim Đồng', 'Ngọc Nữ', 'Bích Vân Tiên Nữ', 'Hạc Đồng', 'Tử Vân Tiên Nữ', 'Lam Hà Đồng Tử', 'Hồng Liên Tiên Nữ'];
+    const ring = (a0) => Array.from({ length: 9 }, (_, k) => { const a = a0 + k * (Math.PI / 4); const c = Math.cos(a), n = Math.sin(a), m = Math.max(Math.abs(c), Math.abs(n)); return { x: cx + (c / m) * R, z: cz + (n / m) * R }; });
+    for (let i = 0; i < 8; i++) { const P = ring(i * 0.79); out.push({ id: `tien_${i}`, name: names[i], role: i % 2 ? 'Tiên nữ' : 'Tiên đồng', look: i % 2 ? 'hero_f' : 'hero_m', gua: 'qian', wx: '金', lines: TIEN_LINES[i % TIEN_LINES.length], x: P[0].x, z: P[0].z, path: i % 3 === 2 ? null : P, near: 60 }); }
+    return out;
+  };
+  let tienOn = false;
+  const setTien = (on) => { if (!citizens || on === tienOn) return; tienOn = on; for (const n of tienNpcs()) if (on) citizens.add(n); else citizens.remove(n.id); };
+  // --- hạc trắng bay vòng (6 con, một lệnh vẽ, vỗ cánh bằng xoay ma trận)
+  let cranes = null;
+  const craneGeo = () => {
+    const v = new Float32Array([0, 0, 0.9, 0, 0, -0.7, -1.6, 0.25, 0, 0, 0, 0.9, 1.6, 0.25, 0, 0, 0, -0.7, 0, 0.05, 0.9, 0, 0.05, 1.5, 0.08, 0, 0.9]);
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(v, 3)); g.computeVertexNormals(); return g;
+  };
   function build() {
     built = true;
+    cranes = new THREE.InstancedMesh(craneGeo(), new THREE.MeshBasicMaterial({ color: '#fbfaf5', side: THREE.DoubleSide, fog: true }), 6); cranes.frustumCulled = false; grp.add(cranes);
     const tops = [], unders = [], lawns = [], floats = [];
     // --- đảo
     L.islands.forEach((s, k) => {
@@ -139,9 +176,10 @@ export function createHeaven(scene) {
     group: grp,
     /** mỗi khung: hiện / ẩn theo vùng, dựng lười, mây trôi */
     update(px, pz, dt, camera) {
+      { const near = Math.hypot(px - THIEN_THE.x, pz - THIEN_THE.z) < 420; stair.visible = near; if (near) { const u = stair.userData; u.stepMesh.position.y = Math.sin(t * 0.8) * 0.15; u.halo.material.opacity = 0.25 + Math.sin(t * 2) * 0.1; u.beam.rotation.y = t * 0.2; } }
       const on = inHeaven(px, pz);
-      grp.visible = on;
-      if (!on) return false;
+      grp.visible = on; setTien(on);
+      if (!on) { t += dt; return false; }
       if (!built) build();
       t += dt;
       if (seaA) { seaA.material.map.offset.x = (t * 0.004) % 1; seaB.material.map.offset.y = (t * 0.003) % 1; }
@@ -151,6 +189,7 @@ export function createHeaven(scene) {
         puffs.instanceMatrix.needsUpdate = true;
       }
       for (const g of rocks) g.position.y = Math.sin(t * 0.4) * 0.8;
+      if (cranes) { for (let i = 0; i < 6; i++) { const a = t * 0.12 + i * 1.05, r = 140 + (i % 3) * 70, fl = Math.sin(t * 4 + i) * 0.5; pos.set(HEAVEN.cx + Math.cos(a) * r, 14 + (i % 2) * 9 + Math.sin(t * 0.5 + i) * 2, HEAVEN.cz + Math.sin(a) * r); q.setFromEuler(new THREE.Euler(0, -a, fl * 0.3)); sc.set(1.6, 1.6 + fl, 1.6); cranes.setMatrixAt(i, m4.compose(pos, q, sc)); } cranes.instanceMatrix.needsUpdate = true; }
       return true;
     },
   };
