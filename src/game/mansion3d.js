@@ -21,6 +21,8 @@ import { setOpenSpots } from './rooms.js';
 import { makeZoneCtx, furnishZone } from './interior-build.js';
 
 const NEAR = { phu: 240, villa: 110 }, FAR = { phu: 330, villa: 150 }, MAX = { phu: 3, villa: 8 };
+// Cửu Trọng Thiên: 8 đảo cách tâm 280 m — đứng quảng trường giữa phải thấy phủ thật (không phải khối hộp bản xa)
+const nearOf = (m) => (m.heaven ? 310 : NEAR[m.kind]), farOf = (m) => (m.heaven ? 390 : FAR[m.kind]), maxOf = (m) => (m.heaven ? 4 : MAX[m.kind]);
 
 /** Dựng hệ khuôn viên vào group (gọi một lần lúc nạp). provider(key) → { mode, owner, items, couplet } (main.js) */
 export function createMansions(grp, { provider = () => null, citizens = null } = {}) {
@@ -144,17 +146,17 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
       tick -= dt;
       if (tick <= 0) {
         tick = 0.4;
-        for (const rec of [...built.values()]) if (Math.hypot(rec.m.x - px, rec.m.z - pz) > FAR[rec.m.kind]) dispose(rec.m.h);
+        for (const rec of [...built.values()]) if (Math.hypot(rec.m.x - px, rec.m.z - pz) > farOf(rec.m)) dispose(rec.m.h);
         // dựng khuôn viên gần nhất chưa dựng (mỗi lượt một cái — tránh khựng)
         let best = null, bd = Infinity;
         for (const m of list) {
           if (built.has(m.h)) continue;
           const d = Math.hypot(m.x - px, m.z - pz);
-          if (d < NEAR[m.kind] && d < bd && count(m.kind) < MAX[m.kind]) { bd = d; best = m; }
+          if (d < nearOf(m) && d < bd && count(m.kind) < maxOf(m)) { bd = d; best = m; }
         }
         if (best) build(best);
         else for (const kind of ['phu', 'villa']) { // đầy chỗ: thay cái xa nhất bằng cái gần hơn
-          const near = list.filter((m) => m.kind === kind && !built.has(m.h) && Math.hypot(m.x - px, m.z - pz) < NEAR[kind]).sort((a, b) => Math.hypot(a.x - px, a.z - pz) - Math.hypot(b.x - px, b.z - pz))[0];
+          const near = list.filter((m) => m.kind === kind && !built.has(m.h) && Math.hypot(m.x - px, m.z - pz) < nearOf(m)).sort((a, b) => Math.hypot(a.x - px, a.z - pz) - Math.hypot(b.x - px, b.z - pz))[0];
           if (!near) continue;
           const farRec = [...built.values()].filter((r) => r.m.kind === kind).sort((a, b) => Math.hypot(b.m.x - px, b.m.z - pz) - Math.hypot(a.m.x - px, a.m.z - pz))[0];
           if (farRec && Math.hypot(farRec.m.x - px, farRec.m.z - pz) > Math.hypot(near.x - px, near.z - pz) + 20) { dispose(farRec.m.h); build(near); break; }

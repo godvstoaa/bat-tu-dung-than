@@ -447,6 +447,7 @@ export function startGame({ onExit = null } = {}) {
     if (st.kind === 'spot' && work && (st.room === 'job:mine' || st.data?.kind === 'job')) { work.spot(st); return; }
     if (st.kind === 'spot' && st.room === DOCK_KEY) { boat?.spot(st); return; }
     if (st.kind === 'spot' && st.room === 'fate') { fateSpot(); return; }
+    if (st.kind === 'spot' && st.room === 'heaven') { placeAt(tileToWorld(START.x, START.y), '☁ Hạ phàm', 'Cưỡi mây trở về Sơn Môn…'); return; } // Nam Thiên Môn (heaven.js)
     if (st.kind === 'spot') {
       S.rollDay(state);
       import('./shop-ui.js').then((m) => {
@@ -1387,26 +1388,32 @@ export function startGame({ onExit = null } = {}) {
   // -------------------------------------------------------------------------
   // Dock: các gian, nhiệm vụ, sổ, âm thanh
   // -------------------------------------------------------------------------
-  $('hq-menu').onclick = () => {
-    const body = document.createElement('div');
-    body.className = 'hq-list';
-    const group = (label, list) => {
-      if (!list.length) return;
-      const h = document.createElement('h4'); h.textContent = label; body.appendChild(h);
-      for (const st of list) {
-        const b = document.createElement('button');
-        b.className = 'hq-btn hq-row';
-        const done = st.kind === 'desk' && S.deskDone(state, st.id);
-        b.textContent = `${ICON[st.id] || '✦'} ${st.name} — ${st.verb}${done ? ' ✓' : ''}`;
-        b.onclick = () => teleportTo(st);
-        body.appendChild(b);
-      }
-    };
-    group('Trong quán', STATIONS.filter((st) => !st.world));
-    group('Sảnh nghề · đi trạm (mỗi sảnh 1 khách/ngày)', STATIONS.filter((st) => st.world && st.kind === 'desk' && !st.room));
-    group('Điện thờ', STATIONS.filter((st) => st.kind === 'door' || st.id === 'que'));
-    panel.open({ title: 'Các gian & sảnh nghề', body });
-  };
+  // menu «Địa điểm» (places-ui.js — NHA-DIADIEM-MANIFEST §3): theo nhu cầu, gần nhất trước, có ô tìm
+  function rideTo(x, z, label, { free = false, sub = null } = {}) {
+    const me = meWorld(), d = Math.hypot(x - me.x, z - me.z);
+    if (!free && d < 260) { panel.close(); state.mapPin = { x, z, name: label }; save(); const t = worldToTile(x, z); walkTo({ x: t.x, y: t.y }); return true; }
+    if (work?.carrying()) { toast('📦 Đang áp hàng — đi bộ giao cho xong đã.'); return false; }
+    if (boat?.aboard()) { toast('⛵ Đang trên thuyền — trả thuyền ở bến trước đã.'); return false; }
+    if (!free && levelInfo(state).level >= 5 && !LIFE.spendXu(state, CART_XU)) { toast('Không đủ 5 đồng đi xe.'); return false; }
+    save(); panel.close();
+    if (free) placeAt({ x, z }, label, sub || 'Đã tới nơi.'); else api.travel(x, z, label);
+    return true;
+  }
+  api.rideTo = rideTo;
+  function openPlaces(tab) {
+    import('./places-ui.js').then((m) => panel.open({ title: '🧭 Địa điểm', body: m.placesBody({
+      tab, me: meWorld, own: I.homeState(state).own, homeSpot: homeSpawnPos, estateInfo: (h) => net.estate.info(h), contract: work?.contract?.() || null,
+      stations: STATIONS, icon: ICON, deskDone: (id) => S.deskDone(state, id), level: levelInfo(state).level,
+      go: (r) => {
+        if (r.st) { panel.close(); teleportTo(r.st); return; }
+        if (r.act === 'edit') { const own = I.homeState(state).own; if (own) api.openHomeEdit(own.h); return; }
+        if (r.home) { const p = tileToWorld(START.x, START.y); rideTo(p.x, p.z, '⛰ Về Sơn Môn', { free: r.free }); return; }
+        if (r.x != null) rideTo(r.x, r.z, r.label || `🐎 Xe ngựa tới ${r.name}`, { free: !!r.free, sub: r.sub2 });
+      },
+    }) })).catch((e) => { console.error(e); toast('Chưa mở được menu địa điểm.'); });
+  }
+  api.openPlaces = openPlaces;
+  $('hq-menu').onclick = () => openPlaces();
 
   $('hq-tasks-btn').onclick = () => {
     const body = document.createElement('div');

@@ -41,7 +41,7 @@ export function createWork(o) {
   const { net, L, player, toast, panel } = o;
   const G = net.guild;
   G.where = () => ({ x: player.x, y: player.y });
-  let shift = null, taskAt = 0, busy = false, synced = false, syncing = false;
+  let shift = null, taskAt = 0, busy = false, synced = false, syncing = false, contract = null; // contract: chỗ làm đang giữ (menu Địa điểm)
   let parcel = (() => { try { return JSON.parse(sessionStorage.getItem(PARCEL_KEY) || 'null'); } catch (e) { return null; } })();
   let mineFrom = (() => { try { return Number(sessionStorage.getItem(MINE_KEY)) || null; } catch (e) { return null; } })();
   const yong = () => o.api.state.player?.yong || null;
@@ -80,7 +80,7 @@ export function createWork(o) {
     try {
       const r = await G.me();
       if (!r.ok) return;
-      synced = true;
+      synced = true; contract = r.contract || null;
       setShift(r.shift);
       if (r.owed > 0) { const c = await G.claim(); if (c.ok && c.amt > 0) { LIFE.earn(L, c.amt); o.save(); o.updateVitals(); toast(`💰 Tiền ca trước (máy chủ tự tan ca khi bạn vắng): +${c.amt} đồng.`); } }
     } finally { syncing = false; }
@@ -331,6 +331,7 @@ export function createWork(o) {
     sync,
     onStatus(status) { if (status === 'online') { synced = false; sync(); } },
     carrying: () => !!parcel,
+    contract: () => contract,
     step(dt) {
       acc += dt; if (acc < 1) return; acc = 0;
       if (shift && Date.now() >= shift.until) { setShift(null); sync(); }

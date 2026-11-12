@@ -17,6 +17,30 @@ function canvas(w, h, draw) {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; return t;
 }
 /** vật liệu dùng chung của bộ kiến trúc */
+// mái màu riêng (tiên phủ Cửu Trọng Thiên — mái theo phương / hành): roof = '#rrggbb' → bản sao vật liệu ngói, giữ vân ngói
+const ROOF_TINT = new Map();
+export function roofMatOf(k, roof) {
+  if (roof === 'green') return k.roofGreen;
+  if (typeof roof === 'string' && roof[0] === '#') {
+    if (!ROOF_TINT.has(roof)) {
+      // vân ngói gốc màu nâu → nhân màu ra nâu đục (mái vàng thành cam). Chuyển vân sang xám sáng rồi mới nhuộm.
+      const m = k.roof.clone(); m.color = new THREE.Color(roof);
+      const img = k.roof.map?.image;
+      if (img && typeof document !== 'undefined' && img.width) {
+        const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+        const d = g.getImageData(0, 0, c.width, c.height), a = d.data;
+        let sum = 0; for (let i = 0; i < a.length; i += 4) sum += a[i] * 0.3 + a[i + 1] * 0.59 + a[i + 2] * 0.11;
+        const k2 = 205 / Math.max(1, sum / (a.length / 4)); // trung bình xám ≈ 205: giữ vân, sáng đều
+        for (let i = 0; i < a.length; i += 4) { const l = Math.min(255, (a[i] * 0.3 + a[i + 1] * 0.59 + a[i + 2] * 0.11) * k2); a[i] = a[i + 1] = a[i + 2] = l; }
+        g.putImageData(d, 0, 0);
+        const t = k.roof.map.clone(); t.image = c; t.needsUpdate = true; m.map = t;
+      } else m.color.multiplyScalar(1.9);
+      ROOF_TINT.set(roof, m);
+    }
+    return ROOF_TINT.get(roof);
+  }
+  return k.roof;
+}
 export function kit() {
   if (K) return K;
   const m = MD.materials();
@@ -136,14 +160,14 @@ export function hall({ w, d, h, plinth: ph = 0.8, back = false, storeys = 1, roo
   // tầng hai: mái hiên giữa + lan can + vách tầng trên lùi vào
   if (storeys > 1) {
     const ym = y0 + colH + 0.1;
-    const eave = MD.roof(w + 3.4, d + 3.4, 1.2, { upturn: 0.5, mats: { ...k, roof: roof === 'green' ? k.roofGreen : k.roof } });
+    const eave = MD.roof(w + 3.4, d + 3.4, 1.2, { upturn: 0.5, mats: { ...k, roof: roofMatOf(k, roof) } });
     eave.position.y = ym - 0.6; eave.scale.y = 0.8; shell.add(eave);
     shell.add(box(w + 1.6, 0.9, 0.12, k.son, 0, ym + 0.9, hd + 0.7)); shell.add(box(w + 1.6, 0.9, 0.12, k.son, 0, ym + 0.9, -hd - 0.7));
     for (let i = 0; i <= bays; i++) for (const sz of [1, -1]) shell.add(cyl(0.18, 0.2, h - colH, k.son, -hw - 0.7 + i * bayW, ym + (h - colH) / 2, sz * (hd + 0.7), 8));
     shell.add(boxM(w + 1.4, 0.4, d + 1.4, k.beam, 0, y0 + h - 0.2, 0, 0, 4));
   }
   // mái chính: lớn hơn thân 3 m mỗi chiều, cao theo chiều sâu
-  const rH = Math.max(1.8, Math.min(5.2, (d + 3) * 0.27)), R = MD.roof(w + 3.4, d + 3.4, rH, { upturn: 0.62, mats: { ...k, roof: roof === 'green' ? k.roofGreen : k.roof } });
+  const rH = Math.max(1.8, Math.min(5.2, (d + 3) * 0.27)), R = MD.roof(w + 3.4, d + 3.4, rH, { upturn: 0.62, mats: { ...k, roof: roofMatOf(k, roof) } });
   R.position.y = y0 + h; shell.add(R);
   return { base, shell, roofTop: y0 + h + rH };
 }

@@ -136,7 +136,7 @@ check('biệt phủ / biệt thự: bố cục theo vùng — đồ đúng nhà 
   assert.equal(EC.validLayout(phu, [{ ...it(1, 'ban_tra', 0, 0), k: k('front') }]), false, 'tiền viện: giữa lối đi');
   assert.equal(EC.validLayout(phu, [{ ...it(1, 'tranh_son_thuy', 0, 0, 0), k: k('front') }]), false, 'treo tường ngoài sân');
   assert.equal(EC.validLayout(phu, [{ ...it(1, 'ban_tra', 0, -Z[0].d / 2 + 1.2), k: 0 }]), false, 'chính đường có cửa sau: lối sau phải trống');
-  assert.equal(EC.validLayout(EC.roomOfH(EC.LISTING_COUNT - 1), [{ ...it(1, 'ban_tra', 3, 0), k: 2 }]), false, 'nhà phố không có vùng');
+  assert.equal(EC.validLayout(EC.roomOfH(EC.TIEN_H0 - 1), [{ ...it(1, 'ban_tra', 3, 0), k: 2 }]), false, 'nhà phố không có vùng');
   assert.deepEqual(EC.decodeLayout(EC.encodeLayout(ok)).map((m) => m.k), ok.map((m) => m.k));
   // biệt thự: nhà chính + sân trước
   const vh = EC.PHU_COUNT + 3, vz = EC.zonesOfH(vh);

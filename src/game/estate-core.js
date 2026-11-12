@@ -4,7 +4,7 @@
 //  LISTING_TIERS: hạng của từng căn rao bán theo chỉ số h (test-game-estate kiểm khớp estate.listings()).
 // ============================================================================
 import { ITEMS, ITEM } from './items.js';
-import { estateLayout, PHU_PLAN, VILLA_STYLES, VILLAS_PER_DISTRICT, VILLA_W, VILLA_D } from './estate-layout.js';
+import { estateLayout, PHU_PLAN, VILLA_STYLES, VILLAS_PER_DISTRICT, VILLA_W, VILLA_D, TIEN_PLAN } from './estate-layout.js';
 
 export const TIERS = {
   tieuxa: { name: 'Tiểu Xá', w: 10, d: 8, h: 4.5, price: { xu: 2 * 100000 } }, // giá: tiền kim loại (P18) — 2 lượng bạc (≈ 1 tháng làm đều — §26.2)
@@ -13,14 +13,17 @@ export const TIERS = {
   // khuôn viên đi bộ ngoài trời (mansions.js + estate-layout.js) — bài trí theo VÙNG (gian + sân vườn)
   bietphu: { name: 'Biệt Phủ', w: 100, d: 100, h: 8, price: { xu: 300 * 100000 }, alt: { ngoc: 2000 }, mansion: true },
   bietthu: { name: 'Biệt Thự', w: VILLA_W, d: VILLA_D, h: 6, price: { xu: 50 * 100000 }, alt: { ngoc: 480 }, mansion: true },
+  // Cửu Trọng Thiên (NHA-DIADIEM-MANIFEST §2): 9 tiên phủ trên đảo trời — Quân Thiên giá gấp đôi (estate.priceOf)
+  tienphu: { name: 'Tiên Phủ', w: 88, d: 84, h: 9, price: { xu: 1000 * 100000 }, alt: { ngoc: 6000 }, mansion: true },
 };
 export const MAX_ITEMS = 60;
 export const MAX_ITEMS_PHU = 240;
-export const PHU_COUNT = PHU_PLAN.length, VILLA_COUNT = VILLA_STYLES.length * VILLAS_PER_DISTRICT;
+export const PHU_COUNT = PHU_PLAN.length, VILLA_COUNT = VILLA_STYLES.length * VILLAS_PER_DISTRICT, TIEN_COUNT = TIEN_PLAN.length;
 /** phong cách + kích thước khuôn viên của căn h (biệt phủ / biệt thự), null nếu là nhà phố */
 export function estatePlanOfH(h) {
   if (h >= 0 && h < PHU_COUNT) return { kind: 'phu', ...PHU_PLAN[h] };
   if (h >= PHU_COUNT && h < PHU_COUNT + VILLA_COUNT) { const di = Math.floor((h - PHU_COUNT) / VILLAS_PER_DISTRICT); return { kind: 'villa', style: VILLA_STYLES[di], W: VILLA_W, D: VILLA_D, district: di }; }
+  if (h >= TIEN_H0 && h < TIEN_H0 + TIEN_COUNT) { const t = TIEN_PLAN[h - TIEN_H0]; return { kind: 'phu', style: t.style, W: t.W, D: t.D, tien: t.id }; }
   return null;
 }
 const ZC = new Map();
@@ -33,7 +36,12 @@ export const zoneOfH = (h, k) => zonesOfH(h)[k] || null;
 /** «phòng» của một vùng (cho canPlace / snapWall / home-edit) */
 export const zoneRoom = (z) => ({ w: z.w, d: z.d, h: z.h || 6, back: !!z.back, yard: z.kind === 'yard', keep: z.keep || [] });
 export const SELL_BACK = 0.5;
-export const LISTING_TIERS = [...Array(PHU_COUNT).fill('bietphu'), ...Array(VILLA_COUNT).fill('bietthu'), "tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tuhop", "tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tuhop", "tieuxa"];
+// nhà phố rao bán (h ngay sau biệt phủ / biệt thự) — thứ tự hạng cố định (city4.streetListings đặt lô theo bảng này)
+export const STREET_TIERS = ["tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tuhop", "tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tuhop", "tieuxa"];
+export const STREET_H0 = PHU_COUNT + VILLA_COUNT;
+// tiên phủ Cửu Trọng Thiên nối vào CUỐI sổ (h 283–291): không đổi chỉ số 283 căn cũ (máy chủ giữ chủ theo h)
+export const TIEN_H0 = STREET_H0 + STREET_TIERS.length;
+export const LISTING_TIERS = [...Array(PHU_COUNT).fill('bietphu'), ...Array(VILLA_COUNT).fill('bietthu'), ...STREET_TIERS, ...Array(TIEN_COUNT).fill('tienphu')];
 export const LISTING_COUNT = LISTING_TIERS.length;
 // phòng trong [w, d] (m) của các căn nhà phố theo thứ tự h sau biệt phủ / biệt thự = khung nhà ngoài trừ tường
 // (estate.listings().room — test-game-estate kiểm khớp). Máy chủ kiểm bố cục theo bảng này.
@@ -42,12 +50,14 @@ export function roomOfH(h) {
   const T = TIERS[LISTING_TIERS[h]]; if (!T) return null;
   const p = estatePlanOfH(h);
   if (p) return { ...T, w: p.W, d: p.D, zones: zonesOfH(h) };
-  const r = LISTING_ROOMS[h - (LISTING_COUNT - LISTING_ROOMS.length)];
+  const r = LISTING_ROOMS[h - STREET_H0];
   return r ? { ...T, w: r[0], d: r[1] } : { ...T };
 }
 /** căn đi bộ ngoài trời (biệt phủ / biệt thự) — bài trí theo vùng */
 export const isPhuH = (h) => !!TIERS[LISTING_TIERS[h]]?.mansion;
-export const isMansionH = (h) => LISTING_TIERS[h] === 'bietphu';
+export const isMansionH = (h) => LISTING_TIERS[h] === 'bietphu' || LISTING_TIERS[h] === 'tienphu';
+/** tiên phủ Cửu Trọng Thiên */
+export const isTienH = (h) => LISTING_TIERS[h] === 'tienphu';
 
 // --- bố cục: món { u (uid), i (id vật phẩm), x, z (m, cục bộ phòng, bội 0,25), r (0–3: ¼ vòng; 0 = quay về cửa +z) }
 const CODE = new Map(ITEMS.map((it, k) => [it.id, k.toString(36)]));

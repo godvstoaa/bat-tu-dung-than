@@ -12,6 +12,7 @@ import * as L from './citylayout.js';
 import { roads4 } from './city4.js';
 import { enterables } from './homes.js';
 import { estates } from './mansions.js';
+import { VILLA_DISTRICT_NAME } from './estate-layout.js';
 import { docks } from './boats.js';
 import { SHOP_TYPES } from './items.js';
 import { esc } from './stations.js';
@@ -29,6 +30,8 @@ export const LAYERS = [
   { id: 'station', icon: '🐎', name: 'Trạm xe' },
   { id: 'dock', icon: '⚓', name: 'Bến' },
   { id: 'est', icon: '🏠', name: 'Nhà bán' },
+  { id: 'phu', icon: '🏯', name: 'Biệt phủ' },
+  { id: 'villa', icon: '🏡', name: 'Biệt thự' },
   { id: 'gate', icon: '🚪', name: 'Cổng' },
 ];
 
@@ -49,6 +52,10 @@ export function mapData() {
   // v5: đình phường ở tâm quảng trường phường (THANH-MANIFEST §3.8) — lớp «Miếu»; tên phường hiện ở mức phóng vừa
   for (const w of L.wards()) if (w.square) pois.push({ layer: 'temple', name: `Đình ${w.name}`, x: w.centre.x, z: w.centre.z, ward: w });
   for (const s of L.stations()) pois.push({ layer: 'station', name: s.name, x: s.x, z: s.z, station: s });
+  // v6 (NHA-DIADIEM-MANIFEST §3): 16 biệt phủ + 8 khu biệt thự có icon và tên (trước chỉ có viền phủ, biệt thự không hiện)
+  const EST = estates().filter((m) => !m.heaven);
+  for (const m of EST) if (m.kind === 'phu') pois.push({ layer: 'phu', name: m.name, x: m.x, z: m.z, big: true, est: m }); // giữa khuôn viên — hai phủ chung cổng phố không đè tên
+  VILLA_DISTRICT_NAME.forEach((name, di) => { const vs = EST.filter((m) => m.kind === 'villa' && m.district === di); if (!vs.length) return; pois.push({ layer: 'villa', name: `${name} · khu biệt thự`, x: vs.reduce((a, m) => a + m.x, 0) / vs.length, z: vs.reduce((a, m) => a + m.z, 0) / vs.length, big: true }); });
   for (const d of docks()) pois.push({ layer: 'dock', name: d.name, x: d.x, z: d.z });
   for (const g of L.gates()) pois.push({ layer: 'gate', name: `Cổng ${g.name}`, x: g.x, z: g.z });
   // tên phố theo chủ đề (citylayout.streets): đặt ở trọng tâm các nhà mặt phố đó
@@ -61,7 +68,7 @@ export function mapData() {
     houses: E, grid: G, GS,
     roads: roads4(), blocks: L.blocks(), water: L.water(), A: L.CITY.A,
     districts: L.districts().filter((d) => d.centre), pois, streetLabels,
-    phu: estates().filter((m) => m.kind === 'phu'),
+    phu: estates().filter((m) => m.kind === 'phu' && !m.heaven), villas: estates().filter((m) => m.kind === 'villa'),
   };
   return DATA;
 }
@@ -116,7 +123,7 @@ export function drawMap(g, view, opt = {}) {
   }
   // biệt phủ: khuôn viên
   g.strokeStyle = '#7fd08a'; g.lineWidth = Math.max(1, 2 * s);
-  for (const m of D.phu) { if (!inView(m.x, m.z, 120)) continue; const c = Math.cos(m.ry), sn = Math.sin(m.ry); g.beginPath(); [[1, 1], [1, -1], [-1, -1], [-1, 1]].forEach(([i, j], n) => { const lx = i * m.W / 2, lz = j * m.D / 2, px = X(m.x + lx * c + lz * sn), py = Y(m.z - lx * sn + lz * c); if (n) g.lineTo(px, py); else g.moveTo(px, py); }); g.closePath(); g.stroke(); }
+  for (const m of [...D.phu, ...(s >= 0.6 ? D.villas : [])]) { if (!inView(m.x, m.z, 120)) continue; const c = Math.cos(m.ry), sn = Math.sin(m.ry); g.beginPath(); [[1, 1], [1, -1], [-1, -1], [-1, 1]].forEach(([i, j], n) => { const lx = i * m.W / 2, lz = j * m.D / 2, px = X(m.x + lx * c + lz * sn), py = Y(m.z - lx * sn + lz * c); if (n) g.lineTo(px, py); else g.moveTo(px, py); }); g.closePath(); g.stroke(); }
   // nhãn
   g.textAlign = 'center'; g.textBaseline = 'middle';
   // nhãn tránh chồng nhau: ô đã chiếm (theo thứ tự ưu tiên vẽ — khu > công trình > đại lộ > phố)
@@ -130,7 +137,7 @@ export function drawMap(g, view, opt = {}) {
   };
   const layers = opt.layers || new Set(LAYERS.map((l) => l.id));
   if (!opt.mini) {
-    for (const p of D.pois) if (p.big && layers.has(p.layer) && inView(p.x, p.z, 40)) label(p.name.replace(/^Sảnh /, ''), X(p.x), Y(p.z) - 20, 12, '#fff3cf', true); // công trình trọng điểm: luôn có tên
+    for (const p of D.pois) if (p.big && layers.has(p.layer) && inView(p.x, p.z, 40)) label(p.name.replace(/^Sảnh /, ''), X(p.x), Y(p.z) - 20, 12, p.layer === 'hall' ? '#fff3cf' : '#c8f0c0', p.layer === 'hall'); // phủ / khu biệt thự: tên nhường chỗ công trình // công trình trọng điểm: luôn có tên
     if (s < 0.9) for (const d of D.districts) if (inView(d.centre.x, d.centre.z, 200)) label(d.name, X(d.centre.x), Y(d.centre.z) - 14, s < 0.2 ? 12 : 15, '#ffe6a0');
     if (s >= 0.18 && s < 1.6) for (const r of D.roads) if (r.label && r.kind === 'avenue') { const mx = (r.a.x + r.b.x) / 2, mz = (r.a.z + r.b.z) / 2; if (!inView(mx, mz)) continue; g.save(); g.translate(X(mx), Y(mz)); let ang = Math.atan2(r.b.z - r.a.z, r.b.x - r.a.x); if (ang > Math.PI / 2) ang -= Math.PI; if (ang < -Math.PI / 2) ang += Math.PI; g.rotate(ang); label(r.label, 0, 0, 11, '#3a2a10'); g.restore(); }
     if (s >= 0.9) for (const t of D.streetLabels) if (inView(t.x, t.z)) label(t.name, X(t.x), Y(t.z), 11, '#fbe9c0');
@@ -196,7 +203,7 @@ export function hitMap(view, px, py, layers) {
 }
 export const nearestStation = (x, z) => L.stations().reduce((b, st) => (!b || Math.hypot(st.x - x, st.z - z) < Math.hypot(b.x - x, b.z - z) ? st : b), null);
 export const districtName = (x, z) => { const d = L.districtOf(x, z), id = typeof d === 'string' ? d : d?.id; return (d?.name) || (id && L.districts().find((q) => q.id === id)?.name) || (Math.max(Math.abs(x), Math.abs(z)) > L.CITY.A ? 'Ngoài thành' : 'Huyền Thành'); };
-const KIND_VI = { shop: 'Cửa hàng', est: 'Nhà rao bán', temple: 'Miếu', fortune: 'Quầy thầy bói', knock: 'Nhà dân', hall: 'Công trình trọng điểm', station: 'Trạm xe ngựa', dock: 'Bến thuyền', gate: 'Cổng thành', street: 'Phố', district: 'Khu', point: 'Vị trí' };
+const KIND_VI = { phu: 'Biệt phủ', villa: 'Khu biệt thự', shop: 'Cửa hàng', est: 'Nhà rao bán', temple: 'Miếu', fortune: 'Quầy thầy bói', knock: 'Nhà dân', hall: 'Công trình trọng điểm', station: 'Trạm xe ngựa', dock: 'Bến thuyền', gate: 'Cổng thành', street: 'Phố', district: 'Khu', point: 'Vị trí' };
 
 // --- giao diện toàn màn hình ---------------------------------------------------------------------------------------
 /**

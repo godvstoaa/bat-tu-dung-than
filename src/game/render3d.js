@@ -28,6 +28,8 @@ import { createCitizens, setCitizenCap } from './citizens.js';
 import { walkers4 } from './city4.js';
 import { createRoomBuilder } from './interior-build.js';
 import { createMansions } from './mansion3d.js';
+import { registerHeaven, inHeaven } from './heaven.js';
+import { createHeaven } from './heaven3d.js';
 import { createRiver } from './river3d.js';
 import * as MO from './motion.js';
 import { createFleet, makeBoat, makeBoatByIdx, floatBoat } from './boats3d.js';
@@ -654,6 +656,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // 16 biệt phủ đi bộ thật ở vành phủ Ngoại Thành (mansion3d.js): va chạm ngay, hình chi tiết dựng lười
   const phuG = new THREE.Group(); phuG.name = 'mansions'; scene.add(phuG);
   registerPrison(); const prison = createPrison(scene); // Thiên Lao + Khoáng Sơn (luật pháp — law.js)
+  registerHeaven(); const heaven = safeInit('heaven', () => createHeaven(scene)); // Cửu Trọng Thiên: 9 đảo trời, tiên phủ (heaven.js — NHA-DIADIEM-MANIFEST §2)
   RZ.initRaze(scene); // công trình ngoài thành phá được (raze.js)
   registerLifePlaces(); createLifePlaces(scene); // quầy cơm, liêu xá, giếng quanh Sơn Môn (sinh tồn — life.js)
   const yoke = makeYoke(); yoke.visible = false; scene.add(yoke); // đòn gánh nước trên vai khi đang gánh
@@ -940,14 +943,15 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     lightRoom = roomAt(w.x, w.z)?.id || null; // trong điện: chỉ thắp nến / đèn của điện đó
     updateLightPool(w.x, gy + 2, w.z, dt);
     if ((absorbT -= dt) < 0) { absorbT = 5; absorbLights(); } // đèn điểm của vùng mới nạp
-    interiors.root.visible = w.x > T.ROOM_X0 - 40; // điện thờ ở dải phòng phía Đông: ngoài đó thì không vẽ (hàng trăm mesh)
+    interiors.root.visible = w.x > T.ROOM_X0 - 40 && !inHeaven(w.x, w.z); // điện thờ ở dải phòng phía Đông: ngoài đó thì không vẽ (hàng trăm mesh)
     if (interiors.root.visible) interiors.ensure(); // dựng lười lần đầu tới dải phòng
     interiors.update(dt);
     roomsB.update(w.x, w.z, dt);
     span('f:mansions', () => mansionsB.update(w.x, w.z, dt));
     river.update(dt, t);
-    prison.setVisible(w.x > T.ROOM_X0 - 40); prison.update(dt);
-    jobPlaces.setVisible(w.x > T.ROOM_X0 - 40); jobPlaces.update(dt);
+    const upSky = inHeaven(w.x, w.z); heaven?.update?.(w.x, w.z, dt, camera); // trên trời: không vẽ Thiên Lao / mỏ / điện thờ ở dải phòng
+    prison.setVisible(w.x > T.ROOM_X0 - 40 && !upSky); prison.update(dt);
+    jobPlaces.setVisible(w.x > T.ROOM_X0 - 40 && !upSky); jobPlaces.update(dt);
     RZ.tickRaze(dt, w.x, w.z);
     // nhãn + dấu vàng của trạm có toạ độ thế giới: bám mặt sàn thật (nền bậc, sàn điện) — cập nhật thưa
     anchorTick -= dt;

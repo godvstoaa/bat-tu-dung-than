@@ -631,3 +631,17 @@ select.hq-input { width: auto; max-width: 100%; }
 .hq-map-card .hq-actions { flex-wrap: wrap; gap: 6px; }
 .hq-map-legend { position: absolute; right: 10px; top: calc(58px + env(safe-area-inset-top)); display: grid; gap: 3px; font-size: 12px; color: var(--hq-paper); background: rgba(28,22,16,0.8); border-radius: 8px; padding: 6px 8px; z-index: 2; }
 .hq-map-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+
+/* menu «Địa điểm» (places-ui.js — NHA-DIADIEM-MANIFEST §3) */
+.hq-places { display: grid; gap: 8px; }
+.hq-places .hq-tabs { margin-top: 0; }
+.hq-places .hq-tab { padding: 7px 8px; font-size: 13px; }
+.hq-places-list { max-height: min(62vh, 560px); overflow-y: auto; gap: 6px; padding-right: 2px; }
+.hq-places-list h4 { margin: 8px 0 0; font-size: 12px; color: var(--hq-gold); letter-spacing: 0.02em; }
+.hq-place { display: flex; align-items: center; gap: 10px; min-height: 48px; }
+.hq-place-ic { font-size: 20px; width: 26px; text-align: center; flex: none; }
+.hq-place-tx { display: grid; gap: 2px; flex: 1; min-width: 0; text-align: left; }
+.hq-place-tx b { font-weight: 600; }
+.hq-place-tx small { color: var(--hq-dim); font-size: 12px; line-height: 1.35; white-space: normal; }
+.hq-place-go { flex: none; font-size: 12px; color: var(--hq-gold); white-space: nowrap; }
+.hq-place:disabled { opacity: 0.75; cursor: default; }

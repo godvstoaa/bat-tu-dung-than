@@ -13,7 +13,7 @@
 import * as L from './citylayout.js';
 import { GUA, toWorld, toLocal } from './batquai.js';
 import { PHU_PLAN, VILLA_STYLES, VILLAS_PER_DISTRICT, VILLA_W, VILLA_D } from './estate-layout.js';
-import { LISTING_TIERS, LISTING_ROOMS, PHU_COUNT, VILLA_COUNT } from './estate-core.js';
+import { STREET_TIERS, LISTING_ROOMS } from './estate-core.js';
 import { HOUSE_SPECS } from './cityblocks.js';
 
 const band = (h) => String(h.block).split('|')[1];
@@ -61,7 +61,7 @@ function plots() {
     }
   });
   // nhà phố: theo đúng thứ tự hạng LISTING_TIERS (mỗi cung tieuxa, nhapho, tuhop [+ tieuxa ở li kan zhen dui xun])
-  const street = [], tiers = LISTING_TIERS.slice(PHU_COUNT + VILLA_COUNT);
+  const street = [], tiers = STREET_TIERS; // v6: tiên phủ Cửu Trọng Thiên nối sau nhà phố — không đặt lô trong thành
   const BAND = { tieuxa: 't2', nhapho: 't2', tuhop: 'g1' };
   const used = {};
   tiers.forEach((t, j) => {

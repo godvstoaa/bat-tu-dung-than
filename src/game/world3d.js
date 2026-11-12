@@ -355,7 +355,7 @@ vec3 gWN = vec3(0.0, 0.0, 1.0);`)
     // chỉ bật khi có nước sâu trong ô (lấy mẫu thưa) — trên núi / giữa thành thì không tốn 32k tam giác
     const cx = Math.round(px / PCELL) * PCELL, cz = Math.round(pz / PCELL) * PCELL;
     if (cx === patch.position.x && cz === patch.position.z && patch.userData.ok !== undefined) return;
-    let wet = false; for (let a = -1; a <= 1 && !wet; a += 0.25) for (let b = -1; b <= 1 && !wet; b += 0.25) if (T.heightAt(cx + a * PATCH * 0.45, cz + b * PATCH * 0.45) < T.WATER - 0.5) wet = true;
+    let wet = false; if (px < T.ROOM_X0 - 40) for (let a = -1; a <= 1 && !wet; a += 0.25) for (let b = -1; b <= 1 && !wet; b += 0.25) if (T.heightAt(cx + a * PATCH * 0.45, cz + b * PATCH * 0.45) < T.WATER - 0.5) wet = true;
     patch.position.x = cx; patch.position.z = cz; patch.userData.ok = wet; patch.visible = wet;
     WU.uPatchC.value.set(wet ? cx : 1e6, wet ? cz : 1e6);
   };

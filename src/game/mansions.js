@@ -10,6 +10,7 @@ import { BELT } from './cityblocks.js';
 import { phuPlots as mansionPlots, villaPlots as villaLots } from './city4.js'; // v4: biệt phủ / biệt thự dời sang thành mới, giữ h
 import { estateLayout, STYLES, VILLA_DISTRICT_NAME, compassOf } from './estate-layout.js';
 import { PHU_COUNT } from './estate-core.js';
+import { heavenLayout } from './heaven.js';
 
 const PHU_NAME = {
   li: ['Chu Tước Phủ', 'Ly Minh Phủ'], kun: ['Hậu Đức Phủ', 'Khôn Ninh Phủ'], dui: ['Duyệt Trạch Phủ', 'Minh Nguyệt Phủ'],
@@ -30,16 +31,18 @@ function makeUnit(base) {
   return u;
 }
 let CACHE = null;
-/** mọi khuôn viên: [16 phủ (h 0–15), 240 biệt thự (h 16–255)] */
+/** mọi khuôn viên: [16 phủ (h 0–15), 240 biệt thự (h 16–255), 9 tiên phủ Cửu Trọng Thiên (h 283–291, kind 'phu', heaven)] */
 export function estates() {
   if (CACHE) return CACHE;
   const phu = mansionPlots().map((p) => makeUnit({ ...p, h: p.k, kind: 'phu', name: PHU_NAME[p.g][p.k % 2] }));
   const villas = villaLots().map((l) => makeUnit({ ...l, k: l.i, h: PHU_COUNT + l.i, kind: 'villa', name: `${VILLA_DISTRICT_NAME[l.district]} số ${l.n + 1}` }));
-  CACHE = [...phu, ...villas];
+  const tien = heavenLayout().plots.map((p) => makeUnit({ ...p, k: p.i, kind: 'phu', heaven: true, tien: p.id }));
+  CACHE = [...phu, ...villas, ...tien];
   return CACHE;
 }
-export const mansions = () => estates().filter((u) => u.kind === 'phu');
-export const estateByH = (h) => estates()[h] || null;
+export const mansions = () => estates().filter((u) => u.kind === 'phu' && !u.heaven);
+let BYH = null; // h → khuôn viên (tiên phủ h 283–291 không trùng chỉ số mảng)
+export const estateByH = (h) => (BYH ||= new Map(estates().map((m) => [m.h, m]))).get(h) || null;
 export const mansion = (k) => mansions()[k] || null;
 function toW(m, lx, lz) { const c = Math.cos(m.ry), s = Math.sin(m.ry); return { x: m.x + c * lx + s * lz, z: m.z - s * lx + c * lz }; }
 /** thế giới → cục bộ khuôn viên */

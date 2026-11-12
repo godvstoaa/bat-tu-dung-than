@@ -61,7 +61,7 @@ check('v4 không công trình nào đè lên mặt nước (nhà phố, nhà che
   renderHouses().forEach((h) => obb(h.x, h.z, h.hw, h.hd, h.ry, `nhà ${h.key}`));
   innerHouses().forEach((h, i) => obb(h.x, h.z, h.hw, h.hd, h.ry, `nhà Sơn Môn #${i}`));
   LAYOUT.landmarks().filter((l) => l.w).forEach((l) => obb(l.x, l.z, l.w / 2, l.d / 2, l.ry || 0, l.name));
-  for (const m of estates()) obb(m.x, m.z, (m.W || 100) / 2, (m.D || 100) / 2, m.ry || 0, `phủ ${m.h}`);
+  for (const m of estates()) if (!m.heaven) obb(m.x, m.z, (m.W || 100) / 2, (m.D || 100) / 2, m.ry || 0, `phủ ${m.h}`);
   assert.equal(hits.length, 0, hits.slice(0, 5).join(', '));
 });
 check('v4 5 cầu qua sông: tĩnh không ≥ 8 m giữa lòng; thuyền hoa (4,2 m) qua được; thuyền buồm (12 m) bị cầu / thủy môn chặn', () => {

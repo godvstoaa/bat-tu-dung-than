@@ -21,7 +21,8 @@ const check = (name, fn) => {
   try { fn(); pass++; console.log(`  ✓ ${name}`); }
   catch (e) { fails.push(`${name} → ${e.message}`); console.log(`  ✗ ${name}`); }
 };
-const E = MS.estates(), P = E.filter((m) => m.kind === 'phu'), V = E.filter((m) => m.kind === 'villa');
+// v6: tiên phủ Cửu Trọng Thiên (heaven) ở dải phía Đông — kiểm riêng trong test-game-heaven.mjs
+const E = MS.estates().filter((m) => !m.heaven), P = E.filter((m) => m.kind === 'phu'), V = E.filter((m) => m.kind === 'villa');
 const octMax = (x, z) => Math.max(...BQ.GUA.map((g) => x * g.dir[0] + z * g.dir[1]));
 const corners = (m, pad = 0) => [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => m.toWorld(a * (m.W / 2 + pad), b * (m.D / 2 + pad)));
 function sat(A, B) {

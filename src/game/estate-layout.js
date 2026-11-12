@@ -34,6 +34,21 @@ export const STYLES = {
   nhavuon: { name: 'Nhà Vườn Huế', fam: 'asian', roof: 'vn', roofCol: '#7a4a32', wall: '#7a4a2e', trim: '#c9a24a', water: 'lotus', fence: 'brick', trees: ['palm', 'frangi', 'peach'], floors: 1, plinth: 0.6 },
   phap: { name: 'Biệt Thự Pháp', fam: 'western', roof: 'mansard', roofCol: '#4a5566', wall: '#f0e3c4', trim: '#ffffff', water: 'parterre', fence: 'iron', trees: ['hedge', 'maple', 'cypress'], floors: 2, plinth: 0.5 },
 };
+// CỬU TRỌNG THIÊN (NHA-DIADIEM-MANIFEST §2): chín cõi trời theo Hoài Nam Tử «Thiên văn huấn» — trung ương Quân Thiên + 8 phương.
+// Nền chung «Thiên Cung» (ngọc trắng, son đỏ, mái cong); mái theo phương / hành. dir: [dx, dz] (Bắc = −z, Đông = +x).
+const THIEN_BASE = { fam: 'asian', roof: 'curved', wall: '#f3eee2', trim: '#b8322a', water: 'lotus', fence: 'whitewall', trees: ['pine', 'peach', 'plum', 'osmanthus', 'ginkgo', 'sakura'], sig: 'pagoda9', wings: true, floors: 2, plinth: 1.4 };
+export const TIEN_PLAN = [
+  { id: 'quan', name: 'Quân Thiên', dir: [0, 0], g: 'kun', roofCol: '#e2b444', W: 100, D: 100 },
+  { id: 'thuong', name: 'Thương Thiên', dir: [1, 0], g: 'zhen', roofCol: '#3f8a64', W: 88, D: 84 },
+  { id: 'bien', name: 'Biến Thiên', dir: [1, -1], g: 'gen', roofCol: '#6a9a7a', W: 84, D: 84 },
+  { id: 'huyen', name: 'Huyền Thiên', dir: [0, -1], g: 'kan', roofCol: '#2e3a58', W: 88, D: 84 },
+  { id: 'u', name: 'U Thiên', dir: [-1, -1], g: 'qian', roofCol: '#4a3f6a', W: 84, D: 84 },
+  { id: 'hao', name: 'Hạo Thiên', dir: [-1, 0], g: 'dui', roofCol: '#d8d6cc', W: 88, D: 84 },
+  { id: 'chu', name: 'Chu Thiên', dir: [-1, 1], g: 'kun', roofCol: '#c23a2a', W: 84, D: 84 },
+  { id: 'viem', name: 'Viêm Thiên', dir: [0, 1], g: 'li', roofCol: '#d0522a', W: 88, D: 84 },
+  { id: 'duong', name: 'Dương Thiên', dir: [1, 1], g: 'xun', roofCol: '#e08a3a', W: 84, D: 84 },
+];
+for (const p of TIEN_PLAN) { p.style = `thien_${p.id}`; STYLES[p.style] = { ...THIEN_BASE, name: `Thiên Cung · ${p.name}`, roofCol: p.roofCol, roofTint: p.roofCol }; }
 /** 16 biệt phủ (thứ tự = cung × bên — cityblocks.mansionPlots): phong cách + kích thước W × D (m) */
 export const PHU_PLAN = [
   { style: 'cungdinh', W: 100, D: 100 }, { style: 'moorish', W: 80, D: 80 },   // Ly

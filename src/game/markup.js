@@ -41,7 +41,7 @@ export function gameMarkup() {
       <nav class="hq-dock" aria-label="Công cụ">
       <button id="hq-tasks-btn" class="hq-dbtn" type="button" aria-label="Nhiệm vụ hôm nay"></button>
       <button id="hq-social" class="hq-dbtn" type="button" aria-label="Giao lưu: cử chỉ và câu chào"><b aria-hidden="true">💬</b><span>Giao lưu</span></button>
-      <button id="hq-menu" class="hq-dbtn" type="button" aria-label="Danh sách các gian"><b aria-hidden="true">☰</b><span>Các gian</span></button>
+      <button id="hq-menu" class="hq-dbtn" type="button" aria-label="Địa điểm: nhà, ngủ nghỉ, ăn uống, làm việc, các gian"><b aria-hidden="true">🧭</b><span>Địa điểm</span></button>
       <button id="hq-econ" class="hq-dbtn" type="button" aria-label="Kho đồ, ruộng, bếp, chợ, tiệm (phím I)"><b aria-hidden="true">🎒</b><span>Kho đồ</span></button>
       <button id="hq-wardrobe" class="hq-dbtn" type="button" aria-label="Tàng Y Các: trang phục, phụ kiện, hiệu ứng"><b aria-hidden="true">👘</b><span>Y Các</span></button>
       <button id="hq-book" class="hq-dbtn" type="button" aria-label="${TEXT.book}"><b aria-hidden="true">📜</b><span>${TEXT.book}</span></button>

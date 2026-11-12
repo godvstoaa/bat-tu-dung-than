@@ -10,7 +10,7 @@
 // ============================================================================
 import * as THREE from 'three';
 import * as MD from './models.js';
-import { kit, hall, gateHouse, plinth as plinthG, pond, rockery, tree as treeA, stoneLantern } from './archkit.js';
+import { kit, roofMatOf as AK_roofMatOf, hall, gateHouse, plinth as plinthG, pond, rockery, tree as treeA, stoneLantern } from './archkit.js';
 
 const Q = Math.PI / 2;
 const STYLES_NAME = { cungdinh: 'Cung Đình Trung Hoa', hue: 'Phủ Đệ Huế', thai: 'Cung Điện Thái Lan' };
@@ -108,7 +108,7 @@ export function styledBuilding(S, b, { villa = false } = {}) {
   const k = kit(), M = styleMats(S);
   if (S.fam === 'asian') {
     // mái / vách / cột theo biến thể Á Đông
-    const roof = S.roof === 'curved' ? (S.roofCol.startsWith('#6') ? 'green' : 'grey') : 'grey';
+    const roof = S.roof === 'curved' ? (S.roofTint || (S.roofCol.startsWith('#6') ? 'green' : 'grey')) : 'grey';
     const { base, shell } = hall({ w: b.w, d: b.d, h: Math.min(b.h, b.floors > 1 ? b.h : 6.2), plinth: b.plinth, back: b.back, storeys: b.floors > 1 ? 2 : 1, roof });
     if (S.roof !== 'curved') {
       // thay mái cong mặc định bằng mái đúng kiểu
@@ -166,7 +166,7 @@ export function styledBuilding(S, b, { villa = false } = {}) {
 
 /** Đình mở (vọng đình / thủy tạ / nhà hồ bơi) theo phong cách */
 export function styledPavilion(S, pv) {
-  if (S.fam === 'asian' || S.fam === 'mughal') return hall({ w: pv.w, d: pv.d, h: pv.h, plinth: 0.5, open: true, octa: pv.octa, roof: S.roofCol.startsWith('#6') ? 'green' : 'grey' });
+  if (S.fam === 'asian' || S.fam === 'mughal') return hall({ w: pv.w, d: pv.d, h: pv.h, plinth: 0.5, open: true, octa: pv.octa, roof: S.roofTint || (S.roofCol.startsWith('#6') ? 'green' : 'grey') });
   const M = styleMats(S), base = plinthG({ w: pv.w - 1.2, d: pv.d - 1.2, h: 0.5 }), shell = new THREE.Group();
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) shell.add(cyl(0.2, 0.22, pv.h, S.fam === 'modern' ? M.trim : M.marble, sx * (pv.w / 2 - 0.5), 0.5 + pv.h / 2, sz * (pv.d / 2 - 0.5), 10));
   if (S.fam === 'modern') shell.add(box(pv.w + 1, 0.3, pv.d + 1, M.trim, 0, 0.5 + pv.h + 0.15, 0));
@@ -194,7 +194,7 @@ export function styledFence(S, list) {
 /** Cổng: phủ (Á Đông: nhà cổng; Tây / Mughal: hai trụ + vòm; hiện đại: tấm đua) · biệt thự: hai trụ nhỏ */
 export function styledGate(S, { w, villa = false, d = 0 }) {
   const M = styleMats(S), g = new THREE.Group();
-  if (!villa && S.fam === 'asian') { const { base, shell } = gateHouse({ w: w + 9, d: 7, h: 5.4, plinth: 0.9, roof: S.roofCol.startsWith('#6') ? 'green' : 'grey', main: true }); base.position.z = shell.position.z = d - 3.5; g.add(base, shell); return g; }
+  if (!villa && S.fam === 'asian') { const { base, shell } = gateHouse({ w: w + 9, d: 7, h: 5.4, plinth: 0.9, roof: S.roofTint || (S.roofCol.startsWith('#6') ? 'green' : 'grey'), main: true }); base.position.z = shell.position.z = d - 3.5; g.add(base, shell); return g; }
   const ph = villa ? 2.2 : 4.6, pw = villa ? 0.5 : 1.2;
   for (const sx of [-1, 1]) { g.add(box(pw, ph, pw, S.fam === 'modern' ? M.trim : M.wall, sx * (w / 2 + pw / 2), ph / 2, d)); g.add(box(pw + 0.3, 0.3, pw + 0.3, M.trim, sx * (w / 2 + pw / 2), ph + 0.15, d)); }
   if (!villa) {
@@ -316,7 +316,7 @@ export function styledTower(S, t) {
       g.add(box(s * 0.78, th * 0.7, s * 0.78, i % 2 ? k.plaster : k.lattice, 0, y + th * 0.35, 0, 0, 2.5));
       for (const sx of [-1, 1]) for (const sz of [-1, 1]) g.add(cyl(0.16, 0.18, th * 0.7, k.son, sx * s * 0.4, y + th * 0.35, sz * s * 0.4, 8));
       g.add(box(s * 0.86, 0.3, s * 0.86, k.beam, 0, y + th * 0.72, 0, 0, 3));
-      const R = MD.roof(s * 1.25, s * 1.25, th * 0.42, { upturn: 0.7, mats: { ...k, roof: S.roofCol.startsWith('#6') ? k.roofGreen : M.roof.color ? k.roof : k.roof } }); R.position.y = y + th * 0.78; g.add(R);
+      const R = MD.roof(s * 1.25, s * 1.25, th * 0.42, { upturn: 0.7, mats: { ...k, roof: S.roofTint ? AK_roofMatOf(k, S.roofTint) : S.roofCol.startsWith('#6') ? k.roofGreen : M.roof.color ? k.roof : k.roof } }); R.position.y = y + th * 0.78; g.add(R);
     }
     g.add(cyl(0.12, 0.35, 5, M.gold, 0, 1.2 + n * th + 2.2, 0, 8));
     for (let i = 0; i < 4; i++) g.add(cyl(0.5 - i * 0.08, 0.5 - i * 0.08, 0.25, M.gold, 0, 1.2 + n * th + 0.8 + i * 0.9, 0, 12));
