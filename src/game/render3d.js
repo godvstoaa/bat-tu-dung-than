@@ -754,6 +754,15 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       if (o) return { station: stationById(o.userData.station), ...MD.toTile(h.point.x, h.point.z) };
       return { station: null, ...MD.toTile(h.point.x, h.point.z) };
     }
+    // dải phía Đông (phòng tiệm / nhà / điện, Cửu Trọng Thiên): không có địa hình để bắn tia → bấm sàn không đi (bản live
+    // 2026-11-12). Dự phòng: mặt phẳng sàn ở độ cao nền dưới chân, chỉ nhận điểm trong 60 m quanh người chơi.
+    if (cam.target.x > T.ROOM_X0 - 40) {
+      const fy = platformTop(cam.target.x, cam.target.z) ?? 0;
+      if (Math.abs(ray.ray.direction.y) > 1e-3) {
+        const k = (fy - ray.ray.origin.y) / ray.ray.direction.y;
+        if (k > 0) { const x = ray.ray.origin.x + ray.ray.direction.x * k, z = ray.ray.origin.z + ray.ray.direction.z * k; if (Math.hypot(x - cam.target.x, z - cam.target.z) < 60) return { station: null, ...MD.toTile(x, z) }; }
+      }
+    }
     return null;
   }
 
