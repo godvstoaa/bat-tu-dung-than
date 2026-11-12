@@ -113,6 +113,7 @@ const LAZY = [];
 const nearDist = (v) => (v >= 6 ? Math.min(150, Math.max(v * 3, 30)) : Math.max(v * 1.5, 8)); // ≥ 6 m: 3 × cỡ, 30–150 m
 const farDist = (v) => Math.max(v * 3.5, 40);   // bản giữa 20k tới đây, xa hơn là .lod 12k
 const cullDist = (v) => (v >= 40 ? Infinity : Math.max(v * 22, 320)); // vật nhỏ ở rất xa: ẩn hẳn (sương đã che gần hết)
+const SHADOW_ONLY = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }); // chỉ đổ bóng
 async function placeLod(parent, id, { fit, at, hd = true }) {
   // bậc xa: .vc (~9k, màu nướng vào đỉnh — scripts/meshy-vclod.mjs; không đường nối UV nên không vỡ mảnh) — thiếu thì
   // .far / .lod cũ (giản lược gộp qua đường nối UV: nhìn gần vỡ mảnh, texture kéo sọc — ảnh người chơi 2026-11-11)
@@ -128,6 +129,9 @@ async function placeLod(parent, id, { fit, at, hd = true }) {
   const L = { id, lod, v, x: at.x, z: at.z, has: new Set(), busy: false, hd };
   // .vc dùng cho cả bậc giữa lẫn xa (bỏ .mid 20k — cũng vỡ mảnh khi nhìn gần): ngoài nearD là .vc, trong nearD là bản gốc
   if (first) { obj0.traverse((o) => { if (o.isMesh) o.castShadow = false; }); lod.addLevel(obj0, vc ? nearDist(v) : farDist(v), 0.08); L.has.add('far'); if (vc) L.has.add('mid'); L.farObj = obj0; }
+  // bóng bậc gần: bản .vc vô hình đi CHUNG nhóm với bản gốc (chỉ có khi bậc gần đang hiện) — bóng như nhau, lượt bóng bớt
+  // ~70k tam giác / công trình gần (cùng cách nhà phố — cityblocks3d). Bậc xa vẫn không đổ bóng như trước.
+  if (vc) L.shadowSrc = obj0;
   if (Number.isFinite(cullDist(v))) lod.addLevel(new THREE.Object3D(), cullDist(v));
   else { lod.addLevel(obj0, 0); L.has.add('near'); L.has.add('mid'); }
   lod.scale.setScalar(v / (ref || 1));
@@ -155,7 +159,13 @@ async function addLazyLevel(L, tier) {
       const mid = L.lod.levels.find((l) => l.object.userData.tier === 'mid');
       if (mid) mid.distance = nearDist(L.v);
       o.userData.tier = 'near';
-      L.lod.addLevel(o, 0, 0.08);
+      let lv = o;
+      if (L.shadowSrc) {
+        o.traverse((m) => { if (m.isMesh) m.castShadow = false; });
+        const sh = L.shadowSrc.clone(true); sh.traverse((m) => { if (m.isMesh) { m.material = SHADOW_ONLY; m.castShadow = true; m.receiveShadow = false; } });
+        lv = new THREE.Group(); lv.add(o, sh); lv.userData.tier = 'near';
+      }
+      L.lod.addLevel(lv, 0, 0.08);
     } else {
       o.userData.tier = 'mid';
       L.lod.addLevel(o, L.has.has('near') ? nearDist(L.v) : 0, 0.08); // trễ 8%: đứng / xoay camera sát ngưỡng không nhấp nháy bậc
