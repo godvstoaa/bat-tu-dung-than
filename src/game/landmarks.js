@@ -391,7 +391,10 @@ export function createLandmarks(scene) {
       const g = new THREE.Group();
       // gộp khối tĩnh dựng bằng mã theo vật liệu (luống ruộng, ao, bia, đĩa quẻ…): nhìn ngang qua thành từng là ~3.200 lệnh vẽ lẻ
       // (docs/DOHOA-MANIFEST.md §3.2). Bỏ qua: con của LOD, vật có va chạm (raze.js ẩn qua tham chiếu), vùng thành chính (biển nhà đổi chủ)
-      ps.push(s.place(g).then(() => { if (!s.noMerge) mergeStatic(g, { keepFootprints: true }); }).then(() => warmObject(g)).then(() => root.add(g)).catch((e) => { console.warn('[landmarks]', e); root.add(g); }));
+      ps.push(s.place(g).then(() => { if (s.noMerge) return; mergeStatic(g, { keepFootprints: true, dedupe: true });
+        // nhóm có va chạm (hàng rào, giá binh khí, cột cờ…): gộp BÊN TRONG từng nhóm — lưới gộp vẫn là con của nhóm nên raze.js ẩn nhóm vẫn đúng
+        const fps = []; g.traverse((o) => { if (o !== g && o.userData.footprint && !o.isMesh && !o.isLOD) fps.push(o); });
+        for (const o of fps) mergeStatic(o, { keepFootprints: true, dedupe: true }); }).then(() => warmObject(g)).then(() => root.add(g)).catch((e) => { console.warn('[landmarks]', e); root.add(g); }));
     });
     return ps;
   };

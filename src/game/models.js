@@ -70,7 +70,10 @@ const cyl = (rt, rb, h, mat, o, seg = 16) => mesh(new THREE.CylinderGeometry(rt,
 const lathe = (pts, mat, o, seg = 24) => mesh(new THREE.LatheGeometry(pts.map(([r, y]) => new THREE.Vector2(r, y)), seg), mat, o);
 
 // Gộp hình học tĩnh theo vật liệu → ít draw call. Giữ userData của group.
-export function mergeStatic(group, { keepFootprints = false } = {}) { // keepFootprints: không gộp vật có va chạm (raze.js ẩn qua tham chiếu)
+// chữ ký vật liệu: hai vật liệu khác bản nhưng cùng mọi thuộc tính vẽ → gộp chung (dedupe — đồ dựng bằng mã hay tạo vật liệu mới mỗi khối)
+const matSig = (m) => [m.type, m.color?.getHexString(), m.emissive?.getHexString(), m.emissiveIntensity, m.map?.uuid, m.normalMap?.uuid, m.roughnessMap?.uuid,
+  m.roughness, m.metalness, m.transparent, m.opacity, m.side, m.vertexColors, m.flatShading, m.alphaTest, m.depthWrite, m.fog, m.userData?.glow ? m.uuid : ''].join('|');
+export function mergeStatic(group, { keepFootprints = false, dedupe = false } = {}) { // keepFootprints: không gộp vật có va chạm (raze.js ẩn qua tham chiếu)
   group.updateMatrixWorld(true);
   const inv = new THREE.Matrix4().copy(group.matrixWorld).invert();
   const buckets = new Map();
@@ -82,7 +85,7 @@ export function mergeStatic(group, { keepFootprints = false } = {}) { // keepFoo
     if (dyn) return;
     const g = o.geometry.index ? o.geometry : null;
     if (!g || !g.attributes.uv || !g.attributes.normal) { keep.push(o); return; }
-    const key = o.material.uuid + (o.castShadow ? 's' : 'n');
+    const key = (dedupe ? matSig(o.material) : o.material.uuid) + (o.castShadow ? 's' : 'n');
     if (!buckets.has(key)) buckets.set(key, { mat: o.material, cast: o.castShadow, geos: [], meshes: [] });
     const gg = g.clone();
     gg.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld));

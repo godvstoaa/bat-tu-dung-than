@@ -184,6 +184,31 @@ Manifest này đi theo hướng đó, đo bằng số, không hứa suông.
 - **Người dùng báo «đang 56 rồi»** sau 4 đợt (lúc đầu 25–30 fps). Đạt và vượt đích khoảng 40 fps của độ phân giải động.
 - Thêm ô đo fps cho người chơi tự kiểm: mở `game.html?fps`, góc trên hiện «fps · mức đồ hoạ · tỉ lệ điểm ảnh», cập nhật mỗi giây.
 
+### Đợt 5 (2026-11-12): rà 9 địa điểm tìm chỗ còn chậm
+
+Đo ở chế độ tự chỉnh, máy đo (cùng sân Sơn Môn: máy đo 31 fps, máy người dùng 56 fps).
+
+| Địa điểm | fps | Tam giác |
+|---|---|---|
+| Rừng | 56 | 1,15 tr |
+| Cảng Nam | 53 | 1,76 tr |
+| Cửu Trọng Thiên | 52 | 0,83 tr |
+| Cổng Nam | 47 | 1,64 tr |
+| Phố | 45 | 1,63 tr |
+| Cổng Tây Nam | 41 | 1,52 tr |
+| Đền thờ | 35 | 2,14 tr |
+| Sân Sơn Môn | 31 | 2,07 tr |
+| **Thiên Thê** | **26** | 2,07 tr |
+
+- **Thiên Thê:** nướng `.bk` cho `lib_paifang` (125k → 25k, `MODE=collapse`; bản voxel vỡ mảnh), `bq_pagoda` (80k → 12k), `lib_pagoda5` (79k → 12k). Kết quả **26 → 37–40 fps**, tam giác 2,07 → 1,83 triệu. `lib_paifang` dùng ở 26 chỗ nên các nơi đó cũng lợi.
+- **Đền thờ (916 lệnh vẽ):**
+  - Khối gỗ của hàng rào, giá binh khí, cột cờ nằm trong nhóm có va chạm nên trước đây bị bỏ qua khi gộp.
+  - Giờ gộp **bên trong** từng nhóm; `raze.js` ẩn nhóm vẫn đúng vì lưới gộp là con của nhóm.
+  - `mergeStatic` có thêm `dedupe` (gom vật liệu cùng thuộc tính; vật liệu phát sáng theo giờ giữ riêng).
+  - Kết quả: 916 → 814 lệnh vẽ, 33 → 37 fps; ảnh trước / sau giống hệt (`shots/gfx/cmp-den.png`).
+- **Ước tính trên máy người dùng** (gấp khoảng 1,8 lần máy đo): mọi địa điểm ≥ 54 fps.
+- 35/35 `test-game-*` xanh, build xanh.
+
 ## 5. Goal tiếp (sau khi đạt mục 4)
 
 - ~~**G-8.1**~~ — đạt đợt 4 (2,08 triệu). Ghi chép cũ: (đợt 2: 2,62 triệu tam giác, 38 fps khi tự chỉnh — tam giác chưa tới 2,2 triệu, nhưng fps đã qua đích ≥ 24): sân Sơn Môn ≤ 2,2 triệu tam giác. Còn lại: phần lớn là `.vc` 9k của công trình trong 110 m và bản gốc trong `nearDist` (tối đa 150 m). Bước kế: thu `nearDist` về 2 × cỡ (tối đa 90 m), nướng `.bk` cho công trình dùng gần (hall_main, gate_sect, palace_grand…), đo lại.
