@@ -71,7 +71,11 @@ Thành game cao 34 m (gần 2,8 lần Tây An) nên giữ chiều cao. Đường
   - Mặt trong chặn từ u = −4,6. Mặt đi trên đỉnh cao 32,5 m.
   - Dải mặt dốc có bậc 21,3 m và 4,2 m. Ngoài chân tường (u ≥ 9,6) đi tự do.
 - [x] Toàn bộ `test-game-*` xanh, build web xanh.
-- [ ] Deploy, kiểm live.
+- [x] Deploy CI xanh (a76ddacc, 1fc2529c, 3128d97a). Kiểm trên live bằng Playwright: menu Địa điểm → Đi lại → Cổng Cảnh Môn.
+  - Cổng hiện đủ; tường gạch xám có răng cưa nối từ cổng (`shots/wall/live-wall1.png`, `live-canhmon2.png`).
+  - Lỗi phụ phát hiện khi kiểm live, đã sửa:
+    - Menu đưa vào giữa lòng cổng: dời điểm đến 45 m vào trong thành.
+    - Game tự tải lại về màn cổng khi fps tụt lúc nạp vùng: giờ bỏ qua 15 s sau dịch chuyển, và chỉ hỏi người chơi trước khi chuyển đồ hoạ nhẹ.
 
 ## 4. Goal tiếp
 
