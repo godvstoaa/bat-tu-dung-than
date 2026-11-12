@@ -32,39 +32,146 @@ const axisRy = (g) => Math.atan2(-g.dir[1], g.dir[0]); // x cục bộ dọc tr�
 // ---------------------------------------------------------------------------
 // Tường Ngoại Thành + cổng
 // ---------------------------------------------------------------------------
-// A: trung đoạn (TRUNG_A 420 = tường Trung Thành, OUTER_A 672 = tường Ngoại Thành), WH: cao tường
+// A: trung đoạn (tường Ngoại Thành v4 = CITY.A 2.125), WH: cao tường
+// TƯỜNG NGOẠI THÀNH (TUONG-THANH-MANIFEST, 2026-11-12 — tham chiếu tường thành Tây An nhà Minh): thành dốc (chân rộng hơn đỉnh),
+// chân kè đá sáng, thân gạch xanh xám (vân theo mét), diềm ngói dưới tường chắn, tường chắn ngoài + răng cưa (nhịp 3,1 m),
+// nữ tường phía trong, MÃ DIỆN nhô ra ~170 m một cái có lầu canh, tháp góc hai tầng lầu, cờ đuôi nheo màu hành của cung.
+// Gộp theo vật liệu (≈ 10 lệnh vẽ cả vòng 14 km); răng cưa + cờ nhân bản.
+let WALL_MATS = null;
+function brickTex() {
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  let s = 917; const r = () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296);
+  g.fillStyle = '#5d5953'; g.fillRect(0, 0, 256, 256); // vữa
+  const rowH = 8, bw = 32; // ô 256 px = 4 m → gạch 0,5 × 0,125 m
+  for (let y = 0; y < 256; y += rowH) for (let x = -((y / rowH) % 2) * bw / 2; x < 256; x += bw) {
+    const v = 0.82 + r() * 0.3, k = r() < 0.06 ? 0.8 : 1; // gạch xanh xám, thỉnh thoảng viên sẫm
+    g.fillStyle = `rgb(${Math.round(139 * v * k)},${Math.round(134 * v * k)},${Math.round(124 * v * k)})`;
+    g.fillRect(x + 1, y + 1, bw - 2, rowH - 2);
+  }
+  for (let i = 0; i < 26; i++) { g.fillStyle = `rgba(40,45,35,${0.04 + r() * 0.06})`; g.fillRect(r() * 256, 0, 2 + r() * 6, 256); } // vệt mưa / rêu
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(0.25, 0.25); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  return t;
+}
+function wallMats() {
+  if (WALL_MATS) return WALL_MATS;
+  const M = mats();
+  WALL_MATS = {
+    brick: new THREE.MeshStandardMaterial({ map: brickTex(), roughness: 0.92 }),
+    plinth: stoneMaterial({ seed: 71, rows: 4, repeat: [0.25, 0.25], base: '#aaa397', grout: '#6e685e', roughness: 0.9 }),
+    cap: M.cap, red: M.red, roof: M.roof, gold: M.gold,
+  };
+  return WALL_MATS;
+}
+/** lăng trụ: đa giác mặt cắt [[u, y], …] (u ra ngoài) đùn dài len theo dọc tường; UV theo mét */
+function prism(shape, len) {
+  const sh = new THREE.Shape(shape.map(([u, y]) => new THREE.Vector2(u, y)));
+  const geo = new THREE.ExtrudeGeometry(sh, { depth: len, bevelEnabled: false, steps: 1 });
+  geo.translate(0, 0, -len / 2);
+  return geo;
+}
+/** khung cục bộ (x = pháp tuyến ra ngoài của cung, y = lên, z = dọc tường) đặt tại (x, y, z) */
+function frameOf(g, x, y, z) {
+  const n = new THREE.Vector3(g.dir[0], 0, g.dir[1]).normalize(), up = new THREE.Vector3(0, 1, 0), t = new THREE.Vector3().crossVectors(n, up);
+  return new THREE.Matrix4().makeBasis(n, up, t).setPosition(x, y, z);
+}
+/** hộp có UV theo mét (vân gạch không bị kéo giãn) */
+const boxM = (w, h, d) => { const b = new THREE.BoxGeometry(w, h, d); const uv = b.attributes.uv, n = b.attributes.normal; for (let i = 0; i < uv.count; i++) { const ax = Math.abs(n.getX(i)), ay = Math.abs(n.getY(i)); const [su, sv] = ax > 0.5 ? [d, h] : ay > 0.5 ? [w, d] : [w, h]; uv.setXY(i, uv.getX(i) * su, uv.getY(i) * sv); } return b; };
+
 export function outerWall(grp, A = CB.OUTER_A, WH = 17) {
-  const M = mats(), L = A * BQ.TAN8, h = CB.OUTER_GATE_W / 2 - 1, WT = 6;
-  const segGeo = [], capGeo = [], merGeo = [];
-  const box = (w, hh, d, x, y, z, ry, list) => { const b = new THREE.BoxGeometry(w, hh, d); b.rotateY(ry); b.translate(x, y, z); list.push(b); };
+  const W = wallMats(), L = A * BQ.TAN8, h = CB.OUTER_GATE_W / 2 - 1;
+  const TOP = WH - 1.5;                                  // mặt đi trên đỉnh (y tương đối chân tường)
+  const IN0 = -4.2, IN1 = -3.5, OUT0 = 9, OUT1 = 3.5;    // mặt trong gần đứng · mặt ngoài dốc ~9°
+  const outAt = (y) => OUT0 - ((y + 3) / (TOP + 3)) * (OUT0 - OUT1);
+  const G = { brick: [], plinth: [], cap: [], red: [], roof: [], gold: [] };
+  const merlons = [], flags = [];
+  const put = (list, geo, m) => { geo.applyMatrix4(m); list.push(geo); };
+  // răng cưa dọc một cạnh: khung m, mặt u, chân y, từ z0 tới z1 (theo trục z của khung)
+  const crenel = (m, u, y, z0, z1) => { const n = Math.max(1, Math.round((z1 - z0) / 3.1)); for (let i = 0; i < n; i++) merlons.push(new THREE.Matrix4().multiplyMatrices(m, new THREE.Matrix4().makeTranslation(u, y + 0.65, z0 + (i + 0.5) * (z1 - z0) / n))); };
   for (const g of BQ.GUA) {
+    const col = new THREE.Color(g.color || '#c8452e');
     for (const [v0, v1] of [[-L, -h], [h, L]]) {
-      const a = BQ.toWorld(g, A, v0), b = BQ.toWorld(g, A, v1);
-      addSolidSegment(a.x, a.z, b.x, b.z, WT / 2 + 0.4);
-      { const L2 = Math.hypot(b.x - a.x, b.z - a.z); addTall((a.x + b.x) / 2, (a.z + b.z) / 2, L2 / 2, WT / 2 + 0.4, Math.atan2(-(b.z - a.z), b.x - a.x), H((a.x + b.x) / 2, (a.z + b.z) / 2) + WH - 1.5); } // mặt thành đi được
-      const ex = b.x - a.x, ez = b.z - a.z, len = Math.hypot(ex, ez), n = Math.max(1, Math.ceil(len / 12)), ry = Math.atan2(-ez, ex);
+      const len = v1 - v0, A0 = BQ.toWorld(g, A, v0), B0 = BQ.toWorld(g, A, v1), segRy = Math.atan2(-(B0.z - A0.z), B0.x - A0.x);
+      // --- va chạm: thân dày (u −4,4…9,2) · mặt đi trên đỉnh · 4 dải mặt dốc bậc thang theo độ cao thật
+      { const a = BQ.toWorld(g, A + 2.4, v0), b = BQ.toWorld(g, A + 2.4, v1); addSolidSegment(a.x, a.z, b.x, b.z, 6.8); }
+      { const c = BQ.toWorld(g, A, (v0 + v1) / 2), y0 = H(c.x, c.z); addTall(c.x, c.z, len / 2, 3.9, segRy, y0 + TOP);
+        for (let k = 0; k < 4; k++) { const u0 = 3.9 + k * 1.33, cc = BQ.toWorld(g, A + u0 + 0.66, (v0 + v1) / 2), yy = Math.min(TOP, ((OUT0 - u0) / (OUT0 - OUT1)) * (TOP + 3) - 3); addTall(cc.x, cc.z, len / 2, 0.67, segRy, y0 + Math.max(1, yy)); } }
+      // --- thân: khúc 24 m bám địa hình; khúc qua sông (thủy môn) treo từ y = 1
+      const n = Math.max(1, Math.ceil(len / 24));
       for (let i = 0; i < n; i++) {
-        const t = (i + 0.5) / n, cx = a.x + ex * t, cz = a.z + ez * t, l = len / n + 0.5;
-        const wet = H(cx, cz) < -1.5, y = wet ? 0 : H(cx, cz); // v4: sông xuyên tường → thủy môn (tường treo trên vòm, chừa 7 m trên mặt nước −6)
-        if (wet) box(l, WH - 1.5 - 1, WT, cx, (WH - 1.5 + 1) / 2, cz, ry, segGeo);
-        else box(l, WH, WT, cx, y + WH / 2 - 1.5, cz, ry, segGeo);
-        box(l, 1.4, WT + 1.4, cx, y + WH - 0.8, cz, ry, capGeo);
-        for (const k of [-0.32, 0, 0.32]) box(1.6, 1.6, 1.1, cx + Math.cos(ry) * k * l, y + WH + 0.6, cz - Math.sin(ry) * k * l, ry, merGeo);
+        const vc = v0 + (i + 0.5) * len / n, l = len / n + 0.3, c = BQ.toWorld(g, A, vc), wet = H(c.x, c.z) < -1.5, y = wet ? 0 : H(c.x, c.z), m = frameOf(g, c.x, y, c.z);
+        const yb = wet ? 1 : -3;
+        put(G.brick, prism([[IN0, yb], [outAt(yb), yb], [OUT1, TOP], [IN1, TOP]], l), m);
+        if (!wet) put(G.plinth, prism([[IN0 - 0.2, -3], [OUT0 + 0.4, -3], [outAt(3) + 0.4, 3], [IN0 - 0.2, 3]], l), m);
+        put(G.cap, prism([[OUT1 - 0.2, TOP - 0.7], [OUT1 + 0.6, TOP - 0.7], [OUT1 + 0.6, TOP - 0.1], [OUT1 - 0.2, TOP]], l), m); // diềm
+        put(G.brick, prism([[OUT1 - 0.8, TOP], [OUT1, TOP], [OUT1, TOP + 1.4], [OUT1 - 0.8, TOP + 1.4]], l), m);              // tường chắn ngoài
+        put(G.brick, prism([[IN1, TOP], [IN1 + 0.6, TOP], [IN1 + 0.6, TOP + 1.1], [IN1, TOP + 1.1]], l), m);                  // nữ tường trong
+        put(G.cap, prism([[IN1 - 0.1, TOP + 1.1], [IN1 + 0.7, TOP + 1.1], [IN1 + 0.7, TOP + 1.3], [IN1 - 0.1, TOP + 1.3]], l), m);
+        crenel(m, OUT1 - 0.4, TOP + 1.4, -l / 2, l / 2);
       }
-      // mã diện (ụ nhô ra ngoài) giữa đoạn
-      const m = BQ.toWorld(g, A + 3, (v0 + v1) / 2), my = H(m.x, m.z);
-      box(9, WH + 2, 9, m.x, my + (WH + 2) / 2 - 1.5, m.z, axisRy(g), segGeo);
-      addSolidCircle(m.x, m.z, 5.5);
+      // --- cờ đuôi nheo mỗi 30 m (màu hành của cung)
+      for (let v = v0 + 15; v < v1 - 5; v += 30) { const c = BQ.toWorld(g, A + OUT1 - 0.4, v), y = Math.max(0, H(c.x, c.z)); flags.push({ x: c.x, y: y + TOP + 2.7, z: c.z, ry: segRy, col }); }
+      // --- mã diện ~170 m một cái (chừa 60 m cạnh cổng, 40 m cạnh góc) + lầu canh
+      const span = Math.abs(len) - 100, nb = Math.max(1, Math.round(span / 170));
+      for (let k = 0; k < nb; k++) {
+        const vb = (v0 < 0 ? v0 + 40 : v0 + 60) + (k + 0.5) * span / nb, c = BQ.toWorld(g, A, vb), y = Math.max(0, H(c.x, c.z)), m = frameOf(g, c.x, y, c.z);
+        put(G.brick, prism([[OUT1 - 0.5, -3], [19, -3], [16.5, TOP], [OUT1 - 0.5, TOP]], 24), m);
+        put(G.plinth, prism([[OUT1, -3], [19.4, -3], [18.9, 3], [OUT1, 3]], 24.8), m);
+        put(G.cap, prism([[16.3, TOP - 0.7], [17.1, TOP - 0.7], [17.1, TOP - 0.1], [16.3, TOP]], 24.6), m);
+        put(G.brick, prism([[15.7, TOP], [16.5, TOP], [16.5, TOP + 1.4], [15.7, TOP + 1.4]], 24), m);
+        crenel(m, 16.1, TOP + 1.4, -12, 12);
+        for (const s of [-1, 1]) {
+          const b = boxM(16.5 - OUT1, 1.4, 0.8); b.translate((16.5 + OUT1) / 2, TOP + 0.7, s * 11.6); put(G.brick, b, m);
+          const mm = new THREE.Matrix4().multiplyMatrices(m, new THREE.Matrix4().makeTranslation(0, 0, s * 11.6).multiply(new THREE.Matrix4().makeRotationY(-Math.PI / 2)));
+          crenel(mm, 0, TOP + 1.4, OUT1 + 1, 15.5); // khung xoay: trục z mới chạy theo u
+        }
+        // lầu canh: nền đá, thân son, hiên, mái chóp ngói, chóp vàng
+        { const base = boxM(9, 0.6, 12); base.translate(10, TOP + 0.3, 0); put(G.plinth, base, m);
+          const body = boxM(7, 4.5, 10); body.translate(10, TOP + 0.6 + 2.25, 0); put(G.red, body, m);
+          const eave = boxM(9.4, 0.35, 12.6); eave.translate(10, TOP + 5.2, 0); put(G.cap, eave, m);
+          const roof = new THREE.ConeGeometry(1, 1, 4, 1); roof.rotateY(Math.PI / 4); roof.scale(6.6, 3.4, 9); roof.translate(10, TOP + 5.1 + 1.7, 0); put(G.roof, roof, m);
+          const tip = new THREE.SphereGeometry(0.45, 8, 6); tip.translate(10, TOP + 8.6, 0); put(G.gold, tip, m); }
+        { const cc = BQ.toWorld(g, A + 11, vb); addSolidOBB(cc.x, cc.z, 8.2, 12.2, axisRy(g)); addTall(cc.x, cc.z, 8.2, 12.2, axisRy(g), y + TOP);
+          const ch = BQ.toWorld(g, A + 10, vb); addTall(ch.x, ch.z, 3.6, 5.1, axisRy(g), y + TOP + 5.2); }
+      }
     }
   }
-  const mesh = (list, mat) => { const geo = mergeGeometries(list, false); list.forEach((q) => q.dispose()); const o = new THREE.Mesh(geo, mat); o.castShadow = true; o.receiveShadow = true; grp.add(o); return o; };
-  mesh(segGeo, M.wall); mesh(capGeo, M.cap); mesh(merGeo, M.wall);
+  // --- tháp góc: đế bát giác dốc + hai tầng lầu son, hai mái
   for (const p of BQ.octVertices(A)) {
-    const y = H(p.x, p.z);
-    const s = WH / 17; // tháp góc theo cao tường
-    const parts = [[new THREE.CylinderGeometry(8 * s, 8.8 * s, 24 * s, 8), M.wall, y + 11 * s], [new THREE.CylinderGeometry(6 * s, 6 * s, 5 * s, 8), M.red, y + 25.5 * s], [new THREE.ConeGeometry(9.6 * s, 6 * s, 8), M.roof, y + 31 * s]];
-    for (const [geo, mat, yy] of parts) { const o = new THREE.Mesh(geo, mat); o.position.set(p.x, yy, p.z); o.rotation.y = Math.PI / 8; o.castShadow = true; grp.add(o); }
-    addSolidCircle(p.x, p.z, 9 * WH / 17);
+    const y = Math.max(0, H(p.x, p.z));
+    const add = (list, geo, yy) => { geo.rotateY(Math.PI / 8); geo.translate(p.x, y + yy, p.z); list.push(geo); };
+    add(G.brick, new THREE.CylinderGeometry(15, 18, TOP + 3, 8), (TOP - 3) / 2);
+    add(G.plinth, new THREE.CylinderGeometry(18.4, 18.8, 6, 8), 0);
+    add(G.cap, new THREE.CylinderGeometry(15.8, 15.6, 0.7, 8), TOP - 0.35);
+    add(G.brick, new THREE.CylinderGeometry(15.4, 15.4, 1.4, 8, 1, true), TOP + 0.7);
+    add(G.plinth, new THREE.CylinderGeometry(11, 11.5, 0.8, 8), TOP + 0.4);
+    add(G.red, new THREE.CylinderGeometry(8, 8, 6, 8), TOP + 0.8 + 3);
+    add(G.cap, new THREE.CylinderGeometry(11.6, 11.6, 0.4, 8), TOP + 6.9);
+    add(G.roof, new THREE.ConeGeometry(12.5, 4.2, 8), TOP + 6.8 + 2.1);
+    add(G.red, new THREE.CylinderGeometry(5.6, 5.6, 4.6, 8), TOP + 8.6 + 2.3);
+    add(G.roof, new THREE.ConeGeometry(8.6, 4.4, 8), TOP + 13.2 + 2.2);
+    add(G.gold, new THREE.SphereGeometry(0.8, 10, 8), TOP + 17.6);
+    for (let k = 0; k < 8; k++) {
+      const a = (k + 0.5) * Math.PI / 4 + Math.PI / 8, x = p.x + Math.cos(a) * 15.1, z = p.z + Math.sin(a) * 15.1, t = a + Math.PI / 2;
+      for (const s of [-1, 1]) merlons.push(new THREE.Matrix4().compose(new THREE.Vector3(x + Math.cos(t) * s * 2.6, y + TOP + 2.05, z + Math.sin(t) * s * 2.6), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -a), new THREE.Vector3(1, 1, 1)));
+    }
+    addSolidCircle(p.x, p.z, 17); addTall(p.x, p.z, 15, 15, Math.PI / 8, y + TOP);
+  }
+  // --- gộp theo vật liệu
+  for (const [k, list] of Object.entries(G)) {
+    if (!list.length) continue;
+    const geo = mergeGeometries(list.map((q) => (q.index ? q.toNonIndexed() : q)), false); list.forEach((q) => q.dispose());
+    const o = new THREE.Mesh(geo, W[k]); o.castShadow = k !== 'gold'; o.receiveShadow = true; o.name = `wall-${k}`; grp.add(o);
+  }
+  // răng cưa (nhân bản): 2,0 × 1,3 × 0,8 m
+  { const geo = boxM(0.8, 1.3, 2.0); const im = new THREE.InstancedMesh(geo, W.brick, merlons.length); merlons.forEach((mm, i) => im.setMatrixAt(i, mm)); im.castShadow = true; im.receiveShadow = true; im.name = 'wall-merlons'; grp.add(im); }
+  // cờ: cán + lá đuôi nheo (màu theo hành của cung)
+  if (flags.length) {
+    const pole = new THREE.CylinderGeometry(0.07, 0.09, 5.4, 5), flag = new THREE.BufferGeometry();
+    flag.setAttribute('position', new THREE.Float32BufferAttribute([0, 2.4, 0, 0, 0.9, 0, 0, 1.65, 2.6, 0, 1.65, 2.6, 0, 0.9, 0, 0, 2.4, 0], 3)); flag.computeVertexNormals();
+    const imP = new THREE.InstancedMesh(pole, W.cap, flags.length), imF = new THREE.InstancedMesh(flag, new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, roughness: 0.8 }), flags.length);
+    const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), one = new THREE.Vector3(1, 1, 1);
+    flags.forEach((f, i) => { q.setFromAxisAngle(up, f.ry + Math.PI / 2); imP.setMatrixAt(i, mm.compose(new THREE.Vector3(f.x, f.y, f.z), q, one)); imF.setMatrixAt(i, mm.compose(new THREE.Vector3(f.x, f.y + 0.3, f.z), q, one)); imF.setColorAt(i, f.col); });
+    imP.name = 'wall-flagpoles'; imF.name = 'wall-flags'; grp.add(imP, imF);
   }
 }
 const corridor = (x, z, ry, hw) => (px, pz) => Math.abs(Math.cos(ry) * (px - x) - Math.sin(ry) * (pz - z)) > hw;

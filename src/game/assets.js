@@ -133,7 +133,10 @@ async function placeLod(parent, id, { fit, at, hd = true }) {
   // ~70k tam giác / công trình gần (cùng cách nhà phố — cityblocks3d). Bậc xa vẫn không đổ bóng như trước.
   if (vc) L.shadowSrc = obj0;
   if (Number.isFinite(cullDist(v))) lod.addLevel(new THREE.Object3D(), cullDist(v));
-  else { lod.addLevel(obj0, 0); L.has.add('near'); L.has.add('mid'); }
+  // không có bản rút gọn: obj0 chính là bản gốc → bậc 0. (Lỗi 2026-11-11 → 11-12: nhánh này từng gắn vào «cullDist vô hạn»
+  // → mọi công trình rộng ≥ 40 m bị thêm CHÍNH bản xa lần hai ở bậc 0: LOD bật rồi tắt cùng một vật → đứng trong ~150 m là
+  // công trình biến mất (cổng thành chỉ còn hai đầu tường) và bản gốc chi tiết không bao giờ được nạp.)
+  if (!first) { lod.addLevel(obj0, 0); L.has.add('near'); L.has.add('mid'); }
   lod.scale.setScalar(v / (ref || 1));
   lod.rotation.y = at.ry || 0;
   lod.updateMatrixWorld(true);
