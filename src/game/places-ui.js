@@ -145,7 +145,7 @@ export function rowsOf(tab, ctx) {
     head('Bến thuyền gần nhất');
     for (const { o } of nearest(docks(), me, 3)) row({ ic: '⚓', name: o.name, sub: area(o.x, o.z), x: o.x, z: o.z });
     head('Cổng thành');
-    for (const g of cityGates()) row({ ic: '🚪', name: `Cổng ${g.name}`, sub: area(g.x, g.z), x: g.x - g.ax * 6, z: g.z - g.az * 6 });
+    for (const g of cityGates()) row({ ic: '🚪', name: `Cổng ${g.name}`, sub: area(g.x, g.z), x: g.x - g.ax * 45, z: g.z - g.az * 45 }); // đứng trong thành trước cổng (lòng cổng sâu ~38 m — 6 m là kẹt giữa đường hầm)
     head('Nơi đặc biệt');
     row({ ic: '⛰', name: 'Sơn Môn', sub: 'Sân trước Chính Điện Tam Thanh', home: true, free: false });
     row({ ic: '🪜', name: 'Thiên Thê', sub: 'Thang mây ngoài tường Đông Sơn Môn — lối đi bộ lên Cửu Trọng Thiên', x: THIEN_THE.x, z: THIEN_THE.z + 6 });
