@@ -6,7 +6,7 @@
 // ============================================================================
 import * as THREE from 'three';
 import * as T from './terrain.js';
-import { placeModel, instanceModel, loadModel, hasLod, warmObject, tickLazyLods, modelAvailable } from './assets.js';
+import { placeModel, instanceModel, loadModel, hasLod, warmObject, tickLazyLods, modelAvailable, viewInstances } from './assets.js';
 import { rng } from './npc.js';
 import { stoneTex } from './textures.js';
 import { stoneMaterial } from './ground-tex.js';
@@ -402,7 +402,7 @@ export function createLandmarks(scene) {
     root,
     /** Màn nạp: dựng trước các vùng gần (≤ R m) — vùng xa tiếp tục nạp nền khi đã vào game. */
     prepare(px, pz, R = 320) { return Promise.all(start(px, pz, R)); },
-    view(cx, cz, fx, fz, halfH, cy) { for (const v of VIEW_UPDATERS) v(cx, cz, fx, fz, halfH, cy); },
+    view(cx, cz, fx, fz, halfH, cy) { for (const v of VIEW_UPDATERS) v(cx, cz, fx, fz, halfH, cy); viewInstances(cx, cz, fx, fz, halfH); },
     update(px, pz, now = performance.now()) {
       if (now - last < (now - born < 20000 ? 400 : 1500)) return; last = now; // 20 giây đầu: nạp bậc chi tiết dồn dập
       for (const u of LOD_UPDATERS) u(px, pz);

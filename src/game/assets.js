@@ -297,7 +297,22 @@ function buildInstanced(g, items, fitKey, group, name = '') {
   return sets;
 }
 const INST = [];
+// cắt theo hướng nhìn (như cityblocks3d.cityHouses.view — docs/DOHOA-MANIFEST.md §3.2): bản sao ngoài hình nón nhìn
+// (nửa góc ngang + 18°) và xa hơn max(45 m, 3 × cỡ) không vẽ; bóng giữ vòng 80 m. viewInstances gọi mỗi khung (landmarks.view).
+const IV = { on: false, cx: 0, cz: 0, ax: 0, az: 1, cosLim: -1, px: 0, pz: 0 };
+export function viewInstances(cx, cz, fx, fz, halfH) {
+  const l = Math.hypot(fx, fz); IV.cx = cx; IV.cz = cz;
+  if (l < 1e-3) { if (IV.on) { IV.on = false; for (const E of INST) E.lx = Infinity; tickInstances(IV.px, IV.pz); } return; }
+  fx /= l; fz /= l; IV.cosLim = Math.cos(Math.min(Math.PI * 0.95, halfH + 0.314));
+  if (!IV.on || fx * IV.ax + fz * IV.az < 0.99) { IV.on = true; IV.ax = fx; IV.az = fz; for (const E of INST) E.lx = Infinity; tickInstances(IV.px, IV.pz); }
+}
+const seen = (it) => {
+  if (!IV.on) return true;
+  const dx = it.x - IV.cx, dz = it.z - IV.cz, d = Math.hypot(dx, dz);
+  return d < Math.max(45, (it.s || 0) * 3) || (dx * IV.ax + dz * IV.az) / d > IV.cosLim;
+};
 function tickInstances(px, pz) {
+  IV.px = px; IV.pz = pz;
   for (const E of INST) {
     const U = E.upgrade;
     if (U && !U.busy && !U.done && E.items.some((it) => Math.hypot(it.x - px, it.z - pz) < U.near)) { U.busy = true; U.run().catch(() => {}).finally(() => { U.busy = false; U.done = true; }); }
@@ -311,7 +326,7 @@ function tickInstances(px, pz) {
     E.lx = px; E.lz = pz;
     const keep = [], far = [], sh = [];
     // bóng: camera bóng phủ ±45 m quanh người chơi → bản sao ngoài 80 m không đổ bóng (trước đây cả thế giới vào lượt bóng)
-    E.items.forEach((it, i) => { const d = Math.hypot(it.x - px, it.z - pz); if (d < E.cut) (E.far && d > E.farD ? far : keep).push(i); if (d < 80) sh.push(i); });
+    E.items.forEach((it, i) => { const d = Math.hypot(it.x - px, it.z - pz); if (d < E.cut && seen(it)) (E.far && d > E.farD ? far : keep).push(i); if (d < 80) sh.push(i); });
     const fill = (sets, list) => { for (const { im, all } of sets) {
       const dst = im.instanceMatrix.array;
       list.forEach((i, n) => dst.set(all.subarray(i * 16, i * 16 + 16), n * 16));

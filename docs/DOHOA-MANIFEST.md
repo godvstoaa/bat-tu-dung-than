@@ -209,6 +209,23 @@ Manifest này đi theo hướng đó, đo bằng số, không hứa suông.
 - **Ước tính trên máy người dùng** (gấp khoảng 1,8 lần máy đo): mọi địa điểm ≥ 54 fps.
 - 35/35 `test-game-*` xanh, build xanh.
 
+### Đợt 6 (2026-11-12): cắt bộ nhân bản công trình theo hướng nhìn
+
+- `assets.viewInstances` (gọi mỗi khung qua `landmarks.view`): bản sao cây, đèn, đá, vạc… ngoài hình nón nhìn và xa hơn max(45 m, 3 × cỡ) không vẽ. Bóng giữ vòng 80 m; tính lại khi xoay > 8°.
+- **A/B chế độ tự chỉnh:**
+
+| Chỗ | Trước | Sau |
+|---|---|---|
+| Sân Sơn Môn | 2,08 tr tam giác · 29 fps | **1,92 tr · 31 fps** |
+| Sơn Môn sau khi xoay camera | 2,03 tr · 31 fps | **1,85 tr · 35 fps** |
+| Thiên Thê | 1,83 tr · 39 fps | **1,68 tr · 41 fps** |
+| Đền thờ | không đổi | không đổi |
+| Cổng Tây Nam | không đổi | không đổi |
+
+- Ảnh sau khi xoay ở Sơn Môn giống nhau (`shots/gfx/cmp-t5-turn.png`).
+- **Phần còn lại ở đền thờ (814 lệnh vẽ):** khoảng 184 lưới GLB của NPC và người chơi, mỗi nhân vật vài lệnh vẽ. Gộp nhân vật có hoạt ảnh xương phải viết lại hệ thống nhân vật thành nhân bản có hoạt ảnh. Đây là việc lớn, chỉ đáng làm khi người dùng báo đền thờ giật trên máy họ.
+- 35/35 test xanh, build xanh.
+
 ## 5. Goal tiếp (sau khi đạt mục 4)
 
 - ~~**G-8.1**~~ — đạt đợt 4 (2,08 triệu). Ghi chép cũ: (đợt 2: 2,62 triệu tam giác, 38 fps khi tự chỉnh — tam giác chưa tới 2,2 triệu, nhưng fps đã qua đích ≥ 24): sân Sơn Môn ≤ 2,2 triệu tam giác. Còn lại: phần lớn là `.vc` 9k của công trình trong 110 m và bản gốc trong `nearDist` (tối đa 150 m). Bước kế: thu `nearDist` về 2 × cỡ (tối đa 90 m), nướng `.bk` cho công trình dùng gần (hall_main, gate_sect, palace_grand…), đo lại.
