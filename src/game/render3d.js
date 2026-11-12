@@ -56,7 +56,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
-import { setActors, blockedByBuilding, platformTop } from './obstacles.js';
+import { setActors, blockedByBuilding, platformTop, tallTopAt } from './obstacles.js';
 import { zones as jobZones } from './jobzones.js';
 
 // Mức chất lượng: ghi đè bằng localStorage «huyenquan:quality» = low | mid | high
@@ -817,7 +817,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     camera.updateProjectionMatrix();
   }
 
-  let debugHour = null;
+  let debugHour = null, camHit = 1; // camHit: phần đường camera còn trống (1 = không bị nhà chắn)
   const sunDir = new THREE.Vector3(), lightDir = new THREE.Vector3(), moonDir = new THREE.Vector3(-0.5, 0.75, -0.4).normalize();
   function applyTime(now) {
     const hour = debugHour ?? (now.getHours() + now.getMinutes() / 60);
@@ -853,7 +853,8 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   let shadowTick = 0;
   function frame(S, dt) {
-    if (degrade >= 2 && ++shadowTick % 6 === 0) renderer.shadowMap.needsUpdate = true;
+    // bậc 1: bản đồ bóng vẽ lại cách một khung (đo sân Sơn Môn: đóng băng bóng +5 fps; bóng trễ 1 khung ~30 ms không thấy) · bậc 2: 1/6 khung
+    if (degrade >= 2) { if (++shadowTick % 6 === 0) renderer.shadowMap.needsUpdate = true; } else if (degrade === 1) { renderer.shadowMap.autoUpdate = false; if (++shadowTick % 2 === 0) renderer.shadowMap.needsUpdate = true; }
     const tF = performance.now(); frame0(S, dt); record('frame:js', performance.now() - tF - lastRenderMs);
   }
   let lastRenderMs = 0;
@@ -1019,12 +1020,27 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       cam.target.y + Math.sin(elev) * cd,
       cam.target.z + Math.cos(cam.yaw) * Math.cos(elev) * cd,
     );
-    const floorY = world.groundY(camera.position.x, camera.position.z) + 0.6;
-    if (camera.position.y < floorY) camera.position.y = floorY;
     // trong điện: camera không xuyên tường / trần
     const inRoom = roomAt(cam.target.x, cam.target.z);
     // trong gian biệt phủ: camera kẹp trong lòng gian (vỏ gian đã mờ — mansion3d.update), không cao quá mái hiên
     const inHall = !inRoom && mansionsB.hallAt(cam.target.x, cam.target.z);
+    // camera không chui vào mái / thân nhà (docs/DOHOA-MANIFEST.md G-8.3 — ảnh phố: cả màn hình là mặt trong mái đen):
+    // dò 14 điểm từ đầu nhân vật ra camera, gặp điểm đầu tiên nằm dưới đỉnh vật cao (nhà phố: mái đứng được = 62 % chiều cao
+    // → cộng 2 m cho bờ nóc) thì kéo camera vào trước điểm đó. Bị chặn: kéo vào ngay; hết chặn: lùi ra dần (không giật).
+    if (!inRoom && !inHall && !inHeaven(cam.target.x, cam.target.z)) {
+      let free = 1;
+      const tx = cam.target.x, ty = cam.target.y, tz = cam.target.z, ex = camera.position.x - tx, ey = camera.position.y - ty, ez = camera.position.z - tz;
+      const startTop = tallTopAt(tx, tz); // vật đang ở ngay chỗ nhân vật (đứng trên mái / tường, hay dưới mái cổng): không tính là vật chắn
+      const len = Math.hypot(ex, ey, ez) || 1;
+      for (let k = 2; k <= 14; k++) {
+        const f = k / 14, x = tx + ex * f, z = tz + ez * f, y = ty + ey * f, top = tallTopAt(x, z);
+        if (top != null && y < top + 2 && !(startTop != null && Math.abs(top - startTop) < 0.5)) { free = Math.max(2.4 / len, (k - 1.5) / 14); break; }
+      }
+      camHit = free < camHit ? free : Math.min(free, camHit + dt * 1.6);
+      if (camHit < 0.999) camera.position.set(tx + ex * camHit, ty + ey * camHit, tz + ez * camHit);
+    } else camHit = 1;
+    const floorY = world.groundY(camera.position.x, camera.position.z) + 0.6;
+    if (camera.position.y < floorY) camera.position.y = floorY;
     if (inHall) {
       const c = Math.cos(inHall.ry), s = Math.sin(inHall.ry), dx = camera.position.x - inHall.cx, dz = camera.position.z - inHall.cz;
       let lx = c * dx - s * dz, lz = s * dx + c * dz;
@@ -1411,13 +1427,14 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
         // KHÔNG tự tải lại nữa (người chơi bị đá về màn cổng giữa chừng — bản live 2026-11-12): hỏi bằng dải báo, đồng ý mới tải lại
         degrade = 3; console.warn(`[huyenquan] fps ${fps.toFixed(1)} hai cửa sổ liền — đề nghị chuyển mức thấp`); suggestLow(fps);
       }
-      // ĐỘ PHÂN GIẢI ĐỘNG (sau bậc 1): fps < 27 → bớt 15 % tỉ lệ điểm ảnh (tối thiểu 0,6); fps > 48 → nâng lại (tối đa 1).
-      // Mỗi cửa sổ đo 3 s một bước — không nhấp nháy; hình mờ hơn chút nhưng mượt hơn rõ trên máy đồ hoạ tích hợp.
+      // ĐỘ PHÂN GIẢI ĐỘNG (sau bậc 1): đích ~40 fps — fps < 36 → bớt 10 % tỉ lệ điểm ảnh (sàn 0,7; mức thấp 0,6); fps > 52 → nâng lại
+      // (tối đa 1). Trước đây ngưỡng 27 / 48 nên game đứng yên ở 27–35 fps («chưa mượt» — người chơi 2026-11-12). Đo sân Sơn Môn:
+      // nghẽn ở khâu tô điểm ảnh (tỉ lệ 0,6 → +48 % fps). Mỗi cửa sổ đo 3 s một bước — không nhấp nháy (docs/DOHOA-MANIFEST.md)
       if ((degrade >= 1 || quality === 'low') && !softGl) {
         lowQuality = true;
-        const prev = dynPR;
-        if (fps < 27 && dynPR > 0.6) dynPR = Math.max(0.6, Math.round(dynPR * 0.85 * 100) / 100);
-        else if (fps > 48 && dynPR < 1) dynPR = Math.min(1, Math.round((dynPR / 0.85) * 100) / 100);
+        const prev = dynPR, floor = quality === 'low' ? 0.6 : 0.7;
+        if (fps < 36 && dynPR > floor) dynPR = Math.max(floor, Math.round(dynPR * 0.9 * 100) / 100);
+        else if (fps > 52 && dynPR < 1) dynPR = Math.min(1, Math.round((dynPR / 0.9) * 100) / 100);
         if (dynPR !== prev) { renderer.setPixelRatio(dynPR); composer?.setPixelRatio(dynPR); }
       }
       fpsAcc = 0; fpsN = 0; fpsT = 0;
@@ -1523,6 +1540,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     get lowQuality() { return lowQuality; },
     get degrade() { return degrade; },
     // gỡ lỗi hiệu năng: tổng lệnh vẽ / tam giác của CẢ một khung (bóng + cảnh + hậu kỳ)
+    webgl: renderer, // đo / gỡ lỗi (scripts/shot-city.mjs)
     frameStats() { const inf = renderer.info; inf.autoReset = false; inf.reset(); if (composer) composer.render(); else renderer.render(scene, camera); const r = { calls: inf.render.calls, tris: inf.render.triangles, geo: inf.memory.geometries, tex: inf.memory.textures, progs: inf.programs.length }; inf.autoReset = true; return r; },
     info: () => ({ ...renderer.info.render, quality, dynPR, degrade, trees: world.treeCount, pending: world.pending, cam: camera.position.toArray().map((v) => Math.round(v)), target: cam.target.toArray().map((v) => Math.round(v)) }),
     // Ảnh chụp canvas (kiểm thử / chia sẻ): vẽ lại rồi đọc ngay trong cùng tác vụ.

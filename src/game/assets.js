@@ -227,28 +227,37 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
   let g = null; if (hasLod(id)) { for (const t of tiers) if ((g = await loadModel(t))) break; } else g = await loadModel(id);
   if (!g || !items.length) return null;
   const group = new THREE.Group();
-  let sets = buildInstanced(g, items, fitKey, group);
+  let sets = buildInstanced(g, items, fitKey, group, `${id}:vis`);
   // bóng bằng bản nhẹ vô hình (.vc2 / .vc) khi mẫu nặng: cây sân Sơn Môn 9,7k × 16 cây vẽ lại trong lượt bóng = ~157k
   // tam giác (đo 2026-11-12). Hình nhìn thấy giữ nguyên; bóng ở độ phân giải bản đồ bóng không khác.
   const triOf = (gg) => { let t = 0; gg.scene.traverse((o) => { if (o.isMesh) t += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3; }); return t; };
-  let proxied = false;
+  let proxied = false, shadowSets = null;
   if (triOf(g) > 4000) {
     const lite = (MODEL_FILES.size ? (MODEL_FILES.has(`${id}.vc2`) ? await loadModel(`${id}.vc2`) : null) : null) || (MODEL_FILES.has(`${id}.vc`) && !g.scene.name?.includes('.vc') ? await loadModel(`${id}.vc`) : null);
     if (lite && lite !== g && triOf(lite) < triOf(g) * 0.5) {
       for (const { im } of sets) im.castShadow = false; proxied = true;
-      for (const { im } of buildInstanced(lite, items, fitKey, group)) { im.material = SHADOW_ONLY; im.castShadow = true; im.receiveShadow = false; }
+      shadowSets = buildInstanced(lite, items, fitKey, group, `${id}:shadow`);
+      for (const { im } of shadowSets) { im.material = SHADOW_ONLY; im.castShadow = true; im.receiveShadow = false; }
     }
+  }
+  // bậc xa theo TỪNG bản sao: ngoài max(6 × cỡ, 70 m) dùng .vc2 (~2,5k) thay .vc 9k (docs/DOHOA-MANIFEST.md G-8.1 —
+  // cổng phường 26 m từng vẽ đủ 9k tới 624 m). Chỉ khi bậc nhìn thấy nặng gấp đôi .vc2 trở lên.
+  let far = null;
+  if (items.length > 1 && MODEL_FILES.has(`${id}.vc2`)) {
+    const g2 = await loadModel(`${id}.vc2`);
+    if (g2 && g2 !== g && triOf(g2) * 2 < triOf(g)) { far = buildInstanced(g2, items, fitKey, group, `${id}:far`); for (const { im } of far) { im.castShadow = false; im.count = 0; im.visible = false; } }
   }
   await warm(group);
   parent.add(group);
   // nhân bản rải rộng (hàng cây, cổng phường, đèn…): chỉ vẽ các bản trong tầm — bản sao ngoài tầm vẫn tốn
   // cả lượt vẽ lẫn lượt bóng vì khung bao của InstancedMesh phủ hết. Va chạm đã cắt lát lúc dựng (không phụ thuộc).
-  const E = { items, sets, lo: sets, hi: null, group, cut: Math.max(Math.max(...items.map((it) => it.s)) * 24, 260), lx: Infinity, lz: Infinity, cull: items.length > 3 };
+  const sMax = Math.max(...items.map((it) => it.s));
+  const E = { items, sets, lo: sets, hi: null, far, shadow: shadowSets, group, cut: Math.max(sMax * 24, 260), farD: Math.max(sMax * 6, 70), lx: Infinity, lz: Infinity, cull: items.length > 3 || !!far || !!shadowSets };
   if (hasLod(id) && items.length <= 4) {
     const near = Math.max(Math.max(...items.map((it) => it.s)) * 4, 70);
     E.upgrade = { near, busy: false, done: false, run: async () => {
       const gm = (await loadModel(id)) || (await loadModel(`${id}.mid`)); if (!gm) return; // tới gần: bản gốc (bản .mid nhìn gần vỡ mảnh)
-      const tmp = new THREE.Group(); const ns = buildInstanced(gm, items, fitKey, tmp); if (proxied) for (const { im } of ns) im.castShadow = false;
+      const tmp = new THREE.Group(); const ns = buildInstanced(gm, items, fitKey, tmp, `${id}:hi`); if (proxied) for (const { im } of ns) im.castShadow = false;
       await warm(tmp);
       for (const { im } of E.sets) group.remove(im);
       for (const { im } of ns) group.add(im);
@@ -258,7 +267,7 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
   if (E.cull || E.upgrade) INST.push(E);
   return group;
 }
-function buildInstanced(g, items, fitKey, group) {
+function buildInstanced(g, items, fitKey, group, name = '') {
   const root = g.scene;
   root.updateMatrixWorld(true);
   const { box, size } = sizeOf(root);
@@ -268,7 +277,7 @@ function buildInstanced(g, items, fitKey, group) {
   const sets = [];
   root.traverse((o) => {
     if (!o.isMesh) return;
-    const im = new THREE.InstancedMesh(o.geometry, o.material, items.length);
+    const im = new THREE.InstancedMesh(o.geometry, o.material, items.length); im.name = name;
     im.castShadow = true; im.receiveShadow = true;
     const all = new Float32Array(items.length * 16);
     items.forEach((it, i) => {
@@ -299,13 +308,15 @@ function tickInstances(px, pz) {
     }
     if (!E.cull || Math.hypot(px - E.lx, pz - E.lz) < 20) continue;
     E.lx = px; E.lz = pz;
-    const keep = [];
-    E.items.forEach((it, i) => { if (Math.hypot(it.x - px, it.z - pz) < E.cut) keep.push(i); });
-    for (const { im, all } of E.sets) {
+    const keep = [], far = [], sh = [];
+    // bóng: camera bóng phủ ±45 m quanh người chơi → bản sao ngoài 80 m không đổ bóng (trước đây cả thế giới vào lượt bóng)
+    E.items.forEach((it, i) => { const d = Math.hypot(it.x - px, it.z - pz); if (d < E.cut) (E.far && d > E.farD ? far : keep).push(i); if (d < 80) sh.push(i); });
+    const fill = (sets, list) => { for (const { im, all } of sets) {
       const dst = im.instanceMatrix.array;
-      keep.forEach((i, n) => dst.set(all.subarray(i * 16, i * 16 + 16), n * 16));
-      im.count = keep.length; im.visible = keep.length > 0; im.instanceMatrix.needsUpdate = true;
-    }
+      list.forEach((i, n) => dst.set(all.subarray(i * 16, i * 16 + 16), n * 16));
+      im.count = list.length; im.visible = list.length > 0; im.instanceMatrix.needsUpdate = true;
+    } };
+    fill(E.sets, keep); if (E.far) fill(E.far, far); if (E.shadow) fill(E.shadow, sh);
   }
 }
 

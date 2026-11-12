@@ -111,9 +111,37 @@ Manifest này đi theo hướng đó, đo bằng số, không hứa suông.
 - [x] Ảnh sân Sơn Môn trước / sau (`shots/gfx/cmp-start.png`) đủ mọi vật sau khi gộp.
 - [x] 35/35 `test-game-*` xanh, build xanh.
 
+### Đợt 2 (2026-11-12)
+
+- **Bộ nhân bản công trình (`assets.instanceModel`):**
+  - Mỗi bản sao xa hơn max(6 × cỡ, 70 m) dùng `.vc2`.
+  - Bộ bóng nhẹ chỉ giữ bản sao trong 80 m (camera bóng phủ ±45 m). Trước đây mọi bản sao trên thế giới đều vào lượt bóng.
+- **Đo nguyên nhân chậm ở sân Sơn Môn** (`window.__hq.renderer.webgl`):
+  - Hạ tỉ lệ điểm ảnh 1 → 0,6: 23 → 34 fps. Vậy **nghẽn ở khâu tô điểm ảnh**.
+  - Đóng băng bóng: +5 fps. Bỏ 4 đèn điểm: +2 fps (ngang nhiễu).
+  - Tắt riêng khu Sơn Môn: +12 fps; tắt địa hình: +8.
+  - Shader địa hình (khoảng 15 lượt đọc texture) giữ nguyên, vì người dùng đã chọn «giữ hình».
+- **Độ phân giải động** (`render3d.js`):
+  - Đích khoảng 40 fps: hạ 10 % khi < 36 fps, nâng khi > 52 fps, sàn 0,7.
+  - Trước đây ngưỡng 27 / 48 nên game đứng yên ở 27–35 fps, đúng mức người dùng than.
+  - Ở bậc 1, bản đồ bóng vẽ lại cách một khung.
+- **Đo như máy người dùng** (không ép mức đồ hoạ, game tự chọn «vừa» và tự hạ bậc; so bản live a84482d6 với bản mới):
+
+| Điểm | Live a84482d6 | Bản mới |
+|---|---|---|
+| Sân Sơn Môn | 31 fps · 3,64 tr tam giác · 677 lệnh vẽ | **38 fps** · 2,62 tr · 416 |
+| Phố | 43 fps | **60 fps** (trần) · 1,74 tr |
+
+  - Ảnh trước / sau giống hệt: `shots/gfx/cmp-auto-01-start.png`.
+- **G-8.3, camera không chui vào mái** (đạt):
+  - Mỗi khung dò 14 điểm từ đầu nhân vật tới camera qua `obstacles.tallTopAt`. Gặp vật cao thì kéo camera vào, gần nhất 2,4 m; hết chặn thì lùi ra từ từ.
+  - Bỏ qua: vật đang trùm hoặc đỡ nhân vật (cổng, mái đang đứng), trong điện, trong gian biệt phủ, trên trời.
+  - Ảnh `shots/gfx/cam3-sheet.png`: Sơn Môn bình thường, lòng cổng thấy nhân vật, phố nhìn qua mái.
+- 35/35 `test-game-*` xanh, build xanh.
+
 ## 5. Goal tiếp (sau khi đạt mục 4)
 
-- **G-8.1:** sân Sơn Môn ≤ 2,2 triệu tam giác. Còn 3,84 triệu: phần lớn là `.vc` 9k của công trình trong 110 m và bản gốc trong `nearDist` (tối đa 150 m). Bước kế: thu `nearDist` về 2 × cỡ (tối đa 90 m), nướng `.bk` cho công trình dùng gần (hall_main, gate_sect, palace_grand…), đo lại.
+- **G-8.1** (đợt 2: 2,62 triệu tam giác, 38 fps khi tự chỉnh — tam giác chưa tới 2,2 triệu, nhưng fps đã qua đích ≥ 24): sân Sơn Môn ≤ 2,2 triệu tam giác. Còn lại: phần lớn là `.vc` 9k của công trình trong 110 m và bản gốc trong `nearDist` (tối đa 150 m). Bước kế: thu `nearDist` về 2 × cỡ (tối đa 90 m), nướng `.bk` cho công trình dùng gần (hall_main, gate_sect, palace_grand…), đo lại.
 - **G-8.4:** sửa 4 model loại trừ bằng tay trong Blender (xoá mặt gập chồng trước khi giảm lưới), hoặc thay model.
 - **G-8.2:** AO màn hình (GTAO) ở mức cao, chỉnh màu (color grading) theo giờ, trời chiều tà dịu.
-- **G-8.3:** camera không chui vào mái (va chạm camera với nhà gần).
+- ~~**G-8.3:** camera không chui vào mái~~ — xong đợt 2.
