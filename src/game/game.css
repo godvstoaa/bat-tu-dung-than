@@ -653,3 +653,6 @@ select.hq-input { width: auto; max-width: 100%; }
 /* dải báo máy chậm (render3d.suggestLow) — hỏi trước khi chuyển đồ hoạ nhẹ, không tự tải lại */
 .hq-lowq { position: absolute; left: 50%; top: 72px; transform: translateX(-50%); z-index: 40; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center; max-width: min(92vw, 640px); padding: 10px 12px; border-radius: 12px; background: rgba(24, 18, 14, 0.92); border: 1px solid var(--hq-gold); color: #f3e7cf; font-size: 13px; }
 .hq-lowq span { flex: 1 1 260px; }
+
+/* ô đo fps (game.html?fps) */
+.hq-fps { position: fixed; top: 6px; left: 50%; transform: translateX(-50%); z-index: 60; padding: 2px 10px; border-radius: 10px; background: rgba(10, 8, 20, 0.72); color: #f3e3b5; font: 600 13px/1.6 system-ui, sans-serif; pointer-events: none; }

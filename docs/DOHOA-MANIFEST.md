@@ -179,6 +179,11 @@ Manifest này đi theo hướng đó, đo bằng số, không hứa suông.
   - Mục «sửa §3.4» của đợt 3 không còn cần: ngân sách gốc đã đạt.
 - 35/35 `test-game-*` xanh, build xanh.
 
+### Số đo trên máy người dùng (2026-11-12)
+
+- **Người dùng báo «đang 56 rồi»** sau 4 đợt (lúc đầu 25–30 fps). Đạt và vượt đích khoảng 40 fps của độ phân giải động.
+- Thêm ô đo fps cho người chơi tự kiểm: mở `game.html?fps`, góc trên hiện «fps · mức đồ hoạ · tỉ lệ điểm ảnh», cập nhật mỗi giây.
+
 ## 5. Goal tiếp (sau khi đạt mục 4)
 
 - ~~**G-8.1**~~ — đạt đợt 4 (2,08 triệu). Ghi chép cũ: (đợt 2: 2,62 triệu tam giác, 38 fps khi tự chỉnh — tam giác chưa tới 2,2 triệu, nhưng fps đã qua đích ≥ 24): sân Sơn Môn ≤ 2,2 triệu tam giác. Còn lại: phần lớn là `.vc` 9k của công trình trong 110 m và bản gốc trong `nearDist` (tối đa 150 m). Bước kế: thu `nearDist` về 2 × cỡ (tối đa 90 m), nướng `.bk` cho công trình dùng gần (hall_main, gate_sect, palace_grand…), đo lại.

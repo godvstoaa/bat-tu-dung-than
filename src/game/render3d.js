@@ -217,6 +217,14 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // --- THẾ GIỚI MỞ Huyền Giới: địa hình 2048², trời tán xạ, nước, rừng (docs/DAI-THE-GIOI-DESIGN.md)
   const quality = pickQuality(coarse, renderer);
   document.documentElement.dataset.hqQuality = quality; /* để kiểm / hỗ trợ: xem mức đồ hoạ đang dùng */
+  // ô đo fps cho người chơi tự kiểm (docs/DOHOA-MANIFEST.md): mở game.html?fps — fps · mức đồ hoạ · tỉ lệ điểm ảnh, cập nhật mỗi giây
+  if (new URLSearchParams(location.search).has('fps')) {
+    const box = document.createElement('div'); box.className = 'hq-fps'; document.body.appendChild(box);
+    let n = 0, t0 = performance.now();
+    const QN = { low: 'thấp', mid: 'vừa', high: 'cao', ultra: 'rất cao' };
+    const tick = () => { n++; const now = performance.now(); if (now - t0 >= 1000) { box.textContent = `${Math.round(n * 1000 / (now - t0))} fps · ${QN[quality] || quality} · ${renderer.getPixelRatio().toFixed(2)}×`; n = 0; t0 = now; } requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }
   /* dựng hình bằng CPU: chi phí tỉ lệ số điểm ảnh → ½ độ phân giải (¼ điểm ảnh) + không bóng đổ (đỡ một lượt vẽ cả cảnh) */
   const softGl = !!document.documentElement.dataset.hqSoftGl;
   if (softGl || quality === 'low') renderer.shadowMap.enabled = false; /* mức thấp: không bóng đổ ngay từ đầu (lượt bóng vẽ lại cả cảnh gần ~ +40% tam giác); tắt lúc đầu không phải biên dịch lại shader */
