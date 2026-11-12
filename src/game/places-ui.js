@@ -15,7 +15,7 @@ import { zones as jobZones } from './jobzones.js';
 import { stations as cartStations, gates as cityGates, districtOf, districts, streets } from './citylayout.js';
 import { docks } from './boats.js';
 import { estates } from './mansions.js';
-import { heavenLayout, HEAVEN } from './heaven.js';
+import { heavenLayout, HEAVEN, THIEN_THE } from './heaven.js';
 import { VILLA_DISTRICT_NAME, STYLES, VILLA_STYLES } from './estate-layout.js';
 import { fmt as fmtCoin } from './coins.js';
 
@@ -148,6 +148,7 @@ export function rowsOf(tab, ctx) {
     for (const g of cityGates()) row({ ic: '🚪', name: `Cổng ${g.name}`, sub: area(g.x, g.z), x: g.x - g.ax * 6, z: g.z - g.az * 6 });
     head('Nơi đặc biệt');
     row({ ic: '⛰', name: 'Sơn Môn', sub: 'Sân trước Chính Điện Tam Thanh', home: true, free: false });
+    row({ ic: '🪜', name: 'Thiên Thê', sub: 'Thang mây ngoài tường Đông Sơn Môn — lối đi bộ lên Cửu Trọng Thiên', x: THIEN_THE.x, z: THIEN_THE.z + 6 });
     const H = heavenLayout(); row({ ic: '☁', name: HEAVEN.name, sub: 'Nam Thiên Môn · 9 tiên phủ · miễn phí', x: H.arrive.x, z: H.arrive.z, free: true, label: '☁ Thăng thiên — Cửu Trọng Thiên', sub2: 'Mây trắng nâng gót, Nam Thiên Môn hiện dần…' });
     return R;
   }
