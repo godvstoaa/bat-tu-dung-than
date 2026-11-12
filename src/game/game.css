@@ -650,3 +650,6 @@ select.hq-input { width: auto; max-width: 100%; }
 .hq-est-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .hq-est-chips label { display: inline-flex; gap: 4px; align-items: center; font-size: 13px; }
 .hq-est-chips .hq-chip.on { border-color: var(--hq-gold); color: var(--hq-gold); }
+/* dải báo máy chậm (render3d.suggestLow) — hỏi trước khi chuyển đồ hoạ nhẹ, không tự tải lại */
+.hq-lowq { position: absolute; left: 50%; top: 72px; transform: translateX(-50%); z-index: 40; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center; max-width: min(92vw, 640px); padding: 10px 12px; border-radius: 12px; background: rgba(24, 18, 14, 0.92); border: 1px solid var(--hq-gold); color: #f3e7cf; font-size: 13px; }
+.hq-lowq span { flex: 1 1 260px; }

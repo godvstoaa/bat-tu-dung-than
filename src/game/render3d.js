@@ -201,6 +201,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // v4: máy hết bộ nhớ đồ họa (WebGL mất ngữ cảnh — trình duyệt hay báo «xảy ra sự cố») → tự tải lại ở mức THẤP thay vì treo / sập
   canvas.addEventListener('webglcontextlost', (e) => {
     e.preventDefault();
+    console.warn('[huyenquan] mất ngữ cảnh WebGL — tải lại ở mức thấp');
     try { if (localStorage.getItem('huyenquan:quality') !== 'low') { localStorage.setItem('huyenquan:quality', 'low'); localStorage.setItem('huyenquan:autoLow', '1'); setTimeout(() => location.reload(), 300); return; } } catch (err) { /* ignore */ }
     const d = document.createElement('div'); d.className = 'hq-loading'; d.style.zIndex = 99; d.textContent = 'Máy hết bộ nhớ đồ họa — đóng bớt tab / ứng dụng khác rồi tải lại trang.'; document.body.appendChild(d);
   }, false);
@@ -771,7 +772,16 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   // [F6 audit] seed ngày bark dựng MỘT LẦN mỗi ngày (so ba số ngày trước khi
   // lắp chuỗi + padStart) — không cấp phát chuỗi mỗi khung hình
   let barkDay = { y: -1, m: -1, d: -1 }, barkDayKey = '';
-  let fpsAcc = 0, fpsN = 0, fpsT = 0, lowQuality = false, degrade = 0, firstT = null, lastReal = 0;
+  // máy quá chậm ở bậc hạ 2: dải báo hỏi người chơi có chuyển đồ hoạ nhẹ (tải lại) không — mỗi phiên hỏi một lần
+  function suggestLow(fps) {
+    if (document.querySelector('.hq-lowq')) return;
+    const d = document.createElement('div'); d.className = 'hq-lowq';
+    d.innerHTML = `<span>Máy đang chậm (~${Math.round(fps)} khung/giây). Chuyển đồ hoạ nhẹ cho mượt? Trang sẽ tải lại, về chỗ cũ.</span><button type="button" class="hq-btn hq-primary" data-a="ok">Chuyển đồ hoạ nhẹ</button><button type="button" class="hq-btn" data-a="no">Để nguyên</button>`;
+    d.querySelector('[data-a=ok]').onclick = () => { try { localStorage.setItem('huyenquan:quality', 'low'); localStorage.setItem('huyenquan:autoLow', '1'); } catch (err) { /* ignore */ } location.reload(); };
+    d.querySelector('[data-a=no]').onclick = () => d.remove();
+    (canvas.closest('.hq-root') || document.body).appendChild(d);
+  }
+  let fpsAcc = 0, fpsN = 0, fpsT = 0, lowQuality = false, degrade = 0, firstT = null, lastReal = 0, jumpX = null, jumpZ = 0, quietUntil = 0, slowRuns = 0;
   let dynPR = 1; // độ phân giải động (sau bậc hạ 1): 0,6–1 × — máy nghẽn ở khâu tô điểm ảnh (đo 2026-11-12: ¼ điểm ảnh → +33 % fps)
   const tmpV = new THREE.Vector3();
   const tmpV2 = new THREE.Vector3();
@@ -1360,9 +1370,14 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     /* bỏ khung giật đơn lẻ (> 1 s) — KHÔNG bỏ khung chậm thường xuyên: máy rất yếu (2–4 fps) trước đây không bao giờ được hạ */
     /* đo bằng đồng hồ THẬT: dt từ vòng lặp đã bị kẹp ≤ 0,05 s (vật lý) nên máy 3 fps vẫn «đo» ra 20 fps, không bao giờ được hạ */
     const realNow = performance.now(), rdt = lastReal ? (realNow - lastReal) / 1000 : 0; lastReal = realNow;
-    if (t - firstT > 8 && rdt > 0 && rdt < 1) { fpsAcc += rdt; fpsN++; fpsT += rdt; }
+    // vừa dịch chuyển (xe, menu Địa điểm, thăng thiên…): 15 s đầu đang nạp vùng mới — khung chậm KHÔNG tính là máy yếu
+    // (bản live 2026-11-12: nạp vùng sau dịch chuyển < 12 fps một cửa sổ 3 s → tự tải lại trang về màn cổng giữa chừng)
+    if (jumpX != null && Math.hypot(w.x - jumpX, w.z - jumpZ) > 50) { quietUntil = realNow + 15000; fpsAcc = fpsN = fpsT = 0; }
+    jumpX = w.x; jumpZ = w.z;
+    if (t - firstT > 8 && realNow > quietUntil && rdt > 0 && rdt < 1) { fpsAcc += rdt; fpsN++; fpsT += rdt; }
     if (fpsT > 3) {
       const fps = fpsN / fpsAcc;
+      if (fps >= 12) slowRuns = 0;
       // hạ theo bậc — bóng đổ giữ tới cùng (tắt bóng làm cả cảnh phẳng, «giả» hẳn):
       // bậc 1: độ phân giải 1×, tắt bloom/hạt bụi, cỏ còn ½, bóng 1024 · bậc 2: tắt bóng
       if (qualityForced) { /* người chơi chọn mức đồ hoạ: không tự hạ bậc (chỉ độ phân giải động ở mức thấp, dưới đây) */ }
@@ -1373,9 +1388,10 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       } else if (fps < 24 && degrade === 1) {
         // KHÔNG tắt shadowMap (tắt = biên dịch lại mọi shader, đứng hình 1–2 s): giữ bóng nhưng chỉ vẽ lại bản đồ bóng thưa
         degrade = 2; renderer.shadowMap.autoUpdate = false;
-      } else if (fps < 12 && degrade === 2 && quality !== 'low') {
+      } else if (fps < 12 && degrade === 2 && quality !== 'low' && ++slowRuns >= 2) { // hai cửa sổ liền (6 s) mới tải lại
         // vẫn quá chậm: tải lại ở mức THẤP (ít nhà chi tiết, tầm nhìn ngắn) — một lần, người chơi được báo khi vào lại
-        degrade = 3; try { localStorage.setItem('huyenquan:quality', 'low'); localStorage.setItem('huyenquan:autoLow', '1'); setTimeout(() => location.reload(), 300); } catch (err) { /* ignore */ }
+        // KHÔNG tự tải lại nữa (người chơi bị đá về màn cổng giữa chừng — bản live 2026-11-12): hỏi bằng dải báo, đồng ý mới tải lại
+        degrade = 3; console.warn(`[huyenquan] fps ${fps.toFixed(1)} hai cửa sổ liền — đề nghị chuyển mức thấp`); suggestLow(fps);
       }
       // ĐỘ PHÂN GIẢI ĐỘNG (sau bậc 1): fps < 27 → bớt 15 % tỉ lệ điểm ảnh (tối thiểu 0,6); fps > 48 → nâng lại (tối đa 1).
       // Mỗi cửa sổ đo 3 s một bước — không nhấp nháy; hình mờ hơn chút nhưng mượt hơn rõ trên máy đồ hoạ tích hợp.
@@ -1507,6 +1523,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     },
     setDebugCam(v) { debugCam = v; },
     // Kiểm thử / ảnh chụp: đặt góc nhìn camera
+    suggestLow, // gỡ lỗi: hiện dải báo máy chậm
     setView({ yaw, pitch, dist } = {}) { if (yaw != null) { cam.yaw = cam.yawGoal = yaw; } if (pitch != null) cam.pitch = pitch; if (dist != null) cam.dist = dist; },
   };
 }
