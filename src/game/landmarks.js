@@ -2,7 +2,7 @@
 //  HUYỀN GIỚI — kiến trúc ĐẠI QUY MÔ theo vùng (docs/DAI-THE-GIOI-DESIGN.md §C1, §F).
 //  Quần thể = nền đá bậc cấp khổng lồ + công trình «trùm» siêu chi tiết (Meshy 4K) + điện phụ,
 //  tháp, cổng. Công trình trùm chưa có → dùng mô hình thường phóng to (fallback), không lỗi.
-//  Mỗi vùng chỉ nạp khi người chơi tới gần (≤ 900 m) — tiết kiệm bộ nhớ iPhone.
+//  Mỗi vùng chỉ nạp khi người chơi tới gần (≤ 1500 m — LOAD_R dòng ~444) — tiết kiệm bộ nhớ iPhone.
 // ============================================================================
 import * as THREE from 'three';
 import * as T from './terrain.js';
@@ -192,7 +192,12 @@ const SPOTS = [
     await place(g, ['lib_tieu_quan', 'lib_mtn_house', 'tea_pavilion'], { solid: false, fit: { width: 13 }, at: { x: 170, y: T.SKY_Y, z: 75, ry: faceTo(170, 75, 0, 0) } });
     await place(g, ['lib_noi_that', 'scholar_desk'], { solid: false, fit: { width: 22 }, at: { x: -150, y: T.SKY_Y, z: -25, ry: faceTo(-150, -25, -170, -40) } }); // bộ đạo cụ trước Đại Sảnh
     // 8 đĩa đảo còn lại: MỘT nhóm nhân bản (Ø 264/183 — rộng hơn mảng bát giác R 130/90 nên không đi trên không ngoài đĩa)
-    const discs = T.SKY_DISTRICT.slice(1).map((s, i) => ({ x: s.x, y: T.SKY_Y - 63.52 * ((s.r > 100 ? 264 : 183) / 264), z: s.z, ry: (i * 2.4) % (Math.PI * 2), s: s.r > 100 ? 264 : 183 }));
+    // ry từng đĩa (F1): lan can sân dao_vua chỉ chừa 2 miệng cầu ±Z model (gen_dao_vua.py) — đĩa neo cầu
+    // (quanthinh/thudao/laungoc/thiendan: 4 đầu ngoài của SKY_BRIDGES) xoay sao cho MỘT miệng hướng thẳng
+    // ra đầu cầu trên đĩa đó (đổ bộ → đi thẳng vào sân qua miệng, lan can không chắn); đĩa không cầu giữ
+    // ry trang trí (i*2.4)%2π cũ. atan2(dx, dz) quay +Z local → hướng tâm-đĩa→đầu-cầu (quy ước local() dòng 123).
+    const discRy = (s, i) => { for (const b of T.SKY_BRIDGES) for (const e of [b.a, b.b]) if (Math.hypot(e.x - s.x, e.z - s.z) < s.r) return Math.atan2(e.x - s.x, e.z - s.z); return (i * 2.4) % (Math.PI * 2); };
+    const discs = T.SKY_DISTRICT.slice(1).map((s, i) => ({ x: s.x, y: T.SKY_Y - 63.52 * ((s.r > 100 ? 264 : 183) / 264), z: s.z, ry: discRy(s, i), s: s.r > 100 ? 264 : 183 }));
     const discId = await firstAvailable(['lib_dao_vua']);
     if (discId) await instanceModel(g, discId, discs, { fitKey: 'width' });
     else await instanceModel(g, 'rock_island', discs.map((d) => ({ ...d, y: T.SKY_Y - 30, s: d.s * 1.1 })), { fitKey: 'max' }); // pack chưa xong: đảo đá sẵn có thay tạm (đáy chìm dưới nền, đỉnh nhô qua mặt sân)

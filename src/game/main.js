@@ -1449,7 +1449,7 @@ export function startGame({ onExit = null } = {}) {
         if (r.st) { panel.close(); teleportTo(r.st); return; }
         if (r.act === 'edit') { const own = I.homeState(state).own; if (own) api.openHomeEdit(own.h); return; }
         if (r.home) { const p = tileToWorld(START.x, START.y); rideTo(p.x, p.z, '⛰ Về Sơn Môn', { free: r.free }); return; }
-        if (r.x != null) rideTo(r.x, r.z, r.label || `🐎 Xe ngựa tới ${r.name}`, { free: !!r.free, sub: r.sub2 });
+        if (r.x != null) rideTo(r.x, r.z, r.label || `🐎 Xe ngựa tới ${r.name}`, { free: !!r.free, sub: r.sub2, targetY: r.y ?? null }); // r.y: cao độ điểm đến (vd quận trời 460) — đi kèm free như Vân Thang §5.6
       },
     }) })).catch((e) => { console.error(e); toast('Chưa mở được menu địa điểm.'); });
   }

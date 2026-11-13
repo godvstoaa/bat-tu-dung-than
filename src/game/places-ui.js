@@ -16,6 +16,7 @@ import { stations as cartStations, gates as cityGates, districtOf, districts, st
 import { docks } from './boats.js';
 import { estates } from './mansions.js';
 import { heavenLayout, HEAVEN, THIEN_THE } from './heaven.js';
+import { SKY_ARRIVE } from './world.js'; // điểm tới đảo chủ quận trời (x, z, y 460 — Vân Thang)
 import { VILLA_DISTRICT_NAME, STYLES, VILLA_STYLES } from './estate-layout.js';
 import { fmt as fmtCoin } from './coins.js';
 
@@ -46,7 +47,7 @@ const nearest = (list, me, n, pos = (o) => o) => list.map((o) => { const p = pos
 const area = (x, z) => { if (Math.abs(x - HEAVEN.cx) < HEAVEN.half && Math.abs(z - HEAVEN.cz) < HEAVEN.half) return HEAVEN.name; const d = districtOf(x, z), id = typeof d === 'string' ? d : d?.id; return d?.name || districts().find((q) => q.id === id)?.name || ''; };
 
 /**
- * Các dòng của một thẻ. Dòng: { ic, name, sub, x, z, free?, label?, sub2?, st? (trạm cũ → teleport), act?, head? }
+ * Các dòng của một thẻ. Dòng: { ic, name, sub, x, z, y? (targetY — cao độ điểm đến, vd quận trời 460), free?, label?, sub2?, st? (trạm cũ → teleport), act?, head? }
  * ctx: { me(), own, homeSpot(), estateInfo(h), contract, stations, icon, deskDone(id), level }
  */
 export function rowsOf(tab, ctx) {
@@ -150,6 +151,7 @@ export function rowsOf(tab, ctx) {
     row({ ic: '⛰', name: 'Sơn Môn', sub: 'Sân trước Chính Điện Tam Thanh', home: true, free: false });
     row({ ic: '🪜', name: 'Thiên Thê', sub: 'Thang mây ngoài tường Đông Sơn Môn — lối đi bộ lên Cửu Trọng Thiên', x: THIEN_THE.x, z: THIEN_THE.z + 6 });
     const H = heavenLayout(); row({ ic: '☁', name: HEAVEN.name, sub: 'Nam Thiên Môn · 9 tiên phủ · miễn phí', x: H.arrive.x, z: H.arrive.z, free: true, label: '☁ Thăng thiên — Cửu Trọng Thiên', sub2: 'Mây trắng nâng gót, Nam Thiên Môn hiện dần…' });
+    row({ ic: '🪷', name: 'Thiên Bàn · Quận Đảo Bay', sub: 'Đảo chủ 9 đĩa trời · cầu vân B1–B4 · miễn phí', x: SKY_ARRIVE.x, z: SKY_ARRIVE.z, y: SKY_ARRIVE.y, free: true, label: '☁ Vân thang — Thiên Bàn Đảo', sub2: 'Mây dưới chân dần đặc lại, Nam Môn quận trời hiện ra…' }); // y 460 = targetY tới đảo chủ (khuôn Vân Thang main.js — rideTo targetY)
     return R;
   }
   return R;

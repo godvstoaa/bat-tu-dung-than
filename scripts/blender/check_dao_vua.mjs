@@ -5,6 +5,15 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'meshoptimizer';
 import fs from 'node:fs';
 
+// Node không có DOM: GLTFLoader (three 0.170) nhánh EXT_texture_webp gọi `new Image()` dò hỗ trợ
+// (detectSupport) và self.URL trong loadImageSource → 'Image is not defined' làm sập cả parse.
+// Script chỉ đo HÌNH HỌC nên stub tối tiểu: self = globalThis, Image stub onload async height 1 →
+// webp đi tiếp vào loadTextureImage, ở đó lỗi nạp ảnh (TextureLoader cần document) bị .catch(()=>null)
+// nuốt thành texture null — geometry vẫn đo đủ. (BỎ plugin webp KHÔNG được: nhánh fallback
+// parser.loadTexture sập "reading 'uri'" vì texture webp không có source JSON — đã thử thực nghiệm.)
+globalThis.self = globalThis;
+globalThis.Image = class { constructor() { this.width = 0; this.height = 0; } set src(v) { this._s = v; queueMicrotask(() => { this.height = 1; if (this.onload) this.onload(); }); } get src() { return this._s; } };
+
 const files = process.argv.slice(2);
 const loader = new GLTFLoader();
 loader.setMeshoptDecoder(MeshoptDecoder);
