@@ -1,0 +1,7 @@
+[{"name":"in-nam","x":0,"z":2050,"wait":20000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.08,dist:12,yaw:3.14159})"},
+{"name":"out-nam","x":0,"z":2215,"wait":12000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.12,dist:14,yaw:0})"},
+{"name":"wall-side","x":300,"z":2060,"wait":12000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.1,dist:14,yaw:3.14159})"},
+{"name":"wall-out-side","x":300,"z":2200,"wait":10000,"eval":"window.__hq.renderer.setView({pitch:0.15,dist:20,yaw:0.4})"},
+{"name":"aerial","x":0,"z":2050,"wait":6000,"eval":"window.__hq.renderer.setView({pitch:0.6,dist:160,yaw:2.6})"},
+{"name":"corner","x":760,"z":1900,"wait":12000,"eval":"window.__hq.renderer.setView({pitch:0.25,dist:60,yaw:2.4})"},
+{"name":"stats","x":0,"z":2050,"wait":3000,"eval":"(()=>{let n=0,t=0;window.__hq.renderer.scene.traverse(o=>{if(o.isMesh&&o.name&&o.name.startsWith('wall-')){n++;const g=o.geometry;const c=(g.index?g.index.count:g.attributes.position.count)/3;t+=c*(o.isInstancedMesh?o.count:1);}});return 'wall meshes '+n+' tris '+Math.round(t)})()"}]

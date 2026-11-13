@@ -1,0 +1,6 @@
+[{"name":"thuong2","x":5850,"z":1300,"wait":14000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.25,dist:45,yaw:-1.57})"},
+{"name":"side","x":5760,"z":1300,"wait":6000,"eval":"window.__hq.renderer.setView({pitch:0.02,dist:70,yaw:-0.6})"},
+{"name":"centre","x":5646,"z":1371,"wait":8000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.3,dist:60,yaw:0})"},
+{"name":"menu-eat","x":0,"z":60,"wait":9000,"eval":"window.__hq.api.openPlaces(\"eat\")"},
+{"name":"menu-work","x":0,"z":60,"wait":1500,"eval":"window.__hq.api.openPlaces(\"work\")"},
+{"name":"map","x":-1500,"z":1200,"wait":6000,"eval":"(async()=>{window.__hq.api.panel?.close?.(); await window.__hq.api.openCityMap(); })()"}]

@@ -1,0 +1,2 @@
+[{"name":"live-sky","x":5646,"z":1371,"wait":20000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.3,dist:60,yaw:0})"},
+{"name":"live-menu","x":5646,"z":1371,"wait":1500,"eval":"window.__hq.api.openPlaces(\"estate\")"}]

@@ -1,0 +1,2 @@
+[{"name":"quan","x":5646,"z":1371,"wait":16000,"stats":true,"eval":"(()=>{window.__hq.renderer.setView({pitch:0.3,dist:60,yaw:0});let n=0,t=0;window.__hq.renderer.scene.getObjectByName('heaven').traverse(o=>{if(o.isMesh&&o.visible){n++;const g=o.geometry;const c=(g.index?g.index.count:g.attributes.position.count)/3;t+=c*(o.isInstancedMesh?o.count:1);}});return 'heaven meshes '+n+' tris '+Math.round(t)})()"},
+{"name":"viem","x":5646,"z":1460,"wait":8000,"eval":"window.__hq.renderer.setView({pitch:0.22,dist:50,yaw:3.14})"}]

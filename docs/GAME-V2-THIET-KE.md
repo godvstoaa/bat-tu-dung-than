@@ -124,6 +124,8 @@ Mã: `cosmetics.js` (danh mục + logic, dùng chung client / máy chủ / test)
 
 **Tài nguyên kho hiện tại:** đã rà chốt — 94 file GLB / 48 id, không thiếu file, credit chỉ còn 7 → **chỉ tải về (GET/CC0), không tạo mới tốn credit**; nguyên tắc và lệnh kiểm xem `docs/GAME-MESHY-ASSET-PLAN.md`. Điện còn thiếu tượng (Huyền Nữ, Quỷ Cốc, Thủy Phủ) và kế hoạch dựng lại khi có tài nguyên: `docs/GAME-THIET-KE-CHOT.md` §4.
 
+**Quận đảo bay «Thiên Bàn»** (2026-11-14) dùng 8 asset `lib_*` **Blender thủ tục tự sinh** (không Meshy, không credit) — hướng dựng từng asset, quy ước nền bát giác / cầu vân y 460 và lối lên Vân Thang nằm ở `docs/GAME-TROI-THIET-KE.md`.
+
 ## 5. Kỹ thuật
 
 - **Nội thất:** `src/game/interior.js` dựng từ khai báo `ROOMS` (world.js: cửa, gốc, kích thước, tượng, NPC). Các điện đặt ngoài bản đồ trên biển mây (x 1500–1800); sàn là nền đi được (`addPlatform`), mép là nước nên không ra ngoài được. Trạm `door_<id>` / `exit_<id>` dịch chuyển vào/ra đúng cửa. Camera bị kẹp trong khung điện; đèn điểm chỉ lấy đèn cùng điện.
@@ -627,3 +629,27 @@ khắp nơi; thành nhỏ, nhà mặt đường chính trông như tiệm mà ch
 
 **Kiểm:** `test-game-fortune`, `test-game-spawn`, `test-game-city-v4` mới; viết lại `test-game-homes / items / mansion / water /
 motion / jobs` cho thành v4; ảnh chụp kiểm bằng `scripts/shot-city.mjs` (Playwright).
+
+### 2026-11-14 — Quận đảo bay «Thiên Bàn» ×50 — Blender thủ tục (đặc tả `docs/GAME-TROI-THIET-KE.md` bản 2)
+
+- **9 đảo** (`terrain.js › SKY_DISTRICT` — nguồn toạ độ duy nhất cho cảnh + nền + nhãn): đảo chủ Thiên Bàn Ø520 ôm quanh `sky_palace` cũ giữ nguyên làm tâm, 5 đảo R 130 (Quan Tinh, Thư Đạo, Lầu Ngọc, Thiên Đàn, Thiền Quán) + 3 đảo R 90 (Ứn Sĩ, Dược Viên, Vân Cảnh), **mặt nền cùng y 460**; 4 cầu vân B1–B4 nối đảo chủ ↔ 4 đảo gần, neo theo mép nền bát giác thật (`skyOctReach` — neo theo R−8 của đĩa sẽ hở 8–45 m tuỳ hướng). **Diện tích trải quận 2,361 km² = ×52,5** đảo cũ 45.000 m² (bao lồi nền bát giác, tính sẵn trong đặc tả §1.4); Σ nền đi được 0,50 km² (×11,2) + cầu 4.800 m² — hai số đều công khai, 9 đảo đúng cỡ không thể đạt 2,25 km² mặt phiến.
+- **8 asset `lib_*` Blender thủ tục mới** (`scripts/blender/gen_*.py` — không Meshy, không credit; gốc model đáy chạm mặt nền, UV theo mét). Tam giác từng bản (`scripts/blender/check_glb.mjs`):
+
+  | asset | vai trò | .glb tri | .lod tri | .glb |
+  |---|---|---|---|---|
+  | `lib_dao_vua` | đĩa đảo Ø264 gốc (s×2 = Ø520 đảo chủ / sØ183 đảo nhỏ) | 19.372 | 11.995 | 130 KB |
+  | `lib_dien_dai` | đại sảnh 9 gian | 13.232 | 11.978 | 86 KB |
+  | `lib_lau_cac` | lầu các 3 tầng (thư các s×0,8, lầu song sinh) | 9.544 | 9.544 | 69 KB |
+  | `lib_thien_dan` | đài tế tròn 3 tầng | 14.656 | 11.959 | 108 KB |
+  | `lib_tieu_quan` | tiểu quán 3 gian / thảo lư | 3.534 | 3.534 | 39 KB |
+  | `lib_cau_van` | cầu vân — cấu kiện 40 m (24 bản lặp) | 4.842 | 4.842 | 42 KB |
+  | `lib_nam_mon` | cổng Nam Môn quận | 7.156 | 7.156 | 37 KB |
+  | `lib_noi_that` | bộ đạo cụ nội thất | 20.822 | 13.319 | 125 KB |
+
+  Tổng bản `.glb` **93.158 tri / ~636 KB** (đặc tả ngân sách 251k — rộng rãi); `.hd` hiện trùng byte `.glb`, `.lod` của 4 asset nhỏ cũng trùng (chưa nấu riêng).
+- **Cơ chế nền đi bộ y cao**: mỗi đảo 2 lệnh `addPlatform` bát giác nội tiếp đĩa R (vuông √2·R + vuông xoay 45°, top 460 bot 455), mỗi cấu kiện cầu 1 nền 5×40 bot 457 — đều mang cờ `sky` mới trong `obstacles.js`: nền trời chỉ tính khi lời gọi biết cao độ người; mọi lời 2D (camera clamp, `blockedAt`, dân phố, cỏ) bỏ qua → spawn (3,43) dưới đảo chủ không bị kẹp camera 460, đi dưới đảo không bị nhấc. `render3d.js` bọc `world.groundY(x, z, y)` y-aware tại từng điểm dùng (avatar bay, vòng số phận, bảng hiệu, nhãn, dấu bàn), cỏ probe terrain; `world.js › nearestStation / openSpotNear` lọc trạm theo tầng `floorY` (|Δy| < 30) — trạm quán / bảng / cửa nhà dưới đảo không mở nhầm. Bay chuyển sang y3 thế giới thật: cất cánh nhấc từ nền đang đứng (đảo 460 → 478), tắt bay rơi từ đúng độ cao (`main.js › setFlying`); mọi tp đặt y3 tường minh (`placeAt(…, targetY)`, exit biệt thự về mép đảo 460).
+- **Access** (§3): lên duy nhất bằng **Vân Thang** trong sân quán (ô dò trống quanh −72,−18) → `rideTo(0, 205)` kèm targetY 460; **Hạ giới** trước Nam Môn đảo chủ (0, 245) về Sơn Môn. Bay từ đất không lên nổi quận (trần 420 < bot nền 455) — như Cửu Trọng Thiên.
+- **Nội thất**: 4 phòng mẫu «Biệt thự trên mây» (`interior.js`, mở từ `stations.js › openMay`, panel `.hq-may` mây trôi CSS) — Đại Sảnh (án thư + bình phong rồng + lư bạc sơn), Thư Các Trời, Thiền Điện (bồ đoàn ×6 + đỉnh trầm), Tiểu Quán; đạo cụ `.clone()` từng node từ `lib_noi_that`; cửa biệt thự khai `floorY 460` khớp lọc tầng.
+- **Render cảnh** (`landmarks.js`): đảo chủ SPOT `noMerge` — `lib_dao_vua` hero fit 520 qua `placeLod` (đáy 460 − 63,52×520/264), `sky_palace` giữ tâm, `lib_nam_mon` mép nam, `lib_dien_dai`, 2 `lib_tieu_quan`, bộ `lib_noi_that` trước sảnh; 8 đĩa còn lại MỘT nhóm `instanceModel` (s 264/183); 24 cấu kiện cầu vân s 46,45 sàn flush 460. Sửa `assets.js` bỏ rơi `EXT_mesh_gpu_instancing` của exporter Blender (lỗi cầu vân: GLB chứa 24 bản chỉ vẽ được 1/24). Đèn ấm + cột sáng mỗi đảo ngoài / đầu cầu (Vân Thang vàng son, đầu cầu lưu ly), nhãn tên 9 đảo ẩn ngoài 70 m.
+- **MMO cao độ tuyệt đối**: gói `mv` thêm `ay` (0–1000 m; client cũ → null) — `a` tương đối kẹp ≤ 420 không bao giờ chạm nền đảo 460 nên người trên đảo từng bị vẽ sai; `protocol.js` + `worker/quan-room.js` kiểm tra / chuyển phát `ay`.
+- **Kiểm (đã chạy hôm nay)**: `node scripts/test-game-sky.mjs` **44/44 đạt** (đứng tâm đảo không rơi, rời mép thì rơi, nền bát giác không vượt đĩa R + phủ mọi hướng ≥ 0,765·R, 4 cầu đi bằng moveFree không hở / không rơi, spawn 3,43 không kẹp 460, dưới gầm cầu không nhấc, rơi từ mép về terrain); `node scripts/blender/check_glb.mjs` **8/8 ok** (magic glTF, COLOR_0, ≤ 60k tri); `node scripts/test-quan-protocol.mjs` **15 đạt** (bổ sung `ay`).

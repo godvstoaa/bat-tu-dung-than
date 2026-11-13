@@ -278,21 +278,32 @@ function buildInstanced(g, items, fitKey, group, name = '') {
   const sets = [];
   root.traverse((o) => {
     if (!o.isMesh) return;
-    const im = new THREE.InstancedMesh(o.geometry, o.material, items.length); im.name = name;
-    im.castShadow = true; im.receiveShadow = true;
-    const all = new Float32Array(items.length * 16);
-    items.forEach((it, i) => {
-      const k = it.s / (ref || 1);
-      // dời gốc mô hình về (tâm x/z, đáy y), co giãn, xoay, đặt vào thế giới
-      base.makeTranslation(-center.x, -box.min.y, -center.z).premultiply(new THREE.Matrix4().makeScale(k, k, k));
-      q.setFromAxisAngle(up, it.ry || 0);
-      M.compose(new THREE.Vector3(it.x, it.y, it.z), q, new THREE.Vector3(1, 1, 1)).multiply(base).multiply(o.matrixWorld);
-      im.setMatrixAt(i, M); M.toArray(all, i * 16);
-    });
-    im.instanceMatrix.needsUpdate = true;
-    im.computeBoundingSphere();
-    group.add(im);
-    sets.push({ im, all });
+    // EXT_mesh_gpu_instancing (exporter Blender gộp linked-duplicate): từng instance nguồn là
+    // một bản sao THẬT của mẫu — trước đây chỉ dùng o.matrixWorld nên bỏ rơi cả o.instanceMatrix
+    // (lỗi cầu vân 2026-11-14: GLB chứa 24 bản chỉ vẽ được 1/24 nội dung). Lấy đủ ma trận nguồn.
+    const srcs = [];
+    if (o.isInstancedMesh && o.instanceMatrix) {
+      const im2 = new THREE.Matrix4();
+      for (let j = 0; j < o.count; j++) { o.getMatrixAt(j, im2); srcs.push(im2.clone().premultiply(o.matrixWorld)); }
+    } else srcs.push(o.matrixWorld.clone());
+    for (const sw of srcs) {
+      const im = new THREE.InstancedMesh(o.geometry, o.material, items.length); im.name = name;
+      im.castShadow = true; im.receiveShadow = true;
+      if (srcs.length > 1) im.frustumCulled = false; // bản nguồn dàn trải — khung bao geometry không phủ hết
+      const all = new Float32Array(items.length * 16);
+      items.forEach((it, i) => {
+        const k = it.s / (ref || 1);
+        // dời gốc mô hình về (tâm x/z, đáy y), co giãn, xoay, đặt vào thế giới
+        base.makeTranslation(-center.x, -box.min.y, -center.z).premultiply(new THREE.Matrix4().makeScale(k, k, k));
+        q.setFromAxisAngle(up, it.ry || 0);
+        M.compose(new THREE.Vector3(it.x, it.y, it.z), q, new THREE.Vector3(1, 1, 1)).multiply(base).multiply(sw);
+        im.setMatrixAt(i, M); M.toArray(all, i * 16);
+      });
+      im.instanceMatrix.needsUpdate = true;
+      im.computeBoundingSphere();
+      group.add(im);
+      sets.push({ im, all });
+    }
   });
   return sets;
 }
@@ -352,9 +363,17 @@ export async function instanceModelLod(parent, id, items, { fitKey = 'height', n
     const meshes = [];
     root.traverse((o) => {
       if (!o.isMesh) return;
-      const im = new THREE.InstancedMesh(o.geometry, o.material, items.length);
-      im.castShadow = true; im.receiveShadow = true; im.count = 0; im.frustumCulled = false;
-      meshes.push({ im, local: o.matrixWorld.clone() });
+      // cùng lỗi buildInstanced: không bỏ rơi instanceMatrix của EXT_mesh_gpu_instancing
+      const srcs = [];
+      if (o.isInstancedMesh && o.instanceMatrix) {
+        const m2 = new THREE.Matrix4();
+        for (let j = 0; j < o.count; j++) { o.getMatrixAt(j, m2); srcs.push(m2.clone().premultiply(o.matrixWorld)); }
+      } else srcs.push(o.matrixWorld.clone());
+      for (const local of srcs) {
+        const im = new THREE.InstancedMesh(o.geometry, o.material, items.length);
+        im.castShadow = true; im.receiveShadow = true; im.count = 0; im.frustumCulled = false;
+        meshes.push({ im, local });
+      }
     });
     return { meshes, ref, center, minY: box.min.y };
   };

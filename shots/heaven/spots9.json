@@ -1,0 +1,4 @@
+[{"name":"thienthe","x":56,"z":-150,"wait":14000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.15,dist:16,yaw:0})"},
+{"name":"thienthe-hi","x":56,"z":-150,"wait":2000,"eval":"window.__hq.renderer.setView({pitch:0.05,dist:30,yaw:0.5})"},
+{"name":"nhamon","x":56,"z":-150,"wait":1500,"eval":"import('/src/game/shop-ui.js').then(m=>{window.__hq.api.panel.open({title:'Sổ nhà đất',body:m.listingsView(window.__hq.api,true)});return 'ok'})"},
+{"name":"tien","x":5646,"z":1371,"wait":16000,"stats":true,"eval":"(()=>{window.__hq.renderer.setView({pitch:0.35,dist:70,yaw:0.6});return window.__hq.renderer.scene.children.length})()"}]

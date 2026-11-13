@@ -5,10 +5,10 @@
 // ============================================================================
 import { record } from './perf.js';
 import * as S from './state.js';
-import { STATIONS, START, findPath, stationAt, nearestStation, blockedAt, stationById, setDoorVerbHook, worldToTile, tileToWorld } from './world.js';
+import { STATIONS, START, findPath, stationAt, nearestStation, blockedAt, stationById, setDoorVerbHook, worldToTile, tileToWorld, SKY_ARRIVE } from './world.js';
 import { estateByH, mansionAt } from './mansions.js';
 import * as MO from './motion.js';
-import { ROOM_X0, cityOctDist } from './terrain.js';
+import { ROOM_X0, cityOctDist, heightAt } from './terrain.js';
 import * as LAW from './law.js';
 import * as PR from './prison.js';
 import { enableHd } from './characters.js';
@@ -80,6 +80,8 @@ export function startGame({ onExit = null } = {}) {
   let paused = false;
 
   const player = { x: START.x, y: START.y, face: 'up', moving: false, sitting: false, path: [], pending: null, name: '', robe: '土', gold: false, flying: false, alt: 0 };
+  // cao độ thế giới của người (mét) — dùng lọc trạm theo tầng (§5.7); null khi chưa có vật lý
+  const playerWorldY = () => player.phys?.y3 ?? null;
   const altCtl = { up: false, down: false };
   let target = null;
   let teaColor = null;
@@ -451,6 +453,10 @@ export function startGame({ onExit = null } = {}) {
       if (st.data?.id === 'up') { import('./heaven.js').then((H) => { const a = H.heavenLayout().arrive; rideTo(a.x, a.z, '☁ Thăng thiên — Cửu Trọng Thiên', { free: true, sub: 'Bậc mây nối bậc mây, Nam Thiên Môn hiện dần…' }); }); return; }
       placeAt(tileToWorld(START.x, START.y), '☁ Hạ phàm', 'Cưỡi mây trở về Sơn Môn…'); return;
     }
+    if (st.kind === 'spot' && st.room === 'sky') { // Vân Thang sân quán «Thăng thiên» · Nam Môn Thiên Bàn «Hạ giới» (GAME-TROI-THIET-KE §3 · §5.8)
+      if (st.data?.id === 'up') { rideTo(SKY_ARRIVE.x, SKY_ARRIVE.z, '☁ Vân Thang — Thiên Bàn Đảo', { free: true, sub: 'Mây dưới chân dần đặc lại, Nam Môn quận trời hiện ra…', targetY: SKY_ARRIVE.y }); return; }
+      placeAt(tileToWorld(START.x, START.y), '☁ Hạ giới', 'Cưỡi mây trở về Sơn Môn…'); return;
+    }
     if (st.kind === 'spot') {
       S.rollDay(state);
       import('./shop-ui.js').then((m) => {
@@ -487,7 +493,7 @@ export function startGame({ onExit = null } = {}) {
     player.replanned = false;
     player.pending = stationId;
     target = player.path.length ? player.path[player.path.length - 1] : null;
-    if (!player.path.length && stationId && nearestStation(player)?.id === stationId) openStation(stationId);
+    if (!player.path.length && stationId && nearestStation(player, 1.5, playerWorldY())?.id === stationId) openStation(stationId);
   }
 
   function walkToStation(st) { if (st) walkTo(st.spot, st.id); }
@@ -504,7 +510,7 @@ export function startGame({ onExit = null } = {}) {
     ov.innerHTML = `<div><b>${head}</b><span>${sub}</span></div>`;
     ($('hq-canvas')?.closest('.hq-root') || document.body).appendChild(ov);
     requestAnimationFrame(() => ov.classList.add('on'));
-    setTimeout(() => { player.x = st.to.x; player.y = st.to.y; player.path = []; target = null; player.face = 'up'; net.teleport(st.to.x, st.to.y); }, 500);
+    setTimeout(() => { player.x = st.to.x; player.y = st.to.y; player.path = []; target = null; player.face = 'up'; if (player.phys) { const w = tileToWorld(st.to.x, st.to.y); player.phys.y3 = st.toY3 != null ? st.toY3 : terrainY3(w.x, w.z); player.y3 = player.phys.y3; } net.teleport(st.to.x, st.to.y); }, 500); // toY3: đích khai sẵn cao độ (exit villa → mép đảo bay 460) — probe terrain sẽ bỏ nền đảo (bot 455 > terrain+1) mà thả người xuống phố
     setTimeout(() => ov.classList.remove('on'), 1000);
     setTimeout(() => ov.remove(), 1600);
     buzz('light');
@@ -537,7 +543,7 @@ export function startGame({ onExit = null } = {}) {
     api.tut?.('travel');
     if (player.sitting) return;
     if (player.flying && st.room) setFlying(false);
-    const go = () => { player.x = st.spot.x; player.y = st.spot.y; player.path = []; target = null; player.face = 'up'; net.teleport(st.spot.x, st.spot.y); };
+    const go = () => { player.x = st.spot.x; player.y = st.spot.y; player.path = []; target = null; player.face = 'up'; if (player.phys) { const w = tileToWorld(st.spot.x, st.spot.y); player.phys.y3 = terrainY3(w.x, w.z); player.y3 = player.phys.y3; } net.teleport(st.spot.x, st.spot.y); };
     // sảnh nghề ngoài thế giới: đi trạm (xe ngựa / đò) — màn chuyển ngắn rồi mới mở án
     if (st.world && !reduced) {
       const ov = document.createElement('div');
@@ -569,7 +575,21 @@ export function startGame({ onExit = null } = {}) {
     if (on && VE.garage(L).ride) VE.ride(L, null);
     if (player.sitting) return;
     player.flying = on;
-    player.alt = on ? Math.max(player.alt, 18) : 0;
+    // §5.5 GAME-TROI-THIET-KE: y3 là cao độ thế giới THẬT — cất cánh nhấc y3 lên đủ 18 m trên nền
+    // đang đứng (đảo 460 → 478, không phải terrain+18); hạ kiếm giữ nguyên y3 để rơi từ đúng độ cao.
+    if (on) {
+      const w0 = tileToWorld(player.x, player.y);
+      const P = player.phys || (player.phys = { x: w0.x, z: w0.z });
+      if (P.y3 == null) P.y3 = terrainY3(w0.x, w0.z);
+      const lift = Math.max(player.alt || 0, 18);
+      P.y3 += Math.max(0, lift - (player.alt || 0));
+      P.flyCap = null;
+      player.alt = lift;
+      player.y3 = P.y3;
+    } else {
+      player.alt = 0;
+      if (player.phys) player.phys.flyCap = null;
+    }
     player.path = []; target = null;
     $('hq-altpad').hidden = !on;
     $('hq-fly').classList.toggle('on', on);
@@ -610,7 +630,7 @@ export function startGame({ onExit = null } = {}) {
     if (e.code === 'KeyE' || e.code === 'Enter') {
       // Space/Enter trên nút HUD phải bấm nút đó, chỉ E mở gian bất kể focus.
       const onScene = document.activeElement === canvas || document.activeElement === document.body;
-      const st = nearestStation(player);
+      const st = nearestStation(player, 1.5, playerWorldY());
       if (st && !player.sitting && (e.code === 'KeyE' || onScene)) { e.preventDefault(); openStation(st.id); }
     }
   }
@@ -825,10 +845,13 @@ export function startGame({ onExit = null } = {}) {
     save(); updateHud();
     lawUi().then((m) => panel.open({ title: '⚖ Phán quyết · Huyền Thành Phủ', body: m.verdictBody(api, rec, crime, sen) }));
   }
-  function placeAt(p, label, sub = 'Xiềng xích loảng xoảng…') {
+  // §5.6: mọi tp đặt y3 tường minh — targetY cho điểm trên đảo (460), mặc định probe terrain
+  // (null-init sẽ gọi groundHeight 2D trong motion.js → dưới đảo chủ nhảy lên 460).
+  const terrainY3 = (x, z) => MO.groundHeight(x, z, heightAt(x, z) + 1);
+  function placeAt(p, label, sub = 'Xiềng xích loảng xoảng…', targetY = null) {
     if (player.flying) setFlying(false);
     const t = worldToTile(p.x, p.z);
-    const go = () => { player.x = t.x; player.y = t.y; player.path = []; target = null; if (player.phys) player.phys.y3 = null; net.teleport(t.x, t.y); };
+    const go = () => { player.x = t.x; player.y = t.y; player.path = []; target = null; if (player.phys) { player.phys.y3 = targetY != null ? targetY : terrainY3(p.x, p.z); player.phys.flyCap = null; player.y3 = player.phys.y3; } net.teleport(t.x, t.y); };
     if (!label) { go(); return; }
     const ov = document.createElement('div'); ov.className = 'hq-travel'; ov.innerHTML = `<div><b>${esc(label)}</b><span>${esc(sub)}</span></div>`;
     ($('hq-canvas')?.closest('.hq-root') || document.body).appendChild(ov);
@@ -1000,7 +1023,7 @@ export function startGame({ onExit = null } = {}) {
     } catch (e) { /* engine lỗi → giữ hồ sơ cũ */ }
     LH.reborn(state, chart); state.lifeXpStart = state.xp || 0;
     const tp = templeOf(WARD_OF_WX[state.player?.yong?.primary]), t = tp ? worldToTile(tp.x, tp.z) : START; // v4: đầu thai ở miếu ứng Dụng thần mới
-    player.x = t.x; player.y = t.y; player.path = []; if (player.phys) player.phys.y3 = null; net.teleport(t.x, t.y);
+    { const w = tileToWorld(t.x, t.y); player.x = t.x; player.y = t.y; player.path = []; if (player.phys) { player.phys.y3 = terrainY3(w.x, w.z); player.y3 = player.phys.y3; } net.teleport(t.x, t.y); }
     save(); updateHud(); updateVitals();
     toast(`👶 Đầu thai — lá số mới ${chart.day}/${chart.month}/${chart.year} (Âm phủ cấp, không phải ngày sinh thật của bạn). Dụng thần mới: ${state.player.yong?.primary || '?'}.`);
   }
@@ -1157,7 +1180,7 @@ export function startGame({ onExit = null } = {}) {
       const f = LIFE.faint(L); carry = null;
       if (player.flying) setFlying(false);
       toast(`😵 Bạn ngất đi vì kiệt sức. Được khiêng về Y Quán cấp cứu — viện phí ${f.fee} đồng${f.owed ? ` (thiếu ${f.owed} đồng, ghi nợ)` : ''}.`);
-      const t = START; player.x = t.x; player.y = t.y; player.path = []; target = null; if (player.phys) player.phys.y3 = null; net.teleport(t.x, t.y);
+      const t = START; player.x = t.x; player.y = t.y; player.path = []; target = null; if (player.phys) { const w = tileToWorld(t.x, t.y); player.phys.y3 = terrainY3(w.x, w.z); player.y3 = player.phys.y3; } net.teleport(t.x, t.y);
     }
     if (Math.floor(Date.now() / 1000) % 15 === 0) save();
     lifeTax(); updateVitals(); fateTick(); afterlifeTick(secs);
@@ -1175,7 +1198,7 @@ export function startGame({ onExit = null } = {}) {
   boat = createBoatControl({
     player, L, toast, panel, save, updateVitals, keys, stick, get moveIn() { return moveIn; }, // moveIn khai báo phía dưới
     where: () => tileToWorld(player.x, player.y),
-    place: (x, z, quiet) => { const t = worldToTile(x, z); player.x = t.x; player.y = t.y; if (!quiet) { player.path = []; target = null; if (player.phys) player.phys.y3 = null; net.teleport(t.x, t.y); } },
+    place: (x, z, quiet) => { const t = worldToTile(x, z); player.x = t.x; player.y = t.y; if (!quiet) { player.path = []; target = null; if (player.phys) { player.phys.y3 = terrainY3(x, z); player.y3 = player.phys.y3; } net.teleport(t.x, t.y); } },
   });
   function lifeSpot(st) {
     const d = st.data;
@@ -1215,6 +1238,7 @@ export function startGame({ onExit = null } = {}) {
   function freeStep(dxW, dzW, mag, dt) {
     const w = tileToWorld(player.x, player.y);
     const P = player.phys || (player.phys = { x: w.x, z: w.z });
+    if (P.y3 == null) P.y3 = terrainY3(w.x, w.z); // §5.6: khởi tạo theo probe terrain — SPAWN dưới đảo chủ không nhảy lên 460 (motion.js:64 init 2D)
     P.x = w.x; P.z = w.z;
     const canClimb = vipActive(state);
     const lm = lifeMods(); P.staminaCap = lm.staminaCap;
@@ -1254,8 +1278,22 @@ export function startGame({ onExit = null } = {}) {
     if (boat?.step(dt)) { freeDone = true; return; } // đang lái thuyền
     const inRooms = tileToWorld(player.x, player.y).x > ROOM_X0 - 40; // phòng nội thất: đi như cũ
     if (player.flying) {
-      // bay: nhanh gấp 4, vượt mọi vật cản; độ cao 3–420 m trên mặt đất
-      player.alt = Math.min(420, Math.max(3, player.alt + ((altCtl.up ? 1 : 0) - (altCtl.down ? 1 : 0)) * 26 * dt));
+      // bay: nhanh gấp 4, vượt mọi vật cản; trần 420 m trên nền dưới chân — KHÔNG nâng toàn map (§6.4).
+      // §5.5: đồng bộ y3 theo cao độ thế giới THẬT bằng tích phân biến thiên alt (không đặt thẳng
+      // groundY+alt: qua khe trời giữa hai đảo groundY tụt về terrain làm mất độ cao, tắt bay giữa
+      // trời sẽ đáp nhầm xuống đất thay vì nền đảo kế tiếp — checklist (iv)).
+      const dA = ((altCtl.up ? 1 : 0) - (altCtl.down ? 1 : 0)) * 26 * dt;
+      const w = tileToWorld(player.x, player.y);
+      const P = player.phys || (player.phys = { x: w.x, z: w.z });
+      if (P.y3 == null) P.y3 = terrainY3(w.x, w.z);
+      P.y3 += dA;
+      const floor = renderer?.groundY ? renderer.groundY(w.x, w.z, P.y3) : MO.groundHeight(w.x, w.z, P.y3);
+      if (P.y3 < floor + 3) P.y3 = floor + 3;
+      // trần chỉ NÂNG CHỨC, không hạ giữa chừng: cất cánh từ đảo (nền 460) → trần 880 suốt chuyến
+      if (P.flyCap == null || floor + 420 > P.flyCap) P.flyCap = floor + 420;
+      if (P.y3 > P.flyCap) P.y3 = P.flyCap;
+      player.alt = Math.min(420, Math.max(3, P.y3 - floor)); // alt tương đối — nghĩa gói mv / render khác giữ nguyên
+      player.y3 = P.y3;
     }
     let dx = 0, dy = 0, mag = 1;
     const SPEED = BASE_SPEED * (I.activeBuff(state, 'speed') ? 1.6 : 1); // Tốc Hành Tán (Dược Phòng)
@@ -1354,8 +1392,8 @@ export function startGame({ onExit = null } = {}) {
     step(dt);
     minimap.update(ts);
     { const w0 = tileToWorld(player.x, player.y), sp = flight.lx == null ? 0 : Math.hypot(w0.x - flight.lx, w0.z - flight.lz) / Math.max(dt, 1e-3); flight.lx = w0.x; flight.lz = w0.z; FL.step(flight, { want: !!player.flying, speedH: sp, sprint: !!moveIn.sprint, vy: altCtl.down ? -7 : 0, alt: player.alt || 0 }, dt); player.fs = flight.s; }
-    net.tick(dt, { x: player.x, y: player.y, h: player.sitting ? Math.PI : (player.boat ? player.boat.h : (player.h || 0)), sitting: player.sitting, alt: Math.max(0, player.alt || 0), w: L.afterlife?.path === 'ngaquy' ? 6 : L.afterlife?.path === 'sucsinh' ? 7 : player.boat ? 3 : player.ride ? 4 : player.waterWalk ? 5 : player.swim ? 2 : player.wade ? 1 : 0, b: player.boat ? player.boat.typeIdx : player.ride ? ['lua', 'ngua', 'xengua'].indexOf(player.ride) : player.waterWalk ? MV.FX_CODE[player.waterWalk.fx] : 0, fs: flight.s }); // w 4 cưỡi (P4) · 5 đạp nước (P14)
-    const near = player.flying ? null : nearestStation(player);
+    net.tick(dt, { x: player.x, y: player.y, h: player.sitting ? Math.PI : (player.boat ? player.boat.h : (player.h || 0)), sitting: player.sitting, alt: Math.max(0, player.alt || 0), y3: player.phys?.y3 ?? null, w: L.afterlife?.path === 'ngaquy' ? 6 : L.afterlife?.path === 'sucsinh' ? 7 : player.boat ? 3 : player.ride ? 4 : player.waterWalk ? 5 : player.swim ? 2 : player.wade ? 1 : 0, b: player.boat ? player.boat.typeIdx : player.ride ? ['lua', 'ngua', 'xengua'].indexOf(player.ride) : player.waterWalk ? MV.FX_CODE[player.waterWalk.fx] : 0, fs: flight.s }); // w 4 cưỡi (P4) · 5 đạp nước (P14) · y3: cao độ tuyệt đối cho gói mv «ay» — người trên đảo bay (460) bị máy khác vẽ xuống đất nếu chỉ dựa «a» tương đối
+    const near = player.flying ? null : nearestStation(player, 1.5, playerWorldY());
     updatePrompt(near);
     const now = new Date();
     if (ts - minuteTick > 60000) { minuteTick = ts; refreshDay(); }
@@ -1392,14 +1430,14 @@ export function startGame({ onExit = null } = {}) {
   // Dock: các gian, nhiệm vụ, sổ, âm thanh
   // -------------------------------------------------------------------------
   // menu «Địa điểm» (places-ui.js — NHA-DIADIEM-MANIFEST §3): theo nhu cầu, gần nhất trước, có ô tìm
-  function rideTo(x, z, label, { free = false, sub = null } = {}) {
+  function rideTo(x, z, label, { free = false, sub = null, targetY = null } = {}) {
     const me = meWorld(), d = Math.hypot(x - me.x, z - me.z);
     if (!free && d < 260) { panel.close(); state.mapPin = { x, z, name: label }; save(); const t = worldToTile(x, z); walkTo({ x: t.x, y: t.y }); return true; }
     if (work?.carrying()) { toast('📦 Đang áp hàng — đi bộ giao cho xong đã.'); return false; }
     if (boat?.aboard()) { toast('⛵ Đang trên thuyền — trả thuyền ở bến trước đã.'); return false; }
     if (!free && levelInfo(state).level >= 5 && !LIFE.spendXu(state, CART_XU)) { toast('Không đủ 5 đồng đi xe.'); return false; }
     save(); panel.close();
-    if (free) placeAt({ x, z }, label, sub || 'Đã tới nơi.'); else api.travel(x, z, label);
+    if (free) placeAt({ x, z }, label, sub || 'Đã tới nơi.', targetY); else api.travel(x, z, label);
     return true;
   }
   api.rideTo = rideTo;

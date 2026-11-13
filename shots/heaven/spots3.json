@@ -1,0 +1,3 @@
+[{"name":"c-menu","x":0,"z":60,"wait":9000,"stats":true,"eval":"window.__hq.api.openPlaces(\"estate\")"},
+{"name":"c-sky","x":5646,"z":1371,"wait":12000,"stats":true},
+{"name":"c-back","x":0,"z":60,"wait":12000,"stats":true}]

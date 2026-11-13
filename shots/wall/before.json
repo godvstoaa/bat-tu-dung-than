@@ -1,0 +1,4 @@
+[{"name":"in-nam","x":0,"z":2050,"wait":16000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.08,dist:12,yaw:3.14159})"},
+{"name":"out-nam","x":0,"z":2210,"wait":12000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.08,dist:12,yaw:0})"},
+{"name":"wall-side","x":300,"z":2060,"wait":12000,"eval":"window.__hq.renderer.setView({pitch:0.1,dist:14,yaw:3.14159})"},
+{"name":"aerial","x":0,"z":2050,"wait":6000,"eval":"window.__hq.renderer.setView({pitch:0.6,dist:160,yaw:2.6})"}]

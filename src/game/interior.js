@@ -7,14 +7,15 @@
 // ============================================================================
 import * as THREE from 'three';
 import { stoneMaterial } from './ground-tex.js';
+import { ROOM_X0 as RXO, SKY_DISTRICT, SKY_Y } from './terrain.js';
 import * as TX from './textures.js';
-import { ROOMS, VAN_GATE_Z, VAN_STELE } from './world.js';
+import { ROOMS, STATIONS, VAN_GATE_Z, VAN_STELE, worldToTile } from './world.js';
 import { roof } from './models.js';
 import { hasStation } from './features.js';
 import { TAISUI_60 } from '../engine/taisui-general.js';
 import { addBlock, addPlatform } from './obstacles.js';
 import { addLight, glowAll, addGlow } from './lights.js';
-import { placeModel, instanceModel, loadModel } from './assets.js';
+import { placeModel, instanceModel, loadModel, warmObject } from './assets.js';
 import { createCharacter } from './characters.js';
 
 const M = {};
@@ -272,6 +273,223 @@ function buildThaiTue(g, r, m, L, az, top, aw, tz) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// [TRỜI] BIỆT THỰ TRÊN MÂY — phòng mẫu nội thất biệt thự quận đảo bay
+// (docs/GAME-TROI-THIET-KE.md §4: room scene kiểu interior.js cho MỌI biệt thự,
+// model villa ngoài đảo chỉ dựng vỏ + ô cửa; đạo cụ lấy từ bộ lib_noi_that).
+// 4 phòng mẫu theo 4 loại villa (dien_dai / lau_cac·thư các / thien_dan / tieu_quan):
+//   · villa_daisanh  «Biệt Thự Trên Mây»   — bình phong rồng sau án thư + lư bạc sơn (Đại Sảnh)
+//   · villa_thuca    «Thư Các Trời»        — giá thư lib_bookshelf + án thư đọc sách
+//   · villa_thiendan «Thiền Điện Trên Mây» — bồ đoàn ×6 quanh đỉnh trầm
+//   · villa_tieuquan «Tiểu Quán Trên Mây»  — án nhỏ + bồ đoàn + ấm trà
+// Đạo cụ thật trong public/models/lib_noi_that.glb (đã kiểm file, 5 node):
+//   nt_anthu · nt_binhphongluarong · nt_den_long_lon · nt_lubacson · bồ đoàn (node không tên, mesh nt_bodoan).
+// Phòng đặt dải ROOM_X0 hàng z = 0 (tiếp hàng điện thờ, không đụng lưới phòng z ≤ −230);
+// CỬA ngoài đảo khai floorY = SKY_Y (460) — khớp cổng tầng §5.7 world.js › stationFloorOf
+// (|cao người − floorY| < 30): người dưới đảo không mở nhầm cửa, người trên đảo vào được.
+// ---------------------------------------------------------------------------
+const VILLA_Y = SKY_Y; // mặt nền quận đảo bay (terrain.js › SKY_Y — cùng cao độ mọi đảo, doc §1.1/§6.4)
+const VM = {};
+function vmats() {
+  if (VM.ready) return VM;
+  VM.floor = stoneMaterial({ seed: 61, rows: 6, repeat: [5, 5], base: '#8a6a44', roughness: 0.75 }); // ván gỗ sẫm
+  VM.wall = new THREE.MeshStandardMaterial({ color: '#b8b2a6', roughness: 0.92 });                   // tường vôi (tieu_quan §2.5)
+  VM.dado = new THREE.MeshStandardMaterial({ color: '#6b4a2f', roughness: 0.7 });                    // chân tường gỗ
+  VM.col = new THREE.MeshStandardMaterial({ map: TX.lacquerTex('#7d3b28', { seed: 8, gold: 0.08 }), roughness: 0.5 }); // cột gỗ son nhạt
+  VM.beam = new THREE.MeshStandardMaterial({ color: '#4a3b2c', roughness: 0.6 });
+  VM.ceil = new THREE.MeshStandardMaterial({ map: TX.panelTex(63), roughness: 0.8 });                // trần ván khung mây
+  VM.cloth = new THREE.MeshStandardMaterial({ color: '#3f6f7a', roughness: 0.9, side: THREE.DoubleSide }); // khăn bàn màu trời
+  VM.gold = new THREE.MeshStandardMaterial({ color: '#d4a63c', roughness: 0.32, metalness: 0.85 });
+  VM.cushion = new THREE.MeshStandardMaterial({ color: '#5a8a6a', roughness: 0.95 });
+  VM.ready = true;
+  return VM;
+}
+
+// Bộ đạo cụ lib_noi_that: mỗi món 1 node GLB — nạp 1 lần,.clone() theo vị trí (placeProp).
+const NT = new Map();
+async function ntProps() {
+  if (NT.size || NT.get('_none')) return NT;
+  const g = await loadModel('lib_noi_that');
+  if (!g) { NT.set('_none', true); return NT; }
+  g.scene.updateMatrixWorld(true);
+  for (const o of g.scene.children) {
+    const key = ['nt_anthu', 'nt_binhphongluarong', 'nt_den_long_lon', 'nt_lubacson'].includes(o.name) ? o.name : 'nt_bodoan';
+    NT.set(key, o);
+  }
+  return NT;
+}
+/** Đặt một đạo cụ theo tên node (fit/at khuôn placeModel: co giãn theo trục, đáy chạm at.y). */
+async function placeProp(parent, key, { fit = { max: 1 }, at = { x: 0, y: 0, z: 0, ry: 0 } } = {}) {
+  await ntProps();
+  const src = NT.get(key);
+  if (!src) return null;
+  const obj = src.clone(true);
+  obj.rotation.y = at.ry || 0;
+  obj.updateMatrixWorld(true);
+  const b0 = new THREE.Box3().setFromObject(obj);
+  const size = b0.getSize(new THREE.Vector3());
+  const [k, v] = Object.entries(fit)[0];
+  const ref = k === 'height' ? size.y : k === 'width' ? size.x : k === 'depth' ? size.z : Math.max(size.x, size.y, size.z);
+  obj.scale.multiplyScalar(v / (ref || 1));
+  obj.updateMatrixWorld(true);
+  const b = new THREE.Box3().setFromObject(obj);
+  obj.position.add(new THREE.Vector3(at.x - (b.min.x + b.max.x) / 2, at.y - b.min.y, at.z - (b.min.z + b.max.z) / 2));
+  obj.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  await warmObject(obj);
+  parent.add(obj);
+  return obj;
+}
+
+/** Vỏ phòng biệt thự: sàn gỗ + tường vôi + cột gỗ + trần ván + ô cửa giữa (như buildRoom nhưng không bàn thờ). */
+function villaShell(g, r, m, L) {
+  const W = r.w, D = r.d, H = r.h, hw = W / 2, hd = D / 2;
+  addPlatform(r.origin.x, r.origin.z, W - 1.2, D - 1.2, 0, 0);
+  box(W + 0.8, 0.4, D + 0.8, m.floor, 0, -0.2, 0, g);
+  const wallT = 0.5;
+  for (const [w, d, x, z] of [[W, wallT, 0, -hd], [wallT, D, -hw, 0], [wallT, D, hw, 0]]) { box(w, H, d, m.wall, x, H / 2, z, g); box(w + 0.05, 1.0, d + 0.05, m.dado, x, 0.5, z, g); }
+  const gap = 4.2, side = (W - gap) / 2;
+  for (const sx of [-1, 1]) { box(side, H, wallT, m.wall, sx * (gap / 2 + side / 2), H / 2, hd, g); box(side, 1.0, wallT + 0.05, m.dado, sx * (gap / 2 + side / 2), 0.5, hd, g); }
+  box(gap, H - 3.2, wallT, m.wall, 0, 3.2 + (H - 3.2) / 2, hd, g);
+  // ô cửa sổ lưới gỗ hai bên hông (bắt sáng như thư các §2.3)
+  for (const sx of [-1, 1]) for (let z = -hd + 3; z <= hd - 3; z += 4) box(0.1, 2.4, 2.0, m.ceil, sx * (hw - 0.3), 3.0, z, g);
+  box(W, 0.45, D, m.ceil, 0, H + 0.22, 0, g);
+  for (let z = -hd + 2.6; z < hd; z += 3.0) box(W - 0.5, 0.5, 0.4, m.beam, 0, H - 0.55, z, g);
+  const colX = hw - 2.6;
+  for (let z = -hd + 4; z <= hd - 4; z += 5) for (const sx of [-1, 1]) {
+    cyl(0.34, 0.38, H - 0.5, m.col, sx * colX, (H - 0.5) / 2, z, g);
+    const w2 = L(sx * colX, z); addBlock(w2.x, w2.z, 0.62);
+  }
+}
+
+/** Bàn gỗ nhỏ (bàn trà / án phụ) + ấm + chén — thuần procedural. */
+function teaTable(g, m, L, x, z) {
+  box(2.2, 0.1, 1.1, m.dado, x, 0.72, z, g);
+  for (const [dx, dz] of [[-0.95, -0.42], [0.95, -0.42], [-0.95, 0.42], [0.95, 0.42]]) box(0.12, 0.72, 0.12, m.beam, x + dx, 0.36, z + dz, g);
+  cyl(0.16, 0.2, 0.26, m.gold, x - 0.4, 0.9, z, g, 12);
+  for (const dx of [0.25, 0.55]) cyl(0.07, 0.05, 0.07, m.cloth, x + dx, 0.8, z, g, 10);
+  const w2 = L(x, z); addBlock(w2.x, w2.z, 1.1);
+}
+
+async function buildVillaRoom(root, r, updaters) {
+  const m = vmats();
+  const g = new THREE.Group(); g.name = `room-${r.id}`; g.position.set(r.origin.x, 0, r.origin.z); root.add(g);
+  const hd = r.d / 2, hw = r.w / 2, H = r.h;
+  const L = (x, z) => ({ x: r.origin.x + x, z: r.origin.z + z });
+  villaShell(g, r, m, L);
+
+  if (r.kind === 'villa_daisanh') {
+    // Đại Sảnh: bệ 2 cấp — bình phong rồng sau án thư + lư bạc sơn trên án (doc §4 «án thư + lư + bình phong sau ngai»)
+    const az = -hd + 3.4;
+    box(10, 0.4, 3.6, m.dado, 0, 0.2, az, g); box(8, 0.4, 3.0, m.floor, 0, 0.6, az, g);
+    const bp = await placeProp(g, 'nt_binhphongluarong', { fit: { height: 2.8 }, at: { x: 0, y: 1.0, z: az - 1.4, ry: 0 } });
+    if (bp) { for (const dx of [-1.1, 1.1]) { const w2 = L(dx, az - 1.4); addBlock(w2.x, w2.z, 0.8); } }
+    const anthu = await placeProp(g, 'nt_anthu', { fit: { height: 1.05 }, at: { x: 0, y: 1.0, z: az + 0.2, ry: 0 } });
+    if (anthu) { const w2 = L(0, az + 0.2); addBlock(w2.x, w2.z, 1.3); }
+    await placeProp(g, 'nt_lubacson', { fit: { height: 0.5 }, at: { x: 0, y: 2.05, z: az + 0.1, ry: 0 } });
+    for (const dx of [-1.8, 1.8]) await placeProp(g, 'nt_bodoan', { fit: { height: 0.16 }, at: { x: dx, y: 0, z: az + 2.6, ry: 0 } });
+    teaTable(g, m, L, hw - 4.4, 2.2);
+    for (const sx of [-1, 1]) { // đèn lồng lớn bộ noi_that treo đầu bệ
+      const dx = sx * 3.6;
+      box(0.05, 1.2, 0.05, m.beam, dx, H - 2.2, az + 2.2, g);
+      const dn = await placeProp(g, 'nt_den_long_lon', { fit: { height: 1.1 }, at: { x: dx, y: H - 3.4, z: az + 2.2, ry: 0 } });
+      if (dn) glowAll(dn, { base: 1.1, night: 0.6, color: '#ff8a3c' });
+      const w2 = L(dx, az + 2.2); addLight(w2.x, H - 2.6, w2.z, { color: '#ffb35c', power: 1.1, room: r.id });
+    }
+    const c = L(0, az + 1.2); addLight(c.x, 4.4, c.z, { color: '#ffe0b0', power: 1.5, room: r.id });
+  }
+
+  if (r.kind === 'villa_thuca') {
+    // Thư Các: giá thư lib_bookshelf quanh tường bắc + tây, án thư giữa phòng
+    for (const [x, z, ry] of [[-4.4, -hd + 1.35, 0], [0, -hd + 1.35, 0], [4.4, -hd + 1.35, 0], [-hw + 1.35, -2.2, Math.PI / 2], [-hw + 1.35, 2.2, Math.PI / 2]]) {
+      const w2 = L(x, z);
+      placeModel(g.parent, 'lib_bookshelf', { fit: { width: 2.4 }, at: { x: w2.x, y: 0, z: w2.z, ry } });
+      addBlock(w2.x, w2.z, 1.15);
+    }
+    const anthu = await placeProp(g, 'nt_anthu', { fit: { height: 1.0 }, at: { x: 1.6, y: 0, z: -hd + 4.4, ry: Math.PI / 4 } });
+    if (anthu) { const w2 = L(1.6, -hd + 4.4); addBlock(w2.x, w2.z, 1.2); }
+    for (const [dx, dz] of [[-1.6, -hd + 4.9], [-2.6, -hd + 3.9]]) await placeProp(g, 'nt_bodoan', { fit: { height: 0.16 }, at: { x: dx, y: 0, z: dz, ry: 0 } });
+    teaTable(g, m, L, hw - 3.4, 0.4);
+    const lan = []; for (const z of [-hd + 4, -hd + 8, -hd + 12]) for (const sx of [-1, 1]) { const w2 = L(sx * (hw - 2.2), z); lan.push({ x: w2.x, y: H - 1.7, z: w2.z, ry: 0, s: 0.9 }); addLight(w2.x, H - 1.4, w2.z, { color: '#ff9a4a', power: 0.8, room: r.id }); }
+    const lanG = await instanceModel(root, 'lib_lantern', lan);
+    if (lanG) glowAll(lanG, { base: 1.0, night: 0.6, color: '#ff8a3c' });
+    const c = L(0, 0); addLight(c.x, H - 1.5, c.z, { color: '#ffe8c0', power: 1.3, room: r.id });
+  }
+
+  if (r.kind === 'villa_thiendan') {
+    // Thiền Điện: đỉnh trầm trên bệ tròn giữa phòng + bồ đoàn ×6 vòng cung (doc §4 «bồ đoàn ×6 + đỉnh trầm»)
+    const cz = -hd + 4.6;
+    cyl(2.3, 2.5, 0.36, m.dado, 0, 0.18, cz, g, 28);
+    cyl(1.6, 1.75, 0.3, m.floor, 0, 0.5, cz, g, 24);
+    const Lu = await placeProp(g, 'nt_lubacson', { fit: { height: 0.9 }, at: { x: 0, y: 0.66, z: cz, ry: 0 } });
+    if (Lu) { const w2 = L(0, cz); addBlock(w2.x, w2.z, 2.4); }
+    for (let k = 0; k < 6; k++) {
+      const dx = (k - 2.5) * 1.35, dz = cz + 3.3 - Math.abs(k - 2.5) * 0.42;
+      await placeProp(g, 'nt_bodoan', { fit: { height: 0.16 }, at: { x: dx, y: 0, z: dz, ry: Math.PI } });
+    }
+    teaTable(g, m, L, hw - 3.2, hd - 2.6);
+    for (const sx of [-1, 1]) {
+      const dx = sx * (hw - 3);
+      box(0.05, 1.1, 0.05, m.beam, dx, H - 1.9, cz + 1.4, g);
+      const dn = await placeProp(g, 'nt_den_long_lon', { fit: { height: 0.95 }, at: { x: dx, y: H - 2.9, z: cz + 1.4, ry: 0 } });
+      if (dn) glowAll(dn, { base: 1.0, night: 0.6, color: '#ff8a3c' });
+      const w2 = L(dx, cz + 1.4); addLight(w2.x, H - 2.2, w2.z, { color: '#ffb35c', power: 1.0, room: r.id });
+    }
+    const c = L(0, cz + 2.4); addLight(c.x, 3.2, c.z, { color: '#ffe0c0', power: 1.2, room: r.id });
+  }
+
+  if (r.kind === 'villa_tieuquan') {
+    // Tiểu Quán: gian nhỏ — án thấp + hai bồ đoàn + ấm trà (tieu_quan §2.5, sàn nhô hiên)
+    const az = -hd + 2.7;
+    const anthu = await placeProp(g, 'nt_anthu', { fit: { height: 0.9 }, at: { x: -2.4, y: 0, z: az, ry: 0 } });
+    if (anthu) { const w2 = L(-2.4, az); addBlock(w2.x, w2.z, 1.1); }
+    cyl(0.14, 0.18, 0.24, m.gold, -2.4, 1.02, az, g, 12);
+    for (const [dx, dz] of [[1.6, az + 0.4], [2.9, az - 0.8]]) await placeProp(g, 'nt_bodoan', { fit: { height: 0.16 }, at: { x: dx, y: 0, z: dz, ry: 0 } });
+    teaTable(g, m, L, 2.6, hd - 2.4);
+    box(0.05, 1.0, 0.05, m.beam, 0, H - 1.7, az + 1.6, g);
+    const dn = await placeProp(g, 'nt_den_long_lon', { fit: { height: 0.85 }, at: { x: 0, y: H - 2.6, z: az + 1.6, ry: 0 } });
+    if (dn) glowAll(dn, { base: 1.0, night: 0.6, color: '#ff8a3c' });
+    const c = L(0, az + 1.6); addLight(c.x, H - 1.9, c.z, { color: '#ffb35c', power: 0.9, room: r.id });
+    const c2 = L(0, 0); addLight(c2.x, H - 1.2, c2.z, { color: '#ffe8c0', power: 0.9, room: r.id });
+  }
+}
+
+// 4 phòng mẫu — CỬA neo THEO VỎ VILLA landmarks.js đã đặt trên đảo (không phải tâm đảo):
+//   · thienban: lib_dien_dai tại (−170,−40) quay về tâm (landmarks.js:190), bậc chính diện phía đó;
+//     cửa đặt trên trục mặt tiền, trước cụm đạo cụ (−150,−25) 13,5 m → không đứng chồng đạo cụ.
+//   · thudao: lib_lau_cac s×0.8 đặt ngay tâm đảo quay về đảo chủ → cửa trên trục mặt tiền ~11,5 m.
+//   · thiendan: lib_thien_dan tâm đảo, bậc chính diện phía đảo chủ → cửa trên trục ~26 m (sau 9 bậc).
+//   · thienquan: 3 thảo lư vòng cung r32 quanh tâm; cửa trước thảo lư k=2 (góc 150°) ~7,5 m.
+const skyIsland = (id) => SKY_DISTRICT.find((s) => s.id === id) || { x: 0, z: 0 };
+const doorOn = (id, dx, dz) => { const s = skyIsland(id); return { x: s.x + dx, z: s.z + dz }; };
+export const VILLA_ROOMS = [
+  { id: 'villa_daisanh', name: 'Biệt Thự Trên Mây', region: 'troi', kind: 'villa_daisanh', door: doorOn('thienban', -139, -33), origin: { x: RXO + 745, z: 0 }, w: 30, d: 24, h: 11, deities: [],
+    desk: { id: 'villa_tra', name: 'Bàn Trà Trên Mây', verb: 'Pha trà ngắm mây', x: 10.6, z: 2.2 } },
+  { id: 'villa_thuca', name: 'Thư Các Trời', region: 'troi', kind: 'villa_thuca', door: doorOn('thudao', 10, 6), origin: { x: RXO + 845, z: 0 }, w: 18, d: 16, h: 9, deities: [],
+    desk: { id: 'villa_anthu', name: 'Án Thư Trên Mây', verb: 'Ngồi đọc sách', x: 5.6, z: -3.6 } },
+  { id: 'villa_thiendan', name: 'Thiền Điện Trên Mây', region: 'troi', kind: 'villa_thiendan', door: doorOn('thiendan', 2, -26), origin: { x: RXO + 955, z: 0 }, w: 20, d: 16, h: 9, deities: [],
+    desk: { id: 'villa_thien', name: 'Bồ Đoàn Thiền', verb: 'Tọa thiền một lát', x: 6.8, z: 5.4 } },
+  { id: 'villa_tieuquan', name: 'Tiểu Quán Trên Mây', region: 'troi', kind: 'villa_tieuquan', door: doorOn('thienquan', -21, 12), origin: { x: RXO + 1045, z: 0 }, w: 13, d: 10, h: 6, deities: [],
+    desk: { id: 'villa_may', name: 'Cửa Sổ Mây', verb: 'Ngắm mây', x: 3.9, z: 2.6 } },
+];
+
+// Đăng ký phòng + trạm theo đúng khuôn world.js (door_/exit_ :104-105, desk :106) — world.js không
+// thuộc phạm vi file được sửa đợt này nên nội thất tự đăng ký vào ROOMS/STATIONS (biến mảng export).
+for (const r of VILLA_ROOMS) {
+  ROOMS.push(r);
+  const doorT = worldToTile(r.door.x, r.door.z);
+  const inside = worldToTile(r.origin.x, r.origin.z + r.d / 2 - 3.2);
+  const exitW = { x: r.origin.x, z: r.origin.z + r.d / 2 - 1.2 };
+  const exitT = worldToTile(exitW.x, exitW.z);
+  STATIONS.push(
+    { id: `door_${r.id}`, kind: 'door', room: r.id, name: r.name, verb: `Vào ${r.name}`, block: [], world: { x: r.door.x, z: r.door.z, y: VILLA_Y }, floorY: VILLA_Y, spot: { x: doorT.x, y: doorT.y + 1.2 }, label: doorT, to: inside },
+    { id: `exit_${r.id}`, kind: 'exit', room: r.id, name: 'Cửa phòng', verb: 'Ra khỏi phòng', block: [], world: exitW, spot: exitT, label: exitT, to: { x: doorT.x, y: doorT.y + 2.2 }, toY3: VILLA_Y, floorY: 0 }, // toY3: đích là mép ĐẢO BAY — main.js phải đặt y3=460, probe terrain sẽ thả người xuống phố dưới đảo
+  );
+  if (r.desk) {
+    const q = { x: r.origin.x + r.desk.x, z: r.origin.z + r.desk.z }, t = worldToTile(q.x, q.z);
+    STATIONS.push({ id: r.desk.id, kind: 'desk', room: r.id, name: r.desk.name, verb: r.desk.verb, block: [], world: q, floorY: 0, spot: worldToTile(q.x + 1.4, q.z), label: t });
+  }
+}
+
 /** Dựng mọi điện — LƯỜI: lần đầu người chơi vào dải phòng phía Đông (ensure) mới dựng và nạp tượng thần
  *  (2026-11-10: trước đây dựng ngay khi mở game → ~6 MB GLB tượng / điện trên màn nạp dù chưa vào điện nào).
  *  Trả { root, ensure(), update(dt), setData({ van, thaitue }) }. */
@@ -281,7 +499,12 @@ export function createInteriors(scene) {
   let built = false;
   const ensure = () => {
     if (built) return; built = true;
-    for (const r of ROOMS) if (hasStation(`door_${r.id}`)) buildRoom(root, r, updaters).catch((e) => console.warn('[interior]', r.id, e));
+    for (const r of ROOMS) {
+      if (!hasStation(`door_${r.id}`)) continue;
+      // [TRỜI] phòng biệt thự (villa_*) dựng bằng vỏ + đạo cụ lib_noi_that, không phải bàn thờ điện
+      const build = String(r.kind || '').startsWith('villa') ? buildVillaRoom : buildRoom;
+      build(root, r, updaters).catch((e) => console.warn('[interior]', r.id, e));
+    }
   };
   let pending = null;
   const apply = () => {

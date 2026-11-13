@@ -1,0 +1,1 @@
+[{"name":"lowq","x":0,"z":2050,"wait":12000,"eval":"(()=>{window.__hq.renderer.suggestLow(9);return !!document.querySelector('.hq-lowq')})()"}]

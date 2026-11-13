@@ -8,11 +8,11 @@
 import { MASTERS } from './fortune-npc.js';
 import * as LAYOUT from './citylayout.js';
 import { hasStation, TEXT } from './features.js';
-import { walkable, SCALE, ROOM_X0 } from './terrain.js';
+import { walkable, SCALE, ROOM_X0, heightAt, SKY_Y } from './terrain.js';
 import { blockedByBuilding, platformTop, reserveClear } from './obstacles.js';
 import { COURT_STATIONS, START_M, toTile } from './court.js';
 import { enterables, doorNear, houseAt, doorOfRoom } from './homes.js';
-import { roomByKey, roomAtDyn, insideOf, exitOf, spotNear, roomSpots, openSpotNear } from './rooms.js';
+import { roomByKey, roomAtDyn, insideOf, exitOf, spotNear, roomSpots, openSpotNear, setOpenSpots } from './rooms.js';
 
 // Bản 2D dự phòng (render.js) vẫn vẽ sân cũ 20×14 ô
 export const COLS = 20;
@@ -72,6 +72,14 @@ export const PLACES = [
   { id: 'amvancoc', name: 'Am Vân Cốc', world: { x: -56, z: -163 } }, // sườn Hậu Sơn, cạnh quần thể điện (0,-116)
   { id: 'laotung', name: 'Lão Tùng', world: { x: 6, z: 72 } }, // gác cổng Sơn Môn (0, z1+1.2 › court.js › COURT) — trong tầm bark 16 m của render3d › GATE_SM
 ];
+
+// ---------------------------------------------------------------------------
+// QUẬN ĐẢO BAY «THIÊN BÀN» — phần TRUY CẬP (docs/GAME-TROI-THIET-KE.md §3). Toạ độ 9 đảo +
+// nền bát giác + cầu vân nằm ở terrain.js › SKY_DISTRICT / registerSkyDistrict (nguồn duy
+// nhất §5.1, thợ terrain); ở đây chỉ giữ điểm đáp Vân Thang và spot lên/xuống.
+// ---------------------------------------------------------------------------
+/** Điểm đáp «Thăng thiên» trên đảo chủ: trước Nam Môn, cách cổng ≥ 20 m (bài học camera heaven.js:53-55). */
+export const SKY_ARRIVE = { x: 0, z: 205, y: SKY_Y };
 
 // ---------------------------------------------------------------------------
 // ĐIỆN VÀO ĐƯỢC (docs/GAME-V2-THIET-KE.md §S4–S5): không gian trong điện đặt ở rìa Đông ngoài bản đồ
@@ -317,20 +325,50 @@ export function stationAt(x, y) {
   return e ? doorStation(e) : null;
 }
 
-export function nearestStation(pos, maxDist = 1.5) {
+// ---------------------------------------------------------------------------
+// TRẠM THEO TẦNG (GAME-TROI-THIET-KE §5.7): station/spot khai floorY (mét, mặc định
+// = mặt nền trạm đứng, probe sát terrain nên nền đảo bay bị bỏ qua). nearestStation
+// chỉ match khi |cao độ người − floorY| < 30 → người trên đảo (y 460) không mở nhầm
+// trạm quán / bảng hiệu / cửa nhà dưới đảo chủ; người dưới sân không dính spot đảo.
+// ---------------------------------------------------------------------------
+const ST_FLOORS = new Map();
+function stationFloorOf(ref, x, z) {
+  if (ref.floorY != null) return ref.floorY;
+  const key = `${ref.id ?? '?'}@${Math.round(x)},${Math.round(z)}`; // kèm toạ độ: id 'up'/'down' trùng giữa heaven và sky
+  let f = ST_FLOORS.get(key);
+  if (f == null) { const h = heightAt(x, z); f = platformTop(x, z, h + 1) ?? h; ST_FLOORS.set(key, f); }
+  return f;
+}
+/** worldY: cao độ người (mét, null = không lọc — hành vi cũ 2D). */
+const floorMatch = (ref, x, z, worldY) => worldY == null || Math.abs(worldY - stationFloorOf(ref, x, z)) < 30;
+
+export function nearestStation(pos, maxDist = 1.5, worldY = null) {
   let best = null, bd = maxDist;
   for (const st of STATIONS) {
     const d = Math.hypot(pos.x - st.spot.x, pos.y - st.spot.y);
-    if (d <= bd) { bd = d; best = st; }
+    if (d <= bd && floorMatch(st, (st.spot.x - 10) * 1.6, (st.spot.y - 7) * 1.6, worldY)) { bd = d; best = st; }
   }
   if (best) return best;
   const w = tileW(pos);
   const inRoom = roomStationNear(w.x, w.z);
   if (inRoom !== undefined) return inRoom;
   // biệt phủ: cổng phủ, đồ đạc trong gian / sân vườn (ngoài trời)
-  const os = openSpotNear(w.x, w.z);
-  if (os) return spotStation(os.key, os.s);
+  { const os = openSpotNear(w.x, w.z); if (os && floorMatch(os.s, os.s.x, os.s.z, worldY)) return spotStation(os.key, os.s); }
   // cửa nhà gần nhất (≤ 2,1 m)
   const e = doorNear(w.x, w.z, 2.1);
   return e ? doorStation(e) : null;
 }
+
+// LỐI LÊN / XUỐNG QUẬN ĐẢO BAY (§3 · §5.8, khuôn setOpenSpots heaven.js:69-72): «Vân Thang»
+// trong sân quán (dò ô trống bằng lưới va chạm — bài học Thiên Thê heaven.js:19-21) và
+// «Hạ giới» trước Nam Môn đảo chủ. Cuối file: worldToTile/tileToWorld/blockedAt đã khai báo hết.
+export const SKY_UP = (() => {
+  let up = { x: -72, z: -18 };
+  const t = worldToTile(up.x, up.z);
+  if (blockedAt(t.x, t.y)) { const free = nearestFreePoint(t.x, t.y); if (free) up = tileToWorld(free.x, free.y); }
+  return up;
+})();
+setOpenSpots('sky', [
+  { id: 'down', kind: 'sky', name: 'Nam Môn Thiên Bàn', verb: 'Hạ giới · về Sơn Môn', x: 0, z: 245, r: 2.6, floorY: SKY_Y },
+  { id: 'up', kind: 'sky', name: 'Vân Thang', verb: 'Bước lên vân thang · Thiên Bàn Đảo', x: SKY_UP.x, z: SKY_UP.z + 1, r: 3 }, // floorY mặc định = terrain probe (đảo bay bị bỏ qua)
+]);

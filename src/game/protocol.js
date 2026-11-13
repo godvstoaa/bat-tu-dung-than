@@ -157,7 +157,7 @@ export function parseClient(text) {
     }
     case 'mv':
       if (!num(m.x) || !num(m.y) || m.x < WORLD_TILES.minX || m.y < WORLD_TILES.minY || m.x > WORLD_TILES.maxX || m.y > WORLD_TILES.maxY) return null;
-      return { t: 'mv', x: round2(m.x), y: round2(m.y), h: num(m.h) ? round2(m.h) : 0, s: m.s ? 1 : 0, a: num(m.a) ? Math.max(0, Math.min(420, Math.round(m.a))) : 0, w: [1, 2, 3, 4, 5, 6, 7].includes(m.w) ? m.w : 0, b: [3, 4, 5].includes(m.w) && [0, 1, 2].includes(m.b) ? m.b : 0, fs: Number.isInteger(m.fs) && m.fs >= 0 && m.fs <= 5 ? m.fs : 0 }; // fs: trạng thái bay (P15)
+      return { t: 'mv', x: round2(m.x), y: round2(m.y), h: num(m.h) ? round2(m.h) : 0, s: m.s ? 1 : 0, a: num(m.a) ? Math.max(0, Math.min(420, Math.round(m.a))) : 0, ay: num(m.ay) ? Math.max(0, Math.min(1000, Math.round(m.ay))) : null, w: [1, 2, 3, 4, 5, 6, 7].includes(m.w) ? m.w : 0, b: [3, 4, 5].includes(m.w) && [0, 1, 2].includes(m.b) ? m.b : 0, fs: Number.isInteger(m.fs) && m.fs >= 0 && m.fs <= 5 ? m.fs : 0 }; // fs: trạng thái bay (P15) · ay: CAO ĐỘ TUYỆT ĐỐI y3 (m, 0–1000) — «a» tương đối kẹp ≤420 không bao giờ chạm nền đảo bay (bot 455, terrain dưới đảo < 34 m) nên người đứng/trên đảo bị vẽ sai; client cũ không gửi → null, máy nhận cũ bỏ qua được
     case 'tp':
       // Nhảy xa hợp lệ do client chủ động (đổi phòng qua cửa điện, lên xe ngựa/đò sang
       // sảnh nghề): chỉ kiểm biên thế giới như mv — không kiểm bước nhảy vì cú nhảy là chủ đích.

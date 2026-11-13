@@ -29,7 +29,7 @@ test('mv: chặn toạ độ ngoài bản đồ / NaN, làm tròn', () => {
   assert.equal(P.parseClient(J({ t: 'mv', x: 5, y: 2700 })), null);
   assert.ok(P.parseClient(J({ t: 'mv', x: -300, y: 400 })), 'thế giới mở: toạ độ xa tâm vẫn hợp lệ');
   assert.equal(P.parseClient(J({ t: 'mv', x: 'a', y: 3 })), null);
-  assert.deepEqual(P.parseClient(J({ t: 'mv', x: 3.14159, y: 2, h: 1.23456, s: true })), { t: 'mv', x: 3.14, y: 2, h: 1.23, s: 1, a: 0, w: 0, b: 0, fs: 0 });
+  assert.deepEqual(P.parseClient(J({ t: 'mv', x: 3.14159, y: 2, h: 1.23456, s: true })), { t: 'mv', x: 3.14, y: 2, h: 1.23, s: 1, a: 0, ay: null, w: 0, b: 0, fs: 0 }); // ay: cao độ TUYỆT ĐỐI mới thêm (null khi client cũ không gửi) — còn lại nguyên khuôn làm tròn / mặc định
   // trạng thái nước: 2 = bơi; 3 = trên thuyền, b = loại thuyền; giá trị lạ → 0
   assert.deepEqual([P.parseClient(J({ t: 'mv', x: 1, y: 1, w: 2 })).w, P.parseClient(J({ t: 'mv', x: 1, y: 1, w: 3, b: 2 })).b, P.parseClient(J({ t: 'mv', x: 1, y: 1, w: 9, b: 2 })).w, P.parseClient(J({ t: 'mv', x: 1, y: 1, w: 2, b: 2 })).b], [2, 2, 0, 0]);
   // độ cao ngự kiếm: kẹp 0–420, làm tròn

@@ -179,11 +179,78 @@ const SPOTS = [
   } },
   { at: RA('phongthuy'), place: async (g) => { const p = R('phongthuy'); await palaceComplex(g, { x: p.x, z: p.z - 40, ry: faceTo(p.x, p.z, 0, 0), scale: 0.6 }); await place(g, 'luopan_stand', { fit: { height: 18 }, at: { x: p.x, y: H(p.x, p.z + 50), z: p.z + 50, ry: faceTo(p.x, p.z + 50, 0, 0) } }); } },
   { at: RA('lichduong'), place: async (g) => { const p = R('lichduong'); await palaceComplex(g, { x: p.x, z: p.z - 40, ry: faceTo(p.x, p.z, 0, 0), scale: 0.6 }); } },
-  { at: [T.SKY_ISLAND.x, T.SKY_ISLAND.z], place: async (g) => {
-    const s = T.SKY_ISLAND;
-    await place(g, ['sky_palace', 'rock_island'], { solid: false, fit: { width: 240 }, at: { x: s.x, y: s.y - 60, z: s.z, ry: 0 } }); // đảo bay ở y 460 trên Ngoại Thành — không chặn mặt đất bên dưới
+  { at: [T.SKY_ISLAND.x, T.SKY_ISLAND.z], noMerge: true, place: async (g) => {
+    // QUẬN ĐẢO BAY «THIÊN BÀN» — đảo CHỦ (docs/GAME-TROI-THIET-KE.md §1.1): nền đi được đã đăng ký sẵn
+    // (terrain.registerSkyDistrict — bát giác + cầu). Mọi model trên trời solid:false, KHÔNG addFootprint:
+    // lưới va chạm 2D sẽ chặn người đi bộ DƯỚI đảo trên mặt đất.
+    // dao_vua Ø264 gốc (đo GLB: rộng 264, đáy −63,5, sân local y0) — s×2 = Ø520 hero đặt riêng bằng placeLod.
+    await place(g, ['lib_dao_vua'], { solid: false, fit: { width: 520 }, at: { x: 0, y: T.SKY_Y - 63.52 * (520 / 264), z: 0, ry: 0 } });
+    await place(g, ['sky_palace', 'rock_island'], { solid: false, fit: { width: 240 }, at: { x: 0, y: T.SKY_Y, z: 0, ry: 0 } }); // giữ nguyên làm tâm đảo (đáy 460)
+    await place(g, ['lib_nam_mon', 'sect_gate_grand', 'gate_sect'], { solid: false, fit: { width: 26 }, at: { x: 0, y: T.SKY_Y, z: 225, ry: 0 } }); // Nam Môn quận mép nam
+    await place(g, ['lib_dien_dai', 'hall_main'], { solid: false, fit: { width: 40 }, at: { x: -170, y: T.SKY_Y, z: -40, ry: faceTo(-170, -40, 0, 0) } });
+    await place(g, ['lib_tieu_quan', 'lib_mtn_house', 'tea_pavilion'], { solid: false, fit: { width: 13 }, at: { x: 155, y: T.SKY_Y, z: -135, ry: faceTo(155, -135, 0, 0) } });
+    await place(g, ['lib_tieu_quan', 'lib_mtn_house', 'tea_pavilion'], { solid: false, fit: { width: 13 }, at: { x: 170, y: T.SKY_Y, z: 75, ry: faceTo(170, 75, 0, 0) } });
+    await place(g, ['lib_noi_that', 'scholar_desk'], { solid: false, fit: { width: 22 }, at: { x: -150, y: T.SKY_Y, z: -25, ry: faceTo(-150, -25, -170, -40) } }); // bộ đạo cụ trước Đại Sảnh
+    // 8 đĩa đảo còn lại: MỘT nhóm nhân bản (Ø 264/183 — rộng hơn mảng bát giác R 130/90 nên không đi trên không ngoài đĩa)
+    const discs = T.SKY_DISTRICT.slice(1).map((s, i) => ({ x: s.x, y: T.SKY_Y - 63.52 * ((s.r > 100 ? 264 : 183) / 264), z: s.z, ry: (i * 2.4) % (Math.PI * 2), s: s.r > 100 ? 264 : 183 }));
+    const discId = await firstAvailable(['lib_dao_vua']);
+    if (discId) await instanceModel(g, discId, discs, { fitKey: 'width' });
+    else await instanceModel(g, 'rock_island', discs.map((d) => ({ ...d, y: T.SKY_Y - 30, s: d.s * 1.1 })), { fitKey: 'max' }); // pack chưa xong: đảo đá sẵn có thay tạm (đáy chìm dưới nền, đỉnh nhô qua mặt sân)
+    // 4 cầu vân: mỗi cấu kiện lib_cau_van 40 m (một GLB = một cấu kiện, dài theo trục X local) — nền đi được
+    // đã có (terrain). Xoay model: trục X local → hướng u ⇒ ry = atan2(−uz, ux).
+    // s = 46,45: KHUNG BAO 1 cấu kiện đo từ GLB (46,45 × 4,32 × 4,90 — ván sàn 40 m + 2 mỏ mây
+    // ôm 3,23 m mỗi đầu, đáy −3,05); s=khung bao ⇒ hệ số co 1:1, sàn phủ đúng nền 40 m mỗi đoạn.
+    const segs = [];
+    for (const b of T.SKY_BRIDGES) for (const q of b.segs) segs.push({ x: q.x, y: T.SKY_Y - 3.22, z: q.z, ry: Math.atan2(-b.uz, b.ux), s: 46.45 }); // y −3,22: mặt ván (cách đáy khung bao +3,215 — vòm đỡ âm sâu nhất −3,05) FLUSH nền 460; võng giữa nhịp −0,5 m như cầu treo
+    if (await firstAvailable(['lib_cau_van'])) await instanceModel(g, 'lib_cau_van', segs, { fitKey: 'width' });
+    else { // pack chưa có cầu vân: ván mây giản lược thay hình (nền đi được đã có từ terrain — chỉ thiếu visual)
+      const van = new THREE.MeshStandardMaterial({ color: '#a98c60', roughness: 0.82 });
+      const geo = new THREE.BoxGeometry(40, 0.24, 5);
+      for (const s of segs) { const m = new THREE.Mesh(geo, van); m.position.set(s.x, T.SKY_Y - 0.12, s.z); m.rotation.y = s.ry; m.castShadow = m.receiveShadow = true; g.add(m); } // tâm −0,12 ⇒ mặt ván trên = 460 Flush nền
+    }
+    // (đèn neo sáng đầu cầu + đèn mỗi đảo ngoài: render3d.js đã đặt — không lặp lại ở đây)
+    const board = nameBoard(T.SKY_DISTRICT[0].name, 0); board.position.set(0, T.SKY_Y, 250); g.add(board); // biển tên đảo chủ trước Nam Môn
   } },
 ];
+
+// Địa danh 3 đảo chính (world.js › PLACES — mảng mở rộng tại đây vì world.js ngoài phạm vi file được phép):
+// đi kèm biển tên 3D đặt trong SPOT đảo; world.y = 460 cho nơi đọc nhãn theo cao độ (GAME-TROI §5.4 :1011).
+for (const s of [T.SKY_DISTRICT[0], T.SKY_DISTRICT[1], T.SKY_DISTRICT[2]]) PLACES.push({ id: s.id, name: s.name, world: { x: s.x, z: s.z, y: s.y } });
+
+// SPOT villa cho 8 đảo ngoài (nền + đĩa đảo đã ở SPOT đảo chủ / terrain) — mọi thứ y 460, solid:false
+for (const s of T.SKY_DISTRICT.slice(1)) {
+  SPOTS.push({ at: [s.x, s.z], noMerge: true, place: async (g) => {
+    const toC = faceTo(s.x, s.z, 0, 0); // quay về đảo chủ
+    const at = (x, z, ry) => ({ x, y: T.SKY_Y, z, ry });
+    if (s.id === 'quanthinh') { // lầu các quan tinh (nóc armilla: bỏ — lib_noi_that là nguyên bộ đạo cụ, không tách từng món)
+      await place(g, ['lib_lau_cac', 'tower_nine', 'library_tower'], { solid: false, fit: { width: 17 }, at: at(s.x, s.z, toC) });
+    } else if (s.id === 'thudao') { // thư các s×0.8
+      await place(g, ['lib_lau_cac', 'library_tower'], { solid: false, fit: { width: 13.6 }, at: at(s.x, s.z, toC) });
+    } else if (s.id === 'laungoc') { // 2 lầu song sinh
+      await place(g, ['lib_lau_cac', 'tower_nine'], { solid: false, fit: { width: 17 }, at: at(s.x - 22, s.z - 2, Math.PI / 2) });
+      await place(g, ['lib_lau_cac', 'tower_nine'], { solid: false, fit: { width: 17 }, at: at(s.x + 22, s.z + 2, -Math.PI / 2) });
+    } else if (s.id === 'thiendan') { // đài tế tròn (bậc chính diện Bắc — quay về đảo chủ)
+      await place(g, ['lib_thien_dan', 'hall_main'], { solid: false, fit: { width: 44 }, at: at(s.x, s.z, toC) });
+    } else if (s.id === 'thienquan') { // 3 thảo lư (biến thể tranh = cùng model)
+      for (let k = 0; k < 3; k++) { const a = k * Math.PI * 2 / 3 - Math.PI / 2, px = s.x + Math.cos(a) * 32, pz = s.z + Math.sin(a) * 32;
+        await place(g, ['lib_tieu_quan', 'lib_mtn_house'], { solid: false, fit: { width: 13 }, at: at(px, pz, faceTo(px, pz, s.x, s.z)) }); }
+    } else if (s.id === 'ansi') { // hermit: 1 thảo lư + núi đá trang trí cao
+      await place(g, ['lib_tieu_quan', 'lib_mtn_house'], { solid: false, fit: { width: 13 }, at: at(s.x, s.z - 30, toC) });
+      await instanceModel(g, 'rock_island', [{ x: s.x - 34, y: T.SKY_Y - 8, z: s.z + 20, ry: 0.6, s: 46 }, { x: s.x + 30, y: T.SKY_Y - 12, z: s.z + 28, ry: 2.9, s: 58 }], { fitKey: 'max' });
+    } else if (s.id === 'duocvien') { // vườn dược + tiểu quán
+      await place(g, ['lib_tieu_quan', 'lib_mtn_house'], { solid: false, fit: { width: 13 }, at: at(s.x - 28, s.z, Math.PI / 2) });
+    } else if (s.id === 'vancanh') { // đình tròn nhỏ (model gần đúng: đình trà thư viện)
+      await place(g, ['tea_pavilion'], { solid: false, fit: { width: 18 }, at: at(s.x, s.z, toC) });
+    }
+    // (đèn giữa đảo ngoài: render3d.js đã đặt theo §5.10 — không lặp)
+    // biển tên 2 đảo cầu vân (quanthinh, thudao) ngay miệng cầu, mặt quay về người tới — đảo chủ đặt ở SPOT trên
+    if (s.id === 'quanthinh' || s.id === 'thudao') {
+      const d = Math.hypot(s.x, s.z), ux = -s.x / d, uz = -s.z / d;
+      const bx = s.x + ux * (s.r * 0.82), bz = s.z + uz * (s.r * 0.82), bry = Math.atan2(ux, uz);
+      const board = nameBoard(s.name, bry); board.position.set(bx, T.SKY_Y, bz); g.add(board);
+    }
+  } });
+}
 
 function shore(cx, cz, dx, dz) {
   const n = Math.hypot(dx, dz);

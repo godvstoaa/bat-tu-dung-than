@@ -1,0 +1,2 @@
+[{"name":"thienthe2","x":78,"z":-40,"wait":14000,"eval":"window.__hq.renderer.setView({pitch:0.12,dist:18,yaw:0})"},
+{"name":"thienthe3","x":78,"z":-40,"wait":2000,"eval":"window.__hq.renderer.setView({pitch:0.3,dist:40,yaw:0.8})"}]

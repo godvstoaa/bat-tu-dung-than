@@ -163,7 +163,7 @@ export function createNet({ profile, onEvent = () => {}, token = null }) {
       case 'count': count = m.n; onEvent({ t: 'count', n: m.n }); break;
       case 'mv': {
         const o = others.get(m.id);
-        if (o) { o.tx = m.x; o.ty = m.y; o.th = m.h; o.s = m.s; o.a = m.a || 0; o.w = m.w || 0; o.b = m.b || 0; o.fs = m.fs || 0; }
+        if (o) { o.tx = m.x; o.ty = m.y; o.th = m.h; o.s = m.s; o.a = m.a || 0; o.ay = m.ay ?? null; o.w = m.w || 0; o.b = m.b || 0; o.fs = m.fs || 0; } // ay: cao độ tuyệt đối (null = máy gửi cũ)
         break;
       }
       case 'emo': {
@@ -231,10 +231,11 @@ export function createNet({ profile, onEvent = () => {}, token = null }) {
       if (me && now - lastSent.at > 1000 / P.MOVE_HZ) {
         const s = self.sitting ? 1 : 0;
         const a = Math.round(self.alt || 0);
+        const ay = self.y3 != null ? Math.round(self.y3) : null; // cao độ tuyệt đối — «a» tương đối không tái dựng được nền đảo bay ở máy người khác
         const h = self.h || 0, w = self.w || 0, b = self.b || 0, fs = self.fs || 0;
-        if (Math.abs(self.x - lastSent.x) > 0.02 || Math.abs(self.y - lastSent.y) > 0.02 || Math.abs(h - lastSent.h) > 0.02 || s !== lastSent.s || a !== lastSent.a || w !== lastSent.w || b !== lastSent.b || fs !== lastSent.fs) {
-          send({ t: 'mv', x: self.x, y: self.y, h, s, a, w, b, fs });
-          lastSent = { x: self.x, y: self.y, s, a, h, w, b, fs, at: now };
+        if (Math.abs(self.x - lastSent.x) > 0.02 || Math.abs(self.y - lastSent.y) > 0.02 || Math.abs(h - lastSent.h) > 0.02 || s !== lastSent.s || a !== lastSent.a || ay !== lastSent.ay || w !== lastSent.w || b !== lastSent.b || fs !== lastSent.fs) {
+          send({ t: 'mv', x: self.x, y: self.y, h, s, a, ay, w, b, fs });
+          lastSent = { x: self.x, y: self.y, s, a, ay, h, w, b, fs, at: now };
         }
       }
       const step = 3.5 * 1.35 * dt; // nhanh hơn tốc độ đi chút để đuổi kịp

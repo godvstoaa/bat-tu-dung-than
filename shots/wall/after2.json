@@ -1,0 +1,4 @@
+[{"name":"wall-out-side","x":300,"z":2215,"wait":14000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.15,dist:24,yaw:0.5})"},
+{"name":"aerial","x":0,"z":2215,"wait":5000,"eval":"window.__hq.renderer.setView({pitch:0.55,dist:180,yaw:0.6})"},
+{"name":"corner","x":820,"z":2040,"wait":12000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.2,dist:70,yaw:-0.6})"},
+{"name":"top","x":-200,"z":2125,"wait":10000,"eval":"window.__hq.renderer.setView({pitch:0.25,dist:16,yaw:1.57})"}]

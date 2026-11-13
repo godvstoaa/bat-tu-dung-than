@@ -13,7 +13,7 @@ import { LIGHTS, GLOW_MATS, addLight } from './lights.js';
 import { createGiatri } from './effects.js';
 import { createInteriors } from './interior.js';
 import { roomAt } from './world.js';
-import { STATIONS, stationById } from './world.js';
+import { STATIONS, stationById, SKY_UP } from './world.js';
 import { incenseState } from './state.js';
 import { createIncense } from './incense3d.js';
 import { updateLotus } from './lotus.js';
@@ -242,6 +242,22 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const noop = new Proxy({}, { get: () => () => undefined });
   const safeInit = (name, fn, stub = noop) => { try { return fn(); } catch (e) { console.error(`[huyenquan] 3D: bỏ phần «${name}» vì lỗi`, e); initErrors.push(`${name}: ${e?.message || e}`); return stub; } };
   const world = span('init:world', () => createWorld(scene, renderer, { quality }));
+  // Vá (a) §5.4 GAME-TROI-THIET-KE: world3d.groundY (world3d.js:379) là 2D — mọi nền đảo bay đều
+  // «dựng» lên tận 460 dù người ở dưới. world3d.js ngoài danh mục file của thợ truy cập nên bọc
+  // TẠI ĐIỂM DÙNG: groundY(x, z, y) chỉ tính nền có mặt dưới ≤ y+0,3 (obstacles › platformTop),
+  // y = null giữ nguyên hành vi 2D cũ.
+  const groundY2 = world.groundY;
+  world.groundY = (x, z, y = null) => {
+    if (y == null) return groundY2(x, z);
+    if (inCourt(x, z)) return platformTop(x, z, y) ?? 0;
+    return Math.max(T.heightAt(x, z), T.WATER - 1.2, platformTop(x, z, y) ?? -1e9);
+  };
+  // cỏ bám chân người: world3d.update gọi grass.update(px, groundY 2D) trong closure của nó —
+  // nền đảo làm cỏ mọc lơ lửng y 460 giữa sân Sơn Môn. Bọc lại, tính lại nền theo probe terrain.
+  if (world.grass?.update) {
+    const gu = world.grass.update.bind(world.grass);
+    world.grass.update = (px, _gy, pz, t) => gu(px, MO.groundHeight(px, pz, T.heightAt(px, pz) + 1), pz, t);
+  }
   setModelQuality(quality);
   const landmarks = span('init:landmarks', () => createLandmarks(scene));
   const interiors = span('init:interiors', () => createInteriors(scene)); // điện thờ vào được (world.js › ROOMS) // tài sản Meshy theo vùng (nạp khi tới gần)
@@ -630,7 +646,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   canvas.parentElement.appendChild(layer);
   const labels = STATIONS.map((st) => {
     const d = document.createElement('div'); d.className = 'hq-label'; d.textContent = st.name; layer.appendChild(d);
-    const anchor = LABEL_ANCHOR[st.id] || (st.world ? [st.world.x, T.heightAt(st.world.x, st.world.z) + 3.4, st.world.z] : [0, 3, 0]);
+    const anchor = LABEL_ANCHOR[st.id] || (st.world ? [st.world.x, (st.world.y ?? T.heightAt(st.world.x, st.world.z)) + 3.4, st.world.z] : [0, 3, 0]);
     return { id: st.id, el: d, pos: new THREE.Vector3(...anchor) };
   });
   const nameTag = document.createElement('div'); nameTag.className = 'hq-label hq-name'; layer.appendChild(nameTag);
@@ -688,6 +704,51 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const phuG = new THREE.Group(); phuG.name = 'mansions'; scene.add(phuG);
   registerPrison(); const prison = createPrison(scene); // Thiên Lao + Khoáng Sơn (luật pháp — law.js)
   registerHeaven(); const heaven = safeInit('heaven', () => createHeaven(scene, { citizens })); // Cửu Trọng Thiên: 9 đảo trời, tiên phủ (heaven.js — NHA-DIADIEM-MANIFEST §2)
+  // QUẬN ĐẢO BAY «THIÊN BÀN» — phần RENDER (§5.10): đèn điểm ấm mỗi đảo ngoài + đầu cầu, cột sáng
+  // Vân Thang (vàng son) và đầu cầu (lưu ly), nhãn tên 9 đảo. Nền đi được (bát giác + cầu vân) do
+  // terrain.js › registerSkyDistrict đăng ký ngay lúc nạp (cờ sky: nền trời bị bỏ qua bởi lời gọi
+  // 2D — obstacles.platformTop) — KHÔNG đăng ký lại ở đây kẻo nền đôi.
+  {
+    const Y = T.SKY_Y;
+    // đầu cầu B1–B4: neo theo mép nền bát giác THẬT (công thức skyOctReach của terrain.js —
+    // neo theo r−8 của đĩa sẽ hở 8–45 m tuỳ hướng), đèn/cột sáng đặt tại 2 đầu mỗi cầu
+    const octReach = (r, ux, uz) => Math.max((r * Math.SQRT1_2) / Math.max(Math.abs(ux), Math.abs(uz)), r / (Math.abs(ux) + Math.abs(uz)));
+    const BY = new Map(T.SKY_DISTRICT.map((s) => [s.id, s]));
+    const heads = [];
+    for (const [ai, bi] of [['thienban', 'quanthinh'], ['thienban', 'thudao'], ['thienban', 'laungoc'], ['thienban', 'thiendan']]) {
+      const A = BY.get(ai), B = BY.get(bi);
+      const d = Math.hypot(B.x - A.x, B.z - A.z) || 1, ux = (B.x - A.x) / d, uz = (B.z - A.z) / d;
+      heads.push({ x: A.x + ux * (octReach(A.r, ux, uz) - 10), z: A.z + uz * (octReach(A.r, ux, uz) - 10) });
+      heads.push({ x: B.x - ux * (octReach(B.r, ux, uz) - 10), z: B.z - uz * (octReach(B.r, ux, uz) - 10) });
+    }
+    // §5.10: sương 190–1700 mờ đảo xa → mỗi đảo ngoài 1 đèn + mỗi đầu cầu 1 đèn ấm vàng son
+    for (const s of T.SKY_DISTRICT.slice(1)) addLight(s.x, s.y + 6, s.z, { color: '#ffb35c', power: 0.9 });
+    for (const e of heads) addLight(e.x, Y + 3, e.z, { color: '#ffb35c', power: 0.7 });
+    addLight(SKY_UP.x, T.heightAt(SKY_UP.x, SKY_UP.z) + 4, SKY_UP.z, { color: '#ffb35c', power: 1 }); // chân Vân Thang
+    // cột sáng (khuôn heaven3d.js:60-64): Vân Thang VÀNG SON lớn ở sân, mỗi đầu cầu một cột nhỏ LƯU LY
+    const beamG = [], ringG = [];
+    {
+      const g = new THREE.CylinderGeometry(2.2, 3.4, 60, 16, 1, true); g.translate(SKY_UP.x, T.heightAt(SKY_UP.x, SKY_UP.z) + 30, SKY_UP.z); beamG.push(g);
+      const r = new THREE.RingGeometry(2.6, 4.2, 32); r.rotateX(-Math.PI / 2); r.translate(SKY_UP.x, T.heightAt(SKY_UP.x, SKY_UP.z) + 0.06, SKY_UP.z); ringG.push(r);
+    }
+    for (const e of heads) {
+      const g = new THREE.CylinderGeometry(1.1, 1.9, 26, 12, 1, true); g.translate(e.x, Y + 13, e.z); beamG.push(g);
+      const r = new THREE.RingGeometry(1.4, 2.2, 24); r.rotateX(-Math.PI / 2); r.translate(e.x, Y + 0.06, e.z); ringG.push(r);
+    }
+    const gold = new THREE.MeshBasicMaterial({ color: '#ffe3a8', transparent: true, opacity: 0.16, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+    const teal = new THREE.MeshBasicMaterial({ color: '#bfe8e2', transparent: true, opacity: 0.12, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+    // cấu kiện gộp: 1 mesh cột vàng son (Vân Thang) + 1 mesh cột lưu ly (đầu cầu) + 2 mesh vòng
+    const bGold = beamG.shift(), rGold = ringG.shift();
+    scene.add(new THREE.Mesh(bGold, gold), new THREE.Mesh(rGold, new THREE.MeshBasicMaterial({ color: '#ffd27a', transparent: true, opacity: 0.35, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide })));
+    if (beamG.length) scene.add(new THREE.Mesh(MG.mergeGeometries(beamG, false), teal));
+    if (ringG.length) scene.add(new THREE.Mesh(MG.mergeGeometries(ringG, false), new THREE.MeshBasicMaterial({ color: '#9fd8d4', transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide })));
+    beamG.forEach((g) => g.dispose()); ringG.forEach((g) => g.dispose());
+    // nhãn tên 9 đảo (cùng vòng nhãn: ẩn ngoài 70 m, khỏi hiện cho người dưới sân)
+    for (const s of T.SKY_DISTRICT) {
+      const el = document.createElement('div'); el.className = 'hq-label'; el.textContent = s.name; layer.appendChild(el);
+      labels.push({ id: `sky_${s.id}`, el, pos: new THREE.Vector3(s.x, s.y + 3.4, s.z) });
+    }
+  }
   RZ.initRaze(scene); // công trình ngoài thành phá được (raze.js)
   registerLifePlaces(); createLifePlaces(scene); // quầy cơm, liêu xá, giếng quanh Sơn Môn (sinh tồn — life.js)
   const yoke = makeYoke(); yoke.visible = false; scene.add(yoke); // đòn gánh nước trên vai khi đang gánh
@@ -902,15 +963,16 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // ngự kiếm: độ cao mượt dần · đi bộ / nhảy / leo / bơi: cao độ thật từ motion.js (tức thời)
     avState.alt = p.flying ? (avState.alt || 0) + ((p.alt || 0) - (avState.alt || 0)) * Math.min(1, dt * 3) : (p.alt || 0);
     // trên mặt đất / dưới nước: cao độ thật p.y3 của motion.js (groundY kẹp đáy nước ở −7,2 → người bơi trên sông sâu
-    // bị vẽ cao vài mét); ngự kiếm / trong phòng nội thất: mặt đất + độ cao như cũ
-    const realY = !p.flying && p.y3 != null && w.x <= T.ROOM_X0 - 40;
+    // bị vẽ cao vài mét); ngự kiếm cũng dùng y3 thật — main.js đồng bộ y3 mỗi bước bay (§5.5);
+    // trong phòng nội thất: mặt đất + độ cao như cũ
+    const realY = p.y3 != null && w.x <= T.ROOM_X0 - 40;
     // bơi: người nằm sấp trên mặt nước khi bơi, đứng thẳng đạp nước khi nổi yên
     avState.swimK = (avState.swimK || 0) + ((p.swim ? (avState.walk > 0.25 ? 1 : 0.25) : 0) - (avState.swimK || 0)) * Math.min(1, dt * 4);
     // trên thuyền: thuyền nổi theo mặt sóng, người đứng / ngồi trên sàn thuyền
     if (p.boat) { const id = p.boat.b?.id || 'do'; if (!myBoat || myBoat.userData.type !== id) { if (myBoat) scene.remove(myBoat); myBoat = makeBoat(id); scene.add(myBoat); } myBoat.visible = true; avState.heading = p.boat.h; }
     else if (myBoat) myBoat.visible = false;
     const boatY = p.boat ? floatBoat(myBoat, w.x, w.z, p.boat.h) + (myBoat.userData.type === 'buom' ? 1.1 : myBoat.userData.type === 'hoa' ? 0.5 : 0.3) : null;
-    let gy = boatY ?? ((realY ? p.y3 : world.groundY(w.x, w.z) + avState.alt) + avState.swimK * 0.72);
+    let gy = boatY ?? ((realY ? p.y3 : world.groundY(w.x, w.z, T.heightAt(w.x, w.z) + 1) + avState.alt) + avState.swimK * 0.72); // §5.4 :913 — probe terrain khi chưa có y3 (dưới đảo không nhảy 460)
     // đang cưỡi: dựng phương tiện dưới chân, người ngồi trên yên, nhấp nhô theo nước kiệu
     const rideId = !p.flying && !p.boat ? p.ride : null;
     if (rideId !== myMountId && !myMountBusy) {
@@ -959,9 +1021,9 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       }
     } else for (const st of steam) st.s.visible = false;
     // gia trì nguyên tố theo hành Dụng thần (progress.js) — dựng lại khi đổi hành
-    if (S.fate) { fateG.visible = true; fateG.position.set(S.fate.x, world.groundY(S.fate.x, S.fate.z), S.fate.z); fateG.userData.col.material.opacity = 0.16 + Math.sin(t * 2.2) * 0.06; fateG.userData.ring.rotation.z = t * 0.6; fateG.userData.ring.scale.setScalar(1 + Math.sin(t * 2.2) * 0.08); }
+    if (S.fate) { fateG.visible = true; fateG.position.set(S.fate.x, world.groundY(S.fate.x, S.fate.z, T.heightAt(S.fate.x, S.fate.z) + 1), S.fate.z); fateG.userData.col.material.opacity = 0.16 + Math.sin(t * 2.2) * 0.06; fateG.userData.ring.rotation.z = t * 0.6; fateG.userData.ring.scale.setScalar(1 + Math.sin(t * 2.2) * 0.08); }
     else fateG.visible = false;
-    for (const m of jobSigns) { const near = Math.hypot(m.position.x - w.x, m.position.z - w.z) < 260; m.visible = near; if (near) m.position.y = Math.max(world.groundY(m.position.x, m.position.z), -5.6); }
+    for (const m of jobSigns) { const near = Math.hypot(m.position.x - w.x, m.position.z - w.z) < 260; m.visible = near; if (near) m.position.y = Math.max(world.groundY(m.position.x, m.position.z, T.heightAt(m.position.x, m.position.z) + 1), -5.6); }
     const gKey = `${p.robe}|${cos.aura || ''}|${cos.trail || ''}|${cos.mount || ''}`;
     if (!giatri || giatriWx !== gKey) {
       if (giatri) { scene.remove(giatri.obj); scene.remove(giatri.trail); giatri.dispose(); } // hủy material/texture bản cũ
@@ -1008,8 +1070,8 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     anchorTick -= dt;
     if (anchorTick <= 0) {
       anchorTick = 2;
-      for (const lb of labels) { const st = stationById(lb.id); if (st?.world) lb.pos.y = world.groundY(st.world.x, st.world.z) + 3.4; }
-      for (const d of deskMarks) d.g.position.y = world.groundY(d.g.position.x, d.g.position.z);
+      for (const lb of labels) { const st = stationById(lb.id); if (st?.world) lb.pos.y = (st.world.y ?? world.groundY(st.world.x, st.world.z, T.heightAt(st.world.x, st.world.z) + 1)) + 3.4; } // §5.4 :1011 — trạm đảo khai world.y
+      for (const d of deskMarks) d.g.position.y = world.groundY(d.g.position.x, d.g.position.z, T.heightAt(d.g.position.x, d.g.position.z) + 1);
     }
     span('f:landmarks', () => landmarks.update(w.x, w.z));
     av.rotation.y = avState.heading;
@@ -1052,7 +1114,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       camHit = free < camHit ? free : Math.min(free, camHit + dt * 1.6);
       if (camHit < 0.999) camera.position.set(tx + ex * camHit, ty + ey * camHit, tz + ez * camHit);
     } else camHit = 1;
-    const floorY = world.groundY(camera.position.x, camera.position.z) + 0.6;
+    const floorY = world.groundY(camera.position.x, camera.position.z, camera.position.y - 0.7) + 0.6; // §5.4 :1055 — clamp mục tiêu ngay dưới camera: SPAWN (3,43) dưới đảo chủ không bị kẹp y 460,6
     if (camera.position.y < floorY) camera.position.y = floorY;
     if (inHall) {
       const c = Math.cos(inHall.ry), s = Math.sin(inHall.ry), dx = camera.position.x - inHall.cx, dz = camera.position.z - inHall.cz;
@@ -1337,7 +1399,12 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       const wy = o.w === 2 ? MO.waterLevelAt(sx, sz) : null;
       const wwY = o.w === 5 ? MO.waterLevelAt(sx, sz) : null; // người khác đạp nước: đứng trên mặt sóng (P14)
       r.swimK = (r.swimK || 0) + ((o.w === 2 ? (o.moving ? 1 : 0.25) : 0) - (r.swimK || 0)) * Math.min(1, dt * 4);
-      r.grp.position.set(sx, by ?? (wwY != null ? wwY + 0.02 : wy != null ? wy - MO.FLOAT + r.swimK * 0.72 : world.groundY(sx, sz) + (o.a || 0)) + (sitting || o.w ? 0 : (o.moving && !reduced ? Math.abs(Math.sin(t * 9.5 + ow.x)) * 0.07 : 0)), sz);
+      // §5.4 + sửa 2026-11-14: ay = cao độ TUYỆT ĐỐI y3 của người gửi — «a» tương đối (kẹp ≤ 420)
+      // cộng vào probe terrain không bao giờ chạm nền đảo bay (bot 455, terrain dưới đảo < 34 m)
+      // nên người đứng trên đảo bị vẽ xuống đất, người bay trên đảo lệch ~400 m. Máy gửi cũ
+      // (ay null) giữ nguyên đường probe cũ theo «a».
+      const gyRemote = o.ay != null ? o.ay : world.groundY(sx, sz, T.heightAt(sx, sz) + (o.a || 0) + 0.5) + (o.a || 0);
+      r.grp.position.set(sx, by ?? (wwY != null ? wwY + 0.02 : wy != null ? wy - MO.FLOAT + r.swimK * 0.72 : gyRemote) + (sitting || o.w ? 0 : (o.moving && !reduced ? Math.abs(Math.sin(t * 9.5 + ow.x)) * 0.07 : 0)), sz);
       r.grp.rotation.order = 'YXZ'; r.grp.rotation.x = r.swimK * 1.25;
       const goalH = sitting ? Math.PI : (o.h || 0);
       const dh2 = ((goalH - r.heading + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
@@ -1349,7 +1416,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     for (const id of [...remotes.keys()]) if (!seen.has(id)) dropRemote(id);
 
     // vòng đích
-    if (S.target && !p.sitting) { const tw = MD.toWorld(S.target.x, S.target.y); targetRing.position.set(tw.x, world.groundY(tw.x, tw.z) + 0.03, tw.z); targetRing.visible = true; targetRing.scale.setScalar(1 + Math.sin(t * 6) * 0.1); }
+    if (S.target && !p.sitting) { const tw = MD.toWorld(S.target.x, S.target.y); targetRing.position.set(tw.x, world.groundY(tw.x, tw.z, T.heightAt(tw.x, tw.z) + 1) + 0.03, tw.z); targetRing.visible = true; targetRing.scale.setScalar(1 + Math.sin(t * 6) * 0.1); }
     else targetRing.visible = false;
 
     {
@@ -1407,7 +1474,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       const o = r.data; if (!o) continue;
       const ow = MD.toWorld(o.x, o.y);
       const near = camera.position.distanceTo(r.grp.position) < 24;
-      const hy = world.groundY(ow.x, ow.z) + (o.a || 0) + (o.s ? 1.75 : 2.45);
+      const hy = (o.ay != null ? o.ay : world.groundY(ow.x, ow.z, T.heightAt(ow.x, ow.z) + (o.a || 0) + 0.5) + (o.a || 0)) + (o.s ? 1.75 : 2.45); // §5.4 :1410 — nhãn tên theo cao độ gói mv (ay tuyệt đối khi có — cùng sửa avatar ở trên)
       if (r.label.textContent !== o.name) r.label.textContent = o.name;
       if (near) place(r.label, ow.x, hy, ow.z); else r.label.style.display = 'none';
       showBubble(r.bub, near ? o.bubble : null, ow.x, hy, ow.z);
@@ -1535,6 +1602,8 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     setStickHook(h) { stickHook = h; },
     morphStats: () => world.morphStats(),
     mode: '3d',
+    /** groundY y-aware (§5.4) — main.js dùng đồng bộ y3 khi bay / truy vấn nền theo cao độ. */
+    groundY: (x, z, y = null) => world.groundY(x, z, y),
     ready,
     citizens, // gỡ lỗi: dân thành Bát Quái
     prepareRoom: (key) => roomsB.prepare(key),

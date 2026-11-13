@@ -65,8 +65,60 @@ export const REGIONS = [
   { id: 'phongthuy', name: 'Phong Thủy Viên', x: -RD, z: 0, r: 240, kind: 'plateau', h: 55 }, // Đoài (Tây)
   { id: 'lichduong', name: 'Lịch Đường', x: RD, z: 0, r: 240, kind: 'plateau', h: 55 },   // Chấn (Đông)
 ];
-// Thiên Bàn Đảo (đảo bay) treo trên Nội Thành
-export const SKY_ISLAND = { id: 'thienban', name: 'Thiên Bàn Đảo', x: 0, z: 0, r: 120 * SCALE, y: 520 };
+// QUẬN ĐẢO BAY «THIÊN BÀN» (docs/GAME-TROI-THIET-KE.md §1.1): 9 đảo trời, mặt nền cùng y 460.
+// Đây là NGUỒN TOẠ ĐỘ DUY NHẤT cho cảnh (landmarks.js › SPOTS), nền đi được (registerSkyDistrict dưới đây)
+// và nhãn (PLACES). r = bán kính đĩa đảo = mảng nền bát giác nội tiếp.
+import { addPlatform } from './obstacles.js';
+export const SKY_DISTRICT = [
+  { id: 'thienban', name: 'Thiên Bàn Đảo', x: 0, z: 0, y: 460, r: 260 },        // đảo CHỦ Ø520 quanh sky_palace
+  { id: 'quanthinh', name: 'Quan Tinh Đảo', x: 500, z: -260, y: 460, r: 130 },   // lầu các quan tinh
+  { id: 'thudao', name: 'Thư Đạo Đảo', x: -500, z: -280, y: 460, r: 130 },      // thư các
+  { id: 'laungoc', name: 'Lầu Ngọc Đảo', x: 20, z: -640, y: 460, r: 130 },      // 2 lầu song sinh
+  { id: 'thiendan', name: 'Thiên Đàn Đảo', x: -40, z: 640, y: 460, r: 130 },    // đài tế tròn
+  { id: 'thienquan', name: 'Thiền Quán Đảo', x: -640, z: 420, y: 460, r: 130 }, // 3 thảo lư
+  { id: 'ansi', name: 'Ứn Sĩ Đảo', x: 640, z: 420, y: 460, r: 90 },             // hermit + núi đá
+  { id: 'duocvien', name: 'Dược Viên Đảo', x: 1290, z: 60, y: 460, r: 90 },     // vườn dược
+  { id: 'vancanh', name: 'Vân Cảnh Đảo', x: -1290, z: 60, y: 460, r: 90 },      // đình tròn
+];
+// tham chiếu cũ (đảo chủ) — mọi nơi chỉ dùng .x/.z thì vẫn đúng; y 520 → 460, r 192 → 260 theo layout mới
+export const SKY_ISLAND = SKY_DISTRICT[0];
+
+// Cầu vân B1–B4 (§1.2): đảo chủ ↔ 4 đảo gần. Đoạn neo CHỐT THEO MÉP NỀN BÁT GIÁC THẬT (không phải R−8 của
+// đĩa — bát giác 2 hình vuông chỉ tới R ở 8 hướng đỉnh, giữa hai đỉnh chỉ tới 0,707R·√2/… → neo theo R−8
+// sẽ HỞ 8–45 m tuỳ hướng, người bước từ đảo xuống cầu thì rơi). neo = reach(θ) − 6 (chồng 6 m vào nền).
+const skyOctReach = (R, ux, uz) => Math.max((R * Math.SQRT1_2) / Math.max(Math.abs(ux), Math.abs(uz)), R / (Math.abs(ux) + Math.abs(uz)));
+export const SKY_Y = 460;                                   // mặt nền chung 9 đảo + cầu (§6.4)
+export const SKY_BRIDGE_W = 5, SKY_SEG = 40;                // cầu rộng 5 m (vân lộ ≥ 4 m — không cần lan can kín), cấu kiện 40 m
+// mỗi cầu: id, a/b (điểm neo trên nền đảo), ux/uz (đơn vị hướng), segs (tâm từng cấu kiện 40 m; ry = hướng nền)
+export const SKY_BRIDGES = [];
+{
+  const pair = (a, b) => {
+    const A = SKY_DISTRICT.find((s) => s.id === a), B = SKY_DISTRICT.find((s) => s.id === b);
+    const d = Math.hypot(B.x - A.x, B.z - A.z), ux = (B.x - A.x) / d, uz = (B.z - A.z) / d;
+    const a0 = { x: A.x + ux * (skyOctReach(A.r, ux, uz) - 6), z: A.z + uz * (skyOctReach(A.r, ux, uz) - 6) };
+    const b0 = { x: B.x - ux * (skyOctReach(B.r, ux, uz) - 6), z: B.z - uz * (skyOctReach(B.r, ux, uz) - 6) };
+    const span = Math.hypot(b0.x - a0.x, b0.z - a0.z), n = Math.ceil(span / SKY_SEG), segs = [];
+    for (let k = 0; k < n; k++) {
+      const t = a0.x + ux * (SKY_SEG * k + SKY_SEG / 2), w = a0.z + uz * (SKY_SEG * k + SKY_SEG / 2);
+      segs.push({ x: t, z: w, ry: Math.atan2(ux, uz) }); // ry nền: trục d (40 m) dọc u — quy ước obstacles.local
+    }
+    return { id: `${a}-${b}`, a: a0, b: b0, ux, uz, segs };
+  };
+  for (const [a, b] of [['thienban', 'quanthinh'], ['thienban', 'thudao'], ['thienban', 'laungoc'], ['thienban', 'thiendan']]) SKY_BRIDGES.push(pair(a, b));
+}
+
+// Nền đi được của quận (§1.3: mỗi đảo 2 lệnh bát giác nội tiếp; cầu: mỗi cấu kiện 1 nền bot 457 — bay / đi
+// dưới cầu không bị nhấc). Đăng ký ngay lúc nạp module: mọi nơi dùng platformTop (motion đi bộ, world.blockedAt,
+// world3d.groundY) đều thấy nền đồng thời — nền sky bị platformTop bỏ qua khi lời gọi không có y (obstacles.js).
+export function registerSkyDistrict() {
+  for (const s of SKY_DISTRICT) {
+    const w = s.r * Math.SQRT2;
+    addPlatform(s.x, s.z, w, w, 0, SKY_Y, SKY_Y - 5, true);        // vuông dọc trục
+    addPlatform(s.x, s.z, w, w, Math.PI / 4, SKY_Y, SKY_Y - 5, true); // vuông xoay 45° → hợp = 16 cạnh nội tiếp đĩa R
+  }
+  for (const b of SKY_BRIDGES) for (const q of b.segs) addPlatform(q.x, q.z, SKY_BRIDGE_W, SKY_SEG, q.ry, SKY_Y, SKY_Y - 3, true);
+}
+registerSkyDistrict();
 
 // Sông Huyền Hà (waterways.js) — RIVER = điểm điều khiển tim sông chính, giữ tên cũ cho nơi dùng.
 export const RIVER = RIVER_CTRL;

@@ -1,0 +1,7 @@
+[{"name":"arrive","x":5646,"z":1371,"wait":16000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.2,dist:12,yaw:0})"},
+{"name":"aerial","x":5646,"z":1371,"wait":4000,"eval":"window.__hq.renderer.setView({pitch:0.6,dist:380,yaw:0.4})"},
+{"name":"edge","x":5646,"z":1371,"wait":3000,"eval":"window.__hq.renderer.setView({pitch:-0.05,dist:30,yaw:2.6})"},
+{"name":"thuong","x":5850,"z":1300,"wait":10000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.25,dist:45,yaw:-1.57})"},
+{"name":"menu-estate","x":5850,"z":1300,"wait":1500,"eval":"window.__hq.api.openPlaces(\"estate\")"},
+{"name":"menu-eat","x":0,"z":60,"wait":9000,"eval":"window.__hq.api.openPlaces(\"eat\")"},
+{"name":"map","x":0,"z":60,"wait":2000,"eval":"(async()=>{document.querySelector('.hq-panel [data-a=close], .hq-panel .hq-close')?.click(); await window.__hq.api.openCityMap(); })()"}]

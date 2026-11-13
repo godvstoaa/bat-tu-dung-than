@@ -911,6 +911,47 @@ function openVan(name, ...args) {
   };
 }
 const VAN_OPEN = { vanbia: openVan('vanBiaBody'), thaitue: openVan('thaiTueBody') };
+// [TRỜI] BIỆT THỰ TRÊN MÂY (interior.js › VILLA_ROOMS): bàn trà / án thư / bồ đoàn / cửa sổ mây trong
+// 4 phòng mẫu nội thất. Panel quan sát thuần lời (không chỗ ngồi máy chủ — ghế bồ đoàn Trà Thất chỉ ở
+// sân quán, api.setSitting sẽ dịch người về seats cũ); câu hiển thị chọn theo hạt ngày+pid như bark
+// (mục 05 §05.3 — cùng ngày cùng câu, mai tự đổi, không Math.random).
+const MAY_VIEWS = {
+  villa_tra: {
+    title: 'Bàn Trà Trên Mây', sub: 'Ấm nước reo nhỏ trên lò than, hơi trà quyện vào mây ngoài cửa.',
+    lines: ['Trà đây uống cùng mây trắng — khách thêm chén nữa không?', 'Từ trên cao nhìn xuống, việc hôm qua nhỏ như hạt sương.', 'Mây qua nhanh, trà nguội chậm — ngồi thêm một lát nhé.'],
+  },
+  villa_anthu: {
+    title: 'Án Thư Trên Mây', sub: 'Bốn báu trên án còn ướt, cuộn thơ mở dở trang giữa.',
+    lines: ['Sách trên mây đọc chậm thôi — mây cũng đang đọc cùng.', 'Một trang sách, một tầng mây — hôm nay đọc tới đâu tiện tới đó.', 'Nghiên mực loang chữ “tĩnh” — căn phòng này sinh ra để chậm lại.'],
+  },
+  villa_thien: {
+    title: 'Bồ Đoàn Thiền', sub: 'Đỉnh trầm nặng một làn khói, sáu bồ đoàn xoay quanh như cánh hoa.',
+    lines: ['Hít vào bốn giây, giữ bốn giây, thở ra sáu giây — mây tự êm.', 'Ngồi yên một lát, để mây đi việc mây, lòng đi việc lòng.', 'Khói trầm thẳng một đường — nhớ giữ lưng thẳng như thế.'],
+  },
+  villa_may: {
+    title: 'Cửa Sổ Mây', sub: 'Khung cửa sổ gỗ mở toang, mây lùa qua bàn như nước chảy.',
+    lines: ['Đám mây kia tựa như người quen — nhìn lâu hóa ra là chính mình.', 'Gió lên rồi — mây đổi hình, việc gì cần đổi thì cứ từ từ.', 'Ngoài cửa sổ chỉ có mây — một kiểu lúc lười rất nên có.'],
+  },
+};
+// chỉ số câu theo hạt (tổng ký tự key) — thuần deterministic, không đổi trong ngày
+const mayIdx = (key) => { let s = 0; for (const ch of key) s = (s * 31 + ch.charCodeAt(0)) >>> 0; return s; };
+function openMay(id) {
+  return (api) => {
+    const V = MAY_VIEWS[id];
+    if (!V) return el('<p class="hq-sub">Gian này chưa có gì để xem.</p>');
+    const line = V.lines[mayIdx(dayKeyOf() + id) % V.lines.length];
+    const body = el(`<div class="hq-may">
+      <div class="hq-may-sky" aria-hidden="true"><i></i><i></i><i></i></div>
+      <p class="hq-sub">${esc(V.sub)}</p>
+      <p class="hq-may-quote">“${esc(line)}”</p>
+      <p class="hq-note">Quận đảo bay «Thiên Bàn» — phòng mẫu nội thất biệt thự.</p>
+      <div class="hq-actions"><button class="hq-btn hq-primary" data-role="back">Đóng</button></div>
+    </div>`);
+    body.querySelector('[data-role=back]').onclick = () => api.panel.close();
+    return body;
+  };
+}
+const MAY_OPEN = { villa_tra: openMay('villa_tra'), villa_anthu: openMay('villa_anthu'), villa_thien: openMay('villa_thien'), villa_may: openMay('villa_may') };
 // Tàng Y Các (quầy Thợ May trong sân) — cùng bảng với nút «Y Các»
 VAN_OPEN.tangy = (api) => lazyBody(async () => (await import('./wardrobe-ui.js')).wardrobeBody(api));
 for (let i = 0; i < 9; i++) VAN_OPEN[`van${i}`] = openVan('vanGateBody', i);
@@ -950,5 +991,5 @@ MASTER_WRAP.m_daumau = hallMaster('tuvi', { label: '📋 Án tử vi luyện ngh
 MASTER_WRAP.m_laoquan = hallMaster('duocvuong', { label: '🍵 Trà dưỡng sinh', title: 'Trà', open: (api) => openTra(api) });
 /** bảng trạm gốc (công cụ, án luyện nghề) — miếu thờ dùng làm nghi thức riêng (temples.js) */
 export const STATION_BASE = { thay: thayBook, compass: openCompass, xam: openXam, huong: openHuong, lich: openLich, tra: openTra, sen: openSen, an0: openCaseSlot(0), an1: openCaseSlot(1), an2: openCaseSlot(2), trach: openTrach, duongtrach: openDuongTrach, que: openQue, ...HALL_OPEN, ...VAN_OPEN };
-export const STATION_OPEN = { ...STATION_BASE, thay: openThay, ...MASTER_WRAP };
+export const STATION_OPEN = { ...STATION_BASE, thay: openThay, ...MASTER_WRAP, ...MAY_OPEN };
 export { ROBE };

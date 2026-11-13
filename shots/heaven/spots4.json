@@ -1,0 +1,1 @@
+[{"name":"map-phu","x":-1500,"z":1200,"wait":8000,"eval":"window.__hq.api.openCityMap().then(()=>'ok')"}]

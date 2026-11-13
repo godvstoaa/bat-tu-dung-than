@@ -1,0 +1,1 @@
+[{"name":"ab","x":300,"z":2060,"wait":18000,"stats":true,"eval":"window.__hq.renderer.setView({pitch:0.1,dist:14,yaw:3.14159})"},{"name":"ab2","x":300,"z":2060,"wait":4000,"stats":true}]

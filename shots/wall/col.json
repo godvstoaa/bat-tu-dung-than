@@ -1,0 +1,1 @@
+[{"name":"col","x":300,"z":2060,"wait":15000,"eval":"import('/src/game/obstacles.js').then(O=>{const r=[];for(const u of [-12,-6,-4.6,-4,0,3,6,8.8,9.6,14,22]){const x=300,z=2125+u;r.push(u+':'+(O.blockedByBuilding(x,z)?'B':'-')+(O.tallTopAt?('/'+(O.tallTopAt(x,z)??'').toString().slice(0,4)):''));}return r.join(' ')})"}]

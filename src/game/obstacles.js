@@ -90,8 +90,11 @@ export function reservedWithin(x0, z0, x1, z1) { for (const v of reserved) if (v
 // nền chia theo ô 64 m (hàng trăm nền của biệt phủ / biệt thự — tra tuyến tính mỗi lần groundY là quá chậm)
 const PB = 64, pbuckets = new Map();
 // bot: mặt dưới (cầu cao — người bơi / đi dưới gầm cầu không bị nhấc lên mặt cầu), mặc định đặc tới đất
-export function addPlatform(x, z, w, d, ry, top, bot = -Infinity) {
-  const r = { x, z, hw: w / 2, hd: d / 2, c: Math.cos(ry), s: Math.sin(ry), top, bot }, R = Math.hypot(w, d) / 2;
+// sky: nền TRỜI (quận đảo bay y 460 — terrain.js › SKY_DISTRICT): chỉ tính khi lời gọi biết cao độ người
+// (motion.groundHeight truyền y). Lời gọi 2D không y (world3d.groundY cho camera clamp, world.blockedAt,
+// dân phố) bỏ qua nền trời — người dưới đảo không bị nhấc lên 460, spawn (3,43) không bị kẹp camera (GAME-TROI-THIET-KE §5.4).
+export function addPlatform(x, z, w, d, ry, top, bot = -Infinity, sky = false) {
+  const r = { x, z, hw: w / 2, hd: d / 2, c: Math.cos(ry), s: Math.sin(ry), top, bot, sky }, R = Math.hypot(w, d) / 2;
   rects.push(r);
   for (let i = Math.floor((x - R) / PB); i <= Math.floor((x + R) / PB); i++) for (let j = Math.floor((z - R) / PB); j <= Math.floor((z + R) / PB); j++) {
     const k = i * 100000 + j; let b = pbuckets.get(k); if (!b) pbuckets.set(k, (b = [])); b.push(r);
@@ -152,6 +155,7 @@ export function platformTop(x, z, y = null) {
   if (dynFloor && x > dynX) { const f = dynFloor(x, z); if (f != null) return f; }
   let t = null;
   for (const r of pbuckets.get(Math.floor(x / PB) * 100000 + Math.floor(z / PB)) || []) {
+    if (r.sky && y == null) continue; // nền trời (đảo bay y 460): chỉ tính khi lời gọi biết cao độ người
     if (y != null && y < r.bot - 0.3) continue;
     const dx = x - r.x, dz = z - r.z;
     const lx = r.c * dx - r.s * dz, lz = r.s * dx + r.c * dz;

@@ -118,10 +118,10 @@ export class TownShard extends DurableObject {
         // (máy chủ reset về START khi hello); parseClient đã chặn biên thế giới.
         if (a.mvFirst) a.mvFirst = false;
         else { const c = P.sanityMv(a, m.x, m.y); m.x = c.x; m.y = c.y; }
-        a.x = m.x; a.y = m.y; a.h = m.h; a.s = m.s; a.a = m.a || 0; a.w = m.w || 0; a.b = m.b || 0; a.fs = m.fs || 0;
+        a.x = m.x; a.y = m.y; a.h = m.h; a.s = m.s; a.a = m.a || 0; a.ay = m.ay ?? null; a.w = m.w || 0; a.b = m.b || 0; a.fs = m.fs || 0; // ay: cao độ tuyệt đối (protocol mv) — null với client cũ
         ws.serializeAttachment(a);
         { // phát theo vùng (protocol.inAoi): gần → mọi gói; xa → thưa (≤ 1 gói / AOI_FAR_MS) cho bản đồ nhỏ
-          const now = Date.now(), far = now - (a.farAt || 0) >= P.AOI_FAR_MS, text = JSON.stringify({ t: 'mv', id: a.id, x: m.x, y: m.y, h: m.h, s: m.s, a: a.a, w: a.w, b: a.b, fs: a.fs });
+          const now = Date.now(), far = now - (a.farAt || 0) >= P.AOI_FAR_MS, text = JSON.stringify({ t: 'mv', id: a.id, x: m.x, y: m.y, h: m.h, s: m.s, a: a.a, ay: a.ay, w: a.w, b: a.b, fs: a.fs });
           if (far) { a.farAt = now; ws.serializeAttachment(a); }
           for (const [w, b] of this.ready(ws)) if (far || P.inAoi(a, b)) { try { w.send(text); } catch (e) { /* bỏ qua */ } }
         }
