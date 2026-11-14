@@ -92,12 +92,6 @@
       "prompt": "An open waterside tea pavilion on wooden stilts, square plan, four cinnabar pillars, double curved roof, low wooden railing, wooden deck"
     },
     {
-      "id": "house_town",
-      "kind": "static",
-      "poly": 12000,
-      "prompt": "A traditional two-room town house with curved tile roof, wooden walls, a round moon window, small porch with a hanging lantern"
-    },
-    {
       "id": "bridge_arch",
       "kind": "static",
       "poly": 10000,

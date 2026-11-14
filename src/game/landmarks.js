@@ -372,7 +372,10 @@ async function lanternPosts(g, pts) {
 SPOTS.push({ at: [0, 60], place: async (g) => {
   // quầy chợ hai bên đại lộ Nam, chừa giữa đường đi — tiệm AAA đúng tỉ lệ (§2.4: 4,2×3,6 m, quầy cao 1,1;
   // tiệm gỗ cũ cao 6,8–7,5 m to quá nên chỉ làm dự phòng khi thiếu file mới)
-  for (let z = 80; z <= 132; z += 22) for (const sx of [-1, 1]) await place(g, ['lib_lib_shop_stall', 'lib_stall_timber'], { fit: { width: 4.2 }, at: { x: sx * 10.5, y: H(sx * 10.5, z), z: z + (sx > 0 ? 11 : 0), ry: sx > 0 ? -Math.PI / 2 : Math.PI / 2 } });
+  // §4 audit 2026-11-14 (finding thấp): kẹp theo CAO 3,2 thay vì width 4,2 — fallback lib_stall_timber
+  // đo GLB h/w = 1,361 nên fit width 4,2 cho đỉnh ~5,7 m vượt luật tiệm 3,2; bản chính lib_lib_shop_stall
+  // h/w = 0,763 nên fit height 3,2 vẫn ra 4,19×3,2 ≈ đúng luật 4,2×3,6×3,2 (mép hiên 3,0 giữ nguyên).
+  for (let z = 80; z <= 132; z += 22) for (const sx of [-1, 1]) await place(g, ['lib_lib_shop_stall', 'lib_stall_timber'], { fit: { height: 3.2 }, at: { x: sx * 10.5, y: H(sx * 10.5, z), z: z + (sx > 0 ? 11 : 0), ry: sx > 0 ? -Math.PI / 2 : Math.PI / 2 } });
   // cột đèn dọc đại lộ, cách 12 m
   const posts = [];
   for (let z = 74; z <= 134; z += 12) for (const sx of [-1, 1]) posts.push({ x: sx * 6.5, y: H(sx * 6.5, z), z, ry: sx > 0 ? Math.PI : 0 });

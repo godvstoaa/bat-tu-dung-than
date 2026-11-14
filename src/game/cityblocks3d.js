@@ -23,7 +23,7 @@ import * as CN from './canals.js';
 import * as AK from './archkit.js';
 import { innerHouses } from './innerfill.js';
 import { stoneMaterial } from './ground-tex.js';
-import { renderHouses } from './city4.js';
+import { renderHouses, allHouses } from './city4.js';
 
 const H = (x, z) => T.heightAt(x, z);
 const CLOSE = 0, NEAR = 36, MID = 68, FAR_VC = 220, FAR_MAX = 1200; // FAR_VC: tới đây là .vc2 (~2,5k, màu đỉnh) thay khối hộp — // v4: bậc theo TỪNG NHÀ — < 36 m BẢN GỐC có bóng (.lod1 nhìn gần vỡ mảnh) · < 68 m .lod1 · < 1,2 km khối xa nhân bản (2 lệnh vẽ) · xa hơn ẩn (sương). Bậc sát .mid tắt (nát)
@@ -365,6 +365,60 @@ function farInstances(houses) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// ĐỒ PHỐ VEN ĐƯỜNG AAA (docs/GAME-AAA-MODEL-THANH-PHO.md §2.6–2.7, 2026-11-14): rải xe hàng /
+// thùng hàng / cột phướng (lib_lib_prop_cart / crate / pole — mỗi mesh một file, đúng tỉ lệ mét)
+// + bộ biển ngang & đèn lồng treo (lib_lib_signage_kit) dọc các ĐƯỜNG VÀNH (ring / mid / belt).
+// Tất định theo FNV của (đường, đoạn, mét); mật độ vừa — mỗi ~26 m một chỗ, bỏ ~45 % → ~410 prop
+// cho ~11,6 km vành (KHÔNG rải theo 17k nhà). Va chạm: vòng tròn nhỏ (cart/crate/pole); biển treo
+// lơ lửng theo mặt tiền (tâm ~2,1 m — §1 bảng 6) nên không chặn đi. Chừa: cổng (26 m), trục đại lộ
+// (|v| ≥ 12, kênh Khảm/Tốn ≥ 21), kênh đào, và trước cửa nhà (≥ 1,3 m) — lỗ cửa xe/ngựa luôn thông.
+// ---------------------------------------------------------------------------
+const fnv = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+export async function streetDressing(grp) {
+  // cửa nhà (thế giới) vào lưới thô 2 m — prop không lấp cửa ra vào
+  const doors = new Map();
+  for (const h of allHouses()) { if (!h.door) continue; const k = Math.floor(h.door.x / 2) * 100000 + Math.floor(h.door.z / 2); (doors.get(k) || doors.set(k, []).get(k)).push(h.door); }
+  const nearDoor = (x, z) => { const gi = Math.floor(x / 2), gj = Math.floor(z / 2); for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (const d of doors.get((gi + a) * 100000 + gj + b) || []) if (Math.hypot(d.x - x, d.z - z) < 1.3) return true; return false; };
+  const gates = BQ.GUA.flatMap((g) => [BQ.toWorld(g, CB.TRUNG_A, 0), CB.outerGate(g)]); // 8 cổng trung + 8 cổng ngoại
+  const guaOf = (x, z) => BQ.GUA.reduce((best, q) => (q.dir[0] * x + q.dir[1] * z > best.dir[0] * x + best.dir[1] * z ? q : best), BQ.GUA[0]);
+  const by = { cart: [], crate: [], pole: [], sign: [] };
+  CB.cityRoads().forEach((r, ri) => {
+    if (r.kind !== 'ring' && r.kind !== 'mid' && r.kind !== 'belt') return;
+    for (let s = 1; s < r.pts.length; s++) {
+      const [ax, az] = r.pts[s - 1], [bx, bz] = r.pts[s];
+      const len = Math.hypot(bx - ax, bz - az), nx = -(bz - az) / len, nz = (bx - ax) / len, ry = Math.atan2(bx - ax, bz - az);
+      for (let d = 9 + fnv(`rd${ri}|${s}`) % 13; d < len - 6; d += 26) {
+        const hs = fnv(`pp${ri}|${s}|${Math.floor(d)}`);
+        if (hs % 100 < 45) continue; // bỏ ~45 % chỗ — phố không đặc như chợ
+        const t = d / len, cx = ax + (bx - ax) * t, cz = az + (bz - az) * t;
+        if (CN.inCanal(cx, cz, 1.2)) continue;
+        if (gates.some((p) => Math.hypot(p.x - cx, p.z - cz) < 26)) continue;             // cổng thành luôn thông
+        const g = guaOf(cx, cz), lv = BQ.toLocal(g, cx, cz);
+        const aveClear = CN.AVE_CANAL.gua.includes(g.id) ? 21 : 12;                        // đại lộ 14 m / kênh 22 m
+        if (Math.abs(lv.v) < aveClear) continue;                                           // không đè trục đại lộ
+        const side = (hs >> 7) & 1 ? 1 : -1;
+        const x = cx + nx * side * (r.w / 2 + 0.55), z = cz + nz * side * (r.w / 2 + 0.55);
+        if (nearDoor(x, z)) continue;
+        const y = H(x, z), rj = ry + (((hs >> 9) % 3) - 1) * 0.35, k = fnv(`kk${ri}|${s}|${Math.floor(d)}`) % 100;
+        if (k < 30) by.crate.push({ x, y, z, ry: rj, s: (hs >> 11) % 10 < 3 ? 0.62 : 0.85 }); // biến thể chồng 0,6³ (§2.6)
+        else if (k < 58) by.cart.push({ x, y, z, ry: rj, s: 1.9 });
+        else if (k < 78) by.pole.push({ x, y, z, ry, s: 2.0 });                              // cột phướng dựng thẳng theo đường
+        else by.sign.push({ x, y: y + 2.1, z, ry, s: 1.1 });                                 // biển + đèn lồng treo tâm ~2,1 m
+      }
+    }
+  });
+  await Promise.all([
+    instanceModel(grp, 'lib_lib_prop_crate', by.crate, { fitKey: 'width' }),
+    instanceModel(grp, 'lib_lib_prop_cart', by.cart, { fitKey: 'width' }),
+    instanceModel(grp, 'lib_lib_prop_pole', by.pole, { fitKey: 'width' }),
+    instanceModel(grp, 'lib_lib_signage_kit', by.sign, { fitKey: 'width' }),
+  ]);
+  for (const p of [...by.crate, ...by.cart]) addSolidCircle(p.x, p.z, 0.5); // xe / thùng chắn đi (nhẹ, không leo)
+  for (const p of by.pole) addSolidCircle(p.x, p.z, 0.22);
+  return { cart: by.cart.length, crate: by.crate.length, pole: by.pole.length, sign: by.sign.length };
+}
+
 export async function cityHouses(grp) {
   // v4 (thành ×10): ~22.900 nhà từ citylayout qua city4.renderHouses (mặt tiền đúng loại tiệm, nhà theo cung) + nhà chen Sơn Môn
   const houses = [...renderHouses(), ...innerHouses().map((h) => ({ ...h, lotF: h.f }))].map((h) => ({ ...h, y: H(h.x, h.z) }));
@@ -472,6 +526,7 @@ export async function cityHouses(grp) {
     }
   };
   update(0, 0);
+  await streetDressing(grp); // đồ phố AAA ven đường vành (§2.6–2.7) — nhẹ (~300 prop bản .lod ~0,5k tam giác)
   // màn nạp chờ bậc chi tiết của các nhà ngay quanh chỗ xuất phát (tối đa 6 giây), còn lại nạp sau
   const settle = (px, pz) => { update(px, pz); return Promise.race([Promise.all([...pend]), new Promise((r) => setTimeout(r, 6000))]); };
   return { update, settle, view, count: houses.length };
@@ -583,10 +638,11 @@ export async function wardFeatures(grp, g) {
       const items = [];
       for (let a = 0; a < 5; a++) for (let b = 0; b < 3; b++) {
         const u = R.u - R.w / 2 + 6 + a * ((R.w - 12) / 4), v = R.v - R.d / 2 + 6 + b * ((R.d - 12) / 2);
-        const w = BQ.toWorld(g, u, v); items.push({ x: w.x, y: H(w.x, w.z), z: w.z, ry: axisRy(g) + (b % 2 ? Math.PI : 0), s: 5 });
-        addSolidOBB(w.x, w.z, 2.4, 2.0, axisRy(g));
+        const w = BQ.toWorld(g, u, v); items.push({ x: w.x, y: H(w.x, w.z), z: w.z, ry: axisRy(g) + (b % 2 ? Math.PI : 0), s: 4.2 });
+        addSolidOBB(w.x, w.z, 2.1, 1.8, axisRy(g));
       }
-      await instanceModel(grp, 'lib_stall_timber', items, { fitKey: 'width' }); // bậc .vc (hasLod) — bản .lod vỡ mảnh
+      // §4(3) AAA (2026-11-14): quầy chợ 4,2×3,6×3,2 đúng tỉ lệ người (quầy 1,1) — thay gian chòi 6,8 m «quầy cao hơn nhà»
+      await instanceModel(grp, 'lib_lib_shop_stall', items, { fitKey: 'width' });
       break;
     }
     case 'fields': field(grp, g, half(0)); field(grp, g, half(1)); break;

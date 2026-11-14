@@ -150,18 +150,6 @@
     "refineCredits": 10,
     "refineGlb": "https://assets.meshy.ai/6c74c981-3cd8-4d82-88d4-2230aaa82a64/tasks/01a1a01d-86ae-7010-9217-53bf068bce6f/output/model.glb?Expires=4947264000&Signature=hBSTX9V3zw4qx78fIiZ3tShTgMd0nqrptMn7wzvl0UpC83-zStMeBJByJPv4BlP6WRKeMFO1raT987Nff-gzdaw3QSyDUryuxOqyww-UW11VUKTEH2NNXDhN0lLD2nrSOqG0T~wmgouDqmHUl6EvHcpiqzRyGq22PwuQy~hftcZLWGUffwdfr0M13CF8iB9YVTHlspUusPSZ6ha2WPBHeTmVfmqAUsoQRglEt2gF77FzPa3VXEs8JlkkOYt8wgcfSU5Yf5NBAPt6TSuAjgtgiZXURh1dCcLAni-LDB9cxTpxShiZ-SZnTXmOTij1SDxrOKFgCylU~kHRzAXiZ2~VbQ__&Key-Pair-Id=K1VGYTHIYLM9UM"
   },
-  "house_town": {
-    "preview": "01a1a018-82a7-7229-96af-0440d34c9316",
-    "rejected": null,
-    "refine": "01a1a01d-8aa1-75b6-a4e7-d5491d13eab3",
-    "at": 1793687314391,
-    "previewStatus": "SUCCEEDED",
-    "previewCredits": 20,
-    "previewGlb": "https://assets.meshy.ai/6c74c981-3cd8-4d82-88d4-2230aaa82a64/tasks/01a1a018-82a7-7229-96af-0440d34c9316/output/model.glb?Expires=4947264000&Signature=Xeav3BjThOJBaZ2tHrLq9v3THjAJqmOe~D-MrSv2lrTk5R8K32DrzB9Ui3pbUuVHKRsSQYb8FKX3k-LtbUbyephAnuffW~qZAQIWu~tIaqfXjTtZWAL-2ttOcBwdRP3GIkBPutbeSf8RCeY52GBDbT45AXS513-Yg0JGhwDgcIYwrMG8o3EpLYsX-ksotKARJnn-LJ3JrmTbhIWr6czX8m4HGAqNQBYZgdaELEQ3ytNswh0Q5g9yQjJTi5wsBn-1MLOrwxeNesuu56SjzzDJg6TlrbISlBIGtuH-7u7d0Y6Wv5mHv0aPlv95u59Gg3hdL2VExSQDQ4WerwwjTTZahw__&Key-Pair-Id=K1VGYTHIYLM9UM",
-    "refineStatus": "SUCCEEDED",
-    "refineCredits": 10,
-    "refineGlb": "https://assets.meshy.ai/6c74c981-3cd8-4d82-88d4-2230aaa82a64/tasks/01a1a01d-8aa1-75b6-a4e7-d5491d13eab3/output/model.glb?Expires=4947264000&Signature=XA7~up7arbWehCcYBrTzKTmc0M486hNoTnx17GVdpabJjO0vVnEALR0SeYPPwf-qwNQVkwI9N7MSXFMuABL674VtnFSczudvDroDHKo5ogT5H~fc8rPNZv-pJCJv-ppqBBU2JgGPEvRf4OpKiK-0EZI37Ivepm5AS73jY954uDy1zeo6RpqgrdKqmQwxhJ9Cltf5hkQRF9MN38D9xDRrBaEbp8jkDt2jLjK4PSTXgREdlYEriAlkuv-WrwD2CHJ4gAdZM1XfIdKoEZ9kpoa5LIICjjhAKQ0~xbC3n8C6wmI3AG45VzDUeB0tp4~Pz2ehnlHOfIBTHwW-c12ZZHmFnA__&Key-Pair-Id=K1VGYTHIYLM9UM"
-  },
   "bridge_arch": {
     "preview": "01a1a018-876d-764d-9fd5-2afb946b3484",
     "rejected": null,

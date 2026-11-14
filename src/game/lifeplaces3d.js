@@ -21,7 +21,8 @@ function sign(text, w = 4.2) {
 export function createLifePlaces(scene) {
   const g = new THREE.Group(); g.name = 'lifeplaces'; scene.add(g);
   (async () => {
-    const st = await placeModel(g, 'lib_stall_timber', { fit: { height: 4.2 }, at: { x: STALL.x, y: 0, z: STALL.z, ry: STALL.ry } });
+    // [AAA tỉ lệ] quầy cơm theo luật §2.4: đỉnh ≤3,2 m (bản cũ height 4,2 → đỉnh ~5,7 m vượt luật)
+    const st = await placeModel(g, 'lib_stall_timber', { fit: { height: 3.2 }, at: { x: STALL.x, y: 0, z: STALL.z, ry: STALL.ry } });
     if (st?.obj) addFootprint(st.obj, { fill: false });
     const inn = await placeModel(g, 'bq_inn', { fit: { width: DORM.w }, at: { x: DORM.x, y: 0, z: DORM.z, ry: DORM.ry } });
     if (inn?.obj) addFootprint(inn.obj, { keep: (x) => x < DORM.x - DORM.d / 2 + 0.2 }); // chừa hiên trước cửa
