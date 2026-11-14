@@ -49,6 +49,12 @@ export function addSolidCircle(x, z, r) {
     if (((i + 0.5) * CELL - x) ** 2 + ((j + 0.5) * CELL - z) ** 2 <= r * r) solid.add(ck(i, j));
   }
 }
+/** Khoét lối tròn (cửa nhà dãy phố AAA — GDD BLD-thanh-23 khoét cổng 1,6 m): bỏ ô đặc trong bán kính r. */
+export function carveSolidCircle(x, z, r) {
+  for (let i = cellOf(x - r); i <= cellOf(x + r); i++) for (let j = cellOf(z - r); j <= cellOf(z + r); j++) {
+    if (((i + 0.5) * CELL - x) ** 2 + ((j + 0.5) * CELL - z) ** 2 <= r * r) solid.delete(ck(i, j));
+  }
+}
 /** Đặc dải thẳng từ A tới B, nửa bề dày hw (tường thành) */
 export function addSolidSegment(ax, az, bx, bz, hw) {
   const L = Math.hypot(bx - ax, bz - az) || 1;

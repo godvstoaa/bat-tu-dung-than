@@ -22,7 +22,7 @@ import { hasStation, TEXT } from './features.js';
 import { createWorld, QUALITY } from './world3d.js';
 import { createLandmarks } from './landmarks.js';
 import { setModelQuality, setWarmup, settleLods, loadModel as loadGlb, placeModel, instanceModel } from './assets.js';
-import { createCharacter, setViewer } from './characters.js';
+import { createCharacter, setViewer, NPC_TINT } from './characters.js';
 import { poseOf } from './flight-poses.js';
 import { createCitizens, setCitizenCap } from './citizens.js';
 import { walkers4 } from './city4.js';
@@ -338,9 +338,10 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     return { marker, g };
   });
 
-  // người bán ở quầy Tàng Y Các — cúi chào khi khách lại gần
+  // người bán ở quầy Tàng Y Các — cúi chào khi khách lại gần;
+  // NPC dân phân hoá theo cung bằng tint (charPlan §3.3): Bà T tư — cung Đoài (Tây, nhà thương mại)
   let tailor = null;
-  createCharacter('npc_merchant', {}).then((ch) => { if (!ch) return; tailor = ch; ch.obj.position.set(TANGY.x + 1.2, 0, TANGY.z - 1.2); scene.add(ch.obj); });
+  createCharacter('npc_merchant', { tint: NPC_TINT.dui }).then((ch) => { if (!ch) return; tailor = ch; ch.obj.position.set(TANGY.x + 1.2, 0, TANGY.z - 1.2); scene.add(ch.obj); });
 
   // --- NPC-AI G2 · bark cục bộ (docs/npc-ai/05 §05.2; luật không-lộ-chuyện mục 13:
   //     bark chỉ gán DOM tại máy này, KHÔNG thêm field nào vào payload mạng, không
@@ -392,6 +393,8 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   const GATE_SM = { x: 0, z: COURT.z1 + 1.2 }; // Sơn Môn — sect.js đặt gate_sect đúng tại đây
 
   // Khách hỏi việc (Giải Án): 3 nhân vật đứng chờ + dấu ❓ vàng xoay khi chưa giải
+  // NPC dân theo cung (charPlan §3.3): mỗi khe một cung — Ly/Chấn/Khảm — bộ màu 60-30-10 của NPC_TINT
+  const CASE_GUA = { an0: 'li', an1: 'chan', an2: 'kham' };
   const caseNpcs = ['an0', 'an1', 'an2'].map((id) => {
     const [x, z] = STATION_CENTER[id];
     const g = new THREE.Group(); g.position.set(x, 0, z); g.userData.station = id;
@@ -1033,8 +1036,9 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     giatri.obj.position.set(w.x, gy, w.z); giatri.obj.rotation.y = avState.heading;
     giatriPos.set(w.x, gy, w.z);
     giatri.update(dt, t, { moving: avState.walk > 0.4, flying: !!p.flying, world: giatriPos });
-    // phụ kiện bám xương (mũ, lưng, tay) — cầm chén trà thì cất đồ cầm tay
-    outfit.set({ head: cos.head, back: cos.back, hand: p.sitting ? null : cos.hand });
+    // phụ kiện bám xương (mũ, lưng, tay) — cầm chén trà thì cất đồ cầm tay;
+    // hero 'wow' mặc định (charPlan §3.4): chưa đội mũ gì → búi tóc cài trâm ngọc (bun_ngoc)
+    outfit.set({ head: cos.head || 'bun_ngoc', back: cos.back, hand: p.sitting ? null : cos.hand });
     outfit.update(hero, avState.heading, t, { night: L.night, visible: !!hero && av.visible === false });
     // gợn nước quanh người chơi trong nước; tóe nước + tiếng khi rơi xuống
     tickRipples(dt);
@@ -1288,10 +1292,10 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
         cn.av = MD.avatar(ROBE[info.npc.robe] || ROBE.土, { hat: info.npc.gender === 'nam' });
         cn.av.traverse((o) => { if (o.isMesh) o.castShadow = true; });
         cn.g.add(cn.av); cn.robe = info.npc.robe + info.npc.gender;
-        // thay bằng nhân vật Meshy (khe chẵn: thương nhân, khe lẻ: dân làng)
+        // thay bằng nhân vật Meshy (khe chẵn: thương nhân, khe lẻ: dân làng) — tint theo cung của khe (ổn định theo id trạm, không đổi theo khách ngày)
         const look = caseNpcs.indexOf(cn) % 2 ? 'npc_villager' : 'npc_merchant';
         if (cn.ch) { cn.g.remove(cn.ch.obj); cn.ch.dispose(); cn.ch = null; }
-        createCharacter(look, {}).then((ch) => { if (!ch) return; cn.ch = ch; cn.g.add(ch.obj); cn.av.visible = false; });
+        createCharacter(look, { tint: NPC_TINT[CASE_GUA[cn.id]] || null }).then((ch) => { if (!ch) return; cn.ch = ch; cn.g.add(ch.obj); cn.av.visible = false; });
       }
       MD.poseAvatar(cn.av, { walk: 0, phase: 0, sitting: false, idle: t + cn.g.position.x });
       if (cn.ch) {
@@ -1350,8 +1354,9 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
         if (close) { r.ch.update(dt); if (sitting) r.ch.seat('calm', t); else r.ch.unseat(); }
         const oc = decodeCos(o.cos || ''); // decode MỘT lần cho cả đồ cầm tay + trang bị + hào quang
         if (close && oc.hand && !sitting && !o.moving) r.ch.hold(t);
-        // trang bị người khác (Tàng Y Các): phụ kiện + hào quang skin + ngự vật khi bay — chỉ khi ở gần
-        r.outfit.set({ head: oc.head, back: oc.back, hand: sitting ? null : oc.hand });
+        // trang bị người khác (Tàng Y Các): phụ kiện + hào quang skin + ngự vật khi bay — chỉ khi ở gần;
+        // cùng luật mặc định hero 'wow' (charPlan §3.4): chưa đội mũ → trâm ngọc — mọi máy vẽ như nhau
+        r.outfit.set({ head: oc.head || 'bun_ngoc', back: oc.back, hand: sitting ? null : oc.hand });
         r.outfit.update(r.ch, r.heading, t, { night: L.night, visible: close });
         // hào quang / vệt / ngự vật người khác: dựng MỘT LẦN mỗi người (chỉ dựng lại khi đổi skin),
         // bật/tắt theo khoảng cách với hysteresis 60/75 m — hết churn dựng/hủy quanh ngưỡng 60 m

@@ -36,6 +36,10 @@ function mats() {
     glow: new THREE.MeshBasicMaterial({ color: '#ffe3a0', transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }),
     cloud: std({ color: '#ffffff', roughness: 1, emissive: '#cfd8ff', emissiveIntensity: 0.35 }),
     lantern: std({ color: '#d02a18', emissive: '#ff6a2a', emissiveIntensity: 1.4, roughness: 0.6 }),
+    // charPlan §3.3 (GAME-AAA-MODEL-THANH-PHO.md) — 10% đai / khăn trán tiểu nhị #5C2223, túi vải #664228
+    khan: std({ color: '#5C2223', roughness: 0.85 }),
+    vai: std({ color: '#664228', roughness: 0.9 }),
+    gourd: std({ color: '#c07a30', roughness: 0.42, metalness: 0.1 }), // bình rượu hông — vàng hổ phách
   });
   M.luopan = std({ map: TX.luopanTex(), roughness: 0.3, metalness: 0.3 });
   M.ok = true;
@@ -115,6 +119,41 @@ const HEAD = {
     g.add(mesh(new THREE.SphereGeometry(0.025, 10, 8), M.glow, 0, 0.03, 0));
     return g;
   },
+  // --- charPlan §3.1 (GAME-AAA-MODEL-THANH-PHO.md): búi tóc + trâm ngọc (M.jade), khăn trán tiểu nhị, nón lá ---
+  bun_ngoc: () => {
+    const g = new THREE.Group();
+    g.add(mesh(new THREE.SphereGeometry(0.062, 12, 10), M.black, 0, -0.05, -0.01));                    // búi tóc (ù búi sẵn có của rig)
+    g.add(mesh(new THREE.TorusGeometry(0.064, 0.007, 6, 20), M.gold, 0, -0.028, -0.01, Math.PI / 2));   // vòng vàng buộc búi
+    g.add(mesh(new THREE.CylinderGeometry(0.007, 0.005, 0.27, 6), M.jade, 0, -0.045, 0, 0, 0, Math.PI / 2 - 0.18)); // trâm ngọc xuyên búi
+    g.add(mesh(new THREE.SphereGeometry(0.02, 8, 6), M.gold, -0.135, -0.037, 0));                       // đầu trâm vàng
+    const tas = new THREE.Group(); tas.position.set(0.135, -0.02, 0);
+    tas.add(mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.09, 4), M.red, 0, -0.045, 0));
+    tas.add(mesh(new THREE.OctahedronGeometry(0.014, 0), M.jade, 0, -0.1, 0));
+    g.add(tas); g.userData.animate = (t) => { tas.rotation.z = Math.sin(t * 2.1) * 0.22; };             // tua ngọc đung đưa
+    return g;
+  },
+  khan_tran: () => {
+    const g = new THREE.Group();
+    g.add(mesh(new THREE.TorusGeometry(0.104, 0.016, 6, 24), M.khan, 0, -0.185, 0.004, Math.PI / 2 + 0.1)); // vành quấn trán #5C2223
+    g.add(mesh(new THREE.BoxGeometry(0.03, 0.05, 0.024), M.khan, 0, -0.185, -0.104));                 // nút thắt sau gáy
+    for (const sx of [-1, 1]) g.add(mesh(new THREE.BoxGeometry(0.02, 0.14, 0.006), M.khan, sx * 0.012, -0.265, -0.1, 0.15, 0, sx * 0.2)); // hai dải buộc
+    return g;
+  },
+  non_la: () => {
+    const g = new THREE.Group();
+    g.add(mesh(new THREE.ConeGeometry(0.5, 0.24, 26, 1, true), M.straw, 0, -0.01, 0));                 // nón lá (M.straw, DoubleSide sẵn)
+    g.add(mesh(new THREE.TorusGeometry(0.49, 0.009, 4, 30), M.wood, 0, -0.1, 0, Math.PI / 2));         // vành tre vòng nón
+    g.add(mesh(new THREE.TorusGeometry(0.15, 0.006, 4, 18), M.khan, 0, -0.3, 0.01, Math.PI / 2 - 0.25)); // dây quai cằm
+    return g;
+  },
+  ngoc_quan: () => {
+    const g = new THREE.Group();
+    g.add(mesh(lathe([[0.001, 0], [0.07, 0], [0.082, 0.05], [0.052, 0.11], [0.001, 0.13]]), M.silver, 0, -0.035, 0));
+    g.add(mesh(new THREE.TorusGeometry(0.078, 0.008, 6, 22), M.gold, 0, 0.012, 0, Math.PI / 2));
+    g.add(mesh(new THREE.OctahedronGeometry(0.032, 0), M.jade, 0, 0.06, 0.055));                       // ngọc bích gắn trước
+    for (const sx of [-1, 1]) g.add(mesh(new THREE.SphereGeometry(0.014, 8, 6), M.jade, sx * 0.06, -0.005, 0.03));
+    return g;
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -138,6 +177,35 @@ const BACK = {
     u.add(mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.35, 6), M.wood, 0, -0.1, 0));
     u.add(mesh(new THREE.ConeGeometry(0.05, 0.1, 12), M.paper, 0, 0.82, 0));
     u.position.set(0.25, -0.45, -0.16); u.rotation.z = 0.55; g.add(u);
+    return g;
+  },
+  // --- charPlan §3.2: túi vải · bình rượu hông · ống quyển — vật CỨNG bám 1 điểm Spine02 (cấm áo vải mềm) ---
+  tui_vai: () => {
+    const g = new THREE.Group();
+    g.add(mesh(lathe([[0.001, 0], [0.095, 0.02], [0.108, 0.12], [0.075, 0.2], [0.048, 0.24], [0.001, 0.26]], 16), M.vai, -0.24, -0.62, -0.16, 0, 0, 0.12)); // túi vải #664228
+    g.add(mesh(new THREE.TorusGeometry(0.055, 0.008, 6, 14), M.khan, -0.24, -0.405, -0.16, Math.PI / 2, 0, 0.12)); // lòi tói thắt miệng túi
+    g.add(mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.34, 4), M.straw, -0.24, -0.5, -0.13, 0, 0, -0.55));       // quai dây buộc
+    return g;
+  },
+  binh_ruou: () => {
+    const g = new THREE.Group();
+    g.add(mesh(lathe([[0.001, 0], [0.072, 0.02], [0.094, 0.1], [0.058, 0.18], [0.05, 0.23], [0.044, 0.27], [0.001, 0.28]], 18), M.gourd, 0.24, -0.58, -0.14, 0, 0, -0.18)); // hồ lô vàng hông phải
+    g.add(mesh(new THREE.CylinderGeometry(0.026, 0.032, 0.05, 10), M.wood, 0.24, -0.29, -0.14, 0, 0, -0.18));        // nút gỗ
+    g.add(mesh(new THREE.TorusGeometry(0.056, 0.006, 6, 16), M.red, 0.288, -0.41, -0.14, Math.PI / 2, 0, -0.18));    // dây đỏ buộc eo hồ lô
+    return g;
+  },
+  ong_quyen: () => {
+    const g = new THREE.Group(); const u = new THREE.Group();
+    u.add(mesh(new THREE.CylinderGeometry(0.048, 0.048, 0.56, 14), M.wood, 0, 0.28, 0));
+    u.add(mesh(new THREE.CylinderGeometry(0.054, 0.054, 0.045, 14), M.khan, 0, 0.025, 0));            // nắp đai sẫm hai đầu ống
+    u.add(mesh(new THREE.CylinderGeometry(0.054, 0.054, 0.045, 14), M.khan, 0, 0.545, 0));
+    u.add(mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.3, 4), M.red, 0.04, 0.32, 0, 0, 0, -0.4));  // dây đeo
+    const tag = new THREE.Group(); tag.position.set(0.11, 0.06, 0);
+    tag.add(mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.1, 4), M.red, 0, -0.05, 0));
+    tag.add(mesh(new THREE.BoxGeometry(0.045, 0.06, 0.012), M.jade, 0, -0.13, 0));                    // ngọc ấn treo ống
+    u.add(tag);
+    u.position.set(-0.27, -0.72, -0.15); u.rotation.z = 0.55; g.add(u);
+    g.userData.animate = (t) => { tag.rotation.z = Math.sin(t * 1.9) * 0.2; };
     return g;
   },
   canh_phuong: () => {
@@ -220,6 +288,18 @@ const HAND = {
     const f = new THREE.Group(); f.position.set(0, 0.14, 0.05); g.add(f);
     for (let i = 0; i < 13; i++) { const a = -0.9 + (i / 12) * 1.8; const p = mesh(new THREE.PlaneGeometry(0.07, 0.36), M.white, Math.sin(a) * 0.04, 0.17, 0, 0, Math.PI / 2, -a); p.geometry.translate(0, 0.0, 0); f.add(p); }
     g.userData.animate = (t) => { f.rotation.x = Math.sin(t * 1.4) * 0.15; };
+    return g;
+  },
+  // --- charPlan §3.4: tràng hạt ngọc cầm tay (món của bộ Vân Du Tiên Môn — ma trận §3 cho phép người chơi) ---
+  trang_hat: () => {
+    const g = new THREE.Group(); const loop = new THREE.Group();
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      loop.add(mesh(new THREE.SphereGeometry(0.013, 8, 6), i % 4 === 0 ? M.gold : M.jade, Math.cos(a) * 0.055, Math.sin(a) * 0.055, 0));
+    }
+    loop.rotation.x = 0.35; g.add(loop);
+    g.add(mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.07, 6), M.gold, 0, 0.062, 0.02)); // ngọc đầu chuỗi
+    g.userData.animate = (t) => { loop.rotation.z = Math.sin(t * 1.8) * 0.18; };
     return g;
   },
 };

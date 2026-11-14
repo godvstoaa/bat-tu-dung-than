@@ -32,6 +32,16 @@ export const wedge = (u) => u * TAN8; // nửa bề ngang hình nêm cung tại 
 // Mẫu nhà: wd = rộng/sâu của model, f = khoảng mặt tiền (m), hd = cao/rộng (khối xa), màu khối xa
 export const HOUSE_SPECS = {
   lib_courtyard: { wd: 1.49, f: [10, 12], hd: 0.49, wall: '#d8cfbd', roof: '#4a5058' },
+  // --- NHÀ PHỐ AAA (docs/GAME-AAA-MODEL-THANH-PHO.md §2.1–2.3 — wire §4(1), vá 2026-11-14):
+  //     bbox đo GLB (wd/hd suy từ w,d,h đo được: a2 11,12×8,06×8,00 …); tên file nhóm A/B lặp
+  //     tiền tố lib_ (lib_lib_house_*) còn nhóm C không — giữ đúng id file trong public/models.
+  //     Không có cờ look → không vào THEME_MIX lớp hình (đồng bộ tuỳ chọn theo doc, chỉ ảnh hưởng biển estate).
+  lib_lib_house_a2: { wd: 1.38, f: [10, 12], hd: 0.72, wall: '#f5f2e9', roof: '#4a5459' }, // nhà 2 tầng 3 gian 11,12×8,06×8,0
+  lib_lib_house_a1: { wd: 1.55, f: [10, 12], hd: 0.41, wall: '#f5f2e9', roof: '#4a5459' }, // nhà 1 tầng 3 gian 11,12×7,19×4,6
+  lib_lib_house_b2: { wd: 0.92, f: [8, 9], hd: 1.08, wall: '#edeae0', roof: '#6b7a80' },   // nhà khá 2 gian 2 tầng 7,38×8,02×7,98
+  lib_lib_house_b1: { wd: 1.05, f: [8, 9], hd: 0.62, wall: '#edeae0', roof: '#6b7a80' },   // nhà khá 2 gian 1 tầng 7,38×7,02×4,58
+  lib_house_c2: { wd: 1.2, f: [7, 8.5], hd: 0.9, wall: '#edeae0', roof: '#3b424c' },       // nhà nghèo gác lửng 7,2×6,01×6,5
+  lib_house_c1: { wd: 1.2, f: [7, 8.5], hd: 0.57, wall: '#edeae0', roof: '#3b424c' },      // nhà nghèo 1 tầng 7,2×5,98×4,1
   bq_house_2f: { wd: 1.05, f: [8, 10], hd: 0.89, wall: '#e2dccd', roof: '#3d4650' },
   bq_house_tiled: { wd: 0.98, f: [8, 10], hd: 0.66, wall: '#cdbfa6', roof: '#5a4a3e' },
   bq_house_stone: { wd: 1.6, f: [9, 11], hd: 0.45, wall: '#a9a294', roof: '#4e4a46' },

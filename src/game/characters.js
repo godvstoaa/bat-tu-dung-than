@@ -50,6 +50,22 @@ export const WX_HSV = {
   水: [0.62, 0.62, 0.42],  // lam huyền (đen ánh xanh)
 };
 
+// NPC dân phân hoá theo 8 cung Bát Quái (charPlan docs/GAME-AAA-MODEL-THANH-PHO.md §3.3): mỗi cung một
+// bộ màu nhuộm bám 60-30-10 — 60% áo ngoài chủ đạo (primary, sắc pha nhuộm thực, không neon) · 30% áo
+// trong giữ màu ngà #F5F2E9 tự nhiên của texture (không nhuộm — không có vùng khoá riêng cho lớp trong)
+// · 10% đai nâu sẫm (accent so le #5C2223 / #664228 theo cung). render3d dùng cho npc_villager /
+// npc_merchant đứng ở sân; tint là mảng HSV nên vào đúng khuôn charMaterial (primary→robe, accent→sash).
+export const NPC_TINT = {
+  kham: { primary: [0.592, 0.437, 0.439], accent: [0.997, 0.63, 0.361] },  // Khảm · Bắc — lam thẫm, đai nâu đỏ
+  gen: { primary: [0.099, 0.515, 0.639], accent: [0.07, 0.608, 0.4] },     // Cấn · Đông Bắc — vàng đất, đai nâu gỗ
+  chan: { primary: [0.271, 0.393, 0.478], accent: [0.997, 0.63, 0.361] },  // Chấn · Đông — xanh rêu, đai nâu đỏ
+  xun: { primary: [0.269, 0.337, 0.627], accent: [0.07, 0.608, 0.4] },     // Tốn · Đông Nam — mộc non nhạt, đai nâu gỗ
+  li: { primary: [0.016, 0.65, 0.561], accent: [0.07, 0.608, 0.4] },       // Ly · Nam — đỏ nâu trầm, đai nâu gỗ
+  kun: { primary: [0.091, 0.483, 0.592], accent: [0.997, 0.63, 0.361] },   // Khôn · Tây Nam — nâu vàng, đai nâu đỏ
+  dui: { primary: [0.565, 0.223, 0.722], accent: [0.997, 0.63, 0.361] },   // Đoài · Tây — ánh bạc xanh, đai nâu đỏ
+  qian: { primary: [0.111, 0.104, 0.788], accent: [0.07, 0.608, 0.4] },    // Càn · Tây Bắc — trắng ngà sẫm, đai nâu gỗ
+};
+
 // Vùng nhuộm theo từng mô hình (đo histogram texture gốc 2026-11-10): robe = áo ngoài → Dụng thần, sash = đai → Hỷ thần.
 // h = tâm sắc độ (vòng 0–1), w = nửa bề rộng, s / v = ngưỡng bão hoà / sáng, ref = độ sáng điển hình (giữ sáng tối vải).
 // hero_f: áo màu ngọc + đai đỏ (trước đây nhuộm ngược: màu chính rơi vào đai); master: lam tím than + đai tím.

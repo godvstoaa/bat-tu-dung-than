@@ -39,6 +39,14 @@ _verify-*.mjs
 public/kinh/
 public/sitemap-kinh.xml
 
+# Scratch smoke/audit của phiên AAA nhà phố (2026-11-14): 46 MB script smoke + ảnh + GLB làm dở +
+# bản đo/_neo_tmp/check-streethouses.mjs, verify-street-actual.mjs, measure-glb.mjs — chạy qua
+# `node _neo_tmp/...` trực tiếp từ worktree, KHÔNG commit (một `git add -A` nuốt sạch vào repo).
+# scripts/blender/__pycache__/ — pyc sinh khi chạy generator Blender.
+_neo_tmp/
+__pycache__/
+scripts/blender/__pycache__/
+
 # Capacitor native projects (regenerated on each machine via `npx cap add ios|android`)
 # Anchor `/` — KHÔNG nuốt src/ios/ hay resources/ios/
 # KHÔNG commit /ios/ — signing/machine-specific. Mac sẽ `npx cap add ios` lại.

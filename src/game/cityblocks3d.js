@@ -18,6 +18,7 @@ import { loadModel, instanceModel, warmObject, getModelQuality } from './assets.
 import { addSolidOBB, addSolidCircle, addSolidSegment, addTall } from './obstacles.js';
 import { addLight, glowAll } from './lights.js';
 import { place, pond, field, yard, arena, nameBoard, mats } from './batquai3d.js';
+import { footprints } from './collide.js'; // outerGates: hạ đỉnh leo trèo của footprint sau khi kẹp scale.y cổng (§4(5))
 import * as CN from './canals.js';
 import * as AK from './archkit.js';
 import { innerHouses } from './innerfill.js';
@@ -179,7 +180,21 @@ export async function outerGates(grp, A = CB.OUTER_A, WH = 17) {
   for (const g of BQ.GUA) {
     const p = BQ.toWorld(g, A, 0), ry = BQ.faceAxis(g, true);
     if (CN.inCanal(p.x, p.z)) { waterGate(grp, g, A, WH); continue; } // kênh xuyên tường: thủy môn
-    await place(grp, ['city_gate', 'gate_sect'], { fit: { width: CB.OUTER_GATE_W * (A > 500 ? 1.45 : 1.25) }, at: { x: p.x, y: H(p.x, p.z), z: p.z, ry }, keep: corridor(p.x, p.z, ry, 6) });
+    const r = await place(grp, ['city_gate', 'gate_sect'], { fit: { width: CB.OUTER_GATE_W * (A > 500 ? 1.45 : 1.25) }, at: { x: p.x, y: H(p.x, p.z), z: p.z, ry }, keep: corridor(p.x, p.z, ry, 6) });
+    // §4(5) (vá 2026-11-14): cổng thành Ngoại (A > 500 ⇒ fit 56×1,45 = RỘNG 81 m) bùng CAO tới
+    // ~62,7 m vì model cao/rộng ≈ 0,77 — kẹp scale.y × 0,61 về đỉnh ~38 m (quy chiếu Thiên An Môn
+    // 34,7), giữ scale.x/z; neo đáy về mặt đất (placeModel căn đáy theo bbox TRƯỚC khi co) và hạ
+    // đỉnh leo trèo của bản ghi footprint theo đỉnh mới. keep corridor(...,6) là toạ độ thế giới
+    // theo mét — lối qua vòm rộng 12 m vẫn thông, không cần co hệ số.
+    if (r?.obj && A > 500) {
+      r.obj.scale.y *= 0.61;
+      r.obj.updateMatrixWorld(true);
+      const ground = H(p.x, p.z), b = new THREE.Box3().setFromObject(r.obj);
+      r.obj.position.y += ground - b.min.y;
+      r.obj.updateMatrixWorld(true);
+      const rec = footprints().find((q) => q.obj === r.obj);
+      if (rec) for (const t of rec.own.tops) t.top = Math.min(t.top, b.max.y); // addTall đã ghi đỉnh ~62,7 khi chưa co
+    }
   }
 }
 
@@ -230,7 +245,9 @@ const diel = (m) => { if (!DIEL.has(m)) { const c = m.clone(); c.metalness = 0; 
 // Tỷ lệ nhà thật (2026-11-10): mô hình giữ tỷ lệ gốc theo mặt tiền (nhà 2 tầng ≈ 7–8 m, 1 tầng 4–6 m bên cạnh người 1,72 m);
 // bỏ «×1,3 phố tu tiên» + kéo cao ngẫu nhiên (từng làm nhà 11–16 m, cửa cao ~3 m). Nhà liền vách: mẫu lấp đủ bề ngang lô
 // (chồng mép mái 1,5%) — mẫu đổi ở lớp hình không còn bị thu hẹp để hở hai bên; chiều sâu ép vừa lô khi mẫu sâu hơn.
-const HCAP = { bq_drum_tower: 16, bq_tower_house: 11, bq_granary: 10, bq_yamen: 12 };
+// §4(1) AAA 2026-11-14: trần an toàn cho nhánh không-ht (nhà innerfill không có ht → houseScale
+// nhánh HCAP): bản 2 tầng AAA kẹp 8,6 (luật 8,0 ± 0,6), bản gác lửng C kẹp 6,8; bản 1 tầng tự thấp.
+const HCAP = { bq_drum_tower: 16, bq_tower_house: 11, bq_granary: 10, bq_yamen: 12, lib_lib_house_a2: 8.6, lib_lib_house_b2: 8.6, lib_house_c2: 6.8 };
 export const houseScale = (h, size) => {
   const kx = ((h.lotF || h.f) * 1.015) / (size.x || 1);
   const kz = h.d ? (h.ht ? Math.min(kx * 1.5, h.d / (size.z || 1)) : Math.min(kx, h.d / (size.z || 1))) : kx; // v5: nhà ống — kéo sâu tới 1,5× cho kín lô

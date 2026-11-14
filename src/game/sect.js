@@ -217,10 +217,13 @@ export function buildSect(scene, { ripple, onBig = null }) {
 
   // --- model Meshy (bất đồng bộ) — tất cả vào lưới va chạm theo hình khối
   const loaded = (async () => {
-    // Sơn Môn + Hậu Môn: khoét lối giữa vòm cổng
+    // Sơn Môn + Hậu Môn: khoét lối giữa vòm cổng.
+    // §4(5) (vá 2026-11-14): kẹp fit 30/20 → 14 (luật cổng tông môn 14×5,1×8,2 — bảng §1 dòng 8);
+    // keep là toạ độ THẾ GIỚI theo mét (collide.js:178) nên KHÔNG co hệ số 14/30: khe |x|>3,4
+    // giữ nguyên = lối đi 6,8 m thông suốt (CHỐT gạch 5 của duyệt).
     const big = (r) => { if (r?.obj && bigHook) bigHook(r.obj); return r; };
-    big(await solid(await placeModel(root, 'gate_sect', { fit: { width: 30 }, at: { x: 0, y: 0, z: COURT.z1 + 1.2, ry: 0 } }), { keep: (x) => Math.abs(x) > 3.4 }));
-    big(await solid(await placeModel(root, 'gate_sect', { fit: { width: 20 }, at: { x: 0, y: 0, z: COURT.z0 - 1.2, ry: Math.PI } }), { keep: (x) => Math.abs(x) > 2.3 }));
+    big(await solid(await placeModel(root, 'gate_sect', { fit: { width: 14 }, at: { x: 0, y: 0, z: COURT.z1 + 1.2, ry: 0 } }), { keep: (x) => Math.abs(x) > 3.4 }));
+    big(await solid(await placeModel(root, 'gate_sect', { fit: { width: 14 }, at: { x: 0, y: 0, z: COURT.z0 - 1.2, ry: Math.PI } }), { keep: (x) => Math.abs(x) > 2.3 }));
     // Chính Đường trên tầng 2 — lùi lại nếu mặt tiền lấn tới bệ thầy
     const hall = await placeModel(root, 'palace_grand', { fit: { width: MAIN_HALL.w }, at: { x: MAIN_HALL.x, y: 4, z: MAIN_HALL.z, ry: 0 } });
     if (hall) {

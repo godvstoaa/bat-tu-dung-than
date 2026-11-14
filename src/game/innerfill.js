@@ -64,7 +64,10 @@ export function occupancy(pad = 1) {
   }
   return occ;
 }
-const RES = ['bq_house_2f', 'bq_house_tiled', 'lib_courtyard', 'bq_house_stone', 'bq_house_2f'];
+// §4(1) wire AAA 2026-11-14: 154 nhà chen Nội Thành cũng đổi da — thêm nhà nghèo C + nhà khá B
+// (nhóm A 11,12 m mặt tiền to hơn lô chen Inner Thành nên không đưa vào đây; id đúng tên file:
+// b* lặp tiền tố lib_lib_house_b2, c* không lặp lib_house_c2).
+const RES = ['bq_house_2f', 'bq_house_tiled', 'lib_courtyard', 'bq_house_stone', 'bq_house_2f', 'lib_house_c2', 'lib_lib_house_b2'];
 const SHOP = ['bq_shop_lantern', 'bq_shop_lantern', 'bq_tavern', 'bq_teahouse'];
 
 let CACHE = null;

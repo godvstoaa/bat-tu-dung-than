@@ -107,17 +107,21 @@ const SHOP_POOL = {
   duoc: ['bq_apothecary', 'bq_house_tiled', 'bq_teashop', 'bq_tower_house'], loren: ['bq_forge', 'bq_house_stone', 'bq_carpentry', 'bq_granary'],
   tuu: ['bq_tavern', 'bq_inn', 'bq_tower_house'], tralau: ['bq_teahouse', 'bq_teashop', 'bq_tavern'], dichtram: ['bq_inn'], namon: ['bq_yamen'],
 };
+// RES_POOL (§4(1) wire AAA 2026-11-14): mỗi cung 3 mẫu cũ nhường chỗ cho nhà AAA đúng tỉ lệ mét
+// (nhóm A thay bq_house_2f/lib_courtyard tim phố, B thay bq_house_tiled, C thay bq_rural_house/
+// bq_farmhouse ở cung đất — doc §2.1-2.3 «replaces»); bq_tower_house GIỮ cho tim phố cao (đỉnh
+// 11 m đáp ứng HT.avenue [10,14] mà lib_house bị chặn ở 8,6 — xem pick()).
 const RES_POOL = {
-  li: ['bq_house_2f', 'bq_house_tiled', 'lib_courtyard', 'bq_tower_house', 'bq_rural_house', 'lib_mtn_house'],
-  kun: ['bq_farmhouse', 'bq_house_stone', 'bq_granary', 'bq_rural_house', 'bq_house_tiled', 'bq_tower_house'],
-  dui: ['bq_house_2f', 'lib_courtyard', 'bq_house_tiled', 'bq_rural_house', 'bq_tower_house', 'lib_mtn_house'],
-  qian: ['bq_house_stone', 'lib_courtyard', 'bq_tower_house', 'bq_house_2f', 'bq_house_tiled', 'bq_granary'],
-  kan: ['bq_canal_house', 'bq_house_tiled', 'lib_courtyard', 'bq_stilt', 'bq_house_2f', 'bq_tower_house'],
-  gen: ['bq_house_stone', 'lib_mtn_house', 'bq_rural_house', 'bq_granary', 'bq_farmhouse', 'bq_house_2f'],
-  zhen: ['bq_house_2f', 'bq_house_tiled', 'bq_tower_house', 'lib_mtn_house', 'bq_rural_house', 'lib_courtyard'],
-  xun: ['lib_courtyard', 'bq_house_2f', 'bq_canal_house', 'bq_house_tiled', 'bq_tower_house', 'bq_stilt'],
+  li: ['lib_lib_house_a2', 'lib_lib_house_b2', 'lib_house_c2', 'lib_lib_house_a1', 'bq_tower_house', 'lib_mtn_house'],
+  kun: ['lib_lib_house_b2', 'lib_house_c2', 'lib_lib_house_b1', 'bq_farmhouse', 'bq_house_stone', 'bq_tower_house'],
+  dui: ['lib_lib_house_a2', 'lib_lib_house_b2', 'lib_house_c2', 'lib_lib_house_a1', 'bq_tower_house', 'lib_courtyard'],
+  qian: ['lib_lib_house_a2', 'lib_lib_house_b1', 'lib_house_c1', 'bq_tower_house', 'bq_house_stone', 'bq_granary'],
+  kan: ['lib_lib_house_b2', 'lib_house_c2', 'lib_lib_house_a1', 'bq_canal_house', 'bq_stilt', 'bq_tower_house'],
+  gen: ['lib_lib_house_b2', 'lib_house_c2', 'lib_lib_house_b1', 'bq_house_stone', 'lib_mtn_house', 'bq_granary'],
+  zhen: ['lib_lib_house_a2', 'lib_lib_house_b2', 'lib_house_c1', 'lib_lib_house_a1', 'bq_tower_house', 'lib_mtn_house'],
+  xun: ['lib_lib_house_a2', 'lib_lib_house_b1', 'lib_house_c2', 'bq_canal_house', 'bq_tower_house', 'bq_stilt'],
 };
-const GARDEN_POOL = ['lib_courtyard', 'bq_farmhouse', 'bq_house_stone', 'bq_house_2f', 'lib_mtn_house'];
+const GARDEN_POOL = ['lib_courtyard', 'bq_farmhouse', 'bq_house_stone', 'bq_house_2f', 'lib_mtn_house', 'lib_lib_house_a1']; // §4(1): thêm nhà vườn 1 tầng AAA
 const ANGLE_HOME = ['bq_tower_house', 'bq_house_2f', 'bq_granary'];
 // chiều cao mái đích theo cấp đường (§3.5) — góc phố +2 m
 const HT = { avenue: [10, 14], plaza: [9, 13], ring: [9, 12.5], street: [6.5, 10.5], lane: [6.5, 10.5], boundary: [6.5, 10.5], alley: [5, 7], boi: [5, 8] }; // v5.1: phố kín hơn (D/H đại lộ ≈ 2,7, phố nhánh ≈ 1,4)
@@ -132,17 +136,30 @@ function poolOf(h) {
   const g = String(h.district).split('-').pop(), b = band(h);
   return b === 'g2' || b === 'g3' ? GARDEN_POOL : RES_POOL[g] || RES_POOL.li;
 }
+// §4(1) chặn kéo cao quá luật (xử gạch 9 của duyệt): nhà AAA (lib_house_*) đỉnh tự nhiên 8,0 m —
+// lọc khỏi pool khi ĐÍCH chiều cao > 8,6 m ⇒ không bao giờ được chọn cho avenue/plaza/ring và
+// nửa trên street/lane (HT.avenue [10,14] tiếp tục do bq_tower_house/bq_house_2f đáp); ht trả về
+// bị HT_DISTORT [0,85;1,25] kẹp quanh cao tự nhiên ⇒ đỉnh kết cuộc ≤ 8,6 m (luật 8,0 ± 0,6).
+// Lọc ở ĐẦU pick (kể cả nhánh fallback best ||=) để không còn đường nào lib_house lọt lên tim phố cao.
+const AAA_HOUSE_RE = /^lib_(lib_)?house_/; // lib_lib_house_a*/b* (file lặp tiền tố) + lib_house_c*
 function pick(h, p1, p2, alt = 0) {
-  const pool = poolOf(h), [lo, hi] = h.villa ? [5.5, 9] : HT[h.front] || [5.5, 9.5], up = h.angle ? 2 : 0;
+  const [lo, hi] = h.villa ? [5.5, 9] : HT[h.front] || [5.5, 9.5], up = h.angle ? 2 : 0;
   // nhịp cao thấp xen kẽ dọc dãy (§3.4–3.5): nhà lẻ ở nửa trên, nhà chẵn ở nửa dưới khoảng đích
   const r = u01(`${h.id}|ht`), q = alt === 0 ? r : alt > 0 ? 0.62 + 0.38 * r : 0.38 * r; // hai nửa tách rõ (khe 24 %)
   const ht = lo + up + (hi - lo) * q, F = h.w;
+  const pool0 = poolOf(h);
+  let pool = pool0;
+  if (ht > 8.6) { const f = pool0.filter((id) => !AAA_HOUSE_RE.test(id)); if (f.length) pool = f; } // pool luôn còn mẫu bq_* (đảm bảo ở mọi pool trên) — nhánh phòng xa
   let best = null, bs = Infinity;
   pool.forEach((id, k) => {
     if (pool.length >= 3 && (id === p1 || id === p2)) return; // không trùng 2 nhà liền trước
     if (pool.length === 2 && id === p1) return;
     const sp = HOUSE_SPECS[id]; if (!sp) return;
     const nat = F * (FACADE_GAP[id] || 1) * sp.hd; // chiều cao khi phóng đều theo mặt tiền
+    // §4(1) (vá 2026-11-14, đo: chỉ lọc đích ht vẫn để 347 nhà ht ≤ 10,75): lô RỘNG hơn mẫu khiến
+    // sàn HT_DISTORT 0,85 × cao phóng-đồng-bộ tự đẩy đỉnh lên quá 8,6 — mẫu AAA chỉ nhận lô mà cao
+    // tự nhiên ≤ 9,8 (9,8 × 1,015 × 0,85 ≈ 8,45 ⇒ đỉnh kết cuộc ≤ 8,6 sau mọi kẹp).
+    if (AAA_HOUSE_RE.test(id) && nat > 9.8) return;
     const sc = Math.abs(Math.log(ht / nat)) + ((hash(`${h.id}|${k}`) % 97) / 97) * 0.15; // gần chiều cao đích nhất (+ ngẫu nhiên nhẹ)
     if (sc < bs) { bs = sc; best = id; }
   });

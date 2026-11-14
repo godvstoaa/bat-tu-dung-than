@@ -43,6 +43,12 @@ export const ITEMS = [
   { id: 'y_tho', slot: 'robe', set: 'tho', name: 'Hậu Thổ Đạo Bào', rarity: 3, price: { ngoc: 160 }, look: { pri: P(0.1, 0.7, 0.78), acc: P(0.06, 0.6, 0.45) }, desc: 'Hoàng bào đạo sĩ, vững như núi.' },
   { id: 'y_kim', slot: 'robe', set: 'kim', name: 'Canh Kim Kiếm Bào', rarity: 3, price: { ngoc: 160 }, look: { pri: P(0.12, 0.08, 0.95), acc: P(0.12, 0.25, 0.75) }, desc: 'Bạch kim ánh bạc của kiếm tu.' },
   { id: 'y_thuy', slot: 'robe', set: 'thuy', name: 'Huyền Thủy Long Bào', rarity: 3, price: { ngoc: 160 }, look: { pri: P(0.62, 0.65, 0.4), acc: P(0.52, 0.55, 0.8) }, desc: 'Lam huyền thăm thẳm như vực rồng.' },
+  // charPlan §3.4 (GAME-AAA-MODEL-THANH-PHO.md): preset robe theo bảng màu ngũ hành CHUẨN
+  // (gdd/01-tam-nhin/13-my-thuat-nhan-vat-vfx-ui.md §6.2 — luật §4.8: đúng 5 màu chuẩn, không neon):
+  // Mộc #4fa463 · Thủy #6b9be0 · Kim #cfc8b8 + Thổ #c99a4a.
+  { id: 'y_tien_thanh', slot: 'robe', name: 'Thanh Vân Tiên Y', rarity: 3, price: { ngoc: 180 }, look: { pri: P(0.36, 0.72, 0.58), acc: P(0.082, 0.7, 0.7) }, desc: 'Xanh mộc chuẩn thêu mây vàng thổ — áo tu hành thanh nhã.' },
+  { id: 'y_tien_lam', slot: 'robe', name: 'Tích Thủy Tiên Y', rarity: 3, price: { ngoc: 180 }, look: { pri: P(0.616, 0.68, 0.62), acc: P(0.113, 0.2, 0.85) }, desc: 'Lam chuẩn thuỷ viền ánh bạc — sâu như nước thu.' },
+  { id: 'y_tu_tien', slot: 'robe', set: 'tucien', name: 'Vân Du Tiên Bào', rarity: 4, price: { ngoc: 260 }, look: { pri: P(0.113, 0.2, 0.92), acc: P(0.082, 0.75, 0.72) }, desc: 'Bạch ngân bào (#cfc8b8) viền vàng thổ (#c99a4a) — phong thái tiên khách vân du.' },
   // --- mũ · trâm
   { id: 'tram_go', slot: 'head', name: 'Trâm Gỗ Đào', rarity: 1, price: { phuc: 60 }, desc: 'Trâm gỗ đào cài búi tóc — trừ tà, giữ tâm.' },
   { id: 'dao_quan', slot: 'head', set: 'kim', name: 'Ngân Đạo Quan', rarity: 3, price: { ngoc: 120 }, desc: 'Đạo quan bạc cài búi, đạo sĩ chính tông.' },
@@ -51,6 +57,10 @@ export const ITEMS = [
   { id: 'dau_lap', slot: 'head', set: 'tho', name: 'Đấu Lạp Mạng Sa', rarity: 3, price: { ngoc: 120 }, desc: 'Nón lá rộng vành buông mạng — giang hồ ẩn sĩ.' },
   { id: 'tram_ngoc', slot: 'head', set: 'thuy', name: 'Bích Ngọc Trâm', rarity: 3, price: { ngoc: 120 }, desc: 'Trâm ngọc lam rủ tua châu.' },
   { id: 'quan_sen', slot: 'head', name: 'Mũ Sen Vàng', rarity: 5, price: { ngoc: 680 }, unlock: { vip: true, level: 10 }, desc: 'Mũ sen vàng rực rỡ — VIP · cấp 10.' },
+  // charPlan §3.1: khăn trán tiểu nhị · nón lá · đạo quan ngọc (bộ Vân Du Tiên Môn)
+  { id: 'khan_tran', slot: 'head', name: 'Khăn Trán Tiểu Nhị', rarity: 1, price: { phuc: 50 }, desc: 'Khăn trán đỏ sẫm buộc sau gáy — tiểu nhị chạy bàn.' },
+  { id: 'non_la', slot: 'head', name: 'Nón Lá Giang Hồ', rarity: 1, price: { phuc: 70 }, desc: 'Nón lá rộng vành vành tre quai cằm — che nắng đường xa.' },
+  { id: 'ngoc_quan', slot: 'head', set: 'tucien', name: 'Ngân Ngọc Đạo Quan', rarity: 4, price: { ngoc: 220 }, desc: 'Đạo quan bạc gắn ngọc bích — chính thống tiên môn.' },
   // --- sau lưng
   { id: 'kiem_go', slot: 'back', name: 'Kiếm Gỗ Đào', rarity: 1, price: { phuc: 120 }, desc: 'Thanh kiếm gỗ đào đeo chéo lưng.' },
   { id: 'kiem_moc', slot: 'back', set: 'moc', name: 'Thanh Trúc Kiếm', rarity: 3, price: { ngoc: 140 }, desc: 'Kiếm bao trúc xanh.' },
@@ -60,12 +70,17 @@ export const ITEMS = [
   { id: 'canh_phuong', slot: 'back', set: 'hoa', name: 'Phượng Hỏa Dực', rarity: 4, price: { ngoc: 320 }, desc: 'Đôi cánh lửa phượng hoàng khẽ đập.' },
   { id: 'canh_hac', slot: 'back', name: 'Tiên Hạc Dực', rarity: 4, price: { ngoc: 320 }, desc: 'Đôi cánh hạc trắng viền đen.' },
   { id: 'phap_luan', slot: 'back', name: 'Bát Quái Hộ Thân Phù', rarity: 5, price: { ngoc: 720 }, unlock: { vip: true }, desc: 'Vòng bát quái vàng xoay sau lưng — VIP.' },
+  // charPlan §3.2: vật cứng bám một điểm Spine02 — túi vải · bình rượu hông · ống quyển
+  { id: 'tui_vai', slot: 'back', name: 'Túi Vải Hành Trang', rarity: 1, price: { phuc: 110 }, desc: 'Túi vải thô lòi tói buộc miệng — đựng đồ đường dài.' },
+  { id: 'binh_ruou', slot: 'back', name: 'Bình Rượu Hồ Lô', rarity: 2, price: { phuc: 240 }, desc: 'Hồ lô vàng hổ phách nút gỗ đeo hông — bạn đường khách giang hồ.' },
+  { id: 'ong_quyen', slot: 'back', set: 'tucien', name: 'Ống Quyển Trúc Giản', rarity: 3, price: { ngoc: 150 }, desc: 'Ống gỗ đựng thư quyến, dây đỏ rủ ngọc ấn.' },
   // --- cầm tay
   { id: 'quat_giay', slot: 'hand', name: 'Quạt Giấy Thư Pháp', rarity: 1, price: { phuc: 90 }, desc: 'Quạt giấy viết chữ «道».' },
   { id: 'phat_tran', slot: 'hand', name: 'Phất Trần Bạch Vĩ', rarity: 2, price: { phuc: 260 }, desc: 'Phất trần lông trắng của đạo sĩ.' },
   { id: 'den_long_tay', slot: 'hand', name: 'Đăng Lung Dạ Hành', rarity: 2, price: { phuc: 260 }, desc: 'Đèn lồng cầm tay, sáng thật khi đêm.' },
   { id: 'la_ban_tay', slot: 'hand', name: 'La Bàn Tam Hợp', rarity: 3, price: { ngoc: 130 }, desc: 'La bàn đồng cầm tay của thầy địa lý.' },
   { id: 'quat_long', slot: 'hand', name: 'Vũ Phiến Gia Cát', rarity: 4, price: { ngoc: 260 }, desc: 'Quạt lông trắng của quân sư.' },
+  { id: 'trang_hat', slot: 'hand', set: 'tucien', name: 'Tràng Hạt Ngọc', rarity: 3, price: { ngoc: 160 }, desc: 'Chuỗi hạt ngọc xen vàng cầm tay — tĩnh tâm mỗi bước.' },
   // --- hào quang (hiện kể cả chưa đủ cấp gia trì)
   { id: 'aura_menh', slot: 'aura', name: 'Gia Trì Bản Mệnh', rarity: 1, free: true, desc: 'Hào quang theo hành Dụng thần (mở theo cấp).' },
   { id: 'aura_dao', slot: 'aura', set: 'moc', name: 'Đào Hoa Phi Vũ', rarity: 3, price: { ngoc: 150 }, desc: 'Cánh đào bay quanh người.' },
@@ -110,6 +125,8 @@ export const SETS = [
   { id: 'tho', wx: '土', name: 'Hậu Thổ Đạo Tông', pieces: ['y_tho', 'dau_lap', 'ho_lo', 'aura_batquai'] },
   { id: 'kim', wx: '金', name: 'Canh Kim Kiếm Tông', pieces: ['y_kim', 'dao_quan', 'kiem_bao', 'aura_set'] },
   { id: 'thuy', wx: '水', name: 'Huyền Thủy Long Tông', pieces: ['y_thuy', 'tram_ngoc', 'o_giay', 'aura_tuyet'] },
+  // charPlan §3.4: outfit set tu tiên «wow» — bạch ngân + vàng thổ (màu Kim/Thổ chuẩn §6.2, không neon)
+  { id: 'tucien', wx: '金', name: 'Vân Du Tiên Môn', pieces: ['y_tu_tien', 'ngoc_quan', 'ong_quyen', 'trang_hat'] },
 ];
 export const SET_BONUS = 0.1; // Hợp mệnh: +10% Phúc Khí giải án / sảnh nghề
 

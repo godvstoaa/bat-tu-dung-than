@@ -6,11 +6,11 @@
 // ============================================================================
 import * as THREE from 'three';
 import * as T from './terrain.js';
-import { placeModel, instanceModel, loadModel, hasLod, warmObject, tickLazyLods, modelAvailable, viewInstances } from './assets.js';
+import { placeModel, instanceModel, instanceModelLod, loadModel, hasLod, warmObject, tickLazyLods, modelAvailable, viewInstances } from './assets.js';
 import { rng } from './npc.js';
 import { stoneTex } from './textures.js';
 import { stoneMaterial } from './ground-tex.js';
-import { addPlatform, markTerraceEdges } from './obstacles.js';
+import { addPlatform, markTerraceEdges, addSolidOBB, addTall, carveSolidCircle } from './obstacles.js';
 import * as BQ from './batquai.js';
 import { octWall, cityGates, buildDistrict } from './batquai3d.js';
 import { outerWall, outerGates, cityHouses } from './cityblocks3d.js';
@@ -26,6 +26,7 @@ import { mergeStatic } from './models.js';
 import * as AK from './archkit.js';
 import { riverBridges, bridgePlatforms, deckTop } from './bridges.js';
 import { riverBridgeBody } from './river3d.js';
+import { streetHouses } from './streets.js';
 export { roadPath } from './roads.js';
 
 const H = (x, z) => T.heightAt(x, z);
@@ -147,6 +148,7 @@ const SPOTS = [
   { at: [0, 0], place: async (g) => {
     octWall(g);
     await cityGates(g);
+    await streetRow(g); // dãy nhà phố AAA — instancing + LOD + footprint đặc theo bbox mới (khoét cửa 1,6 m)
     // Hậu Sơn: quần thể điện tựa núi sau Sơn Môn (cổng là Hậu Môn của Sơn Môn), bậc ngắn
     await palaceComplex(g, { x: 0, z: -116, ry: 0, scale: 0.6, main: ['cliff_palace', 'palace_grand'], gate: false, stepD: 0.9 });
     await instanceModel(g, 'rock_island', [[150, 170, -120], [-170, 230, 60], [80, 270, 200], [-90, 210, -210]].map(([x, y, z], i) => ({ x, y, z, ry: i * 1.3, s: 60 + i * 14 })), { fitKey: 'max' });
@@ -188,8 +190,10 @@ const SPOTS = [
     await place(g, ['sky_palace', 'rock_island'], { solid: false, fit: { width: 240 }, at: { x: 0, y: T.SKY_Y, z: 0, ry: 0 } }); // giữ nguyên làm tâm đảo (đáy 460)
     await place(g, ['lib_nam_mon', 'sect_gate_grand', 'gate_sect'], { solid: false, fit: { width: 26 }, at: { x: 0, y: T.SKY_Y, z: 225, ry: 0 } }); // Nam Môn quận mép nam
     await place(g, ['lib_dien_dai', 'hall_main'], { solid: false, fit: { width: 40 }, at: { x: -170, y: T.SKY_Y, z: -40, ry: faceTo(-170, -40, 0, 0) } });
-    await place(g, ['lib_tieu_quan', 'lib_mtn_house', 'tea_pavilion'], { solid: false, fit: { width: 13 }, at: { x: 155, y: T.SKY_Y, z: -135, ry: faceTo(155, -135, 0, 0) } });
-    await place(g, ['lib_tieu_quan', 'lib_mtn_house', 'tea_pavilion'], { solid: false, fit: { width: 13 }, at: { x: 170, y: T.SKY_Y, z: 75, ry: faceTo(170, 75, 0, 0) } });
+    // §4(5) (vá 2026-11-14): tiểu quán/nhà đảo dưới đây kẹp theo CAO 8,2 m (⇒ 10,3×10,3×8,2) thay vì
+    // fit width 13 bùng cao tự do — đảo solid:false chỉ visual nhưng tỉ lệ vẫn theo luật bảng §1.
+    await place(g, ['lib_tieu_quan', 'lib_mtn_house', 'tea_pavilion'], { solid: false, fit: { height: 8.2 }, at: { x: 155, y: T.SKY_Y, z: -135, ry: faceTo(155, -135, 0, 0) } });
+    await place(g, ['lib_tieu_quan', 'lib_mtn_house', 'tea_pavilion'], { solid: false, fit: { height: 8.2 }, at: { x: 170, y: T.SKY_Y, z: 75, ry: faceTo(170, 75, 0, 0) } });
     await place(g, ['lib_noi_that', 'scholar_desk'], { solid: false, fit: { width: 22 }, at: { x: -150, y: T.SKY_Y, z: -25, ry: faceTo(-150, -25, -170, -40) } }); // bộ đạo cụ trước Đại Sảnh
     // 8 đĩa đảo còn lại: MỘT nhóm nhân bản (Ø 264/183 — rộng hơn mảng bát giác R 130/90 nên không đi trên không ngoài đĩa)
     // ry từng đĩa (F1): lan can sân dao_vua chỉ chừa 2 miệng cầu ±Z model (gen_dao_vua.py) — đĩa neo cầu
@@ -238,12 +242,12 @@ for (const s of T.SKY_DISTRICT.slice(1)) {
       await place(g, ['lib_thien_dan', 'hall_main'], { solid: false, fit: { width: 44 }, at: at(s.x, s.z, toC) });
     } else if (s.id === 'thienquan') { // 3 thảo lư (biến thể tranh = cùng model)
       for (let k = 0; k < 3; k++) { const a = k * Math.PI * 2 / 3 - Math.PI / 2, px = s.x + Math.cos(a) * 32, pz = s.z + Math.sin(a) * 32;
-        await place(g, ['lib_tieu_quan', 'lib_mtn_house'], { solid: false, fit: { width: 13 }, at: at(px, pz, faceTo(px, pz, s.x, s.z)) }); }
+        await place(g, ['lib_tieu_quan', 'lib_mtn_house'], { solid: false, fit: { height: 8.2 }, at: at(px, pz, faceTo(px, pz, s.x, s.z)) }); }
     } else if (s.id === 'ansi') { // hermit: 1 thảo lư + núi đá trang trí cao
-      await place(g, ['lib_tieu_quan', 'lib_mtn_house'], { solid: false, fit: { width: 13 }, at: at(s.x, s.z - 30, toC) });
+      await place(g, ['lib_tieu_quan', 'lib_mtn_house'], { solid: false, fit: { height: 8.2 }, at: at(s.x, s.z - 30, toC) });
       await instanceModel(g, 'rock_island', [{ x: s.x - 34, y: T.SKY_Y - 8, z: s.z + 20, ry: 0.6, s: 46 }, { x: s.x + 30, y: T.SKY_Y - 12, z: s.z + 28, ry: 2.9, s: 58 }], { fitKey: 'max' });
     } else if (s.id === 'duocvien') { // vườn dược + tiểu quán
-      await place(g, ['lib_tieu_quan', 'lib_mtn_house'], { solid: false, fit: { width: 13 }, at: at(s.x - 28, s.z, Math.PI / 2) });
+      await place(g, ['lib_tieu_quan', 'lib_mtn_house'], { solid: false, fit: { height: 8.2 }, at: at(s.x - 28, s.z, Math.PI / 2) });
     } else if (s.id === 'vancanh') { // đình tròn nhỏ (model gần đúng: đình trà thư viện)
       await place(g, ['tea_pavilion'], { solid: false, fit: { width: 18 }, at: at(s.x, s.z, toC) });
     }
@@ -273,11 +277,47 @@ function pinesNear(cx, cz, rad, n, seed) {
   return out;
 }
 
+// --- DÃY NHÀ PHỐ AAA (docs/GAME-AAA-MODEL-THANH-PHO.md §1 proportionTable + §2.1–2.3) ---
+// Dữ liệu dãy phố (biến thể + vị trí + doorX) sống ở src/game/streets.js — nguồn DUY NHẤT,
+// vì _neo_tmp/check-streethouses.mjs phải suy cùng streetHouses() mới kiểm đúng biến thể runtime
+// (bài học 2026-11-14: check hardcode lệch 10/11 vị trí, «OK: 11 nhà» chứng nhận nhầm bố cục).
+// Nhà AAA RỘNG HƠN nhà phố cũ nên footprint CẬP NHẬT theo bbox MỚI: mỗi biến thể một nhóm
+// instanceModelLod (gần = bản gốc, xa = .lod — GIỮ instancing/LOD), khung đặc OBB cùng công thức
+// nhà phố generator + khoét lối cửa 1,6 m (GDD BLD-thanh-23).
+/** dựng dãy nhà AAA: mỗi biến thể một nhóm nhân bản LOD; va chạm = OBB đặc theo khung bbox MỚI
+ *  (cùng công thức nhà phố generator — cityblocks3d.js:354: hw−0,04/hd−0,25) + khoét lối cửa 1,6 m
+ *  (carveSolidCircle) tại TÂM CỬA THẬT của từng biến thể (spec[4], streets.js): nhóm A cửa giữa
+ *  x=0 đúng như cũ; nhóm B hai cửa ±1,72 khoét tâm 0 vẫn đè mép (chấp nhận); nhóm C cửa đơn gian
+ *  trái x=−1,8 — khoét tại 0 để lại 0,3 m tường đặc cạnh cửa thật (người chơi chui QUA TƯỜNG
+ *  cạnh cửa). Không cắt-lat addFootprint trên nhóm instanced: im.count đang chuyển gần/xạ
+ *  lúc màn nạp khiến máy cắt bỏ nhà (đo 2026-11-14: 7/11 nhà mất ô đặc; re-add sau nạp mới đủ). */
+async function streetRow(g) {
+  const hs = streetHouses();
+  const groups = new Map();
+  for (const h of hs) {
+    if (!groups.has(h.spec[0])) groups.set(h.spec[0], { spec: h.spec, items: [] });
+    groups.get(h.spec[0]).items.push({ x: h.x, y: H(h.x, h.z), z: h.z, ry: h.ry, s: h.spec[1] });
+  }
+  for (const [, { spec, items }] of groups) {
+    const row = await instanceModelLod(g, spec[0], items, { fitKey: 'width', near: 45 });
+    if (!row) continue; // thiếu file → bỏ nhóm (game vẫn chạy model khác)
+    for (const it of items) {
+      addSolidOBB(it.x, it.z, spec[1] / 2 - 0.04, spec[2] / 2 - 0.25, it.ry); // thân nhà đặc theo khung mới
+      addTall(it.x, it.z, spec[1] / 2, spec[2] / 2, it.ry, it.y + spec[3]);   // đỉnh mái (leo trèo)
+      const dx = Math.sin(it.ry), dz = Math.cos(it.ry);                        // hướng mặt tiền (+Z local) → world
+      const ox = Math.cos(it.ry), oz = -Math.sin(it.ry);                       // trục X local → world (obstacles.js:38)
+      const doorX = spec[4] || 0;                                              // tâm cửa chính của biến thể (streets.js)
+      carveSolidCircle(it.x + dx * (spec[2] / 2 - 0.7) + ox * doorX, it.z + dz * (spec[2] / 2 - 0.7) + oz * doorX, 0.8);
+    }
+    LOD_UPDATERS.push(row.update);
+  }
+}
+
 // Sơn môn lớn trên đường vào 4 tông môn
 for (const id of ['tubinh', 'manh', 'trichthien', 'cungthong']) {
   const p = R(id); const n = Math.hypot(p.x, p.z);
   const x = p.x - (p.x / n) * p.r * 1.05, z = p.z - (p.z / n) * p.r * 1.05;
-  SPOTS.push({ at: [x, z], place: async (g) => { await place(g, ['sect_gate_grand', 'gate_sect'], { fit: { width: 70 }, at: { x, y: H(x, z), z, ry: faceTo(x, z, 0, 0) }, keep: corridor(x, z, faceTo(x, z, 0, 0), 8) }); } });
+  SPOTS.push({ at: [x, z], place: async (g) => { await place(g, ['sect_gate_grand', 'gate_sect'], { fit: { width: 30 }, at: { x, y: H(x, z), z, ry: faceTo(x, z, 0, 0) }, keep: corridor(x, z, faceTo(x, z, 0, 0), 8) }); } }); // §4(5): fallback cổng 70 → 30 (bản chính là gate_sect 14 ở sect.js)
 }
 // Nam Môn Đại Kiều: cầu đá nhiều nhịp qua sông Huyền Hà thẳng Nam cửa Cảnh Môn (bridges.riverBridges) — mặt cầu đi
 // được theo dốc, nhịp giữa 40 m, tĩnh không ~30 m; đình nghỉ giữa cầu, cột đèn đá, hai lầu cầu ở hai đầu
@@ -330,8 +370,9 @@ async function lanternPosts(g, pts) {
 
 // Phố chợ + cảnh quan bằng model thư viện (đặt thêm, không thay hệ cũ — thiếu file thì bỏ qua)
 SPOTS.push({ at: [0, 60], place: async (g) => {
-  // quầy chợ hai bên đại lộ Nam, chừa giữa đường đi
-  for (let z = 80; z <= 132; z += 22) for (const sx of [-1, 1]) await place(g, 'lib_stall_timber', { fit: { width: 5.5 }, at: { x: sx * 10.5, y: H(sx * 10.5, z), z: z + (sx > 0 ? 11 : 0), ry: sx > 0 ? -Math.PI / 2 : Math.PI / 2 } });
+  // quầy chợ hai bên đại lộ Nam, chừa giữa đường đi — tiệm AAA đúng tỉ lệ (§2.4: 4,2×3,6 m, quầy cao 1,1;
+  // tiệm gỗ cũ cao 6,8–7,5 m to quá nên chỉ làm dự phòng khi thiếu file mới)
+  for (let z = 80; z <= 132; z += 22) for (const sx of [-1, 1]) await place(g, ['lib_lib_shop_stall', 'lib_stall_timber'], { fit: { width: 4.2 }, at: { x: sx * 10.5, y: H(sx * 10.5, z), z: z + (sx > 0 ? 11 : 0), ry: sx > 0 ? -Math.PI / 2 : Math.PI / 2 } });
   // cột đèn dọc đại lộ, cách 12 m
   const posts = [];
   for (let z = 74; z <= 134; z += 12) for (const sx of [-1, 1]) posts.push({ x: sx * 6.5, y: H(sx * 6.5, z), z, ry: sx > 0 ? Math.PI : 0 });
@@ -428,8 +469,8 @@ const amvancoc = PLACES.find((q) => q.id === 'amvancoc');
 SPOTS.push({ at: [amvancoc.world.x, amvancoc.world.z], place: async (g) => {
   const { x, z } = amvancoc.world;
   const ry = faceTo(x, z, 0, -76); // quay nhà về phía bậc điện Hậu Sơn (lối tiếp khách)
-  await place(g, 'lib_mtn_house', { fit: { width: 21 }, at: { x, y: H(x, z), z, ry } });
-  const fx = x + Math.sin(ry) * 11.5, fz = z + Math.cos(ry) * 11.5; // ~5 m tính từ mép nhà
+  await place(g, 'lib_mtn_house', { fit: { height: 8.0 }, at: { x, y: H(x, z), z, ry } }); // §4(5): kẹp theo CAO 8,0 (10,1×10,1×8,0) thay vì width 21 bùng cao ~16,6
+  const fx = x + Math.sin(ry) * 10.5, fz = z + Math.cos(ry) * 10.5; // §4(5): 11,5 → 10,5 giữ mép nhà +5 m sau khi am co lại
   await place(g, 'scholar_desk', { fit: { width: 3.2 }, at: { x: fx, y: H(fx, fz), z: fz, ry } });
   // chiếu cói ngay cạnh bàn: mặt phẳng màu rơm sát đất (+0,02 chống z-fighting), không solid
   const mx = fx + Math.sin(ry) * 2.2, mz = fz + Math.cos(ry) * 2.2;

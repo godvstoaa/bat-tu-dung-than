@@ -122,7 +122,7 @@ export const DISTRICTS = {
   },
   kun: {
     buildings: [
-      B(['bq_granary', 'lib_mtn_house'], { width: 22 }, 120, -27, [22, 22], { name: 'Khôn Nguyên Thương' }),
+      B(['bq_granary', 'lib_mtn_house'], { height: 9.5 }, 120, -27, [12, 12], { name: 'Khôn Nguyên Thương' }), // §4(5): kẹp theo CAO 9,5 (12×12×9,5) thay vì width 22 bùng cao ~17,4; foot = khung kiểm đè co theo
       B(['bq_farmhouse', 'lib_wood_pavilion'], { width: 14 }, 118, 24, [14, 10.6], { name: 'Nông Gia Đình' }),
       B('lib_cart', { width: 4.2 }, 137, 13, [4.2, 4.2], { face: 'axis' }),
     ],
