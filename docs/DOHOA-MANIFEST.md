@@ -226,6 +226,35 @@ Manifest này đi theo hướng đó, đo bằng số, không hứa suông.
 - **Phần còn lại ở đền thờ (814 lệnh vẽ):** khoảng 184 lưới GLB của NPC và người chơi, mỗi nhân vật vài lệnh vẽ. Gộp nhân vật có hoạt ảnh xương phải viết lại hệ thống nhân vật thành nhân bản có hoạt ảnh. Đây là việc lớn, chỉ đáng làm khi người dùng báo đền thờ giật trên máy họ.
 - 35/35 test xanh, build xanh.
 
+### Đợt 7 (2026-11-15): rà 4 commit của bên khác (00f6a4b0 quận đảo bay, 15304718, d7ff7d33 + a6886299 nhà phố AAA)
+
+Bốn commit nằm trên máy, chưa đẩy. 36/36 test xanh, build xanh. Đo A/B chế độ tự chỉnh so với bản live 30fe21d0: tam giác tăng ở mọi điểm.
+
+| Điểm | Live | Code bên khác | Có sửa (đợt 7) |
+|---|---|---|---|
+| Sân Sơn Môn | 1,93 tr | 2,19 tr | 2,01 tr |
+| Phố | 1,62 tr | 1,79 tr | 1,63 tr |
+| Đền thờ | 2,14 tr | 2,48 tr | 2,35 tr |
+| Thiên Thê | 1,68 tr | 1,91 tr | 1,80 tr |
+
+Phần tăng còn lại là nội dung mới hợp lệ: đồ phố ven đường, quầy chợ, quận đảo bay.
+
+**Lỗi tìm thấy và đã sửa:**
+
+1. **`.far` của bộ nhà phố mới hỏng**: thủng tường, nhìn xuyên (a1, a2) hoặc đen (b2) — ảnh `shots/gfx/tier-sheet.png`. Bản này đang được dùng cho mọi nhà mới ở 36–220 m (2.787 nhà) vì bộ mới không có `.vc`.
+   - Thêm `HOUSE_SPECS.near` / `.mid`: a1, a2 dùng `.lod` cho cả bậc gần lẫn bậc vừa. `.lod` 12,8–13,9k trông như bản gốc 73–80k.
+   - b1, b2: `.vc` (9k) và `.vc2`. a1, a2, c1, c2: `.vc2`. Ảnh `shots/gfx/tier-sheet3.png`.
+   - `.vc` của a1, a2 bị nhạt (cửa gỗ thành xám vì mặt cửa chỉ vài tam giác) nên không dùng.
+2. **Thiếu bậc xa** cho bộ nhà mới và quận đảo bay. Tạo `.vc2` cho rock_island, lib_dao_vua, lib_dien_dai, lib_thien_dan, lib_lau_cac. Trước đây đá đảo và đảo chủ vẽ đủ chi tiết (khoảng 0,2 triệu tam giác) khi nhìn từ phố cách 2 km.
+3. **Cắt theo hướng nhìn chỉ xét mặt phẳng**, nên quận đảo bay ở y 460 ngay trên sân Sơn Môn vẫn bị vẽ. `viewInstances` đổi sang hình nón 3D: nửa góc chéo khung + 18° + bán kính góc của vật. Đứng trên Thiên Bàn vẫn thấy đủ cả hai hướng (`shots/gfx/rev-F-sheet.png`).
+4. `buildInstanced` / `instanceModelLod`: bản vá EXT_mesh_gpu_instancing của bên khác dựng N bộ nhân bản (N lệnh vẽ). Đã gộp N bản nguồn vào 1 hình học (bộ nhớ đệm theo mesh). File cầu vân hiện tại không còn dùng phần mở rộng này nên chưa đổi số lệnh vẽ; giữ để phòng file sau này.
+
+**Thử rồi bỏ:** nướng `.bk` bằng Blender cho bộ nhà mới. Model dựng thủ tục nhiều thanh mỏng nên giảm lưới làm thủng mảng lớn (`shots/gfx/bk-sheet6.png`). Đã xoá các file đó.
+
+**Chưa giải thích được:** 1 trong 5 lần chạy, ở lần đầu sau khi khởi động lại server dev, phố hiện khối trắng không có nhà (`shots/gfx/rev-C/02-pho.png`). 4 lần sau, kể cả khởi động nguội lần nữa, đều bình thường. Theo dõi trên live.
+
+**Bên khác tự ghi còn mở:** 2 miệng cầu B1 / B2 phía đảo chủ cần sửa model (đi vòng qua ±Z được).
+
 ## 5. Goal tiếp (sau khi đạt mục 4)
 
 - ~~**G-8.1**~~ — đạt đợt 4 (2,08 triệu). Ghi chép cũ: (đợt 2: 2,62 triệu tam giác, 38 fps khi tự chỉnh — tam giác chưa tới 2,2 triệu, nhưng fps đã qua đích ≥ 24): sân Sơn Môn ≤ 2,2 triệu tam giác. Còn lại: phần lớn là `.vc` 9k của công trình trong 110 m và bản gốc trong `nearDist` (tối đa 150 m). Bước kế: thu `nearDist` về 2 × cỡ (tối đa 90 m), nướng `.bk` cho công trình dùng gần (hall_main, gate_sect, palace_grand…), đo lại.

@@ -36,8 +36,11 @@ export const HOUSE_SPECS = {
   //     bbox đo GLB (wd/hd suy từ w,d,h đo được: a2 11,12×8,06×8,00 …); tên file nhóm A/B lặp
   //     tiền tố lib_ (lib_lib_house_*) còn nhóm C không — giữ đúng id file trong public/models.
   //     Không có cờ look → không vào THEME_MIX lớp hình (đồng bộ tuỳ chọn theo doc, chỉ ảnh hưởng biển estate).
-  lib_lib_house_a2: { wd: 1.38, f: [10, 12], hd: 0.72, wall: '#f5f2e9', roof: '#4a5459' }, // nhà 2 tầng 3 gian 11,12×8,06×8,0
-  lib_lib_house_a1: { wd: 1.55, f: [10, 12], hd: 0.41, wall: '#f5f2e9', roof: '#4a5459' }, // nhà 1 tầng 3 gian 11,12×7,19×4,6
+  //     near: bậc gần (< 36 m) dùng <id>.<near>.glb thay bản gốc — a1/a2 .lod 12–14k giống bản gốc 73–80k (ảnh shots/gfx/tier-sheet.png,
+  //     2026-11-15); mid: bậc vừa (36–68 m) riêng — a1/a2 .lod (bản .vc màu đỉnh nhạt mất cửa gỗ: mặt cửa chỉ vài tam giác); b/c: .vc.
+  //     Xa 68–220 m: .vc2 (scripts/meshy-vclod.mjs). .far của bộ này thủng tường / đen (ảnh shots/gfx/tier-sheet.png) — KHÔNG dùng.
+  lib_lib_house_a2: { wd: 1.38, f: [10, 12], hd: 0.72, wall: '#f5f2e9', roof: '#4a5459', near: 'lod', mid: 'lod' }, // nhà 2 tầng 3 gian 11,12×8,06×8,0
+  lib_lib_house_a1: { wd: 1.55, f: [10, 12], hd: 0.41, wall: '#f5f2e9', roof: '#4a5459', near: 'lod', mid: 'lod' }, // nhà 1 tầng 3 gian 11,12×7,19×4,6
   lib_lib_house_b2: { wd: 0.92, f: [8, 9], hd: 1.08, wall: '#edeae0', roof: '#6b7a80' },   // nhà khá 2 gian 2 tầng 7,38×8,02×7,98
   lib_lib_house_b1: { wd: 1.05, f: [8, 9], hd: 0.62, wall: '#edeae0', roof: '#6b7a80' },   // nhà khá 2 gian 1 tầng 7,38×7,02×4,58
   lib_house_c2: { wd: 1.2, f: [7, 8.5], hd: 0.9, wall: '#edeae0', roof: '#3b424c' },       // nhà nghèo gác lửng 7,2×6,01×6,5

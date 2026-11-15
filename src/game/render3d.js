@@ -1138,7 +1138,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     setViewer(camera.position);
     // cắt nhà ngoài khung nhìn: hướng nhìn ngang + nửa góc nhìn ngang (dọc 45° → ngang theo tỉ lệ khung)
     camera.getWorldDirection(camDir);
-    landmarks.view?.(camera.position.x, camera.position.z, camDir.x, camDir.z, Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect), camera.position.y);
+    landmarks.view?.(camera.position.x, camera.position.z, camDir.x, camDir.z, Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect), camera.position.y, camDir.y, THREE.MathUtils.degToRad(camera.fov / 2));
     if (debugCam) { camera.position.fromArray(debugCam.pos); camera.lookAt(...debugCam.look); }
     span('f:occl', () => world.occlusion(w.x, w.z, camera.position.x, camera.position.z));
     sky.position.copy(camera.position); stars.position.copy(camera.position); mountains.position.set(camera.position.x, 0, camera.position.z);

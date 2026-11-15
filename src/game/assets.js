@@ -9,6 +9,7 @@ import { span } from './perf.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import modelFiles from 'virtual:model-files';
 
 const loader = new GLTFLoader();
@@ -268,6 +269,20 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
   if (E.cull || E.upgrade) INST.push(E);
   return group;
 }
+// EXT_mesh_gpu_instancing trong GLB (Blender gộp bản sao liên kết — cầu vân 24 cấu kiện): gộp mọi bản nguồn vào MỘT hình học
+// (đã áp ma trận nguồn) → 1 lệnh vẽ / bộ nhân bản thay vì N (bản vá 2026-11-14 dựng N InstancedMesh: cầu vân 24 lệnh vẽ / bộ).
+// Trả [{ geo, mat }] cho mọi mesh con, ma trận cục bộ = đơn vị.
+const FLAT = new WeakMap(); // mỗi mesh nguồn gộp một lần (bộ hiện / bóng / xa / nâng dùng chung hình học)
+function flattenSources(o) {
+  if (!(o.isInstancedMesh && o.instanceMatrix && o.count > 1)) return null;
+  if (FLAT.has(o)) return FLAT.get(o);
+  const parts = [], m = new THREE.Matrix4();
+  for (let j = 0; j < o.count; j++) { o.getMatrixAt(j, m); const g = o.geometry.clone(); g.applyMatrix4(m.clone().premultiply(o.matrixWorld)); parts.push(g); }
+  const merged = mergeGeometries(parts, false); parts.forEach((g) => g.dispose());
+  if (merged) merged.computeBoundingSphere();
+  FLAT.set(o, merged);
+  return merged;
+}
 function buildInstanced(g, items, fitKey, group, name = '') {
   const root = g.scene;
   root.updateMatrixWorld(true);
@@ -281,15 +296,11 @@ function buildInstanced(g, items, fitKey, group, name = '') {
     // EXT_mesh_gpu_instancing (exporter Blender gộp linked-duplicate): từng instance nguồn là
     // một bản sao THẬT của mẫu — trước đây chỉ dùng o.matrixWorld nên bỏ rơi cả o.instanceMatrix
     // (lỗi cầu vân 2026-11-14: GLB chứa 24 bản chỉ vẽ được 1/24 nội dung). Lấy đủ ma trận nguồn.
-    const srcs = [];
-    if (o.isInstancedMesh && o.instanceMatrix) {
-      const im2 = new THREE.Matrix4();
-      for (let j = 0; j < o.count; j++) { o.getMatrixAt(j, im2); srcs.push(im2.clone().premultiply(o.matrixWorld)); }
-    } else srcs.push(o.matrixWorld.clone());
+    const flat = flattenSources(o);
+    const srcs = [flat ? new THREE.Matrix4() : (o.isInstancedMesh && o.instanceMatrix ? (() => { const m1 = new THREE.Matrix4(); o.getMatrixAt(0, m1); return m1.premultiply(o.matrixWorld); })() : o.matrixWorld.clone())];
     for (const sw of srcs) {
-      const im = new THREE.InstancedMesh(o.geometry, o.material, items.length); im.name = name;
+      const im = new THREE.InstancedMesh(flat || o.geometry, o.material, items.length); im.name = name;
       im.castShadow = true; im.receiveShadow = true;
-      if (srcs.length > 1) im.frustumCulled = false; // bản nguồn dàn trải — khung bao geometry không phủ hết
       const all = new Float32Array(items.length * 16);
       items.forEach((it, i) => {
         const k = it.s / (ref || 1);
@@ -310,17 +321,20 @@ function buildInstanced(g, items, fitKey, group, name = '') {
 const INST = [];
 // cắt theo hướng nhìn (như cityblocks3d.cityHouses.view — docs/DOHOA-MANIFEST.md §3.2): bản sao ngoài hình nón nhìn
 // (nửa góc ngang + 18°) và xa hơn max(45 m, 3 × cỡ) không vẽ; bóng giữ vòng 80 m. viewInstances gọi mỗi khung (landmarks.view).
-const IV = { on: false, cx: 0, cz: 0, ax: 0, az: 1, cosLim: -1, px: 0, pz: 0 };
-export function viewInstances(cx, cz, fx, fz, halfH) {
-  const l = Math.hypot(fx, fz); IV.cx = cx; IV.cz = cz;
+const IV = { on: false, cx: 0, cy: 0, cz: 0, ax: 0, ay: 0, az: 1, half: Math.PI, px: 0, pz: 0 };
+// hình nón nhìn 3D (2026-11-15): xét cả độ cao — quận đảo bay y 460 ngay trên sân Sơn Môn từng bị vẽ dù camera nhìn ngang / xuống
+// (đo: cầu vân + đá đảo ~0,25 triệu tam giác). halfV = nửa góc nhìn dọc; nửa góc chéo khung + 18° dư + bán kính góc của vật.
+export function viewInstances(cx, cz, fx, fz, halfH, cy = 0, fy = 0, halfV = 0.4) {
+  const l = Math.hypot(fx, fy, fz); IV.cx = cx; IV.cz = cz;
   if (l < 1e-3) { if (IV.on) { IV.on = false; for (const E of INST) E.lx = Infinity; tickInstances(IV.px, IV.pz); } return; }
-  fx /= l; fz /= l; IV.cosLim = Math.cos(Math.min(Math.PI * 0.95, halfH + 0.314));
-  if (!IV.on || fx * IV.ax + fz * IV.az < 0.99) { IV.on = true; IV.ax = fx; IV.az = fz; for (const E of INST) E.lx = Infinity; tickInstances(IV.px, IV.pz); }
+  fx /= l; fy /= l; fz /= l; IV.half = Math.atan(Math.hypot(Math.tan(halfH), Math.tan(halfV))) + 0.314;
+  if (!IV.on || fx * IV.ax + fy * IV.ay + fz * IV.az < 0.99 || Math.abs(cy - IV.cy) > 15) { IV.on = true; IV.ax = fx; IV.ay = fy; IV.az = fz; IV.cy = cy; for (const E of INST) E.lx = Infinity; tickInstances(IV.px, IV.pz); }
 }
 const seen = (it) => {
   if (!IV.on) return true;
-  const dx = it.x - IV.cx, dz = it.z - IV.cz, d = Math.hypot(dx, dz);
-  return d < Math.max(45, (it.s || 0) * 3) || (dx * IV.ax + dz * IV.az) / d > IV.cosLim;
+  const s = it.s || 0, dx = it.x - IV.cx, dy = (it.y || 0) + s * 0.5 - IV.cy, dz = it.z - IV.cz, d = Math.hypot(dx, dy, dz);
+  if (Math.hypot(dx, dz) < Math.max(45, s * 3) && Math.abs(dy) < 60) return true; // sát người chơi (cùng tầng): luôn vẽ
+  return (dx * IV.ax + dy * IV.ay + dz * IV.az) / d > Math.cos(Math.min(Math.PI * 0.95, IV.half + Math.atan(s / d)));
 };
 function tickInstances(px, pz) {
   IV.px = px; IV.pz = pz;
@@ -364,13 +378,10 @@ export async function instanceModelLod(parent, id, items, { fitKey = 'height', n
     root.traverse((o) => {
       if (!o.isMesh) return;
       // cùng lỗi buildInstanced: không bỏ rơi instanceMatrix của EXT_mesh_gpu_instancing
-      const srcs = [];
-      if (o.isInstancedMesh && o.instanceMatrix) {
-        const m2 = new THREE.Matrix4();
-        for (let j = 0; j < o.count; j++) { o.getMatrixAt(j, m2); srcs.push(m2.clone().premultiply(o.matrixWorld)); }
-      } else srcs.push(o.matrixWorld.clone());
+      const flat = flattenSources(o);
+      const srcs = [flat ? new THREE.Matrix4() : (o.isInstancedMesh && o.instanceMatrix ? (() => { const m1 = new THREE.Matrix4(); o.getMatrixAt(0, m1); return m1.premultiply(o.matrixWorld); })() : o.matrixWorld.clone())];
       for (const local of srcs) {
-        const im = new THREE.InstancedMesh(o.geometry, o.material, items.length);
+        const im = new THREE.InstancedMesh(flat || o.geometry, o.material, items.length);
         im.castShadow = true; im.receiveShadow = true; im.count = 0; im.frustumCulled = false;
         meshes.push({ im, local });
       }

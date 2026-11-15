@@ -434,7 +434,7 @@ export async function cityHouses(grp) {
   const models = [];
   const ids = Object.keys(CB.HOUSE_SPECS).filter((id) => houses.some((h) => h.id === id));
   // v4: bậc vừa dùng .lod1 (sạch) — .lod2 giản lược quá tay, hình nhà nát vụn (kiểm 2026-11-11: dựng nhân bản riêng .lod2 vs .lod1)
-  const base = await Promise.all(ids.map(async (id) => (await loadModel(`${id}.vc`)) || (await loadModel(`${id}.lod1`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`)))); // bậc vừa: .vc (màu nướng vào đỉnh, không vỡ mảnh — scripts/meshy-vclod.mjs)
+  const base = await Promise.all(ids.map(async (id) => (CB.HOUSE_SPECS[id]?.mid && (await loadModel(`${id}.${CB.HOUSE_SPECS[id].mid}`))) || (await loadModel(`${id}.vc`)) || (await loadModel(`${id}.lod1`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`)))); // bậc vừa: .vc (màu nướng vào đỉnh, không vỡ mảnh — scripts/meshy-vclod.mjs)
   const base2 = await Promise.all(ids.map((id) => loadModel(`${id}.vc2`))); // bậc xa (~2,5k tam giác, ~70 KB/mẫu) — thay khối hộp tới FAR_VC
   ids.forEach((id, n) => {
     const g = base[n]; if (!g) return;
@@ -456,7 +456,8 @@ export async function cityHouses(grp) {
     const p = (async () => {
       /* 2026-11-12: nhà gần dùng bản .bk (Blender: 12k tam giác, màu + pháp tuyến + AO nướng từ bản gốc ~80k — scripts/blender-bake.mjs,
          docs/DOHOA-MANIFEST.md §3.1). Thiếu .bk thì bản gốc (.lod1 / .mid cũ vỡ mảnh, không dùng ở gần) */
-      const g = (await loadModel(`${m.id}.bk`)) || (await loadModel(m.id)) || (await loadModel(`${m.id}.vc`)) || (await loadModel(`${m.id}.lod1`));
+      const nearSuf = CB.HOUSE_SPECS[m.id]?.near; // mẫu khai bậc gần riêng (HOUSE_SPECS.near — nhà AAA dựng thủ tục: .lod sạch)
+      const g = (nearSuf && (await loadModel(`${m.id}.${nearSuf}`))) || (await loadModel(`${m.id}.bk`)) || (await loadModel(m.id)) || (await loadModel(`${m.id}.vc`)) || (await loadModel(`${m.id}.lod1`));
       if (!g) return;
       // bóng nhà gần: đổ bằng bản .vc (~9k) VÔ HÌNH thay bản gốc 80k — bóng ở độ phân giải bản đồ bóng không khác,
       // mà lượt bóng bớt ~70k tam giác / nhà (đo 2026-11-12: 9 nhà gần = ~720k tam giác chỉ để vẽ bóng)
