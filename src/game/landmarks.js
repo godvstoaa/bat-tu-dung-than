@@ -186,7 +186,8 @@ const SPOTS = [
     // (terrain.registerSkyDistrict — bát giác + cầu). Mọi model trên trời solid:false, KHÔNG addFootprint:
     // lưới va chạm 2D sẽ chặn người đi bộ DƯỚI đảo trên mặt đất.
     // dao_vua Ø264 gốc (đo GLB: rộng 264, đáy −63,5, sân local y0) — s×2 = Ø520 hero đặt riêng bằng placeLod.
-    await place(g, ['lib_dao_vua'], { solid: false, fit: { width: 520 }, at: { x: 0, y: T.SKY_Y - 63.52 * (520 / 264), z: 0, ry: 0 } });
+    // đảo chủ: bản lib_dao_vua_chu có thêm 2 miệng lan can thẳng cầu chéo B1 (Quan Tinh) / B2 (Thư Đảo) — gen_dao_vua.py --mouths 27.47,150.75
+    await place(g, ['lib_dao_vua_chu', 'lib_dao_vua'], { solid: false, fit: { width: 520 }, at: { x: 0, y: T.SKY_Y - 63.52 * (520 / 264), z: 0, ry: 0 } });
     await place(g, ['sky_palace', 'rock_island'], { solid: false, fit: { width: 240 }, at: { x: 0, y: T.SKY_Y, z: 0, ry: 0 } }); // giữ nguyên làm tâm đảo (đáy 460)
     await place(g, ['lib_nam_mon', 'sect_gate_grand', 'gate_sect'], { solid: false, fit: { width: 26 }, at: { x: 0, y: T.SKY_Y, z: 225, ry: 0 } }); // Nam Môn quận mép nam
     await place(g, ['lib_dien_dai', 'hall_main'], { solid: false, fit: { width: 40 }, at: { x: -170, y: T.SKY_Y, z: -40, ry: faceTo(-170, -40, 0, 0) } });

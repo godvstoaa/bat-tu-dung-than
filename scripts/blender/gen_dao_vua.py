@@ -57,6 +57,12 @@ N_K     = 28 * 3      # 84 bucket nhiễu góc — như R*3 của heaven3d.js
 SQ_N    = 6.0         # siêu-elip «vuông» ở miệng
 GAP_HALF = 3.0 / R_POST   # nửa miệng cầu 3 m → miệng rộng 6 m
 MOUTH_A  = math.pi / 2.0  # miệng cầu +Y Blender = +Z game (mặt tiền)
+# --mouths a1,a2 (độ, góc Blender quanh +Z; hướng game (gx, gz) ↔ atan2(−gz, gx)): mở thêm miệng lan can cho cầu chéo
+# (đảo chủ: cầu B1 → Quan Tinh 27,5°, B2 → Thư Đảo 150,7° — 2026-11-15, bản lib_dao_vua_chu)
+EXTRA_MOUTHS = [math.radians(float(v)) for v in _aa[_aa.index('--mouths') + 1].split(',')] if '--mouths' in _aa else []
+MOUTHS = [MOUTH_A, MOUTH_A + math.pi] + EXTRA_MOUTHS
+def in_mouth(a, w):
+    return any(ang_dist(a, m) < w for m in MOUTHS)
 
 # ------------------------------------------------------------------ màu (sRGB hex → linear)
 def _lin(h):
@@ -207,6 +213,11 @@ for (x0, x1, y0, y1) in ((-1.5, 1.5, R_PLIN, 85.5), (-1.5, 1.5, 88.5, 127.0),   
                          (88.5, 127.0, -1.5, 1.5), (-127.0, -88.5, -1.5, 1.5)):
     quad(b1, (x0, y0, -0.28), (x1, y0, -0.28), (x1, y1, -0.28), (x0, y1, -0.28), mix(LOI, SAN2, rp.random() * 0.3))
 
+for m in EXTRA_MOUTHS:                                            # lối đá tỏa qua miệng thêm (rộng 3 m)
+    ca, sa = math.cos(m), math.sin(m)
+    for (r0, r1) in ((R_PLIN, 85.5), (88.5, 127.0)):
+        P = lambda r, w: (ca * r - sa * w, sa * r + ca * w, -0.28)
+        quad(b1, P(r0, -1.5), P(r1, -1.5), P(r1, 1.5), P(r0, 1.5), mix(LOI, SAN2, rp.random() * 0.3))
 # --- hồ mây Ø18: viền đá + đĩa căng mờ phát sáng (mat 1)
 PX, PY = -51.0, -51.0
 for k in range(24):
@@ -233,13 +244,20 @@ for k in range(24):
 for k in range(24):
     b1.face((_pc, _ring[k], _ring[(k + 1) % 24]), mat=1)
 
+def _pad_angle(d):                                              # luống / nền villa trùng lối miệng thêm (±20°) → dời ra 20° khỏi miệng
+    for m in EXTRA_MOUTHS:
+        md = math.degrees(m)
+        diff = (d - md + 180.0) % 360.0 - 180.0
+        if abs(diff) < 20.0:
+            return md + (20.0 if diff >= 0 else -20.0)
+    return d
 for d in (15, 60, 105, 150, 195, 240, 285, 330):                  # 8 luống dược 7×2,4 hướng xịt tâm
-    th = math.radians(d)
+    th = math.radians(_pad_angle(d))
     box(b1, math.cos(th) * 62.0, math.sin(th) * 62.0, -0.3, 0.05, 3.5, 1.2, th,
         mix(DUOC, CO, rq.random() * 0.3), DAT, uvdiv=2.0)
 
 for d in (20, 80, 160, 215, 300):                                 # 5 nền villa phẳng 14×10 (dài theo tiếp tuyến)
-    th = math.radians(d)
+    th = math.radians(_pad_angle(d))
     box(b1, math.cos(th) * 105.0, math.sin(th) * 105.0, -0.3, -0.15, 7.0, 5.0, th + math.pi / 2.0,
         mix(LOI, SAN2, rq.random() * 0.25), DAT, uvdiv=2.0)
 
@@ -322,17 +340,16 @@ def hex_prism(b, cx, cy, z0, z1, r, side, top):
 NPOST = 100
 for i in range(NPOST):                                            # trụ mỗi ~3 m, bỏ 2 miệng cầu rộng 6 m
     a = i / NPOST * 2.0 * math.pi
-    if ang_dist(a, MOUTH_A) < GAP_HALF + 0.006 or ang_dist(a, MOUTH_A + math.pi) < GAP_HALF + 0.006:
+    if in_mouth(a, GAP_HALF + 0.006):
         continue
     hex_prism(b3, math.cos(a) * R_POST, math.sin(a) * R_POST, -0.05, 1.15, 0.22,
               mix(SAN2, SAN, rq2.random() * 0.4), mix(SAN, SAN2, 0.25))
-for a in (MOUTH_A - GAP_HALF - 0.012, MOUTH_A + GAP_HALF + 0.012,  # 4 trụ đầu cầu to hơn
-          MOUTH_A + math.pi - GAP_HALF - 0.012, MOUTH_A + math.pi + GAP_HALF + 0.012):
+for a in [m + d for m in MOUTHS for d in (-GAP_HALF - 0.012, GAP_HALF + 0.012)]:  # 2 trụ đầu cầu to hơn mỗi miệng
     box(b3, math.cos(a) * R_POST, math.sin(a) * R_POST, -0.05, 1.3, 0.26, 0.26, a, SAN, SAN2, uvdiv=2.0)
 
 def rail_ok(k):
     am = (k + 0.5) / 100.0 * 2.0 * math.pi
-    return not (ang_dist(am, MOUTH_A) < 0.066 or ang_dist(am, MOUTH_A + math.pi) < 0.066)
+    return not in_mouth(am, 0.066)
 
 ring_band(b3, R_POST - 0.22, R_POST + 0.22, 1.02, 1.2, 100, rail_ok, mix(SAN2, SAN, 0.3), uvdiv=2.0)     # tay vịn
 ring_band(b3, R_POST - 0.12, R_POST + 0.12, 0.52, 0.6, 100, rail_ok, mix(SAN2, DA_SANG, 0.3), uvdiv=2.0) # đà giữa

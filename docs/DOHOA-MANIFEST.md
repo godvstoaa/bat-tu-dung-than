@@ -253,7 +253,11 @@ Phần tăng còn lại là nội dung mới hợp lệ: đồ phố ven đườ
 
 **Chưa giải thích được:** 1 trong 5 lần chạy, ở lần đầu sau khi khởi động lại server dev, phố hiện khối trắng không có nhà (`shots/gfx/rev-C/02-pho.png`). 4 lần sau, kể cả khởi động nguội lần nữa, đều bình thường. Theo dõi trên live.
 
-**Bên khác tự ghi còn mở:** 2 miệng cầu B1 / B2 phía đảo chủ cần sửa model (đi vòng qua ±Z được).
+**Miệng cầu B1 / B2 (bên khác để mở) — đã sửa:**
+- `gen_dao_vua.py` thêm `--mouths` (độ, góc Blender; hướng game (gx, gz) ↔ atan2(−gz, gx)): mở lối lan can, đặt 2 trụ đầu cầu, lối đá tỏa ra vườn.
+- Luống dược / nền villa trùng lối thì dời 20°. Chạy không có tham số vẫn ra model cũ, nên 8 đảo ngoài không đổi.
+- Đảo chủ dùng `lib_dao_vua_chu` (`--mouths 27.47,150.75`): 19.292 tam giác, khung bao như cũ, kèm `.lod` / `.vc2`.
+- Ảnh từ chỗ cầu B1 / B2 cập bến nhìn vào sân: `shots/gfx/cau3-b1b2.png` (lối thẳng tới miệng lan can, không vật đè).
 
 ## 5. Goal tiếp (sau khi đạt mục 4)
 
