@@ -300,7 +300,7 @@ async function streetRow(g) {
     groups.get(h.spec[0]).items.push({ x: h.x, y: H(h.x, h.z), z: h.z, ry: h.ry, s: h.spec[1] });
   }
   for (const [, { spec, items }] of groups) {
-    const row = await instanceModelLod(g, spec[0], items, { fitKey: 'width', near: 45 });
+    const row = await instanceModelLod(g, spec[0], items, { fitKey: 'width', near: 45, nearSuffix: CB.HOUSE_SPECS[spec[0]]?.near }); // a1/a2: gần dùng .lod (13k) thay bản gốc 80k
     if (!row) continue; // thiếu file → bỏ nhóm (game vẫn chạy model khác)
     for (const it of items) {
       addSolidOBB(it.x, it.z, spec[1] / 2 - 0.04, spec[2] / 2 - 0.25, it.ry); // thân nhà đặc theo khung mới

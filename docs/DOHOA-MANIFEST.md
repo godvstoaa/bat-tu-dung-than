@@ -259,6 +259,33 @@ Phần tăng còn lại là nội dung mới hợp lệ: đồ phố ven đườ
 - Đảo chủ dùng `lib_dao_vua_chu` (`--mouths 27.47,150.75`): 19.292 tam giác, khung bao như cũ, kèm `.lod` / `.vc2`.
 - Ảnh từ chỗ cầu B1 / B2 cập bến nhìn vào sân: `shots/gfx/cau3-b1b2.png` (lối thẳng tới miệng lan can, không vật đè).
 
+### Đợt 8 (2026-11-16): «sửa toàn bộ» — ngân sách về dưới bản live cũ, giữ nguyên nội dung mới; lỗi phố khối trắng
+
+**Cách đo mới.** Trung vị 4 mẫu (2 lượt × 2 lần ghé), chờ 30 s mỗi điểm, chế độ tự chỉnh. Một lần đo lẻ dao động tới ±0,2 triệu vì bậc chi tiết tải lười và NPC di chuyển. Số tam giác của renderer chỉ là lượt vẽ chính (ở chế độ tự chỉnh, bản đồ bóng không vẽ lại mỗi khung).
+
+| Điểm | Live cũ 30fe21d0 | Code bên khác | Đợt 8 |
+|---|---|---|---|
+| Sân Sơn Môn | 1,92 tr | 2,19 tr | **1,78 tr** |
+| Thiên Thê | 1,71 tr | 1,91 tr | **1,59 tr** |
+| Đền thờ | 2,11 tr | 2,48 tr | **2,16 tr** (+2 %: quầy chợ mới 29k thay 17k, nhà AAA trong tầm nhìn) |
+
+Ảnh trước / sau 4 điểm giống hệt, kể cả bóng: `shots/gfx/cmp8-all.png`.
+
+**Sửa:**
+1. **Lưới chỉ-bóng sang layer 1** (`assets.makeShadowOnly`, `SHADOW_LAYER`). Chỉ camera bóng của mặt trời bật layer này. Vật liệu colorWrite / depthWrite false vẫn bị three vẽ ở lượt chính (Thiên Thê từng có thêm 0,8 triệu tam giác vô hình). Áp cho bóng proxy của `placeLod`, `instanceModel` và nhà gần `cityHouses`.
+2. **Bộ nhân bản ≥ 6 bản sao** (đồ phố, quầy, biển, đèn): bản hiện thôi đổ bóng. Bộ chỉ-bóng riêng chỉ giữ bản sao trong 50 m; camera bóng phủ ±45 m.
+3. **`instanceModelLod`** (11 nhà AAA đặt tay, dãy nhà vườn 8 khu): lọc theo hướng nhìn (tính lại ngay khi xoay camera); bậc rất xa `.vc2` ngoài max(3 × near, 120 m); `nearSuffix` để nhà a1 / a2 gần dùng `.lod` 13k thay bản gốc 80k.
+4. **`.vc2` (1,2k)** cho quầy chợ, biển hiệu, xe hàng mới.
+
+**Lỗi phố khối trắng — nguyên nhân và sửa.** `loadModel` nhớ `null` cả phiên chỉ sau MỘT lần tải lỗi, nên mẫu nhà đó mất hẳn.
+- Giờ lỗi mạng / 5xx thử lại 2 lần (1,5 s, 4 s); vẫn lỗi thì nhớ «chưa có» 30 s rồi cho tải lại; 404 vẫn nhớ luôn.
+- `cityHouses` tự lành mỗi 5 s: nạp lại mẫu bậc vừa từng lỗi, gọi lại bậc gần còn thiếu.
+- Kiểm bằng giả lập lỗi mạng (`shot-city.mjs` thêm `BLOCK` / `BLOCKMS`, chặn mọi file `lib_lib_house_a1` 60 s đầu):
+  - code cũ: 0 / 21 nhà a1 tới giây 120;
+  - code mới: 0 lúc bị chặn, 21 / 21 ở giây 103.
+
+**Còn lại:** fps trên máy người dùng sau đợt này chưa đo (`game.html?fps`).
+
 ## 5. Goal tiếp (sau khi đạt mục 4)
 
 - ~~**G-8.1**~~ — đạt đợt 4 (2,08 triệu). Ghi chép cũ: (đợt 2: 2,62 triệu tam giác, 38 fps khi tự chỉnh — tam giác chưa tới 2,2 triệu, nhưng fps đã qua đích ≥ 24): sân Sơn Môn ≤ 2,2 triệu tam giác. Còn lại: phần lớn là `.vc` 9k của công trình trong 110 m và bản gốc trong `nearDist` (tối đa 150 m). Bước kế: thu `nearDist` về 2 × cỡ (tối đa 90 m), nướng `.bk` cho công trình dùng gần (hall_main, gate_sect, palace_grand…), đo lại.

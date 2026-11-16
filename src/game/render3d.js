@@ -199,6 +199,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
   sun.shadow.mapSize.set(coarse ? 1024 : 2048, coarse ? 1024 : 2048);
   Object.assign(sun.shadow.camera, { left: -45, right: 45, top: 45, bottom: -45, near: 1, far: 400 });
   sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.03;
+  sun.shadow.camera.layers.enable(1); // assets.SHADOW_LAYER: lưới chỉ-bóng chỉ vào lượt bóng, không vào lượt vẽ chính
   scene.add(sun, sun.target);
 
   // --- thế giới

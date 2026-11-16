@@ -14,7 +14,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import * as T from './terrain.js';
 import * as BQ from './batquai.js';
 import * as CB from './cityblocks.js';
-import { loadModel, instanceModel, warmObject, getModelQuality } from './assets.js';
+import { loadModel, instanceModel, warmObject, getModelQuality, makeShadowOnly } from './assets.js';
 import { addSolidOBB, addSolidCircle, addSolidSegment, addTall } from './obstacles.js';
 import { addLight, glowAll } from './lights.js';
 import { place, pond, field, yard, arena, nameBoard, mats } from './batquai3d.js';
@@ -263,7 +263,6 @@ export const houseHeight = (h, sp) => {
   return Math.min(nat * (1 + Math.min(0.12, Math.max(-0.04, ((h.ys || 1) - 1) * 0.2))), HCAP[h.id] || 10.5);
 };
 // chỉ đổ bóng: không ghi màu / độ sâu ở lượt vẽ chính (lượt bóng dùng vật liệu độ sâu riêng của three)
-const SHADOW_ONLY = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });
 export function instancedSet(gltf, houses, { shadow, flat = false }) {
   const root = gltf.scene; root.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(root), size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
@@ -427,25 +426,28 @@ export async function cityHouses(grp) {
   // ô không gian
   // v4: khối xa NHÂN BẢN THEO TỪNG NHÀ (tường + mái 4 dốc, khối đơn vị co giãn theo nhà, màu theo mẫu) — 2 lệnh vẽ cho cả
   // thành, và mỗi nhà đổi bậc theo khoảng cách CỦA NÓ (trước: gộp theo ô → cả ô 96 m lên .lod1 khi người chơi tới gần mép ô)
-  const far = farInstances(houses); grp.add(far.wall, far.roof);
+  const far = farInstances(houses); far.wall.name = 'house:box:wall'; far.roof.name = 'house:box:roof'; grp.add(far.wall, far.roof);
   // mỗi model 3 bộ nhân bản: vừa (.lod2, ~3k, texture 256 — NẠP SẴN, nhẹ), gần (.lod1, ~10k) và sát (.mid, ~20k)
   // NẠP LƯỜI: chỉ khi có nhà của mẫu đó lọt vào tầm (2026-11-10: trước đây nạp sẵn cả 3 bậc × 26 mẫu ≈ 32 MB
   // trên màn nạp). Chưa nạp xong thì nhà gần tạm dùng bậc thấp hơn đã có.
   const models = [];
   const ids = Object.keys(CB.HOUSE_SPECS).filter((id) => houses.some((h) => h.id === id));
   // v4: bậc vừa dùng .lod1 (sạch) — .lod2 giản lược quá tay, hình nhà nát vụn (kiểm 2026-11-11: dựng nhân bản riêng .lod2 vs .lod1)
-  const base = await Promise.all(ids.map(async (id) => (CB.HOUSE_SPECS[id]?.mid && (await loadModel(`${id}.${CB.HOUSE_SPECS[id].mid}`))) || (await loadModel(`${id}.vc`)) || (await loadModel(`${id}.lod1`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`)))); // bậc vừa: .vc (màu nướng vào đỉnh, không vỡ mảnh — scripts/meshy-vclod.mjs)
-  const base2 = await Promise.all(ids.map((id) => loadModel(`${id}.vc2`))); // bậc xa (~2,5k tam giác, ~70 KB/mẫu) — thay khối hộp tới FAR_VC
-  ids.forEach((id, n) => {
-    const g = base[n]; if (!g) return;
+  const loadMid = async (id) => (CB.HOUSE_SPECS[id]?.mid && (await loadModel(`${id}.${CB.HOUSE_SPECS[id].mid}`))) || (await loadModel(`${id}.vc`)) || (await loadModel(`${id}.lod1`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`)); // bậc vừa: .vc (màu nướng vào đỉnh, không vỡ mảnh — scripts/meshy-vclod.mjs)
+  const addModel = (id, g, g2) => {
     const mine = houses.map((h, i) => (h.id === id ? i : -1)).filter((i) => i >= 0);
     const list = mine.map((i) => houses[i]);
     const mid = instancedSet(g, list, { shadow: false, flat: true });
-    for (const m of mid.meshes) grp.add(m.im);
-    const far2 = base2[n] ? instancedSet(base2[n], list, { shadow: false, flat: true }) : null;
-    if (far2) for (const m of far2.meshes) grp.add(m.im);
+    for (const m of mid.meshes) { m.im.name = `house:${id}:mid`; grp.add(m.im); } // tên: đo / gỡ lỗi
+    const far2 = g2 ? instancedSet(g2, list, { shadow: false, flat: true }) : null;
+    if (far2) for (const m of far2.meshes) { m.im.name = `house:${id}:far2`; grp.add(m.im); }
     models.push({ id, mine, list, local: new Map(mine.map((hi, j) => [hi, j])), close: null, near: null, nearSh: null, gMid: g, mid, far2, want: new Set(), busy: new Set() });
-  });
+  };
+  const base = await Promise.all(ids.map(loadMid));
+  const base2 = await Promise.all(ids.map((id) => loadModel(`${id}.vc2`))); // bậc xa (~2,5k tam giác, ~70 KB/mẫu) — thay khối hộp tới FAR_VC
+  // mẫu nạp lỗi lúc dựng (mạng chập chờn) — thử lại định kỳ trong update (tự lành; trước đây mất hẳn cả phiên)
+  const missing = new Set();
+  ids.forEach((id, n) => { if (base[n]) addModel(id, base[n], base2[n]); else missing.add(id); });
   await warmObject(grp);
   let dirty = false, lastPx = 0, lastPz = 0;
   const pend = new Set();
@@ -463,7 +465,8 @@ export async function cityHouses(grp) {
       // mà lượt bóng bớt ~70k tam giác / nhà (đo 2026-11-12: 9 nhà gần = ~720k tam giác chỉ để vẽ bóng)
       const proxy = tier === 'near' && m.gMid && m.gMid !== g;
       const set = instancedSet(g, m.list, { shadow: !proxy });
-      if (proxy) { m.nearSh = instancedSet(m.gMid, m.list, { shadow: true, flat: true }); for (const x of m.nearSh.meshes) { x.im.material = SHADOW_ONLY; x.im.receiveShadow = false; grp.add(x.im); } }
+      if (proxy) { m.nearSh = instancedSet(m.gMid, m.list, { shadow: true, flat: true }); for (const x of m.nearSh.meshes) { makeShadowOnly(x.im); grp.add(x.im); } }
+      for (const x of set.meshes) x.im.name = `house:${m.id}:${tier}`; if (m.nearSh) for (const x of m.nearSh.meshes) x.im.name = `house:${m.id}:shadow`;
       const tmp = new THREE.Group(); for (const x of set.meshes) tmp.add(x.im);
       await warmObject(tmp);
       for (const x of set.meshes) grp.add(x.im);
@@ -500,8 +503,21 @@ export async function cityHouses(grp) {
     const dx = h.x - V.cx, dz = h.z - V.cz, d = Math.hypot(dx, dz);
     return d < 45 || (dx * V.ax + dz * V.az) / d > V.cosLim;
   };
+  let lastHeal = performance.now(), healing = false;
   const update = (px, pz) => {
     lastPx = px; lastPz = pz;
+    // tự lành mỗi 5 s: bậc gần thiếu → want() nạp lại; mẫu bậc vừa đã nạp lỗi → nạp lại và dựng bộ nhân bản
+    const now = performance.now();
+    if (now - lastHeal > 5000) {
+      lastHeal = now;
+      // bậc gần đang cần mà chưa có (lần nạp trước lỗi): gọi nạp lại — xong thì want() tự đặt dirty và vẽ lại (không ghi lại cả thành mỗi 5 s)
+      if (lastTier) for (const m of models) if (!m.near && !m.busy.has('near') && m.mine.some((hi) => lastTier[hi] === 0)) want(m, 'near');
+      if (missing.size && !healing) {
+        healing = true;
+        Promise.all([...missing].map(async (id) => { const g = await loadMid(id); if (!g) return; const g2 = await loadModel(`${id}.vc2`); const t = new THREE.Group(); const before = grp.children.length; addModel(id, g, g2); for (const c of grp.children.slice(before)) t.add(c); await warmObject(t); for (const c of [...t.children]) grp.add(c); missing.delete(id); }))
+          .catch((e) => console.warn('[city] tự lành', e)).finally(() => { healing = false; dirty = true; });
+      }
+    }
     if (!dirty && Math.hypot(px - lastX, pz - lastZ) < 6) return;
     lastX = px; lastZ = pz;
     let changed = dirty; dirty = false;

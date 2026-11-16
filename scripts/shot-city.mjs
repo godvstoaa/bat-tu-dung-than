@@ -13,6 +13,10 @@ const browser = await chromium.launch({ headless: true, args: ['--use-angle=d3d1
 const page = await (await browser.newContext({ viewport: { width: Number(process.env.VW || 1280), height: Number(process.env.VH || 720) } })).newPage();
 if (process.env.QUALITY) await page.addInitScript((q) => { try { localStorage.setItem('huyenquan:quality', q); } catch (e) { /* ignore */ } }, process.env.QUALITY); // QUALITY=low|mid|high: chụp ở mức đồ hoạ đó
 const errs = [], tiers = [];
+// BLOCK=<regex> BLOCKMS=<ms>: giả lập lỗi mạng — chặn file khớp trong BLOCKMS ms đầu (kiểm cơ chế tự lành tải model)
+if (process.env.BLOCK) { const re = new RegExp(process.env.BLOCK), until = Date.now() + Number(process.env.BLOCKMS || 30000); let n = 0;
+  await page.route('**/*', (route) => { if (Date.now() < until && re.test(route.request().url())) { n++; return route.abort('connectionreset'); } return route.continue(); });
+  process.on('exit', () => console.log('BLOCK đã chặn', n, 'yêu cầu')); }
 page.on('response', (r) => { const u = r.url(); if (/\.(lod1|mid)\.glb/.test(u)) tiers.push(u.split('/').pop()); });
 page.on('pageerror', (e) => errs.push('pageerror: ' + e.message.slice(0, 300)));
 page.on('response', (r) => { if (r.status() >= 400) errs.push(`${r.status()} ${r.url().slice(0, 160)}`); });

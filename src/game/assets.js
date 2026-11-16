@@ -55,10 +55,28 @@ export function loadModelPrivate(id) {
     .then((buf) => new Promise((res, rej) => loader.parse(buf, '', res, rej))).catch(() => null));
   return priv.get(id);
 }
+// tải GLB có thử lại (2026-11-16): trước đây MỘT lần tải lỗi (mạng chập chờn, server dev khởi động nguội) bị nhớ «null» cả phiên →
+// mọi nhà / công trình dùng mẫu đó mất hẳn (nghi phạm «phố khối trắng» 1/7 lần chạy). Giờ: lỗi mạng / HTTP 5xx thử lại 2 lần
+// (1,5 s, 4 s); vẫn lỗi thì chỉ nhớ «chưa có» 30 s rồi cho tải lại. HTTP 404 (file thật sự không có) vẫn nhớ luôn.
+const FAILED_AT = new Map();
+const fetchGlb = async (id) => {
+  let last;
+  for (const wait of [0, 1500, 4000]) {
+    if (wait) await new Promise((r) => setTimeout(r, wait));
+    try {
+      const r = await fetch(modelUrl(id));
+      if (r.status === 404) { const e = new Error('404'); e.final = true; throw e; }
+      if (!r.ok) throw new Error(r.status);
+      return await r.arrayBuffer();
+    } catch (e) { last = e; if (e.final) break; }
+  }
+  throw last;
+};
 export function loadModel(id) {
   if (!cache.has(id) && MODEL_FILES.size && !MODEL_FILES.has(id)) cache.set(id, Promise.resolve(null)); // không có file → khỏi gửi yêu cầu
+  if (cache.has(id) && FAILED_AT.has(id) && performance.now() - FAILED_AT.get(id) > 30000) { cache.delete(id); FAILED_AT.delete(id); } // lỗi tạm: cho tải lại
   if (!cache.has(id)) {
-    cache.set(id, fetch(modelUrl(id)).then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+    cache.set(id, fetchGlb(id)
       .then((buf) => new Promise((res, rej) => span('glb:' + id, () => loader.parse(buf, '', res, rej)))).then((g) => {
       g.scene.traverse((o) => {
         if (!o.isMesh) return;
@@ -67,7 +85,7 @@ export function loadModel(id) {
         for (const m of [].concat(o.material)) if (m.map) m.map.anisotropy = 4;
       });
       return g;
-    }).catch((e) => { console.warn('[assets] không nạp được', id, e?.message || e); return null; }));
+    }).catch((e) => { console.warn('[assets] không nạp được', id, e?.message || e); if (!e?.final) FAILED_AT.set(id, performance.now()); return null; }));
   }
   return cache.get(id);
 }
@@ -116,6 +134,10 @@ const farDist = (v) => Math.max(v * 3.5, 40);   // bản giữa 20k tới đây,
 const vc2Dist = (v) => Math.max(v * 6, 110);    // từ đây trở ra: bản .vc2 (~2,5k)
 const cullDist = (v) => (v >= 40 ? Infinity : Math.max(v * 22, 320)); // vật nhỏ ở rất xa: ẩn hẳn (sương đã che gần hết)
 const SHADOW_ONLY = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }); // chỉ đổ bóng
+// Lưới CHỈ-BÓNG ở layer riêng: chỉ camera bóng của mặt trời bật layer này (render3d) → lượt vẽ chính bỏ qua hẳn.
+// Trước đây vật liệu colorWrite/depthWrite false vẫn bị vẽ ở lượt chính (đo 2026-11-16: Thiên Thê +0,8 triệu tam giác vô hình).
+export const SHADOW_LAYER = 1;
+export function makeShadowOnly(m) { m.material = SHADOW_ONLY; m.castShadow = true; m.receiveShadow = false; m.layers.set(SHADOW_LAYER); }
 async function placeLod(parent, id, { fit, at, hd = true }) {
   // bậc xa: .vc (~9k, màu nướng vào đỉnh — scripts/meshy-vclod.mjs; không đường nối UV nên không vỡ mảnh) — thiếu thì
   // .far / .lod cũ (giản lược gộp qua đường nối UV: nhìn gần vỡ mảnh, texture kéo sọc — ảnh người chơi 2026-11-11)
@@ -174,7 +196,7 @@ async function addLazyLevel(L, tier) {
       let lv = o;
       if (L.shadowSrc) {
         o.traverse((m) => { if (m.isMesh) m.castShadow = false; });
-        const sh = L.shadowSrc.clone(true); sh.traverse((m) => { if (m.isMesh) { m.material = SHADOW_ONLY; m.castShadow = true; m.receiveShadow = false; } });
+        const sh = L.shadowSrc.clone(true); sh.traverse((m) => { if (m.isMesh) makeShadowOnly(m); });
         lv = new THREE.Group(); lv.add(o, sh); lv.userData.tier = 'near';
       }
       L.lod.addLevel(lv, 0, 0.08);
@@ -239,8 +261,16 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
     if (lite && lite !== g && triOf(lite) < triOf(g) * 0.5) {
       for (const { im } of sets) im.castShadow = false; proxied = true;
       shadowSets = buildInstanced(lite, items, fitKey, group, `${id}:shadow`);
-      for (const { im } of shadowSets) { im.material = SHADOW_ONLY; im.castShadow = true; im.receiveShadow = false; }
+      for (const { im } of shadowSets) makeShadowOnly(im);
     }
+  }
+  // bóng của bộ nhẹ (đồ phố, quầy, biển, đèn…): bản hiện thôi đổ bóng, bộ CHỈ-BÓNG riêng (cùng hình học) chỉ giữ bản sao trong 80 m —
+  // camera bóng phủ ±45 m quanh người chơi nhưng khung bao InstancedMesh phủ cả thành nên three không loại được bản sao ngoài vùng bóng
+  // (đo 2026-11-16: lượt bóng vẽ mọi bản sao trong 260 m). Chỉ khi ≥ 6 bản sao (ít bản: không đáng thêm lệnh vẽ).
+  if (!proxied && items.length >= 6) {
+    for (const { im } of sets) im.castShadow = false;
+    shadowSets = buildInstanced(g, items, fitKey, group, `${id}:shadow`);
+    for (const { im } of shadowSets) makeShadowOnly(im);
   }
   // bậc xa theo TỪNG bản sao: ngoài max(6 × cỡ, 70 m) dùng .vc2 (~2,5k) thay .vc 9k (docs/DOHOA-MANIFEST.md G-8.1 —
   // cổng phường 26 m từng vẽ đủ 9k tới 624 m). Chỉ khi bậc nhìn thấy nặng gấp đôi .vc2 trở lên.
@@ -259,7 +289,7 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
     const near = Math.max(Math.max(...items.map((it) => it.s)) * 4, 70);
     E.upgrade = { near, busy: false, done: false, run: async () => {
       const gm = (await loadModel(`${id}.bk`)) || (await loadModel(id)) || (await loadModel(`${id}.mid`)); if (!gm) return; // tới gần: .bk (Blender 12k) / bản gốc (bản .mid nhìn gần vỡ mảnh) — đèn lồng 80k × 2 = 160k ở sân Sơn Môn
-      const tmp = new THREE.Group(); const ns = buildInstanced(gm, items, fitKey, tmp, `${id}:hi`); if (proxied) for (const { im } of ns) im.castShadow = false;
+      const tmp = new THREE.Group(); const ns = buildInstanced(gm, items, fitKey, tmp, `${id}:hi`); if (proxied || shadowSets) for (const { im } of ns) im.castShadow = false;
       await warm(tmp);
       for (const { im } of E.sets) group.remove(im);
       for (const { im } of ns) group.add(im);
@@ -328,8 +358,9 @@ export function viewInstances(cx, cz, fx, fz, halfH, cy = 0, fy = 0, halfV = 0.4
   const l = Math.hypot(fx, fy, fz); IV.cx = cx; IV.cz = cz;
   if (l < 1e-3) { if (IV.on) { IV.on = false; for (const E of INST) E.lx = Infinity; tickInstances(IV.px, IV.pz); } return; }
   fx /= l; fy /= l; fz /= l; IV.half = Math.atan(Math.hypot(Math.tan(halfH), Math.tan(halfV))) + 0.314;
-  if (!IV.on || fx * IV.ax + fy * IV.ay + fz * IV.az < 0.99 || Math.abs(cy - IV.cy) > 15) { IV.on = true; IV.ax = fx; IV.ay = fy; IV.az = fz; IV.cy = cy; for (const E of INST) E.lx = Infinity; tickInstances(IV.px, IV.pz); }
+  if (!IV.on || fx * IV.ax + fy * IV.ay + fz * IV.az < 0.99 || Math.abs(cy - IV.cy) > 15) { IV.on = true; IV.ax = fx; IV.ay = fy; IV.az = fz; IV.cy = cy; for (const E of INST) E.lx = Infinity; tickInstances(IV.px, IV.pz); for (const f of LOD_ROWS) f(); }
 }
+const LOD_ROWS = []; // instanceModelLod: tính lại khi hướng nhìn đổi
 const seen = (it) => {
   if (!IV.on) return true;
   const s = it.s || 0, dx = it.x - IV.cx, dy = (it.y || 0) + s * 0.5 - IV.cy, dz = it.z - IV.cz, d = Math.hypot(dx, dy, dz);
@@ -350,8 +381,8 @@ function tickInstances(px, pz) {
     if (!E.cull || Math.hypot(px - E.lx, pz - E.lz) < 20) continue;
     E.lx = px; E.lz = pz;
     const keep = [], far = [], sh = [];
-    // bóng: camera bóng phủ ±45 m quanh người chơi → bản sao ngoài 80 m không đổ bóng (trước đây cả thế giới vào lượt bóng)
-    E.items.forEach((it, i) => { const d = Math.hypot(it.x - px, it.z - pz); if (d < E.cut && seen(it)) (E.far && d > E.farD ? far : keep).push(i); if (d < 80) sh.push(i); });
+    // bóng: camera bóng phủ ±45 m quanh người chơi → bản sao ngoài 50 m không đổ bóng (trước đây cả thế giới vào lượt bóng; 80 m → 50 m 2026-11-16)
+    E.items.forEach((it, i) => { const d = Math.hypot(it.x - px, it.z - pz); if (d < E.cut && seen(it)) (E.far && d > E.farD ? far : keep).push(i); if (d < 50) sh.push(i); });
     const fill = (sets, list) => { for (const { im, all } of sets) {
       const dst = im.instanceMatrix.array;
       list.forEach((i, n) => dst.set(all.subarray(i * 16, i * 16 + 16), n * 16));
@@ -365,8 +396,10 @@ function tickInstances(px, pz) {
  * Nhân bản tức thời có 2 mức chi tiết: gần dùng <id>.glb, xa dùng <id>.lod.glb.
  * Trả { group, update(px, pz) } — gọi update định kỳ (landmarks.update) để chia lại gần/xa.
  */
-export async function instanceModelLod(parent, id, items, { fitKey = 'height', near = 45 } = {}) {
-  const [gM, gF] = await Promise.all([loadModel(id), (await loadModel(`${id}.vc`)) || loadModel(`${id}.lod`)]); // gần: bản gốc · xa: .vc (không vỡ mảnh)
+export async function instanceModelLod(parent, id, items, { fitKey = 'height', near = 45, nearSuffix = null } = {}) {
+  // nearSuffix: bậc gần riêng (cityblocks.HOUSE_SPECS.near — nhà AAA a1/a2 .lod 13k giống bản gốc 80k; 2026-11-16)
+  const nearLoad = async () => (nearSuffix && (await loadModel(`${id}.${nearSuffix}`))) || loadModel(id);
+  const [gM, gF] = await Promise.all([nearLoad(), (await loadModel(`${id}.vc`)) || loadModel(`${id}.lod`)]); // gần: bản gốc (hoặc nearSuffix) · xa: .vc (không vỡ mảnh)
   const gN = gM || (hasLod(id) ? await loadModel(`${id}.mid`) : null);
   if (!gN || !items.length) return null;
   const build = (g) => {
@@ -388,10 +421,13 @@ export async function instanceModelLod(parent, id, items, { fitKey = 'height', n
     });
     return { meshes, ref, center, minY: box.min.y };
   };
-  const N = build(gN), F = gF ? build(gF) : null;
+  // bậc rất xa .vc2 (2026-11-16): ngoài max(3 × near, 120 m) — dãy nhà vườn 8 khu / 11 nhà AAA đặt tay từng vẽ bản 9–13k ở mọi khoảng cách
+  const gV = MODEL_FILES.has(`${id}.vc2`) ? await loadModel(`${id}.vc2`) : null;
+  const N = build(gN), F = gF ? build(gF) : null, V = gV && gF ? build(gV) : null;
   const group = new THREE.Group();
   for (const m of N.meshes) group.add(m.im);
   if (F) for (const m of F.meshes) group.add(m.im);
+  if (V) for (const m of V.meshes) { m.im.castShadow = false; group.add(m.im); }
   await warm(group);
   parent.add(group);
   const M = new THREE.Matrix4(), base = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), one = new THREE.Vector3(1, 1, 1), P = new THREE.Vector3();
@@ -409,15 +445,19 @@ export async function instanceModelLod(parent, id, items, { fitKey = 'height', n
   };
   // null (không phải ''): lần đầu danh sách «gần» rỗng có khoá '' — so với '' sẽ bỏ qua lần ghi đầu,
   // mọi bản sao ở lại count 0 → cắt lát va chạm thấy 0 nhà (cả dãy phố đi xuyên được)
-  let lastKey = null;
+  let lastKey = null, lastPx = Infinity, lastPz = Infinity;
+  const vfar = Math.max(near * 3, 120);
+  // bậc từng bản sao: gần (< near) · vừa · rất xa (.vc2) · ẩn khi ngoài hình nón nhìn (seen — như viewInstances; trong near luôn vẽ)
   const update = (px, pz) => {
-    const nearL = [], farL = [];
-    for (const it of items) (Math.hypot(it.x - px, it.z - pz) < near || !F ? nearL : farL).push(it);
-    const key = nearL.map((it) => items.indexOf(it)).join(',');
+    lastPx = px; lastPz = pz;
+    const nearL = [], farL = [], vL = [];
+    items.forEach((it) => { const d = Math.hypot(it.x - px, it.z - pz); if (d < near || !F) nearL.push(it); else if (!Number.isFinite(px) || seen(it)) (V && d > vfar ? vL : farL).push(it); });
+    const key = [nearL, farL, vL].map((l) => l.map((it) => items.indexOf(it)).join(',')).join('|');
     if (key === lastKey) return;
     lastKey = key;
-    write(N, nearL); if (F) write(F, farL);
+    write(N, nearL); if (F) write(F, farL); if (V) write(V, vL);
   };
+  LOD_ROWS.push(() => { if (Number.isFinite(lastPx)) update(lastPx, lastPz); }); // xoay camera: tính lại ngay (viewInstances)
   update(Infinity, Infinity);
   return { group, update };
 }
