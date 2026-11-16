@@ -3,7 +3,7 @@
 
 > Sinh từ mã nguồn. Khi một con số ở chương khác lệch với tệp này thì **tệp này (tức là mã đang chạy) thắng** và chương kia phải sửa.
 
-Tổng **46** bộ test. **11** bộ không nằm trong lệnh npm nào. Lệnh npm trỏ tệp không tồn tại: **0**.
+Tổng **47** bộ test. **11** bộ không nằm trong lệnh npm nào. Lệnh npm trỏ tệp không tồn tại: **0**.
 
 ## A2.2 Bộ test
 
@@ -12,6 +12,7 @@ Tổng **46** bộ test. **11** bộ không nằm trong lệnh npm nào. Lệnh 
 | `scripts/test-bark-pool.mjs` | 96 | `test:npcai` |  | Test NPC-AI G0 · BARK POOL (mục 15 §15.5f; đặc tả mục 16 §16.3.3). Node thuần, không DOM — import thẳng module game. Chạy: node scripts/test-bark-pool.mjs | bark-pool, persona-data |
 | `scripts/test-crisis.mjs` | 97 | `test:npcai` |  | Test cổng khủng hoảng (VC-035) — docs/GAME-SUA-LOI-MANIFEST.md §3 K1; luật: docs/npc-ai/11, docs/game/40 §40.4. ① bộ phân loại: mức A, C, câu thường, câu phóng đại đời th… | npc-chat |
 | `scripts/test-econ-accounts.mjs` | 95 | **không** | có |  | divination |
+| `scripts/test-game-ai-model.mjs` | 53 | `test:npcai` |  | Test AI của game chỉ dùng glm-5.3-flash (quyết định chủ dự án 2026-11-16) — src/game/ai-model.js, worker/llm.js › llmBackends, cổng persona gắn theo mô hình (features.js … | ai-model, llm, features |
 | `scripts/test-game-ai-persona.mjs` | 168 | `test:npcai` |  | Test G1 — nạp persona vào chuỗi AI của Thầy (docs/npc-ai/15-lo-trinh-tich-hop.md §15.6): ① flag FEATURES.personaAi TẮT mặc định → KHÔNG có system message persona (hành vi… | features, npc-personas, persona-data |
 | `scripts/test-game-amduc.mjs` | 59 | `test:game` |  |  | amduc, life, illness, jobs, guild-core, state |
 | `scripts/test-game-auth.mjs` | 84 | `test:game` |  |  | auth-core, protocol, state |
@@ -52,7 +53,7 @@ Tổng **46** bộ test. **11** bộ không nằm trong lệnh npm nào. Lệnh 
 | `scripts/test-persona-schema.mjs` | 175 | `test:npcai` |  | Test NPC-AI G0 · SCHEMA 20 PERSONA (mục 15 §15.5f; đặc tả mục 16 §16.3.2). Node thuần, không DOM — import thẳng module game. Chạy: node scripts/test-persona-schema.mjs | persona-data, npc-personas |
 | `scripts/test-quan-auth.mjs` | 116 | **không** | có |  |  |
 | `scripts/test-quan-mmo.mjs` | 280 | `test:mmo` | có |  | quan-room, protocol, estate-core, guild-core |
-| `scripts/test-quan-protocol.mjs` | 197 | `test:mmo` |  |  | protocol, net |
+| `scripts/test-quan-protocol.mjs` | 187 | `test:mmo` |  |  | protocol, net |
 | `scripts/test-story-gen.mjs` | 173 | `test:npcai` |  | Test story-gen.js — story generator cho khách procedural (docs/npc-ai/08 §8.7 khung + docs/npc-ai/16-chien-luoc-test.md §16.3.4): same-seed deterministic nguyên văn, tách… | story-gen, npc, map-rating |
 | `scripts/test-terrain.mjs` | 39 | **không** |  |  | terrain |
 
@@ -65,7 +66,7 @@ Tổng **46** bộ test. **11** bộ không nằm trong lệnh npm nào. Lệnh 
 | `npm run preview` | vite preview |
 | `npm run test` | node selftest.mjs |
 | `npm run test:game` | node scripts/test-game-state.mjs && node scripts/test-game-zheri.mjs && node scripts/test-game-dz.mjs && node scripts/test-game-halls.mjs && node scripts/test-game-progress.mjs && node scripts/test-game-vanmenh.mjs && node scripts/test-game-cosmetics.mjs && no… |
-| `npm run test:npcai` | node scripts/test-crisis.mjs && node scripts/test-persona-schema.mjs && node scripts/test-bark-pool.mjs && node scripts/test-story-gen.mjs && node scripts/test-map-rating.mjs && node scripts/test-game-ai-persona.mjs |
+| `npm run test:npcai` | node scripts/test-crisis.mjs && node scripts/test-persona-schema.mjs && node scripts/test-bark-pool.mjs && node scripts/test-story-gen.mjs && node scripts/test-map-rating.mjs && node scripts/test-game-ai-persona.mjs && node scripts/test-game-ai-model.mjs |
 | `npm run docs:check` | node scripts/docs-game-lint.mjs |
 | `npm run test:mmo` | node scripts/test-quan-protocol.mjs && node scripts/test-quan-mmo.mjs |
 | `npm run dev:mmo` | node scripts/dev-mmo.mjs |

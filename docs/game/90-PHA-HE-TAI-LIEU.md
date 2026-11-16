@@ -105,7 +105,7 @@ Tiểu mục giữ nguyên số đuôi: «§12.4» cũ là «§20.2.4» mới.
 | 11 | Kinh tế | rà tổng quan 16/11; đọc thêm hiến chương đạo đức | bốn câu thề của cửa hàng → §40.7; rủi ro vật thiêng trong danh mục → `VC-036` | Phúc Khí làm tiền (đã thay bằng tiền kim loại), khoảng 530 mã hàng, 12 mùa, vé mùa, mô hình doanh thu |
 | 12 | Trình bày | **đã rà 10/11** | màu, cỡ chữ, vùng chạm, trợ năng → §22.5 | 94 màn, nhạc, lồng tiếng |
 | 13 | Kỹ thuật | rà tổng quan 16/11 | 21 lỗi mã ghi ở trang tổng của bộ, đã kiểm lại → §3.6; bộ quy trình mẫu là kho tham khảo của Vận hành | kiến trúc đích, 41 lược đồ, 290 việc theo mốc, lộ trình 35 tuần (lúc viết mã có 44 mô-đun, nay 156) |
-| 14 | Rủi ro | rà tổng quan 16/11; đọc thêm bảng 20 rủi ro ưu tiên, mục pháp lý trò chơi, mục hỗ trợ khẩn cấp | giấy phép chế độ nhiều người → §40.6, `VC-039`; luồng khủng hoảng và số hỗ trợ → §40.4; sáu bất biến kinh tế kiểm tự động → `VC-036`; bản nháp chính sách quyền riêng tư và điều khoản là điểm xuất phát cho `VC-020` | sổ 175 rủi ro gắn mốc của bản tầm nhìn; hướng dẫn duyệt cho các vùng đã cắt |
+| 14 | Rủi ro | rà tổng quan 16/11; đọc thêm bảng 20 rủi ro ưu tiên, mục pháp lý trò chơi, mục hỗ trợ khẩn cấp | giấy phép chế độ nhiều người → §40.6, QĐ-32 (bỏ); luồng khủng hoảng và số hỗ trợ → §40.4; sáu bất biến kinh tế kiểm tự động → `VC-036`; bản nháp chính sách quyền riêng tư và điều khoản là điểm xuất phát cho `VC-020` | sổ 175 rủi ro gắn mốc của bản tầm nhìn; hướng dẫn duyệt cho các vùng đã cắt |
 
 «Đã rà» nghĩa là một lượt rà đã đọc trọn tập. «Rà tổng quan» nghĩa là đã đọc trang tổng quan của tập và danh mục tệp, cộng những mục được nêu tên; **chưa đọc từng tệp**. Bộ phận nào cần khai thác sâu một tập thì đọc trọn tập đó trước (`VC-022`).
 

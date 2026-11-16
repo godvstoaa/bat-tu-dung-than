@@ -61,15 +61,6 @@ export const WORLD_TILES = { minX: 10 - Math.ceil(HALF / 1.6), maxX: 10 + Math.c
 export const CLOSE_FULL = 4001;
 export const CLOSE_SPAM = 4002;
 export const CLOSE_BAD = 4003;
-export const CLOSE_REGION = 4004; // chế độ nhiều người chưa mở ở khu vực này (VC-039) — client dừng thử lại, chơi đơn
-
-/** Khu vực có bị tắt chế độ nhiều người không. list = biến môi trường MMO_BLOCK_COUNTRIES («VN,XX»),
- *  rỗng = không chặn ai. country = mã quốc gia Cloudflare gắn vào yêu cầu (request.cf.country). */
-export function mmoBlocked(country, list) {
-  const cc = String(country || '').trim().toUpperCase();
-  if (!cc) return false;
-  return String(list || '').split(',').map((x) => x.trim().toUpperCase()).filter(Boolean).includes(cc);
-}
 
 // Bồ đoàn ở Trà Thất (toạ độ ô) — mỗi chỗ một người, máy chủ giữ khoá.
 // chỗ ngồi bồ đoàn Trà Thất (toạ độ ô) — theo bố cục Sơn Môn

@@ -4,6 +4,14 @@ Mỗi thay đổi về thiết kế hoặc mã game thêm một mục **ở đ�
 
 Nhật ký trước ngày 16/11/2026 nằm ở [GAME-V2-THIET-KE](../GAME-V2-THIET-KE.md) từ §7 trở đi (việc tách sang đây: `VC-023`).
 
+## 2026-11-16 — AI trong game chỉ dùng glm-5.3-flash; bỏ chặn khu vực
+
+- **Việc (QĐ-31):** hằng `GAME_AI_MODEL = 'glm-5.3-flash'` ở `src/game/ai-model.js`. Khung thầy bói gọi `askAI` với `gameAiConfig()` (proxy `/zai`, mô hình flash). `worker/llm.js › llmBackends`: z.ai dùng flash, pool chỉ nhận mục flash. Proxy `/zai` (`worker/index.js › freeRoute`) **trước đây ép mọi yêu cầu về glm-5.3** (đo trên bản thật: xin flash, máy chủ trả `"model":"glm-5.3"`); nay tôn trọng mô hình trong danh sách cho phép, game xin flash thì không rơi sang pool.
+- **Cổng persona:** gắn theo mô hình (`PERSONA_GATE`); `gamePersona` tự tắt vì cổng mới chứng nhận `glm-5.3`. `eval-persona.mjs` mặc định chạy flash và kiểm trước mô hình máy chủ trả; thử trên bản thật hiện tại: dừng đúng («máy chủ trả glm-5.3»). Chạy cổng sau khi deploy.
+- **Việc (QĐ-32):** gỡ `MMO_BLOCK_COUNTRIES`, `CLOSE_REGION`, `mmoBlocked`, trạng thái «region» ở client; `VC-039` đóng.
+- **Chưa deploy** (QĐ-06): các thay đổi Worker chỉ có hiệu lực sau lần deploy tay kế tiếp.
+- **Test:** mới `scripts/test-game-ai-model.mjs` (5 ca, trong `test:npcai`); `test-quan-protocol` bỏ ca chặn khu vực.
+
 ## 2026-11-16 — Chạy cổng đánh giá persona với mô hình thật
 
 - **Việc:** chạy `scripts/eval-persona.mjs --live --origin https://battu.god8.shop` (200 câu thử đỏ, 3 luồng, qua proxy `/zai` của app, mô hình glm-5.3). Ba lượt, mỗi lượt khoảng 65 phút.

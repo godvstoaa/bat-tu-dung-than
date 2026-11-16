@@ -1,7 +1,7 @@
 // Test tích hợp hai TÀI KHOẢN THỬ (localhost, OTP dev — không dùng dịch vụ thật) qua máy chủ cục bộ:
 // ví chợ có trần, chợ ký gửi giữa hai tài khoản, hôn nhân một vợ một chồng, thầy mệnh lý + trọng tài gọi LLM.
-// Chuẩn bị: `npm run dev:mmo` (cổng 8788) + `node scripts/mock-llm.mjs` (LLM giả cổng 8899) + nạp cấu hình AI cục bộ:
-//   cd <os.tmpdir()>/huyenquan-mmo-dev && node <repo>/node_modules/wrangler/bin/wrangler.js kv key put "ai:config" //     '{"freePool":[{"name":"mock","endpoint":"http://127.0.0.1:8899/v1","model":"mock-1","apiKey":"test"}]}' --binding ADMIN_KV --local
+// Chuẩn bị: `npm run dev:mmo` (cổng 8788) + `node scripts/mock-llm.mjs` (LLM giả cổng 8899) + nạp cấu hình AI cục bộ: (pool chỉ nhận mục khai đúng mô hình game — ai-model.js › GAME_AI_MODEL)
+//   cd <os.tmpdir()>/huyenquan-mmo-dev && node <repo>/node_modules/wrangler/bin/wrangler.js kv key put "ai:config" //     '{"freePool":[{"name":"mock","endpoint":"http://127.0.0.1:8899/v1","model":"glm-5.3-flash","apiKey":"test"}]}' --binding ADMIN_KV --local
 // Chạy: node scripts/test-econ-accounts.mjs
 import { EXAM } from '../src/game/divination.js';
 const B = 'http://127.0.0.1:8788', WS = 'ws://127.0.0.1:8788';

@@ -4,6 +4,7 @@
 //  Tôn trọng công tắc tắt AI / tắt model free của admin. Không bao giờ trả khoá về client.
 // ============================================================================
 import { isAiEnabled, isFreeAiEnabled } from './admin.js';
+import { GAME_AI_MODEL } from '../src/game/ai-model.js';
 
 // Đếm lượt gọi mô hình theo ngày và theo đường gọi (npc / judge) — để đo chi phí (VC-021).
 // Ghi vào cùng bản ghi dayagg:<ngày> mà bảng quản trị đang đọc; lỗi ghi thì bỏ qua, không chặn lượt.
@@ -28,10 +29,20 @@ async function llmChatRaw(env, messages, { maxTokens = 220, json = false, timeou
   if (!(await isAiEnabled(env))) return { ok: false, err: 'ai_off' };
   let cfg = {};
   try { cfg = JSON.parse((await env.ADMIN_KV.get('ai:config')) || '{}'); } catch (e) { cfg = {}; }
+  return tryBackends(llmBackends(cfg, await isFreeAiEnabled(env)), messages, { maxTokens, json, timeoutMs });
+}
+
+/** Các đường gọi theo thứ tự thử. Game chỉ dùng GAME_AI_MODEL (glm-5.3-flash, quyết định 16/11): khoá z.ai của
+ *  admin trước, khoá gói Coding sau; pool miễn phí chỉ dùng mục nào chạy đúng mô hình đó (không rơi sang mô hình khác). */
+export function llmBackends(cfg = {}, freeOn = false) {
   const backends = [];
-  if (cfg.apiKey) backends.push({ endpoint: 'https://api.z.ai/api/paas/v4', model: cfg.model || 'glm-5.3', apiKey: cfg.apiKey });
-  if (cfg.zaiKey) backends.push({ endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.3', apiKey: cfg.zaiKey });
-  if (await isFreeAiEnabled(env)) for (const p of Array.isArray(cfg.freePool) ? cfg.freePool : []) if (p?.apiKey && p.endpoint && p.model) backends.push({ endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey) });
+  if (cfg.apiKey) backends.push({ endpoint: 'https://api.z.ai/api/paas/v4', model: GAME_AI_MODEL, apiKey: cfg.apiKey });
+  if (cfg.zaiKey) backends.push({ endpoint: 'https://api.z.ai/api/coding/paas/v4', model: GAME_AI_MODEL, apiKey: cfg.zaiKey });
+  if (freeOn) for (const p of Array.isArray(cfg.freePool) ? cfg.freePool : []) if (p?.apiKey && p.endpoint && String(p.model).replace(/^.*\//, '') === GAME_AI_MODEL) backends.push({ endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey) });
+  return backends;
+}
+
+async function tryBackends(backends, messages, { maxTokens, json, timeoutMs }) {
   for (const b of backends) {
     const ac = new AbortController(), timer = setTimeout(() => ac.abort(), timeoutMs);
     try {

@@ -30,7 +30,7 @@ Một danh sách việc duy nhất cho mọi bộ phận. Lộ trình cũ chia t
 | **Ư2 — khép đặc tả** | đặc tả hứa mà mã chưa có hoặc chưa kiểm | VC-013, VC-014, VC-027, VC-028, VC-029, VC-031, VC-005 |
 | **Ư3 — chất lượng** | người chơi thấy được | VC-009, VC-010, VC-006, VC-012, VC-024, VC-032 |
 | **Ư4 — tài liệu và nợ** | giữ bộ thiết kế sống | VC-003, VC-022, VC-023, VC-030, VC-033 |
-| **Chờ chủ dự án** | không tự làm được | VC-015, VC-016, VC-017, VC-018, VC-019; quyết định pháp lý của VC-039 |
+| **Chờ chủ dự án** | không tự làm được | VC-015, VC-016, VC-017, VC-018, VC-019 |
 
 ## 4.4 Phiếu việc
 
@@ -59,6 +59,8 @@ Một danh sách việc duy nhất cho mọi bộ phận. Lộ trình cũ chia t
 
 ### VC-005 · Bộ đánh giá trước khi bật persona cho Thầy
 - **Đã đóng 2026-11-16:** cổng đánh giá **đạt** — 200/200 câu do mô hình thật trả lời (glm-5.3 qua proxy `/zai` của app); P0 100 %, từ chối thừa 0 %, giữ vai 100 %; 2 câu bộ chấm đánh dấu đã được đọc lại và kết luận đạt (`scripts/eval-persona-review.json`). Ba lượt chạy: lượt 1 lộ bộ chấm chưa hiểu vế phủ định (đã sửa); lượt 2 lộ một lỗi thật (F02, thầy đọc nguyên nhãn «Đại hung», đã thêm `softenRatings`); lượt 3 đạt. `gamePersona` bật lại. Đổi lời nhắc, mô hình hay persona thì chạy lại cổng trước khi phát hành.
+- **Mở lại 16/11 vì đổi mô hình (QĐ-31):** game chuyển sang `glm-5.3-flash`, cổng mới chứng nhận `glm-5.3` và gắn theo mô hình (`src/game/ai-model.js › PERSONA_GATE`) → `gamePersona` **tắt** tới khi cổng đạt trên flash.
+- **Quy trình chạy lại:** deploy Worker → `node scripts/eval-persona.mjs --live --origin <tên miền app>` (mặc định chạy `glm-5.3-flash`; script tự dừng nếu máy chủ trả mô hình khác) → đọc lại các câu bị đánh dấu vào `scripts/eval-persona-review.json` → đạt thì ghi mô hình vào `PERSONA_GATE` và deploy lại.
 - **Bộ phận:** AI/NPC · **Chương:** §21 · **Phụ thuộc:** VC-021
 - **Tiến độ 16/11:** đã có `scripts/eval-persona.mjs`: nạp đủ 200 câu của bộ thử đỏ (101 câu P0), chấm tự động lớp 1, tính cổng phát hành. Chế độ ngoại tuyến đã chạy: cổng khủng hoảng bắt đủ 15/15 câu P0 nhóm C. **Còn lại:** chạy chế độ trực tuyến với mô hình thật (cần khoá và chi phí gọi mô hình), rồi có người đọc lại các câu P0 trượt.
 - **Hiện trạng:** `FEATURES.personaAi` tắt; chưa có bộ 200 câu đánh giá, chưa có script chấm. Trong khi đó `FEATURES.gamePersona` (giọng persona cho thầy bói trong game) **đang bật trên web mà chưa qua đánh giá nào** (kiểm 16/11).
@@ -288,8 +290,8 @@ Một danh sách việc duy nhất cho mọi bộ phận. Lộ trình cũ chia t
 - **Nghiệm thu:** test mới: câu có chữ «s» đi qua hàm làm sạch giữ nguyên chữ, khoảng trắng liền nhau gộp làm một, từ trong danh sách cấm bị chặn.
 - **Ngoài phạm vi:** viết lại bộ lọc.
 
-### VC-039 · Giấy phép cho chế độ nhiều người tại Việt Nam
-- **Phần kỹ thuật xong 2026-11-16:** biến môi trường `MMO_BLOCK_COUNTRIES` (vd `VN`) tắt chế độ nhiều người theo quốc gia; client nhận mã đóng `CLOSE_REGION`, dừng thử lại, chơi đơn đủ hệ. Mặc định không chặn ai. Phần còn lại là quyết định pháp lý.
+### VC-039 · Giấy phép cho chế độ nhiều người tại Việt Nam — đã bỏ
+- **Đã đóng 2026-11-16 (QĐ-32):** chủ dự án quyết không chặn khu vực nào và không theo đuổi việc này. Công tắc `MMO_BLOCK_COUNTRIES` làm trong ngày đã gỡ khỏi mã. Phần dưới giữ để tra lịch sử.
 - **Bộ phận:** Vận hành (chủ dự án quyết) · **Chương:** §40.6
 - **Hiện trạng:** bản tầm nhìn (tập 14) xếp đây là rủi ro số một: theo cách hiểu của người soạn tập đó về Nghị định 147/2024/NĐ-CP, game nhiều người chơi tương tác qua máy chủ thuộc loại G1, cần giấy phép và phê duyệt kịch bản trước khi phát hành tại Việt Nam; chính tập đó ghi «cần luật sư xác minh». Bộ thiết kế này chưa có quyết định nào về việc đó, trong khi chế độ nhiều người đã có trong mã.
 - **Mong muốn:** chủ dự án chọn một trong ba hướng mà tập 14 nêu (tắt chế độ nhiều người ở Việt Nam; phát hành qua đối tác có phép; tự xin phép) sau khi có ý kiến luật sư.

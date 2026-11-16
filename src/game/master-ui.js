@@ -8,6 +8,7 @@ import { esc } from './stations.js';
 import { buzz } from './haptics.js';
 import { guardCrisis, crisisStrip } from './crisis-ui.js';
 import { softenRatings } from './map-rating.js';
+import { gameAiConfig } from './ai-model.js';
 
 function el(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstElementChild; }
 
@@ -68,7 +69,8 @@ export function masterChatBody(api, { R, who, first, starters = [], persona = nu
     try {
       const L = await load();
       abort = new AbortController();
-      const { source, text: rawText, meta } = await L.askAI(frame ? frame(q) : q, R, L.getConfig(), {
+      // AI trong game chỉ dùng GAME_AI_MODEL (glm-5.3-flash) qua proxy /zai — không theo mô hình người dùng chọn cho app
+      const { source, text: rawText, meta } = await L.askAI(frame ? frame(q) : q, R, gameAiConfig(L.getConfig()), {
         history, signal: abort.signal, persona, personaForce,
         onStatus: (s) => { body.innerHTML = `<p class="hq-sub">${esc(s)} …</p>`; },
         // gộp token trong cùng khung hình: mỗi rAF chỉ vẽ một lần (token dồn cuối khung)

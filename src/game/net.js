@@ -121,7 +121,6 @@ export function createNet({ profile, onEvent = () => {}, token = null }) {
       ws = null; me = null; others.clear(); count = 0;
       onEvent({ t: 'count', n: 0 });
       if (e.code === P.CLOSE_FULL && room < P.MAX_ROOMS - 1) { room += 1; connect(); return; }
-      if (e.code === P.CLOSE_REGION) { set('region'); stopped = true; return; } // VC-039: khu vực chưa mở — không thử lại
       set('off');
       scheduleRetry();
     };

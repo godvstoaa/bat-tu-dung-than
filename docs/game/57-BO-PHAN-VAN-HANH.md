@@ -53,4 +53,4 @@ node scripts/docs-game-gen.mjs --check
 ```
 
 ## Hàng việc hiện tại
-`VC-025` (dọn cây làm việc) · `VC-020` (văn bản quyền riêng tư cho tứ trụ) · `VC-021` (trần chi phí AI) · `VC-023` (tách nhật ký) · đặt `MMO_BLOCK_COUNTRIES` theo ý kiến luật sư (`VC-039`) · `VC-016`, `VC-017` (chờ chủ dự án). Deploy giờ chạy tay (§32.4). Chi tiết: [04-LO-TRINH](04-LO-TRINH.md).
+`VC-025` (dọn cây làm việc) · `VC-020` (văn bản quyền riêng tư cho tứ trụ) · `VC-021` (trần chi phí AI) · `VC-023` (tách nhật ký) · `VC-016`, `VC-017` (chờ chủ dự án). Deploy giờ chạy tay (§32.4); sau lần deploy kế tiếp chạy lại cổng persona trên `glm-5.3-flash` (`VC-005`). Chi tiết: [04-LO-TRINH](04-LO-TRINH.md).

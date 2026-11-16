@@ -3,15 +3,15 @@
 
 > Sinh từ mã nguồn. Khi một con số ở chương khác lệch với tệp này thì **tệp này (tức là mã đang chạy) thắng** và chương kia phải sửa.
 
-Tổng: **157 tệp game, 33857 dòng**; **10 tệp máy chủ**. Chưa gán chương: **0**.
+Tổng: **159 tệp game, 34347 dòng**; **10 tệp máy chủ**. Chưa gán chương: **0**.
 
 ## A1.1 Theo chương
 
 | chương | tên | số tệp | số dòng |
 |---|---|---|---|
 | 10 | Thế giới | 38 | 7968 |
-| 11 | Mệnh và nhân vật | 9 | 1913 |
-| 12 | Bói toán và nội dung | 20 | 3779 |
+| 11 | Mệnh và nhân vật | 9 | 1916 |
+| 12 | Bói toán và nội dung | 20 | 3781 |
 | 13 | Đời sống | 4 | 658 |
 | 14 | Việc làm | 6 | 1249 |
 | 15 | Nhà ở và phương tiện | 8 | 1317 |
@@ -20,10 +20,10 @@ Tổng: **157 tệp game, 33857 dòng**; **10 tệp máy chủ**. Chưa gán ch�
 | 18 | Huyền học, tu luyện, luân hồi | 4 | 346 |
 | 19 | Luật và hình phạt | 5 | 460 |
 | 20 | Xã hội | 1 | 82 |
-| 21 | NPC và AI | 10 | 2139 |
+| 21 | NPC và AI | 11 | 2177 |
 | 22 | Giao diện, điều khiển | 6 | 1356 |
-| 30 | Kỹ thuật client | 24 | 9200 |
-| 31 | Máy chủ, mạng, dữ liệu | 5 | 901 |
+| 30 | Kỹ thuật client | 25 | 9657 |
+| 31 | Máy chủ, mạng, dữ liệu | 5 | 891 |
 
 ## A1.2 Mô-đun game `src/game/`
 
@@ -34,6 +34,7 @@ Cột «test» lấy tự động: bộ test nào có nhắc tới tệp đó. �
 | `accessories.js` | 436 | 11 | Client/3D |  | 4: disposeObject, buildMount, createOutfit, HAS_3D |  |  |
 | `account-ui.js` | 114 | 31 | Backend + Client |  | 2: accountBody, chooseBody |  |  |
 | `account.js` | 102 | 31 | Backend + Client |  | 1: createAccount |  |  |
+| `ai-model.js` | 38 | 21 | AI/NPC + Nội dung | MÔ HÌNH AI CỦA GAME — một chỗ duy nhất (client lẫn Worker cùng import). Quyết định chủ dự án 2026-11-16: mọi lượt AI trong game (khung thầy bói, NPC chat, giám khảo kinh tế, bộ đánh giá pers | 8: GAME_AI_MODEL, ZAI_MODELS, ZAI_DEFAULT_MODEL, pickZaiModel, gameModelOnly, gameAiConfig, … |  | game-ai-model |
 | `amduc.js` | 94 | 18 | Thiết kế game |  | 13: TIERS, NEED, PENALTY, tierOfStreak, adState, tier, … |  | game-amduc, game-huyenhoc |
 | `archkit-style.js` | 342 | 30 | Client/3D | BỘ KIẾN TRÚC THEO PHONG CÁCH (three.js, thủ tục, nhẹ) — nhà, mái, tường rào, cổng, mặt nước, cây cho 16 phong cách biệt phủ + 8 phong cách khu biệt thự (estate-layout.STYLES): · Á Đông: cung | 9: styleMats, styledBuilding, styledPavilion, styledFence, styledGate, waterFeature, … |  |  |
 | `archkit.js` | 296 | 30 | Client/3D | BỘ KIẾN TRÚC THỦ TỤC (three.js) — dựng biệt phủ đúng tỉ lệ người 1,9 m bằng hình khối nhẹ, không model Meshy 300k: nền đá có bậc, hàng cột sơn son, vách cửa bức bàn (song gỗ), xà vẽ màu, mái | 11: roofMatOf, kit, plinth, hall, gateHouse, walls, … |  |  |
@@ -77,12 +78,13 @@ Cột «test» lấy tự động: bộ test nào có nhắc tới tệp đó. �
 | `estate-layout.js` | 160 | 10 | Thiết kế game + Client/3D | QUY HOẠCH TRONG KHUÔN VIÊN (thuần JS, tất định, KHÔNG phụ thuộc cityblocks — máy chủ dùng được qua estate-core): phong cách kiến trúc + bố cục một biệt phủ (4.550–10.000 m²) hoặc một biệt th | 9: STYLES, TIEN_PLAN, PHU_PLAN, VILLA_STYLES, VILLA_DISTRICT_NAME, VILLAS_PER_DISTRICT, … |  | game-mansion |
 | `estate.js` | 59 | 15 | Thiết kế game + Backend | NHÀ RIÊNG — danh sách nhà rao bán, giá, hợp mệnh, mã hoá bố cục đồ đạc, kiểm tra bài trí. Thuần JS, tất định (máy chủ worker/estate.js và test Node dùng chung). Chủ sở hữu do máy chủ giữ (Es | 8: listings, listing, fitStars, FIT_TEXT, roomOf, isPhu, … |  | game-estate, game-heaven, game-items |
 | `fatequest.js` | 103 | 14 | Thiết kế game + Backend |  | 13: HOURS, HOUR_TEXT, inHours, QUESTS, PERK, DAY_MIN, … |  | game-fate |
-| `features.js` | 50 | 11 | Thiết kế game + Client/UI |  | 4: IOS, FEATURES, TEXT, hasStation |  | game-ai-persona |
+| `features.js` | 53 | 11 | Thiết kế game + Client/UI |  | 4: IOS, FEATURES, TEXT, hasStation |  | game-ai-model, game-ai-persona |
 | `flight-poses.js` | 60 | 16 | Thiết kế game + Client/3D |  | 2: POSES, poseOf |  | game-flight |
 | `flight.js` | 40 | 16 | Thiết kế game + Client/3D |  | 9: FS, FS_NAME, TAKEOFF_S, rarityBonus, SPEED_CAP, newFlight, … |  | game-flight |
 | `forest.js` | 147 | 30 | Client/3D | HUYỀN GIỚI — rừng: cây sinh thủ tục (trees.js) ba tầng chi tiết. gần (&lt; near m) cây đầy đủ, đổ bóng vừa (&lt; mid m) cùng hình học, không đổ bóng (máy yếu) xa «impostor»: chụp chính cây đó thàn | 2: FOREST_Q, createForest |  |  |
 | `fortune-npc.js` | 118 | 12 | Thiết kế game + Nội dung |  | 7: GUEST_DAILY, MASTERS, MASTER_OF_STATION, chartSource, framedQuestion, useGuestQuota, … |  | game-fortune |
 | `fortune-ui.js` | 70 | 12 | Thiết kế game + Nội dung |  | 3: playerChart, fortuneBody, openFortune |  |  |
+| `fx-foliage.js` | 445 | 30 | Client/3D | HUYỀN GIỚI — GIÓ LÁ THỐNG NHẤT WIND-V2 + CỎ BLADE 3-TRI + HOA ĐỒNG CỎ (docs/GAME-SIEU-THUC-THIET-KE.md §2.1–2.2, §4.3). • WIND: một bộ uniform dùng chung { uT, uDir, uGust } — hướng LẤY ĐÚNG | 8: WIND, tickWind, applyWindV2, windDepthMat, windifyForest, sweepCityWind, … |  |  |
 | `game.css` | 680 | 22 | Client/UI |  | 0 |  |  |
 | `gen.js` | 59 | 30 | Client/3D |  | 2: gen, genBusy |  |  |
 | `gen.worker.js` | 36 | 30 | Client/3D |  | 0 |  |  |
@@ -127,14 +129,14 @@ Cột «test» lấy tự động: bộ test nào có nhắc tới tệp đó. �
 | `map-ui.js` | 285 | 22 | Client/UI | BẢN ĐỒ HUYỀN THÀNH (v4) — bản đồ chi tiết kiểu game nhập vai lớn (Genshin / WoW / GTA): · toàn màn hình, KÉO để di, LĂN chuột / chụm 2 ngón để phóng (từ cả thành 4,25 km tới từng căn nhà) ·  | 8: LAYERS, mapData, drawMap, searchMap, hitMap, nearestStation, … |  | game-map |
 | `market.js` | 44 | 17 | Thiết kế game + Backend |  | 14: DAY, BAND, baseXu, refPrice, band, saleFee, … |  | game-econ |
 | `markup.js` | 65 | 22 | Client/UI | Khung HTML của game — chèn vào bất kỳ host nào (game.html trên web, overlay trong vỏ iOS). | 1: gameMarkup |  |  |
-| `master-ui.js` | 121 | 12 | Thiết kế game + Nội dung | THẦY LUẬN (AI) — dùng nguyên bộ AI của app (../engine/ai.js: askAI stream + tool tra cứu, tóm tắt lá số đã tính, «não» suy luận) + tự chấm Neo (../engine/neo-checker.js). Trong game: thầy tr | 1: masterChatBody |  |  |
+| `master-ui.js` | 123 | 12 | Thiết kế game + Nội dung | THẦY LUẬN (AI) — dùng nguyên bộ AI của app (../engine/ai.js: askAI stream + tool tra cứu, tóm tắt lá số đã tính, «não» suy luận) + tự chấm Neo (../engine/neo-checker.js). Trong game: thầy tr | 1: masterChatBody |  |  |
 | `models.js` | 769 | 30 | Client/3D |  | 33: U, toWorld, toTile, materials, mesh, mergeStatic, … |  |  |
 | `motion.js` | 179 | 16 | Thiết kế game + Client/3D | DI CHUYỂN TỰ DO (thuần JS — main.js gọi mỗi khung, test Node dùng được): · chạy nhanh (Shift, tốn thể lực) · nhảy (Space) + khinh công nhảy hai lần trên không · giữ Space khi rơi = lượn (rơi | 11: G, SPRINT, WADE, SWIM_V, FLOAT, SWIM, … |  | game-motion, game-sky |
 | `mount.js` | 18 | 30 | Client/3D | mountGame(host, { onExit }) — điểm gắn duy nhất cho mọi nền tảng. Web: game.html gọi không có onExit. iOS: vỏ Lữ Đăng mở overlay, truyền onExit để quay về tab trước. Gọi lại lần 2 trên cùng  | 1: mountGame |  |  |
 | `movement.js` | 34 | 16 | Thiết kế game + Client/3D |  | 5: WATER_WALK, DROWN_HP, waterWalkOf, spendWaterWalk, FX_CODE |  | game-motion |
 | `names.js` | 26 | 21 | AI/NPC + Nội dung | Tên khách ngẫu nhiên kiểu Sansa ("Mây Thong Thả") + câu tĩnh tâm cho Lư Hương. | 2: randomName, CALM_LINES |  |  |
 | `namhan.js` | 70 | 12 | Thiết kế game + Nội dung | ĐƯỜNG THẦY · TAB «NĂM HẠN CỦA BẠN» (docs/GAME-THIET-KE-CHOT.md P0-1) — đại vận đang đi + chủ đề thập niên + 5 năm tới, luận từ lá số CỦA NGƯỜI CHƠI (R do stations.js:709-713 truyền sẵn qua c | 3: SOFT_RATING, softRating, buildNamHan | liunian-pro, dayun-god, remedy-fate | game-thay-mo-rong |
-| `net.js` | 285 | 31 | Backend + Client | HUYỀN QUÁN MMO — client mạng. Offline-first: không kết nối được thì game vẫn chơi đơn như cũ; có mạng thì thấy người thật trong cùng phòng (shard). Giao thức: ./protocol.js · Máy chủ: worker | 2: pid, createNet |  | quan-protocol |
+| `net.js` | 284 | 31 | Backend + Client | HUYỀN QUÁN MMO — client mạng. Offline-first: không kết nối được thì game vẫn chơi đơn như cũ; có mạng thì thấy người thật trong cùng phòng (shard). Giao thức: ./protocol.js · Máy chủ: worker | 2: pid, createNet |  | quan-protocol |
 | `npc-chat-core.js` | 158 | 21 | AI/NPC + Nội dung | NPC HỘI THOẠI BẰNG LLM — phần THUẦN (P6, test Node). Đặc tả §8. · Lọc đầu vào (≤ 300 ký tự, bỏ ký tự điều khiển, chặn thô tục) → định tuyến ý định: xã giao (cache theo NPC × ý định × bậc thi | 16: MAX_IN, cleanInput, route, cacheable, affTier, cacheKey, … |  | game-econ |
 | `npc-chat-ui.js` | 60 | 21 | AI/NPC + Nội dung | KHUNG TRÒ CHUYỆN VỚI NPC (P6) — gõ tự do (≤ 300 ký tự), NPC trả lời bằng LLM qua /api/npc/chat. Thẻ hành động do máy chủ đã duyệt (báo giá trong khung 80–110%, mời làm công, cho chịu, gợi ý  | 1: chatBody |  |  |
 | `npc-deep.js` | 54 | 12 | Thiết kế game + Nội dung | BƯỚC «NĂM NAY» CHO 4 SẢNH NGHỀ (docs/GAME-THIET-KE-CHOT.md P0-2) — hàm thuần npcDeep(R, nowYear): nhận LÁ SỐ KHÁCH đã có sẵn ở builder (R = npcR(npc, year), halls.js:26) và luận lưu niên năm | 2: TONE_OF, npcDeep | liunian-pro, remedy-fate | game-npc-deep |
@@ -148,12 +150,12 @@ Cột «test» lấy tự động: bộ test nào có nhắc tới tệp đó. �
 | `prison3d.js` | 77 | 19 | Thiết kế game |  | 1: createPrison |  |  |
 | `production.js` | 117 | 17 | Thiết kế game + Backend |  | 15: SEASON, inSeason, plotsOf, rent, extend, plant, … |  | game-econ |
 | `progress.js` | 59 | 11 | Thiết kế game + Client/UI |  | 10: xpFor, levelOf, effLevel, GIATRI, WX_GIATRI, vipActive, … |  | game-progress |
-| `protocol.js` | 283 | 31 | Backend + Client |  | 42: allowedTitle, VERSION, ROOM_CAP, MAX_ROOMS, MOVE_HZ, MSG_PER_SEC, … |  | game-auth, game-city-v4, game-cosmetics, game-econ, game-estate, game-heaven, game-homes, game-jobs, game-law, game-spawn, game-state, quan-mmo, quan-protocol |
+| `protocol.js` | 274 | 31 | Backend + Client |  | 40: allowedTitle, VERSION, ROOM_CAP, MAX_ROOMS, MOVE_HZ, MSG_PER_SEC, … |  | game-auth, game-city-v4, game-cosmetics, game-econ, game-estate, game-heaven, game-homes, game-jobs, game-law, game-spawn, game-state, quan-mmo, quan-protocol |
 | `que-ui.js` | 298 | 12 | Thiết kế game + Nội dung | THẦY GIẢI QUẺ (docs/GAME-V2-THIET-KE.md §S6 + docs/GAME-THIET-KE-CHOT.md P0-1) — 5 phép của trang chính, cùng engine: Mai Hoa Dịch Số (theo giờ / theo 2 số) · Lục Hào (gieo 3 xu × 6) · Tiểu  | 1: queBody | meihua, liuyao, xiaoliuren, jinkoujue, qiuqian, hexagram-meaning | game-thay-mo-rong |
 | `raze.js` | 123 | 19 | Thiết kế game |  | 7: initRaze, targetNear, strike, applyRazed, tickRaze, razedCount, … |  |  |
 | `realm.js` | 91 | 18 | Thiết kế game |  | 14: REALMS, realmState, effectiveLevel, realmOf, canBreak, breakthrough, … |  | game-huyenhoc |
 | `render.js` | 318 | 30 | Client/3D | HUYỀN QUÁN — vẽ sân quán bằng canvas (pixel art sinh bằng code, không file ảnh). Đơn vị vẽ = ô (TILE px logic); ctx đã scale sẵn theo độ phân giải màn hình. | 5: ROBE, nightLevel, drawPlayer, createRenderer, clientToTile |  |  |
-| `render3d.js` | 1732 | 30 | Client/3D | HUYỀN QUÁN 3D — cảnh, camera thứ ba, ánh sáng theo giờ thật, hạt, nhãn HTML, chọn điểm bằng raycast. Spec mục 5 + 9. Cùng giao diện với renderer 2D: { resize, frame(scene, dt), yaw, rotate(s | 1: create3D | crisis |  |
+| `render3d.js` | 1734 | 30 | Client/3D | HUYỀN QUÁN 3D — cảnh, camera thứ ba, ánh sáng theo giờ thật, hạt, nhãn HTML, chọn điểm bằng raycast. Spec mục 5 + 9. Cùng giao diện với renderer 2D: { resize, frame(scene, dt), yaw, rotate(s | 1: create3D | crisis |  |
 | `river3d.js` | 170 | 10 | Thiết kế game + Client/3D |  | 4: bridgeBody, bridgeRails, riverBridgeBody, createRiver |  |  |
 | `roads.js` | 91 | 10 | Thiết kế game + Client/3D |  | 6: CITY_R, roadPath, roadLines, FIELD_RANGE, roadField, makeRoadSampler |  |  |
 | `roomgrid.js` | 15 | 10 | Thiết kế game + Client/3D |  | 5: COLS, SLOT_EST, slotOrigin, SHOP_SIZE, shopSize |  |  |
@@ -186,7 +188,7 @@ Cột «test» lấy tự động: bộ test nào có nhắc tới tệp đó. �
 | `work-games.js` | 208 | 14 | Thiết kế game + Backend |  | 4: rng, HERBS, play, GAME_KINDS |  |  |
 | `work.js` | 343 | 14 | Thiết kế game + Backend | VIỆC LÀM (P2, client) — bảng Chiêu công trong tiệm, ca làm, mini-game, phu áp hàng, mỏ dân sự, huy hiệu ca. Máy chủ (Guild DO — guild-core.js) giữ chỗ làm, chấm lương, ghi sổ; ví tiền vẫn ở  | 2: ERR, createWork |  |  |
 | `world.js` | 375 | 10 | Thiết kế game + Client/3D |  | 22: COLS, ROWS, TILE, PROPS, HALLS, PLACES, … |  | game-halls, game-homes, game-state |
-| `world3d.js` | 405 | 30 | Client/3D | HUYỀN GIỚI — dựng thế giới mở trong Three.js (docs/DAI-THE-GIOI-DESIGN.md §C2–C3, §C7). Địa hình chunk 128 m + LOD (64/32/8 ô) + skirt chống nứt, tô màu theo độ cao/độ dốc; trời tán xạ (Sky) | 2: QUALITY, createWorld |  |  |
+| `world3d.js` | 415 | 30 | Client/3D | HUYỀN GIỚI — dựng thế giới mở trong Three.js (docs/DAI-THE-GIOI-DESIGN.md §C2–C3, §C7). Địa hình chunk 128 m + LOD (64/32/8 ô) + skirt chống nứt, tô màu theo độ cao/độ dốc; trời tán xạ (Sky) | 2: QUALITY, createWorld |  |  |
 | `zheri-case.js` | 134 | 12 | Thiết kế game + Nội dung | ÁN TRẠCH NHẬT (sảnh Lịch Đường) — khách cần chọn ngày cho một việc lớn. Đáp án do engine app tính: ../engine/zheri.js (12 trực, Hoàng/Hắc đạo, xung–hại–hình–hợp tuổi). 3 bước: lọc ngày xung  | 10: ZHERI_STEPS, ZHERI_TITLE, CHONG, OFFICERS, JOB_VI, birthZhi, … | zheri, constants | game-zheri |
 
 ## A1.3 Máy chủ `worker/`
@@ -199,8 +201,8 @@ Cột «test» lấy tự động: bộ test nào có nhắc tới tệp đó. �
 | `worker/economy.js` | 35 | 31 | Backend | ECONOMY — Durable Object duy nhất («economy») giữ sổ kinh tế Phần II cho mọi shard: kho đồ & độ tươi (P8), sản xuất + chợ ký gửi + Thương hội (P9), bếp & bếp trưởng (P10), mặt bằng / nhà hàn |  |
 | `worker/estate.js` | 77 | 31 | Backend |  |  |
 | `worker/guild.js` | 25 | 31 | Backend |  |  |
-| `worker/index.js` | 237 | 31 | Backend | Cloudflare Worker — serve static app + proxy LLM + admin + anti-scraping + anti-abuse. |  |
-| `worker/llm.js` | 50 | 21 | AI/NPC + Backend | GỌI LLM PHÍA MÁY CHỦ (không stream) — dùng cho NPC chat (§8) và trọng tài thầy mệnh lý (§14.4). Cùng cấu hình «AI Config» của admin (ADMIN_KV ai:config): khoá z.ai trả phí trước, pool miễn p |  |
+| `worker/index.js` | 235 | 31 | Backend | Cloudflare Worker — serve static app + proxy LLM + admin + anti-scraping + anti-abuse. |  |
+| `worker/llm.js` | 61 | 21 | AI/NPC + Backend | GỌI LLM PHÍA MÁY CHỦ (không stream) — dùng cho NPC chat (§8) và trọng tài thầy mệnh lý (§14.4). Cùng cấu hình «AI Config» của admin (ADMIN_KV ai:config): khoá z.ai trả phí trước, pool miễn p | game-ai-model |
 | `worker/npc-chat.js` | 76 | 21 | AI/NPC + Backend |  | crisis |
 | `worker/quan-room.js` | 336 | 31 | Backend |  | game-state, quan-mmo |
 

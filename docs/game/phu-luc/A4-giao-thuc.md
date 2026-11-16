@@ -35,7 +35,6 @@
 | `BURNER_CAP` | [15,6,6,6,6,6,6,6,6] |
 | `CLOSE_BAD` | 4003 |
 | `CLOSE_FULL` | 4001 |
-| `CLOSE_REGION` | 4004 |
 | `CLOSE_SPAM` | 4002 |
 | `COOP_MAX` | 4 |
 | `EC_MAX` | 16000 |

@@ -76,7 +76,7 @@ async function modSection(file, { skip = [], only, cols = {}, max = {}, force = 
 
 // ---------- A1 · bản đồ mã ----------
 const CH = [
-  [/^(main|mount|perf|gen|gen\.worker|assets|collide|obstacles|render3d|render|world3d|terrain-mesh|lights|models|textures|ground-tex|grass|trees|forest|lotus|water3d|archkit|archkit-style|interior-build)\.js$/, '30', 'Client/3D'],
+  [/^(main|mount|perf|gen|gen\.worker|assets|collide|obstacles|render3d|render|world3d|terrain-mesh|lights|models|textures|ground-tex|grass|trees|forest|lotus|water3d|archkit|archkit-style|interior-build|fx-foliage)\.js$/, '30', 'Client/3D'],
   [/^(characters|accessories|effects)\.js$/, '11', 'Client/3D'],
   [/^(markup|map-ui|places-ui|audio|haptics)\.js$|^game\.css$/, '22', 'Client/UI'],
   [/^(net|protocol|account|account-ui|auth-core)\.js$/, '31', 'Backend + Client'],
@@ -91,7 +91,7 @@ const CH = [
   [/^(huyenhoc|realm|luanhoi|amduc)\.js$/, '18', 'Thiết kế game'],
   [/^(law|law-ui|raze|prison|prison3d)\.js$/, '19', 'Thiết kế game'],
   [/^(civil)\.js$/, '20', 'Thiết kế game + Backend'],
-  [/^(npc|npc-personas|persona-data|bark-pool|story-gen|citizens|npc-chat-core|npc-chat-ui|names|crisis-ui)\.js$/, '21', 'AI/NPC + Nội dung'],
+  [/^(npc|npc-personas|persona-data|bark-pool|story-gen|citizens|npc-chat-core|npc-chat-ui|names|crisis-ui|ai-model)\.js$/, '21', 'AI/NPC + Nội dung'],
 ];
 const WCH = { 'index.js': ['31', 'Backend'], 'quan-room.js': ['31', 'Backend'], 'accounts.js': ['31', 'Backend'], 'auth.js': ['31', 'Backend'], 'estate.js': ['31', 'Backend'], 'guild.js': ['31', 'Backend'], 'economy.js': ['31', 'Backend'], 'npc-chat.js': ['21', 'AI/NPC + Backend'], 'llm.js': ['21', 'AI/NPC + Backend'], 'admin.js': ['32', 'Vận hành'] };
 const CH_NAME = { 10: 'Thế giới', 11: 'Mệnh và nhân vật', 12: 'Bói toán và nội dung', 13: 'Đời sống', 14: 'Việc làm', 15: 'Nhà ở và phương tiện', 16: 'Di chuyển', 17: 'Sản xuất, ẩm thực, kinh doanh', 18: 'Huyền học, tu luyện, luân hồi', 19: 'Luật và hình phạt', 20: 'Xã hội', 21: 'NPC và AI', 22: 'Giao diện, điều khiển', 30: 'Kỹ thuật client', 31: 'Máy chủ, mạng, dữ liệu', 32: 'Kiểm thử, triển khai' };

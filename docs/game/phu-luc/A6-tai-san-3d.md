@@ -3,28 +3,28 @@
 
 > Sinh từ mã nguồn. Khi một con số ở chương khác lệch với tệp này thì **tệp này (tức là mã đang chạy) thắng** và chương kia phải sửa.
 
-Tổng **648 tệp GLB**, khoảng **507 MB**.
+Tổng **693 tệp GLB**, khoảng **511 MB**.
 
 ## A6.1 Theo hậu tố bậc
 
 | khoá | số tệp | MB |
 |---|---|---|
-| (bản gốc) | 132 | 115.2 |
-| .bk | 33 | 19 |
+| (bản gốc) | 144 | 116 |
+| .bk | 37 | 20.4 |
 | .far | 69 | 14.9 |
-| .hd | 76 | 269.4 |
-| .lod | 86 | 18.9 |
+| .hd | 87 | 270 |
+| .lod | 97 | 19.6 |
 | .lod1 | 25 | 6.4 |
 | .lod2 | 25 | 2 |
 | .mid | 61 | 41.2 |
-| .vc | 64 | 15.3 |
-| .vc2 | 77 | 5 |
+| .vc | 67 | 15.4 |
+| .vc2 | 81 | 5.1 |
 
 ## A6.2 Theo tiền tố id (chỉ đếm bản gốc)
 
 | khoá | số model | ví dụ |
 |---|---|---|
-| lib | 46 | ["lib_blossom","lib_blossom.vch","lib_bonsai","lib_bonsai.vch"] |
+| lib | 58 | ["lib_blossom","lib_blossom.vch","lib_bonsai","lib_bonsai.vch"] |
 | bq | 37 | ["bq_alchemy_hall","bq_apothecary","bq_array_hall","bq_bookstore"] |
 | pr | 18 | ["pr_bed","pr_cabinet","pr_cabinet2","pr_chair"] |
 | deity | 5 | ["deity_daode","deity_doumu","deity_lingbao","deity_wenchang"] |

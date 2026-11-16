@@ -19,6 +19,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { crisisCheck, foldVi } from '../src/engine/crisis.js';
 import { softenRatings } from '../src/game/map-rating.js'; // cùng lớp hiển thị khung thầy bói (master-ui.js)
+import { GAME_AI_MODEL, gameAiConfig, PERSONA_GATE } from '../src/game/ai-model.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'docs/gdd/06-npc-ai/06-13-red-team.md');
@@ -113,10 +114,16 @@ async function live(rows) {
     const _f = globalThis.fetch;
     globalThis.fetch = (u, o) => _f(typeof u === 'string' && u.startsWith('/') ? origin.replace(/\/+$/, '') + u : u, o);
   }
+  // mặc định chạy đúng mô hình game dùng (ai-model.js › GAME_AI_MODEL) — cổng chứng nhận theo mô hình
   const cfg = origin
-    ? { enabled: true, endpoint: arg('--endpoint', '/zai/api/paas/v4'), model: arg('--model', 'glm-5.3'), apiKey: '', preset: 'zai-proxy' }
-    : { enabled: true, endpoint: arg('--endpoint'), model: arg('--model', 'glm-5.3'), apiKey: arg('--key', ''), preset: 'custom' };
+    ? { ...gameAiConfig(), endpoint: arg('--endpoint', '/zai/api/paas/v4'), model: arg('--model', GAME_AI_MODEL) }
+    : { enabled: true, endpoint: arg('--endpoint'), model: arg('--model', GAME_AI_MODEL), apiKey: arg('--key', ''), preset: 'custom' };
   if (!cfg.endpoint) throw new Error('thiếu --endpoint (hoặc dùng --origin)');
+  // kiểm trước: máy chủ có chạy đúng mô hình được xin không (proxy cũ ép mọi yêu cầu về glm-5.3 — chạy cổng
+  //   trên đó là chứng nhận nhầm mô hình). Lệch → dừng, không chạy 200 câu.
+  const served = await servedModel(cfg);
+  if (served && served !== cfg.model) throw new Error(`máy chủ trả mô hình «${served}», không phải «${cfg.model}» — Worker chưa có bản tôn trọng mô hình (deploy trước), dừng`);
+  console.log(`Mô hình: xin ${cfg.model}, máy chủ trả ${served || '(không đọc được)'}`);
   const gap = Number(arg('--gap-ms', origin ? 2200 : 0)); // proxy của app giới hạn 30 lượt / phút / IP
   const limit = Number(arg('--limit', rows.length));
   const out = [];
@@ -142,7 +149,17 @@ async function live(rows) {
   await Promise.all(Array.from({ length: par }, async () => { while (queue.length) { const [r, i] = queue.shift(); slots[i] = await one(r); } }));
   out.push(...slots);
   process.stdout.write('\n');
-  return { gate: gateOf(out), results: out };
+  return { model: cfg.model, served, gate: gateOf(out), results: out };
+}
+
+async function servedModel(cfg) {
+  try {
+    const res = await fetch(cfg.endpoint.replace(/\/+$/, '') + '/chat/completions', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}) },
+      body: JSON.stringify({ model: cfg.model, messages: [{ role: 'user', content: 'Trả lời một chữ: OK' }], stream: false, max_tokens: 30, thinking: { type: 'disabled' } }),
+    });
+    return (await res.json())?.model || null;
+  } catch (e) { return null; }
 }
 
 /** Áp kết quả người duyệt đọc lại (tệp --review): câu bộ chấm bắt mà người duyệt kết luận «pass» được tính đạt,
@@ -178,13 +195,17 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   // --from <kết quả.json>: không gọi mô hình, chấm lại một lượt đã chạy (kèm --review <tệp duyệt.json>)
   const from = arg('--from'), reviewFile = arg('--review');
   if (LIVE || from) {
-    const r = from ? JSON.parse(fs.readFileSync(path.resolve(from), 'utf8')) : await live(rows);
+    let r;
+    try { r = from ? JSON.parse(fs.readFileSync(path.resolve(from), 'utf8')) : await live(rows); } catch (e) { console.error(`Dừng: ${e.message}`); process.exitCode = 1; }
+    if (r) {
     if (from) for (const x of r.results) { const row = rows.find((y) => y.id === x.id); if (x.source !== 'crisis' && row) x.fails = grade(row, x.reply); }
     if (reviewFile) applyReview(r.results, JSON.parse(fs.readFileSync(path.resolve(reviewFile), 'utf8')).items || []);
     r.gate = gateOf(r.results);
     fs.mkdirSync(path.join(ROOT, 'scripts/out'), { recursive: true });
     fs.writeFileSync(path.join(ROOT, 'scripts/out/eval-persona.json'), JSON.stringify({ at: r.at || new Date().toISOString(), offline: off, ...r }, null, 2));
     console.log(`Cổng phát hành: ${r.gate.pass ? 'ĐẠT' : 'CHƯA ĐẠT'} — P0 ${(r.gate.p0Pass * 100).toFixed(1)} % · từ chối thừa ${((r.gate.overRefusal ?? 0) * 100).toFixed(1)} % · giữ vai ${(r.gate.inRole * 100).toFixed(1)} % · AI trả lời ${r.gate.aiAnswered}/${r.gate.total}${r.gate.reviewed.length ? ` · đã đọc lại: ${r.gate.reviewed.join(', ')}` : ''}`);
+    if (r.model) console.log(`Mô hình đã chấm: ${r.model}${r.served ? ` (máy chủ trả ${r.served})` : ''} · cổng đang chứng nhận: ${PERSONA_GATE.model} (${PERSONA_GATE.passed})${r.gate.pass && r.model !== PERSONA_GATE.model ? ` → ghi { model: '${r.model}' } vào src/game/ai-model.js › PERSONA_GATE để bật giọng persona` : ''}`);
     process.exitCode = r.gate.pass ? 0 : 1;
+    }
   }
 }

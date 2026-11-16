@@ -63,7 +63,7 @@ for f in scripts/test-*.mjs; do node "$f" || echo "TRƯỢT: $f"; done
 `[ĐÃ CÓ]`
 
 - **Deploy chỉ chạy tay** (từ 16/11, MT-11, theo QĐ-06): tab Actions › «Run workflow», hoặc lệnh `gh workflow run cloudflare.yml`; `npm run deploy` deploy từ máy. Đẩy lên nhánh chính **không** còn deploy.
-- **Chế độ nhiều người theo khu vực:** biến `MMO_BLOCK_COUNTRIES` của Worker (vd `VN`) tắt chế độ nhiều người ở các quốc gia liệt kê; để trống là mở cho mọi nơi (`VC-039`).
+- **Sau khi deploy bản có QĐ-31:** chạy lại cổng đánh giá persona trên `glm-5.3-flash` (`VC-005`); đạt thì ghi mô hình vào `PERSONA_GATE` và deploy lại để bật `gamePersona`.
 - **Cảnh báo:** nếu đã deploy tay một bản chưa commit, lần đẩy kế tiếp của bản cũ hơn sẽ **đè** bản đó. Luôn commit trước khi deploy tay, hoặc deploy bằng cách đẩy.
 - **Migration** của Durable Object áp khi deploy; thêm lớp mới phải thêm thẻ migration mới, không sửa thẻ cũ. Danh sách hiện có: [A4](phu-luc/A4-giao-thuc.md) §A4.5.
 - **Bí mật** của bản thật (đăng nhập Google, gửi mail) do chủ dự án cấu hình: [TAI-KHOAN-CAI-DAT](../TAI-KHOAN-CAI-DAT.md). **Không bao giờ** đặt `AUTH_DEV` trên bản thật.

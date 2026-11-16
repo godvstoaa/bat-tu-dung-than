@@ -29,7 +29,7 @@
 - **Lá số nào:** kiếp đầu dùng lá số thật trên máy; sau khi đầu thai dùng lá số hư cấu của kiếp đó (`chartSource`).
 - **Hạn mức:** khách chưa đăng nhập có số câu mỗi ngày (`GUEST_DAILY`).
 - **Ở đâu:** Bàn Thầy và các gian Sơn Môn (`MASTER_OF_STATION`), ba điện có thầy ngồi bàn, miếu phường, và **Phố Thầy Bói** Nội Thành với 289 quầy.
-- **Giọng:** cờ `FEATURES.gamePersona` bật giọng riêng cho thầy trong game (bật lại 16/11 sau khi qua cổng đánh giá, `VC-005`). Lời thầy đi qua lớp hiển thị `map-rating.js › softenRatings`: nhãn «Đại hung», «tai hoạ» của engine đổi sang cụm mềm (§40.2). Không đổi hành vi Thầy trên trang chính của app.
+- **Giọng:** cờ `FEATURES.gamePersona` bật giọng riêng cho thầy trong game. `gamePersona` **tắt** từ khi game chuyển sang `glm-5.3-flash` (16/11): cổng chỉ chứng nhận cho `glm-5.3` và gắn theo mô hình (`src/game/ai-model.js › PERSONA_GATE`). Bật lại khi cổng chạy lại trên flash và đạt — cần Worker bản mới đã deploy (`VC-005`). Lời thầy đi qua lớp hiển thị `map-rating.js › softenRatings`: nhãn «Đại hung», «tai hoạ» của engine đổi sang cụm mềm (§40.2). Mô hình: `glm-5.3-flash` (QĐ-31). Không đổi hành vi Thầy trên trang chính của app.
 - **Bản iOS:** tắt toàn bộ (LN-10).
 
 ## 12.2 Miếu và nghi thức

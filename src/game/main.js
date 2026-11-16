@@ -168,8 +168,8 @@ export function startGame({ onExit = null } = {}) {
     const el = $('hq-online');
     const on = net.status === 'online';
     el.classList.toggle('off', !on);
-    el.textContent = on ? `👥 ${net.count}` : (net.status === 'connecting' ? 'Đang kết nối…' : net.status === 'region' ? 'Chơi đơn' : 'Ngoại tuyến');
-    el.title = on ? `${net.count} người trong phòng ${net.room + 1}` : net.status === 'region' ? 'Chế độ nhiều người chưa mở ở khu vực của bạn — mọi hệ chơi đơn vẫn đủ' : 'Chơi đơn — sẽ tự kết nối lại';
+    el.textContent = on ? `👥 ${net.count}` : (net.status === 'connecting' ? 'Đang kết nối…' : 'Ngoại tuyến');
+    el.title = on ? `${net.count} người trong phòng ${net.room + 1}` : 'Chơi đơn — sẽ tự kết nối lại';
   }
 
   // -------------------------------------------------------------------------

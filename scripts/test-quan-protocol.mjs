@@ -182,15 +182,5 @@ test('lư hương chung: lư lớn nhận 15 người, đầy thì sang lư nh�
   assert.ok(P.BURNER_CAP.reduce((a, b) => a + b, 0) >= P.ROOM_CAP, 'đủ lư cho cả phòng');
 });
 
-test('VC-039: công tắc tắt chế độ nhiều người theo quốc gia — mặc định không chặn ai', () => {
-  assert.equal(P.mmoBlocked('VN', ''), false);
-  assert.equal(P.mmoBlocked('VN', undefined), false);
-  assert.equal(P.mmoBlocked('VN', 'vn'), true);
-  assert.equal(P.mmoBlocked('US', 'VN, SG'), false);
-  assert.equal(P.mmoBlocked('SG', 'VN, SG'), true);
-  assert.equal(P.mmoBlocked('', 'VN'), false, 'không biết quốc gia → không chặn');
-  assert.ok(![P.CLOSE_FULL, P.CLOSE_SPAM, P.CLOSE_BAD].includes(P.CLOSE_REGION), 'mã đóng riêng');
-});
-
 await Promise.all(pending);
 console.log(`\n${passed} test đạt${process.exitCode ? ' — CÓ LỖI' : ''}`);

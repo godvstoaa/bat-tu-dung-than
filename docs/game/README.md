@@ -63,12 +63,12 @@ Game là gì, trong một câu: **một thành phố huyền học sống trên 
 
 | Tệp | Nội dung |
 |---|---|
-| [A1](phu-luc/A1-ban-do-ma.md) | 157 mô-đun → chương → bộ phận → test |
-| [A2](phu-luc/A2-kiem-thu.md) | 46 bộ test, lệnh npm |
+| [A1](phu-luc/A1-ban-do-ma.md) | 159 mô-đun → chương → bộ phận → test |
+| [A2](phu-luc/A2-kiem-thu.md) | 47 bộ test, lệnh npm |
 | [A3](phu-luc/A3-so-lieu.md) | Mọi bảng số liệu: nghề, món, vật phẩm, hạng nhà, cảnh giới… |
 | [A4](phu-luc/A4-giao-thuc.md) | Gói mạng, route HTTP, Durable Object |
 | [A5](phu-luc/A5-dia-diem.md) | Hằng số bố cục, vùng, trạm, số nhà và tiệm đếm thật |
-| [A6](phu-luc/A6-tai-san-3d.md) | 648 tệp model theo bậc và tiền tố |
+| [A6](phu-luc/A6-tai-san-3d.md) | 693 tệp model theo bậc và tiền tố |
 | [A7](phu-luc/A7-dieu-khien-luu-tru.md) | Phím, phần tử HUD, khoá lưu trên máy |
 
 ### Tài liệu chuyên đề đang hiệu lực (lớp L2)
@@ -115,9 +115,9 @@ Rồi:
 
 | | |
 |---|---|
-| Mã game | 157 mô-đun client; máy chủ 10 tệp, 5 Durable Object (số dòng từng tệp ở A1) |
+| Mã game | 159 mô-đun client; máy chủ 10 tệp, 5 Durable Object (số dòng từng tệp ở A1) |
 | Thế giới | 8.192 × 8.192 m; Huyền Thành bát giác, trung đoạn tường ngoài 2.125 m |
 | Trong thành | 18.152 nhà; 8.560 cửa hàng thuộc 15 loại; 289 quầy thầy bói; 21 miếu và điện; 292 căn rao bán |
 | Nội dung mệnh | 13 thầy bói (8 thầy có persona riêng), 8 vị thần miếu, 8 sảnh nghề, 5 phép gieo quẻ |
 | Đời sống | 31 nghề theo ngũ hành, 6 bệnh, 5 bậc phương tiện, 7 cảnh giới, 11 pháp môn, 6 cõi luân hồi |
-| Kiểm thử | 46 bộ test; 43 bộ thuần đều đạt khi chạy lẻ |
+| Kiểm thử | 47 bộ test; 44 bộ thuần đều đạt khi chạy lẻ |

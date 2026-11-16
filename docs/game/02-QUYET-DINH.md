@@ -82,6 +82,8 @@ Mọi quyết định của game nằm ở đây, mỗi quyết định một d�
 | QĐ-28 | 14/11 | Mở rộng diện tích trời | Quận Thiên Bàn chín đảo cùng độ cao 460 m, nối bằng bốn cầu; lên duy nhất bằng Vân Thang | §10 |
 | QĐ-29 | 11/11 | Thông báo dồn dập | Hàng đợi một thông báo mỗi 1,5 giây, gộp trùng; đầu ngày chỉ một thẻ «Sáng nay» | §22 |
 | QĐ-30 | 10/11 | Đổi Dụng thần để trục lợi kinh tế | Máy chủ khoá Dụng thần đã khai 30 ngày; đầu thai là ngoại lệ | §14.2, §18.5.4 |
+| QĐ-31 | 16/11 | Chọn mô hình AI trong game | **Mọi lượt AI của game chỉ dùng `glm-5.3-flash`**: khung thầy bói (đi proxy `/zai`, bỏ mô hình người dùng chọn cho app), NPC chat và trọng tài (`worker/llm.js`). Proxy `/zai` tôn trọng mô hình được xin trong danh sách cho phép; game xin flash thì không rơi sang mô hình khác. Thầy trang chính của app không đổi. Thay phần chọn mô hình của QĐ-22 | §21.3, `src/game/ai-model.js` |
+| QĐ-32 | 16/11 | Chặn chế độ nhiều người theo khu vực | **Bỏ.** Không chặn khu vực nào; gỡ công tắc `MMO_BLOCK_COUNTRIES` và mã đóng 4004; không theo đuổi việc giấy phép (`VC-039` đóng) | §40.6 |
 
 ## 2.4 Mâu thuẫn giữa các tài liệu và cách giải `[ĐỀ XUẤT]`
 
@@ -109,14 +111,14 @@ Mỗi dòng là một chỗ hai tài liệu (hoặc tài liệu và mã) nói ng
 |---|---|---|---|
 | 1 | Duyệt bảy trụ cột §0.3 và mười mâu thuẫn §2.4 | để bộ tài liệu thành chuẩn | dùng bản đề xuất |
 | 2 | Ngân sách LLM mỗi tháng (QĐ-05) và ngưỡng cảnh báo | NPC chat và trọng tài đang chạy không trần tiền | giữ hạn mức theo người: 30 câu thường, 10 câu nghiệp vụ mỗi ngày |
-| 3 | Có bật `FEATURES.personaAi` và `FEATURES.gamePersona` không | giọng Thầy và thầy bói đổi | **Đã giải 16/11 bằng cổng đánh giá:** `gamePersona` **bật** sau khi cổng đạt (200/200 câu do mô hình thật trả lời (glm-5.3 qua proxy `/zai` của app); P0 100 %, từ chối thừa 0 %, giữ vai 100 %; 2 câu bộ chấm đánh dấu đã được đọc lại và kết luận đạt (`scripts/eval-persona-review.json`)). `personaAi` cho Thầy trang chính **giữ tắt**: trang đó không có lớp làm mềm nhãn mà cổng đã dựa vào (`VC-005`) |
+| 3 | Có bật `FEATURES.personaAi` và `FEATURES.gamePersona` không | giọng Thầy và thầy bói đổi | **16/11:** cổng đạt cho `glm-5.3`, rồi game chuyển sang `glm-5.3-flash` (QĐ-31) → `gamePersona` **tắt** từ khi game chuyển sang `glm-5.3-flash` (16/11): cổng chỉ chứng nhận cho `glm-5.3` và gắn theo mô hình (`src/game/ai-model.js › PERSONA_GATE`). Bật lại khi cổng chạy lại trên flash và đạt — cần Worker bản mới đã deploy. `personaAi` cho Thầy trang chính giữ tắt |
 | 4 | Nhà cung cấp SMS và có bật đăng nhập số điện thoại | tốn phí từng tin | giữ tắt |
 | 5 | Cổng thanh toán Ngọc trên web | Ngọc hiện không có nguồn nào | chưa bán |
 | 6 | Bản iOS: có đưa game vào không, khi nào làm Sign in with Apple | bắt buộc nếu có đăng nhập Google | game chưa vào iOS |
 | 7 | Chính sách quyền riêng tư và nhãn kho ứng dụng cho việc gửi tứ trụ (QĐ-07) | điều kiện pháp lý của thầy mệnh lý | tính năng đang chạy trên web |
 | 8 | Sửa `package.json` (lệnh test gãy) và đổi 40 chú thích mã | đụng mã | `package.json` **đã sửa 16/11**; 40 chú thích chưa đổi (`VC-003`) |
 | 9 | Thu hồi nhà bỏ hoang | rủi ro đã chấp nhận từ 10/11 | không thu hồi |
-| 10 | Chế độ nhiều người tại Việt Nam: tắt, phát hành qua đối tác có phép, hay tự xin phép (loại G1) | bản tầm nhìn xếp là rủi ro số một; cần luật sư xác minh | **Phần kỹ thuật xong 16/11:** biến `MMO_BLOCK_COUNTRIES` tắt chế độ nhiều người theo quốc gia, mặc định không chặn ai. Quyết định pháp lý: đặt `VN` vào biến này hay không (`VC-039`) |
+| 10 | Chế độ nhiều người tại Việt Nam: tắt, phát hành qua đối tác có phép, hay tự xin phép (loại G1) | bản tầm nhìn xếp là rủi ro số một; cần luật sư xác minh | **Đã quyết 16/11 (QĐ-32):** không chặn, bỏ công tắc, không theo đuổi |
 | 11 | Món mang hình ảnh thiêng trong Tàng Y Các | lệch luật «hàng bán không mang tên vật thiêng» (§40.3) | **Đã xử lý 16/11** theo yêu cầu «sửa mọi lỗi»: bốn món mở theo cấp, hai tên đổi; giữ nguyên mã món. Chủ dự án vẫn có thể đổi hướng (`VC-036`) |
 | 12 | Cho sửa ba lỗi an toàn trong mã | phát hiện khi rà sách NPC-AI | **Đã sửa 16/11** theo yêu cầu «sửa mọi lỗi» (`VC-034`, `VC-035`, `VC-038`) |
 | 13 | «Đẩy lên nhánh chính là deploy» (MT-11) | lệch QĐ-06 | **Đã giải 16/11:** deploy chạy tay |

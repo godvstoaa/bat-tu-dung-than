@@ -1,7 +1,8 @@
 // Cloudflare Worker — serve static app + proxy LLM + admin + anti-scraping + anti-abuse.
 import { makeProxy } from '../functions/_proxy.js';
 import { handleAdminRoute, isAiEnabled, isFreeAiEnabled, logFreeUsage, logEvent, adminPath } from './admin.js';
-import { MAX_ROOMS, CLOSE_REGION, mmoBlocked } from '../src/game/protocol.js';
+import { MAX_ROOMS } from '../src/game/protocol.js';
+import { pickZaiModel, gameModelOnly } from '../src/game/ai-model.js';
 
 // Durable Object phòng Huyền Quán MMO (binding QUAN trong wrangler.jsonc)
 export { TownShard } from './quan-room.js';
@@ -66,7 +67,13 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
   //   Pool (Groq/NVIDIA/...) chỉ là FALLBACK khi z.ai fail. (Trước đây cf-glm default; Groq từng
   //   đứng đầu pool nhưng key chết 403/413 → mọi request fail ở Groq trước khi tới z.ai.)
   var poolBackends = pool.map(function (p) { return { name: p.name || 'pool', endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey), stripTools: true }; });
-  var zaiBackend = aiCfg.zaiKey ? [{ name: 'z.ai-paid', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: 'glm-5.3', apiKey: String(aiCfg.zaiKey), stripTools: false }] : []; // [SPEED] glm-5.2→glm-5.3-flash (thinking giữ — client gửi thinking:{type:enabled}, flash match isZaiNative)
+  // Mô hình theo yêu cầu client trong danh sách cho phép (ai-model.js): app gửi glm-5.3, game gửi glm-5.3-flash.
+  //   Trước 16/11 proxy ép mọi yêu cầu về glm-5.3 — game xin flash vẫn chạy 5.3. Game xin flash thì CHỈ chạy flash:
+  //   không rơi sang pool mô hình khác (Groq/NVIDIA) khi z.ai lỗi — chỉ nhận mục pool khai đúng mô hình đó
+  //   (cùng luật worker/llm.js › llmBackends).
+  var zaiModel = pickZaiModel(bodyObj && bodyObj.model);
+  var zaiBackend = aiCfg.zaiKey ? [{ name: 'z.ai-paid', endpoint: 'https://api.z.ai/api/coding/paas/v4', model: zaiModel, apiKey: String(aiCfg.zaiKey), stripTools: false }] : [];
+  if (gameModelOnly(zaiModel)) poolBackends = poolBackends.filter(function (p) { return gameModelOnly(p.model.replace(/^.*\//, '')); });
   const backends = [].concat(zaiBackend, poolBackends); // z.ai TRƯỚC, pool fallback
   for (let i = 0; i < backends.length; i++) {
     const b = backends[i];
@@ -123,13 +130,6 @@ export default {
       const origin = request.headers.get('Origin');
       if (origin && !ALLOWED_ORIGINS.test(origin)) return new Response('Forbidden origin', { status: 403 });
       if (!env.QUAN) return new Response('MMO chưa bật', { status: 503 });
-      // VC-039: chủ dự án tắt chế độ nhiều người theo quốc gia bằng biến MMO_BLOCK_COUNTRIES (vd «VN»).
-      //   Nhận kết nối rồi đóng ngay bằng mã CLOSE_REGION để client biết mà dừng thử lại (chơi đơn vẫn đủ).
-      if (mmoBlocked(request.cf?.country, env.MMO_BLOCK_COUNTRIES)) {
-        const [client, server] = Object.values(new WebSocketPair());
-        server.accept(); server.close(CLOSE_REGION, 'region');
-        return new Response(null, { status: 101, webSocket: client });
-      }
       const room = Math.max(0, Math.min(MAX_ROOMS - 1, parseInt(url.searchParams.get('room') || '0', 10) || 0));
       return env.QUAN.get(env.QUAN.idFromName('town-' + room)).fetch(request);
     }

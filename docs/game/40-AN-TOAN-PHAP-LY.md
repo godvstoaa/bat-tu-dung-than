@@ -115,7 +115,7 @@ Phần sách đặc tả mà **chưa có mã**:
 | Phải xoá được tài khoản trong app | có, kèm xuất dữ liệu |
 | Mua trong ứng dụng | bảng nạp ẩn trên iOS; web chưa có cổng thanh toán (`VC-017`) |
 | Xếp hạng tuổi | nội dung giữ ở mức không bạo lực, không nội dung người lớn, không ghê rợn |
-| Chế độ nhiều người tại Việt Nam | **đã có công tắc** (16/11): biến `MMO_BLOCK_COUNTRIES` tắt chế độ nhiều người theo quốc gia, client chuyển sang chơi đơn; mặc định không chặn. Bản tầm nhìn (tập 14) xếp đây là rủi ro số một và tự ghi «cần luật sư xác minh»; bật chặn `VN` hay không là quyết định pháp lý (`VC-039`) |
+| Chế độ nhiều người tại Việt Nam | không chặn khu vực nào; chủ dự án quyết không theo đuổi việc giấy phép (QĐ-32, `VC-039` đóng) |
 | Giấy phép tài sản | chỉ CC0 và tự sinh; có sổ nguồn gốc (LN-13) |
 
 ## 40.7 Đạo đức kiếm tiền `[ĐỀ XUẤT]`
@@ -142,4 +142,4 @@ Gom từ QĐ-03, QĐ-12, QĐ-13 và hiến chương của bản tầm nhìn (t�
 | Máy chủ | lọc ngày sinh, băm, xoá tài khoản | §31 |
 
 - Test hiện có bảo vệ: nhãn mềm, lược đồ persona, lọc ngày sinh khi lưu mây, chống thao túng NPC và trọng tài.
-- Việc mở: `VC-039`, `VC-007`, `VC-020`, `VC-021`, `VC-032`, `VC-017`. Đã đóng ngày 16/11: `VC-034`, `VC-035`, `VC-036`.
+- Việc mở: `VC-007`, `VC-020`, `VC-021`, `VC-032`, `VC-017`. Đã đóng ngày 16/11: `VC-034`, `VC-035`, `VC-036`, `VC-039` (bỏ, QĐ-32).

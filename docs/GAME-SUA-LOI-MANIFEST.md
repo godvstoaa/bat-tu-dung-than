@@ -1,7 +1,7 @@
 # MANIFEST — Sửa lỗi và nâng cấp sau đợt rà 16/11/2026
 
 > Phạm vi: các phiếu `VC-034` … `VC-038`, `VC-001`, `VC-002` trong [docs/game/04-LO-TRINH.md](game/04-LO-TRINH.md), cộng các nâng cấp mà sách NPC-AI đã đặc tả nhưng mã chưa làm.
-> Không thuộc phạm vi: đổi quy trình CI tự deploy (MT-11) và giấy phép chế độ nhiều người (`VC-039`). Hai việc này chủ dự án quyết.
+> Không thuộc phạm vi: đổi quy trình CI tự deploy (MT-11) — chủ dự án quyết. Giấy phép chế độ nhiều người (`VC-039`): chủ dự án quyết bỏ (QĐ-32).
 
 ## 1. Nghiên cứu (nguồn đã xem)
 
@@ -54,8 +54,8 @@ Số đo: `test-crisis` 10/10 ca, khoảng 0,01 ms mỗi câu; `test-game-ai-per
 ## 4. Goal phát triển
 
 - **G-S1 (đợt này) — ĐẠT 2026-11-16.** K1–K8 đạt.
-- **G-S5 — ĐẠT 2026-11-16.** MT-11: deploy chạy tay theo QĐ-06. `VC-039`: công tắc `MMO_BLOCK_COUNTRIES`, mặc định không chặn.
-- **Bước kế (tự đặt):** chạy lại cổng mỗi khi đổi lời nhắc, mô hình hay persona; người kiểm ngẫu nhiên các câu đã đọc lại.
+- **G-S5 — ĐẠT 2026-11-16.** MT-11: deploy chạy tay theo QĐ-06. `VC-039`: chủ dự án bỏ (QĐ-32), công tắc chặn khu vực đã gỡ.
+- **Bước kế (tự đặt):** game chuyển sang `glm-5.3-flash` (QĐ-31) nên cổng phải chạy lại trên flash sau lần deploy kế tiếp; tới lúc đó `gamePersona` tắt (gắn theo `PERSONA_GATE`). Người kiểm ngẫu nhiên các câu đã đọc lại.
 - **G-S2 — ĐẠT 2026-11-16 (cần đội an toàn duyệt lại).** Mức B làm theo hành vi mà tài liệu 06-01 §11.1 đề xuất. Cổng bắt đủ 15/15 câu P0 nhóm khủng hoảng của bộ thử đỏ; mức khớp bộ đề ở 19/20 câu.
 - **G-S3 — ĐẠT 2026-11-16.** Cổng đánh giá chạy với mô hình thật: 200/200 câu do mô hình thật trả lời (glm-5.3 qua proxy `/zai` của app); P0 100 %, từ chối thừa 0 %, giữ vai 100 %; 2 câu bộ chấm đánh dấu đã được đọc lại và kết luận đạt (`scripts/eval-persona-review.json`). `gamePersona` bật lại theo luật cổng.
 - **G-S4 — ĐẠT 2026-11-16.** Máy chủ kiểm sở hữu trang phục và danh hiệu; hàng đợi duyệt báo cáo; khoá quản trị không đi trên địa chỉ của lời gọi API. Test: `test-game-cosmetics` (2 ca mới), `test-quan-protocol`.
@@ -74,3 +74,4 @@ Số đo: `test-crisis` 10/10 ca, khoảng 0,01 ms mỗi câu; `test-game-ai-per
 - 2026-11-16, kiểm cuối đợt «hoàn thiện»: 43/43 bộ test thuần, `selftest.mjs`, `test:game`, `test:npcai`, bản dựng web, cú pháp mọi tệp `worker/` đều đạt. Ba bộ cần máy chủ dev đạt: `test-quan-mmo` 22/22 (sửa một ca theo luật mới về đồ của khách), `test-quan-auth` 10/10, `test-econ-accounts` (máy chủ dev cộng `mock-llm`). `eval-persona` ngoại tuyến: 200 câu, cổng khủng hoảng bắt 15/15 câu P0 nhóm C, không báo nhầm câu nào ở nhóm M.
 - 2026-11-16, khép ba việc còn treo (phản hồi của goal «làm hoàn thiện toàn bộ»): tắt `gamePersona` theo luật cổng thay vì để bật khi chưa đánh giá (đảo quyết định «không tắt» ở mục trước, vì luật 15.3 của sách là luật đã chốt); deploy chạy tay theo QĐ-06; thêm công tắc khu vực cho chế độ nhiều người. Không tự chạy 200 câu thử đỏ qua nhà cung cấp AI trả phí khi chưa có khoá riêng cho việc đánh giá.
 - 2026-11-16, chạy cổng với mô hình thật (phản hồi thứ hai của goal): dùng proxy `/zai` của chính app (tuỳ chọn `--origin`), không cần khoá riêng. Bộ chấm thêm luật vế phủ định sau lượt 1; khung thầy bói thêm `softenRatings` sau lượt 2; lượt 3 đạt sau khi đọc lại 2 câu. Thêm `--review` và `--from` để cổng tính có kèm bằng chứng đọc lại. Người đọc lại là Claude, không phải người; ghi rõ trong tệp duyệt.
+- 2026-11-16, chủ dự án: «AI trong game chỉ dùng glm-5.3-flash» và «bỏ chuyện chặn khu vực». Phát hiện proxy `/zai` ép mọi yêu cầu về glm-5.3 nên đổi cả Worker. Đổi mô hình làm cổng persona hết hiệu lực theo luật cổng → `gamePersona` gắn với `PERSONA_GATE` thay vì bật cứng; không tự deploy để chạy cổng (QĐ-06). Gỡ công tắc `MMO_BLOCK_COUNTRIES` (QĐ-32).
