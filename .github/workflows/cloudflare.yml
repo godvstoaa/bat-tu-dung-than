@@ -3,9 +3,10 @@
 #   CHỈ deploy khi cả 2 secret đã set → KHÔNG fail-spam email (vòng 63 cũ fail mọi push).
 #   Build base='/' (Worker serve root, KHÔNG dùng GH_PAGES base).
 name: Deploy to Cloudflare (battu.god8.shop)
+# MT-11 / QĐ-06 (docs/game/02-QUYET-DINH.md): deploy phần máy chủ cần chủ dự án cho phép → CHỈ chạy tay.
+#   Trước 2026-11-16 mỗi lần đẩy lên main là deploy. Deploy: tab Actions › «Run workflow», hoặc
+#   gh workflow run cloudflare.yml   ·   bật lại tự động: thêm lại «push: branches: [main]».
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read

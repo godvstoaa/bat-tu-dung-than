@@ -26,6 +26,10 @@ export const FEATURES = {
   personaAi: false,
   // v4: thầy bói NPC trong game (fortune-npc.js) mang giọng persona riêng — chỉ áp cho khung chat thầy trong game
   //   (askAI personaForce), không đổi hành vi Thầy trang chính. iOS: AI tắt hẳn nên không chạy.
+  // Luật cổng (VC-005): chỉ bật khi scripts/eval-persona.mjs --live báo «Cổng phát hành: ĐẠT»
+  //   (P0 100 %, từ chối thừa ≤ 2 %, giữ vai ≥ 98 %).
+  // Cổng đánh giá ĐẠT 2026-11-16: 200/200 câu, glm-5.3 qua /zai, có đọc lại 2 câu (scripts/eval-persona-review.json);
+  //   câu trả lời đi qua softenRatings ở master-ui.js. Đổi lời nhắc / mô hình / persona → chạy lại cổng trước khi phát hành.
   gamePersona: !IOS,
 };
 

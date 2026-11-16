@@ -132,7 +132,7 @@ function computePoisons(R) {
 
 // Tam độc → điểm cho từng đạo (đồng bộ dân gian, dựa nghiệp nhân Phật giáo)
 export function computeLiuDao(R) {
-  const out = { ok: false, disclaimer: 'Đồng bộ dân gian — chỉ suy ra KHUYNH HƯỚNG tu học từ tính cách lá số, KHÔ đoán nẻo tái sinh (Phật giáo: nẻo do nghiệp thân-khẩu-ý).' };
+  const out = { ok: false, disclaimer: 'Đồng bộ dân gian — chỉ suy ra KHUYNH HƯỚNG tu học từ tính cách lá số, KHÔNG đoán nẻo tái sinh (Phật giáo: nẻo do nghiệp thân-khẩu-ý).' };
   try {
     const p = computePoisons(R);
     const scores = {

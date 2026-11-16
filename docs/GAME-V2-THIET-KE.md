@@ -1,5 +1,7 @@
 # HUYỀN QUÁN v2 — Thiết kế hệ thống game (đầu → cuối)
 
+> **ĐÃ THAY THẾ MỘT PHẦN (2026-11-16).** Phần thiết kế §1–§6 là lịch sử; bản đang dùng: [docs/game/README.md](game/README.md). Nhật ký thi công từ §7 trở đi vẫn dùng để tra; mục mới ghi ở [docs/game/NHAT-KY.md](game/NHAT-KY.md).
+
 > Viết lại 2026-11-04 theo phản hồi chủ dự án:
 > - vào game phải nhập bát tự sinh thần đầy đủ → dụng thần → màu sắc nhân vật;
 > - cảnh tối, đèn phải sáng;

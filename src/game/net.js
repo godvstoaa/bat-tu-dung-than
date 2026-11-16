@@ -9,12 +9,16 @@ const PID_KEY = 'huyenquan:pid';
 const BLOCK_KEY = 'huyenquan:blocked';
 
 function serverBase() {
-  try {
-    const q = new URLSearchParams(location.search).get('server');
-    if (q) return q;
-    const saved = localStorage.getItem('huyenquan:server');
-    if (saved) return saved;
-  } catch (e) { /* ignore */ }
+  // ?server= và khoá huyenquan:server chỉ dùng ở bản dev: bản phát hành không để một đường link
+  // trỏ game sang máy chủ lạ (VC-037; docs/gdd/14-rui-ro/04 §5.3).
+  if (import.meta.env?.DEV) {
+    try {
+      const q = new URLSearchParams(location.search).get('server');
+      if (q) return q;
+      const saved = localStorage.getItem('huyenquan:server');
+      if (saved) return saved;
+    } catch (e) { /* ignore */ }
+  }
   const native = !!window.Capacitor?.isNativePlatform?.();
   if (native) return 'wss://battu.god8.shop';
   return `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}`;
@@ -117,6 +121,7 @@ export function createNet({ profile, onEvent = () => {}, token = null }) {
       ws = null; me = null; others.clear(); count = 0;
       onEvent({ t: 'count', n: 0 });
       if (e.code === P.CLOSE_FULL && room < P.MAX_ROOMS - 1) { room += 1; connect(); return; }
+      if (e.code === P.CLOSE_REGION) { set('region'); stopped = true; return; } // VC-039: khu vực chưa mở — không thử lại
       set('off');
       scheduleRetry();
     };

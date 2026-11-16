@@ -5,7 +5,25 @@
 // ============================================================================
 import { isAiEnabled, isFreeAiEnabled } from './admin.js';
 
-export async function llmChat(env, messages, { maxTokens = 220, json = false, timeoutMs = 20000 } = {}) {
+// Đếm lượt gọi mô hình theo ngày và theo đường gọi (npc / judge) — để đo chi phí (VC-021).
+// Ghi vào cùng bản ghi dayagg:<ngày> mà bảng quản trị đang đọc; lỗi ghi thì bỏ qua, không chặn lượt.
+async function countLlm(env, tag, ok) {
+  try {
+    const day = new Date().toISOString().slice(0, 10), k = 'dayagg:' + day;
+    let agg = {}; try { agg = JSON.parse((await env.ADMIN_KV.get(k)) || '{}'); } catch (e) { agg = {}; }
+    agg[`llm_${tag}_calls`] = (agg[`llm_${tag}_calls`] || 0) + 1;
+    if (!ok) agg[`llm_${tag}_err`] = (agg[`llm_${tag}_err`] || 0) + 1;
+    await env.ADMIN_KV.put(k, JSON.stringify(agg), { expirationTtl: 60 * 60 * 24 * 90 });
+  } catch (e) { /* đo lường không được làm hỏng lượt chơi */ }
+}
+
+export async function llmChat(env, messages, opts = {}) {
+  const r = await llmChatRaw(env, messages, opts);
+  if (env.ADMIN_KV && r.err !== 'ai_off' && r.err !== 'no_kv') await countLlm(env, opts.tag || 'npc', r.ok);
+  return r;
+}
+
+async function llmChatRaw(env, messages, { maxTokens = 220, json = false, timeoutMs = 20000 } = {}) {
   if (!env.ADMIN_KV) return { ok: false, err: 'no_kv' };
   if (!(await isAiEnabled(env))) return { ok: false, err: 'ai_off' };
   let cfg = {};

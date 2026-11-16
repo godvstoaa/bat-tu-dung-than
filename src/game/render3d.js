@@ -3,6 +3,7 @@
 //  chọn điểm bằng raycast. Spec mục 5 + 9. Cùng giao diện với renderer 2D:
 //  { resize, frame(scene, dt), yaw, rotate(step), celebrate(wx), mode: '3d' }.
 // ============================================================================
+import { crisisActive } from '../engine/crisis.js';
 import * as THREE from 'three';
 import { span, record } from './perf.js';
 import * as MD from './models.js';
@@ -356,7 +357,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     if (!bk.bark && nowMs >= bk.nextAt) {
       const seed = `${seedBase}|${bk.round++}`;
       const r = rng(hashSeed(seed));
-      const text = pickBark(poolId, seed);
+      const text = crisisActive() ? null : pickBark(poolId, seed); // cờ khủng hoảng 30 phút → im lặng
       if (text) bk.bark = { text, until: nowMs + 4200 + Math.floor(r() * 1800) }; // hiện 4,2–6 giây
       bk.nextAt = nowMs + (bk.bark ? bk.bark.until - nowMs + 5000 : 2500) + Math.floor(r() * 4000); // nghỉ 5–9 giây
     } else if (bk.bark && nowMs >= bk.bark.until) bk.bark = null;

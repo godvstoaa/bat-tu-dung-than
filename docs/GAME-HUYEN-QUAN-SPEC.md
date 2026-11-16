@@ -1,5 +1,7 @@
 # HUYỀN QUÁN ONLINE — Spec game "đi xem bát tự phong thủy online"
 
+> **ĐÃ THAY THẾ (2026-11-16).** Tài liệu này giữ làm lịch sử, không dùng để làm việc. Bản đang dùng: [docs/game/README.md](game/README.md). Tra chỗ mới của từng mục: [docs/game/90-PHA-HE-TAI-LIEU.md](game/90-PHA-HE-TAI-LIEU.md).
+
 > Phiên bản spec: 1.1 · 2026-11-03 · Trạng thái: **v1 (single-player, 3D) được build theo spec này**; mục 12 (đồng hiện nhiều người) là Phase 2.
 > 1.1: chuyển hiển thị sang **3D góc nhìn thứ ba** với phong cách mỹ thuật riêng «Sơn Mài Huyền Quán» (mục 9). Bản 2D pixel giữ làm dự phòng khi máy không có WebGL.
 

@@ -1,5 +1,7 @@
 # ĐẠI THẾ GIỚI HUYỀN GIỚI — Prompt · Bộ prompt Meshy · Thiết kế chi tiết · Kế hoạch
 
+> **ĐÃ THAY THẾ (2026-11-16).** Tài liệu này giữ làm lịch sử, không dùng để làm việc. Bản đang dùng: [docs/game/README.md](game/README.md). Tra chỗ mới của từng mục: [docs/game/90-PHA-HE-TAI-LIEU.md](game/90-PHA-HE-TAI-LIEU.md).
+
 > 2026-11-03 · Mở rộng từ yêu cầu chủ dự án: «quy mô to như game tu tiên, gấp 200 lần bản hiện có» + dùng Meshy.ai tạo mô hình 3D.
 > Thứ tự làm việc bắt buộc: **(A) prompt → (B) bộ prompt tài sản → (C) thiết kế chi tiết → (D) thực hiện**.
 > Kế thừa: `GAME-MMO-PROMPT-PLAN.md` (MMO, iOS, giải án) và `GAME-HUYEN-QUAN-SPEC.md` §9 (phong cách Sơn Mài).

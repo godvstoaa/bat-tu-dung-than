@@ -208,6 +208,8 @@ await check('hồ sơ chia sẻ chỉ giữ trường được phép — ngày g
 console.log('NPC hội thoại (P6)');
 await check('lọc đầu vào ≤ 300 ký tự, chặn thô tục; định tuyến xã giao / nghiệp vụ; câu xã giao cache theo bậc thiện cảm', () => {
   assert.equal(NC.cleanInput('x'.repeat(400)).text.length, 300); assert.equal(NC.cleanInput('đm đéo bán à').ok, false); assert.equal(NC.cleanInput('đm bán rẻ đi').ok, false); assert.ok(NC.cleanInput('Đặt bàn cho tôi').ok);
+  // VC-038: biểu thức gộp khoảng trắng từng thiếu «\» nên mọi chữ «s» thành dấu cách
+  assert.equal(NC.cleanInput('sư phụ, số này   bao nhiêu').text, 'sư phụ, số này bao nhiêu'); assert.equal(NC.cleanInput('thầy shit quá').ok, false);
   assert.deepEqual(NC.route('Chào bác'), { intent: 'greet', biz: false }); assert.equal(NC.route('Cái ấm này bao nhiêu tiền?').biz, true);
   assert.equal(NC.route('Cho tôi xin việc').intent, 'job'); assert.ok(NC.cacheable('greet') && !NC.cacheable('price'));
   assert.notEqual(NC.cacheKey('n', 'greet', 0), NC.cacheKey('n', 'greet', 80));

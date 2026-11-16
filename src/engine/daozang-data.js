@@ -7959,7 +7959,7 @@ export function suggestDaozangChartAware(R, question) {
   // 1. Kinh from question
   if (question) out.kinh = suggestDaozangByQuestion(question, 6);
   // 2. Dụng Thần → tu luyện method + extra kinh
-  const yong = R?.yong?.god;
+  const yong = R?.yong?.primary || R?.yong?.god; // R.yong của engine có primary, không có god (trước luôn undefined); giữ god cho shim cũ của game (kinh-tu.js)
   if (yong && _YONG2CULT[yong]) {
     const y = _YONG2CULT[yong];
     out.yongAdvice = `[BÁT TỰ PHỐI HỢP] Dụng Thần ${yong} → ${y.practice}`;

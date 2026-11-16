@@ -428,6 +428,20 @@ export async function handleAdminRoute(request, env, url) {
       _h.append('Set-Cookie', 'btu_admin=' + encodeURIComponent(expected) + '; Path=/' + ap + '; HttpOnly; Secure; SameSite=Strict; Max-Age=86400');
       return new Response(_d.body, { status: _d.status, headers: _h });
     }
+    // Hàng đợi duyệt báo cáo vi phạm của phòng nhiều người (VC-037): GET danh sách, POST {id} đánh dấu đã xử lý
+    if (path === apDash + 'api/mmo-reports' && env.ADMIN_KV) {
+      let q = []; try { q = JSON.parse((await env.ADMIN_KV.get('mmo:reports')) || '[]'); } catch (e) { q = []; }
+      if (method === 'POST') {
+        const b = await request.json().catch(() => ({}));
+        const it = q.find((x) => x.id === String(b.id || ''));
+        if (!it) return json({ ok: false, err: 'Không có báo cáo này.' }, 404);
+        it.done = true; it.doneAt = Date.now(); it.note = String(b.note || '').slice(0, 200);
+        await env.ADMIN_KV.put('mmo:reports', JSON.stringify(q), { expirationTtl: 30 * 86400 });
+        await auditLog(env, request, 'mmo_report_done', { id: it.id });
+        return json({ ok: true });
+      }
+      return json({ ok: true, open: q.filter((x) => !x.done).length, reports: q });
+    }
     if (path === apDash + 'api/stats') { try { return await adminStats(env, url); } catch (e) { return json({ error: e.message }, 500); } }
     // Kinh tế Phần II (§20.3): dòng tiền bơm / hút, giá tham chiếu, quán; hàng đợi duyệt lời luận thầy mệnh lý (§14.4 lớp 2)
     if (path === apDash + 'api/econ' && env.ECONOMY) {
@@ -1153,6 +1167,7 @@ function adminDashboard(env) {
       <section class="tab" id="tab-ai">
         <div class="pagehead"><h2>🤖 AI</h2><span class="pill">Free glm-5.2 · latency · config</span></div>
         <div class="card"><h3>⚡ Latency & free model <span class="card-actions tiny">avg / p95 / max / quota</span></h3><div id="ai-kpis" class="kpi-grid"></div></div>
+        <div class="card"><h3>🚩 Báo cáo vi phạm phòng nhiều người <span class="card-actions"><button class="btn sm" onclick="loadMmoReports()">Tải</button></span></h3><div id="mmo-rep" class="tiny">Bấm «Tải» để xem hàng đợi (giữ 30 ngày).</div></div>
         <div class="card"><h3>🆓 Free glm-5.2 usage <span class="card-actions"><button class="btn sm" onclick="freeTest()">🧪 Test model</button><span id="free-test-result" class="tiny"></span></span></h3><div id="free-usage"></div></div>
         <details><summary>🤖 AI Config — mode / endpoint / key / model</summary>
         <div class="details-body" id="ai-cfg-box">
@@ -1206,6 +1221,19 @@ function adminDashboard(env) {
   </div>
   <script>
   const TOKEN = new URLSearchParams(location.search).get('token') || '';
+  // Token không đi trên địa chỉ của các lời gọi API (lộ vào nhật ký, lịch sử): bỏ «token=» khỏi URL,
+  // gửi bằng header X-Admin-Token; phiên sau đó dựa vào cookie HttpOnly (VC-037).
+  (function () {
+    var _f = window.fetch.bind(window);
+    window.fetch = function (u, o) {
+      o = o || {};
+      if (typeof u === 'string' && u.indexOf('token=') >= 0) {
+        u = u.replace(/([?&])token=[^&#]*&?/, '$1').replace(/[?&]$/, '');
+        var h = new Headers(o.headers || {}); if (TOKEN) h.set('X-Admin-Token', TOKEN); o.headers = h;
+      }
+      return _f(u, o);
+    };
+  })();
   // [AUDIT FIX] dynamic admin path — khi ADMIN_PATH set, /admin/* bị 404, phải dùng path hiện tại
   const AP = location.pathname.replace(/\\/+$/, ''); // /panel-xyz hoặc /admin (strip trailing slash)
   const H = { 'X-Admin-Token': TOKEN };
@@ -1604,6 +1632,22 @@ function adminDashboard(env) {
   loadNeo(); setInterval(function(){ if (!document.hidden) loadNeo(); }, 60000); // [NEO] refresh 60s
   async function tgSave(){ var t=document.getElementById('tg-token').value.trim(),c=document.getElementById('tg-chat').value.trim(); if(!t||!c){alert('Nhập token + chat ID');return;} var r=await fetch(AP+'/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_token:t,tg_chat:c})}).then(function(r){return r.json()}); alert(r.enabled?'✅ Telegram alert ĐÃ BẬT!':'❌ Lỗi'); }
   async function tgOff(){ await fetch(AP+'/api/notify?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable:true})}); alert('Telegram alert đã tắt'); }
+  function loadMmoReports(){
+    fetch(AP+'/api/mmo-reports?token='+TOKEN).then(function(r){return r.json()}).then(function(d){
+      var box=document.getElementById('mmo-rep'); if(!box) return; box.innerHTML='';
+      var head=document.createElement('p'); head.textContent='Chưa xử lý: '+(d.open||0)+' / '+((d.reports||[]).length); box.appendChild(head);
+      (d.reports||[]).slice(0,60).forEach(function(r){
+        var row=document.createElement('div'); row.style.cssText='display:flex;gap:8px;align-items:center;padding:3px 0;border-top:1px solid rgba(255,255,255,.08)';
+        var tx=document.createElement('span'); tx.style.flex='1';
+        tx.textContent=new Date(r.at).toLocaleString('vi-VN')+' · phòng '+r.room+' · «'+((r.target&&r.target.name)||'?')+'» · lý do: '+(r.why||'—')+(r.done?' · đã xử lý':'');
+        row.appendChild(tx);
+        if(!r.done){ var b=document.createElement('button'); b.className='btn sm'; b.textContent='Đã xử lý';
+          b.onclick=function(){ fetch(AP+'/api/mmo-reports?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:r.id})}).then(loadMmoReports); };
+          row.appendChild(b); }
+        box.appendChild(row);
+      });
+    });
+  }
   async function aiLoad(){ var r=await fetch(AP+'/api/ai-config?token='+TOKEN).then(function(r){return r.json()}); var c=r.config||{}; document.getElementById('ai-mode').value=c.mode||'free'; document.getElementById('ai-endpoint').value=c.endpoint||'https://api.z.ai/api/coding/paas/v4'; document.getElementById('ai-apikey').value=''; document.getElementById('ai-apikey').placeholder=c.apiKey?'Đã đặt ('+c.apiKey+')':'API Key (dán từ z.ai/model-api)'; document.getElementById('ai-model').value=c.model||'glm-5.2'; document.getElementById('ai-status').textContent='Mode: '+(c.mode||'free')+(c.apiKey?' | Key: '+c.apiKey:' | No key'); aiModeChange(); }
   function aiModeChange(){ var m=document.getElementById('ai-mode').value; var dis=m==='off'; ['ai-endpoint','ai-apikey','ai-model'].forEach(function(id){document.getElementById(id).disabled=dis;}); }
   async function aiSave(){ var body={mode:document.getElementById('ai-mode').value}; if(document.getElementById('ai-endpoint').value)body.endpoint=document.getElementById('ai-endpoint').value; if(document.getElementById('ai-apikey').value)body.apiKey=document.getElementById('ai-apikey').value; if(document.getElementById('ai-model').value)body.model=document.getElementById('ai-model').value; var r=await fetch(AP+'/api/ai-config?token='+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()}); alert(r.ok?'✅ AI config đã lưu!':'❌ Lỗi'); aiLoad(); load(); }

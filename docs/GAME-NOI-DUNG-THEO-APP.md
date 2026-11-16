@@ -1,5 +1,7 @@
 # HUYỀN QUÁN — Nội dung game lấy từ app gốc
 
+> **ĐÃ THAY THẾ (2026-11-16).** Tài liệu này giữ làm lịch sử, không dùng để làm việc. Bản đang dùng: [docs/game/README.md](game/README.md). Tra chỗ mới của từng mục: [docs/game/90-PHA-HE-TAI-LIEU.md](game/90-PHA-HE-TAI-LIEU.md).
+
 > Nguyên tắc (yêu cầu chủ dự án, 2026-11-03): **game làm từ những gì app battu đang tính được**, không bắt chước game khác.
 > Mỗi hoạt động trong game = một engine thật trong `src/engine/` + đáp án do engine chấm. Không thêm cơ chế «tu tiên» (ngự kiếm, cảnh giới, đột phá, pháp bảo).
 

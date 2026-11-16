@@ -1,5 +1,7 @@
 # KẾ HOẠCH TÀI NGUYÊN 3D MESHY — Huyền Quán
 
+> **ĐÃ THAY THẾ (2026-11-16).** Tài liệu này giữ làm lịch sử, không dùng để làm việc. Bản đang dùng: [docs/game/README.md](game/README.md). Tra chỗ mới của từng mục: [docs/game/90-PHA-HE-TAI-LIEU.md](game/90-PHA-HE-TAI-LIEU.md).
+
 > Nguyên tắc chủ dự án: **HẠN CHẾ TẠO MỚI trên Meshy — chỉ TẢI VỀ model có sẵn.**
 > Ngày lập: 05-11-2026. Kiểm thực bằng lệnh thật trong session này (xem phần bằng chứng).
 

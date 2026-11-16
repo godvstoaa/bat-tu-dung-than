@@ -70,6 +70,12 @@ const REGISTRY = {
  *   bật») bị từ chối — trả null — cho tới khi cờ này bật. Fail-closed.
  * @returns {Object|null}
  */
+/** Persona này có được chèn vào lời gọi mô hình không — luật 8, docs/game/21 §21.2 (VC-034).
+ *  Chỉ mức 'co' và không bị khoá runtime. Bark và kịch bản không cần qua hàm này. */
+export function personaAiAllowed(p) {
+  return !!p && p.runtime !== false && p.aiEnabled === 'co';
+}
+
 export function getPersona(id, opts = {}) {
   const p = REGISTRY[id];
   if (!p) return null;                       // id lạ → null — không ném (mục 04 §4.4.1)

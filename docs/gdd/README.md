@@ -1,5 +1,7 @@
 # HUYỀN GIỚI · MỆNH DO TA TẠO — Bộ tài liệu thiết kế game (GDD) đầy đủ
 
+> **TẦM NHÌN THAM KHẢO (2026-11-16).** Bản này đã bị cắt khỏi kế hoạch thực thi (QĐ-C3). Bản đang dùng: [docs/game/README.md](../game/README.md); phần nào đã được lấy sang: [docs/game/90-PHA-HE-TAI-LIEU.md](../game/90-PHA-HE-TAI-LIEU.md).
+
 Bản sơ đồ tổng `../GAME-AAA-THIET-KE.md` (≈1.000 dòng) chỉ là khung. Thư mục này là **bộ GDD chi tiết**: 14 tập, mỗi tập triển khai một mục của sơ đồ, tổng **127.713 dòng** (đếm `wc -l` ngày 2026-11-05).
 
 Mọi số liệu lá số, tần suất, điểm số trong bộ tài liệu đều lấy từ **chạy engine thật** của app (`src/engine/*`), không bịa. Chỗ nào chưa chắc (luật, tín ngưỡng, ngày lễ) đều đánh dấu «cần xác minh / chờ tham vấn».

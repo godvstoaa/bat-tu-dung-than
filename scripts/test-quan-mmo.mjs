@@ -87,12 +87,13 @@ try {
     a.inbox.length = 0;
   });
 
-  await step('Tàng Y Các: đổi trang bị phát cho người khác, món lạ bị lọc; người vào sau thấy trang bị', async () => {
-    send(a, { t: 'cos', c: 'r:y_hoa,h:kim_quan,b:hack,m:hac' });
+  await step('Tàng Y Các: đổi trang bị phát cho người khác; món lạ và món mua bằng Ngọc / VIP của khách bị lọc (VC-037); người vào sau thấy trang bị', async () => {
+    // khách chưa đăng nhập: máy chủ không xác minh được đồ trả tiền thật → chỉ phát món mua bằng tiền trong game
+    send(a, { t: 'cos', c: 'r:y_bach,h:kim_quan,b:hack,n:quat_giay,m:hac' });
     const c = await wait(b, (m) => m.t === 'cos');
-    assert.equal(c.id, wa.you); assert.equal(c.c, 'r:y_hoa,h:kim_quan,m:hac');
+    assert.equal(c.id, wa.you); assert.equal(c.c, 'r:y_bach,n:quat_giay');
     const d = await client(R0, 'Sen'); const wd = await hello(d);
-    assert.equal(wd.players.find((p) => p.id === wa.you)?.cos, 'r:y_hoa,h:kim_quan,m:hac');
+    assert.equal(wd.players.find((p) => p.id === wa.you)?.cos, 'r:y_bach,n:quat_giay');
     d.ws.close(); await wait(a, (m) => m.t === 'leave'); await wait(b, (m) => m.t === 'leave');
     a.inbox.length = 0; b.inbox.length = 0;
   });

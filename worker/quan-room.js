@@ -7,8 +7,10 @@
 import { DurableObject } from 'cloudflare:workers';
 import * as P from '../src/game/protocol.js';
 import { stableId, accountPid } from '../src/game/auth-core.js';
+import { allowedCos } from '../src/game/cosmetics.js';
 
 const MAX_REPORTS = 500;
+const REPORT_KEEP_MS = 30 * 24 * 3600 * 1000; // báo cáo giữ 30 ngày rồi dọn (VC-037)
 const HELLO_TIMEOUT_MS = 30000; // socket nối mà không hello bị đóng sau ~30 giây
 
 function rid() {
@@ -63,6 +65,35 @@ export class TownShard extends DurableObject {
   ready(gone = null) { return this.ctx.getWebSockets().filter((w) => w !== gone).map((w) => [w, w.deserializeAttachment()]).filter(([, a]) => a && a.ready); }
 
   send(ws, obj) { try { ws.send(JSON.stringify(obj)); } catch (e) { /* socket đã đóng */ } }
+  /** Tủ đồ và xp của tài khoản (bản lưu mây) — null với khách hoặc khi không đọc được. */
+  async ownedOf(uid) {
+    if (!uid || !this.env.ACCOUNTS) return null;
+    try {
+      const sv = await this.env.ACCOUNTS.get(this.env.ACCOUNTS.idFromName('accounts')).getSave(uid);
+      const st = sv?.body ? JSON.parse(sv.body) : null;
+      return st ? { owned: Array.isArray(st.wardrobe?.owned) ? st.wardrobe.owned : [], xp: st.xp ?? 0 } : { owned: [], xp: 0 };
+    } catch (e) { return null; }
+  }
+
+  /** Báo cáo quá 30 ngày được dọn để kho không đầy vĩnh viễn; trả số còn lại. */
+  async pruneReports(now = Date.now()) {
+    const all = await this.ctx.storage.list({ prefix: 'report:' });
+    let left = 0;
+    for (const [k, v] of all) { if (k === 'report:count') continue; if (now - (v?.at || 0) > REPORT_KEEP_MS) await this.ctx.storage.delete(k); else left++; }
+    await this.ctx.storage.put('report:count', left);
+    return left;
+  }
+
+  /** Đưa báo cáo vào hàng đợi duyệt của bảng quản trị (VC-037). Chỉ mã công khai, không mã thiết bị. */
+  async queueReport(r) {
+    const kv = this.env.ADMIN_KV; if (!kv) return;
+    try {
+      let q = []; try { q = JSON.parse((await kv.get('mmo:reports')) || '[]'); } catch (e) { q = []; }
+      q.unshift({ ...r, id: r.at.toString(36) + Math.random().toString(36).slice(2, 6), done: false });
+      await kv.put('mmo:reports', JSON.stringify(q.slice(0, 300)), { expirationTtl: REPORT_KEEP_MS / 1000 });
+    } catch (e) { /* hàng đợi lỗi không chặn người báo */ }
+  }
+
   broadcast(obj, except = null) {
     const now = Date.now();
     if (now - this.lastSweep > 5000) { this.lastSweep = now; this.sweepIdle(now); }
@@ -96,6 +127,10 @@ export class TownShard extends DurableObject {
       let acct = null;
       if (m.tok && this.env.ACCOUNTS) { try { acct = await this.env.ACCOUNTS.get(this.env.ACCOUNTS.idFromName('accounts')).consumeWsToken(m.tok); } catch (e) { acct = null; } }
       const uid = acct?.uid || null;
+      // trang phục và danh hiệu chỉ phát cái tài khoản có (VC-037): đọc tủ đồ + xp từ bản lưu mây
+      const own = await this.ownedOf(uid);
+      m.cos = allowedCos(m.cos, own?.owned ?? null);
+      m.title = P.allowedTitle(m.title, own?.xp ?? null);
       Object.assign(a, { uid, ready: true, name: m.name, robe: m.robe, acc: m.acc, cos: m.cos, look: m.look, title: m.title, pid: m.pid, u: await stableId(uid ? accountPid(uid) : m.pid, a.id), x: m.x ?? 11.875, y: m.y ?? 33.875, h: 0, s: 0, helloAt: 0, mvFirst: true }); // nơi khách chọn (đã kiểm biên ở parseClient), mặc định world.js › START
       ws.serializeAttachment(a);
       this.send(ws, {
@@ -136,6 +171,7 @@ export class TownShard extends DurableObject {
         break;
       }
       case 'cos':
+        m.c = allowedCos(m.c, (await this.ownedOf(a.uid))?.owned ?? null);
         a.cos = m.c; ws.serializeAttachment(a);
         this.broadcast({ t: 'cos', id: a.id, c: m.c }, ws);
         break;
@@ -185,9 +221,10 @@ export class TownShard extends DurableObject {
         const key = `report:${a.pid || a.id}:${m.id}`;
         if (await this.ctx.storage.get(key)) break; // mỗi người báo một lần / đối tượng
         const n = (await this.ctx.storage.get('report:count')) || 0;
-        if (n >= MAX_REPORTS) { this.send(ws, { t: 'err', m: 'Kho báo cáo đã đầy — thử lại sau.' }); break; }
+        if (n >= MAX_REPORTS && (await this.pruneReports()) >= MAX_REPORTS) { this.send(ws, { t: 'err', m: 'Kho báo cáo đã đầy — thử lại sau.' }); break; }
         await this.ctx.storage.put(key, { at: Date.now(), room: a.room, why: m.why, target: { id: m.id, name: target[1].name, pid: target[1].pid }, by: a.pid || a.id });
-        await this.ctx.storage.put('report:count', n + 1);
+        await this.ctx.storage.put('report:count', ((await this.ctx.storage.get('report:count')) || 0) + 1);
+        await this.queueReport({ at: Date.now(), room: a.room, why: String(m.why || '').slice(0, 40), target: { name: target[1].name, u: target[1].u }, by: a.u });
         this.send(ws, { t: 'reported', id: m.id });
         break;
       }

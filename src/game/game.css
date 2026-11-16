@@ -670,3 +670,10 @@ select.hq-input { width: auto; max-width: 100%; }
 @keyframes hq-may-drift { from { transform: translateX(0); } to { transform: translateX(560px); } }
 @media (prefers-reduced-motion: reduce) { .hq-may-sky i { animation: none; } }
 .hq-may-quote { margin: 0; font: 600 17px/1.6 "Noto Serif SC", "Songti SC", serif; color: var(--hq-gold); }
+
+/* Khung khủng hoảng (src/game/crisis-ui.js; docs/npc-ai/11 §11.3): phông giao diện, không phông thoại cổ */
+.hq-crisis { margin: 8px 0; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.35); background: rgba(20,24,32,.92); color: #f2f2f2; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.5; }
+.hq-crisis-line { margin: 0 0 8px; font-weight: 600; }
+.hq-crisis-block { white-space: pre-wrap; }
+.hq-crisis-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.hq-crisis-strip { margin: 6px 0 0; padding: 6px 10px; border-radius: 8px; background: rgba(90,168,255,.12); border: 1px solid rgba(90,168,255,.35); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 13px; }

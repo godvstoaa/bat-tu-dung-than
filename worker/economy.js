@@ -14,7 +14,7 @@ export class Economy extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
     this.e = new EconEngine(ctx.storage, {
-      judge: async (messages) => { const r = await llmChat(env, messages, { maxTokens: 300, json: true }); return r.ok ? r.text : ''; },
+      judge: async (messages) => { const r = await llmChat(env, messages, { maxTokens: 300, json: true, tag: 'judge' }); return r.ok ? r.text : ''; },
       accountCreated: async (uid) => { if (!env.ACCOUNTS) return null; try { return (await env.ACCOUNTS.get(env.ACCOUNTS.idFromName('accounts')).me(uid))?.created || null; } catch (e) { return null; } },
     });
   }

@@ -25,7 +25,7 @@ const SHOP_COL = { tuu: '#c8553d', tralau: '#d08a3c', tratrang: '#8aa64a', gom: 
 const KIND_COL = { knock: '#cbbf9f', est: '#5cc06a', temple: '#c23a2a', fortune: '#8a4fd0' };
 export const LAYERS = [
   { id: 'fortune', icon: '🔮', name: 'Thầy bói' },
-  { id: 'temple', icon: '⛩', name: 'Miếu' },
+  { id: 'temple', icon: '🏮', name: 'Miếu' },
   { id: 'hall', icon: '🏛', name: 'Sảnh · đền' },
   { id: 'station', icon: '🐎', name: 'Trạm xe' },
   { id: 'dock', icon: '⚓', name: 'Bến' },

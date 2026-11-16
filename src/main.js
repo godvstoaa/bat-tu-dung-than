@@ -96,6 +96,7 @@ import { rankDayun } from './engine/dayun-rank.js'; // [loop 1078] rich totalSco
 import { computeMarriageShensha, computeExtraShensha } from './engine/shensha-marriage.js';
 import { viToHan } from './engine/vi2han.js';
 import { askAI, getConfig, setConfig, isAIReady, PRESETS, testAIConnection, suggestFollowups, buildChartBrief } from './engine/ai.js';
+import { crisisCheck, CRISIS_B_STRIP } from './engine/crisis.js'; // mức B: dải hỗ trợ dưới câu trả lời của Thầy
 import { checkNeo } from './engine/neo-checker.js';
 import { initLanding } from './landing.js'; // [LANDING v1] màn đầu sống động — hôm nay + quote + sample // [RESTORE] bị mất khi process song song prune — neo accuracy checker
 // [NATIVE iOS] Capacitor plugins — native feel (haptics + status bar) để không bị coi là «repackaged website» (4.2).
@@ -4380,12 +4381,13 @@ async function handleAsk() {
       onToken: (_delta, full) => { body.textContent = _streamClean(full); if (_atBottom()) _cl.scrollTop = _cl.scrollHeight; },
     });
     body.innerHTML = _md(text);   // [loop 943] render markdown (streaming đã xong)
+    if (crisisCheck(q) === 'B') { const _st = document.createElement('p'); _st.textContent = CRISIS_B_STRIP; _st.style.cssText = 'margin:8px 0 0;padding:6px 10px;border-radius:8px;background:rgba(90,168,255,.12);border:1px solid rgba(90,168,255,.35);font-size:13px'; body.appendChild(_st); }
     body.classList.remove('streaming');
     badge.textContent = source === 'ai' ? chatBrand().short + ' (trực tuyến)' : chatBrand().short + ' (cục bộ)';
     // [NEO-CHECKER] đo accuracy neo-data của response vs brief → log score + conflicts cho admin theo dõi
     let _neo = null;
     try { if (source === 'ai' && currentResult) { const _brief = buildChartBrief(currentResult); _neo = checkNeo(String(text).slice(0, 8000), _brief); } } catch (_) {}
-    _logEvent('ai_chat', { q: q.slice(0,2000), response: String(text).slice(0,16000), source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed, detail: meta && meta.detail, toolsOn0: meta && meta.toolsOn0, error: meta && meta.error, neoScore: _neo && _neo.score, neoConflicts: _neo && _neo.conflicts, neoHasRedFlag: _neo && _neo.hasRedFlag, neoChecked: _neo && _neo.totalChecked }); // [loop 1387] LUÔN log frontend — [FIX] cap 16000 để log ĐỦ câu trả lời + [NEO] score/conflicts
+    if (source !== 'crisis') _logEvent('ai_chat', { q: q.slice(0,2000), response: String(text).slice(0,16000), source: source, durationMs: Date.now() - _aiStart, rounds: meta && meta.rounds, bailed: meta && meta.bailed, detail: meta && meta.detail, toolsOn0: meta && meta.toolsOn0, error: meta && meta.error, neoScore: _neo && _neo.score, neoConflicts: _neo && _neo.conflicts, neoHasRedFlag: _neo && _neo.hasRedFlag, neoChecked: _neo && _neo.totalChecked }); // [loop 1387] LUÔN log frontend — [FIX] cap 16000 để log ĐỦ câu trả lời + [NEO] score/conflicts
     // [loop 947] message actions (refactored → addMsgActions helper, dùng cả cho restore)
     addMsgActions(body, text);
     // [NEO BADGE — user-facing] app bói TỰ CHẤM ĐIỂM mỗi câu trả lời vs lá số đã tính (độc quyền App Store).

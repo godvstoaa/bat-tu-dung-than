@@ -140,6 +140,7 @@ import { analyzeHealth, answerHealth, meridianClock, bodyConstitution, stageHeal
 import { evaluateNumber, recommendNumbers } from './number-fs.js'; // [loop 1137/1141] số lý phong thủy
 import { ANTI_MANIPULATION_DATA as _AM } from './anti-manipulation-data.js'; // [loop 1386] META anti-manipulate steering
 import { FEATURES } from '../game/features.js'; // [G1 — NPC-AI] flag FEATURES.personaAi, TẮT mặc định (docs/npc-ai/15 §15.6a)
+import { crisisCheck, crisisText, setCrisisFlag, CRISIS_B_NOTE, CRISIS_B_STRIP } from './crisis.js'; // cổng khủng hoảng — chạy TRƯỚC mọi lời gọi AI (docs/game/40 §40.4)
 
 // [loop 1386] META-steering injection: neo AI vào LÁ SỐ (data), chống false-premise / narrative
 //   manipulation / sycophancy. Build 1 lần (static), inject vào system message #2 cùng brief.
@@ -2734,6 +2735,9 @@ async function _resolvePersonaMessage(personaInput, ctx, force = false) {
     const p = typeof personaInput === 'string' ? getPersona(personaInput) : personaInput;
     // runtime:false chặn cả đường truyền thẳng object — không nạp tới khi flag tôn giáo bật.
     if (!p || p.runtime === false) return null;
+    // Luật 8 (docs/game/21 §21.2, VC-034): chỉ persona mức aiEnabled 'co' được vào lời gọi mô hình.
+    // 'kichban' (NPC tín ngưỡng chờ biên bản tham vấn) và 'khong' chỉ dùng cho bark / kịch bản.
+    if (p.aiEnabled !== 'co') return null;
     return { id: p.id, message: { role: 'system', content: personaSystemPrompt(p, ctx) } };
   } catch (_) { _npcPersonasPromise = null; return null; } // lỗi nạp → lượt này không persona, lượt sau thử lại được
 }
@@ -2748,12 +2752,23 @@ async function _resolvePersonaMessage(personaInput, ctx, force = false) {
 //    hoàn toàn → tương thích ngược, hành vi Thầy như cũ.
 // ===========================================================================
 export async function askAI(question, R, cfg, { onToken, onStatus, history, signal, style, persona, personaForce = false } = {}) {
+  // Cổng khủng hoảng — lệnh đầu tiên, trước cả việc đọc cấu hình: không gọi mạng, không luận lá số,
+  // chạy cả khi AI tắt và trên iOS (docs/npc-ai/11 §11.5, docs/game/40 §40.4, VC-035).
+  const _crisis = crisisCheck(question);
+  if (_crisis === 'A' || _crisis === 'C') {
+    setCrisisFlag(_crisis);
+    return { source: 'crisis', text: crisisText(_crisis, persona), meta: { crisis: _crisis, rounds: 0, totalMs: 0 } };
+  }
   cfg = cfg || getConfig();
   // [loop 1354] telemetry — track rounds + total elapsed để log vào admin ai_chat event
   //   (admin thấy: query này mất mấy round? có bị guard cắt ở 60s không?)
   let totalAttempts = 0, _roundsDone = 0;
   const _tStart = Date.now();
   const localFallback = (note, meta) => {
+    // mức B: không luận lá số kể cả khi AI không trả lời được — một lời hỏi han cố định
+    if (_crisis === 'B') return { source: 'local', text: `Thầy nghe đây. Hôm nay mình tạm gác lá số lại; kể thêm cho thầy nghe được không?
+
+${CRISIS_B_STRIP}`, meta: Object.assign({ rounds: _roundsDone, totalMs: Date.now() - _tStart, crisis: 'B' }, meta || {}) };
     const block = composeAnswer(question, R);
     const text = `${block.lead}\n\n${block.paragraphs.map((p) => '• ' + p).join('\n')}${note ? '\n\n' + note : ''}`;
     return { source: 'local', text, meta: Object.assign({ rounds: _roundsDone, totalMs: Date.now() - _tStart }, meta || {}) };
@@ -2798,6 +2813,7 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
     //   mảng tự thực thi ưu tiên an toàn > persona > style, KHÔNG cần cơ chế nào khác.
     //   Flag tắt / persona null → spread rỗng → mảng NGUYÊN TRẠNG (hành vi không đổi).
     ...(_persona ? [_persona.message] : []),
+    ...(_crisis === 'B' ? [{ role: 'system', content: CRISIS_B_NOTE }] : []), // mức B: dặn lắng nghe, không luận lá số
     { role: 'system', content: (STYLE_DIRECTIVES[style] || STYLE_DIRECTIVES['gan-guoi']) + '\n\n⚠ REMEMBER THIS STYLE WHEN ANSWERING — áp dụng cho Câu trả lời này.' },
     ...((history || []).slice(-8)),
     { role: 'user', content: question },
@@ -2891,10 +2907,15 @@ export async function askAI(question, R, cfg, { onToken, onStatus, history, sign
       // system timeout → fallback (KHÔNG throw)
     }
     const isCors = /Failed to fetch|NetworkError|Load failed/i.test(e.message);
-    const hint = isCors
-      ? `Không kết nối được luận giải trực tuyến — trình duyệt chặn kết nối. Mở ⚙ chọn nguồn mặc định.`
-      : `Không kết nối được luận giải trực tuyến: ${e.message}.`;
-    return localFallback(hint + ' Hiện trả lời bằng bộ luân giải cục bộ.', { error: String(e.message || e).slice(0, 200) }); // [loop 1374] log error reason
+    // «mất mạng» và «AI bị quản trị tắt» là hai trạng thái khác nhau, báo bằng hai câu khác nhau (docs/npc-ai/12 §12.3)
+    const offline = isCors || (typeof navigator !== 'undefined' && navigator.onLine === false);
+    const why = e && e.aiDisabled ? 'ai_off' : offline ? 'offline' : 'error';
+    const hint = why === 'ai_off'
+      ? 'Luận giải trực tuyến đang tạm tắt — không phải lỗi của bạn.'
+      : isCors
+        ? `Không kết nối được luận giải trực tuyến — trình duyệt chặn kết nối. Mở ⚙ chọn nguồn mặc định.`
+        : `Không kết nối được luận giải trực tuyến: ${e.message}.`;
+    return localFallback(hint + ' Hiện trả lời bằng bộ luân giải cục bộ.', { error: String(e.message || e).slice(0, 200), why }); // [loop 1374] log error reason
   }
 }
 

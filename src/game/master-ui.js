@@ -6,6 +6,8 @@
 // ============================================================================
 import { esc } from './stations.js';
 import { buzz } from './haptics.js';
+import { guardCrisis, crisisStrip } from './crisis-ui.js';
+import { softenRatings } from './map-rating.js';
 
 function el(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstElementChild; }
 
@@ -52,6 +54,8 @@ export function masterChatBody(api, { R, who, first, starters = [], persona = nu
 
   async function ask(q, asker) {
     if (busy || !q) return;
+    // cổng khủng hoảng — lệnh đầu tiên của lượt, trước hạn mức và trước khi nạp engine AI (VC-035)
+    if (guardCrisis(q, { log, lock: [form.q, form.querySelector('button')], personaId: persona })) { sugg.innerHTML = ''; abort?.abort(); return; }
     const g = gate ? gate() : { ok: true };
     if (!g.ok) { log.append(el(`<div class="hq-msg a"><span>${esc(masterName)}</span><div class="hq-msg-body"><p>${esc(g.msg || 'Hôm nay hỏi vậy đủ rồi.')}</p></div></div>`)); return; }
     busy = true; form.q.disabled = true; sugg.innerHTML = '';
@@ -64,16 +68,17 @@ export function masterChatBody(api, { R, who, first, starters = [], persona = nu
     try {
       const L = await load();
       abort = new AbortController();
-      const { source, text } = await L.askAI(frame ? frame(q) : q, R, L.getConfig(), {
+      const { source, text: rawText, meta } = await L.askAI(frame ? frame(q) : q, R, L.getConfig(), {
         history, signal: abort.signal, persona, personaForce,
         onStatus: (s) => { body.innerHTML = `<p class="hq-sub">${esc(s)} …</p>`; },
         // gộp token trong cùng khung hình: mỗi rAF chỉ vẽ một lần (token dồn cuối khung)
         onToken: (_d, full) => {
           rafText = full;
-          if (!rafPaint) rafPaint = requestAnimationFrame(() => { rafPaint = 0; body.innerHTML = md(clean(rafText)); });
+          if (!rafPaint) rafPaint = requestAnimationFrame(() => { rafPaint = 0; body.innerHTML = md(clean(softenRatings(rafText))); });
         },
       });
       if (rafPaint) { cancelAnimationFrame(rafPaint); rafPaint = 0; }
+      const text = softenRatings(rawText); // lớp hiển thị của game: không đọc nguyên nhãn «Đại hung» (§40.2)
       body.innerHTML = md(text);
       a.classList.remove('streaming');
       history.push({ role: 'user', content: q }, { role: 'assistant', content: clean(text) });
@@ -85,8 +90,10 @@ export function masterChatBody(api, { R, who, first, starters = [], persona = nu
           if (n && n.score != null) a.append(el(`<div class="hq-neo ${n.hasRedFlag ? 'bad' : ''}">${n.hasRedFlag ? '⚠' : '🎯'} Neo ${n.score}% · ${n.totalChecked} mốc dữ liệu${n.conflicts?.length ? ` · ${n.conflicts.length} mâu thuẫn` : ' · khớp lá số'}</div>`));
         } catch (_) { /* bỏ qua */ }
       } else {
-        a.append(el('<div class="hq-neo">Luận cục bộ (chưa kết nối máy chủ AI)</div>'));
+        const why = meta?.why;
+        if (source !== 'crisis') a.append(el(`<div class="hq-neo">${why === 'ai_off' ? 'Luận trực tuyến đang tạm tắt — thầy luận bằng sách cục bộ' : why === 'offline' ? 'Mất kết nối mạng — thầy luận bằng sách cục bộ' : 'Luận cục bộ (chưa kết nối máy chủ AI)'}</div>`));
       }
+      { const st = crisisStrip(q); if (st) a.append(st); } // mức B: dải hỗ trợ nhỏ
       buzz('light');
       // gợi ý câu hỏi tiếp của app
       try {

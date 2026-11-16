@@ -1,7 +1,7 @@
 // Cloudflare Worker — serve static app + proxy LLM + admin + anti-scraping + anti-abuse.
 import { makeProxy } from '../functions/_proxy.js';
 import { handleAdminRoute, isAiEnabled, isFreeAiEnabled, logFreeUsage, logEvent, adminPath } from './admin.js';
-import { MAX_ROOMS } from '../src/game/protocol.js';
+import { MAX_ROOMS, CLOSE_REGION, mmoBlocked } from '../src/game/protocol.js';
 
 // Durable Object phòng Huyền Quán MMO (binding QUAN trong wrangler.jsonc)
 export { TownShard } from './quan-room.js';
@@ -52,7 +52,7 @@ function withSecurityHeaders(res) {
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
 }
 
-// [loop 1376] FREE model pool — multi-backend gateway. Z.ai Coding Plan (glm-5.2) là PRIMARY,
+// [loop 1376] FREE model pool — multi-backend gateway. Z.ai Coding Plan (glm-5.3) là PRIMARY,
 //   admin thêm free provider keys (Groq/NVIDIA...) vào ai:config.freePool làm FALLBACK khi z.ai
 //   fail (401/429/500/timeout). Ai cũng dùng được (key server-side, user không cần key).
 async function freeRoute(request, env, ctx, ip, aiCfg) {
@@ -62,7 +62,7 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
   let bodyObj = {};
   try { bodyObj = await request.json(); } catch (e) { try { bodyObj = JSON.parse(await request.text()); } catch (_) {} }
   const pool = Array.isArray(aiCfg && aiCfg.freePool) ? aiCfg.freePool.filter(function (p) { return p && p.apiKey && p.endpoint && p.model; }) : [];
-  // [cloudflare-gỡ] z.ai Coding Plan (glm-5.2) là DEFAULT/PRIMARY — nhanh, ổn, hỗ trợ tool-use.
+  // [cloudflare-gỡ] z.ai Coding Plan (glm-5.3) là DEFAULT/PRIMARY — nhanh, ổn, hỗ trợ tool-use.
   //   Pool (Groq/NVIDIA/...) chỉ là FALLBACK khi z.ai fail. (Trước đây cf-glm default; Groq từng
   //   đứng đầu pool nhưng key chết 403/413 → mọi request fail ở Groq trước khi tới z.ai.)
   var poolBackends = pool.map(function (p) { return { name: p.name || 'pool', endpoint: String(p.endpoint).replace(/\/$/, ''), model: String(p.model), apiKey: String(p.apiKey), stripTools: true }; });
@@ -76,7 +76,7 @@ async function freeRoute(request, env, ctx, ip, aiCfg) {
     try {
       bodyObj.model = b.model;
       // [cloudflare-gỡ] z.ai coding plan làm PRIMARY. Giữ nguyên thinking (frontend gửi
-      //   thinking:{enabled} → z.ai reasoning) — coding plan glm-5.2 thinking ~6s/call, chấp nhận
+      //   thinking:{enabled} → z.ai reasoning) — coding plan glm-5.3 thinking ~6s/call, chấp nhận
       //   được, chất lượng luận giải tốt hơn no-thinking. Chỉ strip tools cho POOL (Groq/NVIDIA)
       //   vì payload tools lớn → HTTP 413; z.ai-paid giữ tools (tool-use đầy đủ).
       // [AUDIT FIX] dùng cờ nội bộ stripTools (trước đây so tên 'z.ai-paid' → admin đặt pool entry
@@ -123,6 +123,13 @@ export default {
       const origin = request.headers.get('Origin');
       if (origin && !ALLOWED_ORIGINS.test(origin)) return new Response('Forbidden origin', { status: 403 });
       if (!env.QUAN) return new Response('MMO chưa bật', { status: 503 });
+      // VC-039: chủ dự án tắt chế độ nhiều người theo quốc gia bằng biến MMO_BLOCK_COUNTRIES (vd «VN»).
+      //   Nhận kết nối rồi đóng ngay bằng mã CLOSE_REGION để client biết mà dừng thử lại (chơi đơn vẫn đủ).
+      if (mmoBlocked(request.cf?.country, env.MMO_BLOCK_COUNTRIES)) {
+        const [client, server] = Object.values(new WebSocketPair());
+        server.accept(); server.close(CLOSE_REGION, 'region');
+        return new Response(null, { status: 101, webSocket: client });
+      }
       const room = Math.max(0, Math.min(MAX_ROOMS - 1, parseInt(url.searchParams.get('room') || '0', 10) || 0));
       return env.QUAN.get(env.QUAN.idFromName('town-' + room)).fetch(request);
     }

@@ -1,5 +1,7 @@
 # HUYỀN QUÁN MMO — Prompt chi tiết & Kế hoạch phát triển
 
+> **ĐÃ THAY THẾ (2026-11-16).** Tài liệu này giữ làm lịch sử, không dùng để làm việc. Bản đang dùng: [docs/game/README.md](game/README.md). Tra chỗ mới của từng mục: [docs/game/90-PHA-HE-TAI-LIEU.md](game/90-PHA-HE-TAI-LIEU.md).
+
 > 2026-11-03 · Thay thế định hướng "single-player + Phase 2 presence" của `GAME-HUYEN-QUAN-SPEC.md` v1.1.
 > Spec v1.1 vẫn là nguồn cho mỹ thuật (mục 9) và 7 gian cơ bản; tài liệu này là **nguồn chân lý mới** cho phạm vi, thứ tự và tiêu chí.
 

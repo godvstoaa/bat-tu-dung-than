@@ -177,7 +177,7 @@ export function getYeguoForChart(R) {
     // 妄语+恶口 ← Thương Quan (khẩu/nghịch)
     if (has('伤官') || has('傷官')) out.push({ ...YEGUO[6], why: 'Thương Quan = khẩu/nghịch khí → dấu 口业 (lời ác/vô nghĩa)' });
     // 嗔业 ← Thất Sát / Kiếp Tài (cạnh tranh,sân)
-    if (has('劫财') || has('七杀') || has('七殺')) out.push({ ...YEGUO[8], why: 'Kiếp/Thất Sát → dấu 嗔业 (sân hận)' });
+    if (has('劫财') || has('劫財') || has('七杀') || has('七殺')) /* engine dùng 劫財 (phồn thể) — trước chỉ so giản thể nên không bao giờ khớp */ out.push({ ...YEGUO[8], why: 'Kiếp/Thất Sát → dấu 嗔业 (sân hận)' });
     // bại cách → 业 chướng nặng tổng
     if (pq.quality === '败格') out.push({ karma: '业障 nặng tổng (cách bại)', result: 'cách cục vỡ = quả của nghiệp chướng tích', cure: '大忏(八十八佛/金刚萨埵)+大积德(败需补大)' });
   } catch (_) {}
@@ -195,7 +195,7 @@ export function getRemedyForChart(R) {
     const isWeak = str.strong === false;
     const hasSha = gods.includes('七杀') || gods.includes('七殺');
     const hasShang = gods.includes('伤官') || gods.includes('傷官');
-    const hasJie = gods.includes('劫财');
+    const hasJie = gods.includes('劫财') || gods.includes('劫財');
     const bai = pq.quality === '败格';
     for (const h of BAZI_HUAJIE) {
       if (isWeak && /Nhật Chủ nhược/.test(h.when)) out.relevant.push(h);

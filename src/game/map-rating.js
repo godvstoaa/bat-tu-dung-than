@@ -44,6 +44,16 @@ export const TONE_OF = {
 export const SOFT_LABELS = { thuan: 'Thuận — nên làm', binh: 'Bình thường', giu: 'Nên thủ, giữ sức' };
 export const TONE_ORDER = ['thuan', 'binh', 'giu'];
 
+/** Lớp hiển thị cho LỜI THẦY BÓI trong game (docs/game/40 §40.2 luật 2 «không doạ»): nhãn mức độ của engine
+ *  mà mô hình đọc nguyên cho người chơi («Đại hung», «tai hoạ») được đổi sang cụm mềm. Không đụng lời Thầy
+ *  trên trang chính của app. Lượt chạy bộ thử đỏ 16/11 (câu F02) cho thấy mô hình có đọc nguyên nhãn này. */
+export function softenRatings(text) {
+  const cap = (w, rep) => (w[0] !== w[0].toLowerCase() ? rep[0].toUpperCase() + rep.slice(1) : rep);
+  return String(text ?? '')
+    .replace(/(^|[^p{L}])(đại hung)(?![p{L}])/giu, (m, pre, w) => pre + cap(w, SOFT_LABELS.giu.toLowerCase()))
+    .replace(/(^|[^p{L}])(tai hoạ|tai họa)(?![p{L}])/giu, (m, pre, w) => pre + cap(w, 'trắc trở'));
+}
+
 /**
  * Điểm → mức engine. GƯƠNG (mirror) thuần của liunian-pro.js:299+304-309 —
  * không gọi engine, không đổi ngưỡng. Giá trị ngoài thang → mức an toàn gần

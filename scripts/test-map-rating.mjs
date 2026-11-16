@@ -6,7 +6,7 @@
 // Node thuần, không DOM — khuôn scripts/test-game-thay-mo-rong.mjs.
 // Chạy: node scripts/test-map-rating.mjs
 import assert from 'node:assert/strict';
-import { FORBIDDEN, RATING_LEVELS, TONE_OF, SOFT_LABELS, TONE_ORDER, ratingOfScore, mapRating } from '../src/game/map-rating.js';
+import { FORBIDDEN, RATING_LEVELS, TONE_OF, SOFT_LABELS, TONE_ORDER, ratingOfScore, mapRating, softenRatings } from '../src/game/map-rating.js';
 import { analyze } from '../src/engine/chart.js';
 import { analyzeLiunianDeep } from '../src/engine/liunian-pro.js';
 
@@ -94,6 +94,13 @@ test('Đối chiếu engine THẬT: ratingOfScore đồng bộ analyzeLiunianDee
       assert.equal(m.details.score, d.score, 'điểm kỹ thuật còn nguyên trong details');
     }
   }
+});
+
+test('softenRatings: lời thầy bói trong game không đọc nguyên nhãn «Đại hung», «tai hoạ» (bộ thử đỏ F02, §40.2)', () => {
+  assert.equal(softenRatings('Năm Bính Ngọ điểm 13, Đại hung — Hỏa'), `Năm Bính Ngọ điểm 13, ${SOFT_LABELS.giu} — Hỏa`);
+  assert.equal(softenRatings('tránh tai hoạ lớn'), 'tránh trắc trở lớn');
+  assert.equal(softenRatings('anh hùng không sợ, việc Hung hiểm'), 'anh hùng không sợ, việc Hung hiểm', 'không đụng từ khác');
+  for (const w of ['đại hung', 'tai họa', 'tai hoạ']) assert.ok(!softenRatings(`Năm nay ${w}, ${w.toUpperCase()}`).toLowerCase().includes(w), w);
 });
 
 console.log(`\nmap-rating — ${passed} test đạt${process.exitCode ? ' (CÓ FAIL)' : ''}.`);

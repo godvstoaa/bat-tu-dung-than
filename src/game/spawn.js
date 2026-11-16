@@ -26,7 +26,7 @@ export function spawnOptions(ctx) {
   const ward = WARD_OF_WX[ctx.yong];
   const t = ward && ctx.templeOf?.(ward);
   if (t) out.push({ id: 'menh', label: `☯ Miếu hợp mệnh ${WX_VI[ctx.yong]} — ${t.name}`, x: t.x, z: t.z });
-  out.push({ id: 'plaza', label: '⛩ Sân Sơn Môn (trung tâm)', x: ctx.plaza.x, z: ctx.plaza.z });
+  out.push({ id: 'plaza', label: '🏮 Sân Sơn Môn (trung tâm)', x: ctx.plaza.x, z: ctx.plaza.z });
   out[0].def = true;
   return out;
 }

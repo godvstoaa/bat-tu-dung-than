@@ -145,6 +145,21 @@ await test('flag BẬT + "lama_dakiet" → KHÔNG nạp (getPersona fail-closed 
   } finally { FEATURES.personaAi = false; }
 });
 
+// ------------------- ⑥ Luật 8 — chỉ mức aiEnabled 'co' vào lời gọi mô hình (VC-034) -----
+await test("mức 'kichban' và 'khong' KHÔNG vào lời gọi mô hình, kể cả khi ép persona (personaForce, như thầy bói trong game)", async () => {
+  const { personaAiAllowed } = await import('../src/game/npc-personas.js');
+  for (const id of ['truong_thiensu', 'dieu_am', 'lo_ban_su', 'dinh_menh_hoi']) {
+    const p = getPersona(id);
+    assert.ok(p && p.aiEnabled !== 'co', `${id} phải là persona mức kichban/khong trong dữ liệu`);
+    assert.equal(personaAiAllowed(p), false, `${id}: personaAiAllowed phải false`);
+    const { bodies } = await captureMessages({ persona: id, personaForce: true });
+    assert.equal(sysCount(bodies[0].messages), 3, `${id}: không được có system message persona`);
+  }
+  assert.equal(personaAiAllowed(getPersona('thay_tubinh')), true, "thay_tubinh (mức 'co') vẫn được phép");
+  const { bodies } = await captureMessages({ persona: 'thay_tubinh', personaForce: true });
+  assert.ok(findPersona(bodies[0].messages, 'Thầy Tử Bình') >= 0, "mức 'co' + personaForce → có persona");
+});
+
 await test('hậu kiểm: flag đã trả về TẮT sau mọi test (mặc định an toàn)', () => {
   assert.equal(FEATURES.personaAi, false);
 });

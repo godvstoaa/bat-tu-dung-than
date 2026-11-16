@@ -1,5 +1,7 @@
 # HUYỀN GIỚI · MỆNH DO TA TẠO
 
+> **TẦM NHÌN THAM KHẢO (2026-11-16).** Bản này đã bị cắt khỏi kế hoạch thực thi (QĐ-C3). Bản đang dùng: [docs/game/README.md](game/README.md); phần nào đã được lấy sang: [docs/game/90-PHA-HE-TAI-LIEU.md](game/90-PHA-HE-TAI-LIEU.md).
+
 ## Tài liệu thiết kế game (Game Design Document) — bản AAA
 
 | | |

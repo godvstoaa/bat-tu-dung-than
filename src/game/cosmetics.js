@@ -32,12 +32,14 @@ export const RARITY = [
 // HSV phẩm phục (áo ngoài, đai) — characters.js › tintMaterial nhận mảng [h, s, v]
 const P = (h, s, v) => [h, s, v];
 
-/** Danh mục. price: { phuc } hoặc { ngoc }; unlock: { level, vip, streak }. set: id bộ ngũ hành. */
+/** Danh mục. price: { phuc } hoặc { ngoc }; unlock: { level, vip, streak }. set: id bộ ngũ hành.
+ *  sacred: món mang hình ảnh thiêng → KHÔNG giá Ngọc, KHÔNG khoá VIP, chỉ mở theo cấp (bất biến E1,
+ *  docs/game/40 §40.3, §40.7; VC-036). Giữ nguyên id để tủ đồ đã lưu không hỏng. */
 export const ITEMS = [
   // --- phẩm phục
   { id: 'y_menh', slot: 'robe', name: 'Bản Mệnh Y', rarity: 1, free: true, desc: 'Áo theo Dụng thần, đai theo Hỷ thần — phẩm phục nhập môn.' },
   { id: 'y_bach', slot: 'robe', name: 'Bạch Y Thư Sinh', rarity: 2, price: { phuc: 240 }, look: { pri: P(0.12, 0.06, 0.96), acc: P(0.58, 0.35, 0.6) }, desc: 'Áo trắng đai lam, nhã như thư sinh lên kinh.' },
-  { id: 'y_tu', slot: 'robe', name: 'Tử Y Chân Nhân', rarity: 4, price: { ngoc: 380 }, unlock: { vip: true }, look: { pri: P(0.78, 0.6, 0.55), acc: P(0.12, 0.7, 0.9) }, desc: 'Tử khí đông lai — chỉ dành cho Chân nhân (VIP).' },
+  { id: 'y_tu', slot: 'robe', name: 'Tử Y Thượng Khách', rarity: 4, price: { ngoc: 380 }, unlock: { vip: true }, look: { pri: P(0.78, 0.6, 0.55), acc: P(0.12, 0.7, 0.9) }, desc: 'Tử khí đông lai — áo tím của khách quý (VIP).' },
   { id: 'y_moc', slot: 'robe', set: 'moc', name: 'Thanh Mộc Tiên Y', rarity: 3, price: { ngoc: 160 }, look: { pri: P(0.36, 0.6, 0.6), acc: P(0.12, 0.7, 0.85) }, desc: 'Lục tùng thêu lá liễu, đai vàng.' },
   { id: 'y_hoa', slot: 'robe', set: 'hoa', name: 'Ly Hỏa Chân Bào', rarity: 3, price: { ngoc: 160 }, look: { pri: P(0.99, 0.82, 0.8), acc: P(0.1, 0.85, 0.95) }, desc: 'Đỏ son như lửa luyện đan.' },
   { id: 'y_tho', slot: 'robe', set: 'tho', name: 'Hậu Thổ Đạo Bào', rarity: 3, price: { ngoc: 160 }, look: { pri: P(0.1, 0.7, 0.78), acc: P(0.06, 0.6, 0.45) }, desc: 'Hoàng bào đạo sĩ, vững như núi.' },
@@ -56,7 +58,7 @@ export const ITEMS = [
   { id: 'kim_quan', slot: 'head', set: 'hoa', name: 'Tử Kim Quan · Lông Trĩ', rarity: 4, price: { ngoc: 220 }, desc: 'Kim quan cắm đôi lông trĩ dài — phong thái tướng quân.' },
   { id: 'dau_lap', slot: 'head', set: 'tho', name: 'Đấu Lạp Mạng Sa', rarity: 3, price: { ngoc: 120 }, desc: 'Nón lá rộng vành buông mạng — giang hồ ẩn sĩ.' },
   { id: 'tram_ngoc', slot: 'head', set: 'thuy', name: 'Bích Ngọc Trâm', rarity: 3, price: { ngoc: 120 }, desc: 'Trâm ngọc lam rủ tua châu.' },
-  { id: 'quan_sen', slot: 'head', name: 'Mũ Sen Vàng', rarity: 5, price: { ngoc: 680 }, unlock: { vip: true, level: 10 }, desc: 'Mũ sen vàng rực rỡ — VIP · cấp 10.' },
+  { id: 'quan_sen', slot: 'head', name: 'Mũ Sen Vàng', rarity: 5, sacred: true, price: { phuc: 1500 }, unlock: { level: 10 }, desc: 'Mũ sen vàng — nhận bằng tu tập: cấp 10.' },
   // charPlan §3.1: khăn trán tiểu nhị · nón lá · đạo quan ngọc (bộ Vân Du Tiên Môn)
   { id: 'khan_tran', slot: 'head', name: 'Khăn Trán Tiểu Nhị', rarity: 1, price: { phuc: 50 }, desc: 'Khăn trán đỏ sẫm buộc sau gáy — tiểu nhị chạy bàn.' },
   { id: 'non_la', slot: 'head', name: 'Nón Lá Giang Hồ', rarity: 1, price: { phuc: 70 }, desc: 'Nón lá rộng vành vành tre quai cằm — che nắng đường xa.' },
@@ -69,7 +71,7 @@ export const ITEMS = [
   { id: 'o_giay', slot: 'back', set: 'thuy', name: 'Ô Giấy Dầu Vẽ Sen', rarity: 3, price: { ngoc: 140 }, desc: 'Ô giấy dầu xếp gọn đeo lưng.' },
   { id: 'canh_phuong', slot: 'back', set: 'hoa', name: 'Phượng Hỏa Dực', rarity: 4, price: { ngoc: 320 }, desc: 'Đôi cánh lửa phượng hoàng khẽ đập.' },
   { id: 'canh_hac', slot: 'back', name: 'Tiên Hạc Dực', rarity: 4, price: { ngoc: 320 }, desc: 'Đôi cánh hạc trắng viền đen.' },
-  { id: 'phap_luan', slot: 'back', name: 'Bát Quái Hộ Thân Phù', rarity: 5, price: { ngoc: 720 }, unlock: { vip: true }, desc: 'Vòng bát quái vàng xoay sau lưng — VIP.' },
+  { id: 'phap_luan', slot: 'back', name: 'Bát Quái Kim Hoàn', rarity: 5, sacred: true, price: { phuc: 1600 }, unlock: { level: 12 }, desc: 'Vòng bát quái vàng xoay sau lưng — nhận bằng tu tập: cấp 12.' },
   // charPlan §3.2: vật cứng bám một điểm Spine02 — túi vải · bình rượu hông · ống quyển
   { id: 'tui_vai', slot: 'back', name: 'Túi Vải Hành Trang', rarity: 1, price: { phuc: 110 }, desc: 'Túi vải thô lòi tói buộc miệng — đựng đồ đường dài.' },
   { id: 'binh_ruou', slot: 'back', name: 'Bình Rượu Hồ Lô', rarity: 2, price: { phuc: 240 }, desc: 'Hồ lô vàng hổ phách nút gỗ đeo hông — bạn đường khách giang hồ.' },
@@ -88,7 +90,7 @@ export const ITEMS = [
   { id: 'aura_batquai', slot: 'aura', set: 'tho', name: 'Bát Quái Trận', rarity: 4, price: { ngoc: 260 }, desc: 'Trận bát quái vàng xoay dưới chân.' },
   { id: 'aura_set', slot: 'aura', set: 'kim', name: 'Cửu Thiên Lôi Quang', rarity: 4, price: { ngoc: 260 }, desc: 'Tia sét tím lách tách quanh thân.' },
   { id: 'aura_tuyet', slot: 'aura', set: 'thuy', name: 'Hàn Tuyết Phiêu', rarity: 3, price: { ngoc: 150 }, desc: 'Tuyết bay lả tả quanh người.' },
-  { id: 'aura_sen', slot: 'aura', name: 'Bộ Bộ Sinh Liên', rarity: 5, price: { ngoc: 640 }, unlock: { level: 8 }, desc: 'Sen vàng nở dưới chân — cấp 8.' },
+  { id: 'aura_sen', slot: 'aura', name: 'Vệt Sen Vàng', rarity: 5, sacred: true, price: { phuc: 1400 }, unlock: { level: 8 }, desc: 'Sen vàng nở dưới chân — nhận bằng tu tập: cấp 8.' },
   // --- vệt bước
   { id: 'trail_menh', slot: 'trail', name: 'Bộ Pháp Bản Mệnh', rarity: 1, free: true, desc: 'Vệt sáng theo hành (mở ở cấp 6).' },
   // đạp nước (P14 — movement.js): bị động, không tốn thể lực; bán bằng Ngọc (ẩn trên iOS như mọi món Ngọc)
@@ -103,7 +105,7 @@ export const ITEMS = [
   { id: 'kiem', slot: 'mount', name: 'Ngự Kiếm', rarity: 1, free: true, desc: 'Thanh kiếm bay dưới chân.' },
   { id: 'may', slot: 'mount', name: 'Cân Đẩu Vân', rarity: 3, price: { ngoc: 200 }, desc: 'Cưỡi mây cân đẩu.' },
   { id: 'ho_lo_bay', slot: 'mount', name: 'Hồ Lô Phi Hành', rarity: 3, price: { ngoc: 200 }, desc: 'Cưỡi hồ lô tím vàng.' },
-  { id: 'dai_sen', slot: 'mount', name: 'Liên Hoa Đài', rarity: 4, price: { ngoc: 360 }, desc: 'Đứng trên đài sen vàng.' },
+  { id: 'dai_sen', slot: 'mount', name: 'Đài Sen Mây', rarity: 4, sacred: true, price: { phuc: 900 }, unlock: { level: 6 }, desc: 'Đứng trên đài sen vàng — nhận bằng tu tập: cấp 6.' },
   { id: 'duc', slot: 'mount', name: 'Ngũ Hành Dực', rarity: 4, price: { ngoc: 420 }, desc: 'Đôi cánh năng lượng theo hành Dụng thần — lơ lửng tự do, bụi sao lấp lánh.' },
   { id: 'hac', slot: 'mount', name: 'Tiên Hạc', rarity: 5, price: { ngoc: 780 }, unlock: { vip: true }, desc: 'Cưỡi hạc trắng sải cánh — VIP.' },
   // --- khung tên
@@ -257,3 +259,15 @@ export function decodeCos(str) {
 }
 /** Chuỗi đã lọc (máy chủ phát lại đúng chuỗi này). */
 export const cleanCos = (str) => encodeCos(decodeCos(str));
+
+/** Máy chủ MMO lọc trang bị theo quyền có (VC-037). owned = tủ đồ trong bản lưu mây của tài khoản;
+ *  null = khách chưa đăng nhập: chỉ món không cần trả tiền thật (không giá Ngọc, không khoá VIP),
+ *  vì máy chủ không xác minh được đồ mua trên máy. */
+export function allowedCos(str, owned = null) {
+  const ok = {};
+  for (const [slot, id] of Object.entries(decodeCos(str))) {
+    const it = ITEM[id];
+    if (owned ? (it.free || owned.includes(id)) : (!it.price?.ngoc && !it.unlock?.vip)) ok[slot] = id;
+  }
+  return encodeCos(ok);
+}

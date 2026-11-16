@@ -96,4 +96,27 @@ t('Lưu / đọc lại giữ tủ đồ', () => {
   assert.equal(C.wardrobe(b).equipped.robe, 'y_bach'); assert.equal(C.wardrobe(b).ngoc, 999);
 });
 
+t('máy chủ MMO chỉ phát trang phục và danh hiệu người chơi có (VC-037)', async () => {
+  // khách: bỏ món cần trả tiền thật (Ngọc / VIP), giữ món mua bằng tiền trong game
+  assert.equal(C.allowedCos('r:y_tu,h:quan_sen,b:kiem_go', null), 'h:quan_sen,b:kiem_go');
+  // tài khoản: chỉ món có trong tủ đồ của bản lưu mây
+  assert.equal(C.allowedCos('r:y_tu,b:kiem_go', ['y_tu']), 'r:y_tu');
+  assert.equal(C.allowedCos('r:y_tu', []), '');
+});
+const { allowedTitle } = await import('../src/game/protocol.js');
+t('danh hiệu: chỉ tên có trong danh sách; tài khoản không vượt bậc xp của mình (VC-037)', () => {
+  assert.equal(allowedTitle('Ta Là Vua', null), S.TITLES[0].name);
+  assert.equal(allowedTitle('Đệ Tử', null), 'Đệ Tử');
+  assert.equal(allowedTitle('Đệ Tử', 10), S.titleFor(10).name);
+  assert.equal(allowedTitle('Khách Quen', 300), 'Khách Quen');
+});
+
+t('bất biến E1 (VC-036): món mang hình ảnh thiêng không bán bằng Ngọc, không khoá VIP, chỉ mở theo cấp', () => {
+  const sac = C.ITEMS.filter((i) => i.sacred);
+  assert.ok(sac.length >= 4, 'phải có ít nhất 4 món đánh dấu sacred');
+  for (const i of sac) { assert.ok(!i.price?.ngoc, i.id + ': không giá Ngọc'); assert.ok(!i.unlock?.vip, i.id + ': không khoá VIP'); assert.ok(i.unlock?.level > 0, i.id + ': mở theo cấp'); }
+  const bad = /Chân Nhân|Pháp Luân|Hộ Thân Phù|Sinh Liên|Liên Hoa Đài/;
+  for (const i of C.ITEMS) assert.ok(!bad.test(i.name), i.id + ': tên mang danh xưng hoặc vật thiêng: ' + i.name);
+});
+
 console.log(`\n${n} test đạt`);

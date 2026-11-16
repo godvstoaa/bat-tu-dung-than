@@ -3,6 +3,7 @@
 //  Spec: docs/GAME-HUYEN-QUAN-SPEC.md mục 7.
 //  `api` do main.js cấp: { state, panel, onClose(body, fn), after(gained, why), toast, goTo, setSitting, setTeaColor, wipe, reduced }.
 // ============================================================================
+import { crisisActive } from '../engine/crisis.js';
 import { Solar } from 'lunar-javascript';
 import { analyze } from '../engine/chart.js';
 import { computeZhai } from '../engine/zhai.js';
@@ -101,6 +102,7 @@ const dayKeyOf = () => `${S.todayStr(new Date())}:${pidLocal()}`;
  *  liệu + một công thức chọn, chung với persona (audit F1/F2). Không có pool →
  * null — trạm câm như hôm nay, KHÔNG bịa giọng. */
 function barkOf(poolId, seed = dayKeyOf()) {
+  if (crisisActive()) return null; // cờ khủng hoảng 30 phút: gian im lặng (docs/npc-ai/11 §11.8)
   return pickBark(poolId, seed);
 }
 // v4: bỏ toast lời rao khi mở trạm (thông báo thừa) — lời chào của thầy nằm ngay đầu khung chat (fortune-npc.js).
@@ -979,7 +981,7 @@ const MASTER_WRAP = {
   tuongphap: withMaster('tuongphap', HALL_OPEN.tuongphap, '📋 Án tượng pháp hôm nay', 'Sảnh Tượng Pháp'),
   trach: withMaster('trach', openTrach, '📋 Án chọn ngày hôm nay', 'Sảnh Trạch Nhật'),
   duongtrach: withMaster('duongtrach', openDuongTrach, '📋 Án xem nhà hôm nay', 'Sảnh Dương Trạch'),
-  que: withMaster('que', openQue, '☯ Tự gieo quẻ (5 phép)', 'Gieo quẻ'),
+  que: withMaster('que', withBark(openQue, 'que'), '☯ Tự gieo quẻ (5 phép)', 'Gieo quẻ'),
 };
 // ba điện Sơn Môn (world.js ROOMS.master): thầy ngồi bàn — chat theo lá số + công cụ riêng của điện
 const hallMaster = (mid, extra) => (api) => {
@@ -990,6 +992,23 @@ MASTER_WRAP.m_vanxuong = hallMaster('vanxuong', { label: '📚 Học Án Cổ (l
 MASTER_WRAP.m_daumau = hallMaster('tuvi', { label: '📋 Án tử vi luyện nghề', title: 'Đẩu Mẫu Điện', open: (api) => HALL_OPEN.tuvi(api) });
 MASTER_WRAP.m_laoquan = hallMaster('duocvuong', { label: '🍵 Trà dưỡng sinh', title: 'Trà', open: (api) => openTra(api) });
 /** bảng trạm gốc (công cụ, án luyện nghề) — miếu thờ dùng làm nghi thức riêng (temples.js) */
-export const STATION_BASE = { thay: thayBook, compass: openCompass, xam: openXam, huong: openHuong, lich: openLich, tra: openTra, sen: openSen, an0: openCaseSlot(0), an1: openCaseSlot(1), an2: openCaseSlot(2), trach: openTrach, duongtrach: openDuongTrach, que: openQue, ...HALL_OPEN, ...VAN_OPEN };
+/** Gắn một câu bark của gian lên đầu khung (sách NPC-AI mục 05: các bể xam, que, huong, la_ban, lich
+ *  đã có câu nhưng chưa có chỗ phát). Gian không trả khung (null, hoặc khung đặc biệt) → để nguyên. */
+function withBark(open, poolId) {
+  return (api, ...rest) => {
+    const node = open(api, ...rest);
+    const t = barkOf(poolId);
+    if (!t || !node || node.nodeType !== 1) return node;
+    const q = document.createElement('p');
+    q.className = 'hq-quote';
+    q.textContent = `“${t}”`;
+    // khung nạp chậm (lazyBody) tự thay chính nó khi nạp xong → bọc ngoài để câu không mất
+    if (node.classList?.contains('hq-loadbox')) { const w = document.createElement('div'); w.append(q, node); return w; }
+    node.prepend(q);
+    return node;
+  };
+}
+
+export const STATION_BASE = { thay: thayBook, compass: withBark(openCompass, 'la_ban'), xam: withBark(openXam, 'xam'), huong: withBark(openHuong, 'huong'), lich: withBark(openLich, 'lich'), tra: openTra, sen: openSen, an0: openCaseSlot(0), an1: openCaseSlot(1), an2: openCaseSlot(2), trach: openTrach, duongtrach: openDuongTrach, que: openQue, ...HALL_OPEN, ...VAN_OPEN };
 export const STATION_OPEN = { ...STATION_BASE, thay: openThay, ...MASTER_WRAP, ...MAY_OPEN };
 export { ROBE };

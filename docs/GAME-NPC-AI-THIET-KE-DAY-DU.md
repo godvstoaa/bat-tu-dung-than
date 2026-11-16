@@ -1,5 +1,7 @@
 # Bản Thiết Kế NPC-AI Huyền Quán (bản sửa theo góp ý duyệt)
 
+> **ĐÃ THAY THẾ (2026-11-16).** Tài liệu này giữ làm lịch sử, không dùng để làm việc. Bản đang dùng: [docs/game/README.md](game/README.md). Tra chỗ mới của từng mục: [docs/game/90-PHA-HE-TAI-LIEU.md](game/90-PHA-HE-TAI-LIEU.md).
+
 **Ngày: 2026-11-08**
 
 Tài liệu này ghép trọn bộ 36 mục thiết kế NPC-AI của Huyền Quán (thư mục `docs/npc-ai/`, mục 01–36) thành một bản duy nhất để duyệt và tra cứu, dựng ngày 2026-11-08 theo góp ý của phiên duyệt, ghép nguyên văn theo đúng thứ tự số mục và phân tách bằng đường kẻ `---`.

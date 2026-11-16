@@ -5,7 +5,8 @@
 //  Không gửi ngày sinh / email / tên thật lên mô hình (client chỉ gửi tên nhân vật + hành Dụng / Hỷ / Kỵ). AI tắt → câu dự phòng.
 // ============================================================================
 import * as NC from '../src/game/npc-chat-core.js';
-import { getPersona, personaSystemPrompt } from '../src/game/npc-personas.js';
+import { getPersona, personaSystemPrompt, personaAiAllowed } from '../src/game/npc-personas.js';
+import { crisisCheck, crisisText, CRISIS_B_NOTE } from '../src/engine/crisis.js';
 import { llmChat } from './llm.js';
 import { sessionOf } from './auth.js';
 import { stableId, accountPid } from '../src/game/auth-core.js';
@@ -25,6 +26,9 @@ export async function handleNpcChat(request, env) {
   const name = String(npc.name || 'Chủ tiệm').slice(0, 30);
   const { intent, biz } = inp.ok ? NC.route(inp.text) : { intent: 'chat', biz: false };
   const fb = (why) => json({ ok: true, text: NC.fallback({ name }, intent, Date.now() / 1000), actions: [], fallback: why });
+  // lớp chặn thứ hai của cổng khủng hoảng (client đã chặn trước): không gọi mô hình, không trừ lượt
+  const cr = crisisCheck(String(b.text ?? ''));
+  if (cr === 'A' || cr === 'C') return json({ ok: true, text: crisisText(cr), actions: [], fallback: 'crisis', crisis: cr });
   if (!inp.ok) return json({ ok: true, text: inp.err === 'rude' ? `${name} nhíu mày: «Ăn nói cho phải phép.»` : '…', actions: [], fallback: inp.err });
   if (!s) return fb('login');                                // khách: câu mẫu G2 (không gọi mô hình)
   const uid = s.uid, day = vnDay();
@@ -43,7 +47,9 @@ export async function handleNpcChat(request, env) {
     if (hit) { if (econ) await econ.memPut(u, npc.id, { ...mem, aff: NC.affAfter(mem.aff, intent) }); return json({ ok: true, text: hit, actions: [], cached: true }); }
   }
   const ctx = b.ctx && typeof b.ctx === 'object' ? b.ctx : {};
-  const persona = npc.persona && getPersona(String(npc.persona)) ? personaSystemPrompt(getPersona(String(npc.persona)), { soChu: 60 }) : '';
+  // mã persona do client gửi → chỉ nạp khi mức aiEnabled cho phép (VC-034); không thì NPC nói giọng chung
+  const pp = npc.persona ? getPersona(String(npc.persona)) : null;
+  const persona = personaAiAllowed(pp) ? personaSystemPrompt(pp, { soChu: 60 }) : '';
   const shop = npc.shop && Array.isArray(npc.shop.items) ? { items: npc.shop.items.slice(0, 16).map((i) => ({ id: String(i.id).slice(0, 24), name: String(i.name).slice(0, 30), price: Math.max(0, Number(i.price) || 0) })) } : null;
   const hiring = npc.hiring && typeof npc.hiring.job === 'string' ? { job: npc.hiring.job.slice(0, 30) } : null;
   const quest = ctx.quest && typeof ctx.quest.id === 'string' ? { id: ctx.quest.id.slice(0, 24), hint: String(ctx.quest.hint || '').slice(0, 160) } : null;
@@ -53,7 +59,9 @@ export async function handleNpcChat(request, env) {
     level: Math.max(1, Math.min(99, ctx.level | 0)), wealth: Math.max(0, Math.min(4, ctx.wealth | 0)), quest,
     yong: ctx.yong && typeof ctx.yong === 'object' ? { primary: String(ctx.yong.primary || '').slice(0, 1), accent: String(ctx.yong.accent || '').slice(0, 1), ji: String(ctx.yong.ji || '').slice(0, 1) } : null,
   };
-  const r = await llmChat(env, NC.buildMessages({ id: npc.id, name, role: String(npc.role || '').slice(0, 60), persona, shop, hiring }, mem, safeCtx, inp.text, { biz }), { maxTokens: biz ? 260 : 160, json: biz });
+  const msgs = NC.buildMessages({ id: npc.id, name, role: String(npc.role || '').slice(0, 60), persona, shop, hiring }, mem, safeCtx, inp.text, { biz });
+  if (cr === 'B') msgs.splice(1, 0, { role: 'system', content: CRISIS_B_NOTE }); // mức B: lắng nghe, không bán hàng
+  const r = await llmChat(env, msgs, { maxTokens: biz ? 260 : 160, json: biz });
   if (!r.ok) return fb(r.err);
   const rep = NC.parseReply(r.text, biz), out = NC.filterOutput(rep.say);
   const actions = out.blocked ? [] : NC.validateActions(rep.actions, { items: shop?.items || [], hiring, rep: Math.max(0, Math.min(100, ctx.rep ?? 50)), aff: mem.aff, questId: quest?.id || null });

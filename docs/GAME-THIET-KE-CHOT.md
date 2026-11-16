@@ -1,5 +1,7 @@
 # HUYỀN QUÁN SƠN MÔN — Thiết kế chốt (nội dung P0 chỉ dùng tài sản sẵn có)
 
+> **ĐÃ THAY THẾ (2026-11-16).** Tài liệu này giữ làm lịch sử, không dùng để làm việc. Bản đang dùng: [docs/game/README.md](game/README.md). Tra chỗ mới của từng mục: [docs/game/90-PHA-HE-TAI-LIEU.md](game/90-PHA-HE-TAI-LIEU.md).
+
 > Ngày chốt: 2026-11-05. Mọi quyết định dưới đây dựa vào **bằng chứng đọc được trong repo** ở dịp rà này:
 > `src/game/assets.js`, `public/models/`, `src/engine/` (grep + chạy thử bằng node), 5 tài liệu thiết kế
 > (`docs/GAME-HUYEN-QUAN-SPEC.md` v1.1, `docs/GAME-NOI-DUNG-THEO-APP.md`, `docs/GAME-V2-THIET-KE.md`, `docs/GAME-AAA-THIET-KE.md`, `docs/gdd/README.md`) và code game đang có.

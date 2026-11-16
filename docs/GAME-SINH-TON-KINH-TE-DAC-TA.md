@@ -1,5 +1,7 @@
 # ĐẶC TẢ: Tài khoản · Sinh tồn · Kinh tế khắt khe · Việc làm theo mệnh · Nhà trọ · NPC hội thoại · Xã hội · Sản xuất · Ẩm thực · Nhà hàng · Di chuyển đặc quyền · Giao diện di động · Tiền kim loại · Huyền học · Luân hồi
 
+> **ĐÃ THAY THẾ (2026-11-16).** Tài liệu này giữ làm lịch sử, không dùng để làm việc. Bản đang dùng: [docs/game/README.md](game/README.md). Tra chỗ mới của từng mục: [docs/game/90-PHA-HE-TAI-LIEU.md](game/90-PHA-HE-TAI-LIEU.md). **Lưu ý:** dòng «P3–P21 chưa code» ở mục «Trạng thái» bên dưới đã lỗi thời — cả 22 giai đoạn P0–P21 đã thi công; phần còn thiếu so với đặc tả ghi ở [docs/game/03-TRANG-THAI.md](game/03-TRANG-THAI.md).
+
 **Dự án:** Huyền Quán Online. Tài liệu này chuyển GDD rút gọn «Life Sim RPG — Kinh tế khắt khe & Mệnh lý Bát Tự» vào thế giới tu tiên Bát Quái Thành.
 
 **Bốn phần:**

@@ -130,7 +130,7 @@ export function rowsOf(tab, ctx) {
     grp('Sảnh nghề (mỗi sảnh 1 khách / ngày)', ctx.stations.filter((st) => st.world && st.kind === 'desk' && !st.room));
     grp('Điện thờ', ctx.stations.filter((st) => st.kind === 'door' || st.id === 'que'));
     head('Miếu gần nhất');
-    for (const { o } of nearest(kindOf('temple'), me, 4, (e) => e.door)) row({ ic: '⛩', name: o.name, sub: area(o.door.x, o.door.z), x: o.door.x, z: o.door.z });
+    for (const { o } of nearest(kindOf('temple'), me, 4, (e) => e.door)) row({ ic: '🏮', name: o.name, sub: area(o.door.x, o.door.z), x: o.door.x, z: o.door.z });
     head('Quầy thầy bói gần nhất');
     for (const { o } of nearest(kindOf('fortune'), me, 3, (e) => e.door)) row({ ic: '🔮', name: o.name, sub: area(o.door.x, o.door.z), x: o.door.x, z: o.door.z });
     return R;

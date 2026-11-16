@@ -4,7 +4,7 @@
 //    1. 天德贵人 Thiên Đức          (theo Nguyệt Chi) — ĐÃ có trong shensha.js
 //    2. 月德贵人 Nguyệt Đức          (theo nhóm tam hợp Nguyệt Chi) — ĐÃ có
 //    3. 三奇贵人 Tam Kỳ              (theo 4 Thiên Can) — ĐÃ có
-//    4. 魁罡    Khôi Cương / Quù Cương (theo Nhật trụ) — ĐÃ có
+//    4. 魁罡    Khôi Cương (theo Nhật trụ) — ĐÃ có
 //    5. 太极贵人 Thái Cực            (theo Nhật Can × Chi) — MỚI (chưa có ở shensha.js)
 //    6. 国印贵人 Quốc Ấn             (theo Nhật Can × Chi) — MỚI
 //
@@ -61,7 +61,7 @@ const NOBLE_INFO = {
     advice: 'Kiên nhẫn tìm người đề bạt (mentor / quý nhân); đừng tự cao tài mà lẻ bạn. Kết hợp sao quý nhân khác sẽ rất phát.',
   },
   kuiGang: {
-    zh: '魁罡', vi: 'Khôi Cương (Quù Cương)',
+    zh: '魁罡', vi: 'Khôi Cương',
     meaning: 'Chủ quyền uy nghiêm, tính cách cương cường, thông minh quyết đoán, dũng cảm gánh vác. Mặt khác dễ khắc cha mẹ / bạn đời; nữ mạng kỵ hình xung, bất lợi hôn nhân.',
     advice: 'Học cách mềm mỏng trong quan hệ vợ chồng / gia đình; giảm tính độc đoán. Nữ mạng cần cẩn trọng nhân duyên, không nên cưới sớm nếu có xung.',
   },

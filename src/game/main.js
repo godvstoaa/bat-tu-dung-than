@@ -67,7 +67,7 @@ import { EMOTES, PHRASES, SEATS, REPORT_REASONS } from './protocol.js';
 const BASE_SPEED = 3.5; // ô/giây
 const WX_NAMES = { 木: 'Mộc', 火: 'Hỏa', 土: 'Thổ', 金: 'Kim', 水: 'Thủy' };
 const WX_CLS = { 木: 'moc', 火: 'hoa', 土: 'tho', 金: 'kim', 水: 'thuy' };
-const ICON = { thay: '📜', compass: '🧭', xam: '🎋', huong: '🕯', lich: '📅', tra: '🍵', sen: '🪷', an0: '❓', an1: '❓', an2: '❓', trach: '🗓', duongtrach: '🧭', dieuhau: '🌡', thuvien: '📚', hophon: '💞', tuvi: '✨', tuongphap: '👁', cachcuc: '🏯', vanbia: '🪨', thaitue: '🪔', tangy: '👘', ...Object.fromEntries(Array.from({ length: 9 }, (_, i) => [`van${i}`, '⛩'])) };
+const ICON = { thay: '📜', compass: '🧭', xam: '🎋', huong: '🕯', lich: '📅', tra: '🍵', sen: '🪷', an0: '❓', an1: '❓', an2: '❓', trach: '🗓', duongtrach: '🧭', dieuhau: '🌡', thuvien: '📚', hophon: '💞', tuvi: '✨', tuongphap: '👁', cachcuc: '🏯', vanbia: '🪨', thaitue: '🪔', tangy: '👘', ...Object.fromEntries(Array.from({ length: 9 }, (_, i) => [`van${i}`, '🏮'])) };
 
 export function startGame({ onExit = null } = {}) {
   const storage = window.localStorage;
@@ -168,8 +168,8 @@ export function startGame({ onExit = null } = {}) {
     const el = $('hq-online');
     const on = net.status === 'online';
     el.classList.toggle('off', !on);
-    el.textContent = on ? `👥 ${net.count}` : (net.status === 'connecting' ? 'Đang kết nối…' : 'Ngoại tuyến');
-    el.title = on ? `${net.count} người trong phòng ${net.room + 1}` : 'Chơi đơn — sẽ tự kết nối lại';
+    el.textContent = on ? `👥 ${net.count}` : (net.status === 'connecting' ? 'Đang kết nối…' : net.status === 'region' ? 'Chơi đơn' : 'Ngoại tuyến');
+    el.title = on ? `${net.count} người trong phòng ${net.room + 1}` : net.status === 'region' ? 'Chế độ nhiều người chưa mở ở khu vực của bạn — mọi hệ chơi đơn vẫn đủ' : 'Chơi đơn — sẽ tự kết nối lại';
   }
 
   // -------------------------------------------------------------------------
@@ -505,7 +505,7 @@ export function startGame({ onExit = null } = {}) {
     st.onEnter?.();
     if (st.kind === 'door' && st.room && renderer?.prepareRoom) renderer.prepareRoom(st.room); // phòng lưới: dựng trong nửa giây chuyển cảnh
     const sub = st.kind === 'door' ? (st.home ? 'Cánh cửa gỗ kẽo kẹt mở ra…' : 'Khói trầm thoang thoảng, nến lung linh…') : 'Trở lại ngoài trời';
-    const head = st.kind === 'door' ? `${st.home ? '🚪' : '⛩'} Bước vào ${esc(st.name)}` : st.home ? '🚪 Ra phố' : `⛩ Ra khỏi ${esc(st.name)}`;
+    const head = st.kind === 'door' ? `${st.home ? '🚪' : '🏮'} Bước vào ${esc(st.name)}` : st.home ? '🚪 Ra phố' : `🏮 Ra khỏi ${esc(st.name)}`;
     if (st.kind === 'door' && st.room?.startsWith('est:')) setTimeout(() => homeWarm(Number(st.room.slice(4))), 900);
     ov.innerHTML = `<div><b>${head}</b><span>${sub}</span></div>`;
     ($('hq-canvas')?.closest('.hq-root') || document.body).appendChild(ov);

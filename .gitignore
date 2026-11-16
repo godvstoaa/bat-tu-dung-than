@@ -72,3 +72,6 @@ docs/_grok-*
 # Meshy: GLB thô (lớn) — chỉ commit bản đã nén trong public/models
 assets-meshy/raw/
 assets-meshy/library/
+
+# kết quả chạy bộ đánh giá persona (scripts/eval-persona.mjs --live)
+scripts/out/

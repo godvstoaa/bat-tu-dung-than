@@ -5,6 +5,7 @@
 //  Không gửi ngày giờ sinh: chỉ tên nhân vật, nghề, cấp, bậc giàu, hành Dụng / Hỷ / Kỵ.
 // ============================================================================
 import * as NC from './npc-chat-core.js';
+import { guardCrisis, crisisStrip } from './crisis-ui.js';
 import * as LIFE from './life.js';
 import { buyDeal, ITEM } from './items.js';
 
@@ -39,6 +40,8 @@ export function chatBody(api, npc, opt = {}) {
 
   form.onsubmit = async (e) => {
     e.preventDefault();
+    // cổng khủng hoảng — trước khi lọc và trước khi gửi lên máy chủ (VC-035): không gọi mạng
+    if (guardCrisis(inp.value, { log: box, lock: [inp, form.querySelector('button')], personaId: npc.persona })) { inp.value = ''; return; }
     const c = NC.cleanInput(inp.value); if (!c.ok) { if (c.err === 'rude') api.toast('Lời lẽ chưa phải phép.'); return; }
     inp.value = ''; add('me', c.text); form.querySelector('button').disabled = true;
     const L = api.life(), s = api.state, y = s.player?.yong;
@@ -48,7 +51,8 @@ export function chatBody(api, npc, opt = {}) {
     form.querySelector('button').disabled = false;
     if (!r?.ok) { add('npc', NC.fallback(npc, NC.route(c.text).intent, Date.now() / 1000)); qn.textContent = 'Mất kết nối — NPC trả lời câu mẫu.'; return; }
     add('npc', r.text, r.actions || []);
-    qn.textContent = r.fallback === 'login' ? 'Đăng nhập tài khoản để NPC trò chuyện tự do (khách nhận câu mẫu).' : r.fallback === 'quota' ? 'Hôm nay đã hết lượt trò chuyện tự do — mai quay lại.' : r.left ? `Còn ${r.left.chat} câu thường · ${r.left.biz} câu nghiệp vụ hôm nay.` : '';
+    { const st = crisisStrip(c.text); if (st) box.append(st); } // mức B: dải hỗ trợ nhỏ
+    qn.textContent = r.fallback === 'login' ? 'Đăng nhập tài khoản để NPC trò chuyện tự do (khách nhận câu mẫu).' : r.fallback === 'quota' ? 'Hôm nay đã hết lượt trò chuyện tự do — mai quay lại.' : r.fallback === 'ai_off' ? 'Trò chuyện tự do đang tạm tắt — NPC trả lời câu mẫu. Không phải lỗi của bạn.' : r.fallback === 'llm_failed' ? 'Máy chủ trò chuyện đang bận — NPC trả lời câu mẫu, lát thử lại.' : r.left ? `Còn ${r.left.chat} câu thường · ${r.left.biz} câu nghiệp vụ hôm nay.` : '';
     inp.focus({ preventScroll: true });
   };
   return root;

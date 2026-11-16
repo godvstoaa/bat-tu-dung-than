@@ -1,5 +1,7 @@
 # Model tải từ thư viện cộng đồng Meshy
 
+> **ĐÃ THAY THẾ (2026-11-16).** Tài liệu này giữ làm lịch sử, không dùng để làm việc. Bản đang dùng: [docs/game/README.md](game/README.md). Tra chỗ mới của từng mục: [docs/game/90-PHA-HE-TAI-LIEU.md](game/90-PHA-HE-TAI-LIEU.md).
+
 Tải ngày 2026-11-03, tài khoản maz.elements3. Mọi model dưới đây đều ghi giấy phép **CC0** trên trang chi tiết: dùng tự do, kể cả thương mại, không bắt buộc ghi tên.
 
 File gốc (rất nặng) nằm ở `assets-meshy/library/<tên>.glb` và không đưa lên git (`.gitignore`). Bản dùng trong game do `scripts/meshy-pack-library.mjs` tạo ra:

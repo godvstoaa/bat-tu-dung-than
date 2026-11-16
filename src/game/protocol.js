@@ -36,8 +36,18 @@
 
 import { HALF, ROOM_X0, ROOM_X1, cityOctDist } from './terrain.js';
 import { cleanCos } from './cosmetics.js';
+import { TITLES, titleFor } from './state.js';
 import { LISTING_COUNT, roomOfH, decodeLayout, validLayout } from './estate-core.js';
 import { COUPLETS } from './items.js';
+
+/** Danh hiệu máy chủ chấp nhận (VC-037): chỉ tên trong state.TITLES; có xp (tài khoản đăng nhập,
+ *  đọc từ bản lưu mây) thì không cao hơn bậc xp đạt được — vượt thì hạ về bậc đúng. */
+export function allowedTitle(title, xp = null) {
+  const i = TITLES.findIndex((t) => t.name === title);
+  if (xp == null) return i >= 0 ? title : TITLES[0].name;
+  const own = titleFor(Math.max(0, Number(xp) || 0));
+  return i >= 0 && TITLES[i].min <= own.min ? title : own.name;
+}
 
 export const VERSION = 1;
 export const ROOM_CAP = 60;                 // người / shard
@@ -51,6 +61,15 @@ export const WORLD_TILES = { minX: 10 - Math.ceil(HALF / 1.6), maxX: 10 + Math.c
 export const CLOSE_FULL = 4001;
 export const CLOSE_SPAM = 4002;
 export const CLOSE_BAD = 4003;
+export const CLOSE_REGION = 4004; // chế độ nhiều người chưa mở ở khu vực này (VC-039) — client dừng thử lại, chơi đơn
+
+/** Khu vực có bị tắt chế độ nhiều người không. list = biến môi trường MMO_BLOCK_COUNTRIES («VN,XX»),
+ *  rỗng = không chặn ai. country = mã quốc gia Cloudflare gắn vào yêu cầu (request.cf.country). */
+export function mmoBlocked(country, list) {
+  const cc = String(country || '').trim().toUpperCase();
+  if (!cc) return false;
+  return String(list || '').split(',').map((x) => x.trim().toUpperCase()).filter(Boolean).includes(cc);
+}
 
 // Bồ đoàn ở Trà Thất (toạ độ ô) — mỗi chỗ một người, máy chủ giữ khoá.
 // chỗ ngồi bồ đoàn Trà Thất (toạ độ ô) — theo bố cục Sơn Môn
