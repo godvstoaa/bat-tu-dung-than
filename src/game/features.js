@@ -32,7 +32,7 @@ export const FEATURES = {
   //   (P0 100 %, từ chối thừa ≤ 2 %, giữ vai ≥ 98 %).
   // Cổng đánh giá ĐẠT 2026-11-16 cho glm-5.3 (200/200 câu, có đọc lại 2 câu — scripts/eval-persona-review.json);
   //   câu trả lời đi qua softenRatings ở master-ui.js. Cổng chứng nhận theo MÔ HÌNH (ai-model.js › PERSONA_GATE):
-  //   game chuyển sang glm-5.3-flash (16/11) → giọng persona tự tắt tới khi cổng chạy lại trên flash và đạt.
+  //   game chuyển sang glm-5.3-flash (16/11) → cổng chạy lại trên flash, đạt cùng ngày → giọng persona bật.
   gamePersona: !IOS && personaGatePassed(GAME_AI_MODEL),
 };
 

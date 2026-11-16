@@ -3,7 +3,7 @@
 > **Trạng thái:** `[ĐÃ CÓ]`
 > **Bộ phận chủ trì:** Client/3D
 > **Nguồn sự thật trong mã:** `src/game/mount.js`, `src/game/main.js`, `src/game/render3d.js`, `src/game/world3d.js`, `src/game/assets.js`, `src/game/collide.js`, `src/game/obstacles.js`, `src/game/gen.js`, `src/game/gen.worker.js`, `src/game/terrain-mesh.js`, `src/game/perf.js`, `vite.config.js`; bảng mô-đun ở [A1](phu-luc/A1-ban-do-ma.md)
-> **Test:** `scripts/test-game-collide.mjs`, `scripts/test-terrain.mjs`; đo bằng `scripts/perf-load.mjs`, `scripts/shot-city.mjs`
+> **Test:** `scripts/test-game-collide.mjs`, `scripts/test-terrain.mjs`; đo bằng `scripts/shot-city.mjs` và công cụ đo tải cục bộ `perf-load.mjs` (không commit — `.gitignore` › `perf-*.mjs`)
 > **Thay thế:** `GAME-V2-THIET-KE` §5 và các mục hiệu năng trong nhật ký; `docs/gdd/13-ky-thuat` là lớp L4; ngân sách chi tiết vẫn ở `DOHOA-MANIFEST`
 > **Kiểm với mã ngày:** 2026-11-16
 
@@ -103,7 +103,7 @@ Mọi hệ mới phải theo đúng ba lớp. Bằng chứng tuân thủ: bộ t
 | Tải | vào game khoảng 10 giây trên mạng thường; model nhà tải thêm không quá 18 MB, nạp theo nhu cầu |
 | Vùng trời | cảnh trời (không tính phủ) không quá 25 lệnh vẽ và 120 nghìn tam giác |
 
-**Cách đo:** thêm `?fps` vào địa chỉ game để hiện ô đo; trong bảng điều khiển trình duyệt gọi công cụ đo giật khung của `perf.js`; `scripts/perf-load.mjs` đo tải; `scripts/shot-city.mjs` chụp bộ ảnh cố định; `scripts/live-map.mjs` và `scripts/live-travel.mjs` kiểm trên bản thật.
+**Cách đo:** thêm `?fps` vào địa chỉ game để hiện ô đo; trong bảng điều khiển trình duyệt gọi công cụ đo giật khung của `perf.js`; công cụ cục bộ `perf-load.mjs` đo tải (không commit); `scripts/shot-city.mjs` chụp bộ ảnh cố định; `scripts/live-map.mjs` và `scripts/live-travel.mjs` kiểm trên bản thật.
 
 **Luật:** không tuyên bố «nhanh hơn» khi chưa có số đo trước và sau ở cùng điểm, cùng mức, cùng phiên.
 

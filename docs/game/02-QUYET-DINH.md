@@ -111,7 +111,7 @@ Mỗi dòng là một chỗ hai tài liệu (hoặc tài liệu và mã) nói ng
 |---|---|---|---|
 | 1 | Duyệt bảy trụ cột §0.3 và mười mâu thuẫn §2.4 | để bộ tài liệu thành chuẩn | dùng bản đề xuất |
 | 2 | Ngân sách LLM mỗi tháng (QĐ-05) và ngưỡng cảnh báo | NPC chat và trọng tài đang chạy không trần tiền | giữ hạn mức theo người: 30 câu thường, 10 câu nghiệp vụ mỗi ngày |
-| 3 | Có bật `FEATURES.personaAi` và `FEATURES.gamePersona` không | giọng Thầy và thầy bói đổi | **16/11:** cổng đạt cho `glm-5.3`, rồi game chuyển sang `glm-5.3-flash` (QĐ-31) → `gamePersona` **tắt** từ khi game chuyển sang `glm-5.3-flash` (16/11): cổng chỉ chứng nhận cho `glm-5.3` và gắn theo mô hình (`src/game/ai-model.js › PERSONA_GATE`). Bật lại khi cổng chạy lại trên flash và đạt — cần Worker bản mới đã deploy. `personaAi` cho Thầy trang chính giữ tắt |
+| 3 | Có bật `FEATURES.personaAi` và `FEATURES.gamePersona` không | giọng Thầy và thầy bói đổi | **16/11:** cổng đạt cho `glm-5.3`, game chuyển sang `glm-5.3-flash` (QĐ-31), cổng chạy lại trên flash và đạt → `gamePersona` **bật** (trừ iOS): cổng chạy lại trên `glm-5.3-flash` ngày 16/11 và đạt (P0 100 %, từ chối thừa 0 %, giữ vai 100 %, 200/200 câu AI trả lời; đọc lại I07). Cổng gắn theo mô hình (`src/game/ai-model.js › PERSONA_GATE`): đổi mô hình là giọng persona tự tắt tới khi cổng chạy lại. `personaAi` cho Thầy trang chính giữ tắt |
 | 4 | Nhà cung cấp SMS và có bật đăng nhập số điện thoại | tốn phí từng tin | giữ tắt |
 | 5 | Cổng thanh toán Ngọc trên web | Ngọc hiện không có nguồn nào | chưa bán |
 | 6 | Bản iOS: có đưa game vào không, khi nào làm Sign in with Apple | bắt buộc nếu có đăng nhập Google | game chưa vào iOS |

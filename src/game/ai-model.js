@@ -33,5 +33,5 @@ export function gameAiConfig(base = {}) {
  * thì giọng persona tự tắt (features.js). Chạy lại: scripts/eval-persona.mjs --live --origin <app>
  * (mặc định dùng GAME_AI_MODEL); đạt thì ghi mô hình và ngày vào đây.
  */
-export const PERSONA_GATE = { model: 'glm-5.3', passed: '2026-11-16', note: 'scripts/eval-persona-review.json' };
+export const PERSONA_GATE = { model: 'glm-5.3-flash', passed: '2026-11-16', note: 'scripts/eval-persona-review.json' };
 export const personaGatePassed = (model = GAME_AI_MODEL) => PERSONA_GATE.model === model;

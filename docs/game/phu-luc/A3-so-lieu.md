@@ -266,7 +266,7 @@ Mỗi mục là một mô-đun: bảng hai cột cho hằng số, rồi mỗi b�
 | wishes | true |
 | ai | true |
 | personaAi | false |
-| gamePersona | false |
+| gamePersona | true |
 
 **Phúc Khí tích lũy cần cho từng cấp** (`progress.xpFor`)
 

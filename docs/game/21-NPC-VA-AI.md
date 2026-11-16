@@ -48,7 +48,7 @@ Luật chi phối: **LN-06** (AI đề xuất, máy chủ quyết), **LN-08** (A
   8. NPC tín ngưỡng phải có biên bản tham vấn trước khi bật AI.
   9. Giọng vùng bằng từ vựng và nhịp, không nhại phát âm.
   10. Hán Việt chuẩn.
-- **Hai cờ** (`features.js`): `personaAi` (giọng persona cho Thầy trên trang chính) **tắt**; `gamePersona` (giọng riêng cho thầy bói trong game): `gamePersona` **tắt** từ khi game chuyển sang `glm-5.3-flash` (16/11): cổng chỉ chứng nhận cho `glm-5.3` và gắn theo mô hình (`src/game/ai-model.js › PERSONA_GATE`). Bật lại khi cổng chạy lại trên flash và đạt — cần Worker bản mới đã deploy. iOS luôn tắt. Đổi lời nhắc, mô hình hay persona → chạy lại `scripts/eval-persona.mjs --live --origin <tên miền app>`.
+- **Hai cờ** (`features.js`): `personaAi` (giọng persona cho Thầy trên trang chính) **tắt**; `gamePersona` (giọng riêng cho thầy bói trong game): `gamePersona` **bật** (trừ iOS): cổng chạy lại trên `glm-5.3-flash` ngày 16/11 và đạt (P0 100 %, từ chối thừa 0 %, giữ vai 100 %, 200/200 câu AI trả lời; đọc lại I07). Cổng gắn theo mô hình (`src/game/ai-model.js › PERSONA_GATE`): đổi mô hình là giọng persona tự tắt tới khi cổng chạy lại. iOS luôn tắt. Đổi lời nhắc, mô hình hay persona → chạy lại `scripts/eval-persona.mjs --live --origin <tên miền app>`.
 - **Lệch đã biết giữa sách và mã** (kiểm lại 16/11; MT-9, MT-12):
   - Dữ liệu khớp bảng của sách: 10 persona mức `co`, 6 mức `kichban`, 4 mức `khong`. **Từ 16/11 mã thi hành mức này** (`npc-personas.js › personaAiAllowed`): chỉ mức `co` được chèn vào lời gọi mô hình, ở chuỗi `askAI` lẫn `/api/npc/chat`. Trương Thiên Sư và Ni sư Diệu Âm (mức `kichban`) nay trả lời bằng giọng chung của thầy bói.
   - Vài persona mang màu tín ngưỡng (Huyền Hư chân nhân, Mao Sơn đạo nhân, Địa Tạng sứ giả, Phán quan Thôi) ở mức `co` theo chính bảng của sách; rà theo LN-11 ở `VC-007`.
@@ -217,7 +217,7 @@ Bốn lượt rà độc lập đọc trọn 16 mục và mở mã để kiểm;
 | 12 · mất mạng | service worker của app; bark và chuyện khách là hàm thuần; hai câu báo khác nhau (16/11) | test khói | §21.5 |
 | 13 · phòng nhiều người | kênh nói chỉ nhận cụm từ; vị trí phát theo vùng gần | — | sách thiếu nhiều loại gói mới, xem [A4](phu-luc/A4-giao-thuc.md) |
 | 14 · chi phí | công tắc; hạn mức theo địa chỉ mạng và theo tài khoản | ngân sách theo persona, trần tháng, đo chi phí NPC chat | `VC-021` |
-| 15 · lộ trình | G0, G1, G2; script cổng đánh giá (16/11) | — | `gamePersona` tắt chờ cổng trên `glm-5.3-flash` (16/11) |
+| 15 · lộ trình | G0, G1, G2; script cổng đánh giá (16/11) | — | cổng đạt trên `glm-5.3-flash`, `gamePersona` bật (16/11) |
 | 16 · test | sáu bộ test đơn vị | lớp đánh giá lời nhắc, lớp thử đỏ, script cổng chung | năm bộ test NPC-AI không nằm trong lệnh npm nào (`VC-001`) |
 
 Luật của sách mà mọi bộ phận phải giữ, đã có mã bảo vệ:

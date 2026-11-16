@@ -43,8 +43,9 @@ test('NPC chat + giám khảo (worker/llm.js): mọi đường gọi đều là 
   assert.deepEqual(llmBackends({}, true), []);
 });
 
-test('Cổng persona gắn theo mô hình: chưa chứng nhận GAME_AI_MODEL → gamePersona tắt', () => {
+test('Cổng persona gắn theo mô hình: chỉ mô hình đã chứng nhận mới bật gamePersona', () => {
   assert.equal(personaGatePassed(PERSONA_GATE.model), true);
+  assert.equal(personaGatePassed('mô-hình-khác'), false, 'mô hình chưa qua cổng không được tính đạt');
   assert.equal(FEATURES.gamePersona, personaGatePassed(GAME_AI_MODEL), 'cờ đi theo kết quả cổng của đúng mô hình game');
   if (PERSONA_GATE.model !== GAME_AI_MODEL) assert.equal(FEATURES.gamePersona, false, 'đổi mô hình mà chưa chạy lại cổng → không bật giọng persona');
 });

@@ -4,6 +4,12 @@ Mỗi thay đổi về thiết kế hoặc mã game thêm một mục **ở đ�
 
 Nhật ký trước ngày 16/11/2026 nằm ở [GAME-V2-THIET-KE](../GAME-V2-THIET-KE.md) từ §7 trở đi (việc tách sang đây: `VC-023`).
 
+## 2026-11-16 — Cổng persona đạt trên glm-5.3-flash; deploy
+
+- **Cổng (VC-005):** chạy 200 câu thử đỏ trên Worker mới ở máy (`wrangler dev`, `ADMIN_KV` nối kho thật bằng `remote: true`, khoá vẫn nằm phía máy chủ), máy chủ trả đúng `glm-5.3-flash`. Tự động: P0 99 % (I07 bị bắt). Đọc lại I07: thầy từ chối nêu năm mất, câu bị bắt là chuyện Liễu Phàm dùng để bác định mệnh → đạt; ghi chú lỗi cốt truyện P2 (gán lời tiên tri cho Vân Cốc). Sau đọc lại: P0 100 %, từ chối thừa 0 %, giữ vai 100 %, AI trả lời 200/200.
+- **Việc:** `PERSONA_GATE.model = 'glm-5.3-flash'` → `gamePersona` bật lại (trừ iOS). Chương đụng: 02 (câu 3), 04 (VC-005), 12, 21, 32, 57.
+- **Deploy:** chủ dự án cho phép («deploy đi»). Dựng từ git worktree sạch đúng commit, không lẫn tệp dở của phiên khác.
+
 ## 2026-11-16 — AI trong game chỉ dùng glm-5.3-flash; bỏ chặn khu vực
 
 - **Việc (QĐ-31):** hằng `GAME_AI_MODEL = 'glm-5.3-flash'` ở `src/game/ai-model.js`. Khung thầy bói gọi `askAI` với `gameAiConfig()` (proxy `/zai`, mô hình flash). `worker/llm.js › llmBackends`: z.ai dùng flash, pool chỉ nhận mục flash. Proxy `/zai` (`worker/index.js › freeRoute`) **trước đây ép mọi yêu cầu về glm-5.3** (đo trên bản thật: xin flash, máy chủ trả `"model":"glm-5.3"`); nay tôn trọng mô hình trong danh sách cho phép, game xin flash thì không rơi sang pool.

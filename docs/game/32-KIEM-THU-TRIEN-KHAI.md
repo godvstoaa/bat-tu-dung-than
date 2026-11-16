@@ -28,7 +28,7 @@ Chương này trả lời: làm sao biết một thay đổi không phá gì, v�
 - **Ba tầng:**
   1. **Test thuần** (42 bộ): nạp mô-đun thuần trong Node, không trình duyệt, không máy chủ. Đây là tầng chính; mọi luật và mọi bảng số phải có ca ở đây.
   2. **Test cần máy chủ dev** (3 bộ): hai kết nối thật vào phòng, tài khoản thử, kinh tế giữa hai tài khoản. Mã một lần hiện ngay trên màn hình ở máy dev, không gửi thật.
-  3. **Kiểm trong trình duyệt và trên bản thật:** `scripts/shot-city.mjs` (bộ ảnh cố định), `scripts/perf-load.mjs` (đo tải), `scripts/live-map.mjs`, `scripts/live-travel.mjs`, `scripts/live-fortune.mjs` (đi lại, bản đồ, thầy bói trên bản thật).
+  3. **Kiểm trong trình duyệt và trên bản thật:** `scripts/shot-city.mjs` (bộ ảnh cố định), `perf-load.mjs` (đo tải, công cụ cục bộ không commit), `scripts/live-map.mjs`, `scripts/live-travel.mjs`, `scripts/live-fortune.mjs` (đi lại, bản đồ, thầy bói trên bản thật).
 - **Kết quả 2026-11-16:** 42/42 bộ thuần đạt khi chạy lẻ.
 - **Lỗi đang có:** `npm run test:game` gọi một tệp không còn tồn tại nên dừng giữa chừng; 17 bộ không nằm trong lệnh nào (`VC-001`). Cho tới khi sửa, chạy lần lượt mọi tệp:
 
@@ -63,7 +63,7 @@ for f in scripts/test-*.mjs; do node "$f" || echo "TRƯỢT: $f"; done
 `[ĐÃ CÓ]`
 
 - **Deploy chỉ chạy tay** (từ 16/11, MT-11, theo QĐ-06): tab Actions › «Run workflow», hoặc lệnh `gh workflow run cloudflare.yml`; `npm run deploy` deploy từ máy. Đẩy lên nhánh chính **không** còn deploy.
-- **Sau khi deploy bản có QĐ-31:** chạy lại cổng đánh giá persona trên `glm-5.3-flash` (`VC-005`); đạt thì ghi mô hình vào `PERSONA_GATE` và deploy lại để bật `gamePersona`.
+- **Đổi mô hình AI của game:** chạy lại cổng đánh giá persona trên mô hình mới (`VC-005`) trước khi deploy — chạy được trên Worker mới ở máy (`wrangler dev` với `ADMIN_KV` nối kho thật, `remote: true`), không cần deploy trước; đạt thì ghi mô hình vào `PERSONA_GATE`. Lần gần nhất: `glm-5.3-flash`, 16/11, đạt.
 - **Cảnh báo:** nếu đã deploy tay một bản chưa commit, lần đẩy kế tiếp của bản cũ hơn sẽ **đè** bản đó. Luôn commit trước khi deploy tay, hoặc deploy bằng cách đẩy.
 - **Migration** của Durable Object áp khi deploy; thêm lớp mới phải thêm thẻ migration mới, không sửa thẻ cũ. Danh sách hiện có: [A4](phu-luc/A4-giao-thuc.md) §A4.5.
 - **Bí mật** của bản thật (đăng nhập Google, gửi mail) do chủ dự án cấu hình: [TAI-KHOAN-CAI-DAT](../TAI-KHOAN-CAI-DAT.md). **Không bao giờ** đặt `AUTH_DEV` trên bản thật.
