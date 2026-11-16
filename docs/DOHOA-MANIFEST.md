@@ -286,6 +286,17 @@ Phần tăng còn lại là nội dung mới hợp lệ: đồ phố ven đườ
 
 **Còn lại:** fps trên máy người dùng sau đợt này chưa đo (`game.html?fps`).
 
+### Đợt 9 (2026-11-16): tìm ra nguyên nhân đền thờ +2 % và sửa
+
+- **Đo «ngoài khung nhưng vẫn vẽ»**: bộ nhân bản có khung bao chung chạm khung nhìn thì three vẽ MỌI bản sao. Ở đền thờ, phần này tăng 72k so với live cũ, chủ yếu đĩa đảo bay (36k) và cầu vân (34k) trên đầu.
+- **Nguyên nhân**: hình nón lọc `seen()` lấy bán kính góc = atan(cỡ / d), tức dùng cả bề rộng làm bán kính. Đĩa đảo 264 m được dư ~23°, nên đảo trên đầu vẫn lọt lọc.
+- **Sửa**: atan(0,6 × cỡ / d), tức nửa đường chéo khung bao.
+- **Kết quả** (tự chỉnh): đền thờ 2,16 → **1,77 tr** (live cũ 2,11), Thiên Thê **1,50 tr**, Sơn Môn **1,80 tr**.
+- **Ảnh cũ / mới 6 góc** (`shots/gfx/cmp9-all.png`), gồm ngước nhìn trời thấy đủ đảo bay. Lệch điểm ảnh > 40: đền thờ 18–32, Thiên Thê 345, phố 398, Sơn Môn ~2.000 (0,3 %, NPC và hạt bụi chuyển động).
+- **Thử rồi bỏ**: quầy chợ đổi sang `.vc2` từ 35 m, không đổi số tam giác ở đền. Đã hoàn tác.
+
+**Tổng các đợt so với live 30fe21d0**: Sơn Môn 1,92 → 1,80 tr · Thiên Thê 1,71 → 1,50 tr · đền thờ 2,11 → 1,77 tr. Mọi điểm đo đều nhẹ hơn bản trước khi có nội dung mới.
+
 ## 5. Goal tiếp (sau khi đạt mục 4)
 
 - ~~**G-8.1**~~ — đạt đợt 4 (2,08 triệu). Ghi chép cũ: (đợt 2: 2,62 triệu tam giác, 38 fps khi tự chỉnh — tam giác chưa tới 2,2 triệu, nhưng fps đã qua đích ≥ 24): sân Sơn Môn ≤ 2,2 triệu tam giác. Còn lại: phần lớn là `.vc` 9k của công trình trong 110 m và bản gốc trong `nearDist` (tối đa 150 m). Bước kế: thu `nearDist` về 2 × cỡ (tối đa 90 m), nướng `.bk` cho công trình dùng gần (hall_main, gate_sect, palace_grand…), đo lại.

@@ -352,7 +352,7 @@ const INST = [];
 // cắt theo hướng nhìn (như cityblocks3d.cityHouses.view — docs/DOHOA-MANIFEST.md §3.2): bản sao ngoài hình nón nhìn
 // (nửa góc ngang + 18°) và xa hơn max(45 m, 3 × cỡ) không vẽ; bóng giữ vòng 80 m. viewInstances gọi mỗi khung (landmarks.view).
 const IV = { on: false, cx: 0, cy: 0, cz: 0, ax: 0, ay: 0, az: 1, half: Math.PI, px: 0, pz: 0 };
-// hình nón nhìn 3D (2026-11-15): xét cả độ cao — quận đảo bay y 460 ngay trên sân Sơn Môn từng bị vẽ dù camera nhìn ngang / xuống
+// hình nón nhìn 3D (2026-11-15; bán kính góc vật = atan(0,6 × cỡ / d) — nửa đường chéo khung bao, 2026-11-16: dùng cả cỡ thì đảo 264 m dư ~23° nên đảo trên đầu vẫn bị vẽ): xét cả độ cao — quận đảo bay y 460 ngay trên sân Sơn Môn từng bị vẽ dù camera nhìn ngang / xuống
 // (đo: cầu vân + đá đảo ~0,25 triệu tam giác). halfV = nửa góc nhìn dọc; nửa góc chéo khung + 18° dư + bán kính góc của vật.
 export function viewInstances(cx, cz, fx, fz, halfH, cy = 0, fy = 0, halfV = 0.4) {
   const l = Math.hypot(fx, fy, fz); IV.cx = cx; IV.cz = cz;
@@ -365,7 +365,7 @@ const seen = (it) => {
   if (!IV.on) return true;
   const s = it.s || 0, dx = it.x - IV.cx, dy = (it.y || 0) + s * 0.5 - IV.cy, dz = it.z - IV.cz, d = Math.hypot(dx, dy, dz);
   if (Math.hypot(dx, dz) < Math.max(45, s * 3) && Math.abs(dy) < 60) return true; // sát người chơi (cùng tầng): luôn vẽ
-  return (dx * IV.ax + dy * IV.ay + dz * IV.az) / d > Math.cos(Math.min(Math.PI * 0.95, IV.half + Math.atan(s / d)));
+  return (dx * IV.ax + dy * IV.ay + dz * IV.az) / d > Math.cos(Math.min(Math.PI * 0.95, IV.half + Math.atan(s * 0.6 / d)));
 };
 function tickInstances(px, pz) {
   IV.px = px; IV.pz = pz;
