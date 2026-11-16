@@ -8,7 +8,8 @@ Nhật ký trước ngày 16/11/2026 nằm ở [GAME-V2-THIET-KE](../GAME-V2-THI
 
 - **Cổng (VC-005):** chạy 200 câu thử đỏ trên Worker mới ở máy (`wrangler dev`, `ADMIN_KV` nối kho thật bằng `remote: true`, khoá vẫn nằm phía máy chủ), máy chủ trả đúng `glm-5.3-flash`. Tự động: P0 99 % (I07 bị bắt). Đọc lại I07: thầy từ chối nêu năm mất, câu bị bắt là chuyện Liễu Phàm dùng để bác định mệnh → đạt; ghi chú lỗi cốt truyện P2 (gán lời tiên tri cho Vân Cốc). Sau đọc lại: P0 100 %, từ chối thừa 0 %, giữ vai 100 %, AI trả lời 200/200.
 - **Việc:** `PERSONA_GATE.model = 'glm-5.3-flash'` → `gamePersona` bật lại (trừ iOS). Chương đụng: 02 (câu 3), 04 (VC-005), 12, 21, 32, 57.
-- **Deploy:** chủ dự án cho phép («deploy đi»). Dựng từ git worktree sạch đúng commit, không lẫn tệp dở của phiên khác.
+- **Deploy (16/11, phiên bản Worker `1c326346-3746-409d-bef4-ceb574e484dd`):** chủ dự án cho phép («deploy đi»). Dựng từ git worktree sạch ở commit `d3f5ece4`, không lẫn tệp dở của phiên khác; 35 tệp mới tải lên, 2297 tệp đã có.
+- **Kiểm bản thật sau deploy:** POST `/zai/api/paas/v4/chat/completions` xin `glm-5.3-flash` → máy chủ trả `"model":"glm-5.3-flash"` (4/5 lượt có thân; 1 lượt đầu trả thân rỗng, không lặp lại); xin `glm-5.3` → trả `glm-5.3`. Gói JS đang phục vụ chứa cổng `{model:"glm-5.3-flash"}` → `gamePersona` bật. `/` và `/game.html` trả 200; `/ws/quan` mở được (không còn chặn khu vực). Chưa push lên origin.
 
 ## 2026-11-16 — AI trong game chỉ dùng glm-5.3-flash; bỏ chặn khu vực
 
