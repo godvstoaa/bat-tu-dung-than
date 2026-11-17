@@ -243,10 +243,17 @@ Nguồn do agent nghiên cứu ngày 2026-11-17 thu thập. Mã màu (hex) là �
 - Lúc đầu 3.319 lệnh vẽ, chỉ 24 fps. Sau khi gộp lưới theo vật liệu và thêm bản gộp cả lầu / cả sảnh khi đứng ngoài, còn khoảng 100 lệnh vẽ đang hiện, đạt **56 fps** (Quân Thiên, Chromium headless, d3d11).
 - **Lệch §8:** con số 250–420 lưới mà script đếm có cả bản từng tầng / từng sảnh đang ẩn. Ngân sách 90 lệnh vẽ áp cho lưới đang hiện.
 
+**Deploy (2026-11-17):**
+- Phiên bản Worker `2abadd8d-c227-4a53-9ff0-4b163a9250d3`, build từ commit `dbc0aada` trong worktree sạch (không kèm thay đổi dở của phiên khác).
+- Trước khi deploy:
+  - 6 bộ test Node đạt trên bản sạch;
+  - bản build chạy `vite preview` không lỗi.
+- Bản thật: vào «Địa điểm» là tới cổng Quân Thiên Phủ mới, có kết nối máy chủ, không lỗi trang (`output/tienphu-after/production-heaven.png`).
+
 ## 10. Goal phát triển (tự theo đuổi)
 
 - **G-TP1 · Va chạm đúng — ĐẠT 2026-11-17** (probe lớn nhất 1,54 %, test leo thang đạt ở 9 lầu). Bước kế: chạy probe cho cả 9 phủ sau mỗi thay đổi hình; hạ phần lọt do cành cây thấp.
 - **G-TP2 · Nhận diện 9 phong cách** (xong khi ảnh cổng của 9 phủ đặt cạnh nhau phân biệt được ngay). Bước kế: bổ sung chi tiết đặc trưng còn thiếu theo ảnh, ví dụ cá shachi, dải pema, rãnh khía Qutb.
 - **G-TP3 · Hiệu năng** (xong khi ≥ 45 fps ở mid trong phủ). Bước kế: đo `frameStats`, gộp thêm hoặc instancing chỗ nào vượt ngân sách §8.
-- **G-TP4 · Lưu tuỳ biến lên máy chủ** (xong khi trường `o` lưu và đọc lại được qua `est_save` / `est_get`). Cần deploy worker, việc này phải hỏi chủ dự án.
+- **G-TP4 · Lưu tuỳ biến lên máy chủ — đã deploy 2026-11-17.** Trường `o` lưu qua `est_save` và đọc lại qua `est_get`. Chưa kiểm vòng tròn bằng một tài khoản thật sở hữu tiên phủ; bước kế là kiểm khi có người mua.
 - **G-TP5 · Sau khi đạt G-TP1 – G-TP3:** NPC theo tầng (quản gia ở Đại Sảnh, thị nữ ở Trà Thất), và nhạc hoặc âm thanh nền riêng cho từng phong cách.
