@@ -13,6 +13,7 @@ import { CELL, cellKey, platformTop, pitAt } from '../obstacles.js';
 
 const V0 = new THREE.Vector3(), V1 = new THREE.Vector3(), V2 = new THREE.Vector3();
 const cellOf = (v) => Math.floor(v / CELL);
+const E = CELL / 2 - 0.01, CORNERS = [[0, 0], [E, E], [-E, E], [E, -E], [-E, -E], [E, 0], [-E, 0], [0, E], [0, -E]]; // tâm, 4 góc, 4 giữa cạnh ô
 
 function addRange(map, i, j, y0, y1) {
   const k = cellKey(i, j); let a = map.get(k);
@@ -38,9 +39,13 @@ function rasterTri(map, a, b, c) {
     if (best < 1e-4) { addRange(map, cellOf(a.x), cellOf(a.z), ymin, ymax); return; }
     const dx = (Q.x - P.x) / best, dz = (Q.z - P.z) / best;
     const U = pts.map((p) => (p.x - P.x) * dx + (p.z - P.z) * dz);
-    const steps = Math.max(1, Math.ceil(best / 0.2));
-    for (let s = 0; s <= steps; s++) {
-      const u = (best * s) / steps;
+    // mẫu dọc u: mỗi ≤ 0,2 m + ĐÚNG vị trí u của 3 đỉnh. Chiều cao tam giác theo u tuyến tính từng khúc,
+    // lớn nhất tại một đỉnh — trước đây chỉ lấy hai đầu mút (nơi tam giác nhọn về một điểm) nên tam giác hẹp < 0,2 m (thành trụ
+    // nhỏ, chấn song, chân cột mảnh, thân cây proxy r 0,2) chỉ ra khoảng cao suy biến [0,0] / [h,h] → mất hẳn vật cản.
+    const steps = Math.max(1, Math.ceil(best / 0.2)), us = [];
+    for (let s = 0; s <= steps; s++) us.push((best * s) / steps);
+    for (const v of U) if (v > 0 && v < best) us.push(v); // (thử chỉ khi 1 bước: trụ r 0,4 m mất ô mép — giữ cho mọi tam giác, chi phí không đáng kể)
+    for (const u of us) {
       // giao đường đứng u với 3 cạnh tam giác trong mặt (u, y)
       let lo = Infinity, hi = -Infinity;
       for (const [i, j] of [[0, 1], [1, 2], [0, 2]]) {
@@ -83,10 +88,14 @@ export function* voxelJob(roots, out, { budget = 12000, skip2D = () => false } =
   const raw = new Map();
   let work = 0;
   for (const root of roots) {
-    root.updateMatrixWorld(true);
+    // updateWorldMatrix(cha = true): tính cả nhóm phủ / cảnh phía trên. updateMatrixWorld(true) cũ dùng matrixWorld của cha
+    // CÒN CŨ (nhóm phủ vừa thêm, chưa qua lượt vẽ nào = đơn vị) → loạt lưới đầu (tường, lầu cổng, cổng phụ) bị raster ở toạ độ
+    // CỤC BỘ: cổng 9 phủ không chặn (đi xuyên cột cổng) + «tường vô hình» rơi quanh gốc thế giới (giữa thành).
+    root.updateWorldMatrix(true, true);
     const meshes = [];
     root.traverse((o) => { if ((o.isMesh || o.isInstancedMesh) && !o.userData.noCollide) { let p = o, skip = false; while (p) { if (p.userData?.noCollide) { skip = true; break; } p = p.parent; } if (!skip) meshes.push(o); } });
     for (const o of meshes) {
+      o.updateWorldMatrix(true, false); // job chạy qua nhiều khung: nhóm có thể vừa đổi vị trí — đọc ma trận mới nhất
       const g = o.geometry, pos = g.attributes.position, idx = g.index;
       const inst = o.isInstancedMesh ? o.count : 1, IM = new THREE.Matrix4(), W = new THREE.Matrix4();
       for (let n = 0; n < inst; n++) {
@@ -110,8 +119,18 @@ export function* voxelJob(roots, out, { budget = 12000, skip2D = () => false } =
     for (let q = 0; q < ranges.length; q += 2) {
       const y0 = ranges[q], y1 = ranges[q + 1];
       if (y1 - y0 < 0.01 && y1 < 0.08) continue; // vệt sát mặt đảo
-      const top = platformTop(cx, cz, y1 + 0.05);
-      if (top != null && Math.abs(top - y1) < 0.06) continue; // thân của chính nền đi được ở ô này
+      // thân của chính nền đi được ở ô này: khoảng không vượt mặt nền CAO NHẤT trong ô (tâm, góc, giữa cạnh).
+      // (trước: chỉ so với nền ở TÂM ô ±6 cm → ô 0,5 m chứa hai bậc sâu 0,34 m thành «khối đặc» — kẹt chân bậc cổng / thềm)
+      // Hỏi tâm trước; 8 điểm phụ chỉ khi khoảng nằm THẤP (≤ 1 m trên nền tâm ô — ca bậc thang): hỏi 9 điểm cho mọi khoảng
+      // làm job voxel 1 s → 8–14 s CPU (đo $TEMP/tpg/buildcpu.mjs 2026-11-17)
+      const c0 = platformTop(cx, cz, y1 + 0.05);
+      if (c0 != null && y1 <= c0 + 0.06) continue;
+      // (đã thử chỉ hỏi khi đỉnh ≥ nền + 0,3 và đệm điểm biên dùng chung giữa các ô: CPU không giảm đáng kể mà mất 1 lối cổng / 3 món đồ — bỏ)
+      if (y1 - (c0 ?? 0) < 1.0) {
+        let top = c0;
+        for (let c = 1; c < CORNERS.length; c++) { const t2 = platformTop(cx + CORNERS[c][0], cz + CORNERS[c][1], y1 + 0.05); if (t2 != null && (top == null || t2 > top)) top = t2; }
+        if (top != null && y1 <= top + 0.06) continue;
+      }
       keep.push(y0, y1);
     }
     if (!keep.length) continue;

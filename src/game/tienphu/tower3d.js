@@ -12,16 +12,19 @@ import { uvMeters, boxAt, cylAt, polyPrism, polySlab, skirt, pyramidRoof, railPo
 import { themeFurniture } from './themes.js';
 
 /** gom geometry theo khoá vật liệu → một Mesh mỗi vật liệu */
+const PROXY_MAT = new THREE.MeshBasicMaterial({ visible: false });
 export class Acc {
   constructor() { this.m = new Map(); }
   add(key, ...geos) { if (!this.m.has(key)) this.m.set(key, []); for (const g of geos.flat()) if (g) this.m.get(key).push(g); return this; }
   build(M, { shadow = true, name = '' } = {}) {
     const grp = new THREE.Group(); grp.name = name;
     for (const [key, list] of this.m) {
-      if (!list.length || !M[key]) continue;
+      if (!list.length || !(M[key] || key === 'proxy')) continue;
       const norm = list.map((g) => { let q = g.index ? g.toNonIndexed() : g; for (const k of Object.keys(q.attributes)) if (!['position', 'normal', 'uv'].includes(k)) q.deleteAttribute(k); if (!q.attributes.uv) q.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(q.attributes.position.count * 2), 2)); if (!q.attributes.normal) q.computeVertexNormals(); return q; });
       const geo = mergeGeometries(norm, false); list.forEach((g) => g.dispose()); norm.forEach((g) => g.dispose());
       if (!geo) continue;
+      // 'proxy': khối va chạm ẩn của đồ GLB (tienphu/props.js, flora.js) — voxel.js đọc mọi lưới kể cả ẩn; không vẽ, không gộp (mergeAll bỏ)
+      if (key === 'proxy') { const mesh = new THREE.Mesh(geo, PROXY_MAT); mesh.visible = false; mesh.castShadow = false; mesh.userData.proxy = true; mesh.userData.matKey = key; grp.add(mesh); continue; }
       const mesh = new THREE.Mesh(geo, M[key]); mesh.castShadow = shadow && key !== 'beam2' && key !== 'glass'; mesh.receiveShadow = true; mesh.userData.matKey = key;
       grp.add(mesh);
     }
@@ -37,7 +40,7 @@ export function mergeAll(group, { dedupe = false } = {}) {
   group.updateMatrixWorld(true);
   const inv = new THREE.Matrix4().copy(group.matrixWorld).invert(), buckets = new Map(), victims = [];
   group.traverse((o) => {
-    if (!o.isMesh || o.isInstancedMesh || o.isSkinnedMesh || Array.isArray(o.material) || o.userData.dynamic) return;
+    if (!o.isMesh || o.isInstancedMesh || o.isSkinnedMesh || Array.isArray(o.material) || o.userData.dynamic || o.userData.proxy) return;
     let q = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
     q.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld));
     for (const k of Object.keys(q.attributes)) if (!['position', 'normal', 'uv'].includes(k)) q.deleteAttribute(k);
@@ -59,7 +62,7 @@ export function mergeAll(group, { dedupe = false } = {}) {
  * spec: towerSpec(st) · st: phong cách · M: tpMats · themes: [10 chỉ số chủ đề]
  * Trả { root, floors: [{ g, shell }] (11 phần tử: 10 tầng + Vọng Đài), column, podium }
  */
-export function buildTower(spec, st, M, themes) {
+export function buildTower(spec, st, M, themes, propsOf = null) { // propsOf(k) → { add(id,…), full } | null — đồ GLB tầng k (tienphu/props.js)
   const T = st.tower, n = spec.n, root = new THREE.Group(); root.name = 'tower';
   const floors = [];
   // ---------------- thềm
@@ -148,7 +151,7 @@ export function buildTower(spec, st, M, themes) {
       crown(acc, spec, st, M, Y, a);
     }
     // đồ bài trí theo chủ đề tầng (đổi được — chủ phủ)
-    if (!deck) themeFurniture(acc, spec, k, themes ? themes[k] : k, st);
+    if (!deck) { const ps = propsOf?.(k); if (ps) { acc.prop = (...a) => ps.add(...a); acc.full = ps.full; } themeFurniture(acc, spec, k, themes ? themes[k] : k, st); delete acc.prop; }
     const g = acc.build(M, { name: `floor${k}` }), shell = sh.build(M, { name: `shell${k}` });
     for (const o of shell.children) { o.material = o.material.clone(); o.material.transparent = true; }
     const fg = new THREE.Group(); fg.name = `tf${k}`; fg.add(g, shell); root.add(fg);

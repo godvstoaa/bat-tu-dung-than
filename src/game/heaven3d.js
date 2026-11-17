@@ -76,9 +76,16 @@ export function createHeaven(scene, { citizens = null } = {}) {
     ['Huyền Thiên phía Bắc thâm trầm, người mệnh Thủy ở đó yên giấc lắm.', 'Hạo Thiên phía Tây mái bạc, khí Kim thanh sạch.'],
   ];
   const tienNpcs = () => {
-    const { cx, cz } = HEAVEN, R = 265, out = [], names = ['Thanh Y Đồng Tử', 'Kim Đồng', 'Ngọc Nữ', 'Bích Vân Tiên Nữ', 'Hạc Đồng', 'Tử Vân Tiên Nữ', 'Lam Hà Đồng Tử', 'Hồng Liên Tiên Nữ'];
-    const ring = (a0) => Array.from({ length: 9 }, (_, k) => { const a = a0 + k * (Math.PI / 4); const c = Math.cos(a), n = Math.sin(a), m = Math.max(Math.abs(c), Math.abs(n)); return { x: cx + (c / m) * R, z: cz + (n / m) * R }; });
-    for (let i = 0; i < 8; i++) { const P = ring(i * 0.79); out.push({ id: `tien_${i}`, name: names[i], role: i % 2 ? 'Tiên nữ' : 'Tiên đồng', look: i % 2 ? 'hero_f' : 'hero_m', gua: 'qian', wx: '金', lines: TIEN_LINES[i % TIEN_LINES.length], x: P[0].x, z: P[0].z, path: i % 3 === 2 ? null : P, near: 60 }); }
+    // Quảng trường trước Quân Thiên Phủ: tường phủ ở cz + 260, mép đảo cz + 340, Nam Thiên Môn cz + 332, điểm đến cz + 305 (trục x = cx).
+    // Lối dạo chạy NGANG quảng trường, chừa trục giữa (cầu Thiên Thê / điểm đến) và lầu cổng phủ (cz + 260 … 272) — vòng cũ R 265 quanh
+    // tường đâm xuyên lầu cổng từ khi phủ nới 520 m. Hai người đứng hầu hai bên cổng phủ, ngoài lầu cổng.
+    const { cx, cz } = HEAVEN, out = [], names = ['Thanh Y Đồng Tử', 'Kim Đồng', 'Ngọc Nữ', 'Bích Vân Tiên Nữ', 'Hạc Đồng', 'Tử Vân Tiên Nữ', 'Lam Hà Đồng Tử', 'Hồng Liên Tiên Nữ'];
+    const P = (pts) => pts.map(([x, z]) => ({ x: cx + x, z: cz + z }));
+    const ROUTES = [
+      P([[18, 288], [140, 288]]), P([[-18, 296], [-150, 296]]), P([[24, 278]]), P([[34, 318], [210, 318]]),
+      P([[-60, 302], [-240, 302], [-240, 284]]), P([[-24, 278]]), P([[60, 304], [240, 304], [240, 284]]), P([[-34, 322], [-200, 322]]),
+    ];
+    for (let i = 0; i < 8; i++) { const R = ROUTES[i]; out.push({ id: `tien_${i}`, name: names[i], role: i % 2 ? 'Tiên nữ' : 'Tiên đồng', look: i % 2 ? 'hero_f' : 'hero_m', gua: 'qian', wx: '金', lines: TIEN_LINES[i % TIEN_LINES.length], x: R[0].x, z: R[0].z, path: R.length > 1 ? R : null, face: R.length > 1 ? undefined : 0, near: 60, outdoor: true }); }
     return out;
   };
   let tienOn = false;

@@ -243,7 +243,7 @@ export const lazyLodStats = () => ({ n: LAZY.length, mid: LAZY.filter((l) => l.h
  * Nhân bản tức thời: mỗi mesh con của GLB → 1 InstancedMesh (đủ cho nhà, cây lặp hàng chục lần).
  * items: [{ x, y, z, ry, s }] — s = kích thước đích theo `fitKey`.
  */
-export async function instanceModel(parent, id, items, { fitKey = 'height' } = {}) {
+export async function instanceModel(parent, id, items, { fitKey = 'height', cut = null } = {}) { // cut: tầm vẽ (m) — vật nhỏ (hoa cỏ) cắt sớm
   // model thư viện (80k+) nhân bản → bản xa nhẹ (.far / .lod) lúc dựng. Ít bản (≤ 4: đình, tháp, vài cây cảnh)
   // thì khi người chơi tới gần mới nạp thêm bản giữa .mid (20k) và thay vào (2026-11-10: trước đây nạp .mid ngay
   // trên màn nạp — ~5 MB cho các công trình chưa chắc đã nhìn thấy gần).
@@ -284,7 +284,7 @@ export async function instanceModel(parent, id, items, { fitKey = 'height' } = {
   // nhân bản rải rộng (hàng cây, cổng phường, đèn…): chỉ vẽ các bản trong tầm — bản sao ngoài tầm vẫn tốn
   // cả lượt vẽ lẫn lượt bóng vì khung bao của InstancedMesh phủ hết. Va chạm đã cắt lát lúc dựng (không phụ thuộc).
   const sMax = Math.max(...items.map((it) => it.s));
-  const E = { items, sets, lo: sets, hi: null, far, shadow: shadowSets, group, cut: Math.max(sMax * 24, 260), farD: Math.max(sMax * 6, 70), lx: Infinity, lz: Infinity, cull: items.length > 3 || !!far || !!shadowSets };
+  const E = { items, sets, lo: sets, hi: null, far, shadow: shadowSets, group, cut: cut ?? Math.max(sMax * 24, 260), farD: Math.max(sMax * 6, 70), lx: Infinity, lz: Infinity, cull: items.length > 3 || !!far || !!shadowSets };
   if (hasLod(id) && items.length <= 4) {
     const near = Math.max(Math.max(...items.map((it) => it.s)) * 4, 70);
     E.upgrade = { near, busy: false, done: false, run: async () => {
@@ -349,6 +349,11 @@ function buildInstanced(g, items, fitKey, group, name = '') {
   return sets;
 }
 const INST = [];
+/** bỏ theo dõi mọi bộ nhân bản nằm trong root (công trình dựng lại / dỡ đi — tiên phủ đổi tuỳ biến): không còn tick bộ đã bỏ */
+export function dropInstances(root) {
+  const mine = new Set(); root.traverse((o) => mine.add(o));
+  for (let i = INST.length - 1; i >= 0; i--) if (mine.has(INST[i].group)) INST.splice(i, 1);
+}
 // cắt theo hướng nhìn (như cityblocks3d.cityHouses.view — docs/DOHOA-MANIFEST.md §3.2): bản sao ngoài hình nón nhìn
 // (nửa góc ngang + 18°) và xa hơn max(45 m, 3 × cỡ) không vẽ; bóng giữ vòng 80 m. viewInstances gọi mỗi khung (landmarks.view).
 const IV = { on: false, cx: 0, cy: 0, cz: 0, ax: 0, ay: 0, az: 1, half: Math.PI, px: 0, pz: 0 };

@@ -22,7 +22,7 @@ import { FH, LEVELS } from './tienphu/tower.js';
 import { FLOOR_THEMES } from './tienphu/styles.js';
 import { decodeOpts } from './tienphu/custom.js';
 import { addLight, LIGHTS } from './lights.js';
-import { placeModel } from './assets.js';
+import { placeModel, dropInstances } from './assets.js';
 import { setOpenSpots } from './rooms.js';
 import { makeZoneCtx, furnishZone } from './interior-build.js';
 
@@ -87,6 +87,9 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
       if (r.done) {
         rec.job = null; const out = r.value;
         rec.g = out.g; rec.halls = out.halls; rec.tower = out.tower; rec.hallsWhole = out.hallsWhole;
+        // đồ GLB (docs/TIEN-PHU-DOHOA-MANIFEST.md): ngoài trời luôn hiện · sảnh hiện khi trong 40 m · tầng lầu hiện khi đứng tầng đó / tầng trên
+        rec.flora = out.flora; rec.props = out.props;
+        if (rec.props) { rec.props.outdoor.build(grp); for (const ps of rec.props.halls) { ps.group.visible = false; ps.build(grp); } rec.props.floors.forEach((ps) => { if (!ps) return; ps.group.visible = false; ps.build(grp); }); }
         setHidden(rec.m, true); grp.add(rec.g);
         const m = rec.m, main = m.layout.buildings[0];
         for (const [x, y, z] of [[-6, 5, m.D / 2 + 3], [6, 5, m.D / 2 + 3], [0, 4, main.z + main.d / 2 + 6], [0, m.tp.tower.spec.podium.y + 4, m.tp.tower.z + m.tp.tower.spec.podium.a + 2]]) { const p = m.toWorld(x, z); rec.lights.push(addLight(p.x, y, p.z, { color: '#ffb35c', power: 1 })); }
@@ -100,7 +103,7 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
     }
     while (!rec.job && rec.vox?.job && performance.now() - t0 < budgetMs) {
       const r = rec.vox.job.next();
-      if (r.done) { rec.vox.job = null; rec.vox.stats = setVoxelLayer(`vox:${rec.m.h}`, rec.vox.out.cells3, rec.vox.out.cells2); rec.vox.out = null; }
+      if (r.done) { rec.vox.job = null; rec.vox.stats = setVoxelLayer(`vox:${rec.m.h}`, rec.vox.out.cells3, rec.vox.out.cells2); rec.vox.dbg = globalThis.__voxDebug ? rec.vox.out : null; rec.vox.out = null; } // __voxDebug: script kiểm giữ lại bản ô
     }
   }
   function build(m) {
@@ -148,6 +151,7 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
     setHidden(rec.m, false);
     if (rec.tien) { setVoxelLayer(`vox:${h}`, new Map(), new Set()); if (!rec.g) { built.delete(h); return; } }
     unfurnish(rec);
+    if (rec.props) for (const ps of [rec.props.outdoor, ...rec.props.halls, ...rec.props.floors]) if (ps) { dropInstances(ps.group); grp.remove(ps.group); }
     grp.remove(rec.g);
     rec.g.traverse((o) => { if (o.isMesh) o.geometry?.dispose?.(); });
     for (const hl of rec.halls) for (const mt of hl.mats || []) mt.dispose();
@@ -186,7 +190,7 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
     }
     setOpenSpots(`est:${m.h}`, [gateSpot(m), ...useSpots, ...extra]);
     const npcs = mansionNpcs(m, info);
-    for (const n of npcs) citizens?.add?.(n);
+    for (const n of npcs) citizens?.add?.({ ...n, outdoor: true }); // gia nhân trong sân phủ: tự kiểm vật cản (citizens › settle)
     rec.furn = { ctxs, npcs };
   }
   let tick = 0;
@@ -199,6 +203,11 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
       for (const rec of built.values()) if (rec.tien && (rec.job || rec.vox?.job)) { stepTien(rec, 6); break; }
       // lầu 10 tầng: ở trong lầu thì ẩn các tầng trên, vách tầng đang đứng mờ đi (nhìn như nhà búp bê)
       for (const rec of built.values()) if (rec.tower) towerView(rec, px, pz, py, dt);
+      for (const rec of built.values()) if (rec.flora || rec.props) {
+        const l = toLocal(rec.m, px, pz);
+        rec.flora?.update(l.x, l.z);
+        if (rec.props) for (const ps of rec.props.halls) ps.group.visible = Math.hypot(l.x - ps.at.x, l.z - ps.at.z) < ps.at.r * 0.6 + 6; // trong / sát cửa sảnh: ngoài đó vỏ sảnh gộp (đặc) che kín đồ — vẽ thừa ~150k tam giác + bóng
+      }
       tick -= dt;
       if (tick <= 0) {
         tick = 0.4;
@@ -280,6 +289,7 @@ function towerView(rec, px, pz, py, dt) {
     const goal = i === k && k < LEVELS ? 0.22 : 1;
     for (const o of fl.shell.children) { const mt = o.material; if (Math.abs(mt.opacity - goal) < 0.01) continue; mt.opacity += (goal - mt.opacity) * Math.min(1, dt * 7); mt.depthWrite = mt.opacity > 0.95; }
   });
+  rec.props?.floors.forEach((ps, i) => { if (ps) ps.group.visible = k >= 0 && (i === k || i === k - 1); });
   rec.floorK = k;
 }
 

@@ -155,7 +155,7 @@ function blockers(P) {
   for (const p of P.pavs) L.push({ x: p.x, z: p.z, hw: p.w / 2 + 3, hd: p.d / 2 + 3 });
   const t = P.tower.spec.podium; L.push({ x: P.tower.x, z: P.tower.z + t.run / 2, hw: t.a + 6, hd: t.a + t.run / 2 + 6 });
   for (const w of P.water) L.push(w.shape === 'ellipse' ? { x: w.x, z: w.z, rx: w.rx + 4, rz: w.rz + 4 } : { x: w.x, z: w.z, hw: w.hw + 4, hd: w.hd + 4 });
-  for (const p of P.paths) L.push({ x: p.x, z: p.z, hw: p.w / 2 + 1.2, hd: p.d / 2 + 1.2 });
+  for (const p of P.paths) L.push({ x: p.x, z: p.z, hw: p.w / 2 + 1.2, hd: p.d / 2 + 1.2, path: true });
   const k = P.rockery; L.push({ x: k.x, z: k.z + k.run / 2, hw: k.w / 2 + 3, hd: k.d / 2 + k.run / 2 + 3 });
   for (const b of P.bridges) { const sw = Math.abs(Math.sin(b.ry)) > 0.5; L.push({ x: b.x, z: b.z, hw: (sw ? b.len : b.w) / 2 + 2, hd: (sw ? b.w : b.len) / 2 + 2 }); }
   for (const b of P.beds) L.push({ x: b.x, z: b.z, hw: b.w / 2 + 1, hd: b.d / 2 + 1 });
@@ -164,6 +164,12 @@ function blockers(P) {
   if (P.moatIsle) for (const s of P.stupas) L.push({ x: s.x, z: s.z, hw: s.r + 4, hd: s.r + 4 });
   for (const g of P.gates) L.push({ x: g.x * 0.96, z: g.z * 0.96, hw: 22, hd: 22 });
   P._bl = L; return L;
+}
+/** (x, z) cục bộ còn trống (không công trình / nước / cầu / cổng / lối lát) cách m — rải hoa cỏ (estate3d, DOHOA-MANIFEST §2.2) */
+export function freeAt(P, x, z, m = 0.5) {
+  if (Math.abs(x) > HW - 3 || Math.abs(z) > HD - 3 || hit(blockers(P).filter((o) => !o.path), x, z, m)) return false; // lối kiểm riêng bên dưới (lề 0,3 m — hoa viền sát lối)
+  for (const p of P.paths) { const c = Math.cos(p.ry || 0), s = Math.sin(p.ry || 0), dx = x - p.x, dz = z - p.z; if (Math.abs(c * dx - s * dz) < p.w / 2 + 0.3 && Math.abs(s * dx + c * dz) < p.d / 2 + 0.3) return false; }
+  return true;
 }
 const hit = (L, x, z, m = 0) => L.some((o) => (o.rx ? ((x - o.x) / (o.rx + m)) ** 2 + ((z - o.z) / (o.rz + m)) ** 2 < 1 : Math.abs(x - o.x) < o.hw + m && Math.abs(z - o.z) < o.hd + m));
 function freeSpot(P, r, z0, z1, m) {
@@ -200,10 +206,23 @@ function plantTrees(P, st, r) {
 // VA CHẠM THEO ĐẶC TẢ (cục bộ phủ) — sàn / bậc / hố / hồ / tường bao / vách sảnh / giả sơn / lầu
 // ---------------------------------------------------------------------------
 /** { plats, polys, pits, pools, s2, s3, tall } — mọi toạ độ cục bộ phủ; y tuyệt đối (mặt đảo 0) */
+/** lầu cổng chính dựng bằng archkit.gateHouse (chỉ kiểu cổng 'paifang' — estate3d): kích thước bệ + bậc, dùng chung cho hình & va chạm */
+export function gateHouseSpec(P) {
+  if (P.st.gate !== 'paifang') return [];
+  const w = P.gate.w + 16.6, d = 9, ph = 0.9;
+  return [{ z: P.D / 2 - 0.5, w, d, ph, W: w + 2.4, D: d + 2.4, n: Math.max(1, Math.round(ph / 0.22)), sw: Math.min(6, w * 0.3) }];
+}
+
 export function tienCollision(P) {
   const plats = [], polys = [], pits = [], pools = [], s2 = [], s3 = [], tall = [];
   // tường bao (2D) + đỉnh leo
   for (const w of P.walls) { s2.push({ x: w.x, z: w.z, hw: w.len / 2, hd: w.t / 2, ry: w.ry }); tall.push({ x: w.x, z: w.z, hw: w.len / 2, hd: w.t / 2, ry: w.ry, top: w.h + 0.4 }); }
+  // lầu cổng kiểu bài lâu (estate3d › gateHouse w = cổng + 16,6, sâu 9, bệ 0,9 — archkit.plinth: W + 2,4, D + 2,4, 4 bậc 0,34 rộng 6):
+  // bệ là NỀN đi được (trước đây không khai → người / lính gác lún 0,9 m trong bệ, voxel coi cả bệ là khối đặc) + bậc ngoài và trong sân
+  for (const g of gateHouseSpec(P)) {
+    plats.push({ x: 0, z: g.z, w: g.W, d: g.D, ry: 0, top: g.ph, bot: -1 });
+    for (const sz of [1, -1]) for (let k = 0; k < g.n; k++) plats.push({ x: 0, z: g.z + sz * (g.D / 2 + (g.n - k - 0.5) * 0.34), w: g.sw, d: 0.36, ry: 0, top: (g.ph * (k + 1)) / g.n, bot: -1 });
+  }
   // sảnh: nền (W = w + 2,4) + bậc trước / sau (archkit.plinth: n = round(h / 0,22), sâu 0,34, rộng min(6, 0,3 w)) + vách có khe cửa 2,4
   for (const b of P.buildings) {
     const c = Math.cos(b.ry), s = Math.sin(b.ry), L = (ax, az) => ({ x: b.x + c * ax + s * az, z: b.z - s * ax + c * az });

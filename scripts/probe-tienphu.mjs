@@ -58,7 +58,7 @@ for (const h of HS) {
       else if (b && !occupied(x, y, z, 0.7)) { ghost++; if (ghosts.length < 8) ghosts.push([tag, Math.round(x * 10) / 10, Math.round(y * 10) / 10, Math.round(z * 10) / 10]); }
     };
     // mặt đất / nền một tầng (trừ thân lầu)
-    for (let a = -m.W / 2 + 1; a < m.W / 2; a += STEP) for (let b = -m.D / 2 + 1; b < m.D / 2; b += STEP) {
+    for (let a = -m.W / 2 - 8; a < m.W / 2 + 8; a += STEP) for (let b = -m.D / 2 - 8; b < m.D / 2 + 8; b += STEP) { // gồm 8 m ngoài tường: lầu cổng / cổng phụ
       const lx = a - m.tp.tower.x, lz = b - m.tp.tower.z; if (Math.abs(lx) < sp.podium.a + 1 && Math.abs(lz) < sp.podium.a + sp.podium.run + 1) continue;
       const p = m.toWorld(a, b), y = O.ground(p.x, p.z, 30); if (y < -0.2 || y > 12) continue; // lòng hồ / nóc giả sơn: bỏ
       sample(p.x, p.z, y, 'đất');

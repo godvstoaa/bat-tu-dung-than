@@ -22,13 +22,14 @@ if (await page.$('#hq-gate input[name=date]')) { const vis = await page.$eval('#
 const go = page.locator('#hq-gate button', { hasText: /Mặc phẩm phục|Bước qua cổng/ });
 await go.first().waitFor({ timeout: 30000 }); await go.first().click();
 await page.waitForFunction(() => document.getElementById('hq-loading')?.hidden, null, { timeout: 180000 });
+await page.evaluate((h) => window.__hq.renderer.setDebugHour?.(h), Number(process.env.HOUR || 10)); // khoá giờ (ảnh trước / sau cùng ánh sáng)
 await page.waitForTimeout(2000);
 const clean = () => page.evaluate(() => document.querySelectorAll('.hq-tut, .hq-digest, .hq-toast').forEach((e) => e.remove()));
 const zoom = async (n) => { await page.mouse.move(640, 360); for (let k = 0; k < Math.abs(n); k++) { await page.mouse.wheel(0, n > 0 ? 400 : -400); await page.waitForTimeout(60); } await page.waitForTimeout(800); };
 const tilt = async (dy, dx = 0) => { await page.mouse.move(640, 300); await page.mouse.down(); for (let k = 1; k <= 10; k++) await page.mouse.move(640 + (dx * k) / 10, 300 + (dy * k) / 10); await page.mouse.up(); await page.waitForTimeout(700); };
 
 for (const h of HS) {
-  const info = await page.evaluate(async (h) => { const M = await import('/src/game/mansions.js'); const m = M.estateByH(h); const sp = m.tp.tower.spec; const f = m.toWorld(m.tp.tower.x, m.tp.tower.z + sp.podium.a + sp.podium.run + 14), pad = m.toWorld(m.tp.tower.x + sp.pad.x, m.tp.tower.z + sp.pad.z + 2.5), gate = m.toWorld(0, m.D / 2 + 10); const inside = [...sp.floors.map((q) => m.toWorld(m.tp.tower.x, m.tp.tower.z + q.a - 3.2)), pad]; return { id: m.tp.st.id, name: m.name, f, pad, gate, inside, ys: [...sp.floors.map((q) => q.y), sp.deck.y] }; }, h);
+  const info = await page.evaluate(async (h) => { const M = await import('/src/game/mansions.js'); const m = M.estateByH(h); const sp = m.tp.tower.spec; const f = m.toWorld(m.tp.tower.x, m.tp.tower.z + sp.podium.a + sp.podium.run + 14), pad = m.toWorld(m.tp.tower.x + sp.pad.x, m.tp.tower.z + sp.pad.z + 2.5), gate = m.toWorld(0, m.D / 2 + 10); const inside = [...sp.floors.map((q) => m.toWorld(m.tp.tower.x, m.tp.tower.z + q.a - 3.2)), pad]; const cams = sp.floors.map((q) => { const e = m.toWorld(m.tp.tower.x + q.a * 0.55, m.tp.tower.z + q.a * 0.75), t = m.toWorld(m.tp.tower.x - q.a * 0.2, m.tp.tower.z - q.a * 0.3); return { pos: [e.x, q.y + 4.2, e.z], look: [t.x, q.y + 0.6, t.z] }; }); return { id: m.tp.st.id, name: m.name, f, pad, gate, inside, cams, ys: [...sp.floors.map((q) => q.y), sp.deck.y] }; }, h);
   console.log(`== ${h} ${info.id} ${info.name}`);
   await page.evaluate(([x, z]) => window.__hq.api.travel(x, z, 'chụp'), [info.f.x, info.f.z]);
   const t0 = Date.now();
@@ -48,6 +49,8 @@ for (const h of HS) {
     await page.evaluate(([p, y]) => { const hq = window.__hq, P = hq.player.phys || (hq.player.phys = {}); P.x = p.x; P.z = p.z; P.y3 = y + 0.05; P.vy = 0; hq.player.y3 = P.y3; const t = { x: p.x / 1.6 + 10, y: p.z / 1.6 + 7 }; hq.player.x = t.x; hq.player.y = t.y; hq.player.path = []; }, [info.inside[k], info.ys[k]]);
     await page.waitForTimeout(1800); await clean();
     await page.screenshot({ path: `${OUT}/${h}-${info.id}-f${k + 1}.png` });
+    // góc máy trong phòng (nhìn chéo cả tầng từ trên cao 4,2 m)
+    if (info.cams[k]) { await page.evaluate((v) => window.__hq.renderer.setDebugCam(v), info.cams[k]); await page.waitForTimeout(1500); await clean(); await page.screenshot({ path: `${OUT}/${h}-${info.id}-f${k + 1}-room.png` }); await page.evaluate(() => window.__hq.renderer.setDebugCam(null)); }
   }
   await page.evaluate(([x, z]) => window.__hq.api.travel(x, z, 'chụp'), [info.gate.x, info.gate.z]);
   await page.waitForTimeout(2500); await clean(); await zoom(4); await tilt(-60);

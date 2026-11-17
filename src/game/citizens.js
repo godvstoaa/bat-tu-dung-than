@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { citizenList, toWorld, guaById } from './batquai.js';
 import { createCharacter, WX_HSV } from './characters.js';
 import { rng, hashSeed } from './npc.js';
+import { blockedStatic } from './obstacles.js';
 
 const NEAR = 70, NEAR_PHO = 55, TALK = 4.5, GREET = 4.5, LABEL = 24;
 let MAX_ACTIVE = 24; // tối đa nhân vật có xương cùng lúc (máy yếu: 16 — setCitizenCap); v5.1: người đi đường rải dày quanh phố có tiệm
@@ -72,6 +73,21 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
     });
   }
 
+  // KHÔNG ĐỨNG / ĐI XUYÊN VẬT (TIEN-PHU-MANIFEST §9b): NPC ngoài trời tự kiểm chỗ đứng bằng lớp vật cản thật
+  // (đặc 2D + voxel theo tầng — lớp voxel tiên phủ nạp SAU khi NPC đã hiện, nên kiểm lại mỗi giây chứ không chỉ lúc dựng).
+  // Đứng trong cột / vách → dời ra chỗ trống gần nhất (≤ 4 m, cùng mặt nền ± 0,6 m). Khách ngồi / người trong phòng: giữ chỗ.
+  const free = (x, z) => { const y = groundY(x, z); return blockedStatic(x, z, y) ? null : y; };
+  function settle(n) {
+    const y0 = groundY(n.x, n.z);
+    n.inSolid = blockedStatic(n.x, n.z, y0);
+    if (!n.inSolid) return;
+    for (let r = 0.5; r <= 4; r += 0.5) for (let k = 0; k < 16; k++) {
+      const a = (k * Math.PI) / 8, x = n.x + Math.cos(a) * r, z = n.z + Math.sin(a) * r, y = free(x, z);
+      if (y != null && Math.abs(y - y0) < 0.6) { n.x = x; n.z = z; n.inSolid = false; n.moved = (n.moved || 0) + 1; return; }
+    }
+  }
+  const outdoor = (n) => (n.outdoor || !n.indoor) && n.pose !== 'sit'; // add() gắn indoor cho cả gia nhân phủ / tiên → họ mang outdoor: true
+
   const actors = [];
   /** Mỗi khung: w = vị trí người chơi (mét). Trả danh sách vòng chặn (actors) của NPC đang hiện. */
   function update(dt, t, w, nowMs, dayKey = '') {
@@ -85,6 +101,7 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
       if (!n.active && d < n.near && act < MAX_ACTIVE) { n.active = true; act++; dom(n); spawn(n); if (n.ch) scene.add(n.ch.obj); }
       else if (n.active && d > n.near + 15) { n.active = false; act--; if (n.ch) scene.remove(n.ch.obj); n.bark = null; hideDom(n); }
       if (!n.active) continue;
+      if (outdoor(n) && !n.moving && t >= (n.chkAt || 0)) { n.chkAt = t + 1; settle(n); }
       // đi lại: qua lại giữa các điểm lộ trình, nghỉ 3–6 s ở đầu mút; khách đứng chắn trước mặt thì dừng
       let goal = n.rest;
       if (n.path && n.path.length > 1) {
@@ -98,9 +115,13 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
             if (n.seg <= 0 || n.seg >= n.path.length - 1) { n.dirn = -n.dirn; n.wait = 3 + (hashSeed(n.id + n.round++) % 30) / 10; }
             n.moving = false;
           } else if (!ahead) {
-            const step = Math.min(L, dt * 1.05);
-            n.x += (dx / L) * step; n.z += (dz / L) * step; n.moving = true;
-            goal = Math.atan2(dx, dz);
+            const step = Math.min(L, dt * 1.05), nx = n.x + (dx / L) * step, nz = n.z + (dz / L) * step;
+            // bước kế đâm vào cột / vách / gốc cây → quay đầu về điểm vừa rời (không lách xuyên).
+            // Nhìn trước 0,45 m, kiểm mỗi 0,2 s (đi 1,05 m/s → ≤ 0,21 m giữa hai lần kiểm < tầm nhìn trước)
+            const look = n.x + (dx / L) * 0.45, lookZ = n.z + (dz / L) * 0.45;
+            if (outdoor(n) && t >= (n.stepAt || 0) && (n.stepAt = t + 0.2) && blockedStatic(look, lookZ, groundY(look, lookZ)) && !blockedStatic(n.x, n.z, groundY(n.x, n.z))) {
+              n.seg += n.dirn; n.dirn = -n.dirn; n.wait = 1.5; n.moving = false; n.bumped = (n.bumped || 0) + 1;
+            } else { n.x = nx; n.z = nz; n.moving = true; goal = Math.atan2(dx, dz); }
           } else n.moving = false;
         }
         if (!n.moving && d < GREET + 1) goal = Math.atan2(w.x - n.x, w.z - n.z);
@@ -145,5 +166,7 @@ export function createCitizens({ scene, layer, groundY, extra = [] }) {
     }
   }
 
-  return { list, update, ui, add, remove, get activeCount() { return list.filter((n) => n.active && n.ch).length; } };
+  /** gỡ lỗi / kiểm (scripts/probe-npc.mjs): chỗ (x, z) có vật cản thật ở tầm thân người trên mặt nền không */
+  const blockedAtGround = (x, z) => blockedStatic(x, z, groundY(x, z));
+  return { list, update, ui, add, remove, blockedAtGround, get activeCount() { return list.filter((n) => n.active && n.ch).length; } };
 }

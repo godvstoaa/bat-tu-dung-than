@@ -250,6 +250,30 @@ Nguồn do agent nghiên cứu ngày 2026-11-17 thu thập. Mã màu (hex) là �
   - bản build chạy `vite preview` không lỗi.
 - Bản thật: vào «Địa điểm» là tới cổng Quân Thiên Phủ mới, có kết nối máy chủ, không lỗi trang (`output/tienphu-after/production-heaven.png`).
 
+## 9c. Sửa đi xuyên lần 2 (2026-11-17, sau phản hồi người chơi kèm ảnh cổng Quân Thiên)
+
+Người chơi thấy NPC «Ngọc Nữ» đứng trong cột lầu cổng và hai lính gác như đang quỳ. Đo lại cho ra 4 lỗi thật, probe cũ bỏ sót cả 4:
+
+| Lỗi | Nguyên nhân | Sửa |
+|---|---|---|
+| Lầu cổng 9 phủ không chặn gì: đi xuyên cột, cánh cửa | `voxel.js` gọi `updateMatrixWorld(true)` trên nhóm `solid` khi nhóm phủ chưa có ma trận thế giới. Loạt lưới đầu (tường, lầu cổng, cổng phụ) bị raster ở toạ độ cục bộ, rơi thành «tường vô hình» quanh gốc thế giới. | `updateWorldMatrix(true, true)` cho gốc, cập nhật lại từng mesh trước khi đọc. Ô voxel giờ nằm đúng trong ±261,8 m cục bộ. |
+| Bệ lầu cổng (0,9 m) không khai là nền: người và lính gác lún 0,9 m | `tienCollision` thiếu bệ và bậc của `gateHouse` | `gateHouseSpec(P)` dùng chung cho hình và va chạm: bệ, 4 bậc ngoài, 4 bậc trong sân (bậc trong là phần dựng mới). |
+| Kẹt ở chân bậc (sau khi có voxel cổng) | Bộ lọc «thân nền» chỉ so mặt nền ở tâm ô ±6 cm. Ô 0,5 m chứa 2 bậc sâu 0,34 m thành khối đặc. | So với mặt nền cao nhất trong ô, lấy ở 9 điểm (tâm, 4 góc, 4 giữa cạnh). |
+| NPC đứng hoặc đi xuyên vật | `citizens.js` đi thẳng theo lộ trình, không hỏi vật cản. Vòng tiên R 265 đâm qua lầu cổng từ khi phủ nới 520 m. | `blockedStatic` (vật cản bỏ vòng nhân vật). NPC ngoài trời mỗi giây tự kiểm chỗ đứng, kẹt thì dời ≤ 4 m; nhìn trước 0,45 m, gặp vật thì quay đầu. Lộ trình tiên dời ra quảng trường cz + 278…322. |
+
+**Kết quả đo:**
+- `scripts/probe-gates.mjs`: **36/36** lối cổng (4 cổng × 9 phủ) đi qua được, mặt nền không nhảy quá 0,3 m. Má cổng hai bên chặn 2/2.
+- Đi bộ thật bằng phím qua cổng chính Quân Thiên: lên bệ 0,9 m, qua lối, xuống sân tới z = 224.
+- `scripts/probe-npc.mjs`: 1.008 mẫu NPC ở cổng và sân 9 phủ, **xuyên 0**.
+- `scripts/probe-tienphu.mjs`, vùng mẫu nới thêm 8 m ngoài tường (gồm lầu cổng): lọt lớn nhất **1,72 %**, đạt mục tiêu ≤ 2 %. Phần còn lọt chủ yếu là cành cây thấp.
+- «Tường vô hình» ghi được chủ yếu là tán cây có đáy cao 1,68 m (ngang đầu người: chặn là đúng) và chính tường bao (probe bỏ tam giác > 400 ô). Không phát sinh từ bản sửa này.
+- Test Node: tienphu 18/18, heaven 4, mansion 8, estate 10, motion 10, batquai 69, homes 10 — đều đạt.
+
+**Bài học cho probe:**
+- Vùng mẫu phải phủ cả công trình ngoài tường (lầu cổng).
+- Phải có phép đi bộ thật qua mọi lối vào.
+- Phải kiểm cả NPC, không chỉ người chơi.
+
 ## 10. Goal phát triển (tự theo đuổi)
 
 - **G-TP1 · Va chạm đúng — ĐẠT 2026-11-17** (probe lớn nhất 1,54 %, test leo thang đạt ở 9 lầu). Bước kế: chạy probe cho cả 9 phủ sau mỗi thay đổi hình; hạ phần lọt do cành cây thấp.

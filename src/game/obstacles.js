@@ -167,6 +167,11 @@ export function blockedByBuilding(x, z, y = null) {
   if (y != null && (s3.size || dyn3.size)) for (const [dx, dz] of BODY) if (solid3At(x + dx, z + dz, y)) return true;
   return false;
 }
+/** như blockedByBuilding nhưng BỎ vòng chặn nhân vật — NPC tự kiểm chỗ đứng / bước kế (không tự chặn chính mình) */
+export function blockedStatic(x, z, y = null) {
+  const a = actors; actors = [];
+  try { return blockedByBuilding(x, z, y); } finally { actors = a; }
+}
 
 // ---------------------------------------------------------------------------
 // VẬT CẢN THEO TẦNG (tiên phủ — toà 10 tầng, docs/TIEN-PHU-MANIFEST.md §4): ô 0,5 m mang khoảng cao [y0, y1].
