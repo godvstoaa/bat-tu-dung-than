@@ -970,7 +970,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // trên mặt đất / dưới nước: cao độ thật p.y3 của motion.js (groundY kẹp đáy nước ở −7,2 → người bơi trên sông sâu
     // bị vẽ cao vài mét); ngự kiếm cũng dùng y3 thật — main.js đồng bộ y3 mỗi bước bay (§5.5);
     // trong phòng nội thất: mặt đất + độ cao như cũ
-    const realY = p.y3 != null && w.x <= T.ROOM_X0 - 40;
+    const realY = p.y3 != null && (w.x <= T.ROOM_X0 - 40 || inHeaven(w.x, w.z)); // vùng trời: vật lý thật (tiên phủ nhiều tầng — TIEN-PHU-MANIFEST §4)
     // bơi: người nằm sấp trên mặt nước khi bơi, đứng thẳng đạp nước khi nổi yên
     avState.swimK = (avState.swimK || 0) + ((p.swim ? (avState.walk > 0.25 ? 1 : 0.25) : 0) - (avState.swimK || 0)) * Math.min(1, dt * 4);
     // trên thuyền: thuyền nổi theo mặt sóng, người đứng / ngồi trên sàn thuyền
@@ -1066,7 +1066,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     if (interiors.root.visible) interiors.ensure(); // dựng lười lần đầu tới dải phòng
     interiors.update(dt);
     roomsB.update(w.x, w.z, dt);
-    span('f:mansions', () => mansionsB.update(w.x, w.z, dt));
+    span('f:mansions', () => mansionsB.update(w.x, w.z, dt, p.y3 ?? null));
     river.update(dt, t);
     const upSky = inHeaven(w.x, w.z); heaven?.update?.(w.x, w.z, dt, camera); // trên trời: không vẽ Thiên Lao / mỏ / điện thờ ở dải phòng
     prison.setVisible(w.x > T.ROOM_X0 - 40 && !upSky); prison.update(dt);
@@ -1104,11 +1104,11 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // trong điện: camera không xuyên tường / trần
     const inRoom = roomAt(cam.target.x, cam.target.z);
     // trong gian biệt phủ: camera kẹp trong lòng gian (vỏ gian đã mờ — mansion3d.update), không cao quá mái hiên
-    const inHall = !inRoom && mansionsB.hallAt(cam.target.x, cam.target.z);
+    const inHall = !inRoom && mansionsB.hallAt(cam.target.x, cam.target.z, cam.target.y - 1.2);
     // camera không chui vào mái / thân nhà (docs/DOHOA-MANIFEST.md G-8.3 — ảnh phố: cả màn hình là mặt trong mái đen):
     // dò 14 điểm từ đầu nhân vật ra camera, gặp điểm đầu tiên nằm dưới đỉnh vật cao (nhà phố: mái đứng được = 62 % chiều cao
     // → cộng 2 m cho bờ nóc) thì kéo camera vào trước điểm đó. Bị chặn: kéo vào ngay; hết chặn: lùi ra dần (không giật).
-    if (!inRoom && !inHall && !inHeaven(cam.target.x, cam.target.z)) {
+    if (!inRoom && !inHall && (!inHeaven(cam.target.x, cam.target.z) || mansionsB.towerFloor?.(cam.target.x, cam.target.z, 0))) { // tiên phủ có lầu 10 tầng / sảnh: camera không chui vào mái
       let free = 1;
       const tx = cam.target.x, ty = cam.target.y, tz = cam.target.z, ex = camera.position.x - tx, ey = camera.position.y - ty, ez = camera.position.z - tz;
       const startTop = tallTopAt(tx, tz); // vật đang ở ngay chỗ nhân vật (đứng trên mái / tường, hay dưới mái cổng): không tính là vật chắn

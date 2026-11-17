@@ -11,6 +11,7 @@ import { phuPlots as mansionPlots, villaPlots as villaLots } from './city4.js'; 
 import { estateLayout, STYLES, VILLA_DISTRICT_NAME, compassOf } from './estate-layout.js';
 import { PHU_COUNT } from './estate-core.js';
 import { heavenLayout } from './heaven.js';
+import { tienPlan } from './tienphu/plan.js';
 
 const PHU_NAME = {
   li: ['Chu Tước Phủ', 'Ly Minh Phủ'], kun: ['Hậu Đức Phủ', 'Khôn Ninh Phủ'], dui: ['Duyệt Trạch Phủ', 'Minh Nguyệt Phủ'],
@@ -21,13 +22,17 @@ const PHU_NAME = {
 export const DOOR_W = 2.4;
 
 function makeUnit(base) {
-  const g = BQ.guaById(base.g), S = STYLES[base.style];
-  const L = estateLayout(base.kind, base.style, base.W, base.D);
+  const g = BQ.guaById(base.g);
+  // tiên phủ Cửu Trọng Thiên: quy hoạch riêng 520 × 520 m + lầu 10 tầng (tienphu/plan.js — TIEN-PHU-MANIFEST §6)
+  const TP = base.heaven ? tienPlan(base.k) : null;
+  const S = TP ? TP.S : STYLES[base.style];
+  const L = TP || estateLayout(base.kind, base.style, base.W, base.D);
   const u = { ...base, wx: g.wx, S, layout: L, zones: L.zones, halls: L.zones.filter((z) => z.kind === 'hall') };
   u.toWorld = (lx, lz) => toW(u, lx, lz);
   const gw = toW(u, 0, base.D / 2 + (base.kind === 'phu' ? 4.5 : 1.8)); u.gate = { x: gw.x, z: gw.z };
   u.facing = compassOf(Math.sin(base.ry), Math.cos(base.ry));
-  u.walls = fenceList(u);
+  u.walls = TP ? TP.walls : fenceList(u);
+  if (TP) { u.tp = TP; u.halls = L.zones.filter((z) => z.kind === 'hall' && !z.tower); }
   return u;
 }
 let CACHE = null;

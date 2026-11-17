@@ -23,7 +23,7 @@
 //   est_list {q}                            est_res {q, ok, list:[[h,name,likes]], mine}
 //   est_get {q,h} · est_claim {q,h}         est_res {q, ok, err?, it?, c?, name?, likes?}
 //   est_release {q,h} · est_like {q,h}      est_up {h, name|null, likes, layout?} (phát cả shard)
-//   est_save {q,h,it,c}  (≤ 3600 ký tự)
+//   est_save {q,h,it,c,o}  (≤ 12600 ký tự; o: tuỳ biến tiên phủ ≤ 64)
 //   ── Phá hủy công trình ngoài thành (law.js) ──
 //   raze {id, x, y}                         razed {id, by} (phát cả shard) · welcome.razed [[id, tuổi ms]]
 //   ── Việc làm (Guild DO, P2) — máy chủ chấm lương, vị trí lấy từ gói mv / tp đã kiểm ──
@@ -38,6 +38,7 @@ import { HALF, ROOM_X0, ROOM_X1, cityOctDist } from './terrain.js';
 import { cleanCos } from './cosmetics.js';
 import { TITLES, titleFor } from './state.js';
 import { LISTING_COUNT, roomOfH, decodeLayout, validLayout } from './estate-core.js';
+import { decodeOpts } from './tienphu/custom.js';
 import { COUPLETS } from './items.js';
 
 /** Danh hiệu máy chủ chấp nhận (VC-037): chỉ tên trong state.TITLES; có xp (tài khoản đăng nhập,
@@ -204,7 +205,9 @@ export function parseClient(text) {
       if (!estH(m.h) || typeof m.it !== 'string' || !Number.isInteger(m.c) || m.c < 0 || m.c >= COUPLETS.length) return null;
       const items = decodeLayout(m.it);
       if (!items || !validLayout(roomOfH(m.h), items)) return null;
-      return { t: 'est_save', h: m.h, it: m.it, c: m.c, q: estQ(m.q) };
+      // o: tuỳ biến tiên phủ (tienphu/custom.js — chuỗi ≤ 64 ký tự [a-z0-9]); thiếu = không đổi gì
+      if (m.o != null && (typeof m.o !== 'string' || !decodeOpts(m.o))) return null;
+      return { t: 'est_save', h: m.h, it: m.it, c: m.c, o: typeof m.o === 'string' ? m.o : '', q: estQ(m.q) };
     }
     case 'job_me': case 'job_renew': case 'job_quit': case 'job_end': case 'job_claim': case 'job_ores': case 'job_log':
       return { t: m.t, q: estQ(m.q) };

@@ -71,10 +71,10 @@ export function createNet({ profile, onEvent = () => {}, token = null }) {
     info: (h) => sold.get(h) || null,
     get mine() { return mine; },
     cached: (h) => layouts.get(h) || null,
-    async get(h) { const r = await ask({ t: 'est_get', h }); if (r.ok) layouts.set(h, { it: r.it || '', c: r.c | 0, at: Date.now() }); return r; },
+    async get(h) { const r = await ask({ t: 'est_get', h }); if (r.ok) layouts.set(h, { it: r.it || '', c: r.c | 0, o: r.o || '', at: Date.now() }); return r; },
     async claim(h) { const r = await ask({ t: 'est_claim', h }); if (r.ok) { mine = h; layouts.set(h, { it: '', c: 0, at: Date.now() }); } return r; },
     async release(h) { const r = await ask({ t: 'est_release', h }); if (r.ok) { mine = null; sold.delete(h); layouts.delete(h); } return r; },
-    async save(h, it, c) { const r = await ask({ t: 'est_save', h, it, c }); if (r.ok) layouts.set(h, { it, c, at: Date.now() }); return r; },
+    async save(h, it, c, o = '') { const r = await ask({ t: 'est_save', h, it, c, o }); if (r.ok) layouts.set(h, { it, c, o, at: Date.now() }); return r; },
     like: (h) => ask({ t: 'est_like', h }),
     refresh: () => ask({ t: 'est_list' }),
   };

@@ -12,7 +12,7 @@
 //  Cao độ tuyệt đối người chơi: p.y3 (m). p.alt = y3 − mặt đất dưới chân (render3d / mạng dùng).
 // ============================================================================
 import * as T from './terrain.js';
-import { platformTop, blockedByBuilding, tallTopAt } from './obstacles.js';
+import { platformTop, blockedByBuilding, tallTopAt, inOpenZone } from './obstacles.js';
 import { inCourt, pondAt } from './court.js';
 import { waterAt, waveHeight, waterTime } from './water.js';
 import { clearanceAt } from './bridges.js';
@@ -44,7 +44,7 @@ export function waterHere(x, z, y = null, t = waterTime()) {
 export function waterLevelAt(x, z, y = null) { return waterHere(x, z, y)?.level ?? null; }
 /** đáy đứng được tại (x, z) ứng với cao độ hiện tại y: { floor, solid, top, water } */
 export function surfaceAt(x, z, y) {
-  const g = groundHeight(x, z, y), solid = blockedByBuilding(x, z);
+  const g = groundHeight(x, z, y), solid = blockedByBuilding(x, z, y); // y: vật cản theo tầng (toà nhiều tầng tiên phủ)
   let top = solid ? tallTopAt(x, z) : null;
   // vật cản chưa khai độ cao (addSolidRect / addBlock không kèm addTall): coi như CAO HƠN tầm nhảy đôi (~3 m).
   // Trước đây 1,2 m < một cú nhảy (1,3 m) → nhảy là đứng lên «đỉnh» rồi đi xuyên tường Sơn Môn 6,5 m, lan can hồ… (2026-11-12)
@@ -104,7 +104,7 @@ export function moveFree(p, input, dt, baseSpeed) {
   if (want && !p.climb) {
     const nx = p.x + (swimStep ? swimStep.x : input.dx * speed * dt), nz = p.z + (swimStep ? swimStep.z : input.dz * speed * dt);
     const tryMove = (tx, tz) => {
-      if (Math.hypot(tx, tz) > T.EDGE + 20) return false; // mép thế giới (biển mây)
+      if (Math.hypot(tx, tz) > T.EDGE + 20 && !inOpenZone(tx, tz)) return false; // mép thế giới (biển mây) — trừ dải trời Cửu Trọng Thiên
       const s = surfaceAt(tx, tz, p.y3);
       const rise = s.floor - p.y3;
       if (p.swim) {
@@ -153,7 +153,7 @@ export function moveFree(p, input, dt, baseSpeed) {
       // đứng / đi trên đúng mặt sóng (+2 cm); dòng chảy đẩy nhẹ 30% vận tốc dòng
       p.y3 = w2.level + 0.02; p.vy = 0; p.air = false; p.jumps = 0; p.swim = false; p.wade = false;
       const nx2 = p.x + w2.flow.x * 0.3 * dt, nz2 = p.z + w2.flow.z * 0.3 * dt;
-      if (!blockedByBuilding(nx2, nz2)) { p.x = nx2; p.z = nz2; }
+      if (!blockedByBuilding(nx2, nz2, p.y3)) { p.x = nx2; p.z = nz2; }
     } else if (w2 && w2.depth > WADE.max && p.y3 <= w2.level + 0.3 && (p.vy <= 0 || p.swim)) {
       // nổi: lò xo + cản về «mặt sóng − 1 m» (nhấp nhô theo sóng); rơi từ cao xuống thì chìm sâu rồi trồi lên
       if (!p.swim) p.splash = (p.splash || 0) + 1;

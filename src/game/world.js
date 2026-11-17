@@ -213,7 +213,7 @@ export const worldToTile = (X, Z) => ({ x: X / U + 10, y: Z / U + 7 });
 // from (tuỳ chọn, toạ độ ô) để xét độ dốc khi đi trên địa hình.
 export function blockedAt(x, y, from = null) {
   const w = tileToWorld(x, y);
-  if (blockedByBuilding(w.x, w.z)) return true;
+  if (blockedByBuilding(w.x, w.z, from?.phys?.y3 ?? null)) return true; // from = người chơi: xét thêm vật cản theo tầng
   if (platformTop(w.x, w.z) != null) return false; // trên nền bậc cấp: đi thoải mái
   const f = from ? tileToWorld(from.x, from.y) : null;
   return !walkable(w.x, w.z, f?.x, f?.z);

@@ -14,7 +14,13 @@ import * as MD from './models.js';
 import * as AK from './archkit.js';
 import * as AS from './archkit-style.js';
 import { estates, mansionSolids, toLocal, hallAtLocal, mansionNpcs, waterParts, mansionAt } from './mansions.js';
-import { addSolidOBB, addPlatform, setRoomSolids, clearRoomSolids, addTall } from './obstacles.js';
+import { addSolidOBB, addPlatform, setRoomSolids, clearRoomSolids, addTall, setRoomSolids3, clearRoomSolids3, setVoxelLayer } from './obstacles.js';
+import { registerTien } from './tienphu/register.js';
+import { buildTienJob } from './tienphu/estate3d.js';
+import { voxelJob } from './tienphu/voxel.js';
+import { FH, LEVELS } from './tienphu/tower.js';
+import { FLOOR_THEMES } from './tienphu/styles.js';
+import { decodeOpts } from './tienphu/custom.js';
 import { addLight, LIGHTS } from './lights.js';
 import { placeModel } from './assets.js';
 import { setOpenSpots } from './rooms.js';
@@ -22,12 +28,14 @@ import { makeZoneCtx, furnishZone } from './interior-build.js';
 
 const NEAR = { phu: 240, villa: 110 }, FAR = { phu: 330, villa: 150 }, MAX = { phu: 3, villa: 8 };
 // Cửu Trọng Thiên: 8 đảo cách tâm 280 m — đứng quảng trường giữa phải thấy phủ thật (không phải khối hộp bản xa)
-const nearOf = (m) => (m.heaven ? 310 : NEAR[m.kind]), farOf = (m) => (m.heaven ? 390 : FAR[m.kind]), maxOf = (m) => (m.heaven ? 4 : MAX[m.kind]);
+// tiên phủ 520 m (TIEN-PHU-MANIFEST §2): dựng khi cách tâm < 640 m (đang qua cầu 330 m sang), tối đa 2 phủ chi tiết
+const nearOf = (m) => (m.heaven ? 640 : NEAR[m.kind]), farOf = (m) => (m.heaven ? 780 : FAR[m.kind]), maxOf = (m) => (m.heaven ? 2 : MAX[m.kind]);
 
 /** Dựng hệ khuôn viên vào group (gọi một lần lúc nạp). provider(key) → { mode, owner, items, couplet } (main.js) */
 export function createMansions(grp, { provider = () => null, citizens = null } = {}) {
   const list = estates();
   for (const m of list) {
+    if (m.heaven) { registerTien(m); continue; } // tiên phủ: va chạm theo đặc tả (sàn lầu / bậc / hố hồ / tường / vách) — TIEN-PHU-MANIFEST §4
     const { obbs, plats } = mansionSolids(m);
     for (const o of obbs) addSolidOBB(o.x, o.z, o.hw, o.hd, o.ry);
     for (const p of plats) addPlatform(p.x, p.z, p.w, p.d, p.ry, p.top);
@@ -41,7 +49,8 @@ export function createMansions(grp, { provider = () => null, citizens = null } =
     for (const t of m.layout.trees) { const c = W2(t.x, t.z); addTall(c.x, c.z, 0.6, 0.6, 0, t.kind === 'hedge' ? 1.2 : t.kind === 'cypress' ? 7.5 : 5.5); }
   }
   // --- bản xa: một mesh cho tất cả
-  const geos = AK.farProxyGeometry(list.map((m) => ({ x: m.x, z: m.z, ry: m.ry, walls: m.walls, halls: [...m.layout.buildings.map((b) => ({ ...b, h: b.h })), ...m.layout.pavs.map((p) => ({ ...p, ry: 0, plinth: 0.5 })), ...(m.layout.towers || []).map((t) => ({ ...t, w: t.w * 0.42, d: t.d * 0.42, ry: 0, plinth: 1.2, h: t.h - 9 }))], body: m.S.wall, roofCol: m.S.roofCol, fenceCol: m.S.fence === 'hedge' ? '#3f6b3a' : m.S.fence === 'redwall' || m.S.fence === 'redstone' ? '#9a3b2a' : '#ddd5c4' })));
+  const towerBox = (m) => { if (!m.tp) return []; const sp = m.tp.tower.spec; return [{ x: m.tp.tower.x, z: m.tp.tower.z, w: sp.floors[0].a * 2, d: sp.floors[0].a * 2, ry: 0, plinth: sp.podium.y, h: sp.height - sp.podium.y - 6 }]; };
+  const geos = AK.farProxyGeometry(list.map((m) => ({ x: m.x, z: m.z, ry: m.ry, walls: m.walls, halls: [...m.layout.buildings.map((b) => ({ ...b, h: b.h })), ...m.layout.pavs.map((p) => ({ ...p, ry: 0, plinth: 0.5 })), ...(m.layout.towers || []).map((t) => ({ ...t, w: t.w * 0.42, d: t.d * 0.42, ry: 0, plinth: 1.2, h: t.h - 9 })), ...towerBox(m)], body: m.S.wall, roofCol: m.S.roofCol, fenceCol: m.S.fence === 'hedge' ? '#3f6b3a' : m.S.fence === 'redwall' || m.S.fence === 'redstone' ? '#9a3b2a' : '#ddd5c4' })));
   // khuôn viên đã dựng chi tiết thì ẩn phần bản xa của nó (trước đây khối hộp + mái chóp đè lên nhà thật, z-fight, lộ qua vỏ gian mờ)
   const hideTex = new THREE.DataTexture(new Uint8Array(Math.max(1, list.length) * 4), Math.max(1, list.length), 1); hideTex.needsUpdate = true;
   const farMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, flatShading: true });
@@ -62,7 +71,40 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
   for (const m of list) setOpenSpots(`est:${m.h}`, [gateSpot(m)]);
 
   const built = new Map(); // h → rec
+  // TIÊN PHỦ: dựng dần qua nhiều khung (estate3d generator) rồi lấy vật cản từ lưới hình (voxel) — TIEN-PHU-MANIFEST §4
+  function buildTien(m) {
+    const info = provider(`est:${m.h}`) || { mode: 'sale', items: [] };
+    const opts = info.opts ? decodeOpts(info.opts) : null;
+    const used = new Set((info.items || []).map((it) => it.k || 0)), empty = new Set(m.zones.filter((z) => z.kind === 'hall' && !z.tower && !used.has(z.k)).map((z) => z.k));
+    const rec = { m, g: null, halls: [], lights: [], furn: null, tien: true, job: buildTienJob(m, opts, empty), vox: null, optsKey: info.opts || '', zoneSig: [...empty].join(','), floorK: -1 };
+    built.set(m.h, rec);
+    return rec;
+  }
+  function stepTien(rec, budgetMs) {
+    const t0 = performance.now();
+    while (rec.job && performance.now() - t0 < budgetMs) {
+      const r = rec.job.next();
+      if (r.done) {
+        rec.job = null; const out = r.value;
+        rec.g = out.g; rec.halls = out.halls; rec.tower = out.tower; rec.hallsWhole = out.hallsWhole;
+        setHidden(rec.m, true); grp.add(rec.g);
+        const m = rec.m, main = m.layout.buildings[0];
+        for (const [x, y, z] of [[-6, 5, m.D / 2 + 3], [6, 5, m.D / 2 + 3], [0, 4, main.z + main.d / 2 + 6], [0, m.tp.tower.spec.podium.y + 4, m.tp.tower.z + m.tp.tower.spec.podium.a + 2]]) { const p = m.toWorld(x, z); rec.lights.push(addLight(p.x, y, p.z, { color: '#ffb35c', power: 1 })); }
+        const sign = signMesh(m.name, false); sign.position.set(0, 8.5, m.D / 2 + 1.2); rec.g.add(sign);
+        furnish(rec);
+        // vật cản từ lưới hình: lầu (nhiều tầng — không thêm đặc 2D trong thềm lầu) + mọi thứ đặc khác
+        const sp = m.tp.tower.spec, tx = m.tp.tower.x, tz = m.tp.tower.z;
+        rec.vox = { out: {}, job: null };
+        rec.vox.job = voxelJob(out.solidRoots, rec.vox.out, { skip2D: (x, z) => { const l = toLocal(m, x, z); return Math.abs(l.x - tx) < sp.podium.a + 1 && Math.abs(l.z - tz) < sp.podium.a + sp.podium.run + 1; } });
+      }
+    }
+    while (!rec.job && rec.vox?.job && performance.now() - t0 < budgetMs) {
+      const r = rec.vox.job.next();
+      if (r.done) { rec.vox.job = null; rec.vox.stats = setVoxelLayer(`vox:${rec.m.h}`, rec.vox.out.cells3, rec.vox.out.cells2); rec.vox.out = null; }
+    }
+  }
   function build(m) {
+    if (m.heaven) return buildTien(m);
     const g = new THREE.Group(); g.name = `est:${m.h}`;
     setHidden(m, true);
     g.position.set(m.x, 0, m.z); g.rotation.y = m.ry;
@@ -104,6 +146,7 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
   function dispose(h) {
     const rec = built.get(h); if (!rec) return;
     setHidden(rec.m, false);
+    if (rec.tien) { setVoxelLayer(`vox:${h}`, new Map(), new Set()); if (!rec.g) { built.delete(h); return; } }
     unfurnish(rec);
     grp.remove(rec.g);
     rec.g.traverse((o) => { if (o.isMesh) o.geometry?.dispose?.(); });
@@ -114,7 +157,7 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
   function unfurnish(rec) {
     const f = rec.furn; if (!f) return;
     for (const c of f.ctxs) { rec.g.remove(c.g); for (const o of c.own) o.dispose?.(); for (const L of c.lightRefs || []) { const i = LIGHTS.indexOf(L); if (i >= 0) LIGHTS.splice(i, 1); } }
-    clearRoomSolids(`estdo:${rec.m.h}`);
+    clearRoomSolids(`estdo:${rec.m.h}`); clearRoomSolids3(`estdo3:${rec.m.h}`);
     for (const n of f.npcs || []) citizens?.remove?.(n.id);
     rec.furn = null;
   }
@@ -122,17 +165,26 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
     unfurnish(rec);
     const { m } = rec, info = provider(`est:${m.h}`) || { mode: 'sale', items: [] };
     const items = info.items || [];
-    const ctxs = [], solids = [], useSpots = [];
+    if (rec.tien && !rec.g) return; // tiên phủ đang dựng dần
+    const ctxs = [], solids = [], solids3 = [], useSpots = [];
     for (const z of m.zones) {
       const mine = items.filter((it) => (it.k || 0) === z.k);
       if (!mine.length && !(z.main && info.mode === 'own')) continue;
       const c = m.toWorld(z.x, z.z);
       const ctx = makeZoneCtx(rec.g, { key: `est:${m.h}`, local: { x: z.x, z: z.z, ry: z.ry }, world: { x: c.x, z: c.z, ry: z.ry + m.ry }, y: z.kind === 'hall' ? z.plinth : 0, w: z.w, d: z.d, h: z.h || 4, yard: z.kind === 'yard' });
       furnishZone(ctx, mine, { mode: info.mode, couplet: info.couplet || 0, deed: z.main });
-      ctxs.push(ctx); solids.push(...ctx.solids); useSpots.push(...ctx.spots);
+      ctxs.push(ctx); useSpots.push(...ctx.spots);
+      if (z.tower) for (const o of ctx.solids) solids3.push({ ...o, y0: z.plinth, y1: z.plinth + 2.2 }); else solids.push(...ctx.solids);
     }
     setRoomSolids(`estdo:${m.h}`, solids);
-    setOpenSpots(`est:${m.h}`, [gateSpot(m), ...useSpots]);
+    setRoomSolids3(`estdo3:${m.h}`, solids3);
+    const extra = [];
+    if (m.tp) { // thang phép (mọi tầng — cùng một điểm) + bảng tuỳ biến cho chủ phủ trước chính điện
+      const sp = m.tp.tower.spec, p = m.toWorld(m.tp.tower.x + sp.pad.x, m.tp.tower.z + sp.pad.z);
+      extra.push({ id: 'lift', kind: 'lift', name: 'Thang phép', verb: 'Thang phép · chọn tầng', x: p.x, z: p.z, r: 1.6, h: m.h });
+      if (info.mode === 'own') { const main = m.layout.buildings[0], q = m.toWorld(-8, main.z + main.d / 2 + 6); extra.push({ id: 'custom', kind: 'tpcustom', name: 'Sổ tuỳ biến phủ', verb: 'Tuỳ biến tiên phủ', x: q.x, z: q.z, r: 2, h: m.h }); }
+    }
+    setOpenSpots(`est:${m.h}`, [gateSpot(m), ...useSpots, ...extra]);
     const npcs = mansionNpcs(m, info);
     for (const n of npcs) citizens?.add?.(n);
     rec.furn = { ctxs, npcs };
@@ -142,7 +194,11 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
   return {
     far,
     /** mỗi khung: dựng / nhả theo khoảng cách; vỏ nhà mờ khi người chơi ở trong. Trả nhà đang đứng. */
-    update(px, pz, dt = 0.016) {
+    update(px, pz, dt = 0.016, py = null) {
+      // tiên phủ đang dựng dần / đang lấy vật cản: mỗi khung một ít (≤ 6 ms)
+      for (const rec of built.values()) if (rec.tien && (rec.job || rec.vox?.job)) { stepTien(rec, 6); break; }
+      // lầu 10 tầng: ở trong lầu thì ẩn các tầng trên, vách tầng đang đứng mờ đi (nhìn như nhà búp bê)
+      for (const rec of built.values()) if (rec.tower) towerView(rec, px, pz, py, dt);
       tick -= dt;
       if (tick <= 0) {
         tick = 0.4;
@@ -173,21 +229,58 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
           h.op += (goal - h.op) * Math.min(1, dt * 7);
           for (const mt of h.mats) { mt.opacity = h.op; mt.depthWrite = h.op > 0.95; }
         }
+        if (rec.hallsWhole) { const inside = !!hz; rec.hallsWhole.visible = !inside; for (const h of rec.halls) h.g.visible = inside; } // tiên phủ: ngoài sảnh vẽ bản gộp
         if (hz) inHall = { m: rec.m, zone: hz };
       }
       return inHall;
     },
-    /** nhà chứa điểm thế giới (cho camera): { cx, cz, ry, hw, hd, top } | null */
-    hallAt(x, z) {
+    /** nhà chứa điểm thế giới (cho camera): { cx, cz, ry, hw, hd, top } | null — y: cao độ (lầu nhiều tầng) */
+    hallAt(x, z, y = null) {
       const m = mansionAt(x, z, 1); if (!m) return null;
+      if (m.tp && y != null) { const f = towerFloorAt(m, x, z, y); if (f) return f.hall; }
       const l = toLocal(m, x, z), h = hallAtLocal(m, l.x, l.z); if (!h) return null;
       const c = m.toWorld(h.x, h.z);
       return { cx: c.x, cz: c.z, ry: h.ry + m.ry, hw: h.w / 2, hd: h.d / 2, top: h.plinth + Math.max(3.4, h.h) };
     },
-    refurnish(h) { const rec = built.get(h); if (rec) furnish(rec); },
+    refurnish(h) {
+      const rec = built.get(h); if (!rec) return;
+      if (rec.tien) { // đổi tuỳ biến / sảnh trống ↔ có đồ → dựng lại phủ (đồ mặc định nhường chỗ cho đồ của chủ)
+        const info = provider(`est:${h}`) || {}, used = new Set((info.items || []).map((it) => it.k || 0));
+        const sig = rec.m.zones.filter((z) => z.kind === 'hall' && !z.tower && !used.has(z.k)).map((z) => z.k).join(',');
+        if ((info.opts || '') !== rec.optsKey || sig !== rec.zoneSig) { dispose(h); buildTien(rec.m); return; }
+      }
+      furnish(rec);
+    },
+    /** tầng lầu tiên phủ tại (x, z, y): { m, k (0–10), y, name } | null */
+    towerFloor: (x, z, y) => { const m = mansionAt(x, z, 1); return m?.tp ? towerFloorAt(m, x, z, y) : null; },
+    builtRec: (h) => built.get(h) || null,
     isBuilt: (h) => built.has(h),
     builtCount: () => built.size,
   };
+}
+
+/** tầng lầu chứa điểm (x, z, y) của tiên phủ m — null nếu ngoài thân lầu */
+function towerFloorAt(m, x, z, y) {
+  const sp = m.tp.tower.spec, l = toLocal(m, x, z), lx = l.x - m.tp.tower.x, lz = l.z - m.tp.tower.z;
+  const a0 = sp.floors[0].slabA + 0.5;
+  if (Math.abs(lx) > a0 || Math.abs(lz) > a0 || y < sp.podium.y - 0.6) return null;
+  const k = Math.max(0, Math.min(LEVELS, Math.floor((y - sp.podium.y + 0.6) / FH)));
+  const f = k < LEVELS ? sp.floors[k] : { y: sp.deck.y, a: sp.deck.a };
+  if (Math.abs(lx) > f.a + 0.2 || Math.abs(lz) > f.a + 0.2) return { m, k, y: f.y, outside: true, name: k < LEVELS ? `Tầng ${k + 1}` : 'Vọng Đài', hall: null };
+  const c = m.toWorld(m.tp.tower.x, m.tp.tower.z);
+  return { m, k, y: f.y, name: k < LEVELS ? `Tầng ${k + 1} · ${FLOOR_THEMES[k].name}` : 'Vọng Đài', hall: k < LEVELS ? { cx: c.x, cz: c.z, ry: m.ry, hw: f.a - 0.4, hd: f.a - 0.4, top: f.y + FH - 2.3 } : null }; // render3d cho camera tới top + 1,5 → dưới đáy sàn trên
+}
+/** hiện / ẩn tầng lầu theo vị trí người chơi */
+function towerView(rec, px, pz, py, dt) {
+  const f = py == null ? null : towerFloorAt(rec.m, px, pz, py);
+  const k = f && !f.outside ? f.k : -1;
+  rec.tower.whole.visible = k < 0; // ngoài lầu: bản gộp
+  rec.tower.floors.forEach((fl, i) => {
+    fl.g.visible = k >= 0 && i <= k;
+    const goal = i === k && k < LEVELS ? 0.22 : 1;
+    for (const o of fl.shell.children) { const mt = o.material; if (Math.abs(mt.opacity - goal) < 0.01) continue; mt.opacity += (goal - mt.opacity) * Math.min(1, dt * 7); mt.depthWrite = mt.opacity > 0.95; }
+  });
+  rec.floorK = k;
 }
 
 function signMesh(text, small = false) {

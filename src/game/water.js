@@ -78,7 +78,27 @@ function canalFlow(x, z) {
  * Nước tại (x, z): null nếu khô; { level (mực tĩnh), ground (đáy), depth, kind, flow: {x, z}, amp }.
  * Chưa tính cầu / nền (motion.js lo phần đó).
  */
+// HỒ ĐĂNG KÝ (tiên phủ Cửu Trọng Thiên — docs/TIEN-PHU-MANIFEST.md §5): elip / chữ nhật xoay, mực + đáy riêng. Ô 64 m.
+// Vùng KHÔNG NƯỚC THẾ GIỚI (dải trời): địa hình dưới đó là biển mây −70 → không được coi là hồ mực −6.
+const POOLS = new Map(), DRY = [];
+export function addPool(p) {
+  const q = { ...p, c: Math.cos(p.ry || 0), s: Math.sin(p.ry || 0) }, R = Math.hypot(p.rx ?? p.hw, p.rz ?? p.hd);
+  for (let i = Math.floor((p.x - R) / 64); i <= Math.floor((p.x + R) / 64); i++) for (let j = Math.floor((p.z - R) / 64); j <= Math.floor((p.z + R) / 64); j++) {
+    const k = i * 100000 + j; let b = POOLS.get(k); if (!b) POOLS.set(k, (b = [])); b.push(q);
+  }
+}
+export function addDryZone(x0, z0, x1, z1) { DRY.push({ x0, z0, x1, z1 }); }
+function poolAt(x, z) {
+  for (const q of POOLS.get(Math.floor(x / 64) * 100000 + Math.floor(z / 64)) || []) {
+    const dx = x - q.x, dz = z - q.z, lx = q.c * dx - q.s * dz, lz = q.s * dx + q.c * dz;
+    if (q.rect ? Math.abs(lx) < q.hw && Math.abs(lz) < q.hd : (lx / q.rx) ** 2 + (lz / q.rz) ** 2 < 1) return q;
+  }
+  return null;
+}
 export function waterAt(x, z) {
+  const pl = POOLS.size ? poolAt(x, z) : null;
+  if (pl) return { level: pl.level, ground: pl.floor, depth: pl.level - pl.floor, kind: 'pond', flow: { x: 0, z: 0 }, amp: 0.03 };
+  for (const d of DRY) if (x > d.x0 && x < d.x1 && z > d.z0 && z < d.z1) return null;
   // hồ sen sân Sơn Môn: nước tĩnh, gợn rất nhẹ (court.pondAt — lội được)
   const pd = pondAt(x, z);
   if (pd) return { level: pd.level, ground: pd.floor, depth: pd.level - pd.floor, kind: 'pond', flow: { x: 0, z: 0 }, amp: 0.02 };

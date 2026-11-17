@@ -274,7 +274,7 @@ export class TownShard extends DurableObject {
       else if (m.t === 'est_get') r = await st.get(m.h);
       else if (m.t === 'est_claim') r = await st.claim(m.h, a.u, a.name);
       else if (m.t === 'est_release') r = await st.release(m.h, a.u);
-      else if (m.t === 'est_save') r = await st.save(m.h, a.u, m.it, m.c);
+      else if (m.t === 'est_save') r = await st.save(m.h, a.u, m.it, m.c, m.o || '');
       else r = await st.like(m.h, a.u);
     } catch (e) { r = { ok: false, err: 'error' }; }
     this.send(ws, { t: 'est_res', q: m.q, ...r });

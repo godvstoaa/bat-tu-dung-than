@@ -99,12 +99,25 @@ const PB = 64, pbuckets = new Map();
 // sky: nền TRỜI (quận đảo bay y 460 — terrain.js › SKY_DISTRICT): chỉ tính khi lời gọi biết cao độ người
 // (motion.groundHeight truyền y). Lời gọi 2D không y (world3d.groundY cho camera clamp, world.blockedAt,
 // dân phố) bỏ qua nền trời — người dưới đảo không bị nhấc lên 460, spawn (3,43) không bị kẹp camera (GAME-TROI-THIET-KE §5.4).
-export function addPlatform(x, z, w, d, ry, top, bot = -Infinity, sky = false) {
-  const r = { x, z, hw: w / 2, hd: d / 2, c: Math.cos(ry), s: Math.sin(ry), top, bot, sky }, R = Math.hypot(w, d) / 2;
+// base: NỀN ĐẢO (tiên phủ) — trong một HỐ (addPit: lòng hồ) thì nền đảo không tính, chỉ còn đáy hồ + nền khác (cầu, đảo giữa hồ)
+export function addPlatform(x, z, w, d, ry, top, bot = -Infinity, sky = false, base = false) {
+  const r = { x, z, hw: w / 2, hd: d / 2, c: Math.cos(ry), s: Math.sin(ry), top, bot, sky, base }, R = Math.hypot(w, d) / 2;
   rects.push(r);
   for (let i = Math.floor((x - R) / PB); i <= Math.floor((x + R) / PB); i++) for (let j = Math.floor((z - R) / PB); j <= Math.floor((z + R) / PB); j++) {
     const k = i * 100000 + j; let b = pbuckets.get(k); if (!b) pbuckets.set(k, (b = [])); b.push(r);
   }
+}
+
+/** nền ĐA GIÁC ĐỀU (sàn lầu tiên phủ): n cạnh, apothem a, cạnh phẳng trên trục cục bộ (tienphu/tower.js › polyVerts) */
+export function addPolyPlatform(x, z, n, a, ry, top, bot = -Infinity, base = false) {
+  const r = { x, z, hw: a / Math.cos(Math.PI / n), hd: a / Math.cos(Math.PI / n), c: Math.cos(ry), s: Math.sin(ry), top, bot, sky: false, base, n, a };
+  r.nc = Array.from({ length: n }, (_, k) => [Math.cos((2 * Math.PI * k) / n), Math.sin((2 * Math.PI * k) / n)]);
+  rects.push(r);
+  const R = r.hw;
+  for (let i = Math.floor((x - R) / PB); i <= Math.floor((x + R) / PB); i++) for (let j = Math.floor((z - R) / PB); j <= Math.floor((z + R) / PB); j++) {
+    const k = i * 100000 + j; let b = pbuckets.get(k); if (!b) pbuckets.set(k, (b = [])); b.push(r);
+  }
+  return r;
 }
 
 // ---------------------------------------------------------------------------
@@ -146,12 +159,87 @@ export function actorAt(x, z, pad = 0) {
   for (const a of actors) { const r = a.r + pad; if ((x - a.x) ** 2 + (z - a.z) ** 2 < r * r) return a; }
   return null;
 }
-export function blockedByBuilding(x, z) {
+/** y (tuỳ chọn) = cao độ chân người: có thì xét thêm VẬT CẢN THEO TẦNG (solid3 — vách / đồ của nhà nhiều tầng) */
+export function blockedByBuilding(x, z, y = null) {
   for (const [dx, dz] of BODY) if (solidAt(x + dx, z + dz)) return true;
   for (const c of circles) if ((x - c.x) ** 2 + (z - c.z) ** 2 < c.r * c.r) return true;
   if (actors.length && actorAt(x, z, 0.3)) return true;
+  if (y != null && (s3.size || dyn3.size)) for (const [dx, dz] of BODY) if (solid3At(x + dx, z + dz, y)) return true;
   return false;
 }
+
+// ---------------------------------------------------------------------------
+// VẬT CẢN THEO TẦNG (tiên phủ — toà 10 tầng, docs/TIEN-PHU-MANIFEST.md §4): ô 0,5 m mang khoảng cao [y0, y1].
+// Chặn thân người khi khoảng đó giao (y + 0,3, y + 1,75) — bậc / thảm thấp hơn 0,3 m không chặn, trần tầng trên không chặn.
+// Lời gọi 2D (không y: A* dân phố, camera) bỏ qua lớp này. s3: tĩnh (vách, cột, lan can); dyn3: đồ bài trí đổi được.
+// ---------------------------------------------------------------------------
+const s3 = new Map(), dyn3 = new Map(), room3 = new Map();
+const pushRange = (M, k, y0, y1) => { let a = M.get(k); if (!a) M.set(k, (a = [])); a.push(y0, y1); };
+const eachOBBCell = (x, z, hw, hd, ry, fn) => {
+  const c = Math.cos(ry), s = Math.sin(ry), R = Math.hypot(hw, hd);
+  for (let i = cellOf(x - R); i <= cellOf(x + R); i++) for (let j = cellOf(z - R); j <= cellOf(z + R); j++) {
+    const px = (i + 0.5) * CELL - x, pz = (j + 0.5) * CELL - z, lx = px * c - pz * s, lz = px * s + pz * c;
+    // nửa ô dung sai: vách mỏng 0,2 m vẫn phủ ít nhất một hàng ô
+    if (Math.abs(lx) <= Math.max(hw, CELL * 0.5) && Math.abs(lz) <= Math.max(hd, CELL * 0.5)) fn(ck(i, j));
+  }
+};
+/** khối đặc theo tầng: hộp xoay (cùng quy ước addSolidOBB), cao từ y0 tới y1 (m tuyệt đối) */
+export function addSolid3(x, z, hw, hd, ry, y0, y1) { eachOBBCell(x, z, hw, hd, ry, (k) => pushRange(s3, k, y0, y1)); }
+/** đồ bài trí theo tầng (dựng lười, đổi được): obbs [{ x, z, hw, hd, ry, y0, y1 }] */
+export function setRoomSolids3(key, obbs) {
+  clearRoomSolids3(key);
+  const own = [];
+  for (const o of obbs) eachOBBCell(o.x, o.z, o.hw, o.hd, o.ry || 0, (k) => { pushRange(dyn3, k, o.y0, o.y1); own.push(k, o.y0, o.y1); });
+  room3.set(key, own);
+}
+export function clearRoomSolids3(key) {
+  const own = room3.get(key); if (!own) return;
+  for (let n = 0; n < own.length; n += 3) {
+    const a = dyn3.get(own[n]); if (!a) continue;
+    for (let q = 0; q < a.length; q += 2) if (a[q] === own[n + 1] && a[q + 1] === own[n + 2]) { a.splice(q, 2); break; }
+    if (!a.length) dyn3.delete(own[n]);
+  }
+  room3.delete(key);
+}
+const BODY_LO = 0.3, BODY_HI = 1.75;
+const hitRange = (a, y) => { if (a) for (let q = 0; q < a.length; q += 2) if (a[q] < y + BODY_HI && a[q + 1] > y + BODY_LO) return true; return false; };
+export function solid3At(x, z, y) { const k = ck(cellOf(x), cellOf(z)); return hitRange(s3.get(k), y) || hitRange(dyn3.get(k), y); }
+export const solid3Count = () => s3.size;
+/** chỉ số ô → khoá ô (tienphu/voxel.js) */
+export const cellKey = (i, j) => ck(i, j);
+// LỚP VOXEL (tiên phủ — vật cản lấy từ chính lưới hình): theo khoá phủ, thay nguyên khi dựng lại (đổi tuỳ biến / chủ đề tầng)
+const vox2 = new Map();
+/** cells3: Map<khoá ô, [y0, y1, …]> (lớp theo tầng) · cells2: Set<khoá ô> (đặc 2D — chặn cả A* / dân phố) */
+export function setVoxelLayer(key, cells3, cells2) {
+  clearRoomSolids3(key);
+  const own = [];
+  for (const [k, ranges] of cells3) for (let q = 0; q < ranges.length; q += 2) { pushRange(dyn3, k, ranges[q], ranges[q + 1]); own.push(k, ranges[q], ranges[q + 1]); }
+  room3.set(key, own);
+  const old = vox2.get(key); if (old) for (const k of old) dyn.delete(k);
+  const mine = new Set(); for (const k of cells2) if (!dyn.has(k)) { dyn.add(k); mine.add(k); }
+  vox2.set(key, mine);
+  return { cells3: cells3.size, cells2: mine.size };
+}
+
+// VÙNG MỞ: dải trời Cửu Trọng Thiên nằm ngoài mép biển mây (T.EDGE) — motion.js không chặn đi trong vùng này
+const openZones = [];
+export function addOpenZone(x0, z0, x1, z1) { openZones.push({ x0, z0, x1, z1 }); }
+export const inOpenZone = (x, z) => openZones.some((o) => x > o.x0 && x < o.x1 && z > o.z0 && z < o.z1);
+
+// HỐ (lòng hồ tiên phủ): elip { x, z, rx, rz, ry } hoặc chữ nhật { x, z, hw, hd, ry, rect } — đáy ở bottom (m tuyệt đối)
+const pits = [], pitB = new Map();
+export function addPit(p) {
+  const q = { ...p, c: Math.cos(p.ry || 0), s: Math.sin(p.ry || 0) }, R = Math.hypot(p.rx ?? p.hw, p.rz ?? p.hd);
+  pits.push(q);
+  for (let i = Math.floor((p.x - R) / PB); i <= Math.floor((p.x + R) / PB); i++) for (let j = Math.floor((p.z - R) / PB); j <= Math.floor((p.z + R) / PB); j++) {
+    const k = i * 100000 + j; let b = pitB.get(k); if (!b) pitB.set(k, (b = [])); b.push(q);
+  }
+}
+// y0 / y1 (tuỳ chọn): hố chỉ khoét nền base có mặt trên trong [y0, y1] (lỗ thang khoét đúng một sàn tầng); bottom (tuỳ chọn): đáy
+const inPit = (q, x, z) => { const dx = x - q.x, dz = z - q.z, lx = q.c * dx - q.s * dz, lz = q.s * dx + q.c * dz; return q.rect ? Math.abs(lx) < q.hw && Math.abs(lz) < q.hd : (lx / q.rx) ** 2 + (lz / q.rz) ** 2 < 1; };
+export function pitsAt(x, z) { const out = []; for (const q of pitB.get(Math.floor(x / PB) * 100000 + Math.floor(z / PB)) || []) if (inPit(q, x, z)) out.push(q); return out; }
+export function pitAt(x, z) { for (const q of pitB.get(Math.floor(x / PB) * 100000 + Math.floor(z / PB)) || []) if (inPit(q, x, z)) return q; return null; }
+const pitCuts = (ps, top) => { for (const q of ps) if ((q.y0 ?? -Infinity) <= top && top <= (q.y1 ?? Infinity)) return true; return false; };
 
 // sàn phòng nội thất lưới (rooms.js đăng ký): tra nhanh theo ô lưới thay vì thêm ~90 nền vào rects
 let dynFloor = null, dynX = Infinity;
@@ -160,12 +248,15 @@ export function setDynFloor(x0, fn) { dynX = x0; dynFloor = fn; }
 export function platformTop(x, z, y = null) {
   if (dynFloor && x > dynX) { const f = dynFloor(x, z); if (f != null) return f; }
   let t = null;
+  const ps = pits.length ? pitsAt(x, z) : null, pit = ps && ps.length ? ps : null;
+  if (pit) for (const q of pit) if (q.bottom != null && (y == null || y >= q.bottom - 0.3)) t = t == null ? q.bottom : Math.max(t, q.bottom);
   for (const r of pbuckets.get(Math.floor(x / PB) * 100000 + Math.floor(z / PB)) || []) {
+    if (pit && r.base && pitCuts(pit, r.top)) continue; // lòng hồ / lỗ thang khoét qua nền base
     if (r.sky && y == null) continue; // nền trời (đảo bay y 460): chỉ tính khi lời gọi biết cao độ người
     if (y != null && y < r.bot - 0.3) continue;
     const dx = x - r.x, dz = z - r.z;
     const lx = r.c * dx - r.s * dz, lz = r.s * dx + r.c * dz;
-    if (Math.abs(lx) < r.hw && Math.abs(lz) < r.hd) t = t == null ? r.top : Math.max(t, r.top);
+    if (Math.abs(lx) < r.hw && Math.abs(lz) < r.hd && (!r.n || r.nc.every(([cx, cz]) => lx * cx + lz * cz <= r.a))) t = t == null ? r.top : Math.max(t, r.top);
   }
   return t;
 }

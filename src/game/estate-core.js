@@ -5,6 +5,7 @@
 // ============================================================================
 import { ITEMS, ITEM } from './items.js';
 import { estateLayout, PHU_PLAN, VILLA_STYLES, VILLAS_PER_DISTRICT, VILLA_W, VILLA_D, TIEN_PLAN } from './estate-layout.js';
+import { tienPlan } from './tienphu/plan.js';
 
 export const TIERS = {
   tieuxa: { name: 'Tiểu Xá', w: 10, d: 8, h: 4.5, price: { xu: 2 * 100000 } }, // giá: tiền kim loại (P18) — 2 lượng bạc (≈ 1 tháng làm đều — §26.2)
@@ -14,7 +15,7 @@ export const TIERS = {
   bietphu: { name: 'Biệt Phủ', w: 100, d: 100, h: 8, price: { xu: 300 * 100000 }, alt: { ngoc: 2000 }, mansion: true },
   bietthu: { name: 'Biệt Thự', w: VILLA_W, d: VILLA_D, h: 6, price: { xu: 50 * 100000 }, alt: { ngoc: 480 }, mansion: true },
   // Cửu Trọng Thiên (NHA-DIADIEM-MANIFEST §2): 9 tiên phủ trên đảo trời — Quân Thiên giá gấp đôi (estate.priceOf)
-  tienphu: { name: 'Tiên Phủ', w: 88, d: 84, h: 9, price: { xu: 1000 * 100000 }, alt: { ngoc: 6000 }, mansion: true },
+  tienphu: { name: 'Tiên Phủ', w: 520, d: 520, h: 9, price: { xu: 1000 * 100000 }, alt: { ngoc: 6000 }, mansion: true }, // TIEN-PHU-MANIFEST: 520 × 520 m, lầu 10 tầng
 };
 export const MAX_ITEMS = 60;
 export const MAX_ITEMS_PHU = 240;
@@ -29,12 +30,12 @@ export function estatePlanOfH(h) {
 const ZC = new Map();
 /** vùng bài trí của căn h (khung cục bộ khuôn viên) */
 export function zonesOfH(h) {
-  if (!ZC.has(h)) { const p = estatePlanOfH(h); ZC.set(h, p ? estateLayout(p.kind, p.style, p.W, p.D).zones : []); }
+  if (!ZC.has(h)) { const p = estatePlanOfH(h); ZC.set(h, !p ? [] : p.tien ? tienPlan(h - TIEN_H0).zones : estateLayout(p.kind, p.style, p.W, p.D).zones); }
   return ZC.get(h);
 }
 export const zoneOfH = (h, k) => zonesOfH(h)[k] || null;
 /** «phòng» của một vùng (cho canPlace / snapWall / home-edit) */
-export const zoneRoom = (z) => ({ w: z.w, d: z.d, h: z.h || 6, back: !!z.back, yard: z.kind === 'yard', keep: z.keep || [] });
+export const zoneRoom = (z) => ({ w: z.w, d: z.d, h: z.h || 6, back: !!z.back, yard: z.kind === 'yard', keep: z.keep || [], tower: !!z.tower });
 export const SELL_BACK = 0.5;
 // nhà phố rao bán (h ngay sau biệt phủ / biệt thự) — thứ tự hạng cố định (city4.streetListings đặt lô theo bảng này)
 export const STREET_TIERS = ["tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tuhop", "tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tieuxa", "nhapho", "tuhop", "tieuxa", "tieuxa", "nhapho", "tuhop", "tieuxa"];
@@ -74,7 +75,7 @@ export function decodeLayout(str, max = MAX_ITEMS_PHU) {
   for (const part of str.split(';')) {
     const [c, x, z, r, k = '0', extra] = part.split(',');
     const id = DECODE.get(c);
-    if (extra !== undefined || !id || ITEM[id].kind !== 'decor' || !/^-?\d+$/.test(x) || !/^-?\d+$/.test(z) || !/^[0-3]$/.test(r) || !/^\d$/.test(k)) return null;
+    if (extra !== undefined || !id || ITEM[id].kind !== 'decor' || !/^-?\d+$/.test(x) || !/^-?\d+$/.test(z) || !/^[0-3]$/.test(r) || !/^\d{1,2}$/.test(k)) return null; // k ≤ 99: tiên phủ có 25 vùng (sảnh + 11 tầng lầu + sân)
     out.push({ u: out.length + 1, i: id, x: Number(x) / 4, z: Number(z) / 4, r: Number(r), k: Number(k) });
     if (out.length > max) return null;
   }
@@ -109,7 +110,7 @@ export function canPlace(room, items, m) {
   }
   const R = rectOf(m), hw = room.w / 2 - 0.55, hd = room.d / 2 - 0.55;
   if (R.x - R.w / 2 < -hw || R.x + R.w / 2 > hw || R.z - R.d / 2 < -hd || R.z + R.d / 2 > hd) return { ok: false, reason: room.yard ? 'Ra ngoài sân.' : 'Ra ngoài phòng.' };
-  if (room.yard) { for (const k of room.keep || []) if (overlap(R, k, 0)) return { ok: false, reason: 'Để trống lối đi.' }; }
+  if (room.yard || room.tower) { for (const k of room.keep || []) if (overlap(R, k, 0)) return { ok: false, reason: room.tower ? 'Để trống cầu thang, thang phép và lối cửa.' : 'Để trống lối đi.' }; }
   // lối vào: dải giữa trước cửa phải trống (gian biệt phủ có cửa sau: cả dải sau)
   else if (overlap(R, { x: 0, z: room.d / 2 - 1.4, w: 2.6, d: 2.8 }, 0) || (room.back && overlap(R, { x: 0, z: -room.d / 2 + 1.4, w: 2.6, d: 2.8 }, 0))) return { ok: false, reason: 'Để trống lối vào cửa.' };
   for (const o of items) if (o.u !== m.u && ITEM[o.i].place !== 'wall' && overlap(R, rectOf(o))) return { ok: false, reason: `Vướng ${ITEM[o.i].name}.` };

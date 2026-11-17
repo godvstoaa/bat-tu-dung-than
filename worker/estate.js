@@ -23,7 +23,7 @@ export class Estate extends DurableObject {
   async get(h) {
     if (!okH(h)) return { ok: false, err: 'bad' };
     const v = await this.ctx.storage.get(`h:${h}`);
-    return v ? { ok: true, it: v.it || '', c: v.c | 0, name: v.name, likes: v.likes | 0 } : { ok: false, err: 'empty' };
+    return v ? { ok: true, it: v.it || '', c: v.c | 0, o: v.o || '', name: v.name, likes: v.likes | 0 } : { ok: false, err: 'empty' };
   }
 
   async claim(h, u, name) {
@@ -43,10 +43,10 @@ export class Estate extends DurableObject {
     return { ok: true };
   }
 
-  async save(h, u, it, c) {
+  async save(h, u, it, c, o = '') {
     const v = okH(h) ? await this.ctx.storage.get(`h:${h}`) : null;
     if (!v || v.u !== u) return { ok: false, err: 'notowner' };
-    await this.ctx.storage.put(`h:${h}`, { ...v, it: String(it).slice(0, 12000), c: c | 0, at: Date.now() });
+    await this.ctx.storage.put(`h:${h}`, { ...v, it: String(it).slice(0, 12000), c: c | 0, o: String(o || '').slice(0, 64), at: Date.now() }); // o: tuỳ biến tiên phủ
     return { ok: true, likes: v.likes | 0 };
   }
 

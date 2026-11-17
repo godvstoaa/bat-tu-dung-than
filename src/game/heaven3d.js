@@ -10,6 +10,8 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { HEAVEN, heavenLayout, inHeaven, THIEN_THE } from './heaven.js';
 import { cloudTex, rng } from './textures.js';
 import { placeModel, instanceModel } from './assets.js';
+import { tienPlan } from './tienphu/plan.js';
+import { shapeWithHoles } from './tienphu/geo.js'; // hạc nâng cấp tại chỗ bằng cùng hệ vỗ cánh shader (doc §3.8/§1 — hết scale-Y ép dẹt)
 
 const JADE = new THREE.Color('#ece7da'), JADE2 = new THREE.Color('#d9d2c2'), LAWN = new THREE.Color('#86b46c'), ROCK = new THREE.Color('#8a8172'), ROCK2 = new THREE.Color('#5f584e'), MOSS = new THREE.Color('#6f9a58');
 
@@ -74,7 +76,7 @@ export function createHeaven(scene, { citizens = null } = {}) {
     ['Huyền Thiên phía Bắc thâm trầm, người mệnh Thủy ở đó yên giấc lắm.', 'Hạo Thiên phía Tây mái bạc, khí Kim thanh sạch.'],
   ];
   const tienNpcs = () => {
-    const { cx, cz } = HEAVEN, R = 65, out = [], names = ['Thanh Y Đồng Tử', 'Kim Đồng', 'Ngọc Nữ', 'Bích Vân Tiên Nữ', 'Hạc Đồng', 'Tử Vân Tiên Nữ', 'Lam Hà Đồng Tử', 'Hồng Liên Tiên Nữ'];
+    const { cx, cz } = HEAVEN, R = 265, out = [], names = ['Thanh Y Đồng Tử', 'Kim Đồng', 'Ngọc Nữ', 'Bích Vân Tiên Nữ', 'Hạc Đồng', 'Tử Vân Tiên Nữ', 'Lam Hà Đồng Tử', 'Hồng Liên Tiên Nữ'];
     const ring = (a0) => Array.from({ length: 9 }, (_, k) => { const a = a0 + k * (Math.PI / 4); const c = Math.cos(a), n = Math.sin(a), m = Math.max(Math.abs(c), Math.abs(n)); return { x: cx + (c / m) * R, z: cz + (n / m) * R }; });
     for (let i = 0; i < 8; i++) { const P = ring(i * 0.79); out.push({ id: `tien_${i}`, name: names[i], role: i % 2 ? 'Tiên nữ' : 'Tiên đồng', look: i % 2 ? 'hero_f' : 'hero_m', gua: 'qian', wx: '金', lines: TIEN_LINES[i % TIEN_LINES.length], x: P[0].x, z: P[0].z, path: i % 3 === 2 ? null : P, near: 60 }); }
     return out;
@@ -93,14 +95,16 @@ export function createHeaven(scene, { citizens = null } = {}) {
     const tops = [], unders = [], lawns = [], floats = [];
     // --- đảo
     L.islands.forEach((s, k) => {
-      const top = new THREE.BoxGeometry(s.hw * 2, 1.2, s.hd * 2); top.translate(0, -0.6, 0);
-      // UV theo mét (ô lát 4 m)
-      const uv = top.attributes.uv, pp = top.attributes.position; for (let i = 0; i < uv.count; i++) uv.setXY(i, (pp.getX(i) + (pp.getY(i) > -0.1 ? 0 : pp.getZ(i))) / 16, (pp.getZ(i) + (pp.getY(i) > -0.1 ? 0 : pp.getY(i))) / 16);
+      // mặt đảo khoét lỗ hồ của tiên phủ trên đảo (TIEN-PHU-MANIFEST §5) — lòng hồ do tienphu/estate3d dựng
+      const off = s.centre ? HEAVEN.plazaD / 2 : HEAVEN.apron / 2, P = s.i >= 0 ? tienPlan(s.i) : null;
+      const holes = P ? P.water.map((w) => (w.shape === 'ellipse' ? { x: w.x, z: w.z - off, rx: w.rx + 0.1, rz: w.rz + 0.1 } : { x: w.x, z: w.z - off, hw: w.hw + 0.1, hd: w.hd + 0.1 })) : [];
+      const top = shapeWithHoles([[-s.hw, -s.hd], [s.hw, -s.hd], [s.hw, s.hd], [-s.hw, s.hd]], holes, 0, 1.2);
+      { const uv = top.attributes.uv, pp = top.attributes.position; for (let i = 0; i < uv.count; i++) uv.setXY(i, pp.getX(i) / 16, pp.getZ(i) / 16); }
       tops.push(place(top, s.x, 0, s.z, s.ry));
       unders.push(place(rockUnder(s.hw, s.hd, Math.max(s.hw, s.hd) * (s.centre ? 0.5 : 0.42), 400 + k * 17), s.x, 0, s.z, s.ry));
     });
     // thảm cỏ tiên trong tường phủ (mansion3d không dựng nền — ở thành là địa hình)
-    for (const p of L.plots) { const g = new THREE.BoxGeometry(p.W - 1, 0.04, p.D - 1); lawns.push(paint(place(g, p.x, 0.02, p.z, p.ry), LAWN)); }
+    // (thảm cỏ trong tường phủ: tienphu/estate3d dựng kèm lỗ hồ — không vẽ ở đây)
     // --- cầu ngọc (mặt lát) + vòm đỡ
     for (const b of L.bridges) {
       const g = new THREE.BoxGeometry(b.w, 1.0, b.len); g.translate(0, -0.5, 0);
@@ -109,14 +113,13 @@ export function createHeaven(scene, { citizens = null } = {}) {
       for (const f of [0.3, 0.7]) { const a = new THREE.CylinderGeometry(0.9, 0.2, 9, 8); a.translate(0, -5.4, 0); unders.push(paint(place(a, b.a.x + (b.b.x - b.a.x) * f, 0, b.a.z + (b.b.z - b.a.z) * f), ROCK2)); }
     }
     // đá nổi nhỏ quanh đảo: đá thủ tục (≈ 450 tam giác / khối) gộp chung mesh đá — model rock_island 17k / khối quá nặng
-    { const rr = rng(55); for (let k = 0; k < 12; k++) { const a = rr() * Math.PI * 2, d = 170 + rr() * 300, sz = 4 + rr() * 9; const g = rockUnder(sz, sz * (0.7 + rr() * 0.5), sz * 1.6, 900 + k); const cap = paint(new THREE.CylinderGeometry(sz * 1.02, sz * 1.02, 0.6, 12), MOSS); cap.translate(0, -0.3, 0); const y = -8 + rr() * 26, x = HEAVEN.cx + Math.cos(a) * d, z = HEAVEN.cz + Math.sin(a) * d; floats.push(place(g, x, y, z, rr() * 6), place(cap, x, y, z)); } }
+    { const rr = rng(55); for (let k = 0; k < 24; k++) { const a = rr() * Math.PI * 2, d = 400 + rr() * 800, sz = 4 + rr() * 9; const g = rockUnder(sz, sz * (0.7 + rr() * 0.5), sz * 1.6, 900 + k); const cap = paint(new THREE.CylinderGeometry(sz * 1.02, sz * 1.02, 0.6, 12), MOSS); cap.translate(0, -0.3, 0); const y = -8 + rr() * 26, x = HEAVEN.cx + Math.cos(a) * d, z = HEAVEN.cz + Math.sin(a) * d; floats.push(place(g, x, y, z, rr() * 6), place(cap, x, y, z)); } }
     const tex = slabTex();
     const topMat = new THREE.MeshStandardMaterial({ map: tex, color: JADE, roughness: 0.7 });
-    const topMesh = new THREE.Mesh(mergeGeometries(tops, false), topMat); topMesh.receiveShadow = true; grp.add(topMesh);
+    const topMesh = new THREE.Mesh(mergeGeometries(tops.map((g) => (g.index ? g.toNonIndexed() : g)), false), topMat); // mặt đảo khoét hồ (Extrude) + cầu (hộp) — đồng bộ không chỉ số topMesh.receiveShadow = true; grp.add(topMesh);
     const rockMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, flatShading: true });
     const rockMesh = new THREE.Mesh(mergeGeometries(unders, false), rockMat); grp.add(rockMesh);
     const floatMesh = new THREE.Mesh(mergeGeometries(floats, false), rockMat); grp.add(floatMesh); rocks = [floatMesh];
-    const lawnMesh = new THREE.Mesh(mergeGeometries(lawns, false), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 })); lawnMesh.receiveShadow = true; grp.add(lawnMesh);
     [...tops, ...unders, ...lawns, ...floats].forEach((g) => g.dispose());
 
     // --- lan can ngọc: trụ mỗi 3 m + tay vịn, dọc mép đảo và hai bên cầu, chừa miệng cầu
@@ -130,13 +133,10 @@ export function createHeaven(scene, { citizens = null } = {}) {
       for (let i = 0; i < n; i++) { const x = ax + (bx - ax) * ((i + 0.5) / n), z = az + (bz - az) * ((i + 0.5) / n); if (!gapAt(x, z)) rails.push([x, z, ry, len / n]); }
     };
     const W = (s, lx, lz) => { const c = Math.cos(s.ry), sn = Math.sin(s.ry); return [s.x + c * lx + sn * lz, s.z - sn * lx + c * lz]; };
-    for (const s of L.islands) { const q = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => W(s, a * (s.hw - 0.3), b * (s.hd - 0.3))); for (let i = 0; i < 4; i++) edge(...q[i], ...q[(i + 1) % 4]); }
-    for (const b of L.bridges) for (const sd of [-1, 1]) {
-      const ux = (b.b.x - b.a.x) / b.len, uz = (b.b.z - b.a.z) / b.len, ox = uz * sd * (b.w / 2 - 0.25), oz = -ux * sd * (b.w / 2 - 0.25);
-      const len = b.len - 8, n = Math.round(len / 3), ry = Math.atan2(ux, uz);
-      for (let i = 0; i <= n; i++) { const t = 4 + len * (i / n); posts.push([b.a.x + ux * t + ox, b.a.z + uz * t + oz]); }
-      for (let i = 0; i < n; i++) { const t = 4 + len * ((i + 0.5) / n); rails.push([b.a.x + ux * t + ox, b.a.z + uz * t + oz, ry, len / n]); }
-    }
+    // lan can: đúng các đoạn heaven.js › railSegments (cũng là VẬT CẢN thật — registerHeaven)
+    for (const r of L.rails) { const len = Math.hypot(r.bx - r.ax, r.bz - r.az), n = Math.max(1, Math.round(len / 3)), ry = Math.atan2(r.bx - r.ax, r.bz - r.az);
+      for (let i = 0; i <= n; i++) posts.push([r.ax + (r.bx - r.ax) * (i / n), r.az + (r.bz - r.az) * (i / n)]);
+      for (let i = 0; i < n; i++) rails.push([r.ax + (r.bx - r.ax) * ((i + 0.5) / n), r.az + (r.bz - r.az) * ((i + 0.5) / n), ry, len / n]); }
     const railMat = new THREE.MeshStandardMaterial({ color: '#f4f0e6', roughness: 0.55 });
     const postGeo = new THREE.BoxGeometry(0.32, 1.15, 0.32); postGeo.translate(0, 0.575, 0);
     const railGeo = new THREE.BoxGeometry(0.16, 0.14, 1); railGeo.translate(0, 0.95, 0);
@@ -150,16 +150,16 @@ export function createHeaven(scene, { citizens = null } = {}) {
     // --- biển mây 2 lớp (trôi ngược chiều) + sương dưới đảo
     const ct = cloudTex(23); ct.wrapS = ct.wrapT = THREE.RepeatWrapping; ct.repeat.set(9, 9);
     const ct2 = ct.clone(); ct2.needsUpdate = true; ct2.repeat.set(5, 5);
-    seaA = new THREE.Mesh(new THREE.PlaneGeometry(3600, 3600), new THREE.MeshBasicMaterial({ map: ct, color: '#fbf7f0', transparent: true, opacity: 0.95, depthWrite: false, fog: true }));
-    seaB = new THREE.Mesh(new THREE.PlaneGeometry(3600, 3600), new THREE.MeshBasicMaterial({ map: ct2, color: '#e8dcf0', transparent: true, opacity: 0.9, depthWrite: false, fog: true }));
+    seaA = new THREE.Mesh(new THREE.PlaneGeometry(7000, 7000), new THREE.MeshBasicMaterial({ map: ct, color: '#fbf7f0', transparent: true, opacity: 0.95, depthWrite: false, fog: true }));
+    seaB = new THREE.Mesh(new THREE.PlaneGeometry(7000, 7000), new THREE.MeshBasicMaterial({ map: ct2, color: '#e8dcf0', transparent: true, opacity: 0.9, depthWrite: false, fog: true }));
     for (const [m, y] of [[seaA, -28], [seaB, -46]]) { m.rotation.x = -Math.PI / 2; m.position.set(HEAVEN.cx, y, HEAVEN.cz); m.renderOrder = -1; grp.add(m); }
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(3600, 3600), new THREE.MeshBasicMaterial({ color: '#e9e2ee', fog: true }));
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(7000, 7000), new THREE.MeshBasicMaterial({ color: '#e9e2ee', fog: true }));
     floor.rotation.x = -Math.PI / 2; floor.position.set(HEAVEN.cx, -60, HEAVEN.cz); grp.add(floor);
 
     // --- cụm mây lơ lửng giữa các đảo (quay mặt về camera mỗi khung)
     const r = rng(77), N = 40, puffGeo = new THREE.PlaneGeometry(1, 1);
     puffs = new THREE.InstancedMesh(puffGeo, new THREE.MeshBasicMaterial({ map: cloudTex(31), color: '#ffffff', transparent: true, opacity: 0.8, depthWrite: false, fog: true }), N);
-    clouds = Array.from({ length: N }, () => { const a = r() * Math.PI * 2, d = 120 + r() * 380; return { x: HEAVEN.cx + Math.cos(a) * d, y: -27 + r() * 19, z: HEAVEN.cz + Math.sin(a) * d, s: 30 + r() * 50, v: 1.5 + r() * 2.5 }; });
+    clouds = Array.from({ length: N }, () => { const a = r() * Math.PI * 2, d = 300 + r() * 1000; return { x: HEAVEN.cx + Math.cos(a) * d, y: -27 + r() * 19, z: HEAVEN.cz + Math.sin(a) * d, s: 30 + r() * 50, v: 1.5 + r() * 2.5 }; });
     puffs.frustumCulled = false; grp.add(puffs);
 
     // --- Nam Thiên Môn (cổng lớn) + biển, đèn đá dọc quảng trường, đá nổi
@@ -185,7 +185,7 @@ export function createHeaven(scene, { citizens = null } = {}) {
       if (seaA) { seaA.material.map.offset.x = (t * 0.004) % 1; seaB.material.map.offset.y = (t * 0.003) % 1; }
       if (puffs && camera) {
         camera.getWorldPosition(cam); q.copy(camera.quaternion);
-        clouds.forEach((c, i) => { const x = HEAVEN.cx + ((c.x - HEAVEN.cx + t * c.v + 500) % 1000) - 500; pos.set(x, c.y, c.z); sc.set(c.s, c.s * 0.55, 1); puffs.setMatrixAt(i, m4.compose(pos, q, sc)); });
+        clouds.forEach((c, i) => { const x = HEAVEN.cx + ((c.x - HEAVEN.cx + t * c.v + 1400) % 2800) - 1400; pos.set(x, c.y, c.z); sc.set(c.s, c.s * 0.55, 1); puffs.setMatrixAt(i, m4.compose(pos, q, sc)); });
         puffs.instanceMatrix.needsUpdate = true;
       }
       for (const g of rocks) g.position.y = Math.sin(t * 0.4) * 0.8;

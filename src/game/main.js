@@ -6,6 +6,11 @@
 import { record } from './perf.js';
 import * as S from './state.js';
 import { STATIONS, START, findPath, stationAt, nearestStation, blockedAt, stationById, setDoorVerbHook, worldToTile, tileToWorld, SKY_ARRIVE } from './world.js';
+import { inHeaven, heavenLayout } from './heaven.js';
+import { liftBody, customBody } from './tienphu/ui.js';
+import { FLOOR_THEMES } from './tienphu/styles.js';
+import { decodeOpts } from './tienphu/custom.js';
+import { LEVELS as TP_LEVELS } from './tienphu/tower.js';
 import { estateByH, mansionAt } from './mansions.js';
 import * as MO from './motion.js';
 import { ROOM_X0, cityOctDist, heightAt } from './terrain.js';
@@ -161,7 +166,7 @@ export function startGame({ onExit = null } = {}) {
       }
       if (!r.ok) return;
     }
-    const x = await est.save(own.h, E.encodeLayout(own.items), own.couplet);
+    const x = await est.save(own.h, E.encodeLayout(own.items), own.couplet, own.opts || '');
     if (x.ok) { own.pending = false; save(); }
   }
   function updateOnline() {
@@ -417,14 +422,14 @@ export function startGame({ onExit = null } = {}) {
         const { keep, drop } = E.fitLayout(E.roomOf(l), own.items); own.fit2 = 1;
         if (drop.length) { const H = I.homeState(state); for (const m of drop) H.inv[m.i] = (H.inv[m.i] || 0) + 1; own.items = keep; save(); setTimeout(() => toast(`Nhà đã đo lại đúng khung ngoài — ${drop.length} món không vừa đã cất về túi.`), 400); }
       }
-      return { mode: 'own', items: own.items, couplet: own.couplet, owner: state.player?.name || '' };
+      return { mode: 'own', items: own.items, couplet: own.couplet, owner: state.player?.name || '', opts: own.opts || '' };
     }
     const info = net.estate.info(h);
     if (!info) return { mode: 'sale', items: [], couplet: 0 };
     const lay = net.estate.cached(h);
     if (!lay) net.estate.get(h).then((r) => { if (r?.ok) renderer?.rebuildRoom?.(key); });
     const vis = lay ? E.decodeLayout(lay.it) || [] : [], vl = E.listing(h);
-    return { mode: 'visit', items: vl && !vl.W ? E.fitLayout(E.roomOf(vl), vis).keep : vis, couplet: lay?.c || 0, owner: info.name, likes: info.likes };
+    return { mode: 'visit', items: vl && !vl.W ? E.fitLayout(E.roomOf(vl), vis).keep : vis, couplet: lay?.c || 0, owner: info.name, likes: info.likes, opts: lay?.o || '' };
   });
   const estateOwnerOf = (h) => { const own = I.homeState(state).own; if (own?.h === h) return { name: state.player?.name || 'bạn', mine: true }; const i = net.estate.info(h); return i ? { name: i.name, mine: false } : null; };
   const refreshEstateSigns = () => renderer?.setEstateLookup?.(estateOwnerOf);
@@ -487,6 +492,29 @@ export function startGame({ onExit = null } = {}) {
   // -------------------------------------------------------------------------
   // Di chuyển: phím, joystick ảo, chạm-để-đi
   // -------------------------------------------------------------------------
+  // ---- TIÊN PHỦ: thang phép + sổ tuỳ biến (tienphu/ui.js — TIEN-PHU-MANIFEST §3, §7)
+  function tienLift(st) {
+    const w = tileToWorld(player.x, player.y), P = player.phys || (player.phys = { x: w.x, z: w.z });
+    const tf = renderer?.mansions?.towerFloor?.(st.data.x, st.data.z, P.y3 ?? 0);
+    const m = tf?.m || renderer?.mansions?.builtRec?.(st.data.h)?.m; if (!m?.tp) return;
+    const own = I.homeState(state).own, sp = m.tp.tower.spec, o = decodeOpts(own?.h === m.h ? own.opts || '' : net.estate.cached(m.h)?.o || '') || decodeOpts('');
+    const floors = [...sp.floors.map((f) => ({ k: f.k, y: f.y, name: `Tầng ${f.k + 1} · ${(FLOOR_THEMES[o.themes[f.k]] || { name: 'Để trống' }).name}` })), { k: TP_LEVELS, y: sp.deck.y, name: 'Vọng Đài' }];
+    const go = (k) => {
+      const f = floors.find((q) => q.k === k); if (!f) return;
+      P.x = st.data.x; P.z = st.data.z; P.y3 = f.y + 0.05; P.vy = 0; P.air = false; player.y3 = P.y3;
+      const t = worldToTile(st.data.x, st.data.z); player.x = t.x; player.y = t.y; player.path = [];
+      panel.close?.(); toast(`✨ Thang phép — ${f.name}`); buzz('light');
+    };
+    panel.open({ title: `${m.tp.tower.name} · Thang phép`, body: liftBody({ floors, cur: tf && !tf.outside ? tf.k : -1, go }) });
+  }
+  function tienCustom(st) {
+    const own = I.homeState(state).own; if (!own || own.h !== st.data.h) { toast('Chỉ chủ phủ mới tuỳ biến được.'); return; }
+    const m = renderer?.mansions?.builtRec?.(own.h)?.m;
+    panel.open({ title: 'Sổ tuỳ biến tiên phủ', body: customBody({ optStr: own.opts || '', styleName: m?.tp?.st?.name || '', onSave: (s) => {
+      own.opts = s; own.pending = true; save(); syncEstate();
+      renderer?.rebuildRoom?.(`est:${own.h}`); panel.close?.(); toast('🏯 Đã lưu — phủ đang dựng lại theo ý chủ nhân.');
+    } }) });
+  }
   function walkTo(pt, stationId = null) {
     if (player.sitting) return;
     player.path = findPath(player, pt);
@@ -499,6 +527,8 @@ export function startGame({ onExit = null } = {}) {
   function walkToStation(st) { if (st) walkTo(st.spot, st.id); }
 
   function enterRoom(st) {
+    if (st.kind === 'spot' && st.data?.kind === 'lift') { tienLift(st); return; }        // thang phép lầu 10 tầng tiên phủ
+    if (st.kind === 'spot' && st.data?.kind === 'tpcustom') { tienCustom(st); return; }  // sổ tuỳ biến tiên phủ (chủ phủ)
     if (player.flying) setFlying(false);
     const ov = document.createElement('div');
     ov.className = 'hq-travel';
@@ -522,7 +552,7 @@ export function startGame({ onExit = null } = {}) {
     const l = E.listing(h), r = homeScore(l, own.items);
     const got = S.grantHome(state, 'warm', warmReward(r.score));
     if (got) { toast(`🏡 Về nhà — phong thủy ${r.score}/100 · +${got} Phúc Khí`); after(got); }
-    if (own.pending && net.estate.online()) net.estate.save(h, E.encodeLayout(own.items), own.couplet).then((x) => { if (x?.ok) { own.pending = false; save(); } });
+    if (own.pending && net.estate.online()) net.estate.save(h, E.encodeLayout(own.items), own.couplet, own.opts || '').then((x) => { if (x?.ok) { own.pending = false; save(); } });
   }
 
   // điểm phong thủy nhà: biệt phủ chấm theo Chính Sảnh (vùng 0, hướng thật của gian) — nhà nhỏ chấm cả phòng
@@ -1271,12 +1301,14 @@ export function startGame({ onExit = null } = {}) {
     work?.step(dt);
     freeDone = false;
     stepMove(dt);
-    if (!player.sitting && !player.flying && !freeDone && tileToWorld(player.x, player.y).x <= ROOM_X0 - 40) freeStep(0, 0, 0, dt); // trọng lực, nổi trên nước, tuột khỏi vách
+    const wNow = tileToWorld(player.x, player.y), inSky = inHeaven(wNow.x, wNow.z);
+    if (!player.sitting && !player.flying && !freeDone && (wNow.x <= ROOM_X0 - 40 || inSky)) freeStep(0, 0, 0, dt); // trọng lực, nổi trên nước, tuột khỏi vách — cả vùng trời Cửu Trọng Thiên (TIEN-PHU-MANIFEST §4)
+    if (inSky && !player.flying && player.phys?.y3 != null && player.phys.y3 < -25) { const a = heavenLayout().arrive; player.phys.y3 = null; placeAt({ x: a.x, z: a.z }, '☁ Mây đỡ lấy bạn', 'Rơi khỏi đảo trời — tiên hạc đưa về Nam Thiên Môn.'); }
   }
   function stepMove(dt) {
     if (player.sitting) { player.moving = false; return; }
     if (boat?.step(dt)) { freeDone = true; return; } // đang lái thuyền
-    const inRooms = tileToWorld(player.x, player.y).x > ROOM_X0 - 40; // phòng nội thất: đi như cũ
+    const wMv = tileToWorld(player.x, player.y), inRooms = wMv.x > ROOM_X0 - 40 && !inHeaven(wMv.x, wMv.z); // phòng nội thất: đi như cũ; vùng trời: vật lý thật
     if (player.flying) {
       // bay: nhanh gấp 4, vượt mọi vật cản; trần 420 m trên nền dưới chân — KHÔNG nâng toàn map (§6.4).
       // §5.5: đồng bộ y3 theo cao độ thế giới THẬT bằng tích phân biến thiên alt (không đặt thẳng
