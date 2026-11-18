@@ -171,4 +171,10 @@ Trong khi đó kho có hơn 500 model, phần lớn chưa dùng.
 ## 7. Deploy
 
 - 2026-11-18: Worker phiên bản `bcb7b8b0-a636-427b-aeb2-e1661761f4bf`, build từ `2832baf4` (gồm `c6d30d72`) trong worktree sạch. Kiểm nhanh trên bản thật đạt. Chưa push.
-- Đợt kế tiếp (9 tổng mặt bằng khác nhau) ghi ở [TIEN-PHU-MATBANG-MANIFEST.md](TIEN-PHU-MATBANG-MANIFEST.md), chưa deploy.
+- 2026-11-18 (2): Worker phiên bản `b84dd076-f4b6-42ce-b09e-1b2b9e5b4c0f`, build từ `02db8f40` trong worktree sạch.
+  Gồm 9 tổng mặt bằng, kiến trúc 155 công trình và cây cổ thụ theo loài.
+  Kiểm bản thật (`battu.maz-elements0.workers.dev`, `battu.god8.shop`):
+  - `game.html` tải không lỗi trang;
+  - model cây `lib_tp_*.near/.vc` và ảnh xa `.imp.png` trả 200.
+
+  Chưa push.

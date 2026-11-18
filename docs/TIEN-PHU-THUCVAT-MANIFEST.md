@@ -108,6 +108,8 @@ Nghiên cứu: [tienphu-nghiencuu/10-thuc-vat.md](tienphu-nghiencuu/10-thuc-vat.
   - cấp xa giữ pháp tuyến hướng trời (mặt sau tấm từng đen).
 - **Ngân sách tải:** 24 model × 3 bản + ảnh xa ≈ 36 MB trong `public/models`. Chỉ tải loài của phủ đang dựng.
 
+- **Deploy:** 2026-11-18, Worker `b84dd076-f4b6-42ce-b09e-1b2b9e5b4c0f` (commit `02db8f40`). Chưa push.
+
 ## 7. Goal tiếp theo
 - **G1:** ≥ 3 biến thể mỗi loài. Hiện mỗi loài 1–2 model Meshy; thêm model hoặc sinh biến thể thủ tục.
   Đo: mỗi loài ≥ 3 lưới khác nhau.
