@@ -1,0 +1,248 @@
+## lau10 — Thiên Kim Lâu (10 tầng)
+5. Cấu kiện nhận diện (theo mức quan trọng)
+1. Các bậc lùi **rõ ràng**, ít nhất 3 lần, mỗi lần ≥ 3 m mỗi phía.
+2. Chóp tầng tầng toả tia bằng kim loại sáng, cửa tam giác.
+3. Cột / trụ dọc liên tục chạy suốt nhiều tầng; spandrel tối nằm lùi giữa các trụ.
+4. Đế góc bo tròn, gạch sọc ngang (nối với ngôn ngữ Cavrois).
+5. Cột buồm / cột cờ trên đỉnh.
+6. Diềm sunburst trên cửa vào, chữ nổi tên lầu "THIÊN KIM LÂU" bằng chữ kim loại vàng trên cửa chính (như chữ
+   "Empire State" trên tầng 5).
+7. Gargoyle / linh vật kim loại ở góc một tầng lùi (Chrysler tầng 31 và 61).
+8. Kích thước đề xuất cho game
+
+Khung hiện tại (code `styles.js`): cạnh 34 m (tầng 1–3) → 28 m (4–6) → 24 m (7–8) → 21 m (9–10), FH 5 m, bệ 1,5 m.
+
+| Hạng mục | Hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Cạnh tầng 1–3 | 34 m | 34 m | Giữ; bệ 46 m chừa sân 6 m mỗi phía |
+| Cạnh tầng 4–6 | 28 m | **26 m** | Lùi 4 m mỗi phía (12 % cạnh) |
+| Cạnh tầng 7–8 | 24 m | **20 m** | Lùi 3 m mỗi phía |
+| Cạnh tầng 9–10 | 21 m | **14 m** | Lùi 3 m mỗi phía; diện tích 196 m² = 17 % đế 1 156 m² → đúng luật "tháp ≤ 25 %" |
+| Cao thân | 10 × 5 = 50 m + bệ 1,5 | giữ | Tương đương 13–14 tầng thật (3,66 m) |
+| Chóp (vòm toả tia) | `crown: 'sunburst'`, chưa rõ cao | **10 m** | [suy] |
+| Cột buồm + cờ | không có | **8 m** | [suy] |
+| Tổng cao | ≈ 55 m | **≈ 69,5 m** | |
+
+Kiểm phong bao 2 : 1: từ đỉnh tầng 3 (y ≈ 16,5 m) tới đỉnh tầng 10 (y ≈ 51,5 m) lên 35 m, lùi 10 m mỗi phía → dốc 3,5 : 1,
+nằm trong phong bao 2 : 1 (dốc hơn là được phép). [suy]
+
+Tỉ lệ cao / cạnh đế: 69,5 / 34 ≈ 2,0. Hilversum 48 m là tháp đơn mảnh trên khối thấp; Chrysler ≈ 282 / 61 ≈ 4,6. Tháp game
+10 tầng sẽ "mập" hơn chọc trời thật — chấp nhận được vì là lầu leo được, nhưng **chóp phải cao** để lấy lại cảm giác vút.
+
+## main — Biệt Thự Chính
+5. Cấu kiện nhận diện
+1. Khối nằm ngang rất dài (dài / rộng ≈ 4 : 1), gạch vàng sọc đen chạy suốt.
+2. **Một** tháp duy nhất ở trục, cao gấp ≈ 2 khối cánh.
+3. Sân thượng bậc thang nhiều cao độ, lan can ống trắng.
+4. Hall-salon kính cả chiều cao ở giữa mặt nam.
+5. Cửa sổ băng ngang và cửa sổ kéo đứng kiểu Mỹ, khung kim loại mảnh [WikiArquitectura].
+6. Pergola bê tông trên sân thượng tầng 2.
+7. Hồ gương 72 m vuông góc mặt nam, phản chiếu mặt tiền.
+8. Góc bo tròn ở vài khối (gạch khuôn cong — lý do có 26 khuôn).
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Rộng × sâu thân nhà | 76 × 22 | **76 × 19** thân + sân thượng nam 3 m trong khung 22 | Giữ dài 76 = 60 × 1,27; sâu thật 15 × 1,27 = 19 |
+| Số tầng | 2 | **2 ở cánh, 3 ở lõi giữa** + tháp | Đúng cao độ thật |
+| Cao parapet cánh | — | **11,5 m** | 9 × 1,27 [suy] |
+| Cao lõi giữa | — | **16 m** | 12,5 × 1,27 [suy] |
+| Cao tháp | — | **26,5 m**; mặt bằng tháp ≈ 7 × 7 m | 21 × 1,27; mặt bằng tháp [chưa có], ước từ cầu thang lớn |
+| Bệ | 0,6 | **1,2 m** + thềm bậc rộng ở mặt nam | Tầng trệt nâng trên hầm nửa chìm |
+| Hồ gương | — | 91 × ≈ 6 m (72 × 1,27; bề rộng [chưa có]) | Nếu mặt bằng tiên phủ đủ chỗ |
+
+## guest — Cánh Khách
+5. Cấu kiện nhận diện
+1. Khối thấp dài, nối về biệt thự chính bằng hành lang có mái phẳng.
+2. Gạch vàng sọc đen như nhà chính.
+3. Sân thượng lùi bậc ở mái, lan can ống trắng.
+4. Cửa sổ băng ngang mỗi phòng + ban công nhỏ.
+5. Khối thang đứng ở đầu cánh, cao hơn mái 1 tầng.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Rộng × sâu | 50 × 16 | **44 × 14** | Cánh Cavrois [suy] 22 m × 1,27 ≈ 28 m quá ngắn cho nhà khách độc lập; 44 m giữ dài/sâu ≈ 3,1, sâu 14 = phòng 9 m + hành lang 2 m + tường |
+| Tầng | 2 | 2 + khối tầng 3 nhỏ (≈ 1/4 mái) | Lặp mô-típ cánh tây |
+| Cao | — | parapet 10 m, khối thang 14 m | [suy] |
+| Bệ | 0,6 | 0,9 m + cửa sổ hầm | [suy] |
+
+## studio — Xưởng Hoạ (khối chéo)
+5. Cấu kiện nhận diện
+1. Mặt kính xưởng lớn, chia lưới ô vuông khung thép mảnh.
+2. Giếng trời / trần kính màu nhìn thấy từ ngoài như hộp kính trên mái.
+3. Hai khối giao nhau theo góc, cao thấp khác nhau.
+4. Khối thang đứng.
+5. Mái phẳng, gờ mái mỏng nhô.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Rộng × sâu | 30 × 18 | 30 × 18 (khối chính 20 × 14, khối phụ 12 × 9 xoay 45°) | Khung đủ; chỉ chia khối |
+| Tầng | 2 | 1 tầng thông cao 8,5 m (6,75 × 1,27) + khối phụ 2 tầng | Xưởng hoạ là không gian thông |
+| Bệ | 0,6 | 0,6 | Giữ |
+
+## cinema — Rạp Chiếu & Phòng Nhạc
+5. Cấu kiện nhận diện
+1. Vây dọc (1 hoặc 3) vượt cao hơn mái, mang chữ tên rạp.
+2. Mái hiên marquee dài, mép cong, viền đèn.
+3. Mặt tiền hai màu kem / đen hoặc đen bóng + nẹp crôm.
+4. Tường chắn mái xây bậc ở hai vai.
+5. Vòm sân khấu dải đồng tâm (sunburst) — thấy được nếu vào trong.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Rộng × sâu | 40 × 22 | **24 × 40** (mặt tiền 24, sâu 40) | Rạp thật hẹp ngang, sâu dọc; 40 × 22 đặt mặt tiền ở cạnh dài thì khán phòng chỉ sâu 22 m, không ra rạp |
+| Cao khán phòng | 1 tầng | **10 m** | [suy] đủ một ban công; Grand Rex > 30 m là rạp 2 700 chỗ |
+| Cao vây | — | **18 m** (≈ 1,8 × mái) | [suy]; tham chiếu tháp Grand Rex 35 m trên khối ≈ 6 tầng |
+| Khung sân khấu | — | 12 × 7,2 m | Tỉ lệ 0,6 của Radio City [suy] |
+| Bệ | 0,6 | 0,6 | Giữ |
+
+Nếu mặt bằng tổng không cho xoay nhà: giữ 40 × 22 nhưng đặt **khán phòng dọc theo cạnh 40** và mặt tiền + vây ở **đầu hồi 22 m**.
+
+## garage — Nhà Xe & Kho
+5. Cấu kiện nhận diện
+1. Dãy cửa gara đều dưới một mái hiên bê tông chạy liền.
+2. Đầu khối bo tròn.
+3. Phân tầng vật liệu: đá trắng dưới, trát trên.
+4. Gờ mái nhô mỏng.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Rộng × sâu | 44 × 14 | 44 × 14 | 6 ô × 3,5 m = 21 m + kho + đầu tròn; sâu 14 = ô 6,5 + kho 6 [suy] |
+| Tầng | 1 | **2** (lầu chỉ phủ ≈ 60 %) | Empain nhà phụ 2 tầng |
+| Cao | — | trệt 3,6 m, tổng 7,5 m | [suy] |
+| Bệ | 0,6 | 0,15 (xe phải vào được) | Gara không nâng nền |
+
+## poolhouse — Nhà Hồ Bơi
+5. Cấu kiện nhận diện
+1. Mặt kính lớn chia khung đứng, có thể mở hết ra ngoài.
+2. Trần lưới dầm ô vuông với ô gạch kính phát sáng.
+3. Sân thượng mái có lan can ống trắng kiểu boong tàu.
+4. Cửa sổ tròn (porthole) ở dãy cabin.
+5. Cầu nhảy kim loại ở đầu bể.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Rộng × sâu | 34 × 14 | 34 × 14 giữ, nhưng **bể trong nhà 19 × 9** (15 × 7 × 1,27) | Phòng bể ≈ 23 × 14; dãy cabin + kỹ thuật 11 × 14 |
+| Tầng | 1 | 1 + sân thượng | Noailles |
+| Cao | — | 5,5 m tới mái, + lan can 1,1 | [suy] |
+| Hồ ngoài trời (nếu có) | — | 34 × 5 (27 × 4 × 1,27) song song nhà chính | Cavrois |
+| Bệ | 0,6 | 0,6 | Giữ |
+
+## gym — Phòng Tập
+5. Cấu kiện nhận diện
+1. Hai khối cao thấp: hộp squash cao kín, phòng tập thấp nhiều kính.
+2. Cửa sổ băng cao sát trần.
+3. Sân thượng mái lan can trắng.
+4. Lối nối có mái phẳng sang hồ bơi.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Rộng × sâu | 30 × 16 | 30 × 16 | Đủ: squash 12,4 × 8,2 ngoài tường (9,75 × 6,4 × 1,27) + phòng tập 14 + thay đồ |
+| Cao | 1 tầng | squash **8 m**, phòng tập **5,5 m** | 5,64 × 1,27 + kết cấu |
+| Bệ | 0,6 | 0,6 | Giữ |
+
+## summit — Đài Ngắm Cảnh
+5. Cấu kiện nhận diện
+1. Phòng tròn kính băng 360° trên đỉnh.
+2. Cánh buồm ngang mỏng.
+3. Gạch vàng sọc đen ở thân.
+4. Mái đĩa mỏng + cột cờ.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Mặt bằng | 9 × 9 | 9 × 9 | Giữ |
+| Cao | — | thân 7 m + phòng tròn 3 m + mái 0,4 + cột cờ 4 m ≈ 14,5 m | [suy] |
+| Phòng tròn | — | Ø 6 m | Phóng từ 2,5–3 m để người chơi đứng được; lệch tỉ lệ có chủ đích, ghi lại |
+
+## gaz1 — Đình Kính
+5. Cấu kiện nhận diện
+1. Vòm nông lỗ chỗ gạch kính phát sáng.
+2. Mặt bằng tam giác cạnh cong.
+3. Tường kính ghép tam giác trắng + hồng.
+4. Quả cầu sáng ở tâm.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Mặt bằng | 10 × 10 | 10 × 10 (tam giác cạnh ≈ 10) | Giữ |
+| Vòm | — | Ø 8,9 m (7 × 1,27), cao đỉnh 5,5 m | [suy] |
+
+## gaz2 — Đình Tennis
+5. Cấu kiện nhận diện
+1. Mái phẳng công-xôn mỏng, nhô dài.
+2. Pergola dầm song song.
+3. Bậc khán đài.
+4. Bảng điểm chữ số kiểu Deco.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất | Lý do |
+|---|---|---|---|
+| Đình | 12 × 9 | 12 × 9 | Giữ |
+| Cao | — | 3,8 m tới mái | [suy] |
+| Sân kèm | — | 23 × 46 khoảng đất nếu phóng 1,27 (18 × 37 × 1,27); tối thiểu 18 × 37 | Không phóng sân thì người chơi thấy sân nhỏ so với nhà |
+
+## gaz3 — Đình Đọc Sách
+5. Cấu kiện nhận diện
+1. Pergola dầm song song mảnh.
+2. Tường gạch thấp hình L.
+3. Một nửa mái kín, một nửa thoáng.
+4. Lan can ống trắng ở cạnh mở (nếu đặt trên cao).
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất |
+|---|---|---|
+| Mặt bằng | 9 × 9 | 9 × 9 |
+| Cao | — | 3,4 m dầm pergola [suy = 1 tầng Cavrois] |
+
+## gaz4 — Đình Hồ Gương
+5. Cấu kiện nhận diện
+1. Đặt đúng trên trục hồ, nhìn về nhà.
+2. Mái phẳng mỏng nổi trên cột mảnh.
+3. Bậc xuống nước.
+4. Quả cầu sáng.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất |
+|---|---|---|
+| Mặt bằng | 9 × 9 | 9 × 4,5 (bán nguyệt) + bậc |
+| Cao | — | 3,2 m |
+
+## gaz5 — Đình Cuối Vườn
+5. Cấu kiện nhận diện
+1. "Cây" bê tông lập phương: thân sắc cạnh + lá tấm phẳng.
+2. 4 cây, mỗi cây một thảm cỏ viền hoàng dương.
+3. Màu xi măng xám trơn.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất |
+|---|---|---|
+| Mặt bằng | 8 × 8 | 8 × 8 |
+| Cao cây | — | 6,4 m (5 × 1,27) |
+
+Lưu ý: 4 cây phải là ít nhất 3 biến thể (4 cách gắn lá thật) — khớp luật "≥ 3 biến thể" của dự án.
+
+## gaz6 — Đình Góc Đông
+5. Cấu kiện nhận diện
+1. Mặt bằng tam giác.
+2. Ô bàn cờ (gạch + cỏ / sỏi) xếp bậc.
+3. Bồn cây hộp vuông.
+4. Tượng đỉnh trục.
+8. Kích thước đề xuất cho game
+
+| Hạng mục | Khung hiện tại | Đề xuất |
+|---|---|---|
+| Mặt bằng | 8 × 8 | tam giác cạnh góc vuông 8 m |
+| Cao | — | tường 1,2 m; tượng 2,5 m |
+
+## giason — Sân Thượng Ngắm Cảnh (giả sơn)
+5. Cấu kiện nhận diện
+Bậc sân bê tông lùi so le; lan can trắng; tường gạch vàng; pergola trên đỉnh.
+8. Kích thước đề xuất cho game
+3 bậc × 4,3 m (3,4 × 1,27) = 13 m cao. Mặt bằng theo tổng mặt bằng hiện có.

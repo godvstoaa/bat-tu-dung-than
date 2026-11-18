@@ -1,0 +1,22 @@
+Lầu 10 tầng: Lầu Kiến Trung (10 tầng) — bệ vuông cạnh 43 m, cao tổng ~?
+NHÀ (id | tên | khung hiện tại rộng x sâu m | số tầng | bệ m):
+- main | Điện Thái Hòa | 50 x 26 | 1 | 2.4
+- canchanh | Điện Cần Chánh | 42 x 20 | 1 | 1.6
+- tavu | Tả Vu | 30 x 12 | 1 | 1.6
+- huuvu | Hữu Vu | 30 x 12 | 1 | 1.6
+- themieu | Thế Miếu | 32 x 50 | 1 | 1.6
+- dientho | Cung Diên Thọ | 32 x 44 | 1 | 1.6
+- truongsanh | Cung Trường Sanh | 34 x 18 | 1 | 1.6
+- hienlam | Hiển Lâm Các | 20 x 20 | 2 | 1.6
+- thaimieu | Thái Miếu | 34 x 18 | 1 | 1.6
+- quocsu | Quốc Sử Quán | 34 x 18 | 1 | 1.6
+ĐÌNH / TIỂU CÔNG TRÌNH:
+- summit | Vọng Sơn Đình | 9 x 9
+- ngomonW | Lầu Ngũ Phụng Tây | 9 x 9
+- ngomonE | Lầu Ngũ Phụng Đông | 9 x 9
+- kimthuyW | Đình Kim Thủy Tây | 8 x 8
+- kimthuyE | Đình Kim Thủy Đông | 8 x 8
+- tinhtam1 | Đình Tịnh Tâm Đông | 9 x 9
+- thieuphuong | Đình Thiệu Phương | 9 x 9
+- island | Hồ Tâm Đình | 10 x 10
+Giả sơn: Thiệu Phương Viên · non bộ

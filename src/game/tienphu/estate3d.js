@@ -11,13 +11,28 @@ import * as AS from '../archkit-style.js';
 import { gateHouse, stoneLantern, kit } from '../archkit.js';
 import { placeModel } from '../assets.js';
 import { Acc, buildTower, mergeAll } from './tower3d.js';
-import { boxAt, cylAt, shapeWithHoles, railLine, pyramidRoof, polyPrism, columnGeo, skirt } from './geo.js';
+import { boxAt, cylAt, shapeWithHoles, inHole, railLine, pyramidRoof, polyPrism, columnGeo, skirt } from './geo.js';
 import { tpMats } from './mats.js';
 import { archStyle, POOL_LEVEL, gateHouseSpec, freeAt } from './plan.js';
 import { plantFlora, hasModel, treeProxy } from './flora.js';
+import { plantBigTrees, isBig, bigProxy } from './bigtrees.js';
+import { FLORA } from './flora-spec.js';
 import { PropSet } from './props.js';
 import { optCol } from './custom.js';
 import { hallFurniture } from './themes.js';
+import { buildArch, STYLES as ARCH_STYLES } from './arch/index.js';
+
+// công trình dựng theo đặc tả kiến trúc (arch/) — dựng một lần mỗi phiên, nhân bản khi phủ dựng lại
+const ARCH_CACHE = new Map();
+const BASE_KEYS = new Set(['stone', 'marble', 'floor', 'wood']);
+/** { base (nền / bậc / sàn — không làm mờ), shell (phần còn lại — mờ khi vào trong) } của một công trình kiến trúc */
+function archParts(key) {
+  if (!ARCH_CACHE.has(key)) ARCH_CACHE.set(key, buildArch(key).group);
+  const g = ARCH_CACHE.get(key), base = new THREE.Group(), shell = new THREE.Group();
+  for (const m of g.children) (BASE_KEYS.has(m.name) ? base : shell).add(new THREE.Mesh(m.geometry, m.material));
+  for (const o of [...base.children, ...shell.children]) o.castShadow = o.receiveShadow = true;
+  return { base, shell };
+}
 
 // đồ mặc định từng sảnh theo công năng (chủ đề tầng lầu dùng chung — themes.js); vùng nào chủ phủ đã bày đồ thì bỏ
 const HALL_THEME = { main: 0, eastfront: 1, eastback: 4, westfront: 2, westback: 5, guardw: 3, guarde: 3, theater: 8, backw: 7, backe: 6 };
@@ -111,6 +126,8 @@ const LAMP_OF = { palace: 'default', toro: 'stone', butter: 'butter', iron: 'iro
  */
 export function* buildTienJob(m, opts, empty = null) {
   const P = m.tp, st = P.st, M = tpMats(st, opts), S = archStyle(st, { key: JSON.stringify(opts || {}), roofCol: optCol(opts, 'roof'), wallCol: optCol(opts, 'wall'), trimCol: optCol(opts, 'trim') });
+  // nền đất theo chữ ký thực vật của phủ (THUCVAT-MANIFEST §4): cỏ úa Tây Tạng, rêu Nhật, cát-cỏ Versailles … (mùa khác giữ màu mùa)
+  if (!opts?.season && FLORA[st.id]?.ground && M.lawn && !M.lawn.userData.tpGround) { M.lawn = M.lawn.clone(); M.lawn.color.set(FLORA[st.id].ground); M.lawn.userData.tpGround = true; }
   const g = new THREE.Group(); g.name = `est:${m.h}`; g.position.set(m.x, 0, m.z); g.rotation.y = m.ry;
   const solid = new THREE.Group(); solid.name = 'solid'; const noCol = new THREE.Group(); noCol.name = 'nocol'; noCol.userData.noCollide = true;
   g.add(solid, noCol);
@@ -133,13 +150,15 @@ export function* buildTienJob(m, opts, empty = null) {
   yield;
   // ---------------- sảnh (archkit-style) — vỏ sảnh làm mờ khi vào trong
   const halls = [], bases = new THREE.Group(); bases.name = 'hallbases';
-  P.buildings.forEach((b, i) => {
-    const { base, shell } = AS.styledBuilding(S, b);
+  for (let i = 0; i < P.buildings.length; i++) {
+    const b = P.buildings[i];
+    const { base, shell } = b.arch ? archParts(b.arch) : AS.styledBuilding(S, b);
     base.position.set(b.x, 0, b.z); base.rotation.y = b.ry; bases.add(base);
     const sg = new THREE.Group(); sg.name = `hall${i}`; sg.position.set(b.x, 0, b.z); sg.rotation.y = b.ry; sg.add(shell);
     mergeAll(sg); MD.ownMaterials(sg); solid.add(sg);
     halls.push({ zone: P.zones[i], g: sg, mats: sg.userData.fadeMats, op: 1 });
-  });
+    if (b.arch) yield;
+  }
   solid.add(mergeAll(bases));
   // đồ mặc định trong sảnh còn trống (một lưới gộp cho mọi sảnh)
   { const acc = new Acc();
@@ -150,7 +169,8 @@ export function* buildTienJob(m, opts, empty = null) {
       const c = Math.cos(b.ry), sn = Math.sin(b.ry);
       const wrap = { add: (key, ...geos) => acc.add(key, geos.flat().filter(Boolean).map((g) => g.rotateY(b.ry).translate(b.x, 0, b.z))), full,
         prop: (id, x, y, z, ry, sc, fit) => ps.add(id, b.x + c * x + sn * z, y, b.z - sn * x + c * z, (ry || 0) + b.ry, sc, fit) };
-      hallFurniture(wrap, { hw: b.w / 2 - 0.45, hd: b.d / 2 - 0.45, y, back: !!b.back }, HALL_THEME[b.id] ?? 1);
+      const iw = b.arch && b.body[0] ? b.body[0] : b.w, id2 = b.arch && b.body[1] ? b.body[1] : b.d; // lòng nhà thật (lưới cột) — không tràn ra nền / nguyệt đài
+      hallFurniture(wrap, { hw: iw / 2 - (b.arch ? 1.2 : 0.45), hd: id2 / 2 - (b.arch ? 1.6 : 0.45), y, back: !!b.back }, b.theme ?? HALL_THEME[b.id] ?? 1); // chủ đề bài trí theo bản vẽ (siteplans.js)
     });
     solid.add(acc.build(M, { name: 'hallFurniture' })); }
   // bản GỘP mọi vỏ sảnh (đứng ngoài sảnh) — vào trong sảnh nào thì hiện vỏ riêng từng sảnh để làm mờ (mansion3d)
@@ -161,26 +181,37 @@ export function* buildTienJob(m, opts, empty = null) {
   solid.add(hallsWhole);
   yield;
   // ---------------- đình
-  { const pavs = new THREE.Group(); pavs.name = 'pavs'; for (const pv of P.pavs) { const { base, shell } = AS.styledPavilion(S, pv); const pg = new THREE.Group(); pg.add(base, shell); pg.position.set(pv.x, pv.y || 0, pv.z); pavs.add(pg); } solid.add(mergeAll(pavs)); }
+  { const pavs = new THREE.Group(); pavs.name = 'pavs'; for (const pv of P.pavs) { const { base, shell } = pv.arch ? archParts(pv.arch) : AS.styledPavilion(S, pv); const pg = new THREE.Group(); pg.add(base, shell); pg.position.set(pv.x, pv.y || 0, pv.z); pavs.add(pg); } solid.add(mergeAll(pavs)); }
   yield;
   // ---------------- lầu chính 10 tầng
-  const tw = buildTower(P.tower.spec, st, M, opts?.themes, (k) => { const ps = new PropSet(null, `tpFloor${k}`); ps.full = full; floorProps[k] = ps; return ps; });
+  const tw = buildTower(P.tower.spec, st, M, opts?.themes, (k) => { const ps = new PropSet(null, `tpFloor${k}`); ps.full = full; floorProps[k] = ps; return ps; }, { skin: !!ARCH_STYLES[st.id]?.specs?.tower });
   for (const ps of floorProps) if (ps) ps.frame = tw.root;
   tw.root.position.set(P.tower.x, 0, P.tower.z); solid.add(tw.root);
+  if (ARCH_STYLES[st.id]?.specs?.tower) { const { base, shell } = archParts(`${st.id}/tower`); const sk = new THREE.Group(); sk.name = 'towerSkin'; sk.add(base, shell); sk.position.set(P.tower.x, 0, P.tower.z); mergeAll(sk); solid.add(sk); } // vỏ lầu theo nguyên mẫu (arch/)
   yield;
   // ---------------- nước: lòng hồ (đáy + vách), mặt nước, bờ đá; sen / cá / sỏi
   { const acc = new Acc(), lake = opts?.lake || 0;
+    // vách / bờ đá chỉ dựng ở phần KHÔNG nằm trong khối nước khác (ao nhiều elip chồng, kênh chữ thập, hào 4 dải) — không còn vách chìm cắt mặt nước
+    const wet = (self, x, z) => P.water.some((o) => o !== self && inHole(o, x, z, -0.25));
     for (const w of P.water) {
       if (w.shape === 'ellipse') {
         const geo = new THREE.CircleGeometry(1, 64); geo.rotateX(-Q);
         acc.add('bed', geo.clone().scale(w.rx, 1, w.rz).translate(w.x, w.floor, w.z));
         acc.add('water', geo.clone().scale(w.rx, 1, w.rz).translate(w.x, w.level, w.z));
-        const wall = new THREE.CylinderGeometry(1, 1, -w.floor, 64, 1, true); wall.scale(w.rx, 1, w.rz); wall.translate(w.x, w.floor / 2, w.z); acc.add('stoneDark', wall);
-        const rim = new THREE.TorusGeometry(1, 0.03, 4, 64); rim.rotateX(Q); rim.scale(w.rx + 0.35, 1, w.rz + 0.35); acc.add('stone', rim.translate(w.x, 0.05, w.z));
-        for (let k = 0; k < 64; k++) { const t = (k / 64) * Math.PI * 2; acc.add('stone', boxAt(1.6, 0.35, 0.8, w.x + Math.cos(t) * (w.rx + 0.3), 0.12, w.z + Math.sin(t) * (w.rz + 0.3), -t + Q)); }
+        const NS = 96;
+        for (let k = 0; k < NS; k++) {
+          const t0 = (k / NS) * Math.PI * 2, t1 = ((k + 1) / NS) * Math.PI * 2, tm = (t0 + t1) / 2, mx = w.x + Math.cos(tm) * w.rx, mz = w.z + Math.sin(tm) * w.rz;
+          if (wet(w, mx, mz)) continue;
+          const ax = w.x + Math.cos(t0) * w.rx, az = w.z + Math.sin(t0) * w.rz, bx = w.x + Math.cos(t1) * w.rx, bz = w.z + Math.sin(t1) * w.rz, L = Math.hypot(bx - ax, bz - az) + 0.05, ry = Math.atan2(-(bz - az), bx - ax);
+          acc.add('stoneDark', boxAt(L, -w.floor, 0.25, mx, w.floor / 2, mz, ry));
+          if (k % 2 === 0) acc.add('stone', boxAt(1.6, 0.35, 0.8, w.x + Math.cos(tm) * (w.rx + 0.3), 0.12, w.z + Math.sin(tm) * (w.rz + 0.3), ry));
+        }
       } else {
         acc.add('bed', boxAt(w.hw * 2, 0.1, w.hd * 2, w.x, w.floor - 0.05, w.z)); acc.add('water', boxAt(w.hw * 2, 0.02, w.hd * 2, w.x, w.level, w.z));
-        for (const [x, z, bw, bd] of [[w.x, w.z - w.hd, w.hw * 2, 0.3], [w.x, w.z + w.hd, w.hw * 2, 0.3], [w.x - w.hw, w.z, 0.3, w.hd * 2], [w.x + w.hw, w.z, 0.3, w.hd * 2]]) acc.add('stoneDark', boxAt(bw, -w.floor, bd, x, w.floor / 2, z)), acc.add('marble', boxAt(bw + 0.5, 0.3, bd + 0.5, x, 0.1, z));
+        for (const [ax, az, bx, bz] of [[w.x - w.hw, w.z - w.hd, w.x + w.hw, w.z - w.hd], [w.x - w.hw, w.z + w.hd, w.x + w.hw, w.z + w.hd], [w.x - w.hw, w.z - w.hd, w.x - w.hw, w.z + w.hd], [w.x + w.hw, w.z - w.hd, w.x + w.hw, w.z + w.hd]]) {
+          const L = Math.hypot(bx - ax, bz - az), n = Math.max(1, Math.round(L / 2)), along = Math.abs(bx - ax) > Math.abs(bz - az);
+          for (let q = 0; q < n; q++) { const t = (q + 0.5) / n, x = ax + (bx - ax) * t, z = az + (bz - az) * t; if (wet(w, x, z)) continue; const sl = L / n + 0.02; acc.add('stoneDark', boxAt(along ? sl : 0.3, -w.floor, along ? 0.3 : sl, x, w.floor / 2, z)); acc.add('marble', boxAt(along ? sl : 0.8, 0.3, along ? 0.8 : sl, x, 0.1, z)); }
+        }
       }
       // điểm xuyết theo tuỳ biến hồ
       const N = w.shape === 'ellipse' ? Math.round(w.rx * w.rz * 0.02) : Math.round(w.hw * w.hd * 0.04);
@@ -233,7 +264,7 @@ export function* buildTienJob(m, opts, empty = null) {
     acc.add('lawn', shapeWithHoles([[-hw, -hd], [hw, -hd], [hw, hd], [-hw, hd]], holes, 0.04, 0.05));
     for (const p of P.paths) acc.add('pave', boxAt(p.w, 0.05, p.d, p.x, 0.07, p.z, p.ry));
     if (P.zen) { acc.add('gravel', boxAt(P.zen.w, 0.05, P.zen.d, P.zen.x, 0.08, P.zen.z)); for (let i = 0; i < 18; i++) acc.add('stone', boxAt(P.zen.w - 2, 0.02, 0.08, P.zen.x, 0.12, P.zen.z - P.zen.d / 2 + 1 + i * (P.zen.d - 2) / 17)); }
-    acc.add('pave', boxAt(130, 0.05, 74, 0, 0.065, P.D / 2 - 40)); // sân tiền viện lát
+    if (P.forecourt) acc.add('pave', boxAt(P.forecourt.w, 0.05, P.forecourt.d, P.forecourt.x, 0.065, P.forecourt.z)); // sân lát trước cổng theo bản vẽ
     noCol.add(acc.build(M, { name: 'ground' }));
   }
   // ---------------- vật trang trí đặc: vườn hoa kỷ hà, đài phun, chedi, cột cờ, đá, ghế, tượng (không phải sư tử GLB)
@@ -264,10 +295,15 @@ export function* buildTienJob(m, opts, empty = null) {
   // ---------------- cây (styledTree) theo mùa — gộp theo vật liệu; tán lá nhuộm theo tuỳ biến mùa
   { const tg = new THREE.Group(); tg.name = 'trees'; let seed = m.h * 31 + 7;
     // loài có model thật → flora.js (nhân bản, gần / xa); loài chưa có model (cypress, hedge, palm, bamboo) dựng thủ tục như cũ
-    const mod = [];
-    for (const t of P.trees) { if (hasModel(t.kind)) { mod.push(t); continue; } const o = AS.styledTree(t.kind, seed++, t.s || 1); o.position.set(t.x, 0, t.z); o.rotation.y = seed; tg.add(o); }
-    { const pa = new Acc(); for (const t of mod) { const q = treeProxy(t); pa.add('proxy', q.r ? cylAt(q.r, q.r * 1.15, q.h, t.x, q.h / 2, t.z, 8) : boxAt(q.w, q.h, q.d, t.x, q.h / 2, t.z)); } solid.add(pa.build(M, { name: 'treeTrunks' })); } // trụ thân ẩn (va chạm)
-    flora = plantFlora(g, mod, opts?.season || 0);
+    const mod = [], big = [];
+    for (const t of P.trees) { if (isBig(t.kind)) { big.push(t); continue; } if (hasModel(t.kind)) { mod.push(t); continue; } const o = AS.styledTree(t.kind, seed++, t.s || 1); o.position.set(t.x, 0, t.z); o.rotation.y = seed; tg.add(o); }
+    { const pa = new Acc(); for (const t of mod) { const q = treeProxy(t); pa.add('proxy', q.r ? cylAt(q.r, q.r * 1.15, q.h, t.x, q.h / 2, t.z, 8) : boxAt(q.w, q.h, q.d, t.x, q.h / 2, t.z)); }
+      for (const t of big) { const q = bigProxy(t); pa.add('proxy', cylAt(q.r, q.r * 1.2, q.h, t.x, q.h / 2, t.z, 10)); }
+      solid.add(pa.build(M, { name: 'treeTrunks' })); } // trụ thân ẩn (va chạm)
+    // cổ thụ (model Meshy / thủ tục, docs/TIEN-PHU-THUCVAT-MANIFEST.md) + cây nhỏ cũ (flora.js) — gộp một bộ cập nhật cho mansion3d
+    { const fa = plantFlora(g, mod, opts?.season || 0), fb = plantBigTrees(g, big, opts?.season || 0);
+      flora = { group: fb.group, ready: Promise.all([fa.ready, fb.ready]), update: (x, z) => { fa.update(x, z); fb.update(x, z); }, stats: () => { const a = fa.stats(), b = fb.stats(); return Object.fromEntries(Object.keys(b).map((k) => [k, (a[k] || 0) + b[k]])); } }; }
+    mod.push(...big); // hoa / bụi quanh gốc dùng chung danh sách
     // hoa viền lối + quanh gốc cây hoa, bụi quanh gốc (DOHOA §2.2) — RNG riêng: không đổi vị trí cây / đèn cũ
     { const rg = rng(991 + m.h), taken = [...P.lamps, ...P.benches]; let nf = 0, ns = 0;
       const okAt = (x, z) => freeAt(P, x, z, 0.6) && !taken.some((o) => Math.abs(o.x - x) < 1.1 && Math.abs(o.z - z) < 1.1) && !P.trees.some((t) => Math.abs(t.x - x) < 0.7 && Math.abs(t.z - z) < 0.7);

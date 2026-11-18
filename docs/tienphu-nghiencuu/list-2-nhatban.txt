@@ -1,0 +1,21 @@
+Lầu 10 tầng: Thiên Thủ Các (10 tầng) — bệ vuông cạnh 46 m, cao tổng ~?
+NHÀ (id | tên | khung hiện tại rộng x sâu m | số tầng | bệ m):
+- main | Đại Quảng Gian (Ōhiroma) | 50 x 26 | 1 | 1.2
+- shikidai | Thức Đài (Shikidai) | 34 x 18 | 1 | 1.2
+- kuroshoin | Hắc Thư Viện | 34 x 18 | 1 | 1.2
+- shiroshoin | Bạch Thư Viện | 28 x 16 | 1 | 1.2
+- kesho | Hóa Trang Lâu (Keshō-yagura) | 40 x 12 | 2 | 1.2
+- kura | Kho Gạo (Kura) | 34 x 12 | 2 | 1.2
+- umaya | Chuồng Ngựa (Umaya) | 44 x 12 | 1 | 1.2
+- masuW | Masugata Tây | 18 x 10 | 2 | 0.6
+- masuE | Masugata Đông | 18 x 10 | 2 | 0.6
+- chashitsu | Trà Thất Kōraku | 18 x 12 | 1 | 1.2
+ĐÌNH / TIỂU CÔNG TRÌNH:
+- summit | Vọng Sơn Đình | 9 x 9
+- yaguraSW | Lầu Góc Tây Nam | 9 x 9
+- yaguraSE | Lầu Góc Đông Nam | 9 x 9
+- yaguraNE | Lầu Góc Đông Bắc | 9 x 9
+- yaguraNW | Lầu Góc Tây Bắc | 9 x 9
+- azumaya | Đình Nghỉ Vườn | 8 x 8
+- machiai | Đình Chờ Trà | 8 x 8
+Giả sơn: Tsukiyama · núi vườn

@@ -180,11 +180,13 @@ export function mansionNpcs(m, info = {}) {
     own: ['Gian nào cũng chờ chủ nhân bài trí — đồ mua ở các tiệm trong thành.', 'Bàn thờ tựa vách sau, nhìn ra cửa thì phong thủy tốt.', 'Nước trước nhà là minh đường, giữ cho trong thì tài lộc tụ.', 'Mỗi ngày chủ nhân về phủ, khí lành lại tụ thêm.'],
     visit: [`${owner} đi vắng, mời khách dạo một vòng.`, 'Chính đường bày biện theo ý chủ nhân, đẹp lắm phải không?', 'Khách thấy được thì ra cổng khen phủ một tiếng nhé.'],
   }[mode] || [];
-  const fz = main.z + main.d / 2 + main.plinth;
-  out.push({ ...base, id: `phu${m.h}_qg`, name: `${mode === 'sale' ? 'Lão' : 'Quản gia'} ${pick(HO, 1)}`, role: mode === 'sale' ? 'Người trông phủ' : 'Quản gia', look: 'master', lines: qgLines, ...at(Math.min(6, main.w / 3), fz + 2.4), path: null, face });
+  const fz = main.d / 2 + main.plinth; // khung CỦA công trình chính (tiên phủ: lệch tâm / xoay theo bản vẽ)
+  const mr = main.ry || 0, mc = Math.cos(mr), ms = Math.sin(mr), atM = (u, v) => at(main.x + mc * u + ms * v, main.z - ms * u + mc * v);
+  const pathM = (pts) => { const Pp = pts.map(([u, v]) => atM(u, v)); return { path: Pp, x: Pp[0].x, z: Pp[0].z }; };
+  out.push({ ...base, id: `phu${m.h}_qg`, name: `${mode === 'sale' ? 'Lão' : 'Quản gia'} ${pick(HO, 1)}`, role: mode === 'sale' ? 'Người trông phủ' : 'Quản gia', look: 'master', lines: qgLines, ...atM(Math.min(6, main.w / 3), fz + 2.4), path: null, face: face + mr });
   out.push({ ...base, id: `phu${m.h}_vuon`, name: `Thím ${pick(TEN_NU, 2)}`, role: 'Người làm vườn', look: 'npc_villager', lines: ['Cây trong phủ phải tỉa đều tay mới đẹp.', 'Cá dưới nước đớp mồi tung tăng.', 'Gò sau phủ trồng thêm cây cho vững thế tọa sơn.'], ...path([[-hw + 7, hd - 9], [-3, hd - 9], [hw - 7, hd - 9]]) });
   if (mode !== 'sale') {
-    out.push({ ...base, id: `phu${m.h}_hau`, name: `A ${pick(TEN_NU, 5)}`, role: west ? 'Người giúp việc' : 'Thị nữ', look: 'hero_f', lines: ['Trà mới pha, mời khách.', 'Chính đường vừa lau dọn xong.', 'Tối nay thắp đèn quanh hồ nhé.'], ...path([[-main.w / 2 + 2, fz + 4], [main.w / 2 - 2, fz + 4]]) });
+    out.push({ ...base, id: `phu${m.h}_hau`, name: `A ${pick(TEN_NU, 5)}`, role: west ? 'Người giúp việc' : 'Thị nữ', look: 'hero_f', lines: ['Trà mới pha, mời khách.', 'Chính đường vừa lau dọn xong.', 'Tối nay thắp đèn quanh hồ nhé.'], ...pathM([[-main.w / 2 + 2, fz + 4], [main.w / 2 - 2, fz + 4]]) });
   }
   return out;
 }

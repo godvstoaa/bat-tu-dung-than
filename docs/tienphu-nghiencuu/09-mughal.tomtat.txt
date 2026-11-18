@@ -1,0 +1,248 @@
+## main-tower — Lăng Vọng Tinh (lầu 10 tầng)
+5. Cấu kiện nhận diện (theo mức quan trọng)
+1. Vòm bầu trắng **trên trống cao**, bầu phình hơn trống, có sen + finial.
+2. Khối vuông **vát góc**, mỗi mặt **pishtaq** khung chữ nhật nhô cao hơn diềm mái.
+3. **Bốn minaret tách rời** ở 4 góc bệ (3 ban công, chhatri đỉnh), thấp hơn lăng.
+4. **Bệ vuông cẩm thạch** rộng 1,68 lần thân lăng.
+5. 4 **chhatri** bát giác quanh trống.
+6. Hai bên pishtaq có **2 tầng iwan chồng nhau**, mặt vát cũng vậy.
+7. **Guldasta** ở mọi cạnh khung.
+8. Dải **thư pháp đen** viền pishtaq, spandrel khảm pietra dura.
+9. Hai công trình đỏ đối xứng (Masjid / Jawab) hai bên. Đây là yếu tố của quần thể.
+8. Đề xuất cho game — 10 tầng chơi được, giữ nguyên hình ngoài
+
+**Khung hiện tại «bệ vuông cạnh 42 m» sai tỉ lệ nếu 42 m là bệ.**
+- Bệ thật / thân = 1,68.
+- Bệ 42 m thì thân chỉ còn 25 m và cao tới finial khoảng 30 m.
+- Không thể nhét 10 tầng chơi được vào trong mà giữ đúng hình.
+
+**Đề xuất: lấy 42 m làm cạnh THÂN lăng**, hệ số s = 42 / 56,9 = **0,74**. Áp cùng s cho cả khu.
+
+| Phần | Thật (m) | Game s = 0,74 (m) |
+|---|---|---|
+| Thân lăng | 56,9 × 56,9 | **42,1 × 42,1** |
+| Cạnh cắt góc vát | khoảng 6,6 | khoảng 4,9 |
+| Bệ cẩm thạch | 95,5 × 95,5 × 6 | 70,7 × 70,7 × 4,4 |
+| Diềm mái | 23,6 | 17,5 |
+| Khung pishtaq rộng × cao | 22,7 × 27 | 16,8 × 20,0 |
+| Đỉnh guldasta | 33 | 24,4 |
+| Lỗ vòm iwan rộng × cao | 13,9 × 20,6 | 10,3 × 15,2 |
+| Trống: đường kính ngoài × cao | 24,5 × 12 | 18,1 × 8,9 |
+| Bầu vòm: đường kính lớn nhất × cao | 27,5 × 23 | 20,4 × 17,0 |
+| Đỉnh finial (trên mặt bệ) | 68 | **50,3** |
+| Cao tổng từ mặt đất (có bệ) | 74 | **54,7** |
+| Minaret: cao × đường kính | 43,0 × 5,65 | 31,8 × 4,2 |
+| Chhatri mái: ngang × cao | khoảng 9,5 × 14 | khoảng 7,0 × 10,4 |
+
+**10 tầng** (cao độ trên mặt bệ, game s = 0,74; trong ngoặc là thật 1:1):
+
+| Tầng | Cao độ sàn | Nằm ở đâu trong hình ngoài | Không gian / diện tích chơi |
+|---|---|---|---|
+| T1 | −4,4 (−6,0) | Trong bệ cẩm thạch, đúng như tầng hầm mộ thật | Hầm bát giác + 4 nhánh |
+| T2 | 0 | Tầng chính | Phòng bát giác ngang 13 m, thông tầng lên tới vòm trong. 4 phòng trục + 4 phòng góc |
+| T3 | 6,8 (9,2) | Tầng iwan trên (gờ phân tầng thật ở 9,2 m) | Vòng phòng góc tầng trên. Ban công jali nhìn xuống T2 |
+| T4 | 11,8 (16,0) | Nửa trên của hốc iwan và ô góc | Hành lang vòng + phòng góc |
+| T5 | 17,5 (23,6) | **Sân mái thật** | 4 chhatri, hành lang cột sau lưng pishtaq (Koch). Ra ngoài trời được |
+| T6 | 20,7 (28,0) | Trong trống, ngay trên lưng vòm trong (vòm trong giả định đỉnh khoảng 26 m thật) | Sàn tròn đường kính khoảng 13,6 (18,4) |
+| T7 | 25,2 (34,0) | Đỉnh trống / chân bầu | Sàn tròn đường kính khoảng 15 |
+| T8 | 29,6 (40,0) | Bầu vòm, gần chỗ phình nhất | Sàn tròn đường kính khoảng 19 |
+| T9 | 34,4 (46,5) | Bầu vòm, phần thu hẹp | Sàn tròn đường kính khoảng 16 |
+| T10 | 38,9 (52,5) | Dưới mũ sen | Sàn tròn đường kính khoảng 9. Đài quan sát |
+| — | 43,2 → 50,3 | Sen + finial | Không vào được |
+
+Chiều cao mỗi tầng ở s = 0,74 là 3,7–6,8 m. Tầng hẹp nhất là T5→T6 (khoảng 3,2 m thông thủy). Tất cả đều chơi được.
+
+**Cách vào và đi lên mà không đổi hình ngoài:**
+- Cầu thang xoắn đặt trong 4 khối trụ góc vát. Khối trụ có đủ bề dày vì mặt bằng *hasht bihisht* để khối đặc ở góc.
+- Trong trống: cầu thang chạy trong bề dày tường trống. Tường dày khoảng (24,5 − 18,4) / 2 ≈ 3 m thật.
+- Trong bầu: cầu thang bám vỏ.
+- Bên trong vỏ đôi thật là khoảng rỗng khoảng 30 m. Chèn sàn vào đó **không đổi hình ngoài**.
+- Ánh sáng T6–T10: ngoài thật trống không có lỗ mở. Phương án lệch nhỏ chấp nhận được: biến vài ô vòm mù trên trống thành jali xuyên sáng. Phải ghi là lệch nguyên mẫu.
+
+**Phương án B (1:1):**
+- Thân 56,9 m, bệ 95,5 m, cao 74 m.
+- Lọt khu 520 m: thật bậc thềm ven sông chỉ 300 × 112 m.
+- Tầng cao hơn và thoáng hơn.
+
+## main — Đại Môn (Darwaza-i Rauza)
+5. Cấu kiện nhận diện
+1. Pishtaq lớn ở giữa, viền thư pháp trắng-đen.
+2. **Hàng 11 chhatri trắng** trên đỉnh pishtaq (mỗi mặt).
+3. 4 tháp góc bát giác đội chhatri.
+4. Hai cánh 2 tầng hốc vòm.
+5. Màu đỏ có panel viền trắng (không phải trắng toàn phần).
+6. Guldasta zigzag kẹp pishtaq.
+8. Đề xuất cho game
+
+| | Thật | Khung hiện tại | Đề xuất s = 0,74 |
+|---|---|---|---|
+| Rộng × sâu | 41,2 × 34 | 44 × 22 | **30,5 × 25,2** |
+| Tỉ lệ sâu / rộng | 0,83 | 0,50 (**quá nông**) | 0,83 |
+| Cao diềm cánh / đỉnh dãy vòm / đỉnh chhatri / guldasta | 17,5 / 23 / 30 / 33 | — | 13 / 17 / 22 / 24,4 |
+| Số tầng | Mặt đứng 2 tầng hốc + mái | 2 | 2 + mái đi được |
+| Bệ | khoảng 1,1 | 1,8 | 0,8–1,0 |
+
+Hai lỗi của khung hiện tại:
+- Khung quá nông.
+- Khung rộng 44 m bằng thân lăng 42 m. Thật thì cổng chỉ rộng 0,72 lần lăng.
+
+## mosque — Thánh Đường (Masjid)
+5. Cấu kiện nhận diện
+1. **3 vòm trắng trên khối đỏ**, vòm giữa lớn hơn.
+2. Pishtaq giữa nhô cao hơn diềm.
+3. Tháp góc bát giác đội chhatri.
+4. Guldasta zigzag.
+5. Đặt đối xứng với Jawab qua lăng.
+8. Đề xuất cho game
+
+| | Thật | Khung hiện tại | Đề xuất s = 0,74 |
+|---|---|---|---|
+| Rộng × sâu | 56,6 × 23,4 (2,42 : 1) | 44 × 20 (2,2 : 1) | **41,9 × 17,3** |
+| Cao diềm / pishtaq / finial vòm giữa | 20,3 / 23,5 / khoảng 34 | — | 15,0 / 17,4 / khoảng 25 |
+| Số tầng | 1 (thông cao) | 1 | 1 |
+| Bệ | Bậc thềm 8,7 + nền thấp | 2,4 | Bậc thềm chung 6,4 + nền khoảng 0,7 |
+
+- Tỉ lệ khung hiện tại gần đúng, chỉ hơi ngắn.
+- Phải ngắn hơn thân lăng một chút: thật 56,6 so với 56,9 (gần bằng).
+
+## jawab — Jawab (Mihman Khana)
+5. Cấu kiện nhận diện
+- Như Masjid.
+- Điểm phân biệt duy nhất nhìn thấy là nội thất (sàn, tường tây không hốc mihrab).
+- Ngoại thất phải **giống hệt** Masjid để giữ đối xứng.
+
+### 6–7. Vật liệu, màu, trang trí
+Như Masjid. Sàn hình học thay cho ô thảm.
+8. Đề xuất cho game
+- Khung hiện tại 44 × 20, 1 tầng, bệ 2,4.
+- Đề xuất y như Masjid: 41,9 × 17,3 ở s = 0,74.
+- Dùng chung mesh, lật gương. Chỉ đổi nội thất.
+
+## khawasW — Khawasspura Tây
+5. Cấu kiện nhận diện
+1. Hiên dài vòm nhiều múi đều nhịp.
+2. Chhajja liên tục.
+3. Sân trong có vườn.
+4. Toàn đỏ, không vòm. Đây là công trình «thấp nhất» trong thứ bậc.
+
+### 6–7. Vật liệu, màu, trang trí
+- Sa thạch đỏ #A8624A, rất ít cẩm thạch.
+- Trang trí tối giản: ô hốc nhiều múi, chỉ đúc.
+8. Đề xuất cho game
+- Khung hiện tại 70 × 14, 2 tầng: dài đúng cỡ một cạnh (thật 62–68 m), nhưng **thật là cụm sân 4 cánh, không phải một khối dài**.
+- Số tầng: chưa có nguồn. Mô tả «hujra sau hiên» gợi ý 1 tầng.
+- Đề xuất s = 0,74: cụm sân **46 × 50 m**, cánh sâu 7–8 m, cao 1 tầng khoảng 5–6 m (suy ra, cần kiểm).
+- Nếu phải giữ một khối: 50 × 8 m, 1 tầng, hiên vòm quay vào trong.
+- Nhịp hiên: chưa có số. Đề xuất khoảng 3,5 m (bội của 3 gaz = 2,43 m nhân 1,5). Đây là **suy ra, cần kiểm**.
+
+## khawasE — Khawasspura Đông
+8. Đề xuất cho game
+Như khawasW, lật gương.
+
+## naubatW — Naubat Khana Tây
+5. Cấu kiện nhận diện
+1. Khối 2 tầng đỏ có **một chhatri trắng ở đỉnh**.
+2. Loggia 3 vòm tầng trên.
+3. Hai lớp chhajja.
+4. Liền với tường vườn có kangura.
+8. Đề xuất cho game
+
+| | Thật | Khung hiện tại | s = 0,74 |
+|---|---|---|---|
+| Rộng × sâu | 22,1 × 13,5 | 30 × 16 | **16,4 × 10,0** |
+| Tầng | 2 + chhatri | 2 | 2 + chhatri |
+| Bệ | khoảng 2 | 1,8 | 1,5 |
+| Cao tổng | khoảng 19 | — | khoảng 14 |
+
+Khung hiện tại quá to so với lăng: thật lăng / Naubat = 2,6; khung hiện tại = 1,4.
+
+## naubatE — Naubat Khana Đông
+8. Đề xuất cho game
+Như naubatW, lật gương.
+
+## tombW — Lăng Phụ Tây (Saheli Burj)
+5. Cấu kiện nhận diện
+1. Thân **bát giác**.
+2. **Một vòm bầu** trên trống thấp.
+3. 8 guldasta góc.
+4. Mỗi mặt một vòm trong khung.
+5. Bệ có lan can.
+6. Vườn charbagh nhỏ quanh lăng.
+8. Đề xuất cho game
+- Khung hiện tại 20 × 20, 1 tầng, bệ 1,8 → **đúng cỡ thật** (18,8).
+- Ở s = 0,74: thân 13,9 m, cao khoảng 14 m trên bệ, bệ 3–3,5 m. Cần thêm sân vườn khoảng 30 × 30 m nếu chỗ cho phép (chưa có số đo vườn).
+
+## summit — Vọng Sơn Đình
+5. Cấu kiện nhận diện
+1. Tháp bát giác đỏ.
+2. Chhatri 8 trụ trên đỉnh.
+3. Chhajja to.
+4. Vòm đỏ (khác vòm trắng của Naubat).
+
+### 6–7. Vật liệu, màu, trang trí
+- Sa thạch đỏ toàn bộ (ảnh lúc chiều #6B3F39, albedo #A8624A).
+- Trang trí ít: khung hốc, chỉ ngang.
+8. Đề xuất cho game
+- Khung hiện tại 9 × 9.
+- s = 0,74: thân khoảng 10 m, chhatri khoảng 9 m, cao khoảng 18 m.
+- Đề xuất khung **10 × 10**, cao 18 m. Đặt trên đỉnh giả sơn.
+
+## chhatriSW — Chhatri Tây Nam
+5. Cấu kiện nhận diện
+1. 8 trụ.
+2. Chhajja đua xa.
+3. Vòm bầu nhỏ có sen + finial.
+4. Mặt bằng bát giác (không phải 4 trụ vuông).
+
+### 6–7. Vật liệu, màu, trang trí
+- Bản «mái lăng»: cẩm thạch trắng, vòm khắc vảy nhẹ.
+- Bản «tường vườn»: thân đỏ, vòm trắng.
+- Chhajja có gờ hoa.
+8. Đề xuất cho game
+- Khung hiện tại 7 × 7.
+- s = 0,74: khoảng 7,0 × 7,0, cao khoảng 10,4 → **khung đúng**.
+- Nên thêm bệ 0,6–1 m vì chhatri đứng trên đất cần bệ.
+
+## chhatriSE — Chhatri Đông Nam
+8. Đề xuất cho game
+7 × 7, cao khoảng 10,4, như SW.
+
+## chhatriNW — Chhatri Tây Bắc
+8. Đề xuất cho game
+7 × 7, cao khoảng 10,4.
+
+## chhatriNE — Chhatri Đông Bắc
+8. Đề xuất cho game
+7 × 7, cao khoảng 10,4.
+
+## baradari — Baradari Ven Sông
+5. Cấu kiện nhận diện
+1. 12 vòm nhiều múi (3 mỗi mặt).
+2. Cột Shahjahani.
+3. Chhajja.
+4. Mặt bằng vuông.
+
+### 6–7. Vật liệu, màu, trang trí
+- Ven sông Taj: sa thạch đỏ, chi tiết trắng.
+- Nếu muốn «hoàng gia» như Khas Mahal: cẩm thạch trắng. Nhưng trái thứ bậc nếu đứng gần lăng.
+- Đề xuất: đỏ.
+8. Đề xuất cho game
+- Khung hiện tại 14 × 10 **không phải baradari**: chữ nhật thì không ra 3 lối đều mỗi mặt.
+- Đề xuất **12 × 12 m** (3 nhịp khoảng 3,6 m + cột), cao tới diềm khoảng 6–7 m.
+- Toàn bộ số này **suy ra, chưa có nguồn đo**.
+- Nếu buộc giữ 14 × 10: đổi thành *dalan* 5 × 3 nhịp. Khi đó phải đổi tên loại hình.
+
+## riverW — Đình Bến Sông Tây
+5. Cấu kiện nhận diện
+1. Tháp bát giác ở góc bậc thềm.
+2. Chhatri đỉnh.
+3. Chân ngập / chạm nước.
+
+### 6–7. Vật liệu, màu, trang trí
+Sa thạch đỏ. Vòm chhatri trắng hay đỏ: **chưa xác minh**.
+8. Đề xuất cho game
+- Khung hiện tại 10 × 10.
+- s = 0,74: ngang khoảng 11 m. Đề xuất **11 × 11**.
+- Cao: chưa có số. Tạm theo tỉ lệ tháp Mehtab (cao / ngang khoảng 1,8) → khoảng 20 m từ mặt nước. **Cần kiểm.**
+
+## Giả sơn — Đài Ngắm Trăng (Mahtab)

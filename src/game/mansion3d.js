@@ -92,7 +92,7 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
         if (rec.props) { rec.props.outdoor.build(grp); for (const ps of rec.props.halls) { ps.group.visible = false; ps.build(grp); } rec.props.floors.forEach((ps) => { if (!ps) return; ps.group.visible = false; ps.build(grp); }); }
         setHidden(rec.m, true); grp.add(rec.g);
         const m = rec.m, main = m.layout.buildings[0];
-        for (const [x, y, z] of [[-6, 5, m.D / 2 + 3], [6, 5, m.D / 2 + 3], [0, 4, main.z + main.d / 2 + 6], [0, m.tp.tower.spec.podium.y + 4, m.tp.tower.z + m.tp.tower.spec.podium.a + 2]]) { const p = m.toWorld(x, z); rec.lights.push(addLight(p.x, y, p.z, { color: '#ffb35c', power: 1 })); }
+        for (const [x, y, z] of [[-6, 5, m.D / 2 + 3], [6, 5, m.D / 2 + 3], [main.x + Math.sin(main.ry || 0) * (main.d / 2 + 6), 4, main.z + Math.cos(main.ry || 0) * (main.d / 2 + 6)], [m.tp.tower.x, m.tp.tower.spec.podium.y + 4, m.tp.tower.z + m.tp.tower.spec.podium.a + 2]]) { const p = m.toWorld(x, z); rec.lights.push(addLight(p.x, y, p.z, { color: '#ffb35c', power: 1 })); }
         const sign = signMesh(m.name, false); sign.position.set(0, 8.5, m.D / 2 + 1.2); rec.g.add(sign);
         furnish(rec);
         // vật cản từ lưới hình: lầu (nhiều tầng — không thêm đặc 2D trong thềm lầu) + mọi thứ đặc khác
@@ -186,7 +186,7 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
     if (m.tp) { // thang phép (mọi tầng — cùng một điểm) + bảng tuỳ biến cho chủ phủ trước chính điện
       const sp = m.tp.tower.spec, p = m.toWorld(m.tp.tower.x + sp.pad.x, m.tp.tower.z + sp.pad.z);
       extra.push({ id: 'lift', kind: 'lift', name: 'Thang phép', verb: 'Thang phép · chọn tầng', x: p.x, z: p.z, r: 1.6, h: m.h });
-      if (info.mode === 'own') { const main = m.layout.buildings[0], q = m.toWorld(-8, main.z + main.d / 2 + 6); extra.push({ id: 'custom', kind: 'tpcustom', name: 'Sổ tuỳ biến phủ', verb: 'Tuỳ biến tiên phủ', x: q.x, z: q.z, r: 2, h: m.h }); }
+      if (info.mode === 'own') { const main = m.layout.buildings[0], q = m.toWorld(main.x + Math.sin(main.ry || 0) * (main.d / 2 + 6) - 8 * Math.cos(main.ry || 0), main.z + Math.cos(main.ry || 0) * (main.d / 2 + 6) + 8 * Math.sin(main.ry || 0)); extra.push({ id: 'custom', kind: 'tpcustom', name: 'Sổ tuỳ biến phủ', verb: 'Tuỳ biến tiên phủ', x: q.x, z: q.z, r: 2, h: m.h }); }
     }
     setOpenSpots(`est:${m.h}`, [gateSpot(m), ...useSpots, ...extra]);
     const npcs = mansionNpcs(m, info);

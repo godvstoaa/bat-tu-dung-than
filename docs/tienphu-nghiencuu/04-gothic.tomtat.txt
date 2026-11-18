@@ -1,0 +1,256 @@
+## lau10 — Tháp Lâu Đài (lầu 10 tầng)
+5. Cấu kiện nhận diện (xếp theo mức quan trọng)
+1. Thân **10 cạnh** (không tròn, không vuông).
+2. **Ba tháp canh** đa giác nhô cao trên đỉnh, không đều nhau về vị trí.
+3. **Dải đá màu ngang** trên thân tháp.
+4. Lan can răng cưa merlon lớn, crenel hẹp.
+5. Tượng **đại bàng** đá trên tháp canh.
+6. Khe bắn tên và cửa sổ nhỏ hai ô ở các tầng trên (cửa sổ "two-light" — medievalheritage.eu; kiểu khe bắn chưa kiểm).
+7. Chân xiên.
+8. Đề xuất kích thước trong game
+Vấn đề: tháp thật chỉ có 4 tầng (~7 m/tầng). Game cần 10 tầng leo được.
+
+| Hạng mục | Đề xuất | Lý do |
+|---|---|---|
+| Bệ vuông | 40 × 40 m, cao 2,5 m, mặt bệ có lan can răng cưa | giữ khung hiện tại; bệ đóng vai "chemise" quanh chân tháp |
+| Thân tháp | **10 cạnh, Ø ngoài 28 m** | to hơn Eagle (21 m) để chứa 10 tầng mà vẫn mảnh; tỉ lệ cao/rộng gần Eagle |
+| Cao mỗi tầng | 4,5 m | 10 tầng = 45 m |
+| Cao tới lan can | 45 m + lan can 2 m = 47 m | — |
+| Ba tháp canh | Ø 6 m, cao thêm 13 m trên lan can | tỉ lệ tháp canh / thân của Eagle: 11/28 ≈ 0,39 → 0,39 × ~47 ≈ 18 m; giảm còn 13 m cho đỡ thô |
+| Cao tổng | **~60 m** (kể bệ 2,5 m) | — |
+| Tỉ lệ cao (tới lan can) / rộng | 47 / 28 ≈ 1,7 | Eagle 28/21 ≈ 1,33; Coucy 55/35 ≈ 1,57 |
+
+Nếu giữ thân tháp bằng cả bệ 40 m thì tỉ lệ 47/40 = 1,2 — trông như hộp; không khuyến nghị.
+
+## main — Đại Sảnh (Great Hall)
+5. Cấu kiện nhận diện
+1. Khối sảnh **cao và hẹp**, một nhịp, mái dốc ~50° có đầu hồi đá.
+2. Hàng **cửa sổ Gothic cao** có song đá Decorated, ngăn bởi **trụ ốp**.
+3. **Louvre** trên nóc.
+4. **Cổng hiên** lệch về một đầu (đầu dưới), không ở giữa.
+5. Hai khối **cánh ngang (cross-wing)** ở hai đầu: khối phục vụ và khối solar — tạo mặt bằng chữ H.
+6. Nội thất: vì kèo gỗ lộ, lò giữa sàn, bình phong, bục.
+8. Đề xuất kích thước trong game
+Khung 56 × 20 m **sai tỉ lệ**: sảnh một nhịp rộng 20 m không có thật trước hammerbeam (Westminster cuối thế kỷ 14).
+Dài/rộng 2,8 thì đúng quy tắc, nhưng bề rộng phải ~12 m.
+
+Đề xuất giữ tổng 56 × 20 m nhưng chia thành **mặt bằng chữ H ba phần** (Penshurst / Ludlow):
+
+| Khối | Rộng × sâu | Cao diềm / nóc | Ghi chú |
+|---|---|---|---|
+| Sảnh giữa | 32 × 13 m | 12 m / 19,7 m (mái 50°) | dài/rộng 2,46; cao suốt "2 tầng" |
+| Cánh phục vụ (đầu dưới) | 12 × 20 m | 9 m / 15 m | 2 tầng: buttery, pantry, lối sang bếp |
+| Cánh solar (đầu trên) | 12 × 20 m | 9 m / 15 m | 2 tầng; trên là phòng khách lãnh chúa |
+| Louvre | 2,5 × 2,5 m, cao 3 m trên nóc | — | giữa nóc sảnh |
+| Cổng hiên | 4 × 4 m, 2 tầng | — | ở góc sảnh cạnh cánh phục vụ |
+
+Bệ 0,8 m ổn (cổng hiên có 4–5 bậc).
+
+## chapel — Nhà Nguyện
+5. Cấu kiện nhận diện
+1. Tầng trên **cao, gần như toàn kính**, cửa sổ lancet cực cao (15,5 m) có song đá.
+2. **Trụ ốp sâu có tháp nhọn**, mỗi nhịp một cặp.
+3. **Apse đa giác** ở đầu đông.
+4. **Gablet** nhọn trên mỗi cửa sổ, nhô qua diềm mái.
+5. **Mái rất dốc** + chóp mảnh giữa nóc.
+6. **Cửa sổ hoa hồng** + cổng hiên ở mặt tây; 2 tháp cầu thang góc tây.
+7. Tầng dưới thấp, ít cửa.
+8. Đề xuất kích thước trong game
+Khung 34 × 16 m **gần đúng tỉ lệ** Sainte-Chapelle (36 × 17; tỉ lệ 2,12 so với 2,13). Giữ nguyên mặt bằng.
+Đề "ở mức nhỏ" → thu độ cao theo hệ số 0,8 [đề xuất]:
+
+| Hạng mục | Đề xuất |
+|---|---|
+| Mặt bằng | 34 × 16 m (lòng ~31 × 10 m) |
+| Tầng dưới | 5,3 m |
+| Diềm mái | 25 m |
+| Bờ nóc | 34 m (mái ~60°) |
+| Chóp | cao thêm 16 m trên nóc (thu nhỏ hơn bản thật cho hợp lâu đài Anh) |
+| Cửa sổ tầng trên | 4 nhịp × 2 bên + apse 5–7 ô; cao 12,4 m; rộng ~3,5 m |
+| Trụ ốp | sâu 2,5 m; pinnacle cao 4 m trên diềm |
+| Hoa hồng tây | Ø 7,2 m |
+
+"2 tầng" của khung = tầng dưới + tầng trên cao vút, không phải 2 tầng đều nhau.
+
+## kitchen — Bếp & Kho
+5. Cấu kiện nhận diện
+1. **Khối tháp vuông** cao hơn hẳn chiều rộng, một tầng trong.
+2. **Mái bát giác / kim tự tháp** chóp cao.
+3. **Đèn lồng thoát khói** trên đỉnh mái.
+4. Không có ống khói thường (Stanton) hoặc lỗ khói trên mỗi lò (Glastonbury).
+5. Trụ ốp ở góc / mặt; máng xối đầu thú.
+6. Lan can răng cưa (Stanton).
+8. Đề xuất kích thước trong game
+Khung 34 × 16 m, 2 tầng **sai**: bếp trung cổ là **khối vuông cao một tầng**, không phải dãy dài 2 tầng.
+Đề xuất tách làm 2 khối nối nhau [đề xuất]:
+
+| Khối | Rộng × sâu | Cao diềm / đỉnh | Dựa vào |
+|---|---|---|---|
+| Bếp (tháp vuông) | 11 × 11 m | 12 m / 22 m (kể đèn lồng và chóp) | Stanton Harcourt ~10 m ngoài, 11,9 m chân mái, 16–19 m đỉnh; Glastonbury 22 m |
+| Đèn lồng | bát giác Ø 3 m, cao 3 m | — | — |
+| Kho (buttery, pantry, kho lương) | 23 × 9 m, 2 tầng | 7 m / 12 m (mái 50°) | dãy phục vụ thường |
+
+Tổng dài 34 m giữ như khung. Bề sâu 16 → 11 m (bếp) và 9 m (kho).
+
+## solar — Phòng Lãnh Chúa (Solar)
+5. Cấu kiện nhận diện
+1. Khối **3 tầng** ngắn và cao, nối với đầu sảnh.
+2. Cửa sổ tầng 1 lớn nhất (phòng đẹp nhất ở tầng 1).
+3. **Ống khói đá** nổi trên tường.
+4. **Tháp vệ sinh** nhô ra.
+5. Cầu thang ngoài (nếu theo Stokesay).
+8. Đề xuất kích thước trong game
+Khung 60 × 14 m **sai rất nặng**: solar là khối ngắn 8–16 m, không phải dãy 60 m.
+Đề xuất [đề xuất]:
+
+| Khối | Rộng × sâu | Tầng | Cao diềm / nóc |
+|---|---|---|---|
+| Khối Great Chamber | 18 × 11 m | 3 | 13 m / 19,5 m (mái 50°) |
+| Tháp vệ sinh | 5 × 5 m | 4 | 16 m, mái phẳng sau lan can |
+
+Nếu mặt bằng tổng thể bắt buộc dài 60 m thì nối thêm dãy phòng ở (xem `guest`) chứ không kéo dài khối solar.
+
+## guest — Nhà Khách
+5. Cấu kiện nhận diện
+1. Dãy dài 2 tầng có **nhịp lặp** rõ (cụm phòng).
+2. **Cổng hiên 2 tầng** nhô ra theo nhịp.
+3. **Hàng ống khói** đều trên mái sau.
+4. Cửa sổ 2 ô có song đứng + ngang.
+8. Đề xuất kích thước trong game
+Khung 40 × 16 m: chiều dài hợp lý, **bề sâu 16 m quá lớn** cho dãy một lớp phòng. Các sảnh một nhịp thời này rộng 7–12 m,
+dãy phòng ở thường hẹp hơn sảnh. Đề xuất [đề xuất]:
+
+| Hạng mục | Đề xuất |
+|---|---|
+| Thân dãy | 40 × 8 m, 2 tầng + gác mái |
+| Cao diềm / nóc | 7,5 m / 12,3 m (mái 50°) |
+| Cụm phòng | 4 cụm × 10 m |
+| Cổng hiên | 4 cái (hoặc 2 cái ghép đôi), mỗi cái 3 × 3 m, cao 6 m, có mái riêng |
+| Ống khói | 4–8 cái ở mặt sau, cao 2 m trên nóc |
+
+## barracks — Doanh Trại
+5. Cấu kiện nhận diện
+1. Dãy dài 2 tầng, mặt **mộc hơn** dãy khách (cửa sổ nhỏ hơn, ít trang trí).
+2. **Cầu thang đá ngoài** dọc mặt tường.
+3. **Cánh vệ sinh** nhô ra mặt sau theo nhịp.
+4. Phân biệt với `guest`: guest có cổng hiên 2 tầng có mái + nhiều ống khói + cửa sổ có song ngang; barracks có cầu thang ngoài
+   lộ thiên + cánh vệ sinh + cửa sổ khe / 1 ô.
+8. Đề xuất kích thước trong game
+Khung 56 × 14 m: dài được, **sâu 14 m quá lớn** (cùng lý do như `guest`). Đề xuất [đề xuất]:
+
+| Hạng mục | Đề xuất |
+|---|---|
+| Thân dãy | 56 × 8 m, 2 tầng |
+| Cao diềm / nóc | 7 m / 11,8 m (mái 50°) |
+| Cầu thang ngoài | 2 cái, rộng 1,2 m, dọc mặt sân |
+| Cánh vệ sinh | 4 cái, 2,5 × 2,5 m, cao 7 m, mặt sau |
+
+## mews — Chuồng Ưng & Ngựa
+5. Cấu kiện nhận diện
+1. Dãy dài hẹp, **tầng dưới đá + tầng trên khung gỗ** — tương phản rõ.
+2. **Hoạ tiết thanh chéo** trên khung gỗ.
+3. Cửa lớn hai cánh cho ngựa; cửa bốc cỏ trên gác.
+4. Phần chuồng ưng có **cửa chớp / song gỗ** thay vì cửa kính.
+8. Đề xuất kích thước trong game
+Khung 44 × 14 m, 1 tầng: **sâu 14 m quá lớn** (thật 6,4 m) và **thiếu tầng gác**. Đề xuất [đề xuất]:
+
+| Hạng mục | Đề xuất |
+|---|---|
+| Thân | 44 × 7 m, 2 tầng (đá + khung gỗ) |
+| Cao diềm / nóc | 6,5 m / 10,7 m (mái 50°) |
+| Chuồng ưng | 10 m ở một đầu, cửa chớp gỗ |
+| Chuồng ngựa | 34 m, ~2 m một ngăn × 2 bên ≈ 34 ngăn |
+
+## library — Thư Các
+5. Cấu kiện nhận diện
+1. **Hàng cửa sổ hẹp một ô** dày đặc ở tầng 1 — nhịp nhỏ, đều.
+2. Tầng 1 là không gian chính; tầng trệt thấp hơn.
+3. Cửa sổ đầu hồi có song đá + ô bốn thuỳ.
+4. Mái dốc không có ống khói (thư viện không đốt lửa).
+5. Nội thất: bục đọc có xích sách, trần gỗ chia ô.
+8. Đề xuất kích thước trong game
+Khung 34 × 16 m: **sâu 16 m quá lớn**; thư viện trung cổ là dãy hẹp để ánh sáng từ hai bên vào tới giữa. Đề xuất [đề xuất]:
+
+| Hạng mục | Đề xuất |
+|---|---|
+| Thân | 34 × 8 m (hoặc chữ L 20 + 14 m, rộng 8 m) |
+| Tầng | trệt 3,5 m + thư viện 5 m |
+| Cao diềm / nóc | 9 m / 13,8 m (mái 50°) |
+| Cửa sổ thư viện | ô đơn rộng 0,8 m, cao 2,4 m, bước 2,5 m (theo nhịp bục đọc) → ~13 ô mỗi bên dài |
+
+## summit — Đài Ngắm Cảnh
+5. Cấu kiện nhận diện
+1. Tháp tròn **mảnh**, cao gấp ~2–3 lần đường kính.
+2. Lan can răng cưa trên đỉnh.
+3. Tháp cầu thang nhỏ hơn nhô cao thêm ở mép (chồng hai bậc tháp).
+4. Khe bắn hẹp dọc thân.
+8. Đề xuất kích thước trong game
+Khung 9 × 9 m hợp lý (bằng cỡ tháp góc). Đề xuất [đề xuất]: tháp tròn Ø 7 m, cao 16 m tới lan can, tháp cầu thang Ø 3 m nhô
+thêm 5,8 m (đúng số Harlech). Bệ 9 × 9 m là chân xiên + sân nhỏ.
+Khác `twr*`: summit đứng một mình, mảnh hơn, có tháp cầu thang chồng; tháp góc là khối to gắn vào tường.
+
+## Bốn tháp góc — twrSW, twrSE, twrNW, twrNE
+
+
+## twrSW — Tháp Góc Tây Nam
+5. Cấu kiện nhận diện
+1. Tháp tròn to, thấp đậm (cao / Ø ≈ 1,6).
+2. **Tháp canh trụ tròn** nhô lên.
+3. Đá xám lục.
+8. Đề xuất kích thước trong game
+Khung 9 × 9 ổn. Ø 9 m; cao 15 m tới lan can; tháp canh Ø 3 m cao thêm 5,8 m [đề xuất].
+
+## twrSE — Tháp Góc Đông Nam
+5. Cấu kiện nhận diện
+1. Tháp tròn **đứng trong nước** (nếu có hào).
+2. Cao / Ø ≈ 2 [suy với cao ~17 m].
+3. Cửa sổ nhỏ có song đứng ở tầng trên phía sân (Bodiam nhà ở dựa vào tường).
+8. Đề xuất kích thước trong game
+Ø 8,7 m; cao 17 m [đề xuất: tường 13 m + 4 m]; không tháp canh. Khác twrSW: mảnh hơn, vàng hơn, không tháp canh.
+
+## twrNW — Tháp Góc Tây Bắc
+5. Cấu kiện nhận diện
+Như twrSW. Khác: thấp hơn 0,7 m (đo thật). Trong game nên đặt tháp canh ở vị trí khác (lệch về góc khác) để hai tháp tây
+không giống hệt nhau.
+
+### 6–7. Vật liệu, trang trí
+Như twrSW.
+8. Đề xuất kích thước trong game
+Ø 9 m; cao 14,3 m; tháp canh Ø 3 m cao 5,8 m [đề xuất].
+
+## twrNE — Tháp Góc Đông Bắc
+5. Cấu kiện nhận diện
+1. Tháp **cao nhất** trong bốn tháp góc (21 m / tường 9,1 m).
+2. **Quét vôi trắng** (khác ba tháp đá trần).
+3. Ba cửa sổ lancet hẹp phía đông nếu làm nhà nguyện trong tháp.
+8. Đề xuất kích thước trong game
+Ø 9 m; cao 21 m [đo Conwy]; cao / Ø ≈ 2,3. Khác ba tháp còn lại: cao nhất, trắng.
+
+## tilt — Khán Đài Đấu Thương
+5. Cấu kiện nhận diện
+1. **Kết cấu gỗ** cột – dầm lộ (khác hẳn các nhà đá).
+2. **Vải treo thêu huy hiệu** ở lan can.
+3. **Mái che** + cờ.
+4. Ô hoàng gia ở giữa cao hơn.
+5. Sân đấu phía trước có hàng rào gỗ thấp.
+8. Đề xuất kích thước trong game
+Khung 14 × 8 m hợp với một khán đài gỗ một nhịp. Đề xuất [đề xuất]:
+
+| Hạng mục | Đề xuất |
+|---|---|
+| Khán đài | 14 × 6 m, 2 tầng sàn (sàn 1 cao 2,5 m, sàn 2 cao 5 m), mái che tới 8 m |
+| Ô hoàng gia | 4 m ở giữa, nhô ra 1 m, mái cao hơn 1,5 m |
+| Hàng rào tilt (nếu dựng sân) | dài ~60 m; sân 60 × 48 m (tỉ lệ 1,25 theo Clephan) |
+| Phần còn lại của khung 8 m | bậc lên + lối đi sau |
+
+## orchard — Chòi Vườn Quả
+5. Cấu kiện nhận diện
+1. **Giàn mắt cáo gỗ** phủ cây leo (không có mái ngói / đá).
+2. **Ghế cỏ chữ U**.
+3. Nằm trong vườn cây quả có tường bao.
+4. Đài nước nhỏ (tuỳ chọn).
+8. Đề xuất kích thước trong game
+Khung 8 × 8 m hợp lý. Đề xuất [đề xuất, không có nguồn số]: giàn vuông 8 × 8 m, cột cao 3 m, đỉnh vòm 4 m; ghế cỏ cao 0,45 m,
+rộng 0,6 m, chạy 3 cạnh. Không làm thành nhà mái kín — sai với nguyên mẫu.
+
+## Giả sơn — Motte (đồi gò canh)

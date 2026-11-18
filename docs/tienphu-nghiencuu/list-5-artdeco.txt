@@ -1,0 +1,18 @@
+Lầu 10 tầng: Thiên Kim Lâu (10 tầng) — bệ vuông cạnh 46 m, cao tổng ~?
+NHÀ (id | tên | khung hiện tại rộng x sâu m | số tầng | bệ m):
+- main | Biệt Thự Chính | 76 x 22 | 2 | 0.6
+- guest | Cánh Khách | 50 x 16 | 2 | 0.6
+- studio | Xưởng Hoạ (khối chéo) | 30 x 18 | 2 | 0.6
+- cinema | Rạp Chiếu & Phòng Nhạc | 40 x 22 | 1 | 0.6
+- garage | Nhà Xe & Kho | 44 x 14 | 1 | 0.6
+- poolhouse | Nhà Hồ Bơi | 34 x 14 | 1 | 0.6
+- gym | Phòng Tập | 30 x 16 | 1 | 0.6
+ĐÌNH / TIỂU CÔNG TRÌNH:
+- summit | Đài Ngắm Cảnh | 9 x 9
+- gaz1 | Đình Kính | 10 x 10
+- gaz2 | Đình Tennis | 12 x 9
+- gaz3 | Đình Đọc Sách | 9 x 9
+- gaz4 | Đình Hồ Gương | 9 x 9
+- gaz5 | Đình Cuối Vườn | 8 x 8
+- gaz6 | Đình Góc Đông | 8 x 8
+Giả sơn: Sân Thượng Ngắm Cảnh

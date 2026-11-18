@@ -62,7 +62,7 @@ export function mergeAll(group, { dedupe = false } = {}) {
  * spec: towerSpec(st) · st: phong cách · M: tpMats · themes: [10 chỉ số chủ đề]
  * Trả { root, floors: [{ g, shell }] (11 phần tử: 10 tầng + Vọng Đài), column, podium }
  */
-export function buildTower(spec, st, M, themes, propsOf = null) { // propsOf(k) → { add(id,…), full } | null — đồ GLB tầng k (tienphu/props.js)
+export function buildTower(spec, st, M, themes, propsOf = null, { skin = false } = {}) { // skin: vỏ ngoài (thềm, mái hắt, ban công, đỉnh) do arch/ dựng — ở đây chỉ dựng vách, sàn, thang, nội thất // propsOf(k) → { add(id,…), full } | null — đồ GLB tầng k (tienphu/props.js)
   const T = st.tower, n = spec.n, root = new THREE.Group(); root.name = 'tower';
   const floors = [];
   // ---------------- thềm
@@ -77,7 +77,7 @@ export function buildTower(spec, st, M, themes, propsOf = null) { // propsOf(k) 
   // bậc thềm + hai thành bậc
   for (let i = 1; i <= P.steps; i++) { const top = i * P.rise, z = pa + P.run - (i - 0.5) * P.tread; pod.add('stone', boxAt(P.stairW, top, P.tread + 0.02, 0, top / 2, z)); }
   for (const sx of [-1, 1]) { const g = new THREE.BoxGeometry(0.7, 1, P.run); const pp = g.attributes.position; for (let i = 0; i < pp.count; i++) { const zz = pp.getZ(i), yy = pp.getY(i); const h = P.y * (0.5 - zz / P.run) + 0.9; pp.setY(i, yy > 0 ? Math.max(0.9, h) : 0); } g.computeVertexNormals(); g.translate(sx * (sw + 0.35), 0, pa + P.run / 2); pod.add('marble', g); }
-  const podium = pod.build(M, { name: 'podium' }); root.add(podium);
+  const podium = pod.build(M, { name: 'podium' }); if (!skin) root.add(podium);
 
   // ---------------- tầng 0..9 + Vọng Đài (10)
   for (let k = 0; k <= LEVELS; k++) {
@@ -128,7 +128,7 @@ export function buildTower(spec, st, M, themes, propsOf = null) { // propsOf(k) 
     // thang phép: đĩa ngọc + vòng phù văn + 2 trụ đèn
     { const p = spec.pad; acc.add('jade', cylAt(PAD_R, PAD_R, 0.08, p.x, Y + 0.06, p.z, 28)); const ring = new THREE.TorusGeometry(PAD_R + 0.1, 0.06, 6, 36); ring.rotateX(Math.PI / 2); ring.translate(p.x, Y + 0.1, p.z); acc.add('gold', ring); for (const sx of [-1, 1]) { acc.add('gold', cylAt(0.07, 0.09, 1.6, p.x + sx * (PAD_R + 0.5), Y + 0.8, p.z, 8)); acc.add('lampGlow', new THREE.SphereGeometry(0.18, 8, 6).translate(p.x + sx * (PAD_R + 0.5), Y + 1.7, p.z)); } }
     // hành lang ngoài: lan can (tầng 1 chừa lối) + hàng cột + xà
-    if (f.gal) {
+    if (f.gal && !skin) {
       const open = k === 0 ? (x, z) => Math.abs(x) < 2.2 && Math.abs(Math.abs(z) - (f.slabA - 0.15)) < 0.5 : null;
       acc.add('rail', railPoly(n, f.slabA - 0.15, Y, 1.1, open));
       if (spec.columns) { const cs = T.colonnade ? 'corinth' : 'round'; for (const [cx, cz] of columnRing(n, f.slabA - 0.7, spec.colStep)) acc.add('column', columnGeo(cx, cz, Y, FH - SLAB - 0.05, T.colonnade ? 0.36 : 0.3, cs)); for (const sd of polySides(n, f.slabA - 0.7)) acc.add('beam', boxAt(sd.len + 0.4, 0.45, 0.45, sd.mx, Y + FH - SLAB - 0.3, sd.mz, sd.ry)); }
@@ -136,7 +136,7 @@ export function buildTower(spec, st, M, themes, propsOf = null) { // propsOf(k) 
       if (T.eave === 'corbel') for (let r = 0; r < 3; r++) acc.add('trim', polyPrism(n, f.slabA - 0.4 - r * 0.45, Y - SLAB - 0.35 * (r + 1), 0.35, f.slabA - 0.1 - r * 0.45)); // muqarnas công-xôn đỡ ban công
     }
     // MÁI HIÊN trên tầng (trừ tầng cuối — đỉnh lầu lo)
-    if (!deck && ROOFED[T.eave] && k < LEVELS - 1) {
+    if (!skin && !deck && ROOFED[T.eave] && k < LEVELS - 1) {
       const out = f.slabA + (T.eave === 'skirt' ? 1.2 : 1.6), y0 = Y + FH - 0.15;
       const drop = T.eave === 'skirt' ? 1.3 : T.eave === 'thai' ? 1.5 : 1.7, up = T.eave === 'skirt' ? 0.25 : T.eave === 'vn' ? 1.1 : T.eave === 'thai' ? 0.5 : 0.9;
       acc.add('roof', skirt(n, a - 0.05, out, y0, drop, up));
@@ -146,14 +146,14 @@ export function buildTower(spec, st, M, themes, propsOf = null) { // propsOf(k) 
       if (T.eave === 'curved' || T.eave === 'vn') for (const sd of polySides(n, f.slabA - 0.7)) { const m = Math.max(2, Math.round(sd.len / 1.2)); for (let i = 0; i <= m; i++) { const t = i / m; acc.add('gold', boxAt(0.36, 0.3, 0.5, sd.x0 + (sd.x1 - sd.x0) * t, Y + FH - SLAB + 0.05, sd.z0 + (sd.z1 - sd.z0) * t, sd.ry)); } } // đấu củng
     }
     // ---------------- Vọng Đài: sàn mở + lan can + đỉnh lầu
-    if (deck) {
+    if (deck && !skin) {
       acc.add('rail', railPoly(n, a + 0.05, Y, 1.1));
       crown(acc, spec, st, M, Y, a);
     }
     // đồ bài trí theo chủ đề tầng (đổi được — chủ phủ)
     if (!deck) { const ps = propsOf?.(k); if (ps) { acc.prop = (...a) => ps.add(...a); acc.full = ps.full; } themeFurniture(acc, spec, k, themes ? themes[k] : k, st); delete acc.prop; }
     const g = acc.build(M, { name: `floor${k}` }), shell = sh.build(M, { name: `shell${k}` });
-    for (const o of shell.children) { o.material = o.material.clone(); o.material.transparent = true; }
+    for (const o of shell.children) { o.material = o.material.clone(); o.material.transparent = true; if (skin) o.material.side = THREE.BackSide; } // có vỏ nguyên mẫu (arch/): vách chung chỉ hiện từ trong lầu
     const fg = new THREE.Group(); fg.name = `tf${k}`; fg.add(g, shell); root.add(fg);
     floors.push({ g: fg, shell, y: Y });
   }
@@ -161,7 +161,7 @@ export function buildTower(spec, st, M, themes, propsOf = null) { // propsOf(k) 
   const colH = spec.deck.y - spec.podium.y + 3.2, column = new THREE.Mesh(new THREE.CylinderGeometry(PAD_R * 0.9, PAD_R * 0.9, colH, 24, 1, true), M.beam2);
   column.position.set(spec.pad.x, spec.podium.y + colH / 2, spec.pad.z); column.userData.noCollide = true; root.add(column);
   // tháp góc Gothic: trụ tròn suốt thân + mái nón
-  if (spec.turrets) {
+  if (spec.turrets && !skin) {
     const acc = new Acc(), r = spec.turrets, a0 = spec.floors[0].a, top = spec.deck.y + 1.5;
     for (const sx of [-1, 1]) for (const sz of [-1, 1]) { const g = new THREE.CylinderGeometry(r, r, top - spec.podium.y, 18); g.translate(sx * a0, spec.podium.y + (top - spec.podium.y) / 2, sz * a0); uvMeters(g, 3.6, FH, 4, spec.podium.y); acc.add('facade', g); const c = new THREE.ConeGeometry(r + 0.6, r * 3.2, 18); c.translate(sx * a0, top + r * 1.6, sz * a0); acc.add('roofFlat', c); acc.add('gold', cylAt(0.06, 0.06, 2, sx * a0, top + r * 3.2 + 0.8, sz * a0, 5)); }
     floors[LEVELS].g.add(acc.build(M, { name: 'turrets' }));

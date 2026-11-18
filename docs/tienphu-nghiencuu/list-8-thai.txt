@@ -1,0 +1,20 @@
+Lầu 10 tầng: Dusit Maha Prasat (10 tầng) — bệ vuông cạnh 47 m, cao tổng ~?
+NHÀ (id | tên | khung hiện tại rộng x sâu m | số tầng | bệ m):
+- main | Chakri Maha Prasat | 60 x 26 | 2 | 1.6
+- ubosot | Ubosot Phật Ngọc | 40 x 22 | 1 | 1.6
+- monthien | Phra Maha Monthien | 44 x 22 | 1 | 1.6
+- officeW | Bộ Hộ (Ngoại triều) | 52 x 16 | 2 | 1.6
+- officeE | Bộ Binh (Ngoại triều) | 52 x 16 | 2 | 1.6
+- inner1 | Nội Cung Tây | 40 x 16 | 2 | 1.6
+- inner2 | Nội Cung Giữa | 40 x 16 | 2 | 1.6
+- inner3 | Nội Cung Đông | 26 x 14 | 2 | 1.6
+- library | Phra Mondop (thư viện kinh) | 22 x 22 | 2 | 1.6
+ĐÌNH / TIỂU CÔNG TRÌNH:
+- summit | Vọng Sơn Đình | 9 x 9
+- sala1 | Sala Siwalai | 12 x 9
+- sala2 | Sala Đảo Đông | 12 x 9
+- aphorn | Aphorn Phimok | 9 x 9
+- sala3 | Sala Ngoại Triều | 10 x 8
+- sala4 | Sala Cổng Chùa | 8 x 8
+- sala5 | Sala Nội Cung | 9 x 9
+Giả sơn: Khao Mo · núi giả

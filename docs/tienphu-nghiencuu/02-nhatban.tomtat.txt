@@ -1,0 +1,249 @@
+## tower — Thiên Thủ Các (10 tầng)
+5. Cấu kiện nhận diện (xếp theo mức quan trọng)
+1. Bệ đá cao, chân thoải, nghiêng cong, góc xếp đá dài xen kẽ.
+2. Thân trắng, mái xám có sọc vữa trắng.
+3. **5 lớp mái**, mỗi mặt có một **tổ hợp đầu hồi riêng** (bảng mục 3). Mặt Nam là quan trọng nhất.
+4. Đầu hồi irimoya lớn hai bên Đông–Tây ở mái 2 重 (dấu hiệu vọng lâu hình).
+5. Kara-hafu cong ở mái 1 Đông, mái 2 Nam, mái 5 Nam–Bắc.
+6. Chidori-hafu tam giác ở mái 4 Nam–Bắc. Irimoya đôi ở mái 3.
+7. Shachi hai đầu nóc.
+8. Cửa sổ lồi có song và hộc thả đá ở góc tầng 1.
+9. Tường đầu hồi có lỗ bắn tròn, tam giác, vuông. Cửa sổ song đứng nhỏ.
+10. Tiểu thiên thủ và hành lang lầu bao quanh (nếu đủ chỗ trong game).
+8. Đề xuất cho game: ánh xạ 10 tầng chơi
+
+Ràng buộc kỹ thuật:
+- `tower.js` dùng chiều cao tầng `FH = 5,0 m` chung cho cả 9 phong cách (29 bậc thang).
+- Đề xuất **giữ FH = 5** và giữ được tỉ lệ Himeji.
+
+Cách làm: **3 tầng nằm trong bệ đá + 7 tầng thân gỗ**, hệ số phóng s = 1,27 so với Himeji.
+- Thân gỗ: 7 × 5 m + mái chóp ≈ 5 m = 40 m = 31,5 × 1,27.
+- Bệ đá nên cao 18 m. Tầng chơi 1 bắt đầu ở +3 m (đế đá đặc 3 m), các tầng hầm cách nhau 5 m.
+- Tỉ lệ bệ / thân = 18 / 40 = 0,45 (thật 0,47).
+- Himeji thật có 1 tầng hầm; tiểu thiên thủ Tây có 2 tầng hầm, nên «tầng nằm trong đá» là có cơ sở.
+
+| Tầng chơi | Cao độ sàn (m) | Tương ứng Himeji | Mặt bằng (間) | Mặt bằng game Đ–T × N–B (m), s = 1,27 | Lớp mái / đầu hồi |
+|---|---|---|---|---|---|
+| G1 | +3 | (thêm) kho trong bệ | — | ≈ 29 × 21 | Trong đá, không mái |
+| G2 | +8 | (thêm) kho trong bệ | — | ≈ 29 × 21 | Trong đá |
+| G3 | +13 | Tầng hầm 穴蔵 | 11,5 × 8,5 | 28,8 × 21,3 | Trong đá |
+| G4 | +18 (mặt bệ) | Tầng 1 | 13 × 10 | 32,5 × 25,0 | Mái 1 重: kara-hafu hiên mặt Đông; hộc thả đá 3 góc |
+| G5 | +23 | Tầng 2 | ≈ 13 × 10 | 32,0 × 24,5 | Mái 2 重: irimoya lớn Đ/T; kara-hafu hiên mặt Nam |
+| G6 | +28 | Tầng 3 | 11 × 8 | 27,5 × 20,0 | (cùng mái 3 重 với G7) |
+| G7 | +33 | (thêm) tầng phòng đầu hồi 破風の間 | nội suy ≈ 10 × 7 | 25,0 × 17,5 | Mái 3 重: irimoya đôi Nam/Bắc |
+| G8 | +38 | Tầng 4 | 9 × 6 | 22,5 × 15,0 | (cùng mái 4 重 với G9) |
+| G9 | +43 | Tầng 5 | 9 × 6 | 22,5 × 15,0 | Mái 4 重: chidori-hafu Nam/Bắc; kara-hafu hiên Đ/T |
+| G10 | +48 | Tầng 6 (vọng lâu) | 7 × 5 | 17,5 × 12,6 | Mái 5 重: kara-hafu Nam/Bắc, irimoya Đ/T; tường lộ cột |
+| Nóc | ≈ +57,5 | — | — | — | Shachi cao ≈ 2,4 m (190 cm × 1,27) |
+
+Ghi chú về cách ánh xạ:
+- Himeji tầng 4 và tầng 5 cùng 9 × 6 間. Suy ra hai tầng này **chung một lớp mái** (4 重).
+  Đây là [Suy]; cần đối chiếu mặt cắt `File:Himeji_model7.JPG`. Vì vậy G8–G9 đặt trong 4 重.
+- Lớp mái 3 重 chứa G6 + G7. G7 là tầng thêm duy nhất của thân gỗ, đóng vai phòng đầu hồi.
+- Nhịp mái giữ đúng 5 lớp. Khoảng cách giữa các mép hiên: 5 m, 5 m, 10 m, 10 m, 5 m.
+  Thân thật cũng không đều nhịp, vì thế mái 3 và 4 «cao vai» là đúng tinh thần Himeji.
+- Bệ đá: mặt trên ≈ 34 × 27 m (chừa 0,8 m quanh G4).
+  Chân bệ với độ nghiêng ước ≈ 0,3 × chiều cao mỗi bên (≈ 5,5 m) → ≈ 45 × 38 m.
+  Cạnh 46 m trong danh sách **khớp với chiều Đông–Tây ở chân bệ**. Nên đổi sang chữ nhật 46 × 38 m.
+  Độ nghiêng 0,3 × H là [Ước], chưa có số đo bệ Himeji.
+- Phương án thay thế «4 + 6»: 4 tầng trong đá + 6 tầng gỗ, khớp đúng 1–1 với 6 sàn Himeji.
+  Nhưng bệ cao 20–23 m sẽ thành 0,57 × thân, vượt tỉ lệ 21%. Không khuyến nghị.
+- So với `styles.js` hiện tại (vuông 34 → 22 m, bệ 8 m): cần đổi sang chữ nhật Đ–T, bậc thu như bảng, bệ 18 m.
+  Engine hiện chỉ nhận đa giác đều `n`. Cần thêm hai nửa cạnh `ax`, `az` riêng (đề xuất kỹ thuật, không thuộc phạm vi file này).
+- Hộc thả đá 20 cm là quá nhỏ để thấy trong game. Phóng phần chìa của hộc (khung hình hakama) lên ≈ 1,2–1,5 m rộng.
+
+## main — Đại Quảng Gian (Ōhiroma, 大広間)
+5. Cấu kiện nhận diện
+1. Mái irimoya **khổng lồ**, chiếm hơn nửa chiều cao nhà, xám, mép hiên thẳng.
+2. Đầu hồi irimoya có lá chắn gió mạ vàng.
+3. Mặt bằng gần vuông, mép gãy bậc. Hiên gỗ chạy quanh.
+4. Mặt ngoài là nhịp cột lộ và cửa trượt, không có cửa sổ, không có tường kín.
+5. Dải tường trắng mảnh trên dầm nageshi.
+6. Nối chéo kiểu nhạn bay với Shikidai và Kuroshoin.
+8. Đề xuất game
+- Khung mới **29 × 27 m** (thay 50 × 26). Nếu cần hoành tráng hơn: phóng đều ×1,2 → 35 × 32 m. **Không kéo dài một chiều.**
+- Cao, ước lượng [Ước]:
+  - Sàn +0,9 m (giả định; chưa có nguồn).
+  - Cao trong tới nageshi 4 m [Blog], trần nâng thêm ≈ 1 m.
+  - Diềm ≈ +6 m.
+  - Mái: nửa nhịp kể cả hiên ≈ 15,5 m × độ dốc ≈ 0,6 → nóc ≈ +15 m.
+  - Mái ≈ 60% tổng cao.
+- Plinth hiện tại 1,2 m là hợp lý cho cao sàn, nhưng phải dựng là **sàn gỗ trên cột + hiên**, không phải khối bệ.
+
+## shikidai — Thức Đài (Shikidai, 式台)
+5. Cấu kiện nhận diện
+1. Là **khâu nối** trong chuỗi nhạn bay; thấp và nhỏ hơn Ōhiroma rõ rệt.
+2. Mái irimoya xám, mép thẳng.
+3. Mặt ngoài nhịp cột + cửa trượt.
+4. Tường trên nageshi trắng. Nguồn chính thức nói phòng lão trung có tường trên dầm màu trắng, sắc độ tiết chế hơn các phòng khác.
+8. Đề xuất game
+- Khung mới **18 × 18,5 m** (thay 34 × 18).
+- Cao nóc phải **thấp hơn Ōhiroma** ≈ 20–25%: ≈ +11,5 m [Ước].
+- Giữ nối chéo: góc Tây Bắc của Shikidai chạm góc Đông Nam của Ōhiroma.
+
+## kuroshoin — Hắc Thư Viện (Kuroshoin, 黒書院 / 小広間)
+5. Cấu kiện nhận diện
+1. Cùng ngôn ngữ với Ōhiroma nhưng **nhỏ hơn ≈ 27%** diện tích.
+2. Mặt bằng gần vuông, mái irimoya to.
+3. Lệch chéo so với Ōhiroma (nhạn bay về Tây Bắc).
+4. **Không sơn đen.** Tên «Hắc» không phải màu ngoại thất.
+8. Đề xuất game
+- Khung mới **25 × 23 m** (thay 34 × 18).
+- Nóc ≈ +13,5 m [Ước] (tỉ lệ theo bề sâu so với Ōhiroma).
+
+## shiroshoin — Bạch Thư Viện (Shiroshoin, 白書院 / 御座の間)
+5. Cấu kiện nhận diện
+1. Nhà nhỏ nhất, **vuông**, một khối irimoya gọn.
+2. Nằm cuối chuỗi nhạn bay, xa cổng nhất.
+3. **Không sơn trắng toàn bộ.** Tên «Bạch» không phải màu ngoại thất.
+8. Đề xuất game
+- Khung mới **17 × 18,5 m** (thay 28 × 16).
+- Nóc ≈ +11 m [Ước].
+
+## kesho — Hóa Trang Lâu (Keshō-yagura, 化粧櫓)
+5. Cấu kiện nhận diện
+1. **Ngoài là yagura trắng** (không phải dinh), **trong là phòng ở**. Dấu hiệu từ ngoài: cửa sổ rộng và nhiều hơn yagura chiến đấu.
+2. Chiều dài ngắn, gắn ở đầu một hành lang lầu rất dài và hẹp.
+3. Hai khối cao thấp (1 tầng + 2 tầng).
+8. Đề xuất game
+- Khung mới **15,4 × 6,5 m** (thay 40 × 12).
+- Nếu muốn giữ «khối dài 40 m»: dựng Keshō-yagura 15,4 × 6,5 m nối với một đoạn **hành lang lầu** rộng ≈ 4 m (≈ 2 間), dài 25 m.
+  Hành lang thật rộng 1 間 phía ngoài, toàn tuyến ≈ 240 m (121 間).
+- Cao [Ước]:
+  - Phần 2 tầng: diềm 1 ≈ +4 m, diềm 2 ≈ +7,5 m, nóc ≈ +10 m.
+  - Phần 1 tầng: nóc ≈ +6,5 m.
+
+## kura — Kho Gạo (Kura, 土蔵 / 米蔵)
+5. Cấu kiện nhận diện
+1. **Dài và rất hẹp** (tỉ lệ ≈ 5,7 : 1).
+2. Tường trắng trơn, gần như không mở cửa.
+3. Cửa ra vào khung dày có bậc, cánh trát vữa.
+4. Mái irimoya xám dài.
+8. Đề xuất game
+- Khung mới **33,5 × 6 m** (thay 34 × 12).
+- Danh sách ghi «2 tầng». Nguyên mẫu là **1 tầng mái**; bên trong có thể có gác lửng.
+- Cao [Ước]: diềm ≈ +4,5 m, nóc ≈ +8 m.
+
+## umaya — Chuồng Ngựa (Umaya, 馬屋)
+5. Cấu kiện nhận diện
+1. **Hình chữ L**, dài, hẹp, thấp.
+2. Mái **ván mỏng** màu nâu xám, không phải ngói.
+3. Tường hai màu: trên trắng, dưới ván đen.
+4. Nhịp ngăn ngựa đều đặn trên mặt trong.
+5. Lầu giếng nhỏ ở cánh Đông–Tây.
+8. Đề xuất game
+- Khung mới **chữ L**: cánh A 25,2 × 5,9 m + cánh B 31,1 × 5,9 m. Hộp bao ≈ 25,2 × 37 m.
+- Nếu vị trí chỉ chứa được hình thẳng: một khối **44 × 6 m** (giữ sâu 6 m, không phải 12 m) và ghi rõ là «biến thể thẳng».
+- Cao [Ước]: diềm ≈ +3,2 m, nóc ≈ +7 m.
+
+## masuW — Masugata Tây (cổng ngoài kōraimon, 高麗門)
+5. Cấu kiện nhận diện
+1. **Mái chính nhỏ, hẹp** đặt ngay trên trụ chính, cộng hai mái phụ thấp hơn ở phía sau.
+2. Cánh cửa lớn bọc sắt sơn đen, đinh tán.
+3. Tường trắng ôm ra hai bên.
+4. Không có tầng lầu.
+8. Đề xuất game
+- **Đổi vai trò:** masuW thành cổng ngoài kōraimon. Khung bao ≈ **8 × 4,5 m** (lối 5,5 m + trụ); cao ≈ **8 m** tới nóc.
+- Sân masugata: Sakurada 27 × 38 m là lớn nhất cả nước. Sân trong game có thể ≈ 20 × 24 m.
+- Cổng trong (masuE) đặt **vuông góc 90°** với cổng ngoài.
+- Bố cục hiện tại (hai lầu 18 × 10 đứng hai bên cổng, x = ±32) phải dựng lại thành hình chữ L quanh sân.
+
+## masuE — Masugata Đông (cổng trong yaguramon, 櫓門)
+5. Cấu kiện nhận diện
+1. **Cầu lầu bắc qua giữa hai khối đá**, lối cổng tối bên dưới.
+2. Hàng cửa song sơn đen kẹp giữa hai cửa sổ hình chuông, đối xứng.
+3. Cửa sổ lồi có mái nhỏ.
+4. Hoa lăng gỗ trên dầm cổng (riêng Hishi-no-mon).
+5. Tường lộ cột (Hishi-no-mon). Các cổng khác trát trắng toàn bộ.
+8. Đề xuất game
+- Khung **19,7 × 7,9 m**, cao ≈ **12 m** tới nóc, 2 tầng (lối cổng + lầu). Thay 18 × 10 × 6 m.
+- Chiều cao hiện tại 6 m là quá thấp một nửa.
+- Bệ: hai khối đá cao ≈ 4–5 m [Ước], rộng mỗi khối ≈ 6 m, chừa lối giữa ≈ 6 m.
+- Đặt **vuông góc** với masuW quanh sân ≈ 20 × 24 m.
+- Phương án lớn: làm theo Osaka, chữ L dài ≈ 35 m ôm hai cạnh sân. Chỉ dùng nếu bản đồ có chỗ.
+
+## chashitsu — Trà Thất Kōraku
+5. Cấu kiện nhận diện
+1. Mái tranh irimoya **dày, dốc** chiếm phần lớn chiều cao.
+2. Mái ván và mái ngói phụ nối thấp hơn; không đối xứng.
+3. Hiên đất sâu có cột thô.
+4. Tường đất vàng nâu, shōji trắng.
+5. Giấy ô vuông xanh trắng ở hốc tường (nhìn qua cửa).
+6. Cửa chui nhỏ của trà thất.
+8. Đề xuất game
+- Khung mới **≈ 10 × 6 m** + hiên đất 1,8 m phía Bắc (thay 18 × 12 = 216 m², gấp 3,9 lần).
+- Nếu cần cho người chơi đi lại bên trong: phóng đều ×1,3 → 13 × 8 m. Không phóng một chiều.
+- Cao [Ước]: sàn +0,45; diềm tranh ≈ +2,4 m; nóc ≈ +6,5 m.
+
+## summit — Vọng Sơn Đình
+5. Cấu kiện nhận diện
+1. Rất nhỏ, mái tranh kirizuma.
+2. Hai mặt mở hoàn toàn.
+3. Cột còn vỏ.
+4. Đặt trên đỉnh đồi, có đá bước dẫn lên. Có bồn rửa tay đá phía trước (theo tên file Commons «Chōzu-bachi in front of Shōka-tei»).
+8. Đề xuất game
+- Khung mới **3,9 × 3,0 m** (thay 9 × 9, gấp 6,9 lần diện tích).
+- Nếu cần đứng được 3–4 người chơi: phóng ×1,4 → 5,5 × 4,2 m.
+- Cao [Ước]: diềm ≈ 2,1 m, nóc ≈ 4,2 m.
+
+## yaguraSW — Lầu Góc Tây Nam
+5. Cấu kiện nhận diện
+1. 2 tầng mái, trắng xám.
+2. **Kara-hafu** cong trên mái tầng 1, mặt Tây. Đây là điểm khác với lầu Đông Nam.
+3. Cửa sổ lồi có hộc thả đá.
+4. Huy hiệu hoa quỳ.
+8. Đề xuất game
+- Khung **7,5 × 7,5 m** (khung 9 × 9 hơi lớn; nếu giữ 9 × 9 thì coi là phóng ×1,2).
+- Cao [Ước]: diềm 1 ≈ +4,5; diềm 2 ≈ +8,5; nóc ≈ +11 m (so với lầu Đông Nam 12,6 m và nhỏ hơn một cỡ).
+
+## yaguraSE — Lầu Góc Đông Nam
+5. Cấu kiện nhận diện
+1. 2 tầng mái.
+2. **Chidori-hafu tam giác** mặt Nam (lầu Tây Nam dùng kara-hafu cong; đây là cặp đối lập cần giữ).
+3. Cửa sổ lồi có hộc thả đá ở hai mặt ngoài.
+4. Hàng 6 cửa sổ tầng 1.
+8. Đề xuất game
+- Khung **9,9 × 9,9 m** (khung 9 × 9 hiện tại gần đúng).
+- Cao **12,6 m** tới nóc. Diềm 1 ≈ +5, diềm 2 ≈ +9,5 [Ước].
+
+## yaguraNE — Lầu Góc Đông Bắc
+5. Cấu kiện nhận diện
+1. **3 tầng mái** thu đều.
+2. Chidori-hafu lớn xuyên hai mái ở tầng 1.
+3. Kara-hafu ở tầng 2.
+4. Hộc thả đá kiểu váy hakama (chân phình ra ở góc tường).
+8. Đề xuất game
+- Khung tầng 1 **≈ 9 × 9 m** (giữ khung hiện tại); tầng 2 ≈ 7,7 × 7,7; tầng 3 ≈ 5,6 × 5,6 (thu theo tỉ lệ Fujimi) [Suy].
+- Cao ≈ 11,5 m [Blog]. Nếu muốn nổi bật hơn hai lầu Nijō, có thể tăng tới 13 m. Ghi rõ là lệch nguồn.
+
+## yaguraNW — Lầu Góc Tây Bắc
+5. Cấu kiện nhận diện
+1. **Chữ L**, hai tầng bằng nhau (khối hộp đứng, không thu tầng). Rất khác ba lầu góc kia.
+2. Hộc thả đá chìa ra có đầu hồi kirizuma ở giữa mặt Tây và Bắc.
+3. Mái irimoya gãy góc.
+8. Đề xuất game
+- Khung 9 × 9 không đúng hình. Đề xuất **chữ L, mỗi cánh 13 × 7 m**, hộp bao ≈ 13 × 13 m.
+- Cao [Ước]: diềm 1 ≈ +4,5, diềm 2 ≈ +9, nóc ≈ +12 m.
+- Nếu bắt buộc 9 × 9: dùng chữ L nhỏ, mỗi cánh 9 × 4,5 m, giữ «hai tầng bằng nhau» và hộc chìa.
+
+## azumaya — Đình Nghỉ Vườn
+5. Cấu kiện nhận diện
+1. Mái tranh **chóp bốn mặt** trên đình vuông nhỏ.
+2. **4 ghế hình chữ 卍**.
+3. Mở bốn phía.
+8. Đề xuất game
+- Khung **2,83 × 2,83 m** (thay 8 × 8, gấp 8 lần diện tích).
+- Nếu cần chỗ cho người chơi: phóng ×1,5 → 4,2 m vuông.
+- Cao [Ước]: diềm 2,1 m, đỉnh ≈ 4 m.
+
+## machiai — Đình Chờ Trà
+5. Cấu kiện nhận diện
+1. Mái tranh bốn mái **dài, thấp**.
+2. Ghế ván dài.
+3. Cột còn vỏ cong.
+4. Hàng đá bước phía trước.
+8. Đề xuất game
+- Khung **5,9 × 2,0 m**, thêm hiên mái 0,8 m mỗi bên → bao mái ≈ 7,5 × 3,6 m (thay 8 × 8).
+- Cao [Ước]: diềm ≈ 2,0 m, nóc ≈ 3,8 m.
+
+## tsukiyama — Giả sơn (núi vườn)

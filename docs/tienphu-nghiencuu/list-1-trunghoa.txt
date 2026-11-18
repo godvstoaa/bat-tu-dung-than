@@ -1,0 +1,24 @@
+Lầu 10 tầng: Thiên Tượng Lâu (10 tầng) — bệ vuông cạnh 45 m, cao tổng ~?
+NHÀ (id | tên | khung hiện tại rộng x sâu m | số tầng | bệ m):
+- main | Ngân An Điện | 52 x 24 | 2 | 2.4
+- jiale | Gia Lạc Đường | 40 x 20 | 1 | 2.4
+- duofu | Đa Phúc Hiên | 38 x 18 | 1 | 2.4
+- ledao | Lạc Đạo Đường | 40 x 20 | 2 | 2.4
+- jijin | Tích Cẩm Trai | 30 x 16 | 1 | 2.4
+- baoguang | Bảo Quang Thất | 38 x 18 | 1 | 2.4
+- jicui | Tích Thúy Đường | 40 x 20 | 1 | 2.4
+- miaoxiang | Diệu Hương Lâu | 30 x 16 | 2 | 2.4
+- houzhaoW | Hậu Tráo Lâu (Tây) | 150 x 14 | 2 | 2.4
+- houzhaoE | Hậu Tráo Lâu (Đông) | 150 x 14 | 2 | 2.4
+- guardw | Tây Môn Phòng | 14 x 9 | 1 | 0.6
+- guarde | Đông Môn Phòng | 14 x 9 | 1 | 0.6
+- theater | Đại Hí Lâu | 40 x 24 | 1 | 2.4
+ĐÌNH / TIỂU CÔNG TRÌNH:
+- summit | Vọng Sơn Đình | 9 x 9
+- liubei | Lưu Bôi Đình | 9 x 9
+- tingyu | Thính Vũ Hiên | 12 x 9
+- shuixie | Thủy Tạ | 12 x 10
+- yuexiang | Nguyệt Hương Đình | 9 x 9
+- cuiyun | Thúy Vân Đình | 8 x 8
+- mingdao | Minh Đạo Đình | 8 x 8
+Giả sơn: Độc Lạc Phong · núi giả chữ Sơn

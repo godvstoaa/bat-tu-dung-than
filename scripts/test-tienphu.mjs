@@ -4,6 +4,7 @@
 //  · NGƯỜI MÁY đi bộ (motion.moveFree) leo từ đất lên Vọng Đài chỉ bằng cầu thang, không xuyên vách
 //  · thang phép tới đủ 11 tầng · vách tầng k không chặn tầng k ± 1 · hồ: sâu ≥ 1,3 m, bước vào thì bơi
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { TP_STYLES } from '../src/game/tienphu/styles.js';
 import { tienPlan, tienCollision, planStats, TP_W, TP_D } from '../src/game/tienphu/plan.js';
 import { towerSpec, LEVELS, RISE, TREAD, RUN, insidePoly, FH } from '../src/game/tienphu/tower.js';
@@ -37,6 +38,13 @@ test('9 đảo không chồng nhau, cả vùng trời nằm trong biên máy ch�
   assert.equal(L.bridges.length, 8);
 });
 
+test('9 TỔNG MẶT BẰNG riêng: không chồng chéo, đi tới mọi cửa, khác nhau từng đôi (scripts/check-siteplans.mjs)', () => {
+  const out = execFileSync(process.execPath, ['scripts/check-siteplans.mjs'], { encoding: 'utf8' });
+  assert.match(out, /9 tổng mặt bằng sạch, khác nhau — ĐẠT/);
+  const towers = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => { const t = tienPlan(i).tower; return `${t.x},${t.z}`; }));
+  assert.ok(towers.size >= 8, 'vị trí lầu phải khác nhau giữa các phủ');
+});
+
 test('9 phong cách khác nhau (mặt bằng · đỉnh · hồ · cổng)', () => {
   const sig = new Set(TP_STYLES.map((s) => `${s.tower.n}|${s.tower.crown}|${s.water}|${s.gate}|${s.hall.roof}`));
   assert.equal(TP_STYLES.length, 9); assert.equal(sig.size, 9);
@@ -54,10 +62,10 @@ test('Lầu ≥ 10 tầng kín + Vọng Đài, tầng nhỏ nhất ≥ 20 × 20 
   assert.ok(RISE <= 0.178 && RISE >= 0.102, `bậc cao ${RISE}`); assert.ok(TREAD >= 0.279); assert.ok(Math.abs(2 * RISE + TREAD - 0.64) < 0.02);
 });
 
-test('Mỗi phủ: ≥ 6 nhà, ≥ 6 đình, ≥ 500 cây, ≥ 80 đèn, ≥ 1 cầu, ≥ 40 đá/ghế/tượng; vùng bài trí ≤ 99, mã k 2 chữ số', () => {
+test('Mỗi phủ: ≥ 6 nhà, ≥ 6 đình, ≥ 150 cây cổ thụ (THUCVAT-MANIFEST §4 — tán 10–30 m, không phải cây non 4–10 m), ≥ 80 đèn, ≥ 1 cầu, ≥ 40 đá/ghế/tượng; vùng bài trí ≤ 99, mã k 2 chữ số', () => {
   for (let i = 0; i < 9; i++) {
     const s = planStats(tienPlan(i));
-    assert.ok(s.buildings >= 6 && s.pavs >= 6 && s.trees >= 500 && s.lamps >= 80 && s.bridges >= 1 && s.rocks >= 40, `phủ ${i}: ${JSON.stringify(s)}`);
+    assert.ok(s.buildings >= 6 && s.pavs >= 6 && s.trees >= 150 && s.lamps >= 80 && s.bridges >= 1 && s.rocks >= 40, `phủ ${i}: ${JSON.stringify(s)}`);
     assert.ok(s.zones <= 99);
     assert.equal(zonesOfH(TIEN_H0 + i).length, s.zones);
   }

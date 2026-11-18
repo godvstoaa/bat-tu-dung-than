@@ -1,0 +1,202 @@
+## lau10 — Hồng Cung (Potrang Marpo) — lầu 10 tầng
+5. Cấu kiện nhận diện (xếp theo mức quan trọng)
+1. Khối lăng trụ **đỏ son**, tường nghiêng ngoài, đặt **cao hơn và ở giữa** khối trắng.
+2. **Dải penbey nâu đỏ ở tầng trên cùng** gắn huy hiệu vàng (pháp luân lớn ở giữa).
+3. **Các mái vàng kiểu Hán nhỏ trên mái bằng** (7 cái; tối thiểu 3: một lớn hai nhỏ — ZW-POT nhắc «三座宝塔，一大二小» trên đỉnh).
+4. **Dải cửa sổ lưới đứng 7 tầng ở giữa mặt Nam**.
+5. Cửa sổ viền đen hình thang, rèm vải sọc trên cửa.
+6. Gyaltsen vàng ở góc mái; cờ chiến thắng khung đồng phủ lụa đen.
+7. Phần trắng bao hai bên / phía dưới (khối Hồng Cung nằm trên các tầng trắng).
+8. Đề xuất kích thước game
+- **Khung hiện tại**: bệ vuông 50 m cao 3 m; tầng vuông cạnh 38 m (T1) giảm đều còn 22,2 m (T10), mỗi tầng lùi 0,88 m mỗi bên (≈ 17,6 % ≈ 10°); tầng 5 m; tổng cao 3 + 50 + 4 = **57 m**.
+- **Đúng**: tổng ≈ 57 m khớp phần Hồng Cung nhô trên Deyang Shar (≈ 57 m, [Suy]).
+- **Sai**:
+  1. Thu nhỏ **bậc từng tầng** (thành tháp chùa) — thật là tường nghiêng **liên tục**, khối không thu nhỏ theo bậc.
+  2. Độ nghiêng 10° quá lớn so với nguồn kỹ thuật (10 % ≈ 5,7°).
+  3. Mặt bằng vuông — thật «gần vuông» nhưng mặt Nam phải dài hơn mặt bên để chứa dải cửa giữa và hai mảng tường đặc; đề xuất chữ nhật nhẹ.
+  4. Bệ 3 m quá thấp — không thể hiện 3–4 tầng đá dưới.
+- **Khung đề xuất** [Đề xuất]:
+
+| Thông số | Hiện tại | Đề xuất |
+|---|---|---|
+| Bệ (khối đá nghiêng, không chơi) | 50 × 50 × 3 m | 52 × 44 m, cao **10 m**, nghiêng 10 %, 3 hàng khe sáng |
+| Mặt bằng T1 (mặt ngoài) | 38 × 38 m | **44 × 34 m** (Đông–Tây × Bắc–Nam) |
+| Mặt bằng T10 | 22,2 × 22,2 m | **35 × 25 m** (tường nghiêng liên tục 10 %: lùi 0,5 m mỗi bên mỗi tầng 5 m) |
+| Giếng trời T6–T10 | không có | lỗ mở **14 × 9 m** (giữ tỉ lệ 24,6 : 15,8 ≈ 1,56) ở giữa sàn, lan can quanh; thang đặt ngoài vùng giếng |
+| Dải cửa lưới giữa mặt Nam | không có | rộng ≈ 1/3 mặt tiền (≈ 12–14 m), từ T4 đến T10 |
+| Dải penbey | không rõ | cao **= cả T10 (4–5 m)**, phẳng với mặt tường đỏ; trên cùng là gờ mái đá nhô ≈ 0,3 m |
+| Mái vàng | 'goldCanopy' 1 khối | 3 gyaphib (1 lớn ở giữa ≈ 12 × 9 m, 2 nhỏ ≈ 7 × 6 m) hoặc đủ 7 xếp Đông–Tây; mái yết sơn đơn diêm, độ dốc kiểu Hán; 2 cái lục giác |
+| Tổng cao | 57 m | 10 + 50 + ≈ 7 (gyaphib) = **≈ 67 m** |
+
+Tỉ lệ giữa các phần cần giữ: cao thân : rộng mặt Nam ≈ 50 : 44; dải penbey = 1/10 chiều cao thân; mái vàng thấp, không quá 1/8 tổng cao.
+
+## main — Bạch Cung (Potrang Karpo)
+5. Cấu kiện nhận diện
+1. Khối **trắng** dài, nhiều tầng (7 hàng cửa), tường nghiêng.
+2. Cửa sổ viền đen hình thang, dày đặc; tầng trên cửa lớn hơn.
+3. Dải penbey nâu đỏ ở diềm.
+4. **Hai bên cầu thang chính là tường penbey đỏ thẫm** (BD-POT: «deep crimson Penma eave walls flank the steps»).
+5. Ba thang gỗ song song từ sân lên.
+6. Nhật Quang điện tầng 7 có mặt kính lớn quay Nam, rèm vàng.
+7. Tháp tròn (bastion) ở đầu Đông.
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 60 × 30 m, 2 tầng, cao 14 m, bệ 4,2 m.
+- **Sai**: 2 tầng (14 m) thì mất hẳn đặc trưng «7 tầng trắng». Rộng 60 m chấp nhận được (Đại điện 27,8 m chỉ là phần giữa). Sâu 30 m vừa đủ chứa Đại điện 25,8 m + 2 tường 2 m — quá sát.
+- **Khung đề xuất** [Đề xuất]: **60 × 34 m, cao thân ≈ 24 m + bệ đá 6 m**.
+  - Giữ 2 tầng chơi (mỗi 5 m) cho tầng 4 (Đại điện) và tầng 7 (Nhật Quang điện); các tầng còn lại là **mặt đứng giả**: tổng 7 hàng cửa sổ trên ≈ 24 m (≈ 3,4 m mỗi hàng).
+  - Đại điện ≈ 28 × 26 m ở giữa, lưới cột 7 gian × 6 gian (≈ 4 m).
+  - Tường nghiêng 10 %; chân dày 3 m, đỉnh 2 m.
+  - Mặt Đông: 3 thang gỗ song song rộng tổng ≈ 8 m, hai bên là tường penbey đỏ thẫm.
+
+## printing — Ấn Kinh Viện
+5. Cấu kiện nhận diện
+1. Khối trắng 2 tầng, sân trong, tường nghiêng nhẹ.
+2. Cửa sổ viền đen hình thang, rèm vải.
+3. Hành lang gỗ đỏ quanh sân ở tầng trên.
+4. Bên trong: giá ván khắc kinh xếp kín tường (dấu hiệu chức năng).
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 40 × 18 m, 2 tầng, cao 8 m — diện tích chiếm đất 720 m², gần **gấp đôi** thật (≈ 380 m²); dạng thanh dài không có sân.
+- **Khung đề xuất** [Đề xuất]: **22 × 20 m**, sân trong 8 × 7 m, 2 tầng chơi = 4 hàng cửa sổ, cao thân ≈ 8 m + tường chắn 0,8 m.
+
+## sholoffice — Shöl Lekhung
+5. Cấu kiện nhận diện
+1. Khối trắng 3 tầng có sân trong, mặt ngoài nghiêm, ít cửa ở tầng trệt.
+2. Cửa sổ viền đen hình thang; tầng trên có cửa lớn hơn / ban công gỗ.
+3. Cổng lớn có lanh tô nhiều lớp rui, rèm vải.
+4. Tường chắn mái nâu đỏ hoặc đen (công sở, không phải chùa).
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 40 × 18 m, 2 tầng, cao 8 m (chiếm 720 m²) — **nhỏ hơn thật ≈ 2,4 lần**, thiếu 1 tầng, không có sân.
+- **Khung đề xuất** [Đề xuất]: **44 × 36 m**, sân trong ≈ 18 × 14 m, 2 tầng chơi + 1 hàng cửa giả = **3 tầng thật** (6 hàng cửa nếu dùng quy tắc 2 hàng / tầng game), cao thân ≈ 10 m. Nếu bản đồ không đủ chỗ: 40 × 30 m, giữ sân và 3 tầng.
+
+## sholhouse — Nhà Dân Shöl
+5. Cấu kiện nhận diện
+1. Khối trắng thấp 2–3 tầng, tường nghiêng nhẹ.
+2. Cửa sổ nhỏ viền đen hình thang, có «sừng» ở góc trên.
+3. Cửa sổ lồi gỗ (rabsel) tầng trên.
+4. Tường chắn mái trơn có trụ góc, **cành cờ cầu nguyện ở 4 góc mái** (TT-FEAT: góc mái hơi nhô, treo cờ).
+5. **Không có penbey, không có mái vàng.**
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 34 × 14 m, 2 tầng, cao 7 m — dạng thanh dài, không sân.
+- **Khung đề xuất** [Đề xuất]: **20 × 18 m**, sân trong 6 × 6 m, 2 tầng chơi = **4 hàng cửa** (≈ 2,5 m mỗi hàng) hoặc 3 hàng nếu muốn đúng 3 tầng thật; cao ≈ 8 m. Nếu cần lấp 34 m chiều dài: làm **2 nhà khác nhau đứng sát nhau** (16 × 14 và 18 × 16), khác số tầng, khác vị trí rabsel — không kéo dài một nhà.
+
+## seminary — Tăng Học Viện
+5. Cấu kiện nhận diện
+1. Hiên cột gỗ đỏ có đấu + đà cung sơn màu, rèm yak đen treo trước hiên.
+2. Diềm penbey nâu đỏ với gương đồng / huy hiệu.
+3. Khối nâng giữa mái (cửa mái lấy sáng của kinh đường).
+4. Cửa sổ viền đen hình thang.
+5. Pháp luân + đôi nai trên mái (dấu hiệu chùa / học viện).
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 36 × 14 m, 2 tầng, cao 9 m, bệ 2,6 m.
+- **Nếu là cánh Tse Lobdra (giữ vị trí cạnh sân)**: khung 36 × 14 hợp lý cho một cánh nhà 2 tầng. Chỉ cần sửa chi tiết: hành lang cột tầng trệt quay ra sân, penbey ở diềm.
+- **Nếu là dratsang đúng nghĩa**: [Đề xuất] **36 × 34 m** = hiên 4 m + kinh đường 36 × 24 m (thu từ Gomang 36,5 × 27) + Phật điện sau sâu 6 m; cao thân 10–12 m, gian giữa kinh đường nâng thêm 3 m làm cửa mái.
+- Khuyến nghị: giữ 36 × 14 làm **cánh Tse Lobdra**, vì kinh đường 36 × 27 m không vừa cạnh sân.
+
+## dormE — Tăng Phòng Đông
+5. Cấu kiện nhận diện
+1. Dãy 2 tầng trắng thấp, mặt sân là hành lang cột gỗ đỏ.
+2. Hàng cửa sổ nhỏ đều nhau viền đen.
+3. Mái thấp hơn hẳn Bạch Cung (làm nền cho khối lớn).
+4. Mặt sân lát arga xám bóng.
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 30 × 14 m, 2 tầng, cao 9 m, bệ 2,6 m.
+- Sâu 14 m **dày gấp đôi** dãy tăng phòng thật (≈ 6–8 m). [Đề xuất] **36 × 8 m**, 2 tầng = 4 hàng cửa nhỏ, cao ≈ 7 m, hành lang cột 2 m quay ra sân. Bệ 2,6 m giữ được (là mép sân).
+
+## zhasha — Zhasha (Tăng Xá)
+5. Cấu kiện nhận diện
+1. Khối trắng **nhiều bậc** theo sườn, thấp hơn và sát cạnh Tây Hồng Cung.
+2. Hàng cửa sổ nhỏ dày, đều.
+3. Dải penbey nâu đỏ ở diềm (khác nhà dân).
+4. Không có mái vàng.
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 50 × 16 m, 2 tầng, cao 10 m, bệ 3,4 m — một hộp phẳng.
+- [Đề xuất] giữ chiều dài 50 m nhưng làm **3 bậc**: bậc dưới 50 × 10 m cao 7 m; bậc giữa 42 × 10 m cao thêm 6 m, lùi 8 m vào sườn; bậc trên 30 × 8 m cao thêm 5 m. Tổng sâu ≈ 26 m, tổng cao ≈ 18 m, **luôn thấp hơn khối đỏ T6** của Hồng Cung. Cửa sổ 2 hàng mỗi bậc.
+
+## lukhang — Lukhang
+5. Cấu kiện nhận diện
+1. **Nằm trên đảo tròn giữa hồ**, cầu đá vòng 5 lỗ.
+2. 3 tầng **thu nhỏ dần** (đây là công trình duy nhất trong bộ được thu bậc theo tầng).
+3. Mái chóp lục giác vàng trên cùng.
+4. Hành lang cột bao tầng 1.
+5. Cây liễu cổ vây quanh (Lukhang «nổi lên giữa lùm liễu» — kết quả tìm squarespace PDF).
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 20 × 16 m, 2 tầng, cao 8 m, bệ 1,6 m, đặt **trên bờ** (x = −195, z = −205); trong khi hồ có đảo r = 12 m với «Hồ Tâm Đình».
+- **Sai lớn**: Lukhang thật **nằm trên đảo**. Mặt bằng 20 × 16 không vuông — phá mandala. Thiếu 1 tầng.
+- [Đề xuất]:
+  - **Chuyển Lukhang lên đảo**, bỏ «Hồ Tâm Đình» (hoặc biến Hồ Tâm Đình thành Lukhang).
+  - Điện **16 × 16 m** (tầng 1 kể cả hành lang), tầng 2 **11 × 11 m**, tầng 3 **7 × 7 m**; cao ≈ 4 + 3,5 + 3 m + mái 3 m ≈ **13,5 m**. (Kích thước là đề xuất; thật chưa có số.)
+  - Đảo: đường kính **≥ 30 m** (thật 40 m; khung hiện tại 24 m quá nhỏ cho điện 16 m).
+  - Hồ: chữ nhật tỉ lệ **2,4 : 1** (270 : 112). Hiện là elip 220 × 60 (3,7 : 1, quá dẹt, sai hình). Đề xuất chữ nhật bo góc 220 × 92 m.
+  - Cầu: 25 m, 5 lỗ, rộng 3,5 m — khung hiện tại 26 × 4 m đã đúng.
+
+## summit — Vọng Sơn Đình
+5. Cấu kiện nhận diện
+1. Thân tường trắng/đỏ có viền cửa đen (không phải đình cột trống kiểu Hán).
+2. Dải penbey dưới mái.
+3. Mái vàng yết sơn đơn diêm với 4 gyaltsen.
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 9 × 9 m, cao 3,6 m, **bát giác** (octa = true vì fam 'asian').
+- [Đề xuất] **vuông** 9 × 9 m (bỏ bát giác — không có gốc Tây Tạng), thân tường cao 3,5 m, penbey 0,8 m, mái yết sơn cao ≈ 3 m → tổng ≈ 7,5 m; mái vươn ≈ 1 m.
+
+## deyang — Đài Deyang Shar
+5. Cấu kiện nhận diện
+1. Mặt sân rộng, phẳng, lát arga xám bóng — **trống ở giữa**.
+2. Ba thang gỗ song song dốc lên cửa Bạch Cung, hai bên tường penbey đỏ thẫm.
+3. Nhà 2 tầng thấp vây ba phía, tường sân sơn vàng.
+4. Cột cờ / darchen ở sân (đề xuất; không có nguồn vị trí).
+8. Đề xuất kích thước game
+- **Khung hiện tại**: pav 12 × 12 m (một «đài») + yard 100 × 30 m.
+- **Sai**: Deyang Shar không phải đình. Yard 100 × 30 m (3 000 m², rất dẹt) gần gấp đôi diện tích thật và sai tỉ lệ (thật ≈ vuông).
+- [Đề xuất]: đổi yard thành **≈ 44 × 40 m** (≈ 1 760 m², thu phóng 1,1); **bỏ pav 12 × 12**, thay bằng **cụm 3 thang gỗ** rộng tổng 8 m, dốc ≈ 45°, đặt ở cạnh Tây sát mặt Bạch Cung. Nếu vẫn cần một vật thể «đài»: một bệ đá thấp 12 × 12 × 0,6 m ở giữa sân (sân khấu múa cham) — **ghi rõ là bổ sung game**, không có nguồn.
+
+## gate1 — Môn Lâu Shöl
+5. Cấu kiện nhận diện
+1. Khối trắng 3 tầng nghiêng, cao hơn tường thành 6 m rõ rệt.
+2. Lỗ cổng giữa, cửa gỗ đỏ đinh sắt.
+3. Cửa sổ nhỏ viền đen ở hai tầng trên.
+4. Liền với tường thành trắng có mặt nghiêng.
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 9 × 7 m. Tường thành game wallH = 7 m (thật 6 m).
+- [Đề xuất] **12 × 8 m, cao ≈ 11 m (3 tầng × 3,6 m)**, lối cổng rộng 4 m cao 4,5 m. Lý do: khối phải cao hơn hẳn tường 7 m và sâu hơn bề dày tường. Tường thành Shöl trong game nên dày ≈ 4 m ở chân, 2,6 m ở đỉnh (hiện wallT = 1,6 m quá mỏng cho tường đất Tây Tạng).
+
+## ramp1 — Đình Lưng Dốc
+5. Cấu kiện nhận diện
+1. Chorten trắng **đứng trên lối đi** — người đi xuyên qua đế.
+2. 13 vòng côn trên thân.
+3. Đỉnh nhật nguyệt vàng.
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 8 × 8 m, cao 3,6 m (đình).
+- [Đề xuất] đế **8 × 8 m**, cao đế 4 m có lối qua rộng 3,5 m (vừa lối dốc rộng 6 m nếu đặt lệch, hoặc nới đế 10 × 10 để vắt cả lối); tổng cao ≈ **16–18 m** (≈ 2 × cạnh đế, theo tỉ lệ Kadampa). Lưu ý: game đã có `stupas` 9–12 m — chorten cổng phải **khác hình** (đế có vòm) để không lặp.
+
+## lake1 — Đình Ven Hồ
+5. Cấu kiện nhận diện
+1. Đình **cột trống** mái vàng (khác hẳn khối tường Tây Tạng — đây là thứ «Hán hoá» duy nhất ở vườn).
+2. Lan can đá quanh bệ.
+3. Đặt sát mép nước, có liễu.
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 9 × 9 m, cao 3,6 m — hợp lý. [Đề xuất] 9 × 9 m, cột cao 3 m, mái cao ≈ 2,5 m, vươn mái ≈ 1,2 m, bệ 0,6 m. Không bát giác.
+
+## lake2 — Đình Liễu
+5. Cấu kiện nhận diện
+1. Đình nhỏ dưới tán **liễu rủ** (cây là phần chính).
+2. Mái đơn giản, màu trầm hơn mái vàng cung điện.
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 8 × 8 m. [Đề xuất] **6 × 6 m**, cao ≈ 5 m (nhỏ hơn lake1 để phân cấp), 3–5 cây liễu cao 10–14 m vây quanh.
+
+## east1 — Đình Kinh Luân
+5. Cấu kiện nhận diện
+1. Bánh xe cầu nguyện lớn hình trụ (đỏ / vàng, chữ mani nổi) nhìn thấy qua cửa mở.
+2. Hàng bánh xe nhỏ dọc tường ngoài.
+3. Lư hương (sang-khang) trắng trước cửa.
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 8 × 8 m, cao 3,6 m. [Đề xuất] **8 × 8 m**, cao tường 4 m + diềm 0,6 m (+ mái vàng nhỏ 2,5 m tuỳ chọn); bánh xe đường kính ≈ 2 m, cao ≈ 3 m ở tâm (**số bánh xe là đề xuất**, chưa có số đo); hàng 12–16 bánh xe nhỏ (đk 0,35 m) dọc 2 tường.
+
+## island — Hồ Tâm Đình
+5. Cấu kiện nhận diện
+(B) 1. Đảo **vuông** (khác đảo tròn Lukhang). 2. Đình 2 tầng mái vàng. 3. Lan can đá. 4. Cầu đá thẳng / vòng thấp.
+8. Đề xuất kích thước game
+- **Khung hiện tại**: 10 × 10 m, cao 3,8 m, bát giác, trên đảo r = 12 m.
+- [Đề xuất A]: thay bằng Lukhang 16 × 16 m (xem lukhang), đảo tròn đk ≥ 30 m.
+- [Đề xuất B]: nếu giữ riêng thì đảo **vuông** 24 × 24 m, đình 10 × 10 m tầng 1 + 7 × 7 m tầng 2, cao ≈ 9 m. Không bát giác.
+
+## Giả sơn — Marpo Ri · đồi đá (ghi chú thêm)

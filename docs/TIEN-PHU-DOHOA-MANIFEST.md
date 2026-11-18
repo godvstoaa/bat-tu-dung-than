@@ -167,3 +167,8 @@ Trong khi đó kho có hơn 500 model, phần lớn chưa dùng.
 - **G-DH3:** gió lay tán (shader), như phố. Tiêu chí: ≤ 0,2 ms / khung.
 - **G-DH4:** đưa job voxel về ≤ 1,5 s CPU / phủ mà vẫn giữ 36/36 lối cổng và 100 % đồ kín. Hướng: chỉ mục `platformTop` theo ô cho vùng lầu (hàng trăm nền bậc), thay cho quét bucket. Tiêu chí: `buildcpu.mjs`.
 - **G-DH5:** sảnh và tầng còn thưa so với diện tích (tầng 1 khoảng 30 × 30 m mà chỉ khoảng 24 món ở giữa). Thêm đồ dọc vách: giá bát bảo, câu đối, tranh treo, kệ hoa. Tiêu chí: ảnh `*-room.png` không còn khoảng sàn trống quá 8 m.
+
+## 7. Deploy
+
+- 2026-11-18: Worker phiên bản `bcb7b8b0-a636-427b-aeb2-e1661761f4bf`, build từ `2832baf4` (gồm `c6d30d72`) trong worktree sạch. Kiểm nhanh trên bản thật đạt. Chưa push.
+- Đợt kế tiếp (9 tổng mặt bằng khác nhau) ghi ở [TIEN-PHU-MATBANG-MANIFEST.md](TIEN-PHU-MATBANG-MANIFEST.md), chưa deploy.

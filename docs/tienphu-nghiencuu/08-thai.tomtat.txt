@@ -1,0 +1,218 @@
+## A2. Bộ "lamyong" — đồ trang trí diềm hồi (bắt buộc trên mọi hồi)
+
+
+## A3. Prasat — luật số tầng chóp
+
+
+## tower — Lầu 10 tầng (Dusit Maha Prasat + ngữ pháp prang Wat Arun + Loha Prasat)
+5. Cấu kiện nhận diện (xếp theo mức quan trọng)
+1. Mặt bằng **chữ thập đều**, mỗi cánh kết thúc bằng một **mặt hồi nhiều lớp** có chofa.
+2. **Một chóp vàng 7 tầng** ở giao điểm, đỡ bằng Garuda ở 4 phía.
+3. Bệ trắng cao (≈ 1/3 chiều cao tường) có gờ sư tử và gờ bát.
+4. Mái mỗi cánh nhiều lớp lùi, nền xanh viền cam, viền diềm hồi vàng.
+5. Tường trắng trơn, cửa sổ khung nhọn thếp vàng xếp đều.
+6. Ban công ngai có chóp nhỏ nhô ra một cánh.
+8. Đề xuất cho game — tháp 10 tầng chơi được, đúng ngữ pháp prasat
+
+Khung hiện tại: bệ vuông cạnh 47 m, cao chưa định. Hằng số trong `src/game/tienphu/tower.js`: FH = 5,0 m sàn tới sàn,
+LEVELS = 10. Như vậy thân 10 tầng = 50 m, gần bằng chóp giữa Chakri (50,4 m) và dưới prang Wat Arun (67 m).
+
+Nguyên tắc ghép (giữ đúng ngữ pháp):
+- **Một họ chóp duy nhất: busabok / mondop (họ của Dusit).** Không đặt ngọn prang lên thân prasat.
+- Mượn của prang Wat Arun **cách xếp 3 cấp sân đi vòng có tượng đỡ**, không mượn ngọn.
+- Mượn của Loha Prasat **cách chia 7 tầng thành 3 cấp lùi, mỗi cấp có hàng chóp nhỏ ở mép**.
+- Mặt bằng mỗi tầng là **vuông lõm 12 góc** hoặc **chữ thập**, không phải vuông trơn.
+
+| Cấp | Tầng | Mặt bằng (cạnh ngoài tường) | Mép mỗi cấp | Tượng đỡ / trang trí | Ghi chú |
+|---|---|---|---|---|---|
+| Bệ | — | 47 × 47 m, cao 2,85 m (đúng Dusit) | Lan can trắng | Garuda quặp Naga quanh gờ | 4 cầu thang lan can Naga 5 đầu ở 4 mặt |
+| Cấp 1 | 1–4 | vuông lõm 12 góc, 34 × 34 m (= chân prang Wat Arun) | Mái hiên ngói 1 vòng ở sàn tầng 5; 4 góc có **chóp busabok 5 tầng** (như prang phụ / mondop Wat Arun) | Dạ xoa đỡ dưới mái hiên | Mỗi mặt 4 mukh nhỏ có hồi + chofa ở giữa |
+| Cấp 2 | 5–7 | vuông lõm, 26 × 26 m | Mái hiên ở sàn tầng 8; 4 góc chóp 5 tầng nhỏ hơn | Khỉ (kabi) đỡ | — |
+| Cấp 3 | 8–9 | vuông lõm, 19 × 19 m | Mái hiên ở sàn tầng 10 | Thiên thần đỡ | — |
+| Điện đỉnh | 10 | **chữ thập** 13 × 13 m, cánh rộng ~6 m (≈ tỉ lệ cánh Dusit) | 4 cánh, mỗi cánh mái 3–4 lớp lùi có chofa | Garuda 4 phía đỡ chóp | Đây chính là "Dusit thu nhỏ" đặt trên tháp |
+| Chóp | — | đáy ≈ 7 × 7 m | **7 tầng** (maha prasat) → chuông 4 mặt → pli → giọt sương | Garuda 4 góc | Cao chóp 16–18 m [đề xuất] |
+
+Chiều cao tổng [đề xuất]: 2,85 (bệ) + 50 (10 tầng) + 16–18 (mái điện đỉnh + chóp) ≈ **69–71 m**.
+Tỉ lệ cao / cạnh chân thân = 70 / 34 ≈ 2,1; prang Wat Arun 67 / 34 ≈ 2,0 [suy]. Tỉ lệ khớp nguyên mẫu.
+
+So với khung hiện tại: cạnh bệ 47 m **giữ được** (gần nền Wat Arun ~55 m và nền rộng hơn thân như Dusit), nhưng thân tầng 1
+phải **lùi vào 34 m**, không xây thẳng thân 47 m. Dusit thật chỉ ~36–38 m mép mái; nếu muốn bám Dusit hơn thì giảm bệ còn
+40 m [đề xuất phụ].
+
+## main — Chakri Maha Prasat
+5. Cấu kiện nhận diện
+1. **Ba chóp vàng 7 tầng** thẳng hàng trên **thân Âu trắng 3 tầng** — "Tây đội mũ chada".
+2. Mặt tiền chia 5 đoạn gần bằng nhau; 3 lầu nhô có chóp, 2 cánh lõm có hàng cửa vòm.
+3. Lầu giữa cao nhất, có cổng vòm, ban công và cầu thang đôi đổ xuống sân.
+4. Tầng nền màu đậm hơn, cửa vòm thấp.
+5. Mái Thái nền đỏ cam viền xanh, hồi lamyong vàng.
+6. Hai voi đồng trước bậc [đo — Dhani Nivat].
+8. Đề xuất cho game
+Khung hiện tại 60 × 26 m, 2 tầng, bệ 1,6 m. **Sai 3 điểm**: dài thiếu (~90 m thật), sâu dư (khối trước ~17 m), số tầng sai (3).
+
+[đề xuất] Khung **72 × 20 m** (tỉ lệ 0,8 so với thật), **3 tầng**:
+
+| Phần | Số [đề xuất] |
+|---|---|
+| Tầng nền (đá giả, cửa vòm) | 4,0 m |
+| Tầng 2 + tầng 3 | 2 × 5,8 m |
+| Gờ mái thân | ~15,6 m |
+| Đỉnh chóp bên | ~33,5 m |
+| Đỉnh chóp giữa | **40,3 m** (= 50,4 × 0,8) |
+| Chia mặt tiền | 5 đoạn × 14,4 m; cánh có 7 cửa vòm mỗi tầng; lầu bên 3 cửa |
+| Khối sau | Sảnh Bắc–Nam ở giữa, dài thêm 16–20 m ra sau (giữ dáng chữ T / H) |
+
+Bệ 1,6 m của khung: thay bằng tầng nền 4 m (Chakri không có bệ Thái).
+
+## ubosot — Ubosot Phật Ngọc
+5. Cấu kiện nhận diện
+1. Khối **hẹp và cao**, trục dài gấp 2,3 lần bề ngang, đầu hồi là mặt chính.
+2. **Mái 3 tầng** ngói lam–vàng–cam, hồi lồng nhau ở mỗi đầu.
+3. **Hàng cột vuông vàng** bao quanh hiên.
+4. **Băng Garuda vàng** quanh bệ.
+5. 3 cửa ở mỗi đầu hồi, bậc ngắn, sư tử đồng.
+6. Tường thấp quanh điện, 8 đình sema nhỏ ở góc / giữa cạnh.
+8. Đề xuất cho game
+Khung hiện tại 40 × 22 m, 1 tầng, bệ 1,6 m. **Sai**: hướng (mặt tiền đặt cạnh 40 m) và tỉ lệ (40 / 22 = 1,8, thật 2,34).
+
+[đề xuất] **Mặt tiền 22 m (đầu hồi) × sâu 51 m**, cao đỉnh nóc ~27 m (tỉ lệ 0,93 so với hiên thật). Bệ ~2,0 m có băng
+Garuda (khoảng 104 tượng, giữ mật độ thật). Hiên cột: 8 × 17 cột, nhịp ~3,0 m. Ba tầng mái, mỗi đầu hồi lộ 3 tam giác.
+Nếu đất chật: giữ tỉ lệ, thu cả khối về 18 × 42 × 22 m.
+
+## monthien — Phra Maha Monthien (mặt chính: điện Amarin Winitchai)
+5. Cấu kiện nhận diện
+1. Sảnh dài, **đầu hồi quay ra sân**, bệ thấp.
+2. Mái 3 dải xanh lá viền cam (màu đặc trưng nhóm Monthien).
+3. Hàng cửa sổ cao khung vương miện vàng trên tường trắng.
+4. Cổng 3 chóp vương miện phủ sứ (Thewaphiban) trước mặt.
+5. Bên cạnh có đình Racharuedee (sala5) và Dusidaphirom (sala3).
+8. Đề xuất cho game
+Khung hiện tại 44 × 22 m, 1 tầng. Hướng sai (Amarin vào ở đầu hồi). [đề xuất] **Mặt tiền 22 m × sâu 30 m**, bệ 0,6 m
+(không phải 1,6 m), đỉnh nóc ~18–20 m [đề xuất, chưa có số đo — chỉ suy từ tỉ lệ cao/rộng ubosot 1,24 trừ đi vì mái
+Amarin thấp hơn]. Nếu muốn giữ diện tích 44 m: nối Amarin (22 × 30) + Phaisan Thaksin phía sau thành khối 22 × 60, hoặc
+xếp đúng thứ tự thật Amarin → Phaisan → Chakraphat theo trục sâu.
+
+## officeW — Bộ Hộ (Ngoại triều) → nguyên mẫu: Phra Thinang Ratchakaranya Sapha
+5. Cấu kiện nhận diện
+1. Nhà Thái **2 tầng kín**, ít cửa, mái hồi.
+2. Hồi nhô vượt ra ngoài đường mái.
+3. Tường trắng, khung cửa đơn giản hơn điện vua.
+8. Đề xuất cho game
+Khung hiện tại 52 × 16 m, 2 tầng — **dài gấp 4,5 lần nguyên mẫu**. Không có nhà Thái 2 tầng dài 52 m nào trong nguồn đã
+đọc. [đề xuất] **12 × 18 m** (mặt tiền đầu hồi 12 m), 2 tầng × 4,5 m, bệ 1,0 m, đỉnh nóc ~16 m [đề xuất]. Nếu bố cục cần
+khối dài: hai nhà như vậy nối bằng hành lang có mái (kiểu **mukh krasan** của Dusit – Phiman Rattaya).
+
+## officeE — Bộ Binh (Ngoại triều) → nguyên mẫu: Phra Thinang Sutthaisawan Prasat
+5. Cấu kiện nhận diện
+1. Khối **rất dài, nông**, nằm trên tường thành, mặt chính ở cạnh dài.
+2. **Một chóp 5 tầng** chính giữa trên lầu có ban công.
+3. Hai hàng cửa chớp xếp sát nhau.
+4. Mái cam đỏ viền xanh, hồi nhỏ ở hai đầu.
+8. Đề xuất cho game
+Khung hiện tại 52 × 16 m, 2 tầng — **dài đúng**, **sâu dư** (thật ~11 m mép mái). [đề xuất] **52 × 11 m**, 2 tầng
+(3,5 m + 4,0 m), chân tường 2,5 m, chóp tới ~22 m. Khác officeW ở chỗ: mặt chính cạnh dài, có chóp 5 tầng, có ban công.
+
+## inner1 — Nội Cung Tây → nguyên mẫu: Phra Thinang Phiman Rattaya
+5. Cấu kiện nhận diện
+1. Điện chữ nhật mái 3 tầng **không có chóp**.
+2. Hiên cột 3 phía.
+3. Sảnh nối dài về điện chữ thập.
+4. Hồi Phra Phrom cưỡi thiên nga.
+8. Đề xuất cho game
+Khung hiện tại 40 × 16 m, 2 tầng. Sai: 1 tầng nền cao thật; hướng hồi. [đề xuất] **Mặt hồi 20 m × sâu 30 m**, 1 tầng
+(tường ~6 m) trên nền 1,6 m (giữ bệ khung), mái 3 tầng, + sảnh nối 6 × 12 m về phía tháp / điện chính.
+
+## inner2 — Nội Cung Giữa → nguyên mẫu: Phra Thinang Chakraphat Phiman
+5. Cấu kiện nhận diện
+1. **Ba mái hồi song song** cạnh nhau (khác hẳn mọi nhà khác).
+2. Hàng cột hiên bao quanh.
+3. Không chóp.
+8. Đề xuất cho game
+Khung hiện tại 40 × 16 m, 2 tầng. [đề xuất] **42 × 22 m, 1 tầng** trên bệ 1,0 m, chia **3 nhà 14 × 22 m**, mỗi nhà mái
+2–3 tầng, 3 hồi quay mặt chính. Khác inner1: 3 hồi song song, không sảnh nối, hiên 4 phía.
+
+## inner3 — Nội Cung Đông → nguyên mẫu: Phra Buddha Rattanasathan (vườn Siwalai)
+5. Cấu kiện nhận diện
+1. **Tường đá xám**, không trắng — điểm khác mọi nhà khác của phủ.
+2. Mái 2 tầng xanh lá.
+3. Hiên cột bao quanh, giữa một bãi cỏ rộng.
+8. Đề xuất cho game
+Khung hiện tại 26 × 14 m, 2 tầng — **tỉ lệ mặt bằng đúng** (26/14 = 1,86; thật 21,7/13,5 = 1,61), nhưng thật là 1 tầng và
+vào ở hồi. [đề xuất] **14 × 22 m**, 1 tầng (tường ~6 m), bệ 1,2 m, mái 2 tầng, đặt giữa bãi cỏ.
+
+## library — Phra Mondop (thư viện kinh)
+5. Cấu kiện nhận diện
+1. Khối **vuông**, 4 mặt như nhau, 4 cửa có mũ vương miện.
+2. **Chóp mondop 7 tầng** (tháp bậc vuông, không phải prang, không phải chuông).
+3. Tường lục + vàng, khác tường trắng của điện.
+4. Bệ cẩm thạch, 4 cầu thang Naga.
+8. Đề xuất cho game
+Khung hiện tại 22 × 22 m, 2 tầng. Sai: rộng hơn thật ~1,5 lần; thật là 1 tầng + chóp. [đề xuất] **15 × 15 m**, bệ cao
+2,5 m (nền ฐานไพที + bệ sen), thân 1 tầng ~7 m, chóp 7 tầng. Tổng cao [đề xuất, chưa có số đo]: ~28–32 m. Lý do: dùng
+tỉ lệ đỉnh / chiều dài sàn đo được trên ảnh Aphorn Phimok (~1,7) nhân với ~15 m, cộng bệ; cần kiểm lại khi có nguồn.
+
+## summit — Vọng Sơn Đình (đình đỉnh giả sơn) → nguyên mẫu: điện thu nhỏ trên đỉnh Khao Krailat
+5. Cấu kiện nhận diện
+1. Đình nhỏ **có chóp prasat** trên đỉnh núi đá.
+2. Tượng thú Himavanta (sư tử, voi, chim thần) quanh chân núi.
+
+### 6–7. Vật liệu, trang trí
+Đình vàng thếp + kính khảm như Aphorn Phimok; núi đá xám #7D7A72 có rêu.
+8. Đề xuất cho game
+Khung 9 × 9 m. [đề xuất] Đình chữ thập **5 × 5 m** (cánh rộng 2,5 m), chóp **5 tầng** (không được 7), cao đỉnh ~9 m,
+bệ 0,6 m. Đặt trên đỉnh Khao Mo của phủ. Khác aphorn: nhỏ hơn một nửa, kín 4 mặt hoặc nửa kín.
+
+## sala1 — Sala Siwalai → nguyên mẫu: Phra Thinang Sitalaphirom
+5. Cấu kiện nhận diện
+1. Đình **gỗ mở**, gần vuông.
+2. Cột **sơn mài đen + hoa văn lửa vàng** (khác cột kính khảm của điện đá).
+3. Mái hồi có chofa.
+8. Đề xuất cho game
+Khung 12 × 9 m — to hơn thật ~1,5 lần. [đề xuất] **8 × 7 m**, cột 2,8 m, đỉnh ~6,5 m, bệ 0,4 m.
+
+## sala2 — Sala Đảo Đông → nguyên mẫu: Phra Thinang Aisawan Thipphaya-at (Bang Pa-In)
+5. Cấu kiện nhận diện
+1. **Đứng trên nước**, sàn trắng trên trụ vòm.
+2. Đình mở chữ thập, chóp vàng.
+3. Mái màu (khác mái xám của Aphorn Phimok).
+8. Đề xuất cho game
+Khung 12 × 9 m. [đề xuất] Sàn nổi **18 × 11 m** cao 1,5–3 m trên nước, đình **11 × 7 m**, đỉnh ~14 m trên sàn, cầu nối bờ.
+Không dùng chung lưới với aphorn: đổi màu mái, thêm sàn nước.
+
+## aphorn — Aphorn Phimok Prasat
+5. Cấu kiện nhận diện
+1. Đình **mở, chữ thập**, cột vàng dày đặc.
+2. **Chóp 5 tầng vàng mảnh**, rất cao so với đình (đỉnh ≈ 1,7 lần chiều dài sàn).
+3. Đứng trên **bệ trắng cao nhiều bậc** sát tường.
+4. Mái tối màu, diềm vàng — tương phản với mái màu của điện bên cạnh.
+8. Đề xuất cho game
+Khung 9 × 9 m — sai hình (vuông). [đề xuất] **Chữ thập 9,4 × 9,4 m mép mái, sàn 9,4 × 4,25 m + cánh ngang ~6 × 4,25 m**,
+cột 4,4 m, đỉnh chóp 16 m trên sàn, bệ 2,5–3 m. Đây là đình duy nhất của phủ được mái xám + cột vàng dày.
+
+## sala3 — Sala Ngoại Triều → nguyên mẫu: Phra Thinang Dusidaphirom
+5. Cấu kiện nhận diện
+1. Đình chữ nhật mở.
+2. **Khảm kính lam + sơn mài vàng** (màu khác các đình khác).
+8. Đề xuất cho game
+Khung 10 × 8 m. [đề xuất] **7,5 × 11 m** (hồi 7,5 m quay ra lối đi), cột 3,2 m, đỉnh ~8 m, bệ 0,5 m.
+
+## sala4 — Sala Cổng Chùa → nguyên mẫu: sala rai của Wat Phra Kaew / đình nghỉ ngoài cổng Koei Sadet
+5. Cấu kiện nhận diện
+Đình mở nhỏ, mái 2 tầng có chofa, đứng theo hàng dọc tường / gần cổng có dạ xoa canh.
+
+### 6–7. Vật liệu, trang trí
+Theo bảng màu chung; khác sala khác ở chỗ đặt **cạnh tượng dạ xoa 5 m** của cổng.
+8. Đề xuất cho game
+Khung 8 × 8 m. [đề xuất, không có số đo] **8 × 5 m**, cột 3 m, đỉnh ~7 m, bệ 0,5 m; đặt cạnh cổng có **2 dạ xoa cao 5 m**.
+
+## sala5 — Sala Nội Cung → nguyên mẫu: Phra Thinang Racharuedee
+5. Cấu kiện nhận diện
+1. Đình **mở, 3 mukh**.
+2. Hồi gỗ chạm vàng Narai cưỡi Garuda.
+3. Bệ thấp, nền cẩm thạch trắng.
+8. Đề xuất cho game
+Khung 9 × 9 m — sai hình. [đề xuất] **12 × 7,8 m** + 2 mukh nhô ~2 m, cột 3,2 m, đỉnh ~8,5 m, bệ 0,7 m.
+
+## khaomo — Giả sơn: Khao Mo
+8. Đề xuất cho game
+Giữ khung giả sơn hiện có; tạo **nhiều chóp đá nhỏ** thay vì một đồi tròn; đình đỉnh theo mục summit; 4–8 tượng thú quanh chân.

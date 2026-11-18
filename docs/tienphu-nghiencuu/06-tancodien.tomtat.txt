@@ -1,0 +1,280 @@
+## tower — Thánh Điện Tháp (10 tầng)
+5. Cấu kiện nhận diện (xếp theo mức quan trọng)
+
+1. Chồng thức đúng thứ tự Doric → Ionic → Corinthian; mỗi tầng có entablature đủ 3 phần.
+2. Vòm ovoid có múi gân vàng, trên tambour có hàng cột tự do bao tròn.
+3. Lanternon có obelisk ở đỉnh.
+4. Bệ đá khía refends với vòm và mascaron.
+5. Lan can con tiện quả lê ở mỗi chỗ lùi tầng; pot à feu và trophée ở góc.
+6. Cuộn đỡ (volute) chuyển từ vuông sang tròn.
+7. Mái phẳng ở các sân thượng lùi tầng (không mái dốc).
+8. Kích thước đề xuất trong game
+
+| Hạng mục | Danh sách hiện tại | Đề xuất |
+|---|---|---|
+| Đế | Bệ vuông 42 m | Giữ 42 × 42 |
+| Tổng cao | «~?» | **≈ 80 m** (10 tầng như bảng mục 3) |
+
+- Nếu cần thấp hơn: thu toàn bộ đồng đều (ví dụ × 0,85 → 68 m), **không cắt bớt chiều cao từng thức**.
+- Lý do: tỉ lệ cột / entablature là bất biến của phong cách.
+
+## main — Lâu Đài Chính (Corps de Logis, mặt vườn)
+5. Cấu kiện nhận diện (xếp theo mức quan trọng)
+
+1. Ba tầng phân biệt: nền khía, tầng chính Ionic cửa vòm, attic thấp.
+2. Đường chân trời lan can dài, đều, có trophée và pot à feu.
+3. Ba avant-corps với cột tự do và tượng trên gờ. Avant-corps giữa rộng nhất (6 cột).
+4. Mái phẳng: không thấy mái.
+5. Nhịp đều ≈ 4,2 m. Mặt rất dài so với cao (≈ 4,7 : 1).
+6. Mascaron ở vòm tầng nền.
+8. Kích thước đề xuất trong game
+
+| | Rộng × sâu | Số tầng | Cao |
+|---|---|---|---|
+| Khung hiện tại | 96 × 24 | **2** | — |
+| Đề xuất | **104 × 24** | **3** | ≈ 22 m tới đỉnh lan can, +2,5 m trophée |
+
+- Bệ 1,2 m giữ, như thềm bậc.
+- Nếu buộc giữ 96 m: dùng 23 nhịp × 4,17 m (6 + 11 + 6), nhưng vẫn phải đủ 3 tầng và 3 avant-corps.
+- Sai lớn nhất của khung hiện tại là số tầng, không phải bề rộng.
+
+## wingW — Cánh Tây (Aile du Midi)
+5. Cấu kiện nhận diện
+
+1. Cùng gờ đầu và lan can với khối giữa: liền một đường chân trời.
+2. Ba avant-corps 8 cột, tượng trên gờ.
+3. Ba tầng, cửa vòm ở tầng nền.
+4. Mặt phía Orangerie có 8 tượng.
+8. Kích thước đề xuất trong game
+
+| | Rộng × sâu | Số tầng |
+|---|---|---|
+| Khung hiện tại | 56 × 18 | **2** |
+| Đề xuất | **56 × 18** | **3** |
+
+- Cao **≈ 22 m, bằng đúng main**. Cánh không được thấp hơn khối giữa.
+- 56 m chỉ chứa ≈ 13 nhịp × 4,3 m. Không đủ cho 3 avant-corps 8 cột.
+- Phương án rút gọn: 3 avant-corps, mỗi cái 3 nhịp và 4 cột, ở hai đầu và giữa; ghi rõ là đơn giản hoá.
+- Nếu đất cho phép: tăng lên **≈ 86 m (20 nhịp)** để giữ được avant-corps 8 cột ở giữa.
+- Trên thực tế, cánh dài gấp 1,5 lần khối giữa. Khung game hiện cho cánh ngắn hơn khối giữa là đảo tỉ lệ (ghi nhận, không bắt buộc sửa).
+
+## wingE — Cánh Đông (Aile du Nord)
+5. Cấu kiện nhận diện
+
+1. Giống wingW: 3 avant-corps 8 cột, 34 nhịp, 3 tầng.
+2. **Khác wingW**: mái nhà nguyện cao vượt lên phía sau. Đây là điểm để phân biệt hai cánh.
+3. Trophée lớn trên lan can avant-corps đầu cánh (4 trophée).
+8. Kích thước đề xuất trong game
+
+| | Rộng × sâu | Số tầng | Cao |
+|---|---|---|---|
+| Khung hiện tại | 56 × 18 | 2 | — |
+| Đề xuất | 56 × 18 | **3** | ≈ 22 m |
+
+- Như wingW, cộng một khối nhà nguyện phía sau ở đầu gần main: ≈ 24 × 42 m [Đo], cao 40 m.
+- Nếu thu nhỏ khối nhà nguyện, giữ tỉ lệ cao / rộng ≈ 1,67.
+
+## stableW — Đại Tàu Ngựa (Grande Écurie)
+5. Cấu kiện nhận diện
+
+1. Mặt bán nguyệt lõm ôm sân.
+2. Cổng giữa có bossage và fronton điêu khắc ngựa.
+3. Mái Mansard ardoise có cửa sổ mái. **Khác mặt vườn lâu đài.**
+4. Tầng trệt vòm.
+5. Mặt hông gạch đỏ chân đá; mặt hướng lâu đài toàn đá.
+8. Kích thước đề xuất trong game
+
+| | Rộng × sâu | Số tầng |
+|---|---|---|
+| Khung hiện tại | 70 × 16 | **1** |
+| Đề xuất | Mặt bán nguyệt dây cung ≈ 70 m, dãy sâu **11–12 m** | **2 + Mansard** |
+
+- Cao diềm ≈ 10,5 m, nóc ≈ 15,5 m.
+- Khối cổng giữa ≈ 14 × 14 m, cao ≈ 18 m tới đỉnh fronton.
+- Khung «70 × 16, 1 tầng» sai cả hình (hộp thẳng thay vì cung lõm), số tầng và loại mái.
+
+## stableE — Tiểu Tàu Ngựa (Petite Écurie)
+5. Cấu kiện nhận diện
+
+1. Mặt bán nguyệt lõm.
+2. Cổng có bossage và fronton ngựa.
+3. **Rotunda tròn nhô lên sau cổng**: điểm phân biệt với Grande Écurie (manège chữ nhật).
+4. Mái Mansard.
+8. Kích thước đề xuất trong game
+
+- Như stableW: dây cung ≈ 70 m, dãy sâu 11–12 m, 2 tầng + Mansard.
+- Thêm rotunda Ø ≈ 16–18 m [Suy, bằng bề rộng manège của Grande], cao ≈ 15 m, mái vòm ardoise.
+- Hai tàu ngựa phải là **cặp đối xứng** qua trục phủ, chỉ khác ở manège (chữ nhật / tròn).
+
+## orangerie — Nhà Cam (Orangerie)
+5. Cấu kiện nhận diện
+
+1. Mặt đá khối nhô dài, liên tục, rất ít trang trí.
+2. Vòm lớn lặp đều, kính đặt sâu trong vòm.
+3. Cột **Toscan** đôi ở avant-corps. Là thức thấp nhất, không có lá acanthe.
+4. Hai cầu thang Cent-Marches ôm hai bên.
+5. Bồn cam trong hộp gỗ xếp hàng trước mặt: > 1.000 cây.
+8. Kích thước đề xuất trong game
+
+| | Rộng × sâu | Số tầng | Cao |
+|---|---|---|---|
+| Khung hiện tại | 60 × 14 | 1 | — |
+| Đề xuất | 60 × 14 (không thể giữ tỉ lệ dài 156 m) | 1 | **≈ 13 m** |
+
+- Giữ đúng chiều cao 13 m và cột Toscan Ø 1,46 m.
+- Rút số vòm: ≈ 7 vòm, mỗi vòm ≈ 7–8 m [Suy], cộng 1 avant-corps giữa có 4 cột Toscan đôi.
+- **Không bóp chiều cao xuống** để giữ tỉ lệ dài. Cột Toscan sẽ thành tí hon.
+- Nếu có đất: thêm 2 cánh ngắn vuông góc, mỗi cánh ≈ 25 m, kèm thang lớn, để giữ chữ U.
+
+## grandtrianon — Grand Trianon (Trianon de marbre)
+5. Cấu kiện nhận diện
+
+1. **Màu hồng đỏ của cột và pilaster đá incarnat** trên tường vàng. Đây là dấu hiệu số một.
+2. Péristyle mở: hàng cột Ionic đứng thoáng giữa hai khối.
+3. Một tầng, mái phẳng, lan can dài.
+4. Cửa vòm xen cặp pilaster.
+8. Kích thước đề xuất trong game
+
+| | Rộng × sâu | Số tầng | Cao |
+|---|---|---|---|
+| Khung hiện tại | 50 × 18 | 1 | — |
+| Đề xuất | **50 × 18** | 1 | **≈ 10,5 m** |
+
+- Khung 50 × 18 vừa đúng cho phần péristyle 40 × 12 cộng 2 khối đầu, mỗi khối ≈ 5 × 18.
+- Đúng số tầng. Chỉ cần bổ sung đúng màu đá, đúng péristyle và mái phẳng.
+- Nếu có đất: kéo 2 cánh vuông góc về phía sân để có hình chữ U.
+
+## petittrianon — Petit Trianon
+5. Cấu kiện nhận diện
+
+1. Khối lập phương gọn, mặt đứng gần vuông.
+2. **Thức Corinthian khổng lồ xuyên 2 tầng.** 4 cột tự do ở mặt tây.
+3. 5 nhịp mỗi mặt; cửa tầng chính cao, cửa attic gần vuông.
+4. Lan can phẳng, **không tượng, không trophée**. Khác hẳn Louis XIV.
+5. Bốn mặt khác nhau. Không được dùng một mặt rồi nhân 4.
+8. Kích thước đề xuất trong game
+
+| | Rộng × sâu | Số tầng | Cao |
+|---|---|---|---|
+| Khung hiện tại | 26 × 26 | 2 | — |
+| Đề xuất | **23,4 × 23,4** (hoặc giữ 26 nếu cần) | **3 ở mặt nam, 2 ở mặt tây** | ≈ 17 m mặt nam / ≈ 13 m mặt tây |
+
+- Khung 26 hơi to nhưng chấp nhận được.
+- Thức khổng lồ phải xuyên 2 tầng trên. **Không chia mỗi tầng một hàng pilaster.**
+- Đặt trên nền dốc: chênh ≈ 4,5 m giữa mặt nam và mặt tây.
+
+## summit — Đài Ngắm Cảnh (kiêm «giả sơn Belvedere»)
+5. Cấu kiện nhận diện
+
+1. Bát giác.
+2. Cặp nhân sư ở mỗi thang.
+3. Lan can che vòm.
+4. Đặt trên gò đá cạnh nước.
+8. Kích thước đề xuất trong game
+
+| | Khung | Cao |
+|---|---|---|
+| Khung hiện tại | 9 × 9 | — |
+| Đề xuất | **Giữ 9 × 9** (bát giác 8,4 m, thừa cho nhân sư) | ≈ 8,5 m |
+
+- Giả sơn đặt bên dưới, có 4 thang lên.
+- Khớp khung hiện tại.
+
+## colonnade — Hành Lang Cột (Bosquet de la Colonnade)
+5. Cấu kiện nhận diện
+
+1. Vòng tròn khép kín các vòm trên cột Ionic đôi (cột + pilaster).
+2. Cột nhiều màu đá xen kẽ.
+3. Pot à feu trên mỗi cột.
+4. Nhóm tượng ở tâm.
+5. Bồn nước dưới mỗi vòm.
+8. Kích thước đề xuất trong game
+
+| | Khung | Cao |
+|---|---|---|
+| Khung hiện tại | 14 × 14 | — |
+| Đề xuất | **≥ 32 × 32**; lý tưởng **40 × 40** | ≈ 7 m |
+
+- **Khung hiện tại sai tỉ lệ nặng.** Ở Ø 14 m, 32 vòm chỉ rộng ≈ 1,3 m, người chơi không lọt qua.
+- Nếu buộc nhỏ: giảm số vòm xuống 16 ở Ø 20 m (bước ≈ 3,7 m giữ nguyên). Ghi rõ là đơn giản hoá; nhận diện sẽ giảm.
+
+## amour — Đền Tình Yêu (Temple de l'Amour)
+5. Cấu kiện nhận diện
+
+1. Tròn, 12 cột Corinthian, không tường.
+2. Nền 7 bậc.
+3. Vòm thấp, mặt trong có caisson.
+4. Tượng Cupid ở tâm.
+5. Đứng trên đảo, soi bóng nước.
+8. Kích thước đề xuất trong game
+
+| | Khung | Cao |
+|---|---|---|
+| Khung hiện tại | 9 × 9 | — |
+| Đề xuất | **16 × 16** (đúng thật: 15,5 m chân bậc) | ≈ 13 m |
+
+- Nếu buộc 9 × 9: thu toàn bộ × 0,58. Cột Ø 0,4 m, cao 4 m, tổng ≈ 7,5 m.
+- Phải **giữ cả 12 cột và 7 bậc**.
+- Không được bỏ bậc để lấy chỗ cho vòng cột: nền bậc là một nửa hình dáng của đền.
+
+## bosq1 — Đình Bosquet Tây
+5. Cấu kiện nhận diện
+
+1. Mặt bằng chữ thập có tâm bát giác.
+2. Lan can xen tượng và bình.
+3. Vòm thấp ở giữa.
+4. Cửa vòm ở trục chính.
+8. Kích thước đề xuất trong game
+
+| | Khung | Cao |
+|---|---|---|
+| Khung hiện tại | 9 × 9 | — |
+| Đề xuất | **17 × 17** (thật) | ≈ 10 m tới đỉnh vòm |
+
+- Nếu giữ 9 × 9: thu × 0,53, nhưng tượng lan can sẽ chỉ cao 0,8 m.
+- Khuyên tối thiểu 12 × 12.
+
+## bosq2 — Đình Bosquet Đông
+5. Cấu kiện nhận diện
+
+1. Giàn mắt cáo xanh phủ mặt tường.
+2. Dãy vòm giàn bao vườn.
+3. Giỏ hoa trên trụ cổng.
+4. Mái bằng.
+8. Kích thước đề xuất trong game
+
+| | Khung | Cao |
+|---|---|---|
+| Khung hiện tại | 9 × 9 | — |
+| Đề xuất | **11 × 9** | ≈ 6 m |
+
+- Gần đúng khung hiện tại.
+- Khác bosq1 rõ ràng: bosq1 bằng đá, chữ thập; bosq2 bằng giàn xanh, chữ nhật.
+
+## canalW — Đình Đầu Kênh Tây
+5. Cấu kiện nhận diện
+
+1. Khối nhỏ đá trắng có vòm.
+2. Lan can.
+3. Thềm ra nước.
+8. Kích thước đề xuất trong game
+
+| | Khung | Cao |
+|---|---|---|
+| Khung hiện tại | 9 × 9 | — |
+| Đề xuất | **Giữ 9 × 9** | ≈ 9,5 m |
+
+## menag — Đình Thú (Ménagerie)
+5. Cấu kiện nhận diện
+
+1. Bát giác có ban công vòng.
+2. Vòm ardoise đen.
+3. Các chuồng xoè hình quạt quanh nhà.
+8. Kích thước đề xuất trong game
+
+| | Khung | Cao |
+|---|---|---|
+| Khung hiện tại | 9 × 9 | — |
+| Đề xuất | **Giữ 9 × 9** cho nhà | ≈ 13 m |
+
+- Thêm vòng tường quạt thấp (≈ 1,2 m) quanh nhà, nếu có đất.

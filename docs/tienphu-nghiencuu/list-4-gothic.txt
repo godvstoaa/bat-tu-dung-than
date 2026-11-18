@@ -1,0 +1,19 @@
+Lầu 10 tầng: Tháp Lâu Đài (10 tầng) — bệ vuông cạnh 40 m, cao tổng ~?
+NHÀ (id | tên | khung hiện tại rộng x sâu m | số tầng | bệ m):
+- main | Đại Sảnh (Great Hall) | 56 x 20 | 2 | 0.8
+- chapel | Nhà Nguyện | 34 x 16 | 2 | 0.8
+- kitchen | Bếp & Kho | 34 x 16 | 2 | 0.8
+- solar | Phòng Lãnh Chúa (Solar) | 60 x 14 | 2 | 0.8
+- guest | Nhà Khách | 40 x 16 | 2 | 0.8
+- barracks | Doanh Trại | 56 x 14 | 2 | 0.8
+- mews | Chuồng Ưng & Ngựa | 44 x 14 | 1 | 0.8
+- library | Thư Các | 34 x 16 | 2 | 0.8
+ĐÌNH / TIỂU CÔNG TRÌNH:
+- summit | Đài Ngắm Cảnh | 9 x 9
+- twrSW | Tháp Góc Tây Nam | 9 x 9
+- twrSE | Tháp Góc Đông Nam | 9 x 9
+- twrNW | Tháp Góc Tây Bắc | 9 x 9
+- twrNE | Tháp Góc Đông Bắc | 9 x 9
+- tilt | Khán Đài Đấu Thương | 14 x 8
+- orchard | Chòi Vườn Quả | 8 x 8
+Giả sơn: Motte · đồi gò canh

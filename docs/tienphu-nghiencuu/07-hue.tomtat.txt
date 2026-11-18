@@ -1,0 +1,256 @@
+## main — Điện Thái Hòa
+5. Cấu kiện nhận diện (theo mức quan trọng)**
+1. Hai tầng mái vàng rất bè, thấp, rộng gấp ~3,7 lần chiều cao.
+2. Nhà kép: thấy 2 nóc khi nhìn chéo hoặc hồi.
+3. Sân 2 cấp phía trước với hệ bậc giữa (dũng đạo).
+4. Mặt tiền 7 gian cửa son thếp, 2 chái gạch có cửa sổ tròn.
+5. Dải cổ diêm ô hộc thơ / hình giữa 2 mái.
+6. Bờ nóc ô hộc pháp lam, giữa có hồ lô / mặt nhật, hai rồng chầu.
+7. Bờ quyết góc đắp rồng.
+8. Hàng cột son trong hiên.
+8. Đề xuất cho game**
+- Khung hiện tại: 50 × 26, h 13, nền 2.4.
+  - Tỉ lệ sâu/rộng thật 0,69. Khung 0,52: **quá nông**.
+  - Chiều cao 13/50 = 0,26 là đúng.
+- [game] Đề xuất **50 × 34,7 × cao nóc 13,4 m** (hệ số 1,136 so với thật).
+  - Nền điện 1,1 m trên sân.
+  - Sân 2 cấp, tổng 2,6 m. Giữ `plinth` 2,4 nếu sân không dựng riêng.
+- Phân mái [suy]:
+  - Mốc đầu cột ≈ 7,3 m.
+  - Mái hạ từ ~4,5 m tới cổ diêm.
+  - Cổ diêm cao ~0,9 m.
+  - Mái thượng tới 13,4 m.
+
+## canchanh — Điện Cần Chánh
+5. Cấu kiện nhận diện**
+1. Giống Thái Hòa nhưng **nhỏ hơn, nền thấp hơn**. Không có sân 2 cấp.
+2. Nhà kép 2 tầng mái vàng.
+3. **Hồi lang** (hành lang có mái) từ hai đầu hồi chạy ra hai bên.
+4. Tả Vu và Hữu Vu vuông góc phía trước, thành chữ Môn.
+8. Đề xuất cho game**
+- Khung hiện tại: 42 × 20, h 11, nền 1.6.
+  - Sâu/rộng 0,48: **quá nông** (thật ~0,69).
+  - Nền 1,6 cao hơn thật.
+- [game] Đề xuất **40 × 27,6 × 11 m**, nền 1,1 m.
+- Thêm hồi lang 2 bên: mái thanh lưu ly, rộng ~3,5 m, cao diềm ~3 m [game].
+
+## tavu — Tả Vu
+5. Cấu kiện nhận diện**
+1. Nhà dài thấp, mái 2 tầng **xanh** (cấp quan, không phải vua).
+2. Đặt vuông góc với Cần Chánh, đối xứng với Hữu Vu.
+3. Hành lang có mái nối sang Đại Cung Môn.
+4. Nội thất vẽ màu kiểu Âu nhưng đề tài cung đình: «Lưỡng long chầu nhật», «Tam sư hý cầu», tứ linh, bát bửu.
+8. Đề xuất cho game**
+- Khung hiện tại 30 × 12, h 8. Chưa có số để kiểm.
+- [game] Giữ 30 × 12. Đổi mái sang thanh lưu ly 2 tầng.
+- Hạ h xuống ~7 m để thấp hơn Cần Chánh rõ ràng (thứ bậc theo C1.2).
+- Cần kiểm lại bằng ảnh `File:Tả Vu (Huế).jpg` trước khi dựng: đếm số gian và xem là nhà đơn hay nhà kép.
+
+## huuvu — Hữu Vu
+5. Khác Tả Vu ở đâu**
+- Chỉ khác chức năng (võ) và hướng (quay Tây). Kiến trúc đối xứng.
+- Theo nguyên tắc «tả văn hữu võ»: bên trái (Đông, nhìn từ ngai quay mặt Nam) là văn; bên phải (Tây) là võ.
+- Khung game đặt Tả Vu ở x = −58. Trong `siteplans.js` cổng `east` ở x = +260, vậy +x là Đông và Tả Vu đang ở **Tây**.
+  Đây là **ngược quy tắc**: phải đổi chỗ Tả Vu và Hữu Vu.
+
+**6–7. Vật liệu, trang trí**
+- Như Tả Vu.
+- Hiện Hữu Vu dùng cho dịch vụ trải nghiệm cung đình.
+8. Đề xuất cho game**
+- Như Tả Vu (30 × 12 × ~7 m), gương đối xứng.
+
+## themieu — Thế Miếu
+5. Cấu kiện nhận diện**
+1. Nhà kép **rất dài** (dài gấp 2 lần sâu), hai tầng mái vàng.
+2. 9 đỉnh đồng xếp hàng trước sân.
+3. Hiển Lâm Các 3 tầng đứng trước, trên trục.
+4. Bờ nóc thái cực pháp lam.
+8. Đề xuất cho game**
+- Khung hiện tại: **32 × 50** (rộng × sâu), h 10. **Sai hướng**: thật là dài 54,6 theo mặt tiền × sâu 27,7.
+- [game] Đề xuất **54,6 × 27,7 × 10,3 m**, nền 0,94 m. Hoặc 50 × 25,4 × 9,5 nếu thiếu chỗ (hệ số 0,92).
+- Bố cục: Hiển Lâm Các ở **phía Nam** Thế Miếu (trước sân), không ở phía Bắc.
+  Khung hiện đặt Hiển Lâm z = −60, phía Bắc của Thế Miếu z = +40.
+
+## dientho — Cung Diên Thọ
+5. Cấu kiện nhận diện**
+1. Nhà kép 2 tầng mái, nền rất thấp.
+2. **Phượng** ở đầu đao thay cho rồng: dấu hiệu cung Thái hậu.
+3. Hồ lô giữa nóc.
+4. Hiên sau rộng (4,5 m), gấp đôi hiên trước.
+5. Cổ diêm ô hộc khảm sành sứ.
+8. Đề xuất cho game**
+- Khung hiện tại: **32 × 44**, h 9, nền 1.6.
+  - **Sai hướng và quá sâu**: thật dài 34,7 theo mặt tiền × sâu 27,5.
+  - Nền 1,6 gấp 3 lần thật.
+- [game] Đề xuất **34,7 × 27,5 × 9,5 m**, nền 0,6 m.
+- Bố cục: thật ở phía **Tây** Hoàng Thành (phía Bắc Thế Miếu). Game đặt ở Đông. Đổi hay giữ do người làm tổng mặt bằng quyết.
+
+## truongsanh — Cung Trường Sanh
+5. Cấu kiện nhận diện**
+1. Cụm **3 nhà song song nối hành lang** (chữ Vương), không phải một nhà lớn.
+2. Lạch nước và cầu son bao quanh.
+3. Cổng tam quan ngũ sắc.
+4. Non bộ phía sau.
+8. Đề xuất cho game**
+- Khung hiện tại 34 × 18, h 8: một khối. **Sai loại hình**: thật là cụm chữ Vương.
+- [game] Trong khung 34 × 18 nên dựng 3 nhà ngang:
+  - mỗi nhà ~30 × 4,5 m;
+  - cách nhau ~2 m;
+  - nối hành lang 3 m ở trục giữa;
+  - nhà giữa (Thọ Khang) cao nhất, ~7 m.
+- Gian giả định: 5 gian 2 chái. **Chưa có nguồn**, phải đánh dấu là giả định.
+
+## hienlam — Hiển Lâm Các
+5. Cấu kiện nhận diện**
+1. **Ba tầng mái chồng, mỗi tầng thu gian (5 → 3 → 1)**. Hình tháp nấc.
+2. Bình hồ lô trên đỉnh.
+3. Lan can / cửa vòm ở mỗi gian tầng 1.
+4. Lầu chuông và trống hai bên.
+5. Hoành phi «Hiển Lâm Các» nền lục, khung 9 rồng thếp vàng.
+8. Đề xuất cho game**
+- Khung hiện tại: 20 × 20, **floors: 2**, h 13. **Sai**: thật 3 tầng, 17 m, mặt bằng chữ nhật.
+- [game] Đề xuất **20 × 15 × 17 m, 3 tầng**.
+  - Cao tầng 5,6 m.
+  - Tầng 2 rộng ~12 m (3 gian), tầng 3 ~6 m (1 gian).
+  - Mái hiên vươn ~1,8 m mỗi tầng.
+
+## thaimieu — Thái Miếu
+5. Cấu kiện nhận diện**
+1. Nhà kép **dài nhất** Hoàng Thành: dài hơn Thế Miếu 1,3 lần, cùng chiều sâu.
+2. Gác 3 tầng (Tuy Thành Các) phía trước, cùng ngữ pháp Hiển Lâm Các.
+3. Mái 2 tầng vàng.
+
+**6–7. Vật liệu, trang trí**
+- Như Thế Miếu [suy].
+8. Đề xuất cho game**
+- Khung hiện tại: 34 × 18, h 9. **Sai nặng**: thật là công trình gỗ lớn nhất (71 × 27), lớn hơn Thế Miếu. Game lại để nhỏ hơn Thế Miếu.
+- [game] Đề xuất **64 × 24,3 × 9,5 m** (hệ số 0,9), nền ~0,9 m.
+- Tối thiểu phải dài hơn Thế Miếu và cùng chiều sâu.
+
+## quocsu — Quốc Sử Quán
+5. Cấu kiện nhận diện**
+1. Cụm nhà chữ Môn quanh sân.
+2. Hai bia «Khuynh cái hạ mã» ở cổng.
+3. Nhà kho bản in phía sau (tường gạch kín, kiểu Tàng Thư Lâu).
+4. Tủ gỗ sơn son đựng sách (nội thất).
+8. Đề xuất cho game**
+- Khung hiện tại 34 × 18, h 9.
+- [game] Giữ **32 × 14 × 8 m** cho nhà chính 7 gian 2 chái.
+  - Chiều sâu 14 m: suy từ nhà rường, sâu ≈ 0,45 dài.
+  - Mái xanh.
+  - Thêm 2 dãy phụ nếu đủ chỗ.
+
+## LẦU 10 TẦNG — Lầu Kiến Trung
+5. Cấu kiện nhận diện (theo mức quan trọng)
+1. Mặt bằng vuông / chữ nhật có gian, cột son lộ ra ngoài. Không phải khối xây kín.
+2. Mỗi tầng một mái hiên vàng. Nhịp **thu gian theo 3 bậc** (7 → 5 → 3 → 1) với dải cổ diêm ở mỗi bậc.
+3. Hồ lô vàng trên đỉnh, hai rồng chầu.
+4. Đài gạch cao 4,6 m, lan can gạch hoa men, bậc giữa có thành rồng.
+5. Lan can gỗ con tiện quanh hiên các tầng trên.
+6. Cửa sổ tròn / vuông / quạt.
+8. Khung game
+- Bệ 43 m giữ nguyên.
+- Đổi `n: 8 → 4`.
+- Đổi `podium: 2,4 → 4,6`.
+- Đổi màu mái sang vàng.
+- Bảng tầng như trên.
+
+## summit — Vọng Sơn Đình
+5. Cấu kiện nhận diện**
+1. Mặt bằng vuông, 16 cột.
+2. Hai tầng mái (8 mặt).
+3. Cổ diêm khảm sành sứ.
+4. Lưỡng long chầu nhật trên nóc.
+8. Đề xuất cho game**
+- Khung 9 × 9, `octa: true`, h 3,6. **Sai hình**: phải vuông. Chiều cao quá thấp cho 2 tầng mái.
+- [game] **9 × 9 × 7,5 m**:
+  - cột cái 5,5 m;
+  - cột quân 3,0 m (tỉ lệ cột quân / cột cái ≈ 0,55, lấy từ Phu Văn Lâu 3/8 cho bản 2 tầng, nới cho đình 1 tầng);
+  - `octa: false`.
+
+## ngomonW — Lầu Ngũ Phụng Tây
+5. Cấu kiện nhận diện**
+1. Mái **xanh** 2 tầng (khác lầu giữa vàng).
+2. Tầng dưới thoáng, cột son.
+3. Tầng trên kín ván, cửa sổ hình tròn / quạt / khánh.
+4. Lan can gỗ con tiện tầng trên.
+5. Đặt **trên đài gạch cao ~5 m**, không đứng trên mặt đất.
+8. Đề xuất cho game**
+- Khung 9 × 9, h 3,6.
+  - Bề ngang 9 m khớp suy luận ô ~9 m.
+  - Thiếu tầng 2 và thiếu đài.
+- [game] **9 × 9 × 8,5 m**, 2 tầng, trên nền 1,14 m.
+- Nếu không dựng đài Ngọ Môn thì nâng cả lầu lên một khối đài cao ~5 m nối với cổng.
+- `gate: 'ngomon'` trong `styles.js` nên là đài chữ U 58 × 27,5 × 5 m mang 9 lầu.
+
+## ngomonE — Lầu Ngũ Phụng Đông
+5. Khác ngomonW ở đâu**
+- Chỉ khác vật treo trong gian góc: chuông ở đây, trống ở Tây.
+- Khi dựng nội thất: treo chuông trên giá gỗ son.
+
+**6–7. Vật liệu, trang trí**
+- Như ngomonW.
+8. Đề xuất cho game**
+- 9 × 9 × 8,5 m, 2 tầng. Gian góc treo chuông Ø ~1,1 m, cao 1,8 m [game, Ø ước từ ảnh].
+
+## kimthuyW — Đình Kim Thủy Tây
+5. Cấu kiện nhận diện**
+1. Nhà vuông 16 cột **đứng trên mặt nước**.
+2. Mái 2 tầng xanh.
+3. Vách kính / cửa sổ 4 mặt.
+4. Non bộ nhỏ trong hồ.
+8. Đề xuất cho game**
+- Khung 8 × 8, h 3,6.
+- [game] **8 × 8 × 6,5 m**, mái 2 tầng xanh, sàn nhô trên mặt nước 0,6 m, `octa: false`.
+
+## kimthuyE — Đình Kim Thủy Đông
+5. Khác kimthuyW ở đâu**
+- Đặt đối xứng bên Đông.
+- Nếu muốn khác biệt: dùng biến thể có **2 nhà vỏ cua trước và sau** (mẫu Nghinh Lương Đình, 3 nóc, 16 mặt mái). Mặt bằng thành chữ nhật 8 × 12 m.
+
+**6–7. Vật liệu, trang trí**
+- Như kimthuyW.
+8. Đề xuất cho game**
+- 8 × 8 × 6,5 m. Hoặc 8 × 12 nếu dùng biến thể vỏ cua.
+
+## tinhtam1 — Đình Tịnh Tâm Đông
+5. Cấu kiện nhận diện**
+1. Thủy tạ hướng ra hồ sen.
+2. Mái 2 tầng.
+3. Hành lang có mái dài nối tới.
+8. Đề xuất cho game**
+- Khung 9 × 9, h 3,6.
+- [game] **9 × 9 × 7 m**, phương đình 16 cột mái 2 tầng, sàn nhô ra nước.
+- Thêm 1 đoạn hành lang có mái ~3 × 12 m nối bờ, nếu đủ chỗ.
+
+## thieuphuong — Đình Thiệu Phương
+5. Cấu kiện nhận diện**
+1. **Hồi lang gấp khúc chữ Vạn** nối nhà. Đây là dấu hiệu chính, quan trọng hơn chính cái đình.
+2. Nhà nhỏ ở góc.
+3. Lạch nước và non bộ.
+8. Đề xuất cho game**
+- Khung 9 × 9, `octa: true`. **Sai**: không có đình bát giác ở đây.
+- [game] Nhà vuông **9 × 9 × 6 m**, 16 cột, mái 2 tầng, `octa: false`.
+- Thêm **hồi lang chữ Vạn**:
+  - rộng 3 m;
+  - mỗi nhánh ~12 m;
+  - gấp vuông góc 1 lần ở cuối nhánh.
+- Đó mới là thứ để người xem nhận ra Thiệu Phương.
+
+## island — Hồ Tâm Đình
+5. Cấu kiện nhận diện**
+1. Lầu vuông 2 tầng, 2 mái chồng.
+2. Tầng dưới mở thoáng, tầng trên kín.
+3. Cửa sổ tròn / vuông.
+4. Lan can đá quanh nền.
+5. Lưỡng long chầu nhật.
+8. Đề xuất cho game**
+- Khung 10 × 10, h 3,8, `octa: true`. **Sai hình và thiếu tầng.**
+- [game] **10 × 10 × 9,5 m**:
+  - tỉ lệ 0,95 như Phu Văn Lâu;
+  - cột cái 6,5 m;
+  - cột quân 2,5 m;
+  - nền 1 m có lan can đá 0,55 m;
+  - `octa: false`.
+
+## Giả sơn — Thiệu Phương Viên · non bộ

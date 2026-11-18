@@ -1,0 +1,19 @@
+Lầu 10 tầng: Lăng Vọng Tinh (10 tầng) — bệ vuông cạnh 42 m, cao tổng ~?
+NHÀ (id | tên | khung hiện tại rộng x sâu m | số tầng | bệ m):
+- main | Đại Môn (Darwaza-i Rauza) | 44 x 22 | 2 | 1.8
+- mosque | Thánh Đường (Masjid) | 44 x 20 | 1 | 2.4
+- jawab | Jawab (Mihman Khana) | 44 x 20 | 1 | 2.4
+- khawasW | Khawasspura Tây | 70 x 14 | 2 | 1.8
+- khawasE | Khawasspura Đông | 70 x 14 | 2 | 1.8
+- naubatW | Naubat Khana Tây | 30 x 16 | 2 | 1.8
+- naubatE | Naubat Khana Đông | 30 x 16 | 2 | 1.8
+- tombW | Lăng Phụ Tây | 20 x 20 | 1 | 1.8
+ĐÌNH / TIỂU CÔNG TRÌNH:
+- summit | Vọng Sơn Đình | 9 x 9
+- chhatriSW | Chhatri Tây Nam | 7 x 7
+- chhatriSE | Chhatri Đông Nam | 7 x 7
+- chhatriNW | Chhatri Tây Bắc | 7 x 7
+- chhatriNE | Chhatri Đông Bắc | 7 x 7
+- baradari | Baradari Ven Sông | 14 x 10
+- riverW | Đình Bến Sông Tây | 10 x 10
+Giả sơn: Đài Ngắm Trăng (Mahtab)

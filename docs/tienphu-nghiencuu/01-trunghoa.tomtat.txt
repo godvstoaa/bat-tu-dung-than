@@ -1,0 +1,312 @@
+## LẦU 10 TẦNG — Thiên Tượng Lâu (bệ vuông cạnh 45 m)
+5. Cấu kiện nhận diện (xếp theo mức quan trọng)
+
+1. Bình diện bát giác. Mỗi tầng nhỏ dần.
+2. Mỗi tầng có **mái hắt riêng** và **ban công bình tọa** riêng. Nhịp lặp "mái – ban công – thân" là dấu hiệu số 1 của tháp lầu các.
+3. Tầng 1 có hai vành mái, rộng nhất.
+4. Đài đá hai lớp: vuông dưới, bát giác trên.
+5. Đấu củng dày dưới mọi vành mái.
+6. Đỉnh chóp bát giác cùng bảo đỉnh / chóp kim loại.
+7. Lan can quanh mỗi bình tọa.
+8. Biển ngạch dưới vành mái của từng tầng (Phật Hương Các có 3 biển).
+8. Đề xuất kích thước trong game
+
+Số tầng cố định là 10 và người chơi phải leo được. Phân bổ chiều cao [Suy]:
+
+| Đoạn | Cao (m) | Cách suy |
+|---|---|---|
+| Đài vuông 45 m | 4,5 | Theo Ứng Huyện 4 m |
+| Tầng 1 (hai vành mái) | 10,0 | Ứng Huyện: tầng nổi + tầng ẩn ≈ (67,31 − 4 − 10) / 5 ≈ 10,7 m; tầng 1 cao nhất |
+| Tầng 2–10: mỗi tầng (bình tọa 1,8 + thân 4,6) | 6,4 → giảm dần 2%/tầng, TB ≈ 6,0 | Đủ trần cho người chơi; giữ nhịp mái dày như Phật Hương Các (đoạn 2–3: 7,6 → 6,0 m) |
+| Chóp bát giác + bảo đỉnh | 12,0 | Phật Hương Các: đoạn đỉnh 12,66 m; chóp Ứng Huyện ~10 m |
+| **Tổng** | **≈ 81 m** | |
+
+| Kích thước ngang | Giá trị | Nhãn |
+|---|---|---|
+| Đường kính tầng 1 (qua cạnh) | 31 m (vòng hành lang ngoài 34 m) | [Suy] để còn sân 5–6 m trên đài 45 m |
+| Đường kính tầng 10 | ~21 m | [Suy] thu 4%/tầng |
+| Cao / đường kính tầng 1 | ≈ 2,6 | Mảnh hơn Ứng Huyện (2,2) vì nhiều tầng hơn; chấp nhận được |
+| Mái vươn mỗi tầng | 2,4–2,8 m tính từ cột ngoài | [Quy] 21 + 6 dk, với dk ~ 0,1 m |
+
+Bỏ khung "hộp tường + mái" hiện tại. Thân tháp phải là chồng 10 khối bát giác giảm dần, mỗi khối có ban công và mái riêng.
+
+## main — Ngân An Điện
+5. Cấu kiện nhận diện
+
+1. Mái yết sơn lưu ly xanh lục, vẫn thú hai đầu nóc.
+2. Nguyệt đài có lan can đá phía trước.
+3. Hàng đấu củng liên tục dưới mái.
+4. 5 (hoặc 7) gian cột đỏ, gian giữa rộng nhất.
+5. Cửa bức bàn mắt cáo.
+6. 7 linh vật trên mỗi góc mái.
+7. Cặp cột đèn đá trên nguyệt đài.
+8. Đề xuất kích thước trong game
+
+Khung hiện tại: 52 × 24, **2 tầng**, nền 2,4 m.
+
+- Rộng 52 m: **đúng** nếu là 7 gian × k = 1,5 (32,6 × 1,5 = 49 m tim cột; nền ≈ 54 m).
+- Sâu 24 m: hợp lý với nền (13 × 1,5 = 19,5 m tim cột; nền ≈ 25 m).
+- **Sai: "2 tầng".** Ngân An Điện chỉ 1 tầng. Nếu cần nhiều tầng mái để nhấn, dùng **重檐歇山** (1 tầng, 2 vành mái). Ghi chú: 重檐歇山 là cấp hoàng thành (Thiên An Môn), vượt quy chế vương phủ. Để ART_BIBLE quyết.
+
+Đề xuất (k = 1,5):
+
+| Kích thước | Giá trị |
+|---|---|
+| Lưới cột | 49 × 19,5 m (7 gian: 5,3 / 6,6 / 7,9 / 9,2 / 7,9 / 6,6 / 5,3) |
+| Nền | 54 × 25 × 2,4 m |
+| Nguyệt đài | 37 × 13 × 1,8 m |
+| Cột | 7,2 m, đk 0,72 m |
+| Mép mái | ≈ 8,7 m trên nền |
+| Nóc | ≈ 17 m trên nền (≈ 19,4 m tính cả nền) |
+
+Tỉ lệ khối:
+- Chiều cao mái (từ đáy mái tới nóc) ≈ 0,9 lần chiều cao thân (từ nền tới đáy mái).
+- **Mái chiếm khoảng một nửa chiều cao nhìn thấy.**
+
+## jiale — Gia Lạc Đường
+5. Cấu kiện nhận diện
+
+1. Mái ngạnh sơn (hồi tường phẳng, mái không vươn qua hồi).
+2. Ngói xanh lục: phân biệt với nhà trục Đông / Tây ngói xám.
+3. Hành lang trước 5 gian.
+4. Đầu hồi 墀头 chạm gạch.
+5. Biển ngạch.
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 40 × 20 × 1 tầng, nền 2,4.
+- Rộng hợp lý với k = 1,5 (≈ 30–38 m).
+- Sâu 20 m hơi dư.
+- Đề xuất: **36 × 16 m tim cột**, nền **39 × 19 × 1,8 m**, nóc ≈ 15 m trên nền.
+- Phải thấp hơn Ngân An Điện: nóc thấp hơn ~2 m, nền thấp hơn.
+
+## duofu — Đa Phúc Hiên
+5. Cấu kiện nhận diện
+
+1. Nóc quyển bằng tròn: khác với nóc thẳng có vẫn thú của Ngân An Điện.
+2. Ngói xám.
+3. Hai sáo điện thấp ở hai đầu, tạo bóng dáng "cao giữa thấp hai đầu".
+4. Nguyệt đài 3 gian.
+5. Hành lang hai mặt.
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 38 × 18.
+- Rộng 38 chỉ đúng nếu tính cả hai sáo điện (30 × 1,25).
+- Sâu 18 quá sâu: thật ~9,5 m → game ~14 m.
+- Đề xuất k = 1,5:
+  - Chính điện **26 × 14 m**, cao nóc **≈ 9,8 m** trên nền 0,9 m.
+  - Hai sáo điện mỗi bên **~9 × 11 m**, nóc thấp hơn ~1,5 m.
+  - Tổng bóng ngang ~44 m.
+
+## ledao — Lạc Đạo Đường
+5. Cấu kiện nhận diện
+
+1. **Hồi tường hình hai vòm tròn liền nhau** (hai quyển). Đây là đặc trưng số 1.
+2. Ngói xám, không có bờ nóc.
+3. Cổng thùy hoa 垂花门 phía trước, có trụ treo hoa sen.
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 40 × 20 × **2 tầng**: **sai số tầng**.
+- Đây là nhà 1 tầng, mái hai quyển.
+- Cái người dựng khung nhầm là "hai tầng" chính là hai mái.
+
+Đề xuất k = 1,5: **26 × 20 m**, nóc **≈ 9 m** trên nền 0,9 m. Hai mái quyển, mỗi quyển nhịp ~10 m.
+
+## jijin — Tích Cẩm Trai (nguyên mẫu: Tích Tấn Trai 锡晋斋)
+5. Cấu kiện nhận diện
+
+1. 7 gian: rộng nhất trong các trai / đường.
+2. Bão hạ phía sau, mái riêng.
+3. Mái yết sơn.
+4. Nguyệt đài.
+5. Bên trong có gác gỗ nam 2 tầng: nếu người chơi vào trong thì phải có.
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 30 × 16 × 1 tầng: **quá nhỏ và thiếu bão hạ.**
+
+Đề xuất k = 1,5:
+- Thân **37 × 16,5 m** tim cột.
+- Bão hạ **26 × 7 m** phía sau. Tổng sâu ~23,5 m.
+- Nguyệt đài **20 × 8 m**.
+- Nóc ≈ 13 m trên nền 1,2 m.
+- 1 tầng mái, bên trong có gác.
+
+## baoguang — Bảo Quang Thất
+5. Cấu kiện nhận diện
+
+1. Ngạnh sơn ngói xám, nóc thẳng có thú.
+2. Biển ngự bút "葆光室".
+3. Trần ô gỗ (nội thất).
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 38 × 18: quá lớn.
+- Đề xuất **26 × 14 m**, nóc ≈ 10 m trên nền 0,9 m.
+- Phải cùng cỡ với Đa Phúc Hiên (hai nhà đối xứng qua trục giữa).
+
+## jicui — Tích Thúy Đường (nguyên mẫu: An Thiện Đường 安善堂, vườn Tụy Cẩm Viên)
+5. Cấu kiện nhận diện
+
+1. Bão hạ lồi ra phía trước.
+2. Hai mái quyển bằng.
+3. Hành lang cong nối nhà hai bên.
+4. Ao hình dơi phía trước.
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 40 × 20 → đề xuất **26 × 24 m** (kể cả bão hạ), nóc ≈ 10 m. Nhà vườn thấp hơn nhà phủ đệ.
+
+## miaoxiang — Diệu Hương Lâu (nguyên mẫu: Diệu Hương Đình 妙香亭)
+5. Cấu kiện nhận diện
+
+1. **Mái bằng 2 tầng:** hiếm trong vườn Bắc Kinh.
+2. Dưới vuông chữ thập, trên tròn hoa.
+3. Lan can quanh tầng trên.
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 30 × 16 × 2 tầng: **sai gấp 4–5 lần.** Nguyên mẫu là một đình 2 tầng nhỏ.
+
+Hai phương án:
+- **(A, khuyến nghị)** Giữ nguyên mẫu: **10 × 10 m**, cao ~11 m (k = 1,5). Chuyển sang nhóm đình.
+- **(B)** Nếu bố cục cần một "lâu" 30 × 16 m: dựng lâu 2 tầng kiểu Hậu Tráo Lâu.
+  - 5 gian, tầng trên có hiên.
+  - Ngạnh sơn ngói xám, cao nóc ~10 m thật → 15 m game.
+  - Ghi rõ đây là nguyên mẫu loại hình, không phải Diệu Hương Đình.
+
+## houzhaoW — Hậu Tráo Lâu (Tây)
+
+
+## houzhaoE — Hậu Tráo Lâu (Đông)
+5. Cấu kiện nhận diện
+
+1. Chiều dài cực lớn với bờ nóc liền.
+2. Mặt sau: hàng 44 thập cẩm song khác hình nhau. Đây là "chữ ký" của công trình.
+3. 2 tầng có hành lang trên.
+4. Ngói xám, tường gạch xám.
+5. Hai đầu bẻ góc.
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 2 × (150 × 14).
+- Tổng 300 m: **gấp gần 2 lần** nguyên bản.
+- Với k = 1,5, tổng nên là ~234 m → **mỗi cánh ~112 × 12 m**, cao nóc ≈ 14,5 m.
+- Nếu bố cục bắt buộc 150 m/cánh, phải tăng số gian (~46 gian/cánh × 3,25 m) chứ không kéo dãn gian. Lý do: gian 3,2–3,3 m (× 1,5 = 4,9 m) là nhịp người xem đọc ra quy mô.
+- Sâu 14 m: chấp nhận được (thật ~8 × 1,5 = 12 m).
+
+## guardw — Tây Môn Phòng
+
+
+## guarde — Đông Môn Phòng
+5. Cấu kiện nhận diện
+
+1. Nhỏ, thấp, ngói xám.
+2. Ngạnh sơn.
+3. Đứng hai bên cổng, đối xứng.
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 14 × 9, nền 0,6: **đúng tỉ lệ** (9,9 × 5,5 × 1,5 ≈ 15 × 8,3). Giữ nguyên. Nóc ≈ 7,5 m.
+
+## theater — Đại Hí Lâu
+5. Cấu kiện nhận diện
+
+1. **Hồi tường ba vòm** (3 quyển). Bên ngoài nhìn như ba nhà liền nhau.
+2. Tường kín, ít cửa sổ.
+3. Bên trong: sân khấu có mái nhỏ riêng, biển 「赏心乐事」 đen chữ vàng.
+4. Toàn bộ cột / xà / tường vẽ giàn tử đằng (lá xanh, hoa tím).
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 40 × 24 (960 m², rộng > sâu): **sai hướng và sai tỉ lệ.**
+- Thật gần vuông, sâu theo trục Nam–Bắc.
+- Đề xuất k = 1,5: **37 (Đông–Tây) × 41 (Nam–Bắc) m**, nóc ≈ 15 m.
+- Ba mái song song chạy Đông–Tây.
+- Nếu muốn giữ diện tích ít hơn: 32 × 36 m, vẫn ba quyển.
+
+## summit — Vọng Sơn Đình
+5. Cấu kiện nhận diện
+
+1. Ba vành mái chồng, chóp vuông.
+2. Đấu củng dày.
+3. Bốn mặt thoáng, cột đỏ.
+4. Đứng trên đỉnh núi.
+8. Đề xuất kích thước trong game
+
+Khung hiện tại 9 × 9.
+- Nếu giữ 3 vành mái thì 9 m quá nhỏ: chiều cao chỉ còn ~8 m, đấu củng không đọc được.
+- Đề xuất **13 × 13 m** (tỉ lệ Vạn Xuân thu nhỏ ×0,75), cao **~12 m**, 3 vành mái.
+- Hoặc giữ 9 × 9 nhưng giảm còn **2 vành mái** (theo mẫu Tri Xuân Đình, xem yuexiang).
+
+## liubei — Lưu Bôi Đình
+5. Cấu kiện nhận diện
+
+1. **Rãnh nước hình chữ khắc trên nền đá:** bắt buộc có.
+2. Mái lục giác.
+3. Núi giả sát phía sau.
+8. Đề xuất kích thước trong game
+
+Khung 9 × 9: hợp lý (≈ 6,5 × 1,4). Đổi thân sang **lục giác**, nóc ≈ 10 m.
+
+## tingyu — Thính Vũ Hiên (nguyên mẫu: Thu Thủy Sơn Phòng 秋水山房)
+5. Cấu kiện nhận diện
+
+1. Mặt trước mở hoàn toàn.
+2. Lan can tựa lưng.
+3. Nóc quyển bằng thấp.
+4. Đặt sát mép nước, lưng tựa núi.
+8. Đề xuất kích thước trong game
+
+Khung 12 × 9 → đề xuất **15 × 8,5 m**, nóc ≈ 9 m. Hiên dài hơn sâu ~1,8 : 1.
+
+## shuixie — Thủy Tạ
+5. Cấu kiện nhận diện
+
+1. Nằm giữa ao vuông, tách khỏi bờ.
+2. Mái yết sơn.
+3. Mở bốn mặt, có ghế lan can.
+4. Cầu hình thuyền.
+5. Đầu rồng phun nước trên bờ.
+8. Đề xuất kích thước trong game
+
+Khung 12 × 10: hơi ngắn chiều rộng. Đề xuất **16 × 10,5 m**, nóc ≈ 10,5 m. Ao quanh ≥ 45 × 45 m (game) để giữ cảm giác "giữa nước".
+
+## yuexiang — Nguyệt Hương Đình (nguyên mẫu: Tri Xuân Đình 知春亭, Di Hòa Viên)
+5. Cấu kiện nhận diện
+
+1. Hai vành mái vuông.
+2. Dải cửa sổ giữa hai vành.
+3. Ghế lan can quanh.
+4. Bảo đỉnh.
+8. Đề xuất kích thước trong game
+
+Khung 9 × 9: **đúng cỡ thật.** Với k = 1,5 thì là 13 × 13, cao 17 m. Nếu giữ 9 × 9, cao phải ≈ 11,5 m (đừng làm đình bẹt).
+
+## cuiyun — Thúy Vân Đình (nguyên mẫu: Lục Thiên Tiểu Ẩn 绿天小隐 + Yêu Nguyệt Đài 邀月台 trên Tích Thúy Nham)
+5. Cấu kiện nhận diện
+
+1. Đứng trên đỉnh núi đá xếp chồng (không phải đồi cỏ).
+2. Sân ngắm trăng phía trước.
+3. Cửa hang dưới chân.
+8. Đề xuất kích thước trong game
+
+Khung 8 × 8.
+- Nếu giữ là "đình": làm đình vuông đơn diêm **8 × 8 m**, cao ~8 m, đặt trên núi giả.
+- Nếu theo nguyên mẫu: sảnh **13 × 7,5 m** + đài **13 × 7,5 m** (k = 1,5).
+- Khuyến nghị phương án nguyên mẫu, vì nó là điểm nhấn trục giữa vườn.
+
+## mingdao — Minh Đạo Đình (nguyên mẫu tên: Minh Đạo Đường 明道堂; hình thức: đình vuông đơn diêm)
+5. Cấu kiện nhận diện
+
+1. Bốn cột, mái chóp vuông.
+2. Ghế lan can.
+3. Bảo đỉnh.
+8. Đề xuất kích thước trong game
+
+Khung 8 × 8 (k ≈ 1,4 so với 5,6 m): hợp lý. Cao nóc ≈ 9 m.
+
+## GIẢ SƠN — Độc Lạc Phong · núi giả chữ Sơn
+5. Cấu kiện nhận diện
+
+1. Đá thủng lỗ, gân dọc (đá Thái Hồ).
+2. Một khối đứng riêng ngay sau cổng.
+3. Núi đá có hang và bậc.
+8. Đề xuất kích thước trong game
+
+- Độc Lạc Phong: cao **7,5 m** (k = 1,5), đặt trên bệ 1 m. Phải là mesh điêu khắc riêng, không phải khối hộp.
+- Núi chữ Sơn: đỉnh giữa ~11 m, hai đỉnh bên ~7–8 m (game).
+
+## CỔNG (không có id trong danh sách — ghi để bản vẽ dùng)

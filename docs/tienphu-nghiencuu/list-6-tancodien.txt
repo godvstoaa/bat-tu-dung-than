@@ -1,0 +1,19 @@
+Lầu 10 tầng: Thánh Điện Tháp (10 tầng) — bệ vuông cạnh 42 m, cao tổng ~?
+NHÀ (id | tên | khung hiện tại rộng x sâu m | số tầng | bệ m):
+- main | Lâu Đài Chính (Corps de Logis) | 96 x 24 | 2 | 1.2
+- wingW | Cánh Tây (Aile du Midi) | 56 x 18 | 2 | 1.2
+- wingE | Cánh Đông (Aile du Nord) | 56 x 18 | 2 | 1.2
+- stableW | Đại Tàu Ngựa | 70 x 16 | 1 | 1.2
+- stableE | Tiểu Tàu Ngựa | 70 x 16 | 1 | 1.2
+- orangerie | Nhà Cam (Orangerie) | 60 x 14 | 1 | 1.2
+- grandtrianon | Grand Trianon | 50 x 18 | 1 | 1.2
+- petittrianon | Petit Trianon | 26 x 26 | 2 | 1.2
+ĐÌNH / TIỂU CÔNG TRÌNH:
+- summit | Đài Ngắm Cảnh | 9 x 9
+- colonnade | Hành Lang Cột (Colonnade) | 14 x 14
+- amour | Đền Tình Yêu | 9 x 9
+- bosq1 | Đình Bosquet Tây | 9 x 9
+- bosq2 | Đình Bosquet Đông | 9 x 9
+- canalW | Đình Đầu Kênh Tây | 9 x 9
+- menag | Đình Thú (Ménagerie) | 9 x 9
+Giả sơn: Belvedere · đài vọng cảnh

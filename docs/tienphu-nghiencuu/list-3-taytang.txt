@@ -1,0 +1,20 @@
+Lầu 10 tầng: Hồng Cung (10 tầng) — bệ vuông cạnh 50 m, cao tổng ~?
+NHÀ (id | tên | khung hiện tại rộng x sâu m | số tầng | bệ m):
+- main | Bạch Cung (Potrang Karpo) | 60 x 30 | 2 | 4.2
+- printing | Ấn Kinh Viện | 40 x 18 | 2 | 1.2
+- sholoffice | Shöl Lekhung | 40 x 18 | 2 | 1.2
+- sholhouse | Nhà Dân Shöl | 34 x 14 | 2 | 1.2
+- seminary | Tăng Học Viện | 36 x 14 | 2 | 2.6
+- dormE | Tăng Phòng Đông | 30 x 14 | 2 | 2.6
+- zhasha | Zhasha (Tăng Xá) | 50 x 16 | 2 | 3.4
+- lukhang | Lukhang | 20 x 16 | 2 | 1.6
+ĐÌNH / TIỂU CÔNG TRÌNH:
+- summit | Vọng Sơn Đình | 9 x 9
+- deyang | Đài Deyang Shar | 12 x 12
+- gate1 | Môn Lâu Shöl | 9 x 7
+- ramp1 | Đình Lưng Dốc | 8 x 8
+- lake1 | Đình Ven Hồ | 9 x 9
+- lake2 | Đình Liễu | 8 x 8
+- east1 | Đình Kinh Luân | 8 x 8
+- island | Hồ Tâm Đình | 10 x 10
+Giả sơn: Marpo Ri · đồi đá

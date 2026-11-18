@@ -48,15 +48,69 @@ export function polySlab(n, a, y, t, holes = []) {
   g.computeVertexNormals(); return g;
 }
 /** mặt phủ (shape + lỗ elip / chữ nhật) mỏng — thảm cỏ có lỗ hồ */
+// ---- GỘP LỖ CHỒNG NHAU (docs/TIEN-PHU-MATBANG-MANIFEST.md): earcut không chịu lỗ chồng / chạm nhau — ao con dơi 3 elip,
+//      kênh chữ thập + hồ tâm Mughal, hào vuông 4 dải chạm góc từng làm thảm cỏ / mặt đảo vỡ (ảnh trên cao Quân Thiên).
+//      Nhóm lỗ chạm nhau → raster 0,25 m → lần biên (ô nước bên trái) → bỏ điểm thẳng hàng → Douglas–Peucker 0,15 m.
+//      Biên ngược chiều (CW) = đảo đất bên trong nhóm nước (hào bao nội thành) → trả về để phủ cỏ riêng.
+export const inHole = (h, x, z, m = 0) => (h.rx ? ((x - h.x) / (h.rx + m)) ** 2 + ((z - h.z) / (h.rz + m)) ** 2 < 1 : Math.abs(x - h.x) < h.hw + m && Math.abs(z - h.z) < h.hd + m);
+const holeBB = (h) => (h.rx ? [h.x - h.rx, h.z - h.rz, h.x + h.rx, h.z + h.rz] : [h.x - h.hw, h.z - h.hd, h.x + h.hw, h.z + h.hd]);
+function touch(a, b) {
+  const A = holeBB(a), B = holeBB(b), x0 = Math.max(A[0], B[0]) - 0.3, z0 = Math.max(A[1], B[1]) - 0.3, x1 = Math.min(A[2], B[2]) + 0.3, z1 = Math.min(A[3], B[3]) + 0.3;
+  if (x0 > x1 || z0 > z1) return false;
+  for (let x = x0; x <= x1; x += 0.25) for (let z = z0; z <= z1; z += 0.25) if (inHole(a, x, z, 0.15) && inHole(b, x, z, 0.15)) return true;
+  return false;
+}
+function simplify(pts, tol) {
+  // bỏ điểm thẳng hàng rồi Douglas–Peucker (vòng kín: cắt tại điểm 0 và điểm xa nhất)
+  const q = pts.filter((p, i) => { const a = pts[(i - 1 + pts.length) % pts.length], b = pts[(i + 1) % pts.length]; return Math.abs((p[0] - a[0]) * (b[1] - a[1]) - (p[1] - a[1]) * (b[0] - a[0])) > 1e-9; });
+  const dp = (seg) => { if (seg.length < 3) return seg; const [a, b] = [seg[0], seg[seg.length - 1]], L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1e-9; let mi = 0, md = 0; for (let i = 1; i < seg.length - 1; i++) { const d = Math.abs((b[0] - a[0]) * (a[1] - seg[i][1]) - (a[0] - seg[i][0]) * (b[1] - a[1])) / L; if (d > md) { md = d; mi = i; } } return md > tol ? [...dp(seg.slice(0, mi + 1)).slice(0, -1), ...dp(seg.slice(mi))] : [a, b]; };
+  if (q.length < 4) return q;
+  let far = 0, fd = 0; for (let i = 1; i < q.length; i++) { const d = Math.hypot(q[i][0] - q[0][0], q[i][1] - q[0][1]); if (d > fd) { fd = d; far = i; } }
+  return [...dp(q.slice(0, far + 1)).slice(0, -1), ...dp([...q.slice(far), q[0]]).slice(0, -1)];
+}
+/** hợp các lỗ chồng nhau: { loops: [[x,z]…] (biên nước), islands: [[x,z]…] (đất bên trong) } */
+export function unionHoles(group, cell = 0.25) {
+  const B = group.map(holeBB), x0 = Math.min(...B.map((b) => b[0])) - 2 * cell, z0 = Math.min(...B.map((b) => b[1])) - 2 * cell, x1 = Math.max(...B.map((b) => b[2])) + 2 * cell, z1 = Math.max(...B.map((b) => b[3])) + 2 * cell;
+  const nx = Math.ceil((x1 - x0) / cell), nz = Math.ceil((z1 - z0) / cell), occ = new Uint8Array(nx * nz);
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) { const x = x0 + (i + 0.5) * cell, z = z0 + (j + 0.5) * cell; if (group.some((h) => inHole(h, x, z))) occ[j * nx + i] = 1; }
+  const O = (i, j) => i >= 0 && j >= 0 && i < nx && j < nz && occ[j * nx + i];
+  const out = new Map(), key = (i, j) => j * (nx + 1) + i, add = (a, b) => { const k = key(...a); if (!out.has(k)) out.set(k, []); out.get(k).push(b); };
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) if (O(i, j)) {
+    if (!O(i, j - 1)) add([i, j], [i + 1, j]); if (!O(i + 1, j)) add([i + 1, j], [i + 1, j + 1]);
+    if (!O(i, j + 1)) add([i + 1, j + 1], [i, j + 1]); if (!O(i - 1, j)) add([i, j + 1], [i, j]);
+  }
+  const loops = [], islands = [];
+  for (const [k0] of out) {
+    while (out.get(k0)?.length) {
+      const ring = []; let cur = [k0 % (nx + 1), Math.floor(k0 / (nx + 1))];
+      for (let guard = 0; guard < nx * nz * 4; guard++) { const k = key(...cur), list = out.get(k); if (!list || !list.length) break; const nxt = list.pop(); ring.push([x0 + cur[0] * cell, z0 + cur[1] * cell]); cur = nxt; if (key(...cur) === k0) break; }
+      if (ring.length < 4) continue;
+      let area = 0; for (let i = 0; i < ring.length; i++) { const a = ring[i], b = ring[(i + 1) % ring.length]; area += a[0] * b[1] - b[0] * a[1]; }
+      (area > 0 ? loops : islands).push(simplify(ring, cell * 0.6));
+    }
+  }
+  return { loops, islands };
+}
 export function shapeWithHoles(outer, holes, y, t = 0.05) {
   const s = new THREE.Shape(); outer.forEach(([x, z], i) => (i ? s.lineTo(x, -z) : s.moveTo(x, -z))); s.closePath();
-  for (const h of holes) {
-    const p = new THREE.Path();
-    if (h.rx) p.absellipse(h.x, -h.z, h.rx, h.rz, 0, Math.PI * 2, true, 0);
-    else { p.moveTo(h.x - h.hw, -(h.z - h.hd)); p.lineTo(h.x - h.hw, -(h.z + h.hd)); p.lineTo(h.x + h.hw, -(h.z + h.hd)); p.lineTo(h.x + h.hw, -(h.z - h.hd)); p.closePath(); }
-    s.holes.push(p);
+  // nhóm lỗ chạm nhau (union-find)
+  const par = holes.map((_, i) => i), find = (i) => (par[i] === i ? i : (par[i] = find(par[i])));
+  for (let a = 0; a < holes.length; a++) for (let b = a + 1; b < holes.length; b++) if (touch(holes[a], holes[b])) par[find(a)] = find(b);
+  const groups = new Map(); holes.forEach((h, i) => { const r = find(i); if (!groups.has(r)) groups.set(r, []); groups.get(r).push(h); });
+  const isles = [];
+  for (const grp of groups.values()) {
+    if (grp.length === 1) {
+      const h = grp[0], p = new THREE.Path();
+      if (h.rx) p.absellipse(h.x, -h.z, h.rx, h.rz, 0, Math.PI * 2, true, 0);
+      else { p.moveTo(h.x - h.hw, -(h.z - h.hd)); p.lineTo(h.x - h.hw, -(h.z + h.hd)); p.lineTo(h.x + h.hw, -(h.z + h.hd)); p.lineTo(h.x + h.hw, -(h.z - h.hd)); p.closePath(); }
+      s.holes.push(p); continue;
+    }
+    const U = unionHoles(grp);
+    for (const L of U.loops) { const p = new THREE.Path(); L.forEach(([x, z], i) => (i ? p.lineTo(x, -z) : p.moveTo(x, -z))); p.closePath(); s.holes.push(p); }
+    isles.push(...U.islands);
   }
-  const g = new THREE.ExtrudeGeometry(s, { depth: t, bevelEnabled: false, curveSegments: 24 });
+  const shapes = [s, ...isles.map((L) => { const q = new THREE.Shape(); L.forEach(([x, z], i) => (i ? q.lineTo(x, -z) : q.moveTo(x, -z))); q.closePath(); return q; })];
+  const g = new THREE.ExtrudeGeometry(shapes, { depth: t, bevelEnabled: false, curveSegments: 24 });
   g.rotateX(-Math.PI / 2); g.translate(0, y - t, 0);
   const p = g.attributes.position, uv = g.attributes.uv; for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / 6, p.getZ(i) / 6);
   g.computeVertexNormals(); return g;
