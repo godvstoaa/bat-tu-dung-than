@@ -236,7 +236,7 @@ const WALK_LINES = {
   zhen: ['Lịch Đường phía Đông, chọn ngày tốt ở đó.', 'Chấn Mộc Thị nhiều thuốc quý.', 'Sấm Chấn đầu xuân, cây cối đâm chồi.'],
   xun: ['Ra hồ Cùng Thông thuê đò chơi.', 'Gió Tốn đưa hương trà.', 'Tốn Phong Thị bán lụa đẹp.'],
 };
-const WALK_LOOKS = ['npc_merchant', 'npc_villager', 'hero_f', 'hero_m'];
+const WALK_LOOKS = ['npc_merchant', 'npc_villager', 'hero_f', 'hero_m', 'npc_lao', 'npc_ba', 'npc_nu']; // + 3 dân Meshy cộng đồng (docs/NHAN-VAT-MESHY-MANIFEST.md)
 const WALK_NAMES = ['Mạnh Sơn', 'Thu Hà', 'Lão Phúc', 'Cô Lan', 'Tiểu Bảo', 'Bá Hùng', 'Ngọc Mai', 'Văn Tài', 'Bà Năm', 'Chú Tư'];
 let WALK = null;
 export function walkers4() {

@@ -216,7 +216,7 @@ export const CITIZENS = {
     N('li_khach', 'Khách Phương Xa', 'Lữ khách', 'hero_f', null, ['Nghe nói thành này xây theo Bát Quái, đi lạc là vòng mãi.', 'Tám cổng, tám cung — lạ thật.'], { path: [[96, -3], [140, -3]] }),
   ],
   kun: [
-    N('kun_nong', 'Lão Nông Thổ Căn', 'Nông gia linh điền', 'npc_villager', [136, 21], ['Đất Khôn dày, nuôi vạn vật.', 'Linh mễ năm nay trổ bông sớm.', 'Tưới bằng nước giếng Khảm, lúa mới thơm.']),
+    N('kun_nong', 'Lão Nông Thổ Căn', 'Nông gia linh điền', 'npc_lao', [136, 21], ['Đất Khôn dày, nuôi vạn vật.', 'Linh mễ năm nay trổ bông sớm.', 'Tưới bằng nước giếng Khảm, lúa mới thơm.']),
     N('kun_kho', 'Quản Kho Điền Thị', 'Quản kho lương', 'npc_merchant', [124, -13], ['Kho Khôn Nguyên đủ lương cho cả thành ba năm.', 'Tử Môn chủ tĩnh — người ra kẻ vào ít thôi.']),
     N('kun_be', 'Bé Hòa', 'Con nhà nông', 'hero_f', null, ['Ông ơi chờ cháu với!', 'Cháu bắt được con dế lửa nè!'], { path: [[100, 2], [146, 2]], height: 1.25 }),
     N('kun_ve', 'Vệ Binh Tử Môn', 'Thủ thành', 'hero_m', [140, -6], ['Tử Môn hướng Tây Nam, cung Khôn — đất mẹ.']),
@@ -224,7 +224,7 @@ export const CITIZENS = {
   dui: [
     N('dui_tra', 'Trà Nương Thu Thủy', 'Chủ trà lâu', 'hero_f', [124, -13], ['Trà Đoài Duyệt pha bằng sương sớm mặt hồ.', 'Đoài là vui — khách ngồi xuống đã rồi hẵng tu.', 'Nghe tiếng đàn bên thủy tạ chưa?']),
     N('dui_cam', 'Cầm Sư Bạch Vân', 'Cầm sư', 'master', [97, 20], ['Cung thương giốc chủy vũ — ngũ âm hợp ngũ hành.', 'Tiếng đàn trong là tâm trong.']),
-    N('dui_ca', 'Ca Kỹ Liên Hoa', 'Ca kỹ', 'hero_f', [120, 17], ['Đêm nay hát khúc «Trạch Thượng Hữu Phong».', 'Khách muốn nghe bài gì?']),
+    N('dui_ca', 'Ca Kỹ Liên Hoa', 'Ca kỹ', 'npc_nu', [120, 17], ['Đêm nay hát khúc «Trạch Thượng Hữu Phong».', 'Khách muốn nghe bài gì?']),
     N('dui_ve', 'Vệ Binh Kinh Môn', 'Thủ thành', 'hero_m', [140, 6], ['Kinh Môn chủ kinh hãi, kiện tụng — vào ra cẩn trọng.']),
     N('dui_dao', 'Đạo Sĩ Dạo Hồ', 'Tán tu', 'npc_villager', null, ['Mặt hồ phẳng như gương — soi được tâm mình.'], { path: [[96, -2], [140, -2]] }),
   ],
@@ -235,7 +235,7 @@ export const CITIZENS = {
     N('qian_ve', 'Vệ Binh Khai Môn', 'Thủ thành', 'hero_m', [140, -6], ['Khai Môn hướng Tây Bắc, đại cát cho xuất hành.']),
   ],
   kan: [
-    N('kan_tinh', 'Bà Giữ Giếng', 'Giữ linh tuyền', 'npc_villager', { x: -53, z: -74.5 }, ['Giếng Khảm thông mạch nước dưới Hậu Sơn.', 'Nước linh tuyền — uống một ngụm, mát tới đan điền.', 'Khảm là hiểm, nhưng nước luôn tìm được đường.']),
+    N('kan_tinh', 'Bà Giữ Giếng', 'Giữ linh tuyền', 'npc_ba', { x: -53, z: -74.5 }, ['Giếng Khảm thông mạch nước dưới Hậu Sơn.', 'Nước linh tuyền — uống một ngụm, mát tới đan điền.', 'Khảm là hiểm, nhưng nước luôn tìm được đường.']),
     N('kan_dong', 'Tiểu Đạo Đồng', 'Đạo đồng Hậu Sơn', 'hero_m', null, ['Sư phụ sai con xuống lấy nước giếng.'], { path: [[-40, -71], [40, -71]], world: true, height: 1.35 }),
   ],
   gen: [
@@ -247,14 +247,14 @@ export const CITIZENS = {
   zhen: [
     N('zhen_loi', 'Lôi Tôn Chấn Hoàng', 'Chủ lôi đài', 'master', [80, -11], ['Chấn là sấm — động thì phải động cho ra động!', 'Ai muốn lên lôi đài? Ba chiêu thôi.']),
     N('zhen_vo', 'Võ Sĩ Thiết Ngưu', 'Đấu sĩ', 'hero_m', [93, -22], ['Hôm qua thua một trận, hôm nay đòi lại.'], { pose: 'hold' }),
-    N('zhen_co', 'Cổ Sư Lôi Minh', 'Đánh trống', 'npc_villager', [118, 18], ['Mỗi giờ Thìn ba hồi trống — thức cả thành.']),
+    N('zhen_co', 'Cổ Sư Lôi Minh', 'Đánh trống', 'npc_lao', [118, 18], ['Mỗi giờ Thìn ba hồi trống — thức cả thành.']),
     N('zhen_ve', 'Vệ Binh Thương Môn', 'Thủ thành', 'hero_m', [140, 6], ['Thương Môn hướng Đông — chủ thương tổn, săn bắt.']),
     N('zhen_kh', 'Khán Giả Hóng Chuyện', 'Dân thành', 'npc_merchant', null, ['Trận chiều nay chắc chắn đông người xem!'], { path: [[66, 2], [140, 2]] }),
   ],
   xun: [
     N('xun_duoc', 'Dược Sư Thanh Phong', 'Dược sư', 'master', [134, 16], ['Tốn là gió, là cây — dược thảo theo gió mà lớn.', 'Bách Thảo Đình có ba trăm loại linh thảo.']),
     N('xun_thu', 'Thủ Thư Tàng Phong', 'Giữ lầu sách', 'npc_villager', [120, -12], ['Tàng Phong Lâu giữ kinh thư phong thủy cổ.', 'Đọc sách cũng như đón gió — mở cửa sổ lòng.']),
-    N('xun_hai', 'Thiếu Nữ Hái Thuốc', 'Hái thuốc', 'hero_f', [142, 33], ['Lá này phải hái lúc còn đọng sương.']),
+    N('xun_hai', 'Thiếu Nữ Hái Thuốc', 'Hái thuốc', 'npc_nu', [142, 33], ['Lá này phải hái lúc còn đọng sương.']),
     N('xun_ve', 'Vệ Binh Đỗ Môn', 'Thủ thành', 'hero_m', [140, -6], ['Đỗ Môn chủ ẩn tàng — người tu muốn lánh đời thường qua đây.']),
   ],
 };

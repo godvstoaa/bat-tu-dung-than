@@ -376,7 +376,7 @@ const ROLE_LINES = {
   xun: ['Dược viên Tốn Phong thơm cả phố.', 'Thanh Phong Các có sách phong thủy cổ.', 'Gió Đông Nam mát, cây cối tốt tươi.'],
 };
 const COMMON_LINES = ['Thành Bát Quái to quá, đi cả ngày chưa hết một cung.', 'Khách từ phương xa tới à?', 'Vào Nội Thành thì đi thẳng đại lộ này.', 'Trời hôm nay đẹp, đi dạo phố thôi.'];
-const LOOKS = ['npc_villager', 'npc_merchant', 'hero_f', 'hero_m', 'npc_villager', 'hero_f'];
+const LOOKS = ['npc_villager', 'npc_merchant', 'hero_f', 'hero_m', 'npc_lao', 'npc_ba', 'npc_nu', 'npc_nu']; // + dân Meshy cộng đồng (docs/NHAN-VAT-MESHY-MANIFEST.md)
 function makeWalkers() {
   const out = [];
   for (const g of GUA) {
@@ -392,7 +392,7 @@ function makeWalkers() {
     out.push({ id: id(2), name: nm(), role: 'Dân phố', look: LOOKS[Math.floor(r() * LOOKS.length)], gua: g.id, wx: g.wx, lines, path: [W(214, LANES_V[0]), W(402, LANES_V[0])] });
     out.push({ id: id(3), name: nm(), role: 'Dân phố', look: LOOKS[Math.floor(r() * LOOKS.length)], gua: g.id, wx: g.wx, lines, path: [W(398, -LANES_V[0]), W(214, -LANES_V[0])] });
     // đi vòng trên vành giữa (một đoạn trong cung)
-    out.push({ id: id(4), name: nm(), role: 'Phu khuân vác', look: 'npc_villager', gua: g.id, wx: g.wx, lines, path: [W(MID_A, -100), W(MID_A, 100)] });
+    out.push({ id: id(4), name: nm(), role: 'Phu khuân vác', look: 'npc_lao', gua: g.id, wx: g.wx, lines, path: [W(MID_A, -100), W(MID_A, 100)] });
     // người bán đứng trước cửa hàng đại lộ (mép đại lộ, giữa hai cột đèn)
     const mv = AVE_CANAL.gua.includes(g.id) ? 18 : 6;
     for (const [k, u] of [[5, 236], [6, 344]]) out.push({ id: id(k), name: nm(), role: 'Người bán hàng', look: 'npc_merchant', gua: g.id, wx: g.wx, lines: ['Mời khách xem hàng!', ...lines.slice(0, 2)], x: W(u, k === 5 ? mv : -mv).x, z: W(u, k === 5 ? mv : -mv).z, path: null });
