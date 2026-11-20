@@ -1,0 +1,12 @@
+{
+ "size": 1024,
+ "span": {
+  "tile": 2.0,
+  "brick": 1.92,
+  "plaster": 4.0,
+  "lacquer": 1.0,
+  "plank": 2.0,
+  "stone": 2.4,
+  "marble": 2.0
+ }
+}
