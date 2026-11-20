@@ -22,10 +22,15 @@ import { FH, LEVELS } from './tienphu/tower.js';
 import { FLOOR_THEMES } from './tienphu/styles.js';
 import { decodeOpts } from './tienphu/custom.js';
 import { addLight, LIGHTS } from './lights.js';
-import { placeModel, dropInstances } from './assets.js';
+import { placeModel, dropInstances, warmObject } from './assets.js';
 import { setOpenSpots } from './rooms.js';
 import { makeZoneCtx, furnishZone } from './interior-build.js';
+import { estatePiece, NEAR_LOD } from './archcity/estatekit.js';
+import { archMats, boxUV, SPAN } from './archcity/mats.js';
+import { estateFence, estateTrees, hedgeRow, pondRim, rockery as ekRockery, prefetchTrees } from './archcity/estate-dress.js';
 
+// biến thể nhà biệt thự 0–2 (luật ART_BIBLE «không nhân bản một lưới»): theo số nhà trong khu, hai căn kề nhau khác nhau
+const VAR = (m) => (m.k ?? m.h) % 3;
 const NEAR = { phu: 240, villa: 110 }, FAR = { phu: 330, villa: 150 }, MAX = { phu: 3, villa: 8 };
 // Cửu Trọng Thiên: 8 đảo cách tâm 280 m — đứng quảng trường giữa phải thấy phủ thật (không phải khối hộp bản xa)
 // tiên phủ 520 m (TIEN-PHU-MANIFEST §2): dựng khi cách tâm < 640 m (đang qua cầu 330 m sang), tối đa 2 phủ chi tiết
@@ -106,45 +111,103 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
       if (r.done) { rec.vox.job = null; rec.vox.stats = setVoxelLayer(`vox:${rec.m.h}`, rec.vox.out.cells3, rec.vox.out.cells2); rec.vox.dbg = globalThis.__voxDebug ? rec.vox.out : null; rec.vox.out = null; } // __voxDebug: script kiểm giữ lại bản ô
     }
   }
+  // (2026-11-20, docs/TRE-DICH-CHUYEN-MANIFEST.md §6) DỰNG CHIA KHUNG: build() chỉ tạo bản ghi + job (generator); update()
+  // chạy job ≤ 6 ms mỗi khung, nhả sau mỗi phần (nhà / đình / tháp / rào / cổng / nước / cây / đồ bài trí) — trước đây dựng
+  // một mạch 0,3–0,7 s trên luồng chính (khựng sau dịch chuyển). Xong job → làm nóng shader → vào cảnh.
   function build(m) {
     if (m.heaven) return buildTien(m);
     const g = new THREE.Group(); g.name = `est:${m.h}`;
-    setHidden(m, true);
+    const rec = { m, g, halls: [], lights: [], furn: null, lods: [], trees: null, lodNear: null, job: null };
+    rec.job = buildGen(m, rec);
+    built.set(m.h, rec);
+    return rec;
+  }
+  function stepJob(rec, budgetMs) {
+    const t0 = performance.now();
+    while (rec.job && performance.now() - t0 < budgetMs) { const r = rec.job.next(); if (r.done) rec.job = null; }
+  }
+  function* buildGen(m, rec) {
+    const g = rec.g;
+    // (2026-11-20, docs/TRE-DICH-CHUYEN-MANIFEST.md) bản xa vẫn hiện tới khi nhà chi tiết đã biên dịch shader xong (bên dưới)
     g.position.set(m.x, 0, m.z); g.rotation.y = m.ry;
     const S = m.S, L = m.layout, villa = m.kind === 'villa', k = AK.kit();
     const base = new THREE.Group(); g.add(base);
-    const halls = [];
-    L.buildings.forEach((b, i) => {
+    const halls = rec.halls, lods = rec.lods;
+    // BIỆT PHỦ LÀM LẠI (docs/BIET-PHU-MANIFEST.md): nhà / tháp / đình / cổng dựng bằng bộ kiến trúc thật theo họ phong cách
+    // (archcity/estatekit) đúng khuôn lô; phần nào họ chưa có thì giữ bản archkit-style cũ. __noEstateKit = bản cũ (đo A/B).
+    const EK = !globalThis.__noEstateKit;
+    const ekPut = (pc, x, z, ry = 0, z0 = 0) => { // nền + thân (thân có bậc vừa) vào g, không gộp (userData.dynamic)
+      const bg = new THREE.Group(); bg.userData.dynamic = true; bg.position.set(x, 0, z + z0); bg.rotation.y = ry; bg.add(pc.base);
+      const sg = new THREE.Group(); sg.userData.dynamic = true; sg.position.copy(bg.position); sg.rotation.y = ry; sg.add(pc.shell);
+      if (pc.shellMid) { pc.shellMid.visible = false; sg.add(pc.shellMid); lods.push({ near: pc.shell, mid: pc.shellMid, x, z: z + z0, nd: villa ? 35 : NEAR_LOD }); } // biệt thự sát nhau ~25 m: bậc gần chỉ căn đang đứng cạnh
+      g.add(bg, sg); return sg;
+    };
+    for (let i = 0; i < L.buildings.length; i++) {
+      const b = L.buildings[i];
+      const pc = EK && estatePiece(m.style, S, 'hall', { id: b.id, w: b.w, d: b.d, h: b.h, floors: b.floors, plinth: b.plinth, back: !!b.back }, { villa, variant: villa ? VAR(m) : 0 });
+      if (pc) { const sg = ekPut(pc, b.x, b.z, b.ry); MD.ownMaterials(sg); for (const mt of sg.userData.fadeMats) mt.transparent = false; halls.push({ zone: m.zones[i], g: sg, mats: sg.userData.fadeMats, op: 1 }); yield; continue; }
       const { base: bb, shell } = AS.styledBuilding(S, b, { villa });
       bb.position.set(b.x, 0, b.z); bb.rotation.y = b.ry; base.add(bb);
       const sg = new THREE.Group(); sg.position.set(b.x, 0, b.z); sg.rotation.y = b.ry; sg.add(shell);
       MD.mergeStatic(sg); MD.ownMaterials(sg); g.add(sg);
       halls.push({ zone: m.zones[i], g: sg, mats: sg.userData.fadeMats, op: 1 });
-    });
-    for (const pv of L.pavs) { const { base: b, shell } = AS.styledPavilion(S, pv); for (const o of [b, shell]) { o.position.set(pv.x, 0, pv.z); base.add(o); } }
-    for (const tw of L.towers || []) { const o = AS.styledTower(S, tw); o.position.set(tw.x, 0, tw.z); base.add(o); }
-    base.add(AS.styledFence(S, m.walls));
-    base.add(AS.styledGate(S, { w: L.gate.w, villa, d: m.D / 2 }));
+      yield;
+    }
+    for (const pv of L.pavs) {
+      const pc = EK && estatePiece(m.style, S, 'pav', { w: pv.w, d: pv.d, h: pv.h, octa: !!pv.octa });
+      if (pc) { ekPut(pc, pv.x, pv.z); yield; continue; }
+      const { base: b, shell } = AS.styledPavilion(S, pv); for (const o of [b, shell]) { o.position.set(pv.x, 0, pv.z); base.add(o); }
+      yield;
+    }
+    for (const tw of L.towers || []) {
+      const pc = EK && estatePiece(m.style, S, 'tower', { w: tw.w, d: tw.d, h: tw.h });
+      if (pc) { ekPut(pc, tw.x, tw.z); yield; continue; }
+      const o = AS.styledTower(S, tw); o.position.set(tw.x, 0, tw.z); base.add(o);
+      yield;
+    }
+    if (EK && S.fence !== 'hedge') base.add(estateFence(S, m.walls, { villa })); else if (!EK) base.add(AS.styledFence(S, m.walls));
+    yield;
+    { const pc = EK && estatePiece(m.style, S, 'gate', { w: L.gate.w, villa, d: 0 }, { villa, variant: villa ? VAR(m) : 0 });
+      if (pc) ekPut(pc, 0, m.D / 2); else base.add(AS.styledGate(S, { w: L.gate.w, villa, d: m.D / 2 })); }
+    yield;
     // lối chính lát đá + sân trước nhà chính
     const main = L.buildings[0];
-    for (const p of L.paths) { const o = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.05, p.d), k.pave); o.position.set(p.x, 0.03, p.z); o.receiveShadow = true; base.add(o); }
-    { const fw = villa ? main.w : main.w + 6, fd = villa ? 1.6 : 5, o = new THREE.Mesh(new THREE.BoxGeometry(fw, 0.05, fd), k.pave); o.position.set(0, 0.03, main.z + main.d / 2 + main.plinth + fd / 2 + 0.6); o.receiveShadow = true; base.add(o); }
-    for (const p of waterParts(m)) base.add(AS.waterFeature(p));
-    base.add(AS.mound(L.mound, L.mound.kind));
-    let seed = m.h * 31 + 7;
-    for (const t of L.trees) { const o = AS.styledTree(t.kind, seed++, villa ? 0.8 : 1); o.position.set(t.x, 0, t.z); o.rotation.y = seed; base.add(o); }
+    // lối + sân lát đá: tấm đá lặp theo mét (2,4 m / ảnh) thay hộp xám phẳng — cạnh viền đá trắng 0,25 m
+    const paveMat = EK ? archMats().floor : k.pave, edgeMat = EK ? archMats().marble : k.pave;
+    const slab = (w, d, x, z) => { const geo = new THREE.BoxGeometry(w, 0.06, d).translate(x, 0.03, z); const o = new THREE.Mesh(EK ? boxUV(geo, { span: SPAN.stone, index: true }) : geo, paveMat); o.receiveShadow = true; base.add(o);
+      if (EK) for (const sx of [-1, 1]) { const e = new THREE.Mesh(boxUV(new THREE.BoxGeometry(0.25, 0.1, d).translate(x + sx * (w / 2 + 0.12), 0.05, z), { span: SPAN.marble, index: true }), edgeMat); e.receiveShadow = true; base.add(e); } };
+    for (const p of L.paths) slab(p.w, p.d, p.x, p.z);
+    { const fw = villa ? main.w : main.w + 6, fd = villa ? 1.6 : 5; slab(fw, fd, 0, main.z + main.d / 2 + main.plinth + fd / 2 + 0.6); }
+    for (const p of waterParts(m)) {
+      if (EK && p.shape === 'ellipse') { g.add(AS.waterFeature({ ...p, rocks: false })); g.add(pondRim(p, m.h + 1)); continue; } // ao: bờ đá xếp + đá tảng (không còn 64 khối 12 mặt đen)
+      base.add(AS.waterFeature(p));
+    }
+    yield;
+    const hedgeMound = [];
+    if (!EK) base.add(AS.mound(L.mound, L.mound.kind));
+    else if (L.mound.kind === 'rock') g.add(ekRockery(L.mound, m.h + 3));
+    else if (L.mound.kind === 'hedge') for (let x = -L.mound.w / 2 + 0.9; x <= L.mound.w / 2 - 0.9; x += 1.6) hedgeMound.push({ kind: 'hedge', x: L.mound.x + x, z: L.mound.z });
+    // (mound 'trees': rặng cây đã có trong L.trees — không dựng gò cầu rêu)
+    yield;
+    let seed = m.h * 31 + 7, trees = null;
+    if (EK) trees = estateTrees(g, [...L.trees, ...hedgeMound, ...(S.fence === 'hedge' ? hedgeRow(m.walls) : [])], { villa });
+    else for (const t of L.trees) { const o = AS.styledTree(t.kind, seed++, villa ? 0.8 : 1); o.position.set(t.x, 0, t.z); o.rotation.y = seed; base.add(o); }
     if (!villa) for (const sx of [-1, 1]) { const o = AS.stoneLantern(); o.position.set(sx * 3.5, 0, main.z + main.d / 2 + main.plinth + 4); base.add(o); }
+    yield;
     MD.mergeStatic(base);
+    yield;
     if (!villa && S.fam === 'asian') for (const sx of [-1, 1]) placeModel(g, 'bq_lion', { fit: { height: 2.4 }, at: { x: sx * (L.gate.w / 2 + 2.4), y: 0, z: m.D / 2 + 2.4, ry: 0 } }).catch(() => null);
     const sign = signMesh(m.name, villa); sign.position.set(0, villa ? 2.6 : S.fam === 'asian' ? 5.3 : 5.4, m.D / 2 + (villa ? 0.3 : S.fam === 'asian' ? 0.15 : 0.4)); g.add(sign);
-    const lights = [];
+    const lights = rec.lights;
     const lp = villa ? [[0, 2.6, m.D / 2]] : [[-L.gate.w / 2, 4, m.D / 2 + 1], [L.gate.w / 2, 4, m.D / 2 + 1], [0, 3.5, main.z + main.d / 2 + 4]];
     for (const [x, y, z] of lp) { const p = m.toWorld(x, z); lights.push(addLight(p.x, y, p.z, { color: '#ffa04a', power: villa ? 0.7 : 1 })); }
-    grp.add(g);
-    const rec = { m, g, halls, lights, furn: null };
-    built.set(m.h, rec);
-    furnish(rec);
-    return rec;
+    // biên dịch shader + đẩy texture TRƯỚC khi vào cảnh (renderer.compileAsync qua assets.warmObject): trước đây thêm thẳng →
+    // khung đầu biên dịch đồng bộ mọi vật liệu mới của phủ (đo phủ Mughal sau dịch chuyển: getProgramInfoLog 1,3 s, khựng tới 1 s)
+    rec.trees = trees;
+    yield;
+    furnish(rec, true); // đồ bài trí vào g TRƯỚC khi làm nóng (đo: 5 chương trình đồ nội thất còn biên dịch đồng bộ khi bày sau)
+    const show = () => { if (built.get(m.h)?.g !== g) return; grp.add(g); setHidden(m, true); };
+    warmObject(g).then(show, show);
   }
   function dispose(h) {
     const rec = built.get(h); if (!rec) return;
@@ -153,7 +216,7 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
     unfurnish(rec);
     if (rec.props) for (const ps of [rec.props.outdoor, ...rec.props.halls, ...rec.props.floors]) if (ps) { dropInstances(ps.group); grp.remove(ps.group); }
     grp.remove(rec.g);
-    rec.g.traverse((o) => { if (o.isMesh) o.geometry?.dispose?.(); });
+    rec.g.traverse((o) => { if (!o.isMesh || o.userData.ek || o.isInstancedMesh) return; for (let p = o.parent; p; p = p.parent) if (p.userData.shared) return; o.geometry?.dispose?.(); }); // hình estatekit / cây mẫu dùng chung
     for (const hl of rec.halls) for (const mt of hl.mats || []) mt.dispose();
     for (const L of rec.lights) { const i = LIGHTS.indexOf(L); if (i >= 0) LIGHTS.splice(i, 1); }
     built.delete(h);
@@ -165,7 +228,8 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
     for (const n of f.npcs || []) citizens?.remove?.(n.id);
     rec.furn = null;
   }
-  function furnish(rec) {
+  function furnish(rec, fromJob = false) {
+    if (rec.job && !fromJob) return; // đang dựng chia khung: job tự bày đồ ở bước cuối
     unfurnish(rec);
     const { m } = rec, info = provider(`est:${m.h}`) || { mode: 'sale', items: [] };
     const items = info.items || [];
@@ -201,8 +265,15 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
     update(px, pz, dt = 0.016, py = null) {
       // tiên phủ đang dựng dần / đang lấy vật cản: mỗi khung một ít (≤ 6 ms)
       for (const rec of built.values()) if (rec.tien && (rec.job || rec.vox?.job)) { stepTien(rec, 6); break; }
+      for (const rec of built.values()) if (!rec.tien && rec.job) { stepJob(rec, 6); break; } // biệt phủ / biệt thự dựng chia khung
       // lầu 10 tầng: ở trong lầu thì ẩn các tầng trên, vách tầng đang đứng mờ đi (nhìn như nhà búp bê)
       for (const rec of built.values()) if (rec.tower) towerView(rec, px, pz, py, dt);
+      // biệt phủ làm lại: bậc gần / vừa của nhà, tháp, đình, cổng theo khoảng cách người chơi (khung cục bộ); cây 3 bậc
+      for (const rec of built.values()) if (rec.lods?.length || rec.trees) {
+        const l = toLocal(rec.m, px, pz);
+        for (const L2 of rec.lods) { const near = Math.hypot(l.x - L2.x, l.z - L2.z) < L2.nd; if (L2.near.visible !== near) { L2.near.visible = near; L2.mid.visible = !near; } }
+        rec.trees?.update(l.x, l.z);
+      }
       for (const rec of built.values()) if (rec.flora || rec.props) {
         const l = toLocal(rec.m, px, pz);
         rec.flora?.update(l.x, l.z);
@@ -236,7 +307,7 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
           const goal = hz === h.zone ? 0.3 : 1;
           if (Math.abs(h.op - goal) < 0.01) continue;
           h.op += (goal - h.op) * Math.min(1, dt * 7);
-          for (const mt of h.mats) { mt.opacity = h.op; mt.depthWrite = h.op > 0.95; }
+          for (const mt of h.mats) { mt.opacity = h.op; mt.depthWrite = h.op > 0.95; mt.transparent = h.op < 0.99; } // chỉ trong suốt khi đang mờ (lượt trong suốt không sớm-z → vẽ chồng tốn)
         }
         if (rec.hallsWhole) { const inside = !!hz; rec.hallsWhole.visible = !inside; for (const h of rec.halls) h.g.visible = inside; } // tiên phủ: ngoài sảnh vẽ bản gộp
         if (hz) inHall = { m: rec.m, zone: hz };
@@ -265,6 +336,26 @@ if (texture2D(uHide, vec2((aEst + 0.5) / uN, 0.5)).r > 0.5) gl_Position = vec4(0
     builtRec: (h) => built.get(h) || null,
     isBuilt: (h) => built.has(h),
     builtCount: () => built.size,
+    /**
+     * DỰNG SẴN KHI ĐI (docs/TRE-DICH-CHUYEN-MANIFEST.md §4c): bấm dịch chuyển → trong lúc lớp phủ «vó ngựa» che màn (1,2 s),
+     * dựng trước bộ đệm estatePiece (nhà / đình / tháp / cổng) của các khuôn viên sẽ dựng chi tiết quanh điểm đến + nạp khuôn
+     * cây. Tới nơi build() chỉ còn sao chép từ bộ đệm. Chạy dần qua setTimeout, mỗi lượt ≤ 1 phần (1 phần nặng nhất ~0,3 s).
+     */
+    prefetch(x, z) {
+      if (globalThis.__noEstateKit || globalThis.__noPrefetch) return Promise.resolve(0);
+      const near = list.filter((m) => !m.heaven && Math.hypot(m.x - x, m.z - z) < nearOf(m)).sort((a, b) => Math.hypot(a.x - x, a.z - z) - Math.hypot(b.x - x, b.z - z));
+      const pick = [...near.filter((m) => m.kind === 'phu').slice(0, MAX.phu), ...near.filter((m) => m.kind === 'villa').slice(0, MAX.villa)];
+      const jobs = [];
+      for (const m of pick) {
+        const L = m.layout, villa = m.kind === 'villa', v = villa ? VAR(m) : 0;
+        for (const b of L.buildings) jobs.push(() => estatePiece(m.style, m.S, 'hall', { id: b.id, w: b.w, d: b.d, h: b.h, floors: b.floors, plinth: b.plinth, back: !!b.back }, { villa, variant: v }));
+        for (const pv of L.pavs) jobs.push(() => estatePiece(m.style, m.S, 'pav', { w: pv.w, d: pv.d, h: pv.h, octa: !!pv.octa }));
+        for (const tw of L.towers || []) jobs.push(() => estatePiece(m.style, m.S, 'tower', { w: tw.w, d: tw.d, h: tw.h }));
+        jobs.push(() => estatePiece(m.style, m.S, 'gate', { w: L.gate.w, villa, d: 0 }, { villa, variant: v }));
+      }
+      const trees = prefetchTrees(pick.flatMap((m) => m.layout.trees.map((t) => t.kind)).concat(['hedge']));
+      return new Promise((res) => { let i = 0; const run = () => { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 12) jobs[i++](); if (i < jobs.length) setTimeout(run, 0); else trees.then(() => res(jobs.length)); }; run(); });
+    },
   };
 }
 

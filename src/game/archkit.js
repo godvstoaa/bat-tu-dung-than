@@ -202,13 +202,13 @@ export function walls(list) {
 }
 
 /** Hồ elip có bờ đá + sen; cầu đá vòm qua hồ */
-export function pond({ x, z, rx, rz }, bridge) {
+export function pond({ x, z, rx, rz, rocks = true }, bridge) {
   const k = kit(), g = new THREE.Group();
   const shape = new THREE.Shape(); shape.absellipse(0, 0, rx, rz, 0, Math.PI * 2);
   const wgeo = new THREE.ShapeGeometry(shape, 48); wgeo.rotateX(-Math.PI / 2);
   const water = waterSurface(rx * 2, rz * 2, { ellipse: true }); water.position.set(x, 0.12, z); g.add(water);
   const bed = new THREE.Mesh(wgeo.clone(), k.stoneDark); bed.position.set(x, 0.04, z); g.add(bed);
-  for (let i = 0; i < 64; i++) {
+  for (let i = 0; i < (rocks ? 64 : 0); i++) { // rocks false: viền do bên gọi dựng (archcity/estate-dress.pondRim)
     const a = (i / 64) * Math.PI * 2, s = 0.6 + ((i * 37) % 7) / 10;
     const r = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), k.rockG);
     r.position.set(x + Math.cos(a) * (rx + 0.4), s * 0.35, z + Math.sin(a) * (rz + 0.4)); r.scale.y = 0.55; r.rotation.y = i; r.castShadow = true; g.add(r);

@@ -3,6 +3,7 @@
 //  Toạ độ: ô lưới (x, y) → thế giới X = (x − 10)·U, Z = (y − 7)·U, Y hướng lên.
 // ============================================================================
 import * as THREE from 'three';
+import { triplanar } from './archcity/mats.js';
 import { lotusLife, waterSurface } from './lotus.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import * as TX from './textures.js';
@@ -19,15 +20,17 @@ let M = null;
 export function materials() {
   if (M) return M;
   M = {
-    son: std({ map: TX.lacquerTex(TX.PAL.son, { seed: 3 }), roughness: 0.38, metalness: 0.05 }),
+    // (2026-11-19, docs/CONG-TRINH-LAM-LAI-MANIFEST.md) gỗ son / gỗ / đá / ngói: chiếu ba mặt theo mét (archcity/mats.triplanar)
+    // thay texture canvas kéo theo từng mặt hộp — đồ dựng tay nét như công trình mới
+    son: triplanar('lacquer', TX.PAL.son, { rough: 0.5 }),
     lacquer: std({ map: TX.lacquerTex(TX.PAL.lacquer, { seed: 4, gold: 1, streak: 0.06 }), roughness: 0.35 }),
-    wood: std({ map: TX.lacquerTex(TX.PAL.canhGian, { seed: 8, gold: 0.15, streak: 0.2 }), roughness: 0.6 }),
+    wood: triplanar('plank', TX.PAL.canhGian, { rough: 0.75 }),
     panel: std({ map: TX.panelTex(), roughness: 0.45 }),
     gold: std({ color: TX.PAL.gold, roughness: 0.3, metalness: 0.85 }),
     bronze: std({ color: '#8a6a34', roughness: 0.45, metalness: 0.8 }),
-    stone: std({ map: TX.stoneTex({ seed: 9, tiles: 2 }), roughness: 0.9 }),
-    stoneDark: std({ color: '#4a433d', roughness: 0.95 }),
-    roof: std({ map: TX.roofTex(), roughness: 0.7, side: THREE.FrontSide }),
+    stone: triplanar('stone', '#c4c1b8', { rough: 0.9 }),
+    stoneDark: triplanar('stone', '#5a534c', { rough: 0.95 }),
+    roof: triplanar('tile', '#5d6468', { rough: 0.8, side: THREE.FrontSide }),
     soffit: std({ color: '#2a1610', roughness: 0.8, side: THREE.BackSide }),
     paper: std({ color: TX.PAL.egg, roughness: 0.9 }),
     ink: std({ color: '#151214', roughness: 0.4 }),
@@ -110,12 +113,11 @@ export function ownMaterials(group) {
   const cache = new Map();
   group.traverse((o) => {
     if (!o.isMesh) return;
-    if (!cache.has(o.material.uuid)) {
-      const c = o.material.clone();
-      c.transparent = true; c.opacity = 1;
-      cache.set(o.material.uuid, c);
-    }
-    o.material = cache.get(o.material.uuid);
+    const own = (m) => {
+      if (!cache.has(m.uuid)) { const c = m.clone(); c.transparent = true; c.opacity = 1; c.onBeforeCompile = m.onBeforeCompile; c.customProgramCacheKey = m.customProgramCacheKey; cache.set(m.uuid, c); }
+      return cache.get(m.uuid);
+    };
+    o.material = Array.isArray(o.material) ? o.material.map(own) : own(o.material); // mảng vật liệu (biển ngạch: khung + mặt chữ)
   });
   group.userData.fadeMats = [...cache.values()];
   return group;

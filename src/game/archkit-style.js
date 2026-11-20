@@ -207,7 +207,7 @@ export function styledGate(S, { w, villa = false, d = 0 }) {
 /** Mặt nước / vườn theo phần (mansions.waterParts) */
 export function waterFeature(p) {
   const k = kit(), g = new THREE.Group();
-  if (p.shape === 'ellipse') { g.add(pond({ x: p.x, z: p.z, rx: p.rx, rz: p.rz }, p.bridge)); return g; }
+  if (p.shape === 'ellipse') { g.add(pond({ x: p.x, z: p.z, rx: p.rx, rz: p.rz, rocks: p.rocks !== false }, p.bridge)); return g; }
   if (p.shape === 'rect') {
     const pool = p.kind === 'pool', w = new THREE.Mesh(new THREE.PlaneGeometry(p.w, p.d), pool ? std({ color: '#3fa7c4', roughness: 0.05, metalness: 0.2, transparent: true, opacity: 0.9 }) : k.water);
     w.rotation.x = -Math.PI / 2; w.position.set(p.x, 0.25, p.z); g.add(w);

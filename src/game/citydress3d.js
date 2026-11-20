@@ -7,6 +7,7 @@
 //    · hàng cây + đèn lồng đại lộ, đèn lồng vành (§3.9) · tháp mốc + chợ ở 8 quảng trường chợ, sạp đầu cầu (§3.10)
 //  Mọi thứ nhân bản, dựng theo Ô 256 m quanh người chơi (citylayout.cell), ô xa thì ẩn → vài chục lệnh vẽ.
 // ============================================================================
+import { streetTrees } from './archcity/trees.js';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import * as L from './citylayout.js';
@@ -14,7 +15,7 @@ import { renderHouses, isRemoved, inPhuPlot } from './city4.js';
 import { heightAt } from './terrain.js';
 import { addSolidCircle, addSolidOBB } from './obstacles.js';
 import { addLight, glowAll } from './lights.js';
-import { placeModel, getModelQuality, loadModel } from './assets.js';
+import { placeModel, getModelQuality, loadModel, warmObject } from './assets.js';
 import { GUA, toWorld } from './batquai.js';
 import { seasonOf } from './season.js';
 
@@ -584,7 +585,8 @@ function buildCell(id, low) {
     }
   }
   B.build(grp, { shadow: !low });
-  if (B.trees.length) grp.userData.trees = treeSet(B.trees, grp.userData.near, !low);
+  // (2026-11-19, docs/CONG-TRINH-LAM-LAI-MANIFEST.md đợt 4) cây phố: model lib_tp_* (archcity/trees.streetTrees) thay lib_lib_tree_* thẻ lá phẳng
+  if (B.trees.length) grp.userData.trees = streetTrees(grp.userData.near, B.trees);
   // model thư viện (LOD tự nạp — xa: bản .vc, gần: bản gốc)
   for (const [, id, fit, x, z, ry] of models) placeModel(grp, id, { fit, at: { x, y: H(x, z), z, ry } }).catch(() => null);
   return grp;
@@ -607,7 +609,15 @@ export function cityDress(parent) {
   const low = () => getModelQuality() === 'low';
   // ô hiện trong R_SHOW; đồ nhỏ (cây, sạp, biển hiệu) chỉ trong R_NEAR (khoảng cách từ người chơi tới hộp ô)
   const vis = (id, g, px, pz) => { if (!g) return; const [i, j] = id.split('_').map(Number), cx = -4096 + (i + 0.5) * 256, cz = -4096 + (j + 0.5) * 256, d = Math.max(Math.abs(cx - px), Math.abs(cz - pz)) - 128; g.visible = d < R_SHOW; if (g.userData.near) g.userData.near.visible = d < R_NEAR; };
-  const make = (id, px, pz) => { const g = buildCell(id, low()); built.set(id, g); if (g) { root.add(g); vis(id, g, px, pz); } };
+  // ô dựng lúc chạy: làm nóng shader (cả biến thể bóng — render3d.compileLike) rồi mới vào cảnh (docs/TRE-DICH-CHUYEN-MANIFEST.md
+  // §4f: ô đồ phố thêm thẳng → bóng MeshDepthMaterial của đồ / cây biên dịch đồng bộ ở lượt bóng). settle (màn nạp) giữ thêm thẳng.
+  const make = (id, px, pz, warm = false) => {
+    const g = buildCell(id, low()); built.set(id, g); if (!g) return;
+    vis(id, g, px, pz);
+    if (!warm) { root.add(g); return; }
+    const show = () => { if (built.get(id) === g) root.add(g); };
+    warmObject(g).then(show, show);
+  };
   function update(px, pz) {
     if (Math.hypot(px - lx, pz - lz) > 24) {
       lx = px; lz = pz;
@@ -618,7 +628,7 @@ export function cityDress(parent) {
     for (const g of built.values()) if (g?.userData.trees && g.userData.near.visible) g.userData.trees.assign(px, pz, low() ? TREE_LOW : 1); // cây: bậc chi tiết theo khoảng cách
     // dựng trong ngân sách ~18 ms mỗi lần gọi (landmarks gọi 0,4–1,5 s / lần)
     const t0 = performance.now();
-    while (queue.length && performance.now() - t0 < 18) make(queue.shift(), px, pz);
+    while (queue.length && performance.now() - t0 < 18) make(queue.shift(), px, pz, true);
   }
   return { update, root, settle: (px, pz, n = 12) => { lx = Infinity; update(px, pz); for (let k = 0; k < n && queue.length; k++) make(queue.shift(), px, pz); } };
 }

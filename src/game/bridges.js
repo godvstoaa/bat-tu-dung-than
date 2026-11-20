@@ -11,6 +11,7 @@ import { MOAT, AVE_CANAL, OUTLET, CANAL_WATER, CANAL_CLEAR } from './canals.js';
 import { RINGS, BELT, TRUNG_A, OUTER_A } from './cityblocks.js';
 import * as T from './terrain.js';
 import { bridges as layoutBridges, deckTop as layoutDeckTop, waterGates as layoutWaterGates } from './citylayout.js';
+import { octMax } from './waterways.js';
 
 export const DECK_T = 0.6;                                  // dày mặt cầu (đáy cầu = mặt − 0,6)
 const HUMP_H = CANAL_WATER + CANAL_CLEAR + DECK_T;          // đỉnh mặt cầu thành: 5,3 m
@@ -115,8 +116,37 @@ export function clearanceAt(x, z) {
   }
   return c;
 }
-/** trụ cầu (vật cản cho thuyền / người bơi): [{ x, z, r }] */
-export const piers = () => allBridges().flatMap((b) => b.piers || []);
+/**
+ * NHỊP THỦY MÔN (docs/THUY-MON-MANIFEST.md — dùng chung cho hình archcity/watergate.js và va chạm thuyền):
+ * mặt nước rộng w dọc tường → n vòm lẻ, trụ p = 2 m, nhịp s ≤ 9,3 m (Bàn Môn Tô Châu: vòm nước 9,3 m), đỉnh vòm
+ * cao crown = 8,4 m trên mặt nước (tĩnh không thuyền 7 m + vành đá). centers: tâm vòm (m, dọc tường, gốc ở tâm sông).
+ */
+export function waterGateBays(w) {
+  const p = 2.0; let n = Math.max(1, Math.round(w / 9.3)); if (n % 2 === 0) n += 1;
+  while ((w - (n - 1) * p) / n > 9.3) n += 2;
+  const s = (w - (n - 1) * p) / n, centers = Array.from({ length: n }, (_, i) => -w / 2 + s / 2 + i * (s + p));
+  return { n, s, p, centers, crown: 8.4 };
+}
+/** khung tường tại thủy môn: pháp tuyến ra ngoài (n) + bề rộng mặt nước dọc tường */
+export function waterGateFrame(w) {
+  const e = 1, gx = octMax(w.x + e, w.z) - octMax(w.x - e, w.z), gz = octMax(w.x, w.z + e) - octMax(w.x, w.z - e), L = Math.hypot(gx, gz) || 1;
+  const nx = gx / L, nz = gz / L, c = Math.abs(w.ax * nx + w.az * nz) || 1;
+  return { nx, nz, tx: -nz, tz: nx, wAlong: w.halfW * 2 / c };
+}
+let WGP = null;
+/** trụ thủy môn: mỗi trụ 4 vòng tròn dọc bề dày tường (thân −4…+3,5 m + mũi rẽ nước) — thuyền va trụ thì nảy */
+export function waterGatePiers() {
+  if (WGP) return WGP;
+  WGP = [];
+  for (const w of waterGates()) {
+    const f = waterGateFrame(w), { s, p, centers, n } = waterGateBays(f.wAlong);
+    const pz = [centers[0] - s / 2 - p / 2, ...centers.slice(0, -1).map((c, i) => (c + centers[i + 1]) / 2), centers[n - 1] + s / 2 + p / 2];
+    for (const z of pz) for (const [u, r] of [[-6.4, 0.9], [-3.2, 1.2], [0, 1.2], [3.2, 1.2], [5.8, 0.9]]) WGP.push({ x: w.x + f.tx * z + f.nx * u, z: w.z + f.tz * z + f.nz * u, r });
+  }
+  return WGP;
+}
+/** trụ cầu + trụ thủy môn (vật cản cho thuyền / người bơi): [{ x, z, r }] */
+export const piers = () => [...allBridges().flatMap((b) => b.piers || []), ...waterGatePiers()];
 
 /** nền đi được theo dốc mặt cầu: lát mỏng (0,45 m — bậc ≤ 0,55 m) dọc hướng băng qua — addPlatform(x, z, w, d, ry, top) */
 export function bridgePlatforms(b, step = 0.45) {

@@ -4,6 +4,7 @@
 //  tháp, cổng. Công trình trùm chưa có → dùng mô hình thường phóng to (fallback), không lỗi.
 //  Mỗi vùng chỉ nạp khi người chơi tới gần (≤ 1500 m — LOAD_R dòng ~444) — tiết kiệm bộ nhớ iPhone.
 // ============================================================================
+import { pailou } from './archcity/gates.js';
 import * as THREE from 'three';
 import * as T from './terrain.js';
 import { placeModel, instanceModel, instanceModelLod, loadModel, hasLod, warmObject, tickLazyLods, modelAvailable, viewInstances } from './assets.js';
@@ -382,7 +383,9 @@ SPOTS.push({ at: [0, 60], place: async (g) => {
   for (let z = 74; z <= 134; z += 12) for (const sx of [-1, 1]) posts.push({ x: sx * 6.5, y: H(sx * 6.5, z), z, ry: sx > 0 ? Math.PI : 0 });
   await lanternPosts(g, posts);
   // cổng chào giữa đại lộ + trạm xe ngoài cửa thành
-  await place(g, 'lib_paifang', { fit: { width: 26 }, at: { x: 0, y: 0, z: 104, ry: 0 }, keep: corridor(0, 104, 0, 4) });
+  // cổng chào: bài lâu 4 trụ 3 gian 3 lâu dựng thủ tục (docs/CONG-TRINH-LAM-LAI-MANIFEST.md §3.1) thay lib_paifang Meshy 26 × 11 m, 7 px/m
+  { const { group, info } = pailou({ mid: 5.6, side: 3.4, colH: 7.4, title: '朱 雀 市' }); group.position.set(0, H(0, 104), 104); g.add(group);
+    addFootprint(group, { keep: (x) => Math.abs(x) > info.gap / 2 - 0.3, fill: false }); }
   await place(g, 'lib_cart', { fit: { width: 4.2 }, at: { x: 10, y: H(10, 180), z: 180, ry: Math.PI / 2 } });
   await place(g, 'lib_horse', { fit: { height: 2.2 }, at: { x: 10, y: H(10, 184.5), z: 184.5, ry: Math.PI / 2 } });
 } });

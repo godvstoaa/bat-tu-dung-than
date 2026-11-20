@@ -364,6 +364,7 @@ export function startGame({ onExit = null } = {}) {
       if (work?.carrying()) { toast('📦 Đang áp hàng — ngựa trạm không chở kiện của phu. Đi bộ giao cho xong đã.'); return; }
       if (boat?.aboard()) { toast('⛵ Đang trên thuyền — trả thuyền ở bến trước đã.'); return; }
       const to = x == null ? START : worldToTile(x, z);
+      if (x != null) try { renderer?.prefetchAt?.(x, z); } catch (e) { /* dựng sẵn chỉ để mượt hơn */ } // trong lúc lớp phủ che màn (docs/TRE-DICH-CHUYEN-MANIFEST.md §4c)
       travelTo(to, label);
     },
     estate: net.estate,

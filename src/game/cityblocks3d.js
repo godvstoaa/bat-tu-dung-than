@@ -18,10 +18,17 @@ import { loadModel, instanceModel, warmObject, getModelQuality, makeShadowOnly }
 import { addSolidOBB, addSolidCircle, addSolidSegment, addTall } from './obstacles.js';
 import { addLight, glowAll } from './lights.js';
 import { place, pond, field, yard, arena, nameBoard, mats } from './batquai3d.js';
-import { footprints } from './collide.js'; // outerGates: hạ đỉnh leo trèo của footprint sau khi kẹp scale.y cổng (§4(5))
+import { footprints, addFootprint } from './collide.js'; // outerGates: footprint lầu cổng thủ tục
 import * as CN from './canals.js';
 import * as AK from './archkit.js';
 import { innerHouses } from './innerfill.js';
+import { procHouse, isProcHouse, procFar } from './archcity/houses.js';
+import { outerGateTower, watchHouse, cornerLou, instancedLod } from './archcity/citywall.js';
+import { archMats, boxUV, SPAN } from './archcity/mats.js';
+import { waterGateBody } from './archcity/watergate.js';
+import { weathered, spoutGeometry, SPOUT_STEP } from './archcity/weather.js';
+import { waterGates as bridgeWaterGates, waterGateFrame } from './bridges.js';
+import { WATER_LEVEL } from './waterways.js';
 import { stoneMaterial } from './ground-tex.js';
 import { renderHouses, allHouses } from './city4.js';
 
@@ -84,12 +91,18 @@ export function outerWall(grp, A = CB.OUTER_A, WH = 17) {
   const IN0 = -4.2, IN1 = -3.5, OUT0 = 9, OUT1 = 3.5;    // mặt trong gần đứng · mặt ngoài dốc ~9°
   const outAt = (y) => OUT0 - ((y + 3) / (TOP + 3)) * (OUT0 - OUT1);
   const G = { brick: [], plinth: [], cap: [], red: [], roof: [], gold: [] };
-  const merlons = [], flags = [];
+  const merlons = [], flags = [], watch = [], corners = [];
   const put = (list, geo, m) => { geo.applyMatrix4(m); list.push(geo); };
   // răng cưa dọc một cạnh: khung m, mặt u, chân y, từ z0 tới z1 (theo trục z của khung)
   const crenel = (m, u, y, z0, z1) => { const n = Math.max(1, Math.round((z1 - z0) / 3.1)); for (let i = 0; i < n; i++) merlons.push(new THREE.Matrix4().multiplyMatrices(m, new THREE.Matrix4().makeTranslation(u, y + 0.65, z0 + (i + 0.5) * (z1 - z0) / n))); };
+  // THỦY MÔN (docs/THUY-MON-MANIFEST.md): sông xuyên tường → các khúc 24 m phủ mặt nước (+ 12 m bờ mỗi bên) không dựng thân
+  // treo nữa; thân thủy môn (archcity/watergate.js) dựng liền khối trên đúng khoảng các khúc đó (tường chắn / răng cưa giữ)
+  const WGS = A > 1500 && !globalThis.__noWaterGate ? bridgeWaterGates().map((w) => ({ w, f: waterGateFrame(w) })) : [];
+  const wgOf = (g) => { const p0 = BQ.toWorld(g, A, 0), p1 = BQ.toWorld(g, A, 1), ex = p1.x - p0.x, ez = p1.z - p0.z, nn = Math.hypot(ex, ez); return WGS.map((q) => ({ ...q, v: ((q.w.x - p0.x) * ex + (q.w.z - p0.z) * ez) / nn, u: Math.abs(((q.w.x - p0.x) * g.dir[0] + (q.w.z - p0.z) * g.dir[1]) / Math.hypot(...g.dir)) })).filter((q) => q.u < 40 && Math.abs(q.v) < L + 5); };
+  const wgBuilt = [];
   for (const g of BQ.GUA) {
     const col = new THREE.Color(g.color || '#c8452e');
+    const gw = wgOf(g);
     for (const [v0, v1] of [[-L, -h], [h, L]]) {
       const len = v1 - v0, A0 = BQ.toWorld(g, A, v0), B0 = BQ.toWorld(g, A, v1), segRy = Math.atan2(-(B0.z - A0.z), B0.x - A0.x);
       // --- va chạm: thân dày (u −4,4…9,2) · mặt đi trên đỉnh · 4 dải mặt dốc bậc thang theo độ cao thật
@@ -97,17 +110,24 @@ export function outerWall(grp, A = CB.OUTER_A, WH = 17) {
       { const c = BQ.toWorld(g, A, (v0 + v1) / 2), y0 = H(c.x, c.z); addTall(c.x, c.z, len / 2, 3.9, segRy, y0 + TOP);
         for (let k = 0; k < 4; k++) { const u0 = 3.9 + k * 1.33, cc = BQ.toWorld(g, A + u0 + 0.66, (v0 + v1) / 2), yy = Math.min(TOP, ((OUT0 - u0) / (OUT0 - OUT1)) * (TOP + 3) - 3); addTall(cc.x, cc.z, len / 2, 0.67, segRy, y0 + Math.max(1, yy)); } }
       // --- thân: khúc 24 m bám địa hình; khúc qua sông (thủy môn) treo từ y = 1
-      const n = Math.max(1, Math.ceil(len / 24));
+      const n = Math.max(1, Math.ceil(len / 24)), wgSpan = new Map(); // thủy môn → [v đầu, v cuối] các khúc bỏ thân
       for (let i = 0; i < n; i++) {
         const vc = v0 + (i + 0.5) * len / n, l = len / n + 0.3, c = BQ.toWorld(g, A, vc), wet = H(c.x, c.z) < -1.5, y = wet ? 0 : H(c.x, c.z), m = frameOf(g, c.x, y, c.z);
         const yb = wet ? 1 : -3;
-        put(G.brick, prism([[IN0, yb], [outAt(yb), yb], [OUT1, TOP], [IN1, TOP]], l), m);
-        if (!wet) put(G.plinth, prism([[IN0 - 0.2, -3], [OUT0 + 0.4, -3], [outAt(3) + 0.4, 3], [IN0 - 0.2, 3]], l), m);
+        const q = gw.find((q) => Math.abs(vc - q.v) < q.f.wAlong / 2 + 12 + len / n / 2);
+        if (q) { const r = wgSpan.get(q) || [Infinity, -Infinity]; wgSpan.set(q, [Math.min(r[0], vc - len / n / 2), Math.max(r[1], vc + len / n / 2)]); }
+        else put(G.brick, prism([[IN0, yb], [outAt(yb), yb], [OUT1, TOP], [IN1, TOP]], l), m);
+        if (!wet && !q) put(G.plinth, prism([[IN0 - 0.2, -3], [OUT0 + 0.4, -3], [outAt(3) + 0.4, 3], [IN0 - 0.2, 3]], l), m);
         put(G.cap, prism([[OUT1 - 0.2, TOP - 0.7], [OUT1 + 0.6, TOP - 0.7], [OUT1 + 0.6, TOP - 0.1], [OUT1 - 0.2, TOP]], l), m); // diềm
         put(G.brick, prism([[OUT1 - 0.8, TOP], [OUT1, TOP], [OUT1, TOP + 1.4], [OUT1 - 0.8, TOP + 1.4]], l), m);              // tường chắn ngoài
         put(G.brick, prism([[IN1, TOP], [IN1 + 0.6, TOP], [IN1 + 0.6, TOP + 1.1], [IN1, TOP + 1.1]], l), m);                  // nữ tường trong
         put(G.cap, prism([[IN1 - 0.1, TOP + 1.1], [IN1 + 0.7, TOP + 1.1], [IN1 + 0.7, TOP + 1.3], [IN1 - 0.1, TOP + 1.3]], l), m);
         crenel(m, OUT1 - 0.4, TOP + 1.4, -l / 2, l / 2);
+      }
+      for (const [q, [va, vb]] of wgSpan) { // thân thủy môn liền khối trên khoảng khúc đã bỏ, tâm sông lệch zOff theo trục dọc khung
+        const vm = (va + vb) / 2, c = BQ.toWorld(g, A, vm), m = frameOf(g, c.x, 0, c.z), ez = new THREE.Vector3().setFromMatrixColumn(m, 2), e1 = BQ.toWorld(g, A, vm + 1), sgn = Math.sign((e1.x - c.x) * ez.x + (e1.z - c.z) * ez.z) || 1;
+        const body = waterGateBody({ span: vb - va + 0.3, zOff: sgn * (q.v - vm), wAlong: q.f.wAlong, TOP, IN0, OUT1, water: WATER_LEVEL });
+        body.applyMatrix4(m); body.name = `thuymon:${q.w.id}`; grp.add(body); wgBuilt.push(q.w.id);
       }
       // --- cờ đuôi nheo mỗi 30 m (màu hành của cung)
       for (let v = v0 + 15; v < v1 - 5; v += 30) { const c = BQ.toWorld(g, A + OUT1 - 0.4, v), y = Math.max(0, H(c.x, c.z)); flags.push({ x: c.x, y: y + TOP + 2.7, z: c.z, ry: segRy, col }); }
@@ -127,10 +147,7 @@ export function outerWall(grp, A = CB.OUTER_A, WH = 17) {
         }
         // lầu canh: nền đá, thân son, hiên, mái chóp ngói, chóp vàng
         { const base = boxM(9, 0.6, 12); base.translate(10, TOP + 0.3, 0); put(G.plinth, base, m);
-          const body = boxM(7, 4.5, 10); body.translate(10, TOP + 0.6 + 2.25, 0); put(G.red, body, m);
-          const eave = boxM(9.4, 0.35, 12.6); eave.translate(10, TOP + 5.2, 0); put(G.cap, eave, m);
-          const roof = new THREE.ConeGeometry(1, 1, 4, 1); roof.rotateY(Math.PI / 4); roof.scale(6.6, 3.4, 9); roof.translate(10, TOP + 5.1 + 1.7, 0); put(G.roof, roof, m);
-          const tip = new THREE.SphereGeometry(0.45, 8, 6); tip.translate(10, TOP + 8.6, 0); put(G.gold, tip, m); }
+          watch.push(new THREE.Matrix4().multiplyMatrices(m, new THREE.Matrix4().makeTranslation(10, TOP + 0.6, 0))); } // lầu canh thủ tục (archcity/citywall.watchHouse) — trước: hộp son + nón 4 cạnh
         { const cc = BQ.toWorld(g, A + 11, vb); addSolidOBB(cc.x, cc.z, 8.2, 12.2, axisRy(g)); addTall(cc.x, cc.z, 8.2, 12.2, axisRy(g), y + TOP);
           const ch = BQ.toWorld(g, A + 10, vb); addTall(ch.x, ch.z, 3.6, 5.1, axisRy(g), y + TOP + 5.2); }
       }
@@ -145,26 +162,44 @@ export function outerWall(grp, A = CB.OUTER_A, WH = 17) {
     add(G.cap, new THREE.CylinderGeometry(15.8, 15.6, 0.7, 8), TOP - 0.35);
     add(G.brick, new THREE.CylinderGeometry(15.4, 15.4, 1.4, 8, 1, true), TOP + 0.7);
     add(G.plinth, new THREE.CylinderGeometry(11, 11.5, 0.8, 8), TOP + 0.4);
-    add(G.red, new THREE.CylinderGeometry(8, 8, 6, 8), TOP + 0.8 + 3);
-    add(G.cap, new THREE.CylinderGeometry(11.6, 11.6, 0.4, 8), TOP + 6.9);
-    add(G.roof, new THREE.ConeGeometry(12.5, 4.2, 8), TOP + 6.8 + 2.1);
-    add(G.red, new THREE.CylinderGeometry(5.6, 5.6, 4.6, 8), TOP + 8.6 + 2.3);
-    add(G.roof, new THREE.ConeGeometry(8.6, 4.4, 8), TOP + 13.2 + 2.2);
-    add(G.gold, new THREE.SphereGeometry(0.8, 10, 8), TOP + 17.6);
+    corners.push({ x: p.x, y: y + TOP + 0.8, z: p.z, ry: Math.atan2(p.x, p.z) }); // giác lâu 2 tầng thủ tục — trước: trụ son + 2 nón + quả cầu
     for (let k = 0; k < 8; k++) {
       const a = (k + 0.5) * Math.PI / 4 + Math.PI / 8, x = p.x + Math.cos(a) * 15.1, z = p.z + Math.sin(a) * 15.1, t = a + Math.PI / 2;
       for (const s of [-1, 1]) merlons.push(new THREE.Matrix4().compose(new THREE.Vector3(x + Math.cos(t) * s * 2.6, y + TOP + 2.05, z + Math.sin(t) * s * 2.6), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -a), new THREE.Vector3(1, 1, 1)));
     }
     addSolidCircle(p.x, p.z, 17); addTall(p.x, p.z, 15, 15, Math.PI / 8, y + TOP);
   }
-  // --- gộp theo vật liệu
+  // --- gộp theo vật liệu — (2026-11-19) vật liệu lặp theo mét (gạch xanh / đá / vữa đỏ / ngói, archcity/mats.js), UV chiếu hộp theo mét thế giới
+  const AM = archMats(), WM = { brick: AM.brick, plinth: AM.stone, cap: AM.brickDark, red: AM.plasterRed, roof: AM.tileGray, gold: W.gold };
+  // (2026-11-20) phong hoá mặt tường (archcity/weather.js, docs/VET-BAN-TUONG-MANIFEST.md): bản sao riêng của tường — nhà khác không đổi
+  const WX = !globalThis.__noWallWeather;
+  if (WX) for (const k of ['brick', 'plinth', 'cap']) WM[k] = weathered(WM[k], { top: TOP });
+  if (WX) grp.traverse((o) => { if (o.isMesh && o.name === 'wg-brick') o.material = WM.brick; }); // thân thủy môn cùng phong hoá
   for (const [k, list] of Object.entries(G)) {
     if (!list.length) continue;
-    const geo = mergeGeometries(list.map((q) => (q.index ? q.toNonIndexed() : q)), false); list.forEach((q) => q.dispose());
-    const o = new THREE.Mesh(geo, W[k]); o.castShadow = k !== 'gold'; o.receiveShadow = true; o.name = `wall-${k}`; grp.add(o);
+    let geo = mergeGeometries(list.map((q) => (q.index ? q.toNonIndexed() : q)), false); list.forEach((q) => q.dispose());
+    if (WM[k].userData.tiled) geo = boxUV(geo, { span: SPAN[WM[k].userData.tiled], roof: k === 'roof' });
+    const o = new THREE.Mesh(geo, WM[k]); o.castShadow = k !== 'gold'; o.receiveShadow = true; o.name = `wall-${k}`; grp.add(o);
   }
+  grp.add(instancedLod(watchHouse().group, watch, { near: 260, hide: 1600, name: 'wall-watch' }));
+  grp.add(instancedLod(cornerLou().group, corners.map((c) => new THREE.Matrix4().makeRotationY(c.ry).setPosition(c.x, c.y, c.z)), { near: 320, hide: 2600, name: 'wall-cornerlou' }));
   // răng cưa (nhân bản): 2,0 × 1,3 × 0,8 m
-  { const geo = boxM(0.8, 1.3, 2.0); const im = new THREE.InstancedMesh(geo, W.brick, merlons.length); merlons.forEach((mm, i) => im.setMatrixAt(i, mm)); im.castShadow = true; im.receiveShadow = true; im.name = 'wall-merlons'; grp.add(im); }
+  { const geo = boxUV(boxM(0.8, 1.3, 2.0), { span: SPAN.brick }); const im = new THREE.InstancedMesh(geo, AM.brickDark, merlons.length); merlons.forEach((mm, i) => im.setMatrixAt(i, mm)); im.castShadow = true; im.receiveShadow = true; im.name = 'wall-merlons'; grp.add(im); }
+  // máng thoát nước mặt trong mỗi SPOUT_STEP m (tường Tây An: 40–60 m) — đặt đúng chỗ shader vẽ vệt sẫm (s ≡ 0 mod bước)
+  if (WX && A > 1500) {
+    const spouts = [];
+    for (const g of BQ.GUA) {
+      const d = Math.hypot(...g.dir), nx = -g.dir[0] / d, nz = -g.dir[1] / d, tx = -nz, tz = nx; // pháp tuyến mặt trong, tiếp tuyến như shader
+      const P = (v) => BQ.toWorld(g, A + IN1, v), p0 = P(0), p1 = P(1), k = (p1.x - p0.x) * tx + (p1.z - p0.z) * tz, s0 = p0.x * tx + p0.z * tz;
+      for (let j = Math.ceil(Math.min(s0 - k * L, s0 + k * L) / SPOUT_STEP); j * SPOUT_STEP <= Math.max(s0 - k * L, s0 + k * L); j++) {
+        const v = (j * SPOUT_STEP - s0) / k; if (Math.abs(v) < h + 20 || Math.abs(v) > L - 30) continue;
+        const c = P(v), y = Math.max(0, H(c.x, c.z)); if (H(c.x, c.z) < -1.5) continue; // không đặt trên thủy môn / mặt nước
+        spouts.push(new THREE.Matrix4().makeRotationY(Math.atan2(-nz, nx)).setPosition(c.x, y + TOP - 0.6, c.z));
+      }
+    }
+    const im = new THREE.InstancedMesh(boxUV(spoutGeometry(), { span: SPAN.stone }), AM.stone, spouts.length); spouts.forEach((m, i) => im.setMatrixAt(i, m));
+    im.castShadow = im.receiveShadow = true; im.name = 'wall-spouts'; grp.add(im);
+  }
   // cờ: cán + lá đuôi nheo (màu theo hành của cung)
   if (flags.length) {
     const pole = new THREE.CylinderGeometry(0.07, 0.09, 5.4, 5), flag = new THREE.BufferGeometry();
@@ -176,10 +211,19 @@ export function outerWall(grp, A = CB.OUTER_A, WH = 17) {
   }
 }
 const corridor = (x, z, ry, hw) => (px, pz) => Math.abs(Math.cos(ry) * (px - x) - Math.sin(ry) * (pz - z)) > hw;
+let OGT = null;
 export async function outerGates(grp, A = CB.OUTER_A, WH = 17) {
   for (const g of BQ.GUA) {
     const p = BQ.toWorld(g, A, 0), ry = BQ.faceAxis(g, true);
     if (CN.inCanal(p.x, p.z)) { waterGate(grp, g, A, WH); continue; } // kênh xuyên tường: thủy môn
+    // (2026-11-19) lầu cổng thủ tục (archcity/citywall.outerGateTower) thay city_gate Meshy (trắng loang, thấp hơn tường 34 m):
+    //   đài gạch cao tới mặt tường, 3 vòm (giữa 14 m), lầu 7 gian 2 tầng đấu củng; tâm đài ở giữa bề dày tường (u + 2,4)
+    if (A > 500) {
+      OGT ||= outerGateTower({ W: CB.OUTER_GATE_W * 1.45, D: 18, H: WH - 0.5 });
+      const c = BQ.toWorld(g, A + 2.4, 0), o = OGT.group.clone(); o.position.set(c.x, H(c.x, c.z), c.z); o.rotation.y = ry; o.name = 'outergate'; grp.add(o);
+      addFootprint(o, { keep: corridor(c.x, c.z, ry, OGT.info.gap / 2 - 0.5) });
+      continue;
+    }
     const r = await place(grp, ['city_gate', 'gate_sect'], { fit: { width: CB.OUTER_GATE_W * (A > 500 ? 1.45 : 1.25) }, at: { x: p.x, y: H(p.x, p.z), z: p.z, ry }, keep: corridor(p.x, p.z, ry, 6) });
     // §4(5) (vá 2026-11-14): cổng thành Ngoại (A > 500 ⇒ fit 56×1,45 = RỘNG 81 m) bùng CAO tới
     // ~62,7 m vì model cao/rộng ≈ 0,77 — kẹp scale.y × 0,61 về đỉnh ~38 m (quy chiếu Thiên An Môn
@@ -238,10 +282,10 @@ function waterGate(grp, g, A, WH) {
 // bản .lod2 (texture 256) giữ hệ số kim loại của bản gốc nhưng mất chi tiết bản đồ → nhà trông như bạc;
 // dùng vật liệu riêng không kim loại, nhám
 const MATTE = new Map();
-const matte = (m) => { if (!MATTE.has(m)) { const c = m.clone(); c.metalness = 0; c.metalnessMap = null; c.roughness = 0.9; c.roughnessMap = null; MATTE.set(m, c); } return MATTE.get(m); };
+const matte = (m) => { if (m.vertexColors) return m; if (!MATTE.has(m)) { const c = m.clone(); c.metalness = 0; c.metalnessMap = null; c.roughness = 0.9; c.roughnessMap = null; MATTE.set(m, c); } return MATTE.get(m); };
 // bậc gần / sát: giữ bản đồ nhám nhưng bỏ kim loại → cùng họ sắc với bậc vừa (hết «đổi màu» khi qua ngưỡng 40 m)
 const DIEL = new Map();
-const diel = (m) => { if (!DIEL.has(m)) { const c = m.clone(); c.metalness = 0; c.metalnessMap = null; c.roughness = Math.max(0.75, c.roughness); DIEL.set(m, c); } return DIEL.get(m); };
+const diel = (m) => { if (m.vertexColors) return m; if (!DIEL.has(m)) { const c = m.clone(); c.metalness = 0; c.metalnessMap = null; c.roughness = Math.max(0.75, c.roughness); DIEL.set(m, c); } return DIEL.get(m); };
 // Tỷ lệ nhà thật (2026-11-10): mô hình giữ tỷ lệ gốc theo mặt tiền (nhà 2 tầng ≈ 7–8 m, 1 tầng 4–6 m bên cạnh người 1,72 m);
 // bỏ «×1,3 phố tu tiên» + kéo cao ngẫu nhiên (từng làm nhà 11–16 m, cửa cao ~3 m). Nhà liền vách: mẫu lấp đủ bề ngang lô
 // (chồng mép mái 1,5%) — mẫu đổi ở lớp hình không còn bị thu hẹp để hở hai bên; chiều sâu ép vừa lô khi mẫu sâu hơn.
@@ -249,6 +293,12 @@ const diel = (m) => { if (!DIEL.has(m)) { const c = m.clone(); c.metalness = 0; 
 // nhánh HCAP): bản 2 tầng AAA kẹp 8,6 (luật 8,0 ± 0,6), bản gác lửng C kẹp 6,8; bản 1 tầng tự thấp.
 const HCAP = { bq_drum_tower: 16, bq_tower_house: 11, bq_granary: 10, bq_yamen: 12, lib_lib_house_a2: 8.6, lib_lib_house_b2: 8.6, lib_house_c2: 6.8 };
 export const houseScale = (h, size) => {
+  // nhà thủ tục (archcity/houses.js): CAO GIỮ NGUYÊN theo người (±4 %), chỉ co ngang theo lô và sâu kẹp 0,8–1,35
+  if (isProcHouse(h.id)) {
+    const kx = ((h.lotF || h.f) * 1.015) / (size.x || 1), kz = h.d ? Math.min(1.35, Math.max(0.8, h.d / (size.z || 1))) : 1;
+    const ky = 0.97 + (((Math.abs(Math.sin(h.x * 12.9898 + h.z * 78.233)) * 43758.5453) % 1) * 0.07);
+    return { kx, ky, kz };
+  }
   const kx = ((h.lotF || h.f) * 1.015) / (size.x || 1);
   const kz = h.d ? (h.ht ? Math.min(kx * 1.5, h.d / (size.z || 1)) : Math.min(kx, h.d / (size.z || 1))) : kx; // v5: nhà ống — kéo sâu tới 1,5× cho kín lô
   // v5 (THANH-MANIFEST §3.5): chiều cao mái đích theo cấp đường (city4 đã chọn model gần đích; kéo dọc ≤ 0,85–1,25 lần)
@@ -258,6 +308,7 @@ export const houseScale = (h, size) => {
   return { kx, ky, kz };
 };
 export const houseHeight = (h, sp) => {
+  if (isProcHouse(h.id)) return procHouse(h.id).H;
   const nat = (h.lotF || h.f) * 1.015 * sp.hd;
   if (h.ht) return Math.min(nat * 1.25, Math.max(nat * 0.85, h.ht));
   return Math.min(nat * (1 + Math.min(0.12, Math.max(-0.04, ((h.ys || 1) - 1) * 0.2))), HCAP[h.id] || 10.5);
@@ -433,7 +484,7 @@ export async function cityHouses(grp) {
   const models = [];
   const ids = Object.keys(CB.HOUSE_SPECS).filter((id) => houses.some((h) => h.id === id));
   // v4: bậc vừa dùng .lod1 (sạch) — .lod2 giản lược quá tay, hình nhà nát vụn (kiểm 2026-11-11: dựng nhân bản riêng .lod2 vs .lod1)
-  const loadMid = async (id) => (CB.HOUSE_SPECS[id]?.mid && (await loadModel(`${id}.${CB.HOUSE_SPECS[id].mid}`))) || (await loadModel(`${id}.vc`)) || (await loadModel(`${id}.lod1`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`)); // bậc vừa: .vc (màu nướng vào đỉnh, không vỡ mảnh — scripts/meshy-vclod.mjs)
+  const loadMid = async (id) => (isProcHouse(id) && procHouse(id).mid) || (CB.HOUSE_SPECS[id]?.mid && (await loadModel(`${id}.${CB.HOUSE_SPECS[id].mid}`))) || (await loadModel(`${id}.vc`)) || (await loadModel(`${id}.lod1`)) || (await loadModel(`${id}.far`)) || (await loadModel(`${id}.lod`)); // bậc vừa: .vc (màu nướng vào đỉnh, không vỡ mảnh — scripts/meshy-vclod.mjs)
   const addModel = (id, g, g2) => {
     const mine = houses.map((h, i) => (h.id === id ? i : -1)).filter((i) => i >= 0);
     const list = mine.map((i) => houses[i]);
@@ -444,7 +495,7 @@ export async function cityHouses(grp) {
     models.push({ id, mine, list, local: new Map(mine.map((hi, j) => [hi, j])), close: null, near: null, nearSh: null, gMid: g, mid, far2, want: new Set(), busy: new Set() });
   };
   const base = await Promise.all(ids.map(loadMid));
-  const base2 = await Promise.all(ids.map((id) => loadModel(`${id}.vc2`))); // bậc xa (~2,5k tam giác, ~70 KB/mẫu) — thay khối hộp tới FAR_VC
+  const base2 = await Promise.all(ids.map((id) => (isProcHouse(id) ? procFar(id) : loadModel(`${id}.vc2`)))); // bậc xa (~2,5k tam giác, ~70 KB/mẫu) — thay khối hộp tới FAR_VC
   // mẫu nạp lỗi lúc dựng (mạng chập chờn) — thử lại định kỳ trong update (tự lành; trước đây mất hẳn cả phiên)
   const missing = new Set();
   ids.forEach((id, n) => { if (base[n]) addModel(id, base[n], base2[n]); else missing.add(id); });
@@ -459,7 +510,7 @@ export async function cityHouses(grp) {
       /* 2026-11-12: nhà gần dùng bản .bk (Blender: 12k tam giác, màu + pháp tuyến + AO nướng từ bản gốc ~80k — scripts/blender-bake.mjs,
          docs/DOHOA-MANIFEST.md §3.1). Thiếu .bk thì bản gốc (.lod1 / .mid cũ vỡ mảnh, không dùng ở gần) */
       const nearSuf = CB.HOUSE_SPECS[m.id]?.near; // mẫu khai bậc gần riêng (HOUSE_SPECS.near — nhà AAA dựng thủ tục: .lod sạch)
-      const g = (nearSuf && (await loadModel(`${m.id}.${nearSuf}`))) || (await loadModel(`${m.id}.bk`)) || (await loadModel(m.id)) || (await loadModel(`${m.id}.vc`)) || (await loadModel(`${m.id}.lod1`));
+      const g = (isProcHouse(m.id) && procHouse(m.id).near) || (nearSuf && (await loadModel(`${m.id}.${nearSuf}`))) || (await loadModel(`${m.id}.bk`)) || (await loadModel(m.id)) || (await loadModel(`${m.id}.vc`)) || (await loadModel(`${m.id}.lod1`));
       if (!g) return;
       // bóng nhà gần: đổ bằng bản .vc (~9k) VÔ HÌNH thay bản gốc 80k — bóng ở độ phân giải bản đồ bóng không khác,
       // mà lượt bóng bớt ~70k tam giác / nhà (đo 2026-11-12: 9 nhà gần = ~720k tam giác chỉ để vẽ bóng)

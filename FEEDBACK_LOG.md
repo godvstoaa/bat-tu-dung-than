@@ -36,6 +36,36 @@ AI ghi vào đây MỖI KHI người dùng không hài lòng, và đọc lại �
 - **Kết quả**: chưa phản hồi
 - **Rút thành luật?**: có → mỗi công trình phải có nguyên mẫu + số đo có nguồn + danh sách cấu kiện nhận diện trước khi vẽ / dựng
 
+### 2026-11-18 — Nhân vật: động tác lặp
+- **Nguyên văn**: "có hàng trăm ngàn động tác trên meshy đó ko chỉ có mỗi đi bộ đâu, đừng có lặp lại"
+- **Lần thứ**: 1 về động tác nhân vật
+- **Chẩn đoán**: mọi nhân vật dùng chung 6 clip cố định (đứng / đi / chạy / ngồi / cúi / vẫy), cùng nhịp; phố toàn 4 khuôn áo đỏ / ngọc.
+- **Đã đổi**: gom động tác do tác giả các bài đăng Meshy cộng đồng gắn sẵn thành thư viện 16 clip, ghép sang mọi rig theo không gian
+  thế giới (`tools/nhanvat.js`); mỗi bản sao bốc kiểu đi riêng, đổi kiểu đứng 6–14 s, lệch pha, NPC chen cử chỉ (characters.js);
+  thêm 3 NPC mới + nam / nữ mới. Manifest `docs/NHAN-VAT-MESHY-MANIFEST.md`.
+- **Bằng chứng**: trước / sau `output/nhanvat/perf/so-sanh-vong.jpg`; mọi clip `output/nhanvat/test/*-clips.jpg`
+- **Kết quả**: chưa phản hồi
+- **Rút thành luật?**: có → nhân vật đứng gần nhau không được cùng động tác / cùng pha; ưu tiên động tác có sẵn trong model cộng đồng (miễn phí)
+
+### 2026-11-19 — Công trình thành: nhà bé, mờ, cổng lọt thỏm, cây dựng ẩu
+- **Nguyên văn**: "Rất nhiều nhà có kích thước bé tẹo ko hợp lý tra lại toàn bộ đi" · "Rất nhiều công trình còn mờ và xấu, bỏ đi làm lại hết" ·
+  "Phần mở đầu có cái cổng … lọt thỏm giữa cái tường thành … tôi yêu cầu nét căng mà vẫn đẹp nhẹ … rà làm lại tất, toàn bộ cây cỏ trong bản đồ những cây nào dựng ẩu xấu cũng thay thế hết"
+- **Lần thứ**: 2 về chất lượng công trình thành (lần 1: «phố chưa ra phố phường» — THANH-MANIFEST v5.1); 1 về cỡ nhà; 2 về cây (lần 1 ở tiên phủ)
+- **Chẩn đoán** (đo, `scripts/scan-scene.mjs`): Meshy 1 texture 1024 kéo cả công trình → 7 px/m (paifang), 36 (sơn môn), 20–50 (nhà);
+  sơn môn 14 × 8,2 m kẹp giữa tường 7,4 m, hở 4 m mỗi bên; nhà đá chen 2,9 m tới nóc; tường / tháp / cây cầu–nón khối thô.
+- **Đã đổi (phương pháp mới)**: bỏ Meshy cho công trình → dựng thủ tục bằng bộ kiến trúc Trung Hoa (tienphu/arch/cn.js) + texture lặp theo mét
+  (7 vật liệu, 1,9 MB, 254–1022 px/m); nhà cao theo NGƯỜI (cửa 2,35 m) không theo bề ngang lô; cây → model Meshy CC0 lib_tp_*.
+  Manifest `docs/CONG-TRINH-LAM-LAI-MANIFEST.md`.
+- **Bằng chứng**: `output/lamlai/so-sanh-cong.jpg`, `output/lamlai/so-sanh-san.jpg` (trước / sau cùng góc), `output/lamlai/v1/sheet3–14.jpg`
+- **Đợt sau (người dùng chọn «Làm tiếp sân sơn môn»)**: Chính Đường, điện phụ, chung / cổ lâu, 4 bảo tháp, đình Tàng Y dựng thủ tục; nền / lan can sang vật liệu lặp; sửa 700 tấm cây dồn ở bệ thầy
+- **Đợt «Đồ nhỏ trong sân»**: đèn đá, cột cờ dựng lại; bảng vật liệu chung chiếu ba mặt theo mét
+- **Đợt «Làm Ngoại Thành»**: tường 34 m vật liệu gạch lặp, 8 lầu cổng + 64 lầu canh + 8 giác lâu thủ tục (ảnh `output/lamlai/so-sanh-ngoai-thanh.jpg`)
+- **Đợt «Vệt bẩn mặt tường»** (2026-11-20): tường 34 m một màu → shader phong hoá theo toạ độ thế giới (vệt nước dưới mũ / khe răng cưa, muối trắng, rêu chân tường, mảng vá, loang) + 290 máng thoát nước mặt trong kiểu Tây An (`docs/VET-BAN-TUONG-MANIFEST.md`, ảnh `output/vetban/so-sanh-vet-ban.jpg`)
+- **Đợt «Thủy môn»** (2026-11-20): 3 chỗ sông xuyên tường 34 m (thân tường treo phẳng trên mặt nước) → thủy môn 3 tầng vòm kiểu Đông Thủy Quan Nam Kinh + áp quan Bàn Môn, trụ mũi rẽ nước có va chạm thuyền (`docs/THUY-MON-MANIFEST.md`, ảnh `output/thuymon/so-sanh-thuy-mon.jpg`)
+- **Đợt «Làm biệt phủ»** (2026-11-20): 16 phủ + 240 biệt thự bỏ hộp / nón / texture canvas (archkit-style) → bộ kiến trúc tiên phủ theo 8 họ phong cách dựng đúng khuôn lô (`docs/BIET-PHU-MANIFEST.md`); cây → lib_tp_* cỡ vườn; ao viền đá xếp + đá nhiễu; tường rào vật liệu lặp + mũ ngói; biệt thự 3 biến thể
+- **Kết quả**: chưa phản hồi
+- **Rút thành luật?**: có → công trình không dùng texture duy nhất phủ cả nhà; mật độ texel gần ≥ 256 px/m; chiều cao nhà theo người (cửa ≥ 2,1 m), không phóng theo lô
+
 ### <ngày> — <asset / hạng mục>
 - **Nguyên văn**: "<lời người dùng>"
 - **Lần thứ**: <1 | 2 | 3> về vấn đề này

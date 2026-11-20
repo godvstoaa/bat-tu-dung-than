@@ -5,6 +5,9 @@
 // ============================================================================
 import { crisisActive } from '../engine/crisis.js';
 import * as THREE from 'three';
+// gió v2 cây phố (fx-foliage.js — mô-đun của phiên đồ hoạ cỏ / gió): nạp mềm qua glob → thiếu file thì bỏ qua (compileLike vẫn chạy)
+let sweepCityWind = () => {};
+for (const ld of Object.values(import.meta.glob('./fx-foliage.js'))) ld().then((m) => { if (m.sweepCityWind) sweepCityWind = m.sweepCityWind; }).catch(() => {});
 import { span, record } from './perf.js';
 import * as MD from './models.js';
 import * as TX from './textures.js';
@@ -22,6 +25,7 @@ import { ROBE } from './render.js';
 import { hasStation, TEXT } from './features.js';
 import { createWorld, QUALITY } from './world3d.js';
 import { createLandmarks } from './landmarks.js';
+import { cityTrees } from './archcity/trees.js';
 import { setModelQuality, setWarmup, settleLods, loadModel as loadGlb, placeModel, instanceModel } from './assets.js';
 import { createCharacter, setViewer, NPC_TINT } from './characters.js';
 import { poseOf } from './flight-poses.js';
@@ -45,7 +49,7 @@ import { registerJobPlaces } from './jobplaces.js';
 import * as RZ from './raze.js';
 import { homeInfoOf } from './rooms.js';
 import { setEstateOwner, setEstateLookup } from './cityident3d.js';
-import { buildSect } from './sect.js';
+import { buildSect, COURT_TREES } from './sect.js';
 import { createOutfit } from './accessories.js';
 import { ITEM, decodeCos } from './cosmetics.js';
 import { addFootprint, footprintIdle } from './collide.js';
@@ -128,6 +132,7 @@ function timeLook(hour) {
 export function create3D(canvas, { onTap, reduced = false } = {}) {
   const coarse = matchMedia('(pointer: coarse)').matches;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !coarse, powerPreference: 'high-performance' });
+  if (globalThis.__noShaderCheck) renderer.debug.checkShaderErrors = false; // đo: getProgramInfoLog đồng bộ lúc dùng lần đầu (docs/TRE-DICH-CHUYEN-MANIFEST.md)
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -410,15 +415,16 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
 
   // cây (vị trí theo PROPS của world.js) + trúc ngoài tường
   const trees = [];
-  for (const [kind, x, z, seed] of [['peach', -31, 34, 1], ['pine', 31, 34, 2], ['peach', -31, 15, 3], ['pine', 31, 15, 4], ['peach', -12, 60, 5], ['peach', 12, 60, 6]]) {
-    const t = kind === 'peach' ? MD.peachTree(seed) : MD.pineTree(seed);
-    t.position.set(x, 0, z); t.rotation.y = seed;
-    if (kind === 'peach') trees.push(t);
-    MD.mergeStatic(t); scene.add(t); addFootprint(t, { hi: 1.3, fill: false });
+  // (2026-11-19, docs/CONG-TRINH-LAM-LAI-MANIFEST.md §2.3) cây khối thô (đào 9 cầu, tùng nón, tre lá nón) → model Meshy CC0
+  //   lib_tp_*: anh đào ở 4 chỗ đào cũ, tùng đen ở 2 chỗ tùng, trắc bách thay 11 bụi tre (sân đạo quán: bách cổ)
+  const courtTreeList = [];
+  for (const [kind, x, z, s] of [['sakura', -31, 34, 0.9], ['kuromatsu', 31, 34, 0.95], ['sakura', -31, 15, 1], ['kuromatsu', 31, 15, 0.85], ['sakura', -12, 60, 0.85], ['sakura', 12, 60, 0.9]]) {
+    courtTreeList.push({ kind, x, z, s });
   }
   for (const [x, z, s] of [[-46, 36, 1], [-46, 44, 2], [-34, 45, 3], [46, 36, 4], [46, 44, 5], [34, 45, 6], [-46, 20, 7], [-34, 19, 8], [46, 18, 9], [56, 2, 10], [-56, 2, 11]]) {
-    const b = MD.bambooClump(s); b.position.set(x, 0, z); MD.mergeStatic(b); scene.add(b); addFootprint(b, { hi: 1.5, fill: false });
+    courtTreeList.push({ kind: 'kuromatsu', x, z, s: 0.85 + (s % 4) * 0.06 }); // tùng đen thấp (baichcn = model buxu phóng 10 m: lá to như lá chuối ở gần)
   }
+  const courtTrees = cityTrees(scene, [...courtTreeList, ...COURT_TREES]);
   const rocks = MD.floatingRocks(); scene.add(rocks);
   // đá trôi thành đảo nổi lơ lửng trên Huyền Thành (cao 140–260 m)
   rocks.children.forEach((r, i) => { r.position.x *= 6; r.position.z *= 6; r.position.y = 140 + (i * 37) % 120; r.scale.setScalar(3 + (i % 3)); });
@@ -1080,6 +1086,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       for (const d of deskMarks) d.g.position.y = world.groundY(d.g.position.x, d.g.position.z, T.heightAt(d.g.position.x, d.g.position.z) + 1);
     }
     span('f:landmarks', () => landmarks.update(w.x, w.z));
+    courtTrees.update(w.x, w.z);
     av.rotation.y = avState.heading;
     MD.poseAvatar(av, { walk: avState.walk, phase: avState.phase, sitting: p.sitting, idle: t });
 
@@ -1243,7 +1250,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // trà, cây, mở khoá
     if (S.teaColor) for (const c of teaG.userData.cups || []) c.material.color.set(S.teaColor);
     const bloom = !!S.peachBloom;
-    if (trees[0].userData.bloom !== bloom) for (const tr of trees) { tr.userData.bloom = bloom; tr.userData.crown.traverse((o) => { if (o.isMesh) o.material = bloom ? mats.blossom : mats.leaf; }); }
+    if (trees.length && trees[0].userData.bloom !== bloom) for (const tr of trees) { tr.userData.bloom = bloom; tr.userData.crown.traverse((o) => { if (o.isMesh) o.material = bloom ? mats.blossom : mats.leaf; }); }
     petals.visible = bloom && !lowQuality && !reduced;
     extraLanterns.visible = !!S.lanterns;
     craneG.visible = !!S.crane;
@@ -1282,7 +1289,7 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       });
     }
     dust.visible = !lowQuality;
-    petals.position.set(trees[0].position.x, 0, trees[0].position.z);
+    petals.position.set(-31, 0, 34); // cánh hoa rơi dưới cây anh đào sân Tây (courtTreeList[0])
 
     // khách hỏi việc: đổi màu áo theo khách trong ngày, nhìn về phía người chơi khi lại gần
     for (const cn of caseNpcs) {
@@ -1545,8 +1552,50 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
       if (performance.now() - t0 > budgetMs) { await nextFrame(); t0 = performance.now(); }
     }
   }
+  /**
+   * BIÊN DỊCH TRƯỚC ĐÚNG BIẾN THỂ SẼ VẼ (docs/TRE-DICH-CHUYEN-MANIFEST.md §4e). Hai lỗi đo được 2026-11-20 (travel-probe DIAG):
+   *  1 · khoá chương trình phụ thuộc đích vẽ: vẽ thật qua EffectComposer (RenderPass → render target: không tone mapping,
+   *      đầu ra tuyến tính) còn compile() chạy với đích = màn hình (ACES + sRGB) → mọi bản làm nóng là BIẾN THỂ SAI, bản
+   *      dùng thật vẫn biên dịch đồng bộ lúc vẽ. Nay đặt đích = bộ đệm của composer trong phần đồng bộ của compileAsync.
+   *  2 · compile() chỉ duyệt vật đang hiện → bật tạm vật ẩn (bậc chi tiết chưa tới, thân bậc vừa, nhân bản chờ cắt, cây).
+   */
+  //  3 · BIẾN THỂ BÓNG (§4f): compile() không biên dịch chương trình lượt bóng. WebGLShadowMap.getDepthMaterial dùng
+  //      object.customDepthMaterial (cây gió …) hoặc MeshDepthMaterial(RGBA) chung, rồi gán side = shadowSide[material.side]
+  //      (đảo trước / sau), map / alphaMap / alphaTest / displacement của vật liệu gốc → dựng lưới thay thế mang đúng vật
+  //      liệu bóng đó (cùng hình học, cùng cờ nhân bản) và biên dịch chung, đích là render target tuyến tính như bản đồ bóng.
+  const SHADOW_SIDE = { [THREE.FrontSide]: THREE.BackSide, [THREE.BackSide]: THREE.FrontSide, [THREE.DoubleSide]: THREE.DoubleSide };
+  const depthRT = new THREE.WebGLRenderTarget(1, 1);
+  function depthProxies(obj) {
+    const g = new THREE.Group();
+    obj.traverse((o) => {
+      if (!o.isMesh || (!o.castShadow && !o.customDepthMaterial) || o.isSkinnedMesh || !o.geometry) return; // cây: bậc gần bật đổ bóng lúc chạy — vẫn có customDepthMaterial sẵn
+      for (const m of [].concat(o.material)) {
+        if (!m) continue;
+        const d = o.customDepthMaterial || new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
+        d.side = m.shadowSide !== null && m.shadowSide !== undefined ? m.shadowSide : SHADOW_SIDE[m.side];
+        d.map = m.map || null; d.alphaMap = m.alphaMap || null; d.alphaTest = m.alphaTest || 0;
+        d.displacementMap = m.displacementMap || null; d.displacementScale = m.displacementScale ?? 1;
+        const px = o.isInstancedMesh ? new THREE.InstancedMesh(o.geometry, d, 1) : new THREE.Mesh(o.geometry, d);
+        if (o.isInstancedMesh) px.instanceColor = o.instanceColor;
+        px.castShadow = true; px.receiveShadow = o.receiveShadow; px.matrixWorld.copy(o.matrixWorld); px.matrixAutoUpdate = false;
+        g.add(px);
+      }
+    });
+    return g;
+  }
+  function compileLike(obj, tScene = obj) {
+    try { sweepCityWind(obj); } catch (e) { /* cây phố chưa đủ dữ liệu — world3d quét lại sau */ } // vá gió v2 + vật liệu bóng TRƯỚC khi biên dịch (world3d quét mỗi 2 s → sau làm nóng: khoá ':w2' / ':depth' biên dịch lúc vẽ)
+    const hidden = []; obj.traverse((o) => { if (!o.visible) { hidden.push(o); o.visible = true; } });
+    const prev = renderer.getRenderTarget();
+    let p, pd = null;
+    try {
+      if (composer) renderer.setRenderTarget(composer.readBuffer); p = renderer.compileAsync(obj, camera, tScene);
+      if (renderer.shadowMap.enabled && !globalThis.__noDepthWarm) { renderer.setRenderTarget(depthRT); pd = renderer.compileAsync(depthProxies(obj), camera, tScene); }
+    } finally { renderer.setRenderTarget(prev); for (const o of hidden) o.visible = false; }
+    return pd ? Promise.all([p, pd]) : p;
+  }
   setWarmup(async (obj) => {
-    await renderer.compileAsync(obj, camera, scene);
+    await compileLike(obj, scene);
     await uploadTextures(obj);
   });
 
@@ -1577,11 +1626,11 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     // trời / môi trường PMREM / sương / mặt trời phải có TRƯỚC khi biên dịch — thiếu environment lúc
     // biên dịch thì khung đầu tiên sau màn nạp sẽ biên dịch lại toàn bộ vật liệu (khựng ~250 ms)
     applyTime(new Date());
-    await renderer.compileAsync(scene, camera);
+    await compileLike(scene, scene);
     // vật liệu dùng chung chỉ được gán về sau (hoa đào nở theo mùa, đèn, mái…) — biên dịch luôn bây giờ
     const spare = new THREE.Group(), boxG = new THREE.BoxGeometry();
     for (const m of Object.values(mats)) if (m?.isMaterial) { const o = new THREE.Mesh(boxG, m); o.castShadow = o.receiveShadow = true; spare.add(o); }
-    await renderer.compileAsync(spare, camera, scene);
+    await compileLike(spare, scene);
     boxG.dispose();
     await uploadTextures(scene, 10);
     // vẽ nháp: bản đồ bóng, PMREM, bộ đệm hậu kỳ khởi tạo xong khi màn còn che
@@ -1616,10 +1665,11 @@ export function create3D(canvas, { onTap, reduced = false } = {}) {
     prepareRoom: (key) => roomsB.prepare(key),
     rebuildRoom: (key) => { roomsB.rebuild(key); const m = /^est:(\d+)$/.exec(key || ''); if (m) mansionsB.refurnish(Number(m[1])); },
     mansions: mansionsB, // gỡ lỗi
+    prefetchAt: (x, z) => mansionsB.prefetch?.(x, z), // dựng sẵn biệt phủ quanh điểm đến (main.travelTo)
     raze: RZ, // phá hủy công trình ngoài thành (main.js)
     rooms: roomsB, // gỡ lỗi
     setEstateOwner, setEstateLookup, // biển nhà rao bán / tên chủ nhà ngoài phố
-    warmScene: () => { absorbLights(); return renderer.compileAsync(scene, camera); },
+    warmScene: () => { absorbLights(); return compileLike(scene, scene); },
     scene, // kiểm thử / gỡ lỗi
     initErrors, // phần cảnh bị bỏ vì lỗi (v4)
     resize,

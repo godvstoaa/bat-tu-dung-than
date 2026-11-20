@@ -15,7 +15,7 @@ export const U = 1.6; // 1 ô lưới = 1,6 m (toạ độ ô của người ch�
 export const toTile = (x, z) => ({ x: x / U + 10, y: z / U + 7 });
 
 // Tường bao (mép trong) và cổng
-export const COURT = { x0: -60, x1: 60, z0: -66, z1: 66, wall: 1.4, wallH: 6.5, gateS: 5, gateN: 3.5 };
+export const COURT = { x0: -60, x1: 60, z0: -66, z1: 66, wall: 1.4, wallH: 5.0, gateS: 5, gateN: 3.5 };
 export const inCourt = (x, z) => x > COURT.x0 - 1 && x < COURT.x1 + 1 && z > COURT.z0 - 1 && z < COURT.z1 + 1;
 
 // Nền đá (mặt trên ở top). Bậc: dải [x0, x1] dọc trục, từ z «from» lên z «to».

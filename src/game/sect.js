@@ -16,6 +16,15 @@ import { addSolidRect as addSolidRectLocal } from './obstacles.js';
 import { COURT, TERRACES, STAIRS, PONDS, MAIN_HALL, TANGY } from './court.js';
 import { SETS, ITEM } from './cosmetics.js';
 import { stoneMaterial } from './ground-tex.js';
+import { shanmen, buildWalls } from './archcity/gates.js';
+import { templeGroup } from './archcity/temple.js';
+import { archMats, boxUV, SPAN } from './archcity/mats.js';
+import { polyRoof, roofProfile } from './tienphu/arch/kit.js';
+const MDM = MD.materials();
+
+// sơn môn Nam (cổng chính, 3 vòm) + Hậu Môn (nhỏ hơn) — docs/CONG-TRINH-LAM-LAI-MANIFEST.md §3.1
+const SM_S = { W: 22, D: 7, Hb: 7.2, mid: [4.6, 5.8], side: [3.2, 4.5], title: '玄 觀' };
+const SM_N = { W: 15, D: 6, Hb: 6.2, mid: [3.6, 4.8], side: [2.4, 3.6], title: '後 山', tile: 'Gray' };
 
 const mk = (geo, mat, x, y, z, g, { ry = 0, rx = 0, shadow = true } = {}) => {
   const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); o.rotation.set(rx, ry, 0);
@@ -59,20 +68,19 @@ function balustrade(g, m, x0, z0, x1, z1, y, gaps = []) {
 // lục giác có 6 trụ (ánh đèn lọt qua khe), mái đá lục giác, búp đỉnh — đăng ký đèn điểm.
 // (Bản cũ: hộp vuông trắng + mái chóp đen sơn → trông như đèn nhựa.)
 function stoneLantern(g, m, x, z, y = 0, s = 1) {
+  // (2026-11-19) dáng tiện tròn mượt (lathe 16 cạnh) + mái đá lục giác cong vểnh góc (polyRoof) thay nón 6 cạnh
   const L = new THREE.Group(); L.position.set(x, y, z); L.scale.setScalar(s); g.add(L);
-  const cyl = (rt, rb, h, seg, mat, yy, o) => mk(new THREE.CylinderGeometry(rt, rb, h, seg), mat, 0, yy, 0, L, o);
-  cyl(0.5, 0.58, 0.2, 8, m.base, 0.1);
-  cyl(0.34, 0.44, 0.24, 8, m.marble, 0.32);
-  cyl(0.15, 0.2, 1.1, 10, m.marble, 0.99);
-  cyl(0.2, 0.15, 0.08, 10, m.marble, 1.28);
-  cyl(0.44, 0.3, 0.16, 6, m.marble, 1.62);
-  cyl(0.22, 0.22, 0.42, 6, m.lampGlow, 1.91, { shadow: false });
-  for (let k = 0; k < 6; k++) { const a = (k / 6) * Math.PI * 2 + Math.PI / 6; box(0.07, 0.46, 0.07, m.marble, Math.cos(a) * 0.29, 1.91, Math.sin(a) * 0.29, L, { ry: -a }); }
-  cyl(0.36, 0.36, 0.05, 6, m.marble, 2.16);
-  mk(new THREE.ConeGeometry(0.66, 0.42, 6), m.marble, 0, 2.39, 0, L);
-  mk(new THREE.SphereGeometry(0.1, 10, 8), m.marble, 0, 2.66, 0, L);
-  mk(new THREE.ConeGeometry(0.06, 0.2, 6), m.marble, 0, 2.82, 0, L);
-  addLight(x, y + 1.95 * s, z, { color: '#ffb35c', power: 1.1 });
+  const lt = (prof, seg, mat, yy) => mk(new THREE.LatheGeometry(prof.map(([r, h]) => new THREE.Vector2(r, h)), seg), mat, 0, yy, 0, L);
+  lt([[0.001, 0], [0.62, 0], [0.62, 0.16], [0.5, 0.22], [0.46, 0.36], [0.36, 0.44], [0.001, 0.44]], 8, m.base, 0);          // bệ bát giác
+  lt([[0.001, 0], [0.24, 0], [0.18, 0.12], [0.15, 0.55], [0.17, 0.85], [0.22, 0.95], [0.001, 0.95]], 16, m.marble, 0.44);    // thân tiện
+  lt([[0.001, 0], [0.2, 0], [0.44, 0.1], [0.46, 0.18], [0.001, 0.18]], 6, m.marble, 1.39);                                    // đài đỡ lục giác
+  mk(new THREE.CylinderGeometry(0.22, 0.22, 0.42, 6), m.lampGlow, 0, 1.79, 0, L, { shadow: false });
+  for (let k = 0; k < 6; k++) { const a = (k / 6) * Math.PI * 2 + Math.PI / 6; box(0.08, 0.46, 0.08, m.marble, Math.cos(a) * 0.3, 1.8, Math.sin(a) * 0.3, L, { ry: -a }); }
+  const prof = roofProfile(0.62, [[0.18, 0.18], 0.5, 0.9], 0, 8);
+  const r = polyRoof({ n: 6, ae: 0.62, yE: 2.04, prof, lift: 0.12, rib: 9, ribW: 0.05, thick: 0.08, rot: Math.PI / 6 });
+  mk(r.tiles, m.marble, 0, 0, 0, L); mk(r.eaveEdge, m.marble, 0, 0, 0, L);
+  lt([[0.001, 0], [0.09, 0], [0.13, 0.08], [0.1, 0.18], [0.04, 0.24], [0.06, 0.3], [0.001, 0.42]], 12, m.marble, r.top - 0.04); // búp đỉnh
+  addLight(x, y + 1.85 * s, z, { color: '#ffb35c', power: 1.1 });
   addFootprint(L, { base: y });
 }
 
@@ -80,8 +88,10 @@ function stoneLantern(g, m, x, z, y = 0, s = 1) {
 const WX_FLAG = ['#2f8f4a', '#c6301f', '#d29a2a', '#e8e2cf', '#2c5fb0'];
 function flag(g0, m, x, z, y, i) {
   const g = new THREE.Group(); g0.add(g);
-  box(0.24, 10, 0.24, m.dark, x, y + 5, z, g);
-  mk(new THREE.SphereGeometry(0.22, 10, 8), m.gold, x, y + 10.1, z, g);
+  mk(new THREE.CylinderGeometry(0.11, 0.15, 10, 14), MDM.son, x, y + 5, z, g);                                  // cột gỗ son tròn (chiếu ba mặt)
+  for (const sz of [-1, 1]) box(0.34, 1.3, 0.22, m.base, x, y + 0.65, z + sz * 0.2, g);                           // đá giáp cột 夹杆石
+  box(0.34, 0.12, 0.66, m.base, x, y + 1.36, z, g);
+  mk(new THREE.LatheGeometry([[0.001, 0], [0.14, 0], [0.2, 0.12], [0.12, 0.26], [0.16, 0.4], [0.05, 0.58], [0.001, 0.72]].map(([r, h]) => new THREE.Vector2(r, h)), 12), m.gold, x, y + 10, z, g);
   box(1.6, 0.12, 0.12, m.gold, x + 0.75, y + 9.6, z, g);
   const cloth = new THREE.MeshStandardMaterial({ color: WX_FLAG[i % 5], roughness: 0.85, side: THREE.DoubleSide });
   const b = mk(new THREE.PlaneGeometry(1.4, 5.2, 1, 6), cloth, x + 0.8, y + 6.9, z, g, { ry: Math.PI / 2 });
@@ -101,6 +111,15 @@ let bigHook = null; // render3d: công trình lớn che camera thì làm mờ
  * Dựng sơn môn. Trả { root, pickables[] } — mặt sân + nền đá cho raycast chọn điểm đi.
  * Model Meshy nạp bất đồng bộ (không chặn khung hình đầu).
  */
+/** cây sân sơn môn (render3d trồng bằng archcity/trees.cityTrees): du tùng dọc tường Đông / Tây + hàng Bắc, anh đào quanh hai cánh */
+export const COURT_TREES = (() => {
+  const out = [];
+  for (let z = -48; z <= 48; z += 12) for (const sx of [-1, 1]) if (z < -50 || z > -22) out.push({ kind: 'thongcn', x: sx * 57, z, s: 0.85 + ((z + 48) % 5) * 0.06 });
+  for (const x of [-44, -30, 30, 44]) out.push({ kind: 'thongcn', x, z: -61, s: 0.9 });
+  for (const [x, z] of [[-52, 30], [52, 30], [-24, 14], [24, 14], [-52, 46], [52, 46]]) out.push({ kind: 'sakura', x, z, s: 0.85 });
+  return out;
+})();
+
 export function buildSect(scene, { ripple, onBig = null }) {
   const root = new THREE.Group(); root.name = 'sect'; scene.add(root);
   const m = mats();
@@ -118,23 +137,12 @@ export function buildSect(scene, { ripple, onBig = null }) {
   mk(new THREE.TorusGeometry(8, 0.12, 6, 64), m.gold, 0, 0.03, 27.5, deco, { rx: Math.PI / 2, shadow: false });
   mk(new THREE.TorusGeometry(6.6, 0.08, 6, 64), m.gold, 0, 0.03, 27.5, deco, { rx: Math.PI / 2, shadow: false });
 
-  // --- tường bao: chân đá, thân son, gờ vàng, mái ngói
-  const T = COURT.wall, H = COURT.wallH;
-  const wall = (x0, z0, x1, z1) => {
-    const len = Math.hypot(x1 - x0, z1 - z0); if (len < 0.5) return;
-    const x = (x0 + x1) / 2, z = (z0 + z1) / 2, ry = -Math.atan2(z1 - z0, x1 - x0);
-    box(len, 1.2, T + 0.3, m.base, x, 0.6, z, deco, { ry });
-    box(len, H - 1.2, T, m.plaster, x, 1.2 + (H - 1.2) / 2, z, deco, { ry });
-    box(len, 0.2, T + 0.1, m.gold, x, H - 0.4, z, deco, { ry, shadow: false });
-    const r = MD.roof(len + 0.8, T + 2.2, 0.9, { upturn: 0.12 }); r.position.set(x, H, z); r.rotation.y = ry; deco.add(r);
-    // trụ gạch mỗi 10 m
-    const n = Math.floor(len / 10);
-    for (let k = 1; k < n; k++) { const t = k / n; box(1.0, H - 0.6, T + 0.5, m.base, x0 + (x1 - x0) * t, (H - 0.6) / 2, z0 + (z1 - z0) * t, deco, { ry }); }
-  };
+  // --- tường bao (docs/CONG-TRINH-LAM-LAI-MANIFEST.md §3.1): chân đá + thân trát đỏ + gờ gạch + nắp ngói hai mái, cao 5 m —
+  //     vật liệu lặp theo mét (archcity/mats.js); nối kín vào hồi sơn môn (Nam rộng 22 → |x| ≥ 11; Hậu Môn 15 → |x| ≥ 7,5)
+  const T = COURT.wall;
   const xo = COURT.x0 - T / 2, xe = COURT.x1 + T / 2, zn = COURT.z0 - T / 2, zs = COURT.z1 + T / 2;
-  wall(xo, zn, xo, zs); wall(xe, zn, xe, zs);
-  wall(xo, zs, -COURT.gateS - 6, zs); wall(COURT.gateS + 6, zs, xe, zs);
-  wall(xo, zn, -COURT.gateN - 4, zn); wall(COURT.gateN + 4, zn, xe, zn);
+  const walls = buildWalls([[xo, zn, xo, zs], [xe, zn, xe, zs], [xo, zs, -SM_S.W / 2, zs], [SM_S.W / 2, zs, xe, zs], [xo, zn, -SM_N.W / 2, zn], [SM_N.W / 2, zn, xe, zn]], { T, H: COURT.wallH });
+  root.add(walls);
 
   // --- nền đá hai tầng
   for (const t of TERRACES) {
@@ -213,6 +221,9 @@ export function buildSect(scene, { ripple, onBig = null }) {
   root.userData.manq = manq;
   addSolidRectLocal(TANGY.x - 2.4, TANGY.z - 0.2, TANGY.x + 2.4, TANGY.z + 0.6);
   addGlow(m.lampGlow, { base: 0.4, night: 2.6, color: '#ffb050' });
+  // (2026-11-19) nền đá / bậc / lan can / đèn đá: vật liệu lặp theo mét (đá khối, cẩm thạch) thay texture canvas kéo theo hộp
+  { const A = archMats(), swap = new Map([[m.terrace, A.stone], [m.base, A.stone], [m.marble, A.marble], [m.top, A.floor]]);
+    deco.traverse((o) => { if (!o.isMesh || Array.isArray(o.material) || !swap.has(o.material)) return; const t = swap.get(o.material); o.geometry = boxUV(o.geometry, { span: SPAN[t.userData.tiled], index: true }); o.material = t; }); }
   span('sect:merge', () => MD.mergeStatic(deco));
 
   // --- model Meshy (bất đồng bộ) — tất cả vào lưới va chạm theo hình khối
@@ -222,37 +233,26 @@ export function buildSect(scene, { ripple, onBig = null }) {
     // keep là toạ độ THẾ GIỚI theo mét (collide.js:178) nên KHÔNG co hệ số 14/30: khe |x|>3,4
     // giữ nguyên = lối đi 6,8 m thông suốt (CHỐT gạch 5 của duyệt).
     const big = (r) => { if (r?.obj && bigHook) bigHook(r.obj); return r; };
-    big(await solid(await placeModel(root, 'gate_sect', { fit: { width: 14 }, at: { x: 0, y: 0, z: COURT.z1 + 1.2, ry: 0 } }), { keep: (x) => Math.abs(x) > 3.4 }));
-    big(await solid(await placeModel(root, 'gate_sect', { fit: { width: 14 }, at: { x: 0, y: 0, z: COURT.z0 - 1.2, ry: Math.PI } }), { keep: (x) => Math.abs(x) > 2.3 }));
-    // Chính Đường trên tầng 2 — lùi lại nếu mặt tiền lấn tới bệ thầy
-    const hall = await placeModel(root, 'palace_grand', { fit: { width: MAIN_HALL.w }, at: { x: MAIN_HALL.x, y: 4, z: MAIN_HALL.z, ry: 0 } });
-    if (hall) {
-      const b = new THREE.Box3().setFromObject(hall.obj);
-      if (b.max.z > -16) { hall.obj.position.z -= b.max.z + 16; hall.obj.updateMatrixWorld(true); }
-      addFootprint(hall.obj, { base: 4 });
-      big(hall);
+    // §3.1 (2026-11-19): sơn môn dựng thủ tục thay gate_sect Meshy (14 × 8,2 m, 36 px/m) — Nam 22 × ~13 m, Hậu Môn 15 m
+    for (const [S, z, ry, keepX] of [[SM_S, COURT.z1 + T / 2, 0, SM_S.mid[0] / 2 - 0.2], [SM_N, COURT.z0 - T / 2, Math.PI, SM_N.mid[0] / 2 - 0.2]]) {
+      const { group } = shanmen(S); group.position.set(0, 0, z); group.rotation.y = ry; root.add(group);
+      addFootprint(group, { keep: (x) => Math.abs(x) > keepX });
+      if (bigHook) bigHook(group);
     }
-    // quầy Thợ May Tiên Y (Tàng Y Các)
-    await solid(await placeModel(root, 'lib_wood_pavilion', { hd: false, fit: { width: 6.2 }, at: { x: TANGY.x, y: 0, z: TANGY.z - 1.4, ry: 0 } }));
+    // (2026-11-19, docs/CONG-TRINH-LAM-LAI-MANIFEST.md goal 2) công trình sân dựng thủ tục (archcity/temple.js) thay Meshy mờ:
+    //   Chính Đường 9 gian ngói vàng · điện phụ 5 gian · chung / cổ lâu 2 tầng · tháp bát giác 5 tầng (Bắc) / vuông 3 tầng (Nam) · đình Tàng Y
+    const put = (id, x, y, z, ry, opts = {}) => { const o = templeGroup(id).clone(); o.position.set(x, y, z); o.rotation.y = ry; root.add(o); addFootprint(o, opts); return o; };
+    big({ obj: put('main', MAIN_HALL.x, 4, MAIN_HALL.z, 0, { base: 4 }) });
+    put('kiosk', TANGY.x, 0, TANGY.z - 1.6, 0);
     // Đại Đỉnh giữa sân
     await solid(await placeModel(root, 'cauldron', { fit: { height: 5.5 }, at: { x: 0, y: 0, z: 27.5, ry: 0 } }));
-    // điện phụ Đông / Tây, lầu chuông / lầu trống (quay vào trục)
     for (const sx of [-1, 1]) {
-      big(await solid(await placeModel(root, 'hall_main', { fit: { width: 22 }, at: { x: sx * 47, y: 0, z: -36, ry: -sx * Math.PI / 2 } })));
-      big(await solid(await placeModel(root, 'lib_pavilion2', { hd: false, fit: { width: 12 }, at: { x: sx * 47, y: 0, z: -9, ry: -sx * Math.PI / 2 } })));
+      big({ obj: put('side', sx * 47, 0, -36, -sx * Math.PI / 2) });
+      big({ obj: put('bell', sx * 47, 0, -9, -sx * Math.PI / 2) });
+      put('pagodaN', sx * 53, 0, -58, Math.PI / 8);
+      put('pagodaS', sx * 53, 0, 58, 0);
     }
-    // bảo tháp bốn góc
-    for (const sx of [-1, 1]) {
-      await solid(await placeModel(root, 'lib_pagoda5', { hd: false, fit: { height: 26 }, at: { x: sx * 53, y: 0, z: -58, ry: 0 } }));
-      await solid(await placeModel(root, 'lib_pagoda_red', { hd: false, fit: { height: 20 }, at: { x: sx * 53, y: 0, z: 58, ry: 0 } }));
-    }
-    // cây: tùng dọc tường Đông/Tây, đào nở quanh hai cánh
-    const pines = [];
-    for (let z = -48; z <= 48; z += 12) for (const sx of [-1, 1]) if (z < -50 || z > -22) pines.push({ x: sx * 57, y: 0, z, ry: z * 0.37, s: 11 });
-    for (const x of [-44, -30, 30, 44]) pines.push({ x, y: 0, z: -61, ry: x, s: 10 });
-    const pg = await instanceModel(root, 'tree_pine', pines); if (pg) addFootprint(pg, { hi: 1.3, ground: () => 0, fill: false });
-    const bl = await instanceModel(root, 'tree_peach', [[-52, 30], [52, 30], [-24, 14], [24, 14], [-52, 46], [52, 46]].map(([x, z], i) => ({ x, y: 0, z, ry: i * 1.3, s: 7 })));
-    if (bl) addFootprint(bl, { hi: 1.3, ground: () => 0, fill: false });
+    // cây sân: chuyển sang render3d (archcity/trees.js — model lib_tp_* thay tree_pine / tree_peach cũ), xem COURT_TREES
   })().catch((e) => console.warn('[sect]', e));
 
   // `loaded`: mọi mô hình Meshy của sơn môn đã đặt xong (màn nạp chờ, có giới hạn thời gian)

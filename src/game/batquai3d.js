@@ -4,6 +4,8 @@
 //  giếng), đèn lồng, nhà vườn, cây. landmarks.js gọi: octWall, cityGates, buildDistrict.
 // ============================================================================
 import * as THREE from 'three';
+import { buildCityWall, cornerTower, cityGateTower } from './archcity/citywall.js';
+import { landmarkGroup, LANDMARK_SPECS } from './archcity/landmarks.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { lotusLife, waterSurface } from './lotus.js';
 import * as T from './terrain.js';
@@ -123,40 +125,39 @@ export const mats = () => wallMats || (wallMats = {
 export function octWall(g) {
   const M = mats();
   for (const b of BQ.octWallBlocks()) addBlock(b.x, b.z, b.r);
-  // gộp thành 3 lưới (thân / mũ / lỗ châu mai) — trước đây ~320 mesh rời = ~110 lệnh vẽ ở phố Nội Thành (đo 2026-11-12)
-  const segGeo = [], capGeo = [], merGeo = [];
-  const box = (w, hh, d, x, y, z, ry, list) => { const b = new THREE.BoxGeometry(w, hh, d); b.rotateY(ry); b.translate(x, y, z); list.push(b); };
+  // (2026-11-19, docs/CONG-TRINH-LAM-LAI-MANIFEST.md đợt 2) tường gạch xanh chân đá, răng cưa ngoài + tường nữ trong, UV theo mét;
+  //   giác lâu 2 tầng trên mã diện góc thay «trụ + nón + quả cầu vàng»
+  const segs = [];
   for (const s of BQ.wallSegments()) {
     const ex = s.b.x - s.a.x, ez = s.b.z - s.a.z, L = Math.hypot(ex, ez), n = Math.max(1, Math.ceil(L / 10));
-    const ry = Math.atan2(-ez, ex), len = L / n + 0.5;
+    const ry = Math.atan2(-ez, ex), len = L / n;
+    // mặt ngoài +z cục bộ phải quay ra ngoài thành: pháp tuyến (−sin ry? ) — đổi chiều đoạn nếu cần
+    const cx0 = (s.a.x + s.b.x) / 2, cz0 = (s.a.z + s.b.z) / 2, nxo = Math.sin(ry), nzo = Math.cos(ry);
+    const flip = nxo * cx0 + nzo * cz0 < 0 ? Math.PI : 0;
     for (let i = 0; i < n; i++) {
       const t = (i + 0.5) / n, cx = s.a.x + ex * t, cz = s.a.z + ez * t, y = H(cx, cz);
-      box(len, BQ.WALL_H, BQ.WALL_T, cx, y + BQ.WALL_H / 2 - 1, cz, ry, segGeo);
+      segs.push({ L: len + 0.02, x: cx, y, z: cz, ry: ry + flip });
       addTall(cx, cz, len / 2, BQ.WALL_T / 2 + 0.3, ry, y + BQ.WALL_H - 1); // độ cao tường cho va chạm (không khai → nhảy xuyên)
-      box(len, 1.4, BQ.WALL_T + 1.4, cx, y + BQ.WALL_H - 0.3, cz, ry, capGeo);
-      for (const k of [-0.3, 0.3]) box(1.6, 1.6, 1.1, cx + Math.cos(ry) * k * len, y + BQ.WALL_H + 1, cz - Math.sin(ry) * k * len, ry, merGeo); // lỗ châu mai
     }
   }
-  for (const [list, mat, shadow] of [[segGeo, M.wall, true], [capGeo, M.cap, false], [merGeo, M.wall, false]]) {
-    if (!list.length) continue;
-    const geo = mergeGeometries(list, false); list.forEach((q) => q.dispose());
-    const o = new THREE.Mesh(geo, mat); o.castShadow = shadow; o.receiveShadow = true; g.add(o);
-  }
-  // tháp góc bát giác ở 8 đỉnh: thân đá, lầu gỗ đỏ, mái ngói
+  g.add(buildCityWall(segs, { H: BQ.WALL_H, T: BQ.WALL_T }));
+  // giác lâu ở 8 đỉnh: mã diện vuông 16 m quay theo phân giác góc
+  const ct = cornerTower({ S: 16, H: BQ.WALL_H });
   for (const p of BQ.octVertices()) {
-    const y = H(p.x, p.z);
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(6.2, 6.8, 20, 8), M.wall); body.position.set(p.x, y + 9, p.z); body.rotation.y = Math.PI / 8; body.castShadow = true; g.add(body);
-    const lau = new THREE.Mesh(new THREE.CylinderGeometry(4.6, 4.6, 4.2, 8), M.red); lau.position.set(p.x, y + 21.1, p.z); lau.rotation.y = Math.PI / 8; lau.castShadow = true; g.add(lau);
-    const roof = new THREE.Mesh(new THREE.ConeGeometry(7.4, 4.6, 8), M.roof); roof.position.set(p.x, y + 25.5, p.z); roof.rotation.y = Math.PI / 8; roof.castShadow = true; g.add(roof);
-    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.6, 10, 8), M.gold); tip.position.set(p.x, y + 28.2, p.z); g.add(tip);
-    addBlock(p.x, p.z, 6.8);
+    const o = ct.group.clone(); o.position.set(p.x, H(p.x, p.z), p.z); o.rotation.y = Math.atan2(p.x, p.z) + Math.PI / 4; g.add(o);
+    addBlock(p.x, p.z, 8.5);
   }
 }
+const GATE_TPL = new Map();
 export async function cityGates(g) {
   for (const gg of BQ.GUA) {
     const p = BQ.toWorld(gg, BQ.OCT_A, 0), ry = BQ.faceAxis(gg, true);
-    const ids = gg.id === 'kan' ? ['gate_sect'] : ['city_gate', 'gate_sect'];
-    await place(g, ids, { fit: { width: BQ.gateWidth(gg) }, at: { x: p.x, y: H(p.x, p.z), z: p.z, ry }, keep: corridor(p.x, p.z, ry, 5) });
+    // lầu cổng thành dựng thủ tục thay city_gate Meshy (40–64 m rộng, cao tới 49 m trên tường 14 m, mờ) — đài cổng gạch + lầu 2 tầng
+    const W = BQ.gateWidth(gg), key = W >= 60 ? 'big' : String(W);
+    if (!GATE_TPL.has(key)) GATE_TPL.set(key, cityGateTower({ W, D: 14, H: BQ.WALL_H, big: W >= 60 }));
+    const T0 = GATE_TPL.get(key), o = T0.group.clone();
+    o.position.set(p.x, H(p.x, p.z), p.z); o.rotation.y = ry; g.add(o);
+    addFootprint(o, { keep: corridor(p.x, p.z, ry, T0.info.gap / 2 - 0.4) });
   }
 }
 
@@ -309,7 +310,11 @@ export async function buildDistrict(grp, g, { lanternPosts, solidTrees }) {
   const D = BQ.DISTRICTS[g.id];
   for (const b of D.buildings) {
     const w = BQ.toWorld(g, b.u, b.v);
-    await place(grp, b.model, { fit: b.fit, at: { x: w.x, y: H(w.x, w.z), z: w.z, ry: ryOf(g, b) } });
+    // (2026-11-19) công trình mốc dựng thủ tục (archcity/landmarks.js) thay Meshy bq_* mờ; mẫu chưa có đặc tả (bảo tháp, đan lô) giữ model cũ
+    const pid = b.model.find((id) => LANDMARK_SPECS[id]);
+    const tpl = pid && landmarkGroup(pid);
+    if (tpl) { const o = tpl.clone(); o.position.set(w.x, H(w.x, w.z), w.z); o.rotation.y = ryOf(g, b); grp.add(o); addFootprint(o); }
+    else await place(grp, b.model, { fit: b.fit, at: { x: w.x, y: H(w.x, w.z), z: w.z, ry: ryOf(g, b) } });
     const bs = BQ.boardSpot(b);
     if (bs) {
       const p = BQ.toWorld(g, bs.u, bs.v);
